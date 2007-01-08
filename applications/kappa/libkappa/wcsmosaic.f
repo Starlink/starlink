@@ -21,10 +21,19 @@
 
 *  Description:
 *     This application aligns and rebins a group of input NDFs into a
-*     single output NDF.
+*     single output NDF. It differs from WCSALIGN in both the algorithm
+*     used, and in the requirements placed on the input NDFs. WCSMOSAIC
+*     requires that the transformation from pixel to WCS co-ordinates
+*     be defined in each input NDF, but (unlike WCSALIGN) the inverse 
+*     transformation from WCS to pixel co-ordinates need not be defined.
+*     For instance, this means that WCSMOSAIC can process data in which 
+*     the WCS position of each input pixel is defined via a look-up-table 
+*     rather than an analytical expression. Note however, that the WCS
+*     information in the reference NDF (see parameter REF) must have a defined 
+*     inverse transformation.
 *
-*     The algorithm proceeds as follows.  First, the output NDF is
-*     filled with zeros.  An associated array of weights (one weight for
+*     The WCSMOSAIC algorithm proceeds as follows.  First, the output NDF 
+*     is filled with zeros.  An associated array of weights (one weight for
 *     each output pixel) is created and is also filled with zeros.  Each
 *     input NDF is then processed in turn.  For each pixel in the
 *     current input NDF, the corresponding transformed position in the
@@ -211,7 +220,9 @@
 *     REF = NDF (Read)
 *        The NDF to which all the input NDFs are to be aligned.  If a
 *        null value is supplied for this parameter, the first NDF
-*        supplied for parameter IN is used.
+*        supplied for parameter IN is used. The WCS Information in this 
+*        NDF must have a defined inverse transformation (from WCS
+*        co-ordinates to pixel co-ordinates).
 *     UBND() = _INTEGER (Read)
 *        An array of values giving the upper pixel-index bound on each
 *        axis for the output NDF.  The suggested default values just
@@ -282,6 +293,9 @@
 *        Added ILEVEL.
 *     2006 April 12 (MJC):
 *        Remove unused variables.
+*     8-JAN-2007 (DSB):
+*        Modified the prologue to clarify the need for an inverse
+*        WCS transformation in the reference NDF.
 *     {enter_further_changes_here}
 
 *-
