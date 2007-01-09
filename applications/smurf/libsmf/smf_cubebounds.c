@@ -104,6 +104,9 @@
 *        using parameter SPECBOUNDS.
 *     1-DEC-2006 (DSB):
 *        Correct memory leak.
+*     9-JAN-2007 (DSB):
+*        Determine the pixel index bounds of the spectral axis in the
+*        same way for both autogrid and non-autogrid mode.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -662,22 +665,20 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
 /* We now add a GRID Frame in the output WCS FrameSet and calculates the
    bounds of the cube in this frame. If an optimal grid is being used, we 
-   want to retain the fractional pixel offset supplied in par[0]. */
+   want to retain the fractional pixel offset supplied in par[0]. We
+   do the spatial and spectral axes separately. First do the spatial axes. */
    if( autogrid ) {
 
 /* Find the indices of the pixels containing the DLBND and DUBND points. */
       lbnd[ 0 ] = NINT( dlbnd[ 0 ] );
       lbnd[ 1 ] = NINT( dlbnd[ 1 ] );
-      lbnd[ 2 ] = NINT( dlbnd[ 2 ] );
       ubnd[ 0 ] = NINT( dubnd[ 0 ] );
       ubnd[ 1 ] = NINT( dubnd[ 1 ] );
-      ubnd[ 2 ] = NINT( dubnd[ 2 ] );
 
 /* Find the integer pixel shifts needed to put the lower bounds at pixel
    (1,1,1). */
       shift[ 0 ] = 1 - lbnd[ 0 ];
       shift[ 1 ] = 1 - lbnd[ 1 ];
-      shift[ 2 ] = 1 - lbnd[ 2 ];
 
 /* Modify the bounds to put the origin at the centre */
       ishift = 1 + ( ubnd[ 0 ] + lbnd[ 0 ] )/2;
@@ -688,11 +689,6 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       lbnd[ 1 ] -= ishift;
       ubnd[ 1 ] -= ishift;
    
-      ishift = 1 + ( ubnd[ 2 ] + lbnd[ 2 ] )/2;
-      lbnd[ 2 ] -= ishift;
-      ubnd[ 2 ] -= ishift;
-
-
 /* Otherwise, we mimick the quick look cube creation tool. */
    } else {
 
@@ -707,16 +703,11 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       lbnd[ 0 ] = NINT( dlbnd[ 0 ] + shift[ 0 ] );
       ubnd[ 0 ] = NINT( dubnd[ 0 ] + shift[ 0 ] );
 
-/* Do the same for the other 2 axes. */
+/* Do the same for the second spatial axis. */
       npix = 1 + (int)( dubnd[ 1 ] - dlbnd[ 1 ] );
       shift[ 1 ] = 0.5*( 1 + npix - dlbnd[ 1 ] - dubnd[ 1 ] );
       lbnd[ 1 ] = NINT( dlbnd[ 1 ] + shift[ 1 ] );
       ubnd[ 1 ] = NINT( dubnd[ 1 ] + shift[ 1 ] );
-
-      npix = 1 + (int)( dubnd[ 2 ] - dlbnd[ 2 ] );
-      shift[ 2 ] = 0.5*( 1 + npix - dlbnd[ 2 ] - dubnd[ 2 ] );
-      lbnd[ 2 ] = NINT( dlbnd[ 2 ] + shift[ 2 ] );
-      ubnd[ 2 ] = NINT( dubnd[ 2 ] + shift[ 2 ] );
 
 /* Modify the bounds to put the origin in the middle, using the same method as
    the on-line system (this relies on integer division). */
@@ -727,12 +718,25 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       ishift = 2 + ( ubnd[ 1 ] - lbnd[ 1 ] )/2;
       lbnd[ 1 ] -= ishift;
       ubnd[ 1 ] -= ishift;
-   
-      ishift = 2 + ( ubnd[ 2 ] - lbnd[ 2 ] )/2;
-      lbnd[ 2 ] -= ishift;
-      ubnd[ 2 ] -= ishift;
-
    }
+
+/* Now do the spectral axis. Find the number of pixels needed to span the
+   Z pixel axis range. */
+   npix = 1 + (int)( dubnd[ 0 ] - dlbnd[ 0 ] );
+
+/* Find a fractional pixel shift which puts the mid point of the axis
+   range at the mid point of a span of "npix" pixels. */
+   shift[ 2 ] = 0.5*( 1 + npix - dlbnd[ 2 ] - dubnd[ 2 ] );
+
+/* Find the upper and lower integer bounds after applying this shift. */
+   lbnd[ 2 ] = NINT( dlbnd[ 2 ] + shift[ 2 ] );
+   ubnd[ 2 ] = NINT( dubnd[ 2 ] + shift[ 2 ] );
+
+/* Modify the bounds to put the origin in the middle, using the same method as
+   the on-line system (this relies on integer division). */
+   ishift = 2 + ( ubnd[ 2 ] - lbnd[ 2 ] )/2;
+   lbnd[ 2 ] -= ishift;
+   ubnd[ 2 ] -= ishift;
 
 /* Now apply the shift to the PIXEL Frame to get the GRID Frame. Remember the 
    index of the WCS Frame so we can re-instate it after adding in the new 
