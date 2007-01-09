@@ -96,6 +96,11 @@
  *                           2x2, not nx2 or 2xn.
  *                 19/12/05  Undo change that removed LockMask in motionNotify.
  *                           I think that's a handy feature.
+ *                 08/01/07  Change isclear to check for RTD_BLANK as the 
+ *                           OBJECT value, don't use the size at all. 
+ *                           Change processMotionEvent to work for images
+ *                           of all sizes (including blank ones). One
+ *                           pixel images are possible in cube sections.
  */
 static const char* const rcsId="@(#) $Id: RtdImage.C,v 1.3 2005/02/02 01:43:03 brighton Exp $";
 
@@ -1818,8 +1823,7 @@ void RtdImage::motionProc(ClientData clientData)
  */
 void RtdImage::processMotionEvent()
 {
-    if (image_ && xImage_ && xImage_->data() && 
-        ! ( image_->width() <= 2 && image_->height() <= 2 ) ) {
+    if (image_ && xImage_ && xImage_->data() ) {
 	double x = motionX_, y = motionY_;
 
 	screenToImageCoords(x, y, 0);
@@ -2066,10 +2070,18 @@ ImageData* RtdImage::makeImage(ImageIO imio)
 
 /*
  * Return true if no image is loaded.
+ * 
+ * PWD: don't use image size (of 2x2), use OBJECT "RTD_BLANK" value instead.
  */
 int RtdImage::isclear()
 {
-    return (!image_ || (image_->width() <= 2 && image_->height() <= 2));
+    if ( image_ ) {
+        const char *object = image_->object();
+        if ( ! object || object && strcmp( "RTD_BLANK", object ) != 0  ) {
+            return 0;
+        }
+    }
+    return 1;
 }
 
 /*
