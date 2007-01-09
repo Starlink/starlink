@@ -17,6 +17,8 @@
 * Peter W. Draper 14/11/05 Merge my RtdImage changes.
 * Peter W. Draper 26/10/06 Change mbandCmd so that clipping happens in 
 *                          centre of last pixel, not previous pixel.
+*                 08/01/07 Mark blank images with an OBJECT keyword
+*                          with value RTD_BLANK. Do not use image size.
 */
 
 /************************************************************************
@@ -570,8 +572,14 @@ int RtdImage::clearCmd(int argc, char* argv[])
     // generate the blank image
     FitsIO* fits = FitsIO::blankImage(ra, dec, equinox, radius, width, height,
 				      colors_->pixelval(0));
-    if (fits) 
+    if (fits) {
 	image_ = makeImage(fits);
+
+        // mark a blank image so we can identify it.
+        if ( width == 2 && height == 2 ) {
+            image_->object( "RTD_BLANK" );
+        }
+    }
 
     //  restore transformations, cut levels, etc from the previous image
     if (image_)
