@@ -829,7 +829,7 @@ itcl::class gaia::GaiaPolDisp {
 
 #  Check that no image is displayed, including blank images created by
 #  this class.
-      if {"[get_image_name]" == "" && [$rtdimage_ width] < 10 && \
+      if { [$rtdimage_ isclear] && \
            ![info exists blankref_($rtdimage_)] } {
 
 #  Create the blank image large enough for the area covered by the
