@@ -31,6 +31,11 @@
  *                           to the FitsIO class. The actual effect
  *                           of the setHDU member is left to the
  *                           implementation (this switches HDU for FitsIO).
+ * Peter W. Draper 08/01/07  Comment out isclear() methods. Not used and
+ *                           no longer reflect how a blank image is detected
+ *                           (if resurrected need to add and then check for
+ *                           RTD_BLANK value in OBJECT card to match behaviour
+ *                           in RTD, or add a member for blankness).
  */
 
 #include <iostream>
@@ -162,7 +167,8 @@ public:
 
     // Return true if no image is loaded (a 2x2 pixel or smaller
     // image is considered blank).
-    virtual int isclear() const {return width_ <= 2 && height_ <= 2;}
+    // PWD: unsafe function. This is not true.
+    //virtual int isclear() const {return width_ <= 2 && height_ <= 2;}
 
     // create a copy, as lightweight as possible.
     virtual ImageIORep *copy() = 0;
@@ -313,7 +319,8 @@ public:
     int status() const {return rep_ ? rep_->status() : 1;}
 
     // Return true if no image is loaded.
-    int isclear() const {return rep_->isclear();}
+    // PWD: see ImageIORep.
+    //int isclear() const {return rep_->isclear();}
 
     // return a pointer to the internal class
     ImageIORep* rep() const {return rep_;}

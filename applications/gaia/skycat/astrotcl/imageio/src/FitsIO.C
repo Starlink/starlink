@@ -22,6 +22,8 @@
  * pbiereic        20/07/04  use %20 field width for keywords in methods put_keyword,
  *                           so that other tools like xv, ds9, fv can read stored real-time
  *                           images.
+ * Peter W. Draper 08/01/07  Write "END" keyword to blank image headers stream.
+ *                           Previously written to buffer only.
  */
 static const char* const rcsId="@(#) $Id: FitsIO.C,v 1.5 2005/02/02 01:43:04 brighton Exp $";
 
@@ -543,6 +545,7 @@ FitsIO* FitsIO::blankImage(double ra, double dec, double equinox,
 
     char buf[81];
     sprintf(buf, "%-80s", "END"); // mark the end of the header
+    os << buf;
 
     strncpy((char*)header.ptr(), os.str().c_str(), header.length()); // write to shared memory
 
