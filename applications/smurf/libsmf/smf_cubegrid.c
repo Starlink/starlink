@@ -109,6 +109,8 @@
 *     8-JAN-2006 (DSB):
 *        Increase pixel size used if all points are co-incident, to avoid
 *        them spanning more than 1 pixel.
+*     9-JAN-2006 (DSB):
+*        Do not allow minimimum pixel size to be less than 0.1 arc-sec.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -593,9 +595,9 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    of 1x1 spatial pixels. The grid pixel sizes (par[4] and par[5]) are
    made twice the size of the area covered by the points in order to
    avoid points spanning two pixels. */
-      if( par[ 0 ] == AST__BAD ) {
+      if( par[ 0 ] == AST__BAD || nallpos < 3 ) {
          if( rdiam < 0.4*AST__DD2R/3600.0 ) {
-            if( rdiam < 0.01*AST__DD2R/3600.0 ) rdiam = 0.01*AST__DD2R/3600.0;
+            if( rdiam < 0.1*AST__DD2R/3600.0 ) rdiam = 0.1*AST__DD2R/3600.0;
             par[ 0 ] = 0.0;
             par[ 1 ] = 0.0;
             par[ 4 ] = -rdiam*2;
