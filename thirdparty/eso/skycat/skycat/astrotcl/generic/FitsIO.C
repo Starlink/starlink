@@ -22,7 +22,9 @@
  * pbiereic        20/07/04  use %20 field width for keywords in methods put_keyword,
  *                           so that other tools like xv, ds9, fv can read stored real-time
  *                           images.
- * Peter W. Draper 08/01/07  Write "END" keyword to blank image headers stream.
+ * Peter W. Draper 05/01/07  Set OBJECT card to value "RTD_BLANK" to determine
+ *                           that a blank image has been generated.
+ *                 08/01/07  Write "END" keyword to blank image headers stream.
  *                           Previously written to buffer only.
  */
 static const char* const rcsId="@(#) $Id: FitsIO.C,v 1.5 2005/02/02 01:43:04 brighton Exp $";
@@ -540,6 +542,9 @@ FitsIO* FitsIO::blankImage(double ra, double dec, double equinox,
 	put_keyword(os, "EQUINOX", 2000.0);      // default equinox 
 	put_keyword(os, "RADECSYS", "FK5");      // J2000...
     }
+
+    // add a keyword so we can determine this image is blank
+    put_keyword(os, "OBJECT", "RTD_BLANK");
 
     //put_keyword(os, "BLANK", (int)color0);   // blank pixel value
 
