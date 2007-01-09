@@ -491,6 +491,8 @@ itcl::class gaia::GaiaImageCtrl {
       if { $warn != {} } {
          set message \
             "Reading your image produced the following messages:\n\n$warn"
+      } else {
+         set message "No WCS warnings"
       }
       set existed [winfo exists $w_.astwarn]
       utilReUseWidget util::TextDialog $w_.astwarn \
