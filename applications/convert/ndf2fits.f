@@ -44,13 +44,20 @@
 *        This specifies the data type of the output FITS file.
 *        Permitted values are: 8 for unsigned byte, 16 for signed word,
 *        32 for integer, -32 for real, -64 for double precision.  There
-*        are two other special values.  BITPIX=0 will cause the output
-*        file to have the data type equivalent to that of the input
-*        NDF.  BITPIX=-1 requests that the output file has the data
-*        type corresponding to the value of the BITPIX keyword in the
-*        NDF's FITS extension.  If the extension or BITPIX keyword is
-*        absent, the output file takes the data type of the input
-*        array.
+*        are three other special values.  
+*
+*        -- BITPIX=0 will cause the output file to have the data type 
+*           equivalent to that of the input NDF.  
+*        -- BITPIX=-1 requests that the output file has the data
+*           type corresponding to the value of the BITPIX keyword in 
+*           the NDF's FITS extension.  If the extension or BITPIX 
+*           keyword is absent, the output file takes the data type of 
+*           the input array. 
+*        -- BITPIX="Native" requests that any scaled arrays in the
+*           NDF be copied to the scaled data type.  Otherwise behaviour
+*           reverts to BITPIX=-1, which may in turn be effectively
+*           BITPIX=0.  The case-insensitive value may be abbreviated 
+*           to "n".
 *
 *        BITPIX must be enclosed in double quotes and may be a list of 
 *        comma-separated values to be applied to each conversion in
@@ -103,7 +110,7 @@
 *        listed in the "World Co-ordinate Systems" section below.  In 
 *        addition, the value "Auto" may also be supplied, in which case 
 *        a suitable default encoding is chosen based on the contents of
-*        the NDFs FITS extension and WCS component.  ["Auto"]
+*        the NDF's FITS extension and WCS component.  ["Auto"]
 *     IN = LITERAL (Read)
 *        The names of the NDFs to be converted into FITS format.  It
 *        may be a list of NDF names or direction specifications
@@ -227,6 +234,17 @@
 *        has the global metadata from the .HEADER's FITS airlock.  The 
 *        four integrations in I1, I2, I3, and I4 components of the
 *        container file are converted to FITS IMAGE extensions.
+*     ndf2fits in=huge out=huge.fits comp=d bitpix=n
+*        This converts the NDF called huge to the FITS file called
+*        huge.fits.  The data type of the FITS primary data array 
+*        matches that of the NDF's scaled data array.  The scale and
+*        offset coefficients used to form the FITS array are also taken
+*        from the NDF's scaled array.
+*     ndf2fits in=huge out=huge.fits comp=d bitpix=-1
+*        As the previous example, except that the data type of the FITS 
+*        primary data array is that given by the BITPIX keyword in the
+*        FITS airlock of NDF huge and the scaling factors are
+*        determined.
 
 *  Notes:
 *     The rules for the conversion are as follows:
@@ -254,11 +272,12 @@
 *        SIMPLE, EXTEND, PCOUNT, GCOUNT --- all take their default
 *          values.
 *        BITPIX, NAXIS, NAXISn --- are derived directly from the NDF
-*          data array;
+*          data array; however the BITPIX in the FITS airlock extension
+*          is transferred when parameter BITPIX is -1.
 *        CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- are derived from
 *          the NDF WCS component if possible (see "World Co-ordinate
 *          Systems").  If this is not possible, and if PROFITS is TRUE, 
-*          then they are copied from the NDF FITS extension.
+*          then they are copied from the NDF's FITS extension.
 *        OBJECT, LABEL, BUNIT --- the values held in the NDF's title,
 *          label, and units components respectively are used if
 *          they are defined; otherwise any values found in the FITS
@@ -300,7 +319,7 @@
 *          regardless of whether or not there are bad values actually
 *          present in the array; this is for the same efficiency reasons
 *          as before.  The END card terminates the FITS header.
-*       HISTORY headers are propagated from the FITS extension when
+*       HISTORY headers are propagated from the FITS airlock when
 *          PROFITS is TRUE, and from the NDF history component when
 *          PROHIS is TRUE.
 *     -  Extension information may be transferred to the FITS file when
@@ -514,6 +533,10 @@
 *     2006 April 5 (MJC):
 *        Extended for multi-NDF container files, and UKIRT's format
 *        in particular.  Added CONTAINER and MERGE parameters.
+*     2007 January 5 (MJC):
+*        Allowed propagation of scaled arrays selected if BITPIX set to
+*        the new special value of Native.  Added examples of BITPIX
+*        special values.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -692,7 +715,7 @@
       CALL GRP_GRPSZ( IGRP3, NIFILE, STATUS )
 
 *  Report an error if the group is empty.
-      IF( NIFILE .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
+      IF ( NIFILE .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'NDF2FITS_NOFILES', 'NDF2FITS: No usable '//
      :                 'input '//ITEM( :NITC )//' supplied.', STATUS )
@@ -822,13 +845,15 @@
          GOOD = .TRUE.
 
 *  Validate the values.  First get each value, convert it to an integer,
-*  and then testing that is has one of the acceptable values (0,8,16,32,
-*  -32,-64).
+*  and then testing that is has one of the acceptable values (-1,0,1,8,
+*  16, 32,-32,-64).
          DO I = 1, NBP
             CALL GRP_GET( BPGRP, I, 1, CBP, STATUS )
-
+            CALL CHR_UCASE( CBP )
+            IF ( CBP( 1:1 ) .EQ. 'N' ) CBP = '1'
             CALL CHR_CTOI( CBP, BITPIX, STATUS )
-            IF ( ( BITPIX .NE. -1 .AND. MOD( BITPIX, 8 ) .NE. 0 )
+            IF ( ( BITPIX .NE. -1 .AND. BITPIX .NE. 1
+     :             .AND. MOD( BITPIX, 8 ) .NE. 0 )
      :           .OR. BITPIX .LT. -64 .OR. BITPIX .GT. 32
      :           .OR. STATUS .NE. SAI__OK ) THEN
 
@@ -844,7 +869,8 @@
                END IF
                CALL MSG_OUT( 'BITPIX_ERR',
      :           'The ^I^TH value "^GM" is not one of the acceptable '/
-     :           /'BITPIX values: 0,-1,8,16,32,-32,-64.', STATUS )
+     :           /'BITPIX values: Native,0,-1,8,16,32,-32,-64.',
+     :           STATUS )
 
 *  Let the user have another go.  So cancel the parameter value and
 *  delete the group.
@@ -1010,7 +1036,7 @@
       CALL PAR_GET0L( 'PROHIS', PROHIS, STATUS )
 
 *  Abort if there has been an error.
-      IF( STATUS .NE. SAI__OK ) GO TO 999
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get the AST encoding to use when converting WCS information to FITS
 *  headers.  If a null "auto" is supplied, the choice is made
@@ -1128,6 +1154,8 @@
 
 *  Find the BITPIX and convert it to an integer value.
          CALL GRP_GET( BPGRP, IFILE, 1, CBP, STATUS )
+         CALL CHR_UCASE( CBP )
+         IF ( CBP( 1:1 ) .EQ. 'N' ) CBP = '1'
          CALL CHR_CTOI( CBP, BITPIX, STATUS )
 
 *  Find the arrays to propagate from the NDF.
