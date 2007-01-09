@@ -639,11 +639,11 @@ ImageData *StarRtdImage::makeImage( ImageIO imio )
     if ( ! rep || strcmp( rep->classname(), "StarWCS" ) != 0 ) {
         char* header = "";
         size_t lheader = 0;
-        if ( ! imio.isclear() )  {
-            // if image is not cleared, set WCS header
-            header = (char *) imio.header().ptr();
-            lheader = imio.header().size();
-        }
+
+        // set WCS header
+        header = (char *) imio.header().ptr();
+        lheader = imio.header().size();
+
         WCS wcs( new StarWCS( header, lheader ) );
         if ( wcs.status() != 0 ) {
             return (ImageData*) NULL;
@@ -654,7 +654,8 @@ ImageData *StarRtdImage::makeImage( ImageIO imio )
     // The image data is fixed at first.
     volatile_ = 0;
 
-    return ImageData::makeImage( name(), imio, biasimage_->biasInfo(), verbose() );
+    return ImageData::makeImage( name(), imio, biasimage_->biasInfo(), 
+                                 verbose() );
 }
 
 //+
@@ -1799,7 +1800,7 @@ int StarRtdImage::astsetCmd( int argc, char *argv[] )
     }
     if ( wcsp->astSetAttrib( argv[0], argv[1] ) ) {
         return TCL_OK;
-    } 
+    }
 
     return error( "Failed to set:" , argv[0] );
 }
@@ -1829,7 +1830,7 @@ int StarRtdImage::astaddcolourCmd( int argc, char *argv[] )
     int index = 0;
     if ( Tcl_GetInt( interp_, argv[0], &index ) != TCL_OK ) {
         return error( argv[0], " is not an integer");
-    } 
+    }
     else {
         // Make sure that default colours are established and add new
         // one.
@@ -3260,7 +3261,7 @@ int StarRtdImage::astbootstatsCmd( int argc, char *argv[] )
 //       indicated by the value 0. This option only applies when
 //       the fourth option is set to 1.
 //
-//       The fourth (optional) argument determines if the new system 
+//       The fourth (optional) argument determines if the new system
 //       should be clean, that is a new skyframe, or be just a modified copy
 //       of the existing one. This latter option keeps all related metadata,
 //       like skyref etc., but has the side-effect of usually having the
@@ -3326,7 +3327,7 @@ int StarRtdImage::astsystemCmd( int argc, char *argv[] )
             }
             return TCL_OK;
         }
-    } 
+    }
     else {
         //  Want a pixel coordinate system (only sensible for NDFs when
         //  pixel coordinates are different from grid coordinates).
@@ -3337,7 +3338,7 @@ int StarRtdImage::astsystemCmd( int argc, char *argv[] )
         //  If any of the above failed, then report the error.
         astClearStatus;
         return error ( "failed to establish new system coordinates system");
-    } 
+    }
     else {
         //  Get a mapping to convert to the new system and add this
         //  to the current frameset. Note we convert from BASE frame to
@@ -3352,7 +3353,7 @@ int StarRtdImage::astsystemCmd( int argc, char *argv[] )
         if ( astOK ) {
             newset_ = (AstFrameSet *) astAnnul( newset_ );
             newset_ = cvt;
-        } 
+        }
         else {
             cvt = (AstFrameSet *) astAnnul( cvt );
             astClearStatus;
