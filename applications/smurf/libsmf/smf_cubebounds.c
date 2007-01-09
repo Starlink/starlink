@@ -720,21 +720,17 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       ubnd[ 1 ] -= ishift;
    }
 
-/* Now do the spectral axis. Find the number of pixels needed to span the
-   Z pixel axis range. */
-   npix = 1 + (int)( dubnd[ 2 ] - dlbnd[ 2 ] );
+/* Now do the spectral axis. Find the indices of the pixels containing the 
+   DLBND and DUBND points. */
+   lbnd[ 2 ] = NINT( dlbnd[ 2 ] );
+   ubnd[ 2 ] = NINT( dubnd[ 2 ] );
 
-/* Find a fractional pixel shift which puts the mid point of the axis
-   range at the mid point of a span of "npix" pixels. */
-   shift[ 2 ] = 0.5*( 1 + npix - dlbnd[ 2 ] - dubnd[ 2 ] );
+/* Find the integer pixel shifts needed to put the lower bounds at pixel
+   (1,1,1). */
+   shift[ 2 ] = 1 - lbnd[ 2 ];
 
-/* Find the upper and lower integer bounds after applying this shift. */
-   lbnd[ 2 ] = NINT( dlbnd[ 2 ] + shift[ 2 ] );
-   ubnd[ 2 ] = NINT( dubnd[ 2 ] + shift[ 2 ] );
-
-/* Modify the bounds to put the origin in the middle, using the same method as
-   the on-line system (this relies on integer division). */
-   ishift = 2 + ( ubnd[ 2 ] - lbnd[ 2 ] )/2;
+/* Modify the bounds to put the origin at the centre */
+   ishift = 1 + ( ubnd[ 2 ] + lbnd[ 2 ] )/2;
    lbnd[ 2 ] -= ishift;
    ubnd[ 2 ] -= ishift;
 
