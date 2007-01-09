@@ -31,6 +31,7 @@
  * pbiereic        18/06/04  Added experimental sampling methods
  * Peter W. Draper 01/11/06  Changed getMinMax to deal with images that
  *                           have a dimension of 1 (but not both).
+ *                 08/01/07  Changed getMinMax to deal with 1x1 case too.
  *
  * This file is included in the .C files for classes derived from class
  * ImageData. The file defines a number of member functions that are
@@ -180,7 +181,7 @@ void CLASS_NAME::getMinMax()
     w = x1 - x0 + 1;
     h = y1 - y0 + 1;
 
-    if (w < 1 || h < 1) {
+    if ( w < 1 || h < 1 || ( w == 1 && h == 1 )) {
 	if (area_ > 0) {
 	    minValue_ = maxValue_ = getVal(rawImage, 0);
         } else {
