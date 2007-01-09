@@ -66,6 +66,8 @@
 *        Replace pattern-specific parameters with general values.
 *     2006-12-21 (AGG):
 *        Add instap & instap_x/y
+*     2006-12-22 (AGG):
+*        Add planet and planetnum
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -373,6 +375,29 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
        thischar++;
       }
       strncpy ( inx->obsmode, convert, 80 );
+   }
+
+   /* Check if a planet has been requested */
+   if ( !astMapGet0C ( keymap, "PLANET", &temp) ) {
+     /* Can't use zero is it is the sun, a valid `planet' */
+     inx->planetnum = -1;
+   } else {
+     if ( strncmp( temp, "mars", 4 ) == 0 
+	  || strncmp( temp, "MARS", 4 ) == 0 ) {
+       inx->planetnum = 4;
+     } else if ( strncmp( temp, "uranus", 6 ) == 0 
+	  || strncmp( temp, "URANUS", 6 ) == 0 ) {
+       inx->planetnum = 7;
+     } else if ( strncmp( temp, "jupiter", 7 ) == 0 
+	  || strncmp( temp, "JUPITER", 7 ) == 0 ) {
+       inx->planetnum = 5;
+     } else if ( strncmp( temp, "moon", 4 ) == 0 
+	  || strncmp( temp, "MOON", 4 ) == 0 ) {
+       inx->planetnum = 3;
+     } else {
+       /* Can't use zero is it is the sun, a valid `planet' */
+       inx->planetnum = -1;
+     }
    }
 
    if ( !astMapGet0I ( keymap, "PLATENUM", &(inx->platenum) ) )
