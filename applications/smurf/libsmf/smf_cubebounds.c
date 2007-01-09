@@ -722,7 +722,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
 /* Now do the spectral axis. Find the number of pixels needed to span the
    Z pixel axis range. */
-   npix = 1 + (int)( dubnd[ 0 ] - dlbnd[ 0 ] );
+   npix = 1 + (int)( dubnd[ 2 ] - dlbnd[ 2 ] );
 
 /* Find a fractional pixel shift which puts the mid point of the axis
    range at the mid point of a span of "npix" pixels. */
