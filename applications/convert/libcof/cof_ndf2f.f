@@ -37,10 +37,14 @@
 *        Data component is present it should be first.
 *     BITPIX = INTEGER (Given)
 *        The number of bits per pixel (FITS BITPIX) required for the
-*        output FITS file.  A value of 0 means use the BITPIX of the
-*        input array.  A value of -1 means use the value of the BITPIX
-*        keyword in the NDF's FITS extension; if the extension or BITPIX
-*        card is absent, the BITPIX of the input array is used.
+*        output FITS file.  In addition there are three special values.
+*        A value of 0 means use the BITPIX of the input array.  A value 
+*        of -1 means use the value of the BITPIX keyword in the NDF's 
+*        FITS extension; if the extension or BITPIX card is absent, the 
+*        BITPIX of the input array is used.  BITPIX=1 requests that any 
+*        scaled arrays in the NDF be copied to the scaled data type.  
+*        In the absence of a scaled array, behaviour reverts to 
+*        BITPIX=-1, which may in turn be effectively BITPIX=0.
 *     BLOCKF = INTEGER (Given)
 *        The blocking factor for the output file.  It must be a positive
 *        integer between 1 and 10.
@@ -103,13 +107,13 @@
 *        SIMPLE, EXTEND, PCOUNT, GCOUNT --- all take their default
 *          values.
 *        BITPIX, NAXIS, NAXISn --- are derived directly from the NDF
-*          data array; however the BITPIX in the FITS extension is
-*          transferred when argument BITPIX is -1.
+*          data array; however the BITPIX in the FITS airlock extension
+*          is transferred when argument BITPIX is -1.
 *        CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- are derived from
 *          the NDF axis structures if possible.  If no linear NDF axis
-*          structures are present, the values in the NDF FITS extension
-*          are copied (when parameter PROFITS is true).  If any axes
-*          are non-linear, all FITS axis information is lost.
+*          structures are present, the values in the NDF's FITS 
+*          extension are copied (when argument PROFITS is .TRUE.).  If 
+*          any axes are non-linear, all FITS axis information is lost.
 *        OBJECT, LABEL, BUNIT --- the values held in the NDF's title,
 *          label, and units components respectively are used if
 *          they are defined; otherwise any values found in the FITS
@@ -149,7 +153,7 @@
 *          same efficiency reasons as before.  The END card terminates
 *          the FITS header.  The END card is written by FITSIO
 *          automatically once the header is closed.
-*        HISTORY cards are propagated from the FITS extension when
+*        HISTORY cards are propagated from the FITS airlock when
 *          PROFIT is .TRUE., and from the NDF HISTORY component when
 *          PROHIS is .TRUE..
 *
@@ -242,6 +246,9 @@
 *        those names are filtered.  Corrected the logic for computing
 *        BPOUTU when the supplied BITPIX argument is -1 and the airlock
 *        value thus accessed is negative.
+*     2007 January 5 (MJC):
+*        Allowed propagation of scaled arrays, selected if BITPIX set to
+*        the new special value of 1.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -296,6 +303,7 @@
 *  Local Variables:
       LOGICAL BAD                ! Bad values may be present in array?
       INTEGER BLANK              ! Data blank for integer arrays
+      INTEGER BP                 ! Local, possibly modified, BITPIX
       INTEGER BPIN               ! Input array's BITPIX
       INTEGER BPINU              ! Input array's BITPIX unsigned version
       INTEGER BPOUT              ! Output array's BITPIX
@@ -310,7 +318,8 @@
       LOGICAL E2DF               ! Extension is from 2dF?
       INTEGER EL                 ! Number of elements in array
       LOGICAL FEXIST             ! FITS already exists?
-      LOGICAL FITPRE             ! FITS extension is present
+      LOGICAL FITPRE             ! FITS airlock extension is present?
+      CHARACTER FORM * ( NDF__SZFRM ) ! Storage form
       DOUBLE PRECISION FSCALE    ! Reduction factor for scale
       INTEGER FSTAT              ! FITSIO error status
       INTEGER FSTATC             ! FITSIO error status for file closure
@@ -333,15 +342,18 @@
       INTEGER NDIM               ! Number of dimensions
       INTEGER NEXTN              ! Number of extensions
       INTEGER NEX2PR             ! Number of extensions to process
+      LOGICAL NSCALE             ! Array component is scaled in the NDF?
       BYTE NULL8                 ! Null value for BITPIX=8
       INTEGER * 2 NULL16         ! Null value for BITPIX=16
       INTEGER NULL32             ! Null value for BITPIX=32
       REAL NUL_32                ! Null value for BITPIX=-32
       DOUBLE PRECISION NUL_64    ! Null value for BITPIX=-64
       LOGICAL OPEN               ! FITS file exists?
-      LOGICAL PROPEX             ! True if the FITS extension is to be
-                                 ! propagated for the current header
+      LOGICAL PROPEX             ! Propagate FITS extension for the 
+                                 ! current header?
+      INTEGER SBYTES             ! No. of bytes per scaled array value
       LOGICAL SCALE              ! The array is to be scaled?
+      CHARACTER SCTYPE * ( DAT__SZTYP )! Data type for scaled arrays
       LOGICAL SHIFT              ! A BZERO offset is required?
       LOGICAL THERE              ! BITPIX FITS header card ! is present?
       CHARACTER * ( NDF__SZTYP ) TYPE ! NDF array's data type
@@ -349,7 +361,7 @@
       CHARACTER * ( DAT__SZLOC ) XLOC ! Locator to an NDF extension
       CHARACTER * ( NDF__SZXNM ) XNAME ! Name of NDF extension
       CHARACTER * ( DAT__SZTYP ) XTYPE ! Name of NDF extension
-
+      
 *  Save persistent variables.
       SAVE FUNIT, NCF
 
@@ -430,26 +442,51 @@
 *  See if this is a header-only NDF.
       HDONLY = ARRNAM( 1 ) .EQ. 'HEADER' 
 
+*  Take a local copy of the supplied BITPIX in case in needs to be
+*  modified.
+      BP = BITPIX
+
 *  Loop for each array component.
 *  ==============================
       DO ICOMP = 1, NOARR
 
+         NSCALE = .FALSE.
          IF ( .NOT. HDONLY ) THEN
 
 *  Define the structure of the array.
 *  ==================================
 
-*  Obtain the NDF type.
+*  Obtain the NDF numeric type.
             CALL NDF_TYPE( NDF, ARRNAM( ICOMP ), TYPE, STATUS )
 
 *  Obtain the bad-pixel flag.
             CALL NDF_BAD( NDF, ARRNAM( ICOMP ), .FALSE., BAD, STATUS )
+
+*  Obtain the array form, and the scale and offset for a scaled array.
+            NSCALE = .FALSE.
+            IF ( BITPIX .EQ. 1 ) THEN
+               CALL NDF_FORM( NDF, 'Data', FORM, STATUS )
+               NSCALE = FORM .EQ. 'SCALED' .AND.   
+     :                  ARRNAM( ICOMP ) .NE. 'QUALITY'
+
+               IF ( NSCALE ) THEN
+                  CALL NDF_SCTYP( NDF, ARRNAM( ICOMP ), SCTYPE, STATUS )
+                  CALL NDF_GTSZD( NDF, ARRNAM( ICOMP ), BSCALE, BZERO, 
+     :                            STATUS )
+
+*  Try to obtain the native type from the FITS airlock as there's no
+*  SCALED array.
+               ELSE
+                  BP = -1
+               END IF
+            END IF
 
 *  Find the input BITPIX.
 *  ======================
 
 *  Get the the number of bytes per data type.
             CALL COF_TYPSZ( TYPE, NBYTES, STATUS )
+            IF ( NSCALE ) CALL COF_TYPSZ( SCTYPE, SBYTES, STATUS )
 
 *  Convert this to a pseudo-BITPIX value, where floating point values
 *  are designated by being greater than the integer types.  The unsigned
@@ -476,7 +513,7 @@
 *  ---------------------------------
 *  Search the FITS extension for the first BITPIX keyword, and return
 *  its value.
-            ELSE IF ( BITPIX .EQ. -1 ) THEN
+            ELSE IF ( BP .EQ. -1 ) THEN
                CALL CON_EKEYI( NDF, 'BITPIX', 1, THERE, BPOUT, COMENT,
      :                         STATUS )
 
@@ -495,6 +532,14 @@
                BPOUT = BPIN
                BPOUTU = BPINU
 
+*  Use the Native BITPIX.
+*  ----------------------
+            ELSE IF ( BITPIX .EQ. 1 ) THEN
+               BPOUT = SBYTES * 8
+               BPOUTU = BPOUT
+
+*  Use the user-defined regular BITPIX value.
+*  ------------------------------------------
             ELSE
                BPOUT = BITPIX
                BPOUTU = BPOUT
@@ -561,16 +606,19 @@
 *  input array value in order to set the BLANK, BSCALE, and BZERO
 *  cards, so that the cards must be written before we write the
 *  array.  This means a two-stage process.
-
          IF ( .NOT. HDONLY ) THEN
 
 *  Set the defaults.
             SCALE = .FALSE.
             SHIFT = .FALSE.
-            BSCALE = 1.0D0
-            BZERO = 0.0D0
             DELTA = DBLE( VAL__EPSR )
             FSCALE = 1.0D0 - DELTA
+
+*  We already know the scaling coefficients for a scaled array.
+            IF ( .NOT. NSCALE ) THEN
+               BSCALE = 1.0D0
+               BZERO = 0.0D0
+            END IF
 
 *  Set the null values.  Only one will be needed, depending on the
 *  value of BPOUT, but it as efficient to assign them all.
@@ -700,8 +748,7 @@
 
 *  Find the scaling.
 *  =================
-
-            IF ( SCALE ) THEN
+            IF ( SCALE .AND. .NOT. NSCALE ) THEN
 
 *  To scale we have to map the input array, find the extreme values,
 *  and hence derive the scale and offset.  These are then applied to
@@ -790,11 +837,12 @@
 
 *  Revise the scale and zero cards.
 *  ================================
-            IF ( SCALE .OR. SHIFT ) THEN
+            IF ( SCALE .OR. SHIFT .OR. NSCALE ) THEN
 
 *  Decide the appropriate number of decimals needed to represent the
 *  block floating point scale and offset.
-               IF ( TYPE .EQ. '_DOUBLE' ) THEN
+               IF ( ( TYPE .EQ. '_DOUBLE'  .AND. .NOT. NSCALE ) .OR.
+     :              SCTYPE .EQ. '_DOUBLE' ) THEN
                   NDECIM = INT( -LOG10( VAL__EPSD ) )
                ELSE
                   NDECIM = INT( -LOG10( VAL__EPSR ) )
