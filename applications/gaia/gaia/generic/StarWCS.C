@@ -366,7 +366,9 @@ int StarWCS::astWCSReplace( AstFrameSet *newwcs )
             initCelestial();
 
             // Release the old WCS.
-            astcopy = (AstFrameSet *) astAnnul( astcopy );
+            if ( astcopy != NULL ) {
+                astcopy = (AstFrameSet *) astAnnul( astcopy );
+            }
         }
     }
     else {
