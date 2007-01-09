@@ -251,9 +251,12 @@
 *     27-NOV-2006 (DSB):
 *        Round the returned CROTA value to 0.1 degree.
 *     8-JAN-2006 (DSB):
-*        Allow the referene poition to be optimised in cases where the
+*        Allow the reference poition to be optimised in cases where the
 *        optimal pixel sizes and orientation cannot be determined, but
 *        dont need to be because values were supplied by the caller.
+*     9-JAN-2006 (DSB):
+*        Check for insufficient points being supplied, and for all
+*        supplied points being co-incident.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -334,14 +337,15 @@
       REAL DY
 *.
 
-*  Check the inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
 *  Initialise
       PWAVE = 0.0D0
       PANG = 0.0D0
       IPHIST = 0
       OK = .TRUE.
+      RDIAM = 0.0
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
@@ -466,11 +470,16 @@
 *  Convert this to radians.
       RDIAM = DIAM*PIXSCL
 
-*  Calculate what the grid spacing would be (in units of initial grid
-*  pixels) if the supplied positions were distributed on a regularly 
-*  spaced grid over the bounding box.
-      SPC = SQRT( ( XHI - XLO )*( YHI - YLO ) ) / 
-     :            ( SQRT( REAL( NPOS ) ) - 1.0 )
+*  Use zero spacing if the points are co-incident. Otherwise, calculate what 
+*  the grid spacing would be (in units of initial grid pixels) if the 
+*  supplied positions were distributed on a regularly spaced grid over the 
+*  bounding box.
+      IF( DIAM .EQ. 0.0 ) THEN
+         SPC = 0.0
+      ELSE
+         SPC = SQRT( ( XHI - XLO )*( YHI - YLO ) ) / 
+     :               ( SQRT( REAL( NPOS ) ) - 1.0 )
+      END IF
 
 *  Store the grid coords at the centre of the bounding box.
       XC = 0.5*( XHI + XLO )
@@ -478,9 +487,9 @@
 
 *  The next bit is to do with determining the optimal pixel sizes and
 *  orientation, so we can skip it if these were supplied by the caller.
-      IF( PAR( 5 ) .EQ. AST__BAD .OR.
-     :    PAR( 6 ) .EQ. AST__BAD .OR.
-     :    PAR( 7 ) .EQ. AST__BAD ) THEN
+      IF( SPC .GT. 0.0 .AND. ( PAR( 5 ) .EQ. AST__BAD .OR.
+     :                         PAR( 6 ) .EQ. AST__BAD .OR.
+     :                         PAR( 7 ) .EQ. AST__BAD ) ) THEN
          OK = .FALSE.
 
 *  Allocate a 1D work array which spans the circle enclosing the bounding box
