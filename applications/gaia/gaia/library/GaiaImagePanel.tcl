@@ -633,7 +633,7 @@ itcl::class gaia::GaiaImagePanel {
       if {$itk_option(-showobject)} {
          set s [$image_ object]
          set f [file tail [$image_ fullname]]
-         if { "z$s" == "z" } {
+         if { "z$s" == "z" || "$s" == "RTD_BLANK" } {
             $itk_component(object) config -value "$f"
          } else {
             $itk_component(object) config -value "$s (file:$f)"
