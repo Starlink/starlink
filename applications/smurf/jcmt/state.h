@@ -92,7 +92,6 @@
 #define JCMT__SZRTS_TASKS      80
 #define JCMT__SZTCS_SOURCE     32
 #define JCMT__SZTCS_TR_SYS     16
-#define JCMT__SZACS_RECEPTOR    5
 #define JCMT__SZACS_SOURCE_RO  16
 #define JCMT__SZSMU_CHOP_PHASE  1
 #define JCMT__SZTCS_BEAM        1
