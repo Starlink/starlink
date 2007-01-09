@@ -4185,13 +4185,27 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          This specifies the data type of the output FITS file.  Permitted
          values are: \texttt{8} for unsigned byte, \texttt{16} for signed word,
          \texttt{32} for integer, \texttt{-32} for real, \texttt{-64} for double
-         precision.  There are two other special values.  BITPIX=\texttt{0}
-         will cause the output file to have the data type equivalent to
-         that of the input NDF.  BITPIX=\texttt{-1} requests that the
-         output file has the data type corresponding to the value of the
-         BITPIX keyword in the NDF's FITS extension.  If the extension
-         or BITPIX keyword is absent, the output file takes the data
-         type of the input array.
+         precision.  There are three other special values.  
+         \ssthitemlist{
+
+         \sstitem 
+            BITPIX=\texttt{0} will cause the output file to have the
+	    data type equivalent to that of the input NDF.
+
+         \sstitem  
+            BITPIX=\texttt{-1} requests that the output file has the
+	    data type corresponding to the value of the BITPIX keyword
+	    in the NDF's FITS extension.  If the extension or BITPIX
+	    keyword is absent, the output file takes the data type of
+	    the input array.
+
+         \sstitem
+            BITPIX=\texttt{"Native"} requests that any scaled arrays
+	    in the NDF be copied to the scaled data type.  Otherwise
+	    behaviour reverts to BITPIX=\texttt{-1}, which may in turn be
+	    effectively BITPIX=\texttt{0}.  The case-insensitive value may
+            be abbreviated to \texttt{"n"}.
+         }
 
          BITPIX values must be enclosed in double quotes and may be a list 
          of comma-separated values to be applied to each conversion in turn.
@@ -4261,7 +4275,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          {world_coordinate_systems}
          section below. In addition, 
          the value \texttt{"Auto"} may also be supplied, in which case a suitable
-         default encoding is chosen based on the contents of the NDFs FITS
+         default encoding is chosen based on the contents of the NDF's FITS
          extension and WCS component.  \texttt{["Auto"]}
       }
       \sstsubsection{
@@ -4443,6 +4457,23 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          four integrations in I1, I2, I3, and I4 components of the
          container file are converted to FITS IMAGE extensions.
       }
+      \sstexamplesubsection{
+         ndf2fits in=huge out=huge.fits comp=d bitpix=n
+      }{
+         This converts the NDF called huge to the FITS file called
+         \texttt{huge.fits}.  The data type of the FITS primary data array 
+         matches that of the NDF's scaled data array.  The scale and
+         offset coefficients used to form the FITS array are also taken
+         from the NDF's scaled array.
+      }
+      \sstexamplesubsection{
+         ndf2fits in=huge out=huge.fits comp=d bitpix=-1
+      }{
+         As the previous example, except that the data type of the FITS 
+         primary data array is that given by the BITPIX keyword in the
+         FITS airlock of NDF huge and the scaling factors are
+         determined.
+      }
    }
    \sstnotes{
       The rules for the conversion are as follows:
@@ -4484,7 +4515,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 
             \sstitem
             BITPIX, NAXIS, NAXISn --- are derived directly from the NDF
-              data array;
+              data array; however the BITPIX in the FITS airlock extension
+              is transferred when parameter BITPIX=\texttt{-1}.
 
             \sstitem
             CRVAL\textit{n}, CDELT\textit{n}, CRPIX\textit{n}, CTYPE\textit{n},
@@ -4493,7 +4525,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
               \htmlref{\texttt{"}World Co-ordinate Systems\texttt{"}}
                  {world_coordinate_systems}).
               If this is not possible, and if PROFITS is \texttt{TRUE}, then
-              they are copied from the NDF FITS extension.
+              they are copied from the NDF's FITS extension.
 
             \sstitem
             OBJECT, LABEL, BUNIT --- the values held in the NDF's title,
@@ -4559,7 +4591,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 
             \sstitem
             HISTORY --- HISTORY headers are propagated from the FITS
-              extension when PROFITS is \texttt{TRUE}, and from the NDF
+              airlock when PROFITS is \texttt{TRUE}, and from the NDF
               history component when PROHIS is \texttt{TRUE}.
 
          }
@@ -7092,5 +7124,14 @@ of \texttt{"Native"} requesting that there is no format conversion, and
 the array of numbers stored in the FITS file are copied to a scaled array
 within the NDF.  This preserves the data compression.  Parameter TYPE
 continues to control the data type of the true unscaled values.
+
+\htmlref{NDF2FITS}{NDF2FITS} parameter BITPIX has a new allowed value
+of \texttt{"Native"}.  This requests that should any scaled-form arrays be 
+converted, then the data type of the corresponding output FITS array 
+is set to the scaled-form array's data type, and that the scale and
+offset coefficients for the format conversion are taken from the NDF's
+scaled array too.  This new facility preserves the data compression
+of large files.  In the absence of a scaled array, the application
+behaves as if BITPIX=\texttt{-1} were specified.
 
 \end{document}
