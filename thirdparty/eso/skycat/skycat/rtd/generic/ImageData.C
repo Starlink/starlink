@@ -49,6 +49,8 @@
  * Peter W. Draper 30/05/01  Added support for double precision.
  * pbiereic        27/06/01  Added method 'noiseStatistics'
  * pbiereic        10/07/04  Added method 'getXline4' with specified x ranges
+ * Peter W. Draper 08/01/07  Return a fake range in autoSetCutLevels for a
+ *                           one pixel image. 
  */
 static const char* const rcsId="@(#) $Id: ImageData.C,v 1.4 2005/02/02 01:43:02 brighton Exp $";
 
@@ -1073,6 +1075,11 @@ void ImageData::autoSetCutLevels(double percent)
 		break;
 	    }
 	}
+    }
+    else {
+        // Fake a range when there are no valid pixels (or just one).
+        high = maxValue_ + 1.0;
+        low = minValue_ - 1.0;;
     }
 
     if (high > low)
