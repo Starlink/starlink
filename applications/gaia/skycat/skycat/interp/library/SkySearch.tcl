@@ -7,6 +7,9 @@
 # who         when       what
 # --------   ---------   ----------------------------------------------
 # A.Brighton 10 Dec 97   created
+# P.W.Draper 08 Jan 07   only check for image isclear, don't use blank
+#                        name and image size < 10 pixels in plot, that
+#                        is no longer true
 
 
 itk::usual SkySearch {}
@@ -419,7 +422,7 @@ itcl::class skycat::SkySearch {
 	}
 
 	# if we have an image display, but no image is loaded, generate dummy image
-	if {"[get_image_name]" == "" && [$image_ width] < 10} {
+	if {[$image_ isclear]} {
 	    if {[gen_blank_image] != 0} {
 		return
 	    }
