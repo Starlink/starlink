@@ -173,6 +173,10 @@
 *     2006-12-21 (AGG):
 *        Set TAI to midpoint of sample, RTS to end. Use instap_x/y
 *        from inx struct
+*     2007-01-10 (AGG):
+*        - Add check that source is above 20 deg at start of observation
+*        - Fix off-by-one bug in digitizing signal
+*        - Set airmass to self-consistent value below 1 deg
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -371,14 +375,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
   if ( *status != SAI__OK) return;
 
-  /* KLUDGE */
-  /*
-  FILE *junk;
-  double x_junk, y_junk, x_out, y_out;
-  junk = fopen( "junk.txt", "w" );
-  */
-  /* ------ */
-
   /* Main routine */
   ndfBegin ();
 
@@ -513,8 +509,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
     /* Get the relevant pointing solution for the telescope based on the
        observation type */
-    msgOutif(MSG__VERB," ", 
-              "Get pointing solution", status );
+    msgOutif(MSG__VERB," ", "Get pointing solution", status );
 
     /* The three primary observing modes are STARE, DREAM, and SCAN.
        In STARE, the telescope points in one direction.  In DREAM, the
@@ -818,6 +813,15 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       /* calculate the az/el corresponding to the map centre (base) */
       slaDe2h ( hourangle, decapp, phi, &temp1, &temp2 );
 
+      /* Issue an error if the source is below 20 degrees */
+      if ( temp2 < 0.35 ) {
+	if ( *status == SAI__OK ) {
+	  *status = SAI__ERROR;
+	  errRep(" ", "Source is below 20 deg elevation", status);
+	  goto CLEANUP;
+	}
+      }
+
       temp3 = slaPa ( hourangle, decapp, phi );
       
       if( *status == SAI__OK ) {
@@ -952,10 +956,14 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       if( fc ) fc = astAnnul(fc);
 
       if( *status == SAI__OK ) {
-        /* Calculate the airmass */
-        if( sky_el >= 1. * AST__DPI/180. )
-          airmass[frame] = 1/sin(sky_el);
-        else airmass[frame] = 1000.;
+        /* Calculate the airmass - note this assumes a PLANE-PARALLEL
+	   atmosphere with no refraction. Set constant below an
+	   elevation of 1 deg. */
+        if( sky_el >= 1.0 * AST__DPI/180. ) {
+          airmass[frame] = 1.0/sin(sky_el);
+        } else {
+	  airmass[frame] = 3283.0;
+	}
         /* Calculate equatorial from horizontal */
         slaDh2e( bor_az[frame], bor_el[frame], phi, &raapp1, &decapp1 );
 	raapp1 = fmod(lst[frame] - raapp1 + D2PI, D2PI );
@@ -968,13 +976,9 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
       if ( !hitsonly ) {
 
-	/*	printf("Boresight RA = %10.8f, Dec = %g; BASE RA = %10.8f, Dec = %g\n",
-	  bor_ra[frame],bor_dec[frame],inx->ra,inx->dec);*/
-
         /* Create an sc2 frameset for this time slice and extract 
 	   bolo->sky mapping */ 
-      
-        state.tcs_az_ac1 = bor_az[frame];
+	state.tcs_az_ac1 = bor_az[frame];
         state.tcs_az_ac2 = bor_el[frame];
         state.tcs_tr_dc1 = bor_ra[frame];
         state.tcs_tr_dc2 = bor_dec[frame]; 
@@ -1000,16 +1004,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
             sc2ast_createwcs(subnum, &state, instap, telpos, &fs, status);
           }
       
-          /* KLUDGE -------------- */
-          /*
-          x_junk = 1;
-          y_junk = 1;
-          astSetC( fs, "SYSTEM", "J2000" );
-          astTran2( fs, 1, &x_junk, &y_junk, 1, &x_out, &y_out );
-          fprintf( junk, "%.*g %lf %lf\n", DBL_DIG, state.rts_end, x_out, y_out );
-          */
-          /* KLUDGE -------------- */
-
           /* simulate one frame of data */
           if( *status == SAI__OK ) {
             sc2sim_simframe ( *inx, *sinx, astnaxes, astscale, astdata->pntr[0], 
@@ -1165,7 +1159,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
 	  /* Digitise the numbers */
           if( !hitsonly && ( *status == SAI__OK ) ) {
-	    sc2sim_digitise ( nbol*frame, &dbuf[k*maxwrite*nbol], 
+	    sc2sim_digitise ( nbol*(frame+1), &dbuf[k*maxwrite*nbol], 
                               digmean, digscale,
 			      digcurrent, digits, status );
 	  }
@@ -1226,6 +1220,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
   }/* for all subarrays */
 
+ CLEANUP:
+
   smf_free( head, status );
   smf_free( posptr, status );
   smf_free( dbuf, status );
@@ -1258,9 +1254,5 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   ndfEnd ( status );
 
   msgOutif(MSG__VERB," ", "Simulation successful.", status ); 
-
-  /* ------ */
-  /* fclose(junk); */
-  /* ------ */
 
 }
