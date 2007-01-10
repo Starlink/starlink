@@ -1,101 +1,114 @@
-  Latest changes:
+  Hokulei Release:
 
-    FITS headers are now shown out to 80 characters. Previously they were
-    truncated at 79.
+    This is an update with many usability changes and minor bug fixes:
 
-    The precession facility of the positions toolbox should now correctly
-    transform the current list of coordinates, rather than a single position.
+    - Spectra can now be sent to other PLASTIC-enabled applications using
+    the Interop menu in the spectral plot window. Only SPLAT-VO supports
+    this at present.
 
-    The celestial coordinates toolbox will now corrrectly use the 
-    sky reference position as an origin or pole. Previously this setting
-    has no effect.
+    - Extracted spectra can now be saved to NDF and FITS files. The 
+    "Send to SPLAT" options now send NDF spectra, previously they
+    sent a text file.
 
-    A bug when extracting a spectrum over a restricted range meant that the
+    - The grid overlay and celestial coordinate system toolboxes now
+    support Horizon (AZEL) coordinates.
+
+    - The celestial coordinates toolbox now supports the use of the
+    sky reference position as an origin (for offset coordinates) or 
+    local pole.
+
+    - Images of size 1x1 should now be accepted and handled as other images.
+    Previously such small images had a special status which meant that
+    no image was displayed.
+
+    - Images that have one dimension of size 1 are now correctly autoranged
+    and oriented (previously these were always drawn horizontally).
+
+    - Cubes with trivial first and second dimensions are now loaded into
+    the cube toolbox when -check_for_cubes is set. Previously these were
+    considered as special form of images.
+
+    - A bug when extracting a spectrum over a restricted range meant that the
     coordinates of an NDF or FITS were incorrect (by an offset). This has
     been fixed.
 
-    Ranges used to extract spectra and control other operations are
-    now preserved, except when the size of the underlying cube changes.
-   
-    The default cube axis is now selected to be the spectral one. Previously
+    - Timeseries cubes can now be switched between different time scales.
+
+    - The default cube axis is now selected to be the spectral one. Previously
     the third axis was always chosen.
 
-    Timeseries cubes can now be switched between different time scales.
-
-    The cube spectral extraction now handles dependent axes (like RA and Dec),
-    differently so that more extractions along one of these axes will succeed.
-
-    The "send to SPLAT" option in the cube toolbox now sends the
+    - The "send to SPLAT" option in the cube toolbox now sends the
     absolute name of the spectrum to be displayed. This means SPLAT
     may be started from another directory.
 
-    The XY profile toolbox can now be activated using control-e.
-    This also avoids the prompt dialog reminding you to draw a
-    rectangle.
-
-    The handling of broken WCS components in NDFs should now 
-    result in the display of an image/cube, without a WCS rather
-    than an unrelated error report about a missing data component.
-    
-    The direction compass is now always a fixed size, not one that
-    depends on the image scale.
-
-    The send to SPLAT options in the cube toolbox have been extended
+    - The "send to SPLAT" options in the cube toolbox have been extended
     to allow the spectrum to be compared to any existing ones (the old
     behaviour) and to replace any spectra already plotted.
- 
-    Bug fix: images that have one dimension of size 1 are now correctly
-    autoranged and oriented.    
 
-    Cubes with trivial first and second dimensions are now loaded into
-    the cube toolbox when -check_for_cubes is set. Previously these were 
-    considered as special form of images.
+    - Ranges used to extract spectra and control other operations are
+    now preserved, except when the size of the underlying cube changes.
+    This makes it easier to extract similar spectra and re-use baseline
+    regions.
 
-    Bug fix: the distance ruler now measures to the middle of the 
-    final pixel to the top and right of the display. Previously
-    this stopped one pixel further in.
-
-    Bug fix: order of baseline subtraction fixed to show the actual
-    default. 
-
-    The grid overlay and celestial coordinate system toolboxes now
-    support Horizon (azel) coordinates.
-   
-    The coordinate system of a channel map is now matched to that
-    of the current cube.
-
-    Fix bug causing a double free core dump when saving modified
-    world coordinate systems for NDF data.
-
-    Channel maps now have a marker drawn to display the same position
+    - Channel maps now have a marker drawn to display the same position
     in each tile. The average spectral coordinate is also displayed
     and the channel map is given the same coordinate system as the
     used by the cube.
 
-    Extracted spectra can now be saved to NDF and FITS files.
+    - The coordinate system of a channel map is now matched to that
+    of the current cube, so that any displayed coordinates are in
+    the correct context.
 
-    Spectral can now be sent to PLASTIC-enabled applications using
-    the Interop menu in the spectral plot window. Only SPLAT supports
-    this at present.
+    - When a cube is collapsed the result image is now in the same coordinates 
+    as the current ones in use by the toolbox. This gives the correct units
+    for any integrated intensity measurements.
 
-    Collapsed cubes now keep the result image in the same coordinates
-    as selected in the cube toolbox (gives correct units for integrated 
-    intensity).
+    - The distance ruler now measures to the middle of the final pixel to the
+    top and right of the display. Previously this stopped one pixel further
+    in. 
 
-    A fatal bug when reading FITS headers from multiple NDFs in a container
-    has been fixed.  
+    - FITS headers are now shown out to 80 characters. Previously they were
+    truncated at 79.
 
-    The behaviour of the spectral plot window can now be changed so that
-    it no longer remains above the main window. To enable this option 
+    - The precession facility of the positions toolbox should now correctly
+    transform the current list of coordinates, rather than a single position.
+
+    - The cube spectral extraction now handles dependent axes (like RA and
+    Dec), differently so that more extractions along one of these axes will
+    succeed. 
+
+    - The XY profile toolbox can now be activated using control-e.
+    This also avoids the prompt dialog reminding you to draw a
+    rectangle.
+
+    - The handling of broken WCS components in NDFs should now
+    result in the display of an image/cube, without a WCS rather
+    than an unrelated error report about a missing data component.
+
+    - The direction compass is now always a fixed size, not one that
+    depends on the image scale. Should now always be visible.
+
+    - The initial order of baseline subtraction is now shown with the correct
+    value (previously this was incorrect until the value was modified).
+
+    - A bug causing a double free core dump when saving modified
+    world coordinate systems for NDF data has been fixed.
+
+    - A fatal bug when reading FITS headers from multiple NDFs in a container
+    has been fixed.
+
+    - The behaviour of the spectral plot window can now be changed so that
+    it no longer remains above the main window. To enable this option
     either start GAIA with -transient_spectralplot 1, or set this option
     in the "File->Startup options..." dialog (this makes the change permanent).
 
-  Release 3.2-0: 28th July 2006.
-  ==============================
+
+  Keoe Release
+  ============
 
   The most significant changes in this release are in cube handling. The
   toolbox is now much faster at image slicing and handles FITS cubes as
-  well as NDF cubes. It also features an all new, built-in, real-time 
+  well as NDF cubes. It also features an all new, built-in, real-time
   interactive spectral extraction display, which features point and region
   extraction. It also has new controls for creating channel map images and
   selecting ranges for baseline subtraction. On 64bit platforms cubes greater
@@ -149,7 +162,7 @@
 
     - The "Show all coordinates" toolbox now displays coordinates from
       systems with more than 2 axes.
-    
+
 
   Finally in this release GAIA has undergone major changes in the way that it
   is built and distributed (it is now available in the Starlink CVS repository
