@@ -891,11 +891,11 @@ int FitsIO::getFitsHeader(ostream& os) const
     istringstream is(s);
     char buf[81];
     while(is.read(buf, 80)) {
-	for (int i = 0; i < 79; i++)
+	for (int i = 0; i < 80; i++)
 	    if (!isascii(buf[i]))
 		buf[i] = ' ';
-	buf[79] = '\n';
-	os.write(buf, 80);
+	buf[80] = '\n';
+	os.write(buf, 81);
 	if (strncmp(buf, "END     ", 8) == 0)
 	    break;
     }
