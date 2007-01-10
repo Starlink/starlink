@@ -1,3 +1,20 @@
+1 CONVERT_Version_1.5-8
+
+ FITS2NDF parameter FMTCNV has a new allowed value of "Native"
+ requesting that there is no format conversion, and the array of
+ numbers stored in the FITS file are copied to a scaled array within
+ the NDF.  This preserves the data compression.  Parameter TYPE
+ continues to control the data type of the true unscaled values.
+
+ NDF2FITS parameter BITPIX has a new allowed value of "Native".  This
+ requests that should any scaled-form arrays be converted, then the
+ data type of the corresponding output FITS array is set to the
+ scaled-form array's data type, and that the scale and offset
+ coefficients for the format conversion are taken from the NDF's
+ scaled array too.  This new facility preserves the data compression
+ of large files.  In the absence of a scaled array, the application
+ behaves as if BITPIX=-1 were specified.
+
 1 CONVERT_Version_1.5-7
 
  FITS2NDF has a new TYPE group parameter to set the data type of 
