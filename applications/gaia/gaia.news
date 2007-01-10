@@ -1,5 +1,8 @@
   Latest changes:
 
+    FITS headers are now shown out to 80 characters. Previously they were
+    truncated at 79.
+
     The precession facility of the positions toolbox should now correctly
     transform the current list of coordinates, rather than a single position.
 
