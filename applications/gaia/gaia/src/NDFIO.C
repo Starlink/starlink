@@ -268,15 +268,15 @@ int NDFIO::getFitsHeader(ostream& os) const
 {
     string istr( (char*)header_.ptr(), header_.length() );
     istringstream is( istr );
-    char buf[81];
+    char buf[FITSCARD+1];
     while( is.read( buf, FITSCARD ) ) {
-        for ( int i = 0; i < ( FITSCARD - 1 ); i++ ) {
+        for ( int i = 0; i < FITSCARD; i++ ) {
             if ( ! isascii( buf[i] ) ) {
                 buf[i] = ' ';
             }
         }
-        buf[ FITSCARD - 1 ] = '\n';
-        os.write( buf, FITSCARD );
+        buf[FITSCARD] = '\n';
+        os.write( buf, FITSCARD+1 );
         if ( strncmp( buf, "END     ", 8 ) == 0 ) {
             break;
         }
