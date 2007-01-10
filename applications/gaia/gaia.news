@@ -14,6 +14,8 @@
     the extraction position. This will be displayed in the SPLAT-VO
     synopsis.
 
+    - An animated GIF of a range of image slices can now be created.
+
     - The grid overlay and celestial coordinate system toolboxes now
     support Horizon (AZEL) coordinates.
 
