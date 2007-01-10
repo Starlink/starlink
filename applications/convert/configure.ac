@@ -51,7 +51,6 @@ dnl AC_PROG_RANLIB
 dnl    so commented out.   
 
 dnl    Documentation.
-LATEX2DVI='$$LATEX $$1; bibtex $$1; $$LATEX $$1; $$LATEX $$1'
 STAR_LATEX_DOCUMENTATION([sun55])
 
 dnl    Library/component sub-directories. IDL requires special handling.
