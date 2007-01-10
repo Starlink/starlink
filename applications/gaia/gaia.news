@@ -10,6 +10,10 @@
     "Send to SPLAT" options now send NDF spectra, previously they
     sent a text file.
 
+    - Extracted spectra may now contain additional meta-data about
+    the extraction position. This will be displayed in the SPLAT-VO
+    synopsis.
+
     - The grid overlay and celestial coordinate system toolboxes now
     support Horizon (AZEL) coordinates.
 
