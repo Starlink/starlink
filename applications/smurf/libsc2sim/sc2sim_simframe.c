@@ -117,6 +117,9 @@
 *        Correct error in airmass correction of sky flux (take 2)
 *     2006-12-21 (AGG):
 *        Only calculate sky gradient if atmosphere is to be added
+*     2007-01-10 (AGG):
+*        Set SYSTEM to GAPPT if we're observing a planet
+*     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -223,7 +226,11 @@ int *status                  /* global status (given and returned) */
    if ( !StatusOkP(status) ) return;
 
    /* Concatenate mappings to get bolo->astronomical image coordinates */
-   astSetC( fset, "SYSTEM", "icrs" );
+   if ( inx.planetnum == -1 ) {
+     astSetC( fset, "SYSTEM", "ICRS" );
+   } else {
+     astSetC( fset, "SYSTEM", "GAPPT" );
+   }
    bolo2sky = astGetMapping( fset, AST__BASE, AST__CURRENT );
    if( !astOK ) {
      *status = SAI__ERROR;
