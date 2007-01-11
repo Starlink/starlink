@@ -78,6 +78,13 @@
 *     and 1/f noise, and nonlinear response which varies for different
 *     bolometers.  It also includes SCUBA-2 field distortion.
 *
+*     Planet observations are now supported. In this case the WCS
+*     FrameSet is created on the fly. In principle this should be done
+*     at every time step, but in practice planets do not move
+*     significantly on the sky in 5 ms. Currently the geocentric
+*     apparent coordinates are calculated every 0.5 s (100 time
+*     steps).
+*
 *     smf_simulate combines the functionality of a number of executables
 *     built in earlier versions of the simulator : staresim, dreamsim,
 *     pongsim
@@ -177,6 +184,8 @@
 *        - Add check that source is above 20 deg at start of observation
 *        - Fix off-by-one bug in digitizing signal
 *        - Set airmass to self-consistent value below 1 deg
+*     2007-01-10 (AGG):
+*        Add planet observations
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -373,6 +382,12 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double twater;                  /* water line temp. for WVM simulation */
   double vmax[2];                 /* telescope maximum velocities (arcsec) */
 
+  int planet = 0;
+  double tt;
+  double diam;
+  AstFitsChan *fitschan=NULL;           /* FITS channels for tanplane projection */
+
+
   if ( *status != SAI__OK) return;
 
   /* Main routine */
@@ -448,8 +463,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       smf_fits_getD ( atmhdr, "PIXSIZE", &atmscale, status );    
     }
 
-    /* Retrieve the WCS info from the astronomical image. */
-
+    /* Retrieve the WCS info from the astronomical image. For planet
+       observations this is not meaningful so WCS is created later */
     if( *status == SAI__OK ) {
       fitswcs = astdata->hdr->wcs;
     }    
@@ -475,6 +490,13 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       }
     }
 
+    /* Set the PLANET flag */
+    if ( inx->planetnum != -1 ) {
+      planet = 1;
+    } else {
+      planet = 0;
+    }
+
     if( *status == SAI__OK ) {
       /* Retrieve the dimensions of the ast & atm images */
       astnaxes[0] = (astdata->dims)[0];
@@ -482,8 +504,15 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       atmnaxes[0] = (atmdata->dims)[0];
       atmnaxes[1] = (atmdata->dims)[1];
     
-      /* Extract the Sky->map pixel mapping for the astronomical image */
-      astSetC( fitswcs, "SYSTEM", "icrs" );
+      /* Extract the Sky->map pixel mapping for the astronomical
+	 image. As noted above, this will have no meaning for planet
+	 observations since the WCS FrameSet is noted created until
+	 later. */
+      if ( planet ) {
+	astSetC( fitswcs, "SYSTEM", "GAPPT" );
+      } else {
+	astSetC( fitswcs, "SYSTEM", "ICRS" );
+      }
       sky2map = astGetMapping( fitswcs, AST__CURRENT, AST__BASE ); 
     
       if( !astOK ) {
@@ -763,15 +792,21 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   msgOutif(MSG__VERB," ", 
            "Start observing at MJD ^DSTART, ^YR-^MO-^DAY", status);
 
-  /* Determine how many chunks of size maxwrite are required to 
-     complete the pattern, and how many frames are in the 
-     last chunk */
+  /* Calculate the apparent-to-mean coordinate conversion
+     parameters. The time parameter should be a TDB but UTC should be
+     good enough, according to SUN/67. These vary very slowly so doing
+     the calculation once per simulation should be fine */
+  slaMappa( 2000.0, inx->mjdaystart, amprms );
+
+
+  /* Determine how many `chunks' of size maxwrite are required to
+     complete the pattern, and how many frames are in the last
+     chunk */
   chunks = ceil ( (double)count / maxwrite );
 
   /* For each chunk, determine the data for the corresponding
      frames.  At the last frame, write the data for each 
      subarray to a file */
-
   for ( curchunk = 0; curchunk < chunks; curchunk++ ) {
 
     /* Adjust the lastframe value depending on whether this is the
@@ -792,12 +827,13 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     sc2sim_calctime( telpos[0]*DD2R, start_time, inx->dut1, samptime, lastframe,
                      mjuldate, lst, status ); 
 
-    /* Convert BASE RA, Dec to apparent RA, Dec for current epoch */
-    /* The time parameter here should be a TDB but UTC should be good
-       enough, according to SUN/67 */
-    slaMappa( 2000.0, start_time, amprms );
-    /* Use quick conversion - should be more than good enough */
-    slaMapqkz( inx->ra, inx->dec, amprms, &raapp, &decapp ); 
+    /* If we're not simulating a planet observation then we only need
+       to calculate the apparent RA, Dec once */
+    if ( !planet ) {
+      /* Convert BASE RA, Dec to apparent RA, Dec for current epoch.
+	 Use quick conversion - should be more than good enough */
+      slaMapqkz( inx->ra, inx->dec, amprms, &raapp, &decapp ); 
+    }
 
     /* Retrieve the values for this chunk */
     for ( frame = 0; frame < lastframe; frame++ ) {
@@ -806,6 +842,33 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
       /* Telescope latitude */
       phi = telpos[1]*DD2R;
+
+      /* If we are simulating a planet observation, calculate apparent
+	 RA, Dec at each time step - actually don't need to do this if
+	 the simulation is short, say 1 min or less but in the first
+	 instance let's do it the correct way. V2: update it only
+	 every 100 frames, else use the previous one */
+      if ( planet ) {
+	if ( frame%100 == 0 ) {
+	  /* Calculate the TT from UTC start_time and TT-UTC from slaDtt */
+	  tt = start_time + slaDtt( start_time ) / SPD;
+	  slaRdplan( tt, inx->planetnum, -DD2R*telpos[0], DD2R*telpos[1], 
+		     &raapp, &decapp, &diam );
+
+	  /* Create frameset to allow sky2map mapping to be determined */
+	  fitschan = astFitsChan ( NULL, NULL, "" );
+	  sc2ast_makefitschan( astnaxes[0]/2.0, astnaxes[1]/2.0, 
+			       (-astscale*DAS2D), (astscale*DAS2D),
+			       raapp*DR2D, decapp*DR2D,
+			       "RA---TAN", "DEC--TAN", fitschan, status );
+	  astClear( fitschan, "Card" );
+	  fitswcs = astRead( fitschan );
+	    
+	  /* Extract the Sky->REF_PIXEL mapping. */
+	  astSetC( fitswcs, "SYSTEM", "GAPPT" );
+	  sky2map = astGetMapping( fitswcs, AST__CURRENT, AST__BASE );
+	}
+      }
 
       /* Calculate hour angle */
       hourangle = lst[frame] - raapp;
@@ -821,6 +884,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	  goto CLEANUP;
 	}
       }
+
 
       temp3 = slaPa ( hourangle, decapp, phi );
       
@@ -1017,6 +1081,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
           /* Annul sc2 frameset for this time slice */
           if( fs ) fs = astAnnul( fs );
+          if( fitschan ) fitschan = astAnnul( fitschan );
 
         }/* for each subarray */
 
@@ -1041,8 +1106,11 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
           /* TCS - Telescope tracking structure ----------------------- */
 	  /* Coord. system  */
-	  snprintf(head[j].tcs_tr_sys,6,"J2000");  
-
+	  if ( planet ) {
+	    snprintf(head[j].tcs_tr_sys,6,"GAPPT");  
+	  } else {
+	    snprintf(head[j].tcs_tr_sys,6,"J2000");  
+	  }
           /* Angle between "up" in Nasmyth coordinates, and "up"
              in tracking coordinates at the base telescope
              positions */
