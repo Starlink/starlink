@@ -50,16 +50,26 @@ extern "C" {
 #include "gaiaUtils.h"
 
 /* Local prototypes */
+static int GaiaUtilsAstAnnul( ClientData clientData, Tcl_Interp *interp,
+                              int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsAstConvert( ClientData clientData, Tcl_Interp *interp,
+                                int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstCopy( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsAstFormat( ClientData clientData, Tcl_Interp *interp,
+                               int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstGet( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstSet( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstShow( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsAstSkyFrame( ClientData clientData, Tcl_Interp *interp,
+                                 int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstTest( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsAstTran2( ClientData clientData, Tcl_Interp *interp,
+                              int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsFrameIsA( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsGt2DWcs( ClientData clientData, Tcl_Interp *interp,
@@ -78,8 +88,11 @@ static int GaiaUtilsUrlGet( ClientData clientData, Tcl_Interp *interp,
  */
 int GaiaUtils_Init( Tcl_Interp *interp )
 {
-    Tcl_CreateObjCommand( interp, "gaiautils::getroiplots",
-                          GaiaUtilsGtROIPlots,
+    Tcl_CreateObjCommand( interp, "gaiautils::astannul", GaiaUtilsAstAnnul,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::astconvert", GaiaUtilsAstConvert,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -91,6 +104,10 @@ int GaiaUtils_Init( Tcl_Interp *interp )
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
+    Tcl_CreateObjCommand( interp, "gaiautils::astformat", GaiaUtilsAstFormat,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
     Tcl_CreateObjCommand( interp, "gaiautils::astset", GaiaUtilsAstSet,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
@@ -99,7 +116,15 @@ int GaiaUtils_Init( Tcl_Interp *interp )
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
+    Tcl_CreateObjCommand( interp, "gaiautils::astskyframe",
+                          GaiaUtilsAstSkyFrame, (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
     Tcl_CreateObjCommand( interp, "gaiautils::asttest", GaiaUtilsAstTest,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::asttran2", GaiaUtilsAstTran2,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -116,6 +141,11 @@ int GaiaUtils_Init( Tcl_Interp *interp )
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::getaxiswcs", GaiaUtilsGtAxisWcs,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::getroiplots",
+                          GaiaUtilsGtROIPlots,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -260,7 +290,7 @@ static int GaiaUtilsAstShow( ClientData clientData, Tcl_Interp *interp,
 
     /* Check arguments, allo up to three  */
     if ( objc < 2 || objc > 4 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, 
+        Tcl_WrongNumArgs( interp, 1, objv,
                           "ast_object [native|FITS|XML] [FITSencoding]" );
         return TCL_ERROR;
     }
@@ -286,7 +316,7 @@ static int GaiaUtilsAstShow( ClientData clientData, Tcl_Interp *interp,
             fitschan = (AstFitsChan *) astFitsChan( NULL, &write_out,
                                                     "Encoding=%s",
                                                     Tcl_GetString( objv[3] ) );
-        } 
+        }
         else {
             fitschan = (AstFitsChan *) astFitsChan( NULL, &write_out, "" );
         }
@@ -510,7 +540,7 @@ static int GaiaUtilsGtAxisCoord( ClientData clientData, Tcl_Interp *interp,
      * coordinate and whether to transform forward or backwards.
      */
     if ( objc != 4 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, 
+        Tcl_WrongNumArgs( interp, 1, objv,
                           "frameset|mapping coordinate ?forward?" );
         return TCL_ERROR;
     }
@@ -642,6 +672,7 @@ static int GaiaUtilsGtROIPlots( ClientData clientData, Tcl_Interp *interp,
     }
 
     /* Convert keymap into a Tcl list */
+    Tcl_ResetResult( interp );
     resultObj = Tcl_GetObjResult( interp );
 
     size = astMapSize( rplots );
@@ -686,3 +717,214 @@ static int GaiaUtilsUrlGet( ClientData clientData, Tcl_Interp *interp,
     return TCL_ERROR;
 }
 
+/**
+ * Create an AST SkyFrame
+ *
+ * There is one argument the attributes to use when creating the SkyFrame.
+ * The result is the address of the new object.
+ */
+static int GaiaUtilsAstSkyFrame( ClientData clientData, Tcl_Interp *interp,
+                                 int objc, Tcl_Obj *CONST objv[] )
+{
+    AstSkyFrame *skyframe = NULL;
+
+    /* Check arguments, only allow one. */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "attributes" );
+        return TCL_ERROR;
+    }
+
+    /* Create the SkyFrame */
+    skyframe = (AstSkyFrame*) astSkyFrame( Tcl_GetString( objv[1] ) );
+
+    /* Export the new object as a long containing the address */
+    if ( astOK ) {
+        Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) skyframe ) );
+        return TCL_OK;
+    }
+    astClearStatus;
+    Tcl_SetResult( interp, "Failed to create SkyFrame", TCL_VOLATILE );
+    return TCL_ERROR;
+}
+
+/**
+ * Annul an AST object.
+ *
+ * There is one argument, the address of the AST object.
+ */
+static int GaiaUtilsAstAnnul( ClientData clientData, Tcl_Interp *interp,
+                              int objc, Tcl_Obj *CONST objv[] )
+{
+    long adr;
+
+    /* Check arguments, only allow one. */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "object" );
+        return TCL_ERROR;
+    }
+
+    /* Get the object */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    astAnnul( (AstObject *) adr );
+
+    if ( ! astOK ) {
+        astClearStatus;
+        Tcl_SetResult( interp, "Failed to annul AST object", TCL_VOLATILE );
+        return TCL_ERROR;
+    }
+    return TCL_OK;
+}
+
+/**
+ * Format a value along an axis of a given AST Frame or FrameSet.
+ *
+ * There are three arguments, the address of the AST FrameSet, the axis
+ * to use and the value to format. The result is the formatted value.
+ */
+static int GaiaUtilsAstFormat( ClientData clientData, Tcl_Interp *interp,
+                               int objc, Tcl_Obj *CONST objv[] )
+{
+    AstFrameSet *wcs;
+    const char *result;
+    double value;
+    int axis;
+    long adr;
+
+    /* Check arguments, only allow three. */
+    if ( objc != 4 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "frameset axis value" );
+        return TCL_ERROR;
+    }
+
+    /* Get the frameset */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    wcs = (AstFrameSet *) adr;
+
+    /* Get the axis */
+    if ( Tcl_GetIntFromObj( interp, objv[2], &axis ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
+    /* Get the value */
+    if ( Tcl_GetDoubleFromObj( interp, objv[3], &value ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
+    /* Do the formatting */
+    result = astFormat( wcs, axis, value );
+
+    /* Return result */
+    if ( ! astOK ) {
+        astClearStatus;
+        Tcl_SetResult( interp, "Failed to format value" , TCL_DYNAMIC );
+        return TCL_ERROR;
+    }
+
+    Tcl_SetResult( interp, (char *) result, TCL_VOLATILE );
+    return TCL_OK;
+}
+
+/**
+ * Create an AST FrameSet that represents the mapping between two Frames.
+ *
+ * There are three arguments, the two Frames and the domain to use when
+ * transforming between the domains (using astConvert). The result is the
+ * address of an AstFrameSet (can be used as a Mapping).
+ */
+static int GaiaUtilsAstConvert( ClientData clientData, Tcl_Interp *interp,
+                                int objc, Tcl_Obj *CONST objv[] )
+{
+    AstFrame *frame1 = NULL;
+    AstFrame *frame2 = NULL;
+    AstFrameSet *mapping = NULL;
+    long adr;
+
+    /* Check arguments, only allow three. */
+    if ( objc != 4 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "Frame Frame DomainList" );
+        return TCL_ERROR;
+    }
+
+    /* Get the Frames */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    frame1 = (AstFrame *) adr;
+
+    if ( Tcl_GetLongFromObj( interp, objv[2], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    frame2 = (AstFrame *) adr;
+
+    /* Do the astConvert */
+    mapping = (AstFrameSet *) astConvert( frame1, frame2, 
+                                          Tcl_GetString( objv[3] ) );
+
+    /* Export the new object as a long containing the address */
+    if ( astOK ) {
+        Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) mapping ) );
+        return TCL_OK;
+    }
+    astClearStatus;
+    Tcl_SetResult( interp, "Failed to convert between systems", TCL_VOLATILE );
+    return TCL_ERROR;
+}
+
+/*
+ * Transform a set of 2D coordinates using a FrameSet as a Mapping.
+ *
+ * There are three arguments, the address of a FrameSet and the two 
+ * coordinate values (doubles). The result is the two transformed values.
+ */
+static int GaiaUtilsAstTran2( ClientData clientData, Tcl_Interp *interp,
+                              int objc, Tcl_Obj *CONST objv[] )
+{
+    AstFrameSet *mapping = NULL;
+    Tcl_Obj *resultObj;
+    double xin[1];
+    double xout[1];
+    double yin[1];
+    double yout[1];
+    double p[2];
+    long adr;
+
+    /* Check arguments, only allow three. */
+    if ( objc != 4 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "Mapping pos1 pos2" );
+        return TCL_ERROR;
+    }
+
+    /* Get the FrameSet */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    mapping = (AstFrameSet *) adr;
+
+    /* Get the position */
+    if ( Tcl_GetDoubleFromObj( interp, objv[2], &xin[0] ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    if ( Tcl_GetDoubleFromObj( interp, objv[3], &yin[0] ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
+    /* Do the transform */
+    astTran2( mapping, 1, xin, yin, 1, xout, yout );
+    p[0] = xout[0];
+    p[1] = yout[0];
+    astNorm( mapping, p ); 
+    if ( astOK ) {
+        Tcl_ResetResult( interp );
+        resultObj = Tcl_GetObjResult( interp );
+        Tcl_ListObjAppendElement( interp, resultObj, Tcl_NewDoubleObj(p[0]) );
+        Tcl_ListObjAppendElement( interp, resultObj, Tcl_NewDoubleObj(p[1]) );
+        return TCL_OK;
+    }
+    astClearStatus;
+    Tcl_SetResult( interp, "Failed to convert between systems", TCL_VOLATILE );
+    return TCL_ERROR;
+}
