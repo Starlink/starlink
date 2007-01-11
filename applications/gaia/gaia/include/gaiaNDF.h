@@ -156,6 +156,11 @@ extern "C" {
     int gaiaNDFGetProperty( int ndfid, const char *extension, 
                             const char *name, char *value, 
                             int value_length, char **error_mess );
+
+    /* Get value of a property in a named extension as double precision */
+    int gaiaNDFGetDoubleProperty( int ndfid, const char *extension,
+                                  const char *name, double *value,
+                                  char **error_mess );
 #ifdef __cplusplus
 }
 #endif

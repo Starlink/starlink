@@ -66,6 +66,7 @@
 #include <float.h>
 #include <math.h>
 #include "sae_par.h"
+#include "prm_par.h"
 #include "cnf.h"
 #include "f77.h"
 #include "ems_par.h"
@@ -1609,7 +1610,7 @@ int gaiaNDFWriteFitsChan( int ndfid, AstFitsChan *fitschan, char **error_mess )
             memcpy( fitsptr, card, 80 );
             fitsptr += 80;
         }
-        
+
     }
 
     /*  Free locator (and flush to disk). */
@@ -1661,7 +1662,7 @@ int gaiaNDFExtensionExists( int ndfid, const char *name )
 /**
  * Get the value of a primitive stored in an extension.
  */
-int gaiaNDFGetProperty( int ndfid, const char *extension, const char *name, 
+int gaiaNDFGetProperty( int ndfid, const char *extension, const char *name,
                         char *value, int value_length, char **error_mess )
 {
     int status = SAI__OK;
@@ -1689,3 +1690,33 @@ int gaiaNDFGetProperty( int ndfid, const char *extension, const char *name,
     return TCL_OK;
 }
 
+/**
+ * Get the value of a double precision primitive stored in an extension.
+ */
+int gaiaNDFGetDoubleProperty( int ndfid, const char *extension,
+                              const char *name, double *value,
+                              char **error_mess )
+{
+    int status = SAI__OK;
+    int exists;
+
+    emsMark();
+
+    /* If the value doesn't exist, return VAL__BADD */
+    *value = VAL__BADD;
+
+    /* Get value */
+    ndfXstat( ndfid, extension, &exists, &status );
+    if ( exists ) {
+        ndfXgt0d( ndfid, extension, name, value, &status );
+    }
+
+    /* If an error occurred return an error message */
+    if ( status != SAI__OK ) {
+        *error_mess = gaiaUtilsErrMessage();
+        emsRlse();
+        return TCL_ERROR;
+    }
+    emsRlse();
+    return TCL_OK;
+}

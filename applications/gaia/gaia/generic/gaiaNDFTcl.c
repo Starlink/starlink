@@ -44,6 +44,7 @@
 
 #include <tcl.h>
 #include <ndf.h>
+#include <prm_par.h>
 #include "gaiaNDF.h"
 #include "gaiaHDS.h"
 #include "gaiaArray.h"
@@ -85,6 +86,9 @@ static int gaiaNDFTclExists( ClientData clientData, Tcl_Interp *interp,
 static int gaiaNDFTclExtensionExists( ClientData clientData, 
                                       Tcl_Interp *interp,
                                       int objc, Tcl_Obj *CONST objv[] );
+static int gaiaNDFTclGetDoubleProperty( ClientData clientData, 
+                                        Tcl_Interp *interp,
+                                        int objc, Tcl_Obj *CONST objv[] );
 static int gaiaNDFTclGetProperty( ClientData clientData, Tcl_Interp *interp,
                                   int objc, Tcl_Obj *CONST objv[] );
 static int gaiaNDFTclGtWcs( ClientData clientData, Tcl_Interp *interp,
@@ -144,6 +148,11 @@ int Ndf_Init( Tcl_Interp *interp )
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "ndf::getc", gaiaNDFTclCGet,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "ndf::getdoubleproperty", 
+                          gaiaNDFTclGetDoubleProperty,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -1028,7 +1037,8 @@ static int queryNdfCoord( AstFrameSet *frameSet, int axis, double *coords,
 }
 
 /**
- * Return the value of a FITS keyword.
+ * Return the value of a FITS keyword. If not found then an empty string is 
+ * returned.
  */
 static int gaiaNDFTclFitsRead( ClientData clientData, Tcl_Interp *interp,
                                int objc, Tcl_Obj *CONST objv[] )
@@ -1088,8 +1098,8 @@ static int gaiaNDFTclFitsRead( ClientData clientData, Tcl_Interp *interp,
                 Tcl_SetStringObj( resultObj, ptr, -1);
             }
             else {
-                Tcl_SetStringObj( resultObj, "Failed to locate FITS card", -1);
-                result = TCL_ERROR;
+                /* Return an empty string when the card is not found */
+                Tcl_SetResult( interp, "", TCL_VOLATILE );
             }
         }
     }
@@ -1198,6 +1208,8 @@ static int gaiaNDFTclExtensionExists( ClientData clientData,
  * NDF. So for instance "ACSIS" "TSYS(10,10)" will return the value of the 
  * primitive in the ACSIS extension, if it exists. Calls to the "FITS"
  * extension will be passed to the ::fitsread procedure.
+ *
+ * If the value doesn't exist an empty string is returned.
  */
 static int gaiaNDFTclGetProperty( ClientData clientData, Tcl_Interp *interp,
                                   int objc, Tcl_Obj *CONST objv[] )
@@ -1251,6 +1263,79 @@ static int gaiaNDFTclGetProperty( ClientData clientData, Tcl_Interp *interp,
         else {
             /* No extension, so no value */
             Tcl_SetResult( interp, "", TCL_VOLATILE );
+        }
+    }
+    return result;
+}
+
+/**
+ * Return the value of a double precision property. Access etc. same
+ * as getproperty. Don't use this with FITS, the return semantics differ
+ * and there's no difference.
+ *
+ * If the value doesn't exist the value "BAD" is returned, which can
+ * also mean the value itself was set to VAL__BADD.
+ */
+static int gaiaNDFTclGetDoubleProperty( ClientData clientData, 
+                                        Tcl_Interp *interp,
+                                        int objc, Tcl_Obj *CONST objv[] )
+{
+    NDFinfo *info;
+    char *error_mess;
+    const char *extension;
+    const char *name;
+    double value;
+    int result;
+
+    /* Check arguments, need the ndf handle, extension and the property name */
+    if ( objc != 4 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "ndf_handle extension name" );
+        return TCL_ERROR;
+    }
+
+    /* Name of extension */
+    extension = Tcl_GetString( objv[2] );
+
+    /* If the extension is "FITS", just pass this request on, result is 
+     * a string, but with full precision anyway. */
+    if ( strcmp( "FITS", extension ) == 0 ) {
+        Tcl_Obj *newobjv[3];
+        newobjv[0] = objv[0];
+        newobjv[1] = objv[1];
+        newobjv[2] = objv[3];
+        return gaiaNDFTclFitsRead( clientData, interp, 3, newobjv );
+    }
+
+    /* Get the NDF */
+    result = importNdfHandle( interp, objv[1], &info );
+    if ( result == TCL_OK ) {
+
+        /* Check we have an extension */
+        if ( gaiaNDFExtensionExists( info->ndfid, extension ) ) {
+
+            /* Name of the component */
+            name = Tcl_GetString( objv[3] );
+
+            /* Value */
+            result = gaiaNDFGetDoubleProperty( info->ndfid, extension, name, 
+                                               &value, &error_mess );
+
+            /* Check against failures, note that conversion of VAL__BADR to 
+             * VAL__BADD doesn't happen! */
+            if ( result == TCL_OK && value != VAL__BADD &&
+                 (float) value != VAL__BADR ) {
+                Tcl_SetObjResult( interp, Tcl_NewDoubleObj( value ) );
+            }
+            else {
+                Tcl_SetResult( interp, "BAD", TCL_VOLATILE );
+                if ( result != TCL_OK ) {
+                    free( error_mess );
+                }
+            }
+        }
+        else {
+            /* No extension, so no value */
+            Tcl_SetResult( interp, "BAD", TCL_VOLATILE );
         }
     }
     return result;

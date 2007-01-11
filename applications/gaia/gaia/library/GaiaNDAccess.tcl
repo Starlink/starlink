@@ -542,6 +542,18 @@ itcl::class gaia::GaiaNDAccess {
       return [${type_}::getproperty $handle_ $extension $name]
    }
 
+   #  As getproperty, except get as a double precision number. Keeps
+   #  precision for NDF extension primitives.
+   public method getdoubleproperty {extension name} {
+      
+      #  For FITS we just read the encoded value anyway, so no useful 
+      #  functionality.
+      if { $type_ == "fits" } {
+         return [fits::getproperty $handle_ $extension $name]
+      }
+      return [${type_}::getdoubleproperty $handle_ $extension $name]
+   }
+
    #  Check if a named extension exists.
    public method extensionexists {extension} {
       return [${type_}::extensionexists $handle_ $extension]

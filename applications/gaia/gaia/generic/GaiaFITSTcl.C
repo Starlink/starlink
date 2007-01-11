@@ -782,7 +782,8 @@ static int GaiaFITSTclCreate( ClientData clientData, Tcl_Interp *interp,
 }
 
 /**
- * Return the value of a FITS keyword.
+ * Return the value of a FITS keyword. If not found an empty string
+ * is returned.
  */
 static int GaiaFITSTclFitsRead( ClientData clientData, Tcl_Interp *interp,
                                 int objc, Tcl_Obj *CONST objv[] )
@@ -808,8 +809,8 @@ static int GaiaFITSTclFitsRead( ClientData clientData, Tcl_Interp *interp,
             Tcl_SetResult( interp, value, TCL_VOLATILE );
         }
         else {
-            Tcl_AppendResult( interp, "Failed to read FITS card",
-                              (char *) NULL );
+            Tcl_ResetResult( interp );
+            Tcl_SetResult( interp, "", TCL_VOLATILE );
         }
     }
     return result;
@@ -883,6 +884,8 @@ static int GaiaFITSTclExtensionExists( ClientData clientData,
  * Return the value of a named property in an extension. For a FITS file
  * the only supported extension is "FITS", so this call is equivalent to 
  * ::fitsread.
+ *
+ * If the property doesn't exist then an empty string is returned.
  */
 static int GaiaFITSTclGetProperty( ClientData clientData, Tcl_Interp *interp,
                                    int objc, Tcl_Obj *CONST objv[] )
@@ -903,7 +906,7 @@ static int GaiaFITSTclGetProperty( ClientData clientData, Tcl_Interp *interp,
         return GaiaFITSTclFitsRead( clientData, interp, 3, newobjv );
     }
 
-    /* Unknown, so return a blank string */
-    Tcl_SetResult( interp, " ", TCL_VOLATILE );
+    /* Unknown, so return an empty string */
+    Tcl_SetResult( interp, "", TCL_VOLATILE );
     return TCL_OK;
 }
