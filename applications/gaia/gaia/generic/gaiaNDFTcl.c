@@ -616,7 +616,6 @@ static int gaiaNDFTclGtWcs( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] )
 {
     NDFinfo *info;
-    Tcl_Obj *resultObj;
     char *error_mess;
     int result;
 
@@ -630,7 +629,6 @@ static int gaiaNDFTclGtWcs( ClientData clientData, Tcl_Interp *interp,
     if( importNdfHandle( interp, objv[1], &info ) != TCL_OK ) {
         return TCL_ERROR;
     }
-    resultObj = Tcl_GetObjResult( interp );
 
     /* Get WCS, this is cached as the NDF library returns a copy each time so
      * any changes will be lost */
@@ -641,10 +639,10 @@ static int gaiaNDFTclGtWcs( ClientData clientData, Tcl_Interp *interp,
 
     /* Export the WCS as a long containing the address */
     if ( result == TCL_OK ) {
-        Tcl_SetLongObj( resultObj, (long) info->wcs );
+        Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) info->wcs ) );
     }
     else {
-        Tcl_SetStringObj( resultObj, error_mess, -1 );
+        Tcl_SetResult( interp, error_mess, TCL_VOLATILE );
         free( error_mess );
     }
     return result;
@@ -893,7 +891,6 @@ static int gaiaNDFTclCoord( ClientData clientData, Tcl_Interp *interp,
 {
     NDFinfo *info;
     Tcl_Obj **listObjv;
-    Tcl_Obj *resultObj;
     char *coord;
     char *error_mess;
     double coords[NDF__MXDIM];
@@ -924,8 +921,8 @@ static int gaiaNDFTclCoord( ClientData clientData, Tcl_Interp *interp,
                 for ( i = 0; i < ncoords; i++ ) {
                     if ( Tcl_GetDoubleFromObj( interp, listObjv[i],
                                                &coords[i] ) != TCL_OK ) {
-                        Tcl_SetStringObj( resultObj,
-                                          "is not a valid number", -1 );
+                        Tcl_SetResult( interp, "not a valid number", 
+                                       TCL_VOLATILE );
                         result = TCL_ERROR;
                         break;
                     }
@@ -945,7 +942,6 @@ static int gaiaNDFTclCoord( ClientData clientData, Tcl_Interp *interp,
                     result = TCL_ERROR;
                 }
 
-                resultObj = Tcl_GetObjResult( interp );
                 if ( result != TCL_ERROR ) {
                     if ( info->wcs == NULL ) {
                         result = gaiaNDFGtWcs( info->ndfid, &info->wcs,
@@ -958,10 +954,10 @@ static int gaiaNDFTclCoord( ClientData clientData, Tcl_Interp *interp,
                                             &coord, &error_mess );
 
                     if ( result == TCL_OK ) {
-                        Tcl_SetStringObj( resultObj, coord, -1 );
+                        Tcl_SetResult( interp, coord, TCL_VOLATILE );
                     }
                     else {
-                        Tcl_SetStringObj( resultObj, error_mess, -1 );
+                        Tcl_SetResult( interp, error_mess, TCL_VOLATILE );
                         free( error_mess );
                     }
                 }
@@ -1079,6 +1075,7 @@ static int gaiaNDFTclFitsRead( ClientData clientData, Tcl_Interp *interp,
                 start = strstr( card, "=" );
                 if ( start != NULL ) {
                     ptr = value;
+                    start++;
                     while ( *start && *start != '/' ) {
                         *ptr++ = *start++;
                     }
