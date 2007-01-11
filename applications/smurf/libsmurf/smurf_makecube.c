@@ -807,7 +807,7 @@ L999:;
    if( detgrp != NULL) grpDelet( &detgrp, status);
    if( igrp != NULL) grpDelet( &igrp, status);
    if( ogrp != NULL) grpDelet( &ogrp, status);
-   if( wgt_array ) wgt_array = astFree( wgt_array );
+   if( wgt_array && !savewgt ) wgt_array = astFree( wgt_array );
 
 /* End the NDF context. */
    ndfEnd( status );
