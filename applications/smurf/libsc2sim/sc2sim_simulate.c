@@ -186,6 +186,8 @@
 *        - Set airmass to self-consistent value below 1 deg
 *     2007-01-10 (AGG):
 *        Add planet observations
+*     2007-01-11 (AGG):
+*        Set BASE position correctly for planets
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -846,8 +848,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       /* If we are simulating a planet observation, calculate apparent
 	 RA, Dec at each time step - actually don't need to do this if
 	 the simulation is short, say 1 min or less but in the first
-	 instance let's do it the correct way. V2: update it only
-	 every 100 frames, else use the previous one */
+	 instance let's do it the correct way. Update it only every
+	 100 frames or 0.5 sec, else use the previous one */
       if ( planet ) {
 	if ( frame%100 == 0 ) {
 	  /* Calculate the TT from UTC start_time and TT-UTC from slaDtt */
@@ -873,7 +875,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       /* Calculate hour angle */
       hourangle = lst[frame] - raapp;
 
-      /* calculate the az/el corresponding to the map centre (base) */
+      /* Calculate the az/el corresponding to the map centre (base) */
       slaDe2h ( hourangle, decapp, phi, &temp1, &temp2 );
 
       /* Issue an error if the source is below 20 degrees */
@@ -885,7 +887,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	}
       }
 
-
+      /* Parallactic angle */
       temp3 = slaPa ( hourangle, decapp, phi );
       
       if( *status == SAI__OK ) {
@@ -1048,8 +1050,13 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         state.tcs_tr_dc2 = bor_dec[frame]; 
         state.tcs_tr_ac1 = bor_ra[frame];
         state.tcs_tr_ac2 = bor_dec[frame]; 
-        state.tcs_tr_bc1 = inx->ra; 
-        state.tcs_tr_bc2 = inx->dec;
+	if (planet) {
+	  state.tcs_tr_bc1 = raapp;
+	  state.tcs_tr_bc2 = decapp;
+	} else {
+	  state.tcs_tr_bc1 = inx->ra; 
+	  state.tcs_tr_bc2 = inx->dec;
+	}
         state.smu_az_jig_x = jig_x_hor[frame];
         state.smu_az_jig_y = jig_y_hor[frame];
         state.smu_az_chop_x = 0;
@@ -1114,9 +1121,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
           /* Angle between "up" in Nasmyth coordinates, and "up"
              in tracking coordinates at the base telescope
              positions */
-
-          head[j].tcs_tr_ang = base_el[j] + 
-                               base_p[j];
+          head[j].tcs_tr_ang = base_el[j] + base_p[j];
 
           /* Demand coordinates */
           head[j].tcs_tr_dc1 = bor_ra[j];
@@ -1127,14 +1132,13 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
           head[j].tcs_tr_ac2 = bor_dec[j]; 
             
           /* Base coordinates (e.g. tangent point for nominal map) */
-          head[j].tcs_tr_bc1 = inx->ra; 
-          head[j].tcs_tr_bc2 = inx->dec;
-
-	  /*
-	  fprintf( junk, "%lf %lf %lf\n", 
-	           head[j].tcs_tr_ac1, head[j].tcs_tr_ac2, 
-		   base_p[j] );
-	  */
+	  if (planet) {
+	    head[j].tcs_tr_bc1 = raapp;
+	    head[j].tcs_tr_bc2 = decapp;
+	  } else {
+	    head[j].tcs_tr_bc1 = inx->ra;
+	    head[j].tcs_tr_bc2 = inx->dec;
+	  }
 
           /* TCS - Telescope tracking in horizontal coordinates ------- */
             
