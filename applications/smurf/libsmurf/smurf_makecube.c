@@ -101,10 +101,19 @@
 *
 *          ["Tsys"]
 *
+*     LBOUND( 3 ) = _INTEGER (Write)
+*          The lower pixel bounds of the output NDF. Note, values will be
+*          written to this output parameter even if a null value is supplied 
+*          for parameter OUT.
 *     IN = NDF (Read)
 *          Input file(s)
 *     OUT = NDF (Write)
-*          Output file
+*          Output file. If a null (!) value is supplied, the application
+*          will terminate early without creating an output cube, but
+*          without reporting an error. Note, the pixel bounds which the
+*          output cube would have had will still be written to output 
+*          parameters LBOUND and UBOUND, even if a null value is supplied
+*          for OUT.
 *     OUTCAT = FILENAME (Write)
 *          An output catalogue in which to store all the detector positions 
 *          used to make the output cube (i.e. those selected using the
@@ -268,6 +277,10 @@
 *          had for the first time slice. For any other system, no such 
 *          shifts are applied, even if the base telescope position is
 *          changing through the observation. [TRACKING]
+*     UBOUND( 3 ) = _INTEGER (Write)
+*          The upper pixel bounds of the output NDF. Note, values will be
+*          written to this output parameter even if a null value is supplied 
+*          for parameter OUT.
 *     USEDETPOS = _LOGICAL (Read)
 *          If a true value is supplied, then the detector positions are
 *          read from the detector position arrays in each input NDF.
@@ -327,6 +340,9 @@
 *     21-DEC-2006 (DSB):
 *        Set the spatial output FrameSet to represent offsets from first
 *        base pointing position if the target is moving.
+*     11-JAN-2007 (DSB):
+*        Aded parameters LBOUND and UBOUND, and allowed a null value to
+*        be supplied for OUT.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -496,6 +512,10 @@ void smurf_makecube( int *status ) {
       smf_cubebounds( igrp, size, oskyfrm, autogrid, usedetpos, par, moving, 
                       lbnd_out, ubnd_out, &wcsout, &npos, status );
 
+/* Output the bounds. */
+      parPut1i( "LBOUND", 3, lbnd_out, status );
+      parPut1i( "UBOUND", 3, ubnd_out, status );
+
 /* See how the output Variances are to be created. */
       parChoic( "GENVAR", "TSYS", "SPREAD,TSYS,NONE", 1, pabuf, 10, status );
 
@@ -568,8 +588,17 @@ void smurf_makecube( int *status ) {
 /* Invert the FrameSet. */
    astInvert( swcsout );
 
-/* Create the output NDF. */
-   ndgCreat ( "OUT", NULL, &ogrp, &outsize, &flag, status );
+/* Create the output NDF. Abort without error if a null value is supplied. */
+   ondf = NDF__NOID;
+   if( *status == SAI__OK ) {
+      ndgCreat ( "OUT", NULL, &ogrp, &outsize, &flag, status );
+
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+         goto L999;
+      }
+   }
+
    smfflags = 0;
    if( genvar ) smfflags |= SMF__MAP_VAR;
    smf_open_newfile( ogrp, 1, SMF__FLOAT, 3, lbnd_out, ubnd_out, smfflags, 
@@ -768,7 +797,7 @@ L999:;
    }
 
 /* Store the WCS FrameSet in the output NDF. */
-   if( wcsout ) ndfPtwcs( wcsout, ondf, status );
+   if( wcsout && ondf != NDF__NOID ) ndfPtwcs( wcsout, ondf, status );
   
 /* Close the output data files. */
    if( wdata ) smf_close_file( &wdata, status );
