@@ -84,6 +84,20 @@
 *          A group of detector names. Only data from the named detectors
 *          will be included in the output cube and catalogue. If a null (!) 
 *          value is supplied, data from all detectors will be used. [!]
+*     FLBND( ) = _DOUBLE (Write)
+*          The lower bounds of the bounding box enclosing the output cube in the
+*          selected output WCS Frame. The values are calculated even if no output
+*          cube is created. Celestial axis values will be in units of radians,
+*          spectral axis units will be in the same units of the input frameset
+*          (matching those used in the SPECBOUNDS parameter). The parameter
+*          is named to be consistent with KAPPA NDFTRACE output.
+*     FLBND( ) = _DOUBLE (Write)
+*          The upper bounds of the bounding box enclosing the output cube in the
+*          selected output WCS Frame. The values are calculated even if no output
+*          cube is created. Celestial axis values will be in units of radians,
+*          spectral axis units will be in the same units of the input frameset
+*          (matching those used in the SPECBOUNDS parameter). The parameter
+*          is named to be consistent with KAPPA NDFTRACE output.
 *     GENVAR = LITERAL (Read)
 *          Indicates how the Variance values in the output NDF are to be
 *          calculated. It can take any of the following values:
@@ -343,6 +357,8 @@
 *     11-JAN-2007 (DSB):
 *        Aded parameters LBOUND and UBOUND, and allowed a null value to
 *        be supplied for OUT.
+*     11-JAN-2007 (TIMJ):
+*        Added FLBND and FUBND.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -420,19 +436,21 @@ void smurf_makecube( int *status ) {
    char *pname = NULL;        /* Name of currently opened data file */
    char pabuf[ 10 ];          /* Text buffer for parameter value */
    char system[ 10 ];         /* Celestial coord system for output cube */
+   char tmpstr[10];           /* temporary unit string */
    double par[ 7 ];           /* Projection parameter */
    double params[ 4 ];        /* astRebinSeq parameters */
    int autogrid;              /* Determine projection parameters automatically? */
    int axes[ 2 ];             /* Indices of selected axes */
    int flag;                  /* Is group expression to be continued? */
    int genvar;                /* How to create output Variances */
+   int i;                     /* Loop index */
    int ifile;                 /* Input file index */
    int ispec;                 /* Index of next spectrum within output NDF */
    int lbnd_out[ 3 ];         /* Lower pixel bounds for output map */
    int lbnd_wgt[ 3 ];         /* Lower pixel bounds for wight array */
    int moving;                /* Is the telescope base position changing? */
    int ndet;                  /* Number of detectors supplied for "DETECTORS" */
-   int nparam;                /* No. of parameters required for spreading scheme */
+   int nparam = 0;            /* No. of parameters required for spreading scheme */
    int npos;                  /* Number of samples included in output NDF */
    int ondf;                  /* output NDF identifier */
    int outax[ 2 ];            /* Indices of corresponding output axes */
@@ -441,7 +459,7 @@ void smurf_makecube( int *status ) {
    int size;                  /* Number of files in input group */
    int smfflags;              /* Flags for smfData */
    int sparse;                /* Create a sparse output array? */
-   int spread;                /* Pixel spreading method */
+   int spread = 0;            /* Pixel spreading method */
    int ubnd_out[ 3 ];         /* Upper pixel bounds for output map */
    int ubnd_wgt[ 3 ];         /* Upper pixel bounds for wight array */
    int usedetpos;             /* Should the detpos array be used? */
@@ -452,6 +470,10 @@ void smurf_makecube( int *status ) {
    void *data_array = NULL;   /* Pointer to the rebinned map data */
    void *var_array = NULL;    /* Pointer to the variance map */
    void *wgt_array = NULL;    /* Pointer to the weights map */
+   double wcslbnd_out[3];     /* Array of lower bounds of output cube */
+   double wcsubnd_out[3];     /* Array of upper bounds of output cube */
+   double glbnd_out[ 3 ];     /* double prec Lower GRID bounds for output map */
+   double gubnd_out[ 3 ];     /* double prec Upper GRID bounds for output map */
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -512,10 +534,6 @@ void smurf_makecube( int *status ) {
       smf_cubebounds( igrp, size, oskyfrm, autogrid, usedetpos, par, moving, 
                       lbnd_out, ubnd_out, &wcsout, &npos, status );
 
-/* Output the bounds. */
-      parPut1i( "LBOUND", 3, lbnd_out, status );
-      parPut1i( "UBOUND", 3, ubnd_out, status );
-
 /* See how the output Variances are to be created. */
       parChoic( "GENVAR", "TSYS", "SPREAD,TSYS,NONE", 1, pabuf, 10, status );
 
@@ -552,6 +570,10 @@ void smurf_makecube( int *status ) {
 
    }
 
+/* Output the pixel bounds. */
+   parPut1i( "LBOUND", 3, lbnd_out, status );
+   parPut1i( "UBOUND", 3, ubnd_out, status );
+
 /* Get the base->current Mapping from the output WCS FrameSet, and split it 
    into two Mappings; one (oskymap) that maps the first 2 GRID axes into 
    celestial sky coordinates, and one (ospecmap) that maps the third GRID
@@ -578,7 +600,7 @@ void smurf_makecube( int *status ) {
    astAddFrame( swcsout, AST__BASE, oskymap, oskyfrm );
 
 /* If the target is moving, ensure the FrameSet describes offset from the
-   first base pointing position (stored in the SkyRef attribute of hte
+   first base pointing position (stored in the SkyRef attribute of the
    SkyFrame). */
    if( moving ) {
       astSet( swcsout, "SkyRefIs=Origin" );
@@ -587,6 +609,40 @@ void smurf_makecube( int *status ) {
 
 /* Invert the FrameSet. */
    astInvert( swcsout );
+
+/* Calculate and output the WCS bounds (required for the database header upload).
+   The bounds are normalised. Celestial coordinates will use radians. */
+   for (i=0; i < 3; i++) {
+     /* need GRID bounds as doubles */
+     glbnd_out[i] = 0.5;
+     gubnd_out[i] = ubnd_out[i] - lbnd_out[i] + 1.5;
+   }
+   for (i=0; i < 3; i++) {
+     astMapBox(tmap, glbnd_out, gubnd_out, 1, i+1, &(wcslbnd_out[i]), &(wcsubnd_out[i]),
+	       NULL, NULL);
+   }
+   astNorm(wcsout, wcslbnd_out );
+   astNorm(wcsout, wcsubnd_out );
+
+   parPut1d( "FLBND", 3,  wcslbnd_out, status );
+   parPut1d( "FUBND", 3,  wcsubnd_out, status );
+
+   msgOutif( MSG__NORM, "WCS_WBND1",
+	     "   Cube Bounding Box:", status );
+   for (i=0; i < 3; i++) {
+     msgSeti( "I", i+1);
+     msgSetc( "L", astFormat( wcsout, i+1, wcslbnd_out[i]));
+     msgSetc( "U", astFormat( wcsout, i+1, wcsubnd_out[i]));
+     if (i == 2) {
+       sprintf(tmpstr, "unit(%d)", i+1);
+       msgSetc( "UNT", astGetC( wcsout, tmpstr ));
+     } else {
+       msgSetc("UNT", "");
+     }
+     msgOutif( MSG__NORM, "WCS_WBND2",
+	       "        Axis: ^I: ^L -> ^U ^UNT", status );
+   }
+   msgBlank( status );
 
 /* Create the output NDF. Abort without error if a null value is supplied. */
    ondf = NDF__NOID;

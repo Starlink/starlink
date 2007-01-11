@@ -735,6 +735,22 @@ package @PACKAGE@ {
             helpkey *
 	  }
 
+          parameter flbnd {
+            size *
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+           }
+
+          parameter fubnd {
+            size *
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+           }
+
  	  parameter genvar {
 	    type LITERAL
 	    vpath DEFAULT
