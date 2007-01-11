@@ -45,8 +45,8 @@
 *        are in units of pixels. All the other projection parameters will 
 *        be in units of radians, and refer to the celestial coodinate 
 *        system in which the POS values are supplied. CROTA2 is the angle 
-*        from celestial north to the Y axis, measured through west if WEST 
-*        is .FALSE., and through east otherwise. Returned pixel sizes are 
+*        from the Y axis to celestial north, measured north through east
+*        (no matter what the value of WEST). Returned pixel sizes are 
 *        rounded to the nearest tenth of an arc-second.
 *     RDIAM = DOUBLE PRECISION (Returned)
 *        The diameter of the circle that just encloses all the supplied sky
@@ -95,6 +95,8 @@
 *        Allow negative pixel sizes.
 *     22-DEC-2006 (DSB):
 *        Add argument RDIAM.
+*     11-JAN-2007 (DSB):
+*        Correct description of CROTA2 in prologue.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -204,9 +206,9 @@
 *        CRPIX1 and CRPIX2 are in units of pixels. All the other projection 
 *        parameters will be in units of radians, and refer to the celestial 
 *        coodinate system in which the POS values are supplied. CROTA2 is 
-*        the angle from celestial north to the Y axis, measured through west 
-*        if WEST is .FALSE., and through east otherwise. Returned pixel sizes 
-*        are rounded to the nearest tenth of an arc-second.
+*        the angle from the Y axis to celestial north, measured north through 
+*        east (no matter what the value of WEST). Returned pixel sizes are 
+*        rounded to the nearest tenth of an arc-second.
 *     AIN( NPOS ) = DOUBLE PRECISION (Given and Returned)
 *        Work space.
 *     BIN( NPOS ) = DOUBLE PRECISION (Given and Returned)
@@ -600,12 +602,13 @@
                   PAR0( 6 ) = PWAVE*PIXSCL
                END IF
 
-*  Store the CROTA2 parameter.
-               PAR0( 7 ) = YANG
+               IF( .NOT. WEST ) PAR0( 5 ) = -PAR0( 5 )
 
-               IF( .NOT. WEST ) THEN
-                  PAR0( 5 ) = -PAR0( 5 )
-                  PAR0( 7 ) = -PAR0( 7 )
+*  Store the CROTA2 parameter.
+               IF( WEST ) THEN
+                  PAR0( 7 ) = YANG
+               ELSE
+                  PAR0( 7 ) = -YANG
                END IF
 
 *  Round to the nearest 10th of a degree. 
@@ -919,6 +922,10 @@
 *     22-NOV-2006 (DSB):
 *        Impove location of peak in auto-correlation function by fitting
 *        a quafratic to the 3 values closest to the peak.
+*     10-JAN-2007 (DSB):
+*        Change the scheme used to weight the auro-correlation peak value
+*        when choosing whether to repalce the old "best angle" with the new 
+*        angle.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1122,15 +1129,19 @@ c      write(*,*) '   new total: ',NEWAMP*NEWWAV*NEWWAV,
 c     :           ' old total: ',MXAMP*MXWAVE*MXWAVE
 
 *  We use the new angle if the auto-correlation peak produces a greater
-*  total squared value (over the entire area of the pixel) than the old 
-*  angle.
-            IF( NEWAMP*NEWWAV*NEWWAV .GT. MXAMP*MXWAVE*MXWAVE ) THEN
+*  value than the old angle. We include a weighting factor that gives
+*  priority to larger wavelengths. This seems to distinguish succesfully 
+*  between the periodicity produced when viewing a grid parallel to an axis 
+*  and when viewing it at 45 degrees to an axis. However, the exponent used 
+*  in this weighting factor has been determined by trial and error and
+*  may not be suitab;le in all cases. Time will tell.
+            IF( NEWAMP*( NEWWAV**0.7 ) .GT. MXAMP*( MXWAVE**0.7 ) ) THEN
                MXANG = ANG
                MXAMP = NEWAMP
                MXWAVE = NEWWAV
             END IF
 c         else
-c            write(*,*) 'No peak found'
+c      write(*,*) 'No peak found'
          END IF
       END IF
 
@@ -1447,7 +1458,7 @@ c            write(*,*) 'No peak found'
       logical dumpit
       common /fred/ dumpit
 
-      double precision ang
+      double precision ang, dang
       integer n, status, place, indf, el, iat, pntr
       real dat( n )
       logical fft
@@ -1465,7 +1476,13 @@ c            write(*,*) 'No peak found'
          iat = 4
       end if
 
-      call chr_puti( nint(AST__DR2D*ang), name, iat )
+
+      dang = AST__DR2D*ang
+
+
+      call chr_puti( int(dang), name, iat )
+      call chr_putc( '_', name, iat )
+      call chr_puti( nint(10*(dang-int(dang))), name, iat )
       call ndf_place( DAT__ROOT, name( : iat ), place, status )
       call ndf_newp( '_REAL', 1, n, place, indf, status )
       call ndf_map( indf, 'data', '_REAL', 'WRITE', pntr, el, status )
