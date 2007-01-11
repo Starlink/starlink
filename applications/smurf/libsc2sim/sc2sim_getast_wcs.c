@@ -130,15 +130,16 @@ int *status                  /* global status (given and returned) */
       Notes: -1 to account for FORTRAN array indices starting at 1, and
              +0.5 so that we round to the nearest pixel */
 
-   for( i=0; i<nboll; i++ ) {
+   for ( i=0; i<nboll; i++ ) {
       /* Fortran 2d array so stored by column rather than row! */
       xnear = (int) (skycoord[i] - 1. + 0.5);
       ynear = (int) (skycoord[nboll+i] - 1. + 0.5);
       if( (xnear >= 0) && (xnear < astnaxes[0]) && 
-              (ynear >= 0) && (ynear < astnaxes[1]) )
-         dbuf[i] = astsim[xnear + astnaxes[0]*ynear];
-    
-      else dbuf[i] = 0;
+	  (ynear >= 0) && (ynear < astnaxes[1]) ) {
+	dbuf[i] = astsim[xnear + astnaxes[0]*ynear];
+      } else {
+	dbuf[i] = 0;
+      }
    }
 
    smf_free(skycoord, status);

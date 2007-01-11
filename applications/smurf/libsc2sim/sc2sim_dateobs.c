@@ -116,7 +116,4 @@ void sc2sim_dateobs ( double mjdaystart, char *dateobs, int *status ) {
   /* Store this in dateobs as YYYY-MM-DDThh:mm:ss.sss */
   sprintf( dateobs, "%d-%02d-%02dT%02d:%02d:%02d.%03d", 
 	   yy, mm, dd, ihmsf[0], ihmsf[1], ihmsf[2], ihmsf[3]);
-
-
-
 }
