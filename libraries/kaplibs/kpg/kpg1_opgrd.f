@@ -926,6 +926,9 @@
 *        Change the scheme used to weight the auro-correlation peak value
 *        when choosing whether to repalce the old "best angle" with the new 
 *        angle.
+*     11-JAN-2007 (DSB):
+*        Ignored insignificant peaks and troughs in the auto-correlation
+*        when finding the first peak.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -964,23 +967,31 @@
 *  Local Variables:
       DOUBLE PRECISION COSANG
       DOUBLE PRECISION D
+      DOUBLE PRECISION DSUM
       DOUBLE PRECISION FBIN
-      DOUBLE PRECISION LSUM2
+      DOUBLE PRECISION LLLSUM2
       DOUBLE PRECISION LLSUM2
+      DOUBLE PRECISION LSUM2
+      DOUBLE PRECISION MAXSUM
+      DOUBLE PRECISION MINSUM
       DOUBLE PRECISION NEWAMP
       DOUBLE PRECISION NEWSPA
       DOUBLE PRECISION NEWWAV
       DOUBLE PRECISION POW
       DOUBLE PRECISION SINANG
       DOUBLE PRECISION SUM2
+      DOUBLE PRECISION USUM
       DOUBLE PRECISION WBIN
       DOUBLE PRECISION WBIN2
       DOUBLE PRECISION XSHIFT
+      INTEGER COUNT
       INTEGER I
       INTEGER IBIN
       INTEGER IBIN2
       INTEGER IFREQ
       INTEGER J
+      INTEGER MAXSH
+      INTEGER MINSH
       INTEGER SHIFT
       LOGICAL MORE             
 *.
@@ -1061,68 +1072,130 @@ c      write(*,*) 'Ang: ',ang*ast__dr2d,' sum2: ',sum2,' mxamp: ',mxamp
 *  histogram. This is determined by forming the auto-correlation of the
 *  histogram, and looking for the first peak that is at least half the
 *  size of the sum of the squared values found above. First evaluate the 
-*  auto-correlation at increasing shifts, until a minimum is found.
+*  auto-correlation at increasing shifts, until a minimum is found which
+*  is less than the two subsequent value.
+
          NEWAMP = SUM2
+         LLLSUM2 = SUM2
+         LLSUM2 = SUM2
          LSUM2 = SUM2
          SHIFT = 1
+         MINSUM = SUM2
    
+*  Loop over increasing shifts until we have found the minimum.
          MORE = .TRUE.
          DO WHILE( MORE )
-   
+
+*  We record the SUM2 values for the three previous shifts. Shuffle them
+*  down so that we can assign a new value to SUM2.
+            LLLSUM2 = LLSUM2
+            LLSUM2 = LSUM2
+            LSUM2 = SUM2
+
+*  Form the SUM2 value (the auto-correlation) for this shift.
             J = 1
             SUM2 = 0.0
             DO I = SHIFT + 1, HISTSZ
                SUM2 = SUM2 + HIST( I )*HIST( J )
                J = J + 1
             END DO
-   
-            SHIFT = SHIFT + 1
-   
-            IF( SUM2 .GT. LSUM2 .OR. SHIFT .EQ. HISTSZ ) THEN
-               MORE = .FALSE.
+
+*  If the SUM2 value is smaller than the smallest value found so far,
+*  record it and rest the count of larger SUM2 values found since the
+*  most recent minimum..
+            IF( SUM2 .LT. MINSUM ) THEN
+               MINSUM = SUM2
+               MINSH = SHIFT 
+               COUNT = 0
+
+*  Otherwise, increment the count of shifts that have produced a higher 
+*  SUM" value than the minimum.
             ELSE
-               LSUM2 = SUM2
-            END IF   
+               COUNT  = COUNT + 1
+
+*  If this is the first shift after the minimum, record the SUM2 values
+*  on either side of the minimum.
+               IF( COUNT .EQ. 1 ) THEN
+                  USUM = SUM2
+                  DSUM = LLSUM2
+*  If this is the second shift after the minimum, accept the minimum as
+*  found.
+               ELSE IF( COUNT .LE. 2 ) THEN
+                  MORE = .FALSE.
+               END IF
+
+            END IF
+
+*  Increment the shift and abort if we have reached the end of the array.
+            SHIFT = SHIFT + 1
+            IF( SHIFT .EQ. HISTSZ ) MORE = .FALSE.
+
          END DO
 
 *  Now continue to evaluate the auto-correlation at increasing shifts
-*  until a maximum is found that is more than half the value at zero shift.
-         LLSUM2 = LSUM2
-         LSUM2 = SUM2
-         MORE = .TRUE.
-         DO WHILE( MORE .AND. SHIFT .LT. HISTSZ )
-   
-            J = 1
-            SUM2 = 0.0
-            DO I = SHIFT + 1, HISTSZ
-               SUM2 = SUM2 + HIST( I )*HIST( J )
-               J = J + 1
-            END DO
+*  until a maximum is found that is more than half the value at zero
+*  shift and is greater than the subsequent two values.
+         IF( SHIFT .LT. HISTSZ ) THEN
 
-            IF( SUM2 .LE. LSUM2 .AND. LSUM2 .GT. 0.5*NEWAMP ) THEN 
-               MORE = .FALSE.
-               SHIFT = SHIFT - 1
-            ELSE
-               SHIFT = SHIFT + 1
+            MAXSUM = 0.5*NEWAMP
+            MAXSH = -1
+
+            SHIFT = MINSH + 1
+            SUM2 = MINSUM
+            LSUM2 = DSUM
+            LLSUM2 = DSUM
+            LLLSUM2 = DSUM
+
+            MORE = .TRUE.
+            DO WHILE( MORE )
+      
+               LLLSUM2 = LLSUM2
                LLSUM2 = LSUM2
                LSUM2 = SUM2
-            END IF
-   
-         END DO
 
-*  Fit a quadratic to the AMP valuies at the highest point (SHIFT) and its
-*  two neighbours, and then find the peak of the quadratic in order to get 
-*  a more accurate estimate of the peak position.
-         XSHIFT = SHIFT + 0.5*( LLSUM2 - SUM2 )/
-     :                        ( LLSUM2 + SUM2 - 2*LSUM2 )
+               J = 1
+               SUM2 = 0.0
+               DO I = SHIFT + 1, HISTSZ
+                  SUM2 = SUM2 + HIST( I )*HIST( J )
+                  J = J + 1
+               END DO
+   
+               IF( SUM2 .GT. MAXSUM ) THEN
+                  MAXSUM = SUM2
+                  MAXSH = SHIFT 
+                  COUNT = 0
+
+               ELSE IF( MAXSH .NE. -1 ) THEN
+                  COUNT  = COUNT + 1
+                  IF( COUNT .EQ. 1 ) THEN
+                     USUM = SUM2
+                     DSUM = LLSUM2
+
+                  ELSE IF( COUNT .LE. 2 ) THEN
+                     MORE = .FALSE.
+                  END IF
+
+               END IF
+   
+               SHIFT = SHIFT + 1
+               IF( SHIFT .EQ. HISTSZ ) MORE = .FALSE.
+   
+            END DO
+         END IF
 
 c         call opgrd_dump( histsz, hist, .false., ang, status )
 c         call opgrd_autodump( ang, histsz, hist, status )
 
-*  SHIFT is left holding the shift at the first significant peak in the
-*  auto-correlation function. Check a peak was found, and convert the
-*  shift value to a wavelength in grid pixels.
+*  Check a peak was found.
          IF( SHIFT .LT. HISTSZ ) THEN
+
+*  Fit a quadratic to the AMP values at the highest point (MAXSH) and its
+*  two neighbours, and then find the peak of the quadratic in order to get 
+*  a more accurate estimate of the peak position.
+            XSHIFT = MAXSH + 0.5*( DSUM - USUM )/
+     :                           ( DSUM + USUM - 2*MAXSUM )
+
+*  Convert the shift value to a wavelength in grid pixels.
             NEWWAV = XSHIFT*SPC
 
 c      write(*,*) '   new total: ',NEWAMP*NEWWAV*NEWWAV,
