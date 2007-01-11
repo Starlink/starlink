@@ -84,6 +84,16 @@
 *          A group of detector names. Only data from the named detectors
 *          will be included in the output cube and catalogue. If a null (!) 
 *          value is supplied, data from all detectors will be used. [!]
+*     FBL( ) = _DOUBLE (Write)
+*          Sky coordinates (radians) of the bottom left corner of the output cube
+*          (the corner with the smallest PIXEL dimension for axis 1 and the smallest
+*          pixel dimension for axis 2). No check is made that the pixel corresponds
+*          valid data.
+*     FBR( ) = _DOUBLE (Write)
+*          Sky coordinates (radians) of the bottom right corner of the output cube
+*          (the corner with the largest PIXEL dimension for axis 1 and the smallest
+*          pixel dimension for axis 2). No check is made that the pixel corresponds
+*          valid data.
 *     FLBND( ) = _DOUBLE (Write)
 *          The lower bounds of the bounding box enclosing the output cube in the
 *          selected output WCS Frame. The values are calculated even if no output
@@ -91,13 +101,23 @@
 *          spectral axis units will be in the same units of the input frameset
 *          (matching those used in the SPECBOUNDS parameter). The parameter
 *          is named to be consistent with KAPPA NDFTRACE output.
-*     FLBND( ) = _DOUBLE (Write)
+*     FUBND( ) = _DOUBLE (Write)
 *          The upper bounds of the bounding box enclosing the output cube in the
 *          selected output WCS Frame. The values are calculated even if no output
 *          cube is created. Celestial axis values will be in units of radians,
 *          spectral axis units will be in the same units of the input frameset
 *          (matching those used in the SPECBOUNDS parameter). The parameter
 *          is named to be consistent with KAPPA NDFTRACE output.
+*     FTL( ) = _DOUBLE (Write)
+*          Sky coordinates (radians) of the top left corner of the output cube
+*          (the corner with the smallest PIXEL dimension for axis 1 and the largest
+*          pixel dimension for axis 2). No check is made that the pixel corresponds
+*          valid data.
+*     FTR( ) = _DOUBLE (Write)
+*          Sky coordinates (radians) of the top right corner of the output cube
+*          (the corner with the largest PIXEL dimension for axis 1 and the largest
+*          pixel dimension for axis 2). No check is made that the pixel corresponds
+*          valid data.
 *     GENVAR = LITERAL (Read)
 *          Indicates how the Variance values in the output NDF are to be
 *          calculated. It can take any of the following values:
@@ -358,7 +378,7 @@
 *        Aded parameters LBOUND and UBOUND, and allowed a null value to
 *        be supplied for OUT.
 *     11-JAN-2007 (TIMJ):
-*        Added FLBND and FUBND.
+*        Added FLBND and FUBND. Add FTL, FTR, FBL, FBR parameters.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -424,6 +444,7 @@ void smurf_makecube( int *status ) {
    AstFrame *ospecfrm = NULL;  /* SpecFrame from the output WCS Frameset */
    AstFrame *tfrm = NULL;      /* Current Frame from output WCS */
    AstFrameSet *swcsout = NULL;/* Spatial WCS FrameSet for output cube */
+   AstFrameSet *tmpwcs = NULL;/* Temporary Spatial WCS FrameSet for output cube */
    AstFrameSet *wcsout = NULL; /* WCS Frameset for output cube */
    AstMapping *oskymap = NULL; /* GRID->SkyFrame Mapping from output WCS */
    AstMapping *ospecmap = NULL;/* GRID->SpecFrame Mapping from output WCS */
@@ -470,8 +491,13 @@ void smurf_makecube( int *status ) {
    void *data_array = NULL;   /* Pointer to the rebinned map data */
    void *var_array = NULL;    /* Pointer to the variance map */
    void *wgt_array = NULL;    /* Pointer to the weights map */
+   double corner[2];          /* WCS of a corner (SKY) */
    double wcslbnd_out[3];     /* Array of lower bounds of output cube */
    double wcsubnd_out[3];     /* Array of upper bounds of output cube */
+   double gx_in[ 4 ];         /* X Grid coordinates of four corners */
+   double gy_in[ 4 ];         /* Y Grid coordinates of four corners */
+   double gx_out[ 4 ];        /* X WCS coordinates of four corners */
+   double gy_out[ 4 ];        /* Y WCS coordinates of four corners */
    double glbnd_out[ 3 ];     /* double prec Lower GRID bounds for output map */
    double gubnd_out[ 3 ];     /* double prec Upper GRID bounds for output map */
 
@@ -610,8 +636,8 @@ void smurf_makecube( int *status ) {
 /* Invert the FrameSet. */
    astInvert( swcsout );
 
-/* Calculate and output the WCS bounds (required for the database header upload).
-   The bounds are normalised. Celestial coordinates will use radians. */
+/* Calculate and output the WCS bounds (matching NDFTRACE output). The bounds are normalised.
+   Celestial coordinates will use radians. */
    for (i=0; i < 3; i++) {
      /* need GRID bounds as doubles */
      glbnd_out[i] = 0.5;
@@ -643,6 +669,44 @@ void smurf_makecube( int *status ) {
 	       "        Axis: ^I: ^L -> ^U ^UNT", status );
    }
    msgBlank( status );
+
+   /* Now also calculate the spatial coordinates of the four corners (required
+      for CADC science archive */
+   /* Calculate input GRID coordinates for 4 corners: TR, TL, BR, BL */
+   gx_in[0] = ubnd_out[0] - lbnd_out[0] + 1.5; /* Right */
+   gx_in[1] = 0.5;                             /* Left */
+   gx_in[2] = gx_in[0];                        /* Right */
+   gx_in[3] = gx_in[1];                        /* Left */
+   gy_in[0] = ubnd_out[1] - lbnd_out[1] + 1.5; /* Top */
+   gy_in[1] = gy_in[0];                        /* Top */
+   gy_in[2] = 0.5;                             /* Bottom */
+   gy_in[3] = gy_in[2];                        /* Bottom */
+
+   /* Since swcsout is inverted we take a copy so that we can properly normalise
+      coordinates */
+   tmpwcs = astCopy( swcsout );
+   astInvert( tmpwcs );
+
+   astTran2( tmpwcs, 4, gx_in, gy_in, 1, gx_out, gy_out );
+   
+   /* Horrible code duplication */
+   corner[0] = gx_out[0];
+   corner[1] = gy_out[0];
+   astNorm( tmpwcs, corner );
+   parPut1d( "FTR", 2, corner, status );
+   corner[0] = gx_out[1];
+   corner[1] = gy_out[1];
+   astNorm( tmpwcs, corner );
+   parPut1d( "FTL", 2, corner, status );
+   corner[0] = gx_out[2];
+   corner[1] = gy_out[2];
+   astNorm( tmpwcs, corner );
+   parPut1d( "FBR", 2, corner, status );
+   corner[0] = gx_out[3];
+   corner[1] = gy_out[3];
+   astNorm( tmpwcs, corner );
+   parPut1d( "FBL", 2, corner, status );
+   tmpwcs = astAnnul( tmpwcs );
 
 /* Create the output NDF. Abort without error if a null value is supplied. */
    ondf = NDF__NOID;
