@@ -254,7 +254,7 @@ itcl::class gaia::GaiaSpecWriter {
                array::copy $cubespecdatacomp $specdatacomp
                $cubeaccessor unmap "VARIANCE"
             }
-            
+
             if { [$cubeaccessor exists "QUALITY"] } {
                $cubeaccessor map "READ" "QUALITY"
                set specdatacomp [$specaccessor map "WRITE/BAD" "QUALITY"]
@@ -263,39 +263,49 @@ itcl::class gaia::GaiaSpecWriter {
                $cubeaccessor unmap "QUALITY"
             }
 
-            #  Record the world coordinates of this position. These 
-            #  document the extraction for other applications.
-            add_fits_coords_ $specaccessor
-
             #  If this is a raw ACSIS cube we will try to extract and record
-            #  the TSYS and TRX values.
+            #  the TSYS and TRX values and work out the pointing information.
+            set rawacsis 0
             if { [$cubeaccessor extensionexists "ACSIS"] &&
                  [$cubeaccessor extensionexists "JCMTSTATE"] } {
 
                #  Must be extracting spectra. These are axis 1. The image
-               #  positions are time and receptor index, these index the 
+               #  positions are time and receptor index, these index the
                #  TSYS and TRX arrays.
                lassign [$cubeaccessor getlastspectruminfo] \
                   type axis alow ahigh p1 p2
                if { $axis == 1 } {
-                  set tsys [$cubeaccessor getproperty ACSIS "TSYS\($p1,$p2\)"]
-                  if { $tsys != "" && $tsys != "-3.40282E+38" } {
+                  set tsys [$cubeaccessor getdoubleproperty ACSIS \
+                               "TSYS\($p1,$p2\)"]
+                  if { $tsys != "BAD" } {
                      $specaccessor fitswrite TSYS $tsys "Median system temp"
                   }
 
-                  set trx [$cubeaccessor getproperty ACSIS "TRX\($p1,$p2\)"]
-                  if { $trx != "" && $trx != "-3.40282E+38" } {
+                  set trx [$cubeaccessor getdoubleproperty ACSIS \
+                              "TRX\($p1,$p2\)"]
+                  if { $trx != "BAD" } {
                      $specaccessor fitswrite TRX $trx "Receiver temp"
                   }
+
+                  #  Attempt to determine the pointing information.
+                  set rawacsis [add_acsis_coords_ \
+                                   $cubeaccessor $specaccessor $p1 $p2]
                }
+            }
+
+            if { ! $rawacsis } {
+               #  Record the world coordinates of this position. These
+               #  document the extraction for other applications. Note we fall
+               #  back to this when raw ACSIS extraction also fails.
+               add_fits_coords_ $specaccessor
             }
          }
          $specaccessor close
-         
+
          blt::busy release $w_
       }
    }
-   
+
    #  FITS format
    #  -----------
 
@@ -330,8 +340,8 @@ itcl::class gaia::GaiaSpecWriter {
          set specaccessor [$cubeaccessor createspectrum "FITS" $filename \
                               $shortname]
 
-         
-         #  Record the world coordinates of this position. These 
+
+         #  Record the world coordinates of this position. These
          #  document the extraction for other applications.
          add_fits_coords_ $specaccessor
 
@@ -350,7 +360,7 @@ itcl::class gaia::GaiaSpecWriter {
    #  spectrum as various FITS cards. Note all in same world coordinate
    #  system.
    protected method add_fits_coords_ {specaccessor} {
-      
+
       #  Not fatal if this fails.
       catch {
          lassign [$cubespectrum get_last_coords] ra dec xra xdec dra ddec
@@ -370,6 +380,123 @@ itcl::class gaia::GaiaSpecWriter {
          }
       }
    }
+
+   #  Determine the ACSIS pointing for the current spectrum.
+   protected method add_acsis_coords_ {cubeaccessor specaccessor p1 p2} {
+
+      set ra {}
+      set dec {}
+
+      #  System, either AZEL or TRACKING.
+      set tsys [$cubeaccessor getproperty ACSIS "RECEPPOS_SYS"]
+      if { $tsys != "" } {
+
+         #  If TRACKING that's in some sky coordinate system.
+         if { $tsys == "TRACKING" } {
+            set tsys \
+               [$cubeaccessor getproperty JCMTSTATE "TCS_TR_SYS\($p2\)"]
+            if { $tsys != {} } {
+
+               #  Transform into AST name for that system.
+               set tsys [jcmt_tracking_to_ast_ $tsys]
+            }
+         }
+
+         if { $tsys != {} } {
+            #  Receptor position in radians.
+            set rx [$cubeaccessor getdoubleproperty ACSIS \
+                       "RECEPPOS\(1,$p1,$p2\)"]
+            set ry [$cubeaccessor getdoubleproperty ACSIS \
+                       "RECEPPOS\(2,$p1,$p2\)"]
+
+            if { $rx != "BAD" && $ry != "BAD" } {
+
+               #  Observer longitude and latitude.
+               set lonobs [$cubeaccessor getproperty FITS "LONG-OBS"]
+               set latobs [$cubeaccessor getproperty FITS "LAT-OBS"]
+               if { $latobs != {} && $lonobs != {} } {
+
+                  set lonobs [string trim $lonobs]
+                  set latobs [string trim $latobs]
+
+                  #  Determine the Epoch, needed for AZEL.
+                  #  Correct to TAI to TDB.
+                  set epoch [$cubeaccessor getdoubleproperty JCMTSTATE \
+                                "TCS_TAI\($p2\)"]
+                  if { $epoch == "BAD" } {
+                     set epoch [$cubeaccessor getdoubleproperty JCMTSTATE \
+                                   "RTS_END\($p2\)"]
+                     set steptime [$cubeaccessor getproperty FITS "STEPTIME"]
+                     set epoch [expr $epoch + (32.184-0.5*$steptime)/86400.0]
+                  } else {
+                     set epoch [expr $epoch + (32.184/86400.0)]
+                  }
+
+                  #  Gather all information. 
+                  set atts "System=$tsys,Epoch=MJD $epoch,\
+                            Obslat=$latobs,Obslon=$lonobs"
+
+                  #  Correction from UT1 to UTC, if known (value in days).
+                  #  Needs to be correct for the epoch of observation.
+                  set dut1 [$cubeaccessor getproperty FITS "DUT1"]
+                  if { $dut1 != {} } {
+                     set dut1 [expr $dut1*86400.0]
+                     append atts ",DUT1=$dut1"
+                  }
+
+                  #  Create the SkyFrame.
+                  set skyframe [gaiautils::astskyframe $atts]
+
+                  #  If the tsys is AZEL then transform to FK5.
+                  if { $tsys == "AZEL" } {
+                     set toframe [gaiautils::astcopy $skyframe]
+                     gaiautils::astset $toframe "system=FK5"
+
+                     set wcs [gaiautils::astconvert $skyframe $toframe "SKY"]
+
+                     lassign [gaiautils::asttran2 $wcs $rx $ry] rx ry
+
+                     gaiautils::astannul $skyframe
+                     gaiautils::astannul $wcs
+                     set skyframe $toframe
+                  }
+
+                  #  Format the receptor position for display.
+                  set ra [gaiautils::astformat $skyframe 1 $rx]
+                  set dec [gaiautils::astformat $skyframe 2 $ry]
+
+                  gaiautils::astannul $skyframe
+               }
+            }
+         }
+      }
+
+      if { $ra != {} && $dec != {} } {
+         $specaccessor fitswrite EXRA  $ra "Spectral extraction position"
+         $specaccessor fitswrite EXDEC $dec "Spectral extraction position"
+         $specaccessor fitswrite EXSYS $tsys "Extraction coordinate system"
+         return 1
+      }
+      return 0
+   }
+
+   #  Convert JCMT TRACKING system into the equivalent AST celestial
+   #  coordinate system. Returns input if no match (OK for some systems).
+   protected method jcmt_tracking_to_ast_ {tsys} {
+      switch -glob "$tsys" {
+         J2* {
+            set tsys "FK5"
+         }
+         B19* {
+            set tsys "FK4"
+         }
+         APP* {
+            set tsys "GAPPT"
+         }
+      }
+      return $tsys
+   }
+
 
    #  Configuration options: (public variables)
    #  ----------------------
