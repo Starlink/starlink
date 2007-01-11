@@ -35,6 +35,7 @@
     18Dec2006 : Replace pattern-specific parameters with general 
                 parameters (jb)
     21Dec2006 : Add instap & instap_x/y (agg)
+    22Dec2006 : Add planetnum (agg)
 */
 #include "libsc2sim/sc2sim_par.h"
 
@@ -101,6 +102,7 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
   int numsamples;             /* number of samples in STARE */
   int nvert;                  /* Nr of vertices in the Jiggle pattern */
   char obsmode[80];           /* Type of observation */
+  int planetnum;              /* Number corresponding to a planet */
   int platenum;               /* number of waveplate rotations */
   double platerev;            /* waveplate rotation rev/sec */
   double pong_angle;          /* angle of pattern relative to telescope
