@@ -386,6 +386,7 @@ itcl::class gaia::GaiaSpecWriter {
 
       set ra {}
       set dec {}
+      set dateobs {}
 
       #  System, either AZEL or TRACKING.
       set tsys [$cubeaccessor getproperty ACSIS "RECEPPOS_SYS"]
@@ -432,7 +433,7 @@ itcl::class gaia::GaiaSpecWriter {
                      set epoch [expr $epoch + (32.184/86400.0)]
                   }
 
-                  #  Gather all information. 
+                  #  Gather all information.
                   set atts "System=$tsys,Epoch=MJD $epoch,\
                             Obslat=$latobs,Obslon=$lonobs"
 
@@ -465,6 +466,12 @@ itcl::class gaia::GaiaSpecWriter {
                   set ra [gaiautils::astformat $skyframe 1 $rx]
                   set dec [gaiautils::astformat $skyframe 2 $ry]
 
+                  #  The DATE-OBS keyword for this spectrum can
+                  #  be defined more accurately as the Epoch, so
+                  #  do that. Note we need to move back to TAI (/UTC).
+                  set epoch [expr $epoch - (32.184/86400.0)]
+                  set dateobs [sla::datemjd2obs $epoch]
+
                   gaiautils::astannul $skyframe
                }
             }
@@ -475,6 +482,9 @@ itcl::class gaia::GaiaSpecWriter {
          $specaccessor fitswrite EXRA  $ra "Spectral extraction position"
          $specaccessor fitswrite EXDEC $dec "Spectral extraction position"
          $specaccessor fitswrite EXSYS $tsys "Extraction coordinate system"
+         if { $dateobs != {} } {
+            $specaccessor fitswrite DATE-OBS $dateobs "Time of observation"
+         }
          return 1
       }
       return 0

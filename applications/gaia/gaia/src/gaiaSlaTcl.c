@@ -44,6 +44,7 @@
 
 #include <tcl.h>
 #include <fitshead.h>
+#include <fitsfile.h>
 #include "gaiaArray.h"
 #include "star/slalib.h"
 
@@ -53,6 +54,13 @@ static int gaiaSlaObs( ClientData clientData, Tcl_Interp *interp,
 
 static int gaiaSlaDateObs2Je( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
+
+static int gaiaSlaDateJe2Obs( ClientData clientData, Tcl_Interp *interp,
+                              int objc, Tcl_Obj *CONST objv[] );
+
+static int gaiaSlaDateMjd2Obs( ClientData clientData, Tcl_Interp *interp,
+                               int objc, Tcl_Obj *CONST objv[] );
+
 
 /**
  * Register all the sla:: commands.
@@ -64,6 +72,14 @@ int Sla_Init( Tcl_Interp *interp )
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "sla::dateobs2je", gaiaSlaDateObs2Je,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "sla::dateje2obs", gaiaSlaDateJe2Obs,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "sla::datemjd2obs", gaiaSlaDateMjd2Obs,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
     return TCL_OK;
@@ -156,3 +172,85 @@ static int gaiaSlaDateObs2Je( ClientData clientData, Tcl_Interp *interp,
     Tcl_SetObjResult( interp, Tcl_NewDoubleObj( value ) );
     return TCL_OK;
 }
+
+
+/**
+ * Convert a Julian epoch into a DATE-OBS FITS string. 
+ * One argument is needed, the Julian epoch.
+ *
+ * The result is the DATE-OBS value.
+ */
+static int gaiaSlaDateJe2Obs( ClientData clientData, Tcl_Interp *interp,
+                              int objc, Tcl_Obj *CONST objv[] )
+{
+    char date[256];
+    char sign[2];
+    double fd;
+    double je;
+    double mjd;
+    int ihmsf[4];
+    int iymdf[4];
+    int jj;
+
+    /* Check arguments, require one */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "Julian_Epoch" );
+        return TCL_ERROR;
+    }
+
+    if ( Tcl_GetDoubleFromObj( interp, objv[1], &je ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
+    /* Use "ccyy-mm-ddThh:mm:ss[.ssss]" format. */
+    mjd = slaEpj2d( je );
+
+    slaDjcl( mjd, iymdf, iymdf+1, iymdf+2, &fd, &jj );
+    slaDd2tf( 3, fd, sign, ihmsf );
+
+    sprintf( date, "%4.4d-%2.2d-%2.2dT%2.2d:%2.2d:%2.2d.%3.3d",
+             iymdf[0], iymdf[1], iymdf[2], ihmsf[0], ihmsf[1],
+             ihmsf[2], ihmsf[3] ); 
+
+    Tcl_SetResult( interp, date, TCL_VOLATILE );
+    return TCL_OK;
+}
+
+/**
+ * Convert a modified Julian date into a DATE-OBS FITS string. 
+ * One argument is needed, the MJD.
+ *
+ * The result is the DATE-OBS value.
+ */
+static int gaiaSlaDateMjd2Obs( ClientData clientData, Tcl_Interp *interp,
+                              int objc, Tcl_Obj *CONST objv[] )
+{
+    char date[256];
+    char sign[2];
+    double fd;
+    double mjd;
+    int ihmsf[4];
+    int iymdf[4];
+    int jj;
+
+    /* Check arguments, require one */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "Modified_Julian_Date" );
+        return TCL_ERROR;
+    }
+
+    if ( Tcl_GetDoubleFromObj( interp, objv[1], &mjd ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
+    /* Use "ccyy-mm-ddThh:mm:ss[.ssss]" format. */
+    slaDjcl( mjd, iymdf, iymdf+1, iymdf+2, &fd, &jj );
+    slaDd2tf( 3, fd, sign, ihmsf );
+    sprintf( date, "%4.4d-%2.2d-%2.2dT%2.2d:%2.2d:%2.2d.%3.3d",
+             iymdf[0], iymdf[1], iymdf[2], ihmsf[0], ihmsf[1],
+             ihmsf[2], ihmsf[3] ); 
+
+    Tcl_SetResult( interp, date, TCL_VOLATILE );
+    return TCL_OK;
+}
+

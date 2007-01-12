@@ -187,7 +187,7 @@ $(DEMO_WISH): normallib tkAppInit.o initFortran.o FORCE
 	- $(RANLIB) $(LIBDIR)/libskycat.a
 	$(LTLINK) $(CC_SWITCHES) tkAppInit.o initFortran.o -o $(DEMO_WISH)  \
 	       $(LDFLAG1) $(LD_SEARCH_FLAGS) $(AST_LIBS) \
-	       $(SKYCAT_LIB) $(LOCAL_LIBRARY) \
+	       $(LOCAL_LIBRARY) $(SKYCAT_LIB) \
 	       $(AST_LIBS) $(ADAM_LIBS) $(AST_LIBS) $(TCLTKLIBS) \
 	       $(X_LIB) $(LDFLAG2) $(EXTRA_LIBS) $(FCLIBS)
 
