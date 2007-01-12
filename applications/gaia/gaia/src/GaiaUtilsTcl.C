@@ -194,20 +194,20 @@ static int GaiaUtilsAstCopy( ClientData clientData, Tcl_Interp *interp,
 
 
 /**
- * Get the value of an AST attribute from a FrameSet.
+ * Get the value of an AST attribute from an AST object.
  *
- * There are two arguments, the address of the AST FrameSet and the attribute.
+ * There are two arguments, the address of the AST object and the attribute.
  */
 static int GaiaUtilsAstGet( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] )
 {
-    AstFrameSet *wcs;
+    AstObject *object;
     long adr;
     const char *value;
 
     /* Check arguments, only allow two. */
     if ( objc != 3 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "frameset attribute" );
+        Tcl_WrongNumArgs( interp, 1, objv, "AstObject attribute" );
         return TCL_ERROR;
     }
 
@@ -215,10 +215,10 @@ static int GaiaUtilsAstGet( ClientData clientData, Tcl_Interp *interp,
     if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
         return TCL_ERROR;
     }
-    wcs = (AstFrameSet *) adr;
+    object = (AstObject *) adr;
 
     /* Get the value */
-    value = astGetC( wcs, Tcl_GetString( objv[2] ) );
+    value = astGetC( object, Tcl_GetString( objv[2] ) );
     if ( ! astOK ) {
         char *buf = ckalloc( 1024 );
         sprintf( buf, "Failed to get AST attribute (%s)",
