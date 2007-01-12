@@ -88,12 +88,14 @@
 *          Sky coordinates (radians) of the bottom left corner of the output cube
 *          (the corner with the smallest PIXEL dimension for axis 1 and the smallest
 *          pixel dimension for axis 2). No check is made that the pixel corresponds
-*          valid data.
+*          valid data. Note that the position is reported for the centre of the pixel.
+*          If SPARSE mode is enabled the positions reported will not be reliable.
 *     FBR( ) = _DOUBLE (Write)
 *          Sky coordinates (radians) of the bottom right corner of the output cube
 *          (the corner with the largest PIXEL dimension for axis 1 and the smallest
 *          pixel dimension for axis 2). No check is made that the pixel corresponds
-*          valid data.
+*          valid data. Note that the position is reported for the centre of the pixel.
+*          If SPARSE mode is enabled the positions reported will not be reliable.
 *     FLBND( ) = _DOUBLE (Write)
 *          The lower bounds of the bounding box enclosing the output cube in the
 *          selected output WCS Frame. The values are calculated even if no output
@@ -112,12 +114,14 @@
 *          Sky coordinates (radians) of the top left corner of the output cube
 *          (the corner with the smallest PIXEL dimension for axis 1 and the largest
 *          pixel dimension for axis 2). No check is made that the pixel corresponds
-*          valid data.
+*          valid data. Note that the position is reported for the centre of the pixel.
+*          If SPARSE mode is enabled the positions reported will not be reliable.
 *     FTR( ) = _DOUBLE (Write)
 *          Sky coordinates (radians) of the top right corner of the output cube
 *          (the corner with the largest PIXEL dimension for axis 1 and the largest
 *          pixel dimension for axis 2). No check is made that the pixel corresponds
-*          valid data.
+*          valid data. Note that the position is reported for the centre of the pixel.
+*          If SPARSE mode is enabled the positions reported will not be reliable.
 *     GENVAR = LITERAL (Read)
 *          Indicates how the Variance values in the output NDF are to be
 *          calculated. It can take any of the following values:
@@ -672,14 +676,17 @@ void smurf_makecube( int *status ) {
 
    /* Now also calculate the spatial coordinates of the four corners (required
       for CADC science archive */
-   /* Calculate input GRID coordinates for 4 corners: TR, TL, BR, BL */
-   gx_in[0] = ubnd_out[0] - lbnd_out[0] + 1.5; /* Right */
-   gx_in[1] = 0.5;                             /* Left */
+   /* Calculate input GRID coordinates for 4 corners: TR, TL, BR, BL. Use pixel
+      centres for reporting. This is important for cases where the pixels are very
+      large and we want to make sure that we are conservative with the database
+      reporting. */
+   gx_in[0] = ubnd_out[0] - lbnd_out[0] + 1.0; /* Right */
+   gx_in[1] = 1.0;                             /* Left */
    gx_in[2] = gx_in[0];                        /* Right */
    gx_in[3] = gx_in[1];                        /* Left */
-   gy_in[0] = ubnd_out[1] - lbnd_out[1] + 1.5; /* Top */
+   gy_in[0] = ubnd_out[1] - lbnd_out[1] + 1.0; /* Top */
    gy_in[1] = gy_in[0];                        /* Top */
-   gy_in[2] = 0.5;                             /* Bottom */
+   gy_in[2] = 1.0;                             /* Bottom */
    gy_in[3] = gy_in[2];                        /* Bottom */
 
    /* Since swcsout is inverted we take a copy so that we can properly normalise
