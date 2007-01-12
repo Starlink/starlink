@@ -383,6 +383,8 @@
 *        be supplied for OUT.
 *     11-JAN-2007 (TIMJ):
 *        Added FLBND and FUBND. Add FTL, FTR, FBL, FBR parameters.
+*     12-JAN-2007 (DSB):
+*        Add reporting of axis labels.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -658,19 +660,23 @@ void smurf_makecube( int *status ) {
    parPut1d( "FUBND", 3,  wcsubnd_out, status );
 
    msgOutif( MSG__NORM, "WCS_WBND1",
-	     "   Cube Bounding Box:", status );
+	     "   Output cube WCS bounds:", status );
    for (i=0; i < 3; i++) {
-     msgSeti( "I", i+1);
      msgSetc( "L", astFormat( wcsout, i+1, wcslbnd_out[i]));
      msgSetc( "U", astFormat( wcsout, i+1, wcsubnd_out[i]));
+
      if (i == 2) {
        sprintf(tmpstr, "unit(%d)", i+1);
        msgSetc( "UNT", astGetC( wcsout, tmpstr ));
      } else {
        msgSetc("UNT", "");
      }
+
+     sprintf( tmpstr, "label(%d)", i + 1 );
+     msgSetc( "LAB", astGetC( wcsout, tmpstr ) );
+
      msgOutif( MSG__NORM, "WCS_WBND2",
-	       "        Axis: ^I: ^L -> ^U ^UNT", status );
+	       "        ^LAB: ^L -> ^U ^UNT", status );
    }
    msgBlank( status );
 

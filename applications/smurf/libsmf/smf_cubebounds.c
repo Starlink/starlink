@@ -107,6 +107,8 @@
 *     9-JAN-2007 (DSB):
 *        Determine the pixel index bounds of the spectral axis in the
 *        same way for both autogrid and non-autogrid mode.
+*     12-JAN-2007 (DSB):
+*        Move reporting of axis labels into smurf_makecube.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -749,8 +751,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* We now erase the original PIXEL Frame since it is no longer needed. */
    astRemoveFrame( *wcsout, 1 );
 
-/* Report the coordinate systems in use in the output cube, and the pixel
-   bounds of the cube. */
+/* Report the pixel bounds of the cube. */
    if( *status == SAI__OK ) {
       msgOutif( MSG__NORM, " ", " ", status );
 
@@ -760,16 +761,8 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       msgSeti( "XU", ubnd[ 0 ] );
       msgSeti( "YU", ubnd[ 1 ] );
       msgSeti( "ZU", ubnd[ 2 ] );
-      msgOutif( MSG__NORM, " ", "   Output cube bounds: ( ^XL:^XU, ^YL:^YU, ^ZL:^ZU )", 
+      msgOutif( MSG__NORM, " ", "   Output cube pixel bounds: ( ^XL:^XU, ^YL:^YU, ^ZL:^ZU )", 
                 status );
-      
-      msgSetc( "X", astGetC( *wcsout, "Label(1)" ) );
-      msgSetc( "Y", astGetC( *wcsout, "Label(2)" ) );
-      msgSetc( "Z", astGetC( *wcsout, "Label(3)" ) );
-      msgOutif( MSG__NORM, " ", "   Output WCS axes: ( ^X, ^Y, ^Z )", 
-                status );
-      
-      msgOutif( MSG__NORM, " ", " ", status );
    }
 
 /* If no error has occurred, export the returned FrameSet pointer from the 
