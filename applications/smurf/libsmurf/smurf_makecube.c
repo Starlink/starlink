@@ -661,7 +661,7 @@ void smurf_makecube( int *status ) {
 
    msgOutif( MSG__NORM, "WCS_WBND1",
 	     "   Output cube WCS bounds:", status );
-   for (i=0; i < 3; i++) {
+   for (i=0; i < 3 && *status == SAI__OK; i++) {
      msgSetc( "L", astFormat( wcsout, i+1, wcslbnd_out[i]));
      msgSetc( "U", astFormat( wcsout, i+1, wcsubnd_out[i]));
 
