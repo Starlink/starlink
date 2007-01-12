@@ -1,3 +1,7 @@
+    Spectra extracted from ACSIS raw timecubes now display the 
+    RA and Dec of the pointing, and the time of the spectrum.
+
+
   Hokulei Release:
 
     This is an update with many usability changes and minor bug fixes:
