@@ -56,10 +56,12 @@
 *        drifts, not the sky
 *     26-JUL-2006 (TIMJ):
 *        Remove unused sc2da includes.
+*     2007-01-12 (AGG):
+*        Add SYSTEM parameter for specifying output coordinate system
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics and Astronomy Research
+*     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
 *     Council and the University of British Columbia.  All Rights
 *     Reserved.
 
@@ -120,6 +122,7 @@ void smurf_qlmakemap( int *status ) {
   AstFrameSet *outframeset=NULL; /* Frameset containing sky->output mapping */
   float pixsize=3;           /* Size of an output map pixel in arcsec */
   int size;                  /* Number of files in input group */
+  char system[10];           /* Celestial coordinate system for output image */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   void *variance=NULL;       /* Pointer to the variance map */
   void *weights=NULL;        /* Pointer to the weights map */
@@ -135,19 +138,24 @@ void smurf_qlmakemap( int *status ) {
   /* Get group of input files */
   ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
 
+  /* Get the celestial coordinate system for the output cube. */
+  parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC,"
+	    "GAPPT,FK4,FK4-NO-E,ECLIPTIC", 1, system, 10, status );
+
   /* Get the user defined pixel size */
   parGet0r( "PIXSIZE", &pixsize, status );
-  if( pixsize <= 0 ) {
+  if ( pixsize <= 0 || pixsize > 60. ) {
     msgSetr("PIXSIZE", pixsize);
     *status = SAI__ERROR;
-    errRep("smurf_makemap", 
-	   "Pixel size ^PIXSIZE is < 0.", status);
+    errRep(FUNC_NAME, 
+	   "Invalid pixel size, ^PIXSIZE (must be positive but < 60 arcsec)", 
+	   status);
   }
 
   /* Calculate the map bounds */
   msgOutif(MSG__VERB," ", 
 	   "SMURF_QLMAKEMAP: Determine approx map bounds", status);
-  smf_mapbounds_approx( igrp, size, "icrs", 0, 0, 1, pixsize, lbnd_out, ubnd_out, 
+  smf_mapbounds_approx( igrp, size, system, 0, 0, 1, pixsize, lbnd_out, ubnd_out, 
 			&outframeset, status );
 
 

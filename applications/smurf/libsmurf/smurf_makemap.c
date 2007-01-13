@@ -83,10 +83,12 @@
 *        Use bad bolometer mask if supplied; add usebad flag
 *     2006-12-18 (AGG):
 *        Fix incorrect indf declaration, delete ogrp if it exists
+*     2007-01-12 (AGG):
+*        Add SYSTEM parameter for specifying output coordinate system
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
+*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
 *     Council and the University of British Columbia. All Rights
 *     Reserved.
 
@@ -171,10 +173,11 @@ void smurf_makemap( int *status ) {
   float pixsize=3;           /* Size of an output map pixel in arcsec */
   int size;                  /* Number of files in input group */
   int smfflags=0;            /* Flags for smfData */
+  char system[10];           /* Celestial coordinate system for output image */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   int usebad;                /* Flag for whether to use bad bolos mask */
   void *variance=NULL;       /* Pointer to the variance map */
-  smfData *wdata=NULL;       /* Pointer to SCUBA2 data struct */
+  smfData *wdata=NULL;       /* Pointer to SCUBA2 data struct for weights */
   void *weights=NULL;        /* Pointer to the weights map */
   HDSLoc *weightsloc=NULL;   /* HDS locator of weights array */
 
@@ -185,18 +188,23 @@ void smurf_makemap( int *status ) {
   /* Get group of input files */
   ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
 
+  /* Get the celestial coordinate system for the output cube. */
+  parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC,"
+	    "GAPPT,FK4,FK4-NO-E,ECLIPTIC", 1, system, 10, status );
+
   /* Get the user defined pixel size */
   parGet0r( "PIXSIZE", &pixsize, status );
-  if( pixsize <= 0 ) {
+  if ( pixsize <= 0 || pixsize > 60. ) {
     msgSetr("PIXSIZE", pixsize);
     *status = SAI__ERROR;
     errRep(FUNC_NAME, 
-	   "Pixel size ^PIXSIZE is < 0.", status);
+	   "Invalid pixel size, ^PIXSIZE (must be positive but < 60 arcsec)", 
+	   status);
   }
 
   /* Determine whether or not to use the bad bolos mask.  If 
      unspecified, use the mask */
-  parGtd0l ("USEBAD", 1, 1, &usebad, status);\
+  parGtd0l ("USEBAD", 1, 1, &usebad, status);
 
   /* Get METHOD */
   parChoic( "METHOD", "REBIN", 
@@ -205,7 +213,7 @@ void smurf_makemap( int *status ) {
   
   /* Calculate the map bounds */
   msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Determine map bounds", status);
-  smf_mapbounds( igrp, size, "icrs", 0, 0, 1, pixsize, lbnd_out, ubnd_out, 
+  smf_mapbounds( igrp, size, system, 0, 0, 1, pixsize, lbnd_out, ubnd_out, 
 		 &outfset, status );
   if (*status != SAI__OK) {
     errRep(FUNC_NAME, "Unable to determine map bounds", status);
@@ -229,12 +237,13 @@ void smurf_makemap( int *status ) {
     variance = (odata->pntr)[1];
 
   }
-  
+
+  /* Create WEIGHTS extension in the output file and map pointer to
+     weights array */
   weightsloc = smf_get_xloc ( odata, "SCU2RED", "SCUBA2_WT_ARR", "WRITE", 
                               0, 0, status );
   smf_open_ndfname ( weightsloc, "WRITE", NULL, "WEIGHTS", "NEW", "_DOUBLE",
                      2, lbnd_out, ubnd_out, &wdata, status );
-
   if ( *status == SAI__OK ) 
     weights = (wdata->pntr)[0];
 
@@ -250,6 +259,11 @@ void smurf_makemap( int *status ) {
       /* ****** 
 	 These calls are not needed - we should probably check that we
 	 have sky-subtracted and extinction-corrected data 
+
+	 Actually I think a parameter called AUTOSKY should be used to
+	 decide whether or not to do the `optimal' sky removal IFF sky
+	 removal and ext correction have not been done already
+
 	 ****** */
       /* Remove sky - assume MEAN is good enough for now */
       /*      smf_subtract_plane(data, "MEAN", status);*/
