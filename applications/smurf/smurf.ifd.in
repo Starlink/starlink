@@ -128,6 +128,8 @@
 #         Added SPECBOUNDS parameter for MAKECUBE
 #     11-JAN-2007 (DSB):
 #         Added UBOUND and LBOUND parameters for MAKECUBE
+#     12-JAN-2007 (AGG):
+*         Added SYSTEM parameter for MAKEMAP and QLMAKEMAP
 #     {enter_changes_here}
 
 #  Bugs:
@@ -343,6 +345,17 @@ package @PACKAGE@ {
             helpkey *
           }
 
+	  parameter system {
+	    position 4
+            type LITERAL
+            access READ
+            vpath DEFAULT 
+            ppath CURRENT DEFAULT
+            prompt {Celestial coord system for output cube}
+            default TRACKING
+            helpkey *
+	  }
+
 	  parameter msg_filter {
 	    type _CHAR
 	    prompt {Message level}
@@ -386,6 +399,17 @@ package @PACKAGE@ {
 	    ppath GLOBAL CURRENT
 	    default 3.0
 	    helpkey *
+	  }
+
+	  parameter system {
+	    position 4
+            type LITERAL
+            access READ
+            vpath DEFAULT 
+            ppath CURRENT DEFAULT
+            prompt {Celestial coord system for output cube}
+            default TRACKING
+            helpkey *
 	  }
 
 	  parameter msg_filter {
@@ -631,6 +655,7 @@ package @PACKAGE@ {
 	    helpkey *
 	 }
      }
+
      action sc2sim {
 
          helplib {$SMURF_HELP}
