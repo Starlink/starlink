@@ -129,7 +129,7 @@
 #     11-JAN-2007 (DSB):
 #         Added UBOUND and LBOUND parameters for MAKECUBE
 #     12-JAN-2007 (AGG):
-*         Added SYSTEM parameter for MAKEMAP and QLMAKEMAP
+#         Added SYSTEM parameter for MAKEMAP and QLMAKEMAP
 #     {enter_changes_here}
 
 #  Bugs:
@@ -1129,7 +1129,6 @@ package @PACKAGE@ {
 	  }
 
      }
-
 
    }
 
