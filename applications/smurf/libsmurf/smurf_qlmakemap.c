@@ -147,7 +147,7 @@ void smurf_qlmakemap( int *status ) {
   if ( pixsize <= 0 || pixsize > 60. ) {
     msgSetr("PIXSIZE", pixsize);
     *status = SAI__ERROR;
-    errRep(FUNC_NAME, 
+    errRep(" ", 
 	   "Invalid pixel size, ^PIXSIZE (must be positive but < 60 arcsec)", 
 	   status);
   }
