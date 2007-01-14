@@ -259,7 +259,7 @@ F77_SUBROUTINE(psx_calloc)( INTEGER(nmemb), CHARACTER(type),
 	 total = (unsigned long)(*nmemb * size);
          sprintf( errbuf, 
             "Failed to allocate space with calloc. %d elements of size %d bytes (%lu bytes total) requested",
-		  (int)nmemb, (int)size, (unsigned long)total );
+		  (int)*nmemb, (int)size, (unsigned long)total );
          psx1_rep_c( "PSX_CALLOC_NOALL", errbuf, status );
       }
    }
