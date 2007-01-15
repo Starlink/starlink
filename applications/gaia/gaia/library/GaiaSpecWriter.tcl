@@ -479,8 +479,8 @@ itcl::class gaia::GaiaSpecWriter {
       }
 
       if { $ra != {} && $dec != {} } {
-         $specaccessor fitswrite EXRA  $ra "Spectral extraction position"
-         $specaccessor fitswrite EXDEC $dec "Spectral extraction position"
+         $specaccessor fitswrite EXRAX  $ra "Spectral extraction position"
+         $specaccessor fitswrite EXDECX $dec "Spectral extraction position"
          $specaccessor fitswrite EXSYS $tsys "Extraction coordinate system"
          if { $dateobs != {} } {
             $specaccessor fitswrite DATE-OBS $dateobs "Time of observation"
