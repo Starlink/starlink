@@ -33,6 +33,7 @@
  * pbiereic        25/05/00  Added method 'fillToFit'
  * pbiereic        27/06/01  Added method 'noiseStatistics'
  * pbiereic        10/02/03  Native byte order routines revised
+ * P.W. Draper     16/01/07  Make sure object_ is null terminated.
  */
 
 #include <sys/types.h>
@@ -114,7 +115,7 @@ protected:
     int width_, height_;
 
     // value in "OBJECT" header field: name of astronomical object
-    char object_[80];
+    char object_[81];
 
     // saved x, y values from last call to updateOffset(x, y)
     double prevX_, prevY_;
@@ -518,7 +519,10 @@ public:
 
     virtual void name(const char* name) {strncpy(name_, name, sizeof(name_)-1);}
     char* name() {return name_;}
-    virtual void object(const char *object) {strncpy(object_, object, sizeof(object_)-1);}
+    virtual void object(const char *object) {
+        strncpy(object_, object, sizeof(object_));
+        object_[80] = '\0';
+    }
     char* object() {return object_;}
 
     int update_pending() {return update_pending_;}
