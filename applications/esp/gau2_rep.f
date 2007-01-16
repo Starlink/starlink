@@ -52,14 +52,13 @@
 *   Arguments
       integer n, liv, lv, p,l,status
       integer iv(liv), gau2par(gau2len)
-      doubleprecision v(lv), x(p), c(l), xerrs(p)
+      double precision v(lv), x(p), c(l), xerrs(p)
       integer ngaussians
       logical calcerrs
 
 *   Local variables
       integer i
-      doubleprecision vt        ! temp real
-      character line*80         ! output line
+      double precision vt       ! temp real
       character remark*40       ! variable remark
 
       if (status .ne. sai__ok) return
@@ -95,10 +94,10 @@
 *      what's going on here, and see if we can accomodate the user's
 *      value in a statistically legitimate way.  See NSG sect. 10 for
 *      notes about (simple) rescaling of this value. 
-      write (line,100) 'Effective data s.d:',
-     :     real(sqrt(2*v(10)/(n-p))),'Check reasonable'
-      call msg_out (' ',line,status)
- 100  format ('   ',a25,g12.3,'  ',a)
+      call msg_setr( 'SD', real(sqrt(2*v(10)/(n-p)))) 
+      call msg_out (' ','Effective data s.d.: ^SD Check reasonable',
+     :     status)
+
 *      call msg_setr ('SIGMA', real(sqrt(2*v(10)/(n-p))))
 *      call msg_out  (' ', '  Effective data s.d.: ^SIGMA', status)
 *      Also write out the condition number from v(rcond)=v(53) (`the
@@ -115,8 +114,9 @@
             remark = 'not good -- uncertainties unreliable'
          endif
       endif
-      write (line,100) 'Condition number:',vt,remark
-      call msg_out (' ',line,status)
+      call msg_setr('VT', real(vt))
+      call msg_setc('REM', remark)
+      call msg_out (' ','Condition number: ^VT ^REM',status)
 *      call msg_setr ('COND', real(1/v(53)**2))
 *      call msg_out  (' ', '  Condition number:    >^COND', status)
 
@@ -146,8 +146,9 @@
             remark = 'Poor'
          endif
       endif
-      write (line,100) 'Optimisation metric:',vt,remark
-      call msg_out (' ',line,status)
+      call msg_setr('VT', real(vt))
+      call msg_setc('REM', remark)
+      call msg_out (' ','Optimisation metric: ^VT ^REM',status)
 *      call msg_setr ('OPT',      
 *     :     1.0 - real(gau2par(gau2calcda)) / real(iv(30)))
 *      call msg_out (' ', '  Optimisation metric: ^OPT', status)
