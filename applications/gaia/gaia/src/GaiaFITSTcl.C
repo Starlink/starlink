@@ -467,13 +467,16 @@ static int GaiaFITSTclCGet( ClientData clientData, Tcl_Interp *interp,
         value[0] = '\0';
 
         /* We test for some special keywords that are used by the NDF
-         * library. These are "units" and "label". Transform these
+         * library. These are "units", "label" and "title". Transform these
          * into the obvious FITS equivalents. */
         char *keyword = Tcl_GetString( objv[2] );
         if ( strcasecmp( keyword, "units" ) == 0 ) {
             keyword = "BUNIT";
         }
         else if ( strcasecmp( keyword, "label" ) == 0 ) {
+            keyword = "OBJECT";
+        }
+        else if ( strcasecmp( keyword, "title" ) == 0 ) {
             keyword = "OBJECT";
         }
         result = GaiaFITSHGet( info->handle, keyword, value, 80 );
