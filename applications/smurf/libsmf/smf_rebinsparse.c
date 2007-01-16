@@ -45,9 +45,12 @@
 *        The data array for the output cube. This is updated on exit to
 *        include the data from the supplied input NDF.
 *     var_array = float * (Given and Returned)
-*        The variance array for the output cube. This is updated on exit
-*        to include the data from the supplied input NDF. Ignored if
-*        "genvar" is not 2.
+*        An array in which to store the variances for the output cube if
+*        "genvar" is not zero (the supplied pointer is ignored if "genvar" is 
+*        zero). The supplied array is update on exit to include the data from 
+*        the supplied input NDF. This array should be big enough to hold a 
+*        single spatial plane from the output cube (all planes will have the 
+*        same variance and so only one plane need be calculated). 
 *     ispec = int * (Given and Returned)
 *        Index of the next spectrum to be stored in the output NDF.
 *     status = int * (Given and Returned)

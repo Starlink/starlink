@@ -385,6 +385,8 @@
 *        Added FLBND and FUBND. Add FTL, FTR, FBL, FBR parameters.
 *     12-JAN-2007 (DSB):
 *        Add reporting of axis labels.
+*     16-JAN-2007 (DSB):
+*        Use 2D variance and weights arrays where possible.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -464,10 +466,24 @@ void smurf_makecube( int *status ) {
    char pabuf[ 10 ];          /* Text buffer for parameter value */
    char system[ 10 ];         /* Celestial coord system for output cube */
    char tmpstr[10];           /* temporary unit string */
+   double corner[2];          /* WCS of a corner (SKY) */
+   double glbnd_out[ 3 ];     /* double prec Lower GRID bounds for output map */
+   double gubnd_out[ 3 ];     /* double prec Upper GRID bounds for output map */
+   double gx_in[ 4 ];         /* X Grid coordinates of four corners */
+   double gx_out[ 4 ];        /* X WCS coordinates of four corners */
+   double gy_in[ 4 ];         /* Y Grid coordinates of four corners */
+   double gy_out[ 4 ];        /* Y WCS coordinates of four corners */
    double par[ 7 ];           /* Projection parameter */
    double params[ 4 ];        /* astRebinSeq parameters */
+   double wcslbnd_out[3];     /* Array of lower bounds of output cube */
+   double wcsubnd_out[3];     /* Array of upper bounds of output cube */
+   float *var_array = NULL;   /* Pointer to temporary variance array */
+   float *var_out = NULL;     /* Pointer to the output variance array */
+   int *work_array = NULL;    /* Pointer to temporary work array */
    int autogrid;              /* Determine projection parameters automatically? */
    int axes[ 2 ];             /* Indices of selected axes */
+   int el0;                   /* Index of 2D array element */
+   int el;                    /* Index of 3D array element */
    int flag;                  /* Is group expression to be continued? */
    int genvar;                /* How to create output Variances */
    int i;                     /* Loop index */
@@ -477,8 +493,11 @@ void smurf_makecube( int *status ) {
    int lbnd_wgt[ 3 ];         /* Lower pixel bounds for wight array */
    int moving;                /* Is the telescope base position changing? */
    int ndet;                  /* Number of detectors supplied for "DETECTORS" */
+   int nel;                   /* Number of elements in 3D array */
    int nparam = 0;            /* No. of parameters required for spreading scheme */
    int npos;                  /* Number of samples included in output NDF */
+   int nwgtdim;               /* No. of axes in the weights array */
+   int nxy;                   /* Number of elements in 2D array */
    int ondf;                  /* output NDF identifier */
    int outax[ 2 ];            /* Indices of corresponding output axes */
    int outsize;               /* Number of files in output group */
@@ -489,23 +508,15 @@ void smurf_makecube( int *status ) {
    int spread = 0;            /* Pixel spreading method */
    int ubnd_out[ 3 ];         /* Upper pixel bounds for output map */
    int ubnd_wgt[ 3 ];         /* Upper pixel bounds for wight array */
+   int use_ast;               /* Use AST for rebinning? */
    int usedetpos;             /* Should the detpos array be used? */
+   int wgtsize;               /* No. of elements in the weights array */
    smfData *data = NULL;      /* Pointer to data struct */
    smfData *odata = NULL;     /* Pointer to output SCUBA2 data struct */
    smfData *wdata = NULL;     /* Pointer to SCUBA2 data struct */
    smfFile *file = NULL;      /* Pointer to data file struct */
    void *data_array = NULL;   /* Pointer to the rebinned map data */
-   void *var_array = NULL;    /* Pointer to the variance map */
    void *wgt_array = NULL;    /* Pointer to the weights map */
-   double corner[2];          /* WCS of a corner (SKY) */
-   double wcslbnd_out[3];     /* Array of lower bounds of output cube */
-   double wcsubnd_out[3];     /* Array of upper bounds of output cube */
-   double gx_in[ 4 ];         /* X Grid coordinates of four corners */
-   double gy_in[ 4 ];         /* Y Grid coordinates of four corners */
-   double gx_out[ 4 ];        /* X WCS coordinates of four corners */
-   double gy_out[ 4 ];        /* Y WCS coordinates of four corners */
-   double glbnd_out[ 3 ];     /* double prec Lower GRID bounds for output map */
-   double gubnd_out[ 3 ];     /* double prec Upper GRID bounds for output map */
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -602,9 +613,75 @@ void smurf_makecube( int *status ) {
 
    }
 
+/* Get the pixel spreading scheme to use, and note if AST will be used to
+   do the rebinning. */
+   use_ast = 0;
+   if( !sparse ) {
+      use_ast = 1;
+      parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,"
+                "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS", 
+                1, pabuf, 10, status );
+
+      if( !strcmp( pabuf, "NEAREST" ) ) {
+         use_ast = 0;
+         spread = AST__NEAREST;
+         nparam = 0;
+   
+      } else if( !strcmp( pabuf, "LINEAR" ) ) {
+         spread = AST__LINEAR;
+         nparam = 0;
+   
+      } else if( !strcmp( pabuf, "SINC" ) ) {      
+         spread = AST__SINC;
+         nparam = 1;
+   
+      } else if( !strcmp( pabuf, "SINCSINC" ) ) {      
+         spread = AST__SINCSINC;
+         nparam = 2;
+   
+      } else if( !strcmp( pabuf, "SINCCOS" ) ) {      
+         spread = AST__SINCCOS;
+         nparam = 2;
+   
+      } else if( !strcmp( pabuf, "SINCGAUSS" ) ) {      
+         spread = AST__SINCGAUSS;
+         nparam = 2;
+   
+      } else if( !strcmp( pabuf, "SOMB" ) ) {      
+         spread = AST__SOMB;
+         nparam = 1;
+   
+      } else if( !strcmp( pabuf, "SOMBCOS" ) ) {      
+         spread = AST__SOMBCOS;
+         nparam = 2;
+   
+      } else if( !strcmp( pabuf, "GAUSS" ) ) {      
+         spread = AST__GAUSS;
+         nparam = 2;
+   
+      } else if( *status == SAI__OK ) {
+         nparam = 0;
+         *status = SAI__ERROR;
+         msgSetc( "V", pabuf );
+         errRep( "", "Support not available for SPREAD = ^V (programming "
+                 "error)", status );
+      }
+
+   } else {
+      spread = AST__NEAREST;
+      nparam = 0;
+   }
+
+/* Get an additional parameter vector if required. */
+   if( nparam > 0 ) parExacd( "PARAMS", nparam, params, status );
+
 /* Output the pixel bounds. */
    parPut1i( "LBOUND", 3, lbnd_out, status );
    parPut1i( "UBOUND", 3, ubnd_out, status );
+
+/* Store the number of pixels per spatial plane in the output cube. */
+   nxy = ( ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1 )*
+         ( ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1 );
 
 /* Get the base->current Mapping from the output WCS FrameSet, and split it 
    into two Mappings; one (oskymap) that maps the first 2 GRID axes into 
@@ -733,7 +810,7 @@ void smurf_makecube( int *status ) {
    }
 
    smfflags = 0;
-   if( genvar ) smfflags |= SMF__MAP_VAR;
+   if( genvar && use_ast ) smfflags |= SMF__MAP_VAR;
    smf_open_newfile( ogrp, 1, SMF__FLOAT, 3, lbnd_out, ubnd_out, smfflags, 
                      &odata, status );
 
@@ -751,9 +828,24 @@ void smurf_makecube( int *status ) {
    that all input NDFs have the same Label and Unit strings. */
    smf_labelunit( igrp, size, odata, status );
 
-/* Get pointers to the mapped output data and variance. */
+/* Get a pointer to the mapped output data array. */
    data_array = (odata->pntr)[ 0 ];
-   var_array = (odata->pntr)[ 1 ];
+
+/* If AST is being used to do the re-binning, the variance will be
+   evaluated for each individual pixel in the output cube. In this case we
+   will have mapped the Variance component in the output cube, so store a
+   pointer to it. */
+   if( use_ast ) {
+      var_array = (odata->pntr)[ 1 ];
+
+/* Otherwise, the variance is assumed to be the same in every spatial
+   slice, so we only need memory to hold one spatial slice (this slice is
+   later copied to all slices in the output cube Variance component).
+   Also allocate an integer work array of the same size. */
+   } else if( genvar ) {
+      var_array = (float *) astMalloc( nxy*sizeof( float ) );
+      work_array = (int *) astMalloc( nxy*sizeof( int ) );
+   }
 
 /* Get the pixel spreading scheme to use. */
    if( !sparse ) {
@@ -813,35 +905,49 @@ void smurf_makecube( int *status ) {
 /* Get an additional parameter vector if required. */
    if( nparam > 0 ) parExacd( "PARAMS", nparam, params, status );
 
-/* If required, create an array to hold the weights. This has to be twice 
-   the size of the output cube if astRebinSeq is being used within 
-   smf_rebincube, and output variances are being generated from the input 
-   data spread. First set up the bounds of the array (a larger array is 
-   needed if AST is being used to do the rebinning), and then see if the 
-   array should be held in temporary work space, or in an extension of 
-   the output NDF. */
+/* If required, create an array to hold the weights. First set up the bounds 
+   of the whole 3D array (a larger array is needed if AST is being used to 
+   do the rebinning and output variances are being created on the basis
+   of the spread of input values), and then see if the array should be held in 
+   temporary work space, or in an extension of the output NDF. If AST is
+   not being used (i.e. if nearest neighbour spreading is being used), then 
+   the weights will be the same for everyt 2D slice in the output cube, and so
+   we can avoid extra memory requirements by using a single 2D array for the
+   weights in this case. */
    if( !sparse ) {   
+
       lbnd_wgt[ 0 ] = 1;
       lbnd_wgt[ 1 ] = 1;
       lbnd_wgt[ 2 ] = 1;
       ubnd_wgt[ 0 ] = ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1;
       ubnd_wgt[ 1 ] = ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1;
       ubnd_wgt[ 2 ] = ubnd_out[ 2 ] - lbnd_out[ 2 ] + 1;
-      if( spread != AST__NEAREST && genvar == 1 ) ubnd_wgt[ 0 ] *= 2;
+
+/* Select the number of dimensions for the weights array, and the total
+   size of the array. */
+      if( spread != AST__NEAREST ) {
+         nwgtdim = 3;
+         if( genvar == 1 ) ubnd_wgt[ 0 ] *= 2;
+         wgtsize = ubnd_wgt[ 0 ]*ubnd_wgt[ 1 ]*ubnd_wgt[ 2 ];
+      } else {
+         nwgtdim = 2;
+         wgtsize = ubnd_wgt[ 0 ]*ubnd_wgt[ 1 ];
+      }
    
+/* See if weights are to be saved in the output NDF. */
       parGet0l( "WEIGHTS", &savewgt, status );
 
-/* Create the extension, or allocate the work space, as required. */
+/* Create the NDF extension, or allocate the work space, as required. */
       if( savewgt ) {
          weightsloc = smf_get_xloc ( odata, "ACSISRED", "WT_ARR", "WRITE", 
                                      0, 0, status );
-         smf_open_ndfname ( weightsloc, "WRITE", NULL, "WEIGHTS", "NEW", "_DOUBLE",
-                         3, (int *) lbnd_wgt, (int *) ubnd_wgt, &wdata, status );
+         smf_open_ndfname ( weightsloc, "WRITE", NULL, "WEIGHTS", "NEW", 
+                            "_DOUBLE", nwgtdim, (int *) lbnd_wgt, 
+                            (int *) ubnd_wgt, &wdata, status );
          if( wdata ) wgt_array = (wdata->pntr)[ 0 ];
    
       } else {
-         wgt_array = astMalloc( sizeof( double )*
-	                   (size_t)ubnd_wgt[ 0 ]*ubnd_wgt[ 1 ]*ubnd_wgt[ 2 ] );
+         wgt_array = astMalloc( sizeof( double )*(size_t)wgtsize );
       }
    }
 
@@ -906,7 +1012,7 @@ void smurf_makecube( int *status ) {
       if( !sparse ) {
          smf_rebincube( data, ifile, size, swcsout, ospecfrm, ospecmap, detgrp,
                         moving, lbnd_out, ubnd_out, spread, params, genvar,
-                        data_array, var_array, wgt_array, status );
+                        data_array, var_array, wgt_array, work_array, status );
       } else {
          smf_rebinsparse( data, ospecfrm, ospecmap, oskyfrm, detgrp, 
                           lbnd_out, ubnd_out, genvar, data_array, var_array, 
@@ -932,6 +1038,28 @@ L999:;
 /* Store the WCS FrameSet in the output NDF. */
    if( wcsout && ondf != NDF__NOID ) ndfPtwcs( wcsout, ondf, status );
   
+/* If the output variances are the same for every spatial slice, the
+   "var_array" used above will be a 2D array holding a single slice of the 3D
+   Variance array. In this case we now copy this slice to the output
+   cube, first unmapping the Data array to minimise memory requirements. */
+   if( !use_ast && genvar ) {
+      ndfUnmap( ondf, "Data", status );
+      ndfMap( ondf, "Variance", "_REAL", "WRITE", (void **) &var_out, &nel, 
+              status );
+      if( var_out && *status == SAI__OK ) {
+         el0 = 0;
+         for( el = 0; el < nel; el++, el0++ ) {
+            if( el0 == nxy ) el0 = 0;
+            var_out[ el ] = var_array[ el0 ];
+         }
+      }
+
+/* Free the memory used to store the 2D variance information. */
+      var_array = astFree( var_array );
+      work_array = astFree( work_array );
+
+   }
+
 /* Close the output data files. */
    if( wdata ) smf_close_file( &wdata, status );
    if( odata ) smf_close_file( &odata, status );

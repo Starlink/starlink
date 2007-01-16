@@ -19,7 +19,7 @@
 *                    int moving, dim_t lbnd_out[ 3 ], dim_t ubnd_out[ 3 ], 
 *                    int spread, const double params[], int genvar, 
 *                    float *data_array, float *var_array, double *wgt_array, 
-*                    int *status );
+*                    int *work_array, int *status );
 
 *  Arguments:
 *     data = smfData * (Given)
@@ -72,14 +72,27 @@
 *        The data array for the output cube. This is updated on exit to
 *        include the data from the supplied input NDF.
 *     var_array = float * (Given and Returned)
-*        The variance array for the output cube. This is updated on exit
-*        to include the data from the supplied input NDF. Ignored if
-*        "genvar" is zero.
+*        An array in which to store the variances for the output cube if
+*        "genvar" is not zero (the supplied pointer is ignored if "genvar" is 
+*        zero). The supplied array is update on exit to include the data from 
+*        the supplied input NDF. If "spread" is AST__NEAREST, then this array 
+*        should be big enough to hold a single spatial plane from the output 
+*        cube (all planes will have the same variance and so only one plane 
+*        need be calculated). For other values of "spread", the "var_array" 
+*        array should be the same shape and size as the output data array.
 *     wgt_array = double * (Given and Returned)
-*        Relative weighting for each pixel in the output cube. This array
-*        should be the same length as "data_array" if "spread" is 
-*        AST__NEAREST, but should be twice the length of "data_array" for
-*        all other values of "spread".
+*        An array in which to store the relative weighting for each pixel in 
+*        the output cube. The supplied array is update on exit to include the 
+*        data from the supplied input NDF. If "spread" is AST__NEAREST, then 
+*        this array should be big enough to hold a single spatial plane from 
+*        the output cube (all planes will have the same weight and so only one 
+*        plane need be calculated). For other values of "spread", the 
+*        "wgt_array" array should be twice the length of "data_array".
+*     work_array = int * (Given and Returned)
+*        A work array, which is updated on exit to include the supplied input 
+*        NDF. Only used if "genvar" is 1 and "spread" is AST__NEAREST. It
+*        should be big enough to hold a single spatial plane from the output 
+*        cube.
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
@@ -120,7 +133,10 @@
 *     19-DEC-2006 (TIMJ):
 *        In some broken data FFT_WIN is undef. Assume truncate.
 *     21-DEC-2006 (DSB):
-*        Restructured ot make moving targets work correctly.
+*        Restructured to make moving targets work correctly.
+*     15-JAN-2007 (DSB):
+*        Restructured to use 2D weights and variance arrays for nearest
+*        neighbour re-binning.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -171,7 +187,7 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
                     int moving, int lbnd_out[ 3 ], int ubnd_out[ 3 ], 
                     int spread, const double params[], int genvar,
                     float *data_array, float *var_array, double *wgt_array, 
-                    int *status ){
+                    int *work_array, int *status ){
 
 /* Local Variables */
    AstCmpMap *fmap = NULL;     /* Mapping from spectral grid to topo freq Hz */
@@ -186,7 +202,8 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
    char *fftwin = NULL;        /* Name of FFT windowing function */
    const char *name;           /* Pointer to current detector name */
    const double *tsys;         /* Pointer to Tsys value for first detector */
-   dim_t iv;                   /* Vector index into output array */
+   dim_t iv;                   /* Vector index into output 3D array */
+   dim_t iv0;                  /* Vector index into 2D array */
    dim_t nel;                  /* No. of pixels in output */
    dim_t nxy;                  /* Number of pixels in one output xy plane */
    double *ipw = NULL;         /* Pointer to weights arrays */
@@ -198,6 +215,7 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
    double at;                  /* Frequency at which to take the gradient */
    double coff;                /* Ratio of "off source" to "on source" integration times */
    double dnew;                /* Channel width in Hz */
+   double d2sum;               /* Sum of squared data values in output spectrum */
    double fcon;                /* Variance factor for whole file */
    double k;                   /* Back-end degradation factor */
    double tcon;                /* Variance factor for whole time slice */
@@ -206,7 +224,6 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
    float *ipv = NULL;          /* Pointer to input variances values */
    float *pdata = NULL;        /* Pointer to next input data value */
    float *varwork = NULL;      /* Work array holding variances for 1 slice/channel */
-   float dval;                 /* Output data value */
    int ast_flags;              /* Flags to use with astRebinSeq */
    int dim[ 3 ];               /* Output array dimensions */
    int found;                  /* Was current detector name found in detgrp? */
@@ -220,6 +237,7 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
    int lbnd_in[ 2 ];           /* Lower input bounds on receptor axis */
    int ldim[ 3 ];              /* Output array lower GRID bounds */
    int nchan;                  /* Number of spectral channels */
+   int ngoodchan;              /* Number of usable spectral channels */
    int pixax[ 3 ];             /* Pixel axis indices */
    int specax;                 /* The index of the input spectral axis */
    int ubnd_in[ 2 ];           /* Upper input bounds on receptor axis */
@@ -336,47 +354,32 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
 /* If this is the first pass through this file, initialise the arrays. */
    if( index == 1 ){
 
-      for( iv = 0; iv < nel; iv++ ) {
-         data_array[ iv ] = 0.0;
-         wgt_array[ iv ] = 0.0;
-      }
+/* Initialise the output cube data array to zero. */
+      for( iv = 0; iv < nel; iv++ ) data_array[ iv ] = 0.0;
 
-/* Do the extra initialisation needed if we are creating output
-   variances based on the spread of input values. */
-      if( genvar == 1 ) {
-         for( iv = 0; iv < nel; iv++ ) {
-            var_array[ iv ] = 0.0;
+/* Other array lengths depend on whether AST is being used to do the
+   rebinning. For AST rebinning, also initialisation the flags for
+   astRebinSeq (we set flags to zero to indicate that the arrays have
+   been initialised). */
+      if( use_ast ){
+         for( iv = 0; iv < 2*nel; iv++ ) wgt_array[ iv ] = 0.0;
+         if( genvar ) {
+            for( iv = 0; iv < nel; iv++ ) var_array[ iv ] = 0.0;
          }
 
-/* If we are using astRebinSeq to do the rebinning, the weights array will
-   be longer, so initialise the rest of it now. */
-         if( use_ast ) {
-            for( iv = 0; iv < nel; iv++ ) {
-               wgt_array[ iv + nel ] = 0.0;
-            }
+         ast_flags = 0;
 
-/* Save the flags to use with astRebinSeq. */
-            ast_flags = AST__GENVAR;
-         }
-
-/* Initialisation required if output variances are based on input Tsys
-   values. */
-      } else if( genvar == 2 ) {
-         if( use_ast ) {
-            for( iv = 0; iv < nel; iv++ ) {
-               var_array[ iv ] = 0.0;
-            }
-            ast_flags = 0;
-         }
-
-/* Initialisation required if no output variances are being created. */
       } else {
-         if( use_ast ) ast_flags = 0;
+         for( iv0 = 0; iv0 < nxy; iv0++ ) wgt_array[ iv0 ] = 0.0;
+         if( genvar ) {
+            for( iv0 = 0; iv0 < nxy; iv0++ ) var_array[ iv0 ] = 0.0;
+            for( iv0 = 0; iv0 < nxy; iv0++ ) work_array[ iv0 ] = 0;
+         }
       }
    }
 
-/* Allocate work arrays big enough to hold the coords of all the
-   detectors in the current input file.*/
+/* Allocate work arrays big enough to hold the coords of all the detectors in 
+   the current input file. */
    xin = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
    yin = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
    xout = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
@@ -401,7 +404,8 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
       yin[ idet ] = 1.0;
 
 /* If a group of detectors to be used was supplied, search the group for
-   the name of the current detector. If not found, set the GRID coords bad. */
+   the name of the current detector. If not found, set the GRID coords bad. 
+   This will cause the detector to be excluded. */
       if( detgrp ) {    
          grpIndex( name, detgrp, 1, &found, status );
          if( !found ) {
@@ -541,12 +545,12 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
    with specialist code that is faster than astRebinSeq. */
       if( !use_ast ) {
 
-/* Transform the positions of the detectors from input GRID to output GRID
-   coords. */
+/* Transform the positions of the detectors at the current time slice from 
+   input GRID to output GRID coords. */
          astTran2( fsmap, (data->dims)[ 1 ], xin, yin, 1, xout, yout );
 
 /* For each good position, place the input data values for a whole spectrum
-   into the nearest pixel of the output array and increment the weight 
+   into the nearest pixel of the output array and increment the 2D weight 
    array. */
          for( idet = 0; idet < (data->dims)[ 1 ]; idet++ ) {
    
@@ -557,10 +561,13 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
                if( ix >= 0 && ix < dim[ 0 ] && 
                    iy >= 0 && iy < dim[ 1 ] ) {
    
-/* If required calculate the weight to associate with the current input
-   spectrum. This is the reciprocal of the input variance, based on the 
+/* Calculate the weight to associate with the current input spectrum. This 
+   is either 1.0, or the reciprocal of the input variance, based on the 
    input Tsys values. */
-                  if( tcon != AST__BAD ) {
+                  if( tcon == AST__BAD ) {
+                     wgt = 1.0;
+
+                  } else {
                      wgt = tcon*tsys[ idet ]*tsys[ idet ];
                      if( wgt > 0.0 ) {
                         wgt = 1.0/wgt;
@@ -569,22 +576,50 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
                      }
                   } 
 
-/* Loop round every channel, updating the output arrays. */
-                  for( ichan = 0; ichan < nchan; ichan++, pdata++ ) {
-                     iz = spectab[ ichan ] - 1;
-                     if( iz >= 0 && iz < dim[ 2 ] && *pdata != VAL__BADR ) { 
-                        iv = ix + dim[ 0 ]*iy + nxy*iz;
+/* Skip to the next detector if no weight could be calculated for this
+   detector. */
+                  if( wgt != AST__BAD ) {
 
-                        if( tcon == AST__BAD ) {                  
-                           data_array[ iv ] += *pdata;
-                           wgt_array[ iv ] += 1.0;
-                           if( genvar == 1 ) var_array[ iv ] += ( *pdata )*( *pdata );
+/* Update the total weight associated with the appropriate output spectrum. 
+   The weight is the same for all channels in the output spectrum, and so 
+   the weights array need only be a single 2D slice. */
+                     iv0 = ix + dim[ 0 ]*iy;
+                     wgt_array[ iv0 ] += wgt;
 
-                        } else if( wgt != AST__BAD ) {
-                           data_array[ iv ] += wgt*( *pdata );
-                           wgt_array[ iv ] += wgt;
-                        }   
+/* Loop round every channel, updating the output data array. */
+                     for( ichan = 0; ichan < nchan; ichan++, pdata++ ) {
+                        iz = spectab[ ichan ] - 1;
+                        if( iz >= 0 && iz < dim[ 2 ] ) {
+
+/* Find the vector index of the pixel within the 3D output data array
+   that will receieve this input pixel. */
+                           iv = iv0 + nxy*iz;
+
+/* If any output pixel is contributed to by a bad input pixel, then set
+   the output pixel bad. We need to do this because we only have a 2D array
+   to store the weights in and so we cannot retain information about the
+   number of bad pixels contributing to each channel. */
+                           if( *pdata != VAL__BADR && 
+                               data_array[ iv ] != VAL__BADR ) {
+                              data_array[ iv ] += wgt*( *pdata );
+
+/* If we are creating output variances based on the spread of input values, 
+   update the variance array to include the squared input data value. The
+   "wgt" value is guranteed to be 1.0 in this case, and so we do not need to
+   included it. */
+                              if( genvar == 1 ) {
+                                 var_array[ iv0 ] += ( *pdata )*( *pdata );
+                                 work_array[ iv0 ]++;
+                              }
+
+                           } else {
+                              data_array[ iv ] = VAL__BADR;
+                           }
+                        }
                      }
+
+                  } else {
+                     pdata += nchan;
                   }
    
                } else {
@@ -713,35 +748,76 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
          fsmap = astAnnul( fsmap );
 
 /* If we have not been using astRebinSeq to do the rebinning, do the 
-   normalisation using hard-wired code. */
+   normalisation using hard-wired code. "iv" is the index into the full 3D
+   output array, and "iv0" is the index into the 2D variance and weight
+   arrays, each of which represents a single spatial plane from the
+   output cube. */
       } else {
 
-         for( iv = 0; iv < nel; iv++ ) {
-            if( wgt_array[ iv ] > 0.0 ) {
-               dval = data_array[ iv ]/wgt_array[ iv ];
-               data_array[ iv ] = dval;
+/* First normalise the 3D data array. */
+         iv0 = 0;
+         for( iv = 0; iv < nel; iv++,iv0++ ) {
+            if( iv0 == nxy ) iv0 = 0;
 
-/* Variance cannot be created on the basis of the spread of input data
-   values if only 1 input point contributed to the output pixel. */
-               if( genvar == 1 ) {
-                  if( wgt_array[ iv ] > 1.0 ) {
-                     var_array[ iv ] /=  wgt_array[ iv ];
-                     var_array[ iv ] -=  dval*dval;
-                     var_array[ iv ] /=  wgt_array[ iv ];
-                  } else {
-                     var_array[ iv ] = VAL__BADR;
-                  }
-
-/* If the output variances are based on the input Tsys values, then they
-   are just the recprocal of the sum of the weights, since each weight is
-   the recprocal of the associated input variance. */
-               } else if( genvar == 2 ) {
-                  var_array[ iv ] =  1.0/wgt_array[ iv ];
-               }
-   
+            if( wgt_array[ iv0 ] > 0.0 && data_array[ iv ] != VAL__BADR ) {
+               data_array[ iv ] /= wgt_array[ iv0 ];
             } else {
                data_array[ iv ] = VAL__BADR;
-               if( genvar ) var_array[ iv ] = VAL__BADR;
+            }
+         }
+
+/* Now normalise the 2D variance array. First handle cases where the
+   output variance is calculated on the basis of the spread of input
+   values. */
+         if( genvar == 1 ) {
+
+/* Loop over every spectrum in the output cube. */
+            for( iv0 = 0; iv0 < nxy; iv0++ ) {
+
+/* Set output variance bad if less than 2 input spectra contributed to this 
+   output spectrum. */
+               if( wgt_array[ iv0 ] < 2.0 ) {
+                  var_array[ iv0 ] = VAL__BADR;
+
+/* Otherwise calculate output spectrum variance. */
+               } else {
+
+/* Find the sum of the squared data values in the current output
+   spectrum, and the number of channels that have good data values. */
+                  d2sum = 0.0;
+                  ngoodchan = 0;
+                  pdata = data_array + iv0;
+                  for( ichan = 0; ichan < nchan; ichan++ ) {
+                     if( *pdata != VAL__BADR ) {
+                        d2sum += (*pdata)*(*pdata);
+                        ngoodchan++;
+                     }
+                     pdata += nxy;
+                  }
+
+/* Form the normalised variance for the output spectrum. This is the mean
+   of the variances for each channel. */              
+                  if( ngoodchan > 0 ) {
+                     var_array[ iv0 ] = ( var_array[ iv0 ]/work_array[ iv0 ] 
+                                          - d2sum/ngoodchan )/( wgt_array[ iv0 ] - 1 );
+                  } else {
+                     var_array[ iv0 ] = VAL__BADR;
+                  }
+
+               }
+            }
+
+/* Now handle cases where the output variance is calculated on the basis of 
+   the input Tsys values. They are just the recprocal of the sum of the 
+   weights, since each weight is the recprocal of the associated input 
+   variance. */
+         } else if( genvar == 2 ) {
+            for( iv0 = 0; iv0 < nxy; iv0++ ) {
+               if( wgt_array[ iv0 ] > 0.0 ) {
+                  var_array[ iv0 ] =  1.0/wgt_array[ iv0 ];
+               } else {
+                  var_array[ iv0 ] =  VAL__BADR;
+               }
             }
          }
       }
