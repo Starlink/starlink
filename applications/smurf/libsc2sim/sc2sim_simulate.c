@@ -191,8 +191,8 @@
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
-*     University of British Columbia. All Rights Reserved.
+*     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
+*     Council.  University of British Columbia. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -319,11 +319,13 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double *dbuf=NULL;              /* simulated data buffer */
   double decapp;                  /* Apparent Dec */
   double decapp1;                 /* Recalculated apparent Dec */
+  double diam;                    /* Angular diameter of planet */
   int *digits=NULL;               /* output data buffer */
   int *dksquid=NULL;              /* dark squid values */
   double drytau183;               /* Broadband 183 GHz zenith optical depth */
   AstFitsChan *fc=NULL;           /* FITS channels for tanplane projection */
   char filename[SC2SIM__FLEN];    /* name of output file */
+  AstFitsChan *fitschan=NULL;     /* FITS channels for tanplane projection */
   AstFrameSet *fitswcs=NULL;      /* Frameset for input image WCS */
   double *flatcal[8];             /* flatfield calibrations for all
 				     subarrays */
@@ -332,7 +334,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double *flatpar[8];             /* flatfield parameters for all subarrays */
   int frame;                      /* frame counter */
   AstFrameSet *fs=NULL;           /* frameset for tanplane projection */
-  double grid[64][2];             /* PONG grid coordinates */
   JCMTState *head;                /* per-frame headers */
   char heatname[SC2SIM__FLEN];    /* name of flatfield cal file */
   double hourangle;               /* Current hour angle */
@@ -352,9 +353,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   int nflat[8];                   /* number of flat coeffs per bol */
   static double noisecoeffs[SC2SIM__MXBOL*3*60]; /* noise coefficients */
   int nterms=0;                   /* number of 1/f noise frequencies */
-  int nwrite=0;                   /* number of frames to write */
-  int outscan=0;                  /* count of scans completed */
   double phi;                     /* latitude (radians) */
+  int planet = 0;                 /* Flag to indicate planet observation */
   double *posptr=NULL;            /* pointing: nasmyth offsets (arcsec) */ 
   double pwvlos;                  /* mm precip. wat. vapor. line of site */
   double pwvzen = 0;              /* zenith precipital water vapour (mm) */
@@ -380,15 +380,11 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double temp1;                   /* store temporary values */
   double temp2;                   /* store temporary values */
   double temp3;                   /* store temporary values */
+  double tt;                      /* Terrestrial Time (TT) for
+				     calculating planet position */
   float ttau[3];                  /* output of wvmOpt */
   double twater;                  /* water line temp. for WVM simulation */
   double vmax[2];                 /* telescope maximum velocities (arcsec) */
-
-  int planet = 0;
-  double tt;
-  double diam;
-  AstFitsChan *fitschan=NULL;           /* FITS channels for tanplane projection */
-
 
   if ( *status != SAI__OK) return;
 
@@ -865,7 +861,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 			       "RA---TAN", "DEC--TAN", fitschan, status );
 	  astClear( fitschan, "Card" );
 	  fitswcs = astRead( fitschan );
-	    
 	  /* Extract the Sky->REF_PIXEL mapping. */
 	  astSetC( fitswcs, "SYSTEM", "GAPPT" );
 	  sky2map = astGetMapping( fitswcs, AST__CURRENT, AST__BASE );
@@ -1114,7 +1109,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
           /* TCS - Telescope tracking structure ----------------------- */
 	  /* Coord. system  */
 	  if ( planet ) {
-	    snprintf(head[j].tcs_tr_sys,6,"GAPPT");  
+	    /* Note: the JCMT writes out APP not GAPPT */
+	    snprintf(head[j].tcs_tr_sys,6,"APP");  
 	  } else {
 	    snprintf(head[j].tcs_tr_sys,6,"J2000");  
 	  }
