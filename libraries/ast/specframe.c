@@ -126,6 +126,8 @@ f     - AST_GETREFPOS: Get reference position in any celestial system
 *        can be cancelled.
 *        - OriginSystem: Clear the AlignSpecOffset attributes before
 *        finding the Mapping between the old and new Systems.
+*     16-JAN-2006 (DSB):
+*        Fix bug in Dump that caused SrcVRF not to be written out.
 *class--
 */
 
@@ -6423,6 +6425,9 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    } else {
       sval = astGetAttrib( this_object, "sourcevrf" );
    }
+
+/* Write out the value. */
+   astWriteString( channel, "SrcVRF", set, 0, sval, "Source velocity rest frame" );
 
 /* SourceSys. */
 /* ---------- */
