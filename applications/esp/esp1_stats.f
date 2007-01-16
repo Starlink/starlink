@@ -163,8 +163,6 @@
 *   the mean value for a given ellipse.
       RESDU=SDP/(1.+ABS(MEAN))
 
- 9999 CONTINUE
-
       END
 
 
@@ -429,7 +427,7 @@
                CALL MSG_OUT (' ','Residual calculation: weighted SD', 
      :              STATUS)
             ELSEIF (RTYPE .EQ. ELP__RESMD) THEN
-               CALL MSG_OUT (' ','Residual calculation: absolute diffs', 
+               CALL MSG_OUT (' ','Residual calculation: absolute diffs',
      :              STATUS)
             ELSEIF (RTYPE .EQ. ELP__RESLS) THEN
                CALL MSG_OUT (' ','Residual calculation: '//
