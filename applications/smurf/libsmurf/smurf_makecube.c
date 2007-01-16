@@ -1042,7 +1042,7 @@ L999:;
    "var_array" used above will be a 2D array holding a single slice of the 3D
    Variance array. In this case we now copy this slice to the output
    cube, first unmapping the Data array to minimise memory requirements. */
-   if( !use_ast && genvar ) {
+   if( !use_ast && genvar && ondf != NDF__NOID ) {
       ndfUnmap( ondf, "Data", status );
       ndfMap( ondf, "Variance", "_REAL", "WRITE", (void **) &var_out, &nel, 
               status );
