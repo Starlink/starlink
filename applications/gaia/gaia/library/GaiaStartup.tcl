@@ -42,7 +42,7 @@
 
 #  Copyright:
 #     Copyright (C) 2003-2005 Central Laboratory of the Research Councils.
-#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2006-2007 Particle Physics & Astronomy Research Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -204,6 +204,8 @@ itcl::class gaia::GaiaStartup {
       set values_($this,check_for_cubes) 1
       set values_($this,default_cmap) real
       set values_($this,default_cut) 100.0
+      set values_($this,isize) 9
+      set values_($this,maxshift) 5.5
       set values_($this,default_itt) ramp
       set values_($this,extended_precision) 0
       set values_($this,float_panel) 0
@@ -232,7 +234,8 @@ itcl::class gaia::GaiaStartup {
                    with_colorramp focus_follows_mouse interop_menu scrollbars \
                    transient_tools transient_spectralplot quiet_exit \
                    min_scale max_scale zoom_factor default_cut default_cmap \
-                   default_itt linear_cartesian always_merge check_for_cubes" {
+                   default_itt linear_cartesian always_merge check_for_cubes \
+                   isize maxshift" {
          $props_ set_named_property Gaia $key $values_($this,$key)
       }
       $props_ save_properties
@@ -262,6 +265,10 @@ itcl::class gaia::GaiaStartup {
             $values_($this,quiet_exit)
          $itk_option(-gaia) configure -check_for_cubes \
             $values_($this,check_for_cubes)
+         $itk_option(-gaia) configure -isize \
+            $values_($this,isize)
+         $itk_option(-gaia) configure -maxshift \
+            $values_($this,maxshift)
       }
    }
 
@@ -544,6 +551,44 @@ itcl::class gaia::GaiaStartup {
       add_short_help $itk_component(defaultcut) \
          {Default percentage cut used for new files}
       pack $itk_component(defaultcut) -side top -fill x
+
+      #  Search box size used for centroiding.
+      itk_component add isize {
+         LabelEntryScale $w_.isize \
+            -text {Centroid search box:} \
+            -labelwidth $lwidth \
+            -valuewidth 4 \
+            -from 3 \
+            -to 21 \
+            -increment 1 \
+            -show_arrows 1 \
+            -resolution 1 \
+            -anchor w \
+            -value $values_($this,isize) \
+            -command [code $this set_value_ isize]
+      }
+      add_short_help $itk_component(isize) \
+         {Size of search box used when centroiding}
+      pack $itk_component(isize) -side top -fill x
+
+      #  Maximum shift allowed when centroiding.
+      itk_component add maxshift {
+         LabelEntryScale $w_.maxshift \
+            -text {Centroid max shift:} \
+            -labelwidth $lwidth \
+            -valuewidth 4 \
+            -from 3.5 \
+            -to 21.5 \
+            -increment 1 \
+            -show_arrows 1 \
+            -resolution 0.5 \
+            -anchor w \
+            -value $values_($this,maxshift) \
+            -command [code $this set_value_ maxshift]
+      }
+      add_short_help $itk_component(maxshift) \
+         {Maximum shift from initial position when centroiding}
+      pack $itk_component(maxshift) -side top -fill x
 
       #  Default colormap
       itk_component add defaultcmap {
