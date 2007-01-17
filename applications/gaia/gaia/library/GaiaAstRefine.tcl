@@ -175,20 +175,46 @@ itcl::class gaia::GaiaAstRefine {
             -command [code $this configure -fittype $i]
       }
 
+      #  Add option to define a different centroid maxshift/search box.
+      set values_($this,isize) $itk_option(-isize)
+      $m add cascade -label {Centroid search box} -menu [menu $m.isize]
+      $short_help_win_ add_menu_short_help $m {Centroid search box} \
+         {Change the search box used when locating centroids (pixels)}
+      for {set i 3} {$i < 22} {incr i} {
+         $m.isize add radiobutton \
+            -value $i \
+            -label $i \
+            -variable [scope values_($this,isize)] \
+            -command [code $this configure -isize $i]
+      }
+      set values_($this,maxshift) $itk_option(-maxshift)
+      $m add cascade -label {Centroid max shift} -menu [menu $m.maxshift]
+      $short_help_win_ add_menu_short_help $m {Centroid max shift} \
+         {Change the maximum shift from initial position (pixels)}
+      for {set i 3.5} { $i < 22} {set i [expr $i+1.0]} {
+         $m.maxshift add radiobutton \
+            -value $i \
+            -label $i \
+            -variable [scope values_($this,maxshift)] \
+            -command [code $this configure -maxshift $i]
+      }
+      
       #  Markers menu
       set Marker [add_menubutton Markers]
 
       #  Create a GaiaAstTable to display the positions that we are using
       #  to refine the WCS.
       itk_component add table {
-	  GaiaAstTable $w_.table \
-		  -editmenu $Edit \
-		  -markmenu $Marker \
-		  -rtdimage $itk_option(-rtdimage) \
-		  -canvas $itk_option(-canvas) \
-		  -image $itk_option(-image) \
-		  -notify_cmd [code $this fix_equinox_] \
-		  -centre_cmd [code $this fix_centre_]
+          GaiaAstTable $w_.table \
+             -editmenu $Edit \
+             -markmenu $Marker \
+             -rtdimage $itk_option(-rtdimage) \
+             -canvas $itk_option(-canvas) \
+             -image $itk_option(-image) \
+             -notify_cmd [code $this fix_equinox_] \
+             -centre_cmd [code $this fix_centre_] \
+             -maxshift $itk_option(-maxshift) \
+             -isize $itk_option(-isize)
       }
       add_short_help $itk_component(table) \
 	      {Reference positions and their ideal X,Y places}
@@ -196,16 +222,16 @@ itcl::class gaia::GaiaAstRefine {
       #  Add a switch for controlling if the graphics markers move
       #  one-by-one or all together.
       itk_component add coupled {
-	  StarLabelCheck $w_.coupled \
-		  -text "Move markers individually:" \
-		  -onvalue 0 \
-		  -offvalue 1 \
-		  -variable [scope values_($this,coupled)] \
-		  -command [code $this set_coupled_]
+         StarLabelCheck $w_.coupled \
+            -text "Move markers individually:" \
+            -onvalue 0 \
+            -offvalue 1 \
+            -variable [scope values_($this,coupled)] \
+            -command [code $this set_coupled_]
       }
       set default_(coupled) 0
       add_short_help $itk_component(coupled) \
-	      {Move markers individually or all together}
+         {Move markers individually or all together}
 
       #  Add scales for changing the offsets, scale and rotations of
       #  the projected positions.
@@ -726,6 +752,25 @@ itcl::class gaia::GaiaAstRefine {
 
    #  If this is a clone, then it should die rather than be withdrawn.
    itk_option define -really_die really_die Really_Die 0
+
+   #  The centroid search box and maximum shift.
+   itk_option define -isize isize Isize 9 {
+      set itk_option(-isize) [expr min(21,max(3,$itk_option(-isize)))]
+      set values_($this,isize) $itk_option(-isize)
+      if { [info exists itk_component(table) ] } { 
+         $itk_component(table) configure -isize $itk_option(-isize)
+      }
+   }
+   
+   #  Need to be 3.5->21.5, steps of 1.
+   itk_option define -maxshift maxshift Maxshift 5.5 {
+      set maxshift [expr min(21.5,max(3.5,$itk_option(-maxshift)))]
+      set itk_option(-maxshift) [expr int($maxshift)+0.5]
+      set values_($this,maxshift) $itk_option(-maxshift)
+      if { [info exists itk_component(table) ] } { 
+         $itk_component(table) configure -maxshift $itk_option(-maxshift)
+      }
+   }
 
    #  Protected variables: (available to instance)
    #  --------------------

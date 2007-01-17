@@ -44,7 +44,7 @@
 
 #  Copyright:
 #     Copyright (C) 1999-2005 Central Laboratory of the Research Councils.
-#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2006-2007 Particle Physics & Astronomy Research Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -128,7 +128,9 @@ itcl::class gaia::GaiaAstTransfer {
             -markmenu $Markers \
             -rtdimage $itk_option(-rtdimage) \
             -canvas $itk_option(-canvas) \
-            -image $itk_option(-image)
+            -image $itk_option(-image) \
+            -isize $itk_option(-isize) \
+            -maxshift $itk_option(-maxshift)
       }
 
       #  Override short help for Table window.
@@ -229,6 +231,26 @@ itcl::class gaia::GaiaAstTransfer {
 
    #  Width of the table (in characters).
    itk_option define -width width Width 40
+
+   #  The centroid search box and maximum shift used by table.
+   itk_option define -isize isize Isize 9 {
+      set itk_option(-isize) [expr min(21,max(3,$itk_option(-isize)))]
+      set values_($this,isize) $itk_option(-isize)
+      if { [info exists itk_component(table) ] } { 
+         $itk_component(table) configure -isize $itk_option(-isize)
+      }
+   }
+   
+   #  Need to be 3.5->21.5, steps of 1.
+   itk_option define -maxshift maxshift Maxshift 5.5 {
+      set maxshift [expr min(21.5,max(3.5,$itk_option(-maxshift)))]
+      set itk_option(-maxshift) [expr int($maxshift)+0.5]
+      set values_($this,maxshift) $itk_option(-maxshift)
+      if { [info exists itk_component(table) ] } { 
+         $itk_component(table) configure -maxshift $itk_option(-maxshift)
+      }
+   }
+
 
    #  Protected variables: (available to instance)
    #  --------------------
