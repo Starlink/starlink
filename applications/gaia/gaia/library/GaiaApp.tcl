@@ -254,6 +254,9 @@ itcl::class gaia::GaiaApp {
       if { [$command_queue_ size] == 0 && 
            $application_status_ != {running...} } {
          catch {delete object $this}
+
+         #  Make sure any vwaits are released.
+         set application_status_ $application_status_
       }
    }
 
@@ -298,11 +301,15 @@ itcl::class gaia::GaiaApp {
 
    #  Method to deal with the inform return of a task.
    protected method inform_ {output} {
-
-      #  Check for an error.
+      
+      #  Check for an error. Note this is start of the error (!!), so
+      #  output_ isn't complete yet, so we wait for application_status_
+      #  to change, should be done by the command_completed_ method.
       if { [string range $output 0 1 ] == "!!" } {
-         error_dialog "$shortname_: $output"
-	 puts stderr "$shortname_: $output"
+         ::vwait [scope application_status_]
+         error_dialog "$output$output_"
+	 puts stderr "Error running $shortname_:\n$output$output_"
+         set output_ {}
       }
 
       #  Write output from task into window if required.
@@ -317,8 +324,10 @@ itcl::class gaia::GaiaApp {
          }
       }
 
-      #  Keep a copy of the output for parsing.
-      append output_ "$output"
+      #  Keep a copy of the error output.
+      if { [string range $output 0 0 ] == "!" } {
+         append output_ "\n$output"
+      }
    }
 
    #  Start monolith.
