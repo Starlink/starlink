@@ -1,6 +1,11 @@
     Spectra extracted from ACSIS raw timecubes now display the 
-    RA and Dec of the pointing, and the time of the spectrum.
+    RA and Dec of the pointing, and the time of observation for the 
+    spectrum.
 
+    The centroid maximum search box size and shift are now start up
+    options that can be defined either on the command-line, or
+    using the "File->Startup options..." dialog (this makes the change
+    permanent)
 
   Hokulei Release:
 
