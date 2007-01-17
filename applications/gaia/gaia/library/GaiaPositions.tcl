@@ -41,7 +41,7 @@
 
 #  Copyright:
 #     Copyright (C) 2000-2005 Central Laboratory of the Research Councils.
-#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2006-2007 Particle Physics & Astronomy Research Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -311,19 +311,21 @@ itcl::class gaia::GaiaPositions {
          -menu [menu $Options.isize]
       $short_help_win_ add_menu_short_help $Options {Centroid search box} \
          {Change the search box used when locating centroids (pixels)}
-      foreach i {3 4 5 7 9 11 13 15 17 19 21} {
+      for {set i 3} {$i < 22} {incr i} {
          $Options.isize add radiobutton \
             -value $i \
             -label $i \
             -variable [scope values_($this,isize)] \
             -command [code $this configure -isize $i]
       }
+
       set values_($this,maxshift) $itk_option(-maxshift)
       $Options add cascade -label {Centroid max shift} \
          -menu [menu $Options.maxshift]
       $short_help_win_ add_menu_short_help $Options {Centroid max shift} \
          {Change the maximum shift from initial position (pixels)}
-      foreach i {3.5 4.5 5.5 7.5 9.5 11.5 13.5 15.5 17.5 19.5 21.5} {
+
+      for {set i 3.5} {$i < 22} {set i [expr $i+1.0]} {
          $Options.maxshift add radiobutton \
             -value $i \
             -label $i \
@@ -599,14 +601,19 @@ itcl::class gaia::GaiaPositions {
 
    #  The centroid search box and maximum shift.
    itk_option define -isize isize Isize 9 {
+      set itk_option(-isize) [expr min(21,max(3,$itk_option(-isize)))]
       set values_($this,isize) $itk_option(-isize)
-      if { [info exists itk_component(table) ] } {
+      if { [info exists itk_component(table) ] } { 
          $itk_component(table) configure -isize $itk_option(-isize)
       }
    }
+   
+   #  Need to be 3.5->21.5, steps of 1.
    itk_option define -maxshift maxshift Maxshift 5.5 {
-      set values_($this,isize) $itk_option(-isize)
-      if { [info exists itk_component(table) ] } {
+      set maxshift [expr min(21.5,max(3.5,$itk_option(-maxshift)))]
+      set itk_option(-maxshift) [expr int($maxshift)+0.5]
+      set values_($this,maxshift) $itk_option(-maxshift)
+      if { [info exists itk_component(table) ] } { 
          $itk_component(table) configure -maxshift $itk_option(-maxshift)
       }
    }
