@@ -194,7 +194,7 @@ itcl::class gaia::GaiaAstReference {
       $m add cascade -label {Centroid search box} -menu [menu $m.isize]
       $short_help_win_ add_menu_short_help $m {Centroid search box} \
          {Change the search box used when locating centroids (pixels)}
-      foreach i {3 4 5 7 9 11 13 15 17 19 21} {
+      for {set i 3} {$i < 22} {incr i} {
          $m.isize add radiobutton \
             -value $i \
             -label $i \
@@ -205,7 +205,7 @@ itcl::class gaia::GaiaAstReference {
       $m add cascade -label {Centroid max shift} -menu [menu $m.maxshift]
       $short_help_win_ add_menu_short_help $m {Centroid max shift} \
          {Change the maximum shift from initial position (pixels)}
-      foreach i {3.5 4.5 5.5 7.5 9.5 11.5 13.5 15.5 17.5 19.5 21.5} {
+      for {set i 3.5} { $i < 22} {set i [expr $i+1.0]} {
          $m.maxshift add radiobutton \
             -value $i \
             -label $i \
@@ -1092,7 +1092,9 @@ itcl::class gaia::GaiaAstReference {
                           -rtdimage $itk_option(-rtdimage) \
                           -canvas $itk_option(-canvas) \
                           -image $itk_option(-image) \
-                          -update_cmd [code $this stop_transfer_]]
+                          -update_cmd [code $this stop_transfer_]\
+                          -isize $itk_option(-isize) \
+                          -maxshift $itk_option(-maxshift)]
       } else {
          wm deiconify $trantop_
       }
@@ -1135,15 +1137,26 @@ itcl::class gaia::GaiaAstReference {
 
    #  The centroid search box and maximum shift.
    itk_option define -isize isize Isize 9 {
+      set itk_option(-isize) [expr min(21,max(3,$itk_option(-isize)))]
       set values_($this,isize) $itk_option(-isize)
       if { [info exists itk_component(table) ] } { 
          $itk_component(table) configure -isize $itk_option(-isize)
       }
+      if { $trantop_ != {} && [winfo exists $trantop_] } { 
+         $trantop_ configure -isize $itk_option(-isize)
+      }
    }
+   
+   #  Need to be 3.5->21.5, steps of 1.
    itk_option define -maxshift maxshift Maxshift 5.5 {
-      set values_($this,isize) $itk_option(-isize)
+      set maxshift [expr min(21.5,max(3.5,$itk_option(-maxshift)))]
+      set itk_option(-maxshift) [expr int($maxshift)+0.5]
+      set values_($this,maxshift) $itk_option(-maxshift)
       if { [info exists itk_component(table) ] } { 
          $itk_component(table) configure -maxshift $itk_option(-maxshift)
+      }
+      if { $trantop_ != {} && [winfo exists $trantop_] } { 
+         $trantop_ configure -maxshift $itk_option(-maxshift)
       }
    }
 
