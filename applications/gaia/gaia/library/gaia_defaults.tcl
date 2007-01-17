@@ -160,6 +160,10 @@ proc gaia::setXdefaults {} {
     option add *CanvasDraw.textFont -adobe-courier-medium-r-*-*-*-120-*-*-*-*-*-*
 
     #  OptionDialog
-    option add *OptionDialog.messageWidth 4i 
+    option add *OptionDialog.messageWidth 5i 
     option add *OptionDialog.messageFont $labelFont
+
+    #  DialogWidget
+    option add *DialogWidget.messageWidth 6i
+    option add *DialogWidget.messageFont $labelFont
 }
