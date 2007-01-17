@@ -26,7 +26,7 @@
 
 #  Copyright:
 #     Copyright (C) 1998-2001 Central Laboratory of the Research Councils
-#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2006-2007 Particle Physics & Astronomy Research Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -173,7 +173,9 @@ Options:
  -focus_follows_mouse <bool> - entry focus follows mouse (default: 0).
  -linear_cartesian <bool> - assuming CAR projections are a linear mapping (default: 1).
  -interop_menu <bool>     - reveal interop menu for PLASTIC interactions (default: 1).
+ -isize <n>               - search box for centroiding (default: 9).
  -max_scale <n>           - maximum scale for magnification menu (default: 20).
+ -maxshift <n.5>          - maximum shift when centroiding (default: 5.5).
  -min_scale <n>           - minimum scale for magnification menu (default: -10).
  -panel_layout <layout>   - panel layout, one of: "saoimage", "reverse" or "default" .
  -panel_orient <orient>   - panel orientation, one of: "horizontal", "vertical"
@@ -981,7 +983,9 @@ itcl::class gaia::Gaia {
             -number $clone_ \
             -notify_cmd [code $this redraw_specials_ 1] \
             -clone_cmd [code $this make_toolbox astreference 1] \
-            -really_die $cloned
+            -really_die $cloned \
+            -isize $itk_option(-isize) \
+            -maxshift $itk_option(-maxshift)
       }
    }
 
@@ -1023,7 +1027,9 @@ itcl::class gaia::Gaia {
             -number $clone_ \
             -notify_cmd [code $this redraw_specials_ 1] \
             -clone_cmd [code $this make_toolbox astrefine 1] \
-            -really_die $cloned
+            -really_die $cloned \
+            -isize $itk_option(-isize) \
+            -maxshift $itk_option(-maxshift)
       }
    }
 
@@ -1153,7 +1159,9 @@ itcl::class gaia::Gaia {
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
             -clone_cmd [code $this make_toolbox positions 1] \
-            -really_die $cloned
+            -really_die $cloned \
+            -maxshift $itk_option(-maxshift) \
+            -isize $itk_option(-isize)
       }
    }
 
@@ -2175,6 +2183,32 @@ window gives you access to this."
 
    #  Check any images that are opened to see if they are cubes.
    itk_option define -check_for_cubes check_for_cubes Check_For_Cubes 1
+
+   #  Search box size when centroiding.
+   itk_option define -isize isize Isize 9 {
+      if { [info exists itk_component(astreference)] } {
+         $itk_component(astreference) configure -isize $itk_option(-isize)
+      }
+      if { [info exists itk_component(astrefine)] } {
+         $itk_component(astrefine) configure -isize $itk_option(-isize)
+      }
+      if { [info exists itk_component(positions)] } {
+         $itk_component(positions) configure -isize $itk_option(-isize)
+      }
+   }
+
+   #  Maximum shift when centroiding.
+   itk_option define -maxshift maxshift Maxshift 5.5 {
+      if { [info exists itk_component(astreference)] } {
+         $itk_component(astreference) configure -maxshift $itk_option(-maxshift)
+      }
+      if { [info exists itk_component(astrefine)] } {
+         $itk_component(astrefine) configure -maxshift $itk_option(-maxshift)
+      }
+      if { [info exists itk_component(positions)] } {
+         $itk_component(positions) configure -maxshift $itk_option(-maxshift)
+      }
+   }
 
    # -- Protected variables --
 
