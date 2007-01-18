@@ -12569,6 +12569,14 @@ iraf! {
 
          helplib {$KAPPA_HELP}
 
+         parameter aranges {
+            size *
+            type _INTEGER
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
          parameter auto {
             type _LOGICAL
             vpath DEFAULT
