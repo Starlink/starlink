@@ -50,6 +50,10 @@
 *     mfittrend in axis ranges order out
 
 *  ADAM Parameters:
+*     ARANGES() = _INTEGER (Write)
+*        This parameter is only written when AUTO=TRUE, recording the
+*        trend-axis fitting regions determined automatically.  They 
+*        comprise pairs of grid co-ordinates.
 *     AUTO = _LOGICAL (Read)
 *        If TRUE, the ranges that define the trends are determined
 *        automatically, and parameter RANGES is ignored.  [FALSE]
@@ -86,13 +90,13 @@
 *        themselves.  This will not be used if SUBTRACT and MODIFYIN
 *        are TRUE (in that case the input NDF will be modified).
 *     RANGES() = LITERAL (Read)
-*        Pairs of co-ordinates that define ranges along the trend
-*        axis.  When given these ranges are used to select the values
-*        that are used in the fits.  The null value (!) causes all the
-*        values along each data line to be used.  The units of these
-*        ranges is determined by the current axis of the world
-*        co-ordinate system that corresponds to the trend axis.  Up to
-*        ten pairs of values are allowed.  This parameter is not
+*        These are the pairs of co-ordinates that define ranges 
+*        along the trend axis.  When given these ranges are used to 
+*        select the values that are used in the fits.  The null value 
+*        (!) causes all the values along each data line to be used.  The
+*        units of these ranges is determined by the current axis of the
+*        world co-ordinate system that corresponds to the trend axis.  
+*        Up to ten pairs of values are allowed.  This parameter is not
 *        accessed when AUTO=TRUE.  [!]
 *     SECTION = LITERAL (Read)
 *        The region from which representative lines are averaged
@@ -170,7 +174,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -180,8 +184,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     PWD: Peter W. Draper (JAC, Durham University)
@@ -195,6 +199,10 @@
 *        Remove unused variables.
 *     2006 May 31 (MJC):
 *        Added option for automatic estimations of the ranges.
+*     2007 January 18 (MJC):
+*        Constrain the automatic ranges to be within the NDF's bounds.
+*        Record automatically determined fitting regions to output
+*        parameter ARANGES.
 *     {enter_further_changes_here}
 
 *-
@@ -546,6 +554,7 @@
      :                     STATUS )
          ELSE
             CALL NDF_FIND( LOC, '()', NDFS, STATUS )
+            CALL DAT_ANNUL( LOC, STATUS )
          END IF
 
 *  Form ranges by averaging the lines in the section, and then
@@ -553,10 +562,18 @@
          CALL KPS1_MFAUR( NDFS, JAXIS, NCLIP, CLIP, MAXRNG, NRANGE, 
      :                    RANGES, STATUS )
 
+*  Ensure that we have valid ranges before attempting to use them.
+         IF ( STATUS .NE. SAI__OK ) GOTO 999
+
 *  Convert the GRID co-ordinates of the RANGES to pixel co-ordinates.
+*  Also ensure that the selected regions are within the NDF bounds.
          DO I = 1, NRANGE
-            RANGES( I ) = RANGES( I ) + LBND( JAXIS ) - 1
+            RANGES( I ) = MAX( MIN( DIMS( JAXIS ), RANGES( I ) ), 1 )
+     :                    + LBND( JAXIS ) - 1
          END DO
+
+*  Record the ranges to a parameter.
+         CALL PAR_PUT1I( 'ARANGES', NRANGE, RANGES, STATUS )
 
 *  OK, use NDF axis JAXIS. Pick full extent if no values were given.
       ELSE IF ( USEALL ) THEN
