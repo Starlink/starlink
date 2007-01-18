@@ -188,6 +188,9 @@
 *        Add planet observations
 *     2007-01-11 (AGG):
 *        Set BASE position correctly for planets
+*     2007-01-16 (AGG):
+*        - Fill SMU_CHOP_PHASE, TCS_BEAM and TCS_SOURCE header entries
+*        - Fix time bug in calculating planet positions
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -323,6 +326,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   int *digits=NULL;               /* output data buffer */
   int *dksquid=NULL;              /* dark squid values */
   double drytau183;               /* Broadband 183 GHz zenith optical depth */
+  double dtt = 0;                 /* Time difference between UTC and TT */
   AstFitsChan *fc=NULL;           /* FITS channels for tanplane projection */
   char filename[SC2SIM__FLEN];    /* name of output file */
   AstFitsChan *fitschan=NULL;     /* FITS channels for tanplane projection */
@@ -491,6 +495,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     /* Set the PLANET flag */
     if ( inx->planetnum != -1 ) {
       planet = 1;
+      dtt = slaDtt( start_time );
     } else {
       planet = 0;
     }
@@ -849,7 +854,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       if ( planet ) {
 	if ( frame%100 == 0 ) {
 	  /* Calculate the TT from UTC start_time and TT-UTC from slaDtt */
-	  tt = start_time + slaDtt( start_time ) / SPD;
+	  tt = start_time + (curframe*samptime + dtt ) / SPD;
 	  slaRdplan( tt, inx->planetnum, -DD2R*telpos[0], DD2R*telpos[1], 
 		     &raapp, &decapp, &diam );
 
@@ -1162,6 +1167,11 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
           head[j].smu_az_jig_x = jig_x_hor[j];
           head[j].smu_az_jig_y = jig_y_hor[j];
            
+	  /* Other headers - more to be added as necessary */
+	  strncpy( head[j].smu_chop_phase, "M", 1 );
+	  strncpy( head[j].tcs_beam, "M", 1 );
+	  strncpy( head[j].tcs_source, "SCIENCE", 7 );
+
           if ( !hitsonly ) {
 
             /* WVM - Water vapour monitor ------------------------------- */
