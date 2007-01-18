@@ -466,9 +466,9 @@ itcl::class gaia::GaiaSpecWriter {
                   set ra [gaiautils::astformat $skyframe 1 $rx]
                   set dec [gaiautils::astformat $skyframe 2 $ry]
 
-                  #  The DATE-OBS keyword for this spectrum can
-                  #  be defined more accurately as the Epoch, so
-                  #  do that. Note we need to move back to TAI (/UTC).
+                  #  The DATE-OBS keyword for this spectrum can be defined
+                  #  more accurately as the Epoch, so do that. Note we need to
+                  #  move back to TAI (/UTC) from TDB.
                   set epoch [expr $epoch - (32.184/86400.0)]
                   set dateobs [sla::datemjd2obs $epoch]
 
