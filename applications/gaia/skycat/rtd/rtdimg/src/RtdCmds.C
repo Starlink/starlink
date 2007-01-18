@@ -19,6 +19,8 @@
 *                          centre of last pixel, not previous pixel.
 *                 08/01/07 Mark blank images with an OBJECT keyword
 *                          with value RTD_BLANK. Do not use image size.
+*                 18/01/07 Back to mband, clip that at 0.5->width/height+0.5
+*                          so that measurement happens to the edge.
 */
 
 /************************************************************************
@@ -1591,11 +1593,11 @@ int RtdImage::mbandCmd(int argc, char* argv[])
 	return TCL_OK;
     }
 
-    // clip to image bounds
-    double ix0 = 1, 
-	iy0 = 1, 
-	ix1 = image_->width(), 
-	iy1 = image_->height();
+    // clip to image bounds (full)
+    double ix0 = 0.5, 
+	iy0 = 0.5, 
+	ix1 = 0.5 + image_->width(), 
+	iy1 = 0.5 + image_->height();
     if (imageToCanvasCoords(ix0, iy0, 0) != TCL_OK
 	|| imageToCanvasCoords(ix1, iy1, 0) != TCL_OK)
 	return TCL_OK;

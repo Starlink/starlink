@@ -5140,10 +5140,10 @@ int StarRtdImage::gbandCmd( int argc, char *argv[] )
     }
 
     //  Clip to image bounds.
-    double ix0 = 0;
-    double iy0 = 0;
-    double ix1 = image_->width();
-    double iy1 = image_->height();
+    double ix0 = 0.5;
+    double iy0 = 0.5;
+    double ix1 = 0.5 + image_->width();
+    double iy1 = 0.5 + image_->height();
     if (   imageToCanvasCoords(ix0, iy0, 0) != TCL_OK
            || imageToCanvasCoords(ix1, iy1, 0) != TCL_OK) {
         return TCL_OK;
