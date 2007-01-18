@@ -7,6 +7,9 @@
     using the "File->Startup options..." dialog (this makes the change
     permanent)
 
+    The measurement band now measures to the image edge, not middle
+    of edge pixels.
+
   Hokulei Release:
 
     This is an update with many usability changes and minor bug fixes:
