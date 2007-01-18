@@ -1,6 +1,12 @@
 HDS Library
 -----------
 
+   Version 5.0-4
+   =============
+
+   * HDSv4 files (64bit) are now created by default. Set HDS_64BIT environment
+     variable to 0 to revert to old v3 format.
+
    Version 5.0-3
    =============
 
