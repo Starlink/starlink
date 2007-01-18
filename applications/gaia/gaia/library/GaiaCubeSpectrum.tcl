@@ -958,10 +958,17 @@ itcl::class gaia::GaiaCubeSpectrum {
    public method get_last_coords {} {
       set xra ""
       set xdec ""
-      set dra ""
-      set ddec ""
+
       set ra ""
       set dec ""
+      set dra ""
+      set ddec ""
+      
+      set refra ""
+      set refdec ""
+      set drefra ""
+      set drefdec ""
+
       if { $last_cxcy_ != {} } {
 
          #  Convert click coordinates from canvas coords to grid coords.
@@ -974,28 +981,63 @@ itcl::class gaia::GaiaCubeSpectrum {
          set iix [expr round($iix)]
          set iiy [expr round($iiy)]
 
-         #  Centre of image.
-         set icx [expr 0.5*[$rtdimage_ width]]
-         set icy [expr 0.5*[$rtdimage_ height]]
+         #  Centre of image, image coordinates.
+         set icx [expr 0.5+0.5*[$rtdimage_ width]]
+         set icy [expr 0.5+0.5*[$rtdimage_ height]]
 
-         #  Distances from centre, in degrees, if a celestial coordinate
+         #  Distances from image centre, in degrees, if a celestial coordinate
          #  system. Fails for non-celestial coords.
          catch {
             $rtdimage_ convert dist [expr $iix-$icx] [expr $iiy-$icy] \
                image dra ddec deg
 
             #  Distance from centre, arcsecs.
-            set dra [format "%f" [expr $dra*3600]]
-            set ddec [format "%f" [expr $ddec*3600]]
+            set dra [format "%f" [expr $dra*3600.0]]
+            set ddec [format "%f" [expr $ddec*3600.0]]
+         } msg
+
+         #  Distance from the RefRA and RefDec positions. These are the 
+         #  offsets from the "source" in an ideal case. First need RefRA and
+         #  RefDec. 
+         set cubeaccessor [$itk_option(-gaiacube) get_cubeaccessor]
+         set axis [$itk_option(-gaiacube) get_axis]
+         if { [$cubeaccessor isaxisframetype $axis "specframe"] ||
+              [$cubeaccessor isaxisframetype $axis "dsbspecframe"] } {
+            catch {
+               set frameset [$cubeaccessor getwcs]
+               set specframe [gaiautils::getaxis $frameset $axis]
+               lassign [gaiautils::astgetrefpos $specframe] refra refdec
+               gaiautils::astannul $specframe
+
+               #  Convert into an image position.
+               $rtdimage_ convert coords $refra $refdec "deg J2000" rx ry image
+
+               #  And get the distance.
+               $rtdimage_ convert dist [expr $iix-$rx] [expr $iiy-$ry] \
+                  image drefra drefdec deg
+               
+               set drefra [format "%f" [expr $drefra*3600.0]]
+               set drefdec [format "%f" [expr $drefdec*3600.0]]
+
+               #  Format reference RA and Dec as FK5 J2000.
+               set skyframe [gaiautils::astskyframe "System=FK5,Digits=9"]
+               set refra \
+                  [gaiautils::astformat $skyframe 1 [expr $refra*$PI_/180.0]]
+               set refdec \
+                  [gaiautils::astformat $skyframe 2 [expr $refdec*$PI_/180.0]]
+               gaiautils::astannul $skyframe
+
+            }
          }
 
          #  Image centre in world coordinates.
          lassign [$rtdimage_ astpix2cur $icx $icy] ra dec
 
-         #  World coordinates of extraction point.
+         #  World coordinates of extraction pixel.
          lassign [$rtdimage_ astpix2cur $iix $iiy] xra xdec
       }
-      return [list $ra $dec $xra $xdec $dra $ddec]
+      return [list $ra $dec $xra $xdec $dra $ddec \
+                   $refra $refdec $drefra $drefdec]
    }
 
    #  Configuration options: (public variables)
@@ -1107,6 +1149,8 @@ itcl::class gaia::GaiaCubeSpectrum {
 
    #  Counter for temporary files.
    common count_ 0
+
+   common PI_ 3.14159265358979323846264338328
 
 #  End of class definition.
 }
