@@ -55,7 +55,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -75,6 +75,8 @@
 *  History:
 *     2006 May 31 (MJC):
 *        Original version.
+*     2007 January 17 (MJC):
+*        Used an NDF section for the padded region being averaged.
 *     {enter_further_changes_here}
 
 *-
@@ -126,6 +128,8 @@
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of input NDF
       INTEGER LBNDO( NDF__MXDIM ) ! Lower bounds of output NDF
       INTEGER NBIN               ! Number of bins
+      INTEGER NDFS               ! Identifier to the used section of 
+                                 ! the input NDF
       INTEGER NDIM               ! Number of dimensions
       INTEGER NERR               ! Number of errors
       INTEGER ODIMS( NDF__MXDIM )! Dimensions of output array
@@ -184,8 +188,13 @@
       CALL NDF_MTYPE( '_REAL,_DOUBLE', INDF, INDF, 'Data', ITYPE, 
      :                DTYPE, STATUS )
 
+*  Create a section of the input NDF containing the region will actually
+*  be used (i.e. excluding any pixels which lie over the edge of the
+*  output image).
+      CALL NDF_SECT( INDF, NDIM, LBND, UBND, NDFS, STATUS )
+
 *  Map the array component of the section.
-      CALL KPG1_MAP( INDF, 'Data', ITYPE, 'READ', PNTRI, EL, STATUS )
+      CALL KPG1_MAP( NDFS, 'Data', ITYPE, 'READ', PNTRI, EL, STATUS )
 
 *  Obtain workspace for the averaged spectrum.
       CALL PSX_CALLOC( IDIMS( DTAXIS ), ITYPE, IPAL, STATUS )
@@ -230,7 +239,10 @@
       CALL PSX_FREE( WPNTR2, STATUS )
 
 *  Tidy the input data array.
-      CALL NDF_UNMAP( INDF, 'Data', STATUS )
+      CALL NDF_UNMAP( NDFS, 'Data', STATUS )
+
+*  Remove the enlarged-section NDF.
+      CALL NDF_ANNUL( NDFS, STATUS )
 
 *  Perform fits and iteratively reject outliers.
       IF ( ITYPE .EQ. '_REAL' ) THEN
