@@ -952,7 +952,9 @@ itcl::class gaia::GaiaCubeSpectrum {
 
    #  Return various useful coordinates. The centre of image, the coordinates
    #  of the extraction and the offset of the extraction from the image
-   #  centre, all in world coordinates (usually RA and Dec).
+   #  centre, all in world coordinates (usually RA and Dec). Note the
+   #  coordinates of the extraction are for the whole pixel, not a sub-pixel
+   #  canvas position.
    public method get_last_coords {} {
       set xra ""
       set xdec ""
@@ -967,6 +969,10 @@ itcl::class gaia::GaiaCubeSpectrum {
          set ccx [$canvas_ canvasx $cx]
          set ccy [$canvas_ canvasy $cy]
          $rtdimage_ convert coords $ccx $ccy canvas iix iiy image
+
+         #  Make grid coordinates integer to pick centre of pixel.
+         set iix [expr round($iix)]
+         set iiy [expr round($iiy)]
 
          #  Centre of image.
          set icx [expr 0.5*[$rtdimage_ width]]
