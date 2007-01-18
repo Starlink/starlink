@@ -49,17 +49,23 @@ extern "C" {
 }
 #include "gaiaUtils.h"
 
+static const double pi_ = 3.14159265358979323846;
+static const double r2d_ = 180.0/pi_;
+static const double d2r_ = pi_/180.0;
+
 /* Local prototypes */
 static int GaiaUtilsAstAnnul( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstConvert( ClientData clientData, Tcl_Interp *interp,
                                 int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstCopy( ClientData clientData, Tcl_Interp *interp,
-                            int objc, Tcl_Obj *CONST objv[] );
+                             int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstFormat( ClientData clientData, Tcl_Interp *interp,
                                int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstGet( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsAstGetRefPos( ClientData clientData, Tcl_Interp *interp,
+                                  int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstSet( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstShow( ClientData clientData, Tcl_Interp *interp,
@@ -74,6 +80,8 @@ static int GaiaUtilsFrameIsA( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsGt2DWcs( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsGtAxis( ClientData clientData, Tcl_Interp *interp,
+                            int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsGtAxisCoord( ClientData clientData, Tcl_Interp *interp,
                                  int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsGtAxisWcs( ClientData clientData, Tcl_Interp *interp,
@@ -101,6 +109,11 @@ int GaiaUtils_Init( Tcl_Interp *interp )
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::astget", GaiaUtilsAstGet,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::astgetrefpos",
+                          GaiaUtilsAstGetRefPos,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -133,6 +146,10 @@ int GaiaUtils_Init( Tcl_Interp *interp )
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::get2dwcs", GaiaUtilsGt2DWcs,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::getaxis", GaiaUtilsGtAxis,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -265,6 +282,53 @@ static int GaiaUtilsAstSet( ClientData clientData, Tcl_Interp *interp,
         Tcl_SetResult( interp, buf, TCL_DYNAMIC );
         return TCL_ERROR;
     }
+    return TCL_OK;
+}
+
+/**
+ * Get the reference position (RefRA,RefDec) in decimal degrees J2000.
+ *
+ * There is one argument, the address of a SpecFrame. Returns the
+ * pair of values.
+ */
+static int GaiaUtilsAstGetRefPos( ClientData clientData, Tcl_Interp *interp,
+                                  int objc, Tcl_Obj *CONST objv[] )
+{
+    AstSpecFrame *object;
+    Tcl_Obj *resultObj;
+    double lat;
+    double lon;
+    long adr;
+
+    /* Check arguments, only allow one. */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "AstSpecFrame" );
+        return TCL_ERROR;
+    }
+
+    /* Get the AstSpecFrame */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    object = (AstSpecFrame *) adr;
+
+    /* Get the value */
+    astGetRefPos( object, (AstSkyFrame *) NULL, &lon, &lat );
+    if ( ! astOK ) {
+        astClearStatus;
+        Tcl_SetResult( interp, "Failed to get reference positions",
+                       TCL_VOLATILE );
+        return TCL_ERROR;
+    }
+
+    /* Radians to degrees */
+    lat *= r2d_;
+    lon *= r2d_;
+
+    Tcl_ResetResult( interp );
+    resultObj = Tcl_GetObjResult( interp );
+    Tcl_ListObjAppendElement( interp, resultObj, Tcl_NewDoubleObj( lon ) );
+    Tcl_ListObjAppendElement( interp, resultObj, Tcl_NewDoubleObj( lat ) );
     return TCL_OK;
 }
 
@@ -518,6 +582,53 @@ static int GaiaUtilsGt2DWcs( ClientData clientData, Tcl_Interp *interp,
         free( error_mess );
     }
     return result;
+}
+
+/**
+ * Return an axis of the given Frame (which can be the current frame of a
+ * FrameSet)
+ *
+ * Two arguments the Frame and the axis. The result is the address of the
+ * picked AstFrame.
+ */
+static int GaiaUtilsGtAxis( ClientData clientData, Tcl_Interp *interp,
+                            int objc, Tcl_Obj *CONST objv[] )
+{
+    AstFrame *picked;
+    AstObject *wcs;
+    int axes[1];
+    int axis;
+    long adr;
+
+    /* Check arguments, only allow two, the frame and the axis */
+    if ( objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "frame axis" );
+        return TCL_ERROR;
+    }
+
+    /* Get the frame/frameset */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    wcs = (AstObject *) adr;
+
+    /* Get the axis (AST index) */
+    if ( Tcl_GetIntFromObj( interp, objv[2], &axis ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    axes[0] = axis;
+
+    /* Pick the axis */
+    picked = (AstFrame *) astPickAxes( wcs, 1, axes, NULL );
+
+    /* Export Frame as a long containing the address */
+    if ( astOK ) {
+        Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) picked ) );
+        return TCL_OK;
+    }
+    Tcl_SetResult( interp, "Failed to extract axis from WCS",
+                   TCL_VOLATILE );
+    return TCL_ERROR;
 }
 
 /**
@@ -861,7 +972,7 @@ static int GaiaUtilsAstConvert( ClientData clientData, Tcl_Interp *interp,
     frame2 = (AstFrame *) adr;
 
     /* Do the astConvert */
-    mapping = (AstFrameSet *) astConvert( frame1, frame2, 
+    mapping = (AstFrameSet *) astConvert( frame1, frame2,
                                           Tcl_GetString( objv[3] ) );
 
     /* Export the new object as a long containing the address */
@@ -877,7 +988,7 @@ static int GaiaUtilsAstConvert( ClientData clientData, Tcl_Interp *interp,
 /*
  * Transform a set of 2D coordinates using a FrameSet as a Mapping.
  *
- * There are three arguments, the address of a FrameSet and the two 
+ * There are three arguments, the address of a FrameSet and the two
  * coordinate values (doubles). The result is the two transformed values.
  */
 static int GaiaUtilsAstTran2( ClientData clientData, Tcl_Interp *interp,
@@ -916,7 +1027,7 @@ static int GaiaUtilsAstTran2( ClientData clientData, Tcl_Interp *interp,
     astTran2( mapping, 1, xin, yin, 1, xout, yout );
     p[0] = xout[0];
     p[1] = yout[0];
-    astNorm( mapping, p ); 
+    astNorm( mapping, p );
     if ( astOK ) {
         Tcl_ResetResult( interp );
         resultObj = Tcl_GetObjResult( interp );
