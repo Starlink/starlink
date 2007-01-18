@@ -363,20 +363,30 @@ itcl::class gaia::GaiaSpecWriter {
 
       #  Not fatal if this fails.
       catch {
-         lassign [$cubespectrum get_last_coords] ra dec xra xdec dra ddec
+         lassign [$cubespectrum get_last_coords] \
+            ra dec xra xdec dra ddec refra refdec drefra drefdec
          if { $ra != "" } {
             $specaccessor fitswrite EXRA  $ra \
-               "RA centre for spectral extraction"
+               "RA image centre for spectral extraction"
             $specaccessor fitswrite EXDEC $dec \
-               "DEC centre for spectral extraction"
+               "DEC image centre for spectral extraction"
             $specaccessor fitswrite EXRAX $xra \
                "RA of spectral extraction"
             $specaccessor fitswrite EXDECX $xdec \
                "Dec of spectral extraction"
             $specaccessor fitswrite EXRAOF  $dra \
-               "Offset from centre of spectral extraction (arcsec)"
+               "Offset from EXRA (arcsec)"
             $specaccessor fitswrite EXDECOF $ddec \
-               "Offset from centre of spectral extraction (arcsec)"
+               "Offset from EXDEC (arcsec)"
+
+            $specaccessor fitswrite EXRRA  $refra \
+               "Reference RA centre for spectral extraction"
+            $specaccessor fitswrite EXRDEC $refdec \
+               "Reference DEC centre for spectral extraction"
+            $specaccessor fitswrite EXRRAOF  $drefra \
+               "Offset from EXRRA (arcsec)"
+            $specaccessor fitswrite EXRDECOF $drefdec \
+               "Offset from EXRDEC (arcsec)"
          }
       }
    }
