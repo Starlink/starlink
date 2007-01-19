@@ -95,6 +95,10 @@
 *        inclusion of the AST include files (which test for astCLASS).
 */
 
+/* Configuration results. */
+/* ---------------------- */
+#include <config.h>
+
 /* Module Macros. */
 /* ============== */
 /* Define the astCLASS macro (even although this is not a class
@@ -158,10 +162,6 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
-
-/* Configuration results. */
-/* ---------------------- */
-#include <config.h>
 
 /* Function Macros. */
 /* =============== */
