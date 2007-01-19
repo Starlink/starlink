@@ -424,7 +424,6 @@ itcl::class gaia::GaiaSpecWriter {
 
             #  Source position in radians. Only when TSYS != GAPPT, as
             #  the reference position moves on the sky.
-            puts "tsys = $tsys"
             if { $tsys != "GAPPT" } {
                
                set sx [$cubeaccessor getdoubleproperty JCMTSTATE \
@@ -435,8 +434,6 @@ itcl::class gaia::GaiaSpecWriter {
                set sx "BAD"
                set sy "BAD"
             }
-
-            puts "sx = $sx, sy = $sy"
 
             if { $rx != "BAD" && $ry != "BAD" } {
 
