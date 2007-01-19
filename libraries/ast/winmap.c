@@ -104,6 +104,8 @@ f     The WinMap class does not define any new routines beyond those
 *        Override astEqual.
 *     23-AUG-2006 (DSB):
 *        Correct initialisation of "result" in the Equal function.
+*     19-JAN-2007 (DSB):
+*        Fix memory leak.
 *class--
 */
 
@@ -543,6 +545,12 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
                   break;
                }
             }           
+
+/* Free resources */
+            a_this = astFree( a_this );
+            a_that = astFree( a_that );
+            b_this = astFree( b_this );
+            b_that = astFree( b_that );
          }
       }
    }
