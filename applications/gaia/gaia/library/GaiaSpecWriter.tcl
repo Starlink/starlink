@@ -367,22 +367,22 @@ itcl::class gaia::GaiaSpecWriter {
             ra dec xra xdec dra ddec refra refdec drefra drefdec
          if { $ra != "" } {
             $specaccessor fitswrite EXRA  $ra \
-               "RA image centre for spectral extraction"
+               "Image centre for spectral extraction"
             $specaccessor fitswrite EXDEC $dec \
-               "DEC image centre for spectral extraction"
+               "Image centre for spectral extraction"
             $specaccessor fitswrite EXRAX $xra \
-               "RA of spectral extraction"
+               "Position of spectral extraction"
             $specaccessor fitswrite EXDECX $xdec \
-               "Dec of spectral extraction"
+               "Position of spectral extraction"
             $specaccessor fitswrite EXRAOF  $dra \
                "Offset from EXRA (arcsec)"
             $specaccessor fitswrite EXDECOF $ddec \
                "Offset from EXDEC (arcsec)"
 
             $specaccessor fitswrite EXRRA  $refra \
-               "Reference RA centre for spectral extraction"
+               "Reference centre for spectral extraction"
             $specaccessor fitswrite EXRDEC $refdec \
-               "Reference DEC centre for spectral extraction"
+               "Reference centre for spectral extraction"
             $specaccessor fitswrite EXRRAOF  $drefra \
                "Offset from EXRRA (arcsec)"
             $specaccessor fitswrite EXRDECOF $drefdec \
@@ -394,8 +394,10 @@ itcl::class gaia::GaiaSpecWriter {
    #  Determine the ACSIS pointing for the current spectrum.
    protected method add_acsis_coords_ {cubeaccessor specaccessor p1 p2} {
 
-      set ra {}
-      set dec {}
+      set rra {}
+      set rdec {}
+      set sra {}
+      set sdec {}
       set dateobs {}
 
       #  System, either AZEL or TRACKING.
@@ -419,6 +421,22 @@ itcl::class gaia::GaiaSpecWriter {
                        "RECEPPOS\(1,$p1,$p2\)"]
             set ry [$cubeaccessor getdoubleproperty ACSIS \
                        "RECEPPOS\(2,$p1,$p2\)"]
+
+            #  Source position in radians. Only when TSYS != GAPPT, as
+            #  the reference position moves on the sky.
+            puts "tsys = $tsys"
+            if { $tsys != "GAPPT" } {
+               
+               set sx [$cubeaccessor getdoubleproperty JCMTSTATE \
+                          "TCS_TR_BC1\($p2\)"]
+               set sy [$cubeaccessor getdoubleproperty JCMTSTATE \
+                          "TCS_TR_BC2\($p2\)"]
+            } else {
+               set sx "BAD"
+               set sy "BAD"
+            }
+
+            puts "sx = $sx, sy = $sy"
 
             if { $rx != "BAD" && $ry != "BAD" } {
 
@@ -445,7 +463,7 @@ itcl::class gaia::GaiaSpecWriter {
 
                   #  Gather all information.
                   set atts "System=$tsys,Epoch=MJD $epoch,\
-                            Obslat=$latobs,Obslon=$lonobs"
+                            Obslat=$latobs,Obslon=$lonobs,Digits=9"
 
                   #  Correction from UT1 to UTC, if known (value in days).
                   #  Needs to be correct for the epoch of observation.
@@ -466,6 +484,10 @@ itcl::class gaia::GaiaSpecWriter {
                      set wcs [gaiautils::astconvert $skyframe $toframe "SKY"]
 
                      lassign [gaiautils::asttran2 $wcs $rx $ry] rx ry
+                     
+                     if { $sx != "BAD" && $sy != "BAD" } {
+                        lassign [gaiautils::asttran2 $wcs $sx $sy] sx sy
+                     }
 
                      gaiautils::astannul $skyframe
                      gaiautils::astannul $wcs
@@ -473,8 +495,14 @@ itcl::class gaia::GaiaSpecWriter {
                   }
 
                   #  Format the receptor position for display.
-                  set ra [gaiautils::astformat $skyframe 1 $rx]
-                  set dec [gaiautils::astformat $skyframe 2 $ry]
+                  set rra [gaiautils::astformat $skyframe 1 $rx]
+                  set rdec [gaiautils::astformat $skyframe 2 $ry]
+                  
+                  #  Same for source position, if available.
+                  if { $sx != "BAD" && $sy != "BAD" } {
+                     set sra [gaiautils::astformat $skyframe 1 $sx]
+                     set sdec [gaiautils::astformat $skyframe 2 $sy]
+                  }
 
                   #  The DATE-OBS keyword for this spectrum can be defined
                   #  more accurately as the Epoch, so do that. Note we need to
@@ -488,10 +516,16 @@ itcl::class gaia::GaiaSpecWriter {
          }
       }
 
-      if { $ra != {} && $dec != {} } {
-         $specaccessor fitswrite EXRAX  $ra "Spectral extraction position"
-         $specaccessor fitswrite EXDECX $dec "Spectral extraction position"
+      if { $rra != {} && $rdec != {} } {
+         $specaccessor fitswrite EXRAX  $rra "Spectral extraction position"
+         $specaccessor fitswrite EXDECX $rdec "Spectral extraction position"
          $specaccessor fitswrite EXSYS $tsys "Extraction coordinate system"
+
+         if { $sra != {} && $sdec != {} } {
+            $specaccessor fitswrite EXRRA  $sra "Position of source"
+            $specaccessor fitswrite EXRDEC $sdec "Position of source"
+         }
+         
          if { $dateobs != {} } {
             $specaccessor fitswrite DATE-OBS $dateobs "Time of observation"
          }
