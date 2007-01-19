@@ -963,7 +963,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       set dec ""
       set dra ""
       set ddec ""
-      
+
       set refra ""
       set refdec ""
       set drefra ""
@@ -996,37 +996,45 @@ itcl::class gaia::GaiaCubeSpectrum {
             set ddec [format "%f" [expr $ddec*3600.0]]
          } msg
 
-         #  Distance from the RefRA and RefDec positions. These are the 
-         #  offsets from the "source" in an ideal case. First need RefRA and
-         #  RefDec. 
+         #  Distance from the source position. Take a guess at these. Try the
+         #  SkyRef positions from the image, failing that see if we have a
+         #  SpecFrame use RefRA and RefDec.
          set cubeaccessor [$itk_option(-gaiacube) get_cubeaccessor]
          set axis [$itk_option(-gaiacube) get_axis]
          if { [$cubeaccessor isaxisframetype $axis "specframe"] ||
               [$cubeaccessor isaxisframetype $axis "dsbspecframe"] } {
+
             catch {
-               set frameset [$cubeaccessor getwcs]
-               set specframe [gaiautils::getaxis $frameset $axis]
-               lassign [gaiautils::astgetrefpos $specframe] refra refdec
-               gaiautils::astannul $specframe
+               set rra [$rtdimage_ astget "SkyRef(1)"]
+               set rdec [$rtdimage_ astget "SkyRef(2)"]
+               if { $rra == "" || $rra == 0.0 } {
+                  set frameset [$cubeaccessor getwcs]
+                  set specframe [gaiautils::getaxis $frameset $axis]
+                  lassign [gaiautils::astgetrefpos $specframe] rra rdec
+                  gaiautils::astannul $specframe
+               } else {
+                  #  Radians to degrees.
+                  set rra [expr $rra*180.0/$PI_]
+                  set rdec [expr $rdec*180.0/$PI_]
+               }
 
                #  Convert into an image position.
-               $rtdimage_ convert coords $refra $refdec "deg J2000" rx ry image
+               $rtdimage_ convert coords $rra $rdec "deg J2000" rx ry image
 
                #  And get the distance.
                $rtdimage_ convert dist [expr $iix-$rx] [expr $iiy-$ry] \
                   image drefra drefdec deg
-               
+
                set drefra [format "%f" [expr $drefra*3600.0]]
                set drefdec [format "%f" [expr $drefdec*3600.0]]
 
-               #  Format reference RA and Dec as FK5 J2000.
+               #  Format reference RA and Dec.
                set skyframe [gaiautils::astskyframe "System=FK5,Digits=9"]
                set refra \
-                  [gaiautils::astformat $skyframe 1 [expr $refra*$PI_/180.0]]
+                  [gaiautils::astformat $skyframe 1 [expr $rra*$PI_/180.0]]
                set refdec \
-                  [gaiautils::astformat $skyframe 2 [expr $refdec*$PI_/180.0]]
+                  [gaiautils::astformat $skyframe 2 [expr $rdec*$PI_/180.0]]
                gaiautils::astannul $skyframe
-
             }
          }
 
