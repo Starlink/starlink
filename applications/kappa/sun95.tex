@@ -17,7 +17,7 @@
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
 \newcommand{\stardocdate}      {2006 December 30}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.6-4}
+\newcommand{\stardocversion}   {1.6-5}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -32138,6 +32138,15 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          polynomial fits will be weighted by the variances.
       }
    }
+   \sstresparameters{
+      \sstsubsection{
+         ARANGES() = \_INTEGER (Write)
+      }{
+         This parameter is only written when AUTO={\tt TRUE}, recording the
+         trend-axis fitting regions determined automatically.  They 
+         comprise pairs of grid co-ordinates.
+      }
+   }
    \sstexamples{
       \sstexamplesubsection{
          mfittrend in=cube axis=3 ranges="1000,2000,3000,4000" order=4 out=detrend
@@ -51425,6 +51434,13 @@ The following applications have been modified:
          \item There is a new parameter LABTYPE to control the sort of
                labels created---numerical or textual---when parameter LABEL
                is {\tt TRUE}.
+      \end{itemize}
+
+   \item [\htmlref{MFITTREND}{MFITTREND}] \mbox{}
+      \begin{itemize} 
+         \item There is a new output parameter ARANGES to record the
+         fitting ranges found in automatic mode.  The automatic ranges
+         are now constrained to the input NDF bounds.
       \end{itemize}
 
    \item [\htmlref{MLINPLOT}{MLINPLOT}] \mbox{}
