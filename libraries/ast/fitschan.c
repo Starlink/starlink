@@ -738,6 +738,9 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *     20-DEC-2006 (DSB):
 *        Correct FK5 to ICRS in error message issued if no RADESYS or
 *        EQUINOX is found.
+*     16-JAN-2007 (DSB):
+*        Cast ignored function return values to (void) to avoid compiler
+*        warnings.
 *class--
 */
 
@@ -1601,7 +1604,7 @@ static void AddFrame( AstFitsChan *this, AstFrameSet *fset, int pixel,
             pmap = astPermMap( npix, inperm, nwcs, outperm, &con, "" );
             tmap = (AstMapping *) astCmpMap( pmap, mapping, 1, "" );
             pmap = astAnnul( pmap );
-            astAnnul( mapping );
+            (void) astAnnul( mapping );
             mapping = tmap;
          }
          inperm = astFree( inperm );
@@ -1768,7 +1771,7 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
                         class );
    tmap2 = (AstMapping *) astCmpMap( iwcmap, tmap, 1, "" );
    tmap = astAnnul( tmap );
-   astAnnul( iwcmap );
+   (void) astAnnul( iwcmap );
    iwcmap = tmap2;
 
 /* Finally add descriptions of any axes not yet described (they are
@@ -1776,7 +1779,7 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
    tmap = OtherAxes( fset, dim, wperm, s, store, crvals, axis_done, method, class );
    tmap2 = (AstMapping *) astCmpMap( iwcmap, tmap, 1, "" );
    tmap = astAnnul( tmap );
-   astAnnul( iwcmap );
+   (void) astAnnul( iwcmap );
    iwcmap = tmap2;
 
 /* The "iwcmap" Mapping found above converts from the WCS Frame to the IWC 
@@ -8104,7 +8107,7 @@ static int MakeBasisVectors( AstMapping *map, int nin, int nout,
 
 /* Transform these grid positions in IWC positions using the supplied 
    Mapping. */
-      astTransform( map, psetg, 1, psetw );
+      (void) astTransform( map, psetg, 1, psetw );
 
 /* Check that all the transformed positions are good. */
       for( j = 0; j < nout; j++ ) {
@@ -9636,7 +9639,7 @@ static FitsStore *FsetToStore( AstFitsChan *this, AstFrameSet *fset, int naxis,
                      }
                   }
                }
-               astAnnul( frame );
+               (void) astAnnul( frame );
             }
          }
 
@@ -10299,7 +10302,7 @@ static void GetFiducialPPC( AstWcsMap *map, double *x0, double *y0 ){
 
 /* Use the inverse WcsMap to convert the native longitude and latitude of 
    the fiducial point into PPC (x,y). */
-      astTransform( map, pset1, 0, pset2 );
+      (void) astTransform( map, pset1, 0, pset2 );
 
 /* Return the calculated PPC coords. */
       *x0 = ptr2[ axlon ][ 0 ];
@@ -10403,7 +10406,7 @@ static int GetFiducialWCS( AstWcsMap *wcsmap, AstMapping *map2, int colon,
 /* The fiducial point in the celestial coordinate system is found by
    transforming the fiducial point in native spherical co-ordinates
    into absolute physical coordinates using map2. */
-      astTransform( map2, pset1, 1, pset2 );
+      (void) astTransform( map2, pset1, 1, pset2 );
 
 /* Store the returned WCS values. */
       *fidlon = ptr2[ colon ][ 0 ];      
@@ -11959,7 +11962,7 @@ static double *FitLine( AstMapping *map, double *g, double *g0, double *w0,
       }
 
 /* Transform these positions into the output space. */
-      astTransform( map, pset1, 1, pset2 );
+      (void) astTransform( map, pset1, 1, pset2 );
 
 /* Loop over all output axes, finding the component of the returned vector. */
       ok = 1;
@@ -15438,7 +15441,7 @@ static int IsMapLinear( AstMapping *map, const double lbnd_in[],
             *(p++) = xl[ i ];
             for( j = 1; j < NP; j++ ) *(p++) = AST__BAD;
          }
-         astTransform( map, pset1, 1, pset2 );
+         (void) astTransform( map, pset1, 1, pset2 );
 
 /* Now create a set of NP points evenly spaced in output coordinates. The
    first point is at the output position found above. Each subsequent
@@ -15457,7 +15460,7 @@ static int IsMapLinear( AstMapping *map, const double lbnd_in[],
 
 /* Transform these output positions into input positions using the
    inverse Mapping. */
-         astTransform( map, pset2, 0, pset1 );
+         (void) astTransform( map, pset2, 0, pset1 );
 
 /* Do a least squares fit to each input coordinate. Each fit gives the
    corresponding input coordinate value as a linear function of the
@@ -18048,7 +18051,7 @@ static double NearestPix( AstMapping *map, double val, int axis ){
       ptr2[ axis ][ 0 ] = val;
 
 /* Transform this output position into an input position. */
-      astTransform( map, pset2, 0, pset1 );
+      (void) astTransform( map, pset2, 0, pset1 );
 
 /* Round all good axis values in the resulting input position to the nearest 
    integer. */
@@ -18059,7 +18062,7 @@ static double NearestPix( AstMapping *map, double val, int axis ){
       }
      
 /* Transform this input position back into output coords. */
-      astTransform( map, pset1, 1, pset2 );
+      (void) astTransform( map, pset1, 1, pset2 );
 
 /* If the resulting axis value is good, return it. */
       if( ptr2[ axis ] [ 0 ] != AST__BAD ) result = ptr2[ axis ] [ 0 ];     
@@ -18967,7 +18970,7 @@ static AstMapping *OtherAxes( AstFrameSet *fs, double *dim, int *wperm,
          for( iax = 0; iax < npix; iax++ ) {
             ptr1[ iax ][ 0 ] = ( dim[ iax ] != AST__BAD ) ? floor( 0.5*dim[ iax ] ) : 1.0;
          }
-         astTransform( map, pset1, 1, pset2 );
+         (void) astTransform( map, pset1, 1, pset2 );
       }
 
 /* Loop round all WCS axes, producing descriptions of any axes which have not
@@ -19016,7 +19019,7 @@ static AstMapping *OtherAxes( AstFrameSet *fs, double *dim, int *wperm,
 /* Combine the Mapping for this axis in series with those of earlier axes. */
             if( ret ) {
                tmap0 = (AstMapping *) astCmpMap( ret, axmap, 1, "" );
-               astAnnul( ret );
+               (void) astAnnul( ret );
                ret = tmap0;
             } else {
                ret = astClone( axmap );
@@ -22017,7 +22020,7 @@ static void SkyPole( AstWcsMap *map2, AstMapping *map3, int ilon, int ilat,
    values correspond to the LONPOLE and LATPOLE keywords. */
          for( iax = 0; iax < nax; iax++ ) ptr2[ iax ][ 0 ] = 0.0;
          ptr2[ ilat ][ 0 ] = AST__DPIBY2;
-         astTransform( map3, pset2, 0, pset1 );
+         (void) astTransform( map3, pset2, 0, pset1 );
 
 /* Retrieve the latitude and longitude (in the standard system) of the 
    fiducial point (i.e. CRVAL), in radians. */
@@ -22672,7 +22675,7 @@ static AstMapping *SpectralAxes( AstFrameSet *fs, double *dim, int *wperm,
             tfs = astAnnul( tfs );
             if( !IsMapLinear( tmap1, &lbnd_s, &ubnd_s, 0 ) ) {
                astClear( fs, unit_attr ); 
-               astAnnul( map );
+               (void) astAnnul( map );
                map = astGetMapping( fs, AST__BASE, AST__CURRENT );
                astMapBox( map, lbnd_p, ubnd_p, 1, iax, &lbnd_s, &ubnd_s,
                           NULL, NULL );
@@ -22994,7 +22997,7 @@ static AstMapping *SpectralAxes( AstFrameSet *fs, double *dim, int *wperm,
 /* Add the Mapping for this axis in series with any existing result Mapping. */
                if( ret ) {
                   tmap0 = (AstMapping *) astCmpMap( ret, axmap, 1, "" );
-                  astAnnul( ret );
+                  (void) astAnnul( ret );
                   ret = tmap0;
                } else {
                   ret = astClone( axmap );
@@ -25064,7 +25067,7 @@ static int SplitMap( AstMapping *map, int invert, int ilon, int ilat,
             ptr1[ i ][ 0 ] = 1.0;
             ptr1[ i ][ 1 ] = 1000.0;
          }
-         astTransform( map, pset1, 1, pset2 );
+         (void) astTransform( map, pset1, 1, pset2 );
 
 /* If the two wcs positions have equal longitude and latitude values,
    assume that the output longitude and latitude axes are assigned
@@ -27055,7 +27058,7 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
 
 /* If there were no other axes, replace the supplied Frame with the skyframe. */
             if( j == 0 ) {
-               astAnnul( *frm );
+               (void) astAnnul( *frm );
                *frm = (AstFrame *) astClone( sfrm );
 
 /* Otherwise pick the other axes from the supplied Frame */               
@@ -27064,7 +27067,7 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
 
 /* Replace the supplied Frame with a CmpFrame made up of this Frame and 
    the SkyFrame. */
-               astAnnul( *frm );
+               (void) astAnnul( *frm );
                *frm = (AstFrame *) astCmpFrame( ofrm, sfrm, "" );
                ofrm = astAnnul( ofrm );
             }
@@ -30208,7 +30211,7 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
 /* If there were no other axes, replace the supplied Frame with the 
    specframe. */
             if( j == 0 ) {
-               astAnnul( *frm );
+               (void) astAnnul( *frm );
                *frm = (AstFrame *) specfrm;
 
 /* Otherwise pick the other axes from the supplied Frame */               
@@ -30217,7 +30220,7 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
 
 /* Replace the supplied Frame with a CmpFrame made up of this Frame and 
    the SpecFrame. */
-               astAnnul( *frm );
+               (void) astAnnul( *frm );
                *frm = (AstFrame *) astCmpFrame( ofrm, specfrm, "" );
                ofrm = astAnnul( ofrm );
                specfrm = astAnnul( specfrm );
@@ -30460,7 +30463,7 @@ static void WorldAxes( AstMapping *cmap, double *dim, int *perm ){
          ptr1[ j ] [ 1 ] = g0[ j ] + 1.0;
       }
 
-      astTransform( map, pset1, 1, pset2 );
+      (void) astTransform( map, pset1, 1, pset2 );
 
       for( i = 0; i < nout; i++ ) {
          w0[ i ] = ptr2[ i ] [ 0 ];
@@ -30484,7 +30487,7 @@ static void WorldAxes( AstMapping *cmap, double *dim, int *perm ){
    ensure that "g0" and "w0" are corresponding positions, transform the 
    "w0" position back into grid coords and use the resulting grid position 
    as "g0". */
-      astTransform( map, pset2, 0, pset1 );
+      (void) astTransform( map, pset2, 0, pset1 );
       for( j = 0; j < nin; j++ ) {
          g0[ j ] = ptr1[ j ] [ 0 ];
       }
@@ -30512,7 +30515,7 @@ static void WorldAxes( AstMapping *cmap, double *dim, int *perm ){
             ptr2[ i ][ 0 ] += dw[ i ];
 
 /* Transform this position into grid coords. */
-            astTransform( map, pset2, 0, pset1 );
+            (void) astTransform( map, pset2, 0, pset1 );
 
 /* Re-instate the original "w0" values within "ptr2", ready for the next
    WCS axis. */
