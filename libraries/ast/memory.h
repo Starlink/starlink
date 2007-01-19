@@ -185,16 +185,16 @@ void astEndPM_( void );
 /* Functions used for debugging memory leaks, etc */
 #ifdef MEM_DEBUG
 
-#define astActiveMemory(label) astERROR_INVOKE(astActiveMemory_(label)
-#define astMemoryTune(name,value) astERROR_INVOKE(astMemoryTune_(name,value)
-#define astWatchMemory(id) astERROR_INVOKE(astWatchMemory_(id)
-#define astFlushMemory(leak) astERROR_INVOKE(astFlushMemory_(leak)
+#define astActiveMemory(label) astERROR_INVOKE(astActiveMemory_(label))
+#define astMemoryTune(name,value) astERROR_INVOKE(astMemoryTune_(name,value))
+#define astWatchMemory(id) astERROR_INVOKE(astWatchMemory_(id))
+#define astFlushMemory(leak) astERROR_INVOKE(astFlushMemory_(leak))
 #define astBeginPM astERROR_INVOKE(astBeginPM_())
 #define astEndPM astERROR_INVOKE(astEndPM_())
-#define astMemoryID(ptr) astERROR_INVOKE(astMemoryID_(ptr)
-#define astMemoryPtr(id) astERROR_INVOKE(astMemoryPtr_(id)
-#define astMemoryAlarm(text) astERROR_INVOKE(astMemoryAlarm_(text)
-#define astMemoryUse(ptr,text) astERROR_INVOKE(astMemoryUse_(ptr,text)
+#define astMemoryID(ptr) astERROR_INVOKE(astMemoryID_(ptr))
+#define astMemoryPtr(id) astERROR_INVOKE(astMemoryPtr_(id))
+#define astMemoryAlarm(text) astERROR_INVOKE(astMemoryAlarm_(text))
+#define astMemoryUse(ptr,text) astERROR_INVOKE(astMemoryUse_(ptr,text))
 
 #else
 
