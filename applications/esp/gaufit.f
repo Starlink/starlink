@@ -884,12 +884,15 @@
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
 *     NG:  Norman Gray (Starlink, GLA)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 
 *  History:
 *     22-Mar-1996 (GJP)
-*     (Original version)
+*       (Original version)
 *     23-Feb-1998 (NG)
-*     Included PSIZE argument.
+*       Included PSIZE argument.
+*     19-JAN-2007 (TIMJ):
+*       Correct FWHM calculation (missing sqrt(2) factor)
 
 *  Bugs:
 *     None known.
@@ -955,7 +958,7 @@
       SIZECONV = 1.0
       IF (PSIZE.GT.0.0) THEN
 *      Display FWHM, rather than sigma
-         SIZECONV = SIZECONV * 2*SQRT(LOG(2.0))
+         SIZECONV = SIZECONV * 2*SQRT(2*LOG(2.0))
       ENDIF
       IF (ABS(PSIZE).GE.1E-6) THEN
 *      Display in units of arcsec, rather than pixels

@@ -2,6 +2,11 @@
 ESP - Extended Surface Photometry
 =================================
 
+Release 0.11-2
+--------------
+
+The reported FWHM from GAUFIT was missing a sqrt(2).
+
 Release 0.11-1
 --------------
 

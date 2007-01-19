@@ -62,6 +62,7 @@
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
 *     NG: Norman Gray (Starlink, GLA)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 
 *  History:
 *     12-Mar-1996 (GJP)
@@ -70,6 +71,8 @@
 *       Changed output format to optionally show FWHM/arcsec
 *     04-JUN-1998 (NG)
 *       Changed output format to display errors on PASS if available
+*     19-JAN-2007 (TIMJ):
+*       Calculation of FWHM was missing factor sqrt(2)
 
 *  Bugs:
 *     None known.
@@ -119,7 +122,7 @@
       CHARACTER WIDA*5,WIDB*5,UNITLAB*2
 *   pass(i,5) and pass(i,6) are sigma in pixels.  
 *   Convert to arsecs (if PSIZE >= 1e-6) by multiplying by PSIZE
-*   Convert to FWHM (if PSIZE > 0) by multiplying by 2sqrt(log(2))
+*   Convert to FWHM (if PSIZE > 0) by multiplying by 2sqrt(2log(2))
       REAL SIZECONV		      ! Conversion factor sigma/px -> ?
 *.
 
@@ -278,7 +281,7 @@
       SIZECONV = 1.0
       IF (PSIZE.GT.0.0) THEN
 *      Display FWHM, rather than sigma
-         SIZECONV = SIZECONV * 2*SQRT(LOG(2.0))
+         SIZECONV = SIZECONV * 2*SQRT(2*LOG(2.0))
       ENDIF
       IF (ABS(PSIZE).GE.1E-6) THEN
 *      Display in units of arcsec, rather than pixels
@@ -1304,7 +1307,6 @@
 *  Local variables:
       CHARACTER *(LINSIZ) TEXT        ! The heading
       CHARACTER *(LINSIZ) LINE        ! FIO line output length
-      CHARACTER *(LINSIZ) PREFIX      ! Output prefix
       CHARACTER *(MSG__SZMSG) NAME    ! NDF name
       LOGICAL OPENF                   ! Was the output file opened?
       INTEGER I                       ! Temporary variable
