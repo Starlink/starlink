@@ -83,7 +83,7 @@
 *        set TRUE.
 *     MODIFYIN = _LOGICAL (Read)
 *        Whether or not to modify the input NDF.  It is only used when
-*        SUBTRACT is TRUE.  If MODYFYIN is FALSE, then an NDF name must
+*        SUBTRACT is TRUE.  If MODIFYIN is FALSE, then an NDF name must
 *        be supplied by the OUT parameter.  [FALSE]
 *     ORDER = _INTEGER (Read)
 *        The order of the polynomials to be used when trend fitting.
@@ -913,8 +913,8 @@
       CALL PSX_FREE( IPWRK1, STATUS )
       CALL PSX_FREE( IPWRK2, STATUS )
 
-*  Evaluate and optioally subtract the trends.
-*  ===========================================
+*  Evaluate and optionally subtract the trends.
+*  ============================================
 
 *  Subtract the result from the NDF data or write the evaluated fit.
 *  If evaluating, then we need to map in the data component, may as
