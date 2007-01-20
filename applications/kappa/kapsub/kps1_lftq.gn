@@ -28,11 +28,11 @@
 
 *  Arguments:
 *     ORDER = INTEGER (Given)
-*        The order of polynomial to fit. Starts at 0 for a constant.
+*        The order of polynomial to fit.  Starts at 0 for a constant.
 *     AXIS = INTEGER (Given)
 *        The axis defining the lines to be fit.
 *     RANGES( NRANGE ) = INTEGER (Given)
-*        Pairs of array co-ordinates along the axis. Only data within
+*        Pairs of array co-ordinates along the axis.  Only data within
 *        these ranges will be used in the fit.
 *     NRANGE = INTEGER (Given)
 *        The number of values in RANGES, must be an even number.
@@ -43,9 +43,9 @@
 *        The dimensions of the input data.  Extra dimension should have
 *        size 1 up to NDF__MXDIM.
 *     AS( ORDER + 1, ORDER + 1 ) = DOUBLE PRECISION (Returned)
-*        Workspace for least squares A matrix.
+*        Workspace for least-squares A matrix.
 *     BS( ORDER + 1, * ) = DOUBLE PRECISION (Returned)
-*        Workspace for least squares B vectors cumulative sums.
+*        Workspace for least-squares B vectors cumulative sums.
 *        On exit this contains the coefficients of the polynomials.
 *
 *        Since there are ORDER + 1 of these for each line, the size of
@@ -64,7 +64,7 @@
 
 *  Notes:
 *     -  This routine works in n-D, where n is 1 to 7.  Even if the
-*     array has actually less dimensions there is negligible loss of
+*     array has actually fewer dimensions there is negligible loss of
 *     efficiency to supply dummy (=1) higher dimensions.
 *
 *     - To work as quickly as possible the fits are performed by running
@@ -87,7 +87,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -97,8 +97,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     PWD: Peter W. Draper (JAC, Durham University)
@@ -118,12 +118,12 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE             ! No implicit typing
+      IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'         ! Standard SAE constants
-      INCLUDE 'PRM_PAR'         ! PRIMDAT constants
-      INCLUDE 'NDF_PAR'         ! NDF public constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+      INCLUDE 'NDF_PAR'          ! NDF public constants
 
 *  Arguments Given:
       INTEGER ORDER
@@ -140,27 +140,27 @@
       INTEGER WRK2( * )
 
 *  Status:
-      INTEGER STATUS            ! Global status
+      INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      <TYPE> TVAL               ! The current data value
-      DOUBLE PRECISION DVAL     ! The current data value
-      DOUBLE PRECISION X        ! The pixel co-ordinate
-      INTEGER B                 ! Pixel index of work arrays
+      <TYPE> TVAL                ! The current data value
+      DOUBLE PRECISION DVAL      ! The current data value
+      DOUBLE PRECISION X         ! The pixel co-ordinate
+      INTEGER B                  ! Pixel index of work arrays
       INTEGER DIMSB( NDF__MXDIM ) ! Dimensions excluding the axis
       INTEGER I( 7 )            ! Equivalences of I1-I7 loop variables
       INTEGER I1, I2, I3, I4, I5, I6, I7 ! Loop variables
       INTEGER IP1, IP2, IP3, IP4, IP5, IP6, IP7 ! Loop variables
-      INTEGER J                 ! Loop counter
-      INTEGER K                 ! Loop counter
-      INTEGER L                 ! Look counter
-      INTEGER LB                ! Bounds loop counter
+      INTEGER J                  ! Loop counter
+      INTEGER K                  ! Loop counter
+      INTEGER L                  ! Look counter
+      INTEGER LB                 ! Bounds loop counter
       INTEGER LLBND( NDF__MXDIM ) ! Loop lower bounds
       INTEGER LUBND( NDF__MXDIM ) ! Loop upper bounds
       INTEGER STRID( NDF__MXDIM ) ! Dimension strides
       INTEGER STRIDA( NDF__MXDIM ) ! Dimension strides excluding axis
       INTEGER STRIDB( NDF__MXDIM ) ! Dimension strides excluding axis
-      INTEGER WEL               ! Workspace elements
+      INTEGER WEL                ! Workspace elements
 
 *  Equivalences so we can index loop variables by AXIS.
       EQUIVALENCE( I1, I( 1 ) )
@@ -172,10 +172,10 @@
       EQUIVALENCE( I7, I( 7 ) )
 
 *  Internal References:
-      INCLUDE 'NUM_DEC_CVT'     ! Declare NUM_ conversion functions
-      INCLUDE 'NUM_DEC_<T>'     ! Declare NUM_ arithmetic functions
-      INCLUDE 'NUM_DEF_CVT'     ! Define NUM_ conversion functions
-      INCLUDE 'NUM_DEF_<T>'     ! Define NUM_ arithmetic functions
+      INCLUDE 'NUM_DEC_CVT'      ! Declare NUM_ conversion functions
+      INCLUDE 'NUM_DEC_<T>'      ! Declare NUM_ arithmetic functions
+      INCLUDE 'NUM_DEF_CVT'      ! Define NUM_ conversion functions
+      INCLUDE 'NUM_DEF_<T>'      ! Define NUM_ arithmetic functions
 *.
 
 *  Check the inherited global status.
@@ -188,7 +188,7 @@
       END DO
 
 *  Calculate the strides for each dimension, this time excluding AXIS
-*  so we can step around the workspace final dimension. WEL is the
+*  so we can step around the workspace final dimension.  WEL is the
 *  total number of workspace elements.
 *  First copy all dimensions, except that for AXIS.
       K = 1
@@ -232,14 +232,14 @@
          END DO
       END DO
 
-*  Set the loop bounds. These are the dimensions of all axes, except for
-*  the one that defines the ranges.
+*  Set the loop bounds.  These are the dimensions of all axes, except
+*  for the one that defines the ranges.
       DO J = 1, NDF__MXDIM
          LLBND( J ) = 1
          LUBND( J ) = DIMS( J )
       END DO
 
-*  Determine the A matrix sums. These are the same for all lines so can
+*  Determine the A matrix sums.  These are the same for all lines so can
 *  be done just once.
       DO LB = 1, NRANGE, 2
          DO L = RANGES( LB ), RANGES( LB + 1 )
@@ -268,7 +268,7 @@
          LLBND( AXIS ) = RANGES( LB )
          LUBND( AXIS ) = RANGES( LB + 1 )
 
-*  For each possible axis. Note these outer loops are usually done
+*  For each possible axis.  Note these outer loops are usually done
 *  NRANGE/2 times only.
          B = 1
          DO I7 = LLBND( 7 ), LUBND( 7 )
