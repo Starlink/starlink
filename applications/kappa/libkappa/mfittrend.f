@@ -39,6 +39,11 @@
 *     they can be subtracted later.  The advantage of that approach is
 *     the subtraction can be undone, but at some cost in efficiency.
 *
+*     Fits may be rejected if their root-mean squared (rms) residuals 
+*     are more than a specified number of standard deviations from the 
+*     the mean rms residuals of the fits.  Rejected fits appear as
+*     bad pixels in the output data.
+
 *     Fitting independent trends can be useful when you need to remove
 *     the continuum from a spectral cube, where each spectrum is
 *     independent of the others (that is you need an independent
@@ -77,9 +82,9 @@
 *        trends subtracted, but only if SUBTRACT and MODIFYIN are both
 *        set TRUE.
 *     MODIFYIN = _LOGICAL (Read)
-*        Whether or not to subtract the trends from the input NDF.  Only
-*        used when SUBTRACT is TRUE.  If this value is FALSE, then an
-*        NDF name must be supplied by the OUT parameter.  [FALSE]
+*        Whether or not to modify the input NDF.  It is only used when
+*        SUBTRACT is TRUE.  If MODYFYIN is FALSE, then an NDF name must
+*        be supplied by the OUT parameter.  [FALSE]
 *     ORDER = _INTEGER (Read)
 *        The order of the polynomials to be used when trend fitting.
 *        A polynomial of order 0 is a constant and 1 a line, 2 a
@@ -98,6 +103,11 @@
 *        world co-ordinate system that corresponds to the trend axis.  
 *        Up to ten pairs of values are allowed.  This parameter is not
 *        accessed when AUTO=TRUE.  [!]
+*     RMSCLIP = _REAL (Read)
+*        The number of standard deviations exceeding the mean of the 
+*        root-mean-squared residuals of the fits at which a fit is
+*        rejected.  A null value (!) means perform no rejections.  
+*        Allowed values are between 2 and 15.  [!]
 *     SECTION = LITERAL (Read)
 *        The region from which representative lines are averaged
 *        in automatic mode to determine the regions to fit trends.  It
@@ -199,6 +209,8 @@
 *        Remove unused variables.
 *     2006 May 31 (MJC):
 *        Added option for automatic estimations of the ranges.
+*     2007 January 11 (MJC):
+*        Added clipping of outlier fits via the RMSCLIP parameter.
 *     2007 January 18 (MJC):
 *        Constrain the automatic ranges to be within the NDF's bounds.
 *        Record automatically determined fitting regions to output
@@ -262,15 +274,20 @@
       INTEGER EL                 ! Number of mapped elements
       INTEGER I                  ! Loop variable
       INTEGER IAXIS              ! Index of axis within current Frame
+      INTEGER IERR               ! Position of first error (dummy)
       INTEGER INNDF              ! NDF identifier of input NDF
       INTEGER IPAS               ! Pointer to workspace
       INTEGER IPBS               ! Pointer to coefficients
+      INTEGER IPCOL              ! Pointer to collapsed rms residuals
       INTEGER IPDAT( 2 )         ! Pointer to NDF data & variance comp's
+      INTEGER IPIN               ! Pointer to input NDF data
       INTEGER IPIX               ! Index of PIXEL Frame within FrameSet
+      INTEGER IPRES              ! Pointer to array of residuals
       INTEGER IPTMP( 1 )         ! Pointer to temporary NDF component
       INTEGER IPVAR( 1 )         ! Pointer to NDF variance component
       INTEGER IPWRK1             ! Pointer to workspace
       INTEGER IPWRK2             ! Pointer to workspace
+      INTEGER IPWRK3             ! Pointer to workspace
       INTEGER IWCS               ! AST FrameSet identifier
       INTEGER JAXIS              ! Index of axis within pixel Frame
       INTEGER JHI                ! High pixel index for axis
@@ -283,12 +300,14 @@
       INTEGER NCSECT             ! Number of characters in section
       INTEGER NDFS               ! NDF identifier of section
       INTEGER NDIM               ! Number of NDF dimensions
+      INTEGER NERR               ! Number of errors
       INTEGER NRANGE             ! Number of range values (not pairs)
       INTEGER ORDER              ! The order of the polynomial to fit
       INTEGER OUTNDF             ! NDF identifier of output NDF
       INTEGER RANGES( MAXRNG )   ! The fit ranges pixels
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF
       LOGICAL AUTO               ! Determine regions automatically?
+      LOGICAL CLIPRE             ! Clip the outlier residuals?
       LOGICAL HASBAD             ! Input NDF may have BAD pixels?
       LOGICAL HAVVAR             ! Have a variance component?
       LOGICAL MODIN              ! Modify input NDF by subtracting fits?
@@ -296,6 +315,7 @@
       LOGICAL USEALL             ! Use the entire axis?
       LOGICAL USEVAR             ! Use variance as weights in fits?
       REAL CLIP( MXCLIP )        ! Clipping sigmas during binning
+      REAL CLPRMS                ! Clipping sigma for outlier rejection
 
 *.
 
@@ -309,12 +329,8 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Start an AST context.
-      CALL AST_BEGIN( STATUS )
-
-*  Begin an NDF context.
-      CALL NDF_BEGIN
-
+*  Obtain the main parameters.
+*  ===========================
 *  Get the order of the polynomial.
       CALL PAR_GDR0I( 'ORDER', 3, 0, 15, .FALSE., ORDER, STATUS )
 
@@ -328,6 +344,24 @@
       IF ( SUBTRA ) THEN
          CALL PAR_GET0L( 'MODIFYIN', MODIN, STATUS )
       END IF
+
+*  Obtain the rms clipping threshold.
+      CLIPRE = .FALSE.
+      CALL PAR_GDR0R( 'RMSCLIP', 4.0, 2.0, 15.0, .FALSE., CLPRMS,
+     :                STATUS )
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+      ELSE IF ( STATUS .EQ. SAI__OK ) THEN
+         CLIPRE = .TRUE.
+      END IF
+
+*  Access the input NDF.
+*  =====================
+*  Start an AST context.
+      CALL AST_BEGIN( STATUS )
+
+*  Begin an NDF context.
+      CALL NDF_BEGIN
 
 *  Obtain identifier for the input NDF.
       IF ( MODIN ) THEN
@@ -455,9 +489,10 @@
          END IF
       END IF
 
-*  The next section deals the determination of which NDF axis the WCS
-*  axis corresponds to. WCS axes can be permuted, rotated etc. so we
-*  must check.
+*  Obtain the NDF axis corresponding to the WCS axis.
+*  --------------------------------------------------
+
+*  WCS axes can be permuted, rotated etc. so we must check.
 
 *  Find an arbitrary position within the NDF which has valid current
 *  Frame co-ordinates. Both pixel and current Frame co-ordinates for
@@ -741,8 +776,8 @@
       CALL PSX_CALLOC( AREA * ( ORDER + 1 ), '_INTEGER', IPWRK2,
      :                 STATUS )
 
-*  Do the fits and optional subtraction. 
-*  =====================================
+*  Determine the fits.
+*  ===================
 
 *  N.B. could reduce memory use by NDF blocking though planes for 
 *  higher dimensional data, or just mapping the intersection of ranges, 
@@ -756,8 +791,8 @@
      :                      %VAL( CNF_PVAL( IPAS ) ),
      :                      %VAL( CNF_PVAL( IPBS ) ),
      :                      %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                      %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                      STATUS )
+     :                      %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
+
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
             CALL KPS1_LFTUB( ORDER, JAXIS, RANGES, NRANGE, USEVAR,
      :                       %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
@@ -765,8 +800,8 @@
      :                       %VAL( CNF_PVAL( IPAS ) ),
      :                       %VAL( CNF_PVAL( IPBS ) ),
      :                       %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                       %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                       STATUS )
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
+
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL KPS1_LFTD( ORDER, JAXIS, RANGES, NRANGE, USEVAR,
      :                      %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
@@ -774,8 +809,8 @@
      :                      %VAL( CNF_PVAL( IPAS ) ),
      :                      %VAL( CNF_PVAL( IPBS ) ),
      :                      %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                      %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                      STATUS )
+     :                      %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
+
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL KPS1_LFTI( ORDER, JAXIS, RANGES, NRANGE, USEVAR,
      :                      %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
@@ -783,8 +818,8 @@
      :                      %VAL( CNF_PVAL( IPAS ) ),
      :                      %VAL( CNF_PVAL( IPBS ) ),
      :                      %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                      %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                      STATUS )
+     :                      %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
+
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL KPS1_LFTR( ORDER, JAXIS, RANGES, NRANGE, USEVAR,
      :                      %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
@@ -792,8 +827,8 @@
      :                      %VAL( CNF_PVAL( IPAS ) ),
      :                      %VAL( CNF_PVAL( IPBS ) ),
      :                      %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                      %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                      STATUS )
+     :                      %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
+
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
             CALL KPS1_LFTW( ORDER, JAXIS, RANGES, NRANGE, USEVAR,
      :                      %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
@@ -801,8 +836,8 @@
      :                      %VAL( CNF_PVAL( IPAS ) ),
      :                      %VAL( CNF_PVAL( IPBS ) ),
      :                      %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                      %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                      STATUS )
+     :                      %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
+
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
             CALL KPS1_LFTUW( ORDER, JAXIS, RANGES, NRANGE, USEVAR,
      :                       %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
@@ -810,8 +845,7 @@
      :                       %VAL( CNF_PVAL( IPAS ) ),
      :                       %VAL( CNF_PVAL( IPBS ) ),
      :                       %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                       %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                       STATUS )
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
          END IF
       ELSE
 
@@ -822,108 +856,277 @@
      :                       %VAL( CNF_PVAL( IPAS ) ),
      :                       %VAL( CNF_PVAL( IPBS ) ),
      :                       %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                       %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                       STATUS )
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
+
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
             CALL KPS1_LFTQUB( ORDER, JAXIS, RANGES, NRANGE,
      :                        %VAL( CNF_PVAL( IPDAT( 1 ) ) ), DIMS,
      :                        %VAL( CNF_PVAL( IPAS ) ),
      :                        %VAL( CNF_PVAL( IPBS ) ),
      :                        %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                        %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                        STATUS )
+     :                        %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
+
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL KPS1_LFTQD( ORDER, JAXIS, RANGES, NRANGE,
      :                       %VAL( CNF_PVAL( IPDAT( 1 ) ) ), DIMS,
      :                       %VAL( CNF_PVAL( IPAS ) ),
      :                       %VAL( CNF_PVAL( IPBS ) ),
      :                       %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                       %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                       STATUS )
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
+
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL KPS1_LFTQI( ORDER, JAXIS, RANGES, NRANGE,
      :                       %VAL( CNF_PVAL( IPDAT( 1 ) ) ), DIMS,
      :                       %VAL( CNF_PVAL( IPAS ) ),
      :                       %VAL( CNF_PVAL( IPBS ) ),
      :                       %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                       %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                       STATUS )
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
+
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL KPS1_LFTQR( ORDER, JAXIS, RANGES, NRANGE,
      :                       %VAL( CNF_PVAL( IPDAT( 1 ) ) ), DIMS,
      :                       %VAL( CNF_PVAL( IPAS ) ),
      :                       %VAL( CNF_PVAL( IPBS ) ),
      :                       %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                       %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                       STATUS )
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
+
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
             CALL KPS1_LFTQW( ORDER, JAXIS, RANGES, NRANGE,
      :                       %VAL( CNF_PVAL( IPDAT( 1 ) ) ), DIMS,
      :                       %VAL( CNF_PVAL( IPAS ) ),
      :                       %VAL( CNF_PVAL( IPBS ) ),
      :                       %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                       %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                       STATUS )
+     :                       %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
+
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
             CALL KPS1_LFTQUW( ORDER, JAXIS, RANGES, NRANGE,
      :                        %VAL( CNF_PVAL( IPDAT( 1 ) ) ), DIMS,
      :                        %VAL( CNF_PVAL( IPAS ) ),
      :                        %VAL( CNF_PVAL( IPBS ) ),
      :                        %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                        %VAL( CNF_PVAL( IPWRK2 ) ),
-     :                        STATUS )
+     :                        %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
          END IF
       END IF
 
+* Free up the workspace at the earliest opportunity.
+      CALL PSX_FREE( IPAS, STATUS )
+      CALL PSX_FREE( IPWRK1, STATUS )
+      CALL PSX_FREE( IPWRK2, STATUS )
+
+*  Evaluate and optioally subtract the trends.
+*  ===========================================
+
 *  Subtract the result from the NDF data or write the evaluated fit.
 *  If evaluating, then we need to map in the data component, may as
-*  well release the input one to save VM.
+*  well release the input one to save VM.  Note that if resiual reject
+*  of points is requested that the IPDAT pointer would be overloaded.
+*  So retain the original pointer for the subtraction forming residuals.
       IF ( .NOT. SUBTRA ) THEN
-         CALL NDF_UNMAP( INNDF, 'DATA', STATUS )
+         IF ( CLIPRE ) THEN
+            IPIN = IPDAT( 1 )
+         ELSE
+            CALL NDF_UNMAP( INNDF, 'DATA', STATUS )
+         END IF
+
          IF ( USEVAR ) THEN
             CALL NDF_UNMAP( INNDF, 'VARIANCE', STATUS )
          END IF
          CALL NDF_MAP( OUTNDF, 'DATA', ITYPE, 'WRITE', IPDAT,
      :                 EL, STATUS )
       END IF
+
       IF ( ITYPE .EQ. '_BYTE' ) THEN
          CALL KPS1_LFTSB( ORDER, JAXIS, SUBTRA,
-     :                    %VAL( CNF_PVAL( IPDAT( 1 ) ) ), DIMS,
-     :                    %VAL( CNF_PVAL( IPBS ) ), STATUS )
+     :                    DIMS, %VAL( CNF_PVAL( IPBS ) ),
+     :                    %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
          CALL KPS1_LFTSUB( ORDER, JAXIS, SUBTRA,
-     :                     %VAL( CNF_PVAL( IPDAT( 1 ) ) ), DIMS,
-     :                     %VAL( CNF_PVAL( IPBS ) ), STATUS )
+     :                     DIMS, %VAL( CNF_PVAL( IPBS ) ),
+     :                     %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL KPS1_LFTSD( ORDER, JAXIS, SUBTRA,
-     :                    %VAL( CNF_PVAL( IPDAT( 1 ) ) ), DIMS,
-     :                    %VAL( CNF_PVAL( IPBS ) ), STATUS )
+     :                    DIMS, %VAL( CNF_PVAL( IPBS ) ),
+     :                    %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
          CALL KPS1_LFTSI( ORDER, JAXIS, SUBTRA,
-     :                    %VAL( CNF_PVAL( IPDAT( 1 ) ) ), DIMS,
-     :                    %VAL( CNF_PVAL( IPBS ) ), STATUS )
+     :                    DIMS, %VAL( CNF_PVAL( IPBS ) ),
+     :                    %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
          CALL KPS1_LFTSR( ORDER, JAXIS, SUBTRA,
-     :                    %VAL( CNF_PVAL( IPDAT( 1 ) ) ), DIMS,
-     :                    %VAL( CNF_PVAL( IPBS ) ), STATUS )
+     :                    DIMS, %VAL( CNF_PVAL( IPBS ) ),
+     :                    %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
          CALL KPS1_LFTSW( ORDER, JAXIS, SUBTRA,
-     :                    %VAL( CNF_PVAL( IPDAT( 1 ) ) ), DIMS,
-     :                    %VAL( CNF_PVAL( IPBS ) ), STATUS )
+     :                    DIMS, %VAL( CNF_PVAL( IPBS ) ),
+     :                    %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
          CALL KPS1_LFTSUW( ORDER, JAXIS, SUBTRA,
-     :                     %VAL( CNF_PVAL( IPDAT( 1 ) ) ), DIMS,
-     :                     %VAL( CNF_PVAL( IPBS ) ), STATUS )
+     :                     DIMS, %VAL( CNF_PVAL( IPBS ) ),
+     :                     %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
       END IF
 
-*  Tidy.
-*  =====
-
-*  Free workspace.
-      CALL PSX_FREE( IPAS, STATUS )
+* Free up the remaining workspace at the earliest opportunity.
       CALL PSX_FREE( IPBS, STATUS )
-      CALL PSX_FREE( IPWRK1, STATUS )
-      CALL PSX_FREE( IPWRK2, STATUS )
+
+*  Form residuals.
+*  ===============
+
+*  If no detrended data calculated, i.e. the residuals, need to form 
+*  the residuals to reject their outliers.
+      IF ( CLIPRE ) THEN
+         IF ( .NOT. SUBTRA ) THEN
+            CALL PSX_CALLOC( EL, ITYPE, IPRES, STATUS )
+
+*  Select the appropriate routine for the data type being processed and
+*  subtract the data arrays.
+            IF ( ITYPE .EQ. '_BYTE' ) THEN
+               CALL VEC_SUBB( HASBAD, EL, %VAL( CNF_PVAL( IPIN ) ),
+     :                        %VAL( CNF_PVAL( IPDAT( 1 ) ) ), 
+     :                        %VAL( CNF_PVAL( IPRES ) ),
+     :                        IERR, NERR, STATUS )
+ 
+            ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
+               CALL VEC_SUBUB( HASBAD, EL, %VAL( CNF_PVAL( IPIN ) ),
+     :                         %VAL( CNF_PVAL( IPDAT( 1 ) ) ), 
+     :                         %VAL( CNF_PVAL( IPRES ) ),
+     :                         IERR, NERR, STATUS )
+ 
+            ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+               CALL VEC_SUBD( HASBAD, EL, %VAL( CNF_PVAL( IPIN ) ),
+     :                        %VAL( CNF_PVAL( IPDAT( 1 ) ) ), 
+     :                        %VAL( CNF_PVAL( IPRES ) ),
+     :                        IERR, NERR, STATUS )
+ 
+            ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
+               CALL VEC_SUBI( HASBAD, EL, %VAL( CNF_PVAL( IPIN ) ),
+     :                        %VAL( CNF_PVAL( IPDAT( 1 ) ) ), 
+     :                        %VAL( CNF_PVAL( IPRES ) ),
+     :                        IERR, NERR, STATUS )
+ 
+            ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+               CALL VEC_SUBR( HASBAD, EL, %VAL( CNF_PVAL( IPIN ) ),
+     :                        %VAL( CNF_PVAL( IPDAT( 1 ) ) ), 
+     :                        %VAL( CNF_PVAL( IPRES ) ),
+     :                        IERR, NERR, STATUS )
+ 
+            ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
+               CALL VEC_SUBW( HASBAD, EL, %VAL( CNF_PVAL( IPIN ) ),
+     :                        %VAL( CNF_PVAL( IPDAT( 1 ) ) ), 
+     :                        %VAL( CNF_PVAL( IPRES ) ),
+     :                        IERR, NERR, STATUS )
+ 
+            ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
+               CALL VEC_SUBUW( HASBAD, EL, %VAL( CNF_PVAL( IPIN ) ),
+     :                         %VAL( CNF_PVAL( IPDAT( 1 ) ) ), 
+     :                         %VAL( CNF_PVAL( IPRES ) ),
+     :                         IERR, NERR, STATUS )
+            END IF
+
+*  Done with the input data array.
+            CALL NDF_UNMAP( INNDF, 'DATA', STATUS )
+
+         ELSE
+            IPRES = IPDAT( 1 )
+         END IF
+
+*  Obtain workspace for the JAXIS collapsed array.
+         CALL PSX_CALLOC( AREA, '_DOUBLE', IPCOL, STATUS )
+         CALL PSX_CALLOC( AREA, '_INTEGER', IPWRK3, STATUS )
+
+*  Derive the the rms of the residuals in the fitting ranges.
+         IF ( ITYPE .EQ. '_BYTE' ) THEN
+            CALL KPS1_MFRMB( JAXIS, NRANGE, RANGES, CLPRMS, DIMS, 
+     :                       %VAL( CNF_PVAL( IPRES ) ),
+     :                       %VAL( CNF_PVAL( IPCOL ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK3 ) ), STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
+            CALL KPS1_MFRMUB( JAXIS, NRANGE, RANGES, CLPRMS, DIMS, 
+     :                        %VAL( CNF_PVAL( IPRES ) ),
+     :                        %VAL( CNF_PVAL( IPCOL ) ), 
+     :                        %VAL( CNF_PVAL( IPWRK3 ) ), STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+            CALL KPS1_MFRMD( JAXIS, NRANGE, RANGES, CLPRMS, DIMS, 
+     :                       %VAL( CNF_PVAL( IPRES ) ),
+     :                       %VAL( CNF_PVAL( IPCOL ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK3 ) ), STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
+            CALL KPS1_MFRMI( JAXIS, NRANGE, RANGES, CLPRMS, DIMS, 
+     :                       %VAL( CNF_PVAL( IPRES ) ),
+     :                       %VAL( CNF_PVAL( IPCOL ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK3 ) ), STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+            CALL KPS1_MFRMR( JAXIS, NRANGE, RANGES, CLPRMS, DIMS, 
+     :                       %VAL( CNF_PVAL( IPRES ) ),
+     :                       %VAL( CNF_PVAL( IPCOL ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK3 ) ), STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
+            CALL KPS1_MFRMW( JAXIS, NRANGE, RANGES, CLPRMS, DIMS, 
+     :                       %VAL( CNF_PVAL( IPRES ) ),
+     :                       %VAL( CNF_PVAL( IPCOL ) ), 
+     :                       %VAL( CNF_PVAL( IPWRK3 ) ), STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
+            CALL KPS1_MFRMUW( JAXIS, NRANGE, RANGES, CLPRMS, DIMS, 
+     :                        %VAL( CNF_PVAL( IPRES ) ),
+     :                        %VAL( CNF_PVAL( IPCOL ) ), 
+     :                        %VAL( CNF_PVAL( IPWRK3 ) ), STATUS )
+         END IF
+
+         CALL PSX_FREE( IPCOL, STATUS )
+         CALL PSX_FREE( IPWRK3, STATUS )
+
+*  Propagate the bad values to the output.  Recall that if the data 
+*  were already detrended then the array supplied to and amended in
+*  KPS1_MFRM is the output array.
+         IF ( .NOT. SUBTRA ) THEN
+            
+            IF ( ITYPE .EQ. '_BYTE' ) THEN
+               CALL KPG1_CPBDB( EL, %VAL( CNF_PVAL( IPDAT ) ), 
+     :                          %VAL( CNF_PVAL( IPRES ) ), 
+     :                          %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+            ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
+               CALL KPG1_CPBDUB( EL, %VAL( CNF_PVAL( IPDAT( 1 ) ) ), 
+     :                           %VAL( CNF_PVAL( IPRES ) ), 
+     :                           %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
+     :                           STATUS )
+            ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+               CALL KPG1_CPBDD( EL, %VAL( CNF_PVAL( IPDAT( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( IPRES ) ), 
+     :                          %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+            ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
+               CALL KPG1_CPBDI( EL, %VAL( CNF_PVAL( IPDAT( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( IPRES ) ), 
+     :                          %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+            ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+               CALL KPG1_CPBDR( EL, %VAL( CNF_PVAL( IPDAT( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( IPRES ) ), 
+     :                          %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+            ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
+               CALL KPG1_CPBDW( EL, %VAL( CNF_PVAL( IPDAT( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( IPRES ) ), 
+     :                          %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+            ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
+               CALL KPG1_CPBDUW( EL, %VAL( CNF_PVAL( IPDAT( 1 ) ) ), 
+     :                           %VAL( CNF_PVAL( IPRES ) ),
+     :                           %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
+     :                           STATUS )
+            END IF
+
+*  Tidy.
+            CALL PSX_FREE( IPRES, STATUS )
+         END IF
+      END IF
 
 *  Obtain the output title and insert it into the result NDF.
       IF ( MODIN ) THEN
