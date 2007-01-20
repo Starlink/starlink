@@ -32019,6 +32019,11 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
       they can be subtracted later.  The advantage of that approach is
       the subtraction can be undone, but at some cost in efficiency.
 
+      Fits may be rejected if their root-mean squared (rms) residuals 
+      are more than a specified number of standard deviations from the 
+      the mean rms residuals of the fits.  Rejected fits appear as
+      bad pixels in the output data.
+
       Fitting independent trends can be useful when you need to remove
       the continuum from a spectral cube, where each spectrum is
       independent of the others (that is you need an independent
@@ -32067,8 +32072,8 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
       \sstsubsection{
          MODIFYIN = \_LOGICAL (Read)
       }{
-         Whether or not to subtract the trends from the input NDF.  Only
-         used when SUBTRACT is {\tt TRUE}.  If this value is {\tt FALSE}, then an
+         Whether or not to subtract the trends from the input NDF.  It is only
+         used when SUBTRACT is {\tt TRUE}.  If MODIFYIN is {\tt FALSE}, then an
          NDF name must be supplied by the OUT parameter.  {\tt [FALSE]}
       }
       \sstsubsection{
@@ -32098,6 +32103,14 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          the world co-ordinate system that corresponds to the trend
          axis.  Up to ten pairs of values are allowed.
          This parameter is not accessed when AUTO={\tt TRUE}.  {\tt [!]}
+      }
+      \sstsubsection{
+         RMSCLIP = \_REAL (Read)
+      }{
+         The number of standard deviations exceeding the mean of the 
+         root-mean-squared residuals of the fits at which a fit is
+         rejected.  A null value ({\tt{!}}) means perform no rejections.  
+         Allowed values are between 2 and 15.  {\tt [!]}
       }
       \sstsubsection{
          SECTION = LITERAL (Read)
@@ -51438,6 +51451,12 @@ The following applications have been modified:
 
    \item [\htmlref{MFITTREND}{MFITTREND}] \mbox{}
       \begin{itemize} 
+         \item Fits to lines may be rejected and flagged bad in the
+         output data using the new parameter CLIPRMS.  Given the
+	 number of clipping standard deviations, MFITTREND locates
+	 positive outliers from the distribution of root-mean-squared
+	 residuals of the fits.
+
          \item There is a new output parameter ARANGES to record the
          fitting ranges found in automatic mode.  The automatic ranges
          are now constrained to the input NDF bounds.
