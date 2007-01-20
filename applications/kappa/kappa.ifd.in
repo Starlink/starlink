@@ -12600,7 +12600,7 @@ iraf! {
             type _REAL
             vpath DEFAULT
             ppath CURRENT DEFAULT
-            prompt {Clipping standard deviations to reject outliers}
+            prompt {Clipping standard deviations to reject outliers for automatic ranges}
             helpkey *
             default 2 2 2.5 3
             size *
@@ -12654,6 +12654,15 @@ iraf! {
             prompt {Co-ordinate ranges (pairs)}
             helpkey *
             size *
+          }
+
+         parameter rmsclip {
+            type _REAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Clipping standard deviation to reject fit r.m.s. outliers}
+            helpkey *
+            default !
           }
 
          parameter section {
