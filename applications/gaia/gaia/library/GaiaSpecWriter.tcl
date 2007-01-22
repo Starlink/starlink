@@ -406,7 +406,7 @@ itcl::class gaia::GaiaSpecWriter {
       set dateobs {}
       set system {}
       set equinox {}
-
+      
       #  Receptor system, either AZEL or TRACKING.
       set rsys [$cubeaccessor getproperty ACSIS "RECEPPOS_SYS"]
       if { $rsys != {} } {
@@ -565,7 +565,7 @@ itcl::class gaia::GaiaSpecWriter {
 
                   #  Record system and equinox of coordinates.
                   set system [gaiautils::astget $skyframe "System"]
-                  if [ $system == "FK5" || $system == "FK4" } {
+                  if { $system == "FK5" || $system == "FK4" } {
                      set equinox [gaiautils::astget $skyframe "Equinox"]
                      if { $equinox < 1984.0 } {
                         set equinox "B$equinox"
