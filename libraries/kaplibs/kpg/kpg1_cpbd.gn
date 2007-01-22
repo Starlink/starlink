@@ -29,20 +29,20 @@
 *        The global status.
 
 *  Notes:
-*     -  There is a routine for double precision and real data types:
-*     replace "x" in the routine name by D or R as appropriate.  The
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
 *     input and output data arrays plus the mask array must have the
 *     data type specified.
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils.
-*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     All Rights Reserved.
+*     Copyright (C) 2006--2007 Particle Physics & Astronomy Research 
+*     Council.  All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
 *     This program is distributed in the hope that it will be
@@ -52,8 +52,8 @@
 *     
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: D.S. Berry (STARLINK)
@@ -65,6 +65,8 @@
 *        Original version.
 *     2006 May 17 (MJC):
 *        Made generic version.
+*     2007 January 11 (MJC):
+*        Extended to all numeric types.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -92,14 +94,15 @@
 
 *  Local Variables:
       INTEGER I               ! Loop count
+
 *.
 
 *  Check inherited global status.
-      IF( STATUS .NE. SAI__OK ) RETURN
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Just do it.
       DO I = 1, N
-         IF( D2( I ) .NE. VAL__BAD<T> ) THEN
+         IF ( D2( I ) .NE. VAL__BAD<T> ) THEN
             OUT( I ) = D1( I )
          ELSE
             OUT( I ) = VAL__BAD<T>
