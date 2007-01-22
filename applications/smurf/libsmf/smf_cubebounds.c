@@ -128,6 +128,7 @@
 *        - Added "detgrp" parameter.
 *        - Restrict the output spectral ramge to the intersection of the
 *        input spectral ranges, rather than the union.
+*        - Ensure SPECBOUNDS values are used in the right order.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -744,9 +745,14 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* Convert the supplied spectral values back to pixel coords. */
    astTran1( ospecmap, 2, specbounds, 1, ispecbounds );
 
-/* Update the output bounds. */
-   dlbnd[ 2 ] = ispecbounds[ 0 ] ;
-   dubnd[ 2 ] = ispecbounds[ 1 ] ;
+/* Update the output bounds, keeping them in the right order. */
+   if( ispecbounds[ 0 ] < ispecbounds[ 1 ] ) {
+      dlbnd[ 2 ] = ispecbounds[ 0 ] ;
+      dubnd[ 2 ] = ispecbounds[ 1 ] ;
+   } else {
+      dubnd[ 2 ] = ispecbounds[ 0 ] ;
+      dlbnd[ 2 ] = ispecbounds[ 1 ] ;
+   }   
 
 /* We now add a GRID Frame in the output WCS FrameSet and calculates the
    bounds of the cube in this frame. If an optimal grid is being used, we 
