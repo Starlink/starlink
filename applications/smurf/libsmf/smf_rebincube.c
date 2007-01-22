@@ -14,12 +14,13 @@
 *     C function
 
 *  Invocation:
-*     smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout, 
-*                    AstFrame *ospecfrm, AstMapping *ospecmap, Grp *detgrp,
-*                    int moving, dim_t lbnd_out[ 3 ], dim_t ubnd_out[ 3 ], 
-*                    int spread, const double params[], int genvar, 
-*                    float *data_array, float *var_array, double *wgt_array, 
-*                    int *work_array, int *status );
+*     smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
+*                    AstMapping *oskymap, AstFrame *ospecfrm, 
+*                    AstMapping *ospecmap, Grp *detgrp, int moving, 
+*                    dim_t lbnd_out[ 3 ], dim_t ubnd_out[ 3 ], int spread, 
+*                    const double params[], int genvar, float *data_array, 
+*                    float *var_array, double *wgt_array, int *work_array, 
+*                    int *status );
 
 *  Arguments:
 *     data = smfData * (Given)
@@ -28,13 +29,14 @@
 *        Index of the current input file within the group of input files.
 *     size = int (Given)
 *        Index of the last input file within the group of input files.
-*     swcsout = AstFrameSet * (Given)
-*        A FrameSet in which the current Frame respresents 2D spatial GRID 
-*        coords in the output, and the base Frame represents 2D sky
-*        coords in the output. Note the unusual order of base and current 
-*        Frame. If "Moving" is non-zero, the sky coords should be offsets
-*        from the first base pointing position (which should be stored in 
-*        SkyRef attribute of the SkyFrame).
+*     abskyfrm = AstSkyFrame * (Given)
+*        A SkyFrame that specifies the coordinate system used to describe 
+*        the spatial axes of the output cube. This should represent
+*        absolute sky coordinates rather than offsets even if "moving" is 
+*        non-zero.
+*     oskymap = AstFrameSet * (Given)
+*        A Mapping from 2D sky coordinates in the output cube to 2D
+*        spatial pixel coordinates in the output cube.
 *     ospecfrm = AstFrame * (Given)
 *        Pointer to the SpecFrame within the current Frame of the output WCS 
 *        Frameset.
@@ -137,6 +139,8 @@
 *     15-JAN-2007 (DSB):
 *        Restructured to use 2D weights and variance arrays for nearest
 *        neighbour re-binning.
+*     22-JAN-2007 (DSB):
+*        Restructured again for better handing of moving targets.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -182,28 +186,33 @@
 
 #define FUNC_NAME "smf_rebincube"
 
-void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
-                    AstFrame *ospecfrm, AstMapping *ospecmap, Grp *detgrp, 
-                    int moving, int lbnd_out[ 3 ], int ubnd_out[ 3 ], 
-                    int spread, const double params[], int genvar,
-                    float *data_array, float *var_array, double *wgt_array, 
-                    int *work_array, int *status ){
+void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
+                    AstMapping *oskymap, AstFrame *ospecfrm, 
+                    AstMapping *ospecmap, Grp *detgrp, int moving, 
+                    int lbnd_out[ 3 ], int ubnd_out[ 3 ], int spread, 
+                    const double params[], int genvar, float *data_array, 
+                    float *var_array, double *wgt_array, int *work_array, 
+                    int *status ){
 
 /* Local Variables */
    AstCmpMap *fmap = NULL;     /* Mapping from spectral grid to topo freq Hz */
    AstCmpMap *ssmap = NULL;    /* Input GRID->output GRID Mapping for spectral axis */
    AstFitsChan *fc = NULL;     /* FitsChan used to get spectral WCS from input */           
+   AstFrame *sf1 = NULL;       /* Pointer to copy of input current Frame */
+   AstFrame *skyin = NULL;     /* Pointer to current Frame in input WCS FrameSet */
    AstFrame *specframe = NULL; /* SpecFrame in input WCS */
    AstFrame *specframe2 = NULL;/* Temporary copy of SpecFrame in input WCS */
    AstFrameSet *fs = NULL;     /* WCS FramesSet from input */           
    AstFrameSet *swcsin = NULL; /* Spatial WCS FrameSet for current time slice */
-   AstMapping *fsmap = NULL;   /* WCS->GRID Mapping from input WCS FrameSet */
+   AstMapping *azel2usesys = NULL;/* Mapping from AZEL to the output sky frame */
+   AstMapping *fsmap = NULL;   /* Mapping extracted from FrameSet */
    AstMapping *specmap = NULL; /* GRID->Spectral Mapping for current input file */
+   AstCmpMap *totmap = NULL;   /* WCS->GRID Mapping from input WCS FrameSet */
    char *fftwin = NULL;        /* Name of FFT windowing function */
    const char *name;           /* Pointer to current detector name */
    const double *tsys;         /* Pointer to Tsys value for first detector */
-   dim_t iv;                   /* Vector index into output 3D array */
    dim_t iv0;                  /* Vector index into 2D array */
+   dim_t iv;                   /* Vector index into output 3D array */
    dim_t nel;                  /* No. of pixels in output */
    dim_t nxy;                  /* Number of pixels in one output xy plane */
    double *ipw = NULL;         /* Pointer to weights arrays */
@@ -212,10 +221,12 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
    double *xout = NULL;        /* Workspace for detector output grid positions */
    double *yin = NULL;         /* Workspace for detector input grid positions */
    double *yout = NULL;        /* Workspace for detector output grid positions */
+   double a;                   /* Longitude value */
    double at;                  /* Frequency at which to take the gradient */
+   double b;                   /* Latitude value */
    double coff;                /* Ratio of "off source" to "on source" integration times */
-   double dnew;                /* Channel width in Hz */
    double d2sum;               /* Sum of squared data values in output spectrum */
+   double dnew;                /* Channel width in Hz */
    double fcon;                /* Variance factor for whole file */
    double k;                   /* Back-end degradation factor */
    double tcon;                /* Variance factor for whole time slice */
@@ -511,35 +522,74 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
          }
       }
 
-/* If the target is moving, set the input WCS FrameSet to represent Az,El
-   offsets from the base pointing position for the current time slice. */
-      if( moving ) {
-         astSet( swcsin, "System=AZEL" );
-         astSetD( swcsin, "SkyRef(1)", hdr->state->tcs_az_bc1 );
-         astSetD( swcsin, "SkyRef(2)", hdr->state->tcs_az_bc2 );
-         astSetC( swcsin, "SkyRefIs", "Origin" );
-         astSetI( swcsin, "AlignOffset", 1 );
+/* Find out how to convert from input GRID coords to the output sky frame.
+   Note, we want absolute sky coords here, even if the target is moving.
+   Record the original base frame before calling astConvert so that it can 
+   be re-instated later (astConvert modifies the base Frame). */
+      astInvert( swcsin );
+      ibasein = astGetI( swcsin, "Base" );
+      fs = astConvert( swcsin, abskyfrm, "SKY" );
+      astSetI( swcsin, "Base", ibasein );
+      astInvert( swcsin );
+
+      if( fs == NULL ) {
+         if( *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            errRep( FUNC_NAME, "The spatial coordinate system in the "
+                    "current input file is not compatible with the "
+                    "spatial coordinate system in the first input file.", 
+                    status );
+         }
+         break;
       }
 
-/* We now align the input and output WCS FrameSets. astConvert finds the
-   Mapping between the current Frames of the two FrameSets (the two 
-   SkyFrames in this case), but we want the Mapping between the the two
-   base Frames (input GRID to output GRID). So we invert the input WCS
-   FrameSet (the output WCS FrameSet has already been inverted). */
-      astInvert( swcsin );
+/* The "fs" FrameSet has input GRID coords as its base Frame, and output
+   (absolute) sky coords as its current frame. If the target is moving,
+   modify this so that the current Frame represents offsets from the
+   current telescope base pointing position (the mapping in the "fs"
+   FrameSet is also modified automatically). */
+      if( moving ) {
 
-/* Now use astConvert to get the Mapping from input GRID to output GRID
-   coords, aligning the coordinate systems on the sky. Note the original 
-   base Frame index so it can be re-instated afterwards (astConvert changes
-   it to indicate the alignment Frame).*/
-      ibasein = astGetI( swcsin, "Base" );
-      fs = astConvert( swcsin, swcsout, "SKY" );
-      fsmap = astGetMapping( fs, AST__BASE, AST__CURRENT );         
-      astSetI( swcsin, "Base", ibasein );
+/* Get the Mapping from AZEL (at the current input epoch) to the output
+   sky system. Use it to convert the telescope base pointing position from 
+   (az,el) to the requested system. */
+         skyin = astGetFrame( swcsin, AST__CURRENT );
+         sf1 = astCopy( skyin );
+         astSetC( sf1, "System", "AZEL" );
+         azel2usesys = astConvert( sf1, abskyfrm, "" );
+         astTran2( azel2usesys, 1, &(hdr->state->tcs_az_bc1),
+                   &(hdr->state->tcs_az_bc2), 1, &a, &b );
 
-/* Invert the input WCS FrameSet again to bring it back into its original
-   state. */
-      astInvert( swcsin );
+/* Explicitly annul these objects for efficiency in this tight loop. */
+         azel2usesys = astAnnul( azel2usesys );
+         sf1 = astAnnul( sf1 );
+         skyin = astAnnul( skyin );
+
+/* Modified the FrameSet to represent offsets from this origin. We use the 
+   FrameSet pointer "fs" rather than a pointer to the current Frame within 
+   the FrameSet. This means that the Mapping in the FrameSet will be 
+   modified to remap the current Frame. */
+         astSetD( fs, "SkyRef(1)", a );
+         astSetD( fs, "SkyRef(2)", b );
+         astSet( fs, "SkyRefIs=origin" );
+
+/* Get the Mapping and then clear the SkyRef attributes (this is because
+   the current Frame in "fs" may be "*skyframe" and we do not want to make a
+   permanent change to *skyframe). */
+         fsmap = astGetMapping( fs, AST__BASE, AST__CURRENT );
+         astClear( fs, "SkyRef(1)" );
+         astClear( fs, "SkyRef(2)" );
+         astClear( fs, "SkyRefIs" );
+
+/* If the target is not moving, just get the Mapping. */
+      } else {
+         fsmap = astGetMapping( fs, AST__BASE, AST__CURRENT );
+      }
+
+/* The output from "fsmap" now corresponds to the input to "oskymap", whether 
+   the target is moving or not. Combine the input GRID to output SKY Mapping 
+   with the output SKY to output pixel Mapping supplied in "oskymap". */
+      totmap = astCmpMap( fsmap, oskymap, 1, "" );
 
 /* First deal with nearest neighbour pixel spreading. This can be done
    with specialist code that is faster than astRebinSeq. */
@@ -547,7 +597,7 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
 
 /* Transform the positions of the detectors at the current time slice from 
    input GRID to output GRID coords. */
-         astTran2( fsmap, (data->dims)[ 1 ], xin, yin, 1, xout, yout );
+         astTran2( totmap, (data->dims)[ 1 ], xin, yin, 1, xout, yout );
 
 /* For each good position, place the input data values for a whole spectrum
    into the nearest pixel of the output array and increment the 2D weight 
@@ -681,7 +731,7 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
 
 /* Paste this array into the plane of the output cube corresponding to
    the current spectral channel. */
-               astRebinSeqF( fsmap, 0.0, 2, lbnd_in, ubnd_in, detwork, varwork,
+               astRebinSeqF( totmap, 0.0, 2, lbnd_in, ubnd_in, detwork, varwork,
                              spread, params, ast_flags, 0.0, 50, VAL__BADR, 
                              2, ldim, dim, lbnd_in, ubnd_in, data_array + iv, 
                              ipv, ipw );
@@ -695,6 +745,7 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
 
 /* For efficiency, explicitly annul the AST Objects created in this tight
    loop. */
+      totmap = astAnnul( totmap );
       fsmap = astAnnul( fsmap );
       fs = astAnnul( fs );
    }

@@ -387,6 +387,10 @@
 *        Add reporting of axis labels.
 *     16-JAN-2007 (DSB):
 *        Use 2D variance and weights arrays where possible.
+*     22-JAN-2007 (DSB):
+*        Modified to accomodate changes to argument lists for smf_cubegrid, 
+*        smf_cubebounds and smf_rebincube, which provide better handling
+*        of moving sources.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -449,12 +453,11 @@
 void smurf_makecube( int *status ) {
 
 /* Local Variables */
-   AstFrame *ospecfrm = NULL;  /* SpecFrame from the output WCS Frameset */
-   AstFrame *tfrm = NULL;      /* Current Frame from output WCS */
-   AstFrameSet *swcsout = NULL;/* Spatial WCS FrameSet for output cube */
-   AstFrameSet *tmpwcs = NULL;/* Temporary Spatial WCS FrameSet for output cube */
-   AstFrameSet *wcsout = NULL; /* WCS Frameset for output cube */
-   AstMapping *oskymap = NULL; /* GRID->SkyFrame Mapping from output WCS */
+   AstSkyFrame *abskyfrm = NULL;/* Output SkyFrame (always absolute) */
+   AstFrame *ospecfrm = NULL; /* SpecFrame from the output WCS Frameset */
+   AstFrame *tfrm = NULL;     /* Current Frame from output WCS */
+   AstFrameSet *wcsout = NULL;/* WCS Frameset for output cube */
+   AstMapping *oskymap = NULL;/* GRID->SkyFrame Mapping from output WCS */
    AstMapping *ospecmap = NULL;/* GRID->SpecFrame Mapping from output WCS */
    AstMapping *tmap = NULL;   /* Base->current Mapping from output WCS */
    AstSkyFrame *oskyfrm = NULL;/* SkyFrame from the output WCS Frameset */
@@ -704,21 +707,6 @@ void smurf_makecube( int *status ) {
    it goes from current Frame to output grid axis. */
    astInvert( ospecmap );
 
-/* Create a FrameSet describing the spatial axes. */
-   swcsout = astFrameSet( astFrame( 2, "Domain=GRID", "" ), "" );
-   astAddFrame( swcsout, AST__BASE, oskymap, oskyfrm );
-
-/* If the target is moving, ensure the FrameSet describes offset from the
-   first base pointing position (stored in the SkyRef attribute of the
-   SkyFrame). */
-   if( moving ) {
-      astSet( swcsout, "SkyRefIs=Origin" );
-      astSet( swcsout, "AlignOffset=1" );
-   }
-
-/* Invert the FrameSet. */
-   astInvert( swcsout );
-
 /* Calculate and output the WCS bounds (matching NDFTRACE output). The bounds are normalised.
    Celestial coordinates will use radians. */
    for (i=0; i < 3; i++) {
@@ -772,31 +760,25 @@ void smurf_makecube( int *status ) {
    gy_in[2] = 1.0;                             /* Bottom */
    gy_in[3] = gy_in[2];                        /* Bottom */
 
-   /* Since swcsout is inverted we take a copy so that we can properly normalise
-      coordinates */
-   tmpwcs = astCopy( swcsout );
-   astInvert( tmpwcs );
-
-   astTran2( tmpwcs, 4, gx_in, gy_in, 1, gx_out, gy_out );
+   astTran2( oskymap, 4, gx_in, gy_in, 1, gx_out, gy_out );
    
    /* Horrible code duplication */
    corner[0] = gx_out[0];
    corner[1] = gy_out[0];
-   astNorm( tmpwcs, corner );
+   astNorm( oskyfrm, corner );
    parPut1d( "FTR", 2, corner, status );
    corner[0] = gx_out[1];
    corner[1] = gy_out[1];
-   astNorm( tmpwcs, corner );
+   astNorm( oskyfrm, corner );
    parPut1d( "FTL", 2, corner, status );
    corner[0] = gx_out[2];
    corner[1] = gy_out[2];
-   astNorm( tmpwcs, corner );
+   astNorm( oskyfrm, corner );
    parPut1d( "FBR", 2, corner, status );
    corner[0] = gx_out[3];
    corner[1] = gy_out[3];
-   astNorm( tmpwcs, corner );
+   astNorm( oskyfrm, corner );
    parPut1d( "FBL", 2, corner, status );
-   tmpwcs = astAnnul( tmpwcs );
 
 /* Create the output NDF. Abort without error if a null value is supplied. */
    ondf = NDF__NOID;
@@ -951,6 +933,15 @@ void smurf_makecube( int *status ) {
       }
    }
 
+/* Invert the output sky mapping so that it goes from sky to pixel
+   coords. */
+   astInvert( oskymap );
+
+/* Create a copy of "oskyfrm" representing absolute coords rather than 
+   offsets. */
+   abskyfrm = astCopy( oskyfrm );
+   astClear( abskyfrm, "SkyRefIs" );
+
 /* Loop round all the input files, pasting each one into the output NDF. */
    ispec = 0;
    for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++ ) {
@@ -1010,11 +1001,12 @@ void smurf_makecube( int *status ) {
 
 /* Rebin the data into the output grid. */
       if( !sparse ) {
-         smf_rebincube( data, ifile, size, swcsout, ospecfrm, ospecmap, detgrp,
-                        moving, lbnd_out, ubnd_out, spread, params, genvar,
-                        data_array, var_array, wgt_array, work_array, status );
+         smf_rebincube( data, ifile, size, abskyfrm, oskymap, ospecfrm, 
+                        ospecmap, detgrp, moving, lbnd_out, ubnd_out, 
+                        spread, params, genvar, data_array, var_array, 
+                        wgt_array, work_array, status );
       } else {
-         smf_rebinsparse( data, ospecfrm, ospecmap, oskyfrm, detgrp, 
+         smf_rebinsparse( data, ospecfrm, ospecmap, abskyfrm, detgrp, 
                           lbnd_out, ubnd_out, genvar, data_array, var_array, 
                           &ispec, status );
       }

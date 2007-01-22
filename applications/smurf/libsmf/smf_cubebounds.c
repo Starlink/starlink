@@ -111,6 +111,8 @@
 *        same way for both autogrid and non-autogrid mode.
 *     12-JAN-2007 (DSB):
 *        Move reporting of axis labels into smurf_makecube.
+*     22-JAN-2007 (DSB):
+*        Restructured again for better handing of moving targets.
 *     {enter_further_changes_here}
 
 *  Copyright:

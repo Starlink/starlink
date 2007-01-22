@@ -111,6 +111,8 @@
 *        them spanning more than 1 pixel.
 *     9-JAN-2006 (DSB):
 *        Do not allow minimimum pixel size to be less than 0.1 arc-sec.
+*     22-JAN-2007 (DSB):
+*        Restructured again for better handing of moving targets.
 *     {enter_further_changes_here}
 
 *  Copyright:
