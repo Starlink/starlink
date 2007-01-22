@@ -56,6 +56,8 @@ static const double d2r_ = pi_/180.0;
 /* Local prototypes */
 static int GaiaUtilsAstAnnul( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsAstAxDistance( ClientData clientData, Tcl_Interp *interp,
+                                   int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstConvert( ClientData clientData, Tcl_Interp *interp,
                                 int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstCopy( ClientData clientData, Tcl_Interp *interp,
@@ -97,78 +99,66 @@ static int GaiaUtilsUrlGet( ClientData clientData, Tcl_Interp *interp,
 int GaiaUtils_Init( Tcl_Interp *interp )
 {
     Tcl_CreateObjCommand( interp, "gaiautils::astannul", GaiaUtilsAstAnnul,
-                          (ClientData) NULL,
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::astaxdistance", 
+                          GaiaUtilsAstAxDistance, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::astconvert", GaiaUtilsAstConvert,
-                          (ClientData) NULL,
-                          (Tcl_CmdDeleteProc *) NULL );
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::astcopy", GaiaUtilsAstCopy,
-                          (ClientData) NULL,
-                          (Tcl_CmdDeleteProc *) NULL );
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::astget", GaiaUtilsAstGet,
-                          (ClientData) NULL,
-                          (Tcl_CmdDeleteProc *) NULL );
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::astgetrefpos",
-                          GaiaUtilsAstGetRefPos,
-                          (ClientData) NULL,
+                          GaiaUtilsAstGetRefPos, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::astformat", GaiaUtilsAstFormat,
-                          (ClientData) NULL,
-                          (Tcl_CmdDeleteProc *) NULL );
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::astset", GaiaUtilsAstSet,
-                          (ClientData) NULL,
-                          (Tcl_CmdDeleteProc *) NULL );
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::astshow", GaiaUtilsAstShow,
-                          (ClientData) NULL,
-                          (Tcl_CmdDeleteProc *) NULL );
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::astskyframe",
                           GaiaUtilsAstSkyFrame, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::asttest", GaiaUtilsAstTest,
-                          (ClientData) NULL,
-                          (Tcl_CmdDeleteProc *) NULL );
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::asttran2", GaiaUtilsAstTran2,
-                          (ClientData) NULL,
-                          (Tcl_CmdDeleteProc *) NULL );
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::frameisa", GaiaUtilsFrameIsA,
-                          (ClientData) NULL,
-                          (Tcl_CmdDeleteProc *) NULL );
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::get2dwcs", GaiaUtilsGt2DWcs,
-                          (ClientData) NULL,
-                          (Tcl_CmdDeleteProc *) NULL );
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::getaxis", GaiaUtilsGtAxis,
-                          (ClientData) NULL,
-                          (Tcl_CmdDeleteProc *) NULL );
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::getaxiscoord",
                           GaiaUtilsGtAxisCoord, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::getaxiswcs", GaiaUtilsGtAxisWcs,
-                          (ClientData) NULL,
-                          (Tcl_CmdDeleteProc *) NULL );
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::getroiplots",
-                          GaiaUtilsGtROIPlots,
-                          (ClientData) NULL,
+                          GaiaUtilsGtROIPlots, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::urlget", GaiaUtilsUrlGet,
-                          (ClientData) NULL,
-                          (Tcl_CmdDeleteProc *) NULL );
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     return TCL_OK;
 }
@@ -744,6 +734,66 @@ static int GaiaUtilsGtAxisWcs( ClientData clientData, Tcl_Interp *interp,
     }
     return result;
 }
+
+
+/**
+ * Determine the separation of two values along an axis.
+ *
+ * There are four arguments, the address of an AstFrame (or subclass),
+ * the axis, and two coordinate values. Returns the separation.
+ */
+static int GaiaUtilsAstAxDistance( ClientData clientData, Tcl_Interp *interp,
+                                   int objc, Tcl_Obj *CONST objv[] )
+{
+    AstFrame *frame;
+    double dist;
+    double value1;
+    double value2;
+    int axis;
+    long adr;
+
+    /* Check arguments, only allow four, the frame, the axis and
+     * the two axis values */ 
+    if ( objc != 5 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, 
+                          "frame axis axis_coord1 axis_coord2" );
+        return TCL_ERROR;
+    }
+
+    /* Get the frame */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    frame = (AstFrame *) adr;
+
+    /* Get the axis, an AST one. */
+    if ( Tcl_GetIntFromObj( interp, objv[2], &axis ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
+    /* Get the coordinates */
+    if ( Tcl_GetDoubleFromObj( interp, objv[3], &value1 ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    if ( Tcl_GetDoubleFromObj( interp, objv[4], &value2 ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
+    /* Get the separation */
+    dist = astAxDistance( frame, axis, value1, value2 );
+
+
+    /* Export the result */
+    if ( astOK ) {
+        Tcl_SetObjResult( interp, Tcl_NewDoubleObj( dist ) );
+        return TCL_OK;
+    }
+    astClearStatus;
+    Tcl_SetResult( interp, "Failed to determine separation of two points",
+                   TCL_VOLATILE );
+    return TCL_ERROR;
+}
+
 
 /**
  * Return a list of Plots that cover each ROI found in a Plot.
