@@ -278,12 +278,14 @@ itcl::class gaia::GaiaSpecWriter {
                   set tsys [$cubeaccessor getdoubleproperty ACSIS \
                                "TSYS\($p1,$p2\)"]
                   if { $tsys != "BAD" } {
+                     set tsys [format "%.4f" $tsys]
                      $specaccessor fitswrite TSYS $tsys "Median system temp"
                   }
 
                   set trx [$cubeaccessor getdoubleproperty ACSIS \
                               "TRX\($p1,$p2\)"]
                   if { $trx != "BAD" } {
+                     set trx [format "%.4f" $trx]
                      $specaccessor fitswrite TRX $trx "Receiver temp"
                   }
 
@@ -391,14 +393,19 @@ itcl::class gaia::GaiaSpecWriter {
       }
    }
 
-   #  Determine the ACSIS pointing for the current spectrum.
+   #  Determine the ACSIS pointing for the current spectrum. Uses the
+   #  ACSIS and JCMTSTATE extensions of a raw timeseries NDF.
    protected method add_acsis_coords_ {cubeaccessor specaccessor p1 p2} {
 
       set rra {}
       set rdec {}
       set sra {}
       set sdec {}
+      set drra {}
+      set drdec {}
       set dateobs {}
+      set system {}
+      set equinox {}
 
       #  Receptor system, either AZEL or TRACKING.
       set rsys [$cubeaccessor getproperty ACSIS "RECEPPOS_SYS"]
@@ -413,7 +420,7 @@ itcl::class gaia::GaiaSpecWriter {
          }
 
          #  If receptor system is TRACKING that's in some sky coordinate
-         #  system which is  the tcssys.
+         #  system which is the tcssys.
          if { $rsys == "TRACKING" && $tcssys != {} } {
             set rsys $tcssys
          }
@@ -425,16 +432,18 @@ itcl::class gaia::GaiaSpecWriter {
             set ry [$cubeaccessor getdoubleproperty ACSIS \
                        "RECEPPOS\(2,$p1,$p2\)"]
 
-            #  Source position in radians. Only when tcssys != GAPPT, as
-            #  otherwise the reference position moves on the sky.
-            if { $tcssys != "GAPPT" } {
+            #  Source position in radians. Get the AZEL positions
+            #  if working in GAPPT as the source is moving (PLANET).
+            if { $tcssys == "GAPPT" } {
+               set sx [$cubeaccessor getdoubleproperty JCMTSTATE \
+                          "TCS_AZ_BC1\($p2\)"]
+               set sy [$cubeaccessor getdoubleproperty JCMTSTATE \
+                          "TCS_AZ_BC2\($p2\)"]
+            } else {
                set sx [$cubeaccessor getdoubleproperty JCMTSTATE \
                           "TCS_TR_BC1\($p2\)"]
                set sy [$cubeaccessor getdoubleproperty JCMTSTATE \
                           "TCS_TR_BC2\($p2\)"]
-            } else {
-               set sx "BAD"
-               set sy "BAD"
             }
 
             if { $rx != "BAD" && $ry != "BAD" } {
@@ -447,10 +456,11 @@ itcl::class gaia::GaiaSpecWriter {
                   set lonobs [string trim $lonobs]
                   set latobs [string trim $latobs]
 
-                  #  Determine the Epoch, needed for AZEL.
+                  #  Determine the Epoch, needed for AZEL & GAPPT.
                   #  Correct to TAI to TDB.
                   set epoch [$cubeaccessor getdoubleproperty JCMTSTATE \
                                 "TCS_TAI\($p2\)"]
+
                   if { $epoch == "BAD" } {
                      set epoch [$cubeaccessor getdoubleproperty JCMTSTATE \
                                    "RTS_END\($p2\)"]
@@ -475,40 +485,76 @@ itcl::class gaia::GaiaSpecWriter {
                   #  Create the SkyFrame.
                   set skyframe [gaiautils::astskyframe $atts]
 
-                  #  If the receptor system is AZEL, convert to FK5.
+                  #  If the source position is GAPPT then the actual position
+                  #  is recorded in AZEL, not tcssys. Need to do the
+                  #  conversion from rsys to AZEL and get the offset in AZEL?
+                  if { $tcssys == "GAPPT" } {
+                     set toframe [gaiautils::astcopy $skyframe]
+                     gaiautils::astset $toframe "system=AZEL,Digits=9"
+                     set wcs \
+                        [gaiautils::astconvert $skyframe $toframe "SKY"]
+
+                     lassign [gaiautils::asttran2 $wcs $rx $ry] arx ary
+
+                     #  Determine the separation between these positions.
+                     set drra [gaiautils::astaxdistance $wcs 1 $arx $sx]
+                     set drdec [gaiautils::astaxdistance $wcs 2 $ary $sy]
+                     gaiautils::astannul $toframe
+                     gaiautils::astannul $wcs
+                  }
+
+                  #  If the receptor system is AZEL, convert to FK5 for
+                  #  display.
                   if { $rsys == "AZEL" } {
 
                      set toframe [gaiautils::astcopy $skyframe]
                      gaiautils::astset $toframe "system=FK5,Digits=9"
-                     set wcs [gaiautils::astconvert $skyframe $toframe "SKY"]
+                     set wcs \
+                        [gaiautils::astconvert $skyframe $toframe "SKY"]
 
                      #  Transform and format values in FK5.
                      lassign [gaiautils::asttran2 $wcs $rx $ry] rx ry
                      set rra [gaiautils::astformat $wcs 1 $rx]
                      set rdec [gaiautils::astformat $wcs 2 $ry]
 
-                     if { $sx != "BAD" && $sy != "BAD" } {
-                      
-                        #  When rsys is AZEL the TCS system may differ, so we
-                        #  need to transform from tcssys to FK5 also.
+                     if {$sx != "BAD" && $sy != "BAD" && $tcssys != "GAPPT"} {
+
+                        #  When rsys is AZEL the TCS system may differ, so
+                        #  we need to transform from tcssys to FK5 also.
+                        gaiautils::astset $wcs "invert=1"
                         gaiautils::astset $wcs "system=$tcssys"
 
                         #  Transform and format values in FK5.
                         lassign [gaiautils::asttran2 $wcs $sx $sy] sx sy
                         set sra [gaiautils::astformat $wcs 1 $sx]
                         set sdec [gaiautils::astformat $wcs 2 $sy]
+
+                        #  Determine the separation between these positions.
+                        set drra [gaiautils::astaxdistance $wcs 1 $rx $sx]
+                        set drdec [gaiautils::astaxdistance $wcs 2 $ry $sy]
                      }
 
-                     gaiautils::astannul $wcs
+                     #  Switch wcs to skyframe, so we get the right system
+                     #  recorded.
+                     gaiautils::astannul $skyframe
+                     set skyframe $wcs
                      gaiautils::astannul $toframe
                   } else {
 
-                     #  Both systems same and not AZEL, so just format.
+                     #  Receptor system not AZEL, so just format.
                      set rra [gaiautils::astformat $skyframe 1 $rx]
                      set rdec [gaiautils::astformat $skyframe 2 $ry]
 
-                     set sra [gaiautils::astformat $skyframe 1 $sx]
-                     set sdec [gaiautils::astformat $skyframe 2 $sy]
+                     if {$sx != "BAD" && $sy != "BAD" && $tcssys != "GAPPT"} {
+                        set sra [gaiautils::astformat $skyframe 1 $sx]
+                        set sdec [gaiautils::astformat $skyframe 2 $sy]
+
+                        #  Determine the separation between these positions.
+                        set drra \
+                           [gaiautils::astaxdistance $skyframe 1 $rx $sx]
+                        set drdec \
+                           [gaiautils::astaxdistance $skyframe 2 $ry $sy]
+                     }
                   }
 
                   #  The DATE-OBS keyword for this spectrum can be defined
@@ -517,6 +563,18 @@ itcl::class gaia::GaiaSpecWriter {
                   set epoch [expr $epoch - (32.184/86400.0)]
                   set dateobs [sla::datemjd2obs $epoch]
 
+                  #  Record system and equinox of coordinates.
+                  set system [gaiautils::astget $skyframe "System"]
+                  if [ $system == "FK5" || $system == "FK4" } {
+                     set equinox [gaiautils::astget $skyframe "Equinox"]
+                     if { $equinox < 1984.0 } {
+                        set equinox "B$equinox"
+                     } else {
+                        set equinox "J$equinox"
+                     }
+                  } else {
+                     set equinox {}
+                  }
                   gaiautils::astannul $skyframe
                }
             }
@@ -526,11 +584,22 @@ itcl::class gaia::GaiaSpecWriter {
       if { $rra != {} && $rdec != {} } {
          $specaccessor fitswrite EXRAX  $rra "Spectral extraction position"
          $specaccessor fitswrite EXDECX $rdec "Spectral extraction position"
-         $specaccessor fitswrite EXSYS $rsys "Extraction coordinate system"
+         $specaccessor fitswrite EXSYS "$system $equinox" \
+            "Extraction coordinate system"
 
-         if { $sra != {} && $sdec != {} } {
+         if { $sra != {} && $sdec != {} && $tcssys != "GAPPT" } {
             $specaccessor fitswrite EXRRA  $sra "Position of source"
             $specaccessor fitswrite EXRDEC $sdec "Position of source"
+         }
+
+         if { $drra != {} && $drdec != {} } {
+
+            #  Values are assumed to be radians, want arcsecs.
+            set drra [format "%.4f" [expr $drra*3600.0*180.0/$PI_]]
+            set drdec [format "%.4f" [expr $drdec*3600.0*180.0/$PI_]]
+
+            $specaccessor fitswrite EXRRAOF  $drra "Offset of extraction"
+            $specaccessor fitswrite EXRDECOF $drdec "Offset of extraction"
          }
 
          if { $dateobs != {} } {
@@ -606,4 +675,6 @@ itcl::class gaia::GaiaSpecWriter {
 
    #  Common variables: (shared by all instances)
    #  -----------------
+
+   common PI_ 3.14159265358979323846264338328
 }
