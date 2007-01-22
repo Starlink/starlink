@@ -15,7 +15,7 @@
 *  Invocation:
 *     smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
 *                     int autogrid, int usedetpos, double par[ 7 ], 
-*                     int moving, int lbnd[ 3 ], int ubnd[ 3 ], 
+*                     Grp *detgrp, int moving, int lbnd[ 3 ], int ubnd[ 3 ], 
 *                     AstFrameSet **wcsout, int *npos, int *status );
 
 *  Arguments:
@@ -46,6 +46,10 @@
 *        CROTA2. The supplied values are used to produce the output WCS 
 *        FrameSet. All the angular parameters are in units of radians,
 *        and CRPIX1/2 are in units of pixels. 
+*     detgrp = Grp * (Given)
+*        A Group containing the names of the detectors to be used. All
+*        detectors will be used to calculate the bounds of the output
+*        cube if this pointer is NULL or if the group is empty.
 *     moving = int (Given)
 *        A flag indicating if the telescope is tracking a moving object. If 
 *        so, each time slice is shifted so that the position specified by 
@@ -79,6 +83,14 @@
 *     If "moving" is non-zero, the spatial axes represent (lon,lat) offsets 
 *     in the requested output frame from the base telescope position associated
 *     with the first time slice.
+*
+*     Note, the bounds of the spatial axes represent the union of the spatial 
+*     coverage of each input NDF, but the bounds of the spectral axis 
+*     represent the intersection (rather than the union) the input spectral 
+*     ranges. This is done so that the code that normalise the output
+*     data sums can assume that the same number of input spectra contributed 
+*     to each channel of an output spectrum, regardless of the output channel 
+*     number.
 
 *  Authors:
 *     David S Berry (JAC, UCLan)
@@ -112,7 +124,10 @@
 *     12-JAN-2007 (DSB):
 *        Move reporting of axis labels into smurf_makecube.
 *     22-JAN-2007 (DSB):
-*        Restructured again for better handing of moving targets.
+*        - Restructured again for better handing of moving targets.
+*        - Added "detgrp" parameter.
+*        - Restrict the output spectral ramge to the intersection of the
+*        input spectral ranges, rather than the union.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -166,13 +181,14 @@
 
 void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
                      int autogrid, int usedetpos, double par[ 7 ], 
-                     int moving, int lbnd[ 3 ], int ubnd[ 3 ], 
+                     Grp *detgrp, int moving, int lbnd[ 3 ], int ubnd[ 3 ], 
                      AstFrameSet **wcsout, int *npos, int *status ){
 
 /* Local Variables */
    AstCmpFrame *cmpfrm = NULL;  /* Current Frame for output FrameSet */
    AstCmpMap *cmpmap = NULL;    /* Base -> Current Mapping for output FrameSet */
    AstCmpMap *ssmap = NULL;     /* I/p GRID-> o/p PIXEL Mapping for spectral axis */
+   AstCmpMap *totmap = NULL;   /* WCS->GRID Mapping from input WCS FrameSet */
    AstFitsChan *fc = NULL;      /* FitsChan used to construct spectral WCS */
    AstFitsChan *fct = NULL;     /* FitsChan used to construct time slice WCS */
    AstFrame *abskyframe = NULL; /* Output SkyFrame (always absolute) */
@@ -188,8 +204,8 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    AstMapping *ospecmap = NULL; /* Spec <> PIXEL mapping in output FrameSet */
    AstMapping *specmap = NULL;  /* PIXEL -> Spec mapping in input FrameSet */
    char *pname = NULL;   /* Name of currently opened data file */
+   const char *name;            /* Pointer to current detector name */
    double *xin = NULL;   /* Workspace for detector input grid positions */
-   AstCmpMap *totmap = NULL;   /* WCS->GRID Mapping from input WCS FrameSet */
    double *xout = NULL;  /* Workspace for detector output pixel positions */
    double *yin = NULL;   /* Workspace for detector input grid positions */
    double *yout = NULL;  /* Workspace for detector output pixel positions */
@@ -202,7 +218,9 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    double specbounds[ 2 ];      /* Bounds of spectral axis in spectral WCS units */
    double specin[ 2];    /* Spectral values to be transformed */
    double specout[ 2];   /* Transformed spectral values */
+   double temp;          /* Temporary storage used when swapping values */
    float *pdata;         /* Pointer to next data sample */
+   int found;            /* Was the detector name found in the supplied group? */
    int good;             /* Are there any good detector samples? */
    int ibasein;          /* Index of base Frame in input FrameSet */
    int ifile;            /* Index of current input file */
@@ -434,11 +452,21 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
          specin[ 1 ] = (data->dims)[ 0 ];
          astTran1( ssmap, 2, specin, 1, specout );
 
-/* Update the bounds of the output cube on the spectral PIXEL axis. */
-         if( specout[ 0 ] < dlbnd[ 2 ] ) dlbnd[ 2 ] = specout[ 0 ];
-         if( specout[ 0 ] > dubnd[ 2 ] ) dubnd[ 2 ] = specout[ 0 ];
-         if( specout[ 1 ] < dlbnd[ 2 ] ) dlbnd[ 2 ] = specout[ 1 ];
-         if( specout[ 1 ] > dubnd[ 2 ] ) dubnd[ 2 ] = specout[ 1 ];
+/* Order the values in "specout". */
+         if( specout[ 0 ] > specout[ 1 ] ) {
+            temp = specout[ 0 ];
+            specout[ 0 ] = specout[ 1 ];
+            specout[ 1 ] = temp;
+         }
+
+/* Update the bounds of the output cube on the spectral PIXEL axis. Note, 
+   these bounds represent the overlap region. That is, they are the
+   intersection, not the union, of the spectral bounds obtained from each 
+   individual input file. This is done so that the code that normalises
+   the total data sum in each output pixel can assumed that each pixel
+   had the same number of contributions. */
+         if( specout[ 0 ] > dlbnd[ 2 ] ) dlbnd[ 2 ] = specout[ 0 ];
+         if( specout[ 1 ] < dubnd[ 2 ] ) dubnd[ 2 ] = specout[ 1 ];
       }
 
 /* Allocate work arrays big enough to hold the coords of all the
@@ -614,15 +642,31 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    SKY Mapping with the output SKY to output pixel Mapping found earlier. */
          totmap = astCmpMap( fsmap, oskymap, 1, "" );
 
+/* Initialise a string to point to the name of the first detector for which 
+   data is available */
+         name = hdr->detname;
+
 /* Transform the positions of the detectors from input GRID to output PIXEL
    coords. Then extend the bounds of the output cube on the spatial axes to 
    accomodate the new positions. */
          astTran2( totmap, (data->dims)[ 1 ], xin, yin, 1, xout, yout );
          for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
 
-/* If the detector has a valid position, see if it produced any good
-   data values. */
-            if( xout[ irec ] != AST__BAD && yout[ irec ] != AST__BAD ) {
+/* If a group of detectors to be used was supplied, search the group for
+   the name of the current detector. If not found, set the "good" flag
+   false in order to skip this detector. */
+            good = 1;
+            if( detgrp ) {    
+               grpIndex( name, detgrp, 1, &found, status );
+               if( !found ) good = 0;
+            }
+
+/* Move on to the next available detector name. */
+            name += strlen( name ) + 1;
+
+/* If the detector is include din the group and has a valid position, see if 
+   it produced any good data values. */
+            if( good && xout[ irec ] != AST__BAD && yout[ irec ] != AST__BAD ) {
                good = 0;
                for( ispec = 0; ispec < (data->dims)[ 0 ]; ispec++ ){
                   if( *(pdata++) != VAL__BADR ) {
@@ -641,8 +685,9 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                   npos++;
                }
 
-/* If this detector does not have a valid position, increment the data
-   pointer to point at the first sameple for the next detector. */
+/* If this detector is not included or does not have a valid position, 
+   increment the data pointer to point at the first sample for the 
+   next detector. */
             } else {
                pdata += (data->dims)[ 0 ];
             }
@@ -671,12 +716,18 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    if( data != NULL ) smf_close_file( &data, status );
 
 /* Check we found some usable data. */
-   if( dlbnd[ 0 ] == VAL__MAXD || 
-       dlbnd[ 1 ] == VAL__MAXD || 
-       dlbnd[ 2 ] == VAL__MAXD ) {
+   if( dlbnd[ 0 ] == VAL__MAXD || dlbnd[ 1 ] == VAL__MAXD ) {
+
       if( *status == SAI__OK ) {
          *status = SAI__ERROR;
          errRep( FUNC_NAME, "No usable data positions found.", status );
+      }
+
+   } else if( dlbnd[ 2 ] == VAL__MAXD || dlbnd[ 2 ] > dubnd[ 2 ] ) {
+
+      if( *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         errRep( FUNC_NAME, "No usable spectral channels found.", status );
       }
    }
 
