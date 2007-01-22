@@ -24,8 +24,10 @@
 *     size = int (Given)
 *        Number of elements in igrp
 *     oskyframe = AstSkyFrame * (Given)
-*        A SkyFrame that specifies the coordinate system used to describe the 
-*        spatial axes of the output cube. 
+*        A SkyFrame that specifies the coordinate system used to describe 
+*        the spatial axes of the output cube. If "moving" is non-zero, this
+*        should represent offsets from the tracking centre rather than
+*        absolute celestial coordinates.
 *     autogrid = int (Given)
 *        If non-zero then the fractional pixel shift implied by elements
 *        0 and 1 of "par" are retained. Otherwise, they are ignored and 
@@ -171,21 +173,26 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    AstCmpMap *ssmap = NULL;     /* I/p GRID-> o/p PIXEL Mapping for spectral axis */
    AstFitsChan *fc = NULL;      /* FitsChan used to construct spectral WCS */
    AstFitsChan *fct = NULL;     /* FitsChan used to construct time slice WCS */
-   AstFrame *oskyframe2 = NULL; /* Copy of output skyframe */
+   AstFrame *abskyframe = NULL; /* Output SkyFrame (always absolute) */
    AstFrame *ospecframe = NULL; /* Spectral Frame in output FrameSet */
+   AstFrame *sf1 = NULL;        /* Pointer to copy of input current Frame */
+   AstFrame *skyin = NULL;      /* Pointer to current Frame in input WCS FrameSet */
    AstFrame *specframe = NULL;  /* Spectral Frame in input FrameSet */
    AstFrameSet *fs = NULL;      /* A general purpose FrameSet pointer */
    AstFrameSet *swcsin = NULL;  /* FrameSet describing spatial input WCS */
-   AstFrameSet *swcsout = NULL; /* FrameSet describing spatial output WCS */
+   AstMapping *azel2usesys = NULL;/* Mapping from AZEL to the output sky frame */
    AstMapping *fsmap = NULL;    /* Base->Current Mapping extracted from a FrameSet */
    AstMapping *oskymap = NULL;  /* Sky <> PIXEL mapping in output FrameSet */
    AstMapping *ospecmap = NULL; /* Spec <> PIXEL mapping in output FrameSet */
    AstMapping *specmap = NULL;  /* PIXEL -> Spec mapping in input FrameSet */
    char *pname = NULL;   /* Name of currently opened data file */
    double *xin = NULL;   /* Workspace for detector input grid positions */
+   AstCmpMap *totmap = NULL;   /* WCS->GRID Mapping from input WCS FrameSet */
    double *xout = NULL;  /* Workspace for detector output pixel positions */
    double *yin = NULL;   /* Workspace for detector input grid positions */
    double *yout = NULL;  /* Workspace for detector output pixel positions */
+   double a;                    /* Longitude value */
+   double b;                    /* Latitude value */
    double dlbnd[ 3 ];    /* Floating point lower bounds for output cube */
    double dubnd[ 3 ];    /* Floating point upper bounds for output cube */
    double ispecbounds[ 2 ];   /* Bounds of spectral axis in grid pixels */
@@ -465,7 +472,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
 /* Create a FrameSet describing the WCS to be associated with the output 
    cube unless this has already be done. */
-         if( *wcsout == NULL ) { 
+         if( *wcsout == NULL && *status == SAI__OK ) { 
 
 /* The spectral Mapping (from GRID to SPECTRUM) and Frame (a SpecFrame)
    are inherited from the first input file. */
@@ -478,11 +485,17 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
             }           
 
 /* Now populate a FitsChan with FITS-WCS headers describing the required 
-   tan plane projection. The longitude and latitude axis types are
-   arbitrarily set to RA and Dec. The projection parameters are supplied 
-   in "par". Convert from radians to degrees as required by FITS. */
-            astSetFitsS( fct, "CTYPE1", "RA---TAN", " ", 1 );
-            astSetFitsS( fct, "CTYPE2", "DEC--TAN", " ", 1 );
+   tan plane projection. The longitude and latitude axis types are set to 
+   either (RA,Dec) or (AZ,EL) to get the correct handedness. The projection 
+   parameters are supplied in "par". Convert from radians to degrees as 
+   required by FITS. */
+            if( !strcmp( astGetC( oskyframe, "System" ), "AZEL" ) ){
+               astSetFitsS( fct, "CTYPE1", "AZ---TAN", " ", 1 );
+               astSetFitsS( fct, "CTYPE2", "EL---TAN", " ", 1 );
+            } else {
+               astSetFitsS( fct, "CTYPE1", "RA---TAN", " ", 1 );
+               astSetFitsS( fct, "CTYPE2", "DEC--TAN", " ", 1 );
+            }
             astSetFitsF( fct, "CRPIX1", par[ 0 ], " ", 1 );
             astSetFitsF( fct, "CRPIX2", par[ 1 ], " ", 1 );
             astSetFitsF( fct, "CRVAL1", par[ 2 ]*AST__DR2D, " ", 1 );
@@ -498,10 +511,11 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* Extract the output PIXEL->SKY Mapping. */
             oskymap = astGetMapping( fs, AST__BASE, AST__CURRENT );
 
-/* Ensure that the returned SkyFrame represents absolute coords rather than 
-   offsets. */
-            astClear( oskyframe, "SkyRefIs" );
-            astClear( oskyframe, "AlignOffset" );
+/* Get a copy of the output SkyFrame and ensure it represents absolute
+   coords rathe rthan offset coords. */
+            abskyframe = astCopy( oskyframe );
+            astClear( abskyframe, "SkyRefIs" );
+            astClear( abskyframe, "AlignOffset" );
 
 /* Construct the CmpFrame that will be used as the current Frame in the 
    output cube WCS FrameSet. */
@@ -520,55 +534,25 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    Mapping to join it to the 3D PIXEL Frame already in the FrameSet. */
             astAddFrame( *wcsout, AST__BASE, cmpmap, cmpfrm );
 
-/* For later convenience, we create another FrameSet describing just the
-   spatial axes of the output. We take a copy of the SkyFrame so that any
-   changes we make to the SkyFrame via the "swcsout" pointer will not
-   affect the "*wcsout" FrameSet. */
-            swcsout = astFrameSet( astFrame( 2, "Domain=PIXEL" ), "" );
-            oskyframe2 = astCopy( oskyframe );
-            astAddFrame( swcsout, AST__BASE, oskymap, oskyframe2 );
+/* For later convenience, invert "oskymap" so that it goes from output
+   (lon,lat) to output pixel coords. */
+            astInvert( oskymap );
 
-/* If the target is moving make the spatial FrameSet describe offsets
-   from the first base pointing position (this position has previously
-   been stored in the SkyRef attribute of the SkyFrame). */
-            if( moving ) {
-               astSet( swcsout, "SkyRefIs=Origin" );
-               astSet( swcsout, "AlignOffset=1" );
-            }
-
-/* For later convenience, we invert it so that the base Frame is the 
-   SkyFrame and the current Frame is the PIXEL Frame. */
-            astInvert( swcsout );
-
-/* Invert the output spectral Mapping so that it goes from output
+/* Also invert the output spectral Mapping so that it goes from output
    spectral WCS value to output spectral grid value. */
             astInvert( ospecmap );
          }
 
-/* If the target is moving, set the input WCS FrameSet to represent Az,El
-   offsets from the base pointing position for the current time slice. */
-         if( moving ) {
-            astSet( swcsin, "System=AZEL" );
-            astSetD( swcsin, "SkyRef(1)", hdr->state->tcs_az_bc1 );
-            astSetD( swcsin, "SkyRef(2)", hdr->state->tcs_az_bc2 );
-            astSetC( swcsin, "SkyRefIs", "Origin" );
-            astSetI( swcsin, "AlignOffset", 1 );
-         }
-
-/* We now align the input and output WCS FrameSets. astConvert finds the
-   Mapping between the current Frames of the two FrameSets (the two 
-   SkyFrames in this case), but we want the Mapping between the the two
-   base Frames (input GRID to output PIXEL). So we invert the input WCS
-   FrameSet (the output WCS FrameSet has already been inverted). */
+/* Find out how to convert from input GRID coords to the output sky frame.
+   Note, we want absolute sky coords here, even if the target is moving.
+   Record the original base frame before calling astConvert so that it can 
+   be re-instated later (astConvert modifies the base Frame). */
+         astInvert( swcsin );
+         ibasein = astGetI( swcsin, "Base" );
+         fs = astConvert( swcsin, abskyframe, "SKY" );
+         astSetI( swcsin, "Base", ibasein );
          astInvert( swcsin );
 
-/* Now use astConvert to get the Mapping from input GRID to output PIXEL
-   coords, aligning the coordinate systems on the sky. Note the original 
-   base Frame index so it can be re-instated afterwards (astConvert changes
-   it to indicate the alignment Frame).*/
-         ibasein = astGetI( swcsin, "Base" );
-         fs = astConvert( swcsin, swcsout, "SKY" );
-         astSetI( swcsin, "Base", ibasein );
          if( fs == NULL ) {
             if( *status == SAI__OK ) {
                msgSetc( "FILE", pname );
@@ -580,14 +564,58 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
             break;
          }
 
-/* Invert the input WCS FrameSet again to bring it back into its original
-   state. */
-         astInvert( swcsin );
+/* The "fs" FrameSet has input GRID coords as its base Frame, and output
+   (absolute) sky coords as its current frame. If the target is moving,
+   modify this so that the current Frame represents offsets from the
+   current telescope base pointing position (the mapping in the "fs"
+   FrameSet is also modified automatically). */
+         if( moving ) {
+
+/* Get the Mapping from AZEL (at the current input epoch) to the
+   (absolute) output sky system. Use it to convert the telescope base 
+   pointing position from (az,el) to the requested system. */
+            skyin = astGetFrame( swcsin, AST__CURRENT );
+	    sf1 = astCopy( skyin );
+	    astSetC( sf1, "System", "AZEL" );
+            azel2usesys = astConvert( sf1, abskyframe, "" );
+            astTran2( azel2usesys, 1, &(hdr->state->tcs_az_bc1),
+                      &(hdr->state->tcs_az_bc2), 1, &a, &b );
+
+/* Explicitly annul these objects for efficiency in this tight loop. */
+            azel2usesys = astAnnul( azel2usesys );
+            sf1 = astAnnul( sf1 );
+            skyin = astAnnul( skyin );
+
+/* Modified the FrameSet to represent offsets from this origin. We use the 
+   FrameSet pointer "fs" rather than a pointer to the current Frame within 
+   the FrameSet. This means that the Mapping in the FrameSet will be 
+   modified to remap the current Frame. */
+            astSetD( fs, "SkyRef(1)", a );
+            astSetD( fs, "SkyRef(2)", b );
+            astSet( fs, "SkyRefIs=origin" );
+
+/* Get the Mapping and then clear the SkyRef attributes (this is because
+   the current Frame in "fs" may be "*skyframe" and we do not want to make a
+   permanent change to *skyframe). */
+            fsmap = astGetMapping( fs, AST__BASE, AST__CURRENT );
+            astClear( fs, "SkyRef(1)" );
+            astClear( fs, "SkyRef(2)" );
+            astClear( fs, "SkyRefIs" );
+
+/* If the target is not moving, just get the Mapping. */
+         } else {
+            fsmap = astGetMapping( fs, AST__BASE, AST__CURRENT );
+         }
+
+/* The output from "fs" now corresponds to the input to "oskymap",
+   whether the target is moving or not. Combine the input GRID to output 
+   SKY Mapping with the output SKY to output pixel Mapping found earlier. */
+         totmap = astCmpMap( fsmap, oskymap, 1, "" );
 
 /* Transform the positions of the detectors from input GRID to output PIXEL
    coords. Then extend the bounds of the output cube on the spatial axes to 
    accomodate the new positions. */
-         astTran2( fs, (data->dims)[ 1 ], xin, yin, 1, xout, yout );
+         astTran2( totmap, (data->dims)[ 1 ], xin, yin, 1, xout, yout );
          for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
 
 /* If the detector has a valid position, see if it produced any good
@@ -621,6 +649,8 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* For efficiency, explicitly annul the AST Objects created in this tight
    loop. */
          fs = astAnnul( fs );
+         totmap = astAnnul( totmap );
+         fsmap = astAnnul( fsmap );
       }   
 
 /* Close the current input data file. */
@@ -782,5 +812,3 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    if( *status != SAI__OK ) errRep( FUNC_NAME, "Unable to determine cube "
                                     "bounds", status );
 }
-
-

@@ -73,6 +73,8 @@
 *        Free detpos coordinates.
 *     2006-11-06 (DSB):
 *        Free detname memory.
+*     2006-1-19 (DSB):
+*        Free tsys memory.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -190,6 +192,7 @@ void smf_close_file( smfData ** data, int * status ) {
       if (hdr->fplanex) smf_free( hdr->fplanex, status );
       if (hdr->fplaney) smf_free( hdr->fplaney, status );
       if (hdr->detpos) smf_free( hdr->detpos, status );
+      if (hdr->tsys) smf_free( hdr->tsys, status );
       if (hdr->detname) smf_free( hdr->detname, status );
     }
     smf_free( hdr, status );

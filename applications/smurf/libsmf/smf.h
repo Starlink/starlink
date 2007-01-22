@@ -453,12 +453,13 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                      int moving, int lbnd[ 3 ], int ubnd[ 3 ], 
                      AstFrameSet **wcsout, int *npos, int *status );
 
-void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
-                    AstFrame *ospecfrm, AstMapping *ospecmap, Grp *detgrp, 
-                    int moving, int lbnd_out[ 3 ], int ubnd_out[ 3 ], 
-                    int spread, const double params[], int genvar, 
-                    float *data_array, float *var_array, double *wgt_array, 
-                    int *work_array, int *status );
+void smf_rebincube( smfData *data, int index, int size, AstFrame *oskyfrm,
+                    AstMapping *oskymap, AstFrame *ospecfrm, 
+                    AstMapping *ospecmap, Grp *detgrp, int moving, 
+                    int lbnd_out[ 3 ], int ubnd_out[ 3 ], int spread, 
+                    const double params[], int genvar, float *data_array, 
+                    float *var_array, double *wgt_array, int *work_array, 
+                    int *status );
 
 void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos, 
                    int autogrid, Grp *detgrp, double par[ 7 ], 
