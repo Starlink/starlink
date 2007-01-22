@@ -72,7 +72,7 @@ KPG_NXD_GEN = kpg1_cmul.gnxd
 
 # All numeric types
 KPG_N_GEN = bad2d.gn kpg1_bl1d.gn kpg1_bor2.gn \
-kpg1_cadd.gn kpg1_chva.gn kpg1_cmpk.gn kpg1_cpnd.gn \
+kpg1_cadd.gn kpg1_chva.gn kpg1_cmpk.gn kpg1_cpbd.gn kpg1_cpnd.gn \
 kpg1_csub.gn kpg1_elnm.gn kpg1_expo.gn kpg1_fill.gn \
 kpg1_flip.gn kpg1_frac.gn kpg1_gauf.gn kpg1_ghst.gn \
 kpg1_hsta.gn kpg1_hstq.gn kpg1_loct.gn kpg1_loga.gn \
@@ -82,8 +82,8 @@ kpg1_nthm.gn kpg1_numb.gn kpg1_past.gn kpg1_pois.gn \
 kpg1_pxdp.gn kpg1_retr.gn kpg1_rmap.gn kpg1_stat.gn \
 kpg1_stor.gn kpg1_tdli.gn kpg1_thrs.gn kpg1_trli.gn \
 kpg1_trsp.gn kpg1_vasv.gn kpg1_wmod.gn \
-kpg1_sclb.gn  kpg1_scli.gn   kpg1_scluw.gn \
-kpg1_sclub.gn  kpg1_sclw.gn
+kpg1_sclb.gn kpg1_scli.gn kpg1_scluw.gn \
+kpg1_sclub.gn kpg1_sclw.gn
 
 
 # All except logical (include char)
@@ -104,7 +104,7 @@ kpg1_axbn.gdr kpg1_axco.gdr kpg1_axex.gdr kpg1_axgv.gdr \
 kpg1_axlv.gdr kpg1_axvl.gdr kpg1_bloc.gdr kpg1_bmed.gdr \
 kpg1_chax.gdr kpg1_chep.gdr kpg1_chev.gdr kpg1_cmav.gdr \
 kpg1_che2.gdr kpg1_cmad.gdr kpg1_cmvd.gdr kpg1_cmvv.gdr \
-kpg1_cpbd.gdr kpg1_d2w2.gdr kpg1_dcli.gdr kpg1_div.gdr  \
+kpg1_d2w2.gdr kpg1_dcli.gdr kpg1_div.gdr  \
 kpg1_dwso.gdr kpg1_ffr.gdr  kpg1_fftf.gdr kpg1_gaus.gdr \
 kpg1_hcon.gdr kpg1_hmlt.gdr kpg1_hsds.gdr kpg1_hsfl.gdr \
 kpg1_hstf.gdr kpg1_is3.gdr  kpg1_litn.gdr kpg1_ludc.gdr \
