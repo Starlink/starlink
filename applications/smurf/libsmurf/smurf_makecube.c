@@ -315,6 +315,13 @@
 *          had for the first time slice. For any other system, no such 
 *          shifts are applied, even if the base telescope position is
 *          changing through the observation. [TRACKING]
+*     TRIM = _LOGICAL (Read)
+*          If TRUE, then the output cube will be trimmed to exclude any
+*          borders filled with bad data caused by one or more detectors 
+*          having been excluded (see parameter DETECTORS). If FALSE, then 
+*          the pixel bounds of the output cube will be such as to include 
+*          data from all detectors, whether or not they have been selected 
+*          for inclusion using the DETECTORS parameter. [TRUE]
 *     UBOUND( 3 ) = _INTEGER (Write)
 *          The upper pixel bounds of the output NDF. Note, values will be
 *          written to this output parameter even if a null value is supplied 
@@ -332,6 +339,12 @@
 *          used. These weights record thre relative weight of the input
 *          data associated with each output pixel. If SPARSE is set TRUE,
 *          then WEIGHTS is not accessed and a FALSE value is assumed. [FALSE]
+
+*  Notes:
+*     - For regularly gridded data, the spectral range of the output cube
+*     is determined by the intersection (rather than the union) of the
+*     input spectral ranges. This is done in order to allow a more memory
+*     efficient algorithm to be used.
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -509,6 +522,7 @@ void smurf_makecube( int *status ) {
    int smfflags;              /* Flags for smfData */
    int sparse;                /* Create a sparse output array? */
    int spread = 0;            /* Pixel spreading method */
+   int trim;                  /* Trim the output cube to exclude bad pixels? */
    int ubnd_out[ 3 ];         /* Upper pixel bounds for output map */
    int ubnd_wgt[ 3 ];         /* Upper pixel bounds for wight array */
    int use_ast;               /* Use AST for rebinning? */
@@ -567,6 +581,11 @@ void smurf_makecube( int *status ) {
    an optimal fitting process. */
    parGet0l( "AUTOGRID", &autogrid, status );
 
+/* See if the output grp should be trimmed to exclude missing data (e.g.
+   caused by detectors not being selected for inclusion via parameter
+   DETECTORS). */
+   parGet0l( "TRIM", &trim, status );
+
 /* Calculate the default grid parameters. */
    smf_cubegrid( igrp,  size, system, usedetpos, autogrid, detgrp, 
                  par, &moving, &oskyfrm, &sparse, status );
@@ -577,8 +596,9 @@ void smurf_makecube( int *status ) {
 
 /* Validate the input files, create the WCS FrameSet to store in the
    output cube, and get the pixel index bounds of the output cube. */
-      smf_cubebounds( igrp, size, oskyfrm, autogrid, usedetpos, par, moving, 
-                      lbnd_out, ubnd_out, &wcsout, &npos, status );
+      smf_cubebounds( igrp, size, oskyfrm, autogrid, usedetpos, par, 
+                      ( trim ? detgrp : NULL ), moving, lbnd_out, ubnd_out,
+                       &wcsout, &npos, status );
 
 /* See how the output Variances are to be created. */
       parChoic( "GENVAR", "TSYS", "SPREAD,TSYS,NONE", 1, pabuf, 10, status );
