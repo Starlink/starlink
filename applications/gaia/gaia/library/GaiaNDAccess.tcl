@@ -149,7 +149,9 @@ itcl::class gaia::GaiaNDAccess {
          set addr_(QUALITY) 0
          set cnfmap_ 0
          set dims_ {}
+         set tdims_ {}
          set bounds_ {}
+         set tbounds_ {}
       }
    }
 
@@ -175,8 +177,23 @@ itcl::class gaia::GaiaNDAccess {
    #  Get the dimensions of the full data. Returns a list of integers.
    #  If trunc is true then any trailing redundant axes are trimmed.
    public method getdims {trunc} {
+      if { $trunc } {
+         if { $tdims_ == {} } {
+            set tdims_ [${type_}::getdims $handle_ 1]
+
+            #  If necessary pad the dimensions up to the expected size.
+            set needbounds $ndims
+            set gotbounds [llength $tdims_]
+            if { $gotbounds < $needbounds } {
+               for {set i $gotbounds} {$i < $needbounds} {incr i} {
+                  lappend tdims_ 1
+               }
+            }
+         }
+         return $tdims_
+      }
       if { $dims_ == {} } {
-         set dims_ [${type_}::getdims $handle_ $trunc]
+         set dims_ [${type_}::getdims $handle_ 0]
       }
       return $dims_
    }
@@ -186,8 +203,23 @@ itcl::class gaia::GaiaNDAccess {
    #  always be 1. If trunc is true then any trailing redundant axes are
    #  trimmed.
    public method getbounds {trunc} {
+      if { $trunc } {
+         if { $tbounds_ == {} } {
+            set tbounds_ [${type_}::getbounds $handle_ 1]
+
+            #  If necessary pad the bounds up to the expected size.
+            set needbounds [expr $ndims*2]
+            set gotbounds [llength $tbounds_]
+            if { $gotbounds < $needbounds } {
+               for {set i $gotbounds} {$i < $needbounds} {incr i} {
+                  lappend tbounds_ 1
+               }
+            }
+         }
+         return $tbounds_
+      }
       if { $bounds_ == {} } {
-         set bounds_ [${type_}::getbounds $handle_ $trunc]
+         set bounds_ [${type_}::getbounds $handle_ 0]
       }
       return $bounds_
    }
@@ -348,21 +380,28 @@ itcl::class gaia::GaiaNDAccess {
       array::release $adr $cnfmap_
    }
 
-   #  Return the underlying information about an accessor array. This
-   #  is the real memory address, number of elements, HDS data type of
-   #  the cube data and the HDS data type of any extracted data (will
-   #  differ for FITS scaled data).
+   #  Return the underlying information about an accessor array. This is the
+   #  real memory address, number of elements, HDS data type of the data and
+   #  the HDS data type of any extracted data (will differ for FITS scaled
+   #  data).
    public method getinfo {adr} {
       return [array::getinfo $adr]
    }
 
    #  Create an NDF that represents the bare bones of an image extracted from
-   #  the attached dataset. The bare bones are an NDF of the correct
-   #  dimensions and bounds, with an appropriate WCS. No data components are
-   #  copied. Returns a new instance of this class wrapping the new NDF.
+   #  the attached dataset that is a cube. The bare bones are an NDF of the
+   #  correct dimensions and bounds, with an appropriate WCS. No data
+   #  components are copied. Returns a new instance of this class wrapping the
+   #  new NDF. 
    public method createimage {name axis {component "DATA"}} {
       if { $addr_($component) == 0 } {
          error "Must map in cube data before creating an image"
+      }
+
+      #  Check this is a cube.
+      set dims [getdims 0]
+      if { [llength $dims] < 3 } {
+         error "createimage only works on cubes"
       }
 
       #  Get the underlying info. Note the cube type may not be the image type
@@ -384,18 +423,17 @@ itcl::class gaia::GaiaNDAccess {
 
       #  Get a 2D WCS for our chosen axes.
       set fullwcs [${type_}::getwcs $handle_]
-      set dims [getdims 1]
       set dim1 [lindex $dims [expr $axis1-1]]
       set dim2 [lindex $dims [expr $axis2-1]]
       set dim3 [expr [lindex $dims [expr $axis-1]]/2]
       set imagewcs [gaiautils::get2dwcs $fullwcs $axis1 $axis2 $dim1 $dim2 $dim3]
 
       #  Get the bounds for our chosen axes.
-      set bounds [getbounds 1]
-      set lbnd1 [lindex $bounds_ [expr (${axis1}-1)*2]]
-      set ubnd1 [lindex $bounds_ [expr (${axis1}-1)*2+1]]
-      set lbnd2 [lindex $bounds_ [expr (${axis2}-1)*2]]
-      set ubnd2 [lindex $bounds_ [expr (${axis2}-1)*2+1]]
+      set bounds [getbounds 0]
+      set lbnd1 [lindex $bounds [expr (${axis1}-1)*2]]
+      set ubnd1 [lindex $bounds [expr (${axis1}-1)*2+1]]
+      set lbnd2 [lindex $bounds [expr (${axis2}-1)*2]]
+      set ubnd2 [lindex $bounds [expr (${axis2}-1)*2+1]]
 
       #  And create the NDF.
       set newhandle \
@@ -545,8 +583,8 @@ itcl::class gaia::GaiaNDAccess {
    #  As getproperty, except get as a double precision number. Keeps
    #  precision for NDF extension primitives.
    public method getdoubleproperty {extension name} {
-      
-      #  For FITS we just read the encoded value anyway, so no useful 
+
+      #  For FITS we just read the encoded value anyway, so no useful
       #  functionality.
       if { $type_ == "fits" } {
          return [fits::getproperty $handle_ $extension $name]
@@ -580,6 +618,17 @@ itcl::class gaia::GaiaNDAccess {
       }
    }
 
+   #  Set the expected dimensionality. When accessing truncated bounds or
+   #  dimensions this is the number you always want returning (3 for a cube)
+   #  for consistency in the handling. Insignificant later dimensions will
+   #  be returned as dimension 1.
+   public variable ndims 3 {
+
+      #  Make sure these are regenerated.
+      set tbounds_ {}
+      set tdims_ {}
+   }
+
    #  Sets the "mapping mode" to be used when reading in the data
    #  component. By default (1) this is "mmap", assuming the underlying system
    #  supports if, otherwise file i/o and malloc should be used. If changed
@@ -595,11 +644,13 @@ itcl::class gaia::GaiaNDAccess {
    #  Data access type, one of "ndf" or "fits".
    protected variable type_ {}
 
-   #  The dimensionality of the data (list).
+   #  The truncated and untruncated dimensionality of the data.
    protected variable dims_ {}
+   protected variable tdims_ {}
 
-   #  The bounds of the data (list).
+   #  The truncated and untruncated bounds of the data.
    protected variable bounds_ {}
+   protected variable tbounds_ {}
 
    #  The handle to the opened dataset. NDF or FITS identifier.
    protected variable handle_ {}
