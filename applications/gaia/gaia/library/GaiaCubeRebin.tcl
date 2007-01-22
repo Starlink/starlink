@@ -124,10 +124,31 @@ itcl::class gaia::GaiaCubeRebin {
          }
          pack $itk_component(bin$n) -side top -fill x -ipadx 1m -ipady 2m
          add_short_help $itk_component(bin$n) \
-         {Binning factor for the n axis, integer 1 to size of cube}
+            {Binning factor for the n axis, integer 1 to size of cube}
       }
 
-      #  Name of output cube (auto-suggested until given a name).
+      #  Prefix for name of output cube (auto-suggested until given a name).
+      itk_component add prefix {
+         LabelEntry $w_.prefix \
+            -text "Output prefix:" \
+            -value "GaiaTempCubeRebin" \
+            -labelwidth $itk_option(-labelwidth) \
+            -valuewidth $itk_option(-valuewidth)
+      }
+      pack $itk_component(prefix) -side top -fill x -ipadx 1m -ipady 2m
+      add_short_help $itk_component(prefix) \
+         {Prefix for names of output cubes, will be appended by an integer}
+
+      itk_component add outputfile {
+         LabelValue $w_.outputfile \
+            -text "Output name:" \
+            -value "" \
+            -labelwidth $itk_option(-labelwidth) \
+            -valuewidth $itk_option(-valuewidth)
+      }
+      pack $itk_component(outputfile) -side top -fill x -ipadx 1m -ipady 2m
+      add_short_help $itk_component(outputfile) \
+         {Name used for the last rebinned cube}
 
       #  Run the application.
       itk_component add runapp {
@@ -152,7 +173,6 @@ itcl::class gaia::GaiaCubeRebin {
          catch {$compavetask_ delete_sometime}
          set compavetask_ {}
       }
-
    }
 
    #  Methods:
@@ -165,7 +185,6 @@ itcl::class gaia::GaiaCubeRebin {
 
    #  Set the binning factor for an axis.
    protected method set_bin_factor_ {axis value} {
-      puts "set_bin_factor_: $axis, $value"
       set bin${axis}_ [expr max($value,1)]
    }
 
@@ -194,12 +213,13 @@ itcl::class gaia::GaiaCubeRebin {
          set task $compaddtask_
       }
 
-      set bins "\[$bin1_,$bin2_,$bin3_\]"
+      #  Create name for the new cube, needs to be different to the 
+      #  currently displayed one.
+      set output_name_ "[$itk_component(prefix) get][incr count_].sdf"
+      $itk_component(outputfile) configure -value ""
 
-      puts "$task runwiths in=$input_name out=$output_name_ compress=$bins accept"
- 
       $task runwiths "in=$input_name out=$output_name_ \
-                       compress=$bins accept"
+                       compress=\[$bin1_,$bin2_,$bin3_\] accept"
   }
 
    #  Do the presentation of the result now the application has completed.
@@ -211,16 +231,24 @@ itcl::class gaia::GaiaCubeRebin {
             blt::busy release $w_
             return
          }
-         set file ${output_name_}.sdf
+         set file "${output_name_}.sdf"
       } else {
-         set file $output_name__
+         set file "$output_name_"
       }
       if { $file != {} } {
-         $itk_option(-gaiacube) configure -cube $file
+         catch {
+            $itk_option(-gaiacube) configure -cube "$file"
+         } msg
+         puts "msg = $msg"
+         $itk_component(outputfile) configure -value "$file"
+
+         #  If the file has Temp in the name, record for automatic removal.
+         if { [string match "*Temp*" $file] } {
+            $itk_option(-gaiacube) register_temp_file $file
+         }
       }
       blt::busy release $w_
    }
-
 
    #  Configuration options: (public variables)
    #  ----------------------
@@ -251,7 +279,7 @@ itcl::class gaia::GaiaCubeRebin {
    protected variable combination_type_ "Mean"
 
    #  Name of the output cube.
-   protected variable output_name_ {newcube}
+   protected variable output_name_ {GaiaCubeRebin1.sdf}
 
    #  The rtdimage instance being used to display the main image.
    protected variable rtdimage_ {}
