@@ -39,7 +39,7 @@
 
 #  Copyright:
 #     Copyright (C) 2004-2005 Central Laboratory of the Research Councils.
-#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2006-2007 Particle Physics & Astronomy Research Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -153,6 +153,13 @@ itcl::class gaia::GaiaCube {
                            -change_cmd [code $this coords_changed_]]
       $spec_coords_ add_menu $SpectralCoords
 
+      #  Add the "Go" menu to switch back and forth between cubes that have
+      #  been loaded.
+      set GoMenu [add_menubutton "Go" \
+                  "Go: menu with shortcuts to view cubes previously viewed"]
+      configure_menubutton "Go" -underline 0
+      $GoMenu config -postcommand [code $this update_history_menu_ $GoMenu]
+
       #  Add window help.
       add_help_button cube "On Window..."
       add_short_help $itk_component(menubar).help \
@@ -164,7 +171,7 @@ itcl::class gaia::GaiaCube {
             -labelwidth $lwidth \
             -text "Input cube:" \
             -textvariable [scope itk_option(-cube)] \
-            -command [code $this set_chosen_cube_] \
+            -command [code $this configure -cube] \
             -filter_types $itk_option(-filter_types)
       }
       pack $itk_component(cube) -side top -fill x -ipadx 1m -ipady 2m
@@ -211,7 +218,7 @@ itcl::class gaia::GaiaCube {
 
       #  Add tab window for choosing either the helper controls.
       itk_component add tabnotebook {
-         iwidgets::tabnotebook $w_.tab \
+         iwidgets::tabnotebook $w_.tab -equaltabs 0 \
             -angle 0 -tabpos n -width 400 -height 420
       }
       pack $itk_component(tabnotebook) -fill both -expand 1
@@ -228,8 +235,11 @@ itcl::class gaia::GaiaCube {
       $itk_component(tabnotebook) add -label Chanmap
       set chanmapTab [$itk_component(tabnotebook) childsite 3]
 
+      $itk_component(tabnotebook) add -label Rebin
+      set rebinTab [$itk_component(tabnotebook) childsite 4]
+
       $itk_component(tabnotebook) add -label Baseline
-      set baselineTab [$itk_component(tabnotebook) childsite 4]
+      set baselineTab [$itk_component(tabnotebook) childsite 5]
 
       #  Spectrum section.
       itk_component add sruler {
@@ -250,7 +260,7 @@ itcl::class gaia::GaiaCube {
             -valuewidth $vwidth \
             -spec_coords [code $spec_coords_] \
             -transient_spectralplot $itk_option(-transient_spectralplot)
-         
+
       }
       set ref_range_controls_($ref_ids) $itk_component(spectrum)
       pack $itk_component(spectrum) -side top -fill both -ipadx 1m -ipady 2m
@@ -304,7 +314,7 @@ itcl::class gaia::GaiaCube {
          LabelRule $chanmapTab.chanmapruler -text "Channel map controls:"
       }
       pack $itk_component(chanmapruler) -side top -fill x
-      
+
       incr ref_ids
       itk_component add chanmap {
          GaiaCubeChanmap $chanmapTab.chanmap \
@@ -319,6 +329,21 @@ itcl::class gaia::GaiaCube {
       }
       set ref_range_controls_($ref_ids) $itk_component(chanmap)
       pack $itk_component(chanmap) -side top -fill both -ipadx 1m -ipady 2m
+
+      #  Rebin section.
+
+      itk_component add rebinruler {
+         LabelRule $rebinTab.rebinruler -text "Rebin cube controls:"
+      }
+      pack $itk_component(rebinruler) -side top -fill x
+
+      itk_component add rebin {
+         GaiaCubeRebin $rebinTab.rebin \
+            -gaiacube [code $this] \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth
+      }
+      pack $itk_component(rebin) -side top -fill both -ipadx 1m -ipady 2m
 
       #  Baseline subtraction section. Must be the last.
 
@@ -402,16 +427,23 @@ itcl::class gaia::GaiaCube {
       $itk_component(chanmap) close
    }
 
-   #  Undo some of the effects of close. Do not reopen cube, that would 
+   #  Undo some of the effects of close. Do not reopen cube, that would
    #  be expensive and reset too much.
    public method open {} {
       $itk_component(spectrum) open
    }
 
    #  Open the chosen file as a cube.
-   protected method set_chosen_cube_ { args } {
+   protected method set_chosen_cube_ {} {
+
       set namer [GaiaImageName \#auto -imagename $itk_option(-cube)]
-      if { [$namer exists] } {
+      if { ! [$namer exists] } {
+         if { $itk_option(-cube) != {} } {
+            error_dialog "No such file: $itk_option(-cube)" $w_
+            record_last_cube_
+         }
+         return
+      } else {
          if { $cubeaccessor_ == {} } {
             set cubeaccessor_ [uplevel \#0 GaiaNDAccess \#auto]
          }
@@ -437,6 +469,7 @@ itcl::class gaia::GaiaCube {
          if { $ndims != 3 } {
             error_dialog \
                "Not a cube, must have 3 significant dimensions (has $ndims)"
+            record_last_cube_
             return
          }
 
@@ -444,8 +477,8 @@ itcl::class gaia::GaiaCube {
          #  application
          load_cube_ 1
 
-         #  Retain the object value for creating new ones.
-         set object_ [$itk_option(-rtdimage) object]
+         #  Retain the TITLE value for creating new object values.
+         set object_ [$cubeaccessor_ getc "TITLE"]
 
          #  Set axis and display the plane for first time. Try to pick
          #  out a spectral axis.
@@ -471,6 +504,9 @@ itcl::class gaia::GaiaCube {
          #  If the spectral plot is open, then close it. It will be
          #  re-created on next image click.
          $itk_component(spectrum) close_plot
+
+         #  Add cube to history (and previous cube to back list).
+         add_history $itk_option(-cube)
       }
    }
 
@@ -891,6 +927,213 @@ itcl::class gaia::GaiaCube {
       $itk_component(spectrum) ref_range_moved 1 $lower $upper none
    }
 
+   #  ============================================================
+   #  Go menu control. Just like that of Skycat, except filters out
+   #  cubes and allows the history to be updated without opening as
+   #  an image.
+   #  =============================================================
+
+   #  Add a cube to the history catalog under the given filename.
+   #  Re-implementation of SkySearch::add_history that avoids using the
+   #  rtdimage to obtain the cube properties.
+   public method add_history {filename} {
+
+      #  Ignore non-existant cubes.
+      if { $filename == "" || ! [file exists $filename] } {
+         return
+      }
+
+      #  Access history catalogue (need to do this sometime, so do it now).
+      set catalog $history_catalog_
+      
+      #  Check if the directory for the catalog exists
+      set dir [file dirname $catalog]
+      if { ! [file isdirectory $dir] } {
+         if { [catch {exec mkdir $dir} msg] } {
+            warning_dialog $msg
+            return
+         }
+      }
+         
+      #  Make sure at least an empty catalog exists.
+      if { ! [file exists $catalog] || [file size $catalog] == 0 } {
+         
+         # If it doesn't exist yet, create an empty catalog file
+         if { [catch {set fd [::open $catalog w]} msg] } {
+            warning_dialog "can't create image history catalog: $msg"
+            return
+         }
+         puts $fd "Skycat History Catalog v1.0"
+         puts $fd ""
+         puts $fd "ra_col: -1"
+         puts $fd "dec_col: -1"
+         puts $fd "x_col: -1"
+         puts $fd "y_col: -1"
+         puts $fd "show_cols: file ra dec object NAXIS NAXIS1 NAXIS2 NAXIS3"
+         puts $fd "sort_cols: timestamp"
+         puts $fd "sort_order: decreasing"
+         puts $fd ""
+         puts $fd [join $history_cols_ "\t"]
+         puts $fd "----"
+         ::close $fd
+         
+         #  Get the catalog into the list of known catalogs.
+         $astrocat_ open $catalog
+      }
+      
+      #  Don't record Temp cubes they will be deleted.
+      if { ! [string match {*Temp*} $filename] } {
+
+         #  Add an entry for the given image and filename
+         set id [file tail $filename]
+      
+         #  Image centre RA and Dec not easily available, so skip (need image
+         #  loaded).
+         set ra "00:00:00"
+         set dec "00:00:00"
+      
+         #  Record cube dimensions.
+         set object [$cubeaccessor_ fitsread OBJECT]
+         set naxis 3
+         set dims [$cubeaccessor_ getdims 0]
+         set naxis1 [lindex $dims 0]
+         set naxis2 [lindex $dims 0]
+         set naxis3 [lindex $dims 0]
+         
+         #  Also make these up.
+         set lowcut 0
+         set highcut 1
+         set colormap "real.lasc"
+         set itt "ramp.iasc"
+         set colorscale "linear"
+         set zoom "1"
+         
+         set timestamp [clock seconds]
+         
+         #  Get full path name of file for preview URL
+         if { "[string index $filename 0]" == "/" } {
+            set fullpath $filename
+         } else {
+            set fullpath [pwd]/$filename
+         }
+         set preview file:$fullpath
+         
+         set data [list [list $id $ra $dec $object \
+                            $naxis $naxis1 $naxis2 $naxis3 \
+                            $lowcut $highcut $colormap $itt $colorscale $zoom \
+                            $timestamp $preview]]
+      
+         $astrocat_ open $catalog
+         $astrocat_ save $catalog 1 $data ""
+      
+         #  Update history catalog window, if it is showing
+         set w [cat::AstroCat::get_instance [file tail $catalog]]
+         if { "$w" != "" && [winfo viewable $w] } {
+            $w search
+         }
+      }         
+
+      #  Add last_cube_ to the back_list_, including temporary ones.
+      record_last_cube_
+   }
+
+   #  SkyCatCtrl like update_history_menu, but filter to only show
+   #  cubes.
+   protected method update_history_menu_ {menu} {
+
+      #  Clear existing items.
+      $menu delete 0 end
+
+      add_menuitem $menu command "Back" \
+         {Go back again to the previous cube} \
+         -command [code $this previous_cube] \
+         -state disabled
+
+      if { [llength $back_list_] } {
+         $menu entryconfig Back -state normal
+      }
+
+      add_menuitem $menu command "Forward" \
+         {Go forward again to the next image} \
+         -command [code $this forward_cube] \
+         -state disabled
+
+      if { [llength $forward_list_] } {
+         $menu entryconfig Forward -state normal
+      }
+
+      $menu add separator
+
+      add_history_menu_items $menu 20
+   }
+
+   #  SkySearch::add_history_menu_items, implemented to filter only
+   #  the first n cubes from the history list.
+   protected method add_history_menu_items {menu n} {
+
+      set catalog $history_catalog_
+      if { [catch {$astrocat_ open $catalog} ] } {
+         #  No catalog yet
+         return
+      }
+      set list [$astrocat_ query \
+                   -nrows $n -sort timestamp -sortorder decreasing]
+
+      foreach row $list {
+         eval lassign {$row} $history_cols_
+         if { $NAXIS3 != {} } {
+            set filename [string range $PREVIEW 5 end]
+            $menu add command \
+               -label $file \
+               -command [code $this configure -cube $filename]
+         }
+      }
+   }
+
+   #  Go back to the previous cube.
+   public method previous_cube {} {
+      while { [set n [llength $back_list_]] } {
+         set filename [lindex $back_list_ end]
+         if { "$filename" != "$itk_option(-cube)" &&
+              [file exists $filename] } {
+            lappend forward_list_ $itk_option(-cube)
+            configure -cube $filename
+            set back_list_ [lrange $back_list_ 0 [expr $n-2]]
+            break
+         }
+         set back_list_ [lrange $back_list_ 0 [expr $n-2]]
+      }
+   }
+
+   #  Go forward again to the next cube.
+   public method forward_cube {} {
+      while { [set n [llength $forward_list_]] } {
+         set filename [lindex $forward_list_ end]
+         if {"$filename" != "$itk_option(-cube)" &&
+             [file exists $filename]} {
+            configure -cube $filename
+            set forward_list_ [lrange $forward_list_ 0 [expr $n-2]]
+            break
+         }
+         set forward_list_ [lrange $forward_list_ 0 [expr $n-2]]
+      }
+   }
+
+   #  Add the "last cube" to the last_cube_ list.
+   protected method record_last_cube_ {} {
+
+      #  Don't add if present as last cube or no cube loaded.
+      if { $last_cube_ != {} } {
+         set current_last [lindex $back_list_ end]
+         if { $current_last != $last_cube_ } {
+            lappend back_list_ $last_cube_
+         }
+      }
+      set last_cube_ $itk_option(-cube)
+   }
+
+
+
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -902,8 +1145,8 @@ itcl::class gaia::GaiaCube {
    #  Name of the Gaia instance we're controlling.
    itk_option define -gaia gaia Gaia {} {
       set check_for_cubes_ [$itk_option(-gaia) cget -check_for_cubes]
-      set rtdctrl [$itk_option(-gaia) get_image]
-      set rtdctrl_info_ [$rtdctrl component info]
+      set rtdctrl_ [$itk_option(-gaia) get_image]
+      set rtdctrl_info_ [$rtdctrl_ component info]
    }
 
    #  The canvas.
@@ -931,6 +1174,9 @@ itcl::class gaia::GaiaCube {
 
    #  Data access object for the cube.
    protected variable cubeaccessor_ {}
+
+   #  Name of the last cube opened.
+   protected variable last_cube_ {}
 
    #  The bounds of the cube, 3 pairs of upper and lower values.
    protected variable bounds_ {}
@@ -971,6 +1217,9 @@ itcl::class gaia::GaiaCube {
    #  have control of the dummy slice.
    protected variable fullobject_ {}
 
+   #  GaiaImageCtrl object used in the main window.
+   protected variable rtdctrl_ {}
+
    #  GaiaImagePanel object used in the main window. Forced to update to
    #  reveal the slice information.
    protected variable rtdctrl_info_ {}
@@ -993,11 +1242,27 @@ itcl::class gaia::GaiaCube {
    #  The ref_id value of the baseline controls. Must be last.
    protected variable baseline_id_ ""
 
+   #  Used for the Go=>Back/Forward menu itemes
+   protected variable back_list_ {}
+   protected variable forward_list_ {}
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
    #  The temporary image count.
-   common count_ 0
+   protected common count_ 0
+
+   #  Name of the history catalogue, shared with Skycat and images.
+   protected common history_catalog_ $::env(HOME)/.skycat/history
+
+   #  C++ astrocat object shared with AstroCat?
+   protected common astrocat_ [astrocat ::cat::.astrocat]
+
+   #  List of columns in the history catalog.
+   protected common history_cols_ \
+      [list file ra dec object NAXIS NAXIS1 NAXIS2 NAXIS3 \
+          lowcut highcut colormap itt colorscale zoom timestamp PREVIEW]
+
 
 #  End of class definition.
 }
