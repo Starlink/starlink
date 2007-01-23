@@ -64,6 +64,8 @@
 *  History:
 *     2006 June 1 (MJC):
 *        Original version.
+*     2007 January 11 (MJC):
+*        Used reordered argument in KPS1_LFTS.
 *     {enter_further_changes_here}
 
 *-
@@ -177,8 +179,7 @@
 
 *  Form the residuals from the fit.
          CALL KPS1_LFTS<T>( ORDER, AXIS, .TRUE., 
-     :                      %VAL( CNF_PVAL( IPRES ) ),
-     :                      DIMS, COEFF, STATUS )
+     :                      DIMS, COEFF, %VAL( CNF_PVAL( IPRES ) ), STATUS )
 
 *  Derive the statistics of the residuals to the fit.
          CALL KPG1_STAT<T>( BAD, EL, %VAL( CNF_PVAL( IPRES ) ),
