@@ -129,6 +129,8 @@
 *        - Restrict the output spectral ramge to the intersection of the
 *        input spectral ranges, rather than the union.
 *        - Ensure SPECBOUNDS values are used in the right order.
+*     23-JAN-2007 (DSB):
+*        Tell user about changes to CRPIX1/2 in autogrid=no mode.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -800,6 +802,16 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       lbnd[ 1 ] = NINT( dlbnd[ 1 ] + shift[ 1 ] );
       ubnd[ 1 ] = NINT( dubnd[ 1 ] + shift[ 1 ] );
 
+/* Tell the user about the new CRPIX values. */
+      if( shift[ 0 ] != 0.0 || shift[ 1 ] != 0.0 ) {
+         msgOutif( MSG__VERB, " ", " ", status );
+         msgOutif( MSG__VERB, " ", "   The CRPIX1/2 values are being changed to the following values:", status );
+         msgSetr( "CRPIX1", (float)( par[ 0 ] + shift[ 0 ] ) );
+         msgOutif( MSG__VERB, " ", "      New CRPIX1 = ^CRPIX1", status );
+         msgSetr( "CRPIX2", (float)( par[ 1 ] + shift[ 1 ] ) );
+         msgOutif( MSG__VERB, " ", "      New CRPIX2 = ^CRPIX2", status );
+      }
+
 /* Modify the bounds to put the origin in the middle, using the same method as
    the on-line system (this relies on integer division). */
       ishift = 2 + ( ubnd[ 0 ] - lbnd[ 0 ] )/2;
@@ -843,7 +855,6 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* Report the pixel bounds of the cube. */
    if( *status == SAI__OK ) {
       msgOutif( MSG__NORM, " ", " ", status );
-
       msgSeti( "XL", lbnd[ 0 ] );
       msgSeti( "YL", lbnd[ 1 ] );
       msgSeti( "ZL", lbnd[ 2 ] );
