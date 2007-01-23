@@ -10,7 +10,7 @@ require DynaLoader;
 use base qw| DynaLoader |;
 
 
-$VERSION = '0.04';
+$VERSION = '0.05';
 
 bootstrap Starlink::AST $VERSION;
 
@@ -482,6 +482,15 @@ package Starlink::AST::Ellipse;
 use base qw/ Starlink::AST::Region /;
 
 package Starlink::AST::Box;
+use base qw/ Starlink::AST::Region /;
+
+package Starlink::AST::Interval;
+use base qw/ Starlink::AST::Region /;
+
+package Starlink::AST::CmpRegion;
+use base qw/ Starlink::AST::Region /;
+
+package Starlink::AST::NullRegion;
 use base qw/ Starlink::AST::Region /;
 
 package Starlink::AST::FluxFrame;

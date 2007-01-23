@@ -2986,6 +2986,7 @@ new( class, frame, form, centre, point1, point2, unc, options)
  PREINIT:
   int naxes = 2;
   int len;
+  int nreq;
   double * ccentre;
   double * cpoint1;
   double * cpoint2;
@@ -2996,9 +2997,14 @@ new( class, frame, form, centre, point1, point2, unc, options)
   len = av_len( centre ) + 1;
   if ( len != naxes ) Perl_croak( aTHX_ "centre must contain %d elements", naxes );
   len = av_len( point1 ) + 1;
-  if ( len != naxes ) Perl_croak( aTHX_ "point1 must contain %d elements", naxes );
+  if ( len != 2 ) Perl_croak( aTHX_ "point1 must contain %d elements", 2 );
   len = av_len( point2 ) + 1;
-  if ( len != naxes ) Perl_croak( aTHX_ "point2 must contain %d elements", naxes );
+  if (form == 0) {
+    nreq = naxes;
+  } else {
+    nreq = 1;
+  }
+  if ( len != nreq ) Perl_croak( aTHX_ "point2 must contain %d elements not %d", nreq, len );
   ccentre = pack1D(newRV_noinc((SV*)centre), 'd');
   cpoint1 = pack1D(newRV_noinc((SV*)point1), 'd');
   cpoint2 = pack1D(newRV_noinc((SV*)point2), 'd');
@@ -3010,10 +3016,12 @@ new( class, frame, form, centre, point1, point2, unc, options)
  OUTPUT:
   RETVAL
 
+
 MODULE = Starlink::AST   PACKAGE = Starlink::AST::Box
 
 AstBox *
-new( frame, form, point1, point2, unc, options )
+new( class, frame, form, point1, point2, unc, options )
+  char * class
   AstFrame * frame
   int form
   AV * point1
@@ -3044,10 +3052,88 @@ new( frame, form, point1, point2, unc, options )
  OUTPUT:
   RETVAL
 
+MODULE = Starlink::AST   PACKAGE = Starlink::AST::Interval
+
+AstInterval *
+new( class, frame, lbnd, ubnd, unc, options )
+  char * class
+  AstFrame * frame
+  AV * lbnd
+  AV * ubnd
+  AstRegion * unc
+  char * options
+ PREINIT:
+  double * clbnd;
+  double * cubnd;
+  int len;
+  int naxes;
+ CODE:
+#ifndef HASREGION
+   Perl_croak(aTHX_ "astInterval: Please upgrade to AST V3.5 or greater");
+#else
+  naxes = astGetI( frame, "Naxes" );
+  len = av_len( lbnd ) + 1;
+  if ( len != naxes ) Perl_croak( aTHX_ "lbnd must contain %d elements", naxes );
+  len = av_len( ubnd ) + 1;
+  if ( len != naxes ) Perl_croak( aTHX_ "ubnd must contain %d elements", naxes );
+  clbnd = pack1D(newRV_noinc((SV*)lbnd), 'd');
+  cubnd = pack1D(newRV_noinc((SV*)ubnd), 'd');
+   ASTCALL(
+     RETVAL = astInterval( frame, clbnd, cubnd, unc, options);
+   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
+#endif
+ OUTPUT:
+  RETVAL
+
+
+MODULE = Starlink::AST   PACKAGE = Starlink::AST::NullRegion
+
+AstNullRegion *
+new( class, frame, unc, options )
+  char * class
+  AstFrame * frame
+  AstRegion * unc
+  char * options
+ CODE:
+#ifndef HASREGION
+   Perl_croak(aTHX_ "astNullRegion: Please upgrade to AST V3.5 or greater");
+#else
+   ASTCALL(
+     RETVAL = astNullRegion( frame, unc, options);
+   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
+#endif
+ OUTPUT:
+  RETVAL
+
+MODULE = Starlink::AST   PACKAGE = Starlink::AST::CmpRegion
+
+AstCmpRegion *
+new( class, region1, region2, oper, options )
+  char * class
+  AstRegion * region1
+  AstRegion * region2
+  int oper
+  char * options
+ CODE:
+#ifndef HASREGION
+   Perl_croak(aTHX_ "astCmpRegion: Please upgrade to AST V3.5 or greater");
+#else
+   ASTCALL(
+     RETVAL = astCmpRegion( region1, region2, oper, options);
+  )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
+#endif
+ OUTPUT:
+  RETVAL
+
+
 MODULE = Starlink::AST   PACKAGE = Starlink::AST::Circle
 
 AstCircle *
-new( frame, form, centre, point, unc, options )
+new( class, frame, form, centre, point, unc, options )
+  char * class
   AstFrame * frame
   int form
   AV * centre
