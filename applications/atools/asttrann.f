@@ -141,6 +141,9 @@
 *        Use CNF_PVAL
 *     22-SEP-2006 (DSB):
 *        Added parameters POSIN and POSOUT.
+*     23-JAN-2007 (DSB):
+*        Report error if the supplied input axis values are not an exact
+*        mutiple of the number of input values for the Mapping.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -432,6 +435,28 @@
 
 *  Find the number of input positions.
          NP = NAXVAL/NAXIN         
+
+*  Report an error if no complete positions were specified.
+         IF( NP .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETI( 'NAXIN', NAXIN )
+            CALL MSG_SETI( 'NAXVAL', NAXVAL )
+            CALL ERR_REP( 'ASTTRANN_ERR5', 'At least ^NAXIN comma '//
+     :                    'separated axis values are required, but '//
+     :                    'only ^NAXVAL were supplied.', STATUS )
+            GO TO 999
+
+*  Report an error if surplus axis values were specified.
+         ELSE IF( NP*NAXIN .NE. NAXVAL .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETI( 'NAXIN', NAXIN )
+            CALL MSG_SETI( 'NAXVAL', NAXVAL )
+            CALL ERR_REP( 'ASTTRANN_ERR6', 'The number of comma '//
+     :                    'separated axis values supplied (^NAXVAL) '//
+     :                    'is not an exact multiple of ^NAXIN.', 
+     :                    STATUS )
+            GO TO 999
+         END IF
 
 *  Allocate work space for the input and output axis values.
          CALL PSX_CALLOC( NP*NAXIN, '_DOUBLE', IPW1, STATUS )
