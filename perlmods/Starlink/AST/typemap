@@ -40,6 +40,9 @@ AstCircle *	T_ASTOBJ
 AstRateMap *	T_ASTOBJ
 AstFluxFrame *	T_ASTOBJ
 AstSpecFluxFrame *	T_ASTOBJ
+AstCmpRegion *	T_ASTOBJ
+AstNullRegion *	T_ASTOBJ
+AstInterval *		T_ASTOBJ
 
 INPUT
 
@@ -56,7 +59,9 @@ T_WCSMAPINT
 	else
 	    Perl_croak(aTHX_ \"$var is not of type Starlink::AST::WcsMap\")
 T_ASTOBJ
-	if (sv_derived_from($arg, ntypeToClass(\"${ntype}\"))) {
+	if (!SvOK($arg)) {
+	  $var = AST__NULL;
+	} else if (sv_derived_from($arg, ntypeToClass(\"${ntype}\"))) {
 	    IV tmp = extractAstIntPointer( $arg );
 	    $var = INT2PTR($type,tmp);
 	}
