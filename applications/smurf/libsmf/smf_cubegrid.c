@@ -4,7 +4,7 @@
 *     smf_cubegrid
 
 *  Purpose:
-*     Calculate optimal values for the spatial projection parameters.
+*     Determine values for the spatial projection parameters.
 
 *  Language:
 *     Starlink ANSI C
@@ -70,12 +70,14 @@
 *        Pointer to inherited status.
 
 *  Description:
-*     This function finds the best values for the parameters describing
+*     This function finds the values to use for the parameters describing
 *     the projection between celestial (longitude,latitude) and the
-*     spatial pixel axes of the output cube.
+*     spatial pixel axes of the output cube. These are either obtained
+*     from the user via some environment parameters, or estimated
+*     automatically from the the distribution of input data points on the sky.
 *
 *     Also creates an output catalogue holding the sample positions. This
-*     uses ADAM parameter OUTCAT to get the name of the catalogue.
+*     uses environment parameter OUTCAT to get the name of the catalogue.
 
 *  Authors:
 *     David S Berry (JAC, UCLan)
