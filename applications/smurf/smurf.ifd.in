@@ -919,6 +919,15 @@ package @PACKAGE@ {
             helpkey *
          }
 
+	 parameter trim {
+	    type _LOGICAL
+	    vpath DEFAULT
+	    prompt {Trim the output cube to excluded unused detectors?}
+	    ppath CURRENT DEFAULT
+	    default TRUE
+	    helpkey *
+	  }
+
  	  parameter weights {
 	    type _LOGICAL
 	    vpath DEFAULT
