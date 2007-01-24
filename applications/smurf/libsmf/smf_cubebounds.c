@@ -41,7 +41,10 @@
 *     par = double[ 7 ] (Given)
 *        An array holding the parameters describing the spatial projection
 *        between celestial (longitude,latitude) in the system specified
-*        by "oskyframe", and GRID coordinates in the output cube. These are
+*        by "oskyframe", and an interim GRID coordinate system for the output 
+*        cube (interim because the bounds of the output cube are not yet
+*        known - the interim grid system is thus more like a PIXEL system
+*        for the output cube but with an arbitrary pixel origin). These are 
 *        stored in the order CRPIX1, CRPIX2, CRVAL1, CRVAL2, CDELT1, CDELT2, 
 *        CROTA2. The supplied values are used to produce the output WCS 
 *        FrameSet. All the angular parameters are in units of radians,
@@ -129,8 +132,9 @@
 *        - Restrict the output spectral ramge to the intersection of the
 *        input spectral ranges, rather than the union.
 *        - Ensure SPECBOUNDS values are used in the right order.
-*     23-JAN-2007 (DSB):
-*        Tell user about changes to CRPIX1/2 in autogrid=no mode.
+*     24-JAN-2007 (DSB):
+*        Change determination of output bounds and pixel origin so that
+*        the pixel origin is at the tangent point.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -191,7 +195,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    AstCmpFrame *cmpfrm = NULL;  /* Current Frame for output FrameSet */
    AstCmpMap *cmpmap = NULL;    /* Base -> Current Mapping for output FrameSet */
    AstCmpMap *ssmap = NULL;     /* I/p GRID-> o/p PIXEL Mapping for spectral axis */
-   AstCmpMap *totmap = NULL;   /* WCS->GRID Mapping from input WCS FrameSet */
+   AstCmpMap *totmap = NULL;    /* WCS->GRID Mapping from input WCS FrameSet */
    AstFitsChan *fc = NULL;      /* FitsChan used to construct spectral WCS */
    AstFitsChan *fct = NULL;     /* FitsChan used to construct time slice WCS */
    AstFrame *abskyframe = NULL; /* Output SkyFrame (always absolute) */
@@ -207,18 +211,18 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    AstMapping *ospecmap = NULL; /* Spec <> PIXEL mapping in output FrameSet */
    AstMapping *specmap = NULL;  /* PIXEL -> Spec mapping in input FrameSet */
    char *pname = NULL;   /* Name of currently opened data file */
-   const char *name;            /* Pointer to current detector name */
+   const char *name;     /* Pointer to current detector name */
    double *xin = NULL;   /* Workspace for detector input grid positions */
    double *xout = NULL;  /* Workspace for detector output pixel positions */
    double *yin = NULL;   /* Workspace for detector input grid positions */
    double *yout = NULL;  /* Workspace for detector output pixel positions */
-   double a;                    /* Longitude value */
-   double b;                    /* Latitude value */
+   double a;             /* Longitude value */
+   double b;             /* Latitude value */
    double dlbnd[ 3 ];    /* Floating point lower bounds for output cube */
    double dubnd[ 3 ];    /* Floating point upper bounds for output cube */
-   double ispecbounds[ 2 ];   /* Bounds of spectral axis in grid pixels */
-   double shift[ 3 ];    /* Shifts from PIXEL to GRID coords */
-   double specbounds[ 2 ];      /* Bounds of spectral axis in spectral WCS units */
+   double gshift[ 3 ];   /* Shifts from interim to final GRID coords */
+   double ispecbounds[ 2 ];/* Bounds of spectral axis in grid pixels */
+   double specbounds[ 2 ]; /* Bounds of spectral axis in spectral WCS units */
    double specin[ 2];    /* Spectral values to be transformed */
    double specout[ 2];   /* Transformed spectral values */
    double temp;          /* Temporary storage used when swapping values */
@@ -231,8 +235,6 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    int ishift;           /* Shift to put pixel origin at centre */
    int ispec;            /* Index of current spectral sample */
    int itime;            /* Index of current time slice */
-   int iwcsfrm;          /* Index of original output WCS Frame */
-   int npix;             /* Number of pixels along axis */
    int nval;             /* Number of values supplied */
    int pixax[ 3 ];       /* The output fed by each selected mapping input */
    int specax;           /* Index of spectral axis in input FrameSet */
@@ -392,7 +394,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
 /* Split off the 1D Mapping for this single axis from the 3D Mapping for
    the whole WCS. This results in "specmap" holding the Mapping from 
-   SpecFrame value to GRID value. */
+   SpecFrame value to interim GRID value. */
       fsmap = astGetMapping( fs, AST__CURRENT, AST__BASE );
       astMapSplit( fsmap, 1, &specax, pixax, &specmap );
       if( !specmap || astGetI( specmap, "Nout" ) != 1 ) {
@@ -405,13 +407,13 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
          break;
       }
 
-/* Invert the Mapping for the spectral axis so that it goes from GRID
+/* Invert the Mapping for the spectral axis so that it goes from interim GRID
    coord to spectral coord. */
       astInvert( specmap );
 
 /* The spectral axis of the output cube is inherited from the spectral axis
    of the first input file. So, if this is the first input file, initialise 
-   the bounds of the spectral GRID axis in the output cube. */
+   the interim GRID bounds of the spectral axis in the output cube. */
       if( !ospecframe ) {
          dlbnd[ 2 ] = 1.0;
          dubnd[ 2 ] = (data->dims)[ 0 ];
@@ -436,9 +438,9 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
             break;
 
 /* Otherwise, combine these Mappings to get the Mapping from the input 
-   spectral GRID axis to the output spectral PIXEL axis. Note, "ospecmap"
-   represents the Mapping from the output spectral WCS axis to the
-   corresponding output PIXEL axis. */
+   spectral interim GRID axis to the output spectral PIXEL axis. Note, 
+   "ospecmap" represents the Mapping from the output spectral WCS axis to 
+   the corresponding output interim GRID axis. */
          } else {
             ssmap = astCmpMap( astCmpMap( specmap, 
                                           astGetMapping( fs, AST__BASE,
@@ -448,9 +450,9 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
          }
 
-/* Use this Mapping to transform the first and last spectral GRID values
-   in the input into the corresponding values on the output spectral PIXEL
-   axis. */
+/* Use this Mapping to transform the first and last spectral values
+   in the input into the corresponding values on the output spectral
+   interim GRID axis. */
          specin[ 0 ] = 1.0;
          specin[ 1 ] = (data->dims)[ 0 ];
          astTran1( ssmap, 2, specin, 1, specout );
@@ -479,7 +481,8 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       xout = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
       yout = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
 
-/* Store the input GRID coords of the detectors. */
+/* Store the input "GRID" coords of the detectors. Thes are just the
+   detector index on axis 1 and a fixed value of 1 on axis 2. */
       for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
          xin[ irec ] = irec + 1.0;
          yin[ irec ] = 1.0;
@@ -503,11 +506,15 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
          smf_tslice_ast( data, itime, 1, status );
          swcsin = hdr->wcs;
 
-/* Create a FrameSet describing the WCS to be associated with the output 
-   cube unless this has already be done. */
+/* Create an interim FrameSet describing the WCS to be associated with the 
+   output cube unless this has already be done. It is described as
+   interim because the base Frame that describes the pixel grid coords is 
+   not yet finalised since we have not yet decided where the pixel origin 
+   will be. The pixel origin will be decided once the bounds of the data 
+   in the interim grid system have been found. */
          if( *wcsout == NULL && *status == SAI__OK ) { 
 
-/* The spectral Mapping (from GRID to SPECTRUM) and Frame (a SpecFrame)
+/* The spectral Mapping (from interim GRID to SPECTRUM) and Frame (a SpecFrame)
    are inherited from the first input file. */
             ospecframe = astClone( specframe );
             ospecmap = astClone( specmap );
@@ -518,8 +525,9 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
             }           
 
 /* Now populate a FitsChan with FITS-WCS headers describing the required 
-   tan plane projection. The longitude and latitude axis types are set to 
-   either (RA,Dec) or (AZ,EL) to get the correct handedness. The projection 
+   tan plane projection from interim grid coords to celestial longitude
+   and latitude. The longitude and latitude axis types are set to either 
+   (RA,Dec) or (AZ,EL) to get the correct handedness. The projection 
    parameters are supplied in "par". Convert from radians to degrees as 
    required by FITS. */
             if( !strcmp( astGetC( oskyframe, "System" ), "AZEL" ) ){
@@ -541,11 +549,11 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 	    astClear( fct, "Card" );
             fs = astRead( fct );
 
-/* Extract the output PIXEL->SKY Mapping. */
+/* Extract the interim GRID->SKY Mapping. */
             oskymap = astGetMapping( fs, AST__BASE, AST__CURRENT );
 
 /* Get a copy of the output SkyFrame and ensure it represents absolute
-   coords rathe rthan offset coords. */
+   coords rather than offset coords. */
             abskyframe = astCopy( oskyframe );
             astClear( abskyframe, "SkyRefIs" );
             astClear( abskyframe, "AlignOffset" );
@@ -554,32 +562,35 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    output cube WCS FrameSet. */
             cmpfrm = astCmpFrame( oskyframe, ospecframe, "" );
 
-/* Construct the corresponding Mapping (from PIXEL coords to the above
-   CmpFrame). The PIXEL origin on the spectral axis is 1, meaning that
-   GRID and PIXEL coords are equivalent for the spectral axis. */
+/* Construct the corresponding Mapping (from interim GRID coords to the 
+   above CmpFrame). */
             cmpmap = astCmpMap( oskymap, ospecmap, 0, "" );
 
 /* Create the returned output cube WCS FrameSet, initialising it to hold a 3D 
-   PIXEL Frame. A GRID Frame will be added later. */
-            *wcsout = astFrameSet( astFrame( 3, "Domain=PIXEL" ), "" );
+   GRID Frame, which represents interim GRID coords. This interim GRID
+   Frame will be re-mapped later (once the bounds of the output cube are
+   known) to represent actual GRID coords in the output cube, and a PIXEL
+   Frame will also be added which puts the PIXEL origin at the tangent
+   point. */
+            *wcsout = astFrameSet( astFrame( 3, "Domain=GRID" ), "" );
 
 /* Add the CmpFrame created above into the new FrameSet, using the above
-   Mapping to join it to the 3D PIXEL Frame already in the FrameSet. */
+   Mapping to join it to the 3D GRID Frame already in the FrameSet. */
             astAddFrame( *wcsout, AST__BASE, cmpmap, cmpfrm );
 
 /* For later convenience, invert "oskymap" so that it goes from output
-   (lon,lat) to output pixel coords. */
+   (lon,lat) to interim grid coords. */
             astInvert( oskymap );
 
 /* Also invert the output spectral Mapping so that it goes from output
-   spectral WCS value to output spectral grid value. */
+   spectral WCS value to output interim spectral grid value. */
             astInvert( ospecmap );
          }
 
-/* Find out how to convert from input GRID coords to the output sky frame.
-   Note, we want absolute sky coords here, even if the target is moving.
-   Record the original base frame before calling astConvert so that it can 
-   be re-instated later (astConvert modifies the base Frame). */
+/* Find out how to convert from input GRID coords (i.e. detetcor index) to 
+   the output sky frame. Note, we want absolute sky coords here, even if the 
+   target is moving. Record the original base frame before calling astConvert
+   so that it can be re-instated later (astConvert modifies the base Frame). */
          astInvert( swcsin );
          ibasein = astGetI( swcsin, "Base" );
          fs = astConvert( swcsin, abskyframe, "SKY" );
@@ -642,16 +653,17 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
 /* The output from "fs" now corresponds to the input to "oskymap",
    whether the target is moving or not. Combine the input GRID to output 
-   SKY Mapping with the output SKY to output pixel Mapping found earlier. */
+   SKY Mapping with the output SKY to output interim grid Mapping found 
+   earlier. */
          totmap = astCmpMap( fsmap, oskymap, 1, "" );
 
 /* Initialise a string to point to the name of the first detector for which 
    data is available */
          name = hdr->detname;
 
-/* Transform the positions of the detectors from input GRID to output PIXEL
-   coords. Then extend the bounds of the output cube on the spatial axes to 
-   accomodate the new positions. */
+/* Transform the positions of the detectors from input GRID to output
+   interim GRID coords. Then extend the bounds of the output cube on the 
+   spatial axes to accomodate the new positions. */
          astTran2( totmap, (data->dims)[ 1 ], xin, yin, 1, xout, yout );
          for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
 
@@ -679,7 +691,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                   }
                }         
 
-/* If it did, extend the bounding box to include the detector. */
+/* If it did, extend the interim grid bounding box to include the detector. */
                if( good ) {
                   if( xout[ irec ] > dubnd[ 0 ] ) dubnd[ 0 ] = xout[ irec ];
                   if( xout[ irec ] < dlbnd[ 0 ] ) dlbnd[ 0 ] = xout[ irec ];
@@ -744,10 +756,10 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    used as dynamic defaults for the SPECBOUNDS parameter. */
    kpg1Gtaxv( "SPECBOUNDS", 2, 1, ospecframe, 1, specbounds, &nval, status );
 
-/* Convert the supplied spectral values back to pixel coords. */
+/* Convert the supplied spectral values back to interim grid coords. */
    astTran1( ospecmap, 2, specbounds, 1, ispecbounds );
 
-/* Update the output bounds, keeping them in the right order. */
+/* Update the output interim grid bounds, keeping them in the right order. */
    if( ispecbounds[ 0 ] < ispecbounds[ 1 ] ) {
       dlbnd[ 2 ] = ispecbounds[ 0 ] ;
       dubnd[ 2 ] = ispecbounds[ 1 ] ;
@@ -756,71 +768,51 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       dlbnd[ 2 ] = ispecbounds[ 1 ] ;
    }   
 
-/* We now add a GRID Frame in the output WCS FrameSet and calculates the
-   bounds of the cube in this frame. If an optimal grid is being used, we 
-   want to retain the fractional pixel offset supplied in par[0]. We
-   do the spatial and spectral axes separately. First do the spatial axes. */
-   if( autogrid ) {
+/* Now we know the bounds of the output cube in interim GRID coords, we
+   can remap the GRID Frame in the output WCS FrameSet so that it
+   represents real GRID coords rather than interim grid coords, and we
+   can also add a PIXEL Frame. For the spatial axes, we choose the PIXEL 
+   origin so that the centre of pixel (1,1) (i.e. pixel coords (0.5,0.5) ) 
+   is at the tangent point specified by par[2] and par[3]. However, if an 
+   optimal grid is being used, then this is modified to retain the fractional 
+   pixel offsets included in par[0] and par[1]. First deal with causes
+   where we are not using an optimal grid. */
+   if( !autogrid ) {
 
-/* Find the indices of the pixels containing the DLBND and DUBND points. */
-      lbnd[ 0 ] = NINT( dlbnd[ 0 ] );
-      lbnd[ 1 ] = NINT( dlbnd[ 1 ] );
-      ubnd[ 0 ] = NINT( dubnd[ 0 ] );
-      ubnd[ 1 ] = NINT( dubnd[ 1 ] );
+/* We want the interim grid value of par[0] to correspond to an output pixel 
+   coord of 0.5. Therefore the upper bound in interim grid coords (i.e. 
+   dubnd[0]) will correspond to "dubnd[0]-par[0]+0.5" in pixel coords. This 
+   will fall in the pixel with index "ceil(dubnd[0]-par[0]+0.5)". Likewise
+   the lower bounds in interim grid coords will fall in the pixel with 
+   index "ceil(dlbnd[0]-par[0]+0.5)". These are the bounds of the output
+   cube in pixel indices. Calculate them now. */
+      lbnd[ 0 ] = ceil( dlbnd[ 0 ] - par[ 0 ] + 0.5 );
+      ubnd[ 0 ] = ceil( dubnd[ 0 ] - par[ 0 ] + 0.5 );
+      lbnd[ 1 ] = ceil( dlbnd[ 1 ] - par[ 1 ] + 0.5 );
+      ubnd[ 1 ] = ceil( dubnd[ 1 ] - par[ 1 ] + 0.5 );
 
-/* Find the integer pixel shifts needed to put the lower bounds at pixel
-   (1,1,1). */
-      shift[ 0 ] = 1 - lbnd[ 0 ];
-      shift[ 1 ] = 1 - lbnd[ 1 ];
+/* Calculate the shifts from interim grid to final grid coords. */
+      gshift[ 0 ] = 2.0 - par[ 0 ] - lbnd[ 0 ];
+      gshift[ 1 ] = 2.0 - par[ 1 ] - lbnd[ 1 ];
 
-/* Modify the bounds to put the origin at the centre */
-      ishift = 1 + ( ubnd[ 0 ] + lbnd[ 0 ] )/2;
-      lbnd[ 0 ] -= ishift;
-      ubnd[ 0 ] -= ishift;
-   
-      ishift = 1 + ( ubnd[ 1 ] + lbnd[ 1 ] )/2;
-      lbnd[ 1 ] -= ishift;
-      ubnd[ 1 ] -= ishift;
-   
-/* Otherwise, we mimick the quick look cube creation tool. */
+/* Now deal with causes where we are using an optimal grid. In this case
+   the fractional part of the supplied par[0] value will indicate where
+   about within the central pixel the tangent point is to be put. Since
+   par[0] is a *grid* value, a fractional part of zero means that the
+   tangent point should be put at the centre of the pixel, which has a
+   pixel coord of 0.5. So to get the pixel coord at the tanegt point, we 
+   need to add on 0.5 to the fractional part of par[0]. */
    } else {
 
-/* Find the number of pixels needed to span the X pixel axis range. */
-      npix = 1 + (int)( dubnd[ 0 ] - dlbnd[ 0 ] );
+/* Calculate the pixel index bounds. */      
+      lbnd[ 0 ] = ceil( dlbnd[ 0 ] - NINT( par[ 0 ] ) + 0.5 );
+      ubnd[ 0 ] = ceil( dubnd[ 0 ] - NINT( par[ 0 ] ) + 0.5 );
+      lbnd[ 1 ] = ceil( dlbnd[ 1 ] - NINT( par[ 1 ] ) + 0.5 );
+      ubnd[ 1 ] = ceil( dubnd[ 1 ] - NINT( par[ 1 ] ) + 0.5 );
 
-/* Find a fractional pixel shift which puts the mid point of the axis
-   range at the mid point of a span of "npix" pixels. */
-      shift[ 0 ] = 0.5*( 1 + npix - dlbnd[ 0 ] - dubnd[ 0 ] );
-
-/* Find the upper and lower integer bounds after applying this shift. */
-      lbnd[ 0 ] = NINT( dlbnd[ 0 ] + shift[ 0 ] );
-      ubnd[ 0 ] = NINT( dubnd[ 0 ] + shift[ 0 ] );
-
-/* Do the same for the second spatial axis. */
-      npix = 1 + (int)( dubnd[ 1 ] - dlbnd[ 1 ] );
-      shift[ 1 ] = 0.5*( 1 + npix - dlbnd[ 1 ] - dubnd[ 1 ] );
-      lbnd[ 1 ] = NINT( dlbnd[ 1 ] + shift[ 1 ] );
-      ubnd[ 1 ] = NINT( dubnd[ 1 ] + shift[ 1 ] );
-
-/* Tell the user about the new CRPIX values. */
-      if( shift[ 0 ] != 0.0 || shift[ 1 ] != 0.0 ) {
-         msgOutif( MSG__VERB, " ", " ", status );
-         msgOutif( MSG__VERB, " ", "   The CRPIX1/2 values are being changed to the following values:", status );
-         msgSetr( "CRPIX1", (float)( par[ 0 ] + shift[ 0 ] ) );
-         msgOutif( MSG__VERB, " ", "      New CRPIX1 = ^CRPIX1", status );
-         msgSetr( "CRPIX2", (float)( par[ 1 ] + shift[ 1 ] ) );
-         msgOutif( MSG__VERB, " ", "      New CRPIX2 = ^CRPIX2", status );
-      }
-
-/* Modify the bounds to put the origin in the middle, using the same method as
-   the on-line system (this relies on integer division). */
-      ishift = 2 + ( ubnd[ 0 ] - lbnd[ 0 ] )/2;
-      lbnd[ 0 ] -= ishift;
-      ubnd[ 0 ] -= ishift;
-   
-      ishift = 2 + ( ubnd[ 1 ] - lbnd[ 1 ] )/2;
-      lbnd[ 1 ] -= ishift;
-      ubnd[ 1 ] -= ishift;
+/* Calculate the shifts from interim grid to final grid coords. */
+      gshift[ 0 ] = 2.0 - NINT( par[ 0 ] ) - lbnd[ 0 ];
+      gshift[ 1 ] = 2.0 - NINT( par[ 1 ] ) - lbnd[ 1 ];
    }
 
 /* Now do the spectral axis. Find the indices of the pixels containing the 
@@ -830,27 +822,16 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
 /* Find the integer pixel shifts needed to put the lower bounds at pixel
    (1,1,1). */
-   shift[ 2 ] = 1 - lbnd[ 2 ];
+   gshift[ 2 ] = 1 - lbnd[ 2 ];
 
 /* Modify the bounds to put the origin at the centre */
    ishift = 1 + ( ubnd[ 2 ] + lbnd[ 2 ] )/2;
    lbnd[ 2 ] -= ishift;
    ubnd[ 2 ] -= ishift;
 
-/* Now apply the shift to the PIXEL Frame to get the GRID Frame. Remember the 
-   index of the WCS Frame so we can re-instate it after adding in the new 
-   GRID Frame. */
-   iwcsfrm = astGetI( *wcsout, "Current" );
-   astAddFrame( *wcsout, AST__BASE, astShiftMap( 3, shift, "" ),
-                                    astFrame( 3, "Domain=GRID") );
-
-/* Make the new GRID Frame the base Frame and then re-instate the
-   original current Frame. */
-   astSetI( *wcsout, "Base", astGetI( *wcsout, "Current" ) );
-   astSetI( *wcsout, "Current", iwcsfrm );
-
-/* We now erase the original PIXEL Frame since it is no longer needed. */
-   astRemoveFrame( *wcsout, 1 );
+/* Now remap the interrim GRID Frame in the returned FrameSet so that it
+   represent actual GRID coords in the output cube. */
+   astRemapFrame( *wcsout, AST__BASE, astShiftMap( 3, gshift, "" ) );
 
 /* Report the pixel bounds of the cube. */
    if( *status == SAI__OK ) {
