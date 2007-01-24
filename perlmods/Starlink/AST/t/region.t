@@ -1,7 +1,7 @@
 #!perl
 
 use strict;
-use Test::More tests => 10;
+use Test::More tests => 11;
 
 require_ok( "Starlink::AST" );
 
@@ -39,3 +39,8 @@ is( $circle->Overlap( $obsArea2 ), 1,"Outside Circular area");
 is( $box->Overlap( $obsArea2 ), 1,"Outside Box area");
 is( $int->Overlap( $obsArea2 ), 1,"Outside Interval");
 is( $ellipse->Overlap( $obsArea2 ), 1,"Outside Ellipse");
+
+# Create a compound region
+
+isa_ok( $circle->CmpRegion( $box, Starlink::AST::Region::AST__AND(), "" ),
+	"Starlink::AST::CmpRegion" );

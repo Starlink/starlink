@@ -3107,11 +3107,13 @@ new( class, frame, unc, options )
  OUTPUT:
   RETVAL
 
-MODULE = Starlink::AST   PACKAGE = Starlink::AST::CmpRegion
+MODULE = Starlink::AST   PACKAGE = Starlink::AST::Region	PREFIX = ast
+
+# Note that we are trying to make this a method in the Region base class
+# so that all regions can be converted into CmpRegions
 
 AstCmpRegion *
-new( class, region1, region2, oper, options )
-  char * class
+astCmpRegion( region1, region2, oper, options )
   AstRegion * region1
   AstRegion * region2
   int oper
@@ -3127,6 +3129,29 @@ new( class, region1, region2, oper, options )
 #endif
  OUTPUT:
   RETVAL
+
+int
+AST__AND()
+ CODE:
+#ifdef AST__AND
+    RETVAL = AST__AND;
+#else
+    Perl_croak(aTHX_ "Constant AST__AND not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+int
+AST__OR()
+ CODE:
+#ifdef AST__OR
+    RETVAL = AST__OR;
+#else
+    Perl_croak(aTHX_ "Constant AST__OR not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
 
 
 MODULE = Starlink::AST   PACKAGE = Starlink::AST::Circle
