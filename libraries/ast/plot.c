@@ -608,6 +608,9 @@ f     - Title: The Plot title drawn using AST_GRID
 *        by PWD). Currently this attribute is not included in the public
 *        documentation, as it may cause problems. If it seems to work OK
 *        then it can be made public.
+*     25-JAN-2006 (DSB)
+*        Do not draw ticks marks that start outside the bounds of the
+*        axis they are labelling.
 *class--
 */
 
@@ -23914,36 +23917,43 @@ static void Ticker( AstPlot *this, int edge, int axis, double value,
             if( this->xrev ) *vx = -*vx;
             if( this->yrev ) *vy = -*vy;
 
+/* Do not draw the tick if the start of the tick is outside the bounds of
+   the axis it is labelling. */
+            if( ( ( edge == 1 || edge == 3 ) && 
+                   *x < this->xhi && *x > this->xlo ) ||
+                ( ( edge == 0 || edge == 2 ) && 
+                   *y < this->yhi && *y > this->ylo ) ) {
+
 /* Store the x and y graphics coords of the far end of the tick mark */
-            xe = *x + tklen*(*vx);
-            ye = *y + tklen*(*vy);
+               xe = *x + tklen*(*vx);
+               ye = *y + tklen*(*vy);
 
 /* Ensure the far end of the tick mark is within the bounds of the axis
    it is labelling. If not, redice the length of the tick mark until it is.*/
-            if( edge == 1 || edge == 3 ) {  /* Top or bottom edge */
-               if( xe > this->xhi ) {
-                  ye = *y + tklen*(*vy)*( this->xhi - *x )/(xe - *x );
-                  xe = this->xhi;
-               } else if( xe < this->xlo ) {
-                  ye = *y + tklen*(*vy)*( this->xlo - *x )/(xe - *x );
-                  xe = this->xlo;
+               if( edge == 1 || edge == 3 ) {  /* Top or bottom edge */
+                  if( xe > this->xhi ) {
+                     ye = *y + tklen*(*vy)*( this->xhi - *x )/(xe - *x );
+                     xe = this->xhi;
+                  } else if( xe < this->xlo ) {
+                     ye = *y + tklen*(*vy)*( this->xlo - *x )/(xe - *x );
+                     xe = this->xlo;
+                  }
+   
+               } else {                        /* Left or right edge */
+                  if( ye > this->yhi ) {
+                     xe = *x + tklen*(*vx)*( this->yhi - *y )/(ye - *y );
+                     ye = this->yhi;
+                  } else if( ye < this->ylo ) {
+                     xe = *x + tklen*(*vx)*( this->ylo - *y )/(ye - *y );
+                     ye = this->ylo;
+                  }
                }
-
-            } else {                        /* Left or right edge */
-               if( ye > this->yhi ) {
-                  xe = *x + tklen*(*vx)*( this->yhi - *y )/(ye - *y );
-                  ye = this->yhi;
-               } else if( ye < this->ylo ) {
-                  xe = *x + tklen*(*vx)*( this->ylo - *y )/(ye - *y );
-                  ye = this->ylo;
-               }
-            }
-
 
 /* Draw the tick mark as a straight line of the specified length. */
-            Bpoly( this, (float) *x, (float) *y, method, class );
-            Apoly( this, (float) xe, (float) ye, method, class );
-            Opoly( this, method, class );
+               Bpoly( this, (float) *x, (float) *y, method, class );
+               Apoly( this, (float) xe, (float) ye, method, class );
+               Opoly( this, method, class );
+            }
                
 /* Move on to the next crossing. */
             x += 4;
