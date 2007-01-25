@@ -7,6 +7,18 @@
  data arrays.
 
 
+Changes introduced at V0.0-22:
+
+ - Added new program parameter LOGFILE which can be used to create a text
+   log file containing clump values and parameter values.
+ - Added new program parameter WCSPAR which can be set TRUE ot get a
+   catalogue containing positions and sizes in WCS coordinates rather than
+   pixel coordinates.
+ - The configuration parameter GaussClumps.ExtraCOls can be set to 1 to
+   get additional GaussClumps-specific columns in the output catalogue.
+ - The parameters used (both configuration and ADAM) are now recorded in the
+   HISTORY section of the output catalogue.
+
 Changes introduced at V0.0-21:
 
  - Added new program parameter DECONV which can be set FALSE in order to
@@ -15,7 +27,7 @@ Changes introduced at V0.0-21:
 
 Changes introduced at V0.0-20:
 
- - Introduction of a new command calledFINDBACK, which uses spatial 
+ - Introduction of a new command called FINDBACK, which uses spatial 
    filtering to remove small-scale structure from the input NDF, thus 
    producing an estimate of the background within the NDF.
 

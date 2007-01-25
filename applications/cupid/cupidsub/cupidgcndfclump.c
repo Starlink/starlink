@@ -150,6 +150,7 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
    HDSLoc *cloc;                /* Cell locator */
    HDSLoc *dloc;                /* Component locator */
    HDSLoc *xloc;                /* Extension locator */
+   HDSLoc *exloc;               /* Locator for structure holding extra info */
    const char *key;             /* KeyMap key name */
    double *ipd;                 /* Pointer to Data array */
    double *m;                   /* Pointer to next data value */
@@ -342,16 +343,22 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
       
 /* Now store any extra diagnostic information. */
       if( extra ) {
+         datNew( xloc, "EXTRA", "EXTRA", 0, NULL, status );
+         datFind( xloc, "EXTRA", &exloc, status );
+
          nex = astMapSize( extra );
          for( i = 0; i < nex; i++ ) {
             key = astMapKey( extra, i );
             if( astMapGet0D( extra, key, &dval ) ) {
-               datNew( xloc, (char *) key, "_DOUBLE", 0, NULL, status );
-               datFind( xloc, (char *) key, &dloc, status );
+               datNew( exloc, (char *) key, "_DOUBLE", 0, NULL, status );
+               datFind( exloc, (char *) key, &dloc, status );
                datPutD( dloc, 0, NULL, &dval, status );
                datAnnul( &dloc, status );
             }
          }
+
+         datAnnul( &exloc, status );
+
       }
 
 /* Release the extension locator. */

@@ -1,11 +1,22 @@
 #include "sae_par.h"
 #include "cupid.h"
 #include "ndf.h"
+#include "star/hds.h"
 #include "prm_par.h"
 #include <math.h>
+#include <string.h>
 
-double *cupidClumpDesc( int indf, int deconv, double beamcorr[ 3 ], 
-                        double *cpars, const char ***names, int *ncpar, 
+/* The maximum number of columns in the catalogue */
+#define MXPAR 30
+
+/* The maximum length of a column name. */
+#define MXNAMLEN 30
+
+
+double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap, 
+                        AstFrame *wcsfrm, const char *dataunits,
+                        double beamcorr[ 3 ], double *cpars, 
+                        const char ***names, const char ***units, int *ncpar, 
                         int *ok, int *status ){
 /*
 *+
@@ -19,9 +30,11 @@ double *cupidClumpDesc( int indf, int deconv, double beamcorr[ 3 ],
 *     Starlink C
 
 *  Synopsis:
-*     double *cupidClumpDesc( int indf, int deconv, double beamcorr[ 3 ], 
-*                             double *cpars, const char ***names, int *ncpar, 
-*                             int *ok, int *status )
+*     double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap, 
+*                             AstFrame *wcsfrm, const char *dataunits,
+*                             double beamcorr[ 3 ], double *cpars, 
+*                             const char ***names, const char ***units, 
+*                             int *ncpar, int *ok, int *status ){
 
 *  Description:
 *     This function calculates the parameters describing a single clump,
@@ -29,34 +42,49 @@ double *cupidClumpDesc( int indf, int deconv, double beamcorr[ 3 ],
 *     NDF has "n" pixel axes, the parameters are returned in the following 
 *     order:
 *
-*        0  - (n-1) : The pixel coords of the clump peak value
-*        n  - (2n-1): The pixel coords of the clump centroid
-*        2n - (3n-1): The clump size (in pixels) on each pixel axis. This is 
-*                     the standard deviation of the pixel axis value about the 
-*                     centroid position, weighted by the pixel values, then 
-*                     corrected to remove the effect of the instrumental 
-*                     smoothing specified in "beamcorr" (but only if
-*                     "deconv" is non-zero).
+*        0  - (n-1) : The pixel or WCS coords of the clump peak value
+*        n  - (2n-1): The pixel or WCS coords of the clump centroid
+*        2n - (3n-1): The clump size (in pixels or WCS units) on each axis. 
+*                     This is the standard deviation of the pixel axis value 
+*                     about the centroid position, weighted by the pixel 
+*                     values, then corrected to remove the effect of the 
+*                     instrumental smoothing specified in "beamcorr" (but 
+*                     only if "deconv" is non-zero).
 *        3n         : The total data value in the clump
 *        3n + 1     : The peak value in the clump. If "deconv" is non-zero, 
 *                     this will be larger than the peak data value by a factor 
 *                     determined by the "beamcorr" values, to take account 
 *                     of the lowering of the peak value caused by the 
 *                     instrumental smoothing.
-*        3n + 2     : The total number of pixels within the clump.
+*        3n + 2     : The total volume of the clump (in pixels or WCS units).
+*
+*     If the supplied NDF has a CUPID extension, then the names of the
+*     components within the CUPID extension are used as additional column
+*     names, following the above names. All components in the CUPID extension 
+*     should be scalar primitive numerical values.
 
 *  Parameters:
 *     indf
 *        Identifier for an NDF holding the data values associated with
 *        the clump. Any pixels which are not part of the clump should be
-*        set bad. 
+*        set bad.
 *     deconv
-*        If non-zero then the clump proprties values stored in the
+*        If non-zero then the clump property values stored in the
 *        catalogue and NDF are modified to remove the smoothing effect 
 *        introduced by the beam width. If zero, the undeconvolved values
 *        are stored in the output catalogue and NDF. Note, the filter to 
 *        remove clumps smaller than the beam width is still applied, even
 *        if "deconv" is zero.
+*     wcsmap
+*        If the output catalogue is to contain values in pixels
+*        coordinates, then a NULL pointer should be supplied for "wcsmap". 
+*        Otherwise, a pointer to a Mapping from the input PIXEL Frame to
+*        the WCS Frame should be supplied.
+*     wcsfrm
+*        A pointer to the current Frame in the WCS FrameSet of the input
+*        NDF. Ignored if "wcsmap" is NULL.
+*     dataunits
+*        The units string describing the data units in the input NDF.
 *     beamcorr
 *        An array holding the FWHM (in pixels) describing the instrumental 
 *        smoothing along each pixel axis. If "deconv" is non-zero, the clump 
@@ -72,6 +100,12 @@ double *cupidClumpDesc( int indf, int deconv, double beamcorr[ 3 ],
 *        of constant character strings. The number of pointers returned in 
 *        this array will be returned in "*ncpar". Each string is the name
 *        associated with the corresponding parameter value returned in "cpars".
+*     units
+*        Pointer to a location at which to return a pointer to an array
+*        of constant character strings. The number of pointers returned in 
+*        this array will be returned in "*ncpar". Each string is the unit
+*        associated with the corresponding parameter value returned in
+*        "cpars", and may be blank.
 *     ncpar
 *        Pointer to an int in which to return the number of parameters
 *        describing the clump.
@@ -117,6 +151,8 @@ double *cupidClumpDesc( int indf, int deconv, double beamcorr[ 3 ],
 *        Original version.
 *     11-DEC-2006 (DSB):
 *        Added parameter "deconv".
+*     16-DEC-2006 (DSB):
+*        Added parameters "wcsmap", "wcsfrm", "dataunits" and "units".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -126,14 +162,22 @@ double *cupidClumpDesc( int indf, int deconv, double beamcorr[ 3 ],
 */
 
 /* Local Variables: */
-
+   AstFrame *axfrm;         /* 1D Frame containing current Axis only */
+   HDSLoc *cloc=NULL;       /* Locator to component of CUPID extension */
+   HDSLoc *xloc=NULL;       /* Locator to CUPID extension */
+   HDSLoc *loc=NULL;        /* Locator to object holding extra column values */
+   char *vu;                /* Pointers to volume unit concatenation point */
    double *ipd;             /* Pointer to start of data array */
    double *pd;              /* Pointer to next element of data array */
    double *ret;             /* Returned list of parameters */
+   double csw;              /* Clump size in WCS units */
    double d;                /* Height above background */
    double dmax;             /* Max value in data array */
    double dmin;             /* Min value in data array */
+   double outlier[ 3 ];     /* Offset position */
    double peakfactor;       /* Factor by which to increase the peak value */
+   double pixpos[ 3 ][ 5 ]; /* Pixel coord positions */
+   double pixvol;           /* Volume of 1 cubic pixel in WCS units */
    double s;                /* Sum of weights */
    double sx2;              /* Sum of weighted squared X pixel indices */
    double sx;               /* Sum of weighted X pixel indices */
@@ -143,19 +187,29 @@ double *cupidClumpDesc( int indf, int deconv, double beamcorr[ 3 ],
    double sz;               /* Sum of weighted Z pixel indices */
    double v0;               /* Variance before corr'n for instrumental blurring */
    double v;                /* Variance after corr'n for instrumental blurring */
+   double wcspos[ 3 ][ 5 ]; /* WCS coord positions */
    int i;                   /* Pixel index on 1st pixel axis */
+   int icol;                /* Index into returned column arrays */
+   int icomp;               /* Index into CUPID extension */
    int j;                   /* Pixel index on 2nd pixel axis */
    int k;                   /* Pixel index on 3rd pixel axis */
    int lbnd[ 3 ];           /* Lower NDF pixel bounds */   
    int n;                   /* Number of good pixels indices */
+   int ncomp;               /* No. of components in the CUPID extension */
    int ndim;                /* Number of pixel axes */   
    int nel;                 /* Number of elements in mapped array */
    int px;                  /* X pixel index at peak value */
    int py;                  /* Y pixel index at peak value */
    int pz;                  /* Z pixel index at peak value */
+   int skyaxis[ 3 ];        /* Flags indicating which axes are skyaxes */
+   int there;               /* Has the NDF got a CUPID extension? */
    int ubnd[ 3 ];           /* Upper NDF pixel bounds */   
 
-   static const char *pnames[ 10 ];/* Parameter names to return */
+   static const char *pnames[ MXPAR ];  /* Parameter names to return */
+   static char name_buf[ MXPAR ][ MXNAMLEN ];/* Buffers for parameter names */
+   static const char *punits[ MXPAR ];  /* Parameter units to return */
+   static char unit_buf[ 3 ][ 20 ];  /* Buffers for units strings */
+   static char volunit_buf[ 60 ];    /* Buffer for volume units string */
 
 /* Initialise. */
    ret = cpars;
@@ -167,37 +221,151 @@ double *cupidClumpDesc( int indf, int deconv, double beamcorr[ 3 ],
 /* Get the bounds of the NDF. */
    ndfBound(  indf, 3, lbnd, ubnd, &ndim, status );
 
+/* If the NDF has a CUPID extension, get a locator to it and see if it
+   contains an EXTRA structure. If so get a locator to it. */
+   ndfXstat( indf, "CUPID", &there, status ); 
+   if( there ) {
+      ndfXloc( indf, "CUPID", "READ", &xloc, status );
+      datThere( xloc, "EXTRA", &there, status ); 
+      if( there ) datFind( xloc, "EXTRA", &loc, status );
+   }
+
 /* If no pointer was supplied, do some initialisation. */
    if( !ret ) {
 
-/* Determine the number of parameters needed to describe the clump. */
-      *ncpar = ndim*3 + 3; 
+/* If the NDF has extra columns in its CUPID extension, get a count of the 
+   components within it. Limit the number so that we do not have too many 
+   catalogue columns. */
+      if( loc ) {
+         datNcomp( loc, &ncomp, status );
+         if( ncomp + ndim*3 + 3 > MXPAR ) ncomp = MXPAR - ndim*3 - 3;
+      } else {
+         ncomp = 0;
+      }
+
+/* Determine the number of parameters needed to describe the clump. This
+   includes the diagnostic values in the CUPID extension. */
+      *ncpar = ndim*3 + 3 + ncomp; 
 
 /* Allocate memory for this number of parameters. */
       ret = astMalloc( sizeof( double )*( *ncpar ) );
 
-/* Store the parameter names. */ 
-      pnames[ 0 ] = "PeakX";
-      pnames[ ndim ] = "CenX";
-      pnames[ 2*ndim ] = "SizeX";
+/* Now create the parameter names. */ 
+      pnames[ 0 ] = "Peak1";
+      if( ndim > 1 ) pnames[ 1 ] = "Peak2";
+      if( ndim > 2 ) pnames[ 2 ] = "Peak3";
 
-      if( ndim > 1 ) {
-         pnames[ 1 ] = "PeakY";
-         pnames[ 1 + ndim ] = "CenY";
-         pnames[ 1 + 2*ndim ] = "SizeY";
+      pnames[ ndim ] = "Cen1";
+      if( ndim > 1 ) pnames[ 1 + ndim ] = "Cen2";
+      if( ndim > 2 ) pnames[ 2 + ndim ] = "Cen3";
 
-         if( ndim > 2 ) {
-            pnames[ 2 ] = "PeakZ";
-            pnames[ 2 + ndim ] = "CenZ";
-            pnames[ 2 + 2*ndim ] = "SizeZ";
-         }
-      }
-       
+      pnames[ 2*ndim ] = "Size1";
+      if( ndim > 1 ) pnames[ 1 + 2*ndim ] = "Size2";
+      if( ndim > 2 ) pnames[ 2 + 2*ndim ] = "Size3";
+
       pnames[ 3*ndim ] = "Sum";
       pnames[ 1 + 3*ndim ] = "Peak";
-      pnames[ 2 + 3*ndim ] = "Area";
+      pnames[ 2 + 3*ndim ] = "Volume";
 
+/* Store the extra column names taken from the CUPID extension. */
+      icol = 2 + 3*ndim + 1;
+      for( icomp = 1; icomp <= ncomp && *status == SAI__OK; icomp++, icol++ ) {
+         datIndex( loc, icomp, &cloc, status );
+         datName( cloc, name_buf[ icol ], status );
+         pnames[ icol ] = name_buf[ icol ];
+
+         for( j = 0; j < icol && *status == SAI__OK; j++ ) {
+
+            if( astChrMatch( pnames[ icol ], pnames[ j ] ) ) {
+               *status = SAI__ERROR;
+               msgSetc( "NM", pnames[ icol ] );
+               errRep( "", "Column name ^NM already in use (programming "
+                       "error).", status );
+               break;
+            }
+         }
+
+         datAnnul( &cloc, status );
+      }
+
+/* Return a pointer to the array. */
       *names = pnames;
+
+/* Now store the parameter units. First, initialise a pointer to the place 
+   at which to store the next units string within the total units string 
+   describing the clump volume. */
+      vu = volunit_buf;
+
+/* Store the parameter units. First deal with cases where catalogue
+   columns use WCS units. */ 
+      if( wcsmap ) {
+
+/* Loop round all pixel axes (it is assumed that there are the same
+   number of WCS axes). */
+         for( i = 1; ( i <= ndim ) && astOK; i++ ) {
+
+/* We want the Domain associated with the current axis, but since the
+   current Frame may be a CmpFrame with its own (different) domain name, 
+   we need to first extract the current axis from the WCS Frame. */
+            axfrm = astPickAxes( wcsfrm, 1, &i, NULL );
+
+/* Copy the axis unit into a local buffer since AST will re-use its
+   internal buffer in which astGetC returns the attribute value. */
+            strcpy( unit_buf[ i - 1 ], astGetC( axfrm, "Unit" ) );
+
+/* The two clump positions are specified in these units. */
+            punits[ i - 1 ] = unit_buf[ i - 1 ];
+            punits[ i - 1 + ndim ] = unit_buf[ i - 1 ];
+
+/* The clump size will also be specified in these units unless the axis
+   is a sky axis in which case the size will be specified in arc-seconds. */
+            if( !strcmp( "SKY", astGetC( axfrm, "Domain" ) ) ) {
+               skyaxis[ i - 1 ] = 1;
+               punits[ i - 1 + 2*ndim ] = "arcsec";
+            } else {
+               skyaxis[ i - 1 ] = 0;
+               punits[ i - 1 + 2*ndim ] = unit_buf[ i - 1 ];
+            }
+
+/* Append the "size" unit to the end of the volume unit string, followed
+   by a dot if this is not the last axis. */
+            strcpy( vu, punits[ i - 1 + 2*ndim ] );
+            vu += strlen( punits[ i - 1 + 2*ndim ] );
+            if( i != ndim ) {
+               strcpy( vu, "." );
+               vu++;
+            }
+         }
+
+/* Now deal with cases where the output catalogue contains column values in 
+   units of pixels. */
+      } else {
+         for( i = 0; i < ndim; i++ ) {
+            punits[ i ] = "pixel";
+            punits[ i + ndim ] = "pixel";
+            punits[ i + 2*ndim ] = "pixel";
+
+            strcpy( vu, "pixel" );
+            vu += 5;
+            if( i != ndim ) {
+               strcpy( vu, "." );
+               vu++;
+            }
+         }
+      }
+
+/* Store the data units. */
+      punits[ 3*ndim ] = dataunits;
+      punits[ 1 + 3*ndim ] = dataunits;
+
+/* Store the volume units. */
+      punits[ 2 + 3*ndim ] = volunit_buf;
+
+/* Store extra blank units strings for the components of the CUPID extension. */
+      for( icol = 2 + 3*ndim + 1; icol < *ncpar; icol++ ) punits[ icol ] = "";
+
+/* Return a pointer to the array of units strings. */
+      *units = punits;
    }
 
 /* Map the NDF data array */
@@ -274,7 +442,7 @@ double *cupidClumpDesc( int indf, int deconv, double beamcorr[ 3 ],
          }
       }
 
-/* Calculate and store the clump parameters */
+/* Calculate and store the clump parameters, using pixel units initially. */
       if( s != 0 ) {
          ret[ 0 ] = px - 0.5;
          ret[ ndim ] = sx/s;
@@ -359,7 +527,77 @@ double *cupidClumpDesc( int indf, int deconv, double beamcorr[ 3 ],
       ret[ 3*ndim + 1 ] = dmax*( (peakfactor > 0.0) ? sqrt( peakfactor ) : 1.0 );
       ret[ 3*ndim + 2 ] = n;
 
+/* If required, convert the parameter values from pixel units to WCS
+   units. */
+      if( wcsmap ) {
+
+/* Collect a set of pixel positions to be transformed into WCS coords.
+   The first is the peak position, the second is the centroid position.
+   The next "ndim" positions are offset away from the peak position along
+   each of the "ndim" pixel axes, the displacement along each pixel axis
+   being the "size" on that axis. */
+         for( i = 0; i < ndim; i++ ) {
+            pixpos[ i ][ 0 ] = ret[ i ];
+            pixpos[ i ][ 1 ] = ret[ ndim + i ];
+            pixpos[ i ][ 2 ] = ret[ i ];
+            pixpos[ i ][ 3 ] = ret[ i ];
+            pixpos[ i ][ 4 ] = ret[ i ];
+         }
+
+         for( i = 0; i < ndim; i++ ) {
+            pixpos[ i ][ i + 2 ] += ret[ 2*ndim + i ];
+         }
+
+/* Transform these positions into WCS coords. */
+         astTranN( wcsmap, ndim + 2, ndim, 5, (double *) pixpos, 1, ndim, 5, 
+                   (double *) wcspos );
+
+/* Store the peak and centroid WCS positions in the returned array. */
+         for( i = 0; i < ndim; i++ ) {
+            ret[ i ] = wcspos[ i ][ 0 ];
+            ret[ ndim + i ] = wcspos[ i ][ 1 ];
+         }
+
+/* Normalise them. */
+         astNorm( wcsfrm, ret );
+         astNorm( wcsfrm, ret + ndim );
+
+/* For each pixel axis, find the WCS distance between the transformed
+   peak position (currently held at the start of "ret"), and the transformed 
+   outlier position, and store in the returned array (converting sky axes
+   from radians to arc-seconds). Also calculate the volume of 1 cubic pixel 
+   in WCS units. */
+         pixvol = 1.0;
+         for( i = 0; i < ndim; i++ ) {
+            for( j = 0; j < ndim; j++ ) outlier[ j ] = wcspos[ j ][ 2 + i ];
+            csw = astDistance( wcsfrm, ret, outlier );
+            if( skyaxis[ i ] ) csw *= AST__DR2D*3600.0;
+            pixvol *= csw/ret[ 2*ndim + i ];
+            ret[ 2*ndim + i ] = csw;
+         }
+
+/* Scale the clump volume from cubic pixel into WCS units. */
+         ret[ 3*ndim + 2 ] *= pixvol;
+
+      }
    }
+
+/* If there is a CUPID extension, store the values of its components at
+   the end of the returned array, and then annul the locator, and then
+   delete the object holding the extra column values. */
+   if( loc ) {
+      icol = 2 + 3*ndim + 1;
+      for( icomp = 1; icomp <= ncomp && *status == SAI__OK; icomp++, icol++ ) {
+         datIndex( loc, icomp, &cloc, status );
+         datGet0D( cloc, ret + icol , status );
+         datAnnul( &cloc, status );
+      }
+      datAnnul( &loc, status );
+      datErase( xloc, "EXTRA", status );
+   }
+
+/* Annul the CUPID extension locator */
+   if( xloc ) datAnnul( &xloc, status );
 
 /* Unmap the NDF data array */
    ndfUnmap(  indf, "Data", status );
@@ -368,3 +606,4 @@ double *cupidClumpDesc( int indf, int deconv, double beamcorr[ 3 ],
    return ret;
 
 }
+

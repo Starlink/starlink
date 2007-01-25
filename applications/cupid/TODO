@@ -1,28 +1,31 @@
 25/9/06:
-   - Provide an option to re-apply the beam width smoothing to the results 
-   returned in the catalogue.
+   - Provide an option to re-apply the beam width smoothing to the
+   results returned in the catalogue. [Done]
 
-   - Option to include extra method-specific columns in the output catalogue.
+   - Option to include extra method-specific columns in the output
+   catalogue. [Done]
+
 
 19/5/06:
 
    - Provide spatial filtering to remove all spatial structure with scale
    length greater than a user-specified value (do not apply filtering in
-   spectral axis).
-   
+   spectral axis). [done]
+
    - A command to outline a specified clump on a 2D displayed image
    
    - Add some sort of clump orientation column
-   
-   - Include output columns that give clump positions and sizes in WCS units
-   
+
+   - Include output columns that give clump positions and sizes in WCS
+   units. [Done]
+
    - Have an option to apply the cellular automata to clean up clumps found
    by clumpfind.
    
    - Include used parameter values in the output catalogue (as catalogue
-   parameters)
+   parameters). [Done]
    
-   - Create a textual log file including a table of clump parameters
+   - Create a textual log file including a table of clump parameters. [Done]
 
 
 

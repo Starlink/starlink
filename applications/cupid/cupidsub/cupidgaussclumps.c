@@ -186,7 +186,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int allbad;          /* Are all the residuals bad? */
    int area;            /* Number of pixels contributing to the clump */
    int area_thresh;     /* The lower threshold for clump areas */
-   int diag;            /* Is extra diagnostic information required? */
+   int excols;          /* Are extra output columns required? */
    int el;              /* Number of elements in array */
    int i;               /* Loop count */
    int iclump;          /* Number of clumps found so far */
@@ -246,7 +246,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    }
 
 /* See if extra diagnostic info is required. */
-   diag = cupidConfigI( gcconfig, "DIAG", 0, status );
+   excols = cupidConfigI( gcconfig, "EXTRACOLS", 0, status );
 
 /* Get the maximum allowed number of failed fits between succesful fits. */
    maxskip = cupidConfigI( gcconfig, "MAXSKIP", 10, status );
@@ -425,7 +425,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    returned. */
                   cupidGCUpdateArrays( type, res, ipd, el, ndim, dims,
                                        x, rms, mlim, imax, ilevel, slbnd,    
-                                       &ret, iclump, diag, mean_peak,
+                                       &ret, iclump, excols, mean_peak,
                                        maxbad, &area, status );
 
 /* Dump the modified residuals if required. */

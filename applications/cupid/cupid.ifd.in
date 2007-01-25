@@ -171,6 +171,15 @@ package cupid {
             helpkey *
           }
 
+         parameter logfile {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath DEFAULT
+            prompt {Name of output log file}
+            helpkey *
+            default !
+         }
+
          parameter out {
             position 2
             type NDF
@@ -229,6 +238,15 @@ package cupid {
             helpkey *
           }
 
+         parameter wcspar {
+            type _LOGICAL
+            access READ
+            vpath DYNAMIC,DEFAULT
+            ppath DYNAMIC,DEFAULT
+            prompt {Use WCS units in the output catalogue?}
+            default FALSE
+            helpkey *
+          }
       }
 
       icl {defstring cupidh(elp) !$CUPID_DIR/cupidhelp}

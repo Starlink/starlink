@@ -13,6 +13,18 @@
 #include <string.h> 
 #include <stdio.h>
 
+/* A string used to mark the end of the configuration parameters and the
+   start of the ADAM parameters within the group of history text lines. */
+#define ADAM_STRING "           CUPID:FINDCLUMPS ADAM parameter values used:"
+
+/* A string used to mark the start of the configuration parameters within 
+   the group of history text lines. */
+#define CONF_STRING "           CUPID:FINDCLUMPS config parameter values used:"
+
+/* A string used to underline the above strings within the group of history 
+   text lines. */
+#define LINE_STRING "           ============================================="
+
 
 /* If the FPTRAP macros is defined, then the fptrapfunction defined here
    will be called in order to cause floating point exceptions to be
@@ -154,6 +166,9 @@ void findclumps( int *status ) {
 *        clump centroid, weighted by the corresponding pixel data value. [1]
 *     IN = NDF (Read)
 *        The 1, 2 or 3 dimensional NDF to be analysed. 
+*     LOGFILE = LITERAL (Read)
+*        The name of a text log file to create. If a null (!) value is
+*        supplied, no log file is created. [!]
 *     METHOD = LITERAL (Read)
 *        The algorithm to use. Each algorithm is described in more detail
 *        in the "Algorithms:" section below. Can be one of:
@@ -184,21 +199,33 @@ void findclumps( int *status ) {
 *        extensions) from the input NDF.
 *     OUTCAT = FILENAME (Write)
 *        An optional output catalogue in which to store the clump parameters.
-*        No catalogue will be produced if a null (!) value is supplied. The
-*        following columns are stored in the catalogue: 
+*        No catalogue will be produced if a null (!) value is supplied.
+*        The following columns are included in the output catalogue:
 *
-*        - PeakX: The PIXEL X coordinates of the clump peak value.
-*        - PeakY: The PIXEL Y coordinates of the clump peak value.
-*        - PeakZ: The PIXEL Z coordinates of the clump peak value.
-*        - CenX: The PIXEL X coordinates of the clump centroid.
-*        - CenY: The PIXEL Y coordinates of the clump centroid.
-*        - CenZ: The PIXEL Z coordinates of the clump centroid.
-*        - SizeX: The size of the clump along the X axis, in pixels.
-*        - SizeY: The size of the clump along the Y axis, in pixels.
-*        - SizeZ: The size of the clump along the Z axis, in pixels.
+*        - Peak1: The position of the clump peak value on axis 1.
+*        - Peak2: The position of the clump peak value on axis 2.
+*        - Peak3: The position of the clump peak value on axis 3.
+*        - Cen1: The position of the clump centroid on axis 1.
+*        - Cen2: The position of the clump centroid on axis 2.
+*        - Cen3: The position of the clump centroid on axis 3.
+*        - Size1: The size of the clump along pixel axis 1.
+*        - Size2: The size of the clump along pixel axis 2.
+*        - Size3: The size of the clump along pixel axis 3.
 *        - Sum: The total data sum in the clump.
 *        - Peak: The peak value in the clump.
-*        - Area: The total number of pixels falling within the clump.
+*        - Volume: The total number of pixels falling within the clump.
+*
+*        The coordinate system used to describe the peak and centroid
+*        positions is determined by the value supplied for parameter 
+*        WCSPAR. If WCSPAR is FALSE, then positions are specified in the
+*        pixel coordinate system of the input NDF. In addition, the clump 
+*        sizes are specified in units of pixels, and the clump volume is 
+*        specified in units of cubic pixels (square pixels for 2D data).
+*        If WCSPAR is TRUE, then positions are specified in the current
+*        coordinate system of the input NDF. In addition, the clump 
+*        sizes and volumes are specified in WCS units. Note, the sizes
+*        are still measured parallel to the pixel axes, but are recorded
+*        in WCS units rather than pixel units. 
 *
 *        If the data has less than 3 pixel axes, then the columns
 *        describing the missing axes will not be present in the catalogue.
@@ -214,9 +241,12 @@ void findclumps( int *status ) {
 *        increase the peak value. Beam sizes are specified by configuration 
 *        parameters FWHMBeam and VeloRes.
 *
-*        For the GaussClump algorithm, the Sum and Area values refer 
+*        For the GaussClump algorithm, the Sum and Volume values refer 
 *        to the part of the Gaussian within the level defined by the
 *        GaussClump.ModelLim configuration parameter.
+*
+*        The values used for configuration parameters and ADAM parameters
+*        are written to the history information of hte output catalogue.
 *
 *        The KAPPA command "listshow" can be used to draw markers at the 
 *        central positions of the clumps described in a catalogue. For
@@ -245,6 +275,24 @@ void findclumps( int *status ) {
 *        being too low. The value supplied for this parameter will be ignored 
 *        if the RMS noise level is also given in the configuration file 
 *        specified by parameter CONFIG.
+*     WCSPAR = _LOGICAL (Read)
+*        If a TRUE value is supplied, then the clump parameters stored in
+*        the output catalogue and in the CUPID extension of the output NDF,
+*        are stored in WCS units, as defined by the current coordinate frame 
+*        in the WCS component of the input NDF (this can be inspected using 
+*        the KAPPA:WCSFRAME command). For instance, if the current
+*        coordinate system in the 3D input NDF is (RA,Dec,freq), then the
+*        catalogue columns that hold the clump peak and centroid positions
+*        will use this same coordinate system. The spatial clump sizes
+*        will be stored in arc-seconds, and the spectral clump size will
+*        be stored in the unit of frequency used by the NDF (Hz, GHz, etc).
+*        If a FALSE value is supplied for this parameter, the clump
+*        parameters are stored in units of pixels within the pixel coordinate 
+*        system of the input NDF. The dynamic default for this parameter is 
+*        TRUE if the current coordinate system in the input NDF represents 
+*        celestial longitude and latitude in some system, plus a recogonised
+*        spectral axis (if the input NDF is 3D). Otherwise, the dynamic
+*        default is FALSE. []
 
 *  Use of CUPID Extension:
 *     This application will create an NDF extension called "CUPID" in the 
@@ -618,12 +666,24 @@ void findclumps( int *status ) {
 *        Original version.
 *     11-DEC-2006 (DSB):
 *        Added parameter DECONV.
+*     25-JAN-2007 (DSB):
+*        Save parameter values (both ADAM and config) in the history text
+*        of the output catalogue.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
+
+*  Undocumented Features:
+*     - If the parameter "GaussClumps.ExtraCols" is set to a positive
+*     integer, then extra method-specific columns are added to the output
+*     catalogue. If ExtraCols is set to 1, then the catalogue will include 
+*     columns with names GCFWHM<i> (where <i> is 1, 2, or 3), holding the 
+*     FWHM of the fitted Gaussian in units of pixels (these FWHM values
+*     have NOT been reduced to excluded the effect of the beam width).
+
 */      
 
 /* Local Variables: */
@@ -634,7 +694,9 @@ void findclumps( int *status ) {
    AstKeyMap *keymap;           /* Pointer to KeyMap holding all config settings */
    AstMapping *map;             /* Current->base Mapping from WCS FrameSet */
    AstMapping *tmap;            /* Unused Mapping */
-   Grp *grp;                    /* GRP identifier for configuration settings */
+   FILE *logfile = NULL;        /* File identifier for output log file */
+   Grp *confgrp = NULL;         /* GRP identifier for configuration settings */
+   Grp *grp = NULL;             /* GRP identifier for input NDF group */
    HDSLoc *ndfs;                /* Array of NDFs, one for each clump */
    HDSLoc *nloc;                /* Locator for main output NDF. */
    HDSLoc *nqloc;               /* Locator for Quality comp in main output NDF. */
@@ -643,12 +705,17 @@ void findclumps( int *status ) {
    HDSLoc *xloc;                /* Locator for CUPID extension in main output */
    HDSLoc *xqnloc;              /* Locator for CUPID_NAMES component in extension */
    IRQLocs *qlocs;              /* HDS locators for quality name information */
+   char *pname;                 /* Pointer to input NDF name */
    char *value;                 /* Pointer to GRP element buffer */
    char attr[ 30 ];             /* AST attribute name */
    char buffer[ GRP__SZNAM ];   /* Buffer for GRP element */
+   char dataunits[ 21 ];        /* NDF data units */
    char dtype[ 20 ];            /* NDF data type */
    char itype[ 20 ];            /* NDF data type */
+   char logfilename[ GRP__SZNAM + 1 ]; /* Log file name */ 
    char method[ 15 ];           /* Algorithm string supplied by user */
+   char ndfname[GRP__SZNAM+1];  /* Input NDF name, derived from GRP */
+   const char *dom;             /* Axis domain */
    const char *lab;             /* AST Label attribute for an axis */
    const char *sys;             /* AST System attribute for an axis */
    double *ipv;                 /* Pointer to Variance array */
@@ -664,27 +731,31 @@ void findclumps( int *status ) {
    int i;                       /* Loop count */
    int ifr;                     /* Index of Frame within WCS FrameSet */
    int ilevel;                  /* Interaction level */
-   int indf3;                   /* Identifier for Quality output NDF */
    int indf2;                   /* Identifier for main output NDF */
+   int indf3;                   /* Identifier for Quality output NDF */
    int indf;                    /* Identifier for input NDF */
    int n;                       /* Number of values summed in "sum" */
    int ndim;                    /* Total number of pixel axes */
    int nfr;                     /* Number of Frames within WCS FrameSet */
    int nsig;                    /* Number of significant pixel axes */
+   int nskyax;                  /* No. of sky axes in current WCS Frame */
+   int nspecax;                 /* No. of spectral axes in current WCS Frame */
    int repconf;                 /* Report configuration? */
    int sdim[ NDF__MXDIM ];      /* The indices of the significant pixel axes */
-   int size;                    /* Size of the "grp" group */
-   int skip[3];         /* Pointer to array of axis skips */
+   int size;                    /* Size of a group */
+   int confpar;                 /* Is this line a config parameter setting? */
+   int skip[3];                 /* Pointer to array of axis skips */
    int slbnd[ NDF__MXDIM ];     /* The lower bounds of the significant pixel axes */
    int subnd[ NDF__MXDIM ];     /* The upper bounds of the significant pixel axes */
    int there;                   /* Does object exist? */
    int type;                    /* Integer identifier for data type */
+   int usewcs;                  /* Use WCS coords in output catalogue? */
    int var;                     /* Does the i/p NDF have a Variance component? */
    int vax;                     /* Index of the velocity WCS axis (if any) */
    int velax;                   /* Index of the velocity pixel axis (if any) */
    void *ipd;                   /* Pointer to Data array */
    void *ipo;                   /* Pointer to output Data array */
-   
+
 #if defined(FPTRAP)
    fptrap(1);
 #endif
@@ -708,7 +779,15 @@ void findclumps( int *status ) {
    file names containing spaces, which NDG does not have. */
    kpg1Rgndf( "IN", 1, 1, "", &grp, &size, status );
    ndgNdfas( grp, 1, "READ", &indf, status );
+
+   pname = ndfname;
+   grpGet( grp, 1, 1, &pname, GRP__SZNAM, status );
+   
    grpDelet( &grp, status );
+
+/* Get the Unit component. */
+   dataunits[ 0 ] = 0;
+   ndfCget( indf, "Units", dataunits, 20, status ); 
 
 /* Get the dimensions of the NDF, and count the significant ones. */
    ndfDim( indf, NDF__MXDIM, dim, &ndim, status );
@@ -744,6 +823,43 @@ void findclumps( int *status ) {
       dims[ i ] = 1;
       skip[ i ] = 0;
    }
+
+/* Count the number of sky axes and spectral axes in the current Frame of
+   the input NDFs WCS FrameSet. */
+   nskyax = 0;
+   nspecax = 0;
+   for( i = 0; i < nsig; i++ ) {
+      sprintf( attr, "Domain(%d)", i + 1 );
+      dom = astGetC( iwcs, attr );
+      if( dom ) {
+         if( !strcmp( dom, "SKY" ) ) {
+            nskyax++;
+         } else if( !strcmp( dom, "SPECTRUM" ) ||
+                    !strcmp( dom, "DSBSPECTRUM" ) ) {
+            nspecax++;
+         }
+      }
+   }
+
+/* See if a log file is to be created. */
+   if( *status == SAI__OK ) {
+      parGet0c( "LOGFILE", logfilename, GRP__SZNAM, status );
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+      } else if( *status == SAI__OK ) {
+         logfile = fopen( logfilename, "w" );
+      }
+   }
+
+/* See if the clump parameters are to be described using WCS values or
+   pixel values. The default is yes if the current WCS Frame consists
+   entirely of sky and spectral axes, and does not contain more than 1
+   spectral axis and 2 sky axes. */
+   parDef0l( "WCSPAR", ( nsig == 1 && nspecax == 1 && nskyax == 0 ) ||
+                       ( nsig == 2 && nspecax == 0 && nskyax == 2 ) ||
+                       ( nsig == 3 && nspecax == 1 && nskyax == 2 ),
+             status );
+   parGet0l( "WCSPAR", &usewcs, status );
 
 /* If the NDF has 3 pixel axes, identify the velocity axis. */
    if( nsig == 3 && astGetI( iwcs, "Naxes" ) == 3 ) {
@@ -954,13 +1070,52 @@ void findclumps( int *status ) {
 /* Create a CUPID extension in the output NDF. */
       ndfXnew( indf2, "CUPID", "CUPID_EXT", 0, NULL, &xloc, status );
 
+/* Get a KeyMap containing the parameters specific to the chosen algorithm,
+   and create a GRP group containing a text form of the KeyMap. */
+      confgrp = grpNew( "", status );
+      grpPut1( confgrp, CONF_STRING, 0, status );
+      grpPut1( confgrp, LINE_STRING, 0, status );
+
+      if( astMapGet0A( keymap, method, (AstObject *) &aconfig ) ) {     
+         kpg1Kygrp( aconfig, &confgrp, status );
+      } 
+
+/* Append the significant ADAM parameter values. */
+      grpPut1( confgrp, " ", 0, status );
+      grpPut1( confgrp, ADAM_STRING, 0, status );
+      grpPut1( confgrp, LINE_STRING, 0, status );
+
+      sprintf( buffer, "IN = %s", ndfname );
+      grpPut1( confgrp, buffer, 0, status );
+
+      sprintf( buffer, "METHOD = %s", method );
+      grpPut1( confgrp, buffer, 0, status );
+
+      sprintf( buffer, "RMS = %g", rms );
+      grpPut1( confgrp, buffer, 0, status );
+
+      sprintf( buffer, "DECONV = %s", deconv ? "yes" : "no" );
+      grpPut1( confgrp, buffer, 0, status );
+
+      sprintf( buffer, "WCSPAR = %s", usewcs ? "yes" : "no" );
+      grpPut1( confgrp, buffer, 0, status );
+
+/* Issue a logfile header for the clump parameters. */
+      if( logfile ) {
+         fprintf( logfile, "           Clump properties:\n" );
+         fprintf( logfile, "           =================\n\n" );
+      }
+
 /* Store the clump properties in the CUPID extension and output catalogue
    (if needed). This may reject further clumps (such clumps will have the
    "Unit" component set to "BAD"). */
       ndfState( indf, "WCS", &gotwcs, status );
       cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, deconv, beamcorr, 
-                        "Output from CUPID:FINDCLUMPS", gotwcs ? iwcs : NULL,
-                        ilevel, status );
+                        "Output from CUPID:FINDCLUMPS", usewcs, 
+                        gotwcs ? iwcs : NULL, ilevel, dataunits, 
+                        confgrp, logfile, status );
+
+      if( logfile ) fprintf( logfile, "\n\n" );
 
 /* Allocate room for a mask holding bad values for points which are not 
    inside any clump. */
@@ -1050,40 +1205,64 @@ void findclumps( int *status ) {
 
    }
 
-/* Report the configuration (if any). */
+/* Ensure the following has a fair chance of working even if an error has
+   already occurred. */
    errBegin( status );
-   parGet0l( "REPCONF", &repconf, status );
-   if( repconf ) {
-      msgBlank( status );
-      msgOut( "", "Current configuration:", status );
 
-/* Get a KeyMap containing the parameters specific to the chosen
-   algorithm. */
-      if( astMapGet0A( keymap, method, (AstObject *) &aconfig ) ) {     
+/* If a group was obtained containing configuration parameters, list them. */
+   if( confgrp ) {     
 
-/* Create a GRP group containing a text form of the KeyMap. */
-         grp = NULL;
-         kpg1Kygrp( aconfig, &grp, status );
-         grpGrpsz( grp, &size, status );
+/* Get the number of entries in the group. */
+      grpGrpsz( confgrp, &size, status );
+
+/* Report the configuration (if any). */
+      parGet0l( "REPCONF", &repconf, status );
+      if( repconf ) {
+         msgBlank( status );
+         if( logfile ) fprintf( logfile, "\n" );
 
 /* Display the values, including the algorithm name. */
+         confpar = 1;
          value = buffer;
          for( i = 1; i <= size; i++ ) {
-            grpGet( grp, i, 1, &value, GRP__SZNAM, status );
-            msgSetc( "A", method );
-            msgSetc( "V", value );
-            msgOut( "", "   ^A.^V", status );
+            grpGet( confgrp, i, 1, &value, GRP__SZNAM, status );
+            if( value ){
+               if( logfile ) fprintf( logfile, "%s\n", value );
+
+               if( !strcmp( value, ADAM_STRING ) ) {
+                  confpar = 0;
+
+               } else if( !strcmp( value, CONF_STRING ) ) {
+                  msgOut( "", "Configuration parameters:", status );
+
+               } else if( astChrLen( value ) == 0 ) {
+                  msgBlank( status );
+
+               } else if( confpar && strcmp( value, LINE_STRING ) ){
+                  msgSetc( "A", method );
+                  msgSetc( "V", value );
+                  msgOut( "", "   ^A.^V", status );
+
+               }
+            }
          }
          msgBlank( status );
+         if( logfile ) fprintf( logfile, "\n" );
+      }
 
 /* Delete the GRP group. */
-         if( grp ) grpDelet( &grp, status );      
-      }
-   }    
+      grpDelet( &confgrp, status );      
+
+   }
+
+/* End the error context. */
    errEnd( status );
 
 /* Tidy up */
 L999:
+
+/* Close any log file. */
+   if( logfile ) fclose( logfile );
 
 /* Release the HDS object containing the list of NDFs describing the clumps. */
    if( ndfs ) datAnnul( &ndfs, status );
@@ -1102,4 +1281,3 @@ L999:
    }
 
 }
-
