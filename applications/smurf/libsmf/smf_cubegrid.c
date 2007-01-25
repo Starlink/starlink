@@ -115,6 +115,8 @@
 *        Do not allow minimimum pixel size to be less than 0.1 arc-sec.
 *     22-JAN-2007 (DSB):
 *        Restructured again for better handing of moving targets.
+*     25-JAN-2007 (DSB):
+*        Add value for HIST parameter when calling kpg1Wrtab.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -839,7 +841,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 /* Create the catalogue. */
       kpg1Wrtab( "OUTCAT", nallpos, nallpos, 2, allpos2, AST__CURRENT, 
                  astFrameSet( *skyframe, "" ), "Detector positions", 1, 
-                 NULL, labgrp, 1, status );
+                 NULL, labgrp, NULL, 1, status );
 
 /* Free resources. */
       allpos2 = astFree( allpos2 );
