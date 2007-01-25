@@ -780,14 +780,14 @@
          CALL KPG1_WRTAB( 'OUTCAT', NDISP, NDISP, NBAX, 
      :                    %VAL( CNF_PVAL( IPW1 ) ),
      :                    BINDEX, IWCS, 'Output from LISTSHOW', 
-     :                    0, %VAL( CNF_PVAL( IPW0 ) ), IGRP4, .TRUE., 
-     :                    STATUS )
+     :                    0, %VAL( CNF_PVAL( IPW0 ) ), IGRP4, GRP__NOID, 
+     :                    .TRUE., STATUS )
       ELSE
          CALL KPG1_WRTAB( 'OUTCAT', NDISP, NDISP, NBAX, 
      :                    %VAL( CNF_PVAL( IPW1 ) ),
      :                    BINDEX, IWCS, TITLE, 
-     :                    0, %VAL( CNF_PVAL( IPW0 ) ), IGRP4, .TRUE., 
-     :                    STATUS )
+     :                    0, %VAL( CNF_PVAL( IPW0 ) ), IGRP4, GRP__NOID,
+     :                    .TRUE., STATUS )
       END IF
 
 *  Write the mapped values to the output parameter.
