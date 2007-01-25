@@ -404,7 +404,8 @@
 *        Modified to accomodate changes to argument lists for smf_cubegrid, 
 *        smf_cubebounds and smf_rebincube, which provide better handling
 *        of moving sources.
-*     {enter_further_changes_here}
+*     25-JAN-2007 (DSB):
+*        Remove duplicated code for getting parameter "SPARSE".
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
@@ -848,64 +849,6 @@ void smurf_makecube( int *status ) {
       var_array = (float *) astMalloc( nxy*sizeof( float ) );
       work_array = (int *) astMalloc( nxy*sizeof( int ) );
    }
-
-/* Get the pixel spreading scheme to use. */
-   if( !sparse ) {
-      parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,"
-                "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS", 
-                1, pabuf, 10, status );
-
-      if( !strcmp( pabuf, "NEAREST" ) ) {
-         spread = AST__NEAREST;
-         nparam = 0;
-   
-      } else if( !strcmp( pabuf, "LINEAR" ) ) {
-         spread = AST__LINEAR;
-         nparam = 0;
-   
-      } else if( !strcmp( pabuf, "SINC" ) ) {      
-         spread = AST__SINC;
-         nparam = 1;
-   
-      } else if( !strcmp( pabuf, "SINCSINC" ) ) {      
-         spread = AST__SINCSINC;
-         nparam = 2;
-   
-      } else if( !strcmp( pabuf, "SINCCOS" ) ) {      
-         spread = AST__SINCCOS;
-         nparam = 2;
-   
-      } else if( !strcmp( pabuf, "SINCGAUSS" ) ) {      
-         spread = AST__SINCGAUSS;
-         nparam = 2;
-   
-      } else if( !strcmp( pabuf, "SOMB" ) ) {      
-         spread = AST__SOMB;
-         nparam = 1;
-   
-      } else if( !strcmp( pabuf, "SOMBCOS" ) ) {      
-         spread = AST__SOMBCOS;
-         nparam = 2;
-   
-      } else if( !strcmp( pabuf, "GAUSS" ) ) {      
-         spread = AST__GAUSS;
-         nparam = 2;
-   
-      } else if( *status == SAI__OK ) {
-         nparam = 0;
-         *status = SAI__ERROR;
-         msgSetc( "V", pabuf );
-         errRep( "", "Support not available for SPREAD = ^V (programming "
-                 "error)", status );
-      }
-
-   } else {
-      spread = AST__NEAREST;
-      nparam = 0;
-   }
-
-/* Get an additional parameter vector if required. */
-   if( nparam > 0 ) parExacd( "PARAMS", nparam, params, status );
 
 /* If required, create an array to hold the weights. First set up the bounds 
    of the whole 3D array (a larger array is needed if AST is being used to 
