@@ -1,5 +1,5 @@
       SUBROUTINE KPG1_WRTA2( PARAM, ARRDIM, NPOS, NAX, POS, IWCS,
-     :                       TITLE, ID0, IDENTS, LABS, STATUS )
+     :                       TITLE, ID0, IDENTS, LABS, HIST, STATUS )
 *+
 *  Name:
 *     KPG1_WRTA2
@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL KPG1_WRTA2( PARAM, ARRDIM, NPOS, NAX, POS, IWCS, TITLE, 
-*                      ID0, IDENTS, LABS, STATUS )
+*                      ID0, IDENTS, LABS, HIST, STATUS )
 
 *  Description:
 *     This routine writes the supplied positions to a CAT catalogue
@@ -56,6 +56,10 @@
 *        with the positions. The number of elements in this group should
 *        be equal to NPOS. If GRP__NOID is supplied, no label column will
 *        be created.
+*     HIST = INTEGER (Given)
+*        A GRP group identifier containing history text to store with the
+*        catalogue.  If GRP__NOID is supplied, no history information
+*        will be stored with the catalogue.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -94,6 +98,8 @@
 *     14-DEC-2006 (DSB):
 *        Mark columns of celestial longitude or latitude values as such even 
 *        if the supplied Frame also contains one or more non-celestial axes.
+*     25-JAN-2007 (DSB):
+*        Added parameter HIST.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -122,6 +128,7 @@
       INTEGER ID0
       INTEGER IDENTS( NPOS )
       INTEGER LABS
+      INTEGER HIST
  
 *  Status:
       INTEGER STATUS             ! Global status
@@ -136,6 +143,7 @@
 *  Local Variables:
       CHARACTER ATTR*10          ! AST attribute name
       CHARACTER BUFFER*80        ! Text buffer
+      CHARACTER HTEXT*(GRP__SZNAM)! A line of history text
       CHARACTER LAB*50           ! Axis label
       CHARACTER LABEL*100        ! Position label
       CHARACTER SYM*20           ! Axis symbol
@@ -151,6 +159,7 @@
       INTEGER J                  ! Axis index
       INTEGER LABLEN             ! Length of longest label
       INTEGER LWCS               ! Pointer to the FrameSet to be stored
+      INTEGER NHIST              ! Number of lines of history text
       INTEGER NLAB               ! Number of labels supplied
       INTEGER QI                 ! CAT identifier for another parameter
       INTEGER TI                 ! CAT identifier for TITLE parameter
@@ -344,6 +353,18 @@
 *  Write out the WCS information.
          CALL KPG1_WCATW( LWCS, CI, STATUS )
 
+      END IF
+
+*  Now dump the history text if any was supplied.
+      IF( HIST .NE. GRP__NOID ) THEN
+         CALL CAT_PUTXT( CI, 'HISTORY', ' ', STATUS )
+         CALL GRP_GRPSZ( HIST, NHIST, STATUS )
+         DO I = 1, NHIST
+            CALL GRP_GET( HIST, I, 1, HTEXT, STATUS )        
+            CALL CAT_PUTXT( CI, 'HISTORY', HTEXT( : CHR_LEN( HTEXT ) ), 
+     :                      STATUS )
+         END DO
+         CALL CAT_PUTXT( CI, 'HISTORY', ' ', STATUS )
       END IF
 
 *  Release the catalogue.

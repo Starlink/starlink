@@ -241,12 +241,13 @@ void kpg1Wrlst( const char *param, int arrdim, int npos, int nax, double *pos,
 F77_SUBROUTINE(kpg1_wrtab)( CHARACTER(PARAM), INTEGER(ARRDIM), INTEGER(NPOS),
                             INTEGER(NAX), DOUBLE_ARRAY(POS), INTEGER(IFRM),
                             INTEGER(IWCS), CHARACTER(TITLE), INTEGER(ID0),
-                            INTEGER_ARRAY(IDENTS), INTEGER(LABS), LOGICAL(PNULL),
+                            INTEGER_ARRAY(IDENTS), INTEGER(LABS), 
+                            INTEGER(HIST), LOGICAL(PNULL),
                             INTEGER(STATUS) TRAIL(PARAM) TRAIL(TITLE) );
 
 void kpg1Wrtab( const char *param, int arrdim, int npos, int nax, double *pos,
                 int ifrm, AstFrameSet *iwcs, const char *title, int id0,
-                int *idents, Grp *labs, int pnull, int *status ){
+                int *idents, Grp *labs, Grp *hist, int pnull, int *status ){
 
    DECLARE_CHARACTER_DYN(PARAM);
    DECLARE_INTEGER(ARRDIM);
@@ -259,6 +260,7 @@ void kpg1Wrtab( const char *param, int arrdim, int npos, int nax, double *pos,
    DECLARE_INTEGER(ID0);
    DECLARE_INTEGER_ARRAY_DYN(IDENTS);
    DECLARE_INTEGER(LABS);
+   DECLARE_INTEGER(HIST);
    DECLARE_LOGICAL(PNULL);
    DECLARE_INTEGER(STATUS);
 
@@ -277,6 +279,7 @@ void kpg1Wrtab( const char *param, int arrdim, int npos, int nax, double *pos,
    F77_CREATE_INTEGER_ARRAY( IDENTS, npos );
    F77_EXPORT_INTEGER_ARRAY( idents, IDENTS, npos );
    F77_EXPORT_INTEGER( grpC2F( labs, status ), LABS );
+   F77_EXPORT_INTEGER( grpC2F( hist, status ), HIST );
    F77_EXPORT_LOGICAL(pnull,PNULL);
    F77_EXPORT_INTEGER(*status,STATUS);
 
@@ -291,6 +294,7 @@ void kpg1Wrtab( const char *param, int arrdim, int npos, int nax, double *pos,
                          INTEGER_ARG(&ID0),
                          INTEGER_ARRAY_ARG(IDENTS),
                          INTEGER_ARG(&LABS),
+                         INTEGER_ARG(&HIST),
                          LOGICAL_ARG(&PNULL),
                          INTEGER_ARG(&STATUS)
                          TRAIL_ARG(PARAM)

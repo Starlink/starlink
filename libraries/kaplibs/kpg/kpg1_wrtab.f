@@ -1,5 +1,6 @@
       SUBROUTINE KPG1_WRTAB( PARAM, ARRDIM, NPOS, NAX, POS, IFRM, IWCS,
-     :                       TITLE, ID0, IDENTS, LABS, NULL, STATUS )
+     :                       TITLE, ID0, IDENTS, LABS, HIST, NULL, 
+     :                       STATUS )
 *+
 *  Name:
 *     KPG1_WRTAB
@@ -12,7 +13,7 @@
 
 *  Invocation:
 *     CALL KPG1_WRTAB( PARAM, ARRDIM, NPOS, NAX, POS, IFRM, IWCS, TITLE, 
-*                      ID0, IDENTS, LABS, NULL, STATUS )
+*                      ID0, IDENTS, LABS, HIST, NULL, STATUS )
 
 *  Description:
 *     This routine is equivalent to KPG1_WRLST, except that it provides
@@ -53,6 +54,10 @@
 *        with the positions. The number of elements in this group should
 *        be equal to NPOS. If GRP__NOID is supplied, no label column will
 *        be created.
+*     HIST = INTEGER (Given)
+*        A GRP group identifier containing history text to store with the
+*        catalogue.  If GRP__NOID is supplied, no history information
+*        will be stored with the catalogue.
 *     NULL = LOGICAL (Given)
 *        Is the user allowed to supply a null value? If so, the error
 *        status will be annulled before returning.
@@ -87,6 +92,8 @@
 *  History:
 *     20-NOV-2006 (DSB):
 *        Original version.
+*     25-JAN-2007 (DSB):
+*        Added argument HIST.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -116,6 +123,7 @@
       INTEGER ID0
       INTEGER IDENTS( NPOS )
       INTEGER LABS
+      INTEGER HIST
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -190,13 +198,13 @@
      :                    AST_FRAMESET( AST_GETFRAME( IWCS, IFRM, 
      :                                                STATUS ), 
      :                                  ' ', STATUS ),
-     :                    TITLE, ID0, IDENTS, LABS, STATUS )
+     :                    TITLE, ID0, IDENTS, LABS, HIST, STATUS )
 
 *  Otherwise, if the Mapping is a UnitMap, we can store the positions as 
 *  supplied, with the full FrameSet.
       ELSE IF( AST_ISAUNITMAP( MAP, STATUS ) ) THEN
          CALL KPG1_WRTA2( PARAM, ARRDIM, NPOS, NAX, POS, IWCS,
-     :                    TITLE, ID0, IDENTS, LABS, STATUS )
+     :                    TITLE, ID0, IDENTS, LABS, HIST, STATUS )
 
 *  Otherwise, we need to map the supplied positions into the Base Frame
 *  before storing them.
@@ -219,7 +227,7 @@
 *  Put the stored Frame positions into the file.
          CALL KPG1_WRTA2( PARAM, NPOS, NPOS, NBAX, 
      :                    %VAL( CNF_PVAL( IPW ) ), IWCS,
-     :                    TITLE, ID0, IDENTS, LABS, STATUS )
+     :                    TITLE, ID0, IDENTS, LABS, HIST, STATUS )
 
 *  Free the workspace.
          CALL PSX_FREE( IPW, STATUS )

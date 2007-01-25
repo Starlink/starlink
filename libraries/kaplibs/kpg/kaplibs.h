@@ -91,7 +91,7 @@ void kpg1Pseed( int * );
 void kpg1Rgndf( const char *, int, int, const char *, Grp **, int *, int * );
 void kpg1Wgndf( const char *, Grp *, int, int, const char *, Grp **, int *, int * );
 void kpg1Wrlst( const char *, int, int, int, double *, int, AstFrameSet *, const char *, int, int *, int, int * );
-void kpg1Wrtab( const char *, int, int, int, double *, int, AstFrameSet *, const char *, int, int *, Grp *, int, int * );
+void kpg1Wrtab( const char *, int, int, int, double *, int, AstFrameSet *, const char *, int, int *, Grp *, Grp *, int, int * );
 
 void irqDelet( int, int * );
 void irqRlse( IRQLocs **, int * );
