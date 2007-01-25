@@ -426,25 +426,18 @@ itcl::class gaia::GaiaSpecWriter {
          }
 
          if { $rsys != {} } {
+
             #  Receptor position in radians.
             set rx [$cubeaccessor getdoubleproperty ACSIS \
                        "RECEPPOS\(1,$p1,$p2\)"]
             set ry [$cubeaccessor getdoubleproperty ACSIS \
                        "RECEPPOS\(2,$p1,$p2\)"]
 
-            #  Source position in radians. Get the AZEL positions
-            #  if working in GAPPT as the source is moving (PLANET).
-            if { $tcssys == "GAPPT" } {
-               set sx [$cubeaccessor getdoubleproperty JCMTSTATE \
-                          "TCS_AZ_BC1\($p2\)"]
-               set sy [$cubeaccessor getdoubleproperty JCMTSTATE \
-                          "TCS_AZ_BC2\($p2\)"]
-            } else {
-               set sx [$cubeaccessor getdoubleproperty JCMTSTATE \
-                          "TCS_TR_BC1\($p2\)"]
-               set sy [$cubeaccessor getdoubleproperty JCMTSTATE \
-                          "TCS_TR_BC2\($p2\)"]
-            }
+            #  Source position in radians.
+            set sx [$cubeaccessor getdoubleproperty JCMTSTATE \
+                       "TCS_TR_BC1\($p2\)"]
+            set sy [$cubeaccessor getdoubleproperty JCMTSTATE \
+                       "TCS_TR_BC2\($p2\)"]
 
             if { $rx != "BAD" && $ry != "BAD" } {
 
@@ -485,20 +478,21 @@ itcl::class gaia::GaiaSpecWriter {
                   #  Create the SkyFrame.
                   set skyframe [gaiautils::astskyframe $atts]
 
-                  #  If the source position is GAPPT then the actual position
-                  #  is recorded in AZEL, not tcssys. Need to do the
-                  #  conversion from rsys to AZEL and get the offset in AZEL?
+                  #  If the source position is GAPPT then need to convert
+                  #  the receptor position to GAPPT to get the offset.
+                  #  We do not calculate a source position for GAPPT as 
+                  #  it is moving.
                   if { $tcssys == "GAPPT" } {
                      set toframe [gaiautils::astcopy $skyframe]
-                     gaiautils::astset $toframe "system=AZEL,Digits=9"
+                     gaiautils::astset $toframe "system=GAPPT,Digits=9"
                      set wcs \
                         [gaiautils::astconvert $skyframe $toframe "SKY"]
 
-                     lassign [gaiautils::asttran2 $wcs $rx $ry] arx ary
+                     lassign [gaiautils::asttran2 $wcs $rx $ry] grx gry
 
                      #  Determine the separation between these positions.
-                     set drra [gaiautils::astaxdistance $wcs 1 $arx $sx]
-                     set drdec [gaiautils::astaxdistance $wcs 2 $ary $sy]
+                     set drra [gaiautils::astaxdistance $wcs 1 $grx $sx]
+                     set drdec [gaiautils::astaxdistance $wcs 2 $gry $sy]
                      gaiautils::astannul $toframe
                      gaiautils::astannul $wcs
                   }
@@ -518,9 +512,10 @@ itcl::class gaia::GaiaSpecWriter {
                      set rdec [gaiautils::astformat $wcs 2 $ry]
 
                      if {$sx != "BAD" && $sy != "BAD" && $tcssys != "GAPPT"} {
-
-                        #  When rsys is AZEL the TCS system may differ, so
-                        #  we need to transform from tcssys to FK5 also.
+                        
+                        #  Source position. When rsys is AZEL the TCS system
+                        #  may differ, so we need to transform from tcssys to
+                        #  FK5 also. Note done when in GAPPT, source is moving.
                         gaiautils::astset $wcs "invert=1"
                         gaiautils::astset $wcs "system=$tcssys"
 
@@ -546,6 +541,9 @@ itcl::class gaia::GaiaSpecWriter {
                      set rdec [gaiautils::astformat $skyframe 2 $ry]
 
                      if {$sx != "BAD" && $sy != "BAD" && $tcssys != "GAPPT"} {
+
+                        #  Same for source position, is same when not AZEL or
+                        #  GAPPT.
                         set sra [gaiautils::astformat $skyframe 1 $sx]
                         set sdec [gaiautils::astformat $skyframe 2 $sy]
 
