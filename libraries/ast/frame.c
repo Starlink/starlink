@@ -231,6 +231,9 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        ObsLat value in GetAttrib.
 *     14-OCT-2006 (DSB):
 *        - Add Dut1 attribute
+*     26-JAN-2007 (DSB):
+*        Fix bug in NewUnit that causes segvio when changing axis symbols
+*        to accomodate changes in units.
 *class--
 */
 
@@ -5938,9 +5941,9 @@ static void NewUnit( AstAxis *ax, const char *old_units, const char *new_units,
                            &new_sym );
       if( map ) {
          map = astAnnul( map );
-         if( new_lab ) {
-            astSetAxisSymbol( ax, new_lab );
-            new_lab = astFree( new_lab );
+         if( new_sym ) {
+            astSetAxisSymbol( ax, new_sym );
+            new_sym = astFree( new_sym );
          }
       }
    }
@@ -8892,7 +8895,7 @@ static int SubFrame( AstFrame *target, AstFrame *template,
    the current results mapping, and then simplify it. */
             if( !uunit && umap ) {
                numap = (AstMapping *) astCmpMap( *map, umap, 1, "" );
-               astAnnul( *map );
+               (void) astAnnul( *map );
                *map = numap;
             }
 
