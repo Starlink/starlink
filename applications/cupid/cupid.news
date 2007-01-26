@@ -7,6 +7,11 @@
  data arrays.
 
 
+Changes introduced at V0.0-23:
+
+ - If WCSPAR=YES, store RA and Dec values in degs rather than rads.
+ - Add units strings to log file output.
+
 Changes introduced at V0.0-22:
 
  - Added new program parameter LOGFILE which can be used to create a text

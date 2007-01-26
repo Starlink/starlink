@@ -105,7 +105,9 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 *        of constant character strings. The number of pointers returned in 
 *        this array will be returned in "*ncpar". Each string is the unit
 *        associated with the corresponding parameter value returned in
-*        "cpars", and may be blank.
+*        "cpars", and may be blank. Note, if "usewcs" is non-zero, sky 
+*        position axes have units of "deg" and sky size axes have units
+*        of "arcsec".
 *     ncpar
 *        Pointer to an int in which to return the number of parameters
 *        describing the clump.
@@ -153,6 +155,9 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 *        Added parameter "deconv".
 *     16-DEC-2006 (DSB):
 *        Added parameters "wcsmap", "wcsfrm", "dataunits" and "units".
+*     26-JAN-2007 (DSB):
+*        Assign units of "rad" to SkyAxis columns, so that they can be
+*        converted to "deg" easily later on (using active units).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -309,23 +314,26 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
    we need to first extract the current axis from the WCS Frame. */
             axfrm = astPickAxes( wcsfrm, 1, &i, NULL );
 
-/* Copy the axis unit into a local buffer since AST will re-use its
-   internal buffer in which astGetC returns the attribute value. */
-            strcpy( unit_buf[ i - 1 ], astGetC( axfrm, "Unit" ) );
+/* See if the axis is a sky axis */
+            skyaxis[ i - 1 ] = !strcmp( "SKY", astGetC( axfrm, "Domain" ) );
 
-/* The two clump positions are specified in these units. */
-            punits[ i - 1 ] = unit_buf[ i - 1 ];
-            punits[ i - 1 + ndim ] = unit_buf[ i - 1 ];
-
-/* The clump size will also be specified in these units unless the axis
-   is a sky axis in which case the size will be specified in arc-seconds. */
-            if( !strcmp( "SKY", astGetC( axfrm, "Domain" ) ) ) {
-               skyaxis[ i - 1 ] = 1;
+/* If so, the unit associated with the axis is set to "deg" rather
+   that the normal "hh:mm:ss" style unit string returned for a SkyAxis.
+   Also, set appropriate units for the size columns. */
+            if( skyaxis[ i - 1 ] ) {
+               strcpy( unit_buf[ i - 1 ], "deg" );
                punits[ i - 1 + 2*ndim ] = "arcsec";
+
+/* Otherwise, copy the axis unit into a local buffer since AST will re-use its
+   internal buffer in which astGetC returns the attribute value. */
             } else {
-               skyaxis[ i - 1 ] = 0;
+               strcpy( unit_buf[ i - 1 ], astGetC( axfrm, "Unit" ) );
                punits[ i - 1 + 2*ndim ] = unit_buf[ i - 1 ];
             }
+
+/* The two clump positions are specified in the axis units chosen above. */
+            punits[ i - 1 ] = unit_buf[ i - 1 ];
+            punits[ i - 1 + ndim ] = unit_buf[ i - 1 ];
 
 /* Append the "size" unit to the end of the volume unit string, followed
    by a dot if this is not the last axis. */
@@ -579,6 +587,11 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 /* Scale the clump volume from cubic pixel into WCS units. */
          ret[ 3*ndim + 2 ] *= pixvol;
 
+/* Convert the positions from rads to degs. */
+         for( i = 0; i < ndim; i++ ) {
+            ret[ i ] *= AST__DR2D;
+            ret[ ndim + i ] *= AST__DR2D;
+         }
       }
    }
 

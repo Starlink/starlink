@@ -141,7 +141,8 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    HDSLoc *ncloc;               /* Locator for array cell */
    char *line = NULL;           /* Pointer to buffer for log file output */
    char attr[ 15 ];             /* AST attribute name */
-   char buf[ LOGTAB + 1 ];      /* Buffer for a log file column value */
+   char buf[ 2*LOGTAB ];        /* Buffer for a log file column value */
+   char buf2[ 2*LOGTAB ];       /* Buffer for a log file unit string */
    char cat[ MAXCAT + 1 ];      /* Catalogue name */
    char unit[ 10 ];             /* String for NDF Unit component */
    const char **names;          /* Component names */
@@ -284,8 +285,8 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
          if( !tab ) {
             tab = astMalloc( sizeof(double)*nndf*ncpar );
 
-/* If a log file is being created, write the column names to the log file. 
-   Each column has a field width of LOGTAB characters. */
+/* If a log file is being created, write the column names & units to the
+   log file. Each column has a field width of LOGTAB characters. */
             if( logfile ) {
                nc = 0;
 
@@ -297,8 +298,21 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
                   line = astAppendString( line, &nc, buf );
                }
                fprintf( logfile, "%s\n", line );
-            }
 
+
+               nc = 0;
+
+               sprintf( buf, "%-*s", LOGTAB, "" );
+               line = astAppendString( line, &nc, buf );
+
+               for( icol = 0; icol < ncpar; icol++ ) {
+                  sprintf( buf2, "[%s]", units[ icol ] );
+                  sprintf( buf, "%-*s", LOGTAB, buf2 );
+                  line = astAppendString( line, &nc, buf );
+               }
+               fprintf( logfile, "%s\n", line );
+
+            }
          }
 
 /* Put the new clump into the table. */
@@ -439,14 +453,25 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
       }
 
 /* Create a Frame with "ncpar" axes describing the table columns. Set the
-   axis Symbols and Units to the column names and units. */
+   axis Symbols and Units to the column names and units. Any axis which
+   initially has a unit of "deg" is a sky axis. Since the AST SkyFrame
+   class requires rads rather than degs, we initially set such axes to
+   "rad".  */
       frm1 = astFrame( ncpar, "Domain=PARAMETERS,Title=Clump parameters" );
       for( icol = 0; icol < ncpar; icol++ ) {
          sprintf( attr, "Symbol(%d)", icol + 1 );
          astSetC( frm1, attr, names[ icol ] );
          sprintf( attr, "Unit(%d)", icol + 1 );
-         astSetC( frm1, attr, units[ icol ] );
+         if( !strcmp( units[ icol ], "deg" ) ) {
+            astSetC( frm1, attr, "rad" );
+         } else {
+            astSetC( frm1, attr, units[ icol ] );
+         }
       }
+
+/* Ensure the ActiveUnit flag is set for this frame so that we can swap
+   between rads and degs automatically if required. */
+      astSetActiveUnit( frm1, 1 );
    
 /* Create a Mapping (a PermMap) from the Frame representing the "ncpar" clump
    parameters, to the "ndim" Frame representing clump centre pixel positions. 
@@ -480,13 +505,26 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
       } else {
 
 /* Add the new Frame describing the catalogue columns into the FrameSet,
-   leaving it as both the base and current Frame. If the catalogue position 
-   and width columns holds values in pixel coordinates, connect the new 
-   Frame to the PIXEL Frame using the "map" mapping. If the catalogue 
-   position and width columns holds values in WCS coordinates, connect the 
-   new Frame to the current Frame using the "map" mapping. */
+   leaving it the current Frame. If the catalogue position and width 
+   columns holds values in pixel coordinates, connect the new Frame to the 
+   PIXEL Frame using the "map" mapping. If the catalogue position and width 
+   columns holds values in WCS coordinates, connect the new Frame to the 
+   current Frame using the "map" mapping. */
          astInvert( map );
          astAddFrame( iwcs, ( usewcs ? AST__CURRENT : pixfrm ), map, frm1 );
+
+/* Now change the units associated with any sky axes in the base Frame 
+   from "rad" to "deg" (the column values are stored in degs). This will 
+   automatically re-map the Frame so that the column deg values get
+   converted to rad values as required by AST. */
+         for( icol = 0; icol < ncpar & *status == SAI__OK; icol++ ) {
+            if( !strcmp( units[ icol ], "deg" ) ){
+               sprintf( attr, "Unit(%d)", icol + 1 );
+               astSetC( iwcs, attr, "deg" );
+            }
+         }
+
+/* Set the same Frame to be the base Frame as well as the current Frame. */
          astSetI( iwcs, "Base", astGetI( iwcs, "Current" ) );
 
 /* Set the ID attribute of the FrameSet to "FIXED_BASE" in order to force
