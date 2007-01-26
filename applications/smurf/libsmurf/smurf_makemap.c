@@ -85,6 +85,8 @@
 *        Fix incorrect indf declaration, delete ogrp if it exists
 *     2007-01-12 (AGG):
 *        Add SYSTEM parameter for specifying output coordinate system
+*     2007-01-25 (AGG):
+*        Update API in calls to smf_mapbounds and smf_rebinmap
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -181,6 +183,7 @@ void smurf_makemap( int *status ) {
   void *weights=NULL;        /* Pointer to the weights map */
   HDSLoc *weightsloc=NULL;   /* HDS locator of weights array */
 
+  int moving = 0;            /* Is the telescope base position changing? */
 
   /* Main routine */
   ndfBegin();
@@ -214,9 +217,15 @@ void smurf_makemap( int *status ) {
   /* Calculate the map bounds */
   msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Determine map bounds", status);
   smf_mapbounds( igrp, size, system, 0, 0, 1, pixsize, lbnd_out, ubnd_out, 
-		 &outfset, status );
+		 &outfset, &moving, status );
   if (*status != SAI__OK) {
     errRep(FUNC_NAME, "Unable to determine map bounds", status);
+  }
+
+  if ( moving ) {
+    msgOutif(MSG__VERB, " ", "Tracking a moving object", status);
+  } else {
+    msgOutif(MSG__VERB, " ", "Tracking a stationary object", status);
   }
 
   /* Create an output smfData */
@@ -295,22 +304,18 @@ void smurf_makemap( int *status ) {
       }
   
       if ( usebad ) {
-
-         /* Retrieve the NDF identifier for this input file */   
-	 ndgNdfas ( igrp, i, "READ", &indf, status );
-
-         /* Rebin the data onto the output grid with bad bolometer mask */ 
-         smf_bbrebinmap(data, indf, i, size, outfset, lbnd_out, ubnd_out, 
-	                map, variance, weights, status );
-
+	/* Retrieve the NDF identifier for this input file */   
+	ndgNdfas ( igrp, i, "READ", &indf, status );
+	/* Rebin the data onto the output grid with bad bolometer mask */ 
+	smf_bbrebinmap(data, indf, i, size, outfset, lbnd_out, ubnd_out, 
+		       map, variance, weights, status );
       } else {
-     
-         /* Rebin the data onto the output grid without bad bolometer mask */
-         smf_rebinmap(data, i, size, outfset, lbnd_out, ubnd_out, 
-		      map, variance, weights, status );
+	msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Beginning the REBIN step", status);
+     	/* Rebin the data onto the output grid without bad bolometer mask */
+	smf_rebinmap(data, i, size, outfset, moving, lbnd_out, ubnd_out, 
+		     map, variance, weights, status );
 
       }
-   
   
       /* Close the data file */
       if( data != NULL ) {
@@ -372,7 +377,7 @@ void smurf_makemap( int *status ) {
 
   }
 
-  /* Write FITS header */
+  /* Write WCS */
   ndfPtwcs( outfset, ondf, status );
   
   if( outfset != NULL ) {
