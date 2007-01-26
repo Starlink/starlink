@@ -130,6 +130,8 @@
 #         Added UBOUND and LBOUND parameters for MAKECUBE
 #     12-JAN-2007 (AGG):
 #         Added SYSTEM parameter for MAKEMAP and QLMAKEMAP
+#     26-JAN-2007 (AGG):
+#         Added OVERWRITE parameter for SC2SIM
 #     {enter_changes_here}
 
 #  Bugs:
@@ -200,7 +202,6 @@ package @PACKAGE@ {
      action extinction {
 
          helplib {$SMURF_HELP}
-
 
          parameter in {
             position 1
@@ -695,8 +696,18 @@ package @PACKAGE@ {
             helpkey *
           }
 
-          parameter simtype {
+          parameter overwrite {
             position 5
+            type _LOGICAL
+            prompt {Overwrite existing files?}
+            vpath DEFAULT
+	    default TRUE
+            ppath CURRENT
+            helpkey *
+          }
+
+          parameter simtype {
+            position 6
             type _CHAR
             prompt {Simulation type (FULL or WEIGHTS)}
             vpath {PROMPT}
@@ -1138,6 +1149,7 @@ package @PACKAGE@ {
 	  }
 
      }
+
 
    }
 
