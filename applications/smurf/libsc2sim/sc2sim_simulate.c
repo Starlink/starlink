@@ -21,7 +21,7 @@
 *                       int nbol, double *pzero, int rseed, double samptime, 
 *                       double weights[], double *xbc, double *xbolo, 
 *                       double *ybc, double *ybolo, 
-*                       int hitsonly, int *status);
+*                       int hitsonly, int overwrite, int *status);
 
 *  Arguments:
 *     inx = sc2sim_obs_struct* (Given)
@@ -66,6 +66,8 @@
 *        Native bolo y-offsets
 *     hitsonly = int (Given)
 *        Flag to indicate hits-only simulation
+*     overwrite = int (GIven)
+*        Flag to indicate whether to overwrite existing files
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -191,6 +193,9 @@
 *     2007-01-16 (AGG):
 *        - Fill SMU_CHOP_PHASE, TCS_BEAM and TCS_SOURCE header entries
 *        - Fix time bug in calculating planet positions
+*     2007-01-26 (AGG):
+*        Add `overwrite' flag to allow simulations to create new files
+*        without overwriting old ones
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -275,7 +280,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 		       int nbol, double *pzero, int rseed, double samptime, 
 		       double weights[], double *xbc, double *xbolo, 
 		       double *ybc, double *ybolo, 
-                       int hitsonly, int *status ) {
+                       int hitsonly, int overwrite, int *status ) {
 
   double accel[2];                /* telescope accelerations (arcsec) */
   float aeff[3];                  /* output of wvmOpt */
@@ -389,6 +394,10 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   float ttau[3];                  /* output of wvmOpt */
   double twater;                  /* water line temp. for WVM simulation */
   double vmax[2];                 /* telescope maximum velocities (arcsec) */
+
+  FILE *ofile = NULL;
+  int groupcounter;
+  int fileexists = 1;
 
   if ( *status != SAI__OK) return;
 
@@ -1226,10 +1235,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	}/* if not hits-only */
 
         dateobs[0] = '\0'; /* Initialize the dateobs string to NULL */
-
-        if( *status == SAI__OK ) { 
-          sc2sim_dateobs( start_time, dateobs, status );
-	}
+	sc2sim_dateobs( start_time, dateobs, status );
 
         /* For each subarray, digitise the data and write it to 
            a file */
@@ -1247,6 +1253,32 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
             sprintf( filename, "%s%04i%02i%02i_00001_%04d", 
                      subarrays[k], date_yr, date_mo, date_da, curchunk + 1 );
+	    /* If we are not overwriting existing files see if the file exists */
+	    if ( !overwrite ) {
+	      groupcounter = 1;
+	      fileexists = 1;
+	      while ( fileexists ) {
+		strncat( filename, ".sdf", 4);
+		ofile = fopen( filename, "r" );
+		/* First see if we can open the file */
+		if ( ofile ) {
+		  /* If yes, close it again, increment counter and set
+		     new file name */
+		  fileexists = 1;
+		  fclose(ofile);
+		  groupcounter++;
+		  sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k], 
+			   date_yr, date_mo, date_da, groupcounter, curchunk + 1 );
+		} else {
+		  /* If not, unset fileexists flag, increment counter
+		     and set new file name */
+		  fileexists = 0;
+		  sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k], 
+			   date_yr, date_mo, date_da, groupcounter, curchunk + 1 );
+		}
+	      }
+	    }
+
 
             msgSetc( "FILENAME", filename );
             msgOut(" ", "Writing ^FILENAME", status ); 

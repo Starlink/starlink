@@ -55,10 +55,12 @@
 *        - modified dateobs to take per-chunk time 
 *     2007-01-03 (AGG):
 *        Add sc2sim_instap_calc
+*     2007-01-26 (AGG):
+*        Add overwrite parameter to sc2sim_simulate
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     University of British Columbia.
 *     All Rights Reserved.
 
@@ -639,7 +641,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 		       int nbol, double *pzero, int rseed, double samptime, 
 		       double weights[], double *xbc, double *xbolo, 
 		       double *ybc, double *ybolo, int hitsonly, 
-                       int *status );
+                       int overwrite, int *status );
 
 void sc2sim_smupath ( int nvert, double vertex_t, int jig_ver[][2],
                       double jig_stepx, double jig_stepy, int movecode,
