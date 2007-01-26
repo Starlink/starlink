@@ -131,10 +131,13 @@
 *        Add smf_cubegrid and change smf_cubebounds.
 *     2006-11-30 (DSB):
 *        Add smf_sparsebounds.
+*     2007-01-19 (AGG):
+*        - Change API to smf_mapbounds: now returns the moving flag
+*        - Change API to smf_rebinmap: takes the moving flag as an argument
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     University of British Columbia.
 *     All Rights Reserved.
 
@@ -190,6 +193,8 @@ double smf_calc_covar ( const smfData *data, const int i, const int j,
 
 void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int *lbnd_out,
                         int *ubnd_out, int *status );
+
+void smf_calc_skyrot( smfData *data, double maxangle, int *nsamples, int *status );
 
 void smf_calc_stareimage( smfData *data, const int naver, int *status);
 
@@ -375,7 +380,8 @@ void * smf_malloc( size_t nelem, size_t bytes_per_elem, int zero,
 
 void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0, 
 		    double lat_0, int flag, double pixsize, int *lbnd_out, 
-		    int *ubnd_out, AstFrameSet **outframeset, int *status );
+		    int *ubnd_out, AstFrameSet **outframeset, int *moving,
+		    int *status );
 
 void smf_mapbounds_approx( Grp *igrp,  int size, char *system, double lon_0, 
 		    double lat_0, int flag, double pixsize, int *lbnd_out, 
@@ -414,7 +420,8 @@ void * smf_realloc( void * pntr, size_t nelem, size_t bytes_per_elem,
 		    int * status );
 
 void smf_rebinmap( smfData *data, int index, int size, 
-                   AstFrameSet *outframeset, int *lbnd_out, int *ubnd_out,
+                   AstFrameSet *outframeset, int moving,
+		   int *lbnd_out, int *ubnd_out,
                    double *map, double *variance,
 		   double *weights, int *status );
 
