@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_rebinmap( smfData *data, int index, int size, 
-*                    AstFrameSet *outfset,
+*                    AstFrameSet *outfset, int moving,
 *                   int *lbnd_out, int *ubnd_out, 
 *                   double *map, double *variance, double *weights,
 *         	    int *status );
@@ -28,6 +28,8 @@
 *        Number of elements in igrp
 *     outfset = AstFrameSet* (Given)
 *        Frameset containing the sky->output map mapping
+*     moving = int (Given)
+*        Flag to denote whether the object is moving
 *     lbnd_out = double* (Given)
 *        2-element array pixel coord. for the lower bounds of the output map 
 *     ubnd_out = double* (Given)
@@ -43,7 +45,7 @@
 
 *  Description:
 *     This function does a simple regridding of data into a map
-*     
+
 *  Authors:
 *     Edward Chapin (UBC)
 *     Tim Jenness (JAC, Hawaii)
@@ -60,13 +62,15 @@
 *        Updated API: now takes a smfData rather than a Grp
 *     2006-07-26 (TIMJ):
 *        sc2head not actually used.
+*     2007-01-25 (AGG):
+*        Rewrite to take account of moving objects
 *     {enter_further_changes_here}
 
 *  Notes:
 *     Currently lon_0 and lat_0 are interpreted only as ra/dec of tangent point
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -102,28 +106,49 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outfset,
-                   int *lbnd_out, int *ubnd_out, double *map, double *variance,
-		   double *weights, int *status ) {
+#define FUNC_NAME "smf_rebinmap"
+
+void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outfset, 
+		   int moving, int *lbnd_out, int *ubnd_out, double *map, 
+		   double *variance, double *weights, int *status ) {
 
   /* Local Variables */
-  AstMapping *bolo2sky=NULL;    /* Mapping bolo->celestial coordinates */
-  AstCmpMap *bolo2map=NULL;     /* Combined mapping bolo->map coordinates */
-  double  *boldata;             /* Pointer to bolometer data */
-  smfHead *hdr=NULL;            /* Pointer to data header this time slice */
+  double a;                     /* Longitude value */
+  AstSkyFrame *abskyfrm = NULL; /* Output SkyFrame (always absolute) */
+  AstMapping *azel2usesys = NULL;/* Mapping from AZEL to the output sky frame */
+  double b;                     /* Latitude value */
+  AstMapping *bolo2sky = NULL;  /* Mapping bolo->celestial coordinates */
+  AstCmpMap *bolo2map = NULL;   /* Combined mapping bolo->map coordinates */
+  double  *boldata = NULL;      /* Pointer to bolometer data */
+  AstFrameSet *fs = NULL;       /* WCS FramesSet from input */           
+  smfHead *hdr = NULL;          /* Pointer to data header this time slice */
   dim_t i;                      /* Loop counter */
+  int ibasein;                  /* Index of base Frame in input WCS FrameSet */
   int lbnd_in[2];               /* Lower pixel bounds for input maps */
   int nbol = 0;                 /* # of bolometers in the sub-array */
+  AstSkyFrame *oskyfrm = NULL;  /* SkyFrame from the output WCS Frameset */
   int rebinflags;               /* Control the rebinning procedure */
-  AstMapping *sky2map=NULL;     /* Mapping celestial->map coordinates */
-  int ubnd_in[2];               /* Upper pixel bounds for input maps */
+  AstMapping *sky2map=NULL;     /* Mapping from celestial->map coordinates */
+  AstFrame *sf1 = NULL;         /* Pointer to copy of input current Frame */
+  AstFrameSet *swcsin = NULL;   /* Spatial WCS FrameSet for current time slice */
+  AstFrame *skyin = NULL;       /* Pointer to current Frame in input WCS FrameSet */
   const char *system;           /* Coordinate system */
+  int ubnd_in[2];               /* Upper pixel bounds for input maps */
 
   /* Main routine */
   if (*status != SAI__OK) return;
 
   /* Get the system from the outfset */
   system = astGetC( outfset, "system" );
+
+  /* Retrieve the sky2map mapping from the output frameset */
+  oskyfrm = astGetFrame( outfset, AST__CURRENT );
+  sky2map = astGetMapping( outfset, AST__BASE, AST__CURRENT );
+  /* Invert it to get Output SKY to output map coordinates */
+  astInvert( sky2map );
+  /* Create a SkyFrame in absolute coordinates */
+  abskyfrm = astCopy( oskyfrm );
+  astClear( abskyfrm, "SkyRefIs" );
 
   /* Calculate bounds in the input array */
   nbol = (data->dims)[0] * (data->dims)[1];
@@ -132,6 +157,7 @@ void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outfset,
   ubnd_in[0] = (data->dims)[0]-1;
   ubnd_in[1] = (data->dims)[1]-1;
 
+  /* Loop over all time slices in the data */
   for( i=0; i<(data->dims)[2]; i++ ) {
 	
     smf_tslice_ast( data, i, 1, status);
@@ -139,26 +165,76 @@ void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outfset,
     if( *status == SAI__OK ) {
       hdr = data->hdr;
 	  
-      /* Get bolo -> sky mapping 
-	 Set the System attribute for the SkyFframe in input WCS 
-	 FrameSet and extract the IN_PIXEL->Sky mapping. */	  
-
-      astSetC( hdr->wcs, "SYSTEM", system );
-      bolo2sky = astGetMapping( data->hdr->wcs, AST__BASE, 
-				AST__CURRENT );
-	  
-      /* Create sky to output grid mapping 
-	 using the base coordinates to get the coordinates of the 
-	 tangent point if it hasn't been done yet. */
-	  
-      if( sky2map == NULL ) { 
-	/* Extract the Sky->REF_PIXEL mapping. */
-	astSetC( outfset, "SYSTEM", system );
-	sky2map = astGetMapping( outfset, AST__CURRENT, 
-				 AST__BASE );
+      swcsin = hdr->wcs;
+      /* Find out how to convert from input GRID coords to the output
+	 sky frame.  Note, we want absolute sky coords here, even if
+	 the target is moving.  Record the original base frame before
+	 calling astConvert so that it can be re-instated later
+	 (astConvert modifies the base Frame). */
+      astInvert( swcsin );
+      ibasein = astGetI( swcsin, "Base" );
+      fs = astConvert( swcsin, abskyfrm, "SKY" );
+      astSetI( swcsin, "Base", ibasein );
+      astInvert( swcsin );
+      if( fs == NULL ) {
+         if( *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            errRep( FUNC_NAME, "The spatial coordinate system in the "
+                    "current input file is not compatible with the "
+                    "spatial coordinate system in the first input file.", 
+                    status );
+         }
+         break;
       }
-	  
-      /* Concatenate Mappings to get IN_PIXEL->REF_PIXEL Mapping */
+
+      /* The "fs" FrameSet has input GRID coords as its base Frame,
+	 and output (absolute) sky coords as its current frame. If the
+	 target is moving, modify this so that the current Frame
+	 represents offsets from the current telescope base pointing
+	 position (the mapping in the "fs" FrameSet is also modified
+	 automatically). */
+      if( moving ) {
+	/* Get the Mapping from AZEL (at the current input epoch) to
+	   the output sky system. Use it to convert the telescope base
+	   pointing position from (az,el) to the requested system. */
+         skyin = astGetFrame( swcsin, AST__CURRENT );
+         sf1 = astCopy( skyin );
+         astSetC( sf1, "System", "AZEL" );
+         azel2usesys = astConvert( sf1, abskyfrm, "" );
+         astTran2( azel2usesys, 1, &(hdr->state->tcs_az_bc1),
+                   &(hdr->state->tcs_az_bc2), 1, &a, &b );
+
+	 /* Explicitly annul these objects for efficiency in this
+	    tight loop. */
+         azel2usesys = astAnnul( azel2usesys );
+         sf1 = astAnnul( sf1 );
+         skyin = astAnnul( skyin );
+
+	 /* Modified the FrameSet to represent offsets from this
+	    origin. We use the FrameSet pointer "fs" rather than a
+	    pointer to the current Frame within the FrameSet. This
+	    means that the Mapping in the FrameSet will be modified to
+	    remap the current Frame. */
+         astSetD( fs, "SkyRef(1)", a );
+         astSetD( fs, "SkyRef(2)", b );
+         astSet( fs, "SkyRefIs=origin" );
+
+	 /* Get the Mapping and then clear the SkyRef attributes (this
+	    is because the current Frame in "fs" may be "*skyframe"
+	    and we do not want to make a permanent change to
+	    *skyframe). */
+         bolo2sky = astGetMapping( fs, AST__BASE, AST__CURRENT );
+         astClear( fs, "SkyRef(1)" );
+         astClear( fs, "SkyRef(2)" );
+         astClear( fs, "SkyRefIs" );
+      } else {
+	 /* If the target is not moving, just get the Mapping. */
+         bolo2sky = astGetMapping( fs, AST__BASE, AST__CURRENT );
+      }
+      /* The output from "sky2map" now corresponds to the input to
+	 "sky2map", whether the target is moving or not. Combine the
+	 input GRID to output SKY Mapping with the output SKY to
+	 output pixel Mapping supplied in "sky2map". */
       bolo2map = astCmpMap( bolo2sky, sky2map, 1, "" );
 
       /*  Rebin this time slice*/
@@ -180,19 +256,15 @@ void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outfset,
 		   map, variance, weights);
 
       /* clean up ast objects */
-      bolo2sky = astAnnul( bolo2sky );
-      bolo2map = astAnnul( bolo2map );
+      if (bolo2sky) bolo2sky = astAnnul( bolo2sky );
+      if (bolo2map) bolo2map = astAnnul( bolo2map );
+      if (fs) fs = astAnnul( fs );
     }
 
     /* Break out of loop over time slices if bad status */
     if (*status != SAI__OK) goto CLEANUP;
   }
 
-  /* Close the data file */
-  /*  if( data != NULL ) {
-    smf_close_file( &data, status);
-    data = NULL;
-    }*/
 
 
   /* Clean Up */
@@ -200,8 +272,6 @@ void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outfset,
   if (sky2map) sky2map  = astAnnul( sky2map );
   if (bolo2sky) bolo2sky = astAnnul( bolo2sky );
   if (bolo2map) bolo2map = astAnnul( bolo2map );
-
-  /*  if( data != NULL )
-      smf_close_file( &data, status);*/
+  if (fs) fs = astAnnul( fs );
 
 }
