@@ -394,6 +394,10 @@
 *          is used.
 *     MAXWRITE = INTEGER (Read)
 *          Number of samples to write in output file.
+*     OVERWRITE = LOGICAL (Read)
+*          Flag to specify whether existing files are
+*          overwritten. Setting this to FALSE increments the `group'
+*          counter in the output file names. Default is TRUE.
 *     SIMTYPE = CHAR (Read)
 *          Simulation type : In a 'full' simulation the flux
 *          for each bolometer at each time slice is calculated
@@ -430,6 +434,7 @@
 *     2006-11-22  Added multiple map cycle capabilities to liss/pong (JB)
 *     2006-12-08  Removed sc2sim_simhits and replaced with 
 *                 hits-only flag (JB)
+*     2007-01-26  Added OVERWRITE parameter
 *     {enter_further_changes_here}
 
 *    History (HEATRUN task):
@@ -447,7 +452,7 @@
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
+*     Copyright (C) 2006-2007 University of British Columbia. All Rights
 *     Reserved.
 
 *  Licence:
@@ -541,6 +546,8 @@ void smurf_sc2sim( int *status ) {
    Grp *obsGrp = NULL;             /* Group containing obs parameter file */
    AstKeyMap *obskeymap=NULL;      /* AstKeyMap for obs parameters */
    int osize = 0;                  /* Size of obsGrp */
+   int overwrite = 0;              /* Flag to specify whether existing
+				      files are overwritten */
    double *pzero=NULL;             /* bolometer power offsets */
    int rseed;                      /* seed for random number generator */
    double samptime;                /* sample time in sec */
@@ -556,6 +563,7 @@ void smurf_sc2sim( int *status ) {
    double *ybc=NULL;               /* projected NAS Y offsets of bolometers 
 				      in arcsec */
    double *ybolo=NULL;             /* Native bolo y-offsets */
+
 
    /* Get input parameters */
    kpg1Gtgrp ("OBSFILE", &obsGrp, &osize, status );
@@ -618,12 +626,14 @@ void smurf_sc2sim( int *status ) {
       /* Get the file close time */
       parGet0i("MAXWRITE", &maxwrite, status);
 
+      parGet0l("OVERWRITE", &overwrite, status);
+
       hitsonly = 0;
 
       sc2sim_simulate ( &inx, &sinx, coeffs, digcurrent, digmean, digscale, 
                         filter, heater, maxwrite, mode, coordframe, nbol, 
 			pzero, rseed, samptime, weights, xbc, xbolo, ybc, 
-			ybolo, hitsonly, status);
+			ybolo, hitsonly, overwrite, status);
 
    }  else if ( mode == pong || mode == singlescan || mode == bous || 
                 mode == liss ) {
@@ -644,6 +654,8 @@ void smurf_sc2sim( int *status ) {
       /* Check if this is a full of weights-only simulation */
       parChoic( "SIMTYPE", "FULL", "FULL, WEIGHTS", 1, 
                 simtype, LEN__METHOD, status);
+
+      parGet0l("OVERWRITE", &overwrite, status);
 
       /* Set the flag for hits-only */
       if( strncmp( simtype, "FULL", 4 ) == 0 ) {
@@ -668,7 +680,7 @@ void smurf_sc2sim( int *status ) {
       sc2sim_simulate ( &inx, &sinx, coeffs, digcurrent, digmean, digscale, 
                         filter, heater, maxwrite, mode, coordframe, nbol, 
 		        pzero, rseed, samptime, weights, xbc, xbolo, ybc, 
-			ybolo, hitsonly, status );
+			ybolo, hitsonly, overwrite, status );
 
    } else {
 
