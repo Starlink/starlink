@@ -186,7 +186,7 @@ void smurf_qlmakemap( int *status ) {
     smf_correct_extinction( data, "CSOTAU", 1, tau, status);
 
     if( *status == SAI__OK) {
-      smf_rebinmap(data, i, size, outframeset, lbnd_out, ubnd_out, 
+      smf_rebinmap(data, i, size, outframeset, 0, lbnd_out, ubnd_out, 
 		   map, variance, weights, status );
 
       /* Break out of loop over data files if bad status */
