@@ -46,6 +46,7 @@
 #define CUPID_INCLUDED
 
 #include "ast.h"
+#include "star/grp.h"
 #include "star/hds.h"
 
 /* Constants */
