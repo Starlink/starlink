@@ -382,7 +382,7 @@ fi
 # AUTOASTROM
 
 if test -f @bindir@/autoastrom/autoastrom; then
-  autoastrom () { . $AUTOASTROM_DIR/autoastrom; }
+  autoastrom () { @exec_prefix@/Perl/bin/perl $AUTOASTROM_DIR/autoastrom; }
 else
   autoastrom () { @staretcdir@/notinst autoastrom; }
 fi
