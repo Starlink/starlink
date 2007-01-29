@@ -166,6 +166,12 @@ if test -f @bindir@/atools/atools.sh; then
    export ATOOLS_HELP=@starhelpdir@/atools/atools
 fi
 
+#  AUTOASTROM
+
+if test -f @bindir@/autoastrom/autoastrom; then
+   export AUTOASTROM_DIR=@bindir@/autoastrom
+fi
+
 #  CCDPACK
 
 if test -f @bindir@/ccdpack/ccdpack.sh; then
@@ -371,6 +377,14 @@ if test -f @bindir@/atools/atools.sh; then
 else
   atools () { @staretcdir@/notinst atools; }
   atoolssetup () { @staretcdir@/notinst atools; }
+fi
+
+# AUTOASTROM
+
+if test -f @bindir@/autoastrom/autoastrom; then
+  autoastrom () { . $AUTOASTROM_DIR/autoastrom; }
+else
+  autoastrom () { @staretcdir@/notinst autoastrom; }
 fi
 
 # CCDPACK
