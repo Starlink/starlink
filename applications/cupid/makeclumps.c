@@ -442,7 +442,7 @@ void makeclumps( int *status ) {
    beamcorr[ 3 ] = velfwhm;
    cupidStoreClumps( "OUTCAT", xloc, obj, ndim, deconv, beamcorr,
                      "Output from CUPID:MAKECLUMPS", 0, NULL, 2, "",
-                     status );
+                     NULL, NULL, status );
 
 /* Relase the extension locator.*/
    datAnnul( &xloc, status );

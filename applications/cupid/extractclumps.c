@@ -68,6 +68,9 @@ void extractclumps( int *status ) {
 *        beam width. If FALSE, the undeconvolved values are stored in the 
 *        output catalogue and NDF. Note, the filter to remove clumps smaller 
 *        than the beam width is still applied, even if DECONV is FALSE. [TRUE]
+*     LOGFILE = LITERAL (Read)
+*        The name of a text log file to create. If a null (!) value is
+*        supplied, no log file is created. [!]
 *     MASK = NDF (Read)
 *        The input NDF containing the pixel assignments. This will
 *        usually have been created by the FINDCLUMPS command.
@@ -84,6 +87,24 @@ void extractclumps( int *status ) {
 *        value is the value stored in the CONFIG component of the CUPID 
 *        extension in the mask NDF, or 2.0 if the CUPID extension does not 
 *        contain a CONFIG component. []
+*     WCSPAR = _LOGICAL (Read)
+*        If a TRUE value is supplied, then the clump parameters stored in 
+*        the output catalogue and in the CUPID extension of the output NDF,
+*        are stored in WCS units, as defined by the current coordinate frame 
+*        in the WCS component of the input NDF (this can be inspected using 
+*        the KAPPA:WCSFRAME command). For instance, if the current
+*        coordinate system in the input NDF is (RA,Dec,freq), then the
+*        catalogue columns that hold the clump peak and centroid positions
+*        will use this same coordinate system. The spatial clump sizes
+*        will be stored in arc-seconds, and the spectral clump size will
+*        be stored in the unit of frequency used by the NDF (Hz, GHz, etc).
+*        If a FALSE value is supplied for this parameter, the clump
+*        parameters are stored in units of pixels within the pixel coordinate 
+*        system of the input NDF. The dynamic default for this parameter is 
+*        TRUE if the current coordinate system in the input NDF represents 
+*        celestial longitude and latitude in some system, plus a recogonised
+*        spectral axis (if the input NDF is 3D). Otherwise, the dynamic
+*        default is FALSE. []
 
 *  Synopsis:
 *     void extractclumps( int *status );
@@ -117,6 +138,9 @@ void extractclumps( int *status ) {
 *        Original version.
 *     11-DEC-2006 (DSB):
 *        Added parameter DECONV.
+*     29-JAN-2006 (DSB):
+*        - Added parameters WCSPAR and LOGFILE.
+*        - Store data units in output catalogue.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -129,13 +153,18 @@ void extractclumps( int *status ) {
    AstFrameSet *iwcs;           /* Pointer to the WCS FrameSet */
    AstKeyMap *config;           /* Pointer to KeyMap holding used config settings */
    AstObject *mconfig;          /* Pointer to KeyMap holding algorithm settings */
+   FILE *logfile = NULL;        /* File identifier for output log file */
    Grp *grp;                    /* GRP group holding NDF names */
    HDSLoc *ndfs;                /* Array of NDFs, one for each clump */
    HDSLoc *xloc;                /* HDS locator for CUPID extension */
    IRQLocs *qlocs;              /* HDS locators for quality name information */
-   const char *method;          /* Algorithm string supplied by user */
+   char attr[ 30 ];             /* AST attribute name */
+   char dataunits[ 21 ];        /* NDF data units */
    char dtype[ 20 ];            /* NDF data type */
    char itype[ 20 ];            /* NDF data type */
+   char logfilename[ GRP__SZNAM + 1 ]; /* Log file name */ 
+   const char *dom;             /* Axis domain */
+   const char *method;          /* Algorithm string supplied by user */
    double beamcorr[ 3 ];        /* Beam width corrections */
    double fb;                   /* FWHMBEAM value */
    double vr;                   /* VELORES value */
@@ -164,6 +193,8 @@ void extractclumps( int *status ) {
    int nclump;                  /* Number of clump IDs */
    int ndim;                    /* Total number of pixel axes */
    int nsig;                    /* Number of significant pixel axes */
+   int nskyax;                  /* No. of sky axes in current WCS Frame */
+   int nspecax;                 /* No. of spectral axes in current WCS Frame */
    int sdim[ NDF__MXDIM ];      /* The indices of the significant pixel axes */
    int size;                    /* Number of elements in "grp" */
    int skip[ 3 ];               /* Pixel axis skips */
@@ -171,6 +202,7 @@ void extractclumps( int *status ) {
    int subnd[ NDF__MXDIM ];     /* The upper bounds of the significant pixel axes */
    int there;                   /* Does object exist? */
    int type;                    /* Integer identifier for data type */
+   int usewcs;                  /* Use WCS coords in output catalogue? */
    void *ipd;                   /* Pointer to Data array */
 
 /* Abort if an error has already occurred. */
@@ -196,6 +228,10 @@ void extractclumps( int *status ) {
    kpg1Rgndf( "DATA", 1, 1, "", &grp, &size, status );
    ndgNdfas( grp, 1, "READ", &indf1, status );
    grpDelet( &grp, status );
+
+/* Get the Unit component. */
+   dataunits[ 0 ] = 0;
+   ndfCget( indf1, "Units", dataunits, 20, status ); 
 
 /* Match the bounds of the two NDFs. */
    ndfMbnd( "TRIM", &indf1, &indf2, status );
@@ -230,6 +266,43 @@ void extractclumps( int *status ) {
       dims[ i ] = 1;
       skip[ i ] = 0;
    }
+
+/* Count the number of sky axes and spectral axes in the current Frame of
+   the input NDFs WCS FrameSet. */
+   nskyax = 0;
+   nspecax = 0;
+   for( i = 0; i < nsig; i++ ) {
+      sprintf( attr, "Domain(%d)", i + 1 );
+      dom = astGetC( iwcs, attr );
+      if( dom ) {
+         if( !strcmp( dom, "SKY" ) ) {
+            nskyax++;
+         } else if( !strcmp( dom, "SPECTRUM" ) ||
+                    !strcmp( dom, "DSBSPECTRUM" ) ) {
+            nspecax++;
+         }
+      }
+   }
+
+/* See if a log file is to be created. */
+   if( *status == SAI__OK ) {
+      parGet0c( "LOGFILE", logfilename, GRP__SZNAM, status );
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+      } else if( *status == SAI__OK ) {
+         logfile = fopen( logfilename, "w" );
+      }
+   }
+
+/* See if the clump parameters are to be described using WCS values or
+   pixel values. The default is yes if the current WCS Frame consists
+   entirely of sky and spectral axes, and does not contain more than 1
+   spectral axis and 2 sky axes. */
+   parDef0l( "WCSPAR", ( nsig == 1 && nspecax == 1 && nskyax == 0 ) ||
+                       ( nsig == 2 && nspecax == 0 && nskyax == 2 ) ||
+                       ( nsig == 3 && nspecax == 1 && nskyax == 2 ),
+             status );
+   parGet0l( "WCSPAR", &usewcs, status );
 
 /* Choose the data type to use when mapping the DATA Data array. */
    ndfMtype( "_REAL,_DOUBLE", indf1, indf1, "DATA", itype, 20, dtype, 20,
@@ -396,13 +469,20 @@ void extractclumps( int *status ) {
 /* See if clump parameters should be deconvolved. */
       parGet0l( "DECONV", &deconv, status );
  
+/* Issue a logfile header for the clump parameters. */
+      if( logfile ) {
+         fprintf( logfile, "           Clump properties:\n" );
+         fprintf( logfile, "           =================\n\n" );
+      }
+
 /* Store the clump properties in the CUPID extension and output catalogue
    (if needed). */
       ndfState( indf1, "WCS", &gotwcs, status );
       msgBlank( status );
       cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, deconv, beamcorr, 
-                        "Output from CUPID:EXTRACTCLUMPS", 
-                        gotwcs ? iwcs : NULL, 1, status );
+                        "Output from CUPID:EXTRACTCLUMPS", usewcs,
+                        gotwcs ? iwcs : NULL, 1, dataunits, 
+                        NULL, logfile, status );
 
 /* Map the output pixel assignment array. */
       ndfMap( indf3, "DATA", "_INTEGER", "WRITE", (void *) &ipa, &el, status );
@@ -449,6 +529,9 @@ void extractclumps( int *status ) {
 
 /* End the NDF context */
    ndfEnd( status );
+
+/* Close any log file. */
+   if( logfile ) fclose( logfile );
 
 /* End the AST context */
    astEnd;
