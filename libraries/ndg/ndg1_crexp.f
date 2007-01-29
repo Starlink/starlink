@@ -85,6 +85,8 @@
 *        exist).
 *     21-DEC-1999 (DSB):
 *        Modified to avoid copying structure from basis HDS files.
+*     29-JAN-2007 (DSB):
+*        Ensure variables are initialised to avoid valgrind warnings.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -234,6 +236,9 @@
          END IF
       ELSE
          INSIZE = 0
+         IGRPB = GRP__NOID
+         IGRPT = GRP__NOID
+         IGRPH = GRP__NOID
       END IF
 
 *  If the group expression begins with "s/" then assume it is a regular
