@@ -21,52 +21,85 @@
 # Make ${1+"$@"} portability feature work on zsh, too.
 test "${ZSH_VERSION+set}" = set && alias -g '${1+"$@"}'='"$@"'
 
+# To simplify relocation use local variables rather than using the
+# @bindir@ everywhere
+relocate=0
+if test "${STAR_RELOC}" != ""; then
+    if [ -e ${STAR_RELOC} ]; then
+        if [ -e ${STAR_RELOC}/bin ]; then
+            relocate=1
+        fi
+    fi
+fi
+
+if [ ${relocate} -ne 0 ]; then
+    exec_prefix=${STAR_RELOC}
+    bindir=${exec_prefix}/bin
+    staretcdir=${exec_prefix}/etc
+    starhelpdir=${exec_prefix}/help
+    libdir=${exec_prefix}/lib
+    sharelibdir=${exec_prefix}/lib
+    datadir=${exec_prefix}/share
+    mandir=${exec_prefix}/man
+    starjavadir=${exec_prefix}/starjava
+else
+    exec_prefix=@exec_prefix@
+    bindir=@bindir@
+    staretcdir=@staretcdir@
+    starhelpdir=@starhelpdir@
+    libdir=@libdir@
+    sharelibdir=@sharelibdir@
+    datadir=@datadir@
+    mandir=@mandir@
+    starjavadir=@starjavadir@
+fi
+
 # Add Starlink directories to relevant paths.
 tmppath="${PATH}"
-if((`echo ${tmppath} | grep -c ':@bindir@/startcl:'`)); then
-    tmppath=`echo ${tmppath} | sed -e 's#:@bindir@/startcl:#:#g'`
+if((`echo ${tmppath} | grep -c ':${bindir}/startcl:'`)); then
+    tmppath=`echo ${tmppath} | sed -e 's#:${bindir}/startcl:#:#g'`
 fi
 
-if((`echo ${tmppath} | grep -c ':@bindir@/startcl$'`)); then
-    tmppath=`echo ${tmppath} | sed -e 's#:@bindir@/startcl##g'`
+if((`echo ${tmppath} | grep -c ':${bindir}/startcl$'`)); then
+    tmppath=`echo ${tmppath} | sed -e 's#:${bindir}/startcl##g'`
 fi
 
-if((`echo ${tmppath} | grep -c '^@bindir@/startcl'`)); then
-    tmppath=`echo ${tmppath} | sed -e 's#@bindir@/startcl:##g'`
+if((`echo ${tmppath} | grep -c '^${bindir}/startcl'`)); then
+    tmppath=`echo ${tmppath} | sed -e 's#${bindir}/startcl:##g'`
 fi
 
-if((`echo ${tmppath} | grep -c ':@bindir@:'`)); then
-    tmppath=`echo ${tmppath} | sed -e 's#:@bindir@:#:#g'`
+if((`echo ${tmppath} | grep -c ':${bindir}:'`)); then
+    tmppath=`echo ${tmppath} | sed -e 's#:${bindir}:#:#g'`
 fi
 
-if((`echo ${tmppath} | grep -c ':@bindir@$'`)); then
-    tmppath=`echo ${tmppath} | sed -e 's#:@bindir@##g'`
+if((`echo ${tmppath} | grep -c ':${bindir}$'`)); then
+    tmppath=`echo ${tmppath} | sed -e 's#:${bindir}##g'`
 fi
 
-if((`echo ${tmppath} | grep -c '^@bindir@'`)); then
-    tmppath=`echo ${tmppath} | sed -e 's#@bindir@:##g'`
+if((`echo ${tmppath} | grep -c '^${bindir}'`)); then
+    tmppath=`echo ${tmppath} | sed -e 's#${bindir}:##g'`
 fi
 
-if((`echo ${tmppath} | grep -c ':@starjavadir@/bin:'`)); then
-    tmppath=`echo ${tmppath} | sed -e 's#:@starjavadir@/bin:#:#g'`
+if((`echo ${tmppath} | grep -c ':${starjavadir}/bin:'`)); then
+    tmppath=`echo ${tmppath} | sed -e 's#:${starjavadir}/bin:#:#g'`
 fi
 
-if((`echo ${tmppath} | grep -c ':@starjavadir@/bin$'`)); then
-    tmppath=`echo ${tmppath} | sed -e 's#:@starjavadir@/bin##g'`
+if((`echo ${tmppath} | grep -c ':${starjavadir}/bin$'`)); then
+    tmppath=`echo ${tmppath} | sed -e 's#:${starjavadir}/bin##g'`
 fi
 
-if((`echo ${tmppath} | grep -c '^@starjavadir@/bin'`)); then
-    tmppath=`echo ${tmppath} | sed -e 's#@starjavadir@:##g'`
+if((`echo ${tmppath} | grep -c '^${starjavadir}/bin'`)); then
+    tmppath=`echo ${tmppath} | sed -e 's#${starjavadir}:##g'`
 fi
 
-export PATH="${tmppath}:@bindir@/startcl:@bindir@:@starjavadir@/bin"
+export PATH="${tmppath}:${bindir}/startcl:${bindir}:${starjavadir}/bin"
 
 #
 #     Prepend Starlink JRE (and JDK) paths to PATH.
 #     Do JRE after JDK so that the JRE takes precidence.
 
-JREHOME=@exec_prefix@/java/jre/bin
-JDKHOME=@exec_prefix@/java/bin
+JREHOME=${exec_prefix}/java/jre/bin
+JDKHOME=${exec_prefix}/java/bin
 
 if test -d ${JDKHOME}; then
     export PATH="${JDKHOME}:${PATH}"
@@ -88,10 +121,10 @@ if test "${@LD_LIB_PATH@}" != ""; then
 #  Set appropriate flag variables.
 
    found_sharelib="no"
-   if test "`echo ${@LD_LIB_PATH@} | grep -c ':@sharelibdir@'`" != "0"; then
+   if test "`echo ${@LD_LIB_PATH@} | grep -c ':${sharelibdir}'`" != "0"; then
       found_sharelib="yes"
    fi
-   if test "`echo ${@LD_LIB_PATH@} | grep -c '^@sharelibdir@'`" != "0"; then
+   if test "`echo ${@LD_LIB_PATH@} | grep -c '^${sharelibdir}'`" != "0"; then
       found_sharelib="yes"
    fi
 
@@ -99,29 +132,29 @@ if test "${@LD_LIB_PATH@}" != ""; then
 #  indicate they are not present.
 
    if test "$found_sharelib" == "no"; then
-      export @LD_LIB_PATH@="${@LD_LIB_PATH@}:@sharelibdir@"
+      export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${sharelibdir}"
 
       case "@build@" in
          *-osf*)
-            export @LD_LIB_PATH@="${@LD_LIB_PATH@}:@starjavadir@/lib/alpha"
+            export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/alpha"
          ;;
          x86_64*-linux*)
-            export @LD_LIB_PATH@="${@LD_LIB_PATH@}:@starjavadir@/lib/amd64"
+            export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/amd64"
          ;;
          *-linux*)
-            export @LD_LIB_PATH@="${@LD_LIB_PATH@}:@starjavadir@/lib/i386"
+            export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/i386"
          ;;
          *-cygwin*)
-            export @LD_LIB_PATH@="${@LD_LIB_PATH@}:@starjavadir@/lib/x86"
+            export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/x86"
          ;;
          *-sun*)
-            export @LD_LIB_PATH@="${@LD_LIB_PATH@}:@starjavadir@/lib/sparc"
+            export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/sparc"
          ;;
          *pc-apple-darwin*)
-            export @LD_LIB_PATH@="${@LD_LIB_PATH@}:@starjavadir@/lib/ppc"
+            export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/ppc"
          ;;
          *86*-apple-darwin*)
-            export @LD_LIB_PATH@="${@LD_LIB_PATH@}:@starjavadir@/lib/i386"
+            export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/i386"
          ;;
       esac
    fi
@@ -130,29 +163,29 @@ else
 
 #  @LD_LIB_PATH@ is not set.  Add required components.
 
-   export @LD_LIB_PATH@=@sharelibdir@
+   export @LD_LIB_PATH@=${sharelibdir}
 
    case "@build@" in
      *-osf*)
-        export @LD_LIB_PATH@="${@LD_LIB_PATH@}:@starjavadir@/lib/alpha"
+        export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/alpha"
      ;;
      x86_64*-linux*)
-        export @LD_LIB_PATH@="${@LD_LIB_PATH@}:@starjavadir@/lib/amd64"
+        export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/amd64"
      ;;
      *-linux*)
-        export @LD_LIB_PATH@="${@LD_LIB_PATH@}:@starjavadir@/lib/i386"
+        export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/i386"
      ;;
      *-cygwin*)
-        export @LD_LIB_PATH@="${@LD_LIB_PATH@}:@starjavadir@/lib/x86"
+        export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/x86"
      ;;
      *-sun*)
-        export @LD_LIB_PATH@="${@LD_LIB_PATH@}:/usr/openwin/lib:@starjavadir@/lib/sparc"
+        export @LD_LIB_PATH@="${@LD_LIB_PATH@}:/usr/openwin/lib:${starjavadir}/lib/sparc"
      ;;
      *pc-apple-darwin*)
-        export @LD_LIB_PATH@="${@LD_LIB_PATH@}:@starjavadir@/lib/ppc"
+        export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/ppc"
      ;;         
      *86*-apple-darwin*)
-        export @LD_LIB_PATH@="${@LD_LIB_PATH@}:@starjavadir@/lib/i386"
+        export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/i386"
      ;;         
    esac
 fi
@@ -161,208 +194,208 @@ fi
 
 #  ATOOLS
 
-if test -f @bindir@/atools/atools.sh; then
-   export ATOOLS_DIR=@bindir@/atools
-   export ATOOLS_HELP=@starhelpdir@/atools/atools
+if test -f ${bindir}/atools/atools.sh; then
+   export ATOOLS_DIR=${bindir}/atools
+   export ATOOLS_HELP=${starhelpdir}/atools/atools
 fi
 
 #  AUTOASTROM
 
-if test -f @bindir@/autoastrom/autoastrom; then
-   export AUTOASTROM_DIR=@bindir@/autoastrom
+if test -f ${bindir}/autoastrom/autoastrom; then
+   export AUTOASTROM_DIR=${bindir}/autoastrom
 fi
 
 #  CCDPACK
 
-if test -f @bindir@/ccdpack/ccdpack.sh; then
-   export CCDPACK_DIR=@bindir@/ccdpack
-   export CCDPACK_HELP=@starhelpdir@/ccdpack/ccdpack
+if test -f ${bindir}/ccdpack/ccdpack.sh; then
+   export CCDPACK_DIR=${bindir}/ccdpack
+   export CCDPACK_HELP=${starhelpdir}/ccdpack/ccdpack
 fi
 
 #  Convert
 
-if test -f @bindir@/convert/convert.sh; then
-   export CONVERT_DIR=@bindir@/convert
-   export CONVERT_HELP=@starhelpdir@/convert/convert
+if test -f ${bindir}/convert/convert.sh; then
+   export CONVERT_DIR=${bindir}/convert
+   export CONVERT_HELP=${starhelpdir}/convert/convert
 fi
 
 #  CUPID
 
-if test -f @bindir@/cupid/cupid.sh; then
-   export CUPID_DIR=@bindir@/cupid
-   export CUPID_HELP=@starhelpdir@/cupid/cupid
+if test -f ${bindir}/cupid/cupid.sh; then
+   export CUPID_DIR=${bindir}/cupid
+   export CUPID_HELP=${starhelpdir}/cupid/cupid
 fi
 
 #  DATACUBE
 
-if test -f @bindir@/datacube/datacube.csh; then
-   export DATACUBE_DIR=@bindir@/datacube
-   export DATACUBE_HELP=@starhelpdir@/datacube/datacube
+if test -f ${bindir}/datacube/datacube.csh; then
+   export DATACUBE_DIR=${bindir}/datacube
+   export DATACUBE_HELP=${starhelpdir}/datacube/datacube
 fi
 
 #
 #  EXTRACTOR
 
-if test -f @bindir@/extractor/extractor.sh; then
-   export EXTRACTOR_DIR=@bindir@/extractor
-   export EXTRACTOR_HELP=@starhelpdir@/extractor/extractor
+if test -f ${bindir}/extractor/extractor.sh; then
+   export EXTRACTOR_DIR=${bindir}/extractor
+   export EXTRACTOR_HELP=${starhelpdir}/extractor/extractor
 fi
 
 #  FIGARO
 
-if test -f @bindir@/figaro/figaro.csh; then
-   export FIG_DIR=@bindir@/figaro
-   export FIG_HELP=@starhelpdir@/figaro/figaro
-   export FIG_HTML=@exec_prefix@/docs/sun86.htx
+if test -f ${bindir}/figaro/figaro.csh; then
+   export FIG_DIR=${bindir}/figaro
+   export FIG_HELP=${starhelpdir}/figaro/figaro
+   export FIG_HTML=${exec_prefix}/docs/sun86.htx
    export FIGARO_FORMATS="ndf,dst"
-   export FIGARO_PROG_S=@staretcdir@/figaro
-   export FIGARO_PROG_N=@bindir@/figaro
+   export FIGARO_PROG_S=${staretcdir}/figaro
+   export FIGARO_PROG_N=${bindir}/figaro
 fi
 
 #  Fluxes
 
-if test -f @bindir@/fluxes/fluxes.sh; then
-   export FLUXES_DIR=@bindir@/fluxes
+if test -f ${bindir}/fluxes/fluxes.sh; then
+   export FLUXES_DIR=${bindir}/fluxes
 fi
 
 #  GAIA
 
-if test -f @bindir@/gaia/gaia.csh; then
-   export GAIA_DIR=@bindir@/gaia
+if test -f ${bindir}/gaia/gaia.csh; then
+   export GAIA_DIR=${bindir}/gaia
 fi
 
 #  HDSTOOLS
 
-if test -f @bindir@/hdstools/hdstools.sh; then
-   export HDSTOOLS_DIR=@bindir@/hdstools
-   export HDSTOOLS_HELP=@starhelpdir@/hdstools/hdstools
+if test -f ${bindir}/hdstools/hdstools.sh; then
+   export HDSTOOLS_DIR=${bindir}/hdstools
+   export HDSTOOLS_HELP=${starhelpdir}/hdstools/hdstools
 fi
 
 #  HDSTRACE
 
-if test -f @bindir@/hdstrace; then
-   export HDSTRACE_DIR=@bindir@
-   export HDSTRACE_HELP=@starhelpdir@/hdstrace
+if test -f ${bindir}/hdstrace; then
+   export HDSTRACE_DIR=${bindir}
+   export HDSTRACE_HELP=${starhelpdir}/hdstrace
 fi
 
 # ICL
 
-if test -f @bindir@/icl; then
-   export ADAM_PACKAGES=@starhelpdir@/adam_packages.shl
-   export ICL_LOGIN_SYS=@staretcdir@/icl_login_sys.icl
+if test -f ${bindir}/icl; then
+   export ADAM_PACKAGES=${starhelpdir}/adam_packages.shl
+   export ICL_LOGIN_SYS=${staretcdir}/icl_login_sys.icl
 fi
 
 #  JPL
 
-if test -f @staretcdir@/jpleph.dat; then
-   export JPL_DIR=@staretcdir@
+if test -f ${staretcdir}/jpleph.dat; then
+   export JPL_DIR=${staretcdir}
 fi
 
 #  Kappa
 
-if test -f @bindir@/kappa/kappa.sh; then
-   export KAPPA_DIR=@bindir@/kappa
-   export KAPPA_HELP=@starhelpdir@/kappa/kappa
+if test -f ${bindir}/kappa/kappa.sh; then
+   export KAPPA_DIR=${bindir}/kappa
+   export KAPPA_HELP=${starhelpdir}/kappa/kappa
 fi
 
 #  Kappa Retirement Home (kaprh)
 
-if test -f @bindir@/kaprh/kaprh.sh; then
-   export KAPRH_DIR=@bindir@/kaprh
-   export KAPRH_HELP=@starhelpdir@/kaprh/kaprh
+if test -f ${bindir}/kaprh/kaprh.sh; then
+   export KAPRH_DIR=${bindir}/kaprh
+   export KAPRH_HELP=${starhelpdir}/kaprh/kaprh
 fi
 
 #  ORAC-DR
 
-if test -f @bindir@/oracdr/etc/oracdr_start.sh; then
-   export ORAC_DIR=@bindir@/oracdr
+if test -f ${bindir}/oracdr/etc/oracdr_start.sh; then
+   export ORAC_DIR=${bindir}/oracdr
    export ORAC_PERL5LIB=${ORAC_DIR}/lib/perl5
    export ORAC_CAL_ROOT=${ORAC_DIR}/cal
 fi
 
 #  PERIOD
 
-if test -f @bindir@/period/period; then
-   export PERIOD_DIR=@bindir@/period
-   export PERIOD_HELP=@starhelpdir@/period
+if test -f ${bindir}/period/period; then
+   export PERIOD_DIR=${bindir}/period
+   export PERIOD_HELP=${starhelpdir}/period
 fi
 
 #  PGPLOT
 
 if test -z "${PGPLOT_DIR}"; then
-   export PGPLOT_DIR=@bindir@/
+   export PGPLOT_DIR=${bindir}/
 fi
 
 #  PHOTOM
 
-if test -f @bindir@/photom/photom.sh; then
-   export PHOTOM_DIR=@bindir@/photom
-   export PHOTOM_HELP=@starhelpdir@/photom/photomhelp
+if test -f ${bindir}/photom/photom.sh; then
+   export PHOTOM_DIR=${bindir}/photom
+   export PHOTOM_HELP=${starhelpdir}/photom/photomhelp
 fi
 
 #  Polpack
 
-if test -f @bindir@/polpack/polpack.sh; then
-   export POLPACK_DIR=@bindir@/polpack
-   export POLPACK_HELP=@starhelpdir@/polpack/polpack
+if test -f ${bindir}/polpack/polpack.sh; then
+   export POLPACK_DIR=${bindir}/polpack
+   export POLPACK_HELP=${starhelpdir}/polpack/polpack
 fi
 
 #
 #  PONGO
 #
 
-if test -f @bindir@/pongo/pongo.icl; then
-   export PONGO_BIN=@bindir@/pongo
-   export PONGO_HELP=@starhelpdir@/pongo/pongohelp
-   export PONGO_EXAMPLES=@datadir@/pongo
+if test -f ${bindir}/pongo/pongo.icl; then
+   export PONGO_BIN=${bindir}/pongo
+   export PONGO_HELP=${starhelpdir}/pongo/pongohelp
+   export PONGO_EXAMPLES=${datadir}/pongo
 fi
 
 #  SMURF
 
-if test -f @bindir@/smurf/smurf.sh; then
-   export SMURF_DIR=@bindir@/smurf
-   export SMURF_HELP=@starhelpdir@/smurf/smurf
+if test -f ${bindir}/smurf/smurf.sh; then
+   export SMURF_DIR=${bindir}/smurf
+   export SMURF_HELP=${starhelpdir}/smurf/smurf
 fi
 
 #
 #  SPECX
 #
 
-if test -f @datadir@/specx/specxstart.sh; then
-   export SYS_SPECX=@datadir@/specx
-   export SPECX_HELP=@starhelpdir@/specx
+if test -f ${datadir}/specx/specxstart.sh; then
+   export SYS_SPECX=${datadir}/specx
+   export SPECX_HELP=${starhelpdir}/specx
 fi
 
 #  SPLAT
 
-if test -f @starjavadir@/bin/splat/splat; then
-   export SPLAT_DIR=@starjavadir@/bin/splat
+if test -f ${starjavadir}/bin/splat/splat; then
+   export SPLAT_DIR=${starjavadir}/bin/splat
 fi
 
 #  SST
 
-if test -f @bindir@/sst/sst.sh; then
-   export SST_DIR=@bindir@/sst
-   export SST_HELP=@starhelpdir@/sst/sst
+if test -f ${bindir}/sst/sst.sh; then
+   export SST_DIR=${bindir}/sst
+   export SST_HELP=${starhelpdir}/sst/sst
 fi
 
 #  STILTS
 
-if test -x @starjavadir@/bin/stilts; then
-   export STILTS_DIR=@starjavadir@/bin/stilts
+if test -x ${starjavadir}/bin/stilts; then
+   export STILTS_DIR=${starjavadir}/bin/stilts
 fi
 
 #  SURF
 
-if test -f @bindir@/surf/surf.sh; then
-   export SURF_DIR=@bindir@/surf
-   export SURF_HELP=@starhelpdir@/surf/surf
+if test -f ${bindir}/surf/surf.sh; then
+   export SURF_DIR=${bindir}/surf
+   export SURF_HELP=${starhelpdir}/surf/surf
 fi
 
 #  TSP
 
-if test -f @bindir@/tsp/tsp.sh; then
-   export TSP_DIR=@bindir@/tsp
+if test -f ${bindir}/tsp/tsp.sh; then
+   export TSP_DIR=${bindir}/tsp
 fi
 
 # Aliases
@@ -371,72 +404,72 @@ fi
 
 # ATOOLS
 
-if test -f @bindir@/atools/atools.sh; then
+if test -f ${bindir}/atools/atools.sh; then
   atools () { . $ATOOLS_DIR/atools.sh; }
   atools () { . $ATOOLS_DIR/atools.sh; }
 else
-  atools () { @staretcdir@/notinst atools; }
-  atoolssetup () { @staretcdir@/notinst atools; }
+  atools () { ${staretcdir}/notinst atools; }
+  atoolssetup () { ${staretcdir}/notinst atools; }
 fi
 
 # AUTOASTROM
 
-if test -f @bindir@/autoastrom/autoastrom; then
-  autoastrom () { @exec_prefix@/Perl/bin/perl $AUTOASTROM_DIR/autoastrom; }
+if test -f ${bindir}/autoastrom/autoastrom; then
+  autoastrom () { ${exec_prefix}/Perl/bin/perl $AUTOASTROM_DIR/autoastrom; }
 else
-  autoastrom () { @staretcdir@/notinst autoastrom; }
+  autoastrom () { ${staretcdir}/notinst autoastrom; }
 fi
 
 # CCDPACK
 
-if test -f @bindir@/ccdpack/ccdpack.sh; then
+if test -f ${bindir}/ccdpack/ccdpack.sh; then
   ccdpack () { . $CCDPACK_DIR/ccdpack.sh; }
   ccdpacksetup () { . $CCDPACK_DIR/ccdpack.sh; }
 else
-  ccdpack () { @staretcdir@/notinst ccdpack; }
-  ccdpacksetup () { @staretcdir@/notinst ccdpack; }
+  ccdpack () { ${staretcdir}/notinst ccdpack; }
+  ccdpacksetup () { ${staretcdir}/notinst ccdpack; }
 fi
 
 # CONVERT
 
-if test -f @bindir@/convert/convert.sh; then
+if test -f ${bindir}/convert/convert.sh; then
   convert () { . $CONVERT_DIR/convert.sh; }
   convertsetup () { . $CONVERT_DIR/convert.sh; }
 else
-  convert () { @staretcdir@/notinst convert; }
-  convertsetup () { @staretcdir@/notinst convert; }
+  convert () { ${staretcdir}/notinst convert; }
+  convertsetup () { ${staretcdir}/notinst convert; }
 fi
 
 # CUPID
 
-if test -f @bindir@/cupid/cupid.sh; then
+if test -f ${bindir}/cupid/cupid.sh; then
   cupid () { . $CUPID_DIR/cupid.sh; }
   cupidsetup () { . $CUPID_DIR/cupid.sh; }
 else
-  cupid () { @staretcdir@/notinst cupid; }
-  cupidsetup () { @staretcdir@/notinst cupid; }
+  cupid () { ${staretcdir}/notinst cupid; }
+  cupidsetup () { ${staretcdir}/notinst cupid; }
 fi
 
 #  DATACUBE
 
-if test -f @bindir@/datacube/datacube.sh; then
-   datacube () { . @bindir@/datacube/datacube.sh; }
-   datacubestart () { . @bindir@/datacube/datacube.sh; }
-   datacubesetup () { . @bindir@/datacube/datacube.sh; }
+if test -f ${bindir}/datacube/datacube.sh; then
+   datacube () { . ${bindir}/datacube/datacube.sh; }
+   datacubestart () { . ${bindir}/datacube/datacube.sh; }
+   datacubesetup () { . ${bindir}/datacube/datacube.sh; }
 else
-   datacube () { @staretcdir@/notinst datacube; }
-   datacubestart () { @staretcdir@/notinst datacubestart; }
-   datacubesetup () { @staretcdir@/notinst datacubesetup; }
+   datacube () { ${staretcdir}/notinst datacube; }
+   datacubestart () { ${staretcdir}/notinst datacubestart; }
+   datacubesetup () { ${staretcdir}/notinst datacubesetup; }
 fi
 
 # DIPSO
 
-if test -f @bindir@/dipso/dipsosetup.sh; then
-  dipsosetup () { . @bindir@/dipso/dipsosetup.sh; }
-  dipso () { . @bindir@/dipso/dipsosetup.sh; }
+if test -f ${bindir}/dipso/dipsosetup.sh; then
+  dipsosetup () { . ${bindir}/dipso/dipsosetup.sh; }
+  dipso () { . ${bindir}/dipso/dipsosetup.sh; }
 else
-  dipsosetup () { @staretcdir@/notinst dipsosetup; }
-  dipso () { @staretcdir@/notinst dipso; }
+  dipsosetup () { ${staretcdir}/notinst dipsosetup; }
+  dipso () { ${staretcdir}/notinst dipso; }
 fi
 
 
@@ -444,216 +477,216 @@ fi
 #   Extractor
 #
 
-if test -f @bindir@/extractor/extractor.sh; then 
-   extractorsetup () { . @bindir@/extractor/extractor.sh; }
-   extractsetup () { . @bindir@/extractor/extractor.sh; }
-   extractor () { . @bindir@/extractor/extractor.sh; }
-   extract () { . @bindir@/extractor/extractor.sh; }
+if test -f ${bindir}/extractor/extractor.sh; then 
+   extractorsetup () { . ${bindir}/extractor/extractor.sh; }
+   extractsetup () { . ${bindir}/extractor/extractor.sh; }
+   extractor () { . ${bindir}/extractor/extractor.sh; }
+   extract () { . ${bindir}/extractor/extractor.sh; }
 else
-   extractorsetup () { @staretcdir@/notinst extractorsetup; }
-   extractsetup () { @staretcdir@/notinst extractsetup; }
-   extractor () { @staretcdir@/notinst extractor; }
-   extract () { @staretcdir@/notinst extract; }
+   extractorsetup () { ${staretcdir}/notinst extractorsetup; }
+   extractsetup () { ${staretcdir}/notinst extractsetup; }
+   extractor () { ${staretcdir}/notinst extractor; }
+   extract () { ${staretcdir}/notinst extract; }
 fi
 
 #  FIGARO
 
-if test -f @bindir@/figaro/figaro.sh; then
-   figaro () { . @bindir@/figaro/figaro.sh; }
-   figarosetup () { . @bindir@/figaro/figaro.sh; }
-   specdre () { . @bindir@/figaro/specdre.sh; }
-   specdresetup () { . @bindir@/figaro/specdre.sh; }
-   twodspec () { . @bindir@/figaro/twodspec.sh; }
-   twodspecsetup () { . @bindir@/figaro/twodspec.sh; }
+if test -f ${bindir}/figaro/figaro.sh; then
+   figaro () { . ${bindir}/figaro/figaro.sh; }
+   figarosetup () { . ${bindir}/figaro/figaro.sh; }
+   specdre () { . ${bindir}/figaro/specdre.sh; }
+   specdresetup () { . ${bindir}/figaro/specdre.sh; }
+   twodspec () { . ${bindir}/figaro/twodspec.sh; }
+   twodspecsetup () { . ${bindir}/figaro/twodspec.sh; }
 else
-   figaro () { @staretcdir@/notinst figaro; }
-   figarosetup () { @staretcdir@/notinst figarosetup; }
-   specdre () { @staretcdir@/notinst specdre; }
-   specdresetup () { @staretcdir@/notinst specdresetup; }
-   twodspec () { @staretcdir@/notinst twodspec; }
-   twodspecsetup () { @staretcdir@/notinst twodspecsetup; }
+   figaro () { ${staretcdir}/notinst figaro; }
+   figarosetup () { ${staretcdir}/notinst figarosetup; }
+   specdre () { ${staretcdir}/notinst specdre; }
+   specdresetup () { ${staretcdir}/notinst specdresetup; }
+   twodspec () { ${staretcdir}/notinst twodspec; }
+   twodspecsetup () { ${staretcdir}/notinst twodspecsetup; }
 fi
 
 # Fluxes
 
-if test -f @bindir@/fluxes/fluxes; then
+if test -f ${bindir}/fluxes/fluxes; then
   fluxes () { $FLUXES_DIR/fluxes.csh; }
   fluxnow () { $FLUXES_DIR/fluxnow.csh; }
 else
-  fluxes () { @staretcdir@/notinst fluxes; }
-  fluxnow () { @staretcdir@/notinst fluxnow; }
+  fluxes () { ${staretcdir}/notinst fluxes; }
+  fluxnow () { ${staretcdir}/notinst fluxnow; }
 fi
 
 #
 #   Gaia
 #
 
-if test -f @bindir@/gaia/gaia.csh; then
+if test -f ${bindir}/gaia/gaia.csh; then
    gaia () { $GAIA_DIR/gaia.csh ${1+"$@"}; }
    gaiadisp () { $GAIA_DIR/gaiadisp.csh ${1+"$@"}; }
 else
-   gaia () { @staretcdir@/notinst gaia; }
-   gaiadisp () { @staretcdir@/notinst gaiadisp; }
+   gaia () { ${staretcdir}/notinst gaia; }
+   gaiadisp () { ${staretcdir}/notinst gaiadisp; }
 fi
 
 # Kappa
 
-if test -f @bindir@/kappa/kappa.sh; then
+if test -f ${bindir}/kappa/kappa.sh; then
   kappa () { . $KAPPA_DIR/kappa.sh; }
   kappasetup () { . $KAPPA_DIR/kappa.sh; }
 else
-  kappa () { @staretcdir@/notinst kappa; }
-  kappasetup () { @staretcdir@/notinst kappa; }
+  kappa () { ${staretcdir}/notinst kappa; }
+  kappasetup () { ${staretcdir}/notinst kappa; }
 fi
 
 # Kappa Retirement Home (KAPRH)
 
-if test -f @bindir@/kaprh/kaprh.sh; then
+if test -f ${bindir}/kaprh/kaprh.sh; then
   kaprh () { . $KAPRH_DIR/kaprh.sh; }
   kaprhsetup () { . $KAPRH_DIR/kaprh.sh; }
 else
-  kaprh () { @staretcdir@/notinst kaprh; }
-  kaprhsetup () { @staretcdir@/notinst kaprh; }
+  kaprh () { ${staretcdir}/notinst kaprh; }
+  kaprhsetup () { ${staretcdir}/notinst kaprh; }
 fi
 
 # HDSTOOLS
 
-if test -f @bindir@/hdstools/hdstools.sh; then
+if test -f ${bindir}/hdstools/hdstools.sh; then
   hdstools () { . $HDSTOOLS_DIR/hdstools.sh; }
   hdstoolssetup () { . $HDSTOOLS_DIR/hdstools.sh; }
 else
-  hdstools () { @staretcdir@/notinst hdstools; }
-  hdstoolssetup () { @staretcdir@/notinst hdstools; }
+  hdstools () { ${staretcdir}/notinst hdstools; }
+  hdstoolssetup () { ${staretcdir}/notinst hdstools; }
 fi
 
 # ORAC-DR
 
-if test -f @bindir@/oracdr/etc/profile; then
-  source @bindir@/oracdr/etc/profile
+if test -f ${bindir}/oracdr/etc/profile; then
+  source ${bindir}/oracdr/etc/profile
 else
-  oracdr_cgs4 () { @staretcdir@/notinst oracdr_cgs4; }
-  oracdr_classiccam () { @staretcdir@/notinst oracdr_classiccam; }
-  oracdr_gmos () { @staretcdir@/notinst oracdr_gmos; }
-  oracdr_ingrid () { @staretcdir@/notinst oracdr_ingrid; }
-  oracdr_ircam () { @staretcdir@/notinst oracdr_ircam; }
-  oracdr_ircam_old () { @staretcdir@/notinst oracdr_ircam_old; }
-  oracdr_iris2 () { @staretcdir@/notinst oracdr_iris2; }
-  oracdr_isaac () { @staretcdir@/notinst oracdr_isaac; }
-  oracdr_michelle () { @staretcdir@/notinst oracdr_michelle; }
-  oracdr_naco () { @staretcdir@/notinst oracdr_naco; }
-  oracdr_niri () { @staretcdir@/notinst oracdr_niri; }
-  oracdr_scuba () { @staretcdir@/notinst oracdr_scuba; }
-  oracdr_sofi () { @staretcdir@/notinst oracdr_sofi; }
-  oracdr_spex () { @staretcdir@/notinst oracdr_spex; }
-  oracdr_swfcam () { @staretcdir@/notinst oracdr_swfcam; }
-  oracdr_swfcam1 () { @staretcdir@/notinst oracdr_swfcam1; }
-  oracdr_swfcam2 () { @staretcdir@/notinst oracdr_swfcam2; }
-  oracdr_swfcam3 () { @staretcdir@/notinst oracdr_swfcam3; }
-  oracdr_swfcam4 () { @staretcdir@/notinst oracdr_swfcam4; }
-  oracdr_ufti () { @staretcdir@/notinst oracdr_ufti; }
-  oracdr_ufti_old () { @staretcdir@/notinst oracdr_ufti_old; }
-  oracdr_uist () { @staretcdir@/notinst oracdr_uist; }
-  xoracdr () { @staretcdir@/notinst xoracdr; }
+  oracdr_cgs4 () { ${staretcdir}/notinst oracdr_cgs4; }
+  oracdr_classiccam () { ${staretcdir}/notinst oracdr_classiccam; }
+  oracdr_gmos () { ${staretcdir}/notinst oracdr_gmos; }
+  oracdr_ingrid () { ${staretcdir}/notinst oracdr_ingrid; }
+  oracdr_ircam () { ${staretcdir}/notinst oracdr_ircam; }
+  oracdr_ircam_old () { ${staretcdir}/notinst oracdr_ircam_old; }
+  oracdr_iris2 () { ${staretcdir}/notinst oracdr_iris2; }
+  oracdr_isaac () { ${staretcdir}/notinst oracdr_isaac; }
+  oracdr_michelle () { ${staretcdir}/notinst oracdr_michelle; }
+  oracdr_naco () { ${staretcdir}/notinst oracdr_naco; }
+  oracdr_niri () { ${staretcdir}/notinst oracdr_niri; }
+  oracdr_scuba () { ${staretcdir}/notinst oracdr_scuba; }
+  oracdr_sofi () { ${staretcdir}/notinst oracdr_sofi; }
+  oracdr_spex () { ${staretcdir}/notinst oracdr_spex; }
+  oracdr_swfcam () { ${staretcdir}/notinst oracdr_swfcam; }
+  oracdr_swfcam1 () { ${staretcdir}/notinst oracdr_swfcam1; }
+  oracdr_swfcam2 () { ${staretcdir}/notinst oracdr_swfcam2; }
+  oracdr_swfcam3 () { ${staretcdir}/notinst oracdr_swfcam3; }
+  oracdr_swfcam4 () { ${staretcdir}/notinst oracdr_swfcam4; }
+  oracdr_ufti () { ${staretcdir}/notinst oracdr_ufti; }
+  oracdr_ufti_old () { ${staretcdir}/notinst oracdr_ufti_old; }
+  oracdr_uist () { ${staretcdir}/notinst oracdr_uist; }
+  xoracdr () { ${staretcdir}/notinst xoracdr; }
 fi
 
 # Polpack
 
-if test -f @bindir@/polpack/polpack.sh; then
+if test -f ${bindir}/polpack/polpack.sh; then
   polpack () { . $POLPACK_DIR/polpack.sh; }
   polpacksetup () { . $POLPACK_DIR/polpack.sh; }
 else
-  polpack () { @staretcdir@/notinst polpack; }
-  polpacksetup () { @staretcdir@/notinst polpack; }
+  polpack () { ${staretcdir}/notinst polpack; }
+  polpacksetup () { ${staretcdir}/notinst polpack; }
 fi
 
 #
 #   Photom
 #
 
-if test -f @bindir@/photom/photom.sh; then
+if test -f ${bindir}/photom/photom.sh; then
    photomstart () { . $PHOTOM_DIR/photom.sh; }
    photom () { . $PHOTOM_DIR/photom.sh; }
    photomsetup () { . $PHOTOM_DIR/photom.sh; }
 else
-   photomstart () { @staretcdir@/notinst photomstart; }
-   photom () { @staretcdir@/notinst photom; }
-   photomsetup () { @staretcdir@/notinst photomsetup; }
+   photomstart () { ${staretcdir}/notinst photomstart; }
+   photom () { ${staretcdir}/notinst photom; }
+   photomsetup () { ${staretcdir}/notinst photomsetup; }
 fi
 
 #
 #   Pongo
 #
 
-if test -f @bindir@/pongo/pongo.icl; then
+if test -f ${bindir}/pongo/pongo.icl; then
    pongo () { icl $PONGO_BIN/pongo; }
 else
-   pongo () { @staretcdir@/notinst pongo; }
+   pongo () { ${staretcdir}/notinst pongo; }
 fi
 
 # SMURF - SCUBA-2 SURF
 
-if test -f @bindir@/smurf/smurf.sh; then
+if test -f ${bindir}/smurf/smurf.sh; then
   smurf () { . $SMURF_DIR/smurf.sh; }
   smurfsetup () { . $SMURF_DIR/smurf.sh; }
 else
-  smurf () { @staretcdir@/notinst smurf; }
-  smurfsetup () { @staretcdir@/notinst smurf; }
+  smurf () { ${staretcdir}/notinst smurf; }
+  smurfsetup () { ${staretcdir}/notinst smurf; }
 fi
 
 #
 # SPECX
 #
 
-if test -f @datadir@/specx/specxstart.sh; then
+if test -f ${datadir}/specx/specxstart.sh; then
   specx () { . $SYS_SPECX/specxstart.sh; command specx; }
   specxsetup () { . $SYS_SPECX/specxstart.sh; }
   specxstart () { . $SYS_SPECX/specxstart.sh; }
 else
-  specx () { @staretcdir@/notinst specx; }
-  specxsetup () { @staretcdir@/notinst specxsetup; }
-  specxstart () { @staretcdir@/notinst specxstart; }
+  specx () { ${staretcdir}/notinst specx; }
+  specxsetup () { ${staretcdir}/notinst specxsetup; }
+  specxstart () { ${staretcdir}/notinst specxstart; }
 fi
 
 # SPLAT
 
-if test -f @starjavadir@/bin/splat/splat; then
+if test -f ${starjavadir}/bin/splat/splat; then
   splat () { $SPLAT_DIR/splat ${1+"$@"}; }
   splatdisp () { $SPLAT_DIR/splatdisp ${1+"$@"}; }
   splatdispmany () { $SPLAT_DIR/splatdispmany ${1+"$@"}; }
 else
-  splat () { @staretcdir@/notinst splat; }
-  splatdisp () { @staretcdir@/notinst splat; }
-  splatdispmany () { @staretcdir@/notinst splat; }
+  splat () { ${staretcdir}/notinst splat; }
+  splatdisp () { ${staretcdir}/notinst splat; }
+  splatdispmany () { ${staretcdir}/notinst splat; }
 fi
 
 # SST
 
-if test -f @bindir@/sst/sst.sh; then
+if test -f ${bindir}/sst/sst.sh; then
   sst () { . $SST_DIR/sst.sh; }
   sstsetup () { . $SST_DIR/sst.sh; }
 else
-  sst () { @staretcdir@/notinst sst; }
-  sstsetup () { @staretcdir@/notinst sst; }
+  sst () { ${staretcdir}/notinst sst; }
+  sstsetup () { ${staretcdir}/notinst sst; }
 fi
 
 # SURF
 
-if test -f @bindir@/surf/surf.sh; then
+if test -f ${bindir}/surf/surf.sh; then
   surf () { . $SURF_DIR/surf.sh; }
   surfsetup () { . $SURF_DIR/surf.sh; }
 else
-  surf () { @staretcdir@/notinst surf; }
-  surfsetup () { @staretcdir@/notinst surf; }
+  surf () { ${staretcdir}/notinst surf; }
+  surfsetup () { ${staretcdir}/notinst surf; }
 fi
 
 # TSP
 
-if test -f @bindir@/tsp/tsp.sh; then
+if test -f ${bindir}/tsp/tsp.sh; then
   tsp () { . $TSP_DIR/tsp.sh; }
   tspsetup () { . $TSP_DIR/tsp.sh; }
 else
-  tsp () { @staretcdir@/notinst tsp; }
-  tspsetup () { @staretcdir@/notinst tsp; }
+  tsp () { ${staretcdir}/notinst tsp; }
+  tspsetup () { ${staretcdir}/notinst tsp; }
 fi
 
 # 64-bit mode for HDS
