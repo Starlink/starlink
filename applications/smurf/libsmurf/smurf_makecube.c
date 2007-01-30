@@ -153,14 +153,19 @@
 *          parameters LBOUND and UBOUND, even if a null value is supplied
 *          for OUT.
 *     OUTCAT = FILENAME (Write)
-*          An output catalogue in which to store all the detector positions 
-*          used to make the output cube (i.e. those selected using the
-*          DETECTORS parameter). By default, the stored positions are in the 
-*          same sky coordinate system as the current Frame in the output NDF
-*          (but see parameter CATFRAME). The label associated with each row 
-*          in the catalogue is the detector name. If a null value (!) is 
-*          supplied, no output catalogue is produced. See also parameter 
-*          CATFRAME. [!]
+*          An output catalogue in which to store all the spatial detector 
+*          positions used to make the output cube (i.e. those selected using 
+*          the DETECTORS parameter). By default, the stored positions are in 
+*          the same sky coordinate system as the current Frame in the output 
+*          NDF (but see parameter CATFRAME). The label associated with each 
+*          row in the catalogue is the detector name. The detector positions 
+*          in the catalogue are ordered as follows: all the positions for
+*          the first input NDF come first, followed by those for the second 
+*          input NDF, etc. Within the group of positions associated with a 
+*          single input NDF, the positions for the first time slice come
+*          first, followed by the positions for the second time slice, etc.
+*          If a null value (!) is supplied, no output catalogue is produced. 
+*          See also parameter CATFRAME. [!]
 *     PARAMS( 2 ) = _DOUBLE (Read)
 *          An optional array which consists of additional parameters
 *          required by the Sinc, SincSinc, SincCos, SincGauss, Somb,
