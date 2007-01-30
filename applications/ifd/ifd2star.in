@@ -45,6 +45,8 @@
 #       command-print and command-obsolete messages
 #    30-JUL-2004 (TIMJ):
 #       Add .sh output file
+#    29-JAN-2007 (TIMJ):
+#       Do not want quotes on "obey" commands in sh
 
 source @bindir@/ifd_front.tcl
 
@@ -450,6 +452,7 @@ proc command_end_hook {name} {
    global Aliases
    global Cmdicl
    global Cmdcsh
+   global Cmdsh
    global pkg_icl
    global pkg_csh
    global pkg_sh
@@ -485,11 +488,12 @@ proc command_end_hook {name} {
       puts $pkg_csh "alias $Current(prefix)_$name $Cmdcsh"
    }
 
+    puts $Cmdcsh
 # Write the .sh file
    puts $pkg_sh ""
-   puts $pkg_sh "$name () { $Cmdcsh \${1+\"\$@\"}; }"
+   puts $pkg_sh "$name () { $Cmdsh \${1+\"\$@\"}; }"
    if [string length $Current(prefix)] {
-      puts $pkg_sh "$Current(prefix)_$name () { $Cmdcsh \${1+\"\$@\"}; }"
+      puts $pkg_sh "$Current(prefix)_$name () { $Cmdsh \${1+\"\$@\"}; }"
    }
 }
 
@@ -500,6 +504,7 @@ proc print_start_hook {mess} {
    global Current
    global Cmdicl
    global Cmdcsh
+   global Cmdsh
 
    set Cmdcsh "echo $mess"
    regsub -all {'} $Cmdcsh {\\\\\\'} Cmdcsh
@@ -508,6 +513,7 @@ proc print_start_hook {mess} {
    regsub -all {\$} $Cmdcsh {\\\\\\$} Cmdcsh
    regsub -all {\(} $Cmdcsh {\\\\\\(} Cmdcsh
    regsub -all {\)} $Cmdcsh {\\\\\\)} Cmdcsh
+   set Cmdsh $Cmdcsh
 
    regsub -all ' $mess '' mess
    set mess "'$mess'"
@@ -522,9 +528,11 @@ proc obey_start_hook {command} {
    global Current
    global Cmdicl
    global Cmdcsh
+   global Cmdsh
 
    set Cmdicl "$command"
    set Cmdcsh "'$command'"
+   set Cmdsh "$command"
 }
 
 proc task_start_hook {action} {
@@ -534,6 +542,7 @@ proc task_start_hook {action} {
    global Current
    global Cmdicl
    global Cmdcsh
+   global Cmdsh
    global Parameters
 
    set Parameters {}
@@ -546,6 +555,7 @@ proc task_end_hook {action} {
    global Current
    global Cmdicl
    global Cmdcsh
+   global Cmdsh
    global Parameters
 
    set Cmdicl "$action $Parameters"
@@ -566,6 +576,7 @@ proc obsolete_start_hook {mess} {
    global Current
    global Cmdicl
    global Cmdcsh
+   global Cmdsh
 
    set Cmdcsh "$mess"
    regsub -all {'} $Cmdcsh {\\\\\\'} Cmdcsh
