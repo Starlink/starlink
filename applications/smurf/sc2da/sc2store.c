@@ -7,6 +7,7 @@
     05Dec2005 : remove star/hds_types.h, star/hds.h and extra ndf.h (bdk)
     23Jan2006 : replace star/hds.h (bdk)
     25Jul2006 : merge with ACSIS state structure usage (timj)
+    29Jan2007 : Added ACS_OFFEXPOSURE (dsb)
 */
 
 #include <string.h>
@@ -770,6 +771,7 @@ int *status                   /* global status (given and returned) */
    RETRIEVE_STATE( sc2_heat, SC2_HEAT, double, VAL__BADD );
 
    RETRIEVE_STATE( acs_exposure, ACS_EXPOSURE, float, VAL__BADR );
+   RETRIEVE_STATE( acs_offexposure, ACS_OFFEXPOSURE, float, VAL__BADR );
    RETRIEVE_STATE( acs_no_prev_ref, ACS_NO_PREV_REF, int, VAL__BADI );
    RETRIEVE_STATE( acs_no_next_ref, ACS_NO_NEXT_REF, int, VAL__BADI );
    RETRIEVE_STATE( acs_no_ons, ACS_NO_ONS, int, VAL__BADI );
