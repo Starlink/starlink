@@ -346,7 +346,12 @@ itcl::class rtd::RtdImageFitsHeader {
 	lassign [split $line =] l1 l2
 	if { [lempty $l1] } { return "" }
 	set key [string trim $l1]
-	lassign [split $l2 /] l1 l2
+	lassign [split $l2 /] l1 l2 l3
+        if { [info exists l3] && $l3 !={} } {
+           #  value = 'name/name' /comment?
+           set l1 "$l1/$l2"
+           set l2 "$l3"
+        }
 	set val [string trim $l1]
 	set com [string trim $l2]
 	return [list $key $val $com]
