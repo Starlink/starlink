@@ -73,6 +73,8 @@
 *        Initial version.
 *     13-DEC-2006 (DSB):
 *        Added "genvar" argument.
+*     30-JAN-2007 (DSB):
+*        Added calculation of Tsys output variances.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -124,20 +126,29 @@ void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap,
                       float *var_array, int *ispec, int *status ){
 
 /* Local Variables */
+   AstCmpMap *fmap = NULL;      /* Mapping from spectral grid to topo freq Hz */
    AstCmpMap *ssmap = NULL;     /* I/p GRID-> o/p PIXEL Mapping for spectral axis */
    AstFitsChan *fc;             /* Storage for FITS headers */
    AstFrame *specframe = NULL;  /* Spectral Frame in input FrameSet */
+   AstFrame *specframe2 = NULL; /* Temporary copy of SpecFrame in input WCS */
    AstFrameSet *fs = NULL;      /* A general purpose FrameSet pointer */
    AstFrameSet *swcsin = NULL;  /* FrameSet describing spatial input WCS */
    AstMapping *fsmap = NULL;    /* Base->Current Mapping extracted from a FrameSet */
    AstMapping *specmap = NULL;  /* PIXEL -> Spec mapping in input FrameSet */
+   char *fftwin = NULL;  /* Name of FFT windowing function */
    char *pname = NULL;   /* Name of currently opened data file */
    const char *name;     /* Pointer to current detector name */
+   const double *tsys;   /* Pointer to Tsys value for first detector */
    double *spectab = NULL;/* Workspace for spectral output grid positions */
    double *xin = NULL;   /* Workspace for detector input grid positions */
    double *xout = NULL;  /* Workspace for detector output pixel positions */
    double *yin = NULL;   /* Workspace for detector input grid positions */
    double *yout = NULL;  /* Workspace for detector output pixel positions */
+   double at;            /* Frequency at which to take the gradient */
+   double dnew;          /* Channel width in Hz */
+   double fcon;          /* Variance factor for whole file */
+   double k;             /* Back-end degradation factor */
+   double tcon;          /* Variance factor for whole time slice */
    float *pdata;         /* Pointer to next data sample */
    float *qdata;         /* Pointer to next data sample */
    int dim[ 3 ];         /* Output array dimensions */
@@ -277,6 +288,63 @@ void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap,
       name += strlen( name ) + 1;
    }
 
+/* If output variances are being calculated on the basis of Tsys values
+   in the input, find the constant factor associated with the current input
+   file. This is the squared backend degradation factor, divided by the
+   noise bandwidth. */
+   fcon = AST__BAD;
+   if( genvar == 2 ) {
+
+/* Get the required FITS headers, checking they were found. */
+      if( astGetFitsF( hdr->fitshdr, "BEDEGFAC", &k ) &&
+          astGetFitsS( hdr->fitshdr, "FFT_WIN", &fftwin ) ){
+
+/* Get a Mapping that converts values in the input spectral system to
+   topocentric frequency in Hz, and concatenate this Mapping with the
+   Mapping from input GRID coord to the input spectral system. The result 
+   is a Mapping from input GRID coord to topocentric frequency in Hz. */
+         specframe2 = astCopy( specframe );
+         astSet( specframe2, "system=freq,stdofrest=topo,unit=Hz" );
+         fmap = astCmpMap( specmap, astGetMapping( astConvert( specframe, 
+                                                               specframe2, 
+                                                               "" ),
+                                                   AST__BASE, AST__CURRENT ),
+                           1, "" );
+
+/* Differentiate this Mapping at the mid channel position to get the width
+   of an input channel in Hz. */
+         at = 0.5*nchan;
+         dnew = astRate( fmap, &at, 1, 1 );
+
+/* Modify the channel width to take account of the effect of the FFT windowing 
+   function. Allow undef value because FFT_WIN for old data had a broken value 
+   in hybrid subband modes. */
+         if( dnew != AST__BAD ) {
+            dnew = fabs( dnew );
+
+            if( !strcmp( fftwin, "truncate" ) ) {
+               dnew *= 1.0;
+
+            } else if( !strcmp( fftwin, "hanning" ) ) {
+               dnew *= 1.5;
+
+	    } else if( !strcmp( fftwin, "<undefined>" ) ) {
+	      /* Deal with broken data - make an assumption */
+ 	       dnew *= 1.0;
+
+            } else if( *status == SAI__OK ) {
+               *status = SAI__ERROR;
+               msgSetc( "W", fftwin );
+               errRep( FUNC_NAME, "FITS header FFT_WIN has unknown value "
+                       "'^W' (programming error).", status );
+            }
+
+/* Form the required constant. */
+            fcon = k*k/dnew;  
+         }        
+      }
+   }
+
 /* Store a pointer to the next input data value */
    pdata = ( data->pntr )[ 0 ];
 
@@ -291,6 +359,24 @@ void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap,
    set to the epoch of the time slice. */
       smf_tslice_ast( data, itime, 1, status );
       swcsin = hdr->wcs;
+
+/* If output variances are being calculated on the basis of Tsys values
+   in the input, find the constant factor associated with the current
+   time slice. */
+      tcon = AST__BAD;
+      if( fcon != AST__BAD ) {
+         if( hdr->state->acs_exposure != VAL__BADR &&
+             hdr->state->acs_exposure != 0.0 &&
+             hdr->state->acs_offexposure != VAL__BADR &&
+             hdr->state->acs_offexposure != 0.0 ) {
+
+            tcon = fcon*( 1.0/hdr->state->acs_exposure + 
+                          1.0/hdr->state->acs_offexposure ); 
+
+/* Get a pointer to the start of the Tsys values for this time slice. */
+            tsys = hdr->tsys + hdr->ndet*itime;
+         }
+      }
 
 /* We now create a Mapping from detector index to position in oskyframe. */
       astInvert( swcsin );
@@ -315,7 +401,7 @@ void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap,
       astTran2( fs, (data->dims)[ 1 ], xin, yin, 1, xout, yout );
 
 /* Loop round all detectors. */
-      for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
+      for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) { 
 
 /* If the detector has a valid position, see if it produced any good
    data values. */
@@ -329,9 +415,17 @@ void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap,
                }
             }         
 
-/* If it did, copy the spectrum to the output NDF. */
+/* If it did, calculate the variance associated with each detector
+   sample (if required), based on the input Tsys values, and copy the 
+   spectrum to the output NDF. */
             if( good ) {
                if( *ispec < dim[ 0 ] ){
+
+                  if( tcon != AST__BAD && genvar == 2 ) {
+                     var_array[ *ispec ] = tcon*tsys[ irec ]*tsys[ irec ];
+                  } else if( var_array ) {
+                     var_array[ *ispec ] = VAL__BADR;
+                  }
    
                   for( ichan = 0; ichan < nchan; ichan++, pdata++ ) {
                      iz = spectab[ ichan ] - 1;

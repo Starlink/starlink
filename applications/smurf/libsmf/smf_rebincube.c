@@ -141,6 +141,9 @@
 *        neighbour re-binning.
 *     22-JAN-2007 (DSB):
 *        Restructured again for better handing of moving targets.
+*     29-JAN-2007 (DSB):
+*        Use new expression for calculating the input variance on the basis of
+*        Tsys.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -224,7 +227,6 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
    double a;                   /* Longitude value */
    double at;                  /* Frequency at which to take the gradient */
    double b;                   /* Latitude value */
-   double coff;                /* Ratio of "off source" to "on source" integration times */
    double d2sum;               /* Sum of squared data values in output spectrum */
    double dnew;                /* Channel width in Hz */
    double fcon;                /* Variance factor for whole file */
@@ -506,16 +508,13 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
    time slice. */
       tcon = AST__BAD;
       if( fcon != AST__BAD ) {
-         if( hdr->state->acs_no_prev_ref != VAL__BADI &&
-             hdr->state->acs_no_next_ref != VAL__BADI &&
-             hdr->state->acs_no_ons != VAL__BADI &&
-             hdr->state->acs_exposure != VAL__BADR &&
-             hdr->state->acs_no_ons > 0 ) {
+         if( hdr->state->acs_exposure != VAL__BADR &&
+             hdr->state->acs_exposure != 0.0 &&
+             hdr->state->acs_offexposure != VAL__BADR && 
+             hdr->state->acs_offexposure != 0.0 ){
 
-            coff = (double)( hdr->state->acs_no_prev_ref +
-                             hdr->state->acs_no_next_ref )/
-                   (double) hdr->state->acs_no_ons;
-            tcon = fcon*( 1.0 + coff )/( coff*hdr->state->acs_exposure );
+            tcon = fcon*( 1.0/hdr->state->acs_exposure + 
+                          1.0/hdr->state->acs_offexposure );
 
 /* Get a pointer to the start of the Tsys values for this time slice. */
             tsys = hdr->tsys + hdr->ndet*itime;
