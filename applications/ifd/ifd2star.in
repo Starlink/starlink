@@ -488,7 +488,6 @@ proc command_end_hook {name} {
       puts $pkg_csh "alias $Current(prefix)_$name $Cmdcsh"
    }
 
-    puts $Cmdcsh
 # Write the .sh file
    puts $pkg_sh ""
    puts $pkg_sh "$name () { $Cmdsh \${1+\"\$@\"}; }"
@@ -561,6 +560,7 @@ proc task_end_hook {action} {
    set Cmdicl "$action $Parameters"
    regsub -all ! "$action $Parameters" {\!} temp
    set Cmdcsh "'$temp'"
+   set Cmdsh "$temp"
 }
 
 proc taskparam_start_hook { val } {
@@ -585,8 +585,9 @@ proc obsolete_start_hook {mess} {
    regsub -all {\$} $Cmdcsh {\\\\\\$} Cmdcsh
    regsub -all {\(} $Cmdcsh {\\\\\\(} Cmdcsh
    regsub -all {\)} $Cmdcsh {\\\\\\)} Cmdcsh
-   set Cmdcsh "'echo $Cmdcsh'"
-
+   set temp $Cmdcsh
+   set Cmdcsh "'echo $temp'"
+   set Cmdsh "echo $temp"
    regsub -all ' $mess '' mess
    set mess "'$mess'"
    regsub -all ' $mess '' mess
