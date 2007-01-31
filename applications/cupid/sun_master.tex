@@ -15,10 +15,10 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {255.1}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {13th September 2006}
+\newcommand{\stardocdate}      {31st January 2007}
 \newcommand{\stardoctitle}     {CUPID}
 \newcommand{\stardoconeline}   {A 3D Clump Identification and Analysis Package}
-\newcommand{\stardocversion}   {Version 0.0-13}
+\newcommand{\stardocversion}   {Version 0.0-25}
 \newcommand{\stardocmanual}    {Users' Manual}
 \newcommand{\stardocabstract}  {CUPID is a package of the identification
 and analysis of clumps of emission within 1-, 2- and 3- dimensional 
@@ -676,6 +676,9 @@ identification algorithms are supported such as ClumpFind, GaussClumps,
 \item[\htmlref{MAKECLUMPS}{MAKECLUMPS}] - creates a 1, 2 or 3D array
 containing a collection of random Gaussian clumps, with added noise.
 
+\item[\htmlref{OUTLINECLUMP}{OUTLINECLUMP}] - draw an outline on a
+previously displayed image around a 2-dimensional clump.
+
 \end{description}
 
 \section{Clump Identification Algorithms}
@@ -1172,10 +1175,9 @@ the entire data array, do:
 \small
 \begin{verbatim}
      % display data mode=perc accept
-     % contour noclear mode=good labpos=\! "clumps.more.cupid.clumps(12)"
+     % outlineclump clumps 12
 \end{verbatim}
 \normalsize
-
 
 \subsection{3D Data}
 

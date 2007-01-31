@@ -7,6 +7,12 @@
  data arrays.
 
 
+Changes introduced at V0.0-25:
+
+ - Add new command OUTLINECLUMP, which draw an outline of a 2D clump on a
+   previously displayed image. This is just a C-shell script that wraps
+   the KAPPA:CONTOUR command.
+
 Changes introduced at V0.0-24:
 
  - Add WCSPAR and LOGFILE parameters to EXTRACTCLUMPS.

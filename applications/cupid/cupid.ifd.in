@@ -497,6 +497,10 @@ package cupid {
 
    }
 
+   command outlineclump {
+      obey {$CUPID_DIR/outlineclump.csh}
+   }
+
    icl {defhelp cupid $CUPID_HELP 0}
 
    display {

@@ -2,7 +2,7 @@
 
 SUBDIRS = cupidsub 
 
-dist_bin_SCRIPTS = cupid.csh cupid.sh cupid.icl $(DATA_FILES) 
+dist_bin_SCRIPTS = cupid.csh cupid.sh cupid.icl outlineclump.csh $(DATA_FILES) 
 
 DATA_FILES = test_data.sdf test_data.FIT
 
@@ -30,20 +30,26 @@ starhelp_DATA = $(HELP_SOURCES:.hlp=.shl)
 
 prohlp=	@PROHLP@
 
-cupid.hlp: $(cupid_mon_TASKS:=.c) history.help cupid.star-hlp
+cupid.hlp: $(cupid_mon_TASKS:=.c) history.help outlineclump.help cupid.star-hlp
 	PATH="$(PATH):$(STARLINK)/bin/sst"; \
 	export PATH ;\
 	for f in $(cupid_mon_TASKS:=.c); do \
 	   $(prohlp) in=$${f} out=$${f}.help ;\
 	done
 	cat cupid.star-hlp *.help > cupid.hlp
-	rm $(cupid_mon_TASKS:=.c.help)
+	rm $(cupid_mon_TASKS:=.c.help) outlineclump.help
 
 history.help: cupid.news
 	./make_history_help
 
 cupid.h: cupid.h.source make_h
 	./make_h 
+
+outlineclump.help: outlineclump.csh
+	cat outlineclump.csh | sed -e 's@^#@*@' > outlineclump.f
+	-rm -f outlineclump.help
+	$(prohlp) in=outlineclump.f out=outlineclump.help
+	rm -f outlineclump.f
 
 ##  The latex documentation
 
@@ -57,10 +63,13 @@ sun255.tex: $(cupid_mon_TASKS:=.c) sun_master.tex
 	   $(prolat) in=$${f} atask nodocument nopage single out=$${f}.latex ;\
 	   ./make_quickdes $${f} ;\
 	done
+	cat outlineclump.csh | sed -e 's@^#@*@' > outlineclump.f
+	$(prolat) in=outlineclump.f atask nodocument nopage single out=outlineclump.latex
+	./make_quickdes outlineclump.f
+	rm -f outlineclump.f
 	cat *.latex > tasks.tex
 	cat *.quickdes > list.tex
-	rm $(cupid_mon_TASKS:=.c.latex)
-	rm $(cupid_mon_TASKS:=.c.quickdes)
+	rm $(cupid_mon_TASKS:=.c.latex) outlineclump.latex *.quickdes
 	./make_doc
 	rm tasks.tex list.tex
 
