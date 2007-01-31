@@ -84,4 +84,8 @@ int astGText( const char *, float, float, const char *, float, float );
 int astGTxExt( const char *, float, float, const char *, float, float, float *, float * );
 int astGCap( int, int );
 
+/* internal prototypes required for module */
+void Perl_storeGrfObject ( SV * plotobject );
+void Perl_clearGrfObject( void );
+
 #endif

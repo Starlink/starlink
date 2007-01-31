@@ -38,7 +38,6 @@
 /* Header files */
 /* ============ */
 #include "ast.h"
-#include "grf.h"           /* Declare the functions in this module */
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,6 +52,8 @@ extern "C" {
 
 #include "astTypemap.h"
 #include "arrays.h"
+#include "grf.h"           /* Declare the functions in this module */
+
 
 /* Have one global hash that contains the SV* reference to the CV */
 
