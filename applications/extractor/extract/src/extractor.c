@@ -170,7 +170,6 @@ void real_extractor( int *status ) {
     Grp *igrp;               /*  Group identifier for input NDFs */
     int size;                /*  Number of NDFs returned */
     int flag;                /*  Status of NDFs returned */
-    int i;                   /*  Loop variable */
 
     if ( setjmp( env ) == 0 ) {
         
