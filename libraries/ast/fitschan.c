@@ -741,6 +741,9 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *     16-JAN-2007 (DSB):
 *        Cast ignored function return values to (void) to avoid compiler
 *        warnings.
+*     31-JAN-2007 (DSB):
+*        Change SpecTrans to ignore blank unit strings (previously
+*        converted them to "Hz").
 *class--
 */
 
@@ -24449,7 +24452,9 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
             if( GetValue2( ret, this, keynam, AST__STRING, (void *) &cval, 0, 
                            method, class ) ){
                size_t nc = astChrLen( cval );
-               if( !Ustrncmp( cval, "Hz", nc ) ) {
+               if( nc == 0 ) {
+                  cval = NULL;
+               } else if( !Ustrncmp( cval, "Hz", nc ) ) {
                   cval = "Hz";
                } else if( !Ustrncmp( cval, "Angstrom", nc ) ) {
                   cval = "Angstrom";
