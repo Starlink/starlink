@@ -25,6 +25,7 @@ STAR_MONOLITHS
 STAR_CHECK_PROGS( ifd2star )
 STAR_CHECK_PROGS( hlib )
 STAR_CHECK_PROGS(prohlp,sst)
+STAR_CHECK_PROGS(perl)
 
 
 STAR_MESSGEN( [ libsmf/smf_err.msg ] )

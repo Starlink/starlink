@@ -132,6 +132,8 @@
 #         Added SYSTEM parameter for MAKEMAP and QLMAKEMAP
 #     26-JAN-2007 (AGG):
 #         Added OVERWRITE parameter for SC2SIM
+#     30-JAN-2007 (TIMJ):
+#         Add jcmtstate2cat
 #     {enter_changes_here}
 
 #  Bugs:
@@ -1152,6 +1154,10 @@ package @PACKAGE@ {
 
 
    }
+
+    command jcmtstate2cat {
+	obey {@PERL@ $SMURF_DIR/jcmtstate2cat}
+    }
 
    icl {defhelp @PACKAGE@ $@PACKAGE_UPCASE@_HELP 0}
 

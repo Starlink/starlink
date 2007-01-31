@@ -41,6 +41,9 @@ smurf_mon_LDADD = libsmurf/libsmurf.la libsc2sim/libsc2sim.la \
 # Dynamically generated scripts
 DYNSCRIPTS = smurf.sh smurf.csh smurf.icl
 
+# Install without modification
+STATICSCRIPTS = scripts/jcmtstate2cat
+
 # IFL files
 IFL_FILES = $(smurf_mon_TASKS:=.ifl) smurf_mon.ifl
 
