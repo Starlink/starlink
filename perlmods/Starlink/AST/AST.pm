@@ -478,6 +478,9 @@ use base qw/ Starlink::AST::Frame /;
 package Starlink::AST::Circle;
 use base qw/ Starlink::AST::Region /;
 
+package Starlink::AST::Polygon;
+use base qw/ Starlink::AST::Region /;
+
 package Starlink::AST::Ellipse;
 use base qw/ Starlink::AST::Region /;
 

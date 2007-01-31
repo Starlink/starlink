@@ -120,6 +120,10 @@ typedef void AstRegion;
 typedef void AstBox;
 typedef void AstCircle;
 typedef void AstEllipse;
+typedef void AstNullRegion;
+typedef void AstPolygon;
+typedef void AstInterval;
+typedef void CmpRegion;
 #endif
 
 /* between v3.0 and v3.4 astRate returned the second derivative */
@@ -3086,6 +3090,57 @@ new( class, frame, lbnd, ubnd, unc, options )
  OUTPUT:
   RETVAL
 
+MODULE = Starlink::AST   PACKAGE = Starlink::AST::Polygon
+
+# Note that the interface differs to the low level routine
+
+AstPolygon *
+new( class, frame, xpoints, ypoints, unc, options )
+  char * class
+  AstFrame * frame
+  AV * xpoints
+  AV * ypoints
+  AstRegion * unc
+  char * options
+ PREINIT:
+  int i;
+  int xlen;
+  int ylen;
+  double * points;
+  double * cxpoints;
+  double * cypoints;
+  double * x;
+  double * y;
+ CODE:
+#ifndef HASREGION
+   Perl_croak(aTHX_ "astPolygon: Please upgrade to AST V3.5 or greater");
+#else
+   /* count elements */
+   xlen = av_len( xpoints ) + 1;
+   ylen = av_len( ypoints ) + 1;
+   if ( xlen != ylen ) Perl_croak( aTHX_ "number of x and y points differ (%d != %d)",
+                           xlen, ylen );
+   cxpoints = pack1D(newRV_noinc((SV*)xpoints), 'd');
+   cypoints = pack1D(newRV_noinc((SV*)ypoints), 'd');
+
+   /* Create memory for the array as required by AST */
+   points = get_mortalspace( xlen * 2, 'd');
+
+   /* copy points in */
+   x = points;
+   y = points + xlen; /* offset into the array */
+   for (i = 0; i < xlen; i++ ) {
+     x[i] = cxpoints[i];
+     y[i] = cypoints[i];
+   }
+
+   ASTCALL(
+     RETVAL = astPolygon(frame, xlen, xlen, points, unc, options );
+   )
+   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
+#endif
+ OUTPUT:
+  RETVAL  
 
 MODULE = Starlink::AST   PACKAGE = Starlink::AST::NullRegion
 

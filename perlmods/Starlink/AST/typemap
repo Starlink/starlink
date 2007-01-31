@@ -36,6 +36,7 @@ AstKeyMap *	T_ASTOBJ
 AstRegion *	T_ASTOBJ
 AstEllipse *	T_ASTOBJ
 AstBox *	T_ASTOBJ
+AstPolygon *	T_ASTOBJ
 AstCircle *	T_ASTOBJ
 AstRateMap *	T_ASTOBJ
 AstFluxFrame *	T_ASTOBJ
