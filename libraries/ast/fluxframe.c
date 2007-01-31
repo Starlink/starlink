@@ -68,6 +68,11 @@ f     The FluxFrame class does not define any new routines beyond those
 *        Free memory allocated by calls to astReadString.
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
+*     31-JAN-2007 (DSB):
+*        Modified so that a FluxFrame can be used as a template to find a
+*        FluxFrame contained within a CmpFrame. This involves changes in
+*        Match and the removal of the local versions of SetMaxAxes and
+*        SetMinAxes.
 *class--
 */
 
@@ -143,8 +148,6 @@ static void (* parent_setunit)( AstFrame *, int, const char * );
 static void (* parent_clearattrib)( AstObject *, const char * );
 static void (* parent_overlay)( AstFrame *, const int *, AstFrame * );
 static void (* parent_setattrib)( AstObject *, const char * );
-static void (* parent_setmaxaxes)( AstFrame *, int );
-static void (* parent_setminaxes)( AstFrame *, int );
 static void (* parent_setsystem)( AstFrame *, AstSystemType );
 static void (* parent_clearsystem)( AstFrame * );
 static void (* parent_clearunit)( AstFrame *, int );
@@ -180,8 +183,6 @@ static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void Overlay( AstFrame *, const int *, AstFrame * );
-static void SetMaxAxes( AstFrame *, int );
-static void SetMinAxes( AstFrame *, int );
 static void SetUnit( AstFrame *, int, const char * );
 
 static AstSystemType GetSystem( AstFrame * );
@@ -1757,12 +1758,6 @@ void astInitFluxFrameVtab_(  AstFluxFrameVtab *vtab, const char *name ) {
    parent_overlay = frame->Overlay;
    frame->Overlay = Overlay;
 
-   parent_setmaxaxes = frame->SetMaxAxes;
-   frame->SetMaxAxes = SetMaxAxes;
-
-   parent_setminaxes = frame->SetMinAxes;
-   frame->SetMinAxes = SetMinAxes;
-
    parent_subframe = frame->SubFrame;
    frame->SubFrame = SubFrame;
 
@@ -2190,7 +2185,9 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    AstFrame *frame0;             /* Pointer to Frame underlying axis 0 */
    AstFluxFrame *template;       /* Pointer to template FluxFrame structure */
    int iaxis0;                   /* Axis index underlying axis 0 */
+   int iaxis;                    /* Axis index */
    int match;                    /* Coordinate conversion possible? */
+   int target_axis0;             /* Index of FluxFrame axis in the target */
    int target_naxes;             /* Number of target axes */
 
 /* Initialise the returned values. */
@@ -2209,24 +2206,12 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 /* Obtain the number of axes in the target Frame. */
    target_naxes = astGetNaxes( target );
 
-/* Obtain pointers to the primary Frame which underlies the target axis. */
-   astPrimaryFrame( target, 0, &frame0, &iaxis0 );
-
-/* The first criterion for a match is that this Frame must be a FluxFrame 
-   (or from a class derived from FluxFrame). */
-   match = astIsAFluxFrame( frame0 );
-
-/* Annul the Frame pointers used in the above tests. */
-   frame0 = astAnnul( frame0 );
-
-/* The next criterion for a match is that the template matches as a
+/* The first criterion for a match is that the template matches as a
    Frame class object. This ensures that the number of axes (1) and
    domain, etc. of the target Frame are suitable. Invoke the parent
    "astMatch" method to verify this. */
-   if( match ) {
-      match = (*parent_match)( template_frame, target,
-                               template_axes, target_axes, map, result );
-   }
+   match = (*parent_match)( template_frame, target,
+                            template_axes, target_axes, map, result );
 
 /* If a match was found, annul the returned objects, which are not
    needed, but keep the memory allocated for the axis association
@@ -2236,30 +2221,47 @@ static int Match( AstFrame *template_frame, AstFrame *target,
       *result = astAnnul( *result );
    }
 
-/* If the Frames still match, we next set up the axis association
-   arrays. */
-   if ( astOK && match ) {
+/* If OK so far, obtain pointers to the primary Frames which underlie
+   all target axes. Stop when a FluxFrame axis is found. */
+   if ( match && astOK ) {
+      match = 0;
+      for( iaxis = 0; iaxis < target_naxes; iaxis++ ) {
+         astPrimaryFrame( target, iaxis, &frame0, &iaxis0 );
+         if( astIsAFluxFrame( frame0 ) ) {
+            frame0 = astAnnul( frame0 );
+            target_axis0 = iaxis;
+            match = 1;
+            break;
+         } else {
+            frame0 = astAnnul( frame0 );
+         }
+      }
+   }
+
+/* Check at least one FluxFrame axis was found it the target. Store the
+   axis associataions. */
+   if( match && astOK ) {
       (*template_axes)[ 0 ] = 0;
-      (*target_axes)[ 0 ] = 0;
+      (*target_axes)[ 0 ] = target_axis0;
 
 /* Use the target's "astSubFrame" method to create a new Frame (the
-   result Frame) with a copy of of the target axis. This process also 
-   overlays the template attributes on to the target Frame and returns a 
-   Mapping between the target and result Frames which effects the required 
-   coordinate conversion. */
+   result Frame) with copies of the target axes in the required
+   order. This process also overlays the template attributes on to the
+   target Frame and returns a Mapping between the target and result
+   Frames which effects the required coordinate conversion. */
       match = astSubFrame( target, template, 1, *target_axes, *template_axes,
                            map, result );
+   }
 
-/* If an error occurred, or conversion to the result Frame's coordinate 
-   system was not possible, then free all memory, annul the returned 
-   objects, and reset the returned value. */
-      if ( !astOK || !match ) {
-         *template_axes = astFree( *template_axes );
-         *target_axes = astFree( *target_axes );
-         if( *map ) *map = astAnnul( *map );
-         if( *result ) *result = astAnnul( *result );
-         match = 0;
-      }
+/* If an error occurred, or conversion to the result Frame's
+   coordinate system was not possible, then free all memory, annul the
+   returned objects, and reset the returned value. */
+   if ( !astOK || !match ) {
+      *template_axes = astFree( *template_axes );
+      *target_axes = astFree( *target_axes );
+      if( *map ) *map = astAnnul( *map );
+      if( *result ) *result = astAnnul( *result );
+      match = 0;
    }
 
 /* Return the result. */
@@ -2512,88 +2514,6 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    } else {
       (*parent_setattrib)( this_object, setting );
    }
-}
-
-static void SetMaxAxes( AstFrame *this_frame, int maxaxes ) {
-/*
-*  Name:
-*     SetMaxAxes
-
-*  Purpose:
-*     Set a value for the MaxAxes attribute of a FluxFrame.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "fluxframe.h"
-*     void SetMaxAxes( AstFrame *this, int maxaxes )
-
-*  Class Membership:
-*     FluxFrame member function (over-rides the astSetMaxAxes method
-*     inherited from the Frame class).
-
-*  Description:
-*     This function sets the MaxAxes value for a FluxFrame to 1, which 
-*     is the only valid value for a FluxFrame, regardless of the value 
-*     supplied.
-
-*  Parameters:
-*     this
-*        Pointer to the FluxFrame.
-*     maxaxes
-*        The new value to be set (ignored).
-
-*  Returned Value:
-*     void.
-*/
-
-/* Check the global error status. */
-   if ( !astOK ) return;
-
-/* Use the parent astSetMaxAxes method to set a value of 1. */
-   (*parent_setmaxaxes)( this_frame, 1 );
-}
-
-static void SetMinAxes( AstFrame *this_frame, int minaxes ) {
-/*
-*  Name:
-*     SetMinAxes
-
-*  Purpose:
-*     Set a value for the MinAxes attribute of a FluxFrame.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "fluxframe.h"
-*     void SetMinAxes( AstFrame *this, int minaxes )
-
-*  Class Membership:
-*     FluxFrame member function (over-rides the astSetMinAxes method
-*     inherited from the Frame class).
-
-*  Description:
-*     This function sets the MinAxes value for a FluxFrame to 1, which is 
-*     the only valid value for a FluxFrame, regardless of the value 
-*     supplied.
-
-*  Parameters:
-*     this
-*        Pointer to the FluxFrame.
-*     minaxes
-*        The new value to be set (ignored).
-
-*  Returned Value:
-*     void.
-*/
-
-/* Check the global error status. */
-   if ( !astOK ) return;
-
-/* Use the parent astSetMinAxes method to set a value of 1. */
-   (*parent_setminaxes)( this_frame, 1 );
 }
 
 static void SetSystem( AstFrame *this_frame, AstSystemType newsys ) {

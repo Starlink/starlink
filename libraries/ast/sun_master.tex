@@ -24,12 +24,12 @@ f+
 \newcommand{\stardocnumber}    {210.22}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {29th June 2006}
+\newcommand{\stardocdate}      {31st January 2007}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
                                 in Astronomy}
-\newcommand{\stardoccopyright} {Copyright (C) 1997-2006 Council for the Central Laboratory of the Research Councils}
+\newcommand{\stardoccopyright} {Copyright (C) 1997-2007 Council for the Central Laboratory of the Research Councils}
 \newcommand{\stardoctitlehtml} {AST - A Library for Handling World Coordinate
                                       Systems in Astronomy}
 \newcommand{\stardocversion}   {V<VERSION_NUMBER>}
@@ -21166,12 +21166,10 @@ minimal cut-down version of SLALIB distributed as part of AST.
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V4.3}
+\subsection{Changes Introduced in V4.3}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V4.2 and V4.3 (the
-current version):
+The following describes the most significant changes which occurred in the 
+AST library between versions V4.2 and V4.3:
 
 \begin{enumerate}
 
@@ -21191,6 +21189,55 @@ source) should be accessed as an apparent radial velocity or a redshift.
 Note, any existing software that assumes that SourceVel always represents
 a velocity in km/s should be changed to allow for the possibility of
 SourceVel representing a redshift value.
+
+\end{enumerate}
+
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V4.4}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V4.3 and V4.4 (the
+current version):
+
+\begin{enumerate}
+
+\item The 
+c+
+astFindFrame 
+c-
+f+
+AST\_FINDFRAME
+f-
+function can now be used to search a CmpFrame for an instance of a more
+specialised class of Frame (SkyFrame, TimeFrame, SpecFrame, DSBSpecFrame
+or FluxFrame). That is, if an instance of one of these classes is used as
+the ``template'' when calling 
+c+
+astFindFrame,
+c-
+f+
+AST\_FINDFRAME,
+f-
+and the ``target'' being searched is a CmpFrame (or a FrameSet in which the 
+current Frame is a CmpFrame), then the component Frames within the CmpFrame 
+will be searched for an instance of the supplied template Frame, and, if 
+found, a suitable Mapping (which will include a PermMap to select the 
+required axes from the CmpFrame) will be returned by 
+c+
+astFindFrame.
+c-
+f+
+AST\_FINDFRAME.
+f-
+Note, for this to work, the MaxAxes and MinAxes attributes of the template 
+Frame must be set so that they cover a range that includes the number of axes 
+in the target CmpFrame.
+
+\item The SkyFrame, SpecFrame, DSBSpecFrame, TimeFrame and FluxFrame classes 
+now allow the MaxAxes and MinAxes attributes to be set freely to any value.
+In previous versions of AST, any attempt to change the value of MinAxes
+or MaxAxes was ignored, resulting in them always taking the default values.
 
 \end{enumerate}
 

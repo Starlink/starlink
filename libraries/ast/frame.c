@@ -3414,6 +3414,18 @@ f        found as part of the RESULT FrameSet. If the target is
 *
 *        If no celestial coordinate system can be found, a value of
 *        AST__NULL will be returned without error.
+c     result = astFindFrame( target, astSkyFrame( "MaxAxes=100" ), "" );
+f     RESULT = AST_FINDFRAME( TARGET, AST_SKYFRAME( 'MaxAxes=100', STATUS ), ' ', STATUS )
+*        This is like the last example, except that in the event of the
+*        target being a CmpFrame, the component Frames encapsulated by the 
+*        CmpFrame will be searched for a SkyFrame. If found, the returned
+*        Mapping will included a PermMap which selects the required axes
+*        from the target CmpFrame. 
+*
+*        This is acomplished by setting the MaxAxes attribute of the 
+*        template SkyFrame to a large number (larger than or equal to the 
+*        number of axes in the target CmpFrame). This allows the SkyFrame 
+*        to be used as a match for Frames containing from 2 to 100 axes.
 c     result = astFindFrame( target, astSkyFrame( "System=FK5" ), "" );
 f     RESULT = AST_FINDFRAME( TARGET, AST_SKYFRAME( 'System=FK5', STATUS ), ' ', STATUS )
 *        Searches for an equatorial (FK5) coordinate system in the
@@ -3496,7 +3508,22 @@ f     (b) the value of its Domain attribute appears in the DOMAINLIST
 *     any other SkyFrame, but will not match a basic
 *     Frame. Conversely, a basic Frame template will match any class
 *     of Frame.
-*     - If a template has a value set for any of its attributes, then
+*     - The exception to this is that a Frame of any class can be used to
+*     match a CmpFrame, if that CmpFrame contains a Frame of the same
+*     class as the template. Note however, the MaxAxes and MinAxes
+*     attributes of the template must be set to suitable values to allow
+*     it to match the CmpFrame. That is, the MinAxes attribute must be
+*     less than or equal to the number of axes in the target, and the MaxAxes 
+*     attribute must be greater than or equal to the number of axes in
+*     the target.
+*     - If using a CmpFrame as a template frame, the MinAxes and MaxAxes 
+*     for the template are determined by the MinAxes and MaxAxes values of 
+*     the component Frames within the template. So if you want a template 
+*     CmpFrame to be able to match Frames with different numbers of axes,
+*     then you must set the MaxAxes and/or MinAxes attributes in the component
+*     template Frames, before combining them together into the template 
+*     CmpFrame.
+*     - If a template has a value set for any of its main attributes, then
 *     it will only match Frames which have an identical value for that
 *     attribute (or which can be transformed, using a built-in
 *     conversion, so that they have the required value for that
@@ -3504,7 +3531,8 @@ f     (b) the value of its Domain attribute appears in the DOMAINLIST
 *     then Frames are matched regardless of the value they may have
 *     for that attribute. You may therefore make a template more or
 *     less specific by choosing the attributes for which you set
-*     values.
+*     values. This requirement does not apply to 'descriptive' attributes
+*     such as titles, labels, symbols, etc.
 *     - An important application of this principle involves the Domain
 *     attribute. Setting the Domain attribute of the template has the
 *     effect of restricting the search to a particular type of Frame
@@ -10806,9 +10834,6 @@ f     AST_FINDFRAME) as a template to match another (target) Frame. It
 *     Frame
 *        The default MaxAxes value for a Frame is equal to the number
 *        of Frame axes (Naxes attribute).
-*     SkyFrame
-*        The SkyFrame class constrains the MaxAxes value to be 2.  Any
-*        attempt to alter this value is simply ignored.
 *     CmpFrame
 *        The MaxAxes attribute of a CmpFrame is equal to the sum of
 *        the MaxAxes values of its two component Frames. Any attempt
@@ -10872,9 +10897,6 @@ f     AST_FINDFRAME) as a template to match another (target) Frame. It
 *     Frame
 *        The default MinAxes value for a Frame is equal to the number
 *        of Frame axes (Naxes attribute).
-*     SkyFrame
-*        The SkyFrame class constrains the MinAxes value to be 2. Any
-*        attempt to alter this value is simply ignored.
 *     CmpFrame
 *        The MinAxes attribute of a CmpFrame is equal to the sum of
 *        the MinAxes values of its two component Frames. Any attempt

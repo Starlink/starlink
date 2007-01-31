@@ -186,6 +186,11 @@ f     The SkyFrame class does not define any new routines beyond those
 *        SkyFrames, regardless of other attribute values.
 *        - Only align in offset coordinates if both target and template
 *        have a non-zero value for AlignOffset.
+*     23-JAN-2007 (DSB):
+*        Modified so that a SkyFrame can be used as a template to find a
+*        SkyFrame contained within a CmpFrame. This involves changes in
+*        Match and the removal of the local versions of SetMaxAxes and
+*        SetMinAxes.
 *class--
 */
 
@@ -660,8 +665,6 @@ static void (* parent_clearsystem)( AstFrame * );
 static void (* parent_overlay)( AstFrame *, const int *, AstFrame * );
 static void (* parent_setattrib)( AstObject *, const char * );
 static void (* parent_setformat)( AstFrame *, int, const char * );
-static void (* parent_setmaxaxes)( AstFrame *, int );
-static void (* parent_setminaxes)( AstFrame *, int );
 static void (* parent_setsystem)( AstFrame *, AstSystemType );
 static void (* parent_clearobslon)( AstFrame * );
 static void (* parent_setobslon)( AstFrame *, double );
@@ -746,8 +749,6 @@ static void Resolve( AstFrame *, const double [], const double [], const double 
 static void SetAsTime( AstSkyFrame *, int, int );
 static void SetAttrib( AstObject *, const char * );
 static void SetEquinox( AstSkyFrame *, double );
-static void SetMaxAxes( AstFrame *, int );
-static void SetMinAxes( AstFrame *, int );
 static void SetNegLon( AstSkyFrame *, int );
 static void SetObsLon( AstFrame *, double );
 static void SetProjection( AstSkyFrame *, const char * );
@@ -3629,10 +3630,6 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name ) {
    frame->Match = Match;
    parent_overlay = frame->Overlay;
    frame->Overlay = Overlay;
-   parent_setmaxaxes = frame->SetMaxAxes;
-   frame->SetMaxAxes = SetMaxAxes;
-   parent_setminaxes = frame->SetMinAxes;
-   frame->SetMinAxes = SetMinAxes;
    parent_subframe = frame->SubFrame;
    frame->SubFrame = SubFrame;
    parent_unformat = frame->Unformat;
@@ -5118,12 +5115,15 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    AstFrame *frame0;          /* Pointer to Frame underlying axis 0 */
    AstFrame *frame1;          /* Pointer to Frame underlying axis 1 */
    AstSkyFrame *template;     /* Pointer to template SkyFrame structure */
+   int iaxis;                 /* Axis index */
    int iaxis0;                /* Axis index underlying axis 0 */
    int iaxis1;                /* Axis index underlying axis 1 */
    int match;                 /* Coordinate conversion possible? */
    int swap1;                 /* Template axes swapped? */
    int swap2;                 /* Target axes swapped? */
    int swap;                  /* Additional axis swap needed? */
+   int target_axis0;          /* Index of 1st SkyFrame axis in the target */
+   int target_axis1;          /* Index of 2nd SkyFrame axis in the target */
    int target_naxes;          /* Number of target axes */
 
 /* Initialise the returned values. */
@@ -5162,28 +5162,51 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    }
 
 /* If OK so far, obtain pointers to the primary Frames which underlie
-   both target axes. */
+   all target axes. Stop when a SkyFrame axis is found. */
    if ( match && astOK ) {
-      astPrimaryFrame( target, 0, &frame0, &iaxis0 );
-      astPrimaryFrame( target, 1, &frame1, &iaxis1 );
 
-/* The next criterion for a match is that the first of these Frames
-   must be a SkyFrame (or from a class derived from SkyFrame). */
-      match = astIsASkyFrame( frame0 );
+      match = 0;
+      for( iaxis = 0; iaxis < target_naxes; iaxis++ ) {
+         astPrimaryFrame( target, iaxis, &frame0, &iaxis0 );
+         if( astIsASkyFrame( frame0 ) ) {
+            target_axis0 = iaxis;
+            match = 1;
+            break;
+         } else {
+            frame0 = astAnnul( frame0 );
+         }
+      }
 
-/* If this test is passed, we can now test that the second Frame is
-   the same one as the first one, and that the underlying axis indices
+/* Check at least one SkyFrame axis was found it the target. */
+      if( match ) {
+
+/* If so, search the remaining target axes for another axis that is
+   derived from the same SkyFrame. */
+         match = 0;
+         for( iaxis++ ; iaxis < target_naxes; iaxis++ ) {
+            astPrimaryFrame( target, iaxis, &frame1, &iaxis1 );
+            if( frame1 == frame0 ) {
+               target_axis1 = iaxis;
+               frame1 = astAnnul( frame1 );
+               match = 1;
+               break;
+            } else {
+               frame1 = astAnnul( frame1 );
+            }
+         }
+
+/* Annul the remaining Frame pointer used in the above tests. */
+         frame0 = astAnnul( frame0 );
+      }
+
+/* If this test is passed, we can now test that the underlying axis indices
    are 0 and 1, in either order. This then ensures that we have a
    single SkyFrame (not a compound Frame) with both axes present. */
       if ( match && astOK ) {
-         match = ( frame0 == frame1 ) &&
-                 ( ( ( iaxis0 == 0 ) && ( iaxis1 == 1 ) ) ||
+         match = ( ( ( iaxis0 == 0 ) && ( iaxis1 == 1 ) ) ||
                    ( ( iaxis1 == 0 ) && ( iaxis0 == 1 ) ) );
       }
 
-/* Annul the Frame pointers used in the above tests. */
-      frame0 = astAnnul( frame0 );
-      frame1 = astAnnul( frame1 );
    }
 
 /* If a possible match has been detected, we must now decide how the
@@ -5218,16 +5241,16 @@ static int Match( AstFrame *template_frame, AstFrame *target,
       if ( astGetPreserveAxes( template ) ) {
          (*template_axes)[ 0 ] = swap;
          (*template_axes)[ 1 ] = !swap;
-         (*target_axes)[ 0 ] = 0;
-         (*target_axes)[ 1 ] = 1;
+         (*target_axes)[ 0 ] = target_axis0;
+         (*target_axes)[ 1 ] = target_axis1;
 
 /* Otherwise, any swap applies to the target axis association
    instead. */
       } else {
          (*template_axes)[ 0 ] = 0;
          (*template_axes)[ 1 ] = 1;
-         (*target_axes)[ 0 ] = swap;
-         (*target_axes)[ 1 ] = !swap;
+         (*target_axes)[ 0 ] = swap ? target_axis1 : target_axis0;
+         (*target_axes)[ 1 ] = swap ? target_axis0 : target_axis1;
       }
 
 /* Use the target's "astSubFrame" method to create a new Frame (the
@@ -7088,86 +7111,6 @@ static void SetLast( AstSkyFrame *this ) {
 
 /* Save the TDB MJD to which this LAST corresponds. */
    this->eplast = astGetEpoch( this );
-}
-
-static void SetMaxAxes( AstFrame *this_frame, int maxaxes ) {
-/*
-*  Name:
-*     SetMaxAxes
-
-*  Purpose:
-*     Set a value for the MaxAxes attribute of a SkyFrame.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "skyframe.h"
-*     void SetMaxAxes( AstFrame *this, int maxaxes )
-
-*  Class Membership:
-*     SkyFrame member function (over-rides the astSetMaxAxes method
-*     inherited from the Frame class).
-
-*  Description:
-*     This function sets the MaxAxes value for a SkyFrame to 2, which is the
-*     only valid value for a SkyFrame, regardless of the value supplied.
-
-*  Parameters:
-*     this
-*        Pointer to the SkyFrame.
-*     maxaxes
-*        The new value to be set (ignored).
-
-*  Returned Value:
-*     void.
-*/
-
-/* Check the global error status. */
-   if ( !astOK ) return;
-
-/* Use the parent astSetMaxAxes method to set a value of 2. */
-   (*parent_setmaxaxes)( this_frame, 2 );
-}
-
-static void SetMinAxes( AstFrame *this_frame, int minaxes ) {
-/*
-*  Name:
-*     SetMinAxes
-
-*  Purpose:
-*     Set a value for the MinAxes attribute of a SkyFrame.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "skyframe.h"
-*     void SetMinAxes( AstFrame *this, int minaxes )
-
-*  Class Membership:
-*     SkyFrame member function (over-rides the astSetMinAxes method
-*     inherited from the Frame class).
-
-*  Description:
-*     This function sets the MinAxes value for a SkyFrame to 2, which is the
-*     only valid value for a SkyFrame, regardless of the value supplied.
-
-*  Parameters:
-*     this
-*        Pointer to the SkyFrame.
-*     minaxes
-*        The new value to be set (ignored).
-
-*  Returned Value:
-*     void.
-*/
-
-/* Check the global error status. */
-   if ( !astOK ) return;
-
-/* Use the parent astSetMinAxes method to set a value of 2. */
-   (*parent_setminaxes)( this_frame, 2 );
 }
 
 static void SetObsLon( AstFrame *this, double val ) {

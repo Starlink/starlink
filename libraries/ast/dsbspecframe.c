@@ -100,6 +100,10 @@ f     The DSBSpecFrame class does not define any new routines beyond those
 *     31-OCT-2006 (DSB):
 *        Use AlignSideBand attribute in SubFrame only if we are not
 *        currently restoring a FrameSet's integrity.
+*     31-JAN-2007 (DSB):
+*        Modified so that a DSBSpecFrame can be used as a template to find a
+*        DSBSpecFrame (or SpecFrame) contained within a CmpFrame. This
+*        involves changes in Match.
 *class--
 
 *  Implementation Deficiencies:
@@ -906,6 +910,8 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 
 /* Local Variables: */
    AstDSBSpecFrame *template;    /* Pointer to template DSBSpecFrame structure */
+   AstFrame *frame0;             /* Pointer to Frame underlying axis 0 */
+   int iaxis0;                   /* Axis index underlying axis 0 */
    int match;                    /* Coordinate conversion possible? */
 
 /* Initialise the returned values. */
@@ -928,22 +934,25 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    match = (*parent_match)( template_frame, target,
                             template_axes, target_axes, map, result );
 
-/* If a match was found, the target Frame must be a SpecFrame but may not
-   be a DSBSpecFrame. We use the returned objects directly if the target 
-   is a SpecFrame but not a DSBSpecFrame. So if a DSBSpecFrame and a
-   base SpecFrame are aligned, this will result in the DSBSpecFrame
-   behaving as a normal SpecFrame. */
+/* If a match was found, the target Frame must be (or contain) a SpecFrame,
+   but this target SpecFrame may be a simple SpecFrame rather than a 
+   DSBSpecFrame. We use the returned objects directly if the target 
+   SpecFrame is not a DSBSpecFrame. So if a DSBSpecFrame and a base 
+   SpecFrame are aligned, this will result in the DSBSpecFrame behaving as 
+   a normal SpecFrame. */
    if ( astOK && match ) {
-      if( astIsADSBSpecFrame( target ) ) {      
 
-/* Annul the returned objects, which are not needed, but keep the memory 
-   allocated for the axis association arrays, which we will re-use. */
+/* Get the primary Frame associated with the matching target axis. */
+      astPrimaryFrame( target, (*target_axes)[ 0 ], &frame0, &iaxis0 );
+
+/* Skip this next section, thus retaining the values returned by the
+   parent Match method above, if the target axis is not a DSBSpecFrame. */
+      if( astIsADSBSpecFrame( frame0 ) ) {      
+
+/* Annul the returned objects, which are not needed, but keep the axis 
+   association arrays which already hold the correct values. */
          *map = astAnnul( *map );
          *result = astAnnul( *result );
-
-/* We next set up the axis association arrays. */
-         (*template_axes)[ 0 ] = 0;
-         (*target_axes)[ 0 ] = 0;
 
 /* Use the target's "astSubFrame" method to create a new Frame (the
    result Frame) with a copy of of the target axis. This process also 
@@ -952,18 +961,22 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    coordinate conversion. */
          match = astSubFrame( target, template, 1, *target_axes, *template_axes,
                               map, result );
+      }
+
+/* Free resources. */
+      frame0 = astAnnul( frame0 );
+
+   }
 
 /* If an error occurred, or conversion to the result Frame's coordinate 
    system was not possible, then free all memory, annul the returned 
    objects, and reset the returned value. */
-         if ( !astOK || !match ) {
-            *template_axes = astFree( *template_axes );
-            *target_axes = astFree( *target_axes );
-            if( *map ) *map = astAnnul( *map );
-            if( *result ) *result = astAnnul( *result );
-            match = 0;
-         }
-      }
+   if ( !astOK || !match ) {
+      if( *template_axes ) *template_axes = astFree( *template_axes );
+      if( *target_axes ) *target_axes = astFree( *target_axes );
+      if( *map ) *map = astAnnul( *map );
+      if( *result ) *result = astAnnul( *result );
+      match = 0;
    }
 
 /* Return the result. */
