@@ -22,17 +22,21 @@
 *  Description:
 *     This is an optimized routine implementing a modified version of
 *     the MAKEMAP task for the QUICK-LOOK SCUBA-2 pipeline. The
-*     map-bounds are retrieved from the FITS header based on the
-*     specified map size. The bolometer drifts are removed using the
-*     fitted polynomials, the sky is removed by subtracting the mean
-*     level per time slice and then the data are extinction corrected
-*     using the MEANWVM tau value (at 225 GHz) from the FITS header.
+*     map-bounds are retrieved from the FITS header in the first file,
+*     which are based on the specified map size. In practice, this
+*     means that the output image will be much larger than
+*     necessary. The bolometer drifts are removed using the fitted
+*     polynomials, the sky is removed by subtracting the mean level
+*     per time slice and then the data are extinction corrected using
+*     the MEANWVM tau value (at 225 GHz) from the FITS header.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
 *          Input file(s)
 *     PIXSIZE = REAL (Read)
 *          Pixel size in output image, in arcsec
+*     SYSTEM = LITERAL (Read)
+*          The celestial coordinate system for the output map
 *     OUT = NDF (Write)
 *          Output file
 
@@ -58,6 +62,10 @@
 *        Remove unused sc2da includes.
 *     2007-01-12 (AGG):
 *        Add SYSTEM parameter for specifying output coordinate system
+*     2007-01-30 (AGG):
+*        Update due to API change for smf_rebinmap. Also just pass in
+*        the index of the first file in the input Grp to
+*        smf_mapbounds_approx
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -112,25 +120,24 @@
 void smurf_qlmakemap( int *status ) {
 
   /* Local Variables */
+  smfData *data = NULL;      /* pointer to  SCUBA2 data struct */
   void *data_index[1];       /* Array of pointers to mapped arrays in ndf */
   int flag;                  /* Flag */
+  dim_t i;                   /* Loop counter */
   Grp *igrp = NULL;          /* Group of input files */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
-  void *map=NULL;            /* Pointer to the rebinned map data */
+  void *map = NULL;          /* Pointer to the rebinned map data */
+  int moving = 0;            /* Flag to denote a moving object */
   int n;                     /* # elements in the output map */
   int ondf;                  /* output NDF identifier */
-  AstFrameSet *outframeset=NULL; /* Frameset containing sky->output mapping */
+  AstFrameSet *outframeset = NULL; /* Frameset containing sky->output mapping */
   float pixsize=3;           /* Size of an output map pixel in arcsec */
   int size;                  /* Number of files in input group */
   char system[10];           /* Celestial coordinate system for output image */
+  double tau;                /* 225 GHz optical depth */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
-  void *variance=NULL;       /* Pointer to the variance map */
-  void *weights=NULL;        /* Pointer to the weights map */
-
-  smfData *data=NULL;          /* pointer to  SCUBA2 data struct */
-  dim_t i;                     /* Loop counter */
-
-  double tau;
+  void *variance = NULL;     /* Pointer to the variance map */
+  void *weights = NULL;      /* Pointer to the weights map */
 
   /* Main routine */
   ndfBegin();
@@ -138,7 +145,7 @@ void smurf_qlmakemap( int *status ) {
   /* Get group of input files */
   ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
 
-  /* Get the celestial coordinate system for the output cube. */
+  /* Get the celestial coordinate system for the output image. */
   parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC,"
 	    "GAPPT,FK4,FK4-NO-E,ECLIPTIC", 1, system, 10, status );
 
@@ -152,12 +159,11 @@ void smurf_qlmakemap( int *status ) {
 	   status);
   }
 
-  /* Calculate the map bounds */
+  /* Calculate the map bounds - from the FIRST FILE only! */
   msgOutif(MSG__VERB," ", 
-	   "SMURF_QLMAKEMAP: Determine approx map bounds", status);
-  smf_mapbounds_approx( igrp, size, system, 0, 0, 1, pixsize, lbnd_out, ubnd_out, 
-			&outframeset, status );
-
+	   "SMURF_QLMAKEMAP: Determine approx map bounds from first file", status);
+  smf_mapbounds_approx( igrp, 1, system, pixsize, lbnd_out, ubnd_out, 
+			&outframeset, &moving, status );
 
   /* Create the output NDF for the image and map arrays */
   ndfCreat( "OUT", "_DOUBLE", 2, lbnd_out, ubnd_out, &ondf, status );
@@ -171,7 +177,9 @@ void smurf_qlmakemap( int *status ) {
 			(ubnd_out[1]-lbnd_out[1]+1), sizeof(double),
 			1, status );
 
-  /* Regrid the data */
+  /* Loop over each input file, subtracting bolometer drifts, a mean
+     sky level (per timeslice), correcting for extinction and
+     regridding the data into the output map */
   msgOutif(MSG__VERB," ", "SMURF_QLMAKEMAP: Regrid data", status);
   for(i=1; i<=size; i++ ) {
     /* Read data from the ith input file in the group */
@@ -179,14 +187,16 @@ void smurf_qlmakemap( int *status ) {
 
     /* Remove bolometer drifts */
     smf_subtract_poly( data, status );
-    /* Remove sky */
+    /* Remove a mean sky level */
     smf_subtract_plane( data, NULL, "MEAN", status );
-    /* Correct extinction */
+    /* Correct for atmospheric extinction using the mean WVM-derived
+       225-GHz optical depth */
     smf_fits_getD( data->hdr, "MEANWVM", &tau, status);
     smf_correct_extinction( data, "CSOTAU", 1, tau, status);
 
+    /* If all's well, add the data into the map */
     if( *status == SAI__OK) {
-      smf_rebinmap(data, i, size, outframeset, 0, lbnd_out, ubnd_out, 
+      smf_rebinmap(data, i, size, outframeset, moving, lbnd_out, ubnd_out, 
 		   map, variance, weights, status );
 
       /* Break out of loop over data files if bad status */
@@ -199,14 +209,16 @@ void smurf_qlmakemap( int *status ) {
       data = NULL;
     }
   }
-  /* Write FITS header */
+  /* Write WCS FrameSet to output file */
   ndfPtwcs( outframeset, ondf, status );
 
+  /* Free the WCS pointer */
   if( outframeset != NULL ) {
     astAnnul( outframeset );
     outframeset = NULL;
   }
-  
+
+  /* Tidy up and close the output file */  
   ndfUnmap( ondf, "DATA", status);
   ndfUnmap( ondf, "VARIANCE", status);
   ndfAnnul( &ondf, status );
