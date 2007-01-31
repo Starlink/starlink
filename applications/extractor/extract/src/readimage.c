@@ -428,13 +428,17 @@ void	readimagehead(picstruct *field)
 /*----------------------------- Astrometry ---------------------------------*/
 /* Presently, astrometry is done only on the measurement and detect images */
   if ( field->flags & ( MEASURE_FIELD | DETECT_FIELD ) ) {
-    astromstruct *as;
-    AstFrameSet  *wcsinfo;
+    AstFrame     *baseframe;
     AstFrame     *frame;
-    AstSkyFrame  *template;
-    AstMapping   *map;
     AstFrameSet  *fs;
+    AstFrameSet  *wcsinfo;
+    AstMapping   *map;
+    AstSkyFrame  *template;
+    astromstruct *as;
+    int          base;
+    int          current;
     int          exists;
+    int          outperm[2];
 
     QCALLOC(as, astromstruct, 1);
     field->astrom = as;
@@ -457,6 +461,10 @@ void	readimagehead(picstruct *field)
         */
         template = astSkyFrame( "" );
 
+        /* Allow the find to pick out a SkyFrame that's inside a nD frame,
+         * most likely this matches the current frame dimensionality */
+        astSetI( template, "MaxAxes", astGetI( wcsinfo, "Nout" ) );
+
         /* Search the WCS FrameSet for a Frame matching this template. This
            will match any SkyFrame, no matter what the axis order, system type,
            etc. It returns a FrameSet connecting the base Frame in the WCS
@@ -475,6 +483,7 @@ void	readimagehead(picstruct *field)
                new current Frame. */
             map = astGetMapping( fs, AST__BASE, AST__CURRENT );
             frame = astGetFrame( fs, AST__CURRENT );
+
             astAddFrame( wcsinfo, AST__BASE, map, frame );
             map = astAnnul( map );
             frame = astAnnul( frame );
@@ -482,8 +491,29 @@ void	readimagehead(picstruct *field)
             /* Set a flag indicating if the current Frame in the WCS FrameSet
                is a usable SkyFrame. */
             as->wcs_flag = 1;
-        } else {
+        } 
+        else {
             as->wcs_flag = 0;
+        }
+
+        /* The BASE coordinates should be 2D as well. Make sure that's the
+         * case. Pick out the select sigaxes. */
+        if ( ndims != 2 ) {
+            outperm[0] = sigaxis[0] + 1;
+            outperm[1] = sigaxis[1] + 1;
+            baseframe = astGetFrame( fs, AST__BASE );
+            frame = astPickAxes( baseframe, 2, outperm, &map );
+            astAnnul( baseframe );
+
+            /* Now add this frame to the FrameSet and make it the base
+             * one. Also reinstate the skyframe as the current frame.*/
+            current = astGetI( wcsinfo, "Current" );
+            astAddFrame( wcsinfo, AST__BASE, map, frame );
+            base = astGetI( wcsinfo, "Current" );
+            astSetI( wcsinfo, "Base", base );
+            astSetI( wcsinfo, "Current", current );
+            astAnnul( frame );
+            astAnnul( map );
         }
 
         /* Store the pointer to the WCS FrameSet */
