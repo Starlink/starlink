@@ -134,6 +134,8 @@
 *     2007-01-19 (AGG):
 *        - Change API to smf_mapbounds: now returns the moving flag
 *        - Change API to smf_rebinmap: takes the moving flag as an argument
+*     2007-01-30 (AGG):
+*        Update API to smf_mapbounds_approx to return moving flag
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -383,9 +385,9 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
 		    int *ubnd_out, AstFrameSet **outframeset, int *moving,
 		    int *status );
 
-void smf_mapbounds_approx( Grp *igrp,  int size, char *system, double lon_0, 
-		    double lat_0, int flag, double pixsize, int *lbnd_out, 
-		    int *ubnd_out, AstFrameSet **outframeset, int *status );
+void smf_mapbounds_approx( Grp *igrp, int index, char *system, double pixsize, 
+			   int *lbnd_out, int *ubnd_out, AstFrameSet **outframeset, 
+			   int *moving, int *status );
 
 void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp, 
 		       int *status);
