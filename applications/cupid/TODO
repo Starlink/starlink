@@ -12,7 +12,7 @@
    length greater than a user-specified value (do not apply filtering in
    spectral axis). [done]
 
-   - A command to outline a specified clump on a 2D displayed image
+   - A command to outline a specified clump on a 2D displayed image. [Done]
    
    - Add some sort of clump orientation column
 
