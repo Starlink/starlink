@@ -196,6 +196,8 @@
 *     2007-01-26 (AGG):
 *        Add `overwrite' flag to allow simulations to create new files
 *        without overwriting old ones
+*     2007-02-01 (AGG):
+*        Fix `zero remainder' bug in calculating number of frames in last file
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -825,9 +827,17 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
        last chunk */
     lastframe = maxwrite;
 
+    /* If we have more than 1 chunk, and we are on the final chunk
+       then the number of frames in the last file is the remainder of
+       count divided by maxwrite. This FAILS if maxwrite is a factor
+       of count (ie no remainder), so check if we have zero
+       remainder. */
     if ( ( chunks != 1 ) && ( curchunk == ( chunks - 1 ) ) ) {
       lastframe = count % maxwrite;
-    }   
+      if ( lastframe == 0 ) {
+	lastframe = maxwrite;
+      }
+    }
 
     /* Increment mjdaystart (UTC) to the beginning of this chunk, then
        calculate the UT1/LAST at each timestep */
