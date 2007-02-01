@@ -176,7 +176,7 @@ Starlink applications, and a number of other common data formats.
 </component>
 
 <component id="cupid" support="S">
-  <version>0.0-24</version>
+  <version>0.0-25</version>
   <path>applications/cupid</path>
   <description>CUPID - AST applications</description>
   <abstract><p>
@@ -2383,7 +2383,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ast" support="S">
-  <version>4.3-0</version>
+  <version>4.4-0</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
   <abstract>
