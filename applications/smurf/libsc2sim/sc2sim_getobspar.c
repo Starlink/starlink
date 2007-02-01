@@ -68,9 +68,13 @@
 *        Add instap & instap_x/y
 *     2006-12-22 (AGG):
 *        Add planet and planetnum
+*     2007-01-26 (AGG):
+*        Add Venus to list of supported planets
+*     2007-02-01 (AGG):
+*        Might as well finish the job - Saturn and Neptune are now supported
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
+*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
 *  Licence:
@@ -388,12 +392,21 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
      } else if ( strncmp( temp, "uranus", 6 ) == 0 
 	  || strncmp( temp, "URANUS", 6 ) == 0 ) {
        inx->planetnum = 7;
+     } else if ( strncmp( temp, "venus", 5 ) == 0 
+	  || strncmp( temp, "VENUS", 5 ) == 0 ) {
+       inx->planetnum = 2;
      } else if ( strncmp( temp, "jupiter", 7 ) == 0 
 	  || strncmp( temp, "JUPITER", 7 ) == 0 ) {
        inx->planetnum = 5;
      } else if ( strncmp( temp, "moon", 4 ) == 0 
 	  || strncmp( temp, "MOON", 4 ) == 0 ) {
        inx->planetnum = 3;
+     } else if ( strncmp( temp, "saturn", 6 ) == 0 
+	  || strncmp( temp, "SATURN", 6 ) == 0 ) {
+       inx->planetnum = 6;
+     } else if ( strncmp( temp, "neptune", 7 ) == 0 
+	  || strncmp( temp, "NEPTUNE", 7 ) == 0 ) {
+       inx->planetnum = 8;
      } else {
        /* Can't use zero is it is the sun, a valid `planet' */
        inx->planetnum = -1;
