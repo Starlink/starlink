@@ -213,6 +213,16 @@ itcl::class gaia::GaiaCubeRebin {
          set task $compaddtask_
       }
 
+      #  Record the system and units so we can restore them if needed.
+      lassign [$itk_option(-spec_coords) get_system] system units
+      if { $system != "default" && $system != {} } {
+         set keep_system_ "$system"
+         set keep_units_ "$units"
+      } else {
+         set keep_system_ ""
+         set keep_units_ ""
+      }
+
       #  Create name for the new cube, needs to be different to the 
       #  currently displayed one.
       set output_name_ "[$itk_component(prefix) get][incr count_].sdf"
@@ -246,6 +256,12 @@ itcl::class gaia::GaiaCubeRebin {
          if { [string match "*Temp*" $file] } {
             $itk_option(-gaiacube) register_temp_file $file
          }
+
+         #  The original cube may have used a different coordinate system,
+         #  switch to that if we can.
+         if { $keep_system_ != {} } {
+            $itk_option(-spec_coords) set_system $keep_system_ $keep_units_ 0
+         }
       }
       blt::busy release $w_
    }
@@ -259,6 +275,10 @@ itcl::class gaia::GaiaCubeRebin {
          set rtdimage_ [$itk_option(-gaiacube) cget -rtdimage]
       }
    }
+
+   #  The GaiaSpecCoords instance used to define the current coordinate
+   #  system.
+   itk_option define -spec_coords spec_coords Spec_Coords {}
 
    #  Width of labels.
    itk_option define -labelwidth labelwidth LabelWidth 20
@@ -288,6 +308,10 @@ itcl::class gaia::GaiaCubeRebin {
    protected variable bin1_ 2
    protected variable bin2_ 2
    protected variable bin3_ 2
+
+   #  The system and units of the original data.
+   protected variable keep_system_ {}
+   protected variable keep_units_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

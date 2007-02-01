@@ -341,7 +341,8 @@ itcl::class gaia::GaiaCube {
          GaiaCubeRebin $rebinTab.rebin \
             -gaiacube [code $this] \
             -labelwidth $lwidth \
-            -valuewidth $vwidth
+            -valuewidth $vwidth \
+            -spec_coords [code $spec_coords_]
       }
       pack $itk_component(rebin) -side top -fill both -ipadx 1m -ipady 2m
 

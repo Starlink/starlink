@@ -214,7 +214,7 @@ itcl::class gaia::GaiaCubeBaseline {
       incr count_
 
       #  Need to determine ranges. Note handle case when coordinate system
-      #  doesn't match the disk-file anymore.
+      #  doesn't match the disk-file.
       lassign [$itk_option(-spec_coords) get_system] system units
       if { $system != "default" && $system != {} } {
          set keep_system_ "$system"
