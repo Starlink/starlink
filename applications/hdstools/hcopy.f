@@ -64,6 +64,7 @@
 *    RJV:  R J Vallance (Birmingham University)
 *    DJA:  D J Allan (Birmingham University)
 *    AJC:  A J Chipperfield (Starlink, RAL)
+*    BC:   Brad Cavanagh (Joint Astronomy Centre, Hawaii)
 
 * History :
 *    19-JAN-1984 (JCMP):
@@ -96,6 +97,8 @@
 *              with slices whose dims=1 precede the real dimensions
 *    16-NOV-2001 (AJC):
 *       V3.0-0 Complete re-write
+*    02-FEB-2007 (BC):
+*       V3.0-1 Close HDS locator when finished, initialise locators.
 *-
 
 *    Type Definitions :
@@ -149,8 +152,14 @@
 
 *    Version id :
       CHARACTER*(20) VERSION
-	PARAMETER(VERSION= 'HCOPY Version 3.0-0')
+	PARAMETER(VERSION= 'HCOPY Version 3.0-1')
 *.
+
+*    Initialise Locators
+      OLOC = DAT__NOLOC
+      FILOC = DAT__NOLOC
+      ILOC = DAT__NOLOC	
+      CLOC = DAT__NOLOC
 
 *    Set MSG environment
       CALL MSG_TUNE( 'ENVIRONMENT', 0, STATUS )
@@ -218,7 +227,6 @@
          IF ( OUTTOP .AND. .NOT. OUTSLICE ) THEN
              CALL HDS_NEW( OUT, NAME, TYPE, NDIM, DIMS, FILOC, STATUS )
              CALL DAT_CLONE( FILOC, OLOC, STATUS )
-
          ELSE
             CALL HDS_OPEN( OUT(:IDOT-1), 'UPDATE', FILOC, STATUS )
             IF ( IDOT .EQ. JPAR ) IDOT = IDOT - 1
@@ -327,11 +335,12 @@
 
                ENDIF
 
-*            Close the output
-               CALL DAT_ANNUL( OLOC, STATUS )
-               CALL HDS_CLOSE ( FILOC, STATUS )
 
             ENDIF
+
+*            Close the output
+            IF (OLOC .NE. DAT__NOLOC) CALL DAT_ANNUL( OLOC, STATUS )
+            CALL HDS_CLOSE ( FILOC, STATUS )
 
       END IF
 
