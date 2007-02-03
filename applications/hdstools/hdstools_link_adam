@@ -44,7 +44,7 @@
 
 #-
 
-      echo `fio_link_adam` `one_link` `shl_link_adam` \
+      echo `fio_link_adam` `one_link` `shl_link_adam` `grp_link` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
