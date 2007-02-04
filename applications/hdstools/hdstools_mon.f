@@ -35,6 +35,8 @@
 *        Original version.
 *     02-FEB-2007 (BC):
 *        Add GRP and HDS locator tracking code.
+*     04-FEB-2007 (TIMJ):
+*        GRP not used by HDSTOOLS so don't check it.
 *     {date} ({author_identifier}):
 *        {changes}
 *     {enter_further_changes_here}
@@ -65,8 +67,6 @@
       CHARACTER FILTER*( 60 )     ! HDS_INFOI filter string
       INTEGER IPOSN               ! Position in string
       INTEGER LSTAT               ! Local status
-      INTEGER NGRP0               ! Number of active GRP groups on entry
-      INTEGER NGRP1               ! Number of active GRP groups on exit
       INTEGER NLOC0               ! Number of active locators on entry
       INTEGER NLOC1               ! Number of active locators on exit
 
@@ -74,9 +74,6 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Note the current number of active GRP identifiers.
-      CALL GRP_INFOI( GRP__NOID, 0, 'NGRP', NGRP0, STATUS )
 
 *  Get the action name.
       CALL TASK_GET_NAME( NAME, STATUS )
@@ -153,27 +150,6 @@
      :        'HDT_MON: The action name ''^NAME'' is ' //
      :        'not recognised by the {routine_name} monolith.',
      :        STATUS )
-      END IF
-
-*  Note the current number of active GRP identifiers. Do this in a new
-*  error reporting context so that we get the correct value even if an
-*  error has occurred.
-      CALL ERR_BEGIN( STATUS )
-      CALL GRP_INFOI( GRP__NOID, 0, 'NGRP', NGRP1, STATUS )
-
-*  If there are more active groups now than there were on entry, there
-*  must be a problem (GRP identifiers are not being freed somewhere). So
-*  report it.
-      IF( STATUS .EQ. SAI__OK .AND. NGRP1 .GT. NGRP0 ) THEN
-         CALL MSG_BLANK( STATUS )
-         CALL MSG_SETC( 'NAME', NAME )
-         CALL MSG_SETI( 'NGRP0', NGRP0 )
-         CALL MSG_SETI( 'NGRP1', NGRP1 )
-         CALL MSG_OUT( 'HDS_NGRP', 'WARNING: The number of active '//
-     :             'GRP identifiers increased from ^NGRP0 to ^NGRP1 '//
-     :             'during execution of ^NAME (HDSTOOLS programming '//
-     :             'error).', STATUS )
-         CALL MSG_BLANK( STATUS )
       END IF
 
 *  Note the current number of active locators. Do this in a new
