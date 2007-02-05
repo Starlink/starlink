@@ -940,7 +940,7 @@ void kpg1Opgrd( int npos, double *pos, int west, double *par, double *rdiam, int
 
 F77_SUBROUTINE(kpg1_gtwcs)( INTEGER(INDF), INTEGER(IWCS), INTEGER(STATUS) );
 
-void kpg1gtwcs( int indf, AstFrameSet **iwcs, int *status ){
+void kpg1Gtwcs( int indf, AstFrameSet **iwcs, int *status ){
    DECLARE_INTEGER(INDF);
    DECLARE_INTEGER(IWCS);
    DECLARE_INTEGER(STATUS);
