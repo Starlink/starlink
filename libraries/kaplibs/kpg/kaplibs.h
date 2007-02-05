@@ -61,6 +61,8 @@
 *        Added kpg1_mxmnd, kpg1_mxmnr and kpg1_mxmni.
 *     29-NOV-2006 (DSB):
 *        Added kpg1Gtaxv.
+*     5-FEB-2007 (DSB):
+*        Added kpg1_gtwcs.
 *-
 */
 
@@ -84,6 +86,7 @@ void kpg1Asget( int, int, int, int, int, int *, int *, int *, AstFrameSet **, in
 void kpg1Fillr( float, int, float *, int * );
 void kpg1Gausr( float, int, int, float, int, int, int, int, float *, float *, int *, float *, float *, float *, int * );
 void kpg1Gtgrp( const char *, Grp **, int*, int *);
+void kpg1Gtwcs( int, AstFrameSet **, int * );
 void kpg1Kygrp( AstKeyMap *, Grp **, int * );
 void kpg1Kymap( Grp *, AstKeyMap **, int * );
 void kpg1Manir( int, int *, float *, int, int *, int *, int *, int *, float *, int * );

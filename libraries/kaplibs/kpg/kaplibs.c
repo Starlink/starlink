@@ -55,6 +55,8 @@
 *        Add kpg1_wwrt and kpg1_wread.
 *     14-AUG-2006 (DSB):
 *        Added kpg1_mxmnd, kpg1_mxmnr and kpg1_mxmni.
+*     5-FEB-2007 (DSB):
+*        Added kpg1_gtwcs.
 *     {enter_further_changes_here}
 
 *-
@@ -936,7 +938,30 @@ void kpg1Opgrd( int npos, double *pos, int west, double *par, double *rdiam, int
 }
 
 
+F77_SUBROUTINE(kpg1_gtwcs)( INTEGER(INDF), INTEGER(IWCS), INTEGER(STATUS) );
 
+void kpg1gtwcs( int indf, AstFrameSet **iwcs, int *status ){
+   DECLARE_INTEGER(INDF);
+   DECLARE_INTEGER(IWCS);
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_INTEGER( indf, INDF );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(kpg1_gtwcs)( INTEGER_ARG(&INDF),
+                         INTEGER_ARG(&IWCS),
+                         INTEGER_ARG(&STATUS) );
+
+   {
+      int tmp;
+      F77_IMPORT_INTEGER( IWCS, tmp );
+      *iwcs = astI2P( tmp );
+   }
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
 
 /* ------------------------------- */
 
