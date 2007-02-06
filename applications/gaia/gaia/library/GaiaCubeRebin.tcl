@@ -247,9 +247,8 @@ itcl::class gaia::GaiaCubeRebin {
       }
       if { $file != {} } {
          catch {
-            $itk_option(-gaiacube) configure -cube "$file"
+            $itk_option(-gaiacube) open_keeplimits "$file"
          } msg
-         puts "msg = $msg"
          $itk_component(outputfile) configure -value "$file"
 
          #  If the file has Temp in the name, record for automatic removal.
