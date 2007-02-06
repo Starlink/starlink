@@ -126,7 +126,7 @@ itcl::class gaia::GaiaCubeSpectrum {
             -show_ref_range $itk_option(-show_ref_range) \
             -labelwidth $itk_option(-labelwidth) \
             -valuewidth $itk_option(-valuewidth) \
-            -coord_update_cmd [code $this set_extraction_bounds_]
+            -coord_update_cmd [code $this set_limits_]
       }
       pack $itk_component(bounds) -side top -fill x -ipadx 1m -ipady 2m
       add_short_help $itk_component(bounds) \
@@ -832,6 +832,18 @@ itcl::class gaia::GaiaCubeSpectrum {
       $toolbox_ clear
    }
 
+   #  Return a list of the current extraction limits, if they differ from the
+   #  maximum and minimum bounds. Otherwise return an empty list.
+   public method get_set_limits {} {
+      set from [$itk_component(bounds) cget -from]
+      set to [$itk_component(bounds) cget -to]
+      if { $from != $itk_option(-lower_limit) || 
+           $to != $itk_option(-upper_limit) } {
+         return [list $itk_option(-lower_limit) $itk_option(-upper_limit)]
+      }
+      return {}
+   }
+
    #  Set the minimum and maximum possible bounds of the extraction.
    public method set_bounds {plane_min plane_max} {
 
@@ -842,12 +854,9 @@ itcl::class gaia::GaiaCubeSpectrum {
       #  If the min/max have changed, reset the extraction range (different
       #  axis or unrelated cube).
       if { $plane_min != $from || $plane_max != $to } {
-         $itk_component(bounds) configure -value1 $plane_min -value2 $plane_max
-         set_extraction_bounds_ $plane_min $plane_max
+         apply_limits $plane_min $plane_max
       } else {
-         #  Make sure displayed world coordinates match the limits.
-         $itk_component(bounds) configure \
-            -value1 $itk_option(-lower_limit) -value2 $itk_option(-upper_limit)
+         apply_limits $itk_option(-lower_limit) $itk_option(-upper_limit)
       }
    }
 
@@ -863,17 +872,24 @@ itcl::class gaia::GaiaCubeSpectrum {
       }
 
       #  Update the bounds.
-      $itk_component(bounds) configure -value1 $coord1 -value2 $coord2
-      set_extraction_bounds_ $coord1 $coord2
+      apply_limits $coord1 $coord2
 
       if { $action == "move" } {
          $itk_component(bounds) configure -show_ref_range $oldvalue
       }
    }
 
-   #  Set the extraction bounds.
-   protected method set_extraction_bounds_ {bound1 bound2} {
-      configure -lower_limit $bound1 -upper_limit $bound2
+   #  Apply an extraction range, that's set it and display the changes.
+   #  Use this instead of configure -lower_limit -upper_limit, after
+   #  construction.
+   public method apply_limits {lower upper} {
+      $itk_component(bounds) configure -value1 $lower -value2 $upper
+      set_limits_ $lower $upper
+   }
+
+   #  Set the extraction limits. Same as configure lower_limit & upper_limit.
+   protected method set_limits_ {lower upper} {
+      configure -lower_limit $lower -upper_limit $upper
    }
 
    #  Toggle the display of the reference range.

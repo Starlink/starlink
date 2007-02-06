@@ -125,7 +125,7 @@ itcl::class gaia::GaiaCubeBaseline {
                -show_ref_range $itk_option(-show_ref_range) \
                -labelwidth $itk_option(-labelwidth) \
                -valuewidth $itk_option(-valuewidth) \
-               -coord_update_cmd [code $this set_numbered_limits_ $i]
+               -coord_update_cmd [code $this set_limits_ $i]
          }
          pack $itk_component(bounds$i) -side top -fill x -ipadx 1m -ipady 2m
          add_short_help $itk_component(bounds$i) \
@@ -169,7 +169,7 @@ itcl::class gaia::GaiaCubeBaseline {
    }
 
    #  Set one of the limits.
-   protected method set_numbered_limits_ {n bound1 bound2} {
+   protected method set_limits_ {n bound1 bound2} {
       set lower_limits_($n) $bound1
       set upper_limits_($n) $bound2
    }
@@ -184,17 +184,31 @@ itcl::class gaia::GaiaCubeBaseline {
       if { $plane_min != $from || $plane_max != $to } {
          for {set i 0} {$i < $itk_option(-nranges)} {incr i} {
             $itk_component(bounds$i) configure -from $plane_min -to $plane_max
-            $itk_component(bounds$i) configure -value1 $plane_min -value2 $plane_max
-            set_numbered_limits_ $i $plane_min $plane_max
+            apply_limits $i $plane_min $plane_max
          }
       } else {
          #  Just set the limits.
          for {set i 0} {$i < $itk_option(-nranges)} {incr i} {
-            $itk_component(bounds$i) configure -from $plane_min -to $plane_max
-            $itk_component(bounds$i) configure \
-               -value1 $lower_limits_($i) -value2 $upper_limits_($i)
+            apply_limits $i $lower_limits_($i) $upper_limits_($i)
          }
       }
+   }
+
+   #  Return a list of the current limits for the given bound, if they differ
+   #  from the maximum and minimum bounds. Otherwise return an empty list.
+   public method get_set_limits {n} {
+      set from [$itk_component(bounds$n) cget -from]
+      set to [$itk_component(bounds$n) cget -to]
+      if { $from != $lower_limits_($n) || $to != $upper_limits_($n) } {
+         return [list $lower_limits_($n) $upper_limits_($n)]
+      }
+      return {}
+   }
+
+   #  Apply some limits, that's set them and display the changes.
+   public method apply_limits {n lower upper} {
+      $itk_component(bounds$n) configure -value1 $lower -value2 $upper
+      set_limits_ $n $lower $upper
    }
 
    #  Run MFITTREND to do the work, and replace the existing cube with the new
@@ -292,8 +306,7 @@ itcl::class gaia::GaiaCubeBaseline {
       }
 
       #  Update the bounds.
-      $itk_component(bounds$n) configure -value1 $coord1 -value2 $coord2
-      set_numbered_limits_ $n $coord1 $coord2
+      apply_limits $n $coord1 $coord2
 
       if { $action == "move" } {
          $itk_component(bounds$n) configure -show_ref_range $oldvalue

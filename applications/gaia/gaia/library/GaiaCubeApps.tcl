@@ -202,13 +202,9 @@ itcl::class gaia::GaiaCubeApps {
       #  If the min/max have changed, reset the range (different axis or
       #  unrelated cube).
       if { $plane_min != $from || $plane_max != $to } {
-         $itk_component(bounds1) configure -value1 $plane_min \
-                                           -value2 $plane_max
-         set_limits_ $plane_min $plane_max
+         apply_limits $plane_min $plane_max
       } else {
-         #  Make sure displayed world coordinates match the limits.
-         $itk_component(bounds1) configure \
-            -value1 $itk_option(-lower_limit) -value2 $itk_option(-upper_limit)
+         apply_limits $itk_option(-lower_limit) $itk_option(-upper_limit)
       }
    }
 
@@ -224,12 +220,30 @@ itcl::class gaia::GaiaCubeApps {
       }
 
       #  Update the bounds.
-      $itk_component(bounds1) configure -value1 $coord1 -value2 $coord2
-      set_limits_ $coord1 $coord2
+      apply_limits $coord1 $coord2
 
       if { $action == "move" } {
          $itk_component(bounds1) configure -show_ref_range $oldvalue
       }
+   }
+
+   #  Return a list of the current limits, if they differ from the
+   #  maximum and minimum bounds. Otherwise return an empty list.
+   public method get_set_limits {} {
+      set from [$itk_component(bounds1) cget -from]
+      set to [$itk_component(bounds1) cget -to]
+      if { $from != $itk_option(-lower_limit) ||
+           $to != $itk_option(-upper_limit) } {
+         return [list $itk_option(-lower_limit) $itk_option(-upper_limit)]
+      }
+      return {}
+   }
+
+   #  Apply some limits, that's set them and display the changes. Use this
+   #  instead of configure -lower_limit -upper_limit, after construction.
+   public method apply_limits {lower upper} {
+      $itk_component(bounds1) configure -value1 $lower -value2 $upper
+      set_limits_ $lower $upper
    }
 
    #  Set the limits of the operation (usually somewhere between the minimum
