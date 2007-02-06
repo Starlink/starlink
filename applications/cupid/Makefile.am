@@ -48,6 +48,8 @@ cupid.h: cupid.h.source make_h
 outlineclump.help: outlineclump.csh
 	cat outlineclump.csh | sed -e 's@^#@*@' > outlineclump.f
 	-rm -f outlineclump.help
+	PATH="$(PATH):$(STARLINK)/bin/sst"; \
+	export PATH ;\
 	$(prohlp) in=outlineclump.f out=outlineclump.help
 	rm -f outlineclump.f
 
@@ -64,6 +66,8 @@ sun255.tex: $(cupid_mon_TASKS:=.c) sun_master.tex
 	   ./make_quickdes $${f} ;\
 	done
 	cat outlineclump.csh | sed -e 's@^#@*@' > outlineclump.f
+	PATH="$(PATH):$(STARLINK)/bin/sst"; \
+	export PATH ;\
 	$(prolat) in=outlineclump.f atask nodocument nopage single out=outlineclump.latex
 	./make_quickdes outlineclump.f
 	rm -f outlineclump.f
