@@ -434,8 +434,16 @@ itcl::class gaia::GaiaCube {
       $itk_component(spectrum) open
    }
 
-   #  Open the chosen file as a cube.
-   protected method set_chosen_cube_ {} {
+   #  Open a new cube, restoring the current extraction limits, if possible.
+   public method open_keeplimits {filename} {
+      set itk_option(-cube) $filename
+      set_chosen_cube_ 1
+   }
+
+   #  Open the currently chosen file as a cube. If requested attempt to
+   #  preserve the extraction limits through the change, even if the cube
+   #  dimensions change.
+   protected method set_chosen_cube_ {{keeplimits 0}} {
 
       set namer [GaiaImageName \#auto -imagename $itk_option(-cube)]
       if { ! [$namer exists] } {
@@ -445,14 +453,25 @@ itcl::class gaia::GaiaCube {
          }
          return
       } else {
+
+         #  Add last_cube_ to the back_list_, including temporary ones.
+         record_last_cube_
+
          if { $cubeaccessor_ == {} } {
             set cubeaccessor_ [uplevel \#0 GaiaNDAccess \#auto]
+         } elseif { $keeplimits } {
+
+            #  Existing cube accessor and keeping limits regardless, so we
+            #  need to save some properties before letting this go.
+            save_limits_
          }
 
          $namer absolute
          set ndfname_ [$namer ndfname 0]
          set type_ [$namer type]
+
          $cubeaccessor_ configure -dataset "$ndfname_"
+
          set bounds_ [$cubeaccessor_ getbounds 0]
          set ndims [expr [llength $bounds_]/2]
 
@@ -506,6 +525,11 @@ itcl::class gaia::GaiaCube {
          #  re-created on next image click.
          $itk_component(spectrum) close_plot
 
+         #  If keeping the limits, regardless, then attempt the restore.
+         if { $keeplimits } {
+            restore_limits_
+         }
+
          #  Add cube to history (and previous cube to back list).
          add_history $itk_option(-cube)
       }
@@ -537,7 +561,7 @@ itcl::class gaia::GaiaCube {
    #  display window and position on the central plane. A dummy NDF is used
    #  for FITS and NDF files as this is the simplest way to make sure that the
    #  toolboxes can also access the data in an efficient manner. When a
-   #  toolbox access this file if will need to save the NDF first to make sure
+   #  toolbox access this file it will need to save the NDF first to make sure
    #  that the data values are up to date.
    protected method set_step_axis_ {value {setplane 1}} {
       if { $value != $axis_ && $bounds_ != {} } {
@@ -550,11 +574,9 @@ itcl::class gaia::GaiaCube {
             $itk_component(index) configure -value $plane_min_
          }
 
-         $itk_component(spectrum) set_bounds $plane_min_ $plane_max_
-         $itk_component(animation) set_bounds $plane_min_ $plane_max_
-         $itk_component(collapse) set_bounds $plane_min_ $plane_max_
-         $itk_component(chanmap) set_bounds $plane_min_ $plane_max_
-         $itk_component(baseline) set_bounds $plane_min_ $plane_max_
+         foreach type "spectrum animation collapse chanmap baseline" {
+            $itk_component($type) set_bounds $plane_min_ $plane_max_
+         }
 
          #  Update the display of label and units in index component.
          $itk_component(index) update_coords_type $plane_
@@ -744,8 +766,8 @@ itcl::class gaia::GaiaCube {
       if { $id > $baseline_id_ } {
          set cid $baseline_id_
       }
-      $ref_range_controls_($cid) configure -lower_limit $coord1 \
-                                          -upper_limit $coord2
+      $ref_range_controls_($cid) configure \
+         -lower_limit $coord1 -upper_limit $coord2
       $ref_range_controls_($cid) ref_range_moved $id $coord1 $coord2 $action
    }
 
@@ -946,7 +968,7 @@ itcl::class gaia::GaiaCube {
 
       #  Access history catalogue (need to do this sometime, so do it now).
       set catalog $history_catalog_
-      
+
       #  Check if the directory for the catalog exists
       set dir [file dirname $catalog]
       if { ! [file isdirectory $dir] } {
@@ -955,10 +977,10 @@ itcl::class gaia::GaiaCube {
             return
          }
       }
-         
+
       #  Make sure at least an empty catalog exists.
       if { ! [file exists $catalog] || [file size $catalog] == 0 } {
-         
+
          # If it doesn't exist yet, create an empty catalog file
          if { [catch {set fd [::open $catalog w]} msg] } {
             warning_dialog "can't create image history catalog: $msg"
@@ -977,22 +999,22 @@ itcl::class gaia::GaiaCube {
          puts $fd [join $history_cols_ "\t"]
          puts $fd "----"
          ::close $fd
-         
+
          #  Get the catalog into the list of known catalogs.
          $astrocat_ open $catalog
       }
-      
+
       #  Don't record Temp cubes they will be deleted.
       if { ! [string match {*Temp*} $filename] } {
 
          #  Add an entry for the given image and filename
          set id [file tail $filename]
-      
+
          #  Image centre RA and Dec not easily available, so skip (need image
          #  loaded).
          set ra "00:00:00"
          set dec "00:00:00"
-      
+
          #  Record cube dimensions.
          set object [$cubeaccessor_ fitsread OBJECT]
          set naxis 3
@@ -1000,7 +1022,7 @@ itcl::class gaia::GaiaCube {
          set naxis1 [lindex $dims 0]
          set naxis2 [lindex $dims 0]
          set naxis3 [lindex $dims 0]
-         
+
          #  Also make these up.
          set lowcut 0
          set highcut 1
@@ -1008,9 +1030,9 @@ itcl::class gaia::GaiaCube {
          set itt "ramp.iasc"
          set colorscale "linear"
          set zoom "1"
-         
+
          set timestamp [clock seconds]
-         
+
          #  Get full path name of file for preview URL
          if { "[string index $filename 0]" == "/" } {
             set fullpath $filename
@@ -1018,24 +1040,21 @@ itcl::class gaia::GaiaCube {
             set fullpath [pwd]/$filename
          }
          set preview file:$fullpath
-         
+
          set data [list [list $id $ra $dec $object \
                             $naxis $naxis1 $naxis2 $naxis3 \
                             $lowcut $highcut $colormap $itt $colorscale $zoom \
                             $timestamp $preview]]
-      
+
          $astrocat_ open $catalog
          $astrocat_ save $catalog 1 $data ""
-      
+
          #  Update history catalog window, if it is showing
          set w [cat::AstroCat::get_instance [file tail $catalog]]
          if { "$w" != "" && [winfo viewable $w] } {
             $w search
          }
-      }         
-
-      #  Add last_cube_ to the back_list_, including temporary ones.
-      record_last_cube_
+      }
    }
 
    #  SkyCatCtrl like update_history_menu, but filter to only show
@@ -1050,7 +1069,7 @@ itcl::class gaia::GaiaCube {
          -command [code $this previous_cube] \
          -state disabled
 
-      if { [llength $back_list_] } {
+      if { [info exists back_list_(cube)] && [llength $back_list_(cube)] } {
          $menu entryconfig Back -state normal
       }
 
@@ -1059,7 +1078,8 @@ itcl::class gaia::GaiaCube {
          -command [code $this forward_cube] \
          -state disabled
 
-      if { [llength $forward_list_] } {
+      if { [info exists forward_list_(cube)] &&
+            [llength $forward_list_(cube)] } {
          $menu entryconfig Forward -state normal
       }
 
@@ -1093,30 +1113,87 @@ itcl::class gaia::GaiaCube {
 
    #  Go back to the previous cube.
    public method previous_cube {} {
-      while { [set n [llength $back_list_]] } {
-         set filename [lindex $back_list_ end]
+
+      while { [set n [llength $back_list_(cube)]] } {
+
+         set filename [lindex $back_list_(cube) end]
+         set system [lindex $back_list_(system) end]
+         set units [lindex $back_list_(units) end]
+
          if { "$filename" != "$itk_option(-cube)" &&
               [file exists $filename] } {
-            lappend forward_list_ $itk_option(-cube)
-            configure -cube $filename
-            set back_list_ [lrange $back_list_ 0 [expr $n-2]]
+
+            #  Current file becomes forward.
+            lappend forward_list_(cube) $itk_option(-cube)
+            lassign [$spec_coords_ get_system] oldsystem oldunits
+            if { $oldsystem == "default" } {
+               set oldsystem {}
+               set oldunits {}
+            }
+            lappend forward_list_(system) $oldsystem
+            lappend forward_list_(units) $oldunits
+
+            #  Remove cube we're about to display from back list. This
+            #  will be added again when a new cube is loaded.
+            set back_list_(cube) [lrange $back_list_(cube) 0 [expr $n-2]]
+            set back_list_(system) [lrange $back_list_(system) 0 [expr $n-2]]
+            set back_list_(units) [lrange $back_list_(units) 0 [expr $n-2]]
+
+            #  Ok, now switch to previous file, making sure the current
+            #  file isn't recorded (goes onto the forward list).
+            set last_cube_ {}
+
+            #  Open cube, attempting to keep any world coordinate limits.
+            open_keeplimits $filename
+
+            #  And its system/units.
+            if { $system != {} } {
+               $spec_coords_ set_system $system $units 0
+            }
             break
          }
-         set back_list_ [lrange $back_list_ 0 [expr $n-2]]
+
+         #  Skip non-existent files.
+         set back_list_(cube) [lrange $back_list_(cube) 0 [expr $n-2]]
+         set back_list_(system) [lrange $back_list_(system) 0 [expr $n-2]]
+         set back_list_(units) [lrange $back_list_(units) 0 [expr $n-2]]
       }
    }
 
    #  Go forward again to the next cube.
    public method forward_cube {} {
-      while { [set n [llength $forward_list_]] } {
-         set filename [lindex $forward_list_ end]
-         if {"$filename" != "$itk_option(-cube)" &&
-             [file exists $filename]} {
-            configure -cube $filename
-            set forward_list_ [lrange $forward_list_ 0 [expr $n-2]]
+
+      while { [set n [llength $forward_list_(cube)]] } {
+         set filename [lindex $forward_list_(cube) end]
+         set system [lindex $forward_list_(system) end]
+         set units [lindex $forward_list_(units) end]
+         if {"$filename" != "$itk_option(-cube)" && [file exists $filename]} {
+
+            #  Remove this from lists.
+            set forward_list_(cube) \
+               [lrange $forward_list_(cube) 0 [expr $n-2]]
+            set forward_list_(system) \
+               [lrange $forward_list_(system) 0 [expr $n-2]]
+            set forward_list_(units) \
+               [lrange $forward_list_(units) 0 [expr $n-2]]
+
+            #  Load and display, attempting to keep world coordinate limits.
+            open_keeplimits $filename
+
+            #  Set related system/units.
+            if { $system != {} } {
+               $spec_coords_ set_system $system $units 0
+            }
             break
          }
-         set forward_list_ [lrange $forward_list_ 0 [expr $n-2]]
+
+         #  Skip non-existent files.
+         set forward_list_(cube) \
+            [lrange $forward_list_(cube) 0 [expr $n-2]]
+         set forward_list_(system) \
+            [lrange $forward_list_(system) 0 [expr $n-2]]
+         set forward_list_(units) \
+            [lrange $forward_list_(units) 0 [expr $n-2]]
       }
    }
 
@@ -1125,20 +1202,161 @@ itcl::class gaia::GaiaCube {
 
       #  Don't add if present as last cube or no cube loaded.
       if { $last_cube_ != {} } {
-         set current_last [lindex $back_list_ end]
+         if { [info exists back_list_(cube)] } {
+            set current_last [lindex $back_list_(cube) end]
+         } else {
+            set current_last {}
+         }
+
          if { $current_last != $last_cube_ } {
-            lappend back_list_ $last_cube_
+            lappend back_list_(cube) $last_cube_
+
+            lassign [$spec_coords_ get_system] system units
+            if { $system == "default" } {
+               set system {}
+               set units {}
+            }
+            lappend back_list_(system) $system
+            lappend back_list_(units) $units
          }
       }
+
       set last_cube_ $itk_option(-cube)
    }
 
 
+   #  =================
+   #  Methods involved in "saving" the current extraction, animation
+   #  etc. limits.
+   #  =================
+
+   protected method save_limits_ {} {
+      catch {unset limits_}
+
+      if { $cubeaccessor_ != {} } {
+
+         #  Save a copy of the current frameset, that defines the world
+         #  coordinates.
+         set wcs [$cubeaccessor_ getwcs]
+         set limits_(frame) [gaiautils::getframe $wcs "current"]
+
+         #  Axis all the limits apply too.
+         set limits_(axis) $axis_
+
+         #  Save all limits in world coordinates. Only done when these
+         #  are different to bounds.
+         foreach type "spectrum animation collapse chanmap" {
+            set bounds [$itk_component($type) get_set_limits]
+            if { $bounds != {} } {
+               set limits_($type,0) [get_coords [lindex $bounds 0]]
+               set limits_($type,1) [get_coords [lindex $bounds 1]]
+            }
+         }
+
+         #  Baseline has several bounds. Need to visit them all.
+         set limits_(baseline,nr) [$itk_component(baseline) cget -nranges]
+         for {set i 0} {$i < $limits_(baseline,nr)} {incr i} {
+            set bounds [$itk_component(baseline) get_set_limits $i]
+            if { $bounds != {} } {
+               set limits_(baseline,$i,0) [get_coords [lindex $bounds 0]]
+               set limits_(baseline,$i,1) [get_coords [lindex $bounds 1]]
+            }
+         }
+      }
+   }
+
+   protected method restore_limits_ {} {
+      if { [info exists limits_] && $cubeaccessor_ != {} } {
+
+         #  If not same axis, then don't bother. The other axis limits are
+         #  faked.
+         if { $limits_(axis) == $axis_ } {
+
+            #  Connect the old frame defining the old coordinate system to the
+            #  current WCS.
+            set wcs [$cubeaccessor_ getwcs]
+
+            #  Use an inverted WCS so we connect to BASE, not just CURRENT.
+            gaiautils::astset $wcs "Invert=1"
+            set convwcs [gaiautils::astconvert $limits_(frame) $wcs ""]
+            gaiautils::astset $wcs "Invert=0"
+
+            if { $convwcs != 0 } {
+
+               set axis [expr $axis_-1]
+
+               foreach type "spectrum animation collapse chanmap" {
+                  if { [info exists limits_($type,0)] } {
+
+                     set li [gaiautils::asttrann $convwcs $limits_($type,0)]
+                     set ui [gaiautils::asttrann $convwcs $limits_($type,1)]
+
+                     #  Convert to integers.
+                     set li [expr int([lindex $li $axis])]
+                     set ui [expr int([lindex $ui $axis])]
+
+                     #  And set.
+                     $itk_component($type) apply_limits $li $ui
+                  }
+               }
+
+               #  Restore baselines.
+               for {set i 0} {$i < $limits_(baseline,nr)} {incr i} {
+                  if { [info exists limits_(baseline,$i,0)] } {
+                     set li \
+                        [gaiautils::asttrann $convwcs $limits_(baseline,$i,0)]
+                     set ui \
+                        [gaiautils::asttrann $convwcs $limits_(baseline,$i,1)]
+
+                     #  Convert to integers.
+                     set li [expr int([lindex $li $axis])]
+                     set ui [expr int([lindex $ui $axis])]
+
+                     #  And set.
+                     $itk_component(baseline) apply_limits $i $li $ui
+                  }
+               }
+            }
+         }
+      }
+
+   }
+
+   #  Get the coordinates of an index along the current axis. Returns
+   #  a list of 3 or 4 values, depending on cube dimensions.
+   public method get_coords {index} {
+
+      #  Need index as a pixel coordinate.
+      set pcoord [expr $index - 0.5]
+      if { $close_section_ != ")" } {
+         if { $axis_ == 1 } {
+            set section [list $pcoord 1 1 1]
+         } elseif { $axis_ == 2 } {
+            set section [list 1 $pcoord 1 1]
+         } else {
+            set section [list 1 1 $pcoord 1]
+         }
+      } else {
+         if { $axis_ == 1 } {
+            set section [list $pcoord 1 1]
+         } elseif { $axis_ == 2 } {
+            set section [list 1 $pcoord 1]
+         } else {
+            set section [list 1 1 $pcoord]
+         }
+      }
+      set coords {}
+      catch {
+         set wcs [$cubeaccessor_ getwcs]
+         set coords [gaiautils::asttrann $wcs $section]
+      }
+      return $coords
+   }
 
    #  Configuration options: (public variables)
    #  ----------------------
 
-   #  Name of the input text file.
+   #  Name of the input cube. NDF or FITS specification.
    itk_option define -cube cube Cube {} {
       set_chosen_cube_
    }
@@ -1243,9 +1461,13 @@ itcl::class gaia::GaiaCube {
    #  The ref_id value of the baseline controls. Must be last.
    protected variable baseline_id_ ""
 
-   #  Used for the Go=>Back/Forward menu itemes
-   protected variable back_list_ {}
-   protected variable forward_list_ {}
+   #  Arrays used for the Go=>Back/Forward menu items.
+   protected variable back_list_
+   protected variable forward_list_
+
+   #  Data associated with the state of all the limits. Used to restore
+   #  between cubes with different sizes.
+   protected variable limits_
 
    #  Common variables: (shared by all instances)
    #  -----------------
