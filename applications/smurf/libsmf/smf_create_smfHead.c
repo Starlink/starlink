@@ -34,6 +34,7 @@
 *  Authors:
 *     Tim Jenness (TIMJ)
 *     David Berry (DSB)
+*     Andy Gibb (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -56,6 +57,8 @@
 *        Add detpos.
 *     2006-11-6 (DSB):
 *        Add detname.
+*     2007-02-06 (AGG):
+*        Add tsys
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -135,5 +138,6 @@ smf_create_smfHead( int * status ) {
   hdr->telpos[2] = 0;
   hdr->instap[0] = 0;
   hdr->instap[1] = 0;
+  hdr->tsys = NULL;
   return hdr;
 }

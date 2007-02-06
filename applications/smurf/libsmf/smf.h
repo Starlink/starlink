@@ -136,6 +136,8 @@
 *        - Change API to smf_rebinmap: takes the moving flag as an argument
 *     2007-01-30 (AGG):
 *        Update API to smf_mapbounds_approx to return moving flag
+*     2007-02-06 (AGG):
+*        Add tsys to smf_construct_smfHead
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -257,7 +259,8 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 		       const JCMTState * allState,
 		       dim_t curframe, dim_t nframes, unsigned int ndet,
 		       const double fplanex[], const double fplaney[],
-		       const double detpos[], const char *detname, int rpazel, int * status );
+		       const double detpos[], const char *detname, int rpazel, 
+		       const double tsys[], int * status );
 
 smfGroup * 
 smf_construct_smfGroup( Grp *igrp, int **subgroups, const int ngroups, 

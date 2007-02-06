@@ -57,6 +57,8 @@
 *     dpazel = int (Given)
 *        If non-zero, then the values in "detpos" are AZEL
 *        positions. Otherwise they are TRACKING positions.
+*     tsys = const double[] (Given)
+*        System temperatures for each receptor
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -84,6 +86,7 @@
 *  Authors:
 *     Tim Jenness (TIMJ)
 *     David Berry (DSB)
+*     Andy Gibb (AGG)
 *     {enter_new_authors_here}
 
 *  History:
@@ -104,6 +107,8 @@
 *        Add detpos.
 *     2006-11-6 (DSB):
 *        Add detname.
+*     2007-02-06 (AGG):
+*        Add tsys
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -156,7 +161,7 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 		       dim_t curframe, dim_t nframes, unsigned int ndet,
 		       const double fplanex[], const double fplaney[],
 		       const double detpos[], const char *detname, 
-                       int dpazel, int * status ) {
+                       int dpazel, const double tsys[], int * status ) {
 
   smfHead * hdr = NULL;   /* Header components */
 
@@ -182,6 +187,7 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
     hdr->detpos = detpos;
     hdr->detname = detname;
     hdr->dpazel = dpazel;
+    hdr->tsys = tsys;
     hdr->isCloned = 1;
   }
 

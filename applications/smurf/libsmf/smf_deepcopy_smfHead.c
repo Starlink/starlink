@@ -58,6 +58,8 @@
 *        Add detpos.
 *     2006-11-06 (DSB):
 *        Add detname.
+*     2007-02-06 (AGG):
+*        Add tsys
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -105,19 +107,20 @@
 smfHead *
 smf_deepcopy_smfHead( const smfHead *old, int * status ) {
 
-  smfHead *new = NULL;   /* New Header */
-  dim_t nframes = 0;
-  dim_t curframe = 0;
-  JCMTState *allState = NULL;
-  AstFitsChan *fitshdr = NULL;
-  AstFrameSet *tswcs = NULL;
-  AstFrameSet *wcs = NULL;
-  inst_t instrument = INST__NONE;
-  unsigned int ndet = 0;
-  double *fplanex = NULL;
-  double *fplaney = NULL;
-  double *detpos = NULL;
-  char *detname = NULL;
+  smfHead *new = NULL;             /* New Header */
+  dim_t nframes = 0;               /* Number of frames/time slices in data */
+  dim_t curframe = 0;              /* Index of current time slice */
+  JCMTState *allState = NULL;      /* Struct with all JCMTState entries */
+  AstFitsChan *fitshdr = NULL;     /* FITS header */
+  AstFrameSet *tswcs = NULL;       /* Frameset for full time series (if tseries) */
+  AstFrameSet *wcs = NULL;         /* Frameset for a particular time slice (frame)*/
+  inst_t instrument = INST__NONE;  /* Instrument label */
+  unsigned int ndet = 0;           /* Number of detectors */
+  double *fplanex = NULL;          /* X focal plane positions */
+  double *fplaney = NULL;          /* Y focal plane positions */
+  double *detpos = NULL;           /* Array of detector positions */
+  char *detname = NULL;            /* Receptor names */
+  double *tsys = NULL;             /* System temperatures */
 
   if (*status != SAI__OK) return NULL;
 
@@ -171,11 +174,18 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
                           ndet*( strlen( old->detname ) + 1 ) );
   } 
 
+  /* Allocate Tsys array */
+  if (old->ndet > 0 && old->tsys) {
+    ndet = old->ndet;
+    tsys = smf_malloc( ndet, sizeof(*tsys), 0, status );
+    if ( tsys ) memcpy( tsys, old->tsys, ndet*sizeof(*tsys) );
+  }
+
   /* Insert elements into new smfHead */
   new = smf_construct_smfHead( new, instrument, wcs, tswcs, fitshdr,
 			       allState, curframe,
 			       nframes, ndet, fplanex, fplaney, detpos,
-                               detname, old->dpazel, status );
+                               detname, old->dpazel, tsys, status );
 
   /* see isCloned to 0 since we have allocated this memory */
   if (new) new->isCloned = 0;
