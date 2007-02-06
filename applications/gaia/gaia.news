@@ -1,18 +1,24 @@
-    Spectra extracted from ACSIS raw timecubes now display the 
-    RA and Dec of the pointing, and the time of observation for the 
-    spectrum.
-
-    The centroid maximum search box size and shift are now start up
-    options that can be defined either on the command-line, or
-    using the "File->Startup options..." dialog (this makes the change
-    permanent)
-
-    The measurement band now measures to the image edge, not middle
-    of edge pixels.
 
   Hokulei Release:
 
     This is an update with many usability changes and minor bug fixes:
+
+    - New "Rebin" controls have been added to the cube toolbox. These allow
+    the current cube to be rebinned and displayed.
+
+    - A new "Go" menu has been added to the cube toolbox. This is similar
+    to the main window menu, but only displays possible cubes, arranges
+    for them to be efficiently loaded and attempts to preserve the 
+    current spectral extraction limits.
+
+    - Spectra extracted from ACSIS raw timecubes now display the 
+    RA and Dec of the pointing, and the time of observation for the 
+    spectrum.
+
+    - The centroid maximum search box size and shift are now start up
+    options that can be defined either on the command-line, or
+    using the "File->Startup options..." dialog (this makes the change
+    permanent)
 
     - Spectra can now be sent to other PLASTIC-enabled applications using
     the Interop menu in the spectral plot window. Only SPLAT-VO supports
@@ -45,6 +51,9 @@
     - Cubes with trivial first and second dimensions are now loaded into
     the cube toolbox when -check_for_cubes is set. Previously these were
     considered as special form of images.
+
+    - The measurement band now measures to the image edge, not middle
+    of edge pixels.
 
     - A bug when extracting a spectrum over a restricted range meant that the
     coordinates of an NDF or FITS were incorrect (by an offset). This has

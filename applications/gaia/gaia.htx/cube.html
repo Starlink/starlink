@@ -173,6 +173,27 @@
       toolbox, just track the mouse over the tile you want to investigate.
     </p>
 
+    <h5>Rebin</h5>
+    <p>
+      These controls allow you to rebin the cube to increase the signal
+      to noise, but at the expense of resolution. The rebinning can be done
+      by simple adding of the data, or by taking the mean.
+    </p>
+    <p>
+      The rebinning is controlled by three bin factors, one for each
+      dimension, so it is possible to avoid rebinning in either the 
+      image or spectral dimensions, if required (by setting the bin 
+      factor for that axis to 1).
+    </p>
+    <p>
+      The resultant cube must have a unique name (you cannot resize a
+      cube on disk and then expect GAIA to sensibly reload it), so the
+      a name is generated using a prefix (the default of
+      <tt>GaiaTempCubeRebin<tt> will result in a new cube called
+      <tt>GaiaTempCubeRebin1.sdf</tt> and so on). Prefixes that include
+      the substring <tt>Temp</tt> will be deleted when GAIA closes.
+    <p>
+
     <h5>Baseline</h5>
     <p>
       These controls run the KAPPA application MFITTREND to fit and subtract
@@ -216,6 +237,20 @@
       to show your new coordinates. This menu is replicated in the spectral
       plot for convenience. To return to the initial system just choose the
       <tt>Default</tt> item.
+    </p>
+
+    <h3>Go</h3>
+    <p>
+      The <tt>Go</tt> menu provides you with a quick menu of cubes that have
+      been recently loaded. To revisit one just select its name in the list.
+      Cubes that have been loaded in this session can also be switched back
+      and forth using the <tt>Back</tt> and <tt>Forward</tt> items. When 
+      using these an attempt to preserve any extraction limits will be
+      made. This will be perfect if the size of the spectral dimension of the
+      cube doesn't change, otherwise a transformation from the old coordinates
+      to the new coordinates will be attempted. That will generally be less
+      precise as the coordinates will always be rounded to the nearest pixel
+      position.
     </p>
 
     <h3>Data formats and efficiency</h3>
