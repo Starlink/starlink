@@ -87,6 +87,9 @@
 *        Add SYSTEM parameter for specifying output coordinate system
 *     2007-01-25 (AGG):
 *        Update API in calls to smf_mapbounds and smf_rebinmap
+*     2007-02-06 (AGG):
+*        Add uselonlat flag rather that specify hard-wired value in
+*        smf_mapbounds
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -178,6 +181,8 @@ void smurf_makemap( int *status ) {
   char system[10];           /* Celestial coordinate system for output image */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   int usebad;                /* Flag for whether to use bad bolos mask */
+  int uselonlat = 0;         /* Flag for whether to use given lon_0 and
+				lat_0 for output frameset */
   void *variance=NULL;       /* Pointer to the variance map */
   smfData *wdata=NULL;       /* Pointer to SCUBA2 data struct for weights */
   void *weights=NULL;        /* Pointer to the weights map */
@@ -216,7 +221,7 @@ void smurf_makemap( int *status ) {
   
   /* Calculate the map bounds */
   msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Determine map bounds", status);
-  smf_mapbounds( igrp, size, system, 0, 0, 1, pixsize, lbnd_out, ubnd_out, 
+  smf_mapbounds( igrp, size, system, 0, 0, uselonlat, pixsize, lbnd_out, ubnd_out, 
 		 &outfset, &moving, status );
   if (*status != SAI__OK) {
     errRep(FUNC_NAME, "Unable to determine map bounds", status);
