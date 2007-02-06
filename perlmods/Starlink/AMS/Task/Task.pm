@@ -463,7 +463,7 @@ sub get {
     # not clear whether I should be doing this in the ADAM module
     # itself or here. For now do it in the ORAC interface
 
-    map { s/(\d)D(\+|-\d)/${1}E$2/g; } @values;
+    map { s/(\d)D((?:\+|-)?\d)/${1}E$2/g; } @values;
 
   } else {
     # This is for an A-task
