@@ -16,7 +16,8 @@
 *     smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap,
 *                      AstSkyFrame *oskyframe, Grp *detgrp, int lbnd_out[ 3 ], 
 *                      int ubnd_out[ 3 ], int genvar, float *data_array,
-*                      float *var_array, int *ispec, int *status );
+*                      float *var_array, int *ispec, float *texp_array, 
+*                      int *status );
 
 *  Arguments:
 *     data = smfData * (Given)
@@ -53,6 +54,11 @@
 *        same variance and so only one plane need be calculated). 
 *     ispec = int * (Given and Returned)
 *        Index of the next spectrum to be stored in the output NDF.
+*     texp_array = float * (Given and Returned)
+*        A work array, which holds the total exposure time for each output 
+*        spectrum. It is updated on exit to include the supplied input 
+*        NDF. Only used if "spread" is AST__NEAREST. It should be big enough 
+*        to hold a single spatial plane from the output cube.
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
@@ -75,6 +81,8 @@
 *        Added "genvar" argument.
 *     30-JAN-2007 (DSB):
 *        Added calculation of Tsys output variances.
+*     7-FEB-2007 (DSB):
+*        Added parameter "texp_array".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -123,7 +131,8 @@
 void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap, 
                       AstSkyFrame *oskyframe, Grp *detgrp, int lbnd_out[ 3 ], 
                       int ubnd_out[ 3 ], int genvar, float *data_array, 
-                      float *var_array, int *ispec, int *status ){
+                      float *var_array, int *ispec, float *texp_array, 
+                      int *status ){
 
 /* Local Variables */
    AstCmpMap *fmap = NULL;      /* Mapping from spectral grid to topo freq Hz */
@@ -151,6 +160,9 @@ void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap,
    double tcon;          /* Variance factor for whole time slice */
    float *pdata;         /* Pointer to next data sample */
    float *qdata;         /* Pointer to next data sample */
+   float texp;           /* Total time ( = ton + toff ) */
+   float toff;           /* Off time */
+   float ton;            /* On time */
    int dim[ 3 ];         /* Output array dimensions */
    int found;            /* Was current detector name found in detgrp? */
    int good;             /* Are there any good detector samples? */
@@ -360,22 +372,29 @@ void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap,
       smf_tslice_ast( data, itime, 1, status );
       swcsin = hdr->wcs;
 
+/* Note the total exposure time (texp) for all the input spectra produced by
+   this time slice. */
+      ton = hdr->state->acs_exposure;
+      if( ton == 0.0 ) ton = VAL__BADR;
+
+      toff = hdr->state->acs_offexposure;
+      if( toff == 0.0 ) toff = VAL__BADR;
+
+      if( ton != VAL__BADR && toff != VAL__BADR ) {
+         texp = ton + toff;
+      } else {
+         texp = VAL__BADR;
+      }
+
 /* If output variances are being calculated on the basis of Tsys values
    in the input, find the constant factor associated with the current
    time slice. */
       tcon = AST__BAD;
-      if( fcon != AST__BAD ) {
-         if( hdr->state->acs_exposure != VAL__BADR &&
-             hdr->state->acs_exposure != 0.0 &&
-             hdr->state->acs_offexposure != VAL__BADR &&
-             hdr->state->acs_offexposure != 0.0 ) {
-
-            tcon = fcon*( 1.0/hdr->state->acs_exposure + 
-                          1.0/hdr->state->acs_offexposure ); 
+      if( fcon != AST__BAD && texp != VAL__BADR ) {
+         tcon = fcon*( 1.0/ton + 1.0/toff );
 
 /* Get a pointer to the start of the Tsys values for this time slice. */
-            tsys = hdr->tsys + hdr->ndet*itime;
-         }
+         tsys = hdr->tsys + hdr->ndet*itime;
       }
 
 /* We now create a Mapping from detector index to position in oskyframe. */
@@ -426,6 +445,8 @@ void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap,
                   } else if( var_array ) {
                      var_array[ *ispec ] = VAL__BADR;
                   }
+
+                  if( texp != VAL__BADR ) texp_array[ *ispec ] = texp;
    
                   for( ichan = 0; ichan < nchan; ichan++, pdata++ ) {
                      iz = spectab[ ichan ] - 1;

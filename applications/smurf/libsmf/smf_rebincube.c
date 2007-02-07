@@ -19,8 +19,8 @@
 *                    AstMapping *ospecmap, Grp *detgrp, int moving, 
 *                    dim_t lbnd_out[ 3 ], dim_t ubnd_out[ 3 ], int spread, 
 *                    const double params[], int genvar, float *data_array, 
-*                    float *var_array, double *wgt_array, int *work_array, 
-*                    int *status );
+*                    float *var_array, double *wgt_array, int *work1_array, 
+*                    float *texp_array, int *status );
 
 *  Arguments:
 *     data = smfData * (Given)
@@ -90,11 +90,16 @@
 *        the output cube (all planes will have the same weight and so only one 
 *        plane need be calculated). For other values of "spread", the 
 *        "wgt_array" array should be twice the length of "data_array".
-*     work_array = int * (Given and Returned)
+*     work1_array = int * (Given and Returned)
 *        A work array, which is updated on exit to include the supplied input 
 *        NDF. Only used if "genvar" is 1 and "spread" is AST__NEAREST. It
 *        should be big enough to hold a single spatial plane from the output 
 *        cube.
+*     texp_array = float * (Given and Returned)
+*        A work array, which holds the total exposure time for each output 
+*        spectrum. It is updated on exit to include the supplied input 
+*        NDF. Only used if "spread" is AST__NEAREST. It should be big enough 
+*        to hold a single spatial plane from the output cube.
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
@@ -144,6 +149,8 @@
 *     29-JAN-2007 (DSB):
 *        Use new expression for calculating the input variance on the basis of
 *        Tsys.
+*     7-FEB-2007 (DSB):
+*        Added parameter "texp_array".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -194,12 +201,13 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
                     AstMapping *ospecmap, Grp *detgrp, int moving, 
                     int lbnd_out[ 3 ], int ubnd_out[ 3 ], int spread, 
                     const double params[], int genvar, float *data_array, 
-                    float *var_array, double *wgt_array, int *work_array, 
-                    int *status ){
+                    float *var_array, double *wgt_array, int *work1_array, 
+                    float *texp_array, int *status ){
 
 /* Local Variables */
    AstCmpMap *fmap = NULL;     /* Mapping from spectral grid to topo freq Hz */
    AstCmpMap *ssmap = NULL;    /* Input GRID->output GRID Mapping for spectral axis */
+   AstCmpMap *totmap = NULL;   /* WCS->GRID Mapping from input WCS FrameSet */
    AstFitsChan *fc = NULL;     /* FitsChan used to get spectral WCS from input */           
    AstFrame *sf1 = NULL;       /* Pointer to copy of input current Frame */
    AstFrame *skyin = NULL;     /* Pointer to current Frame in input WCS FrameSet */
@@ -210,7 +218,6 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
    AstMapping *azel2usesys = NULL;/* Mapping from AZEL to the output sky frame */
    AstMapping *fsmap = NULL;   /* Mapping extracted from FrameSet */
    AstMapping *specmap = NULL; /* GRID->Spectral Mapping for current input file */
-   AstCmpMap *totmap = NULL;   /* WCS->GRID Mapping from input WCS FrameSet */
    char *fftwin = NULL;        /* Name of FFT windowing function */
    const char *name;           /* Pointer to current detector name */
    const double *tsys;         /* Pointer to Tsys value for first detector */
@@ -237,6 +244,9 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
    float *ipv = NULL;          /* Pointer to input variances values */
    float *pdata = NULL;        /* Pointer to next input data value */
    float *varwork = NULL;      /* Work array holding variances for 1 slice/channel */
+   float texp;                 /* Total time ( = ton + toff ) */
+   float toff;                 /* Off time */
+   float ton;                  /* On time */
    int ast_flags;              /* Flags to use with astRebinSeq */
    int dim[ 3 ];               /* Output array dimensions */
    int found;                  /* Was current detector name found in detgrp? */
@@ -383,10 +393,13 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
          ast_flags = 0;
 
       } else {
-         for( iv0 = 0; iv0 < nxy; iv0++ ) wgt_array[ iv0 ] = 0.0;
+         for( iv0 = 0; iv0 < nxy; iv0++ ) {
+            wgt_array[ iv0 ] = 0.0;
+            texp_array[ iv0 ] = 0.0;
+         }
          if( genvar ) {
             for( iv0 = 0; iv0 < nxy; iv0++ ) var_array[ iv0 ] = 0.0;
-            for( iv0 = 0; iv0 < nxy; iv0++ ) work_array[ iv0 ] = 0;
+            for( iv0 = 0; iv0 < nxy; iv0++ ) work1_array[ iv0 ] = 0;
          }
       }
    }
@@ -503,22 +516,29 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
       smf_tslice_ast( data, itime, 1, status );
       swcsin = hdr->wcs;
 
+/* Note the total exposure time (texp) for all the input spectra produced by
+   this time slice. */
+      ton = hdr->state->acs_exposure;
+      if( ton == 0.0 ) ton = VAL__BADR;
+
+      toff = hdr->state->acs_offexposure;
+      if( toff == 0.0 ) toff = VAL__BADR;
+
+      if( ton != VAL__BADR && toff != VAL__BADR ) {
+         texp = ton + toff;
+      } else {
+         texp = VAL__BADR;
+      }
+
 /* If output variances are being calculated on the basis of Tsys values
    in the input, find the constant factor associated with the current
    time slice. */
       tcon = AST__BAD;
-      if( fcon != AST__BAD ) {
-         if( hdr->state->acs_exposure != VAL__BADR &&
-             hdr->state->acs_exposure != 0.0 &&
-             hdr->state->acs_offexposure != VAL__BADR && 
-             hdr->state->acs_offexposure != 0.0 ){
-
-            tcon = fcon*( 1.0/hdr->state->acs_exposure + 
-                          1.0/hdr->state->acs_offexposure );
+      if( fcon != AST__BAD && texp != VAL__BADR ) {
+         tcon = fcon*( 1.0/ton + 1.0/toff );
 
 /* Get a pointer to the start of the Tsys values for this time slice. */
-            tsys = hdr->tsys + hdr->ndet*itime;
-         }
+         tsys = hdr->tsys + hdr->ndet*itime;
       }
 
 /* Find out how to convert from input GRID coords to the output sky frame.
@@ -635,6 +655,9 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
                      iv0 = ix + dim[ 0 ]*iy;
                      wgt_array[ iv0 ] += wgt;
 
+/* Likewise update the total exposure time for the output spectrum. */
+                     if( texp != VAL__BADR ) texp_array[ iv0 ] += texp;
+
 /* Loop round every channel, updating the output data array. */
                      for( ichan = 0; ichan < nchan; ichan++, pdata++ ) {
                         iz = spectab[ ichan ] - 1;
@@ -658,7 +681,7 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
    included it. */
                               if( genvar == 1 ) {
                                  var_array[ iv0 ] += ( *pdata )*( *pdata );
-                                 work_array[ iv0 ]++;
+                                 work1_array[ iv0 ]++;
                               }
 
                            } else {
@@ -816,6 +839,12 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
             }
          }
 
+/* Now set the exp_array values bad for output spectra that do not
+   contain any data. Loop over every spectrum in the output cube. */
+         for( iv0 = 0; iv0 < nxy; iv0++ ) {
+            if( wgt_array[ iv0 ] <= 0.0 ) texp_array[ iv0 ] = VAL__BADR;
+         }            
+
 /* Now normalise the 2D variance array. First handle cases where the
    output variance is calculated on the basis of the spread of input
    values. */
@@ -848,7 +877,7 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
 /* Form the normalised variance for the output spectrum. This is the mean
    of the variances for each channel. */              
                   if( ngoodchan > 0 ) {
-                     var_array[ iv0 ] = ( var_array[ iv0 ]/work_array[ iv0 ] 
+                     var_array[ iv0 ] = ( var_array[ iv0 ]/work1_array[ iv0 ] 
                                           - d2sum/ngoodchan )/( wgt_array[ iv0 ] - 1 );
                   } else {
                      var_array[ iv0 ] = VAL__BADR;

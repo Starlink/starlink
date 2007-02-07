@@ -411,6 +411,8 @@
 *        of moving sources.
 *     25-JAN-2007 (DSB):
 *        Remove duplicated code for getting parameter "SPARSE".
+*     7-FEB-2007 (DSB):
+*        Store median exposure time int he output NDF FITS extension.
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
@@ -472,13 +474,14 @@
 void smurf_makecube( int *status ) {
 
 /* Local Variables */
-   AstSkyFrame *abskyfrm = NULL;/* Output SkyFrame (always absolute) */
+   AstFitsChan *fchan;        /* FitsChan holding output NDF FITS extension */
    AstFrame *ospecfrm = NULL; /* SpecFrame from the output WCS Frameset */
    AstFrame *tfrm = NULL;     /* Current Frame from output WCS */
    AstFrameSet *wcsout = NULL;/* WCS Frameset for output cube */
    AstMapping *oskymap = NULL;/* GRID->SkyFrame Mapping from output WCS */
    AstMapping *ospecmap = NULL;/* GRID->SpecFrame Mapping from output WCS */
    AstMapping *tmap = NULL;   /* Base->current Mapping from output WCS */
+   AstSkyFrame *abskyfrm = NULL;/* Output SkyFrame (always absolute) */
    AstSkyFrame *oskyfrm = NULL;/* SkyFrame from the output WCS Frameset */
    Grp *detgrp = NULL;        /* Group of detector names */
    Grp *igrp = NULL;          /* Group of input files */
@@ -501,13 +504,16 @@ void smurf_makecube( int *status ) {
    double wcsubnd_out[3];     /* Array of upper bounds of output cube */
    float *var_array = NULL;   /* Pointer to temporary variance array */
    float *var_out = NULL;     /* Pointer to the output variance array */
-   int *work_array = NULL;    /* Pointer to temporary work array */
+   float *work2_array = NULL; /* Pointer to temporary work array */
+   float median;              /* Median exposure time in outptu NDF. */
+   int *work1_array = NULL;   /* Pointer to temporary work array */
    int autogrid;              /* Determine projection parameters automatically? */
    int axes[ 2 ];             /* Indices of selected axes */
    int el0;                   /* Index of 2D array element */
    int el;                    /* Index of 3D array element */
    int flag;                  /* Is group expression to be continued? */
    int genvar;                /* How to create output Variances */
+   int gotfits;               /* Does the output NDF have a FITS extension? */
    int i;                     /* Loop index */
    int ifile;                 /* Input file index */
    int ispec;                 /* Index of next spectrum within output NDF */
@@ -516,6 +522,7 @@ void smurf_makecube( int *status ) {
    int moving;                /* Is the telescope base position changing? */
    int ndet;                  /* Number of detectors supplied for "DETECTORS" */
    int nel;                   /* Number of elements in 3D array */
+   int neluse;                /* Number of elements used */
    int nparam = 0;            /* No. of parameters required for spreading scheme */
    int npos;                  /* Number of samples included in output NDF */
    int nwgtdim;               /* No. of axes in the weights array */
@@ -849,10 +856,11 @@ void smurf_makecube( int *status ) {
 /* Otherwise, the variance is assumed to be the same in every spatial
    slice, so we only need memory to hold one spatial slice (this slice is
    later copied to all slices in the output cube Variance component).
-   Also allocate an integer work array of the same size. */
+   Also allocate some work arrays of the same size. */
    } else if( genvar ) {
       var_array = (float *) astMalloc( nxy*sizeof( float ) );
-      work_array = (int *) astMalloc( nxy*sizeof( int ) );
+      work1_array = (int *) astMalloc( nxy*sizeof( int ) );
+      work2_array = (float *) astMalloc( nxy*sizeof( float ) );
    }
 
 /* If required, create an array to hold the weights. First set up the bounds 
@@ -972,11 +980,11 @@ void smurf_makecube( int *status ) {
          smf_rebincube( data, ifile, size, abskyfrm, oskymap, ospecfrm, 
                         ospecmap, detgrp, moving, lbnd_out, ubnd_out, 
                         spread, params, genvar, data_array, var_array, 
-                        wgt_array, work_array, status );
+                        wgt_array, work1_array, work2_array, status );
       } else {
          smf_rebinsparse( data, ospecfrm, ospecmap, abskyfrm, detgrp, 
                           lbnd_out, ubnd_out, genvar, data_array, var_array, 
-                          &ispec, status );
+                          &ispec, work2_array, status );
       }
    
 /* Close the input data file. */
@@ -1014,9 +1022,31 @@ L999:;
          }
       }
 
-/* Free the memory used to store the 2D variance information. */
+/* Find the median value in the "work2_array" array. This array holds the
+   total exposure time for each output spectrum (that is, the sum of the 
+   (Ton+Toff) values for each input spectrum that contributes to the
+   output spectrum). */
+      kpg1Medur( 1, nxy, work2_array, &median, &neluse, status );
+
+/* Store the median exposure time as keyword EXP_TIME in the FITS
+   extension of the output cube. */
+      if( median != VAL__BADR && median > 0.0 ) {
+         ndfXstat( ondf, "FITS", &gotfits, status ); 
+         if( gotfits ) {
+            kpgGtfts( ondf, &fchan, status );
+         } else {
+            fchan = astFitsChan( NULL, NULL, "" );
+         }
+         astSetFitsF( fchan, "EXP_TIME", (double) median, "[s] Median exposure time", 
+                      1 );
+         kpgPtfts( ondf, fchan, status );
+      }
+
+/* Free the memory used to store the 2D variance information and work
+   arrays. */
       var_array = astFree( var_array );
-      work_array = astFree( work_array );
+      work1_array = astFree( work1_array );
+      work2_array = astFree( work2_array );
 
    }
 
