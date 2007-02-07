@@ -18,6 +18,8 @@
 *  History:
 *     26-MAY-2006 (DSB):
 *        Original version.
+*     7-FEB-2007 (DSB):
+*        Added atlMgfts.
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
@@ -57,5 +59,6 @@ enum { ATL__MXDIM  = 7 };
 void atlAxtrm( AstFrameSet *, int *, int *, int *, double *, int * );
 void atlMklut( int, int, int, int, AstFrame *, double *, AstMapping **, int * );
 void atlPlroi( AstPlot *, AstKeyMap **, int * );
+void atlMgfts( int, AstFitsChan *, AstFitsChan *, AstFitsChan **, int * );
 
 #endif

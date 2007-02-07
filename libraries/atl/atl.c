@@ -20,6 +20,8 @@
 *        Original version.
 *     02-JUN-2006 (TIMJ):
 *        Include prototypes.
+*     7-FEB-2007 (DSB):
+*        Added atlMgfts.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -174,4 +176,42 @@ void atlMklut( int ix, int iy, int npnt, int nvar, AstFrame *frm,
 
    return;
 }
+
+
+F77_SUBROUTINE(atl_mgfts)( INTEGER(METHOD),
+                           INTEGER(FC1), 
+                           INTEGER(FC2), 
+                           INTEGER(FC3),
+                           INTEGER(STATUS) );
+
+void atlMgfts( int method, AstFitsChan *fc1, AstFitsChan *fc2, 
+               AstFitsChan **fc3, int *status ){
+   DECLARE_INTEGER(METHOD);
+   DECLARE_INTEGER(FC1);
+   DECLARE_INTEGER(FC2);
+   DECLARE_INTEGER(FC3);
+   DECLARE_INTEGER(STATUS);
+   int ifc3;
+
+   if( !astOK ) return;
+
+   F77_EXPORT_INTEGER( method, METHOD );
+   F77_EXPORT_INTEGER( astP2I( fc1 ), FC1 );
+   F77_EXPORT_INTEGER( astP2I( fc2 ), FC2 );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(atl_mgfts)( INTEGER_ARG(&METHOD),
+                        INTEGER_ARG(&FC1),
+                        INTEGER_ARG(&FC2),
+                        INTEGER_ARG(&FC3),
+                        INTEGER_ARG(&STATUS) );
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_IMPORT_INTEGER( FC3, ifc3 );
+   *fc3 = astI2P( ifc3 );
+
+   return;
+}
+
+
 
