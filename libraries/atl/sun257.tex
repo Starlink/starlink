@@ -621,30 +621,6 @@ higher-level utility tasks.
          The global status.
       }
    }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 2006 Particle Physics \& Astronomy Research Council.
-      All Rights Reserved.
-   }
-   \sstdiytopic{
-      Licence
-   }{
-      This program is free software; you can redistribute it and/or
-      modify it under the terms of the GNU General Public License as
-      published by the Free Software Foundation; either version 2 of
-      the License, or (at your option) any later version.
-
-      This program is distributed in the hope that it will be
-      useful,but WITHOUT ANY WARRANTY; without even the implied
-      warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-      PURPOSE. See the GNU General Public License for more details.
-
-      You should have received a copy of the GNU General Public License
-      along with this program; if not, write to the Free Software
-      Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-      02111-1307, USA
-   }
 }
 \sstroutine{
    ATL\_CPPLA
@@ -684,30 +660,6 @@ higher-level utility tasks.
          The global status.
       }
    }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 2006 Central Laboratory of the Research Councils.
-      All Rights Reserved.
-   }
-   \sstdiytopic{
-      Licence
-   }{
-      This program is free software; you can redistribute it and/or
-      modify it under the terms of the GNU General Public License as
-      published by the Free Software Foundation; either version 2 of
-      the License, or (at your option) any later version.
-
-      This program is distributed in the hope that it will be
-      useful,but WITHOUT ANY WARRANTY; without even the implied
-      warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-      PURPOSE. See the GNU General Public License for more details.
-
-      You should have received a copy of the GNU General Public License
-      along with this program; if not, write to the Free Software
-      Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-      02111-1307, USA
-   }
 }
 \sstroutine{
    ATL\_CREAT
@@ -738,30 +690,6 @@ higher-level utility tasks.
       }{
          The global status.
       }
-   }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 2001, 2003 Central Laboratory of the Research
-      Councils. All Rights Reserved.
-   }
-   \sstdiytopic{
-      Licence
-   }{
-      This program is free software; you can redistribute it and/or
-      modify it under the terms of the GNU General Public License as
-      published by the Free Software Foundation; either version 2 of
-      the License, or (at your option) any later version.
-
-      This program is distributed in the hope that it will be
-      useful, but WITHOUT ANY WARRANTY; without even the implied
-      warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-      PURPOSE. See the GNU General Public License for more details.
-
-      You should have received a copy of the GNU General Public License
-      along with this program; if not, write to the Free Software
-      Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-      02111-1307, USA
    }
 }
 \sstroutine{
@@ -813,30 +741,6 @@ higher-level utility tasks.
          The global status.
       }
    }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 2006 Central Laboratory of the Research Councils.
-      All Rights Reserved.
-   }
-   \sstdiytopic{
-      Licence
-   }{
-      This program is free software; you can redistribute it and/or
-      modify it under the terms of the GNU General Public License as
-      published by the Free Software Foundation; either version 2 of
-      the License, or (at your option) any later version.
-
-      This program is distributed in the hope that it will be
-      useful,but WITHOUT ANY WARRANTY; without even the implied
-      warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-      PURPOSE. See the GNU General Public License for more details.
-
-      You should have received a copy of the GNU General Public License
-      along with this program; if not, write to the Free Software
-      Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-      02111-1307, USA
-   }
 }
 \sstroutine{
    ATL\_FSPEC
@@ -879,30 +783,6 @@ higher-level utility tasks.
          The global status.
       }
    }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 2006 Particle Physics \& Astronomy Research Council.
-      All Rights Reserved.
-   }
-   \sstdiytopic{
-      Licence
-   }{
-      This program is free software; you can redistribute it and/or
-      modify it under the terms of the GNU General Public License as
-      published by the Free Software Foundation; either version 2 of
-      the License, or (at your option) any later version.
-
-      This program is distributed in the hope that it will be
-      useful,but WITHOUT ANY WARRANTY; without even the implied
-      warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-      PURPOSE. See the GNU General Public License for more details.
-
-      You should have received a copy of the GNU General Public License
-      along with this program; if not, write to the Free Software
-      Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-      02111-1307, USA
-   }
 }
 \sstroutine{
    ATL\_GTGRP
@@ -939,29 +819,73 @@ higher-level utility tasks.
          The global status.
       }
    }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 2001 Central Laboratory of the Research Councils.
-      All Rights Reserved.
+}
+\sstroutine{
+   ATL\_MGFTS
+}{
+   Merge two FITS headers
+}{
+   \sstdescription{
+      This routine merges two FITS headers, each supplied in an AST
+      FitsChan, in one of several different ways. The resulting merged
+      list of headers is returned in a new FitsChan.
    }
-   \sstdiytopic{
-      Licence
-   }{
-      This program is free software; you can redistribute it and/or
-      modify it under the terms of the GNU General Public License as
-      published by the Free Software Foundation; either version 2 of
-      the License, or (at your option) any later version.
+   \sstinvocation{
+      CALL ATL\_MGFTS( METHOD, FC1, FC2, FC3, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         METHOD = INTEGER (Given)
+      }{
+         Indicates how the two FITS headers should be merged:
 
-      This program is distributed in the hope that it will be
-      useful, but WITHOUT ANY WARRANTY; without even the implied
-      warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-      PURPOSE. See the GNU General Public License for more details.
+         1 - Concatenation. Store the contents of FC1 in the returned
+             FitsChan, and then append the contents of FC2 to the end of
+             the returned FitsChan. No checks are made for multiple
+             occurences of the same keyword.
 
-      You should have received a copy of the GNU General Public License
-      along with this program; if not, write to the Free Software
-      Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-      02111-1307, USA
+         2 - Union (with priority given to FC2): For every header in FC1, see
+             if FC2 contains the same keyword. If it does not, copy the FC1
+             header to the returned FitsChan. Then append the contents of FC2
+             to the end of the returned FitsChan.
+
+         3 - Overlap: For every header in FC1, see if FC2 contains the same
+             keyword. If it does, and if the keyword value is the same in
+             both FitsChans, copy the FC1 header to the returned FitsChan.
+      }
+      \sstsubsection{
+         FC1 = INTEGER (Given)
+      }{
+         Pointer to the first FitsChan.
+      }
+      \sstsubsection{
+         FC2 = INTEGER (Given)
+      }{
+         Pointer to the second FitsChan.
+      }
+      \sstsubsection{
+         FC3 = INTEGER (Returned)
+      }{
+         Pointer to the returned FitsChan.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The contents of FC1 and FC2 are unchanged on exit.
+
+         \sstitem
+         For METHOD 3 (overlap), floating point values are compared
+         by formatting into a string (using the accuracy specified by the
+         FitsDigits attributes of the two supplied FitsChans) and then
+         comparing the formatted strings for exact equality.
+      }
    }
 }
 \sstroutine{
@@ -1042,30 +966,6 @@ higher-level utility tasks.
          increases or decreases monotonically with X.
       }
    }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 2005 Particle Physics \& Astronomy Research Council.
-      All Rights Reserved.
-   }
-   \sstdiytopic{
-      Licence
-   }{
-      This program is free software; you can redistribute it and/or
-      modify it under the terms of the GNU General Public License as
-      published by the Free Software Foundation; either version 2 of
-      the License, or (at your option) any later version.
-
-      This program is distributed in the hope that it will be
-      useful,but WITHOUT ANY WARRANTY; without even the implied
-      warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-      PURPOSE. See the GNU General Public License for more details.
-
-      You should have received a copy of the GNU General Public License
-      along with this program; if not, write to the Free Software
-      Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-      02111-1307, USA
-   }
 }
 \sstroutine{
    ATL\_NOTIF
@@ -1089,30 +989,6 @@ higher-level utility tasks.
       }{
          The global status.
       }
-   }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 2003 Central Laboratory of the Research Councils.
-      All Rights Reserved.
-   }
-   \sstdiytopic{
-      Licence
-   }{
-      This program is free software; you can redistribute it and/or
-      modify it under the terms of the GNU General Public License as
-      published by the Free Software Foundation; either version 2 of
-      the License, or (at your option) any later version.
-
-      This program is distributed in the hope that it will be
-      useful, but WITHOUT ANY WARRANTY; without even the implied
-      warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-      PURPOSE. See the GNU General Public License for more details.
-
-      You should have received a copy of the GNU General Public License
-      along with this program; if not, write to the Free Software
-      Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-      02111-1307, USA
    }
 }
 \sstroutine{
@@ -1148,30 +1024,6 @@ higher-level utility tasks.
          The global status.
       }
    }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 2006 Particle Physics \& Astronomy Research Council.
-      All Rights Reserved.
-   }
-   \sstdiytopic{
-      Licence
-   }{
-      This program is free software; you can redistribute it and/or
-      modify it under the terms of the GNU General Public License as
-      published by the Free Software Foundation; either version 2 of
-      the License, or (at your option) any later version.
-
-      This program is distributed in the hope that it will be
-      useful,but WITHOUT ANY WARRANTY; without even the implied
-      warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-      PURPOSE. See the GNU General Public License for more details.
-
-      You should have received a copy of the GNU General Public License
-      along with this program; if not, write to the Free Software
-      Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-      02111-1307, USA
-   }
 }
 \sstroutine{
    ATL\_RDCH
@@ -1200,30 +1052,6 @@ higher-level utility tasks.
       }{
          The global status.
       }
-   }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 2001 Central Laboratory of the Research Councils.
-      All Rights Reserved.
-   }
-   \sstdiytopic{
-      Licence
-   }{
-      This program is free software; you can redistribute it and/or
-      modify it under the terms of the GNU General Public License as
-      published by the Free Software Foundation; either version 2 of
-      the License, or (at your option) any later version.
-
-      This program is distributed in the hope that it will be
-      useful, but WITHOUT ANY WARRANTY; without even the implied
-      warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-      PURPOSE. See the GNU General Public License for more details.
-
-      You should have received a copy of the GNU General Public License
-      along with this program; if not, write to the Free Software
-      Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-      02111-1307, USA
    }
 }
 \sstroutine{
@@ -1254,30 +1082,6 @@ higher-level utility tasks.
          The global status.
       }
    }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 2001, 2003 Central Laboratory of the Research
-      Councils. All Rights Reserved.
-   }
-   \sstdiytopic{
-      Licence
-   }{
-      This program is free software; you can redistribute it and/or
-      modify it under the terms of the GNU General Public License as
-      published by the Free Software Foundation; either version 2 of
-      the License, or (at your option) any later version.
-
-      This program is distributed in the hope that it will be
-      useful, but WITHOUT ANY WARRANTY; without even the implied
-      warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-      PURPOSE. See the GNU General Public License for more details.
-
-      You should have received a copy of the GNU General Public License
-      along with this program; if not, write to the Free Software
-      Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-      02111-1307, USA
-   }
 }
 \sstroutine{
    ATL\_RDGRP
@@ -1307,30 +1111,6 @@ higher-level utility tasks.
          The global status.
       }
    }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 2001 Central Laboratory of the Research Councils.
-      All Rights Reserved.
-   }
-   \sstdiytopic{
-      Licence
-   }{
-      This program is free software; you can redistribute it and/or
-      modify it under the terms of the GNU General Public License as
-      published by the Free Software Foundation; either version 2 of
-      the License, or (at your option) any later version.
-
-      This program is distributed in the hope that it will be
-      useful, but WITHOUT ANY WARRANTY; without even the implied
-      warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-      PURPOSE. See the GNU General Public License for more details.
-
-      You should have received a copy of the GNU General Public License
-      along with this program; if not, write to the Free Software
-      Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-      02111-1307, USA
-   }
 }
 \sstroutine{
    ATL\_RM
@@ -1352,31 +1132,6 @@ higher-level utility tasks.
          The path to the file.
       STATUS = INTEGER (Given and Returned)
          The inherited global status.
-   }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 1999 Central Laboratory of the Research Councils.
-      Copyright (C) 2005 Particle Physics \& Astronomy Research Council.
-      All Rights Reserved.
-   }
-   \sstdiytopic{
-      Licence
-   }{
-      This program is free software; you can redistribute it and/or
-      modify it under the terms of the GNU General Public License as
-      published by the Free Software Foundation; either version 2 of
-      the License, or (at your option) any later version.
-
-      This program is distributed in the hope that it will be
-      useful, but WITHOUT ANY WARRANTY; without even the implied
-      warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-      PURPOSE. See the GNU General Public License for more details.
-
-      You should have received a copy of the GNU General Public License
-      along with this program; if not, write to the Free Software
-      Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-      02111-1307, USA
    }
 }
 \sstroutine{
@@ -1404,30 +1159,6 @@ higher-level utility tasks.
       }{
          The global status value.
       }
-   }
-   \sstdiytopic{
-      Copyright
-   }{
-      Councils. Copyright (C) 2006 Particle Physics \& Astronomy
-      Research Council. All Rights Reserved.
-   }
-   \sstdiytopic{
-      Licence
-   }{
-      This program is free software; you can redistribute it and/or
-      modify it under the terms of the GNU General Public License as
-      published by the Free Software Foundation; either version 2 of
-      the License, or (at your option) any later version.
-
-      This program is distributed in the hope that it will be
-      useful, but WITHOUT ANY WARRANTY; without even the implied
-      warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-      PURPOSE. See the GNU General Public License for more details.
-
-      You should have received a copy of the GNU General Public License
-      along with this program; if not, write to the Free Software
-      Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-      02111-1307, USA
    }
 }
 \normalsize
