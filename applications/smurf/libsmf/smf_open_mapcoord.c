@@ -83,7 +83,7 @@ void smf_open_mapcoord( smfData *data, int *status ) {
   void *mapptr[3];              /* Pointer to array of mapped components */
   int nbolo;                    /* Number of bolometers */
   int nmap;                     /* Number of elements mapped */
-  HDSLoc *mapcoordloc=NULL;        /* HDS locator to the MAPCOORD extension */
+  HDSLoc *mapcoordloc=NULL;     /* HDS locator to the MAPCOORD extension */
   int ubnd[1];                  /* Pixel bounds for 1d pointing array */
   
   /* Main routine */
