@@ -204,6 +204,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -241,6 +242,9 @@
 *     2006 June 9 (MJC):
 *        Added support for smoothing all two-dimensional planes in a
 *        three-dimensional cube.
+*     07-FEB-2007 (PWD):
+*        Corrected argument list for KPS1_PSEVL. Set missing "AMP"
+*        argument to value 1.0.
 *     {enter_further_changes_here}
 
 *-
@@ -535,7 +539,7 @@
 
 *  Evaluate the point-spread function within the box.  Gamma is 2.0 for
 *  a Gaussian.
-         CALL KPS1_PSEVL( AXISR, RORI, MIN( FWHM( 1 ), FWHM( 2 ) ),
+         CALL KPS1_PSEVL( 1.0, AXISR, RORI, MIN( FWHM( 1 ), FWHM( 2 ) ),
      :                    2.0, 1, 2 * IBOX + 1, 1, 2 * JBOX + 1,
      :                    REAL( IBOX ) + 0.5, REAL( JBOX ) + 0.5, 
      :                    %VAL( CNF_PVAL( WPNTR1 ) ), STATUS )
