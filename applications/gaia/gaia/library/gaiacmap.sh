@@ -12,9 +12,20 @@ exec $GAIA_DIR/gaia_stcl $0 ${1+"$@"}
 #         gaiacmap cmap_file
 
 #   Description:
-#      
+#      Allows the colour map used by GAIA to be changed to use
+#      an external file. The external file must be a simple text
+#      file with three space separated columns. The columns give
+#      the relative intensities of the red, green and blue channels.
 
 #   Notes:
+#      To convert a KAPPA LUT for use in GAIA you can do the following:
+#
+#      % convert
+#      % ndf2ascii fixed=true noperec=3 in=$KAPPA_DIR/zebra_lut out=zebra_lut.lasc
+#
+#      The file "zebra_lut.lasc" can now be loaded by this script. Note that
+#      an "lasc" file must have 256 rows, so you will need to scale or pad
+#      luts with less or more rows.
 
 #   Authors:
 #      Peter W. Draper (PWD):
