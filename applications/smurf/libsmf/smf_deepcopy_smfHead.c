@@ -177,8 +177,9 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
   /* Allocate Tsys array */
   if (old->ndet > 0 && old->tsys) {
     ndet = old->ndet;
-    tsys = smf_malloc( ndet, sizeof(*tsys), 0, status );
-    if ( tsys ) memcpy( tsys, old->tsys, ndet*sizeof(*tsys) );
+    nframes = old->nframes;
+    tsys = smf_malloc( ndet*nframes, sizeof(*tsys), 0, status );
+    if ( tsys ) memcpy( tsys, old->tsys, ndet*nframes*sizeof(*tsys) );
   }
 
   /* Insert elements into new smfHead */
