@@ -6,6 +6,10 @@
     - New "Rebin" controls have been added to the cube toolbox. These allow
     the current cube to be rebinned and displayed.
 
+    - New "Filter" controls have been added to the cube toolbox. These allow
+    the current cube to be smoothed, image plane by image plane, using a box
+    or gaussian filter. 
+
     - A new "Go" menu has been added to the cube toolbox. This is similar
     to the main window menu, but only displays possible cubes, arranges
     for them to be efficiently loaded and attempts to preserve the 
