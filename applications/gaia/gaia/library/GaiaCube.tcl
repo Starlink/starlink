@@ -219,7 +219,7 @@ itcl::class gaia::GaiaCube {
       #  Add tab window for choosing either the helper controls.
       itk_component add tabnotebook {
          iwidgets::tabnotebook $w_.tab -equaltabs 0 \
-            -angle 0 -tabpos n -width 400 -height 420
+            -angle 0 -tabpos n -width 420 -height 420
       }
       pack $itk_component(tabnotebook) -fill both -expand 1
 
@@ -238,8 +238,11 @@ itcl::class gaia::GaiaCube {
       $itk_component(tabnotebook) add -label Rebin
       set rebinTab [$itk_component(tabnotebook) childsite 4]
 
+      $itk_component(tabnotebook) add -label Filter
+      set filterTab [$itk_component(tabnotebook) childsite 5]
+
       $itk_component(tabnotebook) add -label Baseline
-      set baselineTab [$itk_component(tabnotebook) childsite 5]
+      set baselineTab [$itk_component(tabnotebook) childsite 6]
 
       #  Spectrum section.
       itk_component add sruler {
@@ -345,6 +348,22 @@ itcl::class gaia::GaiaCube {
             -spec_coords [code $spec_coords_]
       }
       pack $itk_component(rebin) -side top -fill both -ipadx 1m -ipady 2m
+
+      #  Filter section.
+
+      itk_component add filterruler {
+         LabelRule $filterTab.filterruler -text "Filter cube controls:"
+      }
+      pack $itk_component(filterruler) -side top -fill x
+
+      itk_component add filter {
+         GaiaCubeFilter $filterTab.filter \
+            -gaiacube [code $this] \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
+            -spec_coords [code $spec_coords_]
+      }
+      pack $itk_component(filter) -side top -fill both -ipadx 1m -ipady 2m
 
       #  Baseline subtraction section. Must be the last.
 
