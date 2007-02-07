@@ -4,7 +4,7 @@
 *     smf_model_create
 
 *  Purpose:
-*     Create group of NDF containers for map-maker model components
+*     Create group of NDF containers for iterative map-maker model components
 
 *  Language:
 *     Starlink ANSI C
@@ -28,9 +28,10 @@
 
 *  Description:
 *     Given a group of input (template) data files, this routine creates
-*     new NDF files with dimensions appropriate for the common-model
-*     signal, namely a 1-dimensional array as a function of time. The names
-*     are the same as the input files, with a suffix "_common"
+*     new NDF files with dimensions appropriate for the model parameters.
+*     For example, a common-model signal is represented by a 1-dimensional 
+*     array as a function of time. The names of the containers are the same as
+*     the input templated, with a suffix added.
 
 *  Notes:
 
@@ -41,6 +42,10 @@
 *  History:
 *     2006-07-06 (EC):
 *        Initial Version
+*     2006-11-02 (EC):
+*        Propagate inputs to residual, create others with sm_open_newfile 
+*     2007-02-07 (EC):
+*        Simplified container files.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -87,18 +92,23 @@ void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp,
 
   /* Local Variables */
   int added=0;                  /* Number of names added to group */
+  int copyinput=0;              /* If set, container is copy of input */
+  dim_t dims[NDF__MXDIM];       /* Size of model dimensions */
   int flag=0;                   /* Flag */
   int i;                        /* Loop counter */
   smfData *idata=NULL;          /* Pointer to input smfdata data */
+  int indf=0;                   /* NDF ID for propagation */
   int isize=0;                  /* Number of files in input group */
+  int lbnd[NDF__MXDIM];         /* Dimensions of container */
   void *mapptr[3];              /* Pointer to array of mapped components */
   char *mname=NULL;             /* String model component name */
-  int mndf=NDF__NOID;           /* Model NDF identifier */
+  int mndf=0;                   /* NDF ID for propagation */
   int msize=0;                  /* Number of files in model group */
-  int ubnd[NDF__MXDIM];         /* Upper bounds of model data array */
+  int ndims=0;                  /* Number of dimensions in container */
   int nmap=0;                   /* Number of elements mapped */
-  int ndims=0;                  /* Number of dimensions in model */
-  int propall=0;                /* If set propagate all components */
+  smfData *tempdata=NULL;       /* Temporary smfData pointer */
+  int ubnd[NDF__MXDIM];         /* Dimensions of container */
+
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -124,8 +134,9 @@ void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp,
      
   for( i=1; i<=isize; i++ ) {
 
+    /* Open the template file */
     smf_open_file( igrp, i, "READ", 0, &idata, status );
-
+    
     /* Check that the template is time-ordered data */
     if( *status == SAI__OK ) {
       if( idata->ndims != 3 ) {
@@ -135,55 +146,75 @@ void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp,
 	i = isize;
       }
     }
-
+    
     if( *status == SAI__OK ) {
-
+      
       /* Determine dimensions of model component */
       
       switch( mtype ) {
 
-      case SMF__AST: /* 2d output image */
-	/* Special: One map for all data files */
-	propall = 1;
+      case SMF__CUM: /* Cumulative model */
+	copyinput = 0;
+	ndims = 3;
+	lbnd[0] = 1;
+	lbnd[1] = 1;
+	lbnd[2] = 1;
+	ubnd[0] = (idata->dims)[0];
+	ubnd[1] = (idata->dims)[1];
+	ubnd[2] = (idata->dims)[2];
 	break;
 
-      case SMF__COM: /* One value at each time step */
-	propall = 0;
+      case SMF__RES: /* Model residual */
+	copyinput = 1;
+	break;
+
+      case SMF__AST: /* Time-domain projection of map */
+	copyinput = 0;
+	ndims = 3;
+	lbnd[0] = 1;
+	lbnd[1] = 1;
+	lbnd[2] = 1;
+	ubnd[0] = (idata->dims)[0];
+	ubnd[1] = (idata->dims)[1];
+	ubnd[2] = (idata->dims)[2];
+	break;
+	
+      case SMF__COM: /* Single-valued common-mode at each time step */
+	copyinput = 0;
 	ndims = 1;
+	lbnd[0] = 1;
 	ubnd[0] = (idata->dims)[2];
 	break;
-
-      case SMF__CUM: /* Same dimensions as the template */
-	propall = 1;
-	break;
-
-      case SMF__RES: /* Same dimensions as the template */
-	propall = 1;
-	break;
-
-      case SMF__NOI: /* Same dimensions as the template */
-	propall = 1;
+	
+      case SMF__NOI: /* Noise model */
+	copyinput = 0;
+	ndims = 3;
+	lbnd[0] = 1;
+	lbnd[1] = 1;
+	lbnd[2] = 1;
+	ubnd[0] = (idata->dims)[0];
+	ubnd[1] = (idata->dims)[1];
+	ubnd[2] = (idata->dims)[2];
 	break;
       }
-
-      if( propall ) {
-	/* Propagate everything */
-	ndgNdfpr( (idata->file)->ndfid, " ", *mgrp, i, &mndf, status );
-
-      } else {
-	/* Define the new dimensions for the NDF */
-	/* ndgNdfcp( *mgrp, i, "_DOUBLE", ndims, ubnd, &mndf, status ); */
-
-	ndgNdfpr( (idata->file)->ndfid, " ", *mgrp, i, &mndf, status );
-      }
-      
-      /* Map the DATA component before annulling so that it is defined */
-      ndfMap( mndf, "DATA", "_DOUBLE", "WRITE", &(mapptr[0]), &nmap, 
-	      status );
-      ndfAnnul( &mndf, status );
 
       /* Close the input template file */
+
       smf_close_file( &idata, status );
+
+      /* Create the model container */
+
+      if( copyinput ) { /* Make a copy of the template file */
+	ndgNdfas( igrp, i, "READ", &indf, status );
+	ndgNdfpr( indf, "DATA,VARIANCE,QUALITY", *mgrp, i, &mndf, status );
+	ndfAnnul( &indf, status );
+	ndfAnnul( &mndf, status );
+	
+      } else {          /* Make a new empty container */
+	smf_open_newfile( *mgrp, i, SMF__DOUBLE, ndims, lbnd, ubnd, 
+			  SMF__MAP_VAR, &tempdata, status );
+	smf_close_file( &tempdata, status );
+      }
     }
   }
 }

@@ -90,6 +90,15 @@ char *smf_model_getname( smf_modeltype type, int *status) {
   if (*status != SAI__OK) return;
 
   switch( type ) {
+
+  case SMF__CUM:
+    retval = "*|flat|cum|";
+    break;
+
+  case SMF__RES:
+    retval = "*|flat|res|";
+    break;
+
   case SMF__AST:
     retval = "*|flat|ast|";
     break;
@@ -98,16 +107,8 @@ char *smf_model_getname( smf_modeltype type, int *status) {
     retval = "*|flat|com|";
     break;
 
-  case SMF__CUM:
-    retval = "*|flat|cum|";
-    break;
-
   case SMF__NOI:
     retval = "*|flat|noi|";
-    break;
-
-  case SMF__RES:
-    retval = "*|flat|res|";
     break;
 
   default:

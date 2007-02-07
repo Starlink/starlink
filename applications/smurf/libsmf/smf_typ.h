@@ -75,7 +75,10 @@
 *        Add detname to smfHead
 *     2006-12-13 (DSB):
 *        Add tsys to smfHead
+*     2007-02-07 (EC):
+*        Updated smf_modeltype
 *     {enter_further_changes_here}
+
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -128,15 +131,13 @@ typedef enum smf_dtype {
 } smf_dtype;
 
 /* Different types of model components used by iterative map-maker */
-
 typedef enum smf_modeltype {
-  SMF__AST=0,             /* Astronomical signal */
-  SMF__COM=1,             /* Common-mode signal */
-  SMF__CUM=2,             /* Cummulative signal */
-  SMF__NOI=3,             /* Noise */
-  SMF__RES=4,             /* Residual signal */
+  SMF__CUM=0,             /* Cumulative time-stream model */
+  SMF__RES=1,             /* Residual time-stream signal */
+  SMF__AST=2,             /* Astronomical time-stream signal */
+  SMF__COM=3,             /* Common-mode signal */
+  SMF__NOI=4,             /* Noise model */
 } smf_modeltype;
-
 
 /* Flags for smf_create_smf* 
    Must be individual bits in a single integer

@@ -53,6 +53,8 @@
 *        GRP__NOID is not a Fortran concept.
 *     2006-08-16 (EC):
 *        Intermediate step: Old routine works with new model container code
+*     2007-02-07 (EC):
+*        Fixed bugs in implementation of models, order of execution.
 
 *  Notes:
 
@@ -107,17 +109,20 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   /* Local Variables */
   int added;                    /* Number of names added to group */
   int astndf;                   /* Astronomical signal NDF identifier */
-  smfData *astdata;             /* Pointer to astronomical data struct */
+  smfData *ast;                 /* Pointer to astronomical data struct */
+  double *ast_data=NULL;        /* Pointer to DATA component of ast */
   Grp *astgrp=NULL;             /* Group of ast model files */
   const char *astname;          /* Name of astmodel group */
   int atmndf;                   /* Atmospheric signal NDF identifier */
-  smfData *atmdata;             /* Pointer to atmospheric data struct */
-  Grp *atmgrp=NULL;             /* Group of atmos model files */
+  smfData *com;                 /* Pointer to atmospheric data struct */
   const char *atmname;          /* Name of atmmodel group */
+  Grp *comgrp=NULL;             /* Group of common-mode model files */
+  Grp *cumgrp=NULL;             /* Group of cumulative model files */
+  dim_t dsize;                  /* Size of data arrays in containers */
   int flag;                     /* Flag */
   dim_t i;                      /* Loop counter */
   int indf;                     /* Input data NDF identifier */
-  smfData *idata;               /* Pointer to input data struct */
+  smfData *cum;                 /* Pointer to input data struct */
   dim_t iter;                   /* Iteration number */
   int isize;                    /* Number of files in input group */
   dim_t j;                      /* Loop counter */
@@ -125,20 +130,17 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   int *lut=NULL;                /* Pointing lookup table */
   void *mapptr[3];              /* Pointer to array of mapped components */
   double mean;                  /* Estimate of mean */
-  smfData *ndata;               /* Pointer to noise data struct */
   int nmap;                     /* Number of elements mapped */
   int nbolo;                    /* Number of bolometers */
   int nndf;                     /* Residual noise NDF identifier */
-  Grp *ngrp=NULL;               /* Group of noise model files */
   const char *nname;            /* Name of noisemodel group */
   int numiter;                  /* Total number iterations */
   int rebinflags;               /* Flags to control rebinning */
+  smfData *res;                 /* Pointer to residual data struct */
+  double *res_data=NULL;        /* Pointer to DATA component of res */
+  double *res_var=NULL;         /* Pointer to DATA component of res */
+  Grp *resgrp=NULL;             /* Group of model residual files */
   double sigma;                 /* Estimate of standard deviation */
-
-  /*
-    struct timeval tm;
-    struct timezone tz;
-  */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -146,13 +148,13 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   /* Get size of the input group */
   grpGrpsz( igrp, &isize, status );
 
-  /* Create empty groups for time-series model components */
-
+  /* Create groups of NDFs for time-series model components */
   msgOut(" ", "SMF_ITERATEMAP: Create model containers", status);
 
+  smf_model_create( igrp, SMF__CUM, &cumgrp, status );
+  smf_model_create( igrp, SMF__RES, &resgrp, status ); /* Copy of igrp */
   smf_model_create( igrp, SMF__AST, &astgrp, status );
-  smf_model_create( igrp, SMF__COM, &atmgrp, status );
-  smf_model_create( igrp, SMF__RES, &ngrp, status );
+  smf_model_create( igrp, SMF__COM, &comgrp, status );
 
   /* Get/check the CONFIG parameters stored in the keymap */
 
@@ -172,182 +174,104 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
       msgOut(" ", "SMF_ITERATEMAP: Iteration ^ITER / ^NUMITER ---------------",
              status);
       
-      msgOut(" ", "SMF_ITERATEMAP: Calculate ATM/AST model", status);
+      msgOut(" ", "SMF_ITERATEMAP: Calculate time-stream model components", 
+	     status);
       for( i=1; i<=isize; i++ ) {
-        
         /* Open files */
-        smf_open_file( igrp, i, "UPDATE", 0, &idata, status );
-        smf_open_file( atmgrp, i, "WRITE", 0, &atmdata, status );
-        smf_open_file( astgrp, i, "WRITE", 0, &astdata, status );
-        
-        /* Loop over time slices and calculate atmos/bolo signal */
-        if( *status == SAI__OK ) {
-          nbolo = (idata->dims)[0] * (idata->dims)[1];
-      
-          for( j=0; j<(idata->dims)[2]; j++ ) {
-            /* First time around just use the array mean for atmosphere*/
-            if( iter == 0 ) {
-              smf_calc_stats( idata, "t", j, 0, 0, &mean, &sigma, status );
-	    
-              for( k=0; k<nbolo; k++ ) {
-                /* Place mean into atmosphere model file */
-                ((double *)(atmdata->pntr)[0])[j*nbolo + k] = mean;
-	      
-                /* Calculate bolo signal minus atmosphere guess */
-                ((double *)(astdata->pntr)[0])[j*nbolo + k] = 
-                  ((double *)(idata->pntr)[0])[j*nbolo + k] - mean; 
+        smf_open_file( cumgrp, i, "UPDATE", 0, &cum, status );
+        smf_open_file( resgrp, i, "UPDATE", 0, &res, status );
+        smf_open_file( astgrp, i, "UPDATE", 0, &ast, status );
+        /*smf_open_file( comgrp, i, "UPDATE", 0, &com, status );*/
 
-                /* If VARIANCE exists, set initial value to 1 for all data 
-                   points */
-                if( (idata->pntr)[1] ) {
-                  ((double *)(idata->pntr)[1])[j*nbolo + k] = 1.; 
-                }
-              }
-	    
-            } else {
-              /* Subsequent iter calc atmos after removing source signal */
-              
-              for( k=0; k<nbolo; k++ ) {
-                /* Temporarily store bolometer corrected by signal in the
-                   atmosphere data array at this time slice */
-                ((double *)(atmdata->pntr)[0])[j*nbolo + k] = 
-                  ((double *)(idata->pntr)[0])[j*nbolo + k] -  
-                  ((double *)(astdata->pntr)[0])[j*nbolo + k];  
-              }
-	    
-              /* Calculate corrected mean atmosphere for this time slice */
-              smf_calc_stats( atmdata, "t", j, 0, 0, &mean, &sigma, status );
-	    
-              for( k=0; k<nbolo; k++ ) {
-                /* Place mean into atmosphere model file */
-                ((double *)(atmdata->pntr)[0])[j*nbolo + k] = mean;
-	      
-                /* Calculate bolo signal minus atmosphere guess */
-                ((double *)(astdata->pntr)[0])[j*nbolo + k] = 
-                  ((double *)(idata->pntr)[0])[j*nbolo + k] - mean; 
-              }
-            }
-          }
-        }
-        
+	/* Calculate the AST model component first. It is a special model
+           because it assumes that the map contains the best current
+           estimate of the astronomical sky. Since the map will have
+           been re-estimated at the end of the last iteration, we
+           always call the ast model calculation first before proceeding
+           with other model components. Also note that we set the
+           flag to zero the cumulative model with this call. */
+
+	smf_calcmodel_ast( cum, res, keymap, map, mapvar, ast,
+			   1, status );
+
+	/* Call the subsequent model calculations in the desired order. */
+	/*smf_calcmodel_com( cum, res, keymap, map, mapvar, com,
+			   0, status );
+	*/
+
         /* Close files */
+        smf_close_file( &cum, status );
+        smf_close_file( &res, status );
+        smf_close_file( &ast, status );    
+        /*smf_close_file( &com, status );*/
 
-        smf_close_file( &idata, status );
-        smf_close_file( &atmdata, status );
-        smf_close_file( &astdata, status );    
+	/* Set exit condition if bad status was set */
+	if( *status != SAI__OK ) i=isize+1;
       }
       
-      msgOut(" ", "SMF_ITERATEMAP: Rebin AST signal to estimate MAP", status);
+      msgOut(" ", "SMF_ITERATEMAP: Rebin residual to estimate MAP", status);
       if( *status == SAI__OK ) {
         for( i=1; i<=isize; i++ ) {
-          /* Open files */
-          smf_open_file( igrp, i, "READ", 0, &idata, status );
-          smf_open_file( astgrp, i, "READ", 0, &astdata, status );
-          
-          nbolo = (astdata->dims)[0] * (astdata->dims)[1];
-          
-          /* Open the LUT from the SMURF.MAPCOORD extension */
-          smf_open_mapcoord( idata, status );
-          
-          if( *status == SAI__OK ) {
-            lut = idata->lut;
-          }
-          
-          /* Set up the flags for the rebinner */
-          rebinflags = 0;
-          if( i == 1 )                                      
-            rebinflags = rebinflags | AST__REBININIT;
-	
-          if( i == isize ) 
-            rebinflags = rebinflags | AST__REBINEND;
-	
-          smf_simplerebinmap( (double *)(astdata->pntr)[0], 
-                              (double *)(idata->pntr)[1], lut, 
-                              nbolo*(astdata->dims)[2], rebinflags,
-                              map, weights, mapvar, msize, status );
-	
-          /* Close files */
-          smf_close_file( &idata, status );   
-          smf_close_file( &astdata, status );   
-        }
-      }
+	  smf_open_file( astgrp, i, "READ", 0, &ast, status );
+	  smf_open_file( resgrp, i, "UPDATE", 0, &res, status );
 
-      msgOut(" ", "SMF_ITERATEMAP: Sample MAP, calculate NOISE", status);
+	  if( *status == SAI__OK ) {
 
-      if( *status == SAI__OK ) {
-        for( i=1; i<=isize; i++ ) {
-          /* Open files */
-          smf_open_file( igrp, i, "UPDATE", 0, &idata, status );
-          smf_open_file( astgrp, i, "WRITE", 0, &astdata, status );
-          smf_open_file( atmgrp, i, "READ", 0, &atmdata, status );
-          smf_open_file( ngrp, i, "WRITE", 0, &ndata, status );
-	
-          nbolo = (astdata->dims)[0] * (astdata->dims)[1];
+	  /* Add last iteration of astronomical signal back in */
+	    ast_data = (double *)(ast->pntr)[0];
+	    res_data = (double *)(res->pntr)[0];
+	    res_var = (double *)(res->pntr)[0];
 
-          /* Open the LUT from the SMURF.MAPCOORD extension */	
-          smf_open_mapcoord( idata, status );
+	    dsize = (ast->dims)[0]*(ast->dims)[1]*(ast->dims)[2];
 
-          if( *status == SAI__OK ) {
-            lut = idata->lut;
-          }
+	    for( j=0; j<dsize; j++ ) {
+	      res_data[j] += ast_data[j];
+	    }
 
-          /* Loop over all data points in this file */
-          if( *status == SAI__OK ) {
-            for( j=0; j<nbolo*(astdata->dims)[2]; j++ ) {
-              if( lut[j] != VAL__BADI ) {
-                /* Sample the map into astdata */
-                ((double *)(astdata->pntr)[0])[j] = map[lut[j]];
-	      
-                /* Re-estimate noise signal as input - atmdata - astdata */
-                ((double *)(ndata->pntr)[0])[j] = 
-                  ((double *)(idata->pntr)[0])[j] - 
-                  ((double *)(atmdata->pntr)[0])[j] - map[lut[j]];
-              }
-            }
-          }
-	
-          /* Loop over bolometers and re-calculate noise parameters from
-             new estimate of clean noise signals */
-          for( j=0; j<nbolo; j++ ) {
-            smf_calc_stats( ndata, "b", j, 0, 0, &mean, &sigma, status );      
+	  }
 
-            /* At each time slice insert noise estimate^2 into variance
-               for each data point (if VARIANCE component exists) */
-            if( (idata->pntr)[1] ) {
-              for( k=0; k<(astdata->dims)[2]; k++ ) {
-                ((double *)(idata->pntr)[1])[k*nbolo + j] = sigma*sigma;
-              }
-            }
+	  /* Load the LUT from the mapcoord extension */
+	  smf_open_mapcoord( res, status );
+
+	  if( *status == SAI__OK ) {
+	    /* Should check if bad status due to lack of extension, in
+	       which case try calculating it */
+	    lut = res->lut;
+	  }
+
+	  if( *status == SAI__OK ) {
+
+	    /* Setup rebin flags */
+	    rebinflags = 0;
+	    if( i == 1 ) {
+	      rebinflags = rebinflags | AST__REBININIT;
+	    }
+	    
+	    if( i == isize ) {
+	      rebinflags = rebinflags | AST__REBINEND;
+	    }
+	    
+	  }
+
+	  /* Rebin the residual + astronomical signal into a map */
+	  smf_simplerebinmap( res_data, res_var, lut, dsize,
+			      rebinflags, map, weights, mapvar,
+			      msize, status );
 	  
-            /* Jump out if there was a problem */
-            if( *status != SAI__OK ) j=nbolo-1;
-          }
-	
-          /* Close files */
-          smf_close_file( &idata, status );    
-
-	  /*
-	    gettimeofday(&tm, &tz);
-	    printf("Start: %i . %i\n", tm.tv_sec, tm.tv_usec);
-	  */
-
-          smf_close_file( &astdata, status );    
-          
-	  /*
-	    gettimeofday(&tm, &tz);
-	    printf("End: %i . %i\n", tm.tv_sec, tm.tv_usec);
-	  */
-
-          smf_close_file( &atmdata, status );    
-          smf_close_file( &ndata, status );    
+	  smf_close_file( &ast, status );    
+	  smf_close_file( &res, status );
+	  
         }
       }
     }
   }
 
   /* Cleanup */
+
+  if( cumgrp ) grpDelet( &cumgrp, status );
+  if( resgrp ) grpDelet( &resgrp, status );
   if( astgrp ) grpDelet( &astgrp, status );
-  if( atmgrp ) grpDelet( &atmgrp, status );
-  if( ngrp ) grpDelet( &ngrp, status );
+  if( comgrp ) grpDelet( &comgrp, status );
+
 
 }
