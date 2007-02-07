@@ -120,6 +120,10 @@
 *        been assigned (nframes is needed by acs_fill_smfHead).
 *     2006-12-20 (TIMJ):
 *        Clean up some error handling.
+*     2007-02-07 (EC):
+*        - renamed isNDF to isFlat to be less confusing
+*        - only issue a warning if data not 2d or 3d to handle iterative
+*          map-maker model containers.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -183,7 +187,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 					     output data components:
 					     one each for DATA,
 					     QUALITY and VARIANCE */
-  int isNDF = 1;             /* Flag to indicate if file flatfielded */
+  int isFlat = 1;            /* Flag to indicate if file flatfielded */
   int isTseries = 0;         /* Flag to specify whether the data are
 				in time series format */
   int itype = SMF__NULL;     /* Data type for DATA (and VARIANCE) array(s) */
@@ -264,30 +268,46 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 
   /* Check dimensionality: 2D is a .In image, 3D is a time series */
   if (ndims == 2) {
-    isNDF = 1;     /* Data have been flat-fielded */
+    isFlat = 1;    /* Data have been flat-fielded */
     isTseries = 0; /* Data are not in time series format */
   } else if (ndims == 3) { /* Time series data */
     /* Check if raw timeseries */
     if (strncmp(dtype, "_UWORD", 6) == 0) {
-      isNDF = 0;   /* Data have not been flatfielded */
+      isFlat = 0;  /* Data have not been flatfielded */
     } else {
-      isNDF = 1;   /* Data have been flatfielded */
+      isFlat = 1;  /* Data have been flatfielded */
     }
     isTseries = 1; /* Data are in time series format */
   } else {
-    /* Report an error due to an unsupported number of dimensions */
+    /* Report a warning due to non-standard dimensions for file */
     if ( *status == SAI__OK) {
-      *status = SAI__ERROR;
+
       msgSeti( "NDIMS", ndims);
+
+      /*
+      *status = SAI__ERROR;
       errRep( FUNC_NAME, 
-	      "Number of dimensions in output, ^NDIMS, is not equal to 2 or 3",
-	      status);
+      "Number of dimensions in output, ^NDIMS, is not equal to 2 or 3",
+      status);
+      */
+      
+      msgOutif(MSG__VERB," ", 
+	       "Number of dimensions in output, ^NDIMS is not equal to 2 or 3",
+	       status);
+
+      /* Data is neither flat-fielded nor standard time-series data. However
+         in this context "flat" data is really just data that doesn't
+         need to be de-compressed using the sc2store library, so we set 
+         isFlat to true */
+      isTseries = 0;
+      isFlat = 1;
+
     }
   }
 
   /* Now we need to create some structures */
   if (!withHdr) flags |= SMF__NOCREATE_HEAD;
-  if (isNDF)    flags |= SMF__NOCREATE_DA;
+  if (isFlat)   flags |= SMF__NOCREATE_DA;
 
   /* Allocate memory for the smfData */
   *data = smf_create_smfData( flags, status );
@@ -340,7 +360,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
       }
     }
 
-    if (isNDF) {
+    if (isFlat) {
 
       ndfState( indf, "QUALITY", &qexists, status);
       ndfState( indf, "VARIANCE", &vexists, status);
@@ -494,7 +514,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	  /* hdr->instrument = INST__SCUBA2; */
 
 	  /* ---------------------------------------------------------------*/
-	  /* WARNING: This has been duplicated from the "isNDF" case to
+	  /* WARNING: This has been duplicated from the "isFlat" case to
 	     accomodate AzTEC data that was written using sc2sim_ndfwrdata.
 	     In principle AzTEC data should not be compressed, in which case
 	     the above assertion "Instrument must be SCUBA-2" would be 
@@ -592,7 +612,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
        has to be done here as these methods rely on information in the
        main smfData struct. First retrieve jigvert and jigpath from
        file */ 
-    if ( isTseries && isNDF ) {
+    if ( isTseries && isFlat ) {
       /* Obtain locator to DREAM extension if we have DREAM data */
       xloc = smf_get_xloc( *data, "DREAM", "DREAM_PAR", "READ", 0, 0, status );
       /* If it's NULL then we don't have dream data */
