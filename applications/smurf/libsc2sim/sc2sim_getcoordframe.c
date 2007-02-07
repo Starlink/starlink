@@ -4,7 +4,7 @@
 *     sc2sim_getcoordframe
 
 *  Purpose:
-*     Calculate obs enumerated type from string
+*     Calculate coordframe enumerated type from string
 
 *  Language:
 *     Starlink ANSI C
