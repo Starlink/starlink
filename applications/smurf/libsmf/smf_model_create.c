@@ -45,7 +45,8 @@
 *     2006-11-02 (EC):
 *        Propagate inputs to residual, create others with sm_open_newfile 
 *     2007-02-07 (EC):
-*        Simplified container files.
+*        - Simplified container files.
+*        - In copyinput case map data array so that it gets copied.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -208,6 +209,10 @@ void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp,
 	ndgNdfas( igrp, i, "READ", &indf, status );
 	ndgNdfpr( indf, "DATA,VARIANCE,QUALITY", *mgrp, i, &mndf, status );
 	ndfAnnul( &indf, status );
+
+	/* Map to ensure that the DATA array is defined on exit */
+	ndfMap( mndf, "DATA", "_DOUBLE", "UPDATE", &mapptr[0], &nmap, status );
+
 	ndfAnnul( &mndf, status );
 	
       } else {          /* Make a new empty container */
