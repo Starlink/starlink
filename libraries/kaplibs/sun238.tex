@@ -6879,6 +6879,96 @@ from one graphical element to another.
    }
 }
 \sstroutine{
+   FTS1\_RNAND
+}{
+   Replaces NaN values with bad values in a vector of 64-bit IEEE
+   floating-point numbers
+}{
+   \sstdescription{
+      This routine replaces any IEEE not-a-number (NaN) values present
+      in a vector of 64-bit IEEE-754 floating-point numbers to the
+      standard \_DOUBLE bad-pixel value.  Also converted to the standard
+      bad-pixel value are values who exponent is greater than maximum
+      provided by the host machine.
+   }
+   \sstinvocation{
+      CALL FTS1\_RNAND( EL, BUF, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         EL = INTEGER (Given)
+      }{
+         The number of IEEE numbers to be processed.  An expression must
+         not be given.
+      }
+      \sstsubsection{
+         BUF( EL ) = DOUBLE PRECISION (Given and Returned)
+      }{
+         The IEEE numbers to be cleansed of NaN values.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         {\tt "}IEEE Standard for Binary Floating-Point Arithmetic{\tt "},
+         ANSI/IEEE 754, 1985.
+      }
+   }
+}
+\sstroutine{
+   FTS1\_RNANR
+}{
+   Replaces NaN values with bad values in a vector of 32-bit IEEE
+   floating-point numbers
+}{
+   \sstdescription{
+      This routine replaces any IEEE not-a-number (NaN) values present
+      in a vector of 32-bit IEEE-754 floating-point numbers to the
+      standard \_REAL bad-pixel value.  Also converted to the standard
+      bad-pixel value are values who exponent is greater than maximum
+      provided by the host machine.
+   }
+   \sstinvocation{
+      CALL FTS1\_RNANR( EL, BUF, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         EL = INTEGER (Given)
+      }{
+         The number of IEEE numbers to be processed.  An expression must
+         not be given.
+      }
+      \sstsubsection{
+         BUF( EL ) = REAL (Given and Returned)
+      }{
+         The IEEE numbers to be cleansed of NaN values.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         {\tt "}IEEE Standard for Binary Floating-Point Arithmetic{\tt "},
+         ANSI/IEEE 754, 1985.
+      }
+   }
+}
+\sstroutine{
    IRA\_ANNUL
 }{
    Annul an IRA identifier
@@ -18800,7 +18890,7 @@ from one graphical element to another.
       centre of a pixel.
    }
    \sstinvocation{
-      CALL KPG1\_OPGRD( NPOS, POS, WEST, PAR, STATUS )
+      CALL KPG1\_OPGRD( NPOS, POS, WEST, PAR, RDIAM, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -18831,15 +18921,21 @@ from one graphical element to another.
          The projection parameters. Each parameter that is supplied with
          a value of AST\_\_BAD on entry will be replaced on exit with the
          optimal value. Non-bad supplied values will be left unchanged on
-         exit. The supplied values will also be left unchanged if no
-         periodicity is visible in the supplied positions. They are stored
-         in the order CRPIX1, CRPIX2, CRVAL1, CRVAL2, CDELT1, CDELT2, CROTA2.
-         CRPIX1 and CRPIX2 are in units of pixels. All the other projection
-         parameters will be in units of radians, and refer to the celestial
-         coodinate system in which the POS values are supplied. CROTA2 is
-         the angle from celestial north to the Y axis, measured through west
-         if WEST is .FALSE., and through east otherwise. Returned pixel sizes
-         are rounded to the nearest tenth of an arc-second.
+         exit. The supplied values will also be left unchanged if optimal
+         values cannot be determined. They are stored in the order CRPIX1,
+         CRPIX2, CRVAL1, CRVAL2, CDELT1, CDELT2, CROTA2. CRPIX1 and CRPIX2
+         are in units of pixels. All the other projection parameters will
+         be in units of radians, and refer to the celestial coodinate
+         system in which the POS values are supplied. CROTA2 is the angle
+         from the Y axis to celestial north, measured north through east
+         (no matter what the value of WEST). Returned pixel sizes are
+         rounded to the nearest tenth of an arc-second.
+      }
+      \sstsubsection{
+         RDIAM = DOUBLE PRECISION (Returned)
+      }{
+         The diameter of the circle that just encloses all the supplied sky
+         positions, in radians.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -23126,7 +23222,7 @@ from one graphical element to another.
    }
    \sstinvocation{
       CALL KPG1\_WRTA2( PARAM, ARRDIM, NPOS, NAX, POS, IWCS, TITLE,
-                       ID0, IDENTS, LABS, STATUS )
+                       ID0, IDENTS, LABS, HIST, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -23191,6 +23287,13 @@ from one graphical element to another.
          be created.
       }
       \sstsubsection{
+         HIST = INTEGER (Given)
+      }{
+         A GRP group identifier containing history text to store with the
+         catalogue.  If GRP\_\_NOID is supplied, no history information
+         will be stored with the catalogue.
+      }
+      \sstsubsection{
          STATUS = INTEGER (Given and Returned)
       }{
          The global status.
@@ -23209,7 +23312,7 @@ from one graphical element to another.
    }
    \sstinvocation{
       CALL KPG1\_WRTAB( PARAM, ARRDIM, NPOS, NAX, POS, IFRM, IWCS, TITLE,
-                       ID0, IDENTS, LABS, NULL, STATUS )
+                       ID0, IDENTS, LABS, HIST, NULL, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -23277,6 +23380,13 @@ from one graphical element to another.
          with the positions. The number of elements in this group should
          be equal to NPOS. If GRP\_\_NOID is supplied, no label column will
          be created.
+      }
+      \sstsubsection{
+         HIST = INTEGER (Given)
+      }{
+         A GRP group identifier containing history text to store with the
+         catalogue.  If GRP\_\_NOID is supplied, no history information
+         will be stored with the catalogue.
       }
       \sstsubsection{
          NULL = LOGICAL (Given)
@@ -26142,8 +26252,8 @@ from one graphical element to another.
       \sstitemlist{
 
          \sstitem
-         There is a routine for double precision and real data types:
-         replace {\tt "}x{\tt "} in the routine name by D or R as appropriate.  The
+         There is a routine for each numeric data type: replace {\tt "}x{\tt "} in
+         the routine name by D, R, I, W, UW, B or UB as appropriate.  The
          input and output data arrays plus the mask array must have the
          data type specified.
       }
@@ -33497,6 +33607,308 @@ from one graphical element to another.
          \sstitem
          Uses the magic-value method for bad or undefined pixels.
       }
+   }
+}
+\sstroutine{
+   kaplibs\_adam.c
+}{
+   Implement the C interface to the ADAM functions in KAPLIBS library
+}{
+   \sstdescription{
+      This module implements C-callable wrappers for the public ADAM
+      routines in the KAPLIBS library. The interface to these wrappers
+      is defined in kaplibs.h.
+   }
+\sstroutine{
+   kaplibs.c
+}{
+   Implement the C interface to the standalone routines in the KAPLIBS
+   library
+}{
+   \sstdescription{
+      This module implements C-callable wrappers for the public non-ADAM
+      routines in the KAPLIBS library. The interface to these wrappers
+      is defined in kaplibs.h.
+   }
+\sstroutine{
+   kpg1Kygp1
+}{
+   Create a GRP group holding keyword/value pairs read from an AST KeyMap
+}{
+   \sstdescription{
+      This function is the inverse of kpg1Kymp1. It extracts the values
+      from the supplied AST KeyMap and creates a set of {\tt "}name=value{\tt "} strings
+      which it appends to a supplied group (or creates a new group). If
+      the KeyMap contains nested KeyMaps, then the {\tt "}name{\tt "} associated with
+      each primitive value stored in the returned group is a hierarchical
+      list of component names separated by dots.
+   }
+\sstroutine{
+   KPG1\_KYGRP
+}{
+   Create an GRP group holding keyword/value pairs read from an AST
+   KeyMap
+}{
+   \sstdescription{
+      This function is the inverse of KPG1\_KYMAP. It extracts the values
+      from the supplied AST KeyMap and creates a set of {\tt "}name=value{\tt "} strings
+      which it appends to a supplied group (or creates a new group). If
+      the KeyMap contains nested KeyMaps, then the {\tt "}name{\tt "} associated with
+      each primitive value stored in the returned group is a hierarchical
+      list of component names separated by dots.
+   }
+   \sstinvocation{
+      CALL KPG1\_KYGRP( KEYMAP, IGRP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         KEYMAP = INTEGER (Given)
+      }{
+         An AST pointer to the existing KeyMap. Numerical entries which
+         have bad values (VAL\_\_BADI for integer entries or VAL\_\_BADD for
+         floating point entries) are not copied into the group.
+      }
+      \sstsubsection{
+         IGRP = INTEGER (Returned)
+      }{
+         A GRP identifier for the group to which to append the {\tt "}name=value{\tt "}
+         strings read from the KeyMap. A new group is created if GRP\_\_NOID
+         is supplied.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   KPG1\_KYMAP
+}{
+   Create an AST KeyMap holding keyword/value pairs read from a GRP
+   group
+}{
+   \sstdescription{
+      This function checks each non-comment, non-blank line in the supplied
+      GRP group. An error is reported if any such lines do not have the
+      form {\tt "}keyword = value{\tt "}, where the keyword name can be a hierarchical
+      list of component names separated by dots. The returned KeyMap has
+      an entry for each component name found at the start of any keyword
+      name. The value associated with the entry will either be a
+      primitive value (if the keyword name contained no other components)
+      or another KeyMap (if the keyword name contained other components).
+
+      For example, consider a group containing the following lines:
+
+      gaussclumps.epsilon = 0.001
+      gaussclumps.contrast = 2.3
+      clumpfind.naxis = 2
+      clumpfind.deltat = 2.0
+      method = gaussclumps
+
+      The returned KeyMap will contain 3 entries with keys {\tt "}gaussclumps{\tt "},
+      {\tt "}clumpfind{\tt "} and {\tt "}method{\tt "}. The value associated with the {\tt "}gaussclumps{\tt "}
+      entry will be another KeyMap containing keys {\tt "}epsilon{\tt "} and {\tt "}contrast{\tt "},
+      which will have primitive values {\tt "}0.001{\tt "} and {\tt "}2.3{\tt "}. The value
+      associated with the {\tt "}clumpfind{\tt "} entry will be another KeyMap
+      containing keys {\tt "}naxis{\tt "} and {\tt "}deltat{\tt "}, which will have primitive
+      values {\tt "}2{\tt "} and {\tt "}2.0{\tt "}. The value associated with the {\tt "}method{\tt "} entry
+      will be the primitive value {\tt "}gaussclumps{\tt "}.
+   }
+   \sstinvocation{
+      CALL KPG1\_KYMAP( IGRP, KEYMAP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         A GRP identifier for the group of text strings to be analysed.
+      }
+      \sstsubsection{
+         KEYMAP = INTEGER (Returned)
+      }{
+         An AST pointer to the new KeyMap, or AST\_\_NULL if an error occurs.
+         A valid pointer to an empty KeyMap will be returned if the supplied
+         group contains nothing but comments and blank lines.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Component names must contain only alphanumerical characters,
+         underscores, plus and minus signs [a-zA-Z0-9\_$+$$\backslash$-]. White space
+         within keywords is ignored.
+
+         \sstitem
+         Any lower case characters contained in a component name will be
+         translated to the upper case equivalent.
+
+         \sstitem
+         If the last non-blank character in a value is a backslash ({\tt "}$\backslash${\tt "}),
+         the backslash will be reomved, together with any white space
+         following it, and the entire next line will be appended to the value.
+      }
+   }
+}
+\sstroutine{
+   kpg1Kymp1
+}{
+   Create an AST KeyMap holding keyword/value pairs read from a GRP
+   group
+}{
+   \sstdescription{
+      This function checks each non-comment, non-blank line in the supplied
+      GRP group. An error is reported if any such lines do not have the
+      form {\tt "}keyword = value{\tt "}, where the keyword name can be a hierarchical
+      list of component names separated by dots. The returned KeyMap has
+      an entry for each component name found at the start of any keyword
+      name. The value associated with the entry will either be a
+      primitive value (if the keyword name contained no other components)
+      or another KeyMap (if the keyword name contained other components).
+
+      For example, consider a group containing the following lines:
+
+      gaussclumps.epsilon = 0.001
+      gaussclumps.contrast = 2.3
+      clumpfind.naxis = 2
+      clumpfind.deltat = 2.0
+      method = gaussclumps
+
+      The returned KeyMap will contain 3 entries with keys {\tt "}gaussclumps{\tt "},
+      {\tt "}clumpfind{\tt "} and {\tt "}method{\tt "}. The value associated with the {\tt "}gaussclumps{\tt "}
+      entry will be another KeyMap containing keys {\tt "}epsilon{\tt "} and {\tt "}contrast{\tt "},
+      which will have primitive values {\tt "}0.001{\tt "} and {\tt "}2.3{\tt "}. The value
+      associated with the {\tt "}clumpfind{\tt "} entry will be another KeyMap
+      containing keys {\tt "}naxis{\tt "} and {\tt "}deltat{\tt "}, which will have primitive
+      values {\tt "}2{\tt "} and {\tt "}2.0{\tt "}. The value associated with the {\tt "}method{\tt "} entry
+      will be the primitive value {\tt "}gaussclumps{\tt "}.
+   }
+\sstroutine{
+   kpg1Kymp2
+}{
+   Parse a {\tt "}keyword = value{\tt "} string for kpg1Kymp1 and add to a KeyMap
+}{
+   \sstdescription{
+      This is a service function for kps1Kymp1. It parses the supplied
+      {\tt "}keyword = value{\tt "} string into a keyword and value. It then parses the
+      keyword into a list of dot-separated component names. It then adds
+      the value into the supplied KeyMap at the correct point.
+   }
+\sstroutine{
+   kpg1\_memry
+}{
+   Return memory currently being used by the current process
+}{
+   \sstdescription{
+      This subroutine returns the maximum resident set size for the
+      current proces.
+   }
+\sstroutine{
+   kpgGtfts
+}{
+   Obtain FITS header information from an NDF
+}{
+   \sstdescription{
+      The routine reads the FITS extension from an NDF and returns an
+      AST pointer to a FitsChan which contains this information. The
+      information may then be accessed using routines from the AST
+      library (SUN/211).
+   }
+   \sstinvocation{
+      CALL KPG\_GTFTS( INDF, FCHAN, STATUS )
+      kpgGtfts( int indf, AstFitsChan $*$$*$ fchan, int $*$ status );
+   }
+   \sstarguments{
+      \sstsubsection{
+         indf = int (Given)
+      }{
+         NDF identifier.
+      }
+      \sstsubsection{
+         fchan = AstFitsChan $*$$*$ (Returned)
+      }{
+         An AST pointer to a FitsChan which contains information about
+         the FITS headers associated with the NDF.
+      }
+      \sstsubsection{
+         status = int $*$ (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         It is the caller{\tt '}s responsibility to annul the AST pointer
+         issued by this routine (e.g. by calling AST\_ANNUL) when it is no
+         longer required.
+
+         \sstitem
+         If this routine is called with STATUS set, then a value of
+         AST\_\_NULL will be returned for the FCHAN argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason.
+
+         \sstitem
+         Status is set to KPG\_\_NOFTS if no FITS extension is found.
+      }
+   }
+   \sstdiytopic{
+      Return Value
+   }{
+      Returns the status.
+   }
+}
+\sstroutine{
+   kpgPtfts
+}{
+   Store FITS header information into an NDF
+}{
+   \sstdescription{
+      The routine stores the contents of an AST FitsChan into an
+      NDF by creating (or replacing) the FITS extension in the NDF.
+   }
+   \sstinvocation{
+      CALL KPG\_PTFTS( INDF, FCHAN, STATUS )
+      kpgPtfts( int indf, AstFitsChan $*$ fchan, int $*$ status );
+   }
+   \sstarguments{
+      \sstsubsection{
+         indf = int (Given)
+      }{
+         Identifier of NDF to receive the .FITS extension.
+      }
+      \sstsubsection{
+         fchan = const AstFitsChan $*$ (Given)
+      }{
+         An AST pointer to a FitsChan which contains information about
+         the FITS header to be associated with the NDF.
+      }
+      \sstsubsection{
+         status = int $*$ (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If a .MORE.FITS extension already exists it will be completely
+         replaced by this routine.
+      }
+   }
+   \sstdiytopic{
+      Return Value
+   }{
+      Returns the status.
    }
 }
 \sstroutine{
