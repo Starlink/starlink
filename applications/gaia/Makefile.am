@@ -32,7 +32,8 @@ SKYCAT_TEST_FILES = built/lib/skycatConfig.sh
 ## Files needed from gaia/library.
 GAIA_LIB_FILES =  \
  skycat2.0.cfg gaiawcs2tab pix2wcs wcs2pix gaiadisp.sh \
- gaiaremote.sh displaycat displaypolcat gaiacut zoomcutandflip
+ gaiaremote.sh displaycat displaypolcat gaiacut zoomcutandflip \
+ gaiacmap.sh
 
 ## Files needed from gaia/bin.
 GAIA_BIN_FILES = \
