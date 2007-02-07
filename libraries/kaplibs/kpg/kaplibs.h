@@ -63,6 +63,8 @@
 *        Added kpg1Gtaxv.
 *     5-FEB-2007 (DSB):
 *        Added kpg1_gtwcs.
+*     7-FEB-2007 (DSB):
+*        Added kpg1_medur.
 *-
 */
 
@@ -116,6 +118,7 @@ void kpg1Mxmnr( int, int, float *, int *, float *, float *, int *, int *, int * 
 void kpg1Mxmnd( int, int, double *, int *, double *, double *, int *, int *, int * );
 void kpg1Mxmni( int, int, int *, int *, int *, int *, int *, int *, int * );
 void kpg1Medud( int, int, double *, double *, int *, int * );
+void kpg1Medur( int, int, float *, float *, int *, int * );
 void kpg1Opgrd( int, double *, int, double *, double *, int * );
 void kpg1Gtaxv( const char *, int, int, AstFrame *, int, double *, int *, int * );
 

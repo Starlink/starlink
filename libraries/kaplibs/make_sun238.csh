@@ -12,7 +12,7 @@ foreach dir (aif ctg fts ira irq kpg lpg)
    touch temp-files
 
    if( $dir != "irq" && $dir != "ira" ) then 
-      foreach file (*.f *.g*)
+      foreach file (*.f *.g* *.c)
          echo $file >> temp-files
       end
 

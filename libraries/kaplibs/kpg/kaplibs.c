@@ -57,6 +57,8 @@
 *        Added kpg1_mxmnd, kpg1_mxmnr and kpg1_mxmni.
 *     5-FEB-2007 (DSB):
 *        Added kpg1_gtwcs.
+*     7-FEB-2007 (DSB):
+*        Added kpg1_medur.
 *     {enter_further_changes_here}
 
 *-
@@ -892,6 +894,43 @@ void kpg1Medud( int bad, int el, double *array, double *median,
 
    F77_IMPORT_INTEGER( STATUS, *status );
    F77_IMPORT_DOUBLE( MEDIAN, *median );
+   F77_IMPORT_INTEGER( NELUSE, *neluse );
+
+   F77_FREE_REAL( ARRAY );
+}
+
+F77_SUBROUTINE(kpg1_medur)( LOGICAL(BAD),  
+                            INTEGER(EL), 
+                            REAL_ARRAY(ARRAY),
+                            REAL(MEDIAN), 
+                            INTEGER(NELUSE),
+                            INTEGER(STATUS) );
+
+void kpg1Medur( int bad, int el, float *array, float *median, 
+                int *neluse, int *status ){
+   DECLARE_LOGICAL(BAD);
+   DECLARE_INTEGER(EL);
+   DECLARE_REAL_ARRAY_DYN(ARRAY);
+   DECLARE_REAL(MEDIAN);
+   DECLARE_INTEGER(NELUSE);
+   DECLARE_INTEGER(STATUS);
+
+   F77_CREATE_REAL_ARRAY( ARRAY, el );
+
+   F77_EXPORT_LOGICAL( bad, BAD );
+   F77_EXPORT_INTEGER( el, EL );
+   F77_ASSOC_REAL_ARRAY( ARRAY, array );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(kpg1_medur)( LOGICAL_ARG(&BAD), 
+                         INTEGER_ARG(&EL), 
+                         REAL_ARRAY_ARG(ARRAY),
+                         REAL_ARG(&MEDIAN), 
+                         INTEGER_ARG(&NELUSE), 
+                         INTEGER_ARG(&STATUS) );
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_IMPORT_REAL( MEDIAN, *median );
    F77_IMPORT_INTEGER( NELUSE, *neluse );
 
    F77_FREE_REAL( ARRAY );
