@@ -175,9 +175,9 @@
 
     <h5>Rebin</h5>
     <p>
-      These controls allow you to rebin the cube to increase the signal
+      These controls allow you to rebin the whole cube to increase the signal
       to noise, but at the expense of resolution. The rebinning can be done
-      by simple adding of the data, or by taking the mean.
+      by simple summation of the data, or by taking the mean.
     </p>
     <p>
       The rebinning is controlled by three bin factors, one for each
@@ -189,10 +189,37 @@
       The resultant cube must have a unique name (you cannot resize a
       cube on disk and then expect GAIA to sensibly reload it), so the
       a name is generated using a prefix (the default of
-      <tt>GaiaTempCubeRebin<tt> will result in a new cube called
+      <tt>GaiaTempCubeRebin</tt> will result in a new cube called
       <tt>GaiaTempCubeRebin1.sdf</tt> and so on). Prefixes that include
       the substring <tt>Temp</tt> will be deleted when GAIA closes.
+    </p>
+
+    <h5>Filter</h5>
     <p>
+      These controls allow you to smooth the image planes of the cube using
+      either a block or gaussian filter. The block filter can be a simple
+      square or a rectangle. The gaussian filter can be symmetric or 
+      ellipsoidal, at a given angle.
+    </p>
+    <p>
+      When filtering using a square or rectangle filter, you must define the
+      size of the edges and what method to use to combine the data. That can be
+      the mean or median. Clearly the median will be useful for data that have
+      spiky noise features.
+    </p>
+    <p>
+      When filtering using a gaussian, the size of the filter is specified
+      using the full width at half maximum (FWHM), but the area over which the
+      gaussian is evaluated is determined by the <tt>Box size</tt>
+      values. Clearly these should be set to several times the size of the
+      FWHM. The orientation of the elliptical gaussian is in degrees running
+      anti-clockwise from the X axis (that's to positive Y). All sizes are
+      measured in pixels.
+    </p>
+    <p>
+      The cube naming scheme follows that used by the Rebin description
+      (although in this case the cube size does not change).
+    </p>
 
     <h5>Baseline</h5>
     <p>
