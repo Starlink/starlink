@@ -108,7 +108,8 @@
       CHARACTER CARD*80
       CHARACTER VALUE2*80
       CHARACTER VALUE3*80
-
+      INTEGER ICARD1
+      INTEGER ICARD2
 *.
 
 *  Initialise.
@@ -117,51 +118,115 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Method 1: simply create a deep copy of FC1 and then append the
-*  contents of FC2 to it.
+*  Note the original current Crad of the two FitsChans, and then re-wind
+*  them
+      ICARD1 = AST_GETI( FC1, 'CARD', STATUS )
+      ICARD2 = AST_GETI( FC2, 'CARD', STATUS )
+      CALL AST_CLEAR( FC1, 'CARD', STATUS )
+      CALL AST_CLEAR( FC2, 'CARD', STATUS )
+
+*  Method 1: Append FC2 to the end of FC1.
+*  --------------------------------------
       IF( METHOD .EQ. 1 ) THEN
+
+*  Initialise FC3 to be a deep copy of FC1
          FC3 = AST_COPY( FC1, STATUS )
+
+*  Ensure the current card in FC3 is the "end-of-file".
          CALL AST_SETI( FC3, 'CARD', 
-     :                  AST_GETI( FC3, 'CARD', STATUS ) + 1, STATUS )
+     :                  AST_GETI( FC3, 'NCARD', STATUS ) + 1, STATUS )
+
+*  Loop round all the cards in FC2
          DO WHILE( AST_FINDFITS( FC2, '%f', CARD, .TRUE., STATUS ) )
+
+*  Append the card from FC2 to the end of FC3
             CALL AST_PUTFITS( FC3, CARD, .FALSE., STATUS )
          END DO
 
-*  Method 2: first create a deep copy of FC1 and then erase any keywords
-*  from it that also occur in FC2 (even if they have different values). 
-*  Finally append the contents of FC2.
+
+*  Method 2: Append FC2 to the end of FC1, excluding FC1 keywords that are
+*  also present in FC2 (even iof they have different values).
+*  --------------------------------------------------------------------
       ELSE IF( METHOD .EQ. 2 ) THEN
+
+*  Initialise FC3 to be a deep copy of FC1
          FC3 = AST_COPY( FC1, STATUS )
+
+*  Rewind FC3 so that AST FindFits searches from the first card in FC3.
          CALL AST_CLEAR( FC3, 'CARD', STATUS )
+
+*  Loop round all cards in FC3.
          DO WHILE( AST_FINDFITS( FC3, '%f', CARD, .TRUE., STATUS ) )
+
+*  See if FC2 contains a card for the same keyword used by the current
+*  card in FC3.
             IF( AST_GETFITSS( FC2, CARD, VALUE2, STATUS ) ) THEN
+
+*  If so, move backwards by one card in FC3 (this is because the above
+*  call to AST_FINDFITS advances the curent card on each invocation, so
+*  the current card at the moment is the one following the card described in
+*  CARD).
+               CALL AST_SETI( FC3, 'CARD', 
+     :                        AST_GETI( FC3, 'CARD', STATUS ) - 1,
+     :                        STATUS )
+
+*  Delete the current card in FC3 (i.e. the one described by CARD).
                CALL AST_DELFITS( FC3, STATUS )
+
             END IF
          END DO
 
+*  Rewind FC2, then loop round all cards in FC2, appending them to the
+*  end of FC3.
+         CALL AST_CLEAR( FC2, 'CARD', STATUS )
          DO WHILE( AST_FINDFITS( FC2, '%f', CARD, .TRUE., STATUS ) )
             CALL AST_PUTFITS( FC3, CARD, .FALSE., STATUS )
          END DO
 
 
-*  Method 3: First create a deep copy of FC1. Then erase all headers 
-*  from FC3 except for those which also occur in FC2 (i.e. have the same
-*  keyword and the same value).
+*  Method 3: Store cards in FC3 which are present in both FC1 and FC2.
+*  Both the keyword name and the keyword value must match for the card 
+*  to be included in FC3.
+*  --------------------------------------------------------------------
       ELSE IF( METHOD .EQ. 3 ) THEN
+
+*  Initialise FC3 to be a deep copy of FC1
          FC3 = AST_COPY( FC1, STATUS )
+
+*  Rewind FC3 so that AST FindFits searches from the first card in FC3.
          CALL AST_CLEAR( FC3, 'CARD', STATUS )
-         DO WHILE( AST_FINDFITS( FC3, '%f', CARD, .TRUE., STATUS ) )
+
+*  Loop round all cards in FC3 (note, AST_FINDFITS does NOT advance to 
+*  the next card because of the .FALSE. fourth argument).
+         DO WHILE( AST_FINDFITS( FC3, '%f', CARD, .FALSE., STATUS ) )
+
+*  See if there is a card in FC2 for the keyword just read from FC1.
+*  If so the keyword value from FC2 is returned in VALUE2. We also get
+*  the keyword value from FC3 (in VALUE3).
             IF( AST_GETFITSS( FC2, CARD, VALUE2, STATUS ) .AND.
      :          AST_GETFITSS( FC3, CARD, VALUE3, STATUS ) ) THEN
+
+*  If the keyword values in the FC1 and FC2 differ, delete the current
+*  card in FC3.
                IF( VALUE2 .NE. VALUE3 ) THEN
                   CALL AST_DELFITS( FC3, STATUS )
+
+* Otherwise, move on to the next card in FC3
+               ELSE
+                  CALL AST_SETI( FC3, 'CARD', 
+     :                           AST_GETI( FC3, 'CARD', STATUS ) + 1,
+     :                           STATUS )
                END IF
+
+*  IF the keyword was not found in FC2, delete the current card in FC3.
             ELSE
                CALL AST_DELFITS( FC3, STATUS )
             END IF
+
          END DO
 
 *  Report an error for any other method.
+*  -------------------------------------
       ELSE IF( STATUS .EQ. SAI__OK ) THEN 
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'M', METHOD )
@@ -170,4 +235,8 @@
      :                 STATUS )
       END IF
     
+*  Re-instate the original current Card of the two FitsChans.
+      CALL AST_SET( FC1, 'CARD', ICARD1, STATUS )
+      CALL AST_SET( FC2, 'CARD', ICARD2, STATUS )
+
       END
