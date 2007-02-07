@@ -490,6 +490,14 @@ void smf_geod( double pos[3], double *phi, double *h, double *lambda );
 
 void smf_instap_get( smfHead * hdr, int * status );
 
+void smf_calcmodel_com( smfData *cum, smfData *res, AstKeyMap *keymap, 
+			double *map, double *mapvar, smfData *model, 
+			int flags, int *status );
+
+void smf_calcmodel_ast( smfData *cum, smfData *res, AstKeyMap *keymap, 
+			double *map, double *mapvar, smfData *model, 
+			int flags, int *status );
+
 void smf_labelunit( Grp *igrp,  int size, smfData *odata, int *status );
 
 void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
