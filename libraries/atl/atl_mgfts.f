@@ -77,6 +77,10 @@
 *  History:
 *     7-FEB-2007 (DSB):
 *        Original version.
+*     8-FEB-2007 (DSB):
+*        Take account of header cards that have no value (e.g. blank
+*        cards, comment cards, etc).
+
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -102,14 +106,13 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Constants:
-
 *  Local Variables:
       CHARACTER CARD*80
       CHARACTER VALUE2*80
       CHARACTER VALUE3*80
       INTEGER ICARD1
       INTEGER ICARD2
+      LOGICAL FLAG
 *.
 
 *  Initialise.
@@ -158,21 +161,25 @@
 *  Loop round all cards in FC3.
          DO WHILE( AST_FINDFITS( FC3, '%f', CARD, .TRUE., STATUS ) )
 
+*  We retain cards from FC1 that do not have a value (i.e. cards which do 
+*  not have an equals sign in column 10 )
+            IF( CARD( 9 : 10 ) .EQ. ' =' ) THEN
+
 *  See if FC2 contains a card for the same keyword used by the current
 *  card in FC3.
-            IF( AST_GETFITSS( FC2, CARD, VALUE2, STATUS ) ) THEN
+               IF( AST_GETFITSS( FC2, CARD, VALUE2, STATUS ) ) THEN
 
 *  If so, move backwards by one card in FC3 (this is because the above
 *  call to AST_FINDFITS advances the curent card on each invocation, so
 *  the current card at the moment is the one following the card described in
 *  CARD).
-               CALL AST_SETI( FC3, 'CARD', 
-     :                        AST_GETI( FC3, 'CARD', STATUS ) - 1,
-     :                        STATUS )
+                  CALL AST_SETI( FC3, 'CARD', 
+     :                           AST_GETI( FC3, 'CARD', STATUS ) - 1,
+     :                           STATUS )
 
 *  Delete the current card in FC3 (i.e. the one described by CARD).
-               CALL AST_DELFITS( FC3, STATUS )
-
+                  CALL AST_DELFITS( FC3, STATUS )
+               END IF
             END IF
          END DO
 
@@ -200,29 +207,38 @@
 *  the next card because of the .FALSE. fourth argument).
          DO WHILE( AST_FINDFITS( FC3, '%f', CARD, .FALSE., STATUS ) )
 
+*  We retain cards from FC1 that do not have a value (i.e. cards which do 
+*  not have an equals sign in column 10 )
+            IF( CARD( 9 : 10 ) .EQ. '= ' ) THEN
+
 *  See if there is a card in FC2 for the keyword just read from FC1.
 *  If so the keyword value from FC2 is returned in VALUE2. We also get
 *  the keyword value from FC3 (in VALUE3).
-            IF( AST_GETFITSS( FC2, CARD, VALUE2, STATUS ) .AND.
-     :          AST_GETFITSS( FC3, CARD, VALUE3, STATUS ) ) THEN
+               IF( AST_GETFITSS( FC2, CARD, VALUE2, STATUS ) .AND.
+     :             AST_GETFITSS( FC3, CARD, VALUE3, STATUS ) ) THEN
 
 *  If the keyword values in the FC1 and FC2 differ, delete the current
 *  card in FC3.
-               IF( VALUE2 .NE. VALUE3 ) THEN
-                  CALL AST_DELFITS( FC3, STATUS )
+                  IF( VALUE2 .NE. VALUE3 ) THEN
+                     CALL AST_DELFITS( FC3, STATUS )
 
 * Otherwise, move on to the next card in FC3
-               ELSE
-                  CALL AST_SETI( FC3, 'CARD', 
-     :                           AST_GETI( FC3, 'CARD', STATUS ) + 1,
-     :                           STATUS )
-               END IF
+                  ELSE
+                     CALL AST_SETI( FC3, 'CARD', 
+     :                              AST_GETI( FC3, 'CARD', STATUS ) + 1,
+     :                              STATUS )
+                  END IF
 
 *  IF the keyword was not found in FC2, delete the current card in FC3.
-            ELSE
-               CALL AST_DELFITS( FC3, STATUS )
-            END IF
+               ELSE
+                  CALL AST_DELFITS( FC3, STATUS )
+               END IF
 
+            ELSE
+               CALL AST_SETI( FC3, 'CARD', 
+     :                        AST_GETI( FC3, 'CARD', STATUS ) + 1,
+     :                        STATUS )
+            END IF
          END DO
 
 *  Report an error for any other method.
@@ -234,9 +250,34 @@
      :                 ' value (^M) supplied (programming error).', 
      :                 STATUS )
       END IF
-    
-*  Re-instate the original current Card of the two FitsChans.
+
+*  If a FitsChan is being returned, replace each contuguous group of 
+*  blank headers with a single blank header.
+      IF( FC3 .NE. AST__NULL ) THEN
+         FLAG = .FALSE.
+         CALL AST_CLEAR( FC3, 'CARD', STATUS )
+         DO WHILE( AST_FINDFITS( FC3, '%f', CARD, .TRUE., STATUS ) )
+            IF( CARD .EQ. ' ' ) THEN
+               IF( FLAG ) THEN
+                  FLAG = .FALSE.
+               ELSE
+                  CALL AST_DELFITS( FC3, STATUS )
+               END IF
+            ELSE
+               FLAG = .TRUE.
+            END IF      
+         END DO
+      END IF
+
+*  Re-instate the original current Card of the two supplied FitsChans,
+*  and re-dinw the retruend FitsChan (if any).
       CALL AST_SET( FC1, 'CARD', ICARD1, STATUS )
       CALL AST_SET( FC2, 'CARD', ICARD2, STATUS )
+      IF( FC3 .NE. AST__NULL ) CALL AST_CLEAR( FC3, 'CARD', STATUS )
+
+*  If an error occurred, delete any returned FitsCHan.
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL AST_ANNUL( FC3, STATUS )         
+      END IF
 
       END
