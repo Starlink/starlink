@@ -471,7 +471,7 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
                     int lbnd_out[ 3 ], int ubnd_out[ 3 ], int spread, 
                     const double params[], int genvar, float *data_array, 
                     float *var_array, double *wgt_array, int *work_array, 
-                    float *texp_array, int *status );
+                    float *texp_array, float *ton_array, double *fcon, int *status );
 
 void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos, 
                    int autogrid, Grp *detgrp, double par[ 7 ], 
@@ -508,6 +508,6 @@ void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap,
                       AstSkyFrame *oskyframe, Grp *detgrp, int lbnd_out[ 3 ], 
                       int ubnd_out[ 3 ], int genvar, float *data_array, 
                       float *var_array, int *ispec, float *texp_array, 
-                      int *status );
+                      float *ton_array, double *fcon, int *status );
 
 #endif /* SMF_DEFINED */

@@ -350,6 +350,26 @@
 *     is determined by the intersection (rather than the union) of the
 *     input spectral ranges. This is done in order to allow a more memory
 *     efficient algorithm to be used.
+*     - A FITS extension is added to the output NDF containing any keywords 
+*     that are common to all input NDFs. To be included in the output
+*     FITS extension, a FITS keyword must be present in the NDF extension
+*     of every input NDF, and it must have the same value in all input
+*     NDFs.
+*     - The output NDF will contain an extension named "SMURF" containing
+*     three NDFs named "EXP_TIME", "ON_TIME" and "TSYS". Each of these NDFs 
+*     is 2-dimensional, with the same pixel bounds as the spatial axes of the 
+*     main output NDF, so that a pixel in one of these NDFs corresponds
+*     to a spectrum in the main output NDF. EXP_TIME holds the sum of the 
+*     total exposure times (Ton + Toff) for the input spectra that 
+*     contributed to each output spectrum. ON_TIME holds the sum of the "on" 
+*     times (Ton) for the input spectra that contributed to each output 
+*     spectrum. TSYS holds the effective system temperature for each output 
+*     spectrum.
+*     - FITS keywords EXP_TIME and TSYS are added to the output FITS
+*     extension. The EXP_TIME keyword holds the median value of the
+*     EXP_TIME array (stored in the SMURF extension of the output NDF).
+*     The TSYS keyword holds the median value of the TSYS array (stored in 
+*     the SMURF extension of the output NDF).
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -413,9 +433,15 @@
 *        Remove duplicated code for getting parameter "SPARSE".
 *     7-FEB-2007 (DSB):
 *        Store median exposure time int he output NDF FITS extension.
+*     8-FEB-2007 (DSB):
+*        - Create a SMURF extension in the output holding arrays EXP_TIME,
+*        ON_TIME and TSYS.
+*        - Store the median output TSYS value in the output FITS extension.
+*        - Find FITS headers that are present and have the same value in all 
+*        input NDFs, and add them to the output NDF's FITS extension.
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics and Astronomy Research
+*     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
 *     Council and the University of British Columbia. All Rights
 *     Reserved.
 
@@ -459,6 +485,7 @@
 #include "star/hds.h"
 #include "star/ndg.h"
 #include "star/grp.h"
+#include "star/atl.h"
 #include "star/kaplibs.h"
 
 
@@ -474,7 +501,8 @@
 void smurf_makecube( int *status ) {
 
 /* Local Variables */
-   AstFitsChan *fchan;        /* FitsChan holding output NDF FITS extension */
+   AstFitsChan *fchan = NULL; /* FitsChan holding output NDF FITS extension */
+   AstFitsChan *fchan2 = NULL;/* FitsChan holding temporary FITS headers */
    AstFrame *ospecfrm = NULL; /* SpecFrame from the output WCS Frameset */
    AstFrame *tfrm = NULL;     /* Current Frame from output WCS */
    AstFrameSet *wcsout = NULL;/* WCS Frameset for output cube */
@@ -486,12 +514,14 @@ void smurf_makecube( int *status ) {
    Grp *detgrp = NULL;        /* Group of detector names */
    Grp *igrp = NULL;          /* Group of input files */
    Grp *ogrp = NULL;          /* Group containing output file */
+   HDSLoc *smurf_xloc = NULL; /* HDS locator for output SMURF extension */
    HDSLoc *weightsloc = NULL; /* HDS locator of weights array */
    char *pname = NULL;        /* Name of currently opened data file */
    char pabuf[ 10 ];          /* Text buffer for parameter value */
    char system[ 10 ];         /* Celestial coord system for output cube */
    char tmpstr[10];           /* temporary unit string */
    double corner[2];          /* WCS of a corner (SKY) */
+   double fcon;               /* Tsys factor for file */
    double glbnd_out[ 3 ];     /* double prec Lower GRID bounds for output map */
    double gubnd_out[ 3 ];     /* double prec Upper GRID bounds for output map */
    double gx_in[ 4 ];         /* X Grid coordinates of four corners */
@@ -502,10 +532,16 @@ void smurf_makecube( int *status ) {
    double params[ 4 ];        /* astRebinSeq parameters */
    double wcslbnd_out[3];     /* Array of lower bounds of output cube */
    double wcsubnd_out[3];     /* Array of upper bounds of output cube */
+   float *exp_array = NULL;   /* Pointer to array of exp times */
+   float *on_array = NULL;    /* Pointer to array of on times  */
+   float *tsys_array = NULL;  /* Pointer to array of tsys values */
    float *var_array = NULL;   /* Pointer to temporary variance array */
    float *var_out = NULL;     /* Pointer to the output variance array */
-   float *work2_array = NULL; /* Pointer to temporary work array */
-   float median;              /* Median exposure time in outptu NDF. */
+   float medexp;              /* Median exposure time in output NDF. */
+   float medtsys;             /* Median system temperature in output NDF. */
+   float teff;                /* Effective integration time */
+   float toff;                /* Off time */
+   float ton;                 /* On time */
    int *work1_array = NULL;   /* Pointer to temporary work array */
    int autogrid;              /* Determine projection parameters automatically? */
    int axes[ 2 ];             /* Indices of selected axes */
@@ -513,7 +549,6 @@ void smurf_makecube( int *status ) {
    int el;                    /* Index of 3D array element */
    int flag;                  /* Is group expression to be continued? */
    int genvar;                /* How to create output Variances */
-   int gotfits;               /* Does the output NDF have a FITS extension? */
    int i;                     /* Loop index */
    int ifile;                 /* Input file index */
    int ispec;                 /* Index of next spectrum within output NDF */
@@ -542,8 +577,11 @@ void smurf_makecube( int *status ) {
    int usedetpos;             /* Should the detpos array be used? */
    int wgtsize;               /* No. of elements in the weights array */
    smfData *data = NULL;      /* Pointer to data struct */
-   smfData *odata = NULL;     /* Pointer to output SCUBA2 data struct */
-   smfData *wdata = NULL;     /* Pointer to SCUBA2 data struct */
+   smfData *expdata = NULL;   /* Pointer to o/p struct holding exp time array */
+   smfData *odata = NULL;     /* Pointer to o/p struct holding data array */
+   smfData *ondata = NULL;    /* Pointer to o/p struct holding on time array */
+   smfData *tsysdata = NULL;  /* Pointer to o/p struct holding tsys array */
+   smfData *wdata = NULL;     /* Pointer to o/p struct holding weights array */
    smfFile *file = NULL;      /* Pointer to data file struct */
    void *data_array = NULL;   /* Pointer to the rebinned map data */
    void *wgt_array = NULL;    /* Pointer to the weights map */
@@ -860,7 +898,6 @@ void smurf_makecube( int *status ) {
    } else if( genvar ) {
       var_array = (float *) astMalloc( nxy*sizeof( float ) );
       work1_array = (int *) astMalloc( nxy*sizeof( int ) );
-      work2_array = (float *) astMalloc( nxy*sizeof( float ) );
    }
 
 /* If required, create an array to hold the weights. First set up the bounds 
@@ -907,6 +944,31 @@ void smurf_makecube( int *status ) {
       } else {
          wgt_array = astMalloc( sizeof( double )*(size_t)wgtsize );
       }
+   }
+
+/* If we are using nearest neighbour rebinning, create a SMURF extension in 
+   the output NDF and create three 2D NDFs in the extension; one for the total 
+   exposure time ("on+off"), one for the "on" time, and one for the Tsys 
+   values. Each of these 2D NDFs inherits the spatial bounds of the main
+   output NDF. */
+   if( spread == AST__NEAREST ) {
+      smurf_xloc = smf_get_xloc ( odata, "SMURF", "SMURF", "WRITE", 
+                                  0, 0, status );
+
+      smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "EXP_TIME", "NEW", 
+                         "_REAL", 2, (int *) lbnd_out, 
+                         (int *) ubnd_out, &expdata, status );
+      if( expdata ) exp_array = (expdata->pntr)[ 0 ];
+
+      smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "ON_TIME", "NEW", 
+                         "_REAL", 2, (int *) lbnd_out, 
+                         (int *) ubnd_out, &ondata, status );
+      if( ondata ) on_array = (ondata->pntr)[ 0 ];
+
+      smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "TSYS", "NEW", 
+                         "_REAL", 2, (int *) lbnd_out, 
+                         (int *) ubnd_out, &tsysdata, status );
+      if( tsysdata ) tsys_array = (tsysdata->pntr)[ 0 ];
    }
 
 /* Invert the output sky mapping so that it goes from sky to pixel
@@ -975,16 +1037,34 @@ void smurf_makecube( int *status ) {
          data->hdr->detpos = NULL;
       }
 
+/* If this is the first file, get a copy of the input NDFs FITS extension
+   (held in a FitsChan). This FitsChan will be used to hold the FITS
+   header for the output NDF. */
+      if( ifile == 1 ) {
+         fchan = astCopy( data->hdr->fitshdr );
+
+/* If this is not the first file, merge the input NDF's FITS extension
+   into the output NDF's FITS extension by removing any headers from the
+   output FITS extension that do not have identical values in the input
+   FITS extension. */
+      } else {
+         atlMgfts( 3, data->hdr->fitshdr, fchan, &fchan2, status );
+         (void) astAnnul( fchan );
+         fchan = fchan2;
+      }
+
 /* Rebin the data into the output grid. */
       if( !sparse ) {
          smf_rebincube( data, ifile, size, abskyfrm, oskymap, ospecfrm, 
                         ospecmap, detgrp, moving, lbnd_out, ubnd_out, 
                         spread, params, genvar, data_array, var_array, 
-                        wgt_array, work1_array, work2_array, status );
+                        wgt_array, work1_array, exp_array, on_array, &fcon,
+                        status );
       } else {
          smf_rebinsparse( data, ospecfrm, ospecmap, abskyfrm, detgrp, 
                           lbnd_out, ubnd_out, genvar, data_array, var_array, 
-                          &ispec, work2_array, status );
+                          &ispec, exp_array, on_array, &fcon,
+                          status );
       }
    
 /* Close the input data file. */
@@ -1022,35 +1102,56 @@ L999:;
          }
       }
 
-/* Find the median value in the "work2_array" array. This array holds the
-   total exposure time for each output spectrum (that is, the sum of the 
-   (Ton+Toff) values for each input spectrum that contributes to the
-   output spectrum). */
-      kpg1Medur( 1, nxy, work2_array, &median, &neluse, status );
-
-/* Store the median exposure time as keyword EXP_TIME in the FITS
-   extension of the output cube. */
-      if( median != VAL__BADR && median > 0.0 ) {
-         ndfXstat( ondf, "FITS", &gotfits, status ); 
-         if( gotfits ) {
-            kpgGtfts( ondf, &fchan, status );
-         } else {
-            fchan = astFitsChan( NULL, NULL, "" );
+/* If all the input files had the same backend degradation factor and
+   channel width, calculate a 2D array of Tsys values for the output
+   cube. */
+      if( fcon != VAL__BADD ) {
+         for( el0 = 0; el0 < nxy; el0++ ) {
+            ton = on_array[ el0 ];
+            toff = exp_array[ el0 ] - ton;
+            if( ton > 0.0 && toff > 0.0 ) {
+               teff = 1.0/( 1.0/ton + 1.0/toff );
+               tsys_array[ el0 ] = sqrt( var_array[ el0 ]*teff/fcon );
+            } else {
+               tsys_array[ el0 ] = VAL__BADR;
+            }
          }
-         astSetFitsF( fchan, "EXP_TIME", (double) median, "[s] Median exposure time", 
-                      1 );
-         kpgPtfts( ondf, fchan, status );
+
+      } else {
+         for( el0 = 0; el0 < nxy; el0++ ) {
+            tsys_array[ el0 ] = VAL__BADR;
+         }
       }
+
+/* Store the median exposure time as keyword EXP_TIME in the FitsChan. */
+      kpg1Medur( 1, nxy, exp_array, &medexp, &neluse, status );
+      if( medexp != VAL__BADR && medexp > 0.0 ) {
+         astSetFitsF( fchan, "EXP_TIME", (double) medexp, 
+                      "[s] Median MAKECUBE exposure time", 1 );
+      }
+
+/* Store the median system temperature as keyword TSYS in the FitsChan. */
+      kpg1Medur( 1, nxy, tsys_array, &medtsys, &neluse, status );
+      if( medtsys != VAL__BADR && medtsys > 0.0 ) {
+         astSetFitsF( fchan, "TSYS", (double) medtsys, 
+                      "[K] Median MAKECUBE system temperature", 1 );
+      }
+
+/* If the FitsChan is not empty, store it in the FITS extension of the
+   output NDF (any existing FITS extension is deleted). */
+      if( astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );
 
 /* Free the memory used to store the 2D variance information and work
    arrays. */
       var_array = astFree( var_array );
       work1_array = astFree( work1_array );
-      work2_array = astFree( work2_array );
 
    }
 
 /* Close the output data files. */
+   if( expdata ) smf_close_file( &expdata, status );
+   if( ondata ) smf_close_file( &ondata, status );
+   if( tsysdata ) smf_close_file( &tsysdata, status );
    if( wdata ) smf_close_file( &wdata, status );
    if( odata ) smf_close_file( &odata, status );
 

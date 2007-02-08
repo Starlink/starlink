@@ -17,7 +17,7 @@
 *                      AstSkyFrame *oskyframe, Grp *detgrp, int lbnd_out[ 3 ], 
 *                      int ubnd_out[ 3 ], int genvar, float *data_array,
 *                      float *var_array, int *ispec, float *texp_array, 
-*                      int *status );
+*                      float *ton_array, double *fcon, int *status );
 
 *  Arguments:
 *     data = smfData * (Given)
@@ -59,6 +59,19 @@
 *        spectrum. It is updated on exit to include the supplied input 
 *        NDF. Only used if "spread" is AST__NEAREST. It should be big enough 
 *        to hold a single spatial plane from the output cube.
+*     ton_array = float * (Given and Returned)
+*        A work array, which holds the "on" time for each output 
+*        spectrum. It is updated on exit to include the supplied input 
+*        NDF. Only used if "spread" is AST__NEAREST. It should be big enough 
+*        to hold a single spatial plane from the output cube.
+*     fcon = double * (Given and Returned)
+*        If "index" is supplied as one, then *fcon is returned holding
+*        the ratio of the squared backend degradation factor to the spectral
+*        channel width (this is the factor needed for calculating the
+*        variances from the Tsys value). This returned value should be
+*        left unchanged on subseuqnet invocations of this function. For 
+*        other values of "index", the value is returned holding VAL__BADD
+*        if the factor for the current file has a different value.
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
@@ -83,6 +96,8 @@
 *        Added calculation of Tsys output variances.
 *     7-FEB-2007 (DSB):
 *        Added parameter "texp_array".
+*     8-FEB-2007 (DSB):
+*        Added parameter "ton_array" and "fcon".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -132,7 +147,7 @@ void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap,
                       AstSkyFrame *oskyframe, Grp *detgrp, int lbnd_out[ 3 ], 
                       int ubnd_out[ 3 ], int genvar, float *data_array, 
                       float *var_array, int *ispec, float *texp_array, 
-                      int *status ){
+                      float *ton_array, double *fcon, int *status ){
 
 /* Local Variables */
    AstCmpMap *fmap = NULL;      /* Mapping from spectral grid to topo freq Hz */
@@ -155,7 +170,7 @@ void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap,
    double *yout = NULL;  /* Workspace for detector output pixel positions */
    double at;            /* Frequency at which to take the gradient */
    double dnew;          /* Channel width in Hz */
-   double fcon;          /* Variance factor for whole file */
+   double fcon2;         /* Variance factor for whole file */
    double k;             /* Back-end degradation factor */
    double tcon;          /* Variance factor for whole time slice */
    float *pdata;         /* Pointer to next data sample */
@@ -304,7 +319,7 @@ void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap,
    in the input, find the constant factor associated with the current input
    file. This is the squared backend degradation factor, divided by the
    noise bandwidth. */
-   fcon = AST__BAD;
+   fcon2 = AST__BAD;
    if( genvar == 2 ) {
 
 /* Get the required FITS headers, checking they were found. */
@@ -352,7 +367,7 @@ void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap,
             }
 
 /* Form the required constant. */
-            fcon = k*k/dnew;  
+            fcon2 = k*k/dnew;  
          }        
       }
    }
@@ -390,8 +405,8 @@ void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap,
    in the input, find the constant factor associated with the current
    time slice. */
       tcon = AST__BAD;
-      if( fcon != AST__BAD && texp != VAL__BADR ) {
-         tcon = fcon*( 1.0/ton + 1.0/toff );
+      if( fcon2 != AST__BAD && texp != VAL__BADR ) {
+         tcon = fcon2*( 1.0/ton + 1.0/toff );
 
 /* Get a pointer to the start of the Tsys values for this time slice. */
          tsys = hdr->tsys + hdr->ndet*itime;
@@ -446,7 +461,10 @@ void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap,
                      var_array[ *ispec ] = VAL__BADR;
                   }
 
-                  if( texp != VAL__BADR ) texp_array[ *ispec ] = texp;
+                  if( texp != VAL__BADR ) {
+                     texp_array[ *ispec ] = texp;
+                     ton_array[ *ispec ] = ton;
+                  }
    
                   for( ichan = 0; ichan < nchan; ichan++, pdata++ ) {
                      iz = spectab[ ichan ] - 1;
@@ -490,6 +508,13 @@ void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap,
    yin = astFree( yin );
    xout = astFree( xout );
    yout = astFree( yout );
+
+/* Return the factor needed for calculating Tsys from the variance. */
+   if( index == 1 ) {
+      *fcon = fcon2;
+   } else if( fcon2 != *fcon ) {
+      *fcon = VAL__BADD;
+   }
 
 /* End the AST context. This will annul all AST objects created within the
    context (except for those that have been exported from the context). */
