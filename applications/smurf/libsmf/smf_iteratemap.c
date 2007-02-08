@@ -55,6 +55,9 @@
 *        Intermediate step: Old routine works with new model container code
 *     2007-02-07 (EC):
 *        Fixed bugs in implementation of models, order of execution.
+*     2007-02-08 (EC):
+*        Changed location of AST model calculation
+*        Fixed pointer bug for variance of residual in map estimate
 
 *  Notes:
 
@@ -118,6 +121,8 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   const char *atmname;          /* Name of atmmodel group */
   Grp *comgrp=NULL;             /* Group of common-mode model files */
   Grp *cumgrp=NULL;             /* Group of cumulative model files */
+  smfData *data;                /* Pointer to source data struct */
+  double *data_data=NULL;       /* Pointer to DATA component of data */
   dim_t dsize;                  /* Size of data arrays in containers */
   int flag;                     /* Flag */
   dim_t i;                      /* Loop counter */
@@ -168,6 +173,28 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   }  
 
   if( *status == SAI__OK ) {
+
+    /* kludge to ensure that the input data is copied to the residual */
+    /*
+    for( i=1; i<=isize; i++ ) {
+      smf_open_file( igrp, i, "READ", 0, &data, status );    
+      smf_open_file( resgrp, i, "UPDATE", 0, &res, status );    
+
+      dsize = (res->dims)[0]*(res->dims)[1]*(res->dims)[2];
+
+      res_data = (double *)(res->pntr)[0];
+      data_data = (double *)(data->pntr)[0];
+
+      for( j=0; j<dsize; j++ ) {
+	res_data[j] = data_data[j];
+      }
+
+      smf_close_file( &res, status );
+      smf_close_file( &data, status );
+    }
+    */
+    /* -------------------------------------------------------------- */
+
     for( iter=0; iter<numiter; iter++ ) {    
       msgSeti("ITER", iter+1);
       msgSeti("NUMITER", numiter);
@@ -181,29 +208,19 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
         smf_open_file( cumgrp, i, "UPDATE", 0, &cum, status );
         smf_open_file( resgrp, i, "UPDATE", 0, &res, status );
         smf_open_file( astgrp, i, "UPDATE", 0, &ast, status );
-        /*smf_open_file( comgrp, i, "UPDATE", 0, &com, status );*/
+        smf_open_file( comgrp, i, "UPDATE", 0, &com, status );
 
-	/* Calculate the AST model component first. It is a special model
-           because it assumes that the map contains the best current
-           estimate of the astronomical sky. Since the map will have
-           been re-estimated at the end of the last iteration, we
-           always call the ast model calculation first before proceeding
-           with other model components. Also note that we set the
-           flag to zero the cumulative model with this call. */
+	/* Call the model calculations in the desired order. The first
+           one should have flags set to 1 to zero the cumulative model */
 
-	smf_calcmodel_ast( cum, res, keymap, map, mapvar, ast,
-			   1, status );
-
-	/* Call the subsequent model calculations in the desired order. */
-	/*smf_calcmodel_com( cum, res, keymap, map, mapvar, com,
-			   0, status );
-	*/
+	smf_calcmodel_com( cum, res, keymap, map, mapvar, com,
+			   1, status ); 	
 
         /* Close files */
         smf_close_file( &cum, status );
         smf_close_file( &res, status );
         smf_close_file( &ast, status );    
-        /*smf_close_file( &com, status );*/
+        smf_close_file( &com, status );
 
 	/* Set exit condition if bad status was set */
 	if( *status != SAI__OK ) i=isize+1;
@@ -212,20 +229,28 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
       msgOut(" ", "SMF_ITERATEMAP: Rebin residual to estimate MAP", status);
       if( *status == SAI__OK ) {
         for( i=1; i<=isize; i++ ) {
-	  smf_open_file( astgrp, i, "READ", 0, &ast, status );
+	  smf_open_file( astgrp, i, "UPDATE", 0, &ast, status );
 	  smf_open_file( resgrp, i, "UPDATE", 0, &res, status );
+	  smf_open_file( cumgrp, i, "UPDATE", 0, &cum, status );
 
 	  if( *status == SAI__OK ) {
 
 	  /* Add last iteration of astronomical signal back in */
 	    ast_data = (double *)(ast->pntr)[0];
 	    res_data = (double *)(res->pntr)[0];
-	    res_var = (double *)(res->pntr)[0];
+	    res_var = (double *)(res->pntr)[1];
 
 	    dsize = (ast->dims)[0]*(ast->dims)[1]*(ast->dims)[2];
 
 	    for( j=0; j<dsize; j++ ) {
+
 	      res_data[j] += ast_data[j];
+
+	      /* Set ast_data back to 0 since we've moved all of the signal
+                 into the map, and then it will get re-estimated by
+                 calcmodel_ast at the start of the next iteration. */
+
+	      ast_data[j] = 0;
 	    }
 
 	  }
@@ -254,13 +279,25 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 	  }
 
 	  /* Rebin the residual + astronomical signal into a map */
+
 	  smf_simplerebinmap( res_data, res_var, lut, dsize,
 			      rebinflags, map, weights, mapvar,
 			      msize, status );
 	  
+	  /* Calculate the AST model component. It is a special model
+	     because it assumes that the map contains the best current
+	     estimate of the astronomical sky. Since the map will have
+	     been re-estimated at the end of the last iteration, we
+	     always call the ast model calculation first before proceeding
+	     with other model components. Also note that we set the
+	     flag to zero the cumulative model with this call. */
+	  
+	  smf_calcmodel_ast( cum, res, keymap, map, mapvar, ast,
+			     0, status );
+	  
 	  smf_close_file( &ast, status );    
 	  smf_close_file( &res, status );
-	  
+	  smf_close_file( &cum, status );	  
         }
       }
     }

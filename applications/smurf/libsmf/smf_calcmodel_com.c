@@ -50,6 +50,8 @@
 *        Initial Version
 *     2006-11-02 (EC):
 *        Updated to correctly modify cumulative and residual models
+*     2007-02-08 (EC):
+*        Fixed bug in replacing previous model before calculating new one
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -133,16 +135,21 @@ void smf_calcmodel_com( smfData *cum, smfData *res, AstKeyMap *keymap,
       memset( cum_data, 0, ndata*sizeof(cum_data) );
     }
 
-    /* Loop over time slice and calculate the mean at each step */
     for( i=0; i<ntslice; i++ ) {
+
+      /* Add previous iteration of the model back into the residual */
       lastmean = model_data[i];
+
+      for( j=0; j<nbolo; j++ ) {
+	res_data[i*nbolo + j] += lastmean;
+      }
+
+      /* Now calculate the new model */
       smf_calc_stats( res, "t", i, 0, 0, &mean, &sigma, status );
       model_data[i] = mean;
       
       /* Loop over bolometer */
       for( j=0; j<nbolo; j++ ) {
-	/* Add previous iteration of the model back into the residual */
-	res_data[i*nbolo + j] += lastmean;
 
 	/* update the cumulative/residual model */
 	cum_data[i*nbolo + j] += mean;
