@@ -365,10 +365,10 @@
 *     times (Ton) for the input spectra that contributed to each output 
 *     spectrum. TSYS holds the effective system temperature for each output 
 *     spectrum.
-*     - FITS keywords EXP_TIME and TSYS are added to the output FITS
+*     - FITS keywords EXP_TIME and MEDTSYS are added to the output FITS
 *     extension. The EXP_TIME keyword holds the median value of the
 *     EXP_TIME array (stored in the SMURF extension of the output NDF).
-*     The TSYS keyword holds the median value of the TSYS array (stored in 
+*     The MEDTSYS keyword holds the median value of the TSYS array (stored in 
 *     the SMURF extension of the output NDF).
 
 *  Authors:
@@ -1133,7 +1133,7 @@ L999:;
 /* Store the median system temperature as keyword TSYS in the FitsChan. */
       kpg1Medur( 1, nxy, tsys_array, &medtsys, &neluse, status );
       if( medtsys != VAL__BADR && medtsys > 0.0 ) {
-         astSetFitsF( fchan, "TSYS", (double) medtsys, 
+         astSetFitsF( fchan, "MEDTSYS", (double) medtsys, 
                       "[K] Median MAKECUBE system temperature", 1 );
       }
 
