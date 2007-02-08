@@ -7,13 +7,30 @@ foreach dir (aif ctg fts ira irq kpg lpg)
    cd $dir
 
 # Get a basic list of files. For IRQ and IRA, only document IRQ_ and IRA_
-# routines (not IRQ1_ or IRA1_).
+# routines (not IRQ1_ or IRA1_). C files are only included if they are
+# designed to be called from Fortran (as indicated by the presence of the
+# string "F77_" somewhere int he file).
    rm -f temp-files >& /dev/null
    touch temp-files
 
    if( $dir != "irq" && $dir != "ira" ) then 
       foreach file (*.f *.g* *.c)
-         echo $file >> temp-files
+         if( $file != "kaplibs.c" && $file != "kaplibs_adam.c" ) then
+
+            set ok = 1
+            grep -q "^#include " $file
+            if( $status == 0 ) then
+               grep -q "F77_" $file
+               if( $status == 1 ) then
+                  set ok = 0
+               endif
+            endif
+            
+            if( $ok == 1 ) then
+               echo $file >> temp-files
+            endif
+
+         endif
       end
 
    else

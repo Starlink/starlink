@@ -48,7 +48,7 @@ void kpg1Kymp1( Grp *igrp, AstKeyMap **keymap, int *status ){
 *     values "2" and "2.0". The value associated with the "method" entry 
 *     will be the primitive value "gaussclumps".
 
-*  Parameters
+*  Arguments:
 *     igrp
 *        A GRP identifier for the group of text strings to be analysed.
 *     keymap

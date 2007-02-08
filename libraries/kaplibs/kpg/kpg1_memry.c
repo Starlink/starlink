@@ -24,11 +24,17 @@ F77_SUBROUTINE(kpg1_memry)( INTEGER(MEM), INTEGER(STATUS) ){
 *  Purpose:
 *     Return memory currently being used by the current process.
 
+*  Language:
+*     C
+
+*  Invocation:
+*     CALL KPG1_MEMRY( MEM, STATUS )
+
 *  Description:
 *     This subroutine returns the maximum resident set size for the
-*     current proces.
+*     current process.
 
-*  Parameters:
+*  Arguments:
 *     MEM = INTEGER (Returned)
 *        The memory currently being used by the current process, in
 *        KB.
@@ -100,7 +106,7 @@ static void Error( const char *text, int *STATUS ) {
 *     The supplied text is used as the text of the error message.
 *     A blank parameter name is used.
 
-*  Parameters:
+*  Arguments:
 *     text
 *        The error message text. Only the first 80 characters are used.
 *     STATUS

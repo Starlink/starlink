@@ -33610,40 +33610,6 @@ from one graphical element to another.
    }
 }
 \sstroutine{
-   kaplibs\_adam.c
-}{
-   Implement the C interface to the ADAM functions in KAPLIBS library
-}{
-   \sstdescription{
-      This module implements C-callable wrappers for the public ADAM
-      routines in the KAPLIBS library. The interface to these wrappers
-      is defined in kaplibs.h.
-   }
-\sstroutine{
-   kaplibs.c
-}{
-   Implement the C interface to the standalone routines in the KAPLIBS
-   library
-}{
-   \sstdescription{
-      This module implements C-callable wrappers for the public non-ADAM
-      routines in the KAPLIBS library. The interface to these wrappers
-      is defined in kaplibs.h.
-   }
-\sstroutine{
-   kpg1Kygp1
-}{
-   Create a GRP group holding keyword/value pairs read from an AST KeyMap
-}{
-   \sstdescription{
-      This function is the inverse of kpg1Kymp1. It extracts the values
-      from the supplied AST KeyMap and creates a set of {\tt "}name=value{\tt "} strings
-      which it appends to a supplied group (or creates a new group). If
-      the KeyMap contains nested KeyMaps, then the {\tt "}name{\tt "} associated with
-      each primitive value stored in the returned group is a hierarchical
-      list of component names separated by dots.
-   }
-\sstroutine{
    KPG1\_KYGRP
 }{
    Create an GRP group holding keyword/value pairs read from an AST
@@ -33757,158 +33723,29 @@ from one graphical element to another.
    }
 }
 \sstroutine{
-   kpg1Kymp1
-}{
-   Create an AST KeyMap holding keyword/value pairs read from a GRP
-   group
-}{
-   \sstdescription{
-      This function checks each non-comment, non-blank line in the supplied
-      GRP group. An error is reported if any such lines do not have the
-      form {\tt "}keyword = value{\tt "}, where the keyword name can be a hierarchical
-      list of component names separated by dots. The returned KeyMap has
-      an entry for each component name found at the start of any keyword
-      name. The value associated with the entry will either be a
-      primitive value (if the keyword name contained no other components)
-      or another KeyMap (if the keyword name contained other components).
-
-      For example, consider a group containing the following lines:
-
-      gaussclumps.epsilon = 0.001
-      gaussclumps.contrast = 2.3
-      clumpfind.naxis = 2
-      clumpfind.deltat = 2.0
-      method = gaussclumps
-
-      The returned KeyMap will contain 3 entries with keys {\tt "}gaussclumps{\tt "},
-      {\tt "}clumpfind{\tt "} and {\tt "}method{\tt "}. The value associated with the {\tt "}gaussclumps{\tt "}
-      entry will be another KeyMap containing keys {\tt "}epsilon{\tt "} and {\tt "}contrast{\tt "},
-      which will have primitive values {\tt "}0.001{\tt "} and {\tt "}2.3{\tt "}. The value
-      associated with the {\tt "}clumpfind{\tt "} entry will be another KeyMap
-      containing keys {\tt "}naxis{\tt "} and {\tt "}deltat{\tt "}, which will have primitive
-      values {\tt "}2{\tt "} and {\tt "}2.0{\tt "}. The value associated with the {\tt "}method{\tt "} entry
-      will be the primitive value {\tt "}gaussclumps{\tt "}.
-   }
-\sstroutine{
-   kpg1Kymp2
-}{
-   Parse a {\tt "}keyword = value{\tt "} string for kpg1Kymp1 and add to a KeyMap
-}{
-   \sstdescription{
-      This is a service function for kps1Kymp1. It parses the supplied
-      {\tt "}keyword = value{\tt "} string into a keyword and value. It then parses the
-      keyword into a list of dot-separated component names. It then adds
-      the value into the supplied KeyMap at the correct point.
-   }
-\sstroutine{
    kpg1\_memry
 }{
    Return memory currently being used by the current process
 }{
    \sstdescription{
       This subroutine returns the maximum resident set size for the
-      current proces.
-   }
-\sstroutine{
-   kpgGtfts
-}{
-   Obtain FITS header information from an NDF
-}{
-   \sstdescription{
-      The routine reads the FITS extension from an NDF and returns an
-      AST pointer to a FitsChan which contains this information. The
-      information may then be accessed using routines from the AST
-      library (SUN/211).
+      current process.
    }
    \sstinvocation{
-      CALL KPG\_GTFTS( INDF, FCHAN, STATUS )
-      kpgGtfts( int indf, AstFitsChan $*$$*$ fchan, int $*$ status );
+      CALL KPG1\_MEMRY( MEM, STATUS )
    }
    \sstarguments{
       \sstsubsection{
-         indf = int (Given)
+         MEM = INTEGER (Returned)
       }{
-         NDF identifier.
+         The memory currently being used by the current process, in
+         KB.
       }
       \sstsubsection{
-         fchan = AstFitsChan $*$$*$ (Returned)
+         STATUS = INTEGER (Given and Returned)
       }{
-         An AST pointer to a FitsChan which contains information about
-         the FITS headers associated with the NDF.
+         The inherited global status.
       }
-      \sstsubsection{
-         status = int $*$ (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         It is the caller{\tt '}s responsibility to annul the AST pointer
-         issued by this routine (e.g. by calling AST\_ANNUL) when it is no
-         longer required.
-
-         \sstitem
-         If this routine is called with STATUS set, then a value of
-         AST\_\_NULL will be returned for the FCHAN argument, although no
-         further processing will occur. The same value will also be
-         returned if the routine should fail for any reason.
-
-         \sstitem
-         Status is set to KPG\_\_NOFTS if no FITS extension is found.
-      }
-   }
-   \sstdiytopic{
-      Return Value
-   }{
-      Returns the status.
-   }
-}
-\sstroutine{
-   kpgPtfts
-}{
-   Store FITS header information into an NDF
-}{
-   \sstdescription{
-      The routine stores the contents of an AST FitsChan into an
-      NDF by creating (or replacing) the FITS extension in the NDF.
-   }
-   \sstinvocation{
-      CALL KPG\_PTFTS( INDF, FCHAN, STATUS )
-      kpgPtfts( int indf, AstFitsChan $*$ fchan, int $*$ status );
-   }
-   \sstarguments{
-      \sstsubsection{
-         indf = int (Given)
-      }{
-         Identifier of NDF to receive the .FITS extension.
-      }
-      \sstsubsection{
-         fchan = const AstFitsChan $*$ (Given)
-      }{
-         An AST pointer to a FitsChan which contains information about
-         the FITS header to be associated with the NDF.
-      }
-      \sstsubsection{
-         status = int $*$ (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         If a .MORE.FITS extension already exists it will be completely
-         replaced by this routine.
-      }
-   }
-   \sstdiytopic{
-      Return Value
-   }{
-      Returns the status.
    }
 }
 \sstroutine{

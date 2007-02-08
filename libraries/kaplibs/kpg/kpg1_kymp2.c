@@ -30,7 +30,7 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
 *     keyword into a list of dot-separated component names. It then adds
 *     the value into the supplied KeyMap at the correct point.
 
-*  Parameters
+*  Arguments:
 *     string
 *        The null-terminated "keyword=value" string to be parsed.
 *     keymap

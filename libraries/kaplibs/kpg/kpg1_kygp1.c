@@ -31,7 +31,7 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
 *     each primitive value stored in the returned group is a hierarchical 
 *     list of component names separated by dots.
 
-*  Parameters
+*  Arguments:
 *     keymap
 *        A pointer to the KeyMap. Numerical entries which have bad values
 *        (VAL__BADI for integer entries or VAL__BADD for floating point
