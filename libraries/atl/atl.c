@@ -218,7 +218,9 @@ F77_SUBROUTINE(atl_ptftr)( INTEGER(THIS),
                            CHARACTER(NAME),
                            REAL(VALUE),
                            CHARACTER(COMMNT),
-                           INTEGER(STATUS) );
+                           INTEGER(STATUS) 
+                           TRAIL(NAME)
+                           TRAIL(COMMNT) );
 
 void atlPtftr( AstFitsChan *this, const char *name, float value, 
                const char *comment, int *status ){
@@ -246,7 +248,9 @@ void atlPtftr( AstFitsChan *this, const char *name, float value,
                         CHARACTER_ARG(NAME),
                         REAL_ARG(&VALUE),
                         CHARACTER_ARG(COMMNT),
-                        INTEGER_ARG(&STATUS) );
+                        INTEGER_ARG(&STATUS)
+                        TRAIL_ARG(NAME)
+                        TRAIL_ARG(COMMNT) );
 
    F77_FREE_CHARACTER( NAME );
    F77_FREE_CHARACTER( COMMNT );
