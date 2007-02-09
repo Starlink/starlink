@@ -289,9 +289,46 @@ itcl::class gaia::GaiaSpecWriter {
                      $specaccessor fitswrite TRX $trx "Receiver temp"
                   }
 
+                  #  The exposure time is ACS_EXPOSURE(==ton)+
+                  #  ACS_OFFEXPOSURE(==toff).
+                  set ton [$cubeaccessor getdoubleproperty JCMTSTATE \
+                              "ACS_EXPOSURE\($p2\)"]
+                  set toff [$cubeaccessor getdoubleproperty JCMTSTATE \
+                               "ACS_OFFEXPOSURE\($p2\)"]
+                  if { $ton != "BAD" && $toff != "BAD" } {
+                     set exptime [format "%.4f" [expr $ton+$toff]]
+                     $specaccessor fitswrite EXTIME $exptime "Exposure time"
+                  }
+
                   #  Attempt to determine the pointing information.
                   set rawacsis [add_acsis_coords_ \
                                    $cubeaccessor $specaccessor $p1 $p2]
+               }
+            }
+
+            #  Not a timeseries cube could be a SMURF/ACSIS cube. In
+            #  that case we can get the exposure time, plus the TSYS.
+            #  XXX tighten up the signature.
+            if { ! $rawacsis && [$cubeaccessor extensionexists "SMURF"] } {
+
+               #  Must be extracting spectra. These are axis 3. The image
+               #  positions index the TSYS and EXP_TIME arrays.
+               lassign [$cubeaccessor getlastspectruminfo] \
+                  type axis alow ahigh p1 p2
+               if { $axis == 3 } {
+                  set tsys [$cubeaccessor getdoubleproperty SMURF \
+                               "TSYS.DATA_ARRAY.DATA\($p1,$p2\)"]
+                  if { $tsys != "BAD" } {
+                     set tsys [format "%.4f" $tsys]
+                     $specaccessor fitswrite TSYS $tsys "Median system temp"
+                  }
+
+                  set exptime [$cubeaccessor getdoubleproperty SMURF \
+                                  "EXP_TIME.DATA_ARRAY.DATA\($p1,$p2\)"]
+                  if { $exptime != "BAD" } {
+                     set exptime [format "%.4f" $exptime]
+                     $specaccessor fitswrite EXTIME $exptime "Exposure time"
+                  }
                }
             }
 
@@ -406,7 +443,7 @@ itcl::class gaia::GaiaSpecWriter {
       set dateobs {}
       set system {}
       set equinox {}
-      
+
       #  Receptor system, either AZEL or TRACKING.
       set rsys [$cubeaccessor getproperty ACSIS "RECEPPOS_SYS"]
       if { $rsys != {} } {
@@ -480,7 +517,7 @@ itcl::class gaia::GaiaSpecWriter {
 
                   #  If the source position is GAPPT then need to convert
                   #  the receptor position to GAPPT to get the offset.
-                  #  We do not calculate a source position for GAPPT as 
+                  #  We do not calculate a source position for GAPPT as
                   #  it is moving.
                   if { $tcssys == "GAPPT" } {
                      set toframe [gaiautils::astcopy $skyframe]
@@ -512,7 +549,7 @@ itcl::class gaia::GaiaSpecWriter {
                      set rdec [gaiautils::astformat $wcs 2 $ry]
 
                      if {$sx != "BAD" && $sy != "BAD" && $tcssys != "GAPPT"} {
-                        
+
                         #  Source position. When rsys is AZEL the TCS system
                         #  may differ, so we need to transform from tcssys to
                         #  FK5 also. Note done when in GAPPT, source is moving.
