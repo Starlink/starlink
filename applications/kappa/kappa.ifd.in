@@ -16606,6 +16606,14 @@ iraf! {
             helpkey *
           }
 
+         parameter lbound {
+            size *
+            type _INTEGER
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
          parameter maxpix {
             type _INTEGER
             access READ
@@ -16661,6 +16669,14 @@ iraf! {
             access READ
             ppath DYNAMIC
             prompt {Upper pixel index bounds for output image}
+            helpkey *
+          }
+
+         parameter ubound {
+            size *
+            type _INTEGER
+            access WRITE
+            vpath INTERNAL
             helpkey *
           }
 

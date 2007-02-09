@@ -124,6 +124,10 @@
 *        axis for the output NDF.  The suggested default values just
 *        encompass all the input data.  A null value (!) also results in
 *        these same defaults being used.  [!]
+*     LBOUND() = _INTEGER (Write)
+*        The lower pixel bounds of the output NDF. Note, values will be
+*        written to this output parameter even if a null value is supplied 
+*        for parameter OUT.
 *     MAXPIX = _INTEGER (Read)
 *        A value which specifies an initial scale size in pixels for the
 *        adaptive algorithm which approximates non-linear Mappings with
@@ -195,7 +199,12 @@
 *        the output variances, you are generally safer using
 *        nearest-neighbour interpolation.  [current value]
 *     OUT = NDF (Write)
-*        The output NDF.
+*        The output NDF. If a null (!) value is supplied, the application
+*        will terminate early without creating an output cube, but
+*        without reporting an error. Note, the pixel bounds which the
+*        output cube would have had will still be written to output 
+*        parameters LBOUND and UBOUND, even if a null value is supplied
+*        for OUT.
 *     PARAMS( 2 ) = _DOUBLE (Read)
 *        An optional array which consists of additional parameters
 *        required by the Sinc, SincSinc, SincCos, SincGauss, Somb,
@@ -228,6 +237,10 @@
 *        axis for the output NDF.  The suggested default values just
 *        encompass all the input data.  A null value (!) also results in
 *        these same defaults being used.  [!]
+*     UBOUND() = _INTEGER (Write)
+*        The upper pixel bounds of the output NDF. Note, values will be
+*        written to this output parameter even if a null value is supplied 
+*        for parameter OUT.
 *     WLIM = _REAL (Read)
 *        This parameter specifies the minimum number of good pixels
 *        that must contribute to an output pixel for the output pixel
@@ -296,6 +309,8 @@
 *     8-JAN-2007 (DSB):
 *        Modified the prologue to clarify the need for an inverse
 *        WCS transformation in the reference NDF.
+*     8-FEB-2007 (DSB):
+*        Added parameters LBOUND and UBOUND.
 *     {enter_further_changes_here}
 
 *-
@@ -425,6 +440,10 @@
          END DO
       END IF
 
+*  Write the output pixel bounds to output parameters LBOUND and UBOUND.
+      CALL PAR_PUT1I( 'LBOUND', NDIM, LBND, STATUS );
+      CALL PAR_PUT1I( 'UBOUND', NDIM, UBND, STATUS );
+
 *  Get the pixel spreading method to be used.
       CALL PAR_CHOIC( 'METHOD', 'SincSinc', 'Nearest,Bilinear,'//
      :                'Sinc,Gauss,SincSinc,SincCos,SincGauss,'//
@@ -518,11 +537,20 @@
       CALL PAR_GET0L( 'GENVAR', GENVAR, STATUS )
       IF( GENVAR ) USEVAR = .FALSE.
 
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Create the output NDF by propagation from the reference NDF.  The
 *  default components HISTORY, TITLE, LABEL and all extensions are
 *  propagated, together with the UNITS and WCS component.  The NDF is
 *  initially created with the same bounds as the reference NDF.
       CALL NDF_PROP( INDFR, 'WCS,UNITS', 'OUT', INDF2, STATUS )
+
+*  If a null value was supplied for OUT, annul the error and abort.
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         GO TO 999
+      END IF
 
 *  Change the bounds of the output NDF to the required values.
       CALL NDF_SBND( NDIM, LBND, UBND, INDF2, STATUS )
