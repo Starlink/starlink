@@ -74,6 +74,8 @@
 *        Original version.
 *     14-DEC-2001: (DSB):
 *        Regenerated generic source.      
+*     9-FEB-2007: (DSB):
+*        Handles cases where all inpout values are bad.
 *     {enter_changes_here}
  
 *  Bugs:
@@ -162,59 +164,68 @@
 *  Compute the median position, or the next element above for an even
 *  number of elements.
          MEDPOS = NELUSE / 2 + 1
- 
+
 *  Sort the array.
 *  ===============
+
+*  If no usable values were found, return a bad median value.
+         IF( NELUSE .EQ. 0 ) THEN
+            MEDIAN = VAL__BAD<T>
+
+*  Otherwise, find the median value.
+         ELSE
  
 *  Initialise the index to the array element for the comparison.
-         TEST = 1
-         ELEM = 0
+           TEST = 1
+           ELEM = 0
  
 *  We can terminate the sort once the position includes the median
 *  position.
-         DO WHILE ( ELEM .LT. MEDPOS )
+           DO WHILE ( ELEM .LT. MEDPOS )
  
 *  Initialise index to the current element and the current value.
-            CURR   = TEST
-            CURVAL = ARRAY( TEST )
+               CURR   = TEST
+               CURVAL = ARRAY( TEST )
  
 *  Compare all array elements after the test element against the
 *  current value.
-            DO INDEX = TEST + 1, NELUSE
-               IF ( ARRAY( INDEX ) .LT. CURVAL ) THEN
+               DO INDEX = TEST + 1, NELUSE
+                  IF ( ARRAY( INDEX ) .LT. CURVAL ) THEN
  
 *  We have found a value in the vector which is less than the current
 *  smallest value, this element becomes new current element.
-                  CURR   = INDEX
-                  CURVAL = ARRAY( INDEX )
-               END IF
-            END DO
- 
-            IF ( CURR .NE. TEST ) THEN
- 
+                     CURR   = INDEX
+                     CURVAL = ARRAY( INDEX )
+                  END IF
+               END DO
+    
+               IF ( CURR .NE. TEST ) THEN
+    
 *  A smaller value than the test value was found so swap the values.
-               ARRAY( CURR ) = ARRAY( TEST )
-               ARRAY( TEST )  = CURVAL
-            END IF
- 
+                  ARRAY( CURR ) = ARRAY( TEST )
+                  ARRAY( TEST )  = CURVAL
+               END IF
+    
 *  Increment the sort-position index.
-            ELEM = ELEM + 1
- 
+               ELEM = ELEM + 1
+    
 *  Increment index to test element
-            TEST = TEST + 1
-         END DO
- 
+               TEST = TEST + 1
+            END DO
+    
 *  Set up the median value.  For even numbers take the mean of the
 *  two values either side.  To avoid bias and overflows for integers,
 *  convert to double precision to evaluate the average.
-         IF ( MOD( NELUSE, 2 ) .EQ. 0 ) THEN
-            MEDIAN = NUM_DTO<T>( ( NUM_<T>TOD( ARRAY( TEST - 1 ) ) +
-     :               NUM_<T>TOD( ARRAY( TEST -2 ) ) ) * 0.5D0 )
-         ELSE
-            MEDIAN = ARRAY( TEST - 1 )
-         END IF
- 
+            IF ( MOD( NELUSE, 2 ) .EQ. 0 ) THEN
+               MEDIAN = NUM_DTO<T>( ( NUM_<T>TOD( ARRAY( TEST - 1 ) ) +
+     :                  NUM_<T>TOD( ARRAY( TEST -2 ) ) ) * 0.5D0 )
+            ELSE
+               MEDIAN = ARRAY( TEST - 1 )
+            END IF
+    
 *  End of condition for number in sample and median position
+         END IF
+
       END IF
  
       END
