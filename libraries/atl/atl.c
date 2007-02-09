@@ -214,4 +214,46 @@ void atlMgfts( int method, AstFitsChan *fc1, AstFitsChan *fc2,
 }
 
 
+F77_SUBROUTINE(atl_ptftr)( INTEGER(THIS),
+                           CHARACTER(NAME),
+                           REAL(VALUE),
+                           CHARACTER(COMMNT),
+                           INTEGER(STATUS) );
+
+void atlPtftr( AstFitsChan *this, const char *name, float value, 
+               const char *comment, int *status ){
+   DECLARE_INTEGER(THIS);
+   DECLARE_CHARACTER_DYN(NAME);  
+   DECLARE_REAL(VALUE);
+   DECLARE_CHARACTER_DYN(COMMNT);  
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_INTEGER( astP2I( this ), THIS );
+
+   if( !astOK ) return;
+
+   F77_CREATE_CHARACTER( NAME, strlen( name ) );
+   F77_EXPORT_CHARACTER( name, NAME, NAME_length );
+
+   F77_EXPORT_REAL( value, VALUE );
+
+   F77_CREATE_CHARACTER( COMMNT, strlen( comment ) );
+   F77_EXPORT_CHARACTER( comment, COMMNT, COMMNT_length );
+
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(atl_ptftr)( INTEGER_ARG(&THIS),
+                        CHARACTER_ARG(NAME),
+                        REAL_ARG(&VALUE),
+                        CHARACTER_ARG(COMMNT),
+                        INTEGER_ARG(&STATUS) );
+
+   F77_FREE_CHARACTER( NAME );
+   F77_FREE_CHARACTER( COMMNT );
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
+
+
 

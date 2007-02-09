@@ -60,5 +60,6 @@ void atlAxtrm( AstFrameSet *, int *, int *, int *, double *, int * );
 void atlMklut( int, int, int, int, AstFrame *, double *, AstMapping **, int * );
 void atlPlroi( AstPlot *, AstKeyMap **, int * );
 void atlMgfts( int, AstFitsChan *, AstFitsChan *, AstFitsChan **, int * );
+void atlPtftr( AstFitsChan *, const char *, float, const char *, int * );
 
 #endif
