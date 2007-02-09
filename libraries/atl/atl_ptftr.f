@@ -28,7 +28,8 @@
 *        in which case the keyword to use is extracted from it. No more 
 *        than 80 characters are read from this string.
 *     VALUE = REAL (Given)
-*        The new keyword value.
+*        The new keyword value. If this is VAL__BADR, then an UNDEF value
+*        will be stored in ther FitsChan.
 *     COMMNT = CHARACTER * ( * ) (Given)
 *        A new comment for the keyword. If this is blank, any comment in
 *        the NAME string is used. If the NAME string contains no comment, 
@@ -81,6 +82,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
 
 *  Arguments Given:
       INTEGER THIS
@@ -93,6 +95,7 @@
 
 *  Local Variables:
       CHARACTER CARD*80
+      DOUBLE PRECISION DVAL
       LOGICAL FOUND
 *.
 
@@ -110,6 +113,11 @@
 
 *  Store the new keyword value, over-writing the current card (or
 *  appending to the end of the FitsChan if the FitsChan is at end-of-file.)
-      CALL AST_SETFITS( THIS, NAME, VALUE, COMMNT, .TRUE., STATUS )
+      IF( VALUE .NE. VAL__BADR ) THEN
+         DVAL = DBLE( VALUE )
+      ELSE
+         DVAL = AST__UNDEFF
+      END IF
+      CALL AST_SETFITF( THIS, NAME, DVAL, COMMNT, .TRUE., STATUS )
 
       END
