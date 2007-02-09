@@ -364,12 +364,14 @@
 *     contributed to each output spectrum. ON_TIME holds the sum of the "on" 
 *     times (Ton) for the input spectra that contributed to each output 
 *     spectrum. TSYS holds the effective system temperature for each output 
-*     spectrum.
+*     spectrum. The TSYS array is not created if GENVAR is "None".
 *     - FITS keywords EXP_TIME and MEDTSYS are added to the output FITS
 *     extension. The EXP_TIME keyword holds the median value of the
 *     EXP_TIME array (stored in the SMURF extension of the output NDF).
 *     The MEDTSYS keyword holds the median value of the TSYS array (stored in 
-*     the SMURF extension of the output NDF).
+*     the SMURF extension of the output NDF). IF either of these values
+*     cannot be calculated for any reason, the corresponding FITS keyword is
+*     assigned a blank value.
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -506,6 +508,7 @@ void smurf_makecube( int *status ) {
    AstFrame *ospecfrm = NULL; /* SpecFrame from the output WCS Frameset */
    AstFrame *tfrm = NULL;     /* Current Frame from output WCS */
    AstFrameSet *wcsout = NULL;/* WCS Frameset for output cube */
+   AstFrameSet *wcsout2d = NULL;/* WCS Frameset describing 2D spatial axes */
    AstMapping *oskymap = NULL;/* GRID->SkyFrame Mapping from output WCS */
    AstMapping *ospecmap = NULL;/* GRID->SpecFrame Mapping from output WCS */
    AstMapping *tmap = NULL;   /* Base->current Mapping from output WCS */
@@ -537,11 +540,14 @@ void smurf_makecube( int *status ) {
    float *tsys_array = NULL;  /* Pointer to array of tsys values */
    float *var_array = NULL;   /* Pointer to temporary variance array */
    float *var_out = NULL;     /* Pointer to the output variance array */
+   float *work2_array = NULL; /* Pointer to temporary work array */
    float medexp;              /* Median exposure time in output NDF. */
    float medtsys;             /* Median system temperature in output NDF. */
    float teff;                /* Effective integration time */
+   float texp;                /* Total expsoure time */
    float toff;                /* Off time */
    float ton;                 /* On time */
+   float var;                 /* Variance value */
    int *work1_array = NULL;   /* Pointer to temporary work array */
    int autogrid;              /* Determine projection parameters automatically? */
    int axes[ 2 ];             /* Indices of selected axes */
@@ -774,6 +780,11 @@ void smurf_makecube( int *status ) {
    astMapSplit( tmap, 1, axes, outax, &ospecmap );
    ospecfrm = astPickAxes( tfrm, 1, outax, NULL );
 
+/* Create a FrameSet describing 2D GRID to spatial sky coords. This wil
+   be used in the extra 2D images stored in the output SMURF extension. */
+   wcsout2d = astFrameSet( astFrame( 2, "Domain=GRID" ), "" );
+   astAddFrame( wcsout2d, AST__BASE, oskymap, oskyfrm );
+
 /* Invert the spectral Mapping (for the convenience of smf_rebincube), so that
    it goes from current Frame to output grid axis. */
    astInvert( ospecmap );
@@ -950,7 +961,8 @@ void smurf_makecube( int *status ) {
    the output NDF and create three 2D NDFs in the extension; one for the total 
    exposure time ("on+off"), one for the "on" time, and one for the Tsys 
    values. Each of these 2D NDFs inherits the spatial bounds of the main
-   output NDF. */
+   output NDF. Note, the Tsys array also needs variances to be calculated. 
+   Include spatial WCS in each NDF. */
    if( spread == AST__NEAREST ) {
       smurf_xloc = smf_get_xloc ( odata, "SMURF", "SMURF", "WRITE", 
                                   0, 0, status );
@@ -958,17 +970,29 @@ void smurf_makecube( int *status ) {
       smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "EXP_TIME", "NEW", 
                          "_REAL", 2, (int *) lbnd_out, 
                          (int *) ubnd_out, &expdata, status );
-      if( expdata ) exp_array = (expdata->pntr)[ 0 ];
+      if( expdata ) {
+         exp_array = (expdata->pntr)[ 0 ];
+         ndfPtwcs( wcsout2d, expdata->file->ndfid, status );
+      }
 
       smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "ON_TIME", "NEW", 
                          "_REAL", 2, (int *) lbnd_out, 
                          (int *) ubnd_out, &ondata, status );
-      if( ondata ) on_array = (ondata->pntr)[ 0 ];
+      if( ondata ) {
+         on_array = (ondata->pntr)[ 0 ];
+         ndfPtwcs( wcsout2d, ondata->file->ndfid, status );
+      }
 
-      smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "TSYS", "NEW", 
-                         "_REAL", 2, (int *) lbnd_out, 
-                         (int *) ubnd_out, &tsysdata, status );
-      if( tsysdata ) tsys_array = (tsysdata->pntr)[ 0 ];
+      if( genvar ) {
+         smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "TSYS", "NEW", 
+                            "_REAL", 2, (int *) lbnd_out, 
+                            (int *) ubnd_out, &tsysdata, status );
+         if( tsysdata ) {
+            tsys_array = (tsysdata->pntr)[ 0 ];
+            ndfPtwcs( wcsout2d, tsysdata->file->ndfid, status );
+         }
+
+      }
    }
 
 /* Invert the output sky mapping so that it goes from sky to pixel
@@ -1061,7 +1085,7 @@ void smurf_makecube( int *status ) {
                         wgt_array, work1_array, exp_array, on_array, &fcon,
                         status );
       } else {
-         smf_rebinsparse( data, ospecfrm, ospecmap, abskyfrm, detgrp, 
+         smf_rebinsparse( data, ifile, ospecfrm, ospecmap, abskyfrm, detgrp, 
                           lbnd_out, ubnd_out, genvar, data_array, var_array, 
                           &ispec, exp_array, on_array, &fcon,
                           status );
@@ -1108,10 +1132,14 @@ L999:;
       if( fcon != VAL__BADD ) {
          for( el0 = 0; el0 < nxy; el0++ ) {
             ton = on_array[ el0 ];
-            toff = exp_array[ el0 ] - ton;
-            if( ton > 0.0 && toff > 0.0 ) {
+            texp = exp_array[ el0 ];
+            var = var_array[ el0 ];
+            if( ton != VAL__BADR && ton > 0.0 && 
+                texp != VAL__BADR && texp > 0.0 &&
+                var != VAL__BADR && var > 0.0 ) {
+               toff = texp - ton;
                teff = 1.0/( 1.0/ton + 1.0/toff );
-               tsys_array[ el0 ] = sqrt( var_array[ el0 ]*teff/fcon );
+               tsys_array[ el0 ] = sqrt( var*teff/fcon );
             } else {
                tsys_array[ el0 ] = VAL__BADR;
             }
@@ -1123,28 +1151,31 @@ L999:;
          }
       }
 
-/* Store the median exposure time as keyword EXP_TIME in the FitsChan. */
-      kpg1Medur( 1, nxy, exp_array, &medexp, &neluse, status );
-      if( medexp != VAL__BADR && medexp > 0.0 ) {
-         astSetFitsF( fchan, "EXP_TIME", (double) medexp, 
-                      "[s] Median MAKECUBE exposure time", 1 );
-      }
+/* Free the memory used to store the 2D variance information and work
+   arrays. */
+      var_array = astFree( var_array );
+      work1_array = astFree( work1_array );
+
+/* Store the median exposure time as keyword EXP_TIME in the FitsChan.
+   Since kpg1Medur partially sorts the array, we need to take a copy of it
+   first. */
+      work2_array = astStore( NULL, exp_array, nxy*sizeof( float ) );
+      kpg1Medur( 1, nxy, work2_array, &medexp, &neluse, status );
+      atlPtftr( fchan, "EXP_TIME", medexp, 
+                "[s] Median MAKECUBE exposure time", status );
 
 /* Store the median system temperature as keyword TSYS in the FitsChan. */
-      kpg1Medur( 1, nxy, tsys_array, &medtsys, &neluse, status );
-      if( medtsys != VAL__BADR && medtsys > 0.0 ) {
-         astSetFitsF( fchan, "MEDTSYS", (double) medtsys, 
-                      "[K] Median MAKECUBE system temperature", 1 );
-      }
+      work2_array = astStore( work2_array, tsys_array, nxy*sizeof( float ) );
+      kpg1Medur( 1, nxy, work2_array, &medtsys, &neluse, status );
+      atlPtftr( fchan, "MEDTSYS", medtsys, 
+                "[K] Median MAKECUBE system temperature", status );
 
 /* If the FitsChan is not empty, store it in the FITS extension of the
    output NDF (any existing FITS extension is deleted). */
       if( astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );
 
-/* Free the memory used to store the 2D variance information and work
-   arrays. */
-      var_array = astFree( var_array );
-      work1_array = astFree( work1_array );
+/* Free the seoncd work array. */
+      work2_array = astFree( work2_array );
 
    }
 

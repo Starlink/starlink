@@ -167,6 +167,8 @@
 *        Added parameter "texp_array".
 *     8-FEB-2007 (DSB):
 *        Added parameter "ton_array" and "fcon".
+*     9-FEB-2007 (DSB):
+*        Check for bad tsys values in the input NDF.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -267,6 +269,7 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
    int ast_flags;              /* Flags to use with astRebinSeq */
    int dim[ 3 ];               /* Output array dimensions */
    int found;                  /* Was current detector name found in detgrp? */
+   int good_tsys;              /* Flag indicating some good Tsys values found */
    int ibasein;                /* Index of base Frame in input WCS FrameSet */
    int ichan;                  /* Index of current channel */
    int idet;                   /* detector index */
@@ -462,65 +465,75 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
       name += strlen( name ) + 1;
    }
 
-/* If output variances are being calculated on the basis of Tsys values
-   in the input, find the constant factor associated with the current input
-   file. This is the squared backend degradation factor, divided by the
-   noise bandwidth. */
-   fcon2 = VAL__BADD;
-   if( genvar == 2 ) {
-
-/* Get the required FITS headers, checking they were found. */
-      if( astGetFitsF( hdr->fitshdr, "BEDEGFAC", &k ) &&
-          astGetFitsS( hdr->fitshdr, "FFT_WIN", &fftwin ) ){
+/* find the constant factor associated with the current input file. This 
+   is the squared backend degradation factor, divided by the noise bandwidth. 
+   Get the required FITS headers, checking they were found. */
+   if( astGetFitsF( hdr->fitshdr, "BEDEGFAC", &k ) &&
+       astGetFitsS( hdr->fitshdr, "FFT_WIN", &fftwin ) ){
 
 /* Get a Mapping that converts values in the input spectral system to
    topocentric frequency in Hz, and concatenate this Mapping with the
    Mapping from input GRID coord to the input spectral system. The result 
    is a Mapping from input GRID coord to topocentric frequency in Hz. */
-         specframe2 = astCopy( specframe );
-         astSet( specframe2, "system=freq,stdofrest=topo,unit=Hz" );
-         fmap = astCmpMap( specmap, astGetMapping( astConvert( specframe, 
-                                                               specframe2, 
-                                                               "" ),
-                                                   AST__BASE, AST__CURRENT ),
-                           1, "" );
+      specframe2 = astCopy( specframe );
+      astSet( specframe2, "system=freq,stdofrest=topo,unit=Hz" );
+      fmap = astCmpMap( specmap, astGetMapping( astConvert( specframe, 
+                                                            specframe2, 
+                                                            "" ),
+                                                AST__BASE, AST__CURRENT ),
+                        1, "" );
 
 /* Differentiate this Mapping at the mid channel position to get the width
    of an input channel in Hz. */
-         at = 0.5*nchan;
-         dnew = astRate( fmap, &at, 1, 1 );
+      at = 0.5*nchan;
+      dnew = astRate( fmap, &at, 1, 1 );
 
 /* Modify the channel width to take account of the effect of the FFT windowing 
    function. Allow undef value because FFT_WIN for old data had a broken value 
    in hybrid subband modes. */
-         if( dnew != VAL__BADD ) {
-            dnew = fabs( dnew );
+      if( dnew != VAL__BADD ) {
+         dnew = fabs( dnew );
 
-            if( !strcmp( fftwin, "truncate" ) ) {
-               dnew *= 1.0;
+         if( !strcmp( fftwin, "truncate" ) ) {
+            dnew *= 1.0;
 
-            } else if( !strcmp( fftwin, "hanning" ) ) {
-               dnew *= 1.5;
+         } else if( !strcmp( fftwin, "hanning" ) ) {
+            dnew *= 1.5;
 
 	    } else if( !strcmp( fftwin, "<undefined>" ) ) {
 	      /* Deal with broken data - make an assumption */
- 	       dnew *= 1.0;
+	       dnew *= 1.0;
 
-            } else if( *status == SAI__OK ) {
-               *status = SAI__ERROR;
-               msgSetc( "W", fftwin );
-               errRep( FUNC_NAME, "FITS header FFT_WIN has unknown value "
-                       "'^W' (programming error).", status );
-            }
+         } else if( *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            msgSetc( "W", fftwin );
+            errRep( FUNC_NAME, "FITS header FFT_WIN has unknown value "
+                    "'^W' (programming error).", status );
+         }
 
 /* Form the required constant. */
-            fcon2 = k*k/dnew;  
-         }        
+         fcon2 = k*k/dnew;  
+
+      } else {
+         fcon2 = VAL__BADD;
       }
+
+   } else {
+      fcon2 = VAL__BADD;
+   }
+
+/* Return the factor needed for calculating Tsys from the variance. */
+   if( index == 1 ) {
+      *fcon = fcon2;
+   } else if( fcon2 != *fcon ) {
+      *fcon = VAL__BADD;
    }
 
 /* Store a pointer to the next input data value to use. */
    pdata = (data->pntr)[ 0 ];
+
+/* Indicate we have not yet found any good Tsys values in the input NDF. */
+   good_tsys = 0;
 
 /* Loop round all time slices in the input NDF. */
    for( itime = 0; itime < (data->dims)[ 2 ] && *status == SAI__OK; itime++ ) {
@@ -552,7 +565,7 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
    in the input, find the constant factor associated with the current
    time slice. */
       tcon = VAL__BADD;
-      if( fcon2 != VAL__BADD && texp != VAL__BADR ) {
+      if( genvar == 2 && fcon2 != VAL__BADD && texp != VAL__BADR ) {
          tcon = fcon2*( 1.0/ton + 1.0/toff );
 
 /* Get a pointer to the start of the Tsys values for this time slice. */
@@ -647,20 +660,31 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
    
                if( ix >= 0 && ix < dim[ 0 ] && 
                    iy >= 0 && iy < dim[ 1 ] ) {
-   
+
+/* Update the update the total exposure time for the output spectrum. */
+                  iv0 = ix + dim[ 0 ]*iy;
+                  if( texp != VAL__BADR ) {
+                     texp_array[ iv0 ] += texp;
+                     ton_array[ iv0 ] += ton;
+                  }
+
 /* Calculate the weight to associate with the current input spectrum. This 
    is either 1.0, or the reciprocal of the input variance, based on the 
    input Tsys values. */
                   if( tcon == VAL__BADD ) {
                      wgt = 1.0;
 
-                  } else {
+                  } else if( tsys[ idet ] != VAL__BADR ) {
+                     good_tsys = 1;
                      wgt = tcon*tsys[ idet ]*tsys[ idet ];
                      if( wgt > 0.0 ) {
                         wgt = 1.0/wgt;
                      } else {
                         wgt = VAL__BADD;
                      }
+
+                  } else {
+                     wgt = VAL__BADD;
                   } 
 
 /* Skip to the next detector if no weight could be calculated for this
@@ -670,14 +694,7 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
 /* Update the total weight associated with the appropriate output spectrum. 
    The weight is the same for all channels in the output spectrum, and so 
    the weights array need only be a single 2D slice. */
-                     iv0 = ix + dim[ 0 ]*iy;
                      wgt_array[ iv0 ] += wgt;
-
-/* Likewise update the total exposure time for the output spectrum. */
-                     if( texp != VAL__BADR ) {
-                        texp_array[ iv0 ] += texp;
-                        ton_array[ iv0 ] += ton;
-                     }
 
 /* Loop round every channel, updating the output data array. */
                      for( ichan = 0; ichan < nchan; ichan++, pdata++ ) {
@@ -860,10 +877,9 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
             }
          }
 
-/* Now set the exp_array values bad for output spectra that do not
-   contain any data. Loop over every spectrum in the output cube. */
+/* Now convert zero texp_array and ton_array values to bad values. */
          for( iv0 = 0; iv0 < nxy; iv0++ ) {
-            if( wgt_array[ iv0 ] <= 0.0 ) {
+            if( texp_array[ iv0 ] <= 0.0 ) {
                texp_array[ iv0 ] = VAL__BADR;
                ton_array[ iv0 ] = VAL__BADR;
             }
@@ -935,11 +951,14 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
    if( detwork ) detwork = astFree( detwork );
    if( varwork ) varwork = astFree( varwork );
 
-/* Return the factor needed for calculating Tsys from the variance. */
-   if( index == 1 ) {
-      *fcon = fcon2;
-   } else if( fcon2 != *fcon ) {
-      *fcon = VAL__BADD;
+/* Issue a warning if Tsys values were being used but no good Tsys values
+   were found in the input NDF. */
+   if( !use_ast && genvar == 2 && !good_tsys ) {
+      msgSetc( "FILE", data->file->name );
+      msgOutif( MSG__NORM, " ", "   Warning: ^FILE contains no good "
+                "Tsys values and will be ignored (since GENVAR=TSYS).", 
+                status );
+      msgBlank( status );
    }
 
 /* End the AST context. This will annul all the AST objects created

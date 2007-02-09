@@ -504,7 +504,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                        int usedetpos, Grp *detgrp, int lbnd[ 3 ], int ubnd[ 3 ],
                        AstFrameSet **wcsout, int *status );
 
-void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap, 
+void smf_rebinsparse( smfData *data, int ifile, AstFrame *ospecfrm, AstMapping *ospecmap, 
                       AstSkyFrame *oskyframe, Grp *detgrp, int lbnd_out[ 3 ], 
                       int ubnd_out[ 3 ], int genvar, float *data_array, 
                       float *var_array, int *ispec, float *texp_array, 

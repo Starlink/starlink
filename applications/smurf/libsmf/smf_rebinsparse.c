@@ -13,15 +13,18 @@
 *     C function
 
 *  Invocation:
-*     smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap,
-*                      AstSkyFrame *oskyframe, Grp *detgrp, int lbnd_out[ 3 ], 
-*                      int ubnd_out[ 3 ], int genvar, float *data_array,
-*                      float *var_array, int *ispec, float *texp_array, 
-*                      float *ton_array, double *fcon, int *status );
+*     smf_rebinsparse( smfData *data, int index, AstFrame *ospecfrm, 
+*                      AstMapping *ospecmap, AstSkyFrame *oskyframe, 
+*                      Grp *detgrp, int lbnd_out[ 3 ], int ubnd_out[ 3 ], 
+*                      int genvar, float *data_array, float *var_array, 
+*                      int *ispec, float *texp_array, float *ton_array, 
+*                      double *fcon, int *status );
 
 *  Arguments:
 *     data = smfData * (Given)
 *        Pointer to the input smfData structure.
+*     index = int (Given)
+*        Index of the current input file within the group of input files.
 *     ospecfrm = AstFrame * (Given)
 *        Pointer to the SpecFrame within the current Frame of the output WCS 
 *        Frameset.
@@ -98,6 +101,8 @@
 *        Added parameter "texp_array".
 *     8-FEB-2007 (DSB):
 *        Added parameter "ton_array" and "fcon".
+*     9-FEB-2007 (DSB):
+*        Check for bad tsys values in the input NDF.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -143,11 +148,12 @@
 /* Returns nearest integer to "x" */
 #define NINT(x) ( ( x > 0 ) ? (int)( x + 0.5 ) : (int)( x - 0.5 ) )
 
-void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap, 
-                      AstSkyFrame *oskyframe, Grp *detgrp, int lbnd_out[ 3 ], 
-                      int ubnd_out[ 3 ], int genvar, float *data_array, 
-                      float *var_array, int *ispec, float *texp_array, 
-                      float *ton_array, double *fcon, int *status ){
+void smf_rebinsparse( smfData *data, int index, AstFrame *ospecfrm, 
+                      AstMapping *ospecmap, AstSkyFrame *oskyframe, 
+                      Grp *detgrp, int lbnd_out[ 3 ], int ubnd_out[ 3 ], 
+                      int genvar, float *data_array, float *var_array, 
+                      int *ispec, float *texp_array, float *ton_array, 
+                      double *fcon, int *status ){
 
 /* Local Variables */
    AstCmpMap *fmap = NULL;      /* Mapping from spectral grid to topo freq Hz */
@@ -181,6 +187,7 @@ void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap,
    int dim[ 3 ];         /* Output array dimensions */
    int found;            /* Was current detector name found in detgrp? */
    int good;             /* Are there any good detector samples? */
+   int good_tsys;        /* Flag indicating some good Tsys values found */
    int ibasein;          /* Index of base Frame in input FrameSet */
    int ichan;            /* Index of current channel */
    int irec;             /* Index of current input detector */
@@ -315,66 +322,76 @@ void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap,
       name += strlen( name ) + 1;
    }
 
-/* If output variances are being calculated on the basis of Tsys values
-   in the input, find the constant factor associated with the current input
-   file. This is the squared backend degradation factor, divided by the
-   noise bandwidth. */
-   fcon2 = AST__BAD;
-   if( genvar == 2 ) {
-
-/* Get the required FITS headers, checking they were found. */
-      if( astGetFitsF( hdr->fitshdr, "BEDEGFAC", &k ) &&
-          astGetFitsS( hdr->fitshdr, "FFT_WIN", &fftwin ) ){
+/* Find the constant factor associated with the current input file. This 
+   is the squared backend degradation factor, divided by the noise bandwidth.
+   Get the required FITS headers, checking they were found. */
+   if( astGetFitsF( hdr->fitshdr, "BEDEGFAC", &k ) &&
+       astGetFitsS( hdr->fitshdr, "FFT_WIN", &fftwin ) ){
 
 /* Get a Mapping that converts values in the input spectral system to
    topocentric frequency in Hz, and concatenate this Mapping with the
    Mapping from input GRID coord to the input spectral system. The result 
    is a Mapping from input GRID coord to topocentric frequency in Hz. */
-         specframe2 = astCopy( specframe );
-         astSet( specframe2, "system=freq,stdofrest=topo,unit=Hz" );
-         fmap = astCmpMap( specmap, astGetMapping( astConvert( specframe, 
-                                                               specframe2, 
-                                                               "" ),
-                                                   AST__BASE, AST__CURRENT ),
-                           1, "" );
+      specframe2 = astCopy( specframe );
+      astSet( specframe2, "system=freq,stdofrest=topo,unit=Hz" );
+      fmap = astCmpMap( specmap, astGetMapping( astConvert( specframe, 
+                                                            specframe2, 
+                                                            "" ),
+                                                AST__BASE, AST__CURRENT ),
+                        1, "" );
 
 /* Differentiate this Mapping at the mid channel position to get the width
    of an input channel in Hz. */
-         at = 0.5*nchan;
-         dnew = astRate( fmap, &at, 1, 1 );
+      at = 0.5*nchan;
+      dnew = astRate( fmap, &at, 1, 1 );
 
 /* Modify the channel width to take account of the effect of the FFT windowing 
    function. Allow undef value because FFT_WIN for old data had a broken value 
    in hybrid subband modes. */
-         if( dnew != AST__BAD ) {
-            dnew = fabs( dnew );
+      if( dnew != AST__BAD ) {
+         dnew = fabs( dnew );
 
-            if( !strcmp( fftwin, "truncate" ) ) {
-               dnew *= 1.0;
+         if( !strcmp( fftwin, "truncate" ) ) {
+            dnew *= 1.0;
 
-            } else if( !strcmp( fftwin, "hanning" ) ) {
-               dnew *= 1.5;
+         } else if( !strcmp( fftwin, "hanning" ) ) {
+            dnew *= 1.5;
 
 	    } else if( !strcmp( fftwin, "<undefined>" ) ) {
 	      /* Deal with broken data - make an assumption */
- 	       dnew *= 1.0;
+	       dnew *= 1.0;
 
-            } else if( *status == SAI__OK ) {
-               *status = SAI__ERROR;
-               msgSetc( "W", fftwin );
-               errRep( FUNC_NAME, "FITS header FFT_WIN has unknown value "
-                       "'^W' (programming error).", status );
-            }
+         } else if( *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            msgSetc( "W", fftwin );
+            errRep( FUNC_NAME, "FITS header FFT_WIN has unknown value "
+                    "'^W' (programming error).", status );
+         }
 
 /* Form the required constant. */
-            fcon2 = k*k/dnew;  
-         }        
+         fcon2 = k*k/dnew;  
+
+      } else {
+         fcon2 = VAL__BADD;
       }
+ 
+   } else {
+      fcon2 = VAL__BADD;
+   }
+
+/* Return the factor needed for calculating Tsys from the variance. */
+   if( index == 1 ) {
+      *fcon = fcon2;
+   } else if( fcon2 != *fcon ) {
+      *fcon = VAL__BADD;
    }
 
 /* Store a pointer to the next input data value */
    pdata = ( data->pntr )[ 0 ];
 
+/* Indicate we have not yet found any good Tsys values in the input NDF. */
+   good_tsys = 0;
+ 
 /* Loop round all the time slices in the input file. */
    for( itime = 0; itime < (data->dims)[ 2 ] && *status == SAI__OK; itime++ ) {
 
@@ -405,7 +422,7 @@ void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap,
    in the input, find the constant factor associated with the current
    time slice. */
       tcon = AST__BAD;
-      if( fcon2 != AST__BAD && texp != VAL__BADR ) {
+      if( genvar == 2 && fcon2 != AST__BAD && texp != VAL__BADR ) {
          tcon = fcon2*( 1.0/ton + 1.0/toff );
 
 /* Get a pointer to the start of the Tsys values for this time slice. */
@@ -455,7 +472,9 @@ void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap,
             if( good ) {
                if( *ispec < dim[ 0 ] ){
 
-                  if( tcon != AST__BAD && genvar == 2 ) {
+                  if( tcon != AST__BAD && genvar == 2 && 
+                      tsys[ irec ] != VAL__BADR ) {
+                     good_tsys = 1;
                      var_array[ *ispec ] = tcon*tsys[ irec ]*tsys[ irec ];
                   } else if( var_array ) {
                      var_array[ *ispec ] = VAL__BADR;
@@ -509,11 +528,14 @@ void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap,
    xout = astFree( xout );
    yout = astFree( yout );
 
-/* Return the factor needed for calculating Tsys from the variance. */
-   if( index == 1 ) {
-      *fcon = fcon2;
-   } else if( fcon2 != *fcon ) {
-      *fcon = VAL__BADD;
+/* Issue a warning if Tsys values were being used but no good Tsys values
+   were found in the input NDF. */
+   if( genvar == 2 && !good_tsys ) {
+      msgSetc( "FILE", data->file->name );
+      msgOutif( MSG__NORM, " ", "   Warning: ^FILE contains no good "
+                "Tsys values and will be ignored (since GENVAR=TSYS).", 
+                status );
+      msgBlank( status );
    }
 
 /* End the AST context. This will annul all AST objects created within the
