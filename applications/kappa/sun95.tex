@@ -45746,7 +45746,12 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       \sstsubsection{
          OUT = NDF (Write)
       }{
-         The output NDF.
+         The output NDF.  If a null ({\tt{!}}) value is supplied, the application
+         will terminate early without creating an output cube, but
+         without reporting an error.  Note, the pixel bounds which the
+         output cube would have had will still be written to output 
+         parameters LBOUND and UBOUND, even if a null value is supplied
+         for OUT.
       }
       \sstsubsection{
          PARAMS( 2 ) = \_DOUBLE (Read)
@@ -45797,6 +45802,22 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          to be valid.  Note, fractional values are allowed.  If a value
          less than 1.0E-10 is supplied, a value of {\tt 1.0E-10} is used.
          {\tt [1.0E-10]}
+      }
+   }
+   \sstresparameters{
+      \sstsubsection{
+         LBOUND() = \_INTEGER (Write)
+      }{
+         The lower pixel bounds of the output NDF.  Note, values will be
+         written to this output parameter even if a null value is supplied 
+         for parameter OUT.
+      }
+      \sstsubsection{
+         UBOUND() = \_INTEGER (Write)
+      }{
+         The upper pixel bounds of the output NDF.  Note, values will be
+         written to this output parameter even if a null value is supplied 
+         for parameter OUT.
       }
    }
    \sstexamples{
@@ -51477,6 +51498,12 @@ The following applications have been modified:
          parameter AXES.
       \end{itemize}
 
+   \item [\htmlref{WCSMOSAIC}{WCSMOSAIC}] \mbox{}
+      \begin{itemize}
+         \item New output parameters LBOUND and UBOUND record the pixel bounds
+         of the output NDF.  If parameter OUT is set to null, the mosaic's
+         bounds can be examined without creating a potentially huge NDF.
+      \end{itemize}
 \end{description}
 
 \begin{latexonly}
