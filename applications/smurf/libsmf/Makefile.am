@@ -37,7 +37,8 @@ smf_cubebounds.c smf_cubegrid.c smf_convert_system.c smf_makefitschan.c smf_detp
 smf_subtract_plane1.c smf_subtract_plane2.c smf_bbrebinmap.c smf_average_data.c \
 smf_calc_stareimage.c smf_fits_export2DA.c smf_geod.c smf_instap_get.c \
 smf_calcmodel_ast.c smf_calcmodel_com.c \
-smf_labelunit.c smf_sparsebounds.c smf_rebinsparse.c
+smf_labelunit.c smf_sparsebounds.c smf_rebinsparse.c \
+smf_model_getptr.c
 
 
 noinst_INCLUDES = smf.h smf_typ.h

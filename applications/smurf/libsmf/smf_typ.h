@@ -77,6 +77,8 @@
 *        Add tsys to smfHead
 *     2007-02-07 (EC):
 *        Updated smf_modeltype
+*     2007-02-12 (EC):
+*        Add smf_calcmodelptr;
 *     {enter_further_changes_here}
 
 
@@ -252,5 +254,9 @@ typedef struct smfGroup {
   int ngroups;               /* Number of subgroups */
   int nrelated;              /* Maximum number of related files */
 } smfGroup;
+
+/* Prototype for function pointer to different models used by DIMM */
+typedef void(*smf_calcmodelptr)( smfData*, smfData*, AstKeyMap*, double*, 
+				 double*, smfData*, int, int* );
 
 #endif /* SMF_TYP_DEFINED */

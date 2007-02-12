@@ -138,6 +138,8 @@
 *        Update API to smf_mapbounds_approx to return moving flag
 *     2007-02-06 (AGG):
 *        Add tsys to smf_construct_smfHead
+*     2007-02-12 (EC):
+*        Add smf_model_getptr
 *     2007-02-12 (DSB):
 *        Add "hasoffexp" argument to smf_cubebounds.c
 *     {enter_further_changes_here}
@@ -499,6 +501,8 @@ void smf_calcmodel_com( smfData *cum, smfData *res, AstKeyMap *keymap,
 void smf_calcmodel_ast( smfData *cum, smfData *res, AstKeyMap *keymap, 
 			double *map, double *mapvar, smfData *model, 
 			int flags, int *status );
+
+smf_calcmodelptr *smf_model_getptr( smf_modeltype type, int *status);
 
 void smf_labelunit( Grp *igrp,  int size, smfData *odata, int *status );
 

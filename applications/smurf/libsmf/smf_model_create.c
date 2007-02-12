@@ -47,6 +47,8 @@
 *     2007-02-07 (EC):
 *        - Simplified container files.
 *        - In copyinput case map data array so that it gets copied.
+*     2007-02-12 (EC):
+*        Now form the grpex here for the model container names
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -96,6 +98,7 @@ void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp,
   int copyinput=0;              /* If set, container is copy of input */
   dim_t dims[NDF__MXDIM];       /* Size of model dimensions */
   int flag=0;                   /* Flag */
+  char fname_grpex[255];        /* String for holding filename grpex */
   int i;                        /* Loop counter */
   smfData *idata=NULL;          /* Pointer to input smfdata data */
   int indf=0;                   /* NDF ID for propagation */
@@ -121,9 +124,14 @@ void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp,
   *mgrp = grpNew( "model component", status );
   mname = smf_model_getname( mtype, status );
 
-  printf("!!!!!!!!! mname=%s\n", mname);
+  /* Form a group expression for the filename */
 
-  grpGrpex( mname, igrp, *mgrp, &msize, &added, &flag, status );
+  if( *status == SAI__OK ) {
+    sprintf( fname_grpex, "*_");
+    strncat( fname_grpex, mname, 10 );
+  }
+
+  grpGrpex( fname_grpex, igrp, *mgrp, &msize, &added, &flag, status );
 
   if( (*status == SAI__OK) && (msize != isize) ) {
     *status = SAI__ERROR;
@@ -216,8 +224,12 @@ void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp,
 	ndfAnnul( &mndf, status );
 	
       } else {          /* Make a new empty container */
+	/*
 	smf_open_newfile( *mgrp, i, SMF__DOUBLE, ndims, lbnd, ubnd, 
 			  SMF__MAP_VAR, &tempdata, status );
+	*/
+	smf_open_newfile( *mgrp, i, SMF__DOUBLE, ndims, lbnd, ubnd, 
+			  0, &tempdata, status );
 	smf_close_file( &tempdata, status );
       }
     }

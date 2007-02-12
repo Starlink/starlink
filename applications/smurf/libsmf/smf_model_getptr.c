@@ -1,10 +1,10 @@
 /*
 *+
 *  Name:
-*     smf_model_getname
+*     smf_model_getptr
 
 *  Purpose:
-*     Return strings representation of a smf_modeltype
+*     Returns pointer to calcmodel function given smf_modeltype
 
 *  Language:
 *     Starlink ANSI C
@@ -13,7 +13,7 @@
 *     Library routine
 
 *  Invocation:
-*     const char *smf_model_getname( smf_modeltype type, int *status);
+*     smf_calcmodelptr *smf_model_getptr( smf_modeltype type, int *status);
 
 *  Arguments:
 *     type = smf_modeltype
@@ -33,13 +33,8 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     2006-07-06 (EC):
-*        Initial Version
-*     2006-08-16 (EC):
-*        Use group expressions for model names (expects _flat for igrp names)
-*        Changed technique/interface to look like smf_dtype_string
 *     2007-02-12 (EC):
-*        Return simple string, form grpex in smf_model_create instead
+*        Initial Version
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -81,9 +76,9 @@
 /* Other includes */
 #include <stdio.h>
 
-#define FUNC_NAME "smf_model_getname"
+#define FUNC_NAME "smf_model_getptr"
 
-char *smf_model_getname( smf_modeltype type, int *status) {
+smf_calcmodelptr *smf_model_getptr( smf_modeltype type, int *status) {
 
   /* Local Variables */
   char *retval = NULL;
@@ -93,29 +88,18 @@ char *smf_model_getname( smf_modeltype type, int *status) {
 
   switch( type ) {
 
-  case SMF__CUM:
-    retval = "cum";
-    break;
-
-  case SMF__RES:
-    retval = "res";
-    break;
-
   case SMF__AST:
-    retval = "ast";
+    retval = &smf_calcmodel_ast;
     break;
     
   case SMF__COM:
-    retval = "com";
-    break;
-
-  case SMF__NOI:
-    retval = "noi";
+    retval = &smf_calcmodel_com;
     break;
 
   default:
     *status = SAI__ERROR;
-    errRep(FUNC_NAME, "Invalid smf_modeltype given.", status);        
+    errRep(FUNC_NAME, "Invalid smf_modeltype given, or no function available.",
+	   status);        
   }
 
   return retval;

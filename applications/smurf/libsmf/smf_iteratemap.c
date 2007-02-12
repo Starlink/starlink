@@ -58,6 +58,8 @@
 *     2007-02-08 (EC):
 *        Changed location of AST model calculation
 *        Fixed pointer bug for variance of residual in map estimate
+*     2007-02-12 (EC)
+*        Enabled dyanmic usage of model components using function pointers
 
 *  Notes:
 
@@ -116,10 +118,9 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   double *ast_data=NULL;        /* Pointer to DATA component of ast */
   Grp *astgrp=NULL;             /* Group of ast model files */
   const char *astname;          /* Name of astmodel group */
+  const char *asttemp=NULL;     /* Pointer to static strings created by ast */
   int atmndf;                   /* Atmospheric signal NDF identifier */
-  smfData *com;                 /* Pointer to atmospheric data struct */
   const char *atmname;          /* Name of atmmodel group */
-  Grp *comgrp=NULL;             /* Group of common-mode model files */
   Grp *cumgrp=NULL;             /* Group of cumulative model files */
   smfData *data;                /* Pointer to source data struct */
   double *data_data=NULL;       /* Pointer to DATA component of data */
@@ -135,8 +136,13 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   int *lut=NULL;                /* Pointing lookup table */
   void *mapptr[3];              /* Pointer to array of mapped components */
   double mean;                  /* Estimate of mean */
+  smfData **modeldata=NULL;     /* Array of pointers to model data */
+  Grp **modelgrps=NULL;         /* Array of group ptrs/ each model component */
+  smf_modeltype *modeltyps=NULL; /* Array of model types */
+  smf_calcmodelptr modelptr=NULL; /* Pointer to current model calc function */
   int nmap;                     /* Number of elements mapped */
   int nbolo;                    /* Number of bolometers */
+  int nmodels;                  /* Number of model components / iteration */
   int nndf;                     /* Residual noise NDF identifier */
   const char *nname;            /* Name of noisemodel group */
   int numiter;                  /* Total number iterations */
@@ -153,47 +159,49 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   /* Get size of the input group */
   grpGrpsz( igrp, &isize, status );
 
-  /* Create groups of NDFs for time-series model components */
-  msgOut(" ", "SMF_ITERATEMAP: Create model containers", status);
-
-  smf_model_create( igrp, SMF__CUM, &cumgrp, status );
-  smf_model_create( igrp, SMF__RES, &resgrp, status ); /* Copy of igrp */
-  smf_model_create( igrp, SMF__AST, &astgrp, status );
-  smf_model_create( igrp, SMF__COM, &comgrp, status );
-
   /* Get/check the CONFIG parameters stored in the keymap */
 
   if( *status == SAI__OK ) {
+    /* Number of iterations */
     if( !astMapGet0I( keymap, "NUMITER", &numiter ) ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "NUMITER unspecified", status);      
+      errRep(FUNC_NAME, "DIMM Failed: NUMITER unspecified", status);      
     }
-  } else {
-    errRep(FUNC_NAME, "Couldn't get NUMITER", status);      
-  }  
 
+    /* Type and order of models to fit */
+    if( astMapGet0C( keymap, "MODELORDER", &asttemp ) ) {
+      /* KLUDGE for now */
+      nmodels = 1;
+      modeltyps = smf_malloc( nmodels, sizeof(*modeltyps), 0, status );
+      modeltyps[0] = SMF__COM;
+    } else {
+      msgOut(" ", "SMF_ITERATEMAP: MODELORDER unspecified - will only rebin!",
+	     status);
+      nmodels = 0;
+    }
+
+  } 
+
+  /* Create groups of NDFs for time-series model components */
+  msgOut(" ", "SMF_ITERATEMAP: Create model containers", status);
+
+  if( nmodels > 0 ) {
+    modeldata = smf_malloc( nmodels, sizeof(*modeldata), 0, status );  
+    modelgrps = smf_malloc( nmodels, sizeof(*modelgrps), 0, status );  
+  }
+
+  /* These always get made */
+  smf_model_create( igrp, SMF__CUM, &cumgrp, status );
+  smf_model_create( igrp, SMF__RES, &resgrp, status );
+  smf_model_create( igrp, SMF__AST, &astgrp, status );
+
+  /* Dynamically created models */
+  for( j=0; j<nmodels; j++ ) {
+    smf_model_create( igrp, modeltyps[j], &modelgrps[j], status );
+  }
+
+  /* Start the main iteration loop */
   if( *status == SAI__OK ) {
-
-    /* kludge to ensure that the input data is copied to the residual */
-    /*
-    for( i=1; i<=isize; i++ ) {
-      smf_open_file( igrp, i, "READ", 0, &data, status );    
-      smf_open_file( resgrp, i, "UPDATE", 0, &res, status );    
-
-      dsize = (res->dims)[0]*(res->dims)[1]*(res->dims)[2];
-
-      res_data = (double *)(res->pntr)[0];
-      data_data = (double *)(data->pntr)[0];
-
-      for( j=0; j<dsize; j++ ) {
-	res_data[j] = data_data[j];
-      }
-
-      smf_close_file( &res, status );
-      smf_close_file( &data, status );
-    }
-    */
-    /* -------------------------------------------------------------- */
 
     for( iter=0; iter<numiter; iter++ ) {    
       msgSeti("ITER", iter+1);
@@ -205,22 +213,35 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 	     status);
       for( i=1; i<=isize; i++ ) {
         /* Open files */
+
         smf_open_file( cumgrp, i, "UPDATE", 0, &cum, status );
         smf_open_file( resgrp, i, "UPDATE", 0, &res, status );
         smf_open_file( astgrp, i, "UPDATE", 0, &ast, status );
-        smf_open_file( comgrp, i, "UPDATE", 0, &com, status );
+
+	for( j=0; j<nmodels; j++ ) {
+	  smf_open_file( modelgrps[j], i, "UPDATE", 0, &modeldata[j], status );
+	}
 
 	/* Call the model calculations in the desired order. The first
            one should have flags set to 1 to zero the cumulative model */
 
-	smf_calcmodel_com( cum, res, keymap, map, mapvar, com,
-			   1, status ); 	
+	for( j=0; j<nmodels; j++ ) {
+	  msgSetc("MNAME", smf_model_getname(modeltyps[j],status));
+	  msgOut( " ", "  ^MNAME", status);
+	  modelptr = smf_model_getptr( modeltyps[j], status );
+
+	  (*modelptr)( cum, res, keymap, map, mapvar, modeldata[j],
+		       j==0, status ); 	
+	}
 
         /* Close files */
         smf_close_file( &cum, status );
         smf_close_file( &res, status );
         smf_close_file( &ast, status );    
-        smf_close_file( &com, status );
+
+	for( j=0; j<nmodels; j++ ) {
+	  smf_close_file( &modeldata[j], status );
+	}
 
 	/* Set exit condition if bad status was set */
 	if( *status != SAI__OK ) i=isize+1;
@@ -289,8 +310,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 	     estimate of the astronomical sky. Since the map will have
 	     been re-estimated at the end of the last iteration, we
 	     always call the ast model calculation first before proceeding
-	     with other model components. Also note that we set the
-	     flag to zero the cumulative model with this call. */
+	     with other model components. */
 	  
 	  smf_calcmodel_ast( cum, res, keymap, map, mapvar, ast,
 			     0, status );
@@ -307,8 +327,13 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 
   if( cumgrp ) grpDelet( &cumgrp, status );
   if( resgrp ) grpDelet( &resgrp, status );
-  if( astgrp ) grpDelet( &astgrp, status );
-  if( comgrp ) grpDelet( &comgrp, status );
+  if( astgrp ) grpDelet( &astgrp, status );  
 
+  for( j=0; j<nmodels; j++ ) {
+    if( modelgrps[i] ) grpDelet( &(modelgrps[j]), status );
+
+  }
+
+  if( modeltyps ) smf_free( modeltyps, status );
 
 }
