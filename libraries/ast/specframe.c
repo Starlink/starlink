@@ -5759,7 +5759,8 @@ astMAKE_TEST(SpecFrame,RestFreq,( this->restfreq != AST__BAD ))
 *     This attribute (together with SourceSys, SourceVRF, RefRA and RefDec) 
 *     defines the "Source" standard of rest (see attribute StdOfRest). This is 
 *     a rest frame which is moving towards the position given by RefRA and 
-*     RefDec at a  velocity given by SourceVel. When a new value is
+*     RefDec at a  velocity given by SourceVel. A positive value means
+*     the source is moving away from the observer. When a new value is
 *     assigned to this attribute, the supplied value is assumed to refer
 *     to the spectral system specified by the SourceSys attribute. For
 *     instance, the SourceVel value may be supplied as a radio velocity, a
