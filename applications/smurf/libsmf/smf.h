@@ -138,6 +138,8 @@
 *        Update API to smf_mapbounds_approx to return moving flag
 *     2007-02-06 (AGG):
 *        Add tsys to smf_construct_smfHead
+*     2007-02-12 (DSB):
+*        Add "hasoffexp" argument to smf_cubebounds.c
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -463,11 +465,11 @@ void smf_tslice_ast (smfData * data, int index, int needwcs, int * status );
 void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
                      int autogrid, int usedetpos, double par[ 7 ], 
                      Grp *detgrp, int moving, int lbnd[ 3 ], int ubnd[ 3 ], 
-                     AstFrameSet **wcsout, int *npos, int *status );
+                     AstFrameSet **wcsout, int *npos, int *hasoffexp, int *status );
 
 void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
                     AstMapping *oskymap, AstFrame *ospecfrm, 
-                    AstMapping *ospecmap, Grp *detgrp, int moving, 
+                    AstMapping *ospecmap, Grp *detgrp, int moving, int usewgt,
                     int lbnd_out[ 3 ], int ubnd_out[ 3 ], int spread, 
                     const double params[], int genvar, float *data_array, 
                     float *var_array, double *wgt_array, int *work_array, 

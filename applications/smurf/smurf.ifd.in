@@ -842,6 +842,15 @@ package @PACKAGE@ {
             helpkey *
           }
 
+ 	  parameter inweight {
+	    type _LOGICAL
+	    vpath DEFAULT
+	    ppath CURRENT DEFAULT
+	    prompt {Weight input spectra when combining them?}
+	    default TRUE
+	    helpkey *
+	  }
+
          parameter lbound {
             size *
             type _INTEGER

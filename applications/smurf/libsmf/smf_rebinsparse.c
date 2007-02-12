@@ -187,7 +187,6 @@ void smf_rebinsparse( smfData *data, int index, AstFrame *ospecfrm,
    int dim[ 3 ];         /* Output array dimensions */
    int found;            /* Was current detector name found in detgrp? */
    int good;             /* Are there any good detector samples? */
-   int good_tsys;        /* Flag indicating some good Tsys values found */
    int ibasein;          /* Index of base Frame in input FrameSet */
    int ichan;            /* Index of current channel */
    int irec;             /* Index of current input detector */
@@ -389,9 +388,6 @@ void smf_rebinsparse( smfData *data, int index, AstFrame *ospecfrm,
 /* Store a pointer to the next input data value */
    pdata = ( data->pntr )[ 0 ];
 
-/* Indicate we have not yet found any good Tsys values in the input NDF. */
-   good_tsys = 0;
- 
 /* Loop round all the time slices in the input file. */
    for( itime = 0; itime < (data->dims)[ 2 ] && *status == SAI__OK; itime++ ) {
 
@@ -473,8 +469,7 @@ void smf_rebinsparse( smfData *data, int index, AstFrame *ospecfrm,
                if( *ispec < dim[ 0 ] ){
 
                   if( tcon != AST__BAD && genvar == 2 && 
-                      tsys[ irec ] != VAL__BADR ) {
-                     good_tsys = 1;
+                      (float) tsys[ irec ] != VAL__BADR ) {
                      var_array[ *ispec ] = tcon*tsys[ irec ]*tsys[ irec ];
                   } else if( var_array ) {
                      var_array[ *ispec ] = VAL__BADR;
@@ -527,16 +522,6 @@ void smf_rebinsparse( smfData *data, int index, AstFrame *ospecfrm,
    yin = astFree( yin );
    xout = astFree( xout );
    yout = astFree( yout );
-
-/* Issue a warning if Tsys values were being used but no good Tsys values
-   were found in the input NDF. */
-   if( genvar == 2 && !good_tsys ) {
-      msgSetc( "FILE", data->file->name );
-      msgOutif( MSG__NORM, " ", "   Warning: ^FILE contains no good "
-                "Tsys values and will be ignored (since GENVAR=TSYS).", 
-                status );
-      msgBlank( status );
-   }
 
 /* End the AST context. This will annul all AST objects created within the
    context (except for those that have been exported from the context). */

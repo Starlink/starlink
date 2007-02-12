@@ -16,7 +16,7 @@
 *  Invocation:
 *     smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
 *                    AstMapping *oskymap, AstFrame *ospecfrm, 
-*                    AstMapping *ospecmap, Grp *detgrp, int moving, 
+*                    AstMapping *ospecmap, Grp *detgrp, int moving, int usewgt,
 *                    dim_t lbnd_out[ 3 ], dim_t ubnd_out[ 3 ], int spread, 
 *                    const double params[], int genvar, float *data_array, 
 *                    float *var_array, double *wgt_array, int *work1_array, 
@@ -52,6 +52,11 @@
 *        so, each time slice is shifted so that the position specified by 
 *        TCS_AZ_BC1/2 is mapped on to the same pixel position in the
 *        output cube.
+*     usewgt = int (Given)
+*        A flag indicating if the input data should be weighted according
+*        to the input variances determined from the input Tsys values.
+*        The supplied value is ignored and a value of zero is assumed if
+*        "spread" is not AST__NEAREST.
 *     lbnd_out = dim_t [ 3 ] (Given)
 *        The lower pixel index bounds of the output cube.
 *     ubnd_out = dim_t [ 3 ] (Given)
@@ -88,9 +93,11 @@
 *        the output cube. The supplied array is update on exit to include the 
 *        data from the supplied input NDF. If "spread" is AST__NEAREST, then 
 *        this array should be big enough to hold a single spatial plane from 
-*        the output cube (all planes will have the same weight and so only one 
-*        plane need be calculated). For other values of "spread", the 
-*        "wgt_array" array should be twice the length of "data_array".
+*        the output cube (all planes will have the same weight and so only 
+*        one plane need be calculated). For other values of "spread", the 
+*        "wgt_array" array should be the length of "data_array", unless
+*        "genvar" is 1, in which case it should be twice the length of 
+*        "data_array".
 *     work1_array = int * (Given and Returned)
 *        A work array, which is updated on exit to include the supplied input 
 *        NDF. Only used if "genvar" is 1 and "spread" is AST__NEAREST. It
@@ -169,6 +176,9 @@
 *        Added parameter "ton_array" and "fcon".
 *     9-FEB-2007 (DSB):
 *        Check for bad tsys values in the input NDF.
+*     12-FEB-2007 (DSB):
+*        Fix bug in initialisation of wgt_array.
+         Add parameter "usewgt".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -216,7 +226,7 @@
 
 void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
                     AstMapping *oskymap, AstFrame *ospecfrm, 
-                    AstMapping *ospecmap, Grp *detgrp, int moving, 
+                    AstMapping *ospecmap, Grp *detgrp, int moving, int usewgt,
                     int lbnd_out[ 3 ], int ubnd_out[ 3 ], int spread, 
                     const double params[], int genvar, float *data_array, 
                     float *var_array, double *wgt_array, int *work1_array, 
@@ -405,7 +415,13 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
    astRebinSeq (we set flags to zero to indicate that the arrays have
    been initialised). */
       if( use_ast ){
-         for( iv = 0; iv < 2*nel; iv++ ) wgt_array[ iv ] = 0.0;
+
+         if( genvar == 1 ) {
+            for( iv = 0; iv < 2*nel; iv++ ) wgt_array[ iv ] = 0.0;
+         } else {
+            for( iv = 0; iv < nel; iv++ ) wgt_array[ iv ] = 0.0;
+         }
+
          if( genvar ) {
             for( iv = 0; iv < nel; iv++ ) var_array[ iv ] = 0.0;
          }
@@ -465,9 +481,10 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
       name += strlen( name ) + 1;
    }
 
-/* find the constant factor associated with the current input file. This 
-   is the squared backend degradation factor, divided by the noise bandwidth. 
-   Get the required FITS headers, checking they were found. */
+/* Find the constant factor associated with the current input file, used
+   when converting Tsys values to variance values. This is the squared 
+   backend degradation factor, divided by the noise bandwidth. Get the 
+   required FITS headers, checking they were found. */
    if( astGetFitsF( hdr->fitshdr, "BEDEGFAC", &k ) &&
        astGetFitsS( hdr->fitshdr, "FFT_WIN", &fftwin ) ){
 
@@ -561,11 +578,10 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
          texp = VAL__BADR;
       }
 
-/* If output variances are being calculated on the basis of Tsys values
-   in the input, find the constant factor associated with the current
-   time slice. */
+/* Find the constant factor associated with the current time slice, that
+   allows conversion between Tsys and variance. */
       tcon = VAL__BADD;
-      if( genvar == 2 && fcon2 != VAL__BADD && texp != VAL__BADR ) {
+      if( fcon2 != VAL__BADD && texp != VAL__BADR ) {
          tcon = fcon2*( 1.0/ton + 1.0/toff );
 
 /* Get a pointer to the start of the Tsys values for this time slice. */
@@ -671,10 +687,10 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
 /* Calculate the weight to associate with the current input spectrum. This 
    is either 1.0, or the reciprocal of the input variance, based on the 
    input Tsys values. */
-                  if( tcon == VAL__BADD ) {
+                  if( !usewgt ) {
                      wgt = 1.0;
 
-                  } else if( tsys[ idet ] != VAL__BADR ) {
+                  } else if( tcon != VAL__BADD && (float) tsys[ idet ] != VAL__BADR ) {
                      good_tsys = 1;
                      wgt = tcon*tsys[ idet ]*tsys[ idet ];
                      if( wgt > 0.0 ) {
@@ -753,9 +769,13 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
 
 /* If required calculate the variance associated with each detector
    sample, based on the input Tsys values. */
-         if( tcon != VAL__BADD ) {
+         if( genvar == 2 ) { 
             for( idet = 0; idet < (data->dims)[ 1 ]; idet++ ) {
-               varwork[ idet ] = tcon*tsys[ idet ]*tsys[ idet ];
+               if( tcon != VAL__BADD && (float) tsys[ idet ] != VAL__BADR ) {
+                  varwork[ idet ] = tcon*tsys[ idet ]*tsys[ idet ];
+               } else {
+                  varwork[ idet ] = VAL__BADR;
+               }
             }
          }
 
@@ -953,10 +973,10 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
 
 /* Issue a warning if Tsys values were being used but no good Tsys values
    were found in the input NDF. */
-   if( !use_ast && genvar == 2 && !good_tsys ) {
+   if( !use_ast && usewgt && !good_tsys ) {
       msgSetc( "FILE", data->file->name );
       msgOutif( MSG__NORM, " ", "   Warning: ^FILE contains no good "
-                "Tsys values and will be ignored (since GENVAR=TSYS).", 
+                "Tsys values and will be ignored (since INWEIGHT=TRUE).", 
                 status );
       msgBlank( status );
    }

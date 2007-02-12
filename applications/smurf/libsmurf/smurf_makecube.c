@@ -139,12 +139,20 @@
 *
 *          ["Tsys"]
 *
+*     IN = NDF (Read)
+*          Input file(s)
+*     INWEIGHT = _LOGICAL (Read)
+*          Indicates if the input spectra should be weighted when combining 
+*          two or more input spectra together to form an output spectrum.
+*          If TRUE, the weights used are the reciprocal of the variances
+*          associated with the input spectra, as determined from the Tsys 
+*          values in the input. This option is ignored unless SPREAD is
+*          "Nearest" (all input data is given equal weight when using other 
+*          spreading schemes). [TRUE]
 *     LBOUND( 3 ) = _INTEGER (Write)
 *          The lower pixel bounds of the output NDF. Note, values will be
 *          written to this output parameter even if a null value is supplied 
 *          for parameter OUT.
-*     IN = NDF (Read)
-*          Input file(s)
 *     OUT = NDF (Write)
 *          Output file. If a null (!) value is supplied, the application
 *          will terminate early without creating an output cube, but
@@ -268,7 +276,10 @@
 *	   
 *          - "Nearest" -- The input pixel value is assigned completely to the
 *          single nearest output pixel. This scheme is much faster than any
-*          of the others.
+*          of the others. In addition, this scheme provides an option for 
+*          weighting the input data values using the receiprocal of the input 
+*          variances (see INWEIGHT). The other spreading schemes do not 
+*          supply any option for weighting the input data.
 *	   
 *          - "Sinc" -- Uses the sinc(pi*x) kernel, where x is the pixel
 *          offset from the interpolation point (resampling) or transformed
@@ -441,6 +452,8 @@
 *        - Store the median output TSYS value in the output FITS extension.
 *        - Find FITS headers that are present and have the same value in all 
 *        input NDFs, and add them to the output NDF's FITS extension.
+*     12-FEB-2007 (DSB):
+*        Added parameter INWEIGHT.
 
 *  Copyright:
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
@@ -555,6 +568,7 @@ void smurf_makecube( int *status ) {
    int el;                    /* Index of 3D array element */
    int flag;                  /* Is group expression to be continued? */
    int genvar;                /* How to create output Variances */
+   int hasoffexp;             /* Any ACS_OFFEXPOSURE values found in the i/p? */
    int i;                     /* Loop index */
    int ifile;                 /* Input file index */
    int ispec;                 /* Index of next spectrum within output NDF */
@@ -580,6 +594,7 @@ void smurf_makecube( int *status ) {
    int ubnd_out[ 3 ];         /* Upper pixel bounds for output map */
    int ubnd_wgt[ 3 ];         /* Upper pixel bounds for wight array */
    int use_ast;               /* Use AST for rebinning? */
+   int use_wgt;               /* Use input variance to weight input data? */
    int usedetpos;             /* Should the detpos array be used? */
    int wgtsize;               /* No. of elements in the weights array */
    smfData *data = NULL;      /* Pointer to data struct */
@@ -655,7 +670,22 @@ void smurf_makecube( int *status ) {
    output cube, and get the pixel index bounds of the output cube. */
       smf_cubebounds( igrp, size, oskyfrm, autogrid, usedetpos, par, 
                       ( trim ? detgrp : NULL ), moving, lbnd_out, ubnd_out,
-                       &wcsout, &npos, status );
+                       &wcsout, &npos, &hasoffexp, status );
+
+/* See if the input data should be weighted according to the reciprocal
+   of the input variances. This required ACS_OFFEXPOSURE values in the
+   input JCMTSTATE, so warn the user if this cannot be done and continue
+   without using weights. */
+      parGet0l( "INWEIGHT", &use_wgt, status );
+      if( use_wgt && !hasoffexp ) {
+         msgBlank( status );
+         msgOutif( MSG__NORM, "INW_MSG1", "   Weights cannot be determined "
+                   "for the input spectra.", status );
+         msgOutif( MSG__NORM, "INW_MSG2", "   Each output spectrum will be "
+                   "an unweighted sum of the input spectra.", status );
+         msgBlank( status );
+         use_wgt = 0;
+      }
 
 /* See how the output Variances are to be created. */
       parChoic( "GENVAR", "TSYS", "SPREAD,TSYS,NONE", 1, pabuf, 10, status );
@@ -1080,7 +1110,7 @@ void smurf_makecube( int *status ) {
 /* Rebin the data into the output grid. */
       if( !sparse ) {
          smf_rebincube( data, ifile, size, abskyfrm, oskymap, ospecfrm, 
-                        ospecmap, detgrp, moving, lbnd_out, ubnd_out, 
+                        ospecmap, detgrp, moving, use_wgt, lbnd_out, ubnd_out, 
                         spread, params, genvar, data_array, var_array, 
                         wgt_array, work1_array, exp_array, on_array, &fcon,
                         status );

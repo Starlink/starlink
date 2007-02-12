@@ -16,7 +16,8 @@
 *     smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
 *                     int autogrid, int usedetpos, double par[ 7 ], 
 *                     Grp *detgrp, int moving, int lbnd[ 3 ], int ubnd[ 3 ], 
-*                     AstFrameSet **wcsout, int *npos, int *status );
+*                     AstFrameSet **wcsout, int *npos, int *hasoffexp, 
+*                     int *status );
 
 *  Arguments:
 *     igrp = Grp * (Given)
@@ -68,6 +69,10 @@
 *     npos = int * (Returned)
 *        Address of an int in which to return the number of good spatial data
 *        positions that will be used in the output cube.
+*     hasoffexp = int * (Returned)
+*        Address of an int in which to return a flag indicating if any of
+*        the supplied input files has a OFF_EXPOSURE component in the JCMTSTATE
+*        NDF extension.
 *     status = int * (Given and Returned)
 *        Pointer to inherited status.
 
@@ -135,6 +140,8 @@
 *     24-JAN-2007 (DSB):
 *        Change determination of output bounds and pixel origin so that
 *        the pixel origin is at the tangent point.
+*     12-FEB-2007 (DSB):
+*        Added hasoffexp argument.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -189,7 +196,7 @@
 void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
                      int autogrid, int usedetpos, double par[ 7 ], 
                      Grp *detgrp, int moving, int lbnd[ 3 ], int ubnd[ 3 ], 
-                     AstFrameSet **wcsout, int *npos, int *status ){
+                     AstFrameSet **wcsout, int *npos, int *hasoffexp, int *status ){
 
 /* Local Variables */
    AstCmpFrame *cmpfrm = NULL;  /* Current Frame for output FrameSet */
@@ -242,8 +249,9 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    smfFile *file = NULL; /* Pointer to file struct for current input file */
    smfHead *hdr = NULL;  /* Pointer to data header for this time slice */
 
-/* Initialise the number of data samples */
+/* Initialise returned values */
    *npos = 0;
+   *hasoffexp = 0;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -505,6 +513,10 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    set to the epoch of the time slice. */
          smf_tslice_ast( data, itime, 1, status );
          swcsin = hdr->wcs;
+
+/* Update the flag indicating if any OFF_EXPOSURE values are available in
+   the input data. */
+         if( hdr->state->acs_offexposure != VAL__BADR ) *hasoffexp = 1;
 
 /* Create an interim FrameSet describing the WCS to be associated with the 
    output cube unless this has already be done. It is described as
