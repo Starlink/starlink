@@ -311,6 +311,8 @@
 *        WCS transformation in the reference NDF.
 *     8-FEB-2007 (DSB):
 *        Added parameters LBOUND and UBOUND.
+*     13-FEB-2007 (DSB):
+*        Remove C-like semi-colon line terminators.
 *     {enter_further_changes_here}
 
 *-
@@ -441,8 +443,8 @@
       END IF
 
 *  Write the output pixel bounds to output parameters LBOUND and UBOUND.
-      CALL PAR_PUT1I( 'LBOUND', NDIM, LBND, STATUS );
-      CALL PAR_PUT1I( 'UBOUND', NDIM, UBND, STATUS );
+      CALL PAR_PUT1I( 'LBOUND', NDIM, LBND, STATUS )
+      CALL PAR_PUT1I( 'UBOUND', NDIM, UBND, STATUS )
 
 *  Get the pixel spreading method to be used.
       CALL PAR_CHOIC( 'METHOD', 'SincSinc', 'Nearest,Bilinear,'//
