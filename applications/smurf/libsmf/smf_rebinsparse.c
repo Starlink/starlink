@@ -193,7 +193,7 @@ void smf_rebinsparse( smfData *data, int index, AstFrame *ospecfrm,
    int itime;            /* Index of current time slice */
    int iv;               /* Offset to next element */
    int iz;               /* Output grid index on axis 3 */
-   int nchan;            /* Number of spectral channels */
+   int nchan;            /* Number of input spectral channels */
    int pixax[ 3 ];       /* The output fed by each selected mapping input */
    int specax;           /* Index of spectral axis in input FrameSet */
    smfHead *hdr = NULL;  /* Pointer to data header for this time slice */
@@ -270,7 +270,7 @@ void smf_rebinsparse( smfData *data, int index, AstFrame *ospecfrm,
    ssmap = astSimplify( ssmap );
 
 /* Create a table with one element for each channel in the input array,
-   holding the index of the nearest corresponding output pixel. */
+   holding the index of the nearest corresponding output channel. */
    nchan = (data->dims)[ 0 ];
    spectab = astMalloc( sizeof( double )*nchan );
    if( spectab ) {

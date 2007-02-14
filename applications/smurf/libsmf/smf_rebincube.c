@@ -378,7 +378,9 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
    ssmap = astSimplify( ssmap );
 
 /* Create a table with one element for each channel in the input array,
-   holding the index of the nearest corresponding output pixel. */
+   holding the index of the nearest corresponding output channel. An index 
+   of zero in spectab is used to indicate that there is no output channel
+   that corresponds to the current input channel. */
    nchan = (data->dims)[ 0 ];
    spectab = astMalloc( sizeof( double )*nchan );
    if( spectab ) {
@@ -712,7 +714,7 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
    the weights array need only be a single 2D slice. */
                      wgt_array[ iv0 ] += wgt;
 
-/* Loop round every channel, updating the output data array. */
+/* Loop round every input channel, updating the output data array. */
                      for( ichan = 0; ichan < nchan; ichan++, pdata++ ) {
                         iz = spectab[ ichan ] - 1;
                         if( iz >= 0 && iz < dim[ 2 ] ) {
@@ -779,7 +781,7 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
             }
          }
 
-/* Process each spectral channel in turn. */
+/* Process each input spectral channel in turn. */
          for( ichan = 0; ichan < nchan; ichan++, pdata++ ) {
 
 /* Get the offset to the first pixel in the output arrays that correspond
@@ -843,7 +845,7 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
    output arrays). */
          fsmap = (AstMapping *) astUnitMap( 2, "" );
 
-/* Process each spectral channel in turn. */
+/* Process each input spectral channel in turn. */
          for( ichan = 0; ichan < nchan; ichan++ ) {
 
 /* Get the offset to the first pixel in the output arrays that correspond
@@ -926,7 +928,7 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
                   d2sum = 0.0;
                   ngoodchan = 0;
                   pdata = data_array + iv0;
-                  for( ichan = 0; ichan < nchan; ichan++ ) {
+                  for( ichan = 0; ichan < dim[ 2 ]; ichan++ ) {
                      if( *pdata != VAL__BADR ) {
                         d2sum += (*pdata)*(*pdata);
                         ngoodchan++;
