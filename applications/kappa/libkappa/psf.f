@@ -65,6 +65,9 @@
 *     AXISR = _REAL (Write)
 *        The axis ratio of the star images: the ratio of the major
 *        axis length to that of the minor axis.
+*     CENTRE  = LITERAL (Write)
+*        The formatted co-ordinates of the first fitted star position, in
+*        the current Frame of the NDF.  
 *     CLEAR = _LOGICAL (Read)
 *        If TRUE the current picture is cleared before the plot is 
 *        drawn.  If CLEAR is FALSE not only is the existing plot 
@@ -238,6 +241,12 @@
 *        values is displayed if an illegal value is supplied.  If a null
 *        (!) value is supplied, the axes with the same indices as the 
 *        two significant NDF pixel axes are used.  [!]
+*     CENTRE  = LITERAL (Write)
+*        The formatted co-ordinates of the first fitted star position, in
+*        the current Frame of the NDF.  
+*     XCEN  =  LITERAL (Write)
+*         The formatted X co-ordinate of the first fitted star position, in the 
+*         current co-ordinate Frame of the NDF. 
 *     XLEFT = _REAL (Read)
 *        The axis value to place at the left hand end of the horizontal
 *        axis of the plot.  If a null (!) value is supplied, a suitable
@@ -255,6 +264,9 @@
 *        of the plot.  If a null (!) value is supplied, a suitable 
 *        default value will be found and used.  The value supplied may 
 *        be greater than or less than the value supplied for YTOP.  [!]
+*     YCEN  =  LITERAL (Write)
+*         The formatted Y co-ordinate of the first fitted star position, in the 
+*         current co-ordinate Frame of the NDF. 
 *     YTOP = _REAL (Read)
 *        The axis value to place at the top end of the vertical axis of 
 *        the plot.  If a null (!) value is supplied, a suitable default
@@ -434,6 +446,9 @@
 *        Use CNF_PVAL.
 *     2006 December 30 (MJC):
 *        Expanded the description of the fitting algorithm.
+*     15-FEB-2007 (TIMJ):
+*        Modify arguments to KPS1_SPAR<X>. Document XCEN, YCEN and CENTRE
+*        parameters.
 *     {enter_further_changes_here}
 
 *-
@@ -744,7 +759,8 @@
      :                    SLBND, ISIZE, RANGE, GAUSS,
      :                    NPOS, %VAL( CNF_PVAL( IPW1 ) ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
-     :                    'GAMMA', 'AMP1', %VAL( CNF_PVAL( IPID ) ), 
+     :                    'GAMMA', 'AMP1', 'CENTRE', 'XCEN', 'YCEN',
+     :                    %VAL( CNF_PVAL( IPID ) ), 
      :                    GOTID, NM, UNITS, AXISR, THETA, FWHM, 
      :                    GAMMA, PSFSIZ, %VAL( CNF_PVAL( IPW2 ) ),
      :                    PX, PY, AMP, STATUS )
@@ -755,7 +771,8 @@
      :                    SLBND, ISIZE, RANGE, GAUSS,
      :                    NPOS, %VAL( CNF_PVAL( IPW1 ) ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
-     :                    'GAMMA', 'AMP1', %VAL( CNF_PVAL( IPID ) ), 
+     :                    'GAMMA', 'AMP1', 'CENTRE', 'XCEN', 'YCEN',
+     :                    %VAL( CNF_PVAL( IPID ) ), 
      :                    GOTID, NM, UNITS, AXISR, THETA, FWHM, 
      :                    GAMMA, PSFSIZ, %VAL( CNF_PVAL( IPW2 ) ),
      :                    PX, PY, AMP, STATUS )
@@ -766,7 +783,8 @@
      :                    SLBND, ISIZE, RANGE, GAUSS,
      :                    NPOS, %VAL( CNF_PVAL( IPW1 ) ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
-     :                    'GAMMA', 'AMP1', %VAL( CNF_PVAL( IPID ) ), 
+     :                    'GAMMA', 'AMP1', 'CENTRE', 'XCEN', 'YCEN',
+     :                    %VAL( CNF_PVAL( IPID ) ), 
      :                    GOTID, NM, UNITS, AXISR, THETA, FWHM, 
      :                    GAMMA, PSFSIZ, %VAL( CNF_PVAL( IPW2 ) ),
      :                    PX, PY, AMP, STATUS )
@@ -777,7 +795,8 @@
      :                    SLBND, ISIZE, RANGE, GAUSS,
      :                    NPOS, %VAL( CNF_PVAL( IPW1 ) ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
-     :                    'GAMMA', 'AMP1', %VAL( CNF_PVAL( IPID ) ), 
+     :                    'GAMMA', 'AMP1', 'CENTRE', 'XCEN', 'YCEN',
+     :                    %VAL( CNF_PVAL( IPID ) ), 
      :                    GOTID, NM, UNITS, AXISR, THETA, FWHM, 
      :                    GAMMA, PSFSIZ, %VAL( CNF_PVAL( IPW2 ) ),
      :                    PX, PY, AMP, STATUS )
@@ -788,7 +807,8 @@
      :                    SLBND, ISIZE, RANGE, GAUSS,
      :                    NPOS, %VAL( CNF_PVAL( IPW1 ) ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
-     :                    'GAMMA', 'AMP1', %VAL( CNF_PVAL( IPID ) ), 
+     :                    'GAMMA', 'AMP1', 'CENTRE', 'XCEN', 'YCEN',
+     :                    %VAL( CNF_PVAL( IPID ) ), 
      :                    GOTID, NM, UNITS, AXISR, THETA, FWHM, 
      :                    GAMMA, PSFSIZ, %VAL( CNF_PVAL( IPW2 ) ),
      :                    PX, PY, AMP, STATUS )
@@ -799,7 +819,8 @@
      :                    SLBND, ISIZE, RANGE, GAUSS,
      :                    NPOS, %VAL( CNF_PVAL( IPW1 ) ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
-     :                    'GAMMA', 'AMP1', %VAL( CNF_PVAL( IPID ) ), 
+     :                    'GAMMA', 'AMP1', 'CENTRE', 'XCEN', 'YCEN',
+     :                    %VAL( CNF_PVAL( IPID ) ), 
      :                    GOTID, NM, UNITS, AXISR, THETA, FWHM, 
      :                    GAMMA, PSFSIZ, %VAL( CNF_PVAL( IPW2 ) ),
      :                    PX, PY, AMP, STATUS )
@@ -810,7 +831,8 @@
      :                    SLBND, ISIZE, RANGE, GAUSS,
      :                    NPOS, %VAL( CNF_PVAL( IPW1 ) ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
-     :                    'GAMMA', 'AMP1', %VAL( CNF_PVAL( IPID ) ), 
+     :                    'GAMMA', 'AMP1', 'CENTRE', 'XCEN', 'YCEN',
+     :                    %VAL( CNF_PVAL( IPID ) ), 
      :                    GOTID, NM, UNITS, AXISR, THETA, FWHM, 
      :                    GAMMA, PSFSIZ, %VAL( CNF_PVAL( IPW2 ) ),
      :                    PX, PY, AMP, STATUS )

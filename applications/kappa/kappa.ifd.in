@@ -13843,6 +13843,15 @@ iraf! {
             default TRUE
           }
 
+         parameter centre {
+            access WRITE
+            type LITERAL
+            vpath DEFAULT
+            prompt {Object to contain the first star position}
+            default { }
+            helpkey *
+          }
+
          parameter cofile {
             type FILENAME
             vpath PROMPT
@@ -14049,6 +14058,15 @@ iraf! {
             helpkey *
           }
 
+         parameter xcen {
+            access WRITE
+            type LITERAL
+            vpath DEFAULT
+            prompt {Object to contain the first star x position}
+            default { }
+            helpkey *
+          }
+
          parameter xleft {
             type _REAL
             prompt {Axis value at left end of horizontal axis}
@@ -14073,6 +14091,15 @@ iraf! {
             vpath DEFAULT
             ppath DYNAMIC
             default !
+            helpkey *
+          }
+
+         parameter ycen {
+            access WRITE
+            type LITERAL
+            vpath DEFAULT
+            prompt {Object to contain the first star y position}
+            default { }
             helpkey *
           }
 

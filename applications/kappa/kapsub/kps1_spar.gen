@@ -1,6 +1,7 @@
       SUBROUTINE KPS1_SPAR<T>( CFRM, MAP,  DIM1, DIM2, ARRAY, LBND, 
      :                       ISIZE, RANGE, GAUSS, NXY, POS, LOGF, FD,
      :                       PNMIN, PAXISR, PORIEN, PFWHM, PGAMMA, PAMP,
+     :                       PCENTRE, PXCEN, PYCEN,
      :                       IDS, GOTIDS, NM, UNITS, AXISR, THETA, FWHM, 
      :                       GAMMA, WIDTH, SIG, PX, PY, AMP, STATUS )
 *+
@@ -17,8 +18,8 @@
 *  Invocation:
 *     CALL KPS1_SPAR<T>( CFRM, MAP, DIM1, DIM2, ARRAY, LBND, ISIZE, RANGE,
 *                      GAUSS, NXY, POS, LOGF, FD, PNMIN, PAXISR, PORIEN, 
-*                      PFWHM, PGAMMA, PAMP, IDS, GOTIDS, NM, UNITS, AXISR, 
-*                      THETA, FWHM, GAMMA, WIDTH, SIG, PX, PY, AMP, STATUS )
+*                      PFWHM, PGAMMA, PAMP, PCENTRE, PXCEN, PYCEN, IDS, GOTIDS, NM,
+*                      UNITS, AXISR, THETA, FWHM, GAMMA, WIDTH, SIG, PX, PY, AMP, STATUS )
 
 *  Description:
 *     This routine calls a number of subroutines to find a set of 
@@ -84,6 +85,15 @@
 *     PAMP = CHARACTER * ( * ) (Given)
 *        The name of an output parameter which will be used to store
 *        the fitted amplitude of hte first usable star.
+*     PCENTRE = CHARACTER * ( * ) (Given)
+*        The name of an output parameter which will be used to store
+*        the position of the first star.
+*     XCEN = CHARACTER * ( * ) (Given)
+*        The name of an output parameter which will be used to store
+*        the X position of the first star.
+*     YCEN = CHARACTER * ( * ) (Given)
+*        The name of an output parameter which will be used to store
+*        the Y position of the first star.
 *     IDS( NXY ) = INTEGER (Given)
 *        An array of integer identifiers for the supplied positions. Only
 *        accessed if GOTIDS is .TRUE.
@@ -198,6 +208,9 @@
 *        Use CNF_PVAL
 *     12-MAY-2005 (PWD):
 *        Normalise coordinates written to logfile.
+*     15-FEB-2007 (TIMJ):
+*        - Use parameters rather than bare numbers
+*        - write centre position of first star to STDOUT and parameter
 *     {enter_further_changes_here}
 
 *-
@@ -230,6 +243,9 @@
       CHARACTER * ( * ) PFWHM
       CHARACTER * ( * ) PGAMMA
       CHARACTER * ( * ) PAMP
+      CHARACTER * ( * ) PCENTRE
+      CHARACTER * ( * ) PXCEN
+      CHARACTER * ( * ) PYCEN
       INTEGER IDS( NXY )
       LOGICAL GOTIDS
       LOGICAL NM
@@ -271,6 +287,12 @@
       DOUBLE PRECISION PI
       PARAMETER ( PI = 3.1415926535898 )
 
+      DOUBLE PRECISION DAS2R
+      PARAMETER ( DAS2R = 180.0D0 * 3600.0D0 / PI )
+
+      DOUBLE PRECISION DR2D
+      PARAMETER ( DR2D = 180.0D0 / PI )
+
 *  Local Variables:
       CHARACTER BUFFER*80        ! Buffer to write results
       CHARACTER FMTVAL*(AST__SZCHR) ! Formatted value
@@ -278,8 +300,10 @@
       CHARACTER FWHMUN*20        ! Units of FWHM
       CHARACTER UNIT*20          ! Value of Unit attribute
       CHARACTER XVAL*13          ! Formatted axis 1 value
+      CHARACTER XVAL1*13         ! Formatted axis 1 value of first star
       CHARACTER YUNITS*80        ! Y axis units
       CHARACTER YVAL*13          ! Formatted axis 2 value
+      CHARACTER YVAL1*13         ! Formatted axis 2 value of first star
       DOUBLE PRECISION SIGOUT    ! Sigma in Current Frame 
       DOUBLE PRECISION XOUT      ! Current Frame axis 1 centre
       DOUBLE PRECISION YOUT      ! Current Frame axis 2 centre
@@ -323,6 +347,9 @@
       REAL STATHE                ! Star orientation
       REAL YSCALE                ! Y axis scale factor for plot
 *.
+
+      XVAL1 = ' '
+      YVAL1 = ' '
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -489,9 +516,23 @@
                CALL CHR_LDBLK( FMTVAL )
                YVAL = FMTVAL
 
+*  Convert Sigma to FWHM by multiplying by sqrt(8ln2)
                FMTVAL = AST_FORMAT( FRM2, 1, SIGOUT*2.35482, STATUS )
                CALL CHR_LDBLK( FMTVAL )
                FVAL = FMTVAL
+
+*  If this is the first star we need to store the coordinates
+*  Only write out to screen if this is the only star
+               IF ( I .EQ. 1 ) THEN
+                  XVAL1 = XVAL
+                  YVAL1 = YVAL
+                  IF (NXY .EQ. 1) THEN
+                     CALL MSG_SETC( 'X', XVAL1 )
+                     CALL MSG_SETC( 'Y', YVAL1 )
+                     CALL MSG_OUT( 'STARPOS',
+     :                    '   Fitted star position: ^X ^Y', STATUS )
+                  END IF
+               END IF
 
 *  Print the star parameters.  
                WRITE ( BUFFER, '( I11, T22, 2( SS, A13, 2X ), SS,'/
@@ -499,7 +540,7 @@
      :                YVAL, FVAL, AXROUT
                CALL FIO_WRITE( FD, BUFFER( :78 ), STATUS )
 
-               WRITE ( BUFFER, '( 66X, SS, G10.3 )' ) ANGOUT*57.29578
+               WRITE ( BUFFER, '( 66X, SS, G10.3 )' ) ANGOUT*REAL(DR2D)
                CALL FIO_WRITE( FD, BUFFER( :76 ), STATUS )
 
             ELSE
@@ -552,11 +593,21 @@
 *  End of (most) logging.
       END IF
 
+*  Write first star position to output parameter
+      BUFFER = ' '
+      IAT = 0
+      CALL CHR_APPND( XVAL1, BUFFER, IAT )
+      IAT = IAT + 1
+      CALL CHR_APPND( YVAL1, BUFFER, IAT )
+      CALL PAR_PUT0C( PCENTRE, BUFFER( : IAT ), STATUS )
+      CALL PAR_PUT0C( PXCEN, XVAL1, STATUS )
+      CALL PAR_PUT0C( PYCEN, YVAL1, STATUS )
+
 *  Report the mean results.
 *  ========================
 *  Find the parameters of the mean ellipe after mapping it into the current 
 *  Frame. We arbitrarily use the position of th efirst valid star as teh
-*  centre position. This will be OK wince we are assuming that the pixel
+*  centre position. This will be OK since we are assuming that the pixel
 *  size and PSF do not vary across the image. Also, use a sigma of SIG0 
 *  so that we can get a scale factor for converting pixels into current
 *  frame distance.
@@ -599,7 +650,7 @@
 
          IF( ANGOUT  .NE. VAL__BADR ) THEN
             WRITE ( BUFFER, '( ''   Mean orientation of major axis ='','
-     :              //'SS, G11.4, '' degrees'' )' ) ANGOUT * 57.29578
+     :              //'SS, G11.4, '' degrees'' )' ) ANGOUT * REAL(DR2D)
             CALL FIO_WRITE( FD, BUFFER( :54 ), STATUS )
          ELSE
             BUFFER = '   Mean orientation of major axis = (undefined)'
@@ -621,7 +672,7 @@
       CALL MSG_OUT( ' ', '   Mean axis ratio = ^A', STATUS )
 
       IF( ANGOUT  .NE. VAL__BADR ) THEN
-         CALL MSG_FMTR( 'A', 'G11.4', ANGOUT*57.29578 )
+         CALL MSG_FMTR( 'A', 'G11.4', ANGOUT*REAL(DR2D) )
          CALL MSG_SETC( 'A', ' degrees' )
       ELSE
          CALL MSG_SETC( 'A', '(undefined)' )
@@ -642,7 +693,7 @@
 
 *  Now write them to the output parameters.
       CALL PAR_PUT0R( PAXISR, AXROUT, STATUS )
-      CALL PAR_PUT0R( PORIEN, ANGOUT*57.29578, STATUS )
+      CALL PAR_PUT0R( PORIEN, ANGOUT*REAL(DR2D), STATUS )
 
 *  Find scale factors and the numbers of radial bins.
 *  ==================================================
@@ -659,7 +710,7 @@
 *  If the current Frame is a SkyFrame, radial distances are displayed in
 *  arc-seconds. but SIGOUT will be in radians. Add a factor to convert
 *  radians into arc-seconds.
-         IF( GOTSKY ) SCALE = SCALE*(180.0*3600.0/PI) 
+         IF( GOTSKY ) SCALE = SCALE*REAL(DAS2R)
 
 *  Calculate the scale factors for converting radial distance to bins.
          RSCALE = RESOL1 * 2.0 / MIN( 2.0, SIG0 )

@@ -43,6 +43,9 @@
 
    o  MLINPLOT now understands SpecFrames and FluxFrames.
 
+   o  PSF now writes the first star position to the screen and
+   output parameters as well as the log file.
+
    o  ROTATE can now reorient three-dimensional NDFs, in the sense
    that it will rotate all the two-dimensional planes within a 
    three-dimensional NDF independently, applying the same rotation 
