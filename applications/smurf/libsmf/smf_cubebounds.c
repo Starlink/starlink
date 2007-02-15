@@ -142,6 +142,9 @@
 *        the pixel origin is at the tangent point.
 *     12-FEB-2007 (DSB):
 *        Added hasoffexp argument.
+*     15-FEB-2007 (DSB):
+*        Report error if SPECBOUNDS values do not have any overlap with
+*        the spectral range covered by the data.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -771,15 +774,37 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* Convert the supplied spectral values back to interim grid coords. */
    astTran1( ospecmap, 2, specbounds, 1, ispecbounds );
 
-/* Update the output interim grid bounds, keeping them in the right order. */
-   if( ispecbounds[ 0 ] < ispecbounds[ 1 ] ) {
-      dlbnd[ 2 ] = ispecbounds[ 0 ] ;
-      dubnd[ 2 ] = ispecbounds[ 1 ] ;
-   } else {
-      dubnd[ 2 ] = ispecbounds[ 0 ] ;
-      dlbnd[ 2 ] = ispecbounds[ 1 ] ;
-   }   
+/* Ensure element 0 is lower than element 1. */
+   if( ispecbounds[ 0 ] > ispecbounds[ 1 ] ) {
+      temp = ispecbounds[ 0 ] ;
+      ispecbounds[ 0 ] = ispecbounds[ 1 ];
+      ispecbounds[ 1 ] = temp;
+   } 
 
+/* Check the specified spectral bounds have some overlap with the available 
+   spectral range. */
+   if( ispecbounds[ 0 ] >= dubnd[ 2 ] ||
+       ispecbounds[ 1 ] <= dlbnd[ 2 ] ){
+      if( *status == SAI__OK ) {
+
+         specin[ 0 ] = dlbnd[ 2 ];
+         specin[ 1 ] = dubnd[ 2 ];
+         astTran1( ospecmap, 2, specin, 0, specout );
+
+         *status = SAI__ERROR;
+         msgSetd( "L", specbounds[ 0 ] );
+         msgSetd( "U", specbounds[ 1 ] );
+         msgSetd( "LL", specout[ 0 ] );
+         msgSetd( "UU", specout[ 1 ] );
+         errRep( "", "Requested spectral bounds (^L,^U) do not overlap "
+                 "the spectral range of the data (^LL,^UU).", status );
+      }
+   }
+
+/* Update the output interim grid bounds, keeping them in the right order. */
+   dlbnd[ 2 ] = ispecbounds[ 0 ] ;
+   dubnd[ 2 ] = ispecbounds[ 1 ] ;
+   
 /* Now we know the bounds of the output cube in interim GRID coords, we
    can remap the GRID Frame in the output WCS FrameSet so that it
    represents real GRID coords rather than interim grid coords, and we

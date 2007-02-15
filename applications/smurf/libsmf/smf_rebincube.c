@@ -178,7 +178,9 @@
 *        Check for bad tsys values in the input NDF.
 *     12-FEB-2007 (DSB):
 *        Fix bug in initialisation of wgt_array.
-         Add parameter "usewgt".
+*        Add parameter "usewgt".
+*     15-FEB-2007 (DSB):
+*        Issue warning if the input file does not overlap the output cube.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -279,6 +281,8 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
    int ast_flags;              /* Flags to use with astRebinSeq */
    int dim[ 3 ];               /* Output array dimensions */
    int found;                  /* Was current detector name found in detgrp? */
+   int good_det;               /* Flag indicating some overlap between detector & o/p */
+   int good_file;              /* Flag indicating some overlap between file & o/p */
    int good_tsys;              /* Flag indicating some good Tsys values found */
    int ibasein;                /* Index of base Frame in input WCS FrameSet */
    int ichan;                  /* Index of current channel */
@@ -554,6 +558,10 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
 /* Indicate we have not yet found any good Tsys values in the input NDF. */
    good_tsys = 0;
 
+/* Indicate we have not yet found any overlap between the input file and
+   the output grid. */
+   good_file = 0;
+
 /* Loop round all time slices in the input NDF. */
    for( itime = 0; itime < (data->dims)[ 2 ] && *status == SAI__OK; itime++ ) {
 
@@ -679,12 +687,12 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
                if( ix >= 0 && ix < dim[ 0 ] && 
                    iy >= 0 && iy < dim[ 1 ] ) {
 
-/* Update the update the total exposure time for the output spectrum. */
+/* Set a flag indicating that this detector has not yet been found to
+   overlap the output cube. */
+                  good_det = 0;
+
+/* Get the index into the 2D array for this output sample. */
                   iv0 = ix + dim[ 0 ]*iy;
-                  if( texp != VAL__BADR ) {
-                     texp_array[ iv0 ] += texp;
-                     ton_array[ iv0 ] += ton;
-                  }
 
 /* Calculate the weight to associate with the current input spectrum. This 
    is either 1.0, or the reciprocal of the input variance, based on the 
@@ -719,6 +727,9 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
                         iz = spectab[ ichan ] - 1;
                         if( iz >= 0 && iz < dim[ 2 ] ) {
 
+/* Indicate some input data from this detector fell in the output array */
+                           good_det = 1;
+
 /* Find the vector index of the pixel within the 3D output data array
    that will receieve this input pixel. */
                            iv = iv0 + nxy*iz;
@@ -750,6 +761,16 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
                      pdata += nchan;
                   }
    
+/* Indicate some input data from this input file fell in the output array,
+   and update the total exposure time for the output spectrum. */
+                  if( good_det ) {
+                     good_file = 1;
+                     if( texp != VAL__BADR ) {
+                        texp_array[ iv0 ] += texp;
+                        ton_array[ iv0 ] += ton;
+                     }
+                  }
+
                } else {
                   pdata += nchan;
                }
@@ -789,6 +810,7 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
    outside the bounds of the output array. */
             iz = spectab[ ichan ] - 1;
             if( iz >= 0 && iz < dim[ 2 ] ) { 
+               good_file = 1;
                iv = nxy*iz;
 
 /* Store pointers to the variance and work arrays be used */
@@ -980,6 +1002,14 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
       msgOutif( MSG__NORM, " ", "   Warning: ^FILE contains no good "
                 "Tsys values and will be ignored (since INWEIGHT=TRUE).", 
                 status );
+      msgBlank( status );
+   }
+
+/* Issue a warning if the input file did not overlap the output cube. */
+   if( !good_file ) {
+      msgSetc( "FILE", data->file->name );
+      msgOutif( MSG__NORM, " ", "   Warning: No data within ^FILE "
+                "fell within the bounds of the output cube.", status );
       msgBlank( status );
    }
 

@@ -64,6 +64,9 @@
 *        Initial version, based on smf_cubebounds.
 *     20-DEC-2006 (DSB):
 *        Correct calculation of pixel bounds for spectral axis.
+*     15-FEB-2007 (DSB):
+*        Report error if SPECBOUNDS values do not have any overlap with
+*        the spectral range covered by the data.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -151,6 +154,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    double specin[ 2 ];   /* Spectral values to be transformed */
    double specout[ 2 ];  /* Transformed spectral values */
    double subnd;         /* Floating point upper bounds for spectral axis */
+   double temp;          /* Temp value used when swapping other values */
    float *pdata;         /* Pointer to next data sample */
    int found;            /* Was current detector name found in detgrp? */
    int good;             /* Are there any good detector samples? */
@@ -539,6 +543,33 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
 /* Convert the supplied spectral values back to pixel coords. */
    astTran1( ospecmap, 2, specbounds, 1, ispecbounds );
+
+/* Ensure element 0 is lower than element 1. */
+   if( ispecbounds[ 0 ] > ispecbounds[ 1 ] ) {
+      temp = ispecbounds[ 0 ] ;
+      ispecbounds[ 0 ] = ispecbounds[ 1 ];
+      ispecbounds[ 1 ] = temp;
+   } 
+
+/* Check the specified spectral bounds have some overlap with the available 
+   spectral range. */
+   if( ispecbounds[ 0 ] >= subnd ||
+       ispecbounds[ 1 ] <= slbnd ){
+      if( *status == SAI__OK ) {
+
+         specin[ 0 ] = slbnd;
+         specin[ 1 ] = subnd;
+         astTran1( ospecmap, 2, specin, 0, specout );
+
+         *status = SAI__ERROR;
+         msgSetd( "L", specbounds[ 0 ] );
+         msgSetd( "U", specbounds[ 1 ] );
+         msgSetd( "LL", specout[ 0 ] );
+         msgSetd( "UU", specout[ 1 ] );
+         errRep( "", "Requested spectral bounds (^L,^U) do not overlap "
+                 "the spectral range of the data (^LL,^UU).", status );
+      }
+   }
 
 /* Update the output bounds. */
    slbnd = ispecbounds[ 0 ] ;
