@@ -117,6 +117,9 @@
 *        Restructured again for better handing of moving targets.
 *     25-JAN-2007 (DSB):
 *        Add value for HIST parameter when calling kpg1Wrtab.
+*     15-FEB-2007 (DSB):
+*        Ensure SkyRef is set in returned SkyFrame, even if the target is
+*        not moving.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -577,14 +580,15 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    above loop. */
    if( data != NULL ) smf_close_file( &data, status );
 
+/* Ensure the reference position in the returned SkyFrame is set to the 
+   first telescope base pointing position. */
+   astSetD( *skyframe, "SkyRef(1)", skyref[ 0 ] );
+   astSetD( *skyframe, "SkyRef(2)", skyref[ 1 ] );
+
 /* If the target is moving, ensure the returned SkyFrame represents 
    offsets from the first telescope base pointing position rather than 
    absolute coords. */
-   if( *moving ) {
-      astSetD( *skyframe, "SkyRef(1)", skyref[ 0 ] );
-      astSetD( *skyframe, "SkyRef(2)", skyref[ 1 ] );
-      astSet( *skyframe, "SkyRefIs=Origin" ); 
-   }
+   if( *moving ) astSet( *skyframe, "SkyRefIs=Origin" ); 
 
 /* Set a flag indicating if all the points are co-incident. */
    coin = 0;
