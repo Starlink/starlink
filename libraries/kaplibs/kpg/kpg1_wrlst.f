@@ -117,6 +117,8 @@
 *        Re-implement by calling KPG1_WRTAB.
 *     25-JAN-2007 (DSB)
 *        Supply a value for argument HIST when calling KPG1_WRTA2.
+*     15-FEB-2007 (DSB)
+*        Correct order of arguments passed to KPG1_WRTAB.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -152,7 +154,7 @@
 *  Call KPG1_WRTAB to do the work, specifiying GRP__NOID for the groups
 *  containing the position labels and history text.
       CALL KPG1_WRTAB( PARAM, ARRDIM, NPOS, NAX, POS, IFRM, IWCS,
-     :                 TITLE, ID0, IDENTS, GRP__NOID, NULL, GRP__NOID,
+     :                 TITLE, ID0, IDENTS, GRP__NOID, GRP__NOID, NULL,
      :                 STATUS )
 
       END
