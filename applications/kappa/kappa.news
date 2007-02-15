@@ -4,10 +4,21 @@
    changes are thus far listed below.  For complete details of all 
    changes, see the "Release Notes" appendix in SUN/95.
 
+2 New_applications
+
+   o  CUMULVEC sums values cumulatively in a one-dimensional NDF.
+
+   o  ODDEVEN removes odd-even defects from a one-dimensional NDF.
+   To correct a two dimensional NDF of odd-even patterning in its
+   columns or rows, first use COLLAPSE.
+   
 2 Modified_applications
-   o  Add WCSATTS parameter to COLLAPSE to allow control of the frameset
-   before collapsing occurs. This is important for estimators whose
-   values depend on the WCS.
+
+   o  COLLAPSE now has a WCSATTS parameter to allow control of the 
+   frameset before collapsing occurs. This is important for estimators
+   whose values depend on the WCS.  A new parameter VARIANCE controls 
+   whether or not variance information present in the input NDF is
+   actually used.
 
    o  DISPLAY has a new parameter SQRPIX to control whether rectangular
    pixels are displayed as squares or rectangles.
@@ -22,14 +33,26 @@
    labels created---numerical or textual---when parameter LABEL
    is TRUE.
 
+   o  In MFITTREND fits to lines may be rejected and flagged bad in
+   the output data using the new parameter CLIPRMS.  Given the number
+   of clipping standard deviations, MFITTREND locates positive 
+   outliers from the distribution of root-mean-squared residuals of 
+   the fits.  MFITTREND has a new output parameter, ARANGES, to
+   record the fitting ranges found in automatic mode.  The automatic
+   ranges are now constrained to the input NDF bounds.
+
    o  MLINPLOT now understands SpecFrames and FluxFrames.
 
-   o  ROTATE can now reorient three-dimensional NDFs, in the sense that 
-   it will rotate all the two-dimensional planes within a 
+   o  ROTATE can now reorient three-dimensional NDFs, in the sense
+   that it will rotate all the two-dimensional planes within a 
    three-dimensional NDF independently, applying the same rotation 
    angle to each plane.  The rotation plane can be parallel to any 
    face of the cube, and is defined by a new parameter AXES.
 
+   o  WCSMOSAIC has nw eoutput parameters LBOUND and UBOUND record 
+   thec pixel bounds of the output NDF.  If parameter OUT is set to
+   null, the mosaic's bounds can be examined without creating a 
+   potentially huge NDF.
 
 1 KAPPA_Version_1.5
 
