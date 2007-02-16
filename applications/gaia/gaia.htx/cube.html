@@ -312,12 +312,19 @@
       using a skeletal NDF with dynamically updated data, so cannot be
       directly processed by any external processes). After analysis you are
       free to continue moving through slices. A side-effect of this quest for
-      speed is that the data processed by the analysis tools will not be a
+      speed is that the data processed by the 2D analysis tools will not be a
       full NDF, that is it currently does not contain any addition components,
       such as variance or quality. If this is important you will need to
       extract the plane from the cube using the KAPPA task NDFCOPY, with a
       suitable NDF section (this is shown as part of the slice name in the
       main window) and open that normally in GAIA.
+    </p>
+    <p>
+      When displaying NDFs it is possible to inspect the other data
+      components, variance and quality, by selecting the component in the
+      <tt>Options</tt> menu. If a component doesn't exist then you'll just get
+      a warning. Note that when using the 2D analysis tools on the cube
+      you'll be operating on the displayed component, not the data component.
     </p>
 
     <h3>Analysing spectra</h3>

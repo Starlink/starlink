@@ -1,5 +1,6 @@
 
   Hokulei Release:
+  ================
 
     This is an update with many usability changes and minor bug fixes:
 
@@ -15,14 +16,17 @@
     for them to be efficiently loaded and attempts to preserve the 
     current spectral extraction limits.
 
-    - Spectra extracted from ACSIS raw timecubes now display the 
-    RA and Dec of the pointing, and the time of observation for the 
-    spectrum.
+    - Spectra extracted from ACSIS cubes now contain various useful 
+    information, such as various RA and Decs, the exposure time of spectrum
+    and the system temperature. These can be displayed by the SPLAT-VO 
+    application synopsis feature, when such a spectrum is sent to it.
 
     - The centroid maximum search box size and shift are now start up
     options that can be defined either on the command-line, or
     using the "File->Startup options..." dialog (this makes the change
     permanent)
+
+    - The variance and quality components of a cube can now be displayed.
 
     - Spectra can now be sent to other PLASTIC-enabled applications using
     the Interop menu in the spectral plot window. Only SPLAT-VO supports
