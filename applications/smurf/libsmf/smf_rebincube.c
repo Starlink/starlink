@@ -181,6 +181,8 @@
 *        Add parameter "usewgt".
 *     15-FEB-2007 (DSB):
 *        Issue warning if the input file does not overlap the output cube.
+*     16-FEB-2007 (DSB):
+*        Ignore input spectra that contain no good data.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -274,6 +276,7 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
    float *detwork = NULL;      /* Work array holding data samples for 1 slice/channel */
    float *ipv = NULL;          /* Pointer to input variances values */
    float *pdata = NULL;        /* Pointer to next input data value */
+   float *qdata = NULL;        /* Pointer to next input data value */
    float *varwork = NULL;      /* Work array holding variances for 1 slice/channel */
    float texp;                 /* Total time ( = ton + toff ) */
    float toff;                 /* Off time */
@@ -712,6 +715,22 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
                   } else {
                      wgt = VAL__BADD;
                   } 
+
+/* See if any of the used input spectrum contains any good values. If
+   not, we can skip to the next detector. */
+                  if( wgt != VAL__BADD ) {
+                     qdata = pdata;
+                     for( ichan = 0; ichan < nchan; ichan++, qdata++ ) {
+                        iz = spectab[ ichan ] - 1;
+                        if( iz >= 0 && iz < dim[ 2 ] ) {
+                           if( *qdata != VAL__BADR ) {
+                              qdata = NULL;
+                              break;
+                           }
+                        }
+                     }
+                     if( qdata ) wgt == VAL__BADD;
+                  }
 
 /* Skip to the next detector if no weight could be calculated for this
    detector. */
