@@ -265,6 +265,14 @@ itcl::class gaia::GaiaNDAccess {
       }
    }
 
+   #  Return if a component is mapped.
+   public method ismapped {component} {
+      if { [info exists addr_($component)] && $addr_($component) != 0 } {
+         return 1
+      }
+      return 0
+   }
+
    #  Return the value of a "character component" of the dataset. These may be
    #  the units of the data and a label describing the units, nothing else is
    #  supported. So valid values for "what" are "units" and "label".
