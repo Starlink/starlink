@@ -11,7 +11,8 @@
 #  Description:
 #     This class defines a label entry field with an associated
 #     button. The button, if pressed, displays a FileChooser for
-#     selecting a name from existing files.
+#     selecting a name from existing files. The FileChooser is
+#     re-used to keep the context.
 
 #  Invocations:
 #
@@ -102,6 +103,10 @@ itcl::class gaia::LabelFileChooser {
    #  Destructor:
    #  -----------
    destructor  {
+      #  Close the file chooser...
+      if { $file_chooser_ != {} && [winfo exists $file_chooser_] } {
+         destroy $file_chooser_
+      }
    }
 
    #  Methods:
@@ -109,21 +114,22 @@ itcl::class gaia::LabelFileChooser {
 
    #  Choose an existing file and entry it into the entry field.
    protected method choose_file_ {} {
-      if { $itk_option(-filter_types) == {} } { 
-         set w [FileSelect .\#auto -title "Select Detection Image"]
-      } else {
-         set w [FileSelect .\#auto \
-                   -title "Select Detection Image"\
-                   -filter_types $itk_option(-filter_types)]
-
+      if { $file_chooser_ == {} } {
+         if { $itk_option(-filter_types) == {} } { 
+            set file_chooser_ \
+               [FileSelect .\#auto -title "Select Detection Image"]
+         } else {
+            set file_chooser_ [FileSelect .\#auto \
+                                  -title "Select Detection Image"\
+                                  -filter_types $itk_option(-filter_types)]
+         }
       }
-      if {[$w activate]} {
-         configure -value [$w get]
+      if { [$file_chooser_ activate] } {
+         configure -value [$file_chooser_ get]
          if { "$itk_option(-command)" != "" } {
             command_proc_ $itk_option(-command)
          }
       }
-      destroy $w
    }
 
    #  Configuration options: (public variables)
@@ -135,10 +141,12 @@ itcl::class gaia::LabelFileChooser {
    #  Protected variables: (available to instance)
    #  --------------------
 
+   #  The file chooser.
+   protected variable file_chooser_ {}
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
 
 #  End of class definition.
 }
-
