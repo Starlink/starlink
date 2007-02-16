@@ -146,6 +146,17 @@ itcl::class gaia::GaiaCube {
       add_menu_short_help $Options {Autocut}  \
          {Continuously change set the cuts of the image slices, data limits}
 
+      #  Choice of cube component.
+      set submenu [menu $Options.component]
+      $Options add cascade -label "Data component" -menu $submenu
+      foreach type {DATA VARIANCE QUALITY} {
+         $submenu add radiobutton \
+            -variable [scope component_] \
+            -value $type \
+            -label $type \
+            -command [code $this component_changed_]
+      }
+
       #  Add the coordinate selection menu.
       set SpectralCoords [add_menubutton "Coords" left]
       configure_menubutton "Coords" -underline 0
@@ -262,6 +273,7 @@ itcl::class gaia::GaiaCube {
             -labelwidth $lwidth \
             -valuewidth $vwidth \
             -spec_coords [code $spec_coords_] \
+            -component $component_ \
             -transient_spectralplot $itk_option(-transient_spectralplot)
 
       }
@@ -424,10 +436,14 @@ itcl::class gaia::GaiaCube {
       }
 
       #  Close spectrum plot, also removes any graphics and bindings.
-      $itk_component(spectrum) close
+      catch {
+         $itk_component(spectrum) close
+      }
 
       #  Halt any animations.
-      $itk_component(animation) stop
+      catch {
+         $itk_component(animation) stop
+      }
    }
 
    #  Methods:
@@ -475,6 +491,10 @@ itcl::class gaia::GaiaCube {
 
          #  Add last_cube_ to the back_list_, including temporary ones.
          record_last_cube_
+
+         #  Always start with the DATA component (essential).
+         set component_ "DATA"
+         set last_component_ "DATA"
 
          if { $cubeaccessor_ == {} } {
             set cubeaccessor_ [uplevel \#0 GaiaNDAccess \#auto]
@@ -568,7 +588,7 @@ itcl::class gaia::GaiaCube {
          busy {
             $cubeaccessor_ unmap
             $cubeaccessor_ configure -usemmap $itk_option(-usemmap)
-            set adr [$cubeaccessor_ map "READ"]
+            set adr [$cubeaccessor_ map "READ" "DATA"]
          }
       }
    }
@@ -708,7 +728,7 @@ itcl::class gaia::GaiaCube {
 
       #  Access the image data for this plane and replace
       #  the displayed copy.
-      lassign [$cubeaccessor_ getimage $axis_ $zp 1] adr
+      set adr [$cubeaccessor_ getimage $axis_ $zp 1 $component_]
       lassign [$cubeaccessor_ getinfo $adr] realadr nel type
       $itk_option(-rtdimage) replaceimagedata $realadr
 
@@ -915,6 +935,39 @@ itcl::class gaia::GaiaCube {
       }
       return [expr round($value+1-$zo)]
    }
+
+   #  Should be called when the data component has changed.
+   protected method component_changed_ {} {
+
+      if { $cubeaccessor_ != {} } {
+         if { [$cubeaccessor_ exists $component_] } {
+            #  Only the DATA component is mapped by default, so make sure
+            #  we access the others too.
+            if { $component_ != "DATA" } {
+               set adr [$cubeaccessor_ map "READ" $component_]
+            }
+
+            #  Cause an update of the image.
+            set_display_plane $plane_ 1
+         } else {
+            #  No such component....
+            info_dialog "No $component_ component in cube" $w_
+            if { $component_ != $last_component_ } {
+               set component_ $last_component_
+            }
+            return
+         }
+      }
+
+      #  Get extracted spectra to display this component.
+      if { [info exists itk_component(spectrum)] } {
+         $itk_component(spectrum) configure -component $component_
+      }
+
+      #  Fallback when component doesn't exist.
+      set last_component_ $component_
+   }
+
 
    #  ==========================================
    #  Utility methods for various helper classes
@@ -1412,6 +1465,11 @@ itcl::class gaia::GaiaCube {
 
    #  Data access object for the cube.
    protected variable cubeaccessor_ {}
+
+   #  The component to display/extract. Usually DATA but could be VARIANCE
+   #  or QUALITY. Keep last component value as a fallback.
+   protected variable component_ "DATA"
+   protected variable last_component_ "DATA"
 
    #  Name of the last cube opened.
    protected variable last_cube_ {}
