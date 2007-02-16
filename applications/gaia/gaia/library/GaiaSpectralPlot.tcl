@@ -469,7 +469,8 @@ itcl::class gaia::GaiaSpectralPlot {
                                  autoscale} {
       #  Get the spectral data from the accessor.
       #  XXXX Note assumes WCS & data array axes are aligned and in same order.
-      set adr [$accessor getregionspectrum $axis $alow $ahigh $desc $meth 1]
+      set adr [$accessor getregionspectrum $axis $alow $ahigh \
+                  $desc $meth 1 $itk_option(-component)]
       display_spectrum_ $adr $accessor $axis $alow $autoscale
    }
 
@@ -486,7 +487,8 @@ itcl::class gaia::GaiaSpectralPlot {
 
       #  Get the spectral data from the accessor.
       #  XXXX Note assumes WCS & data array axes are aligned and in same order.
-      set adr [$accessor getspectrum $axis $alow $ahigh $p1 $p2 1]
+      set adr [$accessor getspectrum $axis $alow $ahigh \
+                  $p1 $p2 1 $itk_option(-component)]
       display_spectrum_ $adr $accessor $axis $alow $autoscale
    }
 
@@ -549,7 +551,8 @@ itcl::class gaia::GaiaSpectralPlot {
       }
 
       #  Get the spectral data from the accessor.
-      set adr [$accessor getregionspectrum $axis $alow $ahigh $desc $meth 1]
+      set adr [$accessor getregionspectrum $axis $alow $ahigh \
+                  $desc $meth 1 $itk_option(-component)]
 
       #  Pass in the data.
       $itk_component(canvas) coords $spectrum_ refpointer $adr
@@ -569,7 +572,8 @@ itcl::class gaia::GaiaSpectralPlot {
       }
 
       #  Get the spectral data from the accessor.
-      lassign [$accessor getspectrum $axis $alow $ahigh $p1 $p2 1] adr
+      set adr [$accessor getspectrum $axis $alow $ahigh $p1 $p2 1 \
+                  $itk_option(-component)]
 
       #  Pass in the data.
       $itk_component(canvas) coords $spectrum_ refpointer $adr
@@ -1123,6 +1127,10 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Configuration options: (public variables)
    #  ----------------------
+   
+   #  The component of the data that we're to display. Usually DATA,
+   #  but could be VARIANCE or QUALITY.
+   itk_option define -component component Component "DATA"
 
    #  Identifying number for toolbox (shown in () in window title).
    itk_option define -number number Number 0 {}

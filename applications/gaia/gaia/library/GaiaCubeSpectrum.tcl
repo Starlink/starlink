@@ -312,8 +312,10 @@ itcl::class gaia::GaiaCubeSpectrum {
 
    #  Remove bindings from main canvas for spectral plot.
    protected method remove_bindings_ {} {
-      $canvas_ bind $rtdimage_ <1> {}
-      $canvas_ bind $rtdimage_ <B1-Motion> {}
+      catch {
+         $canvas_ bind $rtdimage_ <1> {}
+         $canvas_ bind $rtdimage_ <B1-Motion> {}
+      }
    }
 
    #  If not available create the spectral plot, otherwise activate it.
@@ -330,6 +332,7 @@ itcl::class gaia::GaiaCubeSpectrum {
                 -ref_line_changed_cmd [code $cube ref_line_moved_] \
                 -ref_range_changed_cmd [code $cube ref_range_moved_] \
                 -colour_changed_cmd [code $this spec_colour_changed_] \
+                -component $itk_option(-component) \
                 -shorthelpwin $itk_option(-gaia) \
                 -transient $itk_option(-transient_spectralplot) ]
 
@@ -1080,6 +1083,14 @@ itcl::class gaia::GaiaCubeSpectrum {
          set rtdimage_ [$image_ get_image]
          set canvasdraw_ [$image_ component draw]
          set canvas_ [$image_ get_canvas]
+      }
+   }
+
+   #  Component of the cube that we're extracting. Usually DATA but could
+   #  be VARIANCE or QUALITY.
+   itk_option define -component component Component "DATA" {
+      if { $spectrum_ != {} } {
+         $spectrum_ configure -component $itk_option(-component)
       }
    }
 
