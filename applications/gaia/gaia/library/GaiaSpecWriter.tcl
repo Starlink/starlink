@@ -248,19 +248,29 @@ itcl::class gaia::GaiaSpecWriter {
          #  a simple extraction would be incorrect.
          if { [$cubespectrum last_extracted_type] == "point" } {
             if { [$cubeaccessor exists "VARIANCE"] } {
-               $cubeaccessor map "READ" "VARIANCE"
+               set mapped [$cubeaccessor ismapped "VARIANCE"]
+               if { ! $mapped } {
+                  $cubeaccessor map "READ" "VARIANCE"
+               }
                set specdatacomp [$specaccessor map "WRITE/BAD" "VARIANCE"]
                set cubespecdatacomp [$cubeaccessor getlastspectrum "VARIANCE"]
                array::copy $cubespecdatacomp $specdatacomp
-               $cubeaccessor unmap "VARIANCE"
+               if { ! $mapped } {
+                  $cubeaccessor unmap "VARIANCE"
+               }
             }
 
             if { [$cubeaccessor exists "QUALITY"] } {
-               $cubeaccessor map "READ" "QUALITY"
+               set mapped [$cubeaccessor ismapped "QUALITY"]
+               if { ! $mapped } {
+                  $cubeaccessor map "READ" "QUALITY"
+               }
                set specdatacomp [$specaccessor map "WRITE/BAD" "QUALITY"]
                set cubespecdatacomp [$cubeaccessor getlastspectrum "QUALITY"]
                array::copy $cubespecdatacomp $specdatacomp
-               $cubeaccessor unmap "QUALITY"
+               if { ! $mapped } {
+                  $cubeaccessor unmap "QUALITY"
+               }
             }
 
             #  If this is a raw ACSIS cube we will try to extract and record
