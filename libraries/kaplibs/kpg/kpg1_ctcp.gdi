@@ -65,6 +65,7 @@
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -72,6 +73,8 @@
 *        Original version.
 *     2006 May 17 (MJC):
 *        Made generic version.
+*     19-FEB-2007 (PWD):
+*        Assign OUT to generic value VAL__BAD<T>, not VAL__BADD.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -124,12 +127,12 @@
          DO J = 1, NAX
 
 *  If this column ID is valid, get the column value.
-            IF( GI( J ) .NE. CAT__NOID ) THEN 
+            IF ( GI( J ) .NE. CAT__NOID ) THEN 
                CALL CAT_EGT0<T>( GI( J ), OUT( I, J ), NULL, STATUS )
-               IF( STATUS .NE. SAI__OK ) GO TO 999
+               IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Store a Starlink bad value if the value is null.
-               IF( NULL ) OUT( I, J ) = VAL__BADD
+               IF ( NULL ) OUT( I, J ) = VAL__BAD<T>
 
 *  If this column ID is null, store the row number. 
             ELSE
