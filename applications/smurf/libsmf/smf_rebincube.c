@@ -183,6 +183,8 @@
 *        Issue warning if the input file does not overlap the output cube.
 *     16-FEB-2007 (DSB):
 *        Ignore input spectra that contain no good data.
+*     19-FEB-2007 (DSB):
+*        Ignore input spectra that contain any bad data.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -716,20 +718,21 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
                      wgt = VAL__BADD;
                   } 
 
-/* See if any of the used input spectrum contains any good values. If
-   not, we can skip to the next detector. */
+/* See if there are any bad values in the used input spectrum. If there are, 
+   we ignore the entire input spectrum in order to avoid its bad valued
+   polluting the outptu spectrum. */
                   if( wgt != VAL__BADD ) {
                      qdata = pdata;
                      for( ichan = 0; ichan < nchan; ichan++, qdata++ ) {
                         iz = spectab[ ichan ] - 1;
                         if( iz >= 0 && iz < dim[ 2 ] ) {
-                           if( *qdata != VAL__BADR ) {
+                           if( *qdata == VAL__BADR ) {
                               qdata = NULL;
                               break;
                            }
                         }
                      }
-                     if( qdata ) wgt == VAL__BADD;
+                     if( qdata == NULL ) wgt = VAL__BADD;
                   }
 
 /* Skip to the next detector if no weight could be calculated for this
