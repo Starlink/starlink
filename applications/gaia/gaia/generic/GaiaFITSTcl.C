@@ -79,6 +79,8 @@ static int GaiaFITSTclCreate( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclDims( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
+static int GaiaFITSTclFitsHeaders( ClientData clientData, Tcl_Interp *interp,
+                                   int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclFitsRead( ClientData clientData, Tcl_Interp *interp,
                                 int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclFitsWrite( ClientData clientData, Tcl_Interp *interp,
@@ -124,6 +126,10 @@ int Fits_Init( Tcl_Interp *interp )
 
     Tcl_CreateObjCommand( interp, "fits::extensionexists", 
                           GaiaFITSTclExtensionExists,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "fits::fitsheaders", GaiaFITSTclFitsHeaders,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -783,6 +789,57 @@ static int GaiaFITSTclCreate( ClientData clientData, Tcl_Interp *interp,
                            info->bzero, info->blank, object, units,
                            ndims, dims );
 }
+
+/**
+ * Return the FITS headers as a string. Each card is separated by a newline.
+ */
+static int GaiaFITSTclFitsHeaders( ClientData clientData, Tcl_Interp *interp,
+                                   int objc, Tcl_Obj *CONST objv[] )
+{
+    FITSinfo *info;
+    Mem mem;
+    char *headerPtr;
+    char *headers;
+    char *ptr;
+    int i;
+    int headerSize;
+    int ncards;
+    int result;
+
+    /* Check arguments, need the FITS identifier */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "fits_identifier" );
+        return TCL_ERROR;
+    }
+
+    /* Import FITS identifier */
+    result = importFITSIdentifier( interp, objv[1], &info );
+    if ( result == TCL_OK ) {
+
+        /*  Access the FITS headers */
+        mem = info->handle->header();
+        headerPtr = (char *) mem.ptr();
+        headerSize = mem.size();
+
+        /* Loop over all cards, append each one to the result */
+        ncards = headerSize / 80;
+        headers = (char *) ckalloc( ncards * 81 );
+        ptr = headers;
+        for ( i = 0; i < ncards; i++ ) {
+            memcpy( ptr, headerPtr, 80 );
+            ptr[80] = '\n';
+            if ( strncmp( ptr, "END     ", 8 ) == 0 ) {
+                break;
+            }
+            ptr += 81;
+            headerPtr += 80;
+        }
+        ptr = '\0';
+        Tcl_SetResult( interp, headers, TCL_DYNAMIC );
+    }
+    return result;
+}
+
 
 /**
  * Return the value of a FITS keyword. If not found an empty string

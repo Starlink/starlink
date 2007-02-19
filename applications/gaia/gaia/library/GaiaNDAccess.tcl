@@ -605,6 +605,11 @@ itcl::class gaia::GaiaNDAccess {
       return [${type_}::extensionexists $handle_ $extension]
    }
 
+   #  Get the FITS headers as a single string (newline separated cards).
+   public method fitsheaders {} {
+      return [${type_}::fitsheaders $handle_]
+   }
+
    #  Get the value of a FITS card.
    public method fitsread {keyword} {
       return [${type_}::fitsread $handle_ $keyword]

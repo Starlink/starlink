@@ -67,6 +67,8 @@ static int gaiaNDFTclCGet( ClientData clientData, Tcl_Interp *interp,
                            int objc, Tcl_Obj *CONST objv[] );
 static int gaiaNDFTclCPut( ClientData clientData, Tcl_Interp *interp,
                            int objc, Tcl_Obj *CONST objv[] );
+static int gaiaNDFTclFitsHeaders( ClientData clientData, Tcl_Interp *interp,
+                                  int objc, Tcl_Obj *CONST objv[] );
 static int gaiaNDFTclFitsRead( ClientData clientData, Tcl_Interp *interp,
                                int objc, Tcl_Obj *CONST objv[] );
 static int gaiaNDFTclFitsWrite( ClientData clientData, Tcl_Interp *interp,
@@ -135,11 +137,15 @@ int Ndf_Init( Tcl_Interp *interp )
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "ndf::fitswrite", gaiaNDFTclFitsWrite,
+    Tcl_CreateObjCommand( interp, "ndf::fitsheaders", gaiaNDFTclFitsHeaders,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "ndf::fitsread", gaiaNDFTclFitsRead,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "ndf::fitswrite", gaiaNDFTclFitsWrite,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -1035,6 +1041,59 @@ static int queryNdfCoord( AstFrameSet *frameSet, int axis, double *coords,
     }
     return result;
 }
+
+/**
+ * Return the FITS headers as a string. Each card is separated by a newline.
+ */
+static int gaiaNDFTclFitsHeaders( ClientData clientData, Tcl_Interp *interp,
+                                  int objc, Tcl_Obj *CONST objv[] )
+{
+    NDFinfo *info;
+    char *error_mess;
+    char *headers;
+    char *ptr;
+    int i;
+    int ncards;
+    int result;
+
+    /* Check arguments, need the ndf handle */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "ndf_handle" );
+        return TCL_ERROR;
+    }
+
+    /* Get the NDF */
+    result = importNdfHandle( interp, objv[1], &info );
+    if ( result == TCL_OK ) {
+
+        /* Get the FITS headers as an AST FITS channel */
+        if ( info->fitschan == NULL ) {
+            result = gaiaNDFGetFitsChan( info->ndfid, &info->fitschan, 
+                                         &error_mess );
+        }
+        if ( result != TCL_OK ) {
+            Tcl_SetResult( interp, error_mess, TCL_VOLATILE );
+            free( error_mess );
+        }
+        else {
+            /* Loop over all cards, append each one to the result */
+            ncards = astGetI( info->fitschan, "Ncard" );
+            headers = (char *) ckalloc( ncards * 81 );
+            ptr = headers;
+            astClear( info->fitschan, "Card" );
+            for ( i = 0; i < ncards; i++ ) {
+                astFindFits( info->fitschan, "%f", ptr, 1 );
+                ptr[80] = '\n';
+                ptr += 81;
+            }
+            ptr = '\0';
+            Tcl_SetResult( interp, headers, TCL_DYNAMIC );
+        }
+        if ( !astOK ) astClearStatus;
+    }
+    return result;
+}
+
 
 /**
  * Return the value of a FITS keyword. If not found then an empty string is 
