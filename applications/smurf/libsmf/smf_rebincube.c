@@ -184,7 +184,8 @@
 *     16-FEB-2007 (DSB):
 *        Ignore input spectra that contain no good data.
 *     19-FEB-2007 (DSB):
-*        Ignore input spectra that contain any bad data.
+*        Ignore input spectra which have a different placement of bad pixels 
+*        to the output spectrum to which they woud otherwise be added,
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -718,21 +719,55 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
                      wgt = VAL__BADD;
                   } 
 
-/* See if there are any bad values in the used input spectrum. If there are, 
-   we ignore the entire input spectrum in order to avoid its bad valued
-   polluting the outptu spectrum. */
+/* If the input spectrum looks OK so far, and this is not the first input
+   spectrum to be added into the output spectrum, we check if the bad pixel
+   mask in the input spectrum matches the bad pixel mask in the existing
+   output spectrum. Because the weights array is 2D (i.e. not 3D), we
+   require all input spectra that contribute to a given output spectrum to
+   have the saem bad pixel mask. */
                   if( wgt != VAL__BADD ) {
-                     qdata = pdata;
-                     for( ichan = 0; ichan < nchan; ichan++, qdata++ ) {
-                        iz = spectab[ ichan ] - 1;
-                        if( iz >= 0 && iz < dim[ 2 ] ) {
-                           if( *qdata == VAL__BADR ) {
-                              qdata = NULL;
-                              break;
+                     if( wgt_array[ iv0 ] != 0.0 ){
+
+/* Loop round all channels in the input spectrum. */
+                        qdata = pdata;
+                        for( ichan = 0; ichan < nchan; ichan++, qdata++ ) {
+
+/* Get the corresponding output channel and check it is within the range
+   of the output cube. */
+                           iz = spectab[ ichan ] - 1;
+                           if( iz >= 0 && iz < dim[ 2 ] ) {
+
+/* Find the vector index of the pixel within the 3D output data array
+   that would receieve this input pixel. */
+                              iv = iv0 + nxy*iz;
+
+/* If exactly 1 of the input and output data values is bad, then the bad
+   pixel masks differ and so we cannot use this input spectrum. */
+                              if( ( data_array[ iv ] == VAL__BADR &&
+                                    *qdata != VAL__BADR ) || 
+                                  ( data_array[ iv ] != VAL__BADR &&
+                                    *qdata == VAL__BADR ) ) {
+                                 wgt = VAL__BADD;
+                                 break;
+                              }
                            }
                         }
+
+/* If this is the first input spectrum to be added into the output spectrum, 
+   skip it if the input spectrum contains no good data. */
+                     } else {
+                        qdata = pdata;
+                        for( ichan = 0; ichan < nchan; ichan++, qdata++ ) {
+                           iz = spectab[ ichan ] - 1;
+                           if( iz >= 0 && iz < dim[ 2 ] ) {
+                              if( *qdata != VAL__BADR ) {
+                                 qdata = NULL;
+                                 break;
+                              }
+                           }
+                        }
+                        if( qdata != NULL ) wgt = VAL__BADD;
                      }
-                     if( qdata == NULL ) wgt = VAL__BADD;
                   }
 
 /* Skip to the next detector if no weight could be calculated for this
