@@ -53,6 +53,7 @@
 *     A.J.Chipperfield (Starlink, RAL)
 *     Norman Gray (Starlink, Glasgow)
 *     Tim Jenness (JAC, Hawaii)
+*     Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -65,6 +66,8 @@
 *        platform-dependent versions.
 *      9-AUG-2004 (TIMJ):
 *        Reinstate the fallback to emsSyser (at least for g77 case)
+*     20-FEB-2007 (PWD):
+*        Add gfortran support.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -327,11 +330,28 @@ static const MessageInfo* getMessageInfo(void)
        nmsg = sizeof(msgs)/sizeof(msgs[0]);
        info.msgs = &msgs[0];
      } else {
-       /* do not know the gfortran codes */
-       static const char *msgs[] = {
-	 "gnu compiler with unknown code",
+        /* gfortran codes, used as default */
+        static const char *msgs[] = {
+           "Operating system error",          /* ERROR_OS, 5000 */
+           "Conflicting statement options",   /* ERROR_OPTION_CONFLICT */
+           "Bad statement option",            /* ERROR_BAD_OPTION */
+           "Missing statement option",        /* ERROR_MISSING_OPTION */
+           "File already opened in another unit", /* ERROR_ALREADY_OPEN */
+           "Unattached unit",                 /* ERROR_BAD_UNIT */
+           "FORMAT error",                    /* ERROR_FORMAT */
+           "Incorrect ACTION specified",      /* ERROR_BAD_ACTION */
+           "Read past ENDFILE record",        /* ERROR_ENDFILE */
+           "Corrupt unformatted sequential file", /* ERROR_BAD_US */
+           "Bad value during read",           /* ERROR_READ_VALUE */
+           "Numeric overflow on read",        /* ERROR_READ_OVERFLOW */
+           "Internal error in run-time library" /* ERROR_INTERNAL */
+           "Internal unit I/O error"          /* ERROR_INTERNAL_UNIT */
+           "Error in allocation",             /* ERROR_ALLOCATION */
+           "Write exceeds length of DIRECT access record", /* ERROR_DIRECT_EOR */
+           "I/O past end of record on unformatted file", /* ERROR_SHORT_RECORD */
+           "Unformatted file structure has been corrupted" /* ERROR_CORRUPT_FILE */
        };
-       info.first_iostat = 1;
+       info.first_iostat = 5000;
        nmsg = sizeof(msgs)/sizeof(msgs[0]);
        info.msgs = &msgs[0];
      }
