@@ -92,7 +92,8 @@
      1               ''  is linked'')') N
 	  CALL MSG_OUT(' ', TEXT, STATUS) 	
 	  CYC_PAR = -1
-	ELSE IF( LO_A( N ) .NE. N_LARGE .OR. HI_A( N ) .NE. P_LARGE ) THEN
+	ELSE IF( LO_A( N ) .NE. N_LARGE .OR. HI_A( N ) .NE. P_LARGE ) 
+     1  THEN
 	  IF( HI_A( N ) - LO_A( N ) .GE. HI - LO ) THEN
  	    WRITE(TEXT,'(''ERROR > Conflict between LIMIT_PAR'
      1              // ' and CYC_PAR'')')
