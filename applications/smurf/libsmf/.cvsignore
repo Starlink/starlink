@@ -1,8 +1,0 @@
-fac*_err
-smf_err.h
-*.la
-Makefile
-Makefile.in
-*.lo
-.deps
-.libs

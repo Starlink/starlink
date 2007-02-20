@@ -1,8 +1,0 @@
-Interface IRAS_TAG
-
-   Parameter INPUT                    # NDF to be inspected
-      Position  1
-      Prompt 'NDF file to have IRAS astrometry structure appended'
-   EndParameter
-
-EndInterface
