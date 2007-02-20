@@ -10,7 +10,10 @@
 # pbiereic    14/08/01   Created
 # pbiereic    17/02/03   fixed problems with tabnotebook, packing order
 #                        and labels of tabsets
-# pdraper     05/04/06   treat HISTORY like COMMENT
+# pdraper     05/04/06   Treat HISTORY like COMMENT
+# pdraper     20/02/07   Formatting changes: keep empty lines and print
+#                        blank COMMENT/HISTORY lines with blanks, do
+#                        not fake that they start with COMMENT/HISTORY.
 
 itk::usual RtdImageFitsHeader {}
 
@@ -320,7 +323,10 @@ itcl::class rtd::RtdImageFitsHeader {
 		lappend info [list END {} {}]
 		break
 	    }
-	    if { [lempty $l] } { continue }
+	    if { [lempty $l] } {
+               lappend info [list {} {} {}]
+               continue
+            }
 	    set triple [get_kvc $line]
 	    if { [lempty $triple] } {
 		set triple [list INVALID {} $line]
@@ -337,14 +343,11 @@ itcl::class rtd::RtdImageFitsHeader {
 
     protected method get_kvc { line } {
 	set key [string range $line 0 6]
-	if { [lempty $key] || "$key" == "COMMENT" } {
-	    return [list COMMENT {} [string trim [string range $line 7 end]]]
-	}
-	if { [lempty $key] || "$key" == "HISTORY" } {
-            return [list HISTORY {} [string trim [string range $line 7 end]]]
+        if { [lempty $key] || "$key" == "COMMENT" || "$key" == "HISTORY" } {
+	    return [list $key {} [string trim [string range $line 7 end]]]
 	}
 	lassign [split $line =] l1 l2
-	if { [lempty $l1] } { return "" }
+        if { [lempty $l1] } { return "" }
 	set key [string trim $l1]
 	lassign [split $l2 /] l1 l2 l3
         if { [info exists l3] && $l3 !={} } {
