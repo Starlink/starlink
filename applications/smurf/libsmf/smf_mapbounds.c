@@ -55,6 +55,7 @@
 *     Edward Chapin (UBC)
 *     Tim Jenness (JAC, Hawaii)
 *     Andy Gibb (UBC)
+*     David Berry 
 *     {enter_new_authors_here}
 
 *  History:
@@ -78,6 +79,9 @@
 *     2007-01-25 (AGG):
 *        Rewrite to check for and take account of moving objects,
 *        largely borrowed from smf_cubegrid & smf_cubebounds
+*     2007-02-20 (DSB):
+*        Modify check for object movement to take account of the
+*        difference in epoch between the first and last time slices.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -308,15 +312,35 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
             sf2 = astCopy( skyin );
             astSetC( sf2, "System", "ICRS" );
 
-            /* Use the Mapping from `sf' (AzEl) to `sf2' (ICRS) to
-               convert the telescope base pointing position for the
-               first and last slices from (az,el) to ICRS. */
+
+            /* Set the Epoch for `sf1' andf `sf2' to the epoch of the
+	    first time slice, then use the Mapping from `sf1' (AzEl) to
+	    `sf2' (ICRS) to convert the telescope base pointing position
+	    for the first time slices from (az,el) to ICRS. */
+
+            astSet( sf1, "Epoch=MJD %.*g", DBL_DIG, 
+                    (hdr->allState)[ 0 ].rts_end + 32.184/86400.0 );
+            astSet( sf2, "Epoch=MJD %.*g", DBL_DIG, 
+                    (hdr->allState)[ 0 ].rts_end + 32.184/86400.0 );
             az[ 0 ] = (hdr->allState)[ 0 ].tcs_az_bc1;
             el[ 0 ] = (hdr->allState)[ 0 ].tcs_az_bc2;
+            astTran2( astConvert( sf1, sf2, "" ), 1, az, el, 1, ra, dec );
+
+
+            /* Set the Epoch for `sf1' andf `sf2' to the epoch of the
+	    last time slice, then use the Mapping from `sf1' (AzEl) to
+	    `sf2' (ICRS) to convert the telescope base pointing position
+	    for the last time slices from (az,el) to ICRS. */
+
+            astSet( sf1, "Epoch=MJD %.*g", DBL_DIG, 
+                    (hdr->allState)[ hdr->nframes - 1 ].rts_end + 32.184/86400.0 );
+            astSet( sf2, "Epoch=MJD %.*g", DBL_DIG, 
+                    (hdr->allState)[ hdr->nframes - 1 ].rts_end + 32.184/86400.0 );
             az[ 1 ] = (hdr->allState)[ hdr->nframes - 1 ].tcs_az_bc1;
             el[ 1 ] = (hdr->allState)[ hdr->nframes - 1 ].tcs_az_bc2;
+            astTran2( astConvert( sf1, sf2, "" ), 1, az + 1, el + 1, 1, 
+                                                     ra + 1, dec + 1 );
 
-            astTran2( astConvert( sf1, sf2, "" ), 2, az, el, 1, ra, dec );
 
             /* Get the arc distance between the two positions and
                see if it is greater than 0.1 arc-sec. */
@@ -327,7 +351,8 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
           }
 	  /* Just for kicks, let the user know the value of *moving */
           msgSeti("M",*moving);
-          msgOutif(MSG__VERB, " ", "Moving = ^M", status);
+          msgSetr("R", sep*AST__DR2D*3600.0 );
+          msgOutif(MSG__VERB, " ", "Moving = ^M (^R arcsec)", status);
         } /* End skyframe construction */
 
         /* Before adding to frameset, ensure that the SkyFrame

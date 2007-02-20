@@ -120,6 +120,9 @@
 *     15-FEB-2007 (DSB):
 *        Ensure SkyRef is set in returned SkyFrame, even if the target is
 *        not moving.
+*     20-FEB-2007 (DSB):
+*        Change the check for target movement to take account of the
+*        difference in epoch between the first and last time slices.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -429,14 +432,31 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
                sf2 = astCopy( skyin );
                astSetC( sf2, "System", "ICRS" );
 
-/* Use the Mapping from "sf1" (azel) to "sf2" (ICRS) to convert the telescope 
-   base pointing position for the first and last slices from (az,el) to ICRS. */
+/* Set the Epoch for `sf1' andf `sf2' to the epoch of the first time slice, 
+   then use  the Mapping from `sf1' (AzEl) to `sf2' (ICRS) to convert the 
+   telescope base pointing position for the first time slices from (az,el) 
+   to ICRS. */
+               astSet( sf1, "Epoch=MJD %.*g", DBL_DIG, 
+                       (hdr->allState)[ 0 ].rts_end + 32.184/86400.0 );
+               astSet( sf2, "Epoch=MJD %.*g", DBL_DIG, 
+                       (hdr->allState)[ 0 ].rts_end + 32.184/86400.0 );
                az[ 0 ] = (hdr->allState)[ 0 ].tcs_az_bc1;
                el[ 0 ] = (hdr->allState)[ 0 ].tcs_az_bc2;
+               astTran2( astConvert( sf1, sf2, "" ), 1, az, el, 1, ra, dec );
+
+
+/* Set the Epoch for `sf1' andf `sf2' to the epoch of the last time slice, 
+   then use  the Mapping from `sf1' (AzEl) to `sf2' (ICRS) to convert the 
+   telescope base pointing position for the last time slices from (az,el) 
+   to ICRS. */
+               astSet( sf1, "Epoch=MJD %.*g", DBL_DIG, 
+                       (hdr->allState)[ hdr->nframes - 1 ].rts_end + 32.184/86400.0 );
+               astSet( sf2, "Epoch=MJD %.*g", DBL_DIG, 
+                       (hdr->allState)[ hdr->nframes - 1 ].rts_end + 32.184/86400.0 );
                az[ 1 ] = (hdr->allState)[ hdr->nframes - 1 ].tcs_az_bc1;
                el[ 1 ] = (hdr->allState)[ hdr->nframes - 1 ].tcs_az_bc2;
-
-               astTran2( astConvert( sf1, sf2, "" ), 2, az, el, 1, ra, dec );
+               astTran2( astConvert( sf1, sf2, "" ), 1, az + 1, el + 1, 1, 
+                                                        ra + 1, dec + 1 );
 
 /* Get the arc distance between the two positions and see if it is
    greater than 1 arc-sec. */
