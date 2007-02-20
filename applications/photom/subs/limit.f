@@ -252,7 +252,7 @@
 	      END DO
 	    ELSE
  	      WRITE(TEXT, '(''ERROR >  Illegal attempt on a '
-     1		 //   'cyclic slave parameter'')') N
+     1		 //   'cyclic slave parameter'')')
 	      CALL MSG_OUT(' ', TEXT, STATUS) 
 
      
