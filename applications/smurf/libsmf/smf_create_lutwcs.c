@@ -98,6 +98,8 @@
 *        - Correct SMU offsets arcsec->rad conversion.
 *     2006-11-01 (DSB):
 *        Added steptime.
+*     2007-02-20 (DSB):
+*        Clear the cache if the INSTAP values change.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -203,6 +205,10 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
      longitude,latitude Mapping. */
   static AstMapping *azel_cache[ 2 ] = { NULL, NULL };
 
+  /* Cache used to hold the instap values which were hard-wired into the
+     cached Mapping. */
+  static double instap_cache[ 2 ];
+
 
   /* Main routine */
 
@@ -239,7 +245,21 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
      annulling AST objects. Note, there should be no "return" statements
      before the matching call to astEnd. */
   astBegin;
-  
+
+  /* See if either of the instap values has changed. If so, clear the
+     cache since the old instap values were hard-wired into it. */
+  if( ( instap && ( instap[ 0 ] != instap_cache[ 0 ] ||
+                     instap[ 1 ] != instap_cache[ 1 ] ) ) ||
+      ( !instap && ( 0.0 != instap_cache[ 0 ] || 
+                     0.0 != instap_cache[ 1 ] ) ) ){
+
+    if( map_cache ) map_cache = astAnnul( map_cache );
+    if( frameset_cache ) frameset_cache = astAnnul( frameset_cache );
+    if( azel_cache[ 0 ] ) azel_cache[ 0 ] = astAnnul( azel_cache[ 0 ] );
+    if( azel_cache[ 1 ] ) azel_cache[ 1 ] = astAnnul( azel_cache[ 1 ] );
+    if( skyframe ) skyframe = astAnnul( skyframe );
+  }
+
   /* The Mapping from pixel number to AzEl coords can be thought of as
      divided into two parts; the early part which goes from pixel # to
      boresight focal plane offsets, and the later part which goes from
@@ -307,6 +327,12 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
 	instapmap = astShiftMap( 2, instap, "" );
         astInvert( instapmap );
 	map_cache = (AstMapping *) astCmpMap( map_cache, instapmap, 1, "" );
+
+        instap_cache[ 0 ] = instap[ 0 ];
+        instap_cache[ 1 ] = instap[ 1 ];
+      } else {
+        instap_cache[ 0 ] = 0.0;
+        instap_cache[ 1 ] = 0.0;
       }
 
       /* Simplify the Cached Mapping. */
