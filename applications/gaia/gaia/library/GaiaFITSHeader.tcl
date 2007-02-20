@@ -303,10 +303,7 @@ itcl::class gaia::GaiaFITSHeader {
    #  Return a tcl list with keyword, value and comment (kvc).
    protected method get_kvc { line } {
       set key [string range $line 0 6]
-      if { [lempty $key] || "$key" == "COMMENT" } {
-         return [list $key [string trim [string range $line 7 end]] {}]
-      }
-      if { [lempty $key] || "$key" == "HISTORY" } {
+      if { [lempty $key] || "$key" == "COMMENT" || "$key" == "HISTORY" } {
          return [list $key [string trim [string range $line 7 end]] {}]
       }
       lassign [split $line =] l1 l2

@@ -28,6 +28,8 @@
 
     - The variance and quality components of a cube can now be displayed.
 
+    - The FITS headers of a cube can now be inspected.
+
     - Spectra can now be sent to other PLASTIC-enabled applications using
     the Interop menu in the spectral plot window. Only SPLAT-VO supports
     this at present.
