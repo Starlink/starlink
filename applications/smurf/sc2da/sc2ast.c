@@ -99,6 +99,7 @@ int *status             /* global status (given and returned) */
      07Sep2006 : Added "telpos" and "instap" arguments 
                  JCMTState now used for time/pointing (EC)
      19Dec2006 : If "state" is NULL return the focal plane frameset (TJ)
+     20Feb2007 : Clear the cache if instap is changed.
 */
 
 {
@@ -221,8 +222,13 @@ int *status             /* global status (given and returned) */
    longitude,latitude Mapping. */
    static AstMapping *azel_cache[ 2 ] = { NULL, NULL };
 
-
-
+/* Cache used to hold the instap values which were hatrd-wired into the
+   cached Mapping for each subarray. */
+   static double instap_x[ 8 ] = { AST__BAD, AST__BAD, AST__BAD, AST__BAD, 
+                                   AST__BAD, AST__BAD, AST__BAD, AST__BAD };
+   static double instap_y[ 8 ] = { AST__BAD, AST__BAD, AST__BAD, AST__BAD, 
+                                   AST__BAD, AST__BAD, AST__BAD, AST__BAD };
+      
 /* Check the sub-array number. If it is -1, free the cached AST objects and 
    return. Otherwise, report an error if the value is illegal. We do
    this before checking the inherited status so that the memory is freed
@@ -262,6 +268,22 @@ int *status             /* global status (given and returned) */
    annulling AST objects. Note, there should be no "return" statements
    before the matching call to astEnd. */
    astBegin;
+
+/* See if either of the instap values has changed. If so, clear the cache
+   for the requested subarray since the cached Mapping will have the old
+   instap values hard-wired into it. */
+   if( ( instap && ( instap[ 0 ] != instap_x[ subnum ] ||
+                     instap[ 1 ] != instap_y[ subnum ] ) ) ||
+       ( !instap && ( 0.0 != instap_x[ subnum ] || 
+                      0.0 != instap_y[ subnum ] ) ) ){
+
+      if( map_cache[ subnum ] ) {
+         map_cache[ subnum ] = astAnnul( map_cache[ subnum ] );
+      }
+      if( frameset_cache[ subnum ] ) {
+         frameset_cache[ subnum ] = astAnnul( frameset_cache[ subnum ] );
+      }
+   }
 
 /* The Mapping from GRID coords to AzEl coords can be thought of as divided 
    into two parts; the early part which goes from GRID to Cartesian Nasmyth 
@@ -358,11 +380,17 @@ int *status             /* global status (given and returned) */
       map_cache[ subnum ] = (AstMapping *) astCmpMap( map_cache[ subnum ], 
                                                       radmap, 1, "" );
 
-/* Apply focal plane offsets - if supplied */
+/* Apply focal plane offsets - if supplied. Note the effective values in
+   the cache so that we can spot if they are changed. */
       if (instap) {
 	instapmap = astShiftMap( 2, instap, "" );
 	map_cache[ subnum ] = (AstMapping *) astCmpMap( map_cache[ subnum ], 
 							instapmap, 1, "" );
+        instap_x[ subnum ] = instap[ 0 ];
+        instap_y[ subnum ] = instap[ 1 ];
+      } else {
+        instap_x[ subnum ] = 0.0;
+        instap_y[ subnum ] = 0.0;
       }
 
 /* Simplify the Cached Mapping. */
