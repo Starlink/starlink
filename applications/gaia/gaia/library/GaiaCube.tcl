@@ -109,6 +109,16 @@ itcl::class gaia::GaiaCube {
          -accelerator {Control-c}
       bind $w_ <Control-c> [code $this close]
 
+      #  Add the View menu.
+      set View [add_menubutton "View" left]
+      configure_menubutton View -underline 0
+
+      #  View the cube FITS headers.
+      $View add command -label "Fits header..." \
+         -command [code $this show_fitsheaders_] \
+         -accelerator {Control-f}
+      bind $w_ <Control-f> [code $this show_fitsheaders_]
+
       #  Add the Options menu.
       set Options [add_menubutton "Options" left]
       configure_menubutton Options -underline 0
@@ -444,6 +454,15 @@ itcl::class gaia::GaiaCube {
       catch {
          $itk_component(animation) stop
       }
+
+      #  Destroy FITS headers window.
+      if { $fitsheaders_ != {} } {
+         catch {
+            destroy $fitsheaders_
+         } msg
+         puts "msg = $msg"
+      }
+      
    }
 
    #  Methods:
@@ -571,6 +590,9 @@ itcl::class gaia::GaiaCube {
 
          #  Add cube to history (and previous cube to back list).
          add_history $itk_option(-cube)
+
+         #  Update FITS headers, if viewed.
+         maybe_update_fitsheaders_
       }
    }
 
@@ -1424,6 +1446,28 @@ itcl::class gaia::GaiaCube {
       }
       return $coords
    }
+   
+   #  =======
+   #  FITS headers
+   #  =======
+
+   #  Create and display the FITS headers dialog window.
+   protected method show_fitsheaders_ {} {
+      if { $fitsheaders_ == {} } {
+         set fitsheaders_ $w_.fitsheaders_
+      }
+      utilReUseWidget GaiaFITSHeader $fitsheaders_ -accessor $cubeaccessor_
+      $fitsheaders_ activate
+   }
+
+   #  If displaying the FITS headers update to show headers from current cube.
+   protected method maybe_update_fitsheaders_ {} {
+      if { $fitsheaders_ != {} } {
+         if { [winfo viewable $fitsheaders_] } {
+            $fitsheaders_ activate
+         }
+      }
+   }
 
    #  Configuration options: (public variables)
    #  ----------------------
@@ -1545,6 +1589,9 @@ itcl::class gaia::GaiaCube {
    #  Data associated with the state of all the limits. Used to restore
    #  between cubes with different sizes.
    protected variable limits_
+
+   #  Name of GaiaFITSHeader instance, only set when active.
+   protected variable fitsheaders_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

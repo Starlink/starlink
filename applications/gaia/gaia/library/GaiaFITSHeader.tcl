@@ -91,6 +91,7 @@ itcl::class gaia::GaiaFITSHeader {
       #  Set window properties.
       wm protocol $w_ WM_DELETE_WINDOW [code $this close]
       wm title $w_ "FITS Headers ($itk_option(-number))"
+      wm geometry $w_ 100x20
 
       #  Add menubuttons and menus
       add_menubar
@@ -228,26 +229,26 @@ itcl::class gaia::GaiaFITSHeader {
 
       set string [string tolower $string]
 
-      set start_idx $search_idx_
-      set search_idx_ 0
-      if { "$string" != "$search_str_" } {
-         set start_idx 0
-         set search_str_ $string
+      set start_index $search_index_
+      set search_index_ 0
+      if { "$string" != "$search_string_" } {
+         set start_index 0
+         set search_string_ $string
       }
 
-      set end_idx [$listbox index end]
-      if { $start_idx >= $end_idx } {
-         set start_idx 0
+      set end_index [$listbox index end]
+      if { $start_index >= $end_index } {
+         set start_index 0
       }
 
       set length [string length [$listbox get 0]]
       
-      for { set n $start_idx } { $n < $end_idx } { incr n } {
+      for { set n $start_index } { $n < $end_index } { incr n } {
          set row [string tolower [$listbox get $n]]
-         if {[catch {regexp -indices $string $row indices} idx] } {
+         if {[catch {regexp -indices $string $row indices} index] } {
             continue
          }
-         if { $idx > 0 } {
+         if { $index > 0 } {
             $tbl select_row $n
             lassign $indices i1 i2
             set i1 [expr {double($i1) + ($i2 - $i1) / 2.}]
@@ -256,7 +257,7 @@ itcl::class gaia::GaiaFITSHeader {
             set offs [expr {double($length) / $w * [winfo width $w_] / 2.0}]
             set i1 [expr {$i1 - $offs}]
             $listbox xview moveto [expr {(1.0  - (double($length - $i1) / $length))}]
-            set search_idx_ [incr n]
+            set search_index_ [incr n]
             break
          }
       }
@@ -271,7 +272,7 @@ itcl::class gaia::GaiaFITSHeader {
 
    #  Show or update header info
    protected method update_headers_ {} {
-      set search_idx_ 0
+      set search_index_ 0
       set w $itk_component(table)
       
       set headers [$itk_option(-accessor) fitsheaders]
@@ -283,7 +284,10 @@ itcl::class gaia::GaiaFITSHeader {
             lappend info [list END {} {}]
             break
          }
-         if { [lempty $l] } { continue }
+         if { [lempty $l] } { 
+            lappend info [list {} {} {}]
+            continue
+         }
          set triple [get_kvc $line]
          if { [lempty $triple] } {
             set triple [list INVALID {} $line]
@@ -300,10 +304,10 @@ itcl::class gaia::GaiaFITSHeader {
    protected method get_kvc { line } {
       set key [string range $line 0 6]
       if { [lempty $key] || "$key" == "COMMENT" } {
-         return [list COMMENT {} [string trim [string range $line 7 end]]]
+         return [list $key [string trim [string range $line 7 end]] {}]
       }
       if { [lempty $key] || "$key" == "HISTORY" } {
-         return [list HISTORY {} [string trim [string range $line 7 end]]]
+         return [list $key [string trim [string range $line 7 end]] {}]
       }
       lassign [split $line =] l1 l2
       if { [lempty $l1] } { return "" }
@@ -335,6 +339,12 @@ itcl::class gaia::GaiaFITSHeader {
 
    #  Whether to show comments.
    protected variable show_comment_ 1
+
+   #  Current search index.
+   protected variable search_index_ 0
+
+   #  Current search string.
+   protected variable search_string_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
