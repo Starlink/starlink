@@ -298,7 +298,8 @@
 	ELSE
  	  WRITE(TEXT, '(''ERROR > No such parameter # '', I3)') N
 	  CALL MSG_OUT(' ', TEXT, STATUS) 
- 	  WRITE(TEXT, '(''        This call to NOLIMIT_PAR is ignored'')')
+ 	  WRITE(TEXT, 
+     1       '(''        This call to NOLIMIT_PAR is ignored'')')
 	  CALL MSG_OUT(' ', TEXT, STATUS) 
 
 	  NOLIMIT_PAR = -1

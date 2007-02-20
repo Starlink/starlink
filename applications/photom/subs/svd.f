@@ -495,7 +495,8 @@
     	  DO J = 1, SIZE_Y
     	    WORK( I, J ) = 0.0
     	    DO K = 1, SIZE_Y
-    	      WORK( I, J ) = WORK( I, J ) + V( J, K ) * W( K ) * U( I, K )
+    	      WORK( I, J ) = 
+     :           WORK( I, J ) + V( J, K ) * W( K ) * U( I, K )
     	    END DO
     	  END DO
     	END DO
