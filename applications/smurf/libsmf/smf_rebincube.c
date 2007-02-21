@@ -20,7 +20,7 @@
 *                    dim_t lbnd_out[ 3 ], dim_t ubnd_out[ 3 ], int spread, 
 *                    const double params[], int genvar, float *data_array, 
 *                    float *var_array, double *wgt_array, int *work1_array, 
-*                    float *texp_array, float *ton_array, double *fcon, 
+*                    float *texp_array, float *teff_array, double *fcon, 
 *                    int *status );
 
 *  Arguments:
@@ -108,11 +108,12 @@
 *        spectrum. It is updated on exit to include the supplied input 
 *        NDF. Only used if "spread" is AST__NEAREST. It should be big enough 
 *        to hold a single spatial plane from the output cube.
-*     ton_array = float * (Given and Returned)
-*        A work array, which holds the "on" time for each output 
-*        spectrum. It is updated on exit to include the supplied input 
-*        NDF. Only used if "spread" is AST__NEAREST. It should be big enough 
-*        to hold a single spatial plane from the output cube.
+*     teff_array = float * (Given and Returned)
+*        A work array, which holds the effective integration time for each 
+*        output spectrum, scaled by a factor of 4. It is updated on exit to 
+*        include the supplied input NDF. Only used if "spread" is AST__NEAREST.
+*        It should be big enough to hold a single spatial plane from the 
+*        output cube.
 *     fcon = double * (Given and Returned)
 *        If "index" is supplied as one, then *fcon is returned holding
 *        the ratio of the squared backend degradation factor to the spectral
@@ -186,6 +187,8 @@
 *     19-FEB-2007 (DSB):
 *        Ignore input spectra which have a different placement of bad pixels 
 *        to the output spectrum to which they woud otherwise be added,
+*     21-FEB-2007 (DSB):
+*        Change ton_array to teff_array.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -237,7 +240,7 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
                     int lbnd_out[ 3 ], int ubnd_out[ 3 ], int spread, 
                     const double params[], int genvar, float *data_array, 
                     float *var_array, double *wgt_array, int *work1_array, 
-                    float *texp_array, float *ton_array, double *fcon, 
+                    float *texp_array, float *teff_array, double *fcon, 
                     int *status ){
 
 /* Local Variables */
@@ -281,6 +284,7 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
    float *pdata = NULL;        /* Pointer to next input data value */
    float *qdata = NULL;        /* Pointer to next input data value */
    float *varwork = NULL;      /* Work array holding variances for 1 slice/channel */
+   float teff;                 /* Effective integration time */
    float texp;                 /* Total time ( = ton + toff ) */
    float toff;                 /* Off time */
    float ton;                  /* On time */
@@ -444,7 +448,7 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
          for( iv0 = 0; iv0 < nxy; iv0++ ) {
             wgt_array[ iv0 ] = 0.0;
             texp_array[ iv0 ] = 0.0;
-            ton_array[ iv0 ] = 0.0;
+            teff_array[ iv0 ] = 0.0;
          }
          if( genvar ) {
             for( iv0 = 0; iv0 < nxy; iv0++ ) var_array[ iv0 ] = 0.0;
@@ -580,8 +584,8 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
       smf_tslice_ast( data, itime, 1, status );
       swcsin = hdr->wcs;
 
-/* Note the total exposure time (texp) for all the input spectra produced by
-   this time slice. */
+/* Note the total exposure time (texp), and the total effective time
+   (texp), for all the input spectra produced by this time slice. */
       ton = hdr->state->acs_exposure;
       if( ton == 0.0 ) ton = VAL__BADR;
 
@@ -590,8 +594,10 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
 
       if( ton != VAL__BADR && toff != VAL__BADR ) {
          texp = ton + toff;
+         teff = 4*ton*toff/( ton + toff );
       } else {
          texp = VAL__BADR;
+         teff = VAL__BADR;
       }
 
 /* Find the constant factor associated with the current time slice, that
@@ -819,12 +825,13 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
                   }
    
 /* Indicate some input data from this input file fell in the output array,
-   and update the total exposure time for the output spectrum. */
+   and update the total exposure time and effective integration time for the 
+   output spectrum. */
                   if( good_det ) {
                      good_file = 1;
                      if( texp != VAL__BADR ) {
                         texp_array[ iv0 ] += texp;
-                        ton_array[ iv0 ] += ton;
+                        teff_array[ iv0 ] += teff;
                      }
                   }
 
@@ -978,11 +985,11 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
             }
          }
 
-/* Now convert zero texp_array and ton_array values to bad values. */
+/* Now convert zero texp_array and texp_array values to bad values. */
          for( iv0 = 0; iv0 < nxy; iv0++ ) {
             if( texp_array[ iv0 ] <= 0.0 ) {
                texp_array[ iv0 ] = VAL__BADR;
-               ton_array[ iv0 ] = VAL__BADR;
+               teff_array[ iv0 ] = VAL__BADR;
             }
          }            
 

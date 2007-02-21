@@ -17,7 +17,7 @@
 *                      AstMapping *ospecmap, AstSkyFrame *oskyframe, 
 *                      Grp *detgrp, int lbnd_out[ 3 ], int ubnd_out[ 3 ], 
 *                      int genvar, float *data_array, float *var_array, 
-*                      int *ispec, float *texp_array, float *ton_array, 
+*                      int *ispec, float *texp_array, float *teff_array, 
 *                      double *fcon, int *status );
 
 *  Arguments:
@@ -62,8 +62,9 @@
 *        spectrum. It is updated on exit to include the supplied input 
 *        NDF. Only used if "spread" is AST__NEAREST. It should be big enough 
 *        to hold a single spatial plane from the output cube.
-*     ton_array = float * (Given and Returned)
-*        A work array, which holds the "on" time for each output 
+*     teff_array = float * (Given and Returned)
+*        A work array, which holds the effective integration time (scaled 
+*        by a factor of 4) "on" time for each output 
 *        spectrum. It is updated on exit to include the supplied input 
 *        NDF. Only used if "spread" is AST__NEAREST. It should be big enough 
 *        to hold a single spatial plane from the output cube.
@@ -103,6 +104,8 @@
 *        Added parameter "ton_array" and "fcon".
 *     9-FEB-2007 (DSB):
 *        Check for bad tsys values in the input NDF.
+*     21-FEB-2007 (DSB):
+*        Change ton_array to teff_array.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -152,7 +155,7 @@ void smf_rebinsparse( smfData *data, int index, AstFrame *ospecfrm,
                       AstMapping *ospecmap, AstSkyFrame *oskyframe, 
                       Grp *detgrp, int lbnd_out[ 3 ], int ubnd_out[ 3 ], 
                       int genvar, float *data_array, float *var_array, 
-                      int *ispec, float *texp_array, float *ton_array, 
+                      int *ispec, float *texp_array, float *teff_array, 
                       double *fcon, int *status ){
 
 /* Local Variables */
@@ -181,6 +184,7 @@ void smf_rebinsparse( smfData *data, int index, AstFrame *ospecfrm,
    double tcon;          /* Variance factor for whole time slice */
    float *pdata;         /* Pointer to next data sample */
    float *qdata;         /* Pointer to next data sample */
+   float teff;           /* Effective integration time, times 4 */
    float texp;           /* Total time ( = ton + toff ) */
    float toff;           /* Off time */
    float ton;            /* On time */
@@ -410,8 +414,10 @@ void smf_rebinsparse( smfData *data, int index, AstFrame *ospecfrm,
 
       if( ton != VAL__BADR && toff != VAL__BADR ) {
          texp = ton + toff;
+         teff = 4*ton*toff/( ton + toff );
       } else {
          texp = VAL__BADR;
+         teff = VAL__BADR;
       }
 
 /* If output variances are being calculated on the basis of Tsys values
@@ -477,7 +483,7 @@ void smf_rebinsparse( smfData *data, int index, AstFrame *ospecfrm,
 
                   if( texp != VAL__BADR ) {
                      texp_array[ *ispec ] = texp;
-                     ton_array[ *ispec ] = ton;
+                     teff_array[ *ispec ] = teff;
                   }
    
                   for( ichan = 0; ichan < nchan; ichan++, pdata++ ) {

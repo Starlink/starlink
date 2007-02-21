@@ -367,15 +367,17 @@
 *     of every input NDF, and it must have the same value in all input
 *     NDFs.
 *     - The output NDF will contain an extension named "SMURF" containing
-*     three NDFs named "EXP_TIME", "ON_TIME" and "TSYS". Each of these NDFs 
+*     three NDFs named "EXP_TIME", "EFF_TIME" and "TSYS". Each of these NDFs 
 *     is 2-dimensional, with the same pixel bounds as the spatial axes of the 
 *     main output NDF, so that a pixel in one of these NDFs corresponds
 *     to a spectrum in the main output NDF. EXP_TIME holds the sum of the 
 *     total exposure times (Ton + Toff) for the input spectra that 
-*     contributed to each output spectrum. ON_TIME holds the sum of the "on" 
-*     times (Ton) for the input spectra that contributed to each output 
-*     spectrum. TSYS holds the effective system temperature for each output 
-*     spectrum. The TSYS array is not created if GENVAR is "None".
+*     contributed to each output spectrum. EFF_TIME holds the sum of the
+*     effective integration times (Teff) for the input spectra that contributed
+*     to each output spectrum, scaled up by a factor of 4 in order to normalise
+*     it to the reported exposure times in EXP_TIME. TSYS holds the effective 
+*     system temperature for each output spectrum. The TSYS array is not 
+*     created if GENVAR is "None".
 *     - FITS keywords EXP_TIME and MEDTSYS are added to the output FITS
 *     extension. The EXP_TIME keyword holds the median value of the
 *     EXP_TIME array (stored in the SMURF extension of the output NDF).
@@ -454,6 +456,8 @@
 *        input NDFs, and add them to the output NDF's FITS extension.
 *     12-FEB-2007 (DSB):
 *        Added parameter INWEIGHT.
+*     21-FEB-2007 (DSB):
+*        Changed ON_TIME to EFF_TIME.
 
 *  Copyright:
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
@@ -549,7 +553,7 @@ void smurf_makecube( int *status ) {
    double wcslbnd_out[3];     /* Array of lower bounds of output cube */
    double wcsubnd_out[3];     /* Array of upper bounds of output cube */
    float *exp_array = NULL;   /* Pointer to array of exp times */
-   float *on_array = NULL;    /* Pointer to array of on times  */
+   float *eff_array = NULL;   /* Pointer to array of eff times  */
    float *tsys_array = NULL;  /* Pointer to array of tsys values */
    float *var_array = NULL;   /* Pointer to temporary variance array */
    float *var_out = NULL;     /* Pointer to the output variance array */
@@ -557,9 +561,6 @@ void smurf_makecube( int *status ) {
    float medexp;              /* Median exposure time in output NDF. */
    float medtsys;             /* Median system temperature in output NDF. */
    float teff;                /* Effective integration time */
-   float texp;                /* Total expsoure time */
-   float toff;                /* Off time */
-   float ton;                 /* On time */
    float var;                 /* Variance value */
    int *work1_array = NULL;   /* Pointer to temporary work array */
    int autogrid;              /* Determine projection parameters automatically? */
@@ -600,7 +601,7 @@ void smurf_makecube( int *status ) {
    smfData *data = NULL;      /* Pointer to data struct */
    smfData *expdata = NULL;   /* Pointer to o/p struct holding exp time array */
    smfData *odata = NULL;     /* Pointer to o/p struct holding data array */
-   smfData *ondata = NULL;    /* Pointer to o/p struct holding on time array */
+   smfData *effdata = NULL;   /* Pointer to o/p struct holding eff time array */
    smfData *tsysdata = NULL;  /* Pointer to o/p struct holding tsys array */
    smfData *wdata = NULL;     /* Pointer to o/p struct holding weights array */
    smfFile *file = NULL;      /* Pointer to data file struct */
@@ -1005,12 +1006,12 @@ void smurf_makecube( int *status ) {
          ndfPtwcs( wcsout2d, expdata->file->ndfid, status );
       }
 
-      smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "ON_TIME", "NEW", 
+      smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "EFF_TIME", "NEW", 
                          "_REAL", 2, (int *) lbnd_out, 
-                         (int *) ubnd_out, &ondata, status );
-      if( ondata ) {
-         on_array = (ondata->pntr)[ 0 ];
-         ndfPtwcs( wcsout2d, ondata->file->ndfid, status );
+                         (int *) ubnd_out, &effdata, status );
+      if( effdata ) {
+         eff_array = (effdata->pntr)[ 0 ];
+         ndfPtwcs( wcsout2d, effdata->file->ndfid, status );
       }
 
       if( genvar ) {
@@ -1112,12 +1113,12 @@ void smurf_makecube( int *status ) {
          smf_rebincube( data, ifile, size, abskyfrm, oskymap, ospecfrm, 
                         ospecmap, detgrp, moving, use_wgt, lbnd_out, ubnd_out, 
                         spread, params, genvar, data_array, var_array, 
-                        wgt_array, work1_array, exp_array, on_array, &fcon,
+                        wgt_array, work1_array, exp_array, eff_array, &fcon,
                         status );
       } else {
          smf_rebinsparse( data, ifile, ospecfrm, ospecmap, abskyfrm, detgrp, 
                           lbnd_out, ubnd_out, genvar, data_array, var_array, 
-                          &ispec, exp_array, on_array, &fcon,
+                          &ispec, exp_array, eff_array, &fcon,
                           status );
       }
    
@@ -1161,14 +1162,10 @@ L999:;
    cube. */
       if( fcon != VAL__BADD ) {
          for( el0 = 0; el0 < nxy; el0++ ) {
-            ton = on_array[ el0 ];
-            texp = exp_array[ el0 ];
+            teff = 0.25*eff_array[ el0 ];
             var = var_array[ el0 ];
-            if( ton != VAL__BADR && ton > 0.0 && 
-                texp != VAL__BADR && texp > 0.0 &&
+            if( teff != VAL__BADR && teff > 0.0 && 
                 var != VAL__BADR && var > 0.0 ) {
-               toff = texp - ton;
-               teff = 1.0/( 1.0/ton + 1.0/toff );
                tsys_array[ el0 ] = sqrt( var*teff/fcon );
             } else {
                tsys_array[ el0 ] = VAL__BADR;
@@ -1211,7 +1208,7 @@ L999:;
 
 /* Close the output data files. */
    if( expdata ) smf_close_file( &expdata, status );
-   if( ondata ) smf_close_file( &ondata, status );
+   if( effdata ) smf_close_file( &effdata, status );
    if( tsysdata ) smf_close_file( &tsysdata, status );
    if( wdata ) smf_close_file( &wdata, status );
    if( odata ) smf_close_file( &odata, status );
