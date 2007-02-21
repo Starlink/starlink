@@ -378,13 +378,13 @@
 *     it to the reported exposure times in EXP_TIME. TSYS holds the effective 
 *     system temperature for each output spectrum. The TSYS array is not 
 *     created if GENVAR is "None".
-*     - FITS keywords EXP_TIME and MEDTSYS are added to the output FITS
-*     extension. The EXP_TIME keyword holds the median value of the
-*     EXP_TIME array (stored in the SMURF extension of the output NDF).
-*     The MEDTSYS keyword holds the median value of the TSYS array (stored in 
-*     the SMURF extension of the output NDF). IF either of these values
-*     cannot be calculated for any reason, the corresponding FITS keyword is
-*     assigned a blank value.
+*     - FITS keywords EXP_TIME, EFF_TIME and MEDTSYS are added to the output 
+*     FITS extension. The EXP_TIME and EFF_TIME keywords holds the median 
+*     values of the EXP_TIME and EFF_TIME arrays (stored in the SMURF extension
+*     of the output NDF). The MEDTSYS keyword holds the median value of the 
+*     TSYS array (also stored in the SMURF extension of the output NDF). If 
+*     any of these values cannot be calculated for any reason, the 
+*     corresponding FITS keyword is assigned a blank value.
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -457,7 +457,8 @@
 *     12-FEB-2007 (DSB):
 *        Added parameter INWEIGHT.
 *     21-FEB-2007 (DSB):
-*        Changed ON_TIME to EFF_TIME.
+*        - Changed ON_TIME to EFF_TIME.
+*        - Added EFF_TIME FITS header to output.
 
 *  Copyright:
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
@@ -558,6 +559,7 @@ void smurf_makecube( int *status ) {
    float *var_array = NULL;   /* Pointer to temporary variance array */
    float *var_out = NULL;     /* Pointer to the output variance array */
    float *work2_array = NULL; /* Pointer to temporary work array */
+   float medeff;              /* Median effective integration time in output NDF. */
    float medexp;              /* Median exposure time in output NDF. */
    float medtsys;             /* Median system temperature in output NDF. */
    float teff;                /* Effective integration time */
@@ -1190,6 +1192,14 @@ L999:;
       kpg1Medur( 1, nxy, work2_array, &medexp, &neluse, status );
       atlPtftr( fchan, "EXP_TIME", medexp, 
                 "[s] Median MAKECUBE exposure time", status );
+
+/* Store the median effective integration time as keyword EFF_TIME in the 
+   FitsChan. Since kpg1Medur partially sorts the array, we need to take a 
+   copy of it first. */
+      work2_array = astStore( work2_array, eff_array, nxy*sizeof( float ) );
+      kpg1Medur( 1, nxy, work2_array, &medeff, &neluse, status );
+      atlPtftr( fchan, "EFF_TIME", medeff, 
+                "[s] Median MAKECUBE effective integration time", status );
 
 /* Store the median system temperature as keyword TSYS in the FitsChan. */
       work2_array = astStore( work2_array, tsys_array, nxy*sizeof( float ) );
