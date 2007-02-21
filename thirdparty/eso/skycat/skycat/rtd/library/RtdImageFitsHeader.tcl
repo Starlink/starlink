@@ -11,8 +11,8 @@
 # pbiereic    17/02/03   fixed problems with tabnotebook, packing order
 #                        and labels of tabsets
 # pdraper     05/04/06   Treat HISTORY like COMMENT
-# pdraper     20/02/07   Formatting changes: keep empty lines and print
-#                        blank COMMENT/HISTORY lines with blanks, do
+# pdraper     20/02/07   Formatting changes: keep empty lines (one anyway) 
+#                        and print blank COMMENT/HISTORY lines with blanks, do
 #                        not fake that they start with COMMENT/HISTORY.
 
 itk::usual RtdImageFitsHeader {}
@@ -317,6 +317,7 @@ itcl::class rtd::RtdImageFitsHeader {
 
 	set fits [$image_ hdu fits $hdu]
 	# TableList needs formatting...
+        set lastblank 0
 	foreach line [split $fits "\n"] {
 	    set l [string trim $line]
 	    if {"$l" == "END"} {
@@ -324,9 +325,13 @@ itcl::class rtd::RtdImageFitsHeader {
 		break
 	    }
 	    if { [lempty $l] } {
-               lappend info [list {} {} {}]
+               if { ! $lastblank } {
+                  lappend info [list {} {} {}]
+               }
+               set lastblank 1
                continue
             }
+            set lastblank 0
 	    set triple [get_kvc $line]
 	    if { [lempty $triple] } {
 		set triple [list INVALID {} $line]
