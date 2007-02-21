@@ -322,7 +322,7 @@ itcl::class gaia::GaiaSpecWriter {
             if { ! $rawacsis && [$cubeaccessor extensionexists "SMURF"] } {
 
                #  Must be extracting spectra. These are axis 3. The image
-               #  positions index the TSYS and EXP_TIME arrays.
+               #  positions index the TSYS, EXP_TIME and EFF_TIME arrays.
                lassign [$cubeaccessor getlastspectruminfo] \
                   type axis alow ahigh p1 p2
                if { $axis == 3 } {
@@ -338,6 +338,14 @@ itcl::class gaia::GaiaSpecWriter {
                   if { $exptime != "BAD" } {
                      set exptime [format "%.4f" $exptime]
                      $specaccessor fitswrite EXTIME $exptime "Exposure time"
+                  }
+
+                  set efftime [$cubeaccessor getdoubleproperty SMURF \
+                                  "EFF_TIME.DATA_ARRAY.DATA\($p1,$p2\)"]
+                  if { $efftime != "BAD" } {
+                     set efftime [format "%.4f" $efftime]
+                     $specaccessor fitswrite EXEFFT $efftime \
+                        "Effective exposure time (x4)"
                   }
                }
             }

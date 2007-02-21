@@ -304,9 +304,9 @@ itcl::class gaia::GaiaCubeRebin {
    protected variable rtdimage_ {}
 
    #  Binning factors.
-   protected variable bin1_ 2
-   protected variable bin2_ 2
-   protected variable bin3_ 2
+   protected variable bin1_ 1
+   protected variable bin2_ 1
+   protected variable bin3_ 3
 
    #  The system and units of the original data.
    protected variable keep_system_ {}

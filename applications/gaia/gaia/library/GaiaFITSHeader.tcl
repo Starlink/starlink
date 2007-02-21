@@ -278,6 +278,7 @@ itcl::class gaia::GaiaFITSHeader {
       set headers [$itk_option(-accessor) fitsheaders]
 
       #  TableList needs formatting...
+      set lastblank 0
       foreach line [split $headers "\n"] {
          set l [string trim $line]
          if {"$l" == "END"} {
@@ -285,9 +286,14 @@ itcl::class gaia::GaiaFITSHeader {
             break
          }
          if { [lempty $l] } { 
-            lappend info [list {} {} {}]
+            if { ! $lastblank } {
+               lappend info [list {} {} {}]
+            }
+            set lastblank 1
             continue
          }
+         set lastblank 0
+
          set triple [get_kvc $line]
          if { [lempty $triple] } {
             set triple [list INVALID {} $line]
