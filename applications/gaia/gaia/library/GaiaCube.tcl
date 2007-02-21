@@ -459,8 +459,7 @@ itcl::class gaia::GaiaCube {
       if { $fitsheaders_ != {} } {
          catch {
             destroy $fitsheaders_
-         } msg
-         puts "msg = $msg"
+         }
       }
       
    }
