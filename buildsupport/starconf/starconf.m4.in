@@ -569,6 +569,38 @@ float fred_() {
     fi
 ])# STAR_CNF_F2C_COMPATIBLE
 
+# STAR_CNF_BLANK_COMMON
+# ---------------------
+# Define the global symbol used to access the Fortran blank common block.
+# Usually under UNIX this is _BLNK__, but gfortran uses __BLNK__, so we
+# need to check for that. Gfortran is just detected by being a GNU compiler
+# and having "Fortran 95" as part of its --version output.
+#
+# The effect of this macro is to substitute BLANK_COMMON_SYMBOL with
+# the expected value.
+#
+AC_DEFUN([STAR_CNF_BLANK_COMMON],
+   [AC_CACHE_CHECK([symbol used for blank common in Fortran],
+       [star_cv_blank_common_fortran],
+       [AC_REQUIRE([AC_PROG_FC])
+       if test "$ac_cv_fc_compiler_gnu" = yes; then
+            if "$FC" --version 2>&1 < /dev/null | grep 'Fortran 95' > /dev/null; then
+                star_cv_blank_common_fortran=gfortran
+            fi
+        else
+            star_cv_blank_common_fortran=
+        fi])
+    AH_TEMPLATE([STAR_INITIALISE@&t@_FORTRAN],
+       [Define symbol used to access the Fortran blank common block])
+    case "$star_cv_blank_common_fortran" in
+      gfortran)
+        AC_SUBST([BLANK_COMMON_SYMBOL], [__BLNK__] )
+        ;;
+      *) 
+        AC_SUBST([BLANK_COMMON_SYMBOL], [_BLNK__] )
+        ;;
+    esac
+])# STAR_CNF_BLANK_COMMON
 
 
 # STAR_PATH_TCLTK([minversion=0], [options=''])
@@ -1445,6 +1477,7 @@ AC_DEFUN([STAR_INITIALISE_FORTRAN],
 dnl    AC_DEFINE_UNQUOTED([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
 dnl                       $star_cv_initialise_fortran)
 ])# STAR_INITIALISE_FORTRAN
+
 
 # STAR_SUPPRESS_BUILD_IF(test, message)
 # -------------------------------------
