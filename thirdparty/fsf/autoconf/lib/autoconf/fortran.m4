@@ -2192,7 +2192,7 @@ _ACEOF
 ac_fpp_command=$1
 if eval '$ac_fpp_command conftest.$ac_ext > conftest.log 2>/dev/null'; then
   if test -f conftest.f; then
-    if cmp conftest.$ac_ext conftest.f; then
+    if cmp conftest.$ac_ext conftest.f >/dev/null; then
       # ooops -- these two are the same file.  Ie, this is a 
       # case-insensitive filesystem, so ignore this file
       ac_tmp=
@@ -2250,8 +2250,8 @@ if test -z "$ac_cv_prog_fpp" && test $ac_fpp_ok = yes; then
 # ignores, one of the options (for example g77 ignores -F
 # and returns without error), then the test appears to succeed.
 #
-# We only know the following methods of invocation: -F and -E
-  for ac_j in "$FC -F" "$FC -E"; do
+# We only know the following methods of invocation: -E and -F
+  for ac_j in "$FC -E" "$FC -F"; do
     rm -f a.out
     _AC_TEST_FPP([$ac_j])
     if test -e a.out; then
