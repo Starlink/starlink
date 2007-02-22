@@ -264,7 +264,7 @@
 
 /*  Macros used in referring to FORTRAN common blocks.			    */
 
-#define F77_BLANK_COMMON                _BLNK__
+#define F77_BLANK_COMMON                @BLANK_COMMON_SYMBOL@
 #define F77_NAMED_COMMON(B)             F77_EXTERNAL_NAME(B)
 
 

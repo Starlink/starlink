@@ -2,7 +2,7 @@ dnl  Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl   Initialisation: package name and version number
-AC_INIT(cnf, 4.2-2, ussc@star.rl.ac.uk)
+AC_INIT(cnf, 4.2-3, ussc@star.rl.ac.uk)
 
 dnl   Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -43,12 +43,14 @@ dnl   Declare dependencies
 STAR_DECLARE_DEPENDENCIES([build], [starmem])
 STAR_DECLARE_DEPENDENCIES([link],  [starmem])
 
-
 dnl   Check the return type of REAL Fortran functions. Under g77
 dnl   in -ff2c mode (the default), these return a double. Only
-dnl   seems to have an effect under 64-bit. Defines CNF_RETURN_FLOAT_TYPE
+dnl   seems to have an effect under 64-bit. Defines REAL_FUNCTION_TYPE.
 dnl   to double or float.
 STAR_CNF_F2C_COMPATIBLE
+
+dnl   Determine the symbol used for blank common. Defines BLANK_COMMON_SYMBOL.
+STAR_CNF_BLANK_COMMON
 
 dnl   This package has no dependencies
 
