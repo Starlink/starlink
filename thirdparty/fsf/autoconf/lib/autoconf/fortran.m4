@@ -1911,16 +1911,29 @@ AC_DEFUN([AC_FC_HAVE_TYPELESS_BOZ],
 # and g77) Fortran style. These are constants written in the format 'xxx'X,
 # which allows the initialisation of any type to a specific bit pattern. If so
 # set the preprocessor variable HAVE_OLD_TYPELESS_BOZ to be 1.
+#
+# A problem with this test is that it may compile but the assignments are not
+# actually typeless and have been done as integer casts.  To stop this we need
+# to run the program and check if an integer equals a floating point value, by
+# value, they shouldn't for a bit pattern assignment. Uses a "EXIT(1)" to 
+# signal a problem. This is non-standard, so the test may fail for that reason.
 AC_DEFUN([AC_FC_HAVE_OLD_TYPELESS_BOZ],
          [AC_REQUIRE([AC_PROG_FC])dnl
           AC_CACHE_CHECK([whether ${FC} supports OLD style typeless BOZ constants],
                          [ac_cv_fc_have_old_typeless_boz],
                          [AC_LANG_PUSH([Fortran])
-                          AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
+                          AC_RUN_IFELSE([AC_LANG_SOURCE([
+      PROGRAM TMP  
       INTEGER I
-      PARAMETER ( I = 'FF'X )
-      DOUBLE PRECISION D
-      PARAMETER ( D = 'FFEFFFFFFFFFFFFF'X )
+      PARAMETER ( I = 'FF7FFFFF'X )
+      REAL D
+      PARAMETER ( D = 'FF7FFFFF'X )
+      LOGICAL L
+      PARAMETER ( L = 'A55A5AA5'X )
+      IF ( D .EQ. I ) THEN
+         CALL EXIT( 1 )
+      END IF
+      END
 ])],
                           ac_cv_fc_have_old_typeless_boz=yes,
                           ac_cv_fc_have_old_typeless_boz=no)
