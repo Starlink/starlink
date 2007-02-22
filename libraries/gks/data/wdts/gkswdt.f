@@ -1143,8 +1143,8 @@
     1 CONTINUE
 
 *     Create CDRIVE.INC
-      WRITE(CDRIVE,1003) ((J+10000), J = 1, KNWK)
-      WRITE(CDRIVE,1004)
+      WRITE(CDRIVE,1003) ((J+10000), J = 1, KNWK-1)
+      WRITE(CDRIVE,1004) 10000+KNWK
       WRITE(CDRIVE,1005) 10000, 'CS'
       DO 2 J = 1, KNWK
          WRITE(CDRIVE,1005) (J+10000), CWKDR(J)
@@ -1166,7 +1166,7 @@
  1003 FORMAT('      ITEMP = KIUSED'/
      :       '      GOTO ( 10000,'/
      :      ('     :  ',10(I5:',')))
- 1004 FORMAT('     :    ) IWKTYP+1'//
+ 1004 FORMAT('     :  ',I5'  ) IWKTYP+1'//
      :      '      CALL GKBUG(-2018,NAME)'/
      :      '      GOTO 9999'/)
 
