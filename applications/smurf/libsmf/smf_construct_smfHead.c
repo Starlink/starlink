@@ -109,6 +109,8 @@
 *        Add detname.
 *     2007-02-06 (AGG):
 *        Add tsys
+*     2007-02-23 (AGG):
+*        Add instap to API
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -157,8 +159,8 @@ smfHead *
 smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 		       AstFrameSet * wcs, AstFrameSet * tswcs,
 		       AstFitsChan * fitshdr,
-		       const JCMTState * allState,
-		       dim_t curframe, dim_t nframes, unsigned int ndet,
+		       const JCMTState * allState, dim_t curframe,
+		       double instap[], dim_t nframes, unsigned int ndet,
 		       const double fplanex[], const double fplaney[],
 		       const double detpos[], const char *detname, 
                        int dpazel, const double tsys[], int * status ) {
@@ -189,6 +191,8 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
     hdr->dpazel = dpazel;
     hdr->tsys = tsys;
     hdr->isCloned = 1;
+    hdr->instap[0] = instap[0];
+    hdr->instap[1] = instap[1];
   }
 
   return hdr;

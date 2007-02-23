@@ -60,6 +60,8 @@
 *        Add detname.
 *     2007-02-06 (AGG):
 *        Add tsys
+*     2007-02-23 (AGG):
+*        Add instap
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -121,6 +123,7 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
   double *detpos = NULL;           /* Array of detector positions */
   char *detname = NULL;            /* Receptor names */
   double *tsys = NULL;             /* System temperatures */
+  double instap[2];                /* Instrument aperture (focal plane offsets) */
 
   if (*status != SAI__OK) return NULL;
 
@@ -134,6 +137,11 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
   if (old->tswcs) tswcs = astCopy(old->tswcs);
 
   if (old->instrument) instrument = old->instrument;
+
+  if ( old->instap ) {
+    instap[0] = old->instap[0];
+    instap[1] = old->instap[1];
+  }
 
   /* Only allocate space for allState if we have a non-NULL input
      allState */
@@ -184,11 +192,11 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
 
   /* Insert elements into new smfHead */
   new = smf_construct_smfHead( new, instrument, wcs, tswcs, fitshdr,
-			       allState, curframe,
+			       allState, curframe, instap,
 			       nframes, ndet, fplanex, fplaney, detpos,
                                detname, old->dpazel, tsys, status );
 
-  /* see isCloned to 0 since we have allocated this memory */
+  /* set isCloned to 0 since we have allocated this memory */
   if (new) new->isCloned = 0;
 
   /* let people know where things are going wrong */
