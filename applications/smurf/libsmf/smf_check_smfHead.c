@@ -44,12 +44,13 @@
 *        Check detpos 
 *     2006-11-6 (DSB):
 *        Check detname. 
+*     2007-02-23 (AGG):
+*        Check instap
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia.
-*     Copyright (C) 2006 Particle Physics And Astronomy Research Council.
-*     All Rights Reserved.
+*     Copyright (C) 2006-2007 University of British Columbia. Particle
+*     Physics And Astronomy Research Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -258,6 +259,11 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
 
   }
 
+  /* Instrument aperture */
+  if ( ohdr->instap ) {
+    ihdr->instap[0] = ohdr->instap[0];
+    ihdr->instap[1] = ohdr->instap[1];
+  }
 
   /* final report */
   if (*status != SAI__OK) {
