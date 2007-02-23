@@ -1016,6 +1016,7 @@ sub skycatconfig {
   my $self = shift;
   if( @_ ) {
     my $skycatconfig = shift;
+    $skycatconfig =~ s/^file://;
     if( ! -e $skycatconfig ) {
       croak "Could not find SkyCat config file: $skycatconfig";
     }
