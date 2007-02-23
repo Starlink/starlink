@@ -187,7 +187,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       inx->dut1 = 0.0;
 
    if ( !astMapGet0C ( keymap, "FLATNAME", &temp ) )
-      strncpy ( inx->flatname, "", 80 );
+      strncpy ( inx->flatname, "TABLE", 80 );
    else
       strncpy ( inx->flatname, temp, 80 ); 
 
