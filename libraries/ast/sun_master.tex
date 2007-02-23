@@ -21193,12 +21193,10 @@ SourceVel representing a redshift value.
 \end{enumerate}
 
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V4.4}
+\subsection{Changes Introduced in V4.4}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V4.3 and V4.4 (the
-current version):
+The following describes the most significant changes which occurred in
+the AST library between versions V4.3 and V4.4:
 
 \begin{enumerate}
 
@@ -21238,6 +21236,56 @@ in the target CmpFrame.
 now allow the MaxAxes and MinAxes attributes to be set freely to any value.
 In previous versions of AST, any attempt to change the value of MinAxes
 or MaxAxes was ignored, resulting in them always taking the default values.
+
+\item The DSBSpecFrame class has a new attribute called AlignSB that
+specifies whether or not to take account of the SideBand attributes when
+aligning two DSBSpecFrames using 
+c+
+astConvert.
+c-
+f+
+AST\_CONVERT.
+f-
+
+\item The Frame class has a new attribute called Dut1 that can be used to
+store a value for the difference between the UT1 and UTC timescales at 
+the epoch referred to by the Frame. 
+
+\item The number of digits used to format the Frame attributes ObsLat and 
+ObsLon has been increased.
+
+\item The use of the SkyFrame attribute AlignOffset has been changed. This
+attribute is used to control how two SkyFrames are aligned by 
+c+
+astConvert.
+c-
+f+
+AST\_CONVERT.
+f-
+If the template and target SkyFrames both have a non-zero value for 
+AlignOffset, then alignment occurs between the offset coordinate systems 
+(that is, a UnitMap will always be used to align the two SkyFrames).
+
+\item The Plot class has a new attribute called ForceExterior that can be
+used to force exterior (rather than interior) tick marks to be produced.
+By default, exterior ticks are only produced if this would result in 
+more than 3 tick marks being drawn.
+
+\item The TimeFrame class now supports conversion between angle based
+timescales such as UT1 and atomic based timescales such as UTC.
+
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V4.5}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V4.4 and V4.5 (the
+current version):
+
+\begin{enumerate}
+
+\item Support has been added for the FITS-WCS ``HPX'' (HEALPix) projection.
 
 \end{enumerate}
 

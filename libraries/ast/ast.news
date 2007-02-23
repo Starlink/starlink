@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V4.4) of the Starlink AST (astrometry) library is
+   A new release (V4.5) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -16,6 +16,13 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+-  Support has been added for the FITS-WCS "HPX" projection (HEALPix).
+
+
+
+Main Changes in Version 4.4
+---------------------------
+
 - The astFindFrame (AST_FINDFRAME) method can now be used to search a
 CmpFrame for an instance of a more specialised class of Frame (SkyFrame,
 TimeFrame, SpecFrame, DSBSpecFrame or FluxFrame). That is, if an instance
@@ -29,6 +36,30 @@ returned by astFindFrame. Note, for this to work, the MaxAxes and MinAxes
 attributes of the template Frame must be set so that they cover a range
 that includes the number of axes in the target CmpFrame.
 
+- The DSBSpecFrame class has a new attribute called AlignSB that
+specifies whether or not to take account of the SideBand attributes when
+aligning two DSBSpecFrames using astConvert (AST_CONVERT).
+
+- The Frame class has a new attribute called Dut1 that can be used to
+store a value for the difference between the UT1 and UTC timescales at 
+the epoch referred to by the Frame. 
+
+- The number of digits used to format the Frame attributes ObsLat and 
+ObsLon has been increased.
+
+- The use of the SkyFrame attribute AlignOffset has been changed. This
+attribute is used to control how two SkyFrames are aligned by astConvert.
+If the template and target SkyFrames both have a non-zero value for 
+AlignOffset, then alignment occurs within the offset coordinate systems 
+(that is, a UnitMap will always be used to align the two SkyFrames).
+
+- The Plot class has a new attribute called ForceExterior that can be
+used to force exterior (rather than interior) tick marks to be produced,
+even if this would result in less than 3 tick marks being produced.
+
+- The TimeFrame class now supports conversion between angle based
+timescales such as UT1 and atomic based timescales such as UTC.
+
 
 Main Changes in Version 4.3
 ---------------------------
@@ -39,7 +70,6 @@ source) should be accessed as an apparent radial velocity or a redshift.
 Note, any existing software that assumes that SourceVel always represents
 a velocity in km/s should be changed to allow for the possibility of
 SourceVel representing a redshift value.
-
 
 -  The astGetFitsS (AST_GETFITSS) function now strips trailing white space
 from the returned string, if the original string contains 8 or fewer
