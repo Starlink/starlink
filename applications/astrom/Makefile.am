@@ -20,7 +20,7 @@ astrom_SOURCES = \
 	$(PRIVATE_INCLUDES) \
 	dummy_c.c
 
-astrom_LDADD = -lsla -lcfitsio
+astrom_LDADD = `sla_link` `cfitsio_link`
 
 F_ROUTINES = \
 	astrom.f \

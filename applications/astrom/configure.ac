@@ -14,6 +14,9 @@ AC_PROG_FC
 AC_PROG_FPP
 AC_FC_OPEN_SPECIFIERS(readonly)
 
+dnl    Use libtool for linking since it will try to use the -rpath option
+AC_PROG_LIBTOOL
+
 dnl  Specify the fortran unit numbers for standard input and output.
 dnl  We should test for this, but (a) I'm not sure how I'd write such
 dnl  a test, and (b) they really are pretty standard, and this is just
