@@ -58,6 +58,7 @@
 *     -  Use dynamic rather than static memory for the parameter arrays in 
 *        the AstPrjPrm structure.Override astGetObjSize. This is to
 *        reduce the in-memory size of a WcsMap.
+*     -  Healpix projection added.
 
 *=============================================================================
 *
@@ -101,6 +102,7 @@
 *      astTSCset astTSCfwd astTSCrev   TSC: tangential spherical cube
 *      astCSCset astCSCfwd astCSCrev   CSC: COBE quadrilateralized spherical cube
 *      astQSCset astQSCfwd astQSCrev   QSC: quadrilateralized spherical cube
+*      astHPXset astHPXfwd astHPXrev   HPX: HEALPix projection
 *
 *
 *   Driver routines; astPRJset(), astPRJfwd() & astPRJrev()
@@ -287,7 +289,7 @@ int  npcode = 26;
 char pcodes[26][4] =
       {"AZP", "SZP", "TAN", "STG", "SIN", "ARC", "ZPN", "ZEA", "AIR", "CYP",
        "CEA", "CAR", "MER", "COP", "COE", "COD", "COO", "SFL", "PAR", "MOL",
-       "AIT", "BON", "PCO", "TSC", "CSC", "QSC"};
+       "AIT", "BON", "PCO", "TSC", "CSC", "QSC", "HPX"};
 */
 
 const int WCS__AZP = 101;
@@ -316,6 +318,7 @@ const int WCS__PCO = 602;
 const int WCS__TSC = 701;
 const int WCS__CSC = 702;
 const int WCS__QSC = 703;
+const int WCS__HPX = 801;
 
 /* Map error number to error message for each function. */
 const char *astPRJset_errmsg[] = {
@@ -398,6 +401,8 @@ struct AstPrjPrm *prj;
       astCSCset(prj);
    } else if (strcmp(pcode, "QSC") == 0) {
       astQSCset(prj);
+   } else if (strcmp(pcode, "HPX") == 0) {
+      astHPXset(prj);
    } else {
       /* Unrecognized projection code. */
       return 1;
@@ -4402,6 +4407,184 @@ double *phi, *theta;
       *phi = astATan2d(m, l);
    }
    *theta = astASind(n);
+
+   return 0;
+}
+
+/*============================================================================
+*   HPX: HEALPix projection.
+*
+*   Given:
+*      prj->p[1]   H - the number of facets in longitude.
+*      prj->p[2]   K - the number of facets in latitude
+*
+*   Given and/or returned:
+*      prj->r0      Reset to 180/pi if 0.
+*      prj->phi0    Reset to 0.0 
+*      prj->theta0  Reset to 0.0 
+*
+*   Returned:
+*      prj->flag     HPX
+*      prj->code    "HPX"
+*      prj->n       True if K is odd.
+*      prj->w[0]    r0*(pi/180)
+*      prj->w[1]    (180/pi)/r0
+*      prj->w[2]    (K-1)/K
+*      prj->w[3]    90*K/H
+*      prj->w[4]    (K+1)/2
+*      prj->w[5]    90*(K-1)/H
+*      prj->w[6]    180/H
+*      prj->w[7]    H/360
+*      prj->w[8]    (90*K/H)*r0*(pi/180)
+*      prj->w[9]     (180/H)*r0*(pi/180)
+*      prj->astPRJfwd  Pointer to astHPXfwd().
+*      prj->astPRJrev  Pointer to astHPXrev().
+
+
+*===========================================================================*/
+
+int astHPXset(prj)
+
+struct AstPrjPrm *prj;
+
+{
+   strcpy(prj->code, "HPX");
+   prj->flag   = WCS__HPX;
+   prj->phi0   = 0.0;
+   prj->theta0 = 0.0;
+
+   prj->n = ((int)prj->p[2])%2;
+
+   if (prj->r0 == 0.0) {
+      prj->r0 = R2D;
+      prj->w[0] = 1.0;
+      prj->w[1] = 1.0;
+   } else {
+      prj->w[0] = prj->r0*D2R;
+      prj->w[1] = R2D/prj->r0;
+   }
+
+   prj->w[2] = (prj->p[2] - 1.0) / prj->p[2];
+   prj->w[3] = 90.0 * prj->p[2] / prj->p[1];
+   prj->w[4] = (prj->p[2] + 1.0) / 2.0;
+   prj->w[5] = 90.0 * (prj->p[2] - 1.0) / prj->p[1];
+   prj->w[6] = 180.0 / prj->p[1];
+   prj->w[7] = prj->p[1] / 360.0;
+   prj->w[8] = prj->w[3] * prj->w[0];
+   prj->w[9] = prj->w[6] * prj->w[0];
+
+   prj->astPRJfwd = astHPXfwd;
+   prj->astPRJrev = astHPXrev;
+
+   return 0;
+}
+
+/*--------------------------------------------------------------------------*/
+
+int astHPXfwd(phi, theta, prj, x, y)
+
+const double phi, theta;
+struct AstPrjPrm *prj;
+double *x, *y;
+
+{
+   double abssin, sigma, sinthe, phic;
+ 
+   if( prj->flag != WCS__HPX ) {
+      if( astHPXset( prj ) ) return 1;
+   }
+
+   sinthe = astSind( theta );
+   abssin = fabs( sinthe );
+
+/* Equatorial zone */
+   if( abssin <= prj->w[2] ) {
+      *x =  prj->w[0] * phi;
+      *y = prj->w[8] * sinthe;
+
+/* Polar zone */
+   } else {
+      if( prj->n || theta > 0.0 ) {
+         phic = -180.0 + (2.0*floor( (phi+180.0) * prj->w[7] ) + 1 ) * prj->w[6];
+
+      } else {
+         phic = -180.0 + (2.0*floor( (phi+180.0) * prj->w[7] + 1/2 ) ) * prj->w[6];
+      }
+
+      sigma = sqrt( prj->p[2]*( 1.0 - abssin ));
+
+      *x = prj->w[0] *( phic + ( phi - phic )*sigma );
+
+      *y = prj->w[9] * ( prj->w[4] - sigma );
+      if( theta < 0 ) *y = -*y;
+      
+   }
+
+   return 0;
+}
+
+/*--------------------------------------------------------------------------*/
+
+int astHPXrev(x, y, prj, phi, theta)
+
+const double x, y;
+struct AstPrjPrm *prj;
+double *phi, *theta;
+
+{
+   double absy, sigma, t, yr, xc;
+
+   if (prj->flag != WCS__HPX) {
+      if (astHPXset(prj)) return 1;
+   }
+
+   yr = prj->w[1]*y;
+   absy = fabs( yr );
+
+/* Equatorial zone */
+   if( absy <= prj->w[5] ) {
+      *phi = prj->w[1] * x;
+      t = yr/prj->w[3];
+      if( t < -1.0 || t > 1.0 ) {
+         return 2;
+      } else {
+         *theta = astASind( t );
+      }
+
+/* Polar zone */
+   } else if( absy <= 90 ){
+
+      if( prj->n || yr > 0.0 ) {
+         xc = -180.0 + ( 2.0*floor( ( x + 180.0 )*prj->w[7]  ) + 1.0 )*prj->w[6];
+      } else {
+         xc = -180.0 + 2.0*floor( ( x + 180.0 )*prj->w[7] + 1/2 )*prj->w[6];
+      }       
+
+      sigma = prj->w[4] - absy / prj->w[6];
+
+      if( sigma == 0.0 ) {
+         return 2;
+      } else {
+
+         t = ( x - xc )/sigma;
+         if( fabs( t ) <= prj->w[6] ) {
+            *phi = prj->w[1] *( xc + t );
+         } else {
+            return 2;
+         }
+      }
+
+      t = 1.0 - sigma*sigma/prj->p[2];
+      if( t < -1.0 || t > 1.0 ) {
+         return 2;
+      } else {
+         *theta = astASind( t );
+         if( y < 0 ) *theta = -*theta;
+      }
+
+   } else {
+      return 2;
+   }
 
    return 0;
 }

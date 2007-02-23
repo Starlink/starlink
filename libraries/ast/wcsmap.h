@@ -198,6 +198,8 @@
 *           An integer identifier for the FITS QSC projection. 
 *        AST__TSC     
 *           An integer identifier for the FITS TSC projection
+*        AST__HPX     
+*           An integer identifier for the FITS HPX projection. 
 *        AST__TPN
 *           An integer identifier for a "TAN with correction terms" projection. 
 *        AST__WCSBAD  
@@ -331,7 +333,8 @@
 #define AST__NCP 27
 #define AST__GLS 28
 #define AST__TPN 29
-#define AST__WCSBAD 30   /* A bad projection type */
+#define AST__HPX 30
+#define AST__WCSBAD 31   /* A bad projection type */
 
 /* Type Definitions. */
 /* ================= */

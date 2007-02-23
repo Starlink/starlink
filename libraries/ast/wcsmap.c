@@ -194,6 +194,8 @@ f     The WcsMap class does not define any new routines beyond those
 *     4-JAN-2007 (DSB):
 *        Correct astLoadWcsMap to load the projection parameter with
 *        highest index correctly.
+*     23-FEB-2007 (DSB):
+*        Added HPX projection.
 *class--
 */
 
@@ -677,6 +679,7 @@ static PrjData PrjInfo[] = {
    { AST__QSC,  0, 4, "quadrilateralized spherical cube", "-QSC",  astQSCfwd, astQSCrev, 0.0 },
    { AST__NCP,  2, 4, "AIPS north celestial pole", "-NCP",  NULL,   NULL, 0.0 },
    { AST__GLS,  0, 4, "sinusoidal", "-GLS",  astSFLfwd, astSFLrev, 0.0 },
+   { AST__HPX,  2, 4, "HEALPix", "-HPX",  astHPXfwd, astHPXrev, 0.0 },
    { AST__TPN,  WCSLIB_MXPAR, WCSLIB_MXPAR, "gnomonic polynomial", "-TPN",  astTPNfwd, astTPNrev, AST__DPIBY2 },
    { AST__WCSBAD, 0, 4, "<null>",   "    ",  NULL,   NULL, 0.0 } };
 
@@ -2090,6 +2093,10 @@ static void InitPrjPrm( AstWcsMap *this ) {
    } else if( type == AST__TPN ){
       if( (params->p)[ 1 ] == AST__BAD ) (params->p)[ 1 ] = 1.0;
       if( (params->p2)[ 1 ] == AST__BAD ) (params->p2)[ 1 ] = 1.0;
+
+   } else if( type == AST__HPX ){
+      if( (params->p)[ 1 ] == AST__BAD ) (params->p)[ 1 ] = 4.0;
+      if( (params->p)[ 2 ] == AST__BAD ) (params->p)[ 2 ] = 3.0;
 
    } 
 

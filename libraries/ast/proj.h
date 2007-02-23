@@ -45,6 +45,7 @@
 *        correction terms" projection).
 *     -  Added prototypes for TPN projection functions (defined in file 
 *        tpn.c).
+*     -  Added prototypes for HPX projection functions.
 *===========================================================================*/
 
 #ifndef WCSLIB_PROJ_INCLUDED
@@ -157,6 +158,9 @@ struct AstPrjPrm {
    int astQSCset(struct AstPrjPrm *);
    int astQSCfwd(const double, const double, struct AstPrjPrm *, double *, double *);
    int astQSCrev(const double, const double, struct AstPrjPrm *, double *, double *);
+   int astHPXset(struct AstPrjPrm *);
+   int astHPXfwd(const double, const double, struct AstPrjPrm *, double *, double *);
+   int astHPXrev(const double, const double, struct AstPrjPrm *, double *, double *);
 
    int astTPNset(struct AstPrjPrm *);
    int astTPNfwd(const double, const double, struct AstPrjPrm *, double *, double *);
