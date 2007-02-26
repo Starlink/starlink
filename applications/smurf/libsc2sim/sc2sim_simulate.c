@@ -197,7 +197,11 @@
 *        Add `overwrite' flag to allow simulations to create new files
 *        without overwriting old ones
 *     2007-02-01 (AGG):
-*        Fix `zero remainder' bug in calculating number of frames in last file
+*        Fix `zero remainder' bug in calculating number of frames in
+*        last file
+*     2007-02-26 (AGG):
+*        Store planet RA, Dec in inx struct so they can be written to
+*        the FITS header
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -335,6 +339,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double drytau183;               /* Broadband 183 GHz zenith optical depth */
   double dtt = 0;                 /* Time difference between UTC and TT */
   AstFitsChan *fc=NULL;           /* FITS channels for tanplane projection */
+  int fileexists = 1;             /* Flag to denote whether the named
+				     output file already exists */
   char filename[SC2SIM__FLEN];    /* name of output file */
   AstFitsChan *fitschan=NULL;     /* FITS channels for tanplane projection */
   AstFrameSet *fitswcs=NULL;      /* Frameset for input image WCS */
@@ -345,6 +351,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double *flatpar[8];             /* flatfield parameters for all subarrays */
   int frame;                      /* frame counter */
   AstFrameSet *fs=NULL;           /* frameset for tanplane projection */
+  int groupcounter;               /* Counter for `group' portion of output filename */
   JCMTState *head;                /* per-frame headers */
   char heatname[SC2SIM__FLEN];    /* name of flatfield cal file */
   double hourangle;               /* Current hour angle */
@@ -364,6 +371,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   int nflat[8];                   /* number of flat coeffs per bol */
   static double noisecoeffs[SC2SIM__MXBOL*3*60]; /* noise coefficients */
   int nterms=0;                   /* number of 1/f noise frequencies */
+  FILE *ofile = NULL;             /* File pointer to check for existing files */
   double phi;                     /* latitude (radians) */
   int planet = 0;                 /* Flag to indicate planet observation */
   double *posptr=NULL;            /* pointing: nasmyth offsets (arcsec) */ 
@@ -396,10 +404,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   float ttau[3];                  /* output of wvmOpt */
   double twater;                  /* water line temp. for WVM simulation */
   double vmax[2];                 /* telescope maximum velocities (arcsec) */
-
-  FILE *ofile = NULL;
-  int groupcounter;
-  int fileexists = 1;
 
   if ( *status != SAI__OK) return;
 
@@ -877,6 +881,11 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	  slaRdplan( tt, inx->planetnum, -DD2R*telpos[0], DD2R*telpos[1], 
 		     &raapp, &decapp, &diam );
 
+	  /* Store RA Dec in inx struct so they can be written as FITS
+	     headers. Note these are APPARENT RA, Dec which are more
+	     relevant for planets */
+	  inx->ra = raapp;
+	  inx->dec = decapp;
 	  /* Create frameset to allow sky2map mapping to be determined */
 	  fitschan = astFitsChan ( NULL, NULL, "" );
 	  sc2ast_makefitschan( astnaxes[0]/2.0, astnaxes[1]/2.0, 
@@ -922,8 +931,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	  
 	case nasmyth:
 	  /* Get boresight tanplate offsets in Nasmyth coordinates (radians) */
-	  bor_x_nas = (posptr[curframe*2])*DAS2R;
-	  bor_y_nas = (posptr[curframe*2+1])*DAS2R;
+	  bor_x_nas = (posptr[curframe*2] - instap[0])*DAS2R;
+	  bor_y_nas = (posptr[curframe*2+1] - instap[1])*DAS2R;
 
 	  /* Calculate boresight offsets in horizontal coord. */
 	  bor_x_hor =  bor_x_nas*cos(base_el[frame]) - 
@@ -1052,11 +1061,15 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         /* Calculate equatorial from horizontal */
         slaDh2e( bor_az[frame], bor_el[frame], phi, &raapp1, &decapp1 );
 	raapp1 = fmod(lst[frame] - raapp1 + D2PI, D2PI );
-
+	/* Convert apparent RA Dec to Mean RA, Dec for current epoch */
 	slaAmpqk( raapp1, decapp1, amprms, &temp1, &temp2 );
-        
+	/* Store the mean RA, Dec */
         bor_ra[frame] = temp1;
         bor_dec[frame] = temp2;
+	if ( planet ) {
+	  inx->ra = temp1;
+	  inx->dec = temp2;
+	}
       }
 
       if ( !hitsonly ) {
