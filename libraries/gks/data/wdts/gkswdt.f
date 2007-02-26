@@ -1166,7 +1166,7 @@
  1003 FORMAT('      ITEMP = KIUSED'/
      :       '      GOTO ( 10000,'/
      :      ('     :  ',10(I5,',':)))
- 1004 FORMAT('     :  ',I5:'  ) IWKTYP+1'//
+ 1004 FORMAT('     :  ',I5,'  ) IWKTYP+1'//
      :      '      CALL GKBUG(-2018,NAME)'/
      :      '      GOTO 9999'/)
 
