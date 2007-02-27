@@ -210,13 +210,13 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       inx->grid_step_y = 6.28;
 
    if ( !astMapGet0D ( keymap, "HEATNUM", &(inx->heatnum) ) )
-      inx->heatnum = 1.0;
+      inx->heatnum = 150;
 
    if ( !astMapGet0D ( keymap, "HEATSTART", &(inx->heatstart) ) )
-      inx->heatstart = 0.0;
+      inx->heatstart = 24.0;
 
    if ( !astMapGet0D ( keymap, "HEATSTEP", &(inx->heatstep) ) )
-      inx->heatstep = 0.0;
+      inx->heatstep = 0.01;
 
    if ( !astMapGet0D ( keymap, "HEIGHT", &(inx->height) ) )
      inx->height = 2000.0;
