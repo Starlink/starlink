@@ -2,7 +2,7 @@ dnl  Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl   Initialisation: package name and version number
-AC_INIT(fio, 1.5-3, ussc@star.rl.ac.uk)
+AC_INIT(fio, 1.5-4, ussc@star.rl.ac.uk)
 
 dnl   Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -28,7 +28,6 @@ AC_CHECK_HEADERS(string.h)
 
 AC_CHECK_FUNCS([strerror sys_nerr])
 
-
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 #   Test what features the OPEN command can support
@@ -42,7 +41,6 @@ AC_FC_OPEN_SPECIFIERS([access='sequential',recl=1])
 
 #   What unit does OPEN's recl specifier assume?
 AC_FC_RECL_UNIT
-
 
 #   Tests require access to monoliths
 #   This may be a problem if alink has not yet been installed

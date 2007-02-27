@@ -7,16 +7,14 @@
 *    Generic error code handling.
 
 *  Description:
-*    The bodies for the routine fio1_serr.f_pc_linux. The default
+*    The various bodies for the routine fio1_serr.f_pc_linux. The default
 *    case is for g77 as we can detect g95 using it's __G95__ macro (which
-*    is set to the major version so we #ifdef for it, not #if). 
-*
-*    To extend for other compilers (gfortran?) we will need to add 
-*    some checks (parse the output from $CC -v?) to configure.ac that work
-*    out the compiler type.
+*    is set to the major version so we #ifdef for it, not #if) and
+*    if __GNUC__ is defined to be 4 or more, then if this is not g95
+*    it must be gfortran (g77 died at the end of life for GCC3).
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2005-2007 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -24,12 +22,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -59,7 +57,14 @@
       PARAMETER( MXENO = 199 )  !
       INTEGER MXFER             ! Maximum value for FORTRAN IO errors
       PARAMETER( MXFER = 216 )  ! but may change, still under development
-                                ! note gfortran doesn't use an offset
+
+#elif defined(__GNUC__) && __GNUC__ >= 4
+
+*  Must be gfortran.
+      INTEGER MXENO             ! Values <= MXENO are C ERRNOs
+      PARAMETER( MXENO = 5000 ) !
+      INTEGER MXFER             ! Maximum value for FORTRAN IO errors
+      PARAMETER( MXFER = 5017 ) ! but may change, still under development
 
 #else
 
@@ -102,6 +107,34 @@
 * ERROR 214  ERROR_CORRUPT_SEQUENTIAL: "Corrupt record in unformatted sequential-access file";
 * OFEOR 215  ERROR_READ_RECL: "Reading more data than the record size (RECL)";
 * OUTOV 216  ERROR_WRITE_RECL: "Writing more data than the record size (RECL)";
+
+#elif defined(__GNUC__) && __GNUC__ >= 4
+
+      DATA FIOERN/ FIO__INVRG, FIO__INVRG, FIO__INVKY, FIO__ALOPN,
+     :             FIO__UNTNO, FIO__ERFMT, FIO__IVACM, FIO__ENDFL,
+     :             FIO__RDER,  FIO__RDER,  FIO__RDER,  FIO__INVRG,
+     :             FIO__ILOPU, FIO__INSVR, FIO__OUTOV, FIO__OFEOR,
+     :             FIO__ERROR /
+
+* Gfortran errors:
+* ERROR_OPTION_CONFLICT 5001  "Conflicting statement options"
+* ERROR_BAD_OPTION      5002  "Bad statement option"
+* ERROR_MISSING_OPTION  5003  "Missing statement option"
+* ERROR_ALREADY_OPEN    5004  "File already opened in another unit"
+* ERROR_BAD_UNIT        5005  "Unattached unit"
+* ERROR_FORMAT          5006  "FORMAT error"
+* ERROR_BAD_ACTION      5007  "Incorrect ACTION specified"
+* ERROR_ENDFILE         5008  "Read past ENDFILE record"
+* ERROR_BAD_US          5009  "Corrupt unformatted sequential file"
+* ERROR_READ_VALUE      5010  "Bad value during read"
+* ERROR_READ_OVERFLOW   5011  "Numeric overflow on read"
+* ERROR_INTERNAL        5012  "Internal error in run-time library"
+* ERROR_INTERNAL_UNIT   5013  "Internal unit I/O error"
+* ERROR_ALLOCATION      5014  "Error in allocation"
+* ERROR_DIRECT_EOR      5015  "Write exceeds length of DIRECT access record"
+* ERROR_SHORT_RECORD    5016  "I/O past end of record on unformatted file"
+* ERROR_CORRUPT_FILE    5017  "Unformatted file structure has been corrupted"
+
 
 #else
 

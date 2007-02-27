@@ -1,3 +1,7 @@
+FIO Version 1.5-4 is released.
+
+ o  Error code generation now works with gfortran
+
 FIO Version 1.5-3 is released.
 
  o  This version corrects problems arising from the use of a single BLOCK_DATA

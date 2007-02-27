@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 
 <component id="fio" support="S">
-  <version>1.5-3</version>
+  <version>1.5-4</version>
   <path>libraries/fio</path>
   <description>FORTRAN file I/O routines</description>
   <abstract>FIO/RIO is a subroutine package that allows a FORTRAN
