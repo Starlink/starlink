@@ -64,6 +64,8 @@
 *        sc2head not actually used.
 *     2007-01-25 (AGG):
 *        Rewrite to take account of moving objects
+*     2007-02-27 (AGG):
+*        Minor refactor for improved status handling
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -94,6 +96,7 @@
 *-
 */
 
+/* Standard includes */
 #include <stdio.h>
 
 /* Starlink includes */
@@ -128,20 +131,34 @@ void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outfset,
   int nbol = 0;                 /* # of bolometers in the sub-array */
   AstSkyFrame *oskyfrm = NULL;  /* SkyFrame from the output WCS Frameset */
   int rebinflags;               /* Control the rebinning procedure */
-  AstMapping *sky2map=NULL;     /* Mapping from celestial->map coordinates */
   AstFrame *sf1 = NULL;         /* Pointer to copy of input current Frame */
-  AstFrameSet *swcsin = NULL;   /* Spatial WCS FrameSet for current time slice */
+  AstMapping *sky2map=NULL;     /* Mapping from celestial->map coordinates */
   AstFrame *skyin = NULL;       /* Pointer to current Frame in input WCS FrameSet */
+  AstFrameSet *swcsin = NULL;   /* Spatial WCS FrameSet for current time slice */
   const char *system;           /* Coordinate system */
   int ubnd_in[2];               /* Upper pixel bounds for input maps */
 
   /* Main routine */
   if (*status != SAI__OK) return;
 
+  /* Check we have valid input data */
+  if ( data == NULL ) {
+    *status = SAI__ERROR;
+    errRep( "", "Input data struct is NULL", status );
+    return;
+  }
+  /* And a valid FrameSet */
+  if ( outfset == NULL ) {
+    *status = AST__OBJIN;
+    errRep( "", "Supplied FrameSet is NULL", status );
+    return;
+  }
+
   /* Get the system from the outfset */
   system = astGetC( outfset, "system" );
 
-  /* Retrieve the sky2map mapping from the output frameset */
+  /* Retrieve the sky2map mapping from the output frameset (actually
+     map2sky) */
   oskyfrm = astGetFrame( outfset, AST__CURRENT );
   sky2map = astGetMapping( outfset, AST__BASE, AST__CURRENT );
   /* Invert it to get Output SKY to output map coordinates */
@@ -149,6 +166,8 @@ void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outfset,
   /* Create a SkyFrame in absolute coordinates */
   abskyfrm = astCopy( oskyfrm );
   astClear( abskyfrm, "SkyRefIs" );
+  astClear( abskyfrm, "SkyRef(1)" );
+  astClear( abskyfrm, "SkyRef(2)" );
 
   /* Calculate bounds in the input array */
   nbol = (data->dims)[0] * (data->dims)[1];
@@ -157,14 +176,21 @@ void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outfset,
   ubnd_in[0] = (data->dims)[0]-1;
   ubnd_in[1] = (data->dims)[1]-1;
 
+  boldata = (data->pntr)[0];
+  if ( boldata == NULL ) {
+    if ( *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRep( "", "Input data to rebinmap is NULL", status );
+    }
+  }
+
   /* Loop over all time slices in the data */
-  for( i=0; i<(data->dims)[2]; i++ ) {
+  for( i=0; (i<(data->dims)[2]) && (*status == SAI__OK); i++ ) {
 	
     smf_tslice_ast( data, i, 1, status);
 	
     if( *status == SAI__OK ) {
       hdr = data->hdr;
-	  
       swcsin = hdr->wcs;
       /* Find out how to convert from input GRID coords to the output
 	 sky frame.  Note, we want absolute sky coords here, even if
@@ -237,7 +263,7 @@ void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outfset,
 	 output pixel Mapping supplied in "sky2map". */
       bolo2map = astCmpMap( bolo2sky, sky2map, 1, "" );
 
-      /*  Rebin this time slice*/
+      /* Rebin this time slice */
       rebinflags = 0;
       if( (index == 1) && (i == 0) )                    /* Flags start rebin */
 	rebinflags = rebinflags | AST__REBININIT;
@@ -245,33 +271,25 @@ void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outfset,
       if( (index == size) && (i == (data->dims)[2]-1) ) /* Flags end rebin */
 	rebinflags = rebinflags | AST__REBINEND;
 	  
-      boldata = (data->pntr)[0];
-      astRebinSeqD(bolo2map, 0.0,
-		   2, lbnd_in, ubnd_in,
-		   &(boldata[i*nbol]),
-		   NULL, 
-		   AST__NEAREST, NULL, rebinflags, 0.1, 1000000, VAL__BADD,
-		   2,lbnd_out,ubnd_out,
-		   lbnd_in, ubnd_in,
-		   map, variance, weights);
+      astRebinSeqD( bolo2map, 0.0, 2, lbnd_in, ubnd_in, &(boldata[i*nbol]),
+		    NULL, AST__NEAREST, NULL, rebinflags, 0.1, 1000000, 
+		    VAL__BADD, 2, lbnd_out, ubnd_out, lbnd_in, ubnd_in,
+		    map, variance, weights );
 
       /* clean up ast objects */
-      if (bolo2sky) bolo2sky = astAnnul( bolo2sky );
-      if (bolo2map) bolo2map = astAnnul( bolo2map );
-      if (fs) fs = astAnnul( fs );
+      if ( bolo2sky ) bolo2sky = astAnnul( bolo2sky );
+      if ( bolo2map ) bolo2map = astAnnul( bolo2map );
+      if ( fs ) fs = astAnnul( fs );
     }
-
-    /* Break out of loop over time slices if bad status */
-    if (*status != SAI__OK) goto CLEANUP;
   }
 
-
-
   /* Clean Up */
- CLEANUP:
-  if (sky2map) sky2map  = astAnnul( sky2map );
-  if (bolo2sky) bolo2sky = astAnnul( bolo2sky );
-  if (bolo2map) bolo2map = astAnnul( bolo2map );
-  if (fs) fs = astAnnul( fs );
+  if ( sky2map ) sky2map  = astAnnul( sky2map );
+  if ( bolo2sky ) bolo2sky = astAnnul( bolo2sky );
+  if ( bolo2map ) bolo2map = astAnnul( bolo2map );
+  if ( fs ) fs = astAnnul( fs );
 
+  if ( *status != SAI__OK ) {
+    errRep( "", "Rebinning step failed", status );
+  }
 }
