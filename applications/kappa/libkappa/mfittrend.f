@@ -468,7 +468,9 @@
 *  Get the ranges to use. These values are transformed from current
 *  co-ordinates along the fit axis to pixel co-ordinates on some
 *  NDF axis (we've yet to determine).
-         DRANGE( 1 ) = AST__BAD
+         DO I = 1, MAXRNG
+            DRANGE( I ) = AST__BAD
+         END DO
          CALL KPG1_GTAXV( 'RANGES', MAXRNG, .FALSE., CFRM, IAXIS,
      :                    DRANGE, NRANGE, STATUS )
 
