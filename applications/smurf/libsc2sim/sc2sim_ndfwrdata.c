@@ -256,24 +256,23 @@ int *status       /* global status (given and returned) */
 
    /* Determine extent of the map from posptr + known size of the arrays */
    for( i=0; i<numsamples; i++ ) {
+     /* Initialize extrema */
+     if( i == 0 ) {
+       x_min = posptr[0];
+       x_max = posptr[0];
+       y_min = posptr[1];
+       y_max = posptr[1];
+     }
     
-      if( i == 0 ) {
-         x_min = posptr[0];
-         x_max = posptr[0];
-         y_min = posptr[1];
-         y_max = posptr[1];
-      }
-    
-      if( posptr[i*2] < x_min ) x_min = posptr[i*2];
-      if( posptr[i*2] > x_max ) x_max = posptr[i*2];
-      if( posptr[i*2+1] < y_min ) y_min = posptr[i*2+1];
-      if( posptr[i*2+1] > y_max ) y_max = posptr[i*2+1];
-
+     if( posptr[i*2] < x_min ) x_min = posptr[i*2];
+     if( posptr[i*2] > x_max ) x_max = posptr[i*2];
+     if( posptr[i*2+1] < y_min ) y_min = posptr[i*2+1];
+     if( posptr[i*2+1] > y_max ) y_max = posptr[i*2+1];
    }
  
-   map_wdth = (x_max - x_min) + 1000; /* 1000 arcsec for array FOV */
-   map_hght = (y_max - y_min) + 1000; /* 1000 arcsec for array FOV */
-   map_pa = 0; /* kludge */
+   map_wdth = (x_max - x_min) + 650.0; /* 650 arcsec for array diagonal FOV */
+   map_hght = (y_max - y_min) + 650.0; /* 650 arcsec for array diagonal FOV */
+   map_pa = 0; /* kludge for now since it is not specified by the user */
    map_x = (x_max + x_min)/2.;
    map_y = (y_max + y_min)/2.;
   
