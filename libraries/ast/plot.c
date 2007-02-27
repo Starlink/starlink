@@ -611,6 +611,11 @@ f     - Title: The Plot title drawn using AST_GRID
 *     25-JAN-2006 (DSB)
 *        Do not draw ticks marks that start outside the bounds of the
 *        axis they are labelling.
+*     27-FEB-2007 (DSB)
+*        - Change nominal Crv_scerr value from 5.0 to 1.5 (this avoids gaps
+*        in HPX grid plots being bridged by grid lines).
+*        - Double the dimension of the grid used by GoodGrid to avoid
+*        missing the pointy bits in a HPX projection.
 *class--
 */
 
@@ -4239,7 +4244,7 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
 
 /* Now set up the external variables used by the Crv and CrvLine function. */
       Crv_scerr = ( astGetLogPlot( this, 0 ) || 
-                    astGetLogPlot( this, 1 ) ) ? 100.0 : 5.0;
+                    astGetLogPlot( this, 1 ) ) ? 100.0 : 1.5;
       Crv_ux0 = AST__BAD;    
       Crv_tol = tol;
       Crv_limit = 0.5*tol*tol;
@@ -7241,6 +7246,15 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
       printf("%d ",levels[ i ] );
    }
    printf("\n");
+
+   if( getchar() == 'm' ) {
+      float ffx,ffy;
+      for( i = 0; i < CRV_NPNT; i++ ) {
+         ffx = x[i]; ffy = y[i];
+         GMark( this, 1, &ffx, &ffy, 2, method, class );
+         GFlush( this, method, class );
+      }
+   }
 #endif
 
 /* ======================================================================
@@ -8292,7 +8306,7 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
 
 /* Now set up the external variables used by the Crv and CrvLine function. */
       Crv_scerr = ( astGetLogPlot( this, 0 ) || 
-                    astGetLogPlot( this, 1 ) ) ? 100.0 : 5.0;
+                    astGetLogPlot( this, 1 ) ) ? 100.0 : 1.5;
       Crv_ux0 = AST__BAD;    
       Crv_tol = tol;
       Crv_limit = 0.5*tol*tol;
@@ -12722,7 +12736,7 @@ f        The global status.
 
 /* Now set up the external variables used by the Crv and CrvLine function. */
       Crv_scerr = ( astGetLogPlot( this, 0 ) || 
-                    astGetLogPlot( this, 1 ) ) ? 100.0 : 5.0;
+                    astGetLogPlot( this, 1 ) ) ? 100.0 : 1.5;
       Crv_ux0 = AST__BAD;    
       Crv_tol = tol;
       Crv_limit = 0.5*tol*tol;
@@ -14786,7 +14800,7 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
    frm = astGetFrame( this, AST__CURRENT );
 
 /* Initialise the grid dimension. */
-   *dim = 8;
+   *dim = 16;
 
 /* We need a grid which has at least 4 good points. */
    ngood = 0;
@@ -14796,7 +14810,7 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
       *dim *= 2;
 
 /* Report an error if the grid is now too big. */
-      if( *dim >= 256 ){
+      if( *dim >= 512 ){
          astError( AST__VSMAL, "%s(%s): The area of the plot containing "
                    "usable coordinates on both axes is too small.", method, 
                    class );
@@ -14872,7 +14886,7 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
    good physical coordinates. */
          *dim *= MAX( (xmax - xmin)/(this->xhi - this->xlo), 
                       (ymax - ymin)/(this->yhi - this->ylo) );
-         if( *dim < 16 ) *dim = 16;
+         if( *dim < 32 ) *dim = 32;
 
 /* Annul the PointSet holding the current grid. */
          *pset1 = astAnnul( *pset1 );
@@ -18832,8 +18846,8 @@ static void LinePlot( AstPlot *this, double xa, double ya, double xb,
 
 /* Set up the external variables used by the Crv and CrvLine function (see 
    their prologues for details). */
-      Crv_scerr = ( astGetLogPlot( this, 0 ) || 
-                    astGetLogPlot( this, 1 ) ) ? 100.0 : 5.0;
+   Crv_scerr = ( astGetLogPlot( this, 0 ) || 
+                 astGetLogPlot( this, 1 ) ) ? 100.0 : 1.5;
    Crv_ux0 = AST__BAD;
    Crv_limit = 0.5*tol*tol;
    Crv_tol = tol;
@@ -21104,7 +21118,7 @@ f        The global status.
 
 /* Now set up the external variables used by the Crv and CrvLine function. */
       Crv_scerr = ( astGetLogPlot( this, 0 ) || 
-                    astGetLogPlot( this, 1 ) ) ? 100.0 : 5.0;
+                    astGetLogPlot( this, 1 ) ) ? 100.0 : 1.5;
       Crv_tol = tol;
       Crv_limit = 0.5*tol*tol;
       Crv_map = Map3;
