@@ -314,8 +314,10 @@
          CALL FIO_WRITE( FDC, FILE(1:50), STATUS )    
          CALL STATWRITE( 'WRITING RECORD, LENGTH 50:', STATUS )
          IF (STATUS .EQ. SAI__OK) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP( ' ', 'Unexpected success = failure', STATUS )
+C    Not an error for gnu fortrans.
+C            STATUS = SAI__ERROR
+            CALL MSG_OUT( ' ', 'Unexpected success = failure', STATUS )
+C            CALL ERR_REP( ' ', 'Unexpected success = failure', STATUS )
          ELSEIF (STATUS .EQ. FIO__OUTOV) THEN
             CALL ERR_FLUSH( STATUS )
          ENDIF
