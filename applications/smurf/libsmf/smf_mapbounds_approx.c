@@ -4,7 +4,8 @@
 *     smf_mapbounds_approx
 
 *  Purpose:
-*     Automatically calculate the pixel bounds for a map given a projection
+*     Make an approximate calculation of the likely pixel bounds which
+*     include all the data for a map given a projection
 
 *  Language:
 *     Starlink ANSI C
@@ -13,7 +14,7 @@
 *     C function
 
 *  Invocation:
-*     smf_mapbounds_approx( Grp *igrp,  int size, char *system, double pixsize, 
+*     smf_mapbounds_approx( Grp *igrp, int size, char *system, double pixsize, 
 *                           int *lbnd_out, int *ubnd_out, AstFrameSet **outframeset,
 *                           int *moving, int *status );
 
@@ -44,11 +45,22 @@
 *     given file. It creates the WCS frameset (allowing for moving
 *     objects if necessary), setting the tangent point to the RA, Dec
 *     centre.
+*
+*     If the MAP_WDTH and MAP_HGHT keywords are zero then it is
+*     assumed that the output map is the same size as the array
+*     footprint (scaled slightly to allow for non-alignment with the
+*     output coordinate frame).
+*
+*     For cases where the instrument aperture is non-zero, the pixel
+*     bounds are shifted by an amount calculated from the INSTAP_X/_Y
+*     FITS headers and knowledge of the angle between the focal plane
+*     and tracking coordinate systems (TCS_TR_ANG).
 
 * Notes:
-*     Currently the simulator does not write MAP_PA: therefore this
-*     routine ignores the map PA and assumes that the map is oriented
-*     with the Y-axis parallel to the elevation axis.
+*     It is important to note that the map size is defined only by the
+*     FITS header entries. An output map that is made from mulitple
+*     observations of a moving target may not include all of the data
+*     if created in a stationary coordinate frame (e.g. RA/Dec).
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -60,6 +72,13 @@
 *     2007-01-30 (AGG):
 *        Add support for moving objects, remove lon_0/lat_0 from API,
 *        WCS now constructed in same manner as smf_mapbounds
+*     2007-02-21 (AGG):
+*        Apply update from smf_mapbounds for object movement to take
+*        account of the difference in epoch between the first and last
+*        time slices.
+*     2007-02-26 (AGG):
+*        New calculation of map bounds including when the input map
+*        sizes are zero (assumed to be from stare/dream data)
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -89,6 +108,7 @@
 *-
 */
 
+/* Standard includes */
 #include <stdio.h>
 #include <math.h>
 
@@ -112,6 +132,7 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
   /* Local variables */
   double az[ 2 ];              /* Azimuth values */
   AstMapping *azel2usesys = NULL; /* Mapping form AZEL to requested system */
+  double bolospacing = 6.28;   /* Bolometer spacing in arcsec */
   smfData *data = NULL;        /* pointer to  SCUBA2 data struct */
   double dec[ 2 ];             /* Dec values */
   double el[ 2 ];              /* Elevation values */
@@ -122,14 +143,19 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
   AstFrameSet *fs = NULL;      /* A general purpose FrameSet pointer */
   smfHead *hdr = NULL;         /* Pointer to data header this time slice */
   int hghtpix;                 /* Map height in pixels */
+  int instap = 0;              /* Flag to denote whether the
+				  instrument aperture is non-zero */
+  double instapx = 0.0;        /* Effective X offset in tracking frame */
+  double instapy = 0.0;        /* Effective Y offset in tracking frame */
   dim_t k;                     /* Loop counter */
   double lon_0;                /* Longitude of output map reference point */
   double lat_0;                /* Latitude of output map reference point */
-  double maphght;              /* Map height in radians */
-  double mappa = 0;            /* Map position angle in radians */
-  double mapwdth;              /* Map width in radians */
+  double maphght = 0.0;        /* Map height in radians */
+  double mappa = 0.0;          /* Map position angle in radians */
+  double mapwdth = 0.0;        /* Map width in radians */
   double mapx;                 /* Map X offset in radians */
   double mapy;                 /* Map Y offset in radians */
+  double origval = 0.0;        /* A temporary double variable */
   char *pname = NULL;          /* Name of currently opened data file */
   double ra[ 2 ];              /* RA values */
   double sep;                  /* Separation between first and last BASE positions */
@@ -142,7 +168,8 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
   double skyref[ 2 ];          /* Values for output SkyFrame SkyRef attribute */
   AstFrameSet *swcsin = NULL;  /* FrameSet describing input WCS */
   int temp;                    /* Temporary variable  */
-  const char *usesys = NULL;   /* AST system for output cube */
+  double theta = 0.0;          /* */
+  const char *usesys = NULL;   /* AST system for output image */
   int wdthpix;                 /* Map width in pixels */
   double x_array_corners[4];   /* X-Indices for corner bolos in array */ 
   double y_array_corners[4];   /* Y-Indices for corner pixels in array */ 
@@ -150,15 +177,18 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
   /* Main routine */
   if (*status != SAI__OK) return;
 
+  /* Begin an AST context to ensure that all AST objects are annuled
+     before returning to caller */
+  astBegin;
+
   /* Initialize output frameset pointer to NULL */
   *outframeset = NULL;
 
   /* Read data from the given input file in the group - note index
-     should be 1 */
+     should be 1 as we use the first file in the Grp to define the map
+     bounds */
   smf_open_file( igrp, index, "READ", 1, &data, status );
-  /* Construct the WCS for the first time slice in this file */
-  smf_tslice_ast( data, 1, 1, status);
-    
+
   /* Retrieve file name for use feedback */
   file = data->file;
   pname =  file->name;
@@ -184,20 +214,64 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
     }
   }
 
+  /* Construct the WCS for the first time slice in this file */
+  smf_tslice_ast( data, 1, 1, status);
+    
+  /* Retrieve header for later constructing output WCS */
   if( *status == SAI__OK) {
-    /* Retrieve map height and width from header */
     hdr = data->hdr;
+    swcsin = hdr->wcs;
+    /* Retrieve input SkyFrame */
+    skyin = astGetFrame( swcsin, AST__CURRENT );
+    /* Determine the tracking coordinate system, and choose the
+       celestial coordinate system for the output image */
+    if( !strncmp( system, "TRACKING", 8 ) ) {
+      usesys = smf_convert_system( hdr->state->tcs_tr_sys, status );
+    } else {
+      usesys = system;
+    }
+
+    /* Retrieve map height and width from header */
     smf_fits_getD( hdr, "MAP_WDTH", &mapwdth, status );
     smf_fits_getD( hdr, "MAP_HGHT", &maphght, status );
+
+    /* Retrieve the angle between the focal plane and the tracking
+       coordinate system */
+    theta = hdr->state->tcs_tr_ang;
+
+    /* Make an approximation if map height and width are not set -
+       note that this should ONLY apply for non-scan mode data */
+    if ( !mapwdth && !maphght ) {
+      /* 84 comes from 2 x 40 detectors + 4 inter-sub-array gap */
+      mapwdth = sqrt(2.0) * 84 * bolospacing * cos( (AST__DPIBY2/2.0) - theta);
+      maphght = mapwdth;
+    }
+    /* Retrieve RA, Dec from header */
+    smf_fits_getD( hdr, "RA", &lon_0, status );
+    smf_fits_getD( hdr, "DEC", &lat_0, status );
+
     smf_fits_getD( hdr, "MAP_X", &mapx, status );
     smf_fits_getD( hdr, "MAP_Y", &mapy, status );
-    /* Not yet used: must be converted to radians */
+    smf_fits_getD( hdr, "INSTAP_X", &instapx, status );
+    smf_fits_getD( hdr, "INSTAP_Y", &instapy, status );
+    /* If the instrument aperture is set, calculate the projected
+       values in the tracking coordinate frame */
+    if ( instapx && instapy ) {
+      instap = 1;
+      origval = instapx;
+      instapx = instapx*cos(theta) - instapy*sin(theta);
+      instapy = origval*sin(theta) + instapy*cos(theta);
+    }
+
+    /* Convert map Position Angle to radians */
     smf_fits_getD( hdr, "MAP_PA", &mappa, status );
     mappa *= AST__DD2R;
+
+    /* Calculate size of output map in pixels */
     wdthpix = (int) ( ( mapwdth*cos(mappa) + maphght*sin(mappa) ) / pixsize);
     hghtpix = (int) ( ( maphght*cos(mappa) + mapwdth*sin(mappa) ) / pixsize);
-    dxpix = (int) (mapx / pixsize);
-    dypix = (int) (mapy / pixsize);
+    dxpix = (int) ((mapx + instapx) / pixsize);
+    dypix = (int) ((mapy + instapy) / pixsize);
 
     /* Get the offsets for each corner of the array */
     temp = (wdthpix - 1) / 2;
@@ -211,10 +285,6 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
     y_array_corners[1] = dypix + temp;
     y_array_corners[2] = dypix - temp;
     y_array_corners[3] = dypix + temp;
-
-    /* These might get used in the future.... */
-    /*    smf_fits_getD( hdr, "RA", &lon_0, status );
-	  smf_fits_getD( hdr, "DEC", &lat_0, status );*/
 
     lbnd_out[0] = x_array_corners[0];
     ubnd_out[0] = x_array_corners[0];
@@ -233,20 +303,10 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
     goto CLEANUP;
   }
 
-  /* Construct output WCS */
-  swcsin = hdr->wcs;
-  /* Retrieve input SkyFrame */
-  skyin = astGetFrame( swcsin, AST__CURRENT );
-  /* Determine the tracking coordinate system, and choose the
-     celestial coordinate system for the output cube. */
-  if( !strncmp( system, "TRACKING", 8 ) ) {
-    usesys = smf_convert_system( hdr->state->tcs_tr_sys, status );
-  } else {
-    usesys = system;
-  }
-  /* Begin by taking a copy of the input SkyFrame (in order to inherit
-     all the other attributes like Epoch, Equinox, ObsLat, ObsLon,
-     Dut1, etc) and then set its System to the required system. */
+  /* Now create the output FrameSet. Begin by taking a copy of the
+     input SkyFrame (in order to inherit all the other attributes like
+     Epoch, Equinox, ObsLat, ObsLon, Dut1, etc) and then set its
+     System to the required system. */
   skyframe = astCopy( skyin );
   astSetC( skyframe, "SYSTEM", usesys );
 
@@ -265,26 +325,41 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
   /* Determine if the telescope is tracking a moving target such as a
      planet or asteroid. This is indicated by significant change in
      the telescope base pointing position within the ICRS coordinate
-     system. Here, "significant" means more than 1
-     arc-second. Apparently users will only want to track moving
-     objects if the output cube is in AZEL or GAPPT, so we ignoring a
-     moving base pointing position unless the output system is AZEL or
-     GAPPT. */
+     system. Here, "significant" means more than 0.1 arc-second. Users
+     will only want to track moving objects if the output image is in
+     AZEL or GAPPT, so we ignoring a moving base pointing position
+     unless the output system is AZEL or GAPPT. */
   if( !strcmp( usesys, "AZEL" ) || !strcmp( usesys, "GAPPT" ) ) {
     /* Set the "sf2" SkyFrame to represent ICRS coords ("sf1" already
        represents AZEL coords). */
     sf2 = astCopy( skyin );
     astSetC( sf2, "System", "ICRS" );
 
-    /* Use the Mapping from `sf' (AzEl) to `sf2' (ICRS) to convert the
-       telescope base pointing position for the first and last slices
-       from (az,el) to ICRS. */
+    /* Set the Epoch for `sf1' andf `sf2' to the epoch of the first
+       time slice, then use the Mapping from `sf1' (AzEl) to `sf2'
+       (ICRS) to convert the telescope base pointing position for the
+       first time slices from (az,el) to ICRS. */
+    astSet( sf1, "Epoch=MJD %.*g", DBL_DIG, 
+	    (hdr->allState)[ 0 ].rts_end + 32.184/86400.0 );
+    astSet( sf2, "Epoch=MJD %.*g", DBL_DIG, 
+	    (hdr->allState)[ 0 ].rts_end + 32.184/86400.0 );
     az[ 0 ] = (hdr->allState)[ 0 ].tcs_az_bc1;
     el[ 0 ] = (hdr->allState)[ 0 ].tcs_az_bc2;
+    astTran2( astConvert( sf1, sf2, "" ), 1, az, el, 1, ra, dec );
+
+    
+    /* Set the Epoch for `sf1' andf `sf2' to the epoch of the last
+       time slice, then use the Mapping from `sf1' (AzEl) to `sf2'
+       (ICRS) to convert the telescope base pointing position for the
+       last time slices from (az,el) to ICRS. */
+    astSet( sf1, "Epoch=MJD %.*g", DBL_DIG, 
+	    (hdr->allState)[ hdr->nframes - 1 ].rts_end + 32.184/86400.0 );
+    astSet( sf2, "Epoch=MJD %.*g", DBL_DIG, 
+	    (hdr->allState)[ hdr->nframes - 1 ].rts_end + 32.184/86400.0 );
     az[ 1 ] = (hdr->allState)[ hdr->nframes - 1 ].tcs_az_bc1;
     el[ 1 ] = (hdr->allState)[ hdr->nframes - 1 ].tcs_az_bc2;
-
-    astTran2( astConvert( sf1, sf2, "" ), 2, az, el, 1, ra, dec );
+    astTran2( astConvert( sf1, sf2, "" ), 1, az + 1, el + 1, 1, 
+	      ra + 1, dec + 1 );
 
     /* Get the arc distance between the two positions and
        see if it is greater than 0.1 arc-sec. */
@@ -310,6 +385,7 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
     lon_0 = DR2D * skyref[0];
     lat_0 = DR2D * skyref[1];
   }
+
   /* Now populate a FitsChan with FITS-WCS headers describing the
      required tan plane projection. The longitude and latitude axis
      types are set to either (RA,Dec) or (AZ,EL) to get the correct
@@ -345,6 +421,7 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
   astRemapFrame( *outframeset, AST__BASE, astShiftMap( 2, shift, "") );
 
   astSetC( *outframeset, "SYSTEM", usesys );
+  astExport( *outframeset );
   /* Change the pixel bounds to be consistent with the new CRPIX */
   ubnd_out[0] -= lbnd_out[0];
   lbnd_out[0] = 0;
@@ -352,14 +429,11 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
   ubnd_out[1] -= lbnd_out[1];
   lbnd_out[1] = 0;
 
-  /* Clean Up */
- 
+  /* Clean Up */ 
  CLEANUP:
-  if (fs) fs = astAnnul( fs );
-  if (sky2map) sky2map  = astAnnul( sky2map );
-  if (fitschan) fitschan = astAnnul( fitschan );
-
   if( data != NULL )
     smf_close_file( &data, status);
+
+  astEnd;
 
 }
