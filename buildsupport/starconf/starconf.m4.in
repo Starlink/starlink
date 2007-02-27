@@ -602,6 +602,61 @@ AC_DEFUN([STAR_CNF_BLANK_COMMON],
     esac
 ])# STAR_CNF_BLANK_COMMON
 
+# STAR_PRM_COMPATIBLE_SYMBOLS
+# ---------------------------
+#
+#  See if any special flags are required to support PRM's use of typeless BOZ
+#  constants, or if there's no typeless BOZ support any special flags that are
+#  required for that. 
+#
+#  In fact this macro is only currently of use with the gfortran compiler
+#  which has no typeless BOZ support, so requires that the -fno-range-check
+#  flag is set so that assigments to integers can silently overflow (BOZ
+#  constants are replaced with their integer and floating point
+#  equivalents). In general this macro should be used by all packages that
+#  include PRM_PAR, all monoliths are assumed to use this by default.
+#
+AC_DEFUN([STAR_PRM_COMPATIBLE_SYMBOLS],
+   [$_star_docs_only &&
+        AC_MSG_ERROR([STAR[]_PRM_COMPATIBLE_SYMBOLS in docs-only dir])
+    AC_CACHE_CHECK([how to make compiler accept PRM constants],
+       [star_cv_prm_compatible_symbols],
+       [star_cv_prm_compatible_symbols="nocheck"
+        AC_MSG_NOTICE([ ])
+        AC_FC_HAVE_TYPELESS_BOZ
+        if test $ac_cv_fc_have_typeless_boz = no; then
+           AC_FC_HAVE_OLD_TYPELESS_BOZ
+           if test $ac_cv_fc_have_old_typeless_boz = no; then
+              #  Test if "-fno-range-check" works.
+              AC_REQUIRE([AC_PROG_FC])dnl
+              AC_LANG_PUSH([Fortran])
+              AC_LANG_CONFTEST([AC_LANG_SOURCE([
+      PROGRAM conftest
+      INTEGER*2 VAL__BADUW
+      PARAMETER ( VAL__BADUW = 65535 )
+      BYTE VAL__BADUB
+      PARAMETER ( VAL__BADUB = 255 )
+      END
+])])
+              if $FC -c $FCFLAGS -fno-range-check -o conftest conftest.f 2>&5
+              then
+                 star_cv_prm_compatible_symbols="-fno-range-check"
+              fi
+              rm -f conftest.f
+              AC_LANG_POP([Fortran])
+           else
+              star_cv_prm_compatible_symbols=""
+           fi
+         else
+            star_cv_prm_compatible_symbols=""
+         fi
+         if test "$star_cv_prm_compatible_symbols" = "nocheck"; then
+            AC_MSG_ERROR([cannot work out how])
+         else
+            STAR_FCFLAGS="$STAR_FCFLAGS $star_cv_prm_compatible_symbols"
+            STAR_FFLAGS="$STAR_FFLAGS $star_cv_prm_compatible_symbols"
+         fi
+])])# STAR_PRM_COMPATIBLE_SYMBOLS
 
 # STAR_PATH_TCLTK([minversion=0], [options=''])
 # ---------------------------------------------
@@ -1164,6 +1219,7 @@ AC_DEFUN([STAR_MONOLITHS],
           # partly in case the user forgets, but also because this is
           # reasonably part of the default setup required for monoliths.
           STAR_CNF_COMPATIBLE_SYMBOLS
+          STAR_PRM_COMPATIBLE_SYMBOLS
 ])# STAR_MONOLITHS
 
 
