@@ -20,6 +20,7 @@ STAR_CHECK_PROGS([fgeneric])
 
 dnl    Other options here, such as
 STAR_CNF_COMPATIBLE_SYMBOLS
+STAR_PRM_COMPATIBLE_SYMBOLS
 STAR_MONOLITHS
 
 dnl    Declare the build and use dependencies for this package

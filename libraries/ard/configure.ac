@@ -23,6 +23,7 @@ AC_PROG_LIBTOOL
 
 dnl    Other options here, such as
 STAR_CNF_COMPATIBLE_SYMBOLS
+STAR_PRM_COMPATIBLE_SYMBOLS
 
 dnl    Check for %LOC, if not present assume we have LOC.
 AC_FC_HAVE_PERCENTLOC()

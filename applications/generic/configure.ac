@@ -26,8 +26,11 @@ AC_PROG_LN_S
 AC_FC_CHECK_INTRINSICS(zext)
 
 dnl    Check whether we have X'' or ''X notation
-AC_FC_HAVE_OLD_TYPELESS_BOZ()
-AC_FC_HAVE_TYPELESS_BOZ()
+AC_FC_HAVE_OLD_TYPELESS_BOZ
+AC_FC_HAVE_TYPELESS_BOZ
+
+STAR_CNF_COMPATIBLE_SYMBOLS
+STAR_PRM_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, prm)

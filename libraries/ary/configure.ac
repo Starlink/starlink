@@ -27,6 +27,7 @@ dnl    If --with-pic=no is set we should honour that.
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 
 STAR_CNF_COMPATIBLE_SYMBOLS
+STAR_PRM_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [sae prm hds chr ems generic])

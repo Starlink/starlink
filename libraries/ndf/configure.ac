@@ -12,7 +12,6 @@ AM_INIT_AUTOMAKE(1.8.2-starlink)
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
 AC_CONFIG_SRCDIR([NDF_PAR])
-
  
 dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
@@ -51,6 +50,7 @@ dnl   If --with-pic=no is set we should honour that.
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 
 STAR_CNF_COMPATIBLE_SYMBOLS
+STAR_PRM_COMPATIBLE_SYMBOLS
 
 dnl   We need this for the tests
 AC_FC_LIBRARY_LDFLAGS

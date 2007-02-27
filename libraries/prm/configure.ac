@@ -26,6 +26,7 @@ AC_PROG_LIBTOOL
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 
 STAR_CNF_COMPATIBLE_SYMBOLS
+STAR_PRM_COMPATIBLE_SYMBOLS
 
 AC_CHECK_HEADERS([fenv.h limits.h float.h time.h assert.h inttypes.h stdint.h])
 AC_CHECK_FUNCS([nextafter nextafterf])

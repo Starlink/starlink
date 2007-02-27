@@ -22,6 +22,7 @@ AC_PROG_FC
 AC_PROG_LIBTOOL
 
 STAR_CNF_COMPATIBLE_SYMBOLS
+STAR_PRM_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [chr cnf ems hds mers prm sae])

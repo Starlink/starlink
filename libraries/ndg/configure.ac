@@ -23,6 +23,7 @@ AC_PROG_LIBTOOL
 
 dnl    Other options here, such as
 STAR_CNF_COMPATIBLE_SYMBOLS
+STAR_PRM_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [hds grp ndf par prm psx cnf sae])
