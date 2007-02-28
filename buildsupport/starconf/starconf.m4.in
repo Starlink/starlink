@@ -650,13 +650,14 @@ AC_DEFUN([STAR_PRM_COMPATIBLE_SYMBOLS],
          else
             star_cv_prm_compatible_symbols=""
          fi
+])# AC_CACHE_CHECK
          if test "$star_cv_prm_compatible_symbols" = "nocheck"; then
             AC_MSG_ERROR([cannot work out how])
          else
             STAR_FCFLAGS="$STAR_FCFLAGS $star_cv_prm_compatible_symbols"
             STAR_FFLAGS="$STAR_FFLAGS $star_cv_prm_compatible_symbols"
          fi
-])])# STAR_PRM_COMPATIBLE_SYMBOLS
+])# STAR_PRM_COMPATIBLE_SYMBOLS
 
 # STAR_PATH_TCLTK([minversion=0], [options=''])
 # ---------------------------------------------
