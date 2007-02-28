@@ -70,6 +70,7 @@ $Date$</px>
 <copyright>
 <p>Copyright 2004-5, Council for the Central Laboratory of the
 Research Councils</p>
+<p>Copyright 2007, Particle Physics and Astronomy Research Council</p>
 </copyright>
 
 </docinfo>
@@ -6306,6 +6307,26 @@ target: dependency
 
         </subsect>
 
+
+
+        <subsect id='macro-cnf-blank-common' export='export'
+          indexkey="starconf!macros!STAR_CNF_BLANK_COMMON">
+          <subhead>
+            <title>STAR_CNF_BLANK_COMMON</title>
+          </subhead>
+
+          <p><strong><code>STAR_CNF_BLANK_COMMON</code></strong><index>CNF</index>
+            <index seealso="CNF">C and Fortran, mixing</index></p>
+
+          <p>Determine the global symbol used for the Fortran blank common
+             storage space. This is a specialist macro probably only
+             of use to the <code>CNF</code> package. Its only side-effect
+             is to define the C macro <code>BLANK_COMMON_SYMBOL</code>.
+          </p>
+
+        </subsect>
+
+
         <subsect id='macro-cnf-compatible-symbols' export='export'
           indexkey="starconf!macros!STAR_CNF_COMPATIBLE_SYMBOLS">
           <subhead>
@@ -7140,6 +7161,33 @@ BUILT_SOURCES = $(include_MESSAGES)
           <p>For examples of use, see <ref id="autodistrib"/></p>
 
         </subsect>
+
+        <subsect id='macro-prm-compatible-symbols' export='export'
+          indexkey="starconf!macros!STAR_PRM_COMPATIBLE_SYMBOLS">
+          <subhead>
+            <title>STAR_PRM_COMPATIBLE_SYMBOLS</title>
+          </subhead>
+
+          <p><strong><code>STAR_PRM_COMPATIBLE_SYMBOLS</code></strong><index>PRM</index></p>
+
+          <p>This macro supports the use of the <code>VAL__</code> constants
+          that are defined in the include file <code>PRM_PAR</code>. If checks
+          if any special compiler flags are required to support PRM's use of
+          typeless BOZ (binary octal, hexadecimal) constants, or if there's no
+          typeless BOZ support any special flags that are required for that. 
+          </p>
+          <p> In fact this macro is only currently of use with the gfortran
+          compiler which has no typeless BOZ support, so requires that the
+          <code>-fno-range-check</code> flag is set so that assigments to
+          integers can silently overflow (BOZ constants are replaced with
+          their integer and floating point equivalents). In general this macro
+          should be used by all packages that include PRM_PAR, all monoliths
+          are assumed to use this by default.
+          </p>
+
+        </subsect>
+
+
 
         <subsect id="macro-special-install-command"
             export="export"
