@@ -590,7 +590,7 @@ AC_DEFUN([STAR_CNF_BLANK_COMMON],
         else
             star_cv_blank_common_fortran=
         fi])
-    AH_TEMPLATE([STAR_INITIALISE@&t@_FORTRAN],
+    AH_TEMPLATE([BLANK_COMMON_SYMBOL],
        [Define symbol used to access the Fortran blank common block])
     case "$star_cv_blank_common_fortran" in
       gfortran)
@@ -649,8 +649,7 @@ AC_DEFUN([STAR_PRM_COMPATIBLE_SYMBOLS],
            fi
          else
             star_cv_prm_compatible_symbols=""
-         fi
-])# AC_CACHE_CHECK
+         fi])
          if test "$star_cv_prm_compatible_symbols" = "nocheck"; then
             AC_MSG_ERROR([cannot work out how])
          else
