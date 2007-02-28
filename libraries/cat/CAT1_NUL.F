@@ -39,16 +39,21 @@
 *  Copyright:
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1996 Central Laboratory of the Research Councils.
+*     Copyright (C) 2007 Particle Physics and Astronomy Research Council
 *     All Rights Reserved.
 
 *  Authors:
 *     ACD: A C Davenhall (Leicester)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *  History:
 *     27/1/94  (ACD): Original version.
 *     11/4/95  (ACD): Changed the name given in the 'Name:' section of
 *        the prologue to reflect Unix rather than VMS conventions.
 *     25/11/96 (ACD): Incorporated a portable and standard declaration
 *        for CAT1__DNULC from the Linux port of CAT.
+*     28-FEB-2007 (PWD):
+*        Make a BOZ assignments when there's no typeless support. 
+*        Better than nothing.
 *  Global Constants:
 C      INCLUDE 'PRM_PAR'
 *-
@@ -89,8 +94,10 @@ C      INCLUDE 'PRM_PAR'
       PARAMETER (CAT1__DNULL = X'A55A5AA5')
 #elif HAVE_OLD_TYPELESS_BOZ
       PARAMETER (CAT1__DNULL = 'A55A5AA5'X )
+#elif HAVE_BOZ
+      PARAMETER (CAT1__DNULL = Z'A55A5AA5' )
 #else
-      Error Do not have typeless BOZ
+      Error Do not have BOZ support.
 #endif
 
       CHARACTER CAT1__DNULC*1
