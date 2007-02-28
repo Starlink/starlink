@@ -34,6 +34,9 @@ dnl    Should investigate whether we really need this for a non-starlink
 dnl    encumbered pgplot
 STAR_CNF_COMPATIBLE_SYMBOLS
 
+dnl    Need this to allow gfortran to overflow in the BOZ assignments.
+STAR_PRM_COMPATIBLE_SYMBOLS
+
 dnl   Test what features the OPEN command can support
 AC_FC_OPEN_SPECIFIERS(readonly)
 
