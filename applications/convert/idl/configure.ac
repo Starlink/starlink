@@ -34,8 +34,11 @@ AC_PROG_CC
 dnl    Other options here, such as
 STAR_CNF_COMPATIBLE_SYMBOLS
 
-dnl Link against fortran libraries
+dnl Link against fortran libraries. Don't want the Fortran main
+dnl in this, so remove the known libraries that contain it 
+dnl (g77/frtbegin and gfortran/gfortranbegin).
 AC_FC_LIBRARY_LDFLAGS
+FCLIBS=`echo $FCLIBS | sed 's:\ \-l.*begin\ : :g'`
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [mers cnf sae ndf])
