@@ -27,6 +27,8 @@
  *                           need knowledge of this class (so that other
  *                           ImageIORep implementations can be used in
  *                           CompoundImages).
+ *                 01/03/07  Added putcard member to write a header card
+ *                           without decomposition to kvc.
  */
 
 #include <cstdio>
@@ -186,6 +188,8 @@ public:
     int put(const char* keyword, int val, const char* comment = NULL);
     int put(const char* keyword, const char* val, const char* comment = NULL);
 
+    //  Insert a formatted header card.
+    int putcard(const char* card);
     
     // -- HDU access --
     

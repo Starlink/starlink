@@ -26,6 +26,7 @@
  *                           that a blank image has been generated.
  *                 08/01/07  Write "END" keyword to blank image headers stream.
  *                           Previously written to buffer only.
+ *                 01/03/07  Added putcard method for pre-formatted cards.
  */
 static const char* const rcsId="@(#) $Id: FitsIO.C,v 1.5 2005/02/02 01:43:04 brighton Exp $";
 
@@ -948,18 +949,18 @@ int FitsIO::flush()
 
 
 /* 
- * Insert the given FITS keyword and value and return 0 if OK.
+ * Insert the given FITS header card and return 0 if OK.
  * If there is not enough space in the header, the file size is
  * automatically increased.
  */
-int FitsIO::put(const char* keyword, double val, const char* comment) 
+int FitsIO::putcard(const char* card)
 {
     // make sure there is enough space in the header
-    if (checkKeywordSpace(keyword) != 0)
+    if (checkKeywordSpace(card) != 0)
 	return 1;
 
     int status = 0;
-    if (fits_update_key(fitsio_, TDOUBLE, (char*)keyword, &val, (char*)comment, &status) != 0)
+    if (fits_write_record(fitsio_, card,  &status) != 0)
 	return cfitsio_error();
 
     return flush();
