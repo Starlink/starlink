@@ -119,10 +119,12 @@
 *        Only calculate sky gradient if atmosphere is to be added
 *     2007-01-10 (AGG):
 *        Set SYSTEM to GAPPT if we're observing a planet
+*     2007-02-28 (AGG):
+*        Fix major memory leak by annulling bolo2azel mapping
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
+*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
 *  Licence:
@@ -213,7 +215,7 @@ int *status                  /* global status (given and returned) */
    double phase;                   /* 1/f phase calculation */
    int pos;                        /* lookup in noise coefficients */
    double skytrans;                /* sky transmission (%) */
-   double time;                    /* time from start of observation */
+   double time = 0.0;              /* time from start of observation */
    double xpos;                    /* X measurement position */
    double xsky;                    /* X position on sky screen */
    double ypos;                    /* Y measurement position */
@@ -410,6 +412,7 @@ int *status                  /* global status (given and returned) */
 
    if( bolo2sky) bolo2sky = astAnnul(bolo2sky);
    if( bolo2map ) bolo2map = astAnnul(bolo2map);
+   if( bolo2azel ) bolo2azel = astAnnul(bolo2azel);
    smf_free( skycoord, status );
    
 }
