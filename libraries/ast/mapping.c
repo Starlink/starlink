@@ -21851,7 +21851,7 @@ f     AST_RATE
 *  Synopsis:
 c     #include "mapping.h"
 c     double astRate( AstMapping *this, double *at, int ax1, int ax2 )
-f     RESULT = AST_RATE( THIS, AT, AX1, AX2 )
+f     RESULT = AST_RATE( THIS, AT, AX1, AX2, STATUS )
 
 *  Class Membership:
 *     Mapping method.
