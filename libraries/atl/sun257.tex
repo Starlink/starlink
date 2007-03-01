@@ -1057,7 +1057,8 @@ higher-level utility tasks.
       \sstsubsection{
          VALUE = REAL (Given)
       }{
-         The new keyword value.
+         The new keyword value. If this is VAL\_\_BADR, then an UNDEF value
+         will be stored in ther FitsChan.
       }
       \sstsubsection{
          COMMNT = CHARACTER $*$ ( $*$ ) (Given)
@@ -1078,6 +1079,41 @@ higher-level utility tasks.
          \sstitem
          This routine is not processed using GENERIC because the names of
          the required AST routines do not use standard data type codes.
+      }
+   }
+}
+\sstroutine{
+   ATL\_PXDUP
+}{
+   Ensure the number of WCS axes is no less than the number of pixel
+   axes
+}{
+   \sstdescription{
+      This routine ensures that the number of axes in the current Frame
+      (WCS Frame) of a FrameSet is at least equal to the number of axes
+      in the base Frame (PIXEL or GRID Frame). If the initial number of
+      current Frame axes is too small, extra axes are added to the
+      current Frame by duplicating selected pixel axes.
+   }
+   \sstinvocation{
+      CALL ATL\_PXDUP( IWCS, POS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IWCS = INTEGER (Given)
+      }{
+         The supplied FrameSet.
+      }
+      \sstsubsection{
+         POS( $*$ ) = DOUBLE PRECISION (Given)
+      }{
+         The base Frame coords of a position which has good current Frame
+         coords.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
       }
    }
 }
