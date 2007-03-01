@@ -143,7 +143,7 @@ int *status                  /* global status (given and returned) */
    }
 
    smf_free(skycoord, status);
-
+   skycoord = NULL;
 }
 
 
