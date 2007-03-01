@@ -202,6 +202,8 @@
 *     2007-02-26 (AGG):
 *        Store planet RA, Dec in inx struct so they can be written to
 *        the FITS header
+*     2007-02-28 (AGG):
+*        Add memcheck check to report simulation size
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -454,19 +456,17 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     grpPut1 ( skygrp, sinx->atmname, 2, status );
 
     smf_open_file( skygrp, 1, "READ", 1, &astdata, status);
-
     if ( *status != SAI__OK ) {
       msgSetc ( "FILENAME", sinx->astname );
-      msgOut(" ", "Cannot find astronomical file ^FILENAME", status);
-      return;
+      errRep( " ", "Cannot find astronomical file ^FILENAME", status );
+      goto CLEANUP;
     }
 
     smf_open_file( skygrp, 2, "READ", 1, &atmdata, status);
-
     if ( *status != SAI__OK ) {
       msgSetc ( "FILENAME", sinx->atmname );
-      msgOut(" ", "Cannot find atmospheric file ^FILENAME", status);
-      return;
+      errRep( " ", "Cannot find atmospheric file ^FILENAME", status);
+      goto CLEANUP;
     }   
 
     /* Retrieve the astscale and atmscale from the FITS headers. */
@@ -494,7 +494,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                "^FILENAME should have 2 dimensions, but it does not.",
                status);
         *status = DITS__APP_ERROR;
-        return;
+	goto CLEANUP;
       }
 
       if ( ( atmdata->ndims ) != 2 ) {
@@ -503,7 +503,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                "^FILENAME should have 2 dimensions, but it does not.",
                status);
         *status = DITS__APP_ERROR;
-        return;
+        goto CLEANUP;
       }
     }
 
@@ -587,7 +587,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       
       case stare:
         /* Stare just points at a nasmyth offset of 0 from the map centre */
-        msgOut(" ", "Do a STARE observation", status ); 
+	/*        msgOut(" ", "Do a STARE observation", status ); */
         count = inx->numsamples;
         posptr = smf_malloc ( count*2, sizeof(*posptr), 1, status );
         if( *status == SAI__OK ) {
@@ -598,8 +598,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
       case dream:
         /* Call sc2sim_getpat to get the dream pointing solution */
-        msgOut(" ", "Do a DREAM observation", status );
-
+        /*msgOut(" ", "Do a DREAM observation", status );*/
        
         /*  Get jiggle pattern.
             jigptr[*][0] - X-coordinate in arcsec/time of the Jiggle position.
@@ -627,7 +626,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
       case singlescan:
         /* Call sc2sim_getsinglescan to get scan pointing solution */
-        msgOut(" ", "Do a SINGLESCAN observation", status );
+	/*        msgOut(" ", "Do a SINGLESCAN observation", status );*/
         accel[0] = 432.0;
         accel[1] = 540.0;
         vmax[0] = inx->vmax;        /*200.0;*/
@@ -640,7 +639,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
       case bous:
         /* Call sc2sim_getbous to get boustrophedon pointing solution */
-        msgOut(" ", "Do a BOUS observation", status );
+	/*        msgOut(" ", "Do a BOUS observation", status );*/
         accel[0] = 432.0;
         accel[1] = 540.0;
         vmax[0] = inx->vmax;        /*200.0;*/
@@ -654,7 +653,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
       case liss:
         /* Call sc2sim_getliss to get lissjous pointing solution */
-        msgOut(" ", "Do a LISSAJOUS observation", status ); 
+	/*        msgOut(" ", "Do a LISSAJOUS observation", status ); */
 
         accel[0] = 0.0;
         accel[1] = 0.0;
@@ -680,7 +679,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
         if ( strncmp ( inx->pong_type, "STRAIGHT", 8 ) == 0 ) {
 
-          msgOut(" ", "Do a STRAIGHT PONG observation", status );
+	  /*          msgOut(" ", "Do a STRAIGHT PONG observation", status );*/
 
 	  sc2sim_getstraightpong ( inx->pong_angle, inx->width, inx->height, 
                                    inx->spacing, accel, vmax, samptime, 
@@ -688,7 +687,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
         } else if ( strncmp ( inx->pong_type, "CURVE", 5 ) == 0 ) { 
 
-          msgOut(" ", "Do a CURVE PONG observation", status ); 
+	  /*          msgOut(" ", "Do a CURVE PONG observation", status ); */
 
 	  sc2sim_getcurvepong ( inx->pong_angle, inx->width, inx->height, 
                                 inx->spacing, accel, vmax, samptime,
@@ -696,13 +695,13 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         } else {
 
           *status = SAI__ERROR;
-          msgSetc( "PONGTYPE", inx->pong_type );
-          msgOut(" ", "^PONGTYPE is not a valid PONG type", status );
+          msgSetc( "P", inx->pong_type );
+          errRep( " ", "^P is not a valid PONG type", status );
 
         }
 
         break;
-    
+
       default: /* should never be reached...*/
         msgSetc( "MODE", inx->obsmode );
         errRep("", "^MODE is not a supported observation mode", status);
@@ -719,13 +718,27 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   /* Set maxwrite to the maximum amount of frames to be written
      (either count, or the users-specified maxwrite value, whichever
      is least) */
-     
   if ( count < maxwrite ) {
     maxwrite = count;
   }
 
   /* Allocated buffers for quantities that are calculated at each
      time-slice */
+
+  /* Report memory usage if desired: this adds up all the sizes of the
+     smf_mallocs below as well as the allocation for posptr  */
+  msgSeti("B",
+	  ( maxwrite*( ( 12 + nbol*narray)*sizeof(double) + sizeof(*head) 
+		       + (nbol + inx->nboly)*sizeof(int) )
+	    + 2*count*sizeof(double) ) /1e6 );
+  if ( sinx->memcheck ) {
+    msgOut( "", "Running in memory check mode: "
+	    "simulation needs at least ^B MB of memory", status );
+    goto CLEANUP;
+  } else {
+    msgOutif( MSG__VERB, "", "Requested simulation needs at least ^B MB of memory", 
+	      status );
+  }
 
   /* All four subarrays need to have their data stored simultaneously */
   dbuf = smf_malloc ( maxwrite*nbol*narray, sizeof(*dbuf), 1, status );
@@ -1373,7 +1386,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   smf_free( jig_y_hor, status );
   smf_free( airmass, status );
 
-  if ( !hitsonly && ( *status == SAI__OK ) ) {
+  if ( !hitsonly ) {
 
     smf_close_file( &astdata, status);
     smf_close_file( &atmdata, status);
