@@ -36,6 +36,7 @@
                 parameters (jb)
     21Dec2006 : Add instap & instap_x/y (agg)
     22Dec2006 : Add planetnum (agg)
+    28Feb2007 : Add memcheck (agg)
 */
 #include "libsc2sim/sc2sim_par.h"
 
@@ -155,6 +156,8 @@ struct sc2sim_sim_struct      /* parameters read from sim input file */
   double casstrans;           /* transmission of Cass optics (%) */
   int flux2cur;               /* Convert power to current 1=yes, 0=no */
   double meanatm;             /* mean expected atmospheric signal pW */
+  int memcheck;               /* Flag to report memory requirements for given 
+				 simulation */
   double nasang;              /* polarisation angle of Nasmyth optics (deg) */
   double naspol;              /* polarisation of Nasmyth optics (%) */
   double nastrans;            /* transmission of Nasmyth optics (%) */

@@ -44,9 +44,12 @@
 *        Don't free constant memory used by AST
 *     2006-11-01 (AGG):
 *        Put reasonable default values for ast/atm names
+*     2007-02-28 (AGG):
+*        Add memcheck
+*     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
+*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
 *  Licence:
@@ -182,6 +185,9 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
 
    if ( !astMapGet0D ( keymap, "MEANTATM", &(sinx->meanatm) ) )
       sinx->meanatm = 7.0;
+
+   if ( !astMapGet0I ( keymap, "MEMCHECK", &(sinx->memcheck) ) )
+      sinx->memcheck = 0;
 
    if ( !astMapGet0D ( keymap, "NASANG", &(sinx->nasang) ) )
       sinx->nasang = 90.0;
