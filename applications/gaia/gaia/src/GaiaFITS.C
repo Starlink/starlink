@@ -379,7 +379,6 @@ int GaiaFITSHPut( StarFitsIO *fitsio, const char *keyword, const char *value,
             sprintf( card, "%-8.8s= '%18.18s' / %s", keyword, value, comment );
         }
     }
-    fprintf( stderr, "card = %s\n", card );
     fitsio->putcard( card );
     return TCL_OK;
 }

@@ -33,8 +33,11 @@ int GaiaFITSHGet( StarFitsIO *fitsio, const char *keyword, int *value );
 int GaiaFITSHGet( StarFitsIO *fitsio, const char *keyword, double *value );
 
 /* Write a FITS card */
+int GaiaFITSHPutCard( StarFitsIO *fitsio, const char *card );
+
+/* Write a FITS card based on character kvc */
 int GaiaFITSHPut( StarFitsIO *fitsio, const char *keyword, const char *value,
-                  const char *comment );
+                  const char *comment, const char *type );
 
 /* Create a FITS file from a data array and a WCS */
 int GaiaFITSCreate( const char* filename, void *data, 
