@@ -354,8 +354,7 @@ itcl::class gaia::GaiaSpecWriter {
                          "TSYS\($p1,$p2\)"]
             if { $tsys != "BAD" } {
                set tsys [format "%.4f" $tsys]
-               $specaccessor fitswrite TSYS $tsys "Median system temp" \
-                  "numeric"
+               $specaccessor fitswrite TSYS $tsys "System temp" "numeric"
             }
             
             set trx [$cubeaccessor getdoubleproperty ACSIS \
@@ -401,8 +400,7 @@ itcl::class gaia::GaiaSpecWriter {
                          "TSYS.DATA_ARRAY.DATA\($p1,$p2\)"]
             if { $tsys != "BAD" } {
                set tsys [format "%.4f" $tsys]
-               $specaccessor fitswrite TSYS $tsys "Median system temp" \
-                  "numeric"
+               $specaccessor fitswrite TSYS $tsys "System temp" "numeric"
             }
             
             set exptime [$cubeaccessor getdoubleproperty SMURF \
