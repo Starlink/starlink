@@ -202,8 +202,8 @@
 *     2007-02-26 (AGG):
 *        Store planet RA, Dec in inx struct so they can be written to
 *        the FITS header
-*     2007-02-28 (AGG):
-*        Add memcheck check to report simulation size
+*     2007-03-01 (AGG):
+*        Add simstats to API for reporting simulation statistics
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -288,7 +288,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 		       int nbol, double *pzero, int rseed, double samptime, 
 		       double weights[], double *xbc, double *xbolo, 
 		       double *ybc, double *ybolo, 
-                       int hitsonly, int overwrite, int *status ) {
+                       int hitsonly, int overwrite, int simstats, int *status ) {
 
   double accel[2];                /* telescope accelerations (arcsec) */
   float aeff[3];                  /* output of wvmOpt */
@@ -722,23 +722,15 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     maxwrite = count;
   }
 
+  /* Report simulation properties if requested */
+  if ( simstats ) {
+    sc2sim_simstats( count, inx->sample_t, maxwrite, nbol, narray, inx->nboly, 
+		     status );
+    goto CLEANUP;
+  }
+
   /* Allocated buffers for quantities that are calculated at each
      time-slice */
-
-  /* Report memory usage if desired: this adds up all the sizes of the
-     smf_mallocs below as well as the allocation for posptr  */
-  msgSeti("B",
-	  ( maxwrite*( ( 12 + nbol*narray)*sizeof(double) + sizeof(*head) 
-		       + (nbol + inx->nboly)*sizeof(int) )
-	    + 2*count*sizeof(double) ) /1e6 );
-  if ( sinx->memcheck ) {
-    msgOut( "", "Running in memory check mode: "
-	    "simulation needs at least ^B MB of memory", status );
-    goto CLEANUP;
-  } else {
-    msgOutif( MSG__VERB, "", "Requested simulation needs at least ^B MB of memory", 
-	      status );
-  }
 
   /* All four subarrays need to have their data stored simultaneously */
   dbuf = smf_malloc ( maxwrite*nbol*narray, sizeof(*dbuf), 1, status );
@@ -815,7 +807,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
   }/* for all subarrays */
 
-
   msgSetd( "DSTART", inx->mjdaystart );
   msgSeti( "YR", date_yr );
   msgSeti( "MO", date_mo );
@@ -838,7 +829,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   /* For each chunk, determine the data for the corresponding
      frames.  At the last frame, write the data for each 
      subarray to a file */
-  for ( curchunk = 0; curchunk < chunks; curchunk++ ) {
+  for ( curchunk = 0; curchunk < chunks && (*status == SAI__OK); curchunk++ ) {
 
     /* Adjust the lastframe value depending on whether this is the
        last chunk */
@@ -875,7 +866,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     }
 
     /* Retrieve the values for this chunk */
-    for ( frame = 0; frame < lastframe; frame++ ) {
+    for ( frame = 0; frame < lastframe && (*status == SAI__OK); frame++ ) {
 
       curframe = ( curchunk * maxwrite ) + frame;
 
@@ -1089,8 +1080,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
         /* Create an sc2 frameset for this time slice and extract 
 	   bolo->sky mapping */ 
-	state.tcs_az_ac1 = bor_az[frame];
         state.tcs_az_ac2 = bor_el[frame];
+	state.tcs_az_ac1 = bor_az[frame];
         state.tcs_tr_dc1 = bor_ra[frame];
         state.tcs_tr_dc2 = bor_dec[frame]; 
         state.tcs_tr_ac1 = bor_ra[frame];
@@ -1391,7 +1382,10 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     smf_close_file( &astdata, status);
     smf_close_file( &atmdata, status);
 
-    if( sky2map ) sky2map = astAnnul( sky2map );
+    printf("%d \n",(int)(asthdr->nframes));
+
+    if ( sky2map ) sky2map = astAnnul( sky2map );
+    if ( fitswcs ) fitswcs = astAnnul( fitswcs );
 
     grpDelet( &skygrp, status);
 
