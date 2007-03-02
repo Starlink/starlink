@@ -12404,29 +12404,29 @@ from one graphical element to another.
 \sstroutine{
    KPG1\_ASSIM
 }{
-   Simplify a Plot
+   Simplify a FrameSet
 }{
    \sstdescription{
-      This routine simplifies a Plot by adding a copy of the Current
+      This routine simplifies a FrameSet by adding a copy of the Current
       Frame into it, using a simplified version of the Mapping from
       Base to Current Frame. The new Frame becomes the Current Frame.
 
       This routine should be called before doing any plotting with a
-      Plot in order to avoid the possiblity of intermediate Frames
-      being used in which positions are undefined.
+      Plot (remember, a Plot is a FrameSet) in order to avoid the possiblity
+      of intermediate Frames being used in which positions are undefined.
 
       Care should be taken decding where to call this routine since
       the simplification process can be expensive. Do not call it within
       a deep nested loop!
    }
    \sstinvocation{
-      CALL KPG1\_ASSIM( IPLOT, STATUS )
+      CALL KPG1\_ASSIM( IWCS, STATUS )
    }
    \sstarguments{
       \sstsubsection{
-         IPLOT = INTEGER (Given)
+         IWCS = INTEGER (Given)
       }{
-         An AST pointer to the Plot.
+         An AST pointer to the FrameSet.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
