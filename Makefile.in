@@ -66,6 +66,7 @@ ALL_TARGETS = \
 	$(MANIFESTS)/kappa \
 	$(MANIFESTS)/kaprh \
 	$(MANIFESTS)/mag \
+	$(MANIFESTS)/match \
 	$(MANIFESTS)/mers \
 	$(MANIFESTS)/messgen \
 	$(MANIFESTS)/nbs \
