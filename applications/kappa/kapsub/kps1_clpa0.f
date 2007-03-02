@@ -4,7 +4,7 @@
 *     KPS1_CLPA0
 
 *  Purpose:
-*     Modify a WCS Frameet to account for the collapsing of a pixel axis.
+*     Modify a WCS FrameSet to account for the collapsing of a pixel axis.
 
 *  Language:
 *     Starlink Fortran 77
@@ -15,9 +15,7 @@
 *  Description:
 *     This routine modifies the supplied FrameSet by removing the
 *     specified pixel axis from the base Frame. It also removes any
-*     associated current Frame axes. Note, the modified FrameSet only
-*     contains two frames, corresponding to the original base and current 
-*     Frames.
+*     associated current Frame axes. 
 
 *  Arguments:
 *     IWCS = INTEGER (Given)
@@ -33,8 +31,17 @@
 *     STATUS = INTEGER (Given)
 *        The global status.
 
+*  Notes:
+*     - The modified FrameSet only contains two frames, corresponding to the 
+*     original base and current Frames.
+*     - The number of axes in the returned current Frame will always be
+*     at least equal to the number of axes in the returned base Frame.
+*     If necessary, this is achieved by duplicating some of the base
+*     Frame axes within the current Frame (such duplicated axes are 
+*     connected by a UnitMap)
+
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2005-2007 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -60,8 +67,10 @@
 *  History:
 *     2-DEC-2005 (DSB):
 *        Original version.
-*     {enter_further_changes_here}
-
+*     1-MAR-2007 (DSB):
+*        Ensure the returned current Frame has at least as many axes as
+*        there are pixel axes. This is done by calling ATL_PXDUP to duplicate
+*        pixel axes as required.
 *-
       
 *  Type Definitions:
@@ -94,6 +103,7 @@
       DOUBLE PRECISION CMIN( NDF__MXDIM ) ! Minimum axis values
       DOUBLE PRECISION CSAMP( NSAMP, NDF__MXDIM ) ! Current frame sample positions
       DOUBLE PRECISION DELTA     ! Gap between samples
+      DOUBLE PRECISION NEWPOS( NDF__MXDIM )! Reduced dimensionality POS
 
       INTEGER AXES( NDF__MXDIM ) ! Indices of remaining axes
       INTEGER INPRM( NDF__MXDIM )! Input axis permutation array
@@ -132,13 +142,16 @@
       BFRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
       CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
 
-*  Get a list of the "NIN-1" pixel axes which are being retained.
+*  Get a list of the "NIN-1" pixel axes which are being retained. Also
+*  store the reduced dimensionality version of POS.
       NAXES = NIN - 1
       DO I = 1, NAXES
          IF( I .LT. AXIS ) THEN
             AXES( I ) = I
+            NEWPOS( I ) = POS( I )
          ELSE 
             AXES( I ) = I + 1 
+            NEWPOS( I ) = POS( I + 1 )
          END IF
       END DO
 
@@ -286,6 +299,10 @@
 
          END IF
       END IF
+
+*  Ensure the WCS frame has at least as many axes as the pixel frame.
+*  This is done by duplicating pixel axes to suplement the existing WDCS axes.
+      CALL ATL_PXDUP( IWCS, NEWPOS, STATUS )
 
 *  Export the pointer to the returned FrameSet into the parent AST context.
       CALL AST_EXPORT( IWCS, STATUS )

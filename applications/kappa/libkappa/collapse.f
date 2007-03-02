@@ -327,6 +327,10 @@
 *        Added VARIANCE parameter.
 *     21-DEC-2006 (DSB):
 *        Manage without an inverse WCS transformation, when possible.
+*     2-MAR-2007 (DSB):
+*        Pad out the current Frame in the output WCS FrameSet by
+*        duplicating PIXEL axes so that the current Frame has at least as
+*        many axes as the base (GRID) Frame.
 *     {enter_further_changes_here}
 
 *-
@@ -934,6 +938,12 @@
 
 *  Save this modified WCS FrameSet in the output NDF.
       CALL NDF_PTWCS( IWCSO, INDFO, STATUS )      
+
+*  KPS1_CLPA0 may have padded out the current WCS Frame with duplicated
+*  GRID axes (in order to ensure that the current Frame has at least as many
+*  axes as the base Frame). We now convert these duplicated GRID axes to
+*  the corresponding PIXEL axes.
+      CALL KPS1_CLPA2( INDFO, STATUS )      
 
 *  Obtain the remaining parameters.
 *  ================================
