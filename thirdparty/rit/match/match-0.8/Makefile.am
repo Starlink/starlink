@@ -5,3 +5,5 @@ apply_match_SOURCES = apply_match.c misc.c misc.h degtorad.h
 EXTRA_DIST = selftest.pl selfa.dat selfb.dat selfc.dat selfd.dat selfe.dat intransa.dat intransb.dat intransc.dat intransd.dat intranse.dat intransf.dat match.html self_m57.dat self_m57_rad.dat self_m57_asec.dat
 TESTS = selftest.pl
 
+dist_pkgdata_DATA = COPYING README NEWS THANKS AUTHORS ChangeLog
+
