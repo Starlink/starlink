@@ -68,6 +68,9 @@
 *        Flag to indicate hits-only simulation
 *     overwrite = int (GIven)
 *        Flag to indicate whether to overwrite existing files
+*     simstats = int (Given)
+*        Flag to indicate whether to just report simulation statistics
+*        and exit
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -1382,10 +1385,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     smf_close_file( &astdata, status);
     smf_close_file( &atmdata, status);
 
-    printf("%d \n",(int)(asthdr->nframes));
-
     if ( sky2map ) sky2map = astAnnul( sky2map );
-    if ( fitswcs ) fitswcs = astAnnul( fitswcs );
 
     grpDelet( &skygrp, status);
 
