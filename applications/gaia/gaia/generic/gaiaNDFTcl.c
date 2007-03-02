@@ -41,6 +41,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <float.h>
 
 #include <tcl.h>
 #include <ndf.h>
@@ -109,7 +110,7 @@ static int queryNdfCoord( AstFrameSet *frameSet, int axis, double *coords,
                           char **coord, char **error_mess );
 static void storeCard( AstFitsChan *channel, const char *keyword,
                        const char *value, const char *comment, 
-                       int overwrite );
+                       const char *type, int overwrite );
 
 /**
  * Register all the NDF access commands.
@@ -1166,8 +1167,9 @@ static int gaiaNDFTclFitsRead( ClientData clientData, Tcl_Interp *interp,
 }
 
 /**
- * Write a FITS keyword, value and comment to the FITS extension of the NDF.
- * The type must currently be a string.
+ * Write a FITS card, either as a keyword, value, comment set or
+ * as a whole card. If using a keyword the type of value supplied
+ * can be "char", "numeric". If numeric the value is written without quotes.
  */
 static int gaiaNDFTclFitsWrite( ClientData clientData, Tcl_Interp *interp,
                                 int objc, Tcl_Obj *CONST objv[] )
@@ -1178,12 +1180,15 @@ static int gaiaNDFTclFitsWrite( ClientData clientData, Tcl_Interp *interp,
     const char *comment;
     const char *keyword;
     const char *value;
+    const char *type;
     int result;
 
-    /* Check arguments, need the ndf handle, the keyword, value and comment */
-    if ( objc != 5 ) {
+
+    /* Check arguments, need the ndf handle, the keyword, value, comment and
+     * type, or a card. */
+    if ( objc != 3 && objc != 6 ) {
         Tcl_WrongNumArgs( interp, 1, objv, 
-                          "ndf_handle keyword value comment" );
+                          "ndf_handle [keyword value comment type | card]" );
         return TCL_ERROR;
     }
 
@@ -1202,16 +1207,26 @@ static int gaiaNDFTclFitsWrite( ClientData clientData, Tcl_Interp *interp,
             free( error_mess );
         }
         else {
-            keyword = Tcl_GetString( objv[2] );
-            value = Tcl_GetString( objv[3] );
-            comment = Tcl_GetString( objv[4] );
+            if ( objc == 6 ) {
+                keyword = Tcl_GetString( objv[2] );
+                value = Tcl_GetString( objv[3] );
+                comment = Tcl_GetString( objv[4] );
+                type = Tcl_GetString( objv[5] );
 
-            /* Look for existing card */
-            astClear( info->fitschan, "Card" );
-            astFindFits( info->fitschan, keyword, NULL, 0 );
+                /* Look for existing card */
+                astClear( info->fitschan, "Card" );
+                astFindFits( info->fitschan, keyword, NULL, 0 );
 
-            /* And store value */
-            storeCard( info->fitschan, keyword, value, comment, 1 );
+                /* And store value */
+                storeCard( info->fitschan, keyword, value, comment, type, 1 );
+            }
+            else {
+                /* These go at the end */
+                astClear( info->fitschan, "Card" );
+                astSetI( info->fitschan, "Card", 
+                         astGetI( info->fitschan, "Ncard" ) );
+                astPutFits( info->fitschan, Tcl_GetString( objv[2] ), 0 );
+            }
             info->fitschanmod = 1;
         }
     }
@@ -1219,19 +1234,32 @@ static int gaiaNDFTclFitsWrite( ClientData clientData, Tcl_Interp *interp,
 }
 
 /**
- * Write a character string value into a FITS channel.
+ * Write a keyword value comment set into a FITS channel. The type
+ * string should start with one of "c" or "n", for character or numeric.
  */
 static void storeCard( AstFitsChan *fitschan, const char *keyword,
                        const char *value, const char *comment, 
-                       int overwrite )
+                       const char *type, int overwrite )
 {
     char card[81];
-    if ( strlen( value ) > 18 ) {
-        sprintf( card, "%-8.8s='%s' /%s", keyword, value, comment );
-    } 
-    else {
-        sprintf( card, "%-8.8s='%18.18s'/%s", keyword, value, comment );
+    if ( type[0] == 'n' ) {
+        /* Numeric value, no quotes */
+        if ( strlen( value ) > 20 ) {
+            sprintf( card, "%-8.8s= %s / %s", keyword, value, comment );
+        } 
+        else {
+            sprintf( card, "%-8.8s= %20.20s / %s", keyword, value, comment );
+        }
     }
+    else {
+        /* Char */
+        if ( strlen( value ) > 18 ) {
+            sprintf( card, "%-8.8s= '%s' / %s", keyword, value, comment );
+        } 
+        else {
+            sprintf( card, "%-8.8s= '%18.18s' / %s", keyword, value, comment );
+        }
+    } 
     astPutFits( fitschan, card, overwrite );
 }
 

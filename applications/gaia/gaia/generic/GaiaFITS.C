@@ -205,9 +205,9 @@ int GaiaFITSGtWcs( StarFitsIO *fitsio, AstFrameSet **iwcs,
 
 /**
  * Create a FITS file and write a data array, plus WCS, to its primary
- * extension. 
+ * extension.
  */
-int GaiaFITSCreate( const char* filename, void *data, 
+int GaiaFITSCreate( const char* filename, void *data,
                     AstFrameSet *wcs, int bitpix, double bscale,
                     double bzero, long blank, const char *object,
                     const char *units, int naxis, long naxes[] )
@@ -261,29 +261,29 @@ int GaiaFITSCreate( const char* filename, void *data,
 
     /*  Set the OBJECT and BUNIT values */
     if ( object != NULL && object[0] != '\0' ) {
-        fits_write_key_str( fptr, "OBJECT", (char *) object, "Data object", 
+        fits_write_key_str( fptr, "OBJECT", (char *) object, "Data object",
                             &status );
     }
     if ( units != NULL && units[0] != '\0' ) {
-        fits_write_key_str( fptr, "BUNIT", (char *) units, "Data units", 
+        fits_write_key_str( fptr, "BUNIT", (char *) units, "Data units",
                             &status );
     }
 
     /*  Add any BSCALE, BZERO and BLANK values */
     if ( needbscale ) {
-        fits_write_key( fptr, TDOUBLE, "BSCALE", &bscale, "Data scale", 
+        fits_write_key( fptr, TDOUBLE, "BSCALE", &bscale, "Data scale",
                         &status );
-        fits_write_key( fptr, TDOUBLE, "BZERO", &bzero, "Data zero point", 
+        fits_write_key( fptr, TDOUBLE, "BZERO", &bzero, "Data zero point",
                         &status );
-        fits_write_key( fptr, TLONG, "BLANK", &blank, "Blank value", 
+        fits_write_key( fptr, TLONG, "BLANK", &blank, "Blank value",
                         &status );
-        
+
         /* Do not apply these when writing data as these are implicit. */
         fits_set_bscale( fptr, 1.0, 0.0, &status );
     }
 
     /* Write WCS into a FITS channel. Attempt to write headers using a
-     * FITS-WCS encoding, if that fails we use a Native encoding */ 
+     * FITS-WCS encoding, if that fails we use a Native encoding */
     if ( wcs != NULL ) {
         AstFitsChan *chan = astFitsChan( NULL, NULL, "" );
         astSet( chan, "Encoding=FITS-WCS" );
@@ -293,7 +293,7 @@ int GaiaFITSCreate( const char* filename, void *data,
             astSet( chan, "Encoding=Native" );
             nwrite = astWrite( chan, wcs );
         }
-        
+
         /* Now read the channel and write cards to the FITS file. */
         char card[FITSCARD+1];
         astClear( chan, "Card" );
@@ -304,7 +304,7 @@ int GaiaFITSCreate( const char* filename, void *data,
         }
         astAnnul( chan );
     }
-    
+
     /*  Finally write the data array to the file. */
     long nel = 1L;
     for ( int i = 0; i < naxis; i++ ) {
@@ -353,11 +353,42 @@ int GaiaFITSHGet( StarFitsIO *fitsio, const char *keyword, double *value )
 }
 
 /**
- * Write a FITS card.
+ * Write a FITS card as a keyword, value, comment set. The type should be
+ * "char" or "numeric". If the later then the value will be written without
+ * quotes.
  */
 int GaiaFITSHPut( StarFitsIO *fitsio, const char *keyword, const char *value,
-                  const char *comment )
+                  const char *comment, const char *type )
 {
-    fitsio->put( keyword, value, comment );
+    char card[81];
+    if ( type[0] == 'n' ) {
+        /* Numeric value, no quotes */
+        if ( strlen( value ) > 20 ) {
+            sprintf( card, "%-8.8s= %s / %s", keyword, value, comment );
+        }
+        else {
+            sprintf( card, "%-8.8s= %20.20s / %s", keyword, value, comment );
+        }
+    }
+    else {
+        /* Char */
+        if ( strlen( value ) > 18 ) {
+            sprintf( card, "%-8.8s= '%s' / %s", keyword, value, comment );
+        }
+        else {
+            sprintf( card, "%-8.8s= '%18.18s' / %s", keyword, value, comment );
+        }
+    }
+    fprintf( stderr, "card = %s\n", card );
+    fitsio->putcard( card );
+    return TCL_OK;
+}
+
+/**
+ * Write a FITS card as a keyword, value, comment set.
+ */
+int GaiaFITSHPutCard( StarFitsIO *fitsio, const char *card )
+{
+    fitsio->putcard( card );
     return TCL_OK;
 }

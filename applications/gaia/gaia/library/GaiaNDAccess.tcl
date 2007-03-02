@@ -616,9 +616,15 @@ itcl::class gaia::GaiaNDAccess {
    }
 
    #  Set the value of a FITS card. Will be saved, if the dataset is opened
-   #  for write access.
-   public method fitswrite {keyword value comment} {
-      ${type_}::fitswrite $handle_ $keyword $value $comment
+   #  for write access. If only one value is given it is assumed to be a 
+   #  pre-formatted card. The type value should be set to either numeric
+   #  or char (numeric avoids surrounding the value in quotes).
+   public method fitswrite {keyword {value ""} {comment ""} {type "char"}} {
+      if { $value != "" } {
+         ${type_}::fitswrite $handle_ $keyword $value $comment $type
+      } else {
+         ${type_}::fitswrite $handle_ $keyword
+      }
    }
 
    #  Configuration options: (public variables)

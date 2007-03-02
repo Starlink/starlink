@@ -87,7 +87,7 @@ static int GaiaFITSTclFitsWrite( ClientData clientData, Tcl_Interp *interp,
                                  int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclExists( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
-static int GaiaFITSTclExtensionExists( ClientData clientData, 
+static int GaiaFITSTclExtensionExists( ClientData clientData,
                                        Tcl_Interp *interp,
                                        int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclGetProperty( ClientData clientData, Tcl_Interp *interp,
@@ -124,7 +124,7 @@ int Fits_Init( Tcl_Interp *interp )
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "fits::extensionexists", 
+    Tcl_CreateObjCommand( interp, "fits::extensionexists",
                           GaiaFITSTclExtensionExists,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
@@ -877,7 +877,9 @@ static int GaiaFITSTclFitsRead( ClientData clientData, Tcl_Interp *interp,
 }
 
 /**
- * Set the value of a FITS keyword.
+ * Write a FITS card, either as a keyword, value, comment and type or
+ * as a whole card. The type should be "char" or "numeric". If numeric the
+ * value is written without quotes.
  */
 static int GaiaFITSTclFitsWrite( ClientData clientData, Tcl_Interp *interp,
                                  int objc, Tcl_Obj *CONST objv[] )
@@ -885,23 +887,34 @@ static int GaiaFITSTclFitsWrite( ClientData clientData, Tcl_Interp *interp,
     FITSinfo *info;
     const char *comment;
     const char *keyword;
+    const char *type;
     const char *value;
     int result;
 
-    /* Check arguments, need the fits handle, keyword, value and comment */
-    if ( objc != 5 ) {
-        Tcl_WrongNumArgs( interp, 1, objv,
-                          "fits_identifier keyword value comment" );
+    /* Check arguments, need the fits handle and keyword, value and comment,
+    *  or just card */
+    if ( objc != 3 && objc != 6 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, 
+           "fits_identifier [keyword value comment type | card]" );
         return TCL_ERROR;
     }
 
     /* Import FITS identifier */
     result = importFITSIdentifier( interp, objv[1], &info );
     if ( result == TCL_OK ) {
-        keyword = Tcl_GetString( objv[2] );
-        value = Tcl_GetString( objv[3] );
-        comment = Tcl_GetString( objv[4] );
-        result = GaiaFITSHPut( info->handle, keyword, value, comment );
+
+        /* Write kvc or card */
+        if ( objc == 6 ) {
+            keyword = Tcl_GetString( objv[2] );
+            value = Tcl_GetString( objv[3] );
+            comment = Tcl_GetString( objv[4] );
+            type = Tcl_GetString( objv[5] );
+            result = GaiaFITSHPut( info->handle, keyword, value, comment, 
+                                   type );
+        }
+        else {
+            result = GaiaFITSHPutCard( info->handle, Tcl_GetString( objv[2]) );
+        }
     }
     return result;
 }
@@ -910,7 +923,7 @@ static int GaiaFITSTclFitsWrite( ClientData clientData, Tcl_Interp *interp,
  * Return if a named extension exists. FITS only supports "FITS",
  * which is always present.
  */
-static int GaiaFITSTclExtensionExists( ClientData clientData, 
+static int GaiaFITSTclExtensionExists( ClientData clientData,
                                        Tcl_Interp *interp,
                                        int objc, Tcl_Obj *CONST objv[] )
 {
@@ -942,7 +955,7 @@ static int GaiaFITSTclExtensionExists( ClientData clientData,
 
 /**
  * Return the value of a named property in an extension. For a FITS file
- * the only supported extension is "FITS", so this call is equivalent to 
+ * the only supported extension is "FITS", so this call is equivalent to
  * ::fitsread.
  *
  * If the property doesn't exist then an empty string is returned.
@@ -954,7 +967,7 @@ static int GaiaFITSTclGetProperty( ClientData clientData, Tcl_Interp *interp,
 
     /* Check arguments, need the fits handle, extension and property name */
     if ( objc != 4 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, 
+        Tcl_WrongNumArgs( interp, 1, objv,
                           "fits_identifier \"FITS\" keyword" );
         return TCL_ERROR;
     }
