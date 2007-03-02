@@ -1,33 +1,33 @@
-      SUBROUTINE KPG1_ASSIM( IPLOT, STATUS )
+      SUBROUTINE KPG1_ASSIM( IWCS, STATUS )
 *+
 *  Name:
 *     KPG1_ASSIM
 
 *  Purpose:
-*     Simplify a Plot.
+*     Simplify a FrameSet.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_ASSIM( IPLOT, STATUS )
+*     CALL KPG1_ASSIM( IWCS, STATUS )
 
 *  Description:
-*     This routine simplifies a Plot by adding a copy of the Current
+*     This routine simplifies a FrameSet by adding a copy of the Current
 *     Frame into it, using a simplified version of the Mapping from
 *     Base to Current Frame. The new Frame becomes the Current Frame.
 *
 *     This routine should be called before doing any plotting with a 
-*     Plot in order to avoid the possiblity of intermediate Frames
-*     being used in which positions are undefined. 
+*     Plot (remember, a Plot is a FrameSet) in order to avoid the possiblity 
+*     of intermediate Frames being used in which positions are undefined. 
 *
 *     Care should be taken decding where to call this routine since
 *     the simplification process can be expensive. Do not call it within
 *     a deep nested loop!
 
 *  Arguments:
-*     IPLOT = INTEGER (Given)
-*        An AST pointer to the Plot. 
+*     IWCS = INTEGER (Given)
+*        An AST pointer to the FrameSet. 
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -58,6 +58,9 @@
 *  History:
 *     18-SEP-1998 (DSB):
 *        Original version.
+*     2-MAR-2007 (DSB):
+*        Documentation and variable names changed to indicate that this
+*        routine can be used with any class of FrameSet, not just a Plot.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -73,7 +76,7 @@
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
 
 *  Arguments Given:
-      INTEGER IPLOT
+      INTEGER IWCS
 
 *  Status:
       INTEGER STATUS               ! Global status
@@ -87,18 +90,18 @@
 *  Check the inherited status. 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Gett he Mapping from the Base Frame in the Plot to the Current Frame.
-      MAP0 = AST_GETMAPPING( IPLOT, AST__BASE, AST__CURRENT, STATUS )
+*  Gett he Mapping from the Base Frame in the FrameSet to the Current Frame.
+      MAP0 = AST_GETMAPPING( IWCS, AST__BASE, AST__CURRENT, STATUS )
 
 *  Simplify it.
       MAP = AST_SIMPLIFY( MAP0, STATUS )
 
 *  Get pointer to the current Frame.
-      FRM = AST_GETFRAME( IPLOT, AST__CURRENT, STATUS )
+      FRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
 
-*  Add a copy of the Current Frame into the Plot using the above
+*  Add a copy of the Current Frame into the FrameSet using the above
 *  Mapping to connect it to the GRAPHICS (Base) Frame. 
-      CALL AST_ADDFRAME( IPLOT, AST__BASE, MAP, FRM, STATUS ) 
+      CALL AST_ADDFRAME( IWCS, AST__BASE, MAP, FRM, STATUS ) 
 
 *  Annul the pointers.
       CALL AST_ANNUL( MAP0, STATUS )
