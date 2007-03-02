@@ -56,6 +56,9 @@
 *  History:
 *     1-MAR-2007 (DSB):
 *        Original version.
+*     2-MAR-2007 (DSB):
+*        Initialise NDUP, correct argument list for AST_CMPMAP and remove
+*        unused variables.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -81,8 +84,6 @@
 *  Local Variables:
       DOUBLE PRECISION RATE
       DOUBLE PRECISION MXRATE
-      DOUBLE PRECISION PIXPOS( 0 : ATL__MXDIM, ATL__MXDIM )
-      DOUBLE PRECISION WCSPOS( 0 : ATL__MXDIM, ATL__MXDIM )
       INTEGER CM1
       INTEGER DUPAX( ATL__MXDIM )
       INTEGER IAX
@@ -121,6 +122,10 @@
 
 *  Begin an AST context.
          CALL AST_BEGIN( STATUS )
+
+*  Note the number of pixel axes which will need to be duplicated in
+*  order for the current Frame to have NPIX axes.
+         NDUP = NPIX - NWCS
 
 *  Find which pixel axes feed the wcs axes.
          MAP = AST_GETMAPPING( IWCS, AST__CURRENT, AST__BASE, STATUS )
@@ -276,7 +281,8 @@
          NEWMAP = AST_SIMPLIFY( AST_CMPMAP( PM1, AST_CMPMAP( CM1, PM2, 
      :                                                      .TRUE., ' ',
      :                                                      STATUS ),
-     :                                      ' ', STATUS ), STATUS )
+     :                                      .TRUE., ' ', STATUS ), 
+     :                          STATUS )
 
 *  Now we construct the new current Frame. First pick the duplicated pixel
 *  axes from the base Frame, then combine the rsulting Fram ewith the
