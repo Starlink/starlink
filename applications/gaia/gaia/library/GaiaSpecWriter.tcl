@@ -273,89 +273,8 @@ itcl::class gaia::GaiaSpecWriter {
                }
             }
 
-            #  If this is a raw ACSIS cube we will try to extract and record
-            #  the TSYS and TRX values and work out the pointing information.
-            set rawacsis 0
-            if { [$cubeaccessor extensionexists "ACSIS"] &&
-                 [$cubeaccessor extensionexists "JCMTSTATE"] } {
-
-               #  Must be extracting spectra. These are axis 1. The image
-               #  positions are time and receptor index, these index the
-               #  TSYS and TRX arrays.
-               lassign [$cubeaccessor getlastspectruminfo] \
-                  type axis alow ahigh p1 p2
-               if { $axis == 1 } {
-                  set tsys [$cubeaccessor getdoubleproperty ACSIS \
-                               "TSYS\($p1,$p2\)"]
-                  if { $tsys != "BAD" } {
-                     set tsys [format "%.4f" $tsys]
-                     $specaccessor fitswrite TSYS $tsys "Median system temp"
-                  }
-
-                  set trx [$cubeaccessor getdoubleproperty ACSIS \
-                              "TRX\($p1,$p2\)"]
-                  if { $trx != "BAD" } {
-                     set trx [format "%.4f" $trx]
-                     $specaccessor fitswrite TRX $trx "Receiver temp"
-                  }
-
-                  #  The exposure time is ACS_EXPOSURE(==ton)+
-                  #  ACS_OFFEXPOSURE(==toff).
-                  set ton [$cubeaccessor getdoubleproperty JCMTSTATE \
-                              "ACS_EXPOSURE\($p2\)"]
-                  set toff [$cubeaccessor getdoubleproperty JCMTSTATE \
-                               "ACS_OFFEXPOSURE\($p2\)"]
-                  if { $ton != "BAD" && $toff != "BAD" } {
-                     set exptime [format "%.4f" [expr $ton+$toff]]
-                     $specaccessor fitswrite EXTIME $exptime "Exposure time"
-                  }
-
-                  #  Attempt to determine the pointing information.
-                  set rawacsis [add_acsis_coords_ \
-                                   $cubeaccessor $specaccessor $p1 $p2]
-               }
-            }
-
-            #  Not a timeseries cube could be a SMURF/ACSIS cube. In
-            #  that case we can get the exposure time, plus the TSYS.
-            #  XXX tighten up the signature.
-            if { ! $rawacsis && [$cubeaccessor extensionexists "SMURF"] } {
-
-               #  Must be extracting spectra. These are axis 3. The image
-               #  positions index the TSYS, EXP_TIME and EFF_TIME arrays.
-               lassign [$cubeaccessor getlastspectruminfo] \
-                  type axis alow ahigh p1 p2
-               if { $axis == 3 } {
-                  set tsys [$cubeaccessor getdoubleproperty SMURF \
-                               "TSYS.DATA_ARRAY.DATA\($p1,$p2\)"]
-                  if { $tsys != "BAD" } {
-                     set tsys [format "%.4f" $tsys]
-                     $specaccessor fitswrite TSYS $tsys "Median system temp"
-                  }
-
-                  set exptime [$cubeaccessor getdoubleproperty SMURF \
-                                  "EXP_TIME.DATA_ARRAY.DATA\($p1,$p2\)"]
-                  if { $exptime != "BAD" } {
-                     set exptime [format "%.4f" $exptime]
-                     $specaccessor fitswrite EXTIME $exptime "Exposure time"
-                  }
-
-                  set efftime [$cubeaccessor getdoubleproperty SMURF \
-                                  "EFF_TIME.DATA_ARRAY.DATA\($p1,$p2\)"]
-                  if { $efftime != "BAD" } {
-                     set efftime [format "%.4f" $efftime]
-                     $specaccessor fitswrite EXEFFT $efftime \
-                        "Effective exposure time (x4)"
-                  }
-               }
-            }
-
-            if { ! $rawacsis } {
-               #  Record the world coordinates of this position. These
-               #  document the extraction for other applications. Note we fall
-               #  back to this when raw ACSIS extraction also fails.
-               add_fits_coords_ $specaccessor
-            }
+            #  Save the headers describing the pointing and ACSIS meta-data.
+            write_extraction_headers_ $cubeaccessor $specaccessor
          }
          $specaccessor close
 
@@ -397,11 +316,11 @@ itcl::class gaia::GaiaSpecWriter {
          set specaccessor [$cubeaccessor createspectrum "FITS" $filename \
                               $shortname]
 
-
-         #  Record the world coordinates of this position. These
-         #  document the extraction for other applications.
-         add_fits_coords_ $specaccessor
-
+         #  Save the headers describing the pointing and ACSIS meta-data.
+         #  Only useful for point extraction.
+         if { [$cubespectrum last_extracted_type] == "point" } {
+            write_extraction_headers_ $cubeaccessor $specaccessor
+         }
          $specaccessor close
 
          blt::busy release $w_
@@ -411,6 +330,105 @@ itcl::class gaia::GaiaSpecWriter {
    #  Return a suitable shortname.
    public method get_shortname {} {
       return [$cubespectrum sectioned_name]
+   }
+
+
+   #  If this is a raw ACSIS cube try to extract and record the TSYS and TRX
+   #  values and work out the pointing information. If this isn't an ACSIS
+   #  cube then write standard pointing information.
+   protected method write_extraction_headers_ {cubeaccessor specaccessor} {
+      set rawacsis 0
+      if { [$cubeaccessor extensionexists "ACSIS"] &&
+           [$cubeaccessor extensionexists "JCMTSTATE"] } {
+
+         $specaccessor fitswrite \
+            "        ---- GAIA spectral extraction ----"
+
+         #  Must be extracting spectra. These are axis 1. The image
+         #  positions are time and receptor index, these index the
+         #  TSYS and TRX arrays.
+         lassign [$cubeaccessor getlastspectruminfo] \
+            type axis alow ahigh p1 p2
+         if { $axis == 1 } {
+            set tsys [$cubeaccessor getdoubleproperty ACSIS \
+                         "TSYS\($p1,$p2\)"]
+            if { $tsys != "BAD" } {
+               set tsys [format "%.4f" $tsys]
+               $specaccessor fitswrite TSYS $tsys "Median system temp" \
+                  "numeric"
+            }
+            
+            set trx [$cubeaccessor getdoubleproperty ACSIS \
+                        "TRX\($p1,$p2\)"]
+            if { $trx != "BAD" } {
+               set trx [format "%.4f" $trx]
+               $specaccessor fitswrite TRX $trx "Receiver temp" "numeric"
+            }
+            
+            #  The exposure time is ACS_EXPOSURE(==ton)+
+            #  ACS_OFFEXPOSURE(==toff).
+            set ton [$cubeaccessor getdoubleproperty JCMTSTATE \
+                        "ACS_EXPOSURE\($p2\)"]
+            set toff [$cubeaccessor getdoubleproperty JCMTSTATE \
+                         "ACS_OFFEXPOSURE\($p2\)"]
+            if { $ton != "BAD" && $toff != "BAD" } {
+               set exptime [format "%.4f" [expr $ton+$toff]]
+               $specaccessor fitswrite EXTIME $exptime "Exposure time" \
+                  "numeric"
+            }
+            
+            #  Attempt to determine the pointing information.
+            set rawacsis [add_acsis_coords_ \
+                             $cubeaccessor $specaccessor $p1 $p2]
+         }
+      }
+      
+      #  Not a timeseries cube could be a SMURF/ACSIS cube. In
+      #  that case we can get the exposure time, plus the TSYS.
+      #  XXX tighten up the signature.
+      if { ! $rawacsis && [$cubeaccessor extensionexists "SMURF"] } {
+
+         $specaccessor fitswrite \
+            "        ---- GAIA spectral extraction ----"
+         set isacsis 1
+
+         #  Must be extracting spectra. These are axis 3. The image
+         #  positions index the TSYS, EXP_TIME and EFF_TIME arrays.
+         lassign [$cubeaccessor getlastspectruminfo] \
+            type axis alow ahigh p1 p2
+         if { $axis == 3 } {
+            set tsys [$cubeaccessor getdoubleproperty SMURF \
+                         "TSYS.DATA_ARRAY.DATA\($p1,$p2\)"]
+            if { $tsys != "BAD" } {
+               set tsys [format "%.4f" $tsys]
+               $specaccessor fitswrite TSYS $tsys "Median system temp" \
+                  "numeric"
+            }
+            
+            set exptime [$cubeaccessor getdoubleproperty SMURF \
+                            "EXP_TIME.DATA_ARRAY.DATA\($p1,$p2\)"]
+            if { $exptime != "BAD" } {
+               set exptime [format "%.4f" $exptime]
+               $specaccessor fitswrite EXTIME $exptime "Exposure time" \
+                  "numeric"
+            }
+            
+            set efftime [$cubeaccessor getdoubleproperty SMURF \
+                            "EFF_TIME.DATA_ARRAY.DATA\($p1,$p2\)"]
+            if { $efftime != "BAD" } {
+               set efftime [format "%.4f" $efftime]
+               $specaccessor fitswrite EXEFFT $efftime \
+                  "Effective exposure time (x4)" "numeric"
+            }
+         }
+      }
+      
+      if { ! $rawacsis } {
+         #  Record the world coordinates of this position. These
+         #  document the extraction for other applications. Note we fall
+         #  back to this when raw ACSIS extraction also fails.
+         add_fits_coords_ $specaccessor
+      }
    }
 
    #  Add world coordinates and offsets that describe a point extracted
@@ -424,26 +442,26 @@ itcl::class gaia::GaiaSpecWriter {
             ra dec xra xdec dra ddec refra refdec drefra drefdec
          if { $ra != {} } {
             $specaccessor fitswrite EXRA  $ra \
-               "Image centre for spectral extraction"
+               "Image centre for spectral extraction" "char"
             $specaccessor fitswrite EXDEC $dec \
-               "Image centre for spectral extraction"
+               "Image centre for spectral extraction" "char"
             $specaccessor fitswrite EXRAX $xra \
-               "Position of spectral extraction"
+               "Position of spectral extraction" "char"
             $specaccessor fitswrite EXDECX $xdec \
-               "Position of spectral extraction"
+               "Position of spectral extraction" "char"
             $specaccessor fitswrite EXRAOF  $dra \
-               "Offset from EXRA (arcsec)"
+               "Offset from EXRA (arcsec)" "numeric"
             $specaccessor fitswrite EXDECOF $ddec \
-               "Offset from EXDEC (arcsec)"
+               "Offset from EXDEC (arcsec)" "numeric"
 
             $specaccessor fitswrite EXRRA  $refra \
-               "Reference centre for spectral extraction"
+               "Reference centre for spectral extraction" "char"
             $specaccessor fitswrite EXRDEC $refdec \
-               "Reference centre for spectral extraction"
+               "Reference centre for spectral extraction" "char"
             $specaccessor fitswrite EXRRAOF  $drefra \
-               "Offset from EXRRA (arcsec)"
+               "Offset from EXRRA (arcsec)" "numeric"
             $specaccessor fitswrite EXRDECOF $drefdec \
-               "Offset from EXRDEC (arcsec)"
+               "Offset from EXRDEC (arcsec)" "numeric"
          }
       }
    }
@@ -635,14 +653,16 @@ itcl::class gaia::GaiaSpecWriter {
       }
 
       if { $rra != {} && $rdec != {} } {
-         $specaccessor fitswrite EXRAX  $rra "Spectral extraction position"
-         $specaccessor fitswrite EXDECX $rdec "Spectral extraction position"
+         $specaccessor fitswrite EXRAX  $rra "Spectral extraction position" \
+            "char"
+         $specaccessor fitswrite EXDECX $rdec "Spectral extraction position" \
+            "char"
          $specaccessor fitswrite EXSYS "$system $equinox" \
-            "Extraction coordinate system"
+            "Extraction coordinate system" "char"
 
          if { $sra != {} && $sdec != {} && $tcssys != "GAPPT" } {
-            $specaccessor fitswrite EXRRA  $sra "Position of source"
-            $specaccessor fitswrite EXRDEC $sdec "Position of source"
+            $specaccessor fitswrite EXRRA  $sra "Position of source" "char"
+            $specaccessor fitswrite EXRDEC $sdec "Position of source" "char"
          }
 
          if { $drra != {} && $drdec != {} } {
@@ -651,12 +671,15 @@ itcl::class gaia::GaiaSpecWriter {
             set drra [format "%.4f" [expr $drra*3600.0*180.0/$PI_]]
             set drdec [format "%.4f" [expr $drdec*3600.0*180.0/$PI_]]
 
-            $specaccessor fitswrite EXRRAOF  $drra "Offset of extraction"
-            $specaccessor fitswrite EXRDECOF $drdec "Offset of extraction"
+            $specaccessor fitswrite EXRRAOF  $drra "Offset of extraction" \
+               "numeric"
+            $specaccessor fitswrite EXRDECOF $drdec "Offset of extraction" \
+               "numeric"
          }
 
          if { $dateobs != {} } {
-            $specaccessor fitswrite DATE-OBS $dateobs "Time of observation"
+            $specaccessor fitswrite DATE-OBS $dateobs "Time of observation" \
+               "char"
          }
          return 1
       }
