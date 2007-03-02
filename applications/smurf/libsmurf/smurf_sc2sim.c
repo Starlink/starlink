@@ -398,6 +398,10 @@
 *          Flag to specify whether existing files are
 *          overwritten. Setting this to FALSE increments the `group'
 *          counter in the output file names. Default is TRUE.
+*     SIMSTATS = LOGICAL (Read)
+*          Flag to specify whether to report the properties of the
+*          current simulation given the parameters specified in
+*          SIMFILE and OBSFILE. The simulation is not carried out.
 *     SIMTYPE = CHAR (Read)
 *          Simulation type : In a 'full' simulation the flux
 *          for each bolometer at each time slice is calculated
@@ -434,7 +438,8 @@
 *     2006-11-22  Added multiple map cycle capabilities to liss/pong (JB)
 *     2006-12-08  Removed sc2sim_simhits and replaced with 
 *                 hits-only flag (JB)
-*     2007-01-26  Added OVERWRITE parameter
+*     2007-01-26  Added OVERWRITE parameter (AGG)
+*     2007-03-01  Added SIMSTATS parameter (AGG)
 *     {enter_further_changes_here}
 
 *    History (HEATRUN task):
@@ -553,6 +558,8 @@ void smurf_sc2sim( int *status ) {
    double samptime;                /* sample time in sec */
    Grp *simGrp = NULL;             /* Group containing sim parameter file */
    AstKeyMap *simkeymap=NULL;      /* AstKeyMap for sim parameters */
+   int simstats = 0;               /* Flag to denote whether just to
+				      list simulation statistics */
    char simtype[LEN__METHOD];      /* String for simulation type */
    int ssize = 0;                  /* Size of simGrp */
    struct timeval time;            /* Structure for system time */
@@ -566,11 +573,11 @@ void smurf_sc2sim( int *status ) {
 
 
    /* Get input parameters */
-   kpg1Gtgrp ("OBSFILE", &obsGrp, &osize, status );
+   kpg1Gtgrp ( "OBSFILE", &obsGrp, &osize, status );
    kpg1Kymap ( obsGrp, &obskeymap, status );
-   kpg1Gtgrp ("SIMFILE", &simGrp, &ssize, status );
+   kpg1Gtgrp ( "SIMFILE", &simGrp, &ssize, status );
    kpg1Kymap ( simGrp, &simkeymap, status );
-   parGet0i("SEED", &rseed, status);
+   parGet0i( "SEED", &rseed, status );
 
    /* Seed random number generator, either with the time in 
       milliseconds, or from user-supplied seed */
@@ -595,12 +602,13 @@ void smurf_sc2sim( int *status ) {
 		      &digmean, &digscale, &elevation, weights, &heater, 
 		      &pzero, &xbc, &ybc, &xbolo, &ybolo, status );
 
-   nbol = inx.nbolx * inx.nboly;
-   samptime = inx.sample_t / 1000.0;
-
    /* Re-initialise random number generator to give a different sequence
       each time by using the given seed. */
    srand ( rseed );
+
+   nbol = inx.nbolx * inx.nboly;
+   /* Convert sample time from milliseconds to seconds */
+   samptime = inx.sample_t / 1000.0;
 
    /* String for the wavelength of the filter */
    sprintf( filter,"%i",(int) (inx.lambda*1e6) );
@@ -628,12 +636,14 @@ void smurf_sc2sim( int *status ) {
 
       parGet0l("OVERWRITE", &overwrite, status);
 
+      parGet0l( "SIMSTATS", &simstats, status );
+
       hitsonly = 0;
 
       sc2sim_simulate ( &inx, &sinx, coeffs, digcurrent, digmean, digscale, 
                         filter, heater, maxwrite, mode, coordframe, nbol, 
 			pzero, rseed, samptime, weights, xbc, xbolo, ybc, 
-			ybolo, hitsonly, overwrite, status);
+			ybolo, hitsonly, overwrite, simstats, status);
 
    }  else if ( mode == pong || mode == singlescan || mode == bous || 
                 mode == liss ) {
@@ -656,6 +666,7 @@ void smurf_sc2sim( int *status ) {
                 simtype, LEN__METHOD, status);
 
       parGet0l("OVERWRITE", &overwrite, status);
+      parGet0l( "SIMSTATS", &simstats, status );
 
       /* Set the flag for hits-only */
       if( strncmp( simtype, "FULL", 4 ) == 0 ) {
@@ -680,7 +691,7 @@ void smurf_sc2sim( int *status ) {
       sc2sim_simulate ( &inx, &sinx, coeffs, digcurrent, digmean, digscale, 
                         filter, heater, maxwrite, mode, coordframe, nbol, 
 		        pzero, rseed, samptime, weights, xbc, xbolo, ybc, 
-			ybolo, hitsonly, overwrite, status );
+			ybolo, hitsonly, overwrite, simstats, status );
 
    } else {
 

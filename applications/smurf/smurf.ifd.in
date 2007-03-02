@@ -134,6 +134,8 @@
 #         Added OVERWRITE parameter for SC2SIM
 #     30-JAN-2007 (TIMJ):
 #         Add jcmtstate2cat
+#     01-MAR-2007 (AGG):
+#         Add SIMSTATS parameter for SC2SIM
 #     {enter_changes_here}
 
 #  Bugs:
@@ -708,8 +710,18 @@ package @PACKAGE@ {
             helpkey *
           }
 
-          parameter simtype {
+          parameter simstats {
             position 6
+            type _LOGICAL
+            prompt {Report simulation statistics only?}
+            vpath DEFAULT
+	    default FALSE
+            ppath CURRENT
+            helpkey *
+          }
+
+          parameter simtype {
+            position 7
             type _CHAR
             prompt {Simulation type (FULL or WEIGHTS)}
             vpath {PROMPT}
