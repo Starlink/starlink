@@ -69,7 +69,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants
-      INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'ATL_PAR'          ! ATL constants
 
 *  Arguments Given:
       INTEGER IWCS
@@ -81,15 +81,15 @@
 *  Local Variables:
       DOUBLE PRECISION RATE
       DOUBLE PRECISION MXRATE
-      DOUBLE PRECISION PIXPOS( 0 : NDF__MXDIM, NDF__MXDIM )
-      DOUBLE PRECISION WCSPOS( 0 : NDF__MXDIM, NDF__MXDIM )
+      DOUBLE PRECISION PIXPOS( 0 : ATL__MXDIM, ATL__MXDIM )
+      DOUBLE PRECISION WCSPOS( 0 : ATL__MXDIM, ATL__MXDIM )
       INTEGER CM1
-      INTEGER DUPAX( NDF__MXDIM )
+      INTEGER DUPAX( ATL__MXDIM )
       INTEGER IAX
       INTEGER ICUR
       INTEGER IDUP
-      INTEGER INAX( NDF__MXDIM )
-      INTEGER INPRM( 2*NDF__MXDIM )      
+      INTEGER INAX( ATL__MXDIM )
+      INTEGER INPRM( 2*ATL__MXDIM )      
       INTEGER JAX 
       INTEGER JDUP
       INTEGER JUNK
@@ -101,8 +101,8 @@
       INTEGER NFEED
       INTEGER NPIX
       INTEGER NWCS
-      INTEGER OUTAX( NDF__MXDIM )
-      INTEGER OUTPRM( 2*NDF__MXDIM )      
+      INTEGER OUTAX( ATL__MXDIM )
+      INTEGER OUTPRM( 2*ATL__MXDIM )      
       INTEGER PM1
       INTEGER PM2
       LOGICAL ISDUP
