@@ -49,6 +49,9 @@
 *        - In copyinput case map data array so that it gets copied.
 *     2007-02-12 (EC):
 *        Now form the grpex here for the model container names
+*     2007-03-02 (EC):
+*        - Map variance to ensure creation for RESidual container
+*        - Set initial variance to 1 
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -99,12 +102,13 @@ void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp,
   dim_t dims[NDF__MXDIM];       /* Size of model dimensions */
   int flag=0;                   /* Flag */
   char fname_grpex[255];        /* String for holding filename grpex */
-  int i;                        /* Loop counter */
+  dim_t i;                      /* Loop counter */
   smfData *idata=NULL;          /* Pointer to input smfdata data */
   int indf=0;                   /* NDF ID for propagation */
   int isize=0;                  /* Number of files in input group */
+  dim_t j;                      /* Loop counter */
   int lbnd[NDF__MXDIM];         /* Dimensions of container */
-  void *mapptr[3];              /* Pointer to array of mapped components */
+  void *mapptr[3]={NULL,NULL,NULL};/* Pointer to array of mapped components */
   char *mname=NULL;             /* String model component name */
   int mndf=0;                   /* NDF ID for propagation */
   int msize=0;                  /* Number of files in model group */
@@ -219,7 +223,19 @@ void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp,
 	ndfAnnul( &indf, status );
 
 	/* Map to ensure that the DATA array is defined on exit */
-	ndfMap( mndf, "DATA", "_DOUBLE", "UPDATE", &mapptr[0], &nmap, status );
+	ndfMap( mndf, "DATA,", "_DOUBLE", "UPDATE", &mapptr[0], &nmap, 
+		status );
+
+	/* Map to ensure that the VARAINCE array is defined on exit */
+	ndfMap( mndf, "VARIANCE", "_DOUBLE", "WRITE", &mapptr[1], &nmap, 
+		status );
+
+	/* Initialize VARIANCE component of residuals to 1 */
+	if( (*status == SAI__OK) && (mapptr[1]) ) {
+	  for( j=0; j<nmap; j++ ) {
+	    ((double *)(mapptr[1]))[j] = 1; 
+	  }
+	}
 
 	ndfAnnul( &mndf, status );
 	

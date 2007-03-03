@@ -60,6 +60,9 @@
 *        Fixed pointer bug for variance of residual in map estimate
 *     2007-02-12 (EC)
 *        Enabled dyanmic usage of model components using function pointers
+*     2007-03-02 (EC)
+*        Added noise estimation from residual
+*        Fixed counter bug
 
 *  Notes:
 
@@ -140,11 +143,13 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   Grp **modelgrps=NULL;         /* Array of group ptrs/ each model component */
   smf_modeltype *modeltyps=NULL; /* Array of model types */
   smf_calcmodelptr modelptr=NULL; /* Pointer to current model calc function */
-  int nmap;                     /* Number of elements mapped */
   int nbolo;                    /* Number of bolometers */
+  int nmap;                     /* Number of elements mapped */
   int nmodels;                  /* Number of model components / iteration */
   int nndf;                     /* Residual noise NDF identifier */
   const char *nname;            /* Name of noisemodel group */
+  smfData *noi;                 /* Pointer to noise model data struct */
+  Grp *noigrp=NULL;             /* Group of noi model files */
   int numiter;                  /* Total number iterations */
   int rebinflags;               /* Flags to control rebinning */
   smfData *res;                 /* Pointer to residual data struct */
@@ -194,6 +199,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   smf_model_create( igrp, SMF__CUM, &cumgrp, status );
   smf_model_create( igrp, SMF__RES, &resgrp, status );
   smf_model_create( igrp, SMF__AST, &astgrp, status );
+  smf_model_create( igrp, SMF__NOI, &noigrp, status );
 
   /* Dynamically created models */
   for( j=0; j<nmodels; j++ ) {
@@ -253,6 +259,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 	  smf_open_file( astgrp, i, "UPDATE", 0, &ast, status );
 	  smf_open_file( resgrp, i, "UPDATE", 0, &res, status );
 	  smf_open_file( cumgrp, i, "UPDATE", 0, &cum, status );
+	  smf_open_file( noigrp, i, "UPDATE", 0, &noi, status );
 
 	  if( *status == SAI__OK ) {
 
@@ -312,12 +319,16 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 	     always call the ast model calculation first before proceeding
 	     with other model components. */
 	  
-	  smf_calcmodel_ast( cum, res, keymap, map, mapvar, ast,
-			     0, status );
+	  smf_calcmodel_ast( cum, res, keymap, map, mapvar, ast, 0, status );
 	  
+	  /* Finally calculate the noise from the residual */
+
+	  smf_calcmodel_noi( cum, res, keymap, map, mapvar, noi, 0, status );
+	     
 	  smf_close_file( &ast, status );    
 	  smf_close_file( &res, status );
 	  smf_close_file( &cum, status );	  
+	  smf_close_file( &noi, status );	  
         }
       }
     }
@@ -330,7 +341,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   if( astgrp ) grpDelet( &astgrp, status );  
 
   for( j=0; j<nmodels; j++ ) {
-    if( modelgrps[i] ) grpDelet( &(modelgrps[j]), status );
+    if( modelgrps[j] ) grpDelet( &(modelgrps[j]), status );
 
   }
 

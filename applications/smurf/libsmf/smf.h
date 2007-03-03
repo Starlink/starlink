@@ -504,6 +504,10 @@ void smf_calcmodel_ast( smfData *cum, smfData *res, AstKeyMap *keymap,
 			double *map, double *mapvar, smfData *model, 
 			int flags, int *status );
 
+void smf_calcmodel_noi( smfData *cum, smfData *res, AstKeyMap *keymap, 
+			double *map, double *mapvar, smfData *model, 
+			int flags, int *status );
+
 smf_calcmodelptr *smf_model_getptr( smf_modeltype type, int *status);
 
 void smf_labelunit( Grp *igrp,  int size, smfData *odata, int *status );
