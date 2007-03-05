@@ -59,6 +59,9 @@
 *  History:
 *     2-MAR-2007 (DSB):
 *        Original version.
+*     5-MAR-2007 (DSB):
+*        Correct logic for deciding whether to convert GRID axes to PIXEL
+*        axes.
 *-
       
 *  Type Definitions:
@@ -174,7 +177,7 @@
 
 *  Do nothing more if unidentifiable GRID axes were found in the current
 *  Frame, or if no GRID axes were found.
-      IF( OK .OR. NG .EQ. 0 ) THEN
+      IF( OK .AND. NG .GT. 0 ) THEN
 
 *  Create a Frame containing just the non-GRID current Frame axes.
          NGFRM = AST_PICKAXES( WFRM, NNONG, NGAXID, TMAP, STATUS )
