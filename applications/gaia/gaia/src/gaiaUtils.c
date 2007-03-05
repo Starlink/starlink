@@ -278,7 +278,7 @@ int gaiaUtilsQueryCoord( AstFrameSet *frameset, int axis, double *coords,
     if ( ncoords_in == ncoords ) {
         coords_in = coords;
     }
-    else if ( ncoords_in > ncoords ) {
+    else {
         coords_in = static_coords_in;
         memcpy( coords_in, coords, ncoords * sizeof( double ) );
         for ( i = ncoords; i < ncoords_in; i++ ) {
