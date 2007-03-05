@@ -8584,6 +8584,15 @@ package kappa {
             default !
             helpkey *
           }
+          parameter trim {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Remove collapsed pixel and WCS axis?}
+            helpkey *
+            default TRUE
+          }
          parameter variance {
             type _LOGICAL
             access READ
