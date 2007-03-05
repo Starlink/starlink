@@ -295,7 +295,7 @@ itcl::class gaia::GaiaCubeRebin {
    protected variable compavetask_ {}
 
    #  Combination method.
-   protected variable combination_type_ "Mean"
+   protected variable combination_type_ "mean"
 
    #  Name of the output cube.
    protected variable output_name_ {GaiaCubeRebin1.sdf}

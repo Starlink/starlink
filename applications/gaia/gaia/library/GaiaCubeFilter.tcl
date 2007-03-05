@@ -492,7 +492,7 @@ itcl::class gaia::GaiaCubeFilter {
    protected variable filter_type_ "square"
 
    #  Combination method.
-   protected variable combination_type_ "Mean"
+   protected variable combination_type_ "mean"
 
    #  Name of the output cube.
    protected variable output_name_ {GaiaCubeFilter1.sdf}

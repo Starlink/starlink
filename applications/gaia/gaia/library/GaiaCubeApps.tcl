@@ -478,7 +478,7 @@ itcl::class gaia::GaiaCubeApps {
    protected variable setwcsattrib_ {}
 
    #  Combination method, if used/
-   protected variable combination_type_ "Mean"
+   protected variable combination_type_ "mean"
 
    #  Name of the temporary image just created.
    protected variable tmpimage_
