@@ -1,4 +1,6 @@
 
+    FITS spectra now have the extraction meta-data add to their headers.   
+
   Hokulei Release:
   ================
 
