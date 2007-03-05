@@ -76,6 +76,8 @@
 *        Can now use the WVMRAW method for getting tau
 *     2006-04-21 (AGG):
 *        Add call to smf_subtract_plane for sky removal
+*     2008-03-05 (EC):
+*        Changed smf_correct_extinction interface
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -246,7 +248,7 @@ void smurf_extinction( int * status ) {
       }
     }
     /* Apply extinction correction */
-    smf_correct_extinction( odata, method, quick, tau, status );
+    smf_correct_extinction( odata, method, quick, tau, NULL, status );
 
     /* Free resources for output data */
     /*smf_close_file( &odata, status );*/

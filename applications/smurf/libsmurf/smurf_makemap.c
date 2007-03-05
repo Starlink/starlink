@@ -90,6 +90,8 @@
 *     2007-02-06 (AGG):
 *        Add uselonlat flag rather that specify hard-wired value in
 *        smf_mapbounds
+*     2008-03-05 (EC):
+*        Changed smf_correct_extinction interface
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -150,6 +152,8 @@
 #include "sc2da/sc2store.h"
 #include "sc2da/sc2ast.h"
 
+#include "libsc2sim/sc2sim.h"
+
 #define FUNC_NAME "smurf_makemap"
 #define TASK_NAME "MAKEMAP"
 #define LEN__METHOD 20
@@ -190,9 +194,63 @@ void smurf_makemap( int *status ) {
 
   int moving = 0;            /* Is the telescope base position changing? */
 
+  /* Test createwcs ------------------------------------------------ */
+
+  /*
+  double telpos[3]; 
+  double instap[2];
+  JCMTState state;
+
+  int j;
+  FILE *junk;
+  int nbol=1280;
+  double xbolo[1280];
+  double ybolo[1280];
+  double xbc[1280];
+  double ybc[1280];
+
+  smf_calc_telpos( NULL, "JCMT", telpos, status );
+  instap[0] = 0;
+  instap[1] = 0;
+
+  junk = fopen( "junk.txt", "w" );
+
+  for( j=0; j<4; j++ ) {
+
+    state.tcs_az_ac1 = 90.*DD2R;
+    state.tcs_az_ac2 =  10.*DD2R;
+    state.smu_az_jig_x = 0;
+    state.smu_az_jig_y = 0;
+    state.smu_az_chop_x = 0;
+    state.smu_az_chop_y = 0;
+    state.rts_end = 53795;
+
+    sc2ast_createwcs( j, &state, instap, telpos, &outfset, status );
+    
+    astSetC( outfset, "SYSTEM", "J2000" );
+    
+    smf_get_gridcoords( xbolo, ybolo, 40, 32, status );
+    
+
+    astTran2( outfset, nbol, ybolo, xbolo, 1, xbc, ybc ); 
+   
+    astAnnul(outfset);
+ 
+    for( i=0; i<nbol; i++ ) {
+      fprintf(junk,"%lf %lf %lf %lf\n", xbolo[i], ybolo[i], xbc[i], ybc[i]);
+    }
+  }
+  fclose(junk);
+
+  return;
+  */
+ 
+  /* --------------------------------------------------------------- */
+
+
   /* Main routine */
   ndfBegin();
-  
+
   /* Get group of input files */
   ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
 
@@ -218,7 +276,84 @@ void smurf_makemap( int *status ) {
   parChoic( "METHOD", "REBIN", 
 	    "REBIN, ITERATE.", 1,
 	    method, LEN__METHOD, status);
+
+
+  /* Test create_lutwcs -------------------------------------------- */
+  /*
+  double telpos[3]; 
+  double instap[2];
+  JCMTState state;
   
+  int j;
+  FILE *junk;
+  int nbol=144;
+  double xbolo[144];
+  double ybolo[144];
+  double xbc[144];
+  double ybc[144];
+  
+  smfHead * hdr;
+  
+  smf_open_file( igrp, 1, "READ", 1, &data, status );
+
+  hdr = data->hdr;
+  
+  smf_tslice_ast( data, 0, 1, status);
+
+  junk = fopen( "junk.txt", "w" );
+  */
+
+  /*
+  smf_calc_telpos( NULL, "JCMT", telpos, status );
+  instap[0] = 0;
+  instap[1] = 0;
+  
+  state.tcs_az_ac1 = 90.*DD2R;
+  state.tcs_az_ac2 =  45.*DD2R;
+  state.smu_az_jig_x = 0;
+  state.smu_az_jig_y = 0;
+  state.smu_az_chop_x = 0;
+  state.smu_az_chop_y = 0;
+  state.rts_end = 53795;
+
+  printf( "LUT: %lf %lf %i\n", (hdr->fplanex)[0], (hdr->fplaney)[0], 
+	  hdr->ndet );
+
+  smf_create_lutwcs( 0, hdr->fplanex, hdr->fplaney, hdr->ndet, 
+		     &state, instap, telpos, &outfset, status );
+  
+  
+  */
+  /*
+  astSetC( hdr->wcs, "SYSTEM", "AZEL" );
+
+  for( j=0; j<144; j++ ) {
+    xbolo[j] = j+1;
+    ybolo[j] = 1;
+  }
+
+  astTran2( hdr->wcs, nbol, xbolo, ybolo, 1, xbc, ybc ); 
+
+  for( j=0; j<144; j++ ) {
+    xbolo[j] = (hdr->fplanex)[j];
+    ybolo[j] = (hdr->fplaney)[j];
+  }
+
+  printf("nbol=%i\n", nbol);
+
+  for( j=0; j<nbol; j++ ) {
+    fprintf(junk,"%lf %lf %lf %lf\n", 
+	    (hdr->fplanex)[j], (hdr->fplaney)[j], 
+	    xbc[j], ybc[j]);
+  }
+  fclose(junk);
+  return;
+
+  */
+  /*astAnnul(outfset);*/
+  
+  /* --------------------------------------------------------------- */
+
   /* Calculate the map bounds */
   msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Determine map bounds", status);
   smf_mapbounds( igrp, size, system, 0, 0, uselonlat, pixsize, lbnd_out, ubnd_out, 
@@ -238,8 +373,8 @@ void smurf_makemap( int *status ) {
   smfflags = 0;
   smfflags |= SMF__MAP_VAR;
 
-  smf_open_newfile ( ogrp, 1, SMF__DOUBLE, 2, lbnd_out, ubnd_out, smfflags, &odata, 
-		     status );
+  smf_open_newfile ( ogrp, 1, SMF__DOUBLE, 2, lbnd_out, ubnd_out, smfflags, 
+		     &odata, status );
 
   if ( *status == SAI__OK ) {
 
@@ -269,7 +404,8 @@ void smurf_makemap( int *status ) {
 
     for(i=1; i<=size; i++ ) {
       /* Read data from the ith input file in the group */      
-      smf_open_and_flatfield( igrp, NULL, i, &data, status );
+      smf_open_and_flatfield( igrp, NULL, i, &data, status ); 
+
       /* ****** 
 	 These calls are not needed - we should probably check that we
 	 have sky-subtracted and extinction-corrected data 
@@ -279,10 +415,12 @@ void smurf_makemap( int *status ) {
 	 removal and ext correction have not been done already
 
 	 ****** */
+
       /* Remove sky - assume MEAN is good enough for now */
-      /*      smf_subtract_plane(data, "MEAN", status);*/
+      smf_subtract_plane(data, NULL, "MEAN", status);
+
       /* Use raw WVM data to make the extinction correction */
-      /*      smf_correct_extinction(data, "WVMR", 0, 0, status);*/
+      smf_correct_extinction(data, "WVMR", 0, 0, NULL, status);
       
       /* Check that the data dimensions are 3 (for time ordered data) */
       if( *status == SAI__OK ) {
@@ -315,11 +453,11 @@ void smurf_makemap( int *status ) {
 	smf_bbrebinmap(data, indf, i, size, outfset, lbnd_out, ubnd_out, 
 		       map, variance, weights, status );
       } else {
+
 	msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Beginning the REBIN step", status);
      	/* Rebin the data onto the output grid without bad bolometer mask */
 	smf_rebinmap(data, i, size, outfset, moving, lbnd_out, ubnd_out, 
 		     map, variance, weights, status );
-
       }
   
       /* Close the data file */
@@ -379,7 +517,6 @@ void smurf_makemap( int *status ) {
     smf_iteratemap( igrp, keymap, map, variance, weights,
 		    (ubnd_out[0]-lbnd_out[0]+1)*(ubnd_out[1]-lbnd_out[1]+1),
 		    status );
-
   }
 
   /* Write WCS */

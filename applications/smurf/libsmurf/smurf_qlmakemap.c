@@ -68,6 +68,8 @@
 *        first file in the input Grp to smf_mapbounds_approx
 *     2007-02-27 (AGG):
 *        Refactor the code to deal with global status consistently
+*     2008-03-05 (EC):
+*        Changed smf_correct_extinction interface
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -212,7 +214,7 @@ void smurf_qlmakemap( int *status ) {
     /* Correct for atmospheric extinction using the mean WVM-derived
        225-GHz optical depth */
     smf_fits_getD( data->hdr, "MEANWVM", &tau, status );
-    smf_correct_extinction( data, "CSOTAU", 1, tau, status );
+    smf_correct_extinction( data, "CSOTAU", 1, tau, NULL, status );
 
     /* If all's well, add the data into the map */
     smf_rebinmap( data, i, size, outframeset, moving, lbnd_out, ubnd_out, 
