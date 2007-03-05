@@ -1,6 +1,10 @@
 
     FITS spectra now have the extraction meta-data add to their headers.   
 
+    The rebin cube tools now correct use "mean" as the combination method.
+    Previously "sum" was used until either "mean" or "sum" was explicitly
+    selected.
+
   Hokulei Release:
   ================
 
