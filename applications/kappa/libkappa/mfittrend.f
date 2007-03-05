@@ -551,10 +551,12 @@
       ELSE
 
 *  Loop through each pixel axis until a pixel axis is found which has an
-*  affect on the selected WCS axis.
+*  affect on the selected WCS axis. We skip pixel axes that are spanned
+*  by only a single pixel since these cannot be used as a basis for a
+*  polynomial fit.
          JAXIS = 0
          DO I = 1, NDIM
-            IF( JAXIS .EQ. 0 ) THEN 
+            IF( JAXIS .EQ. 0 .AND. DIMS( I ) .GT. 1 ) THEN 
 
 *  Try splitting the pixel->WCS Mapping into parallel Mappings, returning
 *  the Mapping that Maps the current pixel axis into one or more WCS axes.
@@ -585,9 +587,9 @@
             STATUS = SAI__ERROR
             CALL NDF_MSG( 'NDF', INNDF )
             CALL MSG_SETI( 'WCS', IAXIS )
-            CALL ERR_REP( 'MFITTREND_ERR1', 'Cannot identify the '//
-     :                    'pixel axis corresponding to WCS axis '//
-     :                    '^WCS in ^NDF.', STATUS )
+            CALL ERR_REP( 'MFITTREND_ERR1', 'Cannot identify a '//
+     :                    'suitable pixel axis corresponding to '//
+     :                    'WCS axis ^WCS in ^NDF.', STATUS )
          END IF
 
       END IF
