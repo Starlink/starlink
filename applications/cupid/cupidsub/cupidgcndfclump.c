@@ -133,6 +133,8 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 *  History:
 *     10-NOV-2005 (DSB):
 *        Original version.
+*     5-MAR-2007 (DSB):
+*        Initiaslise "exloc" locator to NULL before calling datFind.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -344,6 +346,7 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 /* Now store any extra diagnostic information. */
       if( extra ) {
          datNew( xloc, "EXTRA", "EXTRA", 0, NULL, status );
+         exloc = NULL;
          datFind( xloc, "EXTRA", &exloc, status );
 
          nex = astMapSize( extra );
