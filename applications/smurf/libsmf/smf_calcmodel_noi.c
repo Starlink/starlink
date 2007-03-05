@@ -32,7 +32,8 @@
 *     model = smfData * (Returned)
 *        The data structure that will store the calculated model parameters
 *     flags = int (Given )
-*        Control flags.
+*        Control flags: 
+*        SMF__DIMM_FIRSTCOMP - initializes CUM if first model component
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -52,6 +53,8 @@
 *  History:
 *     2007-03-02 (EC):
 *        Initial Version
+*     2007-03-05 (EC)
+*        Modified bit flags
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -130,9 +133,9 @@ void smf_calcmodel_noi( smfData *cum, smfData *res, AstKeyMap *keymap,
     ntslice = (res->dims)[2];
     ndata = nbolo*ntslice;
 
-    /* if flags set, initialize this iteration by clearing the
+    /* If SMF__DIMM_FIRSTCOMP set, initialize this iteration by clearing the
        cumulative model buffer */
-    if( flags ) {
+    if( flags & SMF__DIMM_FIRSTCOMP ) {
       memset( cum_data, 0, ndata*sizeof(cum_data) );
     }
 
@@ -140,7 +143,6 @@ void smf_calcmodel_noi( smfData *cum, smfData *res, AstKeyMap *keymap,
       /* Don't need to adjust cum/res since this model component is just
          a weight calculation. Measure the sample standard deviation for
 	 each bolometer assuming it is stationary in time... */
- 
       smf_calc_stats( res, "b", i, 0, 0, &mean, &sigma, status );
       var = sigma*sigma;
       

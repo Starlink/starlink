@@ -32,7 +32,8 @@
 *     model = smfData * (Returned)
 *        The data structure that will store the calculated model parameters
 *     flags = int (Given )
-*        Control flags.
+*        Control flags: 
+*        SMF__DIMM_FIRSTCOMP - initializes CUM if first model component
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -52,6 +53,9 @@
 *        Updated to correctly modify cumulative and residual models
 *     2007-02-08 (EC):
 *        Fixed bug in replacing previous model before calculating new one
+*     2007-03-05 (EC)
+*        Modified bit flags
+*        Modified data array indexing to avoid unnecessary multiplies
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -98,6 +102,7 @@ void smf_calcmodel_com( smfData *cum, smfData *res, AstKeyMap *keymap,
 			int flags, int *status) {
 
   /* Local Variables */
+  dim_t base;                   /* Store base index for data array offsets */
   double *cum_data=NULL;        /* Pointer to DATA component of cum */
   dim_t i;                      /* Loop counter */
   dim_t j;                      /* Loop counter */
@@ -109,8 +114,7 @@ void smf_calcmodel_com( smfData *cum, smfData *res, AstKeyMap *keymap,
   double lastmean;              /* Mean from previous iteration */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   double sigma;                 /* Array standard deviation */ 
-  
-
+                                   
   /* Main routine */
   if (*status != SAI__OK) return;
 
@@ -129,19 +133,21 @@ void smf_calcmodel_com( smfData *cum, smfData *res, AstKeyMap *keymap,
     ntslice = (cum->dims)[2];
     ndata = nbolo*ntslice;
 
-    /* if flags set, initialize this iteration by clearing the
+    /* If SMF__DIMM_FIRSTCOMP set, initialize this iteration by clearing the
        cumulative model buffer */
-    if( flags ) {
+    if( flags & SMF__DIMM_FIRSTCOMP ) {
       memset( cum_data, 0, ndata*sizeof(cum_data) );
     }
 
     for( i=0; i<ntslice; i++ ) {
 
+      base = i*nbolo;  /* Index to first data point in i'th time slice */
+
       /* Add previous iteration of the model back into the residual */
       lastmean = model_data[i];
 
       for( j=0; j<nbolo; j++ ) {
-	res_data[i*nbolo + j] += lastmean;
+	res_data[base + j] += lastmean;
       }
 
       /* Now calculate the new model */
@@ -152,8 +158,8 @@ void smf_calcmodel_com( smfData *cum, smfData *res, AstKeyMap *keymap,
       for( j=0; j<nbolo; j++ ) {
 
 	/* update the cumulative/residual model */
-	cum_data[i*nbolo + j] += mean;
-	res_data[i*nbolo + j] -= mean;
+	cum_data[base + j] += mean;
+	res_data[base + j] -= mean;
       }
     }    
   }

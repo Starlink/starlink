@@ -1,4 +1,3 @@
-
 /*
 *+
 *  Name:
@@ -33,7 +32,8 @@
 *     model = smfData * (Returned)
 *        The data structure that will store the calculated model parameters
 *     flags = int (Given )
-*        Control flags.
+*        Control flags: 
+*        SMF__DIMM_FIRSTCOMP - initializes CUM if first model component
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -54,6 +54,8 @@
 *        Initial Version
 *     2006-11-02 (EC):
 *        Updated to correctly modify cumulative and residual models
+*     2007-03-05 (EC)
+*        Modified bit flags
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -135,9 +137,9 @@ void smf_calcmodel_ast( smfData *cum, smfData *res, AstKeyMap *keymap,
     /* Get the raw data dimensions */
     ndata = (cum->dims)[0] * (cum->dims)[1] * (cum->dims)[2];
 
-    /* if flags set, initialize this iteration by clearing the
+    /* If SMF__DIMM_FIRSTCOMP set, initialize this iteration by clearing the
        cumulative model buffer */
-    if( flags ) {
+    if( flags & SMF__DIMM_FIRSTCOMP ) {
       memset( cum_data, 0, ndata*sizeof(cum_data) );
     }
     

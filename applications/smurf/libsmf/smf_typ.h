@@ -79,6 +79,9 @@
 *        Updated smf_modeltype
 *     2007-02-12 (EC):
 *        Add smf_calcmodelptr;
+*     2007-03-05 (EC):
+*        Add SMF__DIMM_FIRSTCOMP/FIRSTITER bit flags;
+*        Add SMF__EXT to smf_modeltype
 *     {enter_further_changes_here}
 
 
@@ -139,7 +142,12 @@ typedef enum smf_modeltype {
   SMF__AST=2,             /* Astronomical time-stream signal */
   SMF__COM=3,             /* Common-mode signal */
   SMF__NOI=4,             /* Noise model */
+  SMF__EXT=5,             /* Extinction correction */
 } smf_modeltype;
+
+/* Bit flags for smf_calcmodel* model component calculations */
+#define SMF__DIMM_FIRSTCOMP 1
+#define SMF__DIMM_FIRSTITER 2
 
 /* Flags for smf_create_smf* 
    Must be individual bits in a single integer
