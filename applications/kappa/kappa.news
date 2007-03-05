@@ -29,7 +29,7 @@
    controls the plotting style, however, its assignments only apply
    to the current invocation.
 
-   o  LISTSHOW haa new parameter LABTYPE to control the sort of
+   o  LISTSHOW has new parameter LABTYPE to control the sort of
    labels created---numerical or textual---when parameter LABEL
    is TRUE.
 
