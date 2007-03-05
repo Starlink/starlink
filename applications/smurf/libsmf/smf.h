@@ -144,6 +144,10 @@
 *        Add "hasoffexp" argument to smf_cubebounds.c
 *     2007-02-23 (AGG):
 *        Add instap to smf_construct_smfHead.c
+*     2008-03-05 (EC):
+*        Changed smf_correct_extinction interface
+*        Add smf_model_gettype
+*        Add smf_calcmodel_ext
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -237,7 +241,8 @@ void smf_close_smfDream( smfDream **dream, int * status );
 void smf_close_smfGroup( smfGroup **group, int *status );
 
 void smf_correct_extinction( smfData *data, const char *method, 
-			     const int quick, double tau, int *status);
+			     const int quick, double tau, 
+			     double *allextcorr, int *status);
 
 smfDA *
 smf_construct_smfDA( smfDA * tofill, double * flatcal,
@@ -403,6 +408,8 @@ void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp,
 
 char *smf_model_getname( smf_modeltype type, int *status);
 
+smf_modeltype smf_model_gettype( const char *modelname, int *status );
+
 void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, 
 			      smfData **ffdata, int *status);
 
@@ -505,6 +512,10 @@ void smf_calcmodel_ast( smfData *cum, smfData *res, AstKeyMap *keymap,
 			int flags, int *status );
 
 void smf_calcmodel_noi( smfData *cum, smfData *res, AstKeyMap *keymap, 
+			double *map, double *mapvar, smfData *model, 
+			int flags, int *status );
+
+void smf_calcmodel_ext( smfData *cum, smfData *res, AstKeyMap *keymap, 
 			double *map, double *mapvar, smfData *model, 
 			int flags, int *status );
 

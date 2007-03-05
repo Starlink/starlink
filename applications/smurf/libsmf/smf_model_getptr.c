@@ -81,7 +81,7 @@
 smf_calcmodelptr *smf_model_getptr( smf_modeltype type, int *status) {
 
   /* Local Variables */
-  char *retval = NULL;
+  smf_calcmodelptr *retval = NULL;
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -89,11 +89,15 @@ smf_calcmodelptr *smf_model_getptr( smf_modeltype type, int *status) {
   switch( type ) {
 
   case SMF__AST:
-    retval = &smf_calcmodel_ast;
+    retval = (smf_calcmodelptr *) &smf_calcmodel_ast;
     break;
     
   case SMF__COM:
-    retval = &smf_calcmodel_com;
+    retval = (smf_calcmodelptr *) &smf_calcmodel_com;
+    break;
+
+  case SMF__EXT:
+    retval = (smf_calcmodelptr *) &smf_calcmodel_ext;
     break;
 
   default:

@@ -13,13 +13,20 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_correct_extinction( smfData *data, double tau, int *status) {
+*     smf_correct_extinction(smfData *data, const char *method, 
+*                            const int quick, double tau, double *allextcorr, 
+*                            int *status) {
 
 *  Arguments:
 *     data = smfData* (Given)
 *        smfData struct
+*     method = const char* (Given)
+*        "CSOT" or "WVMR" for CSO Tau or Water Vapout Monitor respectively
 *     tau = float (Given)
-*        Optical depth from the command line
+*        Optical depth
+*     allexrcorr = double* (Given and Returned)
+*        If given, store calculated corrections for each bolo/time slice. Must
+*        have same dimensions as bolos in *data
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -30,6 +37,7 @@
 *  Authors:
 *     Andy Gibb (UBC)
 *     Tim Jenness (TIMJ)
+*     Ed Chapin (UBC))
 *     {enter_new_authors_here}
 
 *  History:
@@ -72,6 +80,9 @@
 *        Update calls to slaAirmas to reflect new C interface
 *     2006-07-26 (TIMJ):
 *        sc2head no longer used. Use JCMTState instead.
+*     2008-03-05 (EC):
+*        Return allextcorr.
+*        Check for existence of header.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -119,7 +130,8 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_correct_extinction"
 
-void smf_correct_extinction(smfData *data, const char *method, const int quick, double tau, int *status) {
+void smf_correct_extinction(smfData *data, const char *method, const int quick,
+			    double tau, double *allextcorr, int *status) {
 
   /* Local variables */
   smfHead *hdr;            /* Pointer to full header struct */
@@ -198,6 +210,12 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick, 
   /* If we have a CSO Tau then convert it to the current filter */
   if ( strncmp( method, "CSOT", 4) == 0 ) {
     hdr = data->hdr;
+
+    if( hdr == NULL ) {
+      *status = SAI__ERROR;
+      errRep( FUNC_NAME, "smfData doesn't contain header", status);
+    }
+
     smf_fits_getS( hdr, "FILTER", filter, 81, status);
     tau = smf_scale_tau( tau, filter, status);
   }
@@ -247,78 +265,90 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick, 
     }
     /* Retrieve header info */
     hdr = data->hdr;
-    /* See if we have a new WVM value */
-    if (wvmr) {
-      newtwvm[0] = hdr->state->wvm_t12;
-      newtwvm[1] = hdr->state->wvm_t42;
-      newtwvm[2] = hdr->state->wvm_t78;
-      /* Have any of the temperatures changed? */
-      if (newtwvm[0] != oldtwvm[0]) {
-	newtau = 1;
-	oldtwvm[0] = newtwvm[0];
-      } else if (newtwvm[1] != oldtwvm[1]) {
-	newtau = 1;
-	oldtwvm[1] = newtwvm[1];
-      } else if (newtwvm[2] != oldtwvm[2]) {
-	newtau = 1;
-	oldtwvm[2] = newtwvm[2];
-      } else {
-	newtau = 0;
-      }
-      if (newtau) {
-	tau = smf_calc_wvm( hdr, status );
-      /* Check status and/or value of tau */
-      }
-    }
-    if (!quick) {
-      wcs = hdr->wcs;
-      /* Check current frame and store it */
-      origsystem = astGetC( wcs, "SYSTEM");
-      /* Select the AZEL system */
-      if (wcs != NULL) 
-	astSetC( wcs, "SYSTEM", "AZEL" );
-      if (!astOK) {
-	if (*status == SAI__OK) {
-	  *status = SAI__ERROR;
-	  errRep( FUNC_NAME, "Error from AST", status);
-	}
-      }
-      /* Transfrom from pixels to AZEL */
-      astTran2(wcs, npts, xin, yin, 1, xout, yout );
-    }
-    /* If we're using the QUICK application method, we assume a single
-       airmass and tau for the whole array */
-    /* Loop over data in time slice. Start counting at 1 since this is
-       the GRID coordinate frame */
-    base = npts * k; /* Offset into 3d data array */
-    if (quick) {
-      airmass = hdr->state->tcs_airmass;
-      extcorr = exp(airmass*tau);
-    }
-    for (i=0; i < npts; i++ ) {
-      index = indices[i] + base;
-      if (indata[index] != VAL__BADD) {
-	if (!quick) {
-	  zd = M_PI_2 - yout[indices[i]];
-	  airmass = slaAirmas( zd );
-	  extcorr = exp(airmass*tau);
-	}
-	indata[index] *= extcorr;
-	/*	if (vardata != NULL && vardata[index] != VAL__BADD) {
-	  vardata[index] *= extcorr*extcorr;
-	  }*/
-      }
+    if( hdr == NULL ) {
+      *status = SAI__ERROR;
+      errRep( FUNC_NAME, "smfData doesn't contain header", status);
     }
 
-    if (!quick) {
-      /* Restore coordinate frame to original */
-      if ( *status == SAI__OK) {
-	astSetC( wcs, "SYSTEM", origsystem );
-	/* Check AST status */
+    if( *status == SAI__OK ) {
+      /* See if we have a new WVM value */
+      if (wvmr) {
+	newtwvm[0] = hdr->state->wvm_t12;
+	newtwvm[1] = hdr->state->wvm_t42;
+	newtwvm[2] = hdr->state->wvm_t78;
+	/* Have any of the temperatures changed? */
+	if (newtwvm[0] != oldtwvm[0]) {
+	  newtau = 1;
+	  oldtwvm[0] = newtwvm[0];
+	} else if (newtwvm[1] != oldtwvm[1]) {
+	  newtau = 1;
+	  oldtwvm[1] = newtwvm[1];
+	} else if (newtwvm[2] != oldtwvm[2]) {
+	  newtau = 1;
+	  oldtwvm[2] = newtwvm[2];
+	} else {
+	  newtau = 0;
+	}
+	if (newtau) {
+	  tau = smf_calc_wvm( hdr, status );
+	  /* Check status and/or value of tau */
+	}
+      }
+      if (!quick) {
+	wcs = hdr->wcs;
+	/* Check current frame and store it */
+	origsystem = astGetC( wcs, "SYSTEM");
+	/* Select the AZEL system */
+	if (wcs != NULL) 
+	  astSetC( wcs, "SYSTEM", "AZEL" );
 	if (!astOK) {
 	  if (*status == SAI__OK) {
 	    *status = SAI__ERROR;
 	    errRep( FUNC_NAME, "Error from AST", status);
+	  }
+	}
+	/* Transfrom from pixels to AZEL */
+	astTran2(wcs, npts, xin, yin, 1, xout, yout );
+      }
+      /* If we're using the QUICK application method, we assume a single
+	 airmass and tau for the whole array */
+      /* Loop over data in time slice. Start counting at 1 since this is
+	 the GRID coordinate frame */
+      base = npts * k; /* Offset into 3d data array */
+      if (quick) {
+	airmass = hdr->state->tcs_airmass;
+      extcorr = exp(airmass*tau);
+      }
+      for (i=0; i < npts; i++ ) {
+	index = indices[i] + base;
+	if (indata[index] != VAL__BADD) {
+	  if (!quick) {
+	    zd = M_PI_2 - yout[indices[i]];
+	    airmass = slaAirmas( zd );
+	    extcorr = exp(airmass*tau);
+	  }
+	  indata[index] *= extcorr;
+	  
+	  /* If an allextcor pointer is given, store the extinction
+	     correction term for this bolometer, timeslice */
+	  if( allextcorr ) allextcorr[index] = extcorr;
+	  
+	  /*	if (vardata != NULL && vardata[index] != VAL__BADD) {
+	    vardata[index] *= extcorr*extcorr;
+	    }*/
+	}
+      }
+      
+      if (!quick) {
+	/* Restore coordinate frame to original */
+	if ( *status == SAI__OK) {
+	  astSetC( wcs, "SYSTEM", origsystem );
+	  /* Check AST status */
+	  if (!astOK) {
+	    if (*status == SAI__OK) {
+	      *status = SAI__ERROR;
+	      errRep( FUNC_NAME, "Error from AST", status);
+	    }
 	  }
 	}
       }

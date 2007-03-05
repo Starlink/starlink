@@ -89,7 +89,10 @@ char *smf_model_getname( smf_modeltype type, int *status) {
   char *retval = NULL;
 
   /* Main routine */
-  if (*status != SAI__OK) return;
+  if (*status != SAI__OK) {
+    retval = "nul";
+    return retval;
+  }
 
   switch( type ) {
 
@@ -113,7 +116,12 @@ char *smf_model_getname( smf_modeltype type, int *status) {
     retval = "noi";
     break;
 
+  case SMF__EXT:
+    retval = "ext";
+    break;
+
   default:
+    retval = "nul";
     *status = SAI__ERROR;
     errRep(FUNC_NAME, "Invalid smf_modeltype given.", status);        
   }

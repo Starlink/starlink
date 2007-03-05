@@ -209,6 +209,16 @@ void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp,
 	ubnd[1] = (idata->dims)[1];
 	ubnd[2] = (idata->dims)[2];
 	break;
+
+      case SMF__EXT: /* Extinction correction - gain for each bolo/time */
+	ndims = 3;
+	lbnd[0] = 1;
+	lbnd[1] = 1;
+	lbnd[2] = 1;
+	ubnd[0] = (idata->dims)[0];
+	ubnd[1] = (idata->dims)[1];
+	ubnd[2] = (idata->dims)[2];
+	break;
       }
 
       /* Close the input template file */
