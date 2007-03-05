@@ -116,19 +116,19 @@
 *        propagates the title from the input NDF to the output NDF. [!]
 *     TRIM = _LOGICAL (Read)
 *        This parameter controls whether the collapsed axis should be
-*        removed from the coordinate syatems desceribing the output NDF.
+*        removed from the co-ordinate syatems describing the output NDF.
 *        If a TRUE value is supplied, the collapsed WCS axis will be
 *        removed from the WCS FrameSet of the output NDF, and the
 *        collapsed pixel axis will also be removed from the NDF,
 *        resulting in the output NDF having one fewer pixel axes than 
-*        the input NDF. If a FALSE value is supplied, the collapsed WCS 
-*        and pixel axes are retained in the output NDF, resulting in the 
-*        input and output NDFs having the same number of pixel axes. In
-*        this case, the pixel index bounds of the collapse axis will be set 
-*        to (1:1) in the output NDF (that is, the output NDF will span
-*        only a single pixel on the collapse axis). Thus, setting TRIM to
-*        FALSE allows information to be retained about the range of values 
-*        over which the collapse ocurred. [TRUE]
+*        the input NDF.  If a FALSE value is supplied, the collapsed WCS
+*        and pixel axes are retained in the output NDF, resulting in the
+*        input and output NDFs having the same number of pixel axes.  In
+*        this case, the pixel-index bounds of the collapse axis will be 
+*        set to (1:1) in the output NDF (that is, the output NDF will 
+*        span only a single pixel on the collapse axis).  Thus, setting 
+*        TRIM to FALSE allows information to be retained about the range
+*        of values over which the collapse occurred.  [TRUE]
 *     VARIANCE = _LOGICAL (Read)
 *        A flag indicating whether a variance array present in the
 *        NDF is used to weight data values while forming the estimator's
@@ -137,13 +137,13 @@
 *        used to define the weights, otherwise all the weights will be
 *        set equal.  [TRUE]
 *     WCSATTS = GROUP (Read)
-*        A group of attribute settings which will be used to make temporary
-*        changes to the properties of the current co-ordinate Frame in the WCS 
-*        FrameSet before it is used. Supplying a list of attribute values for 
-*        this parameter is equivalent to invoking WCSATTRIB on the input NDF 
-*        prior to running this command, except that no permanent change
-*        is made to the NDF (however the changes are propagated through
-*        to the output NDF).
+*        A group of attribute settings which will be used to make 
+*        temporary changes to the properties of the current co-ordinate 
+*        Frame in the WCS  FrameSet before it is used.  Supplying a list
+*        of attribute values for this parameter is equivalent to
+*        invoking WCSATTRIB on the input NDF prior to running this
+*        command, except that no permanent change is made to the NDF 
+*        (however the changes are propagated through to the output NDF).
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text 
@@ -344,11 +344,12 @@
 *        Manage without an inverse WCS transformation, when possible.
 *     2-MAR-2007 (DSB):
 *        Pad out the current Frame in the output WCS FrameSet by
-*        duplicating PIXEL axes so that the current Frame has at least as
-*        many axes as the base (GRID) Frame.
+*        duplicating PIXEL axes so that the current Frame has at least
+*        as many axes as the base (GRID) Frame.
 *     5-MAR-2007 (DSB):
 *        Added parameter TRIM. Moved calculation of GRDPOS so that it
-*        is available for both splitable Mappings and unsplitable Mappings.
+*        is available for both splitable Mappings and unsplitable 
+*        Mappings.
 *     {enter_further_changes_here}
 
 *-
@@ -583,7 +584,7 @@
          IF( NFEED .EQ. 1 ) THEN
             JAXIS = PIXAXE( 1 )
 
-*  If high and low axis values were supplied, using the Mapping produced 
+*  If high and low axis values were supplied, using the Mapping produced
 *  by AST_MAPSPLIT to get the corresponding pixel positions.
             IF( .NOT. USEALL ) THEN
                CALL AST_TRAN1( TMAP, 1, AXHIGH, .TRUE., PXHIGH, STATUS )
@@ -1253,9 +1254,9 @@
       CALL NDF_PTWCS( IWCS, INDFO, STATUS )      
 
 *  KPS1_CLPA0 may have padded out the current WCS Frame with duplicated
-*  GRID axes (in order to ensure that the current Frame has at least as many
-*  axes as the base Frame). We now convert these duplicated GRID axes to
-*  the corresponding PIXEL axes.
+*  GRID axes (in order to ensure that the current Frame has at least as 
+*  many axes as the base Frame).  We now convert these duplicated GRID 
+*  axes to the corresponding PIXEL axes.
       CALL KPS1_CLPA2( INDFO, STATUS )      
 
 *  Come here if something has gone wrong.
