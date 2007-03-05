@@ -114,6 +114,21 @@
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF structure.  A null value (!)
 *        propagates the title from the input NDF to the output NDF. [!]
+*     TRIM = _LOGICAL (Read)
+*        This parameter controls whether the collapsed axis should be
+*        removed from the coordinate syatems desceribing the output NDF.
+*        If a TRUE value is supplied, the collapsed WCS axis will be
+*        removed from the WCS FrameSet of the output NDF, and the
+*        collapsed pixel axis will also be removed from the NDF,
+*        resulting in the output NDF having one fewer pixel axes than 
+*        the input NDF. If a FALSE value is supplied, the collapsed WCS 
+*        and pixel axes are retained in the output NDF, resulting in the 
+*        input and output NDFs having the same number of pixel axes. In
+*        this case, the pixel index bounds of the collapse axis will be set 
+*        to (1:1) in the output NDF (that is, the output NDF will span
+*        only a single pixel on the collapse axis). Thus, setting TRIM to
+*        FALSE allows information to be retained about the range of values 
+*        over which the collapse ocurred. [TRUE]
 *     VARIANCE = _LOGICAL (Read)
 *        A flag indicating whether a variance array present in the
 *        NDF is used to weight data values while forming the estimator's
@@ -122,8 +137,8 @@
 *        used to define the weights, otherwise all the weights will be
 *        set equal.  [TRUE]
 *     WCSATTS = GROUP (Read)
-*        A group of attribute settings which will be used to temporarily 
-*        modify the properties of the current co-ordinate Frame in the WCS 
+*        A group of attribute settings which will be used to make temporary
+*        changes to the properties of the current co-ordinate Frame in the WCS 
 *        FrameSet before it is used. Supplying a list of attribute values for 
 *        this parameter is equivalent to invoking WCSATTRIB on the input NDF 
 *        prior to running this command, except that no permanent change
@@ -331,6 +346,9 @@
 *        Pad out the current Frame in the output WCS FrameSet by
 *        duplicating PIXEL axes so that the current Frame has at least as
 *        many axes as the base (GRID) Frame.
+*     5-MAR-2007 (DSB):
+*        Added parameter TRIM. Moved calculation of GRDPOS so that it
+*        is available for both splitable Mappings and unsplitable Mappings.
 *     {enter_further_changes_here}
 
 *-
@@ -470,6 +488,7 @@
       LOGICAL GOTAX              ! Does the NDF have an AXIS component?
       LOGICAL LOOP               ! Continue to loop through dimensions?
       LOGICAL NDFVAR             ! NDF contains a variance array?
+      LOGICAL TRIM               ! Remove collapsed axes from o/p?
       LOGICAL USEALL             ! Use the entire collapse pixel axis?
       LOGICAL USEVAR             ! Allow weights to be derived from the
                                  ! NDF's variance array (if present)
@@ -558,6 +577,7 @@
 *  If so, check that the WCS axis is fed by one and only one pixel axis,
 *  and get its index.
       JAXIS = 0
+
       IF( TMAP .NE. AST__NULL ) THEN
          NFEED = AST_GETI( TMAP, 'NOUT', STATUS )
          IF( NFEED .EQ. 1 ) THEN
@@ -571,6 +591,21 @@
             END IF
          END IF
       END IF
+
+*  Find an arbitrary position within the NDF which has valid current 
+*  Frame co-ordinates. Both pixel and current Frame co-ordinates for 
+*  this position are returned.
+      DO I = 1, NDIM
+         DLBND( I ) = DBLE( LBND( I ) - 1 )
+         DUBND( I ) = DBLE( UBND( I ) )
+      END DO
+      CALL KPG1_ASGDP( MAP, NDIM, NAXC, DLBND, DUBND, PIXPOS, CURPOS, 
+     :                 STATUS )
+   
+*  Convert the pixel position into a grid position.
+      DO I = 1, NDIM
+         GRDPOS( I ) = PIXPOS( I ) - LBND( I ) + 1.5
+      END DO 
 
 *  If the Mapping could not be split using AST_MAPSPLIT, we attempt to
 *  analyse it by transforming positions, in order to find the pixel axis
@@ -599,22 +634,7 @@
      :                    'defined.', STATUS )
          END IF
 
-*  Find an arbitrary position within the NDF which has valid current 
-*  Frame co-ordinates. Both pixel and current Frame co-ordinates for 
-*  this position are returned.
-         DO I = 1, NDIM
-            DLBND( I ) = DBLE( LBND( I ) - 1 )
-            DUBND( I ) = DBLE( UBND( I ) )
-         END DO
-         CALL KPG1_ASGDP( MAP, NDIM, NAXC, DLBND, DUBND, PIXPOS, CURPOS, 
-     :                 STATUS )
-   
-*  Convert the pixel position into a grid position.
-         DO I = 1, NDIM
-            GRDPOS( I ) = PIXPOS( I ) - LBND( I ) + 1.5
-         END DO 
-   
-*  Create two copies of these current Frame co-ordinates.
+*  Create two copies of the good current Frame co-ordinates.
          DO I = 1, NAXC
             CPOS( 1, I ) = CURPOS( I )
             CPOS( 2, I ) = CURPOS( I )
@@ -731,24 +751,45 @@
 *  Define the output NDF's bounds.
 *  ===============================
 
+*  See if the collapsed axis is to be trimmed from the output NDF.
+      CALL PAR_GET0L( 'TRIM', TRIM, STATUS )
+
+*  If we are removing the collapsed pixel axis... */
+      IF( TRIM ) THEN
+
 *  The output NDF will have one fewer axes than the input NDF.
-      NDIMO = NDIM - 1
+         NDIMO = NDIM - 1
 
 *  For each pixel axis I in the final output NDF, find the 
 *  corresponding axis in the input NDF.
-      DO I = 1, NDIMO
-         IF ( I .LT. JAXIS ) THEN
-            AXES( I ) = I
-         ELSE
-            AXES( I ) = I + 1
-         END IF
-      END DO
+         DO I = 1, NDIMO
+            IF ( I .LT. JAXIS ) THEN
+               AXES( I ) = I
+            ELSE
+               AXES( I ) = I + 1
+            END IF
+         END DO
 
 *  Find the pixel bounds of the NDF after axis permutation.
-      DO I = 1, NDIMO
-         LBNDO( I ) = LBND( AXES( I ) )
-         UBNDO( I ) = UBND( AXES( I ) )
-      END DO
+         DO I = 1, NDIMO
+            LBNDO( I ) = LBND( AXES( I ) )
+            UBNDO( I ) = UBND( AXES( I ) )
+         END DO
+
+*  If we are retianing the collapsed pixel axis, just set its upper and
+*  lower bounds to 1.
+      ELSE
+         NDIMO = NDIM
+
+         DO I = 1, NDIMO
+            AXES( I ) = I
+            LBNDO( I ) = LBND( I )
+            UBNDO( I ) = UBND( I )
+         END DO
+
+         LBNDO( JAXIS ) = 1
+         UBNDO( JAXIS ) = 1
+      END IF
 
 *  Determine whether or not there are significant dimensions above
 *  the collapse axis.
@@ -804,9 +845,16 @@
 *  Adjust output NDF to its new shape.
 *  ===================================
 
-*  The shape and size of the output NDF created above will be wrong, so
-*  we need to correct it by removing the collapse axis.  This is easy 
-*  if it is the final axis (we would just use NDF_SBND specifying 
+*  Easy if we are retaining the collapsed axes....
+      IF( .NOT. TRIM ) THEN
+         CALL NDF_SBND( NDIMO, LBNDO, UBNDO, INDFO, STATUS ) 
+
+*  Otherwise...
+      ELSE
+
+*  The shape and size of the output NDF created above will be wrong,
+*  so we need to correct it by removing the collapse axis.  This is 
+*  easy if it is the final axis (we would just use NDF_SBND specifying 
 *  NDIM-1 axes), but is not so easy if the collapse axis is not the 
 *  final axis.  In this case, we do the following.
 *    1) - Save copies of an AXIS structure in the output NDF (because
@@ -820,130 +868,110 @@
 *         original Base Frame.
 
 *  First see if the AXIS component is defined.
-      CALL NDF_STATE( INDFO, 'AXIS', GOTAX, STATUS )
-
+         CALL NDF_STATE( INDFO, 'AXIS', GOTAX, STATUS )
+   
 *  If so, we need to save copies of the AXIS structures.
-      IF ( GOTAX ) THEN
-
+         IF ( GOTAX ) THEN
+   
 *  Get an HDS locator to the output NDF structure.
-         CALL NDF_LOC( INDFO, 'UPDATE', LOC1, STATUS )
-
+            CALL NDF_LOC( INDFO, 'UPDATE', LOC1, STATUS )
+   
 *  Get a locator to the AXIS component.
-         CALL DAT_FIND( LOC1, 'AXIS', LOC2, STATUS )
-
+            CALL DAT_FIND( LOC1, 'AXIS', LOC2, STATUS )
+   
 *  Take a copy of the AXIS component and call it OLDAXIS.
-         CALL DAT_COPY( LOC2, LOC1, 'OLDAXIS', STATUS ) 
-
+            CALL DAT_COPY( LOC2, LOC1, 'OLDAXIS', STATUS ) 
+   
 *  Get a locator for OLDAXIS.
-         CALL DAT_FIND( LOC1, 'OLDAXIS', LOC3, STATUS )
-      END IF
-
+            CALL DAT_FIND( LOC1, 'OLDAXIS', LOC3, STATUS )
+         END IF
+   
 *  Set the output NDF bounds to the required values.  This will change
 *  the lengths of the current AXIS arrays (but we have a copy of the
 *  originals in OLDAXIS), and reduce the dimensionality by one.
-      CALL NDF_SBND( NDIMO, LBNDO, UBNDO, INDFO, STATUS ) 
-
+         CALL NDF_SBND( NDIMO, LBNDO, UBNDO, INDFO, STATUS ) 
+   
 *  We now re-instate any AXIS structures, in their new order.
-      IF ( GOTAX ) THEN
-
+         IF ( GOTAX ) THEN
+   
 *  Promote the NDF locator to a primary locator so that the HDS
 *  container file is not closed when the NDF identifier is annulled.
-         CALL DAT_PRMRY( .TRUE., LOC1, .TRUE., STATUS ) 
-
+            CALL DAT_PRMRY( .TRUE., LOC1, .TRUE., STATUS ) 
+   
 *  The DATA array of the output NDF will not yet be in a defined state. 
 *  This would result in NDF_ANNUL reporting an error, so we temporarily
 *  map the DATA array (which puts it into a defined state) to prevent
 *  this.
-         CALL NDF_MAP( INDFO, 'DATA', ITYPE, 'WRITE', IPOUT( 1 ), EL2, 
-     :                 STATUS ) 
-
+            CALL NDF_MAP( INDFO, 'DATA', ITYPE, 'WRITE', IPOUT( 1 ), 
+     :                    EL2, STATUS ) 
+   
 *  Annul the supplied NDF identifier so that we can change the contents
 *  of the NDF using HDS, without getting out of step with the NDFs
 *  libraries description of the NDF. 
-         CALL NDF_ANNUL( INDFO, STATUS )
-
+            CALL NDF_ANNUL( INDFO, STATUS )
+   
 *  Loop round each cell in the returned AXIS structure.
-         DO I = 1, NDIMO
-
+            DO I = 1, NDIMO
+   
 *  Get a locator to this cell in the NDFs AXIS array.
-            CALL DAT_CELL( LOC2, 1, I, LOC4, STATUS )
-
+               CALL DAT_CELL( LOC2, 1, I, LOC4, STATUS )
+   
 *  Empty it of any components
-            CALL DAT_NCOMP( LOC4, NCOMP, STATUS )
-            DO J = NCOMP, 1, -1
-               CALL DAT_INDEX( LOC4, J, LOC5, STATUS )
-               CALL DAT_NAME( LOC5, NAME, STATUS )
-               CALL DAT_ANNUL( LOC5, STATUS )
-               CALL DAT_ERASE( LOC4, NAME, STATUS )
-               IF( STATUS .NE. SAI__OK ) GO TO 999
-            END DO
-
+               CALL DAT_NCOMP( LOC4, NCOMP, STATUS )
+               DO J = NCOMP, 1, -1
+                  CALL DAT_INDEX( LOC4, J, LOC5, STATUS )
+                  CALL DAT_NAME( LOC5, NAME, STATUS )
+                  CALL DAT_ANNUL( LOC5, STATUS )
+                  CALL DAT_ERASE( LOC4, NAME, STATUS )
+                  IF( STATUS .NE. SAI__OK ) GO TO 999
+               END DO
+   
 *  Get a locator to the corresponding cell in the OLDAXIS array.
-            CALL DAT_CELL( LOC3, 1, AXES( I ), LOC5, STATUS )
-
+               CALL DAT_CELL( LOC3, 1, AXES( I ), LOC5, STATUS )
+   
 *  We now copy all the components of the OLDAXIS cell into the AXIS 
 *  cell.  Find the number of components, and loop round them.
-            CALL DAT_NCOMP( LOC5, NCOMP, STATUS )
-            DO J = NCOMP, 1, -1
-
+               CALL DAT_NCOMP( LOC5, NCOMP, STATUS )
+               DO J = NCOMP, 1, -1
+   
 *  Get a locator to this component in the original OLDAXIS cell.
-               CALL DAT_INDEX( LOC5, J, LOC6, STATUS )
-
+                  CALL DAT_INDEX( LOC5, J, LOC6, STATUS )
+   
 *  Get its name.
-               CALL DAT_NAME( LOC6, NAME, STATUS )
-
+                  CALL DAT_NAME( LOC6, NAME, STATUS )
+   
 *  Copy it into the new AXIS structure.
-               CALL DAT_COPY( LOC6, LOC4, NAME, STATUS )           
-
+                  CALL DAT_COPY( LOC6, LOC4, NAME, STATUS )           
+   
 *  Annul the locators.
-               CALL DAT_ANNUL( LOC6, STATUS )
-
+                  CALL DAT_ANNUL( LOC6, STATUS )
+   
 *  Abort if an error has occurred.
-               IF( STATUS .NE. SAI__OK ) GO TO 999
-
-            END DO
-
+                  IF( STATUS .NE. SAI__OK ) GO TO 999
+   
+               END DO
+   
 *  Annul the locators.
-            CALL DAT_ANNUL( LOC4, STATUS )
-            CALL DAT_ANNUL( LOC5, STATUS )
-
-         END DO
-
+               CALL DAT_ANNUL( LOC4, STATUS )
+               CALL DAT_ANNUL( LOC5, STATUS )
+   
+            END DO
+   
 *  Annul the locator to the OLDAXIS structure and then erase the object.
-         CALL DAT_ANNUL( LOC3, STATUS )
-         CALL DAT_ERASE( LOC1, 'OLDAXIS', STATUS ) 
-
+            CALL DAT_ANNUL( LOC3, STATUS )
+            CALL DAT_ERASE( LOC1, 'OLDAXIS', STATUS ) 
+   
 *  Annul the AXIS array locator.
-         CALL DAT_ANNUL( LOC2, STATUS )
-
+            CALL DAT_ANNUL( LOC2, STATUS )
+   
 *  Import the modified NDF back into the NDF system.
-         CALL NDF_FIND( LOC1, ' ', INDFO, STATUS ) 
-
+            CALL NDF_FIND( LOC1, ' ', INDFO, STATUS ) 
+   
 *  Annul the NDF locator.
-         CALL DAT_ANNUL( LOC1, STATUS )
-
+            CALL DAT_ANNUL( LOC1, STATUS )
+   
+         END IF
       END IF
-
-*  Alter the WCS FrameSet.
-*  =======================
-
-*  Copy the FrameSet, as we're about to change it, but the original
-*  is sometimes needed.
-      IWCSO = AST_COPY( IWCS, STATUS )
-
-*  We now modify the input NDFs WCS FrameSet by removing the collapsed
-*  axis from the base and current Frames.
-      CALL KPS1_CLPA0( IWCSO, JAXIS, UBND( JAXIS ) - LBND( JAXIS ) + 1, 
-     :                 GRDPOS, STATUS )
-
-*  Save this modified WCS FrameSet in the output NDF.
-      CALL NDF_PTWCS( IWCSO, INDFO, STATUS )      
-
-*  KPS1_CLPA0 may have padded out the current WCS Frame with duplicated
-*  GRID axes (in order to ensure that the current Frame has at least as many
-*  axes as the base Frame). We now convert these duplicated GRID axes to
-*  the corresponding PIXEL axes.
-      CALL KPS1_CLPA2( INDFO, STATUS )      
 
 *  Obtain the remaining parameters.
 *  ================================
@@ -1023,6 +1051,13 @@
 *  collapse axis.
             J = J + 1
             OBLSIZ( J ) = IBLSIZ( I )
+
+*  If we are retaining the degenerate collapsed pixel axis in the output
+*  NDF, then the output block size for that axis can be 1.
+         ELSE IF( .NOT. TRIM ) THEN
+            J = J + 1
+            OBLSIZ( J ) = 1
+
          END IF
       END DO
 
@@ -1045,7 +1080,6 @@
 
 *  Determine the number of blocks.
       CALL NDF_NBLOC( INDFS, NDIM, IBLSIZ, NBLOCK, STATUS )
-
 
 *  Loop through each block.  Start a new NDF context.
       DO IBLOCK = 1, NBLOCK
@@ -1206,6 +1240,23 @@
 *   Close NDF context.
          CALL NDF_END( STATUS )
       END DO
+
+*  Alter the WCS FrameSet.
+*  =======================
+
+*  We now modify the input NDFs WCS FrameSet by removing the collapsed
+*  axis from the base and current Frames.
+      CALL KPS1_CLPA0( IWCS, JAXIS, UBND( JAXIS ) - LBND( JAXIS ) + 1, 
+     :                 GRDPOS, TRIM, STATUS )
+
+*  Save this modified WCS FrameSet in the output NDF.
+      CALL NDF_PTWCS( IWCS, INDFO, STATUS )      
+
+*  KPS1_CLPA0 may have padded out the current WCS Frame with duplicated
+*  GRID axes (in order to ensure that the current Frame has at least as many
+*  axes as the base Frame). We now convert these duplicated GRID axes to
+*  the corresponding PIXEL axes.
+      CALL KPS1_CLPA2( INDFO, STATUS )      
 
 *  Come here if something has gone wrong.
   999 CONTINUE
