@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.32}
 \newcommand{\stardocnumber}    {95.32}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2006 December 30}
+\newcommand{\stardocdate}      {2007 March 5}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.6-5}
+\newcommand{\stardocversion}   {1.7}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -16934,7 +16934,7 @@ XV; PBMPLUS; NETPBM.
          parameter gives the range of axis values to be compressed.  Note,
          LOW and HIGH should not be equal since.  If a null value ({\tt{!}}) is
          supplied for either LOW or HIGH, the entire range of the axis
-         is collapsed. {\tt [!]}
+         is collapsed.  {\tt [!]}
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -16945,7 +16945,25 @@ XV; PBMPLUS; NETPBM.
          TITLE = LITERAL (Read)
       }{
          \htmlref{Title}{apndf:title} for the output NDF structure.  A null value ({\tt{!}})
-         propagates the title from the input NDF to the output NDF. {\tt [!]}
+         propagates the title from the input NDF to the output NDF.  {\tt [!]}
+      }
+      \sstsubsection{
+         TRIM = \_LOGICAL (Read)
+      }{
+         This parameter controls whether the collapsed axis should be
+         removed from the co-ordinate systems describing the output NDF.
+         If a {\tt TRUE} value is supplied, the collapsed WCS axis will be
+         removed from the WCS FrameSet of the output NDF, and the
+         collapsed pixel axis will also be removed from the NDF,
+         resulting in the output NDF having one fewer pixel axes than 
+         the input NDF.  If a {\tt FALSE} value is supplied, the collapsed WCS
+         and pixel axes are retained in the output NDF, resulting in the
+         input and output NDFs having the same number of pixel axes.  In
+         this case, the pixel-index bounds of the collapse axis will be set 
+         to (1:1) in the output NDF (that is, the output NDF will span
+         only a single pixel on the collapse axis).  Thus, setting TRIM to
+         {\tt FALSE} allows information to be retained about the range of values 
+         over which the collapse occurred.  {\tt [TRUE]}
       }
       \sstsubsection{
          VARIANCE = \_LOGICAL (Read)
@@ -16960,13 +16978,13 @@ XV; PBMPLUS; NETPBM.
       \sstsubsection{
          WCSATTS = GROUP (Read)
       }{
-         A group of attribute settings which will be used to temporarily
-	 modify the properties of the current co-ordinate Frame in the
-	 WCS FrameSet before it is used. Supplying a list of attribute
-	 values for this parameter is equivalent to invoking WCSATTRIB on
-	 the input NDF prior to running this command, except that no
-	 permanent change is made to the NDF (however the changes are
-	 propagated through to the output NDF).
+         A group of attribute settings which will be used to make temporary 
+         changes to the properties of the current co-ordinate Frame in the WCS 
+         FrameSet before it is used.  Supplying a list of attribute values for 
+         this parameter is equivalent to invoking WCSATTRIB on the input NDF 
+         prior to running this command, except that no permanent change 
+         is made to the NDF (however the changes are propagated through to 
+         the output NDF).
 
          A comma-separated list of strings should be given in which each
 	 string is either an attribute setting, or the name of a text
@@ -51415,7 +51433,7 @@ The following applications have been modified:
     
 \end{description}
 
-\section{\xlabel{se_changes}Release Notes---V1.6\label{se:changes}}
+\section{Release Notes---V1.6}
 
 \subsection{New Commands}
 The following new applications have been added:
@@ -51505,6 +51523,31 @@ The following applications have been modified:
          bounds can be examined without creating a potentially huge NDF.
       \end{itemize}
 \end{description}
+
+\section{\xlabel{se_changes}Release Notes---V1.7\label{se:changes}}
+
+\subsection{Modified Commands}
+The following applications have been modified:
+
+\begin{description}
+
+   \item [\htmlref{COLLAPSE}{COLLAPSE}] \mbox{}
+      \begin{itemize}
+         \item It can now correctly collapse along a sky co-ordinate
+         axis such as right-ascension or declination.
+         \item The co-ordinate extent over which the collapse occurs 
+         may be retained in a dummy dimension provided a new parameter 
+         TRIM is set to {\tt FALSE}.  The default of {\tt TRUE} gives
+         the current behaviour.
+      \end{itemize}
+
+   \item [\htmlref{MFITTREND}{MFITTREND}] \mbox{}
+      \begin{itemize}
+      \item It can now cope without an inverse WCS transformation.
+      \end{itemize}
+      
+\end{description}
+
 
 \begin{latexonly}
 \newpage
