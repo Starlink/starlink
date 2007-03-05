@@ -63,6 +63,8 @@
 *     2007-03-02 (EC)
 *        Added noise estimation from residual
 *        Fixed counter bug
+*     2007-03-05 (EC)
+*        Parse modelorder keyword in config file
 
 *  Notes:
 
@@ -106,7 +108,9 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
+/* Other includes */
 #include "sys/time.h"
+
 
 #define FUNC_NAME "smf_iteratemap"
 
@@ -124,14 +128,15 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   const char *asttemp=NULL;     /* Pointer to static strings created by ast */
   int atmndf;                   /* Atmospheric signal NDF identifier */
   const char *atmname;          /* Name of atmmodel group */
+  smfData *cum;                 /* Pointer to input data struct */
   Grp *cumgrp=NULL;             /* Group of cumulative model files */
   smfData *data;                /* Pointer to source data struct */
   double *data_data=NULL;       /* Pointer to DATA component of data */
+  int dimmflags;                /* Control flags for DIMM model components */
   dim_t dsize;                  /* Size of data arrays in containers */
   int flag;                     /* Flag */
   dim_t i;                      /* Loop counter */
   int indf;                     /* Input data NDF identifier */
-  smfData *cum;                 /* Pointer to input data struct */
   dim_t iter;                   /* Iteration number */
   int isize;                    /* Number of files in input group */
   dim_t j;                      /* Loop counter */
@@ -142,21 +147,24 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   smfData **modeldata=NULL;     /* Array of pointers to model data */
   Grp **modelgrps=NULL;         /* Array of group ptrs/ each model component */
   smf_modeltype *modeltyps=NULL; /* Array of model types */
+  char modelname[4];            /* Name of current model component */
   smf_calcmodelptr modelptr=NULL; /* Pointer to current model calc function */
   int nbolo;                    /* Number of bolometers */
   int nmap;                     /* Number of elements mapped */
-  int nmodels;                  /* Number of model components / iteration */
+  int nmodels=0;                /* Number of model components / iteration */
   int nndf;                     /* Residual noise NDF identifier */
   const char *nname;            /* Name of noisemodel group */
   smfData *noi;                 /* Pointer to noise model data struct */
   Grp *noigrp=NULL;             /* Group of noi model files */
   int numiter;                  /* Total number iterations */
+  int pass;                     /* Two pass parsing of MODELORDER */
   int rebinflags;               /* Flags to control rebinning */
   smfData *res;                 /* Pointer to residual data struct */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   double *res_var=NULL;         /* Pointer to DATA component of res */
   Grp *resgrp=NULL;             /* Group of model residual files */
   double sigma;                 /* Estimate of standard deviation */
+  smf_modeltype thismodel;      /* Type of current model */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -173,19 +181,63 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
       errRep(FUNC_NAME, "DIMM Failed: NUMITER unspecified", status);      
     }
 
-    /* Type and order of models to fit */
+    /* Type and order of models to fit from MODELORDER keyword */
     if( astMapGet0C( keymap, "MODELORDER", &asttemp ) ) {
-      /* KLUDGE for now */
-      nmodels = 1;
-      modeltyps = smf_malloc( nmodels, sizeof(*modeltyps), 0, status );
-      modeltyps[0] = SMF__COM;
+
+      modelname[3] = 0;
+
+      /* First pass count components, second pass allocate modeltyps & store */
+      for( pass=1; pass<=2; pass++ ) {
+	j=0; /* Count number of characters in sub-string */
+	nmodels = 0;
+
+	/* Loop over all characters in asttemp, count # valid model names */
+	for( i=0; i<strlen(asttemp); i++ ) {
+	  
+	  /* If current asttemp character non-delimeter, copy to modelname */
+	  if( asttemp[i] != ' ' ) {
+	    modelname[j] = asttemp[i];
+	    j++;
+	  }
+	  
+	  /* If 3 characters in sub-string, extract type */
+	  if( j == 3 ) {
+
+	    thismodel = smf_model_gettype( modelname, status );	    
+
+	    if( *status == SAI__OK ) {
+	      
+	      /* If second pass modeltyps is allocated - store value */
+	      if( pass == 2 ) {
+		modeltyps[nmodels] = thismodel;
+	      }
+	      nmodels++;
+	      j = 0;
+	    }
+	  }
+	}
+	
+	/* End of pass 1: allocate modeltyps */
+	if( pass == 1 ) {
+	  if( nmodels >= 1 ) {
+	    modeltyps = smf_malloc( nmodels, sizeof(*modeltyps), 0, status );
+	  } else {
+	    msgOut(" ", "SMF_ITERATEMAP: No valid models in MODELORDER",
+		   status );
+	  }
+	}
+      }
     } else {
       msgOut(" ", "SMF_ITERATEMAP: MODELORDER unspecified - will only rebin!",
 	     status);
       nmodels = 0;
     }
-
   } 
+
+  printf("%i model components: ", nmodels);
+  for( i=0; i<nmodels; i++ ) 
+    printf( "%s ", smf_model_getname(modeltyps[i],status) );
+  printf( "\n" );
 
   /* Create groups of NDFs for time-series model components */
   msgOut(" ", "SMF_ITERATEMAP: Create model containers", status);
@@ -221,23 +273,32 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
         /* Open files */
 
         smf_open_file( cumgrp, i, "UPDATE", 0, &cum, status );
-        smf_open_file( resgrp, i, "UPDATE", 0, &res, status );
+        smf_open_file( resgrp, i, "UPDATE", 1, &res, status );
         smf_open_file( astgrp, i, "UPDATE", 0, &ast, status );
 
 	for( j=0; j<nmodels; j++ ) {
 	  smf_open_file( modelgrps[j], i, "UPDATE", 0, &modeldata[j], status );
 	}
 
-	/* Call the model calculations in the desired order. The first
-           one should have flags set to 1 to zero the cumulative model */
+	/* Call the model calculations in the desired order. */
 
-	for( j=0; j<nmodels; j++ ) {
-	  msgSetc("MNAME", smf_model_getname(modeltyps[j],status));
-	  msgOut( " ", "  ^MNAME", status);
-	  modelptr = smf_model_getptr( modeltyps[j], status );
-
-	  (*modelptr)( cum, res, keymap, map, mapvar, modeldata[j],
-		       j==0, status ); 	
+	if( *status == SAI__OK ) {
+	  for( j=0; j<nmodels; j++ ) {
+	    
+	    /* Set up control flags for the model calculation */
+	    dimmflags = 0;
+	    if( iter==0 ) dimmflags |= SMF__DIMM_FIRSTITER;
+	    if( j==0 ) dimmflags |= SMF__DIMM_FIRSTCOMP;
+	    
+	    msgSetc("MNAME", smf_model_getname(modeltyps[j],status));
+	    msgOut( " ", "  ^MNAME", status);
+	    modelptr = smf_model_getptr( modeltyps[j], status );
+	    
+	    if( *status == SAI__OK ) {
+	      (*modelptr)( cum, res, keymap, map, mapvar, modeldata[j],
+			   dimmflags, status );
+	    }
+	  }
 	}
 
         /* Close files */
