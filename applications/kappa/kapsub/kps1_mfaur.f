@@ -77,6 +77,8 @@
 *        Original version.
 *     2007 January 17 (MJC):
 *        Used an NDF section for the padded region being averaged.
+*     2007 March 5 (MJC):
+*        Trim two workspaces to required sizes.
 *     {enter_further_changes_here}
 
 *-
@@ -117,9 +119,6 @@
                                  ! i/p pixel 1
       CHARACTER DTYPE *( NDF__SZFTP ) ! Numeric type for output arrays
       INTEGER EL                 ! Number of mapped elements
-      INTEGER ELWS1              ! Number of elements in summation 
-                                 ! workspace
-      INTEGER ELWS2              ! No. of elements in counting workspace
       INTEGER I                  ! Loop counter
       INTEGER IDIMS( NDF__MXDIM ) ! Dimensions of input NDF
       INTEGER IERR               ! Position of first error (dummy)
@@ -197,25 +196,12 @@
       CALL KPG1_MAP( NDFS, 'Data', ITYPE, 'READ', PNTRI, EL, STATUS )
 
 *  Obtain workspace for the averaged spectrum.
-      CALL PSX_CALLOC( IDIMS( DTAXIS ), ITYPE, IPAL, STATUS )
-
-*  Set the quantity of workspace required for averaging.  In order to
-*  save time by not annulling and then re-creating slightly
-*  different-sized summation work arrays, the first is made
-*  sufficiently large to to satisfy all requests.  Also set the type of
-*  the space for counting required by the appropriate averaging
-*  subroutine.
-      ELWS1 = 1
-      DO I = 1, NDIM
-         ELWS1 = MAX( ELWS1, IDIMS( I ) )
-      END DO
-      ELWS1 = ELWS1 * 2
-      ELWS2 = IDIMS( 1 )
+      CALL PSX_CALLOC( ODIMS( DTAXIS ), ITYPE, IPAL, STATUS )
 
 *  Obtain some workspace for the averaging and map them.  First find
 *  the quantity and the type of the counting space required.
-      CALL PSX_CALLOC( ELWS1, ITYPE, WPNTR1, STATUS )
-      CALL PSX_CALLOC( ELWS2, '_INTEGER', WPNTR2, STATUS )
+      CALL PSX_CALLOC( IDIMS( 1 ), ITYPE, WPNTR1, STATUS )
+      CALL PSX_CALLOC( IDIMS( 1 ), '_INTEGER', WPNTR2, STATUS )
 
 *  Average the lines in the section.  The routine expects at least two
 *  dimensions.
