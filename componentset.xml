@@ -648,7 +648,7 @@ and its coordinates are displayed.
 </component>
 
 <component id="gaia" support="S">
-  <version>3.3-7</version>
+  <version>3.3-8</version>
   <path>applications/gaia</path>
   <description>GAIA - Graphical Astronomy and Image Analysis</description>
   <abstract><p>
@@ -856,7 +856,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>1.6-5</version>
+  <version>1.7</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
