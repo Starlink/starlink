@@ -399,7 +399,7 @@ void findclumps( int *status ) {
 *     consecutive clumps have been fitted all of which have peak values less 
 *     than the threshold value specified by the "Thresh" parameter. [10]
 *     - GaussClumps.RMS: The global RMS noise level in the data. The
-*     defaultvalue is the value supplied for parameter RMS. []
+*     default value is the value supplied for parameter RMS. []
 *     - GaussClumps.S0: The Chi-square stiffness parameter "S0" which 
 *     encourages the peak amplitude of each fitted gaussian to be below 
 *     the corresponding maximum value in the observed data (see the Stutski 
@@ -587,7 +587,7 @@ void findclumps( int *status ) {
 *     occuring value within a 3x3x3 cube (or 2x2 square for 2D data) of input 
 *     pixels centred on the output pixel. [1]
 *     - Reinhold.RMS: The global RMS noise level in the data. The
-*     defaultvalue is the value supplied for parameter RMS. []
+*     default value is the value supplied for parameter RMS. []
 *     - Reinhold.VeloRes: The velocity resolution of the instrument, in
 *     channels. The velocity width of each clump written to the output 
 *     catalogue is reduced (in quadrature) by this amount. [2.0]
@@ -632,7 +632,7 @@ void findclumps( int *status ) {
 *     considered to be in the noise. No walk will start from a pixel with 
 *     data value less than this value. [2*RMS]
 *     - FellWalker.RMS: The global RMS noise level in the data. The
-*     defaultvalue is the value supplied for parameter RMS. []
+*     default value is the value supplied for parameter RMS. []
 *     - FellWalker.VeloRes: The velocity resolution of the instrument, in
 *     channels. The velocity width of each clump written to the output 
 *     catalogue is reduced (in quadrature) by this amount. [2.0]
