@@ -75,7 +75,7 @@ void findclumps( int *status ) {
 *  Description:
 *     This application identifies clumps of emission within a 1, 2 or 3 
 *     dimensional NDF. It is assumed that any background has already been
-*     removed form the data array. Information about the clumps is returned 
+*     removed from the data array. Information about the clumps is returned 
 *     in several different ways:
 *
 *     - A pixel mask identifying pixels as background, clump or edge
@@ -193,7 +193,7 @@ void findclumps( int *status ) {
 *        Gaussian clump models including a global background level chosen to 
 *        make the mean output value equal to the mean input value. If METHOD 
 *        is ClumpFind, FellWalker or Reinhold, each pixel in the output is 
-*        the integer index of clump to which the pixel has been assigned. 
+*        the integer index of the clump to which the pixel has been assigned. 
 *        Bad values are stored for pixels which are not part of any clump. 
 *        The output NDF will inherit the AXIS and WCS components (plus any 
 *        extensions) from the input NDF.
