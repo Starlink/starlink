@@ -66,6 +66,8 @@
 *        Original version.
 *     2007 January 11 (MJC):
 *        Used reordered argument in KPS1_LFTS.
+*     2007 March 6 (MJC):
+*        Correct declared type of WORK1 array.
 *     {enter_further_changes_here}
 
 *-
@@ -138,7 +140,7 @@
       DOUBLE PRECISION STDEVC    ! Std. devn. of pixels after clipping
       DOUBLE PRECISION SUM       ! Sum of pixels in array
       DOUBLE PRECISION SUMC      ! Sum of pixels after clipping
-      INTEGER WORK1( OP1 )       ! Workspace
+      DOUBLE PRECISION WORK1( OP1 ) ! Workspace
       INTEGER WORK2( OP1 )       ! Workspace
 
 *  Internal References:
@@ -178,8 +180,8 @@
      :                      IERR, NERR, STATUS )
 
 *  Form the residuals from the fit.
-         CALL KPS1_LFTS<T>( ORDER, AXIS, .TRUE., 
-     :                      DIMS, COEFF, %VAL( CNF_PVAL( IPRES ) ), STATUS )
+         CALL KPS1_LFTS<T>( ORDER, AXIS, .TRUE., DIMS, COEFF, 
+     :                      %VAL( CNF_PVAL( IPRES ) ), STATUS )
 
 *  Derive the statistics of the residuals to the fit.
          CALL KPG1_STAT<T>( BAD, EL, %VAL( CNF_PVAL( IPRES ) ),
