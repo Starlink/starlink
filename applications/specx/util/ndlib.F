@@ -44,9 +44,9 @@ C       Autoconf symbols
       IMPLICIT NONE
       CHARACTER COM*(*)
       INTEGER ISTATUS
-#if HAVE_INTRINSIC_SH
+#if HAVE_INTRINSIC_SH || HAVE_SH
       INTEGER SH
-#elif HAVE_INTRINSIC_SYSTEM
+#elif HAVE_INTRINSIC_SYSTEM || HAVE_SYSTEM
       INTEGER SYSTEM
 #else
   error "Unable to run system commands"
@@ -54,7 +54,7 @@ C       Autoconf symbols
 
 *     Execute the system command
 
-#if HAVE_INTRINSIC_SH
+#if HAVE_INTRINSIC_SH || HAVE_SH
       ISTATUS = SH(COM)    ! SH is far faster than SYSTEM on many systems
 #else
       ISTATUS = SYSTEM(COM)
