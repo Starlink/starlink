@@ -54,7 +54,7 @@
 #elif FC_RECL_UNIT == 4
       PARAMETER ( BYTEPRU = 4 )
 #else
-#           error "Unrecognized FC_RECL_UNIT"
+   error "Unrecognized FC_RECL_UNIT"
 #endif
 
 *  Ok, go...
