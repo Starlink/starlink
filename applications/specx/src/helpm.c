@@ -2,7 +2,7 @@
 #include "star/shl.h"
 #include <stdlib.h>
 
-#ifdef FC_MAIN
+#if HAVE_FC_MAIN
 void FC_MAIN() {}
 #endif
 
