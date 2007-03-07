@@ -24,7 +24,11 @@ AC_PROG_FC
 AC_PROG_FPP
 AC_PROG_LIBTOOL
 AC_FC_LIBRARY_LDFLAGS
+
+dnl    Push Fortran for Fortran tests.
+AC_LANG_PUSH([Fortran])
 AC_FC_CHECK_INTRINSICS([ SH SYSTEM ])
+AC_CHECK_FUNCS([ SH SYSTEM ])
 AC_FC_RECL_UNIT
 AC_FC_OPEN_SPECIFIERS(readonly)
 AC_FC_OPEN_SPECIFIERS(access='append')
@@ -38,6 +42,9 @@ dnl    Check whether we have X'' or ''X notation
 AC_FC_HAVE_OLD_TYPELESS_BOZ()
 AC_FC_HAVE_TYPELESS_BOZ()
 AC_FC_HAVE_BOZ
+
+dnl    Finished Fortran tests.
+AC_LANG_POP([Fortran])
 
 dnl    In some cases readline requires stdio.h to be pre-loaded
 AC_CHECK_HEADERS([readline/readline.h],,,[#include <stdio.h>])
