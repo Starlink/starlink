@@ -157,6 +157,8 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *  History:
 *     29-SEP-2005 (DSB):
 *        Original version.
+*     7-MAR-2007 (DSB):
+*        Use VELORES instead of FWHMBEAM if the data is 1D.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -237,12 +239,17 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    "gcconfig" KeyMap. */
    astMapPut0A( gcconfig, CUPID__CONFIG, astCopy( config ), NULL );
 
-/* Return the instrumental smoothing FWHMs */
-   beamcorr[ 0 ] = cupidConfigD( gcconfig, "FWHMBEAM", 2.0, status );
-   beamcorr[ 1 ] = beamcorr[ 0 ];
-   if( ndim == 3 ) {
-      beamcorr[ 2 ] = beamcorr[ 0 ];
-      beamcorr[ velax ]= cupidConfigD( gcconfig, "VELORES", 2.0, status );
+/* Return the instrumental smoothing FWHMs. For 1D data, we assume the
+   axis is spectral and so use VELORES instead of FWHMBEAM.  */
+   if( ndim == 1 ) {
+      beamcorr[ 0 ] = cupidConfigD( gcconfig, "VELORES", 2.0, status );
+   } else {
+      beamcorr[ 0 ]= cupidConfigD( gcconfig, "FWHMBEAM", 2.0, status );
+      beamcorr[ 1 ] = beamcorr[ 0 ];
+      if( ndim == 3 ) {
+         beamcorr[ 2 ] = beamcorr[ 0 ];
+         beamcorr[ velax ]= cupidConfigD( gcconfig, "VELORES", 2.0, status );
+      }
    }
 
 /* See if extra diagnostic info is required. */

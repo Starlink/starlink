@@ -4,8 +4,8 @@
 
 double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims, 
                                         int imax, int *ax_max, int ax, 
-                                        double rms, double *off, double *cen,
-                                        int *status ){
+                                        double rms, double fwhm, double *off, 
+                                        double *cen, int *status ){
 /*
 *+
 *  Name:
@@ -20,7 +20,8 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 *  Synopsis:
 *     double cupidGCProfWidth<X>( CGEN_TYPE *array, int ndim, int *dims, 
 *                                 int imax, int *ax_max, int ax, double rms, 
-*                                 double *off, double *cen, int *status )
+*                                 double fwhm, double *off, double *cen, 
+*                                 int *status )
 
 *  Description:
 *     This functions produces an initial estimate of the width and
@@ -52,10 +53,13 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 *        is to be taken.
 *     rms
 *        The RMS noise level in the array.
+*     fwhm
+*        The user-supplied instrument beam width, in pixels.
 *     off
 *        Address of a location containing a double value to which to add
 *        the estimate of the background data value (i.e. the mean of the
-*        two minima).
+*        two minima). This is an absolute data value (i.e. not normalised
+*        to units of "rms").
 *     cen
 *        A location at which to return an improved estimate of the 
 *        GRID coordinate of the profile peak, on axis "ax".
@@ -102,6 +106,9 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 *  History:
 *     5-OCT-2005 (DSB):
 *        Original version.
+*     7-MAR-2005 (DSB):
+*        Improvements to width estimation algorithm to cater for high
+*        noise situations.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -111,12 +118,13 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 */
 
 /* Local Variables: */
-
+   double clump_sum;     /* Sum of pixel values in clump */
+   double prev;          /* Previous data value */
    double ret;           /* Sum of weighted axis values */
+   double sum;           /* Sum of pixel values found since the last minimum */
    double v1low;         /* Lowest data value found so far */
    double v2low;         /* Lowest data value found so far */
    double v;             /* Mean value at two profile points */
-   double vlim;          /* Data value at half maximum */
    int hiwid;            /* Half width on higher axis values */
    int i1;               /* Vector index at lower of two profile points */
    int i1low;            /* Vtecor index at lowest pixel */
@@ -127,6 +135,7 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
    int j2;               /* Axis value at upper of two profile points */
    int j2low;            /* Radius at lowest pixel */
    int lowid;            /* Half width on lower axis values */
+   int nsum;             /* No. of pixel values summed in "sum" */
    int step;             /* Vector step between adjacent pixels on an axis */
 
 /* Initialise */
@@ -149,7 +158,7 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 
 /* First move out away from the peak to higher axis values, looking for a
    significant minimum in the data value along the axis. Initialise the GRID 
-   axis value and vector index of the current pixel to be the pixelnext
+   axis value and vector index of the current pixel to be the pixel next
    to the peak pixel. */
    j2 = ax_max[ ax ] + 1;
    i2 = imax + 1;
@@ -158,6 +167,18 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
    v2low = (double) array[ imax ];
    j2low = 0;
 
+/* Initialise the sum of all pixel values subsequent to the most recent
+   minimum value. Also set the number of values summed in "sum" to zero. */
+   sum = 0.0;
+   nsum = 0;
+
+/* Initialise the total data value in the clump up to the current minimum 
+   pixel. */
+   clump_sum = 0.0;
+
+/* We have no previous value as yet. */
+   prev = VAL__BADD;
+
 /* Loop round extending the profile to larger radii until the first 
    significant minimum is found in the profile. */
    while( j2 <= dims[ ax ] ) {
@@ -165,26 +186,40 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 /* Ignore bad pixels */
       if( array[ i2 ] != CGEN_BAD ) {
 
-/* Get the pixel value. */
+/* Get the pixel value, and increment the clump sum. */
          v = (double) array[ i2 ];
+         clump_sum += v;
 
-/* If this value is lower than the previous lowest value, remember it. */
-         if( v < v2low ) {
+/* If this value is lower than the previous lowest value, but not more
+   than 1.5*rms lower than the previous value, remember it. Also reset the 
+   values that are used to find the mean of the pixel values that follow 
+   this minimum. */
+         if( v < v2low && prev != VAL__BADD && prev - v < 1.5*rms) {
             v2low = v;
             j2low = j2;
             i2low = i2;
+            sum = 0.0;
+            nsum = 0;
 
-/* Otherwise, if this value is more than the RMS noise higher
-   than the lowest value found so far, we assume that the lowest value
-   found so far is the minimum point in the profile. */
-         } else if( v > v2low + rms ){
-            break;
-
-/* Otherwise, if the lowest pixel has not changed for the past 3 pixels, 
-   assume we have reached the flat bit of the profile. */
-         } else if( j2 - j2low > 3 ) {
-            break;
+/* Otherwise, update the sum of hte values found since the last minimum,
+   and see if the mean of these values exceeds the minimum value by a
+   significant amount. Here, "significant" means three times the standard
+   error on the mean. We also require at least "fwhm" pixel to have been
+   tested since the last minimum. If both these conditions are passed,
+   accept the current lowest pixel value as the end of the clump. */
+         } else {
+            sum += v;
+            nsum++;
+   
+            if( sum/nsum - v2low >= 3*rms/sqrt( (double) nsum ) &&
+                nsum >= fwhm ) break;
          }
+
+/* Remember the previous value. */
+         prev = v;
+
+      } else {
+         prev = VAL__BADD;
       }
 
 /* Increment the GRID axis value and vector index of the current pixel. */
@@ -192,20 +227,24 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
       i2 += step;
    }
 
-/* Determine the data value at half max on the upper side of the peak. */
+/* The lowest pixel value will underestimate the background. Add on the
+   noise level to provide som ecorrection for this. */
    v2low += rms;
-   vlim = 0.5*( (double) array[ imax ] - v2low ) + v2low;
 
-/* Now rescan the same pixels looking for the first pixel which is less
-   than this half max value. Note the distance in pixels from this point
-   to the peak. */
+/* Correct the clump sum by removing the sum of the pixels subsequent to
+   the minimum pixel value. */
+   clump_sum -= sum;
+
+/* Find the radial point that contains 76% of the clump data sum (this
+   corresponds to the FWHM point in a Gaussian). */
    j2 = ax_max[ ax ] + 1;
    i2 = imax + 1;
-   hiwid = 5;
-   while( j2 <= dims[ ax ] ) {
+   sum = 0.0;
+   clump_sum *= 0.76;
+   while( j2 <= j2low ) {
       if( array[ i2 ] != CGEN_BAD ) {
-         v = (double) array[ i2 ];
-         if( v < vlim ) {
+         sum += (double) array[ i2 ];
+         if( sum > clump_sum ) {
             hiwid = j2 - ax_max[ ax ];
             break;
          }
@@ -221,22 +260,37 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
    v1low = (double) array[ imax ];
    j1low = 0;
 
+   clump_sum = 0.0;
+   sum = 0.0;
+   nsum = 0;
+
+   prev = VAL__BADD;
+
    while( j1 > 0 ) {
 
       if( array[ i1 ] != CGEN_BAD ) {
          v = (double) array[ i1 ];
+         clump_sum += v;
 
-         if( v < v1low ) {
+         if( v < v1low && prev != VAL__BADD && prev - v < 1.5*rms) {
             v1low = v;
             j1low = j1;
             i1low = i1;
+            sum = 0.0;
+            nsum = 0;
 
-         } else if( v > v1low + 3*rms ){
-            break;
+         } else {
+            sum += v;
+            nsum++;
 
-         } else if( j1 - j1low > 10 ) {
-            break;
+            if( sum/nsum - v1low >= 3*rms/sqrt( (double) nsum ) &&
+                nsum >= fwhm ) break;
          }
+
+         prev = v;
+
+      } else { 
+         prev = VAL__BADD;
       }
 
       j1--;
@@ -244,15 +298,17 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
    }
 
    v1low += rms;
-   vlim = 0.5*( (double) array[ imax ] - v1low ) + v1low;
+
+   clump_sum -= sum;
 
    j1 = ax_max[ ax ] - 1;
    i1 = imax - 1;
-   lowid = 5;
-   while( j1 > 0 ) {
+   sum = 0.0;
+   clump_sum *= 0.76;
+   while( j1 >= j1low ) {
       if( array[ i1 ] != CGEN_BAD ) {
-         v = (double) array[ i1 ];
-         if( v < vlim ) {
+         sum += (double) array[ i1 ];
+         if( sum > clump_sum ) {
             lowid = ax_max[ ax ] - j1;
             break;
          }
@@ -264,7 +320,7 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 /* Form the total width at half max. */   
    ret = lowid + hiwid;
 
-/* Increment the sum of hte offsets using the mean of the two minimum
+/* Increment the sum of the offsets using the mean of the two minimum
    values. */
    *off += 0.5*( v1low + v2low );
 

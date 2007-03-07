@@ -7,6 +7,14 @@
  data arrays.
 
 
+Changes introduced at V0.0-27:
+
+ - The algorithm used to make the initial guess at the clump size when
+   using GaussClumps has been improved to better cater for high noise cases.
+ - For 1D data, the VeloStart and VeloRes configuration parameers are bow
+   used instead of FWHMStart and FWHMBeam (since 1D data is usually
+   spectral).
+
 Changes introduced at V0.0-26:
 
  - Fix a bug that could cause an error to be reported saying "supplied
