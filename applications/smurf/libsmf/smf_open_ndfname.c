@@ -59,11 +59,14 @@
 *  History:
 *     2006-08-04 (JB):
 *        Cloned from smf_open_ndf & smf_get_ndfid
+*     2007-03-07 (AGG):
+*        Initialize output smfData to NULL before checking status to
+*        ensure a NULL pointer in case of error
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2006-2007 University of British Columbia. All
+*     Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -128,6 +131,9 @@ void smf_open_ndfname( const HDSLoc *loc, char *accmode, char *filename,
   int place;                    /* Placeholder for NDF */
   int temp;                     /* Temporary integer to convert to dim_t */
 
+  /* Initialize the output smfData to NULL pointer */
+  *ndfdata = NULL;
+
   if ( *status != SAI__OK ) return;
 
   /* Check to see if the HDS Locator is null and retrieve the NDF id */
@@ -158,9 +164,6 @@ void smf_open_ndfname( const HDSLoc *loc, char *accmode, char *filename,
     }
   }
   
-  /* Initialize the output smfData to NULL pointer */
-  *ndfdata = NULL;
-
   /* Get the dtype */
   smf_string_to_dtype ( dattype, &dtype, status );
 
