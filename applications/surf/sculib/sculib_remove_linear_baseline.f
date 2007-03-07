@@ -86,6 +86,7 @@
       INCLUDE 'SAE_PAR'               ! SSE global definitions
       INCLUDE 'PRM_PAR'               ! VAL__ constants
       INCLUDE 'MSG_PAR'               ! MSG__ constants
+      INCLUDE 'CNF_PAR'               ! CNF_PVAL function
 
 *  Arguments Given:
       BYTE    BADBIT
@@ -159,7 +160,6 @@
 
 *     Local References:
       INCLUDE 'NDF_FUNC'
-      INCLUDE 'CNF_PAR'
 
 *.
 

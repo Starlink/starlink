@@ -60,6 +60,9 @@
 *     1996 November 17 (TIMJ):
 *       Original version
 *     $Log$
+*     Revision 1.10  2007/03/07 13:49:11  pdraper
+*     Move CNF_PAR declarations out of the executable code.
+*
 *     Revision 1.9  2006/05/03 22:05:43  timj
 *     protect against all data being bad. Minor other fixes for bad data
 *
@@ -97,6 +100,7 @@
       INCLUDE 'PRM_PAR'               ! VAL__ constants
       INCLUDE 'SAE_PAR'               ! SSE global definitions
       INCLUDE 'MSG_PAR'               ! MSG__ constants
+      INCLUDE 'CNF_PAR'               ! CNF_PVAL function
 
 *  Arguments Given:
       LOGICAL ADD_BACK
@@ -152,7 +156,6 @@
 
 *    External functions:
       INCLUDE 'NDF_FUNC'
-      INCLUDE 'CNF_PAR'
 *.
 
 

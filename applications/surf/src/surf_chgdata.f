@@ -147,6 +147,7 @@
       INCLUDE 'PRM_PAR'                   ! for VAL__NBx
       INCLUDE 'SURF_PAR'                  ! SURF constants
       INCLUDE 'MSG_PAR'                   ! MSG__ constants
+      INCLUDE 'CNF_PAR'                   ! CNF_PVAL function
 
 *  Arguments Given:
 
@@ -245,7 +246,6 @@
 *  External:
       INCLUDE 'NUM_DEC_CVT'               ! Convert UB to integer
       INCLUDE 'NUM_DEF_CVT'               ! Function definitions
-      INCLUDE 'CNF_PAR'                   ! For CNF_PVAL function
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN

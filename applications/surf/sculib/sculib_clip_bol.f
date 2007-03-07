@@ -49,6 +49,9 @@
 *     1996 November 17 (TIMJ):
 *       Original version
 *     $Log$
+*     Revision 1.11  2007/03/07 13:49:11  pdraper
+*     Move CNF_PAR declarations out of the executable code.
+*
 *     Revision 1.10  2004/09/01 00:52:22  timj
 *     use CNF_PVAL
 *
@@ -88,6 +91,7 @@
 *  Global Constants:
       INCLUDE 'PRM_PAR'               ! VAL__ constants
       INCLUDE 'SAE_PAR'               ! SSE global definitions
+      INCLUDE 'CNF_PAR'               ! CNF_PVAL function
 
 *  Arguments Given:
       INTEGER N_POS
@@ -126,7 +130,6 @@
 
 *    External functions:
       INCLUDE 'NDF_FUNC'
-      INCLUDE 'CNF_PAR'
 
 *.
 
