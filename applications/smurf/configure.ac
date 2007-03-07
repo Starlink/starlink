@@ -46,7 +46,7 @@ AC_ARG_WITH(gsl,
 if test -n "$gslextrapath"; then
         if test "$gslextrapath" != default; then
            CPPFLAGS="$CPPFLAGS -I$gslextrapath/include"
-           LIBS="$LIBS -L$gslextrapath/lib"
+           LDFLAGS="$LDFLAGS -L$gslextrapath/lib"
         fi
 fi
 
@@ -66,7 +66,7 @@ AC_ARG_WITH(expat,
 if test -n "$epextrapath"; then
 	if test "$epextrapath" != default; then
 	   CPPFLAGS="$CPPFLAGS -I$epextrapath/include"
-	   LIBS="$LIBS -L$epextrapath/lib"
+	   LDFLAGS="$LDFLAGS -L$epextrapath/lib"
 	fi
 fi
 
@@ -86,14 +86,14 @@ AC_ARG_WITH(netcdf,
 if test -n "$ncextrapath"; then
 	if test "$ncextrapath" != default; then
 	   CPPFLAGS="$CPPFLAGS -I$ncextrapath/include"
-	   LIBS="$LIBS -L$ncextrapath/lib"
+	   LDFLAGS="$LDFLAGS -L$ncextrapath/lib"
 	fi
 fi
 
 
 
 dnl    External libraries
-LIBS="$LIBS -L/usr/lib64"
+LDFLAGS="$LDFLAGS -L/usr/lib64"
 AC_CHECK_LIB( [gslcblas], [cblas_dsdot], [], [
          echo "Error! Couldn't find libgslcblas. Retry with --with-gsl option?"
         exit -1
