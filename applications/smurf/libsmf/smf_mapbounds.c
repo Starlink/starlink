@@ -4,7 +4,8 @@
 *     smf_mapbounds
 
 *  Purpose:
-*     Automatically calculate the pixel bounds for a map given a projection
+*     Automatically calculate the pixel bounds and FrameSet for a map
+*     given a projection
 
 *  Language:
 *     Starlink ANSI C
@@ -82,6 +83,9 @@
 *     2007-02-20 (DSB):
 *        Modify check for object movement to take account of the
 *        difference in epoch between the first and last time slices.
+*     2007-03-07 (AGG):
+*        Annul relevant AST objects every time slice to minimize
+*        memory usage
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -150,13 +154,13 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
   AstFitsChan *fitschan = NULL;/* Fits channels to construct WCS header */
   AstFrameSet *fs = NULL;      /* A general purpose FrameSet pointer */
   smfHead *hdr = NULL;         /* Pointer to data header this time slice */
-  dim_t i;                     /* Loop counter */
+  int i;                       /* Loop counter */
   int ibasein;                 /* Index of base Frame in input FrameSet */
-  dim_t j;                     /* Loop counter */
+  int j;                       /* Loop counter */
   dim_t k;                     /* Loop counter */
   char *pname = NULL;          /* Name of currently opened data file */
   double ra[ 2 ];              /* RA values */
-  double sep;                  /* Separation between first and last base positions */
+  double sep = 0;              /* Separation between first and last base positions */
   AstFrame *sf1 = NULL;        /* Spatial Frame representing AZEL system */
   AstFrame *sf2 = NULL;        /* Spatial Frame representing requested system */
   double shift[ 2 ];           /* Shifts from PIXEL to GRID coords */
@@ -181,8 +185,10 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
   *outframeset = NULL;
   *moving = 0;
 
+  astBegin;
+
   /* Loop over all files in the Grp */
-  for(i=1; i<=size; i++ ) {
+  for( i=1; i<=size; i++ ) {
     /* Read data from the ith input file in the group */      
     smf_open_file( igrp, i, "READ", 1, &data, status );
     
@@ -213,6 +219,7 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
 	/* If OK Decide which detectors (GRID coord) to use for
 	   checking bounds, depending on the instrument in use. */
 	hdr = data->hdr;  
+
 	switch( hdr->instrument ) {
 	  
 	case INST__SCUBA2:
@@ -295,6 +302,7 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
           azel2usesys = astConvert( sf1, skyframe, "" );
           astTran2( azel2usesys, 1, &(hdr->state->tcs_az_bc1),
                     &(hdr->state->tcs_az_bc2), 1, skyref, skyref+1 );
+          azel2usesys = astAnnul( azel2usesys );
           astNorm( skyframe, skyref );
 
 	  /* Determine if the telescope is tracking a moving target
@@ -311,7 +319,6 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
                ("sf1" already represents AZEL coords). */
             sf2 = astCopy( skyin );
             astSetC( sf2, "System", "ICRS" );
-
 
             /* Set the Epoch for `sf1' andf `sf2' to the epoch of the
 	    first time slice, then use the Mapping from `sf1' (AzEl) to
@@ -341,7 +348,8 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
             astTran2( astConvert( sf1, sf2, "" ), 1, az + 1, el + 1, 1, 
                                                      ra + 1, dec + 1 );
 
-
+	    sf1 = astAnnul( sf1 );
+	    sf2 = astAnnul( sf2 );
             /* Get the arc distance between the two positions and
                see if it is greater than 0.1 arc-sec. */
             sep = slaDsep( ra[ 0 ], dec[ 0 ], ra[ 1 ], dec[ 1 ] );
@@ -351,7 +359,7 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
           }
 	  /* Just for kicks, let the user know the value of *moving */
           msgSeti("M",*moving);
-          msgSetr("R", sep*AST__DR2D*3600.0 );
+          msgSetd("R", sep*AST__DR2D*3600.0 );
           msgOutif(MSG__VERB, " ", "Moving = ^M (^R arcsec)", status);
         } /* End skyframe construction */
 
@@ -366,8 +374,8 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
           lon_0 = 0.0;
           lat_0 = 0.0;
         } else {
-	  /* If `flag' is not set, then set lon_0/lat_0, else use
-	     values given */
+	  /* If `flag' is set, use lon_0/lat_0 values given, else set
+	     them to the skyref coordinates  */
 	  if ( !flag ) {
 	    lon_0 = skyref[0];
 	    lat_0 = skyref[1];
@@ -401,6 +409,8 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
           astClear( abskyframe, "SkyRefIs" );
           astClear( abskyframe, "AlignOffset" );
 
+	  /* Tidy up */
+	  fs = astAnnul( fs );
 	  /* Create the output FrameSet */
           *outframeset = astFrameSet( astFrame(2, "Domain=GRID"), "");
 
@@ -416,11 +426,11 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
            the target is moving.  Record the original base frame before
            calling astConvert so that it can be re-instated later
            (astConvert modifies the base Frame). */
-        astInvert( swcsin );
-        ibasein = astGetI( swcsin, "BASE" );
+	astInvert( swcsin );
+	ibasein = astGetI( swcsin, "BASE" );
         fs = astConvert( swcsin, abskyframe, "SKY" );
-        astSetI( swcsin, "BASE", ibasein );
-        astInvert( swcsin );
+	astSetI( swcsin, "BASE", ibasein );
+	astInvert( swcsin );
 
         /* The "fs" FrameSet has input GRID coords as its base Frame,
            and output (absolute) sky coords as its current frame. If
@@ -494,6 +504,12 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
             if( y_map[k] > ubnd_out[1] ) ubnd_out[1] = y_map[k];
           }
         }
+	/* Explicitly annul these mappings each time slice for reduced
+	   memory usage */
+	if (bolo2sky) bolo2sky = astAnnul( bolo2sky );
+	if (bolo2map) bolo2map = astAnnul( bolo2map );
+	if (fs) fs = astAnnul( fs );
+	if ( skyin ) skyin = astAnnul( skyin );
 
         /* Break out of loop over time slices if bad status */
         if (*status != SAI__OK) goto CLEANUP;
@@ -501,13 +517,11 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
       /* Annul any remaining Ast objects before moving on to the next file */
       if (fs) fs = astAnnul( fs );
       if (bolo2sky) bolo2sky = astAnnul( bolo2sky );
+      if (bolo2map) bolo2map = astAnnul( bolo2map );
     }
 
     /* Close the data file */
-    if( data != NULL ) {
-      smf_close_file( &data, status);
-      data = NULL;
-    }
+    smf_close_file( &data, status);
 
     /* Break out of loop over data files if bad status */
     if (*status != SAI__OK) goto CLEANUP;
@@ -520,6 +534,8 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
   astRemapFrame( *outframeset, AST__BASE, astShiftMap( 2, shift, "") );
 
   astSetC( *outframeset, "SYSTEM", usesys );
+
+  astExport( *outframeset );
 
   /* Change the pixel bounds to be consistent with the new CRPIX */
 
@@ -539,5 +555,7 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
 
   if( data != NULL )
     smf_close_file( &data, status );
+
+  astEnd;
 
 }
