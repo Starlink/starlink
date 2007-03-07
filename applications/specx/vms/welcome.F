@@ -63,12 +63,12 @@
       INTEGER LIB$SPAWN
 #else
 
-#  if HAVE_INTRINSIC_SH
+#  if HAVE_INTRINSIC_SH || HAVE_SH
       INTEGER SH
-#  elif HAVE_INTRINSIC_SYSTEM
+#  elif HAVE_INTRINSIC_SYSTEM || HAVE_SYSTEM
       INTEGER SYSTEM
 #  else
-#  error "Do not know how to fork a shell"
+   error "Do not know how to fork a shell"
 #  endif
 
 #endif
@@ -91,8 +91,7 @@ C     Translate the environment variable
 
 C  SH is much faster but is not available on all unix systems
 
-#if HAVE_INTRINSIC_SH
-
+#if HAVE_INTRINSIC_SH || HAVE_SH
       STATUS = SH('more ' // SYS_SPECX(:GEN_ILEN(SYS_SPECX)) //
      :   '/specx_welcome.txt' )
 
