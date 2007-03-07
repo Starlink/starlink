@@ -289,6 +289,9 @@ void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outfset,
   if ( bolo2map ) bolo2map = astAnnul( bolo2map );
   if ( fs ) fs = astAnnul( fs );
 
+  if ( abskyfrm ) abskyfrm = astAnnul( abskyfrm );
+  if ( oskyfrm ) oskyfrm = astAnnul( oskyfrm );
+
   if ( *status != SAI__OK ) {
     errRep( "", "Rebinning step failed", status );
   }
