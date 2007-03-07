@@ -123,10 +123,13 @@
 *     20-FEB-2007 (DSB):
 *        Change the check for target movement to take account of the
 *        difference in epoch between the first and last time slices.
+*     07-MAR-2007 (TIMJ):
+*        Given pointing accuracy of JCMT change coincident check to
+*        use 1 arcsec rather than 0.4.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2006,2007 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -634,13 +637,13 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
                  status );
 
 /* If the automatic grid determination algorithm failed, see if all the
-   points are effectively co-incident (i.e. within a radius of 0.4
+   points are effectively co-incident (i.e. within a radius of 1.0
    arcsec). If so, we use default grid parameters that result in a grid
    of 1x1 spatial pixels. The grid pixel sizes (par[4] and par[5]) are
    made twice the size of the area covered by the points in order to
    avoid points spanning two pixels. */
       if( par[ 0 ] == AST__BAD || nallpos < 3 ) {
-         if( rdiam < 0.4*AST__DD2R/3600.0 ) {
+         if( rdiam < 1.0*AST__DD2R/3600.0 ) {
             if( rdiam < 0.1*AST__DD2R/3600.0 ) rdiam = 0.1*AST__DD2R/3600.0;
             par[ 0 ] = 0.0;
             par[ 1 ] = 0.0;
