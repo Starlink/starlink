@@ -109,6 +109,9 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 *     7-MAR-2005 (DSB):
 *        Improvements to width estimation algorithm to cater for high
 *        noise situations.
+*     8-MAR-2005 (DSB):
+*        Initilaise "hiwid" and "lowid" in case no other suitable values
+*        are found.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -237,6 +240,7 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 
 /* Find the radial point that contains 76% of the clump data sum (this
    corresponds to the FWHM point in a Gaussian). */
+   hiwid = j2low - ax_max[ ax ];
    j2 = ax_max[ ax ] + 1;
    i2 = imax + 1;
    sum = 0.0;
@@ -301,6 +305,7 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 
    clump_sum -= sum;
 
+   lowid = ax_max[ ax ] - j1low;
    j1 = ax_max[ ax ] - 1;
    i1 = imax - 1;
    sum = 0.0;
