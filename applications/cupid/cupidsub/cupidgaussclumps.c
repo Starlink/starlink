@@ -302,7 +302,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Get the lowest value (normalised to the RMS noise level) at which
    model Gaussians should be evaluated. */
-      mlim = cupidConfigD( gcconfig, "MODELLIM", 3.0, status );
+      mlim = cupidConfigD( gcconfig, "MODELLIM", 1.0, status );
 
 /* Get the max allowed number of bad pixels in a clump. */
       maxbad = cupidConfigI( gcconfig, "MAXBAD", 4, status );
@@ -388,6 +388,13 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* If not, make an initial guess at the Gaussian clump parameters centred
    on the current peak. */
          if( iter ) {
+
+
+if( niter == 25 ) {
+   cupidGCDumpF( (float *) res, ndim, dims, "test1dump", status );
+}
+
+
             cupidGCSetInit( type, res, ipv, ndim, dims, imax, rms, gcconfig,
                             ( niter == 1 ), velax, x, slbnd, status );
 
