@@ -385,10 +385,19 @@
 *     TSYS array (also stored in the SMURF extension of the output NDF). If 
 *     any of these values cannot be calculated for any reason, the 
 *     corresponding FITS keyword is assigned a blank value.
+*     - FITS keywords PROVCNT and OBSnnnnn are added to the output FITS
+*     extension. These allow for tracking of OBSID FITS headers from the
+*     input files. If the OBSID FITS header exists in input files, unique
+*     ones from the set of input files are stored in the OBSnnnnn headers,
+*     where nnnnn is a zero-padded integer starting at 1. PROVCNT contains
+*     the count of unique input OBSID headers. If none of the input files
+*     contain an OBSID header, then PROVCNT will exist in the output file
+*     with a value of 0, and no OBSnnnnn headers will exist.
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
 *     David Berry (JAC, UCLan)
+*     Brad Cavanagh (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -459,6 +468,9 @@
 *     21-FEB-2007 (DSB):
 *        - Changed ON_TIME to EFF_TIME.
 *        - Added EFF_TIME FITS header to output.
+*     7-MAR-2007 (BC):
+*        - Added input OBSID FITS header tracking through PROVCNT and
+*        OBSnnnnn output FITS headers.
 
 *  Copyright:
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
@@ -527,6 +539,7 @@ void smurf_makecube( int *status ) {
    AstFrame *tfrm = NULL;     /* Current Frame from output WCS */
    AstFrameSet *wcsout = NULL;/* WCS Frameset for output cube */
    AstFrameSet *wcsout2d = NULL;/* WCS Frameset describing 2D spatial axes */
+   AstKeyMap *keymap = NULL;  /* KeyMap to hold unique OBSID headers */
    AstMapping *oskymap = NULL;/* GRID->SkyFrame Mapping from output WCS */
    AstMapping *ospecmap = NULL;/* GRID->SpecFrame Mapping from output WCS */
    AstMapping *tmap = NULL;   /* Base->current Mapping from output WCS */
@@ -537,6 +550,8 @@ void smurf_makecube( int *status ) {
    Grp *ogrp = NULL;          /* Group containing output file */
    HDSLoc *smurf_xloc = NULL; /* HDS locator for output SMURF extension */
    HDSLoc *weightsloc = NULL; /* HDS locator of weights array */
+   char obshdr[12];           /* OBSnnnnn string buffer */
+   char *obsid = NULL;        /* Value of current file's OBSID header */
    char *pname = NULL;        /* Name of currently opened data file */
    char pabuf[ 10 ];          /* Text buffer for parameter value */
    char system[ 10 ];         /* Celestial coord system for output cube */
@@ -577,6 +592,7 @@ void smurf_makecube( int *status ) {
    int ispec;                 /* Index of next spectrum within output NDF */
    int lbnd_out[ 3 ];         /* Lower pixel bounds for output map */
    int lbnd_wgt[ 3 ];         /* Lower pixel bounds for wight array */
+   int len;                   /* Length of string returned from snprintf */
    int moving;                /* Is the telescope base position changing? */
    int ndet;                  /* Number of detectors supplied for "DETECTORS" */
    int nel;                   /* Number of elements in 3D array */
@@ -588,6 +604,7 @@ void smurf_makecube( int *status ) {
    int ondf;                  /* output NDF identifier */
    int outax[ 2 ];            /* Indices of corresponding output axes */
    int outsize;               /* Number of files in output group */
+   int provcnt = 0;           /* Number of unique OBSIDs from input files */
    int savewgt;               /* Should weights be saved in the output NDF? */
    int size;                  /* Number of files in input group */
    int smfflags;              /* Flags for smfData */
@@ -1096,15 +1113,29 @@ void smurf_makecube( int *status ) {
 
 /* If this is the first file, get a copy of the input NDFs FITS extension
    (held in a FitsChan). This FitsChan will be used to hold the FITS
-   header for the output NDF. */
+   header for the output NDF. Add this NDF's OBSID FITS header to the
+   KeyMap, if there is an OBSID header. */
       if( ifile == 1 ) {
          fchan = astCopy( data->hdr->fitshdr );
+
+         keymap = astKeyMap( "" );
+
+         if( astGetFitsS( fchan, "OBSID", &obsid ) ) {
+            astMapPut0I( keymap, obsid, 1, NULL );
+         }
 
 /* If this is not the first file, merge the input NDF's FITS extension
    into the output NDF's FITS extension by removing any headers from the
    output FITS extension that do not have identical values in the input
-   FITS extension. */
+   FITS extension. Also, check to see if the OBSID FITS header is unique
+   and, if so, place it in the KeyMap. Do so before merging the headers
+   in case this information is lost upon merging. */
       } else {
+
+         if( astGetFitsS( data->hdr->fitshdr, "OBSID", &obsid ) ) {
+           astMapPut0I( keymap, obsid, 1, NULL );
+         }
+
          atlMgfts( 3, data->hdr->fitshdr, fchan, &fchan2, status );
          (void) astAnnul( fchan );
          fchan = fchan2;
@@ -1206,6 +1237,26 @@ L999:;
       kpg1Medur( 1, nxy, work2_array, &medtsys, &neluse, status );
       atlPtftr( fchan, "MEDTSYS", medtsys, 
                 "[K] Median MAKECUBE system temperature", status );
+
+/* Retrieve the unique OBSID keys from the KeyMap and populate the OBSnnnnn
+   and PROVCNT headers from this information. */
+      provcnt = astMapSize( keymap );
+      atlPtfti( fchan, "PROVCNT", provcnt,
+                "Number of unique OBSIDs", status );
+      for( i = 0; i < provcnt; i++ ) {
+         len = snprintf( obshdr, 9, "OBS%05d", i+1 );
+         if( len != 8 ) {
+           if( *status == SAI__OK ) {
+             *status = SAI__ERROR;
+             msgSeti( "N", i );
+             errRep( "", "Buffer overflow in setting OBSnnnnn to ^N", status );
+             break;
+           }
+         }
+         obsid = astMapKey( keymap, i );
+         atlPtfts( fchan, obshdr, obsid,
+                   "OBSID from component observation", status );
+      }
 
 /* If the FitsChan is not empty, store it in the FITS extension of the
    output NDF (any existing FITS extension is deleted). */
