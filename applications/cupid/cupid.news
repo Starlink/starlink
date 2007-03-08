@@ -11,7 +11,7 @@ Changes introduced at V0.0-27:
 
  - The algorithm used to make the initial guess at the clump size when
    using GaussClumps has been improved to better cater for high noise cases.
- - For 1D data, the VeloStart and VeloRes configuration parameers are bow
+ - For 1D data, the VeloStart and VeloRes configuration parameters are now
    used instead of FWHMStart and FWHMBeam (since 1D data is usually
    spectral).
 
@@ -40,7 +40,7 @@ Changes introduced at V0.0-22:
 
  - Added new program parameter LOGFILE which can be used to create a text
    log file containing clump values and parameter values.
- - Added new program parameter WCSPAR which can be set TRUE ot get a
+ - Added new program parameter WCSPAR which can be set TRUE to get a
    catalogue containing positions and sizes in WCS coordinates rather than
    pixel coordinates.
  - The configuration parameter GaussClumps.ExtraCOls can be set to 1 to
@@ -52,7 +52,7 @@ Changes introduced at V0.0-21:
 
  - Added new program parameter DECONV which can be set FALSE in order to
    prevent the reported clump sizes and peak values being modified to
-   take account of the instrumenytal beam smoothing.
+   take account of the instrumental beam smoothing.
 
 Changes introduced at V0.0-20:
 
@@ -85,7 +85,7 @@ Changes introduced at V0.0-18:
    GaussClumps.
 
  - Add a signal handler that will allow GaussClumps to save the clumps
-   found so far when interupted using control-c.
+   found so far when interrupted using control-c.
 
  - Change default for FellWalker.CleanIter from 3 to 1 (for greater speed
    and more realistic clump shapes).
@@ -211,7 +211,7 @@ Changes introduced at V0.0-7:
 
  - The output NDF created by the GaussClumps algorithm no longer includes
  the constant background level which was previously added in order to
- make the mean of the output data array equal to the mean of theinput data
+ make the mean of the output data array equal to the mean of the input data
  array. This brings it into line with the other algorithms which assume
  zero background level.
 
@@ -280,7 +280,7 @@ Changes introduced at V0.0-4:
  - The FellWalker algorithm has been modified so that neighbouring clumps
  are merged together into a single clump unless there is a significant dip
  between the peaks of the clumps. The depth of the dip needed to prevent 
- adjoing peaks from being merged is given by a new configuration parameter 
+ adjoining peaks from being merged is given by a new configuration parameter 
  called FellWalker.MinDip. This reduces the number of distinct clumps 
  typically identified by the FellWalker algorithm.
 
@@ -296,7 +296,7 @@ Changes introduced at V0.0-3:
  command now includes each parameter only once.
 
  - The default value for ClumpFind.DeltaT is now set to twice the RMS noise 
- level no matter how many contouts this would produce. Previously, the 
+ level no matter how many contours this would produce. Previously, the 
  default value was higher than 2*RMS if necessary in order to limit the 
  number of contours to 100.
 
