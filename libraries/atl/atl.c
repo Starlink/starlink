@@ -13,6 +13,7 @@
 *  Authors:
 *     DSB: David S Berry
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     BC: Brad Cavanagh (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -213,6 +214,51 @@ void atlMgfts( int method, AstFitsChan *fc1, AstFitsChan *fc2,
    return;
 }
 
+F77_SUBROUTINE(atl_ptfti)( INTEGER(THIS),
+                           CHARACTER(NAME),
+                           INTEGER(VALUE),
+                           CHARACTER(COMMNT),
+                           INTEGER(STATUS) 
+                           TRAIL(NAME)
+                           TRAIL(COMMNT) );
+
+void atlPtfti( AstFitsChan *this, const char *name, int value, 
+               const char *comment, int *status ){
+   DECLARE_INTEGER(THIS);
+   DECLARE_CHARACTER_DYN(NAME);  
+   DECLARE_INTEGER(VALUE);
+   DECLARE_CHARACTER_DYN(COMMNT);  
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_INTEGER( astP2I( this ), THIS );
+
+   if( !astOK ) return;
+
+   F77_CREATE_CHARACTER( NAME, strlen( name ) );
+   F77_EXPORT_CHARACTER( name, NAME, NAME_length );
+
+   F77_EXPORT_INTEGER( value, VALUE );
+
+   F77_CREATE_CHARACTER( COMMNT, strlen( comment ) );
+   F77_EXPORT_CHARACTER( comment, COMMNT, COMMNT_length );
+
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(atl_ptfti)( INTEGER_ARG(&THIS),
+                        CHARACTER_ARG(NAME),
+                        INTEGER_ARG(&VALUE),
+                        CHARACTER_ARG(COMMNT),
+                        INTEGER_ARG(&STATUS)
+                        TRAIL_ARG(NAME)
+                        TRAIL_ARG(COMMNT) );
+
+   F77_FREE_CHARACTER( NAME );
+   F77_FREE_CHARACTER( COMMNT );
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
+
 
 F77_SUBROUTINE(atl_ptftr)( INTEGER(THIS),
                            CHARACTER(NAME),
@@ -260,4 +306,47 @@ void atlPtftr( AstFitsChan *this, const char *name, float value,
 }
 
 
+F77_SUBROUTINE(atl_ptfts)( INTEGER(THIS),
+                           CHARACTER(NAME),
+                           CHARACTER(VALUE),
+                           CHARACTER(COMMNT),
+                           INTEGER(STATUS) 
+                           TRAIL(NAME)
+                           TRAIL(VALUE)
+                           TRAIL(COMMNT) );
+
+void atlPtfts( AstFitsChan *this, const char *name,
+               const char *value, const char *comment, int *status ){
+   DECLARE_INTEGER(THIS);
+   DECLARE_CHARACTER_DYN(NAME);  
+   DECLARE_CHARACTER_DYN(VALUE);
+   DECLARE_CHARACTER_DYN(COMMNT);  
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_INTEGER( astP2I( this ), THIS );
+
+   if( !astOK ) return;
+
+   F77_CREATE_EXPORT_CHARACTER( name, NAME );
+   F77_CREATE_EXPORT_CHARACTER( value, VALUE );
+   F77_CREATE_EXPORT_CHARACTER( comment, COMMNT );
+
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(atl_ptfts)( INTEGER_ARG(&THIS),
+                        CHARACTER_ARG(NAME),
+                        CHARACTER_ARG(VALUE),
+                        CHARACTER_ARG(COMMNT),
+                        INTEGER_ARG(&STATUS)
+                        TRAIL_ARG(NAME)
+                        TRAIL_ARG(VALUE)
+                        TRAIL_ARG(COMMNT) );
+
+   F77_FREE_CHARACTER( NAME );
+   F77_FREE_CHARACTER( VALUE );
+   F77_FREE_CHARACTER( COMMNT );
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
 
