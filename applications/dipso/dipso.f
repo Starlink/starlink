@@ -3281,7 +3281,7 @@ c       WRITE(*,*)
 
 *  EXPAND:  Set expansion factors for various plot components.
           ELSE IF( SUBCMD .EQ. 'EXPAND' ) THEN
-             CALL EXPAND( 'EXPAND', PARAMS, STATUS )
+             CALL DPEXPAND( 'EXPAND', PARAMS, STATUS )
 
 *  FILL:  Derermines whether extra symbols are filled or empty
           ELSE IF( SUBCMD .EQ. 'FILL' ) THEN

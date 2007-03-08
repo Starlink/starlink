@@ -1,7 +1,7 @@
-      SUBROUTINE EXPAND( COMM, PARAMS, STATUS )
+      SUBROUTINE DPEXPAND( COMM, PARAMS, STATUS )
 *+
 *  Name:
-*     EXPAND
+*     DPEXPAND
 
 *  Purpose:
 *     Implements the DIPSO command EXPAND.
@@ -10,10 +10,10 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL EXPAND( COMM, PARAMS, STATUS )
+*     CALL DPEXPAND( COMM, PARAMS, STATUS )
 
 *  Description:
-*     The EXPOAND command stores expansion factors to apply to various
+*     The EXPAND command stores expansion factors to apply to various
 *     parts of the next plot.
 
 *  Arguments:
@@ -28,11 +28,14 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     21-SEP-1994 (DSB):
 *        Original version.
+*     08-MAR-2007 (TIMJ):
+*        Rename to DPEXPAND to avoid NCAR namespace clash
 *     {enter_changes_here}
 
 *  Bugs:
