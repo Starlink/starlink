@@ -1,1 +1,82 @@
-echo -lncar `gks_link`
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     ncar_link_adam
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking NCAR library.
+
+#  Language:
+#     Bourne Shell
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked when linking against the NCAR library.
+#     Use the -star option when linking with SNX.
+
+#  Copyright:
+#     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#      TIMJ: Tim Jenness (JAC, Hawaii)
+#     {enter_new_authors_here}
+
+#  History:
+#      08-MAR-2007 (TIMJ):
+#         Add -star option
+#     {enter_further_changes_here}
+
+#-
+
+#  Initialise linking options (default to non-Starlink)
+      star='-lncar'
+
+#  Interpret command line switches.
+#  --------------------------------
+      while :; do
+         case "${1}" in
+
+#  -star - Requests linking with Starlink extensions
+#          This means we do not include the routines used by SNX
+         -star)
+            star="-lncar_snx"
+            shift;;
+
+#  Once all switches have been read, continue with the rest of the script.
+         '') break;;
+
+#  Catch unrecognised arguments and report an error.
+         *)
+            echo >&2 "ncar_link: unknown argument \""${1}"\" given"
+            exit 1;;
+         esac
+      done
+
+
+      echo $star `gks_link` \
+           | awk 'BEGIN{RS=" ";FS="\n"}
+                  {f[i++]=$1}
+                  END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+
+#  End of script.
+

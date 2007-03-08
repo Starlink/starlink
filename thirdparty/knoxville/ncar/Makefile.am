@@ -13,11 +13,17 @@ lib_LTLIBRARIES = libncar.la \
 		  libncar_dashsmth.la \
 		  libncar_dashsupr.la \
 		  libncar_conras.la \
-		  libncar_conpms.la
+		  libncar_conpms.la \
+		  libncar_snx.la
 
 dist_bin_SCRIPTS = ncar_link ncar_link_adam
 
-libncar_la_SOURCES = $(F_ROUTINES) $(BLOCKDATA_ROUTINES) $(FPP_ROUTINES)
+# This is the standalone version that can be used when SNX is not in use
+libncar_la_SOURCES = $(F_ROUTINES) $(NONSNX_F_ROUTINES) $(BLOCKDATA_ROUTINES) $(FPP_ROUTINES)
+
+# This version of the library should be used for snx since it lacks
+# the override functions. Do not link this and libncar at the same time
+libncar_snx_la_SOURCES = $(F_ROUTINES) $(BLOCKDATA_ROUTINES) $(FPP_ROUTINES)
 
 libncar_conrecqck_la_SOURCES = conrecqck.f
 libncar_conrecsupr_la_SOURCES = conrecsupr.f
@@ -34,11 +40,13 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 # Source files
 
+NONSNX_F_ROUTINES = agpwrt.f agchnl.f
+
 F_ROUTINES = agaxis.f agback.f agbnch.f agchax.f agchcu.f agchil.f \
-agchnl.f agctcs.f agctko.f agcurv.f agdash.f agdflt.f agdlch.f agdshn.f \
+agctcs.f agctko.f agcurv.f agdash.f agdflt.f agdlch.f agdshn.f \
 agexax.f agexus.f agezsu.f agfpbn.f agftol.f aggetc.f aggetf.f aggeti.f \
 aggetp.f aggtch.f aginit.f agkurv.f aglbls.f agmaxi.f agmini.f agnumb.f \
-agppid.f agpwrt.f agqurv.f agrpch.f agrstr.f agsave.f agscan.f agsetc.f \
+agppid.f agqurv.f agrpch.f agrstr.f agsave.f agscan.f agsetc.f \
 agsetf.f agseti.f agsetp.f agsrch.f agstch.f agstup.f agutol.f anotat.f \
 bound.f calcnt.f ccheck.f cfux.f cfuy.f cfvld.f chstr.f clgen.f clset.f \
 clsgks.f cmfx.f cmfy.f cmux.f cmuy.f concal.f concld.f concls.f \
