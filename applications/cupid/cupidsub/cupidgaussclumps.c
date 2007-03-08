@@ -388,13 +388,6 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* If not, make an initial guess at the Gaussian clump parameters centred
    on the current peak. */
          if( iter ) {
-
-
-if( niter == 25 ) {
-   cupidGCDumpF( (float *) res, ndim, dims, "test1dump", status );
-}
-
-
             cupidGCSetInit( type, res, ipv, ndim, dims, imax, rms, gcconfig,
                             ( niter == 1 ), velax, x, slbnd, status );
 
