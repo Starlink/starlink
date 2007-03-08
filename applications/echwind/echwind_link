@@ -1,6 +1,5 @@
 
 #  N.B. the previous line should be blank.
-#  Build with starlink version of native pgplot (includes gwm driver)
-#  Just use `pgplot_link` to link without starlink drivers
-echo `pgplot_link -star`
+#  Use `pgplot_link` to link without starlink drivers.
+echo `pgplot_link`
 #  End of script.
