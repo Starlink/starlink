@@ -588,9 +588,9 @@ C       IF( .NOT.IOSB.IOSTAT) CALL LIB$SIGNAL(%VAL(IOSB.IOSTAT))
 *          IF( IOSTAT .NE. 0 ) THEN
 *             WRITE (*,
 *     :       '(''   !*  Error closing stream 6 -'',
-*     :       '' SL and SLWR may not function correctly  *!'',A)') 7
+*     :       '' SL and SLWR may not function correctly  *!'',A)') BLEEP
 *          ELSE
-*             WRITE (*,'(''   !*  Closing stream 6  *!'',A)') 7
+*             WRITE (*,'(''   !*  Closing stream 6  *!'',A)') BLEEP
 *          END IF
 *       END IF
 
@@ -890,7 +890,7 @@ c       WRITE(*,*)
 *
           ELSE IF( SUBCMD .EQ. 'ADD' ) THEN
              WRITE (*,'(''   ADD command renamed AADD'',
-     :       '' (correct call mandatory)'',A)') 7
+     :       '' (correct call mandatory)'',A)') BLEEP
              GO TO 5000
           ELSE IF( SUBCMD .EQ. 'AADD' ) THEN
              CALL DECODE('AADD',PARAMS,1,1,VARRAY,'Entry ',OK)
@@ -910,7 +910,7 @@ c       WRITE(*,*)
 *
           ELSE IF( SUBCMD .EQ. 'DIV' ) THEN
              WRITE (*,
-     :       '(''   DIV renamed ADIV (correct call mandatory)'',A)') 7
+     :       '(''   DIV renamed ADIV (correct call mandatory)'',A)') BLEEP
              GO TO 5000
           ELSE IF( SUBCMD .EQ. 'ADIV' ) THEN
              CALL DECODE('ADIV',PARAMS,1,1,VARRAY,'Entry ',OK)
@@ -930,7 +930,7 @@ c       WRITE(*,*)
                    WRITE (*,
      :             '(''   ADIV:  you have divided datasets which'',
      :             '' DIPSO thinks''/''          are in velocity '',
-     :             ''and wavelength space - error!'',A)') 7
+     :             ''and wavelength space - error!'',A)') BLEEP
                    GO TO 5000
                 ELSE IF( WORV .NE. WORVST(NUMENT) ) THEN
                    RATIO = WORV/WORVST(NUMENT)
@@ -945,7 +945,7 @@ c       WRITE(*,*)
           ELSE IF( SUBCMD .EQ. 'MULT' ) THEN
              WRITE (*,
      :       '(''   MULT command renamed AMULT '',
-     :       ''(correct call mandatory)'',A)') 7
+     :       ''(correct call mandatory)'',A)') BLEEP
              GO TO 5000
           ELSE IF( SUBCMD .EQ. 'AMULT' ) THEN
              CALL DECODE('AMULT',PARAMS,1,1,VARRAY,'Entry ',OK)
@@ -966,7 +966,7 @@ c       WRITE(*,*)
           ELSE IF( SUBCMD .EQ. 'SUB' ) THEN
              WRITE (*,
      :       '(''   SUB command renamed ASUB '',
-     :       ''(correct call mandatory)'',A)') 7
+     :       ''(correct call mandatory)'',A)') BLEEP
              GO TO 5000
           ELSE IF( SUBCMD .EQ. 'ASUB' ) THEN
              CALL DECODE('ASUB',PARAMS,1,1,VARRAY,'Entry ',OK)
@@ -988,7 +988,7 @@ c       WRITE(*,*)
              IF( SUBCMD .EQ. 'SWAP' ) THEN
                 WRITE (*,
      :          '(''   SWAP command renamed ASWAP'',
-     :          '' (correct call mandatory)'',A)') 7
+     :          '' (correct call mandatory)'',A)') BLEEP
                 GO TO 5000
              END IF
              CALL DECODE('ASWAP',PARAMS,0,0,VARRAY,' ',OK)
@@ -1736,7 +1736,7 @@ c       WRITE(*,*)
           ELSE IF( SUBCMD .EQ. 'BEEP' ) THEN
              CALL DECODE('BEEP',PARAMS,0,0,TEMP,' ',OK)
              IF( .NOT.(OK)) GO TO 5000
-             WRITE (*,'(''   BEEP:  OK!'',A)') 7
+             WRITE (*,'(''   BEEP:  OK!'',A)') BLEEP
              BLEEP = CHAR(7)
              BEEP = .TRUE.
 *
@@ -3994,7 +3994,7 @@ C ----------------------------------------------------------------
 *
           ELSE IF( SUBCMD .EQ. 'INVX' .OR. SUBCMD .EQ. 'XINV' ) THEN
              IF( SUBCMD .EQ. 'INVX' ) THEN
-                WRITE (*,'(''   INVX command renamed XINV'',A)') 7
+                WRITE (*,'(''   INVX command renamed XINV'',A)') BLEEP
                 SUBCMD = 'XINV'
                 WRITE (*,'(''   (command executed)'')')
              END IF
@@ -4011,7 +4011,7 @@ C ----------------------------------------------------------------
 *
           ELSE IF( SUBCMD .EQ. 'INVY' .OR. SUBCMD .EQ. 'YINV' ) THEN
              IF( SUBCMD .EQ. 'INVY' ) THEN
-                WRITE (*,'(''   INVY command renamed YINV'',A)') 7
+                WRITE (*,'(''   INVY command renamed YINV'',A)') BLEEP
                 SUBCMD = 'YINV'
                 WRITE (*,'(''   (command executed)'')')
              END IF
@@ -4139,7 +4139,7 @@ C ----------------------------------------------------------------
 *  LOGX:  Convert 'X' array to log10 values
           ELSE IF( SUBCMD .EQ. 'LOGX' .OR. SUBCMD .EQ. 'XLOG' ) THEN
              IF( SUBCMD .EQ. 'XLOG' ) THEN
-                WRITE (*,'(''   XLOG command renamed LOGX'',A)') 7
+                WRITE (*,'(''   XLOG command renamed LOGX'',A)') BLEEP
                 SUBCMD = 'LOGX'
                 WRITE (*,'(''   (command executed)'')')
              END IF
@@ -4171,7 +4171,7 @@ C ----------------------------------------------------------------
 *
           ELSE IF( SUBCMD .EQ. 'LOGY' .OR. SUBCMD .EQ. 'YLOG' ) THEN
              IF( SUBCMD .EQ. 'YLOG' ) THEN
-                WRITE (*,'(''   YLOG command renamed LOGY'',A)') 7
+                WRITE (*,'(''   YLOG command renamed LOGY'',A)') BLEEP
                 SUBCMD = 'LOGY'
                 WRITE (*,'(''   (command executed)'')')
              END IF
@@ -4256,7 +4256,7 @@ C ----------------------------------------------------------------
           ELSE IF( SUBCMD .EQ. 'MAX' .OR. SUBCMD .EQ. 'AMAX' ) THEN
              IF( SUBCMD .EQ. 'MAX' ) THEN
                 WRITE (*,'(''   MAX command renamed AMAX '',
-     :          ''(correct call mandatory)'',A)') 7
+     :          ''(correct call mandatory)'',A)') BLEEP
 
                 GO TO 5000
              END IF
@@ -4390,7 +4390,7 @@ C ----------------------------------------------------------------
           ELSE IF( SUBCMD .EQ. 'MIN' .OR. SUBCMD .EQ. 'AMIN' ) THEN
              IF( SUBCMD .EQ. 'MIN' ) THEN
                 WRITE (*,'(''   MIN command renamed AMIN '',
-     :          ''(correct call mandatory)'',A)') 7
+     :          ''(correct call mandatory)'',A)') BLEEP
                 GO TO 5000
              END IF
              CALL DECODE('AMIN',PARAMS,1,1,VARRAY,'Entry ',OK)
@@ -4897,7 +4897,7 @@ C ----------------------------------------------------------------
 *
           ELSE IF( SUBCMD .EQ. 'INV' .OR. SUBCMD .EQ. 'PLOTINV' ) THEN
              IF( SUBCMD .EQ. 'INV' ) THEN
-                WRITE (*,'(''   INV command renamed PLOTINV'',A)') 7
+                WRITE (*,'(''   INV command renamed PLOTINV'',A)') BLEEP
                 SUBCMD = 'PLOTINV'
                 WRITE (*,'(''   (command executed)'')')
              END IF
@@ -4908,7 +4908,7 @@ C ----------------------------------------------------------------
 *
           ELSE IF( SUBCMD .EQ. 'REV' .OR. SUBCMD .EQ. 'PLOTREV' ) THEN
              IF( SUBCMD .EQ. 'REV' ) THEN
-                WRITE (*,'(''   REV command renamed PLOTREV'',A)') 7
+                WRITE (*,'(''   REV command renamed PLOTREV'',A)') BLEEP
                 SUBCMD = 'PLOTREV'
                 WRITE (*,'(''   (command executed)'')')
              END IF
@@ -5700,7 +5700,7 @@ C ----------------------------------------------------------------
 *  RXR:  Restrict x-range of data
           ELSE IF( SUBCMD .EQ. 'RR' .OR. SUBCMD .EQ. 'RXR' ) THEN
              IF( SUBCMD .EQ. 'RR' ) THEN
-                WRITE (*,'(''   RR command renamed RXR'',A)') 7
+                WRITE (*,'(''   RR command renamed RXR'',A)') BLEEP
                 SUBCMD = 'RXR'
                 WRITE (*,'(''   (command executed)'')')
              END IF
@@ -5886,7 +5886,7 @@ C ----------------------------------------------------------------
              IF( PARAMS(LBRK:) .NE. ' ' ) THEN
                 PARAMS(LBRK:) = ' '
                 WRITE (*,'(''   SAVE:  superfluous text ignored'')')
-                IF( BEEP) WRITE (*,'(A)') 7
+                IF( BEEP) WRITE (*,'(A)') BLEEP
              END IF
 
 *    Entry point for EXIT
@@ -6230,7 +6230,7 @@ C                   CLOSE (6)
              IF( PARAMS(LBRK:) .NE. ' ' ) THEN
                 WRITE (*,'(''   SP0WR:  superfluous text ignored'')')
                 PARAMS(LBRK:) = ' '
-                IF( BEEP) WRITE (*,'(A)') 7
+                IF( BEEP) WRITE (*,'(A)') BLEEP
              END IF
              CALL OSP0WR(PARAMS(1:80),TITLE(1:79), IHHEAD(1:79),WORKSZ,
      :                   WORK,NPOINT,WAVE,FLUX,NBREAK,BREAK,SUBCHK,
@@ -6261,7 +6261,7 @@ C                   CLOSE (6)
              IF( PARAMS(LBRK:) .NE. ' ' ) THEN
                 WRITE (*,'(''   SP2WR:  superfluous text ignored'')')
                 PARAMS(LBRK:) = ' '
-                IF( BEEP) WRITE (*,'(A)') 7
+                IF( BEEP) WRITE (*,'(A)') BLEEP
              END IF
              CALL SP2WR(PARAMS(1:80),TITLE(1:79),IHHEAD(1:79),WORKSZ,
      :                  WORK,NPOINT,WAVE,FLUX,NBREAK,BREAK,SUBCHK,
@@ -6618,7 +6618,7 @@ C                   CLOSE (6)
 *
           ELSE IF( SUBCMD .EQ. 'TENX' .OR. SUBCMD .EQ. 'XTEN' ) THEN
              IF( SUBCMD .EQ. 'XTEN' ) THEN
-                WRITE (*,'(''   XTEN command renamed TENX'',A)') 7
+                WRITE (*,'(''   XTEN command renamed TENX'',A)') BLEEP
                 SUBCMD = 'TENX'
                 WRITE (*,'(''   (command executed)'')')
              END IF
@@ -7619,7 +7619,7 @@ C                   CLOSE (6)
 *
           ELSE IF( SUBCMD .EQ. 'XSH' .OR. SUBCMD .EQ. 'XADD' ) THEN
              IF( SUBCMD .EQ. 'XSH' ) THEN
-                WRITE (*,'(''   XSH command renamed XADD'',A)') 7
+                WRITE (*,'(''   XSH command renamed XADD'',A)') BLEEP
                 SUBCMD = 'XADD'
                 WRITE (*,'(''   (command executed)'')')
              END IF
@@ -7815,7 +7815,7 @@ C                   CLOSE (6)
 *
           ELSE IF( SUBCMD .EQ. 'CADD' .OR. SUBCMD .EQ. 'YADD' ) THEN
              IF( SUBCMD .EQ. 'CADD' ) THEN
-                WRITE (*,'(''   CADD command renamed YADD'',A)') 7
+                WRITE (*,'(''   CADD command renamed YADD'',A)') BLEEP
                 WRITE (*,'(''   (command executed)'')')
                 SUBCMD = 'YADD'
              END IF
@@ -7838,7 +7838,7 @@ C                   CLOSE (6)
 *
           ELSE IF( SUBCMD .EQ. 'CDIV' .OR. SUBCMD .EQ. 'YDIV' ) THEN
              IF( SUBCMD .EQ. 'CDIV' ) THEN
-                WRITE (*,'(''   CDIV command renamed YDIV'',A)') 7
+                WRITE (*,'(''   CDIV command renamed YDIV'',A)') BLEEP
                 SUBCMD = 'YDIV'
                 WRITE (*,'(''   (command executed)'')')
              END IF
@@ -7856,7 +7856,7 @@ C                   CLOSE (6)
 *
           ELSE IF( SUBCMD .EQ. 'CMULT' .OR. SUBCMD .EQ. 'YMULT' ) THEN
              IF( SUBCMD .EQ. 'CMULT' ) THEN
-                WRITE (*,'(''   CMULT renamed YMULT'',A)') 7
+                WRITE (*,'(''   CMULT renamed YMULT'',A)') BLEEP
                 SUBCMD = 'YMULT'
                 WRITE (*,'(''   (command executed)'')')
              END IF
@@ -8192,7 +8192,7 @@ C                   CLOSE (6)
                 CLOSE (67)
              END IF
              IF( BEEP ) THEN
-                WRITE (*,'(''   Command line aborted'',a)') 7
+                WRITE (*,'(''   Command line aborted'',a)') BLEEP
              ELSE
                 WRITE (*,'(''   Command line aborted'')')
              END IF
