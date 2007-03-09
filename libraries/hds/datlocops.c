@@ -482,14 +482,15 @@ dat1_get_off(int ndim, const HDS_PTYPE *dims, const HDS_PTYPE *subs,
       if (subs[i]>dims[i] || subs[i]<1)  {
 	hds_gl_status = DAT__SUBIN;
 	emsSeti( "I", i+1 ); /* Fortran indexing */
+	emsSeti( "ND", ndim);
 	if (subs[i]>dims[i]) {
 	  dat1emsSetHdsdim( "SUBS", subs[i]);
 	  dat1emsSetHdsdim( "SIZE", dims[i] );
-	  emsRep( " ", "Subscript for dimension ^I exceeds max allowed value"
+	  emsRep( " ", "Subscript for dimension ^I of ^ND exceeds max allowed value"
 		  " (^SUBS > ^SIZE) ", &hds_gl_status );
 	} else if (subs[i] < 1) {
 	  dat1emsSetHdsdim( "SUBS", subs[i]);
-	  emsRep( " ", "Subscript for dim ^I is out of range (^SUBS < 1)",
+	  emsRep( " ", "Subscript for dimension ^I of ^ND is out of range (^SUBS < 1)",
 		  &hds_gl_status );
 	}
 	return hds_gl_status;
