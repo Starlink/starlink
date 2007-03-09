@@ -92,12 +92,11 @@ classic applications to build the Java ones.
    these variables before building the software.  See './configure
    --help' for a list of `some influential environment variables'.
 
-   At the time of writing (December 2005) it is known that the gfortran
-   compiler will not work. If this is picked up by default on your
-   system you need to re-define FC and F77 to select another compiler.
-   There are encouraging signs this may change, but in the meanwhile the 
-   g95 version is known to work (thanks to Andy Vaught for his help with 
-   this).
+   At the time of writing (March 2007) it is known that the gfortran
+   compiler will work, but only from GCC4.3 onwards (the development main
+   line). If this is picked up by default on your system you need to re-define
+   FC and F77 to select another compiler. For other versions of GCC you will
+   need to use g95 (thanks to Andy Vaught for his help with this).
 
  - First bootstrap the system.  This builds and installs the
    buildsupport system (the tools in the buildsupport directory, plus
