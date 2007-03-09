@@ -2743,11 +2743,13 @@ cvs -d username@cvs.starlink.ac.uk:/cvs co -l applications
 7% ./bootstrap
 ... a few harmless warnings, and miscellaneous other chatter
 ... takes quite a while
-8% ./configure -C
+8% make configure-deps
+... builds some programs needed before configure
+9% ./configure -C
 ... mucho blah-blah-blah
-9% make world
+10% make world
 ... etc
-10% ls /local/star/manifests
+11% ls /local/star/manifests
 adam      automake  ems     hlp      messgen  par       sae   star2html  task
 ams       chr       fio     lex      messys   parsecon  sla   starconf
 atimer    cnf       hds     libtool  misc     pcs       sock  string
