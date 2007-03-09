@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <limits.h>
+#include <float.h>               /* DBL_DIG */
 
 #include "f77.h"                 /* F7 <=> C interface macros               */
 #include "ems.h"                 /* EMS error reporting routines            */
@@ -38,6 +39,18 @@ int dat1_cvt_dtype( bad, nval, imp, exp, nbad )
  *
  *        DAT__OK    if successful.
  *        DAT__CONER if any conversion errors have been detected.
+
+ * Notes:
+ *    Based on the LIB$CVT_DX_DX VAX/VMS routine functionality
+
+ * Authors:
+ *    RFWS: Rodney Warren-Smith (Starlink)
+
+ * History:
+ *    2007-03-08 (TIMJ):
+ *       Use full precision for _DOUBLE to _CHAR conversion.
+
+ *-
  */
 
    int bad;
@@ -1072,7 +1085,7 @@ dat1_cvt_char(bad, nval, imp, exp, nbad)
                                                &nchar );
                break;
             case DAT__D:
-               (void) sprintf( buffer, "%G""%n", *((_DOUBLE *) src.body),
+	      (void) sprintf( buffer, "%.*G%n", DBL_DIG,*((_DOUBLE *) src.body),
                                                &nchar );
                break;
             case DAT__L:
