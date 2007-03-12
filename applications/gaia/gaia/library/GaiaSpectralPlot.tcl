@@ -98,6 +98,23 @@ itcl::class gaia::GaiaSpectralPlot {
       #  Evaluate any options.
       eval itk_initialize $args
 
+      #  Set colour of reference line. Done here as array.
+      set ref_lines_colour_(1) "red"
+
+      #  And restore properties. These apply to local variables, not
+      #  configuration options, so harder work...
+      set props_ [gaia::GaiaProperties::instance]
+      set keys [$props_ get_named_keys GaiaSpectralPlot]
+      if { $keys != {} } {
+         foreach key $keys {
+            set value [$props_ get_property $key]
+            if { $value != {} } {
+               set lkey [$props_ get_unnamed_key GaiaSpectralPlot $key]
+               eval set $lkey $value
+            }
+         }
+      }
+
       #  Set the top-level window title.
       wm title $w_ "GAIA: Spectral plot ($itk_option(-number))"
       wm geometry $w_ 700x300
@@ -195,6 +212,12 @@ itcl::class gaia::GaiaSpectralPlot {
       add_menu_short_help $Options {Coordinate label}  \
          {Show the extraction coordinates of the spectrum}
 
+      #  Reset all saved attributes to their defaults.
+      $Options add command -label "Reset" \
+         -command [code $this reset_options_]
+      add_menu_short_help $Options {Reset}  \
+         {Reset any saved options to their default value}
+
       #  Choose a colour for the spectral line.
       $Options add cascade -label "Line color" \
          -menu [menu $Options.line]
@@ -263,7 +286,6 @@ itcl::class gaia::GaiaSpectralPlot {
       }
       add_menu_short_help $Options {Ref line color} \
           {Change the colour of the image slice reference line}
-      set ref_lines_colour_(1) "red"
 
       #  Choose a colour for the background.
       $Options add cascade -label "Background" \
@@ -277,18 +299,18 @@ itcl::class gaia::GaiaSpectralPlot {
             -command [code $this set_background $colour]
       }
       add_menu_short_help $Options {Background} \
-         {Change the background colour of the plot} \
+         {Change the background colour of the plot}
 
       #  Choose a font for axes labels.
       $Options add cascade -label "Axes font" \
          -menu [menu $Options.font]
       foreach {index xname desc} $fontmap_ {
          $Options.font add radiobutton \
-            -variable [scope itk_option(-axes_font)] \
+            -variable [scope axes_font_] \
             -value $index \
             -font $xname \
             -label $desc \
-            -command [code $this apply_gridoptions]
+            -command [code $this set_axes_font $index]
       }
       add_menu_short_help $Options {Axes font} \
          {Change the font used for axes labelling} \
@@ -337,6 +359,7 @@ itcl::class gaia::GaiaSpectralPlot {
       itk_component add canvas {
          ::canvas $itk_component(canvasframe).canvas
       }
+      set_background $background_
       pack $itk_component(canvasframe) -fill both -expand 1
       pack $itk_component(canvas) -fill both -expand 1
 
@@ -366,6 +389,9 @@ itcl::class gaia::GaiaSpectralPlot {
             }
          }
       }
+
+      #  Save global properties (should do this once at application exit).
+      $props_ save_properties
    }
 
    #  Methods:
@@ -743,6 +769,8 @@ itcl::class gaia::GaiaSpectralPlot {
    #  Set the colour of a reference line.
    public method set_ref_line_colour {id colour} {
       set ref_lines_colour_($id) $colour
+      $props_ set_named_property GaiaSpectralPlot \
+         "ref_lines_colour_($id)" $colour
       if { [::array exists ref_lines_] && [info exists ref_lines_($id)] } {
          $itk_component(canvas) itemconfigure $ref_lines_($id) \
             -fill $ref_lines_colour_($id)
@@ -990,12 +1018,13 @@ itcl::class gaia::GaiaSpectralPlot {
           Colour=$axescolour_,\
           LogPlot(1)=$itk_option(-log_x_axis),\
           LogPlot(2)=$itk_option(-log_y_axis),\
-          Font=$itk_option(-axes_font)"
+          Font=$axes_font_"
    }
 
    #  Set the colour of the spectral line.
    public method set_linecolour {colour} {
       set linecolour_ $colour
+      $props_ set_named_property GaiaSpectralPlot linecolour_ $colour
       if { $spectrum_ != {} } {
          $itk_component(canvas) itemconfigure $spectrum_ \
             -linecolour $linecolour_
@@ -1008,6 +1037,7 @@ itcl::class gaia::GaiaSpectralPlot {
    #  Set the width of the spectral line.
    public method set_linewidth {width} {
       set linewidth_ $width
+      $props_ set_named_property GaiaSpectralPlot linewidth_ $width
       if { $spectrum_ != {} } {
          $itk_component(canvas) itemconfigure $spectrum_ \
             -linewidth $linewidth_
@@ -1017,6 +1047,14 @@ itcl::class gaia::GaiaSpectralPlot {
    #  Set the colour of the axes.
    public method set_axescolour {colour} {
       set axescolour_ $colour
+      $props_ set_named_property GaiaSpectralPlot axescolour_ $colour
+      apply_gridoptions
+   }
+
+   #  Set the font of the axes.
+   public method set_axes_font {font} {
+      set axes_font_ $font
+      $props_ set_named_property GaiaSpectralPlot axes_font_ $font
       apply_gridoptions
    }
 
@@ -1027,6 +1065,7 @@ itcl::class gaia::GaiaSpectralPlot {
          $itk_component(canvas) itemconfigure $spectrum_ \
             -reflinecolour $refspeccolour_
       }
+      $props_ set_named_property GaiaSpectralPlot refspeccolour_ $colour
       if { $itk_option(-colour_changed_cmd) != {} } {
          eval $itk_option(-colour_changed_cmd) "reference" $colour
       }
@@ -1036,6 +1075,19 @@ itcl::class gaia::GaiaSpectralPlot {
    public method set_background {colour} {
       $itk_component(canvas) configure -background $colour
       set background_ $colour
+      $props_ set_named_property GaiaSpectralPlot background_ $colour
+   }
+
+   #  Reset all the saved options to their default values. KEEP this up
+   #  to date.
+   protected method reset_options_ {} {
+      set_linecolour "blue"
+      set_linewidth 1
+      set_axescolour 0
+      set_axes_font 0
+      set_refspeccolour "green"
+      set_background "black"
+      set_ref_line_colour 1 "red"
    }
 
    #  Return the canvas id of the spectral plot.
@@ -1127,7 +1179,7 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Configuration options: (public variables)
    #  ----------------------
-   
+
    #  The component of the data that we're to display. Usually DATA,
    #  but could be VARIANCE or QUALITY.
    itk_option define -component component Component "DATA"
@@ -1157,9 +1209,6 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Whether to log data axis.
    itk_option define -log_y_axis log_y_axis Log_Y_Axis 0
-
-   #  The font to use when drawing the axes (AST integer).
-   itk_option define -axes_font axes_font Axes_Font 0
 
    #  A GaiaSpecCoords object for controlling the coordinate systems.
    #  Actual control is handled by the GaiaCube instance.
@@ -1196,6 +1245,9 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  The label.
    protected variable label_ {}
+
+   #  The font to use when drawing the axes (AST integer).
+   protected variable axes_font_ 0
 
    #  All reference line canvas ids, indexed by a user specified number.
    protected variable ref_lines_
@@ -1285,6 +1337,9 @@ itcl::class gaia::GaiaSpectralPlot {
    #  A list of the temporary files we create. These are deleted on object
    #  destruction.
    protected variable temp_files_ {}
+
+   #  Global properties handler.
+   protected variable props_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
