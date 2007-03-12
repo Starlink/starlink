@@ -215,6 +215,7 @@ void makeclumps( int *status ) {
    char text[ 8 ];               /* Value of PARDIST parameter */
    double beamcorr[ 3 ];         /* Beam widths */
    double par[ 11 ];             /* Clump parameters */
+   double sum;                   /* Integrated intensity */
    float *d;                     /* Pointer to next output element */
    float *ipd2;                  /* Pointer to data array */
    float *ipd;                   /* Pointer to data array */
@@ -360,6 +361,7 @@ void makeclumps( int *status ) {
 /* Loop round creating clumps. */
    obj = NULL;
    maxpeak = 1.0;
+   sum = 0.0;
    nc = 0;
    i = 0;
    while( nc < nclump && *status == SAI__OK) {
@@ -404,7 +406,7 @@ void makeclumps( int *status ) {
    containing the clump data values, appended to the end of the array of
    NDF structures in the HDS object located by "obj". */
       cupidGCUpdateArraysF( NULL, NULL, nel, ndim, dims, par, rms, trunc, 0,
-                            0, lbnd, &obj, i, 0, 0.0, 0, &area, status );
+                            0, lbnd, &obj, i, 0, 0.0, 0, &area, &sum, status );
 
 /* Update the largest peak value. */
       if( par[ 0 ] > maxpeak ) maxpeak = par[ 0 ];

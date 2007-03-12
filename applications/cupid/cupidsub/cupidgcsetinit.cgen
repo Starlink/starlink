@@ -119,6 +119,8 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 *        - Correct use of external and internal axis indices.
 *        - Use VeloStart and VeloRes in place of FWHMStart and FWHMBeam
 *        if the data is 1D.
+*     7-MAR-2007 (DSB):
+*        - Change default for MaxWF from 2 to 1.1, andMaxWF from 0.1 to 0.8.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -174,11 +176,8 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    cupidGCChiSq (this modification is meant to give low weights to pixels
    which do not influence the Gaussian model, status ). */
       cupidGC.nwf = cupidConfigI( config, "NWF", 10, status );
-      cupidGC.minwf = cupidConfigD( config, "MINWF", 0.1, status );
-      cupidGC.maxwf = cupidConfigD( config, "MAXWF", 2.0, status );
-
-/* Indicate background should be included in the fitting process. */
-      cupidGC.fixback = 0;
+      cupidGC.minwf = cupidConfigD( config, "MINWF", 0.8, status );
+      cupidGC.maxwf = cupidConfigD( config, "MAXWF", 1.1, status );
 
 /* Maximum number of function evaluations to be used when fitting an 
    individual clump. */
@@ -421,6 +420,24 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 /* Store the mean of the background estimates, and the peak value. */
    par[ 1 ] = off/ndim;
    par[ 0 ] = cupidGC.ymax - par[ 1 ];
+
+/* Negative background levels are unpghysical (since it is assumed that
+   any background has already been removed from the data before running
+   FINDCLUMPS). However, an apparent negative background can be formed by
+   a previous ill-position fit resulting in negative residiauls. Therefore
+   we have to guard against negative backgrounds. If the initial background 
+   estimate is significantly less than zero, then set it to zero, and 
+   indicate that the background value should be fixed (i.e. not included
+   as a free parameter in the fitting process). Here, "significant" means
+   more than 5% of the total peak height. */
+   if( par[ 1 ] < -fabs( par[ 0 ]*0.05 ) ) {
+      par[ 0 ] += par[ 1 ];
+      par[ 1 ] = 0.0;
+      cupidGC.fixback = 1;
+
+   } else {
+      cupidGC.fixback = 0;
+   }
 
 /* Get the pixel bounds (in the arrays GRID coordinate system) of the section 
    of the array containing the data to be fitted. */

@@ -114,6 +114,9 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
 *  History:
 *     13-OCT-2005 (DSB):
 *        Original version.
+*     9-MAR-2007 (DSB):
+*        Fix bugs in the algorithm used to reduce the weights in regions
+*        that do not contribute to the fit.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -150,6 +153,7 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
    int iax;                /* Axis index */
    int iel;                /* Index of pixel within section currently being fitted */ 
    int what;               /* "xwhat" value assuming bckgnd is being fitted */
+   int wmod;               /* Were the weights changed? */
  
    static int nwm;         /* Number of times the weights have been modified */
    static double bg;       /* Last times background value */
@@ -270,6 +274,7 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
       pm = cupidGC.model;
       prs = cupidGC.resids;
 
+      wmod = 0;
       wsum = 0.0;
       for( iax = 0; iax < ndim; iax++ ) x[ iax ] = cupidGC.lbnd[ iax ];
 
@@ -302,9 +307,9 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
    background has not changed, resulting in the background being poorly
    determined. */
                if( bg != 0.0 ) {
-                  dbg = ( fabs( ( par[ 1 ] - bg )/bg ) > 0.0001 );
+                  dbg = ( fabs( ( par[ 1 ] - bg )/bg ) > 0.001 );
                } else {
-                  dbg = ( par[ 1 ] != 0.0 );
+                  dbg = ( par[ 1 ] != 0.0 ); 
                }
                if( dbg ) {
                   wf = ( res - *pu )/ res;
@@ -312,13 +317,11 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
                   wf = fabs( wf );
                   wf = ( wf < cupidGC.minwf ) ? cupidGC.minwf : ( wf > cupidGC.maxwf ) ? cupidGC.maxwf : wf ;
                   *pw *= wf;
-                  nwm++;
+                  if( *pw > 1.0 ) *pw = 1.0;
+                  wmod = 1;
                }
             }
          }
-
-/* Remember the background value for next time. */
-         bg = par[ 1 ];
 
 /* Save the residual and model value at this pixel */
          *pu = res;
@@ -362,6 +365,13 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
             x[ iax ] += 1.0;
          }
       }
+
+/* Remember the background value for next time. */
+      bg = par[ 1 ];
+
+/* Increment the number of iteration sthat have made modifications to the
+   weights (if any such change has in fact been made). */
+      if( wmod ) nwm++;
 
 /* Divide by the sum of the weights . */
       cupidGC.wsum = wsum;

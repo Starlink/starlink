@@ -323,16 +323,16 @@ void findclumps( int *status ) {
 *     (1990, ApJ 356, 513). This algorithm proceeds by fitting a Gaussian 
 *     profile to the brightest peak in the data. It then subtracts the fit 
 *     from the data and iterates, fitting a new ellipse to the brightest peak 
-*     in the residuals. This continues until a series of consecutive fits
-*     are made which have peak values below a given multiple of the noise
-*     level. Each fitted ellipse is taken to be a single clump and is added 
-*     to the output catalogue. In this algorithm, clumps may overlap. Any 
-*     input variance component is used to scale the weight associated with 
-*     each pixel value when performing the Gaussian fit. The most significant 
-*     configuration parameters for this algorithm are: GaussClumps.FwhmBeam 
-*     and GaussClumps.VeloRes which determine the minimum clump size, and 
-*     GaussClumps.Thresh which (together with the ADAM paramater RMS) 
-*     determine the termination criterion.
+*     in the residuals. This continues until the integrated data sum in the 
+*     fitted Gaussians reaches the integrated data sum in the input array, 
+*     or a series of consecutive fits are made which have peak values below a 
+*     given multiple of the noise level. Each fitted ellipse is taken to be a 
+*     single clump and is added to the output catalogue. In this algorithm, 
+*     clumps may overlap. Any input variance component is used to scale the 
+*     weight associated with each pixel value when performing the Gaussian 
+*     fit. The most significant configuration parameters for this algorithm 
+*     are: GaussClumps.FwhmBeam and GaussClumps.VeloRes which determine the 
+*     minimum clump size.
 
 *     - ClumpFind: Described by Williams et al (1994, ApJ 428, 693). This 
 *     algorithm works by first contouring the data at a multiple of the
@@ -397,13 +397,14 @@ void findclumps( int *status ) {
 *     - GaussClumps.NPad: Specifies a termination criterion for the 
 *     GaussClumps algorithm. The algorithm will terminate when "Npad" 
 *     consecutive clumps have been fitted all of which have peak values less 
-*     than the threshold value specified by the "Thresh" parameter. [10]
+*     than the threshold value specified by the "Thresh" parameter, or
+*     when one of the other termination criteria is met. [10]
 *     - GaussClumps.RMS: The global RMS noise level in the data. The
 *     default value is the value supplied for parameter RMS. []
 *     - GaussClumps.S0: The Chi-square stiffness parameter "S0" which 
-*     encourages the peak amplitude of each fitted gaussian to be below 
-*     the corresponding maximum value in the observed data (see the Stutski 
-*     & Gusten paper). [1.0]
+*     encourages the fitted gaussian value to be below the corresponding 
+*     value in the observed data at every point (see the Stutski & Gusten 
+*     paper). [1.0]
 *     - GaussClumps.Sa: The Chi-square stiffness parameter "Sa" which 
 *     encourages the peak amplitude of each fitted gaussian to be close to 
 *     the corresponding maximum value in the observed data (see the Stutski 

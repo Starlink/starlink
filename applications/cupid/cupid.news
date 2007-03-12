@@ -6,7 +6,22 @@
  and  analyse clumps of emission within 2- or 3- dimensional 
  data arrays.
 
-
+Changes introduced at V0.0-28:
+  - GaussClumps now has an additional termination crietrion; if the total
+  integrated sum in the fitted Gaussians equals or exceeds the total
+  integrated data sum in the input array, then the iterative fitting process 
+  will terminate. This is the termination criterion described by Stutzki
+  and Gusten in their paper describing GaussClumps. GaussClumps has several 
+  terminiation criteria, and the process terminates when the first such 
+  criterion is met.
+  - Gaussians fitted by GaussClumps are now constrained to have positive
+  background values.
+  - The default value for the GaussClumps.ModelLim configuration
+  parameter has been changed from 3.0 to 1.0.
+  - Bug fixed in the algorithm used to make the initial guess at the
+  clump size when using GaussClumps. This bug could cuase segmentation
+  violations when fitting low signal-to-noise clumps.
+ 
 Changes introduced at V0.0-27:
 
  - The algorithm used to make the initial guess at the clump size when

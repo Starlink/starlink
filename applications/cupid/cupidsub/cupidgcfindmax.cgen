@@ -6,7 +6,7 @@
 
 
 int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax,
-         int *status ){
+                                   double *sumdata, int *status ){
 /*
 *+
 *  Name:
@@ -20,7 +20,7 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax,
 
 *  Synopsis:
 *     int cupidGCFindMax<X>( CGEN_TYPE *array, int nel, int *imax,
-*        int *status )
+*                            double *sumdata, int *status )
 
 *  Description:
 *     This functions finds the element with the largest value in the supplied 
@@ -35,6 +35,11 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax,
 *        Pointer the location at which to return the index within the
 *        supplied array of the element with the largest value. A value of
 *        -1 is returned if there are no good values in the supplied array.
+*     sumdata 
+*        Pointer to a location at which to return the sum of the supplied
+*        array values. This is only done if the supplied value for
+*        "sumdata" is VAL__BADD (otherwise the supplied value is left
+*        unchanged).
 *     status
 *        Pointer to the inherited status value.
 
@@ -85,7 +90,7 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax,
 */
 
 /* Local Variables: */
-
+   double sum;          /* Sum of supplied values */
    int i;               /* Loop count */
    int ngood;           /* Number of good array values found */
    CGEN_TYPE maxval;    /* Largest value found so far */
@@ -94,6 +99,7 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax,
    *imax = -1;
    ngood = 0;
    maxval = 0;
+   sum = 0.0;
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return 1;
@@ -105,6 +111,9 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax,
       if( array[ i ] != CGEN_BAD ) {
           ngood++;
 
+/* Increment the sum of the supplied values */
+          sum += (double) array[ i ];
+
 /* If this is the first good value,  or if this value is larger than the 
    previous found maximum, record its position. */
          if( *imax == -1 || array[ i ] > maxval ) {
@@ -113,6 +122,9 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax,
          }
       }
    }
+
+/* Return the data sum, if required. */
+   if( *sumdata == VAL__BADD ) *sumdata = sum;
 
 /* Return a flag indicating if all array values are bad. */
    return ( ngood == 0 );

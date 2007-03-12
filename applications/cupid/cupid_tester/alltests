@@ -1,0 +1,33 @@
+#!/bin/tcsh
+#
+#  This script performs all available CUPID tests and reports on which ones
+#  failed, if any.
+#
+#  Each test is defined in a subdirectory beginning with the word "test..."
+#  Each such subdirectory should contain a script called dotest, which 
+#  performs the required test. If the test fails, the dotest script should 
+#  report some useful information describing the failure, and create a file 
+#  called "dotest.fail" in the test subdirectory.
+#
+
+set ok=1
+
+foreach n (test*)
+   echo "Doing $n"
+   cd $n
+   dotest
+   if( -e dotest.fail ) then
+      echo "$n failed\!\!\!"
+      echo ""
+      set ok=0
+      rm dotest.fail
+   endif
+   cd ..
+end
+
+if( "$ok" == "1" ) then
+   echo ""
+   echo "All tests passed"
+   echo ""
+endif
+

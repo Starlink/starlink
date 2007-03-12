@@ -168,7 +168,6 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 */
 
 /* Local Variables: */
-
    AstKeyMap *gcconfig; /* Configuration parameters for this algorithm */
    char buf[30];        /* File name buffer */
    HDSLoc *ret;         /* Locator for the returned array of NDFs */
@@ -181,8 +180,10 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    double old_peak;     /* The oldest value within "peaks" */
    double peak_thresh;  /* The lower threshold for clump peak values */
    double sigma_peak;   /* The standard deviation of the values within "peaks" */
+   double sumdata;      /* Sum of the supplied data values */
    double sum_peak2;    /* Sum of the squares of the values in "peaks" */
    double sum_peak;     /* Sum of the values in "peaks" */
+   double sumclumps;    /* Sum of the values in all the used clumps so far */
    double x[ CUPID__GCNP3 ]; /* Parameters describing new Gaussian clump */
    int *dims;           /* Pointer to array of array dimensions */
    int allbad;          /* Are all the residuals bad? */
@@ -329,6 +330,8 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       iter = 1;
       niter = 0;
       nskip = 0;
+      sumclumps = 0.0;
+      sumdata = VAL__BADD;
 
 /* Use the setjmp function to define here to be the place to which the
    signal handling function will jump when a signal is detected. Zero is
@@ -361,7 +364,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Find the 1D vector index of the elements with the largest value in the 
    residuals array. */
-         allbad = cupidGCFindMax( type, res, el, &imax, status );
+         allbad = cupidGCFindMax( type, res, el, &imax, &sumdata, status );
 
 /* Finish iterating if all the residuals are bad, or if too many iterations 
    have been performed since the last succesfully fitted clump. */
@@ -433,7 +436,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                   cupidGCUpdateArrays( type, res, ipd, el, ndim, dims,
                                        x, rms, mlim, imax, ilevel, slbnd,    
                                        &ret, iclump, excols, mean_peak,
-                                       maxbad, &area, status );
+                                       maxbad, &area, &sumclumps, status );
 
 /* Dump the modified residuals if required. */
                   if( ilevel > 5 ) {
@@ -475,6 +478,22 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                         msgBlank( status );
                      }
 
+/* If the integrated data sum in the fitted gaussians exceeds or equals
+   the integrated data sum in th einput, exit. */
+                  } else if( sumclumps >= sumdata ) {
+                     iter = 0;
+
+                     if( ilevel > 2 ) msgBlank( status );
+                     if( ilevel > 3 ) {
+                        msgSetr( "SC", (float) sumclumps );
+                        msgSetr( "SD", (float) sumdata );
+                        msgOut( "", "The total data sum of the fitted "
+                                "Gaussians (^SC) has reached the total "
+                                "data sum in the supplied data (^SD).", 
+                                status );
+                        msgBlank( status );
+                     }
+                  
 /* If the count of consecutive peaks below the threshold has reached
    "Npad", terminate. */
                   } else if( peaks_below == npad ) {

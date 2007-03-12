@@ -1,0 +1,4 @@
+$CUPID_DIR/makeclumps lbnd=-500 ubnd=500 pardist=Norm trunc=0.2 nclump=5 \
+           rms=0.01 fwhm1="[20,2]" peak="[3,2]" velfwhm=2 deconv=no \
+           outcat=testcat.FIT out=testdata model=testmodel 
+

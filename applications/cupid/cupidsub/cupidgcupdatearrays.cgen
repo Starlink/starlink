@@ -19,7 +19,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
                                          double mlim, int imax, int ilevel, 
                                          int *lbnd, HDSLoc **ndfs, int iclump, 
                                          int excols, double mean_peak, 
-                                         int maxbad, int *area,
+                                         int maxbad, int *area, double *sumclumps,
                                          int *status ){
 /*
 *+
@@ -38,7 +38,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *                                  double rms, double mlim, int imax, 
 *                                  int ilevel, int *lbnd, HDSLoc **ndfs, 
 *                                  int iclump, int excols, double mean_peak,
-*                                  int maxbad, int *area, int *status )
+*                                  int maxbad, int *area, double *sumclumps,
+*                                  int *status )
 
 *  Description:
 *     This function removes the supplied Gaussian from the residuals array
@@ -96,6 +97,9 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *     area
 *        Pointer to an int in which to store the number of pixels
 *        contributing to the clump.
+*     sumclumps
+*        The supplied value is incremented by the sum of the data values
+*        in the fitted Gaussian.
 *     status
 *        Pointer to the inherited status value.
 
@@ -361,6 +365,10 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
          }
       }
    }
+
+/* Update the supplied "sumclumps" value, which holds the total
+   integrated intensity in the fitted clumps. */
+   *sumclumps += sum;
 
 /* Set the specified element of the residuals array bad if the fit was
    unusable.  This prevents the any subsequent attempt to fit a Gaussian 

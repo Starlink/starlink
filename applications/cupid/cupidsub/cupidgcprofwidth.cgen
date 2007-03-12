@@ -328,6 +328,11 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 /* Increment the sum of the offsets using the mean of the two minimum
    values. */
    *off += 0.5*( v1low + v2low );
+   if( v1low < v2low ) {
+      if ( *off > v1low + rms ) *off = v1low + rms;
+   } else {
+      if ( *off > v2low + rms ) *off = v2low + rms;
+   }
 
 /* Return the supplied central position. */
    *cen = ax_max[ ax ];
