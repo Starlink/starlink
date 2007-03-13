@@ -21,8 +21,8 @@ AC_PROG_LN_S
 AC_FC_LIBRARY_LDFLAGS
 STAR_CNF_COMPATIBLE_SYMBOLS
 
-
-AC_PATH_PROGS(M4, m4, m4)
+dnl    Prefer GNU m4.
+AC_PATH_PROGS(M4, gm4 gnum4 m4, m4)
 
 dnl    On OSX you need to be root to run mknod
 AC_CHECK_FUNCS([atexit on_exit mkfifo mknod])
