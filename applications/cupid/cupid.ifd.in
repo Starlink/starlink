@@ -37,6 +37,15 @@ package cupid {
             helpkey *
           }
 
+         parameter logfile {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath DEFAULT
+            prompt {Name of output log file}
+            helpkey *
+            default !
+         }
+
          parameter mask {
             position 1
             type NDF
