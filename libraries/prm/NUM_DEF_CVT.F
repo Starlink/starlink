@@ -97,7 +97,6 @@
       NUM1_WTOI( NUM_ARGW ) = NUM_ARGW
       NUM1_ITOW( NUM_ARGI ) = NUM_ARGI
 
-
 *  Machine dependent definitions:
 *  =============================
 *  The following conversions between the unsigned integer types use VMS
@@ -113,7 +112,9 @@
       NUM1_UBTOW( NUM_ARGUB ) = IZEXT( NUM_ARGUB )
       NUM1_UWTOI( NUM_ARGUW ) = JZEXT( NUM_ARGUW )
       NUM1_WTOUB( NUM_ARGW )   =
-     :   IIEOR( NUM_ARGW, IIAND( - IIAND( NUM_ARGW, 128 ), -256 ) )
+     :   IIEOR( NUM_ARGW, 
+     :      IIAND( - IIAND( NUM_ARGW, NUM1_ITOW( 128 ) ), 
+     :             NUM1_ITOW( -256 ) ) )
       NUM1_ITOUW( NUM_ARGI )   =
      :  JIAND( 65535, NUM1_WTOI( NUM1_ITOW( NUM_ARGI - 32768 ) )
      :                           + 65536 ) - 32768
