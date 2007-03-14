@@ -223,6 +223,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     24-NOV-2006 (DSB):
 *        Allow astRebinSeq to be called with a NULL pointer for the input
 *        data array.
+*     14-MAR-2007 (DSB):
+*        Modify astRebinSeq to allow input variances to be used as weights.
 *class--
 */
 
@@ -1119,8 +1121,8 @@ static void FunPN( AstMapping *map, double *at, int ax1, int ax2,
 /* Add these new PointSets to the cache, removing any existing 
    PointSets. */
          if( pset_size[ next_slot ] > 0 ) {
-            astAnnul( pset1_cache[ next_slot ] );
-            astAnnul( pset2_cache[ next_slot ] );
+            (void) astAnnul( pset1_cache[ next_slot ] );
+            (void) astAnnul( pset2_cache[ next_slot ] );
          }
          pset1_cache[ next_slot ] = pset1;
          pset2_cache[ next_slot ] = pset2;
@@ -1142,7 +1144,7 @@ static void FunPN( AstMapping *map, double *at, int ax1, int ax2,
       ptr2[ ax1 ] = y;
 
 /* Transform the positions. */
-      astTransform( map, pset1, 1, pset2 );
+      (void) astTransform( map, pset1, 1, pset2 );
 
 /* Re-instate the original arrays in the PointSets. */
       ptr1[ ax2 ] = oldx;
@@ -15551,6 +15553,7 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
    double xn;                    /* Coordinate value (n-d) */ \
    double y;                     /* y coordinate value */ \
    double sum;                   /* Sum of all filter values */ \
+   double wgt;                   /* Weight for input value */ \
    double xx;                    /* X offset */ \
    double yy;                    /* Y offset */ \
    double *kp;                   /* Pointer to next weight values */ \
@@ -15588,6 +15591,7 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
    int genvar;                   /* Generate output variances? */ \
    int usebad;                   /* Use "bad" input pixel values? */ \
    int usevar;                   /* Process variance array? */ \
+   int varwgt;                   /* Use input variances as weights? */ \
    int ystride;                  /* Stride along input grid y dimension */ \
    int jxn; \
 \
@@ -15611,32 +15615,54 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
 \
 /* Determine if we are processing bad pixels or variances. */ \
       usebad = flags & AST__USEBAD; \
-      genvar = ( flags & AST__GENVAR ) && out_var; \
+      genvar = ( flags & AST__GENVAR ) && out_var && work; \
+      varwgt = ( flags & AST__VARWGT ) && in_var && work; \
       usevar = !genvar && in_var && out_var; \
 \
 /* Handle the 1-dimensional case optimally. */ \
 /* ---------------------------------------- */ \
       if ( ndim_out == 1 ) { \
 \
-/* Identify four cases, according to whether bad pixels and/or \
-   variances are being processed. In each case we assign constant values \
-   (0 or 1) to the "Usebad" and "Usevar" flags so that code for handling \
-   bad pixels and variances can be eliminated when not required. */ \
-         if ( usebad ) { \
-            if ( usevar ) { \
-               KERNEL_1D(X,Xtype,1,1,0,IntType) \
-            } else if ( genvar ) { \
-               KERNEL_1D(X,Xtype,1,0,1,IntType) \
+/* Identify eight cases, according to whether bad pixels and/or variances \
+   are being processed and/or used. In each case we assign constant values \
+   (0 or 1) to the "Usebad", "Usevar" and "Varwgt" flags so that code for \
+   handling bad pixels and variances can be eliminated by the compiler's \
+   optimisation system when not required. */ \
+         if( varwgt ) { \
+            if ( usebad ) { \
+               if ( usevar ) { \
+                  KERNEL_1D(X,Xtype,1,1,0,IntType,1) \
+               } else if ( genvar ) { \
+                  KERNEL_1D(X,Xtype,1,0,1,IntType,1) \
+               } else { \
+                  KERNEL_1D(X,Xtype,1,0,0,IntType,1) \
+               } \
             } else { \
-               KERNEL_1D(X,Xtype,1,0,0,IntType) \
+               if ( usevar ) { \
+                  KERNEL_1D(X,Xtype,0,1,0,IntType,1) \
+               } else if ( genvar ) { \
+                  KERNEL_1D(X,Xtype,0,0,1,IntType,1) \
+               } else { \
+                  KERNEL_1D(X,Xtype,0,0,0,IntType,1) \
+               } \
             } \
          } else { \
-            if ( usevar ) { \
-               KERNEL_1D(X,Xtype,0,1,0,IntType) \
-            } else if ( genvar ) { \
-               KERNEL_1D(X,Xtype,0,0,1,IntType) \
+            if ( usebad ) { \
+               if ( usevar ) { \
+                  KERNEL_1D(X,Xtype,1,1,0,IntType,0) \
+               } else if ( genvar ) { \
+                  KERNEL_1D(X,Xtype,1,0,1,IntType,0) \
+               } else { \
+                  KERNEL_1D(X,Xtype,1,0,0,IntType,0) \
+               } \
             } else { \
-               KERNEL_1D(X,Xtype,0,0,0,IntType) \
+               if ( usevar ) { \
+                  KERNEL_1D(X,Xtype,0,1,0,IntType,0) \
+               } else if ( genvar ) { \
+                  KERNEL_1D(X,Xtype,0,0,1,IntType,0) \
+               } else { \
+                  KERNEL_1D(X,Xtype,0,0,0,IntType,0) \
+               } \
             } \
          } \
 \
@@ -15650,25 +15676,46 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
 /* Calculate the stride along the y dimension of the output grid. */ \
          ystride = ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1; \
 \
-/* Identify four cases, according to whether bad pixels and/or \
-   variances are being processed. In each case we assign constant values \
-   (0 or 1) to the "Usebad" and "Usevar" flags so that code for handling \
-   bad pixels and variances can be eliminated when not required. */ \
-         if ( usebad ) { \
-            if ( usevar ) { \
-               KERNEL_2D(X,Xtype,1,1,0,IntType) \
-            } else if ( genvar ) { \
-               KERNEL_2D(X,Xtype,1,0,1,IntType) \
+/* Identify eight cases, according to whether bad pixels and/or variances \
+   are being processed and/or used. In each case we assign constant values \
+   (0 or 1) to the "Usebad", "Usevar" and "Varwgt" flags so that code for \
+   handling bad pixels and variances can be eliminated by the compiler's \
+   optimisation system when not required. */ \
+         if( varwgt ) { \
+            if ( usebad ) { \
+               if ( usevar ) { \
+                  KERNEL_2D(X,Xtype,1,1,0,IntType,1) \
+               } else if ( genvar ) { \
+                  KERNEL_2D(X,Xtype,1,0,1,IntType,1) \
+               } else { \
+                  KERNEL_2D(X,Xtype,1,0,0,IntType,1) \
+               } \
             } else { \
-               KERNEL_2D(X,Xtype,1,0,0,IntType) \
+               if ( usevar ) { \
+                  KERNEL_2D(X,Xtype,0,1,0,IntType,1) \
+               } else if ( genvar ) { \
+                  KERNEL_2D(X,Xtype,0,0,1,IntType,1) \
+               } else { \
+                  KERNEL_2D(X,Xtype,0,0,0,IntType,1) \
+               } \
             } \
          } else { \
-            if ( usevar ) { \
-               KERNEL_2D(X,Xtype,0,1,0,IntType) \
-            } else if ( genvar ) { \
-               KERNEL_2D(X,Xtype,0,0,1,IntType) \
+            if ( usebad ) { \
+               if ( usevar ) { \
+                  KERNEL_2D(X,Xtype,1,1,0,IntType,0) \
+               } else if ( genvar ) { \
+                  KERNEL_2D(X,Xtype,1,0,1,IntType,0) \
+               } else { \
+                  KERNEL_2D(X,Xtype,1,0,0,IntType,0) \
+               } \
             } else { \
-               KERNEL_2D(X,Xtype,0,0,0,IntType) \
+               if ( usevar ) { \
+                  KERNEL_2D(X,Xtype,0,1,0,IntType,0) \
+               } else if ( genvar ) { \
+                  KERNEL_2D(X,Xtype,0,0,1,IntType,0) \
+               } else { \
+                  KERNEL_2D(X,Xtype,0,0,0,IntType,0) \
+               } \
             } \
          } \
 \
@@ -15700,25 +15747,46 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
                xnl[ idim ] = AST__BAD; \
             } \
 \
-/* Identify four cases, according to whether bad pixels and/or \
-   variances are being processed. In each case we assign constant values \
-   (0 or 1) to the "Usebad" and "Usevar" flags so that code for handling \
-   bad pixels and variances can be eliminated when not required. */ \
-            if ( usebad ) { \
-               if ( usevar ) { \
-                  KERNEL_ND(X,Xtype,1,1,0,IntType) \
-               } else if ( genvar ) { \
-                  KERNEL_ND(X,Xtype,1,0,1,IntType) \
+/* Identify eight cases, according to whether bad pixels and/or variances \
+   are being processed and/or used. In each case we assign constant values \
+   (0 or 1) to the "Usebad", "Usevar" and "Varwgt" flags so that code for \
+   handling bad pixels and variances can be eliminated by the compiler's \
+   optimisation system when not required. */ \
+            if( varwgt ) { \
+               if ( usebad ) { \
+                  if ( usevar ) { \
+                     KERNEL_ND(X,Xtype,1,1,0,IntType,1) \
+                  } else if ( genvar ) { \
+                     KERNEL_ND(X,Xtype,1,0,1,IntType,1) \
+                  } else { \
+                     KERNEL_ND(X,Xtype,1,0,0,IntType,1) \
+                  } \
                } else { \
-                  KERNEL_ND(X,Xtype,1,0,0,IntType) \
+                  if ( usevar ) { \
+                     KERNEL_ND(X,Xtype,0,1,0,IntType,1) \
+                  } else if ( genvar ) { \
+                     KERNEL_ND(X,Xtype,0,0,1,IntType,1) \
+                  } else { \
+                     KERNEL_ND(X,Xtype,0,0,0,IntType,1) \
+                  } \
                } \
             } else { \
-               if ( usevar ) { \
-                  KERNEL_ND(X,Xtype,0,1,0,IntType) \
-               } else if ( genvar ) { \
-                  KERNEL_ND(X,Xtype,0,0,1,IntType) \
+               if ( usebad ) { \
+                  if ( usevar ) { \
+                     KERNEL_ND(X,Xtype,1,1,0,IntType,0) \
+                  } else if ( genvar ) { \
+                     KERNEL_ND(X,Xtype,1,0,1,IntType,0) \
+                  } else { \
+                     KERNEL_ND(X,Xtype,1,0,0,IntType,0) \
+                  } \
                } else { \
-                  KERNEL_ND(X,Xtype,0,0,0,IntType) \
+                  if ( usevar ) { \
+                     KERNEL_ND(X,Xtype,0,1,0,IntType,0) \
+                  } else if ( genvar ) { \
+                     KERNEL_ND(X,Xtype,0,0,1,IntType,0) \
+                  } else { \
+                     KERNEL_ND(X,Xtype,0,0,0,IntType,0) \
+                  } \
                } \
             } \
 \
@@ -15754,7 +15822,7 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
 
 
 
-#define KERNEL_1D(X,Xtype,Usebad,Usevar,Genvar,IntType) \
+#define KERNEL_1D(X,Xtype,Usebad,Usevar,Genvar,IntType,Varwgt) \
 \
 /* We do not yet have a previous filter position. */ \
    xxl = AST__BAD; \
@@ -15766,12 +15834,19 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
       off_in = offset[ point ]; \
       in_val = in[ off_in ]; \
 \
-/* If necessary, test if the input data value or variance is bad. */ \
+/* If necessary, test if the input data value or variance is bad (or zero). */ \
       if ( Usebad ) { \
          bad = ( in_val == badval ); \
-         if ( Usevar ) bad = bad || ( in_var[ off_in ] == badval ); \
+         if ( Usevar || Varwgt ) { \
+            bad = bad || ( in_var[ off_in ] == badval ) \
+                      || ( in_var[ off_in ] <= 0.0 ); \
+         } \
       } else { \
-         bad = 0; \
+         if ( Usevar || Varwgt ) { \
+            bad = ( in_var[ off_in ] <= 0.0 ); \
+         } else { \
+            bad = 0; \
+         } \
       } \
 \
 /* Obtain the x coordinate of the current point and test if it is bad. */ \
@@ -15823,26 +15898,39 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
                if( sum == 0.0 ) sum = 1.0; \
             } \
 \
+/* If we are using the input data variances as weights, calculate the \
+   total weight, incorporating the normalisation factor for the kernel. */ \
+            if( Varwgt ) { \
+               wgt = 1.0/(sum*in_var[ off_in ]); \
+\
+/* If we are not using input variances as weights, the weight is just the \
+   kernel normalisation factor. */ \
+            } else { \
+               wgt = 1.0/sum; \
+            } \
+\
 /* Loop round all the output pixels which receive contributions from this \
-   input pixel, calculating the offset \
-   of each pixel from the start of the input array. */ \
+   input pixel, calculating the offset of each pixel from the start of the \
+   input array. */ \
             off_out = lo_ix - lbnd_out[ 0 ]; \
             for ( jx = lo_jx; jx <= hi_jx; jx++, off_out++ ) { \
 \
 /* Retrieve the weight for the current output pixel and normalise it. */ \
-               pixwt = filter[ jx ]/sum; \
+               pixwt = wgt*filter[ jx ]; \
 \
-/* Update the output pixel with the required fraction of the input pixel 
+/* Update the output pixel with the required fraction of the input pixel \
    value. */ \
                c = CONV(IntType,in_val*pixwt); \
                out[ off_out ] += c; \
                if( work ) work[ off_out ] += pixwt; \
+\
                if ( Usevar ) { \
                   out_var[ off_out ] += CONV(IntType,in_var[ off_in ]*pixwt*pixwt); \
                } else if ( Genvar && pixwt != 0.0 ) { \
                   out_var[ off_out ] += c*c/pixwt; \
                   work[ off_out + npix_out ] += pixwt*pixwt; \
                } \
+\
             } \
          } \
       } \
@@ -15851,7 +15939,7 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
 
 
 
-#define KERNEL_2D(X,Xtype,Usebad,Usevar,Genvar,IntType) \
+#define KERNEL_2D(X,Xtype,Usebad,Usevar,Genvar,IntType,Varwgt) \
 \
 /* We do not yet have a previous filter position. */ \
    xxl = AST__BAD; \
@@ -15865,12 +15953,19 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
       off_in = offset[ point ]; \
       in_val = in[ off_in ]; \
 \
-/* If necessary, test if the input data value or variance is bad. */ \
+/* If necessary, test if the input data value or variance is bad (or zero). */ \
       if ( Usebad ) { \
          bad = ( in_val == badval ); \
-         if ( Usevar ) bad = bad || ( in_var[ off_in ] == badval ); \
+         if ( Usevar || Varwgt ) { \
+            bad = bad || ( in_var[ off_in ] == badval ) \
+                      || ( in_var[ off_in ] <= 0.0 ); \
+         } \
       } else { \
-         bad = 0; \
+         if ( Usevar || Varwgt ) { \
+            bad = ( in_var[ off_in ] <= 0.0 ); \
+         } else { \
+            bad = 0; \
+         } \
       } \
 \
 /* Obtain the x coordinate of the current point and test if it is bad. */ \
@@ -15963,6 +16058,17 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
                   if( sum == 0.0 ) sum = 1.0; \
                } \
 \
+/* If we are using the input data variances as weights, calculate the \
+   total weight, incorporating the normalisation factor for the kernel. */ \
+               if( Varwgt ) { \
+                  wgt = 1.0/(sum*in_var[ off_in ]); \
+\
+/* If we are not using input variances as weights, the weight is just the \
+   kernel normalisation factor. */ \
+               } else { \
+                  wgt = 1.0/sum; \
+               } \
+\
 /* Find the offset into the output array at the first modified output pixel \
    in the first modified row. */ \
                off1 = lo_ix - lbnd_out[ 0 ] + ystride * ( lo_iy - lbnd_out[ 1 ] ); \
@@ -15981,7 +16087,7 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
                   for ( jx = lo_jx; jx <= hi_jx; jx++, off_out++, kp++ ) { \
 \
 /* Calculate the weight for this output pixel and normalise it. */ \
-                     pixwt = *kp / sum; \
+                     pixwt = wgt*( *kp ); \
 \
 /* Update the output pixel with the required fraction of the input pixel \
    value. */ \
@@ -16004,7 +16110,7 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
 
 
 
-#define KERNEL_ND(X,Xtype,Usebad,Usevar,Genvar,IntType) \
+#define KERNEL_ND(X,Xtype,Usebad,Usevar,Genvar,IntType,Varwgt) \
 \
 /* We do not yet have a normalising factor */ \
    sum = AST__BAD; \
@@ -16016,12 +16122,19 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
       off_in = offset[ point ]; \
       in_val = in[ off_in ]; \
 \
-/* If necessary, test if the input data value or variance is bad. */ \
+/* If necessary, test if the input data value or variance is bad (or zero). */ \
       if ( Usebad ) { \
          bad = ( in_val == badval ); \
-         if ( Usevar ) bad = bad || ( in_var[ off_in ] == badval ); \
+         if ( Usevar || Varwgt ) { \
+            bad = bad || ( in_var[ off_in ] == badval ) \
+                      || ( in_var[ off_in ] <= 0.0 ); \
+         } \
       } else { \
-         bad = 0; \
+         if ( Usevar || Varwgt ) { \
+            bad = ( in_var[ off_in ] <= 0.0 ); \
+         } else { \
+            bad = 0; \
+         } \
       } \
 \
 /* Initialise offsets into the output array. Then loop to obtain each \
@@ -16154,6 +16267,17 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
                kstart += nb2; \
             } \
 \
+/* If we are using the input data variances as weights, calculate the \
+   total weight, incorporating the normalisation factor for the kernel. */ \
+            if( Varwgt ) { \
+               wgt = 1.0/(sum*in_var[ off_in ]); \
+\
+/* If we are not using input variances as weights, the weight is just the \
+   kernel normalisation factor. */ \
+            } else { \
+               wgt = 1.0/sum; \
+            } \
+\
 /* Initialise, and loop over the neighbouring output pixels to divide up \
    the input pixel value between them. */ \
             idim = ndim_out - 1; \
@@ -16178,7 +16302,7 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
 /* Obtain the weight of each pixel from the accumulated \
    product of weights. Also multiply by the weight for dimension zero, \
    which is not included in the "wtprod" array). */ \
-               pixwt = ( wtprod[ 0 ] * *( wtptr[ 0 ] ) ) / sum; \
+               pixwt = ( wtprod[ 0 ] * *( wtptr[ 0 ] ) )*wgt; \
 \
 /* Update the output pixel with the required fraction of the input pixel \
    value. */ \
@@ -16397,8 +16521,8 @@ static void SpreadLinear##X( int ndim_out, \
                             Xtype *out, Xtype *out_var, double *work ) { \
 \
 /* Local Variables: */ \
-   Xtype in_val;                 /* Input value */ \
    Xtype c;                      /* Contribution to output value */ \
+   Xtype in_val;                 /* Input value */ \
    double *frac_hi;              /* Pointer to array of weights */ \
    double *frac_lo;              /* Pointer to array of weights */ \
    double *wt;                   /* Pointer to array of weights */ \
@@ -16410,6 +16534,7 @@ static void SpreadLinear##X( int ndim_out, \
    double frac_hi_y;             /* Pixel weight (y dimension) */ \
    double frac_lo_x;             /* Pixel weight (x dimension) */ \
    double frac_lo_y;             /* Pixel weight (y dimension) */ \
+   double wgt;                   /* Weight for input value */ \
    double x;                     /* x coordinate value */ \
    double xmax;                  /* x upper limit */ \
    double xmin;                  /* x lower limit */ \
@@ -16424,6 +16549,7 @@ static void SpreadLinear##X( int ndim_out, \
    int bad;                      /* Output pixel bad? */ \
    int bad_var;                  /* Output variance bad? */ \
    int done;                     /* All pixel indices done? */ \
+   int genvar;                   /* Generate output variances? */ \
    int hi_x;                     /* Upper pixel index (x dimension) */ \
    int hi_y;                     /* Upper pixel index (y dimension) */ \
    int idim;                     /* Loop counter for dimensions */ \
@@ -16438,10 +16564,9 @@ static void SpreadLinear##X( int ndim_out, \
    int point;                    /* Loop counter for output points */ \
    int s;                        /* Temporary variable for strides */ \
    int usebad;                   /* Use "bad" input pixel values? */ \
-   int genvar;                   /* Generate output variances? */ \
    int usevar;                   /* Process variance array? */ \
+   int varwgt;                   /* Use input variances as weights? */ \
    int ystride;                  /* Stride along input grid y dimension */ \
-\
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
@@ -16453,7 +16578,8 @@ static void SpreadLinear##X( int ndim_out, \
 \
 /* Determine if we are processing bad pixels or variances. */ \
    usebad = flags & AST__USEBAD; \
-   genvar = ( flags & AST__GENVAR ) && out_var; \
+   genvar = ( flags & AST__GENVAR ) && out_var && work; \
+   varwgt = ( flags & AST__VARWGT ) && in_var && work; \
    usevar = !genvar && in_var && out_var; \
 \
 /* Handle the 1-dimensional case optimally. */ \
@@ -16464,25 +16590,46 @@ static void SpreadLinear##X( int ndim_out, \
       xmin = (double) lbnd_out[ 0 ] - 0.5; \
       xmax = (double) ubnd_out[ 0 ] + 0.5; \
 \
-/* Identify four cases, according to whether bad pixels and/or \
-   variances are being processed. In each case we assign constant values \
-   (0 or 1) to the "Usebad" and "Usevar" flags so that code for handling \
-   bad pixels and variances can be eliminated when not required. */ \
-      if ( usebad ) { \
-         if ( usevar ) { \
-            LINEAR_1D(X,Xtype,1,1,0,IntType) \
-         } else if ( genvar ) { \
-            LINEAR_1D(X,Xtype,1,0,1,IntType) \
+/* Identify eight cases, according to whether bad pixels and/or variances \
+   are being processed and/or used. In each case we assign constant values \
+   (0 or 1) to the "Usebad", "Usevar" and "Varwgt" flags so that code for \
+   handling bad pixels and variances can be eliminated by the compiler's \
+   optimisation system when not required. */ \
+      if( varwgt ) { \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               LINEAR_1D(X,Xtype,1,1,0,IntType,1) \
+            } else if ( genvar ) { \
+               LINEAR_1D(X,Xtype,1,0,1,IntType,1) \
+            } else { \
+               LINEAR_1D(X,Xtype,1,0,0,IntType,1) \
+            } \
          } else { \
-            LINEAR_1D(X,Xtype,1,0,0,IntType) \
+            if ( usevar ) { \
+               LINEAR_1D(X,Xtype,0,1,0,IntType,1) \
+            } else if ( genvar ) { \
+               LINEAR_1D(X,Xtype,0,0,1,IntType,1) \
+            } else { \
+               LINEAR_1D(X,Xtype,0,0,0,IntType,1) \
+            } \
          } \
       } else { \
-         if ( usevar ) { \
-            LINEAR_1D(X,Xtype,0,1,0,IntType) \
-         } else if ( genvar ) { \
-            LINEAR_1D(X,Xtype,0,0,1,IntType) \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               LINEAR_1D(X,Xtype,1,1,0,IntType,0) \
+            } else if ( genvar ) { \
+               LINEAR_1D(X,Xtype,1,0,1,IntType,0) \
+            } else { \
+               LINEAR_1D(X,Xtype,1,0,0,IntType,0) \
+            } \
          } else { \
-            LINEAR_1D(X,Xtype,0,0,0,IntType) \
+            if ( usevar ) { \
+               LINEAR_1D(X,Xtype,0,1,0,IntType,0) \
+            } else if ( genvar ) { \
+               LINEAR_1D(X,Xtype,0,0,1,IntType,0) \
+            } else { \
+               LINEAR_1D(X,Xtype,0,0,0,IntType,0) \
+            } \
          } \
       } \
 \
@@ -16500,25 +16647,46 @@ static void SpreadLinear##X( int ndim_out, \
       ymin = (double) lbnd_out[ 1 ] - 0.5; \
       ymax = (double) ubnd_out[ 1 ] + 0.5; \
 \
-/* Identify four cases, according to whether bad pixels and/or \
-   variances are being processed. In each case we assign constant values \
-   (0 or 1) to the "Usebad" and "Usevar" flags so that code for handling \
-   bad pixels and variances can be eliminated when not required. */ \
-      if ( usebad ) { \
-         if ( usevar ) { \
-            LINEAR_2D(X,Xtype,1,1,0,IntType) \
-         } else if ( genvar ) { \
-            LINEAR_2D(X,Xtype,1,0,1,IntType) \
+/* Identify eight cases, according to whether bad pixels and/or variances \
+   are being processed and/or used. In each case we assign constant values \
+   (0 or 1) to the "Usebad", "Usevar" and "Varwgt" flags so that code for \
+   handling bad pixels and variances can be eliminated by the compiler's \
+   optimisation system when not required. */ \
+      if( varwgt ) { \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               LINEAR_2D(X,Xtype,1,1,0,IntType,1) \
+            } else if ( genvar ) { \
+               LINEAR_2D(X,Xtype,1,0,1,IntType,1) \
+            } else { \
+               LINEAR_2D(X,Xtype,1,0,0,IntType,1) \
+            } \
          } else { \
-            LINEAR_2D(X,Xtype,1,0,0,IntType) \
+            if ( usevar ) { \
+               LINEAR_2D(X,Xtype,0,1,0,IntType,1) \
+            }else if ( genvar ) { \
+               LINEAR_2D(X,Xtype,0,0,1,IntType,1) \
+            } else { \
+               LINEAR_2D(X,Xtype,0,0,0,IntType,1) \
+            } \
          } \
       } else { \
-         if ( usevar ) { \
-            LINEAR_2D(X,Xtype,0,1,0,IntType) \
-         }else if ( genvar ) { \
-            LINEAR_2D(X,Xtype,0,0,1,IntType) \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               LINEAR_2D(X,Xtype,1,1,0,IntType,0) \
+            } else if ( genvar ) { \
+               LINEAR_2D(X,Xtype,1,0,1,IntType,0) \
+            } else { \
+               LINEAR_2D(X,Xtype,1,0,0,IntType,0) \
+            } \
          } else { \
-            LINEAR_2D(X,Xtype,0,0,0,IntType) \
+            if ( usevar ) { \
+               LINEAR_2D(X,Xtype,0,1,0,IntType,0) \
+            }else if ( genvar ) { \
+               LINEAR_2D(X,Xtype,0,0,1,IntType,0) \
+            } else { \
+               LINEAR_2D(X,Xtype,0,0,0,IntType,0) \
+            } \
          } \
       } \
 \
@@ -16550,25 +16718,46 @@ static void SpreadLinear##X( int ndim_out, \
             xn_max[ idim ] = (double) ubnd_out[ idim ] + 0.5; \
          } \
 \
-/* Identify four cases, according to whether bad pixels and/or \
-   variances are being processed. In each case we assign constant values \
-   (0 or 1) to the "Usebad" and "Usevar" flags so that code for handling \
-   bad pixels and variances can be eliminated when not required. */ \
-         if ( usebad ) { \
-            if ( usevar ) { \
-               LINEAR_ND(X,Xtype,1,1,0,IntType) \
-            } else if ( genvar ) { \
-               LINEAR_ND(X,Xtype,1,0,1,IntType) \
+/* Identify eight cases, according to whether bad pixels and/or variances \
+   are being processed and/or used. In each case we assign constant values \
+   (0 or 1) to the "Usebad", "Usevar" and "Varwgt" flags so that code for \
+   handling bad pixels and variances can be eliminated by the compiler's \
+   optimisation system when not required. */ \
+         if( varwgt ) { \
+            if ( usebad ) { \
+               if ( usevar ) { \
+                  LINEAR_ND(X,Xtype,1,1,0,IntType,1) \
+               } else if ( genvar ) { \
+                  LINEAR_ND(X,Xtype,1,0,1,IntType,1) \
+               } else { \
+                  LINEAR_ND(X,Xtype,1,0,0,IntType,1) \
+               } \
             } else { \
-               LINEAR_ND(X,Xtype,1,0,0,IntType) \
+               if ( usevar ) { \
+                  LINEAR_ND(X,Xtype,0,1,0,IntType,1) \
+               } else if ( genvar ) { \
+                  LINEAR_ND(X,Xtype,0,0,1,IntType,1) \
+               } else { \
+                  LINEAR_ND(X,Xtype,0,0,0,IntType,1) \
+               } \
             } \
          } else { \
-            if ( usevar ) { \
-               LINEAR_ND(X,Xtype,0,1,0,IntType) \
-            } else if ( genvar ) { \
-               LINEAR_ND(X,Xtype,0,0,1,IntType) \
+            if ( usebad ) { \
+               if ( usevar ) { \
+                  LINEAR_ND(X,Xtype,1,1,0,IntType,0) \
+               } else if ( genvar ) { \
+                  LINEAR_ND(X,Xtype,1,0,1,IntType,0) \
+               } else { \
+                  LINEAR_ND(X,Xtype,1,0,0,IntType,0) \
+               } \
             } else { \
-               LINEAR_ND(X,Xtype,0,0,0,IntType) \
+               if ( usevar ) { \
+                  LINEAR_ND(X,Xtype,0,1,0,IntType,0) \
+               } else if ( genvar ) { \
+                  LINEAR_ND(X,Xtype,0,0,1,IntType,0) \
+               } else { \
+                  LINEAR_ND(X,Xtype,0,0,0,IntType,0) \
+               } \
             } \
          } \
       } \
@@ -16593,7 +16782,7 @@ static void SpreadLinear##X( int ndim_out, \
 
 
 
-#define LINEAR_1D(X,Xtype,Usebad,Usevar,Genvar,IntType) \
+#define LINEAR_1D(X,Xtype,Usebad,Usevar,Genvar,IntType,Varwgt) \
 \
 /* Loop round all input points which are to be rebinned. */ \
    for( point = 0; point < npoint; point++ ) { \
@@ -16602,12 +16791,19 @@ static void SpreadLinear##X( int ndim_out, \
       off_in = offset[ point ]; \
       in_val = in[ off_in ]; \
 \
-/* If necessary, test if the input data value or variance is bad. */ \
+/* If necessary, test if the input data value or variance is bad (or zero). */ \
       if ( Usebad ) { \
          bad = ( in_val == badval ); \
-         if ( Usevar ) bad = bad || ( in_var[ off_in ] == badval ); \
+         if ( Usevar || Varwgt ) { \
+            bad = bad || ( in_var[ off_in ] == badval ) \
+                      || ( in_var[ off_in ] <= 0.0 ); \
+         } \
       } else { \
-         bad = 0; \
+         if ( Usevar || Varwgt ) { \
+            bad = ( in_var[ off_in ] <= 0.0 ); \
+         } else { \
+            bad = 0; \
+         } \
       } \
 \
 /* Obtain the x coordinate of the current point and test if it lies \
@@ -16628,6 +16824,14 @@ static void SpreadLinear##X( int ndim_out, \
 /* Obtain the offset within the output array of the first pixel to be \
    updated (the one with the smaller index). */ \
          off_lo = lo_x - lbnd_out[ 0 ]; \
+\
+/* If we are using the input data variances as weights, calculate the \
+   weight, and scale the fractions of each input pixel by the weight. */ \
+         if( Varwgt ) { \
+            wgt = 1.0/in_var[ off_in ]; \
+            frac_lo_x *= wgt; \
+            frac_hi_x *= wgt; \
+         } \
 \
 /* For each of the two pixels which may be updated, test if the pixel index \
    lies within the output grid. Where it does, update the output pixel \
@@ -16660,7 +16864,7 @@ static void SpreadLinear##X( int ndim_out, \
 
 
 
-#define LINEAR_2D(X,Xtype,Usebad,Usevar,Genvar,IntType) \
+#define LINEAR_2D(X,Xtype,Usebad,Usevar,Genvar,IntType,Varwgt) \
 \
 /* Loop round all input points which are to be rebinned. */ \
    for( point = 0; point < npoint; point++ ) { \
@@ -16669,12 +16873,19 @@ static void SpreadLinear##X( int ndim_out, \
       off_in = offset[ point ]; \
       in_val = in[ off_in ]; \
 \
-/* If necessary, test if the input data value or variance is bad. */ \
+/* If necessary, test if the input data value or variance is bad (or zero). */ \
       if ( Usebad ) { \
          bad = ( in_val == badval ); \
-         if ( Usevar ) bad = bad || ( in_var[ off_in ] == badval ); \
+         if ( Usevar || Varwgt ) { \
+            bad = bad || ( in_var[ off_in ] == badval ) \
+                      || ( in_var[ off_in ] <= 0.0 ); \
+         } \
       } else { \
-         bad = 0; \
+         if ( Usevar || Varwgt ) { \
+            bad = ( in_var[ off_in ] <= 0.0 ); \
+         } else { \
+            bad = 0; \
+         } \
       } \
 \
 /* Obtain the x coordinate of the current point and test if it lies \
@@ -16703,6 +16914,21 @@ static void SpreadLinear##X( int ndim_out, \
             hi_y = lo_y + 1; \
             frac_lo_y = (double) hi_y - y; \
             frac_hi_y = 1.0 - frac_lo_y; \
+\
+/* If we are using the input data variances as weights, calculate the \
+   weight, and scale the fractions of each input pixel by the weight. \
+   Since the product of two fractions is always used ot scale the input \
+   data values, we use the square root of the reciprocal of the variance \
+   as the weight (so that when the product of two fractions is taken, \
+   the square roots multiply together to give the required 1/variance \
+   weight).  */ \
+            if( Varwgt ) { \
+               wgt = 1.0/sqrt( in_var[ off_in ] ); \
+               frac_lo_x *= wgt; \
+               frac_hi_x *= wgt; \
+               frac_lo_y *= wgt; \
+               frac_hi_y *= wgt; \
+            } \
 \
 /* Obtain the offset within the output array of the first pixel to be \
    updated (the one with the smaller index along both dimensions). */ \
@@ -16771,7 +16997,7 @@ static void SpreadLinear##X( int ndim_out, \
    }
 
 
-#define LINEAR_ND(X,Xtype,Usebad,Usevar,Genvar,IntType) \
+#define LINEAR_ND(X,Xtype,Usebad,Usevar,Genvar,IntType,Varwgt) \
 \
 /* Loop round all input points which are to be rebinned. */ \
    for( point = 0; point < npoint; point++ ) { \
@@ -16780,12 +17006,19 @@ static void SpreadLinear##X( int ndim_out, \
       off_in = offset[ point ]; \
       in_val = in[ off_in ]; \
 \
-/* If necessary, test if the input data value or variance is bad. */ \
+/* If necessary, test if the input data value or variance is bad (or zero). */ \
       if ( Usebad ) { \
          bad = ( in_val == badval ); \
-         if ( Usevar ) bad = bad || ( in_var[ off_in ] == badval ); \
+         if ( Usevar || Varwgt ) { \
+            bad = bad || ( in_var[ off_in ] == badval ) \
+                      || ( in_var[ off_in ] <= 0.0 ); \
+         } \
       } else { \
-         bad = 0; \
+         if ( Usevar || Varwgt ) { \
+            bad = ( in_var[ off_in ] <= 0.0 ); \
+         } else { \
+            bad = 0; \
+         } \
       } \
 \
 /* Initialise offsets into the output array. Then loop to obtain each \
@@ -16822,6 +17055,17 @@ static void SpreadLinear##X( int ndim_out, \
 /* Also store the fractional weight associated with the lower pixel \
    along each dimension. */ \
             wt[ idim ] = frac_lo[ idim ]; \
+         } \
+\
+/* If we are using the input data variances as weights, calculate the \
+   weight, and scale the fractions of each input pixel by the weight. */ \
+         if( Varwgt ) { \
+            wgt = pow( in_var[ off_in ], -1.0/(double)ndim_out ); \
+            for ( idim = 0; idim < ndim_out; idim++ ) { \
+               frac_lo[ idim ] *= wgt; \
+               frac_hi[ idim ] *= wgt; \
+               wt[ idim ] = frac_lo[ idim ]; \
+            } \
          } \
 \
 /* If OK, loop over adjacent output pixels to divide up the input value. */ \
@@ -17071,10 +17315,12 @@ static void SpreadNearest##X( int ndim_out, \
                              Xtype *out, Xtype *out_var, double *work ) { \
 \
 /* Local Variables: */ \
-   Xtype in_val;                 /* Input data value */ \
    Xtype c;                      /* Contribution to output value */ \
+   Xtype in_val;                 /* Input data value */ \
    double *xn_max;               /* Pointer to upper limits array (n-d) */ \
    double *xn_min;               /* Pointer to lower limits array (n-d) */ \
+   double cwgt;                  /* Product of input value and weight */ \
+   double wgt;                   /* Weight for input value */ \
    double x;                     /* x coordinate value */ \
    double xmax;                  /* x upper limit */ \
    double xmin;                  /* x lower limit */ \
@@ -17084,6 +17330,7 @@ static void SpreadNearest##X( int ndim_out, \
    double ymin;                  /* y lower limit */ \
    int *stride;                  /* Pointer to array of dimension strides */ \
    int bad;                      /* Output pixel bad? */ \
+   int genvar;                   /* Generate output variances? */ \
    int idim;                     /* Loop counter for dimensions */ \
    int ix;                       /* Number of pixels offset in x direction */ \
    int ixn;                      /* Number of pixels offset (n-d) */ \
@@ -17093,8 +17340,8 @@ static void SpreadNearest##X( int ndim_out, \
    int point;                    /* Loop counter for output points */ \
    int s;                        /* Temporary variable for strides */ \
    int usebad;                   /* Use "bad" input pixel values? */ \
-   int genvar;                   /* Generate output variances? */ \
    int usevar;                   /* Process variance array? */ \
+   int varwgt;                   /* Use input variances as weights? */ \
    int ystride;                  /* Stride along input grid y direction */ \
 \
 /* Check the global error status. */ \
@@ -17102,7 +17349,8 @@ static void SpreadNearest##X( int ndim_out, \
 \
 /* Determine if we are processing bad pixels or variances. */ \
    usebad = flags & AST__USEBAD; \
-   genvar = ( flags & AST__GENVAR ) && out_var; \
+   genvar = ( flags & AST__GENVAR ) && out_var && work; \
+   varwgt = ( flags & AST__VARWGT ) && in_var && work; \
    usevar = !genvar && in_var && out_var; \
 \
 /* Handle the 1-dimensional case optimally. */ \
@@ -17113,25 +17361,46 @@ static void SpreadNearest##X( int ndim_out, \
       xmin = (double) lbnd_out[ 0 ] - 0.5; \
       xmax = (double) ubnd_out[ 0 ] + 0.5; \
 \
-/* Identify four cases, according to whether bad pixels and/or \
-   variances are being processed. In each case we assign constant values \
-   (0 or 1) to the "Usebad" and "Usevar" flags so that code for handling bad \
-   pixels and variances can be eliminated by the compiler when not required. */ \
-      if ( usebad ) { \
-         if ( usevar ) { \
-            NEAR_1D(X,Xtype,1,1,0,IntType) \
-         } else if ( genvar ) { \
-            NEAR_1D(X,Xtype,1,0,1,IntType) \
+/* Identify eight cases, according to whether bad pixels and/or variances \
+   are being processed and/or used. In each case we assign constant values \
+   (0 or 1) to the "Usebad", "Usevar" and "Varwgt" flags so that code for \
+   handling bad pixels and variances can be eliminated by the compiler's \
+   optimisation system when not required. */ \
+      if( varwgt ) { \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               NEAR_1D(X,Xtype,1,1,0,IntType,1) \
+            } else if ( genvar ) { \
+               NEAR_1D(X,Xtype,1,0,1,IntType,1) \
+            } else { \
+               NEAR_1D(X,Xtype,1,0,0,IntType,1) \
+            } \
          } else { \
-            NEAR_1D(X,Xtype,1,0,0,IntType) \
+            if ( usevar ) { \
+               NEAR_1D(X,Xtype,0,1,0,IntType,1) \
+            } else if ( genvar ) { \
+               NEAR_1D(X,Xtype,0,0,1,IntType,1) \
+            } else { \
+               NEAR_1D(X,Xtype,0,0,0,IntType,1) \
+            } \
          } \
       } else { \
-         if ( usevar ) { \
-            NEAR_1D(X,Xtype,0,1,0,IntType) \
-         } else if ( genvar ) { \
-            NEAR_1D(X,Xtype,0,0,1,IntType) \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               NEAR_1D(X,Xtype,1,1,0,IntType,0) \
+            } else if ( genvar ) { \
+               NEAR_1D(X,Xtype,1,0,1,IntType,0) \
+            } else { \
+               NEAR_1D(X,Xtype,1,0,0,IntType,0) \
+            } \
          } else { \
-            NEAR_1D(X,Xtype,0,0,0,IntType) \
+            if ( usevar ) { \
+               NEAR_1D(X,Xtype,0,1,0,IntType,0) \
+            } else if ( genvar ) { \
+               NEAR_1D(X,Xtype,0,0,1,IntType,0) \
+            } else { \
+               NEAR_1D(X,Xtype,0,0,0,IntType,0) \
+            } \
          } \
       } \
 \
@@ -17149,25 +17418,46 @@ static void SpreadNearest##X( int ndim_out, \
       ymin = (double) lbnd_out[ 1 ] - 0.5; \
       ymax = (double) ubnd_out[ 1 ] + 0.5; \
 \
-/* Identify four cases, according to whether bad pixels and/or \
-   variances are being processed. In each case we assign constant values \
-   (0 or 1) to the "Usebad" and "Usevar" flags so that code for handling bad \
-   pixels and variances can be eliminated by the compiler when not required. */ \
-      if ( usebad ) { \
-         if ( usevar ) { \
-            NEAR_2D(X,Xtype,1,1,0,IntType) \
-         } else if ( genvar ) { \
-            NEAR_2D(X,Xtype,1,0,1,IntType) \
+/* Identify eight cases, according to whether bad pixels and/or variances \
+   are being processed and/or used. In each case we assign constant values \
+   (0 or 1) to the "Usebad", "Usevar" and "Varwgt" flags so that code for \
+   handling bad pixels and variances can be eliminated by the compiler's \
+   optimisation system when not required. */ \
+      if( varwgt ) { \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               NEAR_2D(X,Xtype,1,1,0,IntType,1) \
+            } else if ( genvar ) { \
+               NEAR_2D(X,Xtype,1,0,1,IntType,1) \
+            } else { \
+               NEAR_2D(X,Xtype,1,0,0,IntType,1) \
+            } \
          } else { \
-            NEAR_2D(X,Xtype,1,0,0,IntType) \
+            if ( usevar ) { \
+               NEAR_2D(X,Xtype,0,1,0,IntType,1) \
+            } else if ( genvar ) { \
+               NEAR_2D(X,Xtype,0,0,1,IntType,1) \
+            } else { \
+               NEAR_2D(X,Xtype,0,0,0,IntType,1) \
+            } \
          } \
       } else { \
-         if ( usevar ) { \
-            NEAR_2D(X,Xtype,0,1,0,IntType) \
-         } else if ( genvar ) { \
-            NEAR_2D(X,Xtype,0,0,1,IntType) \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               NEAR_2D(X,Xtype,1,1,0,IntType,0) \
+            } else if ( genvar ) { \
+               NEAR_2D(X,Xtype,1,0,1,IntType,0) \
+            } else { \
+               NEAR_2D(X,Xtype,1,0,0,IntType,0) \
+            } \
          } else { \
-            NEAR_2D(X,Xtype,0,0,0,IntType) \
+            if ( usevar ) { \
+               NEAR_2D(X,Xtype,0,1,0,IntType,0) \
+            } else if ( genvar ) { \
+               NEAR_2D(X,Xtype,0,0,1,IntType,0) \
+            } else { \
+               NEAR_2D(X,Xtype,0,0,0,IntType,0) \
+            } \
          } \
       } \
 \
@@ -17192,25 +17482,46 @@ static void SpreadNearest##X( int ndim_out, \
             xn_max[ idim ] = (double) ubnd_out[ idim ] + 0.5; \
          } \
 \
-/* Identify four cases, according to whether bad pixels and/or \
-   variances are being processed. In each case we assign constant values \
-   (0 or 1) to the "Usebad" and "Usevar" flags so that code for handling bad \
-   pixels and variances can be eliminated by the compiler when not required. */ \
-         if ( usebad ) { \
-            if ( usevar ) { \
-               NEAR_ND(X,Xtype,1,1,0,IntType) \
-            } else if ( genvar ) { \
-               NEAR_ND(X,Xtype,1,0,1,IntType) \
+/* Identify eight cases, according to whether bad pixels and/or variances \
+   are being processed and/or used. In each case we assign constant values \
+   (0 or 1) to the "Usebad", "Usevar" and "Varwgt" flags so that code for \
+   handling bad pixels and variances can be eliminated by the compiler's \
+   optimisation system when not required. */ \
+         if( varwgt ) { \
+            if ( usebad ) { \
+               if ( usevar ) { \
+                  NEAR_ND(X,Xtype,1,1,0,IntType,1) \
+               } else if ( genvar ) { \
+                  NEAR_ND(X,Xtype,1,0,1,IntType,1) \
+               } else { \
+                  NEAR_ND(X,Xtype,1,0,0,IntType,1) \
+               } \
             } else { \
-               NEAR_ND(X,Xtype,1,0,0,IntType) \
+               if ( usevar ) { \
+                  NEAR_ND(X,Xtype,0,1,0,IntType,1) \
+               } else if ( genvar ) { \
+                  NEAR_ND(X,Xtype,0,0,1,IntType,1) \
+               } else { \
+                  NEAR_ND(X,Xtype,0,0,0,IntType,1) \
+               } \
             } \
          } else { \
-            if ( usevar ) { \
-               NEAR_ND(X,Xtype,0,1,0,IntType) \
-            } else if ( genvar ) { \
-               NEAR_ND(X,Xtype,0,0,1,IntType) \
+            if ( usebad ) { \
+               if ( usevar ) { \
+                  NEAR_ND(X,Xtype,1,1,0,IntType,0) \
+               } else if ( genvar ) { \
+                  NEAR_ND(X,Xtype,1,0,1,IntType,0) \
+               } else { \
+                  NEAR_ND(X,Xtype,1,0,0,IntType,0) \
+               } \
             } else { \
-               NEAR_ND(X,Xtype,0,0,0,IntType) \
+               if ( usevar ) { \
+                  NEAR_ND(X,Xtype,0,1,0,IntType,0) \
+               } else if ( genvar ) { \
+                  NEAR_ND(X,Xtype,0,0,1,IntType,0) \
+               } else { \
+                  NEAR_ND(X,Xtype,0,0,0,IntType,0) \
+               } \
             } \
          } \
       } \
@@ -17227,7 +17538,7 @@ static void SpreadNearest##X( int ndim_out, \
 
 
 
-#define NEAR_1D(X,Xtype,Usebad,Usevar,Genvar,IntType) \
+#define NEAR_1D(X,Xtype,Usebad,Usevar,Genvar,IntType,Varwgt) \
 \
 /* Loop round all input points which are to be rebinned. */ \
             for( point = 0; point < npoint; point++ ) { \
@@ -17236,12 +17547,19 @@ static void SpreadNearest##X( int ndim_out, \
                off_in = offset[ point ]; \
                in_val = in[ off_in ]; \
 \
-/* If necessary, test if the input data value or variance is bad. */ \
+/* If necessary, test if the input data value or variance is bad (or zero). */ \
                if ( Usebad ) { \
                   bad = ( in_val == badval ); \
-                  if ( Usevar ) bad = bad || ( in_var[ off_in ] == badval ); \
+                  if ( Usevar || Varwgt ) { \
+                     bad = bad || ( in_var[ off_in ] == badval ) \
+                               || ( in_var[ off_in ] <= 0.0 ); \
+                  } \
                } else { \
-                  bad = 0; \
+                  if ( Usevar || Varwgt ) { \
+                     bad = ( in_var[ off_in ] <= 0.0 ); \
+                  } else { \
+                     bad = 0; \
+                  } \
                } \
 \
 /* Obtain the output x coordinate corresponding to the centre of the \
@@ -17255,21 +17573,56 @@ static void SpreadNearest##X( int ndim_out, \
    which contains the current input point. */ \
                   off_out = (int) floor( x + 0.5 ) - lbnd_out[ 0 ]; \
 \
-/* Increment the value of this output pixel by the value of the input pixel. */ \
+/* Note the input data value. */ \
                   c = CONV(IntType,in_val); \
-                  out[ off_out ] += c; \
-                  if( work ) work[ off_out ] += 1.0; \
 \
-/* If required, also increment the variance of this output pixel by the \
+/* If we are using the input data variances as weights, calculate the \
+   weight. */ \
+                  if( Varwgt ) { \
+                     wgt = 1.0/in_var[ off_in ]; \
+\
+/* Increment the value of this output pixel by the weighted input pixel \
+   value, and increment the sum of the weights. */ \
+                     cwgt = c*wgt; \
+                     out[ off_out ] += CONV(IntType, cwgt ); \
+                     work[ off_out ] += wgt; \
+\
+/* If output variances are being calculated on the basis of the input \
+   variances, then we also store the sum of the weights in "out_var". */ \
+                     if( Usevar ) { \
+                        out_var[ off_out ] += CONV(IntType,wgt); \
+\
+/* If output variances are being calculated on the basis of the spread of \
+   input values, we need the sum of the squared weighted data values, the \
+   sum of the weights (already in the first half of the "work" array), and \
+   the sum of the squared weights. */ \
+                     } else if( Genvar ) { \
+                        out_var[ off_out ] += CONV(IntType,cwgt*cwgt); \
+                        work[ off_out + npix_out ] += wgt*wgt; \
+                     } \
+\
+/* Now deal with cases where we are not using the input data varainces as \
+   weights. */ \
+                  } else { \
+\
+/* Increment the value of this output pixel by the input pixel value, and \
+   increment the sum of the weights by 1. */ \
+                     out[ off_out ] += c; \
+                     if( work ) work[ off_out ] += 1.0; \
+\
+/* If output variances are being calculated on the basis of the input \
+   variances, then we increment the variance of this output pixel by the \
    variance of the input pixel. */ \
-                  if ( Usevar ) { \
-                     out_var[ off_out ] += CONV(IntType,in_var[ off_in ]); \
+                     if ( Usevar ) { \
+                        out_var[ off_out ] += CONV(IntType,in_var[ off_in ]); \
 \
-/* Alternatively, if generating output variances from the spread of \
-   input values, form the required sum.*/ \
-                  } else if( Genvar ) { \
-                     out_var[ off_out ] += c*c; \
-                     work[ off_out + npix_out ] += 1.0; \
+/* If output variances are being calculated on the basis of the spread of \
+   input values, we need the sum of the squared data values, and the number \
+   of values summed. */ \
+                     } else if( Genvar ) { \
+                        out_var[ off_out ] += c*c; \
+                        work[ off_out + npix_out ] += 1.0; \
+                     } \
                   } \
                } \
             }
@@ -17279,7 +17632,7 @@ static void SpreadNearest##X( int ndim_out, \
 
 
 
-#define NEAR_2D(X,Xtype,Usebad,Usevar,Genvar,IntType) \
+#define NEAR_2D(X,Xtype,Usebad,Usevar,Genvar,IntType,Varwgt) \
 \
 /* Loop round all input points which are to be rebinned. */ \
             for( point = 0; point < npoint; point++ ) { \
@@ -17288,12 +17641,19 @@ static void SpreadNearest##X( int ndim_out, \
                off_in = offset[ point ]; \
                in_val = in[ off_in ]; \
 \
-/* If necessary, test if the input data value or variance is bad. */ \
+/* If necessary, test if the input data value or variance is bad (or zero). */ \
                if ( Usebad ) { \
                   bad = ( in_val == badval ); \
-                  if ( Usevar ) bad = bad || ( in_var[ off_in ] == badval ); \
+                  if ( Usevar || Varwgt ) { \
+                     bad = bad || ( in_var[ off_in ] == badval ) \
+                               || ( in_var[ off_in ] <= 0.0 ); \
+                  } \
                } else { \
-                  bad = 0; \
+                  if ( Usevar || Varwgt ) { \
+                     bad = ( in_var[ off_in ] <= 0.0 ); \
+                  } else { \
+                     bad = 0; \
+                  } \
                } \
 \
 /* Obtain the output y coordinate corresponding to the centre of the \
@@ -17318,21 +17678,53 @@ static void SpreadNearest##X( int ndim_out, \
 /* Calculate this pixel's offset from the start of the output array. */ \
                      off_out = ix + ystride * iy; \
 \
-/* Increment the value of this output pixel by the value of the input pixel. */ \
+/* Note the input data value. */ \
                      c = CONV(IntType,in_val); \
-                     out[ off_out ] += c; \
-                     if( work ) work[ off_out ] += 1.0; \
+\
+/* If we are using the input data variances as weights, calculate the \
+   weight. */ \
+                     if( Varwgt ) { \
+                        wgt = 1.0/in_var[ off_in ]; \
+\
+/* Increment the value of this output pixel by the weighted input pixel \
+   value, and increment the sum of the weights. */ \
+                        cwgt = c*wgt; \
+                        out[ off_out ] += CONV(IntType, cwgt ); \
+                        work[ off_out ] += wgt; \
+\
+/* If output variances are being calculated on the basis of the input \
+   variances, then we also store the sum of the weights in "out_var". */ \
+                        if( Usevar ) { \
+                           out_var[ off_out ] += CONV(IntType,wgt); \
+\
+/* If output variances are being calculated on the basis of the spread of \
+   input values, we need the sum of the squared weighted data values, the \
+   sum of the weights (already in the first half of the "work" array), and \
+   the sum of the squared weights. */ \
+                        } else if( Genvar ) { \
+                           out_var[ off_out ] += CONV(IntType,cwgt*cwgt); \
+                           work[ off_out + npix_out ] += wgt*wgt; \
+                        } \
+\
+/* Now deal with cases where we are not using the input data varainces as \
+   weights. */ \
+                     } else { \
+\
+/* Increment the value of this output pixel by the value of the input pixel. */ \
+                        out[ off_out ] += c; \
+                        if( work ) work[ off_out ] += 1.0; \
 \
 /* If required, also increment the variance of this output pixel by the \
    variance of the input pixel. */ \
-                     if ( Usevar ) { \
-                        out_var[ off_out ] += CONV(IntType,in_var[ off_in ]); \
+                        if ( Usevar ) { \
+                           out_var[ off_out ] += CONV(IntType,in_var[ off_in ]); \
 \
 /* Alternatively, if generating output variances from the spread of \
    input values, form the required sum.*/ \
-                     } else if( Genvar ) { \
-                        out_var[ off_out ] += c*c; \
-                        work[ off_out + npix_out ] += 1.0; \
+                        } else if( Genvar ) { \
+                           out_var[ off_out ] += c*c; \
+                           work[ off_out + npix_out ] += 1.0; \
+                        } \
                      } \
                   } \
                } \
@@ -17340,7 +17732,7 @@ static void SpreadNearest##X( int ndim_out, \
 
 
 
-#define NEAR_ND(X,Xtype,Usebad,Usevar,Genvar,IntType) \
+#define NEAR_ND(X,Xtype,Usebad,Usevar,Genvar,IntType,Varwgt) \
 \
 /* Loop round all input points which are to be rebinned. */ \
             for( point = 0; point < npoint; point++ ) { \
@@ -17352,9 +17744,16 @@ static void SpreadNearest##X( int ndim_out, \
 /* If necessary, test if the input data value or variance is bad. */ \
                if ( Usebad ) { \
                   bad = ( in_val == badval ); \
-                  if ( Usevar ) bad = bad || ( in_var[ off_in ] == badval ); \
+                  if ( Usevar || Varwgt ) { \
+                     bad = bad || ( in_var[ off_in ] == badval ) \
+                               || ( in_var[ off_in ] <= 0.0 ); \
+                  } \
                } else { \
-                  bad = 0; \
+                  if ( Usevar || Varwgt ) { \
+                     bad = ( in_var[ off_in ] <= 0.0 ); \
+                  } else { \
+                     bad = 0; \
+                  } \
                } \
 \
                if( !bad ) { \
@@ -17381,26 +17780,57 @@ static void SpreadNearest##X( int ndim_out, \
                   } \
                   if( !bad ) { \
 \
-/* Increment the value of this output pixel by the value of the input pixel. */ \
+/* Note the input data value. */ \
                      c = CONV(IntType,in_val); \
-                     out[ off_out ] += c; \
-                     if( work ) work[ off_out ] += 1.0; \
+\
+/* If we are using the input data variances as weights, calculate the \
+   weight. */ \
+                     if( Varwgt ) { \
+                        wgt = 1.0/in_var[ off_in ]; \
+\
+/* Increment the value of this output pixel by the weighted input pixel \
+   value, and increment the sum of the weights. */ \
+                        cwgt = c*wgt; \
+                        out[ off_out ] += CONV(IntType, cwgt ); \
+                        work[ off_out ] += wgt; \
+\
+/* If output variances are being calculated on the basis of the input \
+   variances, then we also store the sum of the weights in "out_var". */ \
+                        if( Usevar ) { \
+                           out_var[ off_out ] += CONV(IntType,wgt); \
+\
+/* If output variances are being calculated on the basis of the spread of \
+   input values, we need the sum of the squared weighted data values, the \
+   sum of the weights (already in the first half of the "work" array), and \
+   the sum of the squared weights. */ \
+                        } else if( Genvar ) { \
+                           out_var[ off_out ] += CONV(IntType,cwgt*cwgt); \
+                           work[ off_out + npix_out ] += wgt*wgt; \
+                        } \
+\
+/* Now deal with cases where we are not using the input data varainces as \
+   weights. */ \
+                     } else { \
+\
+/* Increment the value of this output pixel by the value of the input pixel. */ \
+                        out[ off_out ] += c; \
+                        if( work ) work[ off_out ] += 1.0; \
 \
 /* If required, also increment the variance of this output pixel by the \
    variance of the input pixel. */ \
-                     if ( Usevar ) { \
-                        out_var[ off_out ] += CONV(IntType,in_var[ off_in ]); \
+                        if ( Usevar ) { \
+                           out_var[ off_out ] += CONV(IntType,in_var[ off_in ]); \
 \
 /* Alternatively, if generating output variances from the spread of \
    input values, form the required sum.*/ \
-                     } else if( Genvar ) { \
-                        out_var[ off_out ] += c*c; \
-                        work[ off_out + npix_out ] += 1.0; \
+                        } else if( Genvar ) { \
+                           out_var[ off_out ] += c*c; \
+                           work[ off_out + npix_out ] += 1.0; \
+                        } \
                      } \
                   } \
                } \
             }
-
 
 
 
@@ -17612,8 +18042,8 @@ f        The global status.
                                                    in_points, out_points );
 
 /* Delete the two PointSets. */
-      astDelete( in_points );
-      astDelete( out_points );
+      in_points = astDelete( in_points );
+      out_points = astDelete( out_points );
    }
 }
 
@@ -17731,8 +18161,8 @@ f        The global status.
                                                    in_points, out_points );
 
 /* Delete the two PointSets. */
-      astDelete( in_points );
-      astDelete( out_points );
+      in_points = astDelete( in_points );
+      out_points = astDelete( out_points );
    }
 }
 
@@ -19264,8 +19694,8 @@ f     be reversed.
                                                       in_points, out_points );
 
 /* Delete the two PointSets. */
-         astDelete( in_points );
-         astDelete( out_points );
+         in_points = astDelete( in_points );
+         out_points = astDelete( out_points );
       }
 
 /* Free the memory used for the data pointers. */
@@ -19386,8 +19816,8 @@ c--
                                                    in_points, out_points );
 
 /* Delete the two PointSets. */
-      astDelete( in_points );
-      astDelete( out_points );
+      in_points = astDelete( in_points );
+      out_points = astDelete( out_points );
    }
 }
 

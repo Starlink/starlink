@@ -24,7 +24,7 @@ f+
 \newcommand{\stardocnumber}    {210.22}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {31st January 2007}
+\newcommand{\stardocdate}      {14th March 2007}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -21286,6 +21286,15 @@ current version):
 \begin{enumerate}
 
 \item Support has been added for the FITS-WCS ``HPX'' (HEALPix) projection.
+\item A new flag ``AST\_\_VARWGT'' can be supplied to 
+c+
+astRebinSeq.
+c-
+f+
+AST\_REBINSEQ.
+f-
+This causes the input data values to be weighted using the reciprocals of 
+the input variances (if supplied).
 
 \end{enumerate}
 

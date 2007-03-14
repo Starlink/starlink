@@ -17,6 +17,9 @@ Main Changes in this Version
 ----------------------------
 
 -  Support has been added for the FITS-WCS "HPX" projection (HEALPix).
+-  A new flag "AST__VARWGT" can be supplied to astRebinSeq. This causes 
+the input data values to be weighted using the reciprocals of the input
+variances (if supplied).
 
 
 

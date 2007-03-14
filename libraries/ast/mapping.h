@@ -342,6 +342,7 @@
 #define AST__REBININIT (128)     /* Initialise a new sequence of calls to astRebinSeq? */
 #define AST__REBINEND (256)      /* End a sequence of calls to astRebinSeq? */
 #define AST__GENVAR (512)        /* Generate output variances when rebinning? */
+#define AST__VARWGT (1024)       /* Use input variances as weights? */
 
 /* These macros identify standard sub-pixel interpolation algorithms
    for use by astResample<X>. They are used by giving the macro's
