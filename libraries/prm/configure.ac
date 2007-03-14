@@ -44,7 +44,7 @@ AC_C_BIGENDIAN
 
 dnl    Check for SIND as proxy for the other trig functions which take
 dnl    degree arguments, and IZEXT as proxy for related VMS intrinsics.
-AC_FC_CHECK_INTRINSICS([izext nint anint sind])
+AC_FC_CHECK_INTRINSICS([izext iiand nint anint sind])
 
 dnl    Determine whether the Fortran compiler supports the VOLATILE keyword
 AC_FC_HAVE_VOLATILE

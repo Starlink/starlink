@@ -278,7 +278,7 @@
 
 *   (3) Routines resulting in DOUBLE PRECISION
 
-      DCV_BTOD( DUMMY_B )    = DUMMY_B                       ! ???
+      DCV_BTOD( DUMMY_B )    = DBLE( DUMMY_B )                ! ???
 #if HAVE_INTRINSIC_ZEXT
       DCV_UBTOD( DUMMY_UB )  = DBLE( ZEXT( DUMMY_UB ) )
 #else
@@ -314,7 +314,7 @@
 
 *   (5) Routines resulting in REAL
 
-      DCV_BTOR( DUMMY_B )    = DUMMY_B                       ! ???
+      DCV_BTOR( DUMMY_B )    = REAL( DUMMY_B )               ! ???
 #if HAVE_INTRINSIC_ZEXT
       DCV_UBTOR( DUMMY_UB )  = REAL( ZEXT( DUMMY_UB ) )
 #else
