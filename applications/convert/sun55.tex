@@ -17,16 +17,16 @@
 {Copyright \copyright\ 2005 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {55.19}
+\newcommand{\stardocnumber}    {55.22}
 \newcommand{\stardocauthors}   {Malcolm J. Currie\\
                                 G.J.Privett\\
                                 A.J.Chipperfield\\
                                 D.S.Berry\\
                                 A.C.Davenhall}
-\newcommand{\stardocdate}      {2006 April 10}
+\newcommand{\stardocdate}      {2007 March 14}
 \newcommand{\stardoctitle}     {CONVERT\\
                                 A Format-conversion Package}
-\newcommand{\stardocversion}   {Version 1.5-8}
+\newcommand{\stardocversion}   {Version 1.5-9}
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {
 The \CONVERT\ package contains utilities for converting data files
@@ -2035,16 +2035,13 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
             from fits.cv.nrao.edu \texttt{/fits/documents/wcs/wcs88.ps.Z}.
 
          \sstitem
-            \texttt{"FITS-WCS"} --- This is the proposed FITS standard WCS
-            encoding scheme described in the paper 
-            \htmladdnormallink{\textit{Representation of celestial coordinates in FITS}}
-            {http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}\\ \latex{
-            (\texttt{http://www.cv.nrao.edu/fits/documents/wcs/wcs.html})}.
-            It is very similar to \texttt{"FITS-IRAF"} but supports a wider 
-            range of projections and co-ordinate systems. Once the standard
-            has been agreed, this encoding should be understood by any 
-            \texttt{FITS-WCS} compliant software and it is likely to be
-            adopted widely for FITS data in future. 
+            \texttt{"FITS-WCS"} --- This is the FITS standard WCS encoding 
+            scheme described in the paper 
+            \htmladdnormallink{\textit{Representation of celestial coordinates in FITS.}}
+            {http://www.atnf.csiro.au/people/mcalabre/WCS/}\\ \latex{
+            (\texttt{http://www.atnf.csiro.au/people/mcalabre/WCS/})}  It is
+            very similar to \texttt{"FITS-IRAF"} but supports a wider range of
+            projections and co-ordinate systems.
 
          \sstitem
             \texttt{"FITS-PC"} --- This uses keywords CRVAL\textit{i},
@@ -4663,16 +4660,18 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 
 
          \sstitem
-         \texttt{"FITS-WCS"} --- This is the proposed FITS standard WCS
-         encoding scheme described in the paper 
-         \htmladdnormallink{\textit{Representation of celestial coordinates in FITS}}
-         {http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}\\ \latex{
-         (\texttt{http://www.cv.nrao.edu/fits/documents/wcs/wcs.html})}.
-         It is very similar to \texttt{"FITS-IRAF"} but supports a wider 
-         range of projections and co-ordinate systems.  Once the standard
-         has been agreed, this encoding should be understood by any 
-         FITS-WCS compliant software and it is likely to be
-         adopted widely for FITS data in future. 
+         \texttt{"FITS-WCS"} --- This is the FITS standard WCS encoding 
+         scheme described in the paper 
+         \htmladdnormallink{\textit{Representation of celestial coordinates in FITS.}}
+         {http://www.atnf.csiro.au/people/mcalabre/WCS/}\\ \latex{
+         (\texttt{http://www.atnf.csiro.au/people/mcalabre/WCS/})}  It is
+         very similar to \texttt{"FITS-IRAF"} but supports a wider range of
+         projections and co-ordinate systems.
+
+         \sstitem
+         \texttt{"FITS-WCS(CD)"} --- This is the same as \texttt{"FITS-WCS"}
+         except that the scaling and rotation of the data array is described by a 
+         CD matrix instead of a PC matrix with associated CDELT values.
 
          \sstitem
          \texttt{"FITS-PC"} --- This uses keywords CRVAL\textit{i},
@@ -7133,5 +7132,12 @@ offset coefficients for the format conversion are taken from the NDF's
 scaled array too.  This new facility preserves the data compression
 of large files.  In the absence of a scaled array, the application
 behaves as if BITPIX=\texttt{-1} were specified.
+
+\section{Release Notes -- V1.5-9}
+
+\htmlref{NDF2FITS}{NDF2FITS} parameter ENCODING has a new allowed
+value of \texttt{"FITS-WCS(CD)"}.  This is the same as
+\texttt{"FITS-WCS"} except that it uses the old CD matrix formalism 
+to describe the data array's rotation and scaling.
 
 \end{document}
