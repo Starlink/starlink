@@ -79,15 +79,12 @@
 *           available by ftp from fits.cv.nrao.edu
 *           /fits/documents/wcs/wcs88.ps.Z. 
 *	    
-*        "FITS-WCS" --- This is the proposed FITS standard WCS encoding 
-*           scheme described in the paper "Representation of celestial
-*           co-ordinates in FITS"
-*           (http://www.cv.nrao.edu/fits/documents/wcs/wcs.html).  It
-*           is very similar to \texttt{"FITS-IRAF"} but supports a wider
-*           range of projections and co-ordinate systems.  Once the
-*           standard has been agreed, this encoding should be understood
-*           by any FITS-WCS compliant software and it is likely to be
-*           adopted widely for FITS data in future. 
+*        "FITS-WCS" --- This is the FITS standard WCS encoding scheme
+*          described in the paper "Representation of celestial 
+*          coordinates in FITS"
+*          (http://www.atnf.csiro.au/people/mcalabre/WCS/).  It is
+*          very similar to "FITS-IRAF" but supports a wider range of
+*          projections and co-ordinate systems. 
 *
 *        "FITS-PC" --- This uses keywords CRVALi, CDELTi, CRPIXi,
 *           PCiiijjj,  etc, as described in a previous (now superseded)
@@ -300,7 +297,7 @@
 *
 *        If FMTCNV="FALSE", the HDS type of the data array in the NDF
 *        will be the equivalent of the FITS data format on tape (e.g.
-*        BITPIX = 16 creates a _WORD array).  If FMTCNV="TRUE", the data 
+*        BITPIX = 16 creates a _WORD array).  If FMTCNV="TRUE", the data
 *        array in the NDF will be converted from the FITS data type
 *        to _REAL or _DOUBLE in the NDF.
 *
