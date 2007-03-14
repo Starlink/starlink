@@ -161,8 +161,6 @@
 *        Converted prologue to ADAM style.
 *     21-AUG-2005 (TIMJ):
 *        Autoconf for g95. IAND can not take typeless BOZ constants
-*     25-FEB-2007 (PWD):
-*        Add non-BOZ parameters.
 *     {enter_further_changes_here}
 
 *-
@@ -195,10 +193,7 @@
       PARAMETER (DCV_UBMASK = '000000FF'X )
       PARAMETER (DCV_UWMASK = '0000FFFF'X )
 #   else
-*  No BOZ support so use simple assignments. These may require compiler
-*  flag support to allow overflow (-fno-range-check for gfortran).
-      PARAMETER (DCV_UBMASK = 255)
-      PARAMETER (DCV_UWMASK = 65535)
+  error Have no BOZ and no ZEXT
 #   endif
 # endif
 
@@ -283,7 +278,7 @@
 
 *   (3) Routines resulting in DOUBLE PRECISION
 
-      DCV_BTOD( DUMMY_B )    = DUMMY_B                       ! ???
+      DCV_BTOD( DUMMY_B )    = DBLE( DUMMY_B )                ! ???
 #if HAVE_INTRINSIC_ZEXT
       DCV_UBTOD( DUMMY_UB )  = DBLE( ZEXT( DUMMY_UB ) )
 #else
@@ -319,7 +314,7 @@
 
 *   (5) Routines resulting in REAL
 
-      DCV_BTOR( DUMMY_B )    = DUMMY_B                       ! ???
+      DCV_BTOR( DUMMY_B )    = REAL( DUMMY_B )               ! ???
 #if HAVE_INTRINSIC_ZEXT
       DCV_UBTOR( DUMMY_UB )  = REAL( ZEXT( DUMMY_UB ) )
 #else
