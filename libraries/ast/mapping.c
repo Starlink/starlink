@@ -10711,6 +10711,9 @@ f     routine
 *     given on the last invocation within the sequence (this causes the
 *     temporary values accumulated in the variance array to be replaced with 
 *     the final required variances).
+*     - AST__VARWGT: Indicates that the input data should be weighted by
+*     the reciprocal of the input variances. Otherwise, all input data are 
+*     given equal weight.
 
 *  Propagation of Missing Data:
 *     Instances of missing data (bad pixels) in the output grid are
