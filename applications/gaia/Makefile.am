@@ -71,7 +71,7 @@ TCL_PREFIX = @TCL_PREFIX@
 
 ##  Build Skycat component.
 $(SKYCAT_FILES) $(SKYCAT_TEST_FILES):
-	- mkdir -p ./built
+	- $(mkdir_p) ./built
 	pwd=`pwd`;\
 	(cd ./skycat; \
 	PATH=$${pwd}/built/bin:$${PATH}; export PATH; \
@@ -91,7 +91,7 @@ $(SKYCAT_FILES) $(SKYCAT_TEST_FILES):
 
 ##  Build GAIA component.
 $(GAIA_FILES): $(SKYCAT_FILES) $(SKYCAT_TEST_FILES)
-	- mkdir -p ./built
+	- $(mkdir_p) ./built
 	pwd=`pwd`;\
 	(cd ./gaia; \
 	sed -e s#@PKG_VERS@#$(PACKAGE_VERSION)# VERSION.in >$ VERSION ;\
@@ -179,6 +179,7 @@ install-exec-local:
 	   $(LN_S) gaiaMon $$t; \
 	   $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(bindir)/$$t" || : ;\
 	done
+	- $(mkdir_p) $(starhelpdir)
 	cd $(starhelpdir)/..; \
 	pwd=`pwd`; \
 	echo "pwd = $${pwd} ($(starhelpdir))"; \
