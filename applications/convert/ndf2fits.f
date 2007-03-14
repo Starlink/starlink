@@ -368,15 +368,16 @@
 *        FITS Format" by R.J. Hanisch and D.G. Wells, 1988, available by
 *        ftp from fits.cv.nrao.edu /fits/documents/wcs/wcs88.ps.Z. 
 *
-*        "FITS-WCS" --- This is the proposed FITS standard WCS encoding
+*        "FITS-WCS" --- This is the FITS standard WCS encoding
 *        scheme described in the paper "Representation of celestial
 *        coordinates in FITS"
-*        (http://www.cv.nrao.edu/fits/documents/wcs/wcs.html).  It is
+*        (http://www.atnf.csiro.au/people/mcalabre/WCS/).  It is
 *        very similar to "FITS-IRAF" but supports a wider range of
-*        projections and co-ordinate systems.  Once the standard has
-*        been agreed, this encoding should be understood by any 
-*        FITS-WCS compliant software and it is likely to be adopted
-*        widely for FITS data in future. 
+*        projections and co-ordinate systems. 
+*
+*        "FITS-WCS(CD)" --- This is the same as "FITS-WCS" except that
+*        the scaling and rotation of the data array is described by a 
+*        CD matrix instead of a PC matrix with associated CDELT values.
 *
 *        "FITS-PC" --- This uses keywords CRVALi, CDELTi, CRPIXi, 
 *        PCiiijjj, etc., as described in a previous (now superseded)
@@ -537,6 +538,8 @@
 *        Allowed propagation of scaled arrays selected if BITPIX set to
 *        the new special value of Native.  Added examples of BITPIX
 *        special values.
+*     14-MAR-2004 (DSB):
+*        Added FITS-WCS(CD) encoding.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1044,7 +1047,7 @@
 *  recognised by the lower level routines.
       CALL PAR_CHOIC( 'ENCODING', 'Auto', 'Auto,FITS-IRAF,FITS-WCS,'//
      :                'FITS-PC,FITS-AIPS,FITS-AIPS++,FITS-CLASS,DSS,'//
-     :                'NATIVE', .FALSE., ENCOD, STATUS )
+     :                'FITS-WCS(CD),NATIVE', .FALSE., ENCOD, STATUS )
       IF ( ENCOD .EQ. 'AUTO' ) ENCOD = ' '
 
 *  See if a NATIVE encoding of the WCS component is to be included in

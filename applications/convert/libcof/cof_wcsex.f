@@ -1,4 +1,4 @@
-      INTEGER FUNCTION COF_WCSEX( FC, INDF, ENCOD, NATIVE, STATUS )
+      INTEGER FUNCTION COF_WCSEX( FC, INDF, ENCOD0, NATIVE, STATUS )
 *+
 *  Name:
 *     COF_WCSEX
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     RESULT = COF_WCSEX( FC, INDF, ENCOD, NATIVE, STATUS )
+*     RESULT = COF_WCSEX( FC, INDF, ENCOD0, NATIVE, STATUS )
 
 *  Description:
 *     The AST FrameSet (see SUN/210) describing the coordinate systems 
@@ -37,7 +37,7 @@
 *        information.
 *     INDF = INTEGER (Given)
 *        The NDF identifier.
-*     ENCOD = CHARACTER * ( * ) (Given)
+*     ENCOD0 = CHARACTER * ( * ) (Given)
 *        The encoding to use. If this is blank, then a default encoding 
 *        is chosen based on the contents of the FITS extension. The
 *        supplied string should be a recognised AST encoding such as 'DSS', 
@@ -83,6 +83,9 @@
 *        pixel axes exceeds the number of WCS axes.
 *     27-AUG-2004 (DSB):
 *        - Added FITS-CLASS encoding.
+*     14-MAR-2007 (DSB):
+*        Added support for modifiers at the end of the encoding name
+*        (currently just the "(CD)" modifier).
 *     {enter_changes_here}
 
 *  Bugs:
@@ -103,7 +106,7 @@
 *  Arguments Given:
       INTEGER FC
       INTEGER INDF
-      CHARACTER ENCOD*(*)
+      CHARACTER ENCOD0*(*)
       LOGICAL NATIVE
 
 *  Status:
@@ -111,6 +114,7 @@
 
 *  External References:
       INTEGER CHR_LEN            ! Used length of a string
+      LOGICAL CHR_SIMLR          ! Case blind string comparison
 
 *  Local Constants:
       INTEGER DEFNCD             ! Number of AST non-native encodings.
@@ -123,6 +127,8 @@
       CHARACTER CARD*80          ! The found FITS header card
       CHARACTER COD*80           ! The encoding to use
       CHARACTER DEFENC*9         ! The default encoding to use
+      CHARACTER ENCOD*13         ! The basic AST encoding to use
+      CHARACTER FCATTR*100       ! String holding FitsChan attributes
       CHARACTER FTLOC * ( DAT__SZLOC ) ! Locator to whole FITS extension
       CHARACTER FTLOCI * ( DAT__SZLOC ) ! Locator to element of FITS extension
       INTEGER AXFRM              ! Pointer to AXIS Frame
@@ -144,6 +150,7 @@
       INTEGER NWCS               ! Number of WCS axes
       INTEGER NOBJ               ! No. of objects written to the FitsChan
       INTEGER OBJ                ! Object read from FitsChan
+      INTEGER P1                 ! Index of first opening parenthesis in ENCOD0
       INTEGER UBND( NDF__MXDIM ) ! NDF upper pixel bounds
       LOGICAL FITSPR             ! True if FITS extension is present
       LOGICAL MORE               ! Read another object?
@@ -155,6 +162,30 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Extract any modifiers from the end of the supplied encoding, and
+*  create a string holding any corresponding AST attribute settings to
+*  use with the FitsChan.
+      FCATTR = ' '
+      P1 = INDEX( ENCOD0, '(' ) 
+      IF( P1 .GT. 0 ) THEN
+         ENCOD = ENCOD0( : P1 - 1 )
+         IF( CHR_SIMLR( ENCOD0( P1 : ), '(CD)' ) ) THEN
+            FCATTR = 'CDMatrix=1'
+         ELSE
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'M', ENCOD0( P1: ) )
+            CALL MSG_SETC( 'E', ENCOD0 )
+            CALL ERR_REP( 'COF_WCSEX_ERR1','Unknown modifier "^M" at '//
+     :                    'end of WCS encoding string "^E".', STATUS )
+            GO TO 999
+         END IF
+      ELSE
+         ENCOD = ENCOD0
+      END IF
+
+*  Assign the attribute values to the supplied FitsCHan.
+      IF( FCATTR .NE. ' ' ) CALL AST_SET( FC, FCATTR, STATUS )
 
 *  Store names of AST non-native encodings to use. They are in the order
 *  in which they should be used if no explicit encoding has been requested.
@@ -182,7 +213,7 @@
             CALL DAT_SIZE( FTLOC, NCARD, STATUS )
 
 *  Create an AST FitsChan to hold the headers in the FITS extension. 
-            FCT = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS )
+            FCT = AST_FITSCHAN( AST_NULL, AST_NULL, FCATTR, STATUS )
 
 *  We want to guard against bad headers in the FITS extension causing the
 *  whole conversion process to abort. Therefore we will annul any errors
