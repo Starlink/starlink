@@ -62,7 +62,9 @@
 *     If the input NDFs contain variances, then these are propagated to
 *     the output.  Alternatively, output variances can be generated from
 *     the spread of input values contributing to each output pixel (see
-*     parameter GENVAR).
+*     parameter GENVAR). Any input variances can also be used to weight
+*     the input data (see parameter VARWGT). By default, all input data
+*     is given equal weight.
 *
 *     The transformations needed to produce alignment are derived from
 *     the co-ordinate system information stored in the WCS components of
@@ -241,6 +243,11 @@
 *        The upper pixel bounds of the output NDF. Note, values will be
 *        written to this output parameter even if a null value is supplied 
 *        for parameter OUT.
+*     VARWGT = _LOGICAL (Read)
+*        If TRUE, then any input Variance components in the input NDFs
+*        are used to weight the input data (the weight used for each
+*        data value is the reciprocal of the variance). If FALSE, all
+*        input data is given equal weight. [FALSE]
 *     WLIM = _REAL (Read)
 *        This parameter specifies the minimum number of good pixels
 *        that must contribute to an output pixel for the output pixel
@@ -313,73 +320,67 @@
 *        Added parameters LBOUND and UBOUND.
 *     13-FEB-2007 (DSB):
 *        Remove C-like semi-colon line terminators.
+*     13-MAR-2007 (DSB):
+*        Add parameter VARWGT.
 *     {enter_further_changes_here}
 
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
+      IMPLICIT NONE          ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'PRM_PAR'          ! VAL__ constants
-      INCLUDE 'PAR_ERR'          ! PAR error constants
-      INCLUDE 'GRP_PAR'          ! GRP constants
-      INCLUDE 'NDF_PAR'          ! NDF constants
-      INCLUDE 'CNF_PAR'          ! CNF constants
-      INCLUDE 'AST_PAR'          ! AST constants
+      INCLUDE 'SAE_PAR'      ! Standard SAE constants
+      INCLUDE 'PRM_PAR'      ! VAL__ constants
+      INCLUDE 'PAR_ERR'      ! PAR error constants
+      INCLUDE 'GRP_PAR'      ! GRP constants
+      INCLUDE 'NDF_PAR'      ! NDF constants
+      INCLUDE 'CNF_PAR'      ! CNF constants
+      INCLUDE 'AST_PAR'      ! AST constants
 
 *  Status:
-      INTEGER STATUS             ! Global status
+      INTEGER STATUS         ! Global status
 
 *  Local Variables:
       CHARACTER DTYPE*(NDF__SZFTP) ! Data type
-      CHARACTER MESS*60          ! Message text
-      CHARACTER METHOD*13        ! Interpolation method to use.
+      CHARACTER MESS*60      ! Message text
+      CHARACTER METHOD*13    ! Interpolation method to use.
       CHARACTER TY_IN*(NDF__SZTYP) ! Numeric type for processing
-      DOUBLE PRECISION PARAMS( 2 ) ! Param. values passed to 
-                                 ! AST_RESAMPLE<x>
+      DOUBLE PRECISION PARAMS( 2 )! Param values passed to AST_RESAMPLE
       INTEGER DLBND( NDF__MXDIM )! Defaults for LBND
       INTEGER DUBND( NDF__MXDIM )! Defaults for UBND
-      INTEGER EL                 ! Number of array elements mapped
-      INTEGER FLAGS              ! Flags for AST_REBINSEQ
-      INTEGER I                  ! Index into input and output groups
-      INTEGER IGRP1              ! GRP id. for group holding input NDFs
-      INTEGER ILEVEL             ! Information level
-      INTEGER INDF1              ! NDF id. for the input NDF
-      INTEGER INDF2              ! NDF id. for the output NDF
-      INTEGER INDFR              ! NDF id. for the reference NDF
-      INTEGER IPD1               ! Pointer to input data array
-      INTEGER IPD2               ! Pointer to output data array
-      INTEGER IPMAP              ! Pointer to array of pix_in->pix_out
-                                 ! Mappings
-      INTEGER IPV1               ! Pointer to input variance array
-      INTEGER IPV2               ! Pointer to output variance array
-      INTEGER IPW                ! Pointer to work array
-      INTEGER LBND( NDF__MXDIM ) ! Indices of lower-left corner of
-                                 ! output
+      INTEGER EL             ! Number of array elements mapped
+      INTEGER FLAGS          ! Flags for AST_REBINSEQ
+      INTEGER I              ! Index into input and output groups
+      INTEGER IGRP1          ! GRP id. for group holding input NDFs
+      INTEGER ILEVEL         ! Information level
+      INTEGER INDF1          ! NDF id. for the input NDF
+      INTEGER INDF2          ! NDF id. for the output NDF
+      INTEGER INDFR          ! NDF id. for the reference NDF
+      INTEGER IPD1           ! Pntr. to input data array
+      INTEGER IPD2           ! Pntr. to output data array
+      INTEGER IPMAP          ! Pntr. to array of pix_in->pix_out Mappings
+      INTEGER IPV1           ! Pntr. to input variance array
+      INTEGER IPV2           ! Pntr. to output variance array
+      INTEGER IPW            ! Pntr. to work array
+      INTEGER LBND( NDF__MXDIM ) ! Indices of lower-left corner of o/p
       INTEGER LBND1( NDF__MXDIM )! Indices of lower-left corner of input
-      INTEGER MAP                ! AST id for (pix_in->pix_out) Mapping
-      INTEGER MAXPIX             ! Initial scale size in pixels
-      INTEGER METHOD_CODE        ! Integer corresponding to spreading 
-                                 ! method 
-      INTEGER NDIM               ! Number of pixel axes in output NDF
-      INTEGER NDIM1              ! Number of pixel axes in input NDF
-      INTEGER NPAR               ! No. of required interpolation
-                                 ! parameters
-      INTEGER SIZE               ! Total size of the input group
-      INTEGER UBND( NDF__MXDIM ) ! Indices of upper-right corner of
-                                 ! output
-      INTEGER UBND1( NDF__MXDIM )! Indices of upper-right corner of 
-                                 ! input
-      LOGICAL BAD_DV             ! Any bad data/variance values in
-                                 ! input?
-      LOGICAL GENVAR             ! Use input spread to create output
-                                 ! variance?
-      LOGICAL USEVAR             ! Use input variances to create output
-                                 ! variance?
-      REAL ERRLIM                ! Positional accuracy in pixels
-      REAL WLIM                  ! Minimum good output weight
+      INTEGER MAP            ! AST id for (pix_in->pix_out) Mapping
+      INTEGER MAXPIX         ! Initial scale size in pixels
+      INTEGER METHOD_CODE    ! Integer identifier for spreading method 
+      INTEGER NDIM           ! Number of pixel axes in output NDF
+      INTEGER NDIM1          ! Number of pixel axes in input NDF
+      INTEGER NPAR           ! No. of required interpolation parameters
+      INTEGER SIZE           ! Total size of the input group
+      INTEGER UBND( NDF__MXDIM ) ! Indices of upper-right corner of o/p
+      INTEGER UBND1( NDF__MXDIM )! Indices of upper-right corner of i/p
+      LOGICAL BAD_DV         ! Any bad data/variance values in input?
+      LOGICAL GENVAR         ! Use i/p spread to create o/p variance?
+      LOGICAL HASVAR         ! Do all i/p NDFs have variances? */
+      LOGICAL USEVAR         ! Use i/p variances to create o/p variance?
+      LOGICAL VARWGT         ! Use i/p variances as weights?
+      REAL ERRLIM            ! Positional accuracy in pixels
+      REAL WLIM              ! Minimum good output weight
 
 *.
 
@@ -419,7 +420,7 @@
 *  NDF.  This includes the default values for LBND and UBND, and the
 *  Mappings from the input PIXEL Frames to the output PIXEL Frame.
       CALL PSX_CALLOC( SIZE, '_INTEGER', IPMAP, STATUS )
-      CALL KPS1_WMOS0( INDFR, IGRP1, NDIM, DLBND, DUBND, USEVAR,
+      CALL KPS1_WMOS0( INDFR, IGRP1, NDIM, DLBND, DUBND, HASVAR,
      :                 %VAL( CNF_PVAL( IPMAP ) ), STATUS )
 
 *  Set the default bounds for the output NDF.
@@ -537,7 +538,24 @@
 *  See if output variances are to be generated on the basis of the
 *  spread of input data values.  If so, we do not use input variances.
       CALL PAR_GET0L( 'GENVAR', GENVAR, STATUS )
-      IF( GENVAR ) USEVAR = .FALSE.
+      IF( GENVAR ) THEN
+         USEVAR = .FALSE.
+
+*  If output variances are not being created on the basis of the spread
+*  in input values, then assume that output variances are being created on
+*  the basis of input variances, if all input NDF have defined Variance
+*  components. 
+      ELSE
+         USEVAR = HASVAR
+      END IF
+
+*  If all input have variance components, see if input variances are to 
+*  be used as weights.
+      IF( HASVAR ) THEN
+         CALL PAR_GET0L( 'VARWGT', VARWGT, STATUS )
+      ELSE
+         VARWGT = .FALSE.
+      END IF      
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -602,12 +620,9 @@
          FLAGS = 0
          IF( I .EQ. 1 ) FLAGS = FLAGS + AST__REBININIT
          IF( I .EQ. SIZE ) FLAGS = FLAGS + AST__REBINEND
-   
-         IF( GENVAR ) THEN
-            FLAGS = FLAGS + AST__GENVAR
-         ELSE IF( USEVAR ) THEN
-            FLAGS = FLAGS + AST__USEVAR
-         END IF
+         IF( GENVAR ) FLAGS = FLAGS + AST__GENVAR
+         IF( USEVAR ) FLAGS = FLAGS + AST__USEVAR
+         IF( VARWGT ) FLAGS = FLAGS + AST__VARWGT
    
          CALL NDF_BAD( INDF1, 'DATA,VARIANCE', .FALSE., BAD_DV, STATUS )
          IF( BAD_DV ) FLAGS = FLAGS + AST__USEBAD 
@@ -618,7 +633,7 @@
 
 *  Map the required components of the input.
          CALL NDF_MAP( INDF1, 'DATA', TY_IN, 'READ', IPD1, EL, STATUS )
-         IF ( USEVAR ) THEN
+         IF ( USEVAR .OR. VARWGT  ) THEN
             CALL NDF_MAP( INDF1, 'VAR', TY_IN, 'READ', IPV1, EL, 
      :                    STATUS )
          ELSE

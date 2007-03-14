@@ -16716,6 +16716,15 @@ iraf! {
             helpkey *
           }
 
+         parameter varwgt {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Use input variances to weight data?}
+            helpkey *
+          }
+
          parameter wlim {
             type _REAL
             prompt {Minimum weight for valid output pixels}
