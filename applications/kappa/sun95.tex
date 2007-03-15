@@ -45588,7 +45588,9 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       If the input NDFs contain variances, then these are propagated to
       the output.  Alternatively, output variances can be generated from
       the spread of input values contributing to each output pixel (see
-      parameter GENVAR).
+      parameter GENVAR). Any input variances can also be used to weight
+      the input data (see parameter VARWGT).  By default, all input data
+      are given equal weight.
 
       The transformations needed to produce alignment are derived from
       the co-ordinate system information stored in the WCS components of
@@ -45811,6 +45813,14 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          axis for the output NDF.  The suggested default values just
          encompass all the input data.  A null value ({\tt{!}}) also results in
          these same defaults being used. {\tt [!]}
+      }
+      \sstsubsection{
+        VARWGT = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, then any input VARIANCE components in the input NDFs
+         are used to weight the input data (the weight used for each
+         data value is the reciprocal of the variance).  If {\tt FALSE}, all
+         input data is given equal weight.  {\tt [FALSE]}
       }
       \sstsubsection{
          WLIM = \_REAL (Read)
@@ -51545,7 +51555,14 @@ The following applications have been modified:
       \begin{itemize}
       \item It can now cope without an inverse WCS transformation.
       \end{itemize}
-      
+
+   \item [\htmlref{WCSMOSAIC}{WCSMOSAIC}] \mbox{}
+      \begin{itemize}
+      \item \htmlref{VARIANCE}{apndf:variance}~ components may be used to weight 
+      the input data if a new parameter VARWGT is set to {\tt TRUE}.
+      VARWGT defaults to the current behaviour.
+      \end{itemize}
+
 \end{description}
 
 
