@@ -1637,7 +1637,7 @@ itcl::class gaia::Gaia {
             if { [catch {
                $app register
             } msg] } {
-               puts "Failed to register with a PLASTIC hub: $msg" $w_
+               puts "Failed to register with a PLASTIC hub: $msg"
             }
          }
 
