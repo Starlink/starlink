@@ -152,6 +152,9 @@ f     The CmpFrame class does not define any new routines beyond those
 *        Over-ride the SetFrameFlags method.
 *     1-NOV-2005 (DSB):
 *        Override astSetDut1, astGetDut1 and astClearDut1.
+*     15-MAR-2007 (DSB):
+*        Override astClearAlignSystem by an implementation that clears 
+*        AlignSystem in the component Frames.
 *class--
 */
 
@@ -570,6 +573,7 @@ static void (* parent_setobslon)( AstFrame *, double );
 static void (* parent_setdut1)( AstFrame *, double );
 static void (* parent_cleardut1)( AstFrame * );
 static double (* parent_getdut1)( AstFrame * );
+static void (* parent_clearalignsystem)( AstFrame * );
 
 /* Pointer to axis index array accessed by "qsort". */
 static int *qsort_axes;
@@ -684,6 +688,7 @@ static double GetObsLat( AstFrame * );
 static void ClearObsLat( AstFrame * );
 static void SetObsLat( AstFrame *, double );
 
+static void ClearAlignSystem( AstFrame * );
 
 /* Member functions. */
 /* ================= */
@@ -1112,6 +1117,52 @@ static double Angle( AstFrame *this_frame, const double a[],
 
 /* Return the result. */
    return result;
+}
+
+static void ClearAlignSystem( AstFrame *this_frame ) {
+/*
+*  Name:
+*     ClearAlignSystem
+
+*  Purpose:
+*     Clear the value of the AlignSystem attribute for a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     void ClearAlignSystem( AstFrame *this )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astClearAlignSystem method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function clears the AlignSystem value in the component Frames as
+*     well as this CmpFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* Invoke the parent method to clear the CmpFrame AlignSystem value. */
+   (*parent_clearalignsystem)( this_frame );
+
+/* Now clear the AlignSystem attribute in the two component Frames. */
+   astClearAlignSystem( this->frame1 );
+   astClearAlignSystem( this->frame2 );
 }
 
 static void ClearAttrib( AstObject *this_object, const char *attrib ) {
@@ -3607,6 +3658,9 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name ) {
 
    parent_getalignsystem = frame->GetAlignSystem;
    frame->GetAlignSystem = GetAlignSystem;
+
+   parent_clearalignsystem = frame->ClearAlignSystem;
+   frame->ClearAlignSystem = ClearAlignSystem;
 
    parent_overlay = frame->Overlay;
    frame->Overlay = Overlay;
@@ -7325,8 +7379,8 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
       result = (AstMapping *) new;
 
 /* Replace the two component Frames with the simplified Frames. */
-      astAnnul( new->frame1 );
-      astAnnul( new->frame2 );
+      (void) astAnnul( new->frame1 );
+      (void) astAnnul( new->frame2 );
       new->frame1 = (AstFrame *) map1;
       new->frame2 = (AstFrame *) map2;
 
