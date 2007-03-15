@@ -52,6 +52,8 @@
 *  History:
 *     2005 December 28 (MJC):
 *        Original version.
+*     2007 March 15 (MJC):
+*        Compute the root mean square not the mean square.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -96,7 +98,9 @@
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
-      INCLUDE 'NUM_DEF_CVT'      ! Define functions...
+      INCLUDE 'NUM_DEC_<T>'      ! NUM_ functions
+      INCLUDE 'NUM_DEF_CVT'      ! Define conversion functions...
+      INCLUDE 'NUM_DEF_<T>'      ! Define functions...
 
 *.
 
@@ -145,7 +149,8 @@
             ELSE
 
 *  Calculate the rms.
-               RESULT( I ) = NUM_DTO<T>( SUMSQ / DBLE( NGOOD ) )
+               RESULT( I ) = NUM_SQRT<T>( 
+     :                       NUM_DTO<T>( SUMSQ / DBLE( NGOOD ) ) )
             END IF
          ELSE
 
