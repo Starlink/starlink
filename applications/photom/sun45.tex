@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {45.14}
+\newcommand{\stardocnumber}    {45.15}
 \newcommand{\stardocauthors}   {Nicholas Eaton, Peter W.\ Draper \& Alasdair Allan}
-\newcommand{\stardocdate}      {11th December 2006}
+\newcommand{\stardocdate}      {16th March 2007}
 \newcommand{\stardoctitle}     {PHOTOM --- A Photometry Package }
 \newcommand{\stardocversion}   {version 1.10-0}
 \newcommand{\stardocmanual}    {User's Manual}
@@ -1666,7 +1666,7 @@ addition, the following Starlink packages have been used: PHOTOM,} ...
        be present for this object, this defines the scales or sizes for
        the inner and outer loci of the sky region.
        \begin{description}
-          \item  \hspace*{1cm} \texttt{\#ANN INDEX INNER\_SCALE/SIZE OUTER\_SCALE/SIZE}
+          \item  \hspace*{1cm} \texttt{\#ANN INDEX INNER\_SCALE|SEMI\_MAJOR OUTER\_SCALE|SEMI\_MAJOR}
        \end{description}
        The \texttt{INDEX} value is the identifier of the related object. If
        \texttt{POSITIONS} is set to \ft{regions} then as many lines
@@ -1742,8 +1742,7 @@ addition, the following Starlink packages have been used: PHOTOM,} ...
       be present for this object, this defines the scales or sizes for
       the inner and outer loci of the sky region.
        \begin{description}
-          \item  \hspace*{1cm} \texttt{\#ANN INDEX INNER\_SCALE/SIZE 
-                           OUTER\_SCALE/SIZE}
+          \item  \hspace*{1cm} \texttt{\#ANN INDEX INNER\_SCALE|SEMI\_MAJOR OUTER\_SCALE|SEMI\_MAJOR}
        \end{description}
       The INDEX value is the identifier of the related object. A good
       estimate of the inner radius of the sky box is about twice the
