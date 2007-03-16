@@ -1,3 +1,7 @@
+    Increased the output length of a TST catalogue line to 4096 
+    characters. Previously this was 1024 which has become restricting
+    (causing some failures to read FITS catalogues with many columns).   
+ 
     The spectral cube window will now retain some settings between 
     sessions. These include the background and line colours.
 
