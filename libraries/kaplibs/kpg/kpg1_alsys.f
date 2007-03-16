@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_ALSYS( PARAM, FRM1, FRM2, STATUS )
+      SUBROUTINE KPG1_ALSYS( PARAM, FRM1, FRM2, AXIS, STATUS )
 *+
 *  Name:
 *     KPG1_ALSYS
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_ALSYS( PARAM, FRM1, FRM2, STATUS )
+*     CALL KPG1_ALSYS( PARAM, FRM1, FRM2, AXIS, STATUS )
 
 *  Description:
 *     This routine obtains a value from the environment that is used to
@@ -25,9 +25,17 @@
 *        A pointer to the AST Frame which is to have its AlignSystem
 *        value changed.
 *     FRM2 = INTEGER (Given)
-*        A pointer to an AST Frame. The AlignSystem value will be copied
-*        from this Frame to FRM1 if the user supplied the value "Data" for
-*        the parameter.
+*        A pointer to an AST Frame. The System value from this Frame will
+*        be used as the AlignSystem value for FRM1 if the user supplied the 
+*        value "Data" for the parameter.
+*     AXIS = INTEGER (Given)
+*        The index (one or more) of a single axis within FRM1 which is to 
+*        have its AlsignSystem value changed, or zero. If zero is
+*        supplied, the new AlignSystem value is applied to the whole Frame.
+*        Supplying an axis index allows a single Frame within a CmpFrame
+*        to have its AlignSystem value changed. If FRM1 is not a
+*        CmpFrame, then the supplied value is ignored and a value of zero
+*        is assumed.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -77,6 +85,7 @@
       CHARACTER PARAM*(*)
       INTEGER FRM1
       INTEGER FRM2
+      INTEGER AXIS
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -85,12 +94,53 @@
       LOGICAL CHR_SIMLR          ! Case insensitive string comparison
 
 *  Local Variables:
+      CHARACTER ATTR1*30         ! AlignSystem attribute name
+      CHARACTER ATTR2*30         ! System attribute name
       CHARACTER VALUE*100        ! New value for AlignSystem
+      INTEGER FRM1B              ! Pointer to FRM1 Frame
+      INTEGER FRM2B              ! Pointer to FRM2 Frame
+      INTEGER IAT1               ! Used length of ATTR1
+      INTEGER IAT2               ! Used length of ATTR2
       LOGICAL MORE               ! Get a new parameter value?
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  If the two supplied Frames are actually FrameSets, get pointers to
+*  their current Frames, since we do not the change to AlignSystem to
+*  cause the Frame to be re-mapped within the FrameSets.
+      IF( AST_ISAFRAMESET( FRM1, STATUS ) ) THEN
+         FRM1B = AST_GETFRAME( FRM1, AST__CURRENT, STATUS )
+      ELSE
+         FRM1B = AST_CLONE( FRM1, STATUS )
+      END IF
+
+      IF( AST_ISAFRAMESET( FRM2, STATUS ) ) THEN
+         FRM2B = AST_GETFRAME( FRM2, AST__CURRENT, STATUS )
+      ELSE
+         FRM2B = AST_CLONE( FRM2, STATUS )
+      END IF
+
+*  Create attribute names that refers to the requested Frame axis.
+      ATTR1 = 'AlignSystem'
+      IAT1 =  11
+      ATTR2 = 'System'
+      IAT2 =  6
+
+      IF( AST_ISACMPFRAME( FRM1B, STATUS ) .AND.
+     :    AST_ISACMPFRAME( FRM2B, STATUS ) .AND.
+     :    AXIS .GT. 0 ) THEN
+
+         CALL CHR_PUTC( '(', ATTR1, IAT1 )
+         CALL CHR_PUTI( AXIS, ATTR1, IAT1 )
+         CALL CHR_PUTC( ')', ATTR1, IAT1 )
+
+         CALL CHR_PUTC( '(', ATTR2, IAT2 )
+         CALL CHR_PUTI( AXIS, ATTR2, IAT2 )
+         CALL CHR_PUTC( ')', ATTR2, IAT2 )
+
+      END IF
 
 *  Loop until we have a good value for the AlignSystem attribute.
       MORE = .TRUE.
@@ -100,21 +150,21 @@
          CALL PAR_GET0C( PARAM, VALUE, STATUS )
 
 *  If a null value was supplied, annul the error and exit, leaving the 
-*  AlignSystem value in FRM1 unchanged.
+*  AlignSystem value in FRM1B unchanged.
          IF( STATUS .NE. SAI__OK ) THEN
             IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
             MORE = .FALSE.
 
 *  Otherwise, if "Data" was supplied (case-insensitive), then use the 
-*  AlignSystem value from FRM2.
+*  System value from FRM2B.
          ELSE IF( CHR_SIMLR( VALUE, 'DATA' ) ) THEN
-            VALUE = AST_GETC( FRM2, 'AlignSystem', STATUS )
+            VALUE = AST_GETC( FRM2B, ATTR2, STATUS )
          END IF
 
 *  If a value was obtained, attempt to use the value, but if an error occurs, 
 *  flush the error and the parameter and get a new value.         
          IF( MORE ) THEN
-            CALL AST_SETC( FRM1, 'AlignSystem', VALUE, STATUS )
+            CALL AST_SETC( FRM1B, ATTR1, VALUE, STATUS )
             IF( STATUS .NE. SAI__OK ) THEN
                CALL ERR_REP( 'KPG1_ALSYS_1', 'Cannot use "^V" as the '//
      :                       'co-ordinate system for aligning old and'//
@@ -123,9 +173,15 @@
      :                       'value for parameter %^PARAM.', STATUS )
                CALL ERR_FLUSH( STATUS )
                CALL PAR_CANCL( PARAM, STATUS )
+            ELSE
+               MORE = .FALSE.
             END IF
          END IF
       END DO
+
+*  Free resources
+      CALL AST_ANNUL( FRM1B, STATUS )
+      CALL AST_ANNUL( FRM2B, STATUS )
 
 *  Add a context message to any other error.
       IF( STATUS .NE. SAI__OK ) THEN
