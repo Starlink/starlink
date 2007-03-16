@@ -2380,9 +2380,11 @@ f        AST_TRAN2), then it provides a means of converting coordinates
 
 *  Applicability:
 *     DSBSpecFrame
-*        Alignment occurs in the upper sideband expressed within the
-*        spectral system and standard of rest given by attributes AlignSystem 
-*        and AlignStdOfRest.
+*        If the AlignSideBand attribute is non-zero, alignment occurs in the 
+*        upper sideband expressed within the spectral system and standard of 
+*        rest given by attributes AlignSystem and AlignStdOfRest. If
+*        AlignSideBand is zero, the two DSBSpecFrames are aligned as if
+*        they were simple SpecFrames (i.e. the SideBand is ignored).
 *     Frame
 *        This function applies to all Frames. Alignment occurs within the
 *        coordinate system given by attribute AlignSystem.
