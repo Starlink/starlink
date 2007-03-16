@@ -80,6 +80,18 @@
 *        value is supplied, a value of TRUE will be used if and only if
 *        a mapping can be found between the existing and the new plots. 
 *        A value of FALSE will be used otherwise.  [!]
+*     ALIGNSYS = LITERAL (Read)
+*        Only used if a TRUE value is supplied for parameter ALIGN. 
+*        It specifies the co-ordinate system in which the new plot and 
+*        the existing plot are aligned (for further details see the
+*        description of the AlignSystem attribute in SUN/211). The supplied 
+*        name should be a valid co-ordinate system name for the horizontal 
+*        axis (see the description of the "System" attribute in SUN/211 
+*        for a list of these names). It may also take the special value 
+*        "Data", in which case alignment occurs in the co-ordinate system 
+*        represented by the current WCS Frame in the supplied NDF. If a 
+*        null (!) value is supplied The alignment system is determined by
+*        the current value of AlignSystem attribute in the supplied NDF. ["Data"]
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes are to be drawn around the
 *        plot.  If a null (!) value is supplied, the value used is 
@@ -625,6 +637,8 @@
 *        sorting).
 *        - Allow alignment with an existing DATAPLOT Frame even if it is 
 *        not the current Frame.
+*     16-MAR-2007 (DSB):
+*        Added AlignSys parameter.
 *     {enter_further_changes_here}
 
 *-
@@ -1153,6 +1167,10 @@
 * If such a Frame was found, make sure it is the current Frame.
          IF( IDP .NE. AST__NOFRAME ) THEN
             CALL AST_SETI( IPLOT, 'Current', IDP, STATUS )
+
+*  Not set the coordinate system in which alignment is to occur. This is
+*  stored in the AlignSystem attribute of the current Frame in FSET.
+            CALL KPG1_ALSYS( 'ALIGNSYS', FSET, IPLOT, 1, STATUS )
 
 *  Attempt to find a Mapping from the DATAPLOT Frame in the existing 
 *  picture to the DATAPLOT Frame in the new picture.
