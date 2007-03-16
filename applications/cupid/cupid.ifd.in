@@ -85,6 +85,16 @@ package cupid {
             helpkey *
           }
 
+         parameter wcspar {
+            type _LOGICAL
+            access READ
+            vpath DYNAMIC,DEFAULT
+            ppath DYNAMIC,DEFAULT
+            prompt {Use WCS units in the output catalogue?}
+            default FALSE
+            helpkey *
+          }
+
       }
 
       action findback {
