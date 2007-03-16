@@ -166,11 +166,13 @@
          IF( MORE ) THEN
             CALL AST_SETC( FRM1B, ATTR1, VALUE, STATUS )
             IF( STATUS .NE. SAI__OK ) THEN
+               CALL MSG_SETC( 'V', VALUE )
                CALL ERR_REP( 'KPG1_ALSYS_1', 'Cannot use "^V" as the '//
      :                       'co-ordinate system for aligning old and'//
      :                       ' new data.', STATUS )
+               CALL MSG_SETC( 'P', PARAM )
                CALL ERR_REP( 'KPG1_ALSYS_2', 'Please supply a new '//
-     :                       'value for parameter %^PARAM.', STATUS )
+     :                       'value for parameter %^P.', STATUS )
                CALL ERR_FLUSH( STATUS )
                CALL PAR_CANCL( PARAM, STATUS )
             ELSE
