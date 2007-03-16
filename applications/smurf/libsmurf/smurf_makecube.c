@@ -146,9 +146,7 @@
 *          two or more input spectra together to form an output spectrum.
 *          If TRUE, the weights used are the reciprocal of the variances
 *          associated with the input spectra, as determined from the Tsys 
-*          values in the input. This option is ignored unless SPREAD is
-*          "Nearest" (all input data is given equal weight when using other 
-*          spreading schemes). [TRUE]
+*          values in the input. [TRUE]
 *     LBOUND( 3 ) = _INTEGER (Write)
 *          The lower pixel bounds of the output NDF. Note, values will be
 *          written to this output parameter even if a null value is supplied 
@@ -276,10 +274,7 @@
 *	   
 *          - "Nearest" -- The input pixel value is assigned completely to the
 *          single nearest output pixel. This scheme is much faster than any
-*          of the others. In addition, this scheme provides an option for 
-*          weighting the input data values using the receiprocal of the input 
-*          variances (see INWEIGHT). The other spreading schemes do not 
-*          supply any option for weighting the input data.
+*          of the others. 
 *	   
 *          - "Sinc" -- Uses the sinc(pi*x) kernel, where x is the pixel
 *          offset from the interpolation point (resampling) or transformed
@@ -471,6 +466,8 @@
 *     7-MAR-2007 (BC):
 *        - Added input OBSID FITS header tracking through PROVCNT and
 *        OBSnnnnn output FITS headers.
+*     16-MAR-2007 (DSB):
+*        Extend use of INWEIGHT to all spreading schemes.
 
 *  Copyright:
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research

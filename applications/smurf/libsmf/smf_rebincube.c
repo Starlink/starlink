@@ -55,8 +55,6 @@
 *     usewgt = int (Given)
 *        A flag indicating if the input data should be weighted according
 *        to the input variances determined from the input Tsys values.
-*        The supplied value is ignored and a value of zero is assumed if
-*        "spread" is not AST__NEAREST.
 *     lbnd_out = dim_t [ 3 ] (Given)
 *        The lower pixel index bounds of the output cube.
 *     ubnd_out = dim_t [ 3 ] (Given)
@@ -189,6 +187,9 @@
 *        to the output spectrum to which they woud otherwise be added,
 *     21-FEB-2007 (DSB):
 *        Change ton_array to teff_array.
+*     14-MAR-2007 (DSB):
+*        Use the AST__VARWGT flag with astRebinSeq to cause input
+*        variances to be used as weights for the input data.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -428,8 +429,9 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
 
 /* Other array lengths depend on whether AST is being used to do the
    rebinning. For AST rebinning, also initialisation the flags for
-   astRebinSeq (we set flags to zero to indicate that the arrays have
-   been initialised). */
+   astRebinSeq (we do not include flag AST__REBININIT because the arrays 
+   have been initialised). Use the AST__VARWGT flag to request that the
+   input variances are used as weights. */
       if( use_ast ){
 
          if( genvar == 1 ) {
@@ -442,7 +444,7 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
             for( iv = 0; iv < nel; iv++ ) var_array[ iv ] = 0.0;
          }
 
-         ast_flags = 0;
+         ast_flags = usewgt && ( genvar == 2 ) ? AST__VARWGT : 0;
 
       } else {
          for( iv0 = 0; iv0 < nxy; iv0++ ) {
