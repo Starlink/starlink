@@ -10466,6 +10466,46 @@ from one graphical element to another.
    }
 }
 \sstroutine{
+   KPG1\_ALSYS
+}{
+   Allow the user to change the AlignSystem attribute in a Frame/
+}{
+   \sstdescription{
+      This routine obtains a value from the environment that is used to
+      specify a new value for the AlignSystem attribute of a supplied Frame.
+      This attribute determines the coordinate system in which the Frame
+      will align with other similar Frames.
+   }
+   \sstinvocation{
+      CALL KPG1\_ALSYS( PARAM, FRM1, FRM2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the parameter to use.
+      }
+      \sstsubsection{
+         FRM1 = INTEGER (Given)
+      }{
+         A pointer to the AST Frame which is to have its AlignSystem
+         value changed.
+      }
+      \sstsubsection{
+         FRM2 = INTEGER (Given)
+      }{
+         A pointer to an AST Frame. The AlignSystem value will be copied
+         from this Frame to FRM1 if the user supplied the value {\tt "}Data{\tt "} for
+         the parameter.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    KPG1\_ARCOG
 }{
    Allow the user to select an array component in a supplied NDF
