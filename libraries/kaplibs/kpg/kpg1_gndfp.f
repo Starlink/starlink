@@ -2,7 +2,7 @@
      :                       LBND, UBND, PERPAX, STATUS )
 *+
 *  Name:
-*     KPG1_GTNDF
+*     KPG1_GNDFP
 
 *  Purpose:
 *     Gets an NDF or NDF section with a specified number of significant
