@@ -5047,6 +5047,15 @@ package kappa {
             helpkey *
           }
 
+         parameter alignsys {
+            type LITERAL
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Co-ordinate system in which to align old and new plots}
+            helpkey *
+            default Data
+          }
+
          parameter axes {
             type _LOGICAL
             vpath DEFAULT
