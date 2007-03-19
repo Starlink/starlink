@@ -2,20 +2,21 @@
 
 dist_bin_SCRIPTS = snx_link snx_link_adam
 
-lib_LTLIBRARIES = libsnx.la
+lib_LTLIBRARIES = libsnx.la libsnx_ncar.la
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ \
     sun90-fig-1.eps sun90-fig-2.eps sun90-fig-3.eps \
     sun90-fig-4.eps sun90-fig-5.eps sun90-fig-6.eps
 
 # Have SNX routines and AG replacements
-libsnx_la_SOURCES = $(F_ROUTINES) $(NCAR_ROUTINES)
+libsnx_la_SOURCES = $(F_ROUTINES) 
+libsnx_ncar_la_SOURCES = $(NCAR_ROUTINES)
 
 # Make all library code position independent. DIPSO creates a shareable
 # library that includes this code.
 if !NOPIC
-libsnx_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libsnx_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
+libsnx_ncar_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
 endif
 
 NCAR_ROUTINES = agchnlz.f agpwritx.f
