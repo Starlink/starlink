@@ -18,6 +18,10 @@ Changes introduced at V0.0-29:
   - FINDBACK has a new parameter called SUB that be set TRUE to indicate 
   that the output NDF should hold the background-subtracted input data,
   rather than the background estimate itself.
+  - FINDBACK has a new parameter called RMS that can be used to override
+  the RMS noise estimate calculated by FINDBACK. If the data contains
+  correlated noise, then the internal RMS noise estimate will be too low, 
+  resulting in the final background estimate being systematically too low.
 
 Changes introduced at V0.0-28:
   - GaussClumps now has an additional termination crietrion; if the total

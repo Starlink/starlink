@@ -57,7 +57,7 @@ void findback( int *status ){
 *     of the bad values rejected above, but may not remove them all. Any
 *     remaining bad values are estimated by linear interpolation between
 *     the nearest good values along the first axis. The interpolated
-*     residuals are then smoothed again using amean filter, to get a
+*     residuals are then smoothed again using a mean filter, to get a
 *     surface representing the bias in the initial background estimate.
 *     This surface is finally added onto the initial background estimate
 *     to obtain the output NDF.
@@ -86,6 +86,14 @@ void findback( int *status ){
 *        various stages of the algorithm. [0]
 *     IN = NDF (Read)
 *        The input NDF.
+*     RMS = _DOUBLE (Read)
+*        Specifies a value to use as the global RMS noise level in the 
+*        supplied data array. The suggested default value is the square root 
+*        of the mean of the values in the input NDF's Variance component.
+*        If the NDF has no Variance component, the suggested default 
+*        is based on the differences between neighbouring pixel values. Any 
+*        pixel-to-pixel correlation in the noise can result in this estimate 
+*        being too low. 
 *     SUB = _LOGICAL (Read)
 *        If a TRUE value is supplied, the output NDF will contain the
 *        difference between the supplied input data and the estimated 
@@ -126,9 +134,10 @@ void findback( int *status ){
 *     13-SEP-2006 (DSB):
 *        Original version.
 *     19-MAR-2007 (DSB):
-*        - Added parameter SUB.
+*        - Added parameters SUB and RMS.
 *        - Fix bug that left the output NDF uninitialised if ILEVEL is set
 *        non-zero.
+*        - Use generic data type handling as in FINDCLUMPS.
 *     {enter_further_changes_here}
 
 *-
@@ -137,9 +146,12 @@ void findback( int *status ){
 /* Local Variables: */
    Grp *grp;                 /* GRP identifier for configuration settings */
    char dtype[ 21 ];         /* HDS data type for output NDF */
-   char type[ 21 ];          /* HDS data type to use when processing */
+   char itype[ 21 ];         /* HDS data type to use when processing */
+   double *ipv;              /* Pointer to Variance array */
    double *pd1;              /* Pointer to double precision input data */
    double *pd2;              /* Pointer to double precision output data */
+   double rms;               /* Global rms error in data */
+   double sum;               /* Sum of variances */
    float *pf1;               /* Pointer to single precision input data */
    float *pf2;               /* Pointer to single precision output data */
    int *old_status;          /* Pointer to original status value */
@@ -151,6 +163,7 @@ void findback( int *status ){
    int indf1;                /* Identifier for input NDF */
    int indf2;                /* Identifier for output NDF */
    int islice;               /* Slice index */
+   int n;                    /* Number of values summed in "sum" */
    int ndim;                 /* Total number of pixel axes in NDF */
    int nsdim;                /* Number of significant pixel axes in NDF */
    int nslice;               /* Number of slices to process */
@@ -162,10 +175,12 @@ void findback( int *status ){
    int slice_dim[ 3 ];       /* Dimensions of each significant slice axis */
    int slice_size;           /* Number of pixels in each slice */
    int sub;                  /* Output the background-subtracted input data? */
-   void *ipdin;              /* Pointer to input Data array */
-   void *ipdout;             /* Pointer to output Data array */
+   int type;                 /* Integer identifier for data type */
+   int var;                  /* Does i/p NDF have a Variance component? */
    void *ipd1;               /* Pointer to input Data array */
    void *ipd2;               /* Pointer to output Data array */
+   void *ipdin;              /* Pointer to input Data array */
+   void *ipdout;             /* Pointer to output Data array */
    void *wa;                 /* Pointer to work array */
    void *wb;                 /* Pointer to work array */
  
@@ -269,25 +284,58 @@ void findback( int *status ){
    slice_size = slice_dim[ 0 ]*slice_dim[ 1 ]*slice_dim[ 2 ];
 
 /* Decide what numeric data type to use, and set the output NDF data type. */
-   ndfMtype( "_REAL,_DOUBLE", indf1, indf1, "Data,Variance", type, 
+   ndfMtype( "_REAL,_DOUBLE", indf1, indf1, "Data,Variance", itype, 
              20, dtype, 20, status ); 
+   if( !strcmp( itype, "_DOUBLE" ) ) {
+      type = CUPID__DOUBLE;
+   } else {
+      type = CUPID__FLOAT;
+   }
+
    ndfStype( dtype, indf2, "Data,Variance", status );
 
 /* Map the input and output arrays. */
-   ndfMap( indf1, "Data", type, "READ", &ipdin, &el, status );
-   ndfMap( indf2, "Data", type, "WRITE", &ipdout, &el, status );
+   ndfMap( indf1, "Data", itype, "READ", &ipdin, &el, status );
+   ndfMap( indf2, "Data", itype, "WRITE", &ipdout, &el, status );
 
-/* Allocate work arrays. */
-   if( type ) {
-      if( !strcmp( type, "_REAL" ) ) {
-         wa = astMalloc( sizeof( float )*el );
-         wb = astMalloc( sizeof( float )*el );
+/* Calculate the default RMS value. If the NDF has a Variance component
+   it is the square root of the mean Variance value. Otherwise, it is found
+   by looking at differences between adjacent pixel values in the Data 
+   component. */
+   ndfState( indf1, "VARIANCE", &var, status );
+   if( *status == SAI__OK && var ) {   
+      ndfMap( indf1, "VARIANCE", "_DOUBLE", "READ", (void *) &ipv, &el, status );
+
+      sum = 0.0;
+      n = 0;
+      for( i = 0; i < el; i++ ) {
+         if( ipv[ i ] != VAL__BADD ) {
+            sum += ipv[ i ];
+            n++;
+         }
+      }
+      
+      if( n > 0 ) {
+         rms = sqrtf( sum/n );
 
       } else {
-         wa = astMalloc( sizeof( double )*el );
-         wb = astMalloc( sizeof( double )*el );
-      }
-   }
+         *status = SAI__ERROR;
+         errRep( "", "The supplied data contains insufficient "
+                 "good Variance values to continue.", status );
+      }         
+
+   } else {
+      ipv = NULL;
+      rms = cupidRms( type, ipdin, el, sdim[ 0 ], status );
+   }   
+
+/* Get the RMS noise level. */
+   parDef0d( "RMS", rms, status );
+   parGet0d( "RMS", &rms, status );
+
+/* Allocate work arrays. */
+   wa = astMalloc( cupidSize( type, "findback" )*el );
+   wb = astMalloc( cupidSize( type, "findback" )*el );
 
 /* Get the interaction level. */
    parGdr0i( "ILEVEL", 0, 0, 1, 1, &ilevel, status );
@@ -311,14 +359,14 @@ void findback( int *status ){
       }
 
 /* Process this slice, then increment the pointer to the next slice. */
-      if( !strcmp( type, "_REAL" ) ) {
-         cupidFindback1F( slice_dim, box, (float *) ipd1, (float *) ipd2, 
+      if( type == CUPID__FLOAT ) {
+         cupidFindback1F( slice_dim, box, rms, (float *) ipd1, (float *) ipd2, 
                         (float *) wa, (float *) wb, ilevel, status );
          ipd1 = ( (float *) ipd1 ) + slice_size;
          ipd2 = ( (float *) ipd2 ) + slice_size;
    
       } else {
-         cupidFindback1D( slice_dim, box, (double *) ipd1, (double *) ipd2, 
+         cupidFindback1D( slice_dim, box, rms, (double *) ipd1, (double *) ipd2, 
                         (double *) wa, (double *) wb, ilevel, status  );
          ipd1 = ( (double *) ipd1 ) + slice_size;
          ipd2 = ( (double *) ipd2 ) + slice_size;
@@ -329,7 +377,7 @@ void findback( int *status ){
    requested that the output should hold the background-subtracted input
    data, then do the arithmetic now. */
    if( sub && *status == SAI__OK ) {
-      if( !strcmp( type, "_REAL" ) ) {
+      if( type == CUPID__FLOAT ) {
          pf1 = (float *) ipdin;
          pf2 = (float *) ipdout;
          for( i = 0; i < el; i++, pf1++, pf2++ ) {

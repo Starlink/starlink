@@ -2,27 +2,31 @@
 #include "cupid.h"
 #include <stdio.h>
 
-void CGEN_FUNCTION(cupidFindback2)( int dim[3], CGEN_TYPE *din, int *status ){
+void CGEN_FUNCTION(cupidFindback2)( double rms, int dim[3], CGEN_TYPE *din, 
+                                    int *status ){
 /*
 *+
 *  Name:
 *     cupidFindback2<X>
 
 *  Purpose:
-*     Reject values larger than 3 times the noise level form the supplied
+*     Reject values larger than 3 times the noise level from the supplied
 *     data array.
 
 *  Language:
 *     Starlink C
 
 *  Synopsis:
-*     void cupidFindback2<X>( int dim[3], CGEN_TYPE *din, int *status )
+*     void cupidFindback2<X>( double rms, int dim[3], CGEN_TYPE *din, 
+*                             int *status )
 
 *  Description:
 *     This function sets all elements of the supplied array bad that are
 *     greater than 3 times the RMS noise in the data.
 
 *  Parameters:
+*     rms
+*        The RMS noise in the data. 
 *     dim
 *        The dimensions of the supplied array.
 *     din
@@ -67,7 +71,6 @@ void CGEN_FUNCTION(cupidFindback2)( int dim[3], CGEN_TYPE *din, int *status ){
 
 /* Local Variables: */
    CGEN_TYPE *ap; 
-   double rms; 
    double thresh; 
    int i;
    int nel;
@@ -77,9 +80,6 @@ void CGEN_FUNCTION(cupidFindback2)( int dim[3], CGEN_TYPE *din, int *status ){
 
 /* Get the number of elements in the array. */
    nel = dim[ 0 ]*dim[ 1 ]*dim[ 2 ];
-
-/* Find an estimate of the RMS noise in the data */
-   rms = CGEN_FUNCTION(cupidRms)( din, nel, dim[ 0 ], status );
 
 /* Reject data points greater than 3 times the RMS noise. */
    thresh = 3*rms;

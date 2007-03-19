@@ -153,6 +153,14 @@ package cupid {
             helpkey *
           }
 
+         parameter rms {
+            type _DOUBLE
+            access READ
+            ppath DYNAMIC
+            prompt {RMS noise level}
+            helpkey *
+          }
+
       }
 
       action findclumps {
