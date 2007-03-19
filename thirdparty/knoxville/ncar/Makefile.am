@@ -143,4 +143,33 @@ dist_starnews_DATA = ncar.news
 
 EXTRA_DIST = ncar.h
 
-
+#  Form second links to the main object library (static and shared). This is 
+#  used when a second pass through the library is needed during linking.
+#  Do not forget to change the contents of the libncar_pass2.la file to refer
+#  to the pass2 libraries rather than the original libraries. Use target 
+#  install-exec-hook rather than install-exec-local so that the soft links 
+#  and files are created *after* the main library has been installed. 
+install-exec-hook: libncar.la
+	$(mkdir_p) $(DESTDIR)$(libdir) 
+	cd $(DESTDIR)$(libdir); \
+	for f in `ls libncar.*`; do \
+	  ff=`echo $$f | sed -e 's/libncar/libncar_pass2/'`; \
+	  if test -f "$$ff"; then rm "$$ff"; fi; \
+	  $(LN_S) $$f $$ff; \
+	  $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(libdir)/$$ff" || :; \
+	done; \
+	if test -f "libncar.la"; then \
+	  if test -f "libncar_pass2.la"; then rm "libncar_pass2.la"; fi; \
+	  sed -e 's/libncar/libncar_pass2/g' libncar.la > libncar_pass2.la; \
+	fi
+	cd $(DESTDIR)$(libdir); \
+	for f in `ls libncar_snx.*`; do \
+	  ff=`echo $$f | sed -e 's/libncar_snx/libncar_snx_pass2/'`; \
+	  if test -f "$$ff"; then rm "$$ff"; fi; \
+	  $(LN_S) $$f $$ff; \
+	  $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(libdir)/$$ff" || :; \
+	done; \
+	if test -f "libncar_snx.la"; then \
+	  if test -f "libncar_snx_pass2.la"; then rm "libncar_snx_pass2.la"; fi; \
+	  sed -e 's/libncar_snx/libncar_snx_pass2/g' libncar_snx.la > libncar_snx_pass2.la; \
+	fi
