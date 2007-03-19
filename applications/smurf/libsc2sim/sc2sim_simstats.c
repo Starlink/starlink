@@ -52,6 +52,8 @@
 *  History :
 *     2007-03-01 (AGG):
 *        Original version
+*     2007-03-08 (AGG):
+*        Minor change to units reported
 
 *  Copyright:
 *     Copyright (C) 2007 University of British Columbia. All Rights
@@ -97,7 +99,7 @@ void sc2sim_simstats ( int npoints, double samptime, int maxwrite, int nbol,
 
   /* Local variables */
   double simlength;              /* Length of simulation */
-  char temp[10];                 /* temporary character string */
+  char temp[4];                  /* temporary character string */
   JCMTState *head;               /* Pointer to a JCMTState struct */
 
   if ( *status != SAI__OK ) return;
@@ -107,12 +109,12 @@ void sc2sim_simstats ( int npoints, double samptime, int maxwrite, int nbol,
   simlength = npoints * samptime / 1000.0;
   if ( simlength > 60 && simlength < 3600 ) {
     simlength /= 60.0;
-    strncpy( temp, "minutes", 7 );
+    strncpy( temp, "min", 3 );
   } else if ( simlength > 3600 ) {
     simlength /= 3600.0;
-    strncpy( temp, "hours", 5);
+    strncpy( temp, "hrs", 3);
   } else {
-    strncpy( temp, "seconds", 7);
+    strncpy( temp, "sec", 3);
   }
   printf( "  Simulation represents an observation of %5.2f %s\n", simlength,temp);
 
@@ -121,12 +123,12 @@ void sc2sim_simstats ( int npoints, double samptime, int maxwrite, int nbol,
   simlength = 400.0 * (npoints * samptime / 1000.0) / 142.0;
   if ( simlength > 60 && simlength < 3600 ) {
     simlength /= 60.0;
-    strncpy( temp, "minutes", 7 );
+    strncpy( temp, "min", 3 );
   } else if ( simlength > 3600 ) {
     simlength /= 3600.0;
-    strncpy( temp, "hours", 5);
+    strncpy( temp, "hrs", 3);
   } else {
-    strncpy( temp, "seconds", 7);
+    strncpy( temp, "sec", 3);
   }
   printf("  ...and will take ~ %5.2f *(1.6GHz/CPU) %s to run\n", simlength,temp);
   
