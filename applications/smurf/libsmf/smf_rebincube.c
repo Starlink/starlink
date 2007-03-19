@@ -190,6 +190,9 @@
 *     14-MAR-2007 (DSB):
 *        Use the AST__VARWGT flag with astRebinSeq to cause input
 *        variances to be used as weights for the input data.
+*     19-MAR-2007 (DSB):
+*        Check for bad input data values and set the appropriate AST__USEBAD
+*        flag when calling astRebinSeq.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -289,8 +292,10 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
    float texp;                 /* Total time ( = ton + toff ) */
    float toff;                 /* Off time */
    float ton;                  /* On time */
-   int ast_flags;              /* Flags to use with astRebinSeq */
+   int ast_flags;              /* Basic flags to use with astRebinSeq */
+   int bad;                    /* Any bad input data values found? */
    int dim[ 3 ];               /* Output array dimensions */
+   int flags;                  /* Modified flags to use with astRebinSeq */
    int found;                  /* Was current detector name found in detgrp? */
    int good_det;               /* Flag indicating some overlap between detector & o/p */
    int good_file;              /* Flag indicating some overlap between file & o/p */
@@ -894,15 +899,20 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
                }
 
 /* Copy the detector values for this spectral channel and time slice into
-   a new array. */
+   a new array, testing for bad pixels. */
+               bad = 0;
                for( idet = 0; idet < (data->dims)[ 1 ]; idet++ ) {
                   detwork[ idet ] = pdata[ idet*nchan ];
+                  if( detwork[ idet ] == VAL__BADR ) bad = 1;
                }
+
+/* Modify the flags for astRebinSeq if there are any bad pixels. */
+               flags = bad ? ast_flags | AST__USEBAD : ast_flags;
 
 /* Paste this array into the plane of the output cube corresponding to
    the current spectral channel. */
                astRebinSeqF( totmap, 0.0, 2, lbnd_in, ubnd_in, detwork, varwork,
-                             spread, params, ast_flags, 0.0, 50, VAL__BADR, 
+                             spread, params, flags, 0.0, 50, VAL__BADR, 
                              2, ldim, dim, lbnd_in, ubnd_in, data_array + iv, 
                              ipv, ipw );
             }
