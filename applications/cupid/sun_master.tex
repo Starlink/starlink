@@ -15,10 +15,10 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {255.1}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {13th March 2007}
+\newcommand{\stardocdate}      {19th March 2007}
 \newcommand{\stardoctitle}     {CUPID}
 \newcommand{\stardoconeline}   {A 3D Clump Identification and Analysis Package}
-\newcommand{\stardocversion}   {Version 0.0-28}
+\newcommand{\stardocversion}   {Version 0.0-29}
 \newcommand{\stardocmanual}    {Users' Manual}
 \newcommand{\stardocabstract}  {CUPID is a package of the identification
 and analysis of clumps of emission within 1-, 2- and 3- dimensional 
@@ -698,16 +698,23 @@ This is based on the algorithm described by \emph{Stutzki \& Gusten}
 (1990, ApJ 356, 513). This algorithm proceeds by fitting a Gaussian
 profile to the brightest peak in the data. It then subtracts the fit from
 the data and iterates, fitting a new ellipse to the brightest peak in the
-residuals. This continues until a series of consecutive fits are made
-that have peak values below a given multiple of the noise level. Each
-fitted ellipse is taken to be a single clump and is added to the output
-catalogue. In this algorithm, clumps may overlap. Any input variance
-component is used to scale the weight associated with each pixel value
-when performing the Gaussian fit. The most significant configuration
-parameters for this algorithm are: {\tt GaussClumps.FwhmBeam} and
-{\tt GaussClumps.VeloRes} which determine the minimum clump size, and
-{\tt GaussClumps.Thresh} which (together with the ADAM parameter RMS) 
-determine the termination criterion.
+residuals. This continues until any one of the ``termination criteria''
+described below is satisfied. Each fitted ellipse is taken to be a single
+clump and is added to the output catalogue. In this algorithm, clumps may
+overlap, and for this reason each input pixel cannot simply be assigned
+to a single clump (as can be done for algorithms such as FellWalker or
+ClumpFind). Therefore, when using GassClumps, the primary output NDF from 
+FINDCLUMPS does not hold the clump index at each input pixel. Instead it
+holds the sum of all the fitted Gaussian that contribute to each input
+pixel position.
+
+Any input variance component is used to scale the weight associated with
+each pixel value when performing the Gaussian fit. The most significant
+configuration parameters for this algorithm are: {\tt
+GaussClumps.FwhmBeam} and {\tt GaussClumps.VeloRes} which determine the
+minimum clump size, and {\tt GaussClumps.Thresh} which (together with the
+ADAM parameter RMS) determine the second of the above termination
+criteria.
 
 Note, this implementation of the GaussClumps algorithm is a completely
 independent re-write, and includes some differences from other
@@ -729,6 +736,10 @@ weighting function implied by configuration parameters
 further clumps if any one of the following criteria is met.
 
 \begin{enumerate}
+
+\item the total data sum in the fitted Gaussians is equal to or exceeds
+the total data sum in the supplied input data (this is the original
+termination criterion used by \emph{Stutzki \& Gusten}).
 
 \item The number of clumps already found equals the value of
 configuration parameter {\tt GaussClumps.MaxClumps}.

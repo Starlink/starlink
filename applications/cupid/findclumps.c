@@ -75,8 +75,8 @@ void findclumps( int *status ) {
 *  Description:
 *     This application identifies clumps of emission within a 1, 2 or 3 
 *     dimensional NDF. It is assumed that any background has already been
-*     removed from the data array. Information about the clumps is returned 
-*     in several different ways:
+*     removed from the data array (for instance, using CUPID:FINDCLUMPS). 
+*     Information about the clumps is returned in several different ways:
 *
 *     - A pixel mask identifying pixels as background, clump or edge
 *     pixels is written to the Quality array of each output NDF (see 
@@ -1156,8 +1156,8 @@ void findclumps( int *status ) {
          config2 = astKeyMap( "" );
          astMapPut0A( config2, method, config, NULL );
          cupidStoreConfig( xloc, config2, status );
-         astAnnul( config2 );
-         astAnnul( config );
+         config2 = astAnnul( config2 );
+         config = astAnnul( config );
       }
 
 /* Release the quality name information. */
