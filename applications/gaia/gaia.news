@@ -11,6 +11,8 @@
     Previously "sum" was used until either "mean" or "sum" was explicitly
     selected.
 
+    FITS images that contain NaN values should now contour correctly.
+
   Hokulei Release:
   ================
 
