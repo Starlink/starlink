@@ -225,6 +225,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        data array.
 *     14-MAR-2007 (DSB):
 *        Modify astRebinSeq to allow input variances to be used as weights.
+*     19-MAR-2007 (DSB):
+*        Fix bub in LINEAR_2D macro that caused bad input pixel values to be
+*        treated as good.
 *class--
 */
 
@@ -16894,7 +16897,7 @@ static void SpreadLinear##X( int ndim_out, \
 /* Obtain the x coordinate of the current point and test if it lies \
    outside the output grid. Also test if it is bad. */ \
       y = coords[ 1 ][ point ]; \
-      bad = ( y < ymin ) || ( y >= ymax ) || ( y == AST__BAD ); \
+      bad = bad || ( y < ymin ) || ( y >= ymax ) || ( y == AST__BAD ); \
       if ( !bad ) { \
 \
 /* Similarly obtain and test the y coordinate. */ \
