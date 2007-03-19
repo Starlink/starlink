@@ -267,9 +267,9 @@ void findclumps( int *status ) {
 *        output. [current value]
 *     RMS = _DOUBLE (Read)
 *        Specifies a value to use as the global RMS noise level in the 
-*        supplied data array. The suggested defaukt value is the square root 
-*        of the mean of the values in the input NDF's Variance component is 
-*        used. If the NDF has no Variance component, the suggested default 
+*        supplied data array. The suggested default value is the square root 
+*        of the mean of the values in the input NDF's Variance component.
+*        If the NDF has no Variance component, the suggested default 
 *        is based on the differences between neighbouring pixel values. Any 
 *        pixel-to-pixel correlation in the noise can result in this estimate 
 *        being too low. The value supplied for this parameter will be ignored 
