@@ -122,6 +122,16 @@ package cupid {
             helpkey *
           }
 
+         parameter sub {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Subtract background from input data?}
+            default FALSE
+            helpkey *
+          }
+
          parameter in {
             position 1
             type NDF

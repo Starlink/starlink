@@ -86,8 +86,14 @@ void findback( int *status ){
 *        various stages of the algorithm. [0]
 *     IN = NDF (Read)
 *        The input NDF.
+*     SUB = _LOGICAL (Read)
+*        If a TRUE value is supplied, the output NDF will contain the
+*        difference between the supplied input data and the estimated 
+*        background. If a FALSE value is supplied, the output NDF will
+*        contain the estimated background itself. [FALSE]
 *     OUT = NDF (Write)
-*        The output NDF containing the fitted lower envelope.
+*        The output NDF containing either the estimated background, or the 
+*        background-subtracted input data, as specified by parameter SUB.
 
 *  Notes:
 *     - Smoothing cubes in 3 dimensions can be very slow.
@@ -119,6 +125,10 @@ void findback( int *status ){
 *  History:
 *     13-SEP-2006 (DSB):
 *        Original version.
+*     19-MAR-2007 (DSB):
+*        - Added parameter SUB.
+*        - Fix bug that left the output NDF uninitialised if ILEVEL is set
+*        non-zero.
 *     {enter_further_changes_here}
 
 *-
@@ -128,6 +138,10 @@ void findback( int *status ){
    Grp *grp;                 /* GRP identifier for configuration settings */
    char dtype[ 21 ];         /* HDS data type for output NDF */
    char type[ 21 ];          /* HDS data type to use when processing */
+   double *pd1;              /* Pointer to double precision input data */
+   double *pd2;              /* Pointer to double precision output data */
+   float *pf1;               /* Pointer to single precision input data */
+   float *pf2;               /* Pointer to single precision output data */
    int *old_status;          /* Pointer to original status value */
    int box[ 3 ];             /* Dimensions of each cell in pixels */
    int dim[ NDF__MXDIM ];    /* Dimensions of each NDF pixel axis */
@@ -147,6 +161,9 @@ void findback( int *status ){
    int size;                 /* Size of GRP group */
    int slice_dim[ 3 ];       /* Dimensions of each significant slice axis */
    int slice_size;           /* Number of pixels in each slice */
+   int sub;                  /* Output the background-subtracted input data? */
+   void *ipdin;              /* Pointer to input Data array */
+   void *ipdout;             /* Pointer to output Data array */
    void *ipd1;               /* Pointer to input Data array */
    void *ipd2;               /* Pointer to output Data array */
    void *wa;                 /* Pointer to work array */
@@ -196,9 +213,18 @@ void findback( int *status ){
    if( nsdim < 3 ) sdim[ 2 ] = 1;
    if( nsdim < 2 ) sdim[ 1 ] = 1;
 
+/* See if the output is to contain the background-subtracted data, or the
+   background estimate itself. */
+   parGet0l( "SUB", &sub, status );
+
 /* Create the output by propagating everything except the Data and
-   Variance arrays. */
-   ndfProp( indf1, "UNITS,AXIS,WCS,QUALITY", "OUT", &indf2, status );
+   (if we are outputting the background itself) Variance arrays. */
+   if( sub ) {
+      ndfProp( indf1, "UNITS,AXIS,WCS,QUALITY,VARIANCE", "OUT", &indf2, 
+               status );
+   } else {
+      ndfProp( indf1, "UNITS,AXIS,WCS,QUALITY", "OUT", &indf2, status );
+   }
 
 /* Get the dimensions of each of the filters, in pixels. If only one
    value is supplied, duplicate it as the second value if the second axis
@@ -248,8 +274,8 @@ void findback( int *status ){
    ndfStype( dtype, indf2, "Data,Variance", status );
 
 /* Map the input and output arrays. */
-   ndfMap( indf1, "Data", type, "READ", &ipd1, &el, status );
-   ndfMap( indf2, "Data", type, "WRITE", &ipd2, &el, status );
+   ndfMap( indf1, "Data", type, "READ", &ipdin, &el, status );
+   ndfMap( indf2, "Data", type, "WRITE", &ipdout, &el, status );
 
 /* Allocate work arrays. */
    if( type ) {
@@ -271,6 +297,8 @@ void findback( int *status ){
    if( *status != SAI__OK ) goto L999;
 
 /* Loop round all slices to be processed. */
+   ipd1 = ipdin;
+   ipd2 = ipdout;
    nslice = nystep*nzstep;
    for( islice = 0; islice < nslice; islice++ ) {
 
@@ -283,7 +311,7 @@ void findback( int *status ){
       }
 
 /* Process this slice, then increment the pointer to the next slice. */
-      else if( !strcmp( type, "_REAL" ) ) {
+      if( !strcmp( type, "_REAL" ) ) {
          cupidFindback1F( slice_dim, box, (float *) ipd1, (float *) ipd2, 
                         (float *) wa, (float *) wb, ilevel, status );
          ipd1 = ( (float *) ipd1 ) + slice_size;
@@ -296,6 +324,35 @@ void findback( int *status ){
          ipd2 = ( (double *) ipd2 ) + slice_size;
       }
    }     
+
+/* The output currently holds the background estimate. If the user has
+   requested that the output should hold the background-subtracted input
+   data, then do the arithmetic now. */
+   if( sub && *status == SAI__OK ) {
+      if( !strcmp( type, "_REAL" ) ) {
+         pf1 = (float *) ipdin;
+         pf2 = (float *) ipdout;
+         for( i = 0; i < el; i++, pf1++, pf2++ ) {
+            if( *pf1 != VAL__BADR && *pf2 != VAL__BADR ) {
+               *pf2 = *pf1 - *pf2;
+            } else {
+               *pf2 = VAL__BADR;
+            }
+         }
+
+      } else {
+         pd1 = (double *) ipdin;
+         pd2 = (double *) ipdout;
+         for( i = 0; i < el; i++, pd1++, pd2++ ) {
+            if( *pd1 != VAL__BADD && *pd2 != VAL__BADD ) {
+               *pd2 = *pd1 - *pd2;
+            } else {
+               *pd2 = VAL__BADD;
+            }
+         }
+
+      }            
+   }
 
 /* Tidy up */
 L999:;
