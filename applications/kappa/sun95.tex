@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.32}
 \newcommand{\stardocnumber}    {95.32}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2007 March 5}
+\newcommand{\stardocdate}      {2007 March 16}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.7}
+\newcommand{\stardocversion}   {1.7-1}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -27060,6 +27060,22 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          be used otherwise. {\tt [!]}
       }
       \sstsubsection{
+         ALIGNSYS = LITERAL (Read)
+      }{
+         This is only used if a {\tt TRUE} value is supplied for parameter 
+         ALIGN.  It specifies the co-ordinate system in which the new plot
+         and the existing plot are aligned (for further details see the
+         description of the AlignSystem attribute in SUN/211).  The supplied 
+         name should be a valid co-ordinate system name for the horizontal 
+         axis (see the description of the "System" attribute in SUN/211 
+         for a list of these names).  It may also take the special value 
+         "Data", in which case alignment occurs in the co-ordinate system 
+         represented by the current WCS Frame in the supplied NDF.  If a 
+         null ({\tt{!}}) value is supplied.  The alignment system is 
+         determined by the current value of AlignSystem attribute in the 
+         supplied NDF.  {\tt ["Data"]}
+      }
+      \sstsubsection{
          AXES = \_LOGICAL (Read)
       }{
          {\tt TRUE} if labelled and annotated axes are to be drawn around the
@@ -51549,6 +51565,13 @@ The following applications have been modified:
          may be retained in a dummy dimension provided a new parameter 
          TRIM is set to {\tt FALSE}.  The default of {\tt TRUE} gives
          the current behaviour.
+      \end{itemize}
+
+   \item [\htmlref{LINPLOT}{LINPLOT}] \mbox{}
+      \begin{itemize}
+      \item There is a noew parameter ALIGNSYS that specifies the
+       co-ordinate system in which a new plot and an existing plot are
+       aligned when ALIGN is {\tt TRUE}.
       \end{itemize}
 
    \item [\htmlref{MFITTREND}{MFITTREND}] \mbox{}
