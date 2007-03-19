@@ -1,12 +1,12 @@
 /*+
  *  Define members of Contour.C that are data type dependent.
  *
- *  The types used by these overloaded members is controlled by the macro
- *  "DATA_TYPE".
+ *  The types used by these overloaded members is controlled by the macros
+ *  "DATA_TYPE" and "DATA_FORMAT".
  *
  *  Copyright:
  *     Copyright (C) 1999-2005 Central Laboratory of the Research Councils.
- *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     Copyright (C) 2006-2007 Particle Physics & Astronomy Research Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -31,11 +31,17 @@
  *   Detect and draw a single contour. Returns the number of pixel
  *   used in the contour. Use unswapped data.
  */
-int Contour::scanNativeImage( const DATA_TYPE *image, const int nx,
-                              const int ny, const AstPlot *plot,
-                              const double cval, const int xlower,
-                              const int ylower, const int xsize,
-                              const int ysize, char *done )
+int JOIN_STRINGS(Contour::scanNativeImage,DATA_FORMAT) 
+    ( const DATA_TYPE *image, 
+      const int nx,
+      const int ny, 
+      const AstPlot *plot,
+      const double cval, 
+      const int xlower,
+      const int ylower, 
+      const int xsize,
+      const int ysize, 
+      char *done )
 {
    //  Number of pixels in a cell.
    const int NCELL = 4;
@@ -110,7 +116,7 @@ int Contour::scanNativeImage( const DATA_TYPE *image, const int nx,
             iy = j + ylower - 1;
 
             //  Don't use this cell if there is a bad pixel adjacent.
-            if ( ! badpix( image, nx, ix, iy ) ) {
+            if ( ! JOIN_STRINGS(badpix,DATA_FORMAT) ( image, nx, ix, iy ) ) {
 
                // Extract data values and test if they contain the contour.
                b[0] = arrayVal( image, nx, ix, iy );
@@ -187,10 +193,11 @@ int Contour::scanNativeImage( const DATA_TYPE *image, const int nx,
                         linend = 1;
                      } else {
                         linend =
-                           badpix( image, nx, ix, iy ) ||
-                           confus ||
-                           arrayVal( done, xsize, ii, jj ) ||
-                           ( npts >= MAXPTS - 1 );
+                            JOIN_STRINGS(badpix,DATA_FORMAT) 
+                            ( image, nx, ix, iy ) ||
+                            confus ||
+                            arrayVal( done, xsize, ii, jj ) ||
+                            ( npts >= MAXPTS - 1 );
                      }
 
                      //  If we are continuing on this contour, extract the
@@ -281,11 +288,17 @@ int Contour::scanNativeImage( const DATA_TYPE *image, const int nx,
 //   Detect and draw a single contour. Returns the number of pixel
 //   used in the contour. Use swapped data.
 //
-int Contour::scanSwapImage( const DATA_TYPE *image, const int nx,
-                            const int ny, const AstPlot *plot,
-                            const double cval, const int xlower,
-                            const int ylower, const int xsize,
-                            const int ysize, char *done )
+int JOIN_STRINGS(Contour::scanSwapImage,DATA_FORMAT) 
+    ( const DATA_TYPE *image, 
+      const int nx,
+      const int ny, 
+      const AstPlot *plot,
+      const double cval, 
+      const int xlower,
+      const int ylower, 
+      const int xsize,
+      const int ysize, 
+      char *done )
 {
    //  Number of pixels in a cell.
    const int NCELL = 4;
@@ -360,7 +373,7 @@ int Contour::scanSwapImage( const DATA_TYPE *image, const int nx,
             iy = j + ylower - 1;
 
             //  Don't use this cell if there is a bad pixel adjacent.
-            if ( ! swapBadpix( image, nx, ix, iy ) ) {
+            if ( ! JOIN_STRINGS(swapBadpix,DATA_FORMAT) ( image, nx, ix, iy ) ) {
 
                // Extract data values and test if they contain the contour.
                b[0] = swapArrayVal( image, nx, ix, iy );
@@ -437,7 +450,8 @@ int Contour::scanSwapImage( const DATA_TYPE *image, const int nx,
                         linend = 1;
                      } else {
                         linend =
-                           swapBadpix( image, nx, ix, iy ) ||
+                            JOIN_STRINGS(swapBadpix,DATA_FORMAT)
+                            ( image, nx, ix, iy ) ||
                            confus ||
                            arrayVal( done, xsize, ii, jj ) ||
                            ( npts >= MAXPTS - 1 );
@@ -526,4 +540,3 @@ int Contour::scanSwapImage( const DATA_TYPE *image, const int nx,
    } //  End of the loop through the lines.
    return ndrawn;
 }
-

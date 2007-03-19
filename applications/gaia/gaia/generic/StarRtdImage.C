@@ -14,7 +14,7 @@
 
  *  Copyright:
  *     Copyright (C) 1997-2005 Central Laboratory of the Research Councils
- *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     Copyright (C) 2006-2007 Particle Physics & Astronomy Research Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -4204,6 +4204,10 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
             //  data. This is only necessary if the image being
             //  contoured is FITS on a non bigendian machine.
             contour.setSwap( swapNeeded( imageIO ) );
+
+            //  Tell contour object if this is FITS. Need to handle NaN
+            //  values.
+            contour.setIsFITS( isfits() );
 
             //  Set the region of image to contour (tuned to match grid plots).
             if ( ncoords > 0 ) {

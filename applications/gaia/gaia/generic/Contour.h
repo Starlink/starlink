@@ -5,7 +5,7 @@
 /*+
  *  Name:
  *     Contour
- 
+
  *  Purpose:
  *     Include file that defines the Contour class.
 
@@ -13,7 +13,7 @@
  *     Copyright (C) 1999-2005 Central Laboratory of the Research Councils.
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
  *     All Rights Reserved.
- 
+
  *  Licence:
  *     This program is free software; you can redistribute it and/or
  *     modify it under the terms of the GNU General Public License as
@@ -29,10 +29,10 @@
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
  *     02111-1307, USA
- 
+
  *  Authors:
  *     P.W. Draper (PWD)
- 
+
  *  History:
  *     12-APR-1999 (PWD):
  *        Original version.
@@ -59,12 +59,17 @@ extern "C" {
 #define FITS_LONG long
 #endif
 
+// Macro function to join two strings, when the strings may themselves
+// be macros requiring further expansion.
+#define DEFER_JOIN_STRINGS(string1,string2) string1 ## string2
+#define JOIN_STRINGS(string1,string2) DEFER_JOIN_STRINGS(string1,string2)
+
 class Contour {
 
 public:
   //  Constructor.
   Contour( const ImageIO imio, const AstPlot *plot, const double
-           levels[] = NULL, const int nlevels = 0, 
+           levels[] = NULL, const int nlevels = 0,
            const char *prefs[] = NULL, const int nprefs = 0 );
 
   //  Destructor
@@ -92,7 +97,7 @@ public:
   char *getPrefs( const int ipref );
 
   //  Set the region of the image to be contoured.
-  void setRegion( const int xlower, const int ylower, 
+  void setRegion( const int xlower, const int ylower,
                   const int xsize, const int ysize );
 
   //  Get the region that is to be contoured.
@@ -106,6 +111,10 @@ public:
 
   //  Set whether image data is byte swapped
   void setSwap( const int swap ) { swap_ = swap; }
+
+  //  Set whether image data is from a FITS file and we need to handle
+  //  NaN in the floating point.
+  void setIsFITS( const int isfits) { isfits_ = isfits; }
 
  protected:
   //  Pointer to imageIO object. This has the image data and its type.
@@ -127,7 +136,7 @@ public:
   //  Array of pointers to the preferences strings.
   char **prefs_;
 
-  //  Coordinates of part of image to be contoured. These run from 
+  //  Coordinates of part of image to be contoured. These run from
   //  xlower to xlower+xsize-1 and ylower to ylower+ysize-1.
   int xlower_;
   int ylower_;
@@ -140,6 +149,10 @@ public:
   //  Whether the image data is byte swapped (from the machine native
   //  form).
   int swap_;
+
+  //  Whether this is a FITS image. Different idea of BAD values, especially
+  //  for floats.
+  int isfits_;
 
   //  Release existing contours.
   void freeLevels();
@@ -171,35 +184,35 @@ public:
   inline char swapArrayVal( const char *arrayPtr, const int& span,
                             const int &ix, const int& iy )
      {
-        return arrayPtr[iy*span + ix]; 
+        return arrayPtr[iy*span + ix];
      }
 
   inline unsigned char swapArrayVal( const unsigned char *arrayPtr,
-                                     const int& span, const int &ix, 
+                                     const int& span, const int &ix,
                                      const int& iy )
      {
-        return arrayPtr[iy*span + ix]; 
+        return arrayPtr[iy*span + ix];
      }
 
   inline short swapArrayVal( const short *arrayPtr, const int& span,
                              const int &ix, const int& iy )
      {
-        return (short)ntohs((unsigned short)arrayPtr[iy*span + ix]); 
+        return (short)ntohs((unsigned short)arrayPtr[iy*span + ix]);
      }
 
-  inline unsigned short swapArrayVal( const unsigned short *arrayPtr, 
-                                      const int& span, const int &ix, 
+  inline unsigned short swapArrayVal( const unsigned short *arrayPtr,
+                                      const int& span, const int &ix,
                                       const int& iy )
      {
-        return ntohs(arrayPtr[iy*span + ix]); 
+        return ntohs(arrayPtr[iy*span + ix]);
      }
 
-  inline FITS_LONG swapArrayVal( const FITS_LONG *arrayPtr, 
+  inline FITS_LONG swapArrayVal( const FITS_LONG *arrayPtr,
                                  const int& span,
                                  const int &ix,
                                  const int& iy )
      {
-        return ntohl(arrayPtr[iy*span + ix]); 
+        return ntohl(arrayPtr[iy*span + ix]);
      }
 
   inline float swapArrayVal( const float *arrayPtr, const int& span,
@@ -260,85 +273,140 @@ public:
   GENERATE_MIN(float);
   GENERATE_MIN(double);
 
-  //  Test for a BAD pixel within the current cell. XXX Note NDF specific doesn't check BLANK or NaN.
-#define GENERATE_BADPIX( T, BADVAL ) \
-   inline int badpix( const T *image, const int& span, \
-                      const int& i, const int& j ) \
+  //  Test for a BAD pixel within the current cell. NDF specific form.
+#define GENERATE_BADPIXNDF( T, BADVAL ) \
+   inline int badpixNDF( const T *image, const int& span, \
+                         const int& i, const int& j ) \
       { return ( arrayVal( image, span, i    , j     ) == BADVAL ) || \
                ( arrayVal( image, span, i + 1, j     ) == BADVAL ) || \
                ( arrayVal( image, span, i + 1, j + 1 ) == BADVAL ) || \
                ( arrayVal( image, span, i    , j + 1 ) == BADVAL ); }
-  GENERATE_BADPIX(char, VAL__BADB);
-  GENERATE_BADPIX(unsigned char, VAL__BADUB);
-  GENERATE_BADPIX(short, VAL__BADS);
-  GENERATE_BADPIX(unsigned short, VAL__BADUS);
-  GENERATE_BADPIX(FITS_LONG, VAL__BADI);
-  GENERATE_BADPIX(float, VAL__BADF);
-  GENERATE_BADPIX(double, VAL__BADD);
+  GENERATE_BADPIXNDF(char, VAL__BADB);
+  GENERATE_BADPIXNDF(unsigned char, VAL__BADUB);
+  GENERATE_BADPIXNDF(short, VAL__BADS);
+  GENERATE_BADPIXNDF(unsigned short, VAL__BADUS);
+  GENERATE_BADPIXNDF(FITS_LONG, VAL__BADI);
+  GENERATE_BADPIXNDF(float, VAL__BADF);
+  GENERATE_BADPIXNDF(double, VAL__BADD);
 
   //  Test for a BAD pixel within the current cell, swapped version.
-#define GENERATE_SWAPBADPIX( T, BADVAL ) \
-   inline int swapBadpix( const T *image, const int& span, \
-                      const int& i, const int& j ) \
+#define GENERATE_SWAPBADPIXNDF( T, BADVAL ) \
+   inline int swapBadpixNDF( const T *image, const int& span, \
+                             const int& i, const int& j ) \
       { return ( swapArrayVal( image, span, i    , j     ) == BADVAL ) || \
                ( swapArrayVal( image, span, i + 1, j     ) == BADVAL ) || \
                ( swapArrayVal( image, span, i + 1, j + 1 ) == BADVAL ) || \
                ( swapArrayVal( image, span, i    , j + 1 ) == BADVAL ); }
-  GENERATE_SWAPBADPIX(char, VAL__BADB);
-  GENERATE_SWAPBADPIX(unsigned char, VAL__BADUB);
-  GENERATE_SWAPBADPIX(short, VAL__BADS);
-  GENERATE_SWAPBADPIX(unsigned short, VAL__BADUS);
-  GENERATE_SWAPBADPIX(FITS_LONG, VAL__BADI);
-  GENERATE_SWAPBADPIX(float, VAL__BADF);
-  GENERATE_SWAPBADPIX(double, VAL__BADD);
+  GENERATE_SWAPBADPIXNDF(char, VAL__BADB);
+  GENERATE_SWAPBADPIXNDF(unsigned char, VAL__BADUB);
+  GENERATE_SWAPBADPIXNDF(short, VAL__BADS);
+  GENERATE_SWAPBADPIXNDF(unsigned short, VAL__BADUS);
+  GENERATE_SWAPBADPIXNDF(FITS_LONG, VAL__BADI);
+  GENERATE_SWAPBADPIXNDF(float, VAL__BADF);
+  GENERATE_SWAPBADPIXNDF(double, VAL__BADD);
+
+
+  //  Test for a BAD pixel within the current cell. FITS specific form
+  //  for floating point data. Note handle BLANK by contouring anyway
+  //  but NaNs cause numeric issues and must be handled carefully.
+  //  Test for a BAD pixel within the current cell, swapped version.
+#define ISNAN(x) ((x) != (x))
+#define GENERATE_BADPIXFITS( T ) \
+   inline int badpixFITS( const T *image, const int& span, \
+                          const int& i, const int& j ) \
+       { return ( ISNAN(arrayVal( image, span, i, j         ) ) ) || \
+                ( ISNAN(arrayVal( image, span, i + 1, j     ) ) ) || \
+                ( ISNAN(arrayVal( image, span, i + 1, j + 1 ) ) ) || \
+                ( ISNAN(arrayVal( image, span, i    , j + 1 ) ) ); }
+  GENERATE_BADPIXFITS(float);
+  GENERATE_BADPIXFITS(double);
+
+  //  Test for a BAD pixel within the current cell, swapped version.
+#define ISNAN(x) ((x) != (x))
+#define GENERATE_SWAPBADPIXFITS( T ) \
+   inline int swapBadpixFITS( const T *image, const int& span, \
+                             const int& i, const int& j ) \
+       { return ( ISNAN(swapArrayVal( image, span, i, j         ) ) ) || \
+                ( ISNAN(swapArrayVal( image, span, i + 1, j     ) ) ) || \
+                ( ISNAN(swapArrayVal( image, span, i + 1, j + 1 ) ) ) || \
+                ( ISNAN(swapArrayVal( image, span, i    , j + 1 ) ) ); }
+  GENERATE_SWAPBADPIXFITS(float);
+  GENERATE_SWAPBADPIXFITS(double);
 
   //  Distance between two points, double and int versions.
-  inline double rdist( const double x[], const double y[], 
-                       const int& i, const int& j ) 
+  inline double rdist( const double x[], const double y[],
+                       const int& i, const int& j )
     { return sqrt( ( x[i] - x[j] ) * ( x[i] - x[j] ) +
                    ( y[i] - y[j] ) * ( y[i] - y[j] ) ); }
-  inline int dist( const double x[], const double y[], 
+  inline int dist( const double x[], const double y[],
                    const int& i, const int& j )
     { return (int) rdist( x, y, i, j ); }
 
   //  Are we outside the allowed part of image?
-  inline int offimg( const int& xsize, const int &ysize, 
+  inline int offimg( const int& xsize, const int &ysize,
                      const int& i, const int& j )
     { return ( i < 0 ) ||  ( j < 0 ) ||
              ( i >= xsize - 1 ) || ( j >= ysize - 1 ); }
 
   //  Plot a contour polyline.
-  void contPlot( const AstPlot *lplot, const int npts, 
+  void contPlot( const AstPlot *lplot, const int npts,
                  const double x[], const double y[] );
 
   //  Data type dependent definitions, use overloaded members.
 #define DATA_TYPE char
+#define DATA_FORMAT NDF
 #include "ContourTemplates.h"
 #undef DATA_TYPE
+#undef DATA_FORMAT
 
 #define DATA_TYPE unsigned char
+#define DATA_FORMAT NDF
 #include "ContourTemplates.h"
 #undef DATA_TYPE
+#undef DATA_FORMAT
 
 #define DATA_TYPE short
+#define DATA_FORMAT NDF
 #include "ContourTemplates.h"
 #undef DATA_TYPE
+#undef DATA_FORMAT
 
 #define DATA_TYPE unsigned short
+#define DATA_FORMAT NDF
 #include "ContourTemplates.h"
 #undef DATA_TYPE
+#undef DATA_FORMAT
 
 #define DATA_TYPE FITS_LONG
+#define DATA_FORMAT NDF
 #include "ContourTemplates.h"
 #undef DATA_TYPE
+#undef DATA_FORMAT
 
 #define DATA_TYPE float
+#define DATA_FORMAT NDF
 #include "ContourTemplates.h"
 #undef DATA_TYPE
+#undef DATA_FORMAT
 
 #define DATA_TYPE double
+#define DATA_FORMAT NDF
 #include "ContourTemplates.h"
 #undef DATA_TYPE
+#undef DATA_FORMAT
+
+  // FITS NaN handling.
+#define DATA_TYPE float
+#define DATA_FORMAT FITS
+#include "ContourTemplates.h"
+#undef DATA_TYPE
+#undef DATA_FORMAT
+
+#define DATA_TYPE double
+#define DATA_FORMAT FITS
+#include "ContourTemplates.h"
+#undef DATA_TYPE
+#undef DATA_FORMAT
 
  private:
   //  Pointer used for passing back character strings.

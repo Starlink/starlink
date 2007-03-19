@@ -89,7 +89,7 @@
  *
  *  Copyright:
  *     Copyright (C) 1999-2005 Central Laboratory of the Research Councils
- *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     Copyright (C) 2006-2007 Particle Physics & Astronomy Research Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -146,6 +146,7 @@ Contour::Contour( const ImageIO imio, const AstPlot *plot,
      ysize_(0),
      careful_(1),
      swap_(0),
+     isfits_(0),
      userBuffer_(NULL)
 {
 
@@ -401,79 +402,101 @@ int Contour::drawContours()
       switch ( type ) {
          case BYTE_IMAGE:
             if ( swap_ ) {
-               ndrawn = scanSwapImage( (unsigned char *) image, nx, ny, 
+               ndrawn = scanSwapImageNDF( (unsigned char *) image, nx, ny, 
                                        lplot, cval, xlower, ylower, 
                                        xsize, ysize, done );
             } else {
-               ndrawn = scanNativeImage( (unsigned char *) image, nx, ny, 
+               ndrawn = scanNativeImageNDF( (unsigned char *) image, nx, ny, 
                                          lplot, cval, xlower, ylower, 
                                          xsize, ysize, done );
             }
             break;
          case X_IMAGE:
             if ( swap_ ) {
-               ndrawn = scanSwapImage( (char *) image, nx, ny,
+               ndrawn = scanSwapImageNDF( (char *) image, nx, ny,
                                        lplot, cval, xlower, ylower, xsize,
                                        ysize, done ); 
             } else {
-               ndrawn = scanNativeImage( (char *) image, nx, ny,
+               ndrawn = scanNativeImageNDF( (char *) image, nx, ny,
                                          lplot, cval, xlower, ylower, xsize,
                                          ysize, done ); 
             }
             break;
          case USHORT_IMAGE:
             if ( swap_ ) {
-               ndrawn = scanSwapImage( (ushort *) image, nx, ny,
+               ndrawn = scanSwapImageNDF( (ushort *) image, nx, ny,
                                        lplot, cval, xlower, ylower,
                                        xsize, ysize, done ); 
             } else {
-               ndrawn = scanNativeImage( (ushort *) image, nx, ny,
+               ndrawn = scanNativeImageNDF( (ushort *) image, nx, ny,
                                          lplot, cval, xlower, ylower,
                                          xsize, ysize, done ); 
             }
             break;
          case SHORT_IMAGE:
             if ( swap_ ) {
-               ndrawn = scanSwapImage( (short *) image, nx, ny, lplot,
+               ndrawn = scanSwapImageNDF( (short *) image, nx, ny, lplot,
                                        cval, xlower, ylower, xsize,
                                        ysize, done ); 
             } else {
-               ndrawn = scanNativeImage( (short *) image, nx, ny, lplot,
+               ndrawn = scanNativeImageNDF( (short *) image, nx, ny, lplot,
                                          cval, xlower, ylower, xsize,
                                          ysize, done ); 
             }
             break;
          case LONG_IMAGE:
             if ( swap_ ) {
-               ndrawn = scanSwapImage( (FITS_LONG *) image, nx, ny,
+               ndrawn = scanSwapImageNDF( (FITS_LONG *) image, nx, ny,
                                        lplot, cval, xlower, ylower,
                                        xsize, ysize, done );
             } else {
-               ndrawn = scanNativeImage( (FITS_LONG *) image, nx, ny,
+               ndrawn = scanNativeImageNDF( (FITS_LONG *) image, nx, ny,
                                          lplot, cval, xlower, ylower,
                                          xsize, ysize, done );
             }
             break;
          case FLOAT_IMAGE:
-            if ( swap_ ) {
-               ndrawn = scanSwapImage( (float *) image, nx, ny, lplot,
-                                       cval, xlower, ylower, xsize,
-                                       ysize, done ); 
+             if ( isfits_ ) {
+                 if ( swap_ ) {
+                     ndrawn = scanSwapImageFITS( (float *) image, nx, ny, 
+                                                 lplot, cval, xlower, ylower, 
+                                                 xsize, ysize, done ); 
+                 } else {
+                     ndrawn = scanNativeImageFITS( (float *) image, nx, ny, 
+                                                   lplot, cval, xlower, 
+                                                   ylower, xsize,
+                                                   ysize, done ); 
+                 }
+            }
+            else if ( swap_ ) {
+                ndrawn = scanSwapImageNDF( (float *) image, nx, ny, lplot,
+                                           cval, xlower, ylower, xsize,
+                                           ysize, done ); 
             } else {
-               ndrawn = scanNativeImage( (float *) image, nx, ny, lplot,
-                                         cval, xlower, ylower, xsize,
-                                         ysize, done ); 
+                ndrawn = scanNativeImageNDF( (float *) image, nx, ny, lplot,
+                                             cval, xlower, ylower, xsize,
+                                             ysize, done ); 
             }
             break;
          case DOUBLE_IMAGE:
-            if ( swap_ ) {
-               ndrawn = scanSwapImage( (double *) image, nx, ny, lplot,
-                                       cval, xlower, ylower, xsize,
-                                       ysize, done ); 
+            if ( isfits_ ) {
+                if ( swap_ ) {
+                    ndrawn = scanSwapImageFITS( (double *) image, nx, ny, 
+                                                lplot, cval, xlower, ylower, 
+                                                xsize, ysize, done ); 
+                } else {
+                    ndrawn = scanNativeImageFITS( (double *) image, nx, ny, 
+                                                  lplot, cval, xlower, ylower,
+                                                  xsize, ysize, done ); 
+                }
+            } else if ( swap_ ) {
+                ndrawn = scanSwapImageNDF( (double *) image, nx, ny, lplot,
+                                           cval, xlower, ylower, xsize,
+                                           ysize, done ); 
             } else {
-               ndrawn = scanNativeImage( (double *) image, nx, ny, lplot,
-                                         cval, xlower, ylower, xsize,
-                                         ysize, done ); 
+                ndrawn = scanNativeImageNDF( (double *) image, nx, ny, lplot,
+                                             cval, xlower, ylower, xsize,
+                                             ysize, done ); 
             }
             break;
          default:
@@ -558,29 +581,56 @@ void Contour::contPlot( const AstPlot *plot, const int npts,
 //  ContourTemplates.C for which ones.
 
 #define DATA_TYPE char
+#define DATA_FORMAT NDF
 #include "ContourTemplates.C"
 #undef DATA_TYPE
+#undef DATA_FORMAT
 
 #define DATA_TYPE unsigned char
+#define DATA_FORMAT NDF
 #include "ContourTemplates.C"
 #undef DATA_TYPE
+#undef DATA_FORMAT
 
 #define DATA_TYPE short
+#define DATA_FORMAT NDF
 #include "ContourTemplates.C"
 #undef DATA_TYPE
+#undef DATA_FORMAT
 
 #define DATA_TYPE unsigned short
+#define DATA_FORMAT NDF
 #include "ContourTemplates.C"
 #undef DATA_TYPE
+#undef DATA_FORMAT
 
 #define DATA_TYPE FITS_LONG
+#define DATA_FORMAT NDF
 #include "ContourTemplates.C"
 #undef DATA_TYPE
+#undef DATA_FORMAT
 
 #define DATA_TYPE float
+#define DATA_FORMAT NDF
 #include "ContourTemplates.C"
 #undef DATA_TYPE
+#undef DATA_FORMAT
 
 #define DATA_TYPE double
+#define DATA_FORMAT NDF
 #include "ContourTemplates.C"
 #undef DATA_TYPE
+#undef DATA_FORMAT
+
+//  Be careful about NaNs in FITS data.
+#define DATA_TYPE float
+#define DATA_FORMAT FITS
+#include "ContourTemplates.C"
+#undef DATA_TYPE
+#undef DATA_FORMAT
+
+#define DATA_TYPE double
+#define DATA_FORMAT FITS
+#include "ContourTemplates.C"
+#undef DATA_TYPE
+#undef DATA_FORMAT
