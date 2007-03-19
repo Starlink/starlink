@@ -6,6 +6,16 @@
  and  analyse clumps of emission within 2- or 3- dimensional 
  data arrays.
 
+Changes introduced at V0.0-29:
+
+  - Fixed a bug that could cause huge negative pixel values to be
+  introduced into clump cut-outs and statistics produced by FellWalker 
+  or Reinhold when using FINDCLUMPS.
+  - When using GaussClumps to find clumps, issue a warning message if 
+  the total input data sum is negative, as this probably indicates that
+  there is a negative background level. GaussClumps assumes that any
+  background level has first been removed (e.g. using CUPID:FINDBACK).
+
 Changes introduced at V0.0-28:
   - GaussClumps now has an additional termination crietrion; if the total
   integrated sum in the fitted Gaussians equals or exceeds the total
