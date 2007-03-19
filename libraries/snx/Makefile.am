@@ -11,6 +11,13 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ \
 # Have SNX routines and AG replacements
 libsnx_la_SOURCES = $(F_ROUTINES) $(NCAR_ROUTINES)
 
+# Make all library code position independent. DIPSO creates a shareable
+# library that includes this code.
+if !NOPIC
+libsnx_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
+libsnx_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
+endif
+
 NCAR_ROUTINES = agchnlz.f agpwritx.f
 
 F_ROUTINES = snx_aggux.f snx_agop.f snx_agugx.f snx_chset.f \

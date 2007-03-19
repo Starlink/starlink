@@ -33,6 +33,20 @@ libncar_dashsupr_la_SOURCES = dashsupr.f
 libncar_conras_la_SOURCES = conras.f
 libncar_conpms_la_SOURCES = conpms.f
 
+# Make all library code position independent. DIPSO creates a shareable
+# library that includes this code.
+if !NOPIC
+libncar_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
+libncar_snx_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
+libncar_conrecqck_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
+libncar_conrecsupr_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
+libncar_dashline_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
+libncar_dashsmth_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
+libncar_dashsupr_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
+libncar_conras_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
+libncar_conpms_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
+endif
+
 # Install the data files
 staretc_DATA = ezmap.dat pwritx.dat
 

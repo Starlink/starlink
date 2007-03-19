@@ -27,6 +27,9 @@ AC_DISABLE_SHARED
 AC_PROG_LIBTOOL
 AC_PROG_LN_S
 
+dnl   If --with-pic=no is set we should honour that.
+AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
+
 dnl dependances on starlink packages
 STAR_DECLARE_DEPENDENCIES(build, [gks])
 
