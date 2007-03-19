@@ -1,7 +1,8 @@
 #!/bin/tcsh
 #
 #  Test Description:
-#     1D data containing a few well separated gaussians with high noise.
+#     GaussClumps: 1D data containing a few well separated gaussians with 
+#     high noise.
 #
 #  Test Notes:
 #     - The high noise level means that the highest pixel value can be some 

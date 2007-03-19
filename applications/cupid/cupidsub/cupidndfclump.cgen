@@ -122,6 +122,9 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 *  History:
 *     3-FEB-2006 (DSB):
 *        Original version.
+*     19-MAR-2007 (DSB):
+*        Check each pixel in a clump to see if it is bad. If it is, do
+*        not include it in the NDF.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -219,18 +222,27 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
             ivinx = iviny;
             for( ix = clbnd[ 0 ]; ix <= cubnd[ 0 ]; ix++ ) {
 
-/* If this pixel is in the clump, store the input data in the output.*/
+/* If this pixel is in the clump, store the input data (if good) in the 
+   output.*/
                if( ipa[ ivinx ] == index ) {
-                  *pout = ipd[ ivinx ];
+
+                  if( ipd[ ivinx ] == CGEN_BAD ) {
+                     *pout = VAL__BADD;
+                     bad++;
+
+                  } else {
+                     *pout = ipd[ ivinx ];
 
 /* Check the input data pixel on either side of the current pixel on the
    first pixel axis. If either is bad, increment the number of contacts
    between the clump and and areas of bad pixels. We assume that no clumps 
-   touch the edge of the main array (meaning we do not need to check ivinx). */
-                  if( ipd[ ivinx - 1 ] == CGEN_BAD ||
-                      ipd[ ivinx + 1 ] == CGEN_BAD ) bad++;
+   touch the edge of the main array (meaning we do not need to check the
+   value of ivinx). */
+                     if( ipd[ ivinx - 1 ] == CGEN_BAD ||
+                         ipd[ ivinx + 1 ] == CGEN_BAD ) bad++;
+                  }
 
-/* If this pixel is in the clump, store a bad value in the output.*/
+/* If this pixel is not in the clump, store a bad value in the output.*/
                } else {                  
                   *pout = VAL__BADD;
                }
