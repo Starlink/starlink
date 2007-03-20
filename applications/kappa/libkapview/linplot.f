@@ -639,6 +639,9 @@
 *        not the current Frame.
 *     16-MAR-2007 (DSB):
 *        Added AlignSys parameter.
+*     19-MAR-2007 (DSB):
+*        Use both STYLE and TEMPSTYLE parameters within the call to 
+*        KPG1_PLTLN that plots the data curve.
 *     {enter_further_changes_here}
 
 *-
@@ -1703,7 +1706,7 @@
      :                 XVAR, YVAR, %VAL( CNF_PVAL( IPXBAR ) ), 
      :                 %VAL( CNF_PVAL( IPYBAR ) ),
      :                 %VAL( CNF_PVAL( IPSTEP ) ), 
-     :                 'STYLE', IPLOT, IMODE, MTYPE,
+     :                 'STYLE,TEMPSTYLE', IPLOT, IMODE, MTYPE,
      :                 ISHAPE, FREQ, 'KAPPA_LINPLOT', STATUS )
 
 *  Produce the Key. 
