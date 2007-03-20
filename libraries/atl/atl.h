@@ -14,12 +14,15 @@
 
 *  Authors:
 *     DSB: David S. Berry (JAC)
+*     TIMJ: Tim Jenness (JAC)
 
 *  History:
 *     26-MAY-2006 (DSB):
 *        Original version.
 *     7-FEB-2007 (DSB):
 *        Added atlMgfts.
+*     20-MAR-2007 (TIMJ):
+*        Added atlPtfts, atlPtfti
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
@@ -61,5 +64,9 @@ void atlMklut( int, int, int, int, AstFrame *, double *, AstMapping **, int * );
 void atlPlroi( AstPlot *, AstKeyMap **, int * );
 void atlMgfts( int, AstFitsChan *, AstFitsChan *, AstFitsChan **, int * );
 void atlPtftr( AstFitsChan *, const char *, float, const char *, int * );
+void atlPtfti( AstFitsChan *this, const char *name, int value, 
+               const char *comment, int *status );
+void atlPtfts( AstFitsChan *this, const char *name,
+               const char *value, const char *comment, int *status );
 
 #endif
