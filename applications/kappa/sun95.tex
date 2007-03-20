@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.32}
 \newcommand{\stardocnumber}    {95.32}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2007 March 16}
+\newcommand{\stardocdate}      {2007 March 20}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.7-1}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -3841,15 +3841,18 @@ to get a group of attribute settings.  But what values are used for
 attributes which are not included in this group?
 
 Obviously, if an attribute has been assigned an explicit value using the
-parameter then that value is used, but you should note that styles are
-`sticky'.  That is, once a group of attribute settings has been
-specified for a style parameter, that group continues to be used by
-subsequent applications until a new group is supplied for the parameter.
-If the group is supplied within a text file, then the `current value'
-stored for the parameter is the list of attribute settings read from the
-file, \emph{not} the name of the file.  Thus, changing the contents of the
-file at a later time will have no effect on the value used for the
-parameter unless you re-specify the parameter on the command line.
+parameter then that value is used, but you should note that most styles
+are `sticky'.\footnote{The exceptions are the TEMPSTYLE parameters. These
+parameters are used to make temporary style changes and always forget any
+previous values assigned to them.} That is, once a group of attribute
+settings has been specified for a style parameter, that group continues
+to be used by subsequent applications until a new group is supplied for
+the parameter. If the group is supplied within a text file, then the
+`current value' stored for the parameter is the list of attribute
+settings read from the file, \emph{not} the name of the file.  Thus,
+changing the contents of the file at a later time will have no effect on
+the value used for the parameter unless you re-specify the parameter on
+the command line.
 
 If an attribute is not specified in the supplied group, then a default
 value is used for the attribute, determined as follows:
