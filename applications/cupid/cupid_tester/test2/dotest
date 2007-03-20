@@ -22,12 +22,11 @@ $CUPID_DIR/findclumps in="testdata" \
 $KAPPA_DIR/sub testout testmodel diff
 $KAPPA_DIR/stats diff > /dev/null
 
-set wantsum=5.09194571431726
-set wantmin=-0.29550838470459
+set wantsum=5.10479342518374
+set wantmin=-0.296462535858154
 set wantmax=0.354020118713379
-set wantsigma=0.0486906051125238
+set wantsigma=0.0487489646473199
 set wantngood=1001
-
 
 set got=`$KAPPA_DIR/parget total stats`
 set err=`$KAPPA_DIR/calc "'qif(2*abs(pa-pb)/abs(pa+pb)>0.001,1,0)'" pa=$got pb=$wantsum`
@@ -74,5 +73,5 @@ if( "$nrow" != "4" ) then
 endif
 
 
-#rm diff.sdf testout.sdf testout.FIT
+rm diff.sdf testout.sdf testout.FIT
 

@@ -393,7 +393,7 @@ void findclumps( int *status ) {
 *     process is terminated. [10]
 *     - GaussClumps.ModelLim: Determines the value at which each Gaussian
 *     model is truncated to zero. Model values below ModelLim times the RMS
-*     noise are treated as zero. [1.0]
+*     noise are treated as zero. [0.5]
 *     - GaussClumps.NPad: Specifies a termination criterion for the 
 *     GaussClumps algorithm. The algorithm will terminate when "Npad" 
 *     consecutive clumps have been fitted all of which have peak values less 

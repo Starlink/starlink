@@ -13,7 +13,9 @@ Changes introduced at V0.0-30:
    subtracting the RMS noise level from the peak data value (the noise 
    will normally cause the peak data value to be larger than the peak 
    clump value).
-
+   - Default value for GaussCLumps.ModelLim changed from 1.0 to 0.5. A
+   lower value works better with higher noise data, and should not make
+   much difference with lower noise data.
 
 Changes introduced at V0.0-29:
 
