@@ -375,6 +375,11 @@ itcl::class gaia::GaiaCubeSpectrum {
       set ub $itk_option(-upper_limit)
       set alow [$itk_option(-gaiacube) axis_pixel2grid $lb]
       set ahigh [$itk_option(-gaiacube) axis_pixel2grid $ub]
+      if { $alow > $ahigh } {
+         set tmp $alow
+         set alow $ahigh
+         set ahigh $tmp
+      }
 
       #  Make sure ix and iy are integers (zoomed images).
       set ix [expr round($iix)]
@@ -439,6 +444,11 @@ itcl::class gaia::GaiaCubeSpectrum {
       set ub $itk_option(-upper_limit)
       set alow [$itk_option(-gaiacube) axis_pixel2grid $lb]
       set ahigh [$itk_option(-gaiacube) axis_pixel2grid $ub]
+      if { $alow > $ahigh } {
+         set tmp $alow
+         set alow $ahigh
+         set ahigh $tmp
+      }
 
       #  Also autoscale when doing a localstart.
       set cubeaccessor [$itk_option(-gaiacube) get_cubeaccessor]
@@ -597,6 +607,11 @@ itcl::class gaia::GaiaCubeSpectrum {
       set ub $itk_option(-upper_limit)
       set alow [$itk_option(-gaiacube) axis_pixel2grid $lb]
       set ahigh [$itk_option(-gaiacube) axis_pixel2grid $ub]
+      if { $alow > $ahigh } {
+         set tmp $alow
+         set alow $ahigh
+         set ahigh $tmp
+      }
 
       #  Make sure ix and iy are integers (zoomed images).
       set ix [expr round($iix)]
@@ -633,6 +648,11 @@ itcl::class gaia::GaiaCubeSpectrum {
       set ub $itk_option(-upper_limit)
       set alow [$itk_option(-gaiacube) axis_pixel2grid $lb]
       set ahigh [$itk_option(-gaiacube) axis_pixel2grid $ub]
+      if { $alow > $ahigh } {
+         set tmp $alow
+         set alow $ahigh
+         set ahigh $tmp
+      }
 
       #  Display it as a reference spectrum.
       set cubeaccessor [$itk_option(-gaiacube) get_cubeaccessor]
