@@ -6,6 +6,15 @@
  and  analyse clumps of emission within 2- or 3- dimensional 
  data arrays.
 
+
+Changes introduced at V0.0-30:
+
+   - GaussClumps: Reduce the initial guess at the clump peak value by 
+   subtracting the RMS noise level from the peak data value (the noise 
+   will normally cause the peak data value to be larger than the peak 
+   clump value).
+
+
 Changes introduced at V0.0-29:
 
   - Fixed a bug that could cause huge negative pixel values to be
