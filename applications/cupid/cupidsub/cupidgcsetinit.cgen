@@ -121,6 +121,10 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 *        if the data is 1D.
 *     7-MAR-2007 (DSB):
 *        - Change default for MaxWF from 2 to 1.1, andMaxWF from 0.1 to 0.8.
+*     20-MAR-2007 (DSB):
+*        Reduce the initial guess at the clump peak value by subtracting the 
+*        RMS noise level (the noise will normally cause the peak data
+*        value to be larger than the peak clump value).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -417,11 +421,13 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
       par[ 10 ] = 0.0;
    }
 
-/* Store the mean of the background estimates, and the peak value. */
+/* Store the mean of the background estimates, and the peak value. Noise
+   will result in the peak data value being larger than the peak clump value
+   by about the RMS noise. Therefore, reduce the peak value by the RMS. */
    par[ 1 ] = off/ndim;
-   par[ 0 ] = cupidGC.ymax - par[ 1 ];
+   par[ 0 ] = cupidGC.ymax - par[ 1 ] - rms;
 
-/* Negative background levels are unpghysical (since it is assumed that
+/* Negative background levels are unphysical (since it is assumed that
    any background has already been removed from the data before running
    FINDCLUMPS). However, an apparent negative background can be formed by
    a previous ill-position fit resulting in negative residiauls. Therefore
