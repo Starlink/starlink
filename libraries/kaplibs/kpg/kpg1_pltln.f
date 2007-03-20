@@ -28,7 +28,7 @@
 *     within the viewport should be GRAPHICS co-ordinates (millimetres from the
 *     bottom left corner of the view surface).
 *
-*     The Plotting style is accessed using the environment parameter
+*     The Plotting style is accessed using one or more environment parameters
 *     specified by PARAM, and may include the following synonyms for graphical
 *     elements: 
 *        "Err(Bars)" - Specifies colour, etc for error bars. Size(errbars)
@@ -72,8 +72,11 @@
 *        millimetres from the bottom left corner of the view surface). Only 
 *        accessed if MODE is 4.
 *     PARAM = CHARACTER * ( * ) (Given)
-*        The name of the style parameter to be used when obtaining the
-*        plotting style.
+*        The names of one or more style parameters to be used when obtaining 
+*        the plotting style. If more than one parameter is supplied, the
+*        list should be separated by commas. The supplied parameters will 
+*        be used in the order supplied, with later parameters allowing
+*        attributes obtained via earlier parameters to be assigned new values.
 *     IPLOT = INTEGER (Given)
 *        An AST Plot which can be used to do the drawing. The Base Frame
 *        should be GRAPHICS co-ordinates (millimetres from the bottom
@@ -161,6 +164,8 @@
 *        Make bad error bars extend to the corresponding edge of the plot.
 *     5-OCT-2005 (DSB):
 *        Free resources used to hold attribute synonyms before returning.
+*     20-MAR-2007 (DSB):
+*        Allow more than one style parameter to be given via argument "PARAM".
 *     {enter_changes_here}
 
 *  Bugs:
@@ -202,12 +207,15 @@
       DOUBLE PRECISION ERR       ! Error bar limit value
       INTEGER AXCOL0             ! Original Axis colour index
       INTEGER AXSTY0             ! Original Axis line style
+      INTEGER COMMA              ! Index of first comma relative to START
       INTEGER CVCOL0             ! Original Curve Colour index
       INTEGER CVSTY0             ! Original Curve line style
+      INTEGER END                ! Index of parameter name end
       INTEGER I                  ! Position index
       INTEGER MKCOL0             ! Original Marker Colour index
       INTEGER MKFNT0             ! Original Marker font
       INTEGER MKSTY0             ! Original Marker line style
+      INTEGER START              ! Index of parameter name start
       LOGICAL DOWN               ! Is the pen down on the paper?
       LOGICAL DRAWC              ! Can line C be drawn?
       LOGICAL GOODX              ! Is current X value good?
@@ -215,6 +223,7 @@
       LOGICAL GOODY              ! Is current Y value good?
       LOGICAL GOODY0             ! Was previous Y value good?
       LOGICAL MIDX               ! Is middle X value good?
+      LOGICAL MORE               ! Continue looping?
       LOGICAL OK                 ! Are there any points within the window?
       REAL AXWID0                ! Original Axis line width 
       REAL CVWID0                ! Original Curve line width
@@ -314,11 +323,40 @@
       CALL KPG1_ASPSY( '(SYM*BOLS)', '(MARKERS)', STATUS )
       CALL KPG1_ASPSY( '(LIN*ES)', '(CURVES)', STATUS )
 
-*  Set the attributes of the supplied Plot using the supplied parameter to 
-*  access a plotting style. The above synonyms are recognised and translated 
-*  into the corresponding AST attribute names. Colour names are also 
-*  translated into colour indices.
-      CALL KPG1_ASSET( APP, PARAM, IPLOT, STATUS )
+*  Set the attributes of the supplied Plot using each supplied parameter
+*  in turn to access a plotting style. Values obtained using earlier
+*  parameters in the list can be over-ridden using later parameters. The 
+*  above synonyms are recognised and translated into the corresponding 
+*  AST attribute names. Colour names are also translated into colour indices.
+      START = 1
+      MORE = .TRUE.
+      DO WHILE( MORE )
+
+*  Find the index of the first comma following the current START position.
+         COMMA = INDEX( PARAM( START : ), ',' )
+
+*  If no comma was found, assume the next parameter name ends at the end
+*  of the PARAM string, and indicate that we will leave the DO loop after 
+*  processing the current parameter name.
+         IF( COMMA .EQ. 0 ) THEN
+            MORE = .FALSE.
+            END = LEN( PARAM )
+
+*  IF a comma was found, calculate the offset of the last character in
+*  the parameter name.
+         ELSE
+            END = START - 1 + COMMA - 1
+         END IF
+
+*  Use current parameter name to get attribute values for the Plot,
+*  over-writing any obtained using earlier parameters.
+         CALL KPG1_ASSET( APP, PARAM( START : END ), IPLOT, STATUS )
+
+*  Update the starting position, so that the search for the next comma
+*  (if any) starts at the character following the current comma.
+         START = END + 2
+
+      END DO
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
