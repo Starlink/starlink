@@ -657,8 +657,4 @@ void sc2sim_smupos ( double t, double vertex_t, int movecode,
                      int nvert, double vertxy[][2], double *x, 
                      double *y, int *status );
 
-
-void sc2sim_dateobs ( double mjdaystart, char *dateobs, int *status);
-
-
 #endif /* SC2SIM_DEFINED */
