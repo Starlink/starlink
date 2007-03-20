@@ -23,12 +23,74 @@
 *     This is the main routine implementing the MAKEMAP task.
 
 *  ADAM Parameters:
+*     CONFIG = GROUP (Read) 
+*        Specifies values for the configuration parameters used by the
+*        iterative map maker (METHOD=ITERATE). If the string "def" (case-insensitive)
+*        or a null (!) value is supplied, a set of default configuration 
+*        parameter values will be used.
+*
+*        The supplied value should be either a comma-separated list of strings 
+*        or the name of a text file preceded by an up-arrow character
+*        "^", containing one or more comma-separated list of strings. Each
+*        string is either a "keyword=value" setting, or the name of a text 
+*        file preceded by an up-arrow character "^". Such text files should
+*        contain further comma-separated lists which will be read and 
+*        interpreted in the same manner (any blank lines or lines beginning 
+*        with "#" are ignored). Within a text file, newlines can be used
+*        as delimiters as well as commas. Settings are applied in the order 
+*        in which they occur within the list, with later settings over-riding 
+*        any earlier settings given for the same keyword.
+*
+*        Each individual setting should be of the form:
+*
+*           <keyword>=<value>
+*        
+*        The parameters available for are listed in the "Configuration
+*        Parameters" sections below. Default values will be used for
+*        any unspecified parameters. Unrecognised options are ignored
+*        (that is, no error is reported). [current value]
 *     IN = NDF (Read)
 *          Input file(s)
-*     PIXSIZE = REAL (Read)
-*          Pixel size in output image, in arcsec
+*     METHOD = LITERAL (Read)
+*          Specify which map maker should be used to construct the map. The
+*          parameter can take the following values:
+*
+*          - "REBIN" -- Use a single pass rebinning algorithm. This technique
+*          assumes that the data have previously had atmosphere and instrument
+*          signatures removed. It makes use of the standard AST library rebinning
+*          algorithms (see also KAPPA WCSMOSAIC). It's an excellent choice for
+*          obtaining an image quickly, especially of a bright source.
+*
+*          - "ITERATE" -- Use the iterative map maker. This map maker is much slower
+*          than the REBIN algorithm because it continually makes a map, constructs models
+*          for different data components (common-mode, spikes etc).
+*
 *     OUT = NDF (Write)
 *          Output file
+*     PIXSIZE = REAL (Read)
+*          Pixel size in output image, in arcsec. []
+*     SYSTEM = LITERAL (Read)
+*          The celestial coordinate system for the output cube. One of
+*          ICRS, GAPPT, FK5, FK4, FK4-NO-E, AZEL, GALACTIC, ECLIPTIC. It
+*          can also be given the value "TRACKING", in which case the
+*          system used will be which ever system was used as the tracking
+*          system during in the observation.
+*
+*          The choice of system also determines if the telescope is 
+*          considered to be tracking a moving object such as a planet or 
+*          asteroid. If system is GAPPT or AZEL, then each time slice in
+*          the input data will be shifted in order to put the base
+*          telescope position (given by TCS_AZ_BC1/2 in the JCMTSTATE
+*          extension of the input NDF) at the same pixel position that it
+*          had for the first time slice. For any other system, no such 
+*          shifts are applied, even if the base telescope position is
+*          changing through the observation. [TRACKING]
+
+*  Iterative MapMaker Configuration Parameters:
+*     The following configuration parameters are available for the iterative
+*     map maker:
+*          - "NUMITER"
+*          - "MODELORDER"
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -90,7 +152,7 @@
 *     2007-02-06 (AGG):
 *        Add uselonlat flag rather that specify hard-wired value in
 *        smf_mapbounds
-*     2008-03-05 (EC):
+*     2007-03-05 (EC):
 *        Changed smf_correct_extinction interface
 *     {enter_further_changes_here}
 
