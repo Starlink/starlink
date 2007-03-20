@@ -144,10 +144,12 @@
 *        Add "hasoffexp" argument to smf_cubebounds.c
 *     2007-02-23 (AGG):
 *        Add instap to smf_construct_smfHead.c
-*     2008-03-05 (EC):
+*     2007-03-05 (EC):
 *        Changed smf_correct_extinction interface
 *        Add smf_model_gettype
 *        Add smf_calcmodel_ext
+*     2007-03-20 (TIMJ):
+*        Add smf_fits_outhdr
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -333,6 +335,9 @@ size_t smf_dtype_size( const smfData* data, int * status );
 void smf_fit_poly(const smfData *data, const int order, double *poly,  
                   int *status);
 
+void smf_fits_add_prov( AstFitsChan * hdr, const AstKeyMap * obsidmap,
+                      int * status);
+
 void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, 
                       int *status);
 
@@ -350,6 +355,10 @@ void smf_fits_getF( const smfHead * hdr, const char * cardname,
                     float * result, int * status );
 void smf_fits_getS( const smfHead * hdr, const char * cardname, 
                     char result[70], size_t len, int * status );
+
+void
+smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
+		 AstKeyMap ** obsidmap, int * status );
 
 void smf_flatfield ( const smfData *idata, smfData **odata, const int flags, 
                      int *status );
