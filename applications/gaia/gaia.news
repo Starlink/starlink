@@ -16,6 +16,10 @@
 
     FITS images that contain NaN values should now contour correctly.
 
+    The default on-line catalogue list has been updated. Fixes a problem
+    with NED CADC access and includes some new CADC catalogues and the
+    JCMT archive.
+
   Hokulei Release:
   ================
 
