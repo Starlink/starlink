@@ -7,7 +7,7 @@
 void sc2store_compress 
 ( 
 int nval,               /* number of values in frame (given) */
-int stackz[],           /* stackzero frame to be subtracted (given) */
+const int stackz[],     /* stackzero frame to be subtracted (given) */
 int digits[],           /* integer values (given and returned) */
 int *bzero,             /* zero offset for compressed values (returned) */
 unsigned short data[],  /* compressed values (returned) */
@@ -40,12 +40,12 @@ int *status              /* global status (given and returned) */
 
 void sc2store_cremap
 (
-char *filename,          /* name of HDS container file (given) */
+const char *filename,     /* name of HDS container file (given) */
 int colsize,             /* number of pixels in a column (given) */
 int rowsize,             /* number of pixels in a row (given) */
 int nframes,             /* number of frames (given) */
 int nflat,               /* number of flat coeffs per bol (given) */
-char *flatname,          /* name of flatfield algorithm (given) */
+const char *flatname,    /* name of flatfield algorithm (given) */
 int **bzero,             /* pointer to subtracted offset values (returned) */
 unsigned short **data,   /* pointer to data array (returned) */
 int **dksquid,           /* pointer to dark SQUID values (returned) */
@@ -60,12 +60,12 @@ int *status              /* global status (given and returned) */
 void sc2store_decompress 
 ( 
 int nval,               /* number of values in frame (given) */
-int stackz[],           /* stackzero frame to be added (given) */
+const int stackz[],     /* stackzero frame to be added (given) */
 int bzero,              /* zero offset for compressed values (given) */
-unsigned short data[],  /* compressed values (given) */
+const unsigned short data[],  /* compressed values (given) */
 int npix,               /* number of incompressible values (given) */
-int pixnum[],           /* indices of incompressible values (given) */
-int pixval[],           /* incompressible values (given) */
+const int pixnum[],     /* indices of incompressible values (given) */
+const int pixval[],     /* incompressible values (given) */
 int digits[],           /* integer values (returned) */
 int *status             /* global status (given and returned) */
 );
@@ -108,7 +108,7 @@ int *status                   /* global status (given and returned) */
 
 void sc2store_headcremap
 (
-HDSLoc *headloc,              /* HDS locator (given) */
+const HDSLoc *headloc,        /* HDS locator (given) */
 int nframes,                  /* number of frames to be created (given) */
 inst_t instrument,            /* instrument code (given) */
 int *status                   /* global status (given and returned) */
@@ -119,7 +119,7 @@ int *status                   /* global status (given and returned) */
 void sc2store_headput
 (
 int frame,                    /* frame index (given) */
-JCMTState head,          /* header data for the frame (given) */
+const JCMTState head,         /* header data for the frame (given) */
 int *status                   /* global status (given and returned) */
 );
 
@@ -127,7 +127,7 @@ int *status                   /* global status (given and returned) */
 
 void sc2store_headrmap
 (
-HDSLoc *headloc,              /* HDS locator (given) */
+const HDSLoc *headloc,        /* HDS locator (given) */
 int nframes,                  /* number of frames expected (given) */
 inst_t instrument,            /* instrument code (given) */
 int *status                   /* global status (given and returned) */
@@ -144,8 +144,8 @@ int *status                   /* global status (given and returned) */
 
 void sc2store_ndfreadscan
 (
-char *filename,     /* name of input map file (given) */
-char *access,       /* "READ" or "UPDATE" access to data file (given) */
+const char *filename,/* name of input map file (given) */
+const char *access, /* "READ" or "UPDATE" access to data file (given) */
 int flatlen,        /* length of string for flatname (given) */
 int *nframes,       /* number of frames in scan (returned) */
 double **xz,        /* X centre for each frame (returned) */
@@ -167,16 +167,16 @@ int *status         /* global status (given and returned) */
 void sc2store_putimage
 (
 int frame,         /* frame index (given) */
-AstFrameSet *fset, /* World coordinate transformations (given) */
+const AstFrameSet *fset, /* World coordinate transformations (given) */
 int ndim,          /* dimensionality of image (given) */
-int dims[],        /* dimensions of image (given) */
+const int dims[],  /* dimensions of image (given) */
 int seqstart,      /* first sequence number used in image (given) */
 int seqend,        /* last sequence number used in image (given) */
 int nbolx,         /* number of bolometers in X (given) */
 int nboly,         /* number of bolometers in Y (given) */
-double *image,     /* constructed image (given) */
-double *zero,      /* bolometer zero values (given) */
-char fitshd[41][81], /* string array of FITS header keywords to write (given) */
+const double *image, /* constructed image (given) */
+const double *zero,  /* bolometer zero values (given) */
+const char fitshd[41][81], /* string array of FITS header keywords to write (given) */
 int nfits,         /* Number of FITS headers */
 int *status        /* global status (given and returned) */
 );
@@ -187,8 +187,8 @@ void sc2store_putincomp
 (
 int frame,         /* frame index (given) */
 int npix,          /* number of incompressible pixels (given) */
-int pixnum[],      /* indices of incompressible pixels (given) */
-int pixval[],      /* values of incompressible pixels (given) */
+const int pixnum[],/* indices of incompressible pixels (given) */
+const int pixval[],/* values of incompressible pixels (given) */
 int *status        /* global status (given and returned) */
 );
 
@@ -199,7 +199,7 @@ void sc2store_putscanfit
 int nbolx,         /* number of bolometers in X (given) */
 int nboly,         /* number of bolometers in Y (given) */
 int ncoeff,        /* number of coefficients (given) */
-double *coptr,     /* coefficients (given) */
+const double *coptr,/* coefficients (given) */
 int *status        /* global status (given and returned) */
 );
 
@@ -218,7 +218,7 @@ int *status           /* global status (given and returned) */
 
 void sc2store_rdflatcal
 (
-char *filename,          /* name of HDS container file (given) */
+const char *filename,    /* name of HDS container file (given) */
 int flatlen,             /* length of space for flatfield name (given) */
 int *colsize,            /* number of pixels in column (returned) */
 int *rowsize,            /* number of pixels in row (returned) */
@@ -233,8 +233,8 @@ int *status              /* global status (given and returned) */
 
 void sc2store_rdmap
 (
-char *filename,          /* name of HDS container file (given) */
-char *access,            /* "READ" or "UPDATE" access (given) */
+const char *filename,    /* name of HDS container file (given) */
+const char *access,      /* "READ" or "UPDATE" access (given) */
 int flatlen,             /* length of space for flatfield name (given) */
 int *colsize,            /* number of pixels in column (returned) */
 int *rowsize,            /* number of pixels in row (returned) */
@@ -258,8 +258,8 @@ int *status              /* global status (given and returned) */
 
 void sc2store_rdtstream
 (
-char *filename,          /* name of HDS container file (given) */
-char *access,            /* "READ" or "UPDATE" access (given) */
+const char *filename,    /* name of HDS container file (given) */
+const char *access,      /* "READ" or "UPDATE" access (given) */
 int flatlen,             /* length of space for flatfield name (given) */
 int maxlen,              /* max length of FITS header (given) */
 int maxfits,             /* max number of FITS headers (given) */
@@ -287,7 +287,7 @@ int *status              /* global status (given and returned) */
 void sc2store_wrfitshead
 (
 int nfits,            /* number of header items (given) */
-char headers[][81],   /* array of FITS headers (given) */
+const char headers[][81],   /* array of FITS headers (given) */
 int *status           /* global status (given and returned) */
 );
 
@@ -295,24 +295,24 @@ int *status           /* global status (given and returned) */
 
 void sc2store_wrtstream
 (
-char file_name[],  /* output file name (given) */
+const char file_name[],  /* output file name (given) */
 int subnum,        /* Sub-array number (given) */
 int nrec,          /* number of FITS header records (given) */
-char fitsrec[][81],/* FITS records (given) */
+const char fitsrec[][81],/* FITS records (given) */
 int colsize,       /* number of bolometers in column (given) */
 int rowsize,       /* number of bolometers in row (given) */
 int numsamples,    /* number of samples (given) */
 int nflat,         /* number of flat coeffs per bol (given) */
-char *flatname,    /* name of flatfield algorithm (given) */
-JCMTState head[],  /* header data for each frame (given) */
-int *dbuf,         /* time stream data (given) */
-int *darksquid,    /* dark SQUID time stream data (given) */
-double *fcal,      /* flat-field calibration (given) */
-double *fpar,      /* flat-field parameters (given) */
-char obsmode[],    /* Observing mode (given) */
-int jig_vert[][2], /* Array of jiggle vertices (given) */
+const char *flatname,    /* name of flatfield algorithm (given) */
+const JCMTState head[],  /* header data for each frame (given) */
+const int *dbuf,         /* time stream data (given) */
+const int *darksquid,    /* dark SQUID time stream data (given) */
+const double *fcal,      /* flat-field calibration (given) */
+const double *fpar,      /* flat-field parameters (given) */
+const char obsmode[],    /* Observing mode (given) */
+const int jig_vert[][2], /* Array of jiggle vertices (given) */
 int nvert,         /* Number of jiggle vertices (given) */
-double jig_path[][2], /* Path of SMU during jiggle cycle (given) */
+const double jig_path[][2], /* Path of SMU during jiggle cycle (given) */
 int npath,         /* Number of positions in jiggle path (given) */
 int *status        /* global status (given and returned) */
 ); 

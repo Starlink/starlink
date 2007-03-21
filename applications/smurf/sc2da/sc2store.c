@@ -65,7 +65,7 @@ static int jigpndf;                 /* NDF identifier for the SMU path */
 void sc2store_compress 
 ( 
 int nval,               /* number of values in frame (given) */
-int stackz[],           /* stackzero frame to be subtracted (given) */
+const int stackz[],     /* stackzero frame to be subtracted (given) */
 int digits[],           /* integer values (given and returned) */
 int *bzero,             /* zero offset for compressed values (returned) */
 unsigned short data[],  /* compressed values (returned) */
@@ -85,6 +85,7 @@ int *status             /* global status (given and returned) */
 
    History :
     24Sep2004:  original (bdk)
+    20Mar2007 : Use const in signature (TIMJ)
 */
 {
    int j;               /* loop counter */
@@ -249,12 +250,12 @@ int *status              /* global status (given and returned) */
 
 void sc2store_cremap
 (
-char *filename,          /* name of HDS container file (given) */
+const char *filename,    /* name of HDS container file (given) */
 int colsize,             /* number of pixels in a column (given) */
 int rowsize,             /* number of pixels in a row (given) */
 int nframes,             /* number of frames (given) */
 int nflat,               /* number of flat coeffs per bol (given) */
-char *flatname,          /* name of flatfield algorithm (given) */
+const char *flatname,    /* name of flatfield algorithm (given) */
 int **bzero,             /* pointer to subtracted offset values (returned) */
 unsigned short **data,   /* pointer to data array (returned) */
 int **dksquid,           /* pointer to dark SQUID values (returned) */
@@ -417,12 +418,12 @@ int *status              /* global status (given and returned) */
 void sc2store_decompress 
 ( 
 int nval,               /* number of values in frame (given) */
-int stackz[],           /* stackzero frame to be added (given) */
+const int stackz[],     /* stackzero frame to be added (given) */
 int bzero,              /* zero offset for compressed values (given) */
-unsigned short data[],  /* compressed values (given) */
+const unsigned short data[],  /* compressed values (given) */
 int npix,               /* number of incompressible values (given) */
-int pixnum[],           /* indices of incompressible values (given) */
-int pixval[],           /* incompressible values (given) */
+const int pixnum[],     /* indices of incompressible values (given) */
+const int pixval[],     /* incompressible values (given) */
 int digits[],           /* integer values (returned) */
 int *status             /* global status (given and returned) */
 )
@@ -438,6 +439,7 @@ int *status             /* global status (given and returned) */
     14Oct2004:  original (bdk)
     18Feb2005:  add stackz onto uncompressible values (bdk)
     13May2005:  check for bad values (bdk)
+    20Mar2007 : Use const in signature (TIMJ)
 */
 {
    int j;               /* loop counter */
@@ -808,7 +810,7 @@ int *status                   /* global status (given and returned) */
 
 void sc2store_headcremap
 (
-HDSLoc *headloc,              /* HDS locator (given) */
+const HDSLoc *headloc,              /* HDS locator (given) */
 int nframes,                  /* number of frames to be created (given) */
 inst_t instrument,            /* instrument code (given) */
 int *status                   /* global status (given and returned) */
@@ -827,6 +829,7 @@ int *status                   /* global status (given and returned) */
                 Risks, overwriting a valid locator (TIMJ)
     27Jul2006 : Use ACSIS/SCUBA-2 merged approach (TIMJ)
     28Jul2006 : Add instrument argument (TIMJ)
+    20Mar2007 : use const in signature (timj)
 */
 {
    int dim[2];
@@ -980,7 +983,7 @@ int *status                   /* global status (given and returned) */
 
 void sc2store_headrmap
 (
-HDSLoc *headloc,              /* HDS locator (given) */
+const HDSLoc *headloc,        /* HDS locator (given) */
 int nframes,                  /* number of frames expected (given) */
 inst_t instrument,            /* instrument code (given) */
 int *status                   /* global status (given and returned) */
@@ -1000,6 +1003,7 @@ int *status                   /* global status (given and returned) */
                 Risks, overwriting a valid locator (TIMJ)
     27Jul2005 : Use shared ACSIS/SCUBA-2 JCMTState scheme
     28Jul2006 : Add instrument argument (TIMJ)
+    20Mar2007 : Use const in signature (TIMJ)
 */
 {
    int dim[2];
@@ -1089,8 +1093,8 @@ int *status                   /* global status (given and returned) */
 
 void sc2store_ndfreadscan
 (
-char *filename,     /* name of input map file (given) */
-char *access,       /* "READ" or "UPDATE" access to data file (given) */
+const char *filename,     /* name of input map file (given) */
+const char *access,       /* "READ" or "UPDATE" access to data file (given) */
 int flatlen,        /* length of string for flatname (given) */
 int *nframes,       /* number of frames in scan (returned) */
 double **xz,        /* X centre for each frame (returned) */
@@ -1125,6 +1129,7 @@ int *status         /* global status (given and returned) */
     13Mar2006 : copied over from map.c (agg)
     14Mar2006 : change FHEAD__MXREC to SC2STORE__MAXFITS (agg)
     21Aug2006 : update API to reflect change to rststream (agg)
+    20Mar2007 : Use const in signature (TIMJ)
 */
 
 {
@@ -1191,16 +1196,16 @@ int *status         /* global status (given and returned) */
 void sc2store_putimage
 (
 int frame,         /* frame index (given) */
-AstFrameSet *fset, /* World coordinate transformations (given) */
+const AstFrameSet *fset, /* World coordinate transformations (given) */
 int ndim,          /* dimensionality of image (given) */
-int dims[],        /* dimensions of image (given) */
+const int dims[],  /* dimensions of image (given) */
 int seqstart,      /* first sequence number used in image (given) */
 int seqend,        /* last sequence number used in image (given) */
 int nbolx,         /* number of bolometers in X (given) */
 int nboly,         /* number of bolometers in Y (given) */
-double *image,     /* constructed image (given) */
-double *zero,      /* bolometer zero values (given) */
-char fitshd[41][81], /* string array of FITS header keywords to write (given) */
+const double *image, /* constructed image (given) */
+const double *zero,  /* bolometer zero values (given) */
+const char fitshd[41][81], /* string array of FITS header keywords to write (given) */
 int nfits,         /* Number of FITS headers */
 int *status        /* global status (given and returned) */
 )
@@ -1219,6 +1224,7 @@ int *status        /* global status (given and returned) */
     13Jun2005 : use ndfHcre to create history component on all NDFs (bdk)
     13Jun2005 : allow image to be n-dimensional (BDK)
     23Nov2005 : Use Official C HDS interface (TIMJ)
+    20Mar2007 : Use const in signature (TIMJ)
 */
 {
 
@@ -1357,8 +1363,8 @@ void sc2store_putincomp
 (
 int frame,         /* frame index (given) */
 int npix,          /* number of incompressible pixels (given) */
-int pixnum[],      /* indices of incompressible pixels (given) */
-int pixval[],      /* values of incompressible pixels (given) */
+const int pixnum[],/* indices of incompressible pixels (given) */
+const int pixval[],/* values of incompressible pixels (given) */
 int *status        /* global status (given and returned) */
 )
 /*
@@ -1367,6 +1373,7 @@ int *status        /* global status (given and returned) */
     19Jun2005 : use ndfHcre to create history component on all NDFs (bdk)
     23Nov2005 : Use Official C HDS interface (TIMJ)
     18Dec2006 : Remove some error checks (TIMJ)
+    20Mar2007 : Use const in signature (TIMJ)
 */
 {
 
@@ -1434,7 +1441,7 @@ void sc2store_putscanfit
 int nbolx,         /* number of bolometers in X (given) */
 int nboly,         /* number of bolometers in Y (given) */
 int ncoeff,        /* number of coefficients (given) */
-double *coptr,     /* coefficients (given) */
+const double *coptr,/* coefficients (given) */
 int *status        /* global status (given and returned) */
 )
 /* Method :
@@ -1444,6 +1451,7 @@ int *status        /* global status (given and returned) */
     25Feb2005 : original (bdk)
     19Jun2005 : use ndfHcre to create history component on all NDFs (bdk)
     26Jan2006 : change component name to SCANFIT (bdk)
+    20Mar2007 : Use const in signature (TIMJ)
 */
 {
 
@@ -1564,7 +1572,7 @@ int *status           /* global status (given and returned) */
 
 void sc2store_rdflatcal
 (
-char *filename,          /* name of HDS container file (given) */
+const char *filename,    /* name of HDS container file (given) */
 int flatlen,             /* length of space for flatfield name (given) */
 int *colsize,            /* number of pixels in column (returned) */
 int *rowsize,            /* number of pixels in row (returned) */
@@ -1586,6 +1594,7 @@ int *status              /* global status (given and returned) */
     07Dec2005 : set sc2open flag when open is successful (bdk)
     25Jan2006 : add access argument to sc2store_rdmap (bdk)
     08Aug2006 : update call to sc2store_rdmap (agg)
+    20Mar2007 : Use const in signature (TIMJ)
 */
 
 {
@@ -1652,8 +1661,8 @@ int *status              /* global status (given and returned) */
 
 void sc2store_rdmap
 (
-char *filename,          /* name of HDS container file (given) */
-char *access,            /* "READ" or "UPDATE" access (given) */
+const char *filename,    /* name of HDS container file (given) */
+const char *access,      /* "READ" or "UPDATE" access (given) */
 int flatlen,             /* length of space for flatfield name (given) */
 int *colsize,            /* number of pixels in column (returned) */
 int *rowsize,            /* number of pixels in row (returned) */
@@ -1685,6 +1694,7 @@ int *status              /* global status (given and returned) */
     25Jan2006 : add access argument (bdk)
     27Jul2006 : use JCMTSTATE extension (timj)
     21Aug2006 : open and read DREAM parameters if present (agg)
+    20Mar2007 : Use const in signature (TIMJ)
 */
 {
    int dim[3];             /* dimensions */
@@ -1813,8 +1823,8 @@ int *status              /* global status (given and returned) */
 
 void sc2store_rdtstream
 (
-char *filename,          /* name of HDS container file (given) */
-char *access,            /* "READ" or "UPDATE" access (given) */
+const char *filename,    /* name of HDS container file (given) */
+const char *access,      /* "READ" or "UPDATE" access (given) */
 int flatlen,             /* length of space for flatfield name (given) */
 int maxlen,              /* max length of FITS header (given) */
 int maxfits,             /* max number of FITS headers (given) */
@@ -1934,13 +1944,14 @@ int *status              /* global status (given and returned) */
 void sc2store_wrfitshead
 (
 int nfits,            /* number of header items (given) */
-char headers[][81],   /* array of FITS headers (given) */
+const char headers[][81],   /* array of FITS headers (given) */
 int *status           /* global status (given and returned) */
 )
 /*
    History :
     12Aug2004 : original (bdk)
     23Nov2005 : Use Official C HDS interface (TIMJ)
+    20Mar2007 : use const in signature (timj)
 */
 {
    HDSLoc *fitsloc = NULL;    /* HDS locator to FITS headers */
@@ -1971,24 +1982,24 @@ int *status           /* global status (given and returned) */
 
 void sc2store_wrtstream
 (
-char file_name[],  /* output file name (given) */
+const char file_name[],  /* output file name (given) */
 int subnum,        /* Sub-array number (given) */
 int nrec,          /* number of FITS header records (given) */
-char fitsrec[][81],/* FITS records (given) */
+const char fitsrec[][81],/* FITS records (given) */
 int colsize,       /* number of bolometers in column (given) */
 int rowsize,       /* number of bolometers in row (given) */
 int numsamples,    /* number of samples (given) */
 int nflat,         /* number of flat coeffs per bol (given) */
-char *flatname,    /* name of flatfield algorithm (given) */
-JCMTState head[],  /* header data for each frame (given) */
-int *dbuf,         /* time stream data (given) */
-int *darksquid,    /* dark SQUID time stream data (given) */
-double *fcal,      /* flat-field calibration (given) */
-double *fpar,      /* flat-field parameters (given) */
-char *obsmode,    /* Observing mode (given) */
-int jig_vert[][2], /* Array of jiggle vertices (given) */
+const char *flatname,    /* name of flatfield algorithm (given) */
+const JCMTState head[],  /* header data for each frame (given) */
+const int *dbuf,         /* time stream data (given) */
+const int *darksquid,    /* dark SQUID time stream data (given) */
+const double *fcal,      /* flat-field calibration (given) */
+const double *fpar,      /* flat-field parameters (given) */
+const char *obsmode,    /* Observing mode (given) */
+const int jig_vert[][2], /* Array of jiggle vertices (given) */
 int nvert,         /* Number of jiggle vertices (given) */
-double jig_path[][2], /* Path of SMU during jiggle cycle (given) */
+const double jig_path[][2], /* Path of SMU during jiggle cycle (given) */
 int npath,         /* Number of positions in jiggle path (given) */
 int *status        /* global status (given and returned) */
 )
@@ -2007,6 +2018,7 @@ int *status        /* global status (given and returned) */
      08Dec2005 : check status after sc2store_cremap (bdk)
      08Aug2006 : add call to credream if we have a DREAM obs (agg)
      19Dec2006 : add WCS to output file (timj)
+     20Mar2007 : use const in signature (timj)
 */
 
 {

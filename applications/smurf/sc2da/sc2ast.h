@@ -85,7 +85,7 @@ int *status             /* global status (given and returned) */
 
 void sc2ast_getdomain
 (
-char *name,               /* AST domain name (given) */
+const char *name,               /* AST domain name (given) */
 AstFrameSet *fset,        /* modified frameset (given and returned) */
 int *status               /* global status (given and returned) */
 );
@@ -100,8 +100,8 @@ double cd1_1,             /* data increment (given) */
 double cd2_2,             /* data increment (given) */
 double crval1,            /* reference coordinate (given) */
 double crval2,            /* reference coordinate (given) */
-char *ctype1,             /* coordinate mapping type (given) */
-char *ctype2,             /* coordinate mapping type (given) */
+const char *ctype1,             /* coordinate mapping type (given) */
+const char *ctype2,             /* coordinate mapping type (given) */
 AstFitsChan *fitschan,   /* FitsChan to be filled (given and returned) */
 int *status               /* global status (given and returned) */
 );
@@ -120,7 +120,7 @@ int *status               /* global status (given and returned) */
 
 void sc2ast_name2num
 (
-char *name,             /* subarray name s8a-d, s4a-d (given) */
+const char *name,             /* subarray name s8a-d, s4a-d (given) */
 int *subnum,            /* subarray number, 0-7 (returned) */
 int *status             /* global status (given and returned) */
 );
@@ -129,7 +129,7 @@ int *status             /* global status (given and returned) */
 
 void sc2ast_polframeset
 (
-AstFrameSet *frameset,  /* 2-D frameset (given) */
+const AstFrameSet *frameset,  /* 2-D frameset (given) */
 AstFrameSet **fset,     /* constructed 3-D frameset (returned) */
 int *status             /* global status (given and returned) */
 );
