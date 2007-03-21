@@ -105,7 +105,7 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
    while( 1 ) {
       i++;
       sprintf( name, "LEVEL%d", i );
-      clevel = cupidConfigD( config, name, VAL__BADD, status );
+      clevel = cupidConfigRMS( config, name, rms, VAL__BADD, status );
       if( clevel == AST__BAD ) {
          i--;
          break;
@@ -143,7 +143,7 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
    } else {
 
 /* Get the lowest contour level using twice the RMS as the default. */
-      clow = cupidConfigD( config, "TLOW", 2.0*rms, status );
+      clow = cupidConfigRMS( config, "TLOW", rms, 2.0*rms, status );
 
 /* Report an error if the lowest contour level is below the minimum value
    in the data array. */
@@ -160,7 +160,7 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
          cdelta = 2.0*rms; 
 
 /* Get the contour interval using the above default. */
-         cdelta = cupidConfigD( config, "DELTAT", cdelta, status );
+         cdelta = cupidConfigRMS( config, "DELTAT", rms, cdelta, status );
 
 /* Find the number of levels needed for this deltat. */
          *nlevels = (int) ( ( maxd - clow )/cdelta );

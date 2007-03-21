@@ -228,6 +228,7 @@ HDSLoc *cupidReinhold( int, int, int *, int *, void *, double *, double, AstKeyM
 double *cupidCFLevels( AstKeyMap *, double, double, double, int *, int * );
 double *cupidClumpDesc( int, int, AstMapping *, AstFrame *, const char *, double[3], double *, const char ***, const char ***, int *, int *, int * );
 double cupidConfigD( AstKeyMap *, const char *, double, int * );
+double cupidConfigRMS( AstKeyMap *, const char *, double, double, int * );
 double cupidGCChiSq( int, double *, int, int, int * );
 double cupidGCModel( int, double *, double *, int, int, int, int * );
 float cupidRanVal( int, float[2], int * );

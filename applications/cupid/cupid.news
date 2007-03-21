@@ -18,6 +18,9 @@ Changes introduced at V0.0-31:
    - Fellwalker: bug fixed that could prevent merger of adjacent clumps
    separated by less than MinDip, if only one pair of clumps is to be
    merged.
+   - Allow selected configuration parameters for FellWalker, ClumpFind
+   and Reinhold to be specified either as an absolute data value, or as a
+   multiple of the RMS noise, using the syntax "[x]*RMS" (e.g. "3.2*RMS").
 
 
 Changes introduced at V0.0-30:

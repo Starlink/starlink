@@ -465,7 +465,9 @@ void findclumps( int *status ) {
 *     in some real peaks being missed and merged in with neighbouring peaks. 
 *     The default value of two times the RMS noise level is usually considered 
 *     to be optimal, although this obviously depends on the RMS noise level 
-*     being correct. [2*RMS]
+*     being correct. The value can be supplied either as an absolute data
+*     value, or as a mutliple of the RMS noise using the syntax "[x]*RMS", 
+*     where "[x]" is a numerical value (e.g. "3.2*RMS"). [2*RMS]
 *     - ClumpFind.FwhmBeam: The FWHM of the instrument beam, in pixels. If 
 *     application paremeter DECONV is set TRUE, the clump widths written to 
 *     the output catalogue are reduced (in quadrature) by this amount. If a 
@@ -491,7 +493,9 @@ void findclumps( int *status ) {
 *     to the lowest supplied contour level, but any new clumps which are 
 *     initially found at the lowest contour level are ignored. That is, clumps 
 *     must have peaks which exceed the second lowest contour level to be 
-*     included in the returned catalogue. []
+*     included in the returned catalogue. The values can be supplied either 
+*     as absolute data values, or as mutliples of the RMS noise using the 
+*     syntax "[x]*RMS", where "[x]" is a numerical value (e.g. "3.2*RMS").[]
 *     - ClumpFind.MaxBad: The maximum number of pixels in a clump that
 *     are allowed to be adjacent to a bad pixel. If the number of clump
 *     pixels adjacent to a bad pixel exceeds this value, the clump is 
@@ -531,7 +535,9 @@ void findclumps( int *status ) {
 *     default value is the value supplied for parameter RMS. []
 *     - ClumpFind.Tlow: The lowest level at which to contour the data
 *     array. Only accessed if no value is supplied for "Level1". See also
-*     "DeltaT". [2*RMS]
+*     "DeltaT". The value can be supplied either as an absolute data
+*     value, or as a mutliple of the RMS noise using the syntax "[x]*RMS", 
+*     where "[x]" is a numerical value (e.g. "3.2*RMS"). [2*RMS]
 *     - ClumpFind.VeloRes: The velocity resolution of the instrument, in
 *     channels. The velocity width of each clump written to the output 
 *     catalogue is reduced (in quadrature) by this amount. If a direct 
@@ -563,13 +569,21 @@ void findclumps( int *status ) {
 *     least 16 pixels. []
 *     - Reinhold.Noise: Defines the data value below which pixels are 
 *     considered to be in the noise. A peak is considered to end when the 
-*     peak value dips below the "noise" value. [2*RMS]
+*     peak value dips below the "noise" value. The value can be supplied 
+*     either as an absolute data value, or as a mutliple of the RMS noise 
+*     using the syntax "[x]*RMS", where "[x]" is a numerical value (e.g. 
+*     "3.2*RMS"). [2*RMS]
 *     - Reinhold.Thresh: The smallest significant peak height. Peaks which 
-*     have a maximum data value less than this value are ignored. 
-*     [Noise+2*RMS]
+*     have a maximum data value less than this value are ignored. The value 
+*     can be supplied either as an absolute data value, or as a mutliple of 
+*     the RMS noise using the syntax "[x]*RMS", where "[x]" is a numerical 
+*     value (e.g. "3.2*RMS"). [Noise+2*RMS]
 *     - Reinhold.FlatSlope: A peak is considered to end when the slope of a
 *     profile through the peak drops below this value. The value should be 
-*     given as a change in data value between adjacent pixels. [1.0*RMS]
+*     given as a change in data value between adjacent pixels. The value can 
+*     be supplied either as an absolute data value, or as a mutliple of the 
+*     RMS noise using the syntax "[x]*RMS", where "[x]" is a numerical value 
+*     (e.g. "3.2*RMS"). [1.0*RMS]
 *     - Reinhold.CAThresh: Controls the operation of the cellular automata 
 *     which is used to erode the (previously dilated) edges regions prior to 
 *     filling them with clump indicies. If the number of edge pixels in
@@ -604,7 +618,10 @@ void findclumps( int *status ) {
 *     value within a 3x3x3 cube (or 2x2 square for 2D data) of neighbours. [1]
 *     - FellWalker.FlatSlope: Any initial section to a walk which has an
 *     average gradient (measured over 4 steps) less than this value will not 
-*     be included in the clump. [1.0*RMS]
+*     be included in the clump. The value can be supplied either as an 
+*     absolute data value, or as a mutliple of the RMS noise using the 
+*     syntax "[x]*RMS", where "[x]" is a numerical value (e.g. 
+*     "3.2*RMS"). [1.0*RMS]
 *     - FellWalker.FwhmBeam: The FWHM of the instrument beam, in pixels. If 
 *     application paremeter DECONV is set TRUE, the clump widths written to 
 *     the output catalogue are reduced (in quadrature) by this amount. [2.0]
@@ -614,10 +631,14 @@ void findclumps( int *status ) {
 *     excluded. [4]
 *     - FellWalker.MinDip: If the dip between two adjacent peaks is less
 *     than this value, then the peaks are considered to be part of the
-*     same clump. [3.0*RMS]
+*     same clump. The value can be supplied either as an absolute data
+*     value, or as a mutliple of the RMS noise using the syntax "[x]*RMS", 
+*     where "[x]" is a numerical value (e.g. "3.2*RMS"). [3.0*RMS]
 *     - FellWalker.MinHeight: If the peak value in a clump is less than
 *     this value then the clump is not included in the returned list of 
-*     clumps. [MinDip+Noise]
+*     clumps. The value can be supplied either as an absolute data
+*     value, or as a mutliple of the RMS noise using the syntax "[x]*RMS", 
+*     where "[x]" is a numerical value (e.g. "3.2*RMS"). [MinDip+Noise]
 *     - FellWalker.MinPix: The lowest number of pixel which a clump can
 *     contain. If a candidate clump has fewer than this number of pixels, 
 *     it will be ignored. This prevents noise spikes from being interpreted 
@@ -631,7 +652,10 @@ void findclumps( int *status ) {
 *     supplied value, in pixels. [4]
 *     - FellWalker.Noise: Defines the data value below which pixels are 
 *     considered to be in the noise. No walk will start from a pixel with 
-*     data value less than this value. [2*RMS]
+*     data value less than this value. The value can be supplied either as 
+*     an absolute data value, or as a mutliple of the RMS noise using the 
+*     syntax "[x]*RMS", where "[x]" is a numerical value (e.g. "3.2*RMS"). 
+*     [2*RMS]
 *     - FellWalker.RMS: The global RMS noise level in the data. The
 *     default value is the value supplied for parameter RMS. []
 *     - FellWalker.VeloRes: The velocity resolution of the instrument, in
@@ -670,6 +694,9 @@ void findclumps( int *status ) {
 *     25-JAN-2007 (DSB):
 *        Save parameter values (both ADAM and config) in the history text
 *        of the output catalogue.
+*     21-MAR-2007 (DSB):
+*        Allow selected configuration parameters to be specified as a
+*        multiple of the RMS.
 *     {enter_further_changes_here}
 
 *  Bugs:

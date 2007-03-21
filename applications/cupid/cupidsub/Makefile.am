@@ -19,6 +19,7 @@ BUILT_SOURCES = $(BUILT_C_ROUTINES)
 # includes the type-specific files which are created from the above
 # generic .cgen files.
 C_ROUTINES = cupidclumpfind.c cupidgaussclumps.c cupidconfigD.c \
+cupidconfigrms.c \
 cupidconfigI.c cupidgclistclump.c cupidgcmodel.c cupidgcchisq.c \
 cupidgccalcf.c cupidgccalcg.c cupidranval.c cupiddumpd.c \
 cupidcferode.c cupidstoreconfig.c cupidstoreclumps.c cupiddatcopy.c \

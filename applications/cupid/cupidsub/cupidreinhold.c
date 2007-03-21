@@ -209,9 +209,9 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Get various configuration parameters. */
    rms = cupidConfigD( rconfig, "RMS", rms, status );
    minlen = cupidConfigI( rconfig, "MINLEN", 4, status );
-   noise = cupidConfigD( rconfig, "NOISE", 2*rms, status );
-   thresh = cupidConfigD( rconfig, "THRESH", noise + 2*rms, status );
-   flatslope = cupidConfigD( rconfig, "FLATSLOPE", rms, status );
+   noise = cupidConfigRMS( rconfig, "NOISE", rms, 2*rms, status );
+   thresh = cupidConfigRMS( rconfig, "THRESH", rms, noise + 2*rms, status );
+   flatslope = cupidConfigRMS( rconfig, "FLATSLOPE", rms, rms, status );
    cathresh = pow( 3, ndim ) - 1.0;
    cathresh = cupidConfigI( rconfig, "CATHRESH", (int) cathresh, status );
    caiter = cupidConfigI( rconfig, "CAITERATIONS", 1, status );

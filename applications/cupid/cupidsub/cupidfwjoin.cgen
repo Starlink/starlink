@@ -181,7 +181,7 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 
 /* Get the minimum dip between two adjoining peaks necessary for the two
    peaks to be considered distinct. */
-   mindip = cupidConfigD( config, "MINDIP", 3.0*rms, status );
+   mindip = cupidConfigRMS( config, "MINDIP", rms, 3.0*rms, status );
 
 /* Indicate that we have not as yet found any pair of adjoining clumps
    that have no significant intervening dip. */

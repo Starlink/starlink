@@ -209,7 +209,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    if( *status != SAI__OK ) return ret;
 
 /* Get the lowest data value to be considered. */
-   noise = cupidConfigD( config, "NOISE", 2.0*rms, status );
+   noise = cupidConfigRMS( config, "NOISE", rms, 2.0*rms, status );
 
 /* Get the largest jump (in pixels) which can be made from a local maximum 
    to a higher maximum in the neighbourhood of the first maximum. */
@@ -219,7 +219,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    the start of a walk. Any initial section of the walk which has an
    average gradient (measured over 4 steps) less than this value is not 
    assigned to any clump. */
-   flat_slope = cupidConfigD( config, "FLATSLOPE", rms, status );
+   flat_slope = cupidConfigRMS( config, "FLATSLOPE", rms, rms, status );
 
 /* Walks which start at low level are ignored until they achieve the
    gradient specified by FLATSLOPE. Walks which start at high level are

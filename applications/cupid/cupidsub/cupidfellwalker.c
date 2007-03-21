@@ -269,14 +269,14 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    if( cubnd ) {
 
 /* Get the lowest data value to be considered. */
-      noise = cupidConfigD( config, "NOISE", 2.0*rms, status );
+      noise = cupidConfigRMS( config, "NOISE", rms, 2.0*rms, status );
 
 /* Get the minimum dip between two adjoining peaks necessary for the two
    peaks to be considered distinct. */
-      mindip = cupidConfigD( config, "MINDIP", 3.0*rms, status );
+      mindip = cupidConfigRMS( config, "MINDIP", rms, 3.0*rms, status );
 
 /* Get the lowest allowed clump peak value. */
-      minhgt = cupidConfigD( fwconfig, "MINHEIGHT", mindip + noise, status );
+      minhgt = cupidConfigRMS( fwconfig, "MINHEIGHT", rms, mindip + noise, status );
 
 /* Get the minimum allowed number of pixels in a clump. */
       minpix = cupidDefMinPix( ndim, beamcorr, noise, minhgt, status );
