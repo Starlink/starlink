@@ -64,9 +64,9 @@ void atlMklut( int, int, int, int, AstFrame *, double *, AstMapping **, int * );
 void atlPlroi( AstPlot *, AstKeyMap **, int * );
 void atlMgfts( int, AstFitsChan *, AstFitsChan *, AstFitsChan **, int * );
 void atlPtftr( AstFitsChan *, const char *, float, const char *, int * );
-void atlPtfti( AstFitsChan *this, const char *name, int value, 
+void atlPtfti( AstFitsChan *chan, const char *name, int value, 
                const char *comment, int *status );
-void atlPtfts( AstFitsChan *this, const char *name,
+void atlPtfts( AstFitsChan *chan, const char *name,
                const char *value, const char *comment, int *status );
 
 #endif
