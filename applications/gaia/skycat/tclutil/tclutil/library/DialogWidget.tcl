@@ -9,6 +9,7 @@
 # Peter W. Draper 03 Jul 06  Stop . being used as a parent, that is usually
 #                            in a withdrawn state. Why hasn't this been a 
 #                            problem before?
+#                 21 Mar 07  Raise the window on activation. Keeps hiding.
 
 itk::usual DialogWidget {}
 
@@ -149,6 +150,7 @@ itcl::class util::DialogWidget {
 	if {$itk_option(-modal)} {
 	    catch {grab $w_}
 	}
+        catch {::raise $w_}
 	tkwait visibility $w_
 	if {$itk_option(-default) >= 0} {
 	    focus $itk_component(button$itk_option(-default))
