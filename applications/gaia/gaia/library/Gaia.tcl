@@ -1865,7 +1865,7 @@ itcl::class gaia::Gaia {
    #  The match string should be set to something new in the
    #  default file.
    public proc check_config_file { config_file } {
-      set newmatch "*UCAC2*"
+      set newmatch "*JCMT*"
 
       #  Search the file for the string match.
       set ok 0
