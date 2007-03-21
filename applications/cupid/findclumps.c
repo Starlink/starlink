@@ -614,7 +614,7 @@ void findclumps( int *status ) {
 *     excluded. [4]
 *     - FellWalker.MinDip: If the dip between two adjacent peaks is less
 *     than this value, then the peaks are considered to be part of the
-*     same clump. [2.0*RMS]
+*     same clump. [3.0*RMS]
 *     - FellWalker.MinHeight: If the peak value in a clump is less than
 *     this value then the clump is not included in the returned list of 
 *     clumps. [MinDip+Noise]

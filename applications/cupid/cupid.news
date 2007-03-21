@@ -7,6 +7,19 @@
  data arrays.
 
 
+Changes introduced at V0.0-31:
+
+   - FellWalker: the default value for FellWalker.MinDip changed from 2*RMS
+   to 3*RMS.
+   - FellWalker diagnostic information extended (accessed viathe ILEVEL
+   parameter)
+   - Fellwalker: the removal of isolated pixels prior to initiating the
+   walking process has been improved for 1 and 2 D data.
+   - Fellwalker: bug fixed that could prevent merger of adjacent clumps
+   separated by less than MinDip, if only one pair of clumps is to be
+   merged.
+
+
 Changes introduced at V0.0-30:
 
    - GaussClumps: Reduce the initial guess at the clump peak value by 

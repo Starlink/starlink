@@ -242,7 +242,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Assign every data pixel to a clump and stores the clumps index in the
    corresponding pixel in "ipa". */
-   maxid = cupidFWMain( type, ipd, el, ndim, dims, skip, rms, fwconfig,
+   maxid = cupidFWMain( type, ipd, el, ndim, dims, skip, slbnd, rms, fwconfig,
                         ipa, ilevel, status );
 
 /* Abort if no clumps found. */
@@ -273,7 +273,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Get the minimum dip between two adjoining peaks necessary for the two
    peaks to be considered distinct. */
-      mindip = cupidConfigD( config, "MINDIP", 2.0*rms, status );
+      mindip = cupidConfigD( config, "MINDIP", 3.0*rms, status );
 
 /* Get the lowest allowed clump peak value. */
       minhgt = cupidConfigD( fwconfig, "MINHEIGHT", mindip + noise, status );

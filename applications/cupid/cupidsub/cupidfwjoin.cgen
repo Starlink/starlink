@@ -15,7 +15,7 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 *     cupidFWJoin<X>
 
 *  Purpose:
-*     Assign a clumpindex to every data pixel.
+*     Assign a clump index to every data pixel.
 
 *  Language:
 *     Starlink C
@@ -125,6 +125,8 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 *  History:
 *     27-MAR-2006 (DSB):
 *        Original version.
+*     21-MAR-2007 (DSB):
+*        Fix bug that prevented merger occuring if only one merger is needed.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -164,6 +166,7 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
    int peak0;      /* Index of first peak to be merged */
    int peak1;      /* Index of second peak to be merged */
    int scanax;     /* Index of pixel axis being scanned */
+   int trans;      /* Do any clump indices need to be translated? */
    int x[ 3 ];     /* GRID indices at starting pixel */
 
 /* Abort if an error has already occurred. */
@@ -178,7 +181,7 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 
 /* Get the minimum dip between two adjoining peaks necessary for the two
    peaks to be considered distinct. */
-   mindip = cupidConfigD( config, "MINDIP", 2.0*rms, status );
+   mindip = cupidConfigD( config, "MINDIP", 3.0*rms, status );
 
 /* Indicate that we have not as yet found any pair of adjoining clumps
    that have no significant intervening dip. */
@@ -299,7 +302,9 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
          for( ipeak = 0; ipeak <= *npeak; ipeak++ ) table2[ ipeak ] = 0;
    
 /* Now map the intermediate clump identifiers onto a contiguous set of
-   final clump identifiers starting at 1. */
+   final clump identifiers starting at 1. Set a flag ("trans") that 
+   indicates if any clump index is to be changed. */
+         trans = 0;
          new_npeak = 0;
          for( ipeak = 0; ipeak <= *npeak; ipeak++ ) {
             jpeak = table1[ ipeak ];
@@ -308,11 +313,11 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
                kpeak = ( table2[ jpeak ] = ++new_npeak );
             }
             table2[ ipeak ] = kpeak;
-
+            if( ipeak != kpeak ) trans = 1;
          }
    
 /* If necesaary, translate all the values in "ipa" using the above table. */
-         if( new_npeak < *npeak ) {
+         if( trans ) {
 
             if( ilevel > 2 ) {
                for( ipeak = 0; ipeak <= *npeak; ipeak++ ) {

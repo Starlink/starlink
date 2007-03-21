@@ -6,9 +6,9 @@
 #include <math.h>
 
 int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
-                                int dims[ 3 ], int skip[ 3 ], double rms, 
-                                AstKeyMap *config, int *ipa, int ilevel,
-                                int *status ){
+                                int dims[ 3 ], int skip[ 3 ], int slbnd[ 3 ],
+                                double rms, AstKeyMap *config, int *ipa, 
+                                int ilevel, int *status ){
 /*
 *+
 *  Name:
@@ -21,9 +21,10 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 *     Starlink C
 
 *  Synopsis:
-*     int cupidFWMain<X>( CGEN_TYPE *array, int nel, int ndim, int dims[ 3 ],
-*                         int skip[ 3 ], double rms, AstKeyMap *config, 
-*                         int *ipa, int ilevel, int *status )
+*     int cupidFWMain<X>( CGEN_TYPE *array, int nel, int ndim, int dims[ 3 ], 
+*                         int skip[ 3 ], int slbnd[ 3 ], double rms, 
+*                         AstKeyMap *config, int *ipa, int ilevel, 
+*                         int *status )
 
 *  Description:
 *     This function decide which clump each data pixel belongs to and fills 
@@ -65,6 +66,8 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 *        the array using a single 1D vector index and using nD coords. This
 *        array should have 3 elements even if "ndim" is less than 3, and
 *        the extra elements should be filled with zero's.
+*     slbnd
+*        The lower pixel index bounds of the input array.
 *     rms
 *        The RMS noise in the data
 *     config
@@ -117,6 +120,9 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 *  History:
 *     1-FEB-2006 (DSB):
 *        Original version.
+*     21-MAR-2007 (DSB):
+*        - Improve cleaning of initial mask for 1 and 2 D cases
+*        - Extend diagnostic facilities.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -131,6 +137,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    double *peak_values; /* Pointer to array holding peak value in each clump */
    double flat[ 4 ];/* Array containing most recent data values along route */
    double flat_slope;/* Lowest gradient which marks the start of the walk */
+   double frac;    /* Min fraction of neighbouring good pixels */
    double g;       /* Gradient from central pixel to neighbouring pixel */
    double h;       /* Pixel data value (i.e. "height" of a pixel) */
    double sea_level;/* Data values less than this are at "sea level" */
@@ -253,11 +260,32 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
       }
    }
 
+/* If required, dump the mask indicating which pixel are below the threshold. */
+   if( ilevel > 4 ) {
+      printf("   About to dump initial mask\n" );
+      cupidDumpI( ipa, ndim, dims, slbnd, status );
+   }
+
 /* Use a cellular automata to remove small isolated groups of usable
    pixels from the above "ipa" array. This allocates new memory for the 
    cleaned up array. */ 	 
    if( ilevel > 1 ) msgOut( "", "Removing isolated pixels\n", status );
-   work = cupidRCA( ipa, NULL, nel, dims, skip, 0.1, VAL__MAXI, 0, -1, 1, status );
+
+   if( ndim == 1 ) {
+      frac = 0.5;
+   } else if( ndim == 2 ) {
+      frac = 0.25;
+   } else {
+      frac = 0.1;
+   }    
+
+   work = cupidRCA( ipa, NULL, nel, dims, skip, frac, VAL__MAXI, 0, -1, 1, status );
+
+/* If required, dump the mask resulting from the above cleaning. */
+   if( ilevel > 4 ) {
+      printf("   About to dump cleaned initial mask\n" );
+      cupidDumpI( work, ndim, dims, slbnd, status );
+   }
 
 /* Initialise the pointer to an array holding the peak value in every clump. */
    peak_values = NULL;
@@ -440,13 +468,13 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
                      if( maxg <= 0 ) {
 
                         if( ilevel > 3 ) {
-                           msgSeti( "P", iix );
+                           msgSeti( "P", iix + slbnd[ 0 ] - 1 );
                            if( ndim > 1 ) {
                               msgSetc( "P", "," );
-                              msgSeti( "P", iiy );
+                              msgSeti( "P", iiy + slbnd[ 1 ] - 1  );
                               if( ndim > 1 ) {
                                  msgSetc( "P", "," );
-                                 msgSeti( "P", iiz );
+                                 msgSeti( "P", iiz + slbnd[ 2 ] - 1 );
                               }
                            }
                            msgOut( "", "    Local max found at (^P)", status );
@@ -500,16 +528,16 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 /* Tell the user if we are jumping to a near-by pixel and continuing to
    walk up hill. */
                         if( ilevel > 3 && iv != nv ) {
-                           msgSeti( "P", iix );
+                           msgSeti( "P", iix + slbnd[ 0 ] - 1 );
                            if( ndim > 1 ) {
                               msgSetc( "P", "," );
-                              msgSeti( "P", iiy );
+                              msgSeti( "P", iiy + slbnd[ 1 ] - 1 );
                               if( ndim > 1 ) {
                                  msgSetc( "P", "," );
-                                 msgSeti( "P", iiz );
+                                 msgSeti( "P", iiz + slbnd[ 2 ] - 1 );
                               }
                            }
-                           msgOut( "", "      (jumping to (^P)", status );
+                           msgOut( "", "      (jumping to (^P))", status );
                         }
 
                      } else{
@@ -599,6 +627,12 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
       msgBlank( status );
    }
 
+/* If required, dump the uncleaned clump mask. */
+   if( ilevel > 4 ) {
+      printf("   About to dump uncleaned clump mask\n" );
+      cupidDumpI( work, ndim, dims, slbnd, status );
+   }
+
 /* Smooth the boundaries between the clumps. This cellular automata replaces 
    each output pixels by the most commonly occuring value within a 3x3x3 
    cube of input pixels centred on the output pixel. Repeat this process
@@ -624,12 +658,24 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    "ipa" array. */
    if( m1 != ipa ) memcpy( ipa, work, sizeof( int )*nel );
 
+/* If required, dump the cleaned clump mask. */
+   if( ilevel > 4 ) {
+      printf("   About to dump cleaned clump mask\n" );
+      cupidDumpI( ipa, ndim, dims, slbnd, status );
+   }
+
 /* Amalgamate adjoining clumps if there is no significant dip between the
    clumps. */
    if( ilevel > 1 ) msgOut( "", "Merging adjoining clumps", status );
    CGEN_FUNCTION(cupidFWJoin)( array, nel, ndim, dims, skip, rms, config, 
                                ipa, peak_values, &ret, ilevel, status );
    if( ilevel > 1 ) msgOut( "", "Merging completed", status );
+
+/* If required, dump the merged clump mask. */
+   if( ilevel > 4 ) {
+      printf("   About to dump merged clump mask\n" );
+      cupidDumpI( ipa, ndim, dims, slbnd, status );
+   }
 
 /* Free resources. */
    peak_values = astFree( peak_values );
