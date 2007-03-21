@@ -341,7 +341,7 @@ void smf_fits_add_prov( AstFitsChan * hdr, const AstKeyMap * obsidmap,
 void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, 
                       int *status);
 
-void smf_fits_export2DA ( AstFitsChan *fitschan, int *ncards, 
+void smf_fits_export2DA ( const AstFitsChan *fitschan, int *ncards, 
                           char fitsrec[SC2STORE__MAXFITS][SZFITSCARD], 
                           int *status );
 

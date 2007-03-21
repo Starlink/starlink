@@ -13,12 +13,12 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_fits_export2DA ( AstFitsChan *fitschan, int *ncards, 
+*     smf_fits_export2DA ( const AstFitsChan *fitschan, int *ncards, 
 *                          char fitsrec[SC2STORE__MAXFITS][SZFITSCARD], 
 *                          int *status )
 
 *  Arguments:
-*     fitschan = AstFitsChan* (Given)
+*     fitschan = const AstFitsChan* (Given)
 *        AstFitsChan containing FITS headers
 *     ncards = int* (Returned)
 *        Number of cards in FITS header
@@ -84,7 +84,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_fits_export2DA"
 
-void smf_fits_export2DA ( AstFitsChan *fitschan, int *ncards, 
+void smf_fits_export2DA ( const AstFitsChan *fitschan, int *ncards, 
                           char fitsrec[SC2STORE__MAXFITS][SZFITSCARD], 
                           int *status ) {
 
