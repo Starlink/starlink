@@ -59,6 +59,8 @@
 *        Add overwrite parameter to sc2sim_simulate
 *     2007-03-01 (AGG):
 *        Add sc2sim_simstats and update API to sc2sim_simulate
+*     2007-03-20 (TIMJ):
+*        Add OBSID to ndfwrdata and use const
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -525,24 +527,25 @@ int *status       /* global status (given and returned) */
 
 void sc2sim_ndfwrdata
 ( 
-struct sc2sim_obs_struct *inx,      /* structure for values from XML (given) */
-struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
+const struct sc2sim_obs_struct *inx,      /* structure for values from XML (given) */
+const struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
 double meanwvm,   /* 225 GHz tau */
-char file_name[], /* output file name (given) */
+const char file_name[], /* output file name (given) */
 int numsamples,   /* number of samples (given) */
 int nflat,        /* number of flat coeffs per bol (given) */
-char *flatname,   /* name of flatfield algorithm (given) */
-JCMTState *head,  /* header data for each frame (given) */
-int *dbuf,        /* simulated data (given) */
-int *dksquid,     /* dark SQUID time stream data (given) */
-double *fcal,     /* flatfield calibration (given) */
-double *fpar,     /* flat-field parameters (given) */
-char instrume[],  /* String representing instrument (e.g. "SCUBA-2") (given) */
-char filter[],    /* String representing filter (e.g. "850") (given) */
-char *dateobs,    /* DateObs string for FITS header */
-double *posptr,   /* Pointing offsets from map centre */
+const char flatname[],   /* name of flatfield algorithm (given) */
+const JCMTState *head,  /* header data for each frame (given) */
+const int *dbuf,        /* simulated data (given) */
+const int *dksquid,     /* dark SQUID time stream data (given) */
+const double *fcal,     /* flatfield calibration (given) */
+const double *fpar,     /* flat-field parameters (given) */
+const char instrume[],  /* String representing instrument (e.g. "SCUBA-2") (given) */
+const char filter[],    /* String representing filter (e.g. "850") (given) */
+const char dateobs[],    /* DateObs string for FITS header */
+const char obsid[],     /* Observation ID string */
+const double *posptr,   /* Pointing offsets from map centre */
 int jigsamples,   /* Number of jiggle samples (given) */
-double jigptr[][2], /* Array of X, Y jiggle positions (given) */
+const double jigptr[][2], /* Array of X, Y jiggle positions (given) */
 int *status       /* global status (given and returned) */
 );
 

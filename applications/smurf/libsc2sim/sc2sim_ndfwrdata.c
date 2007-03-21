@@ -13,43 +13,50 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2sim_ndfwrdata ( struct sc2sim_obs_struct *inx, 
-*                        struct sc2sim_sim_struct *sinx,
-*                        double meanwvm, char file_name[], 
-*                        int numsamples, int nflat, char *flatname, 
-*                        JCMTState *head, int *dbuf, int *dksquid, 
-*                        double *fcal, double *fpar, char filter[], 
-*                        double *posptr, int jigsamples, double jigptr[][2],
+*     sc2sim_ndfwrdata ( const struct sc2sim_obs_struct *inx, 
+*                        const struct sc2sim_sim_struct *sinx,
+*                        double meanwvm, const char file_name[], 
+*                        int numsamples, int nflat, const char flatname[], 
+*                        const JCMTState *head, const int *dbuf, const int *dksquid, 
+*                        const double *fcal, const double *fpar, const char instrume[],
+*                        const char filter[], const char dateobs[], const char obsid[],
+*                        const double *posptr, int jigsamples, const double jigptr[][2],
 *                        int *status )
 
 *  Arguments:
-*     inx = sc2sim_obs_struct* (Given)
+*     inx = const sc2sim_obs_struct* (Given)
 *        Pointer to struct with observation parameters
-*     sinx = sc2sim_sim_struct* (Given)
+*     sinx = const sc2sim_sim_struct* (Given)
 *        Pointer to struct with simulation parameters
 *     meanwvm = double (Given)
 *        225 GHz tau
-*     file_name = char[] (Given)
+*     file_name = const char[] (Given)
 *        Output file name 
 *     numsamples = int (Given)
 *        Number of samples 
 *     nflat = int (Given)
 *        Number of flat coeffs per bol
-*     flatname = char*
+*     flatname = const char[] (Given)
 *        Name of flatfield algorithm 
-*     head = JCMTState* (Given)
+*     head = const JCMTState* (Given)
 *        Header data for each frame 
-*     dbuf = int* (Given)
+*     dbuf = const int* (Given)
 *        Simulated data
-*     dksquid = int* (Given)
+*     dksquid = const int* (Given)
 *        Dark SQUID time stream data 
-*     fcal = double* (Given)
+*     fcal = const double* (Given)
 *        Flatfield calibration 
 *     fpar = double (Given)
 *        Flat-field parameters
-*     filter = char[] (Given)
+*     instrume = const char[] (Given)
+*        Instrument name (usually SCUBA-2)
+*     filter = const char[] (Given)
 *        String representing filter (e.g. "850") 
-*     posptr = double* (Given)
+*     dateobs = const char[] (Given)
+*        DATE-OBS FITS string
+*     obsid = const char[] (Given)
+*        Observation ID string
+*     posptr = const double* (Given)
 *        Pointing offsets from map centre
 *     jigsamples = int (Given)
 *        Number of jiggle samples in DREAM pattern
@@ -104,7 +111,8 @@
 *     2006-12-21 (AGG):
 *        Add instap & instap_x/y FITS headers
 *     2007-03-20 (TIMJ):
-*        Write header units in compliance with FITS standard
+*        - Write header units in compliance with FITS standard
+*        - Use const arguments and add OBSID argument/header
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
@@ -151,24 +159,25 @@
 
 void sc2sim_ndfwrdata
 ( 
-struct sc2sim_obs_struct *inx,  /* structure for values from XML (given) */
-struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
+const struct sc2sim_obs_struct *inx,  /* structure for values from XML (given) */
+const struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
 double meanwvm,   /* 225 GHz tau */
-char file_name[], /* output file name (given) */
+const char file_name[], /* output file name (given) */
 int numsamples,   /* number of samples (given) */
 int nflat,        /* number of flat coeffs per bol (given) */
-char *flatname,   /* name of flatfield algorithm (given) */
-JCMTState *head,  /* header data for each frame (given) */
-int *dbuf,        /* simulated data (given) */
-int *dksquid,     /* dark SQUID time stream data (given) */
-double *fcal,     /* flatfield calibration (given) */
-double *fpar,     /* flat-field parameters (given) */
-char instrume[],  /* String representing instrument (e.g. "SCUBA-2") (given) */
-char filter[],    /* String representing filter (e.g. "850") (given) */
-char *dateobs,    /* String representing UTC DATE-OBS */
-double *posptr,   /* Pointing offsets from map centre (given) */
+const char flatname[],   /* name of flatfield algorithm (given) */
+const JCMTState *head,  /* header data for each frame (given) */
+const int *dbuf,        /* simulated data (given) */
+const int *dksquid,     /* dark SQUID time stream data (given) */
+const double *fcal,     /* flatfield calibration (given) */
+const double *fpar,     /* flat-field parameters (given) */
+const char instrume[],  /* String representing instrument (e.g. "SCUBA-2") (given) */
+const char filter[],    /* String representing filter (e.g. "850") (given) */
+const char dateobs[],    /* String representing UTC DATE-OBS */
+const char obsid[], /* unique obsid for this observation (given) */
+const double *posptr,   /* Pointing offsets from map centre (given) */
 int jigsamples,   /* Number of jiggle samples (given) */
-double jigptr[][2], /* Array of X, Y jiggle positions (given) */
+const double jigptr[][2], /* Array of X, Y jiggle positions (given) */
 int *status       /* global status (given and returned) */
 )
 
@@ -231,6 +240,7 @@ int *status       /* global status (given and returned) */
    astSetFitsF ( fitschan, "ATEND", sinx->atend, "[degC] Ambient temperature at end", 0 );
    astSetFitsS ( fitschan, "OBSMODE", inx->obsmode, "Observing mode", 0 );
    astSetFitsS ( fitschan, "INSTRUME", instrume, "Instrument name", 0 );
+   astSetFitsS ( fitschan, "OBSID", obsid, "Unique observation ID", 0 );
    astSetFitsS ( fitschan, "TELESCOP", "JCMT", "Name of telescope", 0 );
 
    astSetFitsS ( fitschan, "INSTAP", inx->instap, "Instrument aperture", 0 );
