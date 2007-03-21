@@ -283,6 +283,8 @@
 #define FUNC_NAME "sc2sim_simulate"
 #define LEN__METHOD 20
 
+#define INSTRUMENT "SCUBA-2"
+
 void sc2sim_simulate ( struct sc2sim_obs_struct *inx, 
                        struct sc2sim_sim_struct *sinx, 
 		       double coeffs[], double digcurrent, double digmean, 
@@ -334,6 +336,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double date_df;                 /* day fraction corresponding to MJD */
   int date_mo;                    /* month corresponding to MJD */
   int date_yr;                    /* year corresponding to MJD */
+  int date_hr;                    /* Hour corresponding to MJD */
+  int date_mn;                    /* minute corresponding to MJD */
   int date_status;                /* status of mjd->calendar date conversion*/
   double *dbuf=NULL;              /* simulated data buffer */
   double decapp;                  /* Apparent Dec */
@@ -357,7 +361,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   int frame;                      /* frame counter */
   AstFrameSet *fs=NULL;           /* frameset for tanplane projection */
   int groupcounter;               /* Counter for `group' portion of output filename */
-  JCMTState *head;                /* per-frame headers */
+  JCMTState *head = NULL;         /* per-frame headers */
   char heatname[SC2SIM__FLEN];    /* name of flatfield cal file */
   double hourangle;               /* Current hour angle */
   int i;                          /* loop counter */
@@ -376,6 +380,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   int nflat[8];                   /* number of flat coeffs per bol */
   static double noisecoeffs[SC2SIM__MXBOL*3*60]; /* noise coefficients */
   int nterms=0;                   /* number of 1/f noise frequencies */
+  char obsid[80];                 /* OBSID for each observation */
   FILE *ofile = NULL;             /* File pointer to check for existing files */
   double phi;                     /* latitude (radians) */
   int planet = 0;                 /* Flag to indicate planet observation */
@@ -428,7 +433,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     /* Calculate year/month/day corresponding to MJD at start */
     slaDjcl( inx->mjdaystart, &date_yr, &date_mo, &date_da, &date_df, 
              &date_status );
-    
     if( date_status ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Couldn't calculate calendar date from MJD", status);
@@ -1281,11 +1285,11 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	  /* Compress and store as NDF */
           if( *status == SAI__OK ) {
 
-            sprintf( filename, "%s%04i%02i%02i_00001_%04d", 
-                     subarrays[k], date_yr, date_mo, date_da, curchunk + 1 );
+	    groupcounter = 1;
+            sprintf( filename, "%s%04i%02i%02i_%05d_%04d", 
+                     subarrays[k], date_yr, date_mo, date_da, groupcounter, curchunk + 1 );
 	    /* If we are not overwriting existing files see if the file exists */
 	    if ( !overwrite ) {
-	      groupcounter = 1;
 	      fileexists = 1;
 	      while ( fileexists ) {
 		strncat( filename, ".sdf", 4);
@@ -1313,13 +1317,20 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
             msgSetc( "FILENAME", filename );
             msgOut(" ", "Writing ^FILENAME", status ); 
 
+	    /* Calculate OBSID */
+	    date_hr = (int)(date_df * 24);
+	    date_mn = 60 * ((date_df * 24.0) - (float)date_hr);
+	    sprintf(obsid, "%s_%d_%04d%02d%02dT%02d%02d%02d",
+		    INSTRUMENT, groupcounter, date_yr, date_mo, date_da,
+		    date_hr,date_mn,0);
+
             /* Set the subarray name */
             strcpy ( sinx->subname, subarrays[k] );
 
 	    /* Write the data out to a file */
 	    sc2sim_ndfwrdata( inx, sinx, tauCSO, filename, lastframe, nflat[k], 
 			      flatname[k], head, digits, dksquid, flatcal[k], 
-			      flatpar[k], "SCUBA-2", filter, dateobs,
+			      flatpar[k], INSTRUMENT, filter, dateobs, obsid,
 			      &(posptr[(curchunk*maxwrite)*2]), jigsamples, 
                               jigptr, status);
 
