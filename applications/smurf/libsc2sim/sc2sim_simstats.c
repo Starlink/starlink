@@ -47,6 +47,7 @@
 
 *  Authors:
 *     A.G. Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History :
@@ -54,10 +55,12 @@
 *        Original version
 *     2007-03-08 (AGG):
 *        Minor change to units reported
+*     2007-03-20 (TIMJ):
+*        Make sure strings are terminated.
 
 *  Copyright:
-*     Copyright (C) 2007 University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2007 University of British Columbia and Particle Physics and
+*     Astronomy Research Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -94,12 +97,14 @@
 #include "smurf_par.h"
 #include "libsmf/smf.h"
 
+#define SZTEMP 4
+
 void sc2sim_simstats ( int npoints, double samptime, int maxwrite, int nbol, 
 		       int narray, int nboly, int *status ) {
 
   /* Local variables */
   double simlength;              /* Length of simulation */
-  char temp[4];                  /* temporary character string */
+  char temp[SZTEMP];             /* temporary character string */
   JCMTState *head;               /* Pointer to a JCMTState struct */
 
   if ( *status != SAI__OK ) return;
@@ -109,12 +114,12 @@ void sc2sim_simstats ( int npoints, double samptime, int maxwrite, int nbol,
   simlength = npoints * samptime / 1000.0;
   if ( simlength > 60 && simlength < 3600 ) {
     simlength /= 60.0;
-    strncpy( temp, "min", 3 );
+    strncpy( temp, "min", SZTEMP );
   } else if ( simlength > 3600 ) {
     simlength /= 3600.0;
-    strncpy( temp, "hrs", 3);
+    strncpy( temp, "hrs", SZTEMP);
   } else {
-    strncpy( temp, "sec", 3);
+    strncpy( temp, "sec", SZTEMP);
   }
   printf( "  Simulation represents an observation of %5.2f %s\n", simlength,temp);
 
@@ -123,12 +128,12 @@ void sc2sim_simstats ( int npoints, double samptime, int maxwrite, int nbol,
   simlength = 400.0 * (npoints * samptime / 1000.0) / 142.0;
   if ( simlength > 60 && simlength < 3600 ) {
     simlength /= 60.0;
-    strncpy( temp, "min", 3 );
+    strncpy( temp, "min", SZTEMP );
   } else if ( simlength > 3600 ) {
     simlength /= 3600.0;
-    strncpy( temp, "hrs", 3);
+    strncpy( temp, "hrs", SZTEMP);
   } else {
-    strncpy( temp, "sec", 3);
+    strncpy( temp, "sec", SZTEMP);
   }
   printf("  ...and will take ~ %5.2f *(1.6GHz/CPU) %s to run\n", simlength,temp);
   
