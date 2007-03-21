@@ -103,9 +103,11 @@
 *        sc2store_wrtstream has additional subnum argument
 *     2006-12-21 (AGG):
 *        Add instap & instap_x/y FITS headers
+*     2007-03-20 (TIMJ):
+*        Write header units in compliance with FITS standard
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
+*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
 *  Licence:
@@ -201,7 +203,7 @@ int *status       /* global status (given and returned) */
    /* We need to write this - the simulator effectively assumes all
       times are TAI */
    astSetFitsS ( fitschan, "TIMESYS", "UTC", "Time scale for DATE-OBS", 0 );
-   astSetFitsF ( fitschan, "DUT1", inx->dut1, "UT1 - UTC correction (days)", 0 );
+   astSetFitsF ( fitschan, "DUT1", inx->dut1, "[d] UT1 - UTC correction", 0 );
 
    rad = inx->ra * AST__DR2D;
    astSetFitsF ( fitschan, "RA", rad, "Right Ascension of observation", 0 );
@@ -215,7 +217,7 @@ int *status       /* global status (given and returned) */
                  "flag for converting flux to current", 0 );
    astSetFitsI ( fitschan, "NBOLX", inx->nbolx, "number of bolometers in X direction", 0 );
    astSetFitsI ( fitschan, "NBOLY", inx->nboly, "number of bolometers in Y direction", 0 );
-   astSetFitsF ( fitschan, "SAMPLE_T", inx->sample_t, "sample interval in msec", 0 );
+   astSetFitsF ( fitschan, "SAMPLE_T", inx->sample_t, "[ms] sample interval in msec", 0 );
    astSetFitsS ( fitschan, "SUBARRAY", sinx->subname, "subarray name", 0 );
    astSetFitsI ( fitschan, "NUMSAMP", numsamples, "number of samples", 0 );
    astSetFitsF ( fitschan, "AMSTART", sinx->airmass, "Air mass at start", 0 );
@@ -223,17 +225,17 @@ int *status       /* global status (given and returned) */
    astSetFitsF ( fitschan, "MEANWVM", meanwvm, 
                  "Mean zenith tau at 225 GHz from WVM", 0 );
    astSetFitsS ( fitschan, "FILTER", filter, "filter used", 0 );
-   astSetFitsF ( fitschan, "WAVELEN", inx->lambda, "Wavelength (m)", 0 );
+   astSetFitsF ( fitschan, "WAVELEN", inx->lambda, "[m] Wavelength", 0 );
    astSetFitsF ( fitschan, "ATSTART", sinx->atstart, 
-                 "Ambient temperature at start (C)", 0 );
-   astSetFitsF ( fitschan, "ATEND", sinx->atend, "Ambient temperature at end (C)", 0 );
+                 "[degC] Ambient temperature at start", 0 );
+   astSetFitsF ( fitschan, "ATEND", sinx->atend, "[degC] Ambient temperature at end", 0 );
    astSetFitsS ( fitschan, "OBSMODE", inx->obsmode, "Observing mode", 0 );
    astSetFitsS ( fitschan, "INSTRUME", instrume, "Instrument name", 0 );
    astSetFitsS ( fitschan, "TELESCOP", "JCMT", "Name of telescope", 0 );
 
    astSetFitsS ( fitschan, "INSTAP", inx->instap, "Instrument aperture", 0 );
-   astSetFitsF ( fitschan, "INSTAP_X", inx->instap_x, "X focal plane offset (arcsec)", 0 );
-   astSetFitsF ( fitschan, "INSTAP_Y", inx->instap_y, "Y focal plane offset (arcsec)", 0 );
+   astSetFitsF ( fitschan, "INSTAP_X", inx->instap_x, "[arcsec] X focal plane offset", 0 );
+   astSetFitsF ( fitschan, "INSTAP_Y", inx->instap_y, "[arcsec] Y focal plane offset", 0 );
    
    if ( strncmp( inx->obsmode, "DREAM", 5) == 0 ) {
 
@@ -242,7 +244,7 @@ int *status       /* global status (given and returned) */
       astSetFitsI ( fitschan, "NJIGLCYC", sinx->ncycle, 
                     "Number of times around DREAM pattern", 0 );
       astSetFitsF ( fitschan, "JIGSTEP", inx->jig_step_x, 
-                    "Size of jiggle step (arcsec)", 0 );
+                    "[arcsec] Size of jiggle step", 0 );
 
 
      /* Construct weights name from subarray */
@@ -276,11 +278,11 @@ int *status       /* global status (given and returned) */
    map_x = (x_max + x_min)/2.;
    map_y = (y_max + y_min)/2.;
   
-   astSetFitsF ( fitschan, "MAP_HGHT", map_hght, "Map height (arcsec)", 0 );
-   astSetFitsF ( fitschan, "MAP_WDTH", map_wdth, "Map width (arcsec)", 0 );
-   astSetFitsF ( fitschan, "MAP_PA", map_pa, "Map PA (degrees)", 0 );
-   astSetFitsF ( fitschan, "MAP_X", map_x, "Map X offset (arcsec)", 0 );
-   astSetFitsF ( fitschan, "MAP_Y", map_y, "Map Y offset (arcsec)", 0 );
+   astSetFitsF ( fitschan, "MAP_HGHT", map_hght, "[arcsec] Map height", 0 );
+   astSetFitsF ( fitschan, "MAP_WDTH", map_wdth, "[arcsec] Map width", 0 );
+   astSetFitsF ( fitschan, "MAP_PA", map_pa, "[deg] Map PA", 0 );
+   astSetFitsF ( fitschan, "MAP_X", map_x, "[arcsec] Map X offset", 0 );
+   astSetFitsF ( fitschan, "MAP_Y", map_y, "[arcsec] Map Y offset", 0 );
 
    /* Convert the AstFitsChan data to a char array */
    smf_fits_export2DA ( fitschan, &nrec, fitsrec, status );
