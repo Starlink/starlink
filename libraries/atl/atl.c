@@ -23,6 +23,10 @@
 *        Include prototypes.
 *     7-FEB-2007 (DSB):
 *        Added atlMgfts.
+*     9-FEB-2007 (DSB):
+*        Add atlPtftr
+*     8-MAR-2007 (BC):
+*        Add atlPtfti, atlPtfts
 *     {enter_further_changes_here}
 
 *  Copyright:
