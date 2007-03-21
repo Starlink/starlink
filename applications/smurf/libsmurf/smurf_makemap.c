@@ -154,6 +154,8 @@
 *        smf_mapbounds
 *     2007-03-05 (EC):
 *        Changed smf_correct_extinction interface
+*     2007-03-20 (TIMJ):
+*        Write an output FITS header
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -225,6 +227,7 @@ void smurf_makemap( int *status ) {
   /* Local Variables */
   Grp *confgrp = NULL;       /* Group containing configuration file */
   smfData *data=NULL;        /* Pointer to SCUBA2 data struct */
+  AstFitsChan *fchan = NULL; /* FitsChan holding output NDF FITS extension */
   smfFile *file=NULL;        /* Pointer to SCUBA2 data file struct */
   int flag;                  /* Flag */
   dim_t i;                   /* Loop counter */
@@ -235,9 +238,10 @@ void smurf_makemap( int *status ) {
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   void *map=NULL;            /* Pointer to the rebinned map data */
   char method[LEN__METHOD];  /* String for map-making method */
+  AstKeyMap * obsidmap = NULL; /* Map of OBSIDs from input data */
   smfData *odata=NULL;       /* Pointer to output SCUBA2 data struct */
   Grp *ogrp = NULL;          /* Group containing output file */
-  int ondf;                  /* output NDF identifier */
+  int ondf = NDF__NOID;      /* output NDF identifier */
   int outsize;               /* Number of files in output group */
   AstFrameSet *outfset=NULL; /* Frameset containing sky->output mapping */
   int parstate;              /* State of ADAM parameters */
@@ -507,7 +511,10 @@ void smurf_makemap( int *status ) {
 		 status);
 	}
       }
-  
+
+      /* Handle output FITS header creation */
+      smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obsidmap, status );
+
       if ( usebad ) {
 	/* Retrieve the NDF identifier for this input file */   
 	ndgNdfas ( igrp, i, "READ", &indf, status );
@@ -565,6 +572,10 @@ void smurf_makemap( int *status ) {
           errRep(FUNC_NAME, "Bad status calculating MAPCOORD", status);      
         }
 
+	/* Handle output FITS header creation (since the file is open and
+	   he header is available) */
+	smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obsidmap, status );
+
         smf_close_file( &data, status );
         if( *status != SAI__OK) {
           errRep(FUNC_NAME, "Bad status closing smfData", status);      
@@ -583,7 +594,15 @@ void smurf_makemap( int *status ) {
 
   /* Write WCS */
   ndfPtwcs( outfset, ondf, status );
+
+/* Retrieve the unique OBSID keys from the KeyMap and populate the OBSnnnnn
+   and PROVCNT headers from this information. */
+  smf_fits_add_prov( fchan, obsidmap, status ); 
   
+/* If the FitsChan is not empty, store it in the FITS extension of the
+   output NDF (any existing FITS extension is deleted). */
+  if( astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );
+
   if( outfset != NULL ) {
     astAnnul( outfset );
     outfset = NULL;

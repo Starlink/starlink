@@ -68,8 +68,10 @@
 *        first file in the input Grp to smf_mapbounds_approx
 *     2007-02-27 (AGG):
 *        Refactor the code to deal with global status consistently
-*     2008-03-05 (EC):
+*     2007-03-05 (EC):
 *        Changed smf_correct_extinction interface
+*     2007-03-20 (TIMJ):
+*        Write an output FITS header
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -116,6 +118,7 @@
 #include "star/hds.h"
 #include "star/ndg.h"
 #include "star/grp.h"
+#include "star/kaplibs.h"
 
 /* SMURF includes */
 #include "smurf_par.h"
@@ -129,7 +132,7 @@ void smurf_qlmakemap( int *status ) {
 
   /* Local Variables */
   smfData *data = NULL;      /* Pointer to input SCUBA2 data struct */
-  void *data_index[1];       /* Array of pointers to mapped arrays in ndf */
+  AstFitsChan *fchan = NULL; /* FitsChan holding output NDF FITS extension */
   smfFile *file=NULL;        /* Pointer to SCUBA2 data file struct */
   int flag;                  /* Flag */
   dim_t i;                   /* Loop counter */
@@ -137,10 +140,10 @@ void smurf_qlmakemap( int *status ) {
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   void *map = NULL;          /* Pointer to the rebinned map data */
   int moving = 0;            /* Flag to denote a moving object */
-  int n;                     /* # elements in the output map */
+  AstKeyMap * obsidmap = NULL; /* Map of OBSIDs from input data */
   smfData *odata=NULL;       /* Pointer to output SCUBA2 data struct */
   Grp *ogrp = NULL;          /* Group containing output file */
-  int ondf;                  /* output NDF identifier */
+  int ondf = NDF__NOID;      /* output NDF identifier */
   AstFrameSet *outframeset = NULL; /* Frameset containing sky->output map mapping */
   int outsize;               /* Number of files in output group */
   float pixsize = 3.0;       /* Size of an output map pixel in arcsec */
@@ -165,7 +168,7 @@ void smurf_qlmakemap( int *status ) {
   /* Get the user defined pixel size */
   parGet0r( "PIXSIZE", &pixsize, status );
   if ( pixsize <= 0 || pixsize > 60. ) {
-    msgSetr( "PIXSIZE", pixsize );
+    msgSetd( "PIXSIZE", pixsize );
     *status = SAI__ERROR;
     errRep( " ", "Invalid pixel size, ^PIXSIZE (must be positive but < 60 arcsec)", 
 	   status );
@@ -205,6 +208,9 @@ void smurf_qlmakemap( int *status ) {
     /* Read data from the ith input file in the group */
     smf_open_and_flatfield( igrp, NULL, i, &data, status );
 
+    /* Handle output FITS header creation */
+    smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obsidmap, status );
+
     /* Remove bolometer drifts */
     smf_subtract_poly( data, status );
 
@@ -224,6 +230,14 @@ void smurf_qlmakemap( int *status ) {
   }
   /* Write WCS FrameSet to output file */
   ndfPtwcs( outframeset, ondf, status );
+
+/* Retrieve the unique OBSID keys from the KeyMap and populate the OBSnnnnn
+   and PROVCNT headers from this information. */
+  smf_fits_add_prov( fchan, obsidmap, status ); 
+  
+/* If the FitsChan is not empty, store it in the FITS extension of the
+   output NDF (any existing FITS extension is deleted). */
+  if( astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );
 
   /* Free the WCS pointer */
   if ( outframeset != NULL ) {
