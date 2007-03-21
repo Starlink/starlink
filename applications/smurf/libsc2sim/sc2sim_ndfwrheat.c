@@ -145,7 +145,7 @@ int *status        /* global status (given and returned) */
 {
    /* Local variables */
    AstFitsChan *fitschan;           /* FITS headers */
-   char fitsrec[SC2STORE__MAXFITS][SZFITSCARD]; /* Store for FITS records */  
+   const char fitsrec[SC2STORE__MAXFITS][SZFITSCARD]; /* Store for FITS records */  
    double fpos = 0;                 /* RA or Dec in degrees */
    int nrec;                        /* number of FITS header records */
    int subnum;                      /* subarray index */
