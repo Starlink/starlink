@@ -100,7 +100,21 @@ ALL_TARGETS = \
 	$(MANIFESTS)/tclx \
 	$(MANIFESTS)/tk \
 	$(MANIFESTS)/trn \
-	$(MANIFESTS)/xdisplay
+	$(MANIFESTS)/xdisplay \
+	$(MANIFESTS)/sc2 \
+	$(MANIFESTS)/sc3 \
+	$(MANIFESTS)/sc4 \
+	$(MANIFESTS)/sc5 \
+	$(MANIFESTS)/sc6 \
+	$(MANIFESTS)/sc7 \
+	$(MANIFESTS)/sc9 \
+	$(MANIFESTS)/sc12 \
+	$(MANIFESTS)/sc13 \
+	$(MANIFESTS)/sc14 \
+	$(MANIFESTS)/sc15 \
+	$(MANIFESTS)/sc17 \
+	$(MANIFESTS)/sg8 \
+	$(MANIFESTS)/sg9
 
 # The other important target is `buildsupport', the dependencies of
 # which are defined in the Makefile.dependencies which is included below.
