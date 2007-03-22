@@ -53,6 +53,8 @@
 *        Added KPG1_RGNDF and KPG1_WGNDF.
 *     29-NOV-2006 (DSB):
 *        Added kpg1Gtaxv.
+*     22-MAR-2007 (DSB):
+*        Added kpg1Gilst.
 *     {enter_further_changes_here}
 
 *-
@@ -447,6 +449,51 @@ void kpg1Gtaxv( const char *param, int mxval, int exact, AstFrame *frame,
 
    F77_IMPORT_INTEGER( NVAL, *nval );
    F77_IMPORT_DOUBLE_ARRAY( AXVAL, axval, *nval );
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
+
+
+
+void kpg1Gilst( int lonum, int upnum, int maxlin, const char *param, 
+                int *flag, int *number, int *ndisp, int *status ){
+   DECLARE_INTEGER(LONUM);
+   DECLARE_INTEGER(UPNUM);
+   DECLARE_INTEGER(MAXLIN);
+   DECLARE_CHARACTER_DYN(PARAM);
+   DECLARE_INTEGER_ARRAY_DYN(FLAG);
+   DECLARE_INTEGER_ARRAY_DYN(NUMBER);
+   DECLARE_INTEGER(NDISP);
+   DECLARE_INTEGER(STATUS);
+   int nflag;
+   nflag = upnum - lonum + 1;
+
+   F77_EXPORT_INTEGER( lonum, LONUM );
+   F77_EXPORT_INTEGER( upnum, UPNUM );
+   F77_EXPORT_INTEGER( maxlin, MAXLIN );
+   F77_CREATE_CHARACTER( PARAM, strlen( param ) );
+   F77_EXPORT_CHARACTER( param, PARAM, PARAM_length );
+   F77_CREATE_DOUBLE_ARRAY( FLAG, flag );
+   F77_ASSOC_DOUBLE_ARRAY( FLAG, flag );
+   F77_CREATE_DOUBLE_ARRAY( NUMBER, number );
+   F77_ASSOC_DOUBLE_ARRAY( NUMBER, number );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(kpg1_gilst)( INTEGER_ARG(&LONUM),
+                         INTEGER_ARG(&UPNUM),
+                         INTEGER_ARG(&MAXLIN),
+                         CHARACTER_ARG(PARAM),
+                         INTEGER_ARRAY_ARG(FLAG),
+                         INTEGER_ARRAY_ARG(NUMBER),
+                         INTEGER_ARG(&NDISP),
+                         INTEGER_ARG(&STATUS)
+                         TRAIL_ARG(PARAM) );
+
+   F77_FREE_CHARACTER( PARAM );
+   F77_IMPORT_INTEGER( NDISP, *ndisp );
+   F77_IMPORT_INTEGER_ARRAY( FLAG, flag, nflag );
+   F77_IMPORT_INTEGER_ARRAY( NUMBER, number, *ndisp );
    F77_IMPORT_INTEGER( STATUS, *status );
 
    return;
