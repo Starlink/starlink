@@ -176,7 +176,7 @@ Starlink applications, and a number of other common data formats.
 </component>
 
 <component id="cupid" support="S">
-  <version>0.0-30</version>
+  <version>0.0-31</version>
   <path>applications/cupid</path>
   <description>CUPID - AST applications</description>
   <abstract><p>
