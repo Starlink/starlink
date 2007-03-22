@@ -13,7 +13,8 @@ Changes introduced at V0.0-32:
    about one or more previously identified clumps. Currently, it just 
    returns the total number of clumps detected and the bounding box of 
    a specified list of clumps.
-
+   - Plug NDF identifier leak that could cause error messages about "all
+   slots being used".
 
 Changes introduced at V0.0-31:
 
