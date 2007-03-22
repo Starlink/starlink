@@ -128,6 +128,10 @@ void cupid_mon( int *status ) {
    } else if( !strcmp( name, "EXTRACTCLUMPS" ) ) {
       extractclumps( status );
 
+/* Obtain information about one or more clumps. */
+   } else if( !strcmp( name, "CLUMPINFO" ) ) {
+      clumpinfo( status );
+
 /* Report an error if the command name is not recognised. */
    } else if( *status == SAI__OK ) {
       *status = SAI__ERROR;

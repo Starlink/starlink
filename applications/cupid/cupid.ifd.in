@@ -4,6 +4,83 @@ package cupid {
 
    executable cupid_mon {
 
+      action clumpinfo {
+
+         helplib {$CUPID_HELP}
+
+         parameter clumps {
+            position 2
+            type LITERAL
+            access READ
+            ppath CURRENT,DEFAULT
+            prompt {The indices of the clumps to use}
+            default ALL
+            helpkey *
+          }
+
+          parameter flbnd {
+            size *
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
+          parameter fubnd {
+            size *
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
+         parameter lbound {
+            size *
+            type _INTEGER
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
+          parameter nclumps {
+            type _INTEGER
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
+         parameter ndf {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Input NDF containing clump identifications}
+            helpkey *
+          }
+
+         parameter quiet {
+            position 3
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Supress screen output?}
+            default FALSE
+            helpkey *
+          }
+
+          parameter ubound {
+            size *
+            type _INTEGER
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
+      }
+
       action extractclumps {
 
          helplib {$CUPID_HELP}

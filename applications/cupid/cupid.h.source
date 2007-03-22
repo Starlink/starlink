@@ -147,6 +147,20 @@ typedef struct CupidPixelSet {
 } CupidPixelSet;
 
 
+/* A structure used to store information about a group of clumps (used by
+   CLUMPINFO). */
+typedef struct CupidClumpInfo {
+   int init;           /* Has the structure been initialised? */
+   AstFrameSet *iwcs;  /* WCS FrameSet from main NDF */
+   int lbnd[ 3 ];      /* Lower pixel index bounds of bounding box */      
+   int ubnd[ 3 ];      /* Upper pixel index bounds of bounding box */      
+   int npix;           /* Number of pixel axes */
+   int nwcs;           /* Number of WCS axes */
+} CupidClumpInfo;
+
+
+
+
 /* Function macros */
 /* --------------- */
 
@@ -218,6 +232,8 @@ extern int cupid_ps_cache_size;
 
 /* Function prototypes */
 /* ------------------  */
+AstKeyMap *cupidRetrieveConfig( HDSLoc *, int * );
+CupidBoxIter *cupidBoxIterator( CupidBoxIter *, int[3], int[3], int[3], int, int * );
 CupidPixelSet *cupidCFDeletePS( CupidPixelSet *, int * );
 CupidPixelSet *cupidCFFreePS( CupidPixelSet *, int *, int, int * );
 CupidPixelSet *cupidCFMakePS( int, int * );
@@ -235,15 +251,17 @@ float cupidRanVal( int, float[2], int * );
 int *cupidRCA( int *, int *, int, int[ 3 ], int[ 3 ], double, int, int, int, int, int * );
 int *cupidRCA2( int *, int *, int, int[ 3 ], int[ 3 ], int * );
 int cupidCFErode( CupidPixelSet *, int *, int, int *, int[3], int, CupidPixelSet **, int * );
-void cupidCFIdl( CupidPixelSet *, int *, int, int *, int[3], int, CupidPixelSet **, int * );
 int cupidCFXtend( CupidPixelSet *, CupidPixelSet *, int *, int, int *, int[3], int, CupidPixelSet **, int * );
 int cupidConfigI( AstKeyMap *, const char *, int, int * );
-int cupidRFillClumps( int *, int *, int, int, int[ 3 ], int[ 3 ], int, int * );
 int cupidDefMinPix( int, double *, double, double, int * );
+int cupidNextIt( CupidBoxIter *, int[3], int *, int * );
+int cupidRFillClumps( int *, int *, int, int, int[ 3 ], int[ 3 ], int, int * );
 void cupidCFAddPixel( int *, CupidPixelSet *, int, int[3], double, int, int * );
+void cupidCFIdl( CupidPixelSet *, int *, int, int *, int[3], int, CupidPixelSet **, int * );
 void cupidCFMerge( CupidPixelSet *, CupidPixelSet *, int *, int[3], int *, int **, int, CupidPixelSet **, int * );
 void cupidCFNebs( int *, int, int x[], int, int [3], int[3], int, int, int *, int *, int[27], int *, int *, CupidPixelSet **, int * );
 void cupidCFXfer( CupidPixelSet *, CupidPixelSet *, int *, int[3], int * );
+void cupidClumpInfo1( HDSLoc *, CupidClumpInfo *, int * );
 void cupidDatCopy( HDSLoc *, HDSLoc *, int * );
 void cupidDumpD( double *, int, int *, int *, int * );
 void cupidDumpI( int *, int, int *, int *, int * );
@@ -257,9 +275,6 @@ void cupidRFillLine( int *, int *, int, int, int[ 3 ], int[ 3 ], int[ 3 ], int, 
 void cupidStoreClumps( const char *, HDSLoc *, HDSLoc *, int, int, double[3], const char *, int, AstFrameSet *, int, const char *, Grp *, FILE *, int * );
 void cupidStoreConfig( HDSLoc *, AstKeyMap *, int * );
 void cupidSumClumps( int dtype, int ndim, int *lbnd, int *ubnd, int nel, int *, int, double, float *, void *, char *, int * );
-AstKeyMap *cupidRetrieveConfig( HDSLoc *, int * );
-CupidBoxIter *cupidBoxIterator( CupidBoxIter *, int[3], int[3], int[3], int, int * );
-int cupidNextIt( CupidBoxIter *, int[3], int *, int * );
 
 
 void findback( int * );
@@ -267,3 +282,4 @@ void findclumps( int * );
 void cupidhelp( int * );
 void makeclumps( int * );
 void extractclumps( int * );
+void clumpinfo( int * );

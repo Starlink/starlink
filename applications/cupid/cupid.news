@@ -7,6 +7,14 @@
  data arrays.
 
 
+Changes introduced at V0.0-32:
+
+   - New application call CLUMPINFO added, which reports information
+   about one or more previously identified clumps. Currently, it just 
+   returns the total number of clumps detected and the bounding box of 
+   a specified list of clumps.
+
+
 Changes introduced at V0.0-31:
 
    - FellWalker: the default value for FellWalker.MinDip changed from 2*RMS
