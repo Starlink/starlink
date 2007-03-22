@@ -106,6 +106,8 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 *  History:
 *     15-NOV-2005 (DSB):
 *        Original version.
+*     22-MAR-2007 (DSB):
+*        Plug NDF identifier leak.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -217,7 +219,10 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
    pixels). */
       unit[ 0 ]= 0;
       ndfCget( indf, "Unit", unit, 9, status );
-      if( !strcmp( unit, "BAD" ) ) continue;
+      if( !strcmp( unit, "BAD" ) ) {
+         ndfAnnul( &indf, status );
+         continue;
+      }
 
 /* Increment the index to associate with this clump. */
       clump_index++;
