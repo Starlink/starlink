@@ -83,6 +83,8 @@
 *     2008-03-05 (EC):
 *        Return allextcorr.
 *        Check for existence of header.
+*     2008-03-22 (AGG):
+*        Check for incompatible combinations of data and parameters
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -150,8 +152,8 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   double *yin = NULL;      /* Y coordinates of input */
   double *yout = NULL;     /* Y coordinates of output */
   double zd;               /* Zenith distance */
-  size_t * indices;
-
+  size_t *indices = NULL;
+  size_t ndims;            /* Number of dimensions in input data */
   size_t nframes = 0;      /* Number of frames */
   size_t npts;             /* Number of data points */
   double extcorr = 1.0;    /* Extinction correction factor */
@@ -178,9 +180,10 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   }
 
   /* Do we have 2-D image data? */
-  if (data->ndims == 2) {
+  ndims = data->ndims;
+  if (ndims == 2) {
     nframes = 1;
-  } else if (data->ndims == 3 ) {
+  } else if (ndims == 3 ) {
     nframes = (data->dims)[2];
   } else {
     /* Abort with an error if the number of dimensions is not 2 or 3 */
@@ -205,6 +208,14 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   /* Check desired optical depth method */
   if ( strncmp( method, "WVMR", 4) == 0 ) {
     wvmr = 1;
+  }
+
+  /* Check that we're not trying to use the WVM for 2-D data */
+  if ( ndims == 2 && wvmr ) {
+    if ( *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRep( FUNC_NAME, "Method WVMR can not be used on 2-D image data", status );
+    }
   }
 
   /* If we have a CSO Tau then convert it to the current filter */
@@ -255,7 +266,7 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   }
 
   /* Loop over number of time slices/frames */
-  for ( k=0; k<nframes; k++) {
+  for ( k=0; k<nframes && (*status == SAI__OK) ; k++) {
     /* Call tslice_ast to update the header for the particular
        timeslice. If we're in QUICK mode then we don't need the WCS */
     if (quick) {
@@ -304,7 +315,7 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
 	if (!astOK) {
 	  if (*status == SAI__OK) {
 	    *status = SAI__ERROR;
-	    errRep( FUNC_NAME, "Error from AST", status);
+	    errRep( FUNC_NAME, "Error from AST: WCS is NULL", status);
 	  }
 	}
 	/* Transfrom from pixels to AZEL */
@@ -316,8 +327,12 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
 	 the GRID coordinate frame */
       base = npts * k; /* Offset into 3d data array */
       if (quick) {
-	airmass = hdr->state->tcs_airmass;
-      extcorr = exp(airmass*tau);
+	if ( ndims == 2 ) {
+	  smf_fits_getD( hdr, "AMSTART", &airmass, status );
+	} else {
+	  airmass = hdr->state->tcs_airmass;
+	}
+	extcorr = exp(airmass*tau);
       }
       for (i=0; i < npts; i++ ) {
 	index = indices[i] + base;
@@ -359,9 +374,6 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   if ( *status == SAI__OK ) {
     smf_history_add( data, FUNC_NAME, 
 		       "Extinction correction successful", status);
-  } else {
-    errRep(FUNC_NAME, "Error: status set bad. Possible programming error.", 
-	   status);
   }
 
  CLEANUP:
