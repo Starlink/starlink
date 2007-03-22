@@ -1004,13 +1004,32 @@ void kpg1Gtwcs( int indf, AstFrameSet **iwcs, int *status ){
 
 /* ------------------------------- */
 
-F77_SUBROUTINE(kpg1_gtaxv)( CHARACTER(PARAM), 
-                            INTEGER(MXVAL),
-                            LOGICAL(EXACT),
-                            INTEGER(FRAME),
-                            INTEGER(IAXIS),
-                            DOUBLE_ARRAY(AXVAL),
-                            INTEGER(NVAL),
+F77_SUBROUTINE(kpg1_asffr)( INTEGER(TARGET),
+                            CHARACTER(DOMAIN),
+                            INTEGER(IFRM),
                             INTEGER(STATUS)
-                            TRAIL(PARAM) );
+                            TRAIL(DOMAIN) );
+
+void kpg1Asffr( AstFrameSet *target, const char *domain, int *ifrm, int *status ){
+   DECLARE_INTEGER(TARGET);
+   DECLARE_CHARACTER_DYN(DOMAIN);
+   DECLARE_INTEGER(IFRM);
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_INTEGER( astP2I( target ), TARGET );
+   F77_CREATE_CHARACTER( DOMAIN, strlen( domain ) );
+   F77_EXPORT_CHARACTER( domain, DOMAIN, DOMAIN_length );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(kpg1_asffr)( INTEGER_ARG(&TARGET),
+                         CHARACTER_ARG(DOMAIN),
+                         INTEGER_ARG(&IFRM),
+                         INTEGER_ARG(&STATUS)
+                         TRAIL_ARG(DOMAIN) );
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_IMPORT_INTEGER( IFRM, *ifrm );
+   F77_FREE_CHARACTER( DOMAIN );
+}
+
 

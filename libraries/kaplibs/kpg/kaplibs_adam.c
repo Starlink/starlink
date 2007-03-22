@@ -413,6 +413,17 @@ void kpg1Wgndf( const char *param, Grp *grp0, int maxsiz, int minsiz,
 
 }
 
+/* ------------------------------- */
+
+F77_SUBROUTINE(kpg1_gtaxv)( CHARACTER(PARAM), 
+                            INTEGER(MXVAL),
+                            LOGICAL(EXACT),
+                            INTEGER(FRAME),
+                            INTEGER(IAXIS),
+                            DOUBLE_ARRAY(AXVAL),
+                            INTEGER(NVAL),
+                            INTEGER(STATUS)
+                            TRAIL(PARAM) );
 
 void kpg1Gtaxv( const char *param, int mxval, int exact, AstFrame *frame,
                 int iaxis, double *axval, int *nval, int *status ){
@@ -454,6 +465,18 @@ void kpg1Gtaxv( const char *param, int mxval, int exact, AstFrame *frame,
    return;
 }
 
+
+/* ------------------------------- */
+
+F77_SUBROUTINE(kpg1_gilst)( INTEGER(LONUM),
+                            INTEGER(UPNUM),
+                            INTEGER(MAXLIN),
+                            CHARACTER(PARAM), 
+                            INTEGER_ARRAY(FLAG),
+                            INTEGER_ARRAY(NUMBER),
+                            INTEGER(NDISP),
+                            INTEGER(STATUS)
+                            TRAIL(PARAM) );
 
 
 void kpg1Gilst( int lonum, int upnum, int maxlin, const char *param, 
