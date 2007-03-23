@@ -87,7 +87,7 @@ void cupidDumpF( float *array, int ndim, int *dims, int *slbnd,
    }
 
    jj++;
-   sprintf( name, "ddata%d", jj );
+   sprintf( name, "fdata%d", jj );
    printf("   Dumping %s\n", name );
    ndfOpen( NULL, name, "WRITE", "NEW", &indf, &place, status );
    ndfNew( "_REAL", ndim, lbnd, ubnd, &place, &indf, status );
