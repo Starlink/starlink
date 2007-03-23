@@ -21,7 +21,7 @@ BUILT_SOURCES = $(BUILT_C_ROUTINES)
 C_ROUTINES = cupidclumpfind.c cupidgaussclumps.c cupidconfigD.c \
 cupidconfigrms.c \
 cupidconfigI.c cupidgclistclump.c cupidgcmodel.c cupidgcchisq.c \
-cupidgccalcf.c cupidgccalcg.c cupidranval.c cupiddumpd.c \
+cupidgccalcf.c cupidgccalcg.c cupidranval.c cupiddumpd.c cupiddumpf.c \
 cupidcferode.c cupidstoreconfig.c cupidstoreclumps.c cupiddatcopy.c \
 cupidcfdeleteps.c cupidcffreeps.c cupidcfxfer.c cupidcfaddpixel.c \
 cupidcflevels.c cupiddumpi.c cupidclumpdesc.c cupidcfnebs.c cupidedges.c \
