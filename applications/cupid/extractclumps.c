@@ -191,6 +191,7 @@ void extractclumps( int *status ) {
    int iz;                      /* GRID value on 3rd axis */
    int n;                       /* Number of values summed in "sum" */
    int nclump;                  /* Number of clump IDs */
+   int nclumps;                 /* Number of stored clumps */
    int ndim;                    /* Total number of pixel axes */
    int nsig;                    /* Number of significant pixel axes */
    int nskyax;                  /* No. of sky axes in current WCS Frame */
@@ -482,7 +483,7 @@ void extractclumps( int *status ) {
       cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, deconv, beamcorr, 
                         "Output from CUPID:EXTRACTCLUMPS", usewcs,
                         gotwcs ? iwcs : NULL, 1, dataunits, 
-                        NULL, logfile, status );
+                        NULL, logfile, &nclumps, status );
 
 /* Map the output pixel assignment array. */
       ndfMap( indf3, "DATA", "_INTEGER", "WRITE", (void *) &ipa, &el, status );

@@ -244,6 +244,7 @@ void makeclumps( int *status ) {
    int lbnd[ 3 ];                /* Lower pixel bounds */
    int nc;                       /* Number of clumps created */
    int nclump;                   /* Number of clumps to create */
+   int nclumps;                  /* Number of stored clumps */
    int ndim;                     /* Number of pixel axes */
    int nel;                      /* Number of elements in array */
    int normal;                   /* Clump parameters normally distributed? */
@@ -444,7 +445,7 @@ void makeclumps( int *status ) {
    beamcorr[ 3 ] = velfwhm;
    cupidStoreClumps( "OUTCAT", xloc, obj, ndim, deconv, beamcorr,
                      "Output from CUPID:MAKECLUMPS", 0, NULL, 2, "",
-                     NULL, NULL, status );
+                     NULL, NULL, &nclumps, status );
 
 /* Relase the extension locator.*/
    datAnnul( &xloc, status );

@@ -45,7 +45,8 @@ package cupid {
           parameter nclumps {
             type _INTEGER
             access WRITE
-            vpath INTERNAL
+            vpath DEFAULT
+            default 0
             helpkey *
           }
 
@@ -293,6 +294,14 @@ package cupid {
             helpkey *
             default !
          }
+
+          parameter nclumps {
+            type _INTEGER
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
 
          parameter out {
             position 2

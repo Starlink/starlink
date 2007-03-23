@@ -180,6 +180,9 @@ void findclumps( int *status ) {
 *
 *        Each algorithm has a collection of extra tuning values which are
 *        set via the CONFIG parameter.   [current value]
+*     NCLUMPS = _INTEGER (Write)
+*        The total number of clumps descrriptions stored within the output
+*        NDF (and catalogue).
 *     OUT = NDF (Write)
 *        The output NDF which has the same shape and size as the input NDF. 
 *        Information about the identified clumps and the configuration 
@@ -697,6 +700,8 @@ void findclumps( int *status ) {
 *     21-MAR-2007 (DSB):
 *        Allow selected configuration parameters to be specified as a
 *        multiple of the RMS.
+*     23-MAR-2007 (DSB):
+*        Added output parameter NCLUMPS.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -763,6 +768,7 @@ void findclumps( int *status ) {
    int indf3;                   /* Identifier for Quality output NDF */
    int indf;                    /* Identifier for input NDF */
    int n;                       /* Number of values summed in "sum" */
+   int nclumps;                 /* Number of clumps stored in output NDF */
    int ndim;                    /* Total number of pixel axes */
    int nfr;                     /* Number of Frames within WCS FrameSet */
    int nsig;                    /* Number of significant pixel axes */
@@ -795,6 +801,7 @@ void findclumps( int *status ) {
    rmask = NULL;
    ndfs = NULL;
    xloc = NULL;
+   nclumps = 0;
 
 /* Start an AST context */
    astBegin;
@@ -1141,7 +1148,7 @@ void findclumps( int *status ) {
       cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, deconv, beamcorr, 
                         "Output from CUPID:FINDCLUMPS", usewcs, 
                         gotwcs ? iwcs : NULL, ilevel, dataunits, 
-                        confgrp, logfile, status );
+                        confgrp, logfile, &nclumps, status );
 
       if( logfile ) fprintf( logfile, "\n\n" );
 
@@ -1237,6 +1244,9 @@ void findclumps( int *status ) {
    already occurred. */
    errBegin( status );
 
+/* Store the number of clumps in the output NDF. */
+   parPut0i( "NCLUMPS", nclumps, status );
+
 /* If a group was obtained containing configuration parameters, list them. */
    if( confgrp ) {     
 
@@ -1285,6 +1295,7 @@ void findclumps( int *status ) {
 
 /* End the error context. */
    errEnd( status );
+
 
 /* Tidy up */
 L999:

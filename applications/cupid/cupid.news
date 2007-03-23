@@ -9,7 +9,9 @@
 
 Changes introduced at V0.0-33:
 
-   - A parameter used by FINDBACK to estimate the bias between the
+   - FINDCLUMPS has a new output parameter called NCLUMPS to which is
+   written the number of clumps identified by FINDCLUMPS.
+   - The algorithm used by FINDBACK to estimate the bias between the
    noise-free background and the lower envelope of the data has been
    changed to better cope with high noise cases.
 

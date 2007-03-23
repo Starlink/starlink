@@ -19,7 +19,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
                        int ndim, int deconv, double beamcorr[ 3 ], 
                        const char *ttl, int usewcs, AstFrameSet *iwcs, 
                        int ilevel, const char *dataunits, Grp *hist,
-                       FILE *logfile, int *status ){
+                       FILE *logfile, int *nclumps, int *status ){
 /*
 *+
 *  Name:
@@ -36,7 +36,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *                            int ndim, int deconv, double beamcorr[ 3 ], 
 *                            const char *ttl, int usewcs, AstFrameSet *iwcs, 
 *                            int ilevel, const char *dataunits, Grp *hist,
-*                            FILE *logfile, int *status )
+*                            FILE *logfile, int *nclumps, int *status )
 
 *  Description:
 *     This function optionally saves the clump properties in an output
@@ -85,6 +85,9 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *        catalogue has history information.
 *     logfile
 *        Pointer to a file identifier for the output log file, or NULL.
+*     nclumps
+*        Pointer to an int in which to return the number of clumps stored
+*        in the output NDF.
 *     status
 *        Pointer to the inherited status value.
 
@@ -121,6 +124,8 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *        Added parameters "usewcs" and "dataunits".
 *     25-JAN-2007 (DSB):
 *        Added parameters "hist" and "logfile".
+*     23-MAR-2007 (DSB):
+*        Added parameter "nclumps".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -171,6 +176,9 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    int pixfrm;                  /* Index of PIXEL Frame */
    int place;                   /* Place holder for copied NDF */
    int there;                   /* Does component exist?*/
+
+/* Initialise */
+   *nclumps = 0;
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
@@ -421,8 +429,9 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
       msgBlank( status );
    }
 
-/* Resize the array of clump structures */
+/* Resize the array of clump structures, and return the size of the array. */
    if( aloc && iclump < nndf && iclump ) datAlter( aloc, 1, &iclump, status );
+   *nclumps = iclump;
 
 /* See if an output catalogue is to be created. If not, annull the null
    parameter error. */
