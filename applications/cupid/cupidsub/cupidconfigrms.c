@@ -119,45 +119,45 @@ double cupidConfigRMS( AstKeyMap *config, const char *name, double rms,
 /* Free the pointer to the secondary KeyMap. */
          sconfig = astAnnul( sconfig );
       }
+   }
 
 /* If a text string was obtained, attempt to interpret it. */
-      if( text ) {
+   if( text ) {
 
 /* Obtain the length of the text string. */
-         len = strlen( text );
+      len = strlen( text );
 
 /* See if it is a numerical value followed by "*RMS" (case insensitive). If
    so, multiply the supplied RMS value by the numerical value extracted
    from the string. */
-         if( nc = 0, 1 == astSscanf( text, " %lg*%*[Rr]%*[Mm]%*[Ss] %n",
-                                     &ret, &nc ) && ( nc >= len ) ) {
-            ret *= rms;
+      if( nc = 0, 1 == astSscanf( text, " %lg*%*[Rr]%*[Mm]%*[Ss] %n",
+                                  &ret, &nc ) && ( nc >= len ) ) {
+         ret *= rms;
 
 /* Otherwise, see if the string is just "RMS". If so, return the RMS
    value. */
-         } else if( nc = 0, 0 == astSscanf( text, " %*[Rr]%*[Mm]%*[Ss] %n",
-                                            &nc ) && ( nc >= len ) ) {
-            ret = rms;
+      } else if( nc = 0, 0 == astSscanf( text, " %*[Rr]%*[Mm]%*[Ss] %n",
+                                         &nc ) && ( nc >= len ) ) {
+         ret = rms;
 
 /* Otherwise, see if the string is a simple numerical value. If so, return 
    it. */
-         } else if( nc = 0, 1 == astSscanf( text, " %lg %n", &ret, &nc ) 
-                                            && ( nc >= len ) ) {
+      } else if( nc = 0, 1 == astSscanf( text, " %lg %n", &ret, &nc ) 
+                                         && ( nc >= len ) ) {
 
 /* Otherwise, return the default value. */
-         } else {
-            if( *status == SAI__OK ) *status = SAI__ERROR;
-            msgSetc( "V", text );
-            msgSetc( "N", name );
-            errRep( "", "The value (^V) of configuration parameter \"^N\""
-                    "cannot be used.", status );
-            ret = def;
-         }
+      } else {
+         if( *status == SAI__OK ) *status = SAI__ERROR;
+         msgSetc( "V", text );
+         msgSetc( "N", name );
+         errRep( "", "The value (^V) of configuration parameter \"^N\""
+                 "cannot be used.", status );
+         ret = def;
       }
+   }
 
 /* Store the returned value in the supplied KeyMap if it is good. */
-      if( ret != VAL__BADD ) astMapPut0D( config, name, ret, NULL );
-   }
+   if( ret != VAL__BADD ) astMapPut0D( config, name, ret, NULL );
 
 /* Return the result. */
    return ret;
