@@ -132,6 +132,8 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
    int nel;             /* Number of elements in input array */
    int nrow;            /* Number of rows of data */
 
+   int lbnd = 1;
+
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
 
@@ -144,17 +146,39 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
    if( ilevel > 0 ) msgOut( "", "      Applying minimum filter", status );
    CGEN_FUNCTION(cupidFindback3)( dim, box, din, wa, status );
 
+/*
+   CGEN_FUNCTION(cupidDump)( wa, 1, &nel, &lbnd, status );
+   printf("Dumped min filtered data\n\n");
+*/
+
+
+
 /* Apply a second filter which replaces each pixel value in "wa" by the 
    maximum value in a box centred on the pixel. The filtered data goes
    (temporarily) in the output array. */
    if( ilevel > 0 ) msgOut( "", "      Applying maximum filter", status );
    CGEN_FUNCTION(cupidFindback10)( dim, box, wa, dout, status );
 
+/*
+   CGEN_FUNCTION(cupidDump)( dout, 1, &nel, &lbnd, status );
+   printf("Dumped max filtered data\n\n");
+*/
+
+
+
 /* Apply a third filter which replaces each pixel value in "dout" by the 
    mean value in a box centred on the pixel. The filtered data goes
    back into "wa". */
    if( ilevel > 0 ) msgOut( "", "      Applying mean filter", status );
    CGEN_FUNCTION(cupidFindback4)( dim, box, dout, wa, status );
+
+/*
+   CGEN_FUNCTION(cupidDump)( wa, 1, &nel, &lbnd, status );
+   printf("Dumped mean filtered data\n\n");
+*/
+
+
+
 
 /* The background estimate in "wa" should now be a close fit to the lower 
    envelope of the input data, but will be biassed by the noise. That is, 
@@ -177,14 +201,35 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
       }
    }
 
+/*
+   CGEN_FUNCTION(cupidDump)( dout, 1, &nel, &lbnd, status );
+   printf("Dumped initial residuals\n\n");
+*/
+
+
+
 /* Identify background pixels and set all other pixel bad. */
    if( ilevel > 0 ) msgOut( "", "      Removing source residuals", status );
    CGEN_FUNCTION(cupidFindback2)( rms, dim, dout, status );
+
+/*
+   CGEN_FUNCTION(cupidDump)( dout, 1, &nel, &lbnd, status );
+   printf("Dumped source-rejected residuals\n\n");
+*/
+
+
 
 /* Smooth the remaining residuals with a mean filter, putting the results 
    in "wb". */
    if( ilevel > 0 ) msgOut( "", "      Smoothing background residuals", status );
    CGEN_FUNCTION(cupidFindback4)( dim, box, dout, wb, status );
+
+/*
+   CGEN_FUNCTION(cupidDump)( wb, 1, &nel, &lbnd, status );
+   printf("Dumped mean smoothed residuals\n\n");
+*/
+
+
 
 /* Fill in rejected pixel values by interpolation between the good pixels on
    either side. For simplicity and speed, this is done independently for 
@@ -221,9 +266,23 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
 
    }
 
+/*
+   CGEN_FUNCTION(cupidDump)( wb, 1, &nel, &lbnd, status );
+   printf("Dumped filled residuals\n\n");
+*/
+
+
+
 /* Smooth the residuals again, putting the results in the output array. */
    if( ilevel > 0 ) msgOut( "", "      Smoothing filled residuals", status );
    CGEN_FUNCTION(cupidFindback4)( dim, box, wb, dout, status );
+
+/*
+   CGEN_FUNCTION(cupidDump)( dout, 1, &nel, &lbnd, status );
+   printf("Dumped smoothed filled residuals\n\n");
+*/
+
+
 
 /* The values in the output array now represent the bias between the input 
    data and the background estimate formed above. It will be extended into 
@@ -242,6 +301,12 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
          p1++;
       }
    }
+
+/*
+   CGEN_FUNCTION(cupidDump)( dout, 1, &nel, &lbnd, status );
+   printf("Dumped final background\n\n");
+*/
+
 
 }
 

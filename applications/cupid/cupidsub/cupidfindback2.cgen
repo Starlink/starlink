@@ -22,7 +22,7 @@ void CGEN_FUNCTION(cupidFindback2)( double rms, int dim[3], CGEN_TYPE *din,
 
 *  Description:
 *     This function sets all elements of the supplied array bad that are
-*     greater than 3 times the RMS noise in the data.
+*     greater than 6 times the RMS noise in the data.
 
 *  Parameters:
 *     rms
@@ -61,6 +61,13 @@ void CGEN_FUNCTION(cupidFindback2)( double rms, int dim[3], CGEN_TYPE *din,
 *  History:
 *     13-SEP-2006 (DSB):
 *        Original version.
+*     23-MAR-2007 (DSB):
+*        Changed rejection criterion from 3*sigma to 6*sigma. This is
+*        because the supplied array represents the rediausl between the
+*        data and the *lower* enevelope of the noise. Therefore. assuming
+*        the noise extends to 3*sigma above and below the mean, the
+*        difference between the upper envelope and hte lower envelope 
+*        should be 6*sigma.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -82,7 +89,7 @@ void CGEN_FUNCTION(cupidFindback2)( double rms, int dim[3], CGEN_TYPE *din,
    nel = dim[ 0 ]*dim[ 1 ]*dim[ 2 ];
 
 /* Reject data points greater than 3 times the RMS noise. */
-   thresh = 3*rms;
+   thresh = 6*rms;
    ap =din;
    for( i = 0; i < nel; i++ ) {
       if( *ap != CGEN_BAD && *ap > thresh ) {

@@ -7,6 +7,14 @@
  data arrays.
 
 
+Changes introduced at V0.0-33:
+
+   - A parameter used by FINDBACK to estimate the bias between the
+   noise-free background and the lower envelope of the data has been
+   changed to better cope with high noise cases.
+
+
+
 Changes introduced at V0.0-32:
 
    - New application call CLUMPINFO added, which reports information
