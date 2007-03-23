@@ -86,10 +86,14 @@
 *        smf_create_lutwcs and smf_detpos_wcs. 
 *     2006-11-01 (TIMJ):
 *        Add SMURFHELP
+*     2007-03-23 (TIMJ):
+*        Remove FILE leak checking since it sometimes reports
+*        HDS internal scratch files that are not real leaks. Rely
+*        solely on the locator leak check.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
+*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
 *     Council and the University of British Columbia.  All Rights
 *     Reserved.
 
@@ -136,7 +140,8 @@
 #include "libsmf/smf.h"
 
 /* internal protoypes */
-F77_SUBROUTINE(task_get_name)(char *, int*, int);
+F77_SUBROUTINE(task_get_name)(CHARACTER(TASKNAME),
+			      INTEGER(STATUS) TRAIL(TASKNAME));
 void smurf_mon (int * );
 
 /* Main monolith routine */
@@ -151,8 +156,6 @@ void smurf_mon( int * status ) {
   int ngrp1;                   /* Number of grp ids at end */
   int nloc0;                   /* Number of active HDS Locators at start */
   int nloc1;                   /* Number of active HDS Locators at end */
-  int nfil0;                   /* Number of open HDS files at start */
-  int nfil1;                   /* Number of open HDS files at end */
   int memory_caching;          /* Is AST current caching unused memory? */
 
   if ( *status != SAI__OK ) return; 
@@ -172,7 +175,6 @@ void smurf_mon( int * status ) {
   strcat(filter, taskname );
   grpInfoi( NULL, 0, "NGRP", &ngrp0, status );
   hdsInfoI( NULL, "LOCATORS", filter, &nloc0, status );
-  hdsInfoI( NULL, "FILES", NULL, &nfil0, status );
 
 
   /* Update the application name in the NDF history recording
@@ -272,29 +274,8 @@ void smurf_mon( int * status ) {
 	    " error).", status);
     msgBlank(status);
     hdsShow("LOCATORS", status);
-    printf("filter - %s\n",filter);
-  }
-  errEnd( status );
-
-  /* Check for HDS leaks Do this in a new error reporting context so
-   * that we get the correct value even if an error has occurred. */
-  errBegin( status );
-  hdsInfoI( NULL, "FILES", NULL, &nfil1, status );
-
-  /* If there are more active files now than there were on entry,
-   * there must be a problem (HDS files are not being closed
-   * somewhere). So report it. */
-  if (*status == SAI__OK && nfil1 > nfil0) {
-    msgBlank( status );
-    msgSetc( "NAME", taskname );
-    msgSeti( "NFIL0", nfil0 );
-    msgSeti( "NFIL1", nfil1 );
-    msgOut( " ", "WARNING: The number of active "
-	    "HDS container files increased from ^NFIL0 to ^NFIL1 "
-	    "during execution of ^NAME (" PACKAGE_UPCASE " programming "
-	    " error).", status);
-    msgBlank(status);
     hdsShow("FILES", status);
+    printf("filter - %s\n",filter);
   }
   errEnd( status );
 
