@@ -32,7 +32,10 @@
 *        ignored for FILES and LOCATORS topics and can be NULL pointer.
 *     topic = const char * (Given)
 *        Topic on which information is to be obtained. Allowed values are:
-*        - LOCATORS : Return the number of active locators
+*        - LOCATORS : Return the number of active locators.
+*                     Internal scratch locators are ignored.
+*        - ALOCATORS: Returns the number of all active locators, including
+*                     scratch space.
 *        - FILES : Return the number of open files
 *     extra = const char * (Given)
 *        Extra options to control behaviour. The content depends on
@@ -82,10 +85,13 @@
 *        Do not set status to bad if hdsTrace returns bad status.
 *     14-JUL-2006 (BKM)
 *        Make erased locators non-fatal
+*     22-MAR-2007 (TIMJ):
+*        - LOCATORS now filters out internal HDS_SCRATCH locators
+*        - Add ALOCATORS (which behaves like the old LOCATORS and does not filter)
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2006, 2007 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -172,7 +178,7 @@ hdsInfoI(const HDSLoc* loc, const char *topic_str, const char * extra_str,
      len = strlen(extra_str);
      if (len > STR_K_LENGTH-1) {
        *status = DAT__TRUNC;
-       emsSeti("E", len);
+       emsSetu("E", len);
        emsSeti("M", STR_K_LENGTH-1);
        emsRep( "HDS_INFOI_1",
 	       "EXTRA string exceeds maximum length (^E > ^M)",
@@ -207,12 +213,19 @@ hdsInfoI(const HDSLoc* loc, const char *topic_str, const char * extra_str,
    /* Number of open files */
    if (_cheql(4,name, "FILE"))
       rec_count_files( result );
-   if (_cheql(4,name, "LOCA"))
+   if ((_cheql(4,name, "LOCA")) || (_cheql(4,name, "ALOC")))
    {
      /* Locators has the "extra" option to filter out paths */
      /* First see whether we have any components to filter on */
      /* If we find some we store the pointers into comps[] */
      ncomp = 0;
+
+     /* If LOCATORS we need to filter out !HDS_SCRATCH */
+     if (_cheql(4,name, "LOCA")) {
+       comps[ncomp] = "!HDS_SCRATCH";
+       ncomp++;
+     }
+
      if (extra_str != NULL) {
        /* use the upper case version */
        len = strlen(extra);
@@ -248,7 +261,7 @@ hdsInfoI(const HDSLoc* loc, const char *topic_str, const char * extra_str,
       lcp          = dat_ga_wlq;
       locator.check    = DAT__LOCCHECK;
       *result = 0;
-      emsMark;
+      emsMark();
       for (i=0; i<dat_gl_wlqsize; i++)
       {
          data = &lcp->data;
@@ -298,7 +311,7 @@ hdsInfoI(const HDSLoc* loc, const char *topic_str, const char * extra_str,
       }
       if( hds_gl_status == DAT__LOCER)
          emsAnnul(&hds_gl_status);
-      emsRlse;
+      emsRlse();
    }
    return hds_gl_status;
 }
