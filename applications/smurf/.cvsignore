@@ -21,3 +21,5 @@ stamp-h1
 starconf.status
 smurf.hlp
 smurf.shl
+*.sdf
+*.lis
