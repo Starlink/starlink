@@ -207,6 +207,9 @@
 *        the FITS header
 *     2007-03-01 (AGG):
 *        Add simstats to API for reporting simulation statistics
+*     2007-03-20 (AGG):
+*        Update time passed to simframe to be the number of seconds
+*        since the simulation started, not the full MJD.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1123,7 +1126,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
             sc2sim_simframe ( *inx, *sinx, astnaxes, astscale, astdata->pntr[0], 
 			      atmnaxes, atmscale, atmdata->pntr[0], coeffs, 
 			      fs, heater, nbol, frame, nterms, noisecoeffs, 
-			      pzero, samptime, start_time, sinx->telemission, 
+			      pzero, samptime, start_time-inx->mjdaystart, 
+			      sinx->telemission, 
 			      weights, sky2map, xbolo, ybolo, xbc, ybc, 
 			      &(posptr[( (curchunk * maxwrite) + frame )*2]), 
                               &(dbuf[(k*nbol*maxwrite) + (nbol*frame)]), status );
