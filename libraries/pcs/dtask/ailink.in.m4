@@ -309,6 +309,7 @@ if $found_c_files; then
     cat >dtask_wrap.c <<FOO
 #include <f77.h>
 void $EXENAME(int *status);
+F77_SUBROUTINE(dtask_wrap)(INTEGER(fstatus));
 
 F77_SUBROUTINE(dtask_wrap)(INTEGER(fstatus)) {
 int status;
