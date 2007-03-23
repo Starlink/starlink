@@ -60,7 +60,7 @@
 *     samptime = double (Given)
 *        Sample time in sec
 *     start_time = double (Given)
-*        Time at start of scan in sec
+*        Time at start of scan in seconds since the simulation started
 *     telemission = double (Given)
 *        Power from telescope emission
 *     weights = double* (Given)
@@ -185,7 +185,8 @@ int nterms,                  /* number of 1/f noise coeffs (given) */
 double *noisecoeffs,         /* 1/f noise coeffs (given) */
 double *pzero,               /* bolometer power offsets (given) */
 double samptime,             /* sample time in sec (given) */
-double start_time,           /* time at start of scan in sec  (given) */
+double start_time,           /* time at start of scan in sec since start of 
+				simulation (given) */
 double telemission,          /* power from telescope emission (given) */
 double *weights,             /* impulse response (given) */
 AstMapping *sky2map,         /* Mapping celestial->map coordinates */
@@ -289,7 +290,7 @@ int *status                  /* global status (given and returned) */
      }
    }
 
-   /* Get time when frame taken in seconds */
+   /* Get time when frame taken in seconds from beginning of simulation */
    if( *status == SAI__OK ) {
      time = start_time + frame * samptime;
    }
@@ -319,7 +320,7 @@ int *status                  /* global status (given and returned) */
        
        xsky = xpos + sinx.atmxvel * time + sinx.atmzerox;
        ysky = ypos + sinx.atmyvel * time + sinx.atmzeroy;
-       
+
        /* If the add atmospheric emission flag is set, use bilinear interpolation
 	  to find the atmvalue from the input file. */
        if ( sinx.add_atm == 1 ) {
