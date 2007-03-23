@@ -14,8 +14,11 @@ Changes introduced at V0.0-33:
    - The algorithm used by FINDBACK to estimate the bias between the
    noise-free background and the lower envelope of the data has been
    changed to better cope with high noise cases.
-
-
+   - FellWalker bug fixed that could cause inappropriate clumps to be
+   merged together.
+   - Fix bug that could prevent configuration parameters being read if 
+   they are qualified by their method name (e.g. "FellWalker.MinDip" as
+   opposed to just "MinDip").
 
 Changes introduced at V0.0-32:
 

@@ -127,6 +127,8 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 *        Original version.
 *     21-MAR-2007 (DSB):
 *        Fix bug that prevented merger occuring if only one merger is needed.
+*     23-MAR-2007 (DSB):
+*        Fix bug that caused incorrect clumps to be merged.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -291,10 +293,23 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
          for( ipair = 0; ipair < npair; ipair++, p += 2 ) {
             peak0 = table1[ p[ 0 ] ];
             peak1 = table1[ p[ 1 ] ];
+
             if( peak1 > peak0 ){
-               table1[ p[ 1 ] ] = peak0;
+
+               for( ipeak = 0; ipeak <= *npeak; ipeak++ ) {
+                  if( table1[ ipeak ] == peak1 ) {
+                     table1[ ipeak ] = peak0;
+                  }
+               }
+
             } else {
-               table1[ p[ 0 ] ] = peak1;
+
+               for( ipeak = 0; ipeak <= *npeak; ipeak++ ) {
+                  if( table1[ ipeak ] == peak0 ) {
+                     table1[ ipeak ] = peak1;
+                  }
+               }
+
             }
          }
    
