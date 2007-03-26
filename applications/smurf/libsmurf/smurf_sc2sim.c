@@ -257,7 +257,7 @@
 *          ra (char[]) : 0:0:0.0 O (hours:minutes:seconds)
 *            Sexagesimal string representation of the Right 
 *            ascension of the observation.
-*          sample_t (double) : 5.0 (msec)
+*          steptime (double) : 0.005 (sec)
 *            Sample interval time.
 *          scan_angle (double) : 0.0 (radians)
 *            For the SINGLESCAN obsmode, this parameter specifies 
@@ -555,7 +555,6 @@ void smurf_sc2sim( int *status ) {
 				      files are overwritten */
    double *pzero=NULL;             /* bolometer power offsets */
    int rseed;                      /* seed for random number generator */
-   double samptime;                /* sample time in sec */
    Grp *simGrp = NULL;             /* Group containing sim parameter file */
    AstKeyMap *simkeymap=NULL;      /* AstKeyMap for sim parameters */
    int simstats = 0;               /* Flag to denote whether just to
@@ -607,8 +606,6 @@ void smurf_sc2sim( int *status ) {
    srand ( rseed );
 
    nbol = inx.nbolx * inx.nboly;
-   /* Convert sample time from milliseconds to seconds */
-   samptime = inx.sample_t / 1000.0;
 
    /* String for the wavelength of the filter */
    sprintf( filter,"%i",(int) (inx.lambda*1e6) );
@@ -625,7 +622,7 @@ void smurf_sc2sim( int *status ) {
      /* Do a heatrun */
 
      sc2sim_heatrun ( &inx, &sinx, coeffs, digcurrent, digmean, digscale, filter,
-                      heater, nbol, pzero, samptime, status );
+                      heater, nbol, pzero, inx.steptime, status );
 
    } else if ( mode == stare || mode == dream ) {
 
@@ -642,7 +639,7 @@ void smurf_sc2sim( int *status ) {
 
       sc2sim_simulate ( &inx, &sinx, coeffs, digcurrent, digmean, digscale, 
                         filter, heater, maxwrite, mode, coordframe, nbol, 
-			pzero, rseed, samptime, weights, xbc, xbolo, ybc, 
+			pzero, rseed, inx.steptime, weights, xbc, xbolo, ybc, 
 			ybolo, hitsonly, overwrite, simstats, status);
 
    }  else if ( mode == pong || mode == singlescan || mode == bous || 
@@ -690,7 +687,7 @@ void smurf_sc2sim( int *status ) {
       /* Run either a FULL or WEIGHTS simulation */
       sc2sim_simulate ( &inx, &sinx, coeffs, digcurrent, digmean, digscale, 
                         filter, heater, maxwrite, mode, coordframe, nbol, 
-		        pzero, rseed, samptime, weights, xbc, xbolo, ybc, 
+		        pzero, rseed, inx.steptime, weights, xbc, xbolo, ybc, 
 			ybolo, hitsonly, overwrite, simstats, status );
 
    } else {

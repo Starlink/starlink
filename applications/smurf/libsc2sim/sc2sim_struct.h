@@ -36,6 +36,8 @@
                 parameters (jb)
     21Dec2006 : Add instap & instap_x/y (agg)
     22Dec2006 : Add planetnum (agg)
+    26Mar2007 : Change units of steptime (formerly sample_t) to
+                seconds, not ms (agg)
 */
 #include "libsc2sim/sc2sim_par.h"
 
@@ -110,18 +112,17 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
   char pong_type[80];         /* Type of PONG scan (straight or curve) */
   double pong_vmax;           /* Telescope max velocities (arcsec/sec) */
   double ra;                  /* right ascension in radians */
-  double steptime;            /* sample time in msec */
   double scan_angle;          /* angle of pattern relative to telescope
 				 axes in radians anticlockwise  */
   int smu_move;               /* Code for the SMU move algorithm */
   double smu_offset;          /* SMU phase shift */
   int smu_samples;            /* Nr of samples per jiggle vertex */
   double spacing;             /* grid spacing in arcsec */
+  double steptime;            /* Time interval between samples in sec */
   int subsysnr;               /* subsystem number */
   double targetpow;           /* target bolometer power input pW */
   double vmax;                /* Telescope max velocities (arcsec/sec) */
   double width;               /* min width of pattern (arcsec) */
-
 };
 
 struct sc2sim_sim_struct      /* parameters read from sim input file */

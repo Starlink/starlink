@@ -24,7 +24,7 @@
 *     smu_samples = int (Given)
 *        Number of samples between vertices
 *     steptime = double (Given)
-*        Time between data samples in msec
+*        Time between data samples in sec
 *     smu_offset = double (Given)
 *        SMU timing offset in msec
 *     conv_shape = int (Given)
@@ -101,7 +101,7 @@ void sc2sim_getpat
 (
 int nvert,            /* Number of vertices per pattern (given) */
 int smu_samples,      /* number of samples between vertices (given) */
-double steptime,      /* time between data samples in msec (given) */
+double steptime,      /* time between data samples in sec (given) */
 double smu_offset,    /* smu timing offset in msec (given) */
 int conv_shape,       /* choice of convolution function (given) */
 double conv_sig,      /* convolution parameter (given) */
@@ -111,13 +111,10 @@ double jig_stepy,     /* Y interval in arcsec (given) */
 int jig_vert[][2],    /* Array with relative jiggle coordinates in units of
                          jiggle steps in case jiggle positions are 
                          visited (given) */
-
 int *cycle_samples,   /* The number of samples per cycle (returned) */
-
 double pattern[][2],  /* The array to hold the coordinates of the jiggle 
                          offsets in arcsec. There are cycle_samples entries 
                          filled. (returned) */
-
 int *status           /* global status (given and returned) */
 )
 
@@ -163,7 +160,8 @@ int *status           /* global status (given and returned) */
          return;
       }
 
-      vertex_t = steptime * smu_samples;
+      /* Note: steptime is in SECONDS, so convert to ms */
+      vertex_t = 1000.0 * steptime * smu_samples;
       sc2sim_smupath ( nvert, vertex_t, jig_vert, jig_stepx, jig_stepy, 
                       move_code, smu_samples, steptime, smu_offset,
                       *cycle_samples, pattern, status );

@@ -174,7 +174,8 @@ void sc2sim_instrinit( struct sc2sim_obs_struct *inx,
   sc2sim_getobspar ( obskeymap, inx, status );
   sc2sim_getsimpar ( simkeymap, sinx, status );
 
-  samptime = inx->steptime / 1000.0;
+  /* Get the sample interval time in seconds */
+  samptime = inx->steptime;
 
   /* Get the bolometer information */
   if( *status == SAI__OK ) {
