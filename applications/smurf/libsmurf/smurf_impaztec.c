@@ -209,7 +209,7 @@ void smurf_impaztec( int *status ) {
   double ra=0;                 /* ra of observation in radians  */
   double rad;                  /* RA of observation in degrees */
   char ra_str[MAXSTRING];      /* string rep. of ra */
-  double sample_t;             /* sample interval in msec  */
+  double steptime;             /* sample interval in msec  */
   int sec;                     /* second of beginning of observation */
   size_t seconds;              /* seconds in observation */
   int starttime;               /* seconds since noon, UT */
@@ -254,7 +254,7 @@ void smurf_impaztec( int *status ) {
     meanwvm    = 0; /* fix */
     obslam     = 0;
     nrow       = 1;
-    sample_t   = 0.015625; /* AzTEC sample time */
+    steptime   = 0.015625; /* AzTEC sample time */
     nflat      = 1;
     atstart    = 0;
     atend      = 0;
@@ -333,7 +333,7 @@ void smurf_impaztec( int *status ) {
     /* Use simulator routine to calculate array of UT for each
        timeslice. NOTE: this is UT1, not UTC. Also DUT1 passed in as 0
        since we don't have any way of inputting it. */
-    sc2sim_calctime( telpos[0]*DD2R, djm, 0.0, sample_t, nframes,
+    sc2sim_calctime( telpos[0]*DD2R, djm, 0.0, steptime, nframes,
                      mjuldate, tempbuff, status );       
 
     /* RA + Dec at centre of map */
@@ -478,7 +478,7 @@ void smurf_impaztec( int *status ) {
   astSetFitsF ( fitschan, "DEC", decd, "Declination of observation", 0 );
   astSetFitsI ( fitschan, "NBOLX", ncol, "number of bolometers in X direction", 0 );
   astSetFitsI ( fitschan, "NBOLY", nrow, "number of bolometers in Y direction", 0 );
-  astSetFitsF ( fitschan, "STEPTIME", sample_t, "sample interval in msec", 0 );
+  astSetFitsF ( fitschan, "STEPTIME", steptime, "sample interval in msec", 0 );
   astSetFitsS ( fitschan, "SUBARRAY", "AZTEC", "subarray name", 0 );
   astSetFitsI ( fitschan, "NUMSAMP", numsamples, "number of samples", 0 );
   astSetFitsS ( fitschan, "FILTER", "1100", "filter used", 0 );
