@@ -114,7 +114,7 @@ smfDream *smf_create_smfDream( int * status ) {
   dream->invmatx = NULL;
 
   /* Doubles */
-  dream->jigstep = 0.0;
+  dream->jigscal = 0.0;
   dream->gridstep = 0.0;
   for ( i = 0; i < DREAM__MXSAM; i++ ) {
     (dream->jigpath)[i][0] = 0.0;

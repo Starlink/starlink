@@ -211,7 +211,7 @@ typedef struct smfDA {
 
 typedef struct smfDream {
   size_t nvert;              /* Number of jiggle vertices */
-  double jigstep;            /* Size of jiggle step size in arcsec */
+  double jigscal;            /* SMU jiggle pattern scale factor (arcsec) */
   int jigvert[DREAM__MXVERT][2];   /* Jiggle vertex positions in DREAM
 				      pattern */
   double jigpath[DREAM__MXSAM][2]; /* X, Y SMU positions during a cycle, in
