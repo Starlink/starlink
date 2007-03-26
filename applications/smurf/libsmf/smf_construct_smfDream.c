@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     dream = smf_construct_smfDream( smfData *data, const int nvert, 
-*                                     const int npath, const int *jigvert, 
+*                                     const int nsampcycle, const int *jigvert, 
 *                                     const double *jigpath, int * status );
 
 *  Arguments:
@@ -22,7 +22,7 @@
 *        smfData struct for the input raw DREAM data
 *     nvert = const int (Given)
 *        Number of vertices in the DREAM jiggle pattern
-*     npath = const int (Given)
+*     nsampcycle = const int (Given)
 *        Number of data samples in a single DREAM cycle
 *     jigvert = const int * (Given)
 *        Array of positions in the DREAM jiggle pattern
@@ -107,14 +107,13 @@
 
 #define FUNC_NAME "smf_construct_smfDream"
 
-smfDream *smf_construct_smfDream( smfData *data, const int nvert, const int npath, 
-				  const int *jigvert, const double *jigpath, 
-				  int * status ) {
+smfDream *smf_construct_smfDream( smfData *data, const int nvert, 
+				  const int nsampcycle, const int *jigvert, 
+				  const double *jigpath, int * status ) {
 
   /* Local variables */
   smfDream *dream = NULL;    /* DREAM struct to be filled */
   HDSLoc *drmloc;            /* Locator to DREAM extension in weights file */
-  int genint;                /* Generic interger used multiple times */
   smfData *griddata = NULL;  /* smfData for storing components in weights file */
   int *gridiptr = NULL;      /* Pointer to integer griddata data array */
   double *gridptr = NULL;    /* Pointer to double griddata data array  */
@@ -158,36 +157,20 @@ smfDream *smf_construct_smfDream( smfData *data, const int nvert, const int npat
       dream = smf_create_smfDream( status );
       if ( dream != NULL ) {
 	dream->nvert = (size_t)nvert;
-	dream->nsampcycle = (size_t)npath;
+	dream->nsampcycle = (size_t)nsampcycle;
+	dream->ncycles = (size_t)(data->dims)[2] / dream->nsampcycle;
 	/* Retrieve jiggle positions */
 	for (i=0; i<nvert; i++) {
 	  (dream->jigvert)[i][0] = jigvert[i];
 	  (dream->jigvert)[i][1] = jigvert[i+nvert];
 	}
 	/* Store SMU path over DREAM cycle */
-	for (i=0; i<npath; i++) {
+	for (i=0; i<nsampcycle; i++) {
 	  (dream->jigpath)[i][0] = jigpath[i];
-	  (dream->jigpath)[i][1] = jigpath[i+npath];
+	  (dream->jigpath)[i][1] = jigpath[i+nsampcycle];
 	}
-	/* Retrieve other parameters from the FITS header */
-	smf_fits_getD( hdr, "JIGSTEP", &(dream->jigstep), status );
-	smf_fits_getI( hdr, "NJIGLCYC", &genint, status );
-	dream->ncycles = (size_t)genint;
-	smf_fits_getI( hdr, "JIGL_CNT", &genint, status );
-	/* Now for a sanity check: the number of vertices stored in
-	   the FITS header must be equal to the value of nvert passed
-	   in to this routine */
-	if ( genint != nvert ) {
-	  if ( *status == SAI__OK ) {
-	    *status = SAI__ERROR;
-	    msgSeti("J",genint);
-	    msgSeti("M",nvert);
-	    errRep( FUNC_NAME, "Internal consistency check failed: "
-		    "number of jiggle points in FITS header (^J) "
-		    "not equal to number of mapped jiggle points (^M)", 
-		    status);
-	  }
-	}
+	/* Retrieve remaining parameters from the FITS header */
+	smf_fits_getD( hdr, "JIG_SCAL", &(dream->jigscal), status );
 
 	/* Now read reconstruction grid parameters */
 	/* Get weights file name from hdr */
