@@ -258,7 +258,7 @@ smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
 		       AstKeyMap *history, int * status );
 
 smfDream *
-smf_construct_smfDream( smfData *data, const int nvert, const int npath, 
+smf_construct_smfDream( smfData *data, const int nvert, const int nsampcycle, 
 			const int *jigvert, const double *jigpath, int * status );
 
 smfFile *
@@ -315,7 +315,7 @@ void smf_dream_calcweights ( smfData *data, const Grp *ogrp, const int index,
 void smf_dream_getgrid( const AstKeyMap *keymap, double *gridstep, int *ngrid, 
 			int **gridminmax, int gridpts[][2], int *status);
 
-void smf_dream_setjig( char subarray[], int npath, double gridstep, 
+void smf_dream_setjig( char subarray[], int nsampcycle, double gridstep, 
 		       double jigpath[][2], int *status);
 
 void smf_dreamsolve( smfData *data, int *status );

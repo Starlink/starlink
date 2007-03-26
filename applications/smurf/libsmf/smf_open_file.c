@@ -41,6 +41,7 @@
 
 *  Notes:
 *     - If a file has no FITS header then a warning is issued
+*     - JCMTState is NULL for non-time series data
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -152,6 +153,12 @@
 *-
 */
 
+/* Standard includes */
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+/* Starlink includes */
 #include "sae_par.h"
 #include "star/ndg.h"
 #include "ndf.h"
@@ -160,12 +167,14 @@
 #include "smf_typ.h"
 #include "smf_err.h"
 #include "mers.h"
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include "sc2da/sc2store.h"
 #include "star/kaplibs.h"
 #include "kpg_err.h"
+
+/* SC2DA includes */
+#include "sc2da/sc2store.h"
+#include "sc2da/sc2ast.h"
+
+/* SMURF includes */
 #include "libacsis/acsis.h"
 #include "libaztec/aztec.h"
 
@@ -212,7 +221,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
   int *jigvert = NULL;       /* Pointer to jiggle vertices in DREAM pattern */
   double *jigpath = NULL;    /* Pointer to jiggle path */
   smfDream *dream = NULL;    /* Pointer to DREAM parameters */
-  int npath;                 /* Number of positions in jiggle path */
+  int nsampcycle;            /* Number of positions in jiggle path */
   int nvert;                 /* Number of vertices in DREAM pattern */
   int jigvndf;               /* NDF identifier for jiggle vertices */
   int jigpndf;               /* NDF identifier for SMU path */
@@ -390,7 +399,9 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	/* Store the INSTAP values */
 	smf_instap_get( hdr, status );
 
-	/* If not time series, then we can retrieve the stored WCS info */
+	/* If not time series, then we can retrieve the stored WCS
+	   info. Note that the JCMTState parameter is filled ONLY for
+	   time series data */
 	if ( !isTseries ) {
 	  ndfGtwcs( indf, &(hdr->wcs), status);
 	  hdr->nframes = 1;
@@ -474,8 +485,8 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 			  &nfits, headrec, &colsize, &rowsize, 
 			  &nframes, &(da->nflat), da->flatname,
 			  &tmpState, &tdata, &dksquid, 
-			  &flatcal, &flatpar, &jigvert, &nvert, &jigpath, &npath,
-			  status);
+			  &flatcal, &flatpar, &jigvert, &nvert, &jigpath, 
+			  &nsampcycle, status);
 
       if (*status == SAI__OK) {
 	/* Free header info if no longer needed */
@@ -524,7 +535,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	  smf_telpos_get( hdr, status );
 
    	  /* Store the INSTAP values */
- 	  smf_instap_get( hdr, status );
+	  smf_instap_get( hdr, status );
 
 	  /* Determine the instrument */
 	  hdr->instrument = smf_inst_get( hdr, status );
@@ -584,7 +595,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	file->isTstream = 1;
 
 	/* Store DREAM parameters */
-	dream = smf_construct_smfDream( *data, nvert, npath, jigvert, jigpath, 
+	dream = smf_construct_smfDream( *data, nvert, nsampcycle, jigvert, jigpath, 
 					status );
 	(*data)->dream = dream;
       }
@@ -648,14 +659,14 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	}
 	if ( jigpdata != NULL ) {
 	  jigpath = (jigpdata->pntr)[0];
-	  npath = (int)(jigpdata->dims)[0];
+	  nsampcycle = (int)(jigpdata->dims)[0];
 	} else {
 	  if (*status == SAI__OK ) {
 	    *status = SAI__ERROR;
 	    errRep(FUNC_NAME, "smfData for SMU path is NULL", status);
 	  }
 	}
-	dream = smf_construct_smfDream( *data, nvert, npath, jigvert, jigpath, 
+	dream = smf_construct_smfDream( *data, nvert, nsampcycle, jigvert, jigpath, 
 					status );
 	(*data)->dream = dream;
     
