@@ -15,7 +15,7 @@
 *  Invocation:
 *     sc2sim_smupath ( int nvert, double vertex_t, int jig_ver[][2],
 *                      double jig_stepx, double jig_stepy, int movecode,
-*                      int nppp, double sample_t, double smu_offset,
+*                      int nppp, double steptime, double smu_offset,
 *                      int pathsz, double jigpath[][2], int *status )
 
 *  Arguments:
@@ -43,7 +43,7 @@
 *     nppp = int (Given)
 *        The number of calculated coordinates in the path
 *        between 2 successive vertices
-*     sample_t = double (Given)
+*     steptime = double (Given)
 *        Time between samples in msec
 *     smu_offset = double (Given)
 *        smu timing offset in msec
@@ -119,7 +119,7 @@
 
 void sc2sim_smupath ( int nvert, double vertex_t, int jig_vert[][2],
                       double jig_stepx, double jig_stepy, int movecode, 
-                      int nppp, double sample_t, double smu_offset,
+                      int nppp, double steptime, double smu_offset,
                       int pathsz, double jigpath[][2], int *status )
  
 {
@@ -156,7 +156,7 @@ void sc2sim_smupath ( int nvert, double vertex_t, int jig_vert[][2],
       }
 
       for ( j=0; j<np; j++ ) {
-         t = (double)j * sample_t + smu_offset;
+         t = (double)j * steptime + smu_offset;
          sc2sim_smupos ( t, vertex_t, movecode, nvert, vertxy,
            &(jigpath[j][0]), &(jigpath[j][1]), status );
       }

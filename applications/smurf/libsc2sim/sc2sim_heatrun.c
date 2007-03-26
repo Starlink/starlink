@@ -326,7 +326,7 @@ void sc2sim_heatrun ( struct sc2sim_obs_struct *inx,
    /* Store the data in output file file_name */
    /*   sc2sim_ndfwrheat ( sinx->add_atm, sinx->add_fnoise, sinx->add_pns,
                       inx->heatstart, inx->heatstep, filename, inx->nbolx, 
-                      inx->nboly, inx->sample_t, sinx->subname, numsamples, 
+                      inx->nboly, inx->steptime, sinx->subname, numsamples, 
                       nflat, flatname, head, digits, dksquid, flatcal, 
                       flatpar, filter, sinx->atstart, sinx->atend, status );*/
 

@@ -12,7 +12,7 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2sim_getpat ( int nvert, int smu_samples, doubel sample_t, 
+*     sc2sim_getpat ( int nvert, int smu_samples, double steptime, 
 *                     double smu_offset, int conv-shape, double conv_sig,
 *                     int move_code, double jig_stepx, double jig_stepy,
 *                     int jig_vert[][2], int *cycle_samples, 
@@ -23,7 +23,7 @@
 *        Number of vertices per pattern
 *     smu_samples = int (Given)
 *        Number of samples between vertices
-*     sample_t = double (Given)
+*     steptime = double (Given)
 *        Time between data samples in msec
 *     smu_offset = double (Given)
 *        SMU timing offset in msec
@@ -101,7 +101,7 @@ void sc2sim_getpat
 (
 int nvert,            /* Number of vertices per pattern (given) */
 int smu_samples,      /* number of samples between vertices (given) */
-double sample_t,      /* time between data samples in msec (given) */
+double steptime,      /* time between data samples in msec (given) */
 double smu_offset,    /* smu timing offset in msec (given) */
 int conv_shape,       /* choice of convolution function (given) */
 double conv_sig,      /* convolution parameter (given) */
@@ -163,9 +163,9 @@ int *status           /* global status (given and returned) */
          return;
       }
 
-      vertex_t = sample_t * smu_samples;
+      vertex_t = steptime * smu_samples;
       sc2sim_smupath ( nvert, vertex_t, jig_vert, jig_stepx, jig_stepy, 
-                      move_code, smu_samples, sample_t, smu_offset,
+                      move_code, smu_samples, steptime, smu_offset,
                       *cycle_samples, pattern, status );
 
    }

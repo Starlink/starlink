@@ -326,7 +326,7 @@ void sc2sim_getpat
 (
 int nvert,            /* Number of vertices per pattern (given) */
 int smu_samples,      /* number of samples between vertices (given) */
-double sample_t,      /* time between data samples in msec (given) */
+double steptime,      /* time between data samples in msec (given) */
 double smu_offset,    /* smu timing offset in msec (given) */
 int conv_shape,       /* choice of convolution function (given) */
 double conv_sig,      /* convolution parameter (given) */
@@ -653,7 +653,7 @@ void sc2sim_simstats ( int npoints, double samptime, int maxwrite, int nbol,
 
 void sc2sim_smupath ( int nvert, double vertex_t, int jig_ver[][2],
                       double jig_stepx, double jig_stepy, int movecode,
-                      int nppp, double sample_t, double smu_offset,
+                      int nppp, double steptime, double smu_offset,
                       int pathsz, double jigpath[][2], int *status );
 
 void sc2sim_smupos ( double t, double vertex_t, int movecode, 

@@ -446,8 +446,8 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       inx->ra = ra;
    }
 
-   if ( !astMapGet0D ( keymap, "SAMPLE_T", &(inx->sample_t) ) )
-      inx->sample_t = 5.0;
+   if ( !astMapGet0D ( keymap, "STEPTIME", &(inx->steptime) ) )
+      inx->steptime = 5.0;
 
    if ( !astMapGet0D ( keymap, "SCAN_ANGLE", &(inx->scan_angle) ) )
       inx->scan_angle = 0.0;

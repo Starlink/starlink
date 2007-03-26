@@ -616,7 +616,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
             The number of values is returned in count, and should be equal
             to the number of samples per cycle. */
 
-        sc2sim_getpat ( inx->nvert, inx->smu_samples, inx->sample_t,
+        sc2sim_getpat ( inx->nvert, inx->smu_samples, inx->steptime,
                         inx->smu_offset+sinx->smu_terr, inx->conv_shape, 
                         inx->conv_sig, inx->smu_move, inx->jig_step_x, 
                         inx->jig_step_y, inx->jig_vert, &jigsamples, jigptr,
@@ -734,7 +734,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
   /* Report simulation properties if requested */
   if ( simstats ) {
-    sc2sim_simstats( count, inx->sample_t, maxwrite, nbol, narray, inx->nboly, 
+    sc2sim_simstats( count, inx->steptime, maxwrite, nbol, narray, inx->nboly, 
 		     status );
     goto CLEANUP;
   }

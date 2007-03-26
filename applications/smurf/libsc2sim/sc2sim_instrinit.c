@@ -174,7 +174,7 @@ void sc2sim_instrinit( struct sc2sim_obs_struct *inx,
   sc2sim_getobspar ( obskeymap, inx, status );
   sc2sim_getsimpar ( simkeymap, sinx, status );
 
-  samptime = inx->sample_t / 1000.0;
+  samptime = inx->steptime / 1000.0;
 
   /* Get the bolometer information */
   if( *status == SAI__OK ) {
@@ -210,7 +210,7 @@ void sc2sim_instrinit( struct sc2sim_obs_struct *inx,
       exp(-ti/DECAY) divided by the sum of all 16 values.
       This is practically identical to the fb.exp(-t1.fb) formula
       used in the DREAM software with fb=1/DECAY. */
-  sc2sim_getweights ( decay, inx->sample_t, SC2SIM__MXIRF, weights, status );
+  sc2sim_getweights ( decay, inx->steptime, SC2SIM__MXIRF, weights, status );
  
   /* Get the subsystem number */ 
   sc2ast_name2num( sinx->subname, &subnum, status );

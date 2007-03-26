@@ -226,7 +226,7 @@ int *status       /* global status (given and returned) */
                  "flag for converting flux to current", 0 );
    astSetFitsI ( fitschan, "NBOLX", inx->nbolx, "number of bolometers in X direction", 0 );
    astSetFitsI ( fitschan, "NBOLY", inx->nboly, "number of bolometers in Y direction", 0 );
-   astSetFitsF ( fitschan, "SAMPLE_T", inx->sample_t, "[ms] sample interval in msec", 0 );
+   astSetFitsF ( fitschan, "STEPTIME", inx->steptime, "[ms] Time interval between samples", 0 );
    astSetFitsS ( fitschan, "SUBARRAY", sinx->subname, "subarray name", 0 );
    astSetFitsI ( fitschan, "NUMSAMP", numsamples, "number of samples", 0 );
    astSetFitsF ( fitschan, "AMSTART", sinx->airmass, "Air mass at start", 0 );
@@ -248,14 +248,8 @@ int *status       /* global status (given and returned) */
    astSetFitsF ( fitschan, "INSTAP_Y", inx->instap_y, "[arcsec] Y focal plane offset", 0 );
    
    if ( strncmp( inx->obsmode, "DREAM", 5) == 0 ) {
-
-      astSetFitsI ( fitschan, "JIGL_CNT", inx->nvert, 
-                    "Number of positions in DREAM pattern", 0 );
-      astSetFitsI ( fitschan, "NJIGLCYC", sinx->ncycle, 
-                    "Number of times around DREAM pattern", 0 );
-      astSetFitsF ( fitschan, "JIGSTEP", inx->jig_step_x, 
-                    "[arcsec] Size of jiggle step", 0 );
-
+     astSetFitsF ( fitschan, "JIG_SCAL", inx->jig_step_x, 
+		   "[arcsec] SMU jiggle pattern scale factor", 0 );
 
      /* Construct weights name from subarray */
      strncat( weightsname, "dreamweights_", 13);
@@ -263,8 +257,7 @@ int *status       /* global status (given and returned) */
      strncat( weightsname, ".sdf", 4);
      astSetFitsS ( fitschan, "DRMWGHTS", weightsname, 
                    "Name of DREAM weights file", 0 );
-
-  }
+   }
 
    /* Determine extent of the map from posptr + known size of the arrays */
    for( i=0; i<numsamples; i++ ) {

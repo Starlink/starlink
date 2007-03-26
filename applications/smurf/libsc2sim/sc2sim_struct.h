@@ -36,7 +36,6 @@
                 parameters (jb)
     21Dec2006 : Add instap & instap_x/y (agg)
     22Dec2006 : Add planetnum (agg)
-    28Feb2007 : Add memcheck (agg)
 */
 #include "libsc2sim/sc2sim_par.h"
 
@@ -111,7 +110,7 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
   char pong_type[80];         /* Type of PONG scan (straight or curve) */
   double pong_vmax;           /* Telescope max velocities (arcsec/sec) */
   double ra;                  /* right ascension in radians */
-  double sample_t;            /* sample time in msec */
+  double steptime;            /* sample time in msec */
   double scan_angle;          /* angle of pattern relative to telescope
 				 axes in radians anticlockwise  */
   int smu_move;               /* Code for the SMU move algorithm */
@@ -156,8 +155,6 @@ struct sc2sim_sim_struct      /* parameters read from sim input file */
   double casstrans;           /* transmission of Cass optics (%) */
   int flux2cur;               /* Convert power to current 1=yes, 0=no */
   double meanatm;             /* mean expected atmospheric signal pW */
-  int memcheck;               /* Flag to report memory requirements for given 
-				 simulation */
   double nasang;              /* polarisation angle of Nasmyth optics (deg) */
   double naspol;              /* polarisation of Nasmyth optics (%) */
   double nastrans;            /* transmission of Nasmyth optics (%) */

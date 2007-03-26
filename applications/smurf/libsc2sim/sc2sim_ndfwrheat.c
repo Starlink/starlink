@@ -170,7 +170,7 @@ int *status        /* global status (given and returned) */
                  "number of bolometers in X direction", 0 );
    astSetFitsI ( fitschan, "NBOLY", inx->nboly, 
                  "number of bolometers in Y direction", 0 );
-   astSetFitsF ( fitschan, "SAMPLE_T", inx->sample_t, "The sample interval in msec", 0 );
+   astSetFitsF ( fitschan, "STEPTIME", inx->steptime, "[ms] Time interval between samples", 0 );
    astSetFitsS ( fitschan, "SUBARRAY", sinx->subname, "subarray name", 0 );
    astSetFitsI ( fitschan, "NUMSAMP", numsamples, "number of samples", 0 );
    astSetFitsS ( fitschan, "FILTER", filter, "filter used", 0 );
