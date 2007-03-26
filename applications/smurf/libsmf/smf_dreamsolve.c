@@ -212,7 +212,7 @@ void smf_dreamsolve( smfData *data, int *status ) {
     nvert = dream->nvert;
     ngrid = dream->ngrid;    
     nsampcycle = dream->nsampcycle;
-    smf_fits_getI( data->hdr, "NJIGLCYC", &ncycles, status );
+    ncycles = nframes / nsampcycle;
 
     /* Pointers to the weights arrays. If either of these are NULL
      then it means we were not able to find the weights file */
