@@ -191,22 +191,8 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
       /* BEGIN processing */
       /* Read DREAM parameters from input file */
       smf_fits_getS( hdr, "SUBARRAY", subarray, SUB__MAXNAM+1, status);
-      smf_fits_getD( hdr, "SAMPLE_T", &tsamp, status);
+      smf_fits_getD( hdr, "STEPTIME", &tsamp, status);
 
-      /* Get number of samples in file for consistency check */
-      smf_fits_getI( hdr, "NUMSAMP", &numsamples, status);
-      /* Check numsamples and nframes are the same */
-      if ( numsamples != nframes ) {
-	if ( *status == SAI__OK ) {
-	  *status = SAI__ERROR;
-	  msgSeti("F",numsamples);
-	  msgSeti("S",nframes);
-	  errRep(FUNC_NAME, "Internal consistency check failed: "
-		 "number of samples from FITS header (^F) is not equal to "
-		 "number of samples in time stream (^S)",
-		 status);
-	}
-      }
       nsampcycle = (int)(dream->nsampcycle);
       dream->gridstep = gridstep;
       dream->ngrid = (size_t)ngrid;
