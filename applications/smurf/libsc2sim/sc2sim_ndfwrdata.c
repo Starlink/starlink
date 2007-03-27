@@ -250,6 +250,8 @@ int *status       /* global status (given and returned) */
    if ( strncmp( inx->obsmode, "DREAM", 5) == 0 ) {
      astSetFitsF ( fitschan, "JIG_SCAL", inx->jig_step_x, 
 		   "[arcsec] SMU jiggle pattern scale factor", 0 );
+     astSetFitsI ( fitschan, "JIGL_CNT", inx->nvert,
+		   "Number of points in DREAM pattern", 0 );
 
      /* Construct weights name from subarray */
      strncat( weightsname, "dreamweights_", 13);
