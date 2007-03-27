@@ -84,11 +84,13 @@
 *        loop so it's not done every frame.
 *     2006-10-12 (AGG):
 *        Created smf_subtract_plane1 from original smf_subtract_plane
+*     2007-03-23 (TIMJ):
+*        Only do the output messsages if message filter is suitable.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2006 University of British Columbia.
-*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2006-2007 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -139,6 +141,7 @@
 void smf_subtract_plane1( smfData *data, const char *fittype, int *status ) {
 
   /* Local variables */
+  int curlevel;             /* Current messaging level */
   smfHead *hdr;             /* Pointer to full header struct */
   dim_t i;                  /* Loop counter */
   dim_t j;                  /* Loop counter */
@@ -423,24 +426,28 @@ void smf_subtract_plane1( smfData *data, const char *fittype, int *status ) {
 	indata[index] -= sky;
       }
     }
-      /* Debugging info */
-      msgSeti("K",k+1);
-      msgSetc("F",fittype);
-      msgOutif(MSG__VERB," ", 
-		" Fit results for timeslice ^K (fit type = ^F)", status );
-      msgSetd("DS",sky0);
-      msgOutif(MSG__VERB," ", 
-		"              Sky0   = ^DS, ", status );
-      msgSetd("DE",dskyel);
-      msgOutif(MSG__VERB," ", 
-		"              Dskyel = ^DE, ", status );
-      msgSetd("DA",dskyaz);
-      msgOutif(MSG__VERB," ", 
-		"              Dskyaz = ^DA", status );
-      msgSetd("X",chisq);
-      msgOutif(MSG__VERB," ", 
-		"              X^2 = ^X", status );
- 
+      /* Debugging info - do not set all the tokens unless we
+	 actually need to print them out */
+      msgIflev( &curlevel );
+      if (curlevel >= MSG__VERB) {
+	msgSeti("K",k+1);
+	msgSetc("F",fittype);
+	msgOutif(MSG__VERB," ", 
+		 " Fit results for timeslice ^K (fit type = ^F)", status );
+	msgSetd("DS",sky0);
+	msgOutif(MSG__VERB," ", 
+		 "              Sky0   = ^DS, ", status );
+	msgSetd("DE",dskyel);
+	msgOutif(MSG__VERB," ", 
+		 "              Dskyel = ^DE, ", status );
+	msgSetd("DA",dskyaz);
+	msgOutif(MSG__VERB," ", 
+		 "              Dskyaz = ^DA", status );
+	msgSetd("X",chisq);
+	msgOutif(MSG__VERB," ", 
+		 "              X^2 = ^X", status );
+      } 
+
     /* Reset coordinate frame to that on entry if necessary */
     if (needast) {
       if ( *status == SAI__OK) {
