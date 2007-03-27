@@ -28,8 +28,10 @@
 
 
 /* Float data: Prevent auto conversions.
- * No speed hits if this is compiled with gcc -O. */
-inline float SWAP_FLOAT( float x ) 
+ * No speed hits if this is compiled with gcc -O. 
+ * Need static functions for C99 compliance (previously just used from C++).
+ */
+static inline float SWAP_FLOAT( float x ) 
 {
     union {float f; unsigned int i;} u;
     u.f = x;
@@ -37,7 +39,7 @@ inline float SWAP_FLOAT( float x )
     return u.f;
 }
 
-inline float SWAP_DOUBLE( double x ) 
+static inline float SWAP_DOUBLE( double x ) 
 {
     union {double d; unsigned int l[2];} u;
     unsigned int tmp;
@@ -49,7 +51,7 @@ inline float SWAP_DOUBLE( double x )
     return u.d;
 }
 
-inline int SWAP_INT(int x) 
+static inline int SWAP_INT(int x) 
 {
     union {int i; unsigned int ui;} u;
     u.i = x;
@@ -57,7 +59,7 @@ inline int SWAP_INT(int x)
     return u.i;
 }
 
-inline int SWAP_SHORT( short x ) 
+static inline int SWAP_SHORT( short x ) 
 {
     union {short i; unsigned short ui;} u;
     u.i = x;
