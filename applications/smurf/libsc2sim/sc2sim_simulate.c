@@ -210,6 +210,8 @@
 *     2007-03-20 (AGG):
 *        Update time passed to simframe to be the number of seconds
 *        since the simulation started, not the full MJD.
+*     2007-03-27 (AGG):
+*        Make this time-since-start a new variable for clarity
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -401,7 +403,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double sky_x_hor=0;             /* effective x hor. off. on sky (bor+jig) */
   double sky_y_hor=0;             /* effective y hor. off. on sky (bor+jig) */
   JCMTState state;                /* Telescope state at one time slice */
-  double start_time=0;            /* time of start of current scan */
+  double start_time=0.0;          /* time of start of current scan */
   char subarrays[8][80];          /* list of parsed subarray names */
   int subnum;                     /* Subarray number */
   double taiutc;                  /* Difference between TAI and UTC time (s) */
@@ -412,6 +414,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double temp1;                   /* store temporary values */
   double temp2;                   /* store temporary values */
   double temp3;                   /* store temporary values */
+  double timesincestart = 0.0;    /* Time since start of simulation */
   double tt;                      /* Terrestrial Time (TT) for
 				     calculating planet position */
   float ttau[3];                  /* output of wvmOpt */
@@ -1112,6 +1115,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
         /* For each subarray, retrieve the wcs frameset, then generate
            the frame of data */
+	timesincestart = ( mjuldate[frame] - inx->mjdaystart ) * SPD;
         for ( k = 0; k < narray; k++ ) {
 
           /* Get the numerical subarray number from the name */
@@ -1126,7 +1130,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
             sc2sim_simframe ( *inx, *sinx, astnaxes, astscale, astdata->pntr[0], 
 			      atmnaxes, atmscale, atmdata->pntr[0], coeffs, 
 			      fs, heater, nbol, frame, nterms, noisecoeffs, 
-			      pzero, samptime, (start_time-inx->mjdaystart)*SPD, 
+			      pzero, samptime, timesincestart, 
 			      sinx->telemission, 
 			      weights, sky2map, xbolo, ybolo, xbc, ybc, 
 			      &(posptr[( (curchunk * maxwrite) + frame )*2]), 
