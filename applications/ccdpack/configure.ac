@@ -47,6 +47,7 @@ if test "${TCL_PREFIX}" != ""; then
    LDFLAGS="$STAR_LDFLAGS $LDFLAGS"
    have_itcl=1
    my_save_LIBS="$LIBS"
+   LIBS="$LIBS $X_LIBS $X_EXTRA_LIBS $X_PRE_LIBS -lX11"
    AC_CHECK_LIB(itcl$ITCL_VERSION,Itcl_Init,,[unset have_itcl],[$TCL_LIBS])
    AC_CHECK_LIB(itk$ITCL_VERSION,Itk_Init,,[unset have_itcl],[-litcl$ITCL_VERSION -litclstub3.3 $TK_LIBS $TCL_LIBS])
    AC_MSG_CHECKING([whether to use incr tcl])
