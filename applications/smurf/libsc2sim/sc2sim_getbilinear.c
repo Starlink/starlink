@@ -76,10 +76,10 @@
 */
 
 /* Starlink includes */
-
+#include "mers.h"
+#include "sae_par.h"
 
 /* SC2SIM includes */
-#include "mers.h"
 #include "sc2sim.h"
 
 #define FUNC_NAME "sc2sim_getbilinear"
@@ -130,10 +130,10 @@ int *status          /* global status (given and returned) */
              + c * ( dy - dy * dx )
              + d * dy * dx;
    } else {
-      *status = DITS__APP_ERROR;
+      *status = SAI__ERROR;
       msgSeti("XPIX", ixpix);
       msgSeti("YPIX", iypix);
-      errRep( FUNC_NAME, "data point outside image ^IPIX ^YPIX", status);
+      errRep( FUNC_NAME, "data point outside image ^XPIX ^YPIX", status);
    }
 
 }
