@@ -10424,7 +10424,7 @@ f        This argument specifies the scheme to be used for dividing
 *        It may be used to select
 *        from a set of pre-defined schemes by supplying one of the
 *        values described in the "Pixel Spreading Schemes"
-*        section in the descrioption of the 
+*        section in the description of the 
 c        astRebin<X> functions.
 f        AST_REBIN<X> routines.
 *        If a value of zero is supplied, then the default linear spreading 
@@ -10436,7 +10436,7 @@ f        An optional array which should contain
 *        any additional parameter values required by the pixel
 *        spreading scheme. If such parameters are required, this
 *        will be noted in the "Pixel Spreading Schemes" section in the 
-*        descrioption of the 
+*        description of the 
 c        astRebin<X> functions.
 f        AST_REBIN<X> routines.
 *
