@@ -136,6 +136,8 @@
 #         Add jcmtstate2cat
 #     01-MAR-2007 (AGG):
 #         Add SIMSTATS parameter for SC2SIM
+#     28-MAR-2007 (TIMJ):
+#         Add missing helpkey
 #     {enter_changes_here}
 
 #  Bugs:
@@ -488,6 +490,7 @@ package @PACKAGE@ {
 	    position 3
             type INTEGER
             prompt {Polynomial order}
+            helpkey *
           }
 
 	  parameter msg_filter {
@@ -568,6 +571,7 @@ package @PACKAGE@ {
             ppath GLOBAL CURRENT
             association <-GLOBAL.DATA_ARRAY
             prompt {Input raw data file}
+            helpkey *
           }
 
           parameter out {
@@ -578,6 +582,7 @@ package @PACKAGE@ {
             ppath GLOBAL CURRENT
             association ->GLOBAL.DATA_ARRAY
             prompt {Output weights file}
+            helpkey *
           }
 
 	  parameter config {
@@ -611,6 +616,7 @@ package @PACKAGE@ {
             ppath GLOBAL CURRENT
             association <-GLOBAL.DATA_ARRAY
             prompt {Input data file}
+            helpkey *
           }
           parameter out {
             position 2
@@ -620,6 +626,7 @@ package @PACKAGE@ {
             ppath GLOBAL CURRENT
             association ->GLOBAL.DATA_ARRAY
             prompt {Output data file}
+            helpkey *
           }
           parameter msg_filter {
 	    type _CHAR
@@ -642,6 +649,7 @@ package @PACKAGE@ {
             ppath GLOBAL CURRENT
             association <-GLOBAL.DATA_ARRAY
             prompt {Input data file(s)}
+            helpkey *
          }
          parameter out {
             position 2
@@ -651,6 +659,7 @@ package @PACKAGE@ {
             ppath GLOBAL CURRENT
             association ->GLOBAL.DATA_ARRAY
             prompt {Output data file(s)}
+            helpkey *
          }
          parameter msg_filter {
 	    type _CHAR
