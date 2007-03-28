@@ -10716,7 +10716,9 @@ f     routine
 *     the final required variances).
 *     - AST__VARWGT: Indicates that the input data should be weighted by
 *     the reciprocal of the input variances. Otherwise, all input data are 
-*     given equal weight.
+*     given equal weight. If this flag is specified, the calculation of the 
+*     output variances (if any) is modified to take account of the
+*     varying weights assigned to the input data values.
 
 *  Propagation of Missing Data:
 *     Instances of missing data (bad pixels) in the output grid are
