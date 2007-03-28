@@ -471,6 +471,7 @@ void smurf_makemap( int *status ) {
     for(i=1; i<=size; i++ ) {
       /* Read data from the ith input file in the group */      
       smf_open_and_flatfield( igrp, NULL, i, &data, status ); 
+      if (*status != SAI__OK) break;
 
       /* ****** 
 	 These calls are not needed - we should probably check that we
@@ -513,7 +514,8 @@ void smurf_makemap( int *status ) {
       }
 
       /* Handle output FITS header creation */
-      smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obsidmap, status );
+      if (*status == SAI__OK)
+	smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obsidmap, status );
 
       if ( usebad ) {
 	/* Retrieve the NDF identifier for this input file */   
