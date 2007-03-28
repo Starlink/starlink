@@ -145,7 +145,7 @@
 *  Functions resulting in DOUBLE PRECISION.
 *  =======================================
 
-      NUM_BTOD( NUM_ARGB )    = NUM_ARGB
+      NUM_BTOD( NUM_ARGB )    = DBLE( NUM_ARGB )
 
       NUM_UBTOD( NUM_ARGUB )  = DBLE( NUM1_UBTOI( NUM_ARGUB ) )
 
@@ -181,7 +181,7 @@
 *  Functions resulting in REAL.
 *  ===========================
 
-      NUM_BTOR( NUM_ARGB )    = NUM_ARGB
+      NUM_BTOR( NUM_ARGB )    = REAL( NUM_ARGB )
 
       NUM_UBTOR( NUM_ARGUB )  = REAL( NUM1_UBTOI( NUM_ARGUB ) )
 
