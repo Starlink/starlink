@@ -1,0 +1,10 @@
+# #########################
+# STARE-specific parameters
+# #########################
+
+# Select the STARE observing mode
+obsmode=stare
+
+# Number of samples/measurements to make
+numsamples=600
+

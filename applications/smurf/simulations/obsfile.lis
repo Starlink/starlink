@@ -1,0 +1,42 @@
+# ##################################################################
+#                 OBSERVATION PARAMETERS
+# All of these parameters should be defined for all observing modes
+# ##################################################################
+
+# RA/Dec as HH/DD:MM:SS.S
+ra=00:00:00.0
+dec=00:00:00.0
+
+# Pick your wavelength (m)
+lambda=0.85e-3
+
+# Start observing on this date (UT MJD)
+mjdaystart=53997.5
+
+# Sample time (s)
+steptime=5.0e-3
+
+# ##################################################################
+# Optional parameters - uncomment as desired
+# ##################################################################
+
+# Are we offset tracking? If so, set instap to desired subarray
+#instap=s8d
+
+# Choose a planet from moon, venus, mars, jupiter, saturn, uranus, neptune
+#planet=mars
+
+# Coordinate frame used for the observation. Choices are radec, azel
+# or nasmyth. Default is radec.
+#coordframe=radec
+
+# Distance between bolometers in X & Y directions (arcsec). Default is
+# as given bsed on current knowledge of JCMT and SCUBA-2 optics, but
+# may get updated once the instrument is on the telescope.
+#bol_distx=6.28
+#bol_disty=6.28
+
+# ##################################################################
+# End of common parameters
+# Observing mode-specific parameters should follow
+# ##################################################################

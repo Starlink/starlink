@@ -1,0 +1,75 @@
+# ##################################################################
+#                 SIMULATION PARAMETERS
+# All of these parameters should be defined for all observing modes
+# ##################################################################
+
+# List of subarrays to simulate data for (semi-colon separated). Note
+# that for flatfield runs (obsmode=heatrun), only ONE subarray should
+# be specified.
+subname=s8a;s8b;s8c;s8d
+
+# Name of model atmosphere file
+atmname=atm.sdf
+
+# Name of model astronomical sky file
+astname=ast.sdf
+
+# Add a model atmosphere to the simulation?
+add_atm=0
+
+# Add photon noise?
+add_pns=0
+
+# Add 1/f noise?
+add_fnoise=0
+
+# Zenith opacity at 225 GHz
+tauzen=0.05
+
+# Wavelength-dependent parameters:
+# Estimated filter bandwidth (GHz), 35/65 for 850/450 um respectively
+bandGHz=35
+
+# Coupling efficiency: 0.179 at 850 um, 0.721 at 450 um
+aomega=0.179
+
+# Telescope background emission per detector (pW), typically 4/29 pW
+# at 850/450 um respectively
+telemission=4.0
+
+# Mean atmospheric level to use as background if NOT using a model
+# atmosphere (pW), i.e. add_atm=0. Values depend on transmission
+# roughly as follows:
+#  um  t(%) meanatm tauCSO (approx)
+# 850  85     3.4    0.04
+# 850  20    16.4    0.40
+# 450  50    56      0.04
+# 450   5   140      0.15
+meanatm=7.0
+
+# Ambient temperature at start and end of simulation, used for
+# calculating water-vapour brightness temperatures (deg C)
+atstart=5.0
+atend=5.0
+
+# ##################################################################
+# Optional parameters - uncomment as desired
+# ##################################################################
+
+# Parameters for the model atmosphere (if used). Advised to leave
+# these alone unless you understand what you're doing
+# Reference corner frequency (Hz)
+#atmrefnu=0.5
+# Reference velocity (m/s)
+#atmrefvel=15.0
+# Atmospheric background velocity in X,Y directions (arcsec/s)
+#atmxvel=5000.0
+#atmyvel=0.0
+# Atmospheric background offset in X,Y directions (arcsec)
+#atmzerox=5000.0
+#atmzeroy=5000.0
+
+# ##################################################################
+# End of common parameters
+# Observing mode-specific parameters should follow
+# ##################################################################

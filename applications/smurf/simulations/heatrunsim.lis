@@ -1,0 +1,7 @@
+# ######################################
+# HEATRUN-specific simulation parameters
+# ######################################
+
+# Flag to specify whether to add heater noise
+add_hnoise=0
+
