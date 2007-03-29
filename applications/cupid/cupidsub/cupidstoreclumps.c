@@ -12,7 +12,7 @@
 #include <stdio.h>
 
 /* Local Constants: */
-#define MAXCAT   50   /* Max length of catalogue name */
+#define MAXCAT   4096 /* Max length of catalogue name */
 #define LOGTAB   14   /* Width of one log file column, in characters */
 
 void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj, 
@@ -113,6 +113,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -126,6 +127,8 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *        Added parameters "hist" and "logfile".
 *     23-MAR-2007 (DSB):
 *        Added parameter "nclumps".
+*     28-MAR-2007 (TIMJ):
+*        Up MAXCAT to 4096 characters from 50.
 *     {enter_further_changes_here}
 
 *  Bugs:
