@@ -125,6 +125,10 @@
 *        - renamed isNDF to isFlat to be less confusing
 *        - only issue a warning if data not 2d or 3d to handle iterative
 *          map-maker model containers.
+*     2007-03028 (TIMJ):
+*        - Annul SCU2RED locator even if SCANFIT is not present
+*        - Noting Ed's comment that isFlat is less confusing, I disagree
+*          because isNDF applied to non-SCUBA2 data
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -357,12 +361,14 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 
 	  /* Release these resources immediately as they're not needed */
 	  ndfAnnul( &gndf, status );
-	  datAnnul( &xloc, status );
 	} else {
 	  errAnnul(status);
 	  msgOutif(MSG__VERB," ", 
 		   "SCU2RED exists, but not SCANFIT: we probably have STARE or DREAM data", status);
 	}
+	/* Annul the locator */
+	datAnnul( &xloc, status );
+
       } else {
 	msgOutif(MSG__VERB," ", 
 		 "File has no SCU2RED extension. ", status);
