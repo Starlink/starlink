@@ -10706,7 +10706,9 @@ f     in the Fortran interface to AST.)
 *     be used as a work array to accumulate the temporary values needed to 
 *     generate output variances based on the spread of input data values 
 *     contributing to each output pixel. If this flag is given, any supplied 
-*     input variances are ignored. If the generation of such output variances 
+*     input variances have no effect on the output variances (although input 
+*     variances will still be used to weight the input data if the AST__VARWGT
+*     flag is also supplied). If the generation of such output variances 
 *     is required, this flag should be used on every invocation of this
 c     function
 f     routine
