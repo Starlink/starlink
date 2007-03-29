@@ -137,6 +137,9 @@ if ( ${?@LD_LIB_PATH@} ) then
          case *-cygwin*:
             setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/x86"
          breaksw
+         case *-pc-solaris*:
+            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/x86"
+         breaksw
          case *-sun*:
             setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/sparc"
          breaksw
