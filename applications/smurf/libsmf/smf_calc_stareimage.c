@@ -30,16 +30,20 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2006-10-25 (AGG):
 *        Initial version
+*     2007-03-28 (TIMJ):
+*        Free temporary buffer.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2006 University of British Columbia.
+*     Copyright (C) 2007 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -146,6 +150,8 @@ void smf_calc_stareimage( smfData *data, const int naver, int *status) {
       /* Store the averaged data as an image */
       smf_store_image( data, scu2redloc, j, 2, dims, naver, 0, 0, avdata, zero, 
 		       status);
+
+      smf_free( zero, status );
     }
     /* Add a history entry if everything's OK */
     smf_history_write(data, "smf_calc_stareimage", 
