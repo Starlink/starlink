@@ -79,12 +79,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -153,7 +153,7 @@
 *  Status:
       INTEGER STATUS             ! Global status
 *  External References:
-      INTEGER CHR_LEN 
+      INTEGER CHR_LEN
 *  Local Constants:
       INTEGER FITOK   ! FITSIO Success status.
       PARAMETER (FITOK = 0)
@@ -180,6 +180,7 @@
      :  KVALUE*(CAT__SZVAL), ! Value of keyword.
      :  KCOMM*(CAT__SZCOM)   ! Comments for keyword.
 
+      INTEGER UNIQUE ! Unique value, increment after use
 *
 *    Attributes for a single parameter.
 
@@ -198,6 +199,9 @@
      :  PDATE    ! Modification date attribute.
       LOGICAL
      :  PPDISP   ! Preferential display flag attribute.
+
+      SAVE UNIQUE
+      DATA UNIQUE /1000/
 *.
 
       IF (STATUS .EQ. CAT__OK) THEN
@@ -227,7 +231,7 @@ C4000    format(1x, 'numkey, fitstt: ', i5, i15)
 *
 *             Generate the default attributes for a parameter.
 
-               CALL CAT1_DPATT (PNAME, PDTYPE, PCSIZE, PDIM, PSIZE, 
+               CALL CAT1_DPATT (PNAME, PDTYPE, PCSIZE, PDIM, PSIZE,
      :           PDATE, PUNIT, PXFMT, PPDISP, PCOMM, PVALUE, STATUS)
 
 *
@@ -371,10 +375,21 @@ C    :           3x, 'fitstt: ', i15 )
 *
 *                   Add the keyword as a new parameter to the list of
 *                   parameters.
-
                      CALL CAT1_ADDPR (CI, PNAME, PDTYPE, PCSIZE, PDIM,
-     :                 PSIZE, PDATE, PUNIT, PXFMT, PPDISP, PCOMM, 
+     :                 PSIZE, PDATE, PUNIT, PXFMT, PPDISP, PCOMM,
      :                 PVALUE, QI, STATUS)
+                     IF ( STATUS .EQ. CAT__DUPNM .AND. FOUND ) THEN
+
+*                   Still not unique. Try once more with a unique integer.
+                        CALL ERR_ANNUL( STATUS )
+                        LPNAME = CHR_LEN(PNAME) - 4
+                        CALL CHR_PUTI (UNIQUE, PNAME, LPNAME)
+                        UNIQUE = UNIQUE + 1
+                        CALL CAT1_ADDPR (CI, PNAME, PDTYPE, PCSIZE,
+     :                                   PDIM ,PSIZE, PDATE, PUNIT,
+     :                                   PXFMT, PPDISP, PCOMM,PVALUE,
+     :                                   QI, STATUS)
+                     END IF
 
 *
 *                   If ok then increment the number of parameters.
