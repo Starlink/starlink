@@ -564,7 +564,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       if { $splat_disp_ == {} } {
          set splat_disp_ [GaiaForeignExec \#auto \
                              -application $splat_dir_/splatdisp \
-                             -show_output 0]
+                             -show_output $itk_option(-show_splatdisp)]
       }
 
       set filename "GaiaTempSpectrum[incr count_].sdf"
@@ -1139,6 +1139,9 @@ itcl::class gaia::GaiaCubeSpectrum {
 
    #  GaiaSpecCoords instance used by related GaiaCube.
    itk_option define -spec_coords spec_coords Spec_Coords {}
+
+   #  Whether to show the output from splatdisp.
+   itk_option define -show_splatdisp show_splatdisp Show_SplatDisp 0
 
    #  Protected variables: (available to instance)
    #  --------------------
