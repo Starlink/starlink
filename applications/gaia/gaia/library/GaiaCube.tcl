@@ -240,7 +240,7 @@ itcl::class gaia::GaiaCube {
       #  Add tab window for choosing either the helper controls.
       itk_component add tabnotebook {
          iwidgets::tabnotebook $w_.tab -equaltabs 0 \
-            -angle 0 -tabpos n -width 420 -height 420
+            -angle 0 -tabpos n -width 420 -height 525
       }
       pack $itk_component(tabnotebook) -fill both -expand 1
 
