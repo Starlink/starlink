@@ -20,6 +20,9 @@
     with NED CADC access and includes some new CADC catalogues and the
     JCMT archive.
 
+    A bug that caused image region circles to be drawn at the wrong
+    scale has been fixed.
+
   Hokulei Release:
   ================
 
