@@ -22,7 +22,7 @@
  *     instances of this item) if additional spectra are required.
 
  *  Copyright:
- *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     Copyright (C) 2006-2007 Particle Physics & Astronomy Research Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -105,8 +105,11 @@ typedef struct SPItem  {
     double xright;              /* Left-hand physical X coordinate for plot */
     double yborder;             /* Fractional border for Y plot axes, only used when autoscaling using scale command */
     double ybot;                /* Physical Y coordinate for plot top */
+    double ymax;                /* Maximum physical Y coordinate */
+    double ymin;                /* Minimum physical Y coordinate */
     double ytop;                /* Physical Y coordinate for plot bottom */
     int axis;                   /* Axis of supplied WCS that is spectral */
+    int fixdatarange;           /* If set the Y range is fixed to ytop to ybot, otherwise the max and min values are used */
     int fixedscale;             /* If set do not scale item with canvas */
     int isDSB;                  /* Spectral coordinates are dual sideband */
     int linewidth;              /* Width of polyline */
@@ -166,6 +169,9 @@ static Tk_ConfigSpec configSpecs[] = {
     {TK_CONFIG_STRING, "-dataunits", (char *) NULL, (char *) NULL,
      "", Tk_Offset(SPItem, dataunits), TK_CONFIG_NULL_OK, NULL},
 
+    {TK_CONFIG_BOOLEAN, "-fixdatarange", (char *) NULL, (char *) NULL,
+     "0", Tk_Offset(SPItem, fixdatarange), TK_CONFIG_DONT_SET_DEFAULT, NULL},
+
     {TK_CONFIG_BOOLEAN, "-fixedscale", (char *) NULL, (char *) NULL,
      "0", Tk_Offset(SPItem, fixedscale), TK_CONFIG_DONT_SET_DEFAULT, NULL},
 
@@ -219,6 +225,12 @@ static Tk_ConfigSpec configSpecs[] = {
 
     {TK_CONFIG_DOUBLE, "-yborder", (char *) NULL, (char *) NULL,
      "0.20", Tk_Offset(SPItem, yborder), TK_CONFIG_DONT_SET_DEFAULT, NULL},
+
+    {TK_CONFIG_DOUBLE, "-ybot", (char *) NULL, (char *) NULL,
+     "0.0", Tk_Offset(SPItem, ybot), TK_CONFIG_DONT_SET_DEFAULT, NULL},
+
+    {TK_CONFIG_DOUBLE, "-ytop", (char *) NULL, (char *) NULL,
+     "0.0", Tk_Offset(SPItem, ytop), TK_CONFIG_DONT_SET_DEFAULT, NULL},
 
     {TK_CONFIG_END, (char *) NULL, (char *) NULL, (char *) NULL,
      (char *) NULL, 0, 0, NULL}
@@ -327,7 +339,6 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                           "v1 v2 v3 ... ?options?", (char *) NULL );
         return TCL_ERROR;
     }
-
     /*
      * Carry out initialization that is needed in order to clean
      * up after errors during the the remainder of this procedure.
@@ -337,6 +348,7 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     spPtr->dataPtr = NULL;
     spPtr->datalabel = NULL;
     spPtr->dataunits = NULL;
+    spPtr->fixdatarange = 0;
     spPtr->fixedscale = 0;
     spPtr->framesets[0] = NULL;
     spPtr->framesets[1] = NULL;
@@ -365,6 +377,8 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     spPtr->xminmax = 1;
     spPtr->y = 0.0;
     spPtr->yborder = 0.25;
+    spPtr->ybot = DBL_MAX;
+    spPtr->ytop = -DBL_MAX;
 
     /* Create a unique tag for AST graphic elements */
     sprintf( spPtr->utag, "gaiaSpectralPlot%d", tagCounter++ );
@@ -644,8 +658,8 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     spPtr->numPoints = nel;
 
     /* Read in data and work out limits */
-    spPtr->ytop = -DBL_MAX;
-    spPtr->ybot =  DBL_MAX;
+    spPtr->ymax = -DBL_MAX;
+    spPtr->ymin = DBL_MAX;
 
     if ( adr == 0 ) {
         /* Read doubles from each word, cannot be reference spectrum */
@@ -655,8 +669,8 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                 return TCL_ERROR;
             }
             if ( spPtr->dataPtr[i] != spPtr->badvalue ) {
-                spPtr->ybot = MIN( spPtr->ybot, spPtr->dataPtr[i] );
-                spPtr->ytop = MAX( spPtr->ytop, spPtr->dataPtr[i] );
+                spPtr->ymin = MIN( spPtr->ymin, spPtr->dataPtr[i] );
+                spPtr->ymax = MAX( spPtr->ymax, spPtr->dataPtr[i] );
             }
         }
     }
@@ -674,12 +688,19 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
             dataPtr = spPtr->dataPtr;
             for ( i = 0; i < nel; i++ ) {
                 if ( *dataPtr != spPtr->badvalue ) {
-                    spPtr->ybot = MIN( spPtr->ybot, *dataPtr );
-                    spPtr->ytop = MAX( spPtr->ytop, *dataPtr );
+                    spPtr->ymin = MIN( spPtr->ymin, *dataPtr );
+                    spPtr->ymax = MAX( spPtr->ymax, *dataPtr );
                 }
                 dataPtr++;
             }
         }
+    }
+
+    /* If autoscaling or there's no range use the min/max. */
+    if ( ( ! spPtr->fixdatarange ) ||
+         spPtr->ybot == DBL_MAX || spPtr->ytop == -DBL_MAX ) {
+        spPtr->ytop = spPtr->ymax;
+        spPtr->ybot = spPtr->ymin;
     }
 
     /* Check if data has no range, in that case just add +/- 1, so we can
@@ -781,11 +802,11 @@ static void SPDelete( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display )
     spPtr->numPoints = 0;
 
     if ( spPtr->framesets[0] != NULL ) {
-       astAnnul( spPtr->framesets[0] );
+        astAnnul( spPtr->framesets[0] );
     }
 
     if ( spPtr->mapping != NULL ) {
-       astAnnul( spPtr->mapping );
+        astAnnul( spPtr->mapping );
     }
 
     if ( spPtr->polyline != NULL ) {
@@ -882,7 +903,7 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
         fprintf( stderr, "graphbox: %f,%f,%f,%f\n", graphbox[0], graphbox[1],
                  graphbox[2], graphbox[3] );
 #endif
-        
+
         /* Create the Plot. So that we get linear axis 1 coordinates we must
          * choose the current frame as the base frame (so that the mapping
          * from graphics to physical is linear)
@@ -1407,7 +1428,7 @@ static char *FrameSetPrintProc( ClientData clientData, Tk_Window tkwin,
 /**
  * MappingParseProc --
  *
- *      Provide parsing for -mapping option, in fact this isn't 
+ *      Provide parsing for -mapping option, in fact this isn't
  *      really allowed as the mapping is a generated value. Allow
  *      only for debugging purposes.
  */
@@ -1571,7 +1592,7 @@ static void MakeSpectral( SPItem *spPtr )
      */
 
     /* Get a simplified mapping from the base to current frames. This will be
-     * used to transform from GRID coordinates to spectral coordinates. 
+     * used to transform from GRID coordinates to spectral coordinates.
      */
     map = astGetMapping( spPtr->framesets[0], AST__BASE, AST__CURRENT );
     spPtr->mapping = astSimplify( map );
@@ -1601,9 +1622,9 @@ static void MakeSpectral( SPItem *spPtr )
                 grid[spPtr->numPoints*j+i] = i + 1;
             }
         }
-        
+
         /* Transform these GRID positions into the current frame. */
-        astTranN( spPtr->framesets[0], spPtr->numPoints, nin, 
+        astTranN( spPtr->framesets[0], spPtr->numPoints, nin,
                   spPtr->numPoints, grid, 1, nout, spPtr->numPoints, coords );
 
         /* Normalise the coordinates */
@@ -1612,11 +1633,11 @@ static void MakeSpectral( SPItem *spPtr )
                 work[j] = coords[spPtr->numPoints*j+i];
             }
             astNorm( cfrm, work );
-            
+
             /*  Store the selected coordinate */
             lutcoords[i] = work[spPtr->axis - 1];
         }
-        spPtr->mapping = (AstMapping *) astLutMap( spPtr->numPoints, 
+        spPtr->mapping = (AstMapping *) astLutMap( spPtr->numPoints,
                                                    lutcoords, 1.0, 1.0, "" );
 
         free( grid );

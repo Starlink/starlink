@@ -488,9 +488,10 @@ itcl::class gaia::GaiaSpectralPlot {
    #
    #  The axis defines the WCS axis that should be used for the plot X axis.
    #  If autoscale is true, then the plot should be rescaled so that the
-   #  spectrum fits. Otherwise the existing plot bounds are used (unless the
-   #  local autoscale option is enabled, that takes precendence).  The alow and
-   #  ahigh arguments are the range along the axis to extract.
+   #  spectrum fits, unless the data range is being fixed. Otherwise the 
+   #  existing plot bounds are used (unless the local autoscale option 
+   #  is enabled, that takes precendence).  The alow and ahigh arguments 
+   #  are the range along the axis to extract.
    public method display_region {accessor axis alow ahigh desc meth \
                                  autoscale} {
       #  Get the spectral data from the accessor.
@@ -505,10 +506,11 @@ itcl::class gaia::GaiaSpectralPlot {
    #
    #  The axis defines the WCS axis that should be used for the plot X axis.
    #  If autoscale is true, then the plot should be rescaled so that the
-   #  spectrum fits. Otherwise the existing plot bounds are used (unless the
-   #  local autoscale option is enabled, that takes precendence).  The alow and
-   #  ahigh arguments are the range along the axis to extract and p1 and p2 the
-   #  positions of the spectrum along the remaining two axes.
+   #  spectrum fits unless the data range is being fixed. Otherwise the 
+   #  existing plot bounds are used (unless the local autoscale option is 
+   #  enabled, that takes precendence).  The alow and ahigh arguments are 
+   #  the range along the axis to extract and p1 and p2 the positions of 
+   #  the spectrum along the remaining two axes.
    public method display {accessor axis alow ahigh p1 p2 autoscale} {
 
       #  Get the spectral data from the accessor.
@@ -533,7 +535,10 @@ itcl::class gaia::GaiaSpectralPlot {
                            -linecolour $linecolour_ -linewidth $linewidth_ \
                            -gridoptions $gridoptions_ \
                            -showaxes 1 -xminmax $itk_option(-xminmax)\
-                           -reflinecolour $refspeccolour_]
+                           -reflinecolour $refspeccolour_\
+                           -fixdatarange $itk_option(-fix_data_range) \
+                           -ytop $itk_option(-data_high) \
+                           -ybot $itk_option(-data_low)]
          #  Clicking on the plot deselects other graphics.
          $itk_component(canvas) bind $spectrum_ <1> \
             +[code $itk_component(draw) deselect_objects]
@@ -544,9 +549,11 @@ itcl::class gaia::GaiaSpectralPlot {
          move_ref_line_ 1
       }
 
-      #  When autoscaling (or just created one of the plots), set the frameset
-      #  and the NDF data units, and the offset to the start of the spectrum.
-      if { $autoscale || $itk_option(-autoscale) } {
+      #  When autoscaling and not fixing the data range (or if we have just 
+      #  created one of the plots), set the frameset and the NDF data units, 
+      #  and the offset to the start of the spectrum.
+      if { $autoscale || ( $itk_option(-autoscale) &&
+                           ! $itk_option(-fix_data_range) ) } {
          set frameset [$accessor getwcs]
 
          $itk_component(canvas) itemconfigure $spectrum_ \
@@ -1236,6 +1243,29 @@ itcl::class gaia::GaiaSpectralPlot {
    #  The result will be appended by "spectrum" or "reference" and the
    #  new colour.
    itk_option define -colour_changed_cmd colour_changed_cmd Colour_Change_Cmd {}
+
+   #  Fix the spectral plot data range. Otherwise use min/max.
+   itk_option define -fix_data_range fix_data_range Fix_Data_Range 0 {
+      if { $spectrum_ != {} } {
+         $itk_component(canvas) itemconfigure $spectrum_ \
+            -fixdatarange $itk_option(-fix_data_range)
+      }
+   }
+
+   #  Upper and lower data limits.
+   itk_option define -data_high data_high Data_High 1 {
+      if { $spectrum_ != {} } {
+         $itk_component(canvas) itemconfigure $spectrum_ \
+            -ytop $itk_option(-data_high)
+      }
+   }
+
+   itk_option define -data_low data_low Data_Low 0 {
+      if { $spectrum_ != {} } {
+         $itk_component(canvas) itemconfigure $spectrum_ \
+            -ybot $itk_option(-data_low)
+      }
+   }
 
    #  Protected variables: (available to instance)
    #  --------------------
