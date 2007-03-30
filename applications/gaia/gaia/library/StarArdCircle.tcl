@@ -227,8 +227,9 @@ itcl::class gaia::StarArdCircle {
    public variable rad {5} {
       if { [winfo exists $Radius_] } {
          $Radius_ configure -value $rad
+         set crad [canvas_dist $rad]
          $canvas itemconfigure $canvas_id_ \
-            -semimajor $rad -semiminor $rad -angle 0
+            -semimajor $crad -semiminor $crad -angle 0
       }
    }
 
