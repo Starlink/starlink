@@ -132,6 +132,54 @@ itcl::class gaia::GaiaCubeSpectrum {
       add_short_help $itk_component(bounds) \
          {Lower and upper indices used for extraction}
 
+      #  Setting of the data range.
+      itk_component add fixdatarange {
+         StarLabelCheck $w_.fixdatarange \
+            -text "Fix data range:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $itk_option(-labelwidth) \
+            -variable [scope itk_option(-fix_data_range)] \
+            -command [code $this toggle_fix_data_range_]
+      }
+      pack $itk_component(fixdatarange) \
+         -side top -fill x -ipadx 1m -ipady 2m
+      add_short_help $itk_component(fixdatarange) \
+         {Fix data range to the values given, otherwise use min/max}
+
+      #  The displayed data range. Cannot really say what the expected
+      #  range is, so these are just free format fields, expecting a floating
+      #  point value.
+      itk_component add datalow {
+         LabelEntry $w_.datalow \
+            -text "Lower data limit:" \
+            -value 0 \
+            -labelwidth $itk_option(-labelwidth) \
+            -textvariable [scope itk_option(-data_low)] \
+            -validate real \
+            -command [code $this set_lower_data_limit_]
+      }
+      pack $itk_component(datalow) \
+         -side top -fill x -ipadx 1m -ipady 2m
+      add_short_help $itk_component(datalow) \
+         {Lower data limit for spectral plot, press return to apply}
+      
+      itk_component add datahigh {
+         LabelEntry $w_.datahigh \
+            -text "Upper data limit:" \
+            -value 1 \
+            -labelwidth $itk_option(-labelwidth) \
+            -textvariable [scope itk_option(-data_high)] \
+            -validate real \
+            -command [code $this set_upper_data_limit_]
+      }
+      pack $itk_component(datahigh) \
+         -side top -fill x -ipadx 1m -ipady 2m
+      add_short_help $itk_component(datahigh) \
+         {Upper data limit for spectral plot, press return to apply}
+
+      #  Gray out as appropriate.
+      toggle_fix_data_range_
+
       #  Stop point tracking, can be confusing then also using regions.
       itk_component add pointtracking {
          StarLabelCheck $w_.pointtracking \
@@ -334,7 +382,10 @@ itcl::class gaia::GaiaCubeSpectrum {
                 -colour_changed_cmd [code $this spec_colour_changed_] \
                 -component $itk_option(-component) \
                 -shorthelpwin $itk_option(-gaia) \
-                -transient $itk_option(-transient_spectralplot) ]
+                -transient $itk_option(-transient_spectralplot) \
+                -fix_data_range $itk_option(-fix_data_range) \
+                -data_high $itk_option(-data_high) \
+                -data_low $itk_option(-data_low)]
 
          #  Make this a transient of main window, not this one.
          if { $itk_option(-transient_spectralplot) } {
@@ -1087,6 +1138,49 @@ itcl::class gaia::GaiaCubeSpectrum {
                    $refra $refdec $drefra $drefdec]
    }
 
+   #  Handle change in the value of -fix_data_range.
+   protected method toggle_fix_data_range_ {} {
+      if { $spectrum_ != {} } {
+         $spectrum_ configure -fix_data_range $itk_option(-fix_data_range)
+
+         #  If switched on match any existing limits.
+         if { $itk_option(-fix_data_range) } {
+            set_upper_data_limit_ $itk_option(-data_high)
+            set_lower_data_limit_ $itk_option(-data_low)
+         }
+      }
+      set state disabled
+      if { $itk_option(-fix_data_range) } {
+         set state normal
+      }
+      $itk_component(datahigh) configure -state $state
+      $itk_component(datalow) configure -state $state
+   }
+
+   #  Set the upper data limit.
+   protected method set_upper_data_limit_ { value } {
+      if { $value != {} && $itk_option(-data_low) != {} } {
+         configure -data_high $value
+         set_data_limits_
+      }
+   }
+
+   #  Set the lower data limit.
+   protected method set_lower_data_limit_ { value } {
+      if { $value != {} && $itk_option(-data_high) != {} } {
+         configure -data_low $value
+         set_data_limits_
+      }
+   }
+
+   #  Match the data limits to the current values.
+   protected method set_data_limits_ {} {
+      if { $spectrum_ != {} } {
+         $spectrum_ configure -data_high $itk_option(-data_high) \
+                              -data_low $itk_option(-data_low)
+      }
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -1139,6 +1233,13 @@ itcl::class gaia::GaiaCubeSpectrum {
 
    #  GaiaSpecCoords instance used by related GaiaCube.
    itk_option define -spec_coords spec_coords Spec_Coords {}
+
+   #  Fix the spectral plot data range. Otherwise use min/max.
+   itk_option define -fix_data_range fix_data_range Fix_Data_Range 0
+
+   #  Upper and lower data limits.
+   itk_option define -data_high data_high Data_High 1
+   itk_option define -data_low data_low Data_Low 0
 
    #  Whether to show the output from splatdisp.
    itk_option define -show_splatdisp show_splatdisp Show_SplatDisp 0
