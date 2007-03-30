@@ -1,3 +1,34 @@
+/* If the FPTRAP macros is defined, then the fptrapfunction defined here
+   will be called in order to cause floating point exceptions to be
+   generated when a NaN value is returned from a calculation. This can be
+   useful when debugging since otherwise it can be difficult to determine
+   where the NaN values are coming from. */
+
+#if defined(FPTRAP)
+#   include <fpu_control.h>
+#     if defined(__i386__)
+#       if !defined(_FPU_GETCW)
+#         define _FPU_GETCW(cw) (cw=__getfpucw())
+#       endif
+#       if !defined(_FPU_SETCW)
+#         define _FPU_SETCW(cw) (__setfpucw(cw))
+#       endif
+void
+fptrap (int i)
+{
+    unsigned int cw;
+    _FPU_GETCW(cw);
+    _FPU_SETCW(i==0 ? cw | _FPU_MASK_ZM | _FPU_MASK_IM | _FPU_MASK_OM :
+                       cw & ~(_FPU_MASK_ZM | _FPU_MASK_IM | _FPU_MASK_OM));
+}
+
+#  endif 
+#endif
+
+
+
+
+
 /*
 *+
 *  Name:
@@ -146,7 +177,9 @@
 *          two or more input spectra together to form an output spectrum.
 *          If TRUE, the weights used are the reciprocal of the variances
 *          associated with the input spectra, as determined from the Tsys 
-*          values in the input. [TRUE]
+*          values in the input. Note, the supplied value is ignored and a
+*          value of FALSE assumed if SPREAD is not set to "Nearest" and
+*          GENVAR is not set to "Tsys". [TRUE]
 *     LBOUND( 3 ) = _INTEGER (Write)
 *          The lower pixel bounds of the output NDF. Note, values will be
 *          written to this output parameter even if a null value is supplied 
@@ -470,6 +503,13 @@
 *        Extend use of INWEIGHT to all spreading schemes.
 *     20-MAR-2007 (TIMJ):
 *        Factor out output FITS header code.
+*     28-MAR-2007 (DSB):
+*        - Expand documentation for INWEIGHT, and warn user if the supplied
+*        INWEIGHT value cannot be used.
+*        - Set the pixel origin of the weights NDF to be the same as the
+*        pixel origin of the main output NDF.
+*        - Erase the output NDF variance array if less than 10% of the
+*        good output data values have good output variances.
 
 *  Copyright:
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
@@ -564,8 +604,10 @@ void smurf_makecube( int *status ) {
    double params[ 4 ];        /* astRebinSeq parameters */
    double wcslbnd_out[3];     /* Array of lower bounds of output cube */
    double wcsubnd_out[3];     /* Array of upper bounds of output cube */
-   float *exp_array = NULL;   /* Pointer to array of exp times */
    float *eff_array = NULL;   /* Pointer to array of eff times  */
+   float *exp_array = NULL;   /* Pointer to array of exp times */
+   float *ipd = NULL;         /* Pointer to the next output data value */
+   float *ipv = NULL;         /* Pointer to the next output variance value */
    float *tsys_array = NULL;  /* Pointer to array of tsys values */
    float *var_array = NULL;   /* Pointer to temporary variance array */
    float *var_out = NULL;     /* Pointer to the output variance array */
@@ -587,11 +629,13 @@ void smurf_makecube( int *status ) {
    int ifile;                 /* Input file index */
    int ispec;                 /* Index of next spectrum within output NDF */
    int lbnd_out[ 3 ];         /* Lower pixel bounds for output map */
-   int lbnd_wgt[ 3 ];         /* Lower pixel bounds for wight array */
+   int lbnd_wgt[ 4 ];         /* Lower pixel bounds for wight array */
    int moving;                /* Is the telescope base position changing? */
+   int nbad;                  /* No. of o/p pixels with good data but bad variance */
    int ndet;                  /* Number of detectors supplied for "DETECTORS" */
    int nel;                   /* Number of elements in 3D array */
    int neluse;                /* Number of elements used */
+   int ngood;                 /* No. of o/p pixels with good data */
    int nparam = 0;            /* No. of parameters required for spreading scheme */
    int npos;                  /* Number of samples included in output NDF */
    int nwgtdim;               /* No. of axes in the weights array */
@@ -606,20 +650,24 @@ void smurf_makecube( int *status ) {
    int spread = 0;            /* Pixel spreading method */
    int trim;                  /* Trim the output cube to exclude bad pixels? */
    int ubnd_out[ 3 ];         /* Upper pixel bounds for output map */
-   int ubnd_wgt[ 3 ];         /* Upper pixel bounds for wight array */
+   int ubnd_wgt[ 4 ];         /* Upper pixel bounds for wight array */
    int use_ast;               /* Use AST for rebinning? */
    int use_wgt;               /* Use input variance to weight input data? */
    int usedetpos;             /* Should the detpos array be used? */
    int wgtsize;               /* No. of elements in the weights array */
    smfData *data = NULL;      /* Pointer to data struct */
+   smfData *effdata = NULL;   /* Pointer to o/p struct holding eff time array */
    smfData *expdata = NULL;   /* Pointer to o/p struct holding exp time array */
    smfData *odata = NULL;     /* Pointer to o/p struct holding data array */
-   smfData *effdata = NULL;   /* Pointer to o/p struct holding eff time array */
    smfData *tsysdata = NULL;  /* Pointer to o/p struct holding tsys array */
    smfData *wdata = NULL;     /* Pointer to o/p struct holding weights array */
    smfFile *file = NULL;      /* Pointer to data file struct */
    void *data_array = NULL;   /* Pointer to the rebinned map data */
    void *wgt_array = NULL;    /* Pointer to the weights map */
+
+#if defined(FPTRAP)
+   fptrap(1);
+#endif
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -956,32 +1004,37 @@ void smurf_makecube( int *status ) {
    }
 
 /* If required, create an array to hold the weights. First set up the bounds 
-   of the whole 3D array (a larger array is needed if AST is being used to 
+   of the whole 3D array (a larger 4D array is needed if AST is being used to 
    do the rebinning and output variances are being created on the basis
    of the spread of input values), and then see if the array should be held in 
    temporary work space, or in an extension of the output NDF. If AST is
    not being used (i.e. if nearest neighbour spreading is being used), then 
-   the weights will be the same for everyt 2D slice in the output cube, and so
+   the weights will be the same for every 2D slice in the output cube, and so
    we can avoid extra memory requirements by using a single 2D array for the
    weights in this case. */
    if( !sparse ) {   
-
-      lbnd_wgt[ 0 ] = 1;
-      lbnd_wgt[ 1 ] = 1;
-      lbnd_wgt[ 2 ] = 1;
-      ubnd_wgt[ 0 ] = ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1;
-      ubnd_wgt[ 1 ] = ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1;
-      ubnd_wgt[ 2 ] = ubnd_out[ 2 ] - lbnd_out[ 2 ] + 1;
+      lbnd_wgt[ 0 ] = lbnd_out[ 0 ];
+      lbnd_wgt[ 1 ] = lbnd_out[ 1 ];
+      lbnd_wgt[ 2 ] = lbnd_out[ 2 ];
+      lbnd_wgt[ 3 ] = 1;
+      ubnd_wgt[ 0 ] = ubnd_out[ 0 ];
+      ubnd_wgt[ 1 ] = ubnd_out[ 1 ];
+      ubnd_wgt[ 2 ] = ubnd_out[ 2 ];
+      ubnd_wgt[ 3 ] = 2;
 
 /* Select the number of dimensions for the weights array, and the total
    size of the array. */
+      nwgtdim = 2;
+      wgtsize = ubnd_wgt[ 0 ] - lbnd_wgt[ 0 ] + 1;
+      wgtsize *= ubnd_wgt[ 1 ] - lbnd_wgt[ 1 ] + 1;
+
       if( spread != AST__NEAREST ) {
          nwgtdim = 3;
-         if( genvar == 1 ) ubnd_wgt[ 0 ] *= 2;
-         wgtsize = ubnd_wgt[ 0 ]*ubnd_wgt[ 1 ]*ubnd_wgt[ 2 ];
-      } else {
-         nwgtdim = 2;
-         wgtsize = ubnd_wgt[ 0 ]*ubnd_wgt[ 1 ];
+         wgtsize *= ubnd_wgt[ 2 ] - lbnd_wgt[ 2 ] + 1;
+         if( genvar == 1 ) {
+            nwgtdim = 4;
+            wgtsize *= ubnd_wgt[ 3 ] - lbnd_wgt[ 3 ] + 1;
+         }
       }
    
 /* See if weights are to be saved in the output NDF. */
@@ -1105,8 +1158,18 @@ void smurf_makecube( int *status ) {
          data->hdr->detpos = NULL;
       }
 
-      /* Handle output FITS header creation/manipulation */
+/* Handle output FITS header creation/manipulation */
       smf_fits_outhdr( data->hdr->fitshdr, &fchan, &keymap, status );
+
+/* Warn the user if the supplied value for use_wgt cannot be used. */
+      if( use_wgt && use_ast && genvar != 2 ) {
+         msgBlank( status );
+         msgOutif( MSG__NORM, " ", "WARNING: The values supplied for "
+                   "parameters GENVAR and SPREAD mean that the requested "
+                   "TRUE value for parameter INWEIGHT cannot be used.",
+                   status );
+         msgBlank( status );
+      }
 
 /* Rebin the data into the output grid. */
       if( !sparse ) {
@@ -1140,82 +1203,138 @@ L999:;
 
 /* Store the WCS FrameSet in the output NDF. */
    if( wcsout && ondf != NDF__NOID ) ndfPtwcs( wcsout, ondf, status );
-  
-/* If the output variances are the same for every spatial slice, the
-   "var_array" used above will be a 2D array holding a single slice of the 3D
-   Variance array. In this case we now copy this slice to the output
-   cube, first unmapping the Data array to minimise memory requirements. */
-   if( !use_ast && genvar && ondf != NDF__NOID ) {
-      ndfUnmap( ondf, "Data", status );
-      ndfMap( ondf, "Variance", "_REAL", "WRITE", (void **) &var_out, &nel, 
-              status );
-      if( var_out && *status == SAI__OK ) {
-         el0 = 0;
-         for( el = 0; el < nel; el++, el0++ ) {
-            if( el0 == nxy ) el0 = 0;
-            var_out[ el ] = var_array[ el0 ];
-         }
-      }
 
-/* If all the input files had the same backend degradation factor and
-   channel width, calculate a 2D array of Tsys values for the output
-   cube. */
-      if( fcon != VAL__BADD ) {
-         for( el0 = 0; el0 < nxy; el0++ ) {
-            teff = 0.25*eff_array[ el0 ];
-            var = var_array[ el0 ];
-            if( teff != VAL__BADR && teff > 0.0 && 
-                var != VAL__BADR && var > 0.0 ) {
-               tsys_array[ el0 ] = sqrt( var*teff/fcon );
-            } else {
-               tsys_array[ el0 ] = VAL__BADR;
+/* If we are creating an output Variance component... */
+   if( genvar && ondf != NDF__NOID ) {
+
+/* Count the number of pixel which have a good data value but a bad
+   variance value, and count the number which have a good data value. 
+   Unless astRebinSeq was used, the var_array will be one slice of the 
+   output cube, so cycle through this 2D variance array as we move 
+   through the entire 3D output data array. */
+      ngood = 0;
+      nbad = 0;
+      ipd = (float *) data_array;
+      ipv = (float *) var_array;
+      nel = nxy*( ubnd_out[ 2 ] - lbnd_out[ 2 ] + 1 );
+
+      if( use_ast ) {
+
+         for( el = 0; el < nel; el++, ipd++,ipv++ ) {
+            if( *ipd != VAL__BADR ) {
+               ngood++;
+               if( *ipv == VAL__BADR ) nbad++;
             }
          }
 
       } else {
-         for( el0 = 0; el0 < nxy; el0++ ) {
-            tsys_array[ el0 ] = VAL__BADR;
+
+         for( el = 0; el < nel; el++, ipd++,ipv++ ) {
+            if( el % nxy == 0 ) ipv = (float *) var_array;
+            if( *ipd != VAL__BADR ) {
+               ngood++;
+               if( *ipv == VAL__BADR ) nbad++;
+            }
          }
+
       }
+
+/* If more than 10% of the good data values have bad variance values,
+   we will erase the variance component. */
+      if( nbad > 0.1*ngood ) {
+         msgBlank( status );
+         msgOutif( MSG__NORM, " ", "WARNING: Less than 10% of the good "
+                   "output data values have good variances. The output "
+                   "NDF will not contain a Variance array.", status );
+         msgBlank( status );
+
+         if( use_ast ) {
+            ndfUnmap( ondf, "Variance", status );
+            ndfReset( ondf, "Variance", status );
+            (odata->pntr)[ 1 ] = NULL;
+            var_array = NULL;
+
+         } else if( genvar ) {
+            var_array = (float *) astFree( var_array );
+         }
+
+         genvar = 0;
+  
+/* Otherwise, if the output variances are the same for every spatial slice, the
+   "var_array" used above will be a 2D array holding a single slice of the 3D
+   Variance array. In this case we now copy this slice to the output
+   cube, first unmapping the Data array to minimise memory requirements. */
+      } else if( !use_ast ) {
+         ndfUnmap( ondf, "Data", status );
+         ndfMap( ondf, "Variance", "_REAL", "WRITE", (void **) &var_out, &nel, 
+                 status );
+         if( var_out && *status == SAI__OK ) {
+            el0 = 0;
+            for( el = 0; el < nel; el++, el0++ ) {
+               if( el0 == nxy ) el0 = 0;
+               var_out[ el ] = var_array[ el0 ];
+            }
+         }
+
+/* If all the input files had the same backend degradation factor and
+   channel width, calculate a 2D array of Tsys values for the output
+   cube. */
+         if( fcon != VAL__BADD ) {
+            for( el0 = 0; el0 < nxy; el0++ ) {
+               teff = 0.25*eff_array[ el0 ];
+               var = var_array[ el0 ];
+               if( teff != VAL__BADR && teff > 0.0 && 
+                   var != VAL__BADR && var > 0.0 ) {
+                  tsys_array[ el0 ] = sqrt( var*teff/fcon );
+               } else {
+                  tsys_array[ el0 ] = VAL__BADR;
+               }
+            }
+   
+         } else {
+            for( el0 = 0; el0 < nxy; el0++ ) {
+               tsys_array[ el0 ] = VAL__BADR;
+            }
+         }
 
 /* Free the memory used to store the 2D variance information and work
    arrays. */
-      var_array = astFree( var_array );
-      work1_array = astFree( work1_array );
+         var_array = astFree( var_array );
+         work1_array = astFree( work1_array );
 
 /* Store the median exposure time as keyword EXP_TIME in the FitsChan.
    Since kpg1Medur partially sorts the array, we need to take a copy of it
    first. */
-      work2_array = astStore( NULL, exp_array, nxy*sizeof( float ) );
-      kpg1Medur( 1, nxy, work2_array, &medexp, &neluse, status );
-      atlPtftr( fchan, "EXP_TIME", medexp, 
-                "[s] Median MAKECUBE exposure time", status );
+         work2_array = astStore( NULL, exp_array, nxy*sizeof( float ) );
+         kpg1Medur( 1, nxy, work2_array, &medexp, &neluse, status );
+         atlPtftr( fchan, "EXP_TIME", medexp, 
+                   "[s] Median MAKECUBE exposure time", status );
 
 /* Store the median effective integration time as keyword EFF_TIME in the 
    FitsChan. Since kpg1Medur partially sorts the array, we need to take a 
    copy of it first. */
-      work2_array = astStore( work2_array, eff_array, nxy*sizeof( float ) );
-      kpg1Medur( 1, nxy, work2_array, &medeff, &neluse, status );
-      atlPtftr( fchan, "EFF_TIME", medeff, 
-                "[s] Median MAKECUBE effective integration time", status );
+         work2_array = astStore( work2_array, eff_array, nxy*sizeof( float ) );
+         kpg1Medur( 1, nxy, work2_array, &medeff, &neluse, status );
+         atlPtftr( fchan, "EFF_TIME", medeff, 
+                   "[s] Median MAKECUBE effective integration time", status );
 
 /* Store the median system temperature as keyword TSYS in the FitsChan. */
-      work2_array = astStore( work2_array, tsys_array, nxy*sizeof( float ) );
-      kpg1Medur( 1, nxy, work2_array, &medtsys, &neluse, status );
-      atlPtftr( fchan, "MEDTSYS", medtsys, 
-                "[K] Median MAKECUBE system temperature", status );
+         work2_array = astStore( work2_array, tsys_array, nxy*sizeof( float ) );
+         kpg1Medur( 1, nxy, work2_array, &medtsys, &neluse, status );
+         atlPtftr( fchan, "MEDTSYS", medtsys, 
+                   "[K] Median MAKECUBE system temperature", status );
 
 /* Retrieve the unique OBSID keys from the KeyMap and populate the OBSnnnnn
    and PROVCNT headers from this information. */
-      smf_fits_add_prov( fchan, keymap, status ); 
+         smf_fits_add_prov( fchan, keymap, status ); 
 
 /* If the FitsChan is not empty, store it in the FITS extension of the
    output NDF (any existing FITS extension is deleted). */
-      if( astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );
-
+         if( astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );
+  
 /* Free the seoncd work array. */
-      work2_array = astFree( work2_array );
-
+         work2_array = astFree( work2_array );
+      }
    }
 
 /* Close the output data files. */

@@ -193,6 +193,8 @@
 *     19-MAR-2007 (DSB):
 *        Check for bad input data values and set the appropriate AST__USEBAD
 *        flag when calling astRebinSeq.
+*     28-MAR-2007 (DSB):
+*        Set the AST__GENVAR flag when genvar==1 and spread!=nearest.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -449,7 +451,8 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
             for( iv = 0; iv < nel; iv++ ) var_array[ iv ] = 0.0;
          }
 
-         ast_flags = usewgt && ( genvar == 2 ) ? AST__VARWGT : 0;
+         ast_flags = ( usewgt && ( genvar == 2 ) ) ? AST__VARWGT : 0;
+         if( genvar == 1 ) ast_flags = ast_flags | AST__GENVAR;
 
       } else {
          for( iv0 = 0; iv0 < nxy; iv0++ ) {
