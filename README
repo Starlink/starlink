@@ -31,16 +31,18 @@ This directory contains the following directories:
 Building the Starlink source set from scratch
 ---------------------------------------------
 
-To build the COMPLETE set of Starlink classic applications the
-following steps are required.  If you wish to do more elaborate
-things, then you should refer to Starlink document SSN/78, which also
-contains some FAQs.  Details of this document are at the end of this
-README.
+To build the COMPLETE set of Starlink classic applications the following steps
+are required.  If you wish to do more elaborate things, then you should refer
+to Starlink document SSN/78, which also contains some FAQs.  Details of this
+document are at the end of this README.
 
-This procedure will not build the Starlink _Java_ applications.  They
-are built separately, using the procedure described in
-java/source/README.  You do not need to build any of the Starlink
-classic applications to build the Java ones.
+This procedure will not build the Starlink _Java_ applications.  They are
+built separately, using the procedure described in java/source/README.  You do
+not need to build any of the Starlink classic applications to build the Java
+ones.
+
+ Preparation
+ -----------
 
  - Specify where you want the installed files to end up (_PREFIX) and
    where you want the build to find any previously installed Starlink
@@ -92,18 +94,37 @@ classic applications to build the Java ones.
    these variables before building the software.  See './configure
    --help' for a list of `some influential environment variables'.
 
+   This is good time to get the compilers that you're going to use 
+   resolved, especially if you're not working on a GNU/Linux platform. 
+   See the platform specific instructions later in this file.
+
    At the time of writing (March 2007) it is known that the gfortran
    compiler will work, but only from GCC4.3 onwards (the development main
    line). If this is picked up by default on your system you need to re-define
    FC and F77 to select another compiler. For other versions of GCC you will
-   need to use g95 (thanks to Andy Vaught for his help with this).
+   need to use g95 (thanks to Andy Vaught for his help with this), which
+   is available from the g95 web site: www.g95.org.
 
- - First bootstrap the system.  This builds and installs the
-   buildsupport system (the tools in the buildsupport directory, plus
-   third-party applications autoconf, automake and libtool), and then
-   goes on to generate the configure scripts which will be used in the
-   next step.  The autoconf, automake and libtool applications have
-   been patched specifically for building this tree so any versions
+
+ The build sequence
+ ------------------
+
+ To build the complete source distribution, you go through the steps:
+
+   ./bootstrap
+   make configure-deps
+   ./configure -C
+   make world
+
+ Each of these steps is described in detail below. 
+
+ - First bootstrap the system.  
+
+   This builds and installs the buildsupport system (the tools in the
+   buildsupport directory, plus third-party applications autoconf, automake
+   and libtool), and then goes on to generate the configure scripts which will
+   be used in the next step.  The autoconf, automake and libtool applications
+   have been patched specifically for building this tree so any versions
    shipped with the OS, or installed by you, will _not_ work.  These
    applications will be installed into
    $STARCONF_DEFAULT_PREFIX/buildsupport, so you should add
@@ -127,14 +148,18 @@ classic applications to build the Java ones.
    ./bootstrap script is running autoreconf in the top-level
    directory, you should not run autoreconf yourself in this directory.
 
- - There are a _few_ components which have to be built and installed
+ - Build the configure dependencies.
+
+   There are a _few_ components which have to be built and installed
    before the main tree is configured.  You will have been advised of
    this at the end of the bootstrap process above, but in case you
    missed that, the command is
 
       % make configure-deps
 
- - Now configure and build the system.  The dependencies within the
+ - Finally configure and build everything.
+
+   Now configure and build the system.  The dependencies within the
    Makefile ensure that everthing is built in the correct order.
 
       % ./configure -C   # -C means caching results
@@ -150,36 +175,48 @@ classic applications to build the Java ones.
 
    Each of these steps also takes around an hour.
 
- - If you wish to disable the building of shared libraries you should
+ Additional hints
+ ----------------
+
+ - Disabling shared libraries
+
+   If you wish to disable the building of shared libraries you should
    use the --disable-shared configure option when you give the
    ./configure command above.
 
       % ./configure -C --disable-shared
 
- - By default, the system will be configured so that all
-   documentation is built at the same time as the software.  For this
-   to work, you must have LaTeX installed on your machine.  Building
-   the documentation is rather slow, and you can speed up the build
-   somewhat by omitting it.  You do that as follows:
+ - Disabling the documentation
+
+   By default, the system will be configured so that all documentation
+   is built at the same time as the software.  For this to work, you 
+   must have LaTeX installed on your machine.  Building the documentation 
+   is rather slow, and you can speed up the build somewhat by omitting it.  
+   You do that as follows:
 
       % ./configure -C --without-stardocs
 
- - If you wish to build only as far as a given component, then specify
+ - Building a single library or application
+
+   If you wish to build only as far as a given component, then specify
    it by giving the name of the associated `manifest' file.
 
       % make /local-star/manifests/ast
 
    This will build, and install under STARCONF_DEFAULT_PREFIX, this
-   component and everything it depends on.
+   component and _everything it depends on to be built_.
 
 
-Building invidual components
-----------------------------
+Developing individual components
+--------------------------------
 
-Note that this sequence of './bootstrap; ./configure; make world' is
-indeed a`make world' command -- it builds everything in the repository
-that has been brought into the configure-based system, and will fail
-if some components have not been checked out.  If you wish to build a
+Note that this sequence of
+
+   ./bootstrap; make configure-deps; ./configure -C; make world
+
+is indeed a `make world' command -- it builds everything in the repository
+that has been brought into the configure-based system, and will fail if some
+components have not been checked out.  If you wish to build or develop a
 specific component, the instructions are slightly different.
 
  - Specify the _PREFIX and _STARLINK variables as before, though this
@@ -219,24 +256,112 @@ specific component, the instructions are slightly different.
 Updating the source set
 -----------------------
 
-The `make world' command will not _re_build the tree after you do a
-CVS update, possibly unexpectedly.  For a detailed explanation of why this is
-so, see the `General FAQs' in SSN/78, described below.
+The `make world' command will not _re_build the tree after you do a CVS
+update, possibly unexpectedly.  For a detailed explanation of why this is so,
+see the `General FAQs' in SSN/78, described below.
+
+
+Platform specific build notes
+-----------------------------
+
+ - GNU/Linux
+
+ Currently (April 2007) the source set is known to build on many different
+ flavours of GNU/Linux and is actively developed using these. The only expected
+ issue is that of Fortran compiler support (C, C++ and Fortran compilers are
+ required to build the complete collection). 
+
+ After the release of GCC 4 the Fortran compiler "g77" has been replaced with a
+ completely new "gfortran" (that now implements Fortran 90, 95 and some 2003
+ features), which has not been compatible with Starlink Fortran until the 4.3
+ development branch. Happily this turned out to be not a major problem 
+ (thanks to Andy Vaught) as the other free Fortran compiler "g95", is
+ compatible. So to build the collection with a GCC 4+ compiler you'll need a
+ copy of "g95" which is available from  "www.g95.org", or more experimentally
+ you'll need to build the complete GCC 4.3 compiler set from source.
+
+ To make sure you use the "g95" compiler and not "gfortran" you need to 
+ define the environment variables "FC" and "F77":
+
+      % setenv FC g95                     # csh
+      % setenv F77 g95
+   or
+      % export FC=g95                     # sh
+      % export F77=g95
+
+  before running "configure".
+
+
+  - OS X
+
+  The build situation under OS X follows much like that of GNU/Linux,
+  but you'll need to install your own Fortran compiler. In 10.3 
+  the "g77" compiler from "Fink" or "DarwinPorts" has been used successfully,
+  in 10.4 you'll need a copy of "g95" ("gfortran" has not been tested).
+
+  Note you'll also need a development installation of the Apple X11
+  environment, and a functioning TeX and Ghostscript if you want to build the
+  documents.
+
+  - Solaris
+
+  The collection is known to build under Solaris 8 (sparc) and 10 (intel), 
+  using the SUN compilers (Workshop 6 and studio 11 respectively). To make 
+  sure the correct compilers are picked up, you should define:
+
+      % setenv FC f77                     # csh
+      % setenv F77 f77
+      % setenv CC cc
+      % setenv CXX CC
+   or
+      % export FC=f77                     # sh
+      % export F77=f77
+      % export CC=cc
+      % export CXX=CC
+
+   - Tru64 UNIX
+
+   The collection builds nightly on a Tru64 UNIX 5.1 installation 
+   using the platform compilers:
+
+     %  cc -V
+     Compaq C V6.4-014 on Compaq Tru64 UNIX V5.1A (Rev. 1885)
+
+   (earlier versions and revisions are known to fail). It's probably best to
+   define all the compilers as for Solaris, but only the Fortran compiler
+   is known to be required:
+
+      % setenv FC f77                     # csh
+      % setenv F77 f77
+      % setenv CC cc
+      % setenv CXX cxx
+   or
+      % export FC=f77                     # sh
+      % export F77=f77
+      % export CC=cc
+      % export CXX=cxx
+
+   - Cygwin
+
+   This is essentially a GNU environment so works as GNU/Linux (only tested
+   with GCC 3 & "g77"), but you will need patience as the build process is
+   very slow (but the final applications seem to run more effectively) and a
+   full development installation, including LaTeX for the documentation
+   (probably best to disable this with "--without-stardocs"). 
 
 
 Further information
 -------------------
 
-The Starlink document SUN/248 gives further advice about building
-Starlink classic applications, including some platform-specific
+The Starlink document SUN/248 gives further advice about building Starlink
+classic applications, including some old, out-of-date, platform-specific
 notes.  A version is currently (May 2006) available at
-<http://www.astro.gla.ac.uk/users/norman/star/sun248/>, but may
-migrate to the Starlink site in future.  The source is in the
-repository at docs/sun/248.
+<http://www.astro.gla.ac.uk/users/norman/star/sun248/>.  
+The source is in the repository at docs/sun/248.
 
-You should also consult the project web pages at
-<http://www.starlink.ac.uk>, and consider subscribing to the Starlink
-development mailing list: see <http://www.jiscmail.ac.uk/archives/starlink.html>.
+You should consult the project web pages at <http://www.starlink.ac.uk>, and
+consider subscribing to the Starlink development mailing list: see
+<http://www.jiscmail.ac.uk/archives/starlink.html>.
 
 Starlink document SSN/78 gives much more detailed information on the
 process of building Starlink classic applications, but this document
