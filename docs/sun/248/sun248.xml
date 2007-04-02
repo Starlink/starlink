@@ -18,7 +18,7 @@
 </authorlist>
 <docnumber>248</docnumber>
 <history>
-<version number="0" date="29-Apr-2005" author="ng">
+<version number="1" date="02-Apr-2007" author="pwd">
 <px>Draft release: $Revision$</px>
 </version>
 </history>
@@ -26,16 +26,28 @@
 
 <docbody>
 <abstract>
-<px>This document contains instructions on how to build the Starlink `classic'
-software from source.  It contains a few platform-specific notes, and
-a comparison with the old 'mk-based' build system.  This document is
-deliberately terse, since we have invested effort in making the
-processes involved as easy as possible.</px>
 
-<px>This is at present a draft document, and so you should expect it
-to change relatively frequently.  For change details, see the CVS
-change log at
-<url>http://cvsweb.starlink.ac.uk/cvsweb.cgi/docs/sun/248/sun248.xml</url>.</px>
+<px><code>This document is now out of date as the Starlink project has been closed.
+See <url>http://www.starlink.ac.uk</url>. Releases are currently (April 2007) 
+made by the 
+<webref url="http://www.jach.hawaii.edu/software/starlink/">JAC</webref>.  
+Build instructions are now only updated in the main README file, which you can
+find in a source distribution (the instructions in this document remain
+relevant for downloading that), or at:
+<url>http://cvsweb.starlink.ac.uk/cvsweb.cgi/README</url>.  
+Platform specific instructions are also now found in the README only, the ones
+in this document are for historic purposes only. </code>
+</px>
+
+<px>
+Old introduction beings...
+</px>
+
+<px>This document contains instructions on how to build the Starlink `classic'
+software from source and a comparison with the old 'mk-based' build system.
+This document is deliberately terse, since we have invested effort in making
+the processes involved as easy as possible.
+</px>
 
 <px><tabular>
 <tgroup cols="1">
@@ -190,6 +202,11 @@ examine the current version of this file, and its history, at
 on your machine, or the build will fail when building documentation,
 at an irritatingly late stage of the process.  This and other remarks
 are rehearsed in the <code>README</code>, mentioned above.</p>
+
+<p><code>April 2007: the notes below are known to be out of date
+please refer to the README file for newer instructions on what is known
+about platform specifics.</code>
+</p>
 
 <p>The notes below are of the specific type which tends to become either wrong
 or redundant rather promptly.  If they have become wrong by the time
