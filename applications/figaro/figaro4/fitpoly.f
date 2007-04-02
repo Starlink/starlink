@@ -144,6 +144,10 @@
 *        storage structure. In any case this routine will report which
 *        component was actually used and it will deposit the updated
 *        value in the parameter system. [1]
+*     FITCOEFFS( ) = _REAL (Write)
+*        The coefficients of the fitted polynomial. The number of
+*        coefficients returned depends on the order of the fitted
+*        polynomial. No more than eight coefficients will be returned.
 *     LOGFIL = FILENAME (Read)
 *        The file name of the log file. Enter the null value (!) to
 *        disable logging. The log file is opened for append. [!]
@@ -191,6 +195,7 @@
 *     hme: Horst Meyerdierks (UoE, Starlink)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     BEC: Brad Cavanagh (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -210,6 +215,8 @@
 *        Use CNF_PVAL for pointers to mapped data.
 *     2006 Oct 19 (TIMJ):
 *        Fix CNF_PVAL pointer offsetting
+*     2007 April 2 (BEC):
+*        Return fitted polynomial coefficients via parameter system.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -704,6 +711,9 @@
      :         MSKDIM, MSKUSE, MSKELM, MASK, RMIN(1), RMAX(1),
      :         MAXPAR, ORDER, DATA(2), CHISQR, STATUS )
          END IF
+
+*     Return the coefficients via parameter.
+         CALL PAR_PUT1R( 'FITCOEFFS', ORDER + 1 , DATA(2), STATUS )
 
 *     Check status.
          IF ( STATUS .NE. SAI__OK ) GO TO 500
