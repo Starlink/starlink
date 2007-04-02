@@ -954,6 +954,7 @@ $(MANIFESTS)/hdstools: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/fio \
+		$(MANIFESTS)/grp \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/ifd \
