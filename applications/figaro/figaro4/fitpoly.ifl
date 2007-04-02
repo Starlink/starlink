@@ -131,6 +131,14 @@ interface FITPOLY
       helpkey  '*'
    endparameter
 
+   parameter FITCOEFFS
+      type     '_REAL'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  0,0,0,0,0,0,0,0
+      prompt   'Fitted polynomial coefficients'
+      helpkey  '*'
+   endparameter
+
    parameter LOGFIL
       type     'FILENAME'
       default  !
