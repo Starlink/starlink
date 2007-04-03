@@ -208,7 +208,7 @@ itcl::class gaia::GaiaForeignExec {
                          -onerror \[code $this error_\] \
                          $application $args"} msg
          if { $msg != {} } {
-            error_ "$msg"
+            error_ "$msg (bgexec)"
          }
          command_completed_
       }
@@ -265,11 +265,25 @@ itcl::class gaia::GaiaForeignExec {
    private method error_ {msg} {
       if { $msg != "" } {
          if { $use_error } {
-            #  Ordinary message arrive on standard error, just pass on
+            #  Ordinary message arrived on standard error, just pass on
             #  as if ordinary text.
             inform_ $msg
+            if { $show_traceback } {
+               for { set i [info level] } { $i > -1 } { incr i -1 } { 
+                  inform_ "$i: [info level $i]"
+               }
+            }
          } else {
-            error_dialog "$shortname_: $msg"
+            if { $show_traceback } {
+               for { set i [info level] } { $i > -1 } { incr i -1 } { 
+                  append msg "$i: [info level $i]"
+               }
+            }
+            if { $use_error_dialog } {
+               error_dialog "$shortname_: $msg"
+            } else {
+               error "$shortname_: $msg"
+            }
          }
       }
    }
@@ -337,12 +351,18 @@ itcl::class gaia::GaiaForeignExec {
    #  then process these as ordinary output text.
    public variable use_error 0 {}
 
+   #  Error messages can appear in a dialog or can throw an error.
+   public variable use_error_dialog 1
+
    #  Command to use if the output from the program needs
    #  preprocessing (say to remove escape sequences).
    public variable preprocess {} {}
 
    #  Whether to not strip extra newlines from the command output.
    public variable keepnewlines 1
+
+   #  Write a traceback with any error messages.
+   public variable show_traceback 0
 
    #  Protected variables: (available to instance)
    #  --------------------
