@@ -1,16 +1,18 @@
-      SUBROUTINE KPS1_CLPA0( IWCS, AXIS, AXDIM, POS, TRIM, STATUS )
+      SUBROUTINE KPS1_CLPA0( IWCS, AXIS, AXDIM, POS, TRIM, GLO, GHI,
+     :                        STATUS )
 *+
 *  Name:
 *     KPS1_CLPA0
 
 *  Purpose:
-*     Modify a WCS FrameSet to account for the collapsing of a pixel axis.
+*     Modifies a WCS FrameSet to account for the collapsing of a pixel 
+*     axis.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_CLPA0( IWCS, AXIS, AXDIM, POS, TRIM, STATUS )
+*     CALL KPS1_CLPA0( IWCS, AXIS, AXDIM, POS, TRIM, GLO, GHI, STATUS )
 
 *  Description:
 *     This routine modifies the supplied FrameSet by removing the
@@ -30,15 +32,21 @@
 *        coords.
 *     TRIM = LOGICAL (Given)
 *        If .TRUE., then the collapsed WCS and pixel axes are removed 
-*        from the returned FrameSet. Otheriwse, they are retained and the 
-*        Mapping is modified so that the collapsed WCS range maps onto 
-*        the one remaining pixel.
+*        from the returned FrameSet. Otherwise, they are retained and 
+*        the Mapping is modified so that the collapsed WCS range maps
+*        onto the one remaining pixel.
+*     GLO = INTEGER (Given)
+*        The GRID co-ordinate of the first collapsed pixel along the
+*        collapse axis.
+*     GHI = INTEGER (Given)
+*        The GRID co-ordinate of the last collapsed pixel along the
+*        collapse axis.
 *     STATUS = INTEGER (Given)
 *        The global status.
 
 *  Notes:
-*     - The modified FrameSet only contains two frames, corresponding to the 
-*     original base and current Frames.
+*     - The modified FrameSet only contains two frames, corresponding to
+*     the original base and current Frames.
 *     - The number of axes in the returned current Frame will always be
 *     at least equal to the number of axes in the returned base Frame.
 *     If necessary, this is achieved by duplicating some of the base
@@ -46,8 +54,8 @@
 *     connected by a UnitMap)
 
 *  Copyright:
-*     Copyright (C) 2005-2007 Particle Physics & Astronomy Research Council.
-*     All Rights Reserved.
+*     Copyright (C) 2005-2007 Particle Physics & Astronomy Research
+*     Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -67,6 +75,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -80,6 +89,8 @@
 *        - Added argument TRIM (previously a value of TRUE was always
 *        assumed).
 *        - Correct DELTA from "samples per pixel" to "pixels per sample".
+*     2007 April 3 (MJC):
+*        Added GLO and GHI arguments (based upon DSB's analysis).
 *-
       
 *  Type Definitions:
@@ -97,6 +108,8 @@
       INTEGER AXDIM
       DOUBLE PRECISION POS(*)
       LOGICAL TRIM
+      INTEGER GLO
+      INTEGER GHI
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -335,7 +348,7 @@
 *  GRID axis by adding a WinMap in series with the original Mapping. 
 *  This WinMap leaves all axes unchanged except for the removed axis. 
 *  The removed axis is scaled so that the original range of GRID axis 
-*  value (0.5 to AXDIM + 0.5) is mapped onto the range covered by a 
+*  value (GLO - 0.5 to GLO + 0.5) is mapped onto the range covered by a 
 *  single pixel (0.5 to 1.5). Create the WinMap, and create a series 
 *  CmpMap containing the WinMap followed by the original grid->WCS 
 *  Mapping.
@@ -348,8 +361,8 @@
 
          INA( AXIS ) = 0.5D0
          INB( AXIS ) = 1.5D0
-         OUTA( AXIS ) = 0.5D0
-         OUTB( AXIS ) = DBLE( AXDIM ) + 0.5D0
+         OUTA( AXIS ) = DBLE( GLO ) - 0.5D0
+         OUTB( AXIS ) = DBLE( GHI ) + 0.5D0
 
          MAP2 = AST_CMPMAP( AST_WINMAP( NIN, INA, INB, OUTA, OUTB, 
      :                                  ' ', STATUS ),
