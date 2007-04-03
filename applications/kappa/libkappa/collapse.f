@@ -350,6 +350,10 @@
 *        Added parameter TRIM. Moved calculation of GRDPOS so that it
 *        is available for both splitable Mappings and unsplitable 
 *        Mappings.
+*     2007 April 3 (MJC):
+*        Fix bug when the collapsed axis is retained in the WCS 
+*        FrameSet: it now uses the GRID co-ordinates of the limits of
+*        the collapsed axis to give the correct bounds. 
 *     {enter_further_changes_here}
 
 *-
@@ -425,6 +429,8 @@
                                  ! array
       INTEGER EL2                ! Number of elements in an output
                                  ! mapped array
+      INTEGER GHI                ! High GRID index for collapse axis
+      INTEGER GLO                ! Low GRID index for collapse axis
       LOGICAL HIGHER             ! Significant dimensions above collapse
                                  ! axis?
       INTEGER I                  ! Loop count
@@ -1247,8 +1253,10 @@
 
 *  We now modify the input NDFs WCS FrameSet by removing the collapsed
 *  axis from the base and current Frames.
+      GLO = JLO - LBND( JAXIS ) + 1
+      GHI = JHI - LBND( JAXIS ) + 1
       CALL KPS1_CLPA0( IWCS, JAXIS, UBND( JAXIS ) - LBND( JAXIS ) + 1, 
-     :                 GRDPOS, TRIM, STATUS )
+     :                 GRDPOS, TRIM, GLO, GHI, STATUS )
 
 *  Save this modified WCS FrameSet in the output NDF.
       CALL NDF_PTWCS( IWCS, INDFO, STATUS )      
