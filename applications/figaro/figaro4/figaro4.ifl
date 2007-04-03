@@ -1525,9 +1525,8 @@ interface FITPOLY
 
    parameter FITCOEFFS
       type     '_REAL'
-      ppath    'DYNAMIC,CURRENT,DEFAULT'
-      default  0,0,0,0,0,0,0,0
-      prompt   'Fitted polynomial coefficients'
+      access   'WRITE'
+      vpath    'INTERNAL'
       helpkey  '*'
    endparameter
 
