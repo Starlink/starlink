@@ -612,13 +612,18 @@ itcl::class gaia::GaiaCubeSpectrum {
       }
 
       #  If not already done, prepare for sending messages to SPLAT.
-      #  Trap any messages to a text window if requested.
+      #  Trap any messages to a text window if requested and return
+      #  any errors as an error not in a dialog (gives full stack trace).
       if { $splat_disp_ == {} } {
+         set use_error_dialog 1
+         if { $itk_option(-show_splatdisp) } {
+            set use_error_dialog 0
+         }
          set splat_disp_ [GaiaForeignExec \#auto \
                              -application $splat_dir_/splatdisp \
                              -show_output $itk_option(-show_splatdisp) \
-                             -use_error $itk_option(-show_splatdisp) \
-                             -show_traceback $itk_option(-show_splatdisp)]
+                             -show_traceback $itk_option(-show_splatdisp) \
+                             -use_error_dialog $use_error_dialog]
       }
 
       set filename "GaiaTempSpectrum[incr count_].sdf"

@@ -208,7 +208,7 @@ itcl::class gaia::GaiaForeignExec {
                          -onerror \[code $this error_\] \
                          $application $args"} msg
          if { $msg != {} } {
-            error_ "$msg (bgexec)"
+            error_ "$msg (bgexec): $::errorInfo"
          }
          command_completed_
       }
@@ -276,7 +276,7 @@ itcl::class gaia::GaiaForeignExec {
          } else {
             if { $show_traceback } {
                for { set i [info level] } { $i > -1 } { incr i -1 } { 
-                  append msg "$i: [info level $i]"
+                  append msg "\n$i: [info level $i]"
                }
             }
             if { $use_error_dialog } {
