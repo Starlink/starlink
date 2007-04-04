@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.32}
 \newcommand{\stardocnumber}    {95.32}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2007 March 20}
+\newcommand{\stardocdate}      {2007 March 29}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.7-1}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -45608,7 +45608,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       the output.  Alternatively, output variances can be generated from
       the spread of input values contributing to each output pixel (see
       parameter GENVAR). Any input variances can also be used to weight
-      the input data (see parameter VARWGT).  By default, all input data
+      the input data (see parameter VARIANCE).  By default, all input data
       are given equal weight.
 
       The transformations needed to produce alignment are derived from
@@ -45639,12 +45639,14 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       \sstsubsection{
          GENVAR = \_LOGICAL (Read)
       }{
-         If {\tt TRUE}, any input variances are ignored and output variances
-         are generated based on the spread of input pixel values
-         contributing to each output pixel.  If {\tt FALSE}, the output
-         variances are based on the variances in the input NDFs, and the
-         output NDF will contain variances only if all input NDFs
-         contain variances. {\tt [FALSE]}
+         If {\tt TRUE}, output variances are generated based on the spread of input 
+         pixel values contributing to each output pixel.  Any input variances 
+         then have no effect on the output variances (although input variances 
+         will still be used to weight the input data if the VARIANCE parameter 
+         is set {\tt TRUE}).  If GENVAR is set {\tt FALSE}, the output variances 
+         are based  on the variances in the input NDFs, so long as all input NDFs
+         contain variances (otherwise the output NDF will not contain any
+         variances).  {\tt [FALSE]}
       }
       \sstsubsection{
          ILEVEL = \_INTEGER (Read)
@@ -45834,12 +45836,19 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          these same defaults being used. {\tt [!]}
       }
       \sstsubsection{
-        VARWGT = \_LOGICAL (Read)
+         VARIANCE = \_LOGICAL (Read)
       }{
          If {\tt TRUE}, then any input VARIANCE components in the input NDFs
          are used to weight the input data (the weight used for each
          data value is the reciprocal of the variance).  If {\tt FALSE}, all
-         input data is given equal weight.  {\tt [FALSE]}
+         input data is given equal weight. Note, some applications (such
+         as \xref{CCDPACK:MAKEMOS}{sun139}{MAKEMOS}) use a parameter named 
+         USEVAR to determine both whether input variances are used to weights 
+         input data values, and also how to calculate output variances.  
+         However, WCSMOSAIC uses the VARIANCE parameter only for the first of these purposes 
+         (determining whether to weight the input data).  The second
+         purpose (determining how to create output variances) is
+         fulfilled by the GENVAR parameter.  {\tt [FALSE]}
       }
       \sstsubsection{
          WLIM = \_REAL (Read)
@@ -51585,8 +51594,8 @@ The following applications have been modified:
    \item [\htmlref{WCSMOSAIC}{WCSMOSAIC}] \mbox{}
       \begin{itemize}
       \item \htmlref{VARIANCE}{apndf:variance}~ components may be used to weight 
-      the input data if a new parameter VARWGT is set to {\tt TRUE}.
-      VARWGT defaults to the current behaviour.
+      the input data if a new parameter VARIANCE is set to {\tt TRUE}.
+      VARIANCE defaults to the current behaviour.
       \end{itemize}
 
 \end{description}
