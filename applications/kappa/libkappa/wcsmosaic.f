@@ -63,8 +63,8 @@
 *     the output.  Alternatively, output variances can be generated from
 *     the spread of input values contributing to each output pixel (see
 *     parameter GENVAR). Any input variances can also be used to weight
-*     the input data (see parameter USEVAR). By default, all input data
-*     is given equal weight.
+*     the input data (see parameter VARIANCE). By default, all input
+*     data is given equal weight.
 *
 *     The transformations needed to produce alignment are derived from
 *     the co-ordinate system information stored in the WCS components of
@@ -89,14 +89,15 @@
 *        region is used.  High accuracy is paid for by longer run times.
 *        [0.05]
 *     GENVAR = _LOGICAL (Read)
-*        If TRUE, output variances are generated based on the spread of input 
-*        pixel values contributing to each output pixel.  Any input variances 
-*        then have no effect on the output variances (although input variances 
-*        will still be used to weight the input data if the USEVAR parameter 
-*        is set TRUE). If GENVAR is set FALSE, the output variances are based 
-*        on the variances in the input NDFs, so long as all input NDFs
-*        contain variances (otherwise the output NDF will not contain any
-*        Variances).  [FALSE]
+*        If TRUE, output variances are generated based on the spread of 
+*        input pixel values contributing to each output pixel.  Any
+*        input variances then have no effect on the output variances 
+*        (although input variances will still be used to weight the 
+*        input data if the VARIANCE parameter is set TRUE).  If GENVAR
+*        is set FALSE, the output variances are based on the variances
+*        in the input NDFs, so long as all input NDFs contain variances 
+*        (otherwise the output NDF will not contain any Variances).  
+*        [FALSE]
 *     ILEVEL = _INTEGER (Read)
 *        Controls the amount of information displayed on the screen. If
 *        set to 1, no information will be displayed while the command
@@ -245,18 +246,18 @@
 *        The upper pixel bounds of the output NDF. Note, values will be
 *        written to this output parameter even if a null value is supplied 
 *        for parameter OUT.
-*     USEVAR = _LOGICAL (Read)
-*        If TRUE, then any input Variance components in the input NDFs
+*     VARIANCE = _LOGICAL (Read)
+*        If TRUE, then any input VARIANCE components in the input NDFs
 *        are used to weight the input data (the weight used for each
-*        data value is the reciprocal of the variance). If FALSE, all
-*        input data is given equal weight. Note, some applications (such
-*        as CCDPACK:MAKEMOS) use a parameter named USEVAR to determine
-*        both whether input variances are used to weights input data
-*        values, and also how to calculate output variances. However,
-*        WCSMOSAIC uses USEVAR only for the first of these purposes 
-*        (determining whether to weight the input data). The second
-*        purpose (determining how to create output variances) is
-*        fulfilled by the GENVAR parameter. [FALSE]
+*        data value is the reciprocal of the variance).  If FALSE, all
+*        input data is given equal weight.  Note, some applications
+*        (such as CCDPACK:MAKEMOS) use a parameter named USEVAR to 
+*        determine both whether input variances are used to weights 
+*        input data values, and also how to calculate output variances. 
+*        However, WCSMOSAIC uses the VARIANCE parameter only for the 
+*        first of these purposes (determining whether to weight the 
+*        input data).  The second purpose (determining how to create 
+*        output variances) is fulfilled by the GENVAR parameter. [FALSE]
 *     WLIM = _REAL (Read)
 *        This parameter specifies the minimum number of good pixels
 *        that must contribute to an output pixel for the output pixel
@@ -313,6 +314,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -335,6 +337,8 @@
 *        Renamed parameter VARWGT as USEVAR. Internally, the flag is
 *        still refered to as varwgt for consistency with AST (which has
 *        both AST__USEVAR and AST__VARWGT flags).
+*     2007 April 4 (MJC):
+*        Renamed USEVAR to the KAPPA standard of VARIANCE.
 *     {enter_further_changes_here}
 
 *-
@@ -565,7 +569,7 @@
 *  If all input have variance components, see if input variances are to 
 *  be used as weights.
       IF( HASVAR ) THEN
-         CALL PAR_GET0L( 'USEVAR', VARWGT, STATUS )
+         CALL PAR_GET0L( 'VARIANCE', VARWGT, STATUS )
       ELSE
          VARWGT = .FALSE.
       END IF      
