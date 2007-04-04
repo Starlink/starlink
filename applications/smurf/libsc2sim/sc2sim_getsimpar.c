@@ -181,7 +181,7 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
    if ( !astMapGet0I ( keymap, "FLUX2CUR", &(sinx->flux2cur) ) )
       sinx->flux2cur = 1;
 
-   if ( !astMapGet0D ( keymap, "MEANTATM", &(sinx->meanatm) ) )
+   if ( !astMapGet0D ( keymap, "MEANATM", &(sinx->meanatm) ) )
       sinx->meanatm = 7.0;
 
    if ( !astMapGet0D ( keymap, "NASANG", &(sinx->nasang) ) )
