@@ -14,8 +14,9 @@
 *     SLALIB. It should be extended as and when necessary.
 
 *  Copyright:
-*     Copyright (C) 2006 Council for the Central Laboratory of the
-*     Research Councils
+*     Copyright (C) 1996-2006 Council for the Central Laboratory of the
+*     Research Councils. Copyright (C) 2007 Science and Technology
+*     Facilities Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -71,6 +72,8 @@
 *        Add SLA_DTT and SLA_DAT
 *     21-DEC-2006 (TIMJ):
 *        Add SLA_RDPLAN
+*     03-APR-2007 (TIMJ):
+*        Add SLA_DR2TF
 *-
 */
 
@@ -421,6 +424,32 @@ void slaDd2tf ( int ndp, double days, char *sign, int ihmsf[4] ) {
    sign[0] = SIGN[0];
    sign[1] = 0;
    for ( i = 0; i < 4; i++ ) ihmsf[ i ] = IHMSF[ i ];
+}
+
+F77_SUBROUTINE(sla_dr2tf)( INTEGER(NDP),
+                           DOUBLE(ANGLE),
+                           CHARACTER(SIGN),
+                           INTEGER_ARRAY(IHMSF)
+                           TRAIL(SIGN) );
+
+void
+slaDr2tf( int ndp, double angle, char * sign, int ihmsf[4] )  {
+  DECLARE_INTEGER(NDP);
+  DECLARE_DOUBLE(ANGLE);
+  DECLARE_CHARACTER(SIGN,2);
+  DECLARE_INTEGER_ARRAY(IHMSF,4);
+  int i;
+
+  NDP = ndp;   
+  ANGLE = angle;
+  F77_CALL(sla_dr2tf)( INTEGER_ARG(&NDP),
+		       DOUBLE_ARG(&ANGLE),
+		       CHARACTER_ARG(SIGN),
+		       INTEGER_ARRAY_ARG(IHMSF) 
+		       TRAIL_ARG(SIGN) );
+  sign[0] = SIGN[0];
+  sign[1] = 0;
+  for ( i = 0; i < 4; i++ ) ihmsf[ i ] = IHMSF[ i ];
 }
 
 F77_SUBROUTINE(sla_dimxv)( DOUBLE_ARRAY(DM),
