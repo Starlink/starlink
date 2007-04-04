@@ -212,6 +212,8 @@
 *        since the simulation started, not the full MJD.
 *     2007-03-27 (AGG):
 *        Make this time-since-start a new variable for clarity
+*     2007-04-02 (AGG):
+*        Derive more FITS headers, add extra args to ndfwrdata
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -352,6 +354,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   int *dksquid=NULL;              /* dark squid values */
   double drytau183;               /* Broadband 183 GHz zenith optical depth */
   double dtt = 0;                 /* Time difference between UTC and TT */
+  double exptime = 0.0;           /* Subimage exposure time */
   AstFitsChan *fc=NULL;           /* FITS channels for tanplane projection */
   int fileexists = 1;             /* Flag to denote whether the named
 				     output file already exists */
@@ -365,11 +368,13 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double *flatpar[8];             /* flatfield parameters for all subarrays */
   int frame;                      /* frame counter */
   AstFrameSet *fs=NULL;           /* frameset for tanplane projection */
-  int groupcounter;               /* Counter for `group' portion of output filename */
+  int groupcounter;               /* Counter for `group' portion of output 
+				     filename */
   JCMTState *head = NULL;         /* per-frame headers */
   char heatname[SC2SIM__FLEN];    /* name of flatfield cal file */
   double hourangle;               /* Current hour angle */
   int i;                          /* loop counter */
+  int ihmsf[4];                   /* H, M, S and fractional seconds */
   double instap[2];               /* Focal plane instrument offsets */
   int j;                          /* loop counter */
   double jigptr[SC2SIM__MXSIM][2]; /* pointing: nas jiggle offsets from cen. 
@@ -379,13 +384,18 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double *jig_x_hor=NULL;         /* jiggle x-horizontal tanplane offset (radians) */
   int k;                          /* loop counter */
   int lastframe;                  /* number of frames in the last chunk */
+  char loclcrd[SZFITSCARD];       /* Coordinate frame */
   double *lst=NULL;               /* local apparent sidereal time at time step */
+  char lstend[SZFITSCARD];        /* LST at end of sub-scan */
+  char lststart[SZFITSCARD];      /* LST at start of sub-scan */
   double *mjuldate=NULL;          /* modified Julian date each sample */
   int narray = 0;                 /* number of subarrays to generate */
   int nflat[8];                   /* number of flat coeffs per bol */
+  int nimage = 0;                 /* Number of subimages within subscan */
   static double noisecoeffs[SC2SIM__MXBOL*3*60]; /* noise coefficients */
   int nterms=0;                   /* number of 1/f noise frequencies */
   char obsid[80];                 /* OBSID for each observation */
+  char obstype[SZFITSCARD];       /* Observation type, e.g. SCIENCE */
   FILE *ofile = NULL;             /* File pointer to check for existing files */
   double phi;                     /* latitude (radians) */
   int planet = 0;                 /* Flag to indicate planet observation */
@@ -395,7 +405,9 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double raapp;                   /* Apparent RA */
   double raapp1;                  /* Recalculated apparent RA */
   int rowsize;                    /* row size for flatfield */
+  char scancrd[SZFITSCARD];       /* SCAN coordinate frame */
   double sigma;                   /* instrumental white noise */
+  char sign[2];                   /* Sign of angle (+/-) */
   Grp *skygrp = NULL;             /* Group of input files */
   AstMapping *sky2map=NULL;       /* Mapping celestial->map coordinates */
   double sky_az=0;                /* effective az on sky (bor+jig) */
@@ -415,10 +427,12 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double temp2;                   /* store temporary values */
   double temp3;                   /* store temporary values */
   double timesincestart = 0.0;    /* Time since start of simulation */
+  double totaltime;               /* Total integration time */
   double tt;                      /* Terrestrial Time (TT) for
 				     calculating planet position */
   float ttau[3];                  /* output of wvmOpt */
   double twater;                  /* water line temp. for WVM simulation */
+  char utdate[SZFITSCARD];        /* UT date in YYYYMMDD form */
   double vmax[2];                 /* telescope maximum velocities (arcsec) */
 
   if ( *status != SAI__OK) return;
@@ -555,6 +569,11 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
   }/* if not hits-only */
 
+  /* Set some static FITS headers */
+  strncpy( obstype, "SCIENCE", 7);
+  /* KLUDGE !!! */
+  exptime = 200.0 * inx->steptime;
+
   if( *status == SAI__OK ) {
     /*  Re-initialise random number generator to give a different sequence
 	each time by using the given seed. */
@@ -600,7 +619,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       
       case stare:
         /* Stare just points at a nasmyth offset of 0 from the map centre */
-	/*        msgOut(" ", "Do a STARE observation", status ); */
+	msgOutif(MSG__VERB, " ", "Do a STARE observation", status );
         count = inx->numsamples;
         posptr = smf_malloc ( count*2, sizeof(*posptr), 1, status );
         if( *status == SAI__OK ) {
@@ -611,7 +630,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
       case dream:
         /* Call sc2sim_getpat to get the dream pointing solution */
-        /*msgOut(" ", "Do a DREAM observation", status );*/
+        msgOutif(MSG__VERB, " ", "Do a DREAM observation", status );
        
         /*  Get jiggle pattern.
             jigptr[*][0] - X-coordinate in arcsec/time of the Jiggle position.
@@ -639,7 +658,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
       case singlescan:
         /* Call sc2sim_getsinglescan to get scan pointing solution */
-	/*        msgOut(" ", "Do a SINGLESCAN observation", status );*/
+	msgOutif(MSG__VERB, " ", "Do a SINGLESCAN observation", status );
         accel[0] = 432.0;
         accel[1] = 540.0;
         vmax[0] = inx->vmax;        /*200.0;*/
@@ -652,7 +671,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
       case bous:
         /* Call sc2sim_getbous to get boustrophedon pointing solution */
-	/*        msgOut(" ", "Do a BOUS observation", status );*/
+	msgOutif(MSG__VERB, " ", "Do a BOUS observation", status );
         accel[0] = 432.0;
         accel[1] = 540.0;
         vmax[0] = inx->vmax;        /*200.0;*/
@@ -666,7 +685,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
       case liss:
         /* Call sc2sim_getliss to get lissjous pointing solution */
-	/*        msgOut(" ", "Do a LISSAJOUS observation", status ); */
+	msgOutif(MSG__VERB, " ", "Do a LISSAJOUS observation", status );
 
         accel[0] = 0.0;
         accel[1] = 0.0;
@@ -692,7 +711,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
         if ( strncmp ( inx->pong_type, "STRAIGHT", 8 ) == 0 ) {
 
-	  /*          msgOut(" ", "Do a STRAIGHT PONG observation", status );*/
+	  msgOutif(MSG__VERB, " ", "Do a STRAIGHT PONG observation", status );
 
 	  sc2sim_getstraightpong ( inx->pong_angle, inx->width, inx->height, 
                                    inx->spacing, accel, vmax, samptime, 
@@ -700,7 +719,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
         } else if ( strncmp ( inx->pong_type, "CURVE", 5 ) == 0 ) { 
 
-	  /*          msgOut(" ", "Do a CURVE PONG observation", status ); */
+	  msgOutif(MSG__VERB, " ", "Do a CURVE PONG observation", status );
 
 	  sc2sim_getcurvepong ( inx->pong_angle, inx->width, inx->height, 
                                 inx->spacing, accel, vmax, samptime,
@@ -862,8 +881,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
     /* Increment mjdaystart (UTC) to the beginning of this chunk, then
        calculate the UT1/LAST at each timestep */
-    start_time = inx->mjdaystart + 
-      ((double)(curchunk * maxwrite) * samptime / SPD); 
+    totaltime = (double)(curchunk * maxwrite) * samptime;
+    start_time = inx->mjdaystart + (totaltime / SPD); 
 
     taiutc = slaDat( start_time );
 
@@ -1332,16 +1351,39 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 		    INSTRUMENT, groupcounter, date_yr, date_mo, date_da,
 		    date_hr,date_mn,0);
 
+	    sprintf( utdate, "%04d%02d%02d", date_yr, date_mo, date_da);
+
             /* Set the subarray name */
             strcpy ( sinx->subname, subarrays[k] );
+
+	    /* Number of .In images KLUDGE */
+	    if ( mode == dream || mode == stare ) {
+	      nimage = maxwrite / 200;
+	    }
+	    /* LST start/end */
+	    strncpy(sign, "+", 1);
+	    slaDr2tf(4, lst[0], sign, ihmsf);
+	    sprintf( lststart, "%02d:%02d:%02d.%04d", 
+		     ihmsf[0], ihmsf[1], ihmsf[2], ihmsf[3]);
+	    slaDr2tf(4, lst[lastframe-1], sign, ihmsf);
+	    sprintf( lstend, "%02d:%02d:%02d.%04d", 
+		     ihmsf[0], ihmsf[1], ihmsf[2], ihmsf[3]);
+	    /* HST start/end */
 
 	    /* Write the data out to a file */
 	    sc2sim_ndfwrdata( inx, sinx, tauCSO, filename, lastframe, nflat[k], 
 			      flatname[k], head, digits, dksquid, flatcal[k], 
 			      flatpar[k], INSTRUMENT, filter, dateobs, obsid,
 			      &(posptr[(curchunk*maxwrite)*2]), jigsamples, 
-                              jigptr, status);
-
+                              &(jigptr[0]), 
+			      groupcounter, curchunk+1, obstype, utdate, 
+			      head[0].tcs_az_bc1, 
+			      head[lastframe-1].tcs_az_bc1,
+			      head[0].tcs_az_bc2, 
+			      head[lastframe-1].tcs_az_bc2,
+			      lststart, lstend, loclcrd, scancrd, 
+			      totaltime, exptime, nimage,
+			      status);
 
  	    msgSetc( "FILENAME", filename );
 	    msgOut(" ", "Done ^FILENAME", status );

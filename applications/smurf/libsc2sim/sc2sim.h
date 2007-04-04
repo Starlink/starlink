@@ -61,6 +61,8 @@
 *        Add sc2sim_simstats and update API to sc2sim_simulate
 *     2007-03-20 (TIMJ):
 *        Add OBSID to ndfwrdata and use const
+*     2007-04-02 (AGG):
+*        Add beaucoup de FITS headers to ndfwrdata
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -527,26 +529,41 @@ int *status       /* global status (given and returned) */
 
 void sc2sim_ndfwrdata
 ( 
-const struct sc2sim_obs_struct *inx,      /* structure for values from XML (given) */
+const struct sc2sim_obs_struct *inx,  /* structure for values from XML (given) */
 const struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
-double meanwvm,   /* 225 GHz tau */
-const char file_name[], /* output file name (given) */
-int numsamples,   /* number of samples (given) */
-int nflat,        /* number of flat coeffs per bol (given) */
-const char flatname[],   /* name of flatfield algorithm (given) */
-const JCMTState *head,  /* header data for each frame (given) */
-const int *dbuf,        /* simulated data (given) */
-const int *dksquid,     /* dark SQUID time stream data (given) */
-const double *fcal,     /* flatfield calibration (given) */
-const double *fpar,     /* flat-field parameters (given) */
-const char instrume[],  /* String representing instrument (e.g. "SCUBA-2") (given) */
-const char filter[],    /* String representing filter (e.g. "850") (given) */
-const char dateobs[],    /* DateObs string for FITS header */
-const char obsid[],     /* Observation ID string */
-const double *posptr,   /* Pointing offsets from map centre */
-int jigsamples,   /* Number of jiggle samples (given) */
+double meanwvm,           /* 225 GHz tau */
+const char file_name[],   /* output file name (given) */
+int numsamples,           /* number of samples (given) */
+int nflat,                /* number of flat coeffs per bol (given) */
+const char flatname[],    /* name of flatfield algorithm (given) */
+const JCMTState *head,    /* header data for each frame (given) */
+const int *dbuf,          /* simulated data (given) */
+const int *dksquid,       /* dark SQUID time stream data (given) */
+const double *fcal,       /* flatfield calibration (given) */
+const double *fpar,       /* flat-field parameters (given) */
+const char instrume[],    /* String representing instrument (e.g. "SCUBA-2") (given) */
+const char filter[],      /* String representing filter (e.g. "850") (given) */
+const char dateobs[],     /* DateObs string for FITS header */
+const char obsid[],       /* Observation ID string */
+const double *posptr,     /* Pointing offsets from map centre */
+int jigsamples,           /* Number of jiggle samples (given) */
 const double jigptr[][2], /* Array of X, Y jiggle positions (given) */
-int *status       /* global status (given and returned) */
+const int obsnum,         /* Observation number (given) */		 
+const int nsubscan,       /* Sub-scan number (given) */			 
+const char obstype[],     /* Observation type, e.g. SCIENCE (given)*/	 
+const char utdate[],      /* UT date in YYYYMMDD form (given) */		 
+const double azstart,     /* Azimuth at start of sub-scan (given) */	 
+const double azend,       /* Azimuth at end of sub-scan (given) */	 
+const double elstart,     /* Elevation at start of sub-scan (given) */	 
+const double elend,       /* Elevation at end of sub-scan (given) */	 
+const char lststart[],    /* LST at start of sub-scan (given) */		 
+const char lstend[],      /* LST at end of sub-scan (given) */		 
+const char loclcrd[],     /* Coordinate frame (given) */			 
+const char scancrd[],     /* SCAN coordinate frame (given) */		 
+const double totaltime,   /* Total integration time (given) */
+const double exptime,     /* Subimage exposure time (given) */		 
+const int nimage,         /* Number of subimages within subscan (given) */
+int *status               /* Global status (given and returned) */
 );
 
 void sc2sim_ndfwrheat
