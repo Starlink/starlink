@@ -459,7 +459,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       inx->smu_offset = 0.0;
 
    if ( !astMapGet0I ( keymap, "SMU_SAMPLES", &(inx->smu_samples) ) )
-      inx->smu_samples = 1;
+      inx->smu_samples = 8;
 
    if ( !astMapGet0D ( keymap, "SPACING", &(inx->spacing) ) )
      inx->spacing = 240.0;
