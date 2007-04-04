@@ -62,7 +62,7 @@
 *     2007-03-20 (TIMJ):
 *        Add OBSID to ndfwrdata and use const
 *     2007-04-02 (AGG):
-*        Add beaucoup de FITS headers to ndfwrdata
+*        Add more FITS headers to ndfwrdata
 *     {enter_further_changes_here}
 
 *  Copyright:
