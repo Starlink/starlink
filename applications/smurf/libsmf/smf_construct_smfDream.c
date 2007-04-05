@@ -58,6 +58,8 @@
 *        Initial version
 *     2006-11-10 (AGG):
 *        Update prologue, read GRID_SIZE from weights file
+*     2007-04-05 (AGG):
+*        Change OBSMODE to SAM_MODE
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -150,7 +152,7 @@ smfDream *smf_construct_smfDream( smfData *data, const int nvert,
 
   /* Check we have DREAM data */
   hdr = data->hdr;
-  smf_fits_getS( hdr, "OBSMODE", obsmode, SZFITSCARD, status );
+  smf_fits_getS( hdr, "SAM_MODE", obsmode, SZFITSCARD, status );
   if ( strncmp( obsmode, "DREAM", 5) == 0 ) {
     /* Check we have valid pointers to the SMU path and jiggle vertices */
     if ( jigpath != NULL && jigvert != NULL ) {

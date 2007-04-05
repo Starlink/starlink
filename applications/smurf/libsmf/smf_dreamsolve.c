@@ -45,6 +45,8 @@
 *        smf_store_image.c
 *     2006-11-10 (AGG):
 *        Store GRIDEXT and GRID_SIZE parameters in file
+*     2007-04-05 (AGG):
+*        Change OBSMODE to SAM_MODE
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -190,7 +192,7 @@ void smf_dreamsolve( smfData *data, int *status ) {
 
   /* Check we have a DREAM observation. */
   hdr = data->hdr;
-  smf_fits_getS( hdr, "OBSMODE", obsmode, LEN__METHOD+1, status );
+  smf_fits_getS( hdr, "SAM_MODE", obsmode, LEN__METHOD+1, status );
   if ( strncmp( obsmode, "DREAM", 5) == 0 ) {
     msgOutif(MSG__VERB," ", "Processing DREAM data", status);
     /* Have we done this before? If so it's not fatal as new processed

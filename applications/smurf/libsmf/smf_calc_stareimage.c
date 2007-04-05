@@ -38,6 +38,8 @@
 *        Initial version
 *     2007-03-28 (TIMJ):
 *        Free temporary buffer.
+*     2007-04-05 (AGG):
+*        Change OBSMODE to SAM_MODE
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -118,7 +120,7 @@ void smf_calc_stareimage( smfData *data, const int naver, int *status) {
 
   /* Do we have STARE data? */
   hdr = data->hdr;
-  smf_fits_getS( hdr, "OBSMODE", obsmode, LEN__METHOD+1, status );
+  smf_fits_getS( hdr, "SAM_MODE", obsmode, LEN__METHOD+1, status );
   if ( strncmp( obsmode, "STARE", 5) == 0 ) {
     msgOutif(MSG__VERB," ", "Processing STARE data", status);
 

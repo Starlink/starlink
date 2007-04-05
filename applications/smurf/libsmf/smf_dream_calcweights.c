@@ -62,6 +62,8 @@
 *        - Update call to smf_open_newfile due to API change
 *     2006-10-26 (AGG):
 *        Add GRIDSTEP keyword
+*     2007-04-05 (AGG):
+*        Change OBSMODE to SAM_MODE
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -184,7 +186,7 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
 
     /* Check we have a DREAM observation */
     hdr = data->hdr;
-    smf_fits_getS( hdr, "OBSMODE", obsmode, LEN__METHOD, status);
+    smf_fits_getS( hdr, "SAM_MODE", obsmode, LEN__METHOD, status);
     if ( strncmp( obsmode, "DREAM", 5) == 0 ) {
       /* OK we have DREAM data */
       dream = data->dream;
