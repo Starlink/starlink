@@ -31,7 +31,7 @@ TASKS = ascii2ndf ast2ndf conhelp da2ndf dst2ndf fits2ndf \
 
 IFL_FILES = convert_mon.ifl $(TASKS:=.ifl)
 
-HELP_FILES = package.hlp Parameters.hlp Running_applications.hlp \
+HELP_FILES = package.hlp Parameters.hlp Running_from_a_Unix_Shell.hlp \
              Using_Help.hlp
 
 #  List of ancillary data files (all types). These need a home at some point.
