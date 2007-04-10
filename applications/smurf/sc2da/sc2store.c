@@ -234,13 +234,20 @@ int *status              /* global status (given and returned) */
     24Jan2005 : create DA_IMAGE as a scalar instead of an array (bdk)
     15Apr2005 : name DA_IMAGE changed to SCU2RED and da_imloc to
                 scu2redloc (bdk)
+    10Apr2007 : check if extension already exists before attempting to 
+                create it (agg)
 */
 {
+   int isthere = 0;        /* Flag to denote whether extension already exists */
 
    if ( *status != SAI__OK ) return;
 
-   ndfXnew ( indf, "SCU2RED", "SCUBA2_MAP_ARR", 0, 0, &scu2redloc, 
-     status );
+   ndfXstat( indf, "SCU2RED", &isthere, status );
+
+   if ( !isthere ) {
+     ndfXnew ( indf, "SCU2RED", "SCUBA2_MAP_ARR", 0, 0, &scu2redloc, 
+	       status );
+   }
 
    sc2store_errconv ( status );
 }
@@ -1225,6 +1232,8 @@ int *status        /* global status (given and returned) */
     13Jun2005 : allow image to be n-dimensional (BDK)
     23Nov2005 : Use Official C HDS interface (TIMJ)
     20Mar2007 : Use const in signature (TIMJ)
+    10Apr2007 : Do not write MAPDATA extension: SEQSTART/END now stored 
+                as FITS headers; rename BZ_IMAGE -> BOLZERO (AGG)
 */
 {
 
@@ -1238,7 +1247,6 @@ int *status        /* global status (given and returned) */
    int lbnd[7];            /* lower dimension bounds */
    int ntot;               /* total number of elements */
    int place;              /* NDF placeholder */
-   HDSLoc *seq_loc = NULL; /* HDS locator */
    int strnum;             /* structure element number */
    int uindf;              /* NDF identifier */
    int ubnd[7];            /* upper dimension bounds */
@@ -1282,16 +1290,10 @@ int *status        /* global status (given and returned) */
 
    ndfPtwcs ( fset, uindf, status );
 
-/* Store start and end sequence numbers in the extension */
-
-   ndfXnew ( uindf, "MAPDATA", "SEQUENCE_RANGE", 0, 0, &seq_loc, status );
-   ndfXpt0i ( seqstart, uindf, "MAPDATA", "SEQSTART", status );
-   ndfXpt0i ( seqend, uindf, "MAPDATA", "SEQEND", status );
-
 /* Store the bolometer zero points as an NDF in the extension */
 
-   ndfXnew ( uindf, "BZ_IMAGE", "SCUBA2_ZER_ARR", 0, 0, &bz_imloc, 
-     status );
+   ndfXnew ( uindf, "BOLZERO", "SCUBA2_ZER_ARR", 0, 0, &bz_imloc, 
+	     status );
    ndfPlace ( bz_imloc, "ZERO", &place, status );
 
 /* Create the array for bolometer zeros */
@@ -1345,8 +1347,6 @@ int *status        /* global status (given and returned) */
    ndfAnnul ( &uindf, status );
 
 /* Free the locators for the frame */
-
-   datAnnul ( &seq_loc, status );
    datAnnul ( &bz_imloc, status );
 
 
