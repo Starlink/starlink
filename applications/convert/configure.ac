@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(convert, 1.5-8, ussc@star.rl.ac.uk)
+AC_INIT(convert, 1.5-9, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -41,6 +41,7 @@ STAR_CHECK_PROGS(tifftopnm)
 
 dnl    Need "hlib" command to build the help library.
 STAR_CHECK_PROGS(hlib)
+STAR_CHECK_PROGS(prohlp,sst)
 
 dnl    Ranlib is needed on OS X so that we can update the static libraries
 dnl    (the archive index is considered out of date if it doesn't match the
