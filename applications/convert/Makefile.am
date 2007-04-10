@@ -26,10 +26,13 @@ convert_mon_TASKS = $(TASKS) $(FPP_TASKS)
 FPP_TASKS = ndf2iraf iraf2ndf
 
 TASKS = ascii2ndf ast2ndf conhelp da2ndf dst2ndf fits2ndf \
- gasp2ndf ircam2ndf ndf2ascii ndf2da ndf2dst ndf2fits ndf2gasp \
- ndf2pgm ndf2tiff ndf2unf specx2ndf unf2ndf
+        gasp2ndf ircam2ndf ndf2ascii ndf2da ndf2dst ndf2fits ndf2gasp \
+        ndf2pgm ndf2tiff ndf2unf specx2ndf unf2ndf
 
 IFL_FILES = convert_mon.ifl $(TASKS:=.ifl)
+
+HELP_FILES = package.hlp Parameters.hlp Running_applications.hlp \
+             Using_Help.hlp
 
 #  List of ancillary data files (all types). These need a home at some point.
 EXAMPLE_FILES = test_data/*
@@ -43,6 +46,17 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 #  Rule for building the help library from the help source.
 .hlp.shl:
 	@HLIB@ $<
+
+# Create help for the applications.
+tasks.hlp: $(TASKS:=.f)
+	-rm -f tasks.hlp
+	cat $(TASKS:=.f) > all.f
+	PATH="$(PATH):$(STARLINK)/bin/sst"; export PATH; \
+	@PROHLP@ in=all.f out=tasks.hlp single=no
+	-rm all.f
+
+convert.hlp: convert_master.hlp tasks.hlp $(HELP_FILES) 
+	cat convert_master.hlp tasks.hlp $(HELP_FILES) > convert.hlp
 
 ##  Any misc files that have no where else.
 dist_starnews_DATA = convert.news
@@ -100,14 +114,13 @@ tiff2ndf: tiff2ndf.in Makefile
 EXTRA_DIST = convert.f convert.csh.in convert.sh.in convert.icl.in gif2ndf.in \
              ndf2gif.in tiff2ndf.in $(HELP_SOURCES)
 
-
-MISC_BUILT_FILES = convert.shl version.dat gif2ndf ndf2gif tiff2ndf convert.csh convert.icl \
-convert_mon convert_mon.ifl convert.sh
+MISC_BUILT_FILES = convert.shl convert.hlp version.dat gif2ndf ndf2gif tiff2ndf \
+                   convert.csh convert.icl convert_mon convert_mon.ifl convert.sh
 
 IFC_FILES = conhelp.ifc da2ndf.ifc dst2ndf.ifc fits2ndf.ifc gasp2ndf.ifc iraf2ndf.ifc \
-ircam2ndf.ifc ndf2ascii.ifc ndf2da.ifc ndf2dst.ifc ndf2fits.ifc ndf2gasp.ifc \
-ndf2iraf.ifc ndf2pgm.ifc ndf2tiff.ifc ndf2unf.ifc specx2ndf.ifc unf2ndf.ifc \
-ascii2ndf.ifc ast2ndf.ifc convert_mon.ifc 
+            ircam2ndf.ifc ndf2ascii.ifc ndf2da.ifc ndf2dst.ifc ndf2fits.ifc ndf2gasp.ifc \
+            ndf2iraf.ifc ndf2pgm.ifc ndf2tiff.ifc ndf2unf.ifc specx2ndf.ifc unf2ndf.ifc \
+            ascii2ndf.ifc ast2ndf.ifc convert_mon.ifc 
 
 CLEANFILES = $(MISC_BUILT_FILES) $(IFC_FILES)
 
