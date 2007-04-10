@@ -886,7 +886,7 @@ interface NDF2FITS
       ppath       'CURRENT,DYNAMIC'
       prompt      'Number of bits per pixel'
       helpkey     '*'
-#     in          '0', '8', '16', '32', '-32', '-64'
+#     in          'N', '-1', '0', '8', '16', '32', '-32', '-64'
       default     '0'
    endparameter
 
