@@ -2066,8 +2066,15 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
             the AIPS++ project.
 
          \sstitem
-            \texttt{"DSS"} --- 
-            This is the system used by the Digital Sky Survey,
+            \texttt{"FITS-CLASS"} --- This uses the conventions of the CLASS
+            project.  CLASS is a software package for reducing 
+            single-dish radio and sub-mm spectroscopic data.  It 
+            supports double-sideband spectra.  See 
+            \htmladdnormallink{the GILDAS 
+            manual}{http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/class.html}.
+
+         \sstitem
+            \texttt{"DSS"} --- This is the system used by the Digital Sky Survey,
             and uses keywords AMDX\textit{n}, AMDY\textit{n}, PLTRAH, 
             \emph{etc}.
 
@@ -4695,6 +4702,13 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          \texttt{"FITS-AIPS++"} --- This is an extension to FITS-AIPS which 
          allows the use of a wider range of celestial as used by the AIPS++ 
          project.
+
+         \sstitem
+         \texttt{"FITS-CLASS"} --- This uses the conventions of the CLASS
+         project.  CLASS is a software package for reducing single-dish 
+         radio and sub-mm spectroscopic data.  It supports double-sideband 
+         spectra.  See \htmladdnormallink{the GILDAS 
+         manual}{http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/class.html}.
 
          \sstitem
          \texttt{"DSS"} --- This is the system used by the Digital Sky Survey, and
