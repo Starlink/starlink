@@ -1,0 +1,194 @@
+1 IDL_Converters
+IDL function READ_NDF is available to convert a component of an NDF
+to an IDL array, and IDL procedure WRITE_NDF will create an NDF 
+component from an IDL array. So, for example:
+
+   IDL> tv,read_ndf('comwest')
+
+will display the data array of the NDF, comwest.sdf, using the IDL
+command, TV, and:
+
+   IDL> write_ndf(field,'stars')
+
+will create an NDF, stars.sdf, of a suitable type and size, and write
+the IDL array, field, to its DATA_ARRAY component.
+
+   IDL> write_ndf(q,'stars','QUALITY')
+
+will write the IDL array, q, to the QUALITY component of an 
+existing NDF, stars.sdf.
+
+Both READ_NDF and WRITE_NDF can take special action on bad
+values. 
+
+2 Setting_up
+When convert is installed, READ_NDF and WRITE_NDF are
+placed in $CONVERT_DIR, so in order to make them available to IDL,
+that directory must be added to the IDL search path. This will be done
+if the environment variable IDL_PATH has been set (by the idl_setup
+script) when you start the CONVERT package by typing:
+
+   % convert
+
+Note that convert must be run after sourcing the idl_setup script.
+
+Note also that having started CONVERT, the NDF library, ultimately used
+by the procedures, will allow on-the-fly conversion of any files given 
+as parameters. This opens up the possibility of using almost any data 
+format with IDL.
+
+As an example:
+
+   IDL> tv,read_ndf('moon.tif')
+
+will display the TIFF file moon.tif.
+        
+2 READ_NDF
+Description:
+   This IDL function will convert a Starlink NDF file of up to seven
+   dimensions to an IDL array of an appropriate type and shape. Bad values
+   in the NDF may be converted to specific values in the IDL array.
+
+   If NDF on-the-fly conversion has been activated, the given filename may
+   refer to a file of a different data format which is to be converted.
+
+Usage:
+   Result = READ_NDF( Ndf_name[, Bad_value][,COMPONENT=Comp_name])
+
+Returned Value:
+   An IDL array of a size and type corresponding with the NDF. The type
+   correspondence is as follows:
+
+   _REAL -> floating
+   _DOUBLE -> double-precision
+   _UBYTE ->  byte
+   _WORD ->  integer
+   _INTEGER ->  longword integer
+
+Deficiencies:
+   No conversion of the given bad value to the appropriate type for
+   the array will be attempted; instead an error will be reported.
+
+Related Applications:
+   CONVERT: WRITE_NDF
+
+3 Arguments
+Arguments:
+   Ndf_name
+      A string expression specifying name of the NDF to be read.
+
+   Bad_value
+      Optional - A value to replace in the IDL array any occurrence of
+      the PRIMDAT bad value in the NDF component.  The value must be the 
+      same type as the array.
+
+Keywords:
+   COMPONENT
+      Set this to a string expression specifying the NDF component to be 
+      read.  It may be 'DATA', 'VARIANCE' or 'QUALITY' and defaults to 
+      'DATA'. The case of the string does not matter and it may be 
+      abbreviated to one or more characters.
+
+3 Examples
+Assuming \texttt{my_ndf.sdf} is an NDF of type _REAL,
+
+  IDL> data_array = read_ndf('my_ndf')
+
+creates an IDL floating array, data_array, with the same dimensions
+as the NDF and containing the values from its DATA component.
+
+  IDL> data_array = read_ndf('my_ndf', !values.f_nan)
+
+As above except that any occurrence of a bad value (VAL__BADR as 
+defined by the Starlink PRIMDAT package) in the NDF will be replaced
+by NaN in the IDL array.
+
+  IDL> quality = read_ndf('my_ndf',comp='q')
+
+creates an IDL byte array from the QUALITY component of the same NDF.
+(The QUALITY component is always type _UBYTE.)
+Note that the keyword 'component' and the value 'QUALITY' are 
+case-independent and can be abbreviated.
+
+2 WRITE_NDF
+Description:
+      This IDL procedure will write an IDL array of up to seven dimensions
+      to a Starlink NDF. If NDF on-the-fly conversion has been activated,
+      the given filename may refer to a file of a different data format in
+      which case the NDF is then automatically converted to the required
+      file type.
+
+Usage:
+   IDL> write_ndf, IDL_array, Ndf_name[, Bad_value][, COMPONENT=Comp_name]
+
+Deficiencies:
+   No conversion of the given bad value to the appropriate type for
+   the array will be attempted; instead an error will be reported.
+
+Related Applications:
+   CONVERT: READ_NDF
+
+3 Arguments
+Arguments:
+   IDL_array
+      The IDL array to be converted. This may be an array name or
+      constant of up to seven dimensions. The type of the NDF component
+      created will depend on the type of the given array:
+      
+      floating -> _REAL
+      double-precision -> _DOUBLE
+      byte -> _UBYTE
+      integer -> _WORD
+      longword integer -> _INTEGER
+
+      No other types are allowed.
+
+   Ndf_name
+      A string expression specifying name of the NDF to be written.
+
+   Bad_value
+      Optional - A value any occurrence of which in the IDL array is to
+      be replaced by the appropriate PRIMDAT bad value in the NDF
+      component. If no such value is found, the NDF bad pixel flag for
+      the component is set FALSE.  The value must be the same type as
+      the array.
+
+Keywords:
+   COMPONENT
+      Set this to a string expression specifying the NDF component to be 
+      written.  The following values are allowed:
+      
+      'DATA'  A new NDF is created with the same dimensions as the
+              IDL array, and the DATA component written.
+      'VARIANCE' An existing NDF is opened and a new component 
+              written. The size of the given array must be the same
+              as the NDF.
+      'QUALITY' An existing NDF is opened and a new component 
+              written. The size of the given array must be the same
+              as the NDF and the type of the IDL array must be Byte.
+
+      The case of the string does not matter and it may be abbreviated
+      to one or more characters.
+3 Examples
+Assuming \texttt{my_data} is an IDL floating array,
+
+   IDL> write_ndf, my_data, 'my_ndf'
+
+creates the NDF 'my_ndf.sdf' with the same dimensions as the IDL
+array 'my_data', and writes the array to its DATA component (of
+type _REAL). No checks on bad values are made.
+
+   IDL> write_ndf, my_data, 'my_ndf', !values.f_nan
+
+As above except that any occurrence of the value NaN in the array
+will be replaced by the VAL__BADR value as defined by the Starlink
+PRIMDAT package.
+
+   IDL> write_ndf, my_variances, 'my_ndf', comp='v'
+
+Writes the IDL array 'my_variances' to the VARIANCES component of
+the NDF created above. A check is made that the size of the array 
+corresponds with the size of the NDF. (Note that the keyword 
+'COMPONENT' and the value 'VARIANCE' are case-independent and can 
+be abbreviated.)
+
