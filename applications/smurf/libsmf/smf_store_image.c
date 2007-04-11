@@ -61,10 +61,12 @@
 *     2006-10-26 (AGG):
 *        Move some code from smf_dreamsolve here, update API
 *        accordingly, store FITS headers and WCS
+*     2007-04-10 (AGG):
+*        Remove creation of MAPDATA extension, rename BZ_IMAGE to BOLZERO
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
+*     Copyright (C) 2006-2007 University of British Columbia. All Rights
 *     Reserved.
 
 *  Licence:
@@ -208,13 +210,8 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
   /* Store world coordinate transformations */
   ndfPtwcs ( wcs, uindf, status );
 
-  /* Store start and end sequence numbers in the extension */
-  ndfXnew ( uindf, "MAPDATA", "SEQUENCE_RANGE", 0, 0, &seq_loc, status );
-  ndfXpt0i ( seqstart, uindf, "MAPDATA", "SEQSTART", status );
-  ndfXpt0i ( seqend, uindf, "MAPDATA", "SEQEND", status );
-
   /* Store the bolometer zero points as an NDF in the extension */
-  ndfXnew ( uindf, "BZ_IMAGE", "SCUBA2_ZER_ARR", 0, 0, &bz_imloc, 
+  ndfXnew ( uindf, "BOLZERO", "SCUBA2_ZER_ARR", 0, 0, &bz_imloc, 
 	    status );
   ndfPlace ( bz_imloc, "ZERO", &place, status );
 
