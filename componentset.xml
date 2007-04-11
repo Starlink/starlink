@@ -138,7 +138,7 @@ system are supported.
 </component>
 
 <component id="convert" support="S">
-  <version>1.5-8</version>
+  <version>1.5-9</version>
   <path>applications/convert</path>
   <description>CONVERT -- format-conversion package</description>
   <abstract><p>
