@@ -2,40 +2,41 @@
  The CONVERT package contains some of the numerous format-conversion
  routines which are necessary to translate data files to and from the
  Starlink standard n-Dimensional-data format--the NDF---described in
- SUN/33 and SGP/38.  CONVERT commands are available from ICL and UNIX
- shell.
+ SUN/33 and SGP/38.  CONVERT commands are available from various
+ scripting languages such as ICL, and from the UNIX shell.
 
  The commands available are:
 
-     ASCII2NDF -- Converts an ASCII file to an NDF.
-     AST2NDF   -- Converts an Asterix data-cube to an NDF.
-     DA2NDF    -- Converts a direct-access unformatted file to an NDF.
-     DST2NDF   -- Converts a Figaro (Version 2) DST file to an NDF.
-     FITS2NDF  -- Converts FITS files into NDFs.
-     GASP2NDF  -- Converts an image in GASP format to an NDF.
-     GIF2NDF   -- Converts a GIF file to an NDF.
-     IRAF2NDF  -- Converts an IRAF image to an NDF.
-     IRCAM2NDF -- Converts an IRCAM data file to a series of NDFs.
-     NDF2ASCII -- Converts an NDF to an ASCII file.
-     NDF2DA    -- Converts an NDF to a direct-access unformatted file.
-     NDF2DST   -- Converts an NDF to a Figaro (Version 2) DST file.
-     NDF2FITS  -- Converts an NDF to a FITS file.
-     NDF2GASP  -- Converts a two-dimensional NDF into a GASP image.
-     NDF2GIF   -- Converts a two-dimensional NDF into a GIF file.
-     NDF2IRAF  -- Converts an NDF to an IRAF (OIF) image.
-     NDF2PGM   -- Converts a two-dimensional NDF into a PGM file.
-     NDF2TIFF  -- Converts a two-dimensional NDF into a TIFF file.
-     NDF2UNF   -- Converts an NDF to a sequential unformatted file.
-     SPECX2NDF -- Converts a SPECX map into a simple data cube, or
-                  SPECX data files to individual spectra. 
-     TIFF2NDF  -- Converts a TIFF file to an NDF.
-     UNF2NDF   -- Converts a sequential unformatted file to an NDF.
+     ascii2ndf  -- Converts an ASCII file to an NDF.
+     ast2ndf    -- Converts an Asterix data-cube to an NDF.
+     da2ndf     -- Converts a direct-access unformatted file to an NDF.
+     dst2ndf    -- Converts a Figaro (Version 2) DST file to an NDF.
+     fits2ndf   -- Converts FITS files into NDFs.
+     gasp2ndf   -- Converts an image in GASP format to an NDF.
+     gif2ndf    -- Converts a GIF file to an NDF.
+     iraf2ndf   -- Converts an IRAF image to an NDF.
+     ircam2ndf  -- Converts an IRCAM data file to a series of NDFs.
+     mtfits2ndf -- Converts FITS magnetic tape files into NDFs.
+     ndf2ascii  -- Converts an NDF to an ASCII file.
+     ndf2da     -- Converts an NDF to a direct-access unformatted file.
+     ndf2dst    -- Converts an NDF to a Figaro (Version 2) DST file.
+     ndf2fits   -- Converts an NDF to a FITS file.
+     ndf2gasp   -- Converts a two-dimensional NDF into a GASP image.
+     ndf2gif    -- Converts a two-dimensional NDF into a GIF file.
+     ndf2iraf   -- Converts an NDF to an IRAF (OIF) image.
+     ndf2pgm    -- Converts a two-dimensional NDF into a PGM file.
+     ndf2tiff   -- Converts a two-dimensional NDF into a TIFF file.
+     ndf2unf    -- Converts an NDF to a sequential unformatted file.
+     specx2ndf  -- Converts a SPECX map into a simple data cube, or
+                   SPECX data files to individual spectra. 
+     tiff2ndf   -- Converts a TIFF file to an NDF.
+     unf2ndf    -- Converts a sequential unformatted file to an NDF.
 
  In addition there are four IDL procedures:
-     READ_NDF  -- Reads an NDF into an IDL array.
-     WRITE_NDF -- Writes an IDL array to an NDF.
-     HDS2IDL   -- Creates an IDL structure from an HDS file
-     IDL2HDS   -- Creates an HDS file from an IDL structure
+     read_ndf   -- Reads an NDF into an IDL array.
+     write_ndf  -- Writes an IDL array to an NDF.
+     hds2idl    -- Creates an IDL structure from an HDS file
+     idl2hds    -- Creates an HDS file from an IDL structure
 
  Full details can be found in SUN/55.
 
