@@ -49,9 +49,12 @@
 *        Trap out-of-range indices
 *     2006-07-20 (JB):
 *        Split from dsim.c
+*     2007-04-04 (AGG):
+*        Wrap out-of-range indices
+*     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
+*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
 *  Licence:
@@ -105,6 +108,8 @@ int *status          /* global status (given and returned) */
    double dy;            /* fractional pixel offset */
    int ixpix;            /* truncated pixel position */
    int iypix;            /* truncated pixel position */
+   int nwraps;           /* Multiplier to indicate how many times the
+			    atm image is wrapped */
    double xpix;          /* pixel position */
    double ypix;          /* pixel position */
 
@@ -115,6 +120,19 @@ int *status          /* global status (given and returned) */
    ypix = ypos / scale;
    ixpix = (int)xpix;
    iypix = (int)ypix;
+
+   /*   printf("ixpix = %d, iypix = %d, size = %d\n",ixpix,iypix,size);*/
+
+   /* Since ATM image has periodic boundary conditions, we can just
+      return to the lower edge of the image if we go outside */
+   if ( ixpix+1 >= size ) {
+     nwraps = ixpix / size;
+     ixpix -= (size - 2);
+   }
+   if ( iypix+1 >= size ) {
+     nwraps = iypix / size;
+     iypix -=  (size - 2);
+   }
 
    if ( ( ixpix > 0 ) && ( ixpix+1 < size ) &&
         ( iypix > 0 ) && ( iypix+1 < size ) ) {
