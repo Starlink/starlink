@@ -1,0 +1,41 @@
+Directory contents
+------------------
+
+This directory contains the following files:
+
+obsfile.lis    : observation parameters common to all observing modes
+simfile.lis    : simulation parameters common to all observing modes
+heatrunobs.lis : HEATRUN (flatfield) observation parameters
+heatrunsim.lis : HEATRUN (flatfield) simulation parameters
+stareobs.lis   : STARE observation parameters
+staresim.lis   : STARE simulation parameters
+dreamobs.lis   : DREAM observation parameters
+dreamsim.lis   : DREAM simulation parameters
+pongobs.lis    : PONG observation parameters
+pongsim.lis    : PONG simulation parameters
+README         : this file
+candycanes.sdf : Example astronomical sky image
+
+Input files for the simulator
+-----------------------------
+
+The simulator requires two input files: one containing `observation'
+parameters, the other containing `simulation' parameters.  There is no
+requirement for them to have a particular name. Some parameters are
+common to all observing modes, while others are only meaningful to
+particular modes.
+
+The two most important files are `obsfile.lis' and `simfile.lis' which
+contain all the parameters common to all observing modes.
+
+The simulator tries to choose sensible default values when parameters
+are not defined, but they will probably not be what you want so if in
+doubt, keep all of the parameters given in the template files.
+
+To carry out a simulation of a given observing mode, include the
+necessary mode-specific parameters into obsfile.lis and simfile.lis
+files. 
+
+Note: the first step is to create flatfield (heatrun) files. Therefore
+the first time the simulator is run should be to create those files
+with a HEATRUN observing mode.
