@@ -368,8 +368,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double *flatpar[8];             /* flatfield parameters for all subarrays */
   int frame;                      /* frame counter */
   AstFrameSet *fs=NULL;           /* frameset for tanplane projection */
-  int groupcounter;               /* Counter for `group' portion of output 
-				     filename */
+  int obscounter;                 /* Counter for observation number
+				     portion of output filename */
   JCMTState *head = NULL;         /* per-frame headers */
   char heatname[SC2SIM__FLEN];    /* name of flatfield cal file */
   double hourangle;               /* Current hour angle */
@@ -1290,8 +1290,9 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
           /* For now just set to the last airmass calculated */
           sinx->airmass = airmass[frame-1];
           
-          /* Calculate tau CSO from the pwv */
-          tauCSO = pwv2tau(airmass[frame-1],pwvzen);
+          /* Calculate `mean' tau CSO from the pwv */
+          tauCSO = 0.5 * ( pwv2tau(airmass[0],pwvzen) + 
+			   pwv2tau(airmass[frame-1],pwvzen) );
 
 	}/* if not hits-only */
 
@@ -1312,9 +1313,9 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	  /* Compress and store as NDF */
           if( *status == SAI__OK ) {
 
-	    groupcounter = 1;
+	    obscounter = 1;
             sprintf( filename, "%s%04i%02i%02i_%05d_%04d", 
-                     subarrays[k], date_yr, date_mo, date_da, groupcounter, curchunk + 1 );
+                     subarrays[k], date_yr, date_mo, date_da, obscounter, curchunk + 1 );
 	    /* If we are not overwriting existing files see if the file exists */
 	    if ( !overwrite ) {
 	      fileexists = 1;
@@ -1327,15 +1328,15 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 		     new file name */
 		  fileexists = 1;
 		  fclose(ofile);
-		  groupcounter++;
+		  obscounter++;
 		  sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k], 
-			   date_yr, date_mo, date_da, groupcounter, curchunk + 1 );
+			   date_yr, date_mo, date_da, obscounter, curchunk + 1 );
 		} else {
 		  /* If not, unset fileexists flag, increment counter
 		     and set new file name */
 		  fileexists = 0;
 		  sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k], 
-			   date_yr, date_mo, date_da, groupcounter, curchunk + 1 );
+			   date_yr, date_mo, date_da, obscounter, curchunk + 1 );
 		}
 	      }
 	    }
@@ -1348,7 +1349,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	    date_hr = (int)(date_df * 24);
 	    date_mn = 60 * ((date_df * 24.0) - (float)date_hr);
 	    sprintf(obsid, "%s_%d_%04d%02d%02dT%02d%02d%02d",
-		    INSTRUMENT, groupcounter, date_yr, date_mo, date_da,
+		    INSTRUMENT, obscounter, date_yr, date_mo, date_da,
 		    date_hr,date_mn,0);
 
 	    sprintf( utdate, "%04d%02d%02d", date_yr, date_mo, date_da);
@@ -1376,13 +1377,14 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 			      flatpar[k], INSTRUMENT, filter, dateobs, obsid,
 			      &(posptr[(curchunk*maxwrite)*2]), jigsamples, 
                               &(jigptr[0]), 
-			      groupcounter, curchunk+1, obstype, utdate, 
+			      obscounter, curchunk+1, obstype, utdate, 
 			      head[0].tcs_az_bc1, 
 			      head[lastframe-1].tcs_az_bc1,
 			      head[0].tcs_az_bc2, 
 			      head[lastframe-1].tcs_az_bc2,
 			      lststart, lstend, loclcrd, scancrd, 
-			      totaltime, exptime, nimage,
+			      totaltime, exptime, nimage, 
+			      sinx->tauzen, sinx->tauzen,
 			      status);
 
  	    msgSetc( "FILENAME", filename );
