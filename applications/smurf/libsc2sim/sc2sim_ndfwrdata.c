@@ -4,7 +4,7 @@
 *     sc2sim_ndfwrdata
 
 *  Purpose:
-*     Generic digitise/compress and store SC2 data as NDF
+*     Generic digitise/compress and store SCUBA-2 data as NDF
 
 *  Language:
 *     Starlink ANSI C
@@ -17,10 +17,20 @@
 *                        const struct sc2sim_sim_struct *sinx,
 *                        double meanwvm, const char file_name[], 
 *                        int numsamples, int nflat, const char flatname[], 
-*                        const JCMTState *head, const int *dbuf, const int *dksquid, 
-*                        const double *fcal, const double *fpar, const char instrume[],
-*                        const char filter[], const char dateobs[], const char obsid[],
-*                        const double *posptr, int jigsamples, const double jigptr[][2],
+*                        const JCMTState *head, const int *dbuf, const int *dksquid,
+*                        const double *fcal, const double *fpar, 
+*                        const char instrume[], const char filter[], 
+*                        const char dateobs[], const char obsid[], 
+*                        const double *posptr, int jigsamples, 
+*                        const double jigptr[][2], const int obsnum,       
+*                        const int nsubscan, const char obstype[], 
+*                        const char utdate[], const double azstart,
+*                        const double azend, const double elstart,   
+*                        const double elend, const char lststart[],  
+*                        const char lstend[], const char loclcrd[],   
+*                        const char scancrd[], const double totaltime, 
+*                        const double exptime, const int nimage,       
+*                        const double wvmstart, const double wvmend,    
 *                        int *status )
 
 *  Arguments:
@@ -62,13 +72,49 @@
 *        Number of jiggle samples in DREAM pattern
 *     jigptr[][2] = double (Given)
 *        Array of jiggle X and Y positions
+*     obsnum = const int (Given)
+*        Observation number
+*     nsubscan = const int (Given)
+*        Sub-scan number
+*     obstype[] = const char (Given)
+*        Observation type, e.g. SCIENCE
+*     utdate[] = const char (Given)
+*        UT date in YYYYMMDD form
+*     azstart = const double (Given)
+*        Azimuth at start of sub-scan
+*     azend = const double (Given)
+*        Azimuth at end of sub-scan
+*     elstart = const double (Given)
+*        Elevation at start of sub-scan
+*     elend = const double (Given)
+*        Elevation at end of sub-scan
+*     lststart[] = const char (Given)
+*        LST at start of sub-scan
+*     lstend[] = const char (Given)
+*        LST at end of sub-scan
+*     loclcrd[] = const char (Given)
+*        Coordinate frame
+*     scancrd[] = const char (Given)
+*        SCAN coordinate frame
+*     totaltime = const double (Given)
+*        Total integration time
+*     exptime = const double (Given)
+*        Subimage exposure time
+*     nimage = const int (Given)
+*        Number of subimages within subscan
+*     wvmstart = const double (Given)
+*        225-GHz tau at beginning of subscan
+*     wvmend = const double (Given)
+*        225-GHz tau at end of subscan
 *     status = int* (Given and Returned)
 *        Pointer to global status.  
 
 *  Description:
-*     Create and map a SCUBA-2 NDF file. Scale the data to integers one
-*     frame at a time and add a compressed version to the mapped file.
-*     Store the per-frame header items and the FITS headers.
+*     Create and map a SCUBA-2 NDF file. Scale the data to integers
+*     one frame at a time and add a compressed version to the mapped
+*     file.  Store the per-frame header items and the FITS
+*     headers. Calculates images for DREAM and STARE modes, and
+*     scanfit polynomial fits (for 1/f drift) for all modes.
 
 *  Authors:
 *     E.Chapin (UBC)
@@ -115,6 +161,8 @@
 *        - Use const arguments and add OBSID argument/header
 *     2007-04-02 (AGG):
 *        Add more FITS headers
+*     2007-04-10 (AGG):
+*        Calculate STARE images and polynomial fits, write to raw data
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
@@ -148,6 +196,7 @@
 #include "ast.h"
 #include "ndf.h"
 #include "star/kaplibs.h"
+#include "mers.h"
 
 /* SC2SIM includes */
 #include "sc2sim.h"
@@ -158,12 +207,14 @@
 #include "sc2da/sc2store.h"
 #include "sc2da/sc2store_par.h"
 #include "sc2da/sc2ast.h"
+#include "sc2da/sc2math.h"
+#include "sc2da/dream_par.h"
 
 void sc2sim_ndfwrdata
 ( 
 const struct sc2sim_obs_struct *inx,  /* structure for values from XML (given) */
 const struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
-double meanwvm,          /* 225 GHz tau */
+double meanwvm,          /* Mean 225 GHz tau */
 const char file_name[],  /* output file name (given) */
 int numsamples,          /* number of samples (given) */
 int nflat,               /* number of flat coeffs per bol (given) */
@@ -195,30 +246,51 @@ const char scancrd[],    /* SCAN coordinate frame (given) */
 const double totaltime,  /* Total integration time (given) */
 const double exptime,    /* Subimage exposure time (given) */
 const int nimage,        /* Number of subimages within subscan (given) */
+const double wvmstart,   /* 225-GHz tau at beginning of subscan (given) */
+const double wvmend,     /* 225-GHz tau at end of subscan (given) */
 int *status              /* Global status (given and returned) */
 )
 
 {
    /* Local variables */
-   double decd;                     /* Dec of observation in degrees */
-   AstFitsChan *fitschan;           /* FITS headers */
+   double coadd[2*DREAM__MXBOL];   /* Coadded values in output image */
+   double decd;                    /* Dec of observation in degrees */
+   int dims[2];                    /* Extent of output image */
+   AstFitsChan *fitschan;          /* FITS headers */
    char fitsrec[SC2STORE__MAXFITS][SZFITSCARD]; /* Store for FITS records */
-   int i;                           /* Loop counter */
-   int nrec;                        /* number of FITS header records */
-   int subnum;                      /* sub array index */
-   double rad;                      /* RA of observation in degrees */
-   double map_hght;   /* Map height in arcsec */
-   double map_wdth;   /* Map width in arcsec  */
-   double map_pa;     /* Map PA in degrees  */
-   double map_x = 0;  /* Map X offset in arcsec */
-   double map_y = 0;  /* Map Y offset in arcsec */
-   double x_min = 0;  /* Maximum extend of pointing centre offsets */
-   double x_max = 0;
-   double y_min = 0;
-   double y_max = 0;
-
-   char weightsname[81];             /* Name of weights file for DREAM 
-					reconstruction */
+   int framesize;                  /* Number of points in a single `frame' */
+   int i;                          /* Loop counter */
+   double instap[2];               /* Instrument aperture */
+   int j;                          /* Loop counter */
+   int k;                          /* Loop counter */
+   int naver;                      /* Number of frames to average */
+   int ndim;                       /* Dimensionality of output image */
+   int nrec;                       /* number of FITS header records */
+   int nsubim;                     /* Number of DREAM/STARE images */
+   double map_hght;                /* Map height in arcsec */
+   double map_pa;                  /* Map PA in degrees  */
+   double map_wdth;                /* Map width in arcsec  */
+   double map_x = 0;               /* Map X offset in arcsec */
+   double map_y = 0;               /* Map Y offset in arcsec */
+   int midpt;                      /* RTS index of midpoint in range contributing 
+				      to output image */
+   int ncoeff = 2;                 /* Number of coefficients in polynomial fit */
+   double *poly;                   /* Pointer to polynomial fit solution */
+   double rad;                     /* RA of observation in degrees */
+   double *rdata;                  /* Pointer to flatfielded data */
+   int seqend;                     /* RTS index of last frame in output image */
+   int seqstart;                   /* RTS index of first frame in output image */
+   JCMTState state;                /* Dummy JCMT state structure for creating WCS */
+   int subnum;                     /* sub array index */
+   double telpos[3];               /* Telescope position */
+   AstFrameSet *wcs;               /* WCS frameset for output image */
+   char weightsname[81];           /* Name of weights file for DREAM 
+				      reconstruction */
+   double x_max = 0;               /* X extent of pointing centre offsets */
+   double x_min = 0;               /* X extent of pointing centre offsets */
+   double y_max = 0;               /* Y extent of pointing centre offsets */
+   double y_min = 0;               /* Y extent of pointing centre offsets */
+   double zero[2*DREAM__MXBOL];    /* Bolometer zero points */
 
    /* Check status */
    if ( !StatusOkP(status) ) return;
@@ -308,6 +380,10 @@ int *status              /* Global status (given and returned) */
                  "[deg C] Ambient temperature at start", 0 );
    astSetFitsF ( fitschan, "ATEND", sinx->atend, 
 		 "[deg C] Ambient temperature at end", 0 );
+   astSetFitsF ( fitschan, "WVMTAUST", wvmstart, "WVM tau at start", 0 );
+   astSetFitsF ( fitschan, "WVMTAUEN", wvmend, "WVM tau at end", 0 );
+   astSetFitsF ( fitschan, "SEEINGST", 1.0, "Seeing at start", 0 );
+   astSetFitsF ( fitschan, "SEEINGEN", 1.0, "Seeing at end", 0 );
 
    /* OMP & ORAC-DR */
    astSetFitsS ( fitschan, "COMMENT", "", "-- OMP & ORAC-DR parameters --", 0 );
@@ -441,17 +517,9 @@ int *status              /* Global status (given and returned) */
    astSetFitsL ( fitschan, "POL_CONN", 0, "True if polarimeter is in the beam", 0 );
    astSetFitsL ( fitschan, "FTS_CONN", 0, "True if FTS is used", 0 );
 
-   /* We need to write this - the simulator effectively assumes all
-      times are TAI */
-   /*   astSetFitsS ( fitschan, "TIMESYS", "UTC", "Time scale for DATE-OBS", 0 );
-   rad = inx->ra * AST__DR2D;
-   astSetFitsF ( fitschan, "RA", rad, "Right Ascension of observation", 0 );
-   decd = inx->dec * AST__DR2D;
-   astSetFitsF ( fitschan, "DEC", decd, "Declination of observation", 0 );
    astSetFitsF ( fitschan, "MEANWVM", meanwvm, 
-   "Mean zenith tau at 225 GHz from WVM", 0 );*/
+		 "Mean zenith tau at 225 GHz from WVM", 0 );
 
-   
    /* Convert the AstFitsChan data to a char array */
    smf_fits_export2DA ( fitschan, &nrec, fitsrec, status );
 
@@ -465,7 +533,119 @@ int *status              /* Global status (given and returned) */
                         inx->jig_vert, inx->nvert, jigptr, jigsamples, 
                         status );
 
+   /* Create SCU2RED extension for storing polynomial fits and
+      reconstructed images */
+   sc2store_creimages ( status );
+
+   /* Number of points in 1 frame - placeholder to remind us that it
+      may be different for DREAM */
+   if ( strncmp( inx->obsmode, "DREAM", 5) == 0 ) {
+     framesize = inx->nbolx * inx->nboly;
+   } else {
+     framesize = inx->nbolx * inx->nboly;
+   }
+
+   /* Now we need to play with flat-fielded data */
+   rdata = smf_malloc( framesize*numsamples, sizeof(double), 1, status );
+   /* Apply flatfield to timestream */
+   for ( j=0; j<framesize*numsamples; j++ ) {
+     rdata[j] = (double)dbuf[j];
+   }
+   sc2math_flatten ( framesize, numsamples, flatname, nflat, fcal, fpar,
+		     rdata, status );
+
+   /* For DREAM/STARE data, calculate .In images and write to the
+      output file. The default is to average every second. KLUDGE:
+      ONLY STARE CURRENTLY SUPPORTED */
+   if ( strncmp( inx->obsmode, "STARE", 5) == 0 ) {
+     /* Calculate number of samples to average */
+     naver = (int)(1./inx->steptime);
+     /* And then the number of images to create */
+     nsubim = numsamples / naver;
+
+     /* Set jig/chop entries to zero for non-DREAM data */
+     state.smu_az_jig_x = 0.0;
+     state.smu_az_jig_y = 0.0;
+     state.smu_az_chop_x = 0.0;
+     state.smu_az_chop_y = 0.0;
+
+     smf_calc_telpos( NULL, "JCMT", telpos, status );
+     if ( strncmp( inx->instap, " ", 1 ) != 0 ) {
+       sc2sim_instap_calc( inx, instap, status );
+     } else {
+       instap[0] = DAS2R * inx->instap_x;
+       instap[1] = DAS2R * inx->instap_y;
+     }
+
+     /* Loop over number of images */
+     for ( k=0; k<nsubim; k++ ) {
+       /* Initialize sums to zero */
+       for ( i=0; i<framesize; i++ ) {
+	 coadd[i] = 0.0;
+	 zero[i] = 0.0;
+       }
+       /* Begin and end sequence number indices. Note the FITS headers
+	  SEQSTART/SEQEND are incremented by 1 from these values. */
+       seqstart = k*naver;
+       seqend = seqstart + naver - 1;
+
+       /* Create average image */
+       for ( j=seqstart; j<=seqend; j++ ) {
+	 /* coadd frame */
+	 for ( i=0; i<framesize; i++ ){
+	   coadd[i] += rdata[framesize*j+i];
+	 }
+       }
+       /* Average the coadd frame */
+       for ( i=0; i<framesize; i++ ) {
+	 coadd[i] /= (double)naver;
+       }
+
+       /* Calculate the index nearest the middle of the block of
+	  averaged frames for constructing WCS info */
+       midpt = (seqstart + seqend) / 2;
+
+       state.tcs_az_ac1 = head[midpt].tcs_az_ac1;
+       state.tcs_az_ac2 = head[midpt].tcs_az_ac2;
+       state.rts_end = head[midpt].rts_end;
+
+       /* Set dimensions of output image */
+       ndim = 2;
+       dims[0] = inx->nbolx;
+       dims[1] = inx->nboly;
+
+       /* Construct WCS FrameSet */
+       sc2ast_createwcs( subnum, &state, instap, telpos, &wcs, status );
+
+       /* Increment seqstart/end for FITS header */
+       seqstart++;
+       seqend++;
+
+       /* Construct additional FITS headers */
+       fitschan = astFitsChan ( NULL, NULL, "" );
+       astSetFitsI( fitschan, "SEQSTART", seqstart, 
+		    "RTS index number for first frame contributing to image", 0);
+       astSetFitsI( fitschan, "SEQEND", seqend, 
+		    "RTS index number for last frame contributing to image", 0);
+
+       /* Convert the AstFitsChan data to a char array */
+       smf_fits_export2DA ( fitschan, &nrec, fitsrec, status );
+
+       /* Store image */
+       sc2store_putimage ( k, wcs, ndim, dims, seqstart, seqend, inx->nbolx, 
+			   inx->nboly, coadd, zero, fitsrec, nrec, status );
+     }
+   }
+
+   /* Calculate polynomial fits and write out SCANFIT extension */
+   poly = smf_malloc( framesize*ncoeff, sizeof( double ), 0, status );
+   sc2math_fitsky ( 0, framesize, numsamples, ncoeff, rdata, poly, status );
+   sc2store_putscanfit ( inx->nbolx, inx->nboly, ncoeff, poly, status );
+
+   /* Free memory allocated for pointers */
+   smf_free( poly, status );
+   smf_free( rdata, status );
+ 
    /* Close the file */
    sc2store_free ( status );
-
 }
