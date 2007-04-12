@@ -1417,6 +1417,10 @@ static int gaiaNDFTclGetDoubleProperty( ClientData clientData,
                 Tcl_SetResult( interp, "BAD", TCL_VOLATILE );
                 if ( result != TCL_OK ) {
                     free( error_mess );
+
+                    /* The BAD return is also the signal of an error, so 
+                     * clear the status return */
+                    result = TCL_OK;
                 }
             }
         }
