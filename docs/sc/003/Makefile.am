@@ -22,3 +22,5 @@ sc3-scripts.tex: scripts
 	fi; done > ../$@
 
 SUBDIRS = scripts
+
+CLEANFILES = sc3.htx_tar sc3.ps sc3.toc

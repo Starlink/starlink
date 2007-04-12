@@ -21,3 +21,5 @@ sc15_qdp_plot_2.gif sc15_qdp_plot_3.gif sc15_qdp_plot_4.gif \
 sc15_vmware2.gif sc15_vmware_diagram.gif sc15_vmware.gif sc15_vnc.gif \
 sc15_vncwin.gif sc15_xcircuit.gif sc15_xfig.gif sc15_xpaint.gif \
 sc15_xv_capture.gif sc15_xv.gif
+
+CLEANFILES = sc15.htx_tar sc15.ps sc15.lof sc15.lot sc15.toc

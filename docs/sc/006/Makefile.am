@@ -8,3 +8,5 @@ sc6_irwindows.ps sc6_sensitivity.ps sc6_ubv.ps sc6_xcatview1.ps \
 sc6_xcatview2.ps
 
 SUBDIRS = examples
+
+CLEANFILES = sc6.htx_tar sc6.ps sc6.lof sc6.lot sc6.toc

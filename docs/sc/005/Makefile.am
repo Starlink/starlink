@@ -11,3 +11,5 @@ sc5.htx_tar.extras: examples/scripts
 
 SUBDIRS = examples examples/data examples/data/bias examples/data/flats \
           examples/data/targets examples/scripts
+
+CLEANFILES = sc5.htx_tar sc5.ps sc5.toc sc5.lot sc5.lof

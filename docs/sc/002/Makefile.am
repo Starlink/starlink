@@ -8,3 +8,5 @@ sc2_open.ps sc2_particle.ps sc2_rosatslice.ps sc2_simple.ps \
 sc2_slice.ps sc2_vpe.ps
 
 SUBDIRS = examples
+
+CLEANFILES = sc2.htx_tar sc2.ps sc2.lof sc2.lot sc2.toc
