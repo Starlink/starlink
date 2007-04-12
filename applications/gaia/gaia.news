@@ -26,6 +26,9 @@
     A bug that caused image region circles to be drawn at the wrong
     scale has been fixed.
 
+    A bug extracting a TSYS value when cubes have greater image dimensions
+    than expected has been fixed.
+
   Hokulei Release:
   ================
 
