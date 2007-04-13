@@ -29,6 +29,9 @@
     A bug extracting a TSYS value when cubes have greater image dimensions
     than expected has been fixed.
 
+    The "gaiadisp" command has been extended to accept a percentile cut
+    as a command-line option.
+
   Hokulei Release:
   ================
 
