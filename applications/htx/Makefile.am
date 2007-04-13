@@ -10,7 +10,8 @@ PUBLIC_SCR = hlink findme showme
 
 PRIVATE_SCR =  allfind browse creindex depends docfind dockey findbrowser \
 gettitle homepage htxpath moveddocs msgover multised newdocs newindex \
-oldindex reffind relink resolve settrap showhtml stdfile urlgen wrfiles
+oldindex reffind relink resolve settrap showhtml stdfile urlgen wrfiles \
+testdocs
 
 EXTRA_DIST = creindex.sed.in edhead.sed.in edtail.sed.in gethead.sed.in \
              gettitle.sed.in htxpath.in
