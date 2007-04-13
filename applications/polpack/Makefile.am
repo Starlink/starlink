@@ -11,6 +11,11 @@ polpack_mon_SOURCES = $(POLPACK_MONO_SOURCE) $(POLPACK_F_ROUTINES)
 polpack_mon_LDADD = $(LOCAL_LINK)
 polpack_mon_TASKS = $(POLPACK_TASKS)
 
+## Sources that need to be built, but are not mentioned elsewhere.
+## Force the creation of the polka hypertext help, which relies on the
+## various rules added to create the main SUN.
+BUILT_SOURCES = polka.htx_tar
+
 #  version.dat is just the package verion in a file for polversion command
 #  This is for backwards compatibility since, of course, we could make
 #  polversion have the value compiled in
@@ -131,10 +136,34 @@ polplot.ifl polprep.ifl polrdtcl.ifl polsim.ifl \
 polstack.ifl polvec.ifl polversion.ifl polwrtcl.ifl \
 polzconv.ifl
 
-EXTRA_DIST = polpack_master.hlp
+EXTRA_DIST = polpack_master.hlp polka.htx_tar
 
 CLEANFILES = $(MISC_BUILT_FILES) $(BUILT_IFC_FILES) $(BUILT_IFL_FILES)
 
-
-
+#  After all other installation tasks have been done, untar the polka
+#  on-line help, remove the tar file and HTX link it.
+install-data-hook:
+	f="$(prefix)/help/polpack/polka.htx_tar";\
+	d="$(prefix)/help/polpack";\
+	if test -n "$(PAX)"; then \
+	  if $(MANIFEST); then \
+	    $(PAX) -f $$f | \
+	      sed 's+^+MANIFEST:$$d/+'; \
+	  fi; \
+	  cat $$f | (cd $$d; $(PAX) -r); \
+	  rm -f $$f; \
+	elif test -n "$(TAR)"; then \
+	  if $(MANIFEST); then \
+	    cat $$f | (cd $$d; $(TAR) xBpvf -) | sed 's+^+MANIFEST:$$d/+'; \
+	  else \
+	    cat $$f | (cd $$d; $(TAR) xBpf -); \
+	  fi; \
+	  rm -f $$f; \
+	else \
+	   echo "Neither tar nor pax!!!" >&2; \
+	   exit 1; \
+	fi
+	if test -f $(prefix)/bin/hlink; then \
+	    $(prefix)/bin/hlink -v $(prefix)/help/polpack; \
+	fi
 
