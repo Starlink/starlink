@@ -10,6 +10,7 @@
 #                            in a withdrawn state. Why hasn't this been a 
 #                            problem before?
 #                 21 Mar 07  Raise the window on activation. Keeps hiding.
+#                 13 Apr 07  And wait for update 
 
 itk::usual DialogWidget {}
 
@@ -151,6 +152,7 @@ itcl::class util::DialogWidget {
 	    catch {grab $w_}
 	}
         catch {::raise $w_}
+        update idletasks
 	tkwait visibility $w_
 	if {$itk_option(-default) >= 0} {
 	    focus $itk_component(button$itk_option(-default))
