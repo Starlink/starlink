@@ -46,6 +46,8 @@
 #     6-JUL-1998 (DSB):
 #        Modified to use HTX_BROWSER as supplied instead of only using
 #        "netscape" or "mosaic".
+#     13-APR-2007 (DSB):
+#        Add firefox and make it the default browser.
 #     {enter_further_changes_here}
 
 #-
@@ -56,16 +58,16 @@
       global mosaicpid
 #.
 
-#  Check the browser to use. If HTX_BROWSER doesn't exist use Netscape.
+#  Check the browser to use. If HTX_BROWSER doesn't exist use firefox.
 #  If it does, use it.
       if { ! [info exists env(HTX_BROWSER)] } { 
-         set CCDbrowser netscape
+         set CCDbrowser firefox
       } {
          set CCDbrowser $env(HTX_BROWSER)
       }
 
-      switch -glob $CCDbrowser {
-	 *[Mm]osaic* {
+      switch -regexp $CCDbrowser {
+	 [Mm]osaic {
 
 #  Use Mosaic. This relies on the remote-command mechanisms prior to CCI.
 	    set mosaicpid 0
@@ -88,9 +90,9 @@
 	    }
 	 }
 
-	 *[Nn]etscape* {
-	       
-#  Use Mozilla. This uses the NCAPIs methods as of netscape 1.1b1.
+         [Nn]etscape|[Mm]ozilla|[Ff]irefox {
+
+#  Use Mozilla or variant. This uses the NCAPIs methods as of netscape 1.1b1.
 #  Attempt to make browser goto the required page. If this fails then the 
 #  browser has exited for some reason, so restart it.
             if { ! [info exists netscapepid] } { set netscapepid 1 }
