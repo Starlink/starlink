@@ -349,7 +349,7 @@
 *     the current directory.
 
 *  Copyright:
-*     Copyright (C) 1999 Central Laboratory of the Research Councils
+*     Copyright (C) 1999-2007 Central Laboratory of the Research Councils
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -373,6 +373,8 @@
 *     5-OCT-1999 (DSB):
 *        Corrected check on SSIZE prior to accessing SKYPAR. Previously
 *        SKYPAR was never accessed.
+*     13-APR-2007 (DSB):
+*        Fix GRP leak.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -746,6 +748,7 @@
       IF( IGRP1 .NE. GRP__NOID ) CALL GRP_DELET( IGRP1, STATUS )
       IF( IGRP2 .NE. GRP__NOID ) CALL GRP_DELET( IGRP2, STATUS )
       IF( IGRP3 .NE. GRP__NOID ) CALL GRP_DELET( IGRP3, STATUS )
+      IF( IGRP4 .NE. GRP__NOID ) CALL GRP_DELET( IGRP4, STATUS )
       IF( IGRPS .NE. GRP__NOID ) CALL GRP_DELET( IGRPS, STATUS )
 
 *  If an error occurred, then report a contextual message.
