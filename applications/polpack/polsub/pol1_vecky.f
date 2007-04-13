@@ -95,7 +95,11 @@
 *     6-MAR-2006 (DSB):
 *        Clear the background before drawing the key (useful if the key
 *        is drawn over the vector map). Added argument CLRKEY.
+*     13-APR-2007 (DSB):
+*        Allow the user to select not to clear the key background by
+*        setting the text backrgound colour to -1.
 *     {enter_further_changes_here}
+
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -153,6 +157,7 @@
       INTEGER KEYNC              ! Significant length of KEYTXT
       INTEGER MAXNC              ! Length of longest line of text
       INTEGER MXUNIT             ! Max. number of characters in units
+      INTEGER TBG                ! Text background colour
       INTEGER VSCNC              ! Significant length of VSCTXT
       LOGICAL DRTOP              ! Draw the "Vector scale:" string?
       LOGICAL DRTTL              ! Draw any title string?
@@ -338,17 +343,19 @@
 *  See if we can write in the background colour on the current device.
       CALL PGQCOL( CI1, CI2 ) 
 
-*  If we can, clear the area covered by the key,but only if the key is
-*  being drawn over the top of the vector map.
-      IF( CLRKEY .AND. CI1 .EQ. 0 ) THEN
+*  If we can, clear the area covered by the key, but only if the key is
+*  being drawn over the top of the vector map, and the text background
+*  colour is not transparent..
+      CALL GRF_GETTBG( TBG )
+      IF( CLRKEY .AND. CI1 .EQ. 0 .AND. TBG .NE. -1 ) THEN
 
 *  Save the current fill area attributes.
          CALL PGQFS( FS )
          CALL PGQCI( CI )
 
-*  Set "solid fill in background colour (pen 0)".
+*  Set solid fill colour to pen TBG.
          CALL PGSFS( 1 )
-         CALL PGSCI( 0 )
+         CALL PGSCI( TBG )
 
 *  Draw a filled rectangle covering the key (slightly extended at top,
 *  bottom and left).

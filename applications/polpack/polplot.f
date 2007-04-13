@@ -217,7 +217,10 @@
 *        controlled using attribute TextLabGap. A value of 1.0 is used if 
 *        no value is set for this attribute, and produces default vertical 
 *        spacing. Values larger than 1.0 increase the vertical space, and 
-*        values less than 1.0 decrease the vertical space. [current value] 
+*        values less than 1.0 decrease the vertical space. If the key is
+*        drawn over the top of the vector map, the key will ne opaque by
+*        default. The key can be made transparent by including the setting
+*        "Colour(Back)=clear". [current value] 
 *     KEYVEC = _REAL (Read)
 *        Length of the vector to be displayed in the key, in data units.
 *        A default value is generated based on the spread of vector
@@ -421,6 +424,8 @@
 *     16-AUG-2006 (BC):
 *        Shut down the graphics database using KPG1_PGCLS instead of
 *        AGP_DEASS, which doesn't seem to clear the AGI database properly.
+*     13-APR-2007 (DSB):
+*        Allow the key to be transparent.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1324,6 +1329,8 @@
 *  Establish some synonyms for AST attribute names.
          CALL KPG1_ASPSY( 'FORMAT(SCA*LE)', 'FORMAT(1)', STATUS )
          CALL KPG1_ASPSY( 'FORMAT(VEC*TOR)', 'FORMAT(2)', STATUS )
+         CALL KPG1_ASPSY( 'COLOUR(BACK*GROUND)', 'TEXTBACKCOLOUR', 
+     :                    STATUS )
          CALL KPG1_ASPSY( '(VEC*TOR)', '(CURVES)', STATUS )
          CALL KPG1_ASPSY( '(TEXT)', '(STRINGS)', STATUS )
 
