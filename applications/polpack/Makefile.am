@@ -91,7 +91,12 @@ MONO_IFL = $(MONO_SOURCE:.f=.ifl)
 DYNSCRIPTS = polpack.csh polpack.sh polpack.icl
 
 $(IFL_FILES) $(DYNSCRIPTS): polpack.ifd
+	mv -f polpack.ifd polpack.ifd.tmp
+	sed -e 's,INSTALL_HELP,$(prefix)/help/polpack,g' \
+	    -e 's,INSTALL_BIN,$(prefix)/bin/polpack,g' \
+	    polpack.ifd.tmp > polpack.ifd
 	$(IFD2STAR) polpack
+	mv -f polpack.ifd.tmp polpack.ifd
 
 # Fixup scripts with bin location
 # The scripts needs to have installation locations edited into them
