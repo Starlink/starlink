@@ -372,6 +372,11 @@ itcl::class gaia::Gaia {
             plastic_apps_changed_
          }
       }
+
+      #  Start the internal debug logging, if required.
+      if { $itk_option(-debug) } {
+         cmdtrace on notruncate [::open "GaiaDebug.log" w]
+      }
    }
 
    #  Set/get X defaults - can be overridden in subclass and/or
