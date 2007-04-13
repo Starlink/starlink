@@ -9,16 +9,17 @@ exec $GAIA_DIR/gaia_stcl $0 ${1+"$@"}
 #      Display images in a GAIA tool.
 
 #   Usage:
-#         gaiadisp image
+#         gaiadisp [-p value] image
 #      or
-#         gaiadisp image clone_number
+#         gaiadisp [-p value] image clone_number
 #      or
-#         gaiadisp image1 image2 image3 ...
+#         gaiadisp [-p value] image1 image2 image3 ...
 
 #   Description:
 #      This command displays images in GAIA. It has two basic modes
 #      display a single image into a specified "clone", or display
 #      a list of images into a series of automatically created clones.
+#      An optional argument allows for a percentile cut to be applied.
 #
 #      Clones are specified by an integer number less than 1000.
 #      The special number -1 indicates that a number should be generated.
@@ -31,6 +32,7 @@ exec $GAIA_DIR/gaia_stcl $0 ${1+"$@"}
 #  Copyright:
 #     Copyright (C) 1996-2005 Central Laboratory of the Research Councils.
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2007 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -64,7 +66,31 @@ exec $GAIA_DIR/gaia_stcl $0 ${1+"$@"}
 #.
 
 #  Check the command-line arguments.
+
+#  Handle the -p argument.
+package require cmdline
+set options {
+   {p.arg  -1   "percentile cut for display (50-100)" }
+}
+
+set usage ": 
+             gaiadisp \[options] image
+             gaiadisp \[options] image clone_number
+             gaiadisp \[options] image1 image2 image3 ...
+options:"
+array set params [::cmdline::getoptions argv $options $usage]
+
+set percentile "$params(p)"
 set clone -1
+
+#  Handle non option values (images and clone number).
+set argc [llength $argv]
+if { $argc == 1 } {
+    if { [lindex $argv 0] == "" } {
+       set argc 0
+    }
+}
+
 if { $argc == 1 } {
    set clone ""
 } elseif { $argc == 2 } {
@@ -77,8 +103,8 @@ if { $argc == 1 } {
 } elseif { $argc > 2 } {
    set clone -1
 } else {
-   puts stderr {Usage: gaiadisp filename [clone_number]}
-   puts stderr {   or: gaiadisp filename1 filename2 filename3 ...}
+    set argv "-help"
+    puts stderr [::cmdline::usage $options $usage]
    exit
 }
 
@@ -199,11 +225,26 @@ foreach image $argv {
    }
 
    #  And send the command.
-   set ret [send_to_gaia remotetcl $cmd]
-   if { $ret == "" || [string match ".gaia*" $ret] } {
+   set gaianame [send_to_gaia remotetcl $cmd]
+   if { $gaianame == "" || [string match ".gaia*" $gaianame] } {
       puts stderr "Displayed image: $image."
    } else {
-      puts stderr "Failed to display image: ($ret)"
+      puts stderr "Failed to display image: ($gaianame)"
+   }
+
+   #  If have a percentile cut apply that. Note this applies to the clone
+   #  not the base gaia, unless this is the first image.
+   if { $percentile >= 50.0 && $percentile <= 100.0 } {
+      if { $gaianame == "" } {
+         set cmd "$gaia get_image"
+      } else {
+         set cmd "$gaianame get_image"
+      }
+      set gaiaimage [send_to_gaia remotetcl $cmd]
+      set cmd "$gaiaimage get_image"
+      set image [send_to_gaia remotetcl $cmd]
+      set cmd "$image autocut -percent $percentile"
+      send_to_gaia remotetcl $cmd
    }
 }
 close $gaia_fd
