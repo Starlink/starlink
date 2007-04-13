@@ -51,6 +51,9 @@
 *     4-FEB-2004 (DSB):
 *        o  Added GCap
 *        o  Renamed GAxScale as GScales
+*     13-APR-2007 (DSB):
+*        Added grf_gettbg to allow the text background colour to be
+*        obtained.
 */
 
 /* Macros */
@@ -1445,4 +1448,10 @@ F77_SUBROUTINE(grf_settbg)( INTEGER(TBG) ) {
    GENPTR_INTEGER(TBG)
 
    textbg = (int) *TBG;
+}
+
+F77_SUBROUTINE(grf_gettbg)( INTEGER(TBG) ) {
+   GENPTR_INTEGER(TBG)
+
+   *TBG = textbg;
 }
