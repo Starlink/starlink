@@ -1,0 +1,59 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     testdocs
+
+#  Purpose:
+#     Test existence of specified documents.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This script tests a supplied list of HTX documents, and echos a list of 
+#     those documents that exist (one document per line). Any documents that 
+#     do not exist are ignored. Each document is represented by the full path 
+#     to the ".htx" directory, without the trailing ".htx".
+
+#  Invocation:
+#     testdocs docs
+
+#  Parameters:
+#     docs
+#        The list of documents, separated by newlines.
+
+#  Copyright:
+#     Copyright (C) 2007 The Central Laboratory of the Research Councils
+
+#  Authors:
+#     DSB: David S Berru (JAC)
+#     {enter_new_authors_here}
+
+#  History:
+#     13-APR-2007 (DSB):
+#        Original version.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain the list of documents to check
+      docs="${*}"
+
+# Test each supplied document directory for existence, forming a space 
+# separated list of the documents that exist.
+      result=""
+      for dir in ${docs}; do
+         if test -d "${dir}.htx"; then
+            result="${result}${dir} "
+         fi
+      done
+
+# Echo the list to standard output, using tr to replace spaces with new lines.
+      echo ${result} | tr ' ' '
+'
+
+#  End of script.
