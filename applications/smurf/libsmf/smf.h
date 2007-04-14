@@ -150,6 +150,8 @@
 *        Add smf_calcmodel_ext
 *     2007-03-20 (TIMJ):
 *        Add smf_fits_outhdr
+*     2007-04-14 (DSB):
+*        Add "int *nreject" to smf_rebincube.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -493,7 +495,8 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
                     int lbnd_out[ 3 ], int ubnd_out[ 3 ], int spread, 
                     const double params[], int genvar, float *data_array, 
                     float *var_array, double *wgt_array, int *work_array, 
-                    float *texp_array, float *ton_array, double *fcon, int *status );
+                    float *texp_array, float *ton_array, double *fcon, 
+                    int *nreject, int *status );
 
 void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos, 
                    int autogrid, Grp *detgrp, double par[ 7 ], 

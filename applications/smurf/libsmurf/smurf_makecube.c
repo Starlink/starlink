@@ -510,6 +510,8 @@ fptrap (int i)
 *        pixel origin of the main output NDF.
 *        - Erase the output NDF variance array if less than 10% of the
 *        good output data values have good output variances.
+*     14-APR-2007 (DSB):
+*        Warn user about rejected input spectra.
 
 *  Copyright:
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
@@ -620,6 +622,7 @@ void smurf_makecube( int *status ) {
    int *work1_array = NULL;   /* Pointer to temporary work array */
    int autogrid;              /* Determine projection parameters automatically? */
    int axes[ 2 ];             /* Indices of selected axes */
+   int blank;                 /* Was a blank line just output? */
    int el0;                   /* Index of 2D array element */
    int el;                    /* Index of 3D array element */
    int flag;                  /* Is group expression to be continued? */
@@ -639,6 +642,7 @@ void smurf_makecube( int *status ) {
    int nparam = 0;            /* No. of parameters required for spreading scheme */
    int npos;                  /* Number of samples included in output NDF */
    int nwgtdim;               /* No. of axes in the weights array */
+   int nreject;               /* Number of rejected input spectra */
    int nxy;                   /* Number of elements in 2D array */
    int ondf;                  /* output NDF identifier */
    int outax[ 2 ];            /* Indices of corresponding output axes */
@@ -671,6 +675,9 @@ void smurf_makecube( int *status ) {
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
+
+/* We have not yet displayed a blank line on stdout. */
+   blank = 0;
 
 /* Begin an NDF context (we do not begin an AST context since this is
    done within the calling monolith routine). */
@@ -740,12 +747,13 @@ void smurf_makecube( int *status ) {
    without using weights. */
       parGet0l( "INWEIGHT", &use_wgt, status );
       if( use_wgt && !hasoffexp ) {
-         msgBlank( status );
+         if( !blank) msgBlank( status );
          msgOutif( MSG__NORM, "INW_MSG1", "   Weights cannot be determined "
                    "for the input spectra.", status );
          msgOutif( MSG__NORM, "INW_MSG2", "   Each output spectrum will be "
                    "an unweighted sum of the input spectra.", status );
          msgBlank( status );
+         blank = 1;
          use_wgt = 0;
       }
 
@@ -761,6 +769,17 @@ void smurf_makecube( int *status ) {
       } else {
          genvar = 0;
 
+      }
+
+      if( genvar == 2 && !hasoffexp ) {
+         if( !blank ) msgBlank( status );
+         msgOutif( MSG__NORM, "GNV_MSG1", "   Input variances cannot be determined "
+                   "for the input spectra.", status );
+         msgOutif( MSG__NORM, "GNV_MSG2", "   The output file will not contain "
+                   "a Variance array.", status );
+         msgBlank( status );
+         blank = 1;
+         genvar = 0;
       }
 
 /* Now deal with sparse output cubes. */
@@ -918,6 +937,7 @@ void smurf_makecube( int *status ) {
 	       "        ^LAB: ^L -> ^U ^UNT", status );
    }
    msgBlank( status );
+   blank = 1;
 
    /* Now also calculate the spatial coordinates of the four corners (required
       for CADC science archive */
@@ -1102,6 +1122,7 @@ void smurf_makecube( int *status ) {
    astClear( abskyfrm, "SkyRefIs" );
 
 /* Loop round all the input files, pasting each one into the output NDF. */
+   nreject = 0;
    ispec = 0;
    for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++ ) {
 
@@ -1163,12 +1184,13 @@ void smurf_makecube( int *status ) {
 
 /* Warn the user if the supplied value for use_wgt cannot be used. */
       if( use_wgt && use_ast && genvar != 2 ) {
-         msgBlank( status );
+         if( !blank ) msgBlank( status );
          msgOutif( MSG__NORM, " ", "WARNING: The values supplied for "
                    "parameters GENVAR and SPREAD mean that the requested "
                    "TRUE value for parameter INWEIGHT cannot be used.",
                    status );
          msgBlank( status );
+         blank = 1;
       }
 
 /* Rebin the data into the output grid. */
@@ -1177,7 +1199,7 @@ void smurf_makecube( int *status ) {
                         ospecmap, detgrp, moving, use_wgt, lbnd_out, ubnd_out, 
                         spread, params, genvar, data_array, var_array, 
                         wgt_array, work1_array, exp_array, eff_array, &fcon,
-                        status );
+                        &nreject, status );
       } else {
          smf_rebinsparse( data, ifile, ospecfrm, ospecmap, abskyfrm, detgrp, 
                           lbnd_out, ubnd_out, genvar, data_array, var_array, 
@@ -1185,6 +1207,8 @@ void smurf_makecube( int *status ) {
                           status );
       }
    
+      blank = 0;
+
 /* Close the input data file. */
       if( data != NULL ) {
 	smf_close_file( &data, status );
@@ -1193,6 +1217,18 @@ void smurf_makecube( int *status ) {
    }
 
 L999:;
+
+
+/* Tell the user how many input spectra were rejected. */
+   if( nreject > 0 ) {
+      if( !blank ) msgBlank( status );
+      msgSeti( "N", nreject );
+      msgOutif( MSG__NORM, " ", "WARNING: ^N input spectra were ignored "
+                "becuase they included unexpected bad pixel values.",
+                status );
+      msgBlank( status );
+      blank = 1;
+   }
 
 /* Close the input data file that remains open due to an early exit from
    the above loop. */
@@ -1242,11 +1278,12 @@ L999:;
 /* If more than 10% of the good data values have bad variance values,
    we will erase the variance component. */
       if( nbad > 0.1*ngood ) {
-         msgBlank( status );
+         if( !blank ) msgBlank( status );
          msgOutif( MSG__NORM, " ", "WARNING: Less than 10% of the good "
                    "output data values have good variances. The output "
                    "NDF will not contain a Variance array.", status );
          msgBlank( status );
+         blank = 1;
 
          if( use_ast ) {
             ndfUnmap( ondf, "Variance", status );

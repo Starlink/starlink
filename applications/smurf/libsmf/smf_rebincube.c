@@ -21,7 +21,7 @@
 *                    const double params[], int genvar, float *data_array, 
 *                    float *var_array, double *wgt_array, int *work1_array, 
 *                    float *texp_array, float *teff_array, double *fcon, 
-*                    int *status );
+*                    int *nreject, int *status );
 
 *  Arguments:
 *     data = smfData * (Given)
@@ -117,9 +117,13 @@
 *        the ratio of the squared backend degradation factor to the spectral
 *        channel width (this is the factor needed for calculating the
 *        variances from the Tsys value). This returned value should be
-*        left unchanged on subseuqnet invocations of this function. For 
+*        left unchanged on subsequent invocations of this function. For 
 *        other values of "index", the value is returned holding VAL__BADD
 *        if the factor for the current file has a different value.
+*     nreject = int * (Given and Returned)
+*        The number of input spectra that have been ignored becuase they
+*        either do not cover the full spectral range of the output or
+*        because they have a different bad pixel mask to the output.
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
@@ -195,6 +199,12 @@
 *        flag when calling astRebinSeq.
 *     28-MAR-2007 (DSB):
 *        Set the AST__GENVAR flag when genvar==1 and spread!=nearest.
+*     13-APR-2007 (DSB):
+*        Distinguish between the input variance and the input weight. This 
+*        means we can calculate output variances on the basis of the input
+*        Tsys values without also needing to weight the input data using Tsys.
+*     14-APR-2007 (DSB):
+*        Add parameter "*nreject".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -247,7 +257,7 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
                     const double params[], int genvar, float *data_array, 
                     float *var_array, double *wgt_array, int *work1_array, 
                     float *texp_array, float *teff_array, double *fcon, 
-                    int *status ){
+                    int *nreject, int *status ){
 
 /* Local Variables */
    AstCmpMap *fmap = NULL;     /* Mapping from spectral grid to topo freq Hz */
@@ -283,6 +293,7 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
    double dnew;                /* Channel width in Hz */
    double k;                   /* Back-end degradation factor */
    double fcon2;               /* Variance factor for file */
+   double invar;               /* Input variance */
    double tcon;                /* Variance factor for whole time slice */
    double wgt;                 /* Input sample weight */
    float *detwork = NULL;      /* Work array holding data samples for 1 slice/channel */
@@ -716,24 +727,30 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
 /* Get the index into the 2D array for this output sample. */
                   iv0 = ix + dim[ 0 ]*iy;
 
-/* Calculate the weight to associate with the current input spectrum. This 
-   is either 1.0, or the reciprocal of the input variance, based on the 
-   input Tsys values. */
+/* We may need the input variance for two reasons; first to weight the input 
+   data and second to create the output variances. If we are doing either of 
+   these two things, then calculate the input variance on the basis of the 
+   Tsys values. */
+                  invar = VAL__BADD;
+                  if( usewgt || genvar ==2 ) {
+                     if( tcon != VAL__BADD && 
+                         (float) tsys[ idet ] != VAL__BADR ) {
+                        good_tsys = 1;
+                        invar = tcon*tsys[ idet ]*tsys[ idet ];
+                     }
+                  }
+
+/* Calculate the weight to use for the current input spectrum. This 
+   is either 1.0, or the reciprocal of the input variance. */
                   if( !usewgt ) {
                      wgt = 1.0;
-
-                  } else if( tcon != VAL__BADD && (float) tsys[ idet ] != VAL__BADR ) {
-                     good_tsys = 1;
-                     wgt = tcon*tsys[ idet ]*tsys[ idet ];
-                     if( wgt > 0.0 ) {
-                        wgt = 1.0/wgt;
-                     } else {
-                        wgt = VAL__BADD;
-                     }
-
+   
+                  } else if( invar != VAL__BADD && invar > 0.0 ) {
+                     wgt = 1.0/invar;
+  
                   } else {
                      wgt = VAL__BADD;
-                  } 
+                  }
 
 /* If the input spectrum looks OK so far, and this is not the first input
    spectrum to be added into the output spectrum, we check if the bad pixel
@@ -764,6 +781,7 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
                                   ( data_array[ iv ] != VAL__BADR &&
                                     *qdata == VAL__BADR ) ) {
                                  wgt = VAL__BADD;
+                                 (*nreject)++;
                                  break;
                               }
                            }
@@ -794,6 +812,12 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
    The weight is the same for all channels in the output spectrum, and so 
    the weights array need only be a single 2D slice. */
                      wgt_array[ iv0 ] += wgt;
+
+/* If we are creating output variances based on the input Tsys values, 
+   update the array holding the sum of the weighted input variances. */
+                     if( genvar == 2 && invar != VAL__BADD ) {
+                        var_array[ iv0 ] += wgt*wgt*invar;
+                     }
 
 /* Loop round every input channel, updating the output data array. */
                      for( ichan = 0; ichan < nchan; ichan++, pdata++ ) {
@@ -1050,13 +1074,13 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
             }
 
 /* Now handle cases where the output variance is calculated on the basis of 
-   the input Tsys values. They are just the recprocal of the sum of the 
-   weights, since each weight is the recprocal of the associated input 
-   variance. */
+   the input Tsys values. */
          } else if( genvar == 2 ) {
             for( iv0 = 0; iv0 < nxy; iv0++ ) {
-               if( wgt_array[ iv0 ] > 0.0 ) {
-                  var_array[ iv0 ] =  1.0/wgt_array[ iv0 ];
+               if( wgt_array[ iv0 ] > 0.0 &&
+                   var_array[ iv0 ] > 0.0 ) {
+                  var_array[ iv0 ] =  var_array[ iv0 ]/wgt_array[ iv0 ];
+                  var_array[ iv0 ] /=  wgt_array[ iv0 ];
                } else {
                   var_array[ iv0 ] =  VAL__BADR;
                }
@@ -1074,22 +1098,29 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
    if( detwork ) detwork = astFree( detwork );
    if( varwork ) varwork = astFree( varwork );
 
-/* Issue a warning if Tsys values were being used but no good Tsys values
-   were found in the input NDF. */
+/* Issue a warning if Tsys values were being used to weight the input data 
+   but no good Tsys values were found in the input NDF. */
    if( !use_ast && usewgt && !good_tsys ) {
       msgSetc( "FILE", data->file->name );
-      msgOutif( MSG__NORM, " ", "   Warning: ^FILE contains no good "
-                "Tsys values and will be ignored (since INWEIGHT=TRUE).", 
-                status );
+      msgOutif( MSG__NORM, " ", "WARNING: ^FILE contains no Tsys values "
+                "and so all input data will have equal weight.", status );
+   }
+
+/* Issue a warning if Tsys values were being used to create output
+   variances but no good Tsys values were found in the input NDF. */
+   if( genvar == 2 && !good_tsys ) {
       msgBlank( status );
+      msgSetc( "FILE", data->file->name );
+      msgOutif( MSG__NORM, " ", "WARNING: ^FILE contains no Tsys values "
+                "and so output variances are unknown.", status );
    }
 
 /* Issue a warning if the input file did not overlap the output cube. */
    if( !good_file ) {
-      msgSetc( "FILE", data->file->name );
-      msgOutif( MSG__NORM, " ", "   Warning: No data within ^FILE "
-                "fell within the bounds of the output cube.", status );
       msgBlank( status );
+      msgSetc( "FILE", data->file->name );
+      msgOutif( MSG__NORM, " ", "WARNING: No data within ^FILE "
+                "fell within the bounds of the output cube.", status );
    }
 
 /* End the AST context. This will annul all the AST objects created
