@@ -226,8 +226,12 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     14-MAR-2007 (DSB):
 *        Modify astRebinSeq to allow input variances to be used as weights.
 *     19-MAR-2007 (DSB):
-*        Fix bub in LINEAR_2D macro that caused bad input pixel values to be
+*        Fix bug in LINEAR_2D macro that caused bad input pixel values to be
 *        treated as good.
+*     16-APR-2007 (DSB):
+*        Account for reduction in number of degrees of freedom when
+*        calculating output variances on the basis of spread of input values in
+*        astReinSeq.
 *class--
 */
 
@@ -10976,7 +10980,11 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
                sw = weights[ i ]; \
                a = out[ i ]/sw; \
                out_var[ i ] = ( out_var[ i ]/sw - a*a )*weights[ i + npix_out ]; \
-               if( out_var[ i ] < 0.0 ) out_var[ i ] = badval; \
+               if( sw <= 1.0 || out_var[ i ] < 0.0 ) { \
+                  out_var[ i ] = badval; \
+               } else { \
+                  out_var[ i ] *= sw/( sw - 1.0 ); \
+               } \
             } else { \
                out_var[ i ] = badval; \
             } \
