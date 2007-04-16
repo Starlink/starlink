@@ -744,6 +744,10 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *     31-JAN-2007 (DSB):
 *        Change SpecTrans to ignore blank unit strings (previously
 *        converted them to "Hz").
+*     16-APR-2007 (DSB):
+*        In SplitMat, increase the allowed level of rounding erros from 
+*        1.0E-10 to 1.0E-7 (to avoid spurious low CDi_j values being
+*        created that should be zero).
 *class--
 */
 
@@ -25543,13 +25547,14 @@ static int SplitMat( int naxis, double *matrix, double *cdelt ){
       cdelt[ i ] = cdlt;
 
 /* The row of the PC matrix is obtained by dividing the original row by 
-   the CDELT value. */
+   the CDELT value. Set to zero any PC values which are less than 1.0E-7
+   (such values may be produced by rounding errors). */
       a = matrix + i*naxis;
       for( j = 0; j < naxis; j++ ) {
 
          if( cdlt != 0.0 ){
             *a /= cdlt;
-            if( fabs( *a ) < 1.E-10 ) *a = 0.0;
+            if( fabs( *a ) < 1.E-7 ) *a = 0.0;
          } else {
             *a = 0.0;
          }
