@@ -384,7 +384,6 @@ itcl::class gaia::GaiaSpecWriter {
       
       #  Not a timeseries cube could be a SMURF/ACSIS cube. In
       #  that case we can get the exposure time, plus the TSYS.
-      #  XXX tighten up the signature.
       if { ! $rawacsis && [$cubeaccessor extensionexists "SMURF"] } {
 
          $specaccessor fitswrite \
@@ -393,30 +392,39 @@ itcl::class gaia::GaiaSpecWriter {
 
          #  Must be extracting spectra. These are axis 3. The image
          #  positions index the TSYS, EXP_TIME and EFF_TIME arrays.
-         lassign [$cubeaccessor getlastspectruminfo] \
-            type axis alow ahigh p1 p2
+         #  Note that the size of these arrays must match the image
+         #  dimensions, otherwise they are assumed to contain invalid data.
+         lassign [$cubeaccessor getlastspectruminfo] type axis alow ahigh p1 p2
          if { $axis == 3 } {
-            set tsys [$cubeaccessor getdoubleproperty SMURF \
-                         "TSYS.DATA_ARRAY.DATA\($p1,$p2\)"]
-            if { $tsys != "BAD" } {
-               set tsys [format "%.4f" $tsys]
-               $specaccessor fitswrite TSYS $tsys "System temp" "numeric"
-            }
-            
-            set exptime [$cubeaccessor getdoubleproperty SMURF \
-                            "EXP_TIME.DATA_ARRAY.DATA\($p1,$p2\)"]
-            if { $exptime != "BAD" } {
-               set exptime [format "%.4f" $exptime]
-               $specaccessor fitswrite EXTIME $exptime "Exposure time" \
-                  "numeric"
-            }
-            
-            set efftime [$cubeaccessor getdoubleproperty SMURF \
-                            "EFF_TIME.DATA_ARRAY.DATA\($p1,$p2\)"]
-            if { $efftime != "BAD" } {
-               set efftime [format "%.4f" $efftime]
-               $specaccessor fitswrite EXEFFT $efftime \
-                  "Effective exposure time (x4)" "numeric"
+            set cmpdims [$cubeaccessor getpropertydims "SMURF" \
+                            "TSYS.DATA_ARRAY.DATA"]
+            set ndfdims [$cubeaccessor getdims 0]
+            if { $cmpdims != "" &&
+                 [lindex $cmpdims 0] == [lindex $ndfdims 0] &&
+                 [lindex $cmpdims 1] == [lindex $ndfdims 1] } {
+
+               set tsys [$cubeaccessor getdoubleproperty SMURF \
+                            "TSYS.DATA_ARRAY.DATA\($p1,$p2\)"]
+               if { $tsys != "BAD" } {
+                  set tsys [format "%.4f" $tsys]
+                  $specaccessor fitswrite TSYS $tsys "System temp" "numeric"
+               }
+               
+               set exptime [$cubeaccessor getdoubleproperty SMURF \
+                               "EXP_TIME.DATA_ARRAY.DATA\($p1,$p2\)"]
+               if { $exptime != "BAD" } {
+                  set exptime [format "%.4f" $exptime]
+                  $specaccessor fitswrite EXTIME $exptime "Exposure time" \
+                     "numeric"
+               }
+               
+               set efftime [$cubeaccessor getdoubleproperty SMURF \
+                               "EFF_TIME.DATA_ARRAY.DATA\($p1,$p2\)"]
+               if { $efftime != "BAD" } {
+                  set efftime [format "%.4f" $efftime]
+                  $specaccessor fitswrite EXEFFT $efftime \
+                     "Effective exposure time (x4)" "numeric"
+               }
             }
          }
       }
