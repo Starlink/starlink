@@ -1,3 +1,5 @@
+    
+
     The data range used to display the extracted spectrum can now be 
     defined explicitly.
 
@@ -31,6 +33,11 @@
 
     The "gaiadisp" command has been extended to accept a percentile cut
     as a command-line option.
+
+    The SMURF extension data are now ignored in their dimensions do not
+    match the cube. This probably means the cube has had addition processing
+    that makes the extension data invalid (or at least misleading).
+
 
   Hokulei Release:
   ================
