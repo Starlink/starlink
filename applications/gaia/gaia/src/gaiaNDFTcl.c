@@ -56,7 +56,7 @@ struct NDFinfo {
     int ndfid;             /* The NDF identifier */
     AstFrameSet *wcs;      /* Full AST frameset for WCS */
     AstFitsChan *fitschan; /* All FITS headers in a channel, if used */
-    int fitschanmod;       /* Set true then fitschan has been modified 
+    int fitschanmod;       /* Set true then fitschan has been modified
                             * (will require saving) */
 };
 typedef struct NDFinfo NDFinfo;
@@ -86,14 +86,17 @@ static int gaiaNDFTclDims( ClientData clientData, Tcl_Interp *interp,
                            int objc, Tcl_Obj *CONST objv[] );
 static int gaiaNDFTclExists( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
-static int gaiaNDFTclExtensionExists( ClientData clientData, 
+static int gaiaNDFTclExtensionExists( ClientData clientData,
                                       Tcl_Interp *interp,
                                       int objc, Tcl_Obj *CONST objv[] );
-static int gaiaNDFTclGetDoubleProperty( ClientData clientData, 
+static int gaiaNDFTclGetDoubleProperty( ClientData clientData,
                                         Tcl_Interp *interp,
                                         int objc, Tcl_Obj *CONST objv[] );
 static int gaiaNDFTclGetProperty( ClientData clientData, Tcl_Interp *interp,
                                   int objc, Tcl_Obj *CONST objv[] );
+static int gaiaNDFTclGetPropertyDims( ClientData clientData, 
+                                      Tcl_Interp *interp,
+                                      int objc, Tcl_Obj *CONST objv[] );
 static int gaiaNDFTclGtWcs( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
 static int gaiaNDFTclMap( ClientData clientData, Tcl_Interp *interp,
@@ -109,7 +112,7 @@ static int queryNdfCoord( AstFrameSet *frameSet, int axis, double *coords,
                           int trailed, int formatted, int ncoords,
                           char **coord, char **error_mess );
 static void storeCard( AstFitsChan *channel, const char *keyword,
-                       const char *value, const char *comment, 
+                       const char *value, const char *comment,
                        const char *type, int overwrite );
 
 /**
@@ -133,7 +136,7 @@ int Ndf_Init( Tcl_Interp *interp )
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "ndf::extensionexists", 
+    Tcl_CreateObjCommand( interp, "ndf::extensionexists",
                           gaiaNDFTclExtensionExists,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
@@ -158,12 +161,18 @@ int Ndf_Init( Tcl_Interp *interp )
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "ndf::getdoubleproperty", 
+    Tcl_CreateObjCommand( interp, "ndf::getdoubleproperty",
                           gaiaNDFTclGetDoubleProperty,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "ndf::getproperty", gaiaNDFTclGetProperty,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+
+    Tcl_CreateObjCommand( interp, "ndf::getpropertydims",
+                          gaiaNDFTclGetPropertyDims,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -403,7 +412,7 @@ static int gaiaNDFTclCopy( ClientData clientData, Tcl_Interp *interp,
             return TCL_ERROR;
         }
         for ( i = 0; i < ndims; i++ ) {
-            if ( Tcl_GetIntFromObj( interp, listObjv[i], &lbnd[i] ) 
+            if ( Tcl_GetIntFromObj( interp, listObjv[i], &lbnd[i] )
                  != TCL_OK ) {
                 return TCL_ERROR;
             }
@@ -420,7 +429,7 @@ static int gaiaNDFTclCopy( ClientData clientData, Tcl_Interp *interp,
             return TCL_ERROR;
         }
         for ( i = 0; i < ndims; i++ ) {
-            if ( Tcl_GetIntFromObj( interp, listObjv[i], &ubnd[i] ) 
+            if ( Tcl_GetIntFromObj( interp, listObjv[i], &ubnd[i] )
                  != TCL_OK ) {
                 return TCL_ERROR;
             }
@@ -937,7 +946,7 @@ static int gaiaNDFTclCoord( ClientData clientData, Tcl_Interp *interp,
                 for ( i = 0; i < ncoords; i++ ) {
                     if ( Tcl_GetDoubleFromObj( interp, listObjv[i],
                                                &coords[i] ) != TCL_OK ) {
-                        Tcl_SetResult( interp, "not a valid number", 
+                        Tcl_SetResult( interp, "not a valid number",
                                        TCL_VOLATILE );
                         result = TCL_ERROR;
                         break;
@@ -1069,7 +1078,7 @@ static int gaiaNDFTclFitsHeaders( ClientData clientData, Tcl_Interp *interp,
 
         /* Get the FITS headers as an AST FITS channel */
         if ( info->fitschan == NULL ) {
-            result = gaiaNDFGetFitsChan( info->ndfid, &info->fitschan, 
+            result = gaiaNDFGetFitsChan( info->ndfid, &info->fitschan,
                                          &error_mess );
         }
         if ( result != TCL_OK ) {
@@ -1097,7 +1106,7 @@ static int gaiaNDFTclFitsHeaders( ClientData clientData, Tcl_Interp *interp,
 
 
 /**
- * Return the value of a FITS keyword. If not found then an empty string is 
+ * Return the value of a FITS keyword. If not found then an empty string is
  * returned.
  */
 static int gaiaNDFTclFitsRead( ClientData clientData, Tcl_Interp *interp,
@@ -1125,7 +1134,7 @@ static int gaiaNDFTclFitsRead( ClientData clientData, Tcl_Interp *interp,
 
         /* Get the FITS headers as an AST FITS channel */
         if ( info->fitschan == NULL ) {
-            result = gaiaNDFGetFitsChan( info->ndfid, &info->fitschan, 
+            result = gaiaNDFGetFitsChan( info->ndfid, &info->fitschan,
                                          &error_mess );
         }
         resultObj = Tcl_GetObjResult( interp );
@@ -1187,7 +1196,7 @@ static int gaiaNDFTclFitsWrite( ClientData clientData, Tcl_Interp *interp,
     /* Check arguments, need the ndf handle, the keyword, value, comment and
      * type, or a card. */
     if ( objc != 3 && objc != 6 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, 
+        Tcl_WrongNumArgs( interp, 1, objv,
                           "ndf_handle [keyword value comment type | card]" );
         return TCL_ERROR;
     }
@@ -1198,7 +1207,7 @@ static int gaiaNDFTclFitsWrite( ClientData clientData, Tcl_Interp *interp,
 
         /* Get the FITS headers as an AST FITS channel */
         if ( info->fitschan == NULL ) {
-            result = gaiaNDFGetFitsChan( info->ndfid, &info->fitschan, 
+            result = gaiaNDFGetFitsChan( info->ndfid, &info->fitschan,
                                          &error_mess );
         }
         resultObj = Tcl_GetObjResult( interp );
@@ -1223,7 +1232,7 @@ static int gaiaNDFTclFitsWrite( ClientData clientData, Tcl_Interp *interp,
             else {
                 /* These go at the end */
                 astClear( info->fitschan, "Card" );
-                astSetI( info->fitschan, "Card", 
+                astSetI( info->fitschan, "Card",
                          astGetI( info->fitschan, "Ncard" ) );
                 astPutFits( info->fitschan, Tcl_GetString( objv[2] ), 0 );
             }
@@ -1238,7 +1247,7 @@ static int gaiaNDFTclFitsWrite( ClientData clientData, Tcl_Interp *interp,
  * string should start with one of "c" or "n", for character or numeric.
  */
 static void storeCard( AstFitsChan *fitschan, const char *keyword,
-                       const char *value, const char *comment, 
+                       const char *value, const char *comment,
                        const char *type, int overwrite )
 {
     char card[81];
@@ -1246,7 +1255,7 @@ static void storeCard( AstFitsChan *fitschan, const char *keyword,
         /* Numeric value, no quotes */
         if ( strlen( value ) > 20 ) {
             sprintf( card, "%-8.8s= %s / %s", keyword, value, comment );
-        } 
+        }
         else {
             sprintf( card, "%-8.8s= %20.20s / %s", keyword, value, comment );
         }
@@ -1255,18 +1264,18 @@ static void storeCard( AstFitsChan *fitschan, const char *keyword,
         /* Char */
         if ( strlen( value ) > 18 ) {
             sprintf( card, "%-8.8s= '%s' / %s", keyword, value, comment );
-        } 
+        }
         else {
             sprintf( card, "%-8.8s= '%18.18s' / %s", keyword, value, comment );
         }
-    } 
+    }
     astPutFits( fitschan, card, overwrite );
 }
 
 /**
  * Return if a named extension exists.
  */
-static int gaiaNDFTclExtensionExists( ClientData clientData, 
+static int gaiaNDFTclExtensionExists( ClientData clientData,
                                       Tcl_Interp *interp,
                                       int objc, Tcl_Obj *CONST objv[] )
 {
@@ -1282,7 +1291,7 @@ static int gaiaNDFTclExtensionExists( ClientData clientData,
 
     result = importNdfHandle( interp, objv[1], &info );
     if ( result == TCL_OK ) {
-        exists = gaiaNDFExtensionExists( info->ndfid, 
+        exists = gaiaNDFExtensionExists( info->ndfid,
                                          Tcl_GetString( objv[2] ) );
         Tcl_SetObjResult( interp, Tcl_NewBooleanObj( exists ) );
 
@@ -1292,7 +1301,7 @@ static int gaiaNDFTclExtensionExists( ClientData clientData,
 
 /**
  * Return the value of a property. This is a primitive in an extension of the
- * NDF. So for instance "ACSIS" "TSYS(10,10)" will return the value of the 
+ * NDF. So for instance "ACSIS" "TSYS(10,10)" will return the value of the
  * primitive in the ACSIS extension, if it exists. Calls to the "FITS"
  * extension will be passed to the ::fitsread procedure.
  *
@@ -1363,7 +1372,7 @@ static int gaiaNDFTclGetProperty( ClientData clientData, Tcl_Interp *interp,
  * If the value doesn't exist the value "BAD" is returned, which can
  * also mean the value itself was set to VAL__BADD.
  */
-static int gaiaNDFTclGetDoubleProperty( ClientData clientData, 
+static int gaiaNDFTclGetDoubleProperty( ClientData clientData,
                                         Tcl_Interp *interp,
                                         int objc, Tcl_Obj *CONST objv[] )
 {
@@ -1383,7 +1392,7 @@ static int gaiaNDFTclGetDoubleProperty( ClientData clientData,
     /* Name of extension */
     extension = Tcl_GetString( objv[2] );
 
-    /* If the extension is "FITS", just pass this request on, result is 
+    /* If the extension is "FITS", just pass this request on, result is
      * a string, but with full precision anyway. */
     if ( strcmp( "FITS", extension ) == 0 ) {
         Tcl_Obj *newobjv[3];
@@ -1404,10 +1413,10 @@ static int gaiaNDFTclGetDoubleProperty( ClientData clientData,
             name = Tcl_GetString( objv[3] );
 
             /* Value */
-            result = gaiaNDFGetDoubleProperty( info->ndfid, extension, name, 
+            result = gaiaNDFGetDoubleProperty( info->ndfid, extension, name,
                                                &value, &error_mess );
 
-            /* Check against failures, note that conversion of VAL__BADR to 
+            /* Check against failures, note that conversion of VAL__BADR to
              * VAL__BADD doesn't happen! */
             if ( result == TCL_OK && value != VAL__BADD &&
                  (float) value != VAL__BADR ) {
@@ -1418,7 +1427,7 @@ static int gaiaNDFTclGetDoubleProperty( ClientData clientData,
                 if ( result != TCL_OK ) {
                     free( error_mess );
 
-                    /* The BAD return is also the signal of an error, so 
+                    /* The BAD return is also the signal of an error, so
                      * clear the status return */
                     result = TCL_OK;
                 }
@@ -1427,6 +1436,70 @@ static int gaiaNDFTclGetDoubleProperty( ClientData clientData,
         else {
             /* No extension, so no value */
             Tcl_SetResult( interp, "BAD", TCL_VOLATILE );
+        }
+    }
+    return result;
+}
+
+/**
+ * Return the dimensionality of a named component stored in an extension.
+ * If the extension or component do not exist then an error will occur.
+ */
+static int gaiaNDFTclGetPropertyDims( ClientData clientData, 
+                                      Tcl_Interp *interp,
+                                      int objc, Tcl_Obj *CONST objv[] )
+{
+    NDFinfo *info;
+    Tcl_Obj *resultObj;
+    char *error_mess;
+    const char *extension;
+    const char *name;
+    int dims[NDF__MXDIM];
+    int ndim;
+    int i;
+    int result;
+
+    /* Check arguments, need the ndf handle, extension and the component
+     * name. */
+    if ( objc != 4 ) {
+        Tcl_WrongNumArgs( interp, 1, objv,
+                          "ndf_handle extension component_name" );
+        return TCL_ERROR;
+    }
+
+    /* Name of extension. */
+    extension = Tcl_GetString( objv[2] );
+
+    /* Get the NDF */
+    result = importNdfHandle( interp, objv[1], &info );
+    if ( result == TCL_OK ) {
+
+        /* Name of the component */
+        name = Tcl_GetString( objv[3] );
+
+        /* Get the size. If this fails then the dimensionality is returned
+         * as zero */
+        result = gaiaNDFGetPropertyDims( info->ndfid, extension, name, 
+                                         dims, &ndim, &error_mess );
+
+        if ( result == TCL_OK && ndim > 0 ) {
+            resultObj = Tcl_GetObjResult( interp );
+            for ( i = 0; i < ndim; i++ ) {
+                Tcl_ListObjAppendElement( interp, resultObj, 
+                                          Tcl_NewIntObj( dims[i] ) );
+            }
+        }
+        else {
+            if ( ndim == 0 && result == TCL_OK ) {
+                Tcl_SetResult( interp, 
+                               "Failed to get extension component dimensions",
+                               TCL_VOLATILE );
+                result = TCL_ERROR;
+            }
+            else {
+                Tcl_SetResult( interp, error_mess, TCL_VOLATILE );
+                free( error_mess );
+            }
         }
     }
     return result;

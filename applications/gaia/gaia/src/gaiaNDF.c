@@ -85,9 +85,6 @@
 #define TCL_OK 0
 #define TCL_ERROR 1
 
-/*  Maximum number of NDF dimensions */
-#define MAXDIM 7
-
 /*  Prototypes for external Fortran routines */
 extern void F77_EXTERNAL_NAME(rtd_rdndf)( CHARACTER(ndfname),
                                           INTEGER(type),
@@ -1377,8 +1374,8 @@ int gaiaNDFGtWcs( int ndfid, AstFrameSet **iwcs, char **error_mess )
     int fitsaxes;
     int exists = 0;
     int i;
-    int inperm[MAXDIM];
-    int outperm[MAXDIM];
+    int inperm[NDF__MXDIM];
+    int outperm[NDF__MXDIM];
     int status = SAI__OK;
     size_t ncard = 0;
     void *fitsptr = NULL;
@@ -1709,6 +1706,46 @@ int gaiaNDFGetDoubleProperty( int ndfid, const char *extension,
     ndfXstat( ndfid, extension, &exists, &status );
     if ( exists ) {
         ndfXgt0d( ndfid, extension, name, value, &status );
+    }
+
+    /* If an error occurred return an error message */
+    if ( status != SAI__OK ) {
+        *error_mess = gaiaUtilsErrMessage();
+        emsRlse();
+        return TCL_ERROR;
+    }
+    emsRlse();
+    return TCL_OK;
+}
+
+/**
+ * Get the dimensions of a component stored in an extension. The dimensions
+ * are returned in the dims array which should be at least NDF__MXDIM.
+ */
+int gaiaNDFGetPropertyDims( int ndfid, const char *extension,
+                            const char *name, int dims[], int *ndim,
+                            char **error_mess )
+{
+    HDSLoc *extloc = NULL;
+    HDSLoc *comloc = NULL;
+    int exists;
+    int i;
+    int status = SAI__OK;
+
+    emsMark();
+
+    *ndim = 0;
+    for ( i = 0; i < NDF__MXDIM; i++ ) {
+        dims[i] = 1;
+    }
+
+    ndfXstat( ndfid, extension, &exists, &status );
+    if ( exists ) {
+        ndfXloc( ndfid, extension, "READ", &extloc, &status );
+        hdsFind( extloc, name, "READ", &comloc, &status );
+        datShape( comloc, NDF__MXDIM, dims, ndim, &status );
+        datAnnul( &extloc, &status );
+        datAnnul( &comloc, &status );
     }
 
     /* If an error occurred return an error message */
