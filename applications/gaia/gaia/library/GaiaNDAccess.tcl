@@ -605,6 +605,18 @@ itcl::class gaia::GaiaNDAccess {
       return [${type_}::extensionexists $handle_ $extension]
    }
 
+   #  Get the dimensions of a property in an extension. Returns an empty
+   #  string if the extension or property do not exist.
+   public method getpropertydims {extension component} {
+      #  Only valid for NDFs.
+      if { $type_ == "ndf" } {
+         catch {
+            return [ndf::getpropertydims $handle_ $extension $component]
+         }
+      }
+      return ""
+   }
+
    #  Get the FITS headers as a single string (newline separated cards).
    public method fitsheaders {} {
       return [${type_}::fitsheaders $handle_]
