@@ -610,8 +610,9 @@ itcl::class gaia::GaiaNDAccess {
    public method getpropertydims {extension component} {
       #  Only valid for NDFs.
       if { $type_ == "ndf" } {
-         catch {
-            return [ndf::getpropertydims $handle_ $extension $component]
+         if { [catch {ndf::getpropertydims \
+                         $handle_ $extension $component} dims] == 0 } {
+            return $dims
          }
       }
       return ""
