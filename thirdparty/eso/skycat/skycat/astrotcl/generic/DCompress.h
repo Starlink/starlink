@@ -6,13 +6,15 @@
  * E.S.O. - VLT project 
  * $Id$
  *
- * Compress.h - utility class for compressing/decompressing FITS files
+ * DCompress.h - utility class for compressing/decompressing FITS files
  * 
  * (wrapper for archive/CADC "press" routines)
  * 
  * who             when       what 
  * --------------  --------   ----------------------------------------
  * Allan Brighton  2 Aug 96  Created
+ *                 2 Jan 06  Renamed file to avoid name conflict with fitsio's 
+ *                           "compress.h" on file systems that ignore case.
  */
 
 /*
