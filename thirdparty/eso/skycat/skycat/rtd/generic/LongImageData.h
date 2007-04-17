@@ -2,8 +2,8 @@
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: LongImageData.h,v 1.3 2005/02/02 01:43:03 brighton Exp $" 
- * $Id: LongImageData.h,v 1.3 2005/02/02 01:43:03 brighton Exp $
+ * "@(#) $Id: LongImageData.h,v 1.1.1.1 2006/01/12 16:39:22 abrighto Exp $" 
+ * $Id: LongImageData.h,v 1.1.1.1 2006/01/12 16:39:22 abrighto Exp $
  *
  * LongImageData.h - class definitions for class LongImageData
  *
@@ -19,7 +19,6 @@
 
 #include <sys/types.h>
 #include "ImageData.h"
-#include "config.h"
 
 // The type "long" may have up to 64 bits on alpha machines. FITS
 // defines the long we want to use as 32 bits, so use a macro to

@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: RtdCamera.h,v 1.4 2005/02/02 01:43:03 brighton Exp $" 
+ * "@(#) $Id: RtdCamera.h,v 1.1.1.1 2006/01/12 16:39:14 abrighto Exp $" 
  *
  * RtdCamera.h - class definitions for managing realtime image update
  * 
@@ -23,7 +23,6 @@
 #include <cstring>
 #include <sys/types.h>
 #include "error.h"
-#include "define.h"
 #include "Mem.h"
 #include "rtdSem.h"
 #include "rtdImageEvent.h"

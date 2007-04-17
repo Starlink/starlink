@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project
  *
- * "@(#) $Id: ImageTemplates.C,v 1.4 2005/02/02 01:43:02 brighton Exp $"
+ * "@(#) $Id: ImageTemplates.icc,v 1.1.1.1 2006/01/12 16:39:16 abrighto Exp $" 
  *
  * ImageTemplates.C - template member functions for classes derived from
  *                    class ImageData (not C++ templates, uses cpp macros)

@@ -3,7 +3,7 @@
 
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: ImageData.h,v 1.4 2005/02/02 01:43:03 brighton Exp $"
+ * "@(#) $Id: ImageData.h,v 1.1.1.1 2006/01/12 16:39:00 abrighto Exp $"
  *
  * Image.h - class definitions for drawing images in Tk/Tcl
  *
@@ -39,7 +39,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 
-#include "WCS.hxx"
+#include "WCSRep.h"
 #include "LookupTable.h"
 #include "ImageIO.h"
 #include "ImageDisplay.h"
@@ -66,7 +66,7 @@ typedef struct {
  * This is the base class for managing image data. There is a subclass for
  * each of the base data types (byte, short, ushort, int, float). Most
  * of the methods are the same for each data type, any many are implemented
- * in ImageTemplates.C, which uses macros to avoid duplicating code
+ * in ImageTemplates.icc, which uses macros to avoid duplicating code
  * for each data type.
  * 
  * CompoundImageData is used when there are multiple FITS extensions that

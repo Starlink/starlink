@@ -2,7 +2,7 @@
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: UShortImageData.h,v 1.3 2005/02/02 01:43:03 brighton Exp $" 
+ * "@(#) $Id: UShortImageData.h,v 1.1.1.1 2006/01/12 16:38:30 abrighto Exp $" 
  *
  * UShortImageData.h - class definitions for class UShortImageData
  *

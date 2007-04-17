@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive
- * "@(#) $Id: RtdRemote.C,v 1.6 2005/02/02 01:43:03 brighton Exp $"
+ * "@(#) $Id: RtdRemote.C,v 1.3 2006/03/26 13:22:33 abrighto Exp $"
  *
  * RtdRemote.C - member routines for class RtdRemote, manages remote access 
  *               to RtdImage (server side, see ../../rtdrmt/... for client access)
@@ -21,7 +21,7 @@
  *                 16/12/05  Change all SOCKLEN_T use to socklen_t. The logic
  *                           that guarantees a value is set in define.h.
  */
-static const char* const rcsId="@(#) $Id: RtdRemote.C,v 1.6 2005/02/02 01:43:03 brighton Exp $";
+static const char* const rcsId="@(#) $Id: RtdRemote.C,v 1.3 2006/03/26 13:22:33 abrighto Exp $";
 
 
 
@@ -39,9 +39,9 @@ static const char* const rcsId="@(#) $Id: RtdRemote.C,v 1.6 2005/02/02 01:43:03 
 #include <netdb.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include <strings.h>
-#include <stdlib.h>
-#include <stdio.h>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include "error.h"
 #include "define.h"
 #ifdef HAVE_SYS_FILIO_H
@@ -78,10 +78,12 @@ extern "C" {
 }
 #endif /* NEED_SOCKET_PROTO */
 
+#if 0
 #ifdef NEED_GETHOSTNAME_PROTO
 // these are also missing on solaris 
 extern "C" int gethostname(char *name, unsigned int namelen);
 #endif /* NEED_GETHOSTNAME_PROTO */
+#endif
 
 /* -- I/O routines for network I/O taken from the book  --
  *    "UNIX Network Programming" by W. Richard Stevens,
@@ -252,7 +254,7 @@ RtdRemote::~RtdRemote()
  */
 int RtdRemote::makeStatusFile(sockaddr_in& addr)
 {
-    socklen_t addrSize = sizeof(sockaddr_in);
+    socklen_t addrSize = (socklen_t)sizeof(sockaddr_in);
     if (getsockname(socket_, (struct sockaddr *)&addr, &addrSize) == -1) 
 	return sys_error("getsockname");
     
@@ -333,7 +335,7 @@ int RtdRemote::fileEvent()
 
     if (FD_ISSET(socket_, &readFds) > 0) {
 	struct sockaddr_in addr;  // for local socket address
-	socklen_t addrSize = sizeof(addr);
+	socklen_t addrSize = (socklen_t)sizeof(addr);
 	int sock = accept(socket_, (sockaddr *)&addr, &addrSize);
 	if (sock < 0) 
 	    return sys_error("accept");
@@ -402,10 +404,10 @@ int RtdRemote::evalClientCmd(const char* cmd)
     // call the RtdImage command method
     // argv[0] is the subcommand name, the rest are the arguments
     if (call(name, len, argc, av) != TCL_OK) {
-        free(argv);
+        Tcl_Free((char *)argv);
         return TCL_ERROR;
     }
-    free(argv);
+    Tcl_Free((char *)argv);
     return TCL_OK;
 }
 

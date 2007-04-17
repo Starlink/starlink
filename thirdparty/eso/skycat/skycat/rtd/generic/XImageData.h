@@ -4,7 +4,7 @@
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: XImageData.h,v 1.3 2005/02/02 01:43:03 brighton Exp $" 
+ * "@(#) $Id: XImageData.h,v 1.1.1.1 2006/01/12 16:39:06 abrighto Exp $" 
  *
  * XImageData.h - class definitions for class XImageData
  *

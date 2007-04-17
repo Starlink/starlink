@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: RtdImage.C,v 1.3 2005/02/02 01:43:03 brighton Exp $"
+ * "@(#) $Id: RtdImage.C,v 1.5 2006/02/02 17:36:47 abrighto Exp $"
  *
  * RtdImage.C - member routines for class RtdImage,
  *               implementation of the TCL rtdimage command
@@ -101,10 +101,31 @@
  *                           Change processMotionEvent to work for images
  *                           of all sizes (including blank ones). One
  *                           pixel images are possible in cube sections.
+ *
+ * Allan Brighton  16/12/05  Added local Tk_CanvasWindowCoordsNoClip method (moved from tclutil)
+ * Allan Brighton  28/12/05  Replaced init script
  */
-static const char* const rcsId="@(#) $Id: RtdImage.C,v 1.3 2005/02/02 01:43:03 brighton Exp $";
+static const char* const rcsId="@(#) $Id: RtdImage.C,v 1.5 2006/02/02 17:36:47 abrighto Exp $";
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#include "define.h"
 #include "RtdImage.h"
+
+// Tcl procedure to search for an init for Rtd startup file.  
+static char initScript[] = "if {[info proc ::rtd::Init]==\"\"} {\n\
+  namespace eval ::rtd {}\n\
+  proc ::rtd::Init {} {\n"
+#ifdef MAC_TCL
+"    source -rsrc RtdInit.tcl\n"
+#else
+"    global rtd_library\n\
+     tcl_findLibrary rtd " PACKAGE_VERSION " " PACKAGE_VERSION " RtdInit.tcl RTD_LIBRARY rtd_library\n"
+#endif
+"  }\n\
+}\n\
+::rtd::Init";
 
 // should be in X11/extensions/XShm.h
 extern "C" int XShmQueryExtension(Display*);
@@ -113,10 +134,12 @@ extern "C" int XShmQueryExtension(Display*);
 extern "C" int XSyncInitialize(Display *, int *, int *);
 // extern "C" int XSyncSetPriority(Display *, XID, int);
 
+#if 0
 #ifdef NEED_GETHOSTNAME_PROTO
 // should be in unistd.h ?
 extern "C" int gethostname(char *name, unsigned int namelen);
 #endif /* NEED_GETHOSTNAME_PROTO */
+#endif
 
 // generated code for bitmaps used in tcl scripts
 void defineRtdBitmaps(Tcl_Interp*);
@@ -140,14 +163,6 @@ static RtdImage* motionView_ = NULL;
 
 // Rtd Record 
 extern "C" int RtdrecordInit(Tcl_Interp *);
-
-// this routine is defined in tclutil/tclutil/src/TkCanvasPsImage.C
-// to work around the tk canvas clipping coordinates to short range.
-extern "C" void Tk_CanvasWindowCoordsNoClip(
-    Tk_Canvas canvas, 
-    double x, double y,
-    int *screenXPtr, int *screenYPtr);
-
 
 /* 
  * image config options - used to process command line options and for the
@@ -310,6 +325,18 @@ int CmapITT_Init(Tcl_Interp* interp)
 extern "C"
 int Rtd_Init(Tcl_Interp* interp)  
 {
+    // Initialize the local packages that rtd depends on
+
+    // initialize the tclutil package 
+    if (Tclutil_Init(interp) == TCL_ERROR) {
+	return TCL_ERROR;
+    }
+
+    // initialize the astrotcl package 
+    if (Astrotcl_Init(interp) == TCL_ERROR) {
+	return TCL_ERROR;
+    }
+
     char buf[1024];
 #ifndef PANEL_EDITOR_BUG
     // initialize color management (once only per application)
@@ -326,7 +353,7 @@ int Rtd_Init(Tcl_Interp* interp)
 	return TCL_ERROR;
 
     // set up Rtd Tcl package
-    if (Tcl_PkgProvide (interp, "Rtd", RTD_VERSION) != TCL_OK) {
+    if (Tcl_PkgProvide (interp, "Rtd", PACKAGE_VERSION) != TCL_OK) {
 	return TCL_ERROR;
     }
 
@@ -354,46 +381,8 @@ int Rtd_Init(Tcl_Interp* interp)
     // initialize the rtdrecorder and rtdplayback image types
     RtdrecordInit(interp);
 
-    Tcl_SetVar(interp, "rtd_version", RTD_VERSION, TCL_GLOBAL_ONLY);
-
-    /*
-     * Use Tcl script to search for RtdInit.tcl and run the initialization tcl script
-     */
-
-    // defines for RtdInit.icc:
-#   define Pkg_findinit Rtd_findinit
-#   include "RtdInit.icc"
-
-    // defines for calling the script
-#   define Pkg "Rtd"
-#   define Pkg_proc "Rtd_findinit"
-    char* pkg_library = RTD_LIBRARY;
-
-    Tcl_SetVar(interp, "Pkg_findinit", Pkg_proc, TCL_GLOBAL_ONLY);
-
-    if (Tcl_GlobalEval(interp, Pkg_findinit) == TCL_ERROR)
-	return TCL_ERROR;
-
-    sprintf(buf, "%s %s %s", Pkg_proc, Pkg, pkg_library);
-    if (Tcl_GlobalEval(interp, buf) == TCL_ERROR)
-	return TCL_ERROR;
-
-
-    // For backward compatibility, initialize 2 local packages that rtd
-    // depends on:
-
-    // initialize the tclutil package 
-    if (Tclutil_Init(interp) == TCL_ERROR) {
-	return TCL_ERROR;
-    }
-    Tcl_StaticPackage (interp, "Tclutil", Tclutil_Init, (Tcl_PackageInitProc *) NULL);
-
-    // initialize the astrotcl package 
-    if (Astrotcl_Init(interp) == TCL_ERROR) {
-	return TCL_ERROR;
-    }
-    Tcl_StaticPackage (interp, "Astrotcl", Astrotcl_Init, (Tcl_PackageInitProc *) NULL);
-    return TCL_OK;
+    Tcl_SetVar(interp, "rtd_version", PACKAGE_VERSION, TCL_GLOBAL_ONLY);
+    return Tcl_Eval(interp, initScript);
 }
 
 /*
@@ -949,6 +938,54 @@ void RtdImage::updateRequests()
 }
 
 
+// Fix for Tk clipping coordinates to short range: See CanvasWindowCoordsNoClip() below.
+#ifdef HAVE_TKCANVAS_H
+#include "tkCanvas.h"
+#else
+// The structure we need hasn't changed for a long time, so just include a local copy.
+#include "tkCanvas.h-tk8.4.11"
+#define HAVE_TKCANVAS_H 
+#endif
+
+/*
+ * Hack to work around the tk canvas clipping coordinates to short range: 
+ * same as Tk_CanvasWindowCoords, but with no clipping.
+ * Without this fix, there will be problems with very large, or zoomed in images.
+ */
+static void
+Tk_CanvasWindowCoordsNoClip(Tk_Canvas canvas, double x, double y, int* screenXPtr, int* screenYPtr)
+{
+#ifdef HAVE_TKCANVAS_H 
+    TkCanvas *canvasPtr = (TkCanvas *) canvas;
+    double tmp;
+
+    tmp = x - canvasPtr->xOrigin;
+    if (tmp > 0) {
+	tmp += 0.5;
+    } else {
+	tmp -= 0.5;
+    }
+    *screenXPtr = (int)tmp;
+
+    tmp = y  - canvasPtr->yOrigin;
+    if (tmp > 0) {
+	tmp += 0.5;
+    } else {
+	tmp -= 0.5;
+    }
+    *screenYPtr = (int)tmp;
+#else 
+    short sx, sy;
+    Tk_CanvasWindowCoords(canvas, x, y, &sx, &sy);
+    if (sx == 32767 || sx == -32768 || sy == 32767 || sy == -32768) {
+        fprintf(stderr, "Warrning: Tk clipped the RTD image coordinates to short range!\n");
+    }
+    *screenXPtr = sx;
+    *screenYPtr = sy;
+#endif
+}
+
+
 /*
  * This virtual method is invoked indirectly by the Tk image handling
  * routines to draw the image.
@@ -976,8 +1013,7 @@ void RtdImage::displayImage(Drawable d, int imageX, int imageY,
     // get the canvas X,Y offsets
     // Note: the Tk routine Tk_CanvasWindowCoords clips the coordinates to "short" range
     // (-32768 .. 32767), which can cause problems in very large images
-    // and/or at large magnification. The call below is to a replacement (see tclutil
-    // package).
+    // and/or at large magnification. The call below is to a replacement defined here.
     Tk_CanvasWindowCoordsNoClip(canvas_, 0., 0., &canvasX_, &canvasY_);
     
     if (displaymode() == 0) { 

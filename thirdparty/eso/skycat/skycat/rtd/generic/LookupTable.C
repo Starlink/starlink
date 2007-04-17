@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: LookupTable.C,v 1.3 2005/02/02 01:43:02 brighton Exp $" 
+ * "@(#) $Id: LookupTable.C,v 1.1.1.1 2006/01/12 16:38:54 abrighto Exp $" 
  *
  * LookupTable.C - method definitions for class LookupTable, managing image
  *                 pixel lookup tables for converting pixel values to 
@@ -21,15 +21,18 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  09 Aug 96  Created
  */
-static const char* const rcsId="@(#) $Id: LookupTable.C,v 1.3 2005/02/02 01:43:02 brighton Exp $";
+static const char* const rcsId="@(#) $Id: LookupTable.C,v 1.1.1.1 2006/01/12 16:38:54 abrighto Exp $";
 
 
 #include <cmath>
 #include <cstdlib>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include "define.h"
 #include "error.h"
 #include "LookupTable.h"
-#include "FitsIO.hxx"
+#include "Fits_IO.h"
 
 // borrowed this from saoimage
 extern "C" {

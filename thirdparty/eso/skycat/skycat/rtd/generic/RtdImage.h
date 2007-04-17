@@ -3,7 +3,7 @@
 
 /*
  * E.S.O. - VLT project / ESO Archive
- * "@(#) $Id: RtdImage.h,v 1.7 2005/02/02 01:43:03 brighton Exp $"
+ * "@(#) $Id: RtdImage.h,v 1.1.1.1 2006/01/12 16:39:28 abrighto Exp $"
  *
  * RtdImage.h - class definitions for class RtdImage, a real-time image 
  * display extension for Tk.
@@ -55,14 +55,13 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
-#include "define.h"
 #include "error.h"
 #include "WorldCoords.hxx"
 #include "ImageColor.h"
 #include "ImageDisplay.h"
 #include "ImageData.h"
 #include "ImageZoom.h"
-#include "FitsIO.hxx"
+#include "Fits_IO.h"
 #include "RtdCamera.h"
 #include "RtdRemote.h"
 #include "rtdImageEvent.h"

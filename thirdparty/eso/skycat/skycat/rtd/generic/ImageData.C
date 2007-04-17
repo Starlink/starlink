@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: ImageData.C,v 1.4 2005/02/02 01:43:02 brighton Exp $" 
+ * "@(#) $Id: ImageData.C,v 1.1.1.1 2006/01/12 16:38:59 abrighto Exp $" 
  *
  * ImageData.C - member functions for class ImageData
  *
@@ -51,8 +51,9 @@
  * pbiereic        10/07/04  Added method 'getXline4' with specified x ranges
  * Peter W. Draper 08/01/07  Return a fake range in autoSetCutLevels for a
  *                           one pixel image. 
+ * pbiereic        09/10/05  fixed bug in 'getYline4'
  */
-static const char* const rcsId="@(#) $Id: ImageData.C,v 1.4 2005/02/02 01:43:02 brighton Exp $";
+static const char* const rcsId="@(#) $Id: ImageData.C,v 1.1.1.1 2006/01/12 16:38:59 abrighto Exp $";
 
 
 #include <cstdio>
@@ -62,8 +63,11 @@ static const char* const rcsId="@(#) $Id: ImageData.C,v 1.4 2005/02/02 01:43:02 
 #include <cmath>
 #include <iostream>
 #include "error.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include "define.h"
-#include "FitsIO.hxx"
+#include "Fits_IO.h"
 #include "fitshead.h"
 #include "NativeImageData.h"
 #include "ByteImageData.h"
@@ -1554,9 +1558,9 @@ int ImageData::getYline4(int x, int y0, int y1, double *xyvalues)
    
     for (int y = y0; y < y1; y++, numVal++) {
 	cx = getValue(x, y);           // y axis value
-	*xyvalues++ = (double) x - 0.5;      // x axis value
+	*xyvalues++ = (double) y - 0.5;      // x axis value
 	*xyvalues++ = cx;
-	*xyvalues++ = (double) x + 0.5;
+	*xyvalues++ = (double) y + 0.5;
 	*xyvalues++ = cx;
     }
     return numVal;

@@ -17,6 +17,9 @@
  */
 
 #include <unistd.h>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include "RtdRPTool.h"
 
 static rtdShm shmInfo_;		// Structure for managing shm/semaphores
