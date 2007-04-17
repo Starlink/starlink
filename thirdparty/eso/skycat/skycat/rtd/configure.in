@@ -1,596 +1,248 @@
 # E.S.O. - VLT project 
-# $Id: configure.in,v 1.2 2005/02/02 01:43:03 brighton Exp $
+# $Id: configure.in,v 1.5 2006/02/01 22:10:36 abrighto Exp $
 #
-# This file is used with GNU autoconf to generate a configure script for
-# the RTD modules.
+# This file is used with GNU autoconf to generate a configure script
 #
 # usage: % autoconf  # only if configure.in changed
 #        % configure
 #        % make
+#        % make install
+#
 # who             when      what
 # --------------  --------  ---------------------------------------------
-# Allan Brighton  05/10/95  Created
-# P.Biereichel    17/02/97  New Tcl/Tk/blt... versions. xgrabsc.2_41
-#                           Shared lib
-# Allan Brighton  08/04/97  Use tclConfig.sh and tkConfig.sh to get path
-#                           and shared lib option info
-# Allan Brighton  24/11/97  split rtd into rtd and tclutil packages, moved
-#                           config.h and generic classes to tclutil pkg.
-#                           Get config info from the tclutilConfig.sh now.
-# P.Biereichel    26/06/99  Option --with-vltgnu added
-#
+# Allan Brighton  15/12/05  Rewrote using TCL TEA standard
 # -----------------------------------------------------------------------
 
-AC_INIT(rtdimg/src/RtdImage.C)
+#-----------------------------------------------------------------------
+# Sample configure.in for Tcl Extensions.  The only places you should
+# need to modify this file are marked by the string __CHANGE__
+#-----------------------------------------------------------------------
 
-# -----------------------------------------------------------------------
+#-----------------------------------------------------------------------
+# __CHANGE__
+# Set your package name and version numbers here.
 #
-# 	Set prefix variable if one wasn't provided
-#
-# -----------------------------------------------------------------------
-if test "$prefix" = "NONE" ; then
-    #prefix=`(cd ..; pwd)`/install
-    prefix=/usr/local
-fi
-echo "using prefix = $prefix"
-AC_SUBST(prefix)
+# This initializes the environment with PACKAGE_NAME and PACKAGE_VERSION
+# set as provided.  These will also be added as -D defs in your Makefile
+# so you can encode the package version directly into the source files.
+#-----------------------------------------------------------------------
 
-# -----------------------------------------------------------------------
-#
-# 	Set PWD variable (/bin/sh may inherit the wrong value...)
-#
-# -----------------------------------------------------------------------
-PWD=`pwd`
-SRC_ROOT=$PWD
-AC_SUBST(SRC_ROOT)
+AC_INIT([rtd], [3.0])
 
-# set auxiliary dir for AC_PROG_INSTALL, needed to get the absolute
-# path of install.sh in the Makefiles, unless there is a standard
-# one in $PATH
-AC_CONFIG_AUX_DIR($PWD)
-AC_PROG_INSTALL
+#--------------------------------------------------------------------
+# Do application specific checks (see aclocal.m4)
+#--------------------------------------------------------------------
+RTD_CONFIG
 
-# -----------------------------------------------------------------------
-#
-# C compiler and debugging flags
-#
-# -----------------------------------------------------------------------
+#--------------------------------------------------------------------
+# Call TEA_INIT as the first TEA_ macro to set up initial vars.
+# This will define a ${TEA_PLATFORM} variable == "unix" or "windows"
+# as well as PKG_LIB_FILE and PKG_STUB_LIB_FILE.
+#--------------------------------------------------------------------
 
-AC_PROG_RANLIB
-AC_PROG_CPP
-AC_PROG_CXX
+TEA_INIT([3.4])
 
-LIB_STDCPP=""
+#--------------------------------------------------------------------
+# Load the tclConfig.sh file
+#--------------------------------------------------------------------
 
-VLTGNU=0
-AC_ARG_WITH(vltgnu, [--with-vltgnu      use gcc compiler for C and C++], VLTGNU=1)
-if test "$VLTGNU" = "1" ; then
-  CC=gcc
-  CXX=gcc
-  LIB_STDCPP="-lstdc++"
+TEA_PATH_TCLCONFIG
+TEA_LOAD_TCLCONFIG
+
+#--------------------------------------------------------------------
+# Load the tkConfig.sh file if necessary (Tk extension)
+#--------------------------------------------------------------------
+
+TEA_PATH_TKCONFIG
+TEA_LOAD_TKCONFIG
+
+#-----------------------------------------------------------------------
+# Handle the --prefix=... option by defaulting to what Tcl gave.
+# Must be called after TEA_LOAD_TCLCONFIG and before TEA_SETUP_COMPILER.
+#-----------------------------------------------------------------------
+
+TEA_PREFIX
+
+#-----------------------------------------------------------------------
+# Standard compiler checks.
+# This sets up CC by using the CC env var, or looks for gcc otherwise.
+# This also calls AC_PROG_CC, AC_PROG_INSTALL and a few others to create
+# the basic setup necessary to compile executables.
+#-----------------------------------------------------------------------
+
+TEA_SETUP_COMPILER
+
+#-----------------------------------------------------------------------
+# __CHANGE__
+# Specify the C source files to compile in TEA_ADD_SOURCES,
+# public headers that need to be installed in TEA_ADD_HEADERS,
+# stub library C source files to compile in TEA_ADD_STUB_SOURCES,
+# and runtime Tcl library files in TEA_ADD_TCL_SOURCES.
+# This defines PKG(_STUB)_SOURCES, PKG(_STUB)_OBJECTS, PKG_HEADERS
+# and PKG_TCL_SOURCES.
+#-----------------------------------------------------------------------
+
+TEA_ADD_SOURCES([${csources}])
+TEA_ADD_HEADERS([${cheaders}])
+TEA_ADD_INCLUDES([${cincludes}])
+if test $MERGED = yes ; then
+    TEA_ADD_LIBS([${BLT_LIB_SPEC}])
 else
-  AC_ARG_WITH(gcc, [--with-gcc         use gcc compiler for C and g++ for C++], CC=gcc; CXX=g++)
+    TEA_ADD_LIBS([$astrotcl_BUILD_LIB_SPEC $tclutil_BUILD_LIB_SPEC ${BLT_LIB_SPEC}])
 fi
+TEA_ADD_CFLAGS([])
+TEA_ADD_STUB_SOURCES([])
+TEA_ADD_TCL_SOURCES([${tclsources}])
 
-PKG="rtd"
-AC_SUBST(PKG)
-
-AC_SUBST(LIB_STDCPP)
-AC_ARG_WITH(cc,  [--with-cc          use cc  compiler for C and C++], CC=cc; CXX=CC)
-
-
-# -----------------------------------------------------------------------
+#--------------------------------------------------------------------
+# __CHANGE__
+# A few miscellaneous platform-specific items:
 #
-# Set the Rtd version from the VERSION file in this directory
-# (That is the place to set the Rtd version number for a new release)
+# Define a special symbol for Windows (BUILD_sample in this case) so
+# that we create the export library with the dll.
 #
-# -----------------------------------------------------------------------
-RTD_VERSION=`grep vltsccm Makefile.in | grep 'Id:' | sed -e 's/"//g; s/+//g' | awk '{printf $5}'`
-if test "$RTD_VERSION" = "" ; then
-  RTD_VERSION=`cat VERSION | sed -e 's/rtd-//'`
-  echo "RTD VERSION = $RTD_VERSION"
+# Windows creates a few extra files that need to be cleaned up.
+# You can add more files to clean if your extension creates any extra
+# files.
+#
+# TEA_ADD_* any platform specific compiler/build info here.
+#--------------------------------------------------------------------
+if test "${TEA_PLATFORM}" = "windows" ; then
+    AC_DEFINE(BUILD_rtd, 1, [Build windows export dll])
+    CLEANFILES="*.lib *.dll *.exp *.ilk *.pdb vc*.pch"
+    #TEA_ADD_SOURCES([win/winFile.c])
+    #TEA_ADD_INCLUDES([-I\"$(${CYGPATH} ${srcdir}/win)\"])
 else
-  echo "VLT software, Rtd cmm version = $RTD_VERSION"
+    CLEANFILES=""
+    #TEA_ADD_SOURCES([unix/unixFile.c])
+    #TEA_ADD_LIBS([-lsuperfly])
 fi
-AC_SUBST(RTD_VERSION)
+AC_SUBST(CLEANFILES)
 
-
-# -----------------------------------------------------------------------
-#
-# Read the Tclutil config file to find out where the X and Tcl/Tk files and 
-# libraries are and how to make shared libraries.
-#
-# -----------------------------------------------------------------------
-
-# sh procedure to find a config file: arg: 
-# $1 = name in lower case ("tclutil")
-
-getConfig() {
-  name=${1}Config.sh
-  echo "checking for ${name}"
-  TCL_CONFIG_DIR=""
-  places="\
-   ../tclutil \
-   ../astrotcl \
-   $prefix/lib \
-   $prefix/lib/itcl \
-   /vlt/dflow/lib/itcl \
-   /vlt/dflow/lib \
-   /usr/local/lib/itcl \
-   /usr/local/lib"
-  for dir in $places; do
-    if test -r $dir/${name} ; then
-      TCL_CONFIG_DIR=$dir
-      break
-    fi
-  done
-  while test -z "$TCL_CONFIG_DIR" ; do
-    echo "What directory contains ${name} ?"
-    read TCL_CONFIG_DIR
-    if test ! -r $TCL_CONFIG_DIR/${name} ; then
-      echo "can't read $TCL_CONFIG_DIR/${name}"
-      TCL_CONFIG_DIR=""
-    fi
-  done
-    
-  # source the Tcl config file
-  . $TCL_CONFIG_DIR/${name}
-}
-
-# source the config files
-getConfig tclutil
-getConfig astrotcl
-
-# for now, just use the compiler settings used to build rtd
-CC=$TCLUTIL_CC
-CXX=$TCLUTIL_CXX
-AC_SUBST(CC)
-AC_SUBST(CXX)
-
-# pass on Tcl/Tk version info
-TCL_VERSION=$TCLUTIL_TCL_VERSION
-TK_VERSION=$TCLUTIL_TK_VERSION
-ITCL_VERSION=$TCLUTIL_ITCL_VERSION
-ITK_VERSION=$TCLUTIL_ITK_VERSION
-TCLX_VERSION=$TCLUTIL_TCLX_VERSION
-BLT_VERSION=$TCLUTIL_BLT_VERSION
-
-AC_SUBST(TCL_VERSION)
-AC_SUBST(TK_VERSION)
-AC_SUBST(ITCL_VERSION)
-AC_SUBST(ITK_VERSION)
-AC_SUBST(TCLX_VERSION)
-AC_SUBST(BLT_VERSION)
-
-AC_SUBST(TCLUTIL_VERSION)
-AC_SUBST(ASTROTCL_VERSION)
-
-# source dirs
-if test ! -d "$TCLUTIL_SRC_ROOT" -o ! -d "$ASTROTCL_SRC_ROOT"; then
-    echo "*** Error: This package requires source access to the tclutil and astrotcl packages."
-    echo "*** Please configure and make those packages first."
-    exit 1
+#------------------------------------------------------------------------
+# See if we can include tkCanvas.h, an internal tk header file needed 
+# to work around a problem with clipping canvas coordinates on large
+# images.
+#------------------------------------------------------------------------
+if test -f $TK_SRC_DIR/generic/tkCanvas.h ; then
+	AC_DEFINE(HAVE_TKCANVAS_H, 1, 
+		[See if we can include tkCanvas.h, an internal tk header])
+        TEA_ADD_INCLUDES([-I$TK_SRC_DIR/generic])
 fi
-AC_SUBST(TCLUTIL_SRC_ROOT)
-AC_SUBST(ASTROTCL_SRC_ROOT)
 
-# subdirs
-AC_SUBST(TCLUTIL_SUBDIRS)
-AC_SUBST(TCLUTIL_SUBDIRS_NOTIX)
-AC_SUBST(ASTROTCL_SUBDIRS)
+#--------------------------------------------------------------------
+# __CHANGE__
+# Choose which headers you need.  Extension authors should try very
+# hard to only rely on the Tcl public header files.  Internal headers
+# contain private data structures and are subject to change without
+# notice.
+# This MUST be called after TEA_LOAD_TCLCONFIG / TEA_LOAD_TKCONFIG
+#--------------------------------------------------------------------
 
-# The environment variable TCLTK_ROOT may be set before running configure
-# to help locate the correct Tcl/Tk installation
-TCLTK_ROOT=$TCLUTIL_TCLTK_ROOT
-AC_SUBST(TCLTK_ROOT)
+TEA_PUBLIC_TCL_HEADERS
+#TEA_PRIVATE_TCL_HEADERS
 
-# pass these valaues on from the Tclutil package
-LD_VARNAME=$TCLUTIL_LD_VARNAME
-AC_SUBST(LD_VARNAME)
+TEA_PUBLIC_TK_HEADERS
+#TEA_PRIVATE_TK_HEADERS
+TEA_PATH_X
 
-LIB_RUNTIME_DIR=$TCLUTIL_LIB_RUNTIME_DIR
-AC_SUBST(LIB_RUNTIME_DIR)
+#--------------------------------------------------------------------
+# Check whether --enable-threads or --disable-threads was given.
+# This auto-enables if Tcl was compiled threaded.
+#--------------------------------------------------------------------
 
-# get -D defines
-DEFS=$TCLUTIL_DEFS
-AC_SUBST(DEFS)
+TEA_ENABLE_THREADS
 
-# -----------------------------------------------------------------------
-#
-# The "--with-notcl" option can be used to build a version of this package
-# without Tcl access (i.e.: only the C and C++ libraries that do not access
-# anything Tcl related).
-#
-# -----------------------------------------------------------------------
+#--------------------------------------------------------------------
+# The statement below defines a collection of symbols related to
+# building as a shared library instead of a static library.
+#--------------------------------------------------------------------
 
-NO_TCL=0
-AC_ARG_WITH(notcl, [--with-notcl       build a version with no Tcl access], NO_TCL=1)
-AC_SUBST(NO_TCL)
+TEA_ENABLE_SHARED
 
-# The list of source dirs depends on whether we have Tcl access or not
-if test "$NO_TCL" = "1" ; then
-    echo "Compiling with no Tcl access."
-    RTD_SUBDIRS="$SRC_ROOT/rtdevt \
-                 $SRC_ROOT/rtilib \
-		 $SRC_ROOT/rtdrmt"
+#--------------------------------------------------------------------
+# This macro figures out what flags to use with the compiler/linker
+# when building shared/static debug/optimized objects.  This information
+# can be taken from the tclConfig.sh file, but this figures it all out.
+#--------------------------------------------------------------------
+
+TEA_CONFIG_CFLAGS
+
+#--------------------------------------------------------------------
+# Set the default compiler switches based on the --enable-symbols option.
+#--------------------------------------------------------------------
+
+TEA_ENABLE_SYMBOLS
+
+#--------------------------------------------------------------------
+# Everyone should be linking against the Tcl stub library.  If you
+# can't for some reason, remove this definition.  If you aren't using
+# stubs, you also need to modify the SHLIB_LD_LIBS setting below to
+# link against the non-stubbed Tcl library.  Add Tk too if necessary.
+#--------------------------------------------------------------------
+
+# allan: can't use stubs, due to BLT dependency
+#AC_DEFINE(USE_TCL_STUBS, 1, [Use Tcl stubs])
+#AC_DEFINE(USE_TK_STUBS, 1, [Use Tk stubs])
+
+#--------------------------------------------------------------------
+# This macro generates a line to use when building a library.  It
+# depends on values set by the TEA_ENABLE_SHARED, TEA_ENABLE_SYMBOLS,
+# and TEA_LOAD_TCLCONFIG macros above.
+#--------------------------------------------------------------------
+
+# rtd needs -lXext
+PKG_LIBS="${PKG_LIBS} -lXext"
+
+TEA_MAKE_LIB
+
+#--------------------------------------------------------------------
+# Determine the name of the tclsh and/or wish executables in the
+# Tcl and Tk build directories or the location they were installed
+# into. These paths are used to support running test cases only,
+# the Makefile should not be making use of these paths to generate
+# a pkgIndex.tcl file or anything else at extension build time.
+#--------------------------------------------------------------------
+
+TEA_PROG_TCLSH
+TEA_PROG_WISH
+
+#--------------------------------------------------------------------
+# These are for rtdConfig.sh
+#--------------------------------------------------------------------
+
+rtd_LIB_FILE=${PKG_LIB_FILE}
+
+eval pkglibdir="${libdir}"
+if test "${TCL_LIB_VERSIONS_OK}" = "ok"; then
+    eval rtd_LIB_FLAG="-lrtd${PACKAGE_VERSION}"
 else
-    if test "$TCLUTIL_NO_TCL" = "1"; then
-         echo "*** Error: Please configure tclutil first without the --with-notcl option"
-	 exit 1
-    fi
-    if test "$ASTROTCL_NO_TCL" = "1"; then
-         echo "*** Error: Please configure astrotcl first without the --with-notcl option"
-	 exit 1
-    fi
-
-    RTD_SUBDIRS="$SRC_ROOT/rtdevt \
-                 $SRC_ROOT/rtilib \
-		 $SRC_ROOT/rtdrmt \
-                 $SRC_ROOT/rtdimg"
+    eval rtd_LIB_FLAG="-lrtd`echo ${PACKAGE_VERSION} | tr -d .`"
 fi
-AC_SUBST(RTD_SUBDIRS)
+rtd_BUILD_LIB_SPEC="-L`pwd` ${rtd_LIB_FLAG}"
+rtd_BUILD_DIR="`pwd`"
+rtd_LIB_SPEC="-L${pkglibdir} ${rtd_LIB_FLAG}"
 
-# -----------------------------------------------------------------------
-#
-# "makedepend" info
-#
-# normally, "makedepend" wants to know all of the path names and will
-# cause make errors if the include path to the C++ includes is not given.
-# Here we try to extract that information from the C++ preprocessor output.
-# The syntax of the output is different for different compilers...
-#
-# -----------------------------------------------------------------------
-CXX_INCLUDE=$TCLUTIL_CXX_INCLUDE
-AC_SUBST(CXX_INCLUDE)
-AC_SUBST(CXX_DEPEND_FLAGS)
+for i in ${PKG_OBJECTS} ; do 
+    rtd_PKG_OBJECTS="$rtd_PKG_OBJECTS ../rtd/$i"
+done
 
-# -----------------------------------------------------------------------
-#
-# set OS version string
-#
-# -----------------------------------------------------------------------
-OS=`uname -s`
-OSVERSION="${OS}-`uname -r`"
-AC_SUBST(OS)
-AC_SUBST(OSVERSION)
+AC_SUBST(rtd_LIB_FILE)
+AC_SUBST(rtd_BUILD_LIB_SPEC)
+AC_SUBST(rtd_BUILD_DIR)
+AC_SUBST(rtd_LIB_SPEC)
+AC_SUBST(rtd_PKG_OBJECTS)
 
-# -----------------------------------------------------------------------
-#
-# if we are using gcc, we can get better make dependencies using gcc -MM 
-# otherwise we have to use  "makedepend", which sometimes gets confused. 
-# This sets the make target to use:
-#
-# -----------------------------------------------------------------------
-DEPEND_TARGET=$TCLUTIL_DEPEND_TARGET
-AC_SUBST(DEPEND_TARGET)
-
-# -----------------------------------------------------------------------
-#
-# use CDEBUGFLAGS for C and CXXDEBUGFLAGS for C++ compiler options
-#
-# -----------------------------------------------------------------------
-if test "$CC" = "gcc" ; then
-	CDEBUGFLAGS="-g -O"
-fi
-if test "$CXX" = "g++" ; then
-	CXXDEBUGFLAGS="-g -O"
-fi
-AC_ARG_WITH(debug, [--with-debug       use debugging flag], 
-	CDEBUGFLAGS="-g"; CXXDEBUGFLAGS="-g", 
-	CDEBUGFLAGS="-O"; CXXDEBUGFLAGS="-O")
-
-CDEBUGFLAGS="$CDEBUGFLAGS $CFLAGS"
-CXXDEBUGFLAGS="$CXXDEBUGFLAGS $CFLAGS"
-AC_SUBST(CDEBUGFLAGS)
-AC_SUBST(CXXDEBUGFLAGS)
-
-# -----------------------------------------------------------------------
-#
-# Check if we are using (and creating) shared libraries 
-# If so, we use the information from tclConfig.sh to determine the compiler
-# options. 
-#
-# -----------------------------------------------------------------------
-AC_ARG_ENABLE(shared, [--enable-shared    build and use shared libraries],
-	SHARED=1,
-	SHARED=0)
-AC_SUBST(SHARED)
-
-if test $SHARED -eq 0 ; then
-	echo "Don't build shared libraries"
-else
-	echo "Will build shared libraries"
-fi
-
-# Flags to pass to cc when compiling the components of a shared library:
-SHLIB_CFLAGS=$TCLUTIL_SHLIB_CFLAGS
-
-# Base command to use for combining object files into a shared library:
-if test "$VLTGNU" = "1" ; then
-        SHLIB_LD="gcc -ansi -shared -fPIC"
-        if test "$OS" = "HP-UX" ; then
-                SHLIB_LD="$SHLIB_LD -Xlinker -b -Xlinker +s"
-        fi
-else
-	SHLIB_LD=$TCLUTIL_SHLIB_LD
-fi
-
-# Suffix to use for the name of a shared library.
-SHLIB_SUFFIX=$TCLUTIL_SHLIB_SUFFIX
-
-# Either '$LIBS' (if dependent libraries should be included when linking
-# shared libraries) or an empty string.  See Tcl's configure.in for more
-# explanation.
-SHLIB_LD_LIBS=$TCLUTIL_SHLIB_LD_LIBS
-
-# Library file(s) to include in tclsh and other base applications
-# in order to provide facilities needed by DLOBJ above.
-DL_LIBS=$TCLUTIL_DL_LIBS
-
-# Flags to pass to the compiler when linking object files into
-# an executable tclsh or tcltest binary.
-LD_FLAGS=$TCLUTIL_LD_FLAGS
-
-# Flags to pass to cc, such as "-Wl,-R,/usr/local/tcl/lib", that tell the
-# run-time dynamic linker where to look for shared libraries such as
-# libtcl.so.  Used when linking applications.  Only works if there
-# is a variable "LIB_RUNTIME_DIR" defined in the Makefile.
-LD_SEARCH_FLAGS=$TCLUTIL_LD_SEARCH_FLAGS
-
-AC_SUBST(SHLIB_CFLAGS)
-AC_SUBST(SHLIB_LD)
-AC_SUBST(SHLIB_SUFFIX)
-AC_SUBST(SHLIB_LD_LIBS)
-AC_SUBST(DL_LIBS)
-AC_SUBST(LD_FLAGS)
-AC_SUBST(LD_SEARCH_FLAGS)
-
-# -----------------------------------------------------------------------
-# Check the location of X libraries and includes.
-# -----------------------------------------------------------------------
-
-# -I switch(es) to use to make all of the X11 include files accessible:
-XINCSW=$TCLUTIL_XINCSW
-
-# Linker switch(es) to use to link with the X11 library archive.
-XLIBSW=$TCLUTIL_XLIBSW
-
-# dir for X libs
-XLIBDIR=$TCLUTIL_XLIBDIR
-
-AC_SUBST(XINCSW)
-AC_SUBST(XLIBSW)
-AC_SUBST(XLIBDIR)
-
-# -----------------------------------------------------------------------
-#
-# Get the Tcl/Tk information from the tclutilConfig.sh file
-#
-# -----------------------------------------------------------------------
-
-# get the -L and -l library flags
-
-TCL_LIB_SPEC=$TCLUTIL_TCL_LIB_SPEC
-TK_LIB_SPEC=$TCLUTIL_TK_LIB_SPEC
-TCLX_LIB_SPEC=$TCLUTIL_TCLX_LIB_SPEC
-ITCL_LIB_SPEC=$TCLUTIL_ITCL_LIB_SPEC
-ITK_LIB_SPEC=$TCLUTIL_ITK_LIB_SPEC
-BLT_LIB_SPEC=$TCLUTIL_BLT_LIB_SPEC
-
-AC_SUBST(TCL_LIB_SPEC)
-AC_SUBST(TK_LIB_SPEC)
-AC_SUBST(TCLX_LIB_SPEC)
-AC_SUBST(ITCL_LIB_SPEC)
-AC_SUBST(ITK_LIB_SPEC)
-AC_SUBST(BLT_LIB_SPEC)
-
-# -----------------------------------------------------------------------
-# get the -I include flags
-# -----------------------------------------------------------------------
-TCLINCSW=$TCLUTIL_TCLINCSW
-TKINCSW=$TCLUTIL_TKINCSW
-
-AC_SUBST(TCLINCSW)
-AC_SUBST(TKINCSW)
-
-# -----------------------------------------------------------------------
-# tcl package library files
-# -----------------------------------------------------------------------
-TCL_LIBRARY=$TCLUTIL_TCL_LIBRARY
-AC_SUBST(TCL_LIBRARY)
-
-TK_LIBRARY=$TCLUTIL_TK_LIBRARY
-AC_SUBST(TK_LIBRARY)
-
-BLT_LIBRARY=$TCLUTIL_BLT_LIBRARY
-AC_SUBST(BLT_LIBRARY)
-
-AC_SUBST(TCLUTIL_LIBRARY)
-AC_SUBST(ASTROTCL_LIBRARY)
-
-# -----------------------------------------------------------------------
-#       system libs
-# -----------------------------------------------------------------------
-LIBS=$TCLUTIL_LIBS $TCL_LIBS
-AC_SUBST(LIBS)
-
-# -----------------------------------------------------------------------
-# Check if we are using the installed TCLUTIL library and include files
-# or local development versions
-# -----------------------------------------------------------------------
-if test -d $TCLUTIL_SRC_ROOT; then
-	TCLUTIL_LIB=$TCLUTIL_BUILD_LIB_SPEC
-	TCLUTIL_LIB_STATIC=$TCLUTIL_BUILD_LIB_SPEC_STATIC
-	TCLUTIL_BUILD_LIBRARY=$TCLUTIL_BUILD_LIBRARY
-else
-	TCLUTIL_LIB=$TCLUTIL_LIB_SPEC
-	TCLUTIL_LIB_STATIC=$TCLUTIL_LIB_SPEC_STATIC
-	TCLUTIL_BUILD_LIBRARY=$TCLUTIL_LIBRARY
-fi
-AC_SUBST(TCLUTIL_SRC_ROOT)
-AC_SUBST(TCLUTIL_LIB)
-AC_SUBST(TCLUTIL_LIB_SPEC)
-AC_SUBST(TCLUTIL_LIB_STATIC)
-AC_SUBST(TCLUTIL_BUILD_LIBRARY)
-AC_SUBST(TCLUTIL_BUILD_INCLUDES)
-
-# -----------------------------------------------------------------------
-# Check if we are using the installed ASTROTCL library and include files
-# or local development versions
-# -----------------------------------------------------------------------
-if test -d $ASTROTCL_SRC_ROOT; then
-	ASTROTCL_LIB=$ASTROTCL_BUILD_LIB_SPEC
-	ASTROTCL_LIB_STATIC=$ASTROTCL_BUILD_LIB_SPEC_STATIC
-	ASTROTCL_BUILD_LIBRARY=$ASTROTCL_BUILD_LIBRARY
-else
-	ASTROTCL_LIB=$ASTROTCL_LIB_SPEC
-	ASTROTCL_LIB_STATIC=$ASTROTCL_LIB_SPEC_STATIC
-	ASTROTCL_BUILD_LIBRARY=$ASTROTCL_LIBRARY
-fi
-AC_SUBST(ASTROTCL_SRC_ROOT)
-AC_SUBST(ASTROTCL_LIB)
-AC_SUBST(ASTROTCL_LIB_SPEC)
-AC_SUBST(ASTROTCL_LIB_STATIC)
-AC_SUBST(ASTROTCL_BUILD_LIBRARY)
-AC_SUBST(ASTROTCL_BUILD_INCLUDES)
+# rtd_SRC_DIR must be a fully qualified path
+eval rtd_SRC_DIR="$srcdir"
+rtd_SRC_DIR=`cd "${rtd_SRC_DIR}"; pwd`
+AC_SUBST(rtd_SRC_DIR)
 
 #--------------------------------------------------------------------
-# Propagate prefix argument as installation directory.
+# Finally, substitute all of the various values into the Makefile.
+# You may alternatively have a special pkgIndex.tcl.in or other files
+# which require substituting th AC variables in.  Include these here.
 #--------------------------------------------------------------------
-INSTALL_TARGET="$prefix"
-DESTDIR="${INSTALL_TARGET}"
-BINDIR="${INSTALL_TARGET}/bin"
-LIBDIR="${INSTALL_TARGET}/lib"
-INCDIR="${INSTALL_TARGET}/include/rtd"
-MANDIR="${INSTALL_TARGET}/man"
-RTD_DIR=$LIBDIR/rtd
-RTD_LIBRARY=$RTD_DIR
-RTD_BUILD_LIBRARY=$SRC_ROOT/rtdimg/library
-RTD_BUILD_INCLUDES="-I$SRC_ROOT/rtdimg/include -I$SRC_ROOT/rtilib/include -I$SRC_ROOT/rtdevt/include"
+AC_OUTPUT([Makefile pkgIndex.tcl rtdConfig.sh rtd rtd_version.tcl])
 
-AC_SUBST(INSTALL_TARGET)
-AC_SUBST(DESTDIR)
-AC_SUBST(BINDIR)
-AC_SUBST(LIBDIR)
-AC_SUBST(INCDIR)
-AC_SUBST(MANDIR)
-AC_SUBST(RTD_DIR)
-AC_SUBST(RTD_LIBRARY)
-AC_SUBST(RTD_BUILD_LIBRARY)
-AC_SUBST(RTD_BUILD_INCLUDES)
-
-#--------------------------------------------------------------------
-#	Set name of library to link
-#--------------------------------------------------------------------
-
-# String to pass to linker to pick up the Rtd library from its
-# build directory.
-RTD_BUILD_LIB_SPEC="-L$SRC_ROOT -lrtd"
-
-# static version of above
-RTD_BUILD_LIB_SPEC_STATIC="$SRC_ROOT/librtd.a"
-
-# String to pass to linker to pick up the Rtd library from its
-# installed directory.
-RTD_LIB_SPEC="-L$LIBDIR -lrtd"
-
-# static version of above
-RTD_LIB_SPEC_STATIC="$LIBDIR/librtd.a"
-
-# if we are not building shared libraries, make sure we use the static
-# libraries and not get an outdated shared library by accident
-if test "$SHARED" = "0"
-then
-    RTD_BUILD_LIB_SPEC=$RTD_BUILD_LIB_SPEC_STATIC
-    RTD_LIB_SPEC=$RTD_LIB_SPEC_STATIC
-fi
-
-AC_SUBST(RTD_BUILD_LIB_SPEC)
-AC_SUBST(RTD_BUILD_LIB_SPEC_STATIC)
-AC_SUBST(RTD_LIB_SPEC)
-AC_SUBST(RTD_LIB_SPEC_STATIC)
-
-#--------------------------------------------------------------------
-#	Print out some of the more important settings 
-#--------------------------------------------------------------------
-echo "
-Configuration results (edit and run ./config.status to modify):
-
-C   Compiler                      => $CC
-C++ Compiler                      => $CXX
-C++ include flag                  => $CXX_INCLUDE"
-
-if test "$NO_TCL" = "0" ; then
-echo "
-X include files                   => $XINCSW
-Tcl include files                 => $TCLINCSW
-Tk include files                  => $TKINCSW
-
-X libs                            => $XLIBSW
-Tcl libs                          => $TCL_LIB_SPEC
-Tk libs                           => $TK_LIB_SPEC
-TclX libs                         => $TCLX_LIB_SPEC
-Itcl libs                         => $ITCL_LIB_SPEC
-Itk libs                          => $ITK_LIB_SPEC
-BLT libs                          => $BLT_LIB_SPEC
-TCLUTIL libs                      => $TCLUTIL_LIB_SPEC
-ASTROTCL libs                     => $ASTROTCL_LIB_SPEC
-
-directory containing tcl library  => $TCL_LIBRARY
-directory containing tk  library  => $TK_LIBRARY
-directory containing blt library  => $BLT_LIBRARY
-
-install rtd tcl library files in  => $RTD_DIR"
-fi
-
-echo "
-install rtd binaries in           => $BINDIR
-install rtd libraries in          => $LIBDIR
-install rtd include files in      => $INCDIR
-
-default install dir INSTALL_TARGET=> $INSTALL_TARGET"
-
-#--------------------------------------------------------------------
-#	Generate the Makefiles etc...
-#--------------------------------------------------------------------
-export NO_TCL
-AC_OUTPUT(\
-	Makefile \
-	makefile.mk \
-        rtdConfig.sh \
-        \
-	rtdimg/Makefile \
-	rtdimg/src/Makefile \
-	rtdimg/include/Makefile \
-	rtdimg/man/Makefile \
-	rtdimg/library/Makefile \
-	rtdimg/library/rtd_version.tcl \
-	rtdimg/library/pkgIndex.tcl \
-	rtdimg/demos/Makefile \
-	rtdimg/demos/rtd.sh \
-	rtdimg/demos/rtd_env.sh \
-	rtdimg/images/Makefile \
-	rtdimg/bitmaps/Makefile \
-	rtdimg/colormaps/Makefile \
-	rtdimg/test/Makefile \
-	\
-	rtilib/Makefile \
-	rtilib/src/Makefile \
-	rtilib/include/Makefile \
-	rtilib/test/Makefile \
-	rtilib/man/Makefile \
-	\
-	rtdevt/Makefile \
-	rtdevt/src/Makefile \
-	rtdevt/include/Makefile \
-	rtdevt/man/Makefile \
-	\
-	rtdrmt/Makefile \
-	rtdrmt/src/Makefile \
-	rtdrmt/include/Makefile \
-	rtdrmt/test/Makefile \
-	rtdrmt/man/Makefile \
-	\
-	, if test "$NO_TCL" = "0" ; then sh makelinks; fi ; make -s -k depend \
-	)
-
+chmod ugo+rx rtd
