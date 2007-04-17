@@ -15,7 +15,8 @@
 *  Invocation:
 *     smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos, 
 *                   int autogrid, Grp *detgrp, double par[ 7 ], int *moving, 
-*                   AstSkyFrame **skyframe, int *sparse, int *status );
+*                   AstSkyFrame **skyframe, int *sparse, int *gottsys,
+*                   int *status );
 
 *  Arguments:
 *     igrp = Grp * (Given)
@@ -66,6 +67,8 @@
 *        associated with the first time slice.
 *     sparse = int * (Returned)
 *        Should a sparse output cube be created?
+*     gottsys = int * (Returned)
+*        Were some valid Tsys values found in any of the files?
 *     status = int * (Given and Returned)
 *        Pointer to inherited status.
 
@@ -181,7 +184,8 @@
 
 void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos, 
                    int autogrid, Grp *detgrp, double par[ 7 ], int *moving, 
-                   AstSkyFrame **skyframe, int *sparse, int *status ){
+                   AstSkyFrame **skyframe, int *sparse, int *gottsys,
+                   int *status ){
 
 /* Local Variables */
    AstFrame *sf1 = NULL;      /* Spatial Frame representing AZEL system */
@@ -201,6 +205,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    const char *lab = NULL;    /* Pointer to start of next detector name */
    const char *trsys = NULL;  /* AST tracking system */
    const char *usesys = NULL; /* AST system for output cube */
+   const double *tsys;        /* Pointer to Tsys value for first detector */
    double *allpos = NULL;/* Array of all sample positions */
    double *allpos2 = NULL;/* Array of all sample positions */
    double *p;            /* Pointer to next value */
@@ -245,6 +250,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    for( ipar = 0; ipar < 7; ipar++ ) par[ ipar ] = AST__BAD;
    *skyframe = NULL;
    *moving = 0;
+   *gottsys = 0;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -494,6 +500,9 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
             break;
          }
 
+/* Get a pointer to the start of the Tsys values for this time slice. */
+         tsys = hdr->tsys ? hdr->tsys + hdr->ndet*itime : NULL;
+
 /* The "fs" FrameSet goes from GRID to absolute coords in the requested
    system. If the source is moving, we now adjust this FrameSet so that,
    instead of going to absolute coords in the requested system, it goes to 
@@ -564,12 +573,13 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
                   }
                }         
 
-/* If it did, store it. */
+/* If it did, store it. Also, see if this detector has a good Tsys value. */
                if( good ) {
                   *(p++) = xout[ irec ];
                   *(p++) = yout[ irec ];
                   if( labgrp ) grpPut1( labgrp, lab, 0, status );
                   nallpos++;
+                  if( tsys && (float) tsys[ irec ] != VAL__BADR ) *gottsys = 1;
                }
 
 /* If this detector does not have a valid position, increment the data
@@ -596,7 +606,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 
 /* If we do not need to look at any other files, we can leave the loop
    early. */
-      if( *skyframe && !autogrid && !outcat ) break;
+      if( *skyframe && !autogrid && !outcat && *gottsys ) break;
    }
 
 /* Close any data file that was left open due to an early exit from the

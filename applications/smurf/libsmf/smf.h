@@ -501,7 +501,7 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
 void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos, 
                    int autogrid, Grp *detgrp, double par[ 7 ], 
                    int *moving, AstSkyFrame **skyframe, int *sparse, 
-                   int *status );
+                   int *gottsys, int *status );
 
 const char *smf_convert_system( const char *label, int *status );
 

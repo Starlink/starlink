@@ -627,6 +627,7 @@ void smurf_makecube( int *status ) {
    int el;                    /* Index of 3D array element */
    int flag;                  /* Is group expression to be continued? */
    int genvar;                /* How to create output Variances */
+   int gottsys;               /* Have som egood Tsys values been found? */
    int hasoffexp;             /* Any ACS_OFFEXPOSURE values found in the i/p? */
    int i;                     /* Loop index */
    int ifile;                 /* Input file index */
@@ -729,7 +730,7 @@ void smurf_makecube( int *status ) {
 
 /* Calculate the default grid parameters. */
    smf_cubegrid( igrp,  size, system, usedetpos, autogrid, detgrp, 
-                 par, &moving, &oskyfrm, &sparse, status );
+                 par, &moving, &oskyfrm, &sparse, &gottsys, status );
 
 /* If we are producing an output cube with the XY plane being a spatial
    projection... */
@@ -746,9 +747,16 @@ void smurf_makecube( int *status ) {
    input JCMTSTATE, so warn the user if this cannot be done and continue
    without using weights. */
       parGet0l( "INWEIGHT", &use_wgt, status );
-      if( use_wgt && !hasoffexp ) {
+      if( use_wgt && ( !hasoffexp || !gottsys ) ) {
          if( !blank) msgBlank( status );
-         msgOutif( MSG__NORM, "INW_MSG1", "   Weights cannot be determined "
+         if( !hasoffexp ) {
+            msgOutif( MSG__NORM, "INW_MSG1A", "   ACS_OFFEXPOSURE not found "
+                      "in JCMTSTATE extension.", status );
+         } else {
+            msgOutif( MSG__NORM, "INW_MSG1B", "   No good TSYS values found "
+                      "in ACSIS extension.", status );
+         }
+         msgOutif( MSG__NORM, "INW_MSG1C", "   Weights cannot be determined "
                    "for the input spectra.", status );
          msgOutif( MSG__NORM, "INW_MSG2", "   Each output spectrum will be "
                    "an unweighted sum of the input spectra.", status );
@@ -771,9 +779,18 @@ void smurf_makecube( int *status ) {
 
       }
 
-      if( genvar == 2 && !hasoffexp ) {
+      if( genvar == 2 && ( !hasoffexp || !gottsys) ) {
          if( !blank ) msgBlank( status );
-         msgOutif( MSG__NORM, "GNV_MSG1", "   Input variances cannot be determined "
+
+         if( !hasoffexp ) {
+            msgOutif( MSG__NORM, "GNV_MSG1A", "   ACS_OFFEXPOSURE not found "
+                      "in JCMTSTATE extension.", status );
+         } else {
+            msgOutif( MSG__NORM, "GNV_MSG1B", "   No good TSYS values found "
+                      "in ACSIS extension.", status );
+         }
+
+         msgOutif( MSG__NORM, "GNV_MSG1", "   Variances cannot be determined "
                    "for the input spectra.", status );
          msgOutif( MSG__NORM, "GNV_MSG2", "   The output file will not contain "
                    "a Variance array.", status );
