@@ -1,749 +1,237 @@
 # E.S.O. - VLT project 
-# $Id: configure.in,v 1.2 2005/02/02 01:43:04 brighton Exp $
+# $Id: configure.in,v 1.4 2006/01/25 22:21:38 abrighto Exp $
 #
 # This file is used with GNU autoconf to generate a configure script
 #
 # usage: % autoconf  # only if configure.in changed
 #        % configure
 #        % make
-# who             when       what
-# --------------  --------   ---------------------------------------------
-# Allan Brighton  26 Nov 97  Created
-# P.Biereichel    26/06/99   Option --with-vltgnu added
+#        % make install
 #
+# who             when      what
+# --------------  --------  ---------------------------------------------
+# Allan Brighton  15/12/05  Rewrote using TCL TEA standard
 # -----------------------------------------------------------------------
 
-AC_INIT(astrotcl/src/Astrotcl.C)
+#-----------------------------------------------------------------------
+# Sample configure.in for Tcl Extensions.  The only places you should
+# need to modify this file are marked by the string __CHANGE__
+#-----------------------------------------------------------------------
 
-# -----------------------------------------------------------------------
+#-----------------------------------------------------------------------
+# __CHANGE__
+# Set your package name and version numbers here.
 #
-# Set the package version from the VERSION file in this directory
-# (That is the place to set the astrotcl version number for a new release)
-#
-# -----------------------------------------------------------------------
-ASTROTCL_VERSION=`cat VERSION | sed -e 's/astrotcl-//'`
-AC_SUBST(ASTROTCL_VERSION)
+# This initializes the environment with PACKAGE_NAME and PACKAGE_VERSION
+# set as provided.  These will also be added as -D defs in your Makefile
+# so you can encode the package version directly into the source files.
+#-----------------------------------------------------------------------
 
-# -----------------------------------------------------------------------
-#
-# 	Set prefix variable if one wasn't provided
-#
-# -----------------------------------------------------------------------
-if test "$prefix" = "NONE" ; then
-    #prefix=`(cd ..; pwd)`/install
-    prefix=/usr/local
-fi
-echo "using prefix = $prefix"
-AC_SUBST(prefix)
+AC_INIT([astrotcl], [2.0])
 
-# -----------------------------------------------------------------------
-#
-# 	Set PWD variable (/bin/sh may inherit the wrong value...)
-#
-# -----------------------------------------------------------------------
-PWD=`pwd`
-SRC_ROOT=$PWD
-AC_SUBST(SRC_ROOT)
+#--------------------------------------------------------------------
+# Do application specific checks (see aclocal.m4)
+#--------------------------------------------------------------------
+ASTROTCL_CONFIG
 
-# -----------------------------------------------------------------------
+#--------------------------------------------------------------------
+# Call TEA_INIT as the first TEA_ macro to set up initial vars.
+# This will define a ${TEA_PLATFORM} variable == "unix" or "windows"
+# as well as PKG_LIB_FILE and PKG_STUB_LIB_FILE.
+#--------------------------------------------------------------------
+
+TEA_INIT([3.4])
+
+#--------------------------------------------------------------------
+# Load the tclConfig.sh file
+#--------------------------------------------------------------------
+
+TEA_PATH_TCLCONFIG
+TEA_LOAD_TCLCONFIG
+
+#--------------------------------------------------------------------
+# Load the tkConfig.sh file if necessary (Tk extension)
+#--------------------------------------------------------------------
+
+TEA_PATH_TKCONFIG
+TEA_LOAD_TKCONFIG
+
+#-----------------------------------------------------------------------
+# Handle the --prefix=... option by defaulting to what Tcl gave.
+# Must be called after TEA_LOAD_TCLCONFIG and before TEA_SETUP_COMPILER.
+#-----------------------------------------------------------------------
+
+TEA_PREFIX
+
+#-----------------------------------------------------------------------
+# Standard compiler checks.
+# This sets up CC by using the CC env var, or looks for gcc otherwise.
+# This also calls AC_PROG_CC, AC_PROG_INSTALL and a few others to create
+# the basic setup necessary to compile executables.
+#-----------------------------------------------------------------------
+
+TEA_SETUP_COMPILER
+
+#-----------------------------------------------------------------------
+# __CHANGE__
+# Specify the C source files to compile in TEA_ADD_SOURCES,
+# public headers that need to be installed in TEA_ADD_HEADERS,
+# stub library C source files to compile in TEA_ADD_STUB_SOURCES,
+# and runtime Tcl library files in TEA_ADD_TCL_SOURCES.
+# This defines PKG(_STUB)_SOURCES, PKG(_STUB)_OBJECTS, PKG_HEADERS
+# and PKG_TCL_SOURCES.
+#-----------------------------------------------------------------------
+
+changequote(<<, >>)
+csources=`cd $srcdir; echo {generic,press,libwcs,cfitsio}/*.[Cc]`
+changequote([, ])
+cheaders=`cd $srcdir; echo {generic,press,libwcs,cfitsio}/*.h`
+cincludes="-I$srcdir/../tclutil/generic -I$srcdir/generic -I$srcdir/press -I$srcdir/libwcs -I$srcdir/cfitsio"
+tclsources=`cd $srcdir; echo library/*.tcl`
+
+TEA_ADD_SOURCES([${csources}])
+TEA_ADD_HEADERS([${cheaders}])
+TEA_ADD_INCLUDES([$cincludes])
+TEA_ADD_LIBS([$tclutil_BUILD_LIB_SPEC ${BLT_LIB_SPEC}])
+TEA_ADD_CFLAGS([])
+TEA_ADD_STUB_SOURCES([])
+TEA_ADD_TCL_SOURCES([${tclsources}])
+
+#--------------------------------------------------------------------
+# __CHANGE__
+# A few miscellaneous platform-specific items:
 #
-# C compiler and debugging flags
+# Define a special symbol for Windows (BUILD_sample in this case) so
+# that we create the export library with the dll.
 #
-# -----------------------------------------------------------------------
-AC_PROG_INSTALL
-AC_PROG_RANLIB
-AC_PROG_CPP
-AC_PROG_CXX
-    
-LIB_STDCPP=""
-VLTGNU=0
-AC_ARG_WITH(vltgnu, [--with-vltgnu      use gcc compiler for C and C++], VLTGNU=1)
-if test "$VLTGNU" = "1" ; then
-  CC=gcc
-  CXX=gcc
-  LIB_STDCPP="-lstdc++"
+# Windows creates a few extra files that need to be cleaned up.
+# You can add more files to clean if your extension creates any extra
+# files.
+#
+# TEA_ADD_* any platform specific compiler/build info here.
+#--------------------------------------------------------------------
+
+if test "${TEA_PLATFORM}" = "windows" ; then
+    AC_DEFINE(BUILD_astrotcl, 1, [Build windows export dll])
+    CLEANFILES="*.lib *.dll *.exp *.ilk *.pdb vc*.pch"
+    #TEA_ADD_SOURCES([win/winFile.c])
+    #TEA_ADD_INCLUDES([-I\"$(${CYGPATH} ${srcdir}/win)\"])
 else
-  AC_ARG_WITH(gcc, [--with-gcc         use gcc compiler for C and g++ for C++], CC=gcc; CXX=g++)
+    CLEANFILES=""
+    #TEA_ADD_SOURCES([unix/unixFile.c])
+    #TEA_ADD_LIBS([-lsuperfly])
 fi
+AC_SUBST(CLEANFILES)
 
-AC_SUBST(LIB_STDCPP)
-AC_ARG_WITH(cc,  [--with-cc          use cc  compiler for C and C++], CC=cc; CXX=CC)
+#--------------------------------------------------------------------
+# __CHANGE__
+# Choose which headers you need.  Extension authors should try very
+# hard to only rely on the Tcl public header files.  Internal headers
+# contain private data structures and are subject to change without
+# notice.
+# This MUST be called after TEA_LOAD_TCLCONFIG / TEA_LOAD_TKCONFIG
+#--------------------------------------------------------------------
 
-# -----------------------------------------------------------------------
-#
-# Read the Tclutil config file to find out where the X and Tcl/Tk files and 
-# libraries are and how to make shared libraries.
-#
-# -----------------------------------------------------------------------
+TEA_PUBLIC_TCL_HEADERS
+#TEA_PRIVATE_TCL_HEADERS
 
-# sh procedure to find a config file: arg: 
-# $1 = name in lower case ("tclutil")
+TEA_PUBLIC_TK_HEADERS
+#TEA_PRIVATE_TK_HEADERS
+TEA_PATH_X
 
-getConfig() {
-  name=${1}Config.sh
-  echo "checking for ${name}"
-  TCL_CONFIG_DIR=""
-  places="../tclutil \
-   $prefix/lib \
-   $prefix/lib/itcl \
-   /vlt/dflow/lib/itcl \
-   /vlt/dflow/lib \
-   /usr/local/lib/itcl \
-   /usr/local/lib"
-  for dir in $places; do
-    if test -r $dir/${name} ; then
-      TCL_CONFIG_DIR=$dir
-      break
-    fi
-  done
-  while test -z "$TCL_CONFIG_DIR" ; do
-    echo "What directory contains ${name} ?"
-    read TCL_CONFIG_DIR
-    if test ! -r $TCL_CONFIG_DIR/${name} ; then
-      echo "can't read $TCL_CONFIG_DIR/${name}"
-      TCL_CONFIG_DIR=""
-    fi
-  done
-    
-  # source the Tcl config file
-  . $TCL_CONFIG_DIR/${name}
-}
+#--------------------------------------------------------------------
+# Check whether --enable-threads or --disable-threads was given.
+# This auto-enables if Tcl was compiled threaded.
+#--------------------------------------------------------------------
 
-# source the config files
-getConfig tclutil
+TEA_ENABLE_THREADS
 
-# for now, just use the compiler settings used to build astrotcl
-CC=$TCLUTIL_CC
-CXX=$TCLUTIL_CXX
-AC_SUBST(CC)
-AC_SUBST(CXX)
+#--------------------------------------------------------------------
+# The statement below defines a collection of symbols related to
+# building as a shared library instead of a static library.
+#--------------------------------------------------------------------
 
-# pass on Tcl/Tk version info
-TCL_VERSION=$TCLUTIL_TCL_VERSION
-TK_VERSION=$TCLUTIL_TK_VERSION
-ITCL_VERSION=$TCLUTIL_ITCL_VERSION
-ITK_VERSION=$TCLUTIL_ITK_VERSION
-TCLX_VERSION=$TCLUTIL_TCLX_VERSION
-BLT_VERSION=$TCLUTIL_BLT_VERSION
+TEA_ENABLE_SHARED
 
-# versions
-AC_SUBST(TCL_VERSION)
-AC_SUBST(TK_VERSION)
-AC_SUBST(ITCL_VERSION)
-AC_SUBST(ITK_VERSION)
-AC_SUBST(TCLX_VERSION)
-AC_SUBST(BLT_VERSION)
+#--------------------------------------------------------------------
+# This macro figures out what flags to use with the compiler/linker
+# when building shared/static debug/optimized objects.  This information
+# can be taken from the tclConfig.sh file, but this figures it all out.
+#--------------------------------------------------------------------
 
-AC_SUBST(TCLUTIL_VERSION)
+TEA_CONFIG_CFLAGS
 
-# The environment variable TCLTK_ROOT may be set before running configure
-# to help locate the correct Tcl/Tk installation
-TCLTK_ROOT=$TCLUTIL_TCLTK_ROOT
-AC_SUBST(TCLTK_ROOT)
+#--------------------------------------------------------------------
+# Set the default compiler switches based on the --enable-symbols option.
+#--------------------------------------------------------------------
 
-# pass these valaues on from the Tclutil package
-LD_VARNAME=$TCLUTIL_LD_VARNAME
-AC_SUBST(LD_VARNAME)
+TEA_ENABLE_SYMBOLS
 
-LIB_RUNTIME_DIR=$TCLUTIL_LIB_RUNTIME_DIR
-AC_SUBST(LIB_RUNTIME_DIR)
+#--------------------------------------------------------------------
+# Everyone should be linking against the Tcl stub library.  If you
+# can't for some reason, remove this definition.  If you aren't using
+# stubs, you also need to modify the SHLIB_LD_LIBS setting below to
+# link against the non-stubbed Tcl library.  Add Tk too if necessary.
+#--------------------------------------------------------------------
 
-# -----------------------------------------------------------------------
-#
-# The "--with-notcl" option can be used to build a version of this package
-# without Tcl access (i.e.: only the C and C++ libraries that do not access
-# anything Tcl related).
-#
-# -----------------------------------------------------------------------
+# allan: can't use stubs, due to BLT dependency
+#AC_DEFINE(USE_TCL_STUBS, 1, [Use Tcl stubs])
+#AC_DEFINE(USE_TK_STUBS, 1, [Use Tk stubs])
 
-NO_TCL=0
-AC_ARG_WITH(notcl, [--with-notcl       build a version with no Tcl access], NO_TCL=1)
-AC_SUBST(NO_TCL)
+#--------------------------------------------------------------------
+# This macro generates a line to use when building a library.  It
+# depends on values set by the TEA_ENABLE_SHARED, TEA_ENABLE_SYMBOLS,
+# and TEA_LOAD_TCLCONFIG macros above.
+#--------------------------------------------------------------------
 
-# The list of source dirs depends on whether we have Tcl access or not
-if test "$NO_TCL" = "1" ; then
-    echo "Compiling with no Tcl access."
-    ASTROTCL_SUBDIRS="$SRC_ROOT/compress \
-                      $SRC_ROOT/wcslib \
-		      $SRC_ROOT/imageio"
+TEA_MAKE_LIB
+
+#--------------------------------------------------------------------
+# Determine the name of the tclsh and/or wish executables in the
+# Tcl and Tk build directories or the location they were installed
+# into. These paths are used to support running test cases only,
+# the Makefile should not be making use of these paths to generate
+# a pkgIndex.tcl file or anything else at extension build time.
+#--------------------------------------------------------------------
+
+TEA_PROG_TCLSH
+TEA_PROG_WISH
+
+#--------------------------------------------------------------------
+# These are for astrotclConfig.sh
+#--------------------------------------------------------------------
+
+astrotcl_LIB_FILE=${PKG_LIB_FILE}
+
+eval pkglibdir="${libdir}"
+if test "${TCL_LIB_VERSIONS_OK}" = "ok"; then
+    eval astrotcl_LIB_FLAG="-lastrotcl${PACKAGE_VERSION}"
 else
-    if test "$TCLUTIL_NOTCL" = "1"; then
-         echo "*** Error: Please configure tclutil first without the --with-notcl option"
-	 exit 1
-    fi
-
-    ASTROTCL_SUBDIRS="$SRC_ROOT/compress \
-                      $SRC_ROOT/wcslib \
-		      $SRC_ROOT/imageio \
-                      $SRC_ROOT/astrotcl"
+    eval astrotcl_LIB_FLAG="-lastrotcl`echo ${PACKAGE_VERSION} | tr -d .`"
 fi
-AC_SUBST(ASTROTCL_SUBDIRS)
+astrotcl_BUILD_DIR="`pwd`"
+astrotcl_BUILD_LIB_SPEC="-L`pwd` ${astrotcl_LIB_FLAG}"
+astrotcl_LIB_SPEC="-L${pkglibdir} ${astrotcl_LIB_FLAG}"
 
-# -----------------------------------------------------------------------
-#
-# "makedepend" info
-#
-# normally, "makedepend" wants to know all of the path names and will
-# cause make errors if the include path to the C++ includes is not given.
-# Here we try to extract that information from the C++ preprocessor output.
-# The syntax of the output is different for different compilers...
-#
-# -----------------------------------------------------------------------
-CXX_INCLUDE=$TCLUTIL_CXX_INCLUDE
-AC_SUBST(CXX_INCLUDE)
-AC_SUBST(CXX_DEPEND_FLAGS)
+for i in ${PKG_OBJECTS} ; do 
+    astrotcl_PKG_OBJECTS="$astrotcl_PKG_OBJECTS ../astrotcl/$i"
+done
 
-# -----------------------------------------------------------------------
-#
-# set OS version string
-#
-# -----------------------------------------------------------------------
-OS=`uname -s`
-OSVERSION="${OS}-`uname -r`"
-AC_SUBST(OS)
-AC_SUBST(OSVERSION)
+AC_SUBST(astrotcl_LIB_FILE)
+AC_SUBST(astrotcl_BUILD_DIR)
+AC_SUBST(astrotcl_BUILD_LIB_SPEC)
+AC_SUBST(astrotcl_LIB_SPEC)
+AC_SUBST(astrotcl_PKG_OBJECTS)
 
-# -----------------------------------------------------------------------
-#
-# if we are using gcc, we can get better make dependencies using gcc -MM 
-# otherwise we have to use  "makedepend", which sometimes gets confused. 
-# This sets the make target to use:
-#
-# -----------------------------------------------------------------------
-DEPEND_TARGET=$TCLUTIL_DEPEND_TARGET
-AC_SUBST(DEPEND_TARGET)
-
-# -----------------------------------------------------------------------
-#
-# use CDEBUGFLAGS for C and CXXDEBUGFLAGS for C++ compiler options
-#
-# -----------------------------------------------------------------------
-if test "$CC" = "gcc" ; then
-	CDEBUGFLAGS="-g -O"
-fi
-if test "$CXX" = "g++" ; then
-	CXXDEBUGFLAGS="-g -O"
-fi
-AC_ARG_WITH(debug, [--with-debug       use debugging flag], 
-	CDEBUGFLAGS="-g"; CXXDEBUGFLAGS="-g", 
-	CDEBUGFLAGS="-O"; CXXDEBUGFLAGS="-O")
-
-CDEBUGFLAGS="$CDEBUGFLAGS $CFLAGS"
-CXXDEBUGFLAGS="$CXXDEBUGFLAGS $CFLAGS"
-
-# -----------------------------------------------------------------------
-#
-# Check if we are using (and creating) shared libraries 
-# If so, we use the information from tclConfig.sh to determine the compiler
-# options. 
-#
-# -----------------------------------------------------------------------
-AC_ARG_ENABLE(shared, [--enable-shared    build and use shared libraries],
-	SHARED=1,
-	SHARED=0)
-AC_SUBST(SHARED)
-
-if test $SHARED -eq 0 ; then
-	echo "Don't build shared libraries"
-else
-	echo "Will build shared libraries"
-fi
-
-# Flags to pass to cc when compiling the components of a shared library:
-SHLIB_CFLAGS=$TCLUTIL_SHLIB_CFLAGS
-
-# Base command to use for combining object files into a shared library:
-if test "$VLTGNU" = "1" ; then
-        SHLIB_LD="gcc -ansi -shared -fPIC"
-        if test "$OS" = "HP-UX" ; then
-                SHLIB_LD="$SHLIB_LD -Xlinker -b -Xlinker +s"
-        fi
-else
-        SHLIB_LD=$TCLUTIL_SHLIB_LD
-fi
-
-# Suffix to use for the name of a shared library.
-SHLIB_SUFFIX=$TCLUTIL_SHLIB_SUFFIX
-
-# Either '$LIBS' (if dependent libraries should be included when linking
-# shared libraries) or an empty string.  See Tcl's configure.in for more
-# explanation.
-SHLIB_LD_LIBS=$TCLUTIL_SHLIB_LD_LIBS
-
-# Library file(s) to include in tclsh and other base applications
-# in order to provide facilities needed by DLOBJ above.
-DL_LIBS=$TCLUTIL_DL_LIBS
-
-# Flags to pass to the compiler when linking object files into
-# an executable tclsh or tcltest binary.
-LD_FLAGS=$TCLUTIL_LD_FLAGS
-
-# Flags to pass to cc, such as "-Wl,-R,/usr/local/tcl/lib", that tell the
-# run-time dynamic linker where to look for shared libraries such as
-# libtcl.so.  Used when linking applications.  Only works if there
-# is a variable "LIB_RUNTIME_DIR" defined in the Makefile.
-LD_SEARCH_FLAGS=$TCLUTIL_LD_SEARCH_FLAGS
-
-AC_SUBST(SHLIB_CFLAGS)
-AC_SUBST(SHLIB_LD)
-AC_SUBST(SHLIB_SUFFIX)
-AC_SUBST(SHLIB_LD_LIBS)
-AC_SUBST(DL_LIBS)
-AC_SUBST(LD_FLAGS)
-AC_SUBST(LD_SEARCH_FLAGS)
-
-# -----------------------------------------------------------------------
-# Check the location of X libraries and includes.
-# -----------------------------------------------------------------------
-
-# -I switch(es) to use to make all of the X11 include files accessible:
-XINCSW=$TCLUTIL_XINCSW
-
-# Linker switch(es) to use to link with the X11 library archive.
-XLIBSW=$TCLUTIL_XLIBSW
-
-# dir for X libs
-XLIBDIR=$TCLUTIL_XLIBDIR
-
-AC_SUBST(XINCSW)
-AC_SUBST(XLIBSW)
-AC_SUBST(XLIBDIR)
-
-# -----------------------------------------------------------------------
-#
-# Get the Tcl/Tk information from the tclutilConfig.sh file
-#
-# -----------------------------------------------------------------------
-
-# get the -L and -l library flags
-
-TCL_LIB_SPEC=$TCLUTIL_TCL_LIB_SPEC
-TK_LIB_SPEC=$TCLUTIL_TK_LIB_SPEC
-TCLX_LIB_SPEC=$TCLUTIL_TCLX_LIB_SPEC
-ITCL_LIB_SPEC=$TCLUTIL_ITCL_LIB_SPEC
-ITK_LIB_SPEC=$TCLUTIL_ITK_LIB_SPEC
-BLT_LIB_SPEC=$TCLUTIL_BLT_LIB_SPEC
-
-AC_SUBST(TCL_LIB_SPEC)
-AC_SUBST(TK_LIB_SPEC)
-AC_SUBST(TCLX_LIB_SPEC)
-AC_SUBST(ITCL_LIB_SPEC)
-AC_SUBST(ITK_LIB_SPEC)
-AC_SUBST(BLT_LIB_SPEC)
-
-# -----------------------------------------------------------------------
-# get the -I include flags
-# -----------------------------------------------------------------------
-TCLINCSW=$TCLUTIL_TCLINCSW
-TKINCSW=$TCLUTIL_TKINCSW
-
-AC_SUBST(TCLINCSW)
-AC_SUBST(TKINCSW)
-
-# -----------------------------------------------------------------------
-# tcl library files
-# -----------------------------------------------------------------------
-TCL_LIBRARY=$TCLUTIL_TCL_LIBRARY
-AC_SUBST(TCL_LIBRARY)
-
-TK_LIBRARY=$TCLUTIL_TK_LIBRARY
-AC_SUBST(TK_LIBRARY)
-
-BLT_LIBRARY=$TCLUTIL_BLT_LIBRARY
-AC_SUBST(BLT_LIBRARY)
-
-TCLUTIL_LIBRARY=$TCLUTIL_LIBRARY
-AC_SUBST(TCLUTIL_LIBRARY)
-
-# -----------------------------------------------------------------------
-#       system libs
-# -----------------------------------------------------------------------
-LIBS=$TCLUTIL_LIBS $TCL_LIBS
-AC_SUBST(LIBS)
-
-# -----------------------------------------------------------------------
-# Check if we are using the installed TCLUTIL library and include files
-# or local development versions
-# -----------------------------------------------------------------------
-if test -d $TCLUTIL_SRC_ROOT; then
-	TCLUTIL_LIB=$TCLUTIL_BUILD_LIB_SPEC
-	TCLUTIL_LIB_STATIC=$TCLUTIL_BUILD_LIB_SPEC_STATIC
-	TCLUTIL_BUILD_LIBRARY=$TCLUTIL_BUILD_LIBRARY
-else
-	TCLUTIL_LIB=$TCLUTIL_LIB_SPEC
-	TCLUTIL_LIB_STATIC=$TCLUTIL_LIB_SPEC_STATIC
-	TCLUTIL_BUILD_LIBRARY=$TCLUTIL_LIBRARY
-fi
-AC_SUBST(TCLUTIL_SRC_ROOT)
-AC_SUBST(TCLUTIL_LIB)
-AC_SUBST(TCLUTIL_LIB_SPEC)
-AC_SUBST(TCLUTIL_LIB_STATIC)
-AC_SUBST(TCLUTIL_BUILD_LIBRARY)
-AC_SUBST(TCLUTIL_BUILD_INCLUDES)
+# astrotcl_SRC_DIR must be a fully qualified path
+eval astrotcl_SRC_DIR="$srcdir"
+astrotcl_SRC_DIR=`cd "${astrotcl_SRC_DIR}"; pwd`
+AC_SUBST(astrotcl_SRC_DIR)
 
 #--------------------------------------------------------------------
-#	Propagate prefix argument as installation directory.
+# Finally, substitute all of the various values into the Makefile.
+# You may alternatively have a special pkgIndex.tcl.in or other files
+# which require substituting th AC variables in.  Include these here.
 #--------------------------------------------------------------------
-INSTALL_TARGET=$prefix
-DESTDIR="${INSTALL_TARGET}"
-BINDIR="${INSTALL_TARGET}"/bin
-LIBDIR="${INSTALL_TARGET}"/lib
-INCDIR="${INSTALL_TARGET}"/include/astrotcl
-MANDIR="${INSTALL_TARGET}"/man
-ASTROTCL_DIR=$LIBDIR/astrotcl
-ASTROTCL_LIBRARY=$ASTROTCL_DIR
-ASTROTCL_BUILD_LIBRARY=$SRC_ROOT/astrotcl/library
-ASTROTCL_BUILD_INCLUDES="-I$SRC_ROOT/wcslib/include -I$SRC_ROOT/imageio/include -I$SRC_ROOT/compress/include"
-
-AC_SUBST(INSTALL_TARGET)
-AC_SUBST(DESTDIR)
-AC_SUBST(BINDIR)
-AC_SUBST(LIBDIR)
-AC_SUBST(INCDIR)
-AC_SUBST(MANDIR)
-AC_SUBST(ASTROTCL_DIR)
-AC_SUBST(ASTROTCL_LIBRARY)
-AC_SUBST(ASTROTCL_BUILD_LIBRARY)
-AC_SUBST(ASTROTCL_BUILD_INCLUDES)
-
-#--------------------------------------------------------------------
-#	Set name of library to link
-#--------------------------------------------------------------------
-
-# String to pass to linker to pick up the Astrotcl library from its
-# build directory.
-ASTROTCL_BUILD_LIB_SPEC="-L$SRC_ROOT -lastrotcl"
-
-# static version of above
-ASTROTCL_BUILD_LIB_SPEC_STATIC="$SRC_ROOT/libastrotcl.a"
-
-# String to pass to linker to pick up the Astrotcl library from its
-# installed directory.
-ASTROTCL_LIB_SPEC="-L$LIBDIR -lastrotcl"
-
-# static version of above
-ASTROTCL_LIB_SPEC_STATIC="$LIBDIR/libastrotcl.a"
-
-# if we are not building shared libraries, make sure we use the static
-# libraries and not get an outdated shared library by accident
-if test "$SHARED" = "0"
-then
-    ASTROTCL_BUILD_LIB_SPEC=$ASTROTCL_BUILD_LIB_SPEC_STATIC
-    ASTROTCL_LIB_SPEC=$ASTROTCL_LIB_SPEC_STATIC
-fi
-
-AC_SUBST(ASTROTCL_BUILD_LIB_SPEC)
-AC_SUBST(ASTROTCL_BUILD_LIB_SPEC_STATIC)
-AC_SUBST(ASTROTCL_LIB_SPEC)
-AC_SUBST(ASTROTCL_LIB_SPEC_STATIC)
-
-# -----------------------------------------------------------------------
-# The following defines were added for compiling cfitsio
-# -----------------------------------------------------------------------
-
-dnl Checks for ANSI stdlib.h.
-AC_CHECK_HEADERS(stdlib.h string.h math.h limits.h ,ANSI_HEADER=yes,ANSI_HEADER=no)dnl
-
-dnl Check if prototyping is allowed.
-AC_TRY_COMPILE( , void d( int , double) , PROTO=yes, PROTO=no)dnl
-
-if test $ANSI_HEADER = no -o $PROTO = no; then
-     echo "   *********** WARNING: CFITSIO CONFIGURE FAILURE ************  "
-     echo "cfitsio: ANSI C environment NOT found. Aborting cfitsio configure."
-     if test $ANSI_HEADER = no; then 
-        echo "cfitsio: You're missing a needed ANSI header file."
-     fi
-     if test $PROTO = no; then
-        echo "cfitsio: Your compiler can't do ANSI function prototypes."
-     fi
-     echo "cfitsio: You need an ANSI C compiler and all ANSI trappings"
-     echo "cfitsio: to build cfitsio.   "
-     echo "     *******************************************************  "
-     exit 0;
-fi
-
-CFLAGS="$CFLAGS"
-LIBPRE=""
-
-#--------------------------------------------------------------------
-# Check "uname" to determine system type
-#--------------------------------------------------------------------
-AC_PROGRAM_CHECK(uname_found, uname, 1, 0)
-if test $uname_found -eq 0 ; then
-    echo "cfitsio: No uname found; setting system type to unknown."
-    system="unknown"
-else
-    system=`uname -s`-`uname -r`
-fi
-
-case $system in
-    SunOS-4*)
-	ARCH="sun"
-	;;
-    HP-UX-*)
-	ARCH="hp"
-	CXXDEBUGFLAGS="$CXXDEBUGFLAGS -Dappendus -DPG_PPU" 
-	LIBPRE="-Wl,"
-	;;
-    SunOS-5*)
-	ARCH="solaris"
-	CXXDEBUGFLAGS="$CXXDEBUGFLAGS -Dsolaris"
-	;;
-    OSF1*)
-	ARCH="alpha"
-	;;
-    IRIX*)
-	ARCH="sgi"
-	CXXDEBUGFLAGS="$CXXDEBUGFLAGS -DHAVE_POSIX_SIGNALS"
-	;;
-    ULTRIX*)
-	ARCH="dec"
-	;;
-    Linux*)
-	ARCH="linux"
-	CXXDEBUGFLAGS="$CXXDEBUGFLAGS -Dg77Fortran"
-	;;
-    CYGWIN*)
-	ARCH="cygwin"
-	CXXDEBUGFLAGS="$CXXDEBUGFLAGS -Dg77Fortran -DHAVE_POSIX_SIGNALS"
-	;;
-    *)
-		echo "cfitsio: == Don't know what do do with $system"
-	;;
-esac
-
-case $CC in
-	gcc)
-		GCCVERSION="`gcc -v 2>&1 | grep version`"
-		echo "cfitsio: == Using $GCCVERSION"
-		#AC_SUBST(GCCVERSION)
-		;;
-	cc)
-		echo "cfitsio: Old CXXDEBUGFLAGS is $CXXDEBUGFLAGS"
-		CXXDEBUGFLAGS=`echo $CXXDEBUGFLAGS | sed -e "s/-g/-O/"`
-		case $system in
-		    SunOS-5*)
-         		CXXDEBUGFLAGS="$CXXDEBUGFLAGS -DHAVE_ALLOCA_H -DHAVE_POSIX_SIGNALS"
-			;;
-		    *)
-			echo "== No special changes for $system"
-			;;
-		esac
-		echo "New CXXDEBUGFLAGS is $CXXDEBUGFLAGS"
-		;;
-	*)
-		# Don't do anything now
-		;;
-esac
-		
-
-AC_SUBST(ARCH)dnl
-AC_SUBST(CFLAGS)dnl
-AC_SUBST(LIBPRE)dnl
-AC_SUBST(CDEBUGFLAGS)
-AC_SUBST(CXXDEBUGFLAGS)
-
-# ================= test whether we need trigod.c ================
-
-AC_MSG_CHECKING("whether we need trigod.c")
-libs_save=$LIBS
-LIBS="$LIBS -lm"
-AC_TRY_LINK([#include <math.h>], [cosd(1.0);],
-[AC_MSG_RESULT("no"); TRIGOD_C=""; TRIGOD_O=""],
-AC_MSG_RESULT("yes"); TRIGOD_C="trigod.c"; TRIGOD_O="trigod.o")
-LIBS=$libs_save
-AC_SUBST(TRIGOD_C)
-AC_SUBST(TRIGOD_O)
-
-# ================= test for the unix ftruncate function ================
-
-AC_MSG_CHECKING("whether ftruncate works")
-AC_TRY_LINK([#include <unistd.h>
-], [
-ftruncate(0, 0);
-], [
-AC_DEFINE(HAVE_FTRUNCATE)
-AC_MSG_RESULT("yes")
-], AC_MSG_RESULT("no") )
-
-# ==================== SHARED MEMORY DRIVER SECTION =======================
-#
-# 09-Mar-98 : modified by JB/ISDC
-# 3 checks added to support autoconfiguration of shared memory
-# driver. First generic check is made whether shared memory is supported
-# at all, then 2 more specific checks are made (architecture dependent).
-# Currently tested on : sparc-solaris, intel-linux, sgi-irix, dec-alpha-osf
-
-# -------------------------------------------------------------------------
-# check is System V IPC is supported on this machine
-# -------------------------------------------------------------------------
-
-AC_MSG_CHECKING("whether system V style IPC services are supported")
-AC_TRY_LINK([#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <sys/sem.h>
-], [
-shmat(0, 0, 0);
-shmdt(0);
-shmget(0, 0, 0);
-semget(0, 0, 0);
-], [
-AC_DEFINE(HAVE_SHMEM_SERVICES)
-my_shmem=\${SOURCES_SHMEM}
-AC_MSG_RESULT("yes")
-], AC_MSG_RESULT("no") )
-
-AC_SUBST(my_shmem)
-
-# -------------------------------------------------------------------------
-# some systems define flock_t, for others we have to define it ourselves
-# -------------------------------------------------------------------------
-
-AC_MSG_CHECKING("do we have flock_t defined")
-AC_TRY_COMPILE([#include <sys/fcntl.h>
-], [
-flock_t filler;
-], [
-AC_DEFINE(HAVE_FLOCK_T)
-AC_MSG_RESULT("yes") 
-], AC_MSG_RESULT("no") )
-
-
-# -------------------------------------------------------------------------
-# there are some idiosyncrasies with semun defs (used in semxxx). Solaris
-# does not define it at all
-# -------------------------------------------------------------------------
-
-AC_MSG_CHECKING("do we have union semun defined")
-AC_TRY_COMPILE(
-[#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <sys/sem.h>
-], [
-union semun filler;
-], [
-AC_DEFINE(HAVE_UNION_SEMUN)   
-AC_MSG_RESULT("yes")
-], AC_MSG_RESULT("no") )
-
-# ==================== END OF SHARED MEMORY DRIVER SECTION ================
-# ================= test for the unix networking functions ================
-
-#--------------------------------------------------------------------
-#	Check for the existence of the -lsocket and -lnsl libraries.
-#	The order here is important, so that they end up in the right
-#	order in the command line generated by make.  Here are some
-#	special considerations:
-#	1. Use "connect" and "accept" to check for -lsocket, and
-#	   "gethostbyname" to check for -lnsl.
-#	2. Use each function name only once:  can't redo a check because
-#	   autoconf caches the results of the last check and won't redo it.
-#	3. Use -lnsl and -lsocket only if they supply procedures that
-#	   aren't already present in the normal libraries.  This is because
-#	   IRIX 5.2 has libraries, but they aren't needed and they're
-#	   bogus:  they goof up name resolution if used.
-#	4. On some SVR4 systems, can't use -lsocket without -lnsl too.
-#	   To get around this problem, check for both libraries together
-#	   if -lsocket doesn't work by itself.
-#--------------------------------------------------------------------
-cfitsio_checkBoth=0
-AC_CHECK_FUNC(connect, cfitsio_checkSocket=0, cfitsio_checkSocket=1)
-if test "$cfitsio_checkSocket" = 1; then
-    AC_CHECK_LIB(socket, main, LIBS="$LIBS -lsocket", cfitsio_checkBoth=1)
-fi
-if test "$cfitsio_checkBoth" = 1; then
-    tk_oldLibs=$LIBS
-    LIBS="$LIBS -lsocket -lnsl"
-    AC_CHECK_FUNC(accept, cfitsio_checkNsl=0, [LIBS=$tk_oldLibs])
-fi
-AC_CHECK_FUNC(gethostbyname, , AC_CHECK_LIB(nsl, main, [LIBS="$LIBS -lnsl"]))
-
-AC_DEFINE(HAVE_NET_SERVICES)
-
-# ==================== END OF unix networking SECTION ================
-
-# ==================== END OF CFITSIO SECTION ================
-
-#--------------------------------------------------------------------
-#	Print out some of the more important settings 
-#--------------------------------------------------------------------
-echo "
-Configuration results (edit and run ./config.status to modify):
-
-C   Compiler                           => $CC
-C++ Compiler                           => $CXX
-C++ include flag                       => $CXX_INCLUDE"
-
-if test "$NO_TCL" = "0" ; then
-echo "
-X include files                        => $XINCSW
-Tcl include files                      => $TCLINCSW
-Tk include files                       => $TKINCSW
-
-X libs                                 => $XLIBSW
-Tcl libs                               => $TCL_LIB_SPEC
-Tk libs                                => $TK_LIB_SPEC
-TclX libs                              => $TCLX_LIB_SPEC
-Itcl libs                              => $ITCL_LIB_SPEC
-Itk libs                               => $ITK_LIB_SPEC
-BLT libs                               => $BLT_LIB_SPEC
-Tclutil libs                           => $TCLUTIL_LIB_SPEC
-
-directory containing tcl library       => $TCL_LIBRARY
-directory containing tk  library       => $TK_LIBRARY
-directory containing blt library       => $BLT_LIBRARY
-
-install astrotcl tcl library files in  => $ASTROTCL_DIR"
-fi
-
-echo "
-install astrotcl binaries in           => $BINDIR
-install astrotcl libraries in          => $LIBDIR
-install astrotcl include files in      => $INCDIR
-install astrotcl tcl library files in  => $ASTROTCL_DIR
-
-default install dir INSTALL_TARGET     => $INSTALL_TARGET"
-
-#--------------------------------------------------------------------
-#	Generate the Makefiles etc...
-#--------------------------------------------------------------------
-export NO_TCL
-AC_OUTPUT(\
-	Makefile \
-	makefile.mk \
-        astrotclConfig.sh \
-        \
-	astrotcl/Makefile \
-	astrotcl/src/Makefile \
-	astrotcl/include/Makefile \
-	astrotcl/man/Makefile \
-	astrotcl/library/Makefile \
-	astrotcl/library/astrotcl_version.tcl \
-	astrotcl/library/pkgIndex.tcl \
-	astrotcl/demos/Makefile \
-	astrotcl/demos/astrotcl.sh \
-	astrotcl/demos/astrotcl_env.sh \
-	astrotcl/bitmaps/Makefile \
-	astrotcl/test/Makefile \
-	\
-	compress/Makefile \
-	compress/src/Makefile \
-	compress/include/Makefile \
-	compress/test/Makefile \
-	compress/man/Makefile \
-	\
-	wcslib/Makefile \
-	wcslib/src/Makefile \
-	wcslib/include/Makefile \
-	wcslib/test/Makefile \
-	wcslib/man/Makefile \
-	\
-	imageio/Makefile \
-	imageio/src/Makefile \
-	imageio/include/Makefile \
-	imageio/test/Makefile \
-	imageio/man/Makefile \
-	\
-	, if test "$NO_TCL" = "0" ; then sh makelinks; fi; make -k depend \
-)
+AC_OUTPUT([Makefile pkgIndex.tcl astrotclConfig.sh])
 

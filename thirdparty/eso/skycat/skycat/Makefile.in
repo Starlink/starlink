@@ -1,88 +1,68 @@
-# E.S.O. - VLT project 
-# "@(#) $Id: Makefile.in,v 1.1.1.1 2002/04/04 20:11:38 brighton Exp $"
-#
-# Makefile.in
-#
-# start make in the subdirectories
+# Makefile
 
-# set this to the top level install dir
-PREFIX = $(PWD)/install
+# change these to the install prefix and exec-prefix values
+prefix = @prefix@
+exec_prefix = @exec_prefix@
 
-# flags to pass to configure (gcc can do -O with -g)
-CONFIGURE_FLAGS = --with-gcc
+# directories in which to run make
+subdirs = tclutil astrotcl rtd cat skycat
 
-# directories in which to run make (set by configure)
-SUBDIRS = @subdirs@
+# Note: add --enable-merge if you want to merge object files into the 
+# skycat, rtd and cat shared libraries (for backward compatibility)
+CONFIGURE = configure --prefix=$(prefix) --exec_prefix=$(exec_prefix)
 
-all: FORCE
-	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) || exit 1; done
+all install clean: FORCE
+	@set -x; for i in $(subdirs); do (cd $$i && $(MAKE) $@ || exit 1) done
 
-install clean depend man: FORCE
-	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+# Run "configure" and "make all install" in the subdirectories
+All: $(subdirs)
 
-quick: FORCE
-	@for i in tclutil astrotcl rtd cat skycat/interp; \
-	do (cd $$i; echo "$$i:"; $(MAKE) all) done
-	(cd skycat; $(MAKE) master_lib)
+release: FORCE
+	(cd skycat; $(MAKE) release)
 
-# make clean and remove any generated makefiles
-distclean: 
-	-for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
-	-rm -rf ./tmp/*
-	-find . -type f \( -name '*~' \
-		-o -name 'Makefile.bak' \
-		-o -name '*.flc' \
-		-o -name '*.so' \
-		-o -name '*.[oa]' \
-		-o -name '.objs' \
-		-o -name core \
-		-o -name 'config.cache' \) -print -exec rm -f {} \;
-	for i in `find $(SUBDIRS) -type f -name '*.in' -print` ;\
-	do test "`basename $$i`" != "configure.in" && rm -f `dirname $$i`/`basename $$i .in` ;\
-	done
+distclean: FORCE
+	@set -x; for i in $(subdirs) ; do (cd $$i && $(MAKE) distclean) ; done
+	rm -rf autom4te.cache config.status config.log configure */configure Makefile
 
-# run configure and make with the given flags
-All World world: configure 
-	$(MAKE) all install
+# run configure and make in individual dirs
+tclutil: tclutil/configure FORCE
+	(cd tclutil && $(CONFIGURE) && $(MAKE) && $(MAKE) install)
 
-# run configure with the given flags
-configure: FORCE
-	./configure -prefix $(PREFIX) $(CONFIGURE_FLAGS)
+astrotcl: astrotcl/configure FORCE
+	(cd astrotcl && $(CONFIGURE) && $(MAKE) && $(MAKE) install)
 
-autoconf: FORCE
-	-for i in . $(SUBDIRS) ;\
-	 do (cd $$i; echo "$$i:"; autoconf) done
+cat: cat/configure FORCE
+	(cd cat && $(CONFIGURE) && $(MAKE) && $(MAKE) install)
 
-tags:
-	etags Makefile `find . \
-	\( \
-	-name '*.[Cch]' \
-	-o -name '*.tcl' \
-	-o -name '*.in' \
-	\) -print`
+rtd: rtd/configure FORCE
+	(cd rtd && $(CONFIGURE) && $(MAKE) && $(MAKE) install)
 
-itcltags:
-	tcltags \
-	    tclutil/tclutil/library/[A-Z]*.tcl \
-	    rtd/rtdimg/library/[A-Z]*.tcl \
-	    cat/tclcat/library/[A-Z]*.tcl \
-	    skycat/interp/library/[A-Z]*.tcl
+skycat: skycat/configure FORCE
+	(cd skycat && $(CONFIGURE) && $(MAKE) && $(MAKE) install)
 
-# generate man page sources from itcl source files (run make man afterwards)
-doc cleandoc:
-	-for i in tclutil/tclutil astrotcl/astrotcl rtd/rtdimg cat/tclcat skycat/interp ;\
-	 do (if test -d $$i/library; then \
-		cd $$i/library; echo "$$i/library:"; $(MAKE) $@) done
+# run autoconf
+autoconf: configure tclutil/configure astrotcl/configure rtd/configure cat/configure skycat/configure
 
-# generate the tclIndex files
-tclIndex index:
-	-for i in tclutil/tclutil astrotcl/astrotcl rtd/rtdimg cat/tclcat skycat/interp ;\
-	 do (if test -d $$i/library; then \
-		cd $$i/library; echo "$$i/library:"; $(MAKE) $@; fi) done
+# run autoconf and configure
+config: configure tclutil/configure astrotcl/configure rtd/configure cat/configure skycat/configure
+	$(CONFIGURE)
 
-# run make in the given subdirs...
-$(SUBDIRS): FORCE
-	for i in $@ ; do (cd $$i; echo "$$i:"; $(MAKE)) done
+configure: configure.in
+	autoconf
 
+tclutil/configure: tclutil/configure.in tclutil/aclocal.m4 tclconfig/tcl.m4
+	(cd tclutil; autoconf)
+
+astrotcl/configure: astrotcl/configure.in astrotcl/aclocal.m4 tclconfig/tcl.m4
+	(cd astrotcl; autoconf)
+
+rtd/configure: rtd/configure.in rtd/aclocal.m4 tclconfig/tcl.m4
+	(cd rtd; autoconf)
+
+cat/configure: cat/configure.in cat/aclocal.m4 tclconfig/tcl.m4 
+	(cd cat; autoconf)
+
+skycat/configure: skycat/configure.in skycat/aclocal.m4 tclconfig/tcl.m4
+	(cd skycat; autoconf)
 
 FORCE:
