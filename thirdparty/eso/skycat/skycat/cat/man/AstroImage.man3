@@ -1,0 +1,131 @@
+# E.S.O. - VLT project/ESO Archive
+# $Id: AstroImage.man3,v 1.1.1.1 2006/01/12 16:36:06 abrighto Exp $
+#
+# This file is processed by the ESO/VLT docDoManPages command to
+# produce a man page in nroff, TeX and MIF formats. 
+# See docDoManPages(1) for a description of the input format.
+# 
+# who             when       what
+# --------------  ---------  ----------------------------------------
+# Allan Brighton  17 Oct 95  Created
+#
+
+NAME
+AstroImage - C++ class for accessing astromical image servers (obsolete)
+
+SYNOPSIS
+#include "AstroImage.h"
+
+class AstroImage {
+...
+public:
+    AstroImage(const AstroImage&);
+    virtual ~AstroImage();
+
+    static AstroImage* open(const char* name);
+
+    int getImage(const WorldCoords& pos, double width, double height);
+    int getImage(const char* url);
+
+    static const CatalogInfoEntry* firstCatalog();
+    
+    void feedback(FILE* f);
+
+    int status();
+
+    void tmpfile(const char* name);
+    const char* tmpfile();
+
+    const char* name();
+    const char* longName();
+    const char* shortName();
+};
+
+
+DESCRIPTION
+Note: This class is obsolete. Please use class AstroCatalog, which now
+also has the getImage method.
+
+This class is used to retrieve images from an HTTP based image server
+based on a name or position and a width and height in arcmin.  The
+main entry point is the "open" method, which returns a pointer to an
+AstroImage object allocated for use with the named image server.
+
+IMAGE SERVERS
+This class communicates with an image server via HTTP requests. The
+list of servers and how to access them is kept in a configuration
+file, which is also accessed via HTTP. The default config file is:
+
+	http://archive.eso.org/skycat/skycat.cfg
+
+The default can be overridden by defining the environment variable
+SKYCAT_CONFIG to another valid HTTP URL.
+
+UNITS
+Unless otherwise stated, the units for all radius values are in arcmin.
+Floating point values for RA and DEC are always in degrees. The
+default equinox is J2000.
+
+PUBLIC METHODS
+open(name)
+        Open the named image server and return a pointer to an AstroImage
+ 	object allocated for it, or NULL if errors occur.
+
+    	Arguments:
+		name (in ) - Image server name (long or short name from
+			     catalog config file).
+	Return value: 
+		Pointer to an AstroImage object created for the given 
+		image server.
+
+getImage(pos, width, height)
+        Pass a request to the image server to get a FITS file at the
+        given position with the given size and return the status.
+	The name of the file holding the result can be accessed as
+	this->tmpfile().
+
+    	Arguments:
+		pos    (in ) - World coordinates of center of image.
+		width  (in ) - Image width in arcmin.
+		height (in ) - Image height in arcmin.
+	Return value: 
+		Status: 0 if OK, 1 for error.
+
+getImage(url)
+	Given a URL for the image, request the image from the image
+	server and return the status.
+	The name of the file holding the result can be accessed as
+	this->tmpfile().
+
+    	Arguments:
+		url    (in ) - HTTP URL for image.
+	Return value: 
+		Status: 0 if OK, 1 for error.
+		
+
+firstCatalog()
+	Return a pointer to the first catalog config entry (for link
+	list traversal).
+  
+feedback(FILE)
+	Set the file pointer to use for HTTP feedback during image
+	transfers.
+
+status()
+        Return the status (after constructor) for error checking.
+	A return value of 0 is normal, 1 for errors.
+
+name()
+longName()
+shortName()
+        Return the name (long name) or short name of the image server
+	from the catalog config file.
+
+tmpfile()
+tmpfile(name)
+	Get (or set) the name of the temporary file to use to hold images
+	retrieved from the image server.
+
+SEE ALSO
+AstroCatalog, WorldCoords(3C++)
+----------------------------------------------------------------------

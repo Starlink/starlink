@@ -1,0 +1,138 @@
+# E.S.O. - VLT project 
+#
+# "@(#) $Id: rtd_remote.man3,v 1.1 2006/01/16 16:23:59 abrighto Exp $" 
+#
+# This file is processed by the ESO/VLT docDoManPages command to
+# produce a man page in nroff, TeX and MIF formats. 
+# See docDoManPages(1) for a description of the input format.
+# 
+# who             when       what
+# --------------  ---------  ----------------------------------------
+# Allan Brighton  10 Apr 96  Created
+#
+
+NAME
+rtdRemote - C interface for remote access to rtdimage based widgets
+
+SYNOPSIS
+#include "rtdRemote.h"
+
+typedef void (*RtdRemoteErrorHandler)(char* message);
+
+int rtdRemoteConnect(int pid, char* host, int port);
+void rtdRemoteDisconnect();
+
+int rtdRemoteSend(char* cmd, char** result);
+int rtdRemoteGetResult(int socket, char** result);
+
+RtdRemoteErrorHandler rtdRemoteSetErrorHandler(RtdRemoteErrorHandler);
+char* rtdRemoteGetError();
+
+DESCRIPTION
+This man page describes a simple remote interface to rtdimage based
+applications. With this interface, a client application can connect to
+a running application displaying an rtdimage, send commands and get
+results.
+
+REMOTE COMMANDS
+The commands are sent as ASCII strings via socket and have the same
+syntax as the rtdimage Tcl commands, except that no instance name is
+required. The command strings are not "evaluated" by Tcl, but are
+interpreted by the rtdimage code. Any commands that are not handled
+directly by the rtdimage C++ code may be passed on to a registered Tcl
+handler proc or [incr Tk] method. In this way, the list of available
+remote commands can be extended in the Tcl/Tk application.
+
+INTERFACE
+rtdRemoteConnect(pid, hostname, port)
+	Connect to a remote rtdimage application. If pid, hostname and
+	port are zero (null), they are read from the file
+	$HOME/.rtd-remote, if it exists. This file is created by by an
+	rtdimage widget when it starts to listen for a remote
+	connection (see rtdimage, "remote" subcommand). Otherwise,
+	if you know the pid, hostname and port, you can specify them
+	here. This routine initializes an internal static structure
+	with information about the connection.
+
+rtdRemoteDisconnect()
+	Disconnect from remote rtdimage.
+
+rtdRemoteSend(cmd, result)
+	The routine sends the given command to the remote rtdimage for
+	evaluation and returns the status of the command. The result
+	argument is set to point to the command results. The result
+	pointer points to an internal buffer that is only valid until
+	the next call to this routine.
+
+	The command syntax is the same as for the "rtdimage" widget
+	(image type), except that the instance name is missing.
+	Example:
+  
+ 	   char* result;
+	    int status = rtdRemoteCmd("wcscenter", &result);
+	    if (status == 0) {
+ 	        ...
+ 	    }
+
+	If the command could not be sent, result is set to a NULL
+	pointer and an error status (1) is returned. The error message
+	can be retrieved with rtdRemoteGetError().
+
+rtdRemoteSetErrorHandler(errorHandler)
+	Set an error handler to be called when errors occur, format: 
+	    void errorhandler(char* msg).
+
+rtdRemoteGetError();
+	Return the text of the last error message.
+
+EXAMPLE
+
+/*
+ * The following example demonstrates the use of the remote rtd interface:
+ */
+
+
+/* 
+ * this routine is used for convenience in testing below 
+ * Send the command to the rtdimage, then print and return the result.
+ */
+static char* send_rtd(char* cmd) 
+{
+    char* result = NULL;
+    int status = rtdRemoteSend(cmd, &result); 
+    printf("%s ==> %s: %s\n", cmd, (status ? "FAILED" : "OK"), result);
+    return result;
+}
+
+main()
+{
+    int data_id, header_id;
+
+    /* 
+     * connect to running rtd.
+     * uses default args taken from ~/.rtd-remote file 
+     */
+    if (rtdRemoteConnect(0, NULL, 0) != 0) 
+	exit(1);
+
+    /* send some commands to RTD to be evaluated */
+    send_rtd("wcscenter");
+    send_rtd("bitpix");
+    send_rtd("scale");
+    send_rtd("width");
+    send_rtd("height");
+    send_rtd("config -file ngc1316r.fits");
+    send_rtd("width");
+    send_rtd("height");
+
+    data_id = atoi(send_rtd("shm get data"));
+    header_id = atoi(send_rtd("shm get header"));
+
+    exit(0);
+}
+
+
+SEE ALSO
+rtdimage, RtdRemote
+----------------------------------------------------------------------
+

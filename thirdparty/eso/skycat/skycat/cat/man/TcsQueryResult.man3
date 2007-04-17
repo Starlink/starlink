@@ -1,0 +1,86 @@
+# E.S.O. - VLT project/ESO Archive
+# $Id: TcsQueryResult.man3,v 1.1.1.1 2006/01/12 16:36:04 abrighto Exp $
+#
+# This file is processed by the ESO/VLT docDoManPages command to
+# produce a man page in nroff, TeX and MIF formats. 
+# See docDoManPages(1) for a description of the input format.
+# 
+# who             when       what
+# --------------  ---------  ----------------------------------------
+# Allan Brighton  27 Jun 96  Created
+#
+
+NAME
+TcsQueryResult - class for accessing results of a TCS catalog query
+
+SYNOPSIS
+#include "TcsQueryResult.h"
+
+class TcsQueryResult : public QueryResult {
+...
+public:
+    TcsQueryResult();
+    TcsQueryResult(const char* result);
+    virtual ~TcsQueryResult();
+
+    int getObj(int row, TcsCatalogObject&);
+
+    int printRows(ostream& os);
+
+    // -- redefine these to deal with TCS columns --
+
+    char** colNames();
+    int numCols();
+    const char* colName(int col);
+    int colIndex(const char* colName);
+};
+
+
+DESCRIPTION
+This class manages the result of an TcsCatalog::query. Internally a
+QueryResult object manages the "tab table" query results.  This class
+provides transparent access to the result based on a row, column index
+and, unlike the QueryResult class, is specialized for accessing the
+TCS (GSC and PPM) catalogs. There are special methods to return GSC
+and PPM fields in common units and to determine if a field is present
+in the catalog.
+
+UNITS
+Unless otherwise stated, the units for all radius values are in arcmin.
+Floating point values for RA and DEC are always in degrees. The
+default equinox is J2000.
+
+PUBLIC METHODS
+
+TcsQueryResult()
+	Constructor: initialize empty table.
+
+TcsQueryResult(const char* result)
+	Constructor: initialize from query result buffer.
+
+~TcsQueryResult()
+	destructor: free any allocated memory.
+
+getObj(int row, TcsCatalogObject&);
+	Access a TcsCatalog (GSC/PPM) result row: fill out the given
+	TcsCatalogObject. 
+
+printRows(ostream& os);
+	Print table rows to the given stream.
+
+colNames()
+	Get array of column names in a TCS query result.
+
+numCols()
+	Get number of columns in a TCS query result.
+
+colName(int col)
+	Return the column name for the given column index.
+
+int colIndex(const char* colName)
+	Return the column index for the given column name
+
+SEE ALSO
+
+TcsCatalog, TcsCatalogObject(3C++)
+----------------------------------------------------------------------

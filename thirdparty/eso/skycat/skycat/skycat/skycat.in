@@ -1,0 +1,58 @@
+#!/bin/sh
+# Start script for skycat
+#
+# "@(#) $Id: skycat.in,v 1.12 2006/02/04 13:27:30 abrighto Exp $"
+#
+# who         when       what
+# --------   ---------   ----------------------------------------------
+# A.Brighton 28 Jan 06   created
+
+# Determine skycat base dir, following any symbolic links, if needed.
+PRG="$0"
+while [ -h "$PRG" ]; do
+    ls=`ls -ld "$PRG"`
+    link=`expr "$ls" : '.*-> \(.*\)$'`
+    if expr "$link" : '/.*' > /dev/null; then
+        PRG="$link"
+    else
+        PRG=`dirname "$PRG"`/"$link"
+    fi
+done
+DIR=`dirname "$PRG"`/..
+SKYCAT_BASE=`(cd $DIR; pwd)`
+
+# If we're NOT ssh'd in
+if [ ! ${SSH_TTY} ]; then
+    # make sure X is running (on Mac OS X)
+    if [ `uname` = "Darwin" ] ; then
+	if [ "`ps -x | awk '{print $5}' | grep X11`" = "" ]; then
+	    for i in /Applications/Utilities $HOME/Desktop ; do
+		if [ -e $i/X11.app ] ; then
+		    open $i/X11.app &
+		    break
+		fi
+	    done
+	fi
+    fi
+    # Make sure DISPLAY is set
+    if [ x${DISPLAY} = x ]; then
+	export DISPLAY=:0
+    fi
+fi
+
+# Make sure we can find the shared libs
+@LD_LIBRARY_PATH_VAR@="$SKYCAT_BASE/lib:@BLT_LIB_DIR@:${@LD_LIBRARY_PATH_VAR@}"
+export @LD_LIBRARY_PATH_VAR@
+
+# and the Tcl packages
+TCLLIBPATH="$SKYCAT_BASE/lib"
+export TCLLIBPATH
+
+# Make sure we start the correct wish binary
+PATH=$SKYCAT_BASE/bin:$PATH
+export PATH
+
+test -d $HOME/.skycat || mkdir $HOME/.skycat
+echo "`date`: Starting skycat with: $0 ${1+"$@"}" > $HOME/.skycat/log
+exec wish8.4 $SKYCAT_BASE/lib/skycat@PACKAGE_VERSION@/main.tcl ${1+"$@"} | tee -a $HOME/.skycat/log 2>&1
+

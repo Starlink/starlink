@@ -1,0 +1,217 @@
+# E.S.O. - VLT project 
+#
+# "@(#) $Id: ImageIO.man3,v 1.1.1.1 2006/01/12 16:42:43 abrighto Exp $" 
+#
+# This file is processed by the ESO/VLT docDoManPages command to
+# produce a man page in nroff, TeX and MIF formats. 
+# See docDoManPages(1) for a description of the input format.
+# 
+# who             when       what
+# --------------  ---------  ----------------------------------------
+# Allan Brighton  10 Apr 96  Created
+#
+
+NAME
+ImageIO - Reference Counted C++ Class for Reading and Writing Images 
+
+SYNOPSIS
+#include "ImageIO.h"
+
+// types of image data (these mostly correspond to the FITS BITPIX values)
+enum ImageDataType {
+    UNKNOWN_IMAGE  = -1,	// unknown type
+    BYTE_IMAGE  = 8,		// 8 bit images                
+    X_IMAGE  = -8,		// special, color scaled, X image data 
+    SHORT_IMAGE = 16,		// 16 bit signed                
+    USHORT_IMAGE = -16,		// 16 bit unsigned              
+    LONG_IMAGE = 32,		// 32 bit integer               
+    FLOAT_IMAGE = -32		// 32 bit floating point        
+};
+
+
+class ImageIORep { ... };
+class FitsIO : public ImageIORep { ... };
+
+class ImageIO;
+...
+public:
+    ImageIO();
+    ImageIO(ImageIORep* rep);
+    ImageIO(const ImageIO&);
+    ~ImageIO();
+    ImageIO& operator=(const ImageIO&);
+
+    int usingNetBO() const;
+
+    int write(const char *filename) const;
+
+    int wcsinit();
+
+    int get(const char* keyword, double& val) const;
+    int get(const char* keyword, float& val) const;
+    int get(const char* keyword, int& val) const;
+    int get(const char* keyword, long& val) const;
+    int get(const char* keyword, unsigned char& val) const;
+    int get(const char* keyword, unsigned short& val) const;
+    int get(const char* keyword, short& val) const;
+
+    char* get(const char* keyword) const;
+
+    int getFitsHeader(ostream& os) const;
+
+    double scaleValue(double d) const;
+    double unScaleValue(double d) const;
+
+    int pixelSize() const;
+
+    int width() const;
+    int height() const;
+    int bitpix() const;
+    double bscale() const;
+    double bzero() const;
+    const Mem& header() const;
+    const Mem& data() const;
+
+    WCS& wcs();
+    void wcs(const WCS& newwcs);
+
+    int header(const Mem& m);
+    int data(const Mem& m);
+    const char* headerPtr() const;
+    const void* dataPtr() const;
+
+    int status() const;
+    ImageIORep* rep() const;
+};
+
+DESCRIPTION
+Class ImageIO is used to read, write and manage the memory for
+astronomical images of various formats. The image header and data may
+be optionally kept in shared memory (mmap or shm), so they can be
+accessed by external processes that may want to do image processing or
+other operations. Regardless of the original image format and derived
+class, the header and data are always kept in FITS format. Other image
+types are converted to FITS format by the derived classes (see below).
+Subclasses of ImageIORep can, however, specify via a virtual method
+whether the image data is in network or in native byte order (see
+below).
+
+CLASS STRUCTURE
+Class ImageIO uses reference counting to make it easier to share
+objects of this type for displaying in multiple windows.  The actual
+(abstract) base class is ImageIORep. An ImageIO object contains a
+pointer to an ImageIORep object, which may be shared by multiple
+ImageIO objects.  To add new image types, to the ImageIO class,
+classes are derived from ImageIORep.
+
+WORLD COORDINATES SUPPORT
+This class offers optional support of world coordinates for the image,
+which can be initialized by calling the wcsinit() method, which must
+be defined in a derived class, such as FitsIO. Normally wcsinit() will
+get the necessary information from the image header, which is normally
+assumed to be in FITS format.
+
+METHODS
+
+ImageIO()
+	Default constructor, creates a null object (use assignment
+	operator to set later);
+
+ImageIO(ImageIORep* rep)
+	Constructor, from a pointer to a subclass of ImageIORep
+	(FitsIO, for example).  "rep" should be allocated with the
+	"new" operator and will be deleted by this class when there
+	are no more references to it. Note that this constructors
+	enables automatic conversion from a pointer to a subclass of
+	ImageIORep to class ImageIO.
+
+	Examples: 
+	// create an ImageIO object from a FITS file
+	ImageIO imio1 = FitsIO::read(filename);
+
+	// create an ImageIO object from FITS data and header in memory
+	Mem header(...), data(...);
+	ImageIO imio2 = new FitsIO(w, h, type, bzero, bscale, header, data);
+
+
+ImageIO(const ImageIO&)
+	Copy constructor: only copies the internal pointer and raises
+	the reference count.
+
+~ImageIO()
+	Destructor, lowers the reference count and frees the memory,
+  	if there are no more references.
+
+ImageIO& operator=(const ImageIO&)
+	Assignment operator: reference counted.
+
+usingNetBO()
+	Return true if the ImageIORep subclass uses native byte
+	ordering.  FITS files and most other image formats are in
+	network byte order, however, the derived class may want to
+	byte swap the data first, if needed, so that it is easier to
+	work with. This virtual method is checked by classes that use
+	this object to determine if byte-swapping may need to be done.
+
+write(filename)
+	Write the image header and data to a file in a format defined
+	in the derived class.
+
+get(keyword, val)
+	Find and set the value for the given FITS keyword and return 0
+	if OK (found). This method is overloaded for various data types.
+
+get(keyword)
+	Find and return the string value for the given FITS keyword,
+	or NULL if not found.
+
+scaleValue(d)
+	Apply the FITS keyword values for BZERO and BSCALE to the
+	given value (d = BZERO+d*BSCALE)
+ 
+unScaleValue(d)
+	Reverse the effect of BZERO and BSCALE (d = (d-BZERO)/BSCALE)
+
+width()
+	Return the width of the image in pixels. 
+
+height() 
+	Return the height of the image in pixels. 
+
+bitpix() 
+	Return the value of the BITPIX keyword (data type of image). 
+
+bscale() 
+	Return value for the BSCALE keyword.
+
+bzero() 
+	Return the value for the BZERO keyword. 
+
+header() 
+	Return a reference to the FITS header (class Mem). 
+
+data() 
+	Return a reference to the FITS image data (class Mem). 
+
+header(const Mem& newheader)
+	Replace teh image header.
+   
+data(const Mem& newdata)
+	Replace the image data with new data of same size.
+
+WCS& wcs()
+	Return a reference to the object used to manage world
+	coordinates. Note that this object is reference counted in the
+	same way as the ImageIO class.
+
+void wcs(const WCS& newwcs)
+	Set the WCS object used to manage world coordinates. Since the
+	WCS class is also a reference counted wrapper around an
+	abstract base class (WCSRep), you can define subclasses of
+	class WCSRep that redefines the behavior and implementation of
+	the WCS object.
+
+SEE ALSO
+FitsIO, ImageData(3C++), Mem(3C++)
+----------------------------------------------------------------------
+

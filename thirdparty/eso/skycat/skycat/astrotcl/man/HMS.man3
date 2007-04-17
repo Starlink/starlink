@@ -1,0 +1,84 @@
+# E.S.O. - VLT project/ESO Archive
+# $Id: HMS.man3,v 1.1.1.1 2006/01/12 16:42:42 abrighto Exp $
+#
+# This file is processed by the ESO/VLT docDoManPages command to
+# produce a man page in nroff, TeX and MIF formats. 
+# See docDoManPages(1) for a description of the input format.
+# 
+# who             when       what
+# --------------  ---------  ----------------------------------------
+# Allan Brighton  16 Oct 95  Created
+#
+
+NAME
+HMS - C++ class for working with H:M:S (hours minutes seconds) values
+
+SYNOPSIS
+#include "HMS.h"
+
+class HMS {
+public:
+    HMS();
+    HMS(int hours, int min, double sec);
+    HMS(double val);
+    
+    int isNull() const;
+   
+    int hours() const;
+    int min() const;
+    double sec() const;
+    double val() const;
+
+    friend ostream& operator<<(ostream&, const HMS&);
+    friend istream& operator>>(istream&, HMS&);
+
+    friend int operator< (const HMS& a, const HMS& b);
+    friend int operator<=(const HMS& a, const HMS& b);
+    friend int operator> (const HMS& a, const HMS& b);
+    friend int operator>=(const HMS& a, const HMS& b);
+    friend int operator==(const HMS& a, const HMS& b);
+    friend int operator!=(const HMS& a, const HMS& b);
+};
+
+DESCRIPTION
+HMS is a simple class for representing values in Hours:Minutes:Seconds
+format or in degrees, converting back and forth and comparing.
+
+CONSTRUCTORS
+HMS()
+	Initialize a NULL H:M:S value (see isNull() method).
+
+HMS(hours, min, sec)
+	Initialize from hours, minutes and seconds.
+
+HMS(val)
+	Initialize from a value in degrees.
+
+METHODS
+isNull()
+	Return true if the HMS object has the NULL value (created with
+	default constructor).
+   
+hours()
+min()
+sec()
+val()
+	Return the parts of the H:M:S value or the value (val) in
+	degrees.
+
+operator<<(ostream, hms)
+operator>>(istream, hms)
+	I/O operators - using format H:M:S.sss.
+
+operator< (a, b);
+operator<=(a, b);
+operator> (a, b);
+operator>=(a, b);
+operator==(a, b);
+operator!=(a, b);
+	Comparison operators - compare two H:M:S values.
+
+SEE ALSO
+WorldCoords
+----------------------------------------------------------------------
+

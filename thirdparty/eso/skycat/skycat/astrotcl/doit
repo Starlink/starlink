@@ -1,0 +1,7 @@
+#!/bin/sh
+
+set -x
+autoconf \
+&& configure --prefix=$HOME/work/eso/skycat/src/install --exec_prefix=$HOME/work/eso/skycat/src/install \
+&& make \
+&& make install

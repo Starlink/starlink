@@ -1,0 +1,140 @@
+# E.S.O. - VLT project/ESO Archive
+# $Id: QueryResult.man3,v 1.1.1.1 2006/01/12 16:36:06 abrighto Exp $
+#
+# This file is processed by the ESO/VLT docDoManPages command to
+# produce a man page in nroff, TeX and MIF formats. 
+# See docDoManPages(1) for a description of the input format.
+# 
+# who             when       what
+# --------------  ---------  ----------------------------------------
+# Allan Brighton  27 Jun 96  Created
+#
+
+NAME
+QueryResult - Class for accessing results of a catalog query
+
+SYNOPSIS
+#include "QueryResult.h"
+
+class QueryResult : public TabTable {
+public:
+    QueryResult();
+    QueryResult(const char* result);
+    QueryResult(int numCols, char** colNames, const char* result);
+    virtual ~QueryResult();
+
+    virtual int getPos(int row, WorldCoords& pos);
+    virtual int getPos(int row, WorldOrImageCoords& pos);
+
+    virtual int query(const AstroQuery& q, const char* infile, const char* outfile, 
+	      int& more);
+
+    virtual void entry(CatalogInfoEntry* e, const char* result = NULL);
+
+    virtual const char* symbol() const;
+    virtual const char* copyright() const;
+    virtual int id_col() const;
+    virtual int ra_col() const;
+    virtual int dec_col() const;
+    virtual int x_col() const;
+    virtual int y_col() const;
+    virtual double equinox() const;
+    
+    virtual int isWcs() const;
+};
+
+DESCRIPTION
+This class manages the result of an AstroCatalog::query. The basic
+result is a char buffer that contains one row per line where each
+column is separated by a tab character. Since this is the same format
+as a local catalog, this class is also used to implement local
+catalogs (see LocalCatalog).
+
+This class provides transparent access to the result based on a
+row,column index and allows for type conversion from string to the
+desired type.
+
+This class is the same as class TabTable (the parent class), except
+that it assumes the table has at least the 3 columns "id", "ra" and
+"dec", if World Coordinates are supported, or "id", "x" and "y" if
+image coordinates are being used.  This class adds methods to get the
+position for a row and to search in an circle, given the center
+position and radius. The class keeps a pointer to a catalog config
+entry that may be based on the original catalog entry or may be read
+from the header of the local catalog or query results.  World
+Coordinates are assumed if the entry indicates that ra and dec columns
+are present.
+
+UNITS
+Unless otherwise stated, the units for all radius values are in arcmin
+for World Coordinates and image pixels otherwise..  Floating point
+values for RA and DEC are always in degrees. The default equinox is
+J2000.
+
+PUBLIC METHODS
+
+QueryResult()
+QueryResult(const char* result) 
+QueryResult(int numCols, char** colNames, const char* result)
+	The constructors have the same arguments as for the parent
+	class TabTable.  They initialize the table from a buffer in
+	tab table format. See the TabTable constructors for
+	details.
+
+getPos(int row, WorldCoords& pos)
+getPos(int row, WorldOrImageCoords& pos)
+	Get the world coordinate or image pixel position for the given
+	row from the columns "ra" and "dec", or "x" and "y", depending
+	on the settings in the catalog config entry. By default the
+	first 3 fields are: id, ra, dec, in J2000. Keywords in the
+	catalog config entry may override these settings. The return
+	value if 0 unless errors are detected.
+
+query(const AstroQuery& q, const char* infile, const char* outfile, 
+      int& more)
+
+	Query the given tab table file using the condition described
+	by the given AstroQuery object.
+
+	Args:
+	    q -        (in)   object describing the query
+
+	    infile   - (in)   file to search
+	    outfile  - (in)   optional filename to hold results, or null
+
+	    more   -   (out)  set to 1 if more objects would be available 
+                              but were not returned because q.maxRows was 
+                              set lower
+
+	The return value 0 if all is OK. The number found is available
+	as this->numRows().
+
+entry(e, result)
+	Set the catalog config entry for this object. This is included
+	in the file when this object is saved as a local catalog. The
+	optional result arg may be a pointer to the result of a
+	catalog query, which may contain config configuration
+	information. If specified, it is scanned to update the entry
+	with the new information.
+
+symbol()
+id_col()
+ra_col()
+dec_col()
+x_col()
+y_col()
+equinox()
+	All these methods return the corresponding values from the
+	catalog config entry for the query results. This may be the
+	same as for the catalog being searched or may have been
+	modified by config information in the header of the query
+	results or local catalog.
+
+isWcs()
+	Returns true if the query results contain ra and dec columns
+	for World Coordinate support.
+
+SEE ALSO
+
+AstroCatalog
+----------------------------------------------------------------------

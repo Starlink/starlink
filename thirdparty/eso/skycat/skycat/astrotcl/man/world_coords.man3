@@ -1,0 +1,124 @@
+# E.S.O. - VLT project/ESO Archive
+# $Id: world_coords.man3,v 1.1 2006/01/16 16:23:59 abrighto Exp $
+#
+# This file is processed by the ESO/VLT docDoManPages command to
+# produce a man page in nroff, TeX and MIF formats. 
+# See docDoManPages(1) for a description of the input format.
+# 
+# who             when       what
+# --------------  ---------  ----------------------------------------
+# Allan Brighton  16 Oct 95  Created
+#
+
+NAME
+worldCoords - C utility routine for working with world coordinates
+
+SYNOPSIS
+#include "worldCoords.h"
+
+typedef struct { 
+    int hours;	 
+    int min;
+    double sec;
+    double val;			/* value calculated in degrees */
+} WC_HMS;
+
+
+typedef struct { 
+    WC_HMS ra, dec;
+} WC;
+
+
+WC* wcInitNull(WC*);
+
+int wcIsNull(WC* wc);
+
+WC* wcInitFromHMS(WC*, int rh, int rm, double rs, 
+	int dd, int dm, int ds, double equinox);
+
+WC* wcInitFromDeg(WC*, double ra, double dec, double equinox);
+
+WC* wcInitFromStrings(WC*, char* ra, char* dec, double equinox);
+
+void wcPrint(WC* wc, char* ra_buf, char* dec_buf, double equinox);
+
+DESCRIPTION
+The routines described here present a C interface to the C++
+WorldCoords class and are used to convert between different
+representations of world coordinates. The values in the struct are
+always kept in both H:M:S[+-]D:M:S format (members: hours, min, sec)
+and as floating point values in hours (member: val) in the default
+equinox of J2000.
+
+C ROUTINES
+wcInitNull
+        Initialize null world coordinates and return the argument.
+	(Null coordinates are useful in some cases where you have
+	an optional second position for an area instead of a single 
+	point).
+	Arguments:
+		wc   (in/out) - pointer to WC struct to be filled in
+	Return value: 
+		pointer to wc argument.
+
+wcIsNull
+        Return true if the given coords are null.
+	Arguments:
+		wc   (in) - pointer to initialized WC struct
+	Return value: 
+		boolean value
+
+wcInitFromHMS
+        Initialize the world coordinates from RA, DEC in H:M:S D:M:S
+	format and return the first parameter.
+	Arguments:
+		wc      (in/out) - pointer to WC struct to fill out
+		rh      (in)     - RA hours
+		rm      (in)     - RA minutes
+		rs      (in)     - RA seconds
+		dd      (in)     - DEC degrees
+		dm      (in)     - DEC minutes
+		ds      (in)     - DEC seconds
+		equinox (in)     - epoch (2000.0, 1950.0, ...)
+	Return value: 
+		pointer to wc argument
+
+wcInitFromDeg
+        Initialize the world coordinates from RA, DEC in degrees in
+        floating point format and return the first parameter.
+	Arguments:
+		wc      (in/out) - pointer to WC struct to fill out
+		ra      (in)     - right ascension
+		dec     (in)     - declination
+		equinox (in)     - epoch (2000.0, 1950.0, ...)
+	Return value: 
+		pointer to wc argument
+
+wcInitFromStrings
+        Initialize the world coordinates from RA, DEC in the format
+	"H:M:S.sss", "[+-]D:M:S.sss" and return the first parameter.
+	The minutes and seconds are optional, so the formats
+	"H.hhh", "[+-]D.ddd" and "H:M", "D:M" are also supported.
+	Arguments:
+		wc      (in/out) - pointer to WC struct to fill out
+		ra      (in)     - right ascention
+		dec     (in)     - declination
+		equinox (in)     - epoch (2000.0, 1950.0, ...)
+	Return value: 
+		pointer to wc argument
+
+wcPrint
+	Print RA and DEC to the given buffers in the given equinox.
+	Arguments:
+		wc      (in)     - pointer to WC struct
+		ra_buf  (in)     - buffer to contain RA in H:M:S
+		dec_buf (in)     - buffer to contain DEC in D:M:S
+		equinox (in)     - desired epoch (2000.0, 1950.0, ...)
+	Return value: 
+		none.
+
+
+SEE ALSO
+WorldCoords
+----------------------------------------------------------------------
+

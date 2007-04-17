@@ -1,0 +1,86 @@
+# E.S.O. - VLT project 
+#
+# "@(#) $Id: SkySearch.man3,v 1.1.1.1 2006/01/12 16:41:52 abrighto Exp $" 
+#
+# This file is processed by the ESO/VLT docDoManPages command to
+# produce a man page in nroff, TeX and MIF formats. 
+# See docDoManPages(1) for a description of the input format.
+# 
+# who             when       what
+# --------------  ---------  ----------------------------------------
+# Allan Brighton  27 Mar 98  Created
+
+NAME
+SkySearch - C++ class to extend the "astrocat" Tcl command
+
+PARENT CLASS
+TclAstroCat
+
+SYNOPSIS
+#include "SkySearch.h"
+
+class SkySearch : public TclAstroCat {
+...
+public:
+    SkySearch(Tcl_Interp* interp, const char* cmdname, const char* instname);
+
+    static int astroCatCmd(ClientData, Tcl_Interp* interp, int argc, char* argv[]);
+
+    virtual int imgplotCmd(int argc, char* argv[]);
+};
+
+DESCRIPTION
+The SkySearch class extends the "astrocat" Tcl command (class
+TclAstroCat) with image plotting capabilities. The plot method was
+originally implemented as an Itcl method (see SkySearch(n)), but this
+turned out to be slow for large numbers of plot symbols. This class
+improves the plotting performace by making use of C++ symbol drawing
+methods defined in the Skycat class. This class adds a "plot"
+subcommand to the astrocat Tcl command.
+
+PUBLIC METHODS
+astroCatCmd(clientData, interp, argc, argv)
+	This is the entry point from Tcl. This static method is called
+	when the astrocat command is used. It creates a new Tcl
+	command with the same name as its first argument, that can be
+	used to access the astrocat and skysearch subcommands. the
+	object can be deleted with the "delete" subcommand.
+
+imgplotCmd(argc, argv)
+	This method implements the "plot" subcommand:
+
+	usage: $instName imgplot $image ?$data? ?$equinox? ?$headings?
+
+	This subcommand is used to plot catalog objects on the skycat
+	image and was reimplemented here in C++ code to improve
+	performance for large complicated catalogs.
+
+	$image is the name of the image object ("rtdimage" object,
+	implemented by the RtdImage C++ class and extended by the
+	Skycat C++ class).
+
+	If $data is specified, it should be a Tcl list of rows to be
+	plotted, in the format returned by the query command.
+
+	If $equinox is specified, it is the equinox of the ra and dec
+	columns in the data (the first 3 columns are assumed to be id,
+	ra and dec, unless otherwise defined in the catalog config
+	entry or header).
+
+	If $headings is given, it is used as a Tcl list of column
+	headings.  Otherwise the catalog headings are used, if there
+	is a current catalog.
+
+	Note: normally you will need to specify all the arguments,
+	since the querries are done in the background (See AstroCat(n)
+	(cat package) and Batch(n) (tclutil package)). The information
+	for the previous query is lost when the background process
+	exits. This might change if queries were done using threads
+	or if the background/interrupt handling were done in the C++
+	code rather than in the Tcl code, as it is done now.
+
+SEE ALSO
+astrocat(n), AstroCat(n), SkyCat(n), SkySearch(n), RtdImage(3), 
+TkImage(3), TclCommand(3), Batch(n)
+--------------------------------------------------------------------
+

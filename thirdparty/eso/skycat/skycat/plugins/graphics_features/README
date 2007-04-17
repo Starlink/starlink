@@ -1,0 +1,15 @@
+
+Skycat Plugin Examples
+======================
+
+This directory contains the Tcl sources for an example skycat plugin
+that adds the ability to save line graphics to a file in world or
+image coordinates and reload them again.
+
+To use this file for skycat, set the environment variable
+SKYCAT_PLUGIN to the path name of the SkyCat_plugin.tcl file.
+
+This file defines one tcl proc: SkyCat_plugin, which takes one
+argument: the name of the top level skycat widget.
+
+See the skycat documentation for details.

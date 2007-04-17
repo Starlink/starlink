@@ -1,0 +1,78 @@
+# E.S.O. - VLT project 
+#
+# "@(#) $Id: ImageZoom.man3,v 1.1.1.1 2006/01/12 16:37:18 abrighto Exp $" 
+#
+# This file is processed by the ESO/VLT docDoManPages command to
+# produce a man page in nroff, TeX and MIF formats. 
+# See docDoManPages(1) for a description of the input format.
+# 
+# who             when       what
+# --------------  ---------  ----------------------------------------
+# Allan Brighton  20 Jul 95  Created
+
+NAME
+ImageZoom - C++ class for RtdImage Zoom Window
+
+SYNOPSIS
+#include "ImageZoom.h"
+
+/*
+ * This class implements the Zoom window for the RtdImage class
+ */
+class ImageZoom {
+protected:
+    Tk_Window  tkwin_;		// zoom window
+    GC gc_;			// graphics context for copying pixels
+    GC rect_gc_;		// graphics context for drawing box aroung center pixels
+    int width_;			// width of displayed image
+    int height_;		// height of displayed image
+    int zoomFactor_;		// zoom factor (1...n)
+    int zoomStep_;		// value used to calculate zoom = width/factor
+    ImageDisplay *xImage_;	// class object for zoom window's X image 
+    int status_;		// return value from constructor
+
+public:
+    // constructor: initialize the zoom window
+    ImageZoom(Tk_Window tkwin, GC copyGC, int width, int height, int factor,
+			   int usingXShm, int verbose);
+    
+    // destructor: clean up resources
+    ~ImageZoom();
+
+    // called for motion events in the image to do the zooming
+    void zoom(unsigned char* data, int x, int y, int w, int h, int xs, int ys);
+
+    // return status after constructor for error checking
+    int status() {return status_;}
+};
+
+
+DESCRIPTION
+This class is used to implement one version of the RtdImage zoom
+window, a small window displaying a magnified area of the main image
+while tracking mouse pointer motion events. See RtdImageZoomView(n)
+for the other, which is implemented as "view" of an RtdImage widget.
+
+This simple class gets the necessary X window information from the
+constructor arguments. The "zoom()" method is then called for mouse
+pointer motion events with a pointer to the XImage data for the main
+image, the mouse coordinates, the width of the zoom image and the zoom
+factor. The zoom is done at the given factor directly from the given X
+Image data and a rectangle is drawn in the middle to indicate the size
+of a pixel in the main image.
+
+METHODS
+void zoom(unsigned char* data, int x, int y, int w, int h, int xs, int ys)
+	Called for motion events in image window when zooming is on.
+	Args: 
+	  data - pointer to data being displayed
+	  x, y - coords in displayed image (XImage coordinates)
+	  w, h - width (bytesPerLine) and height of displayed image
+	  xs, ys - x and y magnification factors
+
+int status()
+	Return status after constructor for error checking.
+
+SEE ALSO
+RtdImage, RtdImageCtrl(n), RtdImageZoom(n), RtdImageZoomView(n)
+-----------------------------------------------------------------------

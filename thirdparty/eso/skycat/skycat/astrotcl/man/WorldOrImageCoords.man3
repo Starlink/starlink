@@ -1,0 +1,170 @@
+# E.S.O. - VLT project/ESO Archive
+# $Id: WorldOrImageCoords.man3,v 1.1.1.1 2006/01/12 16:42:42 abrighto Exp $
+#
+# This file is processed by the ESO/VLT docDoManPages command to
+# produce a man page in nroff, TeX and MIF formats. 
+# See docDoManPages(1) for a description of the input format.
+# 
+# who             when       what
+# --------------  ---------  ----------------------------------------
+# Allan Brighton  15 Jan 98  Created
+#
+
+NAME
+WorldOrImageCoords - class representing either world or image coordinates
+
+SYNOPSIS
+#include "WorldOrImageCoords.h"
+
+class WorldOrImageCoords {
+...
+public:
+    WorldOrImageCoords();
+    WorldOrImageCoords(WorldCoords wc);
+    WorldOrImageCoords(ImageCoords ic); 
+
+    isNull() const;
+    void setNull();
+
+    friend ostream& operator<<(ostream& os, const WorldOrImageCoords& pos);
+    void print(char* x_buf, char* y_buf, double equinox = 2000., int hmsFlag=1);
+    void print(ostream& os, double equinox = 2000.);
+
+    void get(double& x, double& y, double equinox = 2000.);
+
+    int operator==(const WorldOrImageCoords& pos) const;
+    int operator!=(const WorldOrImageCoords& pos) const;
+    friend WorldOrImageCoords operator-(const WorldOrImageCoords& a, const WorldOrImageCoords& b);
+
+    double ra_deg() const;
+    double dec_deg() const;
+
+    WorldCoords& wc();
+    ImageCoords& ic();
+
+    const WorldCoords& wc() const
+    const ImageCoords& ic() const;
+
+    double dist(WorldOrImageCoords& pos, double& pa) const;
+    double dist(WorldOrImageCoords& pos) const;
+
+    int box(double radius, WorldOrImageCoords& pos1, WorldOrImageCoords& pos2) const;
+
+    static WorldOrImageCoords center(const WorldOrImageCoords& pos1, 
+				     const WorldOrImageCoords& pos2,
+				     double& radius, 
+				     double& width, double& height);
+
+    const HMS& ra() const;
+    const HMS& dec() const;
+    double x() const;
+    double y() const;
+    double isWcs() const;
+    int status() const;
+};
+
+DESCRIPTION
+Class WorldOrImageCoords is designed to be used in situations where
+you might need to deal with either world coordinates or image
+coordinates, but don't know ahead of time which.  We could use a
+common base class and virtual methods, but that would require using
+pointers or references, while it is often more convenient to use
+instances of these classes. Also, the methods in both classes have
+slightly different signatures.
+
+After initializing the class with with a WorldCoords(n) object or an
+ImageCoords(n) object, you can use the isWcs() method to check which
+one it is, if you don't know. Otherwise, most of the methods work
+transparently, independent of the coordinate type. However, you should
+not attempt, for example, to fetch the value of "ra" and "dec" without
+being sure that the object represents world coordinates.
+
+CONSTRUCTORS
+WorldOrImageCoords()
+	Initialize null coordinates.
+
+WorldOrImageCoords(wc) 
+	Initialize world coordinates.
+
+WorldOrImageCoords(ic)
+	Initialize image coordinates.
+
+METHODS
+isNull();
+	Return true if the coordinates are null
+
+setNull()
+	Set to the null value.
+   
+operator<<(os, pos)
+	Output operator, prints world coordinates as hh:mm:ss dd:mm:ss, 
+	image coordinates as x y.
+
+print(x_buf, y_buf, equinox, hmsFlag)
+    	Print the coordinates to the given buffer. For world
+ 	coordinates, if hmsFlag is non-zero, prints in H:M:S [+-]D:M:S
+ 	format, otherwise in decimal degrees.
+
+
+print(os, equinox)
+	Print the coordinates to the given stream.
+
+get(x, y, equinox)
+	Get teh valules of x and y in the given equinox.
+    
+operator==(pos)
+	Check for equality.
+
+operator!=(pos)
+	Check for inequality.
+
+operator-(a, b)
+	Return the difference between two points.
+
+ra_deg()
+	Return ra in degrees.
+
+dec_deg()
+	Return dec in degrees.
+ 
+wc()
+	Return the internal WorldCoords class.
+
+ic()
+	Return the internal ImageCoords class.
+
+dist(pos, pa)
+	Get distance and pa angle between the given point and this point.
+
+dist(pos)
+	Get distance between between the given point and this point.
+
+box(radius, pos1, pos2)
+	Given a radius, set pos1 and pos2 to the 2 endpoints that form
+	a box with center at this position.
+
+center(pos1, pos2, radius, width, height) {
+	Given the endpoints of a box (pos1, pos2), set width, height
+	and radius and return the center position of the box.
+	
+ra()
+	Return the value of ra.
+
+dec()
+	Return the value of dec.
+
+x()
+	Return the value of the x coordinate.
+
+y()
+	Return the value of the y coordinate.
+
+isWcs()
+	Return true if this class represents world coordinates.
+
+status()
+	Return the status after the constructor (0 is OK).
+
+SEE ALSO
+WorldCoords, ImageCoords(3C++)
+----------------------------------------------------------------------

@@ -1,0 +1,25 @@
+#!/bin/sh
+# -*-tcl-*-
+#
+# E.S.O. - VLT project
+#
+# "@(#) $Id: rtdctrl,v 1.1.1.1 2006/01/12 16:37:08 abrighto Exp $" 
+#
+# Start the rtd image server as a standalone program
+#
+# Usage: rtdctrl
+#
+#  who      when     what
+# -------- -------- ------------------
+# abrighto 11/10/95 created 
+# abrighto 29/12/05 adapted for new setup
+
+# Make sure the shared libraries can be found 
+# The next line is executed by sh, the rest by tcl: \
+LD_LIBRARY_PATH="/home/abrighto/work/eso/skycat/src/install/lib:${LD_LIBRARY_PATH}" TCLLIBPATH="/home/abrighto/work/eso/skycat/src/install/lib" exec /usr/bin/wish8.4 "$0" ${1+"$@"}
+
+# -*-tcl-*-
+
+package require Rtd
+setXdefaults
+util::TopLevelWidget::start RtdServerTool

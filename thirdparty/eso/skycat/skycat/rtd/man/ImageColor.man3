@@ -1,0 +1,162 @@
+# E.S.O. - VLT project 
+#
+# "@(#) $Id: ImageColor.man3,v 1.1.1.1 2006/01/12 16:37:17 abrighto Exp $" 
+#
+# This file is processed by the ESO/VLT docDoManPages command to
+# produce a man page in nroff, TeX and MIF formats. 
+# See docDoManPages(1) for a description of the input format.
+# 
+# who             when       what
+# --------------  ---------  ----------------------------------------
+# Allan Brighton  20 Jul 95  Created
+
+NAME
+ImageColor - A C++ class for managing image colors
+
+SYNOPSIS
+#include "ImageColor.h"
+
+/* 
+ * An instance of this class is used to manage colors and colormaps
+ * for RtdImage and derived widgets
+ */
+class ImageColor {
+...
+public:
+    // constructor
+    ImageColor(Display*, Visual*, int numColors);
+    
+    // member functions
+    int numFreeColors();
+    int allocate(int numFreeColors);
+    int reallocate(int numFreeColors);
+
+    // load (reload) a color map from the given file
+    int loadColorMap(char* filename);
+
+    // load (reload) an ITT from the given file
+    int loadITT(char* filename);
+
+    // rotate the colormap by the given amount
+    int rotateColorMap(int amount);
+
+    // shift the colormap by the given amount
+    int shiftColorMap(int amount);
+
+    // scale the current colormap/ITT by the given amount
+    int scaleITT(int amount);
+
+    // reset colormap to original state
+    int reset();
+
+    // start using a private colormap
+    int usePrivateCmap();
+
+    // return true if we are using a private colormap
+    int usingPrivateCmap() {return (colormap_ != defaultCmap_);}
+
+    // if we are using a private colormap, set it for the given window
+    int setColormap(Tk_Window);
+
+    // member access
+    int freeCount() {return freeCount_;}
+    int colorCount() {return colorCount_;}
+    unsigned long* pixelval() {return pixelval_;}
+    unsigned long pixelval(int i) {return pixelval_[i];}
+    XColor* colorCells() {return itt_ ? ittCells_ : colorCells_;}
+};
+
+DESCRIPTION
+This class is used to manage the colormap for an image display
+application. This is normally the default colormap, however, if not
+enough colors can be allocated, a private colormap can be created and
+an attempt is made to reduce color flashing by copying the colors from
+the default colormap to the new one.  Normally, only a single instance
+of the ImageColor class is required per application. Class ImageColor
+modifies the colormap by allocating a given number of color cells and
+assigning color values to cells based on MIDAS colormap and ITT
+(intensity transfer table) files. Methods are also available for
+rotating, shifting, stretching and squeezing the colormap.
+
+MIDAS COLORMAP FILES
+The colormap files used here were taken in ascii form from the MIDAS
+distribution.  A colormap file has 256 lines of red, green, blue
+floating point values between 0.0 and 1.0. The values are scaled to the
+size of the colormap (the number of allocated colors) at run time.
+
+MIDAS ITT FILES
+An ITT file is like a colormap file, except that there is only one
+value per line (256 lines). Each value is between 0.0 and 1.0 and is
+used to modify the colormap. For example, to get a negative of an
+image, a negative ITT would have values starting at 1.0 and ending at
+0.0, equally spaced.
+
+CONSTRUCTOR
+The constructor takes as arguments, a pointer to the X display (for
+colormap operations) and the number of colors to allocate. If there
+are not that many colors available, then the actual number allocated
+will be less.
+
+METHODS
+int numFreeColors()
+	Return the number of free color cells available (uses a binary
+	search between 0 and MAX_COLOR).
+
+int allocate(int numFreeColors)
+	Allocate at most numColors color cells. If there are not that
+	many colors available, then the actual number allocated will
+	be less.
+
+int reallocate(int numFreeColors)
+	Free and then re-allocate at most numColors color cells.
+
+int loadColorMap(char* filename)
+	Load a color map from the given file, where file contains 256
+	lines of (r g b) values.
+
+int loadITT(char* filename)
+	Load an intensity transfer table (ITT) from the given file
+	where file contains 256 ITT values, one per line.
+
+int rotateColorMap(int amount)
+	Rotate the colormap by the given amount. 
+
+int shiftColorMap(int amount)
+	Shift the colormap by the given amount.
+
+int scaleITT(int amount)
+	Scale (squeeze or stretch) the current colormap/ITT by the
+	given amount.
+
+int reset()
+	Reset colormap to original state.
+
+int freeCount()
+	Return the number of free colors available.
+
+int colorCount()
+	Return the number of colors allocated.
+
+unsigned long* pixelval()
+	Return the array of pixel values for the allocated colors in
+	the colormap.
+
+unsigned long pixelval(int i)
+	Return the colormap pixel value at the given index.
+
+XColor* colorCells()
+	Return pointer to array of XColors used for colormap.
+
+int usePrivateCmap()
+	Start using a private colormap.
+
+int usingPrivateCmap()
+	Return true if we are using a private colormap.
+
+int setColormap(Tk_Window)
+	If we are using a private colormap, set it for the given window.
+
+SEE ALSO
+ColorMapInfo, ITTInfo(3C++)
+
+-----------------------------------------------------------------------------

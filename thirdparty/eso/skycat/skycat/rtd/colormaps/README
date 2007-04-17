@@ -1,0 +1,2 @@
+Be sure to run update_colormaps.sh if you add or modify a colormap in this directory. 
+This will create ../generic/colormaps.C which defines the colormaps in C code.

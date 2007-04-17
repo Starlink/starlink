@@ -1,0 +1,39 @@
+# E.S.O. - VLT project/ESO Archive
+# $Id: astrocat.man1,v 1.1.1.1 2006/01/12 16:36:05 abrighto Exp $
+#
+# This file is processed by the ESO/VLT docDoManPages command to
+# produce a man page in nroff, TeX and MIF formats. 
+# See docDoManPages(1) for a description of the input format.
+# 
+# who             when       what
+# --------------  ---------  ----------------------------------------
+# Allan Brighton  27 Mar 98  Created
+#
+
+NAME
+astrocat - Standalone catalog browser application
+
+SYNOPSIS
+astrocat ?catalogName? ?options?
+
+DESCRIPTION
+The "astrocat" command is a standalone user interface to the catalog
+library. This window interface can be used to query catalogs and get
+configuration about the available catalogs.  See the man pages for
+astrocat(n) and AstroCatalog(3) for details that are not described
+here.
+
+If a catalog name is specified, it should be one of the names in the
+catalog configuration file, for example, "gsc@eso".
+
+If no catalog name is specified, a default is chosen (first in config
+file) and you can choose a new catalog from the menus.
+
+OPTIONS
+See AstroCat(n), the Itcl class version, which has the same options.
+
+
+SEE ALSO
+astrocat(n), AstroCat(n), AstroCatalog(3)
+----------------------------------------------------------------------
+

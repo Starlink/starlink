@@ -1,0 +1,380 @@
+# E.S.O. - VLT project 
+#
+# "@(#) $Id: Skycat.man3,v 1.1.1.1 2006/01/12 16:41:51 abrighto Exp $" 
+#
+# This file is processed by the ESO/VLT docDoManPages command to
+# produce a man page in nroff, TeX and MIF formats. 
+# See docDoManPages(1) for a description of the input format.
+# 
+# who             when       what
+# --------------  ---------  ----------------------------------------
+# Allan Brighton  27 Mar 98  Created
+
+NAME
+Skycat - A C++ class that extends the rtdimage Tk image type
+
+PARENT CLASS
+RtdImage
+
+SYNOPSIS
+#include "Skycat.h"
+
+class Skycat : public RtdImage {
+...
+public:
+    Skycat(Tcl_Interp*, const char* instname, int argc, char** argv, 
+	     Tk_ImageMaster master, const char* imageType,
+	     Tk_ConfigSpec* specs = (Tk_ConfigSpec*)NULL, 
+	     RtdImageOptions* options = (RtdImageOptions*)NULL);
+    
+    virtual ~Skycat() {}
+    
+    virtual int call(const char* name, int len, int argc, char* argv[]);
+
+    static int CreateImage(Tcl_Interp*, char *name, int argc, char **argv, 
+		    Tk_ImageType*, Tk_ImageMaster, ClientData*);
+
+    static Skycat* getInstance(char* name);
+
+
+    int get_compass(double x, double y, const char* xy_units, 
+		    double radius, const char* radius_units, 
+		    double ratio, double angle,
+		    double& cx, double& cy, double& nx, double& ny, 
+		    double& ex, double& ey);
+
+    int rotate_point(double& x, double& y, double cx, double cy, double angle);
+
+    int make_label(ostream& os, const char* label, double x, double y, 
+		   const char* tags, const char* color,
+		   const char* font = "-*-courier-medium-r-*-*-*-120-*-*-*-*-*-*");
+
+    int draw_symbol(const char* shape, 
+		    double x, double y, const char* xy_units, 
+		    double radius, const char* radius_units, 
+		    const char* bg, const char* fg, 
+		    const char* symbol_tags, 
+		    double ratio = 1., double angle = 0.,
+		    const char* label = NULL, const char* label_tags = NULL);
+
+    int draw_circle(double x, double y, const char* xy_units, 
+		    double radius, const char* radius_units, 
+		    const char* bg, const char* fg, 
+		    const char* symbol_tags, 
+		    double ratio = 1., double angle = 0.,
+		    const char* label = NULL, const char* label_tags = NULL);
+
+    int draw_square(double x, double y, const char* xy_units, 
+		    double radius, const char* radius_units, 
+		    const char* bg, const char* fg, 
+		    const char* symbol_tags, 
+		    double ratio = 1., double angle = 0.,
+		    const char* label = NULL, const char* label_tags = NULL);
+
+    int draw_plus(double x, double y, const char* xy_units, 
+		  double radius, const char* radius_units, 
+		  const char* bg, const char* fg, 
+		  const char* symbol_tags, 
+		  double ratio = 1., double angle = 0.,
+		  const char* label = NULL, const char* label_tags = NULL);
+
+    int draw_cross(double x, double y, const char* xy_units, 
+		   double radius, const char* radius_units, 
+		   const char* bg, const char* fg, 
+		   const char* symbol_tags, 
+		   double ratio = 1., double angle = 0.,
+		   const char* label = NULL, const char* label_tags = NULL);
+
+    int draw_triangle(double x, double y, const char* xy_units, 
+		      double radius, const char* radius_units, 
+		      const char* bg, const char* fg, 
+		      const char* symbol_tags, 
+		      double ratio = 1., double angle = 0.,
+		      const char* label = NULL, const char* label_tags = NULL);
+
+    int draw_diamond(double x, double y, const char* xy_units, 
+		     double radius, const char* radius_units, 
+		     const char* bg, const char* fg, 
+		     const char* symbol_tags, 
+		     double ratio = 1., double angle = 0.,
+		     const char* label = NULL, const char* label_tags = NULL);
+
+    int draw_ellipse(double x, double y, const char* xy_units, 
+		     double radius, const char* radius_units, 
+		     const char* bg, const char* fg, 
+		     const char* symbol_tags, 
+		     double ratio = 1., double angle = 0.,
+		     const char* label = NULL, const char* label_tags = NULL);
+
+    int draw_compass(double x, double y, const char* xy_units, 
+		     double radius, const char* radius_units, 
+		     const char* bg, const char* fg, 
+		     const char* symbol_tags, 
+		     double ratio = 1., double angle = 0.,
+		     const char* label = NULL, const char* label_tags = NULL);
+
+    int draw_line(double x, double y, const char* xy_units, 
+		  double radius, const char* radius_units, 
+		  const char* bg, const char* fg, 
+		  const char* symbol_tags, 
+		  double ratio = 1., double angle = 0.,
+		  const char* label = NULL, const char* label_tags = NULL);
+
+    int draw_arrow(double x, double y, const char* xy_units, 
+		   double radius, const char* radius_units, 
+		   const char* bg, const char* fg, 
+		   const char* symbol_tags, 
+		   double ratio = 1., double angle = 0.,
+		   const char* label = NULL, const char* label_tags = NULL);
+   
+    int symbolCmd(int argc, char* argv[]);
+    int hduCmd(int argc, char* argv[]);
+
+};
+
+DESCRIPTION
+Class Skycat extends the RtdImage C++ class by adding methods for
+drawing symbols in an image based in world or image coordinates and by
+adding support for FITS tables and multiple FITS HDUs. Since the
+RtdImage class implements the rtdimage Tk image type, this class adds
+features to the rtdimage command as well.
+
+The symbol drawing methods defined here were originally implemented in
+Itcl and were later moved here to improve performance when plotting
+large numbers of symbols in an image.
+
+CONSTRUCTOR
+Skycat(interp, instname, argc, argv, master, imageType, specs, options)
+	Create a new skycat extended rtdimage object with the given
+	name and arguments. The optional arguments "specs" and
+	"options" allow derived classes to add new configuration
+	options. See RtdImage(3) for hints on how to add new
+	subcommand and options. The imageType argument is normally
+	"rtdimage", but could be set to a different name, if you do
+	not want to redefine the rtdimage type, but add a new one
+	instead. The "master" argument is a Tk struct that contains
+	pointers to the image handling routines.
+
+METHODS
+call(name, len, argc, argv)
+	This virtual method is defined at every level in the class
+	hierarchy and is used to call a member function by specifying
+	the name as a string.  This is used to implement rtdimage
+	subcommands by passing control from Tcl to C++. All of the
+	methods that implement subcommands take the same arguments:
+	argc and argv, the Tcl command line arguments.
+
+CreateImage(interp, name, argc, argv, type, master, clientData)
+	This is the entry point from tcl to create a image.
+
+getInstance(name)
+	Return a pointer to the Skycat class object for the given tcl
+	rtdimage instance name, or NULL if the name is not an
+	rtdimage.
+
+get_compass(x, y, xy_units, radius, radius_units, ratio, angle,
+	    cx, cy, nx, ny, ex, ey)
+	Return the canvas coordinates of the 3 points: center, north
+	and east, given the center point and radius in the given
+	units, an optional rotation angle, and an x/y ellipticity
+	ratio.  If the image supports world coordinates, that is taken
+	into account (the calculations are done in RA,DEC before
+	converting to canvas coords).  The conversion to canvas coords
+	automatically takes the current zoom and rotate settings into
+	account. The return arguments {cx cy nx ny ex ey} are for the
+	3 points center, north and east.
+
+rotate_point(x, y, cx, cy, angle)
+	Rotate the point x,y around the center point cx,cy by the
+	given angle in degrees.
+
+make_label(os, label, x, y, tags, color, font)
+	Write a Tcl canvas command to the given stream to add a label
+	to the image at the given canvas coordinates with the given
+	label text, color and canvas tags.
+
+draw_symbol(shape, x, y, xy_units, radius, radius_units, bg, fg, 
+	    symbol_tags, ratio, angle, label, label_tags)
+	Draw a symbol on the image with the given shape at the given
+	coordinates (in the given x,y units), with the given radius
+	(in radius_units), bg and fg color, canvas tags list, x/y
+	ratio and rotation angle.
+
+	shape may be one of "circle", "square", "plus", "cross",
+	"triangle", "diamond", "ellipse", "compass", "line", "arrow".
+
+	x and y are the coordinates in "xy_units", which is one of the
+	units accepted by the Rtd commands (canvas, image, screen,
+	"wcs $equinox", "deg $equinox").
+
+	The radius value is interpreted in radius_units.
+
+	bg and fg are X color names for the symbol (may be the same).
+
+	symbol_tags should be a Tcl list of canvas tags for the
+	symbol.
+
+	ratio and angle are used to stretch/shrink and rotate the
+	symbol.
+
+	label is an optional text for a label to place near the
+	symbol.
+
+	label_tags should be a Tcl list of canvas tags for the label,
+	or an empty or null string, if there is no label.
+
+	Returns an error if the coordinates or part of the symbol are
+	off the image.
+
+	This method uses world coordinates, if available, for the
+	rotation and orientation, for symbols that support it (i.e.:
+	rotation is relative to WCS north).
+
+draw_square(x, y, xy_units, radius, radius_units, bg, fg, symbol_tags, 
+            ratio, angle, label, label_tags)
+draw_circle(...)
+draw_plus(...)
+draw_cross(...)
+draw_triangle(...)
+draw_diamond(...)
+draw_ellipse(...)
+draw_compass(...)
+draw_line(...)
+draw_arrow(...)
+	These methods each draw one type of symbol. They are called by
+	the draw_symbol method and have the same arguments (but no
+	shape argument, of course).
+
+symbolCmd(argc, argv)
+	This method implements a the Tcl symbol subcommand (a new
+ 	rtdimage subcommand added in this subclass):
+
+	Usage: 
+
+	  $instName symbol $shape $x $y $xy_units $radius $radius_units \
+                 $bg $fg $symbol_tags ?$ratio $angle $label $label_tags?
+
+	Draw a symbol on the image with the given shape at the given
+	coordinates (in the given x,y units), with the given radius
+	(in radius_units), bg and fg color, canvas tags list, x/y
+	ratio and rotation angle.
+
+	shape may be one of "circle", "square", "plus", "cross",
+	"triangle", "diamond", "ellipse", "compass", "line", "arrow".
+
+	x and y are the coordinates in "xy_units", which is one of the
+	units accepted by the Rtd commands (canvas, image, screen,
+	"wcs $equinox", "deg $equinox").
+
+	The radius value is interpreted in radius_units.
+
+	bg and fg are X color names for the symbol (may be the same).
+
+	symbol_tags should be a Tcl list of canvas tags for the
+	symbol.
+
+	ratio and angle are optional and used to stretch/shrink and
+	rotate the symbol. The default ratio is 1, default angle 0.
+
+	label is an optional text for a label to place near the
+	symbol.
+
+	label_tags should be a Tcl list of canvas tags for the label,
+	or an empty or null string, if there is no label.
+
+	Returns an error if the coordinates or part of the symbol are
+	off the image.
+
+	Uses world coordinates, if available, for the rotation and
+	orientation, for symbols that support it (i.e.: rotation is
+	relative to WCS north).
+
+
+hduCmd(argc, argv)
+	This method implements the "hdu" subcommand, to access
+	different FITS HDUs (header data units). Each HDU may be of
+	type "image", "binary" table or "ascii" table.
+	
+	 Usage: <path> hdu count
+	 or:    <path> hdu list
+	 or:    <path> hdu listheadings
+	 or:    <path> hdu type ?number?
+	 or:    <path> hdu headings ?$number?
+	 or:    <path> hdu get ?$number? ?$filename? ?$entry?
+	 or:    <path> hdu create $type $extname $headings $tform $data
+	 or:    <path> hdu delete $number
+	 or:    <path> hdu set $number
+	 or:    <path> hdu ?$number?
+	
+	If the "hdu count" subcommand is specified, it returns the
+	number of HDUs in the current image.
+	
+	The "hdu type" subcommand returns the type of the current or
+	given HDU as a string "ascii", "binary" or "image".
+	
+	If the "hdu list" subcommand is specified, it returns a Tcl
+	list of FITS HDU information of the form:
+	
+	  {{number type extname naxis naxis1 naxis2 naxis3 crpix1 
+	    crpix2} ...}
+	
+	Where: 
+	
+	  - number is the HDU number
+
+	  - type is the HDU type: one of "image", "binary table", 
+	    "ascii table".
+
+	  - extname is the value of the EXTNAME keyword, if set
+
+	  - naxis, naxis1, naxis2, naxis3 match the FITS keyword
+	    values.
+	
+	The "hdu listheadings" subcommand returns a list of the column
+	names returned by the "hdu list" subcommand. This can be used
+	to set the title of a table listing of the HDUs in a FITS
+	file.
+	
+	The "hdu headings" subcommand returns a list of the column
+	names in the current or given FITS table.
+	
+	The "hdu get" subcommand with no arguments returns the
+	contents of the current ASCII or binary table as a Tcl list (a
+	list of rows, where each row is a list of column values). If
+	the HDU number is given, the contents of the given HDU are
+	returned. If a filename argument is given, the FITS table is
+	written to the given file in the form of a local (tab
+	separated) catalog.  If optional "entry" argument is given, it
+	specifies the catalog config entry as a list of {{keyword
+	value} {keyword value} ...}, as defined in the catalog config
+	file (~/.skycat/skycat.cfg). The entry is written to the
+	header of the local catalog file and is used mainly to specify
+	plot symbol information for the catalog.
+	
+	The "hdu create" command creates a new FITS table in the
+	current image file. $type maye be "ascii" for an ASCII table
+	or "binary" for a binary FITS table. The name of the table is
+	given by extname. The table headings and data correspond to
+	the catalog headings and data. The tform argument is a list of
+	FITS storage formats, one for each column, of the form {16A 2D
+	12A ...} (similar to FORTRAN formats, see the FITS docs).
+	
+	The "hdu delete" command deletes the given HDU. The argument
+	is the HDU number. The other HDUs in the file following the
+	deleted one are moved to fill the gap.
+	
+	If the "hdu" subcommand is specified with no arguments, it
+	returns the current HDU number. If a number argument is given,
+	the current HDU is set to that number.
+	
+	The "hdu set" subcommand sets the current HDU to the given
+	number.  The keyword "set" is optional (see below).
+	
+	An optional numerical argument may be passed to the "hdu"
+	subcommand, in which case the "current HDU" is set to the
+	given number.
+
+SEE ALSO
+SkyCat(n), SkySearch(3), RtdImage(3), TkImage(3), FitsIO(3)
+--------------------------------------------------------------------
+

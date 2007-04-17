@@ -1,0 +1,201 @@
+# E.S.O. - VLT project 
+#
+# "@(#) $Id: TclCommand.man3,v 1.1.1.1 2006/01/12 16:40:33 abrighto Exp $" 
+#
+# This file is processed by the ESO/VLT docDoManPages command to
+# produce a man page in nroff, TeX and MIF formats. 
+# See docDoManPages(1) for a description of the input format.
+# 
+# who             when       what
+# --------------  ---------  ----------------------------------------
+# Allan Brighton  20 Jul 95  Created
+
+
+NAME
+TclCommand - C++ base class for implementing  new  Tcl  commands
+
+SYNOPSIS
+#include <TclCommand.h>
+
+
+class TclCommand {
+protected:
+    // tcl interpreter
+    Tcl_Interp* interp_;
+
+    // stream to evaluate tcl commands
+    TclInterpStream tcl_;
+
+    // status after constructor
+    int status_;
+
+    // class of tcl command (same as prefix for instname_)
+    const char* cmdname_;
+
+    // name of tcl command created for this object
+    char* instname_;
+
+    // used to generate unique tcl command name if name is specified as '#auto'
+    static int seq_;
+
+protected:
+    // tcl command proc, called by tcl, calls teh correct member function
+    static tclCmdProc(ClientData, Tcl_Interp* interp, int argc, char* argv[]);
+
+    // tcl delete proc, called when tcl object is deleted
+    static void tclDeleteProc(ClientData);
+
+    // check the arg count for a subcommand
+    int check_args(const char* name, int argc, int min_args, int max_args);
+
+    // call a member function by name
+    virtual int call(const char* name, int argc, char* argv[]);
+
+    // append an integer result in tcl
+    int append_result(int);
+
+    // append a string result in tcl
+    int append_result(char*);
+
+    // return an integer value in tcl
+    int set_result(int);
+
+    // return a string value in tcl
+    int set_result(char*);
+
+    // report an error in tcl
+    int error(char* msg);
+
+public:
+
+    // constructor
+    TclCommand(Tcl_Interp*, const char* cmdname, const char* instname);
+
+    // destructor
+    virtual ~TclCommand();
+
+    // return status of constructor
+    int status() const { return status_; }
+
+    // tcl delete sub command (always the same)
+    int delete_(int argc, char* argv[]);
+
+    TclInterpStream& tcl() {return tcl_;}
+
+};
+
+_________________________________________________________________
+
+DESCRIPTION
+TclCommand is a base class for C++ classes defining Tcl commands.  It
+offers support for an [incr Tk] like interface.  That is, Tcl
+commands defined in this framework can be declared as Tcl objects,
+where each object may have any number of methods (or subcommands).
+For example, you can define a Tcl command Dir in C++ and use it like
+this:
+
+#create a Dir object called d
+Dir d
+foreach file [d lsfiles] {...}
+foreach dir [d lsdirs] {...}
+
+# The '#auto' syntax is also supported (generate a unique object name)
+set d [Dir #auto]
+
+# From within itcl classes, I usually use something like this:
+Dir $this.d
+$this.d lsfiles ...
+
+The TclCommand class and classes derived from it each define
+the virtual member function
+
+int call(const char* name, int argc, char* argv[])
+
+to call a the member function that implements the named Tcl
+subcommand.  The search starts at the bottom of the C++ inheritance
+hierarchy and works its way up to the base class.  Each derived class
+checks a local static table of member functions (if necessary) to see
+if it implements the named method and if so, calls the method with the
+given arguments. If the given name does not correspond to a local
+method, control is passed to the next higher class in the inheritance
+hierarchy.
+
+The member functions that implement Tcl subcommands all have the same
+signature. For example, the member function for the delete subcommand
+is defined in the base class for all Tcl objects like this:
+
+// tcl delete sub command (always the same)
+int delete_(int argc, char* argv[]);
+
+EXAMPLE
+An example of a simple Tcl command implemented in C++ is the Dir
+command, which has a number of subcommands for listing file and/or
+directories.  The C++ class declaration for the Dir command looks like
+this:
+
+#include "TclCommand.h"
+
+/* This class declares the methods used to implement the Tcl "Dir"
+ * command.  This command should be some what faster than "glob" or
+ * "ls" for getting a list of "only files" or "only dirs" in a
+ * directory.
+ */
+
+class TclDirCmd : public TclCommand {
+private:
+    DIR* opendir_(char* dirname);
+    int isdir_(char* path);
+    int isfile_(char* path);
+public:
+
+    // -- tcl subcommands --
+
+    int ls_(int argc, char* argv[]);
+    int lsfiles_(int argc, char* argv[]);
+    int lsdirs_(int argc, char* argv[]);
+    int cd_(int argc, char* argv[]);
+    int pwd_(int argc, char* argv[]);
+
+    // constructor
+    TclDirCmd(Tcl_Interp*, const char* cmdname, const char* instname);
+};
+
+The C++ body file then looks something like this:
+/*
+ * declare a table of tcl subcommands
+ * format: name, min_args, max_args, method
+ */
+static class TclDirSubCmds {
+public:
+    char* name; // method name
+    int (TclDirCmd::*fptr)(int argc, char* argv[]);
+    int min_args;    // minimum number of args
+    int max_args;    // maximum number of args
+} subcmds_[] = {
+    {"ls", &TclDirCmd::ls_,  1,  1},
+    {"lsfiles", &TclDirCmd::lsfiles_,  1,  1},
+    {"lsdirs",  &TclDirCmd::lsdirs_,   1,  1},
+    {"cd", &TclDirCmd::cd_,  1,  1},
+    {"pwd",&TclDirCmd::pwd_, 0,  0},
+};
+
+
+/*
+ * Call the given method in this class with the given arguments
+ */
+int TclDirCmd::call(const char* name, int argc, char* argv[])
+{
+    for(int i = 0; i < sizeof(subcmds_)/sizeof(*subcmds_); i++) {
+	TclDirSubCmds* t = &subcmds_[i];
+	if (strcmp(t->name, name) == 0) {
+    	    if (check_args(name, argc, t->min_args, t->max_args) != TCL_OK)
+	        return TCL_ERROR;
+            return (this->*t->fptr)(argc, argv);
+	}
+    }
+    return TclCommand::call(name, argc, argv);
+}
+
+SEE ALSO
+TkWidget, TkImage(3C++), TclInterpStream(3C++)
+-----------------------------------------------------------------------------

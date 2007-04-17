@@ -1,0 +1,212 @@
+# E.S.O. - VLT project 
+#
+# "@(#) $Id: TkImage.man3,v 1.1.1.1 2006/01/12 16:40:33 abrighto Exp $" 
+#
+# This file is processed by the ESO/VLT docDoManPages command to
+# produce a man page in nroff, TeX and MIF formats. 
+# See docDoManPages(1) for a description of the input format.
+# 
+# who             when       what
+# --------------  ---------  ----------------------------------------
+# Allan Brighton  20 Jul 95  Created
+
+NAME
+TkImage - A C++ base class for implementing Tk image types
+
+PARENT CLASS
+TclCommand
+
+DERIVED CLASSES
+RtdImage
+
+SYNOPSIS
+#include "TkImage.h"
+
+/* 
+ * This class or a class derived from it is used to hold the values
+ * modified by the configure image command
+ */
+class TkImageOptions {
+public:
+};
+
+
+/* 
+ * This is the base class for classes defining tk images from
+ * C++ classes.  
+ * In this class, only one instance of an image may be displayed,
+ * in a window, however multiple views of the image with varying 
+ * sizes may be displayed (I didn't see any need for exact copies
+ * of the same image in the same size...)
+ */
+class TkImage : public TclCommand {
+protected:
+    Tk_ImageMaster master_;	// passed from the Tk imaging routines
+
+    TkImageOptions* optionsPtr_; // ptr to class or struct holding option values
+    Tk_ConfigSpec* configSpecsPtr_; // ptr to configSpecs array for Tk options
+    int refCount_;		// Number of instances that share this
+				// image (may only be one here). 
+
+    Tk_Window tkwin_;		// Window in which the image will be displayed. 
+    Display *display_;		// X token for the window's display
+    Visual *visual_;		// X visual for window
+    GC gc_;			// Graphics context for copying to screen  
+    Pixmap pm_;			// Pixmap for storing the image 
+
+    int width_;			// total width of image
+    int height_;		// total height of image
+    int pixw_;			// width of X pixmap, if used
+    int pixh_;			// height of X pixmap, if used
+    int depth_;			// depth of screen
+
+    char* pclass_;		// if specified, restrict images to only be displayed
+				// in widgets of that class
+
+    int update_pending_;	// flag: true if image needs to be updated
+
+    int initialized_;		// flag: true after image has been initialized
+				// (configured, after constructor is done)
+    
+    // -- member functions --
+
+    // do first time image configuration 
+    virtual int initImage(int argc, char* argv[]);
+
+    // configure the image with cmd line options.
+    virtual int configureImage(int argc, char* argv[], int flags = 0);
+    
+    // these are called indirectly by the Tk imaging routines
+    virtual TkImage* getImage(Tk_Window);
+    virtual void displayImage(Drawable, int imageX, int imageY,
+			      int width, int height,
+			      int drawableX, int drawableY) = 0;
+
+    // update the image display eventually
+    virtual void imageChanged();
+
+    // make the X graphics context
+    void makeGC();
+    
+    // set the image size and create/update a pixmap, if use_pixmap is 1
+    int setImageSize(int width, int height, int use_pixmap, int pixw, int pixh);
+
+    // utility method: equivalent of Tk "update idletasks" command
+    void updateIdleTasks();
+
+    // call a member function by name
+    virtual int call(const char* name, int len, int argc, char* argv[]);
+
+public:
+
+    // constructor
+    TkImage(Tcl_Interp* interp, char* cmdname, char* instname,
+		 Tk_ConfigSpec* specs, TkImageOptions& options, 
+		 Tk_ImageMaster master, char* pclass = NULL);
+
+    // destructor
+    virtual ~TkImage();
+
+    // the following static methods are called by the Tk image handling routines
+    static ClientData GetImage(Tk_Window, ClientData);
+    static void DisplayImage(ClientData, Display*, Drawable,
+			     int imageX, int imageY, 
+			     int width, int height,
+			     int drawableX, int drawableY);
+    static void FreeImage(ClientData, Display*);
+    static void DeleteImage(ClientData);
+
+    // implement the configure Tk command    
+    virtual int configureCmd(int argc, char* argv[]);
+
+    // called for the cget image command
+    virtual int cgetCmd(int argc, char* argv[]);
+
+};
+
+DESCRIPTION
+TkImage is a base class for a class defining a new TkImage type. The
+image type defined here differs slightly from standard Tk image types,
+such as photo or bitmap in that it is only allowed to display a given
+image in a single widget and you can optionally specify what type of
+widget that should be.
+
+The intent here is that you specify that the image can only be in,
+say, a canvas window. Since a given image "instance" can only be
+displayed in one canvas window (as far as Tk is concerned), you can
+use the scrolling offsets of the canvas to implement intelligent
+scrolling. It is still possible to display an image in multiple
+widgets, but this must be handled in the derived class (see RtdImage
+for an example).  The restriction comes about, because of the way Tk
+handles images in multiple widgets. Normally, if one changes size, the
+others do as well. This is not necessarily what you always want in an
+image processing application. You may want to have the same image at
+different sizes sharing the same data.
+
+This class does some of the abstract work for dealing with Tk
+images. It declares some of the static member functions that Tk calls
+for image handling (GetImage, DisplayImage, FreeImage and DeleteImage)
+and calls virtual member functions where necessary to handle the
+actual display of the image.
+
+This class also defines and implements the "configure" and "cget"
+image commands.  The derived class passes the TkImage constructor
+information about the configuration options (optionsPtr_ and
+configSpecsPtr_) for use in these subcommands. The derived class may
+still need to redefine the "configureImage" method inorder to handle
+certain options, but most of the work is done in this base class.
+
+INHERITANCE
+Note that each class in this class hierarchy defines the virtual
+method "call" to call a member member function, given the name of the
+Tcl subcommand.  The search starts in the derived class and if a
+method is not found there, its parent class is searched and so on.  In
+this way, each level in the class hierarchy can define Tcl
+subcommands (see TclCommand).
+
+MEMBER VARIABLES
+This class keeps track of the following information for the derived
+class:
+  o Tk image record (master_)
+  o Configuration options (optionsPtr_, configSpecsPtr_)
+  o Widget Reference count (only allowed to be 1) (refCount_)
+  o Tk window where image is displayed (tkwin_)
+  o X Display for window (display_)
+  o X Visual for window (visual_)
+  o Graphics Context (gc_)
+  o X Pixmap for drawing (not always used) (pm_)
+  o Width and Height of image (width_, height_)
+  o Width and Height of Pixmap (pixw_, pixh_)
+  o Allowed widget type for image (pclass_)
+  o Update pending flag (to force image update) (update_pending_)
+  o Initialization flag (set after first create/config) (initialized_)
+
+METHODS
+This class also defines the following methods for use by the derived
+class:
+
+virtual int initImage(int argc, char* argv[])
+	Do first time image configuration.  This procedure needs to be
+	called from the derived class constructor to complete the
+	image initialization. This can't be done in the constructor
+	here since the options_ struct wouldn't be initialized yet.
+
+virtual void imageChanged()
+	This method should be called when the image has changed and
+	should be redrawn eventually.
+
+int setImageSize(int width, int height, int use_pixmap, int pixw, int pixh)
+	Set the image dimensions to the given width and height and if
+	use_pixmap is 1, create or update a pixmap to have the same
+	dimensions.
+
+void updateIdleTasks()
+	Utility method: equivalent of Tk "update idletasks" command.
+	Process all pending display events.
+
+
+SEE ALSO
+TclCommand, RtdImage(3C++), image
+
+-------------------------------------------------------------------------
+

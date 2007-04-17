@@ -1,0 +1,63 @@
+# E.S.O. - VLT project 
+#
+# "@(#) $Id: RtdRemote.man3,v 1.1.1.1 2006/01/12 16:37:16 abrighto Exp $" 
+#
+# This file is processed by the ESO/VLT docDoManPages command to
+# produce a man page in nroff, TeX and MIF formats. 
+# See docDoManPages(1) for a description of the input format.
+# 
+# who             when       what
+# --------------  ---------  ----------------------------------------
+# Allan Brighton  10 Apr 96  Created
+
+NAME
+RtdRemote - C++ class supporting remote access to an rtdimage
+
+SYNOPSIS
+#include "RtdRemote.h"
+
+class RtdRemote {
+...
+public:
+    RtdRemote(Tcl_Interp*, int port, int verbose);
+    virtual ~RtdRemote();
+
+    static void fileEventProc(ClientData, int mask);
+    static void clientEventProc(ClientData, int mask);
+
+    int status() {return status_;}};
+
+DESCRIPTION
+This class is used internally (through subclassing) by the RtdImage
+C++ class to support remote access via a socket interface. See 
+rtdRemote for a description of that interface.
+
+When a remote process wants access a running rtdimage application,
+rtdimage commands are sent via the socket interface. A subclass of
+this class defines the "call" virtual method to determine the correct
+method to call for each message. In this case, RtdImage defines a
+local class that is a subclass of RtdRemote and passes the "call"
+method on to its own "call" method that it uses for image subcommands.
+
+This class keeps a table of client connections (there could be
+multiple connections at once, although this is probably not the norm).
+For each client, there is a socket connection used to send commands
+and receive results and an additional socket connection used for
+callbacks.
+
+A socket message contains the length of the command (as a binary int
+in network byte order), a one byte flag indicating whether the answer
+should be immediate or via the callback socket and finally the
+contents of the command.
+
+EXTENDING THE COMMAND SET
+There are a number of ways to extend the available commands for the
+remote interface. One is through subclassing of class RtdImage at the
+C++ level (and extending the "call" method). Another way is by adding
+a command to the rtdimage Tcl interface to allow for a Tcl command to
+be evaluated for any "unknown" remote commands.
+
+	
+SEE ALSO
+RtdImage, rtdRemote
+-----------------------------------------------------------------------

@@ -1,0 +1,285 @@
+# E.S.O. - VLT project/ESO Archive
+# $Id: TabTable.man3,v 1.1.1.1 2006/01/12 16:36:07 abrighto Exp $
+#
+# This file is processed by the ESO/VLT docDoManPages command to
+# produce a man page in nroff, TeX and MIF formats. 
+# See docDoManPages(1) for a description of the input format.
+# 
+# who             when       what
+# --------------  ---------  ----------------------------------------
+# Allan Brighton  27 Jun 96  Created
+#
+
+NAME
+TabTable - Class for managing a tab separated table of values
+
+SYNOPSIS
+#include "TabTable.h"
+class TabTable {
+...
+public:
+    // constants 
+    enum {MAX_ROW_SIZE=8*1024};	 // max size of a tab table row
+    enum {MAX_HEADER_SIZE=1024}; // max size of a tab table heading
+    enum {MAX_COLUMNS=255};	 // max number of table columns
+
+public:
+    TabTable(char sep = '\t');
+    TabTable(const char* buf, int maxRows = 0, char sep = '\t');
+    TabTable(int numCols, char** colNames, const char* buf, 
+             int maxRows = 0, char sep = '\t');
+    virtual ~TabTable();
+    
+    virtual int clear();
+
+    virtual int init(const char* buf, int maxRows = 0);
+    virtual int init(int numCols, char** colNames, const char* buf, 
+                     int maxRows = 0);
+
+    virtual int get(int row, int col, char*& value);
+    virtual int get(int row, int col, int& value);
+    virtual int get(int row, int col, double& value);
+    virtual int get(int row, int col, float& value);
+    virtual int get(int row, int col, short& value);
+    virtual int get(int row, int col, char& value);
+
+    virtual int get(int row, const char* colName, char*& value);
+    virtual int get(int row, const char* colName, int& value);
+    virtual int get(int row, const char* colName, double& value);
+    virtual int get(int row, const char* colName, float& value);
+    virtual int get(int row, const char* colName, short& value);
+    virtual int get(int row, const char* colName, char& value);
+
+    virtual int colIndex(const char* colName)  const;
+    virtual const char* colName(int col)  const;
+    virtual int hasCol(const char* name)  const;
+
+    static int head(const char* filename, TabTable&);
+    static int head(istream&, TabTable&);
+
+    virtual int compareHeadings(const TabTable& t);
+
+    virtual int save(const char* filename);
+    virtual int save(ostream&);
+
+    virtual int append(const char* filename);
+    virtual int remove(const char* filename);
+
+    virtual int findRow(const char* tableRow);
+    virtual int printRows(ostream& os);
+    
+    virtual int search(const char* filename, int numSearchCols, 
+                       char** searchCols, 
+		       char** minValues, char** maxValues, 
+                       int maxRows); 
+
+    virtual int search(const char* filename, const char* searchCol, 
+                       const char* value, int maxRows);
+
+    virtual int search(const char* filename, int searchCol, 
+                       const char* value, int maxRows); 
+
+    friend ostream& operator<<(ostream& os, TabTable& t);
+    
+    virtual int numRows() const;
+    virtual void numRows(int n);
+    virtual int numCols() const;
+    virtual char** colNames() const;
+    virtual int status() const;
+};
+
+
+DESCRIPTION
+Class TabTable manages a buffer containing a table where the rows are
+separated by newlines and the columns by tabs (or other specified
+char).  The class provides transparent access to the table based on a
+row,column index and allows for type conversion from string to the
+desired type. Methods are also available to print the table and save
+it to a file.
+
+PUBLIC METHODS
+
+TabTable(char sep = '\t')
+	Constructor: initialize empty table.
+
+TabTable(const char* buf, int maxRows = 0, char sep = '\t')
+	Constructor: initialize table from buffer in tab table format: 
+
+	VAR	VALUE	VALUE	...
+	...
+	COL1	COL2	COL3	...	COLN
+	---		----	----	----
+	data	data	data		data
+	...
+
+	Currently, anything up to the column headings is ignored (This
+	may change later). The format is the same as the tab table
+	format used by starbase.  A line beginning with a "-"
+	separates the column names from the data and all column
+	headings and data are separated by tabs (or sep char).
+
+	The part preceding the column headings may be used later to
+	set certain variables pertaining to the table. In this case, a
+	variable may have one or more values, separated by tabs (sep
+	char).
+
+	If maxRows is nonzero, only upto that many rows are taken from
+	buf.
+
+TabTable(int numCols, char** colNames, const char* buf, int maxRows = 0, char sep = '\t')
+	Constructor: initialize table from data buffer without If
+	maxRows is nonzero, only upto that many rows are taken from
+	buf.  headings. The first two args specify the number column
+	headings and their names.
+
+~TabTable()
+	Destructor: free any allocated memory
+
+init(const char* buf, int maxRows = 0)
+	Fill the table from the given buffer in tab table format.  If
+	maxRows is nonzero, only upto that many rows are taken from
+	buf.
+
+init(int numCols, char** colNames, const char* buf, int maxRows = 0)
+	Fill the table from the given buffer in tab table format, with
+	headings specified separately.  The first two args specify the
+	number column headings and their names.  If maxRows is
+	nonzero, only upto that many rows are taken from buf.
+
+clear()
+	Make the table empty and free any resources used
+
+get(int row, int col, char*& value)
+get(int row, int col, int& value)
+get(int row, int col, double& value)
+get(int row, int col, float& value)
+get(int row, int col, short& value)
+get(int row, int col, char& value)
+	Get row,column values: the parameter "value" is set and 0 is
+	returned if there are no errors. Values of type char* point to
+	internal storage and should not be modified.
+
+get(int row, const char* colName, char*& value)
+get(int row, const char* colName, int& value)
+get(int row, const char* colName, double& value)
+get(int row, const char* colName, float& value)
+get(int row, const char* colName, short& value)
+get(int row, const char* colName, char& value)
+	Get table values by column name. Values of type char* point to
+	internal storage and should not be modified.
+
+colIndex(const char* colName)  const
+	Return the table column index for the given table column name.
+
+const char* colName(int col)  const
+	Return the column name for the given column index.
+
+hasCol(const char* name)  const
+	Return true if the table contains the given column. 
+
+static int head(const char* filename, TabTable&)
+static int head(istream&, TabTable&)
+ 	Read the heading info from the given stream and put it in the
+ 	given table.
+
+compareHeadings(const TabTable& t)
+	Compare headings in this table and the given one and return 0
+	if they are the same.
+
+save(const char* filename)
+save(ostream&)
+	Save the contents of this object to the given file as a tab
+	table.
+
+append(const char* filename)
+ 	Append the contents of this object to the given tab table file
+
+remove(const char* filename)
+ 	Remove rows in the tab table file that are also in this object.
+
+findRow(const char* tableRow)
+ 	Find a row matching the given tab separated one and return the
+ 	index.
+
+search(const char* filename, int numSearchCols, char** searchCols, 
+       char** minValues, char** maxValues, int maxRows)
+ 
+	Search the given tab table file for upto maxRows rows with
+	columns values matching the given arguments and fill this
+	table with the resulting rows.
+
+	Args:
+
+	filename          - tab table file to search
+	numSearchCols     - number of columns in argument arrays
+
+	searchCols        - names of the columns to compare
+
+	minValues         - min/max values for comparison
+	maxValues
+
+	maxRows           - max number of rows to find
+
+
+search(const char* filename, const char* searchCol, const char* value, 
+       int maxRows);
+
+	Search the given tab table file for upto maxRows rows where
+	the given column has the given value and fill this table with
+	the resulting rows.
+
+	Args:
+
+	filename         - tab table file to search
+
+	searchCol        - name of the column to compare
+
+	value            - value for comparison
+
+	maxRows          - max number of rows to find
+
+
+search(const char* filename, int searchCol, const char* value, 
+       int maxRows); 
+
+	Search the given tab table file for upto maxRows rows where
+	the given column has the given value and fill this table with
+	the resulting rows.
+
+	Args:
+
+	filename         - tab table file to search
+
+	searchCol        - index of the column to compare (0..n)
+
+	value            - value for comparison
+
+	maxRows          - max number of rows to find
+
+
+printRows(ostream& os)
+	Print the table rows to the given stream in tab table format.
+
+friend ostream& operator<<(ostream& os, TabTable& t)
+	Output operator, prints the table to the given stream in tab
+	table format.
+
+numRows() const
+	Return the number of rows in the table.
+
+void numRows(int n)
+	Set the number of rows in the table.
+
+numCols() const
+	Return the number of columns in the table.
+
+colNames() const
+	Return an array of column names in the table.
+
+status() const
+	Return the status after the constructor has completed.
+
+SEE ALSO
+
+QueryResult
+----------------------------------------------------------------------

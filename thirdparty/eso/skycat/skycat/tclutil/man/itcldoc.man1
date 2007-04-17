@@ -1,0 +1,44 @@
+# E.S.O. - VLT project 
+#
+# "@(#) $Id: itcldoc.man1,v 1.1.1.1 2006/01/12 16:40:32 abrighto Exp $" 
+#
+# This file is processed by the ESO/VLT docDoManPages command to
+# produce a man page in nroff, TeX and MIF formats. 
+# See docDoManPages(1) for a description of the input format.
+# 
+# who             when       what
+# --------------  ---------  ----------------------------------------
+# Allan Brighton  12 Jan 98  Created
+
+
+NAME
+itcldoc - script to extract man pages from itcl class source files
+
+SYNOPSIS
+itcldoc ?filenames?
+
+DESCRIPTION
+Itcldoc is a tcl script used to extract man pages from itcl class
+source files.  The itcldoc script assumes a certain style of coding,
+but does not require any special hints otherwise. It assumes comments
+precede each declaration in comment blocks. The script splits an itcl
+file into a Tcl list. It first filters the comments to make them list
+elements.  It then looks for declaration keywords in the list: class,
+method, proc, itk_option, public, protected,... and sorts and
+documents them based on the comments in the code preceding the
+declarations.
+
+In addition, each source file should have a comment header containing
+a line in the format:
+
+# filename.tcl - short description
+
+It is assumed that each file given defines one itcl class.
+
+This script is only used for itcl files defining an itcl class. By
+convention itcl classes start with an upper case letter and the file
+names for files that contain classes should have the same name with a
+".tcl" extension.
+
+See the source files and man pages in this package for examples.
+-----------------------------------------------------------------------------

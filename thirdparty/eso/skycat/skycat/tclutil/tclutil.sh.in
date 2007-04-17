@@ -1,0 +1,23 @@
+#!/bin/sh
+#
+# E.S.O. - VLT project
+#
+# "@(#) $Id: tclutil.sh.in,v 1.2 2006/01/21 01:06:54 abrighto Exp $" 
+#
+# Startup script for Tcl/Tk applications.
+#
+#  who      when     what
+# -------- -------- ------------------
+# abrighto 11/10/95 created 
+# abrighto 26/11/97 modified to use astrotcl and tclutil pkgs
+# pbiereic 05/08/99 to be used with the appended tcl file (see Makefile)
+# abrighto 20/12/05 rewrote and moved here from demos dir
+
+# Make sure the shared libraries can be found
+@LD_LIBRARY_PATH_VAR@="@exec_prefix@/lib:@BLT_LIB_DIR@:${@LD_LIBRARY_PATH_VAR@}"
+export @LD_LIBRARY_PATH_VAR@
+
+TCLLIBPATH="@exec_prefix@/lib"
+export TCLLIBPATH
+
+exec @WISH_PROG@ "$@"

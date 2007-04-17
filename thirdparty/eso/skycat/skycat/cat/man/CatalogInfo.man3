@@ -1,0 +1,105 @@
+# E.S.O. - VLT project/ESO Archive
+# $Id: CatalogInfo.man3,v 1.1.1.1 2006/01/12 16:36:07 abrighto Exp $
+#
+# This file is processed by the ESO/VLT docDoManPages command to
+# produce a man page in nroff, TeX and MIF formats. 
+# See docDoManPages(1) for a description of the input format.
+# 
+# who             when       what
+# --------------  ---------  ----------------------------------------
+# Allan Brighton  07 Nov 97  Created
+#
+
+NAME
+CatalogInfo - C++ class managing access to catalog configuration files
+
+SYNOPSIS
+#include "CatalogInfo.h"
+
+class CatalogInfo {
+...
+public:
+    CatalogInfo();
+
+    static int load();
+    static int reload();
+    static CatalogInfoEntry* load(istream&, const char* filename = "internal");
+    static int load(CatalogInfoEntry*);
+    static CatalogInfoEntry* lookup(const char* catalogName);
+    static CatalogInfoEntry* lookup(CatalogInfoEntry* entry, const char* name);
+    static CatalogInfoEntry* lookupFile(const char* catalogFileName);
+    static void updateConfigEntry(istream& is, CatalogInfoEntry* entry);
+    static int append(CatalogInfoEntry* e);
+    static int remove(CatalogInfoEntry* e);
+    static CatalogInfoEntry* first();
+    static CatalogInfoEntry* root();
+};
+
+DESCRIPTION
+This class is used to load, edit, access and save catalog config files
+either locally or via HTTP from a remote host. Config files are
+referenced by a URL. This may be either http:/host/file for remote
+config files or file:/pathname for local files. This is a static
+class, since all of the information is meant to be globally
+available. The most common method called is "lookup", which returns a
+pointer to the catalog entry for a given catalog name.
+
+The default config file is loaded automatically the first time it is 
+needed. There is a hard coded default URL that points to ESO's master
+config file. The environment variable CATLIB_CONFIG 
+
+
+METHODS
+CatalogInfo()
+	Constructor. Note that this is a static class (all methods are
+	static), so no instances are required.
+
+load()
+	Load the default catalog config file (called automatically).
+
+reload()
+	Reload the default catalog config file after it has been
+	edited by hand.
+
+load(istream, filename)
+	Load a config file info from the given stream (filename is
+	used for error reporting).
+
+load(entry)
+	Load the catalog config file given by the entry's URL field.
+	This is used for directory entries, to follow a catalog
+	directory link.
+
+lookup(catalogName)
+	Return a pointer to the catalog config file entry for the
+	given catalog.
+
+lookup(entry, name)
+	Look up the catalog name as above, but start the search
+	with the given directory entry rather than at the root.
+
+lookupFile(catalogFileName)
+	Get the config entry for a local catalog from the header
+
+updateConfigEntry(istream, entry)
+	Read catalog config keyword entries from the given stream and
+	update the given entry values.
+
+append(entry)
+	Append the given entry to the end of the main catalog list.
+
+remove(entry)
+	Remove the given entry from the main catalog list.
+
+first()
+	Return a pointer to the first config file entry under the root
+	entry.
+
+root()
+	Return a pointer to the root config file entry.
+
+SEE ALSO
+CatalogInfoEntry, AstroCatalog(3C++), 
+Catalog Library (Overview, part of Frame doc)
+----------------------------------------------------------------------
+

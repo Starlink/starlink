@@ -1,0 +1,164 @@
+# E.S.O. - VLT project/ESO Archive
+# $Id: WorldCoords.man3,v 1.1.1.1 2006/01/12 16:42:42 abrighto Exp $
+#
+# This file is processed by the ESO/VLT docDoManPages command to
+# produce a man page in nroff, TeX and MIF formats. 
+# See docDoManPages(1) for a description of the input format.
+# 
+# who             when       what
+# --------------  ---------  ----------------------------------------
+# Allan Brighton  16 Oct 95  Created
+#
+
+NAME
+WorldCoords - C++ class for working with world coordinates
+
+SYNOPSIS
+#include "WorldCoords.h"
+
+class WorldCoords {
+...
+public:
+    WorldCoords();
+    WorldCoords(const HMS& ra, const HMS& dec, 
+		double equinox = 2000.0);
+
+    WorldCoords(double ra_deg, double dec_deg, 
+		double equinox = 2000.0);
+
+    WorldCoords(int rh, int rm, double rs, 
+	        int dd, int dm, float ds,
+		double equinox = 2000.0);
+    
+    WorldCoords(const char* ra_str, const char* dec_str, 
+		double equinox = 2000.0);
+
+    isNull() const;
+    void setNull();
+    
+    void print(char* ra_buf, char* dec_buf, double equinox = 2000.0);
+
+    friend istream& operator>>(istream&, WorldCoords& pos);
+    friend ostream& operator<<(ostream&, const WorldCoords& pos);
+    
+    friend int operator==(const WorldCoords& a, const WorldCoords& b);
+    friend int operator!=(const WorldCoords& a, const WorldCoords& b);
+
+    friend WorldCoords operator-(const WorldCoords& a, const WorldCoords& b);
+    
+    const HMS& ra() const;
+    const HMS& dec() const;
+    
+    int status();
+};
+
+DESCRIPTION
+This class is used to represent world coordinates and to convert
+between different representations of world coordinates. The member
+variables in the class are always kept internally in both H:M:S format
+and as floating point values in the default equinox J2000.
+
+For example, for a given WorldCoords object "pos", the coordinates in
+H:M:S[+-]D:M:S format are given by: 
+
+	(pos.ra(), pos.dec()) 
+
+ra() and dec() both return a reference to an HMS object, which is used
+to represent values in hours, minutes and seconds (see HMS). The
+coordinates in decimal degrees are given by
+
+	(pos.ra().val()*15, pos.dec().val()).
+
+The ra value must be multiplied by 15 to convert from hours to degrees.
+
+CONSTRUCTORS
+WorldCoords()
+        Initialize null world coordinates.
+	(Null coordinates are useful in some cases where you have an
+	optional second position for an area instead of a single
+	point).
+
+WorldCoords(ra, dec, equinox)
+        Initialize the world coordinates from RA, DEC in H:M:S D:M:S
+	format.
+	Arguments:
+		ra      (in)     - RA in H:M:S
+		dec     (in)     - DEC in D:M:S
+		equinox (in)     - optional epoch (2000.0, 1950.0, ...)
+
+WorldCoords(rh, rm, rs, dd, dm, ds, equinox)
+        Initialize the world coordinates from H M S D M S as separate
+        values.
+
+	Arguments:
+		rh      (in)     - RA hours
+		rm      (in)     - RA minutes
+		rs      (in)     - RA seconds
+		dd      (in)     - DEC degrees
+		dm      (in)     - DEC minutes
+		ds      (in)     - DEC seconds
+		equinox (in)     - optional epoch (2000.0, 1950.0, ...)
+
+WorldCoords(ra_deg, dec_deg, equinox)
+        Initialize the world coordinates from RA, DEC in degrees in
+        floating point format.
+	Arguments:
+		ra      (in)     - right ascension
+		dec     (in)     - declination
+		equinox (in)     - epoch (2000.0, 1950.0, ...)
+
+WorldCoords(ra_str, dec_str, equinox);
+	Initialize the world coordinates from RA and DEC in string
+	format. Allowed formats of input strings:
+
+		hh mm ss.s +/-dd mm ss.s 
+		hh:mm:ss.s +/-dd:mm:ss.s 
+		h.hhhh +/-d.dddd
+
+	Arguments:
+		ra      (in)     - String containing right ascension 
+		dec     (in)     - String containing declination
+		equinox (in)     - epoch (2000.0, 1950.0, ...)
+
+METHODS
+isNull()
+        Return true if the given coords are null (this is true if they
+	were created with the default constructor - i.e.: with no
+	arguments).
+
+setNull()
+	Set to the null value.
+
+print(ra_buf, dec_buf, equinox)
+	Print the coordinates in the given buffers in H:M:S format in
+	given equinox.
+
+operator>>(istream, pos)
+	Input operator: format: H:M:S[+-]D:M:S - reads the position
+	from the given istream.
+
+operator<<(ostream, pos)
+	Output operator: format: H:M:S[+-]D:M:S - writes the position
+	to the given ostream.
+
+operator==(pos1, pos2)
+operator!=(pos1, pos2)
+	Comparison operators - check for equality/inequality.
+
+ra()
+	Return the RA part of the coordinates (class HMS). ra().val()*15
+	is the value in degrees, ra.hours(), ra().min() and ra().sec()
+	give the H:M:S values.
+dec()
+   	Return the DEC part of the coordinates (class
+	HMS). dec().val() is the value in degrees, dec.hours(),
+	dec().min() and dec().sec() give the H:M:S values.
+ 
+status()
+	Return the status after the constructor is done (0 is OK, 1
+	for errors).
+
+SEE ALSO
+HMS
+----------------------------------------------------------------------
+
