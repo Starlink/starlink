@@ -4,7 +4,7 @@
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: CompoundImageData.h,v 1.3 2005/02/02 01:43:03 brighton Exp $" 
+ * "@(#) $Id: CompoundImageData.h,v 1.1.1.1 2006/01/12 16:38:29 abrighto Exp $" 
  *
  * CompoundImageData.h - class definitions for class CompoundImageData
  *
@@ -125,7 +125,7 @@ public:
 
 
     // The methods below access the actual image data and are normally implemented
-    // in ImageTemplates.C. Here we need to define the methods to access the
+    // in ImageTemplates.icc. Here we need to define the methods to access the
     // correct image extensions, based on the visible area, or requested area
     // of the image.
 

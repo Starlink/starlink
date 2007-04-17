@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: ITTInfo.C,v 1.5 2005/02/02 01:43:03 brighton Exp $"
+ * "@(#) $Id: ITTInfo.C,v 1.1.1.1 2006/01/12 16:39:23 abrighto Exp $"
  *
  * ITTInfo.C - member routines for class ITTInfo
  * 
@@ -13,7 +13,7 @@
  *                           (makes last colour pure).
  * pbiereic        17/02/03  Added 'using namespace std'. Removed ::std specs.
  */
-static const char* const rcsId="@(#) $Id: ITTInfo.C,v 1.5 2005/02/02 01:43:03 brighton Exp $";
+static const char* const rcsId="@(#) $Id: ITTInfo.C,v 1.1.1.1 2006/01/12 16:39:23 abrighto Exp $";
 
 
 using namespace std;
@@ -28,6 +28,9 @@ using namespace std;
 #include "ITTInfo.h"
 #include "error.h"
 #include "util.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include "define.h"
 
 // list of itts, used for cache
