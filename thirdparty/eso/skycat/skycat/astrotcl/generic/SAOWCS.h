@@ -4,7 +4,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: SAOWCS.h,v 1.2 2005/02/02 01:43:04 brighton Exp $" 
+ * "@(#) $Id: SAOWCS.h,v 1.1.1.1 2006/01/12 16:44:01 abrighto Exp $" 
  *
  * SAOWCS.h - declarations for class SAOWCS, an implementation class for
  *            class WCS, which is a reference counted class that manages
@@ -24,8 +24,8 @@
  */
 
 
-#include "WCS.hxx"
-#include "WorldCoords.hxx"
+#include "WCSRep.h"
+#include "WorldCoords.h"
 #include "wcs.h"
 
 /* 

@@ -3,14 +3,8 @@
 
 /*  The FITSIO software was written by William Pence at the High Energy    */
 /*  Astrophysic Science Archive Research Center (HEASARC) at the NASA      */
-/*  Goddard Space Flight Center.  Users shall not, without prior written   */
-/*  permission of the U.S. Government,  establish a claim to statutory     */
-/*  copyright.  The Government and others acting on its behalf, shall have */
-/*  a royalty-free, non-exclusive, irrevocable,  worldwide license for     */
-/*  Government purposes to publish, distribute, translate, copy, exhibit,  */
-/*  and perform such material.                                             */
+/*  Goddard Space Flight Center.                                           */
 
-#include <stdio.h>
 #include <string.h>
 #include "fitsio2.h"
 /*--------------------------------------------------------------------------*/
@@ -68,6 +62,14 @@ int ffpscl(fitsfile *fptr,      /* I - FITS file pointer               */
     if (hdutype != IMAGE_HDU)
         return(*status = NOT_IMAGE);         /* not proper HDU type */
 
+    if (fits_is_compressed_image(fptr, status)) /* compressed images */
+    {
+        (fptr->Fptr)->cn_bscale = scale;
+        (fptr->Fptr)->cn_bzero  = zero;
+
+        return(*status);
+    }
+
     /* set pointer to the first 'column' (contains group parameters if any) */
     colptr = (fptr->Fptr)->tableptr; 
 
@@ -80,7 +82,7 @@ int ffpscl(fitsfile *fptr,      /* I - FITS file pointer               */
 }
 /*--------------------------------------------------------------------------*/
 int ffpnul(fitsfile *fptr,      /* I - FITS file pointer                */
-           long nulvalue,       /* I - null pixel value: value of BLANK */
+           LONGLONG nulvalue,   /* I - null pixel value: value of BLANK */
            int *status)         /* IO - error status                    */
 /*
   Define the value used to represent undefined pixels in the primary array or
@@ -104,6 +106,9 @@ int ffpnul(fitsfile *fptr,      /* I - FITS file pointer                */
 
     if (hdutype != IMAGE_HDU)
         return(*status = NOT_IMAGE);         /* not proper HDU type */
+
+    if (fits_is_compressed_image(fptr, status)) /* ignore compressed images */
+        return(*status);
 
     /* set pointer to the first 'column' (contains group parameters if any) */
     colptr = (fptr->Fptr)->tableptr; 
@@ -156,7 +161,7 @@ int fftscl(fitsfile *fptr,      /* I - FITS file pointer */
 /*--------------------------------------------------------------------------*/
 int fftnul(fitsfile *fptr,      /* I - FITS file pointer                  */
            int colnum,          /* I - column number to apply nulvalue to */
-           long nulvalue,       /* I - null pixel value: value of TNULLn  */
+           LONGLONG nulvalue,   /* I - null pixel value: value of TNULLn  */
            int *status)         /* IO - error status                      */
 /*
   Define the value used to represent undefined pixels in the BINTABLE column.

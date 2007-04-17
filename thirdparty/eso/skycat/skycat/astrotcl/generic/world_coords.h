@@ -3,9 +3,9 @@
 
 /*
  * E.S.O. - VLT project 
- * $Id: worldCoords.h,v 1.2 2005/02/02 01:43:04 brighton Exp $
+ * $Id: world_coords.h,v 1.1.1.1 2006/01/12 16:43:52 abrighto Exp $
  *
- * worldCoords.h - C interface to C++ class WorldCoords
+ * world_coords.h - C interface to C++ class WorldCoords
  *
  * (Note: C applications must have at least a dummy C++ main and link
  * with C++)
@@ -15,6 +15,8 @@
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  05/10/95  Created
+ *                 02/01/06  Renamed worldCoords.h to world_coords.h to
+ *                           avoid name conflict on file systems that ignore case
  */
 
 

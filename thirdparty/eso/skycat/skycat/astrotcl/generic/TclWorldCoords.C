@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/Archive
- * $Id: TclWorldCoords.C,v 1.7 2005/02/02 01:43:04 brighton Exp $
+ * $Id: TclWorldCoords.C,v 1.1.1.1 2006/01/12 16:44:02 abrighto Exp $
  *
  * TclWorldCoords.C - method definitions for class TclWorldCoords
  *                    (Tcl interface to the WorldCoords class)
@@ -12,20 +12,21 @@
  * Allan Brighton  09 Nov 95  Created
  * pbiereic        17/02/03  Added 'using namespace std'. Removed ::std specs.
  */
-static const char* const rcsId="@(#) $Id: TclWorldCoords.C,v 1.7 2005/02/02 01:43:04 brighton Exp $";
+static const char* const rcsId="@(#) $Id: TclWorldCoords.C,v 1.1.1.1 2006/01/12 16:44:02 abrighto Exp $";
 
-#include "config.h"  // tclutil
 
+using namespace std;
 #include <cstdio>
 #include <cstring>
 #include <iostream>
 #include <cstdlib>
 #include <sstream>
+#ifdef HAVE_CONFIG_H
 #include "config.h"
-#include "WorldCoords.hxx"
+#endif
+#include "WorldCoords.h"
 #include "TclWorldCoords.h"
 
-using namespace std;
 
 /* 
  * declare a table of tcl subcommands

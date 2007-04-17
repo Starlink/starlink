@@ -14,21 +14,41 @@ BUILDING CFITSIO
 The CFITSIO code is contained in about 40 *.c source files and several *.h
 header files.  The CFITSIO library is built on Unix systems by typing:
 
->  ./configure
->  make
+ >  ./configure [--prefix=/target/installation/path]
+ >  make          (or  'make shared')
+ >  make install  (this step is optional)
 
-at the operating system prompt.  The 'configure' command customizes
-the Makefile for your particular system, then the 'make' command
-builds the library.
+at the operating system prompt.  The configure command customizes the
+Makefile for the particular system, then the `make' command compiles the
+source files and builds the library.  Type `./configure' and not simply
+`configure' to ensure that the configure script in the current directory
+is run and not some other system-wide configure script.  The optional
+'prefix' argument to configure gives the path to the directory where
+the CFITSIO library and include files should be installed via the later
+'make install' command. For example,
 
-On VAX/VMS and ALPHA/VMS systems, the make.com command file may be used
-to build the cfitsio.olb object library.  Execute this command file by
-typing '@make' on the command line.
+   > ./configure --prefix=/usr1/local
 
-On DOS-based PC computers, the makepc.bat file gives an example of how
-to build the CFITSIO library.  This file will probably need to be
-editted to include the appropriate command switches if a different C
-compiler or linker is used.
+will cause the 'make install' command to copy the CFITSIO libcfitsio file 
+to /usr1/local/lib and the necessary include files to /usr1/local/include
+(assuming of course that the  process has permission to write to these 
+directories).
+
+On VAX/VMS and ALPHA/VMS systems the make.com command file may be used
+to build the cfitsio.olb object library using the default G-floating
+point option for double variables.  The make\_dfloat.com and make\_ieee.com
+files may be used instead to build the library with the other floating
+point options.
+
+A precompiled DLL version of CFITSIO is available for IBM-PC users of
+the Borland or Microsoft Visual C++ compilers in the files
+cfitsiodll_2xxx_borland.zip and cfitsiodll_2xxx_vcc.zip, where '2xxx'
+represents the current release number.  These zip archives also
+contains other files and instructions on how to use the CFITSIO DLL
+library. The CFITSIO library may also be built from the source code
+using the makefile.bc or makefile.vcc  files.  Finally, the makepc.bat
+file gives an example of  building CFITSIO with the Borland C++ v4.5
+compiler using simpler DOS commands.
 
 On OS/2 systems, CFITSIO can be built using the supplied makefile by
 typing 'make -f makefile.os2'.  This makefile requires the GCC compiler
@@ -37,14 +57,15 @@ containing OS/2 software, such as
 ftp-os2.nmsu.edu/pub/os2/dev/emx/v0.9c and
 ftp.leo.org/pub/comp/os/os2/leo/devtools/emx+gcc.
 
-The MacOS version of the cfitsio library can be built by (1) un binhex
-and unstuff cfitsio_mac.sit.hqx, (2) put CFitsioPPC.mcp in the cfitsio
-directory, and (3) load CFitsioPPC.mcp into CodeWarrior Pro 2 and
-make.  This builds the cfitsio library for PPC.  There are also targets
-for both the test program and the speed test program.
+When building on Mac OS-X, users should follow the Unix instructions,
+above. Previous MacOS versions of the cfitsio library can be built by
+(1) un binhex and unstuff cfitsio_mac.sit.hqx, (2) put CFitsioPPC.mcp
+in the cfitsio directory, and (3) load CFitsioPPC.mcp into CodeWarrior
+Pro 5 and make.  This builds the cfitsio library for PPC.  There are
+also targets for both the test program and the speed test program.
 
 To use the MacOS port you can add Cfitsio PPC.lib to your Codewarrior
-Pro 2 project.  Note that this only has been tested for the PPC and
+Pro 5 project.  Note that this only has been tested for the PPC and
 probably won't work
  on 68k macs.
 
@@ -96,17 +117,25 @@ CFITSIO has currently been tested on the following platforms:
 
    Operating System          Compiler
    ----------------          --------
+  OPERATING SYSTEM           COMPILER
    Sun OS                     gcc and cc (3.0.1)
    Sun Solaris                gcc and cc
    Silicon Graphics IRIX      gcc and cc
+   Silicon Graphics IRIX64    MIPS
+   Dec Alpha OSF/1            gcc and cc
    DECstation  Ultrix         gcc
-   Dec Alpha OSF/1            gcc
-   Dec Alpha OpenVMS          cc with /float=gfloat or /float=ieee options
+   Dec Alpha OpenVMS          cc 
    DEC VAX/VMS                gcc and cc
-   Linux running on IBM PC    gcc
-   IBM PC w/ Windows 95       Borland C++ V4.5
-   IBM PC w/ OS/2             gcc + EMX
-   MacOS 7.1 or greater       Metrowerks 10.+
+   HP-UX                      gcc
+   IBM AIX                    gcc
+   Linux                      gcc
+   MkLinux                    DR3
+   Windows 95/98/NT           Borland C++ V4.5
+   Windows 95/98/NT/ME/XP     Microsoft/Compaq Visual C++ v5.0, v6.0
+   Windows 95/98/NT           Cygwin gcc
+   OS/2                       gcc + EMX
+   Mac OS 7.1 or greater      Metrowerks 10.+
+   Mac OS-X 10.1 or greater   cc (gcc)
 
 CFITSIO will probably run on most other Unix platforms without
 modification.  Cray supercomputers and IBM mainframe computers are

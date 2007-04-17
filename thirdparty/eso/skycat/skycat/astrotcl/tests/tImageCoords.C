@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * $Id: tImageCoords.C,v 1.4 2005/02/02 01:43:03 brighton Exp $
+ * $Id: tImageCoords.C,v 1.1.1.1 2006/01/12 16:42:57 abrighto Exp $
  *
  * tImageCoords.C - test cases for class ImageCoords
  * 

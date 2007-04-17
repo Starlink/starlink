@@ -1,10 +1,38 @@
-/* fitshead.h  FITS header access subroutines
- * March 27, 2000
- * By Doug Mink, Harvard-Smithsonian Center for Astrophysics
+/*** File fitshead.h  FITS header access subroutines
+ *** August 30, 2004
+ *** By Doug Mink, dmink@cfa.harvard.edu
+ *** Harvard-Smithsonian Center for Astrophysics
+ *** Copyright (C) 1996-2004
+ *** Smithsonian Astrophysical Observatory, Cambridge, MA, USA
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+    
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+    Correspondence concerning WCSTools should be addressed as follows:
+           Internet email: dmink@cfa.harvard.edu
+           Postal address: Doug Mink
+                           Smithsonian Astrophysical Observatory
+                           60 Garden St.
+                           Cambridge, MA 02138 USA
  */
+
+/* Declarations for subroutines in hget.c, hput.c, and iget.c */
 
 #ifndef _fitshead_h_
 #define _fitshead_h_
+
+#include <sys/types.h>
 
 #ifdef __cplusplus /* C++ prototypes */
 extern "C" {
@@ -14,6 +42,11 @@ extern "C" {
 	const char* hstring,	/* FITS header string */
 	const char* keyword,	/* FITS keyword */
 	short* val);		/* short integer value (returned) */
+    int hgeti4c(		/* Extract int value from FITS header */
+	const char* hstring,	/* FITS header string */
+	const char* keyword,	/* FITS keyword */
+	const char mchar,	/* WCS to use */
+	int* val);		/* integer value (returned) */
     int hgeti4(			/* Extract int value from FITS header */
 	const char* hstring,	/* FITS header string */
 	const char* keyword,	/* FITS keyword */
@@ -22,6 +55,11 @@ extern "C" {
 	const char* hstring,	/* FITS header string */
 	const char* keyword,	/* FITS keyword */
 	float* val);		/* float value (returned) */
+    int hgetr8c(			/* Extract double value from FITS header */
+	const char* hstring,	/* FITS header string */
+	const char* keyword,	/* FITS keyword */
+	const char mchar,	/* WCS to use */
+	double* val);		/* double value (returned) */
     int hgetr8(			/* Extract double value from FITS header */
 	const char* hstring,	/* FITS header string */
 	const char* keyword,	/* FITS keyword */
@@ -42,6 +80,12 @@ extern "C" {
 	const char* hstring,	/* FITS header string */
 	const char* keyword,	/* FITS keyword */
 	int* lval);		/* 1 if T, 0 if F (returned) */
+    int hgetsc(			/* Extract string value from FITS header */
+	const char* hstring,	/* FITS header string */
+	const char* keyword,	/* FITS keyword */
+	const char mchar,	/* WCS to use */
+	const int lstr,		/* maximum length of returned string */
+	char* string);		/* null-terminated string value (returned) */
     int hgets(			/* Extract string value from FITS header */
 	const char* hstring,	/* FITS header string */
 	const char* keyword,	/* FITS keyword */
@@ -76,6 +120,14 @@ extern "C" {
 	const char* s2,		/* String to look for */
 	const int ls1);		/* Length of string being searched */
 
+    char *strcsrch (		/* Find string s2 within string s1 (no case) */
+	const char* s1,		/* String to search */
+	const char* s2);	/* String to look for */
+    char *strncsrch (		/* Find string s2 within string s1 (no case) */
+	const char* s1,		/* String to search */
+	const char* s2,		/* String to look for */
+	const int ls1);		/* Length of string being searched */
+
     int hlength(		/* Set length of unterminated FITS header */
         char    *header,        /* FITS header */
         const int lhead);	/* Allocated length of FITS header */
@@ -91,12 +143,14 @@ extern "C" {
 	const char* string);	/* Character string which may be a number */
     int notnum(			/* Return 0 if number, else 1 */
 	const char* string);	/* Character string which may be a number */
+    int numdec(			/* Return number of decimal places in number */
+	const char* string);	/* Character string which may be a number */
 
     char *getltime();		/* Return current local time in ISO format */
     char *getutime();		/* Return current UT as an ISO-format string */
 
 /* Subroutines in iget.c */
-    int mgets(			/* Extract string from multiline FITS keyword */
+    int mgetstr(		/* Extract string from multiline FITS keyword */
 	const char* hstring,	/* FITS header string */
 	const char* mkey,	/* FITS keyword root _n added for extra lines */
 	const char* keyword,	/* IRAF keyword */
@@ -129,6 +183,9 @@ extern "C" {
 	const char* keyword,	/* IRAF keyword */
 	const int lstr,		/* maximum length of returned string */
 	char* string);		/* null-terminated string value (returned) */
+    char *igetc(		/* Extract string from IRAF keyword string */
+	const char* hstring,	/* Multiline IRAF keyword string value */
+	const char* keyword);	/* IRAF keyword */
 
 /* Subroutines in hput.c */
 /* All hput* routines return 0 if successful, else -1 */
@@ -213,21 +270,26 @@ extern "C" {
         const double  num,	/* Number */
 	const int field,	/* Total field size in characters */
         const int ndec);	/* Number of decimal places */
+    void setheadshrink(		/* 0 to keep blank line when keyword deleted */
+	const int hsh);		/* 1 to shrink  header by one line */
 };
 #else /* __cplusplus */
 
 /* Subroutines in hget.c */
 
 /* Extract a value from a FITS header for given keyword */
-extern int hgeti4();	/* int */
+extern int hgeti4();	/* int (Multiple WCS) */
+extern int hgeti4c();	/* int */
 extern int hgeti2();	/* short */
 extern int hgetr4();	/* float */
 extern int hgetr8();	/* double */
+extern int hgetr8c();	/* double (Multiple WCS) */
 extern int hgetra();	/* Right ascension in degrees from string */
 extern int hgetdec();	/* Declination in degrees from string */
 extern int hgetdate();	/* Date in years from FITS date string */
 extern int hgetl();	/* T->1, F->0 from FITS logical entry */
 extern int hgets();	/* Previously allocated string */
+extern int hgetsc();	/* Previously allocated string (Multiple WCS) */
 extern int hgetm();	/* Previously allocated string from multiple keywords */
 extern char *hgetc();	/* Return pointer to string */
 extern int hgetndec();	/* Number of decimal places in keyword value */
@@ -239,6 +301,7 @@ extern double str2dec();
 /* Check to see whether a string is a number or not */
 extern int isnum();
 extern int notnum();
+extern int decnum();
 
 /* Find given keyword entry in FITS header */
 extern char *ksearch();
@@ -249,6 +312,8 @@ extern char *blsearch();
 /* Search for substring s2 within string s1 */
 extern char *strsrch ();	/* s1 null-terminated */
 extern char *strnsrch ();	/* s1 ls1 characters long */
+extern char *strcsrch ();	/* s1 null-terminated (case-insensitive) */
+extern char *strncsrch ();	/* s1 ls1 characters long (case-insensitive) */
 
 /* Set length of header which is not null-terminated */
 extern int hlength();
@@ -257,13 +322,14 @@ extern int hlength();
 extern int gethlength();
 
 /* Subroutines in iget.c */
-extern int mgets();	/* Previously allocated string from multiline keyword */
+extern int mgetstr();	/* Previously allocated string from multiline keyword */
 extern int mgetr8();	/* double from multiline keyword */
 extern int mgeti4();	/* int from multiline keyword */
 extern int igeti4();	/* long integer from IRAF compound keyword value */
 extern int igetr4();	/* real from IRAF compound keyword value */
 extern int igetr8();	/* double from IRAF compound keyword value */
 extern int igets();	/* character string from IRAF compound keyword value */
+extern char *igetc();	/* Extract string from IRAF keyword string */
 
 /* Subroutines in hput.c */
 
@@ -284,6 +350,7 @@ extern int hputcom();	/* Comment after keyword=value (returns 0 if OK) */
 extern int hdel();	/* Delete a keyword line from a FITS header */
 extern int hadd();	/* Add a keyword line to a FITS header */
 extern int hchange();	/* Change a keyword name in a FITS header */
+extern void setheadshrink(); /* Set flag for deleted keyword space disposition*/
 
 /* Subroutines to convert RA and Dec in degrees to strings */
 extern void ra2str();
@@ -291,6 +358,7 @@ extern void dec2str();
 
 extern void deg2str();
 extern void num2str();
+extern int numdec();	/* Return number of decimal places in number */
 
 extern char *getltime(); /* Return current local time in ISO format */
 extern char *getutime(); /* Return current UT as an ISO-format string */
@@ -333,4 +401,15 @@ extern char *getutime(); /* Return current UT as an ISO-format string */
  *
  * Mar 22 2000	Add int to iget*() declarations
  * Mar 27 2000	Add hputm() declaration
+ *
+ * Apr  3 2002	Add hgeti4c(), hgetr8c(), and hgetsc()
+ * Apr  8 2002	Include sys/types.h
+ * Aug 30 2002	Add strcsrch() and strncsrch()
+ *
+ * Sep 23 2003	Change mgets() to mgetstr() to avoid name collision at UCO Lick
+ * Oct 20 2003	Add numdec() to return the number of decimal places in a string
+ *
+ * Feb 26 2004	Add igetc(), formerly internal to iget.c
+ * Jul  1 2004	Add setheadshrink() for hdel()
+ * Aug 30 2004	Add numdec() to non-C++ declarations
  */

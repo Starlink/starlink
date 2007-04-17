@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: CatalogInfo.h,v 1.4 2003/01/20 15:52:21 brighton Exp $
+ * $Id: CatalogInfo.h,v 1.1.1.1 2006/01/12 16:36:24 abrighto Exp $
  *
  * CatalogInfo.h - class holding catalog config information
  *                 from the Catalog.cfg file
@@ -17,8 +17,10 @@
  */
 
 
+using namespace std;
 #include <iostream>
 #include <cstdio>
+#include <stdio.h>
 
 
 // forward ref
@@ -52,7 +54,7 @@ private:
  
     // read a line from the stream into buf and return the stream. 
     // Lines ending with backslash are continued on the next line
-    static std::istream& getline(std::istream& f, char* buf, int size);
+    static istream& getline(istream& f, char* buf, int size);
 
     // Remove the given entry from the given catalog directory list. 
     static void remove(CatalogInfoEntry* e, CatalogInfoEntry* dir);
@@ -75,7 +77,7 @@ public:
     static int reload(CatalogInfoEntry* oldEntry, CatalogInfoEntry* newEntry);
 
     // load config file info from the given stream (filename for error reporting)
-    static CatalogInfoEntry* load(std::istream&, const char* filename = "internal");
+    static CatalogInfoEntry* load(istream&, const char* filename = "internal");
 
     // return a pointer to the catalog config file entry for the given catalog
     static CatalogInfoEntry* lookup(const char* catalogName);
@@ -88,7 +90,7 @@ public:
 
     // Read config keyword entries from the given stream and update the given
     // entry values  
-    static void updateConfigEntry(std::istream& is, CatalogInfoEntry* entry);
+    static void updateConfigEntry(istream& is, CatalogInfoEntry* entry);
 
     // Append the given entry to the end of the main catalog list
     static int append(CatalogInfoEntry* e);
@@ -240,7 +242,7 @@ public:
     void next(CatalogInfoEntry*e) {next_ = e;}
 
     // output operator (output in format similar to input config file)
-    friend std::ostream& operator<<(std::ostream&, const CatalogInfoEntry&);
+    friend ostream& operator<<(ostream&, const CatalogInfoEntry&);
 };
 
 

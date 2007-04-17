@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: worldCoords.C,v 1.2 2005/02/02 01:43:03 brighton Exp $
+ * $Id: world_coords.C,v 1.1.1.1 2006/01/12 16:43:52 abrighto Exp $
  *
  * worldCoords.C - C interface implementation for C++ class WorldCoords
  * 
@@ -9,15 +9,17 @@
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  13 Oct 95  Created
+ *                 02/01/06  Renamed worldCoords.C to world_coords.C to
+ *                           avoid name conflict on file systems that ignore case
  */
-static const char* const rcsId="@(#) $Id: worldCoords.C,v 1.2 2005/02/02 01:43:03 brighton Exp $";
+static const char* const rcsId="@(#) $Id: world_coords.C,v 1.1.1.1 2006/01/12 16:43:52 abrighto Exp $";
 
 
 
 // include the C++ and C interfaces
-#include "WorldCoords.hxx"
+#include "WorldCoords.h"
 extern "C" {
-#include "worldCoords.h"
+#include "world_coords.h"
 }
 
 

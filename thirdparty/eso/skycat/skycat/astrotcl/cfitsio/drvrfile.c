@@ -2,16 +2,21 @@
 
 /*  The FITSIO software was written by William Pence at the High Energy    */
 /*  Astrophysic Science Archive Research Center (HEASARC) at the NASA      */
-/*  Goddard Space Flight Center.  Users shall not, without prior written   */
-/*  permission of the U.S. Government,  establish a claim to statutory     */
-/*  copyright.  The Government and others acting on its behalf, shall have */
-/*  a royalty-free, non-exclusive, irrevocable,  worldwide license for     */
-/*  Government purposes to publish, distribute, translate, copy, exhibit,  */
-/*  and perform such material.                                             */
+/*  Goddard Space Flight Center.                                           */
 
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 #include "fitsio2.h"
+
+#if defined(unix) || defined(__unix__)  || defined(__unix)
+#include <pwd.h>         /* needed in file_openfile */
+
+#ifdef REPLACE_LINKS
+#include <sys/types.h>
+#include <sys/stat.h>
+#endif
+
+#endif
 
 #ifdef HAVE_FTRUNCATE
 #include <unistd.h>      /* contains prototype of UNIX file truncate fn  */
@@ -26,18 +31,18 @@ static char file_outfile[FLEN_FILENAME];
 typedef struct    /* structure containing disk file structure */ 
 {
     FILE *fileptr;
-    long currentpos;
+    LONGLONG currentpos;
     int last_io_op;
 } diskdriver;
 
-static diskdriver handleTable[NIOBUF];  /* allocate diskfile handle tables */
+static diskdriver handleTable[NMAXFILES]; /* allocate diskfile handle tables */
 
 /*--------------------------------------------------------------------------*/
 int file_init(void)
 {
     int ii;
 
-    for (ii = 0; ii < NIOBUF; ii++)  /* initialize all empty slots in table */
+    for (ii = 0; ii < NMAXFILES; ii++) /* initialize all empty slots in table */
     {
        handleTable[ii].fileptr = 0;
     }
@@ -86,15 +91,18 @@ int file_open(char *filename, int rwmode, int *handle)
     {
       /* open the original file, with readonly access */
       status = file_openfile(filename, READONLY, &diskfile);
-      if (status)
+      if (status) {
+        file_outfile[0] = '\0';
         return(status);
- 
+      }
+      
       /* create the output file */
       status =  file_create(file_outfile,handle);
       if (status)
       {
         ffpmsg("Unable to create output file for copy of input file:");
         ffpmsg(file_outfile);
+        file_outfile[0] = '\0';
         return(status);
       }
 
@@ -102,8 +110,10 @@ int file_open(char *filename, int rwmode, int *handle)
       while(0 != (nread = fread(recbuf,1,2880, diskfile)))
       {
         status = file_write(*handle, recbuf, nread);
-        if (status)
+        if (status) {
+	   file_outfile[0] = '\0';
            return(status);
+        }
       }
 
       /* close both files */
@@ -114,12 +124,12 @@ int file_open(char *filename, int rwmode, int *handle)
 
       /* reopen the new copy, with correct rwmode */
       status = file_openfile(file_outfile, rwmode, &diskfile);
-
+      file_outfile[0] = '\0';
     }
     else
     {
       *handle = -1;
-      for (ii = 0; ii < NIOBUF; ii++)  /* find empty slot in table */
+      for (ii = 0; ii < NMAXFILES; ii++)  /* find empty slot in table */
       {
         if (handleTable[ii].fileptr == 0)
         {
@@ -149,6 +159,21 @@ int file_openfile(char *filename, int rwmode, FILE **diskfile)
 {
     char mode[4];
 
+#if defined(unix) || defined(__unix__) || defined(__unix)
+    char tempname[512], *cptr, user[80];
+    struct passwd *pwd;
+    int ii = 0;
+
+#if defined(REPLACE_LINKS)
+    struct stat stbuf;
+    int success = 0;
+    size_t n;
+    FILE *f1, *f2;
+    char buf[BUFSIZ];
+#endif
+
+#endif
+
     if (rwmode == READWRITE)
     {
           strcpy(mode, "r+b");    /* open existing file with read-write */
@@ -162,8 +187,107 @@ int file_openfile(char *filename, int rwmode, FILE **diskfile)
         /* specify VMS record structure: fixed format, 2880 byte records */
         /* but force stream mode access to enable random I/O access      */
     *diskfile = fopen(filename, mode, "rfm=fix", "mrs=2880", "ctx=stm"); 
+
+#elif defined(unix) || defined(__unix__) || defined(__unix)
+
+    /* support the ~user/file.fits or ~/file.fits filenames in UNIX */
+
+    if (*filename == '~')
+    {
+        if (filename[1] == '/')
+        {
+            cptr = getenv("HOME");
+            if (cptr)
+            {
+                 strcpy(tempname, cptr);
+                 strcat(tempname, filename+1);
+            }
+            else
+            {
+                 strcpy(tempname, filename);
+            }
+        }
+        else
+        {
+            /* copy user name */
+            cptr = filename+1;
+            while (*cptr && (*cptr != '/'))
+            {
+                user[ii] = *cptr;
+                cptr++;
+                ii++;
+            }
+            user[ii] = '\0';
+
+            /* get structure that includes name of user's home directory */
+            pwd = getpwnam(user);
+
+            /* copy user's home directory */
+            strcpy(tempname, pwd->pw_dir);
+            strcat(tempname, cptr);
+        }
+
+        *diskfile = fopen(tempname, mode); 
+    }
+    else
+    {
+        /* don't need to expand the input file name */
+        *diskfile = fopen(filename, mode); 
+
+#if defined(REPLACE_LINKS)
+
+        if (!(*diskfile) && (rwmode == READWRITE))  
+        {
+           /* failed to open file with READWRITE privilege.  Test if  */
+           /* the file we are trying to open is a soft link to a file that */
+           /* doesn't have write privilege.  */
+
+           lstat(filename, &stbuf);
+           if ((stbuf.st_mode & S_IFMT) == S_IFLNK) /* is this a soft link? */
+           {
+              if ((f1 = fopen(filename, "rb")) != 0) /* try opening READONLY */
+              {
+                 strcpy(tempname, filename);
+                 strcat(tempname, ".TmxFil");
+                 if ((f2 = fopen(tempname, "wb")) != 0) /* create temp file */
+                 {
+                    success = 1;
+                    while ((n = fread(buf, 1, BUFSIZ, f1)) > 0)
+                    {
+                       /* copy linked file to local temporary file */
+                       if (fwrite(buf, 1, n, f2) != n) 
+                       {
+                          success = 0;
+                          break;
+                       } 
+                    }
+                    fclose(f2);
+                 }
+                 fclose(f1);
+  
+                 if (success)
+                 {
+                    /* delete link and rename temp file to previous link name */
+                    remove(filename);
+                    rename(tempname, filename);
+
+                    /* try once again to open the file with write access */
+                    *diskfile = fopen(filename, mode); 
+                 }
+                 else
+                    remove(tempname);  /* clean up the failed copy */
+              }
+           }
+        }
+#endif
+
+    }
+
 #else
+
+    /* other non-UNIX machines */
     *diskfile = fopen(filename, mode); 
+
 #endif
 
     if (!(*diskfile))           /* couldn't open file */
@@ -180,7 +304,7 @@ int file_create(char *filename, int *handle)
     char mode[4];
 
     *handle = -1;
-    for (ii = 0; ii < NIOBUF; ii++)  /* find empty slot in table */
+    for (ii = 0; ii < NMAXFILES; ii++)  /* find empty slot in table */
     {
         if (handleTable[ii].fileptr == 0)
         {
@@ -191,7 +315,7 @@ int file_create(char *filename, int *handle)
     if (*handle == -1)
        return(TOO_MANY_FILES);    /* too many files opened */
 
-    strcpy(mode, "w+b");    /* open existing file with read-write */
+    strcpy(mode, "w+b");    /* create new file with read-write */
 
     diskfile = fopen(filename, "r"); /* does file already exist? */
 
@@ -221,7 +345,7 @@ int file_create(char *filename, int *handle)
     return(0);
 }
 /*--------------------------------------------------------------------------*/
-int file_truncate(int handle, long filesize)
+int file_truncate(int handle, LONGLONG filesize)
 /*
   truncate the diskfile to a new smaller size
 */
@@ -231,7 +355,7 @@ int file_truncate(int handle, long filesize)
     int fdesc;
 
     fdesc = fileno(handleTable[handle].fileptr);
-    ftruncate(fdesc, filesize);
+    ftruncate(fdesc, (OFF_T) filesize);
 
     handleTable[handle].currentpos = filesize;
     handleTable[handle].last_io_op = IO_WRITE;
@@ -241,30 +365,55 @@ int file_truncate(int handle, long filesize)
     return(0);
 }
 /*--------------------------------------------------------------------------*/
-int file_size(int handle, long *filesize)
+int file_size(int handle, LONGLONG *filesize)
 /*
   return the size of the file in bytes
 */
 {
-    long position;
+    OFF_T position1,position2;
     FILE *diskfile;
 
     diskfile = handleTable[handle].fileptr;
 
-    position = ftell(diskfile);      /* save current postion */
-    if (position < 0)
+#if _FILE_OFFSET_BITS - 0 == 64
+
+/* call the newer ftello and fseeko routines , which support */
+/*  Large Files (> 2GB) if they are supported.  */
+
+    position1 = ftello(diskfile);   /* save current postion */
+    if (position1 < 0)
         return(SEEK_ERROR);
 
-    if (fseek(diskfile, 0, 2) != 0)  /* move to end of the existing file */
+    if (fseeko(diskfile, 0, 2) != 0)  /* seek to end of file */
         return(SEEK_ERROR);
 
-    *filesize = ftell(diskfile);     /* position = size of file */
-    if (*filesize < 0)
+    position2 = ftello(diskfile);     /* get file size */
+    if (position2 < 0)
         return(SEEK_ERROR);
 
-    if (fseek(diskfile, position, 0) != 0) /* move back to orig. position */
+    if (fseeko(diskfile, position1, 0) != 0)  /* seek back to original pos */
         return(SEEK_ERROR);
 
+#else
+
+    position1 = ftell(diskfile);   /* save current postion */
+    if (position1 < 0)
+        return(SEEK_ERROR);
+
+    if (fseek(diskfile, 0, 2) != 0)  /* seek to end of file */
+        return(SEEK_ERROR);
+
+    position2 = ftell(diskfile);     /* get file size */
+    if (position2 < 0)
+        return(SEEK_ERROR);
+
+    if (fseek(diskfile, position1, 0) != 0)  /* seek back to original pos */
+        return(SEEK_ERROR);
+
+#endif
+
+    *filesize = (LONGLONG) position2;
+    
     return(0);
 }
 /*--------------------------------------------------------------------------*/
@@ -298,16 +447,38 @@ int file_flush(int handle)
     if (fflush(handleTable[handle].fileptr) )
         return(WRITE_ERROR);
 
+    /* The flush operation is not supposed to move the internal */
+    /* file pointer, but it does on some Windows-95 compilers and */
+    /* perhaps others, so seek to original position to be sure. */
+    /* This seek will do no harm on other systems.   */
+
+#if MACHINE == IBMPC
+
+    if (file_seek(handle, handleTable[handle].currentpos))
+            return(SEEK_ERROR);
+
+#endif
+
     return(0);
 }
 /*--------------------------------------------------------------------------*/
-int file_seek(int handle, long offset)
+int file_seek(int handle, LONGLONG offset)
 /*
   seek to position relative to start of the file
 */
 {
-    if (fseek(handleTable[handle].fileptr, offset, 0 ) )
+
+#if _FILE_OFFSET_BITS - 0 == 64
+
+    if (fseeko(handleTable[handle].fileptr, (OFF_T) offset, 0) != 0)
         return(SEEK_ERROR);
+
+#else
+
+    if (fseek(handleTable[handle].fileptr, (OFF_T) offset, 0) != 0)
+        return(SEEK_ERROR);
+
+#endif
 
     handleTable[handle].currentpos = offset;
     return(0);
@@ -318,14 +489,32 @@ int file_read(int hdl, void *buffer, long nbytes)
   read bytes from the current position in the file
 */
 {
+    long nread;
+    char *cptr;
+
     if (handleTable[hdl].last_io_op == IO_WRITE)
     {
-      if (fseek(handleTable[hdl].fileptr, handleTable[hdl].currentpos, 0 ))
-        return(READ_ERROR);
+        if (file_seek(hdl, handleTable[hdl].currentpos))
+            return(SEEK_ERROR);
     }
   
-    if( (long) fread(buffer, 1, nbytes, handleTable[hdl].fileptr) != nbytes)
+    nread = (long) fread(buffer, 1, nbytes, handleTable[hdl].fileptr);
+
+    if (nread == 1)
+    {
+         cptr = (char *) buffer;
+
+         /* some editors will add a single end-of-file character to a file */
+         /* Ignore it if the character is a zero, 10, or 32 */
+         if (*cptr == 0 || *cptr == 10 || *cptr == 32)
+             return(END_OF_FILE);
+         else
+             return(READ_ERROR);
+    }
+    else if (nread != nbytes)
+    {
         return(READ_ERROR);
+    }
 
     handleTable[hdl].currentpos += nbytes;
     handleTable[hdl].last_io_op = IO_READ;
@@ -339,10 +528,10 @@ int file_write(int hdl, void *buffer, long nbytes)
 {
     if (handleTable[hdl].last_io_op == IO_READ) 
     {
-      if (fseek(handleTable[hdl].fileptr, handleTable[hdl].currentpos, 0 ))
-         return(WRITE_ERROR);
+        if (file_seek(hdl, handleTable[hdl].currentpos))
+            return(SEEK_ERROR);
     }
-  
+
     if((long) fwrite(buffer, 1, nbytes, handleTable[hdl].fileptr) != nbytes)
         return(WRITE_ERROR);
 
@@ -393,6 +582,7 @@ int file_compress_open(char *filename, int rwmode, int *hdl)
           ffpmsg("uncompressed file already exists: (file_compress_open)");
           ffpmsg(file_outfile);
           fclose(outdiskfile);         /* close file and exit with error */
+	  file_outfile[0] = '\0';
           return(FILE_NOT_CREATED); 
         }
     }
@@ -402,6 +592,7 @@ int file_compress_open(char *filename, int rwmode, int *hdl)
     {
         ffpmsg("could not create uncompressed file: (file_compress_open)");
         ffpmsg(file_outfile);
+	file_outfile[0] = '\0';
         return(FILE_NOT_CREATED); 
     }
 
@@ -416,6 +607,7 @@ int file_compress_open(char *filename, int rwmode, int *hdl)
         ffpmsg(filename);
         ffpmsg(" into new output file:");
         ffpmsg(file_outfile);
+	file_outfile[0] = '\0';
         return(status);
     }
 
@@ -506,8 +698,22 @@ int file_checkfile (char *urltype, char *infile, char *outfile)
       /* This is the name of the uncompressed file to be created on disk. */
       if (strlen(outfile))
       {
-        strcpy(urltype, "compressfile://");  /* use special driver */
-        strcpy(file_outfile, outfile); /* an output file is specified */
+        if (!strncmp(outfile, "mem:", 4) )
+        {
+           /* uncompress the file in memory, with READ and WRITE access */
+           strcpy(urltype, "compressmem://");  /* use special driver */
+           *file_outfile = '\0';  
+        }
+        else
+        {
+          strcpy(urltype, "compressfile://");  /* use special driver */
+
+          /* don't copy the "file://" prefix, if present.  */
+          if (!strncmp(outfile, "file://", 7) )
+             strcpy(file_outfile,outfile+7);
+          else
+             strcpy(file_outfile,outfile);
+        }
       }
       else
       {
@@ -515,6 +721,16 @@ int file_checkfile (char *urltype, char *infile, char *outfile)
         strcpy(urltype, "compress://");  /* use special driver */
         *file_outfile = '\0';  /* no output file was specified */
       }
+    }
+    else  /* an ordinary, uncompressed FITS file on disk */
+    {
+        /* save the output file name for later use when opening the file. */
+        /* In this case, the file to be opened will be opened READONLY,   */
+        /* and copied to this newly created output file.  The original file */
+        /* will be closed, and the copy will be opened by CFITSIO for     */
+        /* subsequent processing (possibly with READWRITE access).        */
+        if (strlen(outfile))
+            strcpy(file_outfile,outfile);
     }
 
     return 0;

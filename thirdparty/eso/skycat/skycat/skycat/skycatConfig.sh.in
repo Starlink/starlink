@@ -1,66 +1,45 @@
 # E.S.O. - VLT project 
-# $Id: skycatConfig.sh.in,v 1.1.1.1 2002/04/04 20:11:53 brighton Exp $
+# $Id: skycatConfig.sh.in,v 1.1.1.1 2006/01/12 16:41:48 abrighto Exp $
 #
 # skycatConfig.sh --
-#
-# This shell script (for sh) is generated automatically by the skycat
+# 
+# This shell script (for sh) is generated automatically by Skycat's
 # configure script.  It will create shell variables for most of
 # the configuration options discovered by the configure script.
-# This script is intended to be included by other configure scripts
-# so that they don't have to figure this all out for themselves.
+# This script is intended to be included by the configure scripts
+# for Skycat extensions so that they don't have to figure this all
+# out for themselves.  This file does not duplicate information
+# already provided by tclConfig.sh, so you may need to use that
+# file in addition to this one.
 #
 # The information in this file is specific to a single platform.
-#
-# who             when      what
-# --------------  --------  ---------------------------------------------
-# Allan Brighton  28/11/97  Created
-#
 
-# SKYCAT install dirs
-SKYCAT_DESTDIR='@DESTDIR@'
-SKYCAT_BINDIR='@BINDIR@'
-SKYCAT_LIBDIR='@LIBDIR@'
-SKYCAT_INCDIR='@INCDIR@'
-SKYCAT_MANDIR='@MANDIR@'
-SKYCAT_DIR='@SKYCAT_DIR@'
+# Skycat's version number.
+skycat_VERSION='@PACKAGE_VERSION@'
 
-# root of cat source tree
-SKYCAT_SRC_ROOT='@SRC_ROOT@'
-
-# default loskycation of Skycat library files
-SKYCAT_LIBRARY='@SKYCAT_LIBRARY@'
-
-# loskycation of Skycat library files in source tree
-SKYCAT_BUILD_LIBRARY='@SKYCAT_BUILD_LIBRARY@'
-
-# -I flags to pick up the skycat include files from the build dirs
-SKYCAT_BUILD_INCLUDES='@SKYCAT_BUILD_INCLUDES@'
-
-# version of the skycatlib library
-# version of the skycatlib library
-SKYCAT_VERSION='@SKYCAT_VERSION@'
-
+# The name of the Skycat library:
+skycat_LIB_FILE=@skycat_LIB_FILE@
 
 # String to pass to linker to pick up the Skycat library from its
 # build directory.
-SKYCAT_BUILD_LIB_SPEC='@SKYCAT_BUILD_LIB_SPEC@'
+skycat_BUILD_LIB_SPEC='@skycat_BUILD_LIB_SPEC@'
 
-# static version of above
-SKYCAT_BUILD_LIB_SPEC_STATIC='@SKYCAT_BUILD_LIB_SPEC_STATIC@'
+# Skycat build directory.
+skycat_BUILD_DIR='@skycat_BUILD_DIR@'
 
 # String to pass to linker to pick up the Skycat library from its
 # installed directory.
-SKYCAT_LIB_SPEC='@SKYCAT_LIB_SPEC@'
+skycat_LIB_SPEC='@skycat_LIB_SPEC@'
 
-# static version of above
-SKYCAT_LIB_SPEC_STATIC='@SKYCAT_LIB_SPEC_STATIC@'
+# Location of the top-level source directories from which Skycat
+# was built.  This is the directory that contains generic, unix, etc.
+# If Skycat was compiled in a different place than the directory
+# containing the source files, this points to the location of the sources,
+# not the location where Skycat was compiled.
+skycat_SRC_DIR='@skycat_SRC_DIR@'
 
-# static libraries for single binary version
-SKYCAT_XLIBSW_STATIC='@XLIBSW_STATIC@'
-SKYCAT_TCL_LIB_SPEC_STATIC='@TCL_LIB_SPEC_STATIC@'
-SKYCAT_TK_LIB_SPEC_STATIC='@TK_LIB_SPEC_STATIC@'
-SKYCAT_TCLX_LIB_SPEC_STATIC='@TCLX_LIB_SPEC_STATIC@'
-SKYCAT_ITCL_LIB_SPEC_STATIC='@ITCL_LIB_SPEC_STATIC@'
-SKYCAT_ITK_LIB_SPEC_STATIC='@ITK_LIB_SPEC_STATIC@'
-SKYCAT_BLT_LIB_SPEC_STATIC='@BLT_LIB_SPEC_STATIC@'
+# List of object files used to build the library (for merging packages).
+skycat_PKG_OBJECTS='@skycat_PKG_OBJECTS@'
 
+# List of header filesinstalled for this library (for merging packages).
+skycat_PKG_HEADERS='@skycat_PKG_HEADERS@'

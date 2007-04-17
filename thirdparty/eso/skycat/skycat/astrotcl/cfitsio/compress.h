@@ -5,6 +5,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
+
+/* 'near' is only relevant for 16-bit PC with small memory model */
+# define near
 
 #if defined(VAXC) || defined(VMS)
 #  define RECORD_IO 1
@@ -68,6 +72,12 @@ typedef unsigned long  ulg;
 #define ENCRYPTED    0x20 /* bit 5 set: file is encrypted */
 #define RESERVED     0xC0 /* bit 6,7:   reserved */
 
+#define MIN_MATCH  3
+#define MAX_MATCH  258
+#define MIN_LOOKAHEAD (MAX_MATCH+MIN_MATCH+1)
+#define MAX_DIST  (WSIZE-MIN_LOOKAHEAD)
+#define translate_eol 0  /* no option -a yet */
+
 #define get_byte()  (inptr < insize ? inbuf[inptr++] : fill_inbuf(0))
 #define try_byte()  (inptr < insize ? inbuf[inptr++] : fill_inbuf(1))
 #define put_ubyte(c) {window[outcnt++]=(uch)(c); if (outcnt==WSIZE)\
@@ -106,10 +116,46 @@ local int  get_method   OF((FILE *in));
 
 local ulg  updcrc        OF((uch *s, unsigned n));
 local int  fill_inbuf    OF((int eof_ok));
-local void flush_outbuf  OF((void));
+local void flush_outbuf  OF((void));  
 local void flush_window  OF((void));
 local void write_buf     OF((voidp buf, unsigned cnt));
 local void error         OF((char *m));
+local ulg  flush_block OF((char *buf, ulg stored_len, int eof));
+typedef int file_t;     /* Do not use stdio */
+#define NO_FILE  (-1)   /* in memory compression */
+local int file_read  OF((char *buf,  unsigned size));
+local void     send_bits  OF((int value, int length));
+local unsigned bi_reverse OF((unsigned value, int length));
+local void     bi_windup  OF((void));
+local void     copy_block OF((char *buf, unsigned len, int header));
+local int (*read_buf) OF((char *buf, unsigned size));
+local void lm_init OF((int pack_level, ush *flags));
+local ulg  deflate OF((void));
+local void ct_init     OF((ush *attr, int *method));
+local int  ct_tally    OF((int dist, int lc));
+local void bi_init    OF((file_t zipfile));
+
+#define put_byte(c) {outbuf[outcnt++]=(uch)(c); if (outcnt==OUTBUFSIZ)\
+   flush_outbuf();}
+
+/* Output a 16 bit value, lsb first */
+#define put_short(w) \
+{ if (outcnt < OUTBUFSIZ-2) { \
+    outbuf[outcnt++] = (uch) ((w) & 0xff); \
+    outbuf[outcnt++] = (uch) ((ush)(w) >> 8); \
+  } else { \
+    put_byte((uch)((w) & 0xff)); \
+    put_byte((uch)((ush)(w) >> 8)); \
+  } \
+}
+
+/* Output a 32 bit value to the bit stream, lsb first */
+#define put_long(n) { \
+    put_short((n) & 0xffff); \
+    put_short(((ulg)(n)) >> 16); \
+}
+
+#define seekable()    0  /* force sequential output */
 
 /* io.c */
 local void fillbuf      OF((int n));
@@ -135,7 +181,7 @@ local int unlzh      OF((FILE *in, FILE *out));
 local int unlzw  OF((FILE *in, FILE *out));
 
 local void read_tree  OF((void));
-local void build_tree OF((void));
+local void build_tree_unpack OF((void));
 
 local int unpack     OF((FILE *in, FILE *out));
 local int check_zipfile OF((FILE *in));

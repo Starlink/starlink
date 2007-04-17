@@ -1,21 +1,21 @@
 /*============================================================================
 *
 *   WCSLIB - an implementation of the FITS WCS proposal.
-*   Copyright (C) 1995-1999, Mark Calabretta
+*   Copyright (C) 1995-2002, Mark Calabretta
 *
-*   This library is free software; you can redistribute it and/or modify it
-*   under the terms of the GNU Library General Public License as published
-*   by the Free Software Foundation; either version 2 of the License, or (at
-*   your option) any later version.
+*   This library is free software; you can redistribute it and/or
+*   modify it under the terms of the GNU Lesser General Public
+*   License as published by the Free Software Foundation; either
+*   version 2 of the License, or (at your option) any later version.
 *
-*   This library is distributed in the hope that it will be useful, but
-*   WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library
-*   General Public License for more details.
-*
-*   You should have received a copy of the GNU Library General Public License
-*   along with this library; if not, write to the Free Software Foundation,
-*   Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*   This library is distributed in the hope that it will be useful,
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+*   Lesser General Public License for more details.
+*   
+*   You should have received a copy of the GNU Lesser General Public
+*   License along with this library; if not, write to the Free Software
+*   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *
 *   Correspondence concerning WCSLIB may be directed to:
 *      Internet email: mcalabre@atnf.csiro.au
@@ -30,7 +30,7 @@
 *   The functions defined herein are trigonometric or inverse trigonometric
 *   functions which take or return angular arguments in decimal degrees.
 *
-*   $Id: wcstrig.c,v 1.2 2005/02/02 01:43:03 brighton Exp $
+*   $Id: wcstrig.c,v 1.1.1.1 2006/01/12 16:44:56 abrighto Exp $
 *---------------------------------------------------------------------------*/
 
 #include <math.h>
@@ -184,4 +184,6 @@ const double x, y;
 /* Dec 20 1999	Doug Mink - Change cosd() and sind() to cosdeg() and sindeg()
  * Dec 20 1999	Doug Mink - Include wcslib.h, which includes wcstrig.h
  * Dec 20 1999	Doug Mink - Use PI from wcslib.h, not locally defined
+ *
+ * Sep 19 2001	Doug Mink - No change for WCSLIB 2.7
  */

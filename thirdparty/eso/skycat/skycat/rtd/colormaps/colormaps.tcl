@@ -2,7 +2,7 @@
 #
 # E.S.O. - VLT project
 #
-# "@(#) $Id: colormaps.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
+# "@(#) $Id: colormaps.tcl,v 1.1.1.1 2006/01/12 16:37:25 abrighto Exp $"
 #
 # script to generate C code including static colormaps, so that the ,
 # (binary) application doesn't have to be delivered with the colormap files.
@@ -15,7 +15,7 @@
 puts {
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: colormaps.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
+ * "@(#) $Id: colormaps.tcl,v 1.1.1.1 2006/01/12 16:37:25 abrighto Exp $"
  *
  * Colormap definitions for RTD
  *

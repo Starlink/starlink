@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# "@(#) $Id: rmipc.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
+# "@(#) $Id: rmipc.tcl,v 1.1.1.1 2006/01/12 16:37:20 abrighto Exp $"
 #
 # rmipc - remove shared memory and semaphores owned by $USER
 #

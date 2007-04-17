@@ -3,22 +3,396 @@
 
 /*  The FITSIO software was written by William Pence at the High Energy    */
 /*  Astrophysic Science Archive Research Center (HEASARC) at the NASA      */
-/*  Goddard Space Flight Center.  Users shall not, without prior written   */
-/*  permission of the U.S. Government,  establish a claim to statutory     */
-/*  copyright.  The Government and others acting on its behalf, shall have */
-/*  a royalty-free, non-exclusive, irrevocable,  worldwide license for     */
-/*  Government purposes to publish, distribute, translate, copy, exhibit,  */
-/*  and perform such material.                                             */
+/*  Goddard Space Flight Center.                                           */
 
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 #include <limits.h>
 #include "fitsio2.h"
+
+/*--------------------------------------------------------------------------*/
+int ffppx(  fitsfile *fptr,  /* I - FITS file pointer                       */
+            int  datatype,   /* I - datatype of the value                   */
+            long  *firstpix, /* I - coord of  first pixel to write(1 based) */
+            LONGLONG  nelem,     /* I - number of values to write               */
+            void  *array,    /* I - array of values that are written        */
+            int  *status)    /* IO - error status                           */
+/*
+  Write an array of pixels to the primary array.  The datatype of the
+  input array is defined by the 2nd argument. Data conversion
+  and scaling will be performed if necessary (e.g, if the datatype of
+  the FITS array is not the same as the array being written). 
+  
+  This routine is simillar to ffppr, except it supports writing to 
+  large images with more than 2**31 pixels.
+*/
+{
+    int naxis, ii;
+    long group = 1;
+    LONGLONG firstelem, dimsize = 1, naxes[9];
+
+    if (*status > 0)           /* inherit input status value if > 0 */
+        return(*status);
+
+    /* get the size of the image */
+    ffgidm(fptr, &naxis, status);
+    ffgiszll(fptr, 9, naxes, status);
+
+    firstelem = 0;
+    for (ii=0; ii < naxis; ii++)
+    {
+        firstelem += ((firstpix[ii] - 1) * dimsize);
+        dimsize *= naxes[ii];
+    }
+    firstelem++;
+
+    if (datatype == TBYTE)
+    {
+      ffpprb(fptr, group, firstelem, nelem, (unsigned char *) array, status);
+    }
+    else if (datatype == TSBYTE)
+    {
+      ffpprsb(fptr, group, firstelem, nelem, (signed char *) array, status);
+    }
+    else if (datatype == TUSHORT)
+    {
+      ffpprui(fptr, group, firstelem, nelem, (unsigned short *) array,
+              status);
+    }
+    else if (datatype == TSHORT)
+    {
+      ffppri(fptr, group, firstelem, nelem, (short *) array, status);
+    }
+    else if (datatype == TUINT)
+    {
+      ffppruk(fptr, group, firstelem, nelem, (unsigned int *) array, status);
+    }
+    else if (datatype == TINT)
+    {
+      ffpprk(fptr, group, firstelem, nelem, (int *) array, status);
+    }
+    else if (datatype == TULONG)
+    {
+      ffppruj(fptr, group, firstelem, nelem, (unsigned long *) array, status);
+    }
+    else if (datatype == TLONG)
+    {
+      ffpprj(fptr, group, firstelem, nelem, (long *) array, status);
+    }
+    else if (datatype == TLONGLONG)
+    {
+      ffpprjj(fptr, group, firstelem, nelem, (LONGLONG *) array, status);
+    }
+    else if (datatype == TFLOAT)
+    {
+      ffppre(fptr, group, firstelem, nelem, (float *) array, status);
+    }
+    else if (datatype == TDOUBLE)
+    {
+      ffpprd(fptr, group, firstelem, nelem, (double *) array, status);
+    }
+    else
+      *status = BAD_DATATYPE;
+
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
+int ffppxll(  fitsfile *fptr,  /* I - FITS file pointer                       */
+            int  datatype,   /* I - datatype of the value                   */
+            LONGLONG  *firstpix, /* I - coord of  first pixel to write(1 based) */
+            LONGLONG  nelem,     /* I - number of values to write               */
+            void  *array,    /* I - array of values that are written        */
+            int  *status)    /* IO - error status                           */
+/*
+  Write an array of pixels to the primary array.  The datatype of the
+  input array is defined by the 2nd argument. Data conversion
+  and scaling will be performed if necessary (e.g, if the datatype of
+  the FITS array is not the same as the array being written). 
+  
+  This routine is simillar to ffppr, except it supports writing to 
+  large images with more than 2**31 pixels.
+*/
+{
+    int naxis, ii;
+    long group = 1;
+    LONGLONG firstelem, dimsize = 1, naxes[9];
+
+    if (*status > 0)           /* inherit input status value if > 0 */
+        return(*status);
+
+    /* get the size of the image */
+    ffgidm(fptr, &naxis, status);
+    ffgiszll(fptr, 9, naxes, status);
+
+    firstelem = 0;
+    for (ii=0; ii < naxis; ii++)
+    {
+        firstelem += ((firstpix[ii] - 1) * dimsize);
+        dimsize *= naxes[ii];
+    }
+    firstelem++;
+
+    if (datatype == TBYTE)
+    {
+      ffpprb(fptr, group, firstelem, nelem, (unsigned char *) array, status);
+    }
+    else if (datatype == TSBYTE)
+    {
+      ffpprsb(fptr, group, firstelem, nelem, (signed char *) array, status);
+    }
+    else if (datatype == TUSHORT)
+    {
+      ffpprui(fptr, group, firstelem, nelem, (unsigned short *) array,
+              status);
+    }
+    else if (datatype == TSHORT)
+    {
+      ffppri(fptr, group, firstelem, nelem, (short *) array, status);
+    }
+    else if (datatype == TUINT)
+    {
+      ffppruk(fptr, group, firstelem, nelem, (unsigned int *) array, status);
+    }
+    else if (datatype == TINT)
+    {
+      ffpprk(fptr, group, firstelem, nelem, (int *) array, status);
+    }
+    else if (datatype == TULONG)
+    {
+      ffppruj(fptr, group, firstelem, nelem, (unsigned long *) array, status);
+    }
+    else if (datatype == TLONG)
+    {
+      ffpprj(fptr, group, firstelem, nelem, (long *) array, status);
+    }
+    else if (datatype == TLONGLONG)
+    {
+      ffpprjj(fptr, group, firstelem, nelem, (LONGLONG *) array, status);
+    }
+    else if (datatype == TFLOAT)
+    {
+      ffppre(fptr, group, firstelem, nelem, (float *) array, status);
+    }
+    else if (datatype == TDOUBLE)
+    {
+      ffpprd(fptr, group, firstelem, nelem, (double *) array, status);
+    }
+    else
+      *status = BAD_DATATYPE;
+
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
+int ffppxn(  fitsfile *fptr,  /* I - FITS file pointer                       */
+            int  datatype,   /* I - datatype of the value                   */
+            long  *firstpix, /* I - first vector element to write(1 = 1st)  */
+            LONGLONG  nelem,     /* I - number of values to write               */
+            void  *array,    /* I - array of values that are written        */
+            void  *nulval,   /* I - pointer to the null value               */
+            int  *status)    /* IO - error status                           */
+/*
+  Write an array of values to the primary array.  The datatype of the
+  input array is defined by the 2nd argument. Data conversion
+  and scaling will be performed if necessary (e.g, if the datatype of
+  the FITS array is not the same as the array being written).
+
+  This routine supports writing to large images with
+  more than 2**31 pixels.
+*/
+{
+    int naxis, ii;
+    long group = 1;
+    LONGLONG firstelem, dimsize = 1, naxes[9];
+
+    if (*status > 0)           /* inherit input status value if > 0 */
+        return(*status);
+
+    if (nulval == NULL)  /* null value not defined? */
+    {
+        ffppx(fptr, datatype, firstpix, nelem, array, status);
+        return(*status);
+    }
+
+    /* get the size of the image */
+    ffgidm(fptr, &naxis, status);
+    ffgiszll(fptr, 9, naxes, status);
+
+    firstelem = 0;
+    for (ii=0; ii < naxis; ii++)
+    {
+        firstelem += ((firstpix[ii] - 1) * dimsize);
+        dimsize *= naxes[ii];
+    }
+    firstelem++;
+
+    if (datatype == TBYTE)
+    {
+      ffppnb(fptr, group, firstelem, nelem, (unsigned char *) array, 
+             *(unsigned char *) nulval, status);
+    }
+    else if (datatype == TSBYTE)
+    {
+      ffppnsb(fptr, group, firstelem, nelem, (signed char *) array, 
+             *(signed char *) nulval, status);
+    }
+    else if (datatype == TUSHORT)
+    {
+      ffppnui(fptr, group, firstelem, nelem, (unsigned short *) array,
+              *(unsigned short *) nulval,status);
+    }
+    else if (datatype == TSHORT)
+    {
+      ffppni(fptr, group, firstelem, nelem, (short *) array,
+             *(short *) nulval, status);
+    }
+    else if (datatype == TUINT)
+    {
+      ffppnuk(fptr, group, firstelem, nelem, (unsigned int *) array,
+             *(unsigned int *) nulval, status);
+    }
+    else if (datatype == TINT)
+    {
+      ffppnk(fptr, group, firstelem, nelem, (int *) array,
+             *(int *) nulval, status);
+    }
+    else if (datatype == TULONG)
+    {
+      ffppnuj(fptr, group, firstelem, nelem, (unsigned long *) array,
+              *(unsigned long *) nulval,status);
+    }
+    else if (datatype == TLONG)
+    {
+      ffppnj(fptr, group, firstelem, nelem, (long *) array,
+             *(long *) nulval, status);
+    }
+    else if (datatype == TLONGLONG)
+    {
+      ffppnjj(fptr, group, firstelem, nelem, (LONGLONG *) array,
+             *(LONGLONG *) nulval, status);
+    }
+    else if (datatype == TFLOAT)
+    {
+      ffppne(fptr, group, firstelem, nelem, (float *) array,
+             *(float *) nulval, status);
+    }
+    else if (datatype == TDOUBLE)
+    {
+      ffppnd(fptr, group, firstelem, nelem, (double *) array,
+             *(double *) nulval, status);
+    }
+    else
+      *status = BAD_DATATYPE;
+
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
+int ffppxnll(  fitsfile *fptr,  /* I - FITS file pointer                       */
+            int  datatype,   /* I - datatype of the value                   */
+            LONGLONG  *firstpix, /* I - first vector element to write(1 = 1st)  */
+            LONGLONG  nelem,     /* I - number of values to write               */
+            void  *array,    /* I - array of values that are written        */
+            void  *nulval,   /* I - pointer to the null value               */
+            int  *status)    /* IO - error status                           */
+/*
+  Write an array of values to the primary array.  The datatype of the
+  input array is defined by the 2nd argument. Data conversion
+  and scaling will be performed if necessary (e.g, if the datatype of
+  the FITS array is not the same as the array being written).
+
+  This routine supports writing to large images with
+  more than 2**31 pixels.
+*/
+{
+    int naxis, ii;
+    long  group = 1;
+    LONGLONG firstelem, dimsize = 1, naxes[9];
+
+    if (*status > 0)           /* inherit input status value if > 0 */
+        return(*status);
+
+    if (nulval == NULL)  /* null value not defined? */
+    {
+        ffppxll(fptr, datatype, firstpix, nelem, array, status);
+        return(*status);
+    }
+
+    /* get the size of the image */
+    ffgidm(fptr, &naxis, status);
+    ffgiszll(fptr, 9, naxes, status);
+
+    firstelem = 0;
+    for (ii=0; ii < naxis; ii++)
+    {
+        firstelem += ((firstpix[ii] - 1) * dimsize);
+        dimsize *= naxes[ii];
+    }
+    firstelem++;
+
+    if (datatype == TBYTE)
+    {
+      ffppnb(fptr, group, firstelem, nelem, (unsigned char *) array, 
+             *(unsigned char *) nulval, status);
+    }
+    else if (datatype == TSBYTE)
+    {
+      ffppnsb(fptr, group, firstelem, nelem, (signed char *) array, 
+             *(signed char *) nulval, status);
+    }
+    else if (datatype == TUSHORT)
+    {
+      ffppnui(fptr, group, firstelem, nelem, (unsigned short *) array,
+              *(unsigned short *) nulval,status);
+    }
+    else if (datatype == TSHORT)
+    {
+      ffppni(fptr, group, firstelem, nelem, (short *) array,
+             *(short *) nulval, status);
+    }
+    else if (datatype == TUINT)
+    {
+      ffppnuk(fptr, group, firstelem, nelem, (unsigned int *) array,
+             *(unsigned int *) nulval, status);
+    }
+    else if (datatype == TINT)
+    {
+      ffppnk(fptr, group, firstelem, nelem, (int *) array,
+             *(int *) nulval, status);
+    }
+    else if (datatype == TULONG)
+    {
+      ffppnuj(fptr, group, firstelem, nelem, (unsigned long *) array,
+              *(unsigned long *) nulval,status);
+    }
+    else if (datatype == TLONG)
+    {
+      ffppnj(fptr, group, firstelem, nelem, (long *) array,
+             *(long *) nulval, status);
+    }
+    else if (datatype == TLONGLONG)
+    {
+      ffppnjj(fptr, group, firstelem, nelem, (LONGLONG *) array,
+             *(LONGLONG *) nulval, status);
+    }
+    else if (datatype == TFLOAT)
+    {
+      ffppne(fptr, group, firstelem, nelem, (float *) array,
+             *(float *) nulval, status);
+    }
+    else if (datatype == TDOUBLE)
+    {
+      ffppnd(fptr, group, firstelem, nelem, (double *) array,
+             *(double *) nulval, status);
+    }
+    else
+      *status = BAD_DATATYPE;
+
+    return(*status);
+}
 /*--------------------------------------------------------------------------*/
 int ffppr(  fitsfile *fptr,  /* I - FITS file pointer                       */
             int  datatype,   /* I - datatype of the value                   */
-            long  firstelem, /* I - first vector element to write(1 = 1st)  */
-            long  nelem,     /* I - number of values to write               */
+            LONGLONG  firstelem, /* I - first vector element to write(1 = 1st)  */
+            LONGLONG  nelem,     /* I - number of values to write               */
             void  *array,    /* I - array of values that are written        */
             int  *status)    /* IO - error status                           */
 /*
@@ -26,56 +400,58 @@ int ffppr(  fitsfile *fptr,  /* I - FITS file pointer                       */
   input array is defined by the 2nd argument. Data conversion
   and scaling will be performed if necessary (e.g, if the datatype of
   the FITS array is not the same as the array being written).
+
 */
 {
-    long row = 1;
+    long group = 1;
 
     if (*status > 0)           /* inherit input status value if > 0 */
         return(*status);
 
-    /*
-      the primary array is represented as a binary table:
-      each group of the primary array is a row in the table,
-      where the first column contains the group parameters
-      and the second column contains the image itself.
-    */
-
     if (datatype == TBYTE)
     {
-      ffpclb(fptr, 2, row, firstelem, nelem, (unsigned char *) array, status);
+      ffpprb(fptr, group, firstelem, nelem, (unsigned char *) array, status);
+    }
+    else if (datatype == TSBYTE)
+    {
+      ffpprsb(fptr, group, firstelem, nelem, (signed char *) array, status);
     }
     else if (datatype == TUSHORT)
     {
-      ffpclui(fptr, 2, row, firstelem, nelem, (unsigned short *) array,
+      ffpprui(fptr, group, firstelem, nelem, (unsigned short *) array,
               status);
     }
     else if (datatype == TSHORT)
     {
-      ffpcli(fptr, 2, row, firstelem, nelem, (short *) array, status);
+      ffppri(fptr, group, firstelem, nelem, (short *) array, status);
     }
     else if (datatype == TUINT)
     {
-      ffpcluk(fptr, 2, row, firstelem, nelem, (unsigned int *) array, status);
+      ffppruk(fptr, group, firstelem, nelem, (unsigned int *) array, status);
     }
     else if (datatype == TINT)
     {
-      ffpclk(fptr, 2, row, firstelem, nelem, (int *) array, status);
+      ffpprk(fptr, group, firstelem, nelem, (int *) array, status);
     }
     else if (datatype == TULONG)
     {
-      ffpcluj(fptr, 2, row, firstelem, nelem, (unsigned long *) array, status);
+      ffppruj(fptr, group, firstelem, nelem, (unsigned long *) array, status);
     }
     else if (datatype == TLONG)
     {
-      ffpclj(fptr, 2, row, firstelem, nelem, (long *) array, status);
+      ffpprj(fptr, group, firstelem, nelem, (long *) array, status);
+    }
+    else if (datatype == TLONGLONG)
+    {
+      ffpprjj(fptr, group, firstelem, nelem, (LONGLONG *) array, status);
     }
     else if (datatype == TFLOAT)
     {
-      ffpcle(fptr, 2, row, firstelem, nelem, (float *) array, status);
+      ffppre(fptr, group, firstelem, nelem, (float *) array, status);
     }
     else if (datatype == TDOUBLE)
     {
-      ffpcld(fptr, 2, row, firstelem, nelem, (double *) array, status);
+      ffpprd(fptr, group, firstelem, nelem, (double *) array, status);
     }
     else
       *status = BAD_DATATYPE;
@@ -85,8 +461,8 @@ int ffppr(  fitsfile *fptr,  /* I - FITS file pointer                       */
 /*--------------------------------------------------------------------------*/
 int ffppn(  fitsfile *fptr,  /* I - FITS file pointer                       */
             int  datatype,   /* I - datatype of the value                   */
-            long  firstelem, /* I - first vector element to write(1 = 1st)  */
-            long  nelem,     /* I - number of values to write               */
+            LONGLONG  firstelem, /* I - first vector element to write(1 = 1st)  */
+            LONGLONG  nelem,     /* I - number of values to write               */
             void  *array,    /* I - array of values that are written        */
             void  *nulval,   /* I - pointer to the null value               */
             int  *status)    /* IO - error status                           */
@@ -95,9 +471,10 @@ int ffppn(  fitsfile *fptr,  /* I - FITS file pointer                       */
   input array is defined by the 2nd argument. Data conversion
   and scaling will be performed if necessary (e.g, if the datatype of
   the FITS array is not the same as the array being written).
+
 */
 {
-    long row = 1;
+    long group = 1;
 
     if (*status > 0)           /* inherit input status value if > 0 */
         return(*status);
@@ -108,57 +485,146 @@ int ffppn(  fitsfile *fptr,  /* I - FITS file pointer                       */
         return(*status);
     }
 
-    /*
-      the primary array is represented as a binary table:
-      each group of the primary array is a row in the table,
-      where the first column contains the group parameters
-      and the second column contains the image itself.
-    */
-
     if (datatype == TBYTE)
     {
-      ffpcnb(fptr, 2, row, firstelem, nelem, (unsigned char *) array, 
+      ffppnb(fptr, group, firstelem, nelem, (unsigned char *) array, 
              *(unsigned char *) nulval, status);
+    }
+    else if (datatype == TSBYTE)
+    {
+      ffppnsb(fptr, group, firstelem, nelem, (signed char *) array, 
+             *(signed char *) nulval, status);
     }
     else if (datatype == TUSHORT)
     {
-      ffpcnui(fptr, 2, row, firstelem, nelem, (unsigned short *) array,
+      ffppnui(fptr, group, firstelem, nelem, (unsigned short *) array,
               *(unsigned short *) nulval,status);
     }
     else if (datatype == TSHORT)
     {
-      ffpcni(fptr, 2, row, firstelem, nelem, (short *) array,
+      ffppni(fptr, group, firstelem, nelem, (short *) array,
              *(short *) nulval, status);
     }
     else if (datatype == TUINT)
     {
-      ffpcnuk(fptr, 2, row, firstelem, nelem, (unsigned int *) array,
+      ffppnuk(fptr, group, firstelem, nelem, (unsigned int *) array,
              *(unsigned int *) nulval, status);
     }
     else if (datatype == TINT)
     {
-      ffpcnk(fptr, 2, row, firstelem, nelem, (int *) array,
+      ffppnk(fptr, group, firstelem, nelem, (int *) array,
              *(int *) nulval, status);
     }
     else if (datatype == TULONG)
     {
-      ffpcnuj(fptr, 2, row, firstelem, nelem, (unsigned long *) array,
+      ffppnuj(fptr, group, firstelem, nelem, (unsigned long *) array,
               *(unsigned long *) nulval,status);
     }
     else if (datatype == TLONG)
     {
-      ffpcnj(fptr, 2, row, firstelem, nelem, (long *) array,
+      ffppnj(fptr, group, firstelem, nelem, (long *) array,
              *(long *) nulval, status);
+    }
+    else if (datatype == TLONGLONG)
+    {
+      ffppnjj(fptr, group, firstelem, nelem, (LONGLONG *) array,
+             *(LONGLONG *) nulval, status);
     }
     else if (datatype == TFLOAT)
     {
-      ffpcne(fptr, 2, row, firstelem, nelem, (float *) array,
+      ffppne(fptr, group, firstelem, nelem, (float *) array,
              *(float *) nulval, status);
     }
     else if (datatype == TDOUBLE)
     {
-      ffpcnd(fptr, 2, row, firstelem, nelem, (double *) array,
+      ffppnd(fptr, group, firstelem, nelem, (double *) array,
              *(double *) nulval, status);
+    }
+    else
+      *status = BAD_DATATYPE;
+
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
+int ffpss(  fitsfile *fptr,   /* I - FITS file pointer                       */
+            int  datatype,    /* I - datatype of the value                   */
+            long *blc,        /* I - 'bottom left corner' of the subsection  */
+            long *trc ,       /* I - 'top right corner' of the subsection    */
+            void *array,      /* I - array of values that are written        */
+            int  *status)     /* IO - error status                           */
+/*
+  Write a section of values to the primary array. The datatype of the
+  input array is defined by the 2nd argument.  Data conversion
+  and scaling will be performed if necessary (e.g, if the datatype of
+  the FITS array is not the same as the array being written).
+
+  This routine supports writing to large images with
+  more than 2**31 pixels.
+*/
+{
+    int naxis;
+    long naxes[9];
+
+    if (*status > 0)   /* inherit input status value if > 0 */
+        return(*status);
+
+    /* get the size of the image */
+    ffgidm(fptr, &naxis, status);
+    ffgisz(fptr, 9, naxes, status);
+
+    if (datatype == TBYTE)
+    {
+        ffpssb(fptr, 1, naxis, naxes, blc, trc,
+               (unsigned char *) array, status);
+    }
+    else if (datatype == TSBYTE)
+    {
+        ffpsssb(fptr, 1, naxis, naxes, blc, trc,
+               (signed char *) array, status);
+    }
+    else if (datatype == TUSHORT)
+    {
+        ffpssui(fptr, 1, naxis, naxes, blc, trc,
+               (unsigned short *) array, status);
+    }
+    else if (datatype == TSHORT)
+    {
+        ffpssi(fptr, 1, naxis, naxes, blc, trc,
+               (short *) array, status);
+    }
+    else if (datatype == TUINT)
+    {
+        ffpssuk(fptr, 1, naxis, naxes, blc, trc,
+               (unsigned int *) array, status);
+    }
+    else if (datatype == TINT)
+    {
+        ffpssk(fptr, 1, naxis, naxes, blc, trc,
+               (int *) array, status);
+    }
+    else if (datatype == TULONG)
+    {
+        ffpssuj(fptr, 1, naxis, naxes, blc, trc,
+               (unsigned long *) array, status);
+    }
+    else if (datatype == TLONG)
+    {
+        ffpssj(fptr, 1, naxis, naxes, blc, trc,
+               (long *) array, status);
+    }
+    else if (datatype == TLONGLONG)
+    {
+        ffpssjj(fptr, 1, naxis, naxes, blc, trc,
+               (LONGLONG *) array, status);
+    }    else if (datatype == TFLOAT)
+    {
+        ffpsse(fptr, 1, naxis, naxes, blc, trc,
+               (float *) array, status);
+    }
+    else if (datatype == TDOUBLE)
+    {
+        ffpssd(fptr, 1, naxis, naxes, blc, trc,
+               (double *) array, status);
     }
     else
       *status = BAD_DATATYPE;
@@ -169,9 +635,9 @@ int ffppn(  fitsfile *fptr,  /* I - FITS file pointer                       */
 int ffpcl(  fitsfile *fptr,  /* I - FITS file pointer                       */
             int  datatype,   /* I - datatype of the value                   */
             int  colnum,     /* I - number of column to write (1 = 1st col) */
-            long  firstrow,  /* I - first row to write (1 = 1st row)        */
-            long  firstelem, /* I - first vector element to write (1 = 1st) */
-            long  nelem,     /* I - number of elements to write             */
+            LONGLONG  firstrow,  /* I - first row to write (1 = 1st row)        */
+            LONGLONG  firstelem, /* I - first vector element to write (1 = 1st) */
+            LONGLONG  nelem,     /* I - number of elements to write             */
             void  *array,    /* I - array of values that are written        */
             int  *status)    /* IO - error status                           */
 /*
@@ -179,6 +645,7 @@ int ffpcl(  fitsfile *fptr,  /* I - FITS file pointer                       */
   input array is defined by the 2nd argument. Data conversion
   and scaling will be performed if necessary (e.g, if the datatype of
   the FITS column is not the same as the array being written).
+
 */
 {
     if (*status > 0)           /* inherit input status value if > 0 */
@@ -186,12 +653,17 @@ int ffpcl(  fitsfile *fptr,  /* I - FITS file pointer                       */
 
     if (datatype == TBIT)
     {
-      ffpclx(fptr, colnum, firstrow, firstelem, nelem, (char *) array, 
+      ffpclx(fptr, colnum, firstrow, (long) firstelem, (long) nelem, (char *) array, 
              status);
     }
     else if (datatype == TBYTE)
     {
       ffpclb(fptr, colnum, firstrow, firstelem, nelem, (unsigned char *) array,
+             status);
+    }
+    else if (datatype == TSBYTE)
+    {
+      ffpclsb(fptr, colnum, firstrow, firstelem, nelem, (signed char *) array,
              status);
     }
     else if (datatype == TUSHORT)
@@ -222,6 +694,11 @@ int ffpcl(  fitsfile *fptr,  /* I - FITS file pointer                       */
     else if (datatype == TLONG)
     {
       ffpclj(fptr, colnum, firstrow, firstelem, nelem, (long *) array,
+             status);
+    }
+    else if (datatype == TLONGLONG)
+    {
+      ffpcljj(fptr, colnum, firstrow, firstelem, nelem, (LONGLONG *) array,
              status);
     }
     else if (datatype == TFLOAT)
@@ -263,9 +740,9 @@ int ffpcl(  fitsfile *fptr,  /* I - FITS file pointer                       */
 int ffpcn(  fitsfile *fptr,  /* I - FITS file pointer                       */
             int  datatype,   /* I - datatype of the value                   */
             int  colnum,     /* I - number of column to write (1 = 1st col) */
-            long  firstrow,  /* I - first row to write (1 = 1st row)        */
-            long  firstelem, /* I - first vector element to write (1 = 1st) */
-            long  nelem,     /* I - number of elements to write             */
+            LONGLONG  firstrow,  /* I - first row to write (1 = 1st row)        */
+            LONGLONG  firstelem, /* I - first vector element to write (1 = 1st) */
+            LONGLONG  nelem,     /* I - number of elements to write             */
             void  *array,    /* I - array of values that are written        */
             void  *nulval,   /* I - pointer to the null value               */
             int  *status)    /* IO - error status                           */
@@ -274,6 +751,7 @@ int ffpcn(  fitsfile *fptr,  /* I - FITS file pointer                       */
   input array is defined by the 2nd argument. Data conversion
   and scaling will be performed if necessary (e.g, if the datatype of
   the FITS column is not the same as the array being written).
+
 */
 {
     if (*status > 0)           /* inherit input status value if > 0 */
@@ -290,6 +768,11 @@ int ffpcn(  fitsfile *fptr,  /* I - FITS file pointer                       */
     {
       ffpcnb(fptr, colnum, firstrow, firstelem, nelem, (unsigned char *) array,
             *(unsigned char *) nulval, status);
+    }
+    else if (datatype == TSBYTE)
+    {
+      ffpcnsb(fptr, colnum, firstrow, firstelem, nelem, (signed char *) array,
+            *(signed char *) nulval, status);
     }
     else if (datatype == TUSHORT)
     {
@@ -321,6 +804,11 @@ int ffpcn(  fitsfile *fptr,  /* I - FITS file pointer                       */
       ffpcnj(fptr, colnum, firstrow, firstelem, nelem, (long *) array,
              *(long *) nulval, status);
     }
+    else if (datatype == TLONGLONG)
+    {
+      ffpcnjj(fptr, colnum, firstrow, firstelem, nelem, (LONGLONG *) array,
+             *(LONGLONG *) nulval, status);
+    }
     else if (datatype == TFLOAT)
     {
       ffpcne(fptr, colnum, firstrow, firstelem, nelem, (float *) array,
@@ -330,6 +818,16 @@ int ffpcn(  fitsfile *fptr,  /* I - FITS file pointer                       */
     {
       ffpcnd(fptr, colnum, firstrow, firstelem, nelem, (double *) array,
              *(double *) nulval, status);
+    }
+    else if (datatype == TCOMPLEX)
+    {
+      ffpcne(fptr, colnum, firstrow, (firstelem - 1) * 2 + 1, nelem * 2,
+             (float *) array, *(float *) nulval, status);
+    }
+    else if (datatype == TDBLCOMPLEX)
+    {
+      ffpcnd(fptr, colnum, firstrow, (firstelem - 1) * 2 + 1, nelem * 2,
+             (double *) array, *(double *) nulval, status);
     }
     else if (datatype == TLOGICAL)
     {
@@ -547,6 +1045,7 @@ int ffiter(int n_cols,
         union {   /*  default null value for the column */
             char   *stringnull;
             unsigned char   charnull;
+            signed char scharnull;
             int    intnull;
             short  shortnull;
             long   longnull;
@@ -560,13 +1059,13 @@ int ffiter(int n_cols,
 
     void *dataptr, *defaultnull;
     colNulls *col;
-    int ii, jj, tstatus;
+    int ii, jj, tstatus, naxis, bitpix;
     int typecode, hdutype, jtype, type, anynul, nfiles, nbytes;
     long totaln, nleft, frow, felement, n_optimum, i_optimum, ntodo;
-    long rept, width, tnull;
+    long rept, rowrept, width, tnull, naxes[9] = {1,1,1,1,1,1,1,1,1}, groups;
     double zeros = 0.;
     char message[FLEN_ERRMSG], keyname[FLEN_KEYWORD], nullstr[FLEN_VALUE];
-    char **stringptr, *cptr;
+    char **stringptr, *nullptr, *cptr;
 
     if (*status > 0)
         return(*status);
@@ -591,15 +1090,31 @@ int ffiter(int n_cols,
     {
         /* check that output datatype code value is legal */
         type = cols[jj].datatype;  
-        if (type != 0 &&
-            type != TBYTE  && type != TLOGICAL && type != TSTRING &&
+
+        /* Allow variable length arrays for InputCol and InputOutputCol columns,
+	   but not for OutputCol columns.  Variable length arrays have a
+	   negative type code value. */
+
+        if ((cols[jj].iotype != OutputCol) && (type<0)) {
+            type*=-1;
+        }
+
+        if (type != 0      && type != TBYTE  &&
+            type != TSBYTE && type != TLOGICAL && type != TSTRING &&
             type != TSHORT && type != TINT     && type != TLONG && 
             type != TFLOAT && type != TDOUBLE  && type != TCOMPLEX &&
             type != TULONG && type != TUSHORT  && type != TDBLCOMPLEX)
         {
+	    if (type < 0) {
+	      sprintf(message,
+              "Variable length array not allowed for output column number %d (ffiter)",
+                    jj + 1);
+	    } else {
             sprintf(message,
                    "Illegal datatype for column number %d: %d  (ffiter)",
                     jj + 1, cols[jj].datatype);
+	    }
+	    
             ffpmsg(message);
             return(*status = BAD_DATATYPE);
         }
@@ -622,8 +1137,8 @@ int ffiter(int n_cols,
                 return(*status = NOT_IMAGE);
             }
 
-            /* images are stored in column 2; ignore the input value */
-            cols[jj].colnum = 2;
+            /* since this is an image, set a dummy column number = 0 */
+            cols[jj].colnum = 0;
             strcpy(cols[jj].colname, "IMAGE");  /* dummy name for images */
 
             tstatus = 0;
@@ -696,7 +1211,25 @@ int ffiter(int n_cols,
 
     if (hdutype == IMAGE_HDU)   /* get total number of pixels in the image */
     {
-      ffgtcl(cols[0].fptr, cols[0].colnum, NULL, &totaln, &width, status);
+      fits_get_img_dim(cols[0].fptr, &naxis, status);
+      fits_get_img_size(cols[0].fptr, 9, naxes, status);
+
+      tstatus = 0;
+      ffgkyj(cols[0].fptr, "GROUPS", &groups, NULL, &tstatus);
+      if (!tstatus && groups && (naxis > 1) && (naxes[0] == 0) )
+      {
+         /* this is a random groups file, with NAXIS1 = 0 */
+         /* Use GCOUNT, the number of groups, as the first multiplier  */
+         /* to calculate the total number of pixels in all the groups. */
+         ffgkyj(cols[0].fptr, "GCOUNT", &totaln, NULL, status);
+
+      }  else {
+         totaln = naxes[0];
+      }
+
+      for (ii = 1; ii < naxis; ii++)
+          totaln *= naxes[ii];
+
       frow = 1;
       felement = 1 + offset;
     }
@@ -741,6 +1274,7 @@ int ffiter(int n_cols,
         }
 
         n_optimum = n_optimum / nfiles;
+        n_optimum = maxvalue(n_optimum, 1);
     }
     else if (n_per_loop < 0)  /* must pass all the values at one time */
     {
@@ -758,14 +1292,59 @@ int ffiter(int n_cols,
 
     for (jj = 0; jj < n_cols; jj++)
     {
-        /* get column datatype and vector length */
-        if (ffgtcl(cols[jj].fptr, cols[jj].colnum, &typecode, &rept,
+        /* get image or column datatype and vector length */
+        if (hdutype == IMAGE_HDU)   /* get total number of pixels in the image */
+        {
+           fits_get_img_type(cols[jj].fptr, &bitpix, status);
+           switch(bitpix) {
+             case BYTE_IMG:
+                 typecode = TBYTE;
+                 break;
+             case SHORT_IMG:
+                 typecode = TSHORT;
+                 break;
+             case LONG_IMG:
+                 typecode = TLONG;
+                 break;
+             case FLOAT_IMG:
+                 typecode = TFLOAT;
+                 break;
+             case DOUBLE_IMG:
+                 typecode = TDOUBLE;
+                 break;
+            }
+        }
+        else
+        {
+            if (ffgtcl(cols[jj].fptr, cols[jj].colnum, &typecode, &rept,
                   &width, status) > 0)
-            goto cleanup;
+                goto cleanup;
+		
+	    if (typecode < 0) {  /* if any variable length arrays, then the */ 
+	        n_optimum = 1;   /* must process the table 1 row at a time */
+		
+              /* Allow variable length arrays for InputCol and InputOutputCol columns,
+	       but not for OutputCol columns.  Variable length arrays have a
+	       negative type code value. */
+
+              if (cols[jj].iotype == OutputCol) {
+ 	        sprintf(message,
+                "Variable length array not allowed for output column number %d (ffiter)",
+                    jj + 1);
+                ffpmsg(message);
+                return(*status = BAD_DATATYPE);
+              }
+	   }
+        }
 
         /* special case where sizeof(long) = 8: use TINT instead of TLONG */
-        if (typecode == TLONG && sizeof(long) == 8 && sizeof(int) == 4)
-            typecode = TINT;
+        if (abs(typecode) == TLONG && sizeof(long) == 8 && sizeof(int) == 4) {
+		if(typecode<0) {
+			typecode = -TINT;
+		} else {
+			typecode = TINT;
+		}
+        }
 
         /* Special case: interprete 'X' column as 'B' */
         if (abs(typecode) == TBIT)
@@ -777,10 +1356,10 @@ int ffiter(int n_cols,
         if (cols[jj].datatype == 0)    /* output datatype not specified? */
         {
             /* special case if sizeof(long) = 8: use TINT instead of TLONG */
-            if (typecode == TLONG && sizeof(long) == 8 && sizeof(int) == 4)
+            if (abs(typecode) == TLONG && sizeof(long) == 8 && sizeof(int) == 4)
                 cols[jj].datatype = TINT;
             else
-                cols[jj].datatype = typecode;
+                cols[jj].datatype = abs(typecode);
         }
 
         /* calc total number of elements to do on each iteration */
@@ -790,7 +1369,7 @@ int ffiter(int n_cols,
             cols[jj].repeat = 1;
 
             /* get the BLANK keyword value, if it exists */
-            if (typecode == TBYTE || typecode == TSHORT || typecode == TLONG)
+            if (abs(typecode) == TBYTE || abs(typecode) == TSHORT || abs(typecode) == TLONG)
             {
                 tstatus = 0;
                 ffgkyj(cols[jj].fptr, "BLANK", &tnull, 0, &tstatus);
@@ -802,11 +1381,23 @@ int ffiter(int n_cols,
         }
         else
         {
+	    if (typecode < 0) 
+	    {
+              /* get max size of the variable length vector; dont't trust the value
+	         given by the TFORM keyword  */
+	      rept = 1;
+	      for (ii = 0; ii < totaln; ii++) {
+		ffgdes(cols[jj].fptr, cols[jj].colnum, frow + ii, &rowrept, NULL, status);
+		
+		rept = maxvalue(rept, rowrept);
+	      }
+            }
+	    
             ntodo = n_optimum * rept;   /* vector columns */
             cols[jj].repeat = rept;
 
             /* get the TNULL keyword value, if it exists */
-            if (typecode == TBYTE || typecode == TSHORT || typecode == TLONG)
+            if (abs(typecode) == TBYTE || abs(typecode) == TSHORT || abs(typecode) == TLONG)
             {
                 tstatus = 0;
                 if (hdutype == ASCII_TBL) /* TNULLn value is a string */
@@ -866,7 +1457,7 @@ int ffiter(int n_cols,
           cols[jj].array = calloc(ntodo + 1, sizeof(char));
           col[jj].nullsize  = sizeof(char);  /* number of bytes per value */
 
-          if (typecode == TBYTE || typecode == TSHORT || typecode == TLONG)
+          if (abs(typecode) == TBYTE || abs(typecode) == TSHORT || abs(typecode) == TLONG)
           {
               tnull = minvalue(tnull, 255);
               tnull = maxvalue(tnull, 0);
@@ -878,11 +1469,27 @@ int ffiter(int n_cols,
           }
           break;
 
+         case TSBYTE:
+          cols[jj].array = calloc(ntodo + 1, sizeof(char));
+          col[jj].nullsize  = sizeof(char);  /* number of bytes per value */
+
+          if (abs(typecode) == TBYTE || abs(typecode) == TSHORT || abs(typecode) == TLONG)
+          {
+              tnull = minvalue(tnull, 127);
+              tnull = maxvalue(tnull, -128);
+              col[jj].null.scharnull = (signed char) tnull;
+          }
+          else
+          {
+              col[jj].null.scharnull = (signed char) -128; /* use -128  null */
+          }
+          break;
+
          case TSHORT:
           cols[jj].array = calloc(ntodo + 1, sizeof(short));
           col[jj].nullsize  = sizeof(short);  /* number of bytes per value */
 
-          if (typecode == TBYTE || typecode == TSHORT || typecode == TLONG)
+          if (abs(typecode) == TBYTE || abs(typecode) == TSHORT || abs(typecode) == TLONG)
           {
               tnull = minvalue(tnull, SHRT_MAX);
               tnull = maxvalue(tnull, SHRT_MIN);
@@ -898,7 +1505,7 @@ int ffiter(int n_cols,
           cols[jj].array = calloc(ntodo + 1, sizeof(unsigned short));
           col[jj].nullsize  = sizeof(unsigned short);  /* bytes per value */
 
-          if (typecode == TBYTE || typecode == TSHORT || typecode == TLONG)
+          if (abs(typecode) == TBYTE || abs(typecode) == TSHORT || abs(typecode) == TLONG)
           {
               tnull = minvalue(tnull, USHRT_MAX);
               tnull = maxvalue(tnull, 0);  /* don't allow negative value */
@@ -911,10 +1518,10 @@ int ffiter(int n_cols,
           break;
 
          case TINT:
-          cols[jj].array = calloc(ntodo + 1, sizeof(int));
+          cols[jj].array = calloc(sizeof(int), ntodo + 1);
           col[jj].nullsize  = sizeof(int);  /* number of bytes per value */
 
-          if (typecode == TBYTE || typecode == TSHORT || typecode == TLONG)
+          if (abs(typecode) == TBYTE || abs(typecode) == TSHORT || abs(typecode) == TLONG)
           {
               tnull = minvalue(tnull, INT_MAX);
               tnull = maxvalue(tnull, INT_MIN);
@@ -930,7 +1537,7 @@ int ffiter(int n_cols,
           cols[jj].array = calloc(ntodo + 1, sizeof(unsigned int));
           col[jj].nullsize  = sizeof(unsigned int);  /* bytes per value */
 
-          if (typecode == TBYTE || typecode == TSHORT || typecode == TLONG)
+          if (abs(typecode) == TBYTE || abs(typecode) == TSHORT || abs(typecode) == TLONG)
           {
               tnull = minvalue(tnull, INT32_MAX);
               tnull = maxvalue(tnull, 0);
@@ -946,7 +1553,7 @@ int ffiter(int n_cols,
           cols[jj].array = calloc(ntodo + 1, sizeof(long));
           col[jj].nullsize  = sizeof(long);  /* number of bytes per value */
 
-          if (typecode == TBYTE || typecode == TSHORT || typecode == TLONG)
+          if (abs(typecode) == TBYTE || abs(typecode) == TSHORT || abs(typecode) == TLONG)
           {
               col[jj].null.longnull = tnull;
           }
@@ -960,7 +1567,7 @@ int ffiter(int n_cols,
           cols[jj].array = calloc(ntodo + 1, sizeof(unsigned long));
           col[jj].nullsize  = sizeof(unsigned long);  /* bytes per value */
 
-          if (typecode == TBYTE || typecode == TSHORT || typecode == TLONG)
+          if (abs(typecode) == TBYTE || abs(typecode) == TSHORT || abs(typecode) == TLONG)
           {
               if (tnull < 0)  /* can't use a negative null value */
                   col[jj].null.ulongnull = LONG_MAX;
@@ -977,7 +1584,7 @@ int ffiter(int n_cols,
           cols[jj].array = calloc(ntodo + 1, sizeof(float));
           col[jj].nullsize  = sizeof(float);  /* number of bytes per value */
 
-          if (typecode == TBYTE || typecode == TSHORT || typecode == TLONG)
+          if (abs(typecode) == TBYTE || abs(typecode) == TSHORT || abs(typecode) == TLONG)
           {
               col[jj].null.floatnull = (float) tnull;
           }
@@ -997,7 +1604,7 @@ int ffiter(int n_cols,
           cols[jj].array = calloc(ntodo + 1, sizeof(double));
           col[jj].nullsize  = sizeof(double);  /* number of bytes per value */
 
-          if (typecode == TBYTE || typecode == TSHORT || typecode == TLONG)
+          if (abs(typecode) == TBYTE || abs(typecode) == TSHORT || abs(typecode) == TLONG)
           {
               col[jj].null.doublenull = (double) tnull;
           }
@@ -1024,6 +1631,7 @@ int ffiter(int n_cols,
           {
             /* allocate string to store the null string value */
             col[jj].null.stringnull = calloc(rept + 1, sizeof(char) );
+            col[jj].null.stringnull[1] = 1; /* to make sure string != 0 */
 
             /* allocate big block for the array of table column strings */
             stringptr[0] = calloc((ntodo + 1) * (rept + 1), sizeof(char) );
@@ -1078,7 +1686,7 @@ int ffiter(int n_cols,
             goto cleanup;
         }
     }
- 
+
     /*--------------------------------------------------*/
     /* main loop while there are values left to process */
     /*--------------------------------------------------*/
@@ -1105,11 +1713,33 @@ int ffiter(int n_cols,
             dataptr = (char *) cols[jj].array + col[jj].nullsize;
             defaultnull = &col[jj].null.charnull; /* ptr to the null value */
           }
-          if (ffgcv(cols[jj].fptr, cols[jj].datatype, cols[jj].colnum,
+
+          if (hdutype == IMAGE_HDU)   
+          {
+              if (ffgpv(cols[jj].fptr, cols[jj].datatype,
+                    felement, cols[jj].repeat * ntodo, defaultnull,
+                    dataptr,  &anynul, status) > 0)
+              {
+                 break;
+              }
+          }
+          else
+          {
+	      if (ffgtcl(cols[jj].fptr, cols[jj].colnum, &typecode, &rept,&width, status) > 0)
+	          goto cleanup;
+		  
+	      if (typecode<0)
+	      {
+	        /* get size of the variable length vector */
+		ffgdes(cols[jj].fptr, cols[jj].colnum, frow,&cols[jj].repeat, NULL,status);
+	      }
+		
+              if (ffgcv(cols[jj].fptr, cols[jj].datatype, cols[jj].colnum,
                     frow, felement, cols[jj].repeat * ntodo, defaultnull,
                     dataptr,  &anynul, status) > 0)
-          {
-            break;
+              {
+                 break;
+              }
           }
 
           /* copy the appropriate null value into first array element */
@@ -1145,7 +1775,13 @@ int ffiter(int n_cols,
          break;   /* looks like an error occurred; quit immediately */
 
       /* call work function */
-      *status = work_fn(totaln, offset, frow, ntodo, n_cols, cols, userPointer);
+
+      if (hdutype == IMAGE_HDU) 
+          *status = work_fn(totaln, offset, felement, ntodo, n_cols, cols,
+                    userPointer);
+      else
+          *status = work_fn(totaln, offset, frow, ntodo, n_cols, cols,
+                    userPointer);
 
       if (*status > 0 || *status < -1 ) 
          break;   /* looks like an error occurred; quit immediately */
@@ -1160,29 +1796,67 @@ int ffiter(int n_cols,
           {
             stringptr = cols[jj].array;
             dataptr = stringptr + 1;
-            nbytes = 1;
+            nullptr = *stringptr;
+            nbytes = 2;
           }
           else
           {
             dataptr = (char *) cols[jj].array + col[jj].nullsize;
+            nullptr = (char *) cols[jj].array;
             nbytes = col[jj].nullsize;
           }
 
-          if (memcmp(cols[jj].array, &zeros, nbytes) ) 
+          if (memcmp(nullptr, &zeros, nbytes) ) 
           {
             /* null value flag not zero; must check for and write nulls */
-            if (ffpcn(cols[jj].fptr, cols[jj].datatype, cols[jj].colnum, frow,
+            if (hdutype == IMAGE_HDU)   
+            {
+                if (ffppn(cols[jj].fptr, cols[jj].datatype, 
                       felement, cols[jj].repeat * ntodo, dataptr,
-                      cols[jj].array, &tstatus) > 0)
-              break;
+                      nullptr, &tstatus) > 0)
+                break;
+            }
+            else
+            {
+	    	if (ffgtcl(cols[jj].fptr, cols[jj].colnum, &typecode, &rept,&width, status) > 0)
+		    goto cleanup;
+		    
+		if (typecode<0)  /* variable length array colum */
+		{
+		   ffgdes(cols[jj].fptr, cols[jj].colnum, frow,&cols[jj].repeat, NULL,status);
+		}
+
+                if (ffpcn(cols[jj].fptr, cols[jj].datatype, cols[jj].colnum, frow,
+                      felement, cols[jj].repeat * ntodo, dataptr,
+                      nullptr, &tstatus) > 0)
+                break;
+            }
           }
           else
           { 
             /* no null values; just write the array */
-            if (ffpcl(cols[jj].fptr, cols[jj].datatype, cols[jj].colnum, frow,
+            if (hdutype == IMAGE_HDU)   
+            {
+                if (ffppr(cols[jj].fptr, cols[jj].datatype,
                       felement, cols[jj].repeat * ntodo, dataptr,
                       &tstatus) > 0)
-              break;
+                break;
+            }
+            else
+            {
+	    	if (ffgtcl(cols[jj].fptr, cols[jj].colnum, &typecode, &rept,&width, status) > 0)
+		    goto cleanup;
+		    
+		if (typecode<0)  /* variable length array column */
+		{
+		   ffgdes(cols[jj].fptr, cols[jj].colnum, frow,&cols[jj].repeat, NULL,status);
+		}
+
+                 if (ffpcl(cols[jj].fptr, cols[jj].datatype, cols[jj].colnum, frow,
+                      felement, cols[jj].repeat * ntodo, dataptr,
+                      &tstatus) > 0)
+                break;
+            }
           }
         }
       }

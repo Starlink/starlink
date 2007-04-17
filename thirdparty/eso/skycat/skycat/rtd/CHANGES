@@ -5,6 +5,10 @@ This file contains a list of changes to the RTD software and user
 interface. The latest changes are at the top.
 
 
+--------------- 03.02.06 released rtd-3.0 -------------------
+
+* Major update: see top level CHANGES file.
+
 --------------- 04.04.05 released rtd-2.29 -----------------
 
 * Merged in RTD changes from Peter Biereichel:

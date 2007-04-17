@@ -6,83 +6,7 @@ This directory contains the sources for Skycat, a tool that combines
 visualization of images and access to catalogs and archive data for
 astronomy.
 
-Skycat is based on the ESO Real-Time Display package (rtd) and the ESO
-Catalog library package (cat).  These should already be installed, or
-compiled in the ../rtd and ../cat directories.
-
--------------------------------------------
-Contacts: Allan Brighton (abrighton@gemini.edu)
--------------------------------------------
-
-For installation instructions, see the file INSTALL in this directory.
-
-See the CHANGES file in this directory for a list of recent changes.
-
-This module consists of the following parts:
-
-* The C++ sources and [incr Tcl] widget classes for Skycat.  These are
-  also available as a Tcl "package" called "Skycat" and so can be
-  dynamically loaded in another application.
-
-* The "interp" directory builds the "interpreted" version of
-  Skycat. This is an extended "wish" binary with the Rtd and Catalog
-  extensions included.
-
-For Tcl7.6/Tk4.2 only:
-
-* The "et" directory is used to create a standalone single binary
-  version of skycat using ET ("Embedded Tk"). ET uses a preprocessor
-  to "include" Tcl/Tk scripts in a C or C++ application at compile
-  time.
-
-For Tcl8.0.3/Tk8.0.3 or newer:
-
-* The "tclpro" directory is used to create a standalone single binary
-  version of Skycat using the Scriptics TclPro "prowrap" application.
-  See http://www.scriptics.com/tclpro/ for more information and a free
-  30 day trial version.
-
-
-Requirements
-------------
-
-The following packages (normally included in the tarfile) should be
-either already installed or compiled under the parent directory (i.e.:
-all of the source packages should be under a common parent directory):
-
-* rtd       Real-Time Display 
-
-* cat       Catalog Library 
-
-* astrotcl  Astronomical software utilities
-
-* tclutil   General utility package
-
-See the INSTALL file for details on compiling and installing the
-skycat package.
-
-
-Running
--------
-
-Once compiled and installed, the skycat application may be started in
-the following ways:
-
-The interpreted version (requires Tcl source files at run time):
-	
-	$INSTALLDIR/bin/skycat
- 
-The single binary version has the OS version appended to the name, for
-example skycat-SunOS-5.5.1 and does not require any special Tcl
-run-time environment:
-
- 	$INSTALLDIR/bin/skycat-$OSVERSION
-
-($OSVERSION is defined as "`uname -s`-`uname -r`")
-
-
-Environment Variables:
-----------------------
+Once installed, you can start the application with the command "skycat".
 
 You may specify a URL for the default catalog config file by defining
 the following environment variable:
@@ -97,28 +21,28 @@ catalog directory browser (Skycat saves changes to the catalog list to
 this file automatically).
 
 
-Documentation
--------------
+For installation instructions, see the file INSTALL in the parent
+directory.  See the CHANGES file in this directory for a list of
+recent changes.  
 
-The latest documentation (in postscript, FrameMaker, and PDF formats)
-is available under:
+The following URLs may also be of interest:
 
+Skycat home page:
+	http://archive.eso.org/skycat/
+
+Sources and binaries:
+	ftp://ftp.eso.org/pub/archive/skycat/README.html
+
+Postscript, PDF, and FrameMaker Documentation:
 	ftp://ftp.eso.org/pub/archive/skycat/doc
 
-An HTML version is also available from:
+HTML Docs:
+	http://archive.eso.org/skycat/docs/skycat-man.html
 
-	http://www.eso.org/~archeso/skycat/skycat-man.html
+------------------------------------------------------------------
+Contact: Allan Brighton (abrighto@eso.org) 
+         Andreas Wicenec (awicenec@eso.org)
+         Peter Biereichel (pbiereic@eso.org) (RTD issues)
 
-The Skycat application is based on the following packages:
-
-* Tclutil (Tcl and C++ Utilities)
-
-* Astrotcl (Astronomical Tcl and C++ Utilities)
-
-* Rtd (Real-Time Display) 
-
-* Cat (Catalog library) 
-
-* Skycat (The ESO Skycat Tool)
-
-See the documentation for the above packages for more information.
+ESO - European Southern Observatory
+------------------------------------------------------------------

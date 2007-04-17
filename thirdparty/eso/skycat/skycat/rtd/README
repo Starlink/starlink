@@ -12,76 +12,37 @@ Contacts: Allan Brighton (abrighton@gemini.edu)
           ESO - European Southern Observatory
 --------------------------------------
 
-For installation instructions, see the file INSTALL in this directory.
+Once installed, you can start the application with the command "rtd".
+There is also a simulation mode, which may be started with the command
 
-See the CHANGES file in this directory for a list of recent changes.
+    rtd -debug 1
 
-Note: The RTD software has been tested on HP-UX, Solaris and Linux
-with gcc 2.7.2.x.
+This automatically starts the rtdServer and a simulation application,
+tRtd, that generates dummy images. Rtd always starts the rtdServer
+background process as needed when you attach a camera.
 
-Once everything has been compiled, the rtd application may be started
-as follows:
+For installation instructions, see the file INSTALL in the parent
+directory.  See the CHANGES file in this directory for a list of
+recent changes.  
 
-	% cd $SRCDIR/rtdimg/demos
-	% rtd 
+The following URLs may also be of interest:
 
-Or, for the installed version:
-	
-	% $INSTALLDIR/bin/rtd 
-	
-You can specify a FITS file to view by specifying a filename on the
-command line, or by selecting "Open" from the "File" menu when the
-application comes up.
+Skycat home page:
+	http://archive.eso.org/skycat/
 
-Note: if you want to run the demo from a machine other than the one
-you compiled it on, you may need to set the RTD_LIBRARY environment
-variable so that the necessary Tcl source files can be found at run
-time:
+Sources and binaries:
+	ftp://ftp.eso.org/pub/archive/skycat/README.html
 
-	% setenv RTD_LIBRARY $INSTALLDIR/lib/rtd
-
-For more information, please refer to the postscript documentation,
-which can be retrieved via anon ftp from:
-
+Postscript, PDF, and FrameMaker Documentation:
 	ftp://ftp.eso.org/pub/archive/skycat/doc
 
-The sources for the man pages can be found in the source tree under
-the "man" directories.
-
-Contents of this Release
-------------------------
-
-rtd			- top level RTD directory
-                          contains the configure script, Makefile and related 
-	                  scripts and information	
-
-  rtdimg		- RTD widget directory, contains C++ and Tcl code.
-
-    doc			- documentation
-    man                 - man pages
-    src			- C++ sources implementing a new Tk image type 
-    include	          "rtdimage"
-    bin			- holds rtdimage_wish binary
-    library		- Tcl/Tk and [incr Tk] support widgets
-    demos		- rtd application startup script
-    images  		- test FITS images
-    bitmaps		- bitmaps used in user interface
-   colormaps		- directory containing MIDAS colormap and intensity
-			  table files (see colormap menu item in demo)
+HTML Docs:
+	http://archive.eso.org/skycat/docs/skycat-man.html
 
 
-  rtdevt		- C sources for rtdServer daemon process, used to	
-    src			  write images to shared memory and then notify
-    include		  user interface application...
-    bin			  holds rtdServer binary
+--------------------------------------
+Contacts: Allan Brighton (abrighto@eso.org)
 
-  rtilib		- C++ class library for manipulating images, 
-    src			  used by "rtdimage", includes transformations,
-    include		  color scaling, raw to X image (byte) conversion 
-			  (but independent of Tk and Xlib)
+ESO - European Southern Observatory
+--------------------------------------
 
-  rtdrmt                - Remote socket interface example client.
-
-  xgrabsc.2_41		- X utility used for printing images.
-
------------------------------------------------------------------------------------

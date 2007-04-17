@@ -1,126 +1,8 @@
-#include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include <string.h>
 #include "fitsio2.h"
-/*--------------------------------------------------------------------------*/
-int ffgics(fitsfile *fptr,    /* I - FITS file pointer           */
-           double *xrval,     /* O - X reference value           */
-           double *yrval,     /* O - Y reference value           */
-           double *xrpix,     /* O - X reference pixel           */
-           double *yrpix,     /* O - Y reference pixel           */
-           double *xinc,      /* O - X increment per pixel       */
-           double *yinc,      /* O - Y increment per pixel       */
-           double *rot,       /* O - rotation angle (degrees)    */
-           char *type,        /* O - type of projection ('-sin') */
-           int *status)       /* IO - error status               */
-/*
-       read the values of the celestial coordinate system keywords.
-       These values may be used as input to the subroutines that
-       calculate celestial coordinates. (ffxypx, ffwldp)
 
-       This routine assumes that the CHDU contains an image
-       with the RA type coordinate running along the first axis
-       and the DEC type coordinate running along the 2nd axis.
-*/
-{
-    int tstat = 0;
-    char comm[FLEN_COMMENT],ctype[FLEN_VALUE];
-
-    if (*status > 0)
-       return(*status);
-
-    ffgkyd(fptr, "CRVAL1", xrval, comm, status);
-    ffgkyd(fptr, "CRVAL2", yrval, comm, status);
-
-    ffgkyd(fptr, "CRPIX1", xrpix, comm, status);
-    ffgkyd(fptr, "CRPIX2", yrpix, comm, status);
-
-    ffgkyd(fptr, "CDELT1", xinc, comm, status);
-    ffgkyd(fptr, "CDELT2", yinc, comm, status);
-
-    ffgkys(fptr, "CTYPE1", ctype, comm, status);
-
-    if (*status > 0)
-    {
-      ffpmsg
-      ("ffgics could not find all the celestial coordinate keywords");
-      return(*status = NO_WCS_KEY); 
-    }
-
-    /* copy the projection type string */
-    strncpy(type, &ctype[4], 4);
-    type[4] = '\0';
-
-    *rot=0.;
-    ffgkyd(fptr, "CROTA2", rot, comm, &tstat); /* keyword may not exist */
-
-    return(*status);
-}
-/*--------------------------------------------------------------------------*/
-int ffgtcs(fitsfile *fptr,    /* I - FITS file pointer           */
-           int xcol,          /* I - column containing the RA coordinate  */
-           int ycol,          /* I - column containing the DEC coordinate */
-           double *xrval,     /* O - X reference value           */
-           double *yrval,     /* O - Y reference value           */
-           double *xrpix,     /* O - X reference pixel           */
-           double *yrpix,     /* O - Y reference pixel           */
-           double *xinc,      /* O - X increment per pixel       */
-           double *yinc,      /* O - Y increment per pixel       */
-           double *rot,       /* O - rotation angle (degrees)    */
-           char *type,        /* O - type of projection ('-sin') */
-           int *status)       /* IO - error status               */
-/*
-       read the values of the celestial coordinate system keywords
-       from a FITS table where the X and Y or RA and DEC coordinates
-       are stored in separate column.  
-       These values may be used as input to the subroutines that
-       calculate celestial coordinates. (ffxypx, ffwldp)
-*/
-{
-    char comm[FLEN_COMMENT],ctype[FLEN_VALUE],keynam[FLEN_KEYWORD];
-    int tstatus = 0;
-
-    if (*status > 0)
-       return(*status);
-
-    ffkeyn("TCRVL",xcol,keynam,status);
-    ffgkyd(fptr,keynam,xrval,comm,status);
-
-    ffkeyn("TCRVL",ycol,keynam,status);
-    ffgkyd(fptr,keynam,yrval,comm,status);
-
-    ffkeyn("TCRPX",xcol,keynam,status);
-    ffgkyd(fptr,keynam,xrpix,comm,status);
-
-    ffkeyn("TCRPX",ycol,keynam,status);
-    ffgkyd(fptr,keynam,yrpix,comm,status);
-
-    ffkeyn("TCDLT",xcol,keynam,status);
-    ffgkyd(fptr,keynam,xinc,comm,status);
-
-    ffkeyn("TCDLT",ycol,keynam,status);
-    ffgkyd(fptr,keynam,yinc,comm,status);
-
-    ffkeyn("TCTYP",xcol,keynam,status);
-    ffgkys(fptr,keynam,ctype,comm,status);
-
-    if (*status > 0)
-    {
-      ffpmsg
-      ("ffgtcs could not find all the celestial coordinate keywords");
-      return(*status = NO_WCS_KEY); 
-    }
-
-    /* copy the projection type string */
-    strncpy(type, &ctype[4], 4);
-    type[4] = '\0';
-
-    *rot=0.;   /* default rotation is 0  */
-    ffkeyn("TCROT",ycol,keynam,status);
-    ffgkyd(fptr,keynam,rot,comm,&tstatus);  /* keyword may not exist */
-
-    return(*status);
-}
 /*--------------------------------------------------------------------------*/
 int ffwldp(double xpix, double ypix, double xref, double yref,
       double xrefpix, double yrefpix, double xinc, double yinc, double rot,
@@ -210,7 +92,7 @@ int ffwldp(double xpix, double ypix, double xref, double yref,
 /* 1 = angle too large for projection;                                   */
 /* (WDP 1/97: changed the return value to 501 instead of 1)              */
 /* does: -SIN, -TAN, -ARC, -NCP, -GLS, -MER, -AIT projections            */
-/* anything else is linear                                               */
+/* anything else is linear (== -CAR)                                     */
 /* Input:                                                                */
 /*   f   xpix    x pixel number  (RA or long without rotation)           */
 /*   f   ypiy    y pixel number  (dec or lat without rotation)           */
@@ -226,15 +108,15 @@ int ffwldp(double xpix, double ypix, double xref, double yref,
 /*   d   *xpos   x (RA) coordinate (deg)                                 */
 /*   d   *ypos   y (dec) coordinate (deg)                                */
 /*-----------------------------------------------------------------------*/
- {double cosr, sinr, dx, dy, dz, temp;
+ {double cosr, sinr, dx, dy, dz, temp, x, y, z;
   double sins, coss, dect, rat, dt, l, m, mg, da, dd, cos0, sin0;
   double dec0, ra0, decout, raout;
   double geo1, geo2, geo3;
   double cond2r=1.745329252e-2;
   double twopi = 6.28318530717959, deps = 1.0e-5;
   int   i, itype;
-  char ctypes[8][5] ={"-SIN","-TAN","-ARC","-NCP", "-GLS", "-MER", "-AIT",
-     "-STG"};
+  char ctypes[9][5] ={"-CAR","-SIN","-TAN","-ARC","-NCP", "-GLS", "-MER",
+     "-AIT", "-STG"};
 
   if (*status > 0)
      return(*status);
@@ -253,7 +135,7 @@ int ffwldp(double xpix, double ypix, double xref, double yref,
 /* WDP 1/97: removed support for default type for better error checking */
 /*  itype = 0;   default type is linear */
   itype = -1;  /* no default type */
-  for (i=0;i<8;i++) if (!strncmp(type, ctypes[i], 4)) itype = i+1;
+  for (i=0;i<9;i++) if (!strncmp(type, ctypes[i], 4)) itype = i;
 /* default, linear result for error return  */
   *xpos = xref + dx;
   *ypos = yref + dy;
@@ -265,9 +147,10 @@ int ffwldp(double xpix, double ypix, double xref, double yref,
   sins = l*l + m*m;
   cos0 = cos(dec0);
   sin0 = sin(dec0);
+
 /* process by case  */
   switch (itype) {
-    case 0:   /* linear */
+    case 0:   /* linear -CAR */
       rat =  ra0 + l;
       dect = dec0 + m;
       break;
@@ -282,11 +165,11 @@ int ffwldp(double xpix, double ypix, double xref, double yref,
       rat = atan2 (l, rat) + ra0;
       break;
     case 2:   /* -TAN tan */
-      if (sins>1.0) return(*status = 501);
-      dect = cos0 - m * sin0;
-      if (dect==0.0) return(*status = 501);
-      rat = ra0 + atan2 (l, dect);
-      dect = atan (cos(rat-ra0) * (m * cos0 + sin0) / dect);
+      x = cos0*cos(ra0) - l*sin(ra0) - m*cos(ra0)*sin0;
+      y = cos0*sin(ra0) + l*cos(ra0) - m*sin(ra0)*sin0;
+      z = sin0                       + m*         cos0;
+      rat  = atan2( y, x );
+      dect = atan ( z / sqrt(x*x+y*y) );
       break;
     case 3:   /* -ARC Arc*/
       if (sins>=twopi*twopi/4.0) return(*status = 501);
@@ -436,11 +319,11 @@ int ffxypx(double xpos, double ypos, double xref, double yref,
 /*   f  *ypiy    y pixel number  (dec or lat without rotation)           */
 /*-----------------------------------------------------------------------*/
  {double dx, dy, dz, r, ra0, dec0, ra, dec, coss, sins, dt, da, dd, sint;
-  double l, m, geo1, geo2, geo3, sinr, cosr;
+  double l, m, geo1, geo2, geo3, sinr, cosr, cos0, sin0;
   double cond2r=1.745329252e-2, deps=1.0e-5, twopi=6.28318530717959;
   int   i, itype;
-  char ctypes[8][5] ={"-SIN","-TAN","-ARC","-NCP", "-GLS", "-MER", "-AIT",
-     "-STG"};
+  char ctypes[9][5] ={"-CAR","-SIN","-TAN","-ARC","-NCP", "-GLS", "-MER",
+     "-AIT", "-STG"};
 
   /* 0h wrap-around tests added by D.Wells 10/12/94: */
   dt = (xpos - xref);
@@ -469,7 +352,7 @@ int ffxypx(double xpos, double ypos, double xref, double yref,
 /* WDP 1/97: removed support for default type for better error checking */
 /*  itype = 0;   default type is linear */
   itype = -1;  /* no default type */
-  for (i=0;i<8;i++) if (!strncmp(type, ctypes[i], 4)) itype = i+1;
+  for (i=0;i<9;i++) if (!strncmp(type, ctypes[i], 4)) itype = i;
   if (itype==0) return(*status);  /* done if linear */
 
 /* Non linear position */
@@ -481,8 +364,11 @@ int ffxypx(double xpos, double ypos, double xref, double yref,
 /* compute direction cosine */
   coss = cos (dec);
   sins = sin (dec);
+  cos0 = cos (dec0);
+  sin0 = sin (dec0);
   l = sin(ra-ra0) * coss;
-  sint = sins * sin(dec0) + coss * cos(dec0) * cos(ra-ra0);
+  sint = sins * sin0 + coss * cos0 * cos(ra-ra0);
+
 /* process by case  */
   switch (itype) {
     case 1:   /* -SIN sin*/ 
@@ -491,9 +377,20 @@ int ffxypx(double xpos, double ypos, double xref, double yref,
       break;
     case 2:   /* -TAN tan */
          if (sint<=0.0) return(*status = 501);
- 	 m = sins * sin(dec0) + coss * cos(dec0) * cos(ra-ra0);
-	 l = l / m;
-	 m = (sins * cos(dec0) - coss * sin(dec0) * cos(ra-ra0)) / m;
+         if( cos0<0.001 ) {
+            /* Do a first order expansion around pole */
+            m = (coss * cos(ra-ra0)) / (sins * sin0);
+            m = (-m + cos0 * (1.0 + m*m)) / sin0;
+         } else {
+            m = ( sins/sint - sin0 ) / cos0;
+         }
+	 if( fabs(sin(ra0)) < 0.3 ) {
+	    l  = coss*sin(ra)/sint - cos0*sin(ra0) + m*sin(ra0)*sin0;
+	    l /= cos(ra0);
+	 } else {
+	    l  = coss*cos(ra)/sint - cos0*cos(ra0) + m*cos(ra0)*sin0;
+	    l /= -sin(ra0);
+	 }
       break;
     case 3:   /* -ARC Arc*/
          m = sins * sin(dec0) + coss * cos(dec0) * cos(ra-ra0);

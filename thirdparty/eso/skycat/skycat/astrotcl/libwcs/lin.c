@@ -1,21 +1,21 @@
 /*=============================================================================
 *
 *   WCSLIB - an implementation of the FITS WCS proposal.
-*   Copyright (C) 1995-1999, Mark Calabretta
+*   Copyright (C) 1995-2002, Mark Calabretta
 *
-*   This library is free software; you can redistribute it and/or modify it
-*   under the terms of the GNU Library General Public License as published
-*   by the Free Software Foundation; either version 2 of the License, or (at
-*   your option) any later version.
+*   This library is free software; you can redistribute it and/or
+*   modify it under the terms of the GNU Lesser General Public
+*   License as published by the Free Software Foundation; either
+*   version 2 of the License, or (at your option) any later version.
 *
-*   This library is distributed in the hope that it will be useful, but
-*   WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library
-*   General Public License for more details.
-*
-*   You should have received a copy of the GNU Library General Public License
-*   along with this library; if not, write to the Free Software Foundation,
-*   Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*   This library is distributed in the hope that it will be useful,
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+*   Lesser General Public License for more details.
+*   
+*   You should have received a copy of the GNU Lesser General Public
+*   License along with this library; if not, write to the Free Software
+*   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *
 *   Correspondence concerning WCSLIB may be directed to:
 *      Internet email: mcalabre@atnf.csiro.au
@@ -117,7 +117,29 @@
 *         coordinate reference pixel, CRPIXn.
 *      double *pc
 *         Pointer to the first element of the PC (pixel coordinate)
-*         transformation matrix.
+*         transformation matrix.  The expected order is
+*
+*            lin.pc = {PC1_1, PC1_2, PC2_1, PC2_2};
+*
+*         This may be conveniently constructed from a two-dimensional array
+*         via
+*
+*            double m[2][2] = {{PC1_1, PC1_2},
+*                              {PC2_1, PC2_2}};
+*         
+*         which is equivalent to,
+*
+*            double m[2][2];
+*            m[0][0] = PC1_1;
+*            m[0][1] = PC1_2;
+*            m[1][0] = PC2_1;
+*            m[1][1] = PC2_2;
+*
+*         for which the storage order is
+*
+*            PC1_1, PC1_2, PC2_1, PC2_2
+*
+*         so it would be legitimate to set lin.pc = *m.
 *      double *cdelt
 *         Pointer to the first element of an array of double containing the
 *         coordinate increments, CDELTn.
@@ -138,9 +160,10 @@
 *   leak will result.
 *
 *   Author: Mark Calabretta, Australia Telescope National Facility
-*   $Id: lin.c,v 1.2 2005/02/02 01:43:04 brighton Exp $
+*   $Id: lin.c,v 1.1.1.1 2006/01/12 16:44:16 abrighto Exp $
 *===========================================================================*/
 
+#include <stdlib.h>
 #include <math.h>
 #include "wcslib.h"
 
@@ -159,17 +182,6 @@ const char *linrev_errmsg[] = {
    0,
    "Memory allocation error",
    "PC matrix is singular"};
-
-
-#ifndef __convexc__
-#if ! ( defined(__APPLE__) && defined(__MACH__) )
-#include <malloc.h>
-#else
-#include <stdlib.h>
-#endif
-#else
-#include <malloc.h>
-#endif
 
 int linset(lin)
 
@@ -425,4 +437,12 @@ double inv[];
    return 0;
 }
 /* Dec 20 1999	Doug Mink - Include wcslib.h, which includes lin.h
+ *
+ * Feb 15 2001	Doug Mink - Add comments for WCSLIB 2.6; no code changes
+ * Sep 19 2001	Doug Mink - Add above change to WCSLIB 2.7 code
+ * Nov 20 2001	Doug Mink - Always include stdlib.h
+ *
+ * Jan 15 2002	Bill Joye - Add ifdef so this compiles on MacOS/X
+ *
+ * Nov 18 2003	Doug Mink - Include stdlib.h instead of malloc.h
  */

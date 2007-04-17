@@ -1,6 +1,6 @@
 /*  worldpos.c -- WCS Algorithms from Classic AIPS.
- *  October 21, 1999
- *  Copyright (C) 1994-1999
+ *  February 3, 2004
+ *  Copyright (C) 1994-2004
  *  Associated Universities, Inc. Washington DC, USA.
  *  With code added by Doug Mink, Smithsonian Astrophysical Observatory
  *                 and Allan Brighton and Andreas Wicenec, ESO
@@ -10,19 +10,21 @@
  * Subroutine:	worldpos() converts from pixel location to RA,Dec 
  * Subroutine:	worldpix() converts from RA,Dec         to pixel location   
 
-    This library is free software; you can redistribute it and/or modify it
-    under the terms of the GNU Library General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or (at your
-    option) any later version.
-   
-    This library is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library General Public
-    License for more details.
-   
-    You should have received a copy of the GNU Library General Public License
-    along with this library; if not, write to the Free Software Foundation,
-    Inc., 675 Massachusetts Ave, Cambridge, MA 02139, USA.
+    -=-=-=-=-=-=-
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+    
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
    
     Correspondence concerning AIPS should be addressed as follows:
 	   Internet email: aipsmail@nrao.edu
@@ -31,12 +33,12 @@
 	                   520 Edgemont Road
 	                   Charlottesville, VA 22903-2475 USA
 
-	         -=-=-=-=-=-=-
+    -=-=-=-=-=-=-
 
     These two ANSI C functions, worldpos() and worldpix(), perform
     forward and reverse WCS computations for 8 types of projective
-    geometries ("-SIN", "-TAN", "-ARC", "-NCP", "-GLS", "-MER", "-AIT"
-    "-STG", "CAR", and "COE"):
+    geometries ("-SIN", "-TAN", "-ARC", "-NCP", "-GLS" or "-SFL", "-MER",
+     "-AIT", "-STG", "CAR", and "COE"):
 
 	worldpos() converts from pixel location to RA,Dec 
 	worldpix() converts from RA,Dec         to pixel location   
@@ -83,8 +85,8 @@
     7) D.Mink changed input to data structure and implemented rotation matrix.
 */
 #include <math.h>
-#include <stdio.h>
 #include <string.h>
+#include <stdio.h>
 #include "wcs.h"
 
 int
@@ -92,7 +94,7 @@ worldpos (xpix, ypix, wcs, xpos, ypos)
 
 /* Routine to determine accurate position for pixel coordinates */
 /* returns 0 if successful otherwise 1 = angle too large for projection; */
-/* does: -SIN, -TAN, -ARC, -NCP, -GLS, -MER, -AIT projections */
+/* does: -SIN, -TAN, -ARC, -NCP, -GLS or -SFL, -MER, -AIT projections */
 /* anything else is linear */
 
 /* Input: */
@@ -255,6 +257,7 @@ double	*ypos;		/* y (dec) coordinate (deg) */
       break;
 
     case WCS_GLS:   /* -GLS global sinusoid */
+    case WCS_SFL:   /* -SFL Samson-Flamsteed */
       dect = dec0 + m;
       if (fabs(dect)>twopi/4.0) return 1;
       coss = cos (dect);
@@ -370,7 +373,7 @@ worldpix (xpos, ypos, wcs, xpix, ypix)
 /* returns 0 if successful otherwise:                                    */
 /*  1 = angle too large for projection;                                  */
 /*  2 = bad values                                                       */
-/* does: SIN, TAN, ARC, NCP, GLS, MER, AIT, STG, CAR, COE projections    */
+/* does: SIN, TAN, ARC, NCP, GLS or SFL, MER, AIT, STG, CAR, COE projections    */
 /* anything else is linear                                               */
 
 /* Input: */
@@ -424,9 +427,16 @@ double	*ypix;		/* y pixel number  (dec or lat without rotation) */
       dt = xpos - xref;
       }
 
-    /* 0h wrap-around tests added by D.Wells 10/12/94: */
-    if (dt > 180.0) xpos -= 360.0;
-    if (dt < -180.0) xpos += 360.0;
+    /* 0h wrap-around tests added by D.Wells 10/12/1994: */
+    /* Modified to exclude weird reference pixels by D.Mink 2/3/2004 */
+    if (xrefpix*xinc > 180.0 || xrefpix*xinc < -180.0) {
+	if (dt > 360.0) xpos -= 360.0;
+	if (dt < 0.0) xpos += 360.0;
+	}
+    else {
+	if (dt > 180.0) xpos -= 360.0;
+	if (dt < -180.0) xpos += 360.0;
+	}
     /* NOTE: changing input argument xpos is OK (call-by-value in C!) */
 
     ra = degrad (xpos);
@@ -480,6 +490,7 @@ double	*ypix;		/* y pixel number  (dec or lat without rotation) */
 	break;
 
     case WCS_GLS:   /* -GLS global sinusoid */
+    case WCS_SFL:   /* -SFL Samson-Flamsteed */
 	dt = ra - ra0;
 	if (fabs(dec)>twopi/4.0) return 1;
 	if (fabs(dec0)>twopi/4.0) return 1;
@@ -651,4 +662,8 @@ double	*ypix;		/* y pixel number  (dec or lat without rotation) */
  * Sep 30 1998	Fix bug in COE inverse code to get sign correct
  *
  * Oct 21 1999	Drop unused y from worldpix()
+ *
+ * Apr  3 2002	Use GLS and SFL interchangeably
+ *
+ * Feb  3 2004	Let ra be >180 in worldpix() if ref pixel is >180 deg away
  */

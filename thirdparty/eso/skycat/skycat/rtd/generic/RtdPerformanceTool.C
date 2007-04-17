@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: RtdPerformanceTool.C,v 1.3 2005/02/02 01:43:03 brighton Exp $"
+ * "@(#) $Id: RtdPerformanceTool.C,v 1.1.1.1 2006/01/12 16:38:53 abrighto Exp $"
  *
  * RtdPerformanceTool.C - member routines for class RtdPerformanceTool,
  *             manages manipulation of performance data

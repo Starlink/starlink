@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: RtdCoords.icc,v 1.2 2005/02/02 01:43:03 brighton Exp $" 
+ * "@(#) $Id: RtdCoords.icc,v 1.1.1.1 2006/01/12 16:39:13 abrighto Exp $" 
  *
  * RtdCoords.h - definitions for the Rtdimage coordinate conversion methods
  * 

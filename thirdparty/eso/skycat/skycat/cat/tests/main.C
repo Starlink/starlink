@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * $Id: main.C,v 1.1.1.1 2002/04/04 20:11:46 brighton Exp $
+ * $Id: main.C,v 1.1.1.1 2006/01/12 16:36:10 abrighto Exp $
  *
  * main.C - C++ main for testing C interface
  * 

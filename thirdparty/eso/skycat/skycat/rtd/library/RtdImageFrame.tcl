@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: RtdImageFrame.tcl,v 1.3 2005/02/02 01:43:03 brighton Exp $"
+# "@(#) $Id: RtdImageFrame.tcl,v 1.1.1.1 2006/01/12 16:38:23 abrighto Exp $"
 #
 # RtdImageFrame.tcl - itcl widget for displaying a section of an rtdimage 
 # at a given position in a canvas window

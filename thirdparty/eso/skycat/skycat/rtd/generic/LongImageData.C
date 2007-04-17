@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: LongImageData.C,v 1.4 2005/02/02 01:43:02 brighton Exp $" 
+ * "@(#) $Id: LongImageData.C,v 1.1.1.1 2006/01/12 16:39:22 abrighto Exp $" 
  *
  * LongImageData.C - member functions for class LongImageData
  *
@@ -35,8 +35,12 @@ using namespace std;
 #include <cstring>
 #include <cassert>
 #include <cmath>
-#include "LongImageData.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include "define.h"
+
+#include "LongImageData.h"
 
 
 /* 
@@ -159,7 +163,7 @@ void LongImageData::initShortConversion()
 #ifndef NTOH
 #    define NTOH(x) SWAP32(x)
 #endif
-#include "ImageTemplates.C"
+#include "ImageTemplates.icc"
 #undef NTOH
 #undef CLASS_NAME
 #undef DATA_TYPE

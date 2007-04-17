@@ -1,6 +1,6 @@
 /*************************************************************************
 * E.S.O. - VLT project
-* "@(#) $Id: rtdImageEvent.c,v 1.2 2005/02/02 01:43:03 brighton Exp $"
+* "@(#) $Id: rtdImageEvent.c,v 1.2 2006/01/18 18:31:56 abrighto Exp $"
 * rtdImageEvent.c
 *
 * who            when      what
@@ -168,7 +168,7 @@
 *
 *-------------------------------------------------------------------------
 */
-static const char* const rcsId="@(#) $Id: rtdImageEvent.c,v 1.2 2005/02/02 01:43:03 brighton Exp $";
+static const char* const rcsId="@(#) $Id: rtdImageEvent.c,v 1.2 2006/01/18 18:31:56 abrighto Exp $";
 
 
 /*
@@ -182,11 +182,14 @@ static const char* const rcsId="@(#) $Id: rtdImageEvent.c,v 1.2 2005/02/02 01:43
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 #ifdef HAVE_SYS_FILIO_H
 #include <sys/filio.h>
 #endif
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <netinet/tcp.h>
 #include <signal.h>
 #include <unistd.h>
@@ -210,7 +213,7 @@ int rtdInitImageEvt(char              *requestor,
     
     struct sockaddr_in rtdClientAddr;  /* for local socket address */
     struct sockaddr_in rtdServerAddr;  /* for peer socket address */
-    int addrlen;
+    socklen_t addrlen;
     int optval;
 
     char buf[256];

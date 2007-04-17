@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: LabelValue2.tcl,v 1.3 2005/02/18 10:49:59 brighton Exp $"
+# "@(#) $Id: LabelValue2.tcl,v 1.1.1.1 2006/01/12 16:38:19 abrighto Exp $"
 #
 # LabelValue2.tcl - Widget displaying a label and two values
 #
@@ -23,7 +23,7 @@ itcl::class util::LabelValue2 {
     }
     
     protected method init {} {
-	#$w_ config -disabledforeground black -state disabled
+	$w_ config -disabledforeground black -state disabled
 	pack $w_ -fill x -expand 0
 
 	# add an additional entry
@@ -55,7 +55,7 @@ itcl::class util::LabelValue2 {
 	    $itk_component(entry2) config -state normal
 	    $itk_component(entry2) delete 0 end
 	    $itk_component(entry2) insert 0 $itk_option(-value2)
-	    #$itk_component(entry2) config -state disabled
+	    $itk_component(entry2) config -state disabled
 	}
     }
 }

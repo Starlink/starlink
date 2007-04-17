@@ -25,10 +25,9 @@ static char SccsId[] = "%W%  %G%";
 #define HDEBUG
 #endif
 
-/* Local prototypes */
 static int equalize_simply();
 #ifdef JIGGLE
-static void adjust_list();
+  static void adjust_list();
 #endif
 
 

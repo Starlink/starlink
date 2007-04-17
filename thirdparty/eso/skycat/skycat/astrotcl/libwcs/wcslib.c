@@ -1,21 +1,21 @@
 /*=============================================================================
 *
 *   WCSLIB - an implementation of the FITS WCS proposal.
-*   Copyright (C) 1995-1999, Mark Calabretta
+*   Copyright (C) 1995-2002, Mark Calabretta
 *
-*   This library is free software; you can redistribute it and/or modify it
-*   under the terms of the GNU Library General Public License as published
-*   by the Free Software Foundation; either version 2 of the License, or (at
-*   your option) any later version.
+*   This library is free software; you can redistribute it and/or
+*   modify it under the terms of the GNU Lesser General Public
+*   License as published by the Free Software Foundation; either
+*   version 2 of the License, or (at your option) any later version.
 *
-*   This library is distributed in the hope that it will be useful, but
-*   WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library
-*   General Public License for more details.
-*
-*   You should have received a copy of the GNU Library General Public License
-*   along with this library; if not, write to the Free Software Foundation,
-*   Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*   This library is distributed in the hope that it will be useful,
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+*   Lesser General Public License for more details.
+*   
+*   You should have received a copy of the GNU Lesser General Public
+*   License along with this library; if not, write to the Free Software
+*   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *
 *   Correspondence concerning WCSLIB may be directed to:
 *      Internet email: mcalabre@atnf.csiro.au
@@ -94,7 +94,7 @@
 *   Given:
 *      crval    const double[]
 *                        Coordinate reference values corresponding to the FITS
-*                        CRVALn header cards.
+*                        CRVALn header cards (see note 2).
 *
 *   Given and returned:
 *      cel      celprm*  Spherical coordinate transformation parameters (usage
@@ -169,7 +169,7 @@
 *   Given:
 *      crval    const double[]
 *                        Coordinate reference values corresponding to the FITS
-*                        CRVALn header cards.
+*                        CRVALn header cards (see note 2).
 *
 *   Given and returned:
 *      cel      celprm*  Spherical coordinate transformation parameters
@@ -219,7 +219,12 @@
 *                              world[wcs->lng].
 *      vspan[2] const double
 *                        Solution interval for the celestial coordinate, in
-*                        degrees.
+*                        degrees.  The ordering of the two limits is
+*                        irrelevant.  Longitude ranges may be specified with
+*                        any convenient normalization, for example [-120,+120]
+*                        is the same as [240,480], except that the solution
+*                        will be returned with the same normalization, i.e.
+*                        lie within the interval specified.
 *      vstep    const double
 *                        Step size for solution search, in degrees.  If zero,
 *                        a sensible, although perhaps non-optimal default will
@@ -240,7 +245,7 @@
 *   Given:
 *      crval    const double[]
 *                        Coordinate reference values corresponding to the FITS
-*                        CRVALn header cards.
+*                        CRVALn header cards (see note 2).
 *
 *   Given and returned:
 *      cel      celprm*  Spherical coordinate transformation parameters
@@ -290,7 +295,9 @@
 *    3) These functions recognize the NCP projection and convert it to the
 *       equivalent SIN projection.
 *
-*    4) The quadcube projections (CSC, QSC, TSC) may be represented in FITS in
+*       They also recognize GLS as a synonym for SFL.
+*
+*    4) The quadcube projections (TSC, CSC, QSC) may be represented in FITS in
 *       either of two ways:
 *
 *          a) The six faces may be laid out in one plane and numbered as
@@ -375,12 +382,13 @@
 *      projections.
 *
 *   Author: Mark Calabretta, Australia Telescope National Facility
-*   $Id: wcslib.c,v 1.2 2005/02/02 01:43:03 brighton Exp $
+*   $Id: wcslib.c,v 1.1.1.1 2006/01/12 16:45:37 abrighto Exp $
 *===========================================================================*/
 
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include <stdio.h>
 #include "wcslib.h"
 
 /* Map error number to error message for each function. */
@@ -410,9 +418,7 @@ const char *wcsmix_errmsg[] = {
    "Invalid linear transformation parameters",
    "No solution found in the specified interval"};
 
-
 #define signb(X) ((X) < 0.0 ? 1 : 0)
-
 
 int
 wcsset (naxis, ctype, wcs)
@@ -422,6 +428,9 @@ const char ctype[][9];
 struct wcsprm *wcs;
 
 {
+   int  nalias = 2;
+   char aliases [2][4] = {"NCP", "GLS"};
+
    int j, k, *ndx;
    char requir[9];
 
@@ -445,13 +454,20 @@ struct wcsprm *wcs;
       }
 
       /* Got an axis qualifier, is it a recognized WCS projection? */
-      for (k = 0; k < skycat_npcode; k++) {
-         if (strncmp(&ctype[j][5], skycat_pcodes[k], 3) == 0) break;
+      for (k = 0; k < npcode; k++) {
+         if (strncmp(&ctype[j][5], pcodes[k], 3) == 0) break;
       }
 
-      if (k == skycat_npcode) {
-         /* Allow NCP to pass (will be converted to SIN later). */
-         if (strncmp(&ctype[j][5], "NCP", 3)) continue;
+      if (k == npcode) {
+         /* Maybe it's a projection alias. */
+         for (k = 0; k < nalias; k++) {
+            if (strncmp(&ctype[j][5], aliases[k], 3) == 0) break;
+         }
+
+         /* Not recognized. */
+         if (k == nalias) {
+            continue;
+         }
       }
 
       /* Parse the celestial axis type. */
@@ -482,6 +498,18 @@ struct wcsprm *wcs;
             sprintf(wcs->lattyp, "%cLAT", ctype[j][0]);
             ndx = &wcs->lng;
             sprintf(requir, "%s-%s", wcs->lngtyp, wcs->pcode);
+         } else if (strncmp(&ctype[j][2], "LN", 2) == 0) {
+            wcs->lng = j;
+            sprintf(wcs->lngtyp, "%c%cLN", ctype[j][0], ctype[j][1]);
+            sprintf(wcs->lattyp, "%c%cLT", ctype[j][0], ctype[j][1]);
+            ndx = &wcs->lat;
+            sprintf(requir, "%s-%s", wcs->lattyp, wcs->pcode);
+         } else if (strncmp(&ctype[j][2], "LT", 2) == 0) {
+            wcs->lat = j;
+            sprintf(wcs->lngtyp, "%c%cLN", ctype[j][0], ctype[j][1]);
+            sprintf(wcs->lattyp, "%c%cLT", ctype[j][0], ctype[j][1]);
+            ndx = &wcs->lng;
+            sprintf(requir, "%s-%s", wcs->lngtyp, wcs->pcode);
          } else {
             /* Unrecognized celestial type. */
             return 1;
@@ -500,6 +528,11 @@ struct wcsprm *wcs;
    if (strcmp(requir, "")) {
       /* Unmatched celestial axis. */
       return 1;
+   }
+
+   /* Do simple alias translations. */
+   if (strncmp(wcs->pcode, "GLS", 3) == 0) {
+      strcpy(wcs->pcode, "SFL");
    }
 
    if (strcmp(wcs->pcode, "")) {
@@ -548,18 +581,18 @@ double pixcrd[];
       /* Compute projected coordinates. */
       if (strcmp(wcs->pcode, "NCP") == 0) {
          /* Convert NCP to SIN. */
-         if (cel->ref[2] == 0.0) {
+         if (cel->ref[1] == 0.0) {
             return 2;
          }
 
          strcpy(wcs->pcode, "SIN");
          prj->p[1] = 0.0;
-         prj->p[2] = cosdeg (cel->ref[2])/sindeg (cel->ref[2]);
-         prj->flag = 0;
+         prj->p[2] = cosdeg (cel->ref[1])/sindeg (cel->ref[1]);
+         prj->flag = (prj->flag < 0) ? -1 : 0;
       }
 
-      if (err = celfwd(wcs->pcode, world[wcs->lng], world[wcs->lat], cel,
-                   phi, theta, prj, &imgcrd[wcs->lng], &imgcrd[wcs->lat])) {
+      if ((err = celfwd(wcs->pcode, world[wcs->lng], world[wcs->lat], cel,
+                   phi, theta, prj, &imgcrd[wcs->lng], &imgcrd[wcs->lat]))) {
          return err;
       }
 
@@ -571,7 +604,7 @@ double pixcrd[];
          } else {
             offset = prj->r0*PI/2.0;
          }
- 
+
          /* Stack faces in a cube. */
          if (imgcrd[wcs->lat] < -0.5*offset) {
             imgcrd[wcs->lat] += offset;
@@ -682,18 +715,18 @@ double world[];
       /* Compute celestial coordinates. */
       if (strcmp(wcs->pcode, "NCP") == 0) {
          /* Convert NCP to SIN. */
-         if (cel->ref[2] == 0.0) {
+         if (cel->ref[1] == 0.0) {
             return 2;
          }
- 
+
          strcpy(wcs->pcode, "SIN");
          prj->p[1] = 0.0;
-         prj->p[2] = cosdeg (cel->ref[2])/sindeg (cel->ref[2]);
-         prj->flag = 0;
+         prj->p[2] = cosdeg (cel->ref[1])/sindeg (cel->ref[1]);
+         prj->flag = (prj->flag < 0) ? -1 : 0;
       }
 
-      if (err = celrev(wcs->pcode, imgcrd[wcs->lng], imgcrd[wcs->lat], prj,
-                   phi, theta, cel, &world[wcs->lng], &world[wcs->lat])) {
+      if ((err = celrev(wcs->pcode, imgcrd[wcs->lng], imgcrd[wcs->lat], prj,
+                   phi, theta, cel, &world[wcs->lng], &world[wcs->lat]))) {
          return err;
       }
    }
@@ -705,7 +738,7 @@ double world[];
 
 int
 wcsmix(ctype, wcs, mixpix, mixcel, vspan, vstep, viter, world, crval, cel,
-       phi, theta, prj, imgcrd, lin, pixcrd)
+           phi, theta, prj, imgcrd, lin, pixcrd)
 
 const char ctype[][9];
 struct wcsprm *wcs;
@@ -724,15 +757,21 @@ double pixcrd[];
 {
    const int niter = 60;
    int    crossed, err, istep, iter, j, k, nstep, retry;
-   const double tol = 1.0e-10;
+   const double tol  = 1.0e-10;
+   const double tol2 = 100.0*tol;
    double lambda, span[2], step;
    double pixmix;
-   double lng, lng0, lng0m, lng1, lng1m;
-   double lat, lat0, lat0m, lat1, lat1m;
+   double dlng, lng, lng0, lng0m, lng1, lng1m;
+   double dlat, lat, lat0, lat0m, lat1, lat1m;
    double d, d0, d0m, d1, d1m, dx;
    double dabs, dmin, lmin;
-   double phi0, phi1;
+   double dphi, phi0, phi1;
    struct celprm cel0;
+
+   /* Initialize if required. */
+   if (wcs->flag != WCSSET) {
+      if (wcsset(lin->naxis, ctype, wcs)) return 1;
+   }
 
    /* Check vspan. */
    if (vspan[0] <= vspan[1]) {
@@ -773,8 +812,8 @@ double pixcrd[];
          /* Check whether the solution interval is a crossing interval. */
          lat0 = span[0];
          world[wcs->lat] = lat0;
-         if (err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta, prj,
-                          imgcrd, lin, pixcrd)) {
+         if ((err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta, prj,
+                          imgcrd, lin, pixcrd))) {
             return err;
          }
          d0 = pixcrd[mixpix] - pixmix;
@@ -784,8 +823,8 @@ double pixcrd[];
 
          lat1 = span[1];
          world[wcs->lat] = lat1;
-         if (err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta, prj,
-                          imgcrd, lin, pixcrd)) {
+         if ((err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta, prj,
+                          imgcrd, lin, pixcrd))) {
             return err;
          }
          d1 = pixcrd[mixpix] - pixmix;
@@ -797,7 +836,7 @@ double pixcrd[];
          dmin = dabs;
 
          /* Check for a crossing point. */
-         if (signb (d0) != signb (d1)) {
+         if (signb(d0) != signb(d1)) {
             crossed = 1;
             dx = d1;
          } else {
@@ -811,8 +850,8 @@ double pixcrd[];
                lat0 -= step;
                if (lat0 < span[0]) lat0 = span[0];
                world[wcs->lat] = lat0;
-               if (err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta,
-                                prj, imgcrd, lin, pixcrd)) {
+               if ((err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta,
+                                prj, imgcrd, lin, pixcrd))) {
                   return err;
                }
                d0 = pixcrd[mixpix] - pixmix;
@@ -828,7 +867,7 @@ double pixcrd[];
                }
 
                /* Check for a crossing point. */
-               if (signb (d0) != signb (d1)) {
+               if (signb(d0) != signb(d1)) {
                   crossed = 2;
                   dx = d0;
                   break;
@@ -850,17 +889,26 @@ double pixcrd[];
                      lambda = 0.9;
                   }
 
-                  lat = lat0 + lambda*(lat1 - lat0);
+                  dlat = lat1 - lat0;
+                  lat = lat0 + lambda*dlat;
                   world[wcs->lat] = lat;
-                  if (err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta,
-                                   prj, imgcrd, lin, pixcrd)) {
+                  if ((err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta,
+                                   prj, imgcrd, lin, pixcrd))) {
                      return err;
                   }
-                  d = pixcrd[mixpix] - pixmix;
 
                   /* Check for a solution. */
+                  d = pixcrd[mixpix] - pixmix;
                   dabs = fabs(d);
                   if (dabs < tol) return 0;
+
+                  if (dlat < tol) {
+                     /* An artifact of numerical imprecision. */
+                     if (dabs < tol2) return 0;
+
+                     /* Must be a discontinuity. */
+                     break;
+                  }
 
                   /* Record the point of closest approach. */
                   if (dabs < dmin) {
@@ -868,7 +916,7 @@ double pixcrd[];
                      dmin = dabs;
                   }
 
-                  if (signb (d0) == signb (d)) {
+                  if (signb(d0) == signb(d)) {
                      lat0 = lat;
                      d0 = d;
                   } else {
@@ -895,8 +943,8 @@ double pixcrd[];
                if (lat1 > span[1]) lat1 = span[1];
 
                world[wcs->lat] = lat0;
-               if (err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta,
-                                prj, imgcrd, lin, pixcrd)) {
+               if ((err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta,
+                                prj, imgcrd, lin, pixcrd))) {
                   return err;
                }
                d0 = fabs(pixcrd[mixpix] - pixmix);
@@ -904,8 +952,8 @@ double pixcrd[];
                d  = dmin;
 
                world[wcs->lat] = lat1;
-               if (err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta,
-                                prj, imgcrd, lin, pixcrd)) {
+               if ((err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta,
+                                prj, imgcrd, lin, pixcrd))) {
                   return err;
                }
                d1 = fabs(pixcrd[mixpix] - pixmix);
@@ -913,8 +961,8 @@ double pixcrd[];
                for (iter = 0; iter < niter; iter++) {
                   lat0m = (lat0 + lat)/2.0;
                   world[wcs->lat] = lat0m;
-                  if (err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta,
-                                   prj, imgcrd, lin, pixcrd)) {
+                  if ((err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta,
+                                   prj, imgcrd, lin, pixcrd))) {
                      return err;
                   }
                   d0m = fabs(pixcrd[mixpix] - pixmix);
@@ -923,8 +971,8 @@ double pixcrd[];
 
                   lat1m = (lat1 + lat)/2.0;
                   world[wcs->lat] = lat1m;
-                  if (err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta,
-                                   prj, imgcrd, lin, pixcrd)) {
+                  if ((err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta,
+                                   prj, imgcrd, lin, pixcrd))) {
                      return err;
                   }
                   d1m = fabs(pixcrd[mixpix] - pixmix);
@@ -957,8 +1005,8 @@ double pixcrd[];
          /* Check whether the solution interval is a crossing interval. */
          lng0 = span[0];
          world[wcs->lng] = lng0;
-         if (err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta, prj,
-                          imgcrd, lin, pixcrd)) {
+         if ((err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta, prj,
+                          imgcrd, lin, pixcrd))) {
             return err;
          }
          d0 = pixcrd[mixpix] - pixmix;
@@ -968,8 +1016,8 @@ double pixcrd[];
 
          lng1 = span[1];
          world[wcs->lng] = lng1;
-         if (err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta, prj,
-                          imgcrd, lin, pixcrd)) {
+         if ((err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta, prj,
+                          imgcrd, lin, pixcrd))) {
             return err;
          }
          d1 = pixcrd[mixpix] - pixmix;
@@ -980,7 +1028,7 @@ double pixcrd[];
          dmin = dabs;
 
          /* Check for a crossing point. */
-         if (signb (d0) != signb (d1)) {
+         if (signb(d0) != signb(d1)) {
             crossed = 1;
             dx = d1;
          } else {
@@ -994,8 +1042,8 @@ double pixcrd[];
                lng0 -= step;
                if (lng0 < span[0]) lng0 = span[0];
                world[wcs->lng] = lng0;
-               if (err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta,
-                          prj, imgcrd, lin, pixcrd)) {
+               if ((err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta,
+                          prj, imgcrd, lin, pixcrd))) {
                   return err;
                }
                d0 = pixcrd[mixpix] - pixmix;
@@ -1011,7 +1059,7 @@ double pixcrd[];
                }
 
                /* Check for a crossing point. */
-               if (signb (d0) != signb (d1)) {
+               if (signb(d0) != signb(d1)) {
                   crossed = 2;
                   dx = d0;
                   break;
@@ -1033,17 +1081,26 @@ double pixcrd[];
                      lambda = 0.9;
                   }
 
-                  lng = lng0 + lambda*(lng1 - lng0);
+                  dlng = lng1 - lng0;
+                  lng = lng0 + lambda*dlng;
                   world[wcs->lng] = lng;
-                  if (err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta,
-                                   prj, imgcrd, lin, pixcrd)) {
+                  if ((err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta,
+                                   prj, imgcrd, lin, pixcrd))) {
                      return err;
                   }
-                  d = pixcrd[mixpix] - pixmix;
 
                   /* Check for a solution. */
+                  d = pixcrd[mixpix] - pixmix;
                   dabs = fabs(d);
                   if (dabs < tol) return 0;
+
+                  if (dlng < tol) {
+                     /* An artifact of numerical imprecision. */
+                     if (dabs < tol2) return 0;
+
+                     /* Must be a discontinuity. */
+                     break;
+                  }
 
                   /* Record the point of closest approach. */
                   if (dabs < dmin) {
@@ -1051,7 +1108,7 @@ double pixcrd[];
                      dmin = dabs;
                   }
 
-                  if (signb (d0) == signb (d)) {
+                  if (signb(d0) == signb(d)) {
                      lng0 = lng;
                      d0 = d;
                   } else {
@@ -1078,8 +1135,8 @@ double pixcrd[];
                if (lng1 > span[1]) lng1 = span[1];
 
                world[wcs->lng] = lng0;
-               if (err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta,
-                                prj, imgcrd, lin, pixcrd)) {
+               if ((err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta,
+                                prj, imgcrd, lin, pixcrd))) {
                   return err;
                }
                d0 = fabs(pixcrd[mixpix] - pixmix);
@@ -1087,8 +1144,8 @@ double pixcrd[];
                d  = dmin;
 
                world[wcs->lng] = lng1;
-               if (err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta,
-                                prj, imgcrd, lin, pixcrd)) {
+               if ((err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta,
+                                prj, imgcrd, lin, pixcrd))) {
                   return err;
                }
                d1 = fabs(pixcrd[mixpix] - pixmix);
@@ -1096,8 +1153,8 @@ double pixcrd[];
                for (iter = 0; iter < niter; iter++) {
                   lng0m = (lng0 + lng)/2.0;
                   world[wcs->lng] = lng0m;
-                  if (err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta,
-                                   prj, imgcrd, lin, pixcrd)) {
+                  if ((err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta,
+                                   prj, imgcrd, lin, pixcrd))) {
                      return err;
                   }
                   d0m = fabs(pixcrd[mixpix] - pixmix);
@@ -1106,8 +1163,8 @@ double pixcrd[];
 
                   lng1m = (lng1 + lng)/2.0;
                   world[wcs->lng] = lng1m;
-                  if (err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta,
-                                   prj, imgcrd, lin, pixcrd)) {
+                  if ((err = wcsfwd(ctype, wcs, world, crval, cel, phi, theta,
+                                   prj, imgcrd, lin, pixcrd))) {
                      return err;
                   }
                   d1m = fabs(pixcrd[mixpix] - pixmix);
@@ -1148,8 +1205,6 @@ double pixcrd[];
    cel0.euler[2] =  90.0;
    cel0.euler[3] =   1.0;
    cel0.euler[4] =   0.0;
-   cel0.prjfwd = cel->prjfwd;
-   cel0.prjrev = cel->prjrev;
 
    /* No convergence, check for aberrant behaviour at a native pole. */
    *theta = -90.0;
@@ -1179,8 +1234,8 @@ double pixcrd[];
       /* Feed native coordinates to wcsfwd() with cel0 set to unity. */
       world[wcs->lng] = -180.0;
       world[wcs->lat] = *theta;
-      if (err = wcsfwd(ctype, wcs, world, crval, &cel0, phi, theta, prj,
-                       imgcrd, lin, pixcrd)) {
+      if ((err = wcsfwd(ctype, wcs, world, crval, &cel0, phi, theta, prj,
+                       imgcrd, lin, pixcrd))) {
          return err;
       }
       d0 = pixcrd[mixpix] - pixmix;
@@ -1196,10 +1251,10 @@ double pixcrd[];
       /* Search for a crossing interval. */
       phi0 = -180.0;
       for (k = -179; k <= 180; k++) {
-         phi1 = (float) k;
+         phi1 = (double) k;
          world[wcs->lng] = phi1;
-         if (err = wcsfwd(ctype, wcs, world, crval, &cel0, phi, theta, prj,
-                          imgcrd, lin, pixcrd)) {
+         if ((err = wcsfwd(ctype, wcs, world, crval, &cel0, phi, theta, prj,
+                          imgcrd, lin, pixcrd))) {
             return err;
          }
          d1 = pixcrd[mixpix] - pixmix;
@@ -1214,7 +1269,7 @@ double pixcrd[];
          }
 
          /* Is it a crossing interval? */
-         if (signb (d0) != signb (d1)) break;
+         if (signb(d0) != signb(d1)) break;
 
          phi0 = phi1;
          d0 = d1;
@@ -1228,24 +1283,25 @@ double pixcrd[];
          } else if (lambda > 0.9) {
             lambda = 0.9;
          }
- 
-         world[wcs->lng] = phi0 + lambda*(phi1 - phi0);
-         if (err = wcsfwd(ctype, wcs, world, crval, &cel0, phi, theta, prj,
-                          imgcrd, lin, pixcrd)) {
+
+         dphi = phi1 - phi0;
+         world[wcs->lng] = phi0 + lambda*dphi;
+         if ((err = wcsfwd(ctype, wcs, world, crval, &cel0, phi, theta, prj,
+                          imgcrd, lin, pixcrd))) {
             return err;
          }
-         d = pixcrd[mixpix] - pixmix;
- 
+
          /* Check for a solution. */
+         d = pixcrd[mixpix] - pixmix;
          dabs = fabs(d);
-         if (dabs < tol) {
+         if (dabs < tol || (dphi < tol && dabs < tol2)) {
             /* Recall saved world coordinates. */
             world[wcs->lng] = lng;
             world[wcs->lat] = lat;
             return 0;
          }
- 
-         if (signb (d0) == signb (d)) {
+
+         if (signb(d0) == signb(d)) {
             phi0 = world[wcs->lng];
             d0 = d;
          } else {
@@ -1260,6 +1316,13 @@ double pixcrd[];
    return 5;
 
 }
-/* Dec 20 1999	Doug Mink - Change signbit() to signb() and always define it
+/* Dec 20 1999  Doug Mink - Change signbit() to signb() and always define it
  * Dec 20 1999	Doug Mink - Include wcslib.h, which includes wcs.h, wcstrig.h
+ *
+ * Mar 20 2001	Doug Mink - Include stdio.h for sprintf()
+ * Mar 20 2001	Doug Mink - Add () around err assignments in if statements
+ * Sep 19 2001	Doug Mink - Add above changes to WCSLIB-2.7 version
+ *
+ * Mar 15 2002	Doug Mink - Add above changes to WCSLIB-2.8.2
+ * Apr  3 2002	Mark Calabretta - Fix bug in code checking section
  */

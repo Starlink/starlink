@@ -1,6 +1,6 @@
 /*************************************************************************
 * E.S.O. - VLT project
-* "@(#) $Id: rtdClient.c,v 1.2 2005/02/02 01:43:03 brighton Exp $"
+* "@(#) $Id: rtdClient.c,v 1.1.1.1 2006/01/12 16:39:59 abrighto Exp $"
 *  rtdClient.c
 *
 * who       when      what
@@ -36,7 +36,7 @@
 *
 *------------------------------------------------------------------------
 */
-static const char* const rcsId="@(#) $Id: rtdClient.c,v 1.2 2005/02/02 01:43:03 brighton Exp $";
+static const char* const rcsId="@(#) $Id: rtdClient.c,v 1.1.1.1 2006/01/12 16:39:59 abrighto Exp $";
 
 
 /* 
@@ -55,7 +55,9 @@ static const char* const rcsId="@(#) $Id: rtdClient.c,v 1.2 2005/02/02 01:43:03 
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 #ifdef HAVE_SYS_FILIO_H
 #include <sys/filio.h>
 #endif
@@ -66,10 +68,10 @@ static const char* const rcsId="@(#) $Id: rtdClient.c,v 1.2 2005/02/02 01:43:03 
 
 #include "rtdImageEvent.h"
 
-int verbose=0;
+static int verbose=0;
  
 
-void usage(void) {
+static void usage(void) {
     printf("rtdClient [-v]\n");
     exit(1);
 }

@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: AstroImage.h,v 1.2 2003/01/20 15:52:21 brighton Exp $
+ * $Id: AstroImage.h,v 1.1.1.1 2006/01/12 16:36:41 abrighto Exp $
  *
  * AstroImage.h - base class definitions for classes that retrieve an image
  *                from a catalog based on object name, position, width and height.

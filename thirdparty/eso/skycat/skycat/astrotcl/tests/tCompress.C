@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * $Id: tCompress.C,v 1.3 2005/02/02 01:43:04 brighton Exp $
+ * $Id: tCompress.C,v 1.1.1.1 2006/01/12 16:43:51 abrighto Exp $
  *
  * tCompress.C - test cases for class Compress
  * 
@@ -13,9 +13,12 @@
 #include <iostream>
 #include <stdlib.h>
 #include "error.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include "define.h"
 #include "Mem.h"
-#include "Compress.hxx"
+#include "DCompress.h"
 
 #define TTEST(x) {if (!(x)){printf("%s: line %d: Test failed\n", __FILE__, __LINE__); exit(1);}}
 

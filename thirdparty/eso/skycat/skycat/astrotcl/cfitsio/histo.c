@@ -1,8 +1,8 @@
 /*   Globally defined histogram parameters */
-#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
+#include <stdlib.h>
 #include "fitsio2.h"
 
 typedef struct {  /*  Structure holding all the histogramming information   */
@@ -23,6 +23,7 @@ typedef struct {  /*  Structure holding all the histogramming information   */
    float binsize1, binsize2, binsize3, binsize4;
    int   wtrecip, wtcolnum;
    float weight;
+   char  *rowselector;
 
 } histType;
 
@@ -293,8 +294,9 @@ int ffbins(char *binspec,   /* I - binning specification */
 
     /* special case: if a single number was entered it should be      */
     /* interpreted as the binning factor for the default X and Y axes */
+
     if (*histaxis == 1 && *colname[0] == '\0' && 
-         minin[0] == FLOATNULLVALUE && maxin[0] == FLOATNULLVALUE)
+         minin[0] == DOUBLENULLVALUE && maxin[0] == DOUBLENULLVALUE)
     {
         *histaxis = 2;
         binsizein[1] = binsizein[0];
@@ -472,15 +474,21 @@ int ffhist(fitsfile **fptr,  /* IO - pointer to table with X and Y cols;    */
            double weightin,        /* I - binning weighting factor          */
            char wtcol[FLEN_VALUE], /* I - optional keyword or col for weight*/
            int recip,              /* I - use reciprocal of the weight?     */
+           char *selectrow,        /* I - optional array (length = no. of   */
+                             /* rows in the table).  If the element is true */
+                             /* then the corresponding row of the table will*/
+                             /* be included in the histogram, otherwise the */
+                             /* row will be skipped.  Ingnored if *selectrow*/
+                             /* is equal to NULL.                           */
            int *status)
 {
     int ii, datatype, repeat, imin, imax, ibin, bitpix, tstatus, use_datamax = 0;
     long haxes[4];
     fitsfile *histptr;
-    char errmsg[FLEN_ERRMSG], keyname[FLEN_KEYWORD];
+    char errmsg[FLEN_ERRMSG], keyname[FLEN_KEYWORD], card[FLEN_CARD];
     tcolumn *colptr;
     iteratorCol imagepars[1];
-    int n_cols = 1;
+    int n_cols = 1, nkeys;
     long  offset = 0;
     long n_per_loop = -1;  /* force whole array to be passed at one time */
     histType histData;    /* Structure holding histogram info for iterator */
@@ -489,6 +497,8 @@ int ffhist(fitsfile **fptr,  /* IO - pointer to table with X and Y cols;    */
     float datamin = FLOATNULLVALUE, datamax = FLOATNULLVALUE;
     char svalue[FLEN_VALUE];
     double dvalue;
+    char cpref[4][FLEN_VALUE];
+    char *cptr;
 
     if (*status > 0)
         return(*status);
@@ -506,6 +516,8 @@ int ffhist(fitsfile **fptr,  /* IO - pointer to table with X and Y cols;    */
     histData.tblptr     = *fptr;
     histData.himagetype = imagetype;
     histData.haxis      = naxis;
+    histData.rowselector = selectrow;
+
     if (imagetype == TBYTE)
         bitpix = BYTE_IMG;
     else if (imagetype == TSHORT)
@@ -518,6 +530,63 @@ int ffhist(fitsfile **fptr,  /* IO - pointer to table with X and Y cols;    */
         bitpix = DOUBLE_IMG;
     else
         return(*status = BAD_DATATYPE);
+
+    /* The CPREF keyword, if it exists, gives the preferred columns. */
+    /* Otherwise, assume "X", "Y", "Z", and "T"  */
+
+    tstatus = 0;
+    ffgky(*fptr, TSTRING, "CPREF", cpref[0], NULL, &tstatus);
+
+    if (!tstatus)
+    {
+        /* Preferred column names are given;  separate them */
+        cptr = cpref[0];
+
+        /* the first preferred axis... */
+        while (*cptr != ',' && *cptr != '\0')
+           cptr++;
+
+        if (*cptr != '\0')
+        {
+           *cptr = '\0';
+           cptr++;
+           while (*cptr == ' ')
+               cptr++;
+
+           strcpy(cpref[1], cptr);
+           cptr = cpref[1];
+
+          /* the second preferred axis... */
+          while (*cptr != ',' && *cptr != '\0')
+             cptr++;
+
+          if (*cptr != '\0')
+          {
+             *cptr = '\0';
+             cptr++;
+             while (*cptr == ' ')
+                 cptr++;
+
+             strcpy(cpref[2], cptr);
+             cptr = cpref[2];
+
+            /* the third preferred axis... */
+            while (*cptr != ',' && *cptr != '\0')
+               cptr++;
+
+            if (*cptr != '\0')
+            {
+               *cptr = '\0';
+               cptr++;
+               while (*cptr == ' ')
+                   cptr++;
+
+               strcpy(cpref[3], cptr);
+
+            }
+          }
+        }
+    }
 
     for (ii = 0; ii < naxis; ii++)
     {
@@ -560,17 +629,10 @@ int ffhist(fitsfile **fptr,  /* IO - pointer to table with X and Y cols;    */
         return(*status = ZERO_SCALE);
       }
 
-      /* Get the default column name if not already specified. The */
-      /* CPREFn keyword, if it exists, gives the preferred  column  */
-      /* for that axis.  Otherwise, assume "X", "Y", "Z", and "T"  */
-
       if (*colname[ii] == '\0')
       {
-         tstatus = 0;
-         ffkeyn("CPREF", ii + 1, keyname, &tstatus);
-         ffgky(*fptr, TSTRING, keyname, colname[ii], NULL, &tstatus);
-
-         if (tstatus || *colname[ii] == '\0')
+         strcpy(colname[ii], cpref[ii]); /* try using the preferred column */
+         if (*colname[ii] == '\0')
          {
            if (ii == 0)
               strcpy(colname[ii], "X");
@@ -596,7 +658,7 @@ int ffhist(fitsfile **fptr,  /* IO - pointer to table with X and Y cols;    */
       colptr = ((*fptr)->Fptr)->tableptr;
       colptr += (histData.hcolnum[ii] - 1);
 
-      repeat = colptr->trepeat;  /* vector repeat factor of the column */
+      repeat = (int) colptr->trepeat;  /* vector repeat factor of the column */
       if (repeat > 1)
       {
         strcpy(errmsg, "Can't bin a vector column: ");
@@ -605,7 +667,10 @@ int ffhist(fitsfile **fptr,  /* IO - pointer to table with X and Y cols;    */
         return(*status = BAD_DATATYPE);
       }
 
-      datatype = colptr->tdatatype;
+      /* get the datatype of the column */
+      fits_get_coltype(*fptr, histData.hcolnum[ii], &datatype,
+         NULL, NULL, status);
+
       if (datatype < 0 || datatype == TSTRING)
       {
         strcpy(errmsg, "Inappropriate datatype; can't bin this column: ");
@@ -635,7 +700,7 @@ int ffhist(fitsfile **fptr,  /* IO - pointer to table with X and Y cols;    */
       }
       else
       {
-        amin[ii] = minin[ii];
+        amin[ii] = (float) minin[ii];
       }
 
       if (maxin[ii] == DOUBLENULLVALUE)
@@ -665,7 +730,7 @@ int ffhist(fitsfile **fptr,  /* IO - pointer to table with X and Y cols;    */
       }
       else
       {
-        amax[ii] = maxin[ii];
+        amax[ii] = (float) maxin[ii];
       }
 
       /* use TDBINn keyword or else 1 if bin size is not given */
@@ -673,7 +738,8 @@ int ffhist(fitsfile **fptr,  /* IO - pointer to table with X and Y cols;    */
       {
          tstatus = 0;
          ffkeyn("TDBIN", histData.hcolnum[ii], keyname, &tstatus);
-         if (ffgky(*fptr, TFLOAT, keyname, binsizein + ii, NULL, &tstatus) > 0)
+
+         if (ffgky(*fptr, TDOUBLE, keyname, binsizein + ii, NULL, &tstatus) > 0)
          {
 	    /* make at least 10 bins */
             binsizein[ii] = (amax[ii] - amin[ii]) / 10. ;
@@ -684,13 +750,13 @@ int ffhist(fitsfile **fptr,  /* IO - pointer to table with X and Y cols;    */
 
       if ( (amin[ii] > amax[ii] && binsizein[ii] > 0. ) ||
            (amin[ii] < amax[ii] && binsizein[ii] < 0. ) )
-          binsize[ii] = -binsizein[ii];  /* reverse the sign of binsize */
+          binsize[ii] = (float) -binsizein[ii];  /* reverse the sign of binsize */
       else
-          binsize[ii] =  binsizein[ii];  /* binsize has the correct sign */
+          binsize[ii] =  (float) binsizein[ii];  /* binsize has the correct sign */
 
-      ibin = binsize[ii];
-      imin = amin[ii];
-      imax = amax[ii];
+      ibin = (int) binsize[ii];
+      imin = (int) amin[ii];
+      imax = (int) amax[ii];
 
       /* Determine the range and number of bins in the histogram. This  */
       /* depends on whether the input columns are integer or floats, so */
@@ -706,17 +772,17 @@ int ffhist(fitsfile **fptr,  /* IO - pointer to table with X and Y cols;    */
 
         haxes[ii] = (imax - imin) / ibin + 1;  /* last bin may only */
                                                /* be partially full */
-        maxbin[ii] = haxes[ii] + 1.;  /* add 1. instead of .5 to avoid roundoff */
+        maxbin[ii] = (float) (haxes[ii] + 1.);  /* add 1. instead of .5 to avoid roundoff */
 
         if (amin[ii] < amax[ii])
         {
-          amin[ii] = amin[ii] - 0.5;
-          amax[ii] = amax[ii] + 0.5;
+          amin[ii] = (float) (amin[ii] - 0.5);
+          amax[ii] = (float) (amax[ii] + 0.5);
         }
         else
         {
-          amin[ii] = amin[ii] + 0.5;
-          amax[ii] = amax[ii] - 0.5;
+          amin[ii] = (float) (amin[ii] + 0.5);
+          amax[ii] = (float) (amax[ii] - 0.5);
         }
       }
       else if (use_datamax)  
@@ -728,7 +794,7 @@ int ffhist(fitsfile **fptr,  /* IO - pointer to table with X and Y cols;    */
         /* in the last partial bin are included.  */
 
         maxbin[ii] = (amax[ii] - amin[ii]) / binsize[ii]; 
-        haxes[ii] = maxbin[ii] + 1;
+        haxes[ii] = (long) (maxbin[ii] + 1);
       }
       else  
       {
@@ -736,7 +802,7 @@ int ffhist(fitsfile **fptr,  /* IO - pointer to table with X and Y cols;    */
         /*  include in the histogram is specified by the calling program. */
         /*  The lower limit is inclusive, but upper limit is exclusive    */
         maxbin[ii] = (amax[ii] - amin[ii]) / binsize[ii];
-        haxes[ii] = maxbin[ii];
+        haxes[ii] = (long) maxbin[ii];
 
         if (amin[ii] < amax[ii])
         {
@@ -783,7 +849,7 @@ int ffhist(fitsfile **fptr,  /* IO - pointer to table with X and Y cols;    */
 
     if (recip && histData.weight != FLOATNULLVALUE)
        /* take reciprocal of weight */
-       histData.weight = 1.0 / histData.weight;
+       histData.weight = (float) (1.0 / histData.weight);
 
     histData.wtrecip = recip;
         
@@ -800,6 +866,15 @@ int ffhist(fitsfile **fptr,  /* IO - pointer to table with X and Y cols;    */
         ffclos(histptr, status);
         return(*status);
     }
+
+    /* copy all non-structural keywords from the table to the image */
+    fits_get_hdrspace(*fptr, &nkeys, NULL, status);
+    for (ii = 1; ii <= nkeys; ii++)
+    {
+       fits_read_record(*fptr, ii, card, status);
+       if (fits_get_keyclass(card) >= 120)
+           fits_write_record(histptr, card, status);
+    }           
 
     /* Set global variables with histogram parameter values.    */
     /* Use separate scalar variables rather than arrays because */
@@ -929,12 +1004,32 @@ int ffhist(fitsfile **fptr,  /* IO - pointer to table with X and Y cols;    */
        ffpky(histptr, TDOUBLE, keyname, &dvalue, "Pixel size", &tstatus);
 
      /*  CROTAn - Rotation angle (degrees CCW)  */
-       ffkeyn("TCROT", histData.hcolnum[ii], keyname, &tstatus);
-       ffgky(*fptr, TDOUBLE, keyname, &dvalue, NULL, &tstatus);
-       if (!tstatus && dvalue != 0.)  /* only write keyword if angle != 0 */
+     /*  There should only be a CROTA2 keyword, and only for 2+ D images */
+       if (ii == 1)
        {
-          ffkeyn("CROTA", ii + 1, keyname, &tstatus);
-          ffpky(histptr, TDOUBLE, keyname, &dvalue, "Rotation angle", &tstatus);
+         ffkeyn("TCROT", histData.hcolnum[ii], keyname, &tstatus);
+         ffgky(*fptr, TDOUBLE, keyname, &dvalue, NULL, &tstatus);
+         if (!tstatus && dvalue != 0.)  /* only write keyword if angle != 0 */
+         {
+           ffkeyn("CROTA", ii + 1, keyname, &tstatus);
+           ffpky(histptr, TDOUBLE, keyname, &dvalue,
+                 "Rotation angle", &tstatus);
+         }
+         else
+         {
+            /* didn't find CROTA for the 2nd axis, so look for one */
+            /* on the first axis */
+           tstatus = 0;
+           ffkeyn("TCROT", histData.hcolnum[0], keyname, &tstatus);
+           ffgky(*fptr, TDOUBLE, keyname, &dvalue, NULL, &tstatus);
+           if (!tstatus && dvalue != 0.)  /* only write keyword if angle != 0 */
+           {
+             dvalue *= -1.;   /* negate the value, because mirror image */
+             ffkeyn("CROTA", ii + 1, keyname, &tstatus);
+             ffpky(histptr, TDOUBLE, keyname, &dvalue,
+                   "Rotation angle", &tstatus);
+           }
+         }
        }
     }
 
@@ -1052,15 +1147,17 @@ int ffcalchist(long totalrows, long offset, long firstrow, long nrows,
     static float *wtcol;
     static long incr2, incr3, incr4;
     static histType histData;
+    static char *rowselect;
 
     /*  Initialization procedures: execute on the first call  */
     if (firstrow == 1)
     {
 
       /*  Copy input histogram data to static local variable so we */
-      /*  don't have to dereference it constantly.                 */
+      /*  don't have to constantly dereference it.                 */
 
       histData = *(histType*)userPointer;
+      rowselect = histData.rowselector;
 
       /* assign the input array pointers to local pointers */
       col1 = (float *) fits_iter_get_array(&colpars[0]);
@@ -1091,11 +1188,24 @@ int ffcalchist(long totalrows, long offset, long firstrow, long nrows,
     /*  Main loop: increment the histogram at position of each event */
     for (ii = 1; ii <= nrows; ii++) 
     {
+        if (rowselect)     /* if a row selector array is supplied... */
+        {
+           if (*rowselect)
+           {
+               rowselect++;   /* this row is included in the histogram */
+           }
+           else
+           {
+               rowselect++;   /* this row is excluded from the histogram */
+               continue;
+           }
+        }
+
         if (col1[ii] == FLOATNULLVALUE)  /* test for null value */
             continue;
 
         pix = (col1[ii] - histData.amin1) / histData.binsize1;
-        ipix = pix + 1; /* add 1 because the 1st pixel is the null value */
+        ipix = (long) (pix + 1.); /* add 1 because the 1st pixel is the null value */
 
 	/* test if bin is within range */
         if (ipix < 1 || ipix > histData.haxis1 || pix > histData.maxbin1)
@@ -1107,8 +1217,9 @@ int ffcalchist(long totalrows, long offset, long firstrow, long nrows,
               continue;
 
           axisbin = (col2[ii] - histData.amin2) / histData.binsize2;
-          iaxisbin = axisbin;
-          if (iaxisbin < 0 || iaxisbin >= histData.haxis2 || axisbin > histData.maxbin2)
+          iaxisbin = (long) axisbin;
+
+          if (axisbin < 0. || iaxisbin >= histData.haxis2 || axisbin > histData.maxbin2)
               continue;
 
           ipix += (iaxisbin * incr2);
@@ -1119,8 +1230,8 @@ int ffcalchist(long totalrows, long offset, long firstrow, long nrows,
                 continue;
 
             axisbin = (col3[ii] - histData.amin3) / histData.binsize3;
-            iaxisbin = axisbin;
-            if (iaxisbin < 0 || iaxisbin >= histData.haxis3 || axisbin > histData.maxbin3)
+            iaxisbin = (long) axisbin;
+            if (axisbin < 0. || iaxisbin >= histData.haxis3 || axisbin > histData.maxbin3)
                 continue;
 
             ipix += (iaxisbin * incr3);
@@ -1131,8 +1242,8 @@ int ffcalchist(long totalrows, long offset, long firstrow, long nrows,
                   continue;
 
               axisbin = (col4[ii] - histData.amin4) / histData.binsize4;
-              iaxisbin = axisbin;
-              if (iaxisbin < 0 || iaxisbin >= histData.haxis4 || axisbin > histData.maxbin4)
+              iaxisbin = (long) axisbin;
+              if (axisbin < 0. || iaxisbin >= histData.haxis4 || axisbin > histData.maxbin4)
                   continue;
 
               ipix += (iaxisbin * incr4);
@@ -1145,41 +1256,41 @@ int ffcalchist(long totalrows, long offset, long firstrow, long nrows,
         if (histData.weight != FLOATNULLVALUE) /* constant weight factor */
         {
             if (histData.himagetype == TINT)
-              histData.hist.j[ipix] += histData.weight;
+              histData.hist.j[ipix] += (int) histData.weight;
             else if (histData.himagetype == TSHORT)
-              histData.hist.i[ipix] += histData.weight;
+              histData.hist.i[ipix] += (short) histData.weight;
             else if (histData.himagetype == TFLOAT)
               histData.hist.r[ipix] += histData.weight;
             else if (histData.himagetype == TDOUBLE)
               histData.hist.d[ipix] += histData.weight;
             else if (histData.himagetype == TBYTE)
-              histData.hist.b[ipix] += histData.weight;
+              histData.hist.b[ipix] += (char) histData.weight;
         }
         else if (histData.wtrecip) /* use reciprocal of the weight */
         {
             if (histData.himagetype == TINT)
-              histData.hist.j[ipix] += 1./wtcol[ii];
+              histData.hist.j[ipix] += (int) (1./wtcol[ii]);
             else if (histData.himagetype == TSHORT)
-              histData.hist.i[ipix] += 1./wtcol[ii];
+              histData.hist.i[ipix] += (short) (1./wtcol[ii]);
             else if (histData.himagetype == TFLOAT)
-              histData.hist.r[ipix] += 1./wtcol[ii];
+              histData.hist.r[ipix] += (float) (1./wtcol[ii]);
             else if (histData.himagetype == TDOUBLE)
               histData.hist.d[ipix] += 1./wtcol[ii];
             else if (histData.himagetype == TBYTE)
-              histData.hist.b[ipix] += 1./wtcol[ii];
+              histData.hist.b[ipix] += (char) (1./wtcol[ii]);
         }
         else   /* no weights */
         {
             if (histData.himagetype == TINT)
-              histData.hist.j[ipix] += wtcol[ii];
+              histData.hist.j[ipix] += (int) wtcol[ii];
             else if (histData.himagetype == TSHORT)
-              histData.hist.i[ipix] += wtcol[ii];
+              histData.hist.i[ipix] += (short) wtcol[ii];
             else if (histData.himagetype == TFLOAT)
               histData.hist.r[ipix] += wtcol[ii];
             else if (histData.himagetype == TDOUBLE)
               histData.hist.d[ipix] += wtcol[ii];
             else if (histData.himagetype == TBYTE)
-              histData.hist.b[ipix] += wtcol[ii];
+              histData.hist.b[ipix] += (char) wtcol[ii];
         }
 
     }  /* end of main loop over all rows */

@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * $Id: tTabTable.C,v 1.2 2003/01/18 21:11:11 brighton Exp $
+ * $Id: tTabTable.C,v 1.1.1.1 2006/01/12 16:36:09 abrighto Exp $
  *
  * tTabTable.C - test cases for class TabTable
  * 
@@ -9,6 +9,7 @@
  * Allan Brighton  08 Jan 96  Created
  */
 
+using namespace std;
 #include <stdio.h>
 #include <stdlib.h>
 #include "error.h"
@@ -107,7 +108,7 @@ main()
     } 
 
     // test search method on file saved above
-    std::cout << "testing search method:\n";
+    cout << "testing search method:\n";
     TabTable t5;
     char** searchCols = t.colNames();
     int numCols = t.numCols();
@@ -124,7 +125,7 @@ main()
 	printf("test 14 failed\n");
 	exit(1);
     }
-    std::cout << "results of search:\n" << t5;
+    cout << "results of search:\n" << t5;
 
     // test sort method
     int ncols = 1;
@@ -133,15 +134,15 @@ main()
 	printf("test 15 failed\n");
 	exit(1);
     }
-    std::cout << "results after sort:\n" << t5;
+    cout << "results after sort:\n" << t5;
 
     // test search for single value
-    std::cout << "\ntesting search method for single column:\n";
+    cout << "\ntesting search method for single column:\n";
     if (t5.search(filename, "col2", "2.0", 1) != 0) {
 	printf("test 16 failed\n");
 	exit(1);
     }
-    std::cout << "results of search:\n" << t5;
+    cout << "results of search:\n" << t5;
 	
     return 0;
 }

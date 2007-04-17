@@ -1,3 +1,3 @@
 # Tcl package index file, version 1.0
 
-package ifneeded Skycat @SKYCAT_VERSION@ [list load "[file join [file dirname $dir] libskycat@SHLIB_SUFFIX@]" Skycat]
+package ifneeded Skycat @PACKAGE_VERSION@ [list load [file join [file dirname $dir] @PKG_LIB_FILE@] Skycat]

@@ -4,6 +4,10 @@ CHANGES to the "catlib" Catalog Interface Library
 This file contains a list of changes to the "catlib" libraries. 
 The latest changes are at the top.
 
+--------------- 03.02.06 released catlib-4.0 -------------------
+
+* Major update: see top level CHANGES file.
+
 --------------- 20.01.03 released cat-3.7.4 -----------------
 
 * Ported to gcc-3.2.1 and Tcl-8.4.1

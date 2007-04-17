@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# "@(#) $Id: CatalogInfo.tcl,v 1.1.1.1 2002/04/04 20:11:47 brighton Exp $"
+# "@(#) $Id: CatalogInfo.tcl,v 1.2 2006/01/20 23:36:27 abrighto Exp $"
 #
 # CatalogInfo.tcl - widget for browsing through a hierarchical list of catalogs
 #
@@ -41,14 +41,31 @@ itcl::class cat::CatalogInfo {
     # called after options have been evaluated
 
     protected method init {} {
+	global ::cat_library
+
 	# if running stand-alone, setup X defaults
 	if {$itk_option(-standalone)} {
-	    rtd::setXdefaults
 	    cat::setXdefaults
 	}
 
 	wm title $w_ "Catalog Directory ($itk_option(-number))"
 	wm iconname $w_ "Catalog Directory"
+
+	# set the strings to display for server types
+	set serv_types_(local) "local catalog"
+	set serv_types_(directory) "directory"
+	set serv_types_(catalog) "catalog"
+	set serv_types_(archive) "archive"
+	set serv_types_(imagesvr) "image server"
+	set serv_types_(namesvr) "name server"
+
+	set images_(local) [image create photo -file $cat_library/local.xpm]
+	set images_(directory) [image create photo -file $cat_library/nsfolder.xpm]
+	set images_(open_directory) [image create photo -file $cat_library/nsopenfold.xpm]
+	set images_(catalog) [image create photo -file $cat_library/catalog.xpm]
+	set images_(archive) [image create photo -file $cat_library/archive.xpm]
+	set images_(imagesvr) [image create photo -file $cat_library/imagesvr.xpm]
+	set images_(namesvr) [image create photo -file $cat_library/namesvr.xpm]	
 
 	# do window layout
 	if {[layout_dialog]} {
@@ -86,13 +103,6 @@ itcl::class cat::CatalogInfo {
 	
 	cat::AstroCat::add_catalog_menu $w_ $itk_option(-id) \
 	    $itk_option(-classname) $itk_option(-debug)
-    }
-
-    
-    # toggle the layout of the tree
-    
-    public method toggle_tree_layout {} {
-	$tree_ toggle_layout
     }
 
     
@@ -235,77 +245,34 @@ itcl::class cat::CatalogInfo {
     # inside the given frame and side
 
     protected method add_tree_frame {} {
-	pack [set tree_ [tixTree $w_.tree -options "
-	    hlist.separator $sep_
-	    hlist.columns 2
-	    hlist.header true
-	    hlist.width 35
-	    hlist.height 25
-	    hlist.selectForeground black
-	    hlist.selectBackground LightYellow2
-	    hlist.foreground black
-	"]] -side top -fill both -expand 1 
+	set tf [frame $w_.tf]
+	set tree_ $tf.tree
+	set vs [scrollbar $w_.vs -orient vertical -command "$tree_ yview"]
+	set hs [scrollbar $w_.hs -orient horizontal -command "$tree_ xview"]
 
-	set hlist_ [$tree_ subwidget hlist]
+	set rootdir_ [$astrocat_ root]
+	
+	treeview $tree_ \
+	    -separator $sep_ \
+	    -autocreate no \
+	    -allowduplicates no \
+	    -hideroot yes \
+	    -selectcommand [code $this select_catalog] \
+	    -yscrollcommand "$vs set" \
+	    -xscrollcommand "$hs set"
 
-	# Use this style of text for the header
-	set style_(header) \
-	    [tixDisplayStyle text \
-		 -refwindow $hlist_ \
-		 -fg black \
-		 -anchor c \
-		 -padx 8 \
-		 -pady 2\
-		 -font [tix option get font]]
 
-	set style_(dir_name) \
-	    [tixDisplayStyle imagetext \
-		 -refwindow $hlist_ \
-		 -pady 2 \
-		 -font [tix option get bold_font]]
+	$tree_ column configure treeView -text Name
+	$tree_ column insert end type -text Type -justify left
 
-	set style_(dir_type)  \
-	    [tixDisplayStyle text \
-		 -refwindow $hlist_ \
-		 -pady 2 \
-		 -padx 8]
+	$tree_ sort auto yes
 
-	set style_(cat_name) \
-	    [tixDisplayStyle imagetext \
-		 -pady 2 \
-		 -refwindow $hlist_ \
-		 -font [tix option get font]]
-
-	set style_(cat_type) \
-	    [tixDisplayStyle text \
-		 -refwindow $hlist_ \
-		 -pady 2 \
-		 -padx 8 \
-		 -font [tix option get font]]
-
-	# set the strings to display for server types
-	set serv_types_(local) "local catalog"
-	set serv_types_(directory) "directory"
-	set serv_types_(catalog) "catalog"
-	set serv_types_(archive) "archive"
-	set serv_types_(imagesvr) "image server"
-	set serv_types_(namesvr) "name server"
-
-	$hlist_ header create 0 \
-	    -itemtype text \
-	    -text "Name" \
-	    -style $style_(header)
-
-	$hlist_ header create 1 \
-	    -itemtype text \
-	    -text "Type" \
-	    -style $style_(header)
-
-	$tree_ config \
-	    -opencmd [code $this open_tree_node] \
-	    -closecmd [code $this close_tree_node] \
-	    -command [code $this open_catalog] \
-	    -browsecmd [code $this select_catalog]
+	table $tf \
+	    0,0 $tree_ -fill both \
+	    0,1 $vs -fill y \
+	    1,0 $hs -fill x
+	table configure $tf c1 r1 r2 -resize none
+	pack $tf -side top -fill both -expand 1 
     }
 
 
@@ -313,28 +280,17 @@ itcl::class cat::CatalogInfo {
 
     protected method init_tree {} {
 	# add the root of the tree
-	set rootdir_ [$astrocat_ root]
-	add_node {} $rootdir_
-	open_tree_node $rootdir_
-	$tree_ setmode $rootdir_ close
-    }
-
-    # reinitialize the tree
-
-    public method reinit_tree {} {
-	$hlist_ delete all
-	init_tree
+	set id [add_node {} $rootdir_]
+	open_catalog_directory $rootdir_ $id
     }
 
     
     # Add a node to the catalog tree. "path" is the path to the parent 
     # of the new node in the format "a${sep_}b${sep_}c" where a is the 
     # root and c is immediate parent of the new node. "name" is the name 
-    # of the new node and the text to display. If "before" is specified, 
-    # the node is inserted just before the node named "$before".
+    # of the new node and the text to display.
     
-    protected method add_node {path name {before ""}} {
-
+    protected method add_node {path name} {
 	if {[string first $sep_ $name] != -1} {
 	    puts "invalid catalog '$name', contains invalid char: '$sep_'"
 	    return
@@ -360,64 +316,42 @@ itcl::class cat::CatalogInfo {
 	    set type $serv_type
 	}
 
-	# set styles and pixmap to display
-	set name_style $style_(cat_name)
-	set type_style $style_(cat_type)
-	switch $serv_type {
-	    directory {
-		set image [tix getimage nsfolder]
-		set name_style $style_(dir_name)
-		set type_style $style_(dir_type)
-	    } 
-	    local {
-		set image [tix getimage local]
-		set text [file tail $name]
-	    }
-	    archive {
-		set image [tix getimage archive]
-	    }
-	    catalog {
-		set image [tix getimage catalog]
-	    }
-	    imagesvr {
-		set image [tix getimage imagesvr]
-	    }
-	    namesvr {
-		set image [tix getimage namesvr]
-	    }
-	    default {
-		set image [tix getimage file]
-	    }
+	# set icon to display
+        if {[catch {set image $images_($serv_type)}]} {
+	    set image $images_(local)
+	}
+	if {"$serv_type" == "local"} {
+	    set text [file tail $name]
 	}
 
-	# add the node
-	set cmd [list $hlist_ add $newpath \
-		     -itemtype imagetext \
-		     -text $text \
-		     -style $name_style \
-		     -image $image]
+	# add the node and server type
+	set node [$tree_ insert end $newpath]
+	$tree_ entry configure $node -data "type $serv_type"
 
-	if {"$before" != ""} {
-	    lappend cmd -before $before
-	}
+	$tree_ entry configure $node \
+	    -icons "$image $image" \
+	    -activeicons "$image $image"
+	
+	$tree_ bind $node <Double-ButtonPress-1> [code $this node_action $node $path $name $serv_type]
 
-	set row [eval $cmd]
+	return $node
+    }
 
-	# add type col
-	$hlist_ item create $row 1 \
-	    -itemtype text \
-	    -text $type \
-	    -style $type_style
 
+    # called for double click on a tree node 
+
+    protected method node_action {id path name serv_type} {
 	if {"$serv_type" == "directory"} {
-	    $tree_ setmode $newpath open
+	    open_catalog_directory $path${sep_}$name $id
+	} else {
+	    open_catalog
 	}
     }
 
     
     # called when a tree node is opened 
 
-    protected method open_tree_node {path} {
+    protected method open_catalog_directory {path id} {
 	# get name and type of selected catalog
 	if {"$path" == "$rootdir_"} {
 	    set name $rootdir_
@@ -427,25 +361,10 @@ itcl::class cat::CatalogInfo {
 	    set name [lindex $list end]
 	    set dirPath [lrange $list 0 [expr [llength $list]-2]]
 	}
-	if {[catch {set serv_type [$astrocat_ servtype $name $dirPath]} msg]} {
-	    error_dialog $msg $w_
-	    return
-	}
-
-	if {"$serv_type" != "directory"} {
-	    # catalog types
-	    select_catalog $path
-	    return
-	} 
 
 	# catalog directory - add list of catalogs, or show existing list
-	set children [$hlist_ info children $path]
-	if {[llength $children]} {
-	    # show existing list
-	    foreach child $children {
-		$hlist_ show entry $child
-	    }
-	} else {
+	set children [$tree_ entry children $id]
+	if {[llength $children] == 0} {
 	    # get and display list of catalogs under this node
 	    busy {
 		set dirPath [split $path $sep_]
@@ -458,52 +377,36 @@ itcl::class cat::CatalogInfo {
 	    foreach i $catalog_list {
 		add_node $path $i
 	    }
+	    $tree_ open $id
+	    
+	    # change the directory icon
+	    $tree_ entry configure $id \
+		-opencommand [code $this opened_catalog_directory $id] \
+		-closecommand [code $this closed_catalog_directory $id]
+	    opened_catalog_directory $id
 	}
 
-	# change the bitmap on $name to show that it has been accessed
-	$hlist_ entryconfigure $path -image [tix getimage nsopenfold]
-	
 	# scroll so that the selected directory is at the top of the window
-	$hlist_ yview $path
+	#$tree_ yview $id
     }
 
+    # Called when a catalog directory node is opened
 
-    # called when a tree node is closed 
-
-    protected method close_tree_node {path} {
-	# get name and type of selected catalog
-	if {"$path" == "$rootdir_"} {
-	    set name $rootdir_
-	    set dirPath ""
-	} else {
-	    set list [split $path $sep_]
-	    set name [lindex $list end]
-	    set dirPath [lrange $list 0 [expr [llength $list]-2]]
-	}
-	if {[catch {set serv_type [$astrocat_ servtype $name $dirPath]} msg]} {
-	    error_dialog $msg $w_
-	    return
-	}
-
-	if {"$serv_type" != "directory"} {
-	    # catalog types
-	    return
-	} 
-
-	# catalog directory - add list of catalogs, or show existing list
-	set children [$hlist_ info children $path]
-	if {[llength $children]} {
-	    # hide existing list
-	    foreach child $children {
-		#$hlist_ hide entry $child
-		$hlist_ delete entry $child
-	    }
-	}
-
-	# change the bitmap on $name tp show that it has been accessed
-	$hlist_ entryconfigure $path -image [tix getimage nsfolder]
+    protected method opened_catalog_directory {id} {
+	set image $images_(open_directory)
+	$tree_ entry configure $id \
+	    -icons "$image $image" \
+	    -activeicons "$image $image"
     }
 
+    # Called when a catalog directory node is closed
+
+    protected method closed_catalog_directory {id} {
+	set image $images_(directory)
+	$tree_ entry configure $id \
+	    -icons "$image $image" \
+	    -activeicons "$image $image"
+    }
 
     # add the dialog button frame
 
@@ -533,7 +436,14 @@ itcl::class cat::CatalogInfo {
 
     # called when a catalog is selected in the catalog list.
 
-    protected method select_catalog {path} {
+    protected method select_catalog {} {
+	set id [$tree_ curselection]
+	if {$id == ""} {
+	    return
+	}
+	set path [$tree_ get -full $id] 
+
+	set catalog_id_ $id
 	set catalog_path_ [split $path $sep_]
 	set catalog_dir_ [lrange $catalog_path_ 0 [expr [llength $catalog_path_]-2]]
 	set catalog_ [lindex $catalog_path_ end]
@@ -656,23 +566,10 @@ itcl::class cat::CatalogInfo {
 
 
     # insert the given catalog in the tree under the root, if it is
-    # not already there, and keep the tree sorted.
+    # not already there.
 
     public method insert_node {name} {
-	set children [lsort [$hlist_ info children $rootdir_]]
-	if {[llength $children]} {
-	    set new "$rootdir_${sep_}$name"
-	    foreach child $children {
-		if {"$child" >= "$new"} {
-		    if {"$child" != "$new"} {
-			add_node $rootdir_ $name $child
-		    }
-		    break
-		}
-	    }
-	} else {
-	    add_node $rootdir_ $name
-	}
+	catch {add_node $rootdir_ $name}
     }
 
 
@@ -690,7 +587,7 @@ itcl::class cat::CatalogInfo {
 	    return
 	}
 
-	$hlist_ delete entry [join $catalog_path_ $sep_]
+	$tree_ delete $catalog_id_
 
 	$w_.add config -state disabled
 	$w_.remove config -state disabled
@@ -759,23 +656,23 @@ itcl::class cat::CatalogInfo {
 
     # -- protected variables --
 
-    # Tix tree widget
+    # tree widget
     protected variable tree_ 
 
-    # hierarchical list widget (part of tree)
-    protected variable hlist_ 
-
-    # array(name) of Tix text display styles
-    protected variable style_
-    
     # array(serv_type) of server type text to display
     protected variable serv_types_
+
+    # array(serv_type) of image to display in tree node
+    protected variable images_
 
     # name of the root catalog directory
     protected variable rootdir_
 
     # name of currently selected catalog
     protected variable catalog_
+
+    # id of currently selected catalog
+    protected variable catalog_id_
 
     # full path name of currently selected catalog
     protected variable catalog_path_
@@ -786,7 +683,7 @@ itcl::class cat::CatalogInfo {
     # set to true if the catalog configuration has been edited and needs to be saved
     protected variable save_needed_ 0
 
-    # separator char for Tix tree/hlist widget
+    # separator char for tree widget (used in catalog path names)
     protected variable sep_ "^"
 
     # C++ astrocat object used by static member procs

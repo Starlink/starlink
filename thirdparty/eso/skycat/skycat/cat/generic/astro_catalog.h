@@ -3,9 +3,9 @@
 
 /*
  * E.S.O. - VLT project 
- * $Id: astroCatalog.h,v 1.1.1.1 2002/04/04 20:11:46 brighton Exp $
+ * $Id: astro_catalog.h,v 1.1.1.1 2006/01/12 16:36:39 abrighto Exp $
  *
- * astroCatalog.h - C interface to C++ class AstroCatalog
+ * astro_catalog.h - C interface to C++ class AstroCatalog
  *
  * (Note: C applications must have at least a dummy C++ main and link
  * with C++)
@@ -17,7 +17,7 @@
  * Allan Brighton  05/10/95  Created
  */
 
-#include "worldCoords.h"
+#include "world_coords.h"
 
 
 /* handle for an open catalog */

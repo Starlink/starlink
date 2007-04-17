@@ -1,7 +1,7 @@
 
 /*
  * E.S.O. - VLT project/Archive
- * $Id: TclAstroImage.C,v 1.6 2003/01/20 15:52:21 brighton Exp $
+ * $Id: TclAstroImage.C,v 1.2 2006/03/26 13:22:33 abrighto Exp $
  *
  * StarCat.C - method definitions for class TclAstroImage
  * 
@@ -14,17 +14,20 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created
  */
-static const char* const rcsId="@(#) $Id: TclAstroImage.C,v 1.6 2003/01/20 15:52:21 brighton Exp $";
+static const char* const rcsId="@(#) $Id: TclAstroImage.C,v 1.2 2006/03/26 13:22:33 abrighto Exp $";
 
+
+using namespace std;
 #include <cctype>
 #include <cstdio>
 #include <iostream>
 #include <cstdlib>
 #include <unistd.h>
-
 #include <sstream>
 #include <cstring>
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 #include "TclAstroCat.h"
 #include "TclAstroImage.h"
 
@@ -213,7 +216,7 @@ int TclAstroImage::getimageCmd(int argc, char* argv[])
 		pos_ = WorldCoords(values[0], values[1], equinox_);
 	    else if (im_->isPix())
 		pos_ = ImageCoords(values[0], values[1]);
-	    free(values);
+	    Tcl_Free((char *)values);
 	    if (pos_.status())
 		return TCL_ERROR;
 	}
@@ -268,7 +271,7 @@ int TclAstroImage::getimageCmd(int argc, char* argv[])
  */
 int TclAstroImage::centerposCmd(int argc, char* argv[])
 {
-    std::ostringstream os;
+    ostringstream os;
 
     pos_.print(os, equinox_);	// print coords in given equinox
     if (im_->isWcs())
@@ -429,7 +432,7 @@ int TclAstroImage::authorizeCmd(int argc, char* argv[])
     
     if (argc == 0) {
 	HTTP& http = im_->http();
-	std::ostringstream os;
+	ostringstream os;
 	os << http.authorizationRequired() 
 	   << " " << http.www_auth_realm()
 	   << " " << http.hostname();

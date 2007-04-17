@@ -4,6 +4,10 @@ CHANGES to Tclutil
 This file contains a list of changes to the Tclutil software.
 The latest changes are at the top.
 
+--------------- 03.02.06 released tclutil-2.0 -------------------
+
+* Major update: see top level CHANGES file.
+
 --------------- 04.04.05 released tclutil-1.2.8 -----------------
 
 * workaround bug in tcl 8.4.3 (SourceForge Request ID 835020)

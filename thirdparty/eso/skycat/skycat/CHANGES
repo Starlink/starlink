@@ -7,6 +7,48 @@ and user interface. The latest changes are at the top.
 See also the CHANGES files in the tclutil, astrotcl, rtd, cat and
 skycat directories for changes specific to those packages.
 
+
+--------------- 26.03.06 released skycat-3.0.1 -----------------
+
+* Added patches from Sergio Gelato <Sergio.Gelato@astro.su.se>: Replaced
+  calls to free() with Tcl_Free() for Tcl lists accessed from C code, as
+  well as other minor bugs that showed up under Debian GNU/Linux 3.1.
+
+--------------- 03.02.06 released skycat-3.0 -------------------
+
+* Rewrote makefiles and configure scripts using the Tcl TEA standard,
+  Simplified source directory structure (There is now only one Makefile
+  per package)
+
+* Rewrote skycat and rtd start scripts to be relocatable and set the
+  correct environment variables on each platform.
+
+* All Tcl packages are now dynamically loaded (There is no skycat binary:
+  just standard wish8.4 and a script that does a "package require Skycat")
+
+* Updated cfitsio and wcstools packages (astrotcl) to the latest versions
+
+* Merged in changes made by Peter Biereichel and Carlos Guirao at ESO
+
+* Removed dependency on the Tix package, replaced with BLT widgets and
+  tkimg
+
+* Added tkimg (Img1.3) package (by request, also used for displaying
+  some images)
+
+* Added Mac OS X support and a Skycat.dmg binary package
+
+* Binary versions are now available for Solaris9 (sparc), HP-UX,
+  Redhat9, Fedora3, Fedora4, SuSE-10, Mac OS X.
+  (Source RPMs can be used to make RPMs for other Linux versions)
+
+* Single binary (TclPro) version is no longer supported. Instead, RPMs
+  and tar files are provided. (TclKit would not work as a replacement
+  for TclPro, due to BLT package/linking issues.)
+
+* Added fix from awicenec@eso.org for WorldCoords.dispos() 
+  (calculates distance between two WCS positions)
+
 --------------- 04.04.05 released skycat-2.7.4 -----------------
 
 * Merged in RTD changes from Peter Biereichel

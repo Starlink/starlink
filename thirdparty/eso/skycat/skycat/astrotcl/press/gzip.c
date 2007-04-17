@@ -35,8 +35,9 @@
 ************************************************************************
 -*/
 
-/* allan: 8.8.96, for configure */
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 
 #include <stdio.h>
 

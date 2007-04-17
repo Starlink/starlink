@@ -1,7 +1,7 @@
 # tkutil.tcl - utility tcl/tk routines
 #
 # Copyright (C) 1994 Allan Brighton (abrighto@eso.org)
-# "@(#) $Id: tkutil.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
+# "@(#) $Id: tkutil.tcl,v 1.1.1.1 2006/01/12 16:40:53 abrighto Exp $"
 #
 
 

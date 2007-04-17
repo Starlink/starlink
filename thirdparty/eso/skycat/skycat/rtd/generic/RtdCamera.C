@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: RtdCamera.C,v 1.2 2005/02/02 01:43:03 brighton Exp $"
+ * "@(#) $Id: RtdCamera.C,v 1.1.1.1 2006/01/12 16:39:13 abrighto Exp $"
  *
  * RtdCamera.C - member routines for class RtdCamera,
  *             manages realtime image update for class RtdImage
@@ -18,8 +18,12 @@
  *                           interface to rtdServer.
  *                           Removed performance test object (handled by RtdImage())
  */
-static const char* const rcsId="@(#) $Id: RtdCamera.C,v 1.2 2005/02/02 01:43:03 brighton Exp $";
+static const char* const rcsId="@(#) $Id: RtdCamera.C,v 1.1.1.1 2006/01/12 16:39:13 abrighto Exp $";
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#include "define.h"
 #include "RtdCamera.h"
 
 /*

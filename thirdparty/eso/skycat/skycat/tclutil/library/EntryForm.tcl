@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# "@(#) $Id: EntryForm.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
+# "@(#) $Id: EntryForm.tcl,v 1.1.1.1 2006/01/12 16:40:54 abrighto Exp $"
 #
 # EntryForm.tcl - Form dialog for entering data at given labels
 #

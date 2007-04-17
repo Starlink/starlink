@@ -25,10 +25,9 @@
 #include "Mem.h"
 #include "rtdImageEvent.h"
 #include "tk.h"
-#include "FitsIO.hxx"
-#include "Compress.hxx"
+#include "Fits_IO.h"
+#include "DCompress.h"
 #include "rtdSem.h"
-#include "config.h"
 #include "RtdRPFile.h"
 
 #define MAXRECORDS	60	// Maximum number of records in file.

@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project 
- * $Id: WorldOrImageCoords.h,v 1.3 2005/02/02 01:43:04 brighton Exp $
+ * $Id: WorldOrImageCoords.h,v 1.1.1.1 2006/01/12 16:43:59 abrighto Exp $
  *
  * WorldOrImageCoords.h - class representing either world (ra, dec, equinox)
  *                        or image (x, y) coordinates
@@ -15,7 +15,7 @@
  * Allan Brighton  26 Sep 97  Created
  */
 
-#include "WorldCoords.hxx"
+#include "WorldCoords.h"
 #include "ImageCoords.h"
 
 /*

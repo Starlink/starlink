@@ -1,6 +1,30 @@
-/* imio.h  memory access subroutines
- * September 27, 1999
- * By Doug Mink, Harvard-Smithsonian Center for Astrophysics
+/*** imio.h  memory access subroutines
+ *** September 27, 1999
+ *** By Doug Mink, dmink@cfa.harvard.edu
+ *** Harvard-Smithsonian Center for Astrophysics
+ *** Copyright (C) 1996-2002
+ *** Smithsonian Astrophysical Observatory, Cambridge, MA, USA
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+    
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+    Correspondence concerning WCSTools should be addressed as follows:
+           Internet email: dmink@cfa.harvard.edu
+           Postal address: Doug Mink
+                           Smithsonian Astrophysical Observatory
+                           60 Garden St.
+                           Cambridge, MA 02138 USA
  */
 
 #ifndef imio_h_
@@ -15,8 +39,10 @@ extern void addpix();   /* Add to one pixel in any data type 2-D array (0,0)*/
 extern void addpix1();  /* Add to one pixel in any data type 2-D array (1,1)*/
 extern void movepix();  /* Move one pixel value between two 2-D arrays (0,0) */
 extern void movepix1(); /* Move one pixel value between two 2-D arrays (1,1) */
-extern void getvec();   /* Read vector from 2-D array */
-extern void putvec();   /* Write vector into 2-D array */
+extern void getvec();   /* Read vector from a 2-D array */
+extern void putvec();   /* Write vector into a 2-D array */
+extern void fillvec();   /* Write constant into a vector */
+extern void fillvec1();   /* Write constant into a vector */
 extern void imswap();   /* Swap alternating bytes in a vector */
 extern void imswap2();  /* Swap bytes in a vector of 2-byte (short) integers */
 extern void imswap4();  /* Reverse bytes in a vector of 4-byte numbers */
@@ -33,4 +59,6 @@ extern int imswapped(); /* Return 1 if machine byte order is not FITS order */
 
  * Sep 27 1999	Add Fortran-indexed (1,1), not (0,0) image access *1()
  * Sep 28 1999	Add addpix()
+ *
+ * Feb 27 2004	Add fillvec()
  */

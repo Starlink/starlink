@@ -3,7 +3,7 @@
 #define _ITTInfo_h_
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: ITTInfo.h,v 1.4 2005/02/02 01:43:03 brighton Exp $" 
+ * "@(#) $Id: ITTInfo.h,v 1.1.1.1 2006/01/12 16:39:23 abrighto Exp $" 
  *
  * ITTInfo.h - class definitions for reading in ITT 
  *             (intensity transfer table) files

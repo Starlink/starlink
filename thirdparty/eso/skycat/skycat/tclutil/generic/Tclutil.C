@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: Tclutil.C,v 1.6 2005/02/02 01:43:02 brighton Exp $"
+ * "@(#) $Id: Tclutil.C,v 1.5 2006/01/25 22:21:38 abrighto Exp $"
  *
  * Tclutil.C - Initialize Tclutil package
  * 
@@ -9,9 +9,11 @@
  * Allan Brighton  21 Nov 97  Created
  * pbiereic        26/08/99   Changed Tclutil_Init()
  * pbiereic        17/02/03   Added 'using namespace std'.
+ * Allan Brighton  28/12/05   Replaced init script
  */
-static const char* const rcsId="@(#) $Id: Tclutil.C,v 1.6 2005/02/02 01:43:02 brighton Exp $";
+static const char* const rcsId="@(#) $Id: Tclutil.C,v 1.5 2006/01/25 22:21:38 abrighto Exp $";
 
+using namespace std;
 #include <cstdlib>
 #include <csignal>
 #include <cstdio>
@@ -21,18 +23,35 @@ static const char* const rcsId="@(#) $Id: Tclutil.C,v 1.6 2005/02/02 01:43:02 br
 #include <cmath>
 #include <cassert>
 #include <cstring>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include "define.h"
 #include "tcl.h"
 #include "tk.h"
 #include "error.h"
 
-using namespace std;
+// Since we have to link the BLT library anyway (because we're using the BLT C interface) 
+// call the init routine directly
+extern "C" int Blt_Init(Tcl_Interp *interp);
 
 // generated code for bitmaps used in tcl scripts
 void defineTclutilBitmaps(Tcl_Interp*);
 
-// local extension to enable postscript printing for images
-extern "C" void TkCanvasPsImage_Init();
+// Tcl procedure to search for an init for Tclutil startup file.  
+static char initScript[] = "if {[info proc ::util::Init]==\"\"} {\n\
+  namespace eval ::util {}\n\
+  proc ::util::Init {} {\n"
+#ifdef MAC_TCL
+"    source -rsrc TclutilInit.tcl\n"
+#else
+"    global tclutil_library\n\
+    tcl_findLibrary tclutil " PACKAGE_VERSION " " PACKAGE_VERSION " TclutilInit.tcl TCLUTIL_LIBRARY tclutil_library\n"
+#endif
+"  }\n\
+}\n\
+::util::Init";
+
 
 // dummy Tcl command implementation
 static int tclutil_cmd(ClientData, Tcl_Interp* interp, int argc, char** argv)
@@ -53,11 +72,13 @@ int Tclutil_Init(Tcl_Interp* interp)
     if (initialized++)
 	return TCL_OK;
 
-    // enable postscript printing for images (local ext)
-    TkCanvasPsImage_Init();
+    // initialize the required BLT package 
+    if (Blt_Init(interp) == TCL_ERROR) {
+	return TCL_ERROR; 
+    }
 
     // set up Tcl package
-    if (Tcl_PkgProvide (interp, "Tclutil", TCLUTIL_VERSION) != TCL_OK) {
+    if (Tcl_PkgProvide(interp, "Tclutil", PACKAGE_VERSION) != TCL_OK) {
 	return TCL_ERROR;
     }
 
@@ -68,29 +89,13 @@ int Tclutil_Init(Tcl_Interp* interp)
     Tcl_CreateCommand(interp, "tclutil", (Tcl_CmdProc*)tclutil_cmd, NULL, NULL);
 
     // Set the global Tcl variable  tclutil_version 
-    Tcl_SetVar(interp, "tclutil_version", TCLUTIL_VERSION, TCL_GLOBAL_ONLY);
+    Tcl_SetVar(interp, "tclutil_version", PACKAGE_VERSION, TCL_GLOBAL_ONLY);
 
-    /*
-     * Use Tcl script to search for TclutilInit.tcl and run the initialization tcl script
-     */
+    // Hack to work around problem in older tcl-8.4.x versions: see ./tcl_findLibrary.h
+#if ((TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 4 && TCL_RELEASE_SERIAL < 11) || TCL_MAJOR_VERSION < 8 || TCL_MINOR_VERSION < 4)
+#include "tcl_findLibrary.h"
+    if (Tcl_Eval(interp, tcl_findLibrary) != TCL_OK) return TCL_ERROR;
+#endif
 
-    // defines for TclutilInit.icc:
-#   define Pkg_findinit Tclutil_findinit
-#   include "TclutilInit.icc"
-
-    // defines for calling the script
-#   define Pkg "Tclutil"
-#   define Pkg_proc "Tclutil_findinit"
-    char* pkg_library = TCLUTIL_LIBRARY;
-
-    Tcl_SetVar(interp, "Pkg_findinit", Pkg_proc, TCL_GLOBAL_ONLY);
-
-    if (Tcl_GlobalEval(interp, Pkg_findinit) == TCL_ERROR)
-	return TCL_ERROR;
-
-    sprintf(buf, "%s %s %s", Pkg_proc, Pkg, pkg_library);
-    if (Tcl_GlobalEval(interp, buf) == TCL_ERROR)
-	return TCL_ERROR;
-
-    return TCL_OK; 
+    return Tcl_Eval(interp, initScript);
 }

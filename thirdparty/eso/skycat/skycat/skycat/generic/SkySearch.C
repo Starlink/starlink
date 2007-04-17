@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/Archive
- * $Id: SkySearch.C,v 1.6 2003/01/20 15:52:21 brighton Exp $
+ * $Id: SkySearch.C,v 1.2 2006/03/26 13:22:33 abrighto Exp $
  *
  * SkySearch.C - method definitions for class SkySearch
  *
@@ -15,7 +15,7 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  10 Feb 98  Created
  */
-static const char* const rcsId="@(#) $Id: SkySearch.C,v 1.6 2003/01/20 15:52:21 brighton Exp $";
+static const char* const rcsId="@(#) $Id: SkySearch.C,v 1.2 2006/03/26 13:22:33 abrighto Exp $";
 
 
 #include <cstring>
@@ -26,7 +26,9 @@ static const char* const rcsId="@(#) $Id: SkySearch.C,v 1.6 2003/01/20 15:52:21 
 #include <unistd.h>
 #include <fstream>
 #include <sstream>
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 #include "TabTable.h"
 #include "Mem.h"
 #include "error.h"
@@ -432,13 +434,13 @@ int SkySearch::plot_objects(Skycat* image, const QueryResult& r,
 
     // free memory allocated for split Tcl lists and return the status
     if (colNames)
-	free(colNames);
+	Tcl_Free((char *)colNames);
     if (colIndexes)
 	delete colIndexes;
     if (symb)
-	free(symb);
+	Tcl_Free((char *)symb);
     if (exprList)
-	free(exprList);
+	Tcl_Free((char *)exprList);
 
     return status;
 }
@@ -489,7 +491,7 @@ int SkySearch::plot(Skycat* image, const QueryResult& r)
 	    break;
 
 	if (argv) {
-	    free(argv);
+	    Tcl_Free((char *)argv);
 	    argv = NULL;
 	}
 	
@@ -498,7 +500,7 @@ int SkySearch::plot(Skycat* image, const QueryResult& r)
     } while(p);
 
     if (argv)
-	free(argv);
+	Tcl_Free((char *)argv);
     if (symbols)
 	free(symbols);
 
@@ -591,7 +593,7 @@ int SkySearch::imgplotCmd(int argc, char* argv[])
 
     // clean up
     if (freeColNames && colNames)
-	free(colNames);		// free split list of column headings
+	Tcl_Free((char *)colNames);	// free split list of column headings
 
     return status;
 }

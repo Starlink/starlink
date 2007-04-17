@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# @(#) $Id: catdefaults.tcl,v 1.1.1.1 2002/04/04 20:11:47 brighton Exp $
+# @(#) $Id: catdefaults.tcl,v 1.2 2006/01/20 23:36:27 abrighto Exp $
 #
 # catdefaults.tcl - X defaults for itk catalog widgets
 #
@@ -68,9 +68,4 @@ proc cat::setXdefaults {} {
     option add *Menubutton*background $menuBg
     option add *menubar*background $menuBg
     option add *Menubutton*foreground $menuFg
-
-    # use smaller default fonts fo Tix widgets
-    #catch {tix configure -fontset "12Point"}
-    # option add *TixFontSet TK
-    # catch {tix configure -fontset "TK"}
 }

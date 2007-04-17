@@ -1,7 +1,7 @@
 /*
  * TkWidget.C - base class definitions for Tk widgets implemented in C++
  *
- * "@(#) $Id: TkWidget.C,v 1.6 2005/02/02 01:43:02 brighton Exp $"
+ * "@(#) $Id: TkWidget.C,v 1.1.1.1 2006/01/12 16:41:04 abrighto Exp $"
  *
  * See the man page for a complete description.
  *
@@ -11,16 +11,21 @@
  * pbiereic        17/02/03  Added 'using namespace std'. Removed ::std specs.
  */
 
-static const char* const rcsId="@(#) $Id: TkWidget.C,v 1.6 2005/02/02 01:43:02 brighton Exp $";
+static const char* const rcsId="@(#) $Id: TkWidget.C,v 1.1.1.1 2006/01/12 16:41:04 abrighto Exp $";
 
+
+
+using namespace std;
 #include <cstdlib>
 #include <cctype>
 #include <iostream>
 #include <cstring>
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 #include "TkWidget.h"
 
-using namespace std;
+
 
 /*
  * Constructor - create the widget and install the tcl command of the

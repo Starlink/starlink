@@ -1,3 +1,3 @@
 # Tcl package index file, version 1.0
 
-package ifneeded Tclutil @TCLUTIL_VERSION@ "load [list $dir/../libtclutil@SHLIB_SUFFIX@]"
+package ifneeded Tclutil @PACKAGE_VERSION@ [list load [file join [file dirname $dir] @PKG_LIB_FILE@] Tclutil]

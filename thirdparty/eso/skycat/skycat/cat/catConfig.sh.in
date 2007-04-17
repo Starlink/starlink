@@ -1,61 +1,45 @@
 # E.S.O. - VLT project 
-# $Id: catConfig.sh.in,v 1.1.1.1 2002/04/04 20:11:44 brighton Exp $
+# $Id: catConfig.sh.in,v 1.2 2006/01/20 23:36:27 abrighto Exp $
 #
 # catConfig.sh --
-#
-# This shell script (for sh) is generated automatically by the catlib
+# 
+# This shell script (for sh) is generated automatically by Cat's
 # configure script.  It will create shell variables for most of
 # the configuration options discovered by the configure script.
-# This script is intended to be included by other configure scripts
-# so that they don't have to figure this all out for themselves.
+# This script is intended to be included by the configure scripts
+# for Cat extensions so that they don't have to figure this all
+# out for themselves.  This file does not duplicate information
+# already provided by tclConfig.sh, so you may need to use that
+# file in addition to this one.
 #
 # The information in this file is specific to a single platform.
-#
-# who             when      what
-# --------------  --------  ---------------------------------------------
-# Allan Brighton  08/04/97  Created
-#
 
-# version of the catlib library
-# version of the catlib library
-CAT_VERSION='@CAT_VERSION@'
+# Cat's version number.
+cat_VERSION='@PACKAGE_VERSION@'
 
-# root of cat source tree
-CAT_SRC_ROOT='@SRC_ROOT@'
-
-# list of cat subdirectory pathnames (depends on --with-notcl flag)
-CAT_SUBDIRS='@CAT_SUBDIRS@'
-
-# If this is true, build library with no Tcl access
-CAT_NO_TCL='@NO_TCL@'
-
-# CAT install dirs
-CAT_DESTDIR='@DESTDIR@'
-CAT_BINDIR='@BINDIR@'
-CAT_LIBDIR='@LIBDIR@'
-CAT_INCDIR='@INCDIR@'
-CAT_MANDIR='@MANDIR@'
-CAT_DIR='@CAT_DIR@'
-
-# default location of Cat library files
-CAT_LIBRARY='@CAT_LIBRARY@'
-
-# location of Cat library files in source tree
-CAT_BUILD_LIBRARY='@CAT_BUILD_LIBRARY@'
-
-# -I flags to pick up the cat include files from the build dirs
-CAT_BUILD_INCLUDES='@CAT_BUILD_INCLUDES@'
+# The name of the Cat library:
+cat_LIB_FILE=@cat_LIB_FILE@
 
 # String to pass to linker to pick up the Cat library from its
 # build directory.
-CAT_BUILD_LIB_SPEC='@CAT_BUILD_LIB_SPEC@'
+cat_BUILD_LIB_SPEC='@cat_BUILD_LIB_SPEC@'
 
-# static version of above
-CAT_BUILD_LIB_SPEC_STATIC='@CAT_BUILD_LIB_SPEC_STATIC@'
+# Cat build directory.
+cat_BUILD_DIR='@cat_BUILD_DIR@'
 
 # String to pass to linker to pick up the Cat library from its
 # installed directory.
-CAT_LIB_SPEC='@CAT_LIB_SPEC@'
+cat_LIB_SPEC='@cat_LIB_SPEC@'
 
-# static version of above
-CAT_LIB_SPEC_STATIC='@CAT_LIB_SPEC_STATIC@'
+# Location of the top-level source directories from which Cat
+# was built.  This is the directory that contains generic, unix, etc.
+# If Cat was compiled in a different place than the directory
+# containing the source files, this points to the location of the sources,
+# not the location where Cat was compiled.
+cat_SRC_DIR='@cat_SRC_DIR@'
+
+# List of object files used to build the library (for merging packages).
+cat_PKG_OBJECTS='@cat_PKG_OBJECTS@'
+
+# List of header filesinstalled for this library (for merging packages).
+cat_PKG_HEADERS='@cat_PKG_HEADERS@'

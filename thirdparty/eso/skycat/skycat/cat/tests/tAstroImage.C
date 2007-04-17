@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project / ESO Archive
- * $Id: tAstroImage.C,v 1.4 2003/01/20 15:52:21 brighton Exp $
+ * $Id: tAstroImage.C,v 1.1.1.1 2006/01/12 16:36:08 abrighto Exp $
  *
  * tAstroImage.C - test cases for class AstroCatalog with an image server
  * 
@@ -9,6 +9,7 @@
  * Allan Brighton  26 Sep 95  Created
  */
 
+using namespace std;
 #include <stdio.h>
 #include <iostream>
 #include <sstream>
@@ -36,22 +37,22 @@ main()
     q.width(1.);
     q.height(1.);
 
-    std::cout << "Retrieve DSS image at pos " << q.pos() 
+    cout << "Retrieve DSS image at pos " << q.pos() 
 	 << ", with width " << q.width()
 	 << " and height " << q.height()
 	 << ":" 
-	 << std::endl;
+	 << endl;
 
     int result = cat->getImage(q);
     if (result != 0) {
-        std::cout << "DSS Test failed\n";
+        cout << "DSS Test failed\n";
         exit(1);
     }
     const char* filename = cat->tmpfile();
  
-    std::cout << "DSS returned image file  (renaming to ./dss.fits)\n";
+    cout << "DSS returned image file  (renaming to ./dss.fits)\n";
 
-    std::ostringstream os;
+    ostringstream os;
     os << "mv " << filename << " ./dss.fits";
     if (system(os.str().c_str()) != 0)
 	sys_error("file rename error");

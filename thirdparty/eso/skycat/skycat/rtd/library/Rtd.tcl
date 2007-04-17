@@ -1,5 +1,5 @@
 # E.S.O. - VLT project
-# "@(#) $Id: Rtd.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
+# "@(#) $Id: Rtd.tcl,v 1.1.1.1 2006/01/12 16:38:15 abrighto Exp $"
 #
 # Rtd.tcl - real-time image display application class
 # See man page Rtd(n) for a complete description.
@@ -56,7 +56,7 @@ itcl::class rtd::Rtd {
     # This method is called after the options have been evaluated.
 
     protected method init {} {
-	global ::argv0 ::errorInfo
+	global ::argv0 ::errorInfo ::rtd_version
 
 	# set/get X defaults first time through - can be overridden in 
 	# subclass and/or in user's .Xdefaults file
@@ -67,9 +67,9 @@ itcl::class rtd::Rtd {
 
 	feedback "initializing user interface..."
 	if {"$itk_option(-number)" == "1"} {
-	    wm title $w_ "Rtd - Real-Time Display, version [rtd_version]"
+	    wm title $w_ "Rtd - Real-Time Display, version $rtd_version"
 	} else {
-	    wm title $w_ "Rtd - Real-Time Display, version [rtd_version] ($itk_option(-number))"
+	    wm title $w_ "Rtd - Real-Time Display, version $rtd_version ($itk_option(-number))"
 	}
 	wm iconname $w_ Rtd
 	

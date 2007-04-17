@@ -157,6 +157,7 @@ int	shared_set_debug(int debug_msgs);	/* set/reset debug mode */
 int	shared_set_createmode(int mode);	/* set/reset debug mode */
 int	shared_list(int id);			/* list segment(s) */
 int	shared_uncond_delete(int id);		/* uncondintionally delete (NOWAIT operation) segment(s) */
+int	shared_getaddr(int id, char **address);	/* get starting address of FITS file in segment */
 
 int	smem_init(void);
 int	smem_shutdown(void);
@@ -167,9 +168,9 @@ int	smem_open(char *filename, int rwmode, int *driverhandle);
 int	smem_create(char *filename, int *driverhandle);
 int	smem_close(int driverhandle);
 int	smem_remove(char *filename);
-int	smem_size(int driverhandle, long *size);
+int	smem_size(int driverhandle, LONGLONG *size);
 int	smem_flush(int driverhandle);
-int	smem_seek(int driverhandle, long offset);
+int	smem_seek(int driverhandle, LONGLONG offset);
 int	smem_read(int driverhandle, void *buffer, long nbytes);
 int	smem_write(int driverhandle, void *buffer, long nbytes);
 

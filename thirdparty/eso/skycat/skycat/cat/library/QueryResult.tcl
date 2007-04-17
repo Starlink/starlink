@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# @(#) $Id: QueryResult.tcl,v 1.1.1.1 2002/04/04 20:11:47 brighton Exp $
+# @(#) $Id: QueryResult.tcl,v 1.1.1.1 2006/01/12 16:36:15 abrighto Exp $
 #
 # QueryResult.tcl - Widget for viewing the results of a catalog query.
 #

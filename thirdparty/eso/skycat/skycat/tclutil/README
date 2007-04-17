@@ -13,63 +13,28 @@ created by the configure script and makes it easier to write configure
 scripts for other packages by providing configuration information,
 such as the locations and names of all the Tcl extensions and
 libraries. The development environment here includes C++, Itcl, TclX,
-BLT and optionally other packages that can be linked in statically or
+BLT, Tkimg, and optionally other packages that can be linked in
 dynamically as needed.
 
-For installation instructions, see the file INSTALL in this directory.
+You can use this package by including the following line in a Tcl script:
 
-See the CHANGES file in this directory for a list of recent changes.
+	package require Tclutil
 
-Once everything has been compiled, the compiled "wish" application can
-be started as follows:
+For installation instructions, see the file INSTALL in the parent
+directory.  See the CHANGES file in this directory for a list of
+recent changes.  
 
-	% cd $SRCDIR/tclutil/demos
-	% tclutil.sh
+The following URLs may also be of interest:
 
-Or, for the installed version:
-	
-	% $INSTALLDIR/bin/tclutil
-	
-This module provides a library and not an application, so the above
-commands only start the "wish" application with the environment needed
-to use the library.
+Skycat home page:
+	http://archive.eso.org/skycat/
 
-Note that if you want to run the demo from a machine other than the
-one you compiled it on, you may need to set the TCLUTIL_LIBRARY
-environment variable so that the necessary Tcl source files can be
-found at run time:
+Sources and binaries:
+	ftp://ftp.eso.org/pub/archive/skycat/README.html
 
-	% setenv TCLUTIL_LIBRARY $INSTALLDIR/lib/tclutil
-
-For more information, please refer to the postscript documentation,
-which can be retrieved via anon ftp from:
-
+Postscript, PDF, and FrameMaker Documentation:
 	ftp://ftp.eso.org/pub/archive/skycat/doc
 
-The sources for the man pages can be found in the source tree under
-the "man" directories.
+HTML Docs:
+	http://archive.eso.org/skycat/docs/skycat-man.html
 
-Contents of this Release
-------------------------
-
-tclutil			- top level TCLUTIL directory,
-                          contains the configure script, Makefile and related 
-	                  scripts and information (README and INSTALL files)
-
-  tclutil		- Contains Tcl related C++ and itcl classes
-
-    man                 - man pages
-
-    src			- C++ sources
-    include	         
-
-    bin			- holds tclutil_wish binary
-
-    library		- Tcl/Tk files and Itcl widget classes
-
-    demos		- demo wish startup script
-    bitmaps		- bitmaps used in user interface widgets
-
-  util                  - C++ utility classes (not Tcl related)
-
------------------------------------------------------------------------------------

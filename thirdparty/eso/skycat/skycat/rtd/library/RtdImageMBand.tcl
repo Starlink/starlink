@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# "@(#) $Id: RtdImageMBand.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
+# "@(#) $Id: RtdImageMBand.tcl,v 1.1.1.1 2006/01/12 16:38:23 abrighto Exp $"
 #
 # RtdImageMBand.tcl - itcl class to display a "measure band" 
 #                     showing the distance between 2 points in world coordinates

@@ -2,19 +2,15 @@
 
 /*  The FITSIO software was written by William Pence at the High Energy    */
 /*  Astrophysic Science Archive Research Center (HEASARC) at the NASA      */
-/*  Goddard Space Flight Center.  Users shall not, without prior written   */
-/*  permission of the U.S. Government,  establish a claim to statutory     */
-/*  copyright.  The Government and others acting on its behalf, shall have */
-/*  a royalty-free, non-exclusive, irrevocable,  worldwide license for     */
-/*  Government purposes to publish, distribute, translate, copy, exhibit,  */
-/*  and perform such material.                                             */
+/*  Goddard Space Flight Center.                                           */
 
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 #include <stddef.h>  /* apparently needed to define size_t */
 #include "fitsio2.h"
 
 #define RECBUFLEN 1000
+
 static char stdin_outfile[FLEN_FILENAME];
 
 typedef struct    /* structure containing mem file structure */ 
@@ -29,18 +25,19 @@ typedef struct    /* structure containing mem file structure */
                          /* always be used, so use *memsizeptr instead. */
     size_t deltasize;    /* Suggested increment for reallocating memory */
     void *(*mem_realloc)(void *p, size_t newsize);  /* realloc function */
-    size_t currentpos;   /* current file position, relative to start */
-    size_t fitsfilesize; /* size of the FITS file (always <= *memsizeptr) */
+    LONGLONG currentpos;   /* current file position, relative to start */
+    LONGLONG fitsfilesize; /* size of the FITS file (always <= *memsizeptr) */
+    FILE *fileptr;      /* pointer to compressed output disk file */
 } memdriver;
 
-static memdriver memTable[NIOBUF];  /* allocate mem file handle tables */
+static memdriver memTable[NMAXFILES];  /* allocate mem file handle tables */
 
 /*--------------------------------------------------------------------------*/
 int mem_init(void)
 {
     int ii;
 
-    for (ii = 0; ii < NIOBUF; ii++)  /* initialize all empty slots in table */
+    for (ii = 0; ii < NMAXFILES; ii++) /* initialize all empty slots in table */
     {
        memTable[ii].memaddrptr = 0;
        memTable[ii].memaddr = 0;
@@ -92,6 +89,72 @@ int mem_create(char *filename, int *handle)
     return(0);
 }
 /*--------------------------------------------------------------------------*/
+int mem_create_comp(char *filename, int *handle)
+/*
+  Create a new empty memory file for subsequent writes.
+  Also create an empty compressed .gz file.  The memory file
+  will be compressed and written to the disk file when the file is closed.
+*/
+{
+    FILE *diskfile;
+    char mode[4];
+    int  status;
+
+    /* first, create disk file for the compressed output */
+
+
+    if ( !strcmp(filename, "-.gz") || !strcmp(filename, "stdout.gz") ||
+         !strcmp(filename, "STDOUT.gz") )
+    {
+       /* special case: create uncompressed FITS file in memory, then
+          compress it an write it out to 'stdout' when it is closed.  */
+
+       diskfile = stdout;
+    }
+    else
+    {
+        /* normal case: create disk file for the compressed output */
+
+        strcpy(mode, "w+b");    /* create file with read-write */
+
+        diskfile = fopen(filename, "r"); /* does file already exist? */
+
+        if (diskfile)
+        {
+            fclose(diskfile);         /* close file and exit with error */
+            return(FILE_NOT_CREATED); 
+        }
+
+#if MACHINE == ALPHAVMS || MACHINE == VAXVMS
+        /* specify VMS record structure: fixed format, 2880 byte records */
+        /* but force stream mode access to enable random I/O access      */
+        diskfile = fopen(filename, mode, "rfm=fix", "mrs=2880", "ctx=stm"); 
+#else
+        diskfile = fopen(filename, mode); 
+#endif
+
+        if (!(diskfile))           /* couldn't create file */
+        {
+            return(FILE_NOT_CREATED); 
+        }
+    }
+
+    /* now create temporary memory file */
+
+    /* initially allocate 1 FITS block = 2880 bytes */
+    status = mem_createmem(2880L, handle);
+
+    if (status)
+    {
+        ffpmsg("failed to create empty memory file (mem_create_comp)");
+        return(status);
+    }
+
+    memTable[*handle].fileptr = diskfile;
+
+    return(0);
+}
+/*--------------------------------------------------------------------------*/
 int mem_openmem(void **buffptr,   /* I - address of memory pointer          */
                 size_t *buffsize, /* I - size of buffer, in bytes           */
                 size_t deltasize, /* I - increment for future realloc's     */
@@ -104,7 +167,7 @@ int mem_openmem(void **buffptr,   /* I - address of memory pointer          */
     int ii;
 
     *handle = -1;
-    for (ii = 0; ii < NIOBUF; ii++)  /* find empty slot in handle table */
+    for (ii = 0; ii < NMAXFILES; ii++)  /* find empty slot in handle table */
     {
         if (memTable[ii].memaddrptr == 0)
         {
@@ -132,7 +195,7 @@ int mem_createmem(size_t msize, int *handle)
     int ii;
 
     *handle = -1;
-    for (ii = 0; ii < NIOBUF; ii++)  /* find empty slot in handle table */
+    for (ii = 0; ii < NMAXFILES; ii++)  /* find empty slot in handle table */
     {
         if (memTable[ii].memaddrptr == 0)
         {
@@ -167,27 +230,35 @@ int mem_createmem(size_t msize, int *handle)
     return(0);
 }
 /*--------------------------------------------------------------------------*/
-int mem_truncate(int handle, long filesize)
+int mem_truncate(int handle, LONGLONG filesize)
 /*
-  truncate the file to a new smaller size
+  truncate the file to a new size
 */
 {
     char *ptr;
 
     /* call the memory reallocation function, if defined */
     if ( memTable[handle].mem_realloc )
-    {
+    {    /* explicit LONGLONG->size_t cast */
         ptr = (memTable[handle].mem_realloc)(
                                 *(memTable[handle].memaddrptr),
-                                 filesize);
+                                 (size_t) filesize);
         if (!ptr)
         {
             ffpmsg("Failed to reallocate memory (mem_truncate)");
             return(MEMORY_ALLOCATION);
         }
 
+        /* if allocated more memory, initialize it to zero */
+        if ( filesize > *(memTable[handle].memsizeptr) )
+        {
+             memset(ptr + *(memTable[handle].memsizeptr),
+                    0,
+                ((size_t) filesize) - *(memTable[handle].memsizeptr) );
+        }
+
         *(memTable[handle].memaddrptr) = ptr;
-        *(memTable[handle].memsizeptr) = filesize;
+        *(memTable[handle].memsizeptr) = (size_t) (filesize);
     }
 
     memTable[handle].fitsfilesize = filesize;
@@ -217,6 +288,7 @@ int stdin_open(char *filename, int rwmode, int *handle)
 */
 {
     int status = 0;
+    char cbuff;
 
     if (*stdin_outfile)
     {
@@ -248,29 +320,44 @@ int stdin_open(char *filename, int rwmode, int *handle)
     }
     else
     {
-      /* copy the stdin stream into memory then open file in memory */
-
-      if (rwmode != READONLY)
+   
+      /* get the first character, then put it back */
+      cbuff = fgetc(stdin);
+      ungetc(cbuff, stdin);
+    
+      /* compressed files begin with 037 or 'P' */
+      if (cbuff == 31 || cbuff == 75)
       {
-        ffpmsg("cannot open stdin with WRITE access");
-        return(FILE_NOT_OPENED);
+         /* looks like the input stream is compressed */
+         status = mem_compress_stdin_open(filename, rwmode, handle);
+	 
       }
-
-      status = mem_createmem(2880L, handle);
-
-      if (status)
+      else
       {
-        ffpmsg("failed to create empty memory file (stdin_open)");
-        return(status);
-      }
+        /* copy the stdin stream into memory then open file in memory */
+
+        if (rwmode != READONLY)
+        {
+          ffpmsg("cannot open stdin with WRITE access");
+          return(READONLY_FILE);
+        }
+
+        status = mem_createmem(2880L, handle);
+
+        if (status)
+        {
+          ffpmsg("failed to create empty memory file (stdin_open)");
+          return(status);
+        }
  
-      /* copy the whole stdin stream into memory */
-      status = stdin2mem(*handle);
+        /* copy the whole stdin stream into memory */
+        status = stdin2mem(*handle);
 
-      if (status)
-      {
-        ffpmsg("failed to copy stdin into memory (stdin_open)");
-        free(memTable[*handle].memaddr);
+        if (status)
+        {
+          ffpmsg("failed to copy stdin into memory (stdin_open)");
+          free(memTable[*handle].memaddr);
+        }
       }
     }
 
@@ -283,7 +370,8 @@ int stdin2mem(int hd)  /* handle number */
   has already been allocated, then realloc more memory if necessary.
 */
 {
-    size_t nread, memsize, filesize, delta;
+    size_t nread, memsize, delta;
+    LONGLONG filesize;
     char *memptr;
     char simple[] = "SIMPLE";
     int c, ii, jj;
@@ -317,7 +405,8 @@ int stdin2mem(int hd)  /* handle number */
 
    if (filesize == 0)
    {
-       ffpmsg("Couldn't find the string 'SIMPLE' in the stdin stream");
+       ffpmsg("Couldn't find the string 'SIMPLE' in the stdin stream.");
+       ffpmsg("This does not look like a FITS file.");
        return(FILE_NOT_OPENED);
    }
 
@@ -423,10 +512,10 @@ int stdout_close(int handle)
 {
     int status = 0;
 
-    /* copy from memory to standard out */
+    /* copy from memory to standard out.  explicit LONGLONG->size_t cast */
     if(fwrite(memTable[handle].memaddr, 1,
-              memTable[handle].fitsfilesize, stdout) !=
-              memTable[handle].fitsfilesize )
+              ((size_t) memTable[handle].fitsfilesize), stdout) !=
+              (size_t) memTable[handle].fitsfilesize )
     {
                 ffpmsg("failed to copy memory file to stdout (stdout_close)");
                 status = WRITE_ERROR;
@@ -438,6 +527,16 @@ int stdout_close(int handle)
     return(status);
 }
 /*--------------------------------------------------------------------------*/
+int mem_compress_openrw(char *filename, int rwmode, int *hdl)
+/*
+  This routine opens the compressed diskfile and creates an empty memory
+  buffer with an appropriate size, then calls mem_uncompress2mem. It allows
+  the memory 'file' to be opened with READWRITE access.
+*/
+{
+   return(mem_compress_open(filename, READONLY, hdl));  
+}
+/*--------------------------------------------------------------------------*/
 int mem_compress_open(char *filename, int rwmode, int *hdl)
 /*
   This routine opens the compressed diskfile and creates an empty memory
@@ -445,10 +544,18 @@ int mem_compress_open(char *filename, int rwmode, int *hdl)
 */
 {
     FILE *diskfile;
-    int status;
+    int status, estimated = 1;
     unsigned char buffer[4];
     size_t finalsize;
     char *ptr;
+
+    if (rwmode != READONLY)
+    {
+        ffpmsg(
+  "cannot open compressed file with WRITE access (mem_compress_open)");
+        ffpmsg(filename);
+        return(READONLY_FILE);
+    }
 
     /* open the compressed disk file */
     status = file_openfile(filename, READONLY, &diskfile);
@@ -478,6 +585,8 @@ int mem_compress_open(char *filename, int rwmode, int *hdl)
 	finalsize |= buffer[1] << 8;
 	finalsize |= buffer[2] << 16;
 	finalsize |= buffer[3] << 24;
+
+        estimated = 0;  /* file size is known, not estimated */
     }
     else if (memcmp(buffer, "\120\113", 2) == 0)   /* PKZIP */
     {
@@ -491,6 +600,8 @@ int mem_compress_open(char *filename, int rwmode, int *hdl)
 	finalsize |= buffer[1] << 8;
 	finalsize |= buffer[2] << 16;
 	finalsize |= buffer[3] << 24;
+
+        estimated = 0;  /* file size is known, not estimated */
     }
     else if (memcmp(buffer, "\037\036", 2) == 0)  /* PACK */
         finalsize = 0;  /* for most methods we can't determine final size */
@@ -516,6 +627,14 @@ int mem_compress_open(char *filename, int rwmode, int *hdl)
 
     /* create a memory file big enough (hopefully) for the uncompressed file */
     status = mem_createmem(finalsize, hdl);
+
+    if (status && estimated)
+    {
+        /* memory allocation failed, so try a smaller estimated size */
+        finalsize = finalsize / 3;
+        status = mem_createmem(finalsize, hdl);
+    }
+
     if (status)
     {
         fclose(diskfile);
@@ -536,10 +655,11 @@ int mem_compress_open(char *filename, int rwmode, int *hdl)
     }
 
     /* if we allocated too much memory initially, then free it */
-    if (*(memTable[*hdl].memsizeptr) > (memTable[*hdl].fitsfilesize + 256L) ) 
+    if (*(memTable[*hdl].memsizeptr) > 
+       (( (size_t) memTable[*hdl].fitsfilesize) + 256L) ) 
     {
         ptr = realloc(*(memTable[*hdl].memaddrptr), 
-                       memTable[*hdl].fitsfilesize);
+                     ((size_t) memTable[*hdl].fitsfilesize) );
         if (!ptr)
         {
             ffpmsg("Failed to reduce size of allocated memory (compress_open)");
@@ -547,7 +667,61 @@ int mem_compress_open(char *filename, int rwmode, int *hdl)
         }
 
         *(memTable[*hdl].memaddrptr) = ptr;
-        *(memTable[*hdl].memsizeptr) = memTable[*hdl].fitsfilesize;
+        *(memTable[*hdl].memsizeptr) = (size_t) (memTable[*hdl].fitsfilesize);
+    }
+
+    return(0);
+}
+/*--------------------------------------------------------------------------*/
+int mem_compress_stdin_open(char *filename, int rwmode, int *hdl)
+/*
+  This routine reads the compressed input stream and creates an empty memory
+  buffer, then calls mem_uncompress2mem.
+*/
+{
+    int status;
+    char *ptr;
+
+    if (rwmode != READONLY)
+    {
+        ffpmsg(
+  "cannot open compressed input stream with WRITE access (mem_compress_stdin_open)");
+        return(READONLY_FILE);
+    }
+ 
+    /* create a memory file for the uncompressed file */
+    status = mem_createmem(28800, hdl);
+
+    if (status)
+    {
+        ffpmsg("failed to create empty memory file (compress_stdin_open)");
+        return(status);
+    }
+
+    /* uncompress file into memory */
+    status = mem_uncompress2mem(filename, stdin, *hdl);
+
+    if (status)
+    {
+        mem_close_free(*hdl);   /* free up the memory */
+        ffpmsg("failed to uncompress stdin into memory (compress_stdin_open)");
+        return(status);
+    }
+
+    /* if we allocated too much memory initially, then free it */
+    if (*(memTable[*hdl].memsizeptr) > 
+       (( (size_t) memTable[*hdl].fitsfilesize) + 256L) ) 
+    {
+        ptr = realloc(*(memTable[*hdl].memaddrptr), 
+                      ((size_t) memTable[*hdl].fitsfilesize) );
+        if (!ptr)
+        {
+            ffpmsg("Failed to reduce size of allocated memory (compress_stdin_open)");
+            return(MEMORY_ALLOCATION);
+        }
+
+        *(memTable[*hdl].memaddrptr) = ptr;
+        *(memTable[*hdl].memsizeptr) = (size_t) (memTable[*hdl].fitsfilesize);
     }
 
     return(0);
@@ -587,6 +761,241 @@ int mem_iraf_open(char *filename, int rwmode, int *hdl)
     return(0);
 }
 /*--------------------------------------------------------------------------*/
+int mem_rawfile_open(char *filename, int rwmode, int *hdl)
+/*
+  This routine creates an empty memory buffer, writes a minimal
+  image header, then copies the image data from the raw file into
+  memory.  It will byteswap the pixel values if the raw array
+  is in little endian byte order.
+*/
+{
+    FILE *diskfile;
+    fitsfile *fptr;
+    short *sptr;
+    int status, endian, datatype, bytePerPix, naxis;
+    long dim[5] = {1,1,1,1,1}, ii, nvals, offset = 0;
+    size_t filesize = 0, datasize;
+    char rootfile[FLEN_FILENAME], *cptr = 0, *cptr2 = 0;
+    void *ptr;
+
+    if (rwmode != READONLY)
+    {
+        ffpmsg(
+  "cannot open raw binary file with WRITE access (mem_rawfile_open)");
+        ffpmsg(filename);
+        return(READONLY_FILE);
+    }
+
+    cptr = strchr(filename, '[');   /* search for opening bracket [ */
+
+    if (!cptr)
+    {
+        ffpmsg("binary file name missing '[' character (mem_rawfile_open)");
+        ffpmsg(filename);
+        return(URL_PARSE_ERROR);
+    }
+
+    *rootfile = '\0';
+    strncat(rootfile, filename, cptr - filename);  /* store the rootname */
+
+    cptr++;
+
+    while (*cptr == ' ')
+       cptr++;    /* skip leading blanks */
+
+    /* Get the Data Type of the Image */
+
+    if (*cptr == 'b' || *cptr == 'B')
+    {
+      datatype = BYTE_IMG;
+      bytePerPix = 1;
+    }
+    else if (*cptr == 'i' || *cptr == 'I')
+    {
+      datatype = SHORT_IMG;
+      bytePerPix = 2;
+    }
+    else if (*cptr == 'u' || *cptr == 'U')
+    {
+      datatype = USHORT_IMG;
+      bytePerPix = 2;
+
+    }
+    else if (*cptr == 'j' || *cptr == 'J')
+    {
+      datatype = LONG_IMG;
+      bytePerPix = 4;
+    }  
+    else if (*cptr == 'r' || *cptr == 'R' || *cptr == 'f' || *cptr == 'F')
+    {
+      datatype = FLOAT_IMG;
+      bytePerPix = 4;
+    }    
+    else if (*cptr == 'd' || *cptr == 'D')
+    {
+      datatype = DOUBLE_IMG;
+      bytePerPix = 8;
+    }
+    else
+    {
+        ffpmsg("error in raw binary file datatype (mem_rawfile_open)");
+        ffpmsg(filename);
+        return(URL_PARSE_ERROR);
+    }
+
+    cptr++;
+
+    /* get Endian: Big or Little; default is same as the local machine */
+    
+    if (*cptr == 'b' || *cptr == 'B')
+    {
+        endian = 0;
+        cptr++;
+    }
+    else if (*cptr == 'l' || *cptr == 'L')
+    {
+        endian = 1;
+        cptr++;
+    }
+    else
+        endian = BYTESWAPPED; /* byteswapped machines are little endian */
+
+    /* read each dimension (up to 5) */
+
+    naxis = 1;
+    dim[0] = strtol(cptr, &cptr2, 10);
+    
+    if (cptr2 && *cptr2 == ',')
+    {
+      naxis = 2;
+      dim[1] = strtol(cptr2+1, &cptr, 10);
+
+      if (cptr && *cptr == ',')
+      {
+        naxis = 3;
+        dim[2] = strtol(cptr+1, &cptr2, 10);
+
+        if (cptr2 && *cptr2 == ',')
+        {
+          naxis = 4;
+          dim[3] = strtol(cptr2+1, &cptr, 10);
+
+          if (cptr && *cptr == ',')
+            naxis = 5;
+            dim[4] = strtol(cptr+1, &cptr2, 10);
+        }
+      }
+    }
+
+    cptr = maxvalue(cptr, cptr2);
+
+    if (*cptr == ':')   /* read starting offset value */
+        offset = strtol(cptr+1, 0, 10);
+
+    nvals = dim[0] * dim[1] * dim[2] * dim[3] * dim[4];
+    datasize = nvals * bytePerPix;
+    filesize = nvals * bytePerPix + 2880;
+    filesize = ((filesize - 1) / 2880 + 1) * 2880; 
+
+    /* open the raw binary disk file */
+    status = file_openfile(rootfile, READONLY, &diskfile);
+    if (status)
+    {
+        ffpmsg("failed to open raw  binary file (mem_rawfile_open)");
+        ffpmsg(rootfile);
+        return(status);
+    }
+
+    /* create a memory file with corrct size for the FITS converted raw file */
+    status = mem_createmem(filesize, hdl);
+    if (status)
+    {
+        ffpmsg("failed to create memory file (mem_rawfile_open)");
+        fclose(diskfile);
+        return(status);
+    }
+
+    /* open this piece of memory as a new FITS file */
+    ffimem(&fptr, (void **) memTable[*hdl].memaddrptr, &filesize, 0, 0, &status);
+
+    /* write the required header keywords */
+    ffcrim(fptr, datatype, naxis, dim, &status);
+
+    /* close the FITS file, but keep the memory allocated */
+    ffclos(fptr, &status);
+
+    if (status > 0)
+    {
+        ffpmsg("failed to write basic image header (mem_rawfile_open)");
+        fclose(diskfile);
+        mem_close_free(*hdl);   /* free up the memory */
+        return(status);
+    }
+
+    if (offset > 0)
+       fseek(diskfile, offset, 0);   /* offset to start of the data */
+
+    /* read the raw data into memory */
+    ptr = *memTable[*hdl].memaddrptr + 2880;
+
+    if (fread((char *) ptr, 1, datasize, diskfile) != datasize)
+      status = READ_ERROR;
+
+    fclose(diskfile);  /* close the raw binary disk file */
+
+    if (status)
+    {
+        mem_close_free(*hdl);   /* free up the memory */
+        ffpmsg("failed to copy raw file data into memory (mem_rawfile_open)");
+        return(status);
+    }
+
+    if (datatype == USHORT_IMG)  /* have to subtract 32768 from each unsigned */
+    {                            /* value to conform to FITS convention. More */
+                                 /* efficient way to do this is to just flip  */
+                                 /* the most significant bit.                 */
+
+      sptr = (short *) ptr;
+
+      if (endian == BYTESWAPPED)  /* working with native format */
+      {
+        for (ii = 0; ii < nvals; ii++, sptr++)
+        {
+          *sptr =  ( *sptr ) ^ 0x8000;
+        }
+      }
+      else  /* pixels are byteswapped WRT the native format */
+      {
+        for (ii = 0; ii < nvals; ii++, sptr++)
+        {
+          *sptr =  ( *sptr ) ^ 0x80;
+        }
+      }
+    }
+
+    if (endian)  /* swap the bytes if array is in little endian byte order */
+    {
+      if (datatype == SHORT_IMG || datatype == USHORT_IMG)
+      {
+        ffswap2( (short *) ptr, nvals);
+      }
+      else if (datatype == LONG_IMG || datatype == FLOAT_IMG)
+      {
+        ffswap4( (INT32BIT *) ptr, nvals);
+      }
+
+      else if (datatype == DOUBLE_IMG)
+      {
+        ffswap8( (double *) ptr, nvals);
+      }
+    }
+
+    memTable[*hdl].currentpos = 0;           /* save starting position */
+    memTable[*hdl].fitsfilesize=filesize;    /* and initial file size  */
+
+    return(0);
+}
+/*--------------------------------------------------------------------------*/
 int mem_uncompress2mem(char *filename, FILE *diskfile, int hdl)
 {
 /*
@@ -608,13 +1017,12 @@ int mem_uncompress2mem(char *filename, FILE *diskfile, int hdl)
   return status;
 }
 /*--------------------------------------------------------------------------*/
-int mem_size(int handle, long *filesize)
+int mem_size(int handle, LONGLONG *filesize)
 /*
   return the size of the file; only called when the file is first opened
 */
 {
     *filesize = memTable[handle].fitsfilesize;
-
     return(0);
 }
 /*--------------------------------------------------------------------------*/
@@ -640,12 +1048,43 @@ int mem_close_keep(int handle)
     return(0);
 }
 /*--------------------------------------------------------------------------*/
-int mem_seek(int handle, long offset)
+int mem_close_comp(int handle)
+/*
+  compress the memory file, writing it out to the fileptr (which might
+  be stdout)
+*/
+{
+    int status = 0;
+    size_t compsize;
+
+    /* compress file in  memory to a .gz disk file */
+
+    if(compress2file_from_mem(memTable[handle].memaddr,
+              (size_t) (memTable[handle].fitsfilesize), 
+              memTable[handle].fileptr,
+              &compsize, &status ) )
+    {
+            ffpmsg("failed to copy memory file to file (mem_close_comp)");
+            status = WRITE_ERROR;
+    }
+
+    free( memTable[handle].memaddr );   /* free the memory */
+    memTable[handle].memaddrptr = 0;
+    memTable[handle].memaddr = 0;
+
+    /* close the compressed disk file (except if it is 'stdout' */
+    if (memTable[handle].fileptr != stdout)
+        fclose(memTable[handle].fileptr);
+
+    return(status);
+}
+/*--------------------------------------------------------------------------*/
+int mem_seek(int handle, LONGLONG offset)
 /*
   seek to position relative to start of the file.
 */
 {
-    if (offset > (long) memTable[handle].fitsfilesize )
+    if (offset >  memTable[handle].fitsfilesize )
         return(END_OF_FILE);
 
     memTable[handle].currentpos = offset;
@@ -676,7 +1115,8 @@ int mem_write(int hdl, void *buffer, long nbytes)
     size_t newsize;
     char *ptr;
 
-    if (memTable[hdl].currentpos + nbytes > *(memTable[hdl].memsizeptr))
+    if ((size_t) (memTable[hdl].currentpos + nbytes) > 
+         *(memTable[hdl].memsizeptr) )
     {
                
         if (!(memTable[hdl].mem_realloc))
@@ -692,7 +1132,7 @@ int mem_write(int hdl, void *buffer, long nbytes)
              the defined 'deltasize' parameter
          */
 
-        newsize = maxvalue(
+        newsize = maxvalue( (size_t)
             (((memTable[hdl].currentpos + nbytes - 1) / 2880) + 1) * 2880,
             *(memTable[hdl].memsizeptr) + memTable[hdl].deltasize);
 

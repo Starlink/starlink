@@ -3,7 +3,7 @@
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: BiasData.h,v 1.3 2005/02/02 01:43:03 brighton Exp $" 
+ * "@(#) $Id: BiasData.h,v 1.1.1.1 2006/01/12 16:38:53 abrighto Exp $" 
  *
  * BiasData.h - class definitions for managing bias subtraction
  *
@@ -16,7 +16,7 @@
 #include <sys/stat.h>
 #include "ImageData.h"
 #include "ImageIO.h"
-#include "FitsIO.hxx"
+#include "Fits_IO.h"
 
 // max. number of bias frames
 #define MAXBIAS 5

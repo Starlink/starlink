@@ -1,12 +1,50 @@
-/* libwcs/wcs.h
- * June 26, 2000
- * By Doug Mink, Harvard-Smithsonian Center for Astrophysics */
+/*** File libwcs/wcs.h
+ *** August 30, 2004
+ *** By Doug Mink, dmink@cfa.harvard.edu
+ *** Harvard-Smithsonian Center for Astrophysics
+ *** Copyright (C) 1994-2004
+ *** Smithsonian Astrophysical Observatory, Cambridge, MA, USA
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+    
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+    Correspondence concerning WCSTools should be addressed as follows:
+           Internet email: dmink@cfa.harvard.edu
+           Postal address: Doug Mink
+                           Smithsonian Astrophysical Observatory
+                           60 Garden St.
+                           Cambridge, MA 02138 USA
+ */
 
 #ifndef _wcs_h_
 #define _wcs_h_
 
 #include "wcslib.h"
 #include "fitshead.h"
+
+/* SIRTF distortion matrix coefficients */
+#define DISTMAX 10
+struct Distort {
+  int    a_order;                /* max power for the 1st dimension */
+  double a[DISTMAX][DISTMAX];  /* coefficient array of 1st dimension */
+  int    b_order;                /* max power for 1st dimension */
+  double b[DISTMAX][DISTMAX];  /* coefficient array of 2nd dimension */
+  int    ap_order;               /* max power for the 1st dimension */
+  double ap[DISTMAX][DISTMAX]; /* coefficient array of 1st dimension */
+  int    bp_order;               /* max power for 1st dimension */
+  double bp[DISTMAX][DISTMAX]; /* coefficient array of 2nd dimension */
+};
 
 struct WorldCoor {
   double	xref;		/* X reference coordinate value (deg) */
@@ -48,6 +86,8 @@ struct WorldCoor {
   double	imrot;		/* Rotation angle of north pole */
   double	pa_north;	/* Position angle of north (0=horizontal) */
   double	pa_east;	/* Position angle of east (0=horizontal) */
+  double	radvel;		/* Radial velocity (km/sec away from observer)*/
+  double	zvel;		/* Radial velocity (v/c away from observer)*/
   int		imflip;		/* If not 0, image is reflected around axis */
   int		prjcode;	/* projection code (-1-32) */
   int		latbase;	/* Latitude base 90 (NPA), 0 (LAT), -90 (SPA) */
@@ -63,6 +103,7 @@ struct WorldCoor {
   int		coorflip;	/* 0 if x=RA, y=Dec; 1 if x=Dec, y=RA */
   int		offscl;		/* 0 if OK, 1 if offscale */
   int		wcson;		/* 1 if WCS is set, else 0 */
+  int		naxis;		/* Number of axes in image (for WCSLIB 3.0) */
   int		naxes;		/* Number of axes in image */
   int		wcsproj;	/* WCS_OLD: AIPS worldpos() and worldpix()
 				   WCS_NEW: Mark Calabretta's WCSLIB subroutines
@@ -96,44 +137,56 @@ struct WorldCoor {
   struct prjprm prj;		/* WCSLIB projection parameters */
   struct IRAFsurface *lngcor;	/* RA/longitude correction structure */
   struct IRAFsurface *latcor;	/* Dec/latitude correction structure */
+  int		distcode;	/* Distortion code 0=none 1=SIRTF */
+  struct Distort distort;	/* SIRTF distortion coefficients */
   char *command_format[10];	/* WCS command formats */
 				/* where %s is replaced by WCS coordinates */
 				/* where %f is replaced by the image filename */
 				/* where %x is replaced by image coordinates */
+  double	ltm[4];		/* Image rotation matrix */
+  double	ltv[2];		/* Image offset */
+  int		idpix[2];	/* First pixel to use in image (x, y) */
+  int		ndpix[2];	/* Number of pixels to use in image (x, y) */
+  struct WorldCoor *wcs;	/* WCS upon which this WCS depends */
+  struct WorldCoor *wcsdep;	/* WCS depending on this WCS */
+  char		*wcsname;	/* WCS name (defaults to NULL pointer) */
+  char		wcschar;	/* WCS character (A-Z, null, space) */
 };
 
-/* Projections (1-26 are WCSLIB) */
+/* Projections (1-26 are WCSLIB) (values for wcs->prjcode) */
 #define WCS_PIX -1	/* Pixel WCS */
 #define WCS_LIN  0	/* Linear projection */
 #define WCS_AZP  1	/* Zenithal/Azimuthal Perspective */
-#define WCS_TAN  2	/* Gnomonic = Tangent Plane */
-#define WCS_SIN  3	/* Orthographic/synthesis */
-#define WCS_STG  4	/* Stereographic */
-#define WCS_ARC  5	/* Zenithal/azimuthal equidistant */
-#define WCS_ZPN  6	/* Zenithal/azimuthal PolyNomial */
-#define WCS_ZEA  7	/* Zenithal/azimuthal Equal Area */
-#define WCS_AIR  8	/* Airy */
-#define WCS_CYP  9	/* CYlindrical Perspective */
-#define WCS_CAR 10	/* Cartesian */
-#define WCS_MER 11	/* Mercator */
-#define WCS_CEA 12	/* Cylindrical Equal Area */
-#define WCS_CPS 13	/* Conic PerSpective (COP) */
-#define WCS_COD 14	/* COnic equiDistant */
-#define WCS_COE 15	/* COnic Equal area */
-#define WCS_COO 16	/* COnic Orthomorphic */
-#define WCS_BON 17	/* Bonne */
-#define WCS_PCO 18	/* Polyconic */
-#define WCS_GLS 19	/* Sanson-Flamsteed (GLobal Sinusoidal) */
-#define WCS_PAR 20	/* Parabolic */
-#define WCS_AIT 21	/* Hammer-Aitoff */
-#define WCS_MOL 22	/* Mollweide */
-#define WCS_CSC 23	/* COBE quadrilateralized Spherical Cube */
-#define WCS_QSC 24	/* Quadrilateralized Spherical Cube */
-#define WCS_TSC 25	/* Tangential Spherical Cube */
-#define WCS_NCP 26	/* Special case of SIN */
-#define WCS_DSS 27	/* Digitized Sky Survey plate solution */
-#define WCS_PLT 28	/* Plate fit polynomials (SAO) */
-#define WCS_TNX 29	/* Gnomonic = Tangent Plane (NOAO with corrections) */
+#define WCS_SZP  2	/* Zenithal/Azimuthal Perspective */
+#define WCS_TAN  3	/* Gnomonic = Tangent Plane */
+#define WCS_SIN  4	/* Orthographic/synthesis */
+#define WCS_STG  5	/* Stereographic */
+#define WCS_ARC  6	/* Zenithal/azimuthal equidistant */
+#define WCS_ZPN  7	/* Zenithal/azimuthal PolyNomial */
+#define WCS_ZEA  8	/* Zenithal/azimuthal Equal Area */
+#define WCS_AIR  9	/* Airy */
+#define WCS_CYP 10	/* CYlindrical Perspective */
+#define WCS_CAR 11	/* Cartesian */
+#define WCS_MER 12	/* Mercator */
+#define WCS_CEA 13	/* Cylindrical Equal Area */
+#define WCS_COP 14	/* Conic PerSpective (COP) */
+#define WCS_COD 15	/* COnic equiDistant */
+#define WCS_COE 16	/* COnic Equal area */
+#define WCS_COO 17	/* COnic Orthomorphic */
+#define WCS_BON 18	/* Bonne */
+#define WCS_PCO 19	/* Polyconic */
+#define WCS_SFL 20	/* Sanson-Flamsteed (GLobal Sinusoidal) */
+#define WCS_PAR 21	/* Parabolic */
+#define WCS_AIT 22	/* Hammer-Aitoff */
+#define WCS_MOL 23	/* Mollweide */
+#define WCS_CSC 24	/* COBE quadrilateralized Spherical Cube */
+#define WCS_QSC 25	/* Quadrilateralized Spherical Cube */
+#define WCS_TSC 26	/* Tangential Spherical Cube */
+#define WCS_NCP 27	/* Special case of SIN */
+#define WCS_GLS 28	/* Same as SFL */
+#define WCS_DSS 29	/* Digitized Sky Survey plate solution */
+#define WCS_PLT 30	/* Plate fit polynomials (SAO) */
+#define WCS_TNX 31	/* Gnomonic = Tangent Plane (NOAO with corrections) */
 
 /* Coordinate systems */
 #define WCS_J2000	1	/* J2000(FK5) right ascension and declination */
@@ -152,6 +205,10 @@ struct WorldCoor {
 #define WCS_ALT		1	/* Use not best WCS projections */
 #define WCS_OLD		2	/* Use AIPS WCS projections */
 #define WCS_NEW		3	/* Use WCSLIB 2.5 WCS projections */
+
+/* Distortion codes (values for wcs->distcode) */
+#define DISTORT_NONE	0	/* No distortion coefficients */
+#define DISTORT_SIRTF	1	/* SIRTF distortion matrix */
 
 #ifndef PI
 #define PI	3.141592653589793238462643
@@ -196,7 +253,23 @@ extern "C" {
 
     /* WCS subroutines in wcs.c */
     struct WorldCoor *wcsinit (const char* hstring);
-    struct WorldCoor *wcsninit (const char* hstring, int len);
+    struct WorldCoor *wcsninit (
+	const char* hstring,	/* FITS header */
+	int len);		/* Length of FITS header */
+    struct WorldCoor *wcsinitn (
+	const char* hstring,	/* FITS header */
+	const char* wcsname);	/* WCS name */
+    struct WorldCoor *wcsninitn (
+	const char* hstring,	/* FITS header */
+	int len,		/* Length of FITS header */
+	const char* wcsname);	/* WCS name */
+    struct WorldCoor *wcsinitc (
+	const char* hstring,	/* FITS header */
+	const char wcschar);	/* WCS character (A-Z) */
+    struct WorldCoor *wcsninitc (
+	const char* hstring,	/* FITS header */
+	int len,		/* Length of FITS header */
+	const char wcschar);	/* WCS character (A-Z) */
     void wcsfree (
 	struct WorldCoor *wcs);	/* World coordinate system structure */
 
@@ -244,6 +317,12 @@ extern "C" {
 	double ra1,		/* World coordinates in degrees */
 	double dec1);
 
+    double wcsdiff(		/* Compute angular distance between 2 sky positions */
+	double ra0,		/* World coordinates in degrees */
+	double dec0,
+	double ra1,		/* World coordinates in degrees */
+	double dec1);
+
     struct WorldCoor* wcsxinit(
         double  cra,    /* Center right ascension in degrees */
         double  cdec,   /* Center declination in degrees */
@@ -273,12 +352,6 @@ extern "C" {
 	double  crota,          /* Rotation angle in degrees, if cd is NULL */
 	int     equinox, /* Equinox of coordinates, 1950 and 2000 supported */
 	double  epoch);  /* Epoch of coordinates, for FK4/FK5 conversion */
-
-    void wcsdeltset(		/* Set rotation and scaling */   /* allan: 8.9.00 added proto */
-        struct WorldCoor *wcs,  /* World coordinate system structure */
-	double cdelt1,          /* scale in degrees/pixel (axis 1) */
-	double cdelt2,          /* scale in degrees/pixel (axis 2) */
-	double rotation);       /* rotation angle in degrees */
 
     void wcsshift(		/* Change center of WCS */
         struct WorldCoor *wcs,  /* World coordinate system structure */
@@ -356,6 +429,22 @@ extern "C" {
 
 
     /* Coordinate conversion subroutines in wcscon.c */
+    void wcsconv(	/* Convert between coordinate systems and equinoxes */
+	int sys1,	/* Input coordinate system (J2000, B1950, ECLIPTIC, GALACTIC */
+	int sys2,	/* Output coordinate system (J2000, B1950, ECLIPTIC, G ALACTIC */
+	double eq1,	/* Input equinox (default of sys1 if 0.0) */
+	double eq2,	/* Output equinox (default of sys2 if 0.0) */
+	double ep1,	/* Input Besselian epoch in years */
+	double ep2,	/* Output Besselian epoch in years */
+	double *dtheta,	/* Longitude or right ascension in degrees
+			   Input in sys1, returned in sys2 */
+	double *dphi,	/* Latitude or declination in degrees
+			   Input in sys1, returned in sys2 */
+	double *ptheta,	/* Longitude or right ascension proper motion in deg/year
+			   Input in sys1, returned in sys2 */
+	double *pphi,	/* Latitude or declination proper motion in deg/year */
+	double *px,	/* Parallax in arcseconds */
+	double *rv);	/* Radial velocity in km/sec */
     void wcsconp(	/* Convert between coordinate systems and equinoxes */
 	int sys1,	/* Input coordinate system (J2000, B1950, ECLIPTIC, GALACTIC */
 	int sys2,	/* Output coordinate system (J2000, B1950, ECLIPTIC, G ALACTIC */
@@ -394,6 +483,35 @@ extern "C" {
 	double equinox,	/* Equinox of coordinate system */
 	double epoch);	/* Epoch of coordinate system */
 
+    void distortinit (	/* Set distortion coefficients from FITS header */
+	struct WorldCoor *wcs,	/* World coordinate system structure */
+	const char* hstring);	/* FITS header */
+
+    void setdistcode (	/* Set WCS distortion code string from CTYPEi value */
+	struct WorldCoor *wcs,	/* World coordinate system structure */
+	char	*ctype);	/* CTYPE value from FITS header */
+
+    char *getdistcode (	/* Return distortion code string for CTYPEi */
+	struct WorldCoor *wcs);	/* World coordinate system structure */
+
+    int DelDistort (	/* Delete all distortion-related fields */
+	char *header,	/* FITS header */
+	int verbose);	/* If !=0, print keywords as deleted */
+
+
+    void pix2foc (	/* Convert pixel to focal plane coordinates */
+	struct WorldCoor *wcs,	/* World coordinate system structure */
+	double x,		/* Image pixel horizontal coordinate */
+	double y,		/* Image pixel vertical coordinate */
+	double *u,		/* Focal plane horizontal coordinate(returned) */
+	double *v);		/* Focal plane vertical coordinate (returned) */
+
+    void foc2pix (	/* Convert focal plane to pixel coordinates */
+	struct WorldCoor *wcs,	/* World coordinate system structure */
+	double u,		/* Focal plane horizontal coordinate */
+	double v,		/* Focal plane vertical coordinate */
+	double *x,		/* Image pixel horizontal coordinate(returned) */
+	double *y);		/* Image pixel vertical coordinate (returned) */
 
 };
 #else /* __cplusplus */
@@ -401,6 +519,10 @@ extern "C" {
 /* WCS subroutines in wcs.c */
 struct WorldCoor *wcsinit(); /* set up a WCS structure from a FITS image header */
 struct WorldCoor *wcsninit(); /* set up a WCS structure from a FITS image header */
+struct WorldCoor *wcsinitn(); /* set up a WCS structure from a FITS image header */
+struct WorldCoor *wcsninitn(); /* set up a WCS structure from a FITS image header */
+struct WorldCoor *wcsinitc(); /* set up a WCS structure from a FITS image header */
+struct WorldCoor *wcsninitc(); /* set up a WCS structure from a FITS image header */
 struct WorldCoor *wcsxinit(); /* set up a WCS structure from arguments */
 struct WorldCoor *wcskinit(); /* set up a WCS structure from keyword values */
 void wcsfree();		/* Free a WCS structure and its contents */
@@ -416,6 +538,7 @@ void wcssize();		/* Return RA and Dec of image center, size in RA and Dec */
 void wcsfull();		/* Return RA and Dec of image center, size in degrees */
 void wcsrange();	/* Return min and max RA and Dec of image in degrees */
 double wcsdist();	/* Distance in degrees between two sky coordinates */
+double wcsdiff();	/* Distance in degrees between two sky coordinates */
 void wcscominit();	/* Initialize catalog search command set by -wcscom */
 void wcscom();		/* Execute catalog search command set by -wcscom */
 char *getradecsys();	/* Return current value of coordinate system */
@@ -450,9 +573,16 @@ void setwcsfile();	/* Set filename for WCS error message */
 /* Coordinate conversion subroutines in wcscon.c */
 void wcscon();		/* Convert between coordinate systems and equinoxes */
 void wcsconp();		/* Convert between coordinate systems and equinoxes */
+void wcsconv();		/* Convert between coordinate systems and equinoxes */
 int wcscsys();		/* Set coordinate system from string */
-double wcsceq();		/* Set equinox from string (return 0.0 if not obvious) */
+double wcsceq();	/* Set equinox from string (return 0.0 if not obvious) */
 void wcscstr();		/* Return system string from system code, equinox, epoch */
+void distortinit();	/* Set distortion coefficients from FITS header */
+void setdistcode();	/* Set WCS distortion code string from CTYPEi value */
+char *getdistcode();	/* Return distortion code string for CTYPEi */
+int DelDistort();	/* Delete all distortion-related fields */
+void pix2foc();		/*  pixel coordinates -> focal plane coordinates */
+void foc2pix();		/*  focal plane coordinates -> pixel coordinates */
 #endif
 #endif
 
@@ -534,4 +664,24 @@ void wcscstr();		/* Return system string from system code, equinox, epoch */
  *
  * Jan 28 2000	Add flags for choice of WCS projection subroutines
  * Jun 26 2000	Add XY coordinate system
+ * Nov  2 2000	Add wcsconv() to convert coordinates when parallax or rv known
+ *
+ * Jan 17 2001	Add idpix and ndpix for trim section, ltm for readout rotation
+ * Jan 31 2001	Add wcsinitn(), wcsninitn(), wcsinitc(), and wcsninitc()
+ * Feb 20 2001	Add wcs->wcs to main data structure
+ * Mar 20 2001	Close unclosed comment in wcsconv() argument list
+ *
+ * Apr  3 2002	Add SZP and second GLS/SFL projection
+ * Apr  9 2002	Add wcs->wcsdep for pointer to WCS depending on this WCS
+ * Apr 26 2002	Add wcs->wcsname and wcs->wcschar to identify WCS structure
+ * May  9 2002	Add wcs->radvel and wcs->zvel for radial velocity in km/sec
+ *
+ * Apr  1 2003	Add wcs->distort Distort structure for distortion correction
+ * Apr  1 2003	Add foc2pix() and pix2foc() subroutines for distortion correction
+ * May  1 2003	Add missing semicolons after C++ declarations of previous two functions
+ * Oct  1 2003	Rename wcs->naxes to wcs->naxis to match WCSLIB 3.2
+ * Nov  3 2003	Add distinit(), setdistcode(), and getdistcode() to distort.c
+ * Dec  3 2003	Add back wcs->naxes for backward compatibility
+ *
+ * Aug 30 2004	Add DelDistort()
  */

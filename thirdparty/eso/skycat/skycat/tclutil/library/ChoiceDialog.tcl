@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: ChoiceDialog.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
+# "@(#) $Id: ChoiceDialog.tcl,v 1.1.1.1 2006/01/12 16:40:52 abrighto Exp $"
 #
 # ChoiceDialog.tcl - Dialog to display a message and get choice from the user
 #

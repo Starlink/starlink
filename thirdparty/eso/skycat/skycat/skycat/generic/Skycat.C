@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: Skycat.C,v 1.7 2003/01/20 15:52:21 brighton Exp $"
+ * "@(#) $Id: Skycat.C,v 1.3 2006/03/26 14:03:13 abrighto Exp $"
  *
  * Skycat.C - Initialize Skycat package
  * 
@@ -13,7 +13,7 @@
  *
  *                 21/02/00  Moved HDU command to bass class RtdImage                 
  */
-static const char* const rcsId="@(#) $Id: Skycat.C,v 1.7 2003/01/20 15:52:21 brighton Exp $";
+static const char* const rcsId="@(#) $Id: Skycat.C,v 1.3 2006/03/26 14:03:13 abrighto Exp $";
 
 #include <cstring>
 #include <cstdlib>
@@ -23,27 +23,40 @@ static const char* const rcsId="@(#) $Id: Skycat.C,v 1.7 2003/01/20 15:52:21 bri
 #include <sstream>
 #include <fstream>
 #include <sys/types.h>
-
 #include <unistd.h>
 #include <cmath>
 #include <cassert>
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 #include "tcl.h"
 #include "tk.h"
 #include "error.h"
 #include "define.h"
 #include "util.h"
-#include "config.h"
 #include "SkySearch.h"
 #include "TcsSkySearch.h"
-#include "FitsIO.hxx"
+#include "Fits_IO.h"
 #include "Skycat.h"
-
-// generated code for bitmaps used in tcl scripts
-void defineSkycatBitmaps(Tcl_Interp*);
 
 extern "C" int Cat_Init(Tcl_Interp *interp);
 extern "C" int Rtd_Init(Tcl_Interp *interp);
+
+
+// Tcl procedure to search for an init for Skycat startup file.  
+static char initScript[] = "if {[info proc ::skycat::Init]==\"\"} {\n\
+  namespace eval ::skycat {}\n\
+  proc ::skycat::Init {} {\n"
+#ifdef MAC_TCL
+"    source -rsrc SkycatInit.tcl\n"
+#else
+"    global skycat_library\n\
+     tcl_findLibrary skycat " PACKAGE_VERSION " " PACKAGE_VERSION " SkycatInit.tcl SKYCAT_LIBRARY skycat_library\n"
+#endif
+"  }\n\
+}\n\
+::skycat::Init";
+
 
 // math constants
 static const double pi_ = 3.14159265358979323846;
@@ -51,6 +64,7 @@ static const double rad_ = pi_/180.;
 
 // size of buffer to use to hold tcl commands to evaluate
 static const int eval_buf_size_ = 4*1024;
+
 
 /* 
  * declare a table of skycat image subcommands and the methods that 
@@ -106,7 +120,7 @@ int Skycat_Init(Tcl_Interp* interp)
     }
 
     // set up Tcl package
-    if (Tcl_PkgProvide (interp, "Skycat", SKYCAT_VERSION) != TCL_OK) {
+    if (Tcl_PkgProvide (interp, "Skycat", PACKAGE_VERSION) != TCL_OK) {
 	return TCL_ERROR;
     }
 
@@ -116,48 +130,11 @@ int Skycat_Init(Tcl_Interp* interp)
     // also extend the tcscat command
     Tcl_CreateCommand(interp, "tcscat", (Tcl_CmdProc*)TcsSkySearch::tcsCatCmd, NULL, NULL);
 
-    // define bitmaps used by Tcl library
-    defineSkycatBitmaps(interp);
-
     // add the skycat image type
     Tk_CreateImageType(&skycatImageType);
 
-    // The skycat_library path can be found in several places.  Here is the order
-    // in which the are searched.
-    //		1) the variable may already exist
-    //		2) env array
-    //		3) the compiled in value of SKYCAT_LIBRARY
-    char* libDir = (char*)Tcl_GetVar(interp, "skycat_library", TCL_GLOBAL_ONLY);
-    if (libDir == NULL) {
-	libDir = (char*)Tcl_GetVar2(interp, "env", "SKYCAT_LIBRARY", TCL_GLOBAL_ONLY);
-    }
-    if (libDir == NULL) {
-	libDir = SKYCAT_LIBRARY;
-    }
-
-    // Set the global Tcl variables skycat_library and skycat_version 
-    // and add skycat_library to the auto_path.
-    Tcl_SetVar(interp, "skycat_library", libDir, TCL_GLOBAL_ONLY);
-    Tcl_SetVar(interp, "skycat_version", SKYCAT_VERSION, TCL_GLOBAL_ONLY);
-
-    char cmd[1048];
-    sprintf(cmd, "lappend auto_path %s", libDir);
-    if (Tcl_Eval(interp, cmd) != TCL_OK)
-	return TCL_ERROR;
-
-    // set up the namespaces used by the itcl/itk classes
-    if (Tcl_Eval(interp, 
-#if (TCL_MAJOR_VERSION >= 8)
-		 "namespace eval skycat {namespace export *};"
-		 "namespace import -force skycat::*;"
-#else
-		 "namespace ::skycat {};"
-		 "import add skycat;"
-#endif
-	) != TCL_OK)
-	return TCL_ERROR;
-
-    return TCL_OK; 
+    Tcl_SetVar(interp, "skycat_version", PACKAGE_VERSION, TCL_GLOBAL_ONLY);
+    return Tcl_Eval(interp, initScript);
 }
 
 

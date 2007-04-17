@@ -1,8 +1,32 @@
-/* File imhfile.c
- * June 12, 2000
- * By Doug Mink, Harvard-Smithsonian Center for Astrophysics
+/*** File imhfile.c
+ *** June 13, 2005
+ *** By Doug Mink, dmink@cfa.harvard.edu
+ *** Harvard-Smithsonian Center for Astrophysics
+ *** Copyright (C) 1996-2005
+ *** Smithsonian Astrophysical Observatory, Cambridge, MA, USA
 
- * Module:      imh2io.c (IRAF 2.11 image file reading and writing)
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+    
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+    Correspondence concerning WCSTools should be addressed as follows:
+           Internet email: dmink@cfa.harvard.edu
+           Postal address: Doug Mink
+                           Smithsonian Astrophysical Observatory
+                           60 Garden St.
+                           Cambridge, MA 02138 USA
+
+ * Module:      imhfile.c (IRAF .imh image file reading and writing)
  * Purpose:     Read and write IRAF image files (and translate headers)
  * Subroutine:  check_immagic (irafheader, teststring )
  *		Verify that file is valid IRAF imhdr or impix
@@ -171,7 +195,7 @@ int	*lihead;	/* Length of IRAF image header in bytes (returned) */
     *lihead = 0;
 
     /* open the image header file */
-    fd = fopen (filename, "r");
+    fd = fopen (filename, "rb");
     if (fd == NULL) {
 	fprintf (stderr, "IRAFRHEAD:  cannot open file %s to read\n", filename);
 	return (NULL);
@@ -237,32 +261,47 @@ char	*fitsheader;	/* FITS image header (filled) */
 {
     FILE *fd;
     char *bang;
-    int naxis, naxis1, naxis2, bitpix, bytepix, pixswap;
+    int naxis, naxis1, naxis2, naxis3, npaxis1, npaxis2,bitpix, bytepix, pixswap, i;
     char *image;
-    int nbr, nbimage;
+    int nbr, nbimage, nbaxis, nbl, nbx, nbdiff, lpname;
     char *pixheader;
-    int imhver, lpixhead;
+    char *linebuff, *pixchar;
+    int imhver, lpixhead, len;
     char pixname[SZ_IM2PIXFILE+1];
+    char newpixname[SZ_IM2HDRFILE+1];
 
     /* Convert pixel file name to character string */
     hgetm (fitsheader, "PIXFIL", SZ_IM2PIXFILE, pixname);
+
+    /* Drop trailing spaces */
+    lpname = strlen (pixname);
+    pixchar = pixname + lpname - 1;
+    while (*pixchar == ' ')
+	*pixchar = (char) 0;
+
     hgeti4 (fitsheader, "PIXOFF", &lpixhead);
 
-    if ((bang = strchr (pixname, '!')) != NULL ) {
-	fd = fopen (bang + 1, "r");
-	if (!fd) {
-	    (void)fprintf(stderr,
-		  "IRAFRIMAGE: Cannot open IRAF pixel file %s\n", pixname);
-	    return (NULL);
-	    }
+    /* Open pixel file, ignoring machine name if present */
+    if ((bang = strchr (pixname, '!')) != NULL )
+	fd = fopen (bang + 1, "rb");
+    else
+	fd = fopen (pixname, "rb");
+
+    /* If not at pathname in header, try same directory as header file */
+    if (!fd) {
+	hgetm (fitsheader, "IMHFIL", SZ_IM2HDRFILE, newpixname);
+	len = strlen (newpixname);
+	newpixname[len-3] = 'p';
+	newpixname[len-2] = 'i';
+	newpixname[len-1] = 'x';
+	fd = fopen (newpixname, "rb");
 	}
-    else {
-	fd = fopen (pixname, "r");
-	if (!fd) {
-	    (void)fprintf(stderr,
-		  "IRAFRIMAGE: Cannot open IRAF pixel file %s\n", pixname);
-	    return (NULL);
-	    }
+
+    /* Print error message and exit if pixel file is not found */
+    if (!fd) {
+	(void)fprintf(stderr,
+	     "IRAFRIMAGE: Cannot open IRAF pixel file %s\n", pixname);
+	return (NULL);
 	}
 
     /* Read pixel header */
@@ -297,6 +336,8 @@ char	*fitsheader;	/* FITS image header (filled) */
     hgeti4 (fitsheader,"NAXIS",&naxis);
     hgeti4 (fitsheader,"NAXIS1",&naxis1);
     hgeti4 (fitsheader,"NAXIS2",&naxis2);
+    hgeti4 (fitsheader,"NPAXIS1",&npaxis1);
+    hgeti4 (fitsheader,"NPAXIS2",&npaxis2);
     hgeti4 (fitsheader,"BITPIX",&bitpix);
     if (bitpix < 0)
 	bytepix = -bitpix / 8;
@@ -305,12 +346,13 @@ char	*fitsheader;	/* FITS image header (filled) */
 
     /* If either dimension is one and image is 3-D, read all three dimensions */
     if (naxis == 3 && ((naxis1 == 1) | (naxis2 == 1))) {
-	int naxis3;
 	hgeti4 (fitsheader,"NAXIS3",&naxis3);
 	nbimage = naxis1 * naxis2 * naxis3 * bytepix;
 	}
-    else
+    else {
 	nbimage = naxis1 * naxis2 * bytepix;
+	naxis3 = 1;
+	}
 
     image =  (char *) calloc (nbimage, 1);
     if (image == NULL) {
@@ -319,8 +361,25 @@ char	*fitsheader;	/* FITS image header (filled) */
 	return (NULL);
 	}
 
-    /* read in IRAF image */
-    nbr = fread (image, 1, nbimage, fd);
+    /* Read IRAF image all at once if physical and image dimensions are the same */
+    if (npaxis1 == naxis1)
+	nbr = fread (image, 1, nbimage, fd);
+
+    /* Read IRAF image one line at a time if physical and image dimensions differ */
+    else {
+	nbdiff = (npaxis1 - naxis1) * bytepix;
+	nbaxis = naxis1 * bytepix;
+	linebuff = image;
+	nbr = 0;
+	if (naxis2 == 1 && naxis3 > 1)
+	    naxis2 = naxis3;
+	for (i = 0; i < naxis2; i++) {
+	    nbl = fread (linebuff, 1, nbaxis, fd);
+	    nbr = nbr + nbl;
+	    nbx = fseek (fd, nbdiff, SEEK_CUR);
+	    linebuff = linebuff + nbaxis;
+	    }
+	}
     fclose (fd);
 
     /* Check size of image */
@@ -431,7 +490,7 @@ int	*nbfits;	/* Number of bytes in FITS header (returned) */
     char *dstring;
     int pixtype;
     int imhver, n, imu, pixoff, impixoff, immax, immin, imtime;
-    int imndim, imphyslen, impixtype, pixswap, hpixswap, mtime;
+    int imndim, imlen, imphyslen, impixtype, pixswap, hpixswap, mtime;
     float rmax, rmin;
 
     headswap = -1;
@@ -452,6 +511,7 @@ int	*nbfits;	/* Number of bytes in FITS header (returned) */
     if (imhver == 2) {
 	nlines = 24 + ((nbiraf - LEN_IM2HDR) / 81);
 	imndim = IM2_NDIM;
+	imlen = IM2_LEN;
 	imphyslen = IM2_PHYSLEN;
 	impixtype = IM2_PIXTYPE;
 	impixoff = IM2_PIXOFF;
@@ -462,6 +522,7 @@ int	*nbfits;	/* Number of bytes in FITS header (returned) */
     else {
 	nlines = 24 + ((nbiraf - LEN_IMHDR) / 162);
 	imndim = IM_NDIM;
+	imlen = IM_LEN;
 	imphyslen = IM_PHYSLEN;
 	impixtype = IM_PIXTYPE;
 	impixoff = IM_PIXOFF;
@@ -524,15 +585,15 @@ int	*nbfits;	/* Number of bytes in FITS header (returned) */
     hputcom (fitsheader,"NAXIS", "IRAF .imh naxis");
     fhead = fhead + 80;
 
-    n = irafgeti4 (irafheader, imphyslen);
+    n = irafgeti4 (irafheader, imlen);
     hputi4 (fitsheader, "NAXIS1", n);
-    hputcom (fitsheader,"NAXIS1", "IRAF .imh naxis[1]");
+    hputcom (fitsheader,"NAXIS1", "IRAF .imh image naxis[1]");
     fhead = fhead + 80;
 
     if (nax > 1) {
-	n = irafgeti4 (irafheader, imphyslen+4);
+	n = irafgeti4 (irafheader, imlen+4);
 	hputi4 (fitsheader, "NAXIS2", n);
-	hputcom (fitsheader,"NAXIS2", "IRAF .imh naxis[2]");
+	hputcom (fitsheader,"NAXIS2", "IRAF .imh image naxis[2]");
 	}
     else
 	hputi4 (fitsheader, "NAXIS2", 1);
@@ -540,15 +601,15 @@ int	*nbfits;	/* Number of bytes in FITS header (returned) */
     fhead = fhead + 80;
 
     if (nax > 2) {
-	n = irafgeti4 (irafheader, imphyslen+8);
+	n = irafgeti4 (irafheader, imlen+8);
 	hputi4 (fitsheader, "NAXIS3", n);
-	hputcom (fitsheader,"NAXIS3", "IRAF .imh naxis[3]");
+	hputcom (fitsheader,"NAXIS3", "IRAF .imh image naxis[3]");
 	fhead = fhead + 80;
 	}
     if (nax > 3) {
-	n = irafgeti4 (irafheader, imphyslen+12);
+	n = irafgeti4 (irafheader, imlen+12);
 	hputi4 (fitsheader, "NAXIS4", n);
-	hputcom (fitsheader,"NAXIS4", "IRAF .imh naxis[4]");
+	hputcom (fitsheader,"NAXIS4", "IRAF .imh image naxis[4]");
 	fhead = fhead + 80;
 	}
 
@@ -566,6 +627,30 @@ int	*nbfits;	/* Number of bytes in FITS header (returned) */
     hputcom (fitsheader,"OBJECT", "IRAF .imh title");
     free (objname);
     fhead = fhead + 80;
+
+    /* Save physical axis lengths so image file can be read */
+    n = irafgeti4 (irafheader, imphyslen);
+    hputi4 (fitsheader, "NPAXIS1", n);
+    hputcom (fitsheader,"NPAXIS1", "IRAF .imh physical naxis[1]");
+    fhead = fhead + 80;
+    if (nax > 1) {
+	n = irafgeti4 (irafheader, imphyslen+4);
+	hputi4 (fitsheader, "NPAXIS2", n);
+	hputcom (fitsheader,"NPAXIS2", "IRAF .imh physical naxis[2]");
+	fhead = fhead + 80;
+	}
+    if (nax > 2) {
+	n = irafgeti4 (irafheader, imphyslen+8);
+	hputi4 (fitsheader, "NPAXIS3", n);
+	hputcom (fitsheader,"NPAXIS3", "IRAF .imh physical naxis[3]");
+	fhead = fhead + 80;
+	}
+    if (nax > 3) {
+	n = irafgeti4 (irafheader, imphyslen+12);
+	hputi4 (fitsheader, "NPAXIS4", n);
+	hputcom (fitsheader,"NPAXIS4", "IRAF .imh physical naxis[4]");
+	fhead = fhead + 80;
+	}
 
     /* Save image minimum and maximum in header */
     rmax = irafgetr4 (irafheader, immax);
@@ -689,7 +774,7 @@ int	*nbfits;	/* Number of bytes in FITS header (returned) */
 		break;
 	    else if (irafchar == 10) {
 		(void)strncpy (fhead, fitsline, 80);
-		/* printf ("%80s\n",fitsline); */
+		/* fprintf (stderr,"%80s\n",fitsline); */
 		if (strncmp (fitsline, "OBJECT ", 7) != 0) {
 		    fhead = fhead + 80;
 		    }
@@ -701,7 +786,7 @@ int	*nbfits;	/* Number of bytes in FITS header (returned) */
 		if (j > 80) {
 		    if (strncmp (fitsline, "OBJECT ", 7) != 0) {
 			(void)strncpy (fhead, fitsline, 80);
-			/* printf ("%80s\n",fitsline); */
+			/* fprintf (stderr,"%80s\n",fitsline); */
 			j = 9;
 			fhead = fhead + 80;
 			}
@@ -733,7 +818,7 @@ int	*nbfits;	/* Number of bytes in FITS header (returned) */
 		    (void)strncpy (fhead, fitsline, 80);
 		    fhead = fhead + 80;
 		    }
-		/* printf ("%80s\n",fitsline); */
+		/* fprintf (stderr,"%80s\n",fitsline); */
 		j = 0;
 		for (k = 0; k < 80; k++)
 		    fitsline[k] = ' ';
@@ -745,7 +830,7 @@ int	*nbfits;	/* Number of bytes in FITS header (returned) */
 			j = 9;
 			fhead = fhead + 80;
 			}
-		    /* printf ("%80s\n",fitsline); */
+		    /* fprintf (stderr,"%80s\n",fitsline); */
 		    for (k = 0; k < 80; k++)
 			fitsline[k] = ' ';
 		    }
@@ -982,7 +1067,7 @@ char	*hdrname;	/* IRAF image header file pathname */
 	}
 
     /* Pixel file has same name as header file, but with .pix extension */
-    else if (strncmp (pixname, "HDR", 3) == 0 ) {
+    else if (strncmp (pixname, "HDR", 3) == 0) {
 
 	/* load entire header name string into name buffer */
 	(void)strncpy (newpixname, hdrname, SZ_IM2PIXFILE);
@@ -1071,7 +1156,7 @@ int	*nbiraf;	/* Length of returned IRAF header */
 	    pixtype = TY_DOUBLE;
 	    break;
 	default:
-	    (void)fprintf(stderr,"Unsupported data type: %d\n", pixtype);
+	    (void)fprintf(stderr,"Unsupported data type: %d\n", nbits);
 	    return (NULL);
 	}
     irafputi4 (irafheader, impixtype, pixtype);
@@ -1716,7 +1801,9 @@ isiraf (filename)
 
 char	*filename;	/* Name of file for which to find size */
 {
-    if (strsrch (filename, ".imh"))
+    if (strchr (filename, '='))
+	return (0);
+    else if (strsrch (filename, ".imh"))
 	return (1);
     else
 	return (0);
@@ -1817,4 +1904,16 @@ FILE *diskfile;		/* Descriptor of file for which to find size */
  * May  1 2000	Fix code for updating pixel file name with HDR$ in fits2iraf()
  * Jun  2 2000	Drop unused variables in fits2iraf() after lint
  * Jun 12 2000	If pixel filename has no / or $, use same path as header file
+ * Sep  6 2000	Use header directory if pixel file not found at its pathname
+ *
+ * Jan 11 2001	Print all messages to stderr
+ * Aug 24 2001	In isiraf(), return 0 if argument contains an equal sign
+ *
+ * Apr  8 2002	Fix bug in error message for unidentified nbits in fits2iraf()
+ *
+ * Feb  4 2003	Open catalog file rb instead of r (Martin Ploner, Bern)
+ * Oct 31 2003	Read image only in irafrimage() if physical dimension > image dim.
+ * Nov  3 2003	Set NAXISi to image, not physical dimensions in iraf2fits()
+ *
+ * Jun 13 2005	Drop trailing spaces on pixel file name
  */

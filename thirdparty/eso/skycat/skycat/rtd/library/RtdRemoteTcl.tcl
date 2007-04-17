@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: RtdRemoteTcl.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
+# "@(#) $Id: RtdRemoteTcl.tcl,v 1.1.1.1 2006/01/12 16:38:11 abrighto Exp $"
 #
 # RtdRemoteTcl.tcl - procedures for the Rtd remote Tcl interface
 # 

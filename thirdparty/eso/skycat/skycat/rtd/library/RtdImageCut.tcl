@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: RtdImageCut.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
+# "@(#) $Id: RtdImageCut.tcl,v 1.1.1.1 2006/01/12 16:38:12 abrighto Exp $"
 #
 # RtdImageCut.tcl - itcl widget for setting cut levels for an RtdImage widget
 # 
@@ -156,7 +156,6 @@ itcl::class rtd::RtdImageCut {
 	# Someone also changed the default symbol to circle also - why?
 	regsub -all {\.} v$graph_.xVector _ xVector_ 
 	regsub -all {\.} v$graph_.yVector _ yVector_ 
-
 	if {$tcl_version >= 8.0} {
 	    $graph_ legend config -hide 1
 	    if {![info exists $xVector_]} {

@@ -2,12 +2,7 @@
 
 /*  The FITSIO software was written by William Pence at the High Energy    */
 /*  Astrophysic Science Archive Research Center (HEASARC) at the NASA      */
-/*  Goddard Space Flight Center.  Users shall not, without prior written   */
-/*  permission of the U.S. Government,  establish a claim to statutory     */
-/*  copyright.  The Government and others acting on its behalf, shall have */
-/*  a royalty-free, non-exclusive, irrevocable,  worldwide license for     */
-/*  Government purposes to publish, distribute, translate, copy, exhibit,  */
-/*  and perform such material.                                             */
+/*  Goddard Space Flight Center.                                           */
 /*                                                                         */
 /*  The group.c module of CFITSIO was written by Donald G. Jennings of     */
 /*  the INTEGRAL Science Data Centre (ISDC) under NASA contract task       */
@@ -19,10 +14,17 @@
 /*  by Jennings, Pence, Folk and Schlesinger. The development of the       */
 /*  grouping structure was partially funded under the NASA AISRP Program.  */ 
     
-#include "fitsio.h"
+#include "fitsio2.h"
 #include "group.h"
-#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+
+#if defined(WIN32) || defined(__WIN32__)
+#include <direct.h>   /* defines the getcwd function on Windows PCs */
+#endif
+
+#define HEX_ESCAPE '%'
 
 /*---------------------------------------------------------------------------
  Change record:
@@ -34,6 +36,41 @@ D. Jennings, 17/11/98, fixed bug in ffgtcpr(). Now use fits_find_nextkey()
                        correctly and insert auxiliary keyword records 
 		       directly before the TTYPE1 keyword in the copied
 		       group table.
+
+D. Jennings, 22/01/99, ffgmop() now looks for relative file paths when 
+                       the MEMBER_LOCATION information is given in a 
+		       grouping table.
+
+D. Jennings, 01/02/99, ffgtop() now looks for relatve file paths when 
+                       the GRPLCn keyword value is supplied in the member
+		       HDU header.
+
+D. Jennings, 01/02/99, ffgtam() now trys to construct relative file paths
+                       from the member's file to the group table's file
+		       (and visa versa) when both the member's file and
+		       group table file are of access type FILE://.
+
+D. Jennings, 05/05/99, removed the ffgtcn() function; made obsolete by
+                       fits_get_url().
+
+D. Jennings, 05/05/99, updated entire module to handle partial URLs and
+                       absolute URLs more robustly. Host dependent directory
+		       paths are now converted to true URLs before being
+		       read from/written to grouping tables.
+
+D. Jennings, 05/05/99, added the following new functions (note, none of these
+                       are directly callable by the application)
+
+		       int fits_path2url()
+		       int fits_url2path()
+		       int fits_get_cwd()
+		       int fits_get_url()
+		       int fits_clean_url()
+		       int fits_relurl2url()
+		       int fits_encode_url()
+		       int fits_unencode_url()
+		       int fits_is_url_absolute()
+
 -----------------------------------------------------------------------------*/
 
 /*---------------------------------------------------------------------------*/
@@ -65,7 +102,24 @@ int ffgtcr(fitsfile *fptr,      /* FITS file pointer                         */
 
   *status = fits_get_num_hdus(fptr,&hdunum,status);
 
-  *status = fits_movabs_hdu(fptr,hdunum,&hdutype,status);
+  /* If hdunum is 0 then we are at the beginning of the file and
+     we actually haven't closed the first header yet, so don't do
+     anything more */
+
+  if (0 != hdunum) {
+
+      *status = fits_movabs_hdu(fptr,hdunum,&hdutype,status);
+  }
+
+  /* Now, the whole point of the above two fits_ calls was to get to
+     the end of file.  Let's ignore errors at this point and keep
+     going since any error is likely to mean that we are already at the 
+     EOF, or the file is fatally corrupted.  If we are at the EOF then
+     the next fits_ call will be ok.  If it's corrupted then the
+     next call will fail, but that's not big deal at this point.
+  */
+
+  if (0 != *status ) *status = 0;
 
   *status = fits_insert_group(fptr,grpname,grouptype,status);
 
@@ -250,7 +304,7 @@ int ffgtch(fitsfile *gfptr,     /* FITS pointer to group                     */
   char *tform[6];
   char *ttype[6];
 
-  unsigned char  charNull[1] = {"\0"};
+  unsigned char  charNull[1] = {'\0'};
 
   char ttypeBuff[102];  
   char tformBuff[54];  
@@ -709,7 +763,10 @@ int ffgtmg(fitsfile *infptr,  /* FITS file ptr to source grouping table      */
 
     }while(0);
 
-  if(tmpfptr != NULL)  fits_close_file(tmpfptr,status);
+  if(tmpfptr != NULL)
+    {
+      fits_close_file(tmpfptr,status);
+    }
 
   return(*status);
 }
@@ -792,7 +849,7 @@ int ffgtcm(fitsfile *gfptr,  /* FITS file pointer to grouping table          */
 	      *status = fits_merge_groups(mfptr,gfptr,OPT_MRG_COPY,status);
 
 	      *status = fits_close_file(mfptr,status);
-	      mfptr   = NULL;
+	      mfptr = NULL;
 
 	      /* 
 		 remove the member from the grouping table now that all of
@@ -810,8 +867,7 @@ int ffgtcm(fitsfile *gfptr,  /* FITS file pointer to grouping table          */
 	      /* not a grouping table; just close the opened member */
 
 	      *status = fits_close_file(mfptr,status);
-
-	      mfptr   = NULL;
+	      mfptr = NULL;
 	    }
 	}
 
@@ -935,19 +991,30 @@ int ffgtop(fitsfile *mfptr,  /* FITS file pointer to the member HDU          */
   then the group specified by GRPID5 would be opened.
 */
 {
+  int i;
+  int found;
 
   long ngroups   = 0;
   long grpExtver = 0;
 
   char keyword[FLEN_KEYWORD];
-  char keyvalue[FLEN_VALUE];
+  char keyvalue[FLEN_FILENAME];
+  char *tkeyvalue;
+  char location[FLEN_FILENAME];
+  char location1[FLEN_FILENAME];
+  char location2[FLEN_FILENAME];
   char comment[FLEN_COMMENT];
+
+  char *url[2];
 
 
   if(*status != 0) return(*status);
 
   do
     {
+      /* set the grouping table pointer to NULL for error checking later */
+
+      *gfptr = NULL;
 
       /*
 	make sure that the group ID requested is valid ==> cannot be
@@ -985,59 +1052,213 @@ int ffgtop(fitsfile *mfptr,  /* FITS file pointer to the member HDU          */
 	reopen the current FITS file. Else the member and grouping table
 	HDUs reside in different files and another FITS file must be opened
 	as specified by the corresponding GRPLCn keyword
+	
+	The DO WHILE loop only executes once and is used to control the
+	file opening logic.
       */
 
-      if(grpExtver > 0) 
-	*status = fits_reopen_file(mfptr,gfptr,status);
-
-      else if(grpExtver < 0)
+      do
 	{
+	  if(grpExtver > 0) 
+	    {
+	      /*
+		the member resides in the same file as the grouping
+		 table, so just reopen the grouping table file
+	      */
+
+	      *status = fits_reopen_file(mfptr,gfptr,status);
+	      continue;
+	    }
+
+	  else if(grpExtver == 0)
+	    {
+	      /* a GRPIDn value of zero (0) is undefined */
+
+	      *status = BAD_GROUP_ID;
+	      sprintf(comment,"Invalid value of %ld for GRPID%d (ffgtop)",
+		      grpExtver,grpid);
+	      ffpmsg(comment);
+	      continue;
+	    }
+
 	  /* 
+	     The GRPLCn keyword value is negative, which implies that
 	     the grouping table must reside in another FITS file;
 	     search for the corresponding GRPLCn keyword 
 	  */
+	  
+	  /* set the grpExtver value positive */
+  
+	  grpExtver = -1*grpExtver;
+
+	  /* read the GRPLCn keyword value */
 
 	  sprintf(keyword,"GRPLC%d",grpid);
-	  *status = fits_read_key_str(mfptr,keyword,keyvalue,comment,status);
+	  /* SPR 1738 */
+	  *status = fits_read_key_longstr(mfptr,keyword,&tkeyvalue,comment,
+				      status);
+	  if (0 == *status) {
+	    strcpy(keyvalue,tkeyvalue);
+	    free(tkeyvalue);
+	  }
+	  
 
 	  /* if the GRPLCn keyword was not found then there is a problem */
 
 	  if(*status == KEY_NO_EXIST)
 	    {
 	      *status = BAD_GROUP_ID;
-	      sprintf(comment,"Cannot find GRPLC%d keyword (ffgtop)",grpid);
+
+	      sprintf(comment,"Cannot find GRPLC%d keyword (ffgtop)",
+		      grpid);
 	      ffpmsg(comment);
+
 	      continue;
 	    }
+
 	  prepare_keyvalue(keyvalue);
 
-	  /* open the FITS file containing the grouping table READWRITE */
+	  /*
+	    if the GRPLCn keyword value specifies an absolute URL then
+	    try to open the file; we cannot attempt any relative URL
+	    or host-dependent file path reconstruction
+	  */
 
-	  *status = fits_open_file(gfptr,keyvalue,READWRITE,status);
+	  if(fits_is_url_absolute(keyvalue))
+	    {
+	      ffpmsg("Try to open group table file as absolute URL (ffgtop)");
+
+	      *status = fits_open_file(gfptr,keyvalue,READWRITE,status);
+
+	      /* if the open was successful then continue */
+
+	      if(*status == 0) continue;
+
+	      /* if READWRITE failed then try opening it READONLY */
+
+	      ffpmsg("OK, try open group table file as READONLY (ffgtop)");
+	      
+	      *status = 0;
+	      *status = fits_open_file(gfptr,keyvalue,READONLY,status);
+
+	      /* continue regardless of the outcome */
+
+	      continue;
+	    }
+
+	  /*
+	    see if the URL gives a file path that is absolute on the
+	    host machine 
+	  */
+
+	  *status = fits_url2path(keyvalue,location1,status);
+
+	  *status = fits_open_file(gfptr,location1,READWRITE,status);
+
+	  /* if the file opened then continue */
+
+	  if(*status == 0) continue;
 
 	  /* if READWRITE failed then try opening it READONLY */
 
-	  if(*status != 0)
+	  ffpmsg("OK, try open group table file as READONLY (ffgtop)");
+	  
+	  *status = 0;
+	  *status = fits_open_file(gfptr,location1,READONLY,status);
+
+	  /* if the file opened then continue */
+
+	  if(*status == 0) continue;
+
+	  /*
+	    the grouping table location given by GRPLCn must specify a 
+	    relative URL. We assume that this URL is relative to the 
+	    member HDU's FITS file. Try to construct a full URL location 
+	    for the grouping table's FITS file and then open it
+	  */
+
+	  *status = 0;
+		  
+	  /* retrieve the URL information for the member HDU's file */
+		  
+	  url[0] = location1; url[1] = location2;
+		  
+	  *status = fits_get_url(mfptr,url[0],url[1],NULL,NULL,NULL,status);
+
+	  /*
+	    It is possible that the member HDU file has an initial
+	    URL it was opened with and a real URL that the file actually
+	    exists at (e.g., an HTTP accessed file copied to a local
+	    file). For each possible URL try to construct a
+	  */
+		  
+	  for(i = 0, found = 0, *gfptr = NULL; i < 2 && !found; ++i)
 	    {
-	      *status = 0;
-	      *status = fits_open_file(gfptr,keyvalue,READONLY,status);
+	      
+	      /* the url string could be empty */
+	      
+	      if(*url[i] == 0) continue;
+	      
+	      /* 
+		 create a full URL from the partial and the member
+		 HDU file URL
+	      */
+	      
+	      *status = fits_relurl2url(url[i],keyvalue,location,status);
+	      
+	      /* if an error occured then contniue */
+	      
+	      if(*status != 0) 
+		{
+		  *status = 0;
+		  continue;
+		}
+	      
+	      /*
+		if the location does not specify an access method
+		then turn it into a host dependent path
+	      */
+
+	      if(! fits_is_url_absolute(location))
+		{
+		  *status = fits_url2path(location,url[i],status);
+		  strcpy(location,url[i]);
+		}
+	      
+	      /* try to open the grouping table file READWRITE */
+	      
+	      *status = fits_open_file(gfptr,location,READWRITE,status);
+	      
+	      if(*status != 0)
+		{    
+		  /* try to open the grouping table file READONLY */
+		  
+		  ffpmsg("opening file as READWRITE failed (ffgtop)");
+		  ffpmsg("OK, try to open file as READONLY (ffgtop)");
+		  *status = 0;
+		  *status = fits_open_file(gfptr,location,READONLY,status);
+		}
+	      
+	      /* either set the found flag or reset the status flag */
+	      
+	      if(*status == 0) 
+		found = 1;
+	      else
+		*status = 0;
 	    }
 
-	  /* set the grpExtver value positive */
+	}while(0); /* end of file opening loop */
 
-	  grpExtver = -1*grpExtver;
-	}
-      else
-	{
-	  /* the GRPIDn value must be zero (0) which is undefined */
-
-	  *status = BAD_GROUP_ID;
-	  sprintf(comment,"Invalid value of %ld for GRPID%d (ffgtop)",
-		  grpExtver,grpid);
-	  ffpmsg(comment);
-	}
+      /* if an error occured with the file opening then exit */
 
       if(*status != 0) continue;
+  
+      if(*gfptr == NULL)
+	{
+	  ffpmsg("Cannot open or find grouping table FITS file (ffgtop)");
+	  *status = GROUP_NOT_FOUND;
+	  continue;
+	}
 
       /* search for the grouping table in its FITS file */
 
@@ -1048,7 +1269,11 @@ int ffgtop(fitsfile *mfptr,  /* FITS file pointer to the member HDU          */
 
     }while(0);
 
-  if(*status != 0 && *gfptr != NULL) fits_close_file(*gfptr,status);
+  if(*status != 0 && *gfptr != NULL) 
+    {
+      fits_close_file(*gfptr,status);
+      *gfptr = NULL;
+    }
 
   return(*status);
 }
@@ -1079,19 +1304,36 @@ int ffgtam(fitsfile *gfptr,   /* FITS file pointer to grouping table HDU     */
   int hdutype        = 0;
   int useLocation    = 0;
   int nkeys          = 6;
+  int found;
   int i;
+
+  int memberIOstate;
+  int groupIOstate;
+  int iomode;
 
   long memberExtver = 0;
   long groupExtver  = 0;
   long memberID     = 0;
   long nmembers     = 0;
   long ngroups      = 0;
+  long grpid        = 0;
 
+  char memberAccess1[FLEN_VALUE];
+  char memberAccess2[FLEN_VALUE];
   char memberFileName[FLEN_FILENAME];
-  char groupFileName[FLEN_FILENAME];
+  char memberLocation[FLEN_FILENAME];
+  char grplc[FLEN_FILENAME];
+  char *tgrplc;
   char memberHDUtype[FLEN_VALUE];
   char memberExtname[FLEN_VALUE];
   char memberURI[] = "URL";
+
+  char groupAccess1[FLEN_VALUE];
+  char groupAccess2[FLEN_VALUE];
+  char groupFileName[FLEN_FILENAME];
+  char groupLocation[FLEN_FILENAME];
+
+  char cwd[FLEN_FILENAME];
 
   char *keys[] = {"GRPNAME","EXTVER","EXTNAME","TFIELDS","GCOUNT","EXTEND"};
   char *tmpPtr[1];
@@ -1099,15 +1341,29 @@ int ffgtam(fitsfile *gfptr,   /* FITS file pointer to grouping table HDU     */
   char keyword[FLEN_KEYWORD];
   char card[FLEN_CARD];
 
-  unsigned char charNull[]  = {"\0"};
+  unsigned char charNull[]  = {'\0'};
 
   fitsfile *tmpfptr = NULL;
+
+  int parentStatus = 0;
 
   if(*status != 0) return(*status);
 
   do
     {
-      
+      /*
+	make sure the grouping table can be modified before proceeding
+      */
+
+      fits_file_mode(gfptr,&iomode,status);
+
+      if(iomode != READWRITE)
+	{
+	  ffpmsg("cannot modify grouping table (ffgtam)");
+	  *status = BAD_GROUP_ATTACH;
+	  continue;
+	}
+
       /*
 	 if the calling function supplied the HDU position of the member
 	 HDU instead of fitsfile pointer then get a fitsfile pointer
@@ -1159,39 +1415,205 @@ int ffgtam(fitsfile *gfptr,   /* FITS file pointer to grouping table HDU     */
 
       fits_get_hdu_num(tmpfptr,&memberPosition);
 
-      /* retrieve and construct the member HDU's file name */
-
-      *status = fits_file_name(tmpfptr,memberFileName,status);
-
-      if(*status != 0) continue;
-
-      ffgtcn(memberFileName);
-
-      /* retrieve and construct the grouping table's file name */
-
-      *status = fits_file_name(gfptr,groupFileName,status);
-
-      ffgtcn(groupFileName);
-      
       /*
-	 if the member HDU and grouping table reside in the same FITS file
-	 then there is no need to add the location and URI information to
-	 the grouping table
+	Determine if the member HDU's FITS file location needs to be
+	taken into account when building its grouping table reference
+
+	If the member location needs to be used (==> grouping table and member
+	HDU reside in different files) then create an appropriate URL for
+	the member HDU's file and grouping table's file. Note that the logic
+	for this is rather complicated
       */
 
-      if(strcmp(groupFileName,memberFileName) == 0)
-	useLocation = 0;
+      /* SPR 3463, don't do this 
+	 if(tmpfptr->Fptr == gfptr->Fptr)
+	 {  */
+	  /*
+	    member HDU and grouping table reside in the same file, no need
+	    to use the location information */
+	  
+      /* printf ("same file\n");
+	   
+	   useLocation     = 0;
+	   memberIOstate   = 1;
+	   *memberFileName = 0;
+	}
       else
-	useLocation = 1;
+      { */ 
+	  /*
+	     the member HDU and grouping table FITS file location information 
+	     must be used.
+
+	     First determine the correct driver and file name for the group
+	     table and member HDU files. If either are disk files then
+	     construct an absolute file path for them. Finally, if both are
+	     disk files construct relative file paths from the group(member)
+	     file to the member(group) file.
+
+	  */
+
+	  /* set the USELOCATION flag to true */
+
+	  useLocation = 1;
+
+	  /* 
+	     get the location, access type and iostate (RO, RW) of the
+	     member HDU file
+	  */
+
+	  *status = fits_get_url(tmpfptr,memberFileName,memberLocation,
+				 memberAccess1,memberAccess2,&memberIOstate,
+				 status);
+
+	  /*
+	     if the memberFileName string is empty then use the values of
+	     the memberLocation string. This corresponds to a file where
+	     the "real" file is a temporary memory file, and we must assume
+	     the the application really wants the original file to be the
+	     group member
+	   */
+
+	  if(strlen(memberFileName) == 0)
+	    {
+	      strcpy(memberFileName,memberLocation);
+	      strcpy(memberAccess1,memberAccess2);
+	    }
+
+	  /* 
+	     get the location, access type and iostate (RO, RW) of the
+	     grouping table file
+	  */
+
+	  *status = fits_get_url(gfptr,groupFileName,groupLocation,
+				 groupAccess1,groupAccess2,&groupIOstate,
+				 status);
+	  
+	  if(*status != 0) continue;
+
+	  /*
+	    the grouping table file must be writable to continue
+	  */
+
+	  if(groupIOstate == 0)
+	    {
+	      ffpmsg("cannot modify grouping table (ffgtam)");
+	      *status = BAD_GROUP_ATTACH;
+	      continue;
+	    }
+
+	  /*
+	    determine how to construct the resulting URLs for the member and
+	    group files
+	  */
+
+	  if(strcasecmp(groupAccess1,"file://")  &&
+	                                   strcasecmp(memberAccess1,"file://"))
+	    {
+              *cwd = 0;
+	      /* 
+		 nothing to do in this case; both the member and group files
+		 must be of an access type that already gives valid URLs;
+		 i.e., URLs that we can pass directly to the file drivers
+	      */
+	    }
+	  else
+	    {
+	      /*
+		 retrieve the Current Working Directory as a Unix-like
+		 URL standard string
+	      */
+
+	      *status = fits_get_cwd(cwd,status);
+
+	      /*
+		 create full file path for the member HDU FITS file URL
+		 if it is of access type file://
+	      */
+	      
+	      if(strcasecmp(memberAccess1,"file://") == 0)
+		{
+		  if(*memberFileName == '/')
+		    {
+		      strcpy(memberLocation,memberFileName);
+		    }
+		  else
+		    {
+		      strcpy(memberLocation,cwd);
+		      strcat(memberLocation,"/");
+		      strcat(memberLocation,memberFileName);
+		    }
+		  
+		  *status = fits_clean_url(memberLocation,memberFileName,
+					   status);
+		}
+
+	      /*
+		 create full file path for the grouping table HDU FITS file URL
+		 if it is of access type file://
+	      */
+
+	      if(strcasecmp(groupAccess1,"file://") == 0)
+		{
+		  if(*groupFileName == '/')
+		    {
+		      strcpy(groupLocation,groupFileName);
+		    }
+		  else
+		    {
+		      strcpy(groupLocation,cwd);
+		      strcat(groupLocation,"/");
+		      strcat(groupLocation,groupFileName);
+		    }
+		  
+		  *status = fits_clean_url(groupLocation,groupFileName,status);
+		}
+
+	      /*
+		if both the member and group files are disk files then 
+		create a relative path (relative URL) strings with 
+		respect to the grouping table's file and the grouping table's 
+		file with respect to the member HDU's file
+	      */
+	      
+	      if(strcasecmp(groupAccess1,"file://") == 0 &&
+		                      strcasecmp(memberAccess1,"file://") == 0)
+		{
+		  fits_url2relurl(memberFileName,groupFileName,
+				                  groupLocation,status);
+		  fits_url2relurl(groupFileName,memberFileName,
+				                  memberLocation,status);
+
+		  /*
+		     copy the resulting partial URL strings to the
+		     memberFileName and groupFileName variables for latter
+		     use in the function
+		   */
+		    
+		  strcpy(memberFileName,memberLocation);
+		  strcpy(groupFileName,groupLocation);		  
+		}
+	    }
+	  /* beo done */
+	  /* }  */
+      
 
       /* retrieve the grouping table's EXTVER value */
 
       *status = fits_read_key_lng(gfptr,"EXTVER",&groupExtver,card,status);
 
+      /* 
+	 if useLocation is true then make the group EXTVER value negative
+	 for the subsequent GRPIDn/GRPLCn matching
+      */
+      /* SPR 3463 change test */
+      if(tmpfptr->Fptr != gfptr->Fptr) groupExtver = -1*groupExtver;
+
       /* retrieve the number of group members */
 
       *status = fits_get_num_members(gfptr,&nmembers,status);
 	      
+    do {
+
       /*
 	 make sure the member HDU is not already an entry in the
 	 grouping table before adding it
@@ -1203,7 +1625,7 @@ int ffgtam(fitsfile *gfptr,   /* FITS file pointer to grouping table HDU     */
       if(*status == MEMBER_NOT_FOUND) *status = 0;
       else if(*status == 0)
 	{  
-	  *status = HDU_ALREADY_MEMBER;
+	  parentStatus = HDU_ALREADY_MEMBER;
     ffpmsg("Specified HDU is already a member of the Grouping table (ffgtam)");
 	  continue;
 	}
@@ -1247,14 +1669,15 @@ int ffgtam(fitsfile *gfptr,   /* FITS file pointer to grouping table HDU     */
 			   status);
 
       if(positionCol != 0)
-	fits_write_col_lng(gfptr,positionCol,nmembers,1,1,
-			   (long *)&memberPosition,status);
+	fits_write_col_int(gfptr,positionCol,nmembers,1,1,
+			   &memberPosition,status);
 
       *tmpPtr = memberFileName; 
 
       if(locationCol != 0)
 	{
-	  if(useLocation != 0)
+	  /* Change the test for SPR 3463 */
+	  if(tmpfptr->Fptr != gfptr->Fptr)
 	    fits_write_col_str(gfptr,locationCol,nmembers,1,1,tmpPtr,status);
 	  else
 	    /* WILL THIS WORK FOR VAR LENTH CHAR COLS??????*/
@@ -1265,61 +1688,173 @@ int ffgtam(fitsfile *gfptr,   /* FITS file pointer to grouping table HDU     */
 
       if(uriCol      != 0)
 	{
-	  if(useLocation != 0)
+
+	  /* Change the test for SPR 3463 */
+
+	  if(tmpfptr->Fptr != gfptr->Fptr)
 	    fits_write_col_str(gfptr,uriCol,nmembers,1,1,tmpPtr,status);
 	  else
 	    /* WILL THIS WORK FOR VAR LENTH CHAR COLS??????*/
 	    fits_write_col_byt(gfptr,uriCol,nmembers,1,1,charNull,status);
 	}
+    } while(0);
 
+      if(0 != *status) continue;
       /*
 	 add GRPIDn/GRPLCn keywords to the member HDU header to link
-	 it to the grouing table
+	 it to the grouing table if the they do not already exist and
+	 the member file is RW
       */
+
+      fits_file_mode(tmpfptr,&iomode,status);
+ 
+     if(memberIOstate == 0 || iomode != READWRITE) 
+	{
+	  ffpmsg("cannot add GRPID/LC keywords to member HDU: (ffgtam)");
+	  ffpmsg(memberFileName);
+	  continue;
+	}
 
       *status = fits_get_num_groups(tmpfptr,&ngroups,status);
 
-      /* position the write pointer to the correct header insert position */
+      /* 
+	 look for the GRPID/LC keywords in the member HDU; if the keywords
+	 for the back-link to the grouping table already exist then no
+	 need to add them again
+       */
 
-      if(ngroups > 0)
+      for(i = 1, found = 0; i <= ngroups && !found && *status == 0; ++i)
 	{
-	  /* find the last GRPIDn/GRPLCn keyword in the header */
+	  sprintf(keyword,"GRPID%d",(int)ngroups);
+	  *status = fits_read_key_lng(tmpfptr,keyword,&grpid,card,status);
 
-	  sprintf(keyword,"GRPLC%d",(int)ngroups);
-	  *status = fits_read_card(tmpfptr,keyword,card,status);
-
-	  if(*status == KEY_NO_EXIST)
+	  if(grpid == groupExtver)
 	    {
-	      *status = 0;
-	      sprintf(keyword,"GRPID%d",(int)ngroups);
-	      *status = fits_read_card(tmpfptr,keyword,card,status);
+	      if(grpid < 0)
+		{
+
+		  /* have to make sure the GRPLCn keyword matches too */
+
+		  sprintf(keyword,"GRPLC%d",(int)ngroups);
+		  /* SPR 1738 */
+		  *status = fits_read_key_longstr(mfptr,keyword,&tgrplc,card,
+						  status);
+		  if (0 == *status) {
+		    strcpy(grplc,tgrplc);
+		    free(tgrplc);
+		  }
+		  
+		  /*
+		     always compare files using absolute paths
+                     the presence of a non-empty cwd indicates
+                     that the file names may require conversion
+                     to absolute paths
+                  */
+
+                  if(0 < strlen(cwd)) {
+                    /* temp buffer for use in assembling abs. path(s) */
+                    char tmp[FLEN_FILENAME];
+
+                    /* make grplc absolute if necessary */
+                    if(!fits_is_url_absolute(grplc)) {
+		      fits_path2url(grplc,groupLocation,status);
+
+		      if(groupLocation[0] != '/')
+			{
+			  strcpy(tmp, cwd);
+			  strcat(tmp,"/");
+			  strcat(tmp,groupLocation);
+			  fits_clean_url(tmp,grplc,status);
+			}
+                    }
+
+                    /* make groupFileName absolute if necessary */
+                    if(!fits_is_url_absolute(groupFileName)) {
+		      fits_path2url(groupFileName,groupLocation,status);
+
+		      if(groupLocation[0] != '/')
+			{
+			  strcpy(tmp, cwd);
+			  strcat(tmp,"/");
+			  strcat(tmp,groupLocation);
+                          /*
+                             note: use groupLocation (which is not used
+                             below this block), to store the absolute
+                             file name instead of using groupFileName.
+                             The latter may be needed unaltered if the
+                             GRPLC is written below
+                          */
+
+			  fits_clean_url(tmp,groupLocation,status);
+			}
+                    }
+                  }
+		  /*
+		    see if the grplc value and the group file name match
+		  */
+
+		  if(strcmp(grplc,groupLocation) == 0) found = 1;
+		}
+	      else
+		{
+		  /* the match is found with GRPIDn alone */
+		  found = 1;
+		}
 	    }
 	}
-      else
-	{
-	  /* no GRPIDn/GRPLCn keywords currently exist in header */
 
+      /*
+	 if FOUND is true then no need to continue
+      */
+
+      if(found)
+	{
+	  ffpmsg("HDU already has GRPID/LC keywords for group table (ffgtam)");
+	  continue;
+	}
+
+      /*
+	 add the GRPID/LC keywords to the member header for this grouping
+	 table
+	 
+	 If NGROUPS == 0 then we must position the header pointer to the
+	 record where we want to insert the GRPID/LC keywords (the pointer
+	 is already correctly positioned if the above search loop activiated)
+      */
+
+      if(ngroups == 0)
+	{
+	  /* 
+	     no GRPIDn/GRPLCn keywords currently exist in header so try
+	     to position the header pointer to a desirable position
+	  */
+	  
 	  for(i = 0, *status = KEY_NO_EXIST; 
-	                            i < nkeys && *status == KEY_NO_EXIST; ++i)
+	                       i < nkeys && *status == KEY_NO_EXIST; ++i)
 	    {
 	      *status = 0;
 	      *status = fits_read_card(tmpfptr,keys[i],card,status);
 	    }
-
+	      
 	  /* all else fails: move write pointer to end of header */
-
+	      
 	  if(*status == KEY_NO_EXIST)
 	    {
+	      *status = 0;
 	      fits_get_hdrspace(tmpfptr,&nkeys,&i,status);
 	      ffgrec(tmpfptr,nkeys,card,status);
 	    }
-
+	  
 	  /* any other error status then abort */
-
+	  
 	  if(*status != 0) continue;
 	}
       
-      /* increment the number of group links counter for the member HDU */
+      /* 
+	 now that the header pointer is positioned for the GRPID/LC 
+	 keyword insertion increment the number of group links counter for 
+	 the member HDU 
+      */
 
       ++ngroups;
 
@@ -1327,22 +1862,29 @@ int ffgtam(fitsfile *gfptr,   /* FITS file pointer to grouping table HDU     */
 	 if the member HDU and grouping table reside in the same FITS file
 	 then there is no need to add a GRPLCn keyword
       */
-
-      if(useLocation == 0)
+      /* SPR 3463 change test */
+      if(tmpfptr->Fptr == gfptr->Fptr)
 	{
+	  /* add the GRPIDn keyword only */
+
 	  sprintf(keyword,"GRPID%d",(int)ngroups);
 	  fits_insert_key_lng(tmpfptr,keyword,groupExtver,
 			      "EXTVER of Group containing this HDU",status);
 	}
-      else
+      else 
 	{
+	  /* add the GRPIDn and GRPLCn keywords */
+
 	  sprintf(keyword,"GRPID%d",(int)ngroups);
-	  fits_insert_key_lng(tmpfptr,keyword,groupExtver*(-1),
+	  fits_insert_key_lng(tmpfptr,keyword,groupExtver,
 			      "EXTVER of Group containing this HDU",status);
 
 	  sprintf(keyword,"GRPLC%d",(int)ngroups);
-	  fits_insert_key_str(tmpfptr,keyword,groupFileName,
+	  /* SPR 1738 */
+	  fits_insert_key_longstr(tmpfptr,keyword,groupFileName,
 			      "URL of file containing Group",status);
+	  fits_write_key_longwarn(tmpfptr,status);
+
 	}
 
     }while(0);
@@ -1350,7 +1892,11 @@ int ffgtam(fitsfile *gfptr,   /* FITS file pointer to grouping table HDU     */
   /* close the tmpfptr pointer if it was opened in this function */
 
   if(mfptr == NULL)
-    *status = fits_close_file(tmpfptr,status);
+    {
+      *status = fits_close_file(tmpfptr,status);
+    }
+
+  *status = 0 == *status ? parentStatus : *status;
 
   return(*status);
 }
@@ -1420,6 +1966,8 @@ int ffgmng(fitsfile *mfptr,   /* FITS file pointer to member HDU            */
   char keyword[FLEN_KEYWORD];
   char newKeyword[FLEN_KEYWORD];
   char card[FLEN_CARD];
+  char comment[FLEN_COMMENT];
+  char *tkeyvalue;
 
   if(*status != 0) return(*status);
 
@@ -1490,7 +2038,16 @@ int ffgmng(fitsfile *mfptr,   /* FITS file pointer to member HDU            */
 
 	      sprintf(keyword,"GRPLC%d",index);
 	      sprintf(newKeyword,"GRPLC%d",newIndex);
-	      fits_modify_name(mfptr,keyword,newKeyword,status);
+	      /* SPR 1738 */
+	      *status = fits_read_key_longstr(mfptr,keyword,&tkeyvalue,comment,
+					      status);
+	      if (0 == *status) {
+		fits_delete_key(mfptr,keyword,status);
+		fits_insert_key_longstr(mfptr,newKeyword,tkeyvalue,comment,status);
+		fits_write_key_longwarn(mfptr,status);
+		free(tkeyvalue);
+	      }
+	      
 
 	      if(*status == KEY_NO_EXIST) *status = 0;
 	    }
@@ -1512,27 +2069,36 @@ int ffgmop(fitsfile *gfptr,  /* FITS file pointer to grouping table          */
   the FITS file pointed to by gfptr. The member to open is identified by its
   row number within the grouping table (first row/member == 1).
 
-  Note that if the member resides in a FITS file different from the grouping
+  If the member resides in a FITS file different from the grouping
   table the member file is first opened readwrite and if this fails then
-  it is opened readonly.
-
+  it is opened readonly. For access type of FILE:// the member file is
+  searched for assuming (1) an absolute path is given, (2) a path relative
+  to the CWD is given, and (3) a path relative to the grouping table file
+  but not relative to the CWD is given. If all of these fail then the
+  error FILE_NOT_FOUND is returned.
 */
+
 {
   int xtensionCol,extnameCol,extverCol,positionCol,locationCol,uriCol;
   int grptype,hdutype;
   int dummy;
-  
+
   long hdupos = 0;
   long extver = 0;
 
   char  xtension[FLEN_VALUE];
   char  extname[FLEN_VALUE];
-  char  location[FLEN_FILENAME];
   char  uri[FLEN_VALUE];
-  char  grpLocation[FLEN_FILENAME];
+  char  grpLocation1[FLEN_FILENAME];
+  char  grpLocation2[FLEN_FILENAME];
+  char  mbrLocation1[FLEN_FILENAME];
+  char  mbrLocation2[FLEN_FILENAME];
+  char  mbrLocation3[FLEN_FILENAME];
+  char  cwd[FLEN_FILENAME];
   char  card[FLEN_CARD];
-  char  nstr[] = {"\0"};
+  char  nstr[] = {'\0'};
   char *tmpPtr[1];
+
 
   if(*status != 0) return(*status);
 
@@ -1583,7 +2149,7 @@ int ffgmop(fitsfile *gfptr,  /* FITS file pointer to grouping table          */
 	  *status = fits_read_col_lng(gfptr,positionCol,member,1,1,0,
 				      (long*)&hdupos,&dummy,status);
 
-      tmpPtr[0] = location;
+      tmpPtr[0] = mbrLocation1;
 
       if(locationCol != 0)
 	*status = fits_read_col_str(gfptr,locationCol,member,1,1,nstr,
@@ -1596,7 +2162,12 @@ int ffgmop(fitsfile *gfptr,  /* FITS file pointer to grouping table          */
 
       if(*status != 0) continue;
 
-      /* decide what FITS file the member HDU resides in */
+      /* 
+	 decide what FITS file the member HDU resides in and open the file
+	 using the fitsfile* pointer mfptr; note that this logic is rather
+	 complicated and is based primiarly upon if a URL specifier is given
+	 for the member file in the grouping table
+      */
 
       switch(grptype)
 	{
@@ -1607,14 +2178,14 @@ int ffgmop(fitsfile *gfptr,  /* FITS file pointer to grouping table          */
 
 	  /*
 	     no location information is given so we must assume that the
-	     member HDU resides in the same FITS file as the grouping table
+	     member HDU resides in the same FITS file as the grouping table;
+	     if the grouping table was incorrectly constructed then this
+	     assumption will be false, but there is nothing to be done about
+	     it at this point
 	  */
 
 	  *status = fits_reopen_file(gfptr,mfptr,status);
 	  
-	  break;
-
-	default:
 	  break;
 
 	case GT_ID_REF_URI:
@@ -1622,14 +2193,23 @@ int ffgmop(fitsfile *gfptr,  /* FITS file pointer to grouping table          */
 	case GT_ID_ALL_URI:
 
 	  /*
-	    The member location column exists; determine if the member 
-	    resides in a separate file from the grouping table; if so, 
-	    attempt to open it
+	    The member location column exists. Determine if the member 
+	    resides in the same file as the grouping table or in a
+	    separate file; open the member file in either case
 	  */
 
-	  if(strlen(location) != 0)
+	  if(strlen(mbrLocation1) == 0)
 	    {
+	      /*
+		 since no location information was given we must assume
+		 that the member is in the same FITS file as the grouping
+		 table
+	      */
 
+	      *status = fits_reopen_file(gfptr,mfptr,status);
+	    }
+	  else
+	    {
 	      /*
 		make sure the location specifiation is "URL"; we cannot
 		decode any other URI types at this time
@@ -1648,77 +2228,287 @@ int ffgmop(fitsfile *gfptr,  /* FITS file pointer to grouping table          */
 
 	      /*
 		The location string for the member is not NULL, so it 
-		does not necessecially reside in the same FITS file as the
-		grouping table. Compare the location string to the 
-		file name that contains the grouping table to see if
-		they are the same ==> member and grouping table reside
-		in the same file.
+		does not necessially reside in the same FITS file as the
+		grouping table. 
 
-		The comparision between member HDU location and grouping
-		table location is made by constructing the URL for each
-		location, e.g., http://xxx.yyy.zzz/filepath/filename, and
-		checking if they are the same string. Note that this 
-		comparision is not unambiguous. For example, a file with
-		name 'filename' containing the grouping table and the
-		file containing the member with full URL 
-                'http://xxx.yyy.zzz/AAA/filename' could actually be the
-		same FITS file and yet this comparision would not
-		reconize it
-	      */
+		Three cases are attempted for opening the member's file
+		in the following order:
 
-	      /* retrieve full input URL of grouping table file and parse */
+		1. The URL given for the member's file is absolute (i.e.,
+		access method supplied); try to open the member
 
-	      *status = fits_file_name(gfptr,grpLocation,status);
+		2. The URL given for the member's file is not absolute but
+		is an absolute file path; try to open the member as a file
+		after the file path is converted to a host-dependent form
 
-	      ffgtcn(grpLocation);
+		3. The URL given for the member's file is not absolute
+	        and is given as a relative path to the location of the 
+		grouping table's file. Create an absolute URL using the 
+		grouping table's file URL and try to open the member.
+		
+		If all three cases fail then an error is returned. In each
+		case the file is first opened in read/write mode and failing
+		that readonly mode.
+		
+		The following DO loop is only used as a mechanism to break
+		(continue) when the proper file opening method is found
+	       */
 
-	      /* parse the member location string and build URL */
-
-	      ffgtcn(location);
-
-	      /* string compare the group and member location URLs */
-	      if(strcmp(grpLocation,location) == 0)
+	      do
 		{
-		  /* 
-		     The member HDU and grouping table reside in the 
-		     same FITS file, so just reopen the current FITS
-		     file
-		  */
-		  *status = fits_reopen_file(gfptr,mfptr,status);
-		}
-	      else
-		{
-		  /* 
-		     The member HDU and grouping table reside in separate
-		     FITS files. first try to open the member HDU's FITS 
-		     file read/write mode; if that fails then try to
-		     open it in readonly mode
-		  */
-		  *status = fits_open_file(mfptr,location,READWRITE,status);
+		  /*
+		     CASE 1:
 
-		  if(*status != 0)
+		     See if the member URL is absolute (i.e., includes a
+		     access directive) and if so open the file
+		   */
+
+		  if(fits_is_url_absolute(mbrLocation1))
 		    {
-		      /* now try to open in readonly mode */ 
-		      *status = 0;
-		      *status = fits_open_file(mfptr,location,READONLY,status);
-		    }
-		}
-	    }
-	  else
-	    {
-	      /*
-		 since no location information was given we must assume
-		 that the member is in the same FITS file as the grouping
-		 table
-	      */
+		      /*
+			 the URL must specify an access method, which 
+			 implies that its an absolute reference
+			 
+			 regardless of the access method, pass the whole
+			 URL to the open function for processing
+		       */
+		      
+		      ffpmsg("member URL is absolute, try open R/W (ffgmop)");
 
-	      *status = fits_reopen_file(gfptr,mfptr,status);
+		      *status = fits_open_file(mfptr,mbrLocation1,READWRITE,
+					       status);
+
+		      if(*status == 0) continue;
+
+		      *status = 0;
+
+		      /* 
+			 now try to open file using full URL specs in 
+			 readonly mode 
+		      */ 
+
+		      ffpmsg("OK, now try to open read-only (ffgmop)");
+
+		      *status = fits_open_file(mfptr,mbrLocation1,READONLY,
+					       status);
+
+		      /* break from DO loop regardless of status */
+
+		      continue;
+		    }
+
+		  /*
+		     CASE 2:
+
+		     If we got this far then the member URL location 
+		     has no access type ==> FILE:// Try to open the member 
+		     file using the URL as is, i.e., assume that it is given 
+		     as absolute, if it starts with a '/' character
+		   */
+
+		  ffpmsg("Member URL is of type FILE (ffgmop)");
+
+		  if(*mbrLocation1 == '/')
+		    {
+		      ffpmsg("Member URL specifies abs file path (ffgmop)");
+
+		      /* 
+			 convert the URL path to a host dependent path
+		      */
+
+		      *status = fits_url2path(mbrLocation1,mbrLocation2,
+					      status);
+
+		      ffpmsg("Try to open member URL in R/W mode (ffgmop)");
+
+		      *status = fits_open_file(mfptr,mbrLocation2,READWRITE,
+					       status);
+
+		      if(*status == 0) continue;
+
+		      *status = 0;
+
+		      /* 
+			 now try to open file using the URL as an absolute 
+			 path in readonly mode 
+		      */
+ 
+		      ffpmsg("OK, now try to open read-only (ffgmop)");
+
+		      *status = fits_open_file(mfptr,mbrLocation2,READONLY,
+					       status);
+
+		      /* break from the Do loop regardless of the status */
+
+		      continue;
+		    }
+		  
+		  /* 
+		     CASE 3:
+
+		     If we got this far then the URL does not specify an
+		     absoulte file path or URL with access method. Since 
+		     the path to the group table's file is (obviously) valid 
+		     for the CWD, create a full location string for the
+		     member HDU using the grouping table URL as a basis
+
+		     The only problem is that the grouping table file might
+		     have two URLs, the original one used to open it and
+		     the one that points to the real file being accessed
+		     (i.e., a file accessed via HTTP but transferred to a
+		     local disk file). Have to attempt to build a URL to
+		     the member HDU file using both of these URLs if
+		     defined.
+		  */
+
+		  ffpmsg("Try to open member file as relative URL (ffgmop)");
+
+		  /* get the URL information for the grouping table file */
+
+		  *status = fits_get_url(gfptr,grpLocation1,grpLocation2,
+					 NULL,NULL,NULL,status);
+
+		  /* 
+		     if the "real" grouping table file URL is defined then
+		     build a full url for the member HDU file using it
+		     and try to open the member HDU file
+		  */
+
+		  if(*grpLocation1)
+		    {
+		      /* make sure the group location is absolute */
+
+		      if(! fits_is_url_absolute(grpLocation1) &&
+			                              *grpLocation1 != '/')
+			{
+			  fits_get_cwd(cwd,status);
+			  strcat(cwd,"/");
+			  strcat(cwd,grpLocation1);
+			  strcpy(grpLocation1,cwd);
+			}
+
+		      /* create a full URL for the member HDU file */
+
+		      *status = fits_relurl2url(grpLocation1,mbrLocation1,
+						mbrLocation2,status);
+
+		      if(*status != 0) continue;
+
+		      /*
+			if the URL does not have an access method given then
+			translate it into a host dependent file path
+		      */
+
+		      if(! fits_is_url_absolute(mbrLocation2))
+			{
+			  *status = fits_url2path(mbrLocation2,mbrLocation3,
+						  status);
+			  strcpy(mbrLocation2,mbrLocation3);
+			}
+
+		      /* try to open the member file READWRITE */
+
+		      *status = fits_open_file(mfptr,mbrLocation2,READWRITE,
+					       status);
+
+		      if(*status == 0) continue;
+
+		      *status = 0;
+		  
+		      /* now try to open in readonly mode */ 
+
+		      ffpmsg("now try to open file as READONLY (ffgmop)");
+
+		      *status = fits_open_file(mfptr,mbrLocation2,READONLY,
+					       status);
+
+		      if(*status == 0) continue;
+
+		      *status = 0;
+		    }
+
+		  /* 
+		     if we got this far then either the "real" grouping table
+		     file URL was not defined or all attempts to open the
+		     resulting member HDU file URL failed.
+
+		     if the "original" grouping table file URL is defined then
+		     build a full url for the member HDU file using it
+		     and try to open the member HDU file
+		  */
+
+		  if(*grpLocation2)
+		    {
+		      /* make sure the group location is absolute */
+
+		      if(! fits_is_url_absolute(grpLocation2) &&
+			                              *grpLocation2 != '/')
+			{
+			  fits_get_cwd(cwd,status);
+			  strcat(cwd,"/");
+			  strcat(cwd,grpLocation2);
+			  strcpy(grpLocation2,cwd);
+			}
+
+		      /* create an absolute URL for the member HDU file */
+
+		      *status = fits_relurl2url(grpLocation2,mbrLocation1,
+						mbrLocation2,status);
+		      if(*status != 0) continue;
+
+		      /*
+			if the URL does not have an access method given then
+			translate it into a host dependent file path
+		      */
+
+		      if(! fits_is_url_absolute(mbrLocation2))
+			{
+			  *status = fits_url2path(mbrLocation2,mbrLocation3,
+						  status);
+			  strcpy(mbrLocation2,mbrLocation3);
+			}
+
+		      /* try to open the member file READWRITE */
+
+		      *status = fits_open_file(mfptr,mbrLocation2,READWRITE,
+					       status);
+
+		      if(*status == 0) continue;
+
+		      *status = 0;
+		  
+		      /* now try to open in readonly mode */ 
+
+		      ffpmsg("now try to open file as READONLY (ffgmop)");
+
+		      *status = fits_open_file(mfptr,mbrLocation2,READONLY,
+					       status);
+
+		      if(*status == 0) continue;
+
+		      *status = 0;
+		    }
+
+		  /*
+		     if we got this far then the member HDU file could not
+		     be opened using any method. Log the error.
+		  */
+
+		  ffpmsg("Cannot open member HDU FITS file (ffgmop)");
+		  *status = MEMBER_NOT_FOUND;
+		  
+		}while(0);
 	    }
 
 	  break;
 
-	}
+	default:
 
+	  /* no default action */
+	  
+	  break;
+	}
+	  
       if(*status != 0) continue;
 
       /*
@@ -1805,13 +2595,18 @@ int ffgmop(fitsfile *gfptr,  /* FITS file pointer to grouping table          */
 	  break;
 
 	default:
-	  break;
 
+	  /* no default action */
+
+	  break;
 	}
       
     }while(0);
 
-  if(*status != 0 && *mfptr != NULL) fits_close_file(*mfptr,status);
+  if(*status != 0 && *mfptr != NULL) 
+    {
+      fits_close_file(*mfptr,status);
+    }
 
   return(*status);
 }
@@ -1854,6 +2649,8 @@ int ffgmcp(fitsfile *gfptr,  /* FITS file pointer to group                   */
   char  extname[FLEN_VALUE];
   char  card[FLEN_CARD];
   char  comment[FLEN_COMMENT];
+  char  keyname[FLEN_CARD];
+  char  value[FLEN_CARD];
 
   fitsfile *tmpfptr = NULL;
 
@@ -1910,7 +2707,11 @@ int ffgmcp(fitsfile *gfptr,  /* FITS file pointer to group                   */
 	    {
 	      *status = fits_find_nextkey(mfptr,incList,2,NULL,0,card,status);
 	      *status = fits_get_hdrpos(mfptr,&numkeys,&keypos,status);  
-	      *status = fits_delete_record(mfptr,keypos-1,status);
+	      /* SPR 1738 */
+	      *status = fits_read_keyn(mfptr,keypos-1,keyname,value,
+				       comment,status);
+	      *status = fits_read_record(mfptr,keypos-1,card,status);
+	      *status = fits_delete_key(mfptr,keyname,status);
 	    }
 
 	  if(*status == KEY_NO_EXIST) *status = 0;
@@ -2024,8 +2825,11 @@ int ffgmcp(fitsfile *gfptr,  /* FITS file pointer to group                   */
 
     }while(0);
       
-  if(tmpfptr != NULL) fits_close_file(tmpfptr,status);
-  
+  if(tmpfptr != NULL) 
+    {
+      fits_close_file(tmpfptr,status);
+    }
+
   return(*status);
 }		     
 
@@ -2100,14 +2904,15 @@ int ffgmrm(fitsfile *gfptr,  /* FITS file pointer to group table             */
   delete is identified by its row number in the table (first member == 1).
   The rmopt parameter determines if the member entry is deleted from the
   grouping table (in which case GRPIDn and GRPLCn keywords in the member 
-  HDU's header shall be updated accordingly) or if the member HDU shall itself
-  be removed from its FITS file.
+  HDU's header shall be updated accordingly) or if the member HDU shall 
+  itself be removed from its FITS file.
 */
 
 {
   int found     = 0;
   int hdutype   = 0;
   int index     = 0;
+  int iomode    = 0;
 
   long i;
   long ngroups      = 0;
@@ -2115,11 +2920,17 @@ int ffgmrm(fitsfile *gfptr,  /* FITS file pointer to group table             */
   long groupExtver  = 0;
   long grpid        = 0;
 
-  char groupFileName[FLEN_FILENAME];
+  char grpLocation1[FLEN_FILENAME];
+  char grpLocation2[FLEN_FILENAME];
+  char grpLocation3[FLEN_FILENAME];
+  char cwd[FLEN_FILENAME];
   char keyword[FLEN_KEYWORD];
-  char grplc[FLEN_VALUE];
+  /* SPR 1738 This can now be longer */
+  char grplc[FLEN_FILENAME];
+  char *tgrplc;
   char keyvalue[FLEN_VALUE];
   char card[FLEN_CARD];
+  char *editLocation;
 
   fitsfile *mfptr  = NULL;
 
@@ -2128,9 +2939,23 @@ int ffgmrm(fitsfile *gfptr,  /* FITS file pointer to group table             */
 
   do
     {
-      /* open the group member to be deleted */
+      /*
+	make sure the grouping table can be modified before proceeding
+      */
+
+      fits_file_mode(gfptr,&iomode,status);
+
+      if(iomode != READWRITE)
+	{
+	  ffpmsg("cannot modify grouping table (ffgtam)");
+	  *status = BAD_GROUP_DETACH;
+	  continue;
+	}
+
+      /* open the group member to be deleted and get its IOstatus*/
 
       *status = fits_open_member(gfptr,member,&mfptr,status);
+      *status = fits_file_mode(mfptr,&iomode,status);
 
       /*
 	 if the member HDU is to be deleted then call fits_unlink_member()
@@ -2192,7 +3017,8 @@ int ffgmrm(fitsfile *gfptr,  /* FITS file pointer to group table             */
 
 	  /* delete the member HDU */
 
-	  *status = fits_delete_hdu(mfptr,&hdutype,status);
+	  if(iomode != READONLY)
+	    *status = fits_delete_hdu(mfptr,&hdutype,status);
 	}
       else if(rmopt == OPT_RM_ENTRY)
 	{
@@ -2204,107 +3030,202 @@ int ffgmrm(fitsfile *gfptr,  /* FITS file pointer to group table             */
 	     and (3) remove the member entry from the grouping table
 	  */
 
-	  /* determine the group EXTVER value of the grouping table */
-
-	  *status = fits_read_key_lng(gfptr,"EXTVER",&groupExtver,card,status);
-
-	  /* retrieve input file names for member and grouping table HDUs */
-
-	  *status = fits_file_name(gfptr,groupFileName,status);
-
-	  if(*status != 0) continue;
-	  
-	  /* construct the grouping table FITS file name */
-
-	  ffgtcn(groupFileName);
-
 	  /*
-	     determine the number of groups to which the member HDU belongs
-	  */
-	  
-	  *status = fits_get_num_groups(mfptr,&ngroups,status);
-
-	  /* reset the HDU keyword position counter to the beginning */
-
-	  *status = ffgrec(mfptr,0,card,status);
-	  
-	  /*
-	     loop over all the GRPIDn keywords in the member HDU header and
-	     find the appropriate GRPIDn and GRPLCn keywords that identify it
-	     as belonging to the group
+	    there is no need to seach for and remove the GRPIDn/GRPLCn
+	    keywords from the member HDU if it has not been opened
+	    in READWRITE mode
 	  */
 
-	  for(index = 1, found = 0; index <= ngroups && *status == 0 && 
-	                                                       !found; ++index)
-	    {	  
-	      /* read the next GRPIDn keyword in the series */
-
-	      sprintf(keyword,"GRPID%d",index);
-
-	      *status = fits_read_key_lng(mfptr,keyword,&grpid,card,status);
+	  if(iomode == READWRITE)
+	    {	  	      
+	      /* 
+		 determine the group EXTVER value of the grouping table; if
+		 the member HDU and grouping table HDU do not reside in the 
+		 same file then set the groupExtver value to its negative 
+	      */
+	      
+	      *status = fits_read_key_lng(gfptr,"EXTVER",&groupExtver,card,
+					  status);
+	      if(mfptr->Fptr != gfptr->Fptr) groupExtver = -1*groupExtver;
+	      
+	      /*
+		retrieve the URLs for the grouping table; note that it is 
+		possible that the grouping table file has two URLs, the 
+		one used to open it and the "real" one pointing to the 
+		actual file being accessed
+	      */
+	      
+	      *status = fits_get_url(gfptr,grpLocation1,grpLocation2,NULL,
+				     NULL,NULL,status);
+	      
 	      if(*status != 0) continue;
 	      
-	      /* grpid value == group EXTVER value then we have a match */
+	      /*
+		if either of the group location strings specify a relative
+		file path then convert them into absolute file paths
+	      */
 
-	      if(grpid > 0)
-		{		
-		  if(grpid == groupExtver) found = index;
-		}
-	      else
+	      *status = fits_get_cwd(cwd,status);
+	      
+	      if(*grpLocation1 != 0 && *grpLocation1 != '/' &&
+		 !fits_is_url_absolute(grpLocation1))
 		{
-		  /* have to look at the GRPLCn value to determine a match */
-
-		  sprintf(keyword,"GRPLC%d",index);
-
-		  *status = fits_read_key_str(mfptr,keyword,grplc,card,status);
-
-		  if(*status == KEY_NO_EXIST)
-		    {
-		      *status = 0;
-		      continue;
-		    }
-		  else if (*status != 0) continue;
-
-		  /* construct the URL for the GRPLCn value */
-
-		  prepare_keyvalue(grplc);
-		  ffgtcn(grplc);
-
-		  /*
-		     if the absolute value of GRPIDn is equal to the
-		     EXTVER value of the grouping table and the derived 
-		     file name of the grouping table matches the
-		     derived file name from the GRPLCn keyword value
-		     then we hava a match
-		   */
-
-		  if(strcmp(grplc,groupFileName) == 0 && 
-		                 groupExtver == -1*grpid) found = index; 
+		  strcpy(grpLocation3,cwd);
+		  strcat(grpLocation3,"/");
+		  strcat(grpLocation3,grpLocation1);
+		  fits_clean_url(grpLocation3,grpLocation1,status);
 		}
-	    }
-
-	  /*
-	     if found == 0 (false) after the above search then we assume 
-	     that it is due to an inpromper updating of the GRPIDn and GRPLCn 
-	     keywords in the member header ==> nothing to delete in the 
-	     header. Else delete the GRPLCn and GRPIDn keywords that identify 
-	     the member HDU with the group HDU and re-enumerate the 
-	     remaining GRPIDn and GRPLCn keywords
-	  */
-
-	  if(found != 0)
-	    {
-	      sprintf(keyword,"GRPID%d",found);
-	      *status = fits_delete_key(mfptr,keyword,status);
 	      
-	      sprintf(keyword,"GRPLC%d",found);
-	      *status = fits_delete_key(mfptr,keyword,status);
+	      if(*grpLocation2 != 0 && *grpLocation2 != '/' &&
+		 !fits_is_url_absolute(grpLocation2))
+		{
+		  strcpy(grpLocation3,cwd);
+		  strcat(grpLocation3,"/");
+		  strcat(grpLocation3,grpLocation2);
+		  fits_clean_url(grpLocation3,grpLocation2,status);
+		}
 	      
-	      *status = 0;
-
-	      /* call fits_get_num_groups() to re-enumerate the GRPIDn */
-
+	      /*
+		determine the number of groups to which the member HDU 
+		belongs
+	      */
+	      
 	      *status = fits_get_num_groups(mfptr,&ngroups,status);
+	      
+	      /* reset the HDU keyword position counter to the beginning */
+	      
+	      *status = ffgrec(mfptr,0,card,status);
+	      
+	      /*
+		loop over all the GRPIDn keywords in the member HDU header 
+		and find the appropriate GRPIDn and GRPLCn keywords that 
+		identify it as belonging to the group
+	      */
+	      
+	      for(index = 1, found = 0; index <= ngroups && *status == 0 && 
+		    !found; ++index)
+		{	  
+		  /* read the next GRPIDn keyword in the series */
+		  
+		  sprintf(keyword,"GRPID%d",index);
+		  
+		  *status = fits_read_key_lng(mfptr,keyword,&grpid,card,
+					      status);
+		  if(*status != 0) continue;
+		  
+		  /* 
+		     grpid value == group EXTVER value then we could have a 
+		     match
+		  */
+		  
+		  if(grpid == groupExtver && grpid > 0)
+		    {
+		      /*
+			if GRPID is positive then its a match because 
+			both the member HDU and grouping table HDU reside
+			in the same FITS file
+		      */
+		      
+		      found = index;
+		    }
+		  else if(grpid == groupExtver && grpid < 0)
+		    {
+		      /* 
+			 have to look at the GRPLCn value to determine a 
+			 match because the member HDU and grouping table 
+			 HDU reside in different FITS files
+		      */
+		      
+		      sprintf(keyword,"GRPLC%d",index);
+		      
+		      /* SPR 1738 */
+		      *status = fits_read_key_longstr(mfptr,keyword,&tgrplc,
+						      card, status);
+		      if (0 == *status) {
+			strcpy(grplc,tgrplc);
+			free(tgrplc);
+		      }
+		      		      
+		      if(*status == KEY_NO_EXIST)
+			{
+			  /* 
+			     no GRPLCn keyword value found ==> grouping
+			     convention not followed; nothing we can do 
+			     about it, so just continue
+			  */
+			  
+			  sprintf(card,"No GRPLC%d found for GRPID%d",
+				  index,index);
+			  ffpmsg(card);
+			  *status = 0;
+			  continue;
+			}
+		      else if (*status != 0) continue;
+		      
+		      /* construct the URL for the GRPLCn value */
+		      
+		      prepare_keyvalue(grplc);
+		      
+		      /*
+			if the grplc value specifies a relative path then
+			turn it into a absolute file path for comparison
+			purposes
+		      */
+		      
+		      if(*grplc != 0 && !fits_is_url_absolute(grplc) &&
+			 *grplc != '/')
+			{
+			    /* No, wrong, 
+			       strcpy(grpLocation3,cwd);
+			       should be */
+			    *status = fits_file_name(mfptr,grpLocation3,status);
+			    /* Remove everything after the last / */
+			    if (NULL != (editLocation = strrchr(grpLocation3,'/'))) {
+				*editLocation = '\0';
+			    }
+				
+			  strcat(grpLocation3,"/");
+			  strcat(grpLocation3,grplc);
+			  *status = fits_clean_url(grpLocation3,grplc,
+						   status);
+			}
+		      
+		      /*
+			if the absolute value of GRPIDn is equal to the
+			EXTVER value of the grouping table and (one of the 
+			possible two) grouping table file URL matches the
+			GRPLCn keyword value then we hava a match
+		      */
+		      
+		      if(strcmp(grplc,grpLocation1) == 0  || 
+			 strcmp(grplc,grpLocation2) == 0) 
+			found = index; 
+		    }
+		}
+
+	      /*
+		if found == 0 (false) after the above search then we assume 
+		that it is due to an inpromper updating of the GRPIDn and 
+		GRPLCn keywords in the member header ==> nothing to delete 
+		in the header. Else delete the GRPLCn and GRPIDn keywords 
+		that identify the member HDU with the group HDU and 
+		re-enumerate the remaining GRPIDn and GRPLCn keywords
+	      */
+
+	      if(found != 0)
+		{
+		  sprintf(keyword,"GRPID%d",found);
+		  *status = fits_delete_key(mfptr,keyword,status);
+		  
+		  sprintf(keyword,"GRPLC%d",found);
+		  *status = fits_delete_key(mfptr,keyword,status);
+		  
+		  *status = 0;
+		  
+		  /* call fits_get_num_groups() to re-enumerate the GRPIDn */
+		  
+		  *status = fits_get_num_groups(mfptr,&ngroups,status);
+		} 
 	    }
 
 	  /*
@@ -2322,12 +3243,17 @@ int ffgmrm(fitsfile *gfptr,  /* FITS file pointer to group table             */
 
     }while(0);
 
-  if(mfptr != NULL) fits_close_file(mfptr,status);
+  if(mfptr != NULL) 
+    {
+      fits_close_file(mfptr,status);
+    }
 
   return(*status);
 }
 
-/*---------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------
+                 Grouping Table support functions
+  ---------------------------------------------------------------------------*/
 int ffgtgc(fitsfile *gfptr,  /* pointer to the grouping table                */
 	   int *xtensionCol, /* column ID of the MEMBER_XTENSION column      */
 	   int *extnameCol,  /* column ID of the MEMBER_NAME column          */
@@ -2549,7 +3475,8 @@ int ffgtdc(int   grouptype,     /* code specifying the type of
   char  URITform[]  = "3A";
 
   char  location[]  = "MEMBER_LOCATION";
-  char  locTform[]  = "160A";
+  /* SPR 01720, move from 160A to 256A */
+  char  locTform[]  = "256A";
 
 
   if(*status != 0) return(*status);
@@ -2744,13 +3671,15 @@ int ffgmul(fitsfile *mfptr,   /* pointer to the grouping table member HDU    */
 
 {
   int memberPosition = 0;
+  int iomode;
 
   long index        = 0;
   long ngroups      = 0;
   long memberExtver = 0;
   long memberID     = 0;
 
-  char memberFileName[FLEN_FILENAME];
+  char mbrLocation1[FLEN_FILENAME];
+  char mbrLocation2[FLEN_FILENAME];
   char memberHDUtype[FLEN_VALUE];
   char memberExtname[FLEN_VALUE];
   char keyword[FLEN_KEYWORD];
@@ -2797,9 +3726,8 @@ int ffgmul(fitsfile *mfptr,   /* pointer to the grouping table member HDU    */
 
       fits_get_hdu_num(mfptr,&memberPosition);
 
-      *status = fits_file_name(mfptr,memberFileName,status);
-
-      ffgtcn(memberFileName);
+      *status = fits_get_url(mfptr,mbrLocation1,mbrLocation2,NULL,NULL,
+			     NULL,status);
 
       if(*status != 0) continue;
 
@@ -2823,13 +3751,46 @@ int ffgmul(fitsfile *mfptr,   /* pointer to the grouping table member HDU    */
 	  if(*status != 0)
 	    {
 	      *status = 0;
+	      sprintf(card,"Cannot open the %dth group table (ffgmul)",
+		      (int)index);
+	      ffpmsg(card);
 	      continue;
 	    }
 
-	  /* try to find the member's row within the grouping table */
-	      
-	  *status = ffgmf(gfptr,memberHDUtype,memberExtname,memberExtver,
-			   memberPosition,memberFileName,&memberID,status);
+	  /*
+	    make sure the grouping table can be modified before proceeding
+	  */
+	  
+	  fits_file_mode(gfptr,&iomode,status);
+
+	  if(iomode != READWRITE)
+	    {
+	      sprintf(card,"The %dth group cannot be modified (ffgtam)",
+		      (int)index);
+	      ffpmsg(card);
+	      continue;
+	    }
+
+	  /* 
+	     try to find the member's row within the grouping table; first 
+	     try using the member HDU file's "real" URL string then try
+	     using its originally opened URL string if either string exist
+	   */
+	     
+	  memberID = 0;
+ 
+	  if(strlen(mbrLocation1) != 0)
+	    {
+	      *status = ffgmf(gfptr,memberHDUtype,memberExtname,memberExtver,
+			      memberPosition,mbrLocation1,&memberID,status);
+	    }
+
+	  if(*status == MEMBER_NOT_FOUND && strlen(mbrLocation2) != 0)
+	    {
+	      *status = 0;
+	      *status = ffgmf(gfptr,memberHDUtype,memberExtname,memberExtver,
+			      memberPosition,mbrLocation2,&memberID,status);
+	    }
 
 	  /* if the member was found then delete it from the grouping table */
 
@@ -2841,6 +3802,10 @@ int ffgmul(fitsfile *mfptr,   /* pointer to the grouping table member HDU    */
 	     was generated
 	  */
 
+	  if(*status == MEMBER_NOT_FOUND)
+	    {
+	      ffpmsg("cannot locate member's entry in group table (ffgmul)");
+	    }
 	  *status = 0;
 
 	  /*
@@ -2864,6 +3829,14 @@ int ffgmul(fitsfile *mfptr,   /* pointer to the grouping table member HDU    */
 
       if(rmopt != 0)
 	{
+	  fits_file_mode(mfptr,&iomode,status);
+
+	  if(iomode == READONLY)
+	    {
+	      ffpmsg("Cannot modify member HDU, opened READONLY (ffgmul)");
+	      continue;
+	    }
+
 	  /* delete all the GRPIDn/GRPLCn keywords */
 
 	  for(index = 1; index <= ngroups && *status == 0; ++index)
@@ -2881,7 +3854,10 @@ int ffgmul(fitsfile *mfptr,   /* pointer to the grouping table member HDU    */
 
   /* make sure the gfptr has been closed */
 
-  if(gfptr != NULL) fits_close_file(gfptr,status);
+  if(gfptr != NULL)
+    { 
+      fits_close_file(gfptr,status);
+    }
 
 return(*status);
 }
@@ -2919,16 +3895,60 @@ int ffgmf(fitsfile *gfptr, /* pointer to grouping table HDU to search       */
 
   long nmembers = 0;
   long mextver  = 0;
+ 
+  char  charBuff1[FLEN_FILENAME];
+  char  charBuff2[FLEN_FILENAME];
+  char  tmpLocation[FLEN_FILENAME];
+  char  mbrLocation1[FLEN_FILENAME];
+  char  mbrLocation2[FLEN_FILENAME];
+  char  mbrLocation3[FLEN_FILENAME];
+  char  grpLocation1[FLEN_FILENAME];
+  char  grpLocation2[FLEN_FILENAME];
+  char  cwd[FLEN_FILENAME];
 
-  char  charBuff[FLEN_FILENAME];
-  char  nstr[] = {"\0"};
-  char *tmpPtr[1];
+  char  nstr[] = {'\0'};
+  char *tmpPtr[2];
 
   if(*status != 0) return(*status);
 
   *member = 0;
 
-  tmpPtr[0] = charBuff;
+  tmpPtr[0] = charBuff1;
+  tmpPtr[1] = charBuff2;
+
+
+  if(*status != 0) return(*status);
+
+  /*
+    if the passed LOCATION value is not an absolute URL then turn it
+    into an absolute path
+  */
+
+  if(location == NULL)
+    {
+      *tmpLocation = 0;
+    }
+
+  else if(*location == 0)
+    {
+      *tmpLocation = 0;
+    }
+
+  else if(!fits_is_url_absolute(location))
+    {
+      fits_path2url(location,tmpLocation,status);
+
+      if(*tmpLocation != '/')
+	{
+	  fits_get_cwd(cwd,status);
+	  strcat(cwd,"/");
+	  strcat(cwd,tmpLocation);
+	  fits_clean_url(cwd,tmpLocation,status);
+	}
+    }
+
+  else
+    strcpy(tmpLocation,location);
 
   /*
      retrieve the Grouping Convention reserved column positions within
@@ -2946,7 +3966,7 @@ int ffgmf(fitsfile *gfptr, /* pointer to grouping table HDU to search       */
      loop over all grouping table rows until the member HDU is found 
   */
 
-  for(i = 1; i <= nmembers && *status == 0; ++i)
+  for(i = 1; i <= nmembers && *member == 0 && *status == 0; ++i)
     {
       if(xtensionCol != 0)
 	{
@@ -2972,25 +3992,165 @@ int ffgmf(fitsfile *gfptr, /* pointer to grouping table HDU to search       */
       if(positionCol != 0 && 
 	            (grptype == GT_ID_POS || grptype == GT_ID_POS_URI))
 	{
-	  fits_read_col_lng(gfptr,positionCol,i,1,1,0,
-			    (long*)&mposition,&dummy,status);
+	  fits_read_col_int(gfptr,positionCol,i,1,1,0,
+			    &mposition,&dummy,status);
 	  if(position != mposition) continue;
 	}
       
+      /*
+	if no location string was passed to the function then assume that
+	the calling application does not wish to use it as a comparision
+	critera ==> if we got this far then we have a match
+      */
+
+      if(location == NULL)
+	{
+	  ffpmsg("NULL Location string given ==> ingore location (ffgmf)");
+	  *member = i;
+	  continue;
+	}
+
+      /*
+	if the grouping table MEMBER_LOCATION column exists then read the
+	location URL for the member, else set the location string to
+	a zero-length string for subsequent comparisions
+      */
+
       if(locationCol != 0)
 	{
 	  fits_read_col_str(gfptr,locationCol,i,1,1,nstr,tmpPtr,&dummy,status);
-	  
-	  /* if the location value is NULL then use the group table location */
+	  strcpy(mbrLocation1,tmpPtr[0]);
+	  *mbrLocation2 = 0;
+	}
+      else
+	*mbrLocation1 = 0;
 
-	  if(strlen(tmpPtr[0]) == 0)
-	    fits_file_name(gfptr,tmpPtr[0],status);
+      /* 
+	 if the member location string from the grouping table is zero 
+	 length (either implicitly or explicitly) then assume that the 
+	 member HDU is in the same file as the grouping table HDU; retrieve
+	 the possible URL values of the grouping table HDU file 
+       */
 
-	  ffgtcn(tmpPtr[0]);
+      if(*mbrLocation1 == 0)
+	{
+	  /* retrieve the possible URLs of the grouping table file */
+	  *status = fits_get_url(gfptr,mbrLocation1,mbrLocation2,NULL,NULL,
+				 NULL,status);
 
-	  if(strcasecmp(tmpPtr[0],location) != 0) continue;
+	  /* if non-NULL, make sure the first URL is absolute or a full path */
+	  if(*mbrLocation1 != 0 && !fits_is_url_absolute(mbrLocation1) &&
+	     *mbrLocation1 != '/')
+	    {
+	      fits_get_cwd(cwd,status);
+	      strcat(cwd,"/");
+	      strcat(cwd,mbrLocation1);
+	      fits_clean_url(cwd,mbrLocation1,status);
+	    }
+
+	  /* if non-NULL, make sure the first URL is absolute or a full path */
+	  if(*mbrLocation2 != 0 && !fits_is_url_absolute(mbrLocation2) &&
+	     *mbrLocation2 != '/')
+	    {
+	      fits_get_cwd(cwd,status);
+	      strcat(cwd,"/");
+	      strcat(cwd,mbrLocation2);
+	      fits_clean_url(cwd,mbrLocation2,status);
+	    }
 	}
 
+      /*
+	if the member location was specified, then make sure that it is
+	either an absolute URL or specifies a full path
+      */
+
+      else if(!fits_is_url_absolute(mbrLocation1) && *mbrLocation1 != '/')
+	{
+	  strcpy(mbrLocation2,mbrLocation1);
+
+	  /* get the possible URLs for the grouping table file */
+	  *status = fits_get_url(gfptr,grpLocation1,grpLocation2,NULL,NULL,
+				 NULL,status);
+	  
+	  if(*grpLocation1 != 0)
+	    {
+	      /* make sure the first grouping table URL is absolute */
+	      if(!fits_is_url_absolute(grpLocation1) && *grpLocation1 != '/')
+		{
+		  fits_get_cwd(cwd,status);
+		  strcat(cwd,"/");
+		  strcat(cwd,grpLocation1);
+		  fits_clean_url(cwd,grpLocation1,status);
+		}
+	      
+	      /* create an absoute URL for the member */
+
+	      fits_relurl2url(grpLocation1,mbrLocation1,mbrLocation3,status);
+	      
+	      /* 
+		 if URL construction succeeded then copy it to the
+		 first location string; else set the location string to 
+		 empty
+	      */
+
+	      if(*status == 0)
+		{
+		  strcpy(mbrLocation1,mbrLocation3);
+		}
+
+	      else if(*status == URL_PARSE_ERROR)
+		{
+		  *status       = 0;
+		  *mbrLocation1 = 0;
+		}
+	    }
+	  else
+	    *mbrLocation1 = 0;
+
+	  if(*grpLocation2 != 0)
+	    {
+	      /* make sure the second grouping table URL is absolute */
+	      if(!fits_is_url_absolute(grpLocation2) && *grpLocation2 != '/')
+		{
+		  fits_get_cwd(cwd,status);
+		  strcat(cwd,"/");
+		  strcat(cwd,grpLocation2);
+		  fits_clean_url(cwd,grpLocation2,status);
+		}
+	      
+	      /* create an absolute URL for the member */
+
+	      fits_relurl2url(grpLocation2,mbrLocation2,mbrLocation3,status);
+	      
+	      /* 
+		 if URL construction succeeded then copy it to the
+		 second location string; else set the location string to 
+		 empty
+	      */
+
+	      if(*status == 0)
+		{
+		  strcpy(mbrLocation2,mbrLocation3);
+		}
+
+	      else if(*status == URL_PARSE_ERROR)
+		{
+		  *status       = 0;
+		  *mbrLocation2 = 0;
+		}
+	    }
+	  else
+	    *mbrLocation2 = 0;
+	}
+
+      /*
+	compare the passed member HDU file location string with the
+	(possibly two) member location strings to see if there is a match
+       */
+
+      if(strcmp(mbrLocation1,tmpLocation) != 0 && 
+	 strcmp(mbrLocation2,tmpLocation) != 0   ) continue;
+  
       /* if we made it this far then a match to the member HDU was found */
       
       *member = i;
@@ -3007,7 +4167,9 @@ int ffgmf(fitsfile *gfptr, /* pointer to grouping table HDU to search       */
   return(*status);
 }
 
-/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------
+                        Recursive Group Functions
+  --------------------------------------------------------------------------*/
 int ffgtrmr(fitsfile   *gfptr,  /* FITS file pointer to group               */
 	    HDUtracker *HDU,    /* list of processed HDUs                   */
 	    int        *status) /* return status code                       */
@@ -3160,6 +4322,8 @@ int ffgtcpr(fitsfile   *infptr,  /* input FITS file pointer                 */
   char keyword[FLEN_KEYWORD];
   char keyvalue[FLEN_VALUE];
   char card[FLEN_CARD];
+  char comment[FLEN_CARD];
+  char *tkeyvalue;
 
   char *includeList[] = {"*"};
   char *excludeList[] = {"EXTNAME","EXTVER","GRPNAME","GRPID#","GRPLC#",
@@ -3192,75 +4356,6 @@ int ffgtcpr(fitsfile   *infptr,  /* input FITS file pointer                 */
       /* save the new grouping table's HDU position for future use */
 
       fits_get_hdu_num(outfptr,&groupHDUnum);
-
-      /*
-	 copy all auxiliary keyword records from the original grouping table
-	 to the new grouping table; they are copied in their original order
-	 and inserted just before the TTYPE1 keyword record
-      */
-
-      *status = fits_read_card(outfptr,"TTYPE1",card,status);
-      *status = fits_get_hdrpos(outfptr,&numkeys,&keypos,status);
-      --keypos;
-
-      startSearch = 8;
-
-      while(*status == 0)
-	{
-	  ffgrec(infptr,startSearch,card,status);
-
-	  *status = fits_find_nextkey(infptr,includeList,1,excludeList,
-				      nexclude,card,status);
-
-	  *status = fits_get_hdrpos(infptr,&numkeys,&startSearch,status);
-
-	  --startSearch;
-
-	  *status = fits_insert_record(outfptr,keypos,card,status);
-
-	  ++keypos;
-	}
-
-      if(*status == KEY_NO_EXIST) 
-	*status = 0;
-      else if(*status != 0) continue;
-
-      /*
-	 search all the columns of the original grouping table and copy
-	 those to the new grouping table that were not part of the grouping
-	 convention. Note that is legal to have additional columns in a
-	 grouping table. Also note that the order of the columns may
-	 not be the same in the original and copied grouping table.
-      */
-
-      /* retrieve the number of columns in the original and new group tables */
-
-      *status = fits_read_key_lng(infptr,"TFIELDS",&tfields,card,status);
-      *status = fits_read_key_lng(outfptr,"TFIELDS",&newTfields,card,status);
-
-      for(i = 1; i <= tfields; ++i)
-	{
-	  sprintf(keyword,"TTYPE%d",i);
-	  *status = fits_read_key_str(infptr,keyword,keyvalue,card,status);
-	  
-	  if(*status == KEY_NO_EXIST)
-	    {
-	      *status = 0;
-              keyvalue[0] = 0;
-	    }
-	  prepare_keyvalue(keyvalue);
-
-	  if(strcasecmp(keyvalue,"MEMBER_XTENSION") != 0 &&
-	     strcasecmp(keyvalue,"MEMBER_NAME")     != 0 &&
-	     strcasecmp(keyvalue,"MEMBER_VERSION")  != 0 &&
-	     strcasecmp(keyvalue,"MEMBER_POSITION") != 0 &&
-	     strcasecmp(keyvalue,"MEMBER_LOCATION") != 0 &&
-	     strcasecmp(keyvalue,"MEMBER_URI_TYPE") != 0   )
-	    {
-	      *status = fits_copy_col(infptr,outfptr,i,newTfields,1,status);
-	      ++newTfields;
-	    }
-	}
 
       /* update the HDUtracker struct with the grouping table's new position */
       
@@ -3306,6 +4401,8 @@ int ffgtcpr(fitsfile   *infptr,  /* input FITS file pointer                 */
 	      /* open the ith member */
 
 	      *status = fits_open_member(infptr,i,&mfptr,status);
+
+	      if(*status != 0) continue;
 
 	      /* add it to the HDUtracker struct */
 
@@ -3381,6 +4478,8 @@ int ffgtcpr(fitsfile   *infptr,  /* input FITS file pointer                 */
 	  break;
 	}
 
+      if(*status != 0) continue; 
+
       /* 
 	 reposition the outfptr to the grouping table so that the grouping
 	 table is the CHDU upon return to the calling function
@@ -3388,13 +4487,105 @@ int ffgtcpr(fitsfile   *infptr,  /* input FITS file pointer                 */
 
       fits_movabs_hdu(outfptr,groupHDUnum,&hdutype,status);
 
+      /*
+	 copy all auxiliary keyword records from the original grouping table
+	 to the new grouping table; they are copied in their original order
+	 and inserted just before the TTYPE1 keyword record
+      */
+
+      *status = fits_read_card(outfptr,"TTYPE1",card,status);
+      *status = fits_get_hdrpos(outfptr,&numkeys,&keypos,status);
+      --keypos;
+
+      startSearch = 8;
+
+      while(*status == 0)
+	{
+	  ffgrec(infptr,startSearch,card,status);
+
+	  *status = fits_find_nextkey(infptr,includeList,1,excludeList,
+				      nexclude,card,status);
+
+	  *status = fits_get_hdrpos(infptr,&numkeys,&startSearch,status);
+
+	  --startSearch;
+	  /* SPR 1738 */
+	  if (strncmp(card,"GRPLC",5)) {
+	    /* Not going to be a long string so we're ok */
+	    *status = fits_insert_record(outfptr,keypos,card,status);
+	  } else {
+	    /* We could have a long string */
+	    *status = fits_read_record(infptr,startSearch,card,status);
+	    card[9] = '\0';
+	    *status = fits_read_key_longstr(infptr,card,&tkeyvalue,comment,
+					    status);
+	    if (0 == *status) {
+	      fits_insert_key_longstr(outfptr,card,tkeyvalue,comment,status);
+	      fits_write_key_longwarn(outfptr,status);
+	      free(tkeyvalue);
+	    }
+	  }
+	  
+	  ++keypos;
+	}
+      
+	  
+      if(*status == KEY_NO_EXIST) 
+	*status = 0;
+      else if(*status != 0) continue;
+
+      /*
+	 search all the columns of the original grouping table and copy
+	 those to the new grouping table that were not part of the grouping
+	 convention. Note that is legal to have additional columns in a
+	 grouping table. Also note that the order of the columns may
+	 not be the same in the original and copied grouping table.
+      */
+
+      /* retrieve the number of columns in the original and new group tables */
+
+      *status = fits_read_key_lng(infptr,"TFIELDS",&tfields,card,status);
+      *status = fits_read_key_lng(outfptr,"TFIELDS",&newTfields,card,status);
+
+      for(i = 1; i <= tfields; ++i)
+	{
+	  sprintf(keyword,"TTYPE%d",i);
+	  *status = fits_read_key_str(infptr,keyword,keyvalue,card,status);
+	  
+	  if(*status == KEY_NO_EXIST)
+	    {
+	      *status = 0;
+              keyvalue[0] = 0;
+	    }
+	  prepare_keyvalue(keyvalue);
+
+	  if(strcasecmp(keyvalue,"MEMBER_XTENSION") != 0 &&
+	     strcasecmp(keyvalue,"MEMBER_NAME")     != 0 &&
+	     strcasecmp(keyvalue,"MEMBER_VERSION")  != 0 &&
+	     strcasecmp(keyvalue,"MEMBER_POSITION") != 0 &&
+	     strcasecmp(keyvalue,"MEMBER_LOCATION") != 0 &&
+	     strcasecmp(keyvalue,"MEMBER_URI_TYPE") != 0   )
+	    {
+ 
+	      /* SPR 3956, add at the end of the table */
+	      *status = fits_copy_col(infptr,outfptr,i,newTfields+1,1,status);
+	      ++newTfields;
+	    }
+	}
+
     }while(0);
 
-  if(mfptr != NULL) fits_close_file(mfptr,status);
+  if(mfptr != NULL) 
+    {
+      fits_close_file(mfptr,status);
+    }
 
   return(*status);
 }
-/*--------------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------------
+                HDUtracker struct manipulation functions
+  --------------------------------------------------------------------------*/
 int fftsad(fitsfile   *mfptr,       /* pointer to an member HDU             */
 	   HDUtracker *HDU,         /* pointer to an HDU tracker struct     */
 	   int        *newPosition, /* new HDU position of the member HDU   */
@@ -3412,7 +4603,8 @@ int fftsad(fitsfile   *mfptr,       /* pointer to an member HDU             */
   int hdunum;
   int status = 0;
 
-  char filename[FLEN_FILENAME];
+  char filename1[FLEN_FILENAME];
+  char filename2[FLEN_FILENAME];
 
   do
     {
@@ -3422,11 +4614,11 @@ int fftsad(fitsfile   *mfptr,       /* pointer to an member HDU             */
       
       /* retrieve the HDU's file name */
       
-      status = fits_file_name(mfptr,filename,&status);
+      status = fits_file_name(mfptr,filename1,&status);
       
       /* parse the file name and construct the "standard" URL for it */
       
-      ffgtcn(filename);
+      status = ffrtnm(filename1,filename2,&status);
       
       /* 
 	 examine all the existing HDUs in the HDUtracker an see if this HDU
@@ -3434,9 +4626,9 @@ int fftsad(fitsfile   *mfptr,       /* pointer to an member HDU             */
       */
 
       for(i = 0; 
-       i < HDU->nHDU && 
-       !(HDU->position[i] == hdunum && strcmp(HDU->filename[i],filename) == 0);
-       ++i);
+       i < HDU->nHDU &&  !(HDU->position[i] == hdunum 
+			   && strcmp(HDU->filename[i],filename2) == 0);
+	  ++i);
 
       if(i != HDU->nHDU) 
 	{
@@ -3472,8 +4664,8 @@ int fftsad(fitsfile   *mfptr,       /* pointer to an member HDU             */
       HDU->position[i]    = hdunum;
       HDU->newPosition[i] = hdunum;
 
-      strcpy(HDU->filename[i],filename);
-      strcpy(HDU->newFilename[i],filename);
+      strcpy(HDU->filename[i],filename2);
+      strcpy(HDU->newFilename[i],filename2);
  
        ++(HDU->nHDU);
 
@@ -3500,7 +4692,8 @@ int fftsud(fitsfile   *mfptr,       /* pointer to an member HDU             */
   int hdunum;
   int status = 0;
 
-  char filename[FLEN_FILENAME];
+  char filename1[FLEN_FILENAME];
+  char filename2[FLEN_FILENAME];
 
 
   /* retrieve the HDU's position within the FITS file */
@@ -3509,11 +4702,11 @@ int fftsud(fitsfile   *mfptr,       /* pointer to an member HDU             */
   
   /* retrieve the HDU's file name */
   
-  fits_file_name(mfptr,filename,&status);
+  status = fits_file_name(mfptr,filename1,&status);
   
   /* parse the file name and construct the "standard" URL for it */
       
-  ffgtcn(filename);
+  status = ffrtnm(filename1,filename2,&status);
 
   /* 
      examine all the existing HDUs in the HDUtracker an see if this HDU
@@ -3521,7 +4714,7 @@ int fftsud(fitsfile   *mfptr,       /* pointer to an member HDU             */
   */
 
   for(i = 0; i < HDU->nHDU && 
-      !(HDU->position[i] == hdunum && strcmp(HDU->filename[i],filename) == 0);
+      !(HDU->position[i] == hdunum && strcmp(HDU->filename[i],filename2) == 0);
       ++i);
 
   /* if previously registered then change newPosition and newFileName */
@@ -3531,10 +4724,6 @@ int fftsud(fitsfile   *mfptr,       /* pointer to an member HDU             */
       if(newPosition  != 0) HDU->newPosition[i] = newPosition;
       if(newFileName  != NULL) 
 	{
-	  /* create the "standard" URL and store in the newFileName */
-	  
-	  ffgtcn(newFileName);
-      
 	  strcpy(HDU->newFilename[i],newFileName);
 	}
     }
@@ -3545,42 +4734,7 @@ int fftsud(fitsfile   *mfptr,       /* pointer to an member HDU             */
 }
 
 /*---------------------------------------------------------------------------*/
-void ffgtcn(char *filename) /* FITS file name                                */
 
-/*
-  construct a URL from an input FITS file name in place (i.e., in the
-  same character string). This function essentially strips off any information
-  that might be contained after the filename in the name specification
-  for purposes of string comparisions used elsewhere in the grouping table
-  module
-*/
-
-{
-  int status = 0;
-
-  char urltype[FLEN_VALUE]; 
-  char infile[FLEN_FILENAME];
-  char outfile[FLEN_FILENAME];
-  char extspec[FLEN_FILENAME];
-  char rowfilter[FLEN_FILENAME];
-  char binspec[FLEN_FILENAME];
-  char colspec[FLEN_FILENAME];
-
-  /* call fits_parse_input_url() to break the filename into peices */
-
-  fits_parse_input_url(filename,urltype,infile,outfile,extspec,rowfilter,
-		       binspec,colspec,&status);
-
-  /* copy the URL specifier to the filename string */
-
-  strcpy(filename,urltype);
-
-  /* copy the machine ID, file path and file name to the filename string */
-
-  strcat(filename,infile);
-}
-
-/*---------------------------------------------------------------------------*/
 void prepare_keyvalue(char *keyvalue) /* string containing keyword value     */
 
 /*
@@ -3621,5 +4775,1650 @@ void prepare_keyvalue(char *keyvalue) /* string containing keyword value     */
   if(i != length)
     {
       for(i = length; i >= 0 && keyvalue[i] == ' '; --i) keyvalue[i] = '\0';
+    }
+}
+
+/*---------------------------------------------------------------------------
+        Host dependent directory path to/from URL functions
+  --------------------------------------------------------------------------*/
+int fits_path2url(char *inpath,  /* input file path string                  */
+		  char *outpath, /* output file path string                 */
+		  int  *status)
+  /*
+     convert a file path into its Unix-style equivelent for URL 
+     purposes. Note that this process is platform dependent. This
+     function supports Unix, MSDOS/WIN32, VMS and Macintosh platforms. 
+     The plaform dependant code is conditionally compiled depending upon
+     the setting of the appropriate C preprocessor macros.
+   */
+{
+  char buff[FLEN_FILENAME];
+
+#if defined(WINNT) || defined(__WINNT__)
+
+  /*
+    Microsoft Windows NT case. We assume input file paths of the form:
+
+    //disk/path/filename
+
+     All path segments may be null, so that a single file name is the
+     simplist case.
+
+     The leading "//" becomes a single "/" if present. If no "//" is present,
+     then make sure the resulting URL path is relative, i.e., does not
+     begin with a "/". In other words, the only way that an absolute URL
+     file path may be generated is if the drive specification is given.
+  */
+
+  if(*status > 0) return(*status);
+
+  if(inpath[0] == '/')
+    {
+      strcpy(buff,inpath+1);
+    }
+  else
+    {
+      strcpy(buff,inpath);
+    }
+
+#elif defined(MSDOS) || defined(__WIN32__) || defined(WIN32)
+
+  /*
+     MSDOS or Microsoft windows/NT case. The assumed form of the
+     input path is:
+
+     disk:\path\filename
+
+     All path segments may be null, so that a single file name is the
+     simplist case.
+
+     All back-slashes '\' become slashes '/'; if the path starts with a
+     string of the form "X:" then it is replaced with "/X/"
+  */
+
+  int i,j,k;
+  int size;
+  if(*status > 0) return(*status);
+
+  for(i = 0, j = 0, size = strlen(inpath), buff[0] = 0; 
+                                           i < size; j = strlen(buff))
+    {
+      switch(inpath[i])
+	{
+
+	case ':':
+
+	  /*
+	     must be a disk desiginator; add a slash '/' at the start of
+	     outpath to designate that the path is absolute, then change
+	     the colon ':' to a slash '/'
+	   */
+
+	  for(k = j; k >= 0; --k) buff[k+1] = buff[k];
+	  buff[0] = '/';
+	  strcat(buff,"/");
+	  ++i;
+	  
+	  break;
+
+	case '\\':
+
+	  /* just replace the '\' with a '/' IF its not the first character */
+
+	  if(i != 0 && buff[(j == 0 ? 0 : j-1)] != '/')
+	    {
+	      buff[j] = '/';
+	      buff[j+1] = 0;
+	    }
+
+	  ++i;
+
+	  break;
+
+	default:
+
+	  /* copy the character from inpath to buff as is */
+
+	  buff[j]   = inpath[i];
+	  buff[j+1] = 0;
+	  ++i;
+
+	  break;
+	}
+    }
+
+#elif defined(VMS) || defined(vms) || defined(__vms)
+
+  /*
+     VMS case. Assumed format of the input path is:
+
+     node::disk:[path]filename.ext;version
+
+     Any part of the file path may be missing, so that in the simplist
+     case a single file name/extension is given.
+
+     all brackets "[", "]" and dots "." become "/"; dashes "-" become "..", 
+     all single colons ":" become ":/", all double colons "::" become
+     "FILE://"
+   */
+
+  int i,j,k;
+  int done;
+  int size;
+
+  if(*status > 0) return(*status);
+     
+  /* see if inpath contains a directory specification */
+
+  if(strchr(inpath,']') == NULL) 
+    done = 1;
+  else
+    done = 0;
+
+  for(i = 0, j = 0, size = strlen(inpath), buff[0] = 0; 
+                           i < size && j < FLEN_FILENAME - 8; j = strlen(buff))
+    {
+      switch(inpath[i])
+	{
+
+	case ':':
+
+	  /*
+	     must be a logical/symbol separator or (in the case of a double
+	     colon "::") machine node separator
+	   */
+
+	  if(inpath[i+1] == ':')
+	    {
+	      /* insert a "FILE://" at the start of buff ==> machine given */
+
+	      for(k = j; k >= 0; --k) buff[k+7] = buff[k];
+	      strncpy(buff,"FILE://",7);
+	      i += 2;
+	    }
+	  else if(strstr(buff,"FILE://") == NULL)
+	    {
+	      /* insert a "/" at the start of buff ==> absolute path */
+
+	      for(k = j; k >= 0; --k) buff[k+1] = buff[k];
+	      buff[0] = '/';
+	      ++i;
+	    }
+	  else
+	    ++i;
+
+	  /* a colon always ==> path separator */
+
+	  strcat(buff,"/");
+
+	  break;
+  
+	case ']':
+
+	  /* end of directory spec, file name spec begins after this */
+
+	  done = 1;
+
+	  buff[j]   = '/';
+	  buff[j+1] = 0;
+	  ++i;
+
+	  break;
+
+	case '[':
+
+	  /* 
+	     begin directory specification; add a '/' only if the last char 
+	     is not '/' 
+	  */
+
+	  if(i != 0 && buff[(j == 0 ? 0 : j-1)] != '/')
+	    {
+	      buff[j]   = '/';
+	      buff[j+1] = 0;
+	    }
+
+	  ++i;
+
+	  break;
+
+	case '.':
+
+	  /* 
+	     directory segment separator or file name/extension separator;
+	     we decide which by looking at the value of done
+	  */
+
+	  if(!done)
+	    {
+	    /* must be a directory segment separator */
+	      if(inpath[i-1] == '[')
+		{
+		  strcat(buff,"./");
+		  ++j;
+		}
+	      else
+		buff[j] = '/';
+	    }
+	  else
+	    /* must be a filename/extension separator */
+	    buff[j] = '.';
+
+	  buff[j+1] = 0;
+
+	  ++i;
+
+	  break;
+
+	case '-':
+
+	  /* 
+	     a dash is the same as ".." in Unix speak, but lets make sure
+	     that its not part of the file name first!
+	   */
+
+	  if(!done)
+	    /* must be part of the directory path specification */
+	    strcat(buff,"..");
+	  else
+	    {
+	      /* the dash is part of the filename, so just copy it as is */
+	      buff[j] = '-';
+	      buff[j+1] = 0;
+	    }
+
+	  ++i;
+
+	  break;
+
+	default:
+
+	  /* nothing special, just copy the character as is */
+
+	  buff[j]   = inpath[i];
+	  buff[j+1] = 0;
+
+	  ++i;
+
+	  break;
+
+	}
+    }
+
+  if(j > FLEN_FILENAME - 8)
+    {
+      *status = URL_PARSE_ERROR;
+      ffpmsg("resulting path to URL conversion too big (fits_path2url)");
+    }
+
+#elif defined(macintosh)
+
+  /*
+     MacOS case. The assumed form of the input path is:
+
+     disk:path:filename
+
+     It is assumed that all paths are absolute with disk and path specified,
+     unless no colons ":" are supplied with the string ==> a single file name
+     only. All colons ":" become slashes "/", and if one or more colon is 
+     encountered then the path is specified as absolute.
+  */
+
+  int i,j,k;
+  int firstColon;
+  int size;
+
+  if(*status > 0) return(*status);
+
+  for(i = 0, j = 0, firstColon = 1, size = strlen(inpath), buff[0] = 0; 
+                                                   i < size; j = strlen(buff))
+    {
+      switch(inpath[i])
+	{
+
+	case ':':
+
+	  /*
+	     colons imply path separators. If its the first colon encountered
+	     then assume that its the disk designator and add a slash to the
+	     beginning of the buff string
+	   */
+	  
+	  if(firstColon)
+	    {
+	      firstColon = 0;
+
+	      for(k = j; k >= 0; --k) buff[k+1] = buff[k];
+	      buff[0] = '/';
+	    }
+
+	  /* all colons become slashes */
+
+	  strcat(buff,"/");
+
+	  ++i;
+	  
+	  break;
+
+	default:
+
+	  /* copy the character from inpath to buff as is */
+
+	  buff[j]   = inpath[i];
+	  buff[j+1] = 0;
+
+	  ++i;
+
+	  break;
+	}
+    }
+
+#else 
+
+  /*
+     Default Unix case.
+
+     Nothing special to do here except to remove the double or more // and 
+     replace them with single /
+   */
+
+  int ii = 0;
+  int jj = 0;
+
+  if(*status > 0) return(*status);
+
+  while (inpath[ii]) {
+      if (inpath[ii] == '/' && inpath[ii+1] == '/') {
+	  /* do nothing */
+      } else {
+	  buff[jj] = inpath[ii];
+	  jj++;
+      }
+      ii++;
+  }
+  buff[jj] = '\0';
+  /* printf("buff is %s\ninpath is %s\n",buff,inpath); */
+  /* strcpy(buff,inpath); */
+
+#endif
+
+  /*
+    encode all "unsafe" and "reserved" URL characters
+  */
+
+  *status = fits_encode_url(buff,outpath,status);
+
+  return(*status);
+}
+
+/*---------------------------------------------------------------------------*/
+int fits_url2path(char *inpath,  /* input file path string  */
+		  char *outpath, /* output file path string */
+		  int  *status)
+  /*
+     convert a Unix-style URL into a platform dependent directory path. 
+     Note that this process is platform dependent. This
+     function supports Unix, MSDOS/WIN32, VMS and Macintosh platforms. Each
+     platform dependent code segment is conditionally compiled depending 
+     upon the setting of the appropriate C preprocesser macros.
+   */
+{
+  char buff[FLEN_FILENAME];
+  int absolute;
+
+#if defined(MSDOS) || defined(__WIN32__) || defined(WIN32)
+  char *tmpStr;
+#elif defined(VMS) || defined(vms) || defined(__vms)
+  int i;
+  char *tmpStr;
+#elif defined(macintosh)
+  char *tmpStr;
+#endif
+
+  if(*status != 0) return(*status);
+
+  /*
+    make a copy of the inpath so that we can manipulate it
+  */
+
+  strcpy(buff,inpath);
+
+  /*
+    convert any encoded characters to their unencoded values
+  */
+
+  *status = fits_unencode_url(inpath,buff,status);
+
+  /*
+    see if the URL is given as absolute w.r.t. the "local" file system
+  */
+
+  if(buff[0] == '/') 
+    absolute = 1;
+  else
+    absolute = 0;
+
+#if defined(WINNT) || defined(__WINNT__)
+
+  /*
+    Microsoft Windows NT case. We create output paths of the form
+
+    //disk/path/filename
+
+     All path segments but the last may be null, so that a single file name 
+     is the simplist case.     
+  */
+
+  if(absolute)
+    {
+      strcpy(outpath,"/");
+      strcat(outpath,buff);
+    }
+  else
+    {
+      strcpy(outpath,buff);
+    }
+
+#elif defined(MSDOS) || defined(__WIN32__) || defined(WIN32)
+
+  /*
+     MSDOS or Microsoft windows/NT case. The output path will be of the
+     form
+
+     disk:\path\filename
+
+     All path segments but the last may be null, so that a single file name 
+     is the simplist case.
+  */
+
+  /*
+    separate the URL into tokens at each slash '/' and process until
+    all tokens have been examined
+  */
+
+  for(tmpStr = strtok(buff,"/"), outpath[0] = 0;
+                                 tmpStr != NULL; tmpStr = strtok(NULL,"/"))
+    {
+      strcat(outpath,tmpStr);
+
+      /* 
+	 if the absolute flag is set then process the token as a disk 
+	 specification; else just process it as a directory path or filename
+      */
+
+      if(absolute)
+	{
+	  strcat(outpath,":\\");
+	  absolute = 0;
+	}
+      else
+	strcat(outpath,"\\");
+    }
+
+  /* remove the last "\" from the outpath, it does not belong there */
+
+  outpath[strlen(outpath)-1] = 0;
+
+#elif defined(VMS) || defined(vms) || defined(__vms)
+
+  /*
+     VMS case. The output path will be of the form:
+
+     node::disk:[path]filename.ext;version
+
+     Any part of the file path may be missing execpt filename.ext, so that in 
+     the simplist case a single file name/extension is given.
+
+     if the path is specified as relative starting with "./" then the first
+     part of the VMS path is "[.". If the path is relative and does not start
+     with "./" (e.g., "a/b/c") then the VMS path is constructed as
+     "[a.b.c]"
+   */
+     
+  /*
+    separate the URL into tokens at each slash '/' and process until
+    all tokens have been examined
+  */
+
+  for(tmpStr = strtok(buff,"/"), outpath[0] = 0; 
+                                 tmpStr != NULL; tmpStr = strtok(NULL,"/"))
+    {
+
+      if(strcasecmp(tmpStr,"FILE:") == 0)
+	{
+	  /* the next token should contain the DECnet machine name */
+
+	  tmpStr = strtok(NULL,"/");
+	  if(tmpStr == NULL) continue;
+
+	  strcat(outpath,tmpStr);
+	  strcat(outpath,"::");
+
+	  /* set the absolute flag to true for the next token */
+	  absolute = 1;
+	}
+
+      else if(strcmp(tmpStr,"..") == 0)
+	{
+	  /* replace all Unix-like ".." with VMS "-" */
+
+	  if(strlen(outpath) == 0) strcat(outpath,"[");
+	  strcat(outpath,"-.");
+	}
+
+      else if(strcmp(tmpStr,".") == 0 && strlen(outpath) == 0)
+	{
+	  /*
+	    must indicate a relative path specifier
+	  */
+
+	  strcat(outpath,"[.");
+	}
+  
+      else if(strchr(tmpStr,'.') != NULL)
+	{
+	  /* 
+	     must be up to the file name; turn the last "." path separator
+	     into a "]" and then add the file name to the outpath
+	  */
+	  
+	  i = strlen(outpath);
+	  if(i > 0 && outpath[i-1] == '.') outpath[i-1] = ']';
+
+	  strcat(outpath,tmpStr);
+	}
+
+      else
+	{
+	  /*
+	    process the token as a a directory path segement
+	  */
+
+	  if(absolute)
+	    {
+	      /* treat the token as a disk specifier */
+	      absolute = 0;
+	      strcat(outpath,tmpStr);
+	      strcat(outpath,":[");
+	    }
+	  else if(strlen(outpath) == 0)
+	    {
+	      /* treat the token as the first directory path specifier */
+	      strcat(outpath,"[");
+	      strcat(outpath,tmpStr);
+	      strcat(outpath,".");
+	    }
+	  else
+	    {
+	      /* treat the token as an imtermediate path specifier */
+	      strcat(outpath,tmpStr);
+	      strcat(outpath,".");
+	    }
+	}
+    }
+
+#elif defined(macintosh)
+
+  /*
+     MacOS case. The output path will be of the form
+
+     disk:path:filename
+
+     All path segments but the last may be null, so that a single file name 
+     is the simplist case.
+  */
+
+  /*
+    separate the URL into tokens at each slash '/' and process until
+    all tokens have been examined
+  */
+
+  for(tmpStr = strtok(buff,"/"), outpath[0] = 0;
+                                 tmpStr != NULL; tmpStr = strtok(NULL,"/"))
+    {
+      strcat(outpath,tmpStr);
+      strcat(outpath,":");
+    }
+
+  /* remove the last ":" from the outpath, it does not belong there */
+
+  outpath[strlen(outpath)-1] = 0;
+
+#else
+
+  /*
+     Default Unix case.
+
+     Nothing special to do here
+   */
+
+  strcpy(outpath,buff);
+
+#endif
+
+  return(*status);
+}
+
+/****************************************************************************/
+int fits_get_cwd(char *cwd,  /* IO current working directory string */
+		 int  *status)
+  /*
+     retrieve the string containing the current working directory absolute
+     path in Unix-like URL standard notation. It is assumed that the CWD
+     string has a size of at least FLEN_FILENAME.
+
+     Note that this process is platform dependent. This
+     function supports Unix, MSDOS/WIN32, VMS and Macintosh platforms. Each
+     platform dependent code segment is conditionally compiled depending 
+     upon the setting of the appropriate C preprocesser macros.
+   */
+{
+
+  char buff[FLEN_FILENAME];
+
+
+  if(*status != 0) return(*status);
+
+#if defined(macintosh)
+
+  /*
+     MacOS case. Currently unknown !!!!
+  */
+
+  *buff = 0;
+
+#else
+  /*
+    Good old getcwd() seems to work with all other platforms
+  */
+
+  getcwd(buff,FLEN_FILENAME);
+
+#endif
+
+  /*
+    convert the cwd string to a URL standard path string
+  */
+
+  fits_path2url(buff,cwd,status);
+
+  return(*status);
+}
+
+/*---------------------------------------------------------------------------*/
+int  fits_get_url(fitsfile *fptr,       /* I ptr to FITS file to evaluate    */
+		  char     *realURL,    /* O URL of real FITS file           */
+		  char     *startURL,   /* O URL of starting FITS file       */
+		  char     *realAccess, /* O true access method of FITS file */
+		  char     *startAccess,/* O "official" access of FITS file  */
+		  int      *iostate,    /* O can this file be modified?      */
+		  int      *status)
+/*
+  For grouping convention purposes, determine the URL of the FITS file
+  associated with the fitsfile pointer fptr. The true access type (file://,
+  mem://, shmem://, root://), starting "official" access type, and iostate 
+  (0 ==> readonly, 1 ==> readwrite) are also returned.
+
+  It is assumed that the url string has enough room to hold the resulting
+  URL, and the the accessType string has enough room to hold the access type.
+*/
+{
+  int i;
+  int tmpIOstate = 0;
+
+  char infile[FLEN_FILENAME];
+  char outfile[FLEN_FILENAME];
+  char tmpStr1[FLEN_FILENAME];
+  char tmpStr2[FLEN_FILENAME];
+  char tmpStr3[FLEN_FILENAME];
+  char tmpStr4[FLEN_FILENAME];
+  char *tmpPtr;
+
+
+  if(*status != 0) return(*status);
+
+  do
+    {
+      /* 
+	 retrieve the member HDU's file name as opened by ffopen() 
+	 and parse it into its constitutent pieces; get the currently
+	 active driver token too
+       */
+	  
+      *tmpStr1 = *tmpStr2 = *tmpStr3 = *tmpStr4 = 0;
+
+      *status = fits_file_name(fptr,tmpStr1,status);
+
+      *status = ffiurl(tmpStr1,NULL,infile,outfile,NULL,tmpStr2,tmpStr3,
+		       tmpStr4,status);
+
+      if((*tmpStr2) || (*tmpStr3) || (*tmpStr4)) tmpIOstate = -1;
+ 
+      *status = ffurlt(fptr,tmpStr3,status);
+
+      strcpy(tmpStr4,tmpStr3);
+
+      *status = ffrtnm(tmpStr1,tmpStr2,status);
+      strcpy(tmpStr1,tmpStr2);
+
+      /*
+	for grouping convention purposes (only) determine the URL of the
+	actual FITS file being used for the given fptr, its true access 
+	type (file://, mem://, shmem://, root://) and its iostate (0 ==>
+	read only, 1 ==> readwrite)
+      */
+
+      /*
+	The first set of access types are "simple" in that they do not
+	use any redirection to temporary memory or outfiles
+       */
+
+      /* standard disk file driver is in use */
+      
+      if(strcasecmp(tmpStr3,"file://")              == 0)         
+	{
+	  tmpIOstate = 1;
+	  
+	  if(strlen(outfile)) strcpy(tmpStr1,outfile);
+	  else *tmpStr2 = 0;
+
+	  /*
+	    make sure no FILE:// specifier is given in the tmpStr1
+	    or tmpStr2 strings; the convention calls for local files
+	    to have no access specification
+	  */
+
+	  if((tmpPtr = strstr(tmpStr1,"://")) != NULL)
+	    {
+	      strcpy(infile,tmpPtr+3);
+	      strcpy(tmpStr1,infile);
+	    }
+
+	  if((tmpPtr = strstr(tmpStr2,"://")) != NULL)
+	    {
+	      strcpy(infile,tmpPtr+3);
+	      strcpy(tmpStr2,infile);
+	    }
+	}
+
+      /* file stored in conventional memory */
+	  
+      else if(strcasecmp(tmpStr3,"mem://")          == 0)          
+	{
+	  if(tmpIOstate < 0)
+	    {
+	      /* file is a temp mem file only */
+	      ffpmsg("cannot make URL from temp MEM:// file (fits_get_url)");
+	      *status = URL_PARSE_ERROR;
+	    }
+	  else
+	    {
+	      /* file is a "perminate" mem file for this process */
+	      tmpIOstate = 1;
+	      *tmpStr2 = 0;
+	    }
+	}
+
+      /* file stored in conventional memory */
+ 
+     else if(strcasecmp(tmpStr3,"memkeep://")      == 0)      
+	{
+	  strcpy(tmpStr3,"mem://");
+	  *tmpStr4 = 0;
+	  *tmpStr2 = 0;
+	  tmpIOstate = 1;
+	}
+
+      /* file residing in shared memory */
+
+      else if(strcasecmp(tmpStr3,"shmem://")        == 0)        
+	{
+	  *tmpStr4   = 0;
+	  *tmpStr2   = 0;
+	  tmpIOstate = 1;
+	}
+      
+      /* file accessed via the ROOT network protocol */
+
+      else if(strcasecmp(tmpStr3,"root://")         == 0)         
+	{
+	  *tmpStr4   = 0;
+	  *tmpStr2   = 0;
+	  tmpIOstate = 1;
+	}
+  
+      /*
+	the next set of access types redirect the contents of the original
+	file to an special outfile because the original could not be
+	directly modified (i.e., resides on the network, was compressed).
+	In these cases the URL string takes on the value of the OUTFILE,
+	the access type becomes file://, and the iostate is set to 1 (can
+	read/write to the file).
+      */
+
+      /* compressed file uncompressed and written to disk */
+
+      else if(strcasecmp(tmpStr3,"compressfile://") == 0) 
+	{
+	  strcpy(tmpStr1,outfile);
+	  strcpy(tmpStr2,infile);
+	  strcpy(tmpStr3,"file://");
+	  strcpy(tmpStr4,"file://");
+	  tmpIOstate = 1;
+	}
+
+      /* HTTP accessed file written locally to disk */
+
+      else if(strcasecmp(tmpStr3,"httpfile://")     == 0)     
+	{
+	  strcpy(tmpStr1,outfile);
+	  strcpy(tmpStr3,"file://");
+	  strcpy(tmpStr4,"http://");
+	  tmpIOstate = 1;
+	}
+      
+      /* FTP accessd file written locally to disk */
+
+      else if(strcasecmp(tmpStr3,"ftpfile://")      == 0)      
+	{
+	  strcpy(tmpStr1,outfile);
+	  strcpy(tmpStr3,"file://");
+	  strcpy(tmpStr4,"ftp://");
+	  tmpIOstate = 1;
+	}
+      
+      /* file from STDIN written to disk */
+
+      else if(strcasecmp(tmpStr3,"stdinfile://")    == 0)    
+	{
+	  strcpy(tmpStr1,outfile);
+	  strcpy(tmpStr3,"file://");
+	  strcpy(tmpStr4,"stdin://");
+	  tmpIOstate = 1;
+	}
+
+      /* 
+	 the following access types use memory resident files as temporary
+	 storage; they cannot be modified or be made group members for 
+	 grouping conventions purposes, but their original files can be.
+	 Thus, their tmpStr3s are reset to mem://, their iostate
+	 values are set to 0 (for no-modification), and their URL string
+	 values remain set to their original values
+       */
+
+      /* compressed disk file uncompressed into memory */
+
+      else if(strcasecmp(tmpStr3,"compress://")     == 0)     
+	{
+	  *tmpStr1 = 0;
+	  strcpy(tmpStr2,infile);
+	  strcpy(tmpStr3,"mem://");
+	  strcpy(tmpStr4,"file://");
+	  tmpIOstate = 0;
+	}
+      
+      /* HTTP accessed file transferred into memory */
+
+      else if(strcasecmp(tmpStr3,"http://")         == 0)         
+	{
+	  *tmpStr1 = 0;
+	  strcpy(tmpStr3,"mem://");
+	  strcpy(tmpStr4,"http://");
+	  tmpIOstate = 0;
+	}
+      
+      /* HTTP accessed compressed file transferred into memory */
+
+      else if(strcasecmp(tmpStr3,"httpcompress://") == 0) 
+	{
+	  *tmpStr1 = 0;
+	  strcpy(tmpStr3,"mem://");
+	  strcpy(tmpStr4,"http://");
+	  tmpIOstate = 0;
+	}
+      
+      /* FTP accessed file transferred into memory */
+      
+      else if(strcasecmp(tmpStr3,"ftp://")          == 0)          
+	{
+	  *tmpStr1 = 0;
+	  strcpy(tmpStr3,"mem://");
+	  strcpy(tmpStr4,"ftp://");
+	  tmpIOstate = 0;
+	}
+      
+      /* FTP accessed compressed file transferred into memory */
+
+      else if(strcasecmp(tmpStr3,"ftpcompress://")  == 0)  
+	{
+	  *tmpStr1 = 0;
+	  strcpy(tmpStr3,"mem://");
+	  strcpy(tmpStr4,"ftp://");
+	  tmpIOstate = 0;
+	}	
+      
+      /*
+	The last set of access types cannot be used to make a meaningful URL 
+	strings from; thus an error is generated
+       */
+
+      else if(strcasecmp(tmpStr3,"stdin://")        == 0)        
+	{
+	  *status = URL_PARSE_ERROR;
+	  ffpmsg("cannot make vaild URL from stdin:// (fits_get_url)");
+	  *tmpStr1 = *tmpStr2 = 0;
+	}
+
+      else if(strcasecmp(tmpStr3,"stdout://")       == 0)       
+	{
+	  *status = URL_PARSE_ERROR;
+	  ffpmsg("cannot make vaild URL from stdout:// (fits_get_url)");
+	  *tmpStr1 = *tmpStr2 = 0;
+	}
+
+      else if(strcasecmp(tmpStr3,"irafmem://")      == 0)      
+	{
+	  *status = URL_PARSE_ERROR;
+	  ffpmsg("cannot make vaild URL from irafmem:// (fits_get_url)");
+	  *tmpStr1 = *tmpStr2 = 0;
+	}
+
+      if(*status != 0) continue;
+
+      /*
+	 assign values to the calling parameters if they are non-NULL
+      */
+
+      if(realURL != NULL)
+	{
+	  if(strlen(tmpStr1) == 0)
+	    *realURL = 0;
+	  else
+	    {
+	      if((tmpPtr = strstr(tmpStr1,"://")) != NULL)
+		{
+		  tmpPtr += 3;
+		  i = (long)tmpPtr - (long)tmpStr1;
+		  strncpy(realURL,tmpStr1,i);
+		}
+	      else
+		{
+		  tmpPtr = tmpStr1;
+		  i = 0;
+		}
+
+	      *status = fits_path2url(tmpPtr,realURL+i,status);
+	    }
+	}
+
+      if(startURL != NULL)
+	{
+	  if(strlen(tmpStr2) == 0)
+	    *startURL = 0;
+	  else
+	    {
+	      if((tmpPtr = strstr(tmpStr2,"://")) != NULL)
+		{
+		  tmpPtr += 3;
+		  i = (long)tmpPtr - (long)tmpStr2;
+		  strncpy(startURL,tmpStr2,i);
+		}
+	      else
+		{
+		  tmpPtr = tmpStr2;
+		  i = 0;
+		}
+
+	      *status = fits_path2url(tmpPtr,startURL+i,status);
+	    }
+	}
+
+      if(realAccess  != NULL)  strcpy(realAccess,tmpStr3);
+      if(startAccess != NULL)  strcpy(startAccess,tmpStr4);
+      if(iostate     != NULL) *iostate = tmpIOstate;
+
+    }while(0);
+
+  return(*status);
+}
+
+/*--------------------------------------------------------------------------
+                           URL parse support functions
+  --------------------------------------------------------------------------*/
+
+/* simple push/pop/shift/unshift string stack for use by fits_clean_url */
+typedef char* grp_stack_data; /* type of data held by grp_stack */
+
+typedef struct grp_stack_item_struct {
+  grp_stack_data data; /* value of this stack item */
+  struct grp_stack_item_struct* next; /* next stack item */
+  struct grp_stack_item_struct* prev; /* previous stack item */
+} grp_stack_item;
+
+typedef struct grp_stack_struct {
+  size_t stack_size; /* number of items on stack */
+  grp_stack_item* top; /* top item */
+} grp_stack;
+
+static char* grp_stack_default = NULL; /* initial value for new instances
+                                          of grp_stack_data */
+
+/* the following functions implement the group string stack grp_stack */
+static void delete_grp_stack(grp_stack** mystack);
+static grp_stack_item* grp_stack_append(
+  grp_stack_item* last, grp_stack_data data
+);
+static grp_stack_data grp_stack_remove(grp_stack_item* last);
+static grp_stack* new_grp_stack(void);
+static grp_stack_data pop_grp_stack(grp_stack* mystack);
+static void push_grp_stack(grp_stack* mystack, grp_stack_data data);
+static grp_stack_data shift_grp_stack(grp_stack* mystack);
+/* static void unshift_grp_stack(grp_stack* mystack, grp_stack_data data); */
+
+int fits_clean_url(char *inURL,  /* I input URL string                      */
+		   char *outURL, /* O output URL string                     */
+		   int  *status)
+/*
+  clean the URL by eliminating any ".." or "." specifiers in the inURL
+  string, and write the output to the outURL string.
+
+  Note that this function must have a valid Unix-style URL as input; platform
+  dependent path strings are not allowed.
+ */
+{
+  grp_stack* mystack; /* stack to hold pieces of URL */
+  char* tmp;
+
+  if(*status) return *status;
+
+  mystack = new_grp_stack();
+  *outURL = 0;
+
+  do {
+    /* handle URL scheme and domain if they exist */
+    tmp = strstr(inURL, "://");
+    if(tmp) {
+      /* there is a URL scheme, so look for the end of the domain too */
+      tmp = strchr(tmp + 3, '/');
+      if(tmp) {
+        /* tmp is now the end of the domain, so
+         * copy URL scheme and domain as is, and terminate by hand */
+        size_t string_size = (size_t) (tmp - inURL);
+        strncpy(outURL, inURL, string_size);
+        outURL[string_size] = 0;
+
+        /* now advance the input pointer to just after the domain and go on */
+        inURL = tmp;
+      } else {
+        /* '/' was not found, which means there are no path-like
+         * portions, so copy whole inURL to outURL and we're done */
+        strcpy(outURL, inURL);
+        continue; /* while(0) */
+      }
+    }
+
+    /* explicitly copy a leading / (absolute path) */
+    if('/' == *inURL) strcat(outURL, "/");
+
+    /* now clean the remainder of the inURL. push URL segments onto
+     * stack, dealing with .. and . as we go */
+    tmp = strtok(inURL, "/"); /* finds first / */
+    while(tmp) {
+      if(!strcmp(tmp, "..")) {
+        /* discard previous URL segment, if there was one. if not,
+         * add the .. to the stack if this is *not* an absolute path
+         * (for absolute paths, leading .. has no effect, so skip it) */
+        if(0 < mystack->stack_size) pop_grp_stack(mystack);
+        else if('/' != *inURL) push_grp_stack(mystack, tmp);
+      } else {
+        /* always just skip ., but otherwise add segment to stack */
+        if(strcmp(tmp, ".")) push_grp_stack(mystack, tmp);
+      }
+      tmp = strtok(NULL, "/"); /* get the next segment */
+    }
+
+    /* stack now has pieces of cleaned URL, so just catenate them
+     * onto output string until stack is empty */
+    while(0 < mystack->stack_size) {
+      tmp = shift_grp_stack(mystack);
+      strcat(outURL, tmp);
+      strcat(outURL, "/");
+    }
+    outURL[strlen(outURL) - 1] = 0; /* blank out trailing / */
+  } while(0);
+  delete_grp_stack(&mystack);
+  return *status;
+}
+
+/* free all stack contents using pop_grp_stack before freeing the
+ * grp_stack itself */
+static void delete_grp_stack(grp_stack** mystack) {
+  if(!mystack || !*mystack) return;
+  while((*mystack)->stack_size) pop_grp_stack(*mystack);
+  free(*mystack);
+  *mystack = NULL;
+}
+
+/* append an item to the stack, handling the special case of the first
+ * item appended */
+static grp_stack_item* grp_stack_append(
+  grp_stack_item* last, grp_stack_data data
+) {
+  /* first create a new stack item, and copy data to it */
+  grp_stack_item* new_item = (grp_stack_item*) malloc(sizeof(grp_stack_item));
+  new_item->data = data;
+  if(last) {
+    /* attach this item between the "last" item and its "next" item */
+    new_item->next = last->next;
+    new_item->prev = last;
+    last->next->prev = new_item;
+    last->next = new_item;
+  } else {
+    /* stack is empty, so "next" and "previous" both point back to it */
+    new_item->next = new_item;
+    new_item->prev = new_item;
+  }
+  return new_item;
+}
+
+/* remove an item from the stack, handling the special case of the last
+ * item removed */
+static grp_stack_data grp_stack_remove(grp_stack_item* last) {
+  grp_stack_data retval = last->data;
+  last->prev->next = last->next;
+  last->next->prev = last->prev;
+  free(last);
+  return retval;
+}
+
+/* create new stack dynamically, and give it valid initial values */
+static grp_stack* new_grp_stack(void) {
+  grp_stack* retval = (grp_stack*) malloc(sizeof(grp_stack));
+  if(retval) {
+    retval->stack_size = 0;
+    retval->top = NULL;
+  }
+  return retval;
+}
+
+/* return the value at the top of the stack and remove it, updating
+ * stack_size. top->prev becomes the new "top" */
+static grp_stack_data pop_grp_stack(grp_stack* mystack) {
+  grp_stack_data retval = grp_stack_default;
+  if(mystack && mystack->top) {
+    grp_stack_item* newtop = mystack->top->prev;
+    retval = grp_stack_remove(mystack->top);
+    mystack->top = newtop;
+    if(0 == --mystack->stack_size) mystack->top = NULL;
+  }
+  return retval;
+}
+
+/* add to the stack after the top element. the added element becomes
+ * the new "top" */
+static void push_grp_stack(grp_stack* mystack, grp_stack_data data) {
+  if(!mystack) return;
+  mystack->top = grp_stack_append(mystack->top, data);
+  ++mystack->stack_size;
+  return;
+}
+
+/* return the value at the bottom of the stack and remove it, updating
+ * stack_size. "top" pointer is unaffected */
+static grp_stack_data shift_grp_stack(grp_stack* mystack) {
+  grp_stack_data retval = grp_stack_default;
+  if(mystack && mystack->top) {
+    retval = grp_stack_remove(mystack->top->next); /* top->next == bottom */
+    if(0 == --mystack->stack_size) mystack->top = NULL;
+  }
+  return retval;
+}
+
+/* add to the stack after the top element. "top" is unaffected, except
+ * in the special case of an initially empty stack */
+/* static void unshift_grp_stack(grp_stack* mystack, grp_stack_data data) {
+   if(!mystack) return;
+   if(mystack->top) grp_stack_append(mystack->top, data);
+   else mystack->top = grp_stack_append(NULL, data);
+   ++mystack->stack_size;
+   return;
+   } */
+
+/*--------------------------------------------------------------------------*/
+int fits_url2relurl(char     *refURL, /* I reference URL string             */
+		    char     *absURL, /* I absoulute URL string to process  */
+		    char     *relURL, /* O resulting relative URL string    */
+		    int      *status)
+/*
+  create a relative URL to the file referenced by absURL with respect to the
+  reference URL refURL. The relative URL is returned in relURL.
+
+  Both refURL and absURL must be absolute URL strings; i.e. either begin
+  with an access method specification "XXX://" or with a '/' character
+  signifiying that they are absolute file paths.
+
+  Note that it is possible to make a relative URL from two input URLs
+  (absURL and refURL) that are not compatable. This function does not
+  check to see if the resulting relative URL makes any sence. For instance,
+  it is impossible to make a relative URL from the following two inputs:
+
+  absURL = ftp://a.b.c.com/x/y/z/foo.fits
+  refURL = /a/b/c/ttt.fits
+
+  The resulting relURL will be:
+
+  ../../../ftp://a.b.c.com/x/y/z/foo.fits 
+
+  Which is syntically correct but meaningless. The problem is that a file
+  with an access method of ftp:// cannot be expressed a a relative URL to
+  a local disk file.
+*/
+
+{
+  int i,j;
+  int refcount,abscount;
+  int refsize,abssize;
+  int done;
+
+
+  if(*status != 0) return(*status);
+
+  do
+    {
+      /*
+	refURL and absURL must be absolute to process
+      */
+
+      if(!(fits_is_url_absolute(refURL) || *refURL == '/') ||
+	 !(fits_is_url_absolute(absURL) || *absURL == '/'))
+	{
+	  *status = URL_PARSE_ERROR;
+	  ffpmsg("Cannot make rel. URL from non abs. URLs (fits_url2relurl)");
+	  continue;
+	}
+
+      /* determine the size of the refURL and absURL strings */
+
+      refsize = strlen(refURL);
+      abssize = strlen(absURL);
+
+      /* process the two URL strings and build the relative URL between them */
+		
+
+      for(done = 0, refcount = 0, abscount = 0; 
+	  !done && refcount < refsize && abscount < abssize; 
+	  ++refcount, ++abscount)
+	{
+	  for(; abscount < abssize && absURL[abscount] == '/'; ++abscount);
+	  for(; refcount < refsize && refURL[refcount] == '/'; ++refcount);
+
+	  /* find the next path segment in absURL */ 
+	  for(i = abscount; absURL[i] != '/' && i < abssize; ++i);
+	  
+	  /* find the next path segment in refURL */
+	  for(j = refcount; refURL[j] != '/' && j < refsize; ++j);
+	  
+	  /* do the two path segments match? */
+	  if(i == j && 
+	     strncmp(absURL+abscount, refURL+refcount,i-refcount) == 0)
+	    {
+	      /* they match, so ignore them and continue */
+	      abscount = i; refcount = j;
+	      continue;
+	    }
+	  
+	  /* we found a difference in the paths in refURL and absURL */
+
+	  /* initialize the relative URL string */
+	  relURL[0] = 0;
+
+	  /* 
+	     for every path segment remaining in the refURL string, append
+	     a "../" path segment to the relataive URL relURL
+	  */
+
+	  for(j = refcount; j < refsize; ++j)
+	    if(refURL[j] == '/') strcat(relURL,"../");
+	  
+	  /* copy all remaining characters of absURL to the output relURL */
+
+	  strcat(relURL,absURL+abscount);
+	  
+	  /* we are done building the relative URL */
+	  done = 1;
+	}
+
+    }while(0);
+
+  return(*status);
+}
+/*--------------------------------------------------------------------------*/
+int fits_relurl2url(char     *refURL, /* I reference URL string             */
+		    char     *relURL, /* I relative URL string to process   */
+		    char     *absURL, /* O absolute URL string              */
+		    int      *status)
+/*
+  create an absolute URL from a relative url and a reference URL. The 
+  reference URL is given by the FITS file pointed to by fptr.
+
+  The construction of the absolute URL from the partial and reference URl
+  is performed using the rules set forth in:
+ 
+  http://www.w3.org/Addressing/URL/URL_TOC.html
+  and
+  http://www.w3.org/Addressing/URL/4_3_Partial.html
+
+  Note that the relative URL string relURL must conform to the Unix-like
+  URL syntax; host dependent partial URL strings are not allowed.
+*/
+{
+  int i;
+
+  char tmpStr[FLEN_FILENAME];
+
+  char *tmpStr1, *tmpStr2;
+
+
+  if(*status != 0) return(*status);
+  
+  do
+    {
+
+      /*
+	make a copy of the reference URL string refURL for parsing purposes
+      */
+
+      strcpy(tmpStr,refURL);
+
+      /*
+	if the reference file has an access method of mem:// or shmem://
+	then we cannot use it as the basis of an absolute URL construction
+	for a partial URL
+      */
+	  
+      if(strncasecmp(tmpStr,"MEM:",4)   == 0 ||
+                	                strncasecmp(tmpStr,"SHMEM:",6) == 0)
+	{
+	  ffpmsg("ref URL has access mem:// or shmem:// (fits_relurl2url)");
+	  ffpmsg("   cannot construct full URL from a partial URL and ");
+	  ffpmsg("   MEM/SHMEM base URL");
+	  *status = URL_PARSE_ERROR;
+	  continue;
+	}
+
+      if(relURL[0] != '/')
+	{
+	  /*
+	    just append the relative URL string to the reference URL
+	    string (minus the reference URL file name) to form the 
+	    absolute URL string
+	  */
+	      
+	  tmpStr1 = strrchr(tmpStr,'/');
+	  
+	  if(tmpStr1 != NULL) tmpStr1[1] = 0;
+	  else                tmpStr[0]  = 0;
+	  
+	  strcat(tmpStr,relURL);
+	}
+      else
+	{
+	  /*
+	    have to parse the refURL string for the first occurnace of the 
+	    same number of '/' characters as contained in the beginning of
+	    location that is not followed by a greater number of consective 
+	    '/' charaters (yes, that is a confusing statement); this is the 
+	    location in the refURL string where the relURL string is to
+	    be appended to form the new absolute URL string
+	   */
+	  
+	  /*
+	    first, build up a slash pattern string that has one more
+	    slash in it than the starting slash pattern of the
+	    relURL string
+	  */
+	  
+	  strcpy(absURL,"/");
+	  
+	  for(i = 0; relURL[i] == '/'; ++i) strcat(absURL,"/");
+	  
+	  /*
+	    loop over the refURL string until the slash pattern stored
+	    in absURL is no longer found
+	  */
+
+	  for(tmpStr1 = tmpStr, i = strlen(absURL); 
+	      (tmpStr2 = strstr(tmpStr1,absURL)) != NULL;
+	      tmpStr1 = tmpStr2 + i);
+	  
+	  /* reduce the slash pattern string by one slash */
+	  
+	  absURL[i-1] = 0;
+	  
+	  /* 
+	     search for the slash pattern in the remaining portion
+	     of the refURL string
+	  */
+
+	  tmpStr2 = strstr(tmpStr1,absURL);
+	  
+	  /* if no slash pattern match was found */
+	  
+	  if(tmpStr2 == NULL)
+	    {
+	      /* just strip off the file name from the refURL  */
+	      
+	      tmpStr2 = strrchr(tmpStr1,'/');
+	      
+	      if(tmpStr2 != NULL) tmpStr2[0] = 0;
+	      else                tmpStr[0]  = 0;
+	    }
+	  else
+	    {
+	      /* set a string terminator at the slash pattern match */
+	      
+	      *tmpStr2 = 0;
+	    }
+	  
+	  /* 
+	    conatenate the relURL string to the refURL string to form
+	    the absURL
+	   */
+
+	  strcat(tmpStr,relURL);
+	}
+
+      /*
+	normalize the absURL by removing any ".." or "." specifiers
+	in the string
+      */
+
+      *status = fits_clean_url(tmpStr,absURL,status);
+
+    }while(0);
+
+  return(*status);
+}
+/*--------------------------------------------------------------------------*/
+int fits_encode_url(char *inpath,  /* I URL  to be encoded                  */ 
+		    char *outpath, /* O output encoded URL                  */
+		    int *status)
+     /*
+       encode all URL "unsafe" and "reserved" characters using the "%XX"
+       convention, where XX stand for the two hexidecimal digits of the
+       encode character's ASCII code.
+
+       Note that the output path is at least as large as, if not larger than
+       the input path, so that OUTPATH should be passed to this function
+       with room for growth. If not a runtime error could result. It is
+       assumed that OUTPATH has been allocated with enough room to hold
+       the resulting encoded URL.
+
+       This function was adopted from code in the libwww.a library available
+       via the W3 consortium <URL: http://www.w3.org>
+     */
+{
+  unsigned char a;
+  
+  char *p;
+  char *q;
+  char *hex = "0123456789ABCDEF";
+  
+unsigned const char isAcceptable[96] =
+{/* 0x0 0x1 0x2 0x3 0x4 0x5 0x6 0x7 0x8 0x9 0xA 0xB 0xC 0xD 0xE 0xF */
+  
+    0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xF,0xE,0x0,0xF,0xF,0xC, 
+                                           /* 2x  !"#$%&'()*+,-./   */
+    0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0x8,0x0,0x0,0x0,0x0,0x0,
+                                           /* 3x 0123456789:;<=>?   */
+    0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF, 
+                                           /* 4x @ABCDEFGHIJKLMNO   */
+    0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0x0,0x0,0x0,0x0,0xF,
+                                           /* 5X PQRSTUVWXYZ[\]^_   */
+    0x0,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,
+                                           /* 6x `abcdefghijklmno   */
+    0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0x0,0x0,0x0,0x0,0x0  
+                                           /* 7X pqrstuvwxyz{\}~DEL */
+};
+
+  if(*status != 0) return(*status);
+  
+  /* loop over all characters in inpath until '\0' is encountered */
+
+  for(q = outpath, p = inpath; *p; p++)
+    {
+      a = (unsigned char)*p;
+
+      /* if the charcter requires encoding then process it */
+
+      if(!( a>=32 && a<128 && (isAcceptable[a-32])))
+	{
+	  /* add a '%' character to the outpath */
+	  *q++ = HEX_ESCAPE;
+	  /* add the most significant ASCII code hex value */
+	  *q++ = hex[a >> 4];
+	  /* add the least significant ASCII code hex value */
+	  *q++ = hex[a & 15];
+	}
+      /* else just copy the character as is */
+      else *q++ = *p;
+    }
+
+  /* null terminate the outpath string */
+
+  *q++ = 0; 
+  
+  return(*status);
+}
+
+/*---------------------------------------------------------------------------*/
+int fits_unencode_url(char *inpath,  /* I input URL with encoding            */
+		      char *outpath, /* O unencoded URL                      */
+		      int  *status)
+     /*
+       unencode all URL "unsafe" and "reserved" characters to their actual
+       ASCII representation. All tokens of the form "%XX" where XX is the
+       hexidecimal code for an ASCII character, are searched for and
+       translated into the actuall ASCII character (so three chars become
+       1 char).
+
+       It is assumed that OUTPATH has enough room to hold the unencoded
+       URL.
+
+       This function was adopted from code in the libwww.a library available
+       via the W3 consortium <URL: http://www.w3.org>
+     */
+
+{
+    char *p;
+    char *q;
+    char  c;
+
+    if(*status != 0) return(*status);
+
+    p = inpath;
+    q = outpath;
+
+    /* 
+       loop over all characters in the inpath looking for the '%' escape
+       character; if found the process the escape sequence
+    */
+
+    while(*p != 0) 
+      {
+	/* 
+	   if the character is '%' then unencode the sequence, else
+	   just copy the character from inpath to outpath
+        */
+
+        if (*p == HEX_ESCAPE)
+	  {
+            if((c = *(++p)) != 0)
+	      { 
+		*q = (
+		      (c >= '0' && c <= '9') ?
+		      (c - '0') : ((c >= 'A' && c <= 'F') ?
+				   (c - 'A' + 10) : (c - 'a' + 10))
+		      )*16;
+
+		if((c = *(++p)) != 0)
+		  {
+		    *q = *q + (
+			       (c >= '0' && c <= '9') ? 
+		               (c - '0') : ((c >= 'A' && c <= 'F') ? 
+					    (c - 'A' + 10) : (c - 'a' + 10))
+			       );
+		    p++, q++;
+		  }
+	      }
+	  } 
+	else
+	  *q++ = *p++; 
+      }
+ 
+    /* terminate the outpath */
+    *q = 0;
+
+    return(*status);   
+}
+/*---------------------------------------------------------------------------*/
+
+int fits_is_url_absolute(char *url)
+/*
+  Return a True (1) or False (0) value indicating whether or not the passed
+  URL string contains an access method specifier or not. Note that this is
+  a boolean function and it neither reads nor returns the standard error
+  status parameter
+*/
+{
+  char *tmpStr1, *tmpStr2;
+
+  char reserved[] = {':',';','/','?','@','&','=','+','$',','};
+
+  /*
+    The rule for determing if an URL is relative or absolute is that it (1)
+    must have a colon ":" and (2) that the colon must appear before any other
+    reserved URL character in the URL string. We first see if a colon exists,
+    get its position in the string, and then check to see if any of the other
+    reserved characters exists and if their position in the string is greater
+    than that of the colons. 
+   */
+
+  if( (tmpStr1 = strchr(url,reserved[0])) != NULL                       &&
+     ((tmpStr2 = strchr(url,reserved[1])) == NULL || tmpStr2 > tmpStr1) &&
+     ((tmpStr2 = strchr(url,reserved[2])) == NULL || tmpStr2 > tmpStr1) &&
+     ((tmpStr2 = strchr(url,reserved[3])) == NULL || tmpStr2 > tmpStr1) &&
+     ((tmpStr2 = strchr(url,reserved[4])) == NULL || tmpStr2 > tmpStr1) &&
+     ((tmpStr2 = strchr(url,reserved[5])) == NULL || tmpStr2 > tmpStr1) &&
+     ((tmpStr2 = strchr(url,reserved[6])) == NULL || tmpStr2 > tmpStr1) &&
+     ((tmpStr2 = strchr(url,reserved[7])) == NULL || tmpStr2 > tmpStr1) &&
+     ((tmpStr2 = strchr(url,reserved[8])) == NULL || tmpStr2 > tmpStr1) &&
+     ((tmpStr2 = strchr(url,reserved[9])) == NULL || tmpStr2 > tmpStr1)   )
+    {
+      return(1);
+    }
+  else
+    {
+      return(0);
     }
 }

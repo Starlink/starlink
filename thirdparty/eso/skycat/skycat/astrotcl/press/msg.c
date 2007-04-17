@@ -227,6 +227,9 @@ void	msg_format(char	*buffer,
 		   int	status,
 		   ...) /* XXX allan: 12.11.03: changed from vararg to stdarg */
 {
+    void	msg_append();
+    char	*msg_find();
+
     char	*errno_arg;
     char	*format;
     int		i;

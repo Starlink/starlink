@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/Archive
- * $Id: TclTcsCat.C,v 1.5 2003/01/20 15:52:21 brighton Exp $
+ * $Id: TclTcsCat.C,v 1.1.1.1 2006/01/12 16:36:41 abrighto Exp $
  *
  * TclTcsCat.C - method definitions for class TclTcsCat
  * 
@@ -10,16 +10,19 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created
  */
-static const char* const rcsId="@(#) $Id: TclTcsCat.C,v 1.5 2003/01/20 15:52:21 brighton Exp $";
+static const char* const rcsId="@(#) $Id: TclTcsCat.C,v 1.1.1.1 2006/01/12 16:36:41 abrighto Exp $";
 
 
+using namespace std;
 #include <cstring>
 #include <cctype>
 #include <cstdio>
 #include <iostream>
 #include <cstdlib>
 #include <unistd.h>
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 #include "TcsCatalog.h"
 #include "TcsLocalCatalog.h"
 #include "TclQueryUtil.h"

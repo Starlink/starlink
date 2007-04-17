@@ -1,7 +1,7 @@
 
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: bitmaps.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
+ * "@(#) $Id: rtd_bitmaps.C,v 1.1.1.1 2006/01/12 16:39:28 abrighto Exp $"
  *
  * Bitmap definitions for Tk
  *
@@ -13,22 +13,22 @@
 
 
 void defineRtdBitmaps(Tcl_Interp *interp) {
+    #include "double_left.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("double_left"), (char*)double_left_bits, double_left_width, double_left_height);
+
     #include "record.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("record"), (char*)record_bits, record_width, record_height);
 
     #include "big_right.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("big_right"), (char*)big_right_bits, big_right_width, big_right_height);
 
-    #include "double_right.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("double_right"), (char*)double_right_bits, double_right_width, double_right_height);
-
-    #include "double_left.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("double_left"), (char*)double_left_bits, double_left_width, double_left_height);
+    #include "Right.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("Right"), (char*)Right_bits, Right_width, Right_height);
 
     #include "rect.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("rect"), (char*)rect_bits, rect_width, rect_height);
 
-    #include "Right.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("Right"), (char*)Right_bits, Right_width, Right_height);
+    #include "double_right.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("double_right"), (char*)double_right_bits, double_right_width, double_right_height);
 
 }

@@ -1,6 +1,6 @@
  /*
  * E.S.O. - VLT project/ESO Archive 
- * $Id: Compress.C,v 1.4 2005/02/02 01:43:04 brighton Exp $
+ * $Id: DCompress.C,v 1.1.1.1 2006/01/12 16:44:01 abrighto Exp $
  *
  * Compress.C - method definitions for class Compress
  *             (based on Archive/CADC press routines)
@@ -8,8 +8,10 @@
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  2 Aug 96  Created
+ *                 2 Jan 06  Renamed file to avoid name conflict with fitsio's 
+ *                           "compress.c" on file systems that ignore case.
  */
-static const char* const rcsId="@(#) $Id: Compress.C,v 1.4 2005/02/02 01:43:04 brighton Exp $";
+static const char* const rcsId="@(#) $Id: DCompress.C,v 1.1.1.1 2006/01/12 16:44:01 abrighto Exp $";
 
 
 #include <sys/types.h>
@@ -23,7 +25,7 @@ static const char* const rcsId="@(#) $Id: Compress.C,v 1.4 2005/02/02 01:43:04 b
 #include <unistd.h>
 #include "error.h"
 #include "Mem.h"
-#include "Compress.hxx"
+#include "DCompress.h"
 
 extern "C" {
 #include "gen_types.h"

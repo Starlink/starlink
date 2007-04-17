@@ -1,7 +1,7 @@
 # util.tcl - general utility procs for Tcl
 #
 # Copyright (C) 1994 Allan Brighton (abrighto@eso.org)
-# "@(#) $Id: tclutil.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
+# "@(#) $Id: tclutil.tcl,v 1.1.1.1 2006/01/12 16:40:51 abrighto Exp $"
 
 
 

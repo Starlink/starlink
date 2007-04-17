@@ -16,7 +16,6 @@ static char SccsId[] = "%W%  %G%";
 
 #include "histeq.h"
 
-/* Local prototypes */
 static SubrangeLink *get_new_subrange_record();
 static void fill_subrange_record();
 

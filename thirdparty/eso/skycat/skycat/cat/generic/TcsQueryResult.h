@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: TcsQueryResult.h,v 1.2 2003/01/18 21:11:11 brighton Exp $
+ * $Id: TcsQueryResult.h,v 1.1.1.1 2006/01/12 16:36:30 abrighto Exp $
  *
  * TcsQueryResult.h - class definitions for accessing results of a 
  *                    TCS catalog query
@@ -17,6 +17,7 @@
  */
 
 
+using namespace std;
 #include "QueryResult.h"
 #include "TcsCatalogObject.h"
 
@@ -62,7 +63,7 @@ protected:
     virtual int getObjFromTable(int row, TcsCatalogObject&);
 
     // print table title and other info
-    virtual void printTableTop(std::ostream& os, const char* title = NULL);
+    virtual void printTableTop(ostream& os, const char* title = NULL);
 
 public:
     // constructor: initialize empty table
@@ -94,7 +95,7 @@ public:
     TcsCatalogObject* getObj(int row) const;
 
     // print the given table row to the given stream
-    virtual int printRow(std::ostream& os, int row) const; 
+    virtual int printRow(ostream& os, int row) const; 
 
     // -- redefine these to deal with TCS columns --
 

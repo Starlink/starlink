@@ -2,7 +2,7 @@
 #\
 test -f ../demos/cat_env.sh && . ../demos/cat_env.sh
 #\
-P=$PWD; DIRN=`dirname $0`; cd $DIRN; XP=$PWD; cd $P
+P=$PWD; DIRN=`dirname $0`; cd $DIRN; XP=`pwd`; cd $P
 #\
 if [ -z "$CAT_LIBRARY" ] ; then
 #\
@@ -12,7 +12,7 @@ if [ -z "$CAT_LIBRARY" ] ; then
 #\
 fi
 #\
-LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${INSTALL_TARGET}/lib:/vlt/tcltk-new/lib:/vlt/tcltk-new/lib/itcl:/usr/X11R6/lib"
+LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${INSTALL_TARGET}/lib:/vlt/APR2003/tcltk/lib:/vlt/APR2003/tcltk/lib/itcl:/usr/X11R6/lib"
 #\
 exec $WISH "$0" ${1+"$@"}
 # --------------------------------------------------

@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project / ESO Archive
- * $Id: tLocalCatalog.C,v 1.3 2003/01/18 21:11:11 brighton Exp $
+ * $Id: tLocalCatalog.C,v 1.1.1.1 2006/01/12 16:36:12 abrighto Exp $
  *
  * tLocalCatalog.C - test cases for class LocalCatalog
  * 
@@ -9,6 +9,7 @@
  * Allan Brighton  11 Jun 96  Created
  */
 
+using namespace std;
 #include <stdio.h>
 #include <iostream>
 #include <stdlib.h>
@@ -37,71 +38,71 @@ main()
     q.radius(10);
     q.maxRows(10);
 
-    std::cout << "Query GSC for objects at pos " 
+    cout << "Query GSC for objects at pos " 
 	 << q.pos() << ", in radius " 
 	 << q.radius1() << ".." << q.radius2() 
 	 << ":" 
-	 << std::endl;
+	 << endl;
 
     QueryResult result;
     int num_results = cat->query(q, "./tLocalCatalog.out", result);
     if (num_results < 0) {
-	std::cout << "Query returned an error\n";
+	cout << "Query returned an error\n";
 	exit(1);
     }
 
-    std::cout << "Query returns: " 
+    cout << "Query returns: " 
 	 << num_results 
 	 << " objects, out of " 
 	 << q.maxRows() 
 	 << " requested" 
-	 << std::endl;
+	 << endl;
 
-    std::cout << "More objects ?: " 
+    cout << "More objects ?: " 
 	 << (cat->more() ? "YES" : "NO") 
-	 << std::endl;
+	 << endl;
 
-    std::cout << "---Result List---" 
-	 << std::endl;
+    cout << "---Result List---" 
+	 << endl;
 
     int ncols = cat->numCols();
     int i, j;
-    std::cout << "columns:\n";
+    cout << "columns:\n";
     for (i = 0; i < ncols; i++) 
-	std::cout << cat->colName(i) << "\t";
-    std::cout << "\n\nresults:\n";
+	cout << cat->colName(i) << "\t";
+    cout << "\n\nresults:\n";
 
     char* s;
     for (i = 0; i < num_results; i++) {
 	// print the Id
 	if (result.get(i, 0, s) == 0)
-	    std::cout << s << "\t";
+	    cout << s << "\t";
 	else
-	    std::cout << "ERROR\t";
+	    cout << "ERROR\t";
 	    
 	// print the position in H:M:S+D:M:S
 	if (result.getPos(i, pos) == 0)
-	    std::cout << pos.ra() << "\t" << pos.dec() << "\t";
+	    cout << pos.ra() << "\t" << pos.dec() << "\t";
 	else
-	    std::cout << "ERROR\t";
+	    cout << "ERROR\t";
 
 	// print the other columns
 	for (j = 3; j < ncols; j++) {
 	    if (result.get(i, j, s) == 0)
-		std::cout << s << "\t";
+		cout << s << "\t";
 	    else
-		std::cout << "ERROR\t";
+		cout << "ERROR\t";
 	}
-	std::cout << std::endl;
+	cout << endl;
     }
-    std::cout << "-----------------" << std::endl;
+    cout << "-----------------" << endl;
 
-    std::cout << "test searching by Id in a local catalog\n";
+    cout << "test searching by Id in a local catalog\n";
     if (cat->getObject("GSC0286902884",	0, NULL, result) != 0) {
-	std::cout << "ERROR\n";
+	cout << "ERROR\n";
     }
     else {
-	std::cout << "OK\n" << result << std::endl;;
+	cout << "OK\n" << result << endl;;
     }
 
     

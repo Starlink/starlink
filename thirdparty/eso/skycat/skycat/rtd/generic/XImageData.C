@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: XImageData.C,v 1.4 2005/02/02 01:43:02 brighton Exp $" 
+ * "@(#) $Id: XImageData.C,v 1.1.1.1 2006/01/12 16:39:06 abrighto Exp $" 
  *
  * XImageData.C - member functions for class XImageData
  *
@@ -13,7 +13,7 @@
  * Allan Brighton  05/10/95  Created
  * pbiereic        17/02/03  Added 'using namespace std'.
  */
-static const char* const rcsId="@(#) $Id: XImageData.C,v 1.4 2005/02/02 01:43:02 brighton Exp $";
+static const char* const rcsId="@(#) $Id: XImageData.C,v 1.1.1.1 2006/01/12 16:39:06 abrighto Exp $";
 
 
 using namespace std;
@@ -24,6 +24,9 @@ using namespace std;
 #include <cassert>
 #include <cmath>
 #include "XImageData.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include "define.h"
 
 
@@ -35,7 +38,7 @@ using namespace std;
 #define CLASS_NAME XImageData
 #define DATA_TYPE byte
 #define NTOH(x) (x)
-#include "ImageTemplates.C"
+#include "ImageTemplates.icc"
 #undef CLASS_NAME
 #undef DATA_TYPE
 #undef NTOH

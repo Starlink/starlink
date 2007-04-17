@@ -4,7 +4,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: LookupTable.h,v 1.3 2005/02/02 01:43:03 brighton Exp $" 
+ * "@(#) $Id: LookupTable.h,v 1.1.1.1 2006/01/12 16:38:54 abrighto Exp $" 
  *
  * LookupTable.h - declarations for class LookupTable, a class for managing
  *                 an image color lookup table used to convert image pixel

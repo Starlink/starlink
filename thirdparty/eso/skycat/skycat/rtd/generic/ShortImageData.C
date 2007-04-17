@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: ShortImageData.C,v 1.4 2005/02/02 01:43:02 brighton Exp $" 
+ * "@(#) $Id: ShortImageData.C,v 1.1.1.1 2006/01/12 16:38:29 abrighto Exp $" 
  *
  * ShortImageData.C - member functions for class ShortImageData
  *
@@ -22,6 +22,9 @@
 #include <cassert>
 #include <cmath>
 #include "ShortImageData.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include "define.h"
 
 
@@ -48,7 +51,7 @@ void ShortImageData::initShortConversion()
 #ifndef NTOH
 #    define NTOH(x) SWAP16(x)
 #endif
-#include "ImageTemplates.C"
+#include "ImageTemplates.icc"
 #undef CLASS_NAME
 #undef DATA_TYPE
 #undef NTOH

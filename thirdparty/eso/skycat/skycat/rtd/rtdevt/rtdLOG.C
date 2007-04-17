@@ -1,7 +1,7 @@
 /*******************************************************************************
 * E.S.O. - VLT project
 *
-* "@(#) $Id: rtdLOG.C,v 1.2 2005/02/02 01:43:03 brighton Exp $"
+* "@(#) $Id: rtdLOG.C,v 1.1.1.1 2006/01/12 16:39:54 abrighto Exp $"
 *
 * who       when      what
 * --------  --------  ----------------------------------------------
@@ -45,7 +45,7 @@
 #define _POSIX_SOURCE 1
 #include "rtdLOG.h"
 
-static char *rcsId="@(#) $Id: rtdLOG.C,v 1.2 2005/02/02 01:43:03 brighton Exp $"; 
+static char *rcsId="@(#) $Id: rtdLOG.C,v 1.1.1.1 2006/01/12 16:39:54 abrighto Exp $"; 
 static void *use_rcsId = ((void)&use_rcsId,(void *) &rcsId);
 
 rtdLOG::rtdLOG(int verbose) :

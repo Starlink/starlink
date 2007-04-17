@@ -3,15 +3,10 @@
 
 /*  The FITSIO software was written by William Pence at the High Energy    */
 /*  Astrophysic Science Archive Research Center (HEASARC) at the NASA      */
-/*  Goddard Space Flight Center.  Users shall not, without prior written   */
-/*  permission of the U.S. Government,  establish a claim to statutory     */
-/*  copyright.  The Government and others acting on its behalf, shall have */
-/*  a royalty-free, non-exclusive, irrevocable,  worldwide license for     */
-/*  Government purposes to publish, distribute, translate, copy, exhibit,  */
-/*  and perform such material.                                             */
+/*  Goddard Space Flight Center.                                           */
 
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 #include "fitsio2.h"
 /*------------------------------------------------------------------------*/
 int ffcsum(fitsfile *fptr,      /* I - FITS file pointer                  */
@@ -192,8 +187,9 @@ int ffpcks(fitsfile *fptr,      /* I - FITS file pointer                  */
 {
     char datestr[20], checksum[FLEN_VALUE], datasum[FLEN_VALUE];
     char  comm[FLEN_COMMENT], chkcomm[FLEN_COMMENT], datacomm[FLEN_COMMENT];
-    int tstatus, chutype;
-    long nrec, headstart, datastart, dataend;
+    int tstatus;
+    long nrec;
+    LONGLONG headstart, datastart, dataend;
     unsigned long dsum, olddsum, sum;
     double tdouble;
 
@@ -238,26 +234,26 @@ int ffpcks(fitsfile *fptr,      /* I - FITS file pointer                  */
         /* olddsum = strtoul(datasum, 0, 10); doesn't work on SUN OS */
 
         tdouble = atof(datasum);
-        olddsum = tdouble;
+        olddsum = (unsigned long) tdouble;
     }
 
     /* close header: rewrite END keyword and following blank fill */
-    if (ffwend(fptr, status) > 0)
+    /* and re-read the required keywords to determine the structure */
+    if (ffrdef(fptr, status) > 0)
         return(*status);
 
-    /* now re-read the required keywords to determine the structure */
-    if (ffrhdu(fptr, &chutype, status) > 0)
-        return(*status);
+    if ((fptr->Fptr)->heapsize > 0)
+         ffuptf(fptr, status);  /* update the variable length TFORM values */
 
     /* write the correct data fill values, if they are not already correct */
     if (ffpdfl(fptr, status) > 0)
         return(*status);
 
     /* calc size of data unit, in FITS 2880-byte blocks */
-    if (ffghad(fptr, &headstart, &datastart, &dataend, status) > 0)
+    if (ffghadll(fptr, &headstart, &datastart, &dataend, status) > 0)
         return(*status);
 
-    nrec = (dataend - datastart) / 2880;
+    nrec = (long) ((dataend - datastart) / 2880);
     dsum = 0;
 
     if (nrec > 0)
@@ -288,7 +284,7 @@ int ffpcks(fitsfile *fptr,      /* I - FITS file pointer                  */
         ffmbyt(fptr, headstart, REPORT_EOF, status);
 
         /* accumulate the header checksum into the previous data checksum */
-        nrec = (datastart - headstart) / 2880;
+        nrec = (long) ((datastart - headstart) / 2880);
         sum = dsum;
         if (ffcsum(fptr, nrec, &sum, status) > 0)
             return(*status);
@@ -304,7 +300,7 @@ int ffpcks(fitsfile *fptr,      /* I - FITS file pointer                  */
     ffmbyt(fptr, headstart, REPORT_EOF, status);
 
     /* accumulate the header checksum into the previous data checksum */
-    nrec = (datastart - headstart) / 2880;
+    nrec = (long) ((datastart - headstart) / 2880);
     sum = dsum;
     if (ffcsum(fptr, nrec, &sum, status) > 0)
            return(*status);
@@ -328,7 +324,8 @@ int ffupck(fitsfile *fptr,      /* I - FITS file pointer                  */
     char datestr[20], chkcomm[FLEN_COMMENT], comm[FLEN_COMMENT];
     char checksum[FLEN_VALUE], datasum[FLEN_VALUE];
     int tstatus;
-    long nrec, headstart, datastart, dataend;
+    long nrec;
+    LONGLONG headstart, datastart, dataend;
     unsigned long sum, dsum;
     double tdouble;
 
@@ -348,10 +345,10 @@ int ffupck(fitsfile *fptr,      /* I - FITS file pointer                  */
     }
 
     tdouble = atof(datasum); /* read as a double as a workaround */
-    dsum = tdouble;
+    dsum = (unsigned long) tdouble;
 
     /* get size of the HDU */
-    if (ffghad(fptr, &headstart, &datastart, &dataend, status) > 0)
+    if (ffghadll(fptr, &headstart, &datastart, &dataend, status) > 0)
         return(*status);
 
     /* get the checksum keyword, if it exists */
@@ -373,7 +370,7 @@ int ffupck(fitsfile *fptr,      /* I - FITS file pointer                  */
         ffmbyt(fptr, headstart, REPORT_EOF, status);
 
         /* accumulate the header checksum into the previous data checksum */
-        nrec = (datastart - headstart) / 2880;
+        nrec = (long) ((datastart - headstart) / 2880);
         sum = dsum;
         if (ffcsum(fptr, nrec, &sum, status) > 0)
            return(*status);
@@ -389,7 +386,7 @@ int ffupck(fitsfile *fptr,      /* I - FITS file pointer                  */
     ffmbyt(fptr, headstart, REPORT_EOF, status);
 
     /* accumulate the header checksum into the previous data checksum */
-    nrec = (datastart - headstart) / 2880;
+    nrec = (long) ((datastart - headstart) / 2880);
     sum = dsum;
     if (ffcsum(fptr, nrec, &sum, status) > 0)
            return(*status);
@@ -432,12 +429,16 @@ int ffvcks(fitsfile *fptr,      /* I - FITS file pointer                  */
         *hdustatus = 0;             /* CHECKSUM keyword does not exist */
         *status = tstatus;
     }
+    if (chksum[0] == '\0')
+        *hdustatus = 0;    /* all blank checksum means it is undefined */
 
     if (ffgkys(fptr, "DATASUM", chksum, comm, status) == KEY_NO_EXIST)
     {
         *datastatus = 0;            /* DATASUM keyword does not exist */
         *status = tstatus;
     }
+    if (chksum[0] == '\0')
+        *datastatus = 0;    /* all blank checksum means it is undefined */
 
     if ( *status > 0 || (!(*hdustatus) && !(*datastatus)) )
         return(*status);            /* return if neither keywords exist */
@@ -448,7 +449,7 @@ int ffvcks(fitsfile *fptr,      /* I - FITS file pointer                  */
     /* sscanf(chksum, "%u", &olddatasum);   doesn't work w/ cc on VAX/VMS */
 
     tdouble = atof(chksum); /* read as a double as a workaround */
-    olddatasum = tdouble;
+    olddatasum = (unsigned long) tdouble;
 
     /*  calculate the data checksum and the HDU checksum */
     if (ffgcks(fptr, &datasum, &hdusum, status) > 0)
@@ -472,16 +473,17 @@ int ffgcks(fitsfile *fptr,           /* I - FITS file pointer             */
 
     /* calculate the checksums of the data unit and the total HDU */
 {
-    long nrec, headstart, datastart, dataend;
+    long nrec;
+    LONGLONG headstart, datastart, dataend;
 
     if (*status > 0)           /* inherit input status value if > 0 */
         return(*status);
 
     /* get size of the HDU */
-    if (ffghad(fptr, &headstart, &datastart, &dataend, status) > 0)
+    if (ffghadll(fptr, &headstart, &datastart, &dataend, status) > 0)
         return(*status);
 
-    nrec = (dataend - datastart) / 2880;
+    nrec = (long) ((dataend - datastart) / 2880);
 
     *datasum = 0;
 
@@ -495,7 +497,7 @@ int ffgcks(fitsfile *fptr,           /* I - FITS file pointer             */
 
     /* move to the start of the header and calc. size of header */
     ffmbyt(fptr, headstart, REPORT_EOF, status);
-    nrec = (datastart - headstart) / 2880;
+    nrec = (long) ((datastart - headstart) / 2880);
 
     /* accumulate the header checksum into the previous data checksum */
     *hdusum = *datasum;

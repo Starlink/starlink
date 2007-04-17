@@ -2,7 +2,7 @@
 #define _error_h_
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: error.h,v 1.2 2005/02/02 01:43:01 brighton Exp $" 
+ * "@(#) $Id: error.h,v 1.1.1.1 2006/01/12 16:41:03 abrighto Exp $" 
  *
  * error.h - declarations for global error reporting
  * 

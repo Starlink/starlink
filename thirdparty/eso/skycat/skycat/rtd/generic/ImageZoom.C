@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: ImageZoom.C,v 1.4 2005/02/02 01:43:03 brighton Exp $"
+ * "@(#) $Id: ImageZoom.C,v 1.1.1.1 2006/01/12 16:39:16 abrighto Exp $"
  *
  * ImageZoom.C - member routines for class ImageZoom,
  *               implementation of Zoom window for RtdImage
@@ -11,7 +11,7 @@
  * --------------  --------  ----------------------------------------
  * Allan Brighton  05/10/95  Created
  */
-static const char* const rcsId="@(#) $Id: ImageZoom.C,v 1.4 2005/02/02 01:43:03 brighton Exp $";
+static const char* const rcsId="@(#) $Id: ImageZoom.C,v 1.1.1.1 2006/01/12 16:39:16 abrighto Exp $";
 
 
 
@@ -21,6 +21,9 @@ static const char* const rcsId="@(#) $Id: ImageZoom.C,v 1.4 2005/02/02 01:43:03 
 #include <cstring>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include "define.h"
 #include "ImageDisplay.h"
 #include "ImageZoom.h"

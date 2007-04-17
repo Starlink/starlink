@@ -1,60 +1,45 @@
 # E.S.O. - VLT project 
-# $Id: astrotclConfig.sh.in,v 1.2 2005/02/02 01:43:04 brighton Exp $
+# $Id: astrotclConfig.sh.in,v 1.1.1.1 2006/01/12 16:42:39 abrighto Exp $
 #
 # astrotclConfig.sh --
-#
-# This shell script (for sh) is generated automatically by the
+# 
+# This shell script (for sh) is generated automatically by Astrotcl's
 # configure script.  It will create shell variables for most of
 # the configuration options discovered by the configure script.
-# This script is intended to be included by other configure scripts
-# so that they don't have to figure this all out for themselves.
+# This script is intended to be included by the configure scripts
+# for Astrotcl extensions so that they don't have to figure this all
+# out for themselves.  This file does not duplicate information
+# already provided by tclConfig.sh, so you may need to use that
+# file in addition to this one.
 #
 # The information in this file is specific to a single platform.
-#
-# who             when       what
-# --------------  --------   ---------------------------------------------
-# Allan Brighton  21 Nov 97  Created
-#
 
-# package version
-ASTROTCL_VERSION='@ASTROTCL_VERSION@'
+# Astrotcl's version number.
+astrotcl_VERSION='@PACKAGE_VERSION@'
 
-# ASTROTCL install dirs
-ASTROTCL_DESTDIR='@DESTDIR@'
-ASTROTCL_BINDIR='@BINDIR@'
-ASTROTCL_LIBDIR='@LIBDIR@'
-ASTROTCL_INCDIR='@INCDIR@'
-ASTROTCL_MANDIR='@MANDIR@'
-ASTROTCL_DIR='@ASTROTCL_DIR@'
+# The name of the Astrotcl library:
+astrotcl_LIB_FILE=@astrotcl_LIB_FILE@
 
-# root of astrotcl source tree
-ASTROTCL_SRC_ROOT='@SRC_ROOT@'
-
-# list of astrotcl subdirectory pathnames (depends on --with-notcl flag)
-ASTROTCL_SUBDIRS='@ASTROTCL_SUBDIRS@'
-
-# If this is true, build library with no Tcl access
-ASTROTCL_NO_TCL='@NO_TCL@'
-
-# default location of Astrotcl library files
-ASTROTCL_LIBRARY='@ASTROTCL_LIBRARY@'
-
-# location of Astrotcl library files in source tree
-ASTROTCL_BUILD_LIBRARY='@ASTROTCL_BUILD_LIBRARY@'
-
-# -I flags to pick up the astrotcl include files from the build dirs
-ASTROTCL_BUILD_INCLUDES='@ASTROTCL_BUILD_INCLUDES@'
+# Astrotcl build directory.
+astrotcl_BUILD_DIR='@astrotcl_BUILD_DIR@'
 
 # String to pass to linker to pick up the Astrotcl library from its
 # build directory.
-ASTROTCL_BUILD_LIB_SPEC='@ASTROTCL_BUILD_LIB_SPEC@'
-
-# static version of above
-ASTROTCL_BUILD_LIB_SPEC_STATIC='@ASTROTCL_BUILD_LIB_SPEC_STATIC@'
+astrotcl_BUILD_LIB_SPEC='@astrotcl_BUILD_LIB_SPEC@'
 
 # String to pass to linker to pick up the Astrotcl library from its
 # installed directory.
-ASTROTCL_LIB_SPEC='@ASTROTCL_LIB_SPEC@'
+astrotcl_LIB_SPEC='@astrotcl_LIB_SPEC@'
 
-# static version of above
-ASTROTCL_LIB_SPEC_STATIC='@ASTROTCL_LIB_SPEC_STATIC@'
+# Location of the top-level source directories from which Astrotcl
+# was built.  This is the directory that contains generic, unix, etc.
+# If Astrotcl was compiled in a different place than the directory
+# containing the source files, this points to the location of the sources,
+# not the location where Astrotcl was compiled.
+astrotcl_SRC_DIR='@astrotcl_SRC_DIR@'
+
+# List of object files used to build the library (for merging packages).
+astrotcl_PKG_OBJECTS='@astrotcl_PKG_OBJECTS@'
+
+# List of header filesinstalled for this library (for merging packages).
+astrotcl_PKG_HEADERS='@astrotcl_PKG_HEADERS@'

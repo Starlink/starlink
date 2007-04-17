@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: TclQueryUtil.h,v 1.2 2003/01/20 15:52:21 brighton Exp $
+ * $Id: TclQueryUtil.h,v 1.1.1.1 2006/01/12 16:36:31 abrighto Exp $
  *
  * TclQueryUtil.h - utility routines for Tcl catalog commands
  *

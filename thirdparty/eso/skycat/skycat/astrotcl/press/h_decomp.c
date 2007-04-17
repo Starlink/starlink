@@ -48,6 +48,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 
 #include "gen_types.h"
 #include "gen_str.h"

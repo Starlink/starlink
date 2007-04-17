@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: QueryResult.h,v 1.2 2003/01/18 21:11:11 brighton Exp $
+ * $Id: QueryResult.h,v 1.1.1.1 2006/01/12 16:36:40 abrighto Exp $
  *
  * QueryResult.h - class definitions for accessing results of a catalog
  * 		   query
@@ -51,7 +51,7 @@ protected:
     virtual int circularSearch(const TabTable& table, const AstroQuery& q, int maxRows);
 
     // print table title and othe info...
-    virtual void printTableTop(std::ostream& os, const char* title = NULL);
+    virtual void printTableTop(ostream& os, const char* title = NULL);
 
 public:
     // constructor: initialize empty table

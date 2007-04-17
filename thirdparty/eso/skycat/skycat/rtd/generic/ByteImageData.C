@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: ByteImageData.C,v 1.4 2005/02/02 01:43:02 brighton Exp $" 
+ * "@(#) $Id: ByteImageData.C,v 1.1.1.1 2006/01/12 16:39:03 abrighto Exp $" 
  *
  * ByteImageData.C - member functions for class ByteImageData
  *
@@ -14,7 +14,7 @@
  * Peter W. Draper 15/03/99  Blank bin is always 128
  * pbiereic        17/02/03  Added 'using namespace std'.
  */
-static const char* const rcsId="@(#) $Id: ByteImageData.C,v 1.4 2005/02/02 01:43:02 brighton Exp $";
+static const char* const rcsId="@(#) $Id: ByteImageData.C,v 1.1.1.1 2006/01/12 16:39:03 abrighto Exp $";
 
 
 using namespace std;
@@ -25,6 +25,9 @@ using namespace std;
 #include <cassert>
 #include <cmath>
 #include "ByteImageData.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include "define.h"
 
 
@@ -51,7 +54,7 @@ void ByteImageData::initShortConversion()
 #define CLASS_NAME ByteImageData
 #define DATA_TYPE byte
 #define NTOH(x) (x)
-#include "ImageTemplates.C"
+#include "ImageTemplates.icc"
 #undef CLASS_NAME
 #undef DATA_TYPE
 #undef NTOH

@@ -13,6 +13,9 @@
 		directives to make gcc -Wall not to complain
 20-Oct-98: added declarations NGP_XTENSION_SIMPLE and NGP_XTENSION_FIRST
 24-Oct-98: prototype of ngp_read_line() function updated.
+22-Jan-99: prototype for ngp_set_extver() function added.
+20-Jun-2002 Wm Pence, added support for the HIERARCH keyword convention
+            (changed NGP_MAX_NAME from (20) to FLEN_KEYWORD)
 */
 
 #ifndef	GRPARSER_H_INCLUDED
@@ -29,7 +32,8 @@ extern "C" {
 #define	NGP_ALLOCCHUNK		(1000)
 #define	NGP_MAX_INCLUDE		(10)			/* include file nesting limit */
 #define	NGP_MAX_COMMENT		(80)			/* max size for comment */
-#define	NGP_MAX_NAME		(20)			/* max size for KEYWORD (FITS limits it to 8 chars) */
+#define	NGP_MAX_NAME		FLEN_KEYWORD		/* max size for KEYWORD (FITS limits it to 8 chars) */
+                                                        /* except HIERARCH can have longer effective keyword names */
 #define	NGP_MAX_STRING		(80)			/* max size for various strings */
 #define	NGP_MAX_ARRAY_DIM	(999)			/* max. number of dimensions in array */
 #define NGP_MAX_FNAME           (1000)                  /* max size of combined path+fname */
@@ -151,8 +155,10 @@ extern	NGP_EXTVER_TAB	*ngp_extver_tab;
 	/* globally visible functions declarations */
 
 int	ngp_get_extver(char *extname, int *version);
+int	ngp_set_extver(char *extname, int version);
 int	ngp_delete_extver_tab(void);
 int	ngp_strcasecmp(char *p1, char *p2);
+int	ngp_strcasencmp(char *p1, char *p2, int n);
 int	ngp_line_from_file(FILE *fp, char **p);
 int	ngp_free_line(void);
 int	ngp_free_prevline(void);

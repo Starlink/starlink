@@ -3,15 +3,10 @@
 
 /*  The FITSIO software was written by William Pence at the High Energy    */
 /*  Astrophysic Science Archive Research Center (HEASARC) at the NASA      */
-/*  Goddard Space Flight Center.  Users shall not, without prior written   */
-/*  permission of the U.S. Government,  establish a claim to statutory     */
-/*  copyright.  The Government and others acting on its behalf, shall have */
-/*  a royalty-free, non-exclusive, irrevocable,  worldwide license for     */
-/*  Government purposes to publish, distribute, translate, copy, exhibit,  */
-/*  and perform such material.                                             */
+/*  Goddard Space Flight Center.                                           */
 
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 #include "fitsio2.h"
 /*--------------------------------------------------------------------------*/
 void ffswap2(short *svalues,  /* IO - pointer to shorts to be swapped       */
@@ -76,26 +71,27 @@ void ffswap8(double *dvalues,  /* IO - pointer to doubles to be swapped     */
 {
     register char *cvalues;
     register long ii;
-
-    union u_tag {
-        char cvals[8];   /* equivalence an array of 8 bytes with */
-        double dval;      /* a double */
-    } u;
+    register char temp;
 
     cvalues = (char *) dvalues;      /* copy the pointer value */
 
-    for (ii = 0; ii < nvals;)
+    for (ii = 0; ii < nvals*8; ii += 8)
     {
-        u.dval = dvalues[ii++];  /* copy next double to buffer */
+        temp = cvalues[ii];
+        cvalues[ii] = cvalues[ii+7];
+        cvalues[ii+7] = temp;
 
-        *cvalues++ = u.cvals[7]; /* copy the 8 bytes in turn */
-        *cvalues++ = u.cvals[6];
-        *cvalues++ = u.cvals[5];
-        *cvalues++ = u.cvals[4];
-        *cvalues++ = u.cvals[3];
-        *cvalues++ = u.cvals[2];
-        *cvalues++ = u.cvals[1];
-        *cvalues++ = u.cvals[0];
+        temp = cvalues[ii+1];
+        cvalues[ii+1] = cvalues[ii+6];
+        cvalues[ii+6] = temp;
+
+        temp = cvalues[ii+2];
+        cvalues[ii+2] = cvalues[ii+5];
+        cvalues[ii+5] = temp;
+
+        temp = cvalues[ii+3];
+        cvalues[ii+3] = cvalues[ii+4];
+        cvalues[ii+4] = temp;
     }
     return;
 }

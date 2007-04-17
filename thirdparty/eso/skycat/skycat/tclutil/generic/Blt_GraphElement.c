@@ -9,8 +9,29 @@
  */
 
 #include "tcl.h"
-#include "blt.h"
 
+/* 
+ * Hack: Rather than have to worry about finding out where blt.h is, 
+ * just include the required definitions here (I don't expect this
+ * package to change much anymore). -- Allan: 03.01.06
+ */
+#if 0
+#include "blt.h"
+#else
+
+typedef struct {
+    double *valueArr;		/* Array of values (possibly malloc-ed) */
+    int numValues;		/* Number of values in the array */
+    int arraySize;		/* Size of the allocated space */
+    double min, max;		/* Minimum and maximum values in the vector */
+    int dirty;			/* Indicates if the vector has been updated */
+    int reserved;		/* Reserved for future use */
+
+} Blt_Vector;
+#endif
+
+
+/* Replacement for the cancelled blt convenience function */
 int Blt_GraphElement(
     Tcl_Interp *interp,         /* Interpreter of the graph widget */
     char *pathName,             /* Path name of the graph widget */
@@ -24,9 +45,6 @@ int Blt_GraphElement(
     register int i;
     int num = numValues/2;
     int nbytes = sizeof(double) * num;
-
-    /* There were a lot of changes between tcl7.6/BLT2.1 and tcl8.0/BLT2.4... (allan) */
-#if (TCL_MAJOR_VERSION >= 8)
 
     /* Note: Blt_Vector::arraySize is the number of bytes bytes! */
     Blt_Vector *xVecPtr, *yVecPtr;
@@ -62,33 +80,6 @@ int Blt_GraphElement(
         (Blt_ResetVector(yVecPtr, yArray, num, nbytes, TCL_DYNAMIC) != TCL_OK)) {
         return TCL_ERROR;
     }
-
-#else  /* BLT2.1/Tcl7.6 */
-
-    /* Note: Blt_Vector::arraySize is the number of doubles! */
-    Blt_Vector xVec, yVec; 
-
-    xVec.numValues = yVec.numValues = xVec.arraySize = yVec.arraySize = num;
-
-    /* Allocate space for the new vectors */
-    xVec.valueArr = (double *)Tcl_Alloc(nbytes);
-    yVec.valueArr = (double *)Tcl_Alloc(nbytes);
-    if (xVec.valueArr == NULL || yVec.valueArr == NULL) {
-	fprintf(stderr, "malloc: out of memory\n");
-        return TCL_ERROR;
-    }
-
-    /* Write the data points into the vectors */
-    for (i = 0; i < num; i++) {
-        xVec.valueArr[i] = *valueArr++;
-        yVec.valueArr[i] = *valueArr++;
-    }
-
-    if ((Blt_ResetVector(interp, xVecName, &xVec, TCL_DYNAMIC) != TCL_OK) ||
-        (Blt_ResetVector(interp, yVecName, &yVec, TCL_DYNAMIC) != TCL_OK)) {
-        return TCL_ERROR;
-    }
-#endif 
 
     return TCL_OK;
 }

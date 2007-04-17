@@ -1,7 +1,7 @@
 /*******************************************************************************
 * E.S.O. - VLT project
 *
-* "@(#) $Id: RtdHDU.C,v 1.6 2005/02/02 01:43:03 brighton Exp $"
+* "@(#) $Id: RtdHDU.C,v 1.2 2006/03/26 13:22:33 abrighto Exp $"
 *
 * who          when      what
 * --------     --------  ----------------------------------------------
@@ -37,12 +37,14 @@
 *------------------------------------------------------------------------
 */
 
-static char *rcsId="@(#) $Id: RtdHDU.C,v 1.6 2005/02/02 01:43:03 brighton Exp $";
+static char *rcsId="@(#) $Id: RtdHDU.C,v 1.2 2006/03/26 13:22:33 abrighto Exp $";
  
 static void *use_rcsId = ((void)&use_rcsId,(void *) &rcsId);
 
 #include <sstream>
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 #include "RtdImage.h"
 
 
@@ -287,18 +289,18 @@ int RtdImage::getHDU(FitsIO* fits, const char* filename, const char* entry)
 	    int n = 0;
 	    char** v = NULL;
 	    if (Tcl_SplitList(interp_, keys[i], &n, &v) != TCL_OK) {
-		free(keys);
+		Tcl_Free((char *)keys);
 		return TCL_ERROR;
 	    }
 	    if (n != 2) {
-		free(keys);
-		free(v);
+		Tcl_Free((char *)keys);
+		Tcl_Free((char *)v);
 		return fmt_error("Invalid catalog config entry: '%s': Expected {key value}", keys[i]);
 	    }
 	    os << v[0] << ": " << v[1] << endl;
-	    free(v);
+	    Tcl_Free((char *)v);
 	}
-	free(keys);
+	Tcl_Free((char *)keys);
 	os << "# End config entry\n\n";
     }
             
@@ -415,7 +417,7 @@ int RtdImage::hduCmdCreate(int argc, char** argv, FitsIO* fits)
 	    if (status != TCL_OK)
 		break;
 	    if (dataCols) {
-		free(dataCols);
+		Tcl_Free((char *)dataCols);
 		dataCols = NULL;
 	    }
 	}
@@ -424,13 +426,13 @@ int RtdImage::hduCmdCreate(int argc, char** argv, FitsIO* fits)
     
     // Clean up and return the status
     if (colHeadings)
-	free(colHeadings);
+	Tcl_Free((char *)colHeadings);
     if (formats)
-	free(formats);
+	Tcl_Free((char *)formats);
     if (dataRows)
-	free(dataRows);
+	Tcl_Free((char *)dataRows);
     if (dataCols)
-	free(dataCols);
+	Tcl_Free((char *)dataCols);
    
     // restore the original HDU
     fits->setHDU(hdu);
@@ -503,17 +505,36 @@ int RtdImage::hduCmdList(int argc, char** argv, FitsIO* fits)
 	fits->get("CRPIX1", crpix1, sizeof(crpix1));
 	fits->get("CRPIX2", crpix2, sizeof(crpix2));
 
-	os << "{" 
-	   << i 
-	   << " " << type 
-	   << " {" << extName << "}"
-	   << " {" << naxis << "}"
-	   << " {" << naxis1 << "}"
-	   << " {" << naxis2 << "}"
-	   << " {" << naxis3 << "}"
-	   << " {" << crpix1 << "}"
-	   << " {" << crpix2 << "}"
-	   << "} ";
+	// Try avoiding long fractional strings
+	if (strlen(crpix1) != 0 &&  strlen(crpix2) != 0) {
+	    double dcrpix1, dcrpix2;
+	    fits->get("CRPIX1", dcrpix1);
+	    fits->get("CRPIX2", dcrpix2);
+	    os << "{" 
+	       << i 
+	       << " " << type 
+	       << " {" << extName << "}"
+	       << " {" << naxis << "}"
+	       << " {" << naxis1 << "}"
+	       << " {" << naxis2 << "}"
+	       << " {" << naxis3 << "}"
+	       << " {" << dcrpix1 << "}"
+	       << " {" << dcrpix2 << "}"
+	       << "} ";
+	}
+	else {
+	    os << "{" 
+	       << i 
+	       << " " << type 
+	       << " {" << extName << "}"
+	       << " {" << naxis << "}"
+	       << " {" << naxis1 << "}"
+	       << " {" << naxis2 << "}"
+	       << " {" << naxis3 << "}"
+	       << " {" << crpix1 << "}"
+	       << " {" << crpix2 << "}"
+	       << "} ";
+	}
 	count++;
     }
     if (count) {
@@ -615,11 +636,11 @@ int RtdImage::hduCmdDisplay(int argc, char** argv, FitsIO* fits)
 
 	for(int i = 0; i < numHDUs; i++) {
 	    if (Tcl_GetInt(interp_, hdus[1], &hduList[i]) != TCL_OK) {
-		free(hdus);
+		Tcl_Free((char *)hdus);
 		return TCL_ERROR;
 	    }
 	}
-	free(hdus);
+	Tcl_Free((char *)hdus);
     }
     else {
 	// use all image extensions, except the primary HDU (1)

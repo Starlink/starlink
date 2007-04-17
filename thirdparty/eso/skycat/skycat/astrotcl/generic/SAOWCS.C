@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: SAOWCS.C,v 1.3 2005/02/02 01:43:04 brighton Exp $" 
+ * "@(#) $Id: SAOWCS.C,v 1.1.1.1 2006/01/12 16:44:00 abrighto Exp $" 
  *
  * SAOWCS.C - method definitions for class SAOWCS, an implementation
  *            of the abstract WCS (WCSRep) class interface based on 
@@ -19,7 +19,7 @@
  *                            libraries.
  * pbiereic        11/10/99   Added deltset()
  */
-static const char* const rcsId="@(#) $Id: SAOWCS.C,v 1.3 2005/02/02 01:43:04 brighton Exp $";
+static const char* const rcsId="@(#) $Id: SAOWCS.C,v 1.1.1.1 2006/01/12 16:44:00 abrighto Exp $";
 
 
 #include <cstdlib>
@@ -27,6 +27,13 @@ static const char* const rcsId="@(#) $Id: SAOWCS.C,v 1.3 2005/02/02 01:43:04 bri
 #include "error.h"
 #include "SAOWCS.h"
 
+extern "C" {
+void wcsdeltset(		/* Set rotation and scaling */   /* missing from wcs.h */
+        struct WorldCoor *wcs,  /* World coordinate system structure */
+	double cdelt1,          /* scale in degrees/pixel (axis 1) */
+	double cdelt2,          /* scale in degrees/pixel (axis 2) */
+	double rotation);       /* rotation angle in degrees */
+}
 
 /*
  * constructor: make an SAOWCS object from the FITS header string

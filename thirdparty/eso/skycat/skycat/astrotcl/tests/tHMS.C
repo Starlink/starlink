@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * $Id: tHMS.C,v 1.4 2005/02/02 01:43:03 brighton Exp $
+ * $Id: tHMS.C,v 1.1.1.1 2006/01/12 16:43:24 abrighto Exp $
  *
  * tHMS.C - test cases for class HMS
  * 

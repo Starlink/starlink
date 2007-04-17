@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: astroImage.C,v 1.1.1.1 2002/04/04 20:11:46 brighton Exp $
+ * $Id: astro_image.C,v 1.1.1.1 2006/01/12 16:36:40 abrighto Exp $
  *
  * astroImage.C - C interface implementation for C++ class AstroImage
  * 
@@ -9,8 +9,10 @@
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  13 Oct 95  Created
+ *                 02/01/06  Renamed astroImage.C to astro_image.C to avoid
+ *                           name conflict on file systems that ignore case
  */
-static const char* const rcsId="@(#) $Id: astroImage.C,v 1.1.1.1 2002/04/04 20:11:46 brighton Exp $";
+static const char* const rcsId="@(#) $Id: astro_image.C,v 1.1.1.1 2006/01/12 16:36:40 abrighto Exp $";
 
 
 
@@ -19,8 +21,8 @@ static const char* const rcsId="@(#) $Id: astroImage.C,v 1.1.1.1 2002/04/04 20:1
 #include "error.h"
 #include "AstroImage.h"
 extern "C" {
-#include "astroImage.hxx"
-#include "astroCatalog.hxx"
+#include "astro_image.h"
+#include "astro_catalog.h"
 }
 
 

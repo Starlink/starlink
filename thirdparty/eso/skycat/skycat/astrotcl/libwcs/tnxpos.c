@@ -1,7 +1,31 @@
-/* File wcslib/tnxpos.c
- * December 10, 1999
- * By Doug Mink, Harvard-Smithsonian Center for Astrophysics
- * After IRAF mwcs/wftnx.x and mwcs/wfgsurfit.x
+/*** File wcslib/tnxpos.c
+ *** June 27, 2005
+ *** By Doug Mink, dmink@cfa.harvard.edu
+ *** Harvard-Smithsonian Center for Astrophysics
+ *** After IRAF mwcs/wftnx.x and mwcs/wfgsurfit.x
+ *** Copyright (C) 1998-2005
+ *** Smithsonian Astrophysical Observatory, Cambridge, MA, USA
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+    
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+    Correspondence concerning WCSTools should be addressed as follows:
+           Internet email: dmink@cfa.harvard.edu
+           Postal address: Doug Mink
+                           Smithsonian Astrophysical Observatory
+                           60 Garden St.
+                           Cambridge, MA 02138 USA
  */
 
 #include <stdio.h>
@@ -15,14 +39,14 @@
 #define MIN(a,b) (((a) < (b)) ? (a) : (b))
 
 /* wftnx -- wcs function driver for the gnomonic projection with correction.
- *    tnxinit (wcs, dir)
- *    tnxdestroy (wcs)
- *    tnxfwd (wcs, v1, v2)	Pixels to WCS
- *    tnxrev (wcs, v1, v2)	WCS to pixels
+ *    tnxinit (header, wcs)
+ *    tnxclose (wcs)
+ *    tnxfwd (xpix, ypix, wcs, xpos, ypos)	Pixels to WCS
+ *    tnxrev (xpos, ypos, wcs, xpix, ypix)	WCS to pixels
  */
 
 #define	max_niter	500
-#define	SZ_ATSTRING	500
+#define	SZ_ATSTRING	2000
 static void wf_gsclose();
 static void wf_gsb1pol();
 static void wf_gsb1leg();
@@ -463,10 +487,10 @@ double	*xpix, *ypix;	/*o physical coordinates (x, y) */
 }
 
 
-/* tnxdestroy -- free up the distortion surface pointers */
+/* TNXCLOSE -- free up the distortion surface pointers */
 
 void
-tnxdestroy (wcs)
+tnxclose (wcs)
 
 struct WorldCoor *wcs;		/* pointer to the WCS descriptor */
 
@@ -480,6 +504,7 @@ struct WorldCoor *wcs;		/* pointer to the WCS descriptor */
 
 /* copyright(c) 1986 association of universities for research in astronomy inc.
  * wfgsurfit.x -- surface fitting package used by wcs function drivers.
+ * Translated to C from SPP by Doug Mink, SAO, May 26, 1998
  *
  * the following routines are used by the experimental function drivers tnx
  * and zpx to decode polynomial fits stored in the image header in the form
@@ -544,6 +569,8 @@ char    *astr;		/* the input mwcs attribute string */
     estr = astr;
     while (*estr != (char) 0) {
 	dval = strtod (astr, &estr);
+	if (*estr == '.')
+	    estr++;
 	if (*estr != (char) 0) {
 	    npar++;
 	    if (npar >= szcoeff) {
@@ -613,8 +640,8 @@ double  y;		/* y value */
             wf_gsb1leg (y, sf->yorder, sf->ymaxmin, sf->yrange, sf->ybasis);
 	    break;
         case TNX_POLYNOMIAL:
-            wf_gsb1pol (x, sf->xorder, sf->xmaxmin, sf->xrange, sf->xbasis);
-            wf_gsb1pol (y, sf->yorder, sf->ymaxmin, sf->yrange, sf->ybasis);
+            wf_gsb1pol (x, sf->xorder, sf->xbasis);
+            wf_gsb1pol (y, sf->yorder, sf->ybasis);
 	    break;
         default:
             fprintf (stderr,"TNX_GSEVAL: unknown surface type\n");
@@ -990,11 +1017,10 @@ double	*fit;			/* array containing the surface parameters
    for a single point and given order. */
 
 static void
-wf_gsb1pol (x, order, k1, k2, basis)
+wf_gsb1pol (x, order, basis)
 
 double  x;		/*i data point */
 int     order;		/*i order of polynomial, order = 1, constant */
-double  k1, k2;		/*i nomalizing constants, dummy in this case */
 double  *basis;		/*o basis functions */
 {
     int     i;
@@ -1039,8 +1065,8 @@ double	*basis;		/*o basis functions */
 
     for (i = 2; i < order; i++) {
 	ri = i;
-        basis[i] = ((2.0 * ri - 3.0) * xnorm * basis[i-1] -
-                       (ri - 2.0) * basis[i-2]) / (ri - 1.0);
+        basis[i] = ((2.0 * ri - 1.0) * xnorm * basis[i-1] -
+                       (ri - 1.0) * basis[i-2]) / ri;
         }
 
     return;
@@ -1182,4 +1208,12 @@ double	*coeff;
  * Oct 22 1999	Drop unused variables, fix case statements after lint
  * Dec 10 1999	Fix bug in gsder() which failed to allocate enough memory
  * Dec 10 1999	Compute wcs->rot using wcsrotset() in tnxinit()
+ *
+ * Feb 14 2001	Fixed off-by-one bug in legendre evaluation (Mike Jarvis)
+ *
+ * Apr 11 2002	Fix bug when .-terminated substring in wf_gsopen()
+ * Apr 29 2002	Clean up code
+ * Jun 26 2002	Increase size of WAT strings from 500 to 2000
+ *
+ * Jun 27 2005	Drop unused arguments k1 and k2 from wf_gsb1pol()
  */

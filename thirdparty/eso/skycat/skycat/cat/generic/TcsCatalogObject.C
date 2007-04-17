@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: TcsCatalogObject.C,v 1.4 2003/01/20 15:52:21 brighton Exp $
+ * $Id: TcsCatalogObject.C,v 1.1.1.1 2006/01/12 16:36:27 abrighto Exp $
  *
  * TcsCatalogObject.C - method definitions for class TcsCatalogObject
  * 
@@ -9,16 +9,19 @@
  * who             when       whuat
  * --------------  --------   ----------------------------------------
  * Allan Brighton  13 Jun 96  Created
+ * pbiereic        20/10/03   method printTableRow (VLTSW20030366, cmagagna)
  */
-static const char* const rcsId="@(#) $Id: TcsCatalogObject.C,v 1.4 2003/01/20 15:52:21 brighton Exp $";
+static const char* const rcsId="@(#) $Id: TcsCatalogObject.C,v 1.1.1.1 2006/01/12 16:36:27 abrighto Exp $";
 
+
+using namespace std;
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <cstring>
 #include "error.h"
-#include "WorldCoords.hxx"
+#include "WorldCoords.h"
 #include "TcsCatalogObject.h"
 
 
@@ -167,7 +170,7 @@ TcsCatalogObject::~TcsCatalogObject()
 /*
  * output operator (Tcl list format)
  */
-std::ostream& operator<<(std::ostream& os, const TcsCatalogObject& t)
+ostream& operator<<(ostream& os, const TcsCatalogObject& t)
 {
     os << '{' << t.id_ << '}';
 
@@ -233,27 +236,27 @@ std::ostream& operator<<(std::ostream& os, const TcsCatalogObject& t)
 /*
  * print this object as a tab separated row
  */
-int TcsCatalogObject::printTableRow(std::ostream& os)
+int TcsCatalogObject::printTableRow(ostream& os)
 {
     char t = '\t';
-    
-    os << id_ << t
-       << ra_ << t
-       << dec_ << t
-       << cooSystem_ << t
-       << epoch_ << t
-       << pma_ << t
-       << pmd_ << t
-       << radvel_ << t
-       << parallax_ << t
-       << cooType_ << t
-       << band_ << t
-       << mag_ << t
-       << more_ << t
-       << preview_ << t
-       << distance_ << t
-       << pa_
-       << std::endl;
+      
+    os << ( id() ? id() : "" ) << t
+       << ra() << t
+       << dec() << t
+       << ( cooSystem() ? cooSystem() : "" ) << t
+       << epoch() << t
+       << pma() << t
+       << pmd() << t
+       << radvel() << t
+       << parallax() << t
+       << ( cooType() ? cooType() : "" ) << t
+       << ( band() ? band() : "" ) << t
+       << mag() << t
+       << ( more() ? more() : "" ) << t
+       << ( preview() ? preview() : "" ) << t
+       << distance() << t
+       << pa()
+       << endl;
     return 0;
 }
  
@@ -263,7 +266,7 @@ int TcsCatalogObject::printTableRow(std::ostream& os)
  */
 void TcsCatalogObject::print(char* buf, int bufsize) 
 {
-    std::ostringstream os;
+    ostringstream os;
     os << *this;
     strncpy(buf, os.str().c_str(), bufsize);
 }
@@ -273,7 +276,7 @@ void TcsCatalogObject::print(char* buf, int bufsize)
  * print the headings to the given ostream 
  * to match the output of the above output operator (<<).
  */
-void TcsCatalogObject::printHeadings(std::ostream& os) 
+void TcsCatalogObject::printHeadings(ostream& os) 
 {
     for (int i = 0; i < numCols_; i++) {
 	os << colNames_[i];
@@ -289,7 +292,7 @@ void TcsCatalogObject::printHeadings(std::ostream& os)
  */
 void TcsCatalogObject::printHeadings(char* buf, int bufsize) 
 {
-    std::ostringstream os;
+    ostringstream os;
     printHeadings(os);
     strncpy(buf, os.str().c_str(), bufsize);
 }

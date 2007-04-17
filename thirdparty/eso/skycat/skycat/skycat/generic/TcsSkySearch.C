@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/Archive
- * $Id: TcsSkySearch.C,v 1.3 2003/01/16 22:09:10 brighton Exp $
+ * $Id: TcsSkySearch.C,v 1.1.1.1 2006/01/12 16:42:01 abrighto Exp $
  *
  * TcsSkySearch.C - method definitions for class TcsSkySearch
  *
@@ -15,10 +15,12 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  2 Apr 98  Created
  */
-static const char* const rcsId="@(#) $Id: TcsSkySearch.C,v 1.3 2003/01/16 22:09:10 brighton Exp $";
+static const char* const rcsId="@(#) $Id: TcsSkySearch.C,v 1.1.1.1 2006/01/12 16:42:01 abrighto Exp $";
 
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 #include "TcsSkySearch.h"
 
 

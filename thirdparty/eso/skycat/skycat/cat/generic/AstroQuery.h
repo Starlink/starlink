@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project 
- * $Id: AstroQuery.h,v 1.2 2003/01/20 15:52:21 brighton Exp $
+ * $Id: AstroQuery.h,v 1.1.1.1 2006/01/12 16:36:28 abrighto Exp $
  *
  * AstroQuery.h - class describing a query to search an astronomical catalog.
  *
@@ -16,7 +16,7 @@
  */
 
 
-#include <cstring>
+#include <cstdio>
 #include "WorldOrImageCoords.h"
 
 

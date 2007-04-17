@@ -3,22 +3,18 @@
 
 /*  The FITSIO software was written by William Pence at the High Energy    */
 /*  Astrophysic Science Archive Research Center (HEASARC) at the NASA      */
-/*  Goddard Space Flight Center.  Users shall not, without prior written   */
-/*  permission of the U.S. Government,  establish a claim to statutory     */
-/*  copyright.  The Government and others acting on its behalf, shall have */
-/*  a royalty-free, non-exclusive, irrevocable,  worldwide license for     */
-/*  Government purposes to publish, distribute, translate, copy, exhibit,  */
-/*  and perform such material.                                             */
+/*  Goddard Space Flight Center.                                           */
 
-#include <stdlib.h>
 #include <limits.h>
 #include <string.h>
+#include <stdlib.h>
 #include "fitsio2.h"
+
 /*--------------------------------------------------------------------------*/
 int ffpprb( fitsfile *fptr,  /* I - FITS file pointer                       */
             long  group,     /* I - group to write(1 = 1st group)           */
-            long  firstelem, /* I - first vector element to write(1 = 1st)  */
-            long  nelem,     /* I - number of values to write               */
+            LONGLONG  firstelem, /* I - first vector element to write(1 = 1st)  */
+            LONGLONG  nelem,     /* I - number of values to write               */
             unsigned char *array, /* I - array of values that are written   */
             int  *status)    /* IO - error status                           */
 /*
@@ -28,6 +24,7 @@ int ffpprb( fitsfile *fptr,  /* I - FITS file pointer                       */
 */
 {
     long row;
+    unsigned char nullvalue;
 
     /*
       the primary array is represented as a binary table:
@@ -35,6 +32,15 @@ int ffpprb( fitsfile *fptr,  /* I - FITS file pointer                       */
       where the first column contains the group parameters
       and the second column contains the image itself.
     */
+
+    if (fits_is_compressed_image(fptr, status))
+    {
+        /* this is a compressed image in a binary table */
+
+        fits_write_compressed_pixels(fptr, TBYTE, firstelem, nelem,
+            0, array, &nullvalue, status);
+        return(*status);
+    }
 
     row=maxvalue(1,group);
 
@@ -44,8 +50,8 @@ int ffpprb( fitsfile *fptr,  /* I - FITS file pointer                       */
 /*--------------------------------------------------------------------------*/
 int ffppnb( fitsfile *fptr,  /* I - FITS file pointer                       */
             long  group,     /* I - group to write(1 = 1st group)           */
-            long  firstelem, /* I - first vector element to write(1 = 1st)  */
-            long  nelem,     /* I - number of values to write               */
+            LONGLONG  firstelem, /* I - first vector element to write(1 = 1st)  */
+            LONGLONG  nelem,     /* I - number of values to write               */
             unsigned char *array, /* I - array of values that are written   */
             unsigned char nulval, /* I - undefined pixel value              */
             int  *status)    /* IO - error status                           */
@@ -58,6 +64,7 @@ int ffppnb( fitsfile *fptr,  /* I - FITS file pointer                       */
 */
 {
     long row;
+    unsigned char nullvalue;
 
     /*
       the primary array is represented as a binary table:
@@ -66,17 +73,29 @@ int ffppnb( fitsfile *fptr,  /* I - FITS file pointer                       */
       and the second column contains the image itself.
     */
 
+    if (fits_is_compressed_image(fptr, status))
+    {
+        /* this is a compressed image in a binary table */
+
+
+        nullvalue = nulval;  /* set local variable */
+        fits_write_compressed_pixels(fptr, TBYTE, firstelem, nelem,
+            1, array, &nullvalue, status);
+        return(*status);
+    }
+
     row=maxvalue(1,group);
 
     ffpcnb(fptr, 2, row, firstelem, nelem, array, nulval, status);
+
     return(*status);
 }
 /*--------------------------------------------------------------------------*/
 int ffp2db(fitsfile *fptr,   /* I - FITS file pointer                     */
            long  group,      /* I - group to write(1 = 1st group)         */
-           long  ncols,      /* I - number of pixels in each row of array */
-           long  naxis1,     /* I - FITS image NAXIS1 value               */
-           long  naxis2,     /* I - FITS image NAXIS2 value               */
+           LONGLONG  ncols,      /* I - number of pixels in each row of array */
+           LONGLONG  naxis1,     /* I - FITS image NAXIS1 value               */
+           LONGLONG  naxis2,     /* I - FITS image NAXIS2 value               */
            unsigned char *array, /* I - array to be written               */
            int  *status)     /* IO - error status                         */
 /*
@@ -85,48 +104,20 @@ int ffp2db(fitsfile *fptr,   /* I - FITS file pointer                     */
   FITS array is not the same as the array being written).
 */
 {
-    long tablerow, nfits, narray, ii;
+    /* call the 3D writing routine, with the 3rd dimension = 1 */
 
-    /*
-      the primary array is represented as a binary table:
-      each group of the primary array is a row in the table,
-      where the first column contains the group parameters
-      and the second column contains the image itself.
-    */
-    tablerow=maxvalue(1,group);
-
-    if (ncols == naxis1)  /* arrays have same row length? */
-    {
-       /* all the image pixels are contiguous, so write all at once */
-        ffpclb(fptr, 2, tablerow, 1L, naxis1 * naxis2, array, status);
-        return(*status);
-    }
-
-    /* loop over the naxis2 rows in the FITS image, */
-    /* writing naxis1 pixels to each row            */
-
-    nfits = 1;   /* next pixel in FITS image to write to */
-    narray = 0;  /* next pixel in input array to be written */
-
-    for (ii = 0; ii < naxis2; ii++)
-    {
-      if (ffpclb(fptr, 2, tablerow, nfits, naxis1, &array[narray], status) > 0)
-          return(*status);
-
-       nfits += naxis1;
-       narray += ncols;
-    }
+    ffp3db(fptr, group, ncols, naxis2, naxis1, naxis2, 1, array, status);
 
     return(*status);
 }
 /*--------------------------------------------------------------------------*/
 int ffp3db(fitsfile *fptr,   /* I - FITS file pointer                     */
            long  group,      /* I - group to write(1 = 1st group)         */
-           long  ncols,      /* I - number of pixels in each row of array */
-           long  nrows,      /* I - number of rows in each plane of array */
-           long  naxis1,     /* I - FITS image NAXIS1 value               */
-           long  naxis2,     /* I - FITS image NAXIS2 value               */
-           long  naxis3,     /* I - FITS image NAXIS3 value               */
+           LONGLONG  ncols,      /* I - number of pixels in each row of array */
+           LONGLONG  nrows,      /* I - number of rows in each plane of array */
+           LONGLONG  naxis1,     /* I - FITS image NAXIS1 value               */
+           LONGLONG  naxis2,     /* I - FITS image NAXIS2 value               */
+           LONGLONG  naxis3,     /* I - FITS image NAXIS3 value               */
            unsigned char *array, /* I - array to be written               */
            int  *status)     /* IO - error status                         */
 /*
@@ -135,14 +126,29 @@ int ffp3db(fitsfile *fptr,   /* I - FITS file pointer                     */
   FITS array is not the same as the array being written).
 */
 {
-    long tablerow, nfits, narray, ii, jj;
-
+    long tablerow, ii, jj;
+    LONGLONG nfits, narray;
+    long fpixel[3]= {1,1,1}, lpixel[3];
     /*
       the primary array is represented as a binary table:
       each group of the primary array is a row in the table,
       where the first column contains the group parameters
       and the second column contains the image itself.
     */
+           
+    if (fits_is_compressed_image(fptr, status))
+    {
+        /* this is a compressed image in a binary table */
+        lpixel[0] = (long) ncols;
+        lpixel[1] = (long) nrows;
+        lpixel[2] = (long) naxis3;
+       
+        fits_write_compressed_img(fptr, TBYTE, fpixel, lpixel,
+            0,  array, NULL, status);
+    
+        return(*status);
+    }
+
     tablerow=maxvalue(1,group);
 
     if (ncols == naxis1 && nrows == naxis2)  /* arrays have same size? */
@@ -151,6 +157,9 @@ int ffp3db(fitsfile *fptr,   /* I - FITS file pointer                     */
       ffpclb(fptr, 2, tablerow, 1L, naxis1 * naxis2 * naxis3, array, status);
       return(*status);
     }
+
+    if (ncols < naxis1 || nrows < naxis2)
+       return(*status = BAD_DIMEN);
 
     nfits = 1;   /* next pixel in FITS image to write to */
     narray = 0;  /* next pixel in input array to be written */
@@ -169,6 +178,7 @@ int ffp3db(fitsfile *fptr,   /* I - FITS file pointer                     */
        nfits += naxis1;
        narray += ncols;
       }
+      narray += (nrows - naxis2) * ncols;
     }
     return(*status);
 }
@@ -191,14 +201,24 @@ int ffpssb(fitsfile *fptr,   /* I - FITS file pointer                       */
 */
 {
     long tablerow;
-    long fpix[7], irange[7], dimen[7], astart, pstart;
-    long off2, off3, off4, off5, off6, off7;
-    long st10, st20, st30, st40, st50, st60, st70;
-    long st1, st2, st3, st4, st5, st6, st7;
-    long ii, i1, i2, i3, i4, i5, i6, i7;
+    LONGLONG fpix[7], dimen[7], astart, pstart;
+    LONGLONG off2, off3, off4, off5, off6, off7;
+    LONGLONG st10, st20, st30, st40, st50, st60, st70;
+    LONGLONG st1, st2, st3, st4, st5, st6, st7;
+    long ii, i1, i2, i3, i4, i5, i6, i7, irange[7];
 
     if (*status > 0)
         return(*status);
+
+    if (fits_is_compressed_image(fptr, status))
+    {
+        /* this is a compressed image in a binary table */
+
+        fits_write_compressed_img(fptr, TBYTE, fpixel, lpixel,
+            0,  array, NULL, status);
+    
+        return(*status);
+    }
 
     if (naxis < 1 || naxis > 7)
       return(*status = BAD_DIMEN);
@@ -260,6 +280,7 @@ int ffpssb(fitsfile *fptr,   /* I - FITS file pointer                       */
         for (i3 = 0; i3 < irange[2]; i3++)
         {
          pstart = st1 + st2 + st3 + st4 + st5 + st6 + st7;
+
          for (i2 = 0; i2 < irange[1]; i2++)
          {
            if (ffpclb(fptr, 2, tablerow, pstart, i1, &array[astart],
@@ -316,9 +337,9 @@ int ffpgpb( fitsfile *fptr,   /* I - FITS file pointer                      */
 /*--------------------------------------------------------------------------*/
 int ffpclb( fitsfile *fptr,  /* I - FITS file pointer                       */
             int  colnum,     /* I - number of column to write (1 = 1st col) */
-            long  firstrow,  /* I - first row to write (1 = 1st row)        */
-            long  firstelem, /* I - first vector element to write (1 = 1st) */
-            long  nelem,     /* I - number of values to write               */
+            LONGLONG  firstrow,  /* I - first row to write (1 = 1st row)        */
+            LONGLONG  firstelem, /* I - first vector element to write (1 = 1st) */
+            LONGLONG  nelem,     /* I - number of values to write               */
             unsigned char *array, /* I - array of values to write           */
             int  *status)    /* IO - error status                           */
 /*
@@ -336,8 +357,9 @@ int ffpclb( fitsfile *fptr,  /* I - FITS file pointer                       */
 */
 {
     int tcode, maxelem, hdutype, writeraw;
-    long twidth, incre, repeat, rowlen, rownum, elemnum, remain, next, ntodo;
-    long tnull, startpos, wrtptr;
+    long twidth, incre;
+    long  ntodo;
+    LONGLONG repeat, startpos, elemnum, wrtptr, rowlen, rownum, remain, next, tnull;
     double scale, zero;
     char tform[20], cform[20];
     char message[FLEN_ERRMSG];
@@ -355,7 +377,7 @@ int ffpclb( fitsfile *fptr,  /* I - FITS file pointer                       */
     /*---------------------------------------------------*/
     /*  Check input and get parameters about the column: */
     /*---------------------------------------------------*/
-    if (ffgcpr( fptr, colnum, firstrow, firstelem, nelem, 1, &scale, &zero,
+    if (ffgcprll( fptr, colnum, firstrow, firstelem, nelem, 1, &scale, &zero,
         tform, &twidth, &tcode, &maxelem, &startpos,  &elemnum, &incre,
         &repeat, &rowlen, &hdutype, &tnull, snull, status) > 0)
         return(*status);
@@ -373,7 +395,7 @@ int ffpclb( fitsfile *fptr,  /* I - FITS file pointer                       */
     if (scale == 1. && zero == 0. && tcode == TBYTE)
     {
         writeraw = 1;
-        maxelem = nelem;  /* we can write the entire array at one time */
+        maxelem = (int) nelem;  /* we can write the entire array at one time */
     }
     else
         writeraw = 0;
@@ -394,10 +416,10 @@ int ffpclb( fitsfile *fptr,  /* I - FITS file pointer                       */
            will fit in the buffer space or to the number of pixels that remain
            in the current vector, which ever is smaller.
         */
-        ntodo = minvalue(remain, maxelem);      
-        ntodo = minvalue(ntodo, (repeat - elemnum));
+        ntodo = (long) minvalue(remain, maxelem);      
+        ntodo = (long) minvalue(ntodo, (repeat - elemnum));
 
-        wrtptr = startpos + (rownum * rowlen) + (elemnum * incre);
+        wrtptr = startpos + ((LONGLONG)rownum * rowlen) + (elemnum * incre);
         ffmbyt(fptr, wrtptr, IGNORE_EOF, status); /* move to write position */
 
         switch (tcode) 
@@ -417,6 +439,13 @@ int ffpclb( fitsfile *fptr,  /* I - FITS file pointer                       */
               }
 
               break;
+
+            case (TLONGLONG):
+
+                ffi1fi8(&array[next], ntodo, scale, zero,
+                        (LONGLONG *) buffer, status);
+                ffpi8b(fptr, ntodo, incre, (long *) buffer, status);
+                break;
 
             case (TSHORT):
  
@@ -492,8 +521,8 @@ int ffpclb( fitsfile *fptr,  /* I - FITS file pointer                       */
         if (*status > 0)  /* test for error during previous write operation */
         {
           sprintf(message,
-          "Error writing elements %ld thru %ld of input data array (ffpclb).",
-              next+1, next+ntodo);
+          "Error writing elements %.0f thru %.0f of input data array (ffpclb).",
+              (double) (next+1), (double) (next+ntodo));
           ffpmsg(message);
           return(*status);
         }
@@ -530,9 +559,9 @@ int ffpclb( fitsfile *fptr,  /* I - FITS file pointer                       */
 /*--------------------------------------------------------------------------*/
 int ffpcnb( fitsfile *fptr,  /* I - FITS file pointer                       */
             int  colnum,     /* I - number of column to write (1 = 1st col) */
-            long  firstrow,  /* I - first row to write (1 = 1st row)        */
-            long  firstelem, /* I - first vector element to write (1 = 1st) */
-            long  nelem,     /* I - number of values to write               */
+            LONGLONG  firstrow,  /* I - first row to write (1 = 1st row)        */
+            LONGLONG  firstelem, /* I - first vector element to write (1 = 1st) */
+            LONGLONG  nelem,     /* I - number of values to write               */
             unsigned char *array,   /* I - array of values to write         */
             unsigned char nulvalue, /* I - flag for undefined pixels        */
             int  *status)    /* IO - error status                           */
@@ -546,7 +575,9 @@ int ffpcnb( fitsfile *fptr,  /* I - FITS file pointer                       */
 */
 {
     tcolumn *colptr;
-    long repeat, first, ngood = 0, nbad = 0, ii, fstelm, fstrow;
+    long  ngood = 0, nbad = 0, ii;
+    LONGLONG repeat, first, fstelm, fstrow;
+    int tcode, overflow = 0;
 
     if (*status > 0)
         return(*status);
@@ -565,7 +596,27 @@ int ffpcnb( fitsfile *fptr,  /* I - FITS file pointer                       */
     colptr  = (fptr->Fptr)->tableptr;   /* point to first column */
     colptr += (colnum - 1);     /* offset to correct column structure */
 
-    repeat = colptr->trepeat;  /* repeat count for this column */
+    tcode  = colptr->tdatatype;
+
+    if (tcode > 0)
+       repeat = colptr->trepeat;  /* repeat count for this column */
+    else
+       repeat = firstelem -1 + nelem;  /* variable length arrays */
+
+    /* if variable length array, first write the whole input vector, 
+       then go back and fill in the nulls */
+    if (tcode < 0) {
+      if (ffpclb(fptr, colnum, firstrow, firstelem, nelem, array, status) > 0) {
+        if (*status == NUM_OVERFLOW) 
+	{
+	  /* ignore overflows, which are possibly the null pixel values */
+	  /*  overflow = 1;   */
+	  *status = 0;
+	} else { 
+          return(*status);
+	}
+      }
+    }
 
     /* absolute element number in the column */
     first = (firstrow - 1) * repeat + firstelem;
@@ -579,6 +630,7 @@ int ffpcnb( fitsfile *fptr,  /* I - FITS file pointer                       */
             fstelm = ii - nbad + first;  /* absolute element number */
             fstrow = (fstelm - 1) / repeat + 1;  /* starting row number */
             fstelm = fstelm - (fstrow - 1) * repeat;  /* relative number */
+
             if (ffpclu(fptr, colnum, fstrow, fstelm, nbad, status) > 0)
                 return(*status);
 
@@ -595,17 +647,25 @@ int ffpcnb( fitsfile *fptr,  /* I - FITS file pointer                       */
             fstrow = (fstelm - 1) / repeat + 1;  /* starting row number */
             fstelm = fstelm - (fstrow - 1) * repeat;  /* relative number */
 
-            if (ffpclb(fptr, colnum, fstrow, fstelm, ngood, &array[ii-ngood],
-                status) > 0)
-                return(*status);
-
+            if (tcode > 0) {  /* variable length arrays have already been written */
+              if (ffpclb(fptr, colnum, fstrow, fstelm, ngood, &array[ii-ngood],
+                status) > 0) {
+		if (*status == NUM_OVERFLOW) 
+		{
+		  overflow = 1;
+		  *status = 0;
+		} else { 
+                  return(*status);
+		}
+	      }
+	    }
             ngood=0;
          }
 
          nbad = nbad + 1;  /* the consecutive number of bad pixels */
       }
     }
-
+    
     /* finished loop;  now just write the last set of pixels */
 
     if (ngood)  /* write last string of good pixels */
@@ -614,15 +674,23 @@ int ffpcnb( fitsfile *fptr,  /* I - FITS file pointer                       */
       fstrow = (fstelm - 1) / repeat + 1;  /* starting row number */
       fstelm = fstelm - (fstrow - 1) * repeat;  /* relative number */
 
-      ffpclb(fptr, colnum, fstrow, fstelm, ngood, &array[ii-ngood], status);
+      if (tcode > 0) {  /* variable length arrays have already been written */
+        ffpclb(fptr, colnum, fstrow, fstelm, ngood, &array[ii-ngood], status);
+      }
     }
-    else  /* write last string of bad pixels */
+    else if (nbad) /* write last string of bad pixels */
     {
       fstelm = ii - nbad + first;  /* absolute element number */
       fstrow = (fstelm - 1) / repeat + 1;  /* starting row number */
       fstelm = fstelm - (fstrow - 1) * repeat;  /* relative number */
 
       ffpclu(fptr, colnum, fstrow, fstelm, nbad, status);
+    }
+
+    if (*status <= 0) {
+      if (overflow) {
+        *status = NUM_OVERFLOW;
+      }
     }
 
     return(*status);
@@ -763,6 +831,53 @@ int ffi1fi4(unsigned char *input,  /* I - array of values to be converted  */
     return(*status);
 }
 /*--------------------------------------------------------------------------*/
+int ffi1fi8(unsigned char *input, /* I - array of values to be converted  */
+            long ntodo,           /* I - number of elements in the array  */
+            double scale,         /* I - FITS TSCALn or BSCALE value      */
+            double zero,          /* I - FITS TZEROn or BZERO  value      */
+            LONGLONG *output,     /* O - output array of converted values */
+            int *status)          /* IO - error status                    */
+/*
+  Copy input to output prior to writing output to a FITS file.
+  Do datatype conversion and scaling if required
+*/
+{
+    long ii;
+    double dvalue;
+
+    if (scale == 1. && zero == 0.)
+    {       
+        for (ii = 0; ii < ntodo; ii++)
+                output[ii] = input[ii];
+    }
+    else
+    {
+        for (ii = 0; ii < ntodo; ii++)
+        {
+            dvalue = (input[ii] - zero) / scale;
+
+            if (dvalue < DLONGLONG_MIN)
+            {
+                *status = OVERFLOW_ERR;
+                output[ii] = LONGLONG_MIN;
+            }
+            else if (dvalue > DLONGLONG_MAX)
+            {
+                *status = OVERFLOW_ERR;
+                output[ii] = LONGLONG_MAX;
+            }
+            else
+            {
+                if (dvalue >= 0)
+                    output[ii] = (LONGLONG) (dvalue + .5);
+                else
+                    output[ii] = (LONGLONG) (dvalue - .5);
+            }
+        }
+    }
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
 int ffi1fr4(unsigned char *input,  /* I - array of values to be converted  */
             long ntodo,            /* I - number of elements in the array  */
             double scale,          /* I - FITS TSCALn or BSCALE value      */
@@ -784,7 +899,7 @@ int ffi1fr4(unsigned char *input,  /* I - array of values to be converted  */
     else
     {
         for (ii = 0; ii < ntodo; ii++)
-            output[ii] = ( ( (double) input[ii] ) - zero) / scale;
+            output[ii] = (float) (( ( (double) input[ii] ) - zero) / scale);
     }
     return(*status);
 }

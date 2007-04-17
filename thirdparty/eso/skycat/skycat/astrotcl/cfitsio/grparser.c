@@ -49,26 +49,38 @@
 		to nonempty FITS. file. fitsfile *ff no longer needs to point
 		to an empty FITS file with 0 HDUs in it. All data written by
 		parser will simple be appended at the end of file.
+22-Jan-99: changes to parser: when in append mode parser initially scans all
+		existing HDUs to built a list of already used EXTNAME/EXTVERs
+22-Jan-99: Bruce O'Neel, bugfix : TLONG should always reference long type
+		variable on OSF/Alpha and on 64-bit archs in general
+20-Jun-2002 Wm Pence, added support for the HIERARCH keyword convention in
+                which keyword names can effectively be longer than 8 characters.
+                Example:
+                HIERARCH  LongKeywordName = 'value' / comment
+30-Jan-2003 Wm Pence, bugfix: ngp_read_xtension was testing for "ASCIITABLE" 
+                instead of "TABLE" as the XTENSION value of an ASCII table,
+                and it did not allow for optional trailing spaces in the
+                "IMAGE" or "TABLE" string. 
+16-Dec-2003 James Peachey: ngp_keyword_all_write was modified to apply
+                comments from the template file to the output file in
+                the case of reserved keywords (e.g. tform#, ttype# etcetera).
 */
 
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#if ! ( defined(__APPLE__) && defined(__MACH__) )
+#ifdef sparc
 #include <malloc.h>
 #include <memory.h>
 #endif
 
 #include <string.h>
-
-#include "fitsio.h"
-
+#include "fitsio2.h"
 #include "grparser.h"
 
-
-NGP_RAW_LINE	ngp_curline = { NULL, NULL, NULL, NGP_TTYPE_UNKNOWN, NULL, NGP_FORMAT_OK };
-NGP_RAW_LINE	ngp_prevline = { NULL, NULL, NULL, NGP_TTYPE_UNKNOWN, NULL, NGP_FORMAT_OK };
+NGP_RAW_LINE	ngp_curline = { NULL, NULL, NULL, NGP_TTYPE_UNKNOWN, NULL, NGP_FORMAT_OK, 0 };
+NGP_RAW_LINE	ngp_prevline = { NULL, NULL, NULL, NGP_TTYPE_UNKNOWN, NULL, NGP_FORMAT_OK, 0 };
 
 int		ngp_inclevel = 0;		/* number of included files, 1 - means mean file */
 int		ngp_grplevel = 0;		/* group nesting level, 0 - means no grouping */
@@ -133,6 +145,45 @@ int	ngp_get_extver(char *extname, int *version)
    return(NGP_OK);
  }
 
+int	ngp_set_extver(char *extname, int version)
+ { NGP_EXTVER_TAB *p;
+   char 	*p2;
+   int		i;
+
+   if (NULL == extname) return(NGP_BAD_ARG);
+   if ((NULL == ngp_extver_tab) && (ngp_extver_tab_size > 0)) return(NGP_BAD_ARG);
+   if ((NULL != ngp_extver_tab) && (ngp_extver_tab_size <= 0)) return(NGP_BAD_ARG);
+
+   for (i=0; i<ngp_extver_tab_size; i++)
+    { if (0 == strcmp(extname, ngp_extver_tab[i].extname))
+        { if (version > ngp_extver_tab[i].version)  ngp_extver_tab[i].version = version;
+          return(NGP_OK);
+        }
+    }
+
+   if (NULL == ngp_extver_tab)
+     { p = (NGP_EXTVER_TAB *)ngp_alloc(sizeof(NGP_EXTVER_TAB)); }
+   else
+     { p = (NGP_EXTVER_TAB *)ngp_realloc(ngp_extver_tab, (ngp_extver_tab_size + 1) * sizeof(NGP_EXTVER_TAB)); }
+
+   if (NULL == p) return(NGP_NO_MEMORY);
+
+   p2 = ngp_alloc(strlen(extname) + 1);
+   if (NULL == p2)
+     { ngp_free(p);
+       return(NGP_NO_MEMORY);
+     }
+
+   strcpy(p2, extname);
+   ngp_extver_tab = p;
+   ngp_extver_tab[ngp_extver_tab_size].extname = p2;
+   ngp_extver_tab[ngp_extver_tab_size].version = version;
+
+   ngp_extver_tab_size++;
+
+   return(NGP_OK);
+ }
+
 
 int	ngp_delete_extver_tab(void)
  { int i;
@@ -175,6 +226,27 @@ int	ngp_strcasecmp(char *p1, char *p2)
     }
  }
 
+int	ngp_strcasencmp(char *p1, char *p2, int n)
+ { char c1, c2;
+   int ii;
+
+   for (ii=0;ii<n;ii++)
+    {
+      c1 = *p1;
+      if ((c1 >= 'a') && (c1 <= 'z')) c1 += ('A' - 'a');
+
+      c2 = *p2;
+      if ((c2 >= 'a') && (c2 <= 'z')) c2 += ('A' - 'a');
+
+      if (c1 < c2) return(-1);
+      if (c1 > c2) return(1);
+      if (0 == c1) return(0);
+      p1++;
+      p2++;
+    }
+    return(0);
+ }
+
 	/* read one line from file */
 
 int	ngp_line_from_file(FILE *fp, char **p)
@@ -188,7 +260,7 @@ int	ngp_line_from_file(FILE *fp, char **p)
    llen = 0;					/* 0 characters read so far */
    *p = (char *)ngp_alloc(1);			/* preallocate 1 byte */
    allocsize = 1;				/* signal that we have allocated 1 byte */
-   if (NULL == *p) return(NGP_NO_MEMORY);	/* if this failed, system is dire straits */
+   if (NULL == *p) return(NGP_NO_MEMORY);	/* if this failed, system is in dire straits */
 
    for (;;)
     { c = getc(fp);				/* get next character */
@@ -353,6 +425,21 @@ int	ngp_extract_tokens(NGP_RAW_LINE *cl)
         { *p = 0;
           break;
         }
+
+      /*
+        from Richard Mathar, 2002-05-03, add 10 lines:
+        if upper/lowercase HIERARCH followed also by an equal sign...
+      */
+      if( strncasecmp("HIERARCH",p,strlen("HIERARCH")) == 0 )
+      {
+           char * const eqsi=strchr(p,'=') ;
+           if( eqsi )
+           {
+              cl_flags |= NGP_FOUND_EQUAL_SIGN ;
+              p=eqsi ;
+              break ;
+           }
+      }
 
       if ((' ' == *p) || ('\t' == *p)) break;
       if ('=' == *p)
@@ -583,8 +670,10 @@ int	ngp_read_line(int ignore_blank_lines)
       if (NULL == ngp_curline.name)  continue;	/* skip lines consisting only of whitespaces */
 
       for (k = 0; k < strlen(ngp_curline.name); k++)
-        if ((ngp_curline.name[k] >= 'a') && (ngp_curline.name[k] <= 'z')) 
-          ngp_curline.name[k] += 'A' - 'a';	/* force keyword to be upper case */
+       { if ((ngp_curline.name[k] >= 'a') && (ngp_curline.name[k] <= 'z')) 
+           ngp_curline.name[k] += 'A' - 'a';	/* force keyword to be upper case */
+         if (k == 7) break;  /* only first 8 chars are required to be upper case */
+       }
 
       for (k=0;; k++)				/* find index of keyword in keyword table */
        { if (NGP_TOKEN_UNKNOWN == ngp_tkdef[k].code) break;
@@ -656,8 +745,9 @@ int	ngp_read_line(int ignore_blank_lines)
       strncpy(ngp_linkey.name, ngp_curline.name, NGP_MAX_NAME); /* and keyword's name */
       ngp_linkey.name[NGP_MAX_NAME - 1] = 0;
 
-      if (strlen(ngp_linkey.name) > 8)
-        { return(NGP_BAD_ARG);		/* cfitsio does not allow names > 8 chars */
+      if (strlen(ngp_linkey.name) > FLEN_KEYWORD)  /* WDP: 20-Jun-2002:  mod to support HIERARCH */
+        { 
+           return(NGP_BAD_ARG);		/* cfitsio does not allow names > 8 chars */
         }
       
       return(NGP_OK);			/* we have valid non empty line, so return success */
@@ -710,8 +800,9 @@ int	ngp_keyword_is_write(NGP_TOKEN *ngp_tok)
 	/* write (almost) all keywords from given HDU to disk */
 
 int     ngp_keyword_all_write(NGP_HDU *ngph, fitsfile *ffp, int mode)
- { int i, r, ib;
-   char buf[200];
+ { int		i, r, ib;
+   char		buf[200];
+   long		l;
 
 
    if (NULL == ngph) return(NGP_NUL_PTR);
@@ -719,7 +810,8 @@ int     ngp_keyword_all_write(NGP_HDU *ngph, fitsfile *ffp, int mode)
    r = NGP_OK;
    
    for (i=0; i<ngph->tokcnt; i++)
-    { if ((NGP_REALLY_ALL & mode) || (NGP_OK == ngp_keyword_is_write(&(ngph->tok[i]))))
+    { r = ngp_keyword_is_write(&(ngph->tok[i]));
+      if ((NGP_REALLY_ALL & mode) || (NGP_OK == r))
         { switch (ngph->tok[i].type)
            { case NGP_TTYPE_BOOL:
 			ib = ngph->tok[i].value.b;
@@ -729,7 +821,8 @@ int     ngp_keyword_all_write(NGP_HDU *ngph, fitsfile *ffp, int mode)
 			fits_write_key_longstr(ffp, ngph->tok[i].name, ngph->tok[i].value.s, ngph->tok[i].comment, &r);
 			break;
              case NGP_TTYPE_INT:
-			fits_write_key(ffp, TLONG, ngph->tok[i].name, &(ngph->tok[i].value.i), ngph->tok[i].comment, &r);
+			l = ngph->tok[i].value.i;	/* bugfix - 22-Jan-99, BO - nonalignment of OSF/Alpha */
+			fits_write_key(ffp, TLONG, ngph->tok[i].name, &l, ngph->tok[i].comment, &r);
 			break;
              case NGP_TTYPE_REAL:
 			fits_write_key(ffp, TDOUBLE, ngph->tok[i].name, &(ngph->tok[i].value.d), ngph->tok[i].comment, &r);
@@ -753,8 +846,17 @@ int     ngp_keyword_all_write(NGP_HDU *ngph, fitsfile *ffp, int mode)
 			fits_write_record(ffp, buf, &r);
                         break;
            }
-          if (r) return(r);
         }
+      else if (NGP_BAD_ARG == r) /* enhancement 10 dec 2003, James Peachey: template comments replace defaults */
+        { r = NGP_OK;						/* update comments of special keywords like TFORM */
+          if (ngph->tok[i].comment && *ngph->tok[i].comment)	/* do not update with a blank comment */
+            { fits_modify_comment(ffp, ngph->tok[i].name, ngph->tok[i].comment, &r);
+            }
+        }
+      else /* other problem, typically a blank token */
+        { r = NGP_OK;						/* skip this token, but continue */
+        }
+      if (r) return(r);
     }
      
    fits_set_hdustruc(ffp, &r);				/* resync cfitsio */
@@ -877,6 +979,7 @@ int	ngp_read_xtension(fitsfile *ff, int parent_hn, int simple_mode)
    char 	*ngph_extname = 0;
    long		ngph_size[NGP_MAX_ARRAY_DIM];
    NGP_HDU	ngph;
+   long		lv;
 
    incrementor_name[0] = 0;			/* signal no keyword+'#' found yet */
    incrementor_index = 0;
@@ -943,9 +1046,9 @@ int	ngp_read_xtension(fitsfile *ff, int parent_hn, int simple_mode)
        for (i=0; i<ngph.tokcnt; i++)
         { if (!strcmp("XTENSION", ngph.tok[i].name))
             { if (NGP_TTYPE_STRING == ngph.tok[i].type)
-                { if (!ngp_strcasecmp("BINTABLE", ngph.tok[i].value.s)) ngph_node_type = NGP_NODE_BTABLE;
-                  if (!ngp_strcasecmp("ASCIITABLE", ngph.tok[i].value.s)) ngph_node_type = NGP_NODE_ATABLE;
-                  if (!ngp_strcasecmp("IMAGE", ngph.tok[i].value.s)) ngph_node_type = NGP_NODE_IMAGE;
+                { if (!ngp_strcasencmp("BINTABLE", ngph.tok[i].value.s,8)) ngph_node_type = NGP_NODE_BTABLE;
+                  if (!ngp_strcasencmp("TABLE", ngph.tok[i].value.s,5)) ngph_node_type = NGP_NODE_ATABLE;
+                  if (!ngp_strcasencmp("IMAGE", ngph.tok[i].value.s,5)) ngph_node_type = NGP_NODE_IMAGE;
                 }
             }
           else if (!strcmp("SIMPLE", ngph.tok[i].name))
@@ -1013,7 +1116,8 @@ int	ngp_read_xtension(fitsfile *ff, int parent_hn, int simple_mode)
 
    if ((NGP_OK == r) && (NULL != ngph_extname))
      { r = ngp_get_extver(ngph_extname, &my_version);	/* write correct ext version number */
-       fits_write_key(ff, TLONG, "EXTVER", &my_version, "auto assigned by template parser", &r); 
+       lv = my_version;		/* bugfix - 22-Jan-99, BO - nonalignment of OSF/Alpha */
+       fits_write_key(ff, TLONG, "EXTVER", &lv, "auto assigned by template parser", &r); 
      }
 
    if (NGP_OK == r)
@@ -1131,13 +1235,17 @@ int	ngp_read_group(fitsfile *ff, char *grpname, int parent_hn)
 /* read whole template. ff should point to the opened empty fits file. */
 
 int	fits_execute_template(fitsfile *ff, char *ngp_template, int *status)
- { int r, exit_flg, first_extension, i, my_hn, tmp0, keys_exist, more_keys;
-   char grnm[NGP_MAX_STRING];
+ { int		r, exit_flg, first_extension, i, my_hn, tmp0, keys_exist, more_keys, used_ver;
+   char		grnm[NGP_MAX_STRING], used_name[NGP_MAX_STRING];
+   long		luv;
 
-   if (NULL == ff) return(NGP_NUL_PTR);
-   if (NULL == ngp_template) return(NGP_NUL_PTR);
    if (NULL == status) return(NGP_NUL_PTR);
-   if (*status) return(*status);
+   if (NGP_OK != *status) return(*status);
+
+   if ((NULL == ff) || (NULL == ngp_template))
+     { *status = NGP_NUL_PTR;
+       return(*status);
+     }
 
    ngp_inclevel = 0;				/* initialize things, not all should be zero */
    ngp_grplevel = 0;
@@ -1145,6 +1253,11 @@ int	fits_execute_template(fitsfile *ff, char *ngp_template, int *status)
    exit_flg = 0;
    ngp_master_dir[0] = 0;			/* this should be before 1st call to ngp_include_file */
    first_extension = 1;				/* we need to create PHDU */
+
+   if (NGP_OK != (r = ngp_delete_extver_tab()))
+     { *status = r;
+       return(r);
+     }
 
    fits_get_hdu_num(ff, &my_hn);		/* our HDU position */
    if (my_hn <= 1)				/* check whether we really need to create PHDU */
@@ -1156,18 +1269,30 @@ int	fits_execute_template(fitsfile *ff, char *ngp_template, int *status)
      }
    else
      { first_extension = 0;			/* PHDU (followed by 1+ extensions) exist */
-     }
-                                                                          
 
-   if (NGP_OK != (r = ngp_delete_extver_tab()))
-     { *status = r;
-       return(r);
+       for (i = 2; i<= my_hn; i++)
+        { *status = NGP_OK;
+          fits_movabs_hdu(ff, 1, &tmp0, status);
+          if (NGP_OK != *status) break;
+
+          fits_read_key(ff, TSTRING, "EXTNAME", used_name, NULL, status);
+          if (NGP_OK != *status)  continue;
+
+          fits_read_key(ff, TLONG, "EXTVER", &luv, NULL, status);
+          used_ver = luv;			/* bugfix - 22-Jan-99, BO - nonalignment of OSF/Alpha */
+          if (VALUE_UNDEFINED == *status)
+            { used_ver = 1;
+              *status = NGP_OK;
+            }
+
+          if (NGP_OK == *status) *status = ngp_set_extver(used_name, used_ver);
+        }
+
+       fits_movabs_hdu(ff, my_hn, &tmp0, status);
      }
-   
-   if (NGP_OK != (r = ngp_include_file(ngp_template))) 
-     { *status = r;
-       return(r);
-     }
+   if (NGP_OK != *status) return(*status);
+                                                                          
+   if (NGP_OK != (*status = ngp_include_file(ngp_template))) return(*status);
 
    for (i = strlen(ngp_template) - 1; i >= 0; i--) /* strlen is > 0, otherwise fopen failed */
     { 

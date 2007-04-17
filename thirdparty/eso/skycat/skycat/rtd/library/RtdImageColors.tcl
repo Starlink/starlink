@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: RtdImageColors.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
+# "@(#) $Id: RtdImageColors.tcl,v 1.1.1.1 2006/01/12 16:38:19 abrighto Exp $"
 #
 # RtdImageColors.tcl - itcl widget for managing colormap for an rtdimage
 # 
@@ -51,8 +51,8 @@ itcl::class rtd::RtdImageColors {
 	$itk_component(scale) config -value Linear
 
 	# choose colormap/ITT
-	set cmap_files [$image_ cmap list]
-	set itt_files [$image_ itt list]
+	set cmap_files [lsort [$image_ cmap list]]
+	set itt_files [lsort [$image_ itt list]]
 
 	# Chooser(n) widget listing available colormaps
 	itk_component add colormaps {

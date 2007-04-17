@@ -1,7 +1,7 @@
 
 /*
  * E.S.O. - VLT project / ESO Archive
- * "@(#) $Id: cat_bitmaps.C,v 1.1.1.1 2002/04/04 20:11:47 brighton Exp $"
+ * "@(#) $Id: cat_bitmaps.C,v 1.2 2006/01/20 23:36:27 abrighto Exp $"
  *
  * Tk Bitmap/Pixmap definitions
  *
@@ -10,8 +10,6 @@
 
 #include <tcl.h>
 #include <tk.h>
-#include <tix.h>
-
 
 void defineCatBitmaps(Tcl_Interp *interp) {
     #include "symb_circle.xbm"
@@ -43,26 +41,4 @@ void defineCatBitmaps(Tcl_Interp *interp) {
 
     #include "symb_compass.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("symb_compass"), (char*)symb_compass_bits, symb_compass_width, symb_compass_height);
-
-    #include "archive.xpm"
-    Tix_DefinePixmap(interp, Tk_GetUid("archive"), archive_xpm);
-
-    #include "catalog.xpm"
-    Tix_DefinePixmap(interp, Tk_GetUid("catalog"), catalog_xpm);
-
-    #include "imagesvr.xpm"
-    Tix_DefinePixmap(interp, Tk_GetUid("imagesvr"), imagesvr_xpm);
-
-    #include "local.xpm"
-    Tix_DefinePixmap(interp, Tk_GetUid("local"), local_xpm);
-
-    #include "namesvr.xpm"
-    Tix_DefinePixmap(interp, Tk_GetUid("namesvr"), namesvr_xpm);
-
-    #include "nsfolder.xpm"
-    Tix_DefinePixmap(interp, Tk_GetUid("nsfolder"), nsfolder_xpm);
-
-    #include "nsopenfold.xpm"
-    Tix_DefinePixmap(interp, Tk_GetUid("nsopenfold"), nsopenfold_xpm);
-
 }

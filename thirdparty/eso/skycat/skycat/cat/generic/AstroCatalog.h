@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: AstroCatalog.h,v 1.2 2003/01/17 11:10:01 brighton Exp $
+ * $Id: AstroCatalog.h,v 1.1.1.1 2006/01/12 16:36:27 abrighto Exp $
  *
  * AstroCatalog.h - class definitions for accessing astronomical
  *                  catalogs
@@ -18,6 +18,7 @@
  */
 
 
+using namespace std;
 #include <iostream>
 #include "CatalogInfo.h"
 #include "AstroQuery.h"

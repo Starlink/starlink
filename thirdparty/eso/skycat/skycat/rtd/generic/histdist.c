@@ -18,10 +18,7 @@ static char SccsId[] = "%W%  %G%";
 #include <stdio.h>
 #include "histeq.h"		/* define SubrangeLink */
 
-/* Local prototypes */
-static int excess_zgroup();
-static int excess_nzgroup();
-static int range_zgroup();
+static int excess_zgroup(), excess_nzgroup(), range_zgroup();
 
 /*
  * Subroutine:	distribute_levels

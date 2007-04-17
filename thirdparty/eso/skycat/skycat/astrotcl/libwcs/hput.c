@@ -1,6 +1,30 @@
 /*** File libwcs/hput.c
- *** July 20, 2000
- *** By Doug Mink
+ *** September 16, 2004
+ *** By Doug Mink, dmink@cfa.harvard.edu
+ *** Harvard-Smithsonian Center for Astrophysics
+ *** Copyright (C) 1995-2004
+ *** Smithsonian Astrophysical Observatory, Cambridge, MA, USA
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+    
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+    Correspondence concerning WCSTools should be addressed as follows:
+           Internet email: dmink@cfa.harvard.edu
+           Postal address: Doug Mink
+                           Smithsonian Astrophysical Observatory
+                           60 Garden St.
+                           Cambridge, MA 02138 USA
 
  * Module:	hput.c (Put FITS Header parameter values)
  * Purpose:	Implant values for parameters into FITS header string
@@ -25,23 +49,23 @@
  * Subroutine:	num2str (out, num, field, ndec) converts number to string
  * Subroutine:  getltime () returns current local time as ISO-style string
  * Subroutine:  getutime () returns current UT as ISO-style string
-
- * Copyright:   1999 Smithsonian Astrophysical Observatory
- *              You may do anything you like with this file except remove
- *              this copyright.  The Smithsonian Astrophysical Observatory
- *              makes no representations about the suitability of this
- *              software for any purpose.  It is provided "as is" without
- *              express or implied warranty.
  */
 #include <sys/time.h>
-#include <time.h>
-#include <stdio.h>
 #include <string.h>             /* NULL, strlen, strstr, strcpy */
+#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include "fitshead.h"
 
 static int verbose=0;	/* Set to 1 to print error messages and other info */
+
+static int headshrink=1; /* Set to 1 to drop line after deleting keyword */
+void
+setheadshrink (hsh)
+int hsh;
+{headshrink = hsh; return;}
+
+static void fixnegzero();
 
 
 /*  HPUTI4 - Set int keyword = ival in FITS header string */
@@ -104,6 +128,9 @@ float rval;		/* float number */
     /* Translate value from binary to ASCII */
     sprintf (value,"%f",rval);
 
+    /* Remove sign if string is -0 or extension thereof */
+    fixnegzero (value);
+
     /* Put value into header string */
     return (hputc (hstring,keyword,value));
 }
@@ -123,6 +150,9 @@ double	dval;		/* double number */
     /* Translate value from binary to ASCII */
     sprintf (value,"%g",dval);
 
+    /* Remove sign if string is -0 or extension thereof */
+    fixnegzero (value);
+
     /* Put value into header string */
     return (hputc (hstring,keyword,value));
 }
@@ -140,19 +170,23 @@ double	dval;		/* double number */
 {
     char value[30];
     char format[8];
-    int i;
+    int i, lval;
 
     /* Translate value from binary to ASCII */
     if (ndec < 0) {
 	sprintf (format, "%%.%dg", -ndec);
 	sprintf (value, format, dval);
-	for (i = 0; i < strlen (value); i++)
+	lval = (int) strlen (value);
+	for (i = 0; i < lval; i++)
 	    if (value[i] == 'e') value[i] = 'E';
 	}
     else {
 	sprintf (format, "%%.%df", ndec);
 	sprintf (value, format, dval);
 	}
+
+    /* Remove sign if string is -0 or extension thereof */
+    fixnegzero (value);
 
     /* Put value into header string */
     return (hputc (hstring,keyword,value));
@@ -173,6 +207,9 @@ double ra;		/* Right ascension in degrees */
     /* Translate value from binary to ASCII */
     ra2str (value, 30, ra, 3);
 
+    /* Remove sign if string is -0 or extension thereof */
+    fixnegzero (value);
+
     /* Put value into header string */
     return (hputs (hstring,keyword,value));
 }
@@ -192,8 +229,41 @@ double dec;		/* Declination in degrees */
     /* Translate value from binary to ASCII */
     dec2str (value, 30, dec, 2);
 
+    /* Remove sign if string is -0 or extension thereof */
+    fixnegzero (value);
+
     /* Put value into header string */
     return (hputs (hstring,keyword,value));
+}
+
+
+/* FIXNEGZERO -- Drop - sign from beginning of any string which is all zeros */
+
+static void
+fixnegzero (string)
+
+char *string;
+{
+    int i, lstr;
+
+    if (string[0] != '-')
+	return;
+
+    /* Drop out if any non-zero digits in this string */
+    lstr = (int) strlen (string);
+    for (i = 1; i < lstr; i++) {
+	if (string[i] > '0' && string[i] <= '9')
+	    return;
+	if (string[i] == 'd' || string[i] == 'e' || string[i] == ' ')
+	    break;
+	}
+
+    /* Drop - from start of string; overwrite string in place */
+    for (i = 1; i < lstr; i++)
+	string[i-1] = string[i];
+    string[lstr-1] = (char) 0;
+
+    return;
 }
 
 
@@ -237,7 +307,7 @@ char *cval;	/* character string containing the value for variable
     char squot = 39;
 
     /*  If COMMENT or HISTORY, use the same keyword on every line */
-    lkw = strlen (keyword);
+    lkw = (int) strlen (keyword);
     if (lkw == 7 && (strncmp (keyword,"COMMENT",7) == 0 ||
 	strncmp (keyword,"HISTORY",7) == 0))
 	comment = 1;
@@ -246,7 +316,7 @@ char *cval;	/* character string containing the value for variable
     else {
 	comment = 0;
 	strcpy (keyroot, keyword);
-	lroot = strlen (keyroot);
+	lroot = (int) strlen (keyroot);
 	if (lroot > 6) {
 	    keyroot[6] = (char) 0;
 	    lroot = 6;
@@ -256,7 +326,7 @@ char *cval;	/* character string containing the value for variable
     /* Write keyword value one line of up to 67 characters at a time */
     ii = '1';
     nkw = 0;
-    lcv = strlen (cval);
+    lcv = (int) strlen (cval);
     strcpy (newkey, keyroot);
     strcat (newkey, "_");
     newkey[lroot+2] = (char) 0;
@@ -313,13 +383,13 @@ char *cval;	/* character string containing the value for variable
     int lcval, i, lkeyword;
 
     /*  If COMMENT or HISTORY, just add it as is */
-    lkeyword = strlen (keyword);
+    lkeyword = (int) strlen (keyword);
     if (lkeyword == 7 && (strncmp (keyword,"COMMENT",7) == 0 ||
 	strncmp (keyword,"HISTORY",7) == 0))
 	return (hputc (hstring,keyword,cval));
 
     /*  find length of variable string */
-    lcval = strlen (cval);
+    lcval = (int) strlen (cval);
     if (lcval > 67)
 	lcval = 67;
 
@@ -360,11 +430,10 @@ char *value;	/* character string containing the value for variable
     char newcom[50];
     char *v, *vp, *v1, *v2, *q1, *q2, *c1, *ve;
     int lkeyword, lcom, lval, lc, lv1, lhead;
-    char *blsearch();
 
     /* Find length of keyword, value, and header */
-    lkeyword = strlen (keyword);
-    lval = strlen (value);
+    lkeyword = (int) strlen (keyword);
+    lval = (int) strlen (value);
     lhead = gethlength (hstring);
 
     /*  If COMMENT or HISTORY, always add it just before the END */
@@ -460,7 +529,7 @@ char *value;	/* character string containing the value for variable
 	    vp = newcom + lcom - 1;
 	    while (vp-- > newcom && *vp == ' ')
 		*vp = 0;
-	    lcom = strlen (newcom);
+	    lcom = (int) strlen (newcom);
 	    }
 	else {
 	    newcom[0] = 0;
@@ -497,7 +566,7 @@ char *value;	/* character string containing the value for variable
     /* Add comment in the appropriate place */
 	if (lcom > 0) {
 	    if (lc+2+lcom > 80)
-		lcom = 78 - lc;
+		lcom = 77 - lc;
 	    vp = v1 + lc + 2;     /* Jul 16 1997: was vp = v1 + lc * 2 */
 	    *vp = '/';
 	    vp = vp + 1;
@@ -508,9 +577,9 @@ char *value;	/* character string containing the value for variable
 
 	if (verbose) {
 	    if (lcom > 0)
-		printf ("HPUT: %s  = %s  / %s\n",keyword, value, newcom);
+		fprintf (stderr,"HPUT: %s  = %s  / %s\n",keyword, value, newcom);
 	    else
-		printf ("HPUT: %s  = %s\n",keyword, value);
+		fprintf (stderr,"HPUT: %s  = %s\n",keyword, value);
 	    }
 
 	return (0);
@@ -528,16 +597,16 @@ hputcom (hstring,keyword,comment)
 {
     char squot;
     char line[100];
-    int lkeyword, lcom, lhead;
+    int lkeyword, lcom, lhead, i, lblank;
     char *vp, *v1, *v2, *c0, *c1, *q1, *q2;
     char *ksearch();
 
     squot = 39;
 
     /*  Find length of variable name */
-    lkeyword = strlen (keyword);
+    lkeyword = (int) strlen (keyword);
     lhead = gethlength (hstring);
-    lcom = strlen (comment);
+    lcom = (int) strlen (comment);
 
     /*  If COMMENT or HISTORY, always add it just before the END */
     if (lkeyword == 7 && (strncmp (keyword,"COMMENT",7) == 0 ||
@@ -569,7 +638,7 @@ hputcom (hstring,keyword,comment)
 	/* If parameter is not found, return without doing anything */
 	if (v1 == NULL) {
 	    if (verbose)
-		printf ("HPUTCOM: %s not found\n",keyword);
+		fprintf (stderr,"HPUTCOM: %s not found\n",keyword);
 	    return (-1);
 	    }
 
@@ -587,7 +656,7 @@ hputcom (hstring,keyword,comment)
 	if (q2 == NULL || q2-line < 31)
 	    c0 = v1 + 31;
 	else
-	    c0 = v1 + (q2-line) + 2; /* allan: 1997-09-30, was c0=q2+2 */
+	    c0 = v1 + (q2 - line) + 2; /* allan: 1997-09-30, was c0=q2+2 */
 
 	/* If comment will not fit, do not add it */
 	if (c0 - v1 > 77)
@@ -599,12 +668,16 @@ hputcom (hstring,keyword,comment)
     if (lcom > 0) {
 	c1 = c0 + 2;
 	if (c1+lcom > v2)
-	    lcom = v2 - c1;
+	    lcom = v2 - c1 - 2;
 	strncpy (c1, comment, lcom);
+	lblank = v2 - c1 - lcom;
+	c1 = c1 + lcom;
+	for (i = 0; i < lblank; i++)
+	    *c1++ = ' ';
 	}
 
     if (verbose) {
-	printf ("HPUTCOM: %s / %s\n",keyword,comment);
+	fprintf (stderr,"HPUTCOM: %s / %s\n",keyword,comment);
 	}
     return (0);
 }
@@ -633,6 +706,10 @@ char *keyword;		/* Keyword of entry to be deleted */
 
     /*  Find end of header */
     ve = ksearch (hstring,"END");
+
+    /* If headshrink is 0, leave END where it is */
+    if (!headshrink)
+	ve = ve - 80;
 
     /* Shift rest of header up one line */
     for (v = v1; v < ve; v = v + 80) {
@@ -682,7 +759,7 @@ char *keyword;		/* Keyword of entry to be deleted */
 	}
 
     /* Cover former first line with new keyword */
-    lkey = strlen (keyword);
+    lkey = (int) strlen (keyword);
     strncpy (hplace, keyword, lkey);
     if (lkey < 8) {
 	for (i = lkey; i < 8; i++)
@@ -720,7 +797,7 @@ char *keyword2;		/* New keyword name */
 	return (0);
 
     else {
-	lv2 = strlen (keyword2);
+	lv2 = (int) strlen (keyword2);
 	v = v1;
 	v2 = keyword2;
 	for (i = 0; i < 8; i++) {
@@ -751,7 +828,7 @@ int	ndec;		/* Number of decimal places in seconds */
     char tstring[64];
     int hours;
     int minutes;
-    int isec;
+    int isec, ltstr;
     double dsgn;
 
     /* Keep RA between 0 and 360 */
@@ -865,7 +942,8 @@ int	ndec;		/* Number of decimal places in seconds */
 	}
 
     /* Move formatted string to returned string */
-    if (strlen (tstring) < lstr-1)
+    ltstr = (int) strlen (tstring);
+    if (ltstr < lstr-1)
 	strcpy (string, tstring);
     else {
 	strncpy (string, tstring, lstr-1);
@@ -891,7 +969,7 @@ int	ndec;		/* Number of decimal places in arcseconds */
     char sign;
     int degrees;
     int minutes;
-    int isec;
+    int isec, ltstr;
     char tstring[64];
 
     /* Keep angle between -180 and 360 degrees */
@@ -1007,7 +1085,8 @@ int	ndec;		/* Number of decimal places in arcseconds */
 	}
 
     /* Move formatted string to returned string */
-    if (strlen (tstring) < lstr-1)
+    ltstr = (int) strlen (tstring);
+    if (ltstr < lstr-1)
 	strcpy (string, tstring);
     else {
 	strncpy (string, tstring, lstr-1);
@@ -1029,7 +1108,7 @@ int	ndec;		/* Number of decimal places in degree string */
 
 {
     char degform[8];
-    int field;
+    int field, ltstr;
     char tstring[64];
     double deg1;
     double dsgn;
@@ -1059,7 +1138,8 @@ int	ndec;		/* Number of decimal places in degree string */
 	}
 
     /* Move formatted string to returned string */
-    if (strlen (tstring) < lstr-1)
+    ltstr = (int) strlen (tstring);
+    if (ltstr < lstr-1)
 	strcpy (string, tstring);
     else {
 	strncpy (string, tstring, lstr-1);
@@ -1150,4 +1230,13 @@ int	ndec;		/* Number of decimal places in degree string */
  * Apr 19 2000	Fix bug in hadd() which overwrote line
  * Jun  2 2000	Dropped unused variable lv in hputm() after lint
  * Jul 20 2000	Drop unused variables blank and i in hputc()
+ *
+ * Jan 11 2001	Print all messages to stderr
+ * Jan 18 2001	Drop declaration of blsearch(); it is in fitshead.h
+ *
+ * Jan  4 2002	Fix placement of comments
+ *
+ * Jul  1 2004	Add headshrink to optionally keep blank lines in header
+ * Sep  3 2004	Fix bug so comments are not pushed onto next line if long value
+ * Sep 16 2004	Add fixnegzero() to avoid putting signed zero values in header
  */

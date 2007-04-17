@@ -3,22 +3,17 @@
 
 /*  The FITSIO software was written by William Pence at the High Energy    */
 /*  Astrophysic Science Archive Research Center (HEASARC) at the NASA      */
-/*  Goddard Space Flight Center.  Users shall not, without prior written   */
-/*  permission of the U.S. Government,  establish a claim to statutory     */
-/*  copyright.  The Government and others acting on its behalf, shall have */
-/*  a royalty-free, non-exclusive, irrevocable,  worldwide license for     */
-/*  Government purposes to publish, distribute, translate, copy, exhibit,  */
-/*  and perform such material.                                             */
+/*  Goddard Space Flight Center.                                           */
 
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 #include "fitsio2.h"
 /*--------------------------------------------------------------------------*/
 int ffpcls( fitsfile *fptr,  /* I - FITS file pointer                       */
             int  colnum,     /* I - number of column to write (1 = 1st col) */
-            long  firstrow,  /* I - first row to write (1 = 1st row)        */
-            long  firstelem, /* I - first vector element to write (1 = 1st) */
-            long  nelem,     /* I - number of strings to write              */
+            LONGLONG  firstrow,  /* I - first row to write (1 = 1st row)        */
+            LONGLONG  firstelem, /* I - first vector element to write (1 = 1st) */
+            LONGLONG  nelem,     /* I - number of strings to write              */
             char  **array,   /* I - array of pointers to strings            */
             int  *status)    /* IO - error status                           */
 /*
@@ -26,8 +21,9 @@ int ffpcls( fitsfile *fptr,  /* I - FITS file pointer                       */
 */
 {
     int tcode, maxelem, hdutype, nchar;
-    long twidth, incre, repeat, rowlen, rownum, elemnum, remain, next;
-    long ii, jj, ntodo, tnull, startpos, wrtptr;
+    long twidth, incre;
+    long ii, jj, ntodo;
+    LONGLONG repeat, startpos, elemnum, wrtptr, rowlen, rownum, remain, next, tnull;
     double scale, zero;
     char tform[20], *blanks;
     char message[FLEN_ERRMSG];
@@ -72,18 +68,27 @@ int ffpcls( fitsfile *fptr,  /* I - FITS file pointer                       */
       nchar = maxvalue(1,strlen(array[0])); /* will write at least 1 char */
                                           /* even if input string is null */
 
-      if (ffgcpr( fptr, colnum, firstrow, 1, nchar, 1, &scale, &zero,
+      if (ffgcprll( fptr, colnum, firstrow, 1, nchar, 1, &scale, &zero,
         tform, &twidth, &tcode, &maxelem, &startpos,  &elemnum, &incre,
         &repeat, &rowlen, &hdutype, &tnull, snull, status) > 0)
         return(*status);
+	
+      /* simply move to write position, then write the string */
+      ffmbyt(fptr, startpos, IGNORE_EOF, status); 
+      ffpbyt(fptr, nchar, array[0], status);
 
-      remain = 1;
-      twidth = nchar;
-      blanks = 0;          /* initialize null pointer */
+      if (*status > 0)  /* test for error during previous write operation */
+      {
+         sprintf(message,
+          "Error writing to variable length string column (ffpcls).");
+         ffpmsg(message);
+      }
+
+      return(*status);
     }
     else if (tcode == TSTRING)
     {
-      if (ffgcpr( fptr, colnum, firstrow, firstelem, nelem, 1, &scale, &zero,
+      if (ffgcprll( fptr, colnum, firstrow, firstelem, nelem, 1, &scale, &zero,
         tform, &twidth, &tcode, &maxelem, &startpos,  &elemnum, &incre,
         &repeat, &rowlen, &hdutype, &tnull, snull, status) > 0)
         return(*status);
@@ -116,8 +121,8 @@ int ffpcls( fitsfile *fptr,  /* I - FITS file pointer                       */
          will fit in the buffer space or to the number of pixels that remain
          in the current vector, which ever is smaller.
       */
-      ntodo = minvalue(remain, maxelem);      
-      ntodo = minvalue(ntodo, (repeat - elemnum));
+      ntodo = (long) minvalue(remain, maxelem);      
+      ntodo = (long) minvalue(ntodo, (repeat - elemnum));
 
       wrtptr = startpos + (rownum * rowlen) + (elemnum * incre);
       ffmbyt(fptr, wrtptr, IGNORE_EOF, status);  /* move to write position */
@@ -159,8 +164,8 @@ int ffpcls( fitsfile *fptr,  /* I - FITS file pointer                       */
       if (*status > 0)  /* test for error during previous write operation */
       {
          sprintf(message,
-          "Error writing elements %ld thru %ld of input data array (ffpcls).",
-             next+1, next+ntodo);
+          "Error writing elements %.0f thru %.0f of input data array (ffpcls).",
+             (double) (next+1), (double) (next+ntodo));
          ffpmsg(message);
 
          if (blanks)
@@ -192,9 +197,9 @@ int ffpcls( fitsfile *fptr,  /* I - FITS file pointer                       */
 /*--------------------------------------------------------------------------*/
 int ffpcns( fitsfile *fptr,  /* I - FITS file pointer                       */
             int  colnum,     /* I - number of column to write (1 = 1st col) */
-            long  firstrow,  /* I - first row to write (1 = 1st row)        */
-            long  firstelem, /* I - first vector element to write (1 = 1st) */
-            long  nelem,     /* I - number of values to write               */
+            LONGLONG  firstrow,  /* I - first row to write (1 = 1st row)        */
+            LONGLONG  firstelem, /* I - first vector element to write (1 = 1st) */
+            LONGLONG  nelem,     /* I - number of values to write               */
             char  **array,   /* I - array of values to write                */
             char  *nulvalue, /* I - string representing a null value        */
             int  *status)    /* IO - error status                           */
@@ -204,7 +209,8 @@ int ffpcns( fitsfile *fptr,  /* I - FITS file pointer                       */
   null value in the output FITS file. 
 */
 {
-    long repeat, width, first, ngood = 0, nbad = 0, ii, fstelm, fstrow;
+    long repeat, width, ngood = 0, nbad = 0, ii;
+    LONGLONG first, fstelm, fstrow;
 
     if (*status > 0)
         return(*status);
@@ -275,7 +281,7 @@ int ffpcns( fitsfile *fptr,  /* I - FITS file pointer                       */
 
       ffpcls(fptr, colnum, fstrow, fstelm, ngood, &array[ii-ngood], status);
     }
-    else  /* write last string of bad pixels */
+    else if (nbad) /* write last string of bad pixels */
     {
       fstelm = ii - nbad + first;  /* absolute element number */
       fstrow = (fstelm - 1) / repeat + 1;  /* starting row number */

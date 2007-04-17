@@ -1,30 +1,46 @@
 /*** File libwcs/iget.c
- *** July 29, 2000
- *** By Doug Mink, Harvard-Smithsonian Center for Astrophysics
+ *** February 26, 2004
+ *** By Doug Mink, dmink@cfa.harvard.edu
+ *** Harvard-Smithsonian Center for Astrophysics
+ *** Copyright (C) 1998-2004
+ *** Smithsonian Astrophysical Observatory, Cambridge, MA, USA
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+    
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+    Correspondence concerning WCSTools should be addressed as follows:
+           Internet email: dmink@cfa.harvard.edu
+           Postal address: Doug Mink
+                           Smithsonian Astrophysical Observatory
+                           60 Garden St.
+                           Cambridge, MA 02138 USA
 
  * Module:	iget.c (Get IRAF FITS Header parameter values)
  * Purpose:	Extract values for variables from IRAF keyword value string
  * Subroutine:	mgeti4 (hstring,mkey,keyword,ival) returns long integer
  * Subroutine:	mgetr8 (hstring,mkey,keyword,dval) returns double
- * Subroutine:	mgets  (hstring,mkey,keyword,lstr,str) returns character string
+ * Subroutine:	mgetstr (hstring,mkey,keyword,lstr,str) returns character string
  * Subroutine:	igeti4 (hstring,keyword,ival) returns long integer
  * Subroutine:	igetr4 (hstring,keyword,rval) returns real
  * Subroutine:	igetr8 (hstring,keyword,dval) returns double
  * Subroutine:	igets  (hstring,keyword,lstr,str) returns character string
  * Subroutine:	igetc  (hstring,keyword) returns character string
  * Subroutine:	isearch (hstring,keyword) returns pointer to header string entry
+ */
 
- * Copyright:   1999 Smithsonian Astrophysical Observatory
- *              You may do anything you like with this file except remove
- *              this copyright.  The Smithsonian Astrophysical Observatory
- *              makes no representations about the suitability of this
- *              software for any purpose.  It is provided "as is" without
- *              express or implied warranty.
-
-*/
-
-#include <stdio.h>
 #include <string.h>		/* NULL, strlen, strstr, strcpy */
+#include <stdio.h>
 #include "fitshead.h"	/* FITS header extraction subroutines */
 #include <stdlib.h>
 #ifndef VMS
@@ -34,7 +50,8 @@
 #define SHRT_MAX 32767
 #endif
 
-static char *igetc();
+#define MAX_LVAL 2000
+
 static char *isearch();
 static char val[30];
 
@@ -54,9 +71,9 @@ int *ival;	/* Integer value returned */
 {
     char *mstring;
 
-    mstring = malloc (600);
+    mstring = malloc (MAX_LVAL);
 
-    if (hgetm (hstring, mkey, 600, mstring)) {
+    if (hgetm (hstring, mkey, MAX_LVAL, mstring)) {
 	if (igeti4 (mstring, keyword, ival)) {
 	    free (mstring);
 	    return (1);
@@ -87,9 +104,9 @@ char	*keyword; /* Character string containing the name of the keyword
 double	*dval;	  /* Integer value returned */
 {
     char *mstring;
-    mstring = malloc (600);
+    mstring = malloc (MAX_LVAL);
 
-    if (hgetm (hstring, mkey, 600, mstring)) {
+    if (hgetm (hstring, mkey, MAX_LVAL, mstring)) {
 	if (igetr8 (mstring, keyword, dval)) {
 	    free (mstring);
 	    return (1);
@@ -109,7 +126,7 @@ double	*dval;	  /* Integer value returned */
 /* Extract string value for variable from IRAF keyword value string */
 
 int
-mgets (hstring, mkey, keyword, lstr, str)
+mgetstr (hstring, mkey, keyword, lstr, str)
 
 char *hstring;	/* character string containing FITS header information
 		   in the format <keyword>= <value> {/ <comment>} */
@@ -125,9 +142,9 @@ int lstr;	/* Size of str in characters */
 char *str;	/* String (returned) */
 {
     char *mstring;
-    mstring = malloc (600);
+    mstring = malloc (MAX_LVAL);
 
-    if (hgetm (hstring, mkey, 600, mstring)) {
+    if (hgetm (hstring, mkey, MAX_LVAL, mstring)) {
 	if (igets (mstring, keyword, lstr, str)) {
 	    free (mstring);
 	    return (1);
@@ -327,7 +344,7 @@ char *str;	/* String (returned) */
 
 /* Extract character value for variable from IRAF keyword value string */
 
-static char *
+char *
 igetc (hstring,keyword0)
 
 char *hstring;	/* character string containing IRAF keyword value string
@@ -338,12 +355,12 @@ char *keyword0;	/* character string containing the name of the keyword
 		   the n'th token in the value is returned.
 		   (the first 8 characters must be unique) */
 {
-	static char cval[500];
+	static char cval[MAX_LVAL];
 	char *value;
 	char cwhite[8];
 	char lbracket[2],rbracket[2];
 	char keyword[16];
-	char line[500];
+	char line[MAX_LVAL];
 	char *vpos,*cpar;
 	char *c1, *brack1, *brack2;
 	int ipar, i;
@@ -367,20 +384,21 @@ char *keyword0;	/* character string containing the name of the keyword
 	    }
 
 /* Initialize returned value to nulls */
-	 for (i = 0; i < 500; i++)
+	 for (i = 0; i < MAX_LVAL; i++)
 	    line[i] = 0;
 
 /* If quoted value, copy until second quote is reached */
 	i = 0;
 	if (*vpos == '"') {
 	     vpos++;
-	     while (*vpos && *vpos != '"' && i < 500)
+	     while (*vpos && *vpos != '"' && i < MAX_LVAL)
 		line[i++] = *vpos++;
 	     }
 
 /* Otherwise copy until next space or tab */
 	else {
-	     while (*vpos != ' ' && *vpos != (char)9 && *vpos > 0 && i < 500)
+	     while (*vpos != ' ' && *vpos != (char)9 &&
+		    *vpos > 0 && i < MAX_LVAL)
 		line[i++] = *vpos++;
 	     }
 
@@ -501,4 +519,11 @@ char *keyword;	/* character string containing the name of the variable
  *
  * Feb 11 2000	Stop search for end of quoted keyword if more than 500 chars
  * Jul 20 2000	Drop unused variables squot, dquot, and slash in igetc()
+ *
+ * Jun 26 2002	Change maximum string length from 600 to 2000; use MAX_LVAL
+ * Jun 26 2002	Stop search for end of quoted keyword if > MAX_LVAL chars
+ *
+ * Sep 23 2003	Change mgets() to mgetstr() to avoid name collision at UCO Lick
+ *
+ * Feb 26 2004	Make igetc() accessible from outside this file
  */

@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: rtdRemote.c,v 1.3 2005/02/02 01:43:03 brighton Exp $"
+ * "@(#) $Id: rtd_remote.c,v 1.1.1.1 2006/01/12 16:39:03 abrighto Exp $"
  *
  * rtdRemote.c - client library for remote control of an RtdImage
  *               widget, communicates over a socket with a remote
@@ -14,8 +14,10 @@
  * Allan Brighton  05/03/96  Created
  * Peter W. Draper 09/02/98  Removed sys_errlist and replaced with strerror.
  * pbiereic        07/04/04  Fixed: variable argument list
+ * Allan Brighton  02/01/06  Renamed rtdRemote.c to rtd_remote.c to avoid
+ *                           name conflict on file systems that ignore case
  */
-static const char* const rcsId="@(#) $Id: rtdRemote.c,v 1.3 2005/02/02 01:43:03 brighton Exp $";
+static const char* const rcsId="@(#) $Id: rtd_remote.c,v 1.1.1.1 2006/01/12 16:39:03 abrighto Exp $";
 
 
 
@@ -35,7 +37,7 @@ static const char* const rcsId="@(#) $Id: rtdRemote.c,v 1.3 2005/02/02 01:43:03 
 #include <sys/shm.h>
 #include <stdarg.h>
 #include <errno.h>
-#include "rtdRemote.h"
+#include "rtd_remote.h"
 
 
 /* -- private interface -- */
@@ -46,7 +48,7 @@ typedef struct {
     int pid;			/* pid of display on host */
     char host[64];		/* hostname where dsplay is running */
     int port;			/* port number to use on host */
-    char errmsg[1024];		/* copy of last error message */
+    char errmsg[10240];		/* copy of last error message */
 
     /* optional error handler, to be called with error message */
     RtdRemoteErrorHandler errhandler;
@@ -85,20 +87,18 @@ static int error(const char *fmt, ...)
  */
 static int sys_error(const char *fmt, ...)
 {
-    char *errstr;
     va_list args;
     char buf[sizeof(info.errmsg)];
+#ifndef errno
     extern int errno;
+#endif
 
     va_start(args, fmt);
     vsprintf(buf, fmt, args);
     va_end(args);
-
-    errstr = strerror(errno);
-    if ( errstr != NULL ) {
-	strcat(buf, ": ");
-	strcat(buf, errstr);
-    }
+    
+    strcat(buf, ": ");
+    strcat(buf, strerror(errno));
 
     strcpy(info.errmsg, buf);
     if (info.errhandler)

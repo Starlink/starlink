@@ -19,12 +19,12 @@ static char SccsId[] = "%W%  %G%";
 #include <stdio.h>
 #include "histeq.h"		/* define SubrangeLink, List */
 
-/* Local prototypes */
+
 static void make_subrange_scalemap();
-static void make_gapped_list();
-static void list_to_map();
+static void make_gapped_list(), list_to_map();
 static int first_shortlist_pass();
 static void add_level_to_short_list();
+
 
 /*
  * Subroutine:	generate_scalemap

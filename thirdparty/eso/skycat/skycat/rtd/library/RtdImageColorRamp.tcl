@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# "@(#) $Id: RtdImageColorRamp.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
+# "@(#) $Id: RtdImageColorRamp.tcl,v 1.1.1.1 2006/01/12 16:38:25 abrighto Exp $"
 #
 # RtdImageColorRamp.tcl - itcl widget used to display contents of the 
 #                         colormap for an RtdImage in a generated image

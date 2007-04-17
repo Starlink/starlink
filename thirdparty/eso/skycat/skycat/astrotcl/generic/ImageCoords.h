@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project 
- * $Id: ImageCoords.h,v 1.5 2005/02/02 01:43:04 brighton Exp $
+ * $Id: ImageCoords.h,v 1.1.1.1 2006/01/12 16:44:01 abrighto Exp $
  *
  * ImageCoords.h - class representing image coordinates (x, y)
  *                 (see also class WorldCoords)

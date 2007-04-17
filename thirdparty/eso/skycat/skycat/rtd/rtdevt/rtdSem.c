@@ -282,9 +282,12 @@
 *-------------------------------------------------------------------------
 */
 
+#include <string.h>
 #include "rtdSem.h"
 #include "rtdImageEvent.h"
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 
 #ifndef HAVE_UNION_SEMUN
 /* argument type needed by semctl - not used here */

@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# @(#) $Id: SkyQuery.tcl,v 1.1.1.1 2002/04/04 20:11:54 brighton Exp $
+# @(#) $Id: SkyQuery.tcl,v 1.1.1.1 2006/01/12 16:41:57 abrighto Exp $
 #
 # SkyQuery.tcl - Widget for searching catalogs and plotting the results in an image.
 #

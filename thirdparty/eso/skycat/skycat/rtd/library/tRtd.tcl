@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# "@(#) $Id: tRtd.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
+# "@(#) $Id: tRtd.tcl,v 1.1.1.1 2006/01/12 16:38:14 abrighto Exp $"
 #
 # tRtd.tcl - itcl widget for starting tRtd
 #

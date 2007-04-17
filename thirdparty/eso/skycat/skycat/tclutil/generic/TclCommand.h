@@ -17,7 +17,7 @@
  *
  * See the man page for a complete description.
  * -----------------------------------------------------------------------------
- * "@(#) $Id: TclCommand.h,v 1.2 2005/02/02 01:43:02 brighton Exp $" 
+ * "@(#) $Id: TclCommand.h,v 1.1.1.1 2006/01/12 16:40:59 abrighto Exp $" 
  */
 
 #include <tcl.h>

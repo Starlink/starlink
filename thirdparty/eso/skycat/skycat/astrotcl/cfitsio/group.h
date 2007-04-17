@@ -39,6 +39,27 @@ int fftsad(fitsfile *mfptr, HDUtracker *HDU, int *newPosition,
 int fftsud(fitsfile *mfptr, HDUtracker *HDU, int newPosition, 
 	   char *newFileName);
 
-void ffgtcn(char *filename);
-
 void prepare_keyvalue(char *keyvalue);
+
+int fits_path2url(char *inpath, char *outpath, int  *status);
+
+int fits_url2path(char *inpath, char *outpath, int  *status);
+
+int fits_get_cwd(char *cwd, int *status);
+
+int fits_get_url(fitsfile *fptr, char *realURL, char *startURL, 
+		 char *realAccess, char *startAccess, int *iostate, 
+		 int *status);
+
+int fits_clean_url(char *inURL, char *outURL, int *status);
+
+int fits_relurl2url(char *refURL, char *relURL, char *absURL, int *status);
+
+int fits_url2relurl(char *refURL, char *absURL, char *relURL, int *status);
+
+int fits_encode_url(char *inpath, char *outpath, int *status);
+
+int fits_unencode_url(char *inpath, char *outpath, int *status);
+
+int fits_is_url_absolute(char *url);
+

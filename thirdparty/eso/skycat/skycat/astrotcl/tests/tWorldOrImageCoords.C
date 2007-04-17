@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * $Id: tWorldOrImageCoords.C,v 1.4 2005/02/02 01:43:03 brighton Exp $
+ * $Id: tWorldOrImageCoords.C,v 1.1.1.1 2006/01/12 16:42:57 abrighto Exp $
  *
  * tWorldOrImageCoords.C - test cases for class WorldOrImageCoords
  * 

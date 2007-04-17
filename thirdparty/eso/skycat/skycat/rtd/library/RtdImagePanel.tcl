@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# "@(#) $Id: RtdImagePanel.tcl,v 1.3 2005/02/02 01:43:03 brighton Exp $"
+# "@(#) $Id: RtdImagePanel.tcl,v 1.1.1.1 2006/01/12 16:38:05 abrighto Exp $"
 #
 # RtdImagePanel.tcl - widget for displaying relevant image information
 #                     in tabular (blt_table) format
@@ -359,10 +359,9 @@ itcl::class rtd::RtdImagePanel {
 
 	# canvas for real-time status display
 	itk_component add cameraStatus {
-	    canvas $w_.status -width 0 -height 0
+	    canvas $w_.status -height 0 -width 0
 	}
 	if { "$itk_option(-panel_orient)" == "vertical" } {
-	    $w_.status config -width 10 -height 36
 	    blt::table $w_ \
 		    $itk_component(cameraStatus)  [incr row],0 -fill both -anchor nw
 	} else {

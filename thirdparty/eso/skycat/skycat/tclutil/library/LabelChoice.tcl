@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: LabelChoice.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
+# "@(#) $Id: LabelChoice.tcl,v 1.1.1.1 2006/01/12 16:40:55 abrighto Exp $"
 #
 # LabelChoice.tcl - Widget for choosing options using a label and radiobuttons
 #

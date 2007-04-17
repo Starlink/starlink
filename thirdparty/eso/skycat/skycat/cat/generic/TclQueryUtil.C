@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/Archive
- * $Id: TclQueryUtil.C,v 1.5 2003/01/20 15:52:21 brighton Exp $
+ * $Id: TclQueryUtil.C,v 1.2 2006/03/26 13:22:33 abrighto Exp $
  *
  * TclQueryUtil.C - utility routines used by TclAstroCat and TclTcsCat
  * 
@@ -10,16 +10,19 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  14 Jun 96  Created
  */
-static const char* const rcsId="@(#) $Id: TclQueryUtil.C,v 1.5 2003/01/20 15:52:21 brighton Exp $";
+static const char* const rcsId="@(#) $Id: TclQueryUtil.C,v 1.2 2006/03/26 13:22:33 abrighto Exp $";
 
 
+using namespace std;
 #include <cstring>
 #include <cctype>
 #include <cstdio>
 #include <iostream>
 #include <cstdlib>
 #include <unistd.h>
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 #include "tcl.h"
 #include "error.h"
 #include "AstroCatalog.h"
@@ -298,7 +301,7 @@ int genAstroQuery(Tcl_Interp* interp, int argc, char* argv[],
     }
 
     if (values)
-	free(values);
+	Tcl_Free((char *)values);
     if (status != TCL_OK)
 	return TCL_ERROR;
 

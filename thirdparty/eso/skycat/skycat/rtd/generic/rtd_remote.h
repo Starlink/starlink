@@ -3,16 +3,18 @@
 
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: rtdRemote.h,v 1.2 2005/02/02 01:43:03 brighton Exp $" 
+ * "@(#) $Id: rtd_remote.h,v 1.1.1.1 2006/01/12 16:39:03 abrighto Exp $" 
  *
- * rtdRemote.h - C interface for remote access to rtdimage based
- *               widgets
+ * rtd_remote.h - C interface for remote access to rtdimage based
+ *                widgets
  * 
  * See the man page for a complete description.
  * 
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  04/03/96  Created
+ *                 02/01/06  Renamed rtdRemote.h to rtd_remote.h to avoid
+ *                           name conflict on file systems that ignore case
  */
 
 

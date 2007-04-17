@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * $Id: tFitsIO.C,v 1.3 2005/02/02 01:43:04 brighton Exp $
+ * $Id: tFitsIO.C,v 1.1.1.1 2006/01/12 16:43:25 abrighto Exp $
  *
  * tFitsIO.C - test cases for class FitsIO
  * 
@@ -14,7 +14,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include "error.h"
-#include "FitsIO.hxx"
+#include "Fits_IO.h"
 
 #define TEST(x) {if (!(x)){printf("%s: line %d: Test failed\n", __FILE__, __LINE__);  exit(1) ;}}
 
@@ -104,7 +104,7 @@ main(int argc, char** argv)
 	 
 #endif
 
-#if 1
+#if 0
     // test FITS table creation
     rows = 4;
     cols = 3;

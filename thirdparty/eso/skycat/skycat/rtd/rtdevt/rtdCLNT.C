@@ -1,13 +1,11 @@
 /*******************************************************************************
 * E.S.O. - VLT project
 *
-* "@(#) $Id: rtdCLNT.C,v 1.3 2005/02/02 01:43:03 brighton Exp $"
+* "@(#) $Id: rtdCLNT.C,v 1.1.1.1 2006/01/12 16:39:59 abrighto Exp $"
 *
 * who       when      what
 * --------  --------  ----------------------------------------------
 * pbiereic  01/03/01  created 
-* pdraper   16/12/05  change SOCKLEN_T to socklen_t. This typedef
-*                     is guaranteed in define.h
 */
 
 /************************************************************************
@@ -67,9 +65,18 @@
 *------------------------------------------------------------------------
 */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#include "define.h"
+
+#ifdef HAVE_SYS_FILIO_H
+#include <sys/filio.h>
+#endif
+
 #include "rtdCLNT.h"
 
-static char *rcsId="@(#) $Id: rtdCLNT.C,v 1.3 2005/02/02 01:43:03 brighton Exp $"; 
+static char *rcsId="@(#) $Id: rtdCLNT.C,v 1.1.1.1 2006/01/12 16:39:59 abrighto Exp $"; 
 static void *use_rcsId = ((void)&use_rcsId,(void *) &rcsId);
 
 rtdCLNT::rtdCLNT(int verbose, int index)

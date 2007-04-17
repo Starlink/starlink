@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: TabTable.h,v 1.3 2003/01/18 21:11:11 brighton Exp $
+ * $Id: TabTable.h,v 1.1.1.1 2006/01/12 16:36:38 abrighto Exp $
  *
  * TabTable.h - class definitions for accessing values from a char buffer
  * 	        in the format of table, such as the result of a database query,
@@ -19,6 +19,7 @@
  */
 
 
+using namespace std;
 #include <iostream>
 
 /*
@@ -65,7 +66,7 @@ protected:
     virtual int fillTable(char* buf);
 
     // internal search util: assumes stream is positioned at first row
-    virtual int search(std::istream& is, int numSearchCols, char** searchCols, 
+    virtual int search(istream& is, int numSearchCols, char** searchCols, 
 	       char** minValues, char** maxValues, int maxRows);
 
     // given a row with columns for this table, compare the row with the
@@ -92,7 +93,7 @@ protected:
     virtual int checkTableIndex(int row, int col=0) const;
 
     // print table title and other info
-    virtual void printTableTop(std::ostream& os, const char* title = NULL);
+    virtual void printTableTop(ostream& os, const char* title = NULL);
 
     // copy constructor (not defined)
     // TabTable(const TabTable&);
@@ -155,7 +156,7 @@ public:
 
     // read the heading info from the given stream and return object for it
     static int head(const char* filename, TabTable&);
-    static int head(std::istream&, TabTable&);
+    static int head(istream&, TabTable&);
  
     // compare headings in this table and the given one
     virtual int compareHeadings(const TabTable& t);
@@ -165,7 +166,7 @@ public:
 
     // save the contents of this object as a tab table
     virtual int save(const char* filename);
-    virtual int save(std::ostream&);
+    virtual int save(ostream&);
     
     // append the contents of this object to the given tab table file
     virtual int append(const char* filename);
@@ -207,13 +208,13 @@ public:
     virtual int search(const char* filename, int searchCol, const char* value, int maxRows); 
 
     // print the table rows to the given stream
-    virtual int printRows(std::ostream& os) const;
+    virtual int printRows(ostream& os) const;
     
     // print the given table row to the given stream
-    virtual int printRow(std::ostream& os, int row) const; 
+    virtual int printRow(ostream& os, int row) const; 
 
     // output operator
-    friend std::ostream& operator<<(std::ostream& os, TabTable& t) {
+    friend ostream& operator<<(ostream& os, TabTable& t) {
 	t.save(os); return os;
     }
 

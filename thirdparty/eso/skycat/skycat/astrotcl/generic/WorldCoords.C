@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive 
- * $Id: WorldCoords.C,v 1.4 2005/02/02 01:43:04 brighton Exp $
+ * $Id: WorldCoords.C,v 1.1.1.1 2006/01/12 16:43:58 abrighto Exp $
  *
  * WorldCoords.C - method definitions for class WorldCoords
  * 
@@ -10,7 +10,7 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created
  */
-static const char* const rcsId="@(#) $Id: WorldCoords.C,v 1.4 2005/02/02 01:43:04 brighton Exp $";
+static const char* const rcsId="@(#) $Id: WorldCoords.C,v 1.1.1.1 2006/01/12 16:43:58 abrighto Exp $";
 
 
 #include <cstdio>
@@ -458,7 +458,8 @@ static double dispos(double dra0,	 // IN: center RA
     {
 	sind=sin(dist);
 	cospa=(sd*cd0 - cd*sd0*cosda)/sind;
-	if(cospa>1.0)cospa=1.0;
+	//if(cospa>1.0)cospa=1.0;
+	if (abs(cospa) > 1.0) cospa=cospa/abs(cospa); // 2005-06-02: fix from awicenec@eso.org
 	sinpa=cd*sin(alf-alf0)/sind;
 	phi=acos(cospa)*radian;
 	if(sinpa < 0.0)phi = 360.0-phi;

@@ -3,12 +3,7 @@
 
 /*  The FITSIO software was written by William Pence at the High Energy    */
 /*  Astrophysic Science Archive Research Center (HEASARC) at the NASA      */
-/*  Goddard Space Flight Center.  Users shall not, without prior written   */
-/*  permission of the U.S. Government,  establish a claim to statutory     */
-/*  copyright.  The Government and others acting on its behalf, shall have */
-/*  a royalty-free, non-exclusive, irrevocable,  worldwide license for     */
-/*  Government purposes to publish, distribute, translate, copy, exhibit,  */
-/*  and perform such material.                                             */
+/*  Goddard Space Flight Center.                                           */
 
 #include <math.h>
 #include <stdlib.h>
@@ -19,8 +14,8 @@
 /*--------------------------------------------------------------------------*/
 int ffgpvk( fitsfile *fptr,   /* I - FITS file pointer                       */
             long  group,      /* I - group to read (1 = 1st group)           */
-            long  firstelem,  /* I - first vector element to read (1 = 1st)  */
-            long  nelem,      /* I - number of values to read                */
+            LONGLONG  firstelem,  /* I - first vector element to read (1 = 1st)  */
+            LONGLONG  nelem,      /* I - number of values to read                */
             int   nulval,     /* I - value for undefined pixels              */
             int   *array,     /* O - array of values that are returned       */
             int  *anynul,     /* O - set to 1 if any values are null; else 0 */
@@ -36,6 +31,19 @@ int ffgpvk( fitsfile *fptr,   /* I - FITS file pointer                       */
 {
     long row;
     char cdummy;
+    int nullcheck = 1;
+    int nullvalue;
+
+    if (fits_is_compressed_image(fptr, status))
+    {
+        /* this is a compressed image in a binary table */
+         nullvalue = nulval;  /* set local variable */
+
+        fits_read_compressed_pixels(fptr, TINT, firstelem, nelem,
+            nullcheck, &nullvalue, array, NULL, anynul, status);
+        return(*status);
+    }
+
     /*
       the primary array is represented as a binary table:
       each group of the primary array is a row in the table,
@@ -52,8 +60,8 @@ int ffgpvk( fitsfile *fptr,   /* I - FITS file pointer                       */
 /*--------------------------------------------------------------------------*/
 int ffgpfk( fitsfile *fptr,   /* I - FITS file pointer                       */
             long  group,      /* I - group to read (1 = 1st group)           */
-            long  firstelem,  /* I - first vector element to read (1 = 1st)  */
-            long  nelem,      /* I - number of values to read                */
+            LONGLONG  firstelem,  /* I - first vector element to read (1 = 1st)  */
+            LONGLONG  nelem,      /* I - number of values to read                */
             int   *array,     /* O - array of values that are returned       */
             char *nularray,   /* O - array of null pixel flags               */
             int  *anynul,     /* O - set to 1 if any values are null; else 0 */
@@ -68,6 +76,17 @@ int ffgpfk( fitsfile *fptr,   /* I - FITS file pointer                       */
 */
 {
     long row;
+    int nullcheck = 2;
+
+    if (fits_is_compressed_image(fptr, status))
+    {
+        /* this is a compressed image in a binary table */
+
+        fits_read_compressed_pixels(fptr, TINT, firstelem, nelem,
+            nullcheck, NULL, array, nularray, anynul, status);
+        return(*status);
+    }
+
     /*
       the primary array is represented as a binary table:
       each group of the primary array is a row in the table,
@@ -85,9 +104,9 @@ int ffgpfk( fitsfile *fptr,   /* I - FITS file pointer                       */
 int ffg2dk(fitsfile *fptr,  /* I - FITS file pointer                       */
            long  group,     /* I - group to read (1 = 1st group)           */
            int  nulval,    /* set undefined pixels equal to this          */
-           long  ncols,     /* I - number of pixels in each row of array   */
-           long  naxis1,    /* I - FITS image NAXIS1 value                 */
-           long  naxis2,    /* I - FITS image NAXIS2 value                 */
+           LONGLONG  ncols,     /* I - number of pixels in each row of array   */
+           LONGLONG  naxis1,    /* I - FITS image NAXIS1 value                 */
+           LONGLONG  naxis2,    /* I - FITS image NAXIS2 value                 */
            int  *array,    /* O - array to be filled and returned         */
            int  *anynul,    /* O - set to 1 if any values are null; else 0 */
            int  *status)    /* IO - error status                           */
@@ -99,40 +118,10 @@ int ffg2dk(fitsfile *fptr,  /* I - FITS file pointer                       */
   nulval = 0 in which case no null checking will be performed.
 */
 {
-    long tablerow, nfits, narray, ii;
-    char cdummy;
+    /* call the 3D reading routine, with the 3rd dimension = 1 */
 
-    /*
-      the primary array is represented as a binary table:
-      each group of the primary array is a row in the table,
-      where the first column contains the group parameters
-      and the second column contains the image itself.
-    */
-    tablerow=maxvalue(1,group);
-
-    if (ncols == naxis1)  /* arrays have same row length? */
-    {
-       /* all the image pixels are contiguous, so read all at once */
-       ffgclk(fptr, 2, tablerow, 1, naxis1 * naxis2, 1, 1, nulval,
-               array, &cdummy, anynul, status);
-       return(*status);
-    }
-
-    /* loop over the naxis2 rows in the FITS image, */
-    /* reading naxis1 pixels to each row            */
-
-    nfits = 1;   /* next pixel in FITS image to read */
-    narray = 0;  /* next pixel in output array to be filled */
-
-    for (ii = 0; ii < naxis2; ii++)
-    {
-       if (ffgclk(fptr, 2, tablerow, nfits, naxis1, 1, 1, nulval,
-          &array[narray], &cdummy, anynul, status) > 0)
-          return(*status);
-
-       nfits += naxis1;
-       narray += ncols;
-    }
+    ffg3dk(fptr, group, nulval, ncols, naxis2, naxis1, naxis2, 1, array, 
+           anynul, status);
 
     return(*status);
 }
@@ -140,11 +129,11 @@ int ffg2dk(fitsfile *fptr,  /* I - FITS file pointer                       */
 int ffg3dk(fitsfile *fptr,  /* I - FITS file pointer                       */
            long  group,     /* I - group to read (1 = 1st group)           */
            int   nulval,    /* set undefined pixels equal to this          */
-           long  ncols,     /* I - number of pixels in each row of array   */
-           long  nrows,     /* I - number of rows in each plane of array   */
-           long  naxis1,    /* I - FITS image NAXIS1 value                 */
-           long  naxis2,    /* I - FITS image NAXIS2 value                 */
-           long  naxis3,    /* I - FITS image NAXIS3 value                 */
+           LONGLONG  ncols,     /* I - number of pixels in each row of array   */
+           LONGLONG  nrows,     /* I - number of rows in each plane of array   */
+           LONGLONG  naxis1,    /* I - FITS image NAXIS1 value                 */
+           LONGLONG  naxis2,    /* I - FITS image NAXIS2 value                 */
+           LONGLONG  naxis3,    /* I - FITS image NAXIS3 value                 */
            int   *array,    /* O - array to be filled and returned         */
            int  *anynul,    /* O - set to 1 if any values are null; else 0 */
            int  *status)    /* IO - error status                           */
@@ -156,8 +145,27 @@ int ffg3dk(fitsfile *fptr,  /* I - FITS file pointer                       */
   nulval = 0 in which case no null checking will be performed.
 */
 {
-    long tablerow, nfits, narray, ii, jj;
+    long tablerow, ii, jj;
     char cdummy;
+    int nullcheck = 1;
+    long inc[] = {1,1,1};
+    LONGLONG fpixel[] = {1,1,1}, nfits, narray;
+    LONGLONG lpixel[3];
+    int nullvalue;
+
+    if (fits_is_compressed_image(fptr, status))
+    {
+        /* this is a compressed image in a binary table */
+
+        lpixel[0] = ncols;
+        lpixel[1] = nrows;
+        lpixel[2] = naxis3;
+        nullvalue = nulval;  /* set local variable */
+
+        fits_read_compressed_img(fptr, TINT, fpixel, lpixel, inc,
+            nullcheck, &nullvalue, array, NULL, anynul, status);
+        return(*status);
+    }
 
     /*
       the primary array is represented as a binary table:
@@ -174,6 +182,9 @@ int ffg3dk(fitsfile *fptr,  /* I - FITS file pointer                       */
                array, &cdummy, anynul, status);
        return(*status);
     }
+
+    if (ncols < naxis1 || nrows < naxis2)
+       return(*status = BAD_DIMEN);
 
     nfits = 1;   /* next pixel in FITS image to read */
     narray = 0;  /* next pixel in output array to be filled */
@@ -193,6 +204,7 @@ int ffg3dk(fitsfile *fptr,  /* I - FITS file pointer                       */
        nfits += naxis1;
        narray += ncols;
       }
+      narray += (nrows - naxis2) * ncols;
     }
 
     return(*status);
@@ -215,16 +227,35 @@ int ffgsvk(fitsfile *fptr, /* I - FITS file pointer                         */
 */
 {
     long ii,i0, i1,i2,i3,i4,i5,i6,i7,i8,row,rstr,rstp,rinc;
-    long str[9],stp[9],incr[9],dsize[10];
-    long felem, nelem, nultyp, ninc, numcol;
+    long str[9],stp[9],incr[9],dir[9];
+    long nelem, nultyp, ninc, numcol;
+    LONGLONG felem, dsize[10], blcll[9], trcll[9];
     int hdutype, anyf;
     char ldummy, msg[FLEN_ERRMSG];
+    int nullcheck = 1;
+    int nullvalue;
 
     if (naxis < 1 || naxis > 9)
     {
         sprintf(msg, "NAXIS = %d in call to ffgsvj is out of range", naxis);
         ffpmsg(msg);
         return(*status = BAD_DIMEN);
+    }
+
+    if (fits_is_compressed_image(fptr, status))
+    {
+        /* this is a compressed image in a binary table */
+
+        for (ii=0; ii < naxis; ii++) {
+	    blcll[ii] = blc[ii];
+	    trcll[ii] = trc[ii];
+	}
+
+        nullvalue = nulval;  /* set local variable */
+
+        fits_read_compressed_img(fptr, TINT, blcll, trcll, inc,
+            nullcheck, &nullvalue, array, NULL, anynul, status);
+        return(*status);
     }
 
 /*
@@ -271,22 +302,32 @@ int ffgsvk(fitsfile *fptr, /* I - FITS file pointer                         */
         stp[ii] = 1;
         incr[ii] = 1;
         dsize[ii] = 1;
+        dir[ii] = 1;
     }
 
     for (ii = 0; ii < naxis; ii++)
     {
       if (trc[ii] < blc[ii])
       {
-        sprintf(msg, "ffgsvj: illegal range specified for axis %ld", ii + 1);
-        ffpmsg(msg);
-        return(*status = BAD_PIX_NUM);
+        if (hdutype == IMAGE_HDU)
+        {
+           dir[ii] = -1;
+        }
+        else
+        {
+          sprintf(msg, "ffgsvk: illegal range specified for axis %ld", ii + 1);
+          ffpmsg(msg);
+          return(*status = BAD_PIX_NUM);
+        }
       }
 
       str[ii] = blc[ii];
       stp[ii] = trc[ii];
       incr[ii] = inc[ii];
       dsize[ii + 1] = dsize[ii] * naxes[ii];
+      dsize[ii] = dsize[ii] * dir[ii];
     }
+    dsize[naxis] = dsize[naxis] * dir[naxis];
 
     if (naxis == 1 && naxes[0] == 1)
     {
@@ -298,32 +339,33 @@ int ffgsvk(fitsfile *fptr, /* I - FITS file pointer                         */
     else
     {
       /* have to read each row individually, in all dimensions */
-      nelem = (stp[0] - str[0]) / inc[0] + 1;
-      ninc = incr[0];
+      nelem = (stp[0]*dir[0] - str[0]*dir[0]) / inc[0] + 1;
+      ninc = incr[0] * dir[0];
     }
 
     for (row = rstr; row <= rstp; row += rinc)
     {
-     for (i8 = str[8]; i8 <= stp[8]; i8 += incr[8])
+     for (i8 = str[8]*dir[8]; i8 <= stp[8]*dir[8]; i8 += incr[8])
      {
-      for (i7 = str[7]; i7 <= stp[7]; i7 += incr[7])
+      for (i7 = str[7]*dir[7]; i7 <= stp[7]*dir[7]; i7 += incr[7])
       {
-       for (i6 = str[6]; i6 <= stp[6]; i6 += incr[6])
+       for (i6 = str[6]*dir[6]; i6 <= stp[6]*dir[6]; i6 += incr[6])
        {
-        for (i5 = str[5]; i5 <= stp[5]; i5 += incr[5])
+        for (i5 = str[5]*dir[5]; i5 <= stp[5]*dir[5]; i5 += incr[5])
         {
-         for (i4 = str[4]; i4 <= stp[4]; i4 += incr[4])
+         for (i4 = str[4]*dir[4]; i4 <= stp[4]*dir[4]; i4 += incr[4])
          {
-          for (i3 = str[3]; i3 <= stp[3]; i3 += incr[3])
+          for (i3 = str[3]*dir[3]; i3 <= stp[3]*dir[3]; i3 += incr[3])
           {
-           for (i2 = str[2]; i2 <= stp[2]; i2 += incr[2])
+           for (i2 = str[2]*dir[2]; i2 <= stp[2]*dir[2]; i2 += incr[2])
            {
-            for (i1 = str[1]; i1 <= stp[1]; i1 += incr[1])
+            for (i1 = str[1]*dir[1]; i1 <= stp[1]*dir[1]; i1 += incr[1])
             {
-              felem=str[0] + (i1 - 1) * dsize[1] + (i2 - 1) * dsize[2] + 
-                             (i3 - 1) * dsize[3] + (i4 - 1) * dsize[4] +
-                             (i5 - 1) * dsize[5] + (i6 - 1) * dsize[6] +
-                             (i7 - 1) * dsize[7] + (i8 - 1) * dsize[8];
+
+              felem=str[0] + (i1 - dir[1]) * dsize[1] + (i2 - dir[2]) * dsize[2] + 
+                             (i3 - dir[3]) * dsize[3] + (i4 - dir[4]) * dsize[4] +
+                             (i5 - dir[5]) * dsize[5] + (i6 - dir[6]) * dsize[6] +
+                             (i7 - dir[7]) * dsize[7] + (i8 - dir[8]) * dsize[8];
 
               if ( ffgclk(fptr, numcol, row, felem, nelem, ninc, nultyp,
                    nulval, &array[i0], &ldummy, &anyf, status) > 0)
@@ -363,16 +405,32 @@ int ffgsfk(fitsfile *fptr, /* I - FITS file pointer                         */
 {
     long ii,i0, i1,i2,i3,i4,i5,i6,i7,i8,row,rstr,rstp,rinc;
     long str[9],stp[9],incr[9],dsize[10];
+    LONGLONG blcll[9], trcll[9];
     long felem, nelem, nultyp, ninc, numcol;
     long nulval = 0;
     int hdutype, anyf;
     char msg[FLEN_ERRMSG];
+    int nullcheck = 2;
 
     if (naxis < 1 || naxis > 9)
     {
         sprintf(msg, "NAXIS = %d in call to ffgsvj is out of range", naxis);
         ffpmsg(msg);
         return(*status = BAD_DIMEN);
+    }
+
+    if (fits_is_compressed_image(fptr, status))
+    {
+        /* this is a compressed image in a binary table */
+
+        for (ii=0; ii < naxis; ii++) {
+	    blcll[ii] = blc[ii];
+	    trcll[ii] = trc[ii];
+	}
+
+        fits_read_compressed_img(fptr, TINT, blcll, trcll, inc,
+            nullcheck, NULL, array, flagval, anynul, status);
+        return(*status);
     }
 
 /*
@@ -524,9 +582,9 @@ int ffggpk( fitsfile *fptr,   /* I - FITS file pointer                       */
 /*--------------------------------------------------------------------------*/
 int ffgcvk(fitsfile *fptr,   /* I - FITS file pointer                       */
            int  colnum,      /* I - number of column to read (1 = 1st col)  */
-           long  firstrow,   /* I - first row to read (1 = 1st row)         */
-           long  firstelem,  /* I - first vector element to read (1 = 1st)  */
-           long  nelem,      /* I - number of values to read                */
+           LONGLONG  firstrow,   /* I - first row to read (1 = 1st row)         */
+           LONGLONG  firstelem,  /* I - first vector element to read (1 = 1st)  */
+           LONGLONG  nelem,      /* I - number of values to read                */
            int   nulval,     /* I - value for null pixels                   */
            int  *array,      /* O - array of values that are read           */
            int  *anynul,     /* O - set to 1 if any values are null; else 0 */
@@ -549,9 +607,9 @@ int ffgcvk(fitsfile *fptr,   /* I - FITS file pointer                       */
 /*--------------------------------------------------------------------------*/
 int ffgcfk(fitsfile *fptr,   /* I - FITS file pointer                       */
            int  colnum,      /* I - number of column to read (1 = 1st col)  */
-           long  firstrow,   /* I - first row to read (1 = 1st row)         */
-           long  firstelem,  /* I - first vector element to read (1 = 1st)  */
-           long  nelem,      /* I - number of values to read                */
+           LONGLONG  firstrow,   /* I - first row to read (1 = 1st row)         */
+           LONGLONG  firstelem,  /* I - first vector element to read (1 = 1st)  */
+           LONGLONG  nelem,      /* I - number of values to read                */
            int   *array,     /* O - array of values that are read           */
            char *nularray,   /* O - array of flags: 1 if null pixel; else 0 */
            int  *anynul,     /* O - set to 1 if any values are null; else 0 */
@@ -574,9 +632,9 @@ int ffgcfk(fitsfile *fptr,   /* I - FITS file pointer                       */
 /*--------------------------------------------------------------------------*/
 int ffgclk( fitsfile *fptr,   /* I - FITS file pointer                       */
             int  colnum,      /* I - number of column to read (1 = 1st col)  */
-            long  firstrow,   /* I - first row to read (1 = 1st row)         */
-            long  firstelem,  /* I - first vector element to read (1 = 1st)  */
-            long  nelem,      /* I - number of values to read                */
+            LONGLONG  firstrow,   /* I - first row to read (1 = 1st row)         */
+            LONGLONG firstelem,  /* I - first vector element to read (1 = 1st)  */
+            LONGLONG  nelem,      /* I - number of values to read                */
             long  elemincre,  /* I - pixel increment; e.g., 2 = every other  */
             int   nultyp,     /* I - null value handling code:               */
                               /*     1: set undefined pixels = nulval        */
@@ -600,12 +658,13 @@ int ffgclk( fitsfile *fptr,   /* I - FITS file pointer                       */
   and will be scaled by the FITS TSCALn and TZEROn values if necessary.
 */
 {
-    double scale, zero, power;
+    double scale, zero, power, dtemp;
     int tcode, maxelem, hdutype, xcode, decimals;
-    long twidth, incre, repeat, rowlen, rownum, elemnum, remain, next, ntodo;
-    long ii, rowincre, tnull, xwidth;
-    int convert, nulcheck;
-    long startpos, readptr;
+    long twidth, incre;
+    long ii, xwidth, ntodo;
+    int convert, nulcheck, readcheck = 0;
+    LONGLONG repeat, startpos, elemnum, readptr, tnull;
+    LONGLONG rowlen, rownum, remain, next, rowincre;
     char tform[20];
     char message[81];
     char snull[20];   /*  the FITS null value if reading from ASCII table  */
@@ -638,12 +697,15 @@ int ffgclk( fitsfile *fptr,   /* I - FITS file pointer                       */
         *anynul = 0;
 
     if (nultyp == 2)
-        memset(nularray, 0, nelem);   /* initialize nullarray */
+        memset(nularray, 0, (size_t) nelem);   /* initialize nullarray */
 
     /*---------------------------------------------------*/
     /*  Check input and get parameters about the column: */
     /*---------------------------------------------------*/
-    if ( ffgcpr( fptr, colnum, firstrow, firstelem, nelem, 0, &scale, &zero,
+    if (elemincre < 0)
+        readcheck = -1;  /* don't do range checking in this case */
+
+    if ( ffgcprll( fptr, colnum, firstrow, firstelem, nelem, readcheck, &scale, &zero,
          tform, &twidth, &tcode, &maxelem, &startpos, &elemnum, &incre,
          &repeat, &rowlen, &hdutype, &tnull, snull, status) > 0 )
          return(*status);
@@ -669,6 +731,12 @@ int ffgclk( fitsfile *fptr,   /* I - FITS file pointer                       */
             tnull == NULL_UNDEFINED) /* if a null value is not defined,    */
             nulcheck = 0;            /* then do not check for null values. */
 
+    else if (tcode == TSHORT && (tnull > SHRT_MAX || tnull < SHRT_MIN) )
+            nulcheck = 0;            /* Impossible null value */
+
+    else if (tcode == TBYTE && (tnull > 255 || tnull < 0) )
+            nulcheck = 0;            /* Impossible null value */
+
     else if (tcode == TSTRING && snull[0] == ASCII_NULL_UNDEFINED)
          nulcheck = 0;
 
@@ -679,7 +747,7 @@ int ffgclk( fitsfile *fptr,   /* I - FITS file pointer                       */
     convert = 1;
     if (tcode == TLONG)           /* Special Case:                        */
     {                             /* no type convertion required, so read */
-        maxelem = nelem;          /* data directly into output buffer.    */
+        maxelem = (int) nelem;          /* data directly into output buffer.    */
 
         if (nulcheck == 0 && scale == 1. && zero == 0.)
             convert = 0;  /* no need to scale data or find nulls */
@@ -706,10 +774,17 @@ int ffgclk( fitsfile *fptr,   /* I - FITS file pointer                       */
            will fit in the buffer or to the number of pixels that remain in
            the current vector, which ever is smaller.
         */
-        ntodo = minvalue(remain, maxelem);      
-        ntodo = minvalue(ntodo, ((repeat - elemnum - 1)/elemincre +1));
+        ntodo = (long) minvalue(remain, maxelem);
+        if (elemincre >= 0)
+        {
+          ntodo = (long) minvalue(ntodo, ((repeat - elemnum - 1)/elemincre +1));
+        }
+        else
+        {
+          ntodo = (long) minvalue(ntodo, (elemnum/(-elemincre) +1));
+        }
 
-        readptr = startpos + (rownum * rowlen) + (elemnum * incre / elemincre);
+        readptr = startpos + ((LONGLONG)rownum * rowlen) + (elemnum * (incre / elemincre));
 
         switch (tcode) 
         {
@@ -720,6 +795,13 @@ int ffgclk( fitsfile *fptr,   /* I - FITS file pointer                       */
                     fffi4int((INT32BIT *) &array[next], ntodo, scale, zero, 
                              nulcheck, (INT32BIT) tnull, nulval,
                              &nularray[next], anynul, &array[next], status);
+                break;
+            case (TLONGLONG):
+
+                ffgi8b(fptr, readptr, ntodo, incre, (long *) buffer, status);
+                fffi8int( (LONGLONG *) buffer, ntodo, scale, zero, 
+                           nulcheck, tnull, nulval, &nularray[next], 
+                            anynul, &array[next], status);
                 break;
             case (TBYTE):
                 ffgi1b(fptr, readptr, ntodo, incre, (unsigned char *) buffer,
@@ -777,9 +859,16 @@ int ffgclk( fitsfile *fptr,   /* I - FITS file pointer                       */
         /*-------------------------*/
         if (*status > 0)  /* test for error during previous read operation */
         {
-          sprintf(message,
-          "Error reading elements %ld thru %ld of input data array (ffgclk).",
-            next+1, next+ntodo);
+	  dtemp = (double) next;
+          if (hdutype > 0)
+            sprintf(message,
+            "Error reading elements %.0f thru %.0f from column %d (ffgclk).",
+              dtemp+1., dtemp+ntodo, colnum);
+          else
+            sprintf(message,
+            "Error reading elements %.0f thru %.0f from image (ffgclk).",
+              dtemp+1., dtemp+ntodo);
+
           ffpmsg(message);
           return(*status);
         }
@@ -798,6 +887,12 @@ int ffgclk( fitsfile *fptr,   /* I - FITS file pointer                       */
                 rowincre = elemnum / repeat;
                 rownum += rowincre;
                 elemnum = elemnum - (rowincre * repeat);
+            }
+            else if (elemnum < 0)  /* completed a row; start on a previous row */
+            {
+                rowincre = (-elemnum - 1) / repeat + 1;
+                rownum -= rowincre;
+                elemnum = (rowincre * repeat) + elemnum;
             }
         }
     }  /*  End of main while Loop  */
@@ -1069,7 +1164,6 @@ int fffi4int(INT32BIT *input,     /* I - array of values to be converted     */
 {
     long ii;
     double dvalue;
-
     if (nullcheck == 0)     /* no null checking required */
     {
         if (scale == 1. && zero == 0.)      /* no scaling */
@@ -1115,6 +1209,143 @@ int fffi4int(INT32BIT *input,     /* I - array of values to be converted     */
                 else
                     output[ii] = (int) input[ii];
 
+            }
+        }
+        else                  /* must scale the data */
+        {
+            for (ii = 0; ii < ntodo; ii++)
+            {
+                if (input[ii] == tnull)
+                {
+                    *anynull = 1;
+                    if (nullcheck == 1)
+                        output[ii] = nullval;
+                    else
+                        nullarray[ii] = 1;
+                }
+                else
+                {
+                    dvalue = input[ii] * scale + zero;
+
+                    if (dvalue < DINT_MIN)
+                    {
+                        *status = OVERFLOW_ERR;
+                        output[ii] = INT_MIN;
+                    }
+                    else if (dvalue > DINT_MAX)
+                    {
+                        *status = OVERFLOW_ERR;
+                        output[ii] = INT_MAX;
+                    }
+                    else
+                        output[ii] = (int) dvalue;
+                }
+            }
+        }
+    }
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
+int fffi8int(LONGLONG *input,     /* I - array of values to be converted     */
+            long ntodo,           /* I - number of elements in the array     */
+            double scale,         /* I - FITS TSCALn or BSCALE value         */
+            double zero,          /* I - FITS TZEROn or BZERO  value         */
+            int nullcheck,        /* I - null checking code; 0 = don't check */
+                                  /*     1:set null pixels = nullval         */
+                                  /*     2: if null pixel, set nullarray = 1 */
+            LONGLONG tnull,       /* I - value of FITS TNULLn keyword if any */
+            int  nullval,         /* I - set null pixels, if nullcheck = 1   */
+            char *nullarray,      /* I - bad pixel array, if nullcheck = 2   */
+            int  *anynull,        /* O - set to 1 if any pixels are null     */
+            int  *output,         /* O - array of converted pixels           */
+            int *status)          /* IO - error status                       */
+/*
+  Copy input to output following reading of the input from a FITS file.
+  Check for null values and do datatype conversion and scaling if required.
+  The nullcheck code value determines how any null values in the input array
+  are treated.  A null value is an input pixel that is equal to tnull.  If 
+  nullcheck = 0, then no checking for nulls is performed and any null values
+  will be transformed just like any other pixel.  If nullcheck = 1, then the
+  output pixel will be set = nullval if the corresponding input pixel is null.
+  If nullcheck = 2, then if the pixel is null then the corresponding value of
+  nullarray will be set to 1; the value of nullarray for non-null pixels 
+  will = 0.  The anynull parameter will be set = 1 if any of the returned
+  pixels are null, otherwise anynull will be returned with a value = 0;
+*/
+{
+    long ii;
+    double dvalue;
+
+    if (nullcheck == 0)     /* no null checking required */
+    {
+        if (scale == 1. && zero == 0.)      /* no scaling */
+        {       
+            for (ii = 0; ii < ntodo; ii++)
+            {
+                if (input[ii] < INT_MIN)
+                {
+                    *status = OVERFLOW_ERR;
+                    output[ii] = INT_MIN;
+                }
+                else if (input[ii] > INT_MAX)
+                {
+                    *status = OVERFLOW_ERR;
+                    output[ii] = INT_MAX;
+                }
+                else
+                    output[ii] = (int) input[ii];
+            }
+        }
+        else             /* must scale the data */
+        {
+            for (ii = 0; ii < ntodo; ii++)
+            {
+                dvalue = input[ii] * scale + zero;
+
+                if (dvalue < DINT_MIN)
+                {
+                    *status = OVERFLOW_ERR;
+                    output[ii] = INT_MIN;
+                }
+                else if (dvalue > DINT_MAX)
+                {
+                    *status = OVERFLOW_ERR;
+                    output[ii] = INT_MAX;
+                }
+                else
+                    output[ii] = (int) dvalue;
+            }
+        }
+    }
+    else        /* must check for null values */
+    {
+        if (scale == 1. && zero == 0.)  /* no scaling */
+        {       
+            for (ii = 0; ii < ntodo; ii++)
+            {
+                if (input[ii] == tnull)
+                {
+                    *anynull = 1;
+                    if (nullcheck == 1)
+                        output[ii] = nullval;
+                    else
+                        nullarray[ii] = 1;
+                }
+                else
+                {
+                    if (input[ii] < INT_MIN)
+                    {
+                        *status = OVERFLOW_ERR;
+                        output[ii] = INT_MIN;
+                    }
+                    else if (input[ii] > INT_MAX)
+                    {
+                        *status = OVERFLOW_ERR;
+                        output[ii] = INT_MAX;
+                    }
+                    else
+                        output[ii] = (int) input[ii];
+                }
             }
         }
         else                  /* must scale the data */
@@ -1227,7 +1458,7 @@ int fffr4int(float *input,        /* I - array of values to be converted     */
     {
         sptr = (short *) input;
 
-#if BYTESWAPPED
+#if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
         sptr++;       /* point to MSBs */
 #endif
 
@@ -1393,7 +1624,7 @@ int fffr8int(double *input,       /* I - array of values to be converted     */
     {
         sptr = (short *) input;
 
-#if BYTESWAPPED
+#if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
         sptr += 3;       /* point to MSBs */
 #endif
         if (scale == 1. && zero == 0.)  /* no scaling */
@@ -1514,7 +1745,7 @@ int fffstrint(char *input,        /* I - array of values to be converted     */
     int nullen;
     long ii;
     double dvalue;
-    char cstring[50], message[81];
+    char *cstring, message[81];
     char *cptr, *tpos;
     char tempstore, chrzero = '0';
     double val, power;
@@ -1524,6 +1755,7 @@ int fffstrint(char *input,        /* I - array of values to be converted     */
     cptr = input;  /* pointer to start of input string */
     for (ii = 0; ii < ntodo; ii++)
     {
+      cstring = cptr;
       /* temporarily insert a null terminator at end of the string */
       tpos = cptr + twidth;
       tempstore = *tpos;
@@ -1630,6 +1862,8 @@ int fffstrint(char *input,        /* I - array of values to be converted     */
           ffpmsg(message);
           sprintf(message, "Column field = %s.", cstring);
           ffpmsg(message);
+          /* restore the char that was overwritten by the null */
+          *tpos = tempstore;
           return(*status = BAD_C2D);
         }
 

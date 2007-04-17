@@ -10,15 +10,25 @@
 #endif
 #include "fitsio2.h"
 
-#define MAXDIMS      5
-#define MAXSUBS     10
-#define CONST_OP -1000
+#ifndef FFBISON
+#include "eval_tab.h"
+#endif
+
+#define MAXDIMS       5
+#define MAXSUBS      10
+#define MAXVARNAME   80
+#define CONST_OP  -1000
+#define pERROR       -1
+
 
 typedef struct {
-                  int  type;
-                  long nelem;
-                  int  naxis;
-                  long naxes[MAXDIMS];
+                  char   name[MAXVARNAME+1];
+                  int    type;
+                  long   nelem;
+                  int    naxis;
+                  long   naxes[MAXDIMS];
+                  char   *undef;
+                  void   *data;
                                 } DataInfo;
 
 typedef struct {
@@ -50,6 +60,9 @@ typedef struct Node {
 
 typedef struct {
                   fitsfile    *def_fptr;
+                  int         (*getData)( char *dataName, void *dataValue );
+                  int         (*loadData)( int varNum, long fRow, long nRows,
+					   void *data, char *undef );
 
                   int         compressed;
                   int         timeCol;
@@ -63,16 +76,22 @@ typedef struct {
                   Node        *Nodes;
                   int         nNodes;
                   int         nNodesAlloc;
+                  int         resultNode;
                   
                   long        firstRow;
                   long        nRows;
 
                   int         nCols;
                   iteratorCol *colData;
-                  DataInfo    *colInfo;
-                  char        **colNulls;
+                  DataInfo    *varData;
+                  PixelFilter *pixFilter;
+
+                  long        firstDataRow;
+                  long        nDataRows;
+                  long        totalRows;
 
                   int         datatype;
+                  int         hdutype;
 
                   int         status;
                                 } ParseData;
@@ -99,6 +118,10 @@ typedef enum {
                   ceil_fct,
                   floor_fct,
                   round_fct,
+		  min1_fct,
+		  min2_fct,
+		  max1_fct,
+		  max2_fct,
                   near_fct,
                   circle_fct,
                   box_fct,
@@ -107,7 +130,14 @@ typedef enum {
                   defnull_fct,
                   gtifilt_fct,
                   regfilt_fct,
-                  row_fct
+                  ifthenelse_fct,
+                  row_fct,
+                  null_fct,
+		  median_fct,
+		  average_fct,
+		  stddev_fct,
+		  nonnull_fct,
+		  angsep_fct
                                 } funcOp;
 
 extern ParseData gParse;
@@ -119,11 +149,8 @@ extern "C" {
    int  ffparse(void);
    int  fflex(void);
    void ffrestart(FILE*);
-   int  ffbuildcolumn( char *ColName, int *ColNum );
-   int  ffallocatecol( int nCol, int *status );
 
-   void Evaluate_Node( int thisNode );
-   void Reset_Parser ( long firstRow, long rowOffset, long nRows );
+   void Evaluate_Parser( long firstRow, long nRows );
 
 #ifdef __cplusplus
     }

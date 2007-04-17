@@ -48,6 +48,7 @@
 ************************************************************************
 -*/
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include <sys/types.h>
 #include <netinet/in.h>
@@ -614,7 +615,7 @@ static int	fitsread
 	    PR_CHECK( status );
 	    line[80] = '\0';
 	    /* Replace line of nulls with line of blanks. */
-	    if ((int)strlen(line) != 80)
+	    if (strlen(line) != 80)
 	    {
 		for (j = strlen(line); j < 80; j++)
 		    line[j] = ' ';

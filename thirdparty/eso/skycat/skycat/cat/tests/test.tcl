@@ -1,6 +1,6 @@
 # E.S.O. - VLT project
 #
-# "@(#) $Id: test.tcl,v 1.1.1.1 2002/04/04 20:11:47 brighton Exp $" 
+# "@(#) $Id: test.tcl,v 1.1.1.1 2006/01/12 16:36:09 abrighto Exp $" 
 #
 # test.tcl - tcl defs to set up environment for test scripts
 #
@@ -10,11 +10,6 @@
 # --------   ---------   ----------------------------------------------
 # A.Brighton 08 Apr 97   created
 
-foreach pkg {BLT} {
-    if {[info exists env(${pkg}_LIBRARY)]} {
-	lappend auto_path $env(${pkg}_LIBRARY)
-    }
-}
 
 proc tkerror {msg} {
     global errorInfo
@@ -26,11 +21,11 @@ proc tkerror {msg} {
 catch {tkerror}
 rename tkerror tkerror__
 
-lappend auto_path ../library
+#lappend auto_path ../library
 package require Cat
 
 set tk_strictMotif 1
-tk appname Cat
+tk appname Tclutil
 
 utilPrintErrors
 

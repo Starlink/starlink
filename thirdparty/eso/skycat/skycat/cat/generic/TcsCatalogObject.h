@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: TcsCatalogObject.h,v 1.2 2003/01/18 21:11:11 brighton Exp $
+ * $Id: TcsCatalogObject.h,v 1.1.1.1 2006/01/12 16:36:27 abrighto Exp $
  *
  * TcsCatalogObject.h - class representing one row of results from a 
  *                      TcsCatalog query.
@@ -16,6 +16,7 @@
  * Allan Brighton  13 Jun 96  Created
  */
 
+using namespace std;
 
 // NULL values
 //#define TCS_CATALOG_NULL_INT 4294967294      /* (2^32 - 1) */
@@ -59,17 +60,17 @@ public:
     TcsCatalogObject& operator=(const TcsCatalogObject &);
 
     // output operator
-    friend std::ostream& operator<<(std::ostream&, const TcsCatalogObject&);
+    friend ostream& operator<<(ostream&, const TcsCatalogObject&);
 
     // print this object to the given buffer
     void print(char* buf, int bufsize);
 
     // print the headings to match the output of '<<' above 
-    static void printHeadings(std::ostream& os);
+    static void printHeadings(ostream& os);
     static void printHeadings(char* buf, int bufsize);
 
     // print this object as a tab separated row
-    int printTableRow(std::ostream&);
+    int printTableRow(ostream&);
  
     // result all fields to default values
     void reset();

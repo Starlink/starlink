@@ -1,6 +1,6 @@
  /*
  * E.S.O. - VLT project/ESO Archive 
- * $Id: base64.C,v 1.2 2005/02/02 01:43:00 brighton Exp $
+ * $Id: base64.C,v 1.1.1.1 2006/01/12 16:41:05 abrighto Exp $
  *
  * base64.C - utility routines for base64 encoding and decoding
  *            (needed for some HTTP protocols, such as password
@@ -12,7 +12,7 @@
  *                           mozilla routines in libi18n/mime2fun.c
  *                           See http://www.mozilla.org/NPL/.
  */
-static const char* const rcsId="@(#) $Id: base64.C,v 1.2 2005/02/02 01:43:00 brighton Exp $";
+static const char* const rcsId="@(#) $Id: base64.C,v 1.1.1.1 2006/01/12 16:41:05 abrighto Exp $";
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: Astrotcl.C,v 1.6 2005/02/02 01:43:04 brighton Exp $"
+ * "@(#) $Id: Astrotcl.C,v 1.1.1.1 2006/01/12 16:44:01 abrighto Exp $"
  *
  * Astrotcl.C - Initialize Astrotcl package
  * 
@@ -9,7 +9,7 @@
  * Allan Brighton  21 Nov 97  Created
  * pbiereic        26/08/99   Changed Astrotcl_Init()
  */
-static const char* const rcsId="@(#) $Id: Astrotcl.C,v 1.6 2005/02/02 01:43:04 brighton Exp $";
+static const char* const rcsId="@(#) $Id: Astrotcl.C,v 1.1.1.1 2006/01/12 16:44:01 abrighto Exp $";
 
 #include <cstdlib>
 #include <cstring>
@@ -23,12 +23,26 @@ static const char* const rcsId="@(#) $Id: Astrotcl.C,v 1.6 2005/02/02 01:43:04 b
 #include <tcl.h>
 #include <tk.h>
 #include "error.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include "define.h"
 
 extern "C" int TclWorldCoords_Init(Tcl_Interp* interp);
 
-// generated code for bitmaps used in tcl scripts
-void defineAstrotclBitmaps(Tcl_Interp*);
+// Tcl procedure to search for an init for Astrotcl startup file.  
+static char initScript[] = "if {[info proc ::util::Init]==\"\"} {\n\
+  namespace eval ::util {}\n\
+  proc ::util::Init {} {\n"
+#ifdef MAC_TCL
+"    source -rsrc AstrotclInit.tcl\n"
+#else
+"    global astrotcl_library\n\
+    tcl_findLibrary astrotcl " PACKAGE_VERSION " " PACKAGE_VERSION " AstrotclInit.tcl ASTROTCL_LIBRARY astrotcl_library\n"
+#endif
+"  }\n\
+}\n\
+::util::Init";
 
 // dummy Tcl command implementation
 static int astrotcl_cmd(ClientData, Tcl_Interp* interp, int argc, char** argv)
@@ -51,12 +65,9 @@ int Astrotcl_Init(Tcl_Interp* interp)
 	return TCL_OK;
 
     // set up Tcl package
-    if (Tcl_PkgProvide (interp, "Astrotcl", ASTROTCL_VERSION) != TCL_OK) {
+    if (Tcl_PkgProvide (interp, "Astrotcl", PACKAGE_VERSION) != TCL_OK) {
 	return TCL_ERROR;
     }
-
-    // define bitmaps used by Tcl library
-    defineAstrotclBitmaps(interp);
 
     // add a dummy tcl command (this command doesn't do anything currently)
     Tcl_CreateCommand(interp, "astrotcl", (Tcl_CmdProc*)astrotcl_cmd, NULL, NULL);
@@ -65,29 +76,7 @@ int Astrotcl_Init(Tcl_Interp* interp)
     TclWorldCoords_Init(interp);
 
     // Set the global Tcl variable astrotcl_version 
-    Tcl_SetVar(interp, "astrotcl_version", ASTROTCL_VERSION, TCL_GLOBAL_ONLY);
+    Tcl_SetVar(interp, "astrotcl_version", PACKAGE_VERSION, TCL_GLOBAL_ONLY);
 
-    /*
-     * Use Tcl script to search for AstrotclInit.tcl and run the initialization tcl script
-     */
-
-    // defines for AstrotclInit.icc:
-#   define Pkg_findinit Astrotcl_findinit
-#   include "AstrotclInit.icc"
-
-    // defines for calling the script
-#   define Pkg "Astrotcl"
-#   define Pkg_proc "Astrotcl_findinit"
-    char* pkg_library = ASTROTCL_LIBRARY;
-
-    Tcl_SetVar(interp, "Pkg_findinit", Pkg_proc, TCL_GLOBAL_ONLY);
-
-    if (Tcl_GlobalEval(interp, Pkg_findinit) == TCL_ERROR)
-        return TCL_ERROR;
-
-    sprintf(buf, "%s %s %s", Pkg_proc, Pkg, pkg_library);
-    if (Tcl_GlobalEval(interp, buf) == TCL_ERROR)
-        return TCL_ERROR;
-    
-    return TCL_OK;
+    return Tcl_Eval(interp, initScript);
 }

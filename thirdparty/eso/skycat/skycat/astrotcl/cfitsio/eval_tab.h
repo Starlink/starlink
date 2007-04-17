@@ -19,19 +19,23 @@ typedef union {
 #define	SCOLUMN	269
 #define	BITCOL	270
 #define	ROWREF	271
-#define	OR	272
-#define	AND	273
-#define	EQ	274
-#define	NE	275
-#define	GT	276
-#define	LT	277
-#define	LTE	278
-#define	GTE	279
-#define	POWER	280
-#define	NOT	281
-#define	INTCAST	282
-#define	FLTCAST	283
-#define	UMINUS	284
+#define	NULLREF	272
+#define	SNULLREF	273
+#define	OR	274
+#define	AND	275
+#define	EQ	276
+#define	NE	277
+#define	GT	278
+#define	LT	279
+#define	LTE	280
+#define	GTE	281
+#define	POWER	282
+#define	NOT	283
+#define	INTCAST	284
+#define	FLTCAST	285
+#define	UMINUS	286
+#define	ACCUM	287
+#define	DIFF	288
 
 
 extern FFSTYPE fflval;
