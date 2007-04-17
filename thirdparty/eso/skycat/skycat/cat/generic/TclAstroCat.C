@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/Archive
- * $Id: TclAstroCat.C,v 1.6 2003/01/20 15:52:21 brighton Exp $
+ * $Id: TclAstroCat.C,v 1.3 2006/03/26 13:22:33 abrighto Exp $
  *
  * TclAstroCat.C - method definitions for class TclAstroCat
  * 
@@ -11,8 +11,9 @@
  * Allan Brighton  26 Sep 95  Created
  * pbiereic        26/08/99   Changed Cat_Init()
  */
-static const char* const rcsId="@(#) $Id: TclAstroCat.C,v 1.6 2003/01/20 15:52:21 brighton Exp $";
+static const char* const rcsId="@(#) $Id: TclAstroCat.C,v 1.3 2006/03/26 13:22:33 abrighto Exp $";
 
+using namespace std;
 #include <cstring>
 #include <cctype>
 #include <cstdio>
@@ -21,7 +22,9 @@ static const char* const rcsId="@(#) $Id: TclAstroCat.C,v 1.6 2003/01/20 15:52:2
 #include <unistd.h>
 #include <fstream>
 #include <sstream>
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 #include "TabTable.h"
 #include "Mem.h"
 #include "error.h"
@@ -47,8 +50,21 @@ extern "C" int Astrotcl_Init(Tcl_Interp *interp);
 // generated code for bitmaps used in tcl scripts
 void defineCatBitmaps(Tcl_Interp*);
 
-// temp: initialize local copy of Tix widget set
-extern "C" int Tixsam_Init(Tcl_Interp *interp);
+
+// Tcl procedure to search for an init for Cat startup file.  
+static char initScript[] = "if {[info proc ::cat::Init]==\"\"} {\n\
+  namespace eval ::cat {}\n\
+  proc ::cat::Init {} {\n"
+#ifdef MAC_TCL
+"    source -rsrc CatInit.tcl\n"
+#else
+"    global cat_library\n\
+     tcl_findLibrary cat " PACKAGE_VERSION " " PACKAGE_VERSION " CatInit.tcl CAT_LIBRARY cat_library\n"
+#endif
+"  }\n\
+}\n\
+::cat::Init";
+
 
 /* 
  * Declare a table of tcl subcommands.
@@ -152,16 +168,24 @@ extern "C" int TclTcsCat_Init(Tcl_Interp *interp);
 extern "C" 
 int Cat_Init(Tcl_Interp* interp)  
 {
-    char buf[1024];
+    // Initialize the local packages that "cat" depends on (we include the
+    // object files from these packages directly, to avoid having the
+    // extra dependencies.)
 
-    // initialize a local copy of the Tix widget set
-    // (required by the catalog browser widget)
-    if (Tixsam_Init(interp) != TCL_OK) 
-        return TCL_ERROR;
-    // Tcl_StaticPackage (interp, "Tix", Tixsam_Init, (Tcl_PackageInitProc *) NULL);
+    // initialize the tclutil package 
+    if (Tclutil_Init(interp) == TCL_ERROR) {
+	return TCL_ERROR;
+    }
+
+    // initialize the astrotcl package 
+    if (Astrotcl_Init(interp) == TCL_ERROR) {
+	return TCL_ERROR;
+    }
+
+    char buf[2048];
 
     // set up Cat Tcl package
-    if (Tcl_PkgProvide (interp, "Cat", CAT_VERSION) != TCL_OK) {
+    if (Tcl_PkgProvide (interp, "Cat", PACKAGE_VERSION) != TCL_OK) {
         return TCL_ERROR;
     }
 
@@ -184,44 +208,8 @@ int Cat_Init(Tcl_Interp* interp)
     Tcl_CreateCommand(interp, "astrocat", (Tcl_CmdProc*)TclAstroCat::astroCatCmd, NULL, NULL);
 
     // Set the global Tcl variable cat_version 
-    Tcl_SetVar(interp, "cat_version", CAT_VERSION, TCL_GLOBAL_ONLY);
-
-    /*
-     * Use Tcl script to search for CatInit.tcl and run the initialization tcl script
-     */
-
-    // defines for CatInit.icc:
-#   define Pkg_findinit Cat_findinit
-#   include "CatInit.icc"
-
-    // defines for calling the script
-#   define Pkg "Cat"
-#   define Pkg_proc "Cat_findinit"
-    char* pkg_library = CAT_LIBRARY;
-    Tcl_SetVar(interp, "Pkg_findinit", Pkg_proc, TCL_GLOBAL_ONLY);
-
-    if (Tcl_GlobalEval(interp, Pkg_findinit) == TCL_ERROR)
-        return TCL_ERROR;
-
-    sprintf(buf, "%s %s %s", Pkg_proc, Pkg, pkg_library);
-    if (Tcl_GlobalEval(interp, buf) == TCL_ERROR)
-        return TCL_ERROR;
-
-    // For backward compatibility, initialize 2 local packages that we
-    // depend on:
-
-    // initialize the tclutil package 
-    if (Tclutil_Init(interp) == TCL_ERROR) {
-        return TCL_ERROR;
-    }
-    // Tcl_StaticPackage (interp, "Tclutil", Tclutil_Init, (Tcl_PackageInitProc *) NULL);
-
-    // initialize the astrotcl package 
-    if (Astrotcl_Init(interp) == TCL_ERROR) {
-        return TCL_ERROR;
-    }
-    // Tcl_StaticPackage (interp, "Astrotcl", Astrotcl_Init, (Tcl_PackageInitProc *) NULL);
-    return TCL_OK;
+    Tcl_SetVar(interp, "cat_version", PACKAGE_VERSION, TCL_GLOBAL_ONLY);
+    return Tcl_Eval(interp, initScript);
 }
 
 
@@ -472,7 +460,7 @@ int TclAstroCat::saveCmd(int argc, char* argv[])
 
     // clean up
     if (freeColNames && colNames)
-	free(colNames);		// free split list of column headings
+	Tcl_Free((char *)colNames);	// free split list of column headings
 
     return status;
 }
@@ -582,7 +570,7 @@ int TclAstroCat::removeCmd(int argc, char* argv[])
     
     // clean up
     if (freeColNames && colNames)
-	free(colNames);		// free split list of column headings
+	Tcl_Free((char *)colNames);	// free split list of column headings
 
     return status;
 }
@@ -655,7 +643,7 @@ int TclAstroCat::checkrowCmd(int argc, char* argv[])
 	pos = WorldCoords(values[cat_->ra_col()], values[cat_->dec_col()]);
     else if (cat_->isPix())
 	pos = ImageCoords(values[cat_->x_col()], values[cat_->y_col()]);
-    free(values);
+    Tcl_Free((char *)values);
     return pos.status();
 }
 
@@ -809,7 +797,7 @@ int TclAstroCat::getimageCmd(int argc, char* argv[])
  */
 int TclAstroCat::queryposCmd(int argc, char* argv[])
 {
-    std::ostringstream os;
+    ostringstream os;
 
     if (! pos1_.isNull()) {
 	pos1_.print(os, equinoxStr_);	// print coords in given equinox
@@ -945,7 +933,7 @@ int TclAstroCat::appendListVal(const char* value)
 	for(int i = 0; i < numValues; i++) {
 	    Tcl_AppendElement(interp_, values[i]);
 	}
-	free(values);
+	Tcl_Free((char *)values);
 
 	Tcl_AppendResult(interp_, "}", NULL);
     } while(p);
@@ -985,7 +973,7 @@ int TclAstroCat::appendKeyListVal(const char* keyword, const char* value)
  *
  * Write the config file format entry value part to the stream.
  */
-int TclAstroCat::tclListToConfigStreamValue(const char* tclList, std::ostream& os)
+int TclAstroCat::tclListToConfigStreamValue(const char* tclList, ostream& os)
 {
     int numValues = 0;
     char** values = NULL;
@@ -1000,7 +988,7 @@ int TclAstroCat::tclListToConfigStreamValue(const char* tclList, std::ostream& o
 	    os << " : ";
     }
 
-    free(values);
+    Tcl_Free((char *)values);
     return TCL_OK;
 }
 
@@ -1011,7 +999,7 @@ int TclAstroCat::tclListToConfigStreamValue(const char* tclList, std::ostream& o
  *
  * keyword; value
  */
-int TclAstroCat::tclListToConfigStreamLine(const char* tclList, std::ostream& os)
+int TclAstroCat::tclListToConfigStreamLine(const char* tclList, ostream& os)
 {
     int numValues = 0;
     char** values = NULL;
@@ -1021,7 +1009,7 @@ int TclAstroCat::tclListToConfigStreamLine(const char* tclList, std::ostream& os
 	return TCL_ERROR;
 
     if (numValues != 2) {
-	free(values);
+	Tcl_Free((char *)values);
 	return error("astrocat: expected {keyword value} list, not: ", tclList);
     }
     const char* keyword = values[0];
@@ -1031,15 +1019,15 @@ int TclAstroCat::tclListToConfigStreamLine(const char* tclList, std::ostream& os
     if (strcmp(keyword, "symbol") == 0 || strcmp(keyword, "search_cols") == 0) {
 	os << keyword << ": ";
 	if (tclListToConfigStreamValue(value, os) != TCL_OK) {
-	    free(values);
+	    Tcl_Free((char *)values);
 	    return TCL_ERROR;
 	}
-	os << std::endl;
+	os << endl;
     }
     else {
-	os << keyword << ": " << value << std::endl;
+	os << keyword << ": " << value << endl;
     }
-    free(values);
+    Tcl_Free((char *)values);
     return TCL_OK;
 }
 
@@ -1051,7 +1039,7 @@ int TclAstroCat::tclListToConfigStreamLine(const char* tclList, std::ostream& os
  * keyword; value
  * keyword: valuue
  */
-int TclAstroCat::tclListToConfigStream(const char* tclList, std::ostream& os)
+int TclAstroCat::tclListToConfigStream(const char* tclList, ostream& os)
 {
     int numValues = 0;
     char** values = NULL;
@@ -1062,11 +1050,11 @@ int TclAstroCat::tclListToConfigStream(const char* tclList, std::ostream& os)
 
     for (int i = 0; i < numValues; i++) {
 	if (tclListToConfigStreamLine(values[i], os) != TCL_OK) {
-	    free(values);
+	    Tcl_Free((char *)values);
 	    return TCL_ERROR;
 	}
     }
-    free(values);
+    Tcl_Free((char *)values);
     return TCL_OK;
 }
 
@@ -1244,7 +1232,7 @@ int TclAstroCat::entryCmd(int argc, char* argv[])
 	if (argc < 2)
 	    return error("missing catalog entry argument");
 
-	std::ostringstream os;
+	ostringstream os;
 
 	// convert tcl list entry to config file format
 	if (tclListToConfigStream(argv[1], os) != TCL_OK)
@@ -1254,7 +1242,7 @@ int TclAstroCat::entryCmd(int argc, char* argv[])
 	if (! os)
 	    return error("internal error writing config entry");
 
-	std::istringstream is(os.str());
+	istringstream is(os.str());
 	
 	if (update || set) {
 	    if (argc == 2) {
@@ -1304,7 +1292,7 @@ int TclAstroCat::entryCmd(int argc, char* argv[])
  */
 int TclAstroCat::loadCmd(int argc, char* argv[])
 {
-    std::ifstream is(argv[0]);
+    ifstream is(argv[0]);
     if (!is)
 	return sys_error("can't open file: ", argv[0]);
 
@@ -1316,7 +1304,7 @@ int TclAstroCat::loadCmd(int argc, char* argv[])
     CatalogInfoEntry* dir = new CatalogInfoEntry;
     dir->servType("directory");
 
-    char url[1024+5];
+    char url[2048+5];
     sprintf(url, "file:%s", argv[0]);
     dir->url(url);
 
@@ -1696,7 +1684,7 @@ int TclAstroCat::getcolCmd(int argc, char* argv[])
 	if (index < numValues) {
 	    set_result(values[index]);
 	}
-	free(values);
+	Tcl_Free((char *)values);
     } 
     else {
 	return error("no such column: ", argv[0]);
@@ -1739,7 +1727,7 @@ int TclAstroCat::getidposCmd(int argc, char* argv[])
 	Tcl_AppendElement(interp_, values[dec_col]);
     }
 
-    free(values);
+    Tcl_Free((char *)values);
     return TCL_OK;
 }
 
@@ -1828,7 +1816,7 @@ int TclAstroCat::authorizeCmd(int argc, char* argv[])
     
     if (argc == 0) {
 	HTTP& http = cat_->http();
-	std::ostringstream os;
+	ostringstream os;
 	os << http.authorizationRequired() 
 	   << " " << http.www_auth_realm()
 	   << " " << http.hostname();
@@ -2000,7 +1988,7 @@ int TclAstroCat::shortnameCmd(int argc, char* argv[])
 int TclAstroCat::getQueryResult(int numCols, char** colNames, const char* list, 
 				const char* equinoxStr, QueryResult& r)
 {
-    std::ostringstream os;
+    ostringstream os;
     int numRows = 0;
     char** rows = NULL;
     char raStr[32], decStr[32];
@@ -2052,7 +2040,7 @@ int TclAstroCat::getQueryResult(int numCols, char** colNames, const char* list,
 		}
 	    }
 	    os << '\n';
-	    free(cols);
+	    Tcl_Free((char *)cols);
 	}
     }
 
@@ -2062,7 +2050,7 @@ int TclAstroCat::getQueryResult(int numCols, char** colNames, const char* list,
 	status = r.init(numCols, colNames, os.str().c_str());
 
     if (rows)
-	free(rows);		// free split list of rows
+	Tcl_Free((char *)rows);		// free split list of rows
 
     return status;
 }

@@ -12,7 +12,6 @@
  */
 static const char* const rcsId="@(#) $Id: TcsCatalog.C,v 1.1.1.1 2006/01/12 16:36:30 abrighto Exp $";
 
-
 #include <cstdlib>
 #include <iostream>
 #include <fstream>

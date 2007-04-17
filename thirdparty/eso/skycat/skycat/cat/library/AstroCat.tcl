@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# @(#) $Id: AstroCat.tcl,v 1.1.1.1 2002/04/04 20:11:47 brighton Exp $
+# @(#) $Id: AstroCat.tcl,v 1.1.1.1 2006/01/12 16:36:21 abrighto Exp $
 #
 # AstroCat.tcl - user interface class for viewing catalog info
 #

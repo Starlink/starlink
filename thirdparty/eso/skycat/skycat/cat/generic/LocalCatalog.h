@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: LocalCatalog.h,v 1.1.1.1 2002/04/04 20:11:45 brighton Exp $
+ * $Id: LocalCatalog.h,v 1.1.1.1 2006/01/12 16:36:38 abrighto Exp $
  *
  * LocalCatalog.h - class definitions for accessing local
  *                  catalogs stored as starbase format tab tables.

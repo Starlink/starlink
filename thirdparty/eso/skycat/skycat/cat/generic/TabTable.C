@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive 
- * $Id: TabTable.C,v 1.4 2003/01/20 15:52:21 brighton Exp $
+ * $Id: TabTable.C,v 1.1.1.1 2006/01/12 16:36:37 abrighto Exp $
  *
  * TabTable.C - method definitions for class TabTable
  *
@@ -10,8 +10,9 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  08 Jan 96  Created
  */
-static const char* const rcsId="@(#) $Id: TabTable.C,v 1.4 2003/01/20 15:52:21 brighton Exp $";
+static const char* const rcsId="@(#) $Id: TabTable.C,v 1.1.1.1 2006/01/12 16:36:37 abrighto Exp $";
 
+using namespace std;
 #include <cstdio>
 #include <cctype>
 #include <cmath>
@@ -345,7 +346,7 @@ int TabTable::splitList(char* line, char** colValues)
  */
 int TabTable::tab_error(int row, int col, char* expected, char* value) const
 {
-    std::ostringstream os;
+    ostringstream os;
     os << "error in tab table input: row " << (row+1) << ", col "
 	<< (col+1) << ", expected " << expected << ", but found '"
 	<< value << "'";
@@ -383,7 +384,7 @@ const char* TabTable::colName(int col) const
  */
 int TabTable::save(const char* filename) 
 {
-    std::ofstream os(filename);
+    ofstream os(filename);
     if (!os) 
 	return sys_error("can't open file: ", filename);
     return save(os);
@@ -394,7 +395,7 @@ int TabTable::save(const char* filename)
  * save the contents of this object as a tab table to the
  * given stream  and return 0 if all is OK.
  */
-int TabTable::save(std::ostream& os) 
+int TabTable::save(ostream& os) 
 {
     if (numCols() == 0)
 	return error("no data to save");
@@ -411,7 +412,7 @@ int TabTable::save(std::ostream& os)
 	if (col < n)
 	    os << '\t';
     }
-    os << std::endl;
+    os << endl;
 
     // dashed line
     for (col = 0; col < ncols; col++) {
@@ -421,7 +422,7 @@ int TabTable::save(std::ostream& os)
 	if (col < n)
 	    os << '\t';
     }
-    os << std::endl;
+    os << endl;
     
     // rows and columns
     return printRows(os);
@@ -432,11 +433,11 @@ int TabTable::save(std::ostream& os)
  * print the table title (and any other info preceding the column headings)
  * (may be redefined in a derived class to add more info)
  */
-void TabTable::printTableTop(std::ostream& os, const char* title) 
+void TabTable::printTableTop(ostream& os, const char* title) 
 {
     if (! title)
 	title = "TabTable";
-    os << title << std::endl;
+    os << title << endl;
 }
 
 
@@ -456,7 +457,7 @@ int TabTable::append(const char* filename)
     if (compareHeadings(t) != 0) // compare with this table
 	return error("tables have different columns");
 
-    std::ofstream os(filename, std::ios::app);
+    ofstream os(filename, ios::app);
     if (! os)
 	return sys_error("can't append to file: ", filename);
         
@@ -497,20 +498,20 @@ int TabTable::insert(const char* filename, int col)
     if (compareHeadings(t) != 0) // compare with this table
 	return error("tables have different columns");
 
-    std::ifstream is(filename);
+    ifstream is(filename);
     if (! is)
     	return sys_error("can't open file: ", filename);
         
-    char tmpfile[1024];
+    char tmpfile[2048];
     sprintf(tmpfile, "%s.TMP", filename);
-    std::ofstream os(tmpfile);
+    ofstream os(tmpfile);
     if (! os)
 	return sys_error("can't open file: ", tmpfile);
 
     // skip heading
     char buf[MAX_ROW_SIZE];
     while (is.getline(buf, sizeof(buf))) {
-	os << buf << std::endl;
+	os << buf << endl;
 	if (buf[0] == '-') 
 	    break;
     }
@@ -524,7 +525,7 @@ int TabTable::insert(const char* filename, int col)
     while (is.getline(buf, sizeof(buf))) {
 	if ((row = findRow(buf, col)) < 0) {
 	    // if row is not found in this object, add it unchanged to the output file
-	    os << buf << std::endl;	
+	    os << buf << endl;	
 	}
 	else {
 	    // found matching id, add new row to the file to replace the old one
@@ -540,7 +541,7 @@ int TabTable::insert(const char* filename, int col)
     delete[] insertedRow;
         
     // make a backup file and rename the tmpfile to the original
-    char bakfile[1024];
+    char bakfile[2048];
     sprintf(bakfile, "%s.BAK", filename);
     if (rename(filename, bakfile) != 0) 
 	return sys_error("can't rename file to file.BAK for: ", filename);
@@ -582,29 +583,29 @@ int TabTable::remove(const char* filename, int col)
 	return error("tables have different columns");
 
     // read from filename and write to $filename.tmp (rename later)
-    std::ifstream is(filename);
+    ifstream is(filename);
     if (!is)
 	return sys_error("can't open file: ", filename);
 
-    char tmpfile[1024];
+    char tmpfile[2048];
     sprintf(tmpfile, "%s.TMP", filename);
-    std::ofstream os(tmpfile);
+    ofstream os(tmpfile);
     if (! os)
 	return sys_error("can't open file: ", tmpfile);
 
     char buf[MAX_ROW_SIZE];
     // skip heading
     while (is.getline(buf, sizeof(buf))) {
-	os << buf << std::endl;
+	os << buf << endl;
 	if (buf[0] == '-') 
 	    break;
     }
     while (is.getline(buf, sizeof(buf))) {
 	if (findRow(buf, col) < 0)	// if row is not found
-	    os << buf << std::endl;	// then add to output file
+	    os << buf << endl;	// then add to output file
     }
         
-    char bakfile[1024];
+    char bakfile[2048];
     sprintf(bakfile, "%s.BAK", filename);
     if (rename(filename, bakfile) != 0) 
 	return sys_error("can't rename file to file.BAK for: ", filename);
@@ -734,7 +735,7 @@ int TabTable::search(const char* filename, int searchCol,
 		     const char* value, int maxRows) 
 {
     // open file to search
-    std::ifstream is(filename);
+    ifstream is(filename);
     if (!is) 
 	return sys_error("can't open file: ", filename);
 
@@ -803,16 +804,16 @@ int TabTable::search(const TabTable& table, int searchCol,
  *
  * maxRows           - max number of rows to find
  */
-int TabTable::search(std::istream& is, int numSearchCols, char** searchCols, 
+int TabTable::search(istream& is, int numSearchCols, char** searchCols, 
 		     char** minValues, char** maxValues, int maxRows) 
 {
     // read and search rows, put matching rows in "os"
     char buf[MAX_ROW_SIZE];
-    std::ostringstream os;
+    ostringstream os;
     int n = 0;
     while (is.getline(buf, sizeof(buf))) {
 	if (compareRow(buf, numSearchCols, searchCols, minValues, maxValues) == 0) {
-	    os << buf << std::endl;
+	    os << buf << endl;
 	    if (++n >= maxRows)
 		break;
 	}
@@ -846,7 +847,7 @@ int TabTable::search(const TabTable& table, int numSearchCols, char** searchCols
 {
     // read and search rows, put matching rows in "os"
     int trows = table.numRows();
-    std::ostringstream os;
+    ostringstream os;
     int n = 0;
     for(int i = 0; i < trows; i++) {
 	if (compareRow(table, i, numSearchCols, searchCols, minValues, maxValues) == 0) {
@@ -928,7 +929,7 @@ int TabTable::search(const char* filename, int numSearchCols, char** searchCols,
 		     char** minValues, char** maxValues, int maxRows) 
 {
     // open file to search
-    std::ifstream is(filename);
+    ifstream is(filename);
     if (!is) 
 	return sys_error("can't open file: ", filename);
 
@@ -1067,7 +1068,7 @@ int TabTable::compareCol(const char* value, const char* minValue, const char* ma
 /*
  * print the table rows to the given stream
  */
-int TabTable::printRows(std::ostream& os) const 
+int TabTable::printRows(ostream& os) const 
 {
     int row;
     for (row = 0; row < numRows_; row++) {
@@ -1080,7 +1081,7 @@ int TabTable::printRows(std::ostream& os) const
 /*
  * print the given table row to the given stream
  */
-int TabTable::printRow(std::ostream& os, int row) const
+int TabTable::printRow(ostream& os, int row) const
 {
     int n = numCols_-1, r = index_[row];
     
@@ -1089,7 +1090,7 @@ int TabTable::printRow(std::ostream& os, int row) const
 	if (col < n)
 	    os << '\t';
     }
-    os << std::endl;
+    os << endl;
     return 0;
 }
 
@@ -1100,7 +1101,7 @@ int TabTable::printRow(std::ostream& os, int row) const
  */
 int TabTable::head(const char* filename, TabTable& t)
 {
-    std::ifstream is(filename);
+    ifstream is(filename);
     if (!is) {
 	return sys_error("can't open file: ", filename);
     }
@@ -1112,12 +1113,12 @@ int TabTable::head(const char* filename, TabTable& t)
  * static method: 
  * read the heading info from the given stream and put it in the given object
  */
-int TabTable::head(std::istream& is, TabTable& t)
+int TabTable::head(istream& is, TabTable& t)
 {
-    std::ostringstream os;
+    ostringstream os;
     char buf[MAX_HEADER_SIZE];
     while (is.getline(buf, sizeof(buf))) {
-	os << buf << std::endl;
+	os << buf << endl;
 	if (buf[0] == '-') 
 	    break;
     }

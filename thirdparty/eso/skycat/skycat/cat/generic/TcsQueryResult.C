@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: TcsQueryResult.C,v 1.4 2003/01/20 15:52:21 brighton Exp $
+ * $Id: TcsQueryResult.C,v 1.1.1.1 2006/01/12 16:36:29 abrighto Exp $
  *
  * TcsQueryResult.C - method definitions for class TcsQueryResult
  * 
@@ -10,8 +10,10 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  13 Jun 96  Created
  */
-static const char* const rcsId="@(#) $Id: TcsQueryResult.C,v 1.4 2003/01/20 15:52:21 brighton Exp $";
+static const char* const rcsId="@(#) $Id: TcsQueryResult.C,v 1.1.1.1 2006/01/12 16:36:29 abrighto Exp $";
 
+
+using namespace std;
 #include <cstdlib>
 #include <cstdio>
 #include <iostream>
@@ -285,7 +287,7 @@ int TcsQueryResult::inputColIndex(const char* colName) const
 /*
  * print the given table row to the given stream
  */
-int TcsQueryResult::printRow(std::ostream& os, int row) const
+int TcsQueryResult::printRow(ostream& os, int row) const
 {
     // output the rows
     TcsCatalogObject* obj = getObj(row);
@@ -300,7 +302,7 @@ int TcsQueryResult::printRow(std::ostream& os, int row) const
  * print the table title (and any other info preceding the column headings)
  * (redefined here from parent class to add TCS column info in table header)
  */
-void TcsQueryResult::printTableTop(std::ostream& os, const char* title) 
+void TcsQueryResult::printTableTop(ostream& os, const char* title) 
 {
     if (! title)
 	title = "TcsQueryResult";
