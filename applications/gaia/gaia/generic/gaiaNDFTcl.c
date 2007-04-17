@@ -1233,7 +1233,7 @@ static int gaiaNDFTclFitsWrite( ClientData clientData, Tcl_Interp *interp,
                 /* These go at the end */
                 astClear( info->fitschan, "Card" );
                 astSetI( info->fitschan, "Card",
-                         astGetI( info->fitschan, "Ncard" ) );
+                         astGetI( info->fitschan, "Ncard" ) + 1 );
                 astPutFits( info->fitschan, Tcl_GetString( objv[2] ), 0 );
             }
             info->fitschanmod = 1;
