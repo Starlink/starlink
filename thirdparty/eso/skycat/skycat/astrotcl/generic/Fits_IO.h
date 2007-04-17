@@ -6,7 +6,7 @@
  *
  * "@(#) $Id$" 
  *
- * FitsIO.h - declarations for class FitsIO, a class representing the
+ * Fits_IO.h - declarations for class FitsIO, a class representing the
  *            contents of a FITS image file (or other image source)
  * 
  * who             when      what
@@ -29,6 +29,10 @@
  *                           CompoundImages).
  *                 01/03/07  Added putcard member to write a header card
  *                           without decomposition to kvc.
+ * pbiereic        17/02/03  Revised byte-order issues
+ * abrighto        02/01/05  Renamed .h file to avoid conflict with cfitsio's 
+ *                           "fitsio.h" on case-ignoring file systems, such as 
+ *                           Mac OSX.
  */
 
 #include <cstdio>
@@ -43,6 +47,14 @@
  */
 class FitsIO : public ImageIORep {
 private:
+    fitsfile* fitsio_;		// handle to use for cfitsio C library routines
+    static FitsIO* fits_;	// current class ptr for reallocFile callback
+
+    Mem primaryHeader_;		// the primary header, if there is more than one HDU
+
+    Mem mergedHeader_;		// the primary header merged with the current extension
+                                // header, if applicable (The primary header is appended
+                                // after the extension header).
     
     // set wcslib header length for searching
     static void set_header_length(const Mem& header);
@@ -54,20 +66,9 @@ private:
     // extend the size of the FITS header by one header block 
     int extendHeader();
 
-    static void* reallocFile(void* p, size_t newsize);
+    static void* FitsIO::reallocFile(void* p, size_t newsize);
 
 protected:   
-    //  PWD: Move here so that derived classes can manipulate (needed to get
-    //  at HDU functions from ther  
-    fitsfile* fitsio_;		// handle to use for cfitsio C library routines
-    static FitsIO* fits_;	// current class ptr for reallocFile callback
-
-    Mem primaryHeader_;		// the primary header, if there is more than one HDU
-
-    Mem mergedHeader_;		// the primary header merged with the current extension
-                                // header, if applicable (The primary header is appended
-                                // after the extension header).
- 
     // Check that this object represents a FITS file (and not just some kind of memory)
     // and return 0 if it does. If not, return an error message.
     int checkFitsFile();
@@ -127,7 +128,7 @@ public:
     static FitsIO* read(const char* filename, int memOptions = 0);
 
     // write the data to a FITS file 
-    virtual int write(const char *filename);
+    int write(const char *filename) const;
 
     // compress or decompress the given file and return the new filename
     // see comments in source file for details.

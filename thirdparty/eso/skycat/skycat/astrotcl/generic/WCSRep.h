@@ -6,7 +6,7 @@
  *
  * "@(#) $Id$" 
  *
- * WCS.h - declarations for class WCS, a reference counted wrapper class
+ * WCSRep.h - declarations for class WCS, a reference counted wrapper class
  *         for managing world coordinates for an image. The implementation
  *         class is a subclass of the abstract WCSRep class.
  *
@@ -17,6 +17,8 @@
  *                            new WCS implementations. The old WCSRep
  *                            class was renamed to SAOWCS.
  * pbiereic        11/10/99   Added deltset()
+ * abrighto        02/01/06   Renamed WCS.h to WCSRep.h to avoid name conflict
+ *                            with wcs.h on file systems that ignore case
  */
 
 

@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: ImageIO.C,v 1.3 2005/02/02 01:43:04 brighton Exp $" 
+ * "@(#) $Id: ImageIO.C,v 1.2 2006/01/18 17:56:53 abrighto Exp $" 
  *
  * ImageIO.C - method definitions for class ImageIO, for managing image
  *             I/O and storage
@@ -16,11 +16,10 @@
  * Peter W. Draper 24/06/99  Changed to use FITS_LONG as type in byte
  *                           swapping. "long" is 8 bytes on alphas and 64 SUNs.
  */
-static const char* const rcsId="@(#) $Id: ImageIO.C,v 1.3 2005/02/02 01:43:04 brighton Exp $";
+static const char* const rcsId="@(#) $Id: ImageIO.C,v 1.2 2006/01/18 17:56:53 abrighto Exp $";
 
-#if ! ( defined(__APPLE__) && defined(__MACH__) )
 #include <netinet/in.h>
-#endif
+#include <arpa/inet.h>
 #include <cmath>
 #include <cstdlib>
 #include "config.h"
@@ -34,7 +33,6 @@ static const char* const rcsId="@(#) $Id: ImageIO.C,v 1.3 2005/02/02 01:43:04 br
 #else 
 #define FITS_LONG long 
 #endif
-
 
 /*
  * copy constructor - increment the reference count...

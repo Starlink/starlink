@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: FitsIO.C,v 1.5 2005/02/02 01:43:04 brighton Exp $" 
+ * "@(#) $Id: FitsIO.C,v 1.1.1.1 2006/01/12 16:43:57 abrighto Exp $" 
  *
  * FitsIO.C - method definitions for class FitsIO, for operating on
  *            Fits files.
@@ -22,13 +22,16 @@
  * pbiereic        20/07/04  use %20 field width for keywords in methods put_keyword,
  *                           so that other tools like xv, ds9, fv can read stored real-time
  *                           images.
+ * abrighto        02/01/05  Renamed .h file to avoid conflict with cfitsio's 
+ *                           "fitsio.h" on case-ignoring file systems, such as 
+ *                           Mac OSX.
  * Peter W. Draper 05/01/07  Set OBJECT card to value "RTD_BLANK" to determine
  *                           that a blank image has been generated.
  *                 08/01/07  Write "END" keyword to blank image headers stream.
  *                           Previously written to buffer only.
  *                 01/03/07  Added putcard method for pre-formatted cards.
  */
-static const char* const rcsId="@(#) $Id: FitsIO.C,v 1.5 2005/02/02 01:43:04 brighton Exp $";
+static const char* const rcsId="@(#) $Id: FitsIO.C,v 1.1.1.1 2006/01/12 16:43:57 abrighto Exp $";
 
 #include "config.h" // tclutil
 
@@ -46,9 +49,12 @@ static const char* const rcsId="@(#) $Id: FitsIO.C,v 1.5 2005/02/02 01:43:04 bri
 #include "error.h"
 #include "fitsio2.h"
 #include "SAOWCS.h"
-#include "Compress.hxx"
+#include "DCompress.h"
 #include "Mem.h"
-#include "FitsIO.hxx"
+#include "Fits_IO.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include "define.h"
 
 using namespace std;
@@ -343,8 +349,7 @@ int FitsIO::cfitsio_error()
 void* FitsIO::reallocFile(void* p, size_t newsize)
 {
     if (!fits_) {
-	error("No current FITS file");
-	return NULL;
+	return p;
     }
     if (fits_->checkWritable() != 0)
 	return NULL;		// not a writable FITS file
@@ -1528,6 +1533,7 @@ int FitsIO::createTable(const char* extname, long rows, int cols,
 	fits_ = NULL;
 	return cfitsio_error();
     }
+    fits_ = NULL;
     if (flush() != 0) 
 	return 1;		// error flushing data
 

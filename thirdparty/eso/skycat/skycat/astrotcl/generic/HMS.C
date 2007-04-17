@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive 
- * $Id: HMS.C,v 1.4 2005/02/02 01:43:04 brighton Exp $
+ * $Id: HMS.C,v 1.1.1.1 2006/01/12 16:43:53 abrighto Exp $
  *
  * HMS.C - method definitions for class HMS
  *
@@ -11,7 +11,7 @@
  * Allan Brighton  26 Sep 95  Created
  * Peter W. Draper 27 Jan 03  Added extra_precision flags for milli-arcsec
  */
-static const char* const rcsId="@(#) $Id: HMS.C,v 1.4 2005/02/02 01:43:04 brighton Exp $";
+static const char* const rcsId="@(#) $Id: HMS.C,v 1.1.1.1 2006/01/12 16:43:53 abrighto Exp $";
 
 #include "config.h" // tclutil
 

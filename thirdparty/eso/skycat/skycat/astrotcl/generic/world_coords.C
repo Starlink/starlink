@@ -17,7 +17,7 @@ static const char* const rcsId="@(#) $Id: world_coords.C,v 1.1.1.1 2006/01/12 16
 
 
 // include the C++ and C interfaces
-#include "WorldCoords.h"
+#include "WorldCoords.hxx"
 extern "C" {
 #include "world_coords.h"
 }

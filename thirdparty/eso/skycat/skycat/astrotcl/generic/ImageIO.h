@@ -4,7 +4,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: ImageIO.h,v 1.5 2005/02/02 01:43:04 brighton Exp $" 
+ * "@(#) $Id: ImageIO.h,v 1.1.1.1 2006/01/12 16:43:54 abrighto Exp $" 
  *
  * ImageIO.h - declarations for class ImageIO, an abstract base class 
  *             representing the contents of an image file (or other
@@ -40,7 +40,7 @@
 
 #include <iostream>
 #include <cmath>
-#include "WCS.hxx"
+#include "WCSRep.h"
 #include "Mem.h"
 
 
