@@ -337,12 +337,13 @@ itcl::class gaia::GaiaSpecWriter {
    #  values and work out the pointing information. If this isn't an ACSIS
    #  cube then write standard pointing information.
    protected method write_extraction_headers_ {cubeaccessor specaccessor} {
+
+      $specaccessor fitswrite "        ---- GAIA spectral extraction ----"
+
       set rawacsis 0
       if { [$cubeaccessor extensionexists "ACSIS"] &&
            [$cubeaccessor extensionexists "JCMTSTATE"] } {
 
-         $specaccessor fitswrite \
-            "        ---- GAIA spectral extraction ----"
 
          #  Must be extracting spectra. These are axis 1. The image
          #  positions are time and receptor index, these index the
@@ -386,8 +387,6 @@ itcl::class gaia::GaiaSpecWriter {
       #  that case we can get the exposure time, plus the TSYS.
       if { ! $rawacsis && [$cubeaccessor extensionexists "SMURF"] } {
 
-         $specaccessor fitswrite \
-            "        ---- GAIA spectral extraction ----"
          set isacsis 1
 
          #  Must be extracting spectra. These are axis 3. The image
@@ -399,6 +398,7 @@ itcl::class gaia::GaiaSpecWriter {
             set cmpdims [$cubeaccessor getpropertydims "SMURF" \
                             "TSYS.DATA_ARRAY.DATA"]
             set ndfdims [$cubeaccessor getdims 0]
+
             if { $cmpdims != "" &&
                  [lindex $cmpdims 0] == [lindex $ndfdims 0] &&
                  [lindex $cmpdims 1] == [lindex $ndfdims 1] } {
