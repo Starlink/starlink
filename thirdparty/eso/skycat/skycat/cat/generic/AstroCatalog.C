@@ -19,6 +19,7 @@
 static const char* const rcsId="@(#) $Id$";
 
 
+using namespace std;
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <cstdlib>
@@ -28,7 +29,7 @@ static const char* const rcsId="@(#) $Id$";
 #include <sstream>
 #include <cstring>
 #include "error.h"
-#include "Compress.hxx"
+#include "DCompress.h"
 #include "WorldOrImageCoords.h"
 #include "HTTP.h"
 #include "Mem.h"
@@ -295,7 +296,7 @@ int AstroCatalog::query(const AstroQuery& q, const char* filename, QueryResult& 
     urls[0] = entry_->url();
     urls[1] = entry_->backup1();
     urls[2] = entry_->backup2();
-    char url[1024];
+    char url[10000];
 
     char* ctype = "";
     for (int i = 0; i < 3 && urls[i]; i++) {
@@ -374,7 +375,7 @@ int AstroCatalog::getImage(const AstroQuery& q)
     urls[0] = entry_->url();
     urls[1] = entry_->backup1();
     urls[2] = entry_->backup2();
-    char url[1024];
+    char url[10000];
 
     // for each url, backup-url, etc...
     for (int i = 0; i < 3 && urls[i]; i++) {
