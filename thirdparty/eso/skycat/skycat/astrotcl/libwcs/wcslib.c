@@ -454,8 +454,8 @@ struct wcsprm *wcs;
       }
 
       /* Got an axis qualifier, is it a recognized WCS projection? */
-      for (k = 0; k < skycat_npcode; k++) {
-         if (strncmp(&ctype[j][5], skycat_pcodes[k], 3) == 0) break;
+      for (k = 0; k < npcode; k++) {
+         if (strncmp(&ctype[j][5], pcodes[k], 3) == 0) break;
       }
 
       if (k == npcode) {
