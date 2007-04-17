@@ -85,7 +85,7 @@ F_ROUTINES = \
 	dat1_pshde.f dat1_pshdf.f dat1_pshdb.f \
 	hds_find.f
 
-F_C_ROUTINES = hds_run.c fortran_interface.c
+F_C_ROUTINES = hds_run.c fortran_interface.c hdsFind.c
 
 #  List of Fortran BLOCK DATA routines.
 BLOCK_DATA_FILES = cmp_blk.f

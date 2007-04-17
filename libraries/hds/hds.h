@@ -1262,12 +1262,21 @@ datConv(const HDSLoc *locator,
         int *status);
 
 /*=====================================================*/
-/* hdsClose - Close container file (Obselete routine!) */
+/* hdsClose - Close container file (Obsolete routine!) */
 /*=====================================================*/
 
 int
 hdsClose(HDSLoc **locator,
         int *status);
+
+
+/*===================================================================*/
+/* hdsFind - Find an object (Fortran routine, requires hdsf library) */
+/*===================================================================*/
+void 
+hdsFind( const HDSLoc *loc1, const char *name, const char *mode, 
+         HDSLoc **loc2, int *status );
+
 
 /* STAR_HDS_H_INCLUDED */
 #endif
