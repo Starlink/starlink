@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# "@(#) $Id: RtdImage.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
+# "@(#) $Id: RtdImage.tcl,v 1.1.1.1 2006/01/12 16:38:19 abrighto Exp $"
 #
 # RtdImage.tcl - itcl widget wrapper for the rtdimage type extension
 #
@@ -984,9 +984,12 @@ itcl::class rtd::RtdImage {
 	imageconfig_ -displaymode
     }
    
-    # X shared memory option
+    # X shared memory option.
+    # DISABLED: pbi 01/03/05
+    # Dynamic re-configuration crashes rtd but has never been used
+    # by any application or by rtd itself.
     itk_option define -usexshm useXshm UseXshm 1 {
-	imageconfig_ -usexshm
+	###imageconfig_ -usexshm
     }
 
     # X synchronisation option
@@ -1113,12 +1116,19 @@ itcl::class rtd::RtdImage {
 
     # flag: if true, set bindings to scroll with the middle mouse button
     itk_option define -drag_scroll drag_scroll Drag_scroll 0 {
-	if {$itk_option(-drag_scroll)} {
-	    bind $canvas_ <2> [code $canvas_ scan mark %x %y]
-	    bind $canvas_ <B2-Motion> [code "$canvas_ scan dragto %x %y; $this maybe_center"]
-	} else {
-	    bind $canvas_ <2> { }
-	    bind $canvas_ <B2-Motion> { }
+	global EDITING  ; # panel editor
+	set pe 0
+	if {[info exists EDITING]} {
+	    set pe $EDITING
+	}
+	if { ! $pe } {
+	    if {$itk_option(-drag_scroll)} {
+		bind $canvas_ <2> [code $canvas_ scan mark %x %y]
+		bind $canvas_ <B2-Motion> [code "$canvas_ scan dragto %x %y; $this maybe_center"]
+	    } else {
+		bind $canvas_ <2> { }
+		bind $canvas_ <B2-Motion> { }
+	    }
 	}
     }
 

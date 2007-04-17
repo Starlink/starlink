@@ -1,6 +1,6 @@
 /*************************************************************************
 * E.S.O. - VLT project
-* "@(#) $Id: rtdCubeDisplay.c,v 1.2 2005/02/02 01:43:03 brighton Exp $"
+* "@(#) $Id: rtdCubeDisplay.c,v 1.1.1.1 2006/01/12 16:39:59 abrighto Exp $"
 *  rtdClient.c
 *
 * who       when      what
@@ -11,7 +11,7 @@
 *             12/09/01 Added UKIRT Quick Look member initialisations, should
 *                      be harmless to other uses.
 */
-static const char* const rcsId="@(#) $Id: rtdCubeDisplay.c,v 1.2 2005/02/02 01:43:03 brighton Exp $";
+static const char* const rcsId="@(#) $Id: rtdCubeDisplay.c,v 1.1.1.1 2006/01/12 16:39:59 abrighto Exp $";
 
 /************************************************************************
 *   NAME
@@ -62,7 +62,9 @@ static const char* const rcsId="@(#) $Id: rtdCubeDisplay.c,v 1.2 2005/02/02 01:4
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 #ifdef HAVE_SYS_FILIO_H
 #include <sys/filio.h>
 #endif
@@ -75,10 +77,10 @@ typedef void (*MySigFunc)(int);  /* allan: prototype cast to keep Sun cc quiet *
 
 #include "rtdImageEvent.h"
 
-int verbose=0;
-int shmId;
+static int verbose=0;
+static int shmId;
 
-void usage()
+static void usage()
 {
     printf("rtdCubeDisplay -f <file name> -c <camera name> [-t <msec>] [-l] [-v]\n");
     printf("-l = loop indefinetly\n");
@@ -88,7 +90,7 @@ void usage()
 }
  
 
-int readFitsCube(FILE  *fptr,
+static int readFitsCube(FILE  *fptr,
 		 int   *type,
 		 int   *width,
 		 int   *height,
@@ -152,7 +154,7 @@ int readFitsCube(FILE  *fptr,
     return RTD_OK;
 }
 
-void cleanup()
+static void cleanup()
 {
     if (shmId) shmctl(shmId,IPC_RMID,NULL);
     if (verbose) printf("Exiting !\n");

@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: RtdImagePopup.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
+# "@(#) $Id: RtdImagePopup.tcl,v 1.1.1.1 2006/01/12 16:38:25 abrighto Exp $"
 #
 # RtdImagePopup.tcl - A toplevel widget for displaying rapid frames for RtdImage
 # 

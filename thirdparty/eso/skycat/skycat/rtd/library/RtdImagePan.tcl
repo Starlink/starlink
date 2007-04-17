@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: RtdImagePan.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
+# "@(#) $Id: RtdImagePan.tcl,v 1.1.1.1 2006/01/12 16:38:07 abrighto Exp $"
 #
 # RtdImagePan.tcl - itcl widget managing the RtdImage panning window
 # 
@@ -20,6 +20,8 @@
 #                 02 Nov 06  Make the compass a fixed size of the width, not
 #                            some size that depends on the image scale. More
 #                            consistent.
+# pbiereic        30/03/05   Fixed: pan image width for long, narrow spectra
+#                            in method notify_cmd
 
 itk::usual RtdImagePan {}
 
@@ -130,6 +132,7 @@ itcl::class rtd::RtdImagePan {
     public method init_panning {} {
 	set panImageWidth_ [$image_ dispwidth]
 	set panImageHeight_ [$image_ dispheight]
+
 	if {$panImageWidth_ == 0} {
 	    $target_image_ pan start [code $this pan] 1
 	    return
@@ -168,9 +171,13 @@ itcl::class rtd::RtdImagePan {
     # is changed (want to see the compass update).
 
     protected method pan {x1 y1 x2 y2 changed} {
-       if { [info exists coords_] && ! $changed } {
+	set scale [lindex [$image_ scale] 0]
+        if { [info exists coords_]  && ! $changed } {
             if { $x1 == $coords_(pan_x1) && $y1 == $coords_(pan_y1) && \
-                 $x2 == $coords_(pan_x2) && $y2 == $coords_(pan_y2) && \
+		 $x2 == $coords_(pan_x2) && $y2 == $coords_(pan_y2) && \
+		 "$scale" == "$coords_(scale)" && \
+                 $panImageHeight_ == $coords_(panImageHeight) && \
+		 $panImageWidth_ == $coords_(panImageWidth) &&
                  $panImageWidth_ > 1 } {
                 return
             }
@@ -179,6 +186,9 @@ itcl::class rtd::RtdImagePan {
         set coords_(pan_y1) $y1
         set coords_(pan_x2) $x2
         set coords_(pan_y2) $y2
+        set coords_(scale)  $scale
+        set coords_(panImageWidth) $panImageWidth_
+        set coords_(panImageHeight) $panImageHeight_
 
 	if {$changed} {
 	    init_panning

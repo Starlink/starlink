@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# "@(#) $Id: RtdImageHduChooser.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
+# "@(#) $Id: RtdImageHduChooser.tcl,v 1.1.1.1 2006/01/12 16:38:21 abrighto Exp $"
 #
 # RtdImageHduChooser.tcl - Itcl widget for displaying FITS extensions
 # 
@@ -111,7 +111,7 @@ itcl::class rtd::RtdImageHduChooser {
                 -borderwidth 2 \
                 -relief raised \
                 -state disabled \
-                -pady 0 \
+                -pady 4 \
                 -highlightthickness 0 \
                 -command [code $this show_images]
 	button $w_.buttons.delete \
@@ -125,9 +125,8 @@ itcl::class rtd::RtdImageHduChooser {
 		$w_.buttons.close \
 		-side left -expand 1 -fill x -padx 1m -ipadx 1m
 	
-        pack $w_.buttons.show -fill both
 	pack $itk_component(buttons) \
-		-side top -fill x -expand 1
+		-side top -fill x
     }
 
     
@@ -265,6 +264,7 @@ itcl::class rtd::RtdImageHduChooser {
 		incr num_images_
 	    } 
 	}
+
 	if {$num_images_ < 1} {
 	    return
 	}
@@ -273,6 +273,7 @@ itcl::class rtd::RtdImageHduChooser {
 	if {$use_crpix} {
 	    # put images in correct order based on crpix values 
 	    set max_row_ 0
+	    set max_col_ 0
 	    for {set i 0} {$i < $num_images_} {incr i} {
 		set crpix1 $ext_($i,CRPIX1)
 		set crpix2 $ext_($i,CRPIX2)
@@ -293,6 +294,7 @@ itcl::class rtd::RtdImageHduChooser {
 		set ext_($i,row) $row
 		set ext_($i,col) $col
 		set max_row_ [max $max_row_ $row]
+		set max_col_ [max $max_col_ $col]
 	    }
 	} 
 
@@ -301,6 +303,7 @@ itcl::class rtd::RtdImageHduChooser {
 	    set num_cols 4
 	    set num_rows [expr {$num_images_/$num_cols+$num_cols}]
 	    set max_row_ 0
+	    set max_col_ 0
 	    set n 0
 	    for {set row 0} {$row < $num_rows} {incr row} {
 		for {set col 0} {$col < $num_cols} {incr col} {
@@ -311,6 +314,7 @@ itcl::class rtd::RtdImageHduChooser {
 		    set ext_($n,col) $col
 		    incr n
 		    set max_row_ [max $max_row_ $row]
+		    set max_col_ [max $max_col_ $col]
 		}
 	    }
 	}
@@ -369,7 +373,6 @@ itcl::class rtd::RtdImageHduChooser {
 	    set im [RtdImage $f.im \
 		    -graphics 0 \
 		    -displaymode 0 \
-		    -file $filename_ \
 		    -canvaswidth 100 \
 		    -canvasheight 100 \
 		    -fitwidth 100 \
@@ -385,33 +388,32 @@ itcl::class rtd::RtdImageHduChooser {
 	    set ext_($i,image) [$im get_image]
 	    set ext_($i,canvas) [$im get_canvas]
 
-	    set hdu $ext_($i,HDU)
-	    set name $ext_($i,ExtName)
-
 	    # position the image in the table
 	    set row [expr {$max_row_-$ext_($i,row)}]
 	    set col $ext_($i,col)
 	    blt::table $w $f ${row},${col} -fill both
 	}
 
-        frame $w.buttons2 -borderwidth 2
-        pack [button $w.buttons2.settings \
+        button $w.settings \
                 -text "Use Settings from Main Image" \
-                -command [code $this use_settings_from_main_image]]
+                -command [code $this use_settings_from_main_image]
 
-        add_short_help $w.buttons2.settings \
+        add_short_help $w.settings \
                 {Set the cut levels and colormap for the preview images to the one used in the main image}
 
         blt::table $w \
-	    $w.buttons2 [expr {$max_row_ + 1}],0 -fill x -columnspan [min 4 $num_images_]
+	    $w.settings [expr {$max_row_ + 1}],0 -fill x -columnspan [expr {$max_col_ + 1}]
 
-        update  ; # wait until images are displayed (needed !)
+        update  ; # wait until images are ready (needed)
 
         # configure the images
 	lassign [$image_ cut] low high
 	busy {
 	    for {set i 0} {$i < $num_images_} {incr i} {
-		$ext_($i,image) config -file $filename_
+		if { [catch {$ext_($i,image) config -file $filename_} msg] } {
+		    error_dialog "HDU $ext_($i,HDU), Extension '$ext_($i,ExtName)':\n$msg"
+		    continue
+		}
 		add_image_bindings $ext_($i,RtdImage) $ext_($i,HDU) $ext_($i,ExtName)
 		$ext_($i,image) cut $low $high
 		update idletasks
@@ -443,7 +445,6 @@ itcl::class rtd::RtdImageHduChooser {
 	    }
 	}
         update idletasks
-	#$image_ hdu $hdu
 	busy { $image_ hdu $hdu }
     }
 
@@ -463,7 +464,7 @@ itcl::class rtd::RtdImageHduChooser {
 	bind $canvas <1> [code $this select_image_hdu $hdu]
 
 	# set up a resize handler to change the image size
-	bind $canvas <Configure> [code $this resize $im %w %h]
+	###bind $canvas <Configure> [code $this resize $im %w %h]
 
 	# add a help message indicating which image it is
 	set s $name
@@ -519,6 +520,11 @@ itcl::class rtd::RtdImageHduChooser {
     # on CRPIX1 and CRPIX2 keywords).
 
     protected method display_as_one_image {} {
+	for {set i 0} {$i < $num_images_} {incr i} {
+	    if {[info exists ext_($i,frame)] && [winfo exists $ext_($i,frame)]} {
+		$ext_($i,frame) configure -relief raised
+	    }
+	}
 	busy { $image_ hdu display }
     }
 
@@ -637,8 +643,9 @@ itcl::class rtd::RtdImageHduChooser {
     # array(HDUIndex,keyword) of image keyword and widget info
     protected variable ext_
 
-    # max row
+    # max row and column
     protected variable max_row_ 0
+    protected variable max_col_ 0
 
     # HDU number of last binary table
     protected variable hdu_bin_ -1

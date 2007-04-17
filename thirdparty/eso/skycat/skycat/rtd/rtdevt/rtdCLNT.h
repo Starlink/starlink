@@ -3,7 +3,7 @@
 /*******************************************************************************
 * E.S.O. - VLT project
 *
-* "@(#) $Id: rtdCLNT.h,v 1.2 2005/02/02 01:43:03 brighton Exp $"
+* "@(#) $Id: rtdCLNT.h,v 1.1.1.1 2006/01/12 16:40:00 abrighto Exp $"
 *
 * who       when      what
 * --------  --------  ----------------------------------------------
@@ -22,7 +22,6 @@
 #include "rtdImageEvent.h"
 #include "rtdSem.h"
 #include "rtdLOG.h"
-#include "define.h"
 
 #include <string.h>
 #include <unistd.h>
@@ -34,10 +33,6 @@
 #include <sys/ioctl.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
-
-#ifdef HAVE_SYS_FILIO_H
-#include <sys/filio.h>
-#endif
 
 class rtdCLNT : rtdLOG
 {

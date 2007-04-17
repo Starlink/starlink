@@ -1,365 +1,194 @@
 /*******************************************************************************
 * E.S.O. - VLT project
-*
+* 
 * "@(#) $Id$"
-*
-* who       when      what
-* --------  --------  ----------------------------------------------
-* pbiereic  01/03/01  created (adapted from previous rtdServer)
+* 
+*  rtdServer.C
+* 
+* who          when      what
+* --------     --------  ----------------------------------------------
+* pbiereic     01/03/01  Adapted from previous version
 */
+static const char* const rcsId="@(#) $Id$";
 
 /************************************************************************
 *   NAME
-*   rtdSERVER - class which manages all clients which connect to the rtdServer
+*      rtdServer - image event dispatcher for RTD
 * 
 *   SYNOPSIS
-*   #include "rtdSERVER.h"
-*   rtdSERVER::rtdSERVER(int verbose, int socketFd, int delay) 
-*            verbose    - verbose flag
-*            socketFd   - socket file descriptor as returned by rtdInitServer()
-*            delay      - delay after each client request in msec
-* 
-*   DESCRIPTION
-*
-*   rtdSERVER accepts client connections and serves requests from connected
-*   clients such as forwarding image events, attach/detach etc. For each
-*   client which connect to the rtdServer, a "client object" is created
-*   which executes the requests from the client.
-*   The main loop enables new connection requests and requests from clients
-*   already connected (via a select() call). Then it processes all active requests
-*   within another loop, so that all clients are served with the same priority,
-*   in particular, no client can block another client.
-*   Clients which use an incompatible info package structure are simply
-*   disconnected.
-*   rtdSERVER "knows" the number of attached RTD clients and sets the semaphore
-*   accordingly. It also provides for multicasting of event notification.
-*
-*   PUBLIC METHODS
-*
-*   int rtdSERVER::Loop()
-*      The main loop which accepts connections and forwards image events to
-*      RTD clients which are attached to the image producer (camera). Cameras
-*      use rtdSendImageInfo() for sending image events.
-*      The command opcodes currently provided are:
-*         ATTACH / DETACH: used by RTD to receive or block image events
-*         IMAGEINFO:       used by camera clients to send image events
-*
-*   rtdCLNT *rtdSERVER::Accept()
-*      Accept connection from RTD or camera (i.e. rtdServer clients).
-*      The Accept() sets the required socket options and creates a
-*      "client object" for handling all requests coming from the client
-*      socket.
-*
-*   void rtdSERVER::DisconnectClient(rtdCLNT *client)
-*      Dsiconnect a client which either sent a wrong event request or died
-*
-*   void rtdSERVER::ServImageCmd(rtdPACKET *rtdPacket, int numbyte)
-*      This methods serves the image event. It first increments the semaphore
-*      according to the number of RTD clients attached. The semaphore is released
-*      by the RTD client when the image was displayed.
-*      Then it calls the client object for actually forwarding the image event.
-*
-*   int rtdSERVER::IncrSem(rtdPACKET *rtdPacket, int increment)
-*      Increment the semaphore: this is done only when the camera client has
-*      implemented the semaphore (see rtdSem.c).
 *      
-*   rtdCLNT *rtdSERVER::GetCurrClient()
-*      Return the object for a client which has sent a request.
+*      rtdServer [-v <verbose>] [-p <port number>] [-t <delay>]
 *
-*   FILES
+*   DESCRIPTION
+*       
+*   rtdServer is the process that manages all image events from cameras
+*   which are forwared to RTD client(s) which display the images.
+*   "Cameras" are acquisition processes like a CCD, IRACE-DCS, etc. which readout the
+*   detector image.
 *
-*   ENVIRONMENT
+*   Clients register (and connect) to the rtdServer via the rtdInitImageEvt() call.
 *
-*   COMMANDS
+*   Connected RTD clients will receive image events from a camera if they are attached
+*   to this camera. If not, then image events are simply discarded.
 *
-*   RETURN VALUES
+*   Cameras use the rtdSendImageInfo() call when there is a new image to be displayed.
 *
-*   CAUTIONS 
+*   Several RTD clients can attach to the same camera as the multicasting
+*   of event notification is supported by the rtdServer. 
+*   RTD clients can also attach to cameras that not have registered yet
+*   as the rtdServer supports a independence between image event producer
+*   and image event consumer.
+*   
+*   The rtdServer also implements semaphore locking of shared memory, to
+*   avoid the possibility of the RTD client reading the shared memory
+*   at the same time as the camera writes (this is known as "image jitter").
 *
-*   EXAMPLES
+*   The rtdServer expects the camera software to lock the semaphore.
+*
+*   The rtdServer will then increment this semaphore by the number of RTD
+*   clients less one (one was already set by the camera). If semaphores
+*   are not implemented in the incoming image event, no action is taken.
+*   The overall locking scheme is discussed in more detail in rtdSem(3).
+*
+*   CAUTIONS
+*
+*   o The rtdServer must not be killed when other clients are still
+*     connected to it.
+*   o rtdServer should not be started when there is another instance running on
+*     the same machine, since there is only one standard server port to which
+*     clients can connect to. If it is nevertheless started, then it will delay
+*     for some seconds before terminating.
+*
+*   ENVIRONMENTS
+*
+*   The rtdServer (and RTD clients) use 5555 as the default, standard port number.
+*   The port number can be changed within a user session by setting the
+*   environment variable RTD_SERVER_PORT before starting rtdServer and it's
+*   clients.
 *
 *   SEE ALSO
-*    rtdInitImageEvt(3), rtdSendImageInfo(3), rtdSem(1)
-*
-*   BUGS   
-* 
+*   rtdInitImageEvt(3), rtdSendImageInfo(3), rtdSem(3)
 *------------------------------------------------------------------------
 */
 
+/* 
+ * System Headers
+ */
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <signal.h>
+
+/* 
+ * Local Headers
+ */
 #include "rtdSERVER.h"
 
-static char *rcsId="@(#) $Id$"; 
-static void *use_rcsId = ((void)&use_rcsId,(void *) &rcsId);
+#define RTD_SERVER_DELAY 5     // default time to sleep before new events are read
 
-rtdSERVER::rtdSERVER(int verbose, int socketFd, int delay) 
-    : rtdLOG(verbose),
-      socketFd_(socketFd),
-      delay_(delay),
-      numClnt_(0),
-      reqClnt_(0),
-      reqCount_(0)
+typedef void (*MySigFunc)(int);  // prototype cast to keep Sun cc quiet
+
+/*
+ * Globals needed for cleanup() after signals
+ */
+int       socketFd  = 0;
+rtdSERVER *mainLoop = NULL;     // rtdSERVER object
+
+
+void usage(void)
 {
-    for (int i = 0; i <= MAX_CLNT; i++)
-	clnt_[i] = NULL;
-}
-
-rtdSERVER::~rtdSERVER()
-{
-    for (int i = 0; i < numClnt_; i++)
-	delete clnt_[i];
-}
-
-int rtdSERVER::Loop()
-{
-    fd_set    readFd;     // file descriptor for port RTD_SERVER_PORT (default 5555)
-    readFd_ = (fd_set *) &readFd;
-    time_t    timeVal;
-    rtdPACKET rtdPacket;  // copy of the standard info package structure
-    int       packetSize = sizeof(rtdPACKET);
-    rtdHEADER *hdr      = &(rtdPacket.body.data.hdr);
-    int       socket;
-    int       n;
-
-    timeVal = time(NULL);
-    strcpy(startTime_, ctime(&timeVal));
-
-    log("Entering main loop and waiting for client connections...\n");
-    while ( 1 ) {
-	/*
-	 * sleep a bit to give the RTD clients more time. A delay can
-	 * be used to slow down the image event rate from ultra-fast cameras
-	 * provided the camera process is using semaphore locking.
-	 */
-	if (delay_ > 0)
-	    rtdSleep(delay_);
-
-	FD_ZERO(readFd_);
-
-	// enable read for connection requests
-	FD_SET(socketFd_, readFd_);
-
-	// Enable read for all clients connected.
-	for (int i = 0; i < numClnt_; i++)
-	    FD_SET(clnt_[i]->Socket(), readFd_);
-
-	/////////////////////////////////////////////
-	int status = select(32, readFd_, 0, 0, NULL);
-	/////////////////////////////////////////////
-
-	if (status <= 0) {
-	    log("Select error !!!\n");
-	    return RTD_ERROR;  // timeout or error (signals) should not happen
-	}
-	log("*** Handling new event (%d) ....\n", reqCount_++); // total number of requests
-
-	// check if a client wants to connect
-	if (FD_ISSET(socketFd_, readFd_) > 0) {
-	    Accept();
-	    continue; // accept or refuse, anyway continue the loop...
-	}
-	/*
-	 * service clients on all active client sockets i.e. the ones which are
-	 * currently in the readFd set. This ensures that all clients are
-	 * serviced even when there is a client which sends events at very
-	 * high speed.
-	 */
-	rtdCLNT *currClient = NULL;    // current client object
-	while ((currClient = GetCurrClient()) != NULL) {
-	    socket = currClient->Socket();
-	    n = read(socket, &rtdPacket, packetSize);
-
-	    // check if client died or sent a wrong event structure
-	    if (n < 0 || n != packetSize) {
-		if (n > 0)
-		    log("Client sent a wrong request. Will be disconnected.\n");
-		else
-		    log("Client apparently closed the connection.\n");
-		DisconnectClient(currClient); // Disconnect the client
-		continue;
-	    }
-	    currClient->Type(hdr->reqType); // keep the requestor type
-
-	    // execute command given in the event info structure
-	    switch (rtdPacket.opcode) {
-	    case ATTACH:
-		currClient->Attach(hdr->reqName, hdr->camName);
-		log("ATTACH command received from %s, %s\n", 
-		    currClient->ReqName(), currClient->CamName());
-		break;
-	    case DETACH:
-		log("DETACH command received from %s, %s\n",
-		    currClient->ReqName(), currClient->CamName());
-		currClient->Detach();
-		break;
-	    case IMAGEINFO:
-		log("IMAGEINFO command received (port %d)\n", currClient->Port());
-		ServImageCmd(&rtdPacket);
-		break;
-	    case STATUS:
-		log("STATUS command received (port %d)\n", currClient->Port());
-		ServStatusCmd(socket);
-		break;
-	    case PING:
-		log("PING command received (port %d)\n", currClient->Port());
-		break;
-	    default:
-		log("Unknown opcode received: %d. Client will be disconnected.\n",
-		    rtdPacket.opcode);
-		DisconnectClient(currClient); // Disconnect the client
-	    } 
-	}
-    }
+    printf("Usage: rtdServer ?-v -p -s?\n"
+	   "  -v  verbose mode\n"
+	   "  -p  port number, default %d. Set with RTD_SERVER_PORT\n"
+	   "  -t  delay between image events in msec (default %d)\n",
+	   RTD_FALLBACK_PORT, RTD_SERVER_DELAY);
+    exit(1);
 }
 
 /*
- * Accept connection from RTD or camera
+ * cleanup resources before terminating. Note that rtdServer does not
+ * create any "global resources" such as shared memory or semaphores.
  */
-rtdCLNT *rtdSERVER::Accept()
+void cleanup(int sig=0)
 {
-    rtdCLNT *client;
-    reqClnt_++;  // for statistics
+    close(socketFd);
+    if (mainLoop != NULL)
+	delete mainLoop;
 
-    // Create a new object for handling the request for this connection
-    client = clnt_[numClnt_++] = new rtdCLNT(Verbose(), numClnt_);
-    if (client->Accept(socketFd_) == RTD_OK && numClnt_ < MAX_CLNT)
-	return client;
-
-    if (numClnt_ >= MAX_CLNT)
-	log("Too many cameras and RTD's connected to rtdServer\n");
-    DisconnectClient(client);
-    return NULL;
+    if (sig >= 0)
+	fprintf(stderr, "rtdServer: signal received\n");
+    exit(0);
 }
 
-void rtdSERVER::DisconnectClient(rtdCLNT *client)
+main(int argc, char *argv[])
 {
-    int idx = client->Index();
-
-    log("Closing connection (port %d)\n", client->Port());
-
-    delete client;
-    clnt_[idx] = NULL;
-    numClnt_--;
-    /*
-     * shuffle up the clnt_[] pointer buffer to simplify programatic access.
-     * The last pointer of the buffer is not used but set to NULL.
-     */
-    for (int i = idx; i < MAX_CLNT; i++)
-	clnt_[i] = clnt_[i+1];
-}
+    extern char *optarg;
+    extern int  optind;
+    int         portNo = 0;
+    int         delay = RTD_SERVER_DELAY;
+    char        c;
+    int         verbose = 0;
 
 /*
- * return a client object for which a request is pending
+ * rtdServer is a central server for all cameras and RTD's on
+ * a host machine. It only terminates after certain signals, such as 
+ * an interrupt from keyboard and signals which cannot be caught.
+ * See the list of signals and their action below.
  */
-rtdCLNT *rtdSERVER::GetCurrClient()
-{
-    for (int i = 0; i < numClnt_; i++) {
-	if (FD_ISSET(clnt_[i]->Socket(), readFd_) <= 0)
-	    continue;
-	FD_CLR(clnt_[i]->Socket(), readFd_);    // needed for next FD_ISSET
-	clnt_[i]->Index(i);       // client  index
-	return clnt_[i];
+
+    // signals which are ignored:
+    signal(SIGTERM, SIG_IGN);
+    signal(SIGHUP,  SIG_IGN);
+    signal(SIGUSR1, SIG_IGN);
+    signal(SIGUSR2, SIG_IGN);
+
+    // signals which must terminate rtdServer:
+    signal(SIGINT,  (MySigFunc)cleanup);
+        
+    // parse command line options
+    while ((c = getopt(argc, argv, "v:p:t:")) != -1) {
+#ifndef SYSV
+	char* optopt = argv[optind];
+#endif
+	switch(c) {
+	case 'v':
+	    verbose = 1;
+	    break;
+	case 'p':
+	    portNo = atoi(optarg);
+	    break;
+	case 't':
+	    delay = atoi(optarg);
+	    break;
+	case ':':
+	    fprintf(stderr,"Option -%s requires an argument\n",(char *)optopt);
+	    usage();
+	case '?':
+	    usage();
+	case 'h':
+	    usage();
+	}
     }
-    return NULL;
-}
+    // Check argument parameters
+    if (portNo < 0 || delay < 0)
+	usage();
 
-void rtdSERVER::ServImageCmd(rtdPACKET *rtdPacket)
-{
-    int  numClients = 0;   // number of RTD clients attached to the camera
-    char *camera        = rtdPacket->body.data.hdr.reqName;
-    rtdIMAGE_INFO *info = &(rtdPacket->body.data.rtdImageInfo);
-    
-    log("Image event received from: %s\n", camera);
-    if (*camera == '\0')
-	return;
-    
-    // Get the number of RTD clients which are currently attached to the camera
-    for (int i = 0; i < numClnt_; i++) {
-	if (clnt_[i]->AttachedToCamera(camera) == RTD_OK)
-	    numClients++;
+    rtdLOG logs = rtdLOG::rtdLOG(verbose);  // create log object
+
+    if (getenv(RTD_SERVER_PORT) != NULL)
+	portNo = atoi(getenv(RTD_SERVER_PORT));
+
+    if (rtdInitServer(&socketFd, portNo, NULL) == RTD_ERROR) {
+	fprintf(stderr, 
+		"Could not initialize server (maybe it is already running ?)\n"
+		"Now sleeping for 10 seconds to avoid an automatic, immediate restart\n");
+	sleep(10);
+	exit (1);
     }
-    /*
-     * Increment the shared memory semaphore with (numClients - 1). One
-     * increment was already done by the camera.
-     */
-    if (IncrSem(rtdPacket, numClients - 1) != RTD_OK)
-	return;
+    logs.log("rtdServer started.\n");
 
-    if (! numClients) {
-	log("No RTD clients are currently attached to '%s'\n", camera);
-	return;
-    }
-    /*
-     * Now loop over the clients to send the packets to all attached RTD's.
-     */
-    for (int i = 0; i < numClnt_; i++) {
-	if (clnt_[i]->AttachedToCamera(camera) != RTD_OK)
-	    continue;
-	/*
-	 * The attached RTD client object needs to cleanup semaphores
-	 * when it's associated RTD terminates.
-	 */
-	clnt_[i]->SetSemPar(info->semId, info->shmNum);
-
-	log("Forwarding event to: %s\n", clnt_[i]->ReqName());
-	if (clnt_[i]->Forward(rtdPacket) != RTD_OK)
-	    log("Forwarding event message failed\n");
-    }
-    return;
-}
-
-void rtdSERVER::ServStatusCmd(int socket)
-{
-    char buf[4096], buf2[256];
-
-    sprintf(buf, "rtdServer info:\n"
-	    "rtdServer was started: %s"
-	    "Delay was set to: %d\n"
-	    "Total number of connections: %d\n"
-	    "Total number of requests: %d\n",
-	    startTime_, delay_, reqClnt_, reqCount_);
-    strcat(buf, "Current rtdServer clients:\n");
-    for (int i=0; i < numClnt_; i++) {
-	if (socket == clnt_[i]->Socket())
-	    continue;
-	sprintf(buf2, "Entry: %d \tName: %s\tCamera: %s\t Type: %s\t\n",
-		i, clnt_[i]->ReqName(), clnt_[i]->CamName(), clnt_[i]->TypeName());
-	if (strlen(buf) + sizeof(buf2) + 1 < sizeof(buf))
-	    strcat(buf, buf2);
-    }
-    log(buf);
-  
-    write(socket, buf, strlen(buf)+1);
-}
-
-int rtdSERVER::IncrSem(rtdPACKET *rtdPacket, int increment)
-{
-    rtdIMAGE_INFO *rtdImageInfo = &(rtdPacket->body.data.rtdImageInfo);
-    int semId  = rtdImageInfo->semId;
-    int shmNum = rtdImageInfo->shmNum;
-    /*
-     * First thing is to check that semaphores were implemented by the camera.
-     * Note that semId=0 is a valid id.
-     */
-    int val = rtdSemGetVal(semId, shmNum);
-    if (val < 0) 
-	return RTD_OK; // for applications not using semaphores
-
-    log("Semaphores implemented: semId = %d, shmNum=%d, val = %d\n",
-	semId, shmNum, val);
-
-    /*
-     * Check also that the semaphore given in the image information 
-     * is set to one.
-     */
-    if (val != 1) {
-	log("Warning: sending image event without semaphore set to 1\n");
-	return RTD_OK;
-    }
-    /*
-     * Now increment the semaphore by increment. First set the required
-     * semaphore to change in the sembuf structure.
-     */
-    if (increment != 0) 
-	rtdSemIncrement(semId, shmNum, increment);
-    return RTD_OK;
+    mainLoop = new rtdSERVER(verbose, socketFd, delay);
+    mainLoop->Loop();
+    cleanup(-1);
 }

@@ -87,6 +87,7 @@ static int error(const char *fmt, ...)
  */
 static int sys_error(const char *fmt, ...)
 {
+    char *errstr;
     va_list args;
     char buf[sizeof(info.errmsg)];
 #ifndef errno

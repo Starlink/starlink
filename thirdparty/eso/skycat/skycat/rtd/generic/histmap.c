@@ -19,7 +19,6 @@ static char SccsId[] = "%W%  %G%";
 #include <stdio.h>
 #include "histeq.h"		/* define SubrangeLink, List */
 
-
 static void make_subrange_scalemap();
 static void make_gapped_list(), list_to_map();
 static int first_shortlist_pass();
