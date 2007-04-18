@@ -40,6 +40,8 @@
 *        Free temporary buffer.
 *     2007-04-05 (AGG):
 *        Change OBSMODE to SAM_MODE
+*     2007-04-17 (AGG):
+*        Change verbose level for warning message to normal
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -161,7 +163,7 @@ void smf_calc_stareimage( smfData *data, const int naver, int *status) {
     /* Release SCU2RED locator */
     datAnnul( &scu2redloc, status );
   } else {
-    msgOutif(MSG__VERB," ", 
+    msgOutif(MSG__NORM," ", 
 	     "Input file is not a STARE observation - ignoring", status);
   }
 
