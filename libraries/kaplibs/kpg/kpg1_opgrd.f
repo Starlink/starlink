@@ -929,6 +929,17 @@
 *     11-JAN-2007 (DSB):
 *        Ignored insignificant peaks and troughs in the auto-correlation
 *        when finding the first peak.
+*     17-APR-2007 (DSB):
+*        If no maximum is found in the auto-correlation function that is
+*        more than half the value at zero shift, then consider using the
+*        maximum auto-correlation value found to define the wavelength.
+*        Only do this if the maximum auto-correlation value found is more
+*        than 10 times the mean auto-correlation value. All this is to
+*        handle cases where the periodicity is defined by a peak that is
+*        small in height compared to the zero-shift value, but large
+*        compared to the noise in the auto-correlation. This may happen
+*        for instance if there are very few positions are supplied (e.g.
+*        a regular grid of 5 points).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -969,6 +980,7 @@
       DOUBLE PRECISION D
       DOUBLE PRECISION DSUM
       DOUBLE PRECISION FBIN
+      DOUBLE PRECISION LIMSUM
       DOUBLE PRECISION LLLSUM2
       DOUBLE PRECISION LLSUM2
       DOUBLE PRECISION LSUM2
@@ -980,6 +992,7 @@
       DOUBLE PRECISION POW
       DOUBLE PRECISION SINANG
       DOUBLE PRECISION SUM2
+      DOUBLE PRECISION SUMSUM
       DOUBLE PRECISION USUM
       DOUBLE PRECISION WBIN
       DOUBLE PRECISION WBIN2
@@ -992,6 +1005,7 @@
       INTEGER J
       INTEGER MAXSH
       INTEGER MINSH
+      INTEGER NSUM
       INTEGER SHIFT
       LOGICAL MORE             
 *.
@@ -1074,13 +1088,14 @@ c      write(*,*) 'Ang: ',ang*ast__dr2d,' sum2: ',sum2,' mxamp: ',mxamp
 *  size of the sum of the squared values found above. First evaluate the 
 *  auto-correlation at increasing shifts, until a minimum is found which
 *  is less than the two subsequent value.
-
          NEWAMP = SUM2
          LLLSUM2 = SUM2
          LLSUM2 = SUM2
          LSUM2 = SUM2
          SHIFT = 1
          MINSUM = SUM2
+         SUMSUM = 0.0
+         NSUM = 0
    
 *  Loop over increasing shifts until we have found the minimum.
          MORE = .TRUE.
@@ -1100,8 +1115,12 @@ c      write(*,*) 'Ang: ',ang*ast__dr2d,' sum2: ',sum2,' mxamp: ',mxamp
                J = J + 1
             END DO
 
+*  Increment sums used to find the mean auto-correlation value.
+            SUMSUM = SUMSUM + SUM2
+            NSUM = NSUM + 1
+
 *  If the SUM2 value is smaller than the smallest value found so far,
-*  record it and rest the count of larger SUM2 values found since the
+*  record it and reset the count of larger SUM2 values found since the
 *  most recent minimum..
             IF( SUM2 .LT. MINSUM ) THEN
                MINSUM = SUM2
@@ -1118,10 +1137,15 @@ c      write(*,*) 'Ang: ',ang*ast__dr2d,' sum2: ',sum2,' mxamp: ',mxamp
                IF( COUNT .EQ. 1 ) THEN
                   USUM = SUM2
                   DSUM = LLSUM2
+
 *  If this is the second shift after the minimum, accept the minimum as
 *  found.
                ELSE IF( COUNT .LE. 2 ) THEN
                   MORE = .FALSE.
+
+c      write(*,*) 'Found minimum ',minsum,' in auto-correlation '//
+c     :           'function at ',minsh
+
                END IF
 
             END IF
@@ -1134,12 +1158,14 @@ c      write(*,*) 'Ang: ',ang*ast__dr2d,' sum2: ',sum2,' mxamp: ',mxamp
 
 *  Now continue to evaluate the auto-correlation at increasing shifts
 *  until a maximum is found that is more than half the value at zero
-*  shift and is greater than the subsequent two values.
+*  shift and is greater than the subsequent two values. In case no such
+*  point is found, we also record the largest value found, and the mean of
+*  all values (except for the first point at zero shift).
          IF( SHIFT .LT. HISTSZ ) THEN
 
-            MAXSUM = 0.5*NEWAMP
             MAXSH = -1
-
+            MAXSUM = MINSUM
+            LIMSUM = 0.5*NEWAMP
             SHIFT = MINSH + 1
             SUM2 = MINSUM
             LSUM2 = DSUM
@@ -1159,7 +1185,10 @@ c      write(*,*) 'Ang: ',ang*ast__dr2d,' sum2: ',sum2,' mxamp: ',mxamp
                   SUM2 = SUM2 + HIST( I )*HIST( J )
                   J = J + 1
                END DO
-   
+
+               SUMSUM = SUMSUM + SUM2
+               NSUM = NSUM + 1
+
                IF( SUM2 .GT. MAXSUM ) THEN
                   MAXSUM = SUM2
                   MAXSH = SHIFT 
@@ -1171,7 +1200,7 @@ c      write(*,*) 'Ang: ',ang*ast__dr2d,' sum2: ',sum2,' mxamp: ',mxamp
                      USUM = SUM2
                      DSUM = LLSUM2
 
-                  ELSE IF( COUNT .LE. 2 ) THEN
+                  ELSE IF( COUNT .LE. 2 .AND. MAXSUM .GT. LIMSUM ) THEN
                      MORE = .FALSE.
                   END IF
 
@@ -1181,6 +1210,15 @@ c      write(*,*) 'Ang: ',ang*ast__dr2d,' sum2: ',sum2,' mxamp: ',mxamp
                IF( SHIFT .EQ. HISTSZ ) MORE = .FALSE.
    
             END DO
+
+
+*  If no peak was found that was more than half the value at zero shift,
+*  use the maximum value found so long as it is more than 10 times the mean 
+*  value.
+            IF( SHIFT .EQ. HISTSZ .AND. MAXSH .NE. -1 ) THEN
+               IF( MAXSUM .GT. 10.0*SUMSUM/NSUM ) SHIFT = MAXSH
+            END IF
+
          END IF
 
 c         call opgrd_dump( histsz, hist, .false., ang, status )
@@ -1198,8 +1236,8 @@ c         call opgrd_autodump( ang, histsz, hist, status )
 *  Convert the shift value to a wavelength in grid pixels.
             NEWWAV = XSHIFT*SPC
 
-c      write(*,*) '   new total: ',NEWAMP*NEWWAV*NEWWAV,
-c     :           ' old total: ',MXAMP*MXWAVE*MXWAVE
+c      write(*,*) '   new total: ',NEWAMP*(NEWWAV**0.7),
+c     :           ' old total: ',MXAMP*(MXWAVE**7)
 
 *  We use the new angle if the auto-correlation peak produces a greater
 *  value than the old angle. We include a weighting factor that gives
@@ -1207,14 +1245,16 @@ c     :           ' old total: ',MXAMP*MXWAVE*MXWAVE
 *  between the periodicity produced when viewing a grid parallel to an axis 
 *  and when viewing it at 45 degrees to an axis. However, the exponent used 
 *  in this weighting factor has been determined by trial and error and
-*  may not be suitab;le in all cases. Time will tell.
+*  may not be suitable in all cases. Time will tell.
             IF( NEWAMP*( NEWWAV**0.7 ) .GT. MXAMP*( MXWAVE**0.7 ) ) THEN
+c      write(*,*) '   Using new total - setting MXAMP to ',NEWAMP
                MXANG = ANG
                MXAMP = NEWAMP
                MXWAVE = NEWWAV
             END IF
-c         else
-c      write(*,*) 'No peak found'
+         else
+c      write(*,*) 'No peak found  shift (',shift,') > histsz (',
+c     :           histsz,')'
          END IF
       END IF
 
