@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: TopLevelWidget.tcl,v 1.3 2005/02/02 01:43:02 brighton Exp $"
+# "@(#) $Id: TopLevelWidget.tcl,v 1.2 2006/01/30 20:21:45 abrighto Exp $"
 #
 # TopLevelWidget.tcl - Itk base class for popup windows
 #
@@ -149,6 +149,10 @@ itcl::class util::TopLevelWidget {
 		    exit 0
 		}
 		if {[llength $optlist] && [lsearch -exact $optlist $opt] == -1} {
+		    if {[string match {-psn*} $opt]} {
+			# ignore -pcn... option inserted on mac package
+			continue
+		    }
 		    puts "invalid option: $opt"
 		    puts "$usage"
 		    exit 1

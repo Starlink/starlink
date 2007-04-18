@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: ProgressBar.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
+# "@(#) $Id: ProgressBar.tcl,v 1.1.1.1 2006/01/12 16:40:38 abrighto Exp $"
 #
 # ProgressBar.tcl - widget to display a message and a progress bar
 #                   in a frame while doing some work that may take 
