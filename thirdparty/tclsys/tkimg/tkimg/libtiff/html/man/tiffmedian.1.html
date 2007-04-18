@@ -1,0 +1,153 @@
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta name="Content-Style" content="text/css">
+<title>TIFFMEDIAN</title>
+</head>
+<body>
+
+<h1 align=center>TIFFMEDIAN</h1>
+<a href="#NAME">NAME</a><br>
+<a href="#SYNOPSIS">SYNOPSIS</a><br>
+<a href="#DESCRIPTION">DESCRIPTION</a><br>
+<a href="#OPTIONS">OPTIONS</a><br>
+<a href="#NOTES">NOTES</a><br>
+<a href="#SEE ALSO">SEE ALSO</a><br>
+
+<hr>
+<!-- Creator     : groff version 1.17.2 -->
+<!-- CreationDate: Mon Dec 22 00:39:35 2003 -->
+<a name="NAME"></a>
+<h2>NAME</h2>
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+tiffmedian - apply the median cut algorithm to data in a <small>TIFF</small> file</td></table>
+<a name="SYNOPSIS"></a>
+<h2>SYNOPSIS</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<b>tiffmedian</b> [ <i>options</i> ] <i>input.tif
+output.tif</i></td></table>
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<i>tiffmedian</i> applies the median cut algorithm to an
+<small>RGB</small> image in <i>input.tif</i> to generate a
+palette image that is written to <i>output.tif</i>. The
+generated colormap has, by default, 256 entries. The image
+data is quantized by mapping each pixel to the closest color
+values in the colormap.</td></table>
+<a name="OPTIONS"></a>
+<h2>OPTIONS</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<b>-c</b></td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="21%"></td><td width="79%">
+Specify the compression to use for data written to the
+output file: <b>none</b> for no compression, <b>packbits</b>
+for PackBits compression, <b>lzw</b> for Lempel-Ziv &amp;
+Welch compression, and <b>zip</b> for Deflate compression.
+By default <i>tiffmedian</i> will compress data according to
+the value of the <i>Compression</i> tag found in the source
+file.</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="21%"></td><td width="79%">
+<small>LZW</small> compression can be specified together
+with a <i>predictor</i> value. A predictor value of 2 causes
+each scanline of the output image to undergo horizontal
+differencing before it is encoded; a value of 1 forces each
+scanline to be encoded without differencing. LZW-specific
+options are specified by appending a ``:''-separated list to
+the ``lzw'' option; e.g. <b>-c lzw:2</b> for
+<small>LZW</small> compression with horizontal
+differencing.</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<b>-C</b></td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="21%"></td><td width="79%">
+Specify the number of entries to use in the generated
+colormap. By default all 256 entries/colors are
+used.</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<b>-f</b></td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="21%"></td><td width="79%">
+Apply Floyd-Steinberg dithering before selecting a colormap
+entry.</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<b>-r</b></td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="21%"></td><td width="79%">
+Specify the number of rows (scanlines) in each strip of data
+written to the output file. By default, <i>tiffmedian</i>
+attempts to set the rows/strip that no more than 8 kilobytes
+of data appear in a strip.</td></table>
+<a name="NOTES"></a>
+<h2>NOTES</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+This program is derived from Paul Heckbert's <i>median</i>
+program.</td></table>
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<i>pal2rgb</i>(1), <i>tiffinfo</i>(1), <i>tiffcp</i>(1),
+<i>tiffcmp</i>(1), <i>libtiff</i>(3)</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+&quot;Color Image Quantization for Frame Buffer
+Display&quot;, Paul Heckbert, SIGGRAPH proceedings, 1982,
+pp. 297-307.</td></table>
+<hr>
+</body>
+</html>

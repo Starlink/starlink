@@ -1,0 +1,150 @@
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta name="Content-Style" content="text/css">
+<title>PAL2RGB</title>
+</head>
+<body>
+
+<h1 align=center>PAL2RGB</h1>
+<a href="#NAME">NAME</a><br>
+<a href="#SYNOPSIS">SYNOPSIS</a><br>
+<a href="#DESCRIPTION">DESCRIPTION</a><br>
+<a href="#OPTIONS">OPTIONS</a><br>
+<a href="#BUGS">BUGS</a><br>
+<a href="#SEE ALSO">SEE ALSO</a><br>
+
+<hr>
+<!-- Creator     : groff version 1.17.2 -->
+<!-- CreationDate: Mon Dec 22 00:39:31 2003 -->
+<a name="NAME"></a>
+<h2>NAME</h2>
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+pal2rgb - convert a palette color <small>TIFF</small> image to a full color image</td></table>
+<a name="SYNOPSIS"></a>
+<h2>SYNOPSIS</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<b>pal2rgb</b> [ <i>options</i> ] <i>input.tif
+output.tif</i></td></table>
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<i>Pal2rgb</i> converts a palette color <small>TIFF</small>
+image to a full color image by applying the colormap of the
+palette image to each sample to generate a full color
+<small>RGB</small> image.</td></table>
+<a name="OPTIONS"></a>
+<h2>OPTIONS</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+Options that affect the interpretation of input data
+are:</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<b>-C</b></td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="21%"></td><td width="79%">
+This option overrides the default behaviour of
+<i>pal2rgb</i> in determining whether or not colormap
+entries contain 16-bit or 8-bit values. By default the
+colormap is inspected and if no colormap entry greater than
+255 is found, the colormap is assumed to have only 8-bit
+values; otherwise 16-bit values (as required by the
+<small>TIFF</small> specification) are assumed. The
+<b>-C</b> option can be used to explicitly specify the
+number of bits for colormap entries: <b>-C 8</b> for 8-bit
+values, <b>-C 16</b> for 16-bit values.</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+Options that affect the output file format are:</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<b>-p</b></td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="21%"></td><td width="79%">
+Explicitly select the planar configuration used in
+organizing data samples in the output image: <b>-p
+contig</b> for samples packed contiguously, and <b>-p
+separate</b> for samples stored separately. By default
+samples are packed.</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<b>-c</b></td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="21%"></td><td width="79%">
+Use the specific compression algorithm to encoded image data
+in the output file: <b>-c packbits</b> for Macintosh
+Packbits, <b>-c lzw</b> for Lempel-Ziv &amp; Welch, <b>-c
+zip</b> for Deflate, <b>-c none</b> for no compression. If
+no compression-related option is specified, the input file's
+compression algorithm is used.</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<b>-r</b></td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="21%"></td><td width="79%">
+Explicitly specify the number of rows in each strip of the
+output file. If the <b>-r</b> option is not specified, a
+number is selected such that each output strip has
+approximately 8 kilobytes of data in it.</td></table>
+<a name="BUGS"></a>
+<h2>BUGS</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+Only 8-bit images are handled.</td></table>
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<i>tiffinfo</i>(1), <i>tiffcp</i>(1), <i>tiffmedian</i>(1),
+<i>libtiff</i>(3)</td></table>
+<hr>
+</body>
+</html>

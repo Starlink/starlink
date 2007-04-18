@@ -1,0 +1,84 @@
+'\"
+'\" Generated from file 'img-gif.man' by tcllib/doctools with format 'nroff'
+'\" Copyright (c) 1995-2003 Jan Nijtmans <nijtmans@users.sourceforge.com>
+'\"
+'\" -*- tcl -*- doctools
+'\" -*- tcl -*- doctools = format-header.inc
+.so man.macros
+.TH "img-gif" n 1.3  "Img"
+.BS
+.SH "NAME"
+img-gif \- Img, Graphics Interchange Format (gif)
+.SH "SYNOPSIS"
+package require \fBTk \fR
+.sp
+package require \fBimg::gif  ?1.3?\fR
+.sp
+\fBimage\fR \fBcreate photo\fR ?\fIname\fR? ?\fIoptions\fR?\fR
+.sp
+.BE
+.SH "DESCRIPTION"
+The package \fBimg::gif\fR is a sub-package of
+\fBImg\fR. It can be loaded as a part of the complete Img support,
+via \fBpackage require Img\fR, or on its own, via
+\fBpackage require img::gif\fR.
+.PP
+Like all packages of \fBImg\fR it does \fInot\fR provide new
+commands, but extends the existing \fBTk\fR command \fBimage\fR so
+that it supports files containing raster images in the
+Graphics Interchange Format (gif). More specifically
+\fBimg::gif\fR extends \fBTk\fR's \fBphoto\fR
+image type.
+.PP
+The name of the new format handler is \fBgif\fR.
+This handler provides new additional configuration options. See
+section \fBGIF OPTIONS\fR for more detailed explanations.
+'\" -*- tcl -*- doctools = format-middle.inc
+.PP
+All of the above means that in a call like
+.TP
+\fBimage\fR \fBcreate photo\fR ?\fIname\fR? ?\fIoptions\fR?\fR
+.IP [1]
+Image data in gif format (options \fB-data\fR and \fB-file\fR) is
+detected automatically.
+.IP [2]
+The format name \fBgif\fR is recognized by the option \fB-format\fR.
+In addition the value for the option is treated as list and may
+contain any of the special options listed in section
+\fBGIF OPTIONS\fR.
+.SH "GIF OPTIONS"
+The handler provides two options, one for reading from a GIF image,
+the other influencing the writing of such.
+.TP
+\fB-index\fR \fIn\fR
+This option is for reading from GIF files containing more than one
+image (\fIanimated GIF's\fR, \fIGIF movies\fR. When specified it
+will read the \fIn\fR'th image in the data. The first image is at
+index \fB0\fR and will be read by default, i.e. when the option is
+not specified.
+.TP
+\fB-interlaced\fR \fIbool\fR
+If the value of this option is set to true the image will be written
+using the interlaced sub-format of GIF. The default is to write
+non-interlaced files. \fIThis option is not implemented yet.\fR
+.SH "IMAGE COMPRESSION"
+Instead of LZW the run-length encoding of Hutchison Avenue Software
+Corporation is used, also known as \fImiGIF\fR compression. The miGIF
+compression routines do not, strictly speaking, generate files
+conforming to the GIF spec, since the image data is not LZW-compressed
+(this is the point: in order to avoid transgression of the Unisys
+patent on the LZW algorithm.) However, miGIF generates data streams
+that any reasonably sane LZW decompresser will decompress to what we
+want.
+.SH "TRANSPARENCY"
+If you want to write images to disk which contain transparency
+information (e.g. GIF89) you need at least \fBTk\fR 8.3.
+'\" -*- tcl -*- doctools = format-footer.inc
+.SH "SEE ALSO"
+img-bmp, img-gif, img-ico, img-intro, img-jpeg, img-pcx, img-pixmap, img-png, img-ppm, img-ps, img-sgi, img-sun, img-tga, img-tiff, img-window, img-xbm, img-xpm
+.SH "KEYWORDS"
+gif, image handling, tk
+.SH "COPYRIGHT"
+.nf
+Copyright (c) 1995-2003 Jan Nijtmans <nijtmans@users.sourceforge.com>
+.fi

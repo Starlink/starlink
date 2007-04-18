@@ -1,0 +1,70 @@
+'\"
+'\" Generated from file 'img-png.man' by tcllib/doctools with format 'nroff'
+'\" Copyright (c) 1995-2003 Jan Nijtmans <nijtmans@users.sourceforge.com>
+'\"
+'\" -*- tcl -*- doctools
+'\" -*- tcl -*- doctools = format-header.inc
+.so man.macros
+.TH "img-png" n 1.3  "Img"
+.BS
+.SH "NAME"
+img-png \- Img, Portable Network Graphics format (png)
+.SH "SYNOPSIS"
+package require \fBTk \fR
+.sp
+package require \fBimg::png  ?1.3?\fR
+.sp
+\fBimage\fR \fBcreate photo\fR ?\fIname\fR? ?\fIoptions\fR?\fR
+.sp
+.BE
+.SH "DESCRIPTION"
+The package \fBimg::png\fR is a sub-package of
+\fBImg\fR. It can be loaded as a part of the complete Img support,
+via \fBpackage require Img\fR, or on its own, via
+\fBpackage require img::png\fR.
+.PP
+Like all packages of \fBImg\fR it does \fInot\fR provide new
+commands, but extends the existing \fBTk\fR command \fBimage\fR so
+that it supports files containing raster images in the
+Portable Network Graphics format (png). More specifically
+\fBimg::png\fR extends \fBTk\fR's \fBphoto\fR
+image type.
+.PP
+The name of the new format handler is \fBpng\fR.
+This handler provides new additional configuration options. See
+section \fBPNG OPTIONS\fR for more detailed explanations.
+'\" -*- tcl -*- doctools = format-middle.inc
+.PP
+All of the above means that in a call like
+.TP
+\fBimage\fR \fBcreate photo\fR ?\fIname\fR? ?\fIoptions\fR?\fR
+.IP [1]
+Image data in png format (options \fB-data\fR and \fB-file\fR) is
+detected automatically.
+.IP [2]
+The format name \fBpng\fR is recognized by the option \fB-format\fR.
+In addition the value for the option is treated as list and may
+contain any of the special options listed in section
+\fBPNG OPTIONS\fR.
+.SH "PNG OPTIONS"
+The handler provides no true options at all, but accepts pairs of keys
+and values when writing a PNG file. Each pair will be written as a
+named text chunk where the key provides the name of the chunk and the
+value its contents.
+For example
+.nf
+    png Author <name> Title <title> Description ...
+.fi
+.SH "TRANSPARENCY"
+If you want to write images to disk which contain transparency
+information (e.g. PNG with alpha channel) you need at least
+\fBTk\fR 8.3.
+'\" -*- tcl -*- doctools = format-footer.inc
+.SH "SEE ALSO"
+img-bmp, img-gif, img-ico, img-intro, img-jpeg, img-pcx, img-pixmap, img-png, img-ppm, img-ps, img-sgi, img-sun, img-tga, img-tiff, img-window, img-xbm, img-xpm
+.SH "KEYWORDS"
+image handling, png, tk
+.SH "COPYRIGHT"
+.nf
+Copyright (c) 1995-2003 Jan Nijtmans <nijtmans@users.sourceforge.com>
+.fi

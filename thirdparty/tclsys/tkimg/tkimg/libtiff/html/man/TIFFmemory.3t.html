@@ -1,0 +1,94 @@
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta name="Content-Style" content="text/css">
+<title>MEMORY</title>
+</head>
+<body>
+
+<h1 align=center>MEMORY</h1>
+<a href="#NAME">NAME</a><br>
+<a href="#SYNOPSIS">SYNOPSIS</a><br>
+<a href="#DESCRIPTION">DESCRIPTION</a><br>
+<a href="#DIAGNOSTICS">DIAGNOSTICS</a><br>
+<a href="#SEE ALSO">SEE ALSO</a><br>
+
+<hr>
+<!-- Creator     : groff version 1.17.2 -->
+<!-- CreationDate: Mon Dec 22 00:39:22 2003 -->
+<a name="NAME"></a>
+<h2>NAME</h2>
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+_TIFFmalloc, _TIFFrealloc, _TIFFfree, _TIFFmemset, _TIFFmemcpy, _TIFFmemcmp, - memory management-related functions for use with <small>TIFF</small> files</td></table>
+<a name="SYNOPSIS"></a>
+<h2>SYNOPSIS</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<pre><b>#include &lt;tiffio.h&gt;
+tdata_t _TIFFmalloc(tsize_t);
+tdata_t _TIFFrealloc(tdata_t, tsize_t);
+void _TIFFfree(tdata_t);
+void _TIFFmemset(tdata_t, int, tsize_t);
+void _TIFFmemcpy(tdata_t, const tdata_t, tsize_t);
+int _TIFFmemcmp(const tdata_t, const tdata_t, tsize_t);
+</b></pre></td></table>
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+These routines are provided for writing portable software
+that uses <i>libtiff</i>; they hide any memory-management
+related issues, such as dealing with segmented architectures
+found on 16-bit machines.</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<i>_TIFFmalloc</i> and <i>_TIFFrealloc</i> are used to
+dynamically allocate and reallocate memory used by
+<i>libtiff</i>; such as memory passed into the I/O routines.
+Memory allocated through these interfaces is released back
+to the system using the <i>_TIFFfree</i>
+routine.</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+Memory allocated through one of the above interfaces can be
+set to a known value using <i>_TIFFmemset</i>, copied to
+another memory location using <i>_TIFFmemcpy</i>, or
+compared for equality using <i>_TIFFmemcmp</i>. These
+routines conform to the equivalent <small>ANSI</small> C
+routines: <i>memset</i>, <i>memcpy</i>, and <i>memcmp</i>,
+repsectively.</td></table>
+<a name="DIAGNOSTICS"></a>
+<h2>DIAGNOSTICS</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+None.</td></table>
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<i>libtiff</i>(3T), <i>malloc</i>(3C),
+<i>memory</i>(3C)</td></table>
+<hr>
+</body>
+</html>

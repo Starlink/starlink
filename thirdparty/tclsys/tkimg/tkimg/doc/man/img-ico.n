@@ -1,0 +1,86 @@
+'\"
+'\" Generated from file 'img-ico.man' by tcllib/doctools with format 'nroff'
+'\" Copyright (c) 1995-2003 Jan Nijtmans <nijtmans@users.sourceforge.com>
+'\"
+'\" -*- tcl -*- doctools
+'\" -*- tcl -*- doctools = format-header.inc
+.so man.macros
+.TH "img-ico" n 1.3  "Img"
+.BS
+.SH "NAME"
+img-ico \- Img, Windows Icon Format (ico)
+.SH "SYNOPSIS"
+package require \fBTk \fR
+.sp
+package require \fBimg::ico  ?1.3?\fR
+.sp
+\fBimage\fR \fBcreate photo\fR ?\fIname\fR? ?\fIoptions\fR?\fR
+.sp
+.BE
+.SH "DESCRIPTION"
+The package \fBimg::ico\fR is a sub-package of
+\fBImg\fR. It can be loaded as a part of the complete Img support,
+via \fBpackage require Img\fR, or on its own, via
+\fBpackage require img::ico\fR.
+.PP
+Like all packages of \fBImg\fR it does \fInot\fR provide new
+commands, but extends the existing \fBTk\fR command \fBimage\fR so
+that it supports files containing raster images in the
+Windows Icon Format (ico). More specifically
+\fBimg::ico\fR extends \fBTk\fR's \fBphoto\fR
+image type.
+.PP
+The name of the new format handler is \fBico\fR.
+This handler provides new additional configuration options. See
+section \fBICO OPTIONS\fR for more detailed explanations.
+'\" -*- tcl -*- doctools = format-middle.inc
+.PP
+All of the above means that in a call like
+.TP
+\fBimage\fR \fBcreate photo\fR ?\fIname\fR? ?\fIoptions\fR?\fR
+.IP [1]
+Image data in ico format (options \fB-data\fR and \fB-file\fR) is
+detected automatically.
+.IP [2]
+The format name \fBico\fR is recognized by the option \fB-format\fR.
+In addition the value for the option is treated as list and may
+contain any of the special options listed in section
+\fBICO OPTIONS\fR.
+.SH "SUPPORTED ICO TYPES"
+.nf
+  1-bit pixels: Black and White.
+  4-bit pixels: Grayscale or indexed.
+  8-bit pixels: True-color (RGB, each channel 8 bit).
+
+ List of currently supported features:
+
+ Type   |     Read      |     Write     |
+        | -file | -data | -file | -data |
+ ----------------------------------------
+  1-bit | Yes   | Yes   | No    | No    |
+  4-bit | Yes   | Yes   | No    | No    |
+  8-bit | Yes   | Yes   | Yes   | Yes   |
+.fi
+.SH "ICO OPTIONS"
+The handler provides the following options:
+.TP
+\fB-verbose\fR \fIbool\fR
+This option is supported for reading and writing.
+.sp
+If set to \fBtrue\fR, additional information about the loaded/stored image
+is printed to stdout. Default is \fBfalse\fR.
+.TP
+\fB-index\fR \fIn\fR
+This option is supported for reading only.
+.sp
+Read the \fIn\fR'th image. The first image is at index \fB0\fR.
+Default is \fB0\fR.
+'\" -*- tcl -*- doctools = format-footer.inc
+.SH "SEE ALSO"
+img-bmp, img-gif, img-ico, img-intro, img-jpeg, img-pcx, img-pixmap, img-png, img-ppm, img-ps, img-sgi, img-sun, img-tga, img-tiff, img-window, img-xbm, img-xpm
+.SH "KEYWORDS"
+ico, image handling, tk
+.SH "COPYRIGHT"
+.nf
+Copyright (c) 1995-2003 Jan Nijtmans <nijtmans@users.sourceforge.com>
+.fi

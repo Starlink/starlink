@@ -1,0 +1,134 @@
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta name="Content-Style" content="text/css">
+<title>TIFFReadScanline</title>
+</head>
+<body>
+
+<h1 align=center>TIFFReadScanline</h1>
+<a href="#NAME">NAME</a><br>
+<a href="#SYNOPSIS">SYNOPSIS</a><br>
+<a href="#DESCRIPTION">DESCRIPTION</a><br>
+<a href="#NOTES">NOTES</a><br>
+<a href="#RETURN VALUES">RETURN VALUES</a><br>
+<a href="#DIAGNOSTICS">DIAGNOSTICS</a><br>
+<a href="#BUGS">BUGS</a><br>
+<a href="#SEE ALSO">SEE ALSO</a><br>
+
+<hr>
+<!-- Creator     : groff version 1.17.2 -->
+<!-- CreationDate: Mon Dec 22 00:39:25 2003 -->
+<a name="NAME"></a>
+<h2>NAME</h2>
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+TIFFReadScanline - read and decode a scanline of data from an open <small>TIFF</small> file</td></table>
+<a name="SYNOPSIS"></a>
+<h2>SYNOPSIS</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<b>#include &lt;tiffio.h&gt;<br>
+int TIFFReadScanline(TIFF* tif, tdata_t buf, uint32 row,
+tsample_t sample)</b></td></table>
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+Read the data for the specified row into the (user supplied)
+data buffer <i>buf</i>. The data are returned decompressed
+and, in the native byte- and bit-ordering, but are otherwise
+packed (see further below). The buffer must be large enough
+to hold an entire scanline of data. Applications should call
+the routine <i>TIFFScanlineSize</i> to find out the size (in
+bytes) of a scanline buffer. The <i>row</i> parameter is
+always used by <i>TIFFReadScanline</i>; the <i>sample</i>
+parameter is used only if data are organized in separate
+planes (<i>PlanarConfiguration</i>=2).</td></table>
+<a name="NOTES"></a>
+<h2>NOTES</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+The library attempts to hide bit- and byte-ordering
+differences between the image and the native machine by
+converting data to the native machine order. Bit reversal is
+done if the <i>FillOrder</i> tag is opposite to the native
+machine bit order. 16- and 32-bit samples are automatically
+byte-swapped if the file was written with a byte order
+opposite to the native machine byte order,</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+In C++ the <i>sample</i> parameter defaults to
+0.</td></table>
+<a name="RETURN VALUES"></a>
+<h2>RETURN VALUES</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<i>TIFFReadScanline</i> returns -1 if it detects an error;
+otherwise 1 is returned.</td></table>
+<a name="DIAGNOSTICS"></a>
+<h2>DIAGNOSTICS</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+All error messages are directed to the <i>TIFFError</i>(3T)
+routine.</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<b>Compression algorithm does not support random access</b>.
+Data was requested in a non-sequential order from a file
+that uses a compression algorithm and that has
+<i>RowsPerStrip</i> greater than one. That is, data in the
+image is stored in a compressed form, and with multiple rows
+packed into a strip. In this case, the library does not
+support random access to the data. The data should either be
+accessed sequentially, or the file should be converted so
+that each strip is made up of one row of data.</td></table>
+<a name="BUGS"></a>
+<h2>BUGS</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+Reading subsampled YCbCR data does not work correctly
+because, for <i>PlanarConfiguration</i>=2 the size of a
+scanline is not calculated on a per-sample basis, and for
+<i>PlanarConfiguration</i>=1 the library does not unpack the
+block-interleaved samples; use the strip- and tile-based
+interfaces to read these formats.</td></table>
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<i>libtiff</i>(3T), <i>TIFFOpen</i>(3T),
+<i>TIFFReadEncodedStrip</i>(3T),
+<i>TIFFReadRawStrip</i>(3T)</td></table>
+<hr>
+</body>
+</html>

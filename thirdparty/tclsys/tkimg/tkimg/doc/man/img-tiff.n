@@ -1,0 +1,74 @@
+'\"
+'\" Generated from file 'img-tiff.man' by tcllib/doctools with format 'nroff'
+'\" Copyright (c) 1995-2003 Jan Nijtmans <nijtmans@users.sourceforge.com>
+'\"
+'\" -*- tcl -*- doctools
+'\" -*- tcl -*- doctools = format-header.inc
+.so man.macros
+.TH "img-tiff" n 1.3  "Img"
+.BS
+.SH "NAME"
+img-tiff \- Img, Tagged Image File Format (tiff)
+.SH "SYNOPSIS"
+package require \fBTk \fR
+.sp
+package require \fBimg::tiff  ?1.3?\fR
+.sp
+\fBimage\fR \fBcreate photo\fR ?\fIname\fR? ?\fIoptions\fR?\fR
+.sp
+.BE
+.SH "DESCRIPTION"
+The package \fBimg::tiff\fR is a sub-package of
+\fBImg\fR. It can be loaded as a part of the complete Img support,
+via \fBpackage require Img\fR, or on its own, via
+\fBpackage require img::tiff\fR.
+.PP
+Like all packages of \fBImg\fR it does \fInot\fR provide new
+commands, but extends the existing \fBTk\fR command \fBimage\fR so
+that it supports files containing raster images in the
+Tagged Image File Format (tiff). More specifically
+\fBimg::tiff\fR extends \fBTk\fR's \fBphoto\fR
+image type.
+.PP
+The name of the new format handler is \fBtiff\fR.
+This handler provides new additional configuration options. See
+section \fBTIFF OPTIONS\fR for more detailed explanations.
+'\" -*- tcl -*- doctools = format-middle.inc
+.PP
+All of the above means that in a call like
+.TP
+\fBimage\fR \fBcreate photo\fR ?\fIname\fR? ?\fIoptions\fR?\fR
+.IP [1]
+Image data in tiff format (options \fB-data\fR and \fB-file\fR) is
+detected automatically.
+.IP [2]
+The format name \fBtiff\fR is recognized by the option \fB-format\fR.
+In addition the value for the option is treated as list and may
+contain any of the special options listed in section
+\fBTIFF OPTIONS\fR.
+.SH "TIFF OPTIONS"
+The handler provides two options to influence the writing of a TIFF
+image. There are \fIno\fR options to influence the reader.
+.TP
+\fB-compression\fR \fItype\fR
+This option specifies the type of compression to use when writing TIFF
+data. It has to be one of \fBnone\fR, \fBjpeg\fR,
+\fBpackbits\fR, or \fBdeflate\fR. The default is \fBnone\fR.
+.TP
+\fB-byteorder\fR \fItype\fR
+This option specifies the byteorder to use when writing TIFF data. It
+has to be one of \fBbigendian\fR, \fBlittleendian\fR,
+\fBnetwork\fR, \fBsmallendian\fR, or the empty string. The default
+is the empty string.
+.sp
+The values \fBbigendian\fR and \fBnetwork\fR are aliases of each
+other, as are \fBlittleendian\fR and \fBsmallendian\fR.
+'\" -*- tcl -*- doctools = format-footer.inc
+.SH "SEE ALSO"
+img-bmp, img-gif, img-ico, img-intro, img-jpeg, img-pcx, img-pixmap, img-png, img-ppm, img-ps, img-sgi, img-sun, img-tga, img-tiff, img-window, img-xbm, img-xpm
+.SH "KEYWORDS"
+image handling, tiff, tk
+.SH "COPYRIGHT"
+.nf
+Copyright (c) 1995-2003 Jan Nijtmans <nijtmans@users.sourceforge.com>
+.fi

@@ -1,0 +1,53 @@
+'\"
+'\" Generated from file 'img-xpm.man' by tcllib/doctools with format 'nroff'
+'\" Copyright (c) 1995-2003 Jan Nijtmans <nijtmans@users.sourceforge.com>
+'\"
+'\" -*- tcl -*- doctools
+'\" -*- tcl -*- doctools = format-header.inc
+.so man.macros
+.TH "img-xpm" n 1.3  "Img"
+.BS
+.SH "NAME"
+img-xpm \- Img, X Windows Pixmap Format (xpm)
+.SH "SYNOPSIS"
+package require \fBTk \fR
+.sp
+package require \fBimg::xpm  ?1.3?\fR
+.sp
+\fBimage\fR \fBcreate photo\fR ?\fIname\fR? ?\fIoptions\fR?\fR
+.sp
+.BE
+.SH "DESCRIPTION"
+The package \fBimg::xpm\fR is a sub-package of
+\fBImg\fR. It can be loaded as a part of the complete Img support,
+via \fBpackage require Img\fR, or on its own, via
+\fBpackage require img::xpm\fR.
+.PP
+Like all packages of \fBImg\fR it does \fInot\fR provide new
+commands, but extends the existing \fBTk\fR command \fBimage\fR so
+that it supports files containing raster images in the
+X Windows Pixmap Format (xpm). More specifically
+\fBimg::xpm\fR extends \fBTk\fR's \fBphoto\fR
+image type.
+.PP
+The name of the new format handler is \fBxpm\fR.
+This handler does not provide additional configuration options.
+'\" -*- tcl -*- doctools = format-middle.inc
+.PP
+All of the above means that in a call like
+.TP
+\fBimage\fR \fBcreate photo\fR ?\fIname\fR? ?\fIoptions\fR?\fR
+.IP [1]
+Image data in xpm format (options \fB-data\fR and \fB-file\fR) is
+detected automatically.
+.IP [2]
+The format name \fBxpm\fR is recognized by the option \fB-format\fR.
+'\" -*- tcl -*- doctools = format-footer.inc
+.SH "SEE ALSO"
+img-bmp, img-gif, img-ico, img-intro, img-jpeg, img-pcx, img-pixmap, img-png, img-ppm, img-ps, img-sgi, img-sun, img-tga, img-tiff, img-window, img-xbm, img-xpm
+.SH "KEYWORDS"
+image handling, tk, xpm
+.SH "COPYRIGHT"
+.nf
+Copyright (c) 1995-2003 Jan Nijtmans <nijtmans@users.sourceforge.com>
+.fi

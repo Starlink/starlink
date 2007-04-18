@@ -1,0 +1,92 @@
+'\"
+'\" Generated from file 'img-jpeg.man' by tcllib/doctools with format 'nroff'
+'\" Copyright (c) 1995-2003 Jan Nijtmans <nijtmans@users.sourceforge.com>
+'\"
+'\" -*- tcl -*- doctools
+'\" -*- tcl -*- doctools = format-header.inc
+.so man.macros
+.TH "img-jpeg" n 1.3  "Img"
+.BS
+.SH "NAME"
+img-jpeg \- Img, Joint Picture Expert Group format (jpeg)
+.SH "SYNOPSIS"
+package require \fBTk \fR
+.sp
+package require \fBimg::jpeg  ?1.3?\fR
+.sp
+\fBimage\fR \fBcreate photo\fR ?\fIname\fR? ?\fIoptions\fR?\fR
+.sp
+.BE
+.SH "DESCRIPTION"
+The package \fBimg::jpeg\fR is a sub-package of
+\fBImg\fR. It can be loaded as a part of the complete Img support,
+via \fBpackage require Img\fR, or on its own, via
+\fBpackage require img::jpeg\fR.
+.PP
+Like all packages of \fBImg\fR it does \fInot\fR provide new
+commands, but extends the existing \fBTk\fR command \fBimage\fR so
+that it supports files containing raster images in the
+Joint Picture Expert Group format (jpeg). More specifically
+\fBimg::jpeg\fR extends \fBTk\fR's \fBphoto\fR
+image type.
+.PP
+The name of the new format handler is \fBjpeg\fR.
+This handler provides new additional configuration options. See
+section \fBJPEG OPTIONS\fR for more detailed explanations.
+'\" -*- tcl -*- doctools = format-middle.inc
+.PP
+All of the above means that in a call like
+.TP
+\fBimage\fR \fBcreate photo\fR ?\fIname\fR? ?\fIoptions\fR?\fR
+.IP [1]
+Image data in jpeg format (options \fB-data\fR and \fB-file\fR) is
+detected automatically.
+.IP [2]
+The format name \fBjpeg\fR is recognized by the option \fB-format\fR.
+In addition the value for the option is treated as list and may
+contain any of the special options listed in section
+\fBJPEG OPTIONS\fR.
+.SH "JPEG OPTIONS"
+The handler provides six options, two effective when reading from a
+JPEG image, and five influencing the writing of such. One option is
+usable for both reading an writing.
+.TP
+\fB-fast\fR
+This option is for reading from JPEG data. It usage activates a
+processing mode which is fast, but also provides only low-quality
+information.
+.TP
+\fB-grayscale\fR
+This option can be used for both reading and writing of JPEG
+data. Usage of this option forces incoming images to grayscale, and
+written images will be monochrome.
+.TP
+\fB-quality\fR \fIn\fR
+This option is for writing JPEG data. It specifies the compression
+level as a quality percentage. The higher the quality, the less the
+compression. The nominal range for \fIn\fR is
+\fB0\fR...\fB100\fR. Useful values are in the range
+\fB5\fR...\fB95\fR. The default value is \fB75\fR.
+.TP
+\fB-smooth\fR \fIn\fR
+This option is for writing JPEG data. When used the writer will smooth
+the image before performing the compression. Values in the
+\fB10\fR...\fB30\fR are usually enough. The default is \fB0\fR,
+i.e no smoothing.
+.TP
+\fB-optimize\fR
+This option is for writing JPEG data. It usage causes the writer to
+optimize the huffman table used to encode the jpeg coefficients.
+.TP
+\fB-progressive\fR
+This option is for writing JPEG data. It usage causes the creation of
+a \fIprogressive\fR JPEG file.
+'\" -*- tcl -*- doctools = format-footer.inc
+.SH "SEE ALSO"
+img-bmp, img-gif, img-ico, img-intro, img-jpeg, img-pcx, img-pixmap, img-png, img-ppm, img-ps, img-sgi, img-sun, img-tga, img-tiff, img-window, img-xbm, img-xpm
+.SH "KEYWORDS"
+image handling, jpeg, tk
+.SH "COPYRIGHT"
+.nf
+Copyright (c) 1995-2003 Jan Nijtmans <nijtmans@users.sourceforge.com>
+.fi

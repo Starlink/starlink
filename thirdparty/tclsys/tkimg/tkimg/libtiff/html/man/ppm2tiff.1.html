@@ -1,0 +1,123 @@
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta name="Content-Style" content="text/css">
+<title>PPM2TIFF</title>
+</head>
+<body>
+
+<h1 align=center>PPM2TIFF</h1>
+<a href="#NAME">NAME</a><br>
+<a href="#SYNOPSIS">SYNOPSIS</a><br>
+<a href="#DESCRIPTION">DESCRIPTION</a><br>
+<a href="#OPTIONS">OPTIONS</a><br>
+<a href="#SEE ALSO">SEE ALSO</a><br>
+
+<hr>
+<!-- Creator     : groff version 1.17.2 -->
+<!-- CreationDate: Mon Dec 22 00:39:31 2003 -->
+<a name="NAME"></a>
+<h2>NAME</h2>
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+ppm2tiff - create a <small>TIFF</small> file from a <small>PPM</small> image file</td></table>
+<a name="SYNOPSIS"></a>
+<h2>SYNOPSIS</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<b>ppm2tiff</b> [ <i>options</i> ] [ <i>input.ppm</i> ]
+<i>output.tif</i></td></table>
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<i>ppm2tiff</i> converts a file in the <small>PPM</small>
+image format to <small>TIFF.</small> By default, the
+<small>TIFF</small> image is created with data samples
+packed (<i>PlanarConfiguration</i>=1), compressed with the
+Lempel-Ziv &amp; Welch algorithm (<i>Compression</i>=5), and
+with each strip no more than 8 kilobytes. These
+characteristics can be overriden, or explicitly specified
+with the options described below</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+If the <small>PPM</small> file contains greyscale data, then
+the <i>PhotometricInterpretation</i> tag is set to 1
+(min-is-black), otherwise it is set to 2 (RGB).</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+If no <small>PPM</small> file is specified on the command
+line, <i>ppm2tiff</i> will read from the standard
+input.</td></table>
+<a name="OPTIONS"></a>
+<h2>OPTIONS</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<b>-c</b></td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="21%"></td><td width="79%">
+Specify a compression scheme to use when writing image data:
+<b>-c none</b> for no compression, <b>-c packbits</b> for
+the PackBits compression algorithm (the default), <b>-c
+jpeg</b> for the baseline JPEG compression algorithm, <b>-c
+zip</b> for the Deflate compression algorithm, and <b>-c
+lzw</b> for Lempel-Ziv &amp; Welch compression.</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<b>-r</b></td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="21%"></td><td width="79%">
+Write data with a specified number of rows per strip; by
+default the number of rows/strip is selected so that each
+strip is approximately 8 kilobytes.</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<b>-R</b></td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="21%"></td><td width="79%">
+Mark the resultant image to have the specified X and Y
+resolution (in dots/inch).</td></table>
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<i>tiffinfo</i>(1), <i>tiffcp</i>(1), <i>tiffmedian</i>(1),
+<i>libtiff</i>(3)</td></table>
+<hr>
+</body>
+</html>

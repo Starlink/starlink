@@ -1,0 +1,138 @@
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta name="Content-Style" content="text/css">
+<title>TIFFTILE</title>
+</head>
+<body>
+
+<h1 align=center>TIFFTILE</h1>
+<a href="#NAME">NAME</a><br>
+<a href="#SYNOPSIS">SYNOPSIS</a><br>
+<a href="#DESCRIPTION">DESCRIPTION</a><br>
+<a href="#DIAGNOSTICS">DIAGNOSTICS</a><br>
+<a href="#SEE ALSO">SEE ALSO</a><br>
+
+<hr>
+<!-- Creator     : groff version 1.17.2 -->
+<!-- CreationDate: Mon Dec 22 00:39:27 2003 -->
+<a name="NAME"></a>
+<h2>NAME</h2>
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+TIFFTileSize, TIFFTileRowSize, TIFFVTileSize, TIFFDefaultTileSize, TIFFComputeTile, TIFFCheckTile, TIFFNumberOfTiles - tile-related utility routines</td></table>
+<a name="SYNOPSIS"></a>
+<h2>SYNOPSIS</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<pre><b>#include &lt;tiffio.h&gt;
+void TIFFDefaultTileSize(TIFF* tif, uint32* tw, uint32* th)
+tsize_t TIFFTileSize(TIFF* tif)
+tsize_t TIFFTileRowSize(TIFF* tif)
+tsize_t TIFFVTileSize(TIFF* tif, uint32 nrows)
+ttile_t TIFFComputeTile(TIFF* tif, uint32 x, uint32 y, uint32 z, tsample_t sample)
+int TIFFCheckTile(TIFF* tif, uint32 x, uint32 y, uint32 z, tsample_t sample)
+ttile_t TIFFNumberOfTiles(TIFF* tif)
+</b></pre></td></table>
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<i>TIFFDefaultTileSize</i> returns the pixel width and
+height of a reasonable-sized tile; suitable for setting up
+the <i>TileWidth</i> and <i>TileLength</i> tags. If the
+<i>tw</i> and <i>th</i> values passed in are non-zero, then
+they are adjusted to reflect any compression-specific
+requirements. The returned width and height are constrained
+to be a multiple of 16 pixels to conform with the
+<small>TIFF</small> specification.</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<i>TIFFTileSize</i> returns the equivalent size for a tile
+of data as it would be returned in a call to
+<i>TIFFReadTile</i> or as it would be expected in a call to
+<i>TIFFWriteTile</i>.</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<i>TIFFVTileSize</i> returns the number of bytes in a
+row-aligned tile with <i>nrows</i> of data.</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<i>TIFFTileRowSize</i> returns the number of bytes of a row
+of data in a tile.</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<i>TIFFComputeTile</i> returns the tile that contains the
+specified coordinates. A valid tile is always returned;
+out-of-range coordinate values are clamped to the bounds of
+the image. The <i>x</i> and <i>y</i> parameters are always
+used in calculating a tile. The <i>z</i> parameter is used
+if the image is deeper than 1 slice
+(<i>ImageDepth</i>&gt;1). The <i>sample</i> parameter is
+used only if data are organized in separate planes
+(<i>PlanarConfiguration</i>=2).</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<i>TIFFCheckTile</i> returns a non-zero value if the
+supplied coordinates are within the bounds of the image and
+zero otherwise. The <i>x</i> parameter is checked against
+the value of the <i>ImageWidth</i> tag. The <i>y</i>
+parameter is checked against the value of the
+<i>ImageLength</i> tag. The <i>z</i> parameter is checked
+against the value of the <i>ImageDepth</i> tag (if defined).
+The <i>sample</i> parameter is checked against the value of
+the <i>SamplesPerPixel</i> parameter if the data are
+organized in separate planes.</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<i>TIFFNumberOfTiles</i> returns the number of tiles in the
+image.</td></table>
+<a name="DIAGNOSTICS"></a>
+<h2>DIAGNOSTICS</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+None.</td></table>
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<i>libtiff</i>(3T), <i>TIFFReadEncodedTile</i>(3T),
+<i>TIFFReadRawTile</i>(3T), <i>TIFFReadTile</i>(3T),
+<i>TIFFWriteEncodedTile</i>(3T),
+<i>TIFFWriteRawTile</i>(3T),
+<i>TIFFWriteTile</i>(3T)</td></table>
+<hr>
+</body>
+</html>

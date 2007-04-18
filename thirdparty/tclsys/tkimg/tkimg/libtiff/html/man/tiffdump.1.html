@@ -1,0 +1,103 @@
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta name="Content-Style" content="text/css">
+<title>TIFFDUMP</title>
+</head>
+<body>
+
+<h1 align=center>TIFFDUMP</h1>
+<a href="#NAME">NAME</a><br>
+<a href="#SYNOPSIS">SYNOPSIS</a><br>
+<a href="#DESCRIPTION">DESCRIPTION</a><br>
+<a href="#OPTIONS">OPTIONS</a><br>
+<a href="#SEE ALSO">SEE ALSO</a><br>
+
+<hr>
+<!-- Creator     : groff version 1.17.2 -->
+<!-- CreationDate: Mon Dec 22 00:39:35 2003 -->
+<a name="NAME"></a>
+<h2>NAME</h2>
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+tiffdump - print verbatim information about <small>TIFF</small> files</td></table>
+<a name="SYNOPSIS"></a>
+<h2>SYNOPSIS</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<b>tiffdump</b> [ <i>options</i> ] <i>name
+...</i></td></table>
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<i>tiffdump</i> displays directory information from files
+created according to the Tag Image File Format, Revision
+6.0. The header of each <small>TIFF</small> file (magic
+number, version, and first directory offset) is displayed,
+followed by the tag contents of each directory in the file.
+For each tag, the name, datatype, count, and value(s) is
+displayed. When the symbolic name for a tag or datatype is
+known, the symbolic name is displayed followed by it's
+numeric (decimal) value. Tag values are displayed enclosed
+in ``&lt;&gt;'' characters immediately preceded by the value
+of the count field. For example, an <i>ImageWidth</i> tag
+might be displayed as ``ImageWidth (256) SHORT (3)
+1&lt;800&gt;''.</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<i>tiffdump</i> is particularly useful for investigating the
+contents of <small>TIFF</small> files that <i>libtiff</i>
+does not understand.</td></table>
+<a name="OPTIONS"></a>
+<h2>OPTIONS</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<b>-h</b></td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="21%"></td><td width="79%">
+Force numeric data to be printed in hexadecimal rather than
+the default decimal.</td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<b>-o</b></td></table>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="21%"></td><td width="79%">
+Dump the contents of the <small>IFD</small> at the a
+particular file offset. The file offset may be specified
+using the usual C-style syntax; i.e. a leading ``0x'' for
+hexadecimal and a leading ``0'' for octal.</td></table>
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<i>tiffinfo</i>(1), <i>libtiff</i>(3)</td></table>
+<hr>
+</body>
+</html>

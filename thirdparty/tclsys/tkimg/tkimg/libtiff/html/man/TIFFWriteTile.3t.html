@@ -1,0 +1,89 @@
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta name="Content-Style" content="text/css">
+<title>TIFFWriteTile</title>
+</head>
+<body>
+
+<h1 align=center>TIFFWriteTile</h1>
+<a href="#NAME">NAME</a><br>
+<a href="#SYNOPSIS">SYNOPSIS</a><br>
+<a href="#DESCRIPTION">DESCRIPTION</a><br>
+<a href="#RETURN VALUES">RETURN VALUES</a><br>
+<a href="#DIAGNOSTICS">DIAGNOSTICS</a><br>
+<a href="#SEE ALSO">SEE ALSO</a><br>
+
+<hr>
+<!-- Creator     : groff version 1.17.2 -->
+<!-- CreationDate: Mon Dec 22 00:39:30 2003 -->
+<a name="NAME"></a>
+<h2>NAME</h2>
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+TIFFWriteTile - encode and write a tile of data to an open <small>TIFF</small> file</td></table>
+<a name="SYNOPSIS"></a>
+<h2>SYNOPSIS</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<b>#include &lt;tiffio.h&gt;<br>
+tsize_t TIFFWriteTile(TIFF* tif, tdata_t buf, uint32 x,
+uint32 y, uint32 z, tsample_t sample)</b></td></table>
+<a name="DESCRIPTION"></a>
+<h2>DESCRIPTION</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+Write the data for the tile <i>containing</i> the specified
+coordinates. The data in <i>buf</i> are is (potentially)
+compressed, and written to the indicated file, normally
+being appended to the end of the file. The buffer must be
+contain an entire tile of data. Applications should call the
+routine <i>TIFFTileSize</i> to find out the size (in bytes)
+of a tile buffer. The <i>x</i> and <i>y</i> parameters are
+always used by <i>TIFFWriteTile</i>. The <i>z</i> parameter
+is used if the image is deeper than 1 slice
+(<i>ImageDepth</i>&gt;1). The <i>sample</i> parameter is
+used only if data are organized in separate planes
+(<i>PlanarConfiguration</i>=2).</td></table>
+<a name="RETURN VALUES"></a>
+<h2>RETURN VALUES</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<i>TIFFWriteTile</i> returns -1 if it detects an error;
+otherwise the number of bytes in the tile is
+returned.</td></table>
+<a name="DIAGNOSTICS"></a>
+<h2>DIAGNOSTICS</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+All error messages are directed to the <i>TIFFError</i>(3T)
+routine.</td></table>
+<a name="SEE ALSO"></a>
+<h2>SEE ALSO</h2>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cols="2" cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td><td width="90%">
+<i>libtiff</i>(3T), <i>TIFFCheckTile</i>(3T),
+<i>TIFFComputeTile</i>(3T), <i>TIFFOpen</i>(3T),
+<i>TIFFReadTile</i>(3T), <i>TIFFWriteScanline</i>(3T),
+<i>TIFFWriteEncodedTile</i>(3T),
+<i>TIFFWriteRawTile</i>(3T)</td></table>
+<hr>
+</body>
+</html>

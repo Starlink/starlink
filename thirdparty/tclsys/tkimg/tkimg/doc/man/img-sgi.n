@@ -1,0 +1,99 @@
+'\"
+'\" Generated from file 'img-sgi.man' by tcllib/doctools with format 'nroff'
+'\" Copyright (c) 1995-2003 Jan Nijtmans <nijtmans@users.sourceforge.com>
+'\"
+'\" -*- tcl -*- doctools
+'\" -*- tcl -*- doctools = format-header.inc
+.so man.macros
+.TH "img-sgi" n 1.3  "Img"
+.BS
+.SH "NAME"
+img-sgi \- Img, SGI Native Format (sgi)
+.SH "SYNOPSIS"
+package require \fBTk \fR
+.sp
+package require \fBimg::sgi  ?1.3?\fR
+.sp
+\fBimage\fR \fBcreate photo\fR ?\fIname\fR? ?\fIoptions\fR?\fR
+.sp
+.BE
+.SH "DESCRIPTION"
+The package \fBimg::sgi\fR is a sub-package of
+\fBImg\fR. It can be loaded as a part of the complete Img support,
+via \fBpackage require Img\fR, or on its own, via
+\fBpackage require img::sgi\fR.
+.PP
+Like all packages of \fBImg\fR it does \fInot\fR provide new
+commands, but extends the existing \fBTk\fR command \fBimage\fR so
+that it supports files containing raster images in the
+SGI Native Format (sgi). More specifically
+\fBimg::sgi\fR extends \fBTk\fR's \fBphoto\fR
+image type.
+.PP
+The name of the new format handler is \fBsgi\fR.
+This handler provides new additional configuration options. See
+section \fBSGI OPTIONS\fR for more detailed explanations.
+'\" -*- tcl -*- doctools = format-middle.inc
+.PP
+All of the above means that in a call like
+.TP
+\fBimage\fR \fBcreate photo\fR ?\fIname\fR? ?\fIoptions\fR?\fR
+.IP [1]
+Image data in sgi format (options \fB-data\fR and \fB-file\fR) is
+detected automatically.
+.IP [2]
+The format name \fBsgi\fR is recognized by the option \fB-format\fR.
+In addition the value for the option is treated as list and may
+contain any of the special options listed in section
+\fBSGI OPTIONS\fR.
+.SH "SUPPORTED SGI TYPES"
+.nf
+ 24-bit pixels: True-color (RGB, each channel 8 bit).
+ 32-bit pixels: True-color with alpha channel (RGBA, each channel 8 bit).
+ 48-bit pixels: True-color (RGB, each channel 16 bit).
+ 64-bit pixels: True-color with alpha channel (RGBA, each channel 16 bit).
+
+ List of currently supported features:
+
+ Type   |     Read      |     Write     |
+        | -file | -data | -file | -data |
+ ----------------------------------------
+ 24-bit | Yes   | Yes*  | Yes   | Yes*  |
+ 32-bit | Yes   | Yes*  | Yes   | Yes*  |
+ 48-bit | Yes   | Yes*  | No    | No    |
+ 64-bit | Yes   | Yes*  | No    | No    |
+
+ *: Implemented by reading/writing from/to a temporary file. This will
+    be slow for larger images.
+
+ All images types may be either uncompressed or run-length encoded.
+.fi
+.SH "SGI OPTIONS"
+The handler provides the following options:
+.TP
+\fB-verbose\fR \fIbool\fR
+This option is supported for reading and writing.
+.sp
+If set to \fBtrue\fR, additional information about the loaded/stored image
+is printed to stdout. Default is \fBfalse\fR.
+.TP
+\fB-compression\fR \fItype\fR
+This option is supported for writing only.
+.sp
+Set the compression mode to either \fBnone\fR or \fBrle\fR.
+Default is \fBrle\fR.
+.TP
+\fB-matte\fR \fIbool\fR
+This option is supported for reading and writing.
+.sp
+If set to \fBfalse\fR, a matte (alpha) channel is ignored
+during reading or writing. Default is \fBtrue\fR.
+'\" -*- tcl -*- doctools = format-footer.inc
+.SH "SEE ALSO"
+img-bmp, img-gif, img-ico, img-intro, img-jpeg, img-pcx, img-pixmap, img-png, img-ppm, img-ps, img-sgi, img-sun, img-tga, img-tiff, img-window, img-xbm, img-xpm
+.SH "KEYWORDS"
+image handling, sgi, tk
+.SH "COPYRIGHT"
+.nf
+Copyright (c) 1995-2003 Jan Nijtmans <nijtmans@users.sourceforge.com>
+.fi
