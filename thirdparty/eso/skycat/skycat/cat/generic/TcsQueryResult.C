@@ -20,7 +20,7 @@ using namespace std;
 #include <fstream>
 #include <cstring>
 #include "error.h"
-#include "WorldCoords.hxx"
+#include "WorldCoords.h"
 #include "TcsQueryResult.h"
 
 
