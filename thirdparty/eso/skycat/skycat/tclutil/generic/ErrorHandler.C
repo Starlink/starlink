@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: ErrorHandler.C,v 1.5 2005/02/02 01:43:02 brighton Exp $"
+ * "@(#) $Id: ErrorHandler.C,v 1.1.1.1 2006/01/12 16:41:02 abrighto Exp $"
  *
  * ErrorHandler.C - class definitions for catching X errors in Tk
  * 
@@ -11,7 +11,7 @@
  * Allan Brighton  05/10/95  Created
  * pbiereic        17/02/03  Added 'using namespace std'. Removed ::std specs.
  */
-static const char* const rcsId="@(#) $Id: ErrorHandler.C,v 1.5 2005/02/02 01:43:02 brighton Exp $";
+static const char* const rcsId="@(#) $Id: ErrorHandler.C,v 1.1.1.1 2006/01/12 16:41:02 abrighto Exp $";
 
 
 

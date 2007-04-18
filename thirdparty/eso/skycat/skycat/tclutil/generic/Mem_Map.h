@@ -3,7 +3,7 @@
 #define MEM_MAP_H
 /*
  * E.S.O. - VLT project 
- * $Id: Mem_Map.h,v 1.2 2005/02/02 01:43:01 brighton Exp $
+ * $Id: Mem_Map.h,v 1.1.1.1 2006/01/12 16:41:01 abrighto Exp $
  *
  * Mem_Map.h - utility class wrapper for mmap(2), Author: Doug Schmidt
  *             (ripped from ACE C++ library for use in OCS by K. Gillies, 
@@ -42,12 +42,14 @@ extern "C" {
 #define MS_SYNC 0
 #endif
 
+/*
 #ifdef NEED_MMAP_PROTO
 extern "C" {
 extern caddr_t mmap(caddr_t, size_t, int, int, int, off_t);
 extern int munmap(caddr_t, size_t);
 }
 #endif
+*/
 
 // MMAP additional flags
 #define PROT_RDWR (PROT_READ|PROT_WRITE)

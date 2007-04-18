@@ -5,7 +5,7 @@
  *
  * E.S.O. - VLT project
  *
- * $Id: define.h,v 1.2 2005/02/02 01:43:01 brighton Exp $
+ * $Id: define.h,v 1.2 2006/01/18 17:56:53 abrighto Exp $
  *
  * define.h - common definitions
  * 
@@ -19,7 +19,7 @@
 
 #include <arpa/inet.h>
 #include <netinet/in.h>
-#include "config.h"
+#include <arpa/inet.h>
 
 // Byte swap defines. On little Endian machines we use the network-to-host
 // routines since they are faster (implemented in assembler code).

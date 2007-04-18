@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: Mem.C,v 1.4 2005/02/02 01:43:00 brighton Exp $" 
+ * "@(#) $Id: Mem.C,v 1.1.1.1 2006/01/12 16:41:00 abrighto Exp $" 
  *
  * Mem.C - method definitions for class Mem, for managing memory
  *         areas with or without shared memory.
@@ -24,7 +24,7 @@
  *                 04/04/06  Added "refcnt" member so that owner can control
  *                           when to release memory.
  */
-static const char* const rcsId="@(#) $Id: Mem.C,v 1.4 2005/02/02 01:43:00 brighton Exp $";
+static const char* const rcsId="@(#) $Id: Mem.C,v 1.1.1.1 2006/01/12 16:41:00 abrighto Exp $";
 
 #include <cstdlib>
 #include <cstring>
@@ -36,6 +36,9 @@ static const char* const rcsId="@(#) $Id: Mem.C,v 1.4 2005/02/02 01:43:00 bright
 #include <sys/shm.h>
 #include <sys/sem.h>
 #include "error.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include "define.h"
 #include "util.h"
 #include "Mem.h"

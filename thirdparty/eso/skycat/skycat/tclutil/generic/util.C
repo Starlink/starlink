@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: util.C,v 1.3 2005/02/02 01:43:00 brighton Exp $" 
+ * "@(#) $Id: util.C,v 1.1.1.1 2006/01/12 16:41:04 abrighto Exp $" 
  *
  * util.C - utility routines
  * 
@@ -14,7 +14,7 @@
  *                            available, rather than just last '.'. 
  * pbiereic        17/02/03   Added 'using namespace std'.
  */
-static const char* const rcsId="@(#) $Id: util.C,v 1.3 2005/02/02 01:43:00 brighton Exp $";
+static const char* const rcsId="@(#) $Id: util.C,v 1.1.1.1 2006/01/12 16:41:04 abrighto Exp $";
 
 
 #include <stdio.h>
@@ -35,6 +35,9 @@ static const char* const rcsId="@(#) $Id: util.C,v 1.3 2005/02/02 01:43:00 brigh
 #include <arpa/inet.h>
 #include <string.h>
 #include "error.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include "define.h"
 
 using namespace std;

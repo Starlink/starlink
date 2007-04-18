@@ -1,6 +1,6 @@
 /*
  * TclCommand.C - base class definitions for tcl command classes
- * "@(#) $Id: TclCommand.C,v 1.7 2005/02/02 01:43:02 brighton Exp $"
+ * "@(#) $Id: TclCommand.C,v 1.1.1.1 2006/01/12 16:40:59 abrighto Exp $"
  * 
  * See the man page for a complete description.
  * 
@@ -9,7 +9,7 @@
  * pbiereic        17/02/03  Added 'using namespace std'. Removed ::std specs.
  *
  */
-static const char* const rcsId="@(#) $Id: TclCommand.C,v 1.7 2005/02/02 01:43:02 brighton Exp $";
+static const char* const rcsId="@(#) $Id: TclCommand.C,v 1.1.1.1 2006/01/12 16:40:59 abrighto Exp $";
 
 #include "config.h" // tclutil
 
@@ -18,7 +18,9 @@ static const char* const rcsId="@(#) $Id: TclCommand.C,v 1.7 2005/02/02 01:43:02
 #include <sstream>
 #include <cerrno>
 #include <cstring>
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 #include "error.h"
 #include "TclCommand.h"
 
