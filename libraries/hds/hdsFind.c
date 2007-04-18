@@ -29,7 +29,7 @@
  *     02111-1307, USA
 
  *   Authors:
- *      PWD: Peter W. Draper, Starlink - University of Durham
+ *      PWD: Peter W. Draper, JAC - University of Durham
 
  *   History:
  *      17-APR-2007 (PWD):
@@ -38,7 +38,11 @@
  *-
  */
 
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
 
+#include "hds1.h"
 #include "hds.h"
 #include "hds_fortran.h"
 #include "f77.h"
