@@ -56,7 +56,7 @@
 #include <X11/Xutil.h>
 
 #include "error.h"
-#include "WorldCoords.hxx"
+#include "WorldCoords.h"
 #include "ImageColor.h"
 #include "ImageDisplay.h"
 #include "ImageData.h"
