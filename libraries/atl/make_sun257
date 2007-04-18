@@ -1,12 +1,16 @@
 #!/bin/csh
-set ff = " "
+
+rm -f atl_routines.tex sun257.tex
+touch atl_routines.tex
+
 foreach n (atl_*.f)
    if( $n != "atl_test.f" ) then
-      set ff = "$ff $n"
+      $STARCONF_DEFAULT_STARLINK/bin/sst/prolat $n out=head \
+                               noatask nodocument single nopage
+      cat head >> atl_routines.tex
+      rm head
    endif
 end
-rm -f atl_routines.tex sun257.tex
-$STARCONF_DEFAULT_STARLINK/bin/sst/prolat \"$ff\" out=atl_routines.tex \
-                               noatask nodocument single nopage
+
 cat sun_head.tex atl_routines.tex sun_tail.tex > sun257.tex
 
