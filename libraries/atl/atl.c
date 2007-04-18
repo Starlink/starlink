@@ -354,3 +354,52 @@ void atlPtfts( AstFitsChan *this, const char *name,
    return;
 }
 
+
+F77_SUBROUTINE(atl_tolut)( INTEGER(INMAP), 
+                           DOUBLE(XLO),
+                           DOUBLE(XHI),
+                           DOUBLE(DX),
+                           INTEGER(OUTMAP),
+                           INTEGER(STATUS) );
+
+void atlTolut( AstMapping *inmap, double xlo, double xhi, double dx,
+               AstMapping **outmap, int *status ){
+
+   DECLARE_INTEGER(INMAP);
+   DECLARE_DOUBLE(XLO);
+   DECLARE_DOUBLE(XHI);
+   DECLARE_DOUBLE(DX);
+   DECLARE_INTEGER(OUTMAP);
+   DECLARE_INTEGER(STATUS);
+   int ioutmap;
+
+   F77_EXPORT_INTEGER( astP2I( inmap ), INMAP );
+
+   if( !astOK ) return;
+
+   F77_EXPORT_DOUBLE( xlo, XLO );
+   F77_EXPORT_DOUBLE( xhi, XHI );
+   F77_EXPORT_DOUBLE( dx, DX );
+
+   F77_CALL(atl_tolut)( INTEGER_ARG(&INMAP),
+                        DOUBLE_ARG(&XLO),
+                        DOUBLE_ARG(&XHI),
+                        DOUBLE_ARG(&DX),
+                        INTEGER_ARG(&OUTMAP),
+                        INTEGER_ARG(&STATUS) );
+
+   if( astOK ) {
+      F77_IMPORT_INTEGER( OUTMAP, ioutmap );
+      *outmap = astI2P( ioutmap );
+   } else {
+      *outmap = AST__NULL;
+   }      
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
+
+
+
+
