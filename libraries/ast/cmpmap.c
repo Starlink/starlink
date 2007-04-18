@@ -121,6 +121,11 @@ f     The CmpMap class does not define any new routines beyond those
 *     23-AUG-2006 (DSB):
 *        - In Simplify, add checks for re-appearance of a Mapping that is
 *        already being simplified at a higher levelin the call stack.
+*     18-APR-2007 (DSB):
+*        In Simplify: if the returned Mapping is not a CmpMap, always copy 
+*        the returned component Mapping (rather than cloning it) so that 
+*        the returned Mapping is not affected if user code subsequently 
+*        inverts the component Mapping via some other pointer.
 
 *class--
 */
@@ -2453,22 +2458,19 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    (because we must not modify the Mapping itself. */
          if ( nmap == 1 ) {
 
-/* Test if the Mapping already has the Invert attribute value we
-   want. If so, we are lucky and can simply clone a pointer to it. */
-           if ( invert_list[ 0 ] == astGetInvert( map_list[ 0 ] ) ) {
-               result = astClone( map_list[ 0 ] );
-
-/* If not, we must make a copy. */
-           } else {
-               result = astCopy( map_list[ 0 ] );
+/* We must make a copy. Cloning is no good (even if the Mapping already
+   has the Invert attribute value we want), since we want the returned
+   Mapping to be independent of the original component Mappings, so that
+   if user code inverts a component Mapping (via some other pre-existing 
+   pointer), the returned simplified Mapping is not affected. */
+            result = astCopy( map_list[ 0 ] );
 
 /* Either clear the copy's Invert attribute, or set it to 1, as
    required. */
-              if ( invert_list[ 0 ] ) {
-                  astSetInvert( result, 1 );
-               } else {
-                  astClearInvert( result );
-               }
+            if ( invert_list[ 0 ] ) {
+               astSetInvert( result, 1 );
+            } else {
+               astClearInvert( result );
             }
 
 /* If the simplified Mapping sequence has more than one element, the
