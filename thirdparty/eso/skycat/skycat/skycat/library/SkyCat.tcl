@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# "@(#) $Id: SkyCat.tcl,v 1.2 2005/01/20 23:04:30 brighton Exp $"
+# "@(#) $Id: SkyCat.tcl,v 1.5 2006/02/02 18:34:51 abrighto Exp $"
 #
 # SkyCat.tcl - image display application class with catalog extensions
 #
@@ -55,11 +55,11 @@ Options:
 
 set about_skycat "\
 Skycat version $skycat_version
-Copyright (C) 1996-2001 ESO - European Southern Observatory
+Copyright (C) 1996-2006 ESO - European Southern Observatory
 
 Authors: 
 
-Allan Brighton (abrighton@gemini.edu)
+Allan Brighton (abrighto@eso.org)
 Thomas Herlin (therlin@eso.org)
 Miguel Albrecht (malbrech@eso.org)
 Daniel Durand (durand@dao.nrc.ca)
@@ -67,7 +67,7 @@ Peter Biereichel (pbiereic@eso.org)
 
 Please send any comments, suggestions or bug reports to:
 
-Allan Brighton (abrighton@gemini.edu)
+Allan Brighton (abrighto@eso.org)
 "
 
 itk::usual SkyCat {}
@@ -99,10 +99,11 @@ itcl::class skycat::SkyCat {
     # called after the options have been evaluated
     
     protected method init {} {
+	global ::skycat_version
 	Rtd::init
 
 	load_toplevel_geometry
-	wm title $w_ "Skycat - version [skycat_version] ($itk_option(-number))"
+	wm title $w_ "Skycat - version $skycat_version ($itk_option(-number))"
 	wm iconname $w_ 
 	feedback "catalog and help menu..."
 	
@@ -228,8 +229,8 @@ itcl::class skycat::SkyCat {
 	    Rtd::add_realtime_menu
 	} else {
 	    # hide the realtime status
-	    [[$itk_component(image) component info] component cameraStatus] config \
-		-width 0 -height 0
+	    #[[$itk_component(image) component info] component cameraStatus] config \
+		#-width 0 -height 0
 	}
     }
 
@@ -305,7 +306,7 @@ itcl::class skycat::SkyCat {
 
 	add_menuitem $m command "Help..." \
 	    {Display information about Skycat in netscape (if netscape is available)} \
-	    -command [code $itk_component(image) send_to_netscape $itk_option(-help_url)]
+	    -command [code $itk_component(image) send_to_browser $itk_option(-help_url)]
 
 	add_short_help $itk_component(menubar).help \
 	    {Help menu: display information about this application}
@@ -388,7 +389,7 @@ itcl::class skycat::SkyCat {
     protected method make_init_window {} {
 	global ::about_skycat ::skycat_library
 	
-	set skycat_logo [image create pixmap -id skycat_logo]
+	set skycat_logo [image create photo -file $skycat_library/skycat-logo.xpm]
 
 	set w [util::TopLevelWidget $w_.init -center 1]
 	#catch {rtd_set_cmap $w}
@@ -488,6 +489,9 @@ itcl::class skycat::SkyCat {
     public proc startSkyCat {} {
 	global ::rtd_library ::skycat_library ::skycat_usage ::tk_strictMotif \
 	    ::argv ::argc ::env
+
+	# print errors also on stderr
+	utilPrintErrors
 
 	if {! [info exists rtd_library]} {
 	    set rtd_library .

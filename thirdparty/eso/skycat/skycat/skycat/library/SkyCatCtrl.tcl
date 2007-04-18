@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# $Id: SkyCatCtrl.tcl,v 1.1.1.1 2002/04/04 20:11:54 brighton Exp $
+# $Id: SkyCatCtrl.tcl,v 1.3 2006/02/02 18:34:51 abrighto Exp $
 #
 # SkyCatCtrl.tcl - image display widget with catalog extensions
 #
@@ -49,8 +49,8 @@ itcl::class skycat::SkyCatCtrl {
     # and the name of the image is in the global var skycat_logo.
 
     protected method display_logo {} {
-	global ::about_skycat
-	set skycat_logo [tix getimage skycat_logo]
+	global ::about_skycat ::skycat_library
+	set skycat_logo [image create photo -file $skycat_library/skycat-logo.xpm]
 
 	# center logo
 	$canvas_ config -scrollregion "0 0 1 1"
@@ -88,8 +88,8 @@ itcl::class skycat::SkyCatCtrl {
     # display a popup window with information about this application
     
     public method about {} {
-	global ::about_skycat
-	set skycat_logo [tix getimage skycat_logo]
+	global ::about_skycat ::skycat_library
+	set skycat_logo [image create photo -file $skycat_library/skycat-logo.xpm]
 
 	DialogWidget $w_.about \
 	    -image $skycat_logo \
@@ -100,13 +100,17 @@ itcl::class skycat::SkyCatCtrl {
     }
 
     
-    # send a URL to be displayed by netscape
+    # send a URL to be displayed by a web browser (firefox, mozila, netscape)
 
-    public method send_to_netscape {url} {
-	if {[catch {exec netscape -remote "openURL($url)"} msg1]} {
-	    if {! [string match $msg1 "netscape: warning"]} {
-		if {[catch {exec netscape $url &} msg2]} {
-		    warning_dialog "couldn't start netscape: $msg1"
+    public method send_to_browser {url} {
+	if {"[exec uname]" == "Darwin"} {
+	    if {[catch {exec open $url}]} {
+		warning_dialog "Could not open $url"
+	    }
+	} elseif {[catch {exec firefox $url &}]} {
+	    if {[catch {exec mozilla $url &}]} {
+		if {[catch {exec netscape $url &}]} {
+		    warning_dialog "Could not start web browser to view $url"
 		}
 	    }
 	}
@@ -158,9 +162,10 @@ itcl::class skycat::SkyCatCtrl {
     # of the file being displayed
 
     protected method update_title {} {
+	global ::skycat_version
 	set file "[file tail $itk_option(-file)]"
 	set w [winfo toplevel $w_]
-	wm title $w "Skycat - version [skycat_version]: $file ([$w cget -number])"
+	wm title $w "Skycat - version $skycat_version: $file ([$w cget -number])"
 	wm iconname $w $file
     }
 
