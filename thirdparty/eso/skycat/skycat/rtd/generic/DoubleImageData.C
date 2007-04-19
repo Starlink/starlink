@@ -97,7 +97,7 @@ void DoubleImageData::initShortConversion()
 // return true is the value x is a NAN (define to 0 for non-float types)
 #define ISNAN(x) isnan(x)
 
-#include "ImageTemplates.C"
+#include "ImageTemplates.icc"
 #undef CLASS_NAME
 #undef DATA_TYPE
 #undef NTOH
