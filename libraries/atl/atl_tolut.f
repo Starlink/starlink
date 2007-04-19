@@ -42,7 +42,7 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
