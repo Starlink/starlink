@@ -11,8 +11,6 @@
  */
 static const char* const rcsId="@(#) $Id: TclCommand.C,v 1.1.1.1 2006/01/12 16:40:59 abrighto Exp $";
 
-#include "config.h" // tclutil
-
 #include <cstdlib>
 #include <iostream>
 #include <sstream>

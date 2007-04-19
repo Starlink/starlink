@@ -66,7 +66,7 @@ private:
     // extend the size of the FITS header by one header block 
     int extendHeader();
 
-    static void* FitsIO::reallocFile(void* p, size_t newsize);
+    static void* reallocFile(void* p, size_t newsize);
 
 protected:   
     // Check that this object represents a FITS file (and not just some kind of memory)
@@ -128,7 +128,7 @@ public:
     static FitsIO* read(const char* filename, int memOptions = 0);
 
     // write the data to a FITS file 
-    int write(const char *filename) const;
+    int write(const char *filename);
 
     // compress or decompress the given file and return the new filename
     // see comments in source file for details.

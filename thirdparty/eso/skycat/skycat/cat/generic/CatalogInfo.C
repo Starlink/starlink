@@ -132,8 +132,6 @@
  */
 static const char* const rcsId="@(#) $Id: CatalogInfo.C,v 1.1.1.1 2006/01/12 16:36:24 abrighto Exp $";
 
-#include "config.h"  //  From skycat util
-
 using namespace std;
 #include <unistd.h>
 #include <cstdlib>

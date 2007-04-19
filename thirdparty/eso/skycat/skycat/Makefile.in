@@ -9,7 +9,7 @@ subdirs = tclutil astrotcl rtd cat skycat
 
 # Note: add --enable-merge if you want to merge object files into the 
 # skycat, rtd and cat shared libraries (for backward compatibility)
-CONFIGURE = configure --prefix=$(prefix) --exec_prefix=$(exec_prefix)
+CONFIGURE = ./configure --prefix=$(prefix) --exec_prefix=$(exec_prefix)
 
 all install clean: FORCE
 	@set -x; for i in $(subdirs); do (cd $$i && $(MAKE) $@ || exit 1) done

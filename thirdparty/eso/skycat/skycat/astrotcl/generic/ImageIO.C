@@ -22,7 +22,9 @@ static const char* const rcsId="@(#) $Id: ImageIO.C,v 1.2 2006/01/18 17:56:53 ab
 #include <arpa/inet.h>
 #include <cmath>
 #include <cstdlib>
+#if HAVE_CONFIG_H
 #include "config.h"
+#endif
 #include "error.h"
 #include "ImageIO.h"
 #include "fitsio2.h"

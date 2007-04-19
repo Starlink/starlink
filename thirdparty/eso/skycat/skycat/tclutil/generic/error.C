@@ -22,8 +22,6 @@
  */
 static const char* const rcsId="@(#) $Id: error.C,v 1.1.1.1 2006/01/12 16:41:03 abrighto Exp $";
 
-#include "config.h"  // tclutil
-
 #include <cstdarg>
 #include <cstdlib>
 #include <iostream>
