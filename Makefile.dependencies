@@ -2052,6 +2052,12 @@ $(MANIFESTS)/tk: \
 	  && $(CONFIG_CPT) \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/tkimg: \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk
+	cd thirdparty/tclsys/tkimg \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/trn: \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \

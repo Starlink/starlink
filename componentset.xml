@@ -4131,4 +4131,24 @@ and some distortion.
   </developers>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
+
+<component id="tkimg" support="U">
+  <version>1.3.0</version>
+  <path>thirdparty/tclsys/tkimg</path>
+  <description>TkImg</description>
+  <dependencies >
+    <build>tcl</build><build>tk</build>
+  </dependencies>
+  <developers>
+    <!-- TkImg is maintained on sourceforge, but this part of the tree
+         is maintained by... -->
+    <person>
+      <name>Peter W Draper</name>
+      <uname>pwd</uname>
+      <email>p.w.draper@durham.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
 </componentset>
