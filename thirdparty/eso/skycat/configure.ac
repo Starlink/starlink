@@ -13,7 +13,6 @@ STAR_DEFAULTS
 
 dnl    Declare dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [skycat-tclutil skycat-astrotcl skycat-cat skycat-rtd], link)
-STAR_DECLARE_DEPENDENCIES([configure], [skycat-tclutil])
 
 dnl    To configure run ./configure in the subdirectory.
 dnl    Do not invoke AC_CONFIG_SUBDIRS, since that prompts autoreconf
