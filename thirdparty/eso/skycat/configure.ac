@@ -26,7 +26,7 @@ dnl    it's allowed to play there, too.
 
 STAR_SPECIAL_INSTALL_COMMAND([
     cd skycat;
-    $(MAKE) INSTALL_ROOT=$$DESTDIR install])
+    $(MAKE) DESTDIR=$$DESTDIR install])
 
 AC_CONFIG_FILES([Makefile component.xml])
 
