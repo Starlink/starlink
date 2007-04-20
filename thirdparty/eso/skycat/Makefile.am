@@ -4,12 +4,12 @@
 RECURSIVE_TARGETS = all clean
 
 $(RECURSIVE_TARGETS):
-	cd rtd; $(MAKE) $@
+	cd skycat; $(MAKE) $@
 
 ##  Need all the source code in the subdirectories for a distribution.
-EXTRA_DIST = rtd
+EXTRA_DIST = skycat
 
-subdirs = rtd
+subdirs = skycat
 
 ##  Before distributing subdirectories we need to clean then up (we get all
 ##  the files in these directories). Also remove the CVS trace and any
@@ -17,4 +17,4 @@ subdirs = rtd
 dist-hook:
 	rm -rf `find $(distdir) -type d -name CVS`
 	rm -rf `find $(distdir) -type l`
-	(cd $(distdir)/rtd; make distclean)
+	(cd $(distdir)/skycat; make distclean)

@@ -2,13 +2,13 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="skycat-rtd" support="U">
+<component id="skycat" support="U">
   <version>3.0.1</version>
-  <path>thirdparty/eso/rtd</path>
-  <description>The rtd component of skycat</description>
+  <path>thirdparty/eso/skycat/skycat</path>
+  <description>The main skycat component</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies >
-    <build option='link'>skycat-tclutil</build><build option='link'>skycat-astrotcl</build><configure>skycat-tclutil</configure>
+    <build option='link'>skycat-tclutil</build><build option='link'>skycat-astrotcl</build><build option='link'>skycat-cat</build><build option='link'>skycat-rtd</build><configure>skycat-tclutil</configure>
   </dependencies>
   <developers>
     <person>

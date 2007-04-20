@@ -1,7 +1,7 @@
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
-AC_INIT(skycat-rtd, 3.0.1, ussc@star.rl.ac.uk)
+AC_INIT(skycat, 3.0.1, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -12,7 +12,7 @@ dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
 
 dnl    Declare dependencies for this package
-STAR_DECLARE_DEPENDENCIES([build], [skycat-tclutil skycat-astrotcl], link)
+STAR_DECLARE_DEPENDENCIES([build], [skycat-tclutil skycat-astrotcl skycat-cat skycat-rtd], link)
 STAR_DECLARE_DEPENDENCIES([configure], [skycat-tclutil])
 
 dnl    To configure run ./configure in the subdirectory.
@@ -20,13 +20,13 @@ dnl    Do not invoke AC_CONFIG_SUBDIRS, since that prompts autoreconf
 dnl    to try to reconfigure that directory, and automake to assume 
 dnl    it's allowed to play there, too.
 (
-    cd rtd
+    cd skycat
     echo ./configure --prefix=$prefix --cache-file=config.cache
     ./configure --prefix=$prefix --cache-file=config.cache
 )
 
 STAR_SPECIAL_INSTALL_COMMAND([
-    cd rtd;
+    cd skycat;
     $(MAKE) INSTALL_ROOT=$$DESTDIR install])
 
 AC_CONFIG_FILES([Makefile component.xml])
