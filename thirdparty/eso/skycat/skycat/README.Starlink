@@ -3,7 +3,7 @@ Starlink system. The various sub-packages (astrotcl, cat, rtd, skycat and
 tclutil) are imported separately to the "ESO" thirdparty branch and have
 starconf wrappers in the immediate sub-directories. This directory is mostly
 the original top-level directory, except the build system is replaced, again
-to work with out build system.
+to work with our build system.
 
 Note that this is not Skycat official and various small-level changes have
 been made that support GAIA, if you want the official Skycat go to the ESO
