@@ -122,21 +122,25 @@ collate: all
 			pkglibdir=$$here/Img/exec_prefix/lib/Img	\
 			;						\
 		cd $$here ; \
-		cat Img/exec_prefix/lib/Img/pkgIndex.tcl >> pkgIndex.tcl ; \
+		cat $$DESTDIR/$$here/Img/exec_prefix/lib/Img/pkgIndex.tcl >> pkgIndex.tcl ; \
 	done
-	mv pkgIndex.tcl Img/exec_prefix/lib/Img/pkgIndex.tcl
+	here=`pwd` ;\
+	cp pkgIndex.tcl $$DESTDIR/$$here/Img/exec_prefix/lib/Img/pkgIndex.tcl
 
 install: collate
-	mkdir -p    $(INSTALL_ROOT)$(LIB_RUNTIME_DIR)
-	for p in Img/exec_prefix/lib/Img/* ; do \
+	here=`pwd` ;\
+	mkdir -p    $(INSTALL_ROOT)$(LIB_RUNTIME_DIR) ;\
+	for p in $$DESTDIR/$$here/Img/exec_prefix/lib/Img/* ; do \
 		$(INSTALL_PROGRAM) $$p $(INSTALL_ROOT)$(LIB_RUNTIME_DIR)/`basename $$p` ; \
 	done
-	mkdir -p $(INSTALL_ROOT)$(libdir)
-	for p in Img/exec_prefix/lib/*.sh ; do \
+	here=`pwd` ;\
+	mkdir -p $(INSTALL_ROOT)$(libdir) ;\
+	for p in $$DESTDIR/$$here/Img/exec_prefix/lib/*.sh ; do \
 		$(INSTALL_PROGRAM) $$p $(INSTALL_ROOT)$(libdir)/`basename $$p` ; \
 	done
-	mkdir -p $(INSTALL_ROOT)$(includedir)
-	for p in Img/prefix/include/* ; do \
+	here=`pwd` ;\
+	mkdir -p $(INSTALL_ROOT)$(includedir) ;\
+	for p in $$DESTDIR/$$here/Img/prefix/include/* ; do \
 		$(INSTALL_PROGRAM) $$p $(INSTALL_ROOT)$(includedir)/`basename $$p` ; \
 	done
 
