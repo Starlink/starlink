@@ -35,7 +35,13 @@
 static char* rcsId="@(#) $Id: tkCanvasPsImage.c,v 1.2 2005/02/02 01:43:02 brighton Exp $";
 
 #include <stdio.h>
+#ifdef HAVE_TKCANVAS_H
 #include "tkCanvas.h"
+#else
+// The structure we need hasn't changed for a long time, so just include a local copy.
+#include "tkCanvas.h-tk8.4.11"
+#define HAVE_TKCANVAS_H 
+#endif
 
 /* Local prototypes */
 static int ImageToPostscript( Tcl_Interp *interp, Tk_Canvas canvas,
