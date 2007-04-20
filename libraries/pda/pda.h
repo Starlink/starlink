@@ -67,5 +67,5 @@ void pdaSumsl( int, double *, double *,
 void pdaDeflt( int, int *, int, int, double * );
 float pdaRand( void );
 float pdaRnnor( float, float );
-
+double pdaD1mach( int );
 #endif

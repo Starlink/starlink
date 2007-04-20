@@ -85,7 +85,7 @@ pda_reldst.f pda_sumsl.f pda_wzbfgs.f pda_humit.f pda_ltvmul.f 	       \
 pda_rmdcon.f pda_humsl.f pda_lupdat.f pda_sgrad2.f pda_v2norm.f	       \
 pda_assst.f
 
-C_ROUTINES = pda.c
+C_ROUTINES = pda.c pdaD1mach.c
 
 
 PUBLIC_F_INCLUDES = 

@@ -23,6 +23,7 @@
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2007 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -43,6 +44,7 @@
 
 *  Authors:
 *     DSB: David S Berry
+*     PWD: Peter W. Draper
 *     {enter_new_authors_here}
 
 *  History:
@@ -50,6 +52,8 @@
 *        Original version.
 *     31-OCT-2005 (DSB):
 *        Added pdaRand and pdaRnnor.
+*     20-APR-2007 (PWD):
+*        Added pda_d1mach.
 *     {enter_further_changes_here}
 
 *-
@@ -260,4 +264,15 @@ void pdaDeflt( int alg, int *iv, int liv, int lv, double *v){
 
    return;
 }
+
+/* Fortran access to C routines */
+/* ============================ */
+
+F77_DOUBLE_FUNCTION(pda_d1mach_c)( INTEGER(i) ) {
+    GENPTR_INTEGER(i)
+    F77_DOUBLE_TYPE(result);
+    result = pdaD1mach( *i );
+    return result;
+}
+
 
