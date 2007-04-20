@@ -1,9 +1,9 @@
-builtin(include,../tclconfig/tcl.m4)
+builtin(include,../../tclconfig/tcl.m4)
 
 AC_DEFUN(CAT_CONFIG, [
 
 # Load the Tclutil definitions
-cf=../tclutil/tclutilConfig.sh
+cf=../../tclutil/tclutil/tclutilConfig.sh
 if test -f $cf ; then
     . $cf
     AC_SUBST(tclutil_VERSION)
@@ -19,7 +19,7 @@ else
 fi
 
 # Load the Astrotcl definitions
-cf=../astrotcl/astrotclConfig.sh
+cf=../../astrotcl/astrotcl/astrotclConfig.sh
 if test -f $cf ; then
     . $cf
     AC_SUBST(astrotcl_VERSION)
@@ -47,12 +47,12 @@ csources=`cd $srcdir; echo generic/*.[Cc]`
 changequote([, ])
 
 cat_headers=`cd $srcdir; echo generic/*.h`
-astrotcl_headers=`cd $srcdir; echo ../astrotcl/{generic,press,libwcs,cfitsio}/*.h`
-tclutil_headers=`cd $srcdir; echo ../tclutil/generic/*.h`
+astrotcl_headers=`cd $srcdir; echo ../../astrotcl/astrotcl/{generic,press,libwcs,cfitsio}/*.h`
+tclutil_headers=`cd $srcdir; echo ../../tclutil/tclutil/generic/*.h`
 
 cat_includes="-I$srcdir/generic -I$srcdir/bitmaps"
-astrotcl_includes="-I$srcdir/../astrotcl/generic -I$srcdir/../astrotcl/cfitsio -I$srcdir/../astrotcl/libwcs"
-tclutil_includes="-I$srcdir/../tclutil/generic"
+astrotcl_includes="-I$srcdir/../../astrotcl/astrotcl/generic -I$srcdir/../../astrotcl/astrotcl/cfitsio -I$srcdir/../../astrotcl/astrotcl/libwcs"
+tclutil_includes="-I$srcdir/../../tclutil/tclutil/generic"
 cincludes="${cat_includes} ${astrotcl_includes} ${tclutil_includes}"
 
 tclsources=`cd $srcdir; echo library/*.tcl library/*.xpm`
