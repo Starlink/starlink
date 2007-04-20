@@ -104,6 +104,8 @@
  *
  * Allan Brighton  16/12/05  Added local Tk_CanvasWindowCoordsNoClip method (moved from tclutil)
  * Allan Brighton  28/12/05  Replaced init script
+ * Peter W. Draper 20/04/07  Add TkCanvasPsImage_Init call to use canvas
+ *                           printing that handles zoomed images.
  */
 static const char* const rcsId="@(#) $Id: RtdImage.C,v 1.5 2006/02/02 17:36:47 abrighto Exp $";
 
@@ -140,6 +142,9 @@ extern "C" int XSyncInitialize(Display *, int *, int *);
 extern "C" int gethostname(char *name, unsigned int namelen);
 #endif /* NEED_GETHOSTNAME_PROTO */
 #endif
+
+// local extension to enable postscript printing for images
+extern "C" void TkCanvasPsImage_Init();
 
 // generated code for bitmaps used in tcl scripts
 void defineRtdBitmaps(Tcl_Interp*);
@@ -326,6 +331,9 @@ extern "C"
 int Rtd_Init(Tcl_Interp* interp)  
 {
     // Initialize the local packages that rtd depends on
+
+    // PWD: enable postscript printing for images (local ext)
+    TkCanvasPsImage_Init();
 
     // initialize the tclutil package 
     if (Tclutil_Init(interp) == TCL_ERROR) {
