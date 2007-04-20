@@ -1,9 +1,9 @@
-builtin(include,../tclconfig/tcl.m4)
+builtin(include,../../tclconfig/tcl.m4)
 
 AC_DEFUN(SKYCAT_CONFIG, [
 
 # Load the Tclutil definitions
-cf=../tclutil/tclutilConfig.sh
+cf=../../tclutil/tclutil/tclutilConfig.sh
 if test -f $cf ; then
     . $cf
     AC_SUBST(tclutil_VERSION)
@@ -20,7 +20,7 @@ else
 fi
 
 # Load the Astrotcl definitions
-cf=../astrotcl/astrotclConfig.sh
+cf=../../astrotcl/astrotcl/astrotclConfig.sh
 if test -f $cf ; then
     . $cf
     AC_SUBST(astrotcl_VERSION)
@@ -35,7 +35,7 @@ else
 fi
 
 # Load the Rtd definitions
-cf=../rtd/rtdConfig.sh
+cf=../../rtd/rtd/rtdConfig.sh
 if test -f $cf ; then
     . $cf
     AC_SUBST(rtd_VERSION)
@@ -50,7 +50,7 @@ else
 fi
 
 # Load the Cat definitions
-cf=../cat/catConfig.sh
+cf=../../cat/cat/catConfig.sh
 if test -f $cf ; then
     . $cf
     AC_SUBST(cat_VERSION)
@@ -77,16 +77,16 @@ changequote([, ])
 
 # For skycat, we merge in the cat, rtd, astrotcl and tclutil libs, to avoid the extra dependencies
 skycat_headers=`cd $srcdir; echo generic/*.h`
-cat_headers=`cd $srcdir; echo ../cat/generic/*.h`
-rtd_headers=`cd $srcdir; echo ../rtd/generic/*.h ../rtd/rtdevt/rtdImageEvent.h ../rtd/rtdevt/rtdSem.h`
-astrotcl_headers=`cd $srcdir; echo ../astrotcl/{generic,press,libwcs,cfitsio}/*.h`
-tclutil_headers=`cd $srcdir; echo ../tclutil/generic/*.h`
+cat_headers=`cd $srcdir; echo ../../cat/cat/generic/*.h`
+rtd_headers=`cd $srcdir; echo ../../rtd/rtd/generic/*.h ../../rtd/rtd/rtdevt/rtdImageEvent.h ../../rtd/rtd/rtdevt/rtdSem.h`
+astrotcl_headers=`cd $srcdir; echo ../../astrotcl/astrotcl/{generic,press,libwcs,cfitsio}/*.h`
+tclutil_headers=`cd $srcdir; echo ../../tclutil/tclutil/generic/*.h`
 
 skycat_includes="-I$srcdir/generic -I$srcdir/bitmaps"
-cat_includes="-I$srcdir/../cat/generic"
-rtd_includes="-I$srcdir/../rtd/generic -I$srcdir/../rtd/rtdevt"
-astrotcl_includes="-I$srcdir/../astrotcl/generic -I$srcdir/../astrotcl/cfitsio -I$srcdir/../astrotcl/libwcs"
-tclutil_includes="-I$srcdir/../tclutil/generic"
+cat_includes="-I$srcdir/../../cat/cat/generic"
+rtd_includes="-I$srcdir/../../rtd/rtd/generic -I$srcdir/../../rtd/rtd/rtdevt"
+astrotcl_includes="-I$srcdir/../../astrotcl/astrotcl/generic -I$srcdir/../../astrotcl/astrotcl/cfitsio -I$srcdir/../../astrotcl/astrotcl/libwcs"
+tclutil_includes="-I$srcdir/../../tclutil/tclutil/generic"
 cincludes="${skycat_includes} ${cat_includes} ${rtd_includes} ${astrotcl_includes} ${tclutil_includes}"
 
 tclsources=`cd $srcdir; echo library/*.tcl library/*.xpm`

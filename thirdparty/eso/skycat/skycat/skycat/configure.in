@@ -239,6 +239,6 @@ AC_SUBST(OS)
 # You may alternatively have a special pkgIndex.tcl.in or other files
 # which require substituting th AC variables in.  Include these here.
 #--------------------------------------------------------------------
-AC_OUTPUT([Makefile pkgIndex.tcl skycatConfig.sh skycat skycat_version.tcl linux/skycat.spec])
+AC_OUTPUT([Makefile pkgIndex.tcl skycatConfig.sh skycat-star skycat_version.tcl linux/skycat.spec])
 
-chmod ugo+rx skycat
+chmod ugo+rx skycat-star

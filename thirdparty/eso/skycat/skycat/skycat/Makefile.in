@@ -22,7 +22,7 @@
 #SAMPLE_NEW_VAR	= @SAMPLE_NEW_VAR@
 
 # Install these scripts
-PROGS = skycat
+PROGS = skycat-star
 
 # Testing applications
 TEST_APPS = 
@@ -442,7 +442,7 @@ FORCE:
 # Generate the skycat release
 #========================================================================
 SKYCAT_FILES = \
-	bin/skycat \
+	bin/skycat-star \
 	bin/rtd \
 	bin/rtdServer \
 	bin/tRtd \
