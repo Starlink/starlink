@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="pda" support="S">
-  <version>0.5-1</version>
+  <version>0.5-2</version>
   <path>libraries/pda</path>
   <description>Public Domain Algorithms</description>
   <abstract><p>Replacements of NAG routines with public domain equivalents from packages such as NETLIB and SLATEC. They have been homogenized to fit into the Starlink calling scheme.
