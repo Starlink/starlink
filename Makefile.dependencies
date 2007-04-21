@@ -1917,6 +1917,41 @@ $(MANIFESTS)/shl: \
 	cd libraries/shl \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/skycat: \
+		$(MANIFESTS)/skycat-astrotcl \
+		$(MANIFESTS)/skycat-cat \
+		$(MANIFESTS)/skycat-rtd \
+		$(MANIFESTS)/skycat-tclutil
+	cd thirdparty/eso/skycat/skycat \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/skycat-astrotcl: \
+		$(MANIFESTS)/skycat-tclutil
+	cd thirdparty/eso/astrotcl \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/skycat-cat: \
+		$(MANIFESTS)/skycat-astrotcl \
+		$(MANIFESTS)/skycat-tclutil
+	cd thirdparty/eso/cat \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/skycat-rtd: \
+		$(MANIFESTS)/skycat-astrotcl \
+		$(MANIFESTS)/skycat-tclutil
+	cd thirdparty/eso/rtd \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/skycat-tclutil: \
+		$(MANIFESTS)/blt \
+		$(MANIFESTS)/itcl \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tclx \
+		$(MANIFESTS)/tk \
+		$(MANIFESTS)/tkimg
+	cd thirdparty/eso/tclutil \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/sla: \
 		$(MANIFESTS)/star2html
 	cd libraries/sla \
