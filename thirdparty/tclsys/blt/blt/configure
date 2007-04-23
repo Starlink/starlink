@@ -9182,7 +9182,7 @@ fi
     SHLIB_LD="ld -shared"
     ;;
 
-  *-osf1V*)
+  *-osf1*)
     # Digital OSF/1
 
     SHLIB_CFLAGS=""
