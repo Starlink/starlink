@@ -498,6 +498,8 @@
 *     Copyright (C) 1995, 1997-1999, 2001, 2004 Central Laboratory of
 *     the Research Councils. Copyright (C) 2006 Particle Physics &
 *     Astronomy Research Council. All Rights Reserved.
+*     Copyright (C) 2007 Science & Technology Facilties Council. All 
+*     Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -608,6 +610,9 @@
 *        Added SQRPIX parameter.
 *     31-OCT-2006 (DSB):
 *        Do not use pixel aspect ratios which are unusably large or small.
+*     23-APR-2007 (DSB):
+*        Fix bug in selection of CENTRE that caused small chanmap images
+*        to be incorrecly centred.
 *     {enter_further_changes_here}
 
 *-
@@ -663,6 +668,8 @@
       DOUBLE PRECISION DLO     ! Lower displayed data value limit
       DOUBLE PRECISION DX      ! X pixel size
       DOUBLE PRECISION DY      ! Y pixel size
+      DOUBLE PRECISION EPSGX   ! Small increment in X GRID co-ord 
+      DOUBLE PRECISION EPSGY   ! Small increment in Y GRID co-ord 
       DOUBLE PRECISION GC( 2 ) ! GRID co-ords at image centre
       DOUBLE PRECISION GRATX( 3 )! GRID pos'ns used to determine PIXRAT
       DOUBLE PRECISION GRATY( 3 )! GRID pos'ns used to determine PIXRAT
@@ -791,6 +798,14 @@
 *  Store the size of each significant dimension.
       DIMS( 1 ) = SUBND( 1 ) - SLBND( 1 ) + 1
       DIMS( 2 ) = SUBND( 2 ) - SLBND( 2 ) + 1
+
+*  Store grid offsets that can be considered as an "insignificant shift"
+*  in grid position, for use when determining if the forward and inverse
+*  transformations of the WCS Mapping are a genuine inverse pair.
+      EPSGX = 0.05*DIMS( 1 )
+      IF( EPSGX .LT. 1.0 ) EPSGX = 1.0
+      EPSGY = 0.05*DIMS( 2 )
+      IF( EPSGY .LT. 1.0 ) EPSGY = 1.0
 
 *  Get the name of the NDF.  This is later stored in the graphics
 *  database.
@@ -1112,8 +1127,8 @@
 *  different GRID position, then we only access the CENTRE parameter if
 *  a value was supplied on the command line.  
       ELSE IF( ( CC( 1 ) .NE. AST__BAD .AND. CC( 2 ) .NE. AST__BAD .AND.
-     :           ABS( GC( 1 ) - GX ) .LT. 10 .AND.
-     :           ABS( GC( 2 ) - GY ) .LT. 10 ) .OR. 
+     :           ABS( GC( 1 ) - GX ) .LT. EPSGX .AND.
+     :           ABS( GC( 2 ) - GY ) .LT. EPSGY ) .OR. 
      :           STATE .EQ. PAR__ACTIVE ) THEN
 
 *  Obtain the Current Frame co-ordinates (returned in CC) to put at the 
