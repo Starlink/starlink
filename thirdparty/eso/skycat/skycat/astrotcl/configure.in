@@ -83,9 +83,9 @@ TEA_SETUP_COMPILER
 #-----------------------------------------------------------------------
 
 changequote(<<, >>)
-csources=`cd $srcdir; echo {generic,press,libwcs,cfitsio}/*.[Cc]`
+csources=`cd $srcdir; echo generic/*.[Cc] press/*.[Cc] libwcs/*.[Cc] cfitsio/*.[Cc]`
 changequote([, ])
-cheaders=`cd $srcdir; echo {generic,press,libwcs,cfitsio}/*.h`
+cheaders=`cd $srcdir; echo echo generic/*.h press/*.h libwcs/*.h cfitsio/*.h`
 cincludes="-I$srcdir/../../tclutil/tclutil/generic -I$srcdir/generic -I$srcdir/press -I$srcdir/libwcs -I$srcdir/cfitsio"
 tclsources=`cd $srcdir; echo library/*.tcl`
 
