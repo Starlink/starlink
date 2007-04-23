@@ -1268,13 +1268,13 @@ case $target in
     SHLIB_LD="ld -shared"
     ;;
 
-  *-osf1*)
+  *dec-osf*)
     # Digital OSF/1
 
     SHLIB_CFLAGS=""
     SHLIB_LD='ld'
     SHLIB_LD_FLAGS='-shared -expect_unresolved "*"'
-    LD_RUN_PATH="-Wl,-rpath,${loader_run_path}"
+    LD_RUN_PATH="-rpath ${loader_run_path}"
     LDFLAGS=""
     ;;
 
