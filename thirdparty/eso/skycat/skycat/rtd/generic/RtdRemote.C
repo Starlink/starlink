@@ -28,6 +28,7 @@ static const char* const rcsId="@(#) $Id: RtdRemote.C,v 1.3 2006/03/26 13:22:33 
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
+#include <fstream>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/socket.h>
@@ -58,8 +59,8 @@ static const char* const rcsId="@(#) $Id: RtdRemote.C,v 1.3 2006/03/26 13:22:33 
 
 // should be in sys/shm.h
 #ifdef NEED_SHM_PROTO
-extern "C" void *shmat(int shmid, const void* shmaddr, int shmflg);
-extern "C" int shmdt(const void* shmaddr);
+/*extern "C" void *shmat(int shmid, const void* shmaddr, int shmflg);
+extern "C" int shmdt(const void* shmaddr);*/
 #endif
 
 #ifdef NEED_SOCKET_PROTO

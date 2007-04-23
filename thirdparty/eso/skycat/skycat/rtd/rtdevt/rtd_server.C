@@ -84,6 +84,7 @@ static const char* const rcsId="@(#) $Id$";
  * Local Headers
  */
 #include "rtdSERVER.h"
+#include "rtdLOG.h"
 
 #define RTD_SERVER_DELAY 5     // default time to sleep before new events are read
 
@@ -174,7 +175,7 @@ main(int argc, char *argv[])
     if (portNo < 0 || delay < 0)
 	usage();
 
-    rtdLOG logs = rtdLOG::rtdLOG(verbose);  // create log object
+    rtdLOG logs = rtdLOG(verbose);  // create log object
 
     if (getenv(RTD_SERVER_PORT) != NULL)
 	portNo = atoi(getenv(RTD_SERVER_PORT));

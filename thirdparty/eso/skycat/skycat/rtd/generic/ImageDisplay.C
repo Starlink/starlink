@@ -41,13 +41,13 @@ static const char* const rcsId="@(#) $Id: ImageDisplay.C,v 1.1.1.1 2006/01/12 16
 
 #ifdef NEED_SHM_PROTO
 // missing prototypes (on SunOS at least)
-extern "C" {
+/*extern "C" {
     // should be in sys/shm.h
     void *shmat(int shmid, const void* shmaddr, int shmflg);
     int shmdt(const void* shmaddr);
     int shmget(key_t, size_t, int);
     int shmctl(int shmid, int cmd, shmid_ds *buf);
-}
+}*/
 #endif
 
 

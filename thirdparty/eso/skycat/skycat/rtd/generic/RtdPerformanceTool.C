@@ -15,6 +15,7 @@
 #include "tcl.h"
 #include <cstdlib>
 #include <cstring>
+#include <fstream>
 
 /*
  * Const array of process type identifiers for performance testing.

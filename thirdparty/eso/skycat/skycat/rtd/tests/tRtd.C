@@ -74,6 +74,7 @@
 #include <math.h>
 
 #include "error.h"
+#include "define.h"
 #include "rtdSem.h"
 
 #include "tRtd.h"

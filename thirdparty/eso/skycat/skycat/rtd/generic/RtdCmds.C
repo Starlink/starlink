@@ -56,6 +56,7 @@ static char *rcsId="@(#) $Id: RtdCmds.C,v 1.1.1.1 2006/01/12 16:39:12 abrighto E
 static void *use_rcsId = ((void)&use_rcsId,(void *) &rcsId);
 
 #include "RtdImage.h"
+#include "define.h"   // for max function
 #include <sstream>
 
 /* 
