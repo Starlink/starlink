@@ -1,4 +1,4 @@
-builtin(include,../tclconfig/tcl.m4)
+builtin(include,../../tclconfig/tcl.m4)
 
 AC_DEFUN(TCLUTIL_CONFIG, [
 
@@ -120,6 +120,11 @@ AC_EGREP_HEADER([int.*munmap.*\(], [sys/mman.h],
 # -----------------------------------------------------------------------
 AC_CHECK_HEADERS(sys/filio.h)
 AC_CHECK_HEADERS(sys/statvfs.h)
+
+# -----------------------------------------------------------------------
+# 	Check if we need (or can use) the socklen_t type.
+# -----------------------------------------------------------------------
+AC_CHECK_TYPES([socklen_t],,,[#include <sys/socket.h>])
 
 #------------------------------------------------------------------------
 #AC_LANG(C++)
