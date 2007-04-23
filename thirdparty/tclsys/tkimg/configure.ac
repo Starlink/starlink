@@ -54,7 +54,7 @@ export star_extra_items
 )
            
 STAR_SPECIAL_INSTALL_COMMAND([
-   ( cd tkimg; $(MAKE) DESTDIR=$$DESTDIR install );
+   ( cd tkimg; $(MAKE) DESTDIR=$$DESTDIR INSTALL_ROOT=$$DESTDIR install );
 ])
 
 AC_CONFIG_FILES([Makefile component.xml])
