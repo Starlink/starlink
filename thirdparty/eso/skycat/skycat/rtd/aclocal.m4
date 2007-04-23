@@ -113,6 +113,9 @@ AC_MSG_RESULT("yes")
 AC_DEFINE(HAVE_NET_SERVICES)
 AC_CHECK_HEADERS(sys/filio.h)
 
+#  Check if we need (or can use) the socklen_t type.
+AC_CHECK_TYPES([socklen_t],,,[#include <sys/socket.h>])
+
 #------------------------------------------------------------------------
 AC_LANG(C++)
 AC_MSG_CHECKING([fd_set])
