@@ -116,7 +116,7 @@ collate: all
 	do	\
 		here=`pwd` ; \
 		cd $$sub ; \
-		$(MAKE) install \
+		$(MAKE) install DESTDIR=$$DESTDIR \
 			exec_prefix=$$here/Img/exec_prefix		\
 			prefix=$$here/Img/prefix			\
 			pkglibdir=$$here/Img/exec_prefix/lib/Img	\
