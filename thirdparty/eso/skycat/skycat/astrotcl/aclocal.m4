@@ -18,6 +18,9 @@ fi
 
 AC_CHECK_HEADERS(sys/filio.h)
 
+#  Check if we need (or can use) the socklen_t type.
+AC_CHECK_TYPES([socklen_t],,,[#include <sys/socket.h>])
+
 AC_DEFINE(USE_COMPAT_CONST, 1, [For compatibility between tcl8.4 and previous tcl releases])
 
 #--------------------------------------------------------------------
