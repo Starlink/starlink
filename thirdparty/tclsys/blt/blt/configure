@@ -3081,6 +3081,8 @@ case $target in
     blt_platform="win"
     blt_lib_prefix=""
     ;;
+  *-*-macosx)
+    blt_platform="macosx"
   *)
     blt_platform="unix"
     ;;
@@ -7489,7 +7491,7 @@ else
   echo "$as_me:$LINENO: checking whether DBL_EPSILON can be computed" >&5
 echo $ECHO_N "checking whether DBL_EPSILON can be computed... $ECHO_C" >&6
   cat > conftest.$ac_ext <<EOF
-#line 7492 "configure"
+#line 7494 "configure"
 #include "confdefs.h"
 
 main () {
@@ -9251,6 +9253,12 @@ fi
     SHLIB_LD_FLAGS=" -Wl,-Bexport"
     ;;
 
+ *-darwin*)
+    SHLIB_CFLAGS='-fno-common'
+    TCL_SHLIB_LD='${CC}'
+    SHLIB_LD_FLAGS="-dynamiclib ${LDFLAGS} -Wl,-single_module"
+    ;;
+
   *)
     build_shared="no"
     ;;
@@ -9264,11 +9272,15 @@ fi
 
 # If we're running gcc, then set SHLIB_CFLAGS flags for compiling
 # shared libraries for gcc, instead of those of the vendor's
-# compiler.
-
-
+# compiler (except on Mac OS X, where we need the -fno-common flag: allan)
 if test "$blt_have_gcc" = "yes" ; then
-  SHLIB_CFLAGS="-fPIC"
+  case $target in
+  *-darwin*)
+    ;;
+  *)
+    SHLIB_CFLAGS="-fPIC"
+    ;;
+  esac
 fi
 
 # We can't back link against static versions of Tcl/Tk.
