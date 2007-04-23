@@ -91,7 +91,7 @@ cincludes="${skycat_includes} ${cat_includes} ${rtd_includes} ${astrotcl_include
 
 tclsources=`cd $srcdir; echo library/*.tcl library/*.xpm`
 
-if test $MERGED == yes ; then
+if test $MERGED = "yes" ; then
     echo "Will build merged master skycat library"
     cheaders="${skycat_headers} ${cat_headers} ${rtd_headers} ${astrotcl_headers} ${tclutil_headers}"
     MERGE_OBJECTS="$cat_PKG_OBJECTS $rtd_PKG_OBJECTS $astrotcl_PKG_OBJECTS $tclutil_PKG_OBJECTS"
