@@ -241,5 +241,3 @@ AC_SUBST(tclutil_SRC_DIR)
 #--------------------------------------------------------------------
 AC_OUTPUT([Makefile pkgIndex.tcl tclutilConfig.sh tclutil.sh tclutil_version.tcl])
 chmod ugo+x tclutil.sh
-
-

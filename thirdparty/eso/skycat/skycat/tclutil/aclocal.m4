@@ -139,4 +139,19 @@ if test $test_ok = yes; then
 fi
 AC_MSG_RESULT($test_ok)
 
+
+#------------------------------------------------------------------------
+#  Check if we require additional libraries to support C++ shareable
+#  libraries.
+system=`uname -s`-`uname -r`
+SHLIB_LD_CXX_LIBS=""
+export SHLIB_LD_CXX_LIBS
+case $system in
+   SunOS-5*)
+      SHLIB_LD_CXX_LIBS="-lCrun -lCstd"
+   ;;
+esac
+echo "SHLIB_LD_CXX_LIBS = $SHLIB_LD_CXX_LIBS"
+AC_SUBST(SHLIB_LD_CXX_LIBS)
+
 ])
