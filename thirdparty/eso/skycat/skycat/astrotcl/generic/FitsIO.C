@@ -30,6 +30,8 @@
  *                 08/01/07  Write "END" keyword to blank image headers stream.
  *                           Previously written to buffer only.
  *                 01/03/07  Added putcard method for pre-formatted cards.
+ * Peter W. Draper 24/04/07  Handle table columns with K format, that's 
+ *                           TLONGLONG.
  */
 static const char* const rcsId="@(#) $Id: FitsIO.C,v 1.1.1.1 2006/01/12 16:43:57 abrighto Exp $";
 
@@ -1460,6 +1462,27 @@ char* FitsIO::getTableValue(long row, int col)
 	sprintf(buf_, "%ld", l);
 	break;
 
+    case TLONGLONG:
+	LONGLONG ll;
+	if (fits_read_col(fitsio_, TLONGLONG, col, row, 1, 1, NULL, 
+			  &ll, &anynulls, &status) != 0) {
+	    cfitsio_error();
+	    return NULL;
+	}
+
+        /*  Handle 64 bit integer printing for this platform. 
+         *  Can be "long long" or "long", plus windows has "I64d"
+         *  format.
+         */
+#if _MSC_VER
+	sprintf(buf_, "%I64d", ll);
+#elif USE_LL_SUFFIX
+	sprintf(buf_, "%lld", ll);
+#else
+	sprintf(buf_, "%ld", ll);
+#endif
+	break;
+
     case TUSHORT:
     case TUINT:
     case TULONG:
@@ -1582,6 +1605,21 @@ int FitsIO::setTableValue(long row, int col, const char* value)
 	if (sscanf(value, "%ld", &l) != 1) 
 	    return error("invalid int value: ", value);
 	if (fits_write_col(fitsio_, TLONG, col, row, 1, 1, &l, &status) != 0) 
+	    return cfitsio_error();
+	break;
+
+    case TLONGLONG:
+	LONGLONG ll;
+#if _MSC_VER
+	if (sscanf(value, "%I64d", &ll) != 1) {
+#elif USE_LL_SUFFIX
+        if (sscanf(value, "%lld", &ll) != 1) {
+#else
+        if (sscanf(value, "%ld", &ll) != 1) {
+#endif
+	    return error("invalid long value: ", value);
+        }
+	if (fits_write_col(fitsio_, TLONGLONG, col, row, 1, 1, &ll, &status) != 0) 
 	    return cfitsio_error();
 	break;
 
