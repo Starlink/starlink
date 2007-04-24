@@ -206,7 +206,13 @@ esac
 
 test -d libjpeg || mkdir libjpeg
 cd libjpeg
-env CC="$JPEG_CC" CFLAGS="$JPEG_CFLAGS" $jpegdir/configure
+if test -f "jconfig.h"; then
+   rm -f "jconfig.h"
+fi
+env CC="$JPEG_CC" CFLAGS="$JPEG_CFLAGS" $jpegdir/configure --prefix=${prefix}
+if test -f "jconfig.h"; then
+   rm -f "jconfig.h"
+fi
 ln -s libjpeg/jconfig.h .
 cd ..
 
