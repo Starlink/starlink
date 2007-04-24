@@ -22,7 +22,7 @@ DIR=`dirname "$PRG"`/..
 SKYCAT_BASE=`(cd $DIR; pwd)`
 
 # If we're NOT ssh'd in
-if [ ! ${SSH_TTY} ]; then
+if [ ! "${SSH_TTY}" ]; then
     # make sure X is running (on Mac OS X)
     if [ `uname` = "Darwin" ] ; then
 	if [ "`ps -x | awk '{print $5}' | grep X11`" = "" ]; then
