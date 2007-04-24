@@ -148,7 +148,7 @@ SHLIB_LD_CXX_LIBS=""
 export SHLIB_LD_CXX_LIBS
 case $system in
    SunOS-5*)
-      SHLIB_LD_CXX_LIBS="-lCrun -lCstd"
+      SHLIB_LD_CXX_LIBS="/usr/lib/libCrun.so.1 /usr/lib/libCstd.so.1"
    ;;
 esac
 echo "SHLIB_LD_CXX_LIBS = $SHLIB_LD_CXX_LIBS"
