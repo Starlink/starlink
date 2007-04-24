@@ -185,6 +185,7 @@ case $target in
     ;;
   *-*-macosx)
     blt_platform="macosx"
+    ;;
   *)
     blt_platform="unix"
     ;;

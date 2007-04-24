@@ -3083,6 +3083,7 @@ case $target in
     ;;
   *-*-macosx)
     blt_platform="macosx"
+    ;;
   *)
     blt_platform="unix"
     ;;
@@ -7491,7 +7492,7 @@ else
   echo "$as_me:$LINENO: checking whether DBL_EPSILON can be computed" >&5
 echo $ECHO_N "checking whether DBL_EPSILON can be computed... $ECHO_C" >&6
   cat > conftest.$ac_ext <<EOF
-#line 7494 "configure"
+#line 7495 "configure"
 #include "confdefs.h"
 
 main () {
