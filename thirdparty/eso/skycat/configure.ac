@@ -12,21 +12,25 @@ dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
 
 dnl    Declare dependencies for this package
-STAR_DECLARE_DEPENDENCIES([build], [skycat-tclutil skycat-astrotcl skycat-cat skycat-rtd], link)
+STAR_DECLARE_DEPENDENCIES([build], [tcl tk tkimg blt itcl tclx], link)
 
 dnl    To configure run ./configure in the subdirectory.
 dnl    Do not invoke AC_CONFIG_SUBDIRS, since that prompts autoreconf
 dnl    to try to reconfigure that directory, and automake to assume 
 dnl    it's allowed to play there, too.
 (
-    cd skycat
-    echo ./configure --prefix=$prefix --cache-file=config.cache
-    ./configure --prefix=$prefix --cache-file=config.cache
+    for f in skycat/tclutil skycat/astrotcl skycat/cat skycat/rtd skycat/skycat; do
+       (cd $f ; \
+       echo "$f: ./configure --prefix=$prefix --cache-file=config.cache" ;\
+       ./configure --prefix=$prefix --cache-file=config.cache )
+    done
 )
 
 STAR_SPECIAL_INSTALL_COMMAND([
-    cd skycat;
-    $(MAKE) DESTDIR=$$DESTDIR install])
+    for f in skycat/tclutil skycat/astrotcl skycat/cat skycat/rtd skycat/skycat; do
+       (cd $$f ; $(MAKE) DESTDIR=$$DESTDIR install )
+    done
+])
 
 AC_CONFIG_FILES([Makefile component.xml])
 
