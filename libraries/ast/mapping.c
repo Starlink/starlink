@@ -10766,6 +10766,8 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
    Xtype *v;                     /* Pointer to next output variance value */ \
    double *w;                    /* Pointer to next weight value */ \
    double a;                     /* Mean data value at output pixel */ \
+   double mwpip;                 /* Mean weight per input pixel */ \
+   double nn;                    /* Effective no. of i/p pixels combined */ \
    double sw;                    /* Sum of weights at output pixel */ \
    int i;                        /* Loop counter for output pixels */ \
    int idim;                     /* Loop counter for coordinate dimensions */ \
@@ -10975,15 +10977,39 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
 /* If required create the output variances from the spread of the input \
    data values.*/ \
       if( flags & AST__GENVAR ) { \
+\
+/* Find the average weight per input pixel, if we do not already know it \
+   to be 1.0. */ \
+         if( flags & AST__VARWGT ) { \
+            sw = 0.0; \
+            a = 0.0; \
+            for( i = 0; i < npix_out; i++ ) { \
+               if( weights[ i ] >= 0 ) { \
+                  sw += weights[ i ]; \
+                  a += 1.0; \
+               } \
+            } \
+            mwpip = sw/a; \
+\
+         } else { \
+            mwpip = 1.0; \
+         } \
+\
+/* Calculate the variance. We apply a factor that accounts for the \
+   reduction in the number of degrees of freedom when finding the \
+   variance. This factor is based on the number of input values included \
+   in each output value, and is taken to be the output weight dividided \
+   by the mean weight per input pixel. */ \
          for( i = 0; i < npix_out; i++ ) { \
-            if( weights[ i ] >= wlim ) { \
-               sw = weights[ i ]; \
+            sw = weights[ i ]; \
+            nn = sw/mwpip; \
+            if( nn > 2.0 && weights[ i ] >= wlim ) { \
                a = out[ i ]/sw; \
                out_var[ i ] = ( out_var[ i ]/sw - a*a )*weights[ i + npix_out ]; \
-               if( sw <= 1.0 || out_var[ i ] < 0.0 ) { \
+               if( out_var[ i ] < 0.0 ) { \
                   out_var[ i ] = badval; \
                } else { \
-                  out_var[ i ] *= sw/( sw - 1.0 ); \
+                  out_var[ i ] *= nn/( nn - 1.0 ); \
                } \
             } else { \
                out_var[ i ] = badval; \
