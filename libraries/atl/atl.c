@@ -381,6 +381,8 @@ void atlTolut( AstMapping *inmap, double xlo, double xhi, double dx,
    F77_EXPORT_DOUBLE( xhi, XHI );
    F77_EXPORT_DOUBLE( dx, DX );
 
+   F77_EXPORT_INTEGER( *status, STATUS );
+
    F77_CALL(atl_tolut)( INTEGER_ARG(&INMAP),
                         DOUBLE_ARG(&XLO),
                         DOUBLE_ARG(&XHI),
