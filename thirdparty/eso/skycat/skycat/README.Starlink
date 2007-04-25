@@ -1,12 +1,9 @@
-This is a re-organised version of Skycat so that it will build within the
-Starlink system. The various sub-packages (astrotcl, cat, rtd, skycat and
-tclutil) are imported separately to the "ESO" thirdparty branch and have
-starconf wrappers in the immediate sub-directories. This directory is mostly
-the original top-level directory, except the build system is replaced, again
-to work with our build system.
+This is the ESO Skycat distribution imported into the ESO thirdparty
+vendor branch. Note none of the build mechanism is used at this level,
+see the directory above.
 
-Note that this is not Skycat official and various small-level changes have
-been made that support GAIA, if you want the official Skycat go to the ESO
-download site.
+Also note that this is not Skycat official and various small-level changes
+have been made that support GAIA, if you want the official Skycat go to the
+ESO download site.
 
-Peter W. Draper 19-APR-2007.
+Peter W. Draper 25-APR-2007.
