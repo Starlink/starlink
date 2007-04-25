@@ -121,7 +121,8 @@ AC_LANG(C++)
 AC_MSG_CHECKING([fd_set])
 AC_TRY_COMPILE([
 #include <sys/types.h>
-#include <sys/time.h>],
+#include <sys/time.h>
+#include <unistd.h>],
 	[fd_set readFds; select(32, &readFds, 0, 0, 0);], test_ok=yes, test_ok=no)
 if test $test_ok = yes; then
 	AC_DEFINE(HAVE_SELECT_FD_SET, 1, 
