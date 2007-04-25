@@ -319,6 +319,9 @@ Platform specific build notes
       % export CC=cc
       % export CXX=CC
 
+   Note that the GNU m4 distributed in Solaris 10 seems to be incompatible
+   abd you should make sure that it is not on your PATH.
+
    - Tru64 UNIX
 
    The collection builds nightly on a Tru64 UNIX 5.1 installation 
