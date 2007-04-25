@@ -1341,6 +1341,7 @@ case $target in
     ;;
 
  *-darwin*)
+    SHLIB_SUFFIX=".dylib"
     SHLIB_CFLAGS='-fno-common'
     TCL_SHLIB_LD='${CC}'
     SHLIB_LD_FLAGS="-dynamiclib ${LDFLAGS} -Wl,-single_module"
