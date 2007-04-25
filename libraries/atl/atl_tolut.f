@@ -68,6 +68,8 @@
 *  History:
 *     18-APR-2007 (DSB):
 *        Original version.
+*     25-APR-2007 (DSB):
+*        Add missing argument NOUT in call to ATL1_TOLUT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -160,7 +162,8 @@
       CALL PSX_CALLOC( LUTSIZ*NOUT, '_DOUBLE', IPW2, STATUS )
 
 *  Create the required Mapping.
-      CALL ATL1_TOLUT( INMAP, XLO, DX, LUTSIZ, %VAL( CNF_PVAL( IPW1 ) ),
+      CALL ATL1_TOLUT( INMAP, NOUT, XLO, DX, LUTSIZ, 
+     :                 %VAL( CNF_PVAL( IPW1 ) ),
      :                 %VAL( CNF_PVAL( IPW2 ) ), OUTMAP, STATUS )
 
 *  Free workspae.
