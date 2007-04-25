@@ -10860,7 +10860,7 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
 \
 /* Similarly check the bounds of the input region. */ \
    if ( astOK ) { \
-      for ( idim = 0; idim < ndim_out; idim++ ) { \
+      for ( idim = 0; idim < ndim_in; idim++ ) { \
          if ( lbnd[ idim ] > ubnd[ idim ] ) { \
             astError( AST__GBDIN, "astRebinSeq"#X"(%s): Lower bound of " \
                       "input region (%d) exceeds corresponding upper " \
