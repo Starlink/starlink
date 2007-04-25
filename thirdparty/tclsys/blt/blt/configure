@@ -9258,6 +9258,8 @@ fi
     SHLIB_CFLAGS='-fno-common'
     TCL_SHLIB_LD='${CC}'
     SHLIB_LD_FLAGS="-dynamiclib ${LDFLAGS} -Wl,-single_module"
+    SHLIB_LIB_SPECS='${LIBS}'
+    SHLIB_TCL_ONLY_LIB_SPECS='${TCL_ONLY_LIB_SPECS}'
     ;;
 
   *)
