@@ -1,4 +1,4 @@
-builtin(include,../../tclconfig/tcl.m4)
+builtin(include,../tclconfig/tcl.m4)
 
 AC_DEFUN(TCLUTIL_CONFIG, [
 

@@ -1,9 +1,9 @@
-builtin(include,../../tclconfig/tcl.m4)
+builtin(include,../tclconfig/tcl.m4)
 
 AC_DEFUN(ASTROTCL_CONFIG, [
 
 # Load the Tclutil definitions
-cf=../../tclutil/tclutil/tclutilConfig.sh
+cf=../tclutil/tclutilConfig.sh
 if test -f $cf ; then
     . $cf
     AC_SUBST(tclutil_VERSION)

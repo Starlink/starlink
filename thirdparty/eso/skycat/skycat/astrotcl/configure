@@ -2756,7 +2756,7 @@ done
 
 
 # Load the Tclutil definitions
-cf=../../tclutil/tclutil/tclutilConfig.sh
+cf=../tclutil/tclutilConfig.sh
 if test -f $cf ; then
     . $cf
 
@@ -8433,7 +8433,7 @@ done
 csources=`cd $srcdir; echo generic/*.[Cc] press/*.[Cc] libwcs/*.[Cc] cfitsio/*.[Cc]`
 
 cheaders=`cd $srcdir; echo generic/*.h press/*.h libwcs/*.h cfitsio/*.h`
-cincludes="-I$srcdir/../../tclutil/tclutil/generic -I$srcdir/generic -I$srcdir/press -I$srcdir/libwcs -I$srcdir/cfitsio"
+cincludes="-I$srcdir/../tclutil/generic -I$srcdir/generic -I$srcdir/press -I$srcdir/libwcs -I$srcdir/cfitsio"
 tclsources=`cd $srcdir; echo library/*.tcl`
 
 

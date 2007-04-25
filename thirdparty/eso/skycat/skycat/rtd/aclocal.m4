@@ -1,10 +1,10 @@
-builtin(include,../../tclconfig/tcl.m4)
+builtin(include,../tclconfig/tcl.m4)
 
 AC_DEFUN(RTD_CONFIG, [
 
 # -----------------------------------------------------------------------
 # Load the Tclutil definitions
-cf=../../tclutil/tclutil/tclutilConfig.sh
+cf=../tclutil/tclutilConfig.sh
 if test -f $cf ; then
     . $cf
     AC_SUBST(tclutil_VERSION)
@@ -21,7 +21,7 @@ else
 fi
 
 # Load the Astrotcl definitions
-cf=../../astrotcl/astrotcl/astrotclConfig.sh
+cf=../astrotcl/astrotclConfig.sh
 if test -f $cf ; then
     . $cf
     AC_SUBST(astrotcl_VERSION)
@@ -50,12 +50,12 @@ csources=`cd $srcdir; echo generic/*.[Cc] rtdevt/rtdImageEvent.c rtdevt/rtdSem.c
 changequote([, ])
 
 rtd_headers=`cd $srcdir; echo generic/*.h rtdevt/rtdImageEvent.h rtdevt/rtdSem.h`
-astrotcl_headers=`cd $srcdir; echo ../../astrotcl/astrotcl/{generic,press,libwcs,cfitsio}/*.h`
-tclutil_headers=`cd $srcdir; echo ../../tclutil/tclutil/generic/*.h`
+astrotcl_headers=`cd $srcdir; echo ../astrotcl/{generic,press,libwcs,cfitsio}/*.h`
+tclutil_headers=`cd $srcdir; echo ../tclutil/generic/*.h`
 
 rtd_includes="-I$srcdir/generic -I$srcdir/rtdevt -I$srcdir/bitmaps"
-astrotcl_includes="-I$srcdir/../../astrotcl/astrotcl/generic -I$srcdir/../../astrotcl/astrotcl/cfitsio -I$srcdir/../../astrotcl/astrotcl/libwcs"
-tclutil_includes="-I$srcdir/../../tclutil/tclutil/generic"
+astrotcl_includes="-I$srcdir/../astrotcl/generic -I$srcdir/../astrotcl/cfitsio -I$srcdir/../astrotcl/libwcs"
+tclutil_includes="-I$srcdir/../tclutil/generic"
 cincludes="${rtd_includes} ${astrotcl_includes} ${tclutil_includes}"
 
 if test $MERGED = yes ; then
