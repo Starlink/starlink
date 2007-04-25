@@ -440,7 +440,7 @@ uninstall-binaries:
 $(RTDEVT_LIB): $(RTDEVT_OBJ)
 	$(RM) $@
 	$(AR) r $@ $(RTDEVT_OBJ)
-	$(RANLIB) $@
+	$(RANLIB_STUB) $@
 
 $(RTD_SERVER): $(RTD_SERVER_OBJS)
 	$(CXXCOMPILE) -o $@ $(RTD_SERVER_OBJS) $(RTDEVT_LIB) @LIBS@
@@ -457,7 +457,7 @@ rtdCubeDisplay: rtdCubeDisplay.o
 $(RTD_REMOTE_LIB): $(RTD_REMOTE_OBJ)
 	$(RM) $@
 	$(AR) r $@ $(RTD_REMOTE_OBJ)
-	$(RANLIB) $@
+	$(RANLIB_STUB) $@
 
 #========================================================================
 # C++ Test cases
