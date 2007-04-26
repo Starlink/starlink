@@ -396,7 +396,7 @@ install-bin-binaries: binaries
 	  fi; \
 	done
 
-.SUFFIXES: .c .$(OBJEXT)
+.SUFFIXES: .c .$(OBJEXT) .C
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) \
