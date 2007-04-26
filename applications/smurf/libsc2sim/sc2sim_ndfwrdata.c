@@ -163,6 +163,9 @@
 *        Add more FITS headers
 *     2007-04-10 (AGG):
 *        Calculate STARE images and polynomial fits, write to raw data
+*     2007-04-26 (AGG):
+*        - Shorten comment for SEQSTART/END to ensure correct formatting
+*        - Add some more (admittedly blank) FITS headers
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
@@ -257,6 +260,7 @@ int *status              /* Global status (given and returned) */
    double decd;                    /* Dec of observation in degrees */
    int dims[2];                    /* Extent of output image */
    AstFitsChan *fitschan;          /* FITS headers */
+   int fitsfind;
    char fitsrec[SC2STORE__MAXFITS][SZFITSCARD]; /* Store for FITS records */
    int framesize;                  /* Number of points in a single `frame' */
    int i;                          /* Loop counter */
@@ -329,7 +333,7 @@ int *status              /* Global status (given and returned) */
 		 "x,y,z triplet for JCMT", 0 );
    astSetFitsF ( fitschan, "OBSGEO-Y", -5.041977547E+06, 
 		 "relative to centre of the Earth", 0 );
-   astSetFitsF ( fitschan, "OBSGEO-Z", 3.554875870E+06, "", 0 );
+   astSetFitsF ( fitschan, "OBSGEO-Z", 3.554875870E+06, "[m]", 0 );
    astSetFitsF ( fitschan, "ALT-OBS", 4092, 
 		 "[m] Height of observatory above sea level", 0 );
    astSetFitsF ( fitschan, "LAT-OBS", 19.8258323669, 
@@ -341,7 +345,7 @@ int *status              /* Global status (given and returned) */
    /* Observation, date & pointing */
    astSetFitsS ( fitschan, "COMMENT", "", "-- Observation & date parameters --", 0 );
    astSetFitsS ( fitschan, "OBSID", obsid, "Unique observation ID", 0 );
-   astSetFitsS ( fitschan, "OBJECT", "Hoonose", "Object Name", 0 );
+   astSetFitsS ( fitschan, "OBJECT", "SMURF", "Object Name", 0 );
    astSetFitsL ( fitschan, "STANDARD", 0, "True if source is a calibrator", 0 );
    astSetFitsI ( fitschan, "OBSNUM", obsnum, "Observation Number", 0 );
    astSetFitsI ( fitschan, "NSUBSCAN", nsubscan, "Sub-scan Number", 0 );
@@ -501,6 +505,13 @@ int *status              /* Global status (given and returned) */
 
    /* SMU specific */
    astSetFitsS ( fitschan, "COMMENT", "", "-- SMU-specific parameters --", 0 );
+   astSetFitsF ( fitschan, "ALIGN_DX", 0.0, "SMU tables X axis alignment offset", 0 );
+   astSetFitsF ( fitschan, "ALIGN_DY", 0.0, "SMU tables Y axis alignment offset", 0 );
+   astSetFitsF ( fitschan, "FOCUS_DZ", 0.0, "SMU tables Z axis focus offset", 0 );
+   astSetFitsF ( fitschan, "DAZ", 0.0, "SMU azimuth pointing offset", 0 );
+   astSetFitsF ( fitschan, "DEL", 0.0, "SMU elevation pointing offset", 0 );
+   astSetFitsF ( fitschan, "UAZ", 0.0, "User azimuth pointing offset", 0 );
+   astSetFitsF ( fitschan, "UEL", 0.0, "User elevation pointing offset", 0 );
 
    /* Misc */
    astSetFitsS ( fitschan, "COMMENT", "", "-- Miscellaneous --", 0 );
@@ -616,17 +627,26 @@ int *status              /* Global status (given and returned) */
 
        /* Construct WCS FrameSet */
        sc2ast_createwcs( subnum, &state, instap, telpos, &wcs, status );
+       /* This should be user defined... */
+       astSetC( wcs, "SYSTEM", "ICRS" );
 
        /* Increment seqstart/end for FITS header */
        seqstart++;
        seqend++;
 
-       /* Construct additional FITS headers */
-       fitschan = astFitsChan ( NULL, NULL, "" );
+       /* Construct additional FITS headers to add to the existing
+	  FitsChan */
+       astClear( fitschan, "Card");
+       /* First find and delete old entries */
+       fitsfind = astFindFits( fitschan, "SEQSTART", NULL, 0);
+       astDelFits( fitschan );
+       fitsfind = astFindFits( fitschan, "SEQEND", NULL, 0);
+       astDelFits( fitschan );
+       /* Add new entries */
        astSetFitsI( fitschan, "SEQSTART", seqstart, 
-		    "RTS index number for first frame contributing to image", 0);
+		    "RTS index number of first frame in image", 0);
        astSetFitsI( fitschan, "SEQEND", seqend, 
-		    "RTS index number for last frame contributing to image", 0);
+		    "RTS index number of last frame in image", 0);
 
        /* Convert the AstFitsChan data to a char array */
        smf_fits_export2DA ( fitschan, &nrec, fitsrec, status );
