@@ -3802,82 +3802,10 @@ Ultrix and for SunOS and may still work for them.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="skycat-astrotcl" support="U">
-  <version>2.0</version>
-  <path>thirdparty/eso/astrotcl</path>
-  <description>The astrotcl component of skycat</description>
-  <dependencies >
-    <build option='link'>skycat-tclutil</build>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Peter W. Draper</name>
-      <uname>pwd</uname>
-      <email>p.w.draper@durham.ac.uk</email>
-      <role>owner</role>
-    </person>
-  </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-</component>
-
-<component id="skycat-cat" support="U">
-  <version>4.0</version>
-  <path>thirdparty/eso/cat</path>
-  <description>The cat component of skycat</description>
-  <dependencies >
-    <build option='link'>skycat-tclutil</build><build option='link'>skycat-astrotcl</build>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Peter W. Draper</name>
-      <uname>pwd</uname>
-      <email>p.w.draper@durham.ac.uk</email>
-      <role>owner</role>
-    </person>
-  </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-</component>
-
-<component id="skycat-rtd" support="U">
-  <version>3.0</version>
-  <path>thirdparty/eso/rtd</path>
-  <description>The rtd component of skycat</description>
-  <dependencies >
-    <build option='link'>skycat-tclutil</build><build option='link'>skycat-astrotcl</build>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Peter W. Draper</name>
-      <uname>pwd</uname>
-      <email>p.w.draper@durham.ac.uk</email>
-      <role>owner</role>
-    </person>
-  </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-</component>
-
 <component id="skycat" support="U">
   <version>3.0.1</version>
   <path>thirdparty/eso/skycat/skycat</path>
   <description>The main skycat component</description>
-  <dependencies >
-    <build option='link'>skycat-tclutil</build><build option='link'>skycat-astrotcl</build><build option='link'>skycat-cat</build><build option='link'>skycat-rtd</build>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Peter W. Draper</name>
-      <uname>pwd</uname>
-      <email>p.w.draper@durham.ac.uk</email>
-      <role>owner</role>
-    </person>
-  </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-</component>
-
-<component id="skycat-tclutil" support="U">
-  <version>2.0</version>
-  <path>thirdparty/eso/tclutil</path>
-  <description>The tclutil component of skycat</description>
   <dependencies >
     <build option='link'>tcl</build><build option='link'>tk</build><build option='link'>tkimg</build><build option='link'>blt</build><build option='link'>itcl</build><build option='link'>tclx</build>
   </dependencies>
