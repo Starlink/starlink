@@ -14,6 +14,17 @@ STAR_DEFAULTS
 dnl    Declare dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [tcl tk tkimg blt itcl tclx], link)
 
+dnl    Look for --disable-shared and pass it on when configuring.
+star_extra_items=
+for ac_arg in $ac_configure_args; do
+   case $ac_arg in 
+      *-disable-shared*)
+         star_extra_items="--disable-shared"
+      ;;
+   esac
+done
+export star_extra_items
+
 dnl    To configure run ./configure in the subdirectory.
 dnl    Do not invoke AC_CONFIG_SUBDIRS, since that prompts autoreconf
 dnl    to try to reconfigure that directory, and automake to assume 
@@ -21,8 +32,11 @@ dnl    it's allowed to play there, too.
 (
     for f in skycat/tclutil skycat/astrotcl skycat/cat skycat/rtd skycat/skycat; do
        (cd $f ; \
-       echo "$f: ./configure --prefix=$prefix --cache-file=config.cache" ;\
-       ./configure --prefix=$prefix --cache-file=config.cache )
+        cmd="./configure --prefix=$prefix \
+                         $star_extra_items \
+                         --cache-file=../config.cache"; \
+        echo $cmd; \
+        $cmd; )
     done
 )
 
