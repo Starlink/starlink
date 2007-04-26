@@ -229,9 +229,7 @@ doc:
 install: all install-binaries install-libraries install-doc
 
 install-binaries: binaries install-lib-binaries install-bin-binaries
-	if test "x$(SHARED_BUILD)" = "x1"; then \
-	    $(INSTALL_DATA) pkgIndex.tcl $(DESTDIR)$(pkglibdir); \
-	fi
+	$(INSTALL_DATA) pkgIndex.tcl $(DESTDIR)$(pkglibdir)
 
 #========================================================================
 # This rule installs platform-independent files, such as header files.
