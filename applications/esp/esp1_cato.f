@@ -74,10 +74,15 @@
 *
 *   Authors:
 *     NG: Norman Gray (Starlink, Glasgow)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *
 *   History:
 *     16-Dec-1999 (NG)
 *       Original version, with logic based on elp1_texto.
+*     27-APR-2007 (PWD):
+*       Output some (specially X and Y) values with format G14.7
+*       not CAT default of E12.3. Need that extra precision for
+*       large images.
 *
 *   Bugs:
 *     None known
@@ -171,52 +176,83 @@
 *         slightly different (and more rational) order from the
 *         corresponding columns in elp1_texto
             call cat_pnew0 (ci, cat__fityp, 'SourceN',
-     :           cat__typei, cols(1), status)
+     :                      cat__typei, cols(1), status)
+
             call cat_pnew0 (ci, cat__fityp, 'Number', 
-     :           cat__typei, cols(2), status)
+     :                      cat__typei, cols(2), status)
+
             call cat_pnew0 (ci, cat__fityp, 'X', 
-     :           cat__typer, cols(3), status)
+     :                      cat__typer, cols(3), status)
+            call cat_tattc (cols(3), 'EXFMT', 'G14.7', status)
+
             call cat_pnew0 (ci, cat__fityp, 'Y', 
-     :           cat__typer, cols(4), status)
+     :                     cat__typer, cols(4), status)
+            call cat_tattc (cols(4), 'EXFMT', 'G14.7', status)
+
             call cat_pnew0 (ci, cat__fityp, 'SemiMajor', 
-     :           cat__typer, cols(5), status)
+     :                      cat__typer, cols(5), status)
+            call cat_tattc (cols(5), 'EXFMT', 'G14.7', status)
+
             call cat_pnew0 (ci, cat__fityp, '1/Ellipt', 
-     :           cat__typer, cols(6), status)
-            call cat_tattc (cols(6), 'COMM', 'reciprocal of ellipticity'
-     :           ,status)
-            call cat_pnew0 (ci, cat__fityp, 'PA', 
-     :           cat__typer, cols(7), status)
+     :                      cat__typer, cols(6), status)
+            call cat_tattc (cols(6), 'COMM', 
+     :                      'reciprocal of ellipticity',status)
+            call cat_tattc (cols(6), 'EXFMT', 'G14.7', status)
+
+            call cat_pnew0 (ci, cat__fityp, 'PA', cat__typer, 
+     :                      cols(7), status)
             call cat_tattc (cols(7), 'UNITS', 'RADIANS{DEGREES}', 
-     :           status)
+     :                      status)
             call cat_tattc (cols(7), 'COMM', 'Position angle', status)
+
             call cat_pnew0 (ci, cat__fityp, 'Count', 
-     :           cat__typer, cols(8), status)
+     :                      cat__typer, cols(8), status)
+
             call cat_pnew0 (ci, cat__fityp, 'Dev', 
-     :           cat__typer, cols(9), status)
+     :                      cat__typer, cols(9), status)
+
             call cat_pnew0 (ci, cat__fityp, 'Points', 
-     :           cat__typei, cols(10), status)
+     :                      cat__typei, cols(10), status)
+
             call cat_pnew0 (ci, cat__fityp, 'PPU', 
-     :           cat__typer, cols(11), status)
+     :                      cat__typer, cols(11), status)
             call cat_tattc (cols(11), 'COMM', 'Percentage points used',
-     :           status)
+     :                      status)
+
             call cat_pnew0 (ci, cat__fityp, 'Statistic', 
-     :           cat__typer, cols(12), status)
+     :                      cat__typer, cols(12), status)
+
             call cat_pnew0 (ci, cat__fityp, '1xSin', 
-     :           cat__typer, cols(13), status)
+     :                      cat__typer, cols(13), status)
+            call cat_tattc (cols(13), 'EXFMT', 'G14.7', status)
+
             call cat_pnew0 (ci, cat__fityp, '1xCos', 
-     :           cat__typer, cols(14), status)
+     :                      cat__typer, cols(14), status)
+            call cat_tattc (cols(14), 'EXFMT', 'G14.7', status)
+
             call cat_pnew0 (ci, cat__fityp, '2xSin', 
-     :           cat__typer, cols(15), status)
+     :                      cat__typer, cols(15), status)
+            call cat_tattc (cols(15), 'EXFMT', 'G14.7', status)
+
             call cat_pnew0 (ci, cat__fityp, '2xCos', 
-     :           cat__typer, cols(16), status)
+     :                      cat__typer, cols(16), status)
+            call cat_tattc (cols(16), 'EXFMT', 'G14.7', status)
+
             call cat_pnew0 (ci, cat__fityp, '3xSin', 
-     :           cat__typer, cols(17), status)
+     :                      cat__typer, cols(17), status)
+            call cat_tattc (cols(17), 'EXFMT', 'G14.7', status)
+
             call cat_pnew0 (ci, cat__fityp, '3xCos', 
-     :           cat__typer, cols(18), status)
+     :                      cat__typer, cols(18), status)
+            call cat_tattc (cols(18), 'EXFMT', 'G14.7', status)
+
             call cat_pnew0 (ci, cat__fityp, '4xSin', 
-     :           cat__typer, cols(19), status)
+     :                      cat__typer, cols(19), status)
+            call cat_tattc (cols(19), 'EXFMT', 'G14.7', status)
+
             call cat_pnew0 (ci, cat__fityp, '4xCos', 
-     :           cat__typer, cols(20), status)
+     :                      cat__typer, cols(20), status)
+            call cat_tattc (cols(20), 'EXFMT', 'G14.7', status)
             
 *         Create parameters, and set their values
             call cat_pnew0 (ci, cat__qityp, 'Filename',

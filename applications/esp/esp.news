@@ -2,6 +2,12 @@
 ESP - Extended Surface Photometry
 =================================
 
+Release 0.11-3
+--------------
+
+Improve format of output catalogues to handle larger images.
+
+
 Release 0.11-2
 --------------
 
