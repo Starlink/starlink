@@ -155,6 +155,9 @@ extern "C" {
 	char 	reqName[RTD_NAMELEN];
     } rtdIMAGE_EVT_HNDL;
 
+#ifdef STATUS
+#undef STATUS
+#endif
     typedef enum rtdSERVER_CMDS {
 	ATTACH = 1, 	 	/* RTD Widget Event Attachment */
 	DETACH, 	 	/* RTD Widget Event Detachment */

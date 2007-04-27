@@ -213,7 +213,11 @@ int rtdInitImageEvt(char              *requestor,
     
     struct sockaddr_in rtdClientAddr;  /* for local socket address */
     struct sockaddr_in rtdServerAddr;  /* for peer socket address */
+#if HAVE_SOCKLEN_T
     socklen_t addrlen;
+#else 
+    int addrlen;
+#endif
     int optval;
 
     char buf[256];

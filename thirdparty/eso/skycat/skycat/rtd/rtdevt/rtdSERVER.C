@@ -195,6 +195,9 @@ int rtdSERVER::Loop()
 		log("IMAGEINFO command received (port %d)\n", currClient->Port());
 		ServImageCmd(&rtdPacket);
 		break;
+#ifdef STATUS
+#undef STATUS
+#endif
 	    case STATUS:
 		log("STATUS command received (port %d)\n", currClient->Port());
 		ServStatusCmd(socket);
