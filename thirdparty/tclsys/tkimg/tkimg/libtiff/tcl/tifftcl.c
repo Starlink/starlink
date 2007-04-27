@@ -82,12 +82,12 @@ Tifftcl_Init (interp)
 #endif
 
 #if TCL_DOES_STUBS
-  if (Tcl_PkgProvideEx(interp, PACKAGE_NAME, TIFFTCL_VERSION,
+  if (Tcl_PkgProvideEx(interp, DPACKAGE_NAME, TIFFTCL_VERSION,
 		       (ClientData) &tifftclStubs) != TCL_OK) {
     return TCL_ERROR;
   }
 #else
-  if (Tcl_PkgProvide(interp, PACKAGE_NAME, TIFFTCL_VERSION) != TCL_OK) {
+  if (Tcl_PkgProvide(interp, DPACKAGE_NAME, TIFFTCL_VERSION) != TCL_OK) {
     return TCL_ERROR;
   }
 #endif

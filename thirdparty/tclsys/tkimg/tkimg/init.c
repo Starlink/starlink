@@ -180,7 +180,7 @@ int
      * At last provide the package ...
      */
 
-    if (Tcl_PkgProvide(interp, PACKAGE_NAME, VERSION) != TCL_OK) {
+    if (Tcl_PkgProvide(interp, DPACKAGE_NAME, VERSION) != TCL_OK) {
         return TCL_ERROR;
     }
     return TCL_OK;

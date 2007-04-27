@@ -87,12 +87,12 @@ Pngtcl_Init (interp)
 #endif
 
 #if TCL_DOES_STUBS
-  if (Tcl_PkgProvideEx(interp, PACKAGE_NAME, PNGTCL_VERSION,
+  if (Tcl_PkgProvideEx(interp, DPACKAGE_NAME, PNGTCL_VERSION,
 		       (ClientData) &pngtclStubs) != TCL_OK) {
     return TCL_ERROR;
   }
 #else
-  if (Tcl_PkgProvide(interp, PACKAGE_NAME, PNGTCL_VERSION) != TCL_OK) {
+  if (Tcl_PkgProvide(interp, DPACKAGE_NAME, PNGTCL_VERSION) != TCL_OK) {
     return TCL_ERROR;
   }
 #endif

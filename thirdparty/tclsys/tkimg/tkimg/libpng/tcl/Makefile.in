@@ -194,7 +194,7 @@ CONFIG_CLEAN_FILES = Makefile pngtclConfig.sh pkgIndex.tcl
 
 CPPFLAGS	= @CPPFLAGS@					\
 		-DZLIBTCL_VERSION=\"$(zlibtcl_VERSION)\"	\
-		-DPACKAGE_NAME=\"$(PACKAGE)\"
+		-DDPACKAGE_NAME=\"$(PACKAGE)\"
 LIBS		= @LIBS@
 AR		= ar
 CFLAGS		= @CFLAGS@

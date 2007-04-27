@@ -63,7 +63,7 @@ Jpegtcl_InitStubs(interp, version, exact)
 #define UNCONST 
 #endif
 
-    result = Tcl_PkgRequireEx(interp, PACKAGE_NAME, UNCONST version, exact,
+    result = Tcl_PkgRequireEx(interp, DPACKAGE_NAME, UNCONST version, exact,
 		(ClientData *) &jpegtclStubsPtr);
     if (!result || !jpegtclStubsPtr) {
         return (char *) NULL;

@@ -1,6 +1,6 @@
 #!/bin/sh
 # The next line restarts using wish8.3 \
-exec wish8.3 $0 ${1+"$@"}
+exec wish8.4 $0 ${1+"$@"}
 
 source [file join [file dirname [info script]] imgmsg.tcl]
 
