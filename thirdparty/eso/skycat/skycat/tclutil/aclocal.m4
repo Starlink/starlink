@@ -150,8 +150,29 @@ case $system in
    SunOS-5*)
       SHLIB_LD_CXX_LIBS="/usr/lib/libCrun.so.1 /usr/lib/libCstd.so.1"
    ;;
+   OSF*)
+      SHLIB_LD_CXX_LIBS="-lcxx -lcxxstd"
+   ;;
 esac
 echo "SHLIB_LD_CXX_LIBS = $SHLIB_LD_CXX_LIBS"
 AC_SUBST(SHLIB_LD_CXX_LIBS)
 
-])
+#-------------------------------------------------------------------------
+#  The cxx C++ compiler under Tru64 UNIX needs the special
+#  CXXFLAGS "-std gnu -D__USE_STD_IOSTREAM=1". These allow the standard 
+#  library streams headers to work and to generate templates that do 
+#  not require special handling throughout skycat directories (normally 
+#  template object files are created in various cxx_repository subdirectories,
+#  this way the object files are kept embedded the usual object files, see 
+#  the cxx man page for details).
+#-------------------------------------------------------------------------
+case $system in
+   OSF*) 
+      if test "$CXX" = "cxx"; then 
+         CXXFLAGS="$CXXFLAGS -g3 -std gnu -D__USE_STD_IOSTREAM=1"
+      fi
+  ;;
+esac
+
+]) #  End of macro
+

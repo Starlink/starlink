@@ -20,8 +20,9 @@ static const char* const rcsId="@(#) $Id: ErrorHandler.C,v 1.1.1.1 2006/01/12 16
 #include <iostream>
 #include "error.h"
 #include "ErrorHandler.h"
-
 using namespace std;
+
+
 
 /*
  * install an X error handler
