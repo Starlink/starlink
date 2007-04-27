@@ -308,7 +308,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS tclutil_VERSION tclutil_LIB_FILE tclutil_BUILD_LIB_SPEC tclutil_LIB_SPEC BLT_LIB_SPEC tclutil_SRC_DIR CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP my_shmem CYGPATH PKG_LIB_FILE PKG_STUB_LIB_FILE PKG_STUB_SOURCES PKG_STUB_OBJECTS PKG_TCL_SOURCES PKG_HEADERS PKG_INCLUDES PKG_LIBS PKG_CFLAGS TCL_VERSION TCL_BIN_DIR TCL_SRC_DIR TCL_LIB_FILE TCL_LIB_FLAG TCL_LIB_SPEC TCL_STUB_LIB_FILE TCL_STUB_LIB_FLAG TCL_STUB_LIB_SPEC TCL_LIBS TCL_DEFS TCL_EXTRA_CFLAGS TCL_LD_FLAGS TCL_SHLIB_LD_LIBS TK_VERSION TK_BIN_DIR TK_SRC_DIR TK_LIB_FILE TK_LIB_FLAG TK_LIB_SPEC TK_STUB_LIB_FILE TK_STUB_LIB_FLAG TK_STUB_LIB_SPEC TK_LIBS TK_XINCLUDES CXX CXXFLAGS ac_ct_CXX INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE RANLIB ac_ct_RANLIB MATH_LIBS PKG_SOURCES PKG_OBJECTS CLEANFILES TCL_INCLUDES TK_INCLUDES TCL_THREADS SHARED_BUILD AR CELIB_DIR LIBOBJS SHLIB_SUFFIX DL_LIBS CFLAGS_DEBUG CFLAGS_OPTIMIZE CFLAGS_WARNING STLIB_LD SHLIB_LD SHLIB_CFLAGS SHLIB_LD_LIBS LDFLAGS_DEBUG LDFLAGS_OPTIMIZE LD_LIBRARY_PATH_VAR TCL_DBGX CFLAGS_DEFAULT LDFLAGS_DEFAULT MAKE_LIB MAKE_SHARED_LIB MAKE_STATIC_LIB MAKE_STUB_LIB RANLIB_STUB TCLSH_PROG WISH_PROG astrotcl_LIB_FILE astrotcl_BUILD_DIR astrotcl_BUILD_LIB_SPEC astrotcl_LIB_SPEC astrotcl_PKG_OBJECTS astrotcl_SRC_DIR LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS tclutil_VERSION tclutil_LIB_FILE tclutil_BUILD_LIB_SPEC tclutil_LIB_SPEC BLT_LIB_SPEC tclutil_SRC_DIR CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP my_shmem SHLIB_LD_CXX_LIBS CYGPATH PKG_LIB_FILE PKG_STUB_LIB_FILE PKG_STUB_SOURCES PKG_STUB_OBJECTS PKG_TCL_SOURCES PKG_HEADERS PKG_INCLUDES PKG_LIBS PKG_CFLAGS TCL_VERSION TCL_BIN_DIR TCL_SRC_DIR TCL_LIB_FILE TCL_LIB_FLAG TCL_LIB_SPEC TCL_STUB_LIB_FILE TCL_STUB_LIB_FLAG TCL_STUB_LIB_SPEC TCL_LIBS TCL_DEFS TCL_EXTRA_CFLAGS TCL_LD_FLAGS TCL_SHLIB_LD_LIBS TK_VERSION TK_BIN_DIR TK_SRC_DIR TK_LIB_FILE TK_LIB_FLAG TK_LIB_SPEC TK_STUB_LIB_FILE TK_STUB_LIB_FLAG TK_STUB_LIB_SPEC TK_LIBS TK_XINCLUDES CXX CXXFLAGS ac_ct_CXX INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE RANLIB ac_ct_RANLIB MATH_LIBS PKG_SOURCES PKG_OBJECTS CLEANFILES TCL_INCLUDES TK_INCLUDES TCL_THREADS SHARED_BUILD AR CELIB_DIR LIBOBJS SHLIB_SUFFIX DL_LIBS CFLAGS_DEBUG CFLAGS_OPTIMIZE CFLAGS_WARNING STLIB_LD SHLIB_LD SHLIB_CFLAGS SHLIB_LD_LIBS LDFLAGS_DEBUG LDFLAGS_OPTIMIZE LD_LIBRARY_PATH_VAR TCL_DBGX CFLAGS_DEFAULT LDFLAGS_DEFAULT MAKE_LIB MAKE_SHARED_LIB MAKE_STATIC_LIB MAKE_STUB_LIB RANLIB_STUB TCLSH_PROG WISH_PROG astrotcl_LIB_FILE astrotcl_BUILD_DIR astrotcl_BUILD_LIB_SPEC astrotcl_LIB_SPEC astrotcl_PKG_OBJECTS astrotcl_SRC_DIR LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -3547,6 +3547,40 @@ _ACEOF
 
 
 # ==================== END OF cfitsio SECTION ================
+
+#------------------------------------------------------------------------
+#  Check if we require additional libraries to support C++ shareable
+#  libraries.
+system=`uname -s`-`uname -r`
+SHLIB_LD_CXX_LIBS=""
+export SHLIB_LD_CXX_LIBS
+case $system in
+   SunOS-5*)
+      SHLIB_LD_CXX_LIBS="/usr/lib/libCrun.so.1 /usr/lib/libCstd.so.1"
+   ;;
+   OSF*)
+      SHLIB_LD_CXX_LIBS="-lcxx -lcxxstd"
+   ;;
+esac
+
+
+#-------------------------------------------------------------------------
+#  The cxx C++ compiler under Tru64 UNIX needs the special
+#  CXXFLAGS "-std gnu -D__USE_STD_IOSTREAM=1". These allow the standard
+#  library streams headers to work and to generate templates that do
+#  not require special handling throughout skycat directories (normally
+#  template object files are created in various cxx_repository subdirectories,
+#  this way the object files are kept embedded the usual object files, see
+#  the cxx man page for details).
+#-------------------------------------------------------------------------
+case $system in
+   OSF*)
+      if test "$CXX" = "cxx"; then
+         CXXFLAGS="$CXXFLAGS -g3 -std gnu -D__USE_STD_IOSTREAM=1"
+      fi
+  ;;
+esac
+
 
 
 
@@ -13577,6 +13611,7 @@ s,@OBJEXT@,$OBJEXT,;t t
 s,@CPP@,$CPP,;t t
 s,@EGREP@,$EGREP,;t t
 s,@my_shmem@,$my_shmem,;t t
+s,@SHLIB_LD_CXX_LIBS@,$SHLIB_LD_CXX_LIBS,;t t
 s,@CYGPATH@,$CYGPATH,;t t
 s,@PKG_LIB_FILE@,$PKG_LIB_FILE,;t t
 s,@PKG_STUB_LIB_FILE@,$PKG_STUB_LIB_FILE,;t t
