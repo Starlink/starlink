@@ -4,7 +4,7 @@
 
 <component id="@PACKAGE@" support="U">
   <version>@PACKAGE_VERSION@</version>
-  <path>thirdparty/eso/skycat/skycat</path>
+  <path>thirdparty/eso/skycat</path>
   <description>The main skycat component</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
