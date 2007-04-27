@@ -11,6 +11,8 @@
 # pbiereic     24/08/99    created
 
 package require img::xpm
+package require Tclutil
+package require Astrotcl
 
 if {![lcontain $auto_path $cat_library]} {
     lappend auto_path $cat_library

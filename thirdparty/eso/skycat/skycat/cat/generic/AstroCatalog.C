@@ -19,7 +19,6 @@
 static const char* const rcsId="@(#) $Id$";
 
 
-using namespace std;
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <cstdlib>
@@ -35,6 +34,8 @@ using namespace std;
 #include "Mem.h"
 #include "AstroCatalog.h"
 #include "LocalCatalog.h"
+
+using namespace std;
 
 
 /*

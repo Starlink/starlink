@@ -308,7 +308,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS tclutil_VERSION tclutil_LIB_FILE tclutil_BUILD_LIB_SPEC tclutil_BUILD_DIR tclutil_LIB_SPEC BLT_LIB_SPEC tclutil_SRC_DIR tclutil_PKG_OBJECTS astrotcl_VERSION astrotcl_LIB_FILE astrotcl_BUILD_LIB_SPEC astrotcl_BUILD_DIR astrotcl_LIB_SPEC astrotcl_SRC_DIR astrotcl_PKG_OBJECTS MERGE_OBJECTS CYGPATH EXEEXT PKG_LIB_FILE PKG_STUB_LIB_FILE PKG_STUB_SOURCES PKG_STUB_OBJECTS PKG_TCL_SOURCES PKG_HEADERS PKG_INCLUDES PKG_LIBS PKG_CFLAGS TCL_VERSION TCL_BIN_DIR TCL_SRC_DIR TCL_LIB_FILE TCL_LIB_FLAG TCL_LIB_SPEC TCL_STUB_LIB_FILE TCL_STUB_LIB_FLAG TCL_STUB_LIB_SPEC TCL_LIBS TCL_DEFS TCL_EXTRA_CFLAGS TCL_LD_FLAGS TCL_SHLIB_LD_LIBS TK_VERSION TK_BIN_DIR TK_SRC_DIR TK_LIB_FILE TK_LIB_FLAG TK_LIB_SPEC TK_STUB_LIB_FILE TK_STUB_LIB_FLAG TK_STUB_LIB_SPEC TK_LIBS TK_XINCLUDES CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC OBJEXT CPP CXX CXXFLAGS ac_ct_CXX INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE RANLIB ac_ct_RANLIB EGREP MATH_LIBS PKG_SOURCES PKG_OBJECTS CLEANFILES TCL_INCLUDES TK_INCLUDES TCL_THREADS SHARED_BUILD AR CELIB_DIR LIBOBJS SHLIB_SUFFIX DL_LIBS CFLAGS_DEBUG CFLAGS_OPTIMIZE CFLAGS_WARNING STLIB_LD SHLIB_LD SHLIB_CFLAGS SHLIB_LD_LIBS LDFLAGS_DEBUG LDFLAGS_OPTIMIZE LD_LIBRARY_PATH_VAR TCL_DBGX CFLAGS_DEFAULT LDFLAGS_DEFAULT MAKE_LIB MAKE_SHARED_LIB MAKE_STATIC_LIB MAKE_STUB_LIB RANLIB_STUB TCLSH_PROG WISH_PROG cat_LIB_FILE cat_BUILD_LIB_SPEC cat_BUILD_DIR cat_LIB_SPEC cat_PKG_OBJECTS cat_SRC_DIR LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CYGPATH EXEEXT PKG_LIB_FILE PKG_STUB_LIB_FILE PKG_STUB_SOURCES PKG_STUB_OBJECTS PKG_TCL_SOURCES PKG_HEADERS PKG_INCLUDES PKG_LIBS PKG_CFLAGS TCL_VERSION TCL_BIN_DIR TCL_SRC_DIR TCL_LIB_FILE TCL_LIB_FLAG TCL_LIB_SPEC TCL_STUB_LIB_FILE TCL_STUB_LIB_FLAG TCL_STUB_LIB_SPEC TCL_LIBS TCL_DEFS TCL_EXTRA_CFLAGS TCL_LD_FLAGS TCL_SHLIB_LD_LIBS TK_VERSION TK_BIN_DIR TK_SRC_DIR TK_LIB_FILE TK_LIB_FLAG TK_LIB_SPEC TK_STUB_LIB_FILE TK_STUB_LIB_FLAG TK_STUB_LIB_SPEC TK_LIBS TK_XINCLUDES CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC OBJEXT CPP CXX CXXFLAGS ac_ct_CXX INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE RANLIB ac_ct_RANLIB EGREP MATH_LIBS tclutil_VERSION tclutil_LIB_FILE tclutil_BUILD_LIB_SPEC tclutil_BUILD_DIR tclutil_LIB_SPEC BLT_LIB_SPEC tclutil_SRC_DIR tclutil_PKG_OBJECTS astrotcl_VERSION astrotcl_LIB_FILE astrotcl_BUILD_LIB_SPEC astrotcl_BUILD_DIR astrotcl_LIB_SPEC astrotcl_SRC_DIR astrotcl_PKG_OBJECTS MERGE_OBJECTS SHLIB_LD_CXX_LIBS PKG_SOURCES PKG_OBJECTS CLEANFILES TCL_INCLUDES TK_INCLUDES TCL_THREADS SHARED_BUILD AR CELIB_DIR LIBOBJS SHLIB_SUFFIX DL_LIBS CFLAGS_DEBUG CFLAGS_OPTIMIZE CFLAGS_WARNING STLIB_LD SHLIB_LD SHLIB_CFLAGS SHLIB_LD_LIBS LDFLAGS_DEBUG LDFLAGS_OPTIMIZE LD_LIBRARY_PATH_VAR TCL_DBGX CFLAGS_DEFAULT LDFLAGS_DEFAULT MAKE_LIB MAKE_SHARED_LIB MAKE_STATIC_LIB MAKE_STUB_LIB RANLIB_STUB TCLSH_PROG WISH_PROG cat_LIB_FILE cat_BUILD_LIB_SPEC cat_BUILD_DIR cat_LIB_SPEC cat_PKG_OBJECTS cat_SRC_DIR LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1336,89 +1336,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 #--------------------------------------------------------------------
 # Do application specific checks (see aclocal.m4)
 #--------------------------------------------------------------------
-
-
-# Load the Tclutil definitions
-cf=../tclutil/tclutilConfig.sh
-if test -f $cf ; then
-    . $cf
-
-
-
-
-
-
-
-
-else
-    { { echo "$as_me:$LINENO: error: $cf doesn't exist" >&5
-echo "$as_me: error: $cf doesn't exist" >&2;}
-   { (exit 1); exit 1; }; }
-fi
-
-# Load the Astrotcl definitions
-cf=../astrotcl/astrotclConfig.sh
-if test -f $cf ; then
-    . $cf
-
-
-
-
-
-
-
-else
-    { { echo "$as_me:$LINENO: error: $cf doesn't exist" >&5
-echo "$as_me: error: $cf doesn't exist" >&2;}
-   { (exit 1); exit 1; }; }
-fi
-
-# -----------------------------------------------------------------------
-# Optionally merge object and header files from dependent packages to make one master lib
-# -----------------------------------------------------------------------
-MERGED=1
-# Check whether --enable-merge or --disable-merge was given.
-if test "${enable_merge+set}" = set; then
-  enableval="$enable_merge"
-  MERGED=$enableval
-else
-  MERGED=no
-fi;
-
-
-csources=`cd $srcdir; echo generic/*.[Cc]`
-
-
-cat_headers=`cd $srcdir; echo generic/*.h`
-astrotcl_headers=`cd $srcdir; echo ../astrotcl/{generic,press,libwcs,cfitsio}/*.h`
-tclutil_headers=`cd $srcdir; echo ../tclutil/generic/*.h`
-
-cat_includes="-I$srcdir/generic -I$srcdir/bitmaps"
-astrotcl_includes="-I$srcdir/../astrotcl/generic -I$srcdir/../astrotcl/cfitsio -I$srcdir/../astrotcl/libwcs"
-tclutil_includes="-I$srcdir/../tclutil/generic"
-cincludes="${cat_includes} ${astrotcl_includes} ${tclutil_includes}"
-
-tclsources=`cd $srcdir; echo library/*.tcl library/*.xpm`
-
-if test $MERGED = yes ; then
-    echo "Will build merged master catalog library"
-    cheaders="${cat_headers} ${astrotcl_headers} ${tclutil_headers}"
-    MERGE_OBJECTS="$astrotcl_PKG_OBJECTS $tclutil_PKG_OBJECTS"
-else
-    echo "Not making a merged master catalog library"
-    cheaders="${cat_headers}"
-    MERGE_OBJECTS=""
-fi
-
-
-# -----------------------------------------------------------------------
-
-cat >>confdefs.h <<\_ACEOF
-#define USE_COMPAT_CONST 1
-_ACEOF
-
-
-
+#CAT_CONFIG
 
 #--------------------------------------------------------------------
 # Call TEA_INIT as the first TEA_ macro to set up initial vars.
@@ -6745,6 +6663,125 @@ done
     fi
 
 
+
+
+# Load the Tclutil definitions
+cf=../tclutil/tclutilConfig.sh
+if test -f $cf ; then
+    . $cf
+
+
+
+
+
+
+
+
+else
+    { { echo "$as_me:$LINENO: error: $cf doesn't exist" >&5
+echo "$as_me: error: $cf doesn't exist" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+# Load the Astrotcl definitions
+cf=../astrotcl/astrotclConfig.sh
+if test -f $cf ; then
+    . $cf
+
+
+
+
+
+
+
+else
+    { { echo "$as_me:$LINENO: error: $cf doesn't exist" >&5
+echo "$as_me: error: $cf doesn't exist" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+# -----------------------------------------------------------------------
+# Optionally merge object and header files from dependent packages to make one master lib
+# -----------------------------------------------------------------------
+MERGED=1
+# Check whether --enable-merge or --disable-merge was given.
+if test "${enable_merge+set}" = set; then
+  enableval="$enable_merge"
+  MERGED=$enableval
+else
+  MERGED=no
+fi;
+
+
+csources=`cd $srcdir; echo generic/*.[Cc]`
+
+
+cat_headers=`cd $srcdir; echo generic/*.h`
+astrotcl_headers=`cd $srcdir; echo ../astrotcl/{generic,press,libwcs,cfitsio}/*.h`
+tclutil_headers=`cd $srcdir; echo ../tclutil/generic/*.h`
+
+cat_includes="-I$srcdir/generic -I$srcdir/bitmaps"
+astrotcl_includes="-I$srcdir/../astrotcl/generic -I$srcdir/../astrotcl/cfitsio -I$srcdir/../astrotcl/libwcs"
+tclutil_includes="-I$srcdir/../tclutil/generic"
+cincludes="${cat_includes} ${astrotcl_includes} ${tclutil_includes}"
+
+tclsources=`cd $srcdir; echo library/*.tcl library/*.xpm`
+
+if test $MERGED = yes ; then
+    echo "Will build merged master catalog library"
+    cheaders="${cat_headers} ${astrotcl_headers} ${tclutil_headers}"
+    MERGE_OBJECTS="$astrotcl_PKG_OBJECTS $tclutil_PKG_OBJECTS"
+else
+    echo "Not making a merged master catalog library"
+    cheaders="${cat_headers}"
+    MERGE_OBJECTS=""
+fi
+
+
+# -----------------------------------------------------------------------
+
+cat >>confdefs.h <<\_ACEOF
+#define USE_COMPAT_CONST 1
+_ACEOF
+
+
+#------------------------------------------------------------------------
+#  Check if we require additional libraries to support C++ shareable
+#  libraries.
+system=`uname -s`-`uname -r`
+SHLIB_LD_CXX_LIBS=""
+export SHLIB_LD_CXX_LIBS
+case $system in
+   SunOS-5*)
+      SHLIB_LD_CXX_LIBS="/usr/lib/libCrun.so.1 /usr/lib/libCstd.so.1"
+   ;;
+   OSF*)
+      SHLIB_LD_CXX_LIBS="-lcxx -lcxxstd"
+   ;;
+esac
+
+
+#-------------------------------------------------------------------------
+#  The cxx C++ compiler under Tru64 UNIX needs the special
+#  CXXFLAGS "-std gnu -D__USE_STD_IOSTREAM=1". These allow the standard
+#  library streams headers to work and to generate templates that do
+#  not require special handling throughout skycat directories (normally
+#  template object files are created in various cxx_repository subdirectories,
+#  this way the object files are kept embedded the usual object files, see
+#  the cxx man page for details).
+#-------------------------------------------------------------------------
+case $system in
+   OSF*)
+      if test "$CXX" = "cxx"; then
+         CXXFLAGS="$CXXFLAGS -g3 -std gnu -D__USE_STD_IOSTREAM=1"
+      fi
+  ;;
+esac
+
+
+
+
+
 #-----------------------------------------------------------------------
 # __CHANGE__
 # Specify the C source files to compile in TEA_ADD_SOURCES,
@@ -11895,22 +11932,6 @@ s,@ECHO_C@,$ECHO_C,;t t
 s,@ECHO_N@,$ECHO_N,;t t
 s,@ECHO_T@,$ECHO_T,;t t
 s,@LIBS@,$LIBS,;t t
-s,@tclutil_VERSION@,$tclutil_VERSION,;t t
-s,@tclutil_LIB_FILE@,$tclutil_LIB_FILE,;t t
-s,@tclutil_BUILD_LIB_SPEC@,$tclutil_BUILD_LIB_SPEC,;t t
-s,@tclutil_BUILD_DIR@,$tclutil_BUILD_DIR,;t t
-s,@tclutil_LIB_SPEC@,$tclutil_LIB_SPEC,;t t
-s,@BLT_LIB_SPEC@,$BLT_LIB_SPEC,;t t
-s,@tclutil_SRC_DIR@,$tclutil_SRC_DIR,;t t
-s,@tclutil_PKG_OBJECTS@,$tclutil_PKG_OBJECTS,;t t
-s,@astrotcl_VERSION@,$astrotcl_VERSION,;t t
-s,@astrotcl_LIB_FILE@,$astrotcl_LIB_FILE,;t t
-s,@astrotcl_BUILD_LIB_SPEC@,$astrotcl_BUILD_LIB_SPEC,;t t
-s,@astrotcl_BUILD_DIR@,$astrotcl_BUILD_DIR,;t t
-s,@astrotcl_LIB_SPEC@,$astrotcl_LIB_SPEC,;t t
-s,@astrotcl_SRC_DIR@,$astrotcl_SRC_DIR,;t t
-s,@astrotcl_PKG_OBJECTS@,$astrotcl_PKG_OBJECTS,;t t
-s,@MERGE_OBJECTS@,$MERGE_OBJECTS,;t t
 s,@CYGPATH@,$CYGPATH,;t t
 s,@EXEEXT@,$EXEEXT,;t t
 s,@PKG_LIB_FILE@,$PKG_LIB_FILE,;t t
@@ -11965,6 +11986,23 @@ s,@RANLIB@,$RANLIB,;t t
 s,@ac_ct_RANLIB@,$ac_ct_RANLIB,;t t
 s,@EGREP@,$EGREP,;t t
 s,@MATH_LIBS@,$MATH_LIBS,;t t
+s,@tclutil_VERSION@,$tclutil_VERSION,;t t
+s,@tclutil_LIB_FILE@,$tclutil_LIB_FILE,;t t
+s,@tclutil_BUILD_LIB_SPEC@,$tclutil_BUILD_LIB_SPEC,;t t
+s,@tclutil_BUILD_DIR@,$tclutil_BUILD_DIR,;t t
+s,@tclutil_LIB_SPEC@,$tclutil_LIB_SPEC,;t t
+s,@BLT_LIB_SPEC@,$BLT_LIB_SPEC,;t t
+s,@tclutil_SRC_DIR@,$tclutil_SRC_DIR,;t t
+s,@tclutil_PKG_OBJECTS@,$tclutil_PKG_OBJECTS,;t t
+s,@astrotcl_VERSION@,$astrotcl_VERSION,;t t
+s,@astrotcl_LIB_FILE@,$astrotcl_LIB_FILE,;t t
+s,@astrotcl_BUILD_LIB_SPEC@,$astrotcl_BUILD_LIB_SPEC,;t t
+s,@astrotcl_BUILD_DIR@,$astrotcl_BUILD_DIR,;t t
+s,@astrotcl_LIB_SPEC@,$astrotcl_LIB_SPEC,;t t
+s,@astrotcl_SRC_DIR@,$astrotcl_SRC_DIR,;t t
+s,@astrotcl_PKG_OBJECTS@,$astrotcl_PKG_OBJECTS,;t t
+s,@MERGE_OBJECTS@,$MERGE_OBJECTS,;t t
+s,@SHLIB_LD_CXX_LIBS@,$SHLIB_LD_CXX_LIBS,;t t
 s,@PKG_SOURCES@,$PKG_SOURCES,;t t
 s,@PKG_OBJECTS@,$PKG_OBJECTS,;t t
 s,@CLEANFILES@,$CLEANFILES,;t t
