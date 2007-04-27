@@ -11,6 +11,9 @@
 # abrighto     02/01/06    created
 
 package require img::xpm
+package require Tclutil
+package require Astrotcl
+package require Cat
 
 if {![lcontain $auto_path $skycat_library]} {
     lappend auto_path $skycat_library
