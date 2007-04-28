@@ -1924,7 +1924,7 @@ $(MANIFESTS)/skycat: \
 		$(MANIFESTS)/tclx \
 		$(MANIFESTS)/tk \
 		$(MANIFESTS)/tkimg
-	cd thirdparty/eso/skycat/skycat \
+	cd thirdparty/eso/skycat \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/sla: \
