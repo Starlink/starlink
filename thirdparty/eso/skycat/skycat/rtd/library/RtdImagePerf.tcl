@@ -42,7 +42,7 @@ itcl::class rtd::RtdImagePerf {
 	set var $target_image_
 	global ::$var
 
-	LabelValue2 $w \
+	util::LabelValue2 $w \
 		-text $label \
 		-labelfont $itk_option(-labelfont) \
 		-valuefont $itk_option(-valuefont) \
