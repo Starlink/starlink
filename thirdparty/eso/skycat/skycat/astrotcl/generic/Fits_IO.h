@@ -47,15 +47,7 @@
  */
 class FitsIO : public ImageIORep {
 private:
-    fitsfile* fitsio_;		// handle to use for cfitsio C library routines
-    static FitsIO* fits_;	// current class ptr for reallocFile callback
-
-    Mem primaryHeader_;		// the primary header, if there is more than one HDU
-
-    Mem mergedHeader_;		// the primary header merged with the current extension
-                                // header, if applicable (The primary header is appended
-                                // after the extension header).
-    
+   
     // set wcslib header length for searching
     static void set_header_length(const Mem& header);
     void set_header_length() const;
@@ -69,6 +61,17 @@ private:
     static void* reallocFile(void* p, size_t newsize);
 
 protected:   
+    //  PWD: Move here so that derived classes can manipulate (needed to get
+    //  at HDU functions from ther  
+    fitsfile* fitsio_;		// handle to use for cfitsio C library routines
+    static FitsIO* fits_;	// current class ptr for reallocFile callback
+
+    Mem primaryHeader_;		// the primary header, if there is more than one HDU
+
+    Mem mergedHeader_;		// the primary header merged with the current extension
+                                // header, if applicable (The primary header is appended
+                                // after the extension header).
+ 
     // Check that this object represents a FITS file (and not just some kind of memory)
     // and return 0 if it does. If not, return an error message.
     int checkFitsFile();
