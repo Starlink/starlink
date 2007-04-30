@@ -1,6 +1,0 @@
-command 'cat ./tShellCommand.tmp' returns:
-status: 0
-stdout: 'first line
-second line
-'
-stderr: ''

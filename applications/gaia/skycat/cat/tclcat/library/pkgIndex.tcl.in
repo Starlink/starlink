@@ -1,3 +1,0 @@
-# Tcl package index file, version 1.0
-
-package ifneeded Cat @CAT_VERSION@ "load [list $dir/../libcat@SHLIB_SUFFIX@]"
