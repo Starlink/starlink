@@ -49,7 +49,7 @@ changequote(<<, >>)
 csources=`cd $srcdir; echo generic/*.[Cc] rtdevt/rtdImageEvent.c rtdevt/rtdSem.c`
 changequote([, ])
 
-rtd_headers=`cd $srcdir; echo generic/*.h rtdevt/rtdImageEvent.h rtdevt/rtdSem.h`
+rtd_headers=`cd $srcdir; echo generic/*.h generic/*.icc rtdevt/rtdImageEvent.h rtdevt/rtdSem.h`
 astrotcl_headers=`cd $srcdir; echo ../astrotcl/{generic,press,libwcs,cfitsio}/*.h`
 tclutil_headers=`cd $srcdir; echo ../tclutil/generic/*.h`
 
