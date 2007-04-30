@@ -88,17 +88,32 @@ itcl::class gaia::GaiaCubeSpectrum {
       #  Evaluate any options [incr Tk].
       eval itk_initialize $args
 
+      itk_component add tframe {
+         frame $w_.tframe
+      }
+
       #  Whether to enable spectral extraction.
       itk_component add extraction {
-         StarLabelCheck $w_.extraction \
+         StarLabelCheck $itk_component(tframe).extraction \
             -text "Spectrum extraction:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $itk_option(-labelwidth) \
             -variable [scope itk_option(-extraction)] \
             -command [code $this toggle_extraction_]
       }
-      pack $itk_component(extraction) -side top -fill x -ipadx 1m -ipady 2m
       add_short_help $itk_component(extraction) {Display extracted spectrum}
+
+      #  Do a re-extraction, without clicking on the image.
+      itk_component add reextract {
+         button $itk_component(tframe).reextract -text "Re-extract" \
+            -command [code $this reextract_]
+      }
+      add_short_help $itk_component(reextract) \
+         {Re-extract spectrum using new limits}
+      
+      pack $itk_component(tframe) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(extraction) -side left -expand 0 -anchor w
+      pack $itk_component(reextract) -side left -expand 0 -anchor c
 
       #  Whether to show the extraction limits as a range object on the
       #  spectral plot.
@@ -213,11 +228,11 @@ itcl::class gaia::GaiaCubeSpectrum {
          button $itk_component(rframe).clearref -text "Clear" \
             -command [code $this clear_reference]
       }
+
       pack $itk_component(rframe) -side top -fill x -ipadx 1m -ipady 2m
       pack $itk_component(reflabel) -side left -expand 0 -ipadx 1m
       pack $itk_component(setref) $itk_component(clearref) \
          -side left -expand 0 -anchor w -ipadx 1m -padx 1m
-
       add_short_help $itk_component(setref) \
          {Make current spectrum the reference}
       add_short_help $itk_component(clearref) \
@@ -599,6 +614,21 @@ itcl::class gaia::GaiaCubeSpectrum {
          return "region"
       }
       return "none"
+   }
+
+   #  Re-extract the spectrum. Quick button to avoid clicking on the image 
+   #  (which can be unzoomed so accuracy is difficult).
+   protected method reextract_ {} {
+      if { $spectrum_ != {} } {
+         set spectype [last_extracted_type]
+         if { $spectype == "point"  } {
+            eval display_point_spectrum_ localstart $last_cxcy_
+         } elseif { $spectype == "region" } {
+            display_region_spectrum_ localstart $last_region_
+         }
+      } else {
+         info_dialog "No spectrum has been extracted" $w_
+      }
    }
 
    #  Send the currently extracted spectrum to SPLAT for display.
