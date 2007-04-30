@@ -359,16 +359,19 @@ F77_SUBROUTINE(atl_tolut)( INTEGER(INMAP),
                            DOUBLE(XLO),
                            DOUBLE(XHI),
                            DOUBLE(DX),
+                           CHARACTER(OPTS),
                            INTEGER(OUTMAP),
-                           INTEGER(STATUS) );
+                           INTEGER(STATUS)
+                           TRAIL(OPTS) );
 
 void atlTolut( AstMapping *inmap, double xlo, double xhi, double dx,
-               AstMapping **outmap, int *status ){
+               const char *opts, AstMapping **outmap, int *status ){
 
    DECLARE_INTEGER(INMAP);
    DECLARE_DOUBLE(XLO);
    DECLARE_DOUBLE(XHI);
    DECLARE_DOUBLE(DX);
+   DECLARE_CHARACTER_DYN(OPTS);
    DECLARE_INTEGER(OUTMAP);
    DECLARE_INTEGER(STATUS);
    int ioutmap;
@@ -377,6 +380,7 @@ void atlTolut( AstMapping *inmap, double xlo, double xhi, double dx,
 
    if( !astOK ) return;
 
+   F77_CREATE_EXPORT_CHARACTER( opts, OPTS );
    F77_EXPORT_DOUBLE( xlo, XLO );
    F77_EXPORT_DOUBLE( xhi, XHI );
    F77_EXPORT_DOUBLE( dx, DX );
@@ -387,8 +391,12 @@ void atlTolut( AstMapping *inmap, double xlo, double xhi, double dx,
                         DOUBLE_ARG(&XLO),
                         DOUBLE_ARG(&XHI),
                         DOUBLE_ARG(&DX),
+                        CHARACTER_ARG(OPTS),
                         INTEGER_ARG(&OUTMAP),
-                        INTEGER_ARG(&STATUS) );
+                        INTEGER_ARG(&STATUS)
+                        TRAIL_ARG(OPTS) );
+
+   F77_FREE_CHARACTER( OPTS );
 
    if( astOK ) {
       F77_IMPORT_INTEGER( OUTMAP, ioutmap );
@@ -396,8 +404,6 @@ void atlTolut( AstMapping *inmap, double xlo, double xhi, double dx,
    } else {
       *outmap = AST__NULL;
    }      
-
-   F77_IMPORT_INTEGER( STATUS, *status );
 
    return;
 }

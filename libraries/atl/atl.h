@@ -66,6 +66,6 @@ void atlMgfts( int, AstFitsChan *, AstFitsChan *, AstFitsChan **, int * );
 void atlPtftr( AstFitsChan *, const char *, float, const char *, int * );
 void atlPtfti( AstFitsChan *, const char *, int, const char *, int * );
 void atlPtfts( AstFitsChan *, const char *, const char *, const char *,  int * );
-void atlTolut( AstMapping *, double, double, double, AstMapping **, int * );
+void atlTolut( AstMapping *, double, double, double, const char *, AstMapping **, int * );
 
 #endif
