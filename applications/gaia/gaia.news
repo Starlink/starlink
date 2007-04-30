@@ -1,4 +1,6 @@
-    
+    The spectrum can now be re-extracted (after changing the extraction
+    limits) by pressing a simple button, as well as by clicking on the
+    image. 
 
     The data range used to display the extracted spectrum can now be 
     defined explicitly.
