@@ -1,4 +1,4 @@
-      SUBROUTINE ATL_TOLUT( INMAP, XLO, XHI, DX, OUTMAP, STATUS )
+      SUBROUTINE ATL_TOLUT( INMAP, XLO, XHI, DX, OPTS, OUTMAP, STATUS )
 *+
 *  Name:
 *     ATL_TOLUT
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ATL_TOLUT( INMAP, XLO, XHI, DX, OUTMAP, STATUS )
+*     CALL ATL_TOLUT( INMAP, XLO, XHI, DX, OPTS, OUTMAP, STATUS )
 
 *  Description:
 *     This routine creates a Mapping that uses one or more LutMaps to
@@ -33,7 +33,9 @@
 *        Mapping will be used.
 *     DX = DOUBLE PRECISION (Given)
 *        The increment in INMAP input value to be used when creating the
-*         LutMaps.
+*        LutMaps.
+*     OPTS = CHARACTER * ( * ) (Given)
+*        Options to pass to the LutMap constructor.
 *     OUTMAP = INTEGER (Returned)
 *        An AST pointer to the returned Mapping, or AST__NULL if no Mapping 
 *        could be created. This will have the same number of inputs and
@@ -70,6 +72,8 @@
 *        Original version.
 *     25-APR-2007 (DSB):
 *        Add missing argument NOUT in call to ATL1_TOLUT.
+*     30-APR-2007 (DSB):
+*        Added OPTS argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -91,6 +95,7 @@
       DOUBLE PRECISION XLO
       DOUBLE PRECISION XHI
       DOUBLE PRECISION DX
+      CHARACTER OPTS*(*)
 
 *  Arguments Returned:
       INTEGER OUTMAP
@@ -162,7 +167,7 @@
       CALL PSX_CALLOC( LUTSIZ*NOUT, '_DOUBLE', IPW2, STATUS )
 
 *  Create the required Mapping.
-      CALL ATL1_TOLUT( INMAP, NOUT, XLO, DX, LUTSIZ, 
+      CALL ATL1_TOLUT( INMAP, NOUT, XLO, DX, LUTSIZ, OPTS, 
      :                 %VAL( CNF_PVAL( IPW1 ) ),
      :                 %VAL( CNF_PVAL( IPW2 ) ), OUTMAP, STATUS )
 
@@ -179,7 +184,7 @@
 
 
 
-      SUBROUTINE ATL1_TOLUT( INMAP, NOUT, XLO, DX, LUTSIZ, W1, W2, 
+      SUBROUTINE ATL1_TOLUT( INMAP, NOUT, XLO, DX, LUTSIZ, OPTS, W1, W2, 
      :                       OUTMAP, STATUS )
 
 *  Type Definitions:
@@ -196,6 +201,7 @@
       DOUBLE PRECISION XLO       ! Lowest INMAP input value
       DOUBLE PRECISION DX        ! INMAP input value step size
       INTEGER LUTSIZ             ! No. of points in each LutMap
+      CHARACTER OPTS*(*)         ! Options for LutMap constructor
 
 *  Arguments Returned:
       DOUBLE PRECISION W1( LUTSIZ ) ! Work space
@@ -237,7 +243,8 @@
 
 *  Create a LutMap which transform the INMAP input value into the curent
 *  output axis value.
-         MAP = AST_LUTMAP( LUTSIZ, W2( 1, I ), XLO, DX, ' ', STATUS )
+         MAP = AST_LUTMAP( LUTSIZ, W2( 1, I ), XLO, DX, OPTS, 
+     :                     STATUS )
 
 *  If this is the first axis, just use the above LutMap as the returned
 *  Mapping.
