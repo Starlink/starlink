@@ -65,6 +65,9 @@
 *        Fixed counter bug
 *     2007-03-05 (EC)
 *        Parse modelorder keyword in config file
+*     2007-04-30 (EC)
+*        Put map estimation in first chunk loop, only ast in second
+
 
 *  Notes:
 
@@ -267,11 +270,14 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
       msgOut(" ", "SMF_ITERATEMAP: Iteration ^ITER / ^NUMITER ---------------",
              status);
       
-      msgOut(" ", "SMF_ITERATEMAP: Calculate time-stream model components", 
-	     status);
       for( i=1; i<=isize; i++ ) {
-        /* Open files */
+	msgSeti("CHUNK", i);
+	msgSeti("NUMCHUNK", isize);
+	msgOut(" ", "SMF_ITERATEMAP: Chunk ^CHUNK / ^NUMCHUNK", status);
+	msgOut(" ", "SMF_ITERATEMAP: Calculate time-stream model components", 
+	       status);
 
+        /* Open files */
         smf_open_file( cumgrp, i, "UPDATE", 0, &cum, status );
         smf_open_file( resgrp, i, "UPDATE", 1, &res, status );
         smf_open_file( astgrp, i, "UPDATE", 0, &ast, status );
@@ -301,6 +307,55 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 	  }
 	}
 
+	/* Once all the other map components have been calculated, but the
+           previous iteration of AST back into the residual, zero ast,
+           and rebin the noise+astro signal into the map */
+
+	/* Add last iteration of astronomical signal back in to residual */
+	ast_data = (double *)(ast->pntr)[0];
+	res_data = (double *)(res->pntr)[0];
+	res_var = (double *)(res->pntr)[1];
+	
+	dsize = (ast->dims)[0]*(ast->dims)[1]*(ast->dims)[2];
+	
+	for( k=0; k<dsize; k++ ) {	  
+	  res_data[k] += ast_data[k];
+	  
+	  /* Set ast_data back to 0 since we've moved all of the signal
+	     into the map, and then it will get re-estimated by
+	     calcmodel_ast at the start of the next iteration. */
+	  
+	  ast_data[k] = 0;
+	}
+	
+	/* Load the LUT from the mapcoord extension */
+	smf_open_mapcoord( res, status );
+
+	if( *status == SAI__OK ) {
+	  /* Should check if bad status due to lack of extension, in
+	     which case try calculating it */
+	  lut = res->lut;
+
+	  /* Setup rebin flags */
+	  rebinflags = 0;
+	  if( i == 1 ) {
+	    rebinflags = rebinflags | AST__REBININIT;
+	  }
+	    
+	  if( i == isize ) {
+	    rebinflags = rebinflags | AST__REBINEND;
+	  }
+	    
+	}
+
+	/* Rebin the residual + astronomical signal into a map */
+
+	msgOut(" ", "SMF_ITERATEMAP: Rebin residual to estimate MAP", status);
+	smf_simplerebinmap( res_data, res_var, lut, dsize,
+			    rebinflags, map, weights, mapvar,
+			    msize, status );
+	  
+
         /* Close files */
         smf_close_file( &cum, status );
         smf_close_file( &res, status );
@@ -314,82 +369,36 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 	if( *status != SAI__OK ) i=isize+1;
       }
       
-      msgOut(" ", "SMF_ITERATEMAP: Rebin residual to estimate MAP", status);
+
+      /*if( iter == 1 ) return;*/
+
+
       if( *status == SAI__OK ) {
+	msgOut(" ", "SMF_ITERATEMAP: Calculate ast", status);
+
         for( i=1; i<=isize; i++ ) {
 	  smf_open_file( astgrp, i, "UPDATE", 0, &ast, status );
 	  smf_open_file( resgrp, i, "UPDATE", 0, &res, status );
 	  smf_open_file( cumgrp, i, "UPDATE", 0, &cum, status );
-	  smf_open_file( noigrp, i, "UPDATE", 0, &noi, status );
+	  /*smf_open_file( noigrp, i, "UPDATE", 0, &noi, status );*/
 
-	  if( *status == SAI__OK ) {
-
-	  /* Add last iteration of astronomical signal back in */
-	    ast_data = (double *)(ast->pntr)[0];
-	    res_data = (double *)(res->pntr)[0];
-	    res_var = (double *)(res->pntr)[1];
-
-	    dsize = (ast->dims)[0]*(ast->dims)[1]*(ast->dims)[2];
-
-	    for( j=0; j<dsize; j++ ) {
-
-	      res_data[j] += ast_data[j];
-
-	      /* Set ast_data back to 0 since we've moved all of the signal
-                 into the map, and then it will get re-estimated by
-                 calcmodel_ast at the start of the next iteration. */
-
-	      ast_data[j] = 0;
-	    }
-
-	  }
-
-	  /* Load the LUT from the mapcoord extension */
-	  smf_open_mapcoord( res, status );
-
-	  if( *status == SAI__OK ) {
-	    /* Should check if bad status due to lack of extension, in
-	       which case try calculating it */
-	    lut = res->lut;
-	  }
-
-	  if( *status == SAI__OK ) {
-
-	    /* Setup rebin flags */
-	    rebinflags = 0;
-	    if( i == 1 ) {
-	      rebinflags = rebinflags | AST__REBININIT;
-	    }
-	    
-	    if( i == isize ) {
-	      rebinflags = rebinflags | AST__REBINEND;
-	    }
-	    
-	  }
-
-	  /* Rebin the residual + astronomical signal into a map */
-
-	  smf_simplerebinmap( res_data, res_var, lut, dsize,
-			      rebinflags, map, weights, mapvar,
-			      msize, status );
-	  
 	  /* Calculate the AST model component. It is a special model
 	     because it assumes that the map contains the best current
-	     estimate of the astronomical sky. Since the map will have
-	     been re-estimated at the end of the last iteration, we
-	     always call the ast model calculation first before proceeding
-	     with other model components. */
-	  
+	     estimate of the astronomical sky. It gets called in this
+             separate loop since the map estimate gets updated by
+             each chunk in the main model component loop */
+
 	  smf_calcmodel_ast( cum, res, keymap, map, mapvar, ast, 0, status );
 	  
 	  /* Finally calculate the noise from the residual */
 
-	  smf_calcmodel_noi( cum, res, keymap, map, mapvar, noi, 0, status );
-	     
+	  /*smf_calcmodel_noi( cum, res, keymap, map, mapvar, noi, 0, status );
+	   */
+ 
 	  smf_close_file( &ast, status );    
 	  smf_close_file( &res, status );
 	  smf_close_file( &cum, status );	  
-	  smf_close_file( &noi, status );	  
+	  /*smf_close_file( &noi, status );*/
         }
       }
     }
