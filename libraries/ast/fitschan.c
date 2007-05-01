@@ -752,7 +752,10 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        - Change DSBSetup so that the central DSBSpecFrame frequency is
 *        CRVAL and the IF is the difference between CRVAL and LO.
 *        - Change tolerance in FitOK from 0.99999 to 0.995 to handle data from Nicolas 
-*        Peretto..
+*        Peretto.
+*     1-MAY-2007 (DSB):
+*        - In astSplit, if a keyword value looks like an int but is too long to 
+*         fit in an int, then treat it as a float instead.
 *class--
 */
 
@@ -1058,6 +1061,9 @@ static AstObject *(* parent_read)( AstChannel * );
    invocation of the astWrite method. */
 static int items_written = 0;
 static int write_nest = -1;
+
+/* Max number of characters in a formatted int */
+static int int_dig;
 
 /* Indentation level for indented comments when writing Objects to a
    FitsChan. */
@@ -14779,6 +14785,7 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name ) {
 /* Local Variables: */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstChannelVtab *channel;      /* Pointer to Channel component of Vtab */
+   char buf[ 100 ];              /* Buffer large enough to store formatted INT_MAX */
 
 /* Check the local error status. */
    if ( !astOK ) return;
@@ -14911,6 +14918,10 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name ) {
    using astWrite (so that in appropriately added cards can be identified
    and removed), and is explicitly switched on in astWrite. */
    MarkNew = 0;
+
+/* Max number of characters needed to format an int. */
+   sprintf( buf, "%d", INT_MAX );
+   int_dig = strlen( buf );
 
 }
 
@@ -24617,6 +24628,7 @@ int astSplit_( const char *card, char **name, char **value,
    int lq;                    /* Was previous character an escaping quote? */
    int len;                   /* Used length of value string */
    int nch;                   /* No. of characters used */
+   int ndig;                  /* No. of digits in the formatted integer */
    int type;                  /* Keyword data type */
    size_t nc;                 /* Number of character in the supplied card */
    size_t ncc;                /* No. of characters in the comment string */
@@ -24938,23 +24950,15 @@ int astSplit_( const char *card, char **name, char **value,
    in the formatted value does not exceed the capacity of an int. This may 
    be the case if there are too many digits in the integer for an "int" to 
    hold. In this case, change the data type to float. */
-
-
-
-/*
-
    if( *value && type == AST__INT ) {
       ndig = 0;
       c = *value;
       while( *c ) {
-         if( isdigit( *c ) ) ndig++;
-         c++;      
+         if( isdigit( *(c++) ) ) ndig++;
       }
 
-      if( ndig >= INT_DIG
+      if( ndig >= int_dig ) type = AST__FLOAT;
    }
-
-*/
 
 
 /* If an error occurred, free the returned strings and issue a context
