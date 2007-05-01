@@ -749,8 +749,10 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        1.0E-10 to 1.0E-7 (to avoid spurious low CDi_j values being
 *        created that should be zero).
 *     30-APR-2007 (DSB):
-*        Change DSBSetup so that the central DSBSpecFrame frequency is
+*        - Change DSBSetup so that the central DSBSpecFrame frequency is
 *        CRVAL and the IF is the difference between CRVAL and LO.
+*        - Change tolerance in FitOK from 0.99999 to 0.995 to handle data from Nicolas 
+*        Peretto..
 *class--
 */
 
@@ -8779,7 +8781,7 @@ static int FitOK( int n, double *act, double *est ) {
    estimates values is sufficiently high. */
       } else if( denom > 0.0 ) {
          r = ( s3 - s1*s2 )/sqrt( denom );
-         ret = ( fabs( r ) > 0.99999 );
+         ret = ( fabs( r ) > 0.995 );
       }
    } 
 
@@ -10685,7 +10687,7 @@ static int GetMaxJM( double ****item, char s ){
 
 *  Synopsis:
 *     #include "fitschan.h"
-*     int GetMaxJM( double ****item, char s )
+*     int GetMaxJM( double ****item, char s)
 
 *  Class Membership:
 *     FitsChan member function.
@@ -10794,7 +10796,7 @@ static int GetMaxI( double ****item, char s ){
 
 *  Synopsis:
 *     #include "fitschan.h"
-*     int GetMaxJM( double ****item, char s )
+*     int GetMaxJM( double ****item, char s)
 
 *  Class Membership:
 *     FitsChan member function.
@@ -10889,7 +10891,7 @@ static char GetMaxS( double ****item ){
 
 *  Synopsis:
 *     #include "fitschan.h"
-*     char GetMaxS( double ****item )
+*     char GetMaxS( double ****item)
 
 *  Class Membership:
 *     FitsChan member function.
@@ -24931,6 +24933,29 @@ int astSplit_( const char *card, char **name, char **value,
    if( *name ) *name = (char *) astRealloc( (void *) *name, strlen( *name ) + 1 );
    if( *comment ) *comment = (char *) astRealloc( (void *) *comment, strlen( *comment ) + 1 );
    if( *value ) *value = (char *) astRealloc( (void *) *value, strlen( *value ) + 1 );
+
+/* If the value is deemed to be integer, check that the number of digits
+   in the formatted value does not exceed the capacity of an int. This may 
+   be the case if there are too many digits in the integer for an "int" to 
+   hold. In this case, change the data type to float. */
+
+
+
+/*
+
+   if( *value && type == AST__INT ) {
+      ndig = 0;
+      c = *value;
+      while( *c ) {
+         if( isdigit( *c ) ) ndig++;
+         c++;      
+      }
+
+      if( ndig >= INT_DIG
+   }
+
+*/
+
 
 /* If an error occurred, free the returned strings and issue a context
    message. */
