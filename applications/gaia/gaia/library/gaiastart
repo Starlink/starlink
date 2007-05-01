@@ -1,7 +1,0 @@
-#!/bin/csh
-#
-#  Startup script for GAIA image display tool.
-#
-alias gaia '$GAIA_DIR/gaia'
-alias gaiadisp '$GAIA_DIR/gaiadisp'
-alias gaiaremote '$GAIA_DIR/gaiaremote'
