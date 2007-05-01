@@ -1,3 +1,2 @@
-Be sure to re-run make if you add or modify a bitmap in this directory. 
-This will create ../src/bitmaps.c which defines the bitmaps in C code.
-
+If adding new bitmaps make sure bitmaps.C is updated (missing Tcl
+script should be added, or do it by hand).
