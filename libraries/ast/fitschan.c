@@ -748,6 +748,9 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        In SplitMat, increase the allowed level of rounding erros from 
 *        1.0E-10 to 1.0E-7 (to avoid spurious low CDi_j values being
 *        created that should be zero).
+*     30-APR-2007 (DSB):
+*        Change DSBSetup so that the central DSBSpecFrame frequency is
+*        CRVAL and the IF is the difference between CRVAL and LO.
 *class--
 */
 
@@ -1273,7 +1276,7 @@ static void ClassTrans( AstFitsChan *, AstFitsChan *, int, int, const char *, co
 static void ClearAttrib( AstObject *, const char * );
 static void Copy( const AstObject *, AstObject * );
 static void CreateKeyword( AstFitsChan *, const char *, char [ FITSNAMLEN + 1 ] );
-static void DSBSetUp( AstFitsChan *, FitsStore *, AstDSBSpecFrame *, char, const char *, const char * );
+static void DSBSetUp( AstFitsChan *, FitsStore *, AstDSBSpecFrame *, char, double, const char *, const char * );
 static void DSSToStore( AstFitsChan *, FitsStore *, const char *, const char * );
 static void DelFits( AstFitsChan * );
 static void Delete( AstObject * );
@@ -6672,8 +6675,8 @@ static void DistortMaps( AstFitsChan *this, FitsStore *store, char s,
 }
 
 static void DSBSetUp( AstFitsChan *this, FitsStore *store, 
-                      AstDSBSpecFrame *dsb, char s, const char *method, 
-                      const char *class  ){
+                      AstDSBSpecFrame *dsb, char s, double crval,
+                      const char *method, const char *class  ){
 /*
 *  Name:
 *     DSBSetUp
@@ -6686,8 +6689,8 @@ static void DSBSetUp( AstFitsChan *this, FitsStore *store,
 
 *  Synopsis:
 *     void DSBSetUp( AstFitsChan *this, FitsStore *store, 
-*                    AstDSBSpecFrame *dsb, char s, const char *method, 
-*                    const char *class  )
+*                    AstDSBSpecFrame *dsb, char s, double crval,
+*                    const char *method, const char *class  )
 
 *  Class Membership:
 *     FitsChan
@@ -6704,6 +6707,11 @@ static void DSBSetUp( AstFitsChan *this, FitsStore *store,
 *        descriptions derived from a FITS header.
 *     dsb
 *        Pointer to the DSBSpecFrame.
+*     s
+*        Alternate axis code.
+*     crval
+*        The spectral CRVAL value, in the spectral system represented by
+*        the supplied DSBSPecFrame.
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
@@ -6719,16 +6727,18 @@ static void DSBSetUp( AstFitsChan *this, FitsStore *store,
 /* Local Variables: */
    AstDSBSpecFrame *dsb2;  /* New DSBSpecFrame in which StdOfRest is topo */
    AstFrameSet *fs;        /* FrameSet connecting two standards of rest */
+   double dsbcentre;       /* Topocentric reference (CRVAL) frequency */
    double in[2];           /* Source rest and image frequencies */
+   double lo;              /* Topocentric Local Oscillator frequency */
    double out[2];          /* Topocentric rest and image frequencies */
    int oldsor;             /* Original value for the StdOfRest attribute */
    int sorset;             /* Was the StdOfRest attribute set originally? */
-
+   
 /* Check the global status. */
    if ( !astOK ) return;
 
 /* Get a Mapping from the standard of rest of the source to the standard of 
-   rest of the observer. First note the orignal standard of rest and then
+   rest of the observer. First note the original standard of rest and then
    set it to source. */
    sorset = astTestStdOfRest( dsb );
    oldsor = sorset ? astGetStdOfRest( dsb ) : AST__NOSOR;
@@ -6754,14 +6764,31 @@ static void DSBSetUp( AstFitsChan *this, FitsStore *store,
    frequencies. Note, the IF value is signed so as to put the rest
    frequency in the observed sideband. */
       if( out[ 0 ] != AST__BAD && out[ 1 ] != AST__BAD ) {
-         astSetIF( dsb, 0.5*( out[ 1 ] - out[ 0 ] ) );
 
-/* When using the protected astSetDSBCentre method, the central frequency 
-   must be supplied in the observers standard of rest. So use the
-   transformed rest frequency as the central frequency. */
-         astSetDSBCentre( dsb, out[ 0 ] );
+/* Store the spectral CRVAL value as the centre frequency of the
+   DSBSpecFrame. The public astSetD method interprets the supplied value
+   as a value in the spectral system described by the other SpecFrame
+   attributes. */
+         astSetD( dsb, "DSBCentre", crval );
 
-/* Se the DSBSpecFrame to represent the observed sideband */
+/* To calculate the topocentric IF we need the topocentric frequency
+   equivalent of CRVAL. So take a copy of the DSBSpecFrame, then set it to
+   represent topocentric frequency, and read back the DSBCentre value. */
+         dsb2 = astAnnul( dsb2 );
+         dsb2 = astCopy( dsb );
+         astSet( dsb2, "System=freq,StdOfRest=topo,unit(1)=Hz" );
+         dsbcentre = astGetD( dsb2, "DSBCentre" );
+
+/* We also need the topocentric Local Oscillator frequency. This is
+   assumed to be half way between the topocentric IMAGFREQ and RESTFREQ
+   values. */
+         lo = 0.5*( out[ 1 ] + out[ 0 ] );
+
+/* Set the IF to be the difference between the Local Oscillator frequency
+   and the CRVAL frequency. */
+         astSetIF( dsb, lo - dsbcentre );
+
+/* Set the DSBSpecFrame to represent the observed sideband */
          astSetC( dsb, "SideBand", "observed" );
       }
 
@@ -30174,8 +30201,9 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
 /* Now do the extra stuff needed if we are creating a dual sideband
    SpecFrame. */
             if( astIsADSBSpecFrame( specfrm ) ) {
-               DSBSetUp( this, store, (AstDSBSpecFrame *) specfrm, s, method, 
-                         class  );
+               DSBSetUp( this, store, (AstDSBSpecFrame *) specfrm, s, 
+                         GetItem( &(store->crval), i, 0, s, NULL, method, 
+                                  class ), method, class  );
             }
 
 /* Now branch for each type of algorithm code. Each case returns a 1D
