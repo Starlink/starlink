@@ -44,6 +44,9 @@
  *     {enter_changes_here}
  *-
  */
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include <climits>
 #include <cstring>
@@ -191,32 +194,32 @@ void RegionStats::calc()
 }
 
 //  Define members that are data type dependent. See
-//  RegionStatsTemplates.C for which ones.
+//  RegionStatsTemplates.icc for which ones.
 
 #define DATA_TYPE char
-#include "RegionStatsTemplates.C"
+#include "RegionStatsTemplates.icc"
 #undef DATA_TYPE
 
 #define DATA_TYPE unsigned char
-#include "RegionStatsTemplates.C"
+#include "RegionStatsTemplates.icc"
 #undef DATA_TYPE
 
 #define DATA_TYPE short
-#include "RegionStatsTemplates.C"
+#include "RegionStatsTemplates.icc"
 #undef DATA_TYPE
 
 #define DATA_TYPE unsigned short
-#include "RegionStatsTemplates.C"
+#include "RegionStatsTemplates.icc"
 #undef DATA_TYPE
 
 #define DATA_TYPE FITS_LONG
-#include "RegionStatsTemplates.C"
+#include "RegionStatsTemplates.icc"
 #undef DATA_TYPE
 
 #define DATA_TYPE float
-#include "RegionStatsTemplates.C"
+#include "RegionStatsTemplates.icc"
 #undef DATA_TYPE
 
 #define DATA_TYPE double
-#include "RegionStatsTemplates.C"
+#include "RegionStatsTemplates.icc"
 #undef DATA_TYPE

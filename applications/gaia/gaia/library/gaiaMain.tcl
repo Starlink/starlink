@@ -55,9 +55,13 @@
 #     {enter_changes_here}
 
 #-
-global ::env ::tcl_version ::gaia_library ::gaia_dir
+
+global ::env ::gaia_dir
 
 #.
+
+#  Access the GAIA commands.
+package require Gaia
 
 #  Withdraw the . window as this cannot be controlled as a metawidget.
 wm withdraw .
@@ -144,7 +148,7 @@ foreach prop [$props get_named_keys Gaia] {
 #  are entered as if command-line arguments so that they propagate
 #  to clone windows. Exclude GIF and TIFF as these always disappoint.
 set file_types {{any *} {NDF(.sdf) *.sdf} {FIT(.fit) *.fit} \
-{FITS(.fits) *.fits} {FITS(.fts) *.fts}}
+                {FITS(.fits) *.fits} {FITS(.fts) *.fts}}
 if { [info exists env(NDF_FORMATS_IN)] } {
    set new_types [split $env(NDF_FORMATS_IN) ","]
    foreach pair $new_types {
@@ -158,10 +162,6 @@ if { [info exists env(NDF_FORMATS_IN)] } {
 lappend argv "-file_types"
 lappend argv $file_types
 incr argc 2
-
-#  This is a native GAIA installation when started by this route
-#  (i.e. not the plugin).
-set env(NATIVE_GAIA) 1
 
 if { $usetabbed } {
 

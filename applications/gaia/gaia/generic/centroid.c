@@ -77,8 +77,9 @@
  *     30-MAY-2001 (PWD):
  *        Added double precision image support.
  */
-
-#include <config.h> /* From skycat util */
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 #include <stdio.h>
 #include <string.h>

@@ -59,8 +59,8 @@
 extern "C" {
 #include "ast.h"
 }
-#include "WorldCoords.hxx"
-#include "WCS.hxx"
+#include "WorldCoords.h"
+#include "WCSRep.h"
 #include "tcl.h"
 
 //

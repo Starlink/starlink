@@ -110,7 +110,6 @@
 #-
 
 #  Version.
-set gaia_version [gaia_version]
 
 #  Make a local copy of about_skycat so we can divert bug reports.
 set about_skycat ""
@@ -126,8 +125,8 @@ Norman Gray (norman@astro.gla.ac.uk)
 David S. Berry (dsb@ast.man.ac.uk)
 Mark Taylor (m.b.taylor@bristol.ac.uk)
 
-GAIA is derived from SkyCat version [skycat_version]
-Copyright (C) 1996-2001 ESO - European Southern Observatory
+GAIA is derived from SkyCat version $skycat_version
+Copyright (C) 1996-2005 ESO - European Southern Observatory
 
 Authors:
 Allan Brighton (abrighton@gemini.edu)
@@ -392,7 +391,7 @@ itcl::class gaia::Gaia {
    #  minimalist stuff when creating a clone.
    protected method make_init_window {{plain 0}} {
 
-      global ::about_skycat ::gaia_dir
+      global ::about_skycat ::gaia_library
       if { $itk_option(-tabbedgaia) } {
 
          #  If tabbedgaia then use a simple component not a window.
@@ -404,7 +403,7 @@ itcl::class gaia::Gaia {
          wm withdraw $w_
       }
       if { ! $plain } {
-         set gaia_logo [image create pixmap -id gaia_logo]
+         set gaia_logo [image create photo -file $gaia_library/gaia_logo.xpm]
          pack \
             [label $w.logo -image $gaia_logo -borderwidth 2 -relief groove] \
             -side top -padx 1m -pady 1m
@@ -434,7 +433,6 @@ itcl::class gaia::Gaia {
    public method add_help_menu {} {
       if { ! $help_menu_done_ } {
          set help_menu_done_ 1
-         global ::gaia_dir
          set m [add_help_button index "Help topics index..." \
                    {Display the main help window and index}]
 
@@ -1784,21 +1782,8 @@ itcl::class gaia::Gaia {
    #  Tcl sources or colormaps at run-time, since they are already loaded in
    #  the binary.
    public proc startGaia {} {
-      global ::rtd_library ::skycat_library ::gaia_usage ::tk_strictMotif \
-         ::argv0 ::argv ::argc ::env ::gaia_dir
-      if {! [info exists rtd_library]} {
-         set rtd_library .
-      }
-
-      #  Check for a plugin or binary installation, third option is
-      #  GAIA running in a proper Starlink distribution. Need to
-      #  detect this and act appropriately (environment is established
-      #  by script that creates this application).
-      if { ! [ info exists env(NATIVE_GAIA)] } {
-         set native 0
-      } else {
-         set native 1
-      }
+      global ::gaia_usage ::tk_strictMotif ::tcl_precision \
+         ::argv0 ::argv ::argc ::env
 
       #  Where to look for catalog config file:
       #    use CATLIB_CONFIG, if set (assume this is deliberate)
@@ -1824,10 +1809,6 @@ itcl::class gaia::Gaia {
       #  Initialise any proxy server.
       cat::AstroCat::check_proxies
 
-      if { ! $native } {
-         setup_starlink_env [file dirname [info nameofexecutable]]
-      }
-
       #  Set some application options
       tk appname GAIA
       set tk_strictMotif 1
@@ -1844,8 +1825,8 @@ itcl::class gaia::Gaia {
    #  Copy the default config file to another file. If the target file
    #  already exists a backup copy is made.
    protected proc copy_default_config_file_ { config_file } {
-      global ::gaia_dir
-      if { [file exists $gaia_dir/skycat2.0.cfg] } {
+      global ::gaia_library
+      if { [file exists $gaia_library/skycat2.0.cfg] } {
          set backupname ""
          set today ""
          if { [file exists $config_file] } {
@@ -1853,7 +1834,7 @@ itcl::class gaia::Gaia {
             set backupname ${config_file}_${today}
             file copy -force $config_file ${backupname}
          }
-         file copy -force $gaia_dir/skycat2.0.cfg $config_file
+         file copy -force $gaia_library/skycat2.0.cfg $config_file
 
          #  Make a directory entry that access the old configs.
          if { $backupname != "" } {
@@ -1913,94 +1894,6 @@ window gives you access to this."
          if { $choice == "OK" } {
             copy_default_config_file_ $config_file
          }
-      }
-   }
-
-   #  Set up the STARLINK environment based on the given
-   #  directory. PLUGIN SPECIFIC.
-   public proc setup_starlink_env {dir} {
-      global ::tcl_version ::env ::argv ::argc ::gaia_dir
-
-      # we need this for the local atclsh binary for running external tcl commands
-      if {[file isdirectory $dir/tcl$tcl_version]} {
-         set env(TCL_LIBRARY) $dir/tcl$tcl_version
-      }
-
-      if {! [file isdirectory $gaia_dir]} {
-         set gaia_library $gaia_dir
-      }
-
-      # Check if using local Starlink binaries
-      if {[file exists $dir/autophotom]} {
-         set env(PHOTOM_DIR) $dir
-      }
-
-      if {[file exists $dir/ardmask]} {
-         set env(KAPPA_DIR) $dir
-      }
-
-      # use given dir for STARLINK, unless another value is defined
-      if {! [info exists env(STARLINK)]} {
-         set env(STARLINK) $dir
-      } else {
-         set dir $env(STARLINK)
-      }
-
-      if {![info exists env(PHOTOM_DIR)] && [file exists $dir/bin/photom/autophotom]} {
-         set env(PHOTOM_DIR) $dir/bin/photom
-      }
-      if {![info exists env(KAPPA_DIR)] && [file exists $dir/bin/kappa/ardmask]} {
-         set env(KAPPA_DIR) $dir/bin/kappa
-      }
-      # alternate dirs
-      if {[file exists $dir/bin/gaiapack/ardmask]} {
-         set env(KAPPA_DIR) $dir/bin/gaiapack
-      }
-      if {[file exists $dir/bin/gaiapack/autophotom]} {
-         set env(PHOTOM_DIR) $dir/bin/gaiapack
-      }
-      if {![info exists env(CONVERT_DIR)] && [file exists $dir/bin/convert/ndf2fits]} {
-         set env(CONVERT_DIR) $dir/bin/convert
-         set env(CONVERT_HELP) $dir/bin/convert
-      }
-
-      # add the plugin bin dir to the path
-      set env(PATH) "${dir}/bin:$env(PATH)"
-
-      # See if the user already sourced convert.csh
-      if {! [info exists env(NDF_FORMATS_IN)] && [info exists env(CONVERT_DIR)]} {
-         # Define environment variables (normally done in convert.csh)
-         setup_convert
-      }
-      # Set up CONVERT to work for .fits file as well as .fit.
-      if {[info exists env(NDF_FORMATS_IN)]} {
-         append env(NDF_FORMATS_IN) ",FITS(.fits),FITS(.fit)"
-         append env(NDF_FORMATS_OUT) ",FITS(.fits),FITS(.fit)"
-      }
-
-      #  Extract the known file types and set these up as defaults. These
-      #  are entered as if command-line arguments so that they propagate
-      #  to clone windows.
-      set file_types {{any *} {NDF(.sdf) *.sdf} {FIT(.fit) *.fit} {FITS(fits) *.fits}}
-      if { [info exists env(NDF_FORMATS_IN)] } {
-         set new_types [split $env(NDF_FORMATS_IN) ","]
-         foreach pair $new_types {
-            regexp {([^\(]*).([^\)]*)} $pair dummy name type
-            if { $name != "NDF" && $type != ".fits" && $type != ".fit" } {
-               lappend file_types [list $name\($type\) *${type}]
-            }
-         }
-      }
-      lappend argv "-file_types"
-      lappend argv $file_types
-      incr argc 2
-
-      # XXX should use ~/adam/gaia-[pid] here, but not sure about cleanup...
-      if {! [info exists env(ADAM_USER)]} {
-         set env(ADAM_USER) $env(HOME)/adam/gaia
-      }
-      if {[file isdirectory $env(ADAM_USER)]} {
-         exec rm -rf $env(ADAM_USER)
       }
    }
 

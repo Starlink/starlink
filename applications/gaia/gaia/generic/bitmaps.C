@@ -10,7 +10,6 @@
 
 #include <tcl.h>
 #include <tk.h>
-#include <tix.h>
 
 
 void defineGaiaBitmaps(Tcl_Interp *interp) {
@@ -73,8 +72,5 @@ void defineGaiaBitmaps(Tcl_Interp *interp) {
 
     #include "yrange.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("yrange"), (char*)yrange_bits, yrange_width, yrange_height);
-
-    #include "gaia_logo.xpm"
-    Tix_DefinePixmap(interp, Tk_GetUid("gaia_logo"), gaia_logo_xpm);
 
 }

@@ -32,13 +32,33 @@
  */
 static const char* const rcsId="@(#) $Id$";
 
+#if HAVE_CONFIG_H
 #include <config.h>
+#endif
 
 #include <cstring>
 #include <cstdlib>
 #include <csignal>
 #include <iostream>
 #include <tcl.h>
+
+/* Tcl procedure to search for an init for GAIA startup file. */
+static char initScript[] = \
+"if {[info proc ::gaia::Init]==\"\"} {\n\
+    namespace eval ::gaia {}\n\
+    proc ::gaia::Init {} {\n"
+#ifdef MAC_TCL
+"      source -rsrc GaiaInit.tcl\n"
+#else
+"      global gaia_library\n\
+       tcl_findLibrary gaia " PACKAGE_VERSION " " PACKAGE_VERSION " \
+                            GaiaInit.tcl GAIA_LIBRARY gaia_library\n"
+"      puts \"gaia_library = $gaia_library\""
+#endif
+"  }\n\
+}\n\
+::gaia::Init";
+
 
 /* These have C++ linkage */
 int GaiaUtils_Init( Tcl_Interp *interp );
@@ -62,6 +82,8 @@ extern "C" {
     int SpectralPlot_Init();
     int Tcladam_Init( Tcl_Interp *interp );
     int Word_Init();
+    
+    int Tkhtml_Init( Tcl_Interp *interp );
 }
 
 //  Generated code for bitmaps used in tcl scripts.
@@ -71,14 +93,19 @@ void defineGaiaBitmaps( Tcl_Interp *interp );
 void defineGaiaColormaps();
 
 /*
- * A call to this function is made from the tkAppInit file at startup
- * to initialize this package
+ * A call to this function is made from the tkAppInit file at startup.
  */
 extern "C" int Gaia_Init( Tcl_Interp *interp )
 {
     /*  Set up the Gaia Tcl package. */
-    if ( Tcl_PkgProvide( interp, "Gaia", GAIA_VERSION ) != TCL_OK) {
-	return TCL_ERROR;
+    if ( Tcl_PkgProvide( interp, "Gaia", PACKAGE_VERSION ) != TCL_OK) {
+        return TCL_ERROR;
+    }
+    Tcl_SetVar( interp, "gaia_version", PACKAGE_VERSION, TCL_GLOBAL_ONLY );
+
+    //  Run the initialisation command.
+    if ( Tcl_Eval( interp, initScript ) != TCL_OK ) {
+        return TCL_ERROR;
     }
 
     /*  Define bitmaps used by Tcl library. */
@@ -89,32 +116,32 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
 
     /* Initialize the new rtd_image type */
     if ( StarRtd_Init( interp ) != TCL_OK)
-	return TCL_ERROR;
+        return TCL_ERROR;
 
     /* Add rtd_ellipse and rtd_rotbox items to canvases */
     if ( Ellipse_Init() != TCL_OK ) {
-	return TCL_ERROR;
+        return TCL_ERROR;
     }
     if ( RotBox_Init() != TCL_OK ) {
-	return TCL_ERROR;
+        return TCL_ERROR;
     }
 
     /* Add rtd_mark and rtd_word items to canvases */
     if ( Word_Init() != TCL_OK ) {
-	return TCL_ERROR;
+        return TCL_ERROR;
     }
     if ( Mark_Init() != TCL_OK ) {
-	return TCL_ERROR;
+        return TCL_ERROR;
     }
 
     /*  Add rtd_segment canvas item for drawing many lines as segments */
     if ( Segment_Init() != TCL_OK ) {
-	return TCL_ERROR;
+        return TCL_ERROR;
     }
 
     /*  Add rtd_polyline canvas item for drawing many polylines at speed */
     if ( Polyline_Init() != TCL_OK ) {
-	return TCL_ERROR;
+        return TCL_ERROR;
     }
 
     /* Add spectral_plot canavs item for interactive spectral drawing */
@@ -124,7 +151,7 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
 
     /* Add Starlink task control commands*/
     if ( Tcladam_Init( interp ) != TCL_OK ) {
-	return TCL_ERROR;
+        return TCL_ERROR;
     }
 
     //  Add GaiaCat command.
@@ -162,77 +189,16 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
         return TCL_ERROR;
     }
 
+    //  HTML viewer widget.
+    
+    if (Tkhtml_Init(interp) == TCL_ERROR ) {
+        return TCL_ERROR;
+    }
+
     //  AST tuning. MemoryCaching give 3-4% speed up, ObjectCaching
     //  is not noticable, so consensus is leave off.
-    astTune( "MemoryCaching", 1 );
     //astTune( "ObjectCaching", 1 );
+    astTune( "MemoryCaching", 1 );
 
-    // The gaia_library path can be found in several places.  Here is the order
-    // in which the are searched.
-    //		1) the variable may already exist
-    //		2) env array
-    //		3) the compiled in value of GAIA_LIBRARY
-    const char* libDir = Tcl_GetVar(interp, "gaia_library", TCL_GLOBAL_ONLY);
-    if (libDir == NULL) {
-	libDir = Tcl_GetVar2(interp, "env", "GAIA_LIBRARY", TCL_GLOBAL_ONLY);
-    }
-    if (libDir == NULL) {
-	libDir = GAIA_LIBRARY;
-    }
-
-    // Set the global Tcl variables gaia_library and gaia_version
-    // and add gaia_library to the auto_path (goes first, so used
-    // first). Also set global var env(GAIA_VERSION) so this is
-    // available to all sub-shells.
-    Tcl_SetVar(interp, "gaia_library", libDir, TCL_GLOBAL_ONLY);
-    Tcl_SetVar(interp, "gaia_version", GAIA_VERSION, TCL_GLOBAL_ONLY);
-    char cmd[1048];
-    sprintf(cmd, "set auto_path [linsert $auto_path 0 %s]", libDir );
-    if (Tcl_Eval(interp, cmd) != TCL_OK) {
-	return TCL_ERROR;
-    }
-    Tcl_SetVar2(interp, "env", "GAIA_VERSION", GAIA_VERSION, TCL_GLOBAL_ONLY);
-
-    //  Do the Iwidgets initialisation, needed for single binary as
-    //  Iwidgets doesn't have a builtin C init function (so the script
-    //  method for doing the init gets confused).
-    libDir = Tcl_GetVar(interp, "iwidgets_library", TCL_GLOBAL_ONLY);
-    if (libDir == NULL) {
-        libDir = Tcl_GetVar2(interp, "env", "IWIDGETS_LIBRARY",
-                             TCL_GLOBAL_ONLY);
-    }
-    if (libDir == NULL) {
-        libDir = IWIDGETS_LIBRARY;
-    }
-    Tcl_SetVar(interp, "iwidgets_library", libDir, TCL_GLOBAL_ONLY);
-    Tcl_SetVar(interp, "iwidgets_version", IWIDGETS_VERSION, TCL_GLOBAL_ONLY);
-    sprintf(cmd, "lappend auto_path %s", libDir);
-    if (Tcl_Eval(interp, cmd) != TCL_OK) {
-        return TCL_ERROR;
-    }
-    
-    //  Also do the package requires.
-    if ( Tcl_Eval( interp,
-                   "package require Tcl 8.4\n"
-                   "package require Tk 8.4\n"
-                   "package require Itcl 3.3\n"
-                   "package require Itk 3.3\n"
-                   "namespace eval ::iwidgets {\n"
-                   "   namespace export *\n"
-                   "}\n"
-                   "lappend auto_path $iwidgets_library  "
-                   "  [file join $iwidgets_library generic] " 
-                   "  [file join $iwidgets_library scripts] \n"
-        ) != TCL_OK ) {
-        return TCL_ERROR;
-    }
-    
-    //  Set up the namespaces used by the itcl/itk classes in GAIA.
-    if (Tcl_Eval(interp,
-		 "namespace eval gaia {namespace export *}\n"
-		 "namespace import -force gaia::*\n"
-        ) != TCL_OK) {
-        return TCL_ERROR;
-    }
     return TCL_OK;
 }

@@ -27,7 +27,6 @@ extern "C" {
 #include "img.h"
 }
 #include "ImageData.h"
-#include "config.h"
 
 // The type "long" may have up to 64 bits on alpha machines. FITS
 // defines the long we want to use as 32 bits, so use a macro to

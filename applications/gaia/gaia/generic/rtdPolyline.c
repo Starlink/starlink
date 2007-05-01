@@ -21,8 +21,9 @@
  *    works for un-smoother lines and the badValue applies to the Y
  *    coordinates (data values).
  */
-
-#include <config.h>  /* From skycat util */
+#if HAVE_CONFIG_H
+#include <config.h> 
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>

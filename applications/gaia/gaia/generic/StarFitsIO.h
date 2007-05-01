@@ -45,8 +45,8 @@
  *                 13/06/05  Added setHDU member.
  *                 28/11/05  Added copy member.
  */
-#include "FitsIO.hxx"
 
+#include "Fits_IO.h"
 
 /*
  * This class manages reading and writing FITS files and storing the

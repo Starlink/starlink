@@ -578,59 +578,59 @@ void Contour::contPlot( const AstPlot *plot, const int npts,
 }
 
 //  Define members that are data type dependent. See
-//  ContourTemplates.C for which ones.
+//  ContourTemplates.icc for which ones.
 
 #define DATA_TYPE char
 #define DATA_FORMAT NDF
-#include "ContourTemplates.C"
+#include "ContourTemplates.icc"
 #undef DATA_TYPE
 #undef DATA_FORMAT
 
 #define DATA_TYPE unsigned char
 #define DATA_FORMAT NDF
-#include "ContourTemplates.C"
+#include "ContourTemplates.icc"
 #undef DATA_TYPE
 #undef DATA_FORMAT
 
 #define DATA_TYPE short
 #define DATA_FORMAT NDF
-#include "ContourTemplates.C"
+#include "ContourTemplates.icc"
 #undef DATA_TYPE
 #undef DATA_FORMAT
 
 #define DATA_TYPE unsigned short
 #define DATA_FORMAT NDF
-#include "ContourTemplates.C"
+#include "ContourTemplates.icc"
 #undef DATA_TYPE
 #undef DATA_FORMAT
 
 #define DATA_TYPE FITS_LONG
 #define DATA_FORMAT NDF
-#include "ContourTemplates.C"
+#include "ContourTemplates.icc"
 #undef DATA_TYPE
 #undef DATA_FORMAT
 
 #define DATA_TYPE float
 #define DATA_FORMAT NDF
-#include "ContourTemplates.C"
+#include "ContourTemplates.icc"
 #undef DATA_TYPE
 #undef DATA_FORMAT
 
 #define DATA_TYPE double
 #define DATA_FORMAT NDF
-#include "ContourTemplates.C"
+#include "ContourTemplates.icc"
 #undef DATA_TYPE
 #undef DATA_FORMAT
 
 //  Be careful about NaNs in FITS data.
 #define DATA_TYPE float
 #define DATA_FORMAT FITS
-#include "ContourTemplates.C"
+#include "ContourTemplates.icc"
 #undef DATA_TYPE
 #undef DATA_FORMAT
 
 #define DATA_TYPE double
 #define DATA_FORMAT FITS
-#include "ContourTemplates.C"
+#include "ContourTemplates.icc"
 #undef DATA_TYPE
 #undef DATA_FORMAT

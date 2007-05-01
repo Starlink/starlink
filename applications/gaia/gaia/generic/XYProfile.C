@@ -221,33 +221,33 @@ void XYProfile::extractProfiles( double *xCoords, double *xVector,
     }
 }
 
-/*  Define members that are data type dependent. See XYProfileTemplates.C for
+/*  Define members that are data type dependent. See XYProfileTemplates.icc for
  *  which ones.
  */
 #define DATA_TYPE char
-#include "XYProfileTemplates.C"
+#include "XYProfileTemplates.icc"
 #undef DATA_TYPE
 
 #define DATA_TYPE unsigned char
-#include "XYProfileTemplates.C"
+#include "XYProfileTemplates.icc"
 #undef DATA_TYPE
 
 #define DATA_TYPE short
-#include "XYProfileTemplates.C"
+#include "XYProfileTemplates.icc"
 #undef DATA_TYPE
 
 #define DATA_TYPE unsigned short
-#include "XYProfileTemplates.C"
+#include "XYProfileTemplates.icc"
 #undef DATA_TYPE
 
 #define DATA_TYPE FITS_LONG
-#include "XYProfileTemplates.C"
+#include "XYProfileTemplates.icc"
 #undef DATA_TYPE
 
 #define DATA_TYPE float
-#include "XYProfileTemplates.C"
+#include "XYProfileTemplates.icc"
 #undef DATA_TYPE
 
 #define DATA_TYPE double
-#include "XYProfileTemplates.C"
+#include "XYProfileTemplates.icc"
 #undef DATA_TYPE

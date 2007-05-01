@@ -1,667 +1,207 @@
-# $Id:
+# E.S.O. - VLT project 
+# $Id$
 #
-# This file is used with GNU autoconf to generate a configure script for
-# the GAIA modules.
+# This file is used with GNU autoconf to generate a configure script
 #
-# usage: % autoconf  # only if configure.in changed, use version 2.7 or later
+# usage: % autoconf  # only if configure.in changed
 #        % configure
 #        % make
-# who             when       what
-# --------------  --------   ---------------------------------------------
-# Allan Brighton  04 Oct 95  Created
-# Peter W. Draper 23/Sep/97  Modified for use with GAIA.
+#        % make install
 #
-# -----------------------------------------------------------------------
-AC_INIT(src/StarRtdImage.C)
-
-# -----------------------------------------------------------------------
-#
-# Set the GAIA version from the VERSION file in this directory
-# (That is the place to set the GAIA version number for a new release)
-#
-# -----------------------------------------------------------------------
-GAIA_VERSION=`cat VERSION | sed -e 's/GAIA-//'`
-AC_SUBST(GAIA_VERSION)
-
-# -----------------------------------------------------------------------
-#
-# Set prefix variable if one wasn't provided
-#
-# -----------------------------------------------------------------------
-if test "$prefix" = "NONE" ; then
-    prefix=`(cd ..; pwd)`/built
-fi
-echo "using prefix = $prefix"
-AC_SUBST(prefix)
-
-
-# Need this for .sh files?
-INSTALL_TARGET=$prefix
-AC_SUBST(INSTALL_TARGET)
-
-# -----------------------------------------------------------------------
-#
-# Set PWD variable (/bin/sh may inherit the wrong value...)
-#
-# -----------------------------------------------------------------------
-PWD=`pwd`
-SRC_ROOT=$PWD
-AC_SUBST(SRC_ROOT)
-
-# -----------------------------------------------------------------------
-#
-# C compiler and debugging flags
-#
-# -----------------------------------------------------------------------
-AC_PROG_CC
-AC_PROG_INSTALL
-AC_PROG_RANLIB
-AC_PROG_CPP
-AC_PROG_CXX
-
-AC_ARG_WITH(gcc, [--with-gcc         use gcc compiler], CC=gcc; CXX=g++)
-AC_ARG_WITH(cc,  [--with-cc          use cc compiler], CC=cc; CXX=CC)
-
-if test -z "$CC" ; then
-  CC=gcc
-fi
-
-#  Pre-C99 compilers do not support inline, check for that.
-AC_C_INLINE
-
-AC_SUBST(CC)
-
-# c++ is a  link to g++ that does not link in -lg++, which we need
-if test "$CXX" = "c++" ; then
-  CXX="g++"
-fi
-AC_SUBST(CXX)
-
-AC_CHECK_PROGS(LIBTOOL,libtool)
-AC_CONFIG_HEADERS(include/gaiaconfig.h)
-
-# -----------------------------------------------------------------------
-#
-# Read the Rtd and Catlib config file to find out where the X and Tcl/Tk
-# files and libraries are and how to make shared libraries.
-#
+# who             when      what
+# --------------  --------  ---------------------------------------------
+# Allan Brighton  15/12/05  Rewrote using TCL TEA standard
+# Peter W. Draper 30/04/07  Adapted for GAIA.
 # -----------------------------------------------------------------------
 
-# sh procedure to find a config file: arg:
-# $1 = name in lower case ("rtd")
+#-----------------------------------------------------------------------
+# Sample configure.in for Tcl Extensions.  The only places you should
+# need to modify this file are marked by the string __CHANGE__
+#-----------------------------------------------------------------------
 
-getConfig() {
-  name=${1}Config.sh
-  echo "checking for ${name}"
-  TCL_CONFIG_DIR=""
-  places="\
-   ../skycat/skycat \
-   ../skycat/tclutil \
-   ../skycat/astrotcl \
-   ../skycat/rtd \
-   ../skycat/cat \
-   $prefix/lib/itcl \
-   $prefix/lib \
-   /vlt/dflow/lib/itcl \
-   /vlt/dflow/lib \
-   $TCL_LIBRARY/.. \
-   $PWD/../tcl \
-   /usr/local/lib/itcl \
-   /usr/local/lib"
-  for dir in $places; do
-    if test -r $dir/${name} ; then
-      TCL_CONFIG_DIR=$dir
-      break
-    fi
-  done
-  while test -z "$TCL_CONFIG_DIR" ; do
-    echo "What directory contains ${name} ?"
-    read TCL_CONFIG_DIR
-    if test ! -r $TCL_CONFIG_DIR/${name} ; then
-      echo "can't read $TCL_CONFIG_DIR/${name}"
-      TCL_CONFIG_DIR=""
-    fi
-  done
-
-  # source the Tcl config file
-  . $TCL_CONFIG_DIR/${name}
-}
-
-# source the config files
-getConfig skycat
-getConfig tclutil
-getConfig astrotcl
-getConfig rtd
-getConfig cat
-
-# get -D defines
-DEFS=$TCLUTIL_DEFS
-AC_SUBST(TCLUTIL_DEFS)
-
-# for now, just use the compiler settings used to build rtd
-CC=$TCLUTIL_CC
-CXX=$TCLUTIL_CXX
-AC_SUBST(CC)
-AC_SUBST(CXX)
-
-# pass these valaues on from the Tclutil package
-LD_VARNAME=$TCLUTIL_LD_VARNAME
-AC_SUBST(LD_VARNAME)
-
-LIB_RUNTIME_DIR=$TCLUTIL_LIB_RUNTIME_DIR
-
-AC_SUBST(LIB_RUNTIME_DIR)
-
-TCLTK_ROOT=$TCLUTIL_TCLTK_ROOT
-AC_SUBST(TCLTK_ROOT)
-
-# versions
-AC_SUBST(TCLUTIL_VERSION)
-AC_SUBST(ASTROTCL_VERSION)
-AC_SUBST(RTD_VERSION)
-AC_SUBST(CAT_VERSION)
-
-TCL_VERSION=$TCLUTIL_TCL_VERSION
-TK_VERSION=$TCLUTIL_TK_VERSION
-ITCL_VERSION=$TCLUTIL_ITCL_VERSION
-ITK_VERSION=$TCLUTIL_ITK_VERSION
-TCLX_VERSION=$TCLUTIL_TCLX_VERSION
-BLT_VERSION=$TCLUTIL_BLT_VERSION
-
-AC_SUBST(TCL_VERSION)
-AC_SUBST(TK_VERSION)
-AC_SUBST(ITCL_VERSION)
-AC_SUBST(ITK_VERSION)
-AC_SUBST(TCLX_VERSION)
-AC_SUBST(BLT_VERSION)
-
-# -----------------------------------------------------------------------
+#-----------------------------------------------------------------------
+# __CHANGE__
+# Set your package name and version numbers here.
 #
-# "makedepend" info
-#
-# normally, "makedepend" wants to know all of the path names and will
-# cause make errors if the include path to the C++ includes is not given.
-# Here we try to extract that information from the C++ preprocessor output.
-# The syntax of the output is different for different compilers...
-#
-# -----------------------------------------------------------------------
-CXX_INCLUDE=$TCLUTIL_CXX_INCLUDE
-AC_SUBST(CXX_INCLUDE)
-AC_SUBST(CXX_DEPEND_FLAGS)
+# This initializes the environment with PACKAGE_NAME and PACKAGE_VERSION
+# set as provided.  These will also be added as -D defs in your Makefile
+# so you can encode the package version directly into the source files.
+#-----------------------------------------------------------------------
 
-# -----------------------------------------------------------------------
-#
-# set OS version string
-#
-# -----------------------------------------------------------------------
-OSVERSION="`uname -s`-`uname -r`"
-AC_SUBST(OSVERSION)
+AC_INIT([gaia], [4.0.0])
 
-# -----------------------------------------------------------------------
-#
-# if we are using gcc, we can get better make dependencies using gcc -MM
-# otherwise we have to use  "makedepend", which sometimes gets confused.
-# This sets the make target to use:
-#
-# -----------------------------------------------------------------------
-DEPEND_TARGET=$TCLUTIL_DEPEND_TARGET
-AC_SUBST(DEPEND_TARGET)
+#--------------------------------------------------------------------
+# Call TEA_INIT as the first TEA_ macro to set up initial vars.
+# This will define a ${TEA_PLATFORM} variable == "unix" or "windows"
+# as well as PKG_LIB_FILE and PKG_STUB_LIB_FILE.
+#--------------------------------------------------------------------
 
-# -----------------------------------------------------------------------
+TEA_INIT([3.4])
+
+#--------------------------------------------------------------------
+# Load the tclConfig.sh file
+#--------------------------------------------------------------------
+
+TEA_PATH_TCLCONFIG
+TEA_LOAD_TCLCONFIG
+
+#--------------------------------------------------------------------
+# Load the tkConfig.sh file if necessary (Tk extension)
+#--------------------------------------------------------------------
+
+TEA_PATH_TKCONFIG
+TEA_LOAD_TKCONFIG
+
+#-----------------------------------------------------------------------
+# Handle the --prefix=... option by defaulting to what Tcl gave.
+# Must be called after TEA_LOAD_TCLCONFIG and before TEA_SETUP_COMPILER.
+#-----------------------------------------------------------------------
+
+TEA_PREFIX
+
+#-----------------------------------------------------------------------
+# Standard compiler checks.
+# This sets up CC by using the CC env var, or looks for gcc otherwise.
+# This also calls AC_PROG_CC, AC_PROG_INSTALL and a few others to create
+# the basic setup necessary to compile executables.
+#-----------------------------------------------------------------------
+
+TEA_SETUP_COMPILER
+
+#--------------------------------------------------------------------
+# Do application specific checks (see aclocal.m4)
+#--------------------------------------------------------------------
+GAIA_CONFIG
+
+#-----------------------------------------------------------------------
+# __CHANGE__
+# Specify the C source files to compile in TEA_ADD_SOURCES,
+# public headers that need to be installed in TEA_ADD_HEADERS,
+# stub library C source files to compile in TEA_ADD_STUB_SOURCES,
+# and runtime Tcl library files in TEA_ADD_TCL_SOURCES.
+# This defines PKG(_STUB)_SOURCES, PKG(_STUB)_OBJECTS, PKG_HEADERS
+# and PKG_TCL_SOURCES.
+#-----------------------------------------------------------------------
+
+TEA_ADD_SOURCES([${csources} ${fsources} ${gsources}])
+TEA_ADD_HEADERS([${cheaders}])
+TEA_ADD_INCLUDES([${gaia_includes}])
+TEA_ADD_LIBS([$skycat_BUILD_LIB_SPEC $cat_BUILD_LIB_SPEC $rtd_BUILD_LIB_SPEC $astrotcl_BUILD_LIB_SPEC $tclutil_BUILD_LIB_SPEC ${BLT_LIB_SPEC}])
+TEA_ADD_CFLAGS([])
+TEA_ADD_STUB_SOURCES([])
+TEA_ADD_TCL_SOURCES([${tclsources}])
+
+#--------------------------------------------------------------------
+# __CHANGE__
+# A few miscellaneous platform-specific items:
 #
-# use CDEBUGFLAGS for C and CXXDEBUGFLAGS for C++ compiler options
+# Define a special symbol for Windows (BUILD_sample in this case) so
+# that we create the export library with the dll.
 #
-# -----------------------------------------------------------------------
-if test "$CC" = "gcc" ; then
-	CDEBUGFLAGS="-g -O"
-fi
-if test "$CXX" = "g++" ; then
-	CXXDEBUGFLAGS="-g -O"
-fi
-AC_ARG_WITH(debug, [--with-debug       use debugging flag],
-	CDEBUGFLAGS="-g -DDEBUG"; CXXDEBUGFLAGS="-g -DDEBUG",
-	CDEBUGFLAGS="-O"; CXXDEBUGFLAGS="-O")
-
-CDEBUGFLAGS="$CDEBUGFLAGS $CFLAGS"
-CXXDEBUGFLAGS="$CXXDEBUGFLAGS $CFLAGS"
-
-AC_SUBST(CDEBUGFLAGS)
-AC_SUBST(CXXDEBUGFLAGS)
-
-# -----------------------------------------------------------------------
+# Windows creates a few extra files that need to be cleaned up.
+# You can add more files to clean if your extension creates any extra
+# files.
 #
-# Check if we are using (and creating) shared libraries
-# If so, we use the information in tclConfig.sh to determine the compiler
-# options.
-#
-# -----------------------------------------------------------------------
+# TEA_ADD_* any platform specific compiler/build info here.
+#--------------------------------------------------------------------
 
-AC_ARG_ENABLE(shared, [--enable-shared    build and use shared libraries],
-	SHARED=1,
-	SHARED=0)
-AC_SUBST(SHARED)
-
-if test $SHARED -eq 0 ; then
-	echo "Don't build shared libraries"
+if test "${TEA_PLATFORM}" = "windows" ; then
+    AC_DEFINE(BUILD_gaia, 1, [Build windows export dll])
+    CLEANFILES="*.lib *.dll *.exp *.ilk *.pdb vc*.pch"
+    #TEA_ADD_SOURCES([win/winFile.c])
+    #TEA_ADD_INCLUDES([-I\"$(${CYGPATH} ${srcdir}/win)\"])
 else
-	echo "Will build shared libraries"
+    CLEANFILES=""
+    #TEA_ADD_SOURCES([unix/unixFile.c])
+    #TEA_ADD_LIBS([-lsuperfly])
 fi
-
-# Flags to pass to cc when compiling the components of a shared library:
-SHLIB_CFLAGS=$TCLUTIL_SHLIB_CFLAGS
-
-# Base command to use for combining object files into a shared library:
-SHLIB_LD=$TCLUTIL_SHLIB_LD
-
-# Suffix to use for the name of a shared library.
-SHLIB_SUFFIX=$TCLUTIL_SHLIB_SUFFIX
-
-# Either '$LIBS' (if dependent libraries should be included when linking
-# shared libraries) or an empty string.  See Tcl's configure.in for more
-SHLIB_LD_LIBS=$TCLUTIL_SHLIB_LD_LIBS
-
-# Library file(s) to include in tclsh and other base applications
-# in order to provide facilities needed by DLOBJ above.
-DL_LIBS=$TCLUTIL_DL_LIBS
-
-# Flags to pass to the compiler when linking object files into
-# an executable tclsh or tcltest binary.
-LD_FLAGS=$TCLUTIL_LD_FLAGS
-
-# Flags to pass to cc, such as "-Wl,-R,/usr/local/tcl/lib", that tell the
-# run-time dynamic linker where to look for shared libraries such as
-# libtcl.so.  Used when linking applications.  Only works if there
-# is a variable "LIB_RUNTIME_DIR" defined in the Makefile.
-LD_SEARCH_FLAGS=$TCLUTIL_LD_SEARCH_FLAGS
-
-AC_SUBST(SHLIB_CFLAGS)
-AC_SUBST(SHLIB_LD)
-AC_SUBST(SHLIB_SUFFIX)
-AC_SUBST(SHLIB_LD_LIBS)
-AC_SUBST(DL_LIBS)
-AC_SUBST(LD_FLAGS)
-AC_SUBST(LD_SEARCH_FLAGS)
-
-# -----------------------------------------------------------------------
-# Check the location of X libraries and includes.
-# -----------------------------------------------------------------------
-
-# -I switch(es) to use to make all of the X11 include files accessible:
-XINCSW=$TCLUTIL_XINCSW
-
-# Linker switch(es) to use to link with the X11 library archive.
-XLIBSW=$TCLUTIL_XLIBSW
-
-# Linker switch(es) to use to link with the static X11 library archive.
-XLIBSW=$TCLUTIL_XLIBSW
-
-AC_SUBST(XINCSW)
-AC_SUBST(XLIBSW)
-
-# -----------------------------------------------------------------------
-#
-# Get the Tcl/Tk information from the rtdConfig.sh file
-#
-# -----------------------------------------------------------------------
-
-# get the -L and -l library flags
-
-TCL_LIB_SPEC=$TCLUTIL_TCL_LIB_SPEC
-TK_LIB_SPEC=$TCLUTIL_TK_LIB_SPEC
-TCLX_LIB_SPEC=$TCLUTIL_TCLX_LIB_SPEC
-ITCL_LIB_SPEC=$TCLUTIL_ITCL_LIB_SPEC
-ITK_LIB_SPEC=$TCLUTIL_ITK_LIB_SPEC
-BLT_LIB_SPEC=$TCLUTIL_BLT_LIB_SPEC
-
-AC_SUBST(TCL_LIB_SPEC)
-AC_SUBST(TK_LIB_SPEC)
-AC_SUBST(TCLX_LIB_SPEC)
-AC_SUBST(ITCL_LIB_SPEC)
-AC_SUBST(ITK_LIB_SPEC)
-AC_SUBST(BLT_LIB_SPEC)
-
-AC_SUBST(TCLUTIL_TCL_BUILD_LIB_PATH)
-AC_SUBST(TCLUTIL_TK_BUILD_LIB_PATH)
-
-
-# get the -I include flags
-
-TCLINCSW=$TCLUTIL_TCLINCSW
-TKINCSW=$TCLUTIL_TKINCSW
-
-AC_SUBST(TCLINCSW)
-AC_SUBST(TKINCSW)
-
-# -----------------------------------------------------------------------
-#
-# For the single binary version of skycat, we want to use the system
-# shared libraries, but otherwise for Tcl/Tk and X the static archives,
-# if they are there. This makes it easier to give away a binary, since
-# every system may have different X lib and Tcl/Tk shared libs installed.
-#
-# -----------------------------------------------------------------------
-# shell procedure to convert a specification in the form:
-#     "-L/usr/local/lib -lX11 -lXext"
-# to:
-#     "/usr/local/lib/libX11.a /usr/local/lib/libXext.a"
-# (if the static archives exists).
-#
-# Args: $1 is the original lib spec (-L... -l...)
-
-getStaticLib() {
-    dirs=""
-    for i in $*
-    do
-	d=`echo $i | sed -e 's/-L\(.*\)/\1/'`
-	test "$d" != "$i" && dirs="$dirs$d "
-    done
-    test -z "$dirs" && dirs="\
-	$prefix/lib \
-	$prefix/lib/itcl \
-	/vlt/tcltk/lib \
-	/vlt/tcltk/lib/itcl \
-	/usr/local/lib \
-	/usr/local/lib/itcl"
-
-    libs=""
-    for i in $*
-    do
-	l=`echo $i | sed -e 's/-l\(.*\)/\1/'`
-	test "$l" != "$i" && libs="$libs$l "
-    done
-
-    # take the first archive that works
-    result=""
-    for lib in $libs
-    do
-	for dir in $dirs
-	do
-	    if test -f $dir/lib${lib}.a
-	    then
-		result="$result$dir/lib${lib}.a "
-		break
-	    fi
-	done
-    done
-
-    test -z "$result" && result=$*
-    echo $result
-}
-
-
-XLIBSW_STATIC=`getStaticLib $XLIBSW`
-TCL_LIB_SPEC_STATIC=`getStaticLib $TCL_LIB_SPEC`
-TK_LIB_SPEC_STATIC=`getStaticLib $TK_LIB_SPEC`
-TCLX_LIB_SPEC_STATIC=`getStaticLib $TCLX_LIB_SPEC`
-ITCL_LIB_SPEC_STATIC=`getStaticLib $ITCL_LIB_SPEC`
-ITK_LIB_SPEC_STATIC=`getStaticLib $ITK_LIB_SPEC`
-BLT_LIB_SPEC_STATIC=`getStaticLib $BLT_LIB_SPEC`
-
-AC_SUBST(XLIBSW_STATIC)
-AC_SUBST(TCL_LIB_SPEC_STATIC)
-AC_SUBST(TK_LIB_SPEC_STATIC)
-AC_SUBST(TCLX_LIB_SPEC_STATIC)
-AC_SUBST(ITCL_LIB_SPEC_STATIC)
-AC_SUBST(ITK_LIB_SPEC_STATIC)
-AC_SUBST(BLT_LIB_SPEC_STATIC)
-
-# add Tix support (there is no tixConfig.sh, but catlib set this up
-# already in catConfig.sh)
-TIX_LIB_SPEC=$CAT_TIX_LIB_SPEC
-TIX_SAM_LIB_SPEC=$CAT_TIX_SAM_LIB_SPEC
-TIX_LIB_SPEC_STATIC=`getStaticLib $TIX_SAM_LIB_SPEC`
-AC_SUBST(TIX_LIB_SPEC)
-AC_SUBST(TIX_LIB_SPEC_STATIC)
-
-# -----------------------------------------------------------------------
-# tcl package library files
-# -----------------------------------------------------------------------
-TCL_LIBRARY=$TCLUTIL_TCL_LIBRARY
-AC_SUBST(TCL_LIBRARY)
-
-TK_LIBRARY=$TCLUTIL_TK_LIBRARY
-AC_SUBST(TK_LIBRARY)
-
-BLT_LIBRARY=$TCLUTIL_BLT_LIBRARY
-AC_SUBST(BLT_LIBRARY)
-
-AC_SUBST(TCLUTIL_LIBRARY)
-AC_SUBST(ASTROTCL_LIBRARY)
-AC_SUBST(RTD_LIBRARY)
-AC_SUBST(CAT_LIBRARY)
-AC_SUBST(SKYCAT_LIBRARY)
-
-#  No one seems to record the same information for tclX, Itcl, Itk
-#  & Iwidgets, so guess.
-DESTDIR="$prefix"
-ITCL_LIBRARY="$TCLTK_ROOT/lib/itcl$ITCL_VERSION"
-AC_SUBST(ITCL_LIBRARY)
-ITK_LIBRARY="$TCLTK_ROOT/lib/itk$ITCL_VERSION"
-AC_SUBST(ITK_LIBRARY)
-TCLX_LIBRARY="$TCLTK_ROOT/lib/tclx$TCLX_VERSION"
-AC_SUBST(TCLX_LIBRARY)
-
-IWIDGETS_VERSION="4.0.1"
-IWIDGETS_LIBRARY="$TCLTK_ROOT/lib/iwidgets$IWIDGETS_VERSION"
-AC_SUBST(IWIDGETS_VERSION)
-AC_SUBST(IWIDGETS_LIBRARY)
-
-# -----------------------------------------------------------------------
-# system libs
-# -----------------------------------------------------------------------
-LIBS=$TCLUTIL_LIBS
-AC_SUBST(LIBS)
-
-# -----------------------------------------------------------------------
-# Check if we are using the installed TCLUTIL library and include files
-# or local development versions
-# -----------------------------------------------------------------------
-if test -d ../skycat/tclutil; then
-	TCLUTIL_LIB=$TCLUTIL_BUILD_LIB_SPEC
-	TCLUTIL_LIB_STATIC=$TCLUTIL_BUILD_LIB_SPEC_STATIC
-	TCLUTIL_BUILD_LIBRARY=$TCLUTIL_BUILD_LIBRARY
-else
-	TCLUTIL_LIB=$TCLUTIL_LIB_SPEC
-	TCLUTIL_LIB_STATIC=$TCLUTIL_LIB_SPEC_STATIC
-	TCLUTIL_BUILD_LIBRARY=$TCLUTIL_LIBRARY
-fi
-AC_SUBST(TCLUTIL_LIB)
-AC_SUBST(TCLUTIL_LIB_SPEC)
-AC_SUBST(TCLUTIL_LIB_STATIC)
-AC_SUBST(TCLUTIL_BUILD_LIBRARY)
-
-# -----------------------------------------------------------------------
-# Check if we are using the installed TCLUTIL library and include files
-# or local development versions
-# -----------------------------------------------------------------------
-if test -d ../sktcat/tclutil; then
-	TCLUTIL_LIB=$TCLUTIL_BUILD_LIB_SPEC
-	TCLUTIL_LIB_STATIC=$TCLUTIL_BUILD_LIB_SPEC_STATIC
-	TCLUTIL_BUILD_LIBRARY=$TCLUTIL_BUILD_LIBRARY
-else
-	TCLUTIL_LIB=$TCLUTIL_LIB_SPEC
-	TCLUTIL_LIB_STATIC=$TCLUTIL_LIB_SPEC_STATIC
-	TCLUTIL_BUILD_LIBRARY=$TCLUTIL_LIBRARY
-fi
-AC_SUBST(TCLUTIL_LIB)
-AC_SUBST(TCLUTIL_LIB_SPEC)
-AC_SUBST(TCLUTIL_LIB_STATIC)
-AC_SUBST(TCLUTIL_BUILD_LIBRARY)
-
-# -----------------------------------------------------------------------
-# Check if we are using the installed ASTROTCL library and include files
-# or local development versions
-# -----------------------------------------------------------------------
-if test -d ../skycat/astrotcl; then
-	ASTROTCL_LIB=$ASTROTCL_BUILD_LIB_SPEC
-	ASTROTCL_LIB_STATIC=$ASTROTCL_BUILD_LIB_SPEC_STATIC
-	ASTROTCL_BUILD_LIBRARY=$ASTROTCL_BUILD_LIBRARY
-else
-	ASTROTCL_LIB=$ASTROTCL_LIB_SPEC
-	ASTROTCL_LIB_STATIC=$ASTROTCL_LIB_SPEC_STATIC
-	ASTROTCL_BUILD_LIBRARY=$ASTROTCL_LIBRARY
-fi
-AC_SUBST(ASTROTCL_LIB)
-AC_SUBST(ASTROTCL_LIB_SPEC)
-AC_SUBST(ASTROTCL_LIB_STATIC)
-AC_SUBST(ASTROTCL_BUILD_LIBRARY)
-
-# -----------------------------------------------------------------------
-# Check if we are using the installed RTD library and include files
-# or local development versions
-# -----------------------------------------------------------------------
-if test -d ../skycat/rtd; then
-	RTD_LIB=$RTD_BUILD_LIB_SPEC
-	RTD_LIB_STATIC=$RTD_BUILD_LIB_SPEC_STATIC
-	RTD_BUILD_LIBRARY=$RTD_BUILD_LIBRARY
-else
-	RTD_LIB=$RTD_LIB_SPEC
-	RTD_LIB_STATIC=$RTD_LIB_SPEC_STATIC
-	RTD_BUILD_LIBRARY=$RTD_LIBRARY
-fi
-
-
-AC_SUBST(RTD_LIB)
-AC_SUBST(RTD_LIB_SPEC)
-AC_SUBST(RTD_LIB_STATIC)
-AC_SUBST(RTD_BUILD_LIBRARY)
-
-# -----------------------------------------------------------------------
-# Check if we are using the installed CAT library and include files
-# or local development versions
-# -----------------------------------------------------------------------
-if test -d ../skycat/cat; then
-	CAT_LIB=$CAT_BUILD_LIB_SPEC
-	CAT_LIB_STATIC=$CAT_BUILD_LIB_SPEC_STATIC
-	CAT_BUILD_LIBRARY=$CAT_BUILD_LIBRARY
-else
-	CAT_LIB=$CAT_LIB_SPEC
-	CAT_LIB_STATIC=$CAT_LIB_SPEC_STATIC
-	CAT_BUILD_LIBRARY=$CAT_LIBRARY
-fi
-
-AC_SUBST(CAT_LIB)
-AC_SUBST(CAT_LIB_SPEC)
-AC_SUBST(CAT_LIB_STATIC)
-AC_SUBST(CAT_BUILD_LIBRARY)
-
-# -----------------------------------------------------------------------
-# Check if we are using the installed SKYCAT library and include files
-# or local development versions
-# -----------------------------------------------------------------------
-if test -d ../skycat/skycat; then
-	SKYCAT_LIB=$SKYCAT_BUILD_LIB_SPEC
-	SKYCAT_LIB_STATIC=$SKYCAT_BUILD_LIB_SPEC_STATIC
-	SKYCAT_BUILD_LIBRARY=$SKYCAT_BUILD_LIBRARY
-else
-	SKYCAT_LIB=$SKYCAT_LIB_SPEC
-	SKYCAT_LIB_STATIC=$SKYCAT_LIB_SPEC_STATIC
-	SKYCAT_BUILD_LIBRARY=$SKYCAT_LIBRARY
-fi
-
-AC_SUBST(SKYCAT_LIB)
-AC_SUBST(SKYCAT_LIB_SPEC)
-AC_SUBST(SKYCAT_LIB_STATIC)
-AC_SUBST(SKYCAT_BUILD_LIBRARY)
-
+AC_SUBST(CLEANFILES)
 
 #--------------------------------------------------------------------
-#       Check for local installation point of Starlink s/w.
+# __CHANGE__
+# Choose which headers you need.  Extension authors should try very
+# hard to only rely on the Tcl public header files.  Internal headers
+# contain private data structures and are subject to change without
+# notice.
+# This MUST be called after TEA_LOAD_TCLCONFIG / TEA_LOAD_TKCONFIG
 #--------------------------------------------------------------------
-AC_MSG_CHECKING([Starlink installation])
-STARLINK=${STARLINK=/star}
-if test ! -x "${STARLINK}"; then
-    echo "What directory is the root of the Starlink development system?"
-    read STARLINK
-fi
-AC_MSG_RESULT($STARLINK)
-AC_SUBST(STARLINK)
 
-#  Name of Fortran compiler, should be part of CVS environment?
-if test "${FC}" = ""; then
-   echo "FC set to blank"
-   AC_CHECK_PROGS(FC, [g77 f77 fort77])
-fi
+TEA_PUBLIC_TCL_HEADERS
+#TEA_PRIVATE_TCL_HEADERS
 
-#  Compilation flags, for g77 we also need -fno-second-underscore. 
-#  Note we now use the newer "FCFLAGS" from the environment in preference to
-#  "FFLAGS".
-AC_MSG_CHECKING([Fortran flags])
-FCFLAGS=${FCFLAGS:--O}
-if test -z "${FCFLAGS}"; then
-   if test "${FC}" = "g77"; then
-      FCFLAGS="$FCFLAGS -fno-second-underscore"
-   fi
-fi
-AC_MSG_RESULT($FCFLAGS)
-AC_SUBST(FCFLAGS)
-
-#  These are the Starlink extras, standard include directories etc.
-AC_SUBST(STAR_FCFLAGS)
-
-#  How to link files.
-AC_PROG_LN_S()
-LINK=${LN_S}
-AC_SUBST(LINK)
-
-#  ALINK script location.
-AC_CHECK_PROG(ALINK,${STARLINK}/bin/alink,alink)
+TEA_PUBLIC_TK_HEADERS
+#TEA_PRIVATE_TK_HEADERS
+TEA_PATH_X
 
 #--------------------------------------------------------------------
-#  Try to determine the extra libraries required to link a
-#  C/C++ program that has f77 libraries or subroutines.
+# Check whether --enable-threads or --disable-threads was given.
+# This auto-enables if Tcl was compiled threaded.
 #--------------------------------------------------------------------
-#  Protect this against LIBS values, which are C specific (from Tcl).
-#  This is a general problem with testing Fortran properties, but
-#  only effects this macro.
-old_LIBS=$LIBS
-LIBS=
-AC_FC_LIBRARY_LDFLAGS
-LIBS=$old_LIBS
+
+TEA_ENABLE_THREADS
 
 #--------------------------------------------------------------------
-#	Propagate prefix argument as installation directory.
+# The statement below defines a collection of symbols related to
+# building as a shared library instead of a static library.
 #--------------------------------------------------------------------
-DESTDIR="$prefix"
-BINDIR="$DESTDIR/bin"
-LIBDIR="$DESTDIR/lib"
-GAIA_DIR="$LIBDIR/gaia"
-GAIA_LIBRARY="$GAIA_DIR"
-GAIA_BUILD_LIBRARY="$SRC_ROOT/library"
-STARTCL_LIBRARY="$STARLINK/lib/startcl"
 
-AC_SUBST(DESTDIR)
-AC_SUBST(BINDIR)
-AC_SUBST(LIBDIR)
-AC_SUBST(GAIA_DIR)
-AC_SUBST(GAIA_LIBRARY)
-AC_SUBST(GAIA_BUILD_LIBRARY)
-AC_SUBST(STARTCL_LIBRARY)
+TEA_ENABLE_SHARED
 
 #--------------------------------------------------------------------
-#	Print out some of the more important settings
+# This macro figures out what flags to use with the compiler/linker
+# when building shared/static debug/optimized objects.  This information
+# can be taken from the tclConfig.sh file, but this figures it all out.
 #--------------------------------------------------------------------
-echo "
-Configuration results (edit and run ./config.status to modify):
 
-C   Compiler            => $CC
-C++ Compiler            => $CXX
-C++ include flag        => $CXX_INCLUDE
-Fortran Compiler        => $FC
-Iwidgets library files  => $IWIDGETS_LIBRARY
-"
+TEA_CONFIG_CFLAGS
 
 #--------------------------------------------------------------------
-#	Generate the Makefiles etc...
+# Set the default compiler switches based on the --enable-symbols option.
 #--------------------------------------------------------------------
-AC_OUTPUT(Makefile \
-        library/Makefile \
-        library/gaia_version.tcl \
-        src/Makefile \
-        tkhtml/Makefile \
-        mktclapp/Makefile \
-        mktclapp/library/gaia_swish.tcl \
-        mktclapp/library/gaia_stcl.tcl \
-        colormaps/Makefile \
-        bitmaps/Makefile, sh makelinks \
-        gaia.htx/Makefile )
+
+TEA_ENABLE_SYMBOLS
+
+#--------------------------------------------------------------------
+# Everyone should be linking against the Tcl stub library.  If you
+# can't for some reason, remove this definition.  If you aren't using
+# stubs, you also need to modify the SHLIB_LD_LIBS setting below to
+# link against the non-stubbed Tcl library.  Add Tk too if necessary.
+#--------------------------------------------------------------------
+
+# allan: can't use stubs, due to BLT dependency
+#AC_DEFINE(USE_TCL_STUBS, 1, [Use Tcl stubs])
+#AC_DEFINE(USE_TK_STUBS, 1, [Use Tk stubs])
+
+#--------------------------------------------------------------------
+# This macro generates a line to use when building a library.  It
+# depends on values set by the TEA_ENABLE_SHARED, TEA_ENABLE_SYMBOLS,
+# and TEA_LOAD_TCLCONFIG macros above.
+#--------------------------------------------------------------------
+
+TEA_MAKE_LIB
+
+#--------------------------------------------------------------------
+# Determine the name of the tclsh and/or wish executables in the
+# Tcl and Tk build directories or the location they were installed
+# into. These paths are used to support running test cases only,
+# the Makefile should not be making use of these paths to generate
+# a pkgIndex.tcl file or anything else at extension build time.
+#--------------------------------------------------------------------
+
+TEA_PROG_TCLSH
+TEA_PROG_WISH
+
+#--------------------------------------------------------------------
+# For the release
+#--------------------------------------------------------------------
+OS=`uname`
+AC_SUBST(OS)
+
+#--------------------------------------------------------------------
+# Finally, substitute all of the various values into the Makefile.
+# You may alternatively have a special pkgIndex.tcl.in or other files
+# which require substituting th AC variables in.  Include these here.
+#--------------------------------------------------------------------
+AC_OUTPUT([Makefile pkgIndex.tcl gaia.sh gaia_version.tcl])
+
+chmod ugo+rx gaia.sh

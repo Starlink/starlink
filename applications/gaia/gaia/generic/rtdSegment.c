@@ -32,8 +32,9 @@
  *                                     establish the canvas and
  *                                     itemPtr.
  */
-
-#include <config.h> /* From skycat util */
+#if HAVE_CONFIG_H
+#include <config.h> 
+#endif
 
 #include <stdio.h>
 #include <ctype.h>
