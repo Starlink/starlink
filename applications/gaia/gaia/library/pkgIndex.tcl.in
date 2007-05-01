@@ -1,3 +1,0 @@
-# Tcl package index file, version 1.0
-
-package ifneeded Gaia @GAIA_VERSION@ [list load "[file join [file dirname $dir] libgaia@SHLIB_SUFFIX@]" Gaia]
