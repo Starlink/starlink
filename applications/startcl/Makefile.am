@@ -54,7 +54,8 @@ HELP_FILES = gwm.help
 # Define additional package-specific installation directories.
 
 binsysdir=$(bindir)/@PACKAGE@
-libsysdir=$(libdir)/@PACKAGE@
+libsysdir=$(libdir)
+pkgsysdir=$(libdir)/@PACKAGE@
 pubobjdir=$(libdir)
 
 # Dependencies.
@@ -94,8 +95,8 @@ include_HEADERS = $(PUBLIC_INCLUDES)
 pubobj_DATA = $(GWM_ROUTINES:.c=.o) $(ADAM_ROUTINES:.c=.o) $(NBS_ROUTINES:.c=.o)
 binsys_SCRIPTS = $(PUBLIC_SCR)
 binsys_DATA = $(HELP_FILES)
-libsys_DATA = $(LIBRARY_FILES) tclIndex
-libsys_SCRIPTS = adamMessageRelay
+pkgsys_DATA = $(LIBRARY_FILES) tclIndex
+pkgsys_SCRIPTS = adamMessageRelay
 TESTS = tester.sh
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
@@ -141,9 +142,9 @@ tclIndex: $(LIBRARY_FILES)
 	echo 'auto_mkindex . *.tcl' | @TCLSH@
 	echo >> tclIndex ''
 	echo >> tclIndex \
-           'set auto_index(gwm) [list load [file join $$dir [concat libtkGwm[info sharedlibextension]] ] tkGwm]'
+           'set auto_index(gwm) [list load [file join $$dir ".." [concat libtkGwm[info sharedlibextension]] ] tkGwm]'
 	echo >> tclIndex \
-           'set auto_index(adam_start) [list load [file join $$dir [concat libtclAdam[info sharedlibextension]] ] tclAdam]'
+           'set auto_index(adam_start) [list load [file join $$dir ".." [concat libtclAdam[info sharedlibextension]] ] tclAdam]'
 
 EXTRA_DIST = $(PRIVATE_INCLUDES) $(LIBRARY_FILES) adamMessageRelay.in adamtest.in \
              gwmXrefresh.in gwm.in startcl_test startcl_test2 tester.sh nbstrace \
