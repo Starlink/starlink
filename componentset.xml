@@ -1505,7 +1505,7 @@ UNIX).
 </component>
 
 <component id="startcl" support="S">
-  <version>1.5-6</version>
+  <version>1.5-7</version>
   <path>applications/startcl</path>
   <description>Starlink extensions to Tcl &amp; Tk</description>
   <abstract>
