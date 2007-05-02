@@ -104,6 +104,8 @@ f     The DSBSpecFrame class does not define any new routines beyond those
 *        Modified so that a DSBSpecFrame can be used as a template to find a
 *        DSBSpecFrame (or SpecFrame) contained within a CmpFrame. This
 *        involves changes in Match.
+*     1-MAY-2007 (DSB):
+*        The default for AlignSideband has been changed from 1 to 0.
 *class--
 
 *  Implementation Deficiencies:
@@ -2390,7 +2392,7 @@ astMAKE_GET(DSBSpecFrame,SideBand,int,USB,(this->sideband == BADSB ? ((astGetIF(
 *     This attribute controls how a DSBSpecFrame behaves when it is used (by
 c     astFindFrame or astConvert) as a template to match another (target)
 f     AST_FINDFRAME or AST_CONVERT) as a template to match another (target)
-*     DSBSpecFrame. If non-zero (the default), the value of the SideBand 
+*     DSBSpecFrame. The default value is zero. If non-zero, the value of the SideBand 
 *     attribute is used so that alignment occurs between sidebands. That
 *     is, if one DSBSpecFrame represents USB and the other represents LSB
 *     then 
@@ -2436,10 +2438,10 @@ f     When AST_FINDFRAME or AST_CONVERT
 *att--
 */
 /* The AlignSideBand value has a value of -1 when not set yielding a 
-   default of 1. */
+   default of 0. */
 astMAKE_TEST(DSBSpecFrame,AlignSideBand,( this->alignsideband != -1 ))
 astMAKE_CLEAR(DSBSpecFrame,AlignSideBand,alignsideband,-1)
-astMAKE_GET(DSBSpecFrame,AlignSideBand,int,-1,((this->alignsideband==-1)?1:this->alignsideband) )
+astMAKE_GET(DSBSpecFrame,AlignSideBand,int,-1,((this->alignsideband==-1)?0:this->alignsideband) )
 astMAKE_SET(DSBSpecFrame,AlignSideBand,int,alignsideband,(value?1:0))
 
 /* Copy constructor. */
