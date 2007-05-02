@@ -106,7 +106,7 @@ typedef enum {
   INST__ACSIS  = 0x00000001,
   INST__SCUBA2 = 0x00000002,
   INST__AZTEC  = 0x00000004,
-  INST__ALL    = 0xFFFFFFFF,  /* All bits set */
+  INST__ALL    = 0x0FFFFFFF  /* All bits set */
 } inst_t;
 
 /* This struct represents all the information available from a JCMT SEQUENCE as published
