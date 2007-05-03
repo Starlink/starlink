@@ -1,10 +1,12 @@
 .libs
+.deps
 Makefile
 Makefile.in
 VERSION
 config.log
 config.status
 dtask_applic.lo
+gaiaMon
 gaiaMon.ifl
 *.ifc
 install
