@@ -33,7 +33,7 @@ f     AST_DSBSPECFRAME
 *     The distance from this central position to the LO frequency is known 
 *     as the "intermediate frequency" (IF). The value supplied for IF can
 *     be a signed value in order to indicate whether the LO frequency is
-*     above of below the central position.
+*     above or below the central position.
 
 *  Inheritance:
 *     The DSBSpecFrame class inherits from the SpecFrame class.
