@@ -12,7 +12,7 @@
 # The information in this file is specific to a single platform.
 
 # Itcl's version number.
-ITCL_VERSION='@ITCL_VERSION@'
+ITK_VERSION='@ITK_VERSION@'
 
 # The name of the Itk library (may be either a .a file or a shared library):
 ITK_LIB_FILE=@ITK_LIB_FILE@

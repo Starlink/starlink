@@ -234,6 +234,45 @@ TEA_PROG_TCLSH
 TEA_PROG_WISH
 
 #--------------------------------------------------------------------
+# These are for itkConfig.sh
+#--------------------------------------------------------------------
+
+# pkglibdir must be a fully qualified path and (not ${exec_prefix}/lib)
+eval pkglibdir="${libdir}/${PACKAGE_NAME}${PACKAGE_VERSION}"
+if test "${TCL_LIB_VERSIONS_OK}" = "ok"; then
+    eval ITK_LIB_FILE="-litk${PACKAGE_VERSION}${DBGX}"
+    eval ITK_STUB_LIB_FILE="-litkstub${PACKAGE_VERSION}${DBGX}"
+else
+    eval ITK_LIB_FILE="-litk`echo ${PACKAGE_VERSION} | tr -d .`${DBGX}"
+    eval ITK_STUB_LIB_FILE"-litkstub`echo ${PACKAGE_VERSION} | tr -d .`${DBGX}"
+fi
+ITK_BUILD_LIB_SPEC="-L`pwd` ${ITK_LIB_FILE}"
+ITK_LIB_SPEC="-L${pkglibdir}/.. ${ITK_LIB_FILE}"
+
+ITK_BUILD_STUB_LIB_SPEC="-L`pwd` ${ITK_STUB_LIB_FILE}"
+ITK_STUB_LIB_SPEC="-L${pkglibdir} ${ITK_STUB_LIB_FILE}"
+ITK_BUILD_STUB_LIB_PATH="`pwd`/${ITK_STUB_LIB_FILE}"
+ITK_STUB_LIB_PATH="${pkglibdir}/${ITK_STUB_LIB_FILE}"
+
+ITK_VERSION=${PACKAGE_VERSION}
+
+AC_SUBST(ITK_BUILD_LIB_SPEC)
+AC_SUBST(ITK_LIB_SPEC)
+AC_SUBST(ITK_LIB_FILE)
+AC_SUBST(ITK_BUILD_STUB_LIB_SPEC)
+AC_SUBST(ITK_STUB_LIB_SPEC)
+AC_SUBST(ITK_BUILD_STUB_LIB_PATH)
+AC_SUBST(ITK_STUB_LIB_PATH)
+AC_SUBST(ITK_STUB_LIB_FILE)
+AC_SUBST(LD_SEARCH_FLAGS)
+AC_SUBST(ITK_VERSION)
+
+# itk_SRC_DIR must be a fully qualified path
+eval ITK_SRC_DIR="$srcdir"
+ITK_SRC_DIR=`cd "${ITK_SRC_DIR}"; pwd`
+AC_SUBST(ITK_SRC_DIR)
+
+#--------------------------------------------------------------------
 # Finally, substitute all of the various values into the Makefile.
 #--------------------------------------------------------------------
 
