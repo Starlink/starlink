@@ -104,7 +104,8 @@ fi
 
 AC_MSG_CHECKING("do we have union semun defined")
 AC_TRY_COMPILE(
-[#include <sys/ipc.h>
+[#include <sys/types.h>
+#include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/sem.h>
 ], [
