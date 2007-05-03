@@ -37,6 +37,10 @@
  * $Id$
  */
 
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdio.h>
 #include "tcl.h"
 #include "tk.h"

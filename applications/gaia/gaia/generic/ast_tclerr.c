@@ -52,6 +52,10 @@
 
 /* Include files. */
 /* ============== */
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 /* Interface definitions. */
 /* ---------------------- */
 #include "ast.h"                 /* AST interface */

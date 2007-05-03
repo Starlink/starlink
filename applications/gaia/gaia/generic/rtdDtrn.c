@@ -36,6 +36,10 @@
  *      {enter_changes_here}
  */
 
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "sae_par.h"
 #include "cnf.h"
 #include "f77.h"

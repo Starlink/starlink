@@ -78,6 +78,10 @@
 /* Header files. */
 /* ============= */
 
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 /* AST Interface definitions. */
 /* -------------------------- */
 #include "ast.h"                 /* AST functions and macros */

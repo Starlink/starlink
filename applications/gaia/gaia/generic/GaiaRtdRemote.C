@@ -42,6 +42,10 @@
  *-
  */
 
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 //  Include files.
 #include <unistd.h>
 #include "GaiaRtdRemote.h"

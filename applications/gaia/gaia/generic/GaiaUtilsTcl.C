@@ -41,6 +41,10 @@
  *-
  */
 
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <float.h>
 #include <tcl.h>
 #include <HTTP.h>

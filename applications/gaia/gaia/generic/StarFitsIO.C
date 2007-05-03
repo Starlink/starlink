@@ -55,6 +55,10 @@
  */
 static const char* const rcsId="@(#) $Id$";
 
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #if ! ( defined(__APPLE__) && defined(__MACH__) )
 #include <netinet/in.h>
 #endif

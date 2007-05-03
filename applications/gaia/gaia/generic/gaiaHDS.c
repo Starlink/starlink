@@ -38,6 +38,10 @@
  *-
  */
 
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <sae_par.h>
 #include <gaiaUtils.h>
 #include <star/hds.h>

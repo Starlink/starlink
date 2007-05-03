@@ -85,7 +85,11 @@
  *-
  */
 
-#include "define.h"    // From tclutil
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include "define.h" //  from tclutil
 
 #include <cstring>
 #include <cstdlib>
@@ -96,7 +100,6 @@
 #include "error.h"
 #include "StarWCS.h"
 #include "gaiaUtils.h"
-#include "define.h"
 
                                     //  Trig conversion factors.
 static const double pi_ = 3.14159265358979323846;
