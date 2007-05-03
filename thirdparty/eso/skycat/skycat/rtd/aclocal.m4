@@ -156,6 +156,7 @@ AC_SUBST(SHLIB_LD_CXX_LIBS)
 #  this way the object files are kept embedded the usual object files, see 
 #  the cxx man page for details).
 #-------------------------------------------------------------------------
+export CXXFLAGS
 case $system in
    OSF*) 
       if test "$CXX" = "cxx"; then 
