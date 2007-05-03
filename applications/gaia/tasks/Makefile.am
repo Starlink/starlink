@@ -13,7 +13,7 @@ gaiaMon_SOURCES = \
 gaiaLib = libgaia@PACKAGE_VERSION@@TCL_SHLIB_EXT@
 
 gaiaMon_LDADD = $(LDADD) \
-	libgaia4.0.0.so \
+	$(gaiaLib) \
 	`fio_link_adam` `ard_link_adam` `ndf_link_adam` `cat_link_adam`
 
 SUBSRC = gai1_nxtab.f gai1_s2ang.f gai1_t2cg.f gai1_t2cn.f gai1_wrtab.f \
@@ -25,3 +25,4 @@ $(gaiaLib):
 	   rm -rf $(gaiaLib) ;\
 	fi
 	ln -s ../gaia/$(gaiaLib) .
+
