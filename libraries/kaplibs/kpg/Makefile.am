@@ -215,6 +215,7 @@ kpg1_numfl.f \
 kpg1_opgrd.f \
 kpg1_orvar.f \
 kpg1_pgesc.f \
+kpg1_pixsc.f \
 kpg1_pl2ge.f \
 kpg1_pl2pu.f \
 kpg1_prcvt.f \
