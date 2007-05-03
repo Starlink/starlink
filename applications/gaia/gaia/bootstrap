@@ -1,0 +1,22 @@
+#! /bin/sh -
+
+echo "Bootstrapping `pwd` ..."
+
+if test ! -f configure.in; then
+   echo "bootstrap: No configure.in in directory `pwd`" >&2
+   exit 1
+fi
+
+#  We need the latest starconf.m4 script, so locate it and put a copy into 
+#  tclconfig.
+starconf_home="`starconf --show buildsupport`"
+starconf_m4="$starconf_home/share/aclocal/starconf.m4"
+if test -f "tclconfig/starconf.m4"; then
+   rm -f "tclconfig/starconf.m4"
+fi
+if test -f "$starconf_m4"; then
+   cp -p "$starconf_m4" tclconfig/
+fi
+
+#  Update configure.
+autoconf
