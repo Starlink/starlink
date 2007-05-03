@@ -18,9 +18,12 @@
 *  History:
 *     08-FEB-2006 (TIMJ):
 *        Original version.
+*     03-MAY-2007 (TIMJ):
+*        Do not include gc.h unless libgc also available
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2007 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -59,7 +62,7 @@ void starMemInitPrivate( int gc_initialized );
 #undef HAVE_LIBGC
 #undef HAVE_GC_H
 
-#if HAVE_GC_H
+#if HAVE_GC_H && HAVE_LIBGC
 #include <gc.h>
 #endif
 
