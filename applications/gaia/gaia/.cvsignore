@@ -1,8 +1,7 @@
 .libs
 Makefile
-VERSION
 config.log
 config.status
-dtask_applic.lo
-gaiaMon.ifl
 install
+pkgIndex.tcl
+autom4te.cache

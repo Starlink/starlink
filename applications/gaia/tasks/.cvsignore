@@ -9,4 +9,4 @@ dtask_applic.lo
 gaiaMon
 gaiaMon.ifl
 *.ifc
-install
+version.dat
