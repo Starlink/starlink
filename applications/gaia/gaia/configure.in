@@ -198,10 +198,13 @@ OS=`uname`
 AC_SUBST(OS)
 
 #--------------------------------------------------------------------
+# Prefer to include a config.h file.
+#--------------------------------------------------------------------
+AC_CONFIG_HEADERS([config.h])
+
+#--------------------------------------------------------------------
 # Finally, substitute all of the various values into the Makefile.
 # You may alternatively have a special pkgIndex.tcl.in or other files
 # which require substituting th AC variables in.  Include these here.
 #--------------------------------------------------------------------
-AC_OUTPUT([Makefile pkgIndex.tcl gaia.sh gaia_version.tcl])
-
-chmod ugo+rx gaia.sh
+AC_OUTPUT([Makefile pkgIndex.tcl])
