@@ -60,6 +60,8 @@
 *        Normalize first pixel centre before display.
 *     10-JAN-2003 (DSB):
 *        Modified to display details of WCS SpecFrames.
+*     1-MAY-2007 (DSB):
+*        Display pixel size at first pixel.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -85,25 +87,28 @@
 
 *  Local Variables :
       CHARACTER ATTRIB*20        ! AST Frame attribute name
+      CHARACTER FPIXSC( NDF__MXDIM )*50   ! Formatted pixel scale
       CHARACTER STEXT*50         ! Sub-frame header text
       CHARACTER UNIT*15          ! Units string
+      CHARACTER UPIXSC( NDF__MXDIM )*20   ! pixel scale unit
       DOUBLE PRECISION CFIRST( 1, NDF__MXDIM ) ! Frame coords of first pixel
       DOUBLE PRECISION GFIRST( 1, NDF__MXDIM ) ! GRID coords of first pixel
+      DOUBLE PRECISION PIXSC( NDF__MXDIM )! Pixel scale
       INTEGER CFRM               ! Frame to be described
       INTEGER COUNT              ! Count of displayed sub-frames
+      INTEGER FRM( 2*NDF__MXDIM )! Pointers to component Frames
       INTEGER FRMNAX             ! Frame dimensionality
       INTEGER I                  ! Loop counter for dimensions
       INTEGER IAT                ! Current length of a string
       INTEGER IAXIS              ! Loop counter for axes
       INTEGER IBASE              ! Index of Base Frame in FrameSet
       INTEGER IGRID              ! Index of GRID Frame in FrameSet
-      INTEGER NDIM               ! Number of dimensions
-      LOGICAL GOTFS              ! Was a FrameSet supplied?
-      LOGICAL SERIES             ! Frames in series?
-      INTEGER FRM( 2*NDF__MXDIM )! Pointers to component Frames
-      INTEGER TOP                ! Index of last Frame to be checked
       INTEGER INV1               ! Invert attribute for first component
       INTEGER INV2               ! Invert attribute for second component
+      INTEGER NDIM               ! Number of dimensions
+      INTEGER TOP                ! Index of last Frame to be checked
+      LOGICAL GOTFS              ! Was a FrameSet supplied?
+      LOGICAL SERIES             ! Frames in series?
 *.
 
 *  Check the inherited status. 
@@ -179,6 +184,11 @@
 
                CALL MSG_OUT( 'WCS_FIRSTP',
      :      '        First pixel centre  : ^FIRST', STATUS )
+
+*  Get the pixel scales at the first pixel.
+               CALL KPG1_PIXSC( FSET, GFIRST, PIXSC, FPIXSC, UPIXSC, 
+     :                          STATUS )
+
             END IF
 
 *  Re-instate the original Base Frame.
@@ -207,7 +217,7 @@
          CALL MSG_SETC( 'LABEL', AST_GETC( CFRM, ATTRIB( : IAT ), 
      :                                     STATUS ) )
          CALL MSG_OUT( 'AXIS_LABEL',
-     :   '              Label: ^LABEL', STATUS )
+     :   '              Label              : ^LABEL', STATUS )
 
 *  Construct the name of the attribute holding the units for this axis.
          ATTRIB = 'UNIT('
@@ -220,8 +230,14 @@
          IF( UNIT .NE. ' ' ) THEN
             CALL MSG_SETC( 'UNIT', UNIT )
             CALL MSG_OUT( 'AXIS_UNITS',
-     :      '              Units: ^UNIT', STATUS )
+     :      '              Units              : ^UNIT', STATUS )
          END IF
+
+*  display the pixel scale at the first pixel
+         CALL MSG_SETC( 'V', FPIXSC( IAXIS ) )
+         CALL MSG_SETC( 'U', UPIXSC( IAXIS ) )
+         CALL MSG_OUT( 'AXIS_SCALE', 
+     :      '              Nominal Pixel scale: ^V ^U', STATUS )
 
 *  Add a spacing line after the information for each axis.
          CALL MSG_BLANK( STATUS )
