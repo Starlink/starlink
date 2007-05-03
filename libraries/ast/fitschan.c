@@ -6759,6 +6759,15 @@ static void DSBSetUp( AstFitsChan *this, FitsStore *store,
 
 /* Now get the Mapping between these. */
    fs = astConvert( dsb, dsb2, "" );
+
+/* Re-instate the orignal attribute values in the supplied Frame. */
+   if( sorset ) {
+      astSetStdOfRest( dsb, oldsor );
+   } else {
+      astClearStdOfRest( dsb );
+   }
+
+/* Check a conversion was found. */
    if( fs != NULL ) {
 
 /* Use this Mapping to transform the rest frequency and the image
@@ -6807,13 +6816,6 @@ static void DSBSetUp( AstFitsChan *this, FitsStore *store,
 
 /* Free resources. */
    dsb2 = astAnnul( dsb2 );
-
-/* Re-instate the orignal attribute values in the supplied Frame. */
-   if( sorset ) {
-      astSetStdOfRest( dsb, oldsor );
-   } else {
-      astClearStdOfRest( dsb );
-   }
 }
 
 static int DSSFromStore( AstFitsChan *this, FitsStore *store, 
