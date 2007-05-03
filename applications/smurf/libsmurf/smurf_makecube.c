@@ -1382,14 +1382,14 @@ L999:;
    and PROVCNT headers from this information. */
          smf_fits_add_prov( fchan, keymap, status ); 
 
-/* If the FitsChan is not empty, store it in the FITS extension of the
-   output NDF (any existing FITS extension is deleted). */
-         if( astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );
-  
 /* Free the seoncd work array. */
          work2_array = astFree( work2_array );
       }
    }
+
+/* If the FitsChan is not empty, store it in the FITS extension of the
+   output NDF (any existing FITS extension is deleted). */
+   if( astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );
 
 /* Close the output data files. */
    if( expdata ) smf_close_file( &expdata, status );
