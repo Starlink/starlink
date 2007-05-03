@@ -218,7 +218,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       }
       itk_component add reflabel {
          label $itk_component(rframe).reflabel -text "Reference:" \
-            -width $itk_option(-labelwidth)
+            -width $itk_option(-labelwidth) -anchor w
       }
       itk_component add setref {
          button $itk_component(rframe).setref -text "Set" \
@@ -244,7 +244,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       }
       itk_component add splatlabel {
          label $itk_component(sframe).splatlabel -text "SPLAT-VO:" \
-            -width $itk_option(-labelwidth)
+            -width $itk_option(-labelwidth) -anchor w
       }
 
       itk_component add splatreplace {
@@ -864,7 +864,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       }
       itk_component add blabel {
          label $itk_component(bframe).label -text "Define region:" \
-            -width $itk_option(-labelwidth)
+            -width $itk_option(-labelwidth) -anchor w
       }
 
       set buttons_ [$toolbox_ make_types_frame $itk_component(bframe).tools]
