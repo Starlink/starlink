@@ -179,6 +179,7 @@ CFLAGS		= @CFLAGS@
 CXXFLAGS        = @CXXFLAGS@
 FCFLAGS         = @FCFLAGS@ @SHLIB_CFLAGS@
 STAR_FCFLAGS    = @STAR_FCFLAGS@
+FGENERIC        = @FGENERIC@
 COMPILE		= $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CXXCOMPILE	= $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) $(CXXFLAGS)
 
@@ -242,7 +243,7 @@ install-libraries: libraries
 	@test -d $(DESTDIR)$(pkgincludedir) || mkdir -p $(DESTDIR)$(pkgincludedir)
 	@echo "Installing header files in $(DESTDIR)$(pkgincludedir)"
 	@list='$(PKG_HEADERS)'; for i in $$list; do \
-	    echo "Installing $(srcdir)/$$i" ; \
+	    echo "MANIFEST:$(srcdir)/$$i" ; \
 	    $(INSTALL_DATA) $(srcdir)/$$i $(DESTDIR)$(pkgincludedir) ; \
 	done;
 
@@ -346,7 +347,7 @@ install-lib-binaries: binaries
 	@test -d $(DESTDIR)$(pkglibdir) || mkdir -p $(DESTDIR)$(pkglibdir)
 	@list='$(lib_BINARIES)'; for p in $$list; do \
 	  if test -f $$p; then \
-	    echo " $(INSTALL_PROGRAM) $$p $(DESTDIR)$(libdir)/$$p"; \
+	    echo "MANIFEST:$(DESTDIR)$(libdir)/$$p"; \
 	    $(INSTALL_PROGRAM) $$p $(DESTDIR)$(libdir)/$$p; \
 	    stub=`echo $$p|sed -e "s/.*\(stub\).*/\1/"`; \
 	    if test "x$$stub" = "xstub"; then \
@@ -360,7 +361,7 @@ install-lib-binaries: binaries
 	    if test "x$$ext" = "xdll"; then \
 		lib=`basename $$p|sed -e 's/.[^.]*$$//'`.lib; \
 		if test -f $$lib; then \
-		    echo " $(INSTALL_DATA) $$lib $(DESTDIR)$(libdir)/$$lib"; \
+		    echo "MANIFEST:$(DESTDIR)$(libdir)/$$lib"; \
 	            $(INSTALL_DATA) $$lib $(DESTDIR)$(libdir)/$$lib; \
 		fi; \
 	    fi; \
@@ -370,12 +371,12 @@ install-lib-binaries: binaries
 	for p in $$list; do \
 	  if test -f $(srcdir)/$$p; then \
 	    destp=`basename $$p`; \
-	    echo " Install $$destp $(DESTDIR)$(pkglibdir)/$$destp"; \
+	    echo "MANIFEST:$(DESTDIR)$(pkglibdir)/$$destp"; \
 	    $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(pkglibdir)/$$destp; \
 	  fi; \
 	done
 	@if test "x$(SHARED_BUILD)" = "x1"; then \
-	    echo " Install pkgIndex.tcl $(DESTDIR)$(pkglibdir)"; \
+	    echo "MANIFEST:$(DESTDIR)$(pkglibdir)"; \
 	    $(INSTALL_DATA) pkgIndex.tcl $(DESTDIR)$(pkglibdir); \
 	fi
 
@@ -394,7 +395,7 @@ install-bin-binaries: binaries
 	@test -d $(DESTDIR)$(bindir) || mkdir -p $(DESTDIR)$(bindir)
 	@list='$(bin_BINARIES)'; for p in $$list; do \
 	  if test -f $$p; then \
-	    echo " $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/$$p"; \
+	    echo "MANIFEST:$(DESTDIR)$(bindir)/$$p"; \
 	    $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/$$p; \
 	  fi; \
 	done
@@ -437,36 +438,31 @@ FORCE:
 #tcltest: binaries libraries
 #	(cd tests; sh all.tcl)
 
+#========================================================================
+# Rules for Fortran compilation, simple and generic
+#========================================================================
+
 .f.o:
 	$(FC) -c $(FCFLAGS) $(STAR_FCFLAGS) $<
 
 .gen.o:
-	$(GC) -t n $<
+	$(FGENERIC) -t n $<
 	$(FC) -c $(FCFLAGS) $(STAR_FCFLAGS) $(<:.gen=.f)
 	rm -f $(<:.gen=.f)
 
 .gsc.o:
-	$(GC) -t rlidc $<
+	$(FGENERIC) -t rlidc $<
 	$(FC) -c $(FCFLAGS) $(STAR_FCFLAGS) $(<:.gsc=.f)
 	rm -f $(<:.gsc=.f)
 
 .gsn.o:
-	$(GC) -t rlid $<
+	$(FGENERIC) -t rlid $<
 	$(FC) -c $(FCFLAGS) $(STAR_FCFLAGS) $(<:.gsn=.f)
 	rm -f $(<:.gsn=.f)
 
+#============================================================================
+# Dummy targets to keep build system happy
+#============================================================================
 
+distdir:
 
-#.gsc.o:
-#	cd generic ;\
-#	$(LINK) $< $(<:.gsc=.gen)
-#	$(GC) -t rlidc $(<:.gsc=.gen)
-#	$(FC) -c $(FCFLAGS) $(STAR_FCFLAGS) $(<:.gsc=.f)
-#	rm -f $(<:.gsc=.f) $(<:.gsc=.gen)
-#
-#.gsn.o:
-#	cd generic ;\
-#	$(LINK) $< $(<:.gsn=.gen)
-#	$(GC) -t rlid $(<:.gsn=.gen)
-#	$(FC) -c $(FCFLAGS) $(STAR_FCFLAGS) $(<:.gsn=.f)
-#	rm -f $(<:.gsn=.f) $(<:.gsn=.gen)

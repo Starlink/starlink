@@ -134,7 +134,11 @@ esac
 # have included "starconf.m4" (see top).
 STAR_DEFAULTS
 STAR_CNF_COMPATIBLE_SYMBOLS
+STAR_PRM_COMPATIBLE_SYMBOLS
 AC_PROG_FC
+STAR_CHECK_PROGS([fgeneric])
+
+STAR_LARGEFILE_SUPPORT
 
 # GAIA needs several Starlink libraries for linking.
 PKG_LIBS="${PKG_LIBS} ${STAR_LDFLAGS} `atl_link` `ard_link -myerr -mygrf` \
