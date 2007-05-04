@@ -644,6 +644,7 @@ void smurf_makecube( int *status ) {
    int npos;                  /* Number of samples included in output NDF */
    int nwgtdim;               /* No. of axes in the weights array */
    int nreject;               /* Number of rejected input spectra */
+   int nused;                 /* Number of input values used */
    int nxy;                   /* Number of elements in 2D array */
    int ondf;                  /* output NDF identifier */
    int outax[ 2 ];            /* Indices of corresponding output axes */
@@ -1140,6 +1141,7 @@ void smurf_makecube( int *status ) {
 
 /* Loop round all the input files, pasting each one into the output NDF. */
    nreject = 0;
+   nused = 0;
    ispec = 0;
    for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++ ) {
 
@@ -1216,7 +1218,7 @@ void smurf_makecube( int *status ) {
                         ospecmap, detgrp, moving, use_wgt, lbnd_out, ubnd_out, 
                         spread, params, genvar, data_array, var_array, 
                         wgt_array, work1_array, exp_array, eff_array, &fcon,
-                        &nreject, status );
+                        &nreject, &nused, status );
       } else {
          smf_rebinsparse( data, ifile, ospecfrm, ospecmap, abskyfrm, detgrp, 
                           lbnd_out, ubnd_out, genvar, data_array, var_array, 

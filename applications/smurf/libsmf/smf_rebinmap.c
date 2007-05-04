@@ -66,6 +66,8 @@
 *        Rewrite to take account of moving objects
 *     2007-02-27 (AGG):
 *        Minor refactor for improved status handling
+*     2007-05-3 (DSB):
+*        Adapt to new astRebinSeq signature.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -129,6 +131,7 @@ void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outfset,
   int ibasein;                  /* Index of base Frame in input WCS FrameSet */
   int lbnd_in[2];               /* Lower pixel bounds for input maps */
   int nbol = 0;                 /* # of bolometers in the sub-array */
+  int nused;                    /* No. of input values used */
   AstSkyFrame *oskyfrm = NULL;  /* SkyFrame from the output WCS Frameset */
   int rebinflags;               /* Control the rebinning procedure */
   AstFrame *sf1 = NULL;         /* Pointer to copy of input current Frame */
@@ -274,7 +277,7 @@ void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outfset,
       astRebinSeqD( bolo2map, 0.0, 2, lbnd_in, ubnd_in, &(boldata[i*nbol]),
 		    NULL, AST__NEAREST, NULL, rebinflags, 0.1, 1000000, 
 		    VAL__BADD, 2, lbnd_out, ubnd_out, lbnd_in, ubnd_in,
-		    map, variance, weights );
+		    map, variance, weights, &nused );
 
       /* clean up ast objects */
       if ( bolo2sky ) bolo2sky = astAnnul( bolo2sky );

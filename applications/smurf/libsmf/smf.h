@@ -496,7 +496,7 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
                     const double params[], int genvar, float *data_array, 
                     float *var_array, double *wgt_array, int *work_array, 
                     float *texp_array, float *ton_array, double *fcon, 
-                    int *nreject, int *status );
+                    int *nreject, int *nused, int *status );
 
 void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos, 
                    int autogrid, Grp *detgrp, double par[ 7 ], 

@@ -21,7 +21,7 @@
 *                    const double params[], int genvar, float *data_array, 
 *                    float *var_array, double *wgt_array, int *work1_array, 
 *                    float *texp_array, float *teff_array, double *fcon, 
-*                    int *nreject, int *status );
+*                    int *nreject, int *nused, int *status );
 
 *  Arguments:
 *     data = smfData * (Given)
@@ -124,6 +124,8 @@
 *        The number of input spectra that have been ignored becuase they
 *        either do not cover the full spectral range of the output or
 *        because they have a different bad pixel mask to the output.
+*     nused = int * (Given and Returned)
+*        The number of input data samples used so far.
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
@@ -205,6 +207,8 @@
 *        Tsys values without also needing to weight the input data using Tsys.
 *     14-APR-2007 (DSB):
 *        Add parameter "*nreject".
+*     4-MAY-2007 (DSB):
+*        Add parameter "*nused".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -257,7 +261,7 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
                     const double params[], int genvar, float *data_array, 
                     float *var_array, double *wgt_array, int *work1_array, 
                     float *texp_array, float *teff_array, double *fcon, 
-                    int *nreject, int *status ){
+                    int *nreject, int *nused, int *status ){
 
 /* Local Variables */
    AstCmpMap *fmap = NULL;     /* Mapping from spectral grid to topo freq Hz */
@@ -941,7 +945,7 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
                astRebinSeqF( totmap, 0.0, 2, lbnd_in, ubnd_in, detwork, varwork,
                              spread, params, flags, 0.0, 50, VAL__BADR, 
                              2, ldim, dim, lbnd_in, ubnd_in, data_array + iv, 
-                             ipv, ipw );
+                             ipv, ipw, nused );
             }
          }
 
@@ -998,7 +1002,7 @@ void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
                astRebinSeqF( fsmap, 0.0, 2, lbnd_in, ubnd_in, NULL, NULL, 
                              spread, params, AST__REBINEND | ast_flags,
                              0.0, 50, VAL__BADR, 2, ldim, dim, lbnd_in, 
-                             ubnd_in, data_array + iv, ipv, ipw );
+                             ubnd_in, data_array + iv, ipv, ipw, nused );
             }
          }
 

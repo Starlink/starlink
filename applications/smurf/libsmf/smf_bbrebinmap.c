@@ -54,6 +54,8 @@
 *  History:
 *     2006-10-10 (JB)
 *        Cloned from smf_rebinmap
+*     2007-5-3 (DSB)
+*        Adapt to new astRebinSeq signature.
 
 *     {enter_further_changes_here}
 
@@ -119,6 +121,7 @@ void smf_bbrebinmap( smfData *data,  int indf, int index, int size, AstFrameSet 
   int lbnd_in[2];               /* Lower pixel bounds for input maps */
   int n;                        /* Number of elements mapped by ndfMap */
   int nbol = 0;                 /* # of bolometers in the sub-array */
+  int nused;                    /* No. of input values used */
   int place;                    /* NDF placeholder */
   int rebinflags;               /* Control the rebinning procedure */
   AstMapping *sky2map=NULL;     /* Mapping celestial->map coordinates */
@@ -231,7 +234,7 @@ void smf_bbrebinmap( smfData *data,  int indf, int index, int size, AstFrameSet 
                    0.1, 1000000, VAL__BADD,
 		   2,lbnd_out,ubnd_out,
 		   lbnd_in, ubnd_in,
-		   map, variance, weights);
+		   map, variance, weights, &nused );
 
       /* clean up ast objects */
       bolo2sky = astAnnul( bolo2sky );
