@@ -495,6 +495,7 @@ F77_SUBROUTINE(ast_rebinseq##f)( INTEGER(THIS), \
                               Ftype##_ARRAY(OUT), \
                               Ftype##_ARRAY(OUT_VAR), \
                               DOUBLE_ARRAY(WEIGHTS), \
+                              INTEGER(NUSED), \
                               INTEGER(STATUS) ) { \
    GENPTR_INTEGER(THIS) \
    GENPTR_DOUBLE(WLIM) \
@@ -517,6 +518,7 @@ F77_SUBROUTINE(ast_rebinseq##f)( INTEGER(THIS), \
    GENPTR_##Ftype##_ARRAY(OUT) \
    GENPTR_##Ftype##_ARRAY(OUT_VAR) \
    GENPTR_DOUBLE_ARRAY(WEIGHTS) \
+   GENPTR_INTEGER(NUSED) \
    GENPTR_INTEGER(STATUS) \
 \
    Xtype *out_var; \
@@ -545,7 +547,7 @@ F77_SUBROUTINE(ast_rebinseq##f)( INTEGER(THIS), \
                    *INTERP, PARAMS, *FLAGS, \
                    *TOL, *MAXPIX, *BADVAL, \
                    *NDIM_OUT, LBND_OUT, UBND_OUT, \
-                   LBND, UBND, (Xtype *) OUT, out_var, WEIGHTS ); \
+                   LBND, UBND, (Xtype *) OUT, out_var, WEIGHTS, NUSED ); \
    ) \
 }
 
