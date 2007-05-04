@@ -339,6 +339,8 @@
 *        both AST__USEVAR and AST__VARWGT flags).
 *     2007 April 4 (MJC):
 *        Renamed USEVAR to the KAPPA standard of VARIANCE.
+*     4-MAY-2007 (DSB):
+*        Add new argument NUSED to calls to AST_REBINSEQ.
 *     {enter_further_changes_here}
 
 *-
@@ -388,6 +390,7 @@
       INTEGER NDIM           ! Number of pixel axes in output NDF
       INTEGER NDIM1          ! Number of pixel axes in input NDF
       INTEGER NPAR           ! No. of required interpolation parameters
+      INTEGER NUSED          ! No. of input values used so far
       INTEGER SIZE           ! Total size of the input group
       INTEGER UBND( NDF__MXDIM ) ! Indices of upper-right corner of o/p
       INTEGER UBND1( NDF__MXDIM )! Indices of upper-right corner of i/p
@@ -618,6 +621,10 @@
 *  Abort if an error has occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
+*  Initialise to zero the number of input values pasted into the 
+*  output array.
+      NUSED = 0
+
 *  Loop round each NDF to be processed.
       DO I = 1, SIZE
 
@@ -670,7 +677,7 @@
      :                          VAL__BADI, NDIM, LBND, UBND, LBND1, 
      :                          UBND1, %VAL( CNF_PVAL( IPD2 ) ), 
      :                          %VAL( CNF_PVAL( IPV2 ) ),
-     :                          %VAL( CNF_PVAL( IPW ) ),
+     :                          %VAL( CNF_PVAL( IPW ) ), NUSED,
      :                          STATUS )
 
          ELSE IF ( TY_IN .EQ. '_REAL' ) THEN
@@ -681,7 +688,7 @@
      :                          VAL__BADR, NDIM, LBND, UBND, LBND1, 
      :                          UBND1, %VAL( CNF_PVAL( IPD2 ) ), 
      :                          %VAL( CNF_PVAL( IPV2 ) ),
-     :                          %VAL( CNF_PVAL( IPW ) ),
+     :                          %VAL( CNF_PVAL( IPW ) ), NUSED,
      :                          STATUS )
          
          ELSE IF ( TY_IN .EQ. '_DOUBLE' ) THEN
@@ -692,7 +699,7 @@
      :                          VAL__BADD, NDIM, LBND, UBND, LBND1, 
      :                          UBND1, %VAL( CNF_PVAL( IPD2 ) ), 
      :                          %VAL( CNF_PVAL( IPV2 ) ),
-     :                          %VAL( CNF_PVAL( IPW ) ),
+     :                          %VAL( CNF_PVAL( IPW ) ), NUSED,
      :                          STATUS )
          
          ELSE IF( STATUS .EQ. SAI__OK ) THEN
