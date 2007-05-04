@@ -16,6 +16,12 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- The astRebinSeq functions now have an extra parameter that is used to
+record the total number of input data val;ues added into the output
+array. This is necessary to correct a flaw in the calculation of output
+variances based on the spread of input values. NOTE, THIS CHANGE WILL
+REQUIRE EXISTING CODE THAT USES ASTREBINSEQ TO BE MODIFIED TO INCLUDE THE
+NEW PARAMETER (CALLED "NUSED").
 -  Support has been added for the FITS-WCS "HPX" projection (HEALPix).
 -  A new flag "AST__VARWGT" can be supplied to astRebinSeq. This causes 
 the input data values to be weighted using the reciprocals of the input
