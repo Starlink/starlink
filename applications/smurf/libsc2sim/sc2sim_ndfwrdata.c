@@ -166,6 +166,8 @@
 *     2007-04-26 (AGG):
 *        - Shorten comment for SEQSTART/END to ensure correct formatting
 *        - Add some more (admittedly blank) FITS headers
+*     2007-05-04 (AGG):
+*        Add INSTRUME FITS keyword
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
@@ -402,6 +404,7 @@ int *status              /* Global status (given and returned) */
 
    /* SCUBA-2 */
    astSetFitsS ( fitschan, "COMMENT", "", "-- SCUBA-2 specific parameters --", 0 );
+   astSetFitsS ( fitschan, "INSTRUME", "SCUBA-2", "Instrument name - SCUBA-2", 0 );
    astSetFitsS ( fitschan, "SUBARRAY", sinx->subname, "subarray name", 0 );
    astSetFitsS ( fitschan, "SHUTTER", "", "Shutter position for dark frames", 0 );
    astSetFitsS ( fitschan, "FILTER", filter, "filter used", 0 );
