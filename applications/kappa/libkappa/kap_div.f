@@ -58,8 +58,8 @@
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
 *     LABEL, TITLE, HISTORY, WCS and VARIANCE components of an NDF data
 *     structure and propagates all extensions.
-*     -  Units processing is not supported at present and therefore the
-*     UNITS component is not propagated.
+*     -  The UNITS component is propagated only if it has the same value
+*     in both input NDFs.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
 *     -  All non-complex numeric data types can be handled.
@@ -108,6 +108,8 @@
 *        Added propagation of the WCS component.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     5-MAY-2007 (DSB):
+*        Propagate the Unit value if it is the same in both NDFs.
 *     {enter_further_changes_here}
 
 *-
@@ -124,10 +126,13 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER * ( 13 ) COMP    ! NDF component list
-      CHARACTER * ( NDF__SZFTP ) DTYPE ! Data type for output components
-      CHARACTER * ( NDF__SZFRM ) FORM ! Form of the NDF
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Data type for processing
+      CHARACTER * ( NDF__SZFRM ) FORM ! Form of the NDF
+      CHARACTER * ( NDF__SZFTP ) DTYPE ! Data type for output components
+      CHARACTER CLIST*30         ! List of NDF components to copy
+      CHARACTER COMP*13          ! List of NDF components to map
+      CHARACTER UNIT1*30         ! Units string from NDF1
+      CHARACTER UNIT2*30         ! Units string from NDF2
       INTEGER EL                 ! Number of mapped elements
       INTEGER NDF1               ! Identifier for 1st NDF (input)
       INTEGER NDF2               ! Identifier for 2nd NDF (input)
@@ -156,9 +161,23 @@
 *  Trim the input pixel-index bounds to match.
       CALL NDF_MBND( 'TRIM', NDF1, NDF2, STATUS )
 
+*  See if the Units are the same.
+      UNIT1 = ' '
+      CALL NDF_CGET( NDF1, 'Unit', UNIT1, STATUS )
+      UNIT2 = ' '
+      CALL NDF_CGET( NDF2, 'Unit', UNIT2, STATUS )
+
+*  Determine the list of components to be propagated from NDF1. We only
+*  propagate the Unit component if it is the same in both input NDFs.
+      IF( UNIT1 .EQ. UNIT2 .AND. UNIT1 .NE. ' ' ) THEN
+         CLIST = 'WCS,Axis,Quality,Unit'
+      ELSE
+         CLIST = 'WCS,Axis,Quality'
+      END IF 
+
 *  Create a new output NDF based on the first input NDF. Propagate the
 *  WCS, axis and quality components.
-      CALL LPG_PROP( NDF1, 'WCS,Axis,Quality', 'OUT', NDF3, STATUS )
+      CALL LPG_PROP( NDF1, CLIST, 'OUT', NDF3, STATUS )
 
 *  See whether a variance component is defined in both the input NDFs
 *  and set the list of components to be processed accordingly.
