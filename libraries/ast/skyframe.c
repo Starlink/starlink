@@ -8757,7 +8757,7 @@ astMAKE_TEST(SkyFrame,Equinox,( this->equinox != AST__BAD ))
 *     Public attribute.
 
 *  Synopsis:
-*     Floating point.
+*     Integer.
 
 *  Description:
 *     This read-only attribute gives the index (1 or 2) of the latitude 
@@ -8783,7 +8783,7 @@ astMAKE_TEST(SkyFrame,Equinox,( this->equinox != AST__BAD ))
 *     Public attribute.
 
 *  Synopsis:
-*     Floating point.
+*     Integer.
 
 *  Description:
 *     This read-only attribute gives the index (1 or 2) of the longitude 
