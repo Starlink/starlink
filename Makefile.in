@@ -73,6 +73,7 @@ ALL_TARGETS = \
 	$(MANIFESTS)/ndf \
 	$(MANIFESTS)/ndg \
 	$(MANIFESTS)/news \
+	$(MANIFESTS)/observe \
 	$(MANIFESTS)/one \
 	$(MANIFESTS)/par \
 	$(MANIFESTS)/period \
