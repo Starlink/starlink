@@ -21285,6 +21285,18 @@ current version):
 
 \begin{enumerate}
 
+\item The 
+c+
+astRebinSeq functions
+c-
+f+
+AST\_REBINSEQ routines
+f-
+now have an extra parameter that is used to record the total number of input 
+data values added into the output array. This is necessary to correct a 
+flaw in the calculation of output variances based on the spread of input 
+values. NOTE, THIS CHANGE WILL REQUIRE EXISTING CODE TO BE MODIFIED TO 
+INCLUDE THE NEW PARAMETER (CALLED "NUSED").
 \item Support has been added for the FITS-WCS ``HPX'' (HEALPix) projection.
 \item A new flag ``AST\_\_VARWGT'' can be supplied to 
 c+
