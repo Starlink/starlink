@@ -1391,7 +1391,7 @@ L999:;
 
 /* If the FitsChan is not empty, store it in the FITS extension of the
    output NDF (any existing FITS extension is deleted). */
-   if( astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );
+   if( ondf && fchan &&  astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );
 
 /* Close the output data files. */
    if( expdata ) smf_close_file( &expdata, status );
