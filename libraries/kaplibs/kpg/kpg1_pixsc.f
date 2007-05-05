@@ -70,6 +70,8 @@
 *  History:
 *     2-MAY-2007 (DSB):
 *        Original version.
+*     5-MAY-2007 (DSB):
+*        Check both transformations are available.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -136,81 +138,97 @@
       FWCS = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
       MAP = AST_GETMAPPING( IWCS, AST__BASE, AST__CURRENT, STATUS )
 
+*  Check the Mapping has both forward and inverse transformations.
+      IF( AST_GETL( MAP, 'TranForward', STATUS ) .AND.
+     :    AST_GETL( MAP, 'TranInverse', STATUS ) ) THEN
+
 *  See if the current Frame contains a SkyFrame. If so, the indices
 *  (within the current Frame) of the longitude and latitude axes are
 *  returned, together with a pointer to the SkyFrame.
-      CALL ATL_FINDSKY( FWCS, SKYFRAME, LATAX, LONAX, STATUS )
+         CALL ATL_FINDSKY( FWCS, SKYFRAME, LATAX, LONAX, STATUS )
 
 *  Store the supplied AT position and another point that is 1 pixel away
 *  from AT along each grid axis.
-      DO I = 1, NPIX
-         IN( 1, I ) = AT( I )
-         IN( 2, I ) = AT( I ) + 1.0
-      END DO
+         DO I = 1, NPIX
+            IN( 1, I ) = AT( I )
+            IN( 2, I ) = AT( I ) + 1.0
+         END DO
 
 *  Transform them into WCS coords.
-      CALL AST_TRANN( MAP, 2, NPIX, 2, IN, .TRUE., NWCS, 2, OUT, 
-     :                STATUS )
+         CALL AST_TRANN( MAP, 2, NPIX, 2, IN, .TRUE., NWCS, 2, OUT, 
+     :                   STATUS )
 
 *  Save a copy of the WCS coords at the AT point. Initialise Q to be the
 *  same as the AT point.
-      DO I = 1, NWCS
-         ATWCS( I ) = OUT( 1, I )
-         Q( I ) = ATWCS( I ) 
-      END DO
+         DO I = 1, NWCS
+            ATWCS( I ) = OUT( 1, I )
+            Q( I ) = ATWCS( I ) 
+         END DO
 
 *  Now loop round each WCS axis.
-      DO I = 1, NWCS
+         DO I = 1, NWCS
 
 *  Get the coords of a point that is a small distance away from AT along
 *  the current WCS axis.
-         Q( I ) = OUT( 2, I ) 
+            Q( I ) = OUT( 2, I ) 
 
 *  Find the geodesic distance in the WCS frame between this point and the 
 *  AT point.
-         DWCS = AST_DISTANCE( FWCS, ATWCS, Q, STATUS )
+            DWCS = AST_DISTANCE( FWCS, ATWCS, Q, STATUS )
 
 *  Transform the outlying WCS positions back into GRID coords.
-         CALL AST_TRANN( MAP, 1, NWCS, 1, Q, .FALSE., NPIX, 1, QGRID, 
-     :                   STATUS )
+            CALL AST_TRANN( MAP, 1, NWCS, 1, Q, .FALSE., NPIX, 1, QGRID, 
+     :                      STATUS )
 
 *  Find the distance between the two points in the GRID frame.
-         DPIX = AST_DISTANCE( FGRID, AT, QGRID, STATUS )
+            DPIX = AST_DISTANCE( FGRID, AT, QGRID, STATUS )
 
 *  Find and return the axis scale.
-         IF( DWCS .NE. AST__BAD .AND. DPIX .NE. AST__BAD .AND.
-     :       DPIX .NE. 0.0 ) THEN
-            PIXSC( I ) = DWCS/DPIX
+            IF( DWCS .NE. AST__BAD .AND. DPIX .NE. AST__BAD .AND.
+     :          DPIX .NE. 0.0 ) THEN
+               PIXSC( I ) = DWCS/DPIX
 
 *  If this is a celestial longitude axis, we format it as a celestial
 *  latitude value in order to get a degrees arc-distance value.
-            IF( I .EQ. LONAX ) THEN
-               FAXIS = LATAX
+               IF( I .EQ. LONAX ) THEN
+                  FAXIS = LATAX
 
 *  All other axes are formatted using their own Format attribute.
-            ELSE
-               FAXIS = I
-            END IF
+               ELSE
+                  FAXIS = I
+               END IF
 
 *  Format the value and get the units string.
-            VALUE( I ) = AST_FORMAT( FWCS, FAXIS, PIXSC( I ), STATUS )
-            ATTR = 'Unit('
-            IAT = 5
-            CALL CHR_PUTI( FAXIS, ATTR, IAT )
-            CALL CHR_APPND( ')', ATTR, IAT )
-            UNIT( I ) = AST_GETC( FWCS, ATTR( : IAT ), STATUS )
+               VALUE( I ) = AST_FORMAT( FWCS, FAXIS, PIXSC( I ), 
+     :                                  STATUS )
+               ATTR = 'Unit('
+               IAT = 5
+               CALL CHR_PUTI( FAXIS, ATTR, IAT )
+               CALL CHR_APPND( ')', ATTR, IAT )
+               UNIT( I ) = AST_GETC( FWCS, ATTR( : IAT ), STATUS )
 
-         ELSE
-            PIXSC( I ) = AST__BAD
-            VALUE( I ) = '<undefined>'
-            UNIT( I ) = ' '
-         END IF
+            ELSE
+               PIXSC( I ) = AST__BAD
+               VALUE( I ) = '<undefined>'
+               UNIT( I ) = ' '
+            END IF
 
 *  Reset Q back to the AT point.
-         Q( I ) = ATWCS( I )
+            Q( I ) = ATWCS( I )
 
-      END DO      
+         END DO      
 
+*  If the Mapping is missing one of the transformations, return null values.
+      ELSE
+
+        DO I = 1, NWCS
+           PIXSC( I ) = AST__BAD
+           VALUE( I ) = '<cannot evaluate>'
+           UNIT( I ) = ' '
+        END DO
+
+      END IF
+     
 *  Free resources
       CALL AST_ANNUL( FGRID, STATUS )
       CALL AST_ANNUL( FWCS, STATUS )
