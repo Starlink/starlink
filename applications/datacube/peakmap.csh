@@ -54,7 +54,7 @@
 #       The script will automatically prompt the user to select a region to
 #       zoom before prompting for the region of interest.  [TRUE]
 #     +z 
-#       The program will not prompt for a zoom before requesting the region
+#       The script will not prompt for a zoom before requesting the region
 #       of interest.  [FALSE]
 #
 #  Notes:
@@ -139,11 +139,14 @@
 #     2006 March 16 (MJC):
 #       Use any supplied spectral-axis section when ripping each spectrum for 
 #       line fitting.  Reset KAPPA;DISPLAY parameters.
-
+#     2007 May 5 (MJC):
+#       Obtain and use spectral units.  Call the new getfitcon script to
+#       determine the fit's initial-guess parameters.
 #     {enter_further_changes_here}
 #
 #  Copyright:
 #     Copyright (C) 2000-2006 Central Laboratory of the Research Councils
+#     2007 Science and Technology Research Council.
 
 #-
 
@@ -177,6 +180,7 @@ set gotinfile = "FALSE"
 set gotoutfile = "FALSE"
 set gotzoom = "ASK"
 set forcefit = "FALSE"
+set approve = "FALSE"
 
 # The SPECDRE extension is used to store the Gaussian fit.
 set component = 1
@@ -253,6 +257,9 @@ set lbnd = `parget lbound ndftrace`
 set ubnd = `parget ubound ndftrace`
 set unit = `parget units ndftrace`
 
+# Get the spectral units.
+set sunits = `wcsattrib ndf=${infile} mode=get name="Unit(3)"`
+
 # Check to see if the NDF has VARIANCE.
 set variance = `parget variance ndftrace`
 
@@ -314,149 +321,17 @@ else
    echo "        Variances: absent."
 endif
 
+# Label for repeated plotting of the spectrum.  Indicate that we do not
+# wish to merely replot, but also possibly zoom.
+rezoom:
+set newfit = " "
 
 # Label for repeated fitting of the Gaussian.
 refit:
 
-# Obtain the spectral range interactively.
-# ========================================
-
-# Plot the ripped spectrum.
-linplot "${ripfile} device=${plotdev}" mode=histogram style="Colour(curves)=1" >& /dev/null
-
-# Zoom if required.
-if ( ${gotzoom} == "ASK") then
-   echo " "
-   echo -n "Zoom in (yes/no): "
-   set zoomit = $<
-else if ( ${gotzoom} == "TRUE") then
-   set zoomit = "yes"
-else
-   set zoomit = "no"
-endif
-
-if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
-
-# Get the lower limit.
-# --------------------
-   echo " "
-   echo "  Left click on lower zoom boundary."
-   source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a X
-   set low_z = $xpos
-
-# Get the upper limit.
-# --------------------
-   echo "  Left click on upper zoom boundary."
-   source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a X
-   set upp_z = $xpos
-
-   echo " "
-   echo "      Zooming:"
-   echo "        Lower Boundary: ${low_z}"
-   echo "        Upper Boundary: ${upp_z}"
-
-# Label for repeated plotting of the spectrum.
-rezoom:
- 
-# Replot the spectrum.
-# --------------------
-   linplot ${ripfile} xleft=${low_z} xright=${upp_z} \
-           mode=histogram device=${plotdev} >& /dev/null
-endif
-
-# Grab the information needed by the FITGAUSS routine.
-# ====================================================
-
-# Get the lower mask boundary.
-# ----------------------------
-
-echo " "
-echo "  Left click on the lower limit of the fitting region."
-source ${DATACUBE_DIR}/getcurpos.csh -ci 2 -a X
-set low_mask = $xpos
-
-# Get the upper mask boundary.
-# ----------------------------
-
-echo "  Left click on the upper limit of the fitting region."
-source ${DATACUBE_DIR}/getcurpos.csh -ci 2 -a X
-set upp_mask = $xpos
-
-echo " " 
-echo "      Fit Mask:"
-echo "        Lower Mask Boundary: ${low_mask}"
-echo "        Upper Mask Boundary: ${upp_mask}"
-
-# Get the continuum values.
-# -------------------------
-
-echo " "
-echo "  Left click on your first estimate of the continuum."
-source ${DATACUBE_DIR}/getcurpos.csh -ci 4 -a Y
-set first_cont = $ypos
-
-echo "  Left click on your second estimate of the continuum."
-source ${DATACUBE_DIR}/getcurpos.csh -ci 4 -a Y
-set second_cont = $ypos
-
-echo " "
-echo "      Continuum:"
-echo "        First Estimate: ${first_cont}"
-echo "        Second Estimate: ${second_cont}"
-
-# Evaluate the average continuum.
-set cont = `calc exp="0.5*((${first_cont})+(${second_cont}))" prec=${prec}`
-
-echo "        Average Value: ${cont}"
-
-# Get the line-peak position.
-# ---------------------------
-
-echo " " 
-echo "  Left click on the line peak."
-source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a XY
-set position = $xpos
-set peak = $ypos
-
-echo " "
-echo "      Line Position:"
-echo "        Peak Position: ${position}"
-echo "        Peak Height: ${peak} ${unit}"
-
-# Get the fwhm left side.
-# -----------------------
-
-echo " " 
-echo "  Left click on the left hand edge of the FWHM."
-source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a XY
-set fwhm_low = $xpos
-
-# Get the fwhm right side.
-# ------------------------
-
-echo "  Left click on the right hand edge of the FWHM."
-echo " "
-source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a XY
-set fwhm_upp = $xpos
-
-echo "      FWHM:"
-echo "        Lower Bound: ${fwhm_low}"
-echo "        Upper Bound: ${fwhm_upp}"
-
-# Evaluate the fwhm.
-# ------------------
-
-set fwhm = `calc exp="(${fwhm_upp})-(${fwhm_low})" prec=${prec}`
-echo "        FWHM: ${fwhm}"
-echo " "
-
-# Get the rest-frame spectral unit.
-# ---------------------------------
-
-# Inform the user.
-echo "      Collapsing:"
-echo "        White-light image: ${dims[1]} x ${dims[2]}"
-echo " "
+# Plot the ripped spectrum with or without zooming, and obtain the fit
+# estimated parameters.
+source ${DATACUBE_DIR}/getfitcon.csh -i ${ripfile} -d ${plotdev} ${newfit} -z {$gotzoom}
 
 # Fit the line.
 # =============
@@ -468,7 +343,7 @@ fitgauss \
     "peak=${peak} fwhm=${fwhm} reguess=no remask=no ncomp=1 "\
     "cf=0 pf=0 wf=0 comp=${component} fitgood=${fitgood} "\
     "centre=${position} logfil=${fitfile} device=${plotdev} "\
-    "dialog=f" >& /dev/null 
+    "dialog=f" >& /dev/null
 
 # Check to see whether or not fitting was successful.
 if ( ! -e $fitfile ) then
@@ -480,10 +355,16 @@ if ( ! -e $fitfile ) then
    if ( ${fitgood} == "no" || ${fitgood} == "n" ) then
       rm -f ${fitfile} >& /dev/null
       goto cleanup 
+
+# Poor fit
    else
       if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
          goto rezoom
       else
+
+# Tell getfitcon to ignore zooming, and that we just want to obtain
+# a new set of initial estimates of the Gaussian.
+         set newfit = "-r"
          goto refit
       endif
    endif
@@ -504,9 +385,9 @@ set integral = $array[8]
 set integral_err = $array[9]
 
 # Report the fit to the user.
-echo "        Centre Position: ${centre_fit} +- ${centre_err}"
+echo "        Centre Position: ${centre_fit} +- ${centre_err} ${sunits}"
 echo "        Peak Height: ${peak_height} +- ${peak_err} ${unit}"
-echo "        FWHM: ${fwhm_fit} +- ${fwhm_err}"
+echo "        FWHM: ${fwhm_fit} +- ${fwhm_err} ${sunits}"
 echo "        Line integral: ${integral} +- ${integral_err} ${unit}"
 
 # Fit ok?
@@ -525,6 +406,10 @@ if ( ${fitgood} == "no" || ${fitgood} == "n" ) then
    if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
       goto rezoom
    else
+
+# Tell getfitcon to ignore zooming, and that we just want to obtain
+# a new set of initial estimates of the Gaussian.
+      set newfit = "-r"
       goto refit
    endif
 else
@@ -598,7 +483,7 @@ while( $y <= ${ubnd[2]} )
             endif
          else
 
-            echo "        Spectrum at ($x,$y): $peak_height +- $peak_err" 
+            echo "        Spectrum at ($x,$y): $peak_height +- $peak_err ${sunits}" 
 
             set line = "${line} ${peak_height}"
             if ( ${dovar} == "TRUE" ) then
@@ -795,129 +680,17 @@ if ( ${forcefit} == "FALSE" ) then
 # Re-plot.
 # ========
 
+# Label for repeated plotting of the spectrum.  Indicate that we do not
+# wish to merely replot, but also possibly zoom.
+manual_rezoom:
+         set newfit = " "
+
 # Label for repeated fitting of the Gaussian.
 manual_refit: 
 
-# Plot the ripped spectrum.
-         linplot "${ripfile} mode=histogram device=${plotdev}" >& /dev/null
-
-# Zoom if required.
-         if ( ${gotzoom} == "ASK") then
-            echo " "
-            echo -n "Zoom in (yes/no): "
-            set zoomit = $<
-         else if ( ${gotzoom} == "TRUE") then
-            set zoomit = "yes"
-         else
-            set zoomit = "no"
-         endif
-
-         if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
-
-# Get the lower limit.
-# --------------------
-            echo " "
-            echo "  Left click on lower zoom boundary"
-            source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a X
-            set low_z = $xpos
-   
-# Get the upper limit.
-# --------------------
-            echo "  Left click on upper zoom boundary"
-            source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a X
-            set upp_z = $xpos
-
-            echo " "
-            echo "      Zooming:"
-            echo "        Lower Boundary: ${low_z}"
-            echo "        Upper Boundary: ${upp_z}"
-
-# Label for repeated fitting of the Gaussian.
-manual_rezoom:
-
-# Replot the spectrum.
-            linplot "${ripfile} xleft=${low_z} xright=${upp_z}"\
-                    mode=histogram "device=${plotdev}" >& /dev/null
-         endif
-       
-# Grab the information needed by the FITGAUSS routine.
-# ====================================================
-
-# Get the lower mask boundary.
-# ----------------------------
-         echo " "
-         echo "  Left click on the lower limit of the fitting region."
-         source ${DATACUBE_DIR}/getcurpos.csh -ci 2 -a X
-         set low_mask = $xpos
- 
-# Get the upper mask boundary.
-# ----------------------------
-         echo "  Left click on the upper limit of the fitting region."
-         source ${DATACUBE_DIR}/getcurpos.csh -ci 2 -a X
-         set upp_mask = $xpos
-
-         echo " " 
-         echo "      Fit Mask:"
-         echo "        Lower Mask Boundary: ${low_mask}"
-         echo "        Upper Mask Boundary: ${upp_mask}"
-
-# Get the continuum values.
-# -------------------------
-         echo " "
-         echo "  Left click on your first estimate of the continuum."
-         source ${DATACUBE_DIR}/getcurpos.csh -ci 4 -a Y
-         set first_cont = $ypos
-
-         echo "  Left click on your second estimate of the continuum."
-         source ${DATACUBE_DIR}/getcurpos.csh -ci 4 -a Y
-         set second_cont = $ypos
-
-         echo " "
-         echo "      Continuum:"
-         echo "        First Estimate: ${first_cont}"
-         echo "        Second Estimate: ${second_cont}"
-
-# Derive the average continuum.
-         set cont = `calc exp="0.5*((${first_cont})+(${second_cont}))" prec=${prec}`
-
-         echo "        Average Value: ${cont}"
-
-# Get the peak position.
-# ----------------------
-         echo " " 
-         echo "  Left click on the line peak"
-         source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a XY
-         set position = $xpos
-         set peak = $ypos
-
-         echo " "
-         echo "      Line Position:"
-         echo "        Peak Position: ${position}"
-         echo "        Peak Height: ${peak} ${unit}"
-
-# Get the fwhm left side.
-# -----------------------
-         echo " " 
-         echo "  Left click on the left-hand edge of the FWHM"
-         source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a XY
-         set fwhm_low = $xpos
-
-# Get the fwhm right side.
-# ------------------------
-         echo "  Left click on the right-hand edge of the FWHM"
-         echo " "
-         source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a XY
-         set fwhm_upp = $xpos
-
-         echo "      FWHM:"
-         echo "        Lower Bound: ${fwhm_low}"
-         echo "        Upper Bound: ${fwhm_upp}"
-
-# Evaluate the fwhm.
-# ------------------
-         set fwhm = `calc exp="(${fwhm_upp})-(${fwhm_low})" prec=${prec}`
-         echo "        FWHM: ${fwhm}"
-         echo " "
+# Plot the ripped spectrum with or without zooming, and obtain the fit
+# estimated parameters.
+         source ${DATACUBE_DIR}/getfitcon.csh -i ${ripfile} -d ${plotdev} ${newfit} -z {$gotzoom}
 
 # Fit the line.
 # =============
@@ -944,6 +717,10 @@ manual_rezoom:
                if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
                   goto manual_rezoom
                else
+
+# Tell getfitcon to ignore zooming, and that we just want to obtain
+# a new set of initial estimates of the Gaussian.
+                  set newfit = "-r"
                   goto manual_refit
                endif
             endif
@@ -964,9 +741,9 @@ manual_rezoom:
          set integral_err = $array[9]
 
 # Show the user the fit.
-         echo "        Centre Position: ${centre_fit} +- ${centre_err}"
+         echo "        Centre Position: ${centre_fit} +- ${centre_err} ${sunits}"
          echo "        Peak Height: ${peak_height} +- ${peak_err} ${unit}"
-         echo "        FWHM: ${fwhm_fit} +- ${fwhm_err}"
+         echo "        FWHM: ${fwhm_fit} +- ${fwhm_err} ${sunits}"
          echo "        Line integral: ${integral} +- ${integral_err} ${unit}"
 
 # Fit ok??
@@ -985,8 +762,13 @@ manual_rezoom:
             if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
                goto manual_rezoom
             else
-              goto manual_refit
+
+# Tell getfitcon to ignore zooming, and that we just want to obtain
+# a new set of initial estimates of the Gaussian.
+               set newfit = "-r"
+               goto manual_refit
             endif
+
          else if ( ${fitgood} == "quit" || ${fitgood} == "q" ) then
             rm -f ${fitfile} >& /dev/null
             goto dropout 
