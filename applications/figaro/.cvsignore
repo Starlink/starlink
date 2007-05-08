@@ -4,6 +4,7 @@ make.log.err
 core.*
 figaro.csh
 figaro.icl
+figaro.sh
 figaro.shl
 sun86.ps
 version.dat
