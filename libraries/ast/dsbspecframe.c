@@ -106,6 +106,8 @@ f     The DSBSpecFrame class does not define any new routines beyond those
 *        involves changes in Match.
 *     1-MAY-2007 (DSB):
 *        The default for AlignSideband has been changed from 1 to 0.
+*     8-MAY-2007 (DSB):
+*        Correct initialisation of alignsideband in astInitDSBSpecFrame_.
 *class--
 
 *  Implementation Deficiencies:
@@ -2596,7 +2598,7 @@ f     RESULT = AST_DSBSPECFRAME( OPTIONS, STATUS )
 *     The distance from this central position to the LO frequency is known 
 *     as the "intermediate frequency" (IF). The value supplied for IF can
 *     be a signed value in order to indicate whether the LO frequency is
-*     above of below the central position.
+*     above or below the central position.
 
 *  Parameters:
 c     options
@@ -2822,7 +2824,7 @@ AstDSBSpecFrame *astInitDSBSpecFrame_( void *mem, size_t size, int init,
       new->dsbcentre = AST__BAD;
       new->ifr = AST__BAD;
       new->sideband = BADSB;
-      new->alignsideband = BADSB;
+      new->alignsideband = -1;
 
 /* If an error occurred, clean up by deleting the new DSBSpecFrame. */
       if ( !astOK ) new = astDelete( new );
