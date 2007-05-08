@@ -62,13 +62,13 @@
 *     workstation id returned from SGS_ICURW.
 *
 *  Copyright:
-*     Copyright (C) 1988, 1989, 1990, 1991, 1992 Science & Engineering Research Council.
-*     All Rights Reserved.
+*     Copyright (C) 1988, 1989, 1990, 1991, 1992 Science & Engineering 
+*     Research Council.  All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
 *     This program is distributed in the hope that it will be
@@ -78,11 +78,12 @@
 *     
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     NE: Nick Eaton (Durham University)
+*     MJC: Malcolm J. Currie (Starlink)
 *
 *  History:
 *     Aug 1988 (NE):
@@ -111,6 +112,8 @@
 *        Save device name used to open device.
 *     Oct 1992 (NE):
 *        Improve error reports from GKS inquiry routines.
+*     2007 May 7 (MJC):
+*        Doubled and parameterised the fuzzy-edge tolerance.
 *-
 *  Type Definitions :
       IMPLICIT NONE
@@ -133,6 +136,10 @@
 
 *  Status :
       INTEGER STATUS
+
+*  Local Constants:
+      REAL ROUND
+      PARAMETER ( ROUND = 2.0E-3 )
 
 *  Local variables :
       LOGICAL FOUND, GOTIT, NOTOPN, USEGKS
@@ -310,10 +317,10 @@
 *   If the ndc's of the database are larger than the current zone then
 *   cannot create a new zone.
 *   Have to use fuzzy edges to allow for any rounding errors in GKS/SGS
-         SFA = MAX( ABS( ZCURN( 1 ) * 2.0E-3 ),
-     :              ABS( ZCURN( 2 ) * 2.0E-3 ),
-     :              ABS( ZCURN( 3 ) * 2.0E-3 ),
-     :              ABS( ZCURN( 4 ) * 2.0E-3 ) )
+         SFA = MAX( ABS( ZCURN( 1 ) * ROUND ),
+     :              ABS( ZCURN( 2 ) * ROUND ),
+     :              ABS( ZCURN( 3 ) * ROUND ),
+     :              ABS( ZCURN( 4 ) * ROUND ) )
          IF ( ( CURNDC( 1 ) .LT. ZCURN( 1 ) - SFA ) .OR.
      :        ( CURNDC( 2 ) .GT. ZCURN( 2 ) + SFA ) .OR.
      :        ( CURNDC( 3 ) .LT. ZCURN( 3 ) - SFA ) .OR.
@@ -345,26 +352,26 @@
 
 *   Allow for a bit of rounding error to ensure new zone does not
 *   lie outside current zone.
-            SFA = MAX( ABS( ZCURW( 1 ) * 1.0E-3 ),
-     :                 ABS( ZCURW( 2 ) * 1.0E-3 ) )
+            SFA = MAX( ABS( ZCURW( 1 ) * ROUND ),
+     :                 ABS( ZCURW( 2 ) * ROUND ) )
             IF ( ( WZONE( 1 ) .LT. ZCURW( 1 ) ) .AND.
      :           ( WZONE( 1 ) .GT. ZCURW( 1 ) - SFA ) ) THEN
-               WZONE( 1 ) = ZCURW( 1 )
+               WZONE( 1 ) = ZCURW( 1 ) + SFA
             ENDIF
             IF ( ( WZONE( 2 ) .GT. ZCURW( 2 ) ) .AND.
      :           ( WZONE( 2 ) .LT. ZCURW( 2 ) + SFA ) ) THEN
-               WZONE( 2 ) = ZCURW( 2 )
+               WZONE( 2 ) = ZCURW( 2 ) - SFA
             ENDIF
 
-            SFA = MAX( ABS( ZCURW( 3 ) * 1.0E-3 ),
-     :                 ABS( ZCURW( 4 ) * 1.0E-3 ) )
+            SFA = MAX( ABS( ZCURW( 3 ) * ROUND ),
+     :                 ABS( ZCURW( 4 ) * ROUND ) )
             IF ( ( WZONE( 3 ) .LT. ZCURW( 3 ) ) .AND.
      :           ( WZONE( 3 ) .GT. ZCURW( 3 ) - SFA ) ) THEN
-               WZONE( 3 ) = ZCURW( 3 )
+               WZONE( 3 ) = ZCURW( 3 ) + SFA
             ENDIF
             IF ( ( WZONE( 4 ) .GT. ZCURW( 4 ) ) .AND.
      :           ( WZONE( 4 ) .LT. ZCURW( 4 ) + SFA ) ) THEN
-               WZONE( 4 ) = ZCURW( 4 )
+               WZONE( 4 ) = ZCURW( 4 ) - SFA
             ENDIF
 
 *   Create the new zone and make its world coordinates as in the database
