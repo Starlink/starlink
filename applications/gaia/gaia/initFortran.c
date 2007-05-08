@@ -29,7 +29,9 @@
  *     02111-1307, USA
  */
 
+#if HAVE_CONFIG_H
 #include <config.h>
+#endif
 #include "ndf.h"                 /* Define NDF interface */
 #include "sae_par.h"             /* Define SAI__OK */
 

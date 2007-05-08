@@ -70,7 +70,7 @@ PKG_HEADERS	= @PKG_HEADERS@
 PKG_LIB_FILE	= @PKG_LIB_FILE@
 PKG_STUB_LIB_FILE = @PKG_STUB_LIB_FILE@
 
-PKG_BIN_FILE	=
+PKG_BIN_FILE	= $(PACKAGE_NAME)_wish$(EXEEXT) $(PACKAGE_NAME)_tcl$(EXEEXT)
 
 bin_BINARIES	= $(PKG_BIN_FILE) $(PROGS)
 lib_BINARIES	= $(PKG_LIB_FILE)
@@ -289,6 +289,22 @@ $(PKG_LIB_FILE): $(PKG_OBJECTS) $(MERGE_OBJECTS)
 #	-rm -f $(PKG_STUB_LIB_FILE)
 #	${MAKE_STUB_LIB}
 #	$(RANLIB_STUB) $(PKG_STUB_LIB_FILE)
+
+#=========================================================================
+# Build the package binaries.
+#=========================================================================
+
+$(PACKAGE_NAME)_wish$(EXEEXT): tkAppInit.o initFortran.o $(PKG_LIB_FILE)
+	$(CC) $(LDFLAGS) ${CFLAGS} tkAppInit.o initFortran.o $(PKG_LIB_FILE) \
+	      $(LD_SEARCH_FLAGS) $(SHLIB_LD_LIBS) \
+              -litcl3.3 -litk3.3 -ltclx8.4 $(itcl_BUILD_SPEC) \
+	      -o $(PACKAGE_NAME)_wish$(EXEEXT)
+
+$(PACKAGE_NAME)_tcl$(EXEEXT): tclAppInit.o initFortran.o 
+	$(CC) $(LDFLAGS) ${CFLAGS} tclAppInit.o initFortran.o \
+	      $(LD_SEARCH_FLAGS) $(SHLIB_LD_LIBS) -litcl3.3 -ltclx8.4 $(itcl_BUILD_SPEC) $(TCL_LIB_SPEC) \
+	      -o $(PACKAGE_NAME)_tcl$(EXEEXT)
+
 
 #========================================================================
 # We need to enumerate the list of .c to .o lines here.

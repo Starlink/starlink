@@ -87,7 +87,7 @@ gsources=`cd ${srcdir}; echo generic/*.gen generic/*.gsc generic/*.gsn`
 changequote([, ])
 
 gaia_headers=`cd ${srcdir}; echo generic/*.h generic/*.icc`
-gaia_includes="-I${srcdir}/generic -I${srcdir}/bitmaps -I${prefix}/include/skycat -I${prefix}/include/rtd -I${prefix}/include/cat -I${prefix}/include/astrotcl -I${prefix}/include/tclutil"
+gaia_includes="-I. -I${srcdir}/generic -I${srcdir}/bitmaps -I${prefix}/include/skycat -I${prefix}/include/rtd -I${prefix}/include/cat -I${prefix}/include/astrotcl -I${prefix}/include/tclutil"
 tclsources=`cd ${srcdir}; echo library/*.tcl library/*.itk library/*.xpm library/skycat2.0.cfg`
 
 # -----------------------------------------------------------------------
@@ -137,6 +137,7 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 STAR_PRM_COMPATIBLE_SYMBOLS
 AC_PROG_FC
 STAR_CHECK_PROGS([fgeneric])
+STAR_INITIALISE_FORTRAN
 
 STAR_LARGEFILE_SUPPORT
 
