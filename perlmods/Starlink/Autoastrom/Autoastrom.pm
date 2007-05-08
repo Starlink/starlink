@@ -869,7 +869,7 @@ sub obsdata {
 
       if( $key eq 'DEC' ) {
         # Convert to Astro::Coords::Angle object.
-        if( $value =~ /^-?\d+:\d+:[\d\.]+$/ ) {
+        if( $value =~ /^[+\-]?\d+:\d+:[\d\.]+$/ ) {
           $value = new Astro::Coords::Angle( $value, units => 'sex' );
         } elsif( $value =~ /^-?[\d\.]+$/ ) {
           $value = new Astro::Coords::Angle( $value, units => 'hour' );
