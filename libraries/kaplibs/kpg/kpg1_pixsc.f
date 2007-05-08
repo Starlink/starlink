@@ -72,6 +72,8 @@
 *        Original version.
 *     5-MAY-2007 (DSB):
 *        Check both transformations are available.
+*     8-MAY-2007 (DSB):
+*        Correct initialisation of SKYFRAME.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -146,6 +148,10 @@
 *  (within the current Frame) of the longitude and latitude axes are
 *  returned, together with a pointer to the SkyFrame.
          CALL ATL_FINDSKY( FWCS, SKYFRAME, LATAX, LONAX, STATUS )
+
+*  We do not need the SkyFrame so annul it.
+         IF( SKYFRAME .NE. AST__NULL ) CALL AST_ANNUL( SKYFRAME, 
+     :                                                 STATUS )
 
 *  Store the supplied AT position and another point that is 1 pixel away
 *  from AT along each grid axis.
@@ -233,7 +239,5 @@
       CALL AST_ANNUL( FGRID, STATUS )
       CALL AST_ANNUL( FWCS, STATUS )
       CALL AST_ANNUL( MAP, STATUS )
-
-      IF( SKYFRAME .NE. AST__NULL ) CALL AST_ANNUL( SKYFRAME, STATUS )
 
       END
