@@ -120,9 +120,12 @@ Tcl_AppInit(Tcl_Interp *interp)
     }
     Tcl_StaticPackage(interp, "Itk", Itk_Init, (Tcl_PackageInitProc *) NULL);
 
+    /* Not required, done in tclutil.
     if (Blt_Init(interp) == TCL_ERROR) {
 	return TCL_ERROR;
     }
+    Tcl_StaticPackage(interp, "Blt", Blt_Init, (Tcl_PackageInitProc *) NULL);
+    */
 
     if (Tclx_Init(interp) == TCL_ERROR) {
 	return TCL_ERROR;

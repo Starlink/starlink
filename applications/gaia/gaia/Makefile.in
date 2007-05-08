@@ -408,11 +408,11 @@ install-lib-binaries: binaries
 #========================================================================
 
 install-bin-binaries: binaries
-	@test -d $(DESTDIR)$(bindir) || mkdir -p $(DESTDIR)$(bindir)
+	@test -d $(DESTDIR)$(bindir)$(PACKAGE_NAME) || mkdir -p $(DESTDIR)$(bindir)$(PACKAGE_NAME)
 	@list='$(bin_BINARIES)'; for p in $$list; do \
 	  if test -f $$p; then \
-	    echo "MANIFEST:$(DESTDIR)$(bindir)/$$p"; \
-	    $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/$$p; \
+	    echo "MANIFEST:$(DESTDIR)$(bindir)/$(PACKAGE_NAME)/$$p"; \
+	    $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/$(PACKAGE_NAME)/$$p; \
 	  fi; \
 	done
 
@@ -431,7 +431,7 @@ uninstall-binaries:
 	  rm -f $(DESTDIR)$(pkglibdir)/$$p; \
 	done
 	list='$(bin_BINARIES)'; for p in $$list; do \
-	  rm -f $(DESTDIR)$(bindir)/$$p; \
+	  rm -f $(DESTDIR)$(bindir)/$(PACKAGE_NAME)/$$p; \
 	done
 
 .PHONY: all binaries clean depend distclean doc install libraries test

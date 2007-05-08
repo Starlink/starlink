@@ -91,6 +91,12 @@ case $tcl_system in
 esac
 AC_SUBST(TCL_SHLIB_EXT)
 
+dnl    The PACKAGE_VERSION values are slightly different for TCL and 
+dnl    starconf, make sure the TCL version is available.
+TCL_PACKAGE_VERSION="`echo $PACKAGE_VERSION | sed 's:\-:\.:'`"
+export TCL_PACKAGE_VERSION
+AC_SUBST(TCL_PACKAGE_VERSION)
+
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
 AC_CONFIG_FILES([Makefile component.xml tasks/Makefile scripts/Makefile])

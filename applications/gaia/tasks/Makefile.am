@@ -10,7 +10,7 @@ gaiaMon_SOURCES = \
 	$(SUBSRC) \
 	$(gaiaLib)
 
-gaiaLib = libgaia@PACKAGE_VERSION@@TCL_SHLIB_EXT@
+gaiaLib = libgaia@TCL_PACKAGE_VERSION@@TCL_SHLIB_EXT@
 
 gaiaMon_LDADD = $(LDADD) \
 	$(gaiaLib) \
