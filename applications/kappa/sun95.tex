@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.32}
 \newcommand{\stardocnumber}    {95.32}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2007 March 29}
+\newcommand{\stardocdate}      {2007 May 5}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.7-1}
+\newcommand{\stardocversion}   {1.7-3}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -13089,8 +13089,8 @@ KAPPA: \htmlref{CADD}{CADD},
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
-         Units processing is not supported at present and therefore the
-         \htmlref{UNITS}{apndf:units}~ component is not propagated.
+         The \htmlref{UNITS}{apndf:units}~ component is propagated only if it has the same 
+         value in both input NDFs.
 
          \sstitem
          Processing of \htmlref{bad pixels}{se:masking} and automatic \htmlref{quality masking}{se:qualitymask} are supported.
@@ -42726,8 +42726,8 @@ KAPPA: \htmlref{ADD}{ADD},
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
-         Units processing is not supported at present and therefore the
-         \htmlref{UNITS}{apndf:units}~ component is not propagated.
+         The \htmlref{UNITS}{apndf:units}~ component is propagated only if it has the same 
+         value in both input NDFs.
 
          \sstitem
          Processing of \htmlref{bad pixels}{se:masking} and automatic \htmlref{quality masking}{se:qualitymask} are supported.
@@ -51569,6 +51569,12 @@ The following applications have been modified:
 
 \begin{description}
 
+   \item [\htmlref{ADD}{ADD}] \mbox{}
+      \begin{itemize}
+         \item This now propagates the {UNITS}{apndf:units}~ component
+         if it is the same in both input NDFs.
+      \end{itemize}
+
    \item [\htmlref{COLLAPSE}{COLLAPSE}] \mbox{}
       \begin{itemize}
          \item It can now correctly collapse along a sky co-ordinate
@@ -51589,6 +51595,12 @@ The following applications have been modified:
    \item [\htmlref{MFITTREND}{MFITTREND}] \mbox{}
       \begin{itemize}
       \item It can now cope without an inverse WCS transformation.
+      \end{itemize}
+
+   \item [\htmlref{SUB}{SUB}] \mbox{}
+      \begin{itemize}
+         \item This now propagates the UNITS component if it is the same
+         in both input NDFs.
       \end{itemize}
 
    \item [\htmlref{WCSMOSAIC}{WCSMOSAIC}] \mbox{}
