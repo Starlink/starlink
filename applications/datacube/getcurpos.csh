@@ -30,7 +30,7 @@
 #       The colour index of the plot annotation.  It should be a
 #       positive integer no more than 15, normally 2 or 3 to stand out
 #       from other elements of the plot. [2]
-#     -d
+#     -d device
 #       The graphics device. [xwin]
 #     -f frame
 #       The co-ordinate Frame in which the co-ordinates are required.
