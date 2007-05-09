@@ -101,7 +101,7 @@
 *          and will also give lower output noise levels than "FIRST" or "OR", 
 *          but at the expense of much greater memory requirements.
 *
-*          ["AND"]
+*          ["OR"]
 *     CATFRAME = LITERAL (Read)
 *          A string determining the co-ordinate Frame in which positions are 
 *          to be stored in the output catalogue associated with parameter
@@ -532,6 +532,8 @@
 *     2-MAY-2007 (DSB):
 *        Modify the message about rejected spectra to indicate how many
 *        input spectra there were in total.
+*     8-MAY-2007 (DSB):
+*        Change default BADMASK to "OR".
 
 *  Copyright:
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
@@ -910,7 +912,7 @@ void smurf_makecube( int *status ) {
    Also choose whether to use the 2D or the 3D weighting system. The 2D  
    system assumes that all pixels in a given output spectrum have the same 
    weight and variance, and requires much less memory than the 3D system. */
-   parChoic( "BADMASK", "AND", "AND,OR,FIRST", 1, pabuf, 10, status );
+   parChoic( "BADMASK", "OR", "AND,OR,FIRST", 1, pabuf, 10, status );
 
    if( !strcmp( pabuf, "AND" ) ) {
       badmask = 2;
