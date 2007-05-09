@@ -27,6 +27,7 @@
 #  Copyright:
 #     Copyright (C) 1998-2001 Central Laboratory of the Research Councils
 #     Copyright (C) 2006-2007 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2007 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -117,7 +118,8 @@ set about_gaia "
 Starlink GAIA version $gaia_version
 
 Copyright (C) 1997-2005 Central Laboratory of the Research Councils
-Copyright (C) 2006 Particle Physics and Astronomy Research Council
+Copyright (C) 2006-2007 Particle Physics and Astronomy Research Council
+Copyright (C) 2007 Science and Technology Facilities Council
 
 Authors:
 Peter W. Draper (p.w.draper@durham.ac.uk)
@@ -126,7 +128,7 @@ David S. Berry (dsb@ast.man.ac.uk)
 Mark Taylor (m.b.taylor@bristol.ac.uk)
 
 GAIA is derived from SkyCat version $skycat_version
-Copyright (C) 1996-2005 ESO - European Southern Observatory
+Copyright (C) 1996-2006 ESO - European Southern Observatory
 
 Authors:
 Allan Brighton (abrighton@gemini.edu)
