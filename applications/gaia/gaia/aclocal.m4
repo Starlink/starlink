@@ -136,8 +136,21 @@ STAR_DEFAULTS
 STAR_CNF_COMPATIBLE_SYMBOLS
 STAR_PRM_COMPATIBLE_SYMBOLS
 AC_PROG_FC
+AC_CHECK_PROGS(LIBTOOL,libtool)
 STAR_CHECK_PROGS([fgeneric])
 STAR_INITIALISE_FORTRAN
+
+#--------------------------------------------------------------------
+#  Try to determine the extra libraries required to link a
+#  C/C++ program that has f77 libraries or subroutines.
+#--------------------------------------------------------------------
+#  Protect this against LIBS values, which are C specific (from Tcl).
+#  This is a general problem with testing Fortran properties, but
+#  only effects this macro.
+old_LIBS=$LIBS
+LIBS=
+AC_FC_LIBRARY_LDFLAGS
+LIBS=$old_LIBS
 
 STAR_LARGEFILE_SUPPORT
 
