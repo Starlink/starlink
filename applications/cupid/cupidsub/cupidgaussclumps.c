@@ -572,7 +572,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
          if( nclump == 0 ) msgOut( "", "No usable clumps found.", status );
    
-         if( ilevel > 1 ) {
+         if( ilevel > 0 ) {
             if( iclump - nclump == 1 ) {
                msgOut( "", "1 clump rejected because it touches an edge of "
                        "the data array.", status );

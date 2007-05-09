@@ -399,7 +399,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 
 /* Tell the user how many usable clumps there are and how many were rejected 
    due to being smaller than the beam size. */
-   if( ilevel > 1 ) {
+   if( ilevel > 0 ) {
 
       if( nsmall == 1 ) {
          msgOut( "", "1 further clump rejected because it "
@@ -418,9 +418,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
          msgOut( "", "^N further clumps rejected because they include "
                  "too many bad pixels.", status );
       }
-   }
 
-   if( ilevel > 0 ) {
       if( iclump == 0 ) {
          msgOut( "", "No usable clumps found.", status );
       } else if( iclump == 1 ){
