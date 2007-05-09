@@ -49,7 +49,7 @@ STAR_DECLARE_DEPENDENCIES(configure, [tcl tk blt itcl])
 
 dnl    Need to add AUTOASTROM to this when available.
 STAR_DECLARE_DEPENDENCIES(use, [convert esp extractor kappa photom dnl
-polpack startcl tcl tk blt tclx tcllibs])
+polpack startcl tcl tk blt tclx tcllibs skycat tkimg])
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
