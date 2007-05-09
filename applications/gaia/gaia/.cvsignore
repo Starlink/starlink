@@ -6,3 +6,7 @@ install
 pkgIndex.tcl
 autom4te.cache
 config.h
+configure.lineno
+gaia_tcl
+gaia_wish
+libgaia*.so
