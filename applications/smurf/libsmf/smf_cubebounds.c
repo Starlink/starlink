@@ -694,7 +694,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* Move on to the next available detector name. */
             name += strlen( name ) + 1;
 
-/* If the detector is include din the group and has a valid position, see if 
+/* If the detector is included in the group and has a valid position, see if 
    it produced any good data values. */
             if( good && xout[ irec ] != AST__BAD && yout[ irec ] != AST__BAD ) {
                good = 0;
