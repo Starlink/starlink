@@ -400,7 +400,7 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          if( ilevel > 0 ) {
             if( nsmall == 1 ){
                msgOut( "", "One clump rejected because it contains too few pixels.", status );
-            } else {
+            } else if( nsmall > 1 ) {
                msgSeti( "N", nsmall );
                msgOut( "", "^N clumps rejected because they contain too few pixels.", status );
             }

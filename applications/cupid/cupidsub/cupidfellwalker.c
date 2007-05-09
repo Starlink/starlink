@@ -379,13 +379,13 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          if( ilevel > 0 ) {
             if( nsmall == 1 ){
                msgOut( "", "One clump rejected because it contains too few pixels.", status );
-            } else {
+            } else if( nsmall > 0 ){
                msgSeti( "N", nsmall );
                msgOut( "", "^N clumps rejected because they contain too few pixels.", status );
             }
             if( nlow == 1 ){
                msgOut( "", "One clump rejected because its peak is too low.", status );
-            } else {
+            } else if( nlow > 0 ){
                msgSeti( "N", nlow );
                msgOut( "", "^N clumps rejected because the peaks are too low.", status );
             }
