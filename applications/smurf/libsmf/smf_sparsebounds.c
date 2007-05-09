@@ -15,7 +15,8 @@
 *  Invocation:
 *     smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
 *                       int usedetpos, Grp *detgrp, int lbnd[ 3 ], 
-*                       int ubnd[ 3 ], AstFrameSet **wcsout, int *status )
+*                       int ubnd[ 3 ], AstFrameSet **wcsout, int *hasoffexp, 
+*                       int *status )
 
 *  Arguments:
 *     igrp = Grp * (Given)
@@ -40,6 +41,10 @@
 *     wcsout = AstFrameSet ** (Returned)
 *        A pointer to a location at which to return a pointer to an AST 
 *        Frameset describing the WCS to be associated with the output cube.
+*     hasoffexp = int * (Returned)
+*        Address of an int in which to return a flag indicating if any of
+*        the supplied input files has a OFF_EXPOSURE component in the JCMTSTATE
+*        NDF extension.
 *     status = int * (Given and Returned)
 *        Pointer to inherited status.
 
@@ -67,6 +72,8 @@
 *     15-FEB-2007 (DSB):
 *        Report error if SPECBOUNDS values do not have any overlap with
 *        the spectral range covered by the data.
+*     24-APR-2007 (DSB):
+*        Added hasoffexp argument.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -120,7 +127,8 @@
 
 void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
                        int usedetpos, Grp *detgrp, int lbnd[ 3 ], 
-                       int ubnd[ 3 ], AstFrameSet **wcsout, int *status ){
+                       int ubnd[ 3 ], AstFrameSet **wcsout, int *hasoffexp, 
+                       int *status ){
 
 /* Local Variables */
    AstCmpMap *cmpmap1 = NULL;   /* Combined Mappings */
@@ -174,6 +182,9 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    smfData *data = NULL; /* Pointer to data struct for current input file */
    smfFile *file = NULL; /* Pointer to file struct for current input file */
    smfHead *hdr = NULL;  /* Pointer to data header for this time slice */
+
+/* Initialise */
+   *hasoffexp = 0;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -451,6 +462,10 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    set to the epoch of the time slice. */
          smf_tslice_ast( data, itime, 1, status );
          swcsin = hdr->wcs;
+
+/* Update the flag indicating if any OFF_EXPOSURE values are available in
+   the input data. */
+         if( hdr->state->acs_offexposure != VAL__BADR ) *hasoffexp = 1;
 
 /* We now create a Mapping from detector index to position in oskyframe. */
          astInvert( swcsin );
