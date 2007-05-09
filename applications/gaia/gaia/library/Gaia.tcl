@@ -2308,3 +2308,5 @@ itcl::body ::skycat::SkySearch::add_history {skycat filename} {
    }
 }
 
+#  Make sure our HelpWin class is used by TopLevelWidget.
+set util::TopLevelWidget::help_window_class gaia::HelpWin

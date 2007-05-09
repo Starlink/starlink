@@ -1,6 +1,7 @@
 #  Package initialisation script.
 
-#  Pick up GAIA scripts before other packages that we depend on.
+#  Pick up GAIA scripts before other packages that we depend on,
+#  or not, as required.
 package require Tclx
 if {![lcontain $auto_path $gaia_library]} {
     lappend auto_path $gaia_library
