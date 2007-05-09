@@ -15,6 +15,7 @@
  *  Copyright:
  *     Copyright (C) 1997-1999 Central Laboratory of the Research Councils
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     Copyright (C) 2007 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -103,8 +104,8 @@
 
                                     //  Trig conversion factors.
 static const double pi_ = 3.14159265358979323846;
-static const double r2d_ = 180.0/pi_;
-static const double d2r_ = pi_/180.0;
+static const double r2d_ = 57.295779513082323;   // (180.0/pi_)
+static const double d2r_ = 0.017453292519943295; // (pi_/180.0);
 
 //  Number of characters in a FITS header card.
 static const int FITSCARD = 80;
@@ -1320,11 +1321,11 @@ int StarWCS::make2D()
     // Add the necessary frames to make the base frame 2D. For these we need
     // to pick out the significant dimensions. Only two are allowed.
     int sigaxes = 0;
-    for ( int i = 0; i < MAXDIM; i++ ) {
+    for ( i = 0; i < MAXDIM; i++ ) {
         outperm[i] = 0;                  /* nbase can be greater than ndims_ */
         inperm[i] = -1;                  /* need initialisation for all axis */
     }
-    for ( int i = 0; i < ndims_; i++ ) {
+    for ( i = 0; i < ndims_; i++ ) {
         if ( dims_[i] > 1 && sigaxes < 2 ) {
             inperm[i] = sigaxes + 1;
             outperm[sigaxes] = i + 1;
