@@ -444,7 +444,7 @@ itcl::class gaia::Gaia {
 
          add_menuitem $m command "SkyCat..." \
             {Display information about SkyCat in netscape (if netscape is available)} \
-            -command [code $itk_component(image) send_to_netscape $itk_option(-help_url)]
+            -command [code $itk_component(image) send_to_browser $itk_option(-help_url)]
 
          add_short_help $itk_component(menubar).help \
             {Help menu: display information about this application}
