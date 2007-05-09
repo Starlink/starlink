@@ -38,7 +38,7 @@
 # instance is created. This class shares a window amongst all its
 # instances, this means that it overwrites any previous contents.
 
-itcl::class util::HelpWin {
+itcl::class gaia::HelpWin {
 
    # Constructor: Note that all HelpWin objects share a single toplevel window.
    constructor {args} {
@@ -125,4 +125,3 @@ itcl::class util::HelpWin {
 
 #  End of class definition.
 }
-
