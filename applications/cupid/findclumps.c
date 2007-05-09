@@ -702,6 +702,8 @@ void findclumps( int *status ) {
 *        multiple of the RMS.
 *     23-MAR-2007 (DSB):
 *        Added output parameter NCLUMPS.
+*     9-MAY-2007 (DSB):
+*        Report the config parameters even if no clumps are found.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1080,6 +1082,42 @@ void findclumps( int *status ) {
               "implemented.", status );
    }
 
+/* Get a KeyMap containing the parameters specific to the chosen algorithm,
+   and create a GRP group containing a text form of the KeyMap. */
+   confgrp = grpNew( "", status );
+   grpPut1( confgrp, CONF_STRING, 0, status );
+   grpPut1( confgrp, LINE_STRING, 0, status );
+
+   if( astMapGet0A( keymap, method, (AstObject *) &aconfig ) ) {     
+      kpg1Kygrp( aconfig, &confgrp, status );
+   } 
+
+/* Append the significant ADAM parameter values. */
+   grpPut1( confgrp, " ", 0, status );
+   grpPut1( confgrp, ADAM_STRING, 0, status );
+   grpPut1( confgrp, LINE_STRING, 0, status );
+
+   sprintf( buffer, "IN = %s", ndfname );
+   grpPut1( confgrp, buffer, 0, status );
+
+   sprintf( buffer, "METHOD = %s", method );
+   grpPut1( confgrp, buffer, 0, status );
+
+   sprintf( buffer, "RMS = %g", rms );
+   grpPut1( confgrp, buffer, 0, status );
+
+   sprintf( buffer, "DECONV = %s", deconv ? "yes" : "no" );
+   grpPut1( confgrp, buffer, 0, status );
+
+   sprintf( buffer, "WCSPAR = %s", usewcs ? "yes" : "no" );
+   grpPut1( confgrp, buffer, 0, status );
+
+/* Issue a logfile header for the clump parameters. */
+   if( logfile ) {
+      fprintf( logfile, "           Clump properties:\n" );
+      fprintf( logfile, "           =================\n\n" );
+   }
+
 /* Skip the rest if no clumps were found. */
    if( ndfs ) {
 
@@ -1104,42 +1142,6 @@ void findclumps( int *status ) {
 
 /* Create a CUPID extension in the output NDF. */
       ndfXnew( indf2, "CUPID", "CUPID_EXT", 0, NULL, &xloc, status );
-
-/* Get a KeyMap containing the parameters specific to the chosen algorithm,
-   and create a GRP group containing a text form of the KeyMap. */
-      confgrp = grpNew( "", status );
-      grpPut1( confgrp, CONF_STRING, 0, status );
-      grpPut1( confgrp, LINE_STRING, 0, status );
-
-      if( astMapGet0A( keymap, method, (AstObject *) &aconfig ) ) {     
-         kpg1Kygrp( aconfig, &confgrp, status );
-      } 
-
-/* Append the significant ADAM parameter values. */
-      grpPut1( confgrp, " ", 0, status );
-      grpPut1( confgrp, ADAM_STRING, 0, status );
-      grpPut1( confgrp, LINE_STRING, 0, status );
-
-      sprintf( buffer, "IN = %s", ndfname );
-      grpPut1( confgrp, buffer, 0, status );
-
-      sprintf( buffer, "METHOD = %s", method );
-      grpPut1( confgrp, buffer, 0, status );
-
-      sprintf( buffer, "RMS = %g", rms );
-      grpPut1( confgrp, buffer, 0, status );
-
-      sprintf( buffer, "DECONV = %s", deconv ? "yes" : "no" );
-      grpPut1( confgrp, buffer, 0, status );
-
-      sprintf( buffer, "WCSPAR = %s", usewcs ? "yes" : "no" );
-      grpPut1( confgrp, buffer, 0, status );
-
-/* Issue a logfile header for the clump parameters. */
-      if( logfile ) {
-         fprintf( logfile, "           Clump properties:\n" );
-         fprintf( logfile, "           =================\n\n" );
-      }
 
 /* Store the clump properties in the CUPID extension and output catalogue
    (if needed). This may reject further clumps (such clumps will have the
