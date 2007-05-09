@@ -17,10 +17,27 @@
 /* static char sccsid[] = "@(#) tclAppInit.c 1.12 94/12/17 16:30:56"; */
 #endif /* not lint */
 
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <stdlib.h>
+#include <tcl.h>
 
 
-/* declare command procedures here */
+/* Tcl procedure to set the gaia_library global variable and add
+ * to the default search path. */
+static char initScript[] = \
+"global gaia_library \n\
+ tcl_findLibrary gaia " PACKAGE_VERSION " " PACKAGE_VERSION " \
+ GaiaInit.tcl GAIA_LIBRARY gaia_library \n\
+ lappend auto_path $gaia_library \n\
+ puts \"gaia_library = $gaia_library\" \n\
+";
+
+
+
+/* Init functions */
 extern "C" {
 #include "tcl.h"
 extern int Itcl_Init(Tcl_Interp *interp);
@@ -105,6 +122,11 @@ Tcl_AppInit(Tcl_Interp *interp)
   }
   if (Tcladam_Init(interp) == TCL_ERROR) {
     return TCL_ERROR;
+  }
+
+  //  Run the initialisation command.
+  if ( Tcl_Eval( interp, initScript ) != TCL_OK ) {
+      return TCL_ERROR;
   }
 
   return TCL_OK;
