@@ -53,7 +53,6 @@ static char initScript[] = \
 "      global gaia_library\n\
        tcl_findLibrary gaia " PACKAGE_VERSION " " PACKAGE_VERSION " \
                             GaiaInit.tcl GAIA_LIBRARY gaia_library\n"
-"      puts \"gaia_library = $gaia_library\""
 #endif
 "  }\n\
 }\n\
