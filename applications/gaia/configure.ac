@@ -61,15 +61,17 @@ AC_CONFIG_HEADERS(config.h)
 dnl    To configure the gaia component, which is modelled on the skycat
 dnl    TEA-based Tcl system we just run ./configure in the gaia subdirectory.
 dnl    Look for --disable-shared and pass it on when configuring.
-star_extra_items=
+star_extra_items="--with-starlink=$STARLINK"
 for ac_arg in $ac_configure_args; do
    case $ac_arg in 
       *-disable-shared*)
-         star_extra_items="--disable-shared"
+         star_extra_items="$star_extra_items --disable-shared"
       ;;
    esac
 done
 export star_extra_items
+
+
 (
     cd gaia
     ./configure --prefix=$prefix $star_extra_items --cache-file=../config.cache
