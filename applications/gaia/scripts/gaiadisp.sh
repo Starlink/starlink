@@ -1,6 +1,6 @@
 #!/bin/sh
 # The next line is executed by /bin/sh, but not Tcl \
-exec $GAIA_DIR/gaia_stcl $0 ${1+"$@"}
+exec $GAIA_DIR/gaia_tcl $0 ${1+"$@"}
 #+
 #   Name:
 #      gaiadisp
@@ -108,7 +108,7 @@ if { $argc == 1 } {
    exit
 }
 
-#  Add GAIA_DIR to autopath for some GAIA classes.
+#  Add GAIA_LIBRARY to autopath for some GAIA classes.
 lappend auto_path $env(GAIA_DIR)
 
 #  Useful to know when instance is created.
@@ -150,7 +150,7 @@ proc connect_to_gaia {} {
       if { $needed && $tries == 0 } {
          puts stderr "Failed to connect to GAIA, starting new instance..."
          set created_instance 1
-         exec $env(GAIA_DIR)/gaia.sh &
+         exec $env(GAIA_DIR)/gaia.csh &
          #exec $env(GAIA_DIR)/tgaia &
       }
 
