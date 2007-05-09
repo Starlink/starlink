@@ -1,0 +1,462 @@
+/*
+*+
+*  Name:
+*     smf_rebincube_ast
+
+*  Purpose:
+*     Paste a supplied 3D array into an existing cube using astRebinSeq.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     C function
+
+*  Invocation:
+*     smf_rebincube_ast( smfData *data, int index, int size, dim_t nchan,
+*                        dim_t ndet, dim_t nslice, dim_t nel, dim_t nxy,
+*                        dim_t nout, dim_t dim[3], AstMapping *ssmap,
+*                        AstSkyFrame *abskyfrm, AstMapping *oskymap, 
+*                        Grp *detgrp, int moving, int usewgt, int spread, 
+*                        const double params[], int genvar, double tfac, 
+*                        double fcon, float *data_array, float *var_array, 
+*                        double *wgt_array, float *texp_array, 
+*                        float *teff_array, int *good_tsys, int *nused,
+*                        int *status );
+
+*  Arguments:
+*     data = smfData * (Given)
+*        Pointer to the input smfData structure.
+*     index = int (Given)
+*        Index of the current input file within the group of input files.
+*     size = int (Given)
+*        Index of the last input file within the group of input files.
+*     nchan = dim_t (Given)
+*        Number of spectral channels in input cube.
+*     ndet = dim_t (Given)
+*        Number of detectors in input cube.
+*     nslice = dim_t (Given)
+*        Number of time slices in input cube.
+*     nel = dim_t (Given)
+*        Total number of elements in input cube.
+*     nxy = dim_t (Given)
+*        Number of elements in one spatial plane of the output cube.
+*     nout = dim_t (Given)
+*        Total number of elements in the output cube.
+*     dim[ 3 ] = dim_t (Given)
+*        The dimensions of the output array.
+*     ssmap = AstMapping * (Given)
+*        A Mapping that goes from input spectral grid axis (pixel axis 1)
+*        to the output spectral grid axis (pixel axis 3).
+*     abskyfrm = AstSkyFrame * (Given)
+*        A SkyFrame that specifies the coordinate system used to describe 
+*        the spatial axes of the output cube. This should represent
+*        absolute sky coordinates rather than offsets even if "moving" is 
+*        non-zero.
+*     oskymap = AstFrameSet * (Given)
+*        A Mapping from 2D sky coordinates in the output cube to 2D
+*        spatial pixel coordinates in the output cube.
+*     detgrp = Grp * (Given)
+*        A Group containing the names of the detectors to be used. All
+*        detectors will be used if this group is empty.
+*     moving = int (Given)
+*        A flag indicating if the telescope is tracking a moving object. If 
+*        so, each time slice is shifted so that the position specified by 
+*        TCS_AZ_BC1/2 is mapped on to the same pixel position in the
+*        output cube.
+*     usewgt = int (Given)
+*        A flag indicating if the input data should be weighted according
+*        to the input variances determined from the input Tsys values.
+*     spread = int (Given)
+*        Specifies the scheme to be used for dividing each input data value 
+*        up amongst the corresponding output pixels. See docs for astRebinSeq
+*        (SUN/211) for the allowed values.
+*     params = const double[] (Given)
+*        An optional pointer to an array of double which should contain any
+*        additional parameter values required by the pixel spreading scheme. 
+*        See docs for astRebinSeq (SUN/211) for further information. If no 
+*        additional parameters are required, this array is not used and a
+*        NULL pointer may be given. 
+*     genvar = int (Given)
+*        Indicates how the output variances should be calculated: 
+*           0 = do not calculate any output variances
+*           1 = use spread of input data values
+*           2 = use system noise temperatures
+*     tfac = double (Given)
+*        Factor describing spectral overlap. Used to reduce the weight of
+*        spectra that do not have much spectral overlap with the output.
+*     fcon = double (Given)
+*        The ratio of the squared backend degradation factor to the spectral
+*        channel width (this is the factor needed for calculating the
+*        variances from the Tsys value). 
+*     data_array = float * (Given and Returned)
+*        The data array for the output cube. This is updated on exit to
+*        include the data from the supplied input NDF.
+*     var_array = float * (Given and Returned)
+*        An array in which to store the variances for the output cube if
+*        "genvar" is not zero (the supplied pointer is ignored if "genvar" is 
+*        zero). The supplied array is update on exit to include the data from 
+*        the supplied input NDF. This array should be the same shape and size 
+*        as the output data array.
+*     wgt_array = double * (Given and Returned)
+*        An array in which to store the relative weighting for each pixel in 
+*        the output cube. The supplied array is update on exit to include the 
+*        data from the supplied input NDF. This array should be the length of 
+*        "data_array", unless "genvar" is 1, in which case it should be twice 
+*        the length of "data_array".
+*     texp_array = float * (Given and Returned)
+*        A work array, which holds the total exposure time for each output 
+*        spectrum. It is updated on exit to include the supplied input NDF. 
+*        It should be big enough to hold a single spatial plane from the 
+*        output cube.
+*     teff_array = float * (Given and Returned)
+*        A work array, which holds the effective integration time for each 
+*        output spectrum, scaled by a factor of 4. It is updated on exit to 
+*        include the supplied input NDF. It should be big enough to hold a 
+*        single spatial plane from the output cube.
+*     good_tsys = int * (Given and Returned)
+*        Returned set to 1 if any good Tsys values were found in the
+*        input cube.
+*     nused = int * (Given and Returned)
+*        Use to accumulate the total number of input data samples that
+*        have been pasted into the output cube.
+*     status = int * (Given and Returned)
+*        Pointer to the inherited status.
+
+*  Description:
+*     The data array of the supplied input NDF is added into the existing
+*     contents of the output data array, and the variance and weights
+*     arrays are updated correspondingly.
+*
+*     Since astRebinSeq is used, various spreading schemes are available
+*     when pasting each input pixel value into the output cube. The
+*     arrays that are used to record the output weights and variances are
+*     3-dimensional, meaning that each output pixel has its own weight and
+*     variance.  A pixel is bad in the output only if the total weight of
+*     the good input pixels that contribute to it is more than 0.
+*
+*     Note, few checks are performed on the validity of the input data
+*     files in this function, since they have already been checked within
+*     smf_cubebounds.
+
+*  Authors:
+*     David S Berry (JAC, UClan)
+*     {enter_new_authors_here}
+
+*  History:
+*     18-APR-2006 (DSB):
+*        Initial version.
+*     {enter_further_changes_here}
+
+*  Copyright:
+*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
+*  Bugs:
+*     {note_any_bugs_here}
+*-
+*/
+
+#include <stdio.h>
+#include <math.h>
+
+/* Starlink includes */
+#include "ast.h"
+#include "mers.h"
+#include "sae_par.h"
+#include "prm_par.h"
+#include "star/ndg.h"
+#include "star/atl.h"
+
+/* SMURF includes */
+#include "libsmf/smf.h"
+
+#define FUNC_NAME "smf_rebincube_ast"
+
+void smf_rebincube_ast( smfData *data, int index, int size, dim_t nchan,
+                        dim_t ndet, dim_t nslice, dim_t nel, dim_t nxy, 
+                        dim_t nout, dim_t dim[3], AstMapping *ssmap,
+                        AstSkyFrame *abskyfrm, AstMapping *oskymap, 
+                        Grp *detgrp, int moving, int usewgt, int spread, 
+                        const double params[], int genvar, double tfac,
+                        double fcon, float *data_array, float *var_array, 
+                        double *wgt_array, float *texp_array, 
+                        float *teff_array, int *good_tsys, int *nused,
+                        int *status ){
+
+/* Local Variables */
+   AstCmpMap *detmap = NULL;   /* Mapping from 1D det. index to 2D i/p "grid" coords */
+   AstMapping *fullmap = NULL; /* WCS->GRID LutMap from input WCS FrameSet */
+   AstMapping *splut = NULL;   /* Spatial LutMap */
+   AstMapping *sslut = NULL;   /* Spectral LutMap */
+   AstMapping *totmap = NULL;  /* WCS->GRID Mapping from input WCS FrameSet */
+   AstPermMap *pmap;           /* Mapping to rearrange output axes */
+   const char *name = NULL;    /* Pointer to current detector name */
+   const double *tsys = NULL;  /* Pointer to Tsys value for first detector */
+   dim_t iv;                   /* Vector index into output 3D array */
+   double *detlut = NULL;      /* Work space for detector mask */
+   double con;                 /* Constant value */
+   double invar;               /* Input variance */
+   double tcon;                /* Variance factor for whole time slice */
+   float *detwork = NULL;      /* Work array for detector values */
+   float *tdata = NULL;        /* Pointer to start of input time slice data */
+   float *varwork = NULL;      /* Work array holding variances for 1 slice/channel */
+   float *vp = NULL;           /* Pointer to next "varwork" element */
+   float teff;                 /* Effective integration time */
+   float texp;                 /* Total time ( = ton + toff ) */
+   int ast_flags;              /* Basic flags to use with astRebinSeq */
+   int found;                  /* Was current detector name found in detgrp? */
+   int ichan;                  /* Index of current channel */
+   int idet;                   /* detector index */
+   int ignore;                 /* Ignore this time slice? */
+   int inperm[ 3 ];            /* Input axis permutation array */
+   int itime;                  /* Index of current time slice */
+   int junk;                   /* Unused parameter */
+   int lbnd_in[ 2 ];           /* Lower input bounds on receptor axis */
+   int ldim[ 3 ];              /* Output array lower GRID bounds */
+   int udim[ 3 ];              /* Output array upper GRID bounds */
+   int uddim[ 1 ];             /* Detector array upper GRID bounds */
+   int outperm[ 3 ];           /* Output axis permutation array */
+   int timeslice_size;         /* Number of elements in a time slice */
+   int ubnd_in[ 2 ];           /* Upper input bounds on receptor axis */
+   smfHead *hdr = NULL;        /* Pointer to data header for this time slice */
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* Store a pointer to the input NDFs smfHead structure. */
+   hdr = data->hdr;
+
+/* Fill an array with the lower grid index bounds of the output. */
+   ldim[ 0 ] = 1;
+   ldim[ 1 ] = 1;
+   ldim[ 2 ] = 1;
+
+/* Integer upper grid index bounds of the output. */
+   udim[ 0 ] = dim[ 0 ];
+   udim[ 1 ] = dim[ 1 ];
+   udim[ 2 ] = dim[ 2 ];
+
+/* Integer upper bounds of detector array. */
+   uddim[ 0 ] = ndet;
+
+/* Store the size of an input time slice. */
+   timeslice_size = nel/nslice;
+
+/* Create a LutMap that holds the output spectral axis GRID value at 
+   the centre of each input spectral axis pixel. LutMaps are faster to
+   evaluate, and so astRebinSeq will go faster. We can use LutMaps without
+   loosing accuracy since astRebinSeq only ever transforms the GRID
+   values at input pixel centres (i.e. integer GRID values), and so the
+   LutMap will always return a tabulated value rather than an
+   interpolated value. */
+   atlTolut( (AstMapping *) ssmap, 1.0, (double) nchan, 1.0, "LutInterp=1", 
+              &sslut, status );
+
+/* If this is the first pass through this file, initialise the arrays. */
+   if( index == 1 ) smf_rebincube_init( 0, nxy, nout, genvar, data_array, var_array, 
+                                        wgt_array, texp_array, teff_array, &junk, status );
+
+/* Initialisation the flags for astRebinSeq (we do not include flag 
+   AST__REBININIT because the arrays have been initialised). */
+   ast_flags = AST__USEBAD;
+   if( usewgt ) ast_flags = ast_flags | AST__VARWGT;
+   if( genvar == 1 ) ast_flags = ast_flags | AST__GENVAR;
+
+/* If required, allocate a work array to hold all the input variances for a 
+   single time slice. */
+   if( usewgt || genvar == 2 ) varwork = astMalloc( timeslice_size * sizeof( float ) );
+
+/* Allocate a work array to hold the exposure time for each detector. */
+   detwork = astMalloc( ndet * sizeof( float ) );
+
+/* Create a LutMap that holds the input GRID index of every detector to be
+   included in the output, and AST__BAD for every detector that is not to be
+   included in the output cube. First allocate the work space for the LUT. */
+   detlut = astMalloc( ndet*sizeof( double ) );
+
+/* Initialise a string to point to the name of the first detector for which 
+   data is available */
+   name = hdr->detname;
+
+/* Loop round all detectors for which data is available. */
+   for( idet = 0; idet < ndet; idet++ ) {
+
+/* Store the input GRID coord of this detector. GRID coords start at 1,
+   not 0. */
+      detlut[ idet ] = idet + 1.0;
+
+/* If a group of detectors to be used was supplied, search the group for
+   the name of the current detector. If not found, set the GRID coord bad. 
+   This will cause astRebinSeq to ignore data from the detector. */
+      if( detgrp ) {    
+         grpIndex( name, detgrp, 1, &found, status );
+         if( !found ) detlut[ idet ] = AST__BAD;
+      }
+
+/* Move on to the next available detector name. */
+      name += strlen( name ) + 1;
+   }
+
+/* Create the LutMap from this array, and combine it with a 1-input, 
+   2-output PermMap that copies its input to create its first output, 
+   and assigns a constant value of 1.0 to its second output. We need to
+   do this because smf_tslice returns a 2D GRID system (even though the
+   second GRID axis is not actually used). */
+   inperm[ 0 ] = 1;
+   outperm[ 0 ] = 1;
+   outperm[ 1 ] = -1;
+   con = 1.0;
+   detmap = astCmpMap( astLutMap( ndet, detlut, 1.0, 1.0, "" ),
+                       astPermMap( 1, inperm, 2, outperm, &con, "" ),
+                       1, "" );
+
+/* Store the bounds of a single time slice grid. */
+   lbnd_in[ 0 ] = 1;
+   ubnd_in[ 0 ] = nchan;
+   lbnd_in[ 1 ] = 1;
+   ubnd_in[ 1 ] = ndet;
+
+/* Create a PermMap that can be used to re-order the output axes so that 
+   channel number is axis 3. */
+   outperm[ 0 ] = 2;
+   outperm[ 1 ] = 3;
+   outperm[ 2 ] = 1;
+   inperm[ 0 ] = 3;
+   inperm[ 1 ] = 1;
+   inperm[ 2 ] = 2;
+   pmap = astPermMap( 3, inperm, 3, outperm, NULL, "" );
+
+/* Loop round all time slices in the input NDF. */
+   for( itime = 0; itime < nslice && *status == SAI__OK; itime++ ) {
+
+/* Store a pointer to the first input data value in this time slice. */
+      tdata = ( (float *) (data->pntr)[ 0 ] ) + itime*timeslice_size;
+
+/* Begin an AST context. Having this context within the time slice loop
+   helps keep the number of AST objects in use to a minimum. */
+      astBegin;
+
+/* Get a Mapping from the spatial GRID axes in the input the spatial 
+   GRID axes in the output for the current time slice. Note this has 
+   to be done first since it stores details of the current time slice 
+   in the "smfHead" structure inside "data", and this is needed by
+   subsequent functions. */
+      totmap = smf_rebincube_totmap( data, itime, abskyfrm, oskymap, moving, 
+                                     status );
+      if( !totmap ) break;
+
+/* Get the effective exposure time, the total exposure time, and the
+   Tsys->Variance onversion factor for this time slice. Also get a
+   pointer to the start of the Tsys array. */
+      tsys = smf_rebincube_tcon( hdr, itime, fcon, &texp, &teff, &tcon, 
+                                 status );
+
+/* So "totmap" is a 2-input, 2-output Mapping that transforms the input
+   spatial GRID coords into output spatial GRID coords. In order to speed
+   up astRebinSeq we represent this by a pair of parallel LutMaps. To do
+   this (using atlTolut) we need a Mapping which only has 1 input, so we 
+   preceed "totmap" with "detmap" (which also has the effect of exluding 
+   data from unrequired detectors). We then combine this Mapping in 
+   parallel with the spectral LutMap to get a 2-input (channel number, 
+   detector index) and 3-output (output grid coords) Mapping. We finally
+   add a PermMap to re-arrange the output axes so that channel number is
+   axis 3 in the output. */
+      atlTolut( (AstMapping *) astCmpMap( detmap, totmap, 1, "" ), 1.0, 
+                (double) ndet, 1.0, "LutInterp=1", &splut, status );
+
+      fullmap = astSimplify( astCmpMap( astCmpMap( sslut, splut, 0, "" ), 
+                                        pmap, 1, "" ) );
+
+/* If required calculate the variance associated with each value in the
+   current time slice. based on the input Tsys values. If they are
+   needed, but not available, ignored the time slice. */
+      ignore = 0;
+      if( varwork ) { 
+         ignore = 1;
+         vp = varwork;
+         for( idet = 0; idet < ndet; idet++ ) {
+            invar = VAL__BADR;
+            if( (float) tsys[ idet ] != VAL__BADR ) {
+               *good_tsys = 1;
+               if( tcon != VAL__BADD ) {
+                  invar = tcon*tsys[ idet ]*tsys[ idet ];
+                  ignore = 0;
+               }
+            }
+            for( ichan = 0; ichan < nchan; ichan++ ) *(vp++) = invar;
+         }
+      }
+
+/* Unless we are ignoring this time slice, paste it into the 3D output cube. */
+      if( !ignore ) {
+         astRebinSeqF( fullmap, 0.0, 2, lbnd_in, ubnd_in, tdata, varwork, 
+                       spread, params, ast_flags, 0.0, 50, VAL__BADR, 3, 
+                       ldim, udim, lbnd_in, ubnd_in, data_array, 
+                       var_array, wgt_array, nused );
+
+/* Now we update the total exposure time array. Scale the exposure time
+   of this time slice in order to reduce its influence on the output
+   expsoure times if it does not have much spectral overlap with the
+   output cube. then fill the 1D work array with this constant value and
+   paste it into the 2D texp_array using the spatial mapping. */
+         if( texp != VAL__BADR ) {
+            texp *= tfac;
+            for( iv = 0; iv < ndet; iv++ ) detwork[ iv ] = texp;
+            astRebinSeqF( splut, 0.0, 1, ldim, uddim, detwork, NULL, 
+                          spread, params, 0, 0.0, 50, VAL__BADR, 2, ldim, 
+                          udim, ldim, uddim, texp_array, NULL, NULL, NULL );
+         }
+
+/* Now do the same with the effective exposure time. */
+         if( teff != VAL__BADR ) {
+            teff *= tfac;
+            for( iv = 0; iv < ndet; iv++ ) detwork[ iv ] = teff;
+            astRebinSeqF( splut, 0.0, 1, ldim, uddim, detwork, NULL, 
+                          spread, params, 0, 0.0, 50, VAL__BADR, 2, ldim, 
+                          udim, ldim, uddim, teff_array, NULL, NULL, NULL );
+         }
+      }
+
+/* End the AST context. */
+      astEnd;
+   }
+
+/* If this is the final pass through this function, normalise the returned
+   data and variance values. */
+   if( index == size ) {
+
+/* Create a dummy mapping that can be used with astRebinSeq (it is not
+   actually used for anything since we are not adding any more data into the
+   output arrays). */
+      fullmap = (AstMapping *) astPermMap( 2, NULL, 3, NULL, NULL, "" );
+
+/* Normalise the data values. */
+      astRebinSeqF( fullmap, 0.0, 2, lbnd_in, ubnd_in, NULL, NULL, spread, 
+                    params, AST__REBINEND | ast_flags, 0.0, 50, VAL__BADR, 
+                    3, ldim, udim, lbnd_in, ubnd_in, data_array, var_array, 
+                    wgt_array, nused );
+   }
+
+/* Free resources. */
+   if( detlut ) detlut = astFree( detlut );
+   if( detwork ) detwork = astFree( detwork );
+   if( varwork ) varwork = astFree( varwork );
+}
+
