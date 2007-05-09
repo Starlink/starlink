@@ -152,6 +152,8 @@
 *        Add smf_fits_outhdr
 *     2007-04-14 (DSB):
 *        Add "int *nreject" to smf_rebincube.
+*     2007-04-23 (DSB):
+*        Big changes to smf_rebincube_xxx functions.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -489,14 +491,75 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                      Grp *detgrp, int moving, int lbnd[ 3 ], int ubnd[ 3 ], 
                      AstFrameSet **wcsout, int *npos, int *hasoffexp, int *status );
 
-void smf_rebincube( smfData *data, int index, int size, AstSkyFrame *abskyfrm,
-                    AstMapping *oskymap, AstFrame *ospecfrm, 
-                    AstMapping *ospecmap, Grp *detgrp, int moving, int usewgt,
-                    int lbnd_out[ 3 ], int ubnd_out[ 3 ], int spread, 
-                    const double params[], int genvar, float *data_array, 
-                    float *var_array, double *wgt_array, int *work_array, 
-                    float *texp_array, float *ton_array, double *fcon, 
-                    int *nreject, int *nused, int *status );
+void smf_rebincube( smfData *data, int index, int size, int badmask, int is2d,
+                    AstSkyFrame *abskyfrm, AstMapping *oskymap, 
+                    AstFrame *ospecfrm, AstMapping *ospecmap, Grp *detgrp,
+                    int moving, int usewgt, int lbnd_out[ 3 ], 
+                    int ubnd_out[ 3 ], int spread, const double params[], 
+                    int genvar, float *data_array, float *var_array, 
+                    double *wgt_array, float *texp_array, float *teff_array, 
+                    double *fcon, int *nused, int *nreject, int *naccept, int *status );
+
+void smf_rebincube_ast( smfData *data, int index, int size, dim_t nchan,
+                        dim_t ndet, dim_t nslice, dim_t nel, dim_t nxy, 
+                        dim_t nout, dim_t dim[3], AstMapping *ssmap,
+                        AstSkyFrame *abskyfrm, AstMapping *oskymap, 
+                        Grp *detgrp, int moving, int usewgt, int spread, 
+                        const double params[], int genvar, double tfac, 
+                        double fcon, float *data_array, float *var_array, 
+                        double *wgt_array, float *texp_array, 
+                        float *teff_array, int *good_tsys, int *nused, int *status );
+
+void smf_rebincube_nn( smfData *data, int index, int size, dim_t nchan,
+                       dim_t ndet, dim_t nslice, dim_t nel, dim_t nxy,
+                       dim_t nout, dim_t dim[3], int badmask, int is2d,
+                       AstMapping *ssmap, AstSkyFrame *abskyfrm, 
+                       AstMapping *oskymap, Grp *detgrp, int moving, 
+                       int usewgt, int genvar, double tcon, double fcon, 
+                       float *data_array, float *var_array, double *wgt_array, 
+                       float *texp_array, float *teff_array, int *nused, 
+                       int *nreject, int *naccept, int *good_tsys, int *status );
+
+void smf_rebincube_paste2d( int badmask, dim_t nchan, int nchanout, 
+                            int *spectab, int *specpop, dim_t iv0, 
+                            dim_t nxy, double wgt, int genvar, 
+                            double invar, float *ddata, 
+                            float *data_array, float *var_array,
+                            double *wgt_array, int *pop_array, 
+                            int *nused, int *nreject, int *naccept, 
+                            float *work, int *status );
+
+void smf_rebincube_paste3d( dim_t nchan, dim_t nout, int *spectab, dim_t iv0,
+                            dim_t nxy, double wgt, int genvar, double invar, 
+                            float *pdata, float *data_array, 
+                            float *var_array, double *wgt_array, int *nused, 
+                            int *status );
+
+void smf_rebincube_norm2d( dim_t nout, dim_t nxy, int genvar, 
+                           float *data_array, float *var_array, 
+                           double *wgt_array, int *pop_array, int *status );
+
+void smf_rebincube_norm3d( dim_t nout, dim_t nxy, int genvar, 
+                            int nused, float *data_array, 
+                            float *var_array, double *wgt_array, 
+                            int *status );
+
+void smf_rebincube_spectab( dim_t nchan, dim_t nchanout, AstMapping *ssmap, 
+                            int **pspectab, int *status );
+
+void smf_rebincube_init( int is2d, dim_t nxy, dim_t nout, int genvar, 
+                         float *data_array, float *var_array, 
+                         double *wgt_array, float *texp_array,
+                         float *teff_array, int *nused, int *status );
+
+const double *smf_rebincube_tcon( smfHead *hdr, dim_t itime, double fcon, 
+                                  float *texp, float *teff, double *tcon, 
+                                  int *status );
+
+AstMapping *smf_rebincube_totmap( smfData *data, dim_t itime, 
+                                  AstSkyFrame *abskyfrm, 
+                                  AstMapping *oskymap, int moving, 
+                                  int *status );
 
 void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos, 
                    int autogrid, Grp *detgrp, double par[ 7 ], 
@@ -537,7 +600,7 @@ void smf_labelunit( Grp *igrp,  int size, smfData *odata, int *status );
 
 void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
                        int usedetpos, Grp *detgrp, int lbnd[ 3 ], int ubnd[ 3 ],
-                       AstFrameSet **wcsout, int *status );
+                       AstFrameSet **wcsout, int *hasoffexp, int *status );
 
 void smf_rebinsparse( smfData *data, int ifile, AstFrame *ospecfrm, AstMapping *ospecmap, 
                       AstSkyFrame *oskyframe, Grp *detgrp, int lbnd_out[ 3 ], 

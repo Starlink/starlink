@@ -1,33 +1,10 @@
-/* If the FPTRAP macros is defined, then the fptrapfunction defined here
-   will be called in order to cause floating point exceptions to be
-   generated when a NaN value is returned from a calculation. This can be
-   useful when debugging since otherwise it can be difficult to determine
-   where the NaN values are coming from. */
-
+/* Defining the FPTRAP macro will cause floating point exceptions to
+   occur whenever a NaN, inf or overflow is generated. This can make it
+   easier to debug the cause of these values. */
 #if defined(FPTRAP)
-#   include <fpu_control.h>
-#     if defined(__i386__)
-#       if !defined(_FPU_GETCW)
-#         define _FPU_GETCW(cw) (cw=__getfpucw())
-#       endif
-#       if !defined(_FPU_SETCW)
-#         define _FPU_SETCW(cw) (__setfpucw(cw))
-#       endif
-void
-fptrap (int i)
-{
-    unsigned int cw;
-    _FPU_GETCW(cw);
-    _FPU_SETCW(i==0 ? cw | _FPU_MASK_ZM | _FPU_MASK_IM | _FPU_MASK_OM :
-                       cw & ~(_FPU_MASK_ZM | _FPU_MASK_IM | _FPU_MASK_OM));
-}
-
-#  endif 
+#define _GNU_SOURCE
+#include <fenv.h>
 #endif
-
-
-
-
 
 /*
 *+
@@ -54,8 +31,6 @@ fptrap (int i)
 *     This routine converts one or more raw data cubes, spanned by
 *     (frequency, detector number, time) axes, into a single output cube
 *     spanned by (celestial longitude, celestial latitude, frequency) axes.
-*     Nearest neighbour rebinning is used (that is, each input data sample 
-*     is placed into the nearest output pixel). 
 *
 *     The output can be either a regularly gridded tangent plane
 *     projection of the sky, or a sparse array (see parameter SPARSE).
@@ -83,6 +58,50 @@ fptrap (int i)
 *          addition, if AUTOGRID is TRUE the precise placement of the tangent 
 *          point is adjusted by up to 1 pixel along each spatial pixel axis 
 *          in order to optimise the grid. [FALSE]
+*     BADMASK = LITERAL (Read)
+*          A string determining the way in which bad pixels are propagated
+*          from input to output. The default value of "AND" should usually be 
+*          used since this scheme uses all input data, thus reducing the 
+*          noise in the output, and also minimises the number of bad pixels in
+*          the output. However, for large data sets, the memory requirements 
+*          of the "AND" scheme can be excessive. For this reason, two
+*          other schemes, "FIRST" and "OR", are provided which greatly reduce 
+*          the memory requirements, at the expense either of introducing more 
+*          bad pixels into the output ("OR") or producing higher output noise 
+*          levels ("FIRST"):
+*
+*          - "FIRST" -- The bad pixel mask in each output spectrum is 
+*          inherited from the first input spectrum that contributes to the 
+*          output spectrum. Any subsequent input spectra that contribute
+*          to the same output spectrum but which have a different bad pixel 
+*          mask are ignored. So an output pixel will be bad if and only if
+*          the corresponding pixel in the first input NDF that contributes 
+*          to it is bad. Since this scheme ignores entire input spectra
+*          if they do not conform to the expected bad pixel mask, the noise 
+*          in the output can be higher than using the other schemes. However, 
+*          this scheme has the benefit of using much less memory than the
+*          "AND" scheme, and will in general produce fewer bad pixels in
+*          the output than the "OR" scheme.
+*
+*          - "OR" -- The bad pixel mask in each output spectrum is the union 
+*          (logical OR) of the bad pixel masks for all input spectra that 
+*          contribute to the output spectrum. So an output pixel will be
+*          bad if any of the input pixels that contribute to it are bad.
+*          This scheme will in general produce more bad output pixels than 
+*          the "FIRST" scheme, but the non-bad output pixels will have a
+*          lower noise because, unlike "FIRST", all the contributing input 
+*          data is coadded to produce the good output pixels. Like "FIRST", 
+*          this scheme uses much less memory than "AND".
+*
+*          "AND" -- The bad pixel mask for each output spectrum is the 
+*          intersection (logical AND) of the bad pixel masks for all input 
+*          spectra that contribute to the output spectrum. So an output 
+*          pixel will be bad only if all the input pixels that contribute to 
+*          it are bad. This scheme will produce fewer bad output pixels
+*          and will also give lower output noise levels than "FIRST" or "OR", 
+*          but at the expense of much greater memory requirements.
+*
+*          ["AND"]
 *     CATFRAME = LITERAL (Read)
 *          A string determining the co-ordinate Frame in which positions are 
 *          to be stored in the output catalogue associated with parameter
@@ -158,10 +177,8 @@ fptrap (int i)
 *          calculated. It can take any of the following values:
 *
 *          - "Spread" -- the output Variance values are based on the spread 
-*          of input data values contributing to each output pixel. Note, if 
-*          only one pixel contributes to an output pixel, then the associated 
-*          Variance value will be bad. This option is not available if
-*          parameter SPARSE is set TRUE. 
+*          of input data values contributing to each output pixel. This option 
+*          is not available if parameter SPARSE is set TRUE. 
 *
 *          - "Tsys" -- the output Variance values are based on the system 
 *          noise temperature values supplied in the input NDFs. 
@@ -177,9 +194,7 @@ fptrap (int i)
 *          two or more input spectra together to form an output spectrum.
 *          If TRUE, the weights used are the reciprocal of the variances
 *          associated with the input spectra, as determined from the Tsys 
-*          values in the input. Note, the supplied value is ignored and a
-*          value of FALSE assumed if SPREAD is not set to "Nearest" and
-*          GENVAR is not set to "Tsys". [TRUE]
+*          values in the input. [TRUE]
 *     LBOUND( 3 ) = _INTEGER (Write)
 *          The lower pixel bounds of the output NDF. Note, values will be
 *          written to this output parameter even if a null value is supplied 
@@ -512,6 +527,11 @@ fptrap (int i)
 *        good output data values have good output variances.
 *     14-APR-2007 (DSB):
 *        Warn user about rejected input spectra.
+*     24-APR-2007 (DSB):
+*        Add parameter BADMASK.
+*     2-MAY-2007 (DSB):
+*        Modify the message about rejected spectra to indicate how many
+*        input spectra there were in total.
 
 *  Copyright:
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
@@ -609,6 +629,8 @@ void smurf_makecube( int *status ) {
    float *eff_array = NULL;   /* Pointer to array of eff times  */
    float *exp_array = NULL;   /* Pointer to array of exp times */
    float *ipd = NULL;         /* Pointer to the next output data value */
+   float *ipt = NULL;         /* Pointer to the next Tsys value */
+   float *ipw = NULL;         /* Pointer to the next work value */
    float *ipv = NULL;         /* Pointer to the next output variance value */
    float *tsys_array = NULL;  /* Pointer to array of tsys values */
    float *var_array = NULL;   /* Pointer to temporary variance array */
@@ -619,7 +641,6 @@ void smurf_makecube( int *status ) {
    float medtsys;             /* Median system temperature in output NDF. */
    float teff;                /* Effective integration time */
    float var;                 /* Variance value */
-   int *work1_array = NULL;   /* Pointer to temporary work array */
    int autogrid;              /* Determine projection parameters automatically? */
    int axes[ 2 ];             /* Indices of selected axes */
    int blank;                 /* Was a blank line just output? */
@@ -627,10 +648,12 @@ void smurf_makecube( int *status ) {
    int el;                    /* Index of 3D array element */
    int flag;                  /* Is group expression to be continued? */
    int genvar;                /* How to create output Variances */
-   int gottsys;               /* Have som egood Tsys values been found? */
+   int hastsys;               /* Have some good Tsys values been found? */
    int hasoffexp;             /* Any ACS_OFFEXPOSURE values found in the i/p? */
    int i;                     /* Loop index */
    int ifile;                 /* Input file index */
+   int badmask;               /* How is the output bad pixel mask chosen? */
+   int is2d;                  /* Is the weights array 2-dimensional? */
    int ispec;                 /* Index of next spectrum within output NDF */
    int lbnd_out[ 3 ];         /* Lower pixel bounds for output map */
    int lbnd_wgt[ 4 ];         /* Lower pixel bounds for wight array */
@@ -643,8 +666,9 @@ void smurf_makecube( int *status ) {
    int nparam = 0;            /* No. of parameters required for spreading scheme */
    int npos;                  /* Number of samples included in output NDF */
    int nwgtdim;               /* No. of axes in the weights array */
+   int naccept;               /* Number of accepted input spectra */
    int nreject;               /* Number of rejected input spectra */
-   int nused;                 /* Number of input values used */
+   int nused;                 /* No. of input samples pasted into output cube */
    int nxy;                   /* Number of elements in 2D array */
    int ondf;                  /* output NDF identifier */
    int outax[ 2 ];            /* Indices of corresponding output axes */
@@ -657,7 +681,6 @@ void smurf_makecube( int *status ) {
    int trim;                  /* Trim the output cube to exclude bad pixels? */
    int ubnd_out[ 3 ];         /* Upper pixel bounds for output map */
    int ubnd_wgt[ 4 ];         /* Upper pixel bounds for wight array */
-   int use_ast;               /* Use AST for rebinning? */
    int use_wgt;               /* Use input variance to weight input data? */
    int usedetpos;             /* Should the detpos array be used? */
    int wgtsize;               /* No. of elements in the weights array */
@@ -672,7 +695,7 @@ void smurf_makecube( int *status ) {
    void *wgt_array = NULL;    /* Pointer to the weights map */
 
 #if defined(FPTRAP)
-   fptrap(1);
+   feenableexcept(FE_DIVBYZERO|FE_INVALID|FE_OVERFLOW);
 #endif
 
 /* Check inherited status */
@@ -731,7 +754,7 @@ void smurf_makecube( int *status ) {
 
 /* Calculate the default grid parameters. */
    smf_cubegrid( igrp,  size, system, usedetpos, autogrid, detgrp, 
-                 par, &moving, &oskyfrm, &sparse, &gottsys, status );
+                 par, &moving, &oskyfrm, &sparse, &hastsys, status );
 
 /* If we are producing an output cube with the XY plane being a spatial
    projection... */
@@ -748,7 +771,7 @@ void smurf_makecube( int *status ) {
    input JCMTSTATE, so warn the user if this cannot be done and continue
    without using weights. */
       parGet0l( "INWEIGHT", &use_wgt, status );
-      if( use_wgt && ( !hasoffexp || !gottsys ) ) {
+      if( use_wgt && ( !hasoffexp || !hastsys ) ) {
          if( !blank) msgBlank( status );
          if( !hasoffexp ) {
             msgOutif( MSG__NORM, "INW_MSG1A", "   ACS_OFFEXPOSURE not found "
@@ -780,33 +803,13 @@ void smurf_makecube( int *status ) {
 
       }
 
-      if( genvar == 2 && ( !hasoffexp || !gottsys) ) {
-         if( !blank ) msgBlank( status );
-
-         if( !hasoffexp ) {
-            msgOutif( MSG__NORM, "GNV_MSG1A", "   ACS_OFFEXPOSURE not found "
-                      "in JCMTSTATE extension.", status );
-         } else {
-            msgOutif( MSG__NORM, "GNV_MSG1B", "   No good TSYS values found "
-                      "in ACSIS extension.", status );
-         }
-
-         msgOutif( MSG__NORM, "GNV_MSG1", "   Variances cannot be determined "
-                   "for the input spectra.", status );
-         msgOutif( MSG__NORM, "GNV_MSG2", "   The output file will not contain "
-                   "a Variance array.", status );
-         msgBlank( status );
-         blank = 1;
-         genvar = 0;
-      }
-
 /* Now deal with sparse output cubes. */
    } else {
 
 /* Validate the input files, create the WCS FrameSet to store in the
    output cube, and get the pixel index bounds of the output cube. */
       smf_sparsebounds( igrp, size, oskyfrm, usedetpos, detgrp, lbnd_out, 
-                        ubnd_out, &wcsout, status );
+                        ubnd_out, &wcsout, &hasoffexp, status );
 
 /* See how the output Variances are to be created (the "Spread" option is
    not available in sparse mode). */
@@ -822,17 +825,36 @@ void smurf_makecube( int *status ) {
 
    }
 
-/* Get the pixel spreading scheme to use, and note if AST will be used to
-   do the rebinning. */
-   use_ast = 0;
+/* We need some good TSYS valaues and some ACS_OFFEXPOSURE values to
+   create Tsys output variances. Report an error if these are not
+   available. */
+   if( genvar == 2 && ( !hasoffexp || !hastsys) ) {
+      if( !blank ) msgBlank( status );
+
+      if( !hasoffexp ) {
+         msgOutif( MSG__NORM, "GNV_MSG1A", "   ACS_OFFEXPOSURE not found "
+                   "in JCMTSTATE extension.", status );
+      } else {
+         msgOutif( MSG__NORM, "GNV_MSG1B", "   No good TSYS values found "
+                   "in ACSIS extension.", status );
+      }
+
+      msgOutif( MSG__NORM, "GNV_MSG1", "   Variances cannot be determined "
+                "for the input spectra.", status );
+      msgOutif( MSG__NORM, "GNV_MSG2", "   The output file will not contain "
+                "a Variance array.", status );
+      msgBlank( status );
+      blank = 1;
+      genvar = 0;
+   }
+
+/* Get the pixel spreading scheme to use. */
    if( !sparse ) {
-      use_ast = 1;
       parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,"
                 "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS", 
                 1, pabuf, 10, status );
 
       if( !strcmp( pabuf, "NEAREST" ) ) {
-         use_ast = 0;
          spread = AST__NEAREST;
          nparam = 0;
    
@@ -884,6 +906,36 @@ void smurf_makecube( int *status ) {
 /* Get an additional parameter vector if required. */
    if( nparam > 0 ) parExacd( "PARAMS", nparam, params, status );
 
+/* See how the bad pixel mask in each output spectrum is to be determined. 
+   Also choose whether to use the 2D or the 3D weighting system. The 2D  
+   system assumes that all pixels in a given output spectrum have the same 
+   weight and variance, and requires much less memory than the 3D system. */
+   parChoic( "BADMASK", "AND", "AND,OR,FIRST", 1, pabuf, 10, status );
+
+   if( !strcmp( pabuf, "AND" ) ) {
+      badmask = 2;
+      is2d = 0;
+
+   } else if( !strcmp( pabuf, "OR" ) ) {
+      badmask = 1;
+      is2d = 1;
+
+   } else {
+      badmask = 0;
+      is2d = 1;
+
+   }
+
+/* BADMASK = OR and FIRST can only be used with SPREAD = Nearest. Report an 
+   error for any other combination. */
+   if( badmask != 2 && spread != AST__NEAREST ) {
+      *status = SAI__ERROR;
+      errRep( "", "Incompatible values supplied for parameters BADMASK "
+              "and SPREAD.", status );
+      errRep( "", "BADMASK values of 'OR' and 'FIRST' can only be used if "
+              "SPREAD is 'Nearest'.", status );
+   }
+
 /* Output the pixel bounds. */
    parPut1i( "LBOUND", 3, lbnd_out, status );
    parPut1i( "UBOUND", 3, ubnd_out, status );
@@ -918,34 +970,36 @@ void smurf_makecube( int *status ) {
    it goes from current Frame to output grid axis. */
    astInvert( ospecmap );
 
-/* Calculate and output the WCS bounds (matching NDFTRACE output). The bounds are normalised.
-   Celestial coordinates will use radians. */
-   for (i=0; i < 3; i++) {
-     /* need GRID bounds as doubles */
-     glbnd_out[i] = 0.5;
-     gubnd_out[i] = ubnd_out[i] - lbnd_out[i] + 1.5;
+/* Calculate and output the WCS bounds (matching NDFTRACE output). The bounds 
+   are normalised. Celestial coordinates will use radians. */
+   for( i = 0; i < 3; i++ ) {
+     glbnd_out[ i ] = 0.5;
+     gubnd_out[ i ] = ubnd_out[ i ] - lbnd_out[i] + 1.5;
    }
-   for (i=0; i < 3; i++) {
-     astMapBox(tmap, glbnd_out, gubnd_out, 1, i+1, &(wcslbnd_out[i]), &(wcsubnd_out[i]),
-	       NULL, NULL);
+
+   for( i = 0; i < 3; i++ ) {
+     astMapBox( tmap, glbnd_out, gubnd_out, 1, i+1, &(wcslbnd_out[ i ]), 
+                &(wcsubnd_out[ i ]), NULL, NULL );
    }
-   astNorm(wcsout, wcslbnd_out );
-   astNorm(wcsout, wcsubnd_out );
+
+   astNorm( wcsout, wcslbnd_out );
+   astNorm( wcsout, wcsubnd_out );
 
    parPut1d( "FLBND", 3,  wcslbnd_out, status );
    parPut1d( "FUBND", 3,  wcsubnd_out, status );
 
    msgOutif( MSG__NORM, "WCS_WBND1",
 	     "   Output cube WCS bounds:", status );
-   for (i=0; i < 3 && *status == SAI__OK; i++) {
+
+   for( i = 0; i < 3 && *status == SAI__OK; i++ ) {
      msgSetc( "L", astFormat( wcsout, i+1, wcslbnd_out[i]));
      msgSetc( "U", astFormat( wcsout, i+1, wcsubnd_out[i]));
 
-     if (i == 2) {
-       sprintf(tmpstr, "unit(%d)", i+1);
+     if( i == 2 ) {
+       sprintf( tmpstr, "unit(%d)", i+1 );
        msgSetc( "UNT", astGetC( wcsout, tmpstr ));
      } else {
-       msgSetc("UNT", "");
+       msgSetc( "UNT", "" );
      }
 
      sprintf( tmpstr, "label(%d)", i + 1 );
@@ -957,38 +1011,41 @@ void smurf_makecube( int *status ) {
    msgBlank( status );
    blank = 1;
 
-   /* Now also calculate the spatial coordinates of the four corners (required
-      for CADC science archive */
-   /* Calculate input GRID coordinates for 4 corners: TR, TL, BR, BL. Use pixel
-      centres for reporting. This is important for cases where the pixels are very
-      large and we want to make sure that we are conservative with the database
-      reporting. */
-   gx_in[0] = ubnd_out[0] - lbnd_out[0] + 1.0; /* Right */
-   gx_in[1] = 1.0;                             /* Left */
-   gx_in[2] = gx_in[0];                        /* Right */
-   gx_in[3] = gx_in[1];                        /* Left */
-   gy_in[0] = ubnd_out[1] - lbnd_out[1] + 1.0; /* Top */
-   gy_in[1] = gy_in[0];                        /* Top */
-   gy_in[2] = 1.0;                             /* Bottom */
-   gy_in[3] = gy_in[2];                        /* Bottom */
+/* Now also calculate the spatial coordinates of the four corners (required
+   for CADC science archive. First, calculate input GRID coordinates for 4 
+   corners: TR, TL, BR, BL. Use pixel centres for reporting. This is 
+   important for cases where the pixels are very large and we want to make 
+   sure that we are conservative with the database reporting. */
+
+   gx_in[ 0 ] = ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1.0; /* Right */
+   gx_in[ 1 ] = 1.0;                                 /* Left */
+   gx_in[ 2 ] = gx_in[ 0 ];                          /* Right */
+   gx_in[ 3 ] = gx_in[ 1 ];                          /* Left */
+   gy_in[ 0 ] = ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1.0; /* Top */
+   gy_in[ 1 ] = gy_in[ 0 ];                          /* Top */
+   gy_in[ 2 ] = 1.0;                                 /* Bottom */
+   gy_in[ 3 ] = gy_in[ 2 ];                          /* Bottom */
 
    astTran2( oskymap, 4, gx_in, gy_in, 1, gx_out, gy_out );
    
-   /* Horrible code duplication */
-   corner[0] = gx_out[0];
-   corner[1] = gy_out[0];
+/* Horrible code duplication */
+   corner[ 0 ] = gx_out[ 0 ];
+   corner[ 1 ] = gy_out[ 0 ];
    astNorm( oskyfrm, corner );
    parPut1d( "FTR", 2, corner, status );
-   corner[0] = gx_out[1];
-   corner[1] = gy_out[1];
+
+   corner[ 0 ] = gx_out[ 1 ];
+   corner[ 1 ] = gy_out[ 1 ];
    astNorm( oskyfrm, corner );
    parPut1d( "FTL", 2, corner, status );
-   corner[0] = gx_out[2];
-   corner[1] = gy_out[2];
+
+   corner[ 0 ] = gx_out[ 2 ];
+   corner[ 1 ] = gy_out[ 2 ];
    astNorm( oskyfrm, corner );
    parPut1d( "FBR", 2, corner, status );
-   corner[0] = gx_out[3];
-   corner[1] = gy_out[3];
+
+   corner[ 0 ] = gx_out[ 3 ];
+   corner[ 1 ] = gy_out[ 3 ];
    astNorm( oskyfrm, corner );
    parPut1d( "FBL", 2, corner, status );
 
@@ -999,12 +1056,12 @@ void smurf_makecube( int *status ) {
 
       if( *status == PAR__NULL ) {
          errAnnul( status );
-         goto L999;
+         goto L998;
       }
    }
 
    smfflags = 0;
-   if( genvar && use_ast ) smfflags |= SMF__MAP_VAR;
+   if( genvar && !is2d ) smfflags |= SMF__MAP_VAR;
    smf_open_newfile( ogrp, 1, SMF__FLOAT, 3, lbnd_out, ubnd_out, smfflags, 
                      &odata, status );
 
@@ -1025,11 +1082,11 @@ void smurf_makecube( int *status ) {
 /* Get a pointer to the mapped output data array. */
    data_array = (odata->pntr)[ 0 ];
 
-/* If AST is being used to do the re-binning, the variance will be
-   evaluated for each individual pixel in the output cube. In this case we
-   will have mapped the Variance component in the output cube, so store a
-   pointer to it. */
-   if( use_ast ) {
+/* If a 3D weights array is being used, the variance will be evaluated for 
+   each individual pixel in the output cube. In this case we will have 
+   mapped the Variance component in the output cube, so store a pointer to 
+   it. */
+   if( !is2d ) {
       var_array = (odata->pntr)[ 1 ];
 
 /* Otherwise, the variance is assumed to be the same in every spatial
@@ -1038,43 +1095,42 @@ void smurf_makecube( int *status ) {
    Also allocate some work arrays of the same size. */
    } else if( genvar ) {
       var_array = (float *) astMalloc( nxy*sizeof( float ) );
-      work1_array = (int *) astMalloc( nxy*sizeof( int ) );
    }
 
-/* If required, create an array to hold the weights. First set up the bounds 
-   of the whole 3D array (a larger 4D array is needed if AST is being used to 
-   do the rebinning and output variances are being created on the basis
-   of the spread of input values), and then see if the array should be held in 
-   temporary work space, or in an extension of the output NDF. If AST is
-   not being used (i.e. if nearest neighbour spreading is being used), then 
-   the weights will be the same for every 2D slice in the output cube, and so
-   we can avoid extra memory requirements by using a single 2D array for the
-   weights in this case. */
+/* If we are producing a regularly gridded output NDF, we need to
+   allocate a work array. */
    if( !sparse ) {   
+
+/* Assume for the moment that the weights array is 2-dimensional (i.e. a
+   single spatial plane of the output). Store its bounds and calculate its 
+   total size in pixels. */
+      nwgtdim = 2;
       lbnd_wgt[ 0 ] = lbnd_out[ 0 ];
       lbnd_wgt[ 1 ] = lbnd_out[ 1 ];
-      lbnd_wgt[ 2 ] = lbnd_out[ 2 ];
-      lbnd_wgt[ 3 ] = 1;
       ubnd_wgt[ 0 ] = ubnd_out[ 0 ];
       ubnd_wgt[ 1 ] = ubnd_out[ 1 ];
-      ubnd_wgt[ 2 ] = ubnd_out[ 2 ];
-      ubnd_wgt[ 3 ] = 2;
-
-/* Select the number of dimensions for the weights array, and the total
-   size of the array. */
-      nwgtdim = 2;
       wgtsize = ubnd_wgt[ 0 ] - lbnd_wgt[ 0 ] + 1;
       wgtsize *= ubnd_wgt[ 1 ] - lbnd_wgt[ 1 ] + 1;
 
-      if( spread != AST__NEAREST ) {
+/* If the weights array is in fact 3D, increase its total size and
+   increment the number of axes in the weights array. */
+      if( !is2d ) {
          nwgtdim = 3;
+         lbnd_wgt[ 2 ] = lbnd_out[ 2 ];
+         ubnd_wgt[ 2 ] = ubnd_out[ 2 ];
          wgtsize *= ubnd_wgt[ 2 ] - lbnd_wgt[ 2 ] + 1;
-         if( genvar == 1 ) {
-            nwgtdim = 4;
-            wgtsize *= ubnd_wgt[ 3 ] - lbnd_wgt[ 3 ] + 1;
-         }
       }
-   
+
+/* If output variances are being created from the spread of input values,
+   the weights array needs to be twice the size determined above.
+   Implement this as an extra trailing axis with bounds [1:2]. */
+      if( genvar == 1 ) {
+         lbnd_wgt[ nwgtdim ] = 1;
+         ubnd_wgt[ nwgtdim ] = 2;
+         nwgtdim++;
+         wgtsize *= 2;
+      }
+
 /* See if weights are to be saved in the output NDF. */
       parGet0l( "WEIGHTS", &savewgt, status );
 
@@ -1092,42 +1148,39 @@ void smurf_makecube( int *status ) {
       }
    }
 
-/* If we are using nearest neighbour rebinning, create a SMURF extension in 
-   the output NDF and create three 2D NDFs in the extension; one for the total 
-   exposure time ("on+off"), one for the "on" time, and one for the Tsys 
-   values. Each of these 2D NDFs inherits the spatial bounds of the main
-   output NDF. Note, the Tsys array also needs variances to be calculated. 
-   Include spatial WCS in each NDF. */
-   if( spread == AST__NEAREST ) {
-      smurf_xloc = smf_get_xloc ( odata, "SMURF", "SMURF", "WRITE", 
-                                  0, 0, status );
+/* Create a SMURF extension in the output NDF and create three 2D NDFs in 
+   the extension; one for the total exposure time ("on+off"), one for the 
+   "on" time, and one for the Tsys values. Each of these 2D NDFs inherits 
+   the spatial bounds of the main output NDF. Note, the Tsys array also 
+   needs variances to be calculated. Include spatial WCS in each NDF. */
+   smurf_xloc = smf_get_xloc ( odata, "SMURF", "SMURF", "WRITE", 
+                               0, 0, status );
 
-      smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "EXP_TIME", "NEW", 
+   smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "EXP_TIME", "NEW", 
+                      "_REAL", 2, (int *) lbnd_out, 
+                      (int *) ubnd_out, &expdata, status );
+   if( expdata ) {
+      exp_array = (expdata->pntr)[ 0 ];
+      ndfPtwcs( wcsout2d, expdata->file->ndfid, status );
+   }
+
+   smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "EFF_TIME", "NEW", 
+                      "_REAL", 2, (int *) lbnd_out, 
+                      (int *) ubnd_out, &effdata, status );
+   if( effdata ) {
+      eff_array = (effdata->pntr)[ 0 ];
+      ndfPtwcs( wcsout2d, effdata->file->ndfid, status );
+   }
+
+   if( genvar ) {
+      smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "TSYS", "NEW", 
                          "_REAL", 2, (int *) lbnd_out, 
-                         (int *) ubnd_out, &expdata, status );
-      if( expdata ) {
-         exp_array = (expdata->pntr)[ 0 ];
-         ndfPtwcs( wcsout2d, expdata->file->ndfid, status );
+                         (int *) ubnd_out, &tsysdata, status );
+      if( tsysdata ) {
+         tsys_array = (tsysdata->pntr)[ 0 ];
+         ndfPtwcs( wcsout2d, tsysdata->file->ndfid, status );
       }
 
-      smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "EFF_TIME", "NEW", 
-                         "_REAL", 2, (int *) lbnd_out, 
-                         (int *) ubnd_out, &effdata, status );
-      if( effdata ) {
-         eff_array = (effdata->pntr)[ 0 ];
-         ndfPtwcs( wcsout2d, effdata->file->ndfid, status );
-      }
-
-      if( genvar ) {
-         smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "TSYS", "NEW", 
-                            "_REAL", 2, (int *) lbnd_out, 
-                            (int *) ubnd_out, &tsysdata, status );
-         if( tsysdata ) {
-            tsys_array = (tsysdata->pntr)[ 0 ];
-            ndfPtwcs( wcsout2d, tsysdata->file->ndfid, status );
-         }
-
-      }
    }
 
 /* Invert the output sky mapping so that it goes from sky to pixel
@@ -1140,6 +1193,7 @@ void smurf_makecube( int *status ) {
    astClear( abskyfrm, "SkyRefIs" );
 
 /* Loop round all the input files, pasting each one into the output NDF. */
+   naccept = 0;
    nreject = 0;
    nused = 0;
    ispec = 0;
@@ -1201,24 +1255,14 @@ void smurf_makecube( int *status ) {
 /* Handle output FITS header creation/manipulation */
       smf_fits_outhdr( data->hdr->fitshdr, &fchan, &keymap, status );
 
-/* Warn the user if the supplied value for use_wgt cannot be used. */
-      if( use_wgt && use_ast && genvar != 2 ) {
-         if( !blank ) msgBlank( status );
-         msgOutif( MSG__NORM, " ", "WARNING: The values supplied for "
-                   "parameters GENVAR and SPREAD mean that the requested "
-                   "TRUE value for parameter INWEIGHT cannot be used.",
-                   status );
-         msgBlank( status );
-         blank = 1;
-      }
-
 /* Rebin the data into the output grid. */
       if( !sparse ) {
-         smf_rebincube( data, ifile, size, abskyfrm, oskymap, ospecfrm, 
-                        ospecmap, detgrp, moving, use_wgt, lbnd_out, ubnd_out, 
-                        spread, params, genvar, data_array, var_array, 
-                        wgt_array, work1_array, exp_array, eff_array, &fcon,
-                        &nreject, &nused, status );
+         smf_rebincube( data, ifile, size, badmask, is2d, abskyfrm, oskymap, 
+                        ospecfrm, ospecmap, detgrp, moving, use_wgt, lbnd_out, 
+                        ubnd_out, spread, params, genvar, data_array, 
+                        var_array, wgt_array, exp_array, eff_array, &fcon, 
+                        &nused, &nreject, &naccept, status );
+
       } else {
          smf_rebinsparse( data, ifile, ospecfrm, ospecmap, abskyfrm, detgrp, 
                           lbnd_out, ubnd_out, genvar, data_array, var_array, 
@@ -1235,19 +1279,20 @@ void smurf_makecube( int *status ) {
       }
    }
 
-L999:;
-
-
 /* Tell the user how many input spectra were rejected. */
    if( nreject > 0 ) {
       if( !blank ) msgBlank( status );
       msgSeti( "N", nreject );
-      msgOutif( MSG__NORM, " ", "WARNING: ^N input spectra were ignored "
-                "becuase they included unexpected bad pixel values.",
-                status );
+      msgSeti( "T", naccept + nreject );
+      msgOutif( MSG__NORM, " ", "WARNING: ^N out of the ^T input spectra "
+                "were ignored because they included unexpected bad pixel "
+                "values.", status );
       msgBlank( status );
       blank = 1;
    }
+
+/* Arrive here if an error occurs. */
+L999:;
 
 /* Close the input data file that remains open due to an early exit from
    the above loop. */
@@ -1256,24 +1301,23 @@ L999:;
       data = NULL;
    }
 
-/* Store the WCS FrameSet in the output NDF. */
-   if( wcsout && ondf != NDF__NOID ) ndfPtwcs( wcsout, ondf, status );
+/* Store the WCS FrameSet in the output NDF (if any). */
+   if( wcsout ) ndfPtwcs( wcsout, ondf, status );
 
 /* If we are creating an output Variance component... */
-   if( genvar && ondf != NDF__NOID ) {
+   if( genvar ) {
 
 /* Count the number of pixel which have a good data value but a bad
    variance value, and count the number which have a good data value. 
-   Unless astRebinSeq was used, the var_array will be one slice of the 
-   output cube, so cycle through this 2D variance array as we move 
-   through the entire 3D output data array. */
+   If the weights array is 2-dimensional, cycle through the 2D variance 
+   array as we move through the entire 3D output data array. */
       ngood = 0;
       nbad = 0;
       ipd = (float *) data_array;
       ipv = (float *) var_array;
       nel = nxy*( ubnd_out[ 2 ] - lbnd_out[ 2 ] + 1 );
 
-      if( use_ast ) {
+      if( !is2d ) {
 
          for( el = 0; el < nel; el++, ipd++,ipv++ ) {
             if( *ipd != VAL__BADR ) {
@@ -1291,26 +1335,25 @@ L999:;
                if( *ipv == VAL__BADR ) nbad++;
             }
          }
-
       }
 
-/* If more than 10% of the good data values have bad variance values,
+/* If more than 50% of the good data values have bad variance values,
    we will erase the variance component. */
-      if( nbad > 0.1*ngood ) {
+      if( nbad > 0.5*ngood ) {
          if( !blank ) msgBlank( status );
-         msgOutif( MSG__NORM, " ", "WARNING: Less than 10% of the good "
-                   "output data values have good variances. The output "
+         msgOutif( MSG__NORM, " ", "WARNING: More than 50% of the good "
+                   "output data values have bad variances. The output "
                    "NDF will not contain a Variance array.", status );
          msgBlank( status );
          blank = 1;
 
-         if( use_ast ) {
+         if( !is2d ) {
             ndfUnmap( ondf, "Variance", status );
             ndfReset( ondf, "Variance", status );
             (odata->pntr)[ 1 ] = NULL;
             var_array = NULL;
 
-         } else if( genvar ) {
+         } else {
             var_array = (float *) astFree( var_array );
          }
 
@@ -1318,17 +1361,21 @@ L999:;
   
 /* Otherwise, if the output variances are the same for every spatial slice, the
    "var_array" used above will be a 2D array holding a single slice of the 3D
-   Variance array. In this case we now copy this slice to the output
-   cube, first unmapping the Data array to minimise memory requirements. */
-      } else if( !use_ast ) {
-         ndfUnmap( ondf, "Data", status );
+   Variance array. In this case we now copy this slice to the output cube. */
+      } else if( is2d ) {
          ndfMap( ondf, "Variance", "_REAL", "WRITE", (void **) &var_out, &nel, 
                  status );
          if( var_out && *status == SAI__OK ) {
+            ipd = (float *) data_array;
+            ipv = (float *) var_out;
             el0 = 0;
-            for( el = 0; el < nel; el++, el0++ ) {
+            for( el = 0; el < nel; el++, el0++, ipd++, ipv++ ) {
                if( el0 == nxy ) el0 = 0;
-               var_out[ el ] = var_array[ el0 ];
+               if( *ipd != VAL__BADR ) {
+                  *ipv = var_array[ el0 ];
+               } else {
+                  *ipv = VAL__BADR;
+               }
             }
          }
 
@@ -1337,11 +1384,11 @@ L999:;
    cube. */
          if( fcon != VAL__BADD ) {
             for( el0 = 0; el0 < nxy; el0++ ) {
-               teff = 0.25*eff_array[ el0 ];
+               teff = eff_array[ el0 ];
                var = var_array[ el0 ];
                if( teff != VAL__BADR && teff > 0.0 && 
                    var != VAL__BADR && var > 0.0 ) {
-                  tsys_array[ el0 ] = sqrt( var*teff/fcon );
+                  tsys_array[ el0 ] = sqrt( 0.25*var*teff/fcon );
                } else {
                   tsys_array[ el0 ] = VAL__BADR;
                }
@@ -1353,52 +1400,121 @@ L999:;
             }
          }
 
-/* Free the memory used to store the 2D variance information and work
-   arrays. */
+/* Free the memory used to store the 2D variance information. */
          var_array = astFree( var_array );
-         work1_array = astFree( work1_array );
+
+/* For 3D variances, the output Tsys values are based on the mean
+   variance in every output spectrum. */
+      } else if( fcon != VAL__BADD ) {
+
+         work2_array = astMalloc( nxy*sizeof( float ) );
+         if( work2_array ) {
+            ipw = work2_array;
+            ipt = tsys_array;
+            for( el = 0; el < nxy; el++ ) {
+               *(ipw++) = 0.0;
+               *(ipt++) = 0.0;
+            }
+   
+            ipv = var_array;
+            ipt = tsys_array;
+            ipw = work2_array;
+   
+            for( el = 0; el < nel; el++, ipv++, ipt++, ipw++ ) {
+               if( el % nxy == 0 ) {
+                  ipt = tsys_array;
+                  ipw = work2_array;
+               }
+   
+               if( *ipv != VAL__BADR ) {
+                  *(ipw) += 1.0;
+                  *(ipt) += *ipv;
+               }
+            }
+   
+            for( el0 = 0; el0 < nxy; el0++ ) {
+               teff = eff_array[ el0 ];
+               var = tsys_array[ el0 ];
+               if( teff != VAL__BADR && teff > 0.0 &&
+                   work2_array[ el0 ] > 0.0 && var > 0.0 ) {
+                  var /= work2_array[ el0 ];
+                  tsys_array[ el0 ] = sqrt( 0.25*var*teff/fcon );
+               } else {
+                  tsys_array[ el0 ] = VAL__BADR;
+               }
+            }
+         }
+
+/* For 3D weights and no Variance->Tsys conversion factor, fill the Tsys
+   array with bad values. */
+      } else {
+
+         if( !blank ) msgBlank( status );
+         msgOutif( MSG__NORM, " ", "WARNING: Cannot create output Tsys "
+                   "values.", status );
+         msgBlank( status );
+         blank = 1;
+
+         for( el0 = 0; el0 < nxy; el0++ ) {
+            tsys_array[ el0 ] = VAL__BADR;
+         }
+
+      }
+   }
+
+/* If we created an output Variance component, store the median system 
+   temperature as keyword TSYS in the FitsChan. */
+   if( genvar ) {
+      work2_array = astStore( work2_array, tsys_array, nxy*sizeof( float ) );
+      kpg1Medur( 1, nxy, work2_array, &medtsys, &neluse, status );
+      atlPtftr( fchan, "MEDTSYS", medtsys, 
+                "[K] Median MAKECUBE system temperature", status );
+
+   } else {
+      if( !blank ) msgBlank( status );
+      msgOutif( MSG__NORM, " ", "WARNING: Cannot create output Tsys "
+                "values since no output variances have been created.",
+                status );
+      msgBlank( status );
+      blank = 1;
+   }
 
 /* Store the median exposure time as keyword EXP_TIME in the FitsChan.
    Since kpg1Medur partially sorts the array, we need to take a copy of it
    first. */
-         work2_array = astStore( NULL, exp_array, nxy*sizeof( float ) );
-         kpg1Medur( 1, nxy, work2_array, &medexp, &neluse, status );
-         atlPtftr( fchan, "EXP_TIME", medexp, 
-                   "[s] Median MAKECUBE exposure time", status );
+   work2_array = astStore( work2_array, exp_array, nxy*sizeof( float ) );
+   kpg1Medur( 1, nxy, work2_array, &medexp, &neluse, status );
+   atlPtftr( fchan, "EXP_TIME", medexp, 
+             "[s] Median MAKECUBE exposure time", status );
 
 /* Store the median effective integration time as keyword EFF_TIME in the 
    FitsChan. Since kpg1Medur partially sorts the array, we need to take a 
    copy of it first. */
-         work2_array = astStore( work2_array, eff_array, nxy*sizeof( float ) );
-         kpg1Medur( 1, nxy, work2_array, &medeff, &neluse, status );
-         atlPtftr( fchan, "EFF_TIME", medeff, 
-                   "[s] Median MAKECUBE effective integration time", status );
-
-/* Store the median system temperature as keyword TSYS in the FitsChan. */
-         work2_array = astStore( work2_array, tsys_array, nxy*sizeof( float ) );
-         kpg1Medur( 1, nxy, work2_array, &medtsys, &neluse, status );
-         atlPtftr( fchan, "MEDTSYS", medtsys, 
-                   "[K] Median MAKECUBE system temperature", status );
+   work2_array = astStore( work2_array, eff_array, nxy*sizeof( float ) );
+   kpg1Medur( 1, nxy, work2_array, &medeff, &neluse, status );
+   atlPtftr( fchan, "EFF_TIME", medeff, 
+             "[s] Median MAKECUBE effective integration time", status );
 
 /* Retrieve the unique OBSID keys from the KeyMap and populate the OBSnnnnn
    and PROVCNT headers from this information. */
-         smf_fits_add_prov( fchan, keymap, status ); 
+   smf_fits_add_prov( fchan, keymap, status ); 
 
 /* Free the seoncd work array. */
-         work2_array = astFree( work2_array );
-      }
-   }
+   work2_array = astFree( work2_array );
 
 /* If the FitsChan is not empty, store it in the FITS extension of the
    output NDF (any existing FITS extension is deleted). */
-   if( ondf && fchan &&  astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );
-
+   if( fchan &&  astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );
+  
 /* Close the output data files. */
    if( expdata ) smf_close_file( &expdata, status );
    if( effdata ) smf_close_file( &effdata, status );
    if( tsysdata ) smf_close_file( &tsysdata, status );
    if( wdata ) smf_close_file( &wdata, status );
    if( odata ) smf_close_file( &odata, status );
+
+/* Arrive here if no output NDF is being created. */
+L998:;
 
 /* Free resources. */  
    if( detgrp != NULL) grpDelet( &detgrp, status);

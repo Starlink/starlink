@@ -22,6 +22,16 @@ smf_construct_smfFile.c smf_construct_smfHead.c smf_construct_smfDA.c \
 smf_construct_smfData.c smf_deepcopy_smfFile.c \
 smf_deepcopy_smfHead.c smf_deepcopy_smfData.c smf_deepcopy_smfDA.c \
 smf_mapbounds.c smf_mapbounds_approx.c smf_rebinmap.c smf_rebincube.c \
+smf_rebincube_ast.c \
+smf_rebincube_nn.c \
+smf_rebincube_paste2d.c \
+smf_rebincube_paste3d.c \
+smf_rebincube_norm2d.c \
+smf_rebincube_norm3d.c \
+smf_rebincube_init.c \
+smf_rebincube_spectab.c \
+smf_rebincube_tcon.c \
+smf_rebincube_totmap.c \
 smf_check_smfData.c smf_check_smfDA.c smf_check_smfFile.c smf_check_smfHead.c \
 smf_calc_wvm.c smf_subtract_poly.c smf_subtract_plane.c smf_fit_poly.c \
 smf_calc_stats.c smf_calc_covar.c \

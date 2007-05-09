@@ -760,6 +760,16 @@ package @PACKAGE@ {
 	    default FALSE
 	    helpkey *
 	  }
+
+         parameter badmask {
+            type LITERAL
+            ppath DEFAULT
+            vpath DEFAULT
+            prompt {Scheme for determining the output bad pixel mask}
+            helpkey *
+            default OR
+         }
+
          parameter catframe {
             type LITERAL
             ppath DEFAULT
