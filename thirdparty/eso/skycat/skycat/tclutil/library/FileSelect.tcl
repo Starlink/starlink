@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: FileSelect.tcl,v 1.1.1.1 2006/01/12 16:40:47 abrighto Exp $"
+# "@(#) $Id: FileSelect.tcl,v 1.14 2005/11/25 12:06:27 pdraper Exp $"
 #
 # FileSelect.tcl - OSF/Motif standard file selection dialog
 #
@@ -76,6 +76,23 @@
 #
 # Peter W. Draper 27 Jan 97  added -filter_types option to allow caller
 #                            to see a list of "known" file extensions. 
+#                 30 Mar 00  added changes to add a file filter
+#                            when user just types in a directory
+#                            (which doesn't then show any files).
+#                 05 Jun 00  added catch to directory list expansion,
+#                            this blows up if a file like "~noname" is
+#                            found (a failed attempt to seek
+#                            $env(HOME)/noname is made). 
+#                 16 Oct 00  Also now skips $filename and
+#                            ~$filename. These cannot be handled by
+#                            NDF (user can still enter these names by hand)
+#                 26 Mar 01  Added panedwindow to control how the
+#                            space is divided between the directory
+#                            and files views.
+#                 07 Jul 03  Added horizontal scrollbars.
+#                 22 Nov 05  Removed panedwindow as this seems to be stopping
+#                            the delivery of double clicks.
+
 
 itk::usual FileSelect {}
 
@@ -90,6 +107,7 @@ itcl::class util::FileSelect {
 
     #  create new scrolled text
     constructor {args} {
+
 	eval itk_initialize $args
 
 	#
@@ -121,8 +139,9 @@ itcl::class util::FileSelect {
 	#	[lindex [$fs(filter) configure -background] 4] -selectborderwidth 0
 
 	pack $fs(filterf).label -side top -anchor w
-	pack $fs(filterf).entry -side bottom -fill x -expand yes -ipady 1m
-		
+        # PWD: modification here, pack to top not bottom.
+        pack $fs(filterf).entry -side top -fill x -expand yes -ipady 1m
+
 	#
 	# Create directory list, scrollbar, and label for the directory 
 	# frame.  Make the list single select.
@@ -131,14 +150,19 @@ itcl::class util::FileSelect {
 	label $fs(dirf).label -text "$itk_option(-dirlabel)"
 	set fs(dirs) [listbox $fs(dirf).list -relief sunken \
 		-yscrollcommand "$fs(dirf).vscroll set" \
+		-xscrollcommand "$fs(dirf).hscroll set" \
 		-selectmode single \
 		-exportselection no]
 
 	scrollbar $fs(dirf).vscroll -orient vertical -relief sunken \
 		-command "$fs(dirf).list yview"
 
+	scrollbar $fs(dirf).hscroll -orient horizontal -relief sunken \
+		-command "$fs(dirf).list xview"
+
 	pack $fs(dirf).label -side top -anchor w
 	pack $fs(dirf).vscroll -side right -fill y
+	pack $fs(dirf).hscroll -side bottom -fill x
 	pack $fs(dirf).list -side left -expand yes -fill both
 
 	#
@@ -149,28 +173,33 @@ itcl::class util::FileSelect {
 	label $fs(filef).label -text "$itk_option(-filelabel)"
 	set fs(files) [listbox $fs(filef).list -relief sunken \
 		-yscrollcommand "$fs(filef).vscroll set" \
+		-xscrollcommand "$fs(filef).hscroll set" \
                 -selectmode single \
 		-exportselection no]
 
 	scrollbar $fs(filef).vscroll -orient vertical -relief sunken \
 		-command "$fs(filef).list yview"
 
+	scrollbar $fs(filef).hscroll -orient horizontal -relief sunken \
+		-command "$fs(filef).list xview"
+
 	pack $fs(filef).label -side top -anchor w
 	pack $fs(filef).vscroll -side right -fill y
+	pack $fs(filef).hscroll -side bottom -fill x
 	pack $fs(filef).list -side left -expand yes -fill both
 
         #
         # Pack the directory and file lists based on the attributes
-	# for displaying each list.  Add a filler frame between the
-	# lists if both list are displayed.
+	# for displaying each list.
         #
         frame $fs(listf).buf -width $_margin -borderwidth 0
 
-        if {$itk_option(-dispdir)} {pack $fs(dirf) -side left -fill both -expand yes}
-
-	if {$itk_option(-dispdir) && $itk_option(-dispfile)} {pack $fs(listf).buf -side left}
-
-	if {$itk_option(-dispfile)} {pack $fs(filef) -side right -fill both -expand yes}
+        if {$itk_option(-dispdir)} {
+           pack $fs(dirf) -side left -fill both -expand yes
+        }
+	if {$itk_option(-dispfile)} {
+           pack $fs(filef) -side right -fill both -expand yes
+        }
 
 	#
 	# Create the label and entry widgets for the selection frame. Turn
@@ -182,7 +211,7 @@ itcl::class util::FileSelect {
 
 	pack $fs(self).label -side top -anchor w
 	pack $fs(self).entry -side bottom -fill x -expand yes -ipady 1m
-		
+	
 	#
 	# Add the separator and create the buttons in the button frame.
 	# Each button is within a frame used to display as default. 
@@ -234,8 +263,8 @@ itcl::class util::FileSelect {
 	# events for the filter and select entry widgets control the default
 	# button display, and return is mapped to the default button as well.
 	#
-        bind $fs(dirs) <ButtonRelease-1> [code $this _selectdir %y]
-        bind $fs(files) <ButtonRelease-1> [code $this _selectfile %y]
+        bind $fs(dirs) <1> [code $this _selectdir %y]
+        bind $fs(files) <1> [code $this _selectfile %y]
         bind $fs(dirs) <Double-1> [code $this _dclickdir %y]
         bind $fs(files) <Double-1> [code $this _dclickfile %y]
 
@@ -383,11 +412,25 @@ itcl::class util::FileSelect {
     # entry text.
 
     protected method _setfilter {{d ""} {f ""}} {
-	if {$d == ""} {set d [file dirname [$fs(filter) get]]}
-	if {$f == ""} {set f [file tail [$fs(filter) get]]}
-
-	$fs(filter) delete 0 end
-	$fs(filter) insert 0 "$d/$f"
+       if { $d == "" } { 
+          set filt [$fs(filter) get]
+          if { [file isdirectory $filt] } {
+             set d $filt
+          } else {
+             set d [file dirname $filt]
+          }
+       }
+       if {$f == ""} {
+          set filt [$fs(filter) get]
+          if { [file isdirectory $filt] } {
+             set f $last_filter_type_
+          } else {
+             set f [file tail $filt]
+          }
+       }
+       $fs(filter) delete 0 end
+       $fs(filter) insert 0 "$d/$f"
+       set last_filter_type_ $f
     }
 
     # Update the selection based on the 
@@ -436,24 +479,28 @@ itcl::class util::FileSelect {
     # Mark the default button as filter.
 
     protected method _filtercmd {} {
-	set seldir [file dirname [$fs(filter) get]]
-
-	if {![file exists $seldir]} {
-	    return
-	}
-
-	cd $seldir
-
-	configure -dir "[pwd]"
-	configure -filter "[file tail [$fs(filter) get]]"
-	set _selection "$itk_option(-dir)/"
-
-	_setfilter
-	_setselection
-	_filldirlist
-	_fillfilelist
-
-	_defaultbtn filter
+       set filt [$fs(filter) get]
+       if { [file isdirectory $filt] } { 
+          set seldir $filt
+       } else {
+          set seldir [file dirname $filt]
+       }
+       if {![file exists $seldir]} {
+          return
+       }
+       
+       cd $seldir
+       set seldir [pwd]
+       _setfilter $seldir
+       configure -dir $seldir
+       configure -filter "[file tail [$fs(filter) get]]"
+       set _selection "$itk_option(-dir)/"
+       
+       _setselection
+       _filldirlist
+       _fillfilelist
+       
+       _defaultbtn filter
     }
 
     # ------------------------------------------------------------------
@@ -482,15 +529,16 @@ itcl::class util::FileSelect {
 
     protected method _filldirlist {} {
 	$fs(dirs) delete 0 end
-
 	foreach i [exec /bin/ls -a $itk_option(-dir)] {
-	    if {[file isdirectory $i]} {
-		if {$itk_option(-full)} {
+           catch {
+              if {[file isdirectory $i]} {
+                 if {$itk_option(-full)} {
 		    $fs(dirs) insert end "$itk_option(-dir)/$i"
-		} else {
+                 } else {
 		    $fs(dirs) insert end [file tail $i]
-		}
-	    }
+                 }
+              }
+           }
 	}
 
 	if {[$fs(dirs) size]} {
@@ -499,26 +547,29 @@ itcl::class util::FileSelect {
 	}
     }
 
-    # Clear the file list filling with the
-    # results of an 'glob'.  Use the full 
-    # attribute to determine full file name
-    # insertion.  Select the first element if 
-    # it exists.
+    # Clear the file list filling with the results of an 'glob'.  
+    # Use the full attribute to determine full file name insertion.
+    # Select the first element if it exists.  PWD: modification. NDF's
+    # cannot start with "$" or "~$", so leave these files alone.
 
     protected method _fillfilelist {} {
-	$fs(files) delete 0 end
-
-	set file_temp [glob -nocomplain $itk_option(-dir)/$itk_option(-filter)]
-	set filefiller [lsort $file_temp]
-	foreach i $filefiller {
-	    if {[file isfile $i]} {
-		if {$itk_option(-full)} {
-		    $fs(files) insert end $i
-		} else {
-		    $fs(files) insert end [file tail $i]
-		}
-	    }
-	}
+       $fs(files) delete 0 end
+       
+       set file_temp [glob -nocomplain $itk_option(-dir)/$itk_option(-filter)]
+       set filefiller [lsort $file_temp]
+       foreach i $filefiller {
+          set tail [file tail $i]
+          if { [string match {$*} $tail] || [string match {./~$*} $tail] } {
+             continue
+          }
+          if {[file isfile $i] } {
+             if {$itk_option(-full)} {
+                $fs(files) insert end $i
+             } else {
+                $fs(files) insert end $tail
+             }
+          }
+       }
     }
 
     # Sets the default button, either ok, filter
@@ -541,8 +592,6 @@ itcl::class util::FileSelect {
 	    $fs(btnf).okf configure -relief flat
 	    $fs(btnf).ff configure -relief flat
 	    $fs(btnf).cf configure -relief sunken
-
-	    catch {focus none}
 	}
     }
 
@@ -581,6 +630,7 @@ itcl::class util::FileSelect {
        set dirname [file dirname [$fs(filter) get]]
        $fs(filter) delete 0 end
        $fs(filter) insert 0 $dirname/$type
+       set last_filter_type_ $type
        update
        _filtercmd
     }
@@ -683,7 +733,7 @@ itcl::class util::FileSelect {
           }
           if { $itk_option(-filter_types) != {} } { 
              set fs(filter_types) [LabelMenu $fs(filterf).types \
-                                      -text {File Type:}]
+                                      -text {Type Filter:}]
              foreach pair "$itk_option(-filter_types)" {
                 set name [lindex $pair 0]
                 set type [lindex $pair 1]
@@ -705,6 +755,9 @@ itcl::class util::FileSelect {
     protected variable _selection "./"
     protected variable fs
     protected variable _initialized 0
+
+    # Last filter type.
+    protected variable last_filter_type_ "*.*"
 
 }
 

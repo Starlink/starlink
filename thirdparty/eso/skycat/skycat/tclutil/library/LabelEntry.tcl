@@ -1,11 +1,35 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: LabelEntry.tcl,v 1.1.1.1 2006/01/12 16:40:46 abrighto Exp $"
+# "@(#) $Id: LabelEntry.tcl,v 1.6 2006/05/04 12:04:33 pwd Exp $"
 #
 # LabelEntry.tcl - Itk widget for displaying a labeled entry
+#
+#  Copyright:
+#     Copyright (C) 1998-2005 Central Laboratory of the Research Councils.
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+#
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of the
+#     License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+#     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 #
 # who             when       what
 # --------------  ---------  ----------------------------------------
 # Allan Brighton  01 Jun 94  Created
+# Peter W. Draper 11 Aug 98  Expanded real definition to allow 1.0e6
+#                            type values.
+#                 26 Feb 99  Merged tcl8 changes from real tclutil version.
 
 itk::usual LabelEntry {}
 
@@ -22,10 +46,10 @@ itcl::class util::LabelEntry {
 	itk_component add entry {
 	    entry $w_.entry
 	} {
-	    keep -textvariable -relief -borderwidth -textvariable -show
+	    keep -textvariable -relief -borderwidth -show
 	    rename -font -valuefont valueFont ValueFont
 	}
-	
+
 	eval itk_initialize $args
     }
 
@@ -35,15 +59,15 @@ itcl::class util::LabelEntry {
     public method get {} {
 	return [$itk_component(entry) get]
     }
-    
-    
+
+
     # select the contents of the entry
 
     public method select {} {
 	$itk_component(entry) select range 0 end
     }
 
-  
+
     # called for traces on textvariable
 
     private method trace_ {args} {
@@ -55,7 +79,7 @@ itcl::class util::LabelEntry {
 
     #  called for return or keypress in entry, calls command proc with new value
 
-    private method command_proc_ {cmd} {
+    protected method command_proc_ {cmd} {
 	lappend cmd [$itk_component(entry) get]
 	eval $cmd
     }
@@ -67,8 +91,8 @@ itcl::class util::LabelEntry {
     private method peek_ {char} {
 	set str [get]
 
-	set insertPos [$itk_component(entry) index insert] 
-	set firstPart [string range $str 0 [expr {$insertPos - 1}]]
+	set insertPos [$itk_component(entry) index insert]
+	set firstPart [string range $str 0 [expr $insertPos - 1]]
 	set lastPart [string range $str $insertPos end]
 
 	append rtnVal $firstPart $char $lastPart
@@ -84,7 +108,7 @@ itcl::class util::LabelEntry {
 	if {"$cmd" == "" || "$itk_option(-validate)" == ""} {
 	    return
 	}
-	
+
 	# pass these on to other bindings...
 	if {$sym == "Return" ||
 	    $sym == "Tab" ||
@@ -106,7 +130,7 @@ itcl::class util::LabelEntry {
             regsub "\"|\\\[|\\\]|{|}| " $char {\\\0} char
             regsub -all "%c" $cmd $char cmd
         }
-	
+
 	set valid [eval LabelEntry::$cmd]
 
 	if {($valid == "") || (! $valid)} {
@@ -134,9 +158,10 @@ itcl::class util::LabelEntry {
 	return [regexp {^(0x)?[0-9a-fA-F]*$} $string]
     }
     protected proc real {string} {
-	return [regexp {^\-?[0-9]*\.?[0-9]*$} $string]
+#	return [regexp {^\-?[0-9]*\.?[0-9]*$} $string]
+        return [regexp -nocase {^[-+]?[0-9]*\.?[0-9]*([0-9]\.?e[-+]?[0-9]*)?$} $string]
     }
-    
+
     # -- options --
 
     # set the value displayed in the entry
@@ -168,7 +193,7 @@ itcl::class util::LabelEntry {
 	    $itk_component(entry) config -foreground $itk_option(-disabledforeground)
 	}
     }
-    
+
     # the command for <Return> in the entry, called with the new value
     itk_option define -command command Command {} {
 	if {"$itk_option(-command)" != ""} {
@@ -242,7 +267,7 @@ itcl::class util::LabelEntry {
 	    }
 	}
     }
-    
+
 
     # select the contents of the entry whenever it gets the focus
     itk_option define -autoselect autoSelect AutoSelect {0} {
@@ -254,7 +279,7 @@ itcl::class util::LabelEntry {
 	}
     }
 
-    # for compat with iwidgets entryfield: action for invalid char with -validate 
+    # for compat with iwidgets entryfield: action for invalid char with -validate
     itk_option define -invalid invalid Command {bell}
 
     # -- protected vars --

@@ -1,11 +1,35 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: LabelMenu.tcl,v 1.1.1.1 2006/01/12 16:40:54 abrighto Exp $"
+# "@(#) $Id: LabelMenu.tcl,v 1.4 2006/05/04 12:04:33 pwd Exp $"
 #
 # LabelMenu.tcl - Itcl widget for displaying a label and a menubutton 
+#
+#  Copyright:
+#     Copyright (C) 1999-2005 Central Laboratory of the Research Councils.
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+#
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of the
+#     License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+#     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 #
 # who             when       what
 # --------------  ---------  ----------------------------------------
 # Allan Brighton  01 Jun 94  Created
+# Peter W. Draper 26 Mar 99  Removed global statements for $variable_
+#                            itcl3 scoping breaks this
+#                 02 Apr 01  Added delete and invoke methods for a single item.
 
 itk::usual LabelMenu {}
 
@@ -61,6 +85,19 @@ itcl::class util::LabelMenu {
 
     public method clear {} {
 	$itk_component(menu) delete 0 end
+    }
+
+
+    # remove a single entry
+
+    public method delete {index} {
+	$itk_component(menu) delete $index
+    }
+
+    # invoke an item.
+
+    public method invoke {index} {
+	$itk_component(menu) invoke $index
     }
 
 
@@ -175,7 +212,7 @@ itcl::class util::LabelMenu {
     # called when "$variable_" has changed, via trace, to update menu
     
     protected method variable_changed {args} {
-	global $variable_
+	#global $variable_
 	config -value [set $variable_]
     }
 
@@ -194,7 +231,7 @@ itcl::class util::LabelMenu {
     # global variable linked to menu
     itk_option define -variable variable Variable {} {
 	set variable_ $itk_option(-variable)
-	global $variable_
+	#global $variable_
 	trace variable $variable_ w [code $this variable_changed]
     }
 

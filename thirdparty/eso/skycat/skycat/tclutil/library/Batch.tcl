@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# @(#) $Id: Batch.tcl,v 1.1.1.1 2006/01/12 16:40:52 abrighto Exp $
+# @(#) $Id: Batch.tcl,v 1.3 2006/05/04 12:04:33 pwd Exp $
 #
 # Batch.tcl - Class to evaluate Tcl commands in a separate process.  
 #
@@ -11,9 +11,35 @@
 #
 # See man page for a complete description.
 #
+#  Copyright:
+#     Copyright (C) 2000-2005 Central Laboratory of the Research Councils.
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+#
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of the
+#     License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+#     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+#
 # who         when       what
 # --------   ---------   ----------------------------------------------
 # A.Brighton 20 Dec 95   created
+# P.W.Draper 10 Feb 98   Changed to use kill SIGKILL to make forked
+#                        process exit without executing any exit
+#                        handlers. This was causing problems with
+#                        Starlink infrastructure s/w (HDS).
+#            02 Mar 99   Merged skycat 2.3.2 changes
 
 itk::usual Batch {}
 
@@ -62,10 +88,17 @@ itcl::class util::Batch {
 	    set status [catch $cmd result]
 	    set fd [open $itk_option(-tmpfile) w]
 	    puts -nonewline $fd $result
+
+            #  Flush all pending output and kill the process using a
+            #  signal that avoids any exit handlers (otherwise these
+            #  are executed in the parent process, this process should
+            #  use _exit form to exit, obviously it doesn't).
+            flush $fd
 	    close $fd
 	    puts $wfd $status
+	    flush $wfd
 	    close $wfd
-	    kill [pid]
+	    kill SIGKILL [pid]
 	} else {
 	    set bg_pid_ $pid
 	    fileevent $rfd readable [code $this read_pipe $rfd $wfd]
