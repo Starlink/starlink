@@ -25,6 +25,7 @@
 #  Copyright:
 #     Copyright (C) 2003-2005 Central Laboratory of the Research Councils.
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2007 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -50,6 +51,10 @@
 #        Make sure installation lib directories are first on the library
 #        path. Now that we have shareable libraries for Tcl/Tk this is 
 #        safer.
+#     08-MAY-2007 (PWD):
+#        Updated for Skycat 3.0.1. Now works without GAIA_DIR pre-defined
+#        and doesn't need to be wrapped by a C-shell script to initialise
+#        CONVERT (currenly bash only).
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -57,65 +62,83 @@
 
 #-
 
-#  Check that GAIA_DIR is around.
-
+#  Check if GAIA_DIR is around, if not locate this script.
 if test "$GAIA_DIR" = ""; then
-  echo "!! Cannot start gaia; the GAIA_DIR environment variable is not set."
-  exit 1
+   PRG="$0"
+   while test -h "$PRG"; do
+      ls=`ls -ld "$PRG"`
+      link=`expr "$ls" : '.*-> \(.*\)$'`
+      if expr "$link" : '/.*' > /dev/null; then
+         PRG="$link"
+      else
+         PRG=`dirname "$PRG"`/"$link"
+      fi
+   done
+   GAIA_DIR=`dirname "$PRG"`
+   export GAIA_DIR
 fi
 
-#  Check that GAIA is installed.
-if test -x $GAIA_DIR/gaia_swish; then
+#  Installation BASE, two directories up (/star in /star/bin/gaia).
+BASE_DIR="$GAIA_DIR/../.."
+BASE_DIR=`(cd $BASE_DIR; pwd)`
+echo "GAIA_DIR = $GAIA_DIR"
+
+#  Locate the Tcl packages.
+TCLLIBPATH="$BASE_DIR/lib"
+export TCLLIBPATH
+
+#  Initialise the CONVERT package if not already done so.
+if test "$CONVERT_DIR" != "" -a "$NDF_FORMATS_IN" = ""; then
+   . $CONVERT_DIR/convert.sh > /dev/null
+   export CONVERT_DIR
+fi
 
 #  Try to stop problems with the AMS rendevous files by creating a
 #  new directory as ADAM_USER.
-  OLD_ADAM_USER=${ADAM_USER:-"${HOME}/adam"}
-  ADAM_USER=${OLD_ADAM_USER}/gaia_$$
-  export ADAM_USER
+if test "$ADAM_USER" != "" -a -d "$ADAM_USER"; then
+   OLD_ADAM_USER="$ADAM_USER"
+else
+   OLD_ADAM_USER="$HOME/adam"
+fi
+ADAM_USER="$OLD_ADAM_USER/gaia_$$"
+export ADAM_USER
 
 #  Make sure directory exists.
-  if test -f $ADAM_USER; then
-    rm -r -f $ADAM_USER
-  fi
+if test ! -d $ADAM_USER; then
   mkdir -p $ADAM_USER
+fi
 
 #  Make sure we remove this all on exit.
-  trap 'rm -r -f $ADAM_USER;exit' 0 1 2 3 9 15
-
-#  Set the BLT_LIBRARY variable. This is needed to locate some .pro files.
-  BLT_LIBRARY=$GAIA_DIR
-  export BLT_LIBRARY
+trap 'rm -r -f $ADAM_USER;exit' 0 1 2 3 9 15
 
 #  Cywgin setup. Need "server" in CYGWIN for cygserver to work.
-  if test "$CYGWIN" = ""; then
+if test "$CYGWIN" = ""; then
      CYGWIN="server"
-  else
+else
      CYGWIN="$CYGWIN server"
-  fi
-  export CYGWIN
+fi
+export CYGWIN
 
 #  Set LD_LIBRARY_PATH or DYLD_LIBRARY_PATH to include the installation
 #  directories. Makes sure we pick up the right Tcl/Tk shareable libraries.
-  if test "$DYLD_LIBRARY_PATH" = ""; then
+if test "$DYLD_LIBRARY_PATH" = ""; then
      export LD_LIBRARY_PATH
      if test "$LD_LIBRARY_PATH" = ""; then
-        LD_LIBRARY_PATH="@sharelibdir@"
+      LD_LIBRARY_PATH="$BASE_DIR/lib:@sharelibdir@"
      else
-        LD_LIBRARY_PATH="@sharelibdir@:$LD_LIBRARY_PATH"
+      LD_LIBRARY_PATH="$BASE_DIR/lib:@sharelibdir@:$LD_LIBRARY_PATH"
      fi
-  else 
+else 
      export DYLD_LIBRARY_PATH
      if test "$DYLD_LIBRARY_PATH" = ""; then
-        DYLD_LIBRARY_PATH="@sharelibdir@"
+      DYLD_LIBRARY_PATH="$BASE_DIR/lib:@sharelibdir@"
      else
-        DYLD_LIBRARY_PATH="@sharelibdir@:$LD_LIBRARY_PATH"
+      DYLD_LIBRARY_PATH="$BASE_DIR/lib:@sharelibdir@:$LD_LIBRARY_PATH"
      fi
-  fi  
-
-#  And run up the interface.
-  $GAIA_DIR/gaia_swish ${1+"$@"} -tabbedgaia 1
-
-else
-  echo "!! Cannot start gaia; failed to locate $GAIA_DIR/gaia_swish."
-  exit 1
 fi
+
+#  Run up GAIA.
+test -d $HOME/.skycat || mkdir $HOME/.skycat
+echo "`date`: Starting GAIA with: $0 ${1+"$@"}" > $HOME/.skycat/log
+exec $GAIA_DIR/gaia_wish $BASE_DIR/lib/gaia@TCL_PACKAGE_VERSION@/gaiaMain.tcl ${1+"$@"} -tabbedgaia 1 | tee -a $HOME/.skycat/log 2>&1
+exit

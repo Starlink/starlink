@@ -9,7 +9,8 @@ SCRIPTS_GAIA = displaycat displaypolcat gaia.csh gaiacmap.sh gaiacut \
 
 ##  Edit the main startup scripts so that they set the LD_LIBRARY_PATH
 ##  to include the installation libdir.
-edit = sed -e 's%@sharelibdir\@%$(libdir)%g'
+edit = sed -e 's%@sharelibdir\@%$(libdir)%g' \
+           -e 's%@TCL_PACKAGE_VERSION\@%$(TCL_PACKAGE_VERSION)%g'
 
 gaia.sh: $(srcdir)/gaia.sh.in
 	rm -f gaia.sh gaia.sh.tmp
