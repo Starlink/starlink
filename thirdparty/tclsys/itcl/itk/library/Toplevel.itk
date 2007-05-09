@@ -24,7 +24,7 @@
 #            mmclennan@lucent.com
 #            http://www.tcltk.com/itcl
 #
-#      RCS:  $Id: Toplevel.itk,v 1.2 2002/06/13 22:46:28 davygrvy Exp $
+#      RCS:  $Id: Toplevel.itk,v 1.1 2003/08/19 17:31:17 pdraper Exp $
 # ----------------------------------------------------------------------
 #            Copyright (c) 1993-1998  Lucent Technologies, Inc.
 # ======================================================================
@@ -35,17 +35,38 @@ itcl::class itk::Toplevel {
     inherit itk::Archetype
 
     constructor {args} {
+
+        puts "Using GAIA Toplevel"
+
         #
         #  Create a toplevel window with the same name as this object
         #
         set itk_hull [namespace tail $this]
         set itk_interior $itk_hull
 
-        itk_component add hull {
-            toplevel $itk_hull -class [namespace tail [info class]]
-        } {
-            keep -background -cursor -takefocus
+        #  The -use option can only be applied when the toplevel is
+        # created. So we need to by-pass the usual passing mechanisms
+        # and apply it now.
+        global ::gaiauseid
+        if { ! [info exists gaiauseid] } {
+           set gaiauseid {}
         }
+
+        if { $gaiauseid != {} } {
+           itk_component add hull {
+              toplevel $itk_hull -class [namespace tail [info class]] \
+                 -use $gaiauseid
+           } {
+              keep -background -cursor -takefocus
+           }
+        } else {
+           itk_component add hull {
+              toplevel $itk_hull -class [namespace tail [info class]]
+           } {
+              keep -background -cursor -takefocus
+           }
+        }
+        set gaiauseid {}
         bind itk-delete-$itk_hull <Destroy> "itcl::delete object $this"
 
         set tags [bindtags $itk_hull]
@@ -63,22 +84,11 @@ itcl::class itk::Toplevel {
             }
             destroy $itk_hull
         }
-        itk_component delete hull
-
-        set components [component]
-        foreach component $components {
-            set path($component) [component $component]
-        }
-        foreach component $components {
-            if {[winfo exists $path($component)]} {
-                destroy $path($component)
-            }
-        }
     }
 
     itk_option define -title title Title "" {
         wm title $itk_hull $itk_option(-title)
     }
-
+   
     private variable itk_hull ""
 }
