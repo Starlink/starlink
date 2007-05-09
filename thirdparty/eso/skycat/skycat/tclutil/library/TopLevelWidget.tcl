@@ -28,6 +28,9 @@
 #                            top-level window to get the focus on
 #                            exit, even when it didn't have the focus
 #                            to start with (causing unintended grab).
+# P.W.Draper      09 May 07  Make HelpWin class a public common variable
+#                            so it can be changed (not possible to sub-
+#                            class and override).
 
 
 itk::usual TopLevelWidget {}
@@ -396,8 +399,8 @@ itcl::class util::TopLevelWidget {
 
     public method show_help {file} {
 	if { $file != {} } {
-	    if { ! [winfo exists $help_window_] } {
-		set help_window_ [util::HelpWin \#auto -file $file]
+            if { ! [winfo exists $help_window_] } {
+                set help_window_ [eval $help_window_class \#auto -file "$file"]
 	    }
 	    $help_window_ display
 	}
@@ -800,6 +803,9 @@ itcl::class util::TopLevelWidget {
     protected variable popup_windows_ {}
 
     # -- common variables (once per class) --
+
+    # the class used to instantiate a help window
+    public common help_window_class util::HelpWin
 
     # optional tcl command to eval for each TopLevelWidget created
     protected common command_ {}
