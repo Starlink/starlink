@@ -67,7 +67,7 @@ void findback( int *status ){
 
 *  ADAM Parameters:
 *     BOX() = _INTEGER (Read)
-*        The dimensions of each of the filtes, in pixels. Each value
+*        The dimensions of each of the filters, in pixels. Each value
 *        should be odd (if an even value is supplied, the next higher odd
 *        value will be used). The number of values supplied should not 
 *        exceed the number of pixel axes in the input array. If any trailing 
