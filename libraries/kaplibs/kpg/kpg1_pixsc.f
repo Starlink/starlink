@@ -32,11 +32,15 @@
 *        longitude and latitude axes are returned as an arc-distance in
 *        radians. The array should have one element for each WCS axis.
 *     VALUE( * ) = CHARACTER( * ) (Returned)
-*        The formatted pixel scales. These are formatted using the axes 
-*        Format attributes in the current WCS Frame, except that celestial 
-*        longitude axes are formatted using the Format attribute of the 
-*        corresponding latitude axis. The array should have one element
-*        for each WCS axis.
+*        The formatted pixel scales. Celestial axes are formatted as
+*        arc-seconds using a "G15.6" format. Time values are also formatted 
+*        using G15.6 (the Format attribute in the current WCS Frame is
+*        ignored, since it may produce a calendar date), in what ever
+*        units are indicated in the current Frame. Other types of 
+*        axes (including spectral axes) are formatted using the axis Format 
+*        attribute in the current WCS Frame. The array should have one 
+*        element for each WCS axis. Each element of the array should be at 
+*        least 15 characters long. The returned text is left justified.
 *     UNIT( * ) = CHARACTER( * ) (Returned)
 *        Units strings that describe the values returned in VALUES. The
 *        array should have one element for each WCS axis.
@@ -73,7 +77,8 @@
 *     5-MAY-2007 (DSB):
 *        Check both transformations are available.
 *     8-MAY-2007 (DSB):
-*        Correct initialisation of SKYFRAME.
+*        - Correct initialisation of SKYFRAME.
+*        - Format celestial axes as arc-seconds, and time axes as seconds.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -104,7 +109,8 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER ATTR*20       
+      CHARACTER ATTR*20
+      CHARACTER DOM*30
       DOUBLE PRECISION ATWCS( NDF__MXDIM )
       DOUBLE PRECISION DPIX
       DOUBLE PRECISION DWCS
@@ -112,17 +118,18 @@
       DOUBLE PRECISION OUT( 2, NDF__MXDIM )
       DOUBLE PRECISION Q( NDF__MXDIM )
       DOUBLE PRECISION QGRID( NDF__MXDIM )
+      DOUBLE PRECISION XIN( 2 )
+      DOUBLE PRECISION XOUT( 2 )
       INTEGER FAXIS
       INTEGER FGRID
       INTEGER FWCS
       INTEGER I
       INTEGER IAT
-      INTEGER LATAX
-      INTEGER LONAX
       INTEGER MAP
       INTEGER NPIX
       INTEGER NWCS
-      INTEGER SKYFRAME
+      INTEGER OUTAX( NDF__MXDIM )
+      INTEGER OMAP
 *.
 
 *  Check the inherited global status.
@@ -140,18 +147,8 @@
       FWCS = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
       MAP = AST_GETMAPPING( IWCS, AST__BASE, AST__CURRENT, STATUS )
 
-*  Check the Mapping has both forward and inverse transformations.
-      IF( AST_GETL( MAP, 'TranForward', STATUS ) .AND.
-     :    AST_GETL( MAP, 'TranInverse', STATUS ) ) THEN
-
-*  See if the current Frame contains a SkyFrame. If so, the indices
-*  (within the current Frame) of the longitude and latitude axes are
-*  returned, together with a pointer to the SkyFrame.
-         CALL ATL_FINDSKY( FWCS, SKYFRAME, LATAX, LONAX, STATUS )
-
-*  We do not need the SkyFrame so annul it.
-         IF( SKYFRAME .NE. AST__NULL ) CALL AST_ANNUL( SKYFRAME, 
-     :                                                 STATUS )
+*  Check the Mapping has an inverse transformation.
+      IF( AST_GETL( MAP, 'TranInverse', STATUS ) ) THEN
 
 *  Store the supplied AT position and another point that is 1 pixel away
 *  from AT along each grid axis.
@@ -194,24 +191,44 @@
      :          DPIX .NE. 0.0 ) THEN
                PIXSC( I ) = DWCS/DPIX
 
-*  If this is a celestial longitude axis, we format it as a celestial
-*  latitude value in order to get a degrees arc-distance value.
-               IF( I .EQ. LONAX ) THEN
-                  FAXIS = LATAX
+*  Get the Domain of the primary Frame defining the current axis.
+               ATTR = 'Domain('
+               IAT = 7
+               CALL CHR_PUTI( I, ATTR, IAT )
+               CALL CHR_APPND( ')', ATTR, IAT )
+               DOM = AST_GETC( FWCS, ATTR( : IAT ), STATUS )
+
+*  If this is a celestial axis, we convert from radians to arc-seconds
+*  and format with a fixed format specifier.
+               IF( DOM .EQ. 'SKY' ) THEN
+                  WRITE( VALUE( I ), '(G15.6)' ) PIXSC( I )*
+     :                                           AST__DR2D*3600.0
+                  CALL CHR_LDBLK( VALUE( I ) )
+
+                  UNIT( I ) = 'arc-sec'
+
+*  If this is time, we ignore the Format since it may be set to format as
+*  a  calendar date.
+               ELSE IF( DOM .EQ. 'TIME' ) THEN
+                  WRITE( VALUE( I ), '(G15.6)' ) PIXSC( I )
+                  CALL CHR_LDBLK( VALUE( I ) )
+
+                  ATTR = 'Unit('
+                  IAT = 5
+                  CALL CHR_PUTI( I, ATTR, IAT )
+                  CALL CHR_APPND( ')', ATTR, IAT )
+                  UNIT( I ) = AST_GETC( FWCS, ATTR( : IAT ), STATUS )
 
 *  All other axes are formatted using their own Format attribute.
                ELSE
-                  FAXIS = I
-               END IF
+                  VALUE( I ) = AST_FORMAT( FWCS, I, PIXSC( I ), STATUS )
 
-*  Format the value and get the units string.
-               VALUE( I ) = AST_FORMAT( FWCS, FAXIS, PIXSC( I ), 
-     :                                  STATUS )
-               ATTR = 'Unit('
-               IAT = 5
-               CALL CHR_PUTI( FAXIS, ATTR, IAT )
-               CALL CHR_APPND( ')', ATTR, IAT )
-               UNIT( I ) = AST_GETC( FWCS, ATTR( : IAT ), STATUS )
+                  ATTR = 'Unit('
+                  IAT = 5
+                  CALL CHR_PUTI( I, ATTR, IAT )
+                  CALL CHR_APPND( ')', ATTR, IAT )
+                  UNIT( I ) = AST_GETC( FWCS, ATTR( : IAT ), STATUS )
+               END IF
 
             ELSE
                PIXSC( I ) = AST__BAD
@@ -224,13 +241,79 @@
 
          END DO      
 
-*  If the Mapping is missing one of the transformations, return null values.
+*  If the Mapping is missing an inverse transformation, we may still be
+*  able to deal with WCS axes that correspond with a single pixel axis.
       ELSE
 
-        DO I = 1, NWCS
-           PIXSC( I ) = AST__BAD
-           VALUE( I ) = '<cannot evaluate>'
-           UNIT( I ) = ' '
+         DO I = 1, NWCS
+
+*  Initialise the scale to unknwon.
+            PIXSC( I ) = AST__BAD
+            VALUE( I ) = '<undefined>'
+            UNIT( I ) = ' '
+
+*  Attempt to split off the current axis form the Mapping
+            CALL AST_MAPSPLIT( MAP, 1, I, OUTAX, OMAP, STATUS )
+            IF( OMAP .NE. AST__NULL ) then
+               IF( AST_GETI( OMAP, 'Nout', STATUS ) .EQ. 1 ) THEN
+
+*  Transform a one pixel gap into WCS coords.
+                  XIN( 1 ) = AT( 1 )
+                  XIN( 2 ) = AT( I ) + 1.0
+                  CALL AST_TRAN1( OMAP, 2, XIN, .TRUE., XOUT, STATUS )
+
+*  Find and return the axis scale.
+                  IF( XOUT( 1 ) .NE. AST__BAD .AND. 
+     :                XOUT( 2 ) .NE. AST__BAD ) THEN
+                     PIXSC( I ) = ABS( XOUT( 2 ) - XOUT( 1 ) )
+
+
+*  Get the Domain of the primary Frame defining the current axis.
+                     ATTR = 'Domain('
+                     IAT = 7
+                     CALL CHR_PUTI( I, ATTR, IAT )
+                     CALL CHR_APPND( ')', ATTR, IAT )
+                     DOM = AST_GETC( FWCS, ATTR( : IAT ), STATUS )
+
+*  If this is a celestial axis, we convert from radians to arc-seconds
+*  and format with a fixed format specifier.
+                     IF( DOM .EQ. 'SKY' ) THEN
+                        WRITE( VALUE( I ), '(G15.6)' ) PIXSC( I )*
+     :                                           AST__DR2D*3600.0
+                        CALL CHR_LDBLK( VALUE( I ) )
+
+                        UNIT( I ) = 'arc-sec'
+
+*  If this is time, we ignore the Format since it may be set to format as
+*  a  calendar date.
+                     ELSE IF( DOM .EQ. 'TIME' ) THEN
+                        WRITE( VALUE( I ), '(G15.6)' ) PIXSC( I )
+                        CALL CHR_LDBLK( VALUE( I ) )
+
+                        ATTR = 'Unit('
+                        IAT = 5
+                        CALL CHR_PUTI( I, ATTR, IAT )
+                        CALL CHR_APPND( ')', ATTR, IAT )
+                        UNIT( I ) = AST_GETC( FWCS, ATTR( : IAT ), 
+     :                                        STATUS )
+
+*  All other axes are formatted using their own Format attribute.
+                     ELSE
+                         VALUE( I ) = AST_FORMAT( FWCS, I, PIXSC( I ), 
+     :                                            STATUS )
+
+                        ATTR = 'Unit('
+                        IAT = 5
+                        CALL CHR_PUTI( I, ATTR, IAT )
+                        CALL CHR_APPND( ')', ATTR, IAT )
+                        UNIT( I ) = AST_GETC( FWCS, ATTR( : IAT ), 
+     :                                        STATUS )
+                     END IF
+
+                  END IF
+              END IF
+              CALL AST_ANNUL( OMAP, STATUS )
+           END IF
         END DO
 
       END IF
