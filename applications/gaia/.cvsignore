@@ -20,3 +20,9 @@ sun214.ps
 sun214.toc
 make.log
 make.log.err
+componentinfo.dtd
+config.*
+install-sh
+ltmain.sh
+missing
+depcomp
