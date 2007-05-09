@@ -834,6 +834,7 @@ $(MANIFESTS)/gaia: \
 		$(MANIFESTS)/prm \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
+		$(MANIFESTS)/skycat \
 		$(MANIFESTS)/sla \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
