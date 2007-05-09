@@ -307,11 +307,12 @@
             END IF
 
 *  Assuming this is a column with angle data. This is either an RA or
-*  DEC. If qualified by {HOURS} or the name is some variation of
+*  DEC. If qualified by {HOURS}, {HMS or the name is some variation of
 *  RA/Ra/r.a./Rightxxx/alphaxxx, then assume RA, otherwise it is a
 *  DEC. Note we need both of these to have a valid match, but we don't
 *  check for that. 
-            IF ( UNITS( 8: ) .EQ. '{hours}' ) THEN
+            IF ( UNITS( 8: ) .EQ. '{hours}' .OR.
+     :           UNITS( 8:11 ) .EQ. '{hms' ) THEN
                IF ( RACOL .EQ. -1 ) RACOL = I - 1
             ELSE
                LNAME = NAME
