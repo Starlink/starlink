@@ -1,0 +1,176 @@
+#!/star/Perl/bin/perl
+
+=head1 NAME
+
+dumpcfg - Retrieve OCS Configuration from data file
+
+=head1 SYNOPSIS
+
+  dumpocscfg a20070105_00050_01_0001.sdf
+
+=head1 DESCRIPTION
+
+Searches for the OCS configuration in the file (if present) and writes
+it to standard output. If the configuration is not present in the file
+(older data will not contain it) the OCS configuration name is
+retrieved and an attempt made to locate the file on the file system
+(only valid at JAC).
+
+=head1 OPTIONS
+
+The following options are supported:
+
+=over 4
+
+=item B<-help>
+
+Print help information.
+
+=item B<-version>
+
+Print version information.
+
+=item B<-man>
+
+Print the full documentation to STDOUT.
+
+=back
+
+=cut
+
+use strict;
+use warnings;
+use NDF;
+use Astro::Coords::Angle::Hour;
+use Astro::FITS::Header::NDF;
+
+use Getopt::Long;
+use Pod::Usage;
+
+my ($help, $man, $version);
+my $ostatus = GetOptions( "help" => \$help,
+			 "man" => \$man,
+			 "version" => \$version
+			 );
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose =>2) if $man;
+if ($version) {
+    my $id = '$Id$';
+    print "dumpocscfg - Display OCS configuration XML\n";
+    print " CVS revision: $id\n";
+    exit;
+}
+
+
+my @files = @ARGV;
+
+my %DATA;
+my $status = &NDF::SAI__OK;
+my $isfirst = 1;
+my $isfirst_file = 1;
+my @columns;
+my %cols;
+err_begin($status );
+for my $f (@files) {
+    # just open with HDS
+    my $status = &NDF::SAI__OK;
+    hds_open( $f, "READ", my $loc, $status);
+    dat_find( $loc, "MORE", my $mloc, $status);
+    my $config = '';
+
+    # Now look for JCMTOCS
+    dat_there( $mloc, "JCMTOCS", my $isthere, $status);
+    if ($isthere) {
+      dat_find( $mloc, "JCMTOCS", my $jloc, $status);
+      dat_find( $jloc, "CONFIG", my $cloc, $status );
+      dat_annul( $jloc, $status);
+
+      dat_get0c( $cloc, $config, $status );
+      chomp($config);
+      dat_annul($cloc, $status );
+    } elsif ($status == &NDF::SAI__OK) {
+      print STDERR "# Configuration not stored in file. Checking headers\n";
+
+      # clean up from previous attempt
+      dat_annul($mloc, $status);
+      dat_annul($loc, $status);
+
+      # Get the FITS header
+      my $hdr = new Astro::FITS::Header::NDF( File => $f );
+      my $cfgname = $hdr->value("OCSCFG");
+
+      # Now look for the item
+      if ($cfgname) {
+	print STDERR "# Looking for OCS configuration $cfgname\n";
+
+	# Can be in two places
+	# /jcmtdata/orac_data/ocsconfigs/
+	# /jcmtdata/raw/acsis/spectra/YYYYMMDD/ocsconfigs/
+	# - ACSIS specific
+	
+	my $path;
+	if (-e File::Spec->catfile( "/jcmtdata/orac_data/ocsconfigs",
+				    $cfgname)) {
+
+	 $path = File::Spec->catfile( "/jcmtdata/orac_data/ocsconfigs",
+				      $cfgname);
+
+	} else {
+	  # more work required
+	  my $inst = $hdr->value("INSTRUME");
+	  my $date = $hdr->value("UTDATE");
+	  my $root;
+	  if ($inst ne "SCUBA-2") {
+	    # assume ACSIS if not SCUBA-2
+	    $root = "/jcmtdata/raw/acsis/spectra/$date/ocsconfigs";
+	  } 
+
+	  if ($root && -e File::Spec->catfile($root, $cfgname)) {
+	    $path = File::Spec->catfile($root, $cfgname);
+	  }
+
+	}
+
+	if ($path) {
+	  open my $fh, "<$path" || die "Tried to open $path but failed: $!";
+	  my @lines = <$fh>;
+	  $config = join("", @lines);
+	  close $fh || die "Error closing $path: $!";
+	} else {
+	  print STDERR "# Unable to locate configuration file $cfgname on disk\n";
+	}
+
+      }
+
+    }
+    print $config ."\n" if $config;
+
+
+    last if $status != &NDF::SAI__OK;
+}
+err_end( $status );
+
+
+
+=head1 AUTHOR
+
+Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>
+
+Copyright (C) 2007 Science and Technology Facilities Council.
+All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place,Suite 330, Boston, MA  02111-1307, USA
+
+=cut
+
