@@ -158,6 +158,8 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 *     26-JAN-2007 (DSB):
 *        Assign units of "rad" to SkyAxis columns, so that they can be
 *        converted to "deg" easily later on (using active units).
+*     8-MAY-2007 (DSB):
+*        Fix bug in conversion of non-sky axis values from pixel to wcs.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -206,10 +208,10 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
    int px;                  /* X pixel index at peak value */
    int py;                  /* Y pixel index at peak value */
    int pz;                  /* Z pixel index at peak value */
-   int skyaxis[ 3 ];        /* Flags indicating which axes are skyaxes */
    int there;               /* Has the NDF got a CUPID extension? */
    int ubnd[ 3 ];           /* Upper NDF pixel bounds */   
 
+   static int skyaxis[ 3 ]; /* Flags indicating which axes are skyaxes */
    static const char *pnames[ MXPAR ];  /* Parameter names to return */
    static char name_buf[ MXPAR ][ MXNAMLEN ];/* Buffers for parameter names */
    static const char *punits[ MXPAR ];  /* Parameter units to return */
@@ -587,10 +589,12 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 /* Scale the clump volume from cubic pixel into WCS units. */
          ret[ 3*ndim + 2 ] *= pixvol;
 
-/* Convert the positions from rads to degs. */
+/* Convert sky positions from rads to degs. */
          for( i = 0; i < ndim; i++ ) {
-            ret[ i ] *= AST__DR2D;
-            ret[ ndim + i ] *= AST__DR2D;
+            if( skyaxis[ i ] ) {
+               ret[ i ] *= AST__DR2D;
+               ret[ ndim + i ] *= AST__DR2D;
+            }
          }
       }
    }
