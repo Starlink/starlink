@@ -59,23 +59,12 @@ dnl    Setup headers for defined macros.
 AC_CONFIG_HEADERS(config.h)
 
 dnl    To configure the gaia component, which is modelled on the skycat
-dnl    TEA-based Tcl system we just run ./configure in the gaia subdirectory.
-dnl    Look for --disable-shared and pass it on when configuring.
-star_extra_items="--with-starlink=$STARLINK"
-for ac_arg in $ac_configure_args; do
-   case $ac_arg in 
-      *-disable-shared*)
-         star_extra_items="$star_extra_items --disable-shared"
-      ;;
-   esac
-done
-export star_extra_items
-
-
-(
-    cd gaia
-    ./configure --prefix=$prefix $star_extra_items --cache-file=../config.cache
-)
+dnl    TEA-based Tcl system we would like to just run ./configure in the gaia
+dnl    subdirectory, but it has some configure dependencies that may not
+dnl    be available yet, so it's deferred until make time (see teagaia).
+CONFIGURE_ARGS="$ac_configure_args"
+export CONFIGURE_ARGS
+AC_SUBST(CONFIGURE_ARGS)
 
 dnl    Need to determine the suffix for shareable libraries, as used by
 dnl    Tcl, so we can link against the GAIA dynamic library.
@@ -101,7 +90,7 @@ AC_SUBST(TCL_PACKAGE_VERSION)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
-AC_CONFIG_FILES([Makefile component.xml tasks/Makefile scripts/Makefile])
+AC_CONFIG_FILES([Makefile component.xml tasks/Makefile scripts/Makefile teagaia/Makefile])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
