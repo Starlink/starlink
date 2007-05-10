@@ -1,4 +1,5 @@
-      SUBROUTINE KPG1_WCFAX( INDF, FS, AXIS, EL, CENTRE, STATUS )
+      SUBROUTINE KPG1_WCFAX( LBND, UBND, MAP, JAXIS, IAXIS, CENTRE, 
+     :                       WORK, STATUS )
 *+
 *  Name:
 *     KPG1_WCFAX
@@ -11,26 +12,34 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_WCFAX( INDF, FS, AXIS, EL, CENTRE, STATUS )
+*     CALL KPG1_WCFAX( LBND, UBND, MAP, JAXIS, IAXIS, CENTRE, WORK, 
+*                      STATUS )
 
 *  Description:
 *     This routine returns the world co-ordinate along a nominated WCS
-*     axis for each pixel centre of the supplied NDF.  The co-ordinates 
-*     are defined within the current Frame in the supplied FrameSet. 
+*     axis for each pixel centre of an NDF.  The co-ordinates are defined 
+*     within the current Frame in the supplied FrameSet. It is assumed
+*     that the nominated axis is independent of the other axes.
 
 *  Arguments:
-*     INDF = INTEGER (Given)
-*        The NDF identifier.
-*     FS = INTEGER (Given)
-*        An AST pointer for a FrameSet.
-*     AXIS = INTEGER (Given)
-*        The number of the WCS axis whose co-ordinates are to be
-*        returned.
-*     EL = INTEGER (Given)
-*        The number of elements in the co-ordinate array.
-*     CENTRE( EL ) = DOUBLE PRECISION (Returned)
-*        The current-Frame co-ordinate along the nominated WCS axis
-*         at each pixel centre.
+*     LBND( * ) = INTEGER (Given)
+*        The lower pixel index bounds of the NDF. This array should have 
+*        one element for each NDF pixel axis.
+*     UBND( * ) = INTEGER (Given)
+*        The upper pixel index bounds of the NDF. This array should have 
+*        one element for each NDF pixel axis.
+*     MAP = INTEGER (Given)
+*        Mapping from PIXEL coords in the NDF to current WCS coords.
+*     JAXIS = INTEGER (Given)
+*        The number of the pixel axis which is varied.
+*     IAXIS = INTEGER (Given)
+*        The number of the WCS axis whose values are returned.
+*     CENTRE( * ) = DOUBLE PRECISION (Returned)
+*        The current-Frame co-ordinate along the nominated axis at each 
+*        pixel centre. The size and shape of this array should be the
+*        same as the NDF.
+*     WORK( * ) = DOUBLE PRECISION (Returned)
+*        A work array with the same length as the requested pixel axis.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -73,6 +82,9 @@
 *     2006 February 15 (MJC):
 *        Set expansion factors to 1 for unused duimensions up to
 *        NDF__MXDIM.
+*     10-MAY-2007 (DSB):
+*        Re-written to use a specified range of GRID coords, and to be
+*        simpler.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -90,40 +102,28 @@
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
-      INTEGER INDF
-      INTEGER FS
-      INTEGER AXIS
-      INTEGER EL
+      INTEGER LBND( * )
+      INTEGER UBND( * )
+      INTEGER MAP
+      INTEGER JAXIS
+      INTEGER IAXIS
 
 *  Arguments Returned:
-      DOUBLE PRECISION CENTRE( EL )
+      DOUBLE PRECISION CENTRE( * )
+      DOUBLE PRECISION WORK( * )
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER DIMS( NDF__MXDIM ) ! Dimensions of the NDF
-      INTEGER EXPAND( NDF__MXDIM ) ! Expansion factors for 1-to-1
-                                 ! mapping
-      INTEGER IAX                ! Axes loop counter
-      INTEGER ICURR              ! Index of Current Frame 
-      INTEGER IERR               ! Position of first numerical error
-      INTEGER IGRID              ! Index of the GRID Frame
-      INTEGER IPCOIN             ! Pointer to mapped grid co-ordinates
-      INTEGER IPCOUT             ! Pointer to mapped current-Frame
-                                 ! co-ordinates
-      INTEGER MAP1               ! n-D GRID to n-D Current mapping
-      INTEGER MAP1T1             ! 1-D GRID to 1-D Current mapping
-      INTEGER MAP2               ! n-D to 1-D mapping
-      INTEGER MAP3               ! n-D GRID to 1-D Current mapping
-      INTEGER MASK               ! Dummy
-      INTEGER NAX                ! Number of WCS axes
-      INTEGER NDIM               ! Number of dimensions
-      INTEGER NERR               ! Number of numerical errors
-      INTEGER OUT( NDF__MXDIM )  ! Index of output Mapping
-      INTEGER PERM( NDF__MXDIM ) ! Indices to select 1-D
-      INTEGER VDIMS( NDF__MXDIM ) ! Dimensions of the vector
-
+      INTEGER EL                 ! Element index
+      INTEGER NEL                ! No. of elements in array
+      INTEGER I                  ! Loop counter
+      INTEGER NAXPIX             ! Number of pixel axes
+      INTEGER NAXWCS             ! Number of WCS axes
+      INTEGER PIND( NDF__MXDIM ) ! Pixel indices
+      DOUBLE PRECISION PPOS( NDF__MXDIM )! PIXEL position
+      DOUBLE PRECISION WPOS( NDF__MXDIM )! WCS position
 *.
 
 *  Check inherited global status.
@@ -133,129 +133,74 @@
 *  Frame of the supplied frameSet, and so must be in the range 1 to
 *  the number of axes in the current frame.  Note that this may not be
 *  the same as the number of pixel axes in the NDF.
-      NAX = AST_GETI( FS, 'Naxes', STATUS )
-      IF ( AXIS .LT. 1 .OR. AXIS .GT. NAX ) THEN
+      NAXWCS = AST_GETI( MAP, 'Nout', STATUS )
+      IF ( IAXIS .LT. 1 .OR. IAXIS .GT. NAXWCS ) THEN
          STATUS = SAI__ERROR
-         CALL NDF_MSG( 'NDF', INDF )
-         CALL MSG_SETI( 'AX', AXIS )
-         CALL MSG_SETI( 'N', NAX )
+         CALL MSG_SETI( 'AX', IAXIS )
+         CALL MSG_SETI( 'N', NAXWCS )
          CALL ERR_REP( 'KPG1_WCFAX',
-     :     'The chosen axis ^AX is not valid for ^NDF, which has ^N '/
-     :     /'WCS axes (probable programming error).', STATUS )
+     :     'The chosen WCS axis ^AX is not valid for the NDF, which '/
+     :     /'has ^N WCS axes (probable programming error).', STATUS )
          GOTO 999
       END IF
 
-*  Obtain the NDF dimensions.
-      CALL NDF_DIM( INDF, NDF__MXDIM, DIMS, NDIM, STATUS )
-
-*  Save the index of the original current Frame in the FrameSet, so 
-*  that it can be re-instated later.
-      ICURR = AST_GETI( FS, 'CURRENT', STATUS )
-
-*  Get the index of the GRID Frame.
-      IGRID = AST_GETI( FS, 'BASE', STATUS )
-
-*  Process the WCS axis in a separate AST context.
-      CALL AST_BEGIN( STATUS )
-
-*  We wish to map from the GRID Frame to the current Frame.  Thus
-*  we can substitute the FrameSet for the mapping.
-
-*  Get the mapping from the GRID Frame to the Current Frame.
-      MAP1 = AST_GETMAPPING( FS, IGRID, ICURR, STATUS )
-
-*  See if the mapping can be split, such that it only depends
-*  one input, that along the chosen WCS axis.
-      CALL AST_MAPSPLIT( MAP1, 1, AXIS, OUT, MAP1T1, STATUS )
-      IF ( MAP1T1 .NE. AST__NULL ) THEN 
-
-*  Obtain workspace to hold the input GRID co-ordinates.
-         CALL PSX_CALLOC( EL, '_DOUBLE', IPCOIN, STATUS )
-
-*  Obtain workspace to hold the output current-Frame co-ordinates.
-         CALL PSX_CALLOC( EL, '_DOUBLE', IPCOUT, STATUS )
-
-*  Check we can safely use %VAL on the pointer returned by PSX_CALLOC.
-         IF ( STATUS .NE. SAI__OK ) GOTO 990
-
-*  Fill the input array with GRID co-ordinates.
-         CALL KPG1_ELNMD( 1, DIMS( AXIS ), DIMS( AXIS ), 
-     :                    %VAL( CNF_PVAL( IPCOIN ) ), STATUS )
-
-*  Transform the vector to current-Frame co-ordinates.
-         CALL AST_TRAN1( MAP1T1, DIMS( AXIS ), 
-     :                   %VAL( CNF_PVAL( IPCOIN ) ), .TRUE.,
-     :                   %VAL( CNF_PVAL( IPCOUT ) ), STATUS )
-
-*  Duplicate this for all elements along the other pixel axes
-*  to fill the CENTRE array.  There is no expansion along the 
-*  chosen pixel axis.
-         DO IAX = 1, NDF__MXDIM
-            EXPAND( IAX ) = DIMS( IAX )
-         END DO
-         EXPAND( AXIS ) = 1
-
-*  Specify the dimension along which the vector resides, and
-*  the output dimensions.
-         DO IAX = 1, NDF__MXDIM
-            VDIMS( IAX ) = 1
-         END DO
-         VDIMS( AXIS ) = DIMS( AXIS )
-         CALL KPG1_PXDPD( VDIMS, %VAL( CNF_PVAL( IPCOUT ) ), EXPAND,
-     :                    .FALSE., MASK, DIMS, CENTRE, STATUS )
-
-*  This is a brute-force method, as it may demand considerable memory
-*  and ignores insignificant dimensions.
-      ELSE
-
-*  Obtain workspace to hold the input GRID co-ordinates.
-         CALL PSX_CALLOC( EL * NDIM, '_DOUBLE', IPCOIN, STATUS )
-
-*  Check we can safely use %VAL on the pointer returned by PSX_CALLOC.
-         IF ( STATUS .NE. SAI__OK ) GOTO 990
-
-*  Fill the input array with GRID co-ordinates.
-         CALL KPG1_FIGRD( NDIM, DIMS, EL, %VAL( CNF_PVAL( IPCOIN ) ),
-     :                    STATUS )
-
-*  Initialise the indices of the axes in the one-dimensional Frame
-*  corresponding to each axis in the n-dimensional Frame.  Since the
-*  axes are presumed to be independent of each other, it does not matter
-*  what values we use so long as the axis being processed is assigned
-*  the value 1.  We use AST PermMaps to pick the axis to process.
-         DO IAX = 1, NAX
-            PERM( IAX ) = 0
-         END DO
-         PERM( AXIS ) = 1
-
-*  MAP1 goes from n-dimensional GRID co-ordinates to n-dimensional 
-*  current co-ordinates.  We need a mapping that transforms
-*  n-dimensional GRID co-ordinates to a one-dimensional co-ordinates
-*  along the specified axis.  So we want to modify MAP1 such that it
-*  maps only a single axis.  To do this we add a PermMap to the input
-*  and output of MAP1, that selects only the required axis.  Create a 
-*  PermMaps to extract axis AXIS from an n-dimensional Frame; MAP2 goes
-*  from n-dimensional to one-dimensional.
-         MAP2 = AST_PERMMAP( NDIM, PERM, 1, AXIS, 0.0D0, ' ', STATUS )
-
-*  Concatenate the Mappings together, to get a mapping between axis
-*  AXIS in the GRID Frame to the same axis in the current Frame.
-         MAP3 = AST_CMPMAP( MAP1, MAP2, .TRUE., ' ', STATUS )
-
-*  Transform the GRID co-ordinates to current-Frame co-ordinates at
-*  each pixel of the NDF.
-         CALL AST_TRANN( MAP3, EL, NDIM, EL, %VAL( CNF_PVAL( IPCOIN ) ),
-     :                   .TRUE., 1, EL, CENTRE, STATUS )
+*  Validate the pixel axis.
+      NAXPIX = AST_GETI( MAP, 'Nin', STATUS )
+      IF ( JAXIS .LT. 1 .OR. JAXIS .GT. NAXPIX ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETI( 'AX', JAXIS )
+         CALL MSG_SETI( 'N', NAXPIX )
+         CALL ERR_REP( 'KPG1_WCFAX',
+     :     'The chosen pixel axis ^AX is not valid for the NDF, which'/
+     :     /'has ^N pixel axes (probable programming error).', STATUS )
+         GOTO 999
       END IF
 
-  990 CONTINUE
+*  Store the PIXEL coords at the centre of the NDF. Since each WCS axis is
+*  assumed to depend only on the specified pixel axis, the other pixel
+*  axes can be set to any arbitrary value. ALso find the total number of
+*  elements in the array.
+      NEL = 1
+      DO I = 1, NAXPIX
+         PPOS( I ) = 0.5*( LBND( I ) + UBND( I ) - 1 )
+         NEL = NEL*( UBND( I ) - LBND( I ) + 1 )
+      END DO
 
-*  End the AST context.
-      CALL AST_END( STATUS )
+*  Loop round the range of PIXEL values on the pixel axis being used.
+      DO I = LBND( JAXIS ), UBND( JAXIS )
+         PPOS( JAXIS ) = DBLE( I ) - 0.5D0
 
-*  Re-instate the original current Frame.
-      CALL AST_SETI( FS, 'CURRENT', ICURR, STATUS )
+*  Transform into current frame coords
+         CALL AST_TRANN( MAP, 1, NAXPIX, 1, PPOS, .TRUE., NAXWCS, 
+     :                   1, WPOS, STATUS )
 
-  999 CONTINUE
+*  Store the required WCS axis value
+         WORK( I - LBND( JAXIS ) + 1 ) = WPOS( IAXIS )
+      END DO
+
+*  Now copy the values into the 1D work array into the 3D CENTRE array.
+*  First initialise the pixel indices of the first pixel in the N-d array.
+      DO I = 1, NAXPIX
+         PIND( I ) = LBND( I )
+      END DO
+
+*  Loop round all the pixels in the N-d array
+      DO EL = 1, NEL
+
+*  Store the coordinate value.
+         CENTRE( EL ) = WORK( PIND( JAXIS ) - LBND( JAXIS ) + 1 )
+
+*  Store the pixel indices of the next pixel in the N-d array.
+         PIND( 1 ) = PIND( 1 ) + 1
+         I = 1
+         DO WHILE( PIND( I ) .GT. UBND( I ) .AND. I .LT. NAXPIX  ) 
+            PIND( I ) = LBND( I )
+            I = I + 1
+            PIND( I ) = PIND( I ) + 1
+         END DO
+
+      END DO
+
+ 999  CONTINUE
 
       END
