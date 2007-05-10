@@ -111,6 +111,8 @@
 *        Modified to use AST instead of linear coeffs.
 *     18-JUL-2001 (DSB):
 *        Modified for ARD version 2.0.
+*     10-MAY-2007 (DSB):
+*        New argument list for ARD1_RDCOF.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -290,7 +292,7 @@
 *  delete it.
          ELSE IF( TYPE .EQ. ARD__COF ) THEN
             IF( UWCS .NE. AST__NULL ) CALL AST_ANNUL( UWCS, STATUS )
-            CALL ARD1_RDCOF( NDIM, IGRP, UWCS, STATUS )
+            CALL ARD1_RDCOF( NDIM, IGRP, AWCS, UWCS, STATUS )
             CALL GRP_DELET( IGRP, STATUS )
 
 *  If it is a COEFFS statement, create a new UWCS from the coefficients.

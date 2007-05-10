@@ -165,6 +165,7 @@
      :                 'align the positions in the supplied ARD '//
      :                 'expression with the pixel data.', STATUS )
          GO TO 999
+
       END IF
 
 *  Note indices of Frames in which alignment occurred.

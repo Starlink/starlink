@@ -316,6 +316,7 @@
 
 *  If the argument list is complete, store the number of values added
 *  to the operand stack, at the index supplied in argument PNARG.
+
          IF( .NOT. KEYW ) THEN
             CALL ARD1_STORD( DBLE( IOPND - IOPND0 ), SZOPND, PNARG, 
      :                       IPOPND, STATUS )

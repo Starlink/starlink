@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_RDCOF( NDIM, IGRP, UWCS, STATUS )
+      SUBROUTINE ARD1_RDCOF( NDIM, IGRP, AWCS, UWCS, STATUS )
 *+
 *  Name:
 *     ARD1_RDCOF
@@ -10,18 +10,20 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_RDCOF( NDIM, IGRP, UWCS, STATUS )
+*     CALL ARD1_RDCOF( NDIM, IGRP, AWCS, UWCS, STATUS )
 
 *  Description:
 *     This routine reads the supplied arguments to the COFRAME statement 
-*     and creates a FrameSet containing the single Frame or SkyFrame 
-*     decribed by the COFRAME statement. 
+*     and creates a FrameSet containing the single Frame decribed by the 
+*     COFRAME statement. 
 
 *  Arguments:
 *     NDIM = INTEGER (Given)
 *        The number of axes required in the Current Frame.
 *     IGRP = INTEGER (Given)
 *        A GRP identifier for the supplied group.
+*     AWCS = INTEGER (Given)
+*        An AST pointer to the application WCS FrameSet.
 *     UWCS = INTEGER (Returned)
 *        An AST pointer to the returned Object. AST__NULL is returned if 
 *        an error occurs.
@@ -56,7 +58,9 @@
 *     17-JUL-2001 (DSB):
 *        Original version.
 *     10-MAY-2007 (DSB):
-*        Extend the range of AST Frame classes that are supported.
+*        - Extend the range of AST Frame classes that are supported.
+*        - Correct interpretation of extra attribute settings.
+*        - Aded argument AWCS.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -76,6 +80,7 @@
 *  Arguments Given:
       INTEGER NDIM
       INTEGER IGRP
+      INTEGER AWCS
 
 *  Arguments Returned:
       INTEGER UWCS
@@ -89,6 +94,8 @@
       INTEGER COMMA             ! Index of comma within group element
       INTEGER FR                ! Frame or Skyframe
       INTEGER I                 ! Loop count
+      INTEGER ICURR             ! Original index of current Frame
+      INTEGER RESULT            ! FrameSet returned by AST_FINDFRAME
       INTEGER SIZE              ! Number of elements in supplied group
 *.
 
@@ -151,12 +158,26 @@
          CALL AST_SETC( FR, 'DOMAIN', DOMAIN, STATUS )
       END IF
 
-*  Loop round any remaining elements in the group, using them to assign
-*  values to Frame attributes
-      DO I = 2, SIZE
-         CALL ARD1_GET( IGRP, I, 1, TEXT, STATUS ) 
-         CALL AST_SET( FR, TEXT, STATUS )
-      END DO
+*  Use any remaining text in the statement to assign values to Frame 
+*  attributes.
+      IF( COMMA .GT. 0 ) THEN
+         CALL AST_SET( FR, TEXT( COMMA + 1 : ), STATUS )
+      END IF
+
+*  Find a Frame in the application FrameSet that looks like the suppleid
+*  Frame. We use the user-supplied Frame as the template so that any
+*  unset attributes are inherited form the application FrameSet.
+      ICURR = AST_GETI( AWCS, 'Current', STATUS )
+      RESULT = AST_FINDFRAME( AWCS, FR, ' ', STATUS )
+      CALL AST_SETI( AWCS, 'Current', ICURR, STATUS )
+
+*  Use the Frame found above rather than the original Frame as it
+*  will have fewer unset attribute values.
+      IF( RESULT .NE. AST__NULL ) THEN
+         CALL AST_ANNUL( FR, STATUS )
+         FR = AST_GETFRAME( RESULT, AST__CURRENT, STATUS )
+         CALL AST_ANNUL( RESULT, STATUS )
+      END IF
 
 *  Create the FrameSet.
       UWCS = AST_FRAMESET( FR, ' ', STATUS )

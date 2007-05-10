@@ -139,4 +139,5 @@
 *  If so, annul the FrameSet.
       IF( LINEAR ) CALL AST_ANNUL( IWCS, STATUS )
 
+
       END
