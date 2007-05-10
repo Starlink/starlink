@@ -66,6 +66,9 @@ CONFIGURE_ARGS="$ac_configure_args"
 export CONFIGURE_ARGS
 AC_SUBST(CONFIGURE_ARGS)
 
+dnl    Make sure configure is ran.
+test -f "gaia/Makefile" && rm -f "gaia/Makefile"
+
 dnl    Need to determine the suffix for shareable libraries, as used by
 dnl    Tcl, so we can link against the GAIA dynamic library.
 tcl_system=`uname -s`-`uname -r`

@@ -14,15 +14,8 @@ STAR_DEFAULTS
 dnl    Declare dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [tcl tk tkimg blt itcl tclx], link)
 
-dnl    Look for --disable-shared and pass it on when configuring.
-star_extra_items=
-for ac_arg in $ac_configure_args; do
-   case $ac_arg in 
-      *-disable-shared*)
-         star_extra_items="--disable-shared"
-      ;;
-   esac
-done
+dnl    Look for --disable-shared etc. and pass on when configuring.
+star_extra_items="$ac_configure_args"
 export star_extra_items
 
 dnl    To configure run ./configure in the subdirectory.
@@ -36,7 +29,7 @@ dnl    it's allowed to play there, too.
                          $star_extra_items \
                          --cache-file=../config.cache"; \
         echo $cmd; \
-        $cmd; )
+        eval $cmd; )
     done
 )
 
