@@ -1,6 +1,13 @@
      Recent changes
      --------------
 
+ 2.1 (May 2006)
+ ---
+
+    The COFRAME statement has been extended to include specific support
+    for spectral and time coordinates.
+
+
  2.0-8 (September 2006)
  -----
 

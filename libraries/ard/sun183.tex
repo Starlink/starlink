@@ -5,14 +5,14 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun183.5}
-\newcommand{\stardocnumber}    {183.4}
+\newcommand{\stardocsource}    {sun183.6}
+\newcommand{\stardocnumber}    {183.6}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {26th October 2001}
+\newcommand{\stardocdate}      {10th May 2007}
 \newcommand{\stardoctitle}     {ARD \\ [1ex]
                                 A Textual Language for Describing \\
                                 Regions within a Data Array}
-\newcommand{\stardocversion}   {Version 2.0}
+\newcommand{\stardocversion}   {Version 2.1}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -1805,12 +1805,25 @@ mappings to be created without the use of COEFF statement in certain cases.
 \item [\label{ST:COFRAME}COFRAME(DOMAIN,...)] - Specifies the user
 coordinate system ({\em i.e.} the coordinate system in which positions
 are supplied within the remainder of the ARD description). The first
-argument is the Domain of the coordinate system. If this is ``SKY'' and
-the ARD description is 2-dimensional, then an AST SkyFrame will be used
-to describe the user coordinate system. Otherwise a simple AST Frame
-will be used instead. Any subsequent arguments should be of the form 
-{\tt <keyword>=<value>} where {\tt <keyword>} is the name of an AST
-attribute and {\tt <value>} is the value to assign to the attribute.
+argument is the Domain of the coordinate system. There are several
+special values that causes specialised AST objects to be created to
+descibe specific forms of coordinate systems:
+
+\begin{itemize}
+\item ``SKY'': If the ARD description is 2-dimensional, an AST SkyFrame will 
+be created.
+\item ``TIME'': If the ARD description is 1-dimensional, an AST TimeFrame will 
+be created.
+\item ``SPECTRUM'': If the ARD description is 1-dimensional, an AST SpecFrame 
+will be created.
+\item ``DSBSPECTRUM'': If the ARD description is 1-dimensional, an AST DSBSpecFrame 
+will be created.
+\end{itemize}
+
+Any other Domain value will cause a simple AST Frame to be created
+instead. Any subsequent arguments should be of the form {\tt
+<keyword>=<value>} where {\tt <keyword>} is the name of an AST attribute
+and {\tt <value>} is the value to assign to the attribute.
 
 \item [\label{ST:OFF}OFFSET( X, Y, Z, ... )] - {\bf DEPRECATED. Use the COFRAME or WCS statement instead.} This modifies the current mapping
 from user coordinates to application coordinates so that the origin of the
@@ -2629,6 +2642,15 @@ of WCS within ARD description.
 
 \item The COEFFS, STRETCH, OFFSET, SCALE and TWIST statements have been
 deprecated in favour of the new WCS and COFRAME statements.
+
+\end{itemize}
+
+\section{Changes Introduced in Version 2.1}
+
+\begin{itemize}
+
+\item The COFRAME statement has been extended to include specific support
+for TimeFrame, SpecFrame and DSBSpecFrame co-ordinate systems.
 
 \end{itemize}
 
