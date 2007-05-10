@@ -354,6 +354,8 @@
 *        Fix bug when the collapsed axis is retained in the WCS 
 *        FrameSet: it now uses the GRID co-ordinates of the limits of
 *        the collapsed axis to give the correct bounds. 
+*     10-MAY-2007 (DSB):
+*        Correct problems with use of KPG1_WCFAX.
 *     {enter_further_changes_here}
 
 *-
@@ -445,6 +447,7 @@
       INTEGER INDFO              ! Output NDF identifier
       INTEGER INDFS              ! Input NDF-section identifier
       INTEGER IPAXCO             ! Pointers to mapped d.p. axis array
+      INTEGER IPAXWO             ! Pointers to mapped d.p. axis array
       INTEGER IPCO               ! Pointers to mapped co-ordinate array
       INTEGER IPIN( 2 )          ! Pointers to mapped input arrays
       INTEGER IPIX               ! Index of PIXEL Frame within WCS 
@@ -1110,7 +1113,6 @@
          CALL NDF_BOUND( IBL, NDF__MXDIM, LBNDS, UBNDS, NDIM, STATUS )
          CALL NDF_BOUND( OBL, NDF__MXDIM, LBNDO, UBNDO, NDIMO, STATUS )
 
-
 *  Allocate work space, unless the last axis is being collapsed (in
 *  which case no work space is needed).
          IF ( HIGHER ) THEN
@@ -1140,6 +1142,8 @@
 *  in the correct data type.
             CALL PSX_CALLOC( EL1, '_DOUBLE', IPAXCO, STATUS )
             CALL PSX_CALLOC( EL1, ITYPE, IPCO, STATUS )
+            CALL PSX_CALLOC( UBNDS( JAXIS ) - LBNDS( JAXIS ) + 1, 
+     :                       '_DOUBLE', IPAXWO, STATUS )
 
 *  Allocate work space, unless the last pixel axis is being collapsed 
 *  (in which case no work space is needed).
@@ -1149,8 +1153,9 @@
 
 *  Obtain the double-precision co-ordinate centres along the collapse
 *  axis in the current Frame.
-            CALL KPG1_WCFAX( IBL, IWCS, IAXIS, EL1, 
-     :                       %VAL( CNF_PVAL( IPAXCO ) ), STATUS )
+            CALL KPG1_WCFAX( LBNDS, UBNDS, MAP, JAXIS, IAXIS, 
+     :                       %VAL( CNF_PVAL( IPAXCO ) ), 
+     :                       %VAL( CNF_PVAL( IPAXWO ) ), STATUS )
 
 *  Copy the centres to the required precision.
             IF ( ITYPE .EQ. '_REAL' ) THEN
@@ -1165,6 +1170,7 @@
 
             END IF
             CALL PSX_FREE( IPAXCO, STATUS )
+            CALL PSX_FREE( IPAXWO, STATUS )
 
 *  Store safe pointer value if axis centres are not needed.
          ELSE
