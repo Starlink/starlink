@@ -241,6 +241,10 @@ void findback( int *status ){
       ndfProp( indf1, "UNITS,AXIS,WCS,QUALITY", "OUT", &indf2, status );
    }
 
+/* Get the interaction level. */
+   parGdr0i( "ILEVEL", 0, 0, 1, 1, &ilevel, status );
+   if( ilevel > 0 ) msgBlank( status );
+
 /* Get the dimensions of each of the filters, in pixels. If only one
    value is supplied, duplicate it as the second value if the second axis
    is significant. If fewer than 3 values were supplied, use 1 for the 3rd 
@@ -255,6 +259,13 @@ void findback( int *status ){
    box[ 0 ] = 2*( box[ 0 ] / 2 ) + 1; 
    box[ 1 ] = 2*( box[ 1 ] / 2 ) + 1; 
    box[ 2 ] = 2*( box[ 2 ] / 2 ) + 1; 
+
+   if( ilevel > 0 ) {
+      msgSeti( "B0", box[0] );
+      msgSeti( "B1", box[1] );
+      msgSeti( "B2", box[2] );
+      msgOut( "", "Using box sizes [^B0,^B1,^B2].", status );
+   }
 
 /* If any trailing axes have a cell size of 1, then we apply the algorithm 
    independently to every pixel index on the trailing axes. First of all 
@@ -336,10 +347,6 @@ void findback( int *status ){
 /* Allocate work arrays. */
    wa = astMalloc( cupidSize( type, "findback" )*el );
    wb = astMalloc( cupidSize( type, "findback" )*el );
-
-/* Get the interaction level. */
-   parGdr0i( "ILEVEL", 0, 0, 1, 1, &ilevel, status );
-   if( ilevel > 0 ) msgBlank( status );
 
 /* Abort if an error has occurred. */
    if( *status != SAI__OK ) goto L999;
