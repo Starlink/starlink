@@ -1512,7 +1512,7 @@ dnl AC_CHECK_TOOL(AR, ar, :)
 	        do64bit_ok=yes
 	        CFLAGS="$CFLAGS -arch ppc64 -mpowerpc64 -mcpu=G5"
 	    fi
-	    SHLIB_LD='${CXX} -dynamiclib ${CFLAGS} ${LDFLAGS}'
+	    SHLIB_LD='${CXX} -dynamiclib -flat_namespace -undefined suppress ${CFLAGS} ${LDFLAGS}'
 	    AC_CACHE_CHECK([if ld accepts -single_module flag], tcl_cv_ld_single_module, [
 	        hold_ldflags=$LDFLAGS
 	        LDFLAGS="$LDFLAGS -dynamiclib -Wl,-single_module"

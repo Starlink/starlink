@@ -140,6 +140,9 @@ AC_CHECK_PROGS(LIBTOOL,libtool)
 STAR_CHECK_PROGS([fgeneric])
 STAR_INITIALISE_FORTRAN
 
+dnl    Sometimes also need to know the name of the Fortran MAIN.
+AC_FC_MAIN
+
 #--------------------------------------------------------------------
 #  Try to determine the extra libraries required to link a
 #  C/C++ program that has f77 libraries or subroutines.
