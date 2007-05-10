@@ -24,33 +24,19 @@ STAR_CHECK_PROGS(tk, Tk_Init)
 
 dnl    We may want to invoke make recursively
 AC_PROG_MAKE_SET
+AC_ARG_WITH(tcl, [  --with-tcl  directory containing tcl configuration (tclConfig.sh)], with_tclconfig=${withval})
+AC_ARG_WITH(tk,  [  --with-tk   directory containing tk configuration (tkConfig.sh)], with_tkconfig=${withval})
 
-AC_ARG_WITH(tcl, [  --with-tcl              directory containing tcl configuration (tclConfig.sh)], with_tclconfig=${withval})
-
-AC_ARG_WITH(tk,  [  --with-tk               directory containing tk configuration (tkConfig.sh)], with_tkconfig=${withval})
-
-dnl    To configure TkImg, run ./configure in the subdirectory.
-
-#  Look for --disable-shared and pass it on.
-star_extra_items=
-for ac_arg in $ac_configure_args; do
-   case $ac_arg in 
-      *-disable-shared*)
-         star_extra_items="--disable-shared"
-      ;;
-   esac
-done
-export star_extra_items
+dnl    To configure TkImg, run ./configure in the subdirectory, passing on any
+dnl    command-line values. 
 (
    cd tkimg; \
    cmd="./configure --prefix=$prefix \
                     --srcdir=. \
-                    $star_extra_items \
-                    --cache-file=../config.cache \
-                    --with-tcl=$with_tcl \
-                    --with-tk=$with_tk"; \
+                    --cache-file=../../config.cache \
+                    $ac_configure_args"; \
    echo $cmd; \
-   $cmd; \
+   eval $cmd; \
 )
            
 STAR_SPECIAL_INSTALL_COMMAND([
