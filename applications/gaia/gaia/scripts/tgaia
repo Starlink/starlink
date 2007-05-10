@@ -5,18 +5,7 @@
 #     GAIA
 
 #  Purpose:
-#     Starts the GAIA image display & analysis tool.
-
-#  Type of Module:
-#     Bourne shell script
-
-#  Usage:
-#     gaia
-
-#  Description:
-#     This command starts the GAIA image display & analysis tool.
-#     
-#     GAIA stands for Graphical Astronomy and Image Analysis tool.
+#     Test version of gaia.sh
 
 #  Authors:
 #     PWD: P.W. Draper (STARLINK, Durham University)
@@ -53,10 +42,15 @@
 
 #-
 
-#  Check that GAIA_DIR is around.
+#  Check that GAIA_DIR and GAIA_LIBRARY are around.
 
 if test "$GAIA_DIR" = ""; then
   echo "!! Cannot start gaia; the GAIA_DIR environment variable is not set."
+  exit 1
+fi
+
+if test "$GAIA_LIBRARY" = ""; then
+  echo "!! Cannot start gaia; the GAIA_LIBRARY environment variable is not set."
   exit 1
 fi
 
@@ -66,7 +60,7 @@ fi
 
 #  Check all the necessary elements are available and start up the GUI.
 
-if test -r $GAIA_DIR/gaiaMain.tcl ; then
+if test -r $GAIA_LIBRARY/gaiaMain.tcl ; then
   if test -x $GAIA_DIR/gaia_wish ; then
 
 #  Try to stop problems with the AMS rendevous files by creating a
@@ -84,23 +78,15 @@ if test -r $GAIA_DIR/gaiaMain.tcl ; then
 #  Make sure we remove this all on exit.
     trap 'rm -r -f $ADAM_USER;exit' 0 1 2 3 9 15
 
-#  Add the local catalogue configuration file.
-    if test -z "$SKYCAT_CONFIG" -o \
-   "$SKYCAT_CONFIG" = "http://ledas-www.star.le.ac.uk/arnieV4/SkyCatConfig.pl"; then
-      SKYCAT_CONFIG=file:${GAIA_DIR}/skycat2.0.cfg
-      export SKYCAT_CONFIG
-    fi
-
 #  And run up the interface.
-    #MALLOC_CHECK_=1;export MALLOC_CHECK_
-    time $GAIA_DIR/gaia_wish $GAIA_DIR/gaiaMain.tcl ${1+"$@"}
+    time $GAIA_DIR/gaia_wish $GAIA_LIBRARY/gaiaMain.tcl ${1+"$@"}
 
   else
     echo "!! Cannot start gaia; failed to locate $GAIA_DIR/gaia_wish."
     exit 1
   fi
 else
-  echo "!! Cannot start gaia; failed to locate $GAIA_DIR/gaiaMain.tcl."
+  echo "!! Cannot start gaia; failed to locate $GAIA_LIBRARY/gaiaMain.tcl."
   exit 1
 fi
 
