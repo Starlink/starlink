@@ -510,7 +510,8 @@ void findclumps( int *status ) {
 *     as real clumps. The default value is based on the supplied values
 *     for the other parameters that specify the minimum peak height, the
 *     background level and the instrumental beam widths, limited to be at
-*     least 16 pixels. If a direct comparison with other implementations
+*     least 16 pixels (for 3D data), 7 pixels (for 2D data) or 3 pixels
+*     (for 1D data). If a direct comparison with other implementations
 *     of the ClumpFind algorithm is required, a value of 5 should be used
 *     (for 3D data) or 20 (for 2D data). []
 *     - ClumpFind.Naxis: Controls the way in which contiguous areas of
@@ -569,7 +570,8 @@ void findclumps( int *status ) {
 *     as real clumps. The default value is based on the supplied values
 *     for the other parameters that specify the minimum peak height, the
 *     background level and the instrumental beam widths, limited to be at
-*     least 16 pixels. []
+*     least 16 pixels(for 3D data), 7 pixels (for 2D data) or 3 pixels
+*     (for 1D data). []
 *     - Reinhold.Noise: Defines the data value below which pixels are 
 *     considered to be in the noise. A peak is considered to end when the 
 *     peak value dips below the "noise" value. The value can be supplied 
@@ -648,7 +650,8 @@ void findclumps( int *status ) {
 *     as real clumps. The default value is based on the supplied values
 *     for the other parameters that specify the minimum peak height, the
 *     background level and the instrumental beam widths, limited to be at
-*     least 16 pixels. []
+*     least 16 pixels (for 3D data), 7 pixels (for 2D data) or 3 pixels
+*     (for 1D data). []
 *     - FellWalker.MaxJump: Defines the extent of the neighbourhood about a
 *     local maximum which is checked for higher pixel values. The
 *     neighbourhood checked is  square or cube with side equal to twice the

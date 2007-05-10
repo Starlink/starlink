@@ -27,11 +27,13 @@ int cupidDefMinPix( int ndim, double *fwhm, double thresh, double minhgt,
 *     at the specified threshold level. The clump is assumed to have the
 *     specified peak value.
 *
-*     If the returned value would be less than 16 pixels, 16 is returned.
+*     The returned value is never less than a limiting value that depends
+*     on the number of axes in the data; for 1D data the limit is 3, for
+*     2D the limit is 7 and for 3D data the limit is 16.
 
 *  Parameters:
 *     ndim
-*        The number fo pixel axes in the data;1, 2 or 3.
+*        The number of pixel axes in the data; 1, 2 or 3.
 *     fwhm
 *        Pointer to an array holding the FWHM of the intrumental beam
 *        associated with each pixel axis.
@@ -72,6 +74,8 @@ int cupidDefMinPix( int ndim, double *fwhm, double thresh, double minhgt,
 *  History:
 *     5-APR-2006 (DSB):
 *        Original version.
+*     10-MAY-2007 (DSB):
+*        Make the lower limit less if there are fewer than 3 axes.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -84,9 +88,11 @@ int cupidDefMinPix( int ndim, double *fwhm, double thresh, double minhgt,
 
    double f;
    int ret;
+   int lowlim;
 
 /* Initialise */
-   ret = 16;
+   lowlim = ( ndim == 1 ) ? 3 : ( ( ndim == 2 ) ? 7 : 16 );
+   ret = lowlim;
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return ret;
@@ -110,7 +116,7 @@ int cupidDefMinPix( int ndim, double *fwhm, double thresh, double minhgt,
    }
 
 /* Ensure a default of at least 16 is used. */
-   if( ret < 16 ) ret = 16;
+   if( ret < lowlim ) ret = lowlim;
 
 /* Return the result. */
    return ret;
