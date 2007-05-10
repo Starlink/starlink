@@ -55,6 +55,8 @@
 *  History:
 *     17-JUL-2001 (DSB):
 *        Original version.
+*     10-MAY-2007 (DSB):
+*        Extend the range of AST Frame classes that are supported.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -125,10 +127,25 @@
       CALL CHR_RMBLK( DOMAIN )
       CALL CHR_UCASE( DOMAIN )
 
-*  If the Domain is SKY and the ARD expression is 2D, create SkyFrame,
-*  otherwise create a Frame.
+*  If the Domain is SKY and the ARD expression is 2D, create SkyFrame.
       IF( DOMAIN .EQ. 'SKY' .AND. NDIM .EQ. 2 ) THEN
          FR = AST_SKYFRAME( ' ', STATUS )
+
+*  If the Domain is TIME and the ARD expression is 1D, create TimeFrame,
+      ELSE IF( DOMAIN .EQ. 'TIME' .AND. NDIM .EQ. 1 ) THEN
+         FR = AST_TIMEFRAME( ' ', STATUS )
+
+*  If the Domain is SPECTRUM and the ARD expression is 1D, create
+*  SpecFrame.
+      ELSE IF( DOMAIN .EQ. 'SPECTRUM' .AND. NDIM .EQ. 1 ) THEN
+         FR = AST_SPECFRAME( ' ', STATUS )
+
+*  If the Domain is DSBSPECTRUM and the ARD expression is 1D, create 
+*  a DSBSpecFrame.
+      ELSE IF( DOMAIN .EQ. 'DSBSPECTRUM' .AND. NDIM .EQ. 1 ) THEN
+         FR = AST_DSBSPECFRAME( ' ', STATUS )
+
+*  Otherwise create a Frame.
       ELSE
          FR = AST_FRAME( NDIM, ' ', STATUS )
          CALL AST_SETC( FR, 'DOMAIN', DOMAIN, STATUS )
