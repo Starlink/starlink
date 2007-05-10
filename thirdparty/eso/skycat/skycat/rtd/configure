@@ -1339,11 +1339,6 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 #--------------------------------------------------------------------
-# Do application specific checks (see aclocal.m4)
-#--------------------------------------------------------------------
-#RTD_CONFIG
-
-#--------------------------------------------------------------------
 # Call TEA_INIT as the first TEA_ macro to set up initial vars.
 # This will define a ${TEA_PLATFORM} variable == "unix" or "windows"
 # as well as PKG_LIB_FILE and PKG_STUB_LIB_FILE.
@@ -6668,7 +6663,9 @@ done
     fi
 
 
-# Do applicatin specific checks (after compilers are setup).
+#--------------------------------------------------------------------
+# Do application specific checks (see aclocal.m4)
+#--------------------------------------------------------------------
 
 
 

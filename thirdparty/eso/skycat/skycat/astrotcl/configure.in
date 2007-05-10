@@ -30,11 +30,6 @@
 AC_INIT([astrotcl], [2.0])
 
 #--------------------------------------------------------------------
-# Do application specific checks (see aclocal.m4)
-#--------------------------------------------------------------------
-ASTROTCL_CONFIG
-
-#--------------------------------------------------------------------
 # Call TEA_INIT as the first TEA_ macro to set up initial vars.
 # This will define a ${TEA_PLATFORM} variable == "unix" or "windows"
 # as well as PKG_LIB_FILE and PKG_STUB_LIB_FILE.
@@ -71,6 +66,11 @@ TEA_PREFIX
 #-----------------------------------------------------------------------
 
 TEA_SETUP_COMPILER
+
+#--------------------------------------------------------------------
+# Do application specific checks (see aclocal.m4)
+#--------------------------------------------------------------------
+ASTROTCL_CONFIG
 
 #-----------------------------------------------------------------------
 # __CHANGE__
