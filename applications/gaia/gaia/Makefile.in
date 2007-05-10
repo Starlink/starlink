@@ -177,6 +177,7 @@ LIBS		= @PKG_LIBS@ @LIBS@
 AR		= @AR@
 CFLAGS		= @CFLAGS@
 CXXFLAGS        = @CXXFLAGS@
+FC              = @FC@
 FCFLAGS         = @FCFLAGS@ @SHLIB_CFLAGS@
 FCLIBS          = @FCLIBS@
 STAR_FCFLAGS    = @STAR_FCFLAGS@
