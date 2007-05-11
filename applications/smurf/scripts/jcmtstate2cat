@@ -41,6 +41,7 @@ use strict;
 use warnings;
 use NDF;
 use Astro::Coords::Angle::Hour;
+use Astro::SLA;
 
 use Getopt::Long;
 use Pod::Usage;
@@ -133,9 +134,24 @@ for my $f (@files) {
 
     for my $i ( 0 .. $#{$local{RTS_NUM}} ) {
 	my @slice;
-	push(@slice, $local{RTS_NUM}->[$i],
-	     Astro::Coords::Angle::Hour->new($local{TCS_TR_AC1}->[$i])->degrees,
-	     Astro::Coords::Angle->new($local{TCS_TR_AC2}->[$i])->degrees);
+
+	# Use the RTS sequence number as the ID
+	push(@slice, $local{RTS_NUM}->[$i]);
+
+	# Now calculate the RA,Dec of the field centre in tracking coordinates
+	# taking the chop and jiggle into account
+	my $rabase = $local{TCS_TR_AC1}->[$i];
+	my $decbase = $local{TCS_TR_AC2}->[$i];
+	my $xoffset = $local{SMU_TR_JIG_X}->[$i] + $local{SMU_TR_CHOP_X}->[$i];
+	my $yoffset = $local{SMU_TR_JIG_Y}->[$i] + $local{SMU_TR_CHOP_Y}->[$i];
+	$xoffset *= Astro::SLA::DAS2R;
+	$yoffset *= Astro::SLA::DAS2R;
+
+	Astro::SLA::slaDtp2s( $xoffset, $yoffset, $rabase, $decbase, my $ra, my $dec );
+
+	push(@slice, Astro::Coords::Angle::Hour->new( $ra )->degrees,
+	    Astro::Coords::Angle->new($dec)->degrees);
+
 	for my $col (@columns) {
 	    push(@slice, $local{$col}->[$i]);
 	}
@@ -151,6 +167,7 @@ err_end( $status );
 Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>
 
 Copyright (C) 2007 Particle Physics and Astronomy Research Council.
+Copyright (C) 2007 Science and Technology Facilities Council.
 All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under
