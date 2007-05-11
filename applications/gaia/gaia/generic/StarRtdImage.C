@@ -4517,11 +4517,11 @@ int StarRtdImage::hduCmd( int argc, char *argv[] )
         return error( "unknown data representation, "
                       "\"hdu\" command only available for FITS and NDF" );
     }
+
     if ( isfits() ) {
         return fitsHduCmd( imio, argc, argv );
-    } else {
-        return ndfHduCmd( imio, argc, argv );
-    }
+    } 
+    return ndfHduCmd( imio, argc, argv );
 }
 
 //+
