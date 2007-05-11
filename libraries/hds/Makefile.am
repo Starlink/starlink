@@ -170,5 +170,5 @@ CLEANFILES = DAT_PAR dat_par.h hds_machine.txt CMP_ERR DAT_ERR dat_err.h \
 
 dist_starnews_DATA = hds.news
 
-EXTRA_DIST = cmp_err.msg dat_err.msg
+EXTRA_DIST = cmp_err.msg dat_err.msg fortran_interface.h
 
