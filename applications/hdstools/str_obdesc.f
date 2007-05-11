@@ -21,12 +21,13 @@
       CHARACTER*(DAT__SZNAM) NAME    ! object name
       CHARACTER*(DAT__SZTYP) TYPE    ! object type
       CHARACTER*30 DSTR
-      CHARACTER*20 VSTR
+      CHARACTER*30 VSTR
       INTEGER NDIMS,DIMS(DAT__MXDIM) ! dimensionality and dimensions
       INTEGER I                      ! index to pos. in string
       LOGICAL VALID                  ! whether locator valid
       LOGICAL PRIM                   ! whether object primitive
 *    Functions :
+      INTEGER CHR_LEN
 *    Local data :
 *-
 
@@ -78,5 +79,9 @@
         ENDIF
       ENDIF
       STR=STRING
+      IF (CHR_LEN(STRING) .GT. LEN(STR) ) THEN
+         I = MAX(1, LEN(STR)-2)
+         STR(I:) = '...'
+      END IF
       END
 

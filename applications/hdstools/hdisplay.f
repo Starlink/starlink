@@ -56,6 +56,7 @@
 *    RJV: R.J.Vallance (Birmingham University)
 *    DJA: D.J.Allan (Birmingham University)
 *    AJC: A.J.Chipperfield (Starlink, RAL)
+*    TIMJ: Tim Jenness (JAC, Hawaii)
 
 * History :
 *    ??-???-???? (RJV):
@@ -85,6 +86,8 @@
 *    06-SEP-2001 (AJC):
 *       V3.0-0 Remove Asterix stuff
 *              Improve prologue
+*    09-MAY-2007 (TIMJ):
+*        Bigger buffer for file name
 *-
 
 *    Type Definitions :
@@ -269,9 +272,9 @@
 *    Local variables :
 *
       CHARACTER*(DAT__SZTYP) TYPE      ! Type of data object
-      CHARACTER*80 FILE                ! Container file name
-      CHARACTER*80 PATH                ! Full object specification
-      CHARACTER*80 STR
+      CHARACTER*256 FILE                ! Container file name
+      CHARACTER*512 PATH                ! Full object specification
+      CHARACTER*256 STR
 
       INTEGER FWID                     ! Field width
       INTEGER NLEV                     ! Number of levels of data

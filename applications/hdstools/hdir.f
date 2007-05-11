@@ -46,6 +46,7 @@
 *    RJV: R.J.Vallance (Birmingham University)
 *    DJA: D.J.Allan (Birmingham University)
 *    AJC: A.J.Chipperfield (Starlink, RAL)
+*    TIMJ: Tim Jenness (JAC, Hawaii)
 
 * History :
 *     ??-???-???? (RJV):
@@ -61,6 +62,8 @@
 *     06-SEP-2001 (AJC):
 *        V3.0-0 Remove Asterix stuff
 *               Improve prologue
+*     09-MAY-2007 (TIMJ):
+*        Bigger buffer for file name
 *-
 
 *    Type Definitions :
@@ -127,10 +130,10 @@
 *    Local Constants :
 *    Local variables :
       CHARACTER*(DAT__SZLOC) COMPLOC    ! locator to structure component
-      CHARACTER*100 PATH                ! full object name from top level
-      CHARACTER*80 FILE                 ! VMS file name
+      CHARACTER*512 PATH                ! full object name from top level
+      CHARACTER*256 FILE                 ! VMS file name
       CHARACTER*132 LINE                 ! dashed line to make output pretty
-      CHARACTER*80 STR                  ! string containing object info
+      CHARACTER*256 STR                  ! string containing object info
       INTEGER L				! used length of string
       INTEGER NLEV                      ! levels of structure
       INTEGER NCOMP                     ! components in structure

@@ -3,11 +3,16 @@
 *    Description :
 *     returns the value of the object pointed to by LOC in
 *     a character string - returns blank if locator invalid
+*     If the string is too small to hold the character an ellipsis
+*     '...' is used to indicate truncation.
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
+      INCLUDE 'DAT_ERR'
+*    External Functions :
+      INTEGER CHR_LEN
 *    Import :
       CHARACTER*(DAT__SZLOC) LOC
 *    Export :
@@ -18,6 +23,8 @@
       CHARACTER*80 STRING         ! string buffer
       CHARACTER*(DAT__SZTYP) TYPE ! data type
       INTEGER IVAL                ! integer,byte or word value
+      INTEGER CLEN                ! Required length of formatted value
+      INTEGER N                   ! Index position
       REAL RVAL                   ! real value
       DOUBLE PRECISION DVAL       ! double precision value
       LOGICAL VALID		  ! whether locator valid
@@ -52,6 +59,7 @@
 *     string and position it at a set column
          IF (SET) THEN
 
+            CALL DAT_CLEN( LOC, CLEN, STATUS )
             CALL DAT_TYPE(LOC,TYPE,STATUS)
 *         Combined integer types
             INTYP=(TYPE.EQ.'_INTEGER'.OR.TYPE.EQ.'_BYTE'
@@ -78,8 +86,17 @@
                WRITE(STRING,FMT4) LVAL
 
 *         Character types
+*         Trap truncation
             ELSEIF (TYPE(:5).EQ.'_CHAR') THEN
+               CALL ERR_MARK
                CALL DAT_GET0C(LOC,STRING,STATUS)
+               IF ( ( STATUS .EQ. DAT__CONER ) .OR.
+     :              ( STATUS .EQ. DAT__TRUNC ) ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  N = MAX( 1, LEN( STRING ) - 2 )
+                  STRING( N : ) = '...'
+               END IF
+               CALL ERR_RLSE
 
             ENDIF
 
@@ -90,5 +107,12 @@
          ENDIF
 
       ENDIF
+
+*     Copy, but trap truncation
       STR=STRING
+      IF ( CHR_LEN(STRING) .GT. LEN(STR) ) THEN
+         N = MAX( 1, LEN( STR ) - 2 )
+         STR( N : ) = '...'
+      END IF
+
       END
