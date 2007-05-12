@@ -831,16 +831,6 @@ void smurf_makecube( int *status ) {
    create Tsys output variances. Report an error if these are not
    available. */
    if( genvar == 2 && ( !hasoffexp || !hastsys) ) {
-      if( !blank ) msgBlank( status );
-
-      if( !hasoffexp ) {
-         msgOutif( MSG__NORM, "GNV_MSG1A", "   ACS_OFFEXPOSURE not found "
-                   "in JCMTSTATE extension.", status );
-      } else {
-         msgOutif( MSG__NORM, "GNV_MSG1B", "   No good TSYS values found "
-                   "in ACSIS extension.", status );
-      }
-
       msgOutif( MSG__NORM, "GNV_MSG1", "   Variances cannot be determined "
                 "for the input spectra.", status );
       msgOutif( MSG__NORM, "GNV_MSG2", "   The output file will not contain "

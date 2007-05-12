@@ -228,7 +228,7 @@ void smf_rebincube( smfData *data, int index, int size, int badmask, int is2d,
    dim_t ndet;                 /* No of detectors in the input */
    dim_t dim[ 3 ];             /* Output array dimensions */
    dim_t iv;                   /* Vector index into output 3D array */
-   dim_t nchan;                /* Number of spectral channels */
+   dim_t nchan;                /* Number of input spectral channels */
    dim_t nel;                  /* No. of pixels in output */
    dim_t nout;                 /* Total number of elements in output cube */
    dim_t nslice;               /* No of time slices in the input */
@@ -340,7 +340,7 @@ void smf_rebincube( smfData *data, int index, int size, int badmask, int is2d,
    gin[ 1 ] = nchan + 0.5;
    astTran1( ssmap, 2, gin, 1, gout );
    if( gout[ 0 ] < 0.5 ) gout[ 0 ] = 0.5;
-   if( gout[ 1 ] > (double) dim[ 2 ] + 0.5 ) gout[ 0 ] = (double) dim[ 2 ] + 0.5;
+   if( gout[ 1 ] > (double) dim[ 2 ] + 0.5 ) gout[ 1 ] = (double) dim[ 2 ] + 0.5;
    tfac = ( fabs( gout[ 1 ] - gout[ 0 ] ) + 1.0  )/( (double) dim[ 2 ] + 1 );
 
 /* Find the constant factor associated with the current input file, used

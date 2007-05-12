@@ -161,6 +161,8 @@
 *        Initial version.
 *     2-MAY-2007 (DSB):
 *        Added parameter naccept.
+*     11-MAY-2007 (DSB):
+*        Correct calculation of spectral overlap factor (tfac).
 *     {enter_further_changes_here}
 
 *  Copyright:
