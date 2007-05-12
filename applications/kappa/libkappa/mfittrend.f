@@ -219,6 +219,9 @@
 *     5-MAR-2007 (DSB):
 *        Add code to identify the required pixel axis in cases where the
 *        WCS->pixel transformation is not defined.
+*     12-MAY-2007 (DSB):
+*        Add code to identify the required pixel ranges in cases where the
+*        WCS->pixel transformation is not defined.
 *-
 
 *  Type Definitions:
@@ -266,11 +269,13 @@
       DOUBLE PRECISION PIXPOS( NDF__MXDIM ) ! A valid pixel Frame
                                  ! position
       DOUBLE PRECISION PPOS( 2, NDF__MXDIM ) ! Two pixel Frame positions
+      DOUBLE PRECISION PRANGE( MAXRNG ) ! Fit ranges pixel co-ordinates
       DOUBLE PRECISION PRJ       ! Vector length projected on to a pixel
                                  ! axis
       DOUBLE PRECISION PRJMAX    ! Maximum vector length projected on to
                                  ! an axis
       INTEGER AREA               ! Area of axes orthogonal to fit axis
+      INTEGER AXMAP              ! PIXEL->WCS Mapping for fitted axis
       INTEGER CFRM               ! Current frame
       INTEGER DIMS( NDF__MXDIM ) ! Dimensions of NDF
       INTEGER EL                 ! Number of mapped elements
@@ -479,6 +484,10 @@
 *  Obtain the NDF axis corresponding to the WCS axis.
 *  --------------------------------------------------
 
+*  Indicate that we can use the full inverse Mapping for identifying the
+*  pixel ranges to use.
+      AXMAP = AST__NULL
+
 *  WCS axes can be permuted, rotated etc. so we must check. How we do
 *  this check depends on whether or not the inverse transformation (from WCS
 *  to PIXEL coords) is defined. First deal with cases where an inverse
@@ -570,10 +579,15 @@
 *  the current pixel axis, but may have more than one output (that is, a
 *  given pixel axis may affect the value of more than one WCS axis). Loop
 *  round each output, checking to see if the output is the requested WCS
-*  axis.
+*  axis. If this mapping generates the WCS axis which is being fitted, save 
+*  the Mapping for later use.
                   NAXO = AST_GETI( OUTMAP, 'Nout', STATUS )
                   DO J = 1, NAXO
-                     IF( OUTAX( J ) .EQ. IAXIS ) JAXIS = I
+                     IF( OUTAX( J ) .EQ. IAXIS ) THEN
+                        JAXIS = I
+                        IF( NAXO .EQ. 1 ) AXMAP = AST_CLONE( OUTMAP, 
+     :                                                       STATUS )
+                     END IF
                   END DO
 
                END IF
@@ -658,17 +672,32 @@
 *  Project the given ranges into pixel co-ordinates.
       ELSE
          DO I = 1, NRANGE, 2
-            CPOS( 1, IAXIS ) = DRANGE( I + 1 )
-            CPOS( 2, IAXIS ) = DRANGE( I )
 
-            CALL AST_TRANN( MAP, 2, NAXC, 2, CPOS, .FALSE., NDIM, 2,
-     :                      PPOS, STATUS )
+*  If MAP has an inverse, we can use MAP directly.
+            IF( AXMAP .EQ. AST__NULL ) THEN
+               CPOS( 1, IAXIS ) = DRANGE( I + 1 )
+               CPOS( 2, IAXIS ) = DRANGE( I )
+
+               CALL AST_TRANN( MAP, 2, NAXC, 2, CPOS, .FALSE., NDIM, 2,
+     :                         PPOS, STATUS )
 
 *  Find the projection of the two test points onto the axis.
-            JLO = KPG1_FLOOR( REAL( MIN( PPOS( 1, JAXIS ),
-     :                                   PPOS( 2, JAXIS ) ) ) )
-            JHI = KPG1_CEIL( REAL( MAX( PPOS( 1, JAXIS ),
-     :                                  PPOS( 2, JAXIS ) ) ) )
+               JLO = KPG1_FLOOR( REAL( MIN( PPOS( 1, JAXIS ),
+     :                                      PPOS( 2, JAXIS ) ) ) )
+               JHI = KPG1_CEIL( REAL( MAX( PPOS( 1, JAXIS ),
+     :                                     PPOS( 2, JAXIS ) ) ) )
+
+*  Otherwise, we use the single-input single-output Mapping that generates 
+*  the requested WCS axis.
+            ELSE
+               CALL AST_TRAN1( AXMAP, 2, DRANGE( I ), .FALSE., PRANGE, 
+     :                         STATUS )
+
+               JLO = KPG1_FLOOR( REAL( MIN( PRANGE( 1 ),
+     :                                      PRANGE( 2 ) ) ) )
+               JHI = KPG1_FLOOR( REAL( MAX( PRANGE( 1 ),
+     :                                      PRANGE( 2 ) ) ) )
+            END IF
 
 *  Ensure these are within the bounds of the pixel axis.
             JLO = MAX( LBND( JAXIS ), JLO )
