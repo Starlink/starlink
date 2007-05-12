@@ -43,9 +43,11 @@ my @STANDARD_HEADERS = (qw/
 			"Type of Module",
 			qw/
 			   Invocation
+                           Synopsis
 			   Description
 			   Arguments
 			   Usage
+                           Parameters
                            /,
 			"ADAM Parameters",
 			"Returned Value",
