@@ -97,7 +97,7 @@ sub push_line {
     #   implementation
 
     if ( $line =~ /^\s*$r\-/  #  *-
-	 || $line =~ /\*\/$/      #  */
+	 || $line =~ /^\s*\*\/\s*$/      #  */
 	 || ($line !~ /\s*$r/ && $line =~ /\w/)  # real code
        ) {
       # print "End of prologue detected\n";
@@ -105,7 +105,7 @@ sub push_line {
       $self->flush_section();
 
       # end of prologue and end of C comment
-      $prl->end_c_comment(1) if ($line =~ /\*\/$/);
+      $prl->end_c_comment(1) if ($line =~ /^\s*\*\/\s*$/);
 
       # undefine the internal copy
       $self->prologue( undef );
