@@ -129,6 +129,10 @@
 *     07-MAR-2007 (TIMJ):
 *        Given pointing accuracy of JCMT change coincident check to
 *        use 1 arcsec rather than 0.4.
+*     07-MAR-2007 (TIMJ):
+*        The check for tsys value in the input was not completed if the
+*        main loop was exited early, resulting in the input tsys values
+*        being ignored.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -478,7 +482,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 
 /* If we do not need to look at any other time slices, we can leave the loop
    early. */
-            if( !autogrid && !outcat ) break;
+            if( !autogrid && !outcat && *gottsys ) break;
          }
 
 /* Get a FrameSet ("fs") connecting the base Frame in the input WCS FrameSet
