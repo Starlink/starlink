@@ -13,7 +13,7 @@
 
 /* Local Constants: */
 #define MAXCAT   4096 /* Max length of catalogue name */
-#define LOGTAB   14   /* Width of one log file column, in characters */
+#define LOGTAB   16   /* Width of one log file column, in characters */
 
 void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj, 
                        int ndim, int deconv, double beamcorr[ 3 ], 
@@ -129,6 +129,8 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *        Added parameter "nclumps".
 *     28-MAR-2007 (TIMJ):
 *        Up MAXCAT to 4096 characters from 50.
+*     14-MAY-2007 (TIMJ):
+*        Prevent log file columns overlapping.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -351,7 +353,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
                   line = astAppendString( line, &nc, buf );
 
                   for( icol = 0; icol < ncpar; icol++ ) {
-                     sprintf( buf, "%-*.*g", LOGTAB, LOGTAB-3, cpars[ icol ] );
+                     sprintf( buf, "%-*.*g", LOGTAB, LOGTAB-5, cpars[ icol ] );
                      line = astAppendString( line, &nc, buf );
                   }
                   fprintf( logfile, "%s\n", line );
@@ -527,7 +529,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    from "rad" to "deg" (the column values are stored in degs). This will 
    automatically re-map the Frame so that the column deg values get
    converted to rad values as required by AST. */
-         for( icol = 0; icol < ncpar & *status == SAI__OK; icol++ ) {
+         for( icol = 0; icol < ncpar && *status == SAI__OK; icol++ ) {
             if( !strcmp( units[ icol ], "deg" ) ){
                sprintf( attr, "Unit(%d)", icol + 1 );
                astSetC( iwcs, attr, "deg" );
