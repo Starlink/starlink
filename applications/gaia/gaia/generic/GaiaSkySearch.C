@@ -107,17 +107,20 @@ int GaiaSkySearch::call(const char* name, int len, int argc, char* argv[])
         mid,
         cond;
 
-    while (low <= high) {
+    while ( low <= high ) {
         mid = (low + high) / 2;
-        if ((cond = strcmp(name, subcmds_[mid].name)) < 0)
+        if ( ( cond = strcmp( name, subcmds_[mid].name ) ) < 0 ) {
             high = mid - 1;
-        else if (cond > 0)
+        }
+        else if ( cond > 0 ) {
             low = mid + 1;
+        }
         else {
             GaiaSkySearchSubCmds& t = subcmds_[mid];
-            if (check_args(name, argc, t.min_args, t.max_args) != TCL_OK)
+            if ( check_args( name, argc, t.min_args, t.max_args ) != TCL_OK ) {
                 return TCL_ERROR;
-            return (this->*t.fptr)(argc, argv);
+            }
+            return (this->*t.fptr)( argc, argv );
         }
     }
 
@@ -226,10 +229,12 @@ int GaiaSkySearch::openCmd(int argc, char* argv[])
         //  recognised by GaiaLocalCatalog.
         if ( GaiaLocalCatalog::is_foreign( argv[0] ) ) {
             cat_ = new GaiaLocalCatalog( e, interp_ );
-        } else {
+        } 
+        else {
             cat_ = new LocalCatalog( e );
         }
-    } else {
+    } 
+    else {
         cat_ = new AstroCatalog( e );   //  Class for remote catalogues.
     }
 
@@ -258,7 +263,8 @@ int GaiaSkySearch::checkCmd(int argc, char* argv[])
 {
     if ( GaiaLocalCatalog::is_foreign( argv[0] ) ) {
         return GaiaLocalCatalog::check_table( argv[0] );
-    } else {
+    } 
+    else {
         return LocalCatalog::check_table( argv[0] );
     }
 }
@@ -287,7 +293,8 @@ int GaiaSkySearch::entryCmd( int argc, char* argv[] )
                 return error( "no catalog is open" );
             }
             e = cat_->entry();
-        } else {
+        } 
+        else {
             if ( argc > 2 ) {
 
                 //  Use given catalog directory.
@@ -380,7 +387,8 @@ int GaiaSkySearch::saveCmd( int argc, char* argv[] )
             }
             argv[0] = (char *) e->url();
 
-        } else {
+        } 
+        else {
 
             //  Create a temporary name to store the results.
             argv[0] = tempnam( (char *) NULL, "gaia" );
@@ -435,8 +443,8 @@ int GaiaSkySearch::csizeCmd( int argc, char *argv[] )
                 Tcl_Free( (char *) mainArgv );
             }
             return error( "not a sub list" );
-        } else {
-
+        } 
+        else {
             //  Allocate memory for columns sizes.
             if ( ncolumn == 0  ) {
                 sizes = new int[rowArgc];
@@ -626,13 +634,14 @@ int GaiaSkySearch::originCmd( int argc, char *argv[] )
         char buf[80];
         sprintf( buf, "%f %f", xOrigin_, yOrigin_ );
         set_result( buf );
-    } else {
-
+    } 
+    else {
         double xo;
         double yo;
         if ( Tcl_GetDouble( interp_, argv[0], &xo ) != TCL_OK ) {
             return error( argv[0], " is not a floating point value");
-        } else {
+        } 
+        else {
             if ( Tcl_GetDouble( interp_, argv[1], &yo ) != TCL_OK ) {
                 return error( argv[1], " is not a floating point value");
             }
@@ -699,7 +708,8 @@ int GaiaSkySearch::infoCmd(int argc, char* argv[])
                         if ( strstr( e->longName(), "}" ) ) {
                             save = 0;
                         }
-                    } else {
+                    } 
+                    else {
                         save = 0;
                     }
                 }
