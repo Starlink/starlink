@@ -676,14 +676,16 @@ This section outlines some of the ways in which a user could supply an ARD
 description in response to a prompt for the 'REGION' parameter in the example
 application described in the previous section. 
 
-The first thing to be said is that the dimensionality of the ARD description
-(i.e. the number of values used to represent a single position in the ARD
-description) must match that of the supplied NDF. If it
-doesn't, then \htmlref{ARD\_WORK}{ARD_WORK} will report an error. By default, ARD descriptions are
-always assumed to be 2-dimensional, but this default can be over-ridden by
-including a \htmlref{DIMENSION}{ST:DIM} statement in the ARD description. Thus for instance, if 
-the NDF is known to be 3-dimensional, the user may want to give an ARD 
-description such as:
+The first thing to be said is that the dimensionality of the ARD
+description (i.e. the number of values used to represent a single
+position in the ARD description) need not match that of the supplied NDF.
+The ARD description may refer to some subset of the axes in the NDF, in
+which case the mask will be applied independently to every value on the
+unspecified axes. By default, ARD descriptions are always assumed to be
+2-dimensional, but this default can be over-ridden by including a
+\htmlref{DIMENSION}{ST:DIM} statement in the ARD description. Thus for
+instance, if the positions in the ARD description are 3-dimensional, the user 
+may want to give an ARD description such as:
 
 \small
 \begin{verbatim}
@@ -1440,7 +1442,7 @@ another. The calling application will always know how to locate a point
 within the mask if the point is specified in pixel coordinates. If, in
 addition, it can also locate points specified in one or more other
 coordinate systems, then it should create a FrameSet describing all the
-coordinate systems which it nows about, one of which must be pixel
+coordinate systems which it knows about, one of which must be pixel
 coordinates within the mask\footnote{ARD recognizes this Frame by the
 fact that its Domain attribute is set to ``PIXEL''.}. It then passes this
 FrameSet to the ARD system by calling routine ARD\_WCS (this must be done
@@ -1455,8 +1457,8 @@ If ARD\_WCS is not used, then a default application FrameSet containing a
 single Frame describing pixel coordinates is generated automatically.
 
 The ARD description must then include statements describing the 
-coordinate system in which positions are given. This can be done in one
-of three ways:
+coordinate system in which positions are given within the ARD description. 
+This can be done in one of three ways:
 
 \begin{enumerate}
 \item By including a \htmlref{COFRAME}{ST:COFRAME} statement before any
@@ -1634,7 +1636,7 @@ appropriate to the current user coordinate system as determined by the
 WCS and/or COFRAME statements. Keywords can be abbreviated to three
 characters. The following keywords are currently supported ($N$
 represents the dimensionality of the ARD description, and all positions
-and distances are given in user coordinates):
+and distances are given in $N$-dimensional user coordinates):
 
 \begin{description}
 
@@ -1772,13 +1774,15 @@ supported ($N$ represents the dimensionality of the ARD description):
 \begin{description}
 
 \item [\label{ST:DIM}DIMENSION( N )] - This establishes the number of
-coordinates (N) required to describe a single point. If no DIMENSION
-statement is found before the first keyword field, a value of 2 is
-assumed for N. The dimensionality may not be changed after the first
+coordinates (N) required to describe a single point in the ARD description. 
+If no DIMENSION statement is found before the first keyword field, a value 
+of 2 is assumed for N. The dimensionality may not be changed after the first
 keyword field, but multiple DIMENSION statements may be included (so long
 as they all specify the same value for N) to improve readability, and to
 allow the concatenation of multiple ARD descriptions which contain
-compatible DIMENSION statements.
+compatible DIMENSION statements. Note, N gives the number of dimensions
+in the user co-ordinate system; this may not necessaily be the saem as
+the number of pixel axes in the mask array.
 
 \item [\label{ST:COE}COEFFS( C1, C2, ... )] - {\bf DEPRECATED. Use the COFRAME or WCS statement instead.} This establishes
 a new linear mapping from user coordinates to application coordinates 
@@ -2527,7 +2531,7 @@ stand-alone version does not contain the routine \htmlref{ARD\_GROUP}{ARD_GROUP}
       \sstsubsection{
          NDIM = INTEGER (Given)
       }{
-         The number of dimensions in the mask array.
+         The number of pixel axes in the mask array.
       }
       \sstsubsection{
          LBND( NDIM ) = INTEGER (Given)
@@ -2606,15 +2610,6 @@ stand-alone version does not contain the routine \htmlref{ARD\_GROUP}{ARD_GROUP}
          STATUS = INTEGER (Given and Returned)
       }{
          The global status.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         An error is reported if the dimensionality of the ARD
-         description is different to that of the mask array (as specified
-         by argument NDIM).
       }
    }
 }
