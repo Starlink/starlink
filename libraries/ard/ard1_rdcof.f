@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_RDCOF( NDIM, IGRP, AWCS, UWCS, STATUS )
+      SUBROUTINE ARD1_RDCOF( NWCS, IGRP, AWCS, UWCS, STATUS )
 *+
 *  Name:
 *     ARD1_RDCOF
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_RDCOF( NDIM, IGRP, AWCS, UWCS, STATUS )
+*     CALL ARD1_RDCOF( NWCS, IGRP, AWCS, UWCS, STATUS )
 
 *  Description:
 *     This routine reads the supplied arguments to the COFRAME statement 
@@ -18,8 +18,8 @@
 *     COFRAME statement. 
 
 *  Arguments:
-*     NDIM = INTEGER (Given)
-*        The number of axes required in the Current Frame.
+*     NWCS = INTEGER (Given)
+*        The default number of axes in the user coord system.
 *     IGRP = INTEGER (Given)
 *        A GRP identifier for the supplied group.
 *     AWCS = INTEGER (Given)
@@ -78,7 +78,7 @@
       INCLUDE 'GRP_PAR'          ! GRP constants 
 
 *  Arguments Given:
-      INTEGER NDIM
+      INTEGER NWCS
       INTEGER IGRP
       INTEGER AWCS
 
@@ -134,27 +134,27 @@
       CALL CHR_RMBLK( DOMAIN )
       CALL CHR_UCASE( DOMAIN )
 
-*  If the Domain is SKY and the ARD expression is 2D, create SkyFrame.
-      IF( DOMAIN .EQ. 'SKY' .AND. NDIM .EQ. 2 ) THEN
+*  If the Domain is SKY, create SkyFrame.
+      IF( DOMAIN .EQ. 'SKY' ) THEN
          FR = AST_SKYFRAME( ' ', STATUS )
 
-*  If the Domain is TIME and the ARD expression is 1D, create TimeFrame,
-      ELSE IF( DOMAIN .EQ. 'TIME' .AND. NDIM .EQ. 1 ) THEN
+*  If the Domain is TIME, create TimeFrame,
+      ELSE IF( DOMAIN .EQ. 'TIME' ) THEN
          FR = AST_TIMEFRAME( ' ', STATUS )
 
-*  If the Domain is SPECTRUM and the ARD expression is 1D, create
+*  If the Domain is SPECTRUM, create
 *  SpecFrame.
-      ELSE IF( DOMAIN .EQ. 'SPECTRUM' .AND. NDIM .EQ. 1 ) THEN
+      ELSE IF( DOMAIN .EQ. 'SPECTRUM' ) THEN
          FR = AST_SPECFRAME( ' ', STATUS )
 
-*  If the Domain is DSBSPECTRUM and the ARD expression is 1D, create 
+*  If the Domain is DSBSPECTRUM, create 
 *  a DSBSpecFrame.
-      ELSE IF( DOMAIN .EQ. 'DSBSPECTRUM' .AND. NDIM .EQ. 1 ) THEN
+      ELSE IF( DOMAIN .EQ. 'DSBSPECTRUM' ) THEN
          FR = AST_DSBSPECFRAME( ' ', STATUS )
 
 *  Otherwise create a Frame.
       ELSE
-         FR = AST_FRAME( NDIM, ' ', STATUS )
+         FR = AST_FRAME( NWCS, ' ', STATUS )
          CALL AST_SETC( FR, 'DOMAIN', DOMAIN, STATUS )
       END IF
 
@@ -164,9 +164,17 @@
          CALL AST_SET( FR, TEXT( COMMA + 1 : ), STATUS )
       END IF
 
-*  Find a Frame in the application FrameSet that looks like the suppleid
+*  Use any other elements in the group.
+      DO I = 2, SIZE
+         CALL ARD1_GET( IGRP, I, 1, TEXT, STATUS ) 
+         CALL AST_SET( FR, TEXT, STATUS )
+      END DO
+
+*  Find a Frame in the application FrameSet that looks like the supplied
 *  Frame. We use the user-supplied Frame as the template so that any
 *  unset attributes are inherited form the application FrameSet.
+      CALL AST_SETI( FR, 'MaxAxes', AST_GETI( AWCS, 'Nout', STATUS ),
+     :               STATUS )
       ICURR = AST_GETI( AWCS, 'Current', STATUS )
       RESULT = AST_FINDFRAME( AWCS, FR, ' ', STATUS )
       CALL AST_SETI( AWCS, 'Current', ICURR, STATUS )

@@ -1,4 +1,4 @@
-      LOGICAL FUNCTION ARD1_INTR( FRM, TYPE, NDIM, NPAR, PAR, UC, INIT,
+      LOGICAL FUNCTION ARD1_INTR( FRM, TYPE, NWCS, NPAR, PAR, UC, INIT,
      :                            STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     RETURN = ARD1_INTR( FRM, TYPE, NDIM, NPAR, PAR, UC, INIT,
+*     RETURN = ARD1_INTR( FRM, TYPE, NWCS, NPAR, PAR, UC, INIT,
 *                         STATUS )
 
 *  Description:
@@ -25,13 +25,13 @@
 *        A pointer to an AST Frame representing user coordinates.
 *     TYPE = INTEGER (Given)
 *        The identifier for the region type.
-*     NDIM = INTEGER (Given)
+*     NWCS = INTEGER (Given)
 *        The number of dimensions in the array.
 *     NPAR = INTEGER (Given)
 *        The size of the PAR array.
 *     PAR( NPAR ) = DOUBLE PRECISION (Given)
 *        The parameters defining the region.
-*     UC( NDIM ) = DOUBLE PRECISION (Given)
+*     UC( NWCS ) = DOUBLE PRECISION (Given)
 *        The user coordinates at the position to be tested.
 *     INIT = LOGICAL (Given)
 *        Supplied .TRUE. if a new region is being filled.
@@ -93,10 +93,10 @@
 *  Arguments Given:
       INTEGER FRM
       INTEGER TYPE
-      INTEGER NDIM
+      INTEGER NWCS
       INTEGER NPAR
       DOUBLE PRECISION PAR( NPAR )
-      DOUBLE PRECISION UC( NDIM )
+      DOUBLE PRECISION UC( NWCS )
       LOGICAL INIT
 
 *  Status:
@@ -133,14 +133,14 @@
 *  centre, followed by the lengths of the box sides in user co-ordinates. 
 *  Box edges are always considered to be lines of constant axis values.
 *  These are not necessarily geodesics. If a side length is negative, the
-*  axis value must lie outside the specified range. This becuase (for
+*  axis value must lie outside the specified range. This because (for
 *  instance), and RA range from 359 degs to 1 deg *includes values less
 *  than 1 and greater than 359.
       IF( TYPE .EQ. ARD__BOX ) THEN
-         DO I = 1, NDIM
+         DO I = 1, NWCS
             IF( ABS( AST_AXDISTANCE( FRM, I, PAR( I ), UC( I ), 
      :                               STATUS ) ) .GT. 
-     :          0.5*ABS( PAR( I + NDIM ) ) ) THEN
+     :          0.5*ABS( PAR( I + NWCS ) ) ) THEN
                ARD1_INTR = .FALSE.
                GO TO 999
             END IF
@@ -194,7 +194,7 @@
 *  Find the distance from the test point to the circle centre.
 *  If it is less than or equal to the radius, the point is inside.
          ARD1_INTR = ( AST_DISTANCE( FRM, PAR, UC, STATUS ) .LE. 
-     :                 PAR( NDIM + 1 ) )
+     :                 PAR( NWCS + 1 ) )
 
 *  ELLIPSE: Parameters are the user co-ordinates of the centre of the ellipse,
 *  the half-lengths of the two axes of the ellipse, and the angle (in degrees) 

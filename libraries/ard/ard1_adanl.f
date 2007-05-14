@@ -30,7 +30,7 @@
 *        The identifier for the GRP group containing the text of the
 *        complete ARD description.
 *     NDIM = INTEGER (Given)
-*        The number of dimensions in the mask supplied to ARD_WORK.
+*        The number of pixel axes in the mask supplied to ARD_WORK.
 *     AWCS = INTEGER (Given)
 *        A pointer to an AST FrameSet supplied by the application. This
 *        should have a Base Frame referring to pixel coords within the 
@@ -179,6 +179,7 @@
      : MAP,                      ! AST Mapping from PIXEL to user coords
      : NARG,                     ! No. of arguments obtained so far
      : NKEYW,                    ! No. of keywords in ARD description
+     : NWCS,                     ! No. of WCS axes
      : PNARG,                    ! Index at which to store no. of arg.s
      : SIZE,                     ! No. of elements in group
      : TYPE,                     ! Identifier for operator or operand
@@ -243,6 +244,9 @@
 *  case).
       NEEDIM = NDIM .NE. 2
 
+*  Assume there are the same number of WCS axes as there are pixel axes.
+      NWCS = NDIM
+
 *  Create a default user FrameSet in which application coords and user
 *  coords are connected by a UnitMap.
       UWCS = AST__NULL
@@ -283,11 +287,11 @@
 *  ARD1_KEYW twice; the first time initializes things, the second one
 *  completes things.
                      IF( KEYW ) THEN
-                        CALL ARD1_KEYW( TYPE, NEEDIM, NDIM, IWCS, 
+                        CALL ARD1_KEYW( TYPE, NEEDIM, NWCS, IWCS, 
      :                                  WCSDAT, ELEM, L, CFRM, IPOPND, 
      :                                  IOPND, PNARG, SZOPND, NARG, I, 
      :                                  KEYW, STATUS )
-                        CALL ARD1_KEYW( TYPE, NEEDIM, NDIM, IWCS, 
+                        CALL ARD1_KEYW( TYPE, NEEDIM, NWCS, IWCS, 
      :                                  WCSDAT, ELEM, L, CFRM, IPOPND, 
      :                                  IOPND, PNARG, SZOPND, NARG, I, 
      :                                  KEYW, STATUS )
@@ -337,7 +341,7 @@
 *  keyword field, copy any remaining keyword arguments from the current
 *  GRP element into the returned operand array.
          ELSE IF( KEYW ) THEN
-            CALL ARD1_KEYW( TYPE, NEEDIM, NDIM, IWCS, WCSDAT, ELEM, L, 
+            CALL ARD1_KEYW( TYPE, NEEDIM, NWCS, IWCS, WCSDAT, ELEM, L, 
      :                      CFRM, IPOPND, IOPND, PNARG, SZOPND, NARG, I, 
      :                      KEYW, STATUS )
 
@@ -346,13 +350,14 @@
 *  is complete, make any modifications to the current transformations,
 *  etc, specified by the statement.
          ELSE IF( STAT ) THEN
-            CALL ARD1_STAT( TYPE, ELEM, L, NDIM, AWCS, DLBND, 
+            CALL ARD1_STAT( TYPE, ELEM, L, NWCS, AWCS, DLBND, 
      :                      DUBND, NEEDIM, NARG, I, UWCS, MAP, STAT, 
      :                      IWCS, WCSDAT, STATUS )
 
 *  Update the current Frame pointer.
             CALL AST_ANNUL( CFRM, STATUS )
             CFRM = AST_GETFRAME( UWCS, AST__CURRENT, STATUS )
+            NWCS = AST_GETI( CFRM, 'Naxes', STATUS )
 
 *  If we are ready to start a new field...
          ELSE

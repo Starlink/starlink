@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_KEYW( TYPE, NEEDIM, NDIM, IWCS, WCSDAT, ELEM, L, 
+      SUBROUTINE ARD1_KEYW( TYPE, NEEDIM, NWCS, IWCS, WCSDAT, ELEM, L, 
      :                      CFRM, IPOPND, IOPND, PNARG, SZOPND, NARG, I, 
      :                      KEYW, STATUS )
 *+
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_KEYW( TYPE, NEEDIM, NDIM, IWCS, WCSDAT, ELEM, L, CFRM, IPOPND, 
+*     CALL ARD1_KEYW( TYPE, NEEDIM, NWCS, IWCS, WCSDAT, ELEM, L, CFRM, IPOPND, 
 *                     IOPND, PNARG, SZOPND, NARG, I, KEYW, STATUS )
 
 *  Description:
@@ -30,8 +30,8 @@
 *        Supplied .TRUE. if a DIMENSION statement is still needed to
 *        establish the dimensionality of the ARD description. An error
 *        is reported if this is supplied .TRUE.
-*     NDIM = INTEGER (Given)
-*        The number of dimensions in the mask supplied to ARD_WORK.
+*     NWCS = INTEGER (Given)
+*        The number of axes in the user coord system.
 *     IWCS = INTEGER (Given)
 *        If AST__NULL, then the pixel->user mapping is linear. Otherwise, 
 *        IWCS is a pointer to an AST FrameSet containing just two Frames, 
@@ -137,7 +137,7 @@
 *  Arguments Given:
       INTEGER TYPE
       LOGICAL NEEDIM
-      INTEGER NDIM
+      INTEGER NWCS
       INTEGER IWCS
       DOUBLE PRECISION WCSDAT( * )
       CHARACTER ELEM*(*)
@@ -187,14 +187,14 @@
       IF( NARG .EQ. -1 ) THEN
 
 *  Report an error and abort if a dimension statement is still needed.
-*  No dimension statement is needed if NDIM is 2 (because 2 is the
+*  No dimension statement is needed if NWCS is 2 (because 2 is the
 *  default dimensionality).
          IF( NEEDIM ) THEN
             STATUS = ARD__BADDM
-            CALL MSG_SETI( 'NDIM', NDIM )
+            CALL MSG_SETI( 'NWCS', NWCS )
             CALL ERR_REP( 'ARD1_KEYW_ERR1', 'ARD description is '//
      :                    'defaulting to 2-dimensions. It should be '//
-     :                    '^NDIM dimensional.', STATUS )
+     :                    '^NWCS dimensional.', STATUS )
             GO TO 999
          END IF
 
@@ -256,57 +256,57 @@
 
 *  POINT and PIXEL keywords...
          IF( TYPE .EQ. ARD__POI .OR. TYPE .EQ. ARD__PIX ) THEN
-            CALL ARD1_POIAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
+            CALL ARD1_POIAR( NWCS, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                       NARG, I, KEYW, STATUS )
 
 *  LINE keywords...
          ELSE IF( TYPE .EQ. ARD__LIN ) THEN
-            CALL ARD1_LINAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
+            CALL ARD1_LINAR( NWCS, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                       NARG, I, KEYW, STATUS )
 
 *  ROW keywords...
          ELSE IF( TYPE .EQ. ARD__ROW ) THEN
-            CALL ARD1_ROWAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
+            CALL ARD1_ROWAR( NWCS, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                    NARG, I, KEYW, STATUS )
 
 *  COLUMN keywords...
          ELSE IF( TYPE .EQ. ARD__COL ) THEN
-            CALL ARD1_COLAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
+            CALL ARD1_COLAR( NWCS, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                    NARG, I, KEYW, STATUS )
 
 *  BOX keywords...
          ELSE IF( TYPE .EQ. ARD__BOX ) THEN
-            CALL ARD1_BOXAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
+            CALL ARD1_BOXAR( NWCS, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                    NARG, I, KEYW, STATUS )
 
 *  RECT keywords...
          ELSE IF( TYPE .EQ. ARD__REC ) THEN
-            CALL ARD1_RECAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
+            CALL ARD1_RECAR( NWCS, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                    NARG, I, KEYW, STATUS )
 
 *  ROTBOX keywords...
          ELSE IF( TYPE .EQ. ARD__ROT ) THEN
-            CALL ARD1_ROTAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
+            CALL ARD1_ROTAR( NWCS, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                    NARG, I, KEYW, STATUS )
 
 *  POLYGON keywords...
          ELSE IF( TYPE .EQ. ARD__POL ) THEN
-            CALL ARD1_POLAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
+            CALL ARD1_POLAR( NWCS, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                    NARG, I, KEYW, STATUS )
 
 *  CIRCLE keywords...
          ELSE IF( TYPE .EQ. ARD__CIR ) THEN
-            CALL ARD1_CIRAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
+            CALL ARD1_CIRAR( NWCS, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                    NARG, I, KEYW, STATUS )
 
 *  ELLIPSE keywords...
          ELSE IF( TYPE .EQ. ARD__ELL ) THEN
-            CALL ARD1_ELLAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
+            CALL ARD1_ELLAR( NWCS, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                    NARG, I, KEYW, STATUS )
 
 *  FRAME keywords...
          ELSE IF( TYPE .EQ. ARD__FRA ) THEN
-            CALL ARD1_FRAAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
+            CALL ARD1_FRAAR( NWCS, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                    NARG, I, KEYW, STATUS )
 
 *  If the operand requires no keywords, the argument list is complete.
@@ -340,7 +340,7 @@
                CALL ARD1_STORD( DAST, SZOPND, IOPND, IPOPND, STATUS )
 
 *  Now store the transformation coefficients.
-               DO J = 1, NDIM*( NDIM + 1 )               
+               DO J = 1, NWCS*( NWCS + 1 )               
                   CALL ARD1_STORD( WCSDAT( J ), SZOPND, IOPND, IPOPND, 
      :                             STATUS )
                END DO

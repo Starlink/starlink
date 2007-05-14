@@ -30,7 +30,7 @@
 *     TYPE = INTEGER (Given)
 *        Integer code for region type.
 *     NDIM = INTEGER (Given)
-*        The number of dimensions in the B array.
+*        The number of pixel axes in the B array.
 *     LBND( NDIM ) = INTEGER (Given)
 *        The lower pixel index bounds of the B array.
 *     UBND( NDIM ) = INTEGER (Given)
@@ -194,6 +194,7 @@
      :        MAP,               ! Pixel to user coords Mapping
      :        MXPIX,             ! Max dimension of array
      :        NBAD,              ! No. of missing pixels found in B
+     :        NWCS,              ! No. of user axes
      :        UBIN( ARD__MXDIM ),! Upper bounds for pretend input image
      :        WINMAP             ! Mapping from grixel to pixel
 
@@ -244,18 +245,19 @@
 *  Begin an AST context.
          CALL AST_BEGIN( STATUS )
 
-*  Get a pointer to the user coordinate Frame.
+*  Get a pointer to the user coordinate Frame, and the number of WCS axes.
          CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )  
+         NWCS = AST_GETI( CFRM, 'Naxes', STATUS )
 
 *  We can simplify some regions...
 
 *  Convert RECT regions into BOX regions.
          IF( TYPE .EQ. ARD__REC ) THEN
-            DO I = 1, NDIM
+            DO I = 1, NWCS
                HW = 0.5*AST_AXDISTANCE( CFRM, I, PAR( I ), 
-     :                                  PAR( I + NDIM ), STATUS )
+     :                                  PAR( I + NWCS ), STATUS )
                PAR( I ) = AST_AXOFFSET( CFRM, I, PAR( I ), HW, STATUS )
-               PAR( I + NDIM ) = 2*ABS( HW )
+               PAR( I + NWCS ) = 2*ABS( HW )
             END DO
             TYPE = ARD__BOX
 
@@ -431,7 +433,7 @@
 *  position is within the region defined in user coords. We use
 *  AST_RESAMPLE to do this, supplying routine ARD1_UINTERP to do the 
 *  specific form of pseudo-"resampling" required.
-            NBAD = AST_RESAMPLEI( GMAP, NDIM, LBIN, UBIN, DP, DP, 
+            NBAD = AST_RESAMPLEI( GMAP, NWCS, LBIN, UBIN, DP, DP, 
      :                            AST__UINTERP, ARD1_UINTERP, PAR, 0, 
      :                            DPP*0.2, MXPIX, 0, NDIM, LBND, UBND, 
      :                            LBINTB, UBINTB, 

@@ -20,7 +20,7 @@
 
 *  Arguments:
 *     NDIM = INTEGER (Given)
-*        The number of dimensions in the array.
+*        The number of pixel axes in the array.
 *     FRM = INTEGER (Given)
 *        The user cooridnate Frame.
 *     TYPE = INTEGER (Given)
@@ -102,7 +102,8 @@
 *  Local Variables:
       INTEGER
      :      I,                   ! Axis index
-     :      NEED                 ! No. of parameters required by the region
+     :      NEED,                ! No. of parameters required by the region
+     :      NWCS                 ! No. of user axes
 
       LOGICAL
      :      BADPAR,              ! A bad no. of parameters supplied?
@@ -126,6 +127,9 @@
          UBXUB( I ) = VAL__MIND
       END DO
 
+*  Nose the number of user axes.
+      NWCS = AST_GETI( FRM, 'Naxes', STATUS )
+
 *  Initialize a flag indicating if an invalid number of parameters have
 *  been supplied.
       BADPAR = .FALSE.
@@ -138,12 +142,12 @@
 *  followed by the lengths of the box sides in user co-ordinates. Report
 *  an error if the wrong number of parameters has been supplied.
       IF( TYPE .EQ. ARD__BOX ) THEN
-         NEED = 2*NDIM
+         NEED = 2*NWCS
          IF( NPAR .NE. NEED ) THEN
             BADPAR = .TRUE.
 
          ELSE
-            DO I = 1, NDIM
+            DO I = 1, NWCS
                HW = ABS( 0.5*PAR( I + NDIM ) )
                UBXUB( I ) = AST_AXOFFSET( FRM, I, PAR( I ), HW, 
      :                                    STATUS )
@@ -157,7 +161,7 @@
       ELSE IF( TYPE .EQ. ARD__POL ) THEN
 
 *  Report an error if the dimensionality is not 2.
-         IF( NDIM .NE. 2 ) THEN
+         IF( NWCS .NE. 2 ) THEN
             ERR2D = .TRUE.
 
 *  Report an error if an incomplete parameter list is supplied.
@@ -194,13 +198,13 @@
       ELSE IF( TYPE .EQ. ARD__CIR ) THEN
 
 *  Report an error if the number of parameters is wrong.
-         NEED = NDIM + 1
+         NEED = NWCS + 1
          IF( NPAR .NE. NEED ) THEN
             BADPAR = .TRUE.
 
          ELSE
             RAD = ABS( PAR( NPAR ) )
-            DO I = 1, NDIM
+            DO I = 1, NWCS
                UBXUB( I ) = PAR( I ) + RAD
                UBXLB( I ) = PAR( I ) - RAD
             END DO
@@ -213,7 +217,7 @@
       ELSE IF( TYPE .EQ. ARD__ELL ) THEN
 
 *  Report an error and abort if the dimensionality is not 2.
-         IF( NDIM .NE. 2 ) THEN
+         IF( NWCS .NE. 2 ) THEN
             ERR2D = .TRUE.
          ELSE
 

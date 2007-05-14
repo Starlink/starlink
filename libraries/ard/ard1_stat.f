@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_STAT( TYPE, ELEM, L, NDIM, AWCS, DLBND, DUBND, 
+      SUBROUTINE ARD1_STAT( TYPE, ELEM, L, NWCS, AWCS, DLBND, DUBND, 
      :                      NEEDIM, NARG, II, UWCS, MAP, STAT, IWCS, 
      :                      WCSDAT, STATUS )
 *+
@@ -13,7 +13,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_STAT( TYPE, ELEM, L, NDIM, AWCS, DLBND, DUBND, NEEDIM, 
+*     CALL ARD1_STAT( TYPE, ELEM, L, NWCS, AWCS, DLBND, DUBND, NEEDIM, 
 *                     NARG, II, UWCS, MAP, STAT, IWCS, WCSDAT, STATUS )
 
 *  Description:
@@ -29,8 +29,8 @@
 *        The text of the current element of the ARD description.
 *     L = INTEGER (Given)
 *        The index of the last character to be checked in ELEM.
-*     NDIM = INTEGER (Given)
-*        The number of dimensions in the mask supplied to ARD_WORK.
+*     NWCS = INTEGER (Given)
+*        The number of axes in the user coord system.
 *     AWCS = INTEGER (Given)
 *        A pointer to an AST FrameSet supplied by the application. This
 *        should have a Base Frame referring to pixel coords within the 
@@ -75,7 +75,7 @@
 *        from pixel to user coords. Otherwise, wcsdat(1) holds a lower
 *        limit on the distance (within the user coords) per pixel, and
 *        the other elements in WCSDAT are not used. The supplied array
-*        should have at least NDIM*(NDIM+1) elements.
+*        should have at least NWCS*(NWCS+1) elements.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -141,7 +141,7 @@
       INTEGER TYPE
       CHARACTER ELEM*(*)
       INTEGER L
-      INTEGER NDIM
+      INTEGER NWCS
       INTEGER AWCS
       DOUBLE PRECISION DLBND( * )
       DOUBLE PRECISION DUBND( * )
@@ -216,30 +216,30 @@
 
 *  Report an error and abort if the dimensionality of the ARD
 *  description has not yet been determined (NEEDIM is supplied .FALSE.
-*  if NDIM is 2).
+*  if NWCS is 2).
                IF( NEEDIM .AND. STATUS .EQ. SAI__OK ) THEN
                   STATUS = ARD__BADDM
-                  CALL MSG_SETI( 'NDIM', NDIM )
+                  CALL MSG_SETI( 'NWCS', NWCS )
                   CALL ERR_REP( 'ARD1_STAT_ERR1', 'ARD description is'//
      :                     ' defaulting to 2-dimensions. It should be'//
-     :                     ' ^NDIM dimensional.', STATUS )
+     :                     ' ^NWCS dimensional.', STATUS )
                   GO TO 999
                END IF
 
 *  OFFSET - The number of arguments required for the OFFSET statement
 *  equals the dimensionality of the ARD description. 
                IF( TYPE .EQ. ARD__OFF ) THEN
-                  ARGREQ = NDIM
+                  ARGREQ = NWCS
 
 *  STRETCH - The number of arguments required for the STRETCH statement
 *  equals the dimensionality of the ARD description. 
                ELSE IF( TYPE .EQ. ARD__STR ) THEN
-                  ARGREQ = NDIM
+                  ARGREQ = NWCS
 
 *  COEFFS - The number of arguments required for the COEFFS statement
 *  depends on the dimensionality of the ARD description. 
                ELSE IF( TYPE .EQ. ARD__COE ) THEN
-                  ARGREQ = NDIM*( NDIM + 1 )
+                  ARGREQ = NWCS*( NWCS + 1 )
 
 *  Report an error for any other statement.
                ELSE IF (STATUS .EQ. SAI__OK ) THEN
@@ -265,34 +265,23 @@
 *  parameters.
       IF( .NOT. STAT ) THEN 
 
-*  If it is a DIMENSION statement, report an error and abort if the
-*  specified dimensionality is not the same as that of the mask.
+*  If it is a DIMENSION statement, indicate that a DIMENSION statement has 
+*  been found.
          IF( TYPE .EQ. ARD__DIM ) THEN
-
-            IF( NINT( STARGS( 1 ) ) .NE. NDIM .AND.
-     :          STATUS .EQ. SAI__OK ) THEN
-               STATUS = ARD__BADDM
-               CALL MSG_SETI( 'NDIM', NDIM )
-               CALL ERR_REP( 'ARD1_STAT_ERR3', 'ARD description '//
-     :                       'should be ^NDIM dimensional.',STATUS )
-               GO TO 999
-            END IF
-
-*  Otherwise, indicate that a DIMENSION statement has been found.
             NEEDIM = .FALSE.
 
 *  If it is a WCS statement, read the UWCS FrameSet from the GRP group and
 *  delete it.
          ELSE IF( TYPE .EQ. ARD__WCS ) THEN
             IF( UWCS .NE. AST__NULL ) CALL AST_ANNUL( UWCS, STATUS )
-            CALL ARD1_RDWCS( NDIM, IGRP, UWCS, STATUS )
+            CALL ARD1_RDWCS( NWCS, IGRP, UWCS, STATUS )
             CALL GRP_DELET( IGRP, STATUS )
 
 *  If it is a COFRAME statement, create a UWCS FrameSet from the GRP group and
 *  delete it.
          ELSE IF( TYPE .EQ. ARD__COF ) THEN
             IF( UWCS .NE. AST__NULL ) CALL AST_ANNUL( UWCS, STATUS )
-            CALL ARD1_RDCOF( NDIM, IGRP, AWCS, UWCS, STATUS )
+            CALL ARD1_RDCOF( NWCS, IGRP, AWCS, UWCS, STATUS )
             CALL GRP_DELET( IGRP, STATUS )
 
 *  If it is a COEFFS statement, create a new UWCS from the coefficients.
@@ -314,7 +303,7 @@
 
 *  If it is a STRETCH statement, modify the current UWCS.
          ELSE IF( TYPE .EQ. ARD__STR ) THEN
-            CALL ARD1_STWCS( NDIM, STARGS, UWCS, STATUS )
+            CALL ARD1_STWCS( NWCS, STARGS, UWCS, STATUS )
 
 *  Report an error and abort for any other statement.
          ELSE

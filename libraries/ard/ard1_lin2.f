@@ -1,6 +1,6 @@
-      SUBROUTINE ARD1_LIN2( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, PAR,
-     :                     NLP, IWCS, B, LBEXTB, UBEXTB, LBINTB, UBINTB, 
-     :                     WORK, STATUS )
+      SUBROUTINE ARD1_LIN2( RINDEX, NDIM, NWCS, LBND, UBND, MSKSIZ,
+     :                      NPAR, PAR, NLP, IWCS, B, LBEXTB, UBEXTB, 
+     :                      LBINTB, UBINTB, WORK, STATUS )
 *+
 *  Name:
 *     ARD1_LIN2
@@ -13,8 +13,9 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_LIN2( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, PAR, NLP, IWCS, 
-*                    B, LBEXTB, UBEXTB, LBINTB, UBINTB, WORK, STATUS )
+*     CALL ARD1_LIN2( RINDEX, NDIM, NWCS, LBND, UBND, MSKSIZ, NPAR, PAR, 
+*                     NLP, IWCS, B, LBEXTB, UBEXTB, LBINTB, UBINTB, WORK, 
+*                     STATUS )
 
 *  Description:
 *     Interior values are assigned to the points specified by the
@@ -25,7 +26,9 @@
 *     RINDEX = INTEGER (Given)
 *        The value to use to represent interior points.
 *     NDIM = INTEGER (Given)
-*        The number of dimensions in the B array.
+*        The number of pixel axes
+*     NWCS = INTEGER (Given)
+*        The number of user axes
 *     LBND( NDIM ) = INTEGER (Given)
 *        The lower pixel index bounds of the B array.
 *     UBND( NDIM ) = INTEGER (Given)
@@ -61,8 +64,9 @@
 *     UBINTB( NDIM ) = INTEGER (Given and Returned)
 *        The upper pixel bounds of the smallest box which contains all
 *        interior points in B. 
-*     WORK( NLP, NDIM ) = DOUBLE PRECISION (Given and Returned)
-*        Work array.
+*     WORK( NLP, * ) = DOUBLE PRECISION (Given and Returned)
+*        Work array. The size of the second axis should be the maximum of
+*        NDIM and NWCS.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -116,6 +120,7 @@
 *  Arguments Given:
       INTEGER RINDEX
       INTEGER NDIM
+      INTEGER NWCS
       INTEGER LBND( NDIM )
       INTEGER UBND( NDIM )
       INTEGER MSKSIZ
@@ -130,7 +135,7 @@
       INTEGER UBEXTB( NDIM )
       INTEGER LBINTB( NDIM )
       INTEGER UBINTB( NDIM )
-      DOUBLE PRECISION WORK( NLP, NDIM )
+      DOUBLE PRECISION WORK( NLP, * )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -169,25 +174,26 @@
          GO TO 999
       END IF
 
-*  Get the user -> pixel Mapping from the FrameSet.
+*  Get the user -> pixel Mapping from the FrameSet, and the number of
+*  user axes.
       MAP = AST_SIMPLIFY( AST_GETMAPPING( IWCS, AST__CURRENT,
      :                                    AST__BASE, STATUS ),
      :                    STATUS )
 
 *  Fill the work array with NLP positions evenly spaced along the line in
 *  user coords.
-      DO J = 1, NDIM
-         DELTA( J ) = ( PAR( J + NDIM ) - PAR( J ) )/DBLE( NLP - 1 )
+      DO J = 1, NWCS
+         DELTA( J ) = ( PAR( J + NWCS ) - PAR( J ) )/DBLE( NLP - 1 )
       END DO
 
       DO I = 1, NLP
-         DO J = 1, NDIM
+         DO J = 1, NWCS
             WORK( I, J ) = PAR( J ) + DELTA( J )*( I - 1 )
          END DO
       END DO
 
 *  Transform these users coords into pixel coords.
-      CALL AST_TRANN( MAP, NLP, NDIM, NLP, WORK, .TRUE., NDIM, NLP,
+      CALL AST_TRANN( MAP, NLP, NWCS, NLP, WORK, .TRUE., NDIM, NLP,
      :                WORK, STATUS )
 
 *  Initialise the interior bounding box. At the same time, store the first 

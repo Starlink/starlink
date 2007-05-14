@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_CIRAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
+      SUBROUTINE ARD1_CIRAR( NWCS, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                       NARG, I, KEYW, STATUS )
 *+
 *  Name:
@@ -11,14 +11,14 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_CIRAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND, NARG,
+*     CALL ARD1_CIRAR( NWCS, CFRM, ELEM, L, IPOPND, IOPND, SZOPND, NARG,
 *                      I, KEYW, STATUS )
 
 *  Description:
 *     The supplied arguments are stored on the operand stack.
 
 *  Arguments:
-*     NDIM = INTEGER (Given)
+*     NWCS = INTEGER (Given)
 *        The dimensionality of the ARD description (i.e. the number of
 *        values required to specify a position).
 *     CFRM = INTEGER (Given)
@@ -92,7 +92,7 @@
       INCLUDE 'ARD_ERR'          ! ARD_ error constants
 
 *  Arguments Given:
-      INTEGER NDIM
+      INTEGER NWCS
       INTEGER CFRM
       CHARACTER ELEM*(*)
       INTEGER L
@@ -128,7 +128,7 @@
 
 *  The last argument is a radius. Find the index of the axis along which 
 *  the radius is measured.
-         IF( AXIS .GT. NDIM ) CALL ARD1_DSTAX( CFRM, AXIS, STATUS )
+         IF( AXIS .GT. NWCS ) CALL ARD1_DSTAX( CFRM, AXIS, STATUS )
 
 *  Read the next argument.
          CALL ARD1_GTARG( CFRM, AXIS, ELEM, L, I, OK, KEYW, VALUE, 
@@ -143,7 +143,7 @@
 *  the number of arguments obtained is incorrect.
          ELSE IF( .NOT. KEYW ) THEN
  
-            IF( NARG .NE. NDIM + 1 .AND. STATUS .EQ. SAI__OK ) THEN
+            IF( NARG .NE. NWCS + 1 .AND. STATUS .EQ. SAI__OK ) THEN
                STATUS = ARD__ARGS
                CALL ERR_REP( 'ARD1_CIRAR_ERR1', 'Incorrect number of '//
      :                       'arguments found.', STATUS )

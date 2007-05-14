@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_RDWCS( NDIM, IGRP, IWCS, STATUS )
+      SUBROUTINE ARD1_RDWCS( NWCS, IGRP, IWCS, STATUS )
 *+
 *  Name:
 *     ARD1_RDWCS
@@ -10,15 +10,15 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_RDWCS( NDIM, IGRP, IWCS, STATUS )
+*     CALL ARD1_RDWCS( NWCS, IGRP, IWCS, STATUS )
 
 *  Description:
 *     This routine attempts to read an AST FrameSet from the supplied
 *     GRP group. An error is reported if the Object read is not a FrameSet,
-*     or if the Current Frame does not have NDIM axes.
+*     or if the Current Frame does not have NWCS axes.
 
 *  Arguments:
-*     NDIM = INTEGER (Given)
+*     NWCS = INTEGER (Given)
 *        The number of axes required in the Current Frame.
 *     IGRP = INTEGER (Given)
 *        A GRP identifier for the supplied group.
@@ -72,7 +72,7 @@
       INCLUDE 'ARD_CONST'        ! ARD provate constants 
 
 *  Arguments Given:
-      INTEGER NDIM
+      INTEGER NWCS
       INTEGER IGRP
 
 *  Arguments Returned:
@@ -141,22 +141,22 @@
      :                    'is required.', STATUS )      
 
 *  Report an error if the Current Frame has the wrong number of axes.
-         ELSE IF( AST_GETI( IWCS, 'NAXES', STATUS ) .NE. NDIM ) THEN
+         ELSE IF( AST_GETI( IWCS, 'NAXES', STATUS ) .NE. NWCS ) THEN
             NAX = AST_GETI( IWCS, 'NAXES', STATUS )
             CALL AST_ANNUL( IWCS, STATUS )
 
             STATUS = ARD__BADAR
             CALL MSG_SETI( 'NAX', NAX )
-            CALL MSG_SETI( 'NDIM', NDIM )
+            CALL MSG_SETI( 'NWCS', NWCS )
 
-            IF( NDIM .EQ. 1 ) THEN
-               CALL MSG_SETC( 'NDIM', ' is' )
+            IF( NWCS .EQ. 1 ) THEN
+               CALL MSG_SETC( 'NWCS', ' is' )
             ELSE
-               CALL MSG_SETC( 'NDIM', ' are' )
+               CALL MSG_SETC( 'NWCS', ' are' )
             END IF
 
             CALL ERR_REP( 'ARD1_RDWCS_ERR3', 'The current Frame in '//
-     :                    'the WCS FrameSet has ^NAX axes, but ^NDIM '//
+     :                    'the WCS FrameSet has ^NAX axes, but ^NWCS '//
      :                    'required.', STATUS )
          END IF
 

@@ -19,7 +19,7 @@
 
 *  Arguments:
 *     NDIM = INTEGER (Given)
-*        The number of axes required in the Current Frame.
+*        The number of pixel axes in the mask supplied to ARD_WORK.
 *     TR( * ) = REAL (Given)
 *        The coefficients of the linear transformation from application
 *        coords to pixel coords, supplied to ARD_WORK. Ignored if a call
@@ -127,6 +127,7 @@
          AWCS = AST_COPY( CMN_AWCS, STATUS )
 
 *  Check each Frame until one is found with Domain stored in CMN_ADOM.
+*  This is the frame that describes pixel coordinates in the mask array.
          IPIX = AST__NOFRAME       
          DO I = 1, AST_GETI( AWCS, 'NFRAME', STATUS )
             FR = AST_GETFRAME( AWCS, I, STATUS )
@@ -143,9 +144,22 @@
 
  10      CONTINUE
 
-*  If a suitable Frame was found make it the Base Frame.
+*  If a suitable Frame was found, make it th ebase Frame.
          IF( IPIX .NE. AST__NOFRAME ) THEN
             CALL AST_SETI( AWCS, 'BASE', IPIX, STATUS )
+
+*  Check it has the required number of axes.
+            IF( AST_GETI( AWCS, 'Nin', STATUS ) .NE. NDIM ) THEN
+               IF( STATUS .EQ. SAI__OK ) THEN
+                  STATUS = ARD__NOPIX 
+                  CALL MSG_SETC( 'D', CMN_ADOM )
+                  CALL MSG_SETI( 'N', AST_GETI( AWCS, 'Nin', STATUS ) )
+                  CALL MSG_SETI( 'M', NDIM )
+                  CALL ERR_REP( 'ARD1_APWCS_ERR2', 'The ^D Frame '//
+     :                          'specified using ARD_WCS has ^N axes '//
+     :                          'but ^M are required.', STATUS )
+               END IF
+            END IF
          
 *  Application coordinates are given by the current Frame of the WCS 
 *  FrameSet. Therefore, the Mapping from the current Frame to Application 

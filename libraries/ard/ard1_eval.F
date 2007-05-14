@@ -51,7 +51,7 @@
 *        The value to assign to pixels selected by the first keyword in
 *        the ARD description (excluding INPUT keywords).
 *     NDIM = INTEGER (Given)
-*        The no. of dimensions.
+*        The no. of pixel axes.
 *     LBND( NDIM ) = INTEGER (Given)
 *        The lower pixel index bounds of the mask and the arrays on the
 *        stack.

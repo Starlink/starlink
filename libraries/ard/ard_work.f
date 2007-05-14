@@ -1,8 +1,8 @@
-      SUBROUTINE ARD_WORK( IGRP, NDIM, LBND, UBND, TRCOEF, CONCAT,
-     :                     REGVAL, MASK, LBNDI, UBNDI, LBNDE, UBNDE,
-     :                     STATUS )
-*+
-*  Name:
+      SUBROUTINE ARD_WORK( IGRP, NDIM, LBND, UBND, TRCOEF, CONCAT, 
+     :                     REGVAL, MASK, LBNDI, UBNDI, LBNDE, UBNDE, 
+     :                     STATUS ) 
+*+ 
+*  Name: 
 *     ARD_WORK
 
 *  Purpose:
@@ -24,7 +24,7 @@
 *     IGRP = INTEGER (Given)
 *        A GRP identifier for the group holding the ARD description.
 *     NDIM = INTEGER (Given)
-*        The number of dimensions in the mask array.
+*        The number of pixl axes in the mask array.
 *     LBND( NDIM ) = INTEGER (Given)
 *        The lower pixel index bounds of the mask array.
 *     UBND( NDIM ) = INTEGER (Given)

@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_FRAAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
+      SUBROUTINE ARD1_FRAAR( NWCS, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                       NARG, I, KEYW, STATUS )
 *+
 *  Name:
@@ -11,14 +11,14 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_FRAAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND, NARG,
+*     CALL ARD1_FRAAR( NWCS, CFRM, ELEM, L, IPOPND, IOPND, SZOPND, NARG,
 *                      I, KEYW, STATUS )
 
 *  Description:
 *     The supplied arguments are stored on the operand stack.
 
 *  Arguments:
-*     NDIM = INTEGER (Given)
+*     NWCS = INTEGER (Given)
 *        The dimensionality of the ARD description (i.e. the number of
 *        values required to specify a position).
 *     CFRM = INTEGER (Given)
@@ -92,7 +92,7 @@
       INCLUDE 'ARD_ERR'          ! ARD_ error constants
 
 *  Arguments Given:
-      INTEGER NDIM
+      INTEGER NWCS
       INTEGER CFRM
       CHARACTER ELEM*(*)
       INTEGER L
@@ -118,7 +118,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Report an error and abort if the dimensionality is not 2.
-      IF( NDIM .NE. 2 ) THEN
+      IF( NWCS .NE. 2 ) THEN
          STATUS = ARD__NOT2D
          CALL ERR_REP( 'ARD1_FRAAR_ERR1', 'ARD mask is not 2 '//
      :                 'dimensional.', STATUS )

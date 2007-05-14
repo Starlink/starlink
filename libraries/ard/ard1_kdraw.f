@@ -172,6 +172,7 @@
       INTEGER
      :        I,                 ! Loop count
      :        IPLOT,             ! AST Plot identifier
+     :        NWCS,              ! No. of user coord axes
      :        IPW1               ! Pointer to work space 
 
       REAL
@@ -181,6 +182,9 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Store the number of WCS axes.
+      NWCS = AST_GETI( IWCS, 'Naxes', STATUS )
 
 *  POINT/PIXEL keywords are easy. Just transform them from user to pixel and 
 *  mark the pixel in which they fall.
@@ -194,10 +198,11 @@
 *  just transform a set of evenly spaced points from user coords to pixel
 *  coords and join them up with straight lines. Not nice, but probably no
 *  one uses 3D lines anyway.
-      ELSE IF( TYPE .EQ. ARD__LIN .AND. NDIM .NE. 2 ) THEN
+      ELSE IF( TYPE .EQ. ARD__LIN .AND. ( NDIM .NE. 2 .OR. 
+     :                                    NWCS .NE. 2 ) ) THEN
          CALL PSX_CALLOC( NDIM*NLP, '_DOUBLE', IPW1, STATUS )
-         CALL ARD1_LIN2( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, PAR,
-     :                   NLP, IWCS, %VAL( CNF_PVAL( IPB ) ), 
+         CALL ARD1_LIN2( RINDEX, NDIM, NWCS, LBND, UBND, MSKSIZ, NPAR,
+     :                   PAR, NLP, IWCS, %VAL( CNF_PVAL( IPB ) ), 
      :                   LBEXTB, UBEXTB, LBINTB,
      :                   UBINTB, %VAL( CNF_PVAL( IPW1 ) ), STATUS )
          CALL PSX_FREE( IPW1, STATUS )
@@ -208,7 +213,7 @@
 *  the drawn curve passes. Doing it this way means we pick up all the 
 *  sophisticated adaptive facilities of the Plot class for handling 
 *  non-linearities and discontinuities in the user->pixel transformation.
-      ELSE IF( NDIM .EQ. 2 ) THEN
+      ELSE IF( NDIM .EQ. 2 .AND. NWCS .EQ. 2 ) THEN
 
 *  Initialize the interior bounding box passed in common to the "drawing" 
 *  routines.

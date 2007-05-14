@@ -7,6 +7,13 @@
     The COFRAME statement has been extended to include specific support
     for spectral and time coordinates.
 
+    The user coordinate system used to describe positions and shapes
+    within an ARD expression can now refer to a sub-space of the axes
+    defined in the application WCS FrameSet. For instance, if the
+    application is an (RA,Dec,freq) cube, an ARD expression can be used
+    that refers only to the freq axis, in which case the same frequency
+    region will be masked in all (ra,dec) planes.
+
 
  2.0-8 (September 2006)
  -----

@@ -150,6 +150,10 @@
       NIN = AST_GETI( MAP, 'NIN', STATUS )
       NOUT = AST_GETI( MAP, 'NOUT', STATUS )
 
+*  The Mapping is not considered to be linear if the number of inputs and
+*  outputs differ.
+      IF( NIN .NE. NOUT ) GO TO 999
+      
 *  We only need to do the check if CMN_LINOK is supplied .TRUE.
       IF( CMN_LINOK ) THEN
 

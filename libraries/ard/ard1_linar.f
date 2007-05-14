@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_LINAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
+      SUBROUTINE ARD1_LINAR( NWCS, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                       NARG, I, KEYW, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_LINAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND, NARG,
+*     CALL ARD1_LINAR( NWCS, CFRM, ELEM, L, IPOPND, IOPND, SZOPND, NARG,
 *                      I, KEYW, STATUS )
 
 *  Description:
@@ -19,7 +19,7 @@
 *     stored on the operand stack.
 
 *  Arguments:
-*     NDIM = INTEGER (Given)
+*     NWCS = INTEGER (Given)
 *        The dimensionality of the ARD description (i.e. the number of
 *        values required to specify a position).
 *     CFRM = INTEGER (Given)
@@ -92,7 +92,7 @@
       INCLUDE 'ARD_ERR'          ! ARD_ error constants
 
 *  Arguments Given:
-      INTEGER NDIM
+      INTEGER NWCS
       INTEGER CFRM
       CHARACTER ELEM*(*)
       INTEGER L
@@ -123,7 +123,7 @@
       DO WHILE( I .LE. L .AND. KEYW .AND. STATUS .EQ. SAI__OK ) 
 
 *  If another argument is obtained, which axis will it refer to?
-         AXIS = MOD( NARG, NDIM ) + 1
+         AXIS = MOD( NARG, NWCS ) + 1
 
 *  Read the next argument.
          CALL ARD1_GTARG( CFRM, AXIS, ELEM, L, I, OK, KEYW, VALUE, 
@@ -138,7 +138,7 @@
 *  the number of arguments obtained is incorrect.
          ELSE IF( .NOT. KEYW ) THEN
  
-            IF( NARG .NE. 2*NDIM .AND. STATUS .EQ. SAI__OK ) THEN
+            IF( NARG .NE. 2*NWCS .AND. STATUS .EQ. SAI__OK ) THEN
                STATUS = ARD__ARGS
                CALL ERR_REP( 'ARD1_LINAR_ERR1', 'Incorrect number of '//
      :                       'arguments found.', STATUS )

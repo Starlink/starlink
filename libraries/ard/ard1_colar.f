@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_COLAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
+      SUBROUTINE ARD1_COLAR( NWCS, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                       NARG, I, KEYW, STATUS )
 *+
 *  Name:
@@ -11,14 +11,14 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_COLAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND, NARG,
+*     CALL ARD1_COLAR( NWCS, CFRM, ELEM, L, IPOPND, IOPND, SZOPND, NARG,
 *                      I, KEYW, STATUS )
 
 *  Description:
 *     Store the supplied arguments on the operands stack.
 
 *  Arguments:
-*     NDIM = INTEGER (Given)
+*     NWCS = INTEGER (Given)
 *        The dimensionality of the ARD description (i.e. the number of
 *        values required to specify a position).
 *     CFRM = INTEGER (Given)
@@ -91,7 +91,7 @@
       INCLUDE 'ARD_ERR'          ! ARD_ error constants
 
 *  Arguments Given:
-      INTEGER NDIM
+      INTEGER NWCS
       INTEGER CFRM
       CHARACTER ELEM*(*)
       INTEGER L
@@ -117,7 +117,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Report an error and abort if the dimensionality is not 2.
-      IF( NDIM .NE. 2 ) THEN
+      IF( NWCS .NE. 2 ) THEN
          STATUS = ARD__NOT2D
          CALL ERR_REP( 'ARD1_COLAR_ERR1', 'Ard mask is not 2 '//
      :                 'dimensional.', STATUS )

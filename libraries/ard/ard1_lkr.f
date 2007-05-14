@@ -256,7 +256,7 @@
          LINEAR = .TRUE.
          DAST = OPRNDS( IOPND + 4 + NPAR )
          ICOEFF = IOPND + 5 + NPAR
-         LASTOP = IOPND + 4 + NPAR + NDIM*( NDIM + 1 ) 
+         LASTOP = IOPND + 4 + NPAR +  NDIM*( NDIM + 1 ) 
       END IF
 
 *  Report an error if there are insufficient values in OPRNDS.

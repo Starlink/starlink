@@ -138,6 +138,7 @@
      :        IND,               ! Current Cartesian co-ord. value
      :        IPAR,              ! Index of current Cartesian co-ord.
      :        MAP,               ! AST identifier for user -> pixel Mapping 
+     :        NWCS,              ! No. of user axes
      :        VA                 ! Vector address eqv to Cartesian pnt.
 
 *.
@@ -151,17 +152,19 @@
          UBINTB( I ) = VAL__MINI
       END DO
 
-*  Get the user -> pixel Mapping from the FrameSet.
+*  Get the user -> pixel Mapping from the FrameSet, and the number of
+*  user axes.
       MAP = AST_SIMPLIFY( AST_GETMAPPING( IWCS, AST__CURRENT,
      :                                    AST__BASE, STATUS ),
      :                    STATUS )
+      NWCS = AST_GETI( MAP, 'Nin', STATUS )
 
 *  Loop round each set of co-ordinates.
       IPAR = 1
       DO WHILE( IPAR .LE. NPAR - NDIM + 1 )
 
 *  Transform this position from user to pixel coords.
-         CALL AST_TRANN( MAP, 1, NDIM, 1, PAR( IPAR ), .TRUE., NDIM,
+         CALL AST_TRANN( MAP, 1, NWCS, 1, PAR( IPAR ), .TRUE., NDIM,
      :                   1, GR, STATUS )
 
 *  Find the vector address corresponding to these pixel co-ordinates.
