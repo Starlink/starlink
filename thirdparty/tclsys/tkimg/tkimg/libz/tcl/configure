@@ -3130,6 +3130,11 @@ fi
 rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
     fi
 
+    #---------------------------------------------------------------------
+    # Add any environment CFLAGS to the compiler (user defined).
+    #---------------------------------------------------------------------
+    CC="${CC} ${CFLAGS}"
+
     # Find a good install program.  We prefer a C program (faster),
 # so one script is as good as another.  But avoid the broken or
 # incompatible versions:
