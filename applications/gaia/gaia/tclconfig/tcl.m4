@@ -3072,6 +3072,12 @@ AC_DEFUN(TEA_SETUP_COMPILER_CC, [
 
     AC_PROG_CXX
 
+    #-------------------------------------------------------------------
+    #  Apply environment (user defined) flags to compilers.
+    #-------------------------------------------------------------------
+    CC="${CC} ${CFLAGS}"
+    CXX="${CXX} ${CXXFLAGS} ${CFLAGS}"
+
     AC_PROG_INSTALL
 
     #--------------------------------------------------------------------
