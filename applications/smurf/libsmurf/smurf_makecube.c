@@ -920,7 +920,7 @@ void smurf_makecube( int *status ) {
 
 /* BADMASK = OR and FIRST can only be used with SPREAD = Nearest. Report an 
    error for any other combination. */
-   if( badmask != 2 && spread != AST__NEAREST ) {
+   if( badmask != 2 && spread != AST__NEAREST && *status == SAI__OK) {
       *status = SAI__ERROR;
       errRep( "", "Incompatible values supplied for parameters BADMASK "
               "and SPREAD.", status );
