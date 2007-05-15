@@ -1297,7 +1297,7 @@ L999:;
    if( wcsout ) ndfPtwcs( wcsout, ondf, status );
 
 /* If we are creating an output Variance component... */
-   if( genvar ) {
+   if( genvar && *status == SAI__OK) {
 
 /* Count the number of pixel which have a good data value but a bad
    variance value, and count the number which have a good data value. 
