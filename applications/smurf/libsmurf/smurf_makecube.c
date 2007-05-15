@@ -60,7 +60,7 @@
 *          in order to optimise the grid. [FALSE]
 *     BADMASK = LITERAL (Read)
 *          A string determining the way in which bad pixels are propagated
-*          from input to output. The default value of "AND" should usually be 
+*          from input to output. "AND" should usually be 
 *          used since this scheme uses all input data, thus reducing the 
 *          noise in the output, and also minimises the number of bad pixels in
 *          the output. However, for large data sets, the memory requirements 
@@ -68,7 +68,8 @@
 *          other schemes, "FIRST" and "OR", are provided which greatly reduce 
 *          the memory requirements, at the expense either of introducing more 
 *          bad pixels into the output ("OR") or producing higher output noise 
-*          levels ("FIRST"):
+*          levels ("FIRST"). This parameter is only requested if SPREAD is
+*          set to "Nearest":
 *
 *          - "FIRST" -- The bad pixel mask in each output spectrum is 
 *          inherited from the first input spectrum that contributes to the 
@@ -901,21 +902,28 @@ void smurf_makecube( int *status ) {
 /* See how the bad pixel mask in each output spectrum is to be determined. 
    Also choose whether to use the 2D or the 3D weighting system. The 2D  
    system assumes that all pixels in a given output spectrum have the same 
-   weight and variance, and requires much less memory than the 3D system. */
-   parChoic( "BADMASK", "OR", "AND,OR,FIRST", 1, pabuf, 10, status );
+   weight and variance, and requires much less memory than the 3D system.
+   Do not bother asking if we are using a 3d spread function by definition.
+*/
+   if (spread == AST__NEAREST) {
+     parChoic( "BADMASK", "OR", "AND,OR,FIRST", 1, pabuf, 10, status );
 
-   if( !strcmp( pabuf, "AND" ) ) {
-      badmask = 2;
-      is2d = 0;
+     if( !strcmp( pabuf, "AND" ) ) {
+       badmask = 2;
+       is2d = 0;
 
-   } else if( !strcmp( pabuf, "OR" ) ) {
-      badmask = 1;
-      is2d = 1;
+     } else if( !strcmp( pabuf, "OR" ) ) {
+       badmask = 1;
+       is2d = 1;
 
+     } else {
+       badmask = 0;
+       is2d = 1;
+
+     }
    } else {
-      badmask = 0;
-      is2d = 1;
-
+     badmask = 2;
+     is2d = 0;
    }
 
 /* BADMASK = OR and FIRST can only be used with SPREAD = Nearest. Report an 
