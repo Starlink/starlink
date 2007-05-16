@@ -100,13 +100,12 @@ AC_SUBST(SHLIB_LD_CXX_LIBS)
 export CXXFLAGS
 case $system in
    OSF*) 
-      if test "$CXX" = "cxx"; then 
-         CXXFLAGS="$CXXFLAGS -g3 -std gnu -D__USE_STD_IOSTREAM=1"
-      fi
+      case "x$CXX" in
+         xcxx*)
+            CXXFLAGS="$CXXFLAGS -g3 -std gnu -D__USE_STD_IOSTREAM=1"
+         ;;
+      esac
   ;;
 esac
-
-
-
 ])
 
