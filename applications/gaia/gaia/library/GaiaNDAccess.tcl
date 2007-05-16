@@ -510,7 +510,7 @@ itcl::class gaia::GaiaNDAccess {
       lassign [getinfo $addr_(DATA)] adr nel hdstype fulltype
 
       #  Get a 1D WCS for our chosen axes.
-      set spectralwcs [getaxiswcs $axis $alow]
+      set spectralwcs [getaxiswcs $axis [expr $alow-1]]
 
       #  Extract the spectral data values and copy into place.
       set specdata [getlastspectrum "DATA"]
