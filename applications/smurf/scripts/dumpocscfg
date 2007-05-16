@@ -85,11 +85,22 @@ for my $f (@files) {
       dat_find( $jloc, "CONFIG", my $cloc, $status );
       dat_annul( $jloc, $status);
 
+      dat_len($cloc, my $strlen, $status);
       dat_shape($cloc, 7, my @dim, my $ndim, $status);
       dat_getvc( $cloc, $dim[0], my @config, my $nlines, $status );
-      $config = join("",@config);
-      chomp($config);
       dat_annul($cloc, $status );
+
+      # because trailing spaces will be stripped, but we know that
+      # trailing spaces are important, we need to add spaces back on
+      # before joining (sprintf complains if a newline character is
+      # in the string so we use length). Remove the last newline from
+      # the last line only (and we do not need to pad the last line)
+      for my $line (@config[0..$#config-1]) {
+	$config .= $line . (" "x($strlen - length($line)));
+      }
+      # Now the last line
+      chomp($config[-1]);
+      $config .= $config[-1];
     } elsif ($status == &NDF::SAI__OK) {
       print STDERR "# Configuration not stored in file. Checking headers\n";
 
@@ -145,7 +156,7 @@ for my $f (@files) {
       }
 
     }
-    print $config ."\n" if $config;
+    print $config ."\n" if defined $config;
 
 
     last if $status != &NDF::SAI__OK;
