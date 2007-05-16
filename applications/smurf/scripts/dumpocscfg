@@ -85,7 +85,9 @@ for my $f (@files) {
       dat_find( $jloc, "CONFIG", my $cloc, $status );
       dat_annul( $jloc, $status);
 
-      dat_get0c( $cloc, $config, $status );
+      dat_shape($cloc, 7, my @dim, my $ndim, $status);
+      dat_getvc( $cloc, $dim[0], my @config, my $nlines, $status );
+      $config = join("",@config);
       chomp($config);
       dat_annul($cloc, $status );
     } elsif ($status == &NDF::SAI__OK) {
