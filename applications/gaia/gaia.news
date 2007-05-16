@@ -4,27 +4,31 @@
     The version of Skycat that GAIA is based on has been updated to
     version 3.0-1.
 
+    A bug when writing an extracted spectrum to NDF and FITS files
+    has been corrected. Previously the coordinates of was incorrect
+    by a single channel.
+
     GAIA 3.3-7
     ==========
 
     The spectrum can now be re-extracted (after changing the extraction
     limits) by pressing a simple button, as well as by clicking on the
-    image. 
+    image.
 
-    The data range used to display the extracted spectrum can now be 
+    The data range used to display the extracted spectrum can now be
     defined explicitly.
 
     The various bounds for extracting spectra etc. should now work
     correctly when the lower bound is greater than the upper bound.
 
-    Increased the output length of a TST catalogue line to 4096 
+    Increased the output length of a TST catalogue line to 4096
     characters. Previously this was 1024 which has become restricting
-    (causing some failures to read FITS catalogues with many columns).   
- 
-    The spectral cube window will now retain some settings between 
+    (causing some failures to read FITS catalogues with many columns).
+
+    The spectral cube window will now retain some settings between
     sessions. These include the background and line colours.
 
-    FITS spectra now have the extraction meta-data add to their headers.   
+    FITS spectra now have the extraction meta-data add to their headers.
 
     The rebin cube tools now correct use "mean" as the combination method.
     Previously "sum" was used until either "mean" or "sum" was explicitly
@@ -60,16 +64,16 @@
 
     - New "Filter" controls have been added to the cube toolbox. These allow
     the current cube to be smoothed, image plane by image plane, using a box
-    or gaussian filter. 
+    or gaussian filter.
 
     - A new "Go" menu has been added to the cube toolbox. This is similar
     to the main window menu, but only displays possible cubes, arranges
-    for them to be efficiently loaded and attempts to preserve the 
+    for them to be efficiently loaded and attempts to preserve the
     current spectral extraction limits.
 
-    - Spectra extracted from ACSIS cubes now contain various useful 
+    - Spectra extracted from ACSIS cubes now contain various useful
     information, such as various RA and Decs, the exposure time of spectrum
-    and the system temperature. These can be displayed by the SPLAT-VO 
+    and the system temperature. These can be displayed by the SPLAT-VO
     application synopsis feature, when such a spectrum is sent to it.
 
     - The centroid maximum search box size and shift are now start up
@@ -85,7 +89,7 @@
     the Interop menu in the spectral plot window. Only SPLAT-VO supports
     this at present.
 
-    - Extracted spectra can now be saved to NDF and FITS files. The 
+    - Extracted spectra can now be saved to NDF and FITS files. The
     "Send to SPLAT" options now send NDF spectra, previously they
     sent a text file.
 
@@ -99,7 +103,7 @@
     support Horizon (AZEL) coordinates.
 
     - The celestial coordinates toolbox now supports the use of the
-    sky reference position as an origin (for offset coordinates) or 
+    sky reference position as an origin (for offset coordinates) or
     local pole.
 
     - Images of size 1x1 should now be accepted and handled as other images.
@@ -147,13 +151,13 @@
     of the current cube, so that any displayed coordinates are in
     the correct context.
 
-    - When a cube is collapsed the result image is now in the same coordinates 
+    - When a cube is collapsed the result image is now in the same coordinates
     as the current ones in use by the toolbox. This gives the correct units
     for any integrated intensity measurements.
 
     - The distance ruler now measures to the middle of the final pixel to the
     top and right of the display. Previously this stopped one pixel further
-    in. 
+    in.
 
     - FITS headers are now shown out to 80 characters. Previously they were
     truncated at 79.
@@ -163,7 +167,7 @@
 
     - The cube spectral extraction now handles dependent axes (like RA and
     Dec), differently so that more extractions along one of these axes will
-    succeed. 
+    succeed.
 
     - The XY profile toolbox can now be activated using control-e.
     This also avoids the prompt dialog reminding you to draw a
