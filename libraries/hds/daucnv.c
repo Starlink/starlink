@@ -999,6 +999,19 @@ int dat1_cvt_dtype( bad, nval, imp, exp, nbad )
          break;
 
    }
+   /* Make sure we keep EMS happy */
+   if (hds_gl_status == DAT__CONER) {
+     emsSetc( "I", dat_gl_ndr[ imp->dtype ].name );
+     emsSetc( "O", dat_gl_ndr[ exp->dtype ].name );
+     emsRep(" ", "Error converting from ^I to ^O",
+	    &hds_gl_status);
+   } else if (hds_gl_status == DAT__TRUNC) {
+     emsSeti( "SLEN", (int)(imp->length) );
+     emsSeti( "DLEN", (int)(exp->length) );
+     emsRep(" ","Truncation during copy (^DLEN < ^SLEN)",
+	    &hds_gl_status);
+   }
+
    return hds_gl_status;
 }
 
