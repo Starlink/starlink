@@ -803,10 +803,15 @@ itcl::class gaia::GaiaImageCtrl {
    #  Display a popup window with information about this application,
    #  override to remove SkyCat splash logo.
    public method about {} {
-      global ::about_skycat
+      global ::about_skycat ::gaia_library
+      set gaia_logo [image create photo -file $gaia_library/gaia_logo.xpm]
+      set lines [split $about_skycat "\n"]
+      set max_lines [llength $lines]
       DialogWidget $w_.about \
-         -messagewidth 6.5i \
+         -image $gaia_logo \
+         -messagewidth 5i \
          -justify center \
+         -max_lines $max_lines \
          -text $about_skycat
       $w_.about activate
    }
