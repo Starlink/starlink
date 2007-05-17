@@ -130,8 +130,8 @@ Mark Taylor (m.b.taylor@bristol.ac.uk)
 GAIA is derived from SkyCat version $skycat_version
 Copyright (C) 1996-2006 ESO - European Southern Observatory
 
-Authors:
-Allan Brighton (abrighton@gemini.edu)
+Authors: 
+Allan Brighton (abrighto@eso.org)
 Thomas Herlin (therlin@eso.org)
 Miguel Albrecht (malbrech@eso.org)
 Daniel Durand (durand@dao.nrc.ca)
