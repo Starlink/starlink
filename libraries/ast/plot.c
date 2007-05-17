@@ -616,6 +616,9 @@ f     - Title: The Plot title drawn using AST_GRID
 *        in HPX grid plots being bridged by grid lines).
 *        - Double the dimension of the grid used by GoodGrid to avoid
 *        missing the pointy bits in a HPX projection.
+*     17-MAY-2007 (DSB)
+*        Exclude corner positions when determining the range of axis
+*        values covered by the plot. This gives better default gap sizes.
 *class--
 */
 
@@ -1776,7 +1779,7 @@ static char *FindWord( char *, const char *, const char ** );
 static char *GrfItem( int, const char * );
 static const char *SplitValue( AstPlot *, const char *, int, int * );
 static const char *JustMB( AstPlot *, int, const char *, float *, float *, float, float, const char *, float, float, float, float, float *, float *, const char *, const char * );
-static double **MakeGrid( AstPlot *, AstFrame *, AstMapping *, int, double, double, double, double, int, AstPointSet **, AstPointSet**, int, const char *, const char * );
+static double **MakeGrid( AstPlot *, AstFrame *, AstMapping *, int, int, double, double, double, double, int, AstPointSet **, AstPointSet**, int, const char *, const char * );
 static double GetTicks( AstPlot *, int, double *, double **, int *, int *, int, int *, double *, const char *, const char * );
 static double GetUseSize( AstPlot *, int );
 static double GetUseWidth( AstPlot *, int );
@@ -1854,7 +1857,7 @@ static void GScales( AstPlot *, float *, float *, const char *, const char *  );
 static void GText( AstPlot *, const char *, float, float, const char *, float, float, const char *, const char * );
 static void GTxExt( AstPlot *, const char *, float , float, const char *, float, float, float *, float *, const char *, const char * );
 static void GenCurve( AstPlot *, AstMapping * );
-static void GraphGrid( int, double, double, double, double, double ** );
+static int GraphGrid( int, int, double, double, double, double, double ** );
 static void GrfPop( AstPlot * );
 static void GrfPush( AstPlot * );
 static void GrfSet( AstPlot *, const char *,  AstGrfFun );
@@ -4460,7 +4463,7 @@ static int Boundary( AstPlot *this, const char *method, const char *class ){
    rate_disabled = astRateState( 1 );
 
 /* Create the grid. */
-   ptr2 = MakeGrid( this, NULL, map, dim, this->xlo, this->xhi, this->ylo, 
+   ptr2 = MakeGrid( this, NULL, map, 0, dim, this->xlo, this->xhi, this->ylo, 
                     this->yhi, 2, &pset1, &pset2, 0, method, class );
 
 /* Store the number of cells along each edge of the grid. */
@@ -4598,8 +4601,9 @@ static int Boundary( AstPlot *this, const char *method, const char *class ){
 /* If this cell is a boundary cell with the required flag value, store a 
    refined grid of graphics coordinates covering the area of the cell. */
                      if( *( flag++ ) == flag_value ){
-                        GraphGrid( rdim, ptr1[ 0 ][ c0 ], ptr1[ 0 ][ c2 ], 
-                                   ptr1[ 1 ][ c0 ], ptr1[ 1 ][ c2 ], ptr3b );
+                        (void) GraphGrid( rdim, 0, ptr1[ 0 ][ c0 ], 
+                                          ptr1[ 0 ][ c2 ], ptr1[ 1 ][ c0 ], 
+                                          ptr1[ 1 ][ c2 ], ptr3b );
 
 /* Increment the pointers to the next values to be added to the PointSet
    arrays. */
@@ -8502,7 +8506,7 @@ static AstPointSet *DefGap( AstPlot *this, double *gaps, int *ngood,
    ptr2 = astGetPoints( pset2 );
 
 /* Store the number of elements in each PointSet. */
-   psize = dim*dim;
+   psize = astGetNpoint( pset1 );
 
 /* For each axis... */
    for( j = 0; j < 2 && astOK; j++ ){
@@ -8529,7 +8533,7 @@ static AstPointSet *DefGap( AstPlot *this, double *gaps, int *ngood,
       minv = ptr2[ j ][ 0 ];
       maxv = ptr2[ j ][ ngood[ j ] - 1 ];
 
-/* See if ticks on this axis are spaced linearly or logarithmicly. If a
+/* See if ticks on this axis are spaced linearly or logarithmically. If a
    value has been set for LogTicks used it, otherwise find a default value.
    The default is 0 unless LogPlot is non-zero, the axis range does not
    encompass zero and and the dynamic range is 100 or more. Set this
@@ -14650,7 +14654,6 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
             } else {
                break;
             }
-   
          }
 
 /* If an explicit gap size was supplied, use it. */
@@ -14775,6 +14778,7 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
    double ymin;       /* Low Y bound of region containing good phy. coords */
    int j;             /* Element offset */
    int ngood;         /* Number of grid points with good physical coords */
+   int size;          /* Number of grid points */
 
 /* Initialise the returned PointSet pointers. */
    *pset1 = NULL;
@@ -14821,8 +14825,11 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
    and the other holding the corresponding physical coordinates. The grid
    covers the entire plotting area with the current grid dimension. A
    pointer to the physical axis values is returned. */
-      ptr2 = MakeGrid( this, frm, map, *dim, this->xlo, this->xhi, this->ylo, 
+      ptr2 = MakeGrid( this, frm, map, 1, *dim, this->xlo, this->xhi, this->ylo, 
                        this->yhi, 2, pset1, pset2, 0, method, class );
+
+/* Get the number of graphics axis values. */
+      size = astGetNpoint( *pset1 );
 
 /* Get a pointer to the graphics axis values. */
       ptr1 = astGetPoints( *pset1 );
@@ -14844,7 +14851,7 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
          ymin = DBL_MAX;
          ymax = -DBL_MAX;
 
-         for( j = 0; j < (*dim)*(*dim); j++ ){
+         for( j = 0; j < size; j++ ){
             if( *pa != AST__BAD && *pb != AST__BAD ){
                if( *px < xmin ) xmin = *px;
                if( *px > xmax ) xmax = *px;
@@ -14863,7 +14870,7 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
 /* Store approximate fraction of the plotting area containing good
    physical coordinates. */
    if( astOK ) {
-      frac =  ( (double) ngood )/(double)( (*dim)*(*dim) );
+      frac =  ( (double) ngood )/(double)( astGetNpoint( *pset1 ) );
 
 /* Get the size of each grid cell. */
       dx = ptr1[0][1] - ptr1[0][0];
@@ -14894,7 +14901,7 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
 
 /* Create the new grid covering the region containing good physical
    coordinates. */
-         (void) MakeGrid( this, frm, map, *dim, xmin, xmax, ymin, ymax, 2,
+         (void) MakeGrid( this, frm, map, 1, *dim, xmin, xmax, ymin, ymax, 2,
                           pset1, pset2, 0, method, class );
       }
    }
@@ -14917,8 +14924,8 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
 
 }
 
-static void GraphGrid( int dim, double xlo, double xhi, double ylo, 
-                       double yhi, double **ptr1 ){
+static int GraphGrid( int dim, int disk, double xlo, double xhi, double ylo, 
+                      double yhi, double **ptr1 ){
 /*
 *  Name:
 *     GraphGrid
@@ -14931,8 +14938,8 @@ static void GraphGrid( int dim, double xlo, double xhi, double ylo,
 
 *  Synopsis:
 *     #include "plot.h"
-*     void GraphGrid( int dim, double xlo, double xhi, double ylo, 
-*                     double yhi, double **ptr1 )
+*     int GraphGrid( int dim, int disk, double xlo, double xhi, double ylo, 
+*                    double yhi, double **ptr1 )
 
 *  Class Membership:
 *     Plot member function.
@@ -14948,6 +14955,9 @@ static void GraphGrid( int dim, double xlo, double xhi, double ylo,
 *  Parameters:
 *     dim
 *        The number of samples along each edge of the grid.
+*     disk
+*        If non-zero, the corners of the grid are omitted, resulting in a 
+*        grid that is more disk like than rectangular.
 *     xlo
 *        The lower bound on the first axis of the region to be covered
 *        by the grid.
@@ -14965,24 +14975,40 @@ static void GraphGrid( int dim, double xlo, double xhi, double ylo,
 *        arrays to receive the values for each of the two axes of the graphics
 *        coordinate data.
 
+*  Returned Value:
+*     The number of points in the grid. If "disk" is zero, this will be
+*     the square of "dim". If "disk" is non-zero, this will be less than
+*     the square of "dim" to account for the lack of corner points.
+
 */
 
 /* Local Variables: */
    double *px;
    double *py;
+   double cen;
    double dx;      
+   double dy2;
    double dy;
+   double dx2;
+   double r2;
    double y;
    int i;
    int j;
+   int ok; 
 
 /* Check the global error status. */
-   if ( !astOK ) return;
+   if ( !astOK ) return 0;
 
 /* Find the cell size. */
    dx = ( xhi - xlo )/(double)( dim - 1 );
    dy = ( yhi - ylo )/(double)( dim - 1 );
  
+/* Store the mid cell index. */
+   cen = 0.5*( dim - 1 );
+
+/* Store the squared radius of the disk. */
+   r2 = 1.9*cen*cen;
+
 /* Initialise pointers to the start of the two arrays to recieve the 
    returned graphics values for each axis. */
    px = ptr1[ 0 ];
@@ -14990,6 +15016,8 @@ static void GraphGrid( int dim, double xlo, double xhi, double ylo,
 
 /* Loop round row. */
    for( j = 0; j < dim; j++ ){
+      dy2 = j - cen;
+      dy2 *= dy2;
 
 /* Get the Y coordinate of the current row. */
       y = ylo + j*dy;
@@ -14997,17 +15025,26 @@ static void GraphGrid( int dim, double xlo, double xhi, double ylo,
 /* Loop round each column in the current row. */
       for( i = 0; i < dim; i++ ){
 
+/* If we are forming a disk rather than a square, check if this point is
+   sufficiently close to the centre to be included in the disk. */
+         if( disk ) {
+            dx2 = i - cen;
+            dx2 *= dx2;
+            ok = ( dx2 + dy2 <= r2 );
+         } else {
+            ok = 1;
+         }
+
 /* Store the coordinates of the current grid point. */
-         *(px++) = xlo + i*dx;
-         *(py++) = y;
-
+         if( ok ) {
+            *(px++) = xlo + i*dx;
+            *(py++) = y;
+         }
       }
-
    }
 
-/* Return. */
-   return;
-
+/* Return the used length of the PointSet. */
+   return (int)( px - ptr1[ 0 ] );
 }
 
 static void GrfPop( AstPlot *this ) {
@@ -18948,8 +18985,8 @@ static void LinePlot( AstPlot *this, double xa, double ya, double xb,
 }
 
 static double **MakeGrid( AstPlot *this, AstFrame *frm, AstMapping *map, 
-                          int dim, double xlo, double xhi, double ylo, 
-                          double yhi, int nphy, AstPointSet **pset1, 
+                          int disk, int dim, double xlo, double xhi, 
+                          double ylo, double yhi, int nphy, AstPointSet **pset1,
                           AstPointSet **pset2, int norm, const char *method, 
                           const char *class ){
 /*
@@ -18966,7 +19003,7 @@ static double **MakeGrid( AstPlot *this, AstFrame *frm, AstMapping *map,
 *  Synopsis:
 *     #include "plot.h"
 *     double **MakeGrid( AstPlot *this, AstFrame *frm, AstMapping *map, 
-*                        int dim, double xlo, double xhi, double ylo, 
+*                        int disk, int dim, double xlo, double xhi, double ylo,
 *                        double yhi, int nphy, AstPointSet **pset1, 
 *                        AstPointSet **pset2, int norm, const char *method, 
 *                        const char *class ){
@@ -18993,6 +19030,10 @@ static double **MakeGrid( AstPlot *this, AstFrame *frm, AstMapping *map,
 *     map
 *        The Mapping from graphics to physical coordinates, extracted from
 *        the Plot.
+*     disk
+*        If non-zero, the corners of the grid are omitted form the
+*        returned PointSets, resulting in a grid that is more disk like than
+*        rectangular.
 *     dim
 *        The number of samples along each edge of the grid.
 *     xlo
@@ -19048,7 +19089,8 @@ static double **MakeGrid( AstPlot *this, AstFrame *frm, AstMapping *map,
 /* Check the global error status. */
    if ( !astOK ) return NULL;
 
-/* Create two PointSets. */
+/* Create two PointSets. We assume for the moment that they cover the
+   full grid, including corners. */
    size = dim*dim;
    *pset1 = astPointSet( size, 2, "" );
    *pset2 = astPointSet( size, nphy, "" );
@@ -19058,7 +19100,14 @@ static double **MakeGrid( AstPlot *this, AstFrame *frm, AstMapping *map,
    ptr2 = astGetPoints( *pset2 );
 
 /* Create a grid covering the supplied area. */
-   GraphGrid( dim, xlo, xhi, ylo, yhi, ptr1 );
+   size = GraphGrid( dim, disk, xlo, xhi, ylo, yhi, ptr1 );
+
+/* If the corners are being omitted, reduce the number of points in the 
+   two PointSets. */
+   if( disk ) {
+      astSetNpoint( *pset1, size );
+      astSetNpoint( *pset2, size );
+   }
 
 /* Transform these graphics positions to physical coordinates. */
    Trans( this, frm, map, *pset1, 1, *pset2, norm, method, class ); 
