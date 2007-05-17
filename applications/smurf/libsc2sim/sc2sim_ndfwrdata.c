@@ -168,6 +168,8 @@
 *        - Add some more (admittedly blank) FITS headers
 *     2007-05-04 (AGG):
 *        Add INSTRUME FITS keyword
+*     2007-05-17 (EC):
+*        Use astFitsSetCN instead of astFitsSetS for COMMENT lines
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
@@ -327,7 +329,7 @@ int *status              /* Global status (given and returned) */
    fitschan = astFitsChan ( NULL, NULL, "" );
 
    /* Telescope */
-   astSetFitsS ( fitschan, "COMMENT", "", "-- Telescope specific parameters --", 0 );
+   astSetFitsCN ( fitschan, "COMMENT", "", "-- Telescope specific parameters --", 0 );
    astSetFitsS ( fitschan, "TELESCOP", "JCMT", "Name of telescope", 0 );
    astSetFitsS ( fitschan, "ORIGIN", "SMURF SCUBA-2 simulator", 
 		 "Origin of file", 0 );
@@ -345,7 +347,7 @@ int *status              /* Global status (given and returned) */
    astSetFitsF ( fitschan, "ETAL", 1.0, "Telescope efficiency", 0 );
 
    /* Observation, date & pointing */
-   astSetFitsS ( fitschan, "COMMENT", "", "-- Observation & date parameters --", 0 );
+   astSetFitsCN ( fitschan, "COMMENT", "", "-- Observation & date parameters --", 0 );
    astSetFitsS ( fitschan, "OBSID", obsid, "Unique observation ID", 0 );
    astSetFitsS ( fitschan, "OBJECT", "SMURF", "Object Name", 0 );
    astSetFitsL ( fitschan, "STANDARD", 0, "True if source is a calibrator", 0 );
@@ -381,7 +383,7 @@ int *status              /* Global status (given and returned) */
    astSetFitsS ( fitschan, "LSTEND", lstend, "LST at end of sub-scan", 0 );
 
    /* Environment */
-   astSetFitsS ( fitschan, "COMMENT", "", "-- Environment parameters --", 0 );
+   astSetFitsCN ( fitschan, "COMMENT", "", "-- Environment parameters --", 0 );
    astSetFitsF ( fitschan, "ATSTART", sinx->atstart, 
                  "[deg C] Ambient temperature at start", 0 );
    astSetFitsF ( fitschan, "ATEND", sinx->atend, 
@@ -392,7 +394,7 @@ int *status              /* Global status (given and returned) */
    astSetFitsF ( fitschan, "SEEINGEN", 1.0, "Seeing at end", 0 );
 
    /* OMP & ORAC-DR */
-   astSetFitsS ( fitschan, "COMMENT", "", "-- OMP & ORAC-DR parameters --", 0 );
+   astSetFitsCN ( fitschan, "COMMENT", "", "-- OMP & ORAC-DR parameters --", 0 );
    astSetFitsS ( fitschan, "PROJECT", "M08AC00", 
 		 "The proposal ID for the PROJECT", 0 );
    astSetFitsS ( fitschan, "RECIPE", "", "The ORAC-DR recipe", 0 );
@@ -403,7 +405,7 @@ int *status              /* Global status (given and returned) */
    astSetFitsS ( fitschan, "SURVEY", "", "Survey Name", 0 );
 
    /* SCUBA-2 */
-   astSetFitsS ( fitschan, "COMMENT", "", "-- SCUBA-2 specific parameters --", 0 );
+   astSetFitsCN ( fitschan, "COMMENT", "", "-- SCUBA-2 specific parameters --", 0 );
    astSetFitsS ( fitschan, "INSTRUME", "SCUBA-2", "Instrument name - SCUBA-2", 0 );
    astSetFitsS ( fitschan, "SUBARRAY", sinx->subname, "subarray name", 0 );
    astSetFitsS ( fitschan, "SHUTTER", "", "Shutter position for dark frames", 0 );
@@ -411,7 +413,7 @@ int *status              /* Global status (given and returned) */
    astSetFitsF ( fitschan, "WAVELEN", inx->lambda, "[m] Wavelength", 0 );
 
    /* Switching and mapping */
-   astSetFitsS ( fitschan, "COMMENT", "", "-- Mapping parameters --", 0 );
+   astSetFitsCN ( fitschan, "COMMENT", "", "-- Mapping parameters --", 0 );
    if ( strncmp( inx->obsmode, "DREAM", 5) == 0 || 
 	strncmp( inx->obsmode, "STARE", 5) == 0 ) {
      astSetFitsS ( fitschan, "SAM_MODE", inx->obsmode, 
@@ -485,12 +487,12 @@ int *status              /* Global status (given and returned) */
    }
 
    /* JOS parameters */
-   astSetFitsS ( fitschan, "COMMENT", "", "-- JOS parameters --", 0 );
+   astSetFitsCN ( fitschan, "COMMENT", "", "-- JOS parameters --", 0 );
    astSetFitsF ( fitschan, "STEPTIME", inx->steptime, 
 		 "[s] Time interval between samples", 0 );
 
    /* Integration time */
-   astSetFitsS ( fitschan, "COMMENT", "", 
+   astSetFitsCN ( fitschan, "COMMENT", "", 
 		 "-- Integration time-related parameters --", 0 );
    astSetFitsF ( fitschan, "INT_TIME", totaltime, 
 		 "[s] Time spent integrating on source", 0 );
@@ -507,7 +509,7 @@ int *status              /* Global status (given and returned) */
    }
 
    /* SMU specific */
-   astSetFitsS ( fitschan, "COMMENT", "", "-- SMU-specific parameters --", 0 );
+   astSetFitsCN ( fitschan, "COMMENT", "", "-- SMU-specific parameters --", 0 );
    astSetFitsF ( fitschan, "ALIGN_DX", 0.0, "SMU tables X axis alignment offset", 0 );
    astSetFitsF ( fitschan, "ALIGN_DY", 0.0, "SMU tables Y axis alignment offset", 0 );
    astSetFitsF ( fitschan, "FOCUS_DZ", 0.0, "SMU tables Z axis focus offset", 0 );
@@ -517,7 +519,7 @@ int *status              /* Global status (given and returned) */
    astSetFitsF ( fitschan, "UEL", 0.0, "User elevation pointing offset", 0 );
 
    /* Misc */
-   astSetFitsS ( fitschan, "COMMENT", "", "-- Miscellaneous --", 0 );
+   astSetFitsCN ( fitschan, "COMMENT", "", "-- Miscellaneous --", 0 );
    astSetFitsS ( fitschan, "OCSCFG", "config.xml", 
 		 "Name of OCS Configuration XML file defining the observation", 0 );
    astSetFitsL ( fitschan, "SIMULATE", 1, "True if data produced by simulator", 0 );
