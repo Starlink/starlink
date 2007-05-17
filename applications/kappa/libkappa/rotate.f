@@ -228,6 +228,11 @@
 *     2006 August 19 (MJC):
 *        Added support for rotating all two-dimensional planes in a
 *        cube.
+*     2007 May 16 (MJC):
+*        Fixed bug introduced at previous change, where for a
+*        two-dimensional array with an insignificant dimension, or a 
+*        cube with two insignificant dimensions, the wrong bounds were
+*        assigned to the output NDF.
 *     {enter_further_changes_here}
 
 *-
@@ -268,6 +273,7 @@
       REAL ANGLE                 ! Clockwise degrees rotation
       DOUBLE PRECISION ANGLED    ! Rotation angle 
       CHARACTER * ( 80 ) AXCOMP  ! Axis character component
+      INTEGER AXSUM              ! Sum of the axis indices
       INTEGER IAXIS              ! Axis index
       LOGICAL AXIS               ! Axis structure present?
       LOGICAL AXNORM             ! Axis normalisation flag
@@ -391,6 +397,18 @@
 *  If we are dealing with a cube, create a two-dimensional section 
 *  from the input NDF of the size of each plane to be rotated.
       IF ( IDIM .GT. NDIM ) THEN
+
+*  Allow for the special case when a three-dimensional array has two
+*  single-element dimensions.  The first term is the sum of the
+*  dimension indices from 1 to NDIM
+         IF ( DIMSI( 1 ) .EQ. 1 .OR. DIMSI( 2 ) .EQ. 1 ) THEN
+            AXSUM = 0
+            DO I = 1, IDIM
+               AXSUM = AXSUM + I
+            END DO
+            PERPAX = AXSUM - SDIM( 1 ) - SDIM( 2 )
+         END IF
+
          DO I = 1, NDIM
             LBNDS( SDIM( I ) ) = LBNDO( SDIM( I ) )
             UBNDS( SDIM( I ) ) = UBNDO( SDIM( I ) )
@@ -398,7 +416,13 @@
          LBNDS( PERPAX ) = LBNDO( PERPAX )
          UBNDS( PERPAX ) = LBNDS( PERPAX )
          CALL NDF_SECT( NDFI, IDIM, LBNDS, UBNDS, NDFS, STATUS )
+
       ELSE
+
+*  Allow for the special case when a two-dimensional array has a
+*  single-element dimension.
+         IF ( PERPAX .LE. NDIM ) PERPAX = NDIM + 1
+
          CALL NDF_CLONE( NDFI, NDFS, STATUS )
       END IF
 
