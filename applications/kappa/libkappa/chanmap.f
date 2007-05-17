@@ -240,12 +240,13 @@
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -255,8 +256,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -295,6 +296,8 @@
 *     22-JUN-2006 (DSB):
 *        Ensure that if the original current Frame is PIXEL, AXIS or 
 *        GRID, then the output contains a suitable 3D current Frame.
+*     2007 May 17 (MJC):
+*        Correct problems with use of KPG1_WCFAX.
 *     {enter_further_changes_here}
 
 *-
@@ -403,6 +406,7 @@
       INTEGER INSLAB( MAXCHN )   ! Pointers to inverse collapsed-axis 
                                  ! slab intervals for each channel
       INTEGER IPAXCO             ! Pointers to mapped d.p. axis array
+      INTEGER IPAXWO             ! Pointers to mapped d.p. axis array
       INTEGER IPCH( 2 )          ! Pointers to mapped channel arrays
       INTEGER IPCO               ! Pointers to mapped co-ordinate array
       INTEGER IPERM( NDIM - 1 )  ! Input permutation
@@ -1092,6 +1096,9 @@
 *  in the correct data type.
                CALL PSX_CALLOC( ELI, '_DOUBLE', IPAXCO, STATUS )
                CALL PSX_CALLOC( ELI, ITYPE, IPCO, STATUS )
+               CALL PSX_CALLOC( UBNDS( JAXIS ) - LBNDS( JAXIS ) + 1, 
+     :                          '_DOUBLE', IPAXWO, STATUS )
+
 
 *  Allocate work space, unless the last pixel axis is being collapsed 
 *  (in which case no work space is needed).
@@ -1101,8 +1108,10 @@
 
 *  Obtain the double-precision co-ordinate centres along the collapse
 *  axis in the current Frame.
-               CALL KPG1_WCFAX( IBL, IWCS, IAXIS, ELI, 
-     :                          %VAL( CNF_PVAL( IPAXCO ) ), STATUS )
+               CALL KPG1_WCFAX( LBNDS, UBNDS, MAP, JAXIS, IAXIS, 
+     :                          %VAL( CNF_PVAL( IPAXCO ) ), 
+     :                          %VAL( CNF_PVAL( IPAXWO ) ), STATUS )
+
 
 *  Copy the centres to the required precision.
                IF ( ITYPE .EQ. '_REAL' ) THEN
@@ -1119,6 +1128,7 @@
 
                END IF
                CALL PSX_FREE( IPAXCO, STATUS )
+               CALL PSX_FREE( IPAXWO, STATUS )
 
 *  Store safe pointer value if axis centres are not needed.
             ELSE
