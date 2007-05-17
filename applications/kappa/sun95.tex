@@ -17,7 +17,7 @@
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
 \newcommand{\stardocdate}      {2007 May 5}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.7-3}
+\newcommand{\stardocversion}   {1.7-4}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -20206,12 +20206,9 @@ KAPPA: \htmlref{ADD}{ADD},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs}, and \htmlref{VARIANCE}{apndf:variance}~ components of an NDF
-         data structure and propagates all \htmlref{extensions}{apndf:extensions}.
-
-         \sstitem
-         Units processing is not supported at present and therefore the
-         \htmlref{UNITS}{apndf:units}~ component is not propagated.
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units},
+         \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs}, and \htmlref{VARIANCE}{apndf:variance}~ 
+         components of an NDF data structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
          Processing of \htmlref{bad pixels}{se:masking} and automatic \htmlref{quality masking}{se:qualitymask} are supported.
@@ -33167,12 +33164,9 @@ KAPPA: \htmlref{ADD}{ADD},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs}, and \htmlref{VARIANCE}{apndf:variance}~ components of an NDF
-         data structure and propagates all \htmlref{extensions}{apndf:extensions}.
-
-         \sstitem
-         Units processing is not supported at present and therefore the
-         \htmlref{UNITS}{apndf:units}~ component is not propagated.
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, 
+         \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs}, and \htmlref{VARIANCE}{apndf:variance}~ 
+         components of an NDF data structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
          Processing of \htmlref{bad pixels}{se:masking} and automatic \htmlref{quality masking}{se:qualitymask} are supported.
@@ -51575,6 +51569,12 @@ The following applications have been modified:
          if it is the same in both input NDFs.
       \end{itemize}
 
+   \item [\htmlref{DIV}{DIV}] \mbox{}
+      \begin{itemize}
+         \item This now propagates any UNITS, combining them into a
+         normalised form. 
+      \end{itemize}
+
    \item [\htmlref{COLLAPSE}{COLLAPSE}] \mbox{}
       \begin{itemize}
          \item It can now correctly collapse along a sky co-ordinate
@@ -51595,6 +51595,24 @@ The following applications have been modified:
    \item [\htmlref{MFITTREND}{MFITTREND}] \mbox{}
       \begin{itemize}
       \item It can now cope without an inverse WCS transformation.
+      \end{itemize}
+
+   \item [\htmlref{MULT}{MULT}] \mbox{}
+      \begin{itemize}
+         \item This now propagates any UNITS, combining them into a
+         normalised form. 
+      \end{itemize}
+
+   \item [\htmlref{NDFTRACE}{NDFTRACE}] \mbox{}
+      \begin{itemize}
+      \item It now reports a nominal pixel scale.
+      \end{itemize}
+
+   \item [\htmlref{ROTATE}{ROTATE}] \mbox{}
+      \begin{itemize}
+         \item A bug introduced at previous release is fixed.  It can
+         again rotate a two-dimensional array with a dimension of one
+         element, or a cube with two single-element dimensions.
       \end{itemize}
 
    \item [\htmlref{SUB}{SUB}] \mbox{}
