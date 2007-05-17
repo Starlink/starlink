@@ -35,6 +35,8 @@
 *  History:
 *     2007-02-12 (EC):
 *        Initial Version
+*     2007-05-17 (EC)
+*        Added SMF__NOI
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -98,6 +100,10 @@ smf_calcmodelptr *smf_model_getptr( smf_modeltype type, int *status) {
 
   case SMF__EXT:
     retval = (smf_calcmodelptr *) &smf_calcmodel_ext;
+    break;
+
+  case SMF__NOI:
+    retval = (smf_calcmodelptr *) &smf_calcmodel_noi;
     break;
 
   default:
