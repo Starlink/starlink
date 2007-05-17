@@ -67,6 +67,8 @@
 *        Parse modelorder keyword in config file
 *     2007-04-30 (EC)
 *        Put map estimation in first chunk loop, only ast in second
+*     2007-05-17 (EC)
+*        Added missing status checks
 
 
 *  Notes:
@@ -311,23 +313,28 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
            previous iteration of AST back into the residual, zero ast,
            and rebin the noise+astro signal into the map */
 
-	/* Add last iteration of astronomical signal back in to residual */
-	ast_data = (double *)(ast->pntr)[0];
-	res_data = (double *)(res->pntr)[0];
-	res_var = (double *)(res->pntr)[1];
+	if( *status == SAI__OK ) {
+
+	  /* Add last iteration of astronomical signal back in to residual */
+	  ast_data = (double *)(ast->pntr)[0];
+	  res_data = (double *)(res->pntr)[0];
+	  res_var = (double *)(res->pntr)[1];
 	
-	dsize = (ast->dims)[0]*(ast->dims)[1]*(ast->dims)[2];
-	
-	for( k=0; k<dsize; k++ ) {	  
-	  res_data[k] += ast_data[k];
+	  /*printf( "here1 %i\n", *status );*/
+	  dsize = (ast->dims)[0]*(ast->dims)[1]*(ast->dims)[2];
+	  /*printf( "here2 %i\n", *status );*/
+
+	  for( k=0; k<dsize; k++ ) {	  
+	    res_data[k] += ast_data[k];
 	  
-	  /* Set ast_data back to 0 since we've moved all of the signal
-	     into the map, and then it will get re-estimated by
-	     calcmodel_ast at the start of the next iteration. */
+	    /* Set ast_data back to 0 since we've moved all of the signal
+	       into the map, and then it will get re-estimated by
+	       calcmodel_ast at the start of the next iteration. */
 	  
-	  ast_data[k] = 0;
+	    ast_data[k] = 0;
+	  }
 	}
-	
+
 	/* Load the LUT from the mapcoord extension */
 	smf_open_mapcoord( res, status );
 
