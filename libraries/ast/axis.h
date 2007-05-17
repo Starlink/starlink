@@ -294,6 +294,7 @@ typedef struct AstAxisVtab {
    const char *(* GetAxisLabel)( AstAxis * );
    const char *(* GetAxisSymbol)( AstAxis * );
    const char *(* GetAxisUnit)( AstAxis * );
+   const char *(* GetAxisNormUnit)( AstAxis * );
    double (* AxisGap)( AstAxis *, double, int * );
    double (* AxisDistance)( AstAxis *, double, double );
    double (* AxisOffset)( AstAxis *, double, double );
@@ -308,6 +309,7 @@ typedef struct AstAxisVtab {
    int (* TestAxisLabel)( AstAxis * );
    int (* TestAxisSymbol)( AstAxis * );
    int (* TestAxisUnit)( AstAxis * );
+   int (* TestAxisNormUnit)( AstAxis * );
    void (* AxisNorm)( AstAxis *, double * );
    void (* AxisOverlay)( AstAxis *, AstAxis * );
    void (* ClearAxisDigits)( AstAxis * );
@@ -375,6 +377,7 @@ const char *astGetAxisFormat_( AstAxis * );
 const char *astGetAxisLabel_( AstAxis * );
 const char *astGetAxisSymbol_( AstAxis * );
 const char *astGetAxisUnit_( AstAxis * );
+const char *astGetAxisNormUnit_( AstAxis * );
 double astAxisGap_( AstAxis *, double, int * );
 double astAxisDistance_( AstAxis *, double, double );
 double astAxisOffset_( AstAxis *, double, double );
@@ -388,6 +391,7 @@ int astTestAxisFormat_( AstAxis * );
 int astTestAxisLabel_( AstAxis * );
 int astTestAxisSymbol_( AstAxis * );
 int astTestAxisUnit_( AstAxis * );
+int astTestAxisNormUnit_( AstAxis * );
 void astAxisOverlay_( AstAxis *, AstAxis * );
 void astClearAxisDigits_( AstAxis * );
 void astClearAxisDirection_( AstAxis * );
@@ -504,6 +508,8 @@ astINVOKE(V,astGetAxisLabel_(astCheckAxis(this)))
 astINVOKE(V,astGetAxisSymbol_(astCheckAxis(this)))
 #define astGetAxisUnit(this) \
 astINVOKE(V,astGetAxisUnit_(astCheckAxis(this)))
+#define astGetAxisNormUnit(this) \
+astINVOKE(V,astGetAxisNormUnit_(astCheckAxis(this)))
 #define astSetAxisDigits(this,digits) \
 astINVOKE(V,astSetAxisDigits_(astCheckAxis(this),digits))
 #define astSetAxisDirection(this,direction) \
@@ -528,6 +534,8 @@ astINVOKE(V,astTestAxisLabel_(astCheckAxis(this)))
 astINVOKE(V,astTestAxisSymbol_(astCheckAxis(this)))
 #define astTestAxisUnit(this) \
 astINVOKE(V,astTestAxisUnit_(astCheckAxis(this)))
+#define astTestAxisNormUnit(this) \
+astINVOKE(V,astTestAxisNormUnit_(astCheckAxis(this)))
 
 #define astClearAxisTop(this) \
 astINVOKE(V,astClearAxisTop_(astCheckAxis(this)))

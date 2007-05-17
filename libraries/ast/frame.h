@@ -528,6 +528,8 @@
 *     14-OCT-2006 (DSB):
 *        Added dut1 to the Frame structure.
 *        Added Dut1 accessor methods.
+*     17-MAY-2007 (DSB):
+*        Added NormUnit attribute.
 *-
 */
 
@@ -645,6 +647,7 @@ typedef struct AstFrameVtab {
    const char *(* GetLabel)( AstFrame *, int );
    const char *(* GetSymbol)( AstFrame *, int );
    const char *(* GetTitle)( AstFrame * );
+   const char *(* GetNormUnit)( AstFrame *, int );
    const char *(* GetUnit)( AstFrame *, int );
    const int *(* GetPerm)( AstFrame * );
    double (* Angle)( AstFrame *, const double[], const double[], const double[] );
@@ -862,6 +865,7 @@ const char *astGetLabel_( AstFrame *, int );
 const char *astGetSymbol_( AstFrame *, int );
 const char *astGetTitle_( AstFrame * );
 const char *astGetUnit_( AstFrame *, int );
+const char *astGetNormUnit_( AstFrame *, int );
 const int *astGetPerm_( AstFrame * );
 double astGap_( AstFrame *, int, double, int * );
 int astFields_( AstFrame *, int, const char *, const char *, int, char **, int *, double * );
@@ -1150,6 +1154,8 @@ astINVOKE(V,astGetSymbol_(astCheckFrame(this),axis))
 astINVOKE(V,astGetTitle_(astCheckFrame(this)))
 #define astGetUnit(this,axis) \
 astINVOKE(V,astGetUnit_(astCheckFrame(this),axis))
+#define astGetNormUnit(this,axis) \
+astINVOKE(V,astGetNormUnit_(astCheckFrame(this),axis))
 #define astMatch(template,target,template_axes,target_axes,map,result) \
 astINVOKE(V,astMatch_(astCheckFrame(template),astCheckFrame(target),template_axes,target_axes,(AstMapping **)(map),(AstFrame **)(result)))
 #define astIsUnitFrame(this) \

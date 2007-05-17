@@ -21308,6 +21308,11 @@ f-
 This causes the input data values to be weighted using the reciprocals of 
 the input variances (if supplied).
 
+\item The Frame class has a new read-only attribute called NormUnit that
+returns the normalised value of the Unit attribute for an axis. Here,
+``normalisation'' means cancelling redundant units, etc. So for instance, a
+Unit value of ``s*(m/s)'' would result in a NormUnit value of ``m''.
+
 \end{enumerate}
 
 Programs which are statically linked will need to be re-linked in

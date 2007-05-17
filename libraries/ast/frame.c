@@ -49,6 +49,7 @@ f     AST_FRAME
 *     - MaxAxes: Maximum number of Frame axes to match
 *     - MinAxes: Minimum number of Frame axes to match
 *     - Naxes: Number of Frame axes
+*     - NormUnit(axis): Normalised axis physical units
 *     - ObsLat: Geodetic latitude of observer
 *     - ObsLon: Geodetic longitude of observer
 *     - Permute: Permute axis order?
@@ -234,6 +235,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *     26-JAN-2007 (DSB):
 *        Fix bug in NewUnit that causes segvio when changing axis symbols
 *        to accomodate changes in units.
+*     17-MAY-2007 (DSB):
+*        Added read-only attribute NormUnit.
 *class--
 */
 
@@ -698,6 +701,7 @@ static const char *GetLabel( AstFrame *, int );
 static const char *GetSymbol( AstFrame *, int );
 static const char *GetTitle( AstFrame * );
 static const char *GetUnit( AstFrame *, int );
+static const char *GetNormUnit( AstFrame *, int );
 static const int *GetPerm( AstFrame * );
 static double Angle( AstFrame *, const double[], const double[], const double[] );
 static double AxDistance( AstFrame *, int, double, double );
@@ -1921,7 +1925,8 @@ L1:
 /* --------------------- */
 /* Test if the attribute name matches any of the read-only attributes
    of this class. If it does, then report an error. */
-   } else if ( !strcmp( attrib, "naxes" ) ) {
+   } else if ( !strcmp( attrib, "naxes" ) ||
+               !strncmp( attrib, "normunit", 8 ) ) {
       astError( AST__NOWRT, "astClear: Invalid attempt to clear the \"%s\" "
                 "value for a %s.", attrib, astGetClass( this ) );
       astError( AST__NOWRT, "This is a read-only attribute." );
@@ -4308,6 +4313,13 @@ L1:
                && ( nc >= len ) ) {
       result = astGetUnit( this, axis - 1 );
 
+/* NormUnit(axis). */
+/* --------------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( attrib, "normunit(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      result = astGetNormUnit( this, axis - 1 );
+
 /* ObsLat. */
 /* ------- */
    } else if ( !strcmp( attrib, "obslat" ) ) {
@@ -4936,6 +4948,7 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name ) {
    vtab->GetSymbol = GetSymbol;
    vtab->GetTitle = GetTitle;
    vtab->GetUnit = GetUnit;
+   vtab->GetNormUnit = GetNormUnit;
    vtab->IsUnitFrame = IsUnitFrame;
    vtab->Match = Match;
    vtab->Norm = Norm;
@@ -8321,7 +8334,8 @@ L1:
 
 /* Use this macro to report an error if a read-only attribute has been
    specified. */
-   } else if ( MATCH( "naxes" ) ) {
+   } else if ( MATCH( "naxes" ) ||
+               strncmp( setting, "normunit", 8 ) ) {
       astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.",
                 setting, astGetClass( this ) );
       astError( AST__NOWRT, "This is a read-only attribute." );
@@ -9359,7 +9373,8 @@ L1:
 /* --------------------- */
 /* Test if the attribute name matches any of the read-only attributes
    of this class. If it does, then return zero. */
-   } else if ( !strcmp( attrib, "naxes" ) ) {
+   } else if ( !strcmp( attrib, "naxes" ) ||
+               !strncmp( attrib, "naxes", 8 ) ) {
       result = 0;
 
 /* Other axis attributes. */
@@ -10689,6 +10704,42 @@ f        the AST_FORMAT function when formatting coordinate values.
    the Unit string. */
 MAKE_GET(Unit,const char *,NULL,0,0)
 MAKE_TEST(Unit)
+
+/*
+*att++
+*  Name:
+*     NormUnit(axis)
+
+*  Purpose:
+*     Normalised Axis physical units.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     String, read-only.
+
+*  Description:
+*     The value of this read-only attribute is derived from the current
+*     value of the Unit attribute. It will represent an equivalent system
+*     of units to the Unit attribute, but will potentially be simplified.
+*     For instance, if Unit is set to "s*(m/s)", the NormUnit value will
+*     be "m". If no simplification can be performed, the value of the
+*     NormUnit attribute will equal that of the Unit attribute.
+
+*  Applicability:
+*     Frame
+*        All Frames have this attribute.
+
+*  Notes:
+*     - When specifying this attribute by name, it should be
+*     subscripted with the number of the Frame axis to which it
+*     applies.
+*att--
+*/
+/* This simply provides an interface to the Axis methods for accessing
+   the Unit string. */
+MAKE_GET(NormUnit,const char *,NULL,0,0)
 
 /* Implement member functions to access the attributes associated with
    the Frame as a whole using the macros defined for this purpose in

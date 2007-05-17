@@ -76,6 +76,9 @@
 *        Modify CleanExp to convert "MJY/STER" to standard form ("MJy/sr").
 *     7-JUL-2006 (DSB):
 *        Correct initialisation of "word" flag in CleanExp. 
+*     17-MAY-2007 (DSB):
+*        Simplify the units string returned by astUnitNormaliser.
+*        - Fix indexing bug in CombineFactors.
 */
 
 /* Module Macros. */
@@ -641,7 +644,7 @@ static UnitNode *CombineFactors( UnitNode **factors, double *powers,
                                  int nfactor, double coeff ) {
 /*
 *  Name:
-*     CombineTree
+*     CombineFactors
 
 *  Purpose:
 *     Create a tree which represents the product of the supplied factors.
@@ -709,7 +712,7 @@ static UnitNode *CombineFactors( UnitNode **factors, double *powers,
    will only be a handfull of factors. */
    for( i = nfactor - 1; i > 0; i-- ) {
       done = 1;
-      for( j = 0, jp = 1; j < i; i++, jp++ ) {
+      for( j = 0, jp = 1; j < i; j++, jp++ ) {
          if( CmpTree( factors[ j ], factors[ jp ], 0 ) > 0 ) {
             ftmp = factors[ j ];
             factors[ j ] = factors[ jp ];
@@ -5704,6 +5707,9 @@ const char *astUnitNormaliser_( const char *in ){
    fails. */
    in_tree = CreateTree( in, 0 );
    if( in_tree ) {
+
+/* Simplify the units expression, only doing genuine simplifications. */
+      SimplifyTree( &in_tree, 1 );
 
 /* Invert literal constant unit multipliers. This is because a constant of 
    say 1000 for a unit of "m" means "multiply the value in metres by 1000", 

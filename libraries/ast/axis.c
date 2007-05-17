@@ -165,6 +165,7 @@ static const char *GetAxisFormat( AstAxis * );
 static const char *GetAxisLabel( AstAxis * );
 static const char *GetAxisSymbol( AstAxis * );
 static const char *GetAxisUnit( AstAxis * );
+static const char *GetAxisNormUnit( AstAxis * );
 static char *ParseAxisFormat( const char *, int, int *, int *, int *, int * );
 static double AxisDistance( AstAxis *, double, double );
 static double AxisGap( AstAxis *, double, int * );
@@ -181,6 +182,7 @@ static int TestAxisFormat( AstAxis * );
 static int TestAxisLabel( AstAxis * );
 static int TestAxisSymbol( AstAxis * );
 static int TestAxisUnit( AstAxis * );
+static int TestAxisNormUnit( AstAxis * );
 static void AxisNorm( AstAxis *, double * );
 static void AxisOverlay( AstAxis *, AstAxis * );
 static void ClearAttrib( AstObject *, const char * );
@@ -1264,11 +1266,104 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "unit" ) ) {
       astClearAxisUnit( this );
 
+/* Read-only attributes. */
+/* --------------------- */
+/* Test if the attribute name matches any of the read-only attributes
+   of this class. If it does, then report an error. */
+   } else if ( !strcmp( attrib, "normunit" ) ) {
+      astError( AST__NOWRT, "astClear: Invalid attempt to clear the \"%s\" "
+                "value for a %s.", attrib, astGetClass( this ) );
+      astError( AST__NOWRT, "This is a read-only attribute." );
+
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
       (*parent_clearattrib)( this_object, attrib );
    }
+}
+
+static const char *GetAxisNormUnit( AstAxis *this ){
+/*
+*+
+*  Name:
+*     astGetAxisNormUnit
+
+*  Purpose:
+*     Return the normalised Unit attribute for an Axis.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "axis.h"
+*     const char *astGetAxisNormUnit( AstAxis *this ){
+
+*  Class Membership:
+*     Axis method.
+
+*  Description:
+*     This function normalised and returns the axis Unit attribute.
+*     Normalisation refers to transformations such as "s*(m/s)" -> "m".
+
+*  Parameters:
+*     this
+*        Pointer to the Axis.
+
+*  Returned Value:
+*     - Pointer to a null-terminated string containing the normalised
+*     unit string.
+
+*  Notes:
+*     - The returned pointer points to a static memory buffer. The
+*     contents of this buffer will be over-written on each invocation of 
+*     this function. A copy of the returned string should therefore be
+*     taken if it will be needed later.
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*-
+*/
+/* Local Constants: */
+#define BUFF_LEN 127         /* Maximum characters in result */
+
+/* Local Variables: */
+   const char *result;       /* Pointer to dynamic memory holding returned text */
+   int nc;                   /* Length of normalised Unit string */
+   static char buff[ BUFF_LEN + 1 ]; /* Buffer for result string */
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Get the Axis Unit attrribute and normalise it. */
+   result = astUnitNormaliser( astGetAxisUnit( this ) );
+
+/* If successful, check that the resulting string will fit in the buffer.
+   If not, report an error. */
+   if( result ) {
+      nc = strlen( result );
+      if( nc > BUFF_LEN ) {
+         astError( AST__FMTER, "astGetAxisNormUnit(%s): Internal buffer "
+                      "overflow while normalising the units string '%s' "
+                      "- result exceeds %d characters.", astGetClass( this ),
+                      result, BUFF_LEN );
+
+         result = astFree( (void *) result );
+
+/* If so, copy it into the static buffer and free the dynamic memory returned 
+   by astUnitNormaliser. */
+      } else {
+         strcpy( buff, result );
+      }
+      astFree( (void *) result );
+
+      result = buff;
+   }
+
+/* Return the answer. */
+   return result;
+
+/* Undefine macros local to this function. */
+#undef BUFF_LEN
 }
 
 static int GetObjSize( AstObject *this_object ) {
@@ -1464,6 +1559,11 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "unit" ) ) {
       result = astGetAxisUnit( this );
 
+/* NormUnit. */
+/* --------- */
+   } else if ( !strcmp( attrib, "normunit" ) ) {
+      result = astGetAxisNormUnit( this );
+
 /* If the attribute name was not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
@@ -1555,6 +1655,7 @@ void astInitAxisVtab_(  AstAxisVtab *vtab, const char *name ) {
    vtab->GetAxisLabel = GetAxisLabel;
    vtab->GetAxisSymbol = GetAxisSymbol;
    vtab->GetAxisUnit = GetAxisUnit;
+   vtab->GetAxisNormUnit = GetAxisNormUnit;
    vtab->SetAxisDigits = SetAxisDigits;
    vtab->SetAxisDirection = SetAxisDirection;
    vtab->SetAxisFormat = SetAxisFormat;
@@ -1567,6 +1668,7 @@ void astInitAxisVtab_(  AstAxisVtab *vtab, const char *name ) {
    vtab->TestAxisLabel = TestAxisLabel;
    vtab->TestAxisSymbol = TestAxisSymbol;
    vtab->TestAxisUnit = TestAxisUnit;
+   vtab->TestAxisNormUnit = TestAxisNormUnit;
 
    vtab->ClearAxisTop = ClearAxisTop;
    vtab->GetAxisTop = GetAxisTop;
@@ -1945,11 +2047,29 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
         && ( nc >= len ) ) {
       astSetAxisUnit( this, setting + unit );
 
+/* Read-only attributes. */
+/* --------------------- */
+/* Define a macro to see if the setting string matches any of the
+   read-only attributes of this class. */
+#define MATCH(attrib) \
+        ( nc = 0, ( 0 == astSscanf( setting, attrib "=%*[^\n]%n", &nc ) ) && \
+                  ( nc >= len ) )
+
+/* Use this macro to report an error if a read-only attribute has been
+   specified. */
+   } else if ( MATCH( "normunit" ) ) {
+      astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.",
+                setting, astGetClass( this ) );
+      astError( AST__NOWRT, "This is a read-only attribute." );
+
 /* Pass any unrecognised attribute setting to the parent method for further
    interpretation. */
    } else {
       (*parent_setattrib)( this_object, setting );
    }
+
+/* Undefine macros local to this function. */
+#undef MATCH
 }
 
 static int TestAttrib( AstObject *this_object, const char *attrib ) {
@@ -2046,6 +2166,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "unit" ) ) {
       result = astTestAxisUnit( this );
 
+/* NormUnit. */
+/* --------- */
+   } else if ( !strcmp( attrib, "normunit" ) ) {
+      result = astTestAxisNormUnit( this );
+
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
@@ -2055,6 +2180,44 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* Return the result, */
    return result;
 }
+
+static int TestAxisNormUnit( AstAxis *this ){
+/*
+*  Name:
+*     TestAxisNormUnit
+
+*  Purpose:
+*     Test if a NormUnit attribute value is set for an Axis.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "axis.h"
+*     int TestAxisNormUnit( AstAxis *this )
+
+*  Class Membership:
+*     Axis member function 
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate
+*     whether a value has been set for the NormUnit string.
+
+*  Parameters:
+*     this
+*        Pointer to the Axis.
+
+*  Returned Value:
+*     One if a value has been set, otherwise zero.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+   return astTestAxisUnit( this );
+}
+
 
 /* Functions which access class attributes. */
 /* ---------------------------------------- */
@@ -2915,6 +3078,14 @@ int astAxisFields_( AstAxis *this, const char *fmt, const char *str,
 int astAxisIn_( AstAxis *this, double lo, double hi, double val, int closed ){
    if ( !astOK ) return 0;
    return (**astMEMBER(this,Axis,AxisIn))( this, lo, hi, val, closed );
+}
+const char *astGetAxisNormUnit_( AstAxis *this ) {
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Axis,GetAxisNormUnit))( this );
+}
+int astTestAxisNormUnit_( AstAxis *this ) {
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Axis,TestAxisNormUnit))( this );
 }
 
 
