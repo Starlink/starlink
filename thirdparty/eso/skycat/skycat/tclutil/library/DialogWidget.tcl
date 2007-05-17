@@ -11,6 +11,7 @@
 #                            problem before?
 #                 21 Mar 07  Raise the window on activation. Keeps hiding.
 #                 13 Apr 07  And wait for update 
+#                 17 May 07  Make truncation lines an option.
 
 itk::usual DialogWidget {}
 
@@ -92,8 +93,8 @@ itcl::class util::DialogWidget {
     protected method init {} {
 	# truncate long (many lines) error mesages
 	set err [split $itk_option(-text) \n]
-	if {[llength $err] > 20} {
-	    set err [lrange $err 0 20]
+	if {[llength $err] > $itk_option(-max_lines) } {
+	    set err [lrange $err 0 $itk_option(-max_lines)]
 	    lappend err "..."
 	}
 	set err [join $err \n]
@@ -223,6 +224,9 @@ itcl::class util::DialogWidget {
     
     # flag: if true, grab the screen
     itk_option define -modal modal Modal 1
+   
+    # number of lines before truncation.
+    itk_option define -max_lines max_lines Max_Lines 20
 
     # -- protected vars --
 
