@@ -1,0 +1,160 @@
+NAXIS1  =                  150 / length of data axis 1
+NAXIS2  =                  120 / length of data axis 2
+DATE-OBS= '2007-04-30T15:13:53.717'/ Date of observation
+CRPIX1  =            75.910204 / Reference pixel on axis 1
+CRPIX2  =            60.359184 / Reference pixel on axis 2
+CRVAL1  =          1.220833333 / Value at ref. pixel on axis 1
+CRVAL2  =          277.5004167 / Value at ref. pixel on axis 2
+CTYPE1  = 'DEC--TAN'           / Type of co-ordinate on axis 1
+CTYPE2  = 'RA---TAN'           / Type of co-ordinate on axis 2
+CD1_1   =      -0.001831773954 / Transformation matrix element
+CD1_2   =      -8.541702226E-4 / Transformation matrix element
+CD2_1   =      0.0008541702226 / Transformation matrix element
+CD2_2   =      -0.001831773954 / Transformation matrix element
+RADECSYS= 'FK5     '           / Reference frame for RA/DEC values
+EQUINOX =               2000.0 / Epoch of reference equinox
+DUT1    =      -1.145603703E-6 / [d] UT1-UTC correction
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+EXP_TIME=          41.97277069 / [s] Median MAKECUBE exposure time
+EFF_TIME=          11.13561535 / [s] Median MAKECUBE effective integration time
+PROVCNT =                    1 / Number of unique OBSIDs
+OBS00001= 'acsis_98_20070430T151247'/ OBSID from component observation
+
+
+HISTORY History structure created 2007 Apr 30 05:52:50.656
+HISTORY Update mode: NORMAL   Current record: 8
+
+HISTORY 1: 2007 Apr 30 05:52:53.959 - MAKECUBE        (SMURF V0.2.2)
+HISTORY User: operator   Host: kolea  Width: 72
+HISTORY Dataset: /jcmtdata/reduced/acsis/20070430/a20070430_00098_01_cube
+HISTORY Parameters: AUTOGRID=TRUE CROTA=115 DETECTORS=!
+HISTORY    FBL=[4.8435931408225,0.024206080047514]
+HISTORY    FBR=[4.8456657339925,0.019762137343435]
+HISTORY    FLBND=[4.8407875332009,0.018441755319268,-426.75185625342]
+HISTORY    FUBND=[4.8456891772589,0.024229519070352,440.3284772626]
+HISTORY    FTL=[4.8408109789176,0.022909013956528]
+HISTORY    FTR=[4.8428837776034,0.018465194476559] GENVAR='tsys'
+HISTORY    IN=@^/jcmtdata/reduced/acsis/20070430/oractemppV8I2A.lis
+HISTORY    INWEIGHT=TRUE LBOUND=[-70,-41,-1024] OUT=@a20070430_00098_01_cube
+HISTORY    OUTCAT=! PIXSIZE=7.2761 MSG_FILTER='NORM' REFLAT='1:13:15'
+HISTORY    REFLON='18:30:00.1' SPARSE=FALSE SPECBOUNDS='-426.5402 440.1168'
+HISTORY    TRIM=TRUE WEIGHTS=FALSE SPREAD='nearest' SYSTEM='TRACKING'
+HISTORY    UBOUND=[69,46,1023] USEDETPOS=TRUE
+HISTORY Software: /star/bin/smurf/smurf_mon
+
+HISTORY 2: 2007 Apr 30 05:52:59.952 - NDFCOPY         (KAPPA 1.7-2)
+HISTORY User: operator   Host: kolea  Width: 72
+HISTORY Dataset: /jcmtdata/reduced/acsis/20070430/a20070430_00098_01_em
+HISTORY Parameters: IN=@a20070430_00098_01_cube(,,-820:819) LIKE=!
+HISTORY    OUT=@a20070430_00098_01_em TITLE=! TRIM=FALSE
+HISTORY Software: /star/bin/kappa/ndfpack_mon
+
+HISTORY 3: 2007 Apr 30 05:53:04.009 - MFITTREND       (KAPPA 1.7-2)
+HISTORY User: operator   Host: kolea  Width: 72
+HISTORY Dataset: /jcmtdata/reduced/acsis/20070430/a20070430_00098_01_bl
+HISTORY Parameters: ARANGES=[-820,-56,47,819] AUTO=TRUE AXIS=@3 CLIP=[2,2,2.5,3]
+HISTORY    IN=@a20070430_00098_01_em MODIFYIN=FALSE ORDER=0
+HISTORY    OUT=@a20070430_00098_01_bl RMSCLIP=! SECTION='-70:69,-41:46,'
+HISTORY    SUBTRACT=TRUE TITLE=! VARIANCE=TRUE
+HISTORY Software: /star/bin/kappa/kappa_mon
+
+HISTORY 4: 2007 Apr 30 05:53:17.048 - NDFCOPY         (KAPPA 1.7-2)
+HISTORY User: operator   Host: kolea  Width: 72
+HISTORY Dataset: /jcmtdata/reduced/acsis/20070430/ga20070430_98
+HISTORY Parameters: IN=@a20070430_00098_01_bl LIKE=! OUT=@ga20070430_98
+HISTORY    TITLE='ga20070430_98' TRIM=FALSE
+HISTORY Software: /star/bin/kappa/ndfpack_mon
+
+HISTORY 5: 2007 Apr 30 06:40:02.994 - WCSMOSAIC       (KAPPA 1.7-2)
+HISTORY User: operator   Host: kolea  Width: 72
+HISTORY Dataset: /jcmtdata/reduced/acsis/20070430/oractemppLv7wv
+HISTORY Parameters: ACC=0.05 GENVAR=FALSE ILEVEL=2
+HISTORY    IN=@^/jcmtdata/reduced/acsis/20070430/oractempyopUhZ.lis LBND=!
+HISTORY    LBOUND=[-70,-43,-820] MAXPIX=1000 METHOD='nearest'
+HISTORY    OUT=@/jcmtdata/reduced/acsis/20070430/oractemppLv7wv REF=! UBND=!
+HISTORY    UBOUND=[69,46,819] VARIANCE=TRUE WLIM=1E-10
+HISTORY Software: /star/bin/kappa/kappa_mon
+
+HISTORY 6: 2007 Apr 30 06:40:05.801 - NDFCOPY         (KAPPA 1.7-2)
+HISTORY User: operator   Host: kolea  Width: 72
+HISTORY Dataset: /jcmtdata/reduced/acsis/20070430/ga20070430_98
+HISTORY Parameters: IN=@/jcmtdata/reduced/acsis/20070430/oractemppLv7wv LIKE=!
+HISTORY    OUT=@ga20070430_98 TITLE=! TRIM=FALSE
+HISTORY Software: /star/bin/kappa/ndfpack_mon
+
+HISTORY 7: 2007 May 10 10:42:40.627 - WCSMOSAIC       (KAPPA 1.7-3)
+HISTORY User: jbuckle   Host: scubadev  Width: 72
+HISTORY Dataset: /home/jbuckle/data/serpens_cube
+HISTORY Parameters: ACC=0.05 GENVAR=FALSE ILEVEL=2
+HISTORY    IN=@ga20070430_98,ga20070502_63_1 LBND=! LBOUND=[-77,-52,-820]
+HISTORY    MAXPIX=1000 METHOD='nearest' OUT=@serpens_cube REF=!
+HISTORY    UBOUND=[77,54,819] VARIANCE=TRUE WLIM=1E-10
+HISTORY Software: /star/bin/kappa/wcsmosaic
+
+HISTORY 8: 2007 May 17 12:04:41.724 - NDFCOPY         (KAPPA 1.7-2)
+HISTORY User: dsb   Host: localhost.localdomain  Width: 72
+HISTORY Dataset: /stardev/jaccvs/jcmt/scuba2/soft/smurf/makecube/jane
+HISTORY Parameters: IN=@serpens_cube(~150,~120,0) LIKE=! OUT=@jane TITLE=!
+HISTORY    TRIM=TRUE TRIMWCS=TRUE USEAXIS=!
+HISTORY Software: /stardev/cvs/star/bin/kappa/ndfcopy
+END
+XTENSION= 'IMAGE   '           / IMAGE extension
+BITPIX  =                  -32 / number of bits per data pixel
+NAXIS   =                    2 / number of data axes
+NAXIS1  =                  150 / length of data axis 1
+NAXIS2  =                  120 / length of data axis 2
+PCOUNT  =                    0 / required keyword; must = 0
+GCOUNT  =                    1 / required keyword; must = 1
+LBOUND1 =                  -74 / Pixel origin along axis 1
+LBOUND2 =                  -58 / Pixel origin along axis 2
+OBJECT  = 'ga20070430_98'      / Title of the dataset
+LABEL   = 'T%s60+%v30+A%^50+%<20+*%+   corrected antenna ...'/ Label of the pri
+BUNIT   = 'K       '           / Units of the primary array
+DATE    = '2007-05-17T11:05:09'/ file creation date (YYYY-MM-DDThh:mm:ss UT)
+ORIGIN  = 'Starlink Project, U.K.'/ Origin of this FITS file
+BSCALE  =                  1.0 / True_value = BSCALE * FITS_value + BZERO
+BZERO   =                  0.0 / True_value = BSCALE * FITS_value + BZERO
+HDUCLAS1= 'NDF     '           / Starlink NDF (hierarchical n-dim format)
+HDUCLAS2= 'VARIANCE'           / Array component subclass
+EXTNAME = 'VARIANCE'           / Array component
+HDSTYPE = 'NDF     '           / HDS data type of the component
+
+CRPIX1  =            75.910204 / Reference pixel on axis 1
+CRPIX2  =            60.359184 / Reference pixel on axis 2
+CRVAL1  =          1.220833333 / Value at ref. pixel on axis 1
+CRVAL2  =          277.5004167 / Value at ref. pixel on axis 2
+CTYPE1  = 'DEC--TAN'           / Type of co-ordinate on axis 1
+CTYPE2  = 'RA---TAN'           / Type of co-ordinate on axis 2
+CD1_1   =      -0.001831773954 / Transformation matrix element
+CD1_2   =      -8.541702226E-4 / Transformation matrix element
+CD2_1   =      0.0008541702226 / Transformation matrix element
+CD2_2   =      -0.001831773954 / Transformation matrix element
+RADECSYS= 'FK5     '           / Reference frame for RA/DEC values
+EQUINOX =               2000.0 / Epoch of reference equinox
+DATE-OBS= '2007-04-30T15:13:53.717'/ Date of observation
+END
