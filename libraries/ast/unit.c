@@ -5693,6 +5693,7 @@ const char *astUnitNormaliser_( const char *in ){
 
 /* Local Variables: */
    UnitNode *in_tree;
+   double dval;
    const char *result;
 
 /* Initialise */
@@ -5719,6 +5720,11 @@ const char *astUnitNormaliser_( const char *in ){
 
 /* Convert the tree into string form. */
       result = MakeExp( in_tree, 2, 1 );
+
+/* If the result is a constant value, return a blank string. */
+      if( 1 == astSscanf( result, "%lg", &dval ) ) {
+         *((char *) result) = 0;
+      }
 
 /* Free the tree. */
       in_tree = FreeTree( in_tree );

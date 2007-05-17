@@ -8335,7 +8335,7 @@ L1:
 /* Use this macro to report an error if a read-only attribute has been
    specified. */
    } else if ( MATCH( "naxes" ) ||
-               strncmp( setting, "normunit", 8 ) ) {
+               !strncmp( setting, "normunit", 8 ) ) {
       astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.",
                 setting, astGetClass( this ) );
       astError( AST__NOWRT, "This is a read-only attribute." );
@@ -9374,7 +9374,7 @@ L1:
 /* Test if the attribute name matches any of the read-only attributes
    of this class. If it does, then return zero. */
    } else if ( !strcmp( attrib, "naxes" ) ||
-               !strncmp( attrib, "naxes", 8 ) ) {
+               !strncmp( attrib, "normunit", 8 ) ) {
       result = 0;
 
 /* Other axis attributes. */
