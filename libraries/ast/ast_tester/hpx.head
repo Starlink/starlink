@@ -1,0 +1,10 @@
+NAXIS1  =                  300 
+NAXIS2  =                  200 
+CTYPE1  = 'GLON-HPX'           
+CTYPE2  = 'GLAT-HPX'           
+CRVAL1  =           -149.56866 
+CRVAL2  =           -19.758201 
+CRPIX1  =              150.500 
+CRPIX2  =              100.500 
+CDELT1  =             -1.00000 
+CDELT2  =              1.00000
