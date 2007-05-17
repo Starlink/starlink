@@ -155,6 +155,11 @@ LIBS=
 AC_FC_LIBRARY_LDFLAGS
 LIBS=$old_LIBS
 
+#  One platform check. Solaris 8 includes libcx, which isn't required and
+#  causes issues with shareable libraries (when not linked with FC).
+FCLIBS=`echo $FCLIBS | sed 's:-lcx::g'`
+echo "FCLIBS = $FCLIBS"
+
 STAR_LARGEFILE_SUPPORT
 
 # GAIA needs several Starlink libraries for linking.
