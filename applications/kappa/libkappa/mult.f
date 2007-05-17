@@ -56,7 +56,7 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     LABEL, TITLE, HISTORY, WCS, UNITS and VARIANCE components of an
+*     LABEL, TITLE, UNITS, HISTORY, WCS, and VARIANCE components of an
 *     NDF data structure and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
@@ -69,7 +69,9 @@
 *  Copyright:
 *     Copyright (C) 1990, 1992 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1998, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.  
+*     Copyright (C) 2007 Science & Technology Research Council.  All 
+*     Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
