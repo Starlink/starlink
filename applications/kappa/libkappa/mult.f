@@ -56,10 +56,8 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     LABEL, TITLE, HISTORY, WCS and VARIANCE components of an NDF data
-*     structure and propagates all extensions.
-*     -  The UNITS component is propagated only if it has the same value
-*     in both input NDFs.
+*     LABEL, TITLE, HISTORY, WCS, UNITS and VARIANCE components of an
+*     NDF data structure and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
 *     -  All non-complex numeric data types can be handled.
@@ -110,6 +108,8 @@
 *        Use CNF_PVAL
 *     5-MAY-2007 (DSB):
 *        Propagate the Unit value if it is the same in both NDFs.
+*     17-MAY-2007 (DSB):
+*        Correct propagation of the Unit value.
 *     {enter_further_changes_here}
 
 *-
@@ -121,9 +121,13 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+      INCLUDE 'AST_PAR'          ! AST constants and functions
 
 *  Status:
       INTEGER STATUS             ! Global status
+
+*  External References:
+      INTEGER CHR_LEN            ! Used length of a string
 
 *  Local Variables:
       CHARACTER CLIST*30         ! List of NDF components to copy
@@ -131,9 +135,11 @@
       CHARACTER DTYPE*( NDF__SZFTP ) ! Data type for output components
       CHARACTER FORM*( NDF__SZFRM ) ! Form of the NDF
       CHARACTER ITYPE*( NDF__SZTYP ) ! Data type for processing
+      CHARACTER NEWUN*255        ! New units component
       CHARACTER UNIT1*30         ! Units string from NDF1
       CHARACTER UNIT2*30         ! Units string from NDF2
       INTEGER EL                 ! Number of mapped elements
+      INTEGER IAT                ! String length
       INTEGER NDF1               ! Identifier for 1st NDF (input)
       INTEGER NDF2               ! Identifier for 2nd NDF (input)
       INTEGER NDF3               ! Identifier for 3rd NDF (output)
@@ -141,11 +147,11 @@
       INTEGER PNTR1( 2 )         ! Pointers to 1st NDF mapped arrays
       INTEGER PNTR2( 2 )         ! Pointers to 2nd NDF mapped arrays
       INTEGER PNTR3( 2 )         ! Pointers to 3rd NDF mapped arrays
+      INTEGER TMPFRM             ! An AST Frame used to convert units
       LOGICAL BAD                ! Need to check for bad pixels?
       LOGICAL VAR                ! Process variance?
       LOGICAL VAR1               ! Variance component in 1st input NDF?
       LOGICAL VAR2               ! Variance component in 2nd input NDF?
-
 *.
 
 *  Check inherited global status.
@@ -161,23 +167,40 @@
 *  Trim the input pixel-index bounds to match.
       CALL NDF_MBND( 'TRIM', NDF1, NDF2, STATUS )
 
-*  See if the Units are the same.
+*  Get the input Units.
       UNIT1 = ' '
       CALL NDF_CGET( NDF1, 'Unit', UNIT1, STATUS )
       UNIT2 = ' '
       CALL NDF_CGET( NDF2, 'Unit', UNIT2, STATUS )
 
-*  Determine the list of components to be propagated from NDF1. We only
-*  propagate the Unit component if it is the same in both input NDFs.
-      IF( UNIT1 .EQ. UNIT2 .AND. UNIT1 .NE. ' ' ) THEN
-         CLIST = 'WCS,Axis,Quality,Unit'
-      ELSE
-         CLIST = 'WCS,Axis,Quality'
-      END IF 
+*  Create an AST Frame with Unit set to the product of the two supplied
+*  Units.
+      TMPFRM = AST_FRAME( 1, ' ', STATUS )
+
+      NEWUN = '('
+      IAT = 1
+      CALL CHR_APPND( UNIT1, NEWUN, IAT )
+      CALL CHR_APPND( ')*(', NEWUN, IAT )
+      CALL CHR_APPND( UNIT2, NEWUN, IAT )
+      CALL CHR_APPND( ')', NEWUN, IAT )
+
+      CALL AST_SETC( TMPFRM, 'Unit(1)', NEWUN( : IAT ), STATUS )
+
+*  Retrieve the normalised Unit string, and free the Frame.
+      NEWUN = AST_GETC( TMPFRM, 'NormUnit(1)', STATUS )
+      CALL AST_ANNUL( TMPFRM, STATUS )
+
+*  Set the list of components to be propagated from NDF1. 
+      CLIST = 'WCS,Axis,Quality'
 
 *  Create a new output NDF based on the first input NDF. Propagate the
 *  WCS, axis and quality components.
       CALL LPG_PROP( NDF1, CLIST, 'OUT', NDF3, STATUS )
+
+*  Set the output Unit component.
+      IAT = CHR_LEN( NEWUN )
+      IF( IAT .GT. 0 ) CALL NDF_CPUT( NEWUN( : IAT ), NDF3, 'Unit', 
+     :                                STATUS )
 
 *  See whether a variance component is defined in both the input NDFs
 *  and set the list of components to be processed accordingly.
