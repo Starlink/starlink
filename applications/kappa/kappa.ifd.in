@@ -15099,6 +15099,16 @@ iraf! {
 
          helplib {$KAPPA_HELP}
 
+         parameter axis {
+            type _INTEGER
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Index of axis to squash or stretch}
+            helpkey *
+         }
+
          parameter factors {
             size *
             position 3
@@ -15167,6 +15177,14 @@ iraf! {
             vpath PROMPT
             ppath CURRENT
             prompt {Auxiliary resampling parameters}
+            helpkey *
+         }
+
+         parameter pixscale {
+            type LITERAL
+            access READ
+            prompt {Pixel scale for each WCS axis}
+            ppath DYNAMIC
             helpkey *
          }
 
