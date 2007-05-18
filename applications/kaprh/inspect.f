@@ -529,6 +529,8 @@
 *        Inserted the "Save" option into the description of OPTION.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     2007 May 18 (MJC):
+*        Used revised API for KPG1_STDSR.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -633,6 +635,8 @@
      :  IMGMES( 6 ) * 80,        ! Informational messages if device is
                                  ! an image display
      :  ITYPE * ( NDF__SZTYP ),  ! Processing type of the image
+     :  MAXWCS * 255,            ! Formatted maximum WCS position
+     :  MINWCS * 255,            ! Formatted minimum WCS position
      :  MODE * 10,               ! Interaction mode
      :  OPTDEF * 10,             ! Option default
      :  OPTION * 10,             ! Chosen option
@@ -1644,7 +1648,8 @@
 
          CALL KPG1_STDSR( NDIMS, REL, NGOOD, DMIN, MINP, MINC, DMAX,
      :                    MAXP, MAXC, SUM, MEAN, STDEV, VAL__BADD,
-     :                    VAL__BADD, 1, VAL__BADR, VAL__BADD, STATUS )
+     :                    VAL__BADD, 1, VAL__BADR, VAL__BADD, 
+     :                    MAXWCS, MINWCS, STATUS )
 
 *    HIST option.
 *    ============
