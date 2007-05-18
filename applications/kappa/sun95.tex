@@ -14963,7 +14963,16 @@ KAPPA: \htmlref{ADD}{ADD},
       parameter CERROR).
    }
    \sstusage{
-      centroid ndf [mode] init [search] [maxiter] [maxshift] [toler]
+      centroid ndf [mode]
+        $\left\{ {\begin{tabular}{l}
+                    init \\
+                    coin=? \\
+                    incat=?
+                   \end{tabular} }
+        \right.$ [search] [maxiter] [maxshift] [toler]
+        \newline\hspace*{10em}
+        \makebox[0mm][c]{\small mode}
+
    }
    \sstparameters{
       \sstsubsection{
@@ -14972,7 +14981,7 @@ KAPPA: \htmlref{ADD}{ADD},
          A string determining the \htmlref{co-ordinate Frame}{se:domains}~  in which positions are
          to be stored in the output catalogue associated with parameter
          OUTCAT.  The string supplied for CATFRAME can be one of the
-         following:
+         following options.
 
          \ssthitemlist{
 
@@ -15078,7 +15087,7 @@ KAPPA: \htmlref{ADD}{ADD},
          Only accessed if parameter MODE is given the value {\tt "Cursor"}.  It
          indicates which positions are to be marked on the screen using the
          marker type given by parameter MARKER.  It can take any of the
-         following values:
+         following values.
 
          \ssthitemlist{
 
@@ -15125,7 +15134,8 @@ KAPPA: \htmlref{ADD}{ADD},
          MODE = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The \htmlref{mode}{se:interaction} in which the initial co-ordinates 
-         are to be obtained.  The   supplied string can be one of the following:
+         are to be obtained.  The supplied string can be one of the 
+         following values.
 
          \ssthitemlist{
 
@@ -15201,13 +15211,14 @@ KAPPA: \htmlref{ADD}{ADD},
       \sstsubsection{
          POSITIVE = \_LOGICAL (Read)
       }{
-         {\tt TRUE}, if array features are positive above the background. {\tt [TRUE]}
+         {\tt TRUE}, if array features are positive above the 
+         background.  {\tt [TRUE]}
       }
       \sstsubsection{
          QUIET = \_LOGICAL (Read)
       }{
          If {\tt TRUE} then the centroid positions are not displayed on the
-         screen.  Output parameters and files are still created. {\tt [FALSE]}
+         screen.  Output parameters and files are still created.  {\tt [FALSE]}
       }
       \sstsubsection{
          SEARCH() = \_INTEGER (Read)
@@ -15224,7 +15235,7 @@ KAPPA: \htmlref{ADD}{ADD},
          parameter OUTCAT, and to display before the centroid positions
          are listed.  If a null ({\tt{!}}) value is supplied, the title is taken
          from any input catalogue specified by parameter INCAT, or is a
-         fixed string including the name of the NDF. {\tt [!]}
+         fixed string including the name of the NDF.  {\tt [!]}
       }
       \sstsubsection{
          TOLER = \_REAL (Read)
@@ -15777,7 +15788,6 @@ KAPPA: \htmlref{PASTE}{PASTE},
      KAPPA: \htmlref{COLLAPSE}{COLLAPSE},
      \htmlref{CLINPLOT}{CLINPLOT}.
    }
-   \newpage
    \sstimplementationstatus{
       \ssthitemlist{
 
@@ -16796,7 +16806,6 @@ XV; PBMPLUS; NETPBM.
    }
 }
 
-\newpage
 \sstroutine{
    COLLAPSE
 }{
@@ -19527,11 +19536,16 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
       the rest is clipped.  The image is padded with bad pixels if necessary.
    }
    \sstusage{
-      display in [comp] clear [device] mode [centre] [xmagn] [ymagn]
-         [out] \{ low=? high=?
-               \{ percentiles=?
-               \{ sigmas=?
-               mode
+      display in [comp] clear [device] mode [centre] [xmagn] [ymagn] [out]
+        \newline\hspace*{1.5em}
+        $\left\{ {\begin{tabular}{l}
+                    low=? high=? \\
+                    percentiles=? \\
+                    sigmas=?
+                   \end{tabular} }
+        \right.$
+        \newline\hspace*{1.9em}
+        \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
       \sstsubsection{
@@ -42215,32 +42229,60 @@ KAPPA: \htmlref{REGRID}{REGRID},
    }
 }
 
-
 \sstroutine{
    SQORST
 }{
    Squashes or stretches an NDF
 }{
    \sstdescription{
-      An output \NDFref{NDF} is produced by squashing or stretching an input
-      NDF along one or more of its dimensions.  The shape of the
+      An output \NDFref{NDF} is produced by squashing or stretching an
+      input NDF along one or more of its dimensions.  The shape of the
       output NDF can be specified in one of two ways, according to
       the value of the MODE parameter; either a distortion factor
       is given for each dimension, or its lower and upper pixel
       bounds are given explicitly.
    }
    \sstusage{
-      sqorst in out factors
+      sqorst in out
+        $\left\{ {\begin{tabular}{l}
+                    factors \\  
+                    lbound=? ubound=? \\
+                    pixscale=? \\
+                  \end{tabular} }
+        \right.$
+        \newline\hspace*{6.6em}
+        \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
       \sstsubsection{
+         AXIS = \_INTEGER (Read)
+      }{
+         Assigning a value to this parameter indicates that a single
+	 axis should be squashed or stretched.  If a null ({\tt{!}})
+	 value is supplied for AXIS, a squash or stretch factor must
+	 be supplied for each axis in the manner indicated by the MODE
+	 parameter.  If a non-null value is supplied for AXIS, it
+	 should be the integer index of the axis to be squashed or
+	 stretched (the first axis has index 1).  In this case, only a
+	 single squash or stretch factor should be supplied, and all
+	 other axes will be left unchanged.  If MODE is set to
+	 {\tt PixelScale"}, then the supplied value should be the index 
+         of a WCS axis.  Otherwise it should be the index of a pixel 
+         axis.  {\tt [!]}
+     }
+      \sstsubsection{
          FACTORS( ) = \_DOUBLE (Read)
       }{
-         The factor by which each dimension will be distorted to
-         produce the output NDF.  A factor greater than one is a stretch
-         and less than one is a squash.  The number of values supplied
-         must be the same as the number of dimensions of the NDF.
-         Only used if MODE={\tt "Factors"}.
+         This parameter is used only if MODE={\tt "Factors"}.  It
+	 defines the factor by which each dimension will be distorted
+	 to produce the output NDF.  A factor greater than one is a
+	 stretch and less than one is a squash.  If no value has been
+	 supplied for parameter AXIS, the number of values supplied
+	 for FACTORS must be the same as the number of pixel axes in
+	 the NDF.  If a non-null value has been supplied for parameter
+	 AXIS, then only a single value should be supplied for FACTORS
+	 and that value will be used to distort the axis indicated by 
+         parameter AXIS.
       }
       \sstsubsection{
          IN = NDF (Read)
@@ -42248,19 +42290,25 @@ KAPPA: \htmlref{REGRID}{REGRID},
          The NDF to be squashed or stretched.
       }
       \sstsubsection{
-         LBOUND( ) = \_INTEGER
+         LBOUND( ) = \_INTEGER (Read)
       }{
-         The lower pixel index values of the output NDF.  The number of
-         values supplied must be the same as the number of dimensions
-         of the NDF.  If null ({\tt{!}}) is given, the lower pixel bounds of
-         the input NDF will be used.  Only used if MODE={\tt "Bounds"}.
+         This parameter is only used if MODE={\tt "Bounds"}.  It
+	 specifies the lower pixel-index values of the output NDF.  If
+	 no value has been supplied for parameter AXIS, the number of
+	 values supplied for LBOUND must be the same as the number of
+	 pixel axes in the NDF.  If a non-null value has been supplied
+	 for parameter AXIS, then only a single value should be
+	 supplied for LBOUND and the supplied value will be used as
+	 the new lower bounds on the axis indicated by parameter AXIS.
+	 If null ({\tt{!}}) is given, the lower pixel bounds of the
+	 input NDF will be used.  
       }
       \sstsubsection{
          METHOD = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The interpolation method used to perform the one-dimensional
          resampling operations which constitute the squash or stretch.
-         The following values are permitted:
+         The following values are permitted.
 
          \ssthitemlist{
 
@@ -42307,12 +42355,27 @@ KAPPA: \htmlref{REGRID}{REGRID},
       \sstsubsection{
          MODE = LITERAL (Read)
       }{
-         Determines how the shape of the output NDF is to be specified.
-         If MODE={\tt "Factors"} (the default) then the FACTORS parameter
-         will be used to determine the factor by which each dimension
-         should be multiplied.  If MODE={\tt "Bounds"} then the LBOUND and
-         UBOUND parameters will be used to get the lower and upper
-         pixel bounds of the output NDF. {\tt ["Factors"]}
+         This determines how the shape of the output NDF is to be specified.
+         The allowed values and their meanings are as follows.
+         
+         \ssthitemlist{
+
+            \sstitem
+            {\tt "Factors"} --- the FACTORS parameter will be used to 
+                                determine the factor by which each dimension 
+                                should be multiplied.
+            
+            \sstitem
+            {\tt "Bounds"}  --- the LBOUND and UBOUND parameters will be used 
+                                to get the lower and upper pixel bounds of the 
+                                output NDF. 
+            
+            \sstitem
+            {\tt "PixelScale"} --- the PIXSCALE parameter will be used to 
+                                   obtain the new pixel scale to use for 
+                                   each WCS axis.
+         }
+         {\tt ["Factors"]}
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -42329,18 +42392,41 @@ KAPPA: \htmlref{REGRID}{REGRID},
          \htmlref{``Sub-pixel Interpolation Schemes''}{subpixel:sqorst}.
       }
       \sstsubsection{
+         PIXSCALE = LITERAL (Read)
+      }{
+         The PIXSCALE parameter is only used if parameter MODE is set
+	 to {\tt "PixelScale"}.  It should be supplied holding the
+	 required new pixel scales.  In this context, a pixel scale
+	 for a WCS axis is the increment in WCS axis value caused by a
+	 movement of one pixel along the WCS axis, and are measured at
+	 the first pixel in the array.  The suggested default value
+	 are the current pixel scales.  If no value has been supplied
+	 for parameter AXIS, the number of values supplied for
+	 PIXSCALE must be the same as the number of WCS axes in the
+	 NDF.  If a non-null value has been supplied for parameter
+	 AXIS, then only a single value should be supplied for
+	 PIXSCALE and that value will be used as the new pixel scale
+	 on the WCS axis indicated by parameter AXIS. 
+      }
+      \sstsubsection{
          TITLE = LITERAL (Read)
       }{
          Title for the output NDF.  A null ({\tt{!}}) value causes the input
          title to be used.  {\tt [!]}
       }
       \sstsubsection{
-         UBOUND( ) = \_INTEGER
+         UBOUND( ) = \_INTEGER (Read)
       }{
-         The upper pixel index values of the output NDF.  The number of
-         values supplied must be the same as the number of dimensions
-         of the NDF.  If null ({\tt{!}}) is given, the upper pixel bounds of
-         the input NDF will be used.  Only used if MODE={\tt "Bounds"}.
+         This parameter is only used if MODE={\tt "Bounds"}.  The upper
+	 pixel index values of the output NDF. If no value has been
+	 supplied for parameter AXIS, the number of values supplied
+	 for UBOUND must be the same as the number of pixel axes in
+	 the NDF.  If a non-null value has been supplied for parameter
+	 AXIS, then only a single value should be supplied for UBOUND
+	 and the supplied value will be used as the new upper bounds
+	 on the axis indicated by parameter AXIS.  If null ({\tt{!}})
+	 is given, the upper pixel bounds of the input NDF will be
+	 used.  
       }
    }
    \sstexamples{
@@ -42367,6 +42453,12 @@ KAPPA: \htmlref{REGRID}{REGRID},
          which has 50 pixels along each side.  The same region of sky
          is represented, but the input image is squashed along both
          axes to fit the specified dimensions.
+      }
+      \sstexamplesubsection{
+         sqorst fred mode=pixelscale pixscale=5 axis=3
+      }{
+         This resamples a cube NDF called fred on to a velocity scale
+         of 5 km/s per pixel along its third axis.
       }
    }
    \sstnotes{
@@ -42404,12 +42496,18 @@ KAPPA: \htmlref{REGRID}{REGRID},
       \sstitemlist{
 
          \sstitem
-         The \htmlref{LABEL}{apndf:label}, \htmlref{UNITS}{apndf:units}, and \htmlref{HISTORY}{apndf:history}~ components, and all 
-         \htmlref{extensions}{apndf:extensions}~ are
-         propagated.  \htmlref{TITLE}{apndf:title}~ is controlled by the TITLE parameter.  DATA,
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{AXIS}{apndf:axis}~ and \htmlref{WCS}{apndf:wcs} are propagated after appropriate modification. 
-         The \htmlref{QUALITY}{apndf:quality}~ component is also propagated if 
-         nearest-neighbour interpolation is being used.  
+
+         The \htmlref{LABEL}{apndf:label},
+	 \htmlref{UNITS}{apndf:units}, and
+	 \htmlref{HISTORY}{apndf:history}~ components, and all 
+	 \htmlref{extensions}{apndf:extensions}~ are propagated.
+	 \htmlref{TITLE}{apndf:title}~ is controlled by the TITLE
+	 parameter.  DATA, \htmlref{VARIANCE}{apndf:variance},
+	 \htmlref{AXIS}{apndf:axis}~ and \htmlref{WCS}{apndf:wcs} are
+	 propagated after appropriate modification.  The
+	 \htmlref{QUALITY}{apndf:quality}~ component is also
+	 propagated if nearest-neighbour interpolation is being used.
+	 
 
          \sstitem
          Processing of \htmlref{bad pixels}{se:masking} and automatic \htmlref{quality masking}{se:qualitymask} are
@@ -51643,6 +51741,15 @@ The following applications have been modified:
          \item A bug introduced at previous release is fixed.  It can
          again rotate a two-dimensional array with a dimension of one
          element, or a cube with two single-element dimensions.
+      \end{itemize}
+
+   \item [\htmlref{SQORST}{SQORST}] \mbox{}
+      \begin{itemize}
+         \item There is a new MODE ={\tt "PixelScale"} option, and new
+         corresponding PIXSCALE and AXIS parameters.  These allow the
+         WCS scales per pixel to be modified.  So for example, it can
+         resample a spectral cube into a cube with a specified channel
+         width.
       \end{itemize}
 
    \item [\htmlref{STATS}{STATS}] \mbox{}
