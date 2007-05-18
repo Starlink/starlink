@@ -756,6 +756,10 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *     1-MAY-2007 (DSB):
 *        - In astSplit, if a keyword value looks like an int but is too long to 
 *         fit in an int, then treat it as a float instead.
+*     18-MAY-2007 (DSB):
+*        In CnvType, use input type rather than output type when checking
+*        for a COMMENT card. Also, return a null data value buffer for a
+*        COMMENT card.
 *class--
 */
 
@@ -5259,13 +5263,25 @@ static int CnvType( int otype, void *odata, size_t osize, int type,
 /* If there is no data value and this is not a COMMENT keyword, or if
    there is a data value and this is a COMMENT card, conversion is not
    possible. */
-   } else if( ( odata && type == AST__COMMENT ) ||
-              ( !odata && type != AST__COMMENT ) ) {
+   } else if( ( odata && otype == AST__COMMENT ) ||
+              ( !odata && otype != AST__COMMENT ) ) {
       ret = 0;
 
-/* If there is no data (and therefore this is a comment card), leave the 
-   supplied buffers unchanged. */
-   } else if( odata ) {
+/* If there is no data (and therefore this is a comment card), return a
+   undefined buffer value. */
+   } else if( !odata ) {
+      if( type == AST__STRING || type == AST__CONTINUE ||
+                 type == AST__COMMENT ){
+         *( (char **) buff ) = AST__UNDEFS;
+   
+      } else if( astOK ) {
+         ret = 0;
+         astError( AST__INTER, "CnvType: Cannot convert an undefined "
+                   "FITS keyword value to type '%s'.", type_names[ otype ] );
+      }
+
+/* If there is data... */
+   } else {
 
 /* Do each possible combination of supplied and stored data types... */
 
