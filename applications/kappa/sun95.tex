@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.32}
 \newcommand{\stardocnumber}    {95.32}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2007 May 5}
+\newcommand{\stardocdate}      {2007 May 18}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.7-4}
+\newcommand{\stardocversion}   {1.7-5}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -25689,9 +25689,9 @@ KAPPA: \htmlref{HISCOM}{HISCOM},
       \sstsubsection{
          MAXCOORD( ) = \_DOUBLE (Write)
       }{
-         A one-dimensional array of values giving the user co-ordinates of
-         the centre of the (first) maximum-valued pixel found in the
-         NDF array.  The number of co-ordinates is equal to the number
+         A one-dimensional array of values giving the \htmlref{WCS}{apndf:wcs} 
+         co-ordinates of the centre of the (first) maximum-valued pixel found in
+         the NDF array.  The number of co-ordinates is equal to the number
          of NDF dimensions.
       }
       \sstsubsection{
@@ -25702,9 +25702,16 @@ KAPPA: \htmlref{HISCOM}{HISCOM},
       \sstsubsection{
          MAXPOS( ) = \_INTEGER (Write)
       }{
-         A one-dimensional array of pixel indices identifying the (first)
+         A one-dimensional array of \htmlref{pixel indices}{se:pixgrd}~
+         identifying the (first)
          maximum-valued pixel found in the NDF array.  The number of
          indices is equal to the number of NDF dimensions.
+      }
+      \sstsubsection{
+         MAXWCS = LITERAL (Write)
+      }{
+         The formatted WCS co-ordinates at the maximum pixel value.  The 
+         individual axis values are comma separated.
       }
       \sstsubsection{
          MEAN = \_DOUBLE (Write)
@@ -25735,6 +25742,12 @@ KAPPA: \htmlref{HISCOM}{HISCOM},
          A one-dimensional array of pixel indices identifying the (first)
          minimum-valued pixel found in the NDF array.  The number of
          indices is equal to the number of NDF dimensions.
+      }
+      \sstsubsection{
+         MINWCS = LITERAL (Write)
+      }{
+         The formatted WCS co-ordinates at the minimum pixel value.  The
+         individual axis values are comma separated.
       }
       \sstsubsection{
          MODE = \_DOUBLE (Write)
@@ -42505,10 +42518,10 @@ KAPPA: \htmlref{REGRID}{REGRID},
       \sstsubsection{
          MAXCOORD( ) = \_DOUBLE (Write)
       }{
-         A one-dimensional array of values giving the data co-ordinates of
-         the centre of the (first) maximum-valued pixel found in the
-         NDF array.  The number of co-ordinates is equal to the number of
-         NDF dimensions.
+         A one-dimensional array of values giving the \htmlref{WCS}{apndf:wcs} 
+         co-ordinates of the centre of the (first) maximum-valued pixel found 
+         in the NDF array.  The number of co-ordinates is equal to the number 
+         of NDF dimensions.
       }
       \sstsubsection{
          MAXIMUM = \_DOUBLE (Write)
@@ -42522,6 +42535,12 @@ KAPPA: \htmlref{REGRID}{REGRID},
          identifying the (first)
          maximum-valued pixel found in the NDF array.  The number of
          indices is equal to the number of NDF dimensions.
+      }
+      \sstsubsection{
+         MAXWCS = LITERAL (Write)
+      }{
+         The formatted WCS co-ordinates at the maximum pixel value.  The 
+         individual axis values are comma separated.
       }
       \sstsubsection{
          MEAN = \_DOUBLE (Write)
@@ -42547,6 +42566,12 @@ KAPPA: \htmlref{REGRID}{REGRID},
          A one-dimensional array of pixel indices identifying the (first)
          minimum-valued pixel found in the NDF array.  The number of
          indices is equal to the number of NDF dimensions.
+      }
+      \sstsubsection{
+         MINWCS = LITERAL (Write)
+      }{
+         The formatted WCS co-ordinates at the minimum pixel value.  The
+         individual axis values are comma separated.
       }
       \sstsubsection{
          NUMBAD = \_INTEGER (Write)
@@ -51585,6 +51610,11 @@ The following applications have been modified:
          the current behaviour.
       \end{itemize}
 
+   \item [\htmlref{HISTAT}{HISTAT}] \mbox{}
+      \begin{itemize}
+         \item See the STATS changes below.
+      \end{itemize}
+
    \item [\htmlref{LINPLOT}{LINPLOT}] \mbox{}
       \begin{itemize}
       \item There is a noew parameter ALIGNSYS that specifies the
@@ -51613,6 +51643,16 @@ The following applications have been modified:
          \item A bug introduced at previous release is fixed.  It can
          again rotate a two-dimensional array with a dimension of one
          element, or a cube with two single-element dimensions.
+      \end{itemize}
+
+   \item [\htmlref{STATS}{STATS}] \mbox{}
+      \begin{itemize}
+         \item There are two new output parameters---MAXWCS and
+         MINWCS---that hold formatted \htmlref{WCS}{apndf:wcs} co-ordinates 
+         of the maximum- and minimum-valued pixels.  MAXCOORD and MINCOORD 
+         parameters now contain the corresponding numerical WCS co-ordinates,
+         provided the NDF being analysed has a WCS FrameSet; otherwise
+         they continue to hold the AXIS-component values.
       \end{itemize}
 
    \item [\htmlref{SUB}{SUB}] \mbox{}
