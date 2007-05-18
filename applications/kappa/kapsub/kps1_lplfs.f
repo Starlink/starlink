@@ -120,9 +120,11 @@
 *        Global status value.
 
 *  Copyright:
-*     Copyright (C) 1998, 2003-2004 Central Laboratory of the Research
-*     Councils. Copyright (C) 2005 Particle Physics & Astronomy
-*     Research Council. All Rights Reserved.
+*     Copyright (C) 1998, 2003-2004 Central Laboratory of the Research 
+*                                   Councils. 
+*     Copyright (C) 2005 Particle Physics & Astronomy Research Council. 
+*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -170,6 +172,10 @@
 *        Correct logic for checkign for AST__BADUN errors.
 *     15-APR-2005 (PWD):
 *        Parameterize use of backslashes to improve portability.
+*     18-MAY-2007 (DSB):
+*        Normalise log and lin RMS values before comparing them, by
+*        converting them from an increment in data value (log or lin),
+*        to an increment in pixels.
 *     {enter_further_changes_here}
 
 *-
@@ -378,6 +384,9 @@
      :                       %VAL( CNF_PVAL( IPG ) ), M, C,
      :                       RMSLIN, STATUS )
 
+*  Convert the RMS value into a distance in pixels
+            IF( M .NE. 0.0 ) RMSLIN = ABS( RMSLIN/M )
+
 *  Now take the log base 10 of the axis values and find the new RMS
 *  deviation.
             CALL KPG1_LOGAD( .TRUE., DIM, %VAL( CNF_PVAL( IPD ) ), 
@@ -390,6 +399,9 @@
                CALL KPG1_FIT1D( 1, DIM, %VAL( CNF_PVAL( IPD ) ), 
      :                          %VAL( CNF_PVAL( IPG ) ), M, C,
      :                          RMSLOG, STATUS )
+
+*  Convert the RMS value into a distance in pixels
+               IF( M .NE. 0.0 ) RMSLOG = ABS( RMSLOG/M )
 
 *  Choose the mapping which gives the smallest rms (i.e. spreads the
 *  pixels out most evenly on the screen).
@@ -434,6 +446,9 @@
      :                       %VAL( CNF_PVAL( IPG ) ), M, C,
      :                       RMSLIN, STATUS )
 
+*  Convert the RMS into an equivalent number of pixels.
+            IF( M .NE. 0.0 ) RMSLIN = ABS( RMSLIN/M )
+
 *  Now take the log base 10 of the axis values and find the new RMS
 *  deviation.
             CALL KPG1_LOGAD( .TRUE., DIM, %VAL( CNF_PVAL( IPD ) ), 
@@ -446,6 +461,9 @@
                CALL KPG1_FIT1D( 1, DIM, %VAL( CNF_PVAL( IPD ) ), 
      :                          %VAL( CNF_PVAL( IPG ) ), M, C,
      :                          RMSLOG, STATUS )
+
+*  Convert the RMS into an equivalent number of pixels.
+               IF( M .NE. 0.0 ) RMSLOG = ABS( RMSLOG/M )
 
 *  Choose the mapping which gives the smallest rms (i.e. spreads the
 *  pixels out most evenly on the screen).
