@@ -146,6 +146,8 @@
 *  History:
 *     18-APR-2006 (DSB):
 *        Initial version.
+*     18-MAY-2006 (DSB):
+*        Corrections to handle cases where there is only 1 detector.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -202,7 +204,9 @@ void smf_rebincube_ast( smfData *data, int index, int size, dim_t nchan,
 
 /* Local Variables */
    AstCmpMap *detmap = NULL;   /* Mapping from 1D det. index to 2D i/p "grid" coords */
+   AstMapping *dtotmap = NULL; /* 1D det index->o/p GRID Mapping */
    AstMapping *fullmap = NULL; /* WCS->GRID LutMap from input WCS FrameSet */
+   AstMapping *lutmap = NULL;  /* Mapping that identifies detectors to be used */
    AstMapping *splut = NULL;   /* Spatial LutMap */
    AstMapping *sslut = NULL;   /* Spectral LutMap */
    AstMapping *totmap = NULL;  /* WCS->GRID Mapping from input WCS FrameSet */
@@ -230,11 +234,11 @@ void smf_rebincube_ast( smfData *data, int index, int size, dim_t nchan,
    int junk;                   /* Unused parameter */
    int lbnd_in[ 2 ];           /* Lower input bounds on receptor axis */
    int ldim[ 3 ];              /* Output array lower GRID bounds */
-   int udim[ 3 ];              /* Output array upper GRID bounds */
-   int uddim[ 1 ];             /* Detector array upper GRID bounds */
    int outperm[ 3 ];           /* Output axis permutation array */
    int timeslice_size;         /* Number of elements in a time slice */
    int ubnd_in[ 2 ];           /* Upper input bounds on receptor axis */
+   int uddim[ 1 ];             /* Detector array upper GRID bounds */
+   int udim[ 3 ];              /* Output array upper GRID bounds */
    smfHead *hdr = NULL;        /* Pointer to data header for this time slice */
 
 /* Check the inherited status. */
@@ -286,45 +290,54 @@ void smf_rebincube_ast( smfData *data, int index, int size, dim_t nchan,
 /* Allocate a work array to hold the exposure time for each detector. */
    detwork = astMalloc( ndet * sizeof( float ) );
 
-/* Create a LutMap that holds the input GRID index of every detector to be
-   included in the output, and AST__BAD for every detector that is not to be
-   included in the output cube. First allocate the work space for the LUT. */
-   detlut = astMalloc( ndet*sizeof( double ) );
+/* If we are dealing with more than 1 detector, create a LutMap that holds 
+   the input GRID index of every detector to be included in the output, and 
+   AST__BAD for every detector that is not to be included in the output cube. 
+   First allocate the work space for the LUT. */
+   if( ndet > 1 ) {
+      detlut = astMalloc( ndet*sizeof( double ) );
 
 /* Initialise a string to point to the name of the first detector for which 
    data is available */
-   name = hdr->detname;
+      name = hdr->detname;
 
 /* Loop round all detectors for which data is available. */
-   for( idet = 0; idet < ndet; idet++ ) {
+      for( idet = 0; idet < ndet; idet++ ) {
 
 /* Store the input GRID coord of this detector. GRID coords start at 1,
    not 0. */
-      detlut[ idet ] = idet + 1.0;
+         detlut[ idet ] = idet + 1.0;
 
 /* If a group of detectors to be used was supplied, search the group for
    the name of the current detector. If not found, set the GRID coord bad. 
    This will cause astRebinSeq to ignore data from the detector. */
-      if( detgrp ) {    
-         grpIndex( name, detgrp, 1, &found, status );
-         if( !found ) detlut[ idet ] = AST__BAD;
-      }
+         if( detgrp ) {    
+            grpIndex( name, detgrp, 1, &found, status );
+            if( !found ) detlut[ idet ] = AST__BAD;
+         }
 
 /* Move on to the next available detector name. */
-      name += strlen( name ) + 1;
+         name += strlen( name ) + 1;
+      }
+
+/* Create the LutMap. */
+      lutmap = (AstMapping *) astLutMap( ndet, detlut, 1.0, 1.0, "" );
+
+/* If we only have 1 detector, use a UnitMap instead of a LutMap (lutMaps
+   must have 2 or more table entries). */
+   } else {
+      lutmap = (AstMapping *) astUnitMap( 1, "" );    
    }
 
-/* Create the LutMap from this array, and combine it with a 1-input, 
-   2-output PermMap that copies its input to create its first output, 
-   and assigns a constant value of 1.0 to its second output. We need to
-   do this because smf_tslice returns a 2D GRID system (even though the
-   second GRID axis is not actually used). */
+/* Combine the above LutMap with a 1-input, 2-output PermMap that copies its 
+   input to create its first output, and assigns a constant value of 1.0 to 
+   its second output. We need to do this because smf_tslice returns a 2D 
+   GRID system (even though the second GRID axis is not actually used). */
    inperm[ 0 ] = 1;
    outperm[ 0 ] = 1;
    outperm[ 1 ] = -1;
    con = 1.0;
-   detmap = astCmpMap( astLutMap( ndet, detlut, 1.0, 1.0, "" ),
-                       astPermMap( 1, inperm, 2, outperm, &con, "" ),
+   detmap = astCmpMap( lutmap, astPermMap( 1, inperm, 2, outperm, &con, "" ),
                        1, "" );
 
 /* Store the bounds of a single time slice grid. */
@@ -378,8 +391,13 @@ void smf_rebincube_ast( smfData *data, int index, int size, dim_t nchan,
    detector index) and 3-output (output grid coords) Mapping. We finally
    add a PermMap to re-arrange the output axes so that channel number is
    axis 3 in the output. */
-      atlTolut( (AstMapping *) astCmpMap( detmap, totmap, 1, "" ), 1.0, 
-                (double) ndet, 1.0, "LutInterp=1", &splut, status );
+      dtotmap = (AstMapping *) astCmpMap( detmap, totmap, 1, "" );
+      if( ndet > 1 ) {
+         atlTolut( dtotmap, 1.0, (double) ndet, 1.0, "LutInterp=1", &splut, 
+                   status );
+      } else {
+         splut = astClone( dtotmap );
+      }
 
       fullmap = astSimplify( astCmpMap( astCmpMap( sslut, splut, 0, "" ), 
                                         pmap, 1, "" ) );
