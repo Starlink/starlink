@@ -76,6 +76,9 @@
 *        A 1-dimensional array of pixel indices identifying the (first)
 *        maximum-valued pixel found in the NDF array.  The number of
 *        indices is equal to the number of NDF dimensions.
+*     MAXWCS = LITERAL (Write)
+*        The formatted WCS co-ordinates at the maximum pixel value. The
+*        individual axis values are comma separated.
 *     MEAN = _DOUBLE (Write)
 *        The mean value of all the valid pixels in the NDF array.
 *     MINCOORD( ) = _DOUBLE (Write)
@@ -89,6 +92,9 @@
 *        A 1-dimensional array of pixel indices identifying the (first)
 *        minimum-valued pixel found in the NDF array.  The number of
 *        indices is equal to the number of NDF dimensions.
+*     MINWCS = LITERAL (Write)
+*        The formatted WCS co-ordinates at the minimum pixel value. The
+*        individual axis values are comma separated.
 *     NDF = NDF (Read)
 *        The NDF data structure to be analysed.
 *     NUMBAD = _INTEGER (Write)
@@ -145,6 +151,7 @@
 *  Copyright:
 *     Copyright (C) 1991-1992 Science & Engineering Research Council.
 *     Copyright (C) 2004 Central Laboratory of the Research Councils.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -183,6 +190,8 @@
 *        Display current Frame WCS coords at max and min pixel positions.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     18-MAY-2007 (DSB):
+*        Added parameters MINWCS and MAXWCS.
 *     {enter_further_changes_here}
 
 *-
@@ -192,6 +201,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'AST_PAR'          ! AST functions and constants
       INCLUDE 'PAR_ERR'          ! PAR_ error codes
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
@@ -212,6 +222,8 @@
       CHARACTER * ( 8 ) MCOMP    ! Component name for mapping arrays
       CHARACTER * ( NDF__SZTYP ) TYPE ! Numeric type for processing
       CHARACTER * ( SZBUF ) BUF  ! Text buffer
+      CHARACTER * ( 255 ) MAXWCS ! Formatted max WCS position
+      CHARACTER * ( 255 ) MINWCS ! Formatted max WCS position
       DOUBLE PRECISION DMAX      ! Max. value of pixels in array
       DOUBLE PRECISION DMAXC     ! Max. pixel value after clipping
       DOUBLE PRECISION DMIN      ! Min. value of pixels in array
@@ -250,6 +262,7 @@
       INTEGER NDIM               ! Number of NDF dimensions
       INTEGER NGOOD              ! No. valid pixels in array
       INTEGER NGOODC             ! No. valid pixels after clipping
+      INTEGER NWCS               ! Number of WCS axes
       INTEGER PNTR( 1 )          ! Pointer to mapped NDF array
       INTEGER UBND( NDF__MXDIM ) ! NDF upper bounds
       LOGICAL BAD                ! Bad-pixel flag
@@ -273,6 +286,9 @@
 
 *  Get its WCS FrameSet
       CALL KPG1_GTWCS( NDF, IWCS, STATUS )
+
+*  Get the number of WCS axes.
+      NWCS = AST_GETI( IWCS, 'Nout', STATUS )
 
 *  Determine which array component is to be analysed, converting
 *  'ERROR' into 'VARIANCE'.
@@ -456,12 +472,17 @@
          CALL KPG1_VEC2N( 1, IMAX, NDIM, LBND, UBND, MAXPC, STATUS )
          CALL KPG1_PX2AX( NDIM, MINPC, NDF, MINCC, STATUS )
          CALL KPG1_PX2AX( NDIM, MAXPC, NDF, MAXCC, STATUS )
-         DO 2 I = 1, NDIM
+
+         DO I = 1, NDIM
             MINP( I ) = MINPC( I )
             MAXP( I ) = MAXPC( I )
+         END DO
+
+         DO I = 1, NWCS
             MINC( I ) = MINCC( I )
             MAXC( I ) = MAXCC( I )
- 2       CONTINUE
+         END DO
+
       END IF
 
 *  Assign undefined values to the ordered statistics.
@@ -475,11 +496,13 @@
       IF ( TYPE .EQ. '_DOUBLE' ) THEN
          CALL KPG1_STDSD( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                    DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
-     :                    MEDIAN, MODE, 1, PERCNT, PERVAL, STATUS )
+     :                    MEDIAN, MODE, 1, PERCNT, PERVAL, MAXWCS, 
+     :                    MINWCS, STATUS )
       ELSE
          CALL KPG1_STDSR( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                    DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
-     :                    MEDIAN, MODE, 1, PERCNT, PERVAL, STATUS )
+     :                    MEDIAN, MODE, 1, PERCNT, PERVAL, MAXWCS,
+     :                    MINWCS, STATUS )
       END IF
 
 *  Also write the statistics to the logfile, if used.
@@ -529,12 +552,14 @@
             CALL KPG1_STDSD( IWCS, NDIM, EL, NGOODC, DMINC, MINPC, 
      :                       MINCC,
      :                       DMAXC, MAXPC, MAXCC, SUMC, MEANC, STDEVC,
-     :                       MEDIAN, MODE, 1, PERCNT, PERVAL, STATUS )
+     :                       MEDIAN, MODE, 1, PERCNT, PERVAL, MAXWCS,
+     :                       MINWCS, STATUS )
          ELSE
             CALL KPG1_STDSR( IWCS, NDIM, EL, NGOODC, DMINC, MINPC, 
      :                       MINCC,
      :                       DMAXC, MAXPC, MAXCC, SUMC, MEANC, STDEVC,
-     :                       MEDIAN, MODE, 1, PERCNT, PERVAL, STATUS )
+     :                       MEDIAN, MODE, 1, PERCNT, PERVAL, MAXWCS,
+     :                       MINWCS, STATUS )
          END IF
 
 *  Also write the statistics to the log file, if used.
@@ -556,6 +581,8 @@
 
 *  Write the final results to the output parameters.
       CALL PAR_PUT0D( 'MAXIMUM', DMAXC, STATUS )
+      CALL PAR_PUT0C( 'MAXWCS', MAXWCS, STATUS )
+      CALL PAR_PUT0C( 'MINWCS', MINWCS, STATUS )
       CALL PAR_PUT0D( 'MEAN', MEANC, STATUS )
       CALL PAR_PUT0D( 'MINIMUM', DMINC, STATUS )
       CALL PAR_PUT0D( 'SIGMA', STDEVC, STATUS )
@@ -563,8 +590,8 @@
       CALL PAR_PUT0I( 'NUMBAD', EL - NGOODC, STATUS )
       CALL PAR_PUT0I( 'NUMGOOD', NGOODC, STATUS )
       CALL PAR_PUT0I( 'NUMPIX', EL, STATUS )
-      CALL PAR_PUT1D( 'MAXCOORD', NDIM, MAXCC, STATUS )
-      CALL PAR_PUT1D( 'MINCOORD', NDIM, MINCC, STATUS )
+      CALL PAR_PUT1D( 'MAXCOORD', NWCS, MAXCC, STATUS )
+      CALL PAR_PUT1D( 'MINCOORD', NWCS, MINCC, STATUS )
       CALL PAR_PUT1I( 'MAXPOS', NDIM, MAXPC, STATUS )
       CALL PAR_PUT1I( 'MINPOS', NDIM, MINPC, STATUS )
 

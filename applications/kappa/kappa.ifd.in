@@ -10282,6 +10282,14 @@ package kappa {
             helpkey *
           }
 
+         parameter maxwcs {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+
          parameter mean {
             type _DOUBLE
             access WRITE
@@ -10319,6 +10327,14 @@ package kappa {
             type _INTEGER
             access WRITE
             vpath INTERNAL
+            helpkey *
+          }
+
+         parameter minwcs {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            default 0
             helpkey *
           }
 
@@ -15223,6 +15239,14 @@ iraf! {
             helpkey *
           }
 
+         parameter maxwcs {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+
          parameter maximum {
             type _DOUBLE
             access WRITE
@@ -15268,6 +15292,14 @@ iraf! {
             type _INTEGER
             access WRITE
             vpath INTERNAL
+            helpkey *
+          }
+
+         parameter minwcs {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            default 0
             helpkey *
           }
 

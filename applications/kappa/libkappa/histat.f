@@ -63,6 +63,9 @@
 *        A 1-dimensional array of pixel indices identifying the (first)
 *        maximum-valued pixel found in the NDF array.  The number of
 *        indices is equal to the number of NDF dimensions.
+*     MAXWCS = LITERAL (Write)
+*        The formatted WCS co-ordinates at the maximum pixel value. The
+*        individual axis values are comma separated.
 *     MEAN = _DOUBLE (Write)
 *        The mean value of all the valid pixels in the NDF array.
 *     MEDIAN = _DOUBLE (Write)
@@ -78,6 +81,9 @@
 *        A 1-dimensional array of pixel indices identifying the (first)
 *        minimum-valued pixel found in the NDF array. The number of
 *        indices is equal to the number of NDF dimensions.
+*     MINWCS = LITERAL (Write)
+*        The formatted WCS co-ordinates at the minimum pixel value. The
+*        individual axis values are comma separated.
 *     MODE = _DOUBLE (Write)
 *        The modal value of all the valid pixels in the NDF array.  It
 *        is estimated from 3 * median - 2 * mean.  This is only valid
@@ -159,6 +165,7 @@
 *  Copyright:
 *     Copyright (C) 1991, 1994 Science & Engineering Research Council.
 *     Copyright (C) 2000, 2004 Central Laboratory of the Research
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     Councils. All Rights Reserved.
 
 *  Licence:
@@ -197,6 +204,8 @@
 *        Display current Frame WCS coords at max and min pixel positions.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     18-MAY-2007 (DSB):
+*        Added parameters MINWCS and MAXWCS.
 *     {enter_further_changes_here}
 
 *-
@@ -211,6 +220,7 @@
       INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
       INCLUDE 'MSG_PAR'          ! Message constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+      INCLUDE 'AST_PAR'          ! AST functions and constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -226,6 +236,8 @@
       LOGICAL BAD                ! There may be bad values in the array
       CHARACTER * ( SZBUF ) BUF  ! Text buffer
       CHARACTER * ( 8 ) COMP     ! Name of array component to analyse
+      CHARACTER * ( 255 ) MAXWCS ! Formatted max WCS position
+      CHARACTER * ( 255 ) MINWCS ! Formatted max WCS position
       DOUBLE PRECISION DMAX      ! Max. value of pixels in array
       DOUBLE PRECISION DMIN      ! Min. value of pixels in array
       LOGICAL DOPRCT             ! Percentiles have been supplied
@@ -250,6 +262,7 @@
       INTEGER NDIM               ! Number of NDF dimensions
       INTEGER NGOOD              ! No. valid pixels in array
       INTEGER NUMPER             ! Number of percentiles
+      INTEGER NWCS               ! Number of WCS axes
       REAL PERCNT( NPRCTL )      ! Percentiles
       DOUBLE PRECISION PERVAL( NPRCTL ) ! Values at the percentiles
       INTEGER PNTR( 1 )          ! Pointer to mapped NDF array
@@ -463,18 +476,21 @@
 *  Get the WCS FrameSet.
       CALL KPG1_GTWCS( NDF, IWCS, STATUS )
 
+*  Get the number of WCS axes.
+      NWCS = AST_GETI( IWCS, 'Nout', STATUS )
+
 *  Display the statistics, using the most appropriate floating-point
 *  precision.
       IF ( TYPE .EQ. '_DOUBLE' ) THEN
          CALL KPG1_STDSD( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                    DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
      :                    MEDIAN, MODE, NUMPER, PERCNT, PERVAL,
-     :                    STATUS )
+     :                    MAXWCS, MINWCS, STATUS )
       ELSE
          CALL KPG1_STDSR( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                    DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
      :                    MEDIAN, MODE, NUMPER, PERCNT, PERVAL,
-     :                    STATUS )
+     :                    MAXWCS, MINWCS, STATUS )
       END IF
 
 *  Also write the statistics to the logfile, if used.
@@ -509,6 +525,8 @@
       CALL PAR_PUT1D( 'MINCOORD', NDIM, MINC, STATUS )
       CALL PAR_PUT1I( 'MAXPOS', NDIM, MAXP, STATUS )
       CALL PAR_PUT1I( 'MINPOS', NDIM, MINP, STATUS )
+      CALL PAR_PUT0C( 'MAXWCS', MAXWCS, STATUS )
+      CALL PAR_PUT0C( 'MINWCS', MINWCS, STATUS )
 
 *  Only write percentiles values if any percentiles were given.
       IF ( DOPRCT ) CALL PAR_PUT1D( 'PERVAL', NUMPER, PERVAL, STATUS )
