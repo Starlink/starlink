@@ -54,14 +54,17 @@
 *     parameter CERROR).
 
 *  Usage:
-*     centroid ndf [mode] init [search] [maxiter] [maxshift] [toler]
+*     centroid ndf [mode] { init   [search] [maxiter] [maxshift] [toler]
+*                         { coin=?
+*                         { incat=?
+*                       mode
 
 *  ADAM Parameters:
 *     CATFRAME = LITERAL (Read)
-*        A string determining the co-ordinate Frame in which positions are 
-*        to be stored in the output catalogue associated with parameter
-*        OUTCAT. The string supplied for CATFRAME can be one of the 
-*        following:
+*        A string determining the co-ordinate Frame in which positions 
+*        are to be stored in the output catalogue associated with 
+*        parameter OUTCAT.  The string supplied for CATFRAME can be one 
+*        of the following options.
 *
 *        - A Domain name such as SKY, AXIS, PIXEL, etc. 
 *
@@ -72,10 +75,10 @@
 *
 *        If a null (!) value is supplied, the positions will be stored 
 *        in a SKY Frame, if a SKY Frame is available within the input 
-*        catalogue. Otherwise, they will be stored in PIXEL co-ordinates, 
-*        if a PIXEL Frame is available within the input catalogue. 
-*        Otherwise, they are stored in the base Frame of the supplied 
-*        WCS information. [!]
+*        catalogue.  Otherwise, they will be stored in PIXEL 
+*        co-ordinates, if a PIXEL Frame is available within the input 
+*        catalogue.  Otherwise, they are stored in the base Frame of the
+*        supplied WCS information.  [!]
 *     CATEPOCH = DOUBLE PRECISION (Read)
 *        The epoch at which the sky positions stored in the output
 *        catalogue were determined. It will only be accessed if an epoch
@@ -90,7 +93,7 @@
 *     CERROR = _LOGICAL (Read)
 *        If TRUE, errors in the centroided position will be calculated.
 *        The input NDF must contain a VARIANCE component in order to 
-*        compute errors. [FALSE]
+*        compute errors.  [FALSE]
 *     COIN =  FILENAME (Read)
 *        Name of a text file containing the initial guesses at the 
 *        co-ordinates of features to be centroided. Only accessed if 
@@ -100,20 +103,20 @@
 *        spaces, tabs or commas. The file may contain comment lines 
 *        with the first character # or !. 
 *     DESCRIBE = LOGICAL (Read)
-*        If TRUE, a detailed description of the co-ordinate Frame in which 
-*        the centroided positions will be reported is displayed before the 
-*        positions themselves. [current value]
+*        If TRUE, a detailed description of the co-ordinate Frame in 
+*        which  the centroided positions will be reported is displayed 
+*        before the positions themselves.  [current value]
 *     DEVICE = DEVICE (Read)
 *        The graphics device which is to be used to give the initial
 *        guesses at the centroid positions. Only accessed if parameter 
-*        MODE is given the value "Cursor". [Current graphics device]
+*        MODE is given the value "Cursor".  [Current graphics device]
 *     ERROR  =  LITERAL (Write)
 *        The errors associated with the position written to parameter
 *        CENTRE.
 *     GUESS = _LOGICAL (Read)
 *        If TRUE, then the supplied guesses for the centroid positions
 *        will be included in the screen and log file output, together
-*        with the accurate positions. [current value]
+*        with the accurate positions.  [current value]
 *     INCAT = FILENAME (Read)
 *        A catalogue containing a positions list giving the initial
 *        guesses at the centroid positions, such as produced by
@@ -121,26 +124,27 @@
 *        MODE is given the value "Catalogue". 
 *     INIT  = LITERAL (Read)
 *        An initial guess at the co-ordinates of the next feature to be 
-*        centroided, in the current co-ordinate Frame of the NDF (supplying 
-*        a colon ":" will display details of the current co-ordinate Frame). 
-*        The position should be supplied as a list of formatted axis values 
-*        separated by spaces or commas. INIT is only accessed if parameter 
-*        MODE is given the value "Interface". If the initial co-ordinates 
-*        are supplied on the command line only one centroid will be found; 
-*        otherwise the application will ask for further guesses, which may 
-*        be terminated by supplying the null value (!). 
+*        centroided, in the current co-ordinate Frame of the NDF
+*        (supplying a colon ":" will display details of the current 
+*        co-ordinate Frame).  The position should be supplied as a list
+*        of formatted axis values separated by spaces or commas.  INIT 
+*        is only accessed if parameter MODE is given the value 
+*        "Interface".  If the initial co-ordinates are supplied on the 
+*        command line only one centroid will be found; otherwise the 
+*        application will ask for further guesses, which may be
+*        terminated by supplying the null value (!). 
 *     LOGFILE  =  FILENAME (Read)
 *        Name of the text file to log the results.  If null, there
 *        will be no logging.  Note this is intended for the human reader
-*        and is not intended for passing to other applications. [!]
+*        and is not intended for passing to other applications.  [!]
 *     MARK = LITERAL (Read)
-*        Only accessed if parameter MODE is given the value "Cursor". It
-*        indicates which positions are to be marked on the screen using the
-*        marker type given by parameter MARKER. It can take any of the
-*        following values:
+*        Only accessed if parameter MODE is given the value "Cursor". 
+*        It indicates which positions are to be marked on the screen 
+*        using the marker type given by parameter MARKER.  It can take
+*        any of the following values.
 *
-*        - "Initial": The position of the cursor when the mouse button is
-*        pressed is marked.
+*        - "Initial": The position of the cursor when the mouse button 
+*                     is pressed is marked.
 *
 *        - "Centroid": The corresponding centroid position is marked.
 *
@@ -149,34 +153,36 @@
 *        [current value]
 *     MARKER = INTEGER (Read)
 *        This parameter is only accessed if parameter MARK is set TRUE.
-*        It specifies the type of marker with which each cursor position 
-*        should be marked, and should be given as an integer PGPLOT marker 
-*        type. For instance, 0 gives a box, 1 gives a dot, 2 gives a cross, 
-*        3 gives an asterisk, 7 gives a triangle. The value must be larger 
-*        than or equal to -31. [current value]
+*        It specifies the type of marker with which each cursor position
+*        should be marked, and should be given as an integer PGPLOT
+*        marker type.  For instance, 0 gives a box, 1 gives a dot, 2 
+*        gives a cross, 3 gives an asterisk, 7 gives a triangle.  The 
+*        value must be larger than or equal to -31.  [current value]
 *     MAXITER  =  _INTEGER (Read)
 *        Maximum number of iterations to be used in the search.  It must
-*        be in the range 1--9.  The dynamic default is 3. [9]
+*        be in the range 1--9.  The dynamic default is 3.  [9]
 *     MAXSHIFT()  =  _REAL (Read)
 *        Maximum shift in each dimension allowed between the guess and
 *        output positions in pixels.  Each must lie in the range
 *        0.0--26.0.  If only a single value is given, then it will be
 *        duplicated to all dimensions. The dynamic default is half of
-*        SEARCH + 1. [9.0]
+*        SEARCH + 1.  [9.0]
 *     MODE  =  LITERAL (Read)
-*        The mode in which the initial co-ordinates are to be obtained. The
-*        supplied string can be one of the following:
+*        The mode in which the initial co-ordinates are to be obtained. 
+*        The supplied string can be one of the following values.
 *
 *        - "Interface": positions are obtained using parameter INIT.
 *
 *        - "Cursor": positions are obtained using the graphics cursor of
-*           the device specified by parameter DEVICE.
+*                    the device specified by parameter DEVICE.
 *
 *        - "Catalogue": positions are obtained from a positions list
-*           using parameter INCAT.
+*                       using parameter INCAT.
 *
-*        -  "File": positions are obtained from a text file using parameter
-*           COIN. [current value]
+*        -  "File": positions are obtained from a text file using 
+*                   parameter COIN.
+*
+*        [current value]
 *
 *     NDF = NDF (Read)
 *        The NDF structure containing the data array to be analysed. In
@@ -191,37 +197,39 @@
 *        as one over the square root of NSIM. The range of acceptable
 *        values is 3--10000. [100]
 *     OUTCAT = FILENAME (Write)
-*        The output catalogue in which to store the centroided positions. 
-*        If a null value (!) is supplied, no output catalogue is produced.
-*        See also parameter CATFRAME. [!]
+*        The output catalogue in which to store the centroided 
+*        positions.  If a null value (!) is supplied, no output 
+*        catalogue is produced.  See also parameter CATFRAME.  [!]
 *     PLOTSTYLE = LITERAL (Read)
 *        A group of attribute settings describing the style to use when
 *        drawing the graphics markers specified by parameter MARK. 
 *
 *        A comma-separated list of strings should be given in which each
-*        string is either an attribute setting, or the name of a text file
-*        preceded by an up-arrow character "^". Such text files should
-*        contain further comma-separated lists which will be read and 
-*        interpreted in the same manner. Attribute settings are applied in 
-*        the order in which they occur within the list, with later settings
-*        over-riding any earlier settings given for the same attribute.
+*        string is either an attribute setting, or the name of a text 
+*        file preceded by an up-arrow character "^".  Such text files 
+*        should contain further comma-separated lists which will be read
+*        and interpreted in the same manner.  Attribute settings are 
+*        applied in the order in which they occur within the list, with
+*        later settings overriding any earlier settings given for the 
+*        same attribute.
 *
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
 *
-*        where <name> is the name of a plotting attribute, and <value> is
-*        the value to assign to the attribute. Default values will be
-*        used for any unspecified attributes. All attributes will be
-*        defaulted if a null value (!) is supplied. See section "Plotting
-*        Attributes" in SUN/95 for a description of the available
-*        attributes. Any unrecognised attributes are ignored (no error is
-*        reported). [current value]
+*        where <name> is the name of a plotting attribute, and <value>
+*        is the value to assign to the attribute.  Default values will
+*        be used for any unspecified attributes.  All attributes will be
+*        defaulted if a null value (!) is supplied.  See Section 
+*        "Plotting Attributes" in SUN/95 for a description of the 
+*        available attributes.  Any unrecognised attributes are ignored
+*        (no error is reported).  [current value]
 *     POSITIVE  =  _LOGICAL (Read)
-*        TRUE, if array features are positive above the background. [TRUE]
+*        TRUE, if array features are positive above the background. 
+*        [TRUE]
 *     QUIET = LOGICAL (Read)
 *        If TRUE then the centroid positions are not displayed on the 
-*        screen. Output parameters and files are still created. [FALSE]
+*        screen. Output parameters and files are still created.  [FALSE]
 *     SEARCH()  =  _INTEGER (Read)
 *        Size in pixels of the search box to be used. If only a single
 *        value is given, then it will be duplicated to all dimensions
@@ -230,22 +238,22 @@
 *     TITLE =  LITERAL (Read)
 *        A title to store with the output catalogue specified by
 *        parameter OUTCAT, and to display before the centroid positions 
-*        are listed. If a null (!) value is supplied, the title is taken 
+*        are listed. If a null (!) value is supplied, the title is taken
 *        from any input catalogue specified by parameter INCAT, or is a 
-*        fixed string including the name of the NDF. [!]
+*        fixed string including the name of the NDF.  [!]
 *     TOLER  =  _REAL (Read)
 *        Accuracy in pixels required in centroiding.  Iterations will
 *        stop when the shift between successive centroid positions
 *        is less than the accuracy.  The accuracy must lie in the range
-*        0.0--2.0. [0.05]
+*        0.0--2.0.  [0.05]
 *     XCEN  =  LITERAL (Write)
-*         The formatted X co-ordinate of the last centroid position, in the 
-*         current co-ordinate Frame of the NDF. 
+*         The formatted X co-ordinate of the last centroid position, in
+*         the current co-ordinate Frame of the NDF. 
 *     XERR =  LITERAL (Write)
 *         The error associated with the value written to parameter XCEN.
 *     YCEN  =  LITERAL (Write)
-*         The formatted Y co-ordinate of the last centroid position, in the 
-*         current co-ordinate Frame of the NDF. 
+*         The formatted Y co-ordinate of the last centroid position, in
+*         the current co-ordinate Frame of the NDF. 
 *     YERR =  LITERAL (Write)
 *         The error associated with the value written to parameter YCEN.
 
@@ -256,11 +264,12 @@
 *     centroid cluster cu search=21 mark=ce plotstyle='colour=red'
 *        This finds the centroids in the NDF called cluster via the
 *        graphics cursor on the current graphics device.  The search
-*        box for the centroid is 21 pixels in each dimension. The centroid
-*        positions are marked using a red symbol.
+*        box for the centroid is 21 pixels in each dimension.  The 
+*        centroid positions are marked using a red symbol.
 *     centroid cluster i '"21.7,5007.1"'
 *        This finds the centroid of the object in the 2-dimensional NDF
-*        called cluster around the current Frame co-ordinate (21.7,5007.1).
+*        called cluster around the current Frame co-ordinate 
+*        (21.7,5007.1).
 *     centroid arp244(6,,) i '"40,30"' toler=0.01
 *        This finds the 2-dimensional centroid of the feature near
 *        pixel (6,40,30) in the 3-dimensional NDF called arp244 (assuming
