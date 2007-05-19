@@ -6090,7 +6090,6 @@ package kappa {
 
          parameter lbound {
             size *
-            position 5
             type _REAL
             vpath PROMPT
             ppath DYNAMIC
@@ -6138,7 +6137,6 @@ package kappa {
 
          parameter ubound {
             size *
-            position 6
             type _REAL
             vpath PROMPT
             ppath DYNAMIC
