@@ -12951,7 +12951,7 @@ mutually exclusive.  An example should clarify.
         $\left\{ {\begin{tabular}{l}
                     firstcnt=? stepcnt=? \\
                     heights=?
-                   \end{tabular} }
+                  \end{tabular} }
         \right.$
         \newline\hspace*{2.9em}
         \makebox[0mm][c]{\footnotesize mode}
@@ -13410,8 +13410,8 @@ KAPPA: \htmlref{STATS}{STATS},
       ardgen ardout shape option [device] [startup] [palnum] [poicol]
          \newline\hspace*{1.5em}
          $\left\{ {\begin{tabular}{l}
-            operands=? operator=? \\
-            regions=? \\
+                   operands=? operator=? \\
+                   regions=? \\
                    \end{tabular} }
         \right.$
         \newline\hspace*{1.9em}
@@ -14965,14 +14965,13 @@ KAPPA: \htmlref{ADD}{ADD},
    \sstusage{
       centroid ndf [mode]
         $\left\{ {\begin{tabular}{l}
-                    init \\
-                    coin=? \\
-                    incat=?
-                   \end{tabular} }
+                  init \\
+                  coin=? \\
+                  incat=?
+                  \end{tabular} }
         \right.$ [search] [maxiter] [maxshift] [toler]
-        \newline\hspace*{10em}
+        \newline\latexelsehtml{\hspace*{10em}}{~~~~~~~~~~~~~~~~~~}
         \makebox[0mm][c]{\small mode}
-
    }
    \sstparameters{
       \sstsubsection{
@@ -17807,11 +17806,11 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
       contour ndf [comp] mode ncont [key] [device]
         \newline\hspace*{1.5em}
         $\left\{ {\begin{tabular}{l}
-                    firstcnt=? stepcnt=? \\
-                    heights=? \\
-                    percentiles=? 
-                   \end{tabular} }
-        \right.$
+                  low=? high=? \\
+                  percentiles=? \\
+                  sigmas=?
+                  \end{tabular} }
+        \right.$ 
         \newline\hspace*{1.9em}
         \makebox[0mm][c]{\small mode}
    }
@@ -18586,6 +18585,16 @@ KAPPA: \htmlref{SUBSTITUTE}{SUBSTITUTE},
    }
    \sstusage{
       creframe out mode [lbound] [ubound]
+        \newline\hspace*{1.5em}
+        $\left\{ {\begin{tabular}{l}
+                  mean=? \\
+                  background=? distrib=? max=? min=? ngauss=? seeing=? \\
+                  mean=? sigma=? \\
+                  high=? low=?
+                  \end{tabular} }
+        \right.$
+        \newline\hspace*{1.9em}
+        \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
       \sstsubsection{
@@ -19539,10 +19548,10 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
       display in [comp] clear [device] mode [centre] [xmagn] [ymagn] [out]
         \newline\hspace*{1.5em}
         $\left\{ {\begin{tabular}{l}
-                    low=? high=? \\
-                    percentiles=? \\
-                    sigmas=?
-                   \end{tabular} }
+                  low=? high=? \\
+                  percentiles=? \\
+                  sigmas=?
+                  \end{tabular} }
         \right.$
         \newline\hspace*{1.9em}
         \makebox[0mm][c]{\small mode}
@@ -20298,7 +20307,8 @@ KAPPA: \htmlref{ADD}{ADD},
          the two axes which were used to annotate the previously displayed
          picture.  If the arrows are required to be parallel to the axes of
          some other  Frame, the required Frame should be specified using this
-         parameter.  The string supplied for FRAME can be one of the following:
+         parameter.  The string supplied for FRAME can be one of the following
+         options.
 
          \ssthitemlist{
 
@@ -20332,7 +20342,7 @@ KAPPA: \htmlref{ADD}{ADD},
       }{
          Specifies the \htmlref{co-ordinate Frame}{se:domains}~  in which the position of the arrows
          will be supplied (see parameter ORIGIN).  The following Frames will
-         always be available:
+         always be available.
 
          \ssthitemlist{
 
@@ -20376,7 +20386,7 @@ KAPPA: \htmlref{ADD}{ADD},
       }{
          The co-ordinates at which to place the origin of the arrows, in the
          Frame specified by parameter OFRAME.  If a null ({\tt{!}}) value is
-         supplied, OFRAME is ignored and the arrows are positions at a
+         supplied, OFRAME is ignored and the arrows are situated at a
          default position near one of the corners, or at the centre.  The
          supplied position can be anywhere within the current picture.  An
          error is reported if the arrows and labels cannot be drawn at any
@@ -23070,13 +23080,12 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
    }
    \sstusage{
       fitsmod ndf
-        \newline\hspace*{1.5em}
         $\left\{ {\begin{tabular}{l}
-                    keyword edit value comment position \\
-                    table=?
-                   \end{tabular} }
+                  keyword edit value comment position \\
+                  table=?
+                  \end{tabular} }
         \right.$
-        \newline\hspace*{1.9em}
+        \newline\latexelsehtml{\hspace*{5.8em}}{~~~~~~~~~~}
         \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
@@ -25192,6 +25201,14 @@ KAPPA: \htmlref{GDSET}{GDSET},
    }
    \sstusage{
       glitch in out [title]
+        $\left\{ {\begin{tabular}{l}
+                  incat=? \\
+                  infile=? \\
+                  pixpos=?
+                  \end{tabular} }
+        \right.$
+        \newline\latexelsehtml{\hspace*{11em}}{~~~~~~~~~~~~~~~~~~~~}
+        \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
       \sstsubsection{
@@ -25220,7 +25237,8 @@ KAPPA: \htmlref{GDSET}{GDSET},
          MODE = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The method used to obtain the positions of the pixels to be
-         replaced.  The supplied string can be one of the following:
+         replaced.  The supplied string can be one of the following
+         options.
 
          \ssthitemlist{
 
@@ -25350,11 +25368,11 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
    \sstusage{
       hiscom ndf [mode] 
         $\left\{ {\begin{tabular}{l}
-                    file=? \\
-                    comment=?
-                   \end{tabular} }
-        \right.$
-        \newline\hspace*{8.85em}
+                  file=? \\
+                  comment=?
+                  \end{tabular} }
+        \right.$ 
+        \newline\latexelsehtml{\hspace*{8.85em}}{~~~~~~~~~~~~~~~~}
         \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
@@ -27779,21 +27797,71 @@ plot (10k).
       appended to the end of this initial list (see parameter INCAT).
    }
    \sstusage{
-      listmake outcat [ndf] [mode] [file]
+      listmake outcat [ndf] [mode]
+        $\left\{ {\begin{tabular}{l}
+                  file=? \\
+                  position=?
+                  \end{tabular} }
+        \right.$
+        \newline\latexelsehtml{\hspace*{14.4em}}{~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+        \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
       \sstsubsection{
+         CATFRAME = LITERAL (Read)
+      }{
+         A string determining the co-ordinate Frame in which positions
+         are to be stored in the output catalogue associated with 
+         parameter OUTCAT.  The string supplied for CATFRAME can be one
+         of the following options.
+
+         \ssthitemlist{
+
+            \sstitem
+            A \htmlref{domain name}{se:domains}~ such as 
+            \htmlref{SKY, AXIS, PIXEL}{se:resdoms}.
+
+            \sstitem
+            An integer value giving the index of the required Frame.
+
+            \sstitem
+            An IRAS90 \emph{Sky Co-ordinate System} (SCS) values such as
+            {\tt "EQUAT(J2000)"} (see \xref{SUN/163}{sun163}{}).
+
+         }
+
+         If a null ({\tt{!}}) value is supplied, the positions will be
+	 stored in a SKY Frame, if a SKY Frame is available within the
+	 input catalogue.  Otherwise, they will be stored in PIXEL 
+	 co-ordinates, if a PIXEL Frame is available within the input 
+	 catalogue.  Otherwise, they are stored in the base Frame of
+	 the supplied WCS information.  {\tt [!]}
+      }
+      \sstsubsection{
+         CATEPOCH = \_DOUBLE (Read)
+      }{
+         The epoch at which the sky positions stored in the output
+         catalogue were determined.  It will only be accessed if an 
+         epoch value is needed to qualify the co-ordinate Frame 
+         specified by COLFRAME.  If required, it should be given as a
+         decimal years value, with or without decimal places 
+         ({\tt "1996.8"} for example).  Such values are interpreted as
+         a Besselian epoch if less than 1984.0 and as a Julian epoch
+         otherwise. 
+      }
+      \sstsubsection{
          DESCRIBE = \_LOGICAL (Read)
       }{
-         If {\tt TRUE}, a detailed description of the co-ordinate Frame in which
-         positions are required will be displayed before the positions
-         are obtained using either parameter POSITION or FILE.   {\tt [}current value{\tt{]}}
+         If {\tt TRUE}, a detailed description of the co-ordinate Frame 
+         in which positions are required will be displayed before the 
+         positions are obtained using either parameter POSITION or 
+         FILE.  {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          DIM = \_INTEGER (Read)
       }{
-         The number of axes for each position.  Only accessed if a null
-         value is supplied for parameter NDF.
+         The number of axes for each position.  It is only accessed if 
+         a null value is supplied for parameter NDF.
       }
       \sstsubsection{
          EPOCH = \_DOUBLE (Read)
@@ -27803,16 +27871,16 @@ plot (10k).
          then an epoch value is needed to qualify it.  This is the epoch at
          which the supplied sky positions were determined.  It should be
          given as a decimal years value, with or without decimal places
-         ({\tt "1996.8"} for example).  Such values are interpreted as a Besselian
-         epoch if less than 1984.0 and as a Julian epoch otherwise.
+         ({\tt "1996.8"} for example).  Such values are interpreted as a
+         Besselian epoch if less than 1984.0 and as a Julian epoch otherwise.
       }
       \sstsubsection{
          FILE = FILENAME (Read)
       }{
          A text file containing the positions to be stored in the output
          positions list.  Each line should contain the formatted axis values
-         for a single position, separated by white space.  Only accessed if
-         parameter MODE is given the value {\tt "File"}.
+         for a single position, separated by white space.  It is only 
+         accessed  if parameter MODE is given the value {\tt "File"}.
       }
       \sstsubsection{
          FRAME = LITERAL (Read)
@@ -27839,13 +27907,13 @@ plot (10k).
          supplied.  A message is displayed indicating the Frame in which
          alignment occurred.  They are then stored in the output list before
          any further positions are added.  A null value may be supplied
-         if there is no input positions list. {\tt [!]}
+         if there is no input positions list.  {\tt [!]}
       }
       \sstsubsection{
          MODE = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The mode by which the positions are to be obtained.  The options are
-         as follows:
+         as follows.
 
          \ssthitemlist{
 
@@ -27874,13 +27942,14 @@ plot (10k).
          NDF = NDF (READ)
       }{
          The NDF which defines the available co-ordinate Frames in the
-         output positions list.  If an NDF is supplied, the positions
-         obtained using parameter POSITION or FILE are assumed to be in
-         the current co-ordinate Frame of the NDF, and the \htmlref{WCS}{apndf:wcs} component
-         of the NDF is copied to the output positions list.  If a null
-         value is supplied, the single co-ordinate Frame defined by parameter
-         FRAME is stored in the output positions list, and supplied
-         positions are assumed to be in the same Frame. {\tt [!]}
+	 output positions list.  If an NDF is supplied, the positions
+	 obtained using parameter POSITION or FILE are assumed to be
+	 in the current co-ordinate Frame of the NDF, and the
+	 \htmlref{WCS}{apndf:wcs} component of the NDF is copied to
+	 the output positions list.  If a null value is supplied, the
+	 single co-ordinate Frame defined by parameter FRAME is stored
+	 in the output positions list, and supplied positions are
+	 assumed to be in the same Frame. {\tt [!]}
       }
       \sstsubsection{
          OUTCAT = FILENAME (Write)
@@ -27890,21 +27959,23 @@ plot (10k).
       \sstsubsection{
          POSITION = LITERAL (Read)
       }{
-         The co-ordinates of a single position to be stored in the output
-         positions list.  Supplying {\tt ":"} will display details of the co-ordinate
-         Frame in which the position is required.  The position should be
-         given as a list of formatted axis values separated by white space.
-         You are prompted for new values for this parameter until a null
-         value is entered.  Only accessed if parameter MODE is given the
-         value {\tt "Interface"}.
+         The co-ordinates of a single position to be stored in the
+	 output positions list.  Supplying {\tt ":"} will display
+	 details of the co-ordinate Frame in which the position is
+	 required.  The position should be given as a list of
+	 formatted axis values separated by white space. You are
+	 prompted for new values for this parameter until a null value
+	 is entered.  It is only accessed if parameter MODE is given
+	 the value {\tt "Interface"}.
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         A title for the output positions list.  If a null ({\tt{!}}) value is
-         supplied, the value used is obtained from the input positions list
-         if one is supplied.  Otherwise, it is obtained from the NDF if one
-         is supplied.  Otherwise, it is {\tt "Output from LISTMAKE"}. {\tt [!]}
+         A title for the output positions list.  If a null ({\tt{!}})
+	 value is supplied, the value used is obtained from the input
+	 positions list if one is supplied.  Otherwise, it is obtained
+	 from the NDF if one is supplied.  Otherwise, it is {\tt
+	 "Output from LISTMAKE"}.  {\tt [!]}
       }
    }
    \sstexamples{
@@ -28731,6 +28802,17 @@ KAPPA: \htmlref{LOG10}{LOG10},
    }
    \sstusage{
       look ndf centre [size] [logfile] [format] [comp] [mode]
+        \newline\hspace*{1.5em}
+        $\left\{ {\begin{tabular}{l}
+                  arddesc=? \\
+                  ardfile=? \\
+                  lbound=? ubound=? \\
+                  centre=?
+                  \end{tabular} }
+        \right.$
+        \newline\hspace*{1.9em}
+%        \newline\latexelsehtml{\hspace*{27.9em}}{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+        \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
       \sstsubsection{
@@ -28786,7 +28868,7 @@ KAPPA: \htmlref{LOG10}{LOG10},
       \sstsubsection{
          FORMAT = LITERAL (Read)
       }{
-         Specifies the format for the listing:
+         Specifies the format for the listing from the following options.
 
          \ssthitemlist{
 
@@ -30100,7 +30182,7 @@ KAPPA: \htmlref{LUTEDIT}{LUTEDIT},
       This application displays a key to the current colour table on the
       specified graphics device using the whole of the current colour
       table (excluding the low 16 pens which are reserved for axis
-      annotation, \emph{etc}).  The key can either be a simple rectangular block
+      annotation, \emph{etc.}).  The key can either be a simple rectangular block
       of colour which ramps through the colour table, a histogram-style
       key in which the width of the block reflects the number of pixels
       allocated to each colour index, or a set of RGB intensity curves.
@@ -30135,7 +30217,7 @@ KAPPA: \htmlref{LUTEDIT}{LUTEDIT},
          the square root of the variance values to be used).  If {\tt "Quality"} is
          specified, then the quality values are treated as numerical values (in
          the range 0 to 255).  The dynamic default is obtained from global
-         parameter COMP which is set by applications such as KDISPLAY. {\tt []}
+         parameter COMP which is set by applications such as DISPLAY. {\tt []}
       }
       \sstsubsection{
          CURPIC = \_LOGICAL (Read)
@@ -30156,13 +30238,13 @@ KAPPA: \htmlref{LUTEDIT}{LUTEDIT},
       }{
          Specifies the \htmlref{co-ordinate Frame}{se:domains}~  of the positions supplied using
          parameters LBOUND and UBOUND.  The following Frames will always
-         be available:
+         be available.
 
          \ssthitemlist{
 
             \sstitem
-            {\tt "GRAPHICS"} --- gives positions in millimetres from the 
-            bottom-left corner of the plotting surface.
+            {\tt "GRAPHICS"} --- gives positions in millimetres from
+            the bottom-left corner of the plotting surface.
 
             \sstitem
             {\tt "BASEPIC"} --- gives positions in a normalised system in which the
@@ -30172,13 +30254,20 @@ KAPPA: \htmlref{LUTEDIT}{LUTEDIT},
 
             \sstitem
             {\tt "CURPIC"} --- gives positions in a normalised system in which the
-            bottom-left corner of the current picture is (0,~0) and the
-            shortest dimension of the current picture has length 1.0.  The
-            scales on the two axes are equal.
+            bottom-left corner of the underlying DATA picture is (0,~0) and
+            the shortest dimension of the picture has length 1.0.  The scales
+            on the two axes are equal.
 
             \sstitem
-            {\tt "NDC"} --- gives positions in a normalized system in which each 
-            axis of the graphics device has unit length.
+            {\tt "NDC"} --- gives positions in a normalised system in which the
+            bottom-left corner of the plotting surface is (0,~0) and the
+            top-right corner is (1,~1).
+
+            \sstitem
+            {\tt "CURNDC"} --- gives positions in a normalised system in which the
+            bottom-left corner of the current picture is (0,~0) and the
+            top-right corner is (1,~1).
+
          }
          There may be additional Frames available, describing previously
          displayed data.  If a null value is supplied, the current Frame
@@ -30197,12 +30286,12 @@ KAPPA: \htmlref{LUTEDIT}{LUTEDIT},
       \sstsubsection{
          LBOUND = LITERAL (Read)
       }{
-         Co-ordinates of the lower left corner of the rectangular region
+         Co-ordinates of the lower-left corner of the rectangular region
          containing the colour ramp and annotation, in the co-ordinate
          Frame specified by parameter FRAME (supplying a colon {\tt ":"} will
          display details of the selected co-ordinate Frame).  The position
          should be supplied as a list of formatted axis values separated
-         by spaces or commas.  A null ({\tt{!}}) value causes the lower left corner
+         by spaces or commas.  A null ({\tt{!}}) value causes the lower-left corner
          of the BASE or (if CURPIC is {\tt TRUE}) current picture to be used.
       }
       \sstsubsection{
@@ -30329,13 +30418,13 @@ KAPPA: \htmlref{LUTEDIT}{LUTEDIT},
       \sstsubsection{
          UBOUND = LITERAL (Read)
       }{
-         Co-ordinates of the upper right corner of the rectangular region
+         Co-ordinates of the upper-right corner of the rectangular region
          containing the colour ramp and annotation, in the co-ordinate
          Frame specified by parameter FRAME (supplying a colon {\tt ":"} will
          display details of the selected co-ordinate Frame).  The position
          should be supplied as a list of formatted axis values separated
-         by spaces or commas.  A null ({\tt{!}}) value causes the lower left corner
-         of the BASE or (if CURPIC is {\tt TRUE}) current picture to be used.
+         by spaces or commas.  A null ({\tt{!}}) value causes the lower-left corner
+         of the BASE or (if CURPIC is {\tt TRUE}) the current picture to be used.
       }
    }
    \sstexamples{
@@ -30350,7 +30439,7 @@ KAPPA: \htmlref{LUTEDIT}{LUTEDIT},
       }{
          As above, but the key has the form of a coloured histogram of
          the pen numbers in the most recently displayed image.  The second
-         axis display the logarithm (base 10) of the bin population.
+         axis displays the logarithm (base 10) of the bin population.
       }
       \sstexamplesubsection{
          lutview style='form=graph,pennums=1'
@@ -31639,13 +31728,14 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
       \xref{SUN/117}{sin117}{}.
    }
    \sstusage{
-      mem2d in out mask=? $\left\{ {\begin{tabular}{l}
-                                     fwhmpsf=? \\
-                                     psf=?
-                                    \end{tabular} }
-                          \right.$
-                                    \newline\hspace*{10.3em}
-                                    \makebox[0mm][c]{\small psftype}
+      mem2d in out mask=?
+      $\left\{ {\begin{tabular}{l}
+                fwhmpsf=? \\
+                psf=?
+                \end{tabular} }
+      \right.$
+      \newline\latexelsehtml{\hspace*{10.5em}}{~~~~~~~~~~~~~~~~~}
+      \makebox[0mm][c]{\small psftype}
    }
    \sstparameters{
       \sstsubsection{
@@ -35761,11 +35851,11 @@ KAPPA: \htmlref{PICCUR}{PICCUR},
    \sstusage{
       picdef [mode] [fraction]
         $\left\{ {\begin{tabular}{l}
-                    xpic ypic prefix=? \\
-                    lbound ubound
+                  xpic ypic prefix=? \\
+                  lbound=? ubound=?
                   \end{tabular} }
         \right.$
-        \newline\hspace*{12.4em}
+        \newline\latexelsehtml{\hspace*{12.4em}}{~~~~~~~~~~~~~~~~~~~~~~~}
         \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
@@ -37294,6 +37384,7 @@ KAPPA: \htmlref{ADD}{ADD},
       }
    }
 }
+
 \sstroutine{
    PROFILE
 }{
@@ -37310,7 +37401,14 @@ KAPPA: \htmlref{ADD}{ADD},
       output positions list (see parameter OUTCAT).
    }
    \sstusage{
-      profile in out start finish nsamp
+      profile in out 
+        $\left\{ {\begin{tabular}{l}
+                  start finish [nsamp] \\
+                  incat=?
+                  \end{tabular} }
+        \right.$
+        \newline\latexelsehtml{\hspace*{7.35em}}{~~~~~~~~~~~~~}
+        \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
       \sstsubsection{
@@ -37433,8 +37531,8 @@ KAPPA: \htmlref{ADD}{ADD},
          sample is at the last supplied vertex.  The sample positions are
          evenly spaced within the current co-ordinate Frame of the NDF.  If
          a null value is supplied, a default value is used equal to one
-         more than the length of the profile in pixels.  Only accessed if
-         parameter MODE is given the value {\tt "Curve"}. {\tt [!]}
+         more than the length of the profile in pixels.  This is only accessed 
+         if parameter MODE is given the value {\tt "Curve"}. {\tt [!]}
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -39356,6 +39454,14 @@ KAPPA: \htmlref{NORMALIZE}{NORMALIZE}.
    }
    \sstusage{
       segment in1 in2 out
+        $\left\{ {\begin{tabular}{l}
+                  coords=? \\
+                  incat1-incat20=? \\
+                  poly1-poly20=?
+                  \end{tabular} }
+        \right.$
+        \newline\latexelsehtml{\hspace*{9.8em}}{~~~~~~~~~~~~~~~~~~}
+        \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
       \sstsubsection{
@@ -39440,7 +39546,8 @@ KAPPA: \htmlref{NORMALIZE}{NORMALIZE}.
          MODE = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The mode in which the co-ordinates of each polygon vertex are to
-         be obtained.  The supplied string can be one of the following:
+         be obtained.  The supplied string can be one of the following
+         selection.
 
          \ssthitemlist{
 
@@ -39519,7 +39626,7 @@ KAPPA: \htmlref{NORMALIZE}{NORMALIZE}.
          selected vertex.  It is only used if parameter MODE is given
          the value {\tt "Cursor"}.  The appearance of these graphics (colour,
          size, \emph{etc.}) is controlled by the STYLE parameter.  PLOT can take
-         any of the following values:
+         any of the following values.
 
          \ssthitemlist{
 
@@ -39555,7 +39662,7 @@ KAPPA: \htmlref{NORMALIZE}{NORMALIZE}.
          POLY20 is reached.
 
          Each position should be supplied within the current co-ordinate
-         Frame of the output NDF (see parameter OUT).  No more than 2
+         Frame of the output NDF (see parameter OUT).  No more than two
          formatted axis values (separated by a comma or space) may be
          supplied on each line.  If the co-ordinate Frame being used has
          more than two axes, then the two axes to use must be specified using
@@ -39740,14 +39847,13 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
    }
    \sstusage{
       setaxis ndf dim mode [comp]
-        \newline\hspace*{1.5em}
         $\left\{ {\begin{tabular}{l}
-                    file=? \\  
-                    index=? newval=? \\
-                    exprs=? \\
+                  file=? \\  
+                  index=? newval=? \\
+                  exprs=? \\
                   \end{tabular} }
         \right.$
-        \newline\hspace*{13.9em}
+        \newline\latexelsehtml{\hspace*{13.9em}}{~~~~~~~~~~~~~~~~~~~~~~~~~~}
         \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
@@ -40444,13 +40550,13 @@ KAPPA: \htmlref{NDFCOPY}{NDFCOPY},
    \sstusage{
       setext ndf xname option cname 
         $\left\{ {\begin{tabular}{l}
-                    ok \\
-                    ctype=? shape=? ok \\
-                    newname=? \\
-                    xtype=? 
-                   \end{tabular} }
+                  ok \\
+                  ctype=? shape=? ok \\
+                  newname=? \\
+                  xtype=? 
+                  \end{tabular} }
         \right.$
-        \newline\hspace*{14.95em}
+        \newline\latexelsehtml{\hspace*{14.95em}}{~~~~~~~~~~~~~~~~~~~~~~~~~~~}
         \makebox[0mm][c]{\small option}
    }
    \sstparameters{
@@ -42245,12 +42351,12 @@ KAPPA: \htmlref{REGRID}{REGRID},
    \sstusage{
       sqorst in out
         $\left\{ {\begin{tabular}{l}
-                    factors \\  
-                    lbound=? ubound=? \\
-                    pixscale=? \\
+                  factors \\  
+                  lbound=? ubound=? \\
+                  pixscale=?
                   \end{tabular} }
         \right.$
-        \newline\hspace*{6.6em}
+        \newline\latexelsehtml{\hspace*{6.9em}}{~~~~~~~~~~}
         \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
@@ -46668,7 +46774,15 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
       regions to be replaced in a subsequent invocation of ZAPLIN.
    }
    \sstusage{
-      zaplin in out [title] colin=? lincol=? columns=? lines=?
+      zaplin in out [title]
+        $\left\{ {\begin{tabular}{l}
+                  lincol=? \\
+                  columns=? lines=? \\
+                  colin=?
+                  \end{tabular} }
+        \right.$
+        \newline\latexelsehtml{\hspace*{10.92em}}{~~~~~~~~~~~~~~~~~~~~}
+        \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
       \sstsubsection{
