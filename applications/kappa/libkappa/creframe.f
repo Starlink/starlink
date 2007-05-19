@@ -30,6 +30,11 @@
 
 *  Usage:
 *     creframe out mode [lbound] [ubound]
+*         { mean=?
+*         { background=? distrib=? max=? min=? ngauss=? seeing=?
+*         { mean=? sigma=?
+*         { high=? low=?
+*         mode                                       
 
 *  ADAM Parameters:
 *     BACKGROUND = _REAL (Read)
