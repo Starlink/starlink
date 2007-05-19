@@ -28,45 +28,51 @@
 *     bounds are given explicitly.
 
 *  Usage:
-*     sqorst in out factors
+*     sqorst in out { factors
+*                   { lbound=? ubound=?
+*                   { pixscale=?
+*                  mode
 
 *  ADAM Parameters:
 *     AXIS = _INTEGER (Read)
-*        Assigning a value to this parameter indicates that a single axis 
-*        should be squashed or stretched. If a null (!) value is supplied 
-*        for AXIS, a squash or stretch factor must be supplied for each 
-*        axis in the manner indicated by the MODE parameter. If a non-null
-*        value is supplied for AXIS, it should be the integer index of the 
-*        axis to be squashed or stretched (the first axis has index 1). In 
-*        this case, only a single squash or stretch factor should be 
-*        supplied, and all other axes will be left unchanged. If MODE is set 
-*        to PIXSCALE then the supplied value should be the index of a WCS 
-*        axis. Otherwise it should be the index of a pixel axis. [!]
+*        Assigning a value to this parameter indicates that a single 
+*        axis should be squashed or stretched.  If a null (!) value is 
+*        supplied for AXIS, a squash or stretch factor must be supplied 
+*        for each axis in the manner indicated by the MODE parameter. 
+*        If a non-null value is supplied for AXIS, it should be the 
+*        integer index of the axis to be squashed or stretched (the
+*        first axis has index 1).  In this case, only a single squash or
+*        stretch factor should be supplied, and all other axes will be 
+*        left unchanged.  If MODE is set to "PixelScale" then the 
+*        supplied value should be the index of a WCS axis.  Otherwise 
+*        it should be the index of a pixel axis.  [!]
 *     FACTORS( ) = _DOUBLE (Read)
-*        Only used if MODE="Factors". The factor by which each dimension 
-*        will be distorted to produce the output NDF.  A factor greater 
-*        than one is a stretch and less than one is a squash.  If no value 
-*        has been supplied for parameter AXIS, the number of values supplied 
-*        for FACTORS must be the same as the number of pixel axes in the NDF.  
-*        If a non-null value has been supplied for parameter AXIS, then
-*        only a single value should be supplied for FACTORS and the supplied 
-*        value will be used to distort the axis indicated by parameter
+*        This parameter is only used if MODE="Factors".  It defines the 
+*        factor by which each dimension will be distorted to produce the
+*        output NDF.  A factor greater than one is a stretch and less 
+*        than one is a squash.  If no value has been supplied for 
+*        parameter AXIS, the number of values supplied for FACTORS must
+*        be the same as the number of pixel axes in the NDF.  If a 
+*        non-null value has been supplied for parameter AXIS, then
+*        only a single value should be supplied for FACTORS and that
+*        value will be used to distort the axis indicated by parameter 
 *        AXIS.
 *     IN = NDF (Read)
 *        The NDF to be squashed or stretched.
-*     LBOUND( ) = _INTEGER
-*        Only used if MODE="Bounds". The lower pixel index values of the 
-*        output NDF. If no value has been supplied for parameter AXIS, the 
-*        number of values supplied for LBOUND must be the same as the number 
-*        of pixel axes in the NDF.  If a non-null value has been supplied for 
-*        parameter AXIS, then only a single value should be supplied for 
-*        LBOUND and the supplied value will be used as the new lower
-*        bounds on the axis indicated by parameter AXIS. If null (!) is 
-*        given, the lower pixel bounds of the input NDF will be used.  
+*     LBOUND( ) = _INTEGER (Read)
+*        This parameter is only used if MODE="Bounds".  It specifies the
+*        lower pixel-index values of the output NDF.  If no value has 
+*        been supplied for parameter AXIS, the number of values supplied
+*        for LBOUND must be the same as the number of pixel axes in the 
+*        NDF.  If a non-null value has been supplied for parameter AXIS,
+*        then only a single value should be supplied for LBOUND and the 
+*        supplied value will be used as the new lower bounds on the axis
+*        indicated by parameter AXIS.  If null (!) is given, the lower 
+*        pixel bounds of the input NDF will be used.  
 *     METHOD = LITERAL (Read)
-*        The interpolation method used to perform the 1-dimensional
+*        The interpolation method used to perform the one-dimensional
 *        resampling operations which constitute the squash or stretch.
-*        The following values are permitted:
+*        The following values are permitted.
 *
 *        -  "Auto"      -- Equivalent to "BlockAve" with an appropriate
 *                          PARAMS for squashes by a factor of 2 or more,
@@ -96,29 +102,39 @@
 *        given in the "Sub-Pixel Interpolation Schemes" section below.
 *        ["Auto"]
 *     MODE = LITERAL (Read)
-*        Determines how the shape of the output NDF is to be specified.
-*        If MODE="Factors" (the default) then the FACTORS parameter
-*        will be used to determine the factor by which each dimension
-*        should be multiplied.  If MODE="Bounds" then the LBOUND and
-*        UBOUND parameters will be used to get the lower and upper
-*        pixel bounds of the output NDF. If MODE="PixelScale" then the 
-*        PIXSCALE parameter will be used to obtain the new pixel scale to
-*        use for each WCS axis. ["Factors"]
+*        This determines how the shape of the output NDF is to be 
+*        specified.  The allowed values and their meanings are as
+*        follows.
+*
+*        -  "Factors"    -- the FACTORS parameter will be used to 
+*                           determine the factor by which each dimension
+*                           should be multiplied.  
+*
+*        -  "Bounds"     -- the LBOUND and UBOUND parameters will be 
+*                           used to get the lower and upper pixel bounds
+*                           of the output NDF. 
+*
+*        -  "PixelScale" -- the PIXSCALE parameter will be used to 
+*                           obtain the new pixel scale to use for each 
+*                           WCS axis. 
+*
+*        ["Factors"]
 *     OUT = NDF (Write)
 *        The squashed or stretched NDF.
 *     PIXSCALE = LITERAL (Read)
-*        The PIXSCALE parameter is only used if parameter MODE is set to 
-*        "PixelScale". It should be supplied holding the required new pixel 
-*        scales. In this context, a pixel scale for a WCS axis is the 
-*        increment in WCS axis value caused by a movement of 1 pixel along 
-*        the WCS axis, and are measured at the first pixel in the array. The 
-*        suggested default value are the current pixel scales. If no value 
-*        has been supplied for parameter AXIS, the number of values supplied 
-*        for PIXSCALE must be the same as the number of WCS axes in the NDF.  
-*        If a non-null value has been supplied for parameter AXIS, then only 
-*        a single value should be supplied for PIXSCALE and the supplied 
-*        value will be used as the new pixel scale on the WCS axis indicated 
-*        by parameter AXIS. 
+*        The PIXSCALE parameter is only used if parameter MODE is set to
+*        "PixelScale".  It should be supplied holding the required new 
+*        pixel scales.  In this context, a pixel scale for a WCS axis is
+*        the increment in WCS axis value caused by a movement of one 
+*        pixel along the WCS axis, and are measured at the first pixel 
+*        in the array.  The suggested default value are the current 
+*        pixel scales.  If no value has been supplied for parameter 
+*        AXIS, the number of values supplied for PIXSCALE must be the 
+*        same as the number of WCS axes in the NDF.  If a non-null value
+*        has been supplied for parameter AXIS, then only a single value 
+*        should be supplied for PIXSCALE and that value will be used as 
+*        the new pixel scale on the WCS axis indicated by parameter 
+*        AXIS. 
 *     PARAMS( ) = _DOUBLE (Read)
 *        Parameters required to control the resampling scheme.  One or
 *        more values may be required to specify the exact resampling
@@ -127,19 +143,20 @@
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF. A null (!) value causes the input
 *        title to be used. [!]
-*     UBOUND( ) = _INTEGER
-*        Only used if MODE="Bounds". The upper pixel index values of the 
-*        output NDF. If no value has been supplied for parameter AXIS, the 
-*        number of values supplied for UBOUND must be the same as the number 
-*        of pixel axes in the NDF.  If a non-null value has been supplied for 
-*        parameter AXIS, then only a single value should be supplied for 
-*        UBOUND and the supplied value will be used as the new upper
-*        bounds on the axis indicated by parameter AXIS. If null (!) is 
-*        given, the upper pixel bounds of the input NDF will be used.  
+*     UBOUND( ) = _INTEGER (Read)
+*        This parameter is only used if MODE="Bounds".  It specifies the
+*        upper pixel-index values of the output NDF.  If no value has 
+*        been supplied for parameter AXIS, the number of values supplied
+*        for UBOUND must be the same as the number of pixel axes in the 
+*        NDF.  If a non-null value has been supplied for parameter AXIS,
+*        then only a single value should be supplied for UBOUND and the 
+*        supplied value will be used as the new upper bounds on the axis
+*        indicated by parameter AXIS.  If null (!) is given, the upper
+*        pixel bounds of the input NDF will be used.  
 
 *  Examples:
 *     sqorst block blocktall [1,2,1]
-*        The 3-dimensional NDF called block is stretched by a factor 
+*        The three-dimensional NDF called block is stretched by a factor
 *        of two along its second axis to produce an NDF called
 *        blocktall with twice as many pixels.  The same data block
 *        is represented, but each pixel in the output NDF corresponds
@@ -149,10 +166,13 @@
 *        The same operation as the previous example is performed, 
 *        except that a Lanczos kernel is used for the interpolation.
 *     sqorst cygnus1 squish1 mode=bounds lbound=[1,1] ubound=[50,50]
-*        This turns the 2-dimensional NDF cygnus1 into a new NDF squish1 
-*        which has 50 pixels along each side.  The same region of sky
-*        is represented, but the input image is squashed along both
-*        axes to fit the specified dimensions.
+*        This turns the two-dimensional NDF cygnus1 into a new NDF 
+*        squish1 which has 50 pixels along each side.  The same region 
+*        of sky is represented, but the input image is squashed along 
+*        both axes to fit the specified dimensions.
+*     sqorst fred mode=pixelscale pixscale=5 axis=3
+*        This resamples a cube NDF called fred on to a velocity scale
+*        of 5 km/s per pixel along its third axis.
 *
 *  Sub-Pixel Interpolation Schemes:
 *     When squashing or stretching an NDF, a separate one-dimensional 
@@ -185,11 +205,11 @@
 *     KAPPA: REGRID, SLIDE, WCSADD.
 
 *  Implementation Status:
-*     -  The LABEL, UNITS, and HISTORY components, and all extensions are 
-*     propagated. TITLE is controlled by the TITLE parameter. DATA,
-*     VARIANCE, AXIS and WCS are propagated after appropriate modification.
-*     QUALITY component is also propagated if Nearest Neighbour
-*     interpolation is being used. 
+*     -  The LABEL, UNITS, and HISTORY components, and all extensions
+*     are propagated.  TITLE is controlled by the TITLE parameter. 
+*     DATA. VARIANCE, AXIS and WCS are propagated after appropriate
+*     modification.  The QUALITY component is also propagated if 
+*     nearest-neighbour interpolation is being used. 
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
 *     -  All non-complex numeric data types can be handled.
@@ -202,7 +222,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -212,8 +232,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MBT: Mark Taylor (Starlink)
@@ -227,7 +247,8 @@
 *     16-JAN-2002 (DSB):
 *        Added propagation of QUALITY and AXIS.
 *     3-SEP-2002 (DSB):
-*        Avoid use of PSX_CALLOC since it cannot handle all HDS data types.
+*        Avoid use of PSX_CALLOC since it cannot handle all HDS data 
+*        types.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
 *     18-MAY-2007 (DSB):
@@ -359,38 +380,38 @@
 *  We do this becaise PSX_CALLOC cannot accept the whole range of HDS
 *  data types. So we work out the numberof bytes needed and use 
 *  PSX_MALLOC instead.
-      IF( ITYPE .EQ. '_BYTE' ) THEN
-	BPV = VAL__NBB
-      ELSE IF( ITYPE .EQ. '_UBYTE' ) THEN
-	BPV = VAL__NBUB
-      ELSE IF( ITYPE .EQ. '_WORD' ) THEN
-	BPV = VAL__NBW
-      ELSE IF( ITYPE .EQ. '_UWORD' ) THEN
-	BPV = VAL__NBUW
-      ELSE IF( ITYPE .EQ. '_INTEGER' ) THEN
-	BPV = VAL__NBI
-      ELSE IF( ITYPE .EQ. '_REAL' ) THEN
-	BPV = VAL__NBR
-      ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
-	BPV = VAL__NBD
-      ELSE IF( STATUS .EQ. SAI__OK ) THEN
-        STATUS = SAI__ERROR
-        CALL ERR_REP( 'SQORST_ERR1', 'Data type '//ITYPE//' not yet '//
-     :                'supported fully.', STATUS )
-      END IF  
+      IF ( ITYPE .EQ. '_BYTE' ) THEN
+         BPV = VAL__NBB
+      ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
+         BPV = VAL__NBUB
+      ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
+         BPV = VAL__NBW
+      ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
+         BPV = VAL__NBUW
+      ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
+         BPV = VAL__NBI
+      ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+         BPV = VAL__NBR
+      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+         BPV = VAL__NBD
+      ELSE IF ( STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'SQORST_ERR1', 'Data type '//ITYPE//' not yet '//
+     :                 'supported fully.', STATUS )
+      END IF
 
 *  Get its pixel index bounds.
       CALL NDF_BOUND( NDFI, NDF__MXDIM, LBNDI, UBNDI, NDIM, STATUS )
 
 *  Abort if an error has occurred.
-      IF( STATUS .NE. SAI__OK ) GO TO 999    
+      IF ( STATUS .NE. SAI__OK ) GO TO 999    
 
 *  Get the axis to squash or stretch.
       CALL PAR_GDR0I( 'AXIS', 0, 1, NDIM, .FALSE., AXIS, STATUS )
 
-*  If a null value was supplied for AXIS, annul the error and set AXIS to
-*  zero to indicate that all axes should be squashed and stretched.
-      IF( STATUS .EQ. PAR__NULL ) THEN
+*  If a null value was supplied for AXIS, annul the error and set AXIS 
+*  to zero to indicate that all axes should be squashed and stretched.
+      IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          AXIS = 0
       END IF
@@ -404,7 +425,7 @@
       IF ( MODE .EQ. 'FACTORS' ) THEN
 
 *  Get the expansion factors.
-         IF( AXIS .EQ. 0 ) THEN
+         IF ( AXIS .EQ. 0 ) THEN
             CALL PAR_EXACD( 'FACTORS', NDIM, FACTS, STATUS )
          ELSE
             DO I = 1, NDIM
@@ -421,7 +442,7 @@
          END DO
 
 *  Now deal with MODE=BOUNDS...
-      ELSE IF( MODE. EQ. 'BOUNDS' ) THEN
+      ELSE IF ( MODE. EQ. 'BOUNDS' ) THEN
 
 *  Set defaults.
          DO I = 1, NDIM
@@ -432,7 +453,7 @@
 *  Get the lower bounds.
          IF ( STATUS .NE. SAI__OK ) GO TO 999
 
-         IF( AXIS .EQ. 0 ) THEN
+         IF ( AXIS .EQ. 0 ) THEN
             CALL PAR_EXACI( 'LBOUND', NDIM, LBNDO, STATUS )
          ELSE
             CALL PAR_GET0I( 'LBOUND', LBNDO( AXIS ), STATUS )
@@ -453,7 +474,7 @@
          END DO
          IF ( STATUS .NE. SAI__OK ) GO TO 999
 
-         IF( AXIS .EQ. 0 ) THEN
+         IF ( AXIS .EQ. 0 ) THEN
             CALL PAR_GRM1I( 'UBOUND', NDIM, BMIN, LBNDO, BMAX, .FALSE.,
      :                      UBNDO, STATUS )
          ELSE
@@ -481,8 +502,9 @@
 *  Get the WCS FrameSet from the iput NDF.
          CALL KPG1_GTWCS( NDFI, IWCS, STATUS )
 
-*  See how many axes there are in the current WCS coordinate frame. Note,
-*  this need not necesarily be the same as the number of pixel axes (NDIM).
+*  See how many axes there are in the current WCS coordinate Frame.
+*  Note, this need not necesarily be the same as the number of pixel 
+*  axes (NDIM).
          NWCS = AST_GETI( IWCS, 'Nout', STATUS )
 
 *  The pixel scales are determined at the first pixel in the array (the
@@ -493,19 +515,19 @@
          END DO
 
 *  Get the current pixel scales for each WCS axis. This returns both
-*  formatted and unformatted versions of the scales, together with strings
-*  indicating the units of each WCS axis.
+*  formatted and unformatted versions of the scales, together with 
+*  strings indicating the units of each WCS axis.
          CALL KPG1_PIXSC( IWCS, GFIRST, PIXSC, FPIXSC, UPIXSC, STATUS )
 
 *  Concatenate the formatted pixel scales in to a comma-separated list
 *  and use it as the dynamic default for parameter PIXSCALE.
          TEXT = ' '
          IAT = 0
-         IF( AXIS .EQ. 0 ) THEN
+         IF ( AXIS .EQ. 0 ) THEN
 
             DO I = 1, NWCS
                CALL CHR_APPND( FPIXSC( I ), TEXT, IAT )            
-               IF( I .NE. NWCS ) THEN
+               IF ( I .NE. NWCS ) THEN
                   CALL CHR_APPND( ',', TEXT, IAT )            
                   IAT = IAT + 1
                END IF
@@ -519,7 +541,7 @@
 
 *  Get new values for the required pixel scales.
          CALL PAR_GET0C( 'PIXSCALE', TEXT, STATUS )
-         IF( STATUS .NE. SAI__OK ) GO TO 999
+         IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get the length of the text and initalise the character to read next.
          TLEN = CHR_LEN( TEXT )
@@ -530,7 +552,7 @@
 
 *  If we are only distorting one axis, all other axes have a new scale
 *  equal to the old scale.
-            IF( AXIS .NE. 0 .AND. AXIS .NE. I ) THEN
+            IF ( AXIS .NE. 0 .AND. AXIS .NE. I ) THEN
                NEWSCL( I ) = PIXSC( I )
             ELSE
 
@@ -546,11 +568,11 @@
 *  each pair of numerical values in the string).
                COMMA = ( TEXT( IAT : IAT ) .EQ. ',' )
 
-*  Read a floating point value from the beginning of the remainder of the 
-*  pixscale string, up to the first comma or space.
+*  Read a floating point value from the beginning of the remainder of 
+*  the pixscale string, up to the first comma or space.
                CALL CHR_CTOD( TEXT( START : IAT - 1 ), NEWSCL( I ), 
      :                        STATUS )
-               IF( STATUS .NE. SAI__OK ) THEN
+               IF ( STATUS .NE. SAI__OK ) THEN
                   CALL MSG_SETI( 'I', I )
                   CALL ERR_REP( ' ', 'Ill-formed pixel scale value '//
      :                          'supplied for WCS axis ^I.', STATUS )
@@ -561,7 +583,7 @@
                END IF
 
 *  Report an error if the piel scale is zero.
-               IF( NEWSCL( I ) .EQ. 0.0 ) THEN
+               IF ( NEWSCL( I ) .EQ. 0.0 ) THEN
                   STATUS = SAI__ERROR
                   CALL MSG_SETI( 'I', I )
                   CALL ERR_REP( ' ', 'Zero pixel scale value '//
@@ -574,7 +596,7 @@
 
 *  If the scale units are arc-seconds, scale the new scale from
 *  arc-seconds to radians.
-               IF( UPIXSC( I ) .EQ. 'arc-sec' ) THEN
+               IF ( UPIXSC( I ) .EQ. 'arc-sec' ) THEN
                   NEWSCL( I ) = AST__DD2R*NEWSCL( I )/3600.0D0
                END IF
 
@@ -584,12 +606,12 @@
                START = IAT + 1
                MORE = .TRUE.
                DO WHILE( START .LE. TLEN .AND. MORE )
-	       
-                  IF( TEXT( START : START ) .EQ. ' ' ) THEN
+          
+                  IF ( TEXT( START : START ) .EQ. ' ' ) THEN
                      START = START + 1
-	       
-                  ELSE IF( TEXT( START : START ) .EQ. ',' ) THEN
-                     IF( COMMA ) THEN
+       
+                  ELSE IF ( TEXT( START : START ) .EQ. ',' ) THEN
+                     IF ( COMMA ) THEN
                         MORE = .FALSE.
                      ELSE
                         START = START + 1
@@ -724,12 +746,12 @@
          END IF
 
 *  If using Nearest Neighbour interpolation, also map the QUALITY array.
-         IF( HASQUA .AND. INTERP .EQ. AST__NEAREST ) THEN
-            CALL NDF_MAP( NDFI, 'QUALITY', '_UBYTE', 'READ', IPQUAI, EL, 
+         IF ( HASQUA .AND. INTERP .EQ. AST__NEAREST ) THEN
+            CALL NDF_MAP( NDFI, 'QUALITY', '_UBYTE', 'READ', IPQUAI, EL,
      :                    STATUS )
          ELSE
             HASQUA = .FALSE.
-         END IF        
+         END IF
 
 *  Initialise the per-iteration input data to be the input NDF.
          IPDAT1 = IPDATI
@@ -768,19 +790,19 @@
                   END IF
                END IF
 
-*  If this axis has a defined AXIS Centre array, we need to over-write the 
-*  AXIS Centre array propagated from the input NDF, by resampling the input 
-*  AXIS Centre array. See if it is defined. If so, map the input and
-*  output AXIS Centre array as _DOUBLE. Reset other AXIS arrays in the
-*  output.
+*  If this axis has a defined AXIS Centre array, we need to overwrite
+*  the  AXIS Centre array propagated from the input NDF, by resampling
+*  the input AXIS Centre array.  See if it is defined.  If so, map the
+*  input and output AXIS Centre array as _DOUBLE.  Reset other AXIS 
+*  arrays in the output.
                CALL NDF_ASTAT( NDFI, 'Centre', I, HASAXI, STATUS ) 
-               IF( HASAXI ) THEN
+               IF ( HASAXI ) THEN
                   CALL NDF_AMAP( NDFI, 'Centre', I, '_DOUBLE', 'READ',
      :                           IPAXI, EL, STATUS ) 
                   CALL NDF_AMAP( NDFO, 'Centre', I, '_DOUBLE', 'WRITE',
      :                           IPAXO, EL, STATUS ) 
-                  CALL NDF_AREST( NDFO, 'Variance,Width', I, STATUS )                
-               END IF            
+                  CALL NDF_AREST( NDFO, 'Variance,Width', I, STATUS )
+               END IF
 
 *  Get a pointer to the array into which the results will be written.
 *  This may be either a temporary workspace array allocated for the
@@ -977,8 +999,8 @@
                   CALL PSX_FREE( IPWQ2, STATUS )
                END IF
 
-*  Release the input array, which may be the original mapped NDF component
-*  or intermediately allocated workspace.
+*  Release the input array, which may be the original mapped NDF 
+*  component or intermediately allocated workspace.
                IF ( IPDAT1 .EQ. IPDATI ) THEN
                   CALL NDF_UNMAP( NDFI, 'DATA', STATUS )
                   IF ( HASVAR ) THEN
