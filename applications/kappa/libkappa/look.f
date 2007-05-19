@@ -33,6 +33,11 @@
 
 *  Usage:
 *     look ndf centre [size] [logfile] [format] [comp] [mode]
+*        { arddesc=?
+*        { ardfile=?
+*        { lbound=? ubound=?
+*        { centre=?
+*        mode
 
 *  ADAM Parameters:
 *     AGAIN = _LOGICAL (Read)
@@ -70,9 +75,10 @@
 *        alternative to "Variance" and causes the square root of the
 *        variance values to be displayed).  If "Quality" is specified,
 *        then the quality values are treated as numerical values (in
-*        the range 0 to 255). ["Data"]
+*        the range 0 to 255).  ["Data"]
 *     FORMAT = LITERAL (Read)
-*        Specifies the format for the listing:
+*        Specifies the format for the listing from the following
+*        options.
 *
 *        - "strips" -- The area being displayed is divided up into
 *        vertical strips of limited width. Each strip is displayed in
@@ -257,7 +263,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -267,8 +273,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
