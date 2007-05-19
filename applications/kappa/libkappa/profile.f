@@ -30,7 +30,9 @@
 *     be saved in an output positions list (see parameter OUTCAT).
 
 *  Usage:
-*     profile in out start finish nsamp
+*     profile in out { start finish [nsamp]
+*                    { incat=?
+*                    mode
 
 *  ADAM Parameters:
 *     CATFRAME = LITERAL (Read)
@@ -124,8 +126,8 @@
 *        are evenly spaced within the current co-ordinate Frame of the
 *        NDF.  If a null value is supplied, a default value is used
 *        equal to one more than the length of the profile in pixels. 
-*        Only accessed if parameter MODE is given the value "Curve".
-*        [!]
+*        This is only accessed if parameter MODE is given the value
+*        "Curve".  [!]
 *     OUT = NDF (Write)
 *        The output NDF.  This will be one-dimensional with length
 *        specified by parameter NSAMP. 
@@ -223,7 +225,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -233,8 +235,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
