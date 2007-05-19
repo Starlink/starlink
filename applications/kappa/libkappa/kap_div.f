@@ -112,6 +112,8 @@
 *        Propagate the Unit value if it is the same in both NDFs.
 *     17-MAY-2007 (DSB):
 *        Correct propagation of the Unit value.
+*     19-MAY-2007 (DSB):
+*        Take account of undefined input units.
 *     {enter_further_changes_here}
 
 *-
@@ -170,28 +172,37 @@
 *  Trim the input pixel-index bounds to match.
       CALL NDF_MBND( 'TRIM', NDF1, NDF2, STATUS )
 
-*  Get the input Units.
-      UNIT1 = ' '
+*  Get the input Units. Use '1' as the default unit. This is interpreted
+*  as "dimensionless" units by AST.
+      UNIT1 = '1'
       CALL NDF_CGET( NDF1, 'Unit', UNIT1, STATUS )
-      UNIT2 = ' '
+      UNIT2 = '1'
       CALL NDF_CGET( NDF2, 'Unit', UNIT2, STATUS )
+
+*  If nether NDF had any units, then neither does the output.
+      IF( UNIT1 .EQ. '1' .AND. UNIT2 .EQ. '1' ) THEN
+         NEWUN = ' '
+
+*  Otherwise, combine the input NDF units.
+      ELSE
 
 *  Create an AST Frame with Unit set to the product of the two supplied
 *  Units.
-      TMPFRM = AST_FRAME( 1, ' ', STATUS )
-
-      NEWUN = '('
-      IAT = 1
-      CALL CHR_APPND( UNIT1, NEWUN, IAT )
-      CALL CHR_APPND( ')/(', NEWUN, IAT )
-      CALL CHR_APPND( UNIT2, NEWUN, IAT )
-      CALL CHR_APPND( ')', NEWUN, IAT )
-
-      CALL AST_SETC( TMPFRM, 'Unit(1)', NEWUN( : IAT ), STATUS )
+         TMPFRM = AST_FRAME( 1, ' ', STATUS )
+         
+         NEWUN = '('
+         IAT = 1
+         CALL CHR_APPND( UNIT1, NEWUN, IAT )
+         CALL CHR_APPND( ')/(', NEWUN, IAT )
+         CALL CHR_APPND( UNIT2, NEWUN, IAT )
+         CALL CHR_APPND( ')', NEWUN, IAT )
+         
+         CALL AST_SETC( TMPFRM, 'Unit(1)', NEWUN( : IAT ), STATUS )
 
 *  Retrieve the normalised Unit string, and free the Frame.
-      NEWUN = AST_GETC( TMPFRM, 'NormUnit(1)', STATUS )
-      CALL AST_ANNUL( TMPFRM, STATUS )
+         NEWUN = AST_GETC( TMPFRM, 'NormUnit(1)', STATUS )
+         CALL AST_ANNUL( TMPFRM, STATUS )
+      END IF
 
 *  Set the list of components to be propagated from NDF1. 
       CLIST = 'WCS,Axis,Quality'
@@ -200,7 +211,7 @@
 *  WCS, axis and quality components.
       CALL LPG_PROP( NDF1, CLIST, 'OUT', NDF3, STATUS )
 
-*  Set the output Unit component.
+*  Set the output Unit component, if the are defined.
       IAT = CHR_LEN( NEWUN )
       IF( IAT .GT. 0 ) CALL NDF_CPUT( NEWUN( : IAT ), NDF3, 'Unit', 
      :                                STATUS )
