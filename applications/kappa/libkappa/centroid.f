@@ -143,12 +143,12 @@
 *        using the marker type given by parameter MARKER.  It can take
 *        any of the following values.
 *
-*        - "Initial": The position of the cursor when the mouse button 
-*                     is pressed is marked.
+*        - "Initial"  -- The position of the cursor when the mouse
+*                        button is pressed is marked.
 *
-*        - "Centroid": The corresponding centroid position is marked.
+*        - "Centroid" -- The corresponding centroid position is marked.
 *
-*        - "None": No positions are marked.
+*        - "None"     -- No positions are marked.
 *
 *        [current value]
 *     MARKER = INTEGER (Read)
@@ -171,16 +171,17 @@
 *        The mode in which the initial co-ordinates are to be obtained. 
 *        The supplied string can be one of the following values.
 *
-*        - "Interface": positions are obtained using parameter INIT.
+*        - "Interface" -- positions are obtained using parameter INIT.
 *
-*        - "Cursor": positions are obtained using the graphics cursor of
-*                    the device specified by parameter DEVICE.
+*        - "Cursor"    -- positions are obtained using the graphics 
+*                         cursor of the device specified by parameter 
+*                         DEVICE.
 *
-*        - "Catalogue": positions are obtained from a positions list
-*                       using parameter INCAT.
+*        - "Catalogue" -- positions are obtained from a positions list
+*                         using parameter INCAT.
 *
-*        -  "File": positions are obtained from a text file using 
-*                   parameter COIN.
+*        - "File"      -- positions are obtained from a text file using 
+*                         parameter COIN.
 *
 *        [current value]
 *
@@ -344,7 +345,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -355,7 +356,7 @@
 *     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
 *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-*     MA 02111-1307, USA
+*     MA 02111-1307, USA,
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
