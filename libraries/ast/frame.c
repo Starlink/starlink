@@ -237,6 +237,9 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        to accomodate changes in units.
 *     17-MAY-2007 (DSB):
 *        Added read-only attribute NormUnit.
+*     21-MAY-2007 (DSB):
+*        Use rather than ignore the value returned by astTestAxisDigits in 
+*        TestAttrib.
 *class--
 */
 
@@ -9252,7 +9255,7 @@ L1:
    attribute. */
       (void) astValidateAxis( this, axis - 1, "astTestDigits(axis)" );
       ax = astGetAxis( this, axis - 1 );
-      astTestAxisDigits( ax );
+      result = astTestAxisDigits( ax );
       ax = astAnnul( ax );
 
 /* Direction(axis). */
