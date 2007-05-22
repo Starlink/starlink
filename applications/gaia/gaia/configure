@@ -308,7 +308,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_default_prefix=/home/pdraper/starlink_cvs/star
+ac_default_prefix=/export/pwda/pdraper/starlink_cvs/build
 ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CYGPATH EXEEXT PKG_LIB_FILE PKG_STUB_LIB_FILE PKG_STUB_SOURCES PKG_STUB_OBJECTS PKG_TCL_SOURCES PKG_HEADERS PKG_INCLUDES PKG_LIBS PKG_CFLAGS TCL_VERSION TCL_BIN_DIR TCL_SRC_DIR TCL_LIB_FILE TCL_LIB_FLAG TCL_LIB_SPEC TCL_STUB_LIB_FILE TCL_STUB_LIB_FLAG TCL_STUB_LIB_SPEC TCL_LIBS TCL_DEFS TCL_EXTRA_CFLAGS TCL_LD_FLAGS TCL_SHLIB_LD_LIBS TK_VERSION TK_BIN_DIR TK_SRC_DIR TK_LIB_FILE TK_LIB_FLAG TK_LIB_SPEC TK_STUB_LIB_FILE TK_STUB_LIB_FLAG TK_STUB_LIB_SPEC TK_LIBS TK_XINCLUDES CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC OBJEXT CPP CXX CXXFLAGS ac_ct_CXX INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE RANLIB ac_ct_RANLIB EGREP MATH_LIBS tclutil_VERSION tclutil_LIB_FILE tclutil_BUILD_LIB_SPEC tclutil_BUILD_DIR tclutil_LIB_SPEC BLT_LIB_SPEC BLT_LIB_DIR tclutil_SRC_DIR tclutil_PKG_OBJECTS astrotcl_VERSION astrotcl_LIB_FILE astrotcl_BUILD_LIB_SPEC astrotcl_BUILD_DIR astrotcl_LIB_SPEC astrotcl_SRC_DIR astrotcl_PKG_OBJECTS rtd_VERSION rtd_LIB_FILE rtd_BUILD_LIB_SPEC rtd_BUILD_DIR rtd_LIB_SPEC rtd_SRC_DIR rtd_PKG_OBJECTS cat_VERSION cat_LIB_FILE cat_BUILD_LIB_SPEC cat_BUILD_DIR cat_LIB_SPEC cat_SRC_DIR skycat_VERSION skycat_LIB_FILE skycat_BUILD_LIB_SPEC skycat_BUILD_DIR skycat_LIB_SPEC skycat_SRC_DIR SHLIB_LD_CXX_LIBS STARLINK STAR_CPPFLAGS STAR_FCFLAGS STAR_FFLAGS STAR_LDFLAGS build build_cpu build_vendor build_os FC FCFLAGS ac_ct_FC C_FC_FCLINK_MAGIC C_FC_PPFC_FCLINK_MAGIC stardocsdir staretcdir starexamplesdir starfacsdir starhelpdir starnewsdir STAR_DEPENDENCIES_ATTRIBUTES STAR_DEPENDENCIES_CHILDREN STAR_DOCUMENTATION PACKAGE_VERSION_MAJOR PACKAGE_VERSION_MINOR PACKAGE_VERSION_RELEASE PACKAGE_VERSION_INTEGER STAR_MANIFEST_DIR PREDIST PAX TAR LIBTOOL FGENERIC FCLIBS PKG_SOURCES PKG_OBJECTS CLEANFILES TCL_INCLUDES TK_INCLUDES TCL_THREADS SHARED_BUILD AR CELIB_DIR LIBOBJS SHLIB_SUFFIX DL_LIBS CFLAGS_DEBUG CFLAGS_OPTIMIZE CFLAGS_WARNING STLIB_LD SHLIB_LD SHLIB_CFLAGS SHLIB_LD_LIBS LDFLAGS_DEBUG LDFLAGS_OPTIMIZE LD_LIBRARY_PATH_VAR TCL_DBGX CFLAGS_DEFAULT LDFLAGS_DEFAULT MAKE_LIB MAKE_SHARED_LIB MAKE_STATIC_LIB MAKE_STUB_LIB RANLIB_STUB TCLSH_PROG WISH_PROG OS LTLIBOBJS'
 ac_subst_files=''
 
@@ -888,7 +888,7 @@ Optional Packages:
   --with-tcl              directory containing tcl configuration (tclConfig.sh)
   --with-tk               directory containing tk configuration (tkConfig.sh)
   --with-starlink         Starlink tree to use (default
-                          ${STARLINK:=/home/pdraper/starlink_cvs/star})
+                          ${STARLINK:=/export/pwda/pdraper/starlink_cvs/build})
   --without-stardocs      Do not install built documentation (default --with)
   --with-tclinclude       directory containing the public Tcl header files
   --with-tkinclude      directory containing the public Tk header files.
@@ -7553,7 +7553,7 @@ test -n "$_star_docs_only"        || _star_docs_only=false
 
 
 # Ensure that STARLINK has a value, defaulting to
-# /home/pdraper/starlink_cvs/star.  Note that this directory may be
+# /export/pwda/pdraper/starlink_cvs/build.  Note that this directory may be
 # different from /star, and reflects the value of
 # STARCONF_DEFAULT_STARLINK that the `starconf' package was configured
 # with before its installation.
@@ -7567,7 +7567,7 @@ test -n "$_star_docs_only"        || _star_docs_only=false
 # is possible to make a test version of a new package, using tools
 # from an old installation, but installing in a new place.
 #
-# However, we install software in /home/pdraper/starlink_cvs/star by
+# However, we install software in /export/pwda/pdraper/starlink_cvs/build by
 # default.  This is so even if $STARLINK and STARCONF_DEFAULT_STARLINK
 # are different, because in this case we are planning to use a
 # previous installation in $STARLINK or $STARCONF_DEFAULT_STARLINK,
@@ -7583,7 +7583,7 @@ test -n "$_star_docs_only"        || _star_docs_only=false
 # installed.
 
 
-test -n "$STARLINK" || STARLINK=/home/pdraper/starlink_cvs/star
+test -n "$STARLINK" || STARLINK=/export/pwda/pdraper/starlink_cvs/build
 
 # Handle the --with-starlink option.  If --with-starlink is present
 # with no argument (the default), we do nothing as this simply
@@ -8298,6 +8298,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
          else
             star_cv_prm_compatible_symbols=""
          fi
+fi
+echo "$as_me:$LINENO: result: $star_cv_prm_compatible_symbols" >&5
+echo "${ECHO_T}$star_cv_prm_compatible_symbols" >&6
          if test "$star_cv_prm_compatible_symbols" = "nocheck"; then
             { { echo "$as_me:$LINENO: error: cannot work out how" >&5
 echo "$as_me: error: cannot work out how" >&2;}
@@ -8307,9 +8310,6 @@ echo "$as_me: error: cannot work out how" >&2;}
             STAR_FFLAGS="$STAR_FFLAGS $star_cv_prm_compatible_symbols"
          fi
 
-fi
-echo "$as_me:$LINENO: result: $star_cv_prm_compatible_symbols" >&5
-echo "${ECHO_T}$star_cv_prm_compatible_symbols" >&6
 ac_ext=${FC_SRCEXT-f}
 ac_compile='$FC -c $FCFLAGS $FCFLAGS_SRCEXT conftest.$ac_ext >&5'
 ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $FCFLAGS_SRCEXT conftest.$ac_ext $LIBS >&5'
@@ -8743,6 +8743,78 @@ _ACEOF
     esac
 
 
+echo "$as_me:$LINENO: checking for inline" >&5
+echo $ECHO_N "checking for inline... $ECHO_C" >&6
+if test "${ac_cv_c_inline+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_cv_c_inline=no
+for ac_kw in inline __inline__ __inline; do
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#ifndef __cplusplus
+typedef int foo_t;
+static $ac_kw foo_t static_foo () {return 0; }
+$ac_kw foo_t foo () {return 0; }
+#endif
+
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_c_inline=$ac_kw; break
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+done
+
+fi
+echo "$as_me:$LINENO: result: $ac_cv_c_inline" >&5
+echo "${ECHO_T}$ac_cv_c_inline" >&6
+
+
+case $ac_cv_c_inline in
+  inline | yes) ;;
+  *)
+    case $ac_cv_c_inline in
+      no) ac_val=;;
+      *) ac_val=$ac_cv_c_inline;;
+    esac
+    cat >>confdefs.h <<_ACEOF
+#ifndef __cplusplus
+#define inline $ac_val
+#endif
+_ACEOF
+    ;;
+esac
+
+
 ac_ext=${FC_SRCEXT-f}
 ac_compile='$FC -c $FCFLAGS $FCFLAGS_SRCEXT conftest.$ac_ext >&5'
 ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $FCFLAGS_SRCEXT conftest.$ac_ext $LIBS >&5'
@@ -8905,7 +8977,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FCFLAGS
 FCFLAGS="$FCFLAGS $ac_verb"
-(eval echo $as_me:8908: \"$ac_link\") >&5
+(eval echo $as_me:8980: \"$ac_link\") >&5
 ac_fc_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_fc_v_output" >&5
 FCFLAGS=$ac_save_FFLAGS
@@ -8983,7 +9055,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FCFLAGS
 FCFLAGS="$FCFLAGS $ac_cv_prog_fc_v"
-(eval echo $as_me:8986: \"$ac_link\") >&5
+(eval echo $as_me:9058: \"$ac_link\") >&5
 ac_fc_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_fc_v_output" >&5
 FCFLAGS=$ac_save_FFLAGS

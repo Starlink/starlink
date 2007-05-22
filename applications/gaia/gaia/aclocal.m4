@@ -143,6 +143,9 @@ AC_CHECK_PROGS(LIBTOOL,libtool)
 STAR_CHECK_PROGS([fgeneric])
 STAR_INITIALISE_FORTRAN
 
+dnl Pre-C99 compilers do not support inline, check for that.
+AC_C_INLINE
+
 dnl    Sometimes also need to know the name of the Fortran MAIN.
 AC_FC_MAIN
 
