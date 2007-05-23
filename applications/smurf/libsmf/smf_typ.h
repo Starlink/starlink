@@ -264,7 +264,7 @@ typedef struct smfGroup {
 } smfGroup;
 
 /* Prototype for function pointer to different models used by DIMM */
-typedef void(*smf_calcmodelptr)( smfData*, smfData*, AstKeyMap*, double*, 
+typedef void(*smf_calcmodelptr)( smfData*, AstKeyMap*, double*, 
 				 double*, smfData*, int, int* );
 
 #endif /* SMF_TYP_DEFINED */

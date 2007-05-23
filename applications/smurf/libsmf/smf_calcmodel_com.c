@@ -13,13 +13,11 @@
 *     Library routine
 
 *  Invocation:
-*     smf_calcmodel_com( smfData *cum, smfData *res, AstKeyMap *keymap, 
+*     smf_calcmodel_com( smfData *res, AstKeyMap *keymap, 
 *                        double *map, double *mapvar, smfData *model, 
 *                        int flags, int *status);
 
 *  Arguments:
-*     cum = smfData * (Given and Returned)
-*        The cummulative signal from previously calculated model components
 *     res = smfData * (Given and Returned)
 *        The residual signal from previously calculated model components
 *     keymap = AstKeyMap * (Given)
@@ -33,7 +31,6 @@
 *        The data structure that will store the calculated model parameters
 *     flags = int (Given )
 *        Control flags: 
-*        SMF__DIMM_FIRSTCOMP - initializes CUM if first model component
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -56,6 +53,10 @@
 *     2007-03-05 (EC)
 *        Modified bit flags
 *        Modified data array indexing to avoid unnecessary multiplies
+*     2007-05-23 (EC)
+*        - Removed CUM calculation
+*        - Added COM_BOXCAR parameter to CONFIG file
+
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -97,13 +98,14 @@
 
 #define FUNC_NAME "smf_calcmodel_com"
 
-void smf_calcmodel_com( smfData *cum, smfData *res, AstKeyMap *keymap, 
+void smf_calcmodel_com( smfData *res, AstKeyMap *keymap, 
 			double *map, double *mapvar, smfData *model, 
 			int flags, int *status) {
 
   /* Local Variables */
   dim_t base;                   /* Store base index for data array offsets */
-  double *cum_data=NULL;        /* Pointer to DATA component of cum */
+  int boxcar=0;                 /* width in samples of boxcar filter */ 
+  int do_boxcar=0;              /* flag to do boxcar smooth */
   dim_t i;                      /* Loop counter */
   dim_t j;                      /* Loop counter */
   double mean;                  /* Array mean */
@@ -118,26 +120,24 @@ void smf_calcmodel_com( smfData *cum, smfData *res, AstKeyMap *keymap,
   /* Main routine */
   if (*status != SAI__OK) return;
 
+  /* Checl for smoothing parameters in the CONFIG file */
+  if( !astMapGet0I( keymap, "COM_BOXCAR", &boxcar) ) {
+    do_boxcar = 1;
+  }
+
   /* Get pointers to DATA components */
-  cum_data = (double *)(cum->pntr)[0];
   res_data = (double *)(res->pntr)[0];
   model_data = (double *)(model->pntr)[0];
 
-  if( (cum_data == NULL) || (res_data == NULL) || (model_data == NULL) ) {
+  if( (res_data == NULL) || (model_data == NULL) ) {
     *status = SAI__ERROR;
     errRep(FUNC_NAME, "Null data in inputs", status);      
   } else {
     
     /* Get the raw data dimensions */
-    nbolo = (cum->dims)[0] * (cum->dims)[1];
-    ntslice = (cum->dims)[2];
+    nbolo = (res->dims)[0] * (res->dims)[1];
+    ntslice = (res->dims)[2];
     ndata = nbolo*ntslice;
-
-    /* If SMF__DIMM_FIRSTCOMP set, initialize this iteration by clearing the
-       cumulative model buffer */
-    if( flags & SMF__DIMM_FIRSTCOMP ) {
-      memset( cum_data, 0, ndata*sizeof(cum_data) );
-    }
 
     for( i=0; i<ntslice; i++ ) {
 
@@ -150,16 +150,23 @@ void smf_calcmodel_com( smfData *cum, smfData *res, AstKeyMap *keymap,
 	res_data[base + j] += lastmean;
       }
 
-      /* Now calculate the new model */
+      /* Now calculate the new model as array average at this time slice */
       smf_calc_stats( res, "t", i, 0, 0, &mean, &sigma, status );
       model_data[i] = mean;
-      
+
+    }
+     
+    /* boxcar smooth if desired */
+    if( do_boxcar ) {
+      smf_boxcar1( model_data, ntslice, boxcar, status );
+    }
+
+    /* Remove common mode from the residual */
+    for( i=0; i<ntslice; i++ ) {
       /* Loop over bolometer */
       for( j=0; j<nbolo; j++ ) {
-
-	/* update the cumulative/residual model */
-	cum_data[base + j] += mean;
-	res_data[base + j] -= mean;
+	/* update the residual model */
+	res_data[base + j] -= model_data[i];
       }
     }    
   }

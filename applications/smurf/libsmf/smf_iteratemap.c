@@ -133,8 +133,8 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   const char *asttemp=NULL;     /* Pointer to static strings created by ast */
   int atmndf;                   /* Atmospheric signal NDF identifier */
   const char *atmname;          /* Name of atmmodel group */
-  smfData *cum;                 /* Pointer to input data struct */
-  Grp *cumgrp=NULL;             /* Group of cumulative model files */
+  /*smfData *cum;*/                 /* Pointer to input data struct */
+  /*Grp *cumgrp=NULL;*/             /* Group of cumulative model files */
   smfData *data;                /* Pointer to source data struct */
   double *data_data=NULL;       /* Pointer to DATA component of data */
   int dimmflags;                /* Control flags for DIMM model components */
@@ -253,7 +253,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   }
 
   /* These always get made */
-  smf_model_create( igrp, SMF__CUM, &cumgrp, status );
+  /*smf_model_create( igrp, SMF__CUM, &cumgrp, status );*/
   smf_model_create( igrp, SMF__RES, &resgrp, status );
   smf_model_create( igrp, SMF__AST, &astgrp, status );
   smf_model_create( igrp, SMF__NOI, &noigrp, status );
@@ -280,7 +280,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 	       status);
 
         /* Open files */
-        smf_open_file( cumgrp, i, "UPDATE", 0, &cum, status );
+        /*smf_open_file( cumgrp, i, "UPDATE", 0, &cum, status );*/
         smf_open_file( resgrp, i, "UPDATE", 1, &res, status );
         smf_open_file( astgrp, i, "UPDATE", 0, &ast, status );
 
@@ -303,7 +303,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 	    modelptr = smf_model_getptr( modeltyps[j], status );
 	    
 	    if( *status == SAI__OK ) {
-	      (*modelptr)( cum, res, keymap, map, mapvar, modeldata[j],
+	      (*modelptr)( res, keymap, map, mapvar, modeldata[j],
 			   dimmflags, status );
 	    }
 	  }
@@ -364,7 +364,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 	  
 
         /* Close files */
-        smf_close_file( &cum, status );
+        /*smf_close_file( &cum, status );*/
         smf_close_file( &res, status );
         smf_close_file( &ast, status );    
 
@@ -386,7 +386,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
         for( i=1; i<=isize; i++ ) {
 	  smf_open_file( astgrp, i, "UPDATE", 0, &ast, status );
 	  smf_open_file( resgrp, i, "UPDATE", 0, &res, status );
-	  smf_open_file( cumgrp, i, "UPDATE", 0, &cum, status );
+	  /*smf_open_file( cumgrp, i, "UPDATE", 0, &cum, status );*/
 	  /*smf_open_file( noigrp, i, "UPDATE", 0, &noi, status );*/
 
 	  /* Calculate the AST model component. It is a special model
@@ -395,7 +395,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
              separate loop since the map estimate gets updated by
              each chunk in the main model component loop */
 
-	  smf_calcmodel_ast( cum, res, keymap, map, mapvar, ast, 0, status );
+	  smf_calcmodel_ast( res, keymap, map, mapvar, ast, 0, status );
 	  
 	  /* Finally calculate the noise from the residual */
 
@@ -404,7 +404,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
  
 	  smf_close_file( &ast, status );    
 	  smf_close_file( &res, status );
-	  smf_close_file( &cum, status );	  
+	  /*smf_close_file( &cum, status );*/
 	  /*smf_close_file( &noi, status );*/
         }
       }
@@ -413,7 +413,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 
   /* Cleanup */
 
-  if( cumgrp ) grpDelet( &cumgrp, status );
+  /*if( cumgrp ) grpDelet( &cumgrp, status );*/
   if( resgrp ) grpDelet( &resgrp, status );
   if( astgrp ) grpDelet( &astgrp, status );  
 

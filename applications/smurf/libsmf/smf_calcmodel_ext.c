@@ -13,13 +13,11 @@
 *     Library routine
 
 *  Invocation:
-*     smf_calcmodel_ext( smfData *cum, smfData *res, AstKeyMap *keymap, 
+*     smf_calcmodel_ext( smfData *res, AstKeyMap *keymap, 
 *                        double *map, double *mapvar, smfData *model, 
 *                        int flags, int *status);
 
 *  Arguments:
-*     cum = smfData * (Given and Returned)
-*        The cummulative signal from previously calculated model components
 *     res = smfData * (Given and Returned)
 *        The residual signal from previously calculated model components
 *     keymap = AstKeyMap * (Given)
@@ -33,7 +31,6 @@
 *        The data structure that will store the calculated model parameters
 *     flags = int (Given )
 *        Control flags: 
-*        SMF__DIMM_FIRSTCOMP - initializes CUM if first model component
 *        SMF__DIMM_FIRSTITER - calc. non-iterated components once
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -97,13 +94,12 @@
 
 #define FUNC_NAME "smf_calcmodel_ext"
 
-void smf_calcmodel_ext( smfData *cum, smfData *res, AstKeyMap *keymap, 
+void smf_calcmodel_ext( smfData *res, AstKeyMap *keymap, 
 			double *map, double *mapvar, smfData *model, 
 			int flags, int *status) {
 
   /* Local Variables */
   dim_t base;                   /* Store base index for data array offsets */
-  double *cum_data=NULL;        /* Pointer to DATA component of cum */
   const char *extmethod=NULL;   /* Pointer to static strings created by ast */
   dim_t i;                      /* Loop counter */
   dim_t j;                      /* Loop counter */
@@ -126,36 +122,24 @@ void smf_calcmodel_ext( smfData *cum, smfData *res, AstKeyMap *keymap,
   } else {
 
     /* Get pointers to DATA components */
-    cum_data = (double *)(cum->pntr)[0];
     res_data = (double *)(res->pntr)[0];
     model_data = (double *)(model->pntr)[0];
 
-    if( (cum_data == NULL) || (res_data == NULL) || (model_data == NULL) ) {
+    if( (res_data == NULL) || (model_data == NULL) ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Null data in inputs", status);      
     } else {
     
       /* Get the raw data dimensions */
-      nbolo = (cum->dims)[0] * (cum->dims)[1];
-      ntslice = (cum->dims)[2];
+      nbolo = (res->dims)[0] * (res->dims)[1];
+      ntslice = (res->dims)[2];
       ndata = nbolo*ntslice;
 
-      /* If SMF__DIMM_FIRSTCOMP set, initialize this iteration by clearing the
-	 cumulative model buffer */
-      if( flags & SMF__DIMM_FIRSTCOMP ) {
-	memset( cum_data, 0, ndata*sizeof(cum_data) );
-      }
-      
       /* If SMF_DIMM_FIRSTITER set, call the extinction correction
 	 routine for the residual model component, and store the corrections 
 	 for each data point to use in subsequent iterations */
       if( flags & SMF__DIMM_FIRSTITER ) {
 	smf_correct_extinction( res, extmethod, 0, 0, model_data, status );
-
-	/* Also apply the correction to the cumulative model */
-	for( i=0; i<ndata; i++ ) {
-	  cum_data[i] *= model_data[i];
-	}
 
       } else {
 	/* If this is not the first iteration, apply the previously 

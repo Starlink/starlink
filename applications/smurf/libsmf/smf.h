@@ -583,19 +583,19 @@ void smf_terr( double phi, double h, double lambda, double pos[3] );
 
 void smf_instap_get( smfHead * hdr, int * status );
 
-void smf_calcmodel_com( smfData *cum, smfData *res, AstKeyMap *keymap, 
+void smf_calcmodel_com( smfData *res, AstKeyMap *keymap, 
 			double *map, double *mapvar, smfData *model, 
 			int flags, int *status );
 
-void smf_calcmodel_ast( smfData *cum, smfData *res, AstKeyMap *keymap, 
+void smf_calcmodel_ast( smfData *res, AstKeyMap *keymap, 
 			double *map, double *mapvar, smfData *model, 
 			int flags, int *status );
 
-void smf_calcmodel_noi( smfData *cum, smfData *res, AstKeyMap *keymap, 
+void smf_calcmodel_noi( smfData *res, AstKeyMap *keymap, 
 			double *map, double *mapvar, smfData *model, 
 			int flags, int *status );
 
-void smf_calcmodel_ext( smfData *cum, smfData *res, AstKeyMap *keymap, 
+void smf_calcmodel_ext( smfData *res, AstKeyMap *keymap, 
 			double *map, double *mapvar, smfData *model, 
 			int flags, int *status );
 

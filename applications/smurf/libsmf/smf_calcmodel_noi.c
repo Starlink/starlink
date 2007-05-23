@@ -13,13 +13,11 @@
 *     Library routine
 
 *  Invocation:
-*     smf_calcmodel_noi( smfData *cum, smfData *res, AstKeyMap *keymap, 
+*     smf_calcmodel_noi( smfData *res, AstKeyMap *keymap, 
 *                        double *map, double *mapvar, smfData *model, 
 *                        int flags, int *status);
 
 *  Arguments:
-*     cum = smfData * (Given and Returned)
-*        The cummulative signal from previously calculated model components
 *     res = smfData * (Given and Returned)
 *        The residual signal from previously calculated model components
 *     keymap = AstKeyMap * (Given)
@@ -33,7 +31,6 @@
 *        The data structure that will store the calculated model parameters
 *     flags = int (Given )
 *        Control flags: 
-*        SMF__DIMM_FIRSTCOMP - initializes CUM if first model component
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -95,12 +92,11 @@
 
 #define FUNC_NAME "smf_calcmodel_noi"
 
-void smf_calcmodel_noi( smfData *cum, smfData *res, AstKeyMap *keymap, 
+void smf_calcmodel_noi( smfData *res, AstKeyMap *keymap, 
 			double *map, double *mapvar, smfData *model, 
 			int flags, int *status) {
 
   /* Local Variables */
-  double *cum_data=NULL;        /* Pointer to DATA component of cum */
   dim_t i;                      /* Loop counter */
   dim_t j;                      /* Loop counter */
   double mean;                  /* Array mean */
@@ -118,12 +114,11 @@ void smf_calcmodel_noi( smfData *cum, smfData *res, AstKeyMap *keymap,
   if (*status != SAI__OK) return;
 
   /* Get pointers to DATA components */
-  cum_data = (double *)(cum->pntr)[0];
   res_data = (double *)(res->pntr)[1];
   res_var = (double *)(res->pntr)[1];
   model_data = (double *)(model->pntr)[0];
 
-  if( (cum_data == NULL) || (res_data == NULL) || (model_data == NULL) ) {
+  if( (res_data == NULL) || (model_data == NULL) ) {
     *status = SAI__ERROR;
     errRep(FUNC_NAME, "Null data in inputs", status);      
   } else {
@@ -133,14 +128,8 @@ void smf_calcmodel_noi( smfData *cum, smfData *res, AstKeyMap *keymap,
     ntslice = (res->dims)[2];
     ndata = nbolo*ntslice;
 
-    /* If SMF__DIMM_FIRSTCOMP set, initialize this iteration by clearing the
-       cumulative model buffer */
-    if( flags & SMF__DIMM_FIRSTCOMP ) {
-      memset( cum_data, 0, ndata*sizeof(cum_data) );
-    }
-
     for( i=0; i<nbolo; i++ ) {
-      /* Don't need to adjust cum/res since this model component is just
+      /* Don't need to adjust res since this model component is just
          a weight calculation. Measure the sample standard deviation for
 	 each bolometer assuming it is stationary in time... */
       smf_calc_stats( res, "b", i, 0, 0, &mean, &sigma, status );

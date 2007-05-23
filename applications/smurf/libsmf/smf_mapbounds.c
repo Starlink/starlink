@@ -478,6 +478,13 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
           bolo2sky = astGetMapping( fs, AST__BASE, AST__CURRENT );
         }
 
+	/* KLUDGE: map bolo 0,0 -> ra,dec */
+	//double xin, yin, xout, yout;
+	//xin=0; yin=0;
+	//astTran2( bolo2sky, 1, &xin, &yin, 1, &xout, &yout );
+	//printf("ooga: %lf,%lf ---> %lf,%lf\n", xin, yin, xout, yout);
+	/* ------------------------------ */
+
 	/* Create the input GRID to output map mapping */
         bolo2map = astCmpMap( bolo2sky, sky2map, 1, "" );
 

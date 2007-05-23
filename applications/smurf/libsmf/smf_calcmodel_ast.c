@@ -13,13 +13,11 @@
 *     Library routine
 
 *  Invocation:
-*     smf_calcmodel_ast( smfData *cum, smfData *res, AstKeyMap *keymap, 
+*     smf_calcmodel_ast( smfData *res, AstKeyMap *keymap, 
 *                        double *map, double *mapvar, smfData *model, 
 *                        int flags, int *status);
 
 *  Arguments:
-*     cum = smfData * (Given and Returned)
-*        The cummulative signal from previously calculated model components
 *     res = smfData * (Given and Returned)
 *        The residual signal from previously calculated model components
 *     keymap = AstKeyMap * (Given)
@@ -33,7 +31,6 @@
 *        The data structure that will store the calculated model parameters
 *     flags = int (Given )
 *        Control flags: 
-*        SMF__DIMM_FIRSTCOMP - initializes CUM if first model component
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -56,6 +53,8 @@
 *        Updated to correctly modify cumulative and residual models
 *     2007-03-05 (EC)
 *        Modified bit flags
+*     2007-05-23 (EC)
+*        Removed CUM calculation
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -97,12 +96,11 @@
 
 #define FUNC_NAME "smf_calcmodel_ast"
 
-void smf_calcmodel_ast( smfData *cum, smfData *res, AstKeyMap *keymap, 
+void smf_calcmodel_ast( smfData *res, AstKeyMap *keymap, 
 			double *map, double *mapvar, smfData *model, 
 			int flags, int *status) {
 
   /* Local Variables */
-  double *cum_data=NULL;        /* Pointer to DATA component of cum */
   dim_t i;                      /* Loop counter */
   int *lut=NULL;                /* Pointing lookup table */
   double *model_data=NULL;      /* Pointer to DATA component of model */
@@ -124,25 +122,17 @@ void smf_calcmodel_ast( smfData *cum, smfData *res, AstKeyMap *keymap,
   }
 
   /* Get pointers to DATA components */
-  cum_data = (double *)(cum->pntr)[0];
   res_data = (double *)(res->pntr)[0];
   model_data = (double *)(model->pntr)[0];
 
-  if( (cum_data == NULL) || (res_data == NULL) || (lut == NULL) ||
-      (model_data == NULL) ) {
+  if( (res_data == NULL) || (lut == NULL) || (model_data == NULL) ) {
     *status = SAI__ERROR;
     errRep(FUNC_NAME, "Null data / pointing LUT in inputs", status);      
   } else {
 
     /* Get the raw data dimensions */
-    ndata = (cum->dims)[0] * (cum->dims)[1] * (cum->dims)[2];
+    ndata = (res->dims)[0] * (res->dims)[1] * (res->dims)[2];
 
-    /* If SMF__DIMM_FIRSTCOMP set, initialize this iteration by clearing the
-       cumulative model buffer */
-    if( flags & SMF__DIMM_FIRSTCOMP ) {
-      memset( cum_data, 0, ndata*sizeof(cum_data) );
-    }
-    
     /* Loop over data points */ 
     for( i=0; i<ndata; i++ ) {
       if( lut[i] != VAL__BADI ) {
@@ -152,8 +142,7 @@ void smf_calcmodel_ast( smfData *cum, smfData *res, AstKeyMap *keymap,
 	/* calculate new model using the map/LUT */
 	model_data[i] = map[lut[i]];
 	
-	/* update the cumulative/residual model */
-	cum_data[i] += model_data[i];
+	/* update the residual model */
 	res_data[i] -= model_data[i];
       }
     }    
