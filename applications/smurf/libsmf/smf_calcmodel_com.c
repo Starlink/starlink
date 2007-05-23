@@ -163,6 +163,8 @@ void smf_calcmodel_com( smfData *res, AstKeyMap *keymap,
 
     /* Remove common mode from the residual */
     for( i=0; i<ntslice; i++ ) {
+      base = i*nbolo;  /* Index to first data point in i'th time slice */
+
       /* Loop over bolometer */
       for( j=0; j<nbolo; j++ ) {
 	/* update the residual model */
