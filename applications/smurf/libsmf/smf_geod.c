@@ -17,6 +17,8 @@
 *     the earth, Z axis going through the north pole, X axis at
 *     (long,lat)=(0,0), and Y axis at (long,lat) = (E90,0).
 *
+*     The inverse of this function is smf_terr.
+*
 *     The algorithm is due to Borkowski, and is described in the
 *     Explanatory Supplement to the Astronomical Almanac (p206).
 
