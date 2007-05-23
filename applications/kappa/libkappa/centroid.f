@@ -267,11 +267,11 @@
 *        graphics cursor on the current graphics device.  The search
 *        box for the centroid is 21 pixels in each dimension.  The 
 *        centroid positions are marked using a red symbol.
-*     centroid cluster i '"21.7,5007.1"'
+*     centroid cluster i "21.7,5007.1"
 *        This finds the centroid of the object in the 2-dimensional NDF
 *        called cluster around the current Frame co-ordinate 
 *        (21.7,5007.1).
-*     centroid arp244(6,,) i '"40,30"' toler=0.01
+*     centroid arp244(6,,) i "40,30" toler=0.01
 *        This finds the 2-dimensional centroid of the feature near
 *        pixel (6,40,30) in the 3-dimensional NDF called arp244 (assuming
 *        the current co-ordinate Frame of the NDF is PIXEL). The centroid
@@ -356,7 +356,7 @@
 *     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
 *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-*     MA 02111-1307, USA,
+*     MA 02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
