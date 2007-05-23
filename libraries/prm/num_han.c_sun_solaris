@@ -1,5 +1,9 @@
 /* Declare/revert numerical error handling functions for Solaris systems.   */
 
+#ifdef __GNUC__
+#include "num_han.cdefault"
+#else
+
 #include <floatingpoint.h>
 #include <math.h>
 #include <siginfo.h>
@@ -343,3 +347,4 @@
 /* Exit the routine.							    */
       return;
    }
+#endif /* __GNUC__ */
