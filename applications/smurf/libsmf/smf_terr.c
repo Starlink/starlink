@@ -64,14 +64,11 @@
 
 /* Starlink includes */
 #include "ast.h"
+#include "star/slalib.h"
 
 /* SMURF includes */
 #include "smurf_par.h"
 #include "smf.h"
-
-/* Prototype for wrapped slalib call in ast "pal.c" */
-void palSlaGeoc ( double p, double h, double *r, double *z );
-
 
 #define FUNC_NAME "smf_terr"
 
@@ -84,7 +81,7 @@ void smf_terr( double phi, double h, double lambda, double pos[3] ) {
   if( !astOK ) return;
 
   /* Calculate cartesian coordinates in metres */
-  palSlaGeoc( phi, h, &r, &z );
+  slaGeoc( phi, h, &r, &z );
   r *= AST__AU; /* covert AU to metres */
   pos[0] = r*cos( lambda );
   pos[1] = r*sin( lambda );
