@@ -170,6 +170,8 @@
 *        Add INSTRUME FITS keyword
 *     2007-05-17 (EC):
 *        Use astFitsSetCN instead of astFitsSetS for COMMENT lines
+*     2007-05-22 (EC):
+*        Hard-wire obsgeo keywords to Mauna Kea - not Socorro NM!
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
@@ -333,11 +335,12 @@ int *status              /* Global status (given and returned) */
    astSetFitsS ( fitschan, "TELESCOP", "JCMT", "Name of telescope", 0 );
    astSetFitsS ( fitschan, "ORIGIN", "SMURF SCUBA-2 simulator", 
 		 "Origin of file", 0 );
-   astSetFitsF ( fitschan, "OBSGEO-X", -1.601185365E+06, 
+   astSetFitsF ( fitschan, "OBSGEO-X", -5464545.04, //-1.601185365E+06, 
 		 "x,y,z triplet for JCMT", 0 );
-   astSetFitsF ( fitschan, "OBSGEO-Y", -5.041977547E+06, 
+   astSetFitsF ( fitschan, "OBSGEO-Y", -2492986.33, //-5.041977547E+06, 
 		 "relative to centre of the Earth", 0 );
-   astSetFitsF ( fitschan, "OBSGEO-Z", 3.554875870E+06, "[m]", 0 );
+   astSetFitsF ( fitschan, "OBSGEO-Z", 2150635.34, //3.554875870E+06, 
+		 "[m]", 0 );
    astSetFitsF ( fitschan, "ALT-OBS", 4092, 
 		 "[m] Height of observatory above sea level", 0 );
    astSetFitsF ( fitschan, "LAT-OBS", 19.8258323669, 
