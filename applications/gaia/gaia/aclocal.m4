@@ -90,6 +90,12 @@ gaia_headers=`cd ${srcdir}; echo generic/*.h generic/*.icc`
 gaia_includes="-I. -I${srcdir}/generic -I${srcdir}/bitmaps -I${prefix}/include/skycat -I${prefix}/include/rtd -I${prefix}/include/cat -I${prefix}/include/astrotcl -I${prefix}/include/tclutil"
 tclsources=`cd ${srcdir}; echo library/*.tcl library/*.itk library/*.xpm library/skycat2.0.cfg`
 
+]) 
+# GAIA_CONFIG
+
+
+AC_DEFUN(GAIA_COMPILER_TESTS, [
+
 # -----------------------------------------------------------------------
 # 	Check if we need (or can use) the socklen_t type.
 AC_CHECK_TYPES([socklen_t],,,[#include <sys/socket.h>])
