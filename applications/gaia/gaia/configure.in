@@ -68,11 +68,6 @@ TEA_PREFIX
 
 TEA_SETUP_COMPILER
 
-#--------------------------------------------------------------------
-# Do application specific checks (see aclocal.m4)
-#--------------------------------------------------------------------
-GAIA_CONFIG
-
 #-----------------------------------------------------------------------
 # __CHANGE__
 # Specify the C source files to compile in TEA_ADD_SOURCES,
@@ -201,6 +196,11 @@ AC_SUBST(OS)
 # Prefer to include a config.h file.
 #--------------------------------------------------------------------
 AC_CONFIG_HEADERS([config.h])
+
+#--------------------------------------------------------------------
+# Do application specific checks (see aclocal.m4)
+#--------------------------------------------------------------------
+GAIA_CONFIG
 
 #--------------------------------------------------------------------
 # Finally, substitute all of the various values into the Makefile.

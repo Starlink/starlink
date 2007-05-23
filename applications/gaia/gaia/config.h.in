@@ -3,6 +3,13 @@
 /* Build windows export dll */
 #undef BUILD_gaia
 
+/* Define to alternate name for `main' routine that is called from a `main' in
+   the Fortran libraries. */
+#undef FC_MAIN
+
+/* True when Fortran main isn't C main */
+#undef HAVE_FC_MAIN
+
 /* Define to 1 if fseeko (and presumably ftello) exists and is declared. */
 #undef HAVE_FSEEKO
 
@@ -184,3 +191,9 @@
 
 /* Do we want to use the XOPEN network library? */
 #undef _XOPEN_SOURCE_EXTENDED
+
+/* Define to `__inline__' or `__inline' if that's what the C compiler
+   calls it, or to nothing if 'inline' is not supported under any name.  */
+#ifndef __cplusplus
+#undef inline
+#endif
