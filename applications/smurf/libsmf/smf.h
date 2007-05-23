@@ -154,6 +154,9 @@
 *        Add "int *nreject" to smf_rebincube.
 *     2007-04-23 (DSB):
 *        Big changes to smf_rebincube_xxx functions.
+*     2007-04-23 (EC):
+*        Add smf_terr
+
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -575,6 +578,8 @@ void smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3],
                      double steptime, AstFrameSet **fset, int *status );
 
 void smf_geod( double pos[3], double *phi, double *h, double *lambda );
+
+void smf_terr( double phi, double h, double lambda, double pos[3] );
 
 void smf_instap_get( smfHead * hdr, int * status );
 
