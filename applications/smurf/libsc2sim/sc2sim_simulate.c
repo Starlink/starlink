@@ -214,6 +214,8 @@
 *        Make this time-since-start a new variable for clarity
 *     2007-04-02 (AGG):
 *        Derive more FITS headers, add extra args to ndfwrdata
+*     2007-04-02 (EC):
+*        Moved telpos into sinx
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -421,7 +423,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double taiutc;                  /* Difference between TAI and UTC time (s) */
   double tauCSO=0;                /* CSO zenith optical depth */
   float tbri[3];                  /* simulated wvm measurements */
-  double telpos[3];               /* Geodetic location of the telescope */
   float teff[3];                  /* output of wvmOpt */
   double temp1;                   /* store temporary values */
   double temp2;                   /* store temporary values */
@@ -441,7 +442,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   ndfBegin ();
 
   /* Setup instap (converted from arcsec to radians) and telpos */
-  smf_calc_telpos( NULL, "JCMT", telpos, status );
+  smf_calc_telpos( NULL, "JCMT", sinx->telpos, status );
   if ( strncmp( inx->instap, " ", 1 ) != 0 ) {
     sc2sim_instap_calc( inx, instap, status );
   } else {
@@ -886,8 +887,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
     taiutc = slaDat( start_time );
 
-    sc2sim_calctime( telpos[0]*DD2R, start_time, inx->dut1, samptime, lastframe,
-                     mjuldate, lst, status ); 
+    sc2sim_calctime( (sinx->telpos[0])*DD2R, start_time, inx->dut1, samptime, 
+		     lastframe, mjuldate, lst, status ); 
 
     /* If we're not simulating a planet observation then we only need
        to calculate the apparent RA, Dec once */
@@ -903,7 +904,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       curframe = ( curchunk * maxwrite ) + frame;
 
       /* Telescope latitude */
-      phi = telpos[1]*DD2R;
+      phi = (sinx->telpos[1])*DD2R;
 
       /* If we are simulating a planet observation, calculate apparent
 	 RA, Dec at each time step - actually don't need to do this if
@@ -914,8 +915,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	if ( frame%100 == 0 ) {
 	  /* Calculate the TT from UTC start_time and TT-UTC from slaDtt */
 	  tt = start_time + (curframe*samptime + dtt ) / SPD;
-	  slaRdplan( tt, inx->planetnum, -DD2R*telpos[0], DD2R*telpos[1], 
-		     &raapp, &decapp, &diam );
+	  slaRdplan( tt, inx->planetnum, -DD2R*(sinx->telpos)[0], 
+		     DD2R*(sinx->telpos)[1], &raapp, &decapp, &diam );
 
 	  /* Store RA Dec in inx struct so they can be written as FITS
 	     headers. Note these are APPARENT RA, Dec which are more
@@ -1141,7 +1142,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
           sc2ast_name2num( subarrays[k], &subnum, status );
 
           if( *status == SAI__OK ) {
-            sc2ast_createwcs(subnum, &state, instap, telpos, &fs, status);
+            sc2ast_createwcs(subnum, &state, instap, sinx->telpos, &fs, 
+			     status);
           }
       
           /* simulate one frame of data */

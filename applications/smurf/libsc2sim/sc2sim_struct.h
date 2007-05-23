@@ -38,6 +38,7 @@
     22Dec2006 : Add planetnum (agg)
     26Mar2007 : Change units of steptime (formerly sample_t) to
                 seconds, not ms (agg)
+    23May2007 : Added telpos to sc2sim_sim_struct (ec)
 */
 #include "libsc2sim/sc2sim_par.h"
 
@@ -163,6 +164,7 @@ struct sc2sim_sim_struct      /* parameters read from sim input file */
   double smu_terr;            /* SMU timing error */
   char subname[80];           /* name of subarray */
   double telemission;         /* telescope background pW per pixel */
+  double telpos[3];           /* telescope W. lon/lat/altitude (deg/deg/m) */
   double tauzen;              /* optical depth at 225GHz at the zenith */
   double xpoint;              /* X pointing offset on sky (arcsec) */
   double ypoint;              /* Y pointing offset on sky (arcsec) */

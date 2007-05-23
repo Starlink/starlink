@@ -172,6 +172,9 @@
 *        Use astFitsSetCN instead of astFitsSetS for COMMENT lines
 *     2007-05-22 (EC):
 *        Hard-wire obsgeo keywords to Mauna Kea - not Socorro NM!
+*     2007-05-2e (EC):
+*        Derive obsgeo keywords from telpos using smf_terr
+
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
@@ -285,6 +288,7 @@ int *status              /* Global status (given and returned) */
    int midpt;                      /* RTS index of midpoint in range contributing 
 				      to output image */
    int ncoeff = 2;                 /* Number of coefficients in polynomial fit */
+   double obsgeo[3];               /* Cartesian geodetic observatory coords. */
    double *poly;                   /* Pointer to polynomial fit solution */
    double rad;                     /* RA of observation in degrees */
    double *rdata;                  /* Pointer to flatfielded data */
@@ -292,7 +296,6 @@ int *status              /* Global status (given and returned) */
    int seqstart;                   /* RTS index of first frame in output image */
    JCMTState state;                /* Dummy JCMT state structure for creating WCS */
    int subnum;                     /* sub array index */
-   double telpos[3];               /* Telescope position */
    AstFrameSet *wcs;               /* WCS frameset for output image */
    char weightsname[81];           /* Name of weights file for DREAM 
 				      reconstruction */
@@ -335,18 +338,24 @@ int *status              /* Global status (given and returned) */
    astSetFitsS ( fitschan, "TELESCOP", "JCMT", "Name of telescope", 0 );
    astSetFitsS ( fitschan, "ORIGIN", "SMURF SCUBA-2 simulator", 
 		 "Origin of file", 0 );
-   astSetFitsF ( fitschan, "OBSGEO-X", -5464545.04, //-1.601185365E+06, 
+
+   smf_terr( (sinx->telpos)[1]*DD2R, (sinx->telpos)[2],
+	     -(sinx->telpos)[0]*DD2R, obsgeo );
+
+   astSetFitsF ( fitschan, "OBSGEO-X", obsgeo[0], //-5464545.04, 
 		 "x,y,z triplet for JCMT", 0 );
-   astSetFitsF ( fitschan, "OBSGEO-Y", -2492986.33, //-5.041977547E+06, 
+   astSetFitsF ( fitschan, "OBSGEO-Y", obsgeo[1], //-2492986.33, 
 		 "relative to centre of the Earth", 0 );
-   astSetFitsF ( fitschan, "OBSGEO-Z", 2150635.34, //3.554875870E+06, 
+   astSetFitsF ( fitschan, "OBSGEO-Z", obsgeo[2], //2150635.34, 
 		 "[m]", 0 );
-   astSetFitsF ( fitschan, "ALT-OBS", 4092, 
+
+   astSetFitsF ( fitschan, "ALT-OBS", (sinx->telpos)[2], //4092, 
 		 "[m] Height of observatory above sea level", 0 );
-   astSetFitsF ( fitschan, "LAT-OBS", 19.8258323669, 
+   astSetFitsF ( fitschan, "LAT-OBS", (sinx->telpos)[1], //19.8258323669, 
 		 "[deg] Latitude of observatory", 0 );
-   astSetFitsF ( fitschan, "LONG-OBS", 204.520278931, 
+   astSetFitsF ( fitschan, "LONG-OBS", -(sinx->telpos)[0], //204.520278931, 
 		 "[deg] East longitude of observatory", 0 );
+
    astSetFitsF ( fitschan, "ETAL", 1.0, "Telescope efficiency", 0 );
 
    /* Observation, date & pointing */
@@ -588,7 +597,7 @@ int *status              /* Global status (given and returned) */
      state.smu_az_chop_x = 0.0;
      state.smu_az_chop_y = 0.0;
 
-     smf_calc_telpos( NULL, "JCMT", telpos, status );
+     /*smf_calc_telpos( NULL, "JCMT", telpos, status );*/
      if ( strncmp( inx->instap, " ", 1 ) != 0 ) {
        sc2sim_instap_calc( inx, instap, status );
      } else {
@@ -634,7 +643,7 @@ int *status              /* Global status (given and returned) */
        dims[1] = inx->nboly;
 
        /* Construct WCS FrameSet */
-       sc2ast_createwcs( subnum, &state, instap, telpos, &wcs, status );
+       sc2ast_createwcs( subnum, &state, instap, sinx->telpos, &wcs, status );
        /* This should be user defined... */
        astSetC( wcs, "SYSTEM", "ICRS" );
 
