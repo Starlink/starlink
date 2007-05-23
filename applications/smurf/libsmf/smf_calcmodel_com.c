@@ -121,7 +121,7 @@ void smf_calcmodel_com( smfData *res, AstKeyMap *keymap,
   if (*status != SAI__OK) return;
 
   /* Checl for smoothing parameters in the CONFIG file */
-  if( !astMapGet0I( keymap, "COM_BOXCAR", &boxcar) ) {
+  if( astMapGet0I( keymap, "COM_BOXCAR", &boxcar) ) {
     do_boxcar = 1;
   }
 
