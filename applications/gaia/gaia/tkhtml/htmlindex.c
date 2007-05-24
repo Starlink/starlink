@@ -24,6 +24,7 @@ static char const rcsid[] = "@(#) $Id$";
 **   http://www.hwaci.com/drh/
 */
 #include <ctype.h>
+#include <string.h>
 #include <tk.h>
 #include "htmlindex.h"
 

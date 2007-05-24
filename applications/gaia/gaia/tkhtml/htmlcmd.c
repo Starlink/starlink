@@ -25,6 +25,7 @@ static char const rcsid[] = "@(#) $Id$";
 */
 #include <tk.h>
 #include <stdlib.h>
+#include <string.h>
 #include "htmlcmd.h"
 
 /*
