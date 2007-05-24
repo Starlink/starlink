@@ -4,8 +4,12 @@
     The version of Skycat that GAIA is based on has been updated to
     version 3.0-1.
 
+    The spectral offsets from the centre of the observation of cube
+    now preserve the sense of the direction by including a sign
+    (negative for west and south).
+
     A bug when writing an extracted spectrum to NDF and FITS files
-    has been corrected. Previously the coordinates of was incorrect
+    has been corrected. Previously the coordinates were incorrect
     by a single channel.
 
     GAIA 3.3-7
