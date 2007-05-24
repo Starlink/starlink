@@ -16,7 +16,7 @@ paste.f permaxes.f pixdupe.f psf.f rift.f regrid.f rotate.f segment.f  \
 setmagic.f shadow.f slide.f sqorst.f stats.f sub.f substitute.f	       \
 surfit.f thresh.f trandat.f trig.f wiener.f zaplin.f listmake.f	       \
 listshow.f profile.f wcsalign.f wcsmosaic.f wcstran.f kapversion.f     \
-mfittrend.f oddeven.f cumulvec.f
+mfittrend.f oddeven.f cumulvec.f beamfit.f
 
 F2_ROUTINES = kap_div.f kap_pow.f
 
@@ -25,6 +25,11 @@ F3_ROUTINES = kaphelp.f
 F_ROUTINES = $(F1_ROUTINES) $(F2_ROUTINES) $(F3_ROUTINES)
 
 C_ROUTINES = makesnr.c
+
+beamfit.f: BF_PAR
+
+BF_PAR: ../kapsub/BF_PAR
+	$(LN_S) ../kapsub/BF_PAR ./BF_PAR
 
 wcsalign.f: KAP_ERR
 

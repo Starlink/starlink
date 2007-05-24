@@ -1077,7 +1077,7 @@ package kappa {
             access READ
             vpath DEFAULT
             ppath DEFAULT
-            prompt {Scale factor for Variance component}
+            prompt {Scale factor for VARIANCE component}
             helpkey *
             default !
           }
@@ -1087,7 +1087,7 @@ package kappa {
             access READ
             vpath DEFAULT
             ppath DEFAULT
-            prompt {Zero offset for Variance component}
+            prompt {Zero offset for VARIANCE component}
             helpkey *
             default !
           }
@@ -2385,7 +2385,7 @@ package kappa {
             vpath DEFAULT
             ppath CURRENT DEFAULT
             default TRUE
-            prompt {Set a new type for the variance component?}
+            prompt {Set a new type for the VARIANCE component?}
             helpkey *
           }
 
@@ -7241,6 +7241,322 @@ package kappa {
             default !
             helpkey *
           }
+      }
+
+      action beamfit {
+         alias {beam(fit)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter amp {
+            size *
+            access WRITE
+            type _DOUBLE
+            vpath INTERNAL
+            prompt {Object to contain the amplitude and its error for the primary beam}
+            helpkey *
+          }
+
+
+         parameter ampratio {
+            type _REAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Ratios of amplitudes of secondary features relative to the primary}
+            helpkey *
+          }
+
+         parameter back {
+            size *
+            access WRITE
+            type _DOUBLE
+            vpath INTERNAL
+            prompt {Object to contain the background and its error for the primary beam}
+            helpkey *
+          }
+
+         parameter beams {
+            position 2
+            type _INTEGER
+            ppath CURRENT
+            vpath DEFAULT
+            prompt {Number of beam features to fit}
+            helpkey *
+            default 1
+         }
+
+         parameter centre {
+            size *
+            access WRITE
+            type LITERAL
+            vpath INTERNAL
+            prompt {Object to contain the position and its error for the primary beam}
+            helpkey *
+          }
+
+         parameter coin {
+            type FILENAME
+            ppath CURRENT
+            prompt {Text file containing initial positions}
+            helpkey *
+          }
+
+         parameter describe {
+            type _LOGICAL
+            prompt {Is the co-ordinate Frame to be described?}
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            helpkey *
+          }
+
+         parameter device {
+            ptype DEVICE
+            vpath GLOBAL PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.GRAPHICS_DEVICE
+            prompt {Name of graphics device}
+            helpkey *
+          }
+
+         parameter fixamp {
+            type _DOUBLE
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Fixed amplitude of the primary beam}
+            helpkey *
+          }
+
+         parameter fitarea {
+            type _INTEGER
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Size of region to fit}
+            helpkey *
+          }
+
+         parameter fixback {
+            type _DOUBLE
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Fixed background level}
+            helpkey *
+          }
+
+         parameter fixfwhm {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Fixed FWHM}
+            helpkey *
+          }
+
+          parameter fixpos {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Fix beam location(s) at supplied position(s)?}
+            default FALSE
+            helpkey *
+          }
+
+         parameter incat {
+            type FILENAME
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.CATALOGUE
+            prompt {Positions list containing initial positions}
+            helpkey *
+          }
+
+         parameter init1 {
+            position 4
+            type LITERAL
+            ppath CURRENT DYNAMIC
+            prompt {Initial position of primary beam}
+            helpkey *
+          }
+
+         parameter init2 {
+            type LITERAL
+            ppath CURRENT DYNAMIC
+            prompt {Initial position of first secondary beam}
+            helpkey *
+          }
+
+         parameter init3 {
+            type LITERAL
+            ppath CURRENT DYNAMIC
+            prompt {Initial position of second secondary beam}
+            helpkey *
+          }
+
+         parameter init4 {
+            type LITERAL
+            ppath CURRENT DYNAMIC
+            prompt {Initial position of third secondary beam}
+            helpkey *
+          }
+
+         parameter init5 {
+            type LITERAL
+            ppath CURRENT DYNAMIC
+            prompt {Initial position of fourth secondary beam}
+            helpkey *
+          }
+
+         parameter logfile {
+            type FILENAME
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Filename to store the screen output}
+            default !
+            helpkey *
+          }
+
+         parameter majfwhm {
+            size *
+            access WRITE
+            type _DOUBLE
+            vpath INTERNAL
+            prompt {Object to contain the major-axis FWHM and its error for the primary beam}
+            helpkey *
+          }
+
+         parameter mark {
+            type LITERAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Positions to mark}
+            helpkey *
+            default Fit
+          }
+
+         parameter marker {
+            type _INTEGER
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {The PGPLOT type for position markers}
+            default 2
+            helpkey *
+          }
+
+         parameter minfwhm {
+            size *
+            access WRITE
+            type _DOUBLE
+            vpath INTERNAL
+            prompt {Object to contain the minor-axis FWHM and its error for the primary beam}
+            helpkey *
+          }
+
+         parameter mode {
+            position 3
+            type LITERAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Mode used to obtain initial positions}
+            default Interface
+            helpkey *
+          }
+
+         parameter ndf {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.DATA_ARRAY
+            prompt {Array to be analysed}
+            helpkey *
+          }
+
+         parameter orient {
+            size *
+            access WRITE
+            type _DOUBLE
+            vpath INTERNAL
+            prompt {Object to contain the beam orientation and its error for the primary beam}
+            helpkey *
+          }
+
+         parameter plotstyle {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath CURRENT DEFAULT
+            prompt {Style for graphics markers}
+            helpkey *
+            default !
+          }
+
+         parameter quiet {
+            type _LOGICAL
+            ppath DEFAULT
+            vpath DEFAULT
+            default FALSE
+            prompt {Suppress screen output?}
+            helpkey *
+          }
+
+         parameter rms {
+            access WRITE
+            type _DOUBLE
+            vpath INTERNAL
+            prompt {Object to contain the rms of the fit for the primary beam}
+            helpkey *
+          }
+
+         parameter sep1 {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath DEFAULT
+            prompt {Offset of the second beam from the primary}
+            helpkey *
+            default !
+          }
+
+         parameter sep2 {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath PROMPT
+            prompt {Offset of the third beam from the primary}
+            helpkey *
+            default !
+          }
+
+         parameter sep3 {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath PROMPT
+            prompt {Offset of the fourth beam position from the primary}
+            helpkey *
+            default !
+          }
+
+         parameter sep4 {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath PROMPT
+            prompt {Offset of the fifth beam position from the primary}
+            helpkey *
+            default !
+          }
+
+         parameter variance {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Weight using variance array, if available?}
+            default FALSE
+            helpkey *
+          }
+
       }
 
       action block {
@@ -13867,21 +14183,21 @@ iraf! {
             helpkey *
           }
 
+         parameter centre {
+            access WRITE
+            type LITERAL
+            vpath DEFAULT
+            prompt {Object to contain the first PSF position}
+            default { }
+            helpkey *
+          }
+
          parameter clear {
             type _LOGICAL
             vpath DEFAULT
             prompt {Is the current picture to be cleared before plotting?}
             helpkey *
             default TRUE
-          }
-
-         parameter centre {
-            access WRITE
-            type LITERAL
-            vpath DEFAULT
-            prompt {Object to contain the first star position}
-            default { }
-            helpkey *
           }
 
          parameter cofile {

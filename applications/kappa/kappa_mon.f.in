@@ -101,6 +101,8 @@
 *        Added ODDEVEN.
 *     2006 October 10 (MJC):
 *        Added CUMULVEC.
+*     2007 March 16 (MJC):
+*        Added BEAMFIT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -220,6 +222,10 @@
 *  Uses an ARD file to set some pixels of an NDF to be bad.
          ELSE IF ( NAME .EQ. 'ARDMASK' ) THEN
             CALL ARDMASK ( STATUS )
+
+*  Fits Gaussian beams in an NDF
+         ELSE IF ( NAME .EQ. 'BEAMFIT' ) THEN
+            CALL BEAMFIT ( STATUS )
 
 *  Smooths a 1- or 2-dimensional image using a square or rectangular
 *  box filter.
