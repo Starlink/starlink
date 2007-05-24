@@ -4,7 +4,7 @@
 *     BEAMFIT
 
 *  Purpose:
-*     Fits beam features in an NDF.
+*     Fits beam features in a two-dimensional NDF.
 
 *  Language:
 *     Starlink Fortran 77
@@ -50,7 +50,7 @@
 *     In the first two modes the application loops, asking for new
 *     feature co-ordinates until it is told to quit or encounters an
 *     error or the maximum number of features is reached.  The last is
-*     five, unless parameter SEPARATION defines the location of the 
+*     five, unless parameters SEP1-SEP4 defines the location of the 
 *     secondary beams and then only the primary beam's position is 
 *     demanded.
 *
@@ -61,7 +61,11 @@
 *     of the input parameters (see parameter LOGFILE).  
 *
 *  Usage:
-*     beamfit ndf [mode] [beams] init1
+*     beamfit ndf [mode] { incat=?
+*                        { [beams]
+*                        { coin=?
+*                        { [beams] init1 init2-init5=?
+*                        mode
 
 *  ADAM Parameters:
 *     AMP( 2 ) = _DOUBLE (Write)
@@ -73,7 +77,7 @@
 *        than the number of beams.  If you give fewer than that the last
 *        ratio  is copied to the missing values.  The ratios would
 *        normally be negative, usually -1 or -0.5.  AMPRATIO is ignored
-*        when there is only one beam feature to fit.
+*        when there is only one beam feature to fit.  [!]
 *     BACK( 2 ) = _DOUBLE (Write)
 *        The primary beam position's background level and its error.
 *     BEAMS = _INTEGER (Read)
@@ -133,7 +137,7 @@
 *        mean 20 arcminutes, and "1:0:0" would mean 1 degree.  If the 
 *        current co-ordinate Frame is not a SKY Frame, then the widths
 *        should be specified as an increment along Axis 1 of the 
-*        current co-ordinate Frame.  Thus, if the Urrent Frame is 
+*        current co-ordinate Frame.  Thus, if the Current Frame is 
 *        PIXEL, the value should be given simply as a number of pixels.
 *
 *        Null indicates that the FWHM values are free parameters of the
@@ -283,7 +287,7 @@
 *        This finds the Gaussian coefficients of the primary beam
 *        feature in the NDF called mars_3pos, using the supplied
 *        co-ordinates (5.0,-3.5) for the initial guess for the
-*        beam;s centre.  The co-ordinates are measured in the NDF's
+*        beam's centre.  The co-ordinates are measured in the NDF's
 *        current co-ordinate Frame.  In this case they offsets in
 *        arcseconds.
 *     beamfit ndf=mars_3pos mode=interface beams=1 init1="5.0,-3.5"
@@ -322,7 +326,7 @@
 *        features have fixed offsets from the primary, measured in
 *        the current Frame of the NDF displayed.
 *     beamfit jupiter cu 2 mark=ce plotstyle='colour=red' marker=3
-*        This fits to two beam feaures in the NDF called jupiter 
+*        This fits to two beam features in the NDF called jupiter 
 *        via the graphics cursor on the current graphics device.  The
 *        beam positions are marked using a red asterisk.
 *     beamfit jupiter file 4 coin=features.dat logfile=jupiter.log
@@ -330,7 +334,7 @@
 *        initial positions are given in the text file features.dat in
 *        the current co-ordinate Frame.  Only the first four positions
 *        will be used.  A log of selected input parameter values, 
-*        and the fitted coefficents and errors is written to the text
+*        and the fitted coefficients and errors is written to the text
 *        file jupiter.log.
 *     beamfit jupiter mode=cat incat=jove
 *        This example reads the initial guess positions from the
@@ -346,20 +350,19 @@
 *     value.  Application WCSFRAME can be used to change the current
 *     co-ordinate Frame of the NDF before running this application if 
 *     required.
-*     -  In Cursor or Interface mode, only the first 200 supplied 
-*     positions will be stored in the output catalogue.  Any further
-*     positions will be displayed on the screen but not stored in the
-*     output catalogue.
 *     -  The uncertainty in the positions are estimated iteratively
 *     using the curvature matrix derived from the Jacobian, itself
 *     determined by a forward-difference approximation.
 
 *  Related Applications:
-*     KAPPA: PSF, CENTROID, CURSOR, LISTSHOW, LISTMAKE; ESP: FITGAUSS.
+*     KAPPA: PSF, CENTROID, CURSOR, LISTSHOW, LISTMAKE; ESP: GAUFIT;
+*     Figaro: FITGAUSS.
 
 *  Implementation Status:
-*     -  The processing of bad pixels and all non-complex numeric types
-*     is supported.
+*      -  Processing of bad pixels and automatic quality masking are
+*      supported.
+*      -  All non-complex numeric data types can be handled.  Arithmetic
+*      is performed using double-precision floating point.
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics and Astronomy Research 
