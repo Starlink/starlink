@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.32}
 \newcommand{\stardocnumber}    {95.32}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2007 May 18}
+\newcommand{\stardocdate}      {2007 May 23}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.7-5}
+\newcommand{\stardocversion}   {1.7-6}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -11827,6 +11827,8 @@ picture.}
  Sets a new label value for an axis within an NDF data structure.}
 \menuitem{AXUNITS}{
  Sets a new units value for an axis within an NDF data structure.}
+\menuitem{BEAMFIT}{
+ Fits beam features in a two-dimensional NDF.}
 \menuitem{BLOCK}{
  Smooths a one- or two-dimensional image using a square or rectangular box filter.}
 \menuitem{CADD}{
@@ -12824,6 +12826,8 @@ WCS component of an NDF.
 %
 \item {\large\bf Other}
 \begin{description}
+\classitem{BEAMFIT}
+ Fits beam features in a two-dimensional NDF.
 \classitem{CENTROID}
  Finds the centroids of star-like features in an NDF.
 \classitem{NORMALIZE}
@@ -14158,6 +14162,525 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
 \htmlref{SETUNITS}{SETUNITS}.
    }
 }
+
+\sstroutine{
+   BEAMFIT
+}{
+   Fits beam features in a two-dimensional NDF
+}{
+   \sstdescription{
+      This fits Gaussians to beam features within the data array of a
+      two-dimensional NDF given approximate initial co-ordinates.  It
+      uses an unconstrained least-squares minimisation using the
+      residuals and a modified Levenberg-Marquardt algorithm.  The
+      beam feature is a set of connected pixels which are either
+      above or below the surrounding background region.  The errors in
+      the fitted coefficients are also calculated.
+
+      You may apply various constraints.  These are either fixed, or
+      relative.   Fixed values include the FWHM or background level.
+      Relative constraints define the properties of secondary beam
+      features with respect to the primary (first given) feature, and
+      can specify amplitude ratios, and beam separations.
+
+      Four methods are available for obtaining the initial positions,
+      selected using parameter MODE:
+
+      \ssthitemlist{
+
+         \sstitem
+         from the parameter system (see parameter INIT);
+
+         \sstitem
+         using a graphics cursor to indicate the feature in a previously
+         displayed data array (see parameter DEVICE);
+
+         \sstitem
+         from a specified positions list (see parameter INCAT); or
+
+         \sstitem
+         from a simple text file containing a list of co-ordinates (see
+         parameter COIN).
+
+      }
+      In the first two modes the application loops, asking for new
+      feature co-ordinates until it is told to quit or encounters an
+      error or the maximum number of features is reached.  The last is
+      five, unless parameter SEPARATION defines the location of the
+      secondary beams and then only the primary beam's position is
+      demanded.
+
+      The fit coefficients and their errors are stored in results
+      parameters, which can be used to pass them coefficients on to
+      another application.  Also a lsiting of the fit may be written
+      to a log file geared more towards human readers, including details
+      of the input parameters (see parameter LOGFILE).
+   }
+   \sstusage{
+      \mbox{beamfit ndf [mode]} 
+        $\left\{ {\begin{tabular}{l}
+                  incat=? \\
+                  \mbox{[beams]} \\
+                  coin=? \\
+                  \mbox{[beams]} init1 init2-init5=?
+                  \end{tabular} }
+        \right.$ 
+        \newline\latexelsehtml{\hspace*{9.45em}}{~~~~~~~~~~~~~~~~~~}
+        \makebox[0mm][c]{\small mode}
+      
+   }
+   \sstparameters{
+      \sstsubsection{
+         AMPRATIO( ) = \_REAL (Read)
+      }{
+         If number of beam positions given by BEAMS is more than one,
+         this specifies the ratio of the amplitude of the secondary
+         beams to the primary.  Thus you should supply one fewer value
+         than the number of beams.  If you give fewer than that the last
+         ratio  is copied to the missing values.  The ratios would
+         normally be negative, usually $-1$ or $-0.5$.  AMPRATIO is ignored
+         when there is only one beam feature to fit.  {\tt [!]}
+      }
+      \sstsubsection{
+         BEAMS = \_INTEGER (Read)
+      }{
+         The number of beam positions to fit.  This will normally be 1,
+         unless a chopped observation is supplied, when there may be two
+         or three beam positions.  This parameter is ignored  for {\tt "File"}
+         and {\tt "Catalogue"} modes, where the number comes from the number
+         of beam positions read from the files; and for "Interface" mode
+         when the beam position is supplied on the command line.
+         In all modes there is a maximum of five positions, which for
+         {\tt "File"} or {\tt "Catalogue"} modes will be the first five. {\tt [1]}
+      }
+      \sstsubsection{
+         COIN =  FILENAME (Read)
+      }{
+         Name of a text file containing the initial guesses at the
+         co-ordinates of beams to be fitted.  It is only accessed if
+         parameter MODE is given the value {\tt "File"}.  Each line should
+         contain the formatted axis values for a single position, in the
+         current Frame of the NDF.  Axis values can be separated by
+         spaces, tabs or commas.  The file may contain comment lines
+         with the first character \# or !.
+      }
+      \sstsubsection{
+         DESCRIBE = LOGICAL (Read)
+      }{
+         If {\tt TRUE}, a detailed description of the co-ordinate Frame in
+         which the beam positions will be reported is displayed before
+         the positions themselves.  {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         The graphics device which is to be used to give the initial
+         guesses at the beam positions.  Only accessed if parameter
+         MODE is given the value {\tt "Cursor"}.  
+         {\tt [}Current graphics device{\tt{]}}
+      }
+      \sstsubsection{
+         FIXAMP = \_DOUBLE (Read)
+      }{
+         This specifies the fixed amplitude of the first beam.
+         Secondary sources arising from chopped data use FIXAMP
+         multiplied by the AMPRATIO.  A null value indicates that
+         the amplitude should be fitted.  {\tt [!]}
+      }
+      \sstsubsection{
+         FITAREA() = \_INTEGER (Read)
+      }{
+         Size in pixels of the fitting area to be used.  If only a
+         single value is given, then it will be duplicated to all
+         dimensions so that a square region is fitted.  Each value must
+         be greater than 9.  A null value requests that the full data
+         array is used.  {\tt [!]}
+      }
+      \sstsubsection{
+         FIXBACK = \_DOUBLE (Read)
+      }{
+         If a non-null value is supplied then the model fit will use
+         that value as the constant background level otherwise the
+         background is a free parameter of the fit.  {\tt [!]}
+      }
+      \sstsubsection{
+         FIXFWHM = LITERAL (Read)
+      }{
+         If a non-null value is supplied then the model fit will use
+         that value as the full-width half-maximum value for the beam
+         and assumes that the beam is circular.  If two values are
+         supplied then these are the fixed major- and minor-axis
+         full-width half maxima.
+
+         If the current co-ordinate Frame of the NDF is a SKY Frame
+	 (\emph{e.g.} right ascension and declination), then the value should
+	 be supplied as an increment of celestial latitude (\emph{e.g.}
+	 declination).  Thus, {\tt "5.7"} means 5.7 arcseconds, {\tt
+	 "20:0"} would mean 20 arcminutes, and {\tt "1:0:0"} would
+	 mean 1 degree.  If the current co-ordinate Frame is not a SKY
+	 Frame, then the widths should be specified as an increment
+	 along Axis 1 of the current co-ordinate Frame.  Thus, if the
+	 Current Frame is PIXEL, the value should be given simply as a
+	 number of pixels.
+
+         Null indicates that the FWHM values are free parameters of the
+         fit.  {\tt [!]}
+      }
+      \sstsubsection{
+         FIXPOS = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, the supplied position of each beam is used and
+         the centre co-ordinates of the beam are not fit.  {\tt FALSE} means
+         that the centre is to be fitted.  It is advisable not to use
+         this option in the inaccurate {\tt "Cursor"} mode.  {\tt [FALSE]}
+      }
+      \sstsubsection{
+         INCAT = FILENAME (Read)
+      }{
+         A catalogue containing a positions list giving the initial
+         guesses at the beam positions, such as produced by applications
+         CURSOR, LISTMAKE, \emph{etc.}  It is only accessed if parameter MODE
+         is given the value {\tt "Catalogue"}.
+      }
+      \sstsubsection{
+         INIT1-INIT5 = LITERAL (Read)
+      }{
+         An initial guess at the co-ordinates of the next beam to be
+         fitted, in the current co-ordinate Frame of the NDF (supplying
+         a colon {\tt ":"} will display details of the current co-ordinate
+         Frame).  The primary feature's position is given by INIT1, and
+         any secondary beams by INIT2 through INIT5, the parameter name
+         incrementing by 1 for each subsequent beam feature.  The total
+         number required is equal to the value of parameter BEAMS.
+
+         A position should be supplied as a list of formatted WCS axis
+         values separated by spaces or commas.  INIT1-INIT5 parameters
+         are only accessed if parameter MODE is given the value
+         {\tt "Interface"}.  If the initial co-ordinates are supplied on the
+         command line only one beam will be fit; otherwise the
+         application will ask for further beams that may be terminated
+         by supplying the null value ({\tt{!}}).
+      }
+      \sstsubsection{
+         LOGFILE = FILENAME (Read)
+      }{
+         Name of the text file to log the results.  If null, there
+         will be no logging.  Note this is intended for the human reader
+         and is not intended for passing to other applications.  {\tt [!]}
+      }
+      \sstsubsection{
+         MARK = LITERAL (Read)
+      }{
+          Only accessed if parameter MODE is given the value {\tt "Cursor"}.
+          It indicates which positions are to be marked on the screen
+          using the marker type given by parameter MARKER.  It can take
+          any of the following values.
+
+         \ssthitemlist{
+
+            \sstitem
+             {\tt "Initial"} -- The position of the cursor when the mouse
+            button is pressed is marked.
+
+            \sstitem
+             {\tt "Fit"} -- The corresponding fit position is marked.
+
+            \sstitem
+             {\tt "None"} -- No positions are marked.
+
+         }
+          {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         MARKER = INTEGER (Read)
+      }{
+         This parameter is only accessed if parameter MARK is set {\tt TRUE}.
+         It specifies the type of marker with which each cursor
+         position should be marked, and should be given as an integer
+         PGPLOT marker type.  For instance, {\tt 0} gives a box, {\tt 1} gives a
+         dot, {\tt 2} gives a cross, {\tt 3} gives an asterisk, {\tt 7} gives a triangle.
+         The value must be larger than or equal to $-31$.  {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         MODE = \htmlref{LITERAL}{se:parmenu} (Read)
+      }{
+         The mode in which the initial co-ordinates are to be obtained.
+         The supplied string can be one of the following values.
+
+         \ssthitemlist{
+
+            \sstitem
+            {\tt "Interface"} -- positions are obtained using parameter INIT.
+
+            \sstitem
+            {\tt "Cursor"} -- positions are obtained using the graphics cursor
+            of the device specified by parameter DEVICE.
+
+            \sstitem
+            {\tt "Catalogue"} -- positions are obtained from a positions list
+            using parameter INCAT.
+
+            \sstitem
+            {\tt "File"} -- positions are obtained from a text file using
+            parameter COIN.
+            {\tt [}current value{\tt{]}}
+         }
+      }
+      \sstsubsection{
+         NDF = NDF (Read)
+      }{
+         The NDF structure containing the data array to be analysed.  In
+         cursor mode (see parameter MODE), the run-time default is the
+         displayed data, as recorded in the graphics database.  In other
+         modes, there is no run-time default and the user must supply a
+         value.   {\tt []}
+      }
+      \sstsubsection{
+         PLOTSTYLE = LITERAL (Read)
+      }{
+         A group of attribute settings describing the style to use when
+         drawing the graphics markers specified by parameter MARK.
+
+         A comma-separated list of strings should be given in which each
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
+
+         Each individual attribute setting should be of the form:
+
+            $<$name$>$=$<$value$>$
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will
+         be used for any unspecified attributes.  All attributes will be
+         defaulted if a null value ({\tt{!}}) is supplied.  See section
+         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr} 
+         for a description of the available attributes.  Any unrecognised 
+         attributes are ignored (no error is reported).  {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         QUIET = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE} then the fit parameters are not displayed on the
+         screen.  Output parameters and files are still created.
+         {\tt [FALSE]}
+      }
+      \sstsubsection{
+         SEP1-SEP4 = LITERAL (Read)
+      }{
+         If number of beam positions given by BEAMS is more than one,
+         each parameter specifies fixed separations along each axis
+         of a secondary beam position to that of the primary.  Thus you
+         should supply one fewer offset pairs than the number of beam
+         positions via these parameters.  SEP1 applies to the first
+         secondary beam, SEP2 is for the second secondary beam, and so
+         on.
+
+         Each distance should be given as a single literal string
+         containing a space- or comma-separated list of axis values
+         measured in the current co-ordinate Frame of the NDF.  The
+         allowed formats depends on the class of the current Frame.
+         Supplying a single colon {\tt ":"} will display details of the
+         current Frame, together with an indication of the format
+         required for each axis value, and a new parameter value is then
+         obtained.
+
+         A null value means fit to all beam positions.  {\tt [!]}
+      }
+      \sstsubsection{
+         VARIANCE = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, then any VARIANCE component present within the input
+         NDF will be used to weight the fit; the weight used for each
+         data value is the reciprocal of the variance.  If set to {\tt FALSE}
+         or there is no VARIANCE present, all points will be given equal
+         weight.  {\tt [FALSE]}
+      }
+   }
+   \sstresparameters{
+      \sstsubsection{
+         AMP( 2 ) = \_DOUBLE (Write)
+      }{
+         The primary beam position's amplitude and its error.
+      }
+      \sstsubsection{
+         BACK( 2 ) = \_DOUBLE (Write)
+      }{
+         The primary beam position's background level and its error.
+      }
+      \sstsubsection{
+         CENTRE( 2 ) = LITERAL (Write)
+      }{
+         The formatted co-ordinates and their errors of the primary
+         beam in the current co-ordinate Frame of the NDF.
+      }
+      \sstsubsection{
+         MAJFWHM( 2 ) = \_DOUBLE (Write)
+      }{
+         The primary beam position's major-axis FWHM and its error,
+         measured in the current co-ordinate Frame of the NDF.
+      }
+      \sstsubsection{
+         MINFWHM( 2 ) = \_DOUBLE (Write)
+      }{
+         The primary beam position's minor-axis FWHM and its error,
+         measured in the current co-ordinate Frame of the NDF.
+      }
+      \sstsubsection{
+         ORIENT( 2 ) = \_DOUBLE (Write)
+      }{
+         The primary beam position's orientation and its error, measured
+         in degrees.  If the current WCS frame is a SKY Frame, the angle
+         is measured from North through East.  For other Frames the
+         angle is from the $X$-axis through $Y$.
+      }
+      \sstsubsection{
+         RMS = \_DOUBLE (Write)
+      }{
+         The primary beam position's root mean-squared deviation from
+         the fit.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         beamfit mars\_3pos i 1 "5.0,-3.5"
+      }{
+         This finds the Gaussian coefficients of the primary beam
+         feature in the NDF called mars\_3pos, using the supplied
+         co-ordinates (5.0,$-$3.5) for the initial guess for the
+         beam's centre.  The co-ordinates are measured in the NDF's
+         current co-ordinate Frame.  In this case they offsets in
+         arcseconds.
+      }
+      \sstexamplesubsection{
+         beamfit ndf=mars\_3pos mode=interface beams=1 init1="5.0,-3.5" fixback=0
+      }{
+         As above but now the background is fixed to be zero.
+      }
+      \sstexamplesubsection{
+         beamfit ndf=mars\_3pos mode=interface beams=1 fixfwhm=16.5
+      }{
+         As above but now the Gaussian is constrained to have
+         a FWHM of 16.5 arcseconds and be circular.
+      }
+      \sstexamplesubsection{
+         beamfit mars\_3pos in beams=1 fixfwhm=16.5 fitarea=51
+      }{
+         As above but now the fitted data is restricted to areas
+         51$\times$51 pixels about the initial guess positions.  All
+         the other examples use the full array.
+      }
+      \sstexamplesubsection{
+         beamfit mars\_3pos int 3 "5.0,-3.5" ampratio=-0.5
+      }{
+         As the first example except this finds the Gaussian
+         coefficients of the primary beam feature and two secondary
+         features.  The secondary features have fixed amplitudes that
+         are half that of the primary feature and of the opposite
+         polarity.
+      }
+      \sstexamplesubsection{
+         beamfit mars\_3pos int 2 "5.0,-3.5" sep1=-60.5,0.6" fixpos
+      }{
+         This finds the Gaussian coefficients of the primary beam
+         feature and a secondary feature in the NDF called mars\_3pos.
+         The supplied co-ordinates (5.0,$-$3.5) define the centre, \emph{i.e.}
+         they are not fitted.  Also the secondary beam is fixed at
+         ($-$55.5,$-$2.9).
+      }
+      \sstexamplesubsection{
+         beamfit mode=cu beams=1
+      }{
+         This finds the Gaussian coefficients of the primary beam
+         feature of an NDF, using the graphics cursor on the current
+         graphics device to indicate the approximate centre of the
+         feature.  The NDF being analysed comes from the graphics
+         database.
+      }
+      \sstexamplesubsection{
+         beamfit mode=cu beams=3 sep1="-60.5,0.6" sep2="59.5,-1.7"
+      }{
+         This is like the previous example except it finds the Gaussian
+         coefficients of the primary beam feature and two secondary
+         features in an NDF.  The graphics cursor indicates the
+         approximate centre of the primary feature.  The secondary
+         features have fixed offsets from the primary, measured in
+         the current Frame of the NDF displayed.
+      }
+      \sstexamplesubsection{
+         beamfit jupiter cu 2 mark=ce plotstyle='colour=red' marker=3
+      }{
+         This fits to two beam features in the NDF called jupiter
+         via the graphics cursor on the current graphics device.  The
+         beam positions are marked using a red asterisk.
+      }
+      \sstexamplesubsection{
+         beamfit jupiter file 4 coin=features.dat logfile=jupiter.log
+      }{
+         This fits to the beam features in the NDF called jupiter.  The
+         initial positions are given in the text file {\tt features.dat} in
+         the current co-ordinate Frame.  Only the first four positions
+         will be used.  A log of selected input parameter values,
+         and the fitted coefficients and errors is written to the text
+         file {\tt jupiter.log}.
+      }
+      \sstexamplesubsection{
+         beamfit jupiter mode=cat incat=jove
+      }{
+         This example reads the initial guess positions from the
+         positions list in file {\tt jove.FIT}.  The number of beam
+         features fit is the number of positions in the catalogue
+         subject to a maximum of five.  The input file may, for
+         instance, have been created using the application CURSOR.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         All positions are supplied and reported in the current
+	 co-ordinate Frame of the NDF.  A description of the
+	 co-ordinate Frame being used is given if parameter DESCRIBE
+	 is set to a {\tt TRUE} value.  Application
+	 \htmlref{WCSFRAME}{WCSFRAME} can be used to change the
+	 current co-ordinate Frame of the NDF before running this
+	 application if required.
+
+         \sstitem
+         The uncertainty in the positions are estimated iteratively
+         using the curvature matrix derived from the Jacobian, itself
+         determined by a forward-difference approximation.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: \htmlref{PSF}{PSF},
+      \htmlref{CENTROID}{CENTROID},
+      \htmlref{CURSOR}{CURSOR},
+      \htmlref{LISTSHOW}{LISTSHOW},
+      \htmlref{LISTMAKE}{LISTMAKE};
+      \xref{ESP}{sun180}{}: \xref{GAUFIT}{sun180}{GAUFIT};
+      \xref{FIGARO}{sun86}{}: \xref{FITGAUSS}{sun86}{FITGAUSS}.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         Processing of \htmlref{bad pixels}{se:masking} and automatic 
+         \htmlref{quality masking}{se:qualitymask} are supported.
+
+         \sstitem
+         All  \htmlref{non-complex numeric data types}{ap:HDStypes} can be handled.  Arithmetic
+         is performed using double-precision floating point.
+      }
+   }
+}
+
 \sstroutine{
    BLOCK
 }{
@@ -51795,6 +52318,19 @@ The following applications have been modified:
 
 \section{\xlabel{se_changes}Release Notes---V1.7\label{se:changes}}
 
+\subsection{New Commands}
+The following new applications have been added:
+
+\begin{description}
+   \item [\htmlref{BEAMFIT}{BEAMFIT}] \mbox{}
+   This fits up to five Gaussians to beam features in a two-dimensional 
+   NDF, given initial co-ordinates defined in one of four modes.
+   Various fixed and relative constraints may be placed.  It reports
+   the coefficients and associated errors to the terminal, an optional
+   logfile, and to \htmlref{results parameters}{se:parout}.
+
+\end{description}
+
 \subsection{Modified Commands}
 The following applications have been modified:
 
@@ -52506,6 +53042,8 @@ functions as follows.
 %
 \item {\large\bf Other}
 \begin{description}
+\classitem{BEAMFIT}
+ Fits beam features in a two-dimensional NDF.
 \classitem{CENTROID}
  Finds the centroids of star-like features in an NDF.
 \classitem{NORMALIZE}
