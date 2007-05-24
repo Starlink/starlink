@@ -10,7 +10,9 @@ F_ROUTINES = cnthlt.f curre.f ftsize.f ftsizt.f getv2.f hstdsp.f \
 hstlo.f hstrep.f imlst.f inpol.f inre.f inva.f kps1_agnch.f \
 kps1_agncm.f kps1_agncp.f kps1_agndl.f kps1_agndr.f kps1_agndw.f \
 kps1_agnls.f kps1_agnms.f kps1_agnst.f kps1_agnwc.f kps1_bafid.f \
-kps1_bafir.f kps1_ccmpp.f kps1_ccmqn.f kps1_cenab.f kps1_cenad.f \
+kps1_bafir.f kps1_bfcrf.f kps1_bffil.f kps1_bffn.f  kps1_bfft.f  \
+kps1_bfftg.f kps1_bfhd.f  kps1_bfint.f kps1_bflog.f kps1_bfop.f \
+kps1_ccmpp.f kps1_ccmqn.f kps1_cenab.f kps1_cenad.f \
 kps1_cenai.f kps1_cenar.f kps1_cenaub.f kps1_cenauw.f kps1_cenaw.f \
 kps1_cenbt.f kps1_cenhd.f kps1_censg.f kps1_censh.f kps1_cff2d.f \
 kps1_cff2r.f kps1_chsha.f kps1_clnsr.f kps1_clpa0.f kps1_clpal.f \
@@ -68,6 +70,12 @@ kps1_zprguw.f kps1_zprgw.f linplt.f listsb.f lsfun1.f med3d.f medwts.f \
 medwv.f shifts.f shiftx.f shifty.f statv.f thrsr.f kps1_lmkgd.f \
 kps1_grdsc.f
 
+# This is more ffor comment as Fortrtran dependencies aren't supported.
+kps1_bffil.o: BF_PAR BF_COM
+kps1_bffn.o: BF_PAR BF_COM
+kps1_bfft.o: BF_PAR BF_COM
+kps1_bfftg.o: BF_PAR BF_COM
+kps1_bfint.o: BF_PAR BF_COM
 
 C_ROUTINES = kps1_luted.c
 
@@ -123,6 +131,6 @@ MAINTAINERCLEANFILES = $(GEN_F_ROUTINES)
 
 AM_FCFLAGS = @TCL_CFLAGS@ @TK_CFLAGS@
 
-PRIVATE_INCLUDES = SFT_COM C1_COM
+PRIVATE_INCLUDES = BF_PAR BF_COM SFT_COM C1_COM
 
 EXTRA_DIST = $(PRIVATE_INCLUDES)
