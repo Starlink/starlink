@@ -1113,13 +1113,16 @@ itcl::class gaia::GaiaCubeSpectrum {
          set icx [expr 0.5+0.5*[$rtdimage_ width]]
          set icy [expr 0.5+0.5*[$rtdimage_ height]]
 
-         #  Distances from image centre, in degrees, if a celestial coordinate
-         #  system. Fails for non-celestial coords.
+         #  Offsets from the image centre (not distances). This needs
+         #  the positions in degrees which are then offset along each
+         #  of the sky axes.
          catch {
-            $rtdimage_ convert dist [expr $iix-$icx] [expr $iiy-$icy] \
-               image dra ddec deg
+            $rtdimage_ convert coords $icx $icy image cra cdec deg
+            $rtdimage_ convert coords $iix $iiy image pra pdec deg
+            set dra [angdiff_ $pra $cra]
+            set ddec [angdiff_ $pdec $cdec]
 
-            #  Distance from centre, arcsecs.
+            #  Offset from centre, arcsecs.
             set dra [format "%f" [expr $dra*3600.0]]
             set ddec [format "%f" [expr $ddec*3600.0]]
          } msg
@@ -1149,9 +1152,11 @@ itcl::class gaia::GaiaCubeSpectrum {
                #  Convert into an image position.
                $rtdimage_ convert coords $rra $rdec "deg J2000" rx ry image
 
-               #  And get the distance.
-               $rtdimage_ convert dist [expr $iix-$rx] [expr $iiy-$ry] \
-                  image drefra drefdec deg
+               #  Derive offsets along sky axes.
+               $rtdimage_ convert coords $rx $ry image cra cdec deg
+               $rtdimage_ convert coords $iix $iiy image pra pdec deg
+               set drefra [angdiff_ $pra $cra]
+               set drefdec [angdiff_ $pdec $cdec]
 
                set drefra [format "%f" [expr $drefra*3600.0]]
                set drefdec [format "%f" [expr $drefdec*3600.0]]
@@ -1217,6 +1222,18 @@ itcl::class gaia::GaiaCubeSpectrum {
          $spectrum_ configure -data_high $itk_option(-data_high) \
                               -data_low $itk_option(-data_low)
       }
+   }
+
+   #  Difference between two angles normalised into the range +/- 180.
+   protected method angdiff_ {a1 a2} {
+      set ang [expr $a1-$a2]
+      set diff [expr fmod($ang,360.0)]
+      if { $diff >= 180.0 } {
+         set diff [expr $diff-360.0]
+      } elseif { $diff <= -180.0 } {
+         set diff [expr $diff+360.0]
+      }
+      return $diff
    }
 
    #  Configuration options: (public variables)
