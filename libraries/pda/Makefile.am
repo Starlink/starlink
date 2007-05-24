@@ -83,7 +83,7 @@ pda_qdrtg.f pda_stopx.f pda_vscopy.f pda_dupdu.f pda_lsqrt.f 	       \
 pda_qdrtgh.f pda_sumit.f pda_vvmulp.f pda_gqtst.f pda_lsvmin.f 	       \
 pda_reldst.f pda_sumsl.f pda_wzbfgs.f pda_humit.f pda_ltvmul.f 	       \
 pda_rmdcon.f pda_humsl.f pda_lupdat.f pda_sgrad2.f pda_v2norm.f	       \
-pda_assst.f
+pda_assst.f pda_lmerr.f
 
 C_ROUTINES = pda.c pdaD1mach.c
 
