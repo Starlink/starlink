@@ -1,0 +1,125 @@
+*+
+*  Name:
+*     BF_COM
+
+*  Purpose:
+*     Defines the common blocks used by the BEAMFIT application.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     COMMON-block include file.
+
+*  Description:
+*     This file defines the COMMON blocks used by the BEAMFIT task.
+*     It's needed to pass additional information through to routines 
+*     accessed from a PDA fitting routine that in turn invokes a
+*     function-evaluation routine with a fixed API.
+
+*  Notes:
+*     -  BF_PAR must be included in routines that access the BEAMFIT
+*     common block.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Copyright:
+*     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2007 January 25 (MJC):
+*        Original version.
+*     2007 April 25 (MJC):
+*        Split into two include files.  Added RATIOC and ARATIO.
+*     2007 May 14 (MJC):
+*        Added SEPARC and PIXOFF.
+*     {enter_changes_here}
+
+*-
+
+*  Common block /BF1_COM/
+*
+*        PC( BF__NCOEF, BF__MXPOS ) = DOUBLE PRECISION 
+*           The initial-guess parameter values, including any fixed
+*           values supplied by the user.
+*        PIXOFF( BF__MXPOS - 1, BF__NDIM ) = DOUBLE PRECISION
+*           The pixel offsets of the secondary beam positions with
+*           respect to the primary beam position.  
+*        ARATIO( BF__MXPOS - 1 ) = DOUBLE PRECISION
+*           The amplitude ratios of the secondary to the primary beam
+*           positions.
+*        USEVAR = LOGICAL
+*           Whether or not to use variance to weight the fit.
+*        NBEAMS = INTEGER
+*           The number of beams to fit.
+
+      DOUBLE PRECISION PC( BF__NCOEF, BF__MXPOS )
+      DOUBLE PRECISION ARATIO( BF__MXPOS - 1 )
+      DOUBLE PRECISION PIXOFF( BF__MXPOS - 1, BF__NDIM )
+      LOGICAL USEVAR
+      INTEGER NBEAMS
+
+*  Common block /BF2_COM/
+*
+*        IPWD = INTEGER
+*           Pointer to work space for data values
+*        IPWV = INTEGER
+*           Pointer to work space for variance values
+*        LBND( BF__NDIM ) = INTEGER
+*           Lower pixel bounds of the data and variance arrays.
+*        UBND( BF__NDIM ) = INTEGER
+*           Upper pixel bounds of the data and variance arrays.
+*        AMPC = LOGICAL
+*           Amplitude fixed by user?
+*        BACKC = LOGICAL
+*           Background level fixed by the user?
+*        FWHMC = LOGICAL
+*           FWHM of the Gaussian fixed by the user?
+*        POSC = LOGICAL
+*           Position co-ordinates fixed?
+*        RATIOC = LOGICAL 
+*           Amplitude ratios fixed by the user?
+*        SEPARC = LOGICAL
+*           Are the separations fixed by the user?
+*        ISTAT = INTEGER
+*           Local status value
+
+      INTEGER IPWD               ! Pointer to work space for data
+                                 ! values
+      INTEGER IPWV               ! Pointer to work space for variance 
+                                 ! values
+      INTEGER LBND( BF__NDIM )   ! Lower pixel bounds of the data and
+                                 ! variance arrays
+      INTEGER UBND( BF__NDIM )   ! Upper pixel bounds of the data and
+                                 ! variance arrays
+      LOGICAL AMPC               ! Amplitude fixed by user?
+      LOGICAL BACKC              ! Background level fixed by user?
+      LOGICAL FWHMC              ! FWHM of the Gaussian fixed by user?
+      LOGICAL ORIC               ! Position co-ordinates fixed?
+      LOGICAL POSC               ! Position co-ordinates fixed?
+      LOGICAL RATIOC             ! Amplitude ratios fixed by user?
+      LOGICAL SEPARC             ! Separations fixed by user?
+      INTEGER ISTAT              ! Local status value
+
+      COMMON /BF1_COM/ PC, PIXOFF, ARATIO, USEVAR, NBEAMS
+      COMMON /BF2_COM/ IPWD, IPWV, LBND, UBND, AMPC, BACKC, FWHMC,
+     :                 ORIC, POSC, RATIOC, SEPARC, ISTAT

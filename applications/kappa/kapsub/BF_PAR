@@ -1,0 +1,69 @@
+*+
+*  Name:
+*     BF_PAR
+
+*  Purpose:
+*     Defines BEAMFIT system parameter constants.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global constants include file.
+
+*  Description:
+*     This file defines the size of any BEAMFIT global constants.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Copyright:
+*     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2007 March 30 (MJC):
+*        Original version.
+*     2007 May 11 (MJC):
+*        Add number of constraints.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global Constants:
+
+*  Maximum number of beam positions to fit simultaneously
+      INTEGER BF__MXPOS
+      PARAMETER ( BF__MXPOS = 5 )
+
+*  Maximum number of constraints
+      INTEGER BF__NCON
+      PARAMETER ( BF__NCON = 6 )
+
+*  Number of fit coefficients per beam
+      INTEGER BF__NCOEF
+      PARAMETER ( BF__NCOEF = 7 )
+
+*  Dimensionality of the data to be fitted
+      INTEGER BF__NDIM
+      PARAMETER ( BF__NDIM = 2 )
