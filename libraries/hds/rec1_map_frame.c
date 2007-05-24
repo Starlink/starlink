@@ -309,7 +309,7 @@ access in file ^FILE - ^MESSAGE.",
 /* can attempt to recover from the error.)				    */
             if ( !( systat & STS$M_SUCCESS ) )
             {
-	       ems_mark_c( );
+	       emsMark( );
                hds_gl_status = DAT__FILMP;
                dat1emsSetBigi( "START", bloc );
 	       dat1emsSetBigi( "END", bloc + nbloc - 1 );
@@ -340,7 +340,7 @@ access in file ^FILE - ^MESSAGE.",
 /* error and carry on.							    */
                if ( systat & STS$M_SUCCESS )
 	       {
-		  ems_annul_c( &hds_gl_status );
+		  emsAnnul( &hds_gl_status );
 
 /* Map the required blocks of the file into the allocated range of	    */
 /* addresses. (Note this deletes the previous mapping of these addresses to */
@@ -372,7 +372,7 @@ access in file ^FILE - ^MESSAGE.",
 	       }
 
 /* End deferral of error messages.					    */
-	       ems_rlse_c( );
+	       emsRlse( );
 	    }
             
 /* If the file has been mapped successfully to a range of addresses not	    */

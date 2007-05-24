@@ -119,7 +119,7 @@
          if ( offset + length > rcl.dlen )
          {
             hds_gl_status = DAT__INCHK;
-            ems_seti_c( "DLEN", rcl.dlen );
+            emsSeti( "DLEN", rcl.dlen );
             rec1_fmsg( "FILE", han->slot );
             emsRep( "REC_LOCATE_DATA_1",
                        "Requested data extends beyond the end of the record; \

@@ -238,7 +238,7 @@ datMap(const HDSLoc    *locator,
 /* If conversion errors occurred, then report contextual information.        */
    if ( hds_gl_status == DAT__CONER )
    {
-      ems_seti_c( "NBAD", nbad );
+      emsSeti( "NBAD", nbad );
       emsRep( "DAT_MAP_2",
                  "A total of ^NBAD data conversion error(s) occurred.",
       &hds_gl_status );

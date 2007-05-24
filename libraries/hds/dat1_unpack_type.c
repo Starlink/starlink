@@ -188,7 +188,7 @@
                {
                   hds_gl_status = DAT__TYPIN;
                   emsSetnc( "TYPE", ptype, DAT__SZTYP );
-                  ems_seti_c( "MXCHR", DAT__MXCHR );
+                  emsSeti( "MXCHR", DAT__MXCHR );
                   emsRep( "DAT1_UNPACK_TYPE_1",
                              "Invalid length encountered in the character \
 type specification \'^TYPE\'; this should be in the range 1 to ^MXCHR \

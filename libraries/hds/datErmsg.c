@@ -82,7 +82,7 @@ datErmsg(int  status,
 *     8-APR-1991 (RFWS):
 *        Improved prologue.
 *     13-MAY-1991 (RFWS):
-*        Added calls to ems_mark_c and ems_rlse_c to prevent use of ems_
+*        Added calls to emsMark and emsRlse to prevent use of ems_
 *        routines from affecting any previously defined message tokens.
 *     9-JAN-1992 (RFWS):
 *        Updated error message for DAT__NOMEM status.

@@ -604,7 +604,7 @@ datValid(const HDSLoc *locator,
    Defer error reporting. Import the locator and set the flag
    appropriately.
 */
-   ems_mark_c( );
+   emsMark( );
 
    dat1_import_loc(locator, &lcp );
    *valid = ( lcp != NULL ? TRUE : FALSE );
@@ -612,8 +612,8 @@ datValid(const HDSLoc *locator,
 /*
    Annul any errors and end the error context.
 */
-   ems_annul_c( &hds_gl_status );
-   ems_rlse_c( );
+   emsAnnul( &hds_gl_status );
+   emsRlse( );
 
 /*
    Return the status value.

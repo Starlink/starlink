@@ -101,7 +101,7 @@
             {
                hds_gl_status = DAT__TYPIN;
                emsSetnc( "TYPE", txt, type->length );
-               ems_seti_c( "SZTYP", DAT__SZTYP );
+               emsSeti( "SZTYP", DAT__SZTYP );
                emsRep( "DAU_CHECK_TYPE_1",
                           "Invalid type string \'^TYPE\' specified; more than \
 ^SZTYP characters long (possible programming error).",
@@ -114,8 +114,8 @@
             {
                hds_gl_status = DAT__TYPIN;
                emsSetnc( "TYPE", txt, type->length );
-               ems_seti_c( "CODE", (int) txt[ i ] );
-               ems_seti_c( "POSN", i + 1 );
+               emsSeti( "CODE", (int) txt[ i ] );
+               emsSeti( "POSN", i + 1 );
                emsRep( "DAU_CHECK_TYPE_2",
                           "Invalid type string \'^TYPE\' specified; contains \
 illegal character (code=^CODE decimal) at position ^POSN (possible \
@@ -261,7 +261,7 @@ error).",
                   {
                      hds_gl_status = DAT__TYPIN;
                      emsSetnc( "TYPE", txt, type->length );
-                     ems_seti_c( "MXCHR", DAT__MXCHR );
+                     emsSeti( "MXCHR", DAT__MXCHR );
                      emsRep( "DAT1_CHECK_TYPE_5",
                                 "Invalid length encountered in the character \
 type specification \'^TYPE\'; should be in the range 1 to ^MXCHR (possible \

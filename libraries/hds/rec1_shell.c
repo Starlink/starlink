@@ -451,7 +451,7 @@ extern char **environ;           /* Pointer to environment array            */
          {
             hds_gl_status = DAT__FATAL;
             emsSyser( "MESSAGE", errno );
-            ems_seti_c( "FD", (INT) pipein[ 1 ] );
+            emsSeti( "FD", (INT) pipein[ 1 ] );
             emsRep( "REC1_SHELL_6",
                        "Error associating a stream with file descriptor ^FD "
                        "for writing to a shell prrocess - ^MESSAGE",
@@ -467,7 +467,7 @@ extern char **environ;           /* Pointer to environment array            */
          {
             hds_gl_status = DAT__FATAL;
             emsSyser( "MESSAGE", errno );
-            ems_seti_c( "FD", (INT) pipeout[ 0 ] );
+            emsSeti( "FD", (INT) pipeout[ 0 ] );
             emsRep( "REC1_SHELL_7",
                        "Error associating a stream with file descriptor ^FD "
                        "for reading from a shell prrocess - ^MESSAGE",

@@ -92,7 +92,7 @@
       {
          hds_gl_status = DAT__NOMEM;
          emsSyser( "MESSAGE", errno );
-         ems_seti_c( "NBYTES", size );
+         emsSeti( "NBYTES", size );
          emsRep( "REC_REALL_MEM_1",
                     "Unable to obtain a block of ^NBYTES bytes of memory - \
 ^MESSAGE",

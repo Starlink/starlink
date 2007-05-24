@@ -227,7 +227,7 @@ the specification \'^FSPEC\'.",
 /* Otherwise, mark the error stack and attempt to open the file.            */
             else
             {
-               ems_mark_c( );
+               emsMark( );
                rec_attach_file( 0, fname, fname_len, 'O', mode_c, &rcl, &han );
 
 /* If the file could not be opened for acceptable reasons, then annul the   */
@@ -235,8 +235,8 @@ the specification \'^FSPEC\'.",
                if ( ( hds_gl_status == DAT__FILIN ) || /* Not an HDS file   */
                     ( hds_gl_status == DAT__FILPR ) )  /* File protected    */
                {
-                  ems_annul_c( &hds_gl_status );
-                  ems_rlse_c( );
+                  emsAnnul( &hds_gl_status );
+                  emsRlse( );
                   again = 1;
                }
 
@@ -244,7 +244,7 @@ the specification \'^FSPEC\'.",
 /* and initialise the returned locator.                                     */
                else
                {
-                  ems_rlse_c( );
+                  emsRlse( );
                   dat1_alloc_lcp(locator, &lcp );
                   if ( _ok( hds_gl_status ) )
                   {

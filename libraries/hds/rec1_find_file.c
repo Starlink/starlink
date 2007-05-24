@@ -292,7 +292,7 @@ void rec1_find_file( void ){};	 /* This routine not used on VMS systems */
 	 else
 	 {
 	    hds_gl_status = DAT__FATAL;
-	    ems_seti_c( "SHELL", hds_gl_shell );
+	    emsSeti( "SHELL", hds_gl_shell );
 	    emsRep( "REC_FIND_FILE_1",
 	               "Invalid UNIX shell (no. ^SHELL) specified; this shell \
 is not properly supported within HDS (internal programming error).",

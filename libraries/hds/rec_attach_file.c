@@ -225,8 +225,8 @@ file.",
                      {
                          hds_gl_status = DAT__VERMM;
                          rec1_fmsg( "FILE", slot );
-                         ems_seti_c( "VFILE", hcb->version );
-                         ems_seti_c( "VSOFT", REC__VERSION4 );
+                         emsSeti( "VFILE", hcb->version );
+                         emsSeti( "VSOFT", REC__VERSION4 );
                          emsRep( "REC_ATTACH_FILE_2",
                                     "HDS file format version mismatch in file ^FILE \
 - file version=^VFILE, software version=^VSOFT (possible re-link needed).",

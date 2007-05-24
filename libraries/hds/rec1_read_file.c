@@ -193,8 +193,8 @@ argument of ^BLOC for file ^FILE (internal programming error).",
             if ( !( systat & STS$M_SUCCESS ) )
             {
                hds_gl_status = DAT__FILRD;
-               ems_seti_c( "FIRST", bloc0 );
-               ems_seti_c( "LAST", bloc0 + size0 - 1 );
+               emsSeti( "FIRST", bloc0 );
+               emsSeti( "LAST", bloc0 + size0 - 1 );
                rec1_fmsg( "FILE", slot );
                emsSyser( "MESSAGE", systat );
                emsRep( "REC1_READ_FILE_2",
