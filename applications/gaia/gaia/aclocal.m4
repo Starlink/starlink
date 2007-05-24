@@ -91,10 +91,19 @@ gaia_includes="-I. -I${srcdir}/generic -I${srcdir}/bitmaps -I${prefix}/include/s
 tclsources=`cd ${srcdir}; echo library/*.tcl library/*.itk library/*.xpm library/skycat2.0.cfg`
 
 ]) 
-# GAIA_CONFIG
+#  GAIA_CONFIG
 
 
 AC_DEFUN(GAIA_COMPILER_TESTS, [
+
+#  Tests that require the full compiler setup, including CFLAGS.
+
+#  Some compiler flags are set by tcl.m4, but are protected to survive
+#  unexpanded into Makefile, work around that (tcl.4m should not be handling
+#  CFLAGS at all, it should stick to another name and merge that in the
+#  Makefile, CFLAGS are for users, not systems).  
+old_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS_DEFAULT $SHLIB_CFLAGS $CFLAGS_WARNING"
 
 # -----------------------------------------------------------------------
 # 	Check if we need (or can use) the socklen_t type.
@@ -139,8 +148,8 @@ case $system in
   ;;
 esac
 
-# Fortran support. Also need Starlink installation and FCFLAGS, so 
-# have included "starconf.m4" (see top).
+#  Fortran support. Also need Starlink installation and FCFLAGS, so 
+#  have included "starconf.m4" (see top).
 STAR_DEFAULTS
 STAR_CNF_COMPATIBLE_SYMBOLS
 STAR_PRM_COMPATIBLE_SYMBOLS
@@ -168,15 +177,21 @@ AC_FC_LIBRARY_LDFLAGS
 LIBS=$old_LIBS
 
 #  One platform check. Solaris 8 includes libcx, which isn't required and
-#  causes issues with shareable libraries (when not linked with FC).
+#  causes issues with shareable libraries (when not linked with FC). Strip
+#  that out.        
 FCLIBS=`echo $FCLIBS | sed 's:-lcx::g'`
-echo "FCLIBS = $FCLIBS"
 
 STAR_LARGEFILE_SUPPORT
 
-# GAIA needs several Starlink libraries for linking.
-PKG_LIBS="${PKG_LIBS} ${STAR_LDFLAGS} `atl_link` `ard_link -myerr -mygrf` \
+#  GAIA needs several Starlink libraries for linking. Use -latl instead
+#  of atl_link to avoid picking up two versions of cfitsio (skycat and
+#  starlink). 
+PKG_LIBS="${PKG_LIBS} ${STAR_LDFLAGS} -latl `ard_link -myerr -mygrf` \
 `fio_link` -L${STARLINK}/lib/startcl -ltclAdam `ams_link_adam` \
 `ndf_link -myerr -mygrf` -lpda `ast_link -myerr` `sla_link`"
 
+#  Restore full tcl.m4 CFLAGS.
+CFLAGS="$old_CFLAGS"
+
 ])
+#  GAIA_COMPILER_TESTS
