@@ -271,8 +271,8 @@
             if ( !( systat & STS$M_SUCCESS ) )
             {
                hds_gl_status = DAT__FILMP;
-               emsSeti( "START", bloc );
-	       emsSeti( "END", bloc + nbloc - 1 );
+               dat1emsSetBigi( "START", bloc );
+	       dat1emsSetBigi( "END", bloc + nbloc - 1 );
 	       emsSetnc( "ACCESS", &mode, 1 );
 	       rec1_fmsg( "FILE", slot );
                emsSyser( "MESSAGE", systat );
@@ -311,8 +311,8 @@ access in file ^FILE - ^MESSAGE.",
             {
 	       ems_mark_c( );
                hds_gl_status = DAT__FILMP;
-               emsSeti( "START", bloc );
-	       emsSeti( "END", bloc + nbloc - 1 );
+               dat1emsSetBigi( "START", bloc );
+	       dat1emsSetBigi( "END", bloc + nbloc - 1 );
 	       emsSetnc( "ACCESS", &mode, 1 );
 	       rec1_fmsg( "FILE", slot );
                emsSyser( "MESSAGE", systat );
@@ -353,8 +353,8 @@ access in file ^FILE - ^MESSAGE.",
                   if ( !( systat & STS$M_SUCCESS ) )
                   {
                      hds_gl_status = DAT__FILMP;
-                     emsSeti( "START", bloc );
-	             emsSeti( "END", bloc + nbloc - 1 );
+                     dat1emsSetBigi( "START", bloc );
+	             dat1emsSetBigi( "END", bloc + nbloc - 1 );
 	             emsSetnc( "ACCESS", &mode, 1 );
 	             rec1_fmsg( "FILE", slot );
                      emsSyser( "MESSAGE", systat );
