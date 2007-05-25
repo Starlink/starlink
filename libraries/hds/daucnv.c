@@ -49,6 +49,9 @@ int dat1_cvt_dtype( bad, nval, imp, exp, nbad )
  * History:
  *    2007-03-08 (TIMJ):
  *       Use full precision for _DOUBLE to _CHAR conversion.
+ *    2007-05-24 (TIMJ):
+ *       Write an informative DAT__TRUNC error message including any input string
+ *       that has been truncated.
 
  *-
  */
@@ -1008,7 +1011,14 @@ int dat1_cvt_dtype( bad, nval, imp, exp, nbad )
    } else if (hds_gl_status == DAT__TRUNC) {
      emsSeti( "SLEN", (int)(imp->length) );
      emsSeti( "DLEN", (int)(exp->length) );
-     emsRep(" ","Truncation during copy (^DLEN < ^SLEN)",
+     /* If we are converting a string tell people the string in the error message */
+     if (imp->dtype == DAT__C) {
+       emsSetnc( "STR", (_CHAR *)imp->body, imp->length );
+     } else {
+       emsSetc( "STR", "<numeric>");
+     }
+
+     emsRep(" ","Truncation during copy (destination ^DLEN < source ^SLEN) of '^STR'",
 	    &hds_gl_status);
    }
 
