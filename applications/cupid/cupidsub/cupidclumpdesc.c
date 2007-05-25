@@ -2,6 +2,7 @@
 #include "cupid.h"
 #include "ndf.h"
 #include "star/hds.h"
+#include "mers.h"
 #include "prm_par.h"
 #include <math.h>
 #include <string.h>
