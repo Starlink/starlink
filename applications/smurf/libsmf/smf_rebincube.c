@@ -155,6 +155,7 @@
 
 *  Authors:
 *     David S Berry (JAC, UClan)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -162,6 +163,8 @@
 *        Initial version.
 *     2-MAY-2007 (DSB):
 *        Add parameter naccept.
+*     25-MAY-2007 (TIMJ):
+*        Allow fcon to drift a little
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -242,7 +245,7 @@ void smf_rebincube( smfData *data, int index, int size, int badmask, int is2d,
    double tfac;                /* Factor describing spectral overlap */
    int good_tsys;              /* Flag indicating some good Tsys values found */
    int gotbf;                  /* Have required FITS keywords been obtained? */
-   int gotdnu;                 /* Has spectral channel width been obtained? */
+   int gotdnu = 0;             /* Has spectral channel width been obtained? */
    int pixax[ 3 ];             /* Pixel axis indices */
    int specax;                 /* The index of the input spectral axis */
    smfHead *hdr = NULL;        /* Pointer to data header for this time slice */
@@ -410,8 +413,22 @@ void smf_rebincube( smfData *data, int index, int size, int badmask, int is2d,
 /* Return the factor needed for calculating Tsys from the variance. */
    if( index == 1 ) {
       *fcon = fcon2;
-   } else if( fcon2 != *fcon ) {
+   } else if (fcon2 == VAL__BADD) {
       *fcon = VAL__BADD;
+   } else if( fcon2 != *fcon && *fcon != VAL__BADD) {
+      /* fcon can be different by fraction of a percent and still be accurate enough 
+         for our purposes */
+      double percent = 100.0 * fabs(*fcon - fcon2 ) / *fcon;
+      if ( percent > 0.001) {
+        msgSetd("ORI", *fcon);
+        msgSetd("NEW", fcon2);
+        msgSetc("FILE", data->file->name);
+        msgSetd("PC", percent);
+        msgOutif(MSG__NORM," ",
+          "WARNING: Tsys conversion factor has changed from ^ORI to ^NEW (^PC %) in file ^FILE",
+          status);
+        *fcon = VAL__BADD;
+      }
    }
 
 /* If we need the input variances, but we cannot calculate the input
