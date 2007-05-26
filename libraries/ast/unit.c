@@ -79,6 +79,8 @@
 *     17-MAY-2007 (DSB):
 *        Simplify the units string returned by astUnitNormaliser.
 *        - Fix indexing bug in CombineFactors.
+*     26-MAY-2007 (DSB):
+*        Correct error reporting in astUNitNormaliser.
 */
 
 /* Module Macros. */
@@ -5729,7 +5731,7 @@ const char *astUnitNormaliser_( const char *in ){
 /* Free the tree. */
       in_tree = FreeTree( in_tree );
 
-   } else if( astOK ) {
+   } else {
       astError( AST__BADUN, "astUnitNormaliser: Error parsing input "
                 "units string '%s'.", in );
    }
