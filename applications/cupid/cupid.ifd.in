@@ -200,6 +200,15 @@ package cupid {
             helpkey *
           }
 
+         parameter newalg {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Use experimental algorithm variations?}
+            default FALSE
+            helpkey *
+          }
          parameter sub {
             type _LOGICAL
             access READ

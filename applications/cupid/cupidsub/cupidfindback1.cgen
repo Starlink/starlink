@@ -7,7 +7,7 @@
 void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms, 
                                     CGEN_TYPE *din, CGEN_TYPE *dout, 
                                     CGEN_TYPE *wa, CGEN_TYPE *wb, int ilevel, 
-                                    int *status ){
+                                    int alg, int *status ){
 /*
 *+
 *  Name:
@@ -23,7 +23,7 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
 *  Synopsis:
 *     void cupidFindback1<X>( int dim[3], int box[3], double rms, 
 *                             CGEN_TYPE *din, CGEN_TYPE *dout, CGEN_TYPE *wa, 
-*                             CGEN_TYPE *wb, int ilevel, int *status )
+*                             CGEN_TYPE *wb, int ilevel, int alg, int *status )
 
 *  Description:
 *     This function uses spatial filtering to remove features with a
@@ -76,6 +76,8 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
 *        Pointer to workspace with the same size as "din".
 *     ilevel
 *        Intformation level.
+*     alg
+*        Indicates which variant of the algorithm to use.
 *     status
 *        Pointer to the inherited status value.
 
@@ -131,8 +133,7 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
    int lbad;            /* Was previous pixel value bad? */
    int nel;             /* Number of elements in input array */
    int nrow;            /* Number of rows of data */
-
-   int lbnd = 1;
+   int newbox[ 3 ];     /* Box size for smoothing */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
@@ -165,20 +166,61 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
 */
 
 
+/* We now enter a loop in which the current background estimate is
+   repeatedly smoothed using a mean box filter, but using a smaller box
+   each time. The smoothing will result in the smoothed background being
+   over-estimated in the troughs between peaks. To eliminate this effect,
+   the current background estimate is modified after each smoothing to
+   become the lower of the smoothed background and the original
+   background. First initialise the mean box size, then loop. */
+   newbox[ 0 ] = box[ 0 ];
+   newbox[ 1 ] = box[ 1 ];
+   newbox[ 2 ] = box[ 2 ];
+   while( 1 ){
 
-/* Apply a third filter which replaces each pixel value in "dout" by the 
-   mean value in a box centred on the pixel. The filtered data goes
-   back into "wa". */
-   if( ilevel > 0 ) msgOut( "", "      Applying mean filter", status );
-   CGEN_FUNCTION(cupidFindback4)( dim, box, dout, wa, status );
+/* Smooth the current background estimate in dout using a mean box filter, 
+   putting the results in "wa". */
+      if( ilevel > 0 ) {
+         msgSeti( "A", newbox[ 0 ] );
+         msgSeti( "B", newbox[ 1 ] );
+         msgSeti( "C", newbox[ 2 ] );
+         msgOut( "", "      Applying mean filter (box size [^A,^B,^C]).", status );
+      }
+      CGEN_FUNCTION(cupidFindback4)( dim, newbox, dout, wa, status );
 
 /*
-   CGEN_FUNCTION(cupidDump)( wa, 1, &nel, &lbnd, status );
-   printf("Dumped mean filtered data\n\n");
+      CGEN_FUNCTION(cupidDump)( wa, 1, &nel, &lbnd, status );
+      printf("Dumped mean filtered data\n");
 */
 
+/* Reduce the box size to half its previous dimensions. */
+      newbox[ 0 ] = ( newbox[ 0 ] - 1 )/2 + 1;
+      newbox[ 1 ] = ( newbox[ 1 ] - 1 )/2 + 1;
+      newbox[ 2 ] = ( newbox[ 2 ] - 1 )/2 + 1;
 
+/* Stop looping when all the filter box sizes are 1 (i.e. no further
+   smoothing to be done), or if the original FINDBACK algorithm is
+   required. */
+      if( alg == 0 || ( 
+          newbox[ 0 ] == 1 && newbox[ 1 ] == 1 && newbox[ 2 ] == 1 ) ) break;
 
+/* Find the minimum of the original background estimate and the smoothed
+   background estimate at every point and store in "dout". */
+      if( ilevel > 0 ) msgOut( "", "      Taking minimum ", status );
+      p1 = dout;
+      p2 = wa;
+      for( i = 0; i < nel; i++,p1++,p2++ ) {
+         if( *p1 != CGEN_BAD && *p2 != CGEN_BAD ) {
+            if( *p2 < *p1 ) *p1 = *p2;
+         }
+      }
+
+/*   
+      CGEN_FUNCTION(cupidDump)( dout, 1, &nel, &lbnd, status );
+      printf("Dumped minimised filtered data\n\n");
+*/
+
+   }
 
 /* The background estimate in "wa" should now be a close fit to the lower 
    envelope of the input data, but will be biassed by the noise. That is, 

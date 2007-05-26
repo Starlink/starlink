@@ -165,6 +165,7 @@ void findback( int *status ){
    int islice;               /* Slice index */
    int n;                    /* Number of values summed in "sum" */
    int ndim;                 /* Total number of pixel axes in NDF */
+   int newalg;               /* Use experimental algorithm variations? */
    int nsdim;                /* Number of significant pixel axes in NDF */
    int nslice;               /* Number of slices to process */
    int nval;                 /* Number of values supplied */
@@ -344,6 +345,9 @@ void findback( int *status ){
    parDef0d( "RMS", rms, status );
    parGet0d( "RMS", &rms, status );
 
+/* See if any experimental algorithm variations are to be used. */
+   parGet0l( "NEWALG", &newalg, status );
+
 /* Allocate work arrays. */
    wa = astMalloc( cupidSize( type, "findback" )*el );
    wb = astMalloc( cupidSize( type, "findback" )*el );
@@ -368,13 +372,13 @@ void findback( int *status ){
 /* Process this slice, then increment the pointer to the next slice. */
       if( type == CUPID__FLOAT ) {
          cupidFindback1F( slice_dim, box, rms, (float *) ipd1, (float *) ipd2, 
-                        (float *) wa, (float *) wb, ilevel, status );
+                        (float *) wa, (float *) wb, ilevel, newalg, status );
          ipd1 = ( (float *) ipd1 ) + slice_size;
          ipd2 = ( (float *) ipd2 ) + slice_size;
    
       } else {
          cupidFindback1D( slice_dim, box, rms, (double *) ipd1, (double *) ipd2, 
-                        (double *) wa, (double *) wb, ilevel, status  );
+                        (double *) wa, (double *) wb, ilevel, newalg, status  );
          ipd1 = ( (double *) ipd1 ) + slice_size;
          ipd2 = ( (double *) ipd2 ) + slice_size;
       }
