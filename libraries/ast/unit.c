@@ -80,7 +80,9 @@
 *        Simplify the units string returned by astUnitNormaliser.
 *        - Fix indexing bug in CombineFactors.
 *     26-MAY-2007 (DSB):
-*        Correct error reporting in astUNitNormaliser.
+*        - Correct error reporting in astUNitNormaliser.
+*        - Fix bug in CleanExp that caused (for example) "-2" to be
+*        converted to "^-2".
 */
 
 /* Module Macros. */
@@ -376,7 +378,8 @@ static const char *CleanExp( const char *exp ) {
 /* Any alphabetical word followed by a digit is taken as <word>^<digit>. 
    Any alphabetical word followed by a sign and a digit is taken as 
    <word>^<sign><digit>. */
-      if( l > 1 && strcspn( t, "0123456789" ) == l - 1 ) {
+      if( l > 1 && *t != '-' && *t != '+' && 
+          strcspn( t, "0123456789" ) == l - 1 ) {
          tok[ i ] = astMalloc( l + 2 );
          if( tok[ i ] ) {
             strcpy( tok[ i ], t );
