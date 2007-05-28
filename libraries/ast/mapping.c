@@ -22461,7 +22461,7 @@ f        calculated.
    return astRate_( this, at, ax1 - 1, ax2 - 1 );
 }
 
-void astMapSplitId_( AstMapping *this, int nin, int *in, int*out, 
+void astMapSplitId_( AstMapping *this, int nin, int *in, int *out, 
                             AstMapping **map ){
 /*
 *++
