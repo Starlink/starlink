@@ -154,6 +154,8 @@ f     - AST_SETUNC: Associate a new uncertainty with a Region
 *        Changed AST_LONG_DOUBLE to HAVE_LONG_DOUBLE.
 *     14-MAR-2006 (DSB):
 *        Added astGetRefFS.
+*     28-MAY-2007 (DSB):
+*        - Added protected function astBndMesh.
 *class--
 
 *  Implementation Notes:
@@ -792,6 +794,7 @@ static AstMapping *Simplify( AstMapping * );
 static AstPointSet *RegBaseGrid( AstRegion * );
 static AstPointSet *RegBaseMesh( AstRegion * );
 static AstPointSet *BndBaseMesh( AstRegion *, double *, double * );
+static AstPointSet *BndMesh( AstRegion *, double *, double * );
 static AstPointSet *RegGrid( AstRegion * );
 static AstPointSet *RegMesh( AstRegion * );
 static AstPointSet *BTransform( AstRegion *, AstPointSet *, int, AstPointSet * );
@@ -1427,7 +1430,7 @@ static AstPointSet *BndBaseMesh( AstRegion *this, double *lbnd, double *ubnd ){
 
 *  Purpose:
 *     Return a PointSet containing points spread around part of the boundary 
-*     of a Region.
+*     of a Region, in the base Frame.
 
 *  Type:
 *     Protected function.
@@ -1442,29 +1445,29 @@ static AstPointSet *BndBaseMesh( AstRegion *this, double *lbnd, double *ubnd ){
 *  Description:
 *     This function returns a PointSet containing a set of points on the
 *     boundary of the intersection between the supplied Region and the
-*     supplied box. The points refer to the base Frame of the 
-*     encapsulated FrameSet. If the boundary of the supplied Region does
-*     not intersect the supplied box, then a PointSet containing a single 
-*     bad point is returned.
+*     supplied (current Frame) box. The mesh points refer to the base
+*     Frame. If the boundary of the supplied Region does not intersect the 
+*     supplied box, then a PointSet containing a single bad point is 
+*     returned.
 
 *  Parameters:
 *     this
 *        Pointer to the Region.
 *     lbnd
 *        Pointer to an array holding the lower limits of the axis values 
-*        within the required box.
+*        within the required box. Defined in the current Frame of the Region.
 *     ubnd
 *        Pointer to an array holding the upper limits of the axis values 
-*        within the required box.
+*        within the required box. Defined in the current Frame of the Region.
 
 *  Returned Value:
-*     Pointer to the PointSet. The axis values in this PointSet will have 
-*     associated accuracies derived from the uncertainties which were
-*     supplied when the Region was created.
+*     Pointer to the PointSet holding the base Frame mesh. The axis values 
+*     in this PointSet will have associated accuracies derived from the 
+*     uncertainties which were supplied when the Region was created.
 *     
-*    If the Region does not intersect the supplied box, the returned
-*    PointSet will contain a single point with a value of AST__BAD on
-*    every axis.
+*     If the Region does not intersect the supplied box, the returned
+*     PointSet will contain a single point with a value of AST__BAD on
+*     every axis.
 
 *  Notes:
 *    - A NULL pointer is returned if an error has already occurred, or if
@@ -1512,6 +1515,89 @@ static AstPointSet *BndBaseMesh( AstRegion *this, double *lbnd, double *ubnd ){
       
 /* Free resources. */
    box = astAnnul( box );
+
+/* Return NULL if an error occurred. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return the required pointer. */
+   return result;
+}
+
+static AstPointSet *BndMesh( AstRegion *this, double *lbnd, double *ubnd ){
+/*
+*+
+*  Name:
+*     astBndMesh
+
+*  Purpose:
+*     Return a PointSet containing points spread around part of the boundary 
+*     of a Region, in the current Frame.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "region.h"
+*     AstPointSet *astBndMesh( AstRegion *this, double *lbnd, double *ubnd )
+
+*  Class Membership:
+*     Region virtual function.
+
+*  Description:
+*     This function returns a PointSet containing a set of points on the
+*     boundary of the intersection between the supplied Region and the
+*     supplied box. The points refer to the current Frame of the 
+*     encapsulated FrameSet. If the boundary of the supplied Region does
+*     not intersect the supplied box, then a PointSet containing a single 
+*     bad point is returned.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     lbnd
+*        Pointer to an array holding the lower limits of the axis values 
+*        within the required box. Defined in the current Frame of the Region.
+*     ubnd
+*        Pointer to an array holding the upper limits of the axis values 
+*        within the required box. Defined in the current base Frame of the 
+*        Region.
+
+*  Returned Value:
+*     Pointer to the PointSet. The axis values in this PointSet will have 
+*     associated accuracies derived from the uncertainties which were
+*     supplied when the Region was created.
+*     
+*    If the Region does not intersect the supplied box, the returned
+*    PointSet will contain a single point with a value of AST__BAD on
+*    every axis.
+
+*  Notes:
+*    - A NULL pointer is returned if an error has already occurred, or if
+*    this function should fail for any reason.
+*-
+*/
+
+/* Local Variables: */
+   AstMapping *map;
+   AstPointSet *ps1;  
+   AstPointSet *result;  
+
+/* Check the local error status. */
+   if ( !astOK ) return NULL;
+
+/* Get the current->base Mapping from the Region. */
+   map = astGetMapping( this->frameset, AST__CURRENT, AST__BASE );
+
+/* Use astBndBaseMesh to get a mesh of base Frame points within this base
+   Frame bounding box. */
+   ps1 = astBndBaseMesh( this, lbnd, ubnd );
+
+/* Transform it into the current Frame. */
+   if( ps1 ) result = astTransform( map, ps1, 0, NULL );
+      
+/* Free resources. */
+   map = astAnnul( map );
+   ps1 = astAnnul( ps1 );
 
 /* Return NULL if an error occurred. */
    if( !astOK ) result = astAnnul( result );
@@ -3962,6 +4048,7 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name ) {
    vtab->Overlap = Overlap;
    vtab->OverlapX = OverlapX;
    vtab->Negate = Negate;
+   vtab->BndMesh = BndMesh;
    vtab->BndBaseMesh = BndBaseMesh;
    vtab->RegBaseGrid = RegBaseGrid;
    vtab->RegBaseMesh = RegBaseMesh;
@@ -5878,7 +5965,7 @@ L1:
 
 /* Transform the points in the submesh of the second Region into the
    current Frame of the first Region. */
-         astAnnul( ps1 );
+         (void ) astAnnul( ps1 );
          ps1 = astTransform( cmap, reg2_submesh, 1, NULL );
 
 /* Transform this submesh using the first Region as a Mapping. Any points
@@ -8306,7 +8393,7 @@ static void SetRegFS( AstRegion *this, AstFrame *frm ) {
    f2 = astAnnul( f2 );
 
 /* Annul any existing FrameSet */
-   if( this->frameset ) astAnnul( this->frameset );
+   if( this->frameset ) (void) astAnnul( this->frameset );
 
 /* Use the new FrameSet */
    this->frameset = fs;
@@ -8609,7 +8696,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 /* Transform into the curent Frame of "this", and then back into the base
    Frame. */  
          pset2 = astTransform( map, pset1, 1, NULL );
-         astTransform( map, pset2, 0, pset1 );
+         (void) astTransform( map, pset2, 0, pset1 );
 
 /* Re-centre the uncertainty Region at this position. */
          astRegCentre( unc, NULL, ptr1, 0, AST__CURRENT );
@@ -11100,6 +11187,10 @@ AstPointSet *astRegBaseGrid_( AstRegion *this ){
 AstPointSet *astBndBaseMesh_( AstRegion *this, double *lbnd, double *ubnd ){
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Region,BndBaseMesh))( this, lbnd, ubnd );
+}
+AstPointSet *astBndMesh_( AstRegion *this, double *lbnd, double *ubnd ){
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Region,BndMesh))( this, lbnd, ubnd );
 }
 
 #define MAKE_MASK_(X,Xtype) \

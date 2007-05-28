@@ -61,6 +61,8 @@ f     The Interval class does not define any new routines beyond those
 *        Original version.
 *     19-APR-2006 (DSB):
 *        Negate the cached equivalent Box if the Interval has been negated.
+*     28-MAY-2007 (DSB):
+*        Re-implemented BndBaseMesh.
 *class--
 */
 
@@ -215,27 +217,25 @@ static AstPointSet *BndBaseMesh( AstRegion *this, double *lbnd, double *ubnd ){
 
 /* Local Variables: */
    AstBox *box;
-   AstPointSet *mesh1;  
-   AstPointSet *pset;  
+   AstFrame *bfrm;
+   AstInterval *this_interval;
+   AstMapping *map;
    AstPointSet *result;  
+   double *lbndb;
+   double *ubndb;
    double **ptr;
-   double *lbnd_new;
-   double *p;
-   double *ubnd_new;
-   double lb;
-   double ub;
-   int allGood;
-   int ic;
-   int ip;
-   int nc;
-   int np;
-   int overlap;             
+   int closed;
+   int i;
+   int nbase;
 
 /* Initialise */
    result = NULL;
 
 /* Check the local error status. */
    if ( !astOK ) return result;
+
+/* Store a pointer to the interval. */
+   this_interval = (AstInterval *) this;
 
 /* If the Interval is effectively a Box, invoke the astBndBaseMesh
    function on the equivalent Box. A pointer to the equivalent Box will
@@ -244,73 +244,61 @@ static AstPointSet *BndBaseMesh( AstRegion *this, double *lbnd, double *ubnd ){
    if( box ) {
       result = astBndBaseMesh( box, lbnd, ubnd );
 
-/* If the Interval is not equivalent to a Box... */
+/* If the Interval is not equivalent to a Box (i.e. if one or more bounds
+   are missing)... */
    } else {
 
-/* Create a Box with the supplied bounds. */
-      box = astBox( this, 1, lbnd, ubnd, NULL, "" );
-
-/* Get a mesh covering this box. */
-      mesh1 = astRegBaseMesh( box );
-
-/* Transform this mesh using this Interval as a Mapping. Mesh points
-   outside the Interval will be set bad in the returned PointSet. */
-      pset = astTransform( this, mesh1, 1, NULL );
-
-/* Find the bounding box of the good points in the returned PoinSet. */
-      np = astGetNpoint( pset );
-      nc = astGetNcoord( pset );
-      ptr = astGetPoints( pset );
-      lbnd_new = astMalloc( sizeof( double )*(size_t) nc );
-      ubnd_new = astMalloc( sizeof( double )*(size_t) nc );
+/* Find the base frame box that just encloses the supplied current Frame 
+   box. */
+      map = astGetMapping( this->frameset, AST__CURRENT, AST__BASE );
+      nbase = astGetNout( map );
+      lbndb = astMalloc( sizeof(double)*nbase );
+      ubndb = astMalloc( sizeof(double)*nbase );
       if( astOK ) {
-         allGood = 1;
-         overlap = 1;
-         for( ic = 0; ic < nc; ic++ ) {
-            lb = DBL_MAX;
-            ub = -DBL_MAX;
-            p = ptr[ ic ];
-            for( ip = 0; ip < np; ip++, p++ ) {
-               if( *p == AST__BAD ) {
-                  allGood = 0;
-               } else {
-                  if( *p < lb ) lb = *p;               
-                  if( *p > ub ) ub = *p;               
-               }
-            }
-            if( lb > ub ) {
-               overlap = 0;
-               break;
-            } else {
-               lbnd_new[ ic ] = lb;         
-               ubnd_new[ ic ] = ub;         
-            }
+         for( i = 0; i < nbase; i++ ) {
+            astMapBox( map, lbnd, ubnd, 1, i, lbndb + i, ubndb + i, 
+                       NULL, NULL );
+         }            
+  
+/* Create a Box that is like this Interval except that missing bounds are
+   inherited from the supplied limits. Check that the resulting box is
+   closed. */
+         closed = 1;
+         for( i = 0; i < nbase; i++ ) {
+            if( this_interval->ubnd[ i ] != DBL_MAX ) ubndb[ i ] = this_interval->ubnd[ i ];
+            if( this_interval->lbnd[ i ] != -DBL_MAX ) lbndb[ i ] = this_interval->lbnd[ i ];
+            if( lbndb[ i ] > ubndb[ i ] ) closed = 0;
          }
+
+/* Cannot create the required mesh if the box is not closed. */
+         if( closed ) {
+
+/* Create the Box. */
+            bfrm = astGetFrame( this->frameset, AST__BASE );
+            box = astBox( bfrm, 1, lbndb, ubndb, NULL, "" );
+
+/* Create the required mesh. */
+            result = astRegBaseMesh( box );
+
+/* Free resources */
+            bfrm = astAnnul( bfrm );
+            box = astAnnul( box );
 
 /* If the boundary of the supplied Region does not intersect the box,
    return a PointSet containing a single bad position. */
-         if( !overlap || allGood ) {
-            result = astPointSet( 1, nc, "" );
+         } else {
+            result = astPointSet( 1, nbase, "" );
             ptr = astGetPoints( result );
             if( astOK ) {
-               for( ic = 0; ic < nc; ic++ ) ptr[ ic ][ 0 ] = AST__BAD;
+               for( i = 0; i < nbase; i++ ) ptr[ i ][ 0 ] = AST__BAD;
             }
-
-/* Otherwise, create another Box with the bounds found above, and create
-   a mesh covering this new Box. */
-         } else {
-            astAnnul( box );
-            box = astBox( this, 1, lbnd_new, ubnd_new, NULL, "" );
-            result = astRegBaseMesh( box );
          }
       }
 
 /* Free resources. */
-      box = astAnnul( box );
-      mesh1 = astAnnul( mesh1 );
-      pset = astAnnul( pset );
-      lbnd_new = astFree( lbnd_new );
-      ubnd_new = astFree( ubnd_new );
+      map = astAnnul( map );
+      lbndb = astFree( lbndb );
+      ubndb = astFree( ubndb );
    }
 
 /* Return NULL if an error occurred. */
@@ -2512,7 +2500,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
                }
             }
             psetc = astTransform( map, psetb, 1, NULL );
-            astTransform( map, psetc, 0, psetb );
+            (void) astTransform( map, psetc, 0, psetb );
             if( astOK ) {
                for( ic = 0; ic < nc; ic++ ) {
                   lb = ptrb[ ic ][ 0 ];
@@ -2585,7 +2573,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    
 /* If the simplified Box is a NullRegion return it. */
                if( astIsANullRegion( sreg ) ) {
-                  astAnnul( new );
+                  (void) astAnnul( new );
                   new = astClone( sreg );
                   simpler = 1;
                  
@@ -2712,7 +2700,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 /* Create the simplified Interval from the current Frame limits found
    above, and use it in place of the original. */
                      unc = astTestUnc( new ) ? astGetUncFrm( new, AST__CURRENT ) : NULL;
-                     astAnnul( new );
+                     (void) astAnnul( new );
                      new = (AstRegion *) astInterval( cfrm, slbnd, subnd, unc, "" );
                      if( unc ) unc = astAnnul( unc );
                      simpler = 1;

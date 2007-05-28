@@ -139,6 +139,7 @@ typedef struct AstRegionVtab {
    AstPointSet *(* RegBaseMesh)( AstRegion * );
    AstPointSet *(* RegBaseGrid)( AstRegion * );
    AstPointSet *(* BndBaseMesh)( AstRegion *, double *, double * );
+   AstPointSet *(* BndMesh)( AstRegion *, double *, double * );
    AstRegion *(* GetUncFrm)( AstRegion *, int );
    AstRegion *(* GetUnc)( AstRegion *, int );
    AstRegion *(* GetDefUnc)( AstRegion * );
@@ -262,6 +263,7 @@ AstPointSet *astRegGrid_( AstRegion * );
 AstPointSet *astRegBaseMesh_( AstRegion * );
 AstPointSet *astRegBaseGrid_( AstRegion * );
 AstPointSet *astBndBaseMesh_( AstRegion *, double *, double * );
+AstPointSet *astBndMesh_( AstRegion *, double *, double * );
 AstRegion *astGetUncFrm_( AstRegion *, int );
 AstRegion *astGetDefUnc_( AstRegion * );
 int astOverlapX_( AstRegion *, AstRegion * );
@@ -398,6 +400,7 @@ astINVOKE(V,astMaskUS_(astCheckRegion(this),(map?astCheckMapping(map):NULL),insi
 #define astRegBaseMesh(this) astINVOKE(O,astRegBaseMesh_(astCheckRegion(this)))
 #define astRegBaseGrid(this) astINVOKE(O,astRegBaseGrid_(astCheckRegion(this)))
 #define astBndBaseMesh(this,lbnd,ubnd) astINVOKE(O,astBndBaseMesh_(astCheckRegion(this),lbnd,ubnd))
+#define astBndMesh(this,lbnd,ubnd) astINVOKE(O,astBndMesh_(astCheckRegion(this),lbnd,ubnd))
 #define astRegCentre(this,cen,ptr,index,ifrm) astINVOKE(V,astRegCentre_(astCheckRegion(this),cen,ptr,index,ifrm))
 #define astRegFrame(this) astINVOKE(O,astRegFrame_(astCheckRegion(this)))
 #define astRegGrid(this) astINVOKE(O,astRegGrid_(astCheckRegion(this)))

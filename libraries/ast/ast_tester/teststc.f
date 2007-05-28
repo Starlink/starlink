@@ -177,8 +177,13 @@ c      call ast_listissued( 'teststc' )
      :   .gt. 1.0D-7 ) call stopit( status, 'Error 0e' )
 
       call ast_getregionbounds( obj, lbnd, ubnd, status )
-      if( abs( lbnd(3) ) .gt. 1.0D-6 ) 
-     :       call stopit( status, 'Error 0f' )
+      if( abs( lbnd(3) ) .gt. 1.0D-6 ) THEN
+
+      write(*,*) lbnd(3)
+
+         call stopit( status, 'Error 0f' )
+      END IF
+
 
       call ast_set( obj, 'timescale=tt', status )
       obj = ast_Simplify( obj, status )
