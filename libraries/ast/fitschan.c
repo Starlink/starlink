@@ -20440,7 +20440,7 @@ static void RetainFits( AstFitsChan *this ){
 *++
 *  Name:
 c     astRetainFits
-f     AST_RetainFITS
+f     AST_RETAINFITS
 
 *  Purpose:
 *     Indicate that the current card in a FitsChan should be retained.
