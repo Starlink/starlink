@@ -124,6 +124,8 @@
 *     30-SEP-2004 (DSB):
 *        Modified to use NDF GRID bounds as input bounds if an NDF is
 *        supplied. Also show axis label with results (if available).
+*     23-MAY-2007 (DSB):
+*        Correct dimensionality of displayed XU and XL values.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -280,9 +282,9 @@
       CALL PAR_PUT0D( 'UBNDOUT', UBNDOUT, STATUS ) 
 
       CALL MSG_BLANK( STATUS )
-      DO I = 1, NAXOUT
+      DO I = 1, NAXIN
          CALL MSG_SETD( 'XL', XL( I ) )
-         IF( I .NE. NAXOUT ) CALL MSG_SETC( 'XL', ',' )
+         IF( I .NE. NAXIN ) CALL MSG_SETC( 'XL', ',' )
       END DO
 
       IF( INFRM .NE. AST__NULL ) THEN
@@ -299,9 +301,9 @@
       CALL PAR_PUT1D( 'XL', NAXOUT, XL, STATUS ) 
 
       CALL MSG_BLANK( STATUS )
-      DO I = 1, NAXOUT
+      DO I = 1, NAXIN
          CALL MSG_SETD( 'XU', XU( I ) )
-         IF( I .NE. NAXOUT ) CALL MSG_SETC( 'XU', ',' )
+         IF( I .NE. NAXIN ) CALL MSG_SETC( 'XU', ',' )
       END DO
 
       IF( INFRM .NE. AST__NULL ) THEN

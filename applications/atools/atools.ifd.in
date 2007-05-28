@@ -231,6 +231,45 @@ package atools {
           }
 
       }
+      action astmapregion {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter frame {
+            position 3
+            type NDF
+            prompt {The Frame for the new Region}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter map {
+            position 2
+            type NDF
+            prompt {The Mapping from the original Frame to the new Frame}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter result {
+            position 4
+            type LITERAL
+            prompt {The mapped Region}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Region}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
       action astcopy {
 
          helplib {$ATOOLS_HELP}
@@ -514,6 +553,53 @@ iraf! {
             position 5
             type LITERAL
             prompt {Name of file in which to store the CmpMap}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
+      action astcmpregion {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter region1 {
+            position 1
+            type LITERAL
+            prompt {The first component Region}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter region2 {
+            position 2
+            type LITERAL
+            prompt {The second component Region}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter oper {
+            position 3
+            type LITERAL
+            prompt {The boolean operator}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter options {
+            position 4
+            type LITERAL
+            prompt {Options for the CmpRegion}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 5
+            type LITERAL
+            prompt {Name of file in which to store the CmpRegion}
             ppath DYNAMIC CURRENT
             association ->GLOBAL.AST_OBJECT
             helpkey *
@@ -1401,6 +1487,30 @@ iraf! {
             helpkey *
           }
          parameter xu {
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+      }
+
+      action astgetregbounds {
+         helplib {$ATOOLS_HELP}
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Region}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+         parameter lbnd {
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+         parameter ubnd {
             type _DOUBLE
             access WRITE
             vpath INTERNAL
