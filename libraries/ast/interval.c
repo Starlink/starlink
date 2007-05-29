@@ -20,6 +20,11 @@ f     AST_INTERVAL
 *     neither. If both limits are supplied but are in reverse order (so
 *     that the lower limit is greater than the upper limit), then the
 *     interval is an excluded interval, rather than an included interval.
+*
+*     Note, The Interval class makes no allowances for cyclic nature of
+*     some coordinate systems (such as SkyFrame coordinates). A Box
+*     should usually be used in these cases since this requires the user 
+*     to think about suitable upper and lower limits,
 
 *  Inheritance:
 *     The Interval class inherits from the Region class.
@@ -3346,6 +3351,11 @@ f     RESULT = AST_INTERVAL( FRAME, LBND, UBND, UNC, OPTIONS, STATUS )
 *     interval, rather than an included interval.
 *
 *     At least one axis limit must be supplied.
+*
+*     Note, The Interval class makes no allowances for cyclic nature of
+*     some coordinate systems (such as SkyFrame coordinates). A Box
+*     should usually be used in these cases since this requires the user 
+*     to think about suitable upper and lower limits,
 
 *  Parameters:
 c     frame
