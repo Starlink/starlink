@@ -6,11 +6,12 @@
 #     [incr Tcl] class
 
 #  Purpose:
-#     Class for running a "foreign" program as catalogue conversion filter.
+#     Class for handling the import of foreign catalogue formats.
 
 #  Description:
 #     This class defines a object that controls a series of defined
-#     filters for converting to and from CAT and ASCII supported formats.
+#     filters for converting to and from FITS, other CAT and ASCII 
+#     supported formats.
 
 #  Invocations:
 #
@@ -37,7 +38,8 @@
 
 #  Copyright:
 #     Copyright (C) 1998-2001 Central Laboratory of the Research Councils
-#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council
+#     Copyright (C) 2007 Science and Technology Research Council
 #     All Rights Reserved.
 
 #  Licence:
@@ -65,6 +67,12 @@
 #        Original version.
 #     08-AUG-2001 (PWD):
 #        Changed to map file types to lower case.
+#     14-MAY-2007 (PWD):
+#        Changed to handle import of FITS catalogues using native support
+#        (CAT support for FITS is ageing, so 'K' format). Native support 
+#        is Skycat, plus some GAIA changes for backwards compatibility in 
+#        dealing with the meta-data. Export of FITS still uses CAT, but
+#        that's quite lossy.
 #     {enter_further_changes_here}
 
 #-
@@ -105,43 +113,69 @@ itcl::class gaia::GaiaConvertTable {
    #  Methods:
    #  --------
 
-   #  Convert from a CAT/ASCII catalogue to a tab table.
-   public method to {in out {now 0}} {
+   #  Convert from a CAT, ASCII or FITS catalogue to a tab table.
+   #  Arguments in and out give the catalogue name and a name for the
+   #  new catalogue.
+   public method to {in out} {
 
       #  Get the file type.
       set type [get_type_ $in]
 
-      #  Start up filter.
-      if { $to_filter_($type) == {} } {
-         global env
-         set to_filter_($type) [GaiaForeignExec \#auto \
-                                   -application $to_app_($type) \
-                                   -show_output 0]
-      }
+      if { $type == ".fits" || $type == ".fit" } {
+         
+         #  Use native support for FITS files.
+         lassign [get_hdu_ $in] in hdu
+         set rtdimage [::image create rtdimage -file "$in"]
 
-      #  Now attempt the conversion.
-      set cmd [format $to_cmd_ $in $out]
-      if { $now } {
+         #  Move to the HDU.
+         $rtdimage hdu set $hdu
+
+         #  Make sure we revisit the disk file, otherwise uses cached version.
+         $rtdimage update;#  Doesn't work...????
+
+         #  Get the catalog config entry.
+         set entry [create_config_entry $rtdimage $in $hdu]
+
+         #  Copy the FITS table to a local catalog.
+         if { [catch {$rtdimage hdu get $hdu $out $entry} msg] } {
+            error_dialog $msg
+            catch {::image delete $rtdimage}
+            return 0
+         }
+         catch {::image delete $rtdimage} msg
+
+      } else {
+         #  Start up external filter.
+         if { $to_filter_($type) == {} } {
+            global env
+            set to_filter_($type) [GaiaForeignExec \#auto \
+                                      -application $to_app_($type) \
+                                      -show_output 0]
+         }
+         
+         #  Now attempt the conversion.
+         set cmd [format $to_cmd_ $in $out]
          catch {eval $to_filter_($type) runnow $cmd} msg
          if { $msg == "1" || $msg == "0" } {
             set msg {}
          }
-      } else {
-         catch {$to_filter_($type) runwiths $cmd} msg
-      }
-      if { $msg != {} } {
-         return 0
+         if { $msg != {} } {
+            return 0
+         }
       }
       return 1
    }
 
-   #  Convert a tab table to a CAT/ASCII catalogue.
-   public method from {in out {now 0}} {
+   #  Convert a tab table to a CAT/ASCII catalogue. Handles FITS using
+   #  foreign conversion as Skycat only supports saving FITS tables
+   #  with an existing image, not to a new file. Downside is we loose
+   #  some information, like 8 byte integer values (converted to doubles).
+   public method from {in out} {
 
-      #  Get the file type so we can invoke the correct filter.
+      #  Get the file type.
       set type [get_type_ $out]
 
-      #  Start up filter.
+      #  Start up external filter.
       if { $from_filter_($type) == {} } {
          global env
          set from_filter_($type) [GaiaForeignExec \#auto \
@@ -153,16 +187,12 @@ itcl::class gaia::GaiaConvertTable {
       if { [file exists $out] } {
          file delete $out
       }
-
+      
       #  Now attempt the conversion.
       set cmd [format $from_cmd_ $in $out]
-      if { $now } {
-         set res [catch {eval $from_filter_($type) runnow $cmd} msg]
-         if { $msg == "1" || $msg == "0" } {
-            set msg {}
-         }
-      } else {
-         set res [catch {$from_filter_($type) runwiths $cmd} msg]
+      set res [catch {eval $from_filter_($type) runnow $cmd} msg]
+      if { $msg == "1" || $msg == "0" } {
+         set msg {}
       }
       if { $msg != {} || $res != 0 } {
          if { $msg == {} } {
@@ -180,14 +210,214 @@ itcl::class gaia::GaiaConvertTable {
 
       #  Extract type from extension and map to lower case.
       set type [string tolower [file extension $name]]
-      
-      #  Some FITS types may reference extensions... (TODO: gsc etc?).
+
+      #  Some FITS types may reference extensions, so just check part
+      #  of the extension.
       if { [string match {.fits*} "$type"] } {
          set type ".fits"
       } elseif { [string match {.fit*} "$type"] } {
          set type ".fit"
       }
       return $type
+   }
+   
+   #  Return the HDU for the given FITS filename specification. The HDU
+   #  is given as a number in {} or in []. The {} format supports backwards
+   #  compatibility with CAT. The result is two values, the input name without
+   #  the HDU specification and the hdu number (this defaults to 2 so that
+   #  the first extension will be picked up).
+   protected method get_hdu_ {in} {
+      set hdu 2
+      set i1 [string last "\[" $in]
+      set i2 [string last "\]" $in]
+      if { $i1 == -1 } {
+         set i1 [string last "\{" $in]
+         set i2 [string last "\}" $in]
+      }
+      if { $i1 > -1 && $i2 > -1 } {
+         set hdu [string range $in [incr i1] [incr i2 -1]]
+         set in [string range $in 0 [incr i1 -2]]
+      }
+      return [list $in $hdu]
+   }
+
+   #  Divine a configuration entry for this catalogue based on its
+   #  properties. This is just a list of paired entries like:
+   #  {{shortname shortname} {fullname filename} {symbol ...} ...}.
+   protected method create_config_entry {rtdimage filename hdu} {
+      
+      set headings [$rtdimage hdu list]
+      set headings [lindex $headings [expr $hdu-1]]
+
+      set extname [lindex $headings 2]
+      if { $extname == {} } {
+         set extname "$filename"
+      }
+
+      set entry {}
+      lappend entry [list serv_type local]
+      lappend entry [list short_name $extname]
+      lappend entry [list long_name "$filename"]
+      lappend entry [list url "$filename"]
+
+      #  Catalogue parameters. 
+      #
+      #  Only interested in a fixed set of possible values. Symbol may span
+      #  more than one line (and be suffixed by an integer from 1 to 9 to allow
+      #  for long lines). No suffix is allowed. Note we gather the units.
+      set symbol {}
+      set headers [$rtdimage hdu fits $hdu]
+      foreach line [split $headers "\n"] {
+         set line [string trim $line]
+         lassign [::gaia::GaiaFITSHeader::get_kvc $line] keyword value
+         set keyword [string tolower $keyword]
+         set value [regsub -all {'} $value {}]
+         switch -glob $keyword {
+            symbol* {
+               append symbol $value
+            }
+            search_c* {
+               lappend entry "search_cols $value"
+            }
+            sort_col {
+               lappend entry "sort_col $value"
+            }
+            sort_ord* {
+               lappend entry "sort_order $value"
+            }
+            show_col* {
+               lappend entry "show_cols $value"
+            }
+            copyrigh* {
+               lappend "copyright $value"
+            }
+            tunit* {
+               set units($keyword) [string tolower $value]
+            }
+         }
+      }
+
+      #  Catalog columns. Try to use a knowledge of the various names
+      #  to pick out the positional columns, use units picked in last pass.
+      set racol -1
+      set deccol -1
+      set xcol -1
+      set ycol -1
+      set idcol -1
+      
+      set headings [$rtdimage hdu headings $hdu]
+      set nc [llength $headings]
+      
+      for { set i 0 } { $i < $nc } { incr i } {
+         set name [string tolower [lindex $headings $i]]
+         
+         #  Check any units for special significance, radians or degrees are
+         #  assumed to be possible sky coordinates. 
+         set unit {}
+         set j [expr $i + 1]
+         if { [info exists units(tunit$j)] } {
+            set unit $units(tunit$j)
+         }
+         if { [string match "radian*" $unit] || 
+              [string match "degree*" $unit] } {
+               
+            #  Assuming this is a column with angle data. This is either an RA
+            #  or DEC. If qualified by {HOURS}, {HMSxxx} or the name is some
+            #  variation of RA/Ra/r.a./Rightxxx/alphaxxx, then assume RA,
+            #  otherwise it is a DEC. Note we need both of these to have a
+            #  valid match, but we don't check for that.
+            if { [string match "*hours*" $unit] ||
+                 [string match "*hms*" $unit] } {
+               if { $racol == -1 } {
+                  set racol $i
+               }
+            } else {
+               switch -glob $name {
+                  ra* -
+                  right* -
+                  r.a.* -
+                  x_world* -
+                  alpha* {
+                     if { $racol == -1 } {
+                        set racol $i
+                     }
+                  }
+                  default {
+                     #  Assume this is a declination, unless name starts with
+                     #  "pos", which is most likely a position angle (for an
+                     #  ellipse).
+                     if { ! [string match "pos*" $name] } {
+                        if { $deccol == -1 } {
+                           set deccol $i
+                        }
+                     }
+                  }
+               }
+            }
+         } else {
+
+            #  Check for SExtractor specific names without units. SExtractor
+            #  world coordinates are in degrees.
+            switch -exact $name {
+               x_world {
+                  if { $racol == -1 } {
+                     set racol $i
+                  }
+               }
+               y_world {
+                  if { $deccol == -1 } {
+                     set deccol $i
+                  }
+               }
+               x_image - 
+               x {
+                  if { $xcol == -1 } {
+                     set xcol $i
+                  }
+               }
+               y_image -
+               y {
+                  if { $ycol == -1 } {
+                     set ycol $i
+                  }
+               }
+               id_col {
+                  if { $idcol == -1 } {
+                     set idcol $i
+                  }
+               }
+            }
+         }
+      }
+
+      #  OK, if we have located special columns then add these to the header
+      #  section. Note that if world coordinates are not located then this is
+      #  recorded (as -1). This is necessary as information about the presence
+      #  of these coordinates may persist. If no id_col has been located then
+      #  we will create a fake one, but only if the first column is positional
+      #  (ra, dec, x or y), which isn't suitable.
+      if { $idcol != - 1 } {
+         lappend entry "id_col $idcol"
+      } else {
+         if { $racol != 0 && $deccol != 0 && $xcol != 0 && $ycol != 0 } {
+            lappend entry "id_col 0"
+         }
+      }
+      lappend entry "ra_col $racol"
+      lappend entry "dec_col $deccol"
+      if { $xcol != -1 && $ycol != -1 } {
+         lappend entry "x_col $xcol"
+         lappend entry "y_col $ycol"
+      }
+
+      #  If no symbol use a default.
+      if { $symbol == {} } {
+         set symbol {{} {circle {} {} {} {} {}} {4.0 {}}}
+      }
+      if { $symbol != {} } {
+         lappend entry [list symbol $symbol]
+      }
+      return $entry
    }
 
    #  Configuration options: (public variables)
@@ -213,6 +443,9 @@ itcl::class gaia::GaiaConvertTable {
    #  Names of the objects used to control the filters.
    protected variable to_filter_
    protected variable from_filter_
+
+   #  Name of the FITS table containing catalog config info.
+   protected variable catinfo_ "CATINFO"
 
    #  End of class definition.
 }
