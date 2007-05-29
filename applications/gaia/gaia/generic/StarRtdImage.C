@@ -568,7 +568,8 @@ ImageData* StarRtdImage::getStarImage( const char* filename,
     //  for a compressed FITS file, or "fts*"
     char* p = (char *) strchr( filename, '.' );
     int isfits = 1;
-    if ( p && strstr( p, ".fit" ) == NULL && strstr( p, ".fts" ) == NULL ) {
+    if ( p && strstr( p, ".fit" ) == NULL && strstr( p, ".fts" ) == NULL 
+           && strstr( p, ".FIT" ) == NULL && strstr( p, ".FTS" ) == NULL ) {
         isfits = 0;
     }
 
@@ -4906,6 +4907,72 @@ int StarRtdImage::ndfCmdDisplay( int argc, char *argv[], NDFIO *ndf )
     return initNewImage();
 }
 
+/*
+ * Re-implement the FITS hdu get subcommand:
+ *
+ *    <path> hdu get ?$number? ?$filename? ?$entry?
+ *
+ * See skycat for details. This method is overridden so we can trap binary
+ * tables that are really compressed images and handle them appropriately.
+ */
+int StarRtdImage::hduCmdGet( int argc, char** argv, FitsIO* fits )
+{
+    StarFitsIO *sfits = (StarFitsIO *) fits;
+    int hdu = fits->getHDUNum();
+    int saved_hdu = hdu;
+    int numHDUs = fits->getNumHDUs();
+    int status = TCL_OK;
+
+    //  Check for the optional hdu arg, otherwise use current
+    if ( argc >= 2 && sscanf( argv[1], "%d", &hdu ) == 1 ) {
+	argc--;
+	argv++;
+	if ( hdu != saved_hdu ) {
+	    if ( hdu < 1 || hdu > numHDUs ) {
+		return fmt_error( "HDU number %d out of range (max %d)", hdu,
+                                  numHDUs );
+            }
+
+	    //  Switch to the given HDU, but restore the original before returning
+	    if ( fits->setHDU( hdu ) != 0 ) {
+                return TCL_ERROR;
+            }
+	}
+    }
+    
+    //  Check for the filename arg, needed for compressed image support.
+    char* filename = NULL;
+    if ( argc >= 2 ) {
+	filename = argv[1];
+    }
+
+    //  Check if this is a compressed image and handle.
+    if ( sfits->isCompressedImage() ) {
+        if ( argc >= 2 ) {
+            status = sfits->saveCompressedImage( filename );
+        }
+        else {
+            status = error( "Saving compressed image requires a filename" );
+        }
+    }
+    else {
+        //  Normal table save, check for the entry arg.
+        char* entry = NULL;
+        if ( argc >= 3 ) {
+            entry = argv[2];
+        }
+
+        //  Get the info and catch any errors
+        status = getHDU( fits, filename, entry );
+    }
+
+    //  Restore the original HDU before returning.
+    if ( hdu != saved_hdu && fits->setHDU( saved_hdu ) != 0 ) {
+	status = TCL_ERROR;
+    }
+    return status;
+}
+
 //+
 //   StarRtdImage::colorrampCmd
 //
@@ -5441,7 +5508,9 @@ int StarRtdImage::parseName( const char *imagename, char **fullname,
         //  Could be FITS file. No funny possibilities for these names.
         char* p = strchr( *fullname, '.' );
         if ( p && ( strstr( p, ".fit" ) != NULL ||
-                    strstr( p, ".fts" ) != NULL ) ) {
+                    strstr( p, ".fts" ) != NULL ||
+                    strstr( p, ".FIT" ) != NULL ||
+                    strstr( p, ".FTS" ) != NULL ) ) {
 
             //  Is a FITS name, does file exist? If not assume might
             //  be NDF component and pass on. Note a slice is valid,

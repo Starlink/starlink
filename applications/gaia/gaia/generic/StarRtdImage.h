@@ -450,6 +450,9 @@ class StarRtdImage : public Skycat
    //  Get the FITS headers of the NDF.
    int ndfCmdFits( int argc, char *argv[], NDFIO *ndf );
 
+   //  Get a FITS HDU and write to a disk file.
+   int hduCmdGet( int argc, char** argv, FitsIO* fits );
+
    //  Change the data of a BLT vector.
    int resetBltVector( const int num, const double *valueArr,
                        char *vecName );
