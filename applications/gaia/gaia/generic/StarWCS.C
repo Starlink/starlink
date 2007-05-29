@@ -102,7 +102,7 @@
 #include "StarWCS.h"
 #include "gaiaUtils.h"
 
-                                    //  Trig conversion factors.
+//  Trig conversion factors.
 static const double pi_ = 3.14159265358979323846;
 static const double r2d_ = 57.295779513082323;   // (180.0/pi_)
 static const double d2r_ = 0.017453292519943295; // (pi_/180.0);
