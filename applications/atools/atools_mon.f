@@ -247,6 +247,9 @@
       ELSE IF ( NAME .EQ. 'ASTINTERVAL' ) THEN
          CALL ASTINTERVAL( STATUS )
  
+      ELSE IF ( NAME .EQ. 'ASTBOX' ) THEN
+         CALL ASTBOX( STATUS )
+ 
 
 *  If the action name is not recognised, then report an error.
       ELSE

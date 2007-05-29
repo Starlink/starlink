@@ -23,7 +23,7 @@ atools_mon_TASKS = astcopy astaddframe astclear astget astset asttest \
  astgetregbounds astunformat asttran1 asttran2 astmapregion astcmpregion \
  astmathmap astsetactunit astgetactunit astpolymap astswitchmap asttranmap \
  astdsbframe astfluxframe astsfluxframe astpolygon astellipse astmapsplit \
- astselectormap astinterval
+ astselectormap astinterval astbox
 
 FSRC = \
  atl1_gtfrm.f \
@@ -91,7 +91,7 @@ astconvert.ifc astcopy.ifc astdsbframe.ifc astellipse.ifc \
 astfindframe.ifc astfluxframe.ifc astformat.ifc astunformat.ifc astframe.ifc \
 astframeset.ifc astgetactunit.ifc astgetframe.ifc astget.ifc \
 astgetmapping.ifc astgetrefpos.ifc astinvert.ifc astlutmap.ifc \
-astmapbox.ifc astmathmap.ifc astmatrixmap.ifc astpcdmap.ifc \
+astmapbox.ifc astmathmap.ifc astmatrixmap.ifc astpcdmap.ifc astbox.ifc \
 astpermaxes.ifc astpermmap.ifc astpickaxes.ifc astpolygon.ifc \
 astinterval.ifc astpolymap.ifc astremapframe.ifc astremoveframe.ifc \
 astsetactunit.ifc astset.ifc astsetrefpos.ifc astsfluxframe.ifc \
@@ -105,7 +105,7 @@ astconvert.ifl astcopy.ifl astdsbframe.ifl astellipse.ifl \
 astfindframe.ifl astfluxframe.ifl astformat.ifl astunformat.ifl astframe.ifl \
 astframeset.ifl astgetactunit.ifl astgetframe.ifl astget.ifl \
 astgetmapping.ifl astgetrefpos.ifl astinvert.ifl astlutmap.ifl \
-astmapbox.ifl astmathmap.ifl astmatrixmap.ifl astpcdmap.ifl \
+astmapbox.ifl astmathmap.ifl astmatrixmap.ifl astpcdmap.ifl astbox.ifl \
 astpermaxes.ifl astpermmap.ifl astpickaxes.ifl astpolygon.ifl \
 astinterval.ifl astpolymap.ifl astremapframe.ifl astremoveframe.ifl \
 astsetactunit.ifl astset.ifl astsetrefpos.ifl astsfluxframe.ifl \

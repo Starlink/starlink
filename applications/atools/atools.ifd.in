@@ -2676,6 +2676,68 @@ iraf! {
 
       }
 
+      action astbox {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter frame {
+            position 1
+            type NDF
+            prompt {The Frame in which the Box is defined}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter form {
+            position 2
+            type _INTEGER
+            prompt {Specify the Box by opposite corners?}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter point1 {
+            position 3
+            type LITERAL
+            prompt {Centre or corner axis values}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter point2 {
+            position 4
+            type LITERAL
+            prompt {Corner axis values}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter unc {
+            position 5
+            type LITERAL
+            prompt {The uncertainty Region}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter options {
+            position 6
+            type LITERAL
+            prompt {Options for the Box}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 7
+            type LITERAL
+            prompt {Name of file in which to store the Box}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+      }
 
    }
 

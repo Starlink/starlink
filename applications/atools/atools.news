@@ -11,7 +11,7 @@
 
   Changes in V1.9-3
 
-  - New commands astmapregion, astcmpregion, astgetregbounds
+  - New commands astmapregion, astcmpregion, astgetregbounds, astbox
 
 
   Changes in V1.9-2
