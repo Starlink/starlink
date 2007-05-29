@@ -294,7 +294,7 @@ itcl::class gaia::GaiaFITSHeader {
          }
          set lastblank 0
 
-         set triple [get_kvc $line]
+         set triple [GaiaFITSHeader::get_kvc $line]
          if { [lempty $triple] } {
             set triple [list INVALID {} $line]
          }
@@ -306,18 +306,17 @@ itcl::class gaia::GaiaFITSHeader {
       [$w component listbox] xview moveto 0.0
    }
 
-   #  Return a tcl list with keyword, value and comment (kvc).
-   protected method get_kvc { line } {
-      set key [string range $line 0 6]
-      if { [lempty $key] || "$key" == "COMMENT" || "$key" == "HISTORY" } {
-         return [list $key [string trim [string range $line 7 end]] {}]
+   #  Return a tcl list with keyword, value and comment (kvc). 
+   #  Public proc for re-usability.
+   public proc get_kvc { line } {
+      #  Use utility parser to handle quoted strings.
+      lassign [fits::parsecard $line] key val com
+
+      #  For these keywords make the comment the value, it's tidier.
+      if { "$key" == ""  || "$key" == "COMMENT" || "$key" == "HISTORY" } {
+         set val $com
+         set com ""
       }
-      lassign [split $line =] l1 l2
-      if { [lempty $l1] } { return "" }
-      set key [string trim $l1]
-      lassign [split $l2 /] l1 l2
-      set val [string trim $l1]
-      set com [string trim $l2]
       return [list $key $val $com]
    }
    
