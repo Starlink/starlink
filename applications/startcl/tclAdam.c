@@ -16,6 +16,7 @@
       27 Jan   2006 Really remove Tcladam_Exit (PWD).
        6 Feb   2006 Add location of init.tcl script as part of package
                     start up. Also defines startcl_library.
+      29 May   2007 Use tcl_findLibrary to locate startup script. More robust.
 */
 #include "config.h"                   /* Local version */
 
@@ -69,6 +70,7 @@ static int Tcladam_ProcessMessage ( Tcl_Interp *interp, int path, int messid,
     int inmsg_status, int inmsg_context, char *inmsg_name, int inmsg_length, 
     char *inmsg_value);
 static void Tcladam_AppendStatus(Tcl_Interp *interp, int status);
+
 
 /*  Buffer for translating Adam status's into messages */
 
@@ -397,21 +399,6 @@ Tcl_Interp *interp   /* tcl interpreter pointer */
                        (Tcl_CmdProc *)Tcladam_Start,
                        (ClientData)NULL, 
                        (Tcl_CmdDeleteProc *)NULL );
-
-   /* The startcl_library path can be found in several places.  Here is the
-    * order in which the are searched.
-    *          1) the variable may already exist
-    *          2) env array
-    *          3) the compiled in value of STARTCL_LIBRARY
-    */
-   libDir = Tcl_GetVar(interp, "startcl_library", TCL_GLOBAL_ONLY);
-   if (libDir == NULL) {
-       libDir = Tcl_GetVar2(interp, "env", "STARTCL_LIBRARY", TCL_GLOBAL_ONLY);
-   }
-   if (libDir == NULL) {
-       libDir = STARTCL_LIBRARY;
-   }
-   Tcl_SetVar(interp, "startcl_library", libDir, TCL_GLOBAL_ONLY);
 
    /* Locate the init.tcl script and arrange for scripts be autoloaded */
    result = Tcl_Eval( interp, initScript );
