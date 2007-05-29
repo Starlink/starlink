@@ -109,6 +109,12 @@ public:
     // Move to the specified HDU and make it the current one
     int setHDU( int num );
 
+    // Does current HDU contain a compressed image?
+    int isCompressedImage();
+
+    // Save a compressed image from the current extension to a file.
+    int saveCompressedImage( const char *filename );
+
 protected:
     // Whether to merge headers or not.
     static int alwaysMerge_;

@@ -6,14 +6,17 @@
  * StarFitsIO.C - method definitions for class StarFitsIO, for operating on
  *                Fits files. This class redefines class FitsIO to use
  *                the Starlink AST library. It also forces the use of
- *                readonly access, if that is all that is available
- *                and correctly saves a set of merged headers for
- *                extension images.
+ *                readonly access, if that is all that is available,
+ *                correctly saves a set of merged headers for
+ *                extension images and supports the extraction of
+ *                compressed extension images to a file.
+ *
  *  Copyright:
  *     Copyright (C) 2000-2005 Central Laboratory of the Research Councils.
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     Copyright (C) 2007 Science and Technology Facilities Council.
  *     All Rights Reserved.
- 
+
  *  Licence:
  *     This program is free software; you can redistribute it and/or
  *     modify it under the terms of the GNU General Public License as
@@ -52,6 +55,11 @@
  *                 13/06/05  Added setHDU member. Overrides the FitsIO version
  *                           (which is now virtual), so we can register
  *                           the pointer with CNF.
+ *                 23/05/07  Check for INHERIT keyword when testing if headers
+ *                           should be merged. That's the standard way
+ *                           (nearly).
+ *                 24/05/07  Add methods for extracting compressed extension
+ *                           images.
  */
 static const char* const rcsId="@(#) $Id$";
 
@@ -83,6 +91,7 @@ extern "C" {
 int StarFitsIO::alwaysMerge_ = 0;
 
 enum {FITSBLOCK=2880};
+enum {FITSCARD=80};
 
 /*
  * create and return a temporary file with a copy of stdin.
@@ -151,7 +160,7 @@ StarFitsIO* StarFitsIO::copy()
     if ( status != 0 ) {
         return NULL;
     }
-    return new StarFitsIO( width_, height_, bitpix_, bzero_, bscale_, 
+    return new StarFitsIO( width_, height_, bitpix_, bzero_, bscale_,
                            header_, data_, newFitsio );
 }
 
@@ -337,7 +346,7 @@ StarFitsIO* StarFitsIO::initialize( Mem& header, Mem& data, fitsfile* fitsio )
 int StarFitsIO::getReadonly() {
     if ( header_.options() && Mem::FILE_RDWR ) {
         return 0;
-    } 
+    }
     else {
         return 1;
     }
@@ -363,7 +372,8 @@ int StarFitsIO::wcsinit()
 /**
  * Determine if we need to merge the header with those from the primary HDU or
  * not. If the alwaysMerge_ member is set true, then we always merge,
- * otherwise we only merge if the primary HDU contains a dummy image.
+ * otherwise we only merge if the primary HDU contains a dummy image or if the
+ * INHERIT keyword is set.
  */
 int StarFitsIO::mergeNeeded()
 {
@@ -374,23 +384,31 @@ int StarFitsIO::mergeNeeded()
 
     int result = alwaysMerge_;
     if ( !result ) {
-        //  Need to check the primary image size... Don't want to modify the
-        //  current HDU so need to do this the hard way?
-        int ncards = primaryHeader_.length() / 80;
-        char *ptr = (char *) primaryHeader_.ptr();
-        char *subptr = NULL;
-        int naxis = 0;
-        for ( int i = 0 ; i < ncards; i++, ptr += 80 ) {
-            if ( strncmp( ptr, "NAXIS ", 6 ) == 0 ) {
-                subptr = strstr( ptr, "=" );
-                if ( subptr != NULL ) {
-                    sscanf( ++subptr, "%d", &naxis );
-                }
-                break;
-            }
-        }
-        if ( naxis == 0 ) {
+        //  Check for INHERIT, if that "T" then we inherit.
+        const char *inherit = get( "INHERIT" );
+        if ( inherit && inherit[0] == 'T' ) {
             result = 1;
+        }
+        else {
+            //  Need to check the primary image size... Don't want to modify
+            //  the current HDU so need to do this the hard way by scanning
+            //  the copy of the headers.
+            int ncards = primaryHeader_.length() / FITSCARD;
+            char *ptr = (char *) primaryHeader_.ptr();
+            char *subptr = NULL;
+            int naxis = 0;
+            for ( int i = 0 ; i < ncards; i++, ptr += FITSCARD ) {
+                if ( strncmp( ptr, "NAXIS ", 6 ) == 0 ) {
+                    subptr = strstr( ptr, "=" );
+                    if ( subptr != NULL ) {
+                        sscanf( ++subptr, "%d", &naxis );
+                    }
+                    break;
+                }
+            }
+            if ( naxis == 0 ) {
+                result = 1;
+            }
         }
     }
     return result;
@@ -416,29 +434,31 @@ void StarFitsIO::mergeHeader()
     //  which should be XTENSION='IMAGE', with SIMPLE = T.
     sprintf( newheader, "%-80s",
              "SIMPLE  =                    T / Fits standard" );
-    strncpy( newheader + 80, (char *)header_.ptr() + 80, elength - 80 );
+    strncpy( newheader + FITSCARD, (char *)header_.ptr() + FITSCARD,
+             elength - FITSCARD );
 
     //  Get number of cards in each of the headers.
-    int fixedcards = elength / 80;
-    int extracards = plength / 80;
+    int fixedcards = elength / FITSCARD;
+    int extracards = plength / FITSCARD;
 
     //  Locate and skip the END card (this is where we start adding
     //  any new cards).
     char *endPtr = (char *) newheader;
     int newlength = 0;
     int i = 0;
-    for ( i = 0 ; i < fixedcards; i++, endPtr += 80, newlength += 80 ) {
+    for ( i = 0 ; i < fixedcards; i++, endPtr += FITSCARD,
+                                       newlength += FITSCARD ) {
         if ( strncmp( endPtr, "END     ", 8 ) == 0 ) {
             break;
         }
     }
-    fixedcards = newlength / 80;
+    fixedcards = newlength / FITSCARD;
 
     //  Loop over all primary headers, adding any new or special
     //  cards to the end of the new headers.
     char *extraPtr = (char *) primaryHeader_.ptr();
     int skip = 0;
-    for ( i = 0 ; i < extracards; i++, extraPtr += 80 ) {
+    for ( i = 0 ; i < extracards; i++, extraPtr += FITSCARD ) {
 
         //  Special cards are always added to the end. Note END card
         //  is always copied from primary headers.
@@ -457,7 +477,7 @@ void StarFitsIO::mergeHeader()
             //  position if found.
             skip = 0;
             char *mainPtr = (char *) newheader;
-            for ( int j = 0; j < fixedcards; j++, mainPtr += 80 ) {
+            for ( int j = 0; j < fixedcards; j++, mainPtr += FITSCARD ) {
                 if ( strncmp( extraPtr, mainPtr, 8 ) == 0 ) {
                     skip = 1;
                     break;
@@ -467,9 +487,9 @@ void StarFitsIO::mergeHeader()
         if ( ! skip ) {
 
             //  Keyword not seen or special, so append this.
-            strncpy( endPtr, extraPtr, 80 );
-            endPtr += 80;
-            newlength += 80;
+            strncpy( endPtr, extraPtr, FITSCARD );
+            endPtr += FITSCARD;
+            newlength += FITSCARD;
         }
     }
 
@@ -500,11 +520,12 @@ int StarFitsIO::write( const char *filename )
 
     // if the file exists, rename it to make a backup and to avoid
     // crashing if we have the file mapped already
-    if (access(filename, F_OK) == 0) {
+    if ( access( filename, F_OK ) == 0 ) {
 	char backup[1024];
-	sprintf(backup, "%s.BAK", filename);
-	if (rename(filename, backup) != 0)
-	    return sys_error("can't create backup file for ", filename);
+	sprintf( backup, "%s.BAK", filename );
+	if ( rename( filename, backup ) != 0 ) {
+	    return sys_error( "cannot create backup file for ", filename );
+        }
     }
 
     FILE *f;
@@ -531,7 +552,7 @@ int StarFitsIO::write( const char *filename )
     }
     else {
 	// create a FITS header
-	int size = FITSBLOCK/80;  // number of keyword lines in FITS header, including END
+	int size = FITSBLOCK/FITSCARD;  // number of keyword lines in FITS header, including END
 
 	// output keywords
 	put_keyword(f, "SIMPLE", 'T'); size--;
@@ -624,7 +645,7 @@ int StarFitsIO::write( const char *filename )
 }
 
 /*
- * Move to the specified HDU and make it the current one 
+ * Move to the specified HDU and make it the current one
  */
 int StarFitsIO::setHDU( int num )
 {
@@ -636,3 +657,141 @@ int StarFitsIO::setHDU( int num )
 
     return result;
 }
+
+//
+// Compressed image support
+// ========================
+//
+
+/**
+ * Check if the current HDU contains a compressed image.
+ */
+int StarFitsIO::isCompressedImage()
+{
+    int status = 0;
+    return fits_is_compressed_image( fitsio_, &status );
+}
+
+/**
+ * Save the compressed image in the current HDU to a disk file.
+ * Also merges the headers with those of the primary image if required.
+ */
+int StarFitsIO::saveCompressedImage( const char *filename )
+{
+    double *array;
+    double bscale = 1.0;
+    double bzero = 0.0;
+    double nulval = 0.0;
+    fitsfile *outfptr;
+    int bitpix = 0;
+    int bytepix = 0;
+    int datatype = 0;
+    long naxes[2];
+    int naxis = 0;
+    int status = 0;
+    long nbytes = 0;
+    long npix = 0;
+    int nkeys = 0;
+    int anynul = 0;
+
+    //  If the file exists, rename it to make a backup and to avoid
+    //  crashing if we have the file mapped already
+    if ( access( filename, F_OK ) == 0 ) {
+	char backup[1024];
+	sprintf( backup, "%s.BAK", filename );
+	if ( rename( filename, backup ) != 0 ) {
+	    return sys_error( "cannot create backup file for ", filename );
+        }
+    }
+
+    //  Decompressing is tricky, especially using file mapping, so we will
+    //  just use the native cfitsio routines to do this work.
+    fits_create_file( &outfptr, filename, &status );
+    if ( status != 0 ) {
+        return cfitsio_error();
+    }
+
+    //  Get image dimensions and total number of pixels in image.
+    naxes[0] = 1;
+    naxes[1] = 1;
+    fits_get_img_param( fitsio_, 2, &bitpix, &naxis, naxes, &status );
+    if ( status != 0 ) {
+        return cfitsio_error();
+    }
+    npix = naxes[0] * naxes[1];
+
+    // Create the new image
+    fits_create_img( outfptr, bitpix, naxis, naxes, &status );
+
+    // Copy all the existing user keywords (not the structural keywords)
+    // from the current HDU.
+    fits_get_hdrspace( fitsio_, &nkeys, NULL, &status );
+    char card[FITSCARD+1];
+    for ( int i = 1; i <= nkeys; i++) {
+        fits_read_record( fitsio_, i, card, &status );
+        if ( fits_get_keyclass( card ) > TYP_CMPRS_KEY ) {
+            fits_write_record( outfptr, card, &status );
+        }
+    }
+
+    // Same for headers from the primary extension, if needed.
+    if ( mergeNeeded() ) {
+        int plength = primaryHeader_.length();
+        int pcards = plength / FITSCARD;
+        char *p = (char *) primaryHeader_.ptr();
+        for ( int i = 0 ; i < pcards; i++, p += FITSCARD ) {
+            if ( fits_get_keyclass( p ) > TYP_CMPRS_KEY ) {
+                fits_write_record( outfptr, p, &status );
+            }
+        }
+    }
+
+    // Work out data characteristics and allocate memory to hold
+    // decompressed image.
+    switch( bitpix ) {
+    case BYTE_IMG:
+        datatype = TBYTE;
+        break;
+    case SHORT_IMG:
+        datatype = TSHORT;
+        break;
+    case LONG_IMG:
+        datatype = TINT;
+        break;
+    case FLOAT_IMG:
+        datatype = TFLOAT;
+        break;
+    case DOUBLE_IMG:
+        datatype = TDOUBLE;
+        break;
+    }
+
+    bytepix = abs(bitpix) / 8;
+    nbytes = npix * bytepix;
+    array = (double *) malloc( nbytes );
+
+    // Turn off any scaling so that we copy the raw pixel values.
+    // Note should be undone by any call that changes HDU.
+    fits_set_bscale( fitsio_,  bscale, bzero, &status );
+    fits_set_bscale( outfptr, bscale, bzero, &status );
+
+    // Read image and write it back to the output file.
+    fits_read_img( fitsio_, datatype, 1, npix, &nulval, array, &anynul,
+                   &status );
+    fits_write_img( outfptr, datatype, 1, npix, array, &status );
+
+    // Expect to be at the end of file.
+    if ( status == END_OF_FILE ) {
+        status = 0;
+    }
+
+    // Close file ans release memory.
+    fits_close_file( outfptr,  &status );
+    free( array );
+
+    if ( status ) {
+        return cfitsio_error();
+    }
+    return OK;
+}
+
