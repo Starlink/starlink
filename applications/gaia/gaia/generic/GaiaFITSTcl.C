@@ -57,6 +57,7 @@ extern "C" {
 #include "GaiaFITS.h"
 
 #define MAX_DIMS 7
+#define FITSCARD 80
 
 /* Struct for information associated with an identifier */
 struct FITSinfo {
@@ -102,6 +103,8 @@ static int GaiaFITSTclMap( ClientData clientData, Tcl_Interp *interp,
                            int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclOpen( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
+static int GaiaFITSTclParseCard( ClientData clientData, Tcl_Interp *interp,
+                                 int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclUnMap( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
 
@@ -165,6 +168,10 @@ int Fits_Init( Tcl_Interp *interp )
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
+    Tcl_CreateObjCommand( interp, "fits::getwcs", GaiaFITSTclGtWcs,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
     Tcl_CreateObjCommand( interp, "fits::map", GaiaFITSTclMap,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
@@ -173,11 +180,11 @@ int Fits_Init( Tcl_Interp *interp )
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "fits::unmap", GaiaFITSTclUnMap,
+    Tcl_CreateObjCommand( interp, "fits::parsecard", GaiaFITSTclParseCard,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "fits::getwcs", GaiaFITSTclGtWcs,
+    Tcl_CreateObjCommand( interp, "fits::unmap", GaiaFITSTclUnMap,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -461,7 +468,7 @@ static int GaiaFITSTclCGet( ClientData clientData, Tcl_Interp *interp,
 {
     FITSinfo *info;
     Tcl_Obj *resultObj;
-    char value[80];
+    char value[FITSCARD];
     int result;
 
     /* Check arguments, need 2 the fits identifier and the header key */
@@ -489,7 +496,7 @@ static int GaiaFITSTclCGet( ClientData clientData, Tcl_Interp *interp,
         else if ( strcasecmp( keyword, "title" ) == 0 ) {
             keyword = "OBJECT";
         }
-        result = GaiaFITSHGet( info->handle, keyword, value, 80 );
+        result = GaiaFITSHGet( info->handle, keyword, value, FITSCARD );
         if ( result == TCL_OK ) {
             Tcl_SetStringObj( resultObj, value, -1 );
         }
@@ -986,4 +993,64 @@ static int GaiaFITSTclGetProperty( ClientData clientData, Tcl_Interp *interp,
     /* Unknown, so return an empty string */
     Tcl_SetResult( interp, "", TCL_VOLATILE );
     return TCL_OK;
+}
+
+/**
+ * Parse a given FITS header card into it keyword, value and comment
+ * parts. Returns the card as a list of values.
+ */
+static int GaiaFITSTclParseCard( ClientData clientData, Tcl_Interp *interp,
+                                 int objc, Tcl_Obj *CONST objv[] )
+{
+    Tcl_Obj *resultObj;
+    char *c;
+    char *k;
+    char *v;
+    char comment[FITSCARD+1];
+    char keyword[FITSCARD+1];
+    char value[FITSCARD+1];
+    const char *card;
+    int status = 0;
+
+    /* Check arguments, need the card */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "FITS_card" );
+        return TCL_ERROR;
+    }
+    card = Tcl_GetString( objv[1] );
+
+    /* Get keyword, just the characters to the first space or equals sign. */
+    c = (char *) card;
+    k = keyword;
+    while ( *c && *c != '=' && *c != ' ' ) {
+        *k = *c;
+        c++;
+        k++;
+    }
+    *k = '\0';
+
+    /* Do parsing to get value and comment, handles quoting. */
+    if ( fits_parse_value( (char *) card, value, comment, &status ) == 0 ) {
+
+        /* Remove quoting from value, if present. */
+        v = value;
+        if ( *v == '\'' ) {
+            v++;
+            c = value + strlen( value );
+            while ( *c && *c != '\'' ) c--;
+            *c = '\0';
+        }
+    
+        /*  Construct result */
+        resultObj = Tcl_GetObjResult( interp );
+        Tcl_ListObjAppendElement( interp, resultObj, 
+                                  Tcl_NewStringObj( keyword, -1 ) );
+        Tcl_ListObjAppendElement( interp, resultObj, 
+                                  Tcl_NewStringObj( v, -1 ) );
+        Tcl_ListObjAppendElement( interp, resultObj, 
+                                  Tcl_NewStringObj( comment, -1 ) );
+        return TCL_OK;
+    }
+    Tcl_SetResult( interp, "Error reading FITS card", TCL_VOLATILE );
+    return TCL_ERROR;
 }
