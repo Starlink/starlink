@@ -8,16 +8,23 @@
 * A. Brighton  05/10/95  Created
 * pbiereic     01/03/01  copied from RtdImage.C
 * pbiereic     14/08/01  added "hdu fits" subcommand
+* P. W. Draper 20/05/07  pick out special columns in getHDU entry
+*                        and examine the properties so that we make
+*                        sure there is an id column (when the positional
+*                        columns take up column 0) and that any sky
+*                        coordinates are convered from radians to degrees.
+*                        also delete the fits copy in hduCmdSet when
+*                        a table is accessed, stops a leak.
 */
 
 /************************************************************************
 *   NAME
-*   
+*
 *   RtdHDU.C - methods for Rtdimage subcommand hduCmd()
-* 
+*
 *   SYNOPSIS
-*   
-* 
+*
+*
 *   DESCRIPTION
 *
 *   This file contains all RtdImage member functions needed for
@@ -27,18 +34,18 @@
 *
 *   ENVIRONMENT
 *
-*   CAUTIONS 
+*   CAUTIONS
 *
 *   SEE ALSO
 *    RtdImage(3), RTD documentation
 *
-*   BUGS   
-* 
+*   BUGS
+*
 *------------------------------------------------------------------------
 */
 
 static char *rcsId="@(#) $Id: RtdHDU.C,v 1.2 2006/03/26 13:22:33 abrighto Exp $";
- 
+
 static void *use_rcsId = ((void)&use_rcsId,(void *) &rcsId);
 
 #include <sstream>
@@ -47,6 +54,9 @@ static void *use_rcsId = ((void)&use_rcsId,(void *) &rcsId);
 #endif
 #include "RtdImage.h"
 
+//  Trig conversion factors.
+static const double pi_ = 3.14159265358979323846;
+static const double r2d_ = 57.295779513082323;   // (180.0/pi_)
 
 /*
  * Implement the hdu headings subcommand:
@@ -74,11 +84,11 @@ int RtdImage::hduCmdHeadings(int argc, char** argv, FitsIO* fits)
 
     // get the info and catch any errors
     int status = getHDUHeadings(fits);
-    
+
     // restore the original HDU before returning
     if (hdu != saved_hdu && fits->setHDU(saved_hdu) != 0)
 	status = TCL_ERROR;
-    
+
     return status;
 }
 
@@ -112,17 +122,17 @@ int RtdImage::hduCmdFits(int argc, char** argv, FitsIO* fits)
     ostringstream os;
     fits->getFitsHeader(os);
     set_result(os.str().c_str());
-    
+
     // restore the original HDU before returning
     if (hdu != saved_hdu && fits->setHDU(saved_hdu) != 0)
 	status = TCL_ERROR;
-    
+
     return status;
 }
 
 /*
  * This method is used to implement the "hdu headings" subcommand.
- * It returns the table headings of the current FITS table as a 
+ * It returns the table headings of the current FITS table as a
  * Tcl list. An error is returned if the current HDU is not a FITS
  * table.
  */
@@ -149,7 +159,7 @@ int RtdImage::getHDUHeadings(FitsIO* fits)
 
 /*
  * Implement the "hdu type" subcommand:
- * 
+ *
  *    <path> hdu type ?$number?
  *
  * See comments for hduCmd() for details.
@@ -177,19 +187,19 @@ int RtdImage::hduCmdType(int argc, char** argv, FitsIO* fits)
     int status = TCL_OK;
     if (type)
 	set_result(fits->getHDUType());
-    else 
+    else
 	status = TCL_ERROR;
 
     // restore the original HDU before returning
     if (hdu != saved_hdu && fits->setHDU(saved_hdu) != 0)
 	status = TCL_ERROR;
-    
+
     return status;
 }
 
 /*
  * Implement the hdu get subcommand:
- * 
+ *
  *    <path> hdu get ?$number? ?$filename? ?$entry?
  *
  * See comments for hduCmd() for details.
@@ -215,30 +225,30 @@ int RtdImage::hduCmdGet(int argc, char** argv, FitsIO* fits)
 
     // check for the filename arg
     char* filename = NULL;
-    if (argc >= 2) 
+    if (argc >= 2)
 	filename = argv[1];
 
     // check for the entry arg
     char* entry = NULL;
-    if (argc >= 3) 
+    if (argc >= 3)
 	entry = argv[2];
 
     // get the info and catch any errors
     int status = getHDU(fits, filename, entry);
-    
+
     // restore the original HDU before returning
     if (hdu != saved_hdu && fits->setHDU(saved_hdu) != 0)
 	status = TCL_ERROR;
-    
+
     return status;
 }
 
-    
+
 /*
  * This method implements the main body of the hdu get subcommand.
  * If filename arg is not NULL, the contents of the current HDU are
  * written to the file as a local catalog. Otherwise, the contents
- * of the current HDU are returned as a Tcl list or rows. If the 
+ * of the current HDU are returned as a Tcl list or rows. If the
  * entry arg is not null and a filename was specified, it specifies
  * the catalog config entry for the file's header, in Tcl list format
  * {{key value} {key value} ...}.
@@ -278,11 +288,22 @@ int RtdImage::getHDU(FitsIO* fits, const char* filename, const char* entry)
     // output the catalog header
     os << "QueryResult\n\n";
 
+    //  PWD: locate special columns and their conversion factors (to degrees
+    //  from radians).
+    int idcol = -1;
+    int racol = -1;
+    double rascale = 1.0;
+    int deccol = -1;
+    double decscale = 1.0;
+
     // output the catalog config entry, if there is one
     if (entry != NULL) {
 	os << "# Config entry\n";
 	int nkeys = 0;
 	char** keys = NULL;
+        const char *p;
+        const char *t;
+        char buf[20];
 	if (Tcl_SplitList(interp_, (char*)entry, &nkeys, &keys) != TCL_OK)
 	    return TCL_ERROR;
 	for(int i = 0; i < nkeys; i++) {
@@ -297,14 +318,51 @@ int RtdImage::getHDU(FitsIO* fits, const char* filename, const char* entry)
 		Tcl_Free((char *)v);
 		return fmt_error("Invalid catalog config entry: '%s': Expected {key value}", keys[i]);
 	    }
+
+            //  PWD: record ra_col, dec_col and id_col columns.
+            p = v[0];
+            while ( p && *p && *p == ' ' ) p++;  // Trim leading blanks.
+            if ( strncasecmp( p, "ra_col", 6 ) == 0 ) {
+                sscanf( v[1], "%d", &racol );
+
+                //  If these are radians we need to convert to degrees.
+                sprintf( buf, "TUNIT%d", racol + 1 );
+                t = fits->get( buf );
+                while ( t && *t && *t == ' ' ) t++;  // Trim leading blanks.
+                if ( t && strncasecmp( t, "radian", 6 ) == 0 ) {
+                    rascale = r2d_;
+                }
+            }
+            else if ( strncasecmp( p, "dec_col", 7 ) == 0 ) {
+                sscanf( v[1], "%d", &deccol );
+
+                //  If these are radians we need to convert to degrees.
+                sprintf( buf, "TUNIT%d", deccol + 1 );
+                t = fits->get( buf );
+                while ( t && *t && *t == ' ' ) t++;  // Trim leading blanks.
+                if ( t && strncasecmp( t, "radian", 6 ) == 0 ) {
+                    decscale = r2d_;
+                }
+            }
+            else if ( strncasecmp( p, "id_col", 6 ) == 0 ) {
+                sscanf( v[1], "%d", &idcol );
+            }
 	    os << v[0] << ": " << v[1] << endl;
 	    Tcl_Free((char *)v);
 	}
+        
+        //  No id_col, so we fake an index at the end.
+        if ( idcol == -1 ) {
+            os << "id_col: " << ncols << endl;
+        }
+
 	Tcl_Free((char *)keys);
 	os << "# End config entry\n\n";
     }
-            
-    // output the column headings
+
+    // output the column headings, if id_col is undefined then create a fake
+    // column at the end (to keep ra_col & dec_col at current settings, which
+    // are written out, could also be x_col and y_col to keep happy).
     int col;
     for(col = 1; col <= ncols; col++) {
 	char* s = fits->getTableHead(col);
@@ -314,18 +372,34 @@ int RtdImage::getHDU(FitsIO* fits, const char* filename, const char* entry)
 	if (col < ncols)
 	    os << '\t';
     }
+    if ( idcol == -1 && entry != NULL ) {
+        os << '\t' << "ID";
+    }
+
     os << "\n---\n";    // heading separator (dashed line)
 
     // output the data
     for(long row = 1; row <= nrows; row++) {
 	for(col = 1; col <= ncols; col++) {
-	    char* s = fits->getTableValue(row, col);
+            char* s;
+            if ( col == ( racol + 1 ) ) {
+                s = fits->getTableValue(row, col, rascale);
+            }
+            else if ( col == ( deccol + 1 ) ) {
+                s = fits->getTableValue(row, col, decscale);
+            }
+            else {
+                s = fits->getTableValue(row, col, 1.0);
+            }
 	    if (!s)
 		return TCL_ERROR;
 	    os << s;
 	    if (col < ncols)
 		os << '\t';
 	}
+        if ( idcol == -1 && entry != NULL ) {
+            os << '\t' << row;
+        }
 	os << endl;
     }
     return TCL_OK;
@@ -371,7 +445,7 @@ int RtdImage::hduCmdCreate(int argc, char** argv, FitsIO* fits)
 	    status = TCL_ERROR;
 	    break;
 	}
-   
+
 	// get the column formats array
 	int numFormats = 0;
 	if (Tcl_SplitList(interp_, tform, &numFormats, &formats) != TCL_OK) {
@@ -390,7 +464,7 @@ int RtdImage::hduCmdCreate(int argc, char** argv, FitsIO* fits)
 	    status = TCL_ERROR;
 	    break;
 	}
-    
+
 	// Create the FITS table
 	if (fits->createTable(extname, numRows, numCols, (char**)colHeadings, (char**)formats, asciiFlag) != 0) {
 	    status = TCL_ERROR;
@@ -423,7 +497,7 @@ int RtdImage::hduCmdCreate(int argc, char** argv, FitsIO* fits)
 	}
 	break;                  // once only
     }
-    
+
     // Clean up and return the status
     if (colHeadings)
 	Tcl_Free((char *)colHeadings);
@@ -433,7 +507,7 @@ int RtdImage::hduCmdCreate(int argc, char** argv, FitsIO* fits)
 	Tcl_Free((char *)dataRows);
     if (dataCols)
 	Tcl_Free((char *)dataCols);
-   
+
     // restore the original HDU
     fits->setHDU(hdu);
 
@@ -460,7 +534,7 @@ int RtdImage::hduCmdDelete(int argc, char** argv, FitsIO* fits)
 
     if (fits->deleteHDU(hdu) != 0)
 	return TCL_ERROR;
-   
+
     return TCL_OK;
 }
 
@@ -496,7 +570,7 @@ int RtdImage::hduCmdList(int argc, char** argv, FitsIO* fits)
 
 	// get these keyword values and default to ""
 	char extName[80], naxis[32], naxis1[32], naxis2[32], naxis3[32];
-	char crpix1[32], crpix2[32]; 
+	char crpix1[32], crpix2[32];
 	fits->get("EXTNAME", extName, sizeof(extName));
 	fits->get("NAXIS", naxis, sizeof(naxis));
 	fits->get("NAXIS1", naxis1, sizeof(naxis1));
@@ -510,9 +584,9 @@ int RtdImage::hduCmdList(int argc, char** argv, FitsIO* fits)
 	    double dcrpix1, dcrpix2;
 	    fits->get("CRPIX1", dcrpix1);
 	    fits->get("CRPIX2", dcrpix2);
-	    os << "{" 
-	       << i 
-	       << " " << type 
+	    os << "{"
+	       << i
+	       << " " << type
 	       << " {" << extName << "}"
 	       << " {" << naxis << "}"
 	       << " {" << naxis1 << "}"
@@ -523,9 +597,9 @@ int RtdImage::hduCmdList(int argc, char** argv, FitsIO* fits)
 	       << "} ";
 	}
 	else {
-	    os << "{" 
-	       << i 
-	       << " " << type 
+	    os << "{"
+	       << i
+	       << " " << type
 	       << " {" << extName << "}"
 	       << " {" << naxis << "}"
 	       << " {" << naxis1 << "}"
@@ -573,23 +647,26 @@ int RtdImage::hduCmdSet(int argc, char** argv, FitsIO* fits)
 	delete fits;
 	return TCL_ERROR;
     }
-        
+
     const char* hduType = fits->getHDUType();
     if (!hduType)
 	return TCL_ERROR;
-    
-    if (*hduType != 'i')
-	return TCL_OK;          // FITS table, not image: don't display 
+
+    if (*hduType != 'i') {
+        delete fits;            // Otherwise just dropped. Note original
+                                // FitsIO now positioned ay new HDU anyway.
+	return TCL_OK;          // FITS table, not image: don't display
+    }
 
     // save image transformation parameters to restore later
     ImageDataParams p;
     image_->saveParams(p);
 
     // delete old image
-    delete image_; 
+    delete image_;
     image_ = NULL;
     updateViews();
-        
+
     // Re-initialize the image from the given HDU
     ImageData* im = makeImage(fits);
     if (! im)
@@ -670,15 +747,15 @@ int RtdImage::hduCmdDisplay(int argc, char** argv, FitsIO* fits)
     image_->saveParams(p);
 
     // delete old image
-    delete image_; 
+    delete image_;
     image_ = NULL;
     updateViews();
-    
+
     // Create an image composed of all of the requested image extensions
     image_ = ImageData::makeCompoundImage(name(), imio, hduList, numHDUs, biasimage_->biasInfo(), verbose());
     if (! image_)
 	return TCL_ERROR;
-    
+
     // restore transformations
     image_->restoreParams(p, !autoSetCutLevels_);
 
