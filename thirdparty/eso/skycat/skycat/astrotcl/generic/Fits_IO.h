@@ -223,7 +223,7 @@ public:
     char* getTableHead(int col);
 
     // Return the value in the current FITS table at the given row and column
-    char* getTableValue(long row, int col);
+    char* getTableValue(long row, int col, double scale = 1.0);
 
     // get the contents of the given column as an array of doubles
     int getTableColumn(int col, double* values, int numValues);

@@ -32,8 +32,9 @@
  *                 01/03/07  Added putcard method for pre-formatted cards.
  * Peter W. Draper 24/04/07  Handle table columns with K format, that's 
  *                           TLONGLONG.
- *                 22/05/07  Convert radian table values into degrees. 
- *                           Needed for sky coordinates. Could do with a more
+ *                 22/05/07  Extend getTableValue so that the value can be scaled
+ *                           (so that radian table values can be converted into degrees. 
+ *                           Needed for sky coordinates). Could do with a more
  *                           general system to determine which columns should
  *                           be converted (using the catalogue info?).
  *                 23/05/07  Return compressed images (of the inline type
