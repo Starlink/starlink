@@ -216,6 +216,8 @@
 *        Derive more FITS headers, add extra args to ndfwrdata
 *     2007-04-02 (EC):
 *        Moved telpos into sinx
+*     2007-05-29 (AGG):
+*        Minor change to error messages if atm/ast files could not be opened.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -379,7 +381,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   int ihmsf[4];                   /* H, M, S and fractional seconds */
   double instap[2];               /* Focal plane instrument offsets */
   int j;                          /* loop counter */
-  double jigptr[SC2SIM__MXSIM][2]; /* pointing: nas jiggle offsets from cen. 
+  double jigpat[SC2SIM__MXSIM][2]; /* pointing: nas jiggle offsets from cen. 
 				      in ARCSEC */
   int jigsamples=1;               /* number of samples in jiggle pattern */
   double *jig_y_hor=NULL;         /* jiggle y-horizontal tanplane offset (radians) */
@@ -486,14 +488,14 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     smf_open_file( skygrp, 1, "READ", 1, &astdata, status);
     if ( *status != SAI__OK ) {
       msgSetc ( "FILENAME", sinx->astname );
-      errRep( " ", "Cannot find astronomical file ^FILENAME", status );
+      errRep( " ", "Unable to open astronomical file ^FILENAME", status );
       goto CLEANUP;
     }
 
     smf_open_file( skygrp, 2, "READ", 1, &atmdata, status);
     if ( *status != SAI__OK ) {
       msgSetc ( "FILENAME", sinx->atmname );
-      errRep( " ", "Cannot find atmospheric file ^FILENAME", status);
+      errRep( " ", "Unable to open atmospheric file ^FILENAME", status);
       goto CLEANUP;
     }   
 
@@ -501,6 +503,12 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     if( *status == SAI__OK ) {
       asthdr = astdata->hdr;
       smf_fits_getD ( asthdr, "PIXSIZE", &astscale, status );
+      /* If PIXSIZE couldn't be found, then look for CDELT2 */
+      if ( *status != SAI__OK ) {
+	errAnnul(status);
+	smf_fits_getD ( asthdr, "CDELT2", &astscale, status );
+	astscale *= 3600.0; /* Convert from deg to arcsec */
+      }
     }
  
     if( *status == SAI__OK ) {
@@ -583,7 +591,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     /* Initialize SMU nasmyth jiggle offsets to 0 */
     for( i=0; i<SC2SIM__MXSIM; i++ ) {
       for( j=0; j<2; j++ ) {
-	jigptr[i][j] = 0;
+	jigpat[i][j] = 0;
       }
     }
 
@@ -634,15 +642,15 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         msgOutif(MSG__VERB, " ", "Do a DREAM observation", status );
        
         /*  Get jiggle pattern.
-            jigptr[*][0] - X-coordinate in arcsec/time of the Jiggle position.
-            jigptr[*][1] - Y-coordinate in arcsec/time of the Jiggle position.
+            jigpat[*][0] - X-coordinate in arcsec/time of the Jiggle position.
+            jigpat[*][1] - Y-coordinate in arcsec/time of the Jiggle position.
             The number of values is returned in count, and should be equal
             to the number of samples per cycle. */
 
         sc2sim_getpat ( inx->nvert, inx->smu_samples, inx->steptime,
                         inx->smu_offset+sinx->smu_terr, inx->conv_shape, 
                         inx->conv_sig, inx->smu_move, inx->jig_step_x, 
-                        inx->jig_step_y, inx->jig_vert, &jigsamples, jigptr,
+                        inx->jig_step_y, inx->jig_vert, &jigsamples, jigpat,
                         status );
       
         count = jigsamples*sinx->ncycle;
@@ -978,31 +986,31 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	              bor_y_nas*cos(base_el[frame]);
 	  
 	  /* Calculate jiggle offsets in horizontal coord. */
-	  /* jigptr is in ARCSEC: jig_x/y_hor must be in RADIANS */
-	  jig_x_hor[frame] = DAS2R*(jigptr[curframe%jigsamples][0]*
+	  /* jigpat is in ARCSEC: jig_x/y_hor must be in RADIANS */
+	  jig_x_hor[frame] = DAS2R*(jigpat[curframe%jigsamples][0]*
                                     cos(base_el[frame]) -
-				    jigptr[curframe%jigsamples][1]*
+				    jigpat[curframe%jigsamples][1]*
                                     sin(base_el[frame]));
 	  
-	  jig_y_hor[frame] = DAS2R*(jigptr[curframe%jigsamples][0]*
+	  jig_y_hor[frame] = DAS2R*(jigpat[curframe%jigsamples][0]*
                                     sin(base_el[frame]) +
-				    jigptr[curframe%jigsamples][1]*
+				    jigpat[curframe%jigsamples][1]*
                                     cos(base_el[frame]));
 
 	  break;
 	  
 	case azel:
-	  /* posptr and jigptr already give the azel tanplane offsets */
+	  /* posptr and jigpat already give the azel tanplane offsets */
 	  bor_x_hor = (posptr[curframe*2])*DAS2R;
 	  bor_y_hor = (posptr[curframe*2+1])*DAS2R;
 
-	  /* jigptr is in ARCSEC: jig_x/y_hor must be in RADIANS */
-	  jig_x_hor[frame] = DAS2R*jigptr[curframe%jigsamples][0];
-	  jig_y_hor[frame] = DAS2R*jigptr[curframe%jigsamples][1];
+	  /* jigpat is in ARCSEC: jig_x/y_hor must be in RADIANS */
+	  jig_x_hor[frame] = DAS2R*jigpat[curframe%jigsamples][0];
+	  jig_y_hor[frame] = DAS2R*jigpat[curframe%jigsamples][1];
 	  break;
 	  
 	case radec:
-	  /* posptr and jigptr give the RADec tanplane offsets */
+	  /* posptr and jigpat give the RADec tanplane offsets */
 	  bor_x_cel = (posptr[curframe*2])*DAS2R;
 	  bor_y_cel = (posptr[curframe*2+1])*DAS2R;
 	  
@@ -1014,15 +1022,15 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	  bor_y_hor = bor_x_cel*sin(-base_p[frame]) + 
 	    bor_y_cel*cos(-base_p[frame]);
 	  
-	  /* jigptr is in ARCSEC: jig_x/y_hor must be in RADIANS */
-	  jig_x_hor[frame] = DAS2R*(jigptr[curframe%jigsamples][0]*
+	  /* jigpat is in ARCSEC: jig_x/y_hor must be in RADIANS */
+	  jig_x_hor[frame] = DAS2R*(jigpat[curframe%jigsamples][0]*
                                     cos(base_p[frame]) -
-			            jigptr[curframe%jigsamples][1]*
+			            jigpat[curframe%jigsamples][1]*
                                     sin(base_p[frame]));
 	  
-	  jig_y_hor[frame] = DAS2R*(jigptr[curframe%jigsamples][0]*
+	  jig_y_hor[frame] = DAS2R*(jigpat[curframe%jigsamples][0]*
                                     sin(base_p[frame]) +
-			            jigptr[curframe%jigsamples][1]*
+			            jigpat[curframe%jigsamples][1]*
                                     cos(base_p[frame]));
 	  break;
 
@@ -1378,7 +1386,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 			      flatname[k], head, digits, dksquid, flatcal[k], 
 			      flatpar[k], INSTRUMENT, filter, dateobs, obsid,
 			      &(posptr[(curchunk*maxwrite)*2]), jigsamples, 
-                              &(jigptr[0]), 
+                              &(jigpat[0]), 
 			      obscounter, curchunk+1, obstype, utdate, 
 			      head[0].tcs_az_bc1, 
 			      head[lastframe-1].tcs_az_bc1,
