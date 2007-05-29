@@ -103,7 +103,7 @@ AC_DEFUN(GAIA_COMPILER_TESTS, [
 #  CFLAGS at all, it should stick to another name and merge that in the
 #  Makefile, CFLAGS are for users, not systems).  
 old_CFLAGS="$CFLAGS"
-CFLAGS="$CFLAGS_DEFAULT $SHLIB_CFLAGS $CFLAGS_WARNING"
+CFLAGS=`eval echo "$CFLAGS"`
 
 # -----------------------------------------------------------------------
 # 	Check if we need (or can use) the socklen_t type.
