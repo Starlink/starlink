@@ -153,6 +153,8 @@
 *        Call new KPS1_BFCRF to perform co-ordinate conversions of the
 *        results.  Tidy up removing superfluous code, and MXPOS and 
 *        PIXPOS arguments.
+*     2007 May 29 (MJC):
+*        Make arguments the same type in MAX and MIN function calls.
 *     {enter_further_changes_here}
 
 *-
@@ -426,10 +428,10 @@
             END DO
          ELSE
             DO J = 1, BF__NDIM
-               FLBND( J ) = MAX( PIXPOS( 1, J ) + 0.5D0 - HBOX( J ),
-     :                           SLBND( J ) )
-               FUBND( J ) = MIN( PIXPOS( 1, J ) + 0.5D0 + HBOX( J ),
-     :                           SUBND( J ) )
+               FLBND( J ) = MAX( NINT( PIXPOS( 1, J ) + 0.5D0 ) -
+     :                           HBOX( J ), SLBND( J ) )
+               FUBND( J ) = MIN( NINT( PIXPOS( 1, J ) + 0.5D0 ) +
+     :                           HBOX( J ), SUBND( J ) )
             END DO
 
 *  We need an NDF section corresponding to the chosen region.
