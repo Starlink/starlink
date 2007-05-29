@@ -8,14 +8,15 @@
 #  Purpose:
 #     Extends SkyCatHduChooser to add features required for GAIA.
 
-#  Description: 
-#     This class extends SkyCatHduChooser so that GAIA specific
-#     features can be added. At present this amounts to changing the
-#     way that FITS tables are accessed, so that we can use the GAIA
-#     filters which have specific knowledge about CURSA formats.
-#     We also intercept any binary tables that are of type "COMPRESSED_IMAGE"
-#     and convert these into temporary FITS image files using the CFITSIO
-#     example program "imcopy".
+#  Description:
+
+#     This class extends SkyCatHduChooser so that GAIA specific features can
+#     be added. At present this amounts to changing the way that FITS tables
+#     are accessed, so that we can apply heuristics to catalogue configuration
+#     (pick up RA and DEC columns, reconstruct the symbol etc). This is done
+#     by using the GaiaConvertTable conversions (which also deal with CAT &
+#     ASCII formats). We also intercept any binary tables that are of type
+#     "COMPRESSED_IMAGE" and convert these into temporary FITS image files.
 
 #  Invocations:
 #
@@ -45,6 +46,7 @@
 #  Copyright:
 #     Copyright (C) 2000-2005 Central Laboratory of the Research Councils.
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2007 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -72,6 +74,9 @@
 #        Original version.
 #     03-MAY-2005 (PWD):
 #        Added decompression of inline images.
+#     21-MAY-2007 (PWD):
+#        Stop using CAT, effectively same class but uses new GaiaConvertTable.
+#        Stop using imcopy to access compressed images.
 #     {enter_further_changes_here}
 
 #-
@@ -101,30 +106,30 @@ itcl::class gaia::GaiaHduChooser {
 
    #  Methods:
    #  --------
-   
-   #  Display the current FITS table, override to use GAIA methods
-   #  which are based on external conversion filters.
+
+   #  Display the current FITS table, which may include a compressed image.
    protected method display_fits_table {name hdu} {
-      
+
       #  Get name of FITS file.
       set file [$image_ cget -file]
-      
+
       #  May be a compressed image masquerading as a table. Check for that.
       if { "$name" == "COMPRESSED_IMAGE" } {
 
          #  Arrange for decompression of this extension and then load it.
-         decompress_inline_ $file [expr $hdu-1]
+         decompress_inline_ $file $hdu
          return
       }
 
-      #  Construct CURSA name.
-      incr hdu -1
-      if { $hdu > 0 } { 
+      #  Construct qualified table name for use by GaiaConvertTable (used be
+      #  be accessed as a CAT table, but now uses native access, so hdu not
+      #  decremented). Note catalogue HDU should always be 2 or greater.
+      if { $hdu > 1 } {
          set catalogue "$file\{$hdu\}"
       } else {
          set catalogue "$file"
       }
-      
+
       #  Set the catalog config entry from the $catinfo table
       if { [catch "$astrocat_ entry get $catalogue"] } {
          set fname [full_name_ $catalogue]
@@ -132,12 +137,12 @@ itcl::class gaia::GaiaHduChooser {
             [list "serv_type local" "long_name $fname" "short_name \
                   $catalogue" "url $fname"]
       }
-      
+
       #  Display the catalogue.
       gaia::GaiaSearch::new_local_catalog $catalogue $itk_option(-image) \
          ::gaia::GaiaSearch
    }
-   
+
    #  Expand name to full path relative to current directory.
    protected method full_name_ {name} {
       if { "[string index $name 0]" != "/"} {
@@ -148,21 +153,15 @@ itcl::class gaia::GaiaHduChooser {
       return $fname
    }
 
-   #  Decompress an image stored in an extension (usually RICE format) and
-   #  display it. Will reuse a decompressed extension, if already done.
+   #  Decompress an image stored in an extension (RICE format for instance)
+   #  and display it. Will reuse a decompressed extension, if already
+   #  processed. Decompression is supported by the StarFITSIO write method, so
+   #  we just move to the HDU and save it to disk.
    protected method decompress_inline_ {file hdu} {
-
-      #  Create the task that does the conversion.
-      if { $imcopy_ == {} } { 
-         global gaia_dir
-         set imcopy_ [GaiaForeignExec \#auto \
-                         -application $gaia_dir/imcopy \
-                         -show_output 0]
-      }
 
       #  If this extension is already done, and the file still exists,
       #  reuse it.
-      if { [info exists tempfiles_($file,$hdu)] && 
+      if { [info exists tempfiles_($file,$hdu)] &&
            [file exists $tempfiles_($file,$hdu)] } {
          set converted_file $tempfiles_($file,$hdu)
       } else {
@@ -173,13 +172,9 @@ itcl::class gaia::GaiaHduChooser {
          if { [file exists $converted_file] } {
             file delete -force $converted_file
          }
-         catch {
-            $imcopy_ runwith $file\[$hdu\] $converted_file
-         } msg
-         if { $msg != "" } { 
-            error_dialog "$msg"
-            return
-         }
+
+         #  Write the HDU out to disk.
+         $image_ hdu get $hdu $converted_file
 
          #  Success so cache for next time.
          set tempfiles_($file,$hdu) $converted_file
@@ -191,7 +186,7 @@ itcl::class gaia::GaiaHduChooser {
    }
 
    #  Remove all the temporary files we have created. Needs to be called
-   #  sometime before the application exits. Not done by the destructor as 
+   #  sometime before the application exits. Not done by the destructor as
    #  that would stop any chance of caching and reusing converted files.
    public proc release_temporary_files {} {
       if { [info exists tempfiles_] } {
@@ -210,9 +205,6 @@ itcl::class gaia::GaiaHduChooser {
 
    #  Protected variables: (available to instance)
    #  --------------------
-
-   #  The application used to do the conversion of a compressed extension.
-   protected variable imcopy_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
