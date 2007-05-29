@@ -130,8 +130,7 @@
 *        - Noting Ed's comment that isFlat is less confusing, I disagree
 *          because isNDF applied to non-SCUBA2 data
 *     2007-05-29 (AGG):
-*        Check if data type is _REAL and change to _DOUBLE if
-*        permissions allow, else issue error message
+*        Check if data type is _REAL and map as _DOUBLE
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -285,19 +284,11 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
   /* Check dimensionality: 2D is a .In image, 3D is a time series */
   if (ndims == 2) {
     if (strncmp(dtype, "_REAL", 5) == 0) {
-      /* Change _REAL to _DOUBLE if the file is updateable */
-      if ( (strncmp(mode, "WRITE", 5) == 0)  || (strncmp(mode, "UPDATE", 6) == 0) ) {
-	msgOutif( MSG__VERB, "", 
-		  "Input file is _REAL, converting to _DOUBLE for handling", status );
-	strncpy( dtype, "_DOUBLE", NDF__SZTYP+1 );
-	ndfStype( dtype, indf, "DATA,VARIANCE", status );
-      } else {
-	/* Issue error if file is read-only*/
-	if ( *status == SAI__OK ) {
-	  *status = SAI__ERROR;
-	  errRep( FUNC_NAME, "Input file is of type _REAL; must be _DOUBLE", status);
-	}
-      }
+      /* Change _REAL to _DOUBLE */
+      msgOutif( MSG__VERB, "", 
+		"Input file is _REAL, will map as _DOUBLE for internal handling", 
+		status );
+      strncpy( dtype, "_DOUBLE", NDF__SZTYP+1 );
     }
     isFlat = 1;    /* Data have been flat-fielded */
     isTseries = 0; /* Data are not in time series format */
