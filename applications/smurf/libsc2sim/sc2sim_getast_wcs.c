@@ -52,8 +52,10 @@
 *        Use astTranGrid instead of astTran2
 *     2006-07-20 (JB):
 *        Split from dsim.c
+*     2007-05-29 (AGG):
+*        Set bad values to zero
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
+*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
 *  Licence:
@@ -79,6 +81,7 @@
 
 /* Starlink includes */
 #include "ast.h"
+#include "prm_par.h"
 
 /* SC2SIM includes */
 #include "sc2sim.h"
@@ -137,8 +140,12 @@ int *status                  /* global status (given and returned) */
       if( (xnear >= 0) && (xnear < astnaxes[0]) && 
 	  (ynear >= 0) && (ynear < astnaxes[1]) ) {
 	dbuf[i] = astsim[xnear + astnaxes[0]*ynear];
+	/* Set to zero if we have a bad value */
+	if ( dbuf[i] == VAL__BADD ) {
+	  dbuf[i] = 0.0;
+	}
       } else {
-	dbuf[i] = 0;
+	dbuf[i] = 0.0;
       }
    }
 
