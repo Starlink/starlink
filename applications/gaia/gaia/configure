@@ -11898,7 +11898,6 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 #  Makefile, CFLAGS are for users, not systems).
 old_CFLAGS="$CFLAGS"
 CFLAGS=`eval echo "$CFLAGS"`
-echo "CFLAGS = $CFLAGS"
 
 # -----------------------------------------------------------------------
 # 	Check if we need (or can use) the socklen_t type.
