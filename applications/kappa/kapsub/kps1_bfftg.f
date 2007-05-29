@@ -211,11 +211,6 @@
          END IF
       END DO
 
-      print *, ( PC(I,1), I=1,7)
-      print *, ( PC(I,2), I=1,7)
-      print *, ( PC(I,3), I=1,7)
-      print *,' '
-      
 *  Variance weighting
 *  ==================
       IF ( USEVAR ) THEN
