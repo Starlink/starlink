@@ -498,7 +498,7 @@ static int gaiaNDFTclClose( ClientData clientData, Tcl_Interp *interp,
             }
 
             /* Free the channel */
-            astAnnul( info->fitschan );
+            info->fitschan = (AstFrameSet *) astAnnul( info->fitschan );
             info->fitschan = NULL;
             info->fitschanmod = 0;
         }

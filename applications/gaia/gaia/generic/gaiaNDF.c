@@ -1443,7 +1443,7 @@ int gaiaNDFGtWcs( int ndfid, AstFrameSet **iwcs, char **error_mess )
 
                 /* Current frame of FITS WCS becomes the Current frame */
                 astSetI( *iwcs, "Current", ndfframes + fitscurrent );
-                astAnnul( fitswcs );
+                fitswcs = (AstFrameSet *) astAnnul( fitswcs );
            }
            datAnnul( &fitsloc, &status );
        }
@@ -1589,7 +1589,7 @@ int gaiaNDFWriteFitsChan( int ndfid, AstFitsChan *fitschan, char **error_mess )
 
     /*  How many cards */
     ncard[0] = astGetI( fitschan, "Ncard" );
-    if ( ncard == 0 ) {
+    if ( ncard[0] == 0 ) {
         /* Nothing to do */
         return TCL_OK;
     }
