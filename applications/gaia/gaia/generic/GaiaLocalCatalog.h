@@ -80,10 +80,10 @@ class GaiaLocalCatalog : public LocalCatalog
     virtual int getInfo();
     
     //  Convert catalogue to tab-table format.
-    virtual int convertTo( int now = 0 );
+    virtual int convertTo();
     
     //  Convert tab-table back to original format.
-    virtual int convertFrom( int now = 0 );
+    virtual int convertFrom();
     
     //  Get the modification date of a file.
     time_t modDate( const char *filename );

@@ -168,9 +168,8 @@ int GaiaLocalCatalog::check_table( const char* filename )
 {
   if ( GaiaLocalCatalog::is_foreign( filename ) ) {
     return TCL_OK;
-  } else {
-    return TCL_ERROR;
-  }
+  } 
+  return TCL_ERROR;
 }
 
 //
@@ -195,7 +194,8 @@ int GaiaLocalCatalog::getInfo()
       //  regenerate.
       dispose();
       filename_ = realname_;
-    } else {
+    } 
+    else {
 
       //  Check if temporary file has been modified since it was last
       //  read, if so we need to re-read it.
@@ -220,7 +220,7 @@ int GaiaLocalCatalog::getInfo()
   entry_->url( filename_ );   //  Set the temporary name as the url.
                               //  This is the correct place. 
                               //  Leave longname and shortname alone.
-  if ( ! convertTo( 1 ) ) {
+  if ( ! convertTo() ) {
     return sys_error( "failed to convert catalogue: ", realname_ );
   }
 
@@ -246,7 +246,7 @@ int GaiaLocalCatalog::freeCat() {
       if ( modified_ ) {
 
         //  This is changed, so convert it back.
-        convertFrom( 1 );
+        convertFrom();
       }
     }
 
@@ -271,17 +271,14 @@ int GaiaLocalCatalog::is_foreign( const char *name )
        strncasecmp( type, "lis", 3 )  == 0 ||
        strncasecmp( type, "txt", 3 )  == 0 ) {
     return 1;
-  } else {
-    return 0;
-  }
+  } 
+  return 0;
 }
 
 //
-//  Convert the current file "realname_" into a tab table. If now is 1 
-//  then the conversion is done immediately, rather than being
-//  queued.
+//  Convert the current file "realname_" into a tab table.
 //
-int GaiaLocalCatalog::convertTo( int now )
+int GaiaLocalCatalog::convertTo()
 {
   //  If realname_ is defined then attempt to convert it into a tab
   //  table.
@@ -295,8 +292,7 @@ int GaiaLocalCatalog::convertTo( int now )
 
     //  Convert to a temporary file.
     char buf[1024];
-    sprintf( buf, "%s to %s %s %d", convertTable_, realname_,
-             filename_, now );
+    sprintf( buf, "%s to %s %s", convertTable_, realname_, filename_ );
     if ( Tcl_Eval( interp_, buf ) != TCL_OK ) {
        cerr << buf << endl;
        cerr << "command failed:" << interp_->result << endl;
@@ -312,29 +308,26 @@ int GaiaLocalCatalog::convertTo( int now )
 //
 //  Convert temporary tab table into previous filename and type.
 //
-//  if now is 1 then the jobs runs in a blocking manner (needed to 
-//  guarantee completion when application is really exiting).
-//
-int GaiaLocalCatalog::convertFrom( int now )
+int GaiaLocalCatalog::convertFrom()
 {
-  //  If filename_ is defined then attempt to convert it back.
-  if ( filename_ ) {
-
-    //  Make sure we're ok to attempt a conversion.
-    if ( ! startConvert() ) {
-      return 0;
+    //  If filename_ is defined then attempt to convert it back.
+    if ( filename_ ) {
+        
+        //  Make sure we're ok to attempt a conversion.
+        if ( ! startConvert() ) {
+            return 0;
+        }
+        
+        //  Convert back to permanent file.
+        char buf[1024];
+        sprintf( buf, "%s from %s %s", convertTable_, filename_, realname_ );
+        if ( Tcl_Eval( interp_, buf ) != TCL_OK ) {
+            cerr << "command failed:" << interp_->result << endl;
+            return 0;
+        }
     }
-
-    //  Convert back to permanent file.
-    char buf[1024];
-    sprintf( buf, "%s from %s %s %d", convertTable_, filename_, 
-	     realname_, now );
-    if ( Tcl_Eval( interp_, buf ) != TCL_OK ) {
-      return 0;
-    }
-  }
-  modified_ = 0;
-  return 1;
+    modified_ = 0;
+    return 1;
 }
 
 //
@@ -350,10 +343,11 @@ int GaiaLocalCatalog::startConvert()
   //  that is current and record for future use.
   char buf[256];
   if ( convertTable_[0] != '\0' ) {
-    sprintf( buf, "info exists %s", convertTable_ );
+    sprintf( buf, "info exists \"%s\"", convertTable_ );
     if ( Tcl_Eval( interp_, buf ) != TCL_OK ) {
       convertTable_[0] = '\0';
-    } else {
+    } 
+    else {
       if ( strcmp( interp_->result, "0" ) == 0 ) { 
         convertTable_[0] = '\0';
       }
@@ -362,7 +356,8 @@ int GaiaLocalCatalog::startConvert()
   if ( convertTable_[0] == '\0' ) {
     if ( Tcl_Eval( interp_, (char *) "GaiaConvertTable #auto" ) != TCL_OK ) {
       return 0;
-    } else {
+    } 
+    else {
       if ( Tcl_VarEval( interp_, "code ", interp_->result, (char *) NULL ) != TCL_OK ) {
         return 0;
       }
@@ -379,7 +374,7 @@ time_t GaiaLocalCatalog::modDate( const char *filename )
 {
   struct stat buf;
   if ( stat( filename, &buf ) != 0 ) {
-    return (time_t) 0;
+      return (time_t) 0;
   }
   return buf.st_mtime;
 }
@@ -430,9 +425,8 @@ int GaiaLocalCatalog::readTemp()
     //  Record modification date at this read.
     tempstamp_ = modDate( filename_ );
     return TCL_OK;
-  } else {
-    return TCL_ERROR;
   }
+  return TCL_ERROR;
 }
 
 //
@@ -479,9 +473,8 @@ int GaiaLocalCatalog::save( CatalogInfoEntry *e,
 			    const char *out )
 {
   GaiaLocalCatalog *temp = new GaiaLocalCatalog( e, interp, in, out );
-  if ( temp->convertFrom( 1 ) ) {
+  if ( temp->convertFrom() ) {
     return TCL_OK;
-  } else {
-    return error( "failed to save file:", out );
   }
+  return error( "failed to save file:", out );
 }
