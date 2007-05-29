@@ -94,7 +94,7 @@
 
 *  Local Parameters:
       INTEGER MAXLEN
-      PARAMETER ( MAXLEN = 1024 )
+      PARAMETER ( MAXLEN = 2048 )
       DOUBLE PRECISION PI       ! PI
       PARAMETER ( PI =  3.141592653589793238462643 )
 

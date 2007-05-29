@@ -97,7 +97,7 @@
 
 *  Local Parameters:
       INTEGER MAXLEN
-      PARAMETER ( MAXLEN = 1024 )
+      PARAMETER ( MAXLEN = 4096 )
 
 *  Local Variables:
       CHARACTER * ( CAT__SZCMP ) NAME ! Name of a component
