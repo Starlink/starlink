@@ -32,6 +32,14 @@
  *                 01/03/07  Added putcard method for pre-formatted cards.
  * Peter W. Draper 24/04/07  Handle table columns with K format, that's 
  *                           TLONGLONG.
+ *                 22/05/07  Convert radian table values into degrees. 
+ *                           Needed for sky coordinates. Could do with a more
+ *                           general system to determine which columns should
+ *                           be converted (using the catalogue info?).
+ *                 23/05/07  Return compressed images (of the inline type
+ *                           stored in an extension, RICE etc.) as binary
+ *                           tables. As images they are garbled anyway.
+ *                           (GAIA spots this and decompresses them).
  */
 static const char* const rcsId="@(#) $Id: FitsIO.C,v 1.1.1.1 2006/01/12 16:43:57 abrighto Exp $";
 
@@ -81,7 +89,6 @@ static char buf_[1024];
 
 // "current" FitsIO object pointer, needed for cfitsio realloc callback
 FitsIO* FitsIO::fits_ = NULL;
-
 
 /*
  * constructor: initialize from the given header and data objects
@@ -1258,7 +1265,9 @@ int FitsIO::getNumHDUs()
 
 /*
  * Return the type of the current HDU as a string: "image", "ascii", 
- * or "binary" or NULL if there was an error
+ * or "binary" or NULL if there was an error.
+ *
+ * PWD: return compressed images as a table.
  */
 const char* FitsIO::getHDUType()
 {
@@ -1272,6 +1281,12 @@ const char* FitsIO::getHDUType()
 	cfitsio_error();
 	return NULL;
     }
+
+    /* Check for a compressed image. */
+    if ( fits_is_compressed_image( fitsio_, &status ) ) {
+        type = BINARY_TBL;
+    }
+
     switch(type) {
     case IMAGE_HDU: return "image";
     case ASCII_TBL: return "ascii";
@@ -1413,11 +1428,13 @@ int FitsIO::getTableColumn(int col, double* values, int numValues)
 
 /*
  * Return the value in the current FITS table at the given row 
- * and column, or NULL if there was an error.
+ * and column, or NULL if there was an error. If the value is a 
+ * a floating point value it will be scaled (by scale, which defaults to 1.0).
+ * (use this to convert value from radians to degrees).
  * The returned pointer points to static storage and will be overwritten
  * on the next call to this method or the get(keyword) methods.
  */
-char* FitsIO::getTableValue(long row, int col)
+char* FitsIO::getTableValue(long row, int col, double scale)
 {
     if (!fitsio_) {
 	error(noFitsErrMsg);
@@ -1432,7 +1449,7 @@ char* FitsIO::getTableValue(long row, int col)
 	cfitsio_error();
 	return NULL;
     }
-    
+
     if (width > sizeof(buf_)-1) {
 	fmt_error("FITS table value at row %d, col %d is too long", row, col);
 	return NULL;
@@ -1503,7 +1520,7 @@ char* FitsIO::getTableValue(long row, int col)
 	    cfitsio_error();
 	    return NULL;
 	}
-	sprintf(buf_, "%lg", d);
+	sprintf(buf_, "%lg", d*scale);
 	break;
 
     case TLOGICAL:
@@ -1518,7 +1535,7 @@ char* FitsIO::getTableValue(long row, int col)
 	break;
 
     default:
-	fmt_error("cfitsio data type (%d) not supported");
+	fmt_error("cfitsio data type (%d) not supported",typecode);
 	return NULL;
     }
 
@@ -1680,7 +1697,7 @@ int FitsIO::checkWritable()
     
     if (!(header_.options() & Mem::FILE_RDWR)) {
 	if (access(header_.filename(), W_OK) != 0)
-	    return error("FitsIO: no wite permission on file: ", header_.filename());
+	    return error("FitsIO: no write permission on file: ", header_.filename());
 	return header_.remap(Mem::FILE_RDWR);
     }
 
