@@ -2,7 +2,8 @@
     ==========
 
     The version of Skycat that GAIA is based on has been updated to
-    version 3.0-1.
+    version 3.0-1. This has meant a major overhaul of the GAIA build
+    system.
 
     The spectral offsets from the centre of the observation of cube
     now preserve the sense of the direction by including a sign
@@ -11,6 +12,18 @@
     A bug when writing an extracted spectrum to NDF and FITS files
     has been corrected. Previously the coordinates were incorrect
     by a single channel.
+
+    When merging FITS headers from the primary data unit into those of an 
+    extensions the INHERIT keyword is now checked.
+
+    Inline compressed images (RICE) are now extracted more efficiently
+    using built-in methods, rather than an external filter. The primary
+    headers are now merged into such images as needed.
+
+    Reading FITS catalogues is now handled using built-in methods. This
+    should be more efficient.
+
+    FITS catalogues can now have 64 bit integer columns ('K' type).
 
     GAIA 3.3-7
     ==========
