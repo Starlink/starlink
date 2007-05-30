@@ -130,7 +130,7 @@ static int gaiaSlaObs( ClientData clientData, Tcl_Interp *interp,
     /* The call */
     slaObs( n, c, name, &w, &p, &h );
 
-    // Construct a list return of all the parameters.
+    /* Construct a list return of all the parameters. */
     resultObj = Tcl_GetObjResult( interp );
     Tcl_ListObjAppendElement( interp, resultObj, Tcl_NewStringObj( c, -1 ) );
     Tcl_ListObjAppendElement( interp, resultObj, Tcl_NewStringObj( name, -1 ));

@@ -1811,7 +1811,7 @@ void RtdLineQuickSetCoords( Tcl_Interp *interp, Tk_Canvas canvas,
                                linePtr->header.x2, linePtr->header.y2 );
 }
 
-//  Quick configuration routines.
+/*  Quick configuration routines. */
 
 EXTERN void RtdLineSetColour( Display *display, Tk_Item *itemPtr,
                               XColor *colour )

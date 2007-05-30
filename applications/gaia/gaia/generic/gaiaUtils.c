@@ -495,7 +495,7 @@ int gaiaUtilsGt2DWcs( AstFrameSet *fullwcs, int axis1, int axis2, int length1,
             inperm[i] = n;
         }
         else {
-            if ( out1[i][0] != AST__BAD ) {        // Single valued coordinate
+            if ( out1[i][0] != AST__BAD ) {        /* Single valued coordinate */
                 zero[abs(izero) - 1] = out1[i][0];
             }
             else {
