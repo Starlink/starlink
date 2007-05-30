@@ -71,6 +71,8 @@ $Date$</px>
 <p>Copyright 2004-5, Council for the Central Laboratory of the
 Research Councils</p>
 <p>Copyright 2007, Particle Physics and Astronomy Research Council</p>
+<p>Copyright 2007, Science and Technology Facilities Council</p>
+
 </copyright>
 
 </docinfo>
@@ -5119,6 +5121,25 @@ M Makefile.dependencies
 
               <p>See <ref id="configure-script"/> for more discussion
                 of these variables.</p>
+            </dd>
+
+
+
+            <dt>I've just modified an include file, ran make in a component, 
+                but nothing has compiled</dt>
+            <dd>
+              <p>
+                 Automake provides the <code>depcomp</code> command
+                 to automatically generate dependencies on include files
+                 (these are added to <code>Makefile.in</code>). Unfortunately
+                 this support doesn't extend to Fortran, only C, so modifying
+                 a file included in Fortran will not result in the 
+                 files being recompiled. Also not all C compilers and
+                 platforms are supported. To avoid this problem either
+                 keep the list of dependencies up to date in the 
+                 <code>Makefile.am</code>, or be prepared to clean 
+                 directories during development.
+              </p>
             </dd>
 
             <dt>It's all going horribly wrong.  Help!</dt>
