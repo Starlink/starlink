@@ -759,6 +759,11 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Initialisations.
+      IPWRK = 0
+      IPOUT = 0
+      IPBIAS = 0
+
 ************************************************************************
 *  Open Logfile and write program introduction. Find out if NDF
 *  extension items are to be checked.

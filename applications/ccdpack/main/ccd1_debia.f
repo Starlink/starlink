@@ -233,6 +233,17 @@
 *.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Initialisations.
+      OFFSET = .FALSE.
+      CMODE = ' '
+      SMODE = ' '
+      FMODE = ' '
+      WMODE = ' '
+      IPIDD = 0
+      IPIDI = 0
+      IPIDR = 0
+      RNOISE = 0.0D0
+
       IF ( GOTBIA ) THEN
 
 *  Does the user require the bias frame offset to the mean value of the

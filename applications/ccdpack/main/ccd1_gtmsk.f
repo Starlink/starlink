@@ -175,8 +175,9 @@
 *  Check global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Try to access the mask NDF or ARD expression.
+*  Try to access the mask NDF or ARD expression. If this fails return immediately.
       CALL CCD1_ACMSK( PARAM, ID, ISARD, FNAME, STATUS )
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  If it's an ARD description (ISARD) then need to create an NDF to
 *  put the mask information into.
