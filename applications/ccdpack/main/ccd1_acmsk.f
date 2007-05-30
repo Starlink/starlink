@@ -116,6 +116,7 @@
 *  Defaults.
       ISARD = .FALSE.
       FILENM = ' '
+      INFILE = ' '
 
 *  Get a group of ARD expressions or a filename.
       CALL ERR_MARK
