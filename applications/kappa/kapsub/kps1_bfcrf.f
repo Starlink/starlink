@@ -84,6 +84,9 @@
 *     2007 May 21 (MJC):
 *        Original version created from KPS1_BFLOG with the aim of
 *        avoiding code duplication.
+*     2007 May 25 (MJC):
+*        Fixed repeated typo's such that the PSIGMA values are now 
+*        assigned.
 *     {enter_further_changes_here}
 
 *-
@@ -197,12 +200,12 @@
             END DO
             B( 1 ) = POS( 2, 1 )
 
-            PSIGMA( 1, IB )  = AST_DISTANCE( CFRM, A, B, STATUS )
+            RSIGMA( 1, IB )  = AST_DISTANCE( CFRM, A, B, STATUS )
 
 *  Now we swap the path to the second axis.
             B( 1 ) = A( 1 )
             B( 2 ) = POS( 2, 2 )
-            PSIGMA( 2, IB ) = AST_DISTANCE( CFRM, A, B, STATUS )
+            RSIGMA( 2, IB ) = AST_DISTANCE( CFRM, A, B, STATUS )
          END IF
 
 *  FWHMs
@@ -274,11 +277,11 @@
             END DO
             B( 1 ) = POS( 2, 1 )
 
-            PSIGMA( 3, IB ) = AST_DISTANCE( CFRM, A, B, STATUS )
+            RSIGMA( 3, IB ) = AST_DISTANCE( CFRM, A, B, STATUS )
 
             B( 1 ) = A( 1 )
             B( 2 ) = POS( 2, 2 )
-            PSIGMA( 4, IB ) = AST_DISTANCE( CFRM, A, B, STATUS )
+            RSIGMA( 4, IB ) = AST_DISTANCE( CFRM, A, B, STATUS )
          END IF
 
 *  Orientation
