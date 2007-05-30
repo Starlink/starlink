@@ -100,6 +100,9 @@
 *        Frame.
 *     2007 May 21 (MJC):
 *        Remove the conversions from PIXEL to the reporting Frame.
+*     2007 May 25 (MJC):
+*        Widen the output buffer and message wrap for long orientation
+*        lines.
 *     {enter_further_changes_here}
 
 *-
@@ -143,7 +146,7 @@
 
 *  Local Variables:
       CHARACTER*9 ATTR           ! Name of an AST attribute
-      CHARACTER*80 BUF           ! Output buffer
+      CHARACTER*100 BUF          ! Output buffer
       CHARACTER*4 FORMAT         ! Orientation format
       INTEGER FRM2               ! Copied reporting Frame
       DOUBLE PRECISION FWHM      ! Full-width half maximum
@@ -199,7 +202,7 @@
 
 *  Set the format for the FWHM values so they are displayed with three
 *  decimal places.  We are assuming here that non-SkyFrame will be 
-*  Some form of pixel-based domian, like GRID or PIXEL or OFFSET.
+*  Some form of pixel-based domain, like GRID or PIXEL or OFFSET.
          CALL AST_SETC( FRM2, ATTR( : LATTR ), 's.3', STATUS )
       ELSE
          CALL AST_SETC( FRM2, ATTR( : LATTR ), '%-12.3F', STATUS )
@@ -235,20 +238,26 @@
          ELSE
 
 *  Display the current Frame's co-ordinates of the beam centre.
-            CALL MSG_SETC( 'XP', AST_FORMAT( FRM2, REPAX, P( 1, IB ),
+            CALL MSG_SETC( 'XP', AST_FORMAT( CFRM, 1, P( 1, IB ),
      :                                       STATUS ) )
-            CALL MSG_SETC( 'YP', AST_FORMAT( FRM2, REPAX, P( 2, IB ),
+            CALL MSG_SETC( 'YP', AST_FORMAT( CFRM, 1, P( 2, IB ),
      :                                       STATUS ) )
 
 *  Form the Unit attribute name for this axis.
-            ATTR = 'UNIT('
-            LATTR = 5
-            CALL CHR_PUTI( REPAX, ATTR, LATTR )
-            CALL CHR_APPND( ')', ATTR, LATTR )
+            IF ( .NOT. ISSKY ) THEN
+               ATTR = 'UNIT('
+               LATTR = 5
+               CALL CHR_PUTI( REPAX, ATTR, LATTR )
+               CALL CHR_APPND( ')', ATTR, LATTR )
 
 *  Get the Unit value.
-            CALL MSG_SETC( 'UNIT', 
-     :                     AST_GETC( CFRM, ATTR( : LATTR ), STATUS ) )
+               CALL MSG_SETC( 'UNIT', AST_GETC( CFRM, ATTR( : LATTR ), 
+     :                                          STATUS ) )
+
+*  It would be messy inserting both of the expected sexagesimal formats.
+            ELSE
+               CALL MSG_SETC( 'UNIT', ' ' )
+            END IF
          END IF
 
          IF ( SIGMA( 1, IB ) .EQ. VAL__BADD ) THEN
@@ -264,10 +273,10 @@
 *  Centre errors
 *  -------------
                CALL MSG_SETC( 'XE',
-     :                        AST_FORMAT( FRM2, REPAX, SIGMA( 1, IB ), 
+     :                        AST_FORMAT( CFRM, 1, SIGMA( 1, IB ), 
      :                                    STATUS ) )
                CALL MSG_SETC( 'YE',
-     :                        AST_FORMAT( FRM2, REPAX, SIGMA( 2, IB ),
+     :                        AST_FORMAT( CFRM, 2, SIGMA( 2, IB ),
      :                                    STATUS ) )
             END IF
             CALL MSG_LOAD( 'KPS1_BFLOG_MSG2E', '    Centre      '/
@@ -305,9 +314,14 @@
             CALL MSG_SETC( 'FWHM', AST_FORMAT( FRM2, REPAX, FWHM,
      :                                         STATUS ) )
 
-*  Get the Unit value.
+*  Form the Unit attribute name for this axis.
+            ATTR = 'UNIT('
+            LATTR = 5
+            CALL CHR_PUTI( REPAX, ATTR, LATTR )
+            CALL CHR_APPND( ')', ATTR, LATTR )
+
             CALL MSG_SETC( 'UNIT', 
-     :                     AST_GETC( CFRM, ATTR( : LATTR ), STATUS ) )
+     :                     AST_GETC( FRM2, ATTR( : LATTR ), STATUS ) )
          END IF
 
 *  Error in major-axis width
@@ -353,7 +367,7 @@
 *  Get the Unit value.  Note assume spatial domain comprises the
 *  first two axes.
             CALL MSG_SETC( 'UNIT',
-     :                     AST_GETC( CFRM, ATTR( : LATTR ), STATUS ) )
+     :                     AST_GETC( FRM2, ATTR( : LATTR ), STATUS ) )
          END IF
 
 *  Error in minor-axis width
@@ -394,6 +408,11 @@
 *  Reverse these if the axis order is swapped in the SkyFrame.
             CALL MSG_SETC( 'SENSE',
      :                     '(measured from North through East)' )
+
+*  The message may generate a line longer than 80 characters especially
+*  if there is an uncertainty too.   Now 80 is normlly where a line will
+*  wrap.  Tune to allow longer lines.
+            CALL MSG_TUNE( 'SZOUT', 100, STATUS )
          END IF
 
 *  Display the major-axis orientation, formatting to have left-justified
@@ -416,6 +435,11 @@
             END IF
             IF ( LOGF ) CALL FIO_WRITE( FD, BUF( : LBUF ), STATUS )
             CALL MSG_OUTIF( MSG__NORM, ' ', BUF( : LBUF ), STATUS )
+
+*  Reset the width.  Is there no inquiry function to obtain previous
+*  width?
+            IF ( PIXEL .OR. .NOT. ISSKY )
+     :        CALL MSG_TUNE( 'SZOUT', 100, STATUS )
          END IF
 
 *  Amplitude
