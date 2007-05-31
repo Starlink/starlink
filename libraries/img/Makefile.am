@@ -20,7 +20,7 @@ libimg_adam_la_SOURCES = \
  $(GCP_ROUTINES:.gcp=.f)
 
 ##  Distribute the original sources, in case these are needed for further
-##  development. 
+##  development.
 EXTRA_DIST = $(G_ROUTINES) $(GNP_ROUTINES) $(GCP_ROUTINES)
 
 ## List headers which are to be installed -- these are built first if necessary
@@ -70,9 +70,9 @@ G_ROUTINES = img_in1x.gen img_in2x.gen img_in3x.gen img_inx.gen \
  img_outx.gen img_tmp1x.gen img_tmp2x.gen img_tmp3x.gen \
  img_tmpx.gen img_mod1x.gen img_mod2x.gen img_mod3x.gen img_modx.gen
 
-img_in1x.o: img_in1x.f 
-img_in2x.o: img_in2x.f 
-img_in3x.o: img_in3x.f 
+img_in1x.o: img_in1x.f
+img_in2x.o: img_in2x.f
+img_in3x.o: img_in3x.f
 img_inx.o: img_inx.f
 img_new1x.o: img_new1x.f
 img_new2x.o:img_new2x.f
@@ -83,7 +83,7 @@ img_tmp1x.o: img_tmp1x.f
 img_tmp2x.o: img_tmp2x.f
 img_tmp3x.o: img_tmp3x.f
 img_tmpx.o: img_tmpx.f
-img_mod1x.o: img_mod1x.f 
+img_mod1x.o: img_mod1x.f
 img_mod2x.o: img_mod2x.f
 img_mod3x.o: img_mod3x.f
 img_modx.o: img_modx.f
@@ -158,3 +158,87 @@ dist_pkgdata_DATA = LICENCE
 
 CLEANFILES = img_test img_test.ifc
 
+#  Fortran object file dependencies on local include files.
+hdr_copy.lo:  IMG_CONST IMG_ERR  IMG_PCB
+hdr_delet.lo:  IMG_CONST IMG_ERR IMG_PCB
+hdr_inx.lo:  IMG_CONST IMG_ERR
+hdr_name.lo:  IMG_CONST IMG_ERR
+hdr_numb.lo:  IMG_CONST IMG_ERR
+hdr_outx.lo:  IMG_CONST IMG_ERR IMG_PCB
+img1_assoc.lo: IMG_CONST IMG_PCB
+img1_callo.lo: IMG_CONST IMG_ERR
+img1_cfree.lo: IMG_CONST
+img1_ckey.lo: IMG_ERR
+img1_cnslt.lo: IMG_CONST IMG_ERR IMG_PCB
+img1_cpy.lo: IMG_ERR
+img1_creal.lo: IMG_CONST IMG_ERR
+img1_dlex.lo:  IMG_CONST IMG_ECB IMG_ERR IMG_PCB
+img1_dlft.lo:  IMG_CONST IMG_ECB IMG_ERR IMG_PCB
+img1_exex.lo:  IMG_CONST IMG_ECB IMG_ERR
+img1_exft.lo:  IMG_CONST IMG_ECB IMG_ERR
+img1_exini.lo:  IMG_CONST IMG_ECB IMG_ERR IMG_PCB
+img1_frext.lo:  IMG_CONST IMG_ECB IMG_ERR IMG_PCB
+img1_frslt.lo: IMG_CONST IMG_ERR IMG_PCB
+img1_frtra.lo:   IMG_CONST IMG_ECB IMG_ERR
+img1_gkeyx.lo: IMG_ERR
+img1_gtndf.lo:  IMG_CONST IMG_ERR IMG_PCB 
+img1_gtslt.lo: IMG_CONST IMG_ERR IMG_PCB
+img1_init.lo:  IMG_CONST IMG_ECB IMG_PCB
+img1_nex.lo:  IMG_CONST IMG_ECB IMG_ERR
+img1_nft.lo:  IMG_CONST IMG_ECB IMG_ERR IMG_PCB
+img1_nmex.lo:  IMG_CONST IMG_ECB IMG_ERR
+img1_nmft.lo:  IMG_CONST IMG_ECB IMG_ERR
+img1_nwndf.lo: IMG_CONST IMG_ERR IMG_PCB
+img1_prndf.lo:  IMG_CONST IMG_ERR IMG_PCB
+img1_pshdb.lo: IMG_ERR
+img1_pshde.lo: IMG_ERR
+img1_pshdf.lo: IMG_ERR
+img1_rdexx.lo:  IMG_CONST IMG_ECB IMG_ERR IMG_PCB
+img1_repft.lo:  IMG_ECB   IMG_CONST
+img1_repex.lo:   IMG_CONST IMG_ECB
+img1_rkey.lo: IMG_ERR
+img1_tpndf.lo: IMG_CONST IMG_ERR IMG_PCB
+img1_trace.lo:  IMG_CONST IMG_ECB IMG_ERR IMG_PCB
+img1_vpar.lo: IMG_CONST IMG_ERR
+img1_wrexx.lo:  IMG_CONST IMG_ECB IMG_ERR IMG_PCB
+img_cancl.lo:  IMG_CONST IMG_ECB IMG_ERR IMG_PCB
+img_check.lo: IMG_CONST IMG_PCB
+img_delet.lo:  IMG_CONST IMG_ECB IMG_ERR
+img_free.lo:  IMG_CONST IMG_ECB IMG_ERR IMG_PCB
+img_in.lo: IMG_CONST
+img_in1.lo: IMG_CONST
+img_in1x.lo: IMG_CONST
+img_in2.lo: IMG_CONST
+img_in2x.lo: IMG_CONST
+img_in3.lo: IMG_CONST
+img_in3x.lo: IMG_CONST
+img_indf.lo: IMG_CONST IMG_PCB
+img_inx.lo: IMG_CONST
+img_mod.lo: IMG_CONST
+img_mod1.lo: IMG_CONST
+img_mod1x.lo: IMG_CONST
+img_mod2.lo: IMG_CONST
+img_mod2x.lo: IMG_CONST
+img_mod3.lo: IMG_CONST
+img_mod3x.lo: IMG_CONST
+img_modx.lo: IMG_CONST
+img_name.lo: IMG_CONST IMG_ERR IMG_PCB
+img_new.lo: IMG_CONST
+img_new1.lo: IMG_CONST
+img_new1x.lo: IMG_CONST
+img_new2.lo: IMG_CONST
+img_new2x.lo: IMG_CONST
+img_new3.lo: IMG_CONST
+img_new3x.lo: IMG_CONST
+img_newx.lo: IMG_CONST
+img_out.lo: IMG_CONST
+img_outx.lo: IMG_CONST
+img_test.lo: IMG_ERR
+img_tmp.lo: IMG_CONST
+img_tmp1.lo: IMG_CONST
+img_tmp1x.lo: IMG_CONST
+img_tmp2.lo: IMG_CONST
+img_tmp2x.lo: IMG_CONST
+img_tmp3.lo: IMG_CONST
+img_tmp3x.lo: IMG_CONST
+img_tmpx.lo: IMG_CONST
