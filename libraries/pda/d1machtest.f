@@ -1,3 +1,6 @@
+C
+C PWD: not used. Checked C version of PDA_D1MACH against C version.
+C
       PROGRAM D1MACHTEST
       
       DOUBLE PRECISION PDA_D1MACH

@@ -111,11 +111,15 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
 *     2007 February 13 (MJC):
 *        Original version.
+*     2007 May 21 (PWD):
+*        Use EMS_ calls to replace ERR_ and MSG_. PDA library only
+*        depends on EMS.
 *     {enter_further_changes_here}
 
 *-
@@ -183,9 +187,9 @@
 *  Validate that there are sufficient degrees of freedom.
       IF ( M .LE. N ) THEN
          STATUS = SAI__ERROR
-         CALL MSG_SETI( 'M', M )
-         CALL MSG_SETI( 'N', N )
-         CALL ERR_REP( 'PDA_LMERR_ERR1', 'Too few points (^M) to '/
+         CALL EMS_SETI( 'M', M )
+         CALL EMS_SETI( 'N', N )
+         CALL EMS_REP( 'PDA_LMERR_ERR1', 'Too few points (^M) to '/
      :                 /'determine ^N coefficients'' errors.', STATUS )
          GOTO 999
       END IF
@@ -292,7 +296,7 @@
          CALL PDA_DGEFA( COVAR, N, N, PIVOT, IFAIL )
          IF ( IFAIL .NE. 0 ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( ' ', 'Failed to invert the curvature matrix.',
+            CALL EMS_REP( ' ', 'Failed to invert the curvature matrix.',
      :                    STATUS )
             GOTO 999
          ELSE

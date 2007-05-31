@@ -268,7 +268,7 @@ void pdaDeflt( int alg, int *iv, int liv, int lv, double *v){
 /* Fortran access to C routines */
 /* ============================ */
 
-F77_DOUBLE_FUNCTION(pda_d1mach_c)( INTEGER(i) ) {
+F77_DOUBLE_FUNCTION(pda_d1mach)( INTEGER(i) ) {
     GENPTR_INTEGER(i)
     F77_DOUBLE_TYPE(result);
     result = pdaD1mach( *i );

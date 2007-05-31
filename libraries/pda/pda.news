@@ -27,3 +27,11 @@
      [double precision random number generator and seed]
    * Add PDA_R1MACH to complement PDA_D1MACH
 
+ V0.5-2
+
+   * Start adding a C interface to some routines. See pda.c.
+
+   * Switch to C version of PDA_D1MACH to improve portability.
+   
+   * Add new routine PDA_LMERR to estimate errors in a non-linear
+     least square fit.

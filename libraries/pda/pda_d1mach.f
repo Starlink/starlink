@@ -1,3 +1,6 @@
+C
+C  31-MAY-2007 (PWD): Note this routine is not used. See pdaD1mach.c.
+C
       DOUBLE PRECISION FUNCTION PDA_D1MACH(I)
       IMPLICIT NONE
       INTEGER I
