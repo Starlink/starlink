@@ -25,6 +25,9 @@
 
     FITS catalogues can now have 64 bit integer columns ('K' type).
 
+    Compressed NDFs (.gz and .Z) can now be opened directly in the cube
+    toolbox. 
+
     GAIA 3.3-7
     ==========
 
