@@ -578,9 +578,10 @@
 *     extensions instead.
 
 *  Copyright:
-*     Copyright (C) 1991-1992, 1994 Science & Engineering Research
-*     Council. Copyright (C) 1995, 1997, 1999-2001 Central Laboratory
-*     of the Research Councils. All Rights Reserved.
+*     Copyright (C) 1991-1994 Science & Engineering Research Council. 
+*     Copyright (C) 1995-2005 Central Laboratory of the Research Councils. 
+*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -611,8 +612,8 @@
 *     5-JUN-1992 (PDRAPER):
 *        Changed prologue and added new combination routines.
 *     28-JAN-1994 (PDRAPER):
-*        Now uses extension information. Added parameters USEMASK
-*        and USEBIAS to overcome DCL's reluctance to accept !
+*        Now uses extension information. Added parameters GETMASK
+*        and GETBIAS to overcome DCL's reluctance to accept !
 *        on command line.
 *     2-FEB-1994 (PDRAPER):
 *        Added option to delete input NDFs when processed.
@@ -632,6 +633,9 @@
 *        Upgraded for use with Sets.
 *     15-MAY-2001 (MBT):
 *        Added Set-specific global parameter values.
+*     31-MAY-2007 (PDRAPER):
+*        Remove unnecessary check for expanding output variances. That
+*        always happens for GENVAR=TRUE (flawed logic).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -988,12 +992,10 @@
 *  out an message warning user that this component will be lost. If not
 *  generating variances and one exists already better process it.
             CALL NDF_STATE( IDIN, 'Variance', HAVIV, STATUS )
-            IF ( HAVIV ) THEN
-               IF ( GENVAR ) THEN
-                  CALL MSG_OUT( 'DEBIAS_GOTVAR',
+            IF ( HAVIV .AND. GENVAR ) THEN
+               CALL MSG_OUT( 'DEBIAS_GOTVAR',
      :' Warning - input NDF has a variance component this will be'//
      :' superceded', STATUS )
-               END IF
             END IF
 
 *  Check that the frame type of the NDF is reasonable for debiassing.
@@ -1239,9 +1241,8 @@
      :                    STATUS )
 
 *  Map in the output variance component, set to BAD if generating
-*  variances. Map it in only if
-*  have a result to enter, ie. if generating variances or have a
-*  variance to propagate.
+*  variances. Map it in only if have a result to enter, i.e. if
+*  generating variances or have a variance to propagate.
             IF ( GENVAR ) THEN
                CALL NDF_MAP( IDOUT, 'Variance', ITYPE, 'WRITE/BAD',
      :                       IPOVAR, EL, STATUS )
@@ -1424,12 +1425,9 @@
 *  Set the units title
                CALL NDF_CPUT( 'ELECTRONS', IDOUT, 'UNITS', STATUS )
 
-*  Variance needs modification also - only if we're generating variances
-*  or have some to propagate.
-               IF ( GENVAR .OR. ( HAVIV .AND. .NOT. GENVAR ) ) THEN
-                  CALL CCD1_CMULT( BAD, ITYPE, IPOVAR, EL, ADC * ADC,
-     :                             IPWRK, NERR, STATUS )
-               END IF
+*  Variance needs modification as well.
+               CALL CCD1_CMULT( BAD, ITYPE, IPOVAR, EL, ADC * ADC,
+     :                          IPWRK, NERR, STATUS )
 
 *  Saturation value requires modification, from the pre-expanded value.
                IF( SETSAT ) SATVAL = ADC * SATVAL

@@ -89,7 +89,7 @@
 *     IPBVAR = INTEGER (Given)
 *        Pointer bias variance component.
 *     HAVIV = LOGICAL (Given)
-*        Set true if input data had somne associated variances. These
+*        Set true if input data had some associated variances. These
 *        should have been propagated to the output array and be pointed
 *        to by IPOVAR.
 *     IPOVAR = INTEGER (Given)
