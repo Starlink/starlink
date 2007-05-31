@@ -113,9 +113,10 @@ itcl::class gaia::GaiaNDAccess {
 
       #  Release previous dataset, if any.
       close
-
+      
+      #  Get underlying data access type. Allow NDFs to be compressed.
       $namer_ configure -imagename $dataset
-      if { "[$namer_ type]" == ".sdf" } {
+      if { [string match ".sdf*" [$namer_ type]] } {
          set type_ "ndf"
          set cnfmap_ 1
       } else {
@@ -131,7 +132,7 @@ itcl::class gaia::GaiaNDAccess {
    #  These should be light-weight accesses that just get meta-data at this
    #  stage.
    protected method open_ {} {
-      set handle_ [${type_}::open [$namer_ ndfname 0]]
+      set handle_ [${type_}::open [$namer_ fullname 0]]
    }
 
    #  Close the dataset, if open.
