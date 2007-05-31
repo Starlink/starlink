@@ -359,11 +359,15 @@ itcl::class gaia::GaiaImageName {
 	 return 1
       }
 
-      #  If the file type matches a string in NDF_FORMATS_IN, that's great.
+      #  If the file type matches a string in NDF_FORMATS_IN we accept
+      #  that. Take care to pick out the full type "($type_)", could match a
+      #  part of it, if just looked for "$type_"
       global env
       if { [info exists env(NDF_FORMATS_IN)] } {
-	 if { [string first $type_ $env(NDF_FORMATS_IN)] > -1 } {
-	    return 1
+         if { [regexp "\\(${type_}\\)" $env(NDF_FORMATS_IN) m1] } {
+            if { [info exists m1] && "$m1" == "(${type_})" } {
+               return 1
+            }
 	 }
       }
       return 0
