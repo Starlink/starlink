@@ -473,18 +473,18 @@ FORCE:
 
 .gen.o:
 	$(FGENERIC) -t n $<
-	$(FC) -c $(FCFLAGS) $(STAR_FCFLAGS) $(<:.gen=.f)
-	rm -f $(<:.gen=.f)
+	$(FC) -c $(FCFLAGS) $(STAR_FCFLAGS) $(<:%.gen=%.f)
+	rm -f $(<:%.gen=%.f)
 
 .gsc.o:
 	$(FGENERIC) -t rlidc $<
-	$(FC) -c $(FCFLAGS) $(STAR_FCFLAGS) $(<:.gsc=.f)
-	rm -f $(<:.gsc=.f)
+	$(FC) -c $(FCFLAGS) $(STAR_FCFLAGS) $(<:%.gsc=%.f)
+	rm -f $(<:%.gsc=%.f)
 
 .gsn.o:
 	$(FGENERIC) -t rlid $<
-	$(FC) -c $(FCFLAGS) $(STAR_FCFLAGS) $(<:.gsn=.f)
-	rm -f $(<:.gsn=.f)
+	$(FC) -c $(FCFLAGS) $(STAR_FCFLAGS) $(<:%.gsn=%.f)
+	rm -f $(<:%.gsn=%.f)
 
 #============================================================================
 # Dummy targets to keep build system happy
