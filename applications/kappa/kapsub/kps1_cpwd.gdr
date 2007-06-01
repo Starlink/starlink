@@ -103,7 +103,6 @@
       INTEGER STATUS             ! Global status
  
 *  Local Variables:
-      <LTYPE> DIFF               ! Difference between adjacent elements
       INTEGER J                  ! Loop counter
       <LTYPE> SUM                ! Cumulative differences
       <LTYPE> SUMV               ! Cumulative variance

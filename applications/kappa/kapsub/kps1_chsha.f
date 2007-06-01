@@ -99,13 +99,11 @@
       REAL CASP                  ! Aspect ratio of current configuration
       INTEGER GM                 ! Geometric mean of the no. of tiles
       INTEGER I                  ! Loop counter
-      INTEGER IP                 ! Maximum additional no. of tiles in x
       INTEGER LX                 ! Lowest number of tiles in x
       INTEGER LY                 ! Lowest number of tiles in y
       INTEGER HX                 ! Highest number of tiles in x
       INTEGER HY                 ! Highest number of tiles in y
       INTEGER J                  ! Loop counter
-      INTEGER JP                 ! Maximum additional no. of tiles in y
       INTEGER NC                 ! Number of tiles in current 
                                  ! configuration
       REAL TASP                  ! Aspect ratio of a tile

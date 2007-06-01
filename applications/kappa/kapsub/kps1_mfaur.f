@@ -121,7 +121,6 @@
       INTEGER EL                 ! Number of mapped elements
       INTEGER I                  ! Loop counter
       INTEGER IDIMS( NDF__MXDIM ) ! Dimensions of input NDF
-      INTEGER IERR               ! Position of first error (dummy)
       INTEGER IPAL               ! Pointer to averaged line
       CHARACTER ITYPE * ( NDF__SZTYP ) ! Numeric type for processing
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of input NDF
@@ -130,10 +129,8 @@
       INTEGER NDFS               ! Identifier to the used section of 
                                  ! the input NDF
       INTEGER NDIM               ! Number of dimensions
-      INTEGER NERR               ! Number of errors
       INTEGER ODIMS( NDF__MXDIM )! Dimensions of output array
       INTEGER PNTRI( 1 )         ! Pointer to input array component
-      INTEGER PNTRO( 1 )         ! Pointer to output array component
       INTEGER REF( NDF__MXDIM )  ! I/p pixel co-ords at bottom left of 
                                  ! a compression box
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of input NDF

@@ -98,17 +98,14 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  External References:
-      INTEGER CHR_LEN            ! Returns significant length of string
-
-*  Local constants :
+*  Local Constants:
       REAL ARAT                  ! Nominal character aspect ratio
       PARAMETER ( ARAT = 1.5 )
 
       INTEGER LINELN             ! Max no. of characters on a single
       PARAMETER ( LINELN = 30 )  ! line of the heading.
 
-*  Local variables :
+*  Local Variables:
       CHARACTER LINE*(LINELN)    ! One line text string
       CHARACTER SLABEL*80        ! Spectral label
       CHARACTER SUNIT*20         ! Spectral unit
