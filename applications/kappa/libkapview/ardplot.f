@@ -40,9 +40,15 @@
 *        the text "COFRAME(SKY,System=FK5)" would indicate that positions 
 *        are specified in RA/DEC (FK5,J2000). The statement "COFRAME(PIXEL)" 
 *        indicates explicitly that positions are specified in pixel 
-*        co-ordinates. 
+*        co-ordinates. The ARDFILE parameter is only accessed if
+*        parameter REGION is given a null (!) value.
 *     DEVICE = DEVICE (Read)
 *        The plotting device. [Current graphics device]
+*     REGION = FILENAME (Read)
+*        The name of a file containing an AST Region to be outlined, or 
+*        null (!) if the ARD region defined by parameter ARDFILE is to be
+*        outlined. Suitable files can be created using the ATOOLS
+*        package. [!]
 *     REGVAL = _INTEGER (Read)
 *        Indicates which regions within the ARD description are to be
 *        outlined. If zero (the default) is supplied, then the plotted
@@ -53,7 +59,8 @@
 *        supplied, then all regions with indices greater than or equal 
 *        to the absolute value of the supplied index are outlined. See
 *        SUN/183 for further information on the numbering of regions 
-*        within an ARD description. [0]
+*        within an ARD description. The REGVAL parameter is only accessed 
+*        if parameter REGION is given a null (!) value. [0]
 *     STYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to use 
 *        for the curves.
@@ -101,7 +108,9 @@
 *  Copyright:
 *     Copyright (C) 2001, 2004 Central Laboratory of the Research
 *     Councils. Copyright (C) 2005 Particle Physics & Astronomy
-*     Research Council. All Rights Reserved.
+*     Research Council. 
+*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -132,6 +141,8 @@
 *        Use CNF_PVAL
 *     15-NOV-2005 (DSB):
 *        Delete the GRP identifier before returning.
+*     28-MAY-2007 (DSB):
+*        Modified to support outlining of AST Regions as well as ARD files.
 *     {enter_further_changes_here}
 
 *-
@@ -142,27 +153,40 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST_ constants and function declarations
       INCLUDE 'GRP_PAR'          ! GRP_ constants
+      INCLUDE 'PAR_ERR'          ! PAR error constants
 
 *  Status:
       INTEGER STATUS
 
+*  External References:
+      EXTERNAL AST_ISAREGION
+
 *  Local Variables:
+      CHARACTER ADOM*30          ! Name of alignment Domain
       CHARACTER FILNAM*(GRP__SZFNM)! Name of ARD file
       DOUBLE PRECISION BOX( 4 )  ! Bounds of used region of (X,Y) axes
       INTEGER FD                 ! File descriptor
+      INTEGER FS                 ! Pointer to conversion FrameSet
+      INTEGER IBASE              ! Index of original Base frame
       INTEGER IGRP               ! Group identifier
       INTEGER IPICD              ! AGI identifier for the DATA picture
       INTEGER IPICF              ! AGI identifier for the frame picture
       INTEGER IPICK              ! AGI identifier for the KEY picture
       INTEGER IPIX               ! Index of PIXEL Frame
       INTEGER IPLOT              ! Pointer to AST Plot for DATA picture
+      INTEGER IREG               ! Pointer to AST Region to outline
       INTEGER NFRM               ! Frame index increment between IWCS and IPLOT
       INTEGER REGVAL             ! Requested region value
       INTEGER RV                 ! Max available region value
       LOGICAL ALIGN              ! DATA pic. aligned with a previous picture?
       LOGICAL CONT               ! ARD description to continue?
+      LOGICAL SPARSE             ! Were there holds in the coord frame?
       REAL GBOX( 4 )             ! Bounds of used region of (X,Y) axes
       REAL MARGIN( 4 )           ! Margins round DATA picture
+
+*  Initialisations:
+      DATA MARGIN / 0.0, 0.0, 0.0, 0.0 /
+      DATA BOX / 0.0, 0.0, 1.0, 1.0 /
 *.
 
 *  Check the inherited global status.
@@ -170,20 +194,6 @@
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
-
-*  Use a literal parameter to obtain the value to avoid having to give
-*  the indirection and continuation.  Call FIO to open the file to
-*  ensure that the obtained file exists.  Get the name and add the
-*  indirection symbol so that ARD does not treat the filename as a
-*  literal ARD description.
-      CALL FIO_ASSOC( 'ARDFILE', 'READ', 'LIST', 0, FD, STATUS )
-      CALL AIF_FLNAM( 'ARDFILE', FILNAM( 2: ), STATUS )
-      FILNAM( 1:1 ) = '^'
-      CALL FIO_ANNUL( FD, STATUS )
-
-*  Read the ARD description from the file, into a GRP group.
-      IGRP = GRP__NOID
-      CALL ARD_GRPEX( FILNAM, GRP__NOID, IGRP, CONT, STATUS )
 
 *  Start up the graphics system, checking that there is an existing DATA
 *  picture on the device. This stores a new DATA picture in the AGI 
@@ -199,40 +209,122 @@
      :                ' ', ' ', 0.0, 0.0, 'PIXEL', BOX, IPICD, IPICF, 
      :                IPICK, IPLOT, NFRM, ALIGN, STATUS )
 
-*  We want to draw the ARD region over the entire plotting area, so get the 
-*  bounds of the PGPLOT window (this will be in millimetres).
-      CALL PGQWIN( GBOX( 1 ), GBOX( 3 ), GBOX( 2 ), GBOX( 4 ) )
+*  Abort if an error occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Indicate we have no ARD file.
+      IGRP = GRP__NOID
+
+*  Indicate we have no AST Region.
+      IREG = AST__NULL
+
+*  First of all, attempt to get an AST Region.
+      CALL KPG1_GTOBJ( 'REGION', 'Region', AST_ISAREGION, IREG, 
+     :                 STATUS )
+
+*  If no region was supplied, annul the error and proceed to display an
+*  ARD file.
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+
+*  Use a literal parameter to obtain the value to avoid having to give
+*  the indirection and continuation.  Call FIO to open the file to
+*  ensure that the obtained file exists.  Get the name and add the
+*  indirection symbol so that ARD does not treat the filename as a
+*  literal ARD description.
+         CALL FIO_ASSOC( 'ARDFILE', 'READ', 'LIST', 0, FD, STATUS )
+         CALL AIF_FLNAM( 'ARDFILE', FILNAM( 2: ), STATUS )
+         FILNAM( 1:1 ) = '^'
+         CALL FIO_ANNUL( FD, STATUS )
+
+*  Read the ARD description from the file, into a GRP group.
+         IGRP = GRP__NOID
+         CALL ARD_GRPEX( FILNAM, GRP__NOID, IGRP, CONT, STATUS )
 
 *  Get the index of the region to draw.
-      CALL PAR_GET0I( 'REGVAL', REGVAL, STATUS )      
+         CALL PAR_GET0I( 'REGVAL', REGVAL, STATUS )      
 
-*  Select the PIXELE Frame as the current Frame in the Plot so that 
+*  We want to draw the ARD region over the entire plotting area, so get the 
+*  bounds of the PGPLOT window (this will be in millimetres).
+         CALL PGQWIN( GBOX( 1 ), GBOX( 3 ), GBOX( 2 ), GBOX( 4 ) )
+
+*  Select the PIXEL Frame as the current Frame in the Plot so that 
 *  pixel coords become the default coord system for the ARD file.
-      CALL KPG1_ASFFR( IPLOT, 'PIXEL', IPIX, STATUS )
-      CALL AST_SETI( IPLOT, 'CURRENT', IPIX, STATUS )
+         CALL KPG1_ASFFR( IPLOT, 'PIXEL', IPIX, STATUS )
+         CALL AST_SETI( IPLOT, 'CURRENT', IPIX, STATUS )
 
 *  Plot it.
-      RV = REGVAL
-      CALL ARD_PLOT( IGRP, IPLOT, GBOX, RV, STATUS )
+         RV = REGVAL
+         CALL ARD_PLOT( IGRP, IPLOT, GBOX, RV, STATUS )
 
 *  If the supplied REGVAL did not occur in the ARD description, report a
 *  warning.
-      IF( RV .LE. REGVAL .AND. REGVAL .NE. 0 ) THEN
-         CALL MSG_SETI( 'R', ABS( REGVAL ) )
-         CALL MSG_SETI( 'RV', RV - 1 )
-         CALL MSG_BLANK( STATUS )
-         CALL MSG_OUT( 'ARDPLOT_MSG1', '  The request region index ^R'//
-     :                 ' is greater than the highest region index '//
-     :                 '(^RV) used in the supplied ARD description.', 
-     :                 STATUS )
-         CALL MSG_BLANK( STATUS )
+         IF( RV .LE. REGVAL .AND. REGVAL .NE. 0 ) THEN
+            CALL MSG_SETI( 'R', ABS( REGVAL ) )
+            CALL MSG_SETI( 'RV', RV - 1 )
+            CALL MSG_BLANK( STATUS )
+            CALL MSG_OUT( 'ARDPLOT_MSG1', '  The request region index'//
+     :                    ' ^R is greater than the highest region '//
+     :                    'index (^RV) used in the supplied ARD '//
+     :                    'description.', STATUS )
+            CALL MSG_BLANK( STATUS )
+         END IF
+
+
+*  Now handle cases where an AST Region was supplied.
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+
+*  Find the Mapping from the existing Plot to the Frame represented by
+*  the Region. Record the original Base frame index because AST_CONVERT
+*  changes it.
+         IBASE = AST_GETI( IPLOT, 'Base', STATUS )
+         FS = AST_CONVERT( IPLOT, IREG, ' ', STATUS )
+
+*  Get the Domain in which alignment occurred (the Domain of the new 
+*  base Frame in the Plot), and then reinstate the original Base Frame.
+         CALL AST_INVERT( IPLOT, STATUS )
+         ADOM = AST_GETC( IPLOT, 'Domain', STATUS )
+         CALL AST_INVERT( IPLOT, STATUS )
+         CALL AST_SETI( IPLOT, 'Base', IBASE, STATUS )
+
+*  Report an error if there is no way to transform positions from the
+*  current Frame of the Plot to the supplied Region.
+         IF( FS .EQ. AST__NULL ) THEN
+            IF( STATUS .EQ. SAI__OK ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'ARDPLOT_ERR1', 'Cannot align the '//
+     :                       'supplied Region with the displayed plot.', 
+     :                       STATUS )
+            END IF
+
+*  Otherwise, add the Frame into the plot using the Mapping returned by
+*  AST_CONVERT to connect it to the current Frame in the Plot.
+         ELSE
+            CALL AST_ADDFRAME( IPLOT, AST__CURRENT, 
+     :                         AST_GETMAPPING( FS, AST__BASE, 
+     :                                         AST__CURRENT, STATUS ),
+     :                         IREG, STATUS )
+
+*  Plot a boundary round the Region.
+            SPARSE = AST_BORDER( IPLOT, STATUS )
+
+*  Tell the user what Domain alignment occurred in.
+            CALL MSG_SETC( 'D', ADOM )
+            CALL MSG_OUT( 'ARDPLOT_MSG1', '   Alignment occurred in '//
+     :                    'the ^D Domain.', STATUS )
+            CALL MSG_BLANK( STATUS )
+
+         END IF
       END IF
+
+*  Arrive here if an error occurs.
+ 999  CONTINUE
 
 *  Shutdown PGPLOT and the graphics database.
       CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
 
-*  Delete the group.
-      CALL GRP_DELET( IGRP, STATUS )
+*  Delete the group, if supplied.
+      IF( IGRP .NE. GRP__NOID ) CALL GRP_DELET( IGRP, STATUS )
 
 *  End the AST context.
       CALL AST_END( STATUS )

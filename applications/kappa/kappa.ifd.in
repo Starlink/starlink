@@ -3348,6 +3348,15 @@ package kappa {
             helpkey *
          }
 
+         parameter region {
+            type FILENAME
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Text file containing AST Region to be outlined}
+            default !
+            helpkey *
+         }
+
          parameter regval {
             position 3
             type _INTEGER
