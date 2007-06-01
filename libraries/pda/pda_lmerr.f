@@ -118,8 +118,10 @@
 *     2007 February 13 (MJC):
 *        Original version.
 *     2007 May 21 (PWD):
-*        Use EMS_ calls to replace ERR_ and MSG_. PDA library only
-*        depends on EMS.
+*        Use EMS_ calls to replace ERR_ and MSG_.  PDA library depends
+*        only on EMS.
+*     2007 May 31 (MJC):
+*        Replace external machine precision with internal PDA_D1MACH.
 *     {enter_further_changes_here}
 
 *-
@@ -129,7 +131,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
 
 *  Arguments Given:
       INTEGER M
@@ -154,12 +155,11 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
+       DOUBLE PRECISION PDA_D1MACH
+       EXTERNAL PDA_D1MACH       ! Machine precision
        EXTERNAL FCN              ! Name of the fitting function
 
 *  Local Constants:
-       DOUBLE PRECISION MINPS    ! Minimum parameter shift fraction
-       PARAMETER ( MINPS = 1.D2 * VAL__EPSD ) ! Allow for some rounding
-
        DOUBLE PRECISION PSINIT    ! Initial parameter shift fraction
        PARAMETER ( PSINIT = 1.D-2 )
 
@@ -173,6 +173,7 @@
        INTEGER J                 ! Loop counter
        INTEGER K                 ! Loop counter
        INTEGER ITER              ! Iteration loop counter
+       DOUBLE PRECISION MINPS    ! Minimum parameter shift fraction
        INTEGER MITER             ! Constrained number of iterations
        DOUBLE PRECISION PS       ! Parameter shift
        DOUBLE PRECISION SUM      ! Sum of Jacobian products
@@ -183,6 +184,10 @@
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Define a parameter.  Cannot do this with a PARAMETER dstatement
+*  because of the PDA function.
+      MINPS = 1.D2 * PDA_D1MACH( 4 )
 
 *  Validate that there are sufficient degrees of freedom.
       IF ( M .LE. N ) THEN
