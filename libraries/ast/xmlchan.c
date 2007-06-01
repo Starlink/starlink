@@ -1032,7 +1032,7 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
                if( rtime ) {
                   if( reg ) {
                      tmp = (AstRegion *) astPrism( reg, rtime, "" );
-                     astAnnul( reg );
+                     (void) astAnnul( reg );
                      reg = tmp;
                   } else {
                      reg = astClone( rtime );
@@ -1043,7 +1043,7 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
                if( rspec ) {
                   if( reg ) {
                      tmp = (AstRegion *) astPrism( reg, rspec, "" );
-                     astAnnul( reg );
+                     (void) astAnnul( reg );
                      reg = tmp;
                   } else {
                      reg = astClone( rspec );
@@ -1054,7 +1054,7 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
                if( rred ) {
                   if( reg ) {
                      tmp = (AstRegion *) astPrism( reg, rred, "" );
-                     astAnnul( reg );
+                     (void) astAnnul( reg );
                      reg = tmp;
                   } else {
                      reg = astClone( rred );
@@ -1069,7 +1069,7 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
                      sum = astClone( reg );
                   } else {
                      tmp = (AstRegion *) astCmpRegion( sum, reg, AST__OR, "" );
-                     astAnnul( sum );
+                     (void) astAnnul( sum );
                      sum = tmp;
                   }
                   reg = astAnnul( reg );
@@ -1091,7 +1091,7 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
 
 /* Simplify the total sum Region. */
             tmp = astSimplify( sum );
-            astAnnul( sum );
+            (void) astAnnul( sum );
             sum = tmp;
    
 /* The axes in this sum Region may not be in the correct order or units (i.e 
@@ -1576,7 +1576,7 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
                if( t ) {
                   tt = (AstRegion *) astPrism( t, r, "" );
                   r = astAnnul( r );
-                  astAnnul( t );
+                  (void) astAnnul( t );
                   t = tt;
    
 /* If this is the first axis, use the region determined for this axis as
@@ -1598,7 +1598,7 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
                if( t ) {
                   tt = (AstRegion *) astPrism( t, r, "" );
                   r = astAnnul( r );
-                  astAnnul( t );
+                  (void) astAnnul( t );
                   t = tt;
                } else {
                   t = r;
@@ -1618,7 +1618,7 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
                if( t ) {
                   tt = (AstRegion *) astPrism( t, r, "" );
                   r = astAnnul( r );
-                  astAnnul( t );
+                  (void) astAnnul( t );
                   t = tt;
                } else {
                   t = r;
@@ -1794,7 +1794,7 @@ static AstObject *AstroCoordSystemReader( AstXmlChan *this,
    
       } else {
          tmp = astCmpFrame( comp[ 0 ], comp[ 1 ], "" );
-         astAnnul( comp[ 0 ] );
+         (void) astAnnul( comp[ 0 ] );
          comp[ 0 ] = (AstFrame *) tmp;
          tmp = astCmpFrame( comp[ 0 ], comp[ 2 ], "" );
          new = (AstObject *) astCmpFrame( tmp, comp[ 3 ], "" );
@@ -2966,7 +2966,7 @@ static AstRegion *ConvexReader( AstXmlChan *this, AstXmlElement *elem,
          reg = ConstraintReader( this, scan->el[0][i], cfrm );
          tmp = (AstRegion *) astCmpRegion( new, reg, AST__AND, "" );
          reg = astAnnul( reg );
-         astAnnul( new );
+         (void) astAnnul( new );
          new = tmp;
       }
 
@@ -5126,7 +5126,7 @@ static AstRegion *IntersectionReader( AstXmlChan *this, AstXmlElement *elem,
          reg = RegionReader( this, scan->el[0][i], frm );
          tmp = (AstRegion *) astCmpRegion( new, reg, AST__AND, "" );
          reg = astAnnul( reg );
-         astAnnul( new );
+         (void) astAnnul( new );
          new = tmp;
       }
 
@@ -7786,7 +7786,7 @@ static void ReCentreAnc( AstRegion *region, int nanc, AstKeyMap **ancs ){
                      if( !astIsAUnitMap( smap ) ) {
                         r2 = astMapRegion( r, smap, frm );
                         astMapPut0A( ancs[ j ], key[ k ], r2, NULL );
-                        astAnnul( r );
+                        (void) astAnnul( r );
                         r = r2;
                      } 
                      map = astAnnul( map );
@@ -8762,7 +8762,7 @@ static void Report( AstXmlChan *this, AstXmlElement *elem, int severity,
 
 
    if( severity == RESET ) {
-      if( this->warnings ) astAnnul( this->warnings );
+      if( this->warnings ) (void) astAnnul( this->warnings );
       nwarn = 0;
 
    } else if( severity == WARNING && astOK ) {
@@ -11491,7 +11491,7 @@ static AstRegion *UnionReader( AstXmlChan *this, AstXmlElement *elem,
          reg = RegionReader( this, scan->el[0][i], frm );
          tmp = (AstRegion *) astCmpRegion( new, reg, AST__OR, "" );
          reg = astAnnul( reg );
-         astAnnul( new );
+         (void) astAnnul( new );
          new = tmp;
       }
 

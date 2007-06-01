@@ -2531,7 +2531,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    creating a copy of the supplied Stc, if this has not already been done. */
       if( stc == (AstStc *) this_mapping ) {
          temp = (AstStc *) astCopy( stc );
-         astAnnul( stc );
+         (void) astAnnul( stc );
          stc = temp;
       }
 
@@ -2572,13 +2572,13 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    creating a copy of the supplied Stc, if this has not already been done. */
       if( stc == (AstStc *) this_mapping ) {
          temp = (AstStc *) astCopy( stc );
-         astAnnul( stc );
+         (void) astAnnul( stc );
          stc = temp;
       }
 
 /* Store the new region in "stc", annulling the existing Region. */
       if( stc ) {
-         astAnnul( stc->region );
+         (void) astAnnul( stc->region );
          stc->region = astClone( newreg );
       }
 
@@ -2638,7 +2638,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    
                   if( stc == (AstStc *) this_mapping ) {
                      temp = astCopy( stc );
-                     astAnnul( stc );
+                     (void) astAnnul( stc );
                      stc = temp;
                      keymap = temp->coord[ i ];
                   }

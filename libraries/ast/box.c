@@ -1173,7 +1173,7 @@ static AstPointSet *RegBaseGrid( AstRegion *this ){
                result = astClone( ps );
             } else {
                newps = astAppendPoints( result, ps );
-               astAnnul( result );
+               (void) astAnnul( result );
                result = newps;
             }
 
@@ -2529,7 +2529,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
       if( astRegPins( newbox, mesh, NULL, NULL ) ) {
 
 /* If so, use the new Box in place of the original. */
-         astAnnul( new );
+         (void) astAnnul( new );
          new = astClone( newbox );
          simpler = 1;
 
@@ -2606,7 +2606,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
             if( astRegPins( newpoly, mesh, NULL, NULL ) ) {
 
 /* If so, use the new Polygon in place of the original Box. */
-               astAnnul( new );
+               (void) astAnnul( new );
                new = astClone( newpoly );
                simpler = 1;
             }

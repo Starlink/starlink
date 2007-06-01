@@ -1140,7 +1140,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 /* Create a new PointList, and use it in place of the original. */
          new2 = astPointList( fr, np, nc, np, pts, unc, "" );
-         astAnnul( new );
+         (void) astAnnul( new );
          new = (AstRegion *) new2;
          simpler = 1;
       }
@@ -1282,7 +1282,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    pointer. If so take a copy of the PointSet so we can change it safely. */
    if( in_base == in ) {
       ps3 = astCopy( in_base );
-      astAnnul( in_base );
+      (void) astAnnul( in_base );
       in_base = ps3;
       ps3 = NULL;
    }

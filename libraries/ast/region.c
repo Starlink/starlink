@@ -1582,8 +1582,11 @@ static AstPointSet *BndMesh( AstRegion *this, double *lbnd, double *ubnd ){
    AstPointSet *ps1;  
    AstPointSet *result;  
 
+/* Initialise */
+   result = NULL;
+
 /* Check the local error status. */
-   if ( !astOK ) return NULL;
+   if ( !astOK ) return result;
 
 /* Get the current->base Mapping from the Region. */
    map = astGetMapping( this->frameset, AST__CURRENT, AST__BASE );

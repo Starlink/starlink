@@ -1258,8 +1258,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    the end slot which is no longer used, reduce the number of Mappings in 
    the list by 1, and return the index of the first modified Mapping. */
             if( map2 ) {
-               astAnnul( ( *map_list )[ i1 ] );
-               astAnnul( ( *map_list )[ i2 ] );
+               (void) astAnnul( ( *map_list )[ i1 ] );
+               (void) astAnnul( ( *map_list )[ i2 ] );
                ( *map_list )[ i1 ] = map2;
                ( *invert_list )[ i1 ] = 0;
                for( i = i2 + 1; i < *nmap; i++ ){

@@ -1290,7 +1290,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
          if( newreg && astRegPins( newreg, mesh, NULL, NULL ) ) {
 
 /* If so, use the new Circle in place of the original. */
-            astAnnul( new );
+            (void) astAnnul( new );
             new = astClone( newreg );
 
 /* Otherwise, if the region is 2-d we see if an Ellipse can represent the 
@@ -1299,7 +1299,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 /* Find the best fitting Ellipse (defined in the current Frame) through these 
    points */
-            if( newreg ) astAnnul( newreg );
+            if( newreg ) (void) astAnnul( newreg );
             newreg = astBestEllipse( mesh, cen, unc );
  
 /* See if all points within this mesh fall on the boundary of the best
@@ -1307,7 +1307,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
             if( newreg && astRegPins( newreg, mesh, NULL, NULL ) ) {
 
 /* If so, use the new Ellipse in place of the original. */
-               astAnnul( new );
+               (void) astAnnul( new );
                new = astClone( newreg );
                simpler = 1;
             }

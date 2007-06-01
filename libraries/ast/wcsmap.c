@@ -4325,8 +4325,8 @@ static void WcsPerm( AstMapping **maps, int *inverts, int iwm  ){
    astSetInvert( wm, old_winv );
 
 /* Annul the supplied pointers */
-   astAnnul( pm );
-   astAnnul( wm );
+   pm = astAnnul( pm );
+   wm = astAnnul( wm );
 
 /* Store the returned Mappings. */
    maps[ iwm ] = (AstMapping *) newpm;

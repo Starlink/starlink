@@ -718,7 +718,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
    bounding box of the Ellipse. These bounds are cached in the Ellipse
    structure by astRegBaseMesh. Ensure astRegBaseMesh has been invoked,
    so that it is safe to use the cached bounding box. */
-   if( !this_region->basemesh ) astAnnul( astRegBaseMesh( this ) );
+   if( !this_region->basemesh ) (void) astAnnul( astRegBaseMesh( this ) );
 
 /* Store the bounding box. */
    lbnd[ 0 ] = this->lbx;
@@ -1499,7 +1499,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
       if( newreg && astRegPins( newreg, mesh, NULL, NULL ) ) {
 
 /* If so, use the new Circle in place of the original Region. */
-         astAnnul( new );
+         (void) astAnnul( new );
          new = astClone( newreg );
          simpler =1;
 
@@ -1509,7 +1509,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 /* Find the best fitting Ellipse (defined in the current Frame) through these 
    points */
-         if( newreg ) astAnnul( newreg );
+         if( newreg ) (void) astAnnul( newreg );
          newreg = astBestEllipse( mesh, cen, unc );
  
 /* See if all points within this mesh fall on the boundary of the best
@@ -1517,7 +1517,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
          if( newreg && astRegPins( newreg, mesh, NULL, NULL ) ) {
 
 /* If so, use the new Ellipse in place of the original Region. */
-            astAnnul( new );
+            (void) astAnnul( new );
             new = astClone( newreg );
             simpler = 1;
          }

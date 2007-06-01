@@ -1453,7 +1453,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                }   
 
 /* Use the route Mapping to transform this PointSet. */
-               astTransform( rmap, ps1a, forward, ps2a );
+               (void) astTransform( rmap, ps1a, forward, ps2a );
 
 /* Copy the axis values from the resulting PointSet back into the results
    array. */

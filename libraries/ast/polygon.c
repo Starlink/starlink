@@ -908,7 +908,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 
 /* Resolve all the supplied mesh points into components parallel and 
    perpendicular to this edge. */
-         astResolvePoints( frm, start, end, pset1, pset2 );
+         (void) astResolvePoints( frm, start, end, pset1, pset2 );
 
 /* A point is effectively on this edge if the parallel component is
    greater than (-wid) and less than (edge_len+wid) AND the perpendicular
@@ -1181,7 +1181,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
          if( newpol && astRegPins( newpol, mesh, NULL, NULL ) ) {
 
 /* If so, use the new Polygon in place of the original Region. */
-            astAnnul( new );
+            (void) astAnnul( new );
             new = astClone( newpol );
             simpler =1;
          }

@@ -2847,7 +2847,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
       if( naxout1 == naxt && naxout2 == 0 ) {
          newfrm1 = astPickAxes( cfrm, naxout1, axout1, NULL );
          newreg1 = astMapRegion( reg1, nmap1, newfrm1 );
-         astAnnul( new );
+         (void) astAnnul( new );
          new = astSimplify( newreg1 );      
          if( neg ) astNegate( new );
          perm = astMalloc( sizeof( int )*(size_t) ( naxout1 ) );
@@ -2864,7 +2864,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
       } else if( naxout1 == 0 && naxout2 == naxt ) {
          newfrm2 = astPickAxes( cfrm, naxout2, axout2, NULL );
          newreg2 = astMapRegion( reg2, nmap2, newfrm2 );
-         astAnnul( new );
+         (void) astAnnul( new );
          new = astSimplify( newreg2 );      
          if( neg ) astNegate( new );
          perm = astMalloc( sizeof( int )*(size_t) ( naxout2 ) );
@@ -2901,14 +2901,14 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 /* If the simplified second component is no longer an Interval or Box, revert 
    to the original Interval. */
          if( !astIsAInterval( snewreg2 ) && !astIsABox( snewreg2 ) ) {
-            astAnnul( snewreg2 );
+            (void) astAnnul( snewreg2 );
             snewreg2 = astClone( newreg2 );
          }
    
 /* If either component Region was simplified, create a new Prism from the 
    simplified Regions. */
          if( snewreg1 != newreg1 || snewreg2 != newreg2 ) {
-            astAnnul( new );
+            (void) astAnnul( new );
             new = astPrism( snewreg1, snewreg2, "" );
    
 /* Ensure the new Prism has the same Negated attribute as the original. */
@@ -2942,7 +2942,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
       if( new && astIsAPrism( new ) ) {
          new2 = astMergeInterval( new->region2, new->region1 );
          if( new2 ) {
-            astAnnul( new );
+            (void) astAnnul( new );
             new = astSimplify( new2 );
             new2 = astAnnul( new2 );
    
@@ -2954,7 +2954,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
             newreg2 = astMergeInterval( new->region2, cpr->region2 );
             if( newreg2 ) {
                new2 = (AstRegion *) astPrism( newreg1, newreg2, "" );
-               astAnnul( new );
+               (void) astAnnul( new );
                new = astSimplify( new2 );
                new2 = astAnnul( new2 );
             }

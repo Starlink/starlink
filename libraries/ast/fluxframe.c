@@ -2388,7 +2388,7 @@ static void Overlay( AstFrame *template, const int *template_axes,
       resff = (AstFluxFrame *) result;
       tmpff = (AstFluxFrame *) template;
       resff->defspecval = tmpff->defspecval;
-      if( resff->specframe ) astAnnul( resff->specframe );
+      if( resff->specframe ) (void) astAnnul( resff->specframe );
       resff->specframe = tmpff->specframe ? astCopy( tmpff->specframe ) : NULL;
 
 /* If the result Frame is not a FluxFrame, we must temporarily clear the

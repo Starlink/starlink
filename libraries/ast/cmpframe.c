@@ -3939,6 +3939,7 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    *map = NULL;
    *result = NULL;
    match = 0;
+   pm = NULL;
 
 /* Check the global error status. */
    if ( !astOK ) return match;

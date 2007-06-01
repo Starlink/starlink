@@ -2358,7 +2358,7 @@ static AstMatrixMap *MatPerm( AstMatrixMap *mm, AstPermMap *pm, int minv,
       }
 
 /* Transform these unit vectors using the inverse PermMap. */
-      astTransform( pm, pset1, 0, pset2 );
+      (void) astTransform( pm, pset1, 0, pset2 );
 
 /* Copy the transformed vectors into the matrix array. */
       p = matrix;
@@ -3678,10 +3678,10 @@ static int PermOK( AstMapping *pm ){
       }
 
 /* Use the PermMap to transform these positions in the forward direction. */
-      astTransform( pm, pset1, 1, pset2 );
+      (void) astTransform( pm, pset1, 1, pset2 );
 
 /* Now transform the results back again using the inverse PermMap. */
-      astTransform( pm, pset2, 0, pset1 );
+      (void) astTransform( pm, pset2, 0, pset1 );
 
 /* See if the input positions have changed. If they have, then the PermMap
    does not have a consistent pair of transformations. If they have not,
