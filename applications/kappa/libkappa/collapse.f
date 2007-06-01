@@ -458,7 +458,6 @@
       INTEGER IPW3               ! Pointer to third work array
       INTEGER IPWID              ! Pointers to mapped width work array
       INTEGER IWCS               ! WCS FrameSet pointer
-      INTEGER IWCSO              ! Output NDF's WCS FrameSet pointer
       INTEGER J                  ! Loop count
       INTEGER JAXIS              ! Index of collapse axis within PIXEL
                                  ! Frame

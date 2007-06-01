@@ -578,8 +578,6 @@
       INTEGER IPIX            ! Index of PIXEL Frame
       INTEGER IPLOT           ! Plot for current picture
       INTEGER IPLOTB          ! Plot for BASE picture
-      INTEGER JAT             ! No. of characters in the string
-      INTEGER JCOL( NDF__MXDIM )! Min. col. no. for start of each field
       INTEGER LBND( NDF__MXDIM )! Lower bounds of the associated NDF
       INTEGER MAP1            ! Pointer to Base->Current Mapping
       INTEGER MAP2            ! Pointer to Base->secondary Frame Mapping
@@ -616,7 +614,6 @@
       LOGICAL PLURAL          ! Use plural form of a word in a message?
       LOGICAL QUIET           ! Run quietly?
       LOGICAL SAME            ! Is given pic. same as current pic.?
-      LOGICAL SETTAB          ! Find new tab pos'ns for displayed line?
       LOGICAL SHDATA          ! Display data values from the NDF?
       LOGICAL SHPIX           ! Display additional PIXEL co-ords?
       LOGICAL THERE           ! Is the NDF component in a defined state?

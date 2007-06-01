@@ -451,17 +451,13 @@
       INTEGER NAXC               ! Original number of current Frame axes
       INTEGER NBLOCK             ! Number of NDF blocks
       INTEGER NC                 ! Used length of string
-      INTEGER NCOMP              ! No. of components within cell of AXIS
-                                 ! array
       INTEGER ND                 ! Number of dimensions (dummy)
       INTEGER NDIMO              ! Number of pixel axes in output NDF
       INTEGER NERR               ! Number of numerical errors
       CHARACTER NEWDOM*( 20 )    ! Domain name for revised current Frame
       INTEGER NEWFRM             ! Pointer to revised current Frame
       INTEGER NOCHAN             ! Number of channels
-      INTEGER NSHAPE             ! Number of shape values
       INTEGER NVAL               ! Number of values obtained (1)
-      INTEGER OBL                ! Identifier for output-NDF block
       INTEGER ODIMS( NDF__MXDIM ) ! Output NDF dimensions
       INTEGER OFFSET( NDF__MXDIM ) ! Channel-image pixel offsets within
                                  ! output array

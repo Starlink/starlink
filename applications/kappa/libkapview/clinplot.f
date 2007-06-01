@@ -473,7 +473,6 @@
       INTEGER CREG( MXSPEC*MXSPEC )! GRAPHICS Interval for a cell
       INTEGER DATF              ! The data value Frame
       INTEGER DIM( NDIM )       ! The pixel NDF axis dimensions
-      INTEGER DIMS( NDIM )      ! Dimensions of input array
       INTEGER DPF               ! DATAPLOT Frame
       INTEGER DPMAP             ! 1st cell GRAPHICS->DATAPLOT Mapping 
       INTEGER EL                ! No. of mapped elements
@@ -506,12 +505,9 @@
       INTEGER IX                ! Index of cell in row
       INTEGER IY                ! Index of cell in column
       INTEGER KM                ! Subsiduary KeyMap for polyline info
-      INTEGER MAXPOS            ! Position of maximum data value
-      INTEGER MINPOS            ! Position of minimum data value
       INTEGER NCELL             ! Number of cells in plot
       INTEGER NCU               ! Number of characters in the units
       INTEGER NFRM              ! Increment in Frame index      
-      INTEGER NINVAL            ! No. of bad values
       INTEGER NK                ! Number of celestial axes
       INTEGER NKP               ! No. of values supplied for KEYPOS
       INTEGER NMARG             ! No. of margin values given
@@ -520,7 +516,6 @@
       INTEGER NPTOT             ! Total no. of points in all tick marks
       INTEGER NS                ! Number of spectral axes
       INTEGER NSAMP             ! No. of samples along a spectrum
-      INTEGER NVAL              ! No.of points retrieved from KeyMap
       INTEGER NX                ! No. of spectra per row
       INTEGER NY                ! No. of spectra per column
       INTEGER OUTP( 4 )         ! Output axis permutation array
@@ -530,7 +525,6 @@
       INTEGER SDIM( NDIM )      ! The significant NDF axes
       INTEGER SKAX( NDF__MXDIM )! Indices of celestial WCS axes
       INTEGER SKBAX( NDF__MXDIM )! Indices of celestial GRID axes
-      INTEGER SKFRM             ! Pointer to celestial WCS Frame
       INTEGER SKMAP             ! Celestial WCS->grid Mapping
       INTEGER SKWCS             ! P'nter to WCS FrameSet for sky axes
       INTEGER SKYF              ! Pointer to 2D celestial WCS Frame
@@ -555,7 +549,6 @@
       LOGICAL FIRST             ! Is the first cell yet to be annotated?
       LOGICAL KEY               ! Make a key of the grid co-ordinates?
       LOGICAL REFLAB            ! Draw labels around the first spectrum?
-      LOGICAL TICKS             ! Draw ticks round each spectrum cell?
       REAL ASPECT               ! Aspect ratio of the input array
       REAL DUMMY                ! Un-required argument value
       REAL DX1                  ! Unused
@@ -575,10 +568,8 @@
       REAL SMARGX               ! X margin used by spectral annotation
       REAL SMARGY               ! Y margin used by spectral annotation
       REAL TL                   ! MajTickLen value
-      REAL X                    ! GRAPHICS X at next line
       REAL X1                   ! GRAPHICS X at left hand of Plot
       REAL X2                   ! GRAPHICS X at right hand of Plot
-      REAL Y                    ! GRAPHICS Y at next line
       REAL Y1                   ! GRAPHICS Y at bottom of Plot
       REAL Y2                   ! GRAPHICS Y at top of Plot
       REAL YBOT                 ! Min data value to be displayed

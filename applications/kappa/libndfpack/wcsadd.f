@@ -458,7 +458,6 @@
       DOUBLE PRECISION ZOOM      ! Scaling factor for ZoomMap
       INTEGER ACTVAL             ! No. of transformation coefficients 
                                  ! supplied
-      INTEGER AXES( NDF__MXDIM ) ! Axis selection array
       INTEGER FRMB               ! Pointer to basis Frame
       INTEGER FRMN               ! Pointer to new Frame
       INTEGER I                  ! General loop count
@@ -477,7 +476,6 @@
       INTEGER NAXB               ! Number of axes in basis Frame
       INTEGER NCOEF              ! Required number of transformation 
                                  ! coefficients 
-      INTEGER NEXP               ! Number of expressions got so far
       INTEGER NFEXP              ! Number of expressions for forward 
                                  ! transforms
       INTEGER NIEXP              ! Number of expressions for inverse

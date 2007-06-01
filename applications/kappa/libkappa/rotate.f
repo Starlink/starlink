@@ -279,8 +279,6 @@
       LOGICAL AXNORM             ! Axis normalisation flag
       DOUBLE PRECISION B( 2 )    ! Second point
       LOGICAL BAD                ! Bad-pixel flag
-      LOGICAL BADDAT             ! Bad values stored in o/p data array?
-      LOGICAL BADVAR             ! Bad values stored in o/p variance?
       BYTE BB                    ! Quality Bad-bits value
       DOUBLE PRECISION C( 2 )    ! Third point
       INTEGER CFRM               ! Current WCS Frame

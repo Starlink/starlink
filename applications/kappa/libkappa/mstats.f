@@ -249,7 +249,6 @@
       INTEGER IPPTR              ! Pointer to array of pointers to 
                                  ! mapped arrays
       INTEGER IPWORK             ! Pointer to workspace array
-      INTEGER LBND( NDF__MXDIM ) ! Lower pixel bounds of output NDF
       INTEGER NGOOD              ! Number of non-bad pixels
       INTEGER NGOOD1             ! Number of pixels used
       INTEGER NNDF               ! The number of input NDFs

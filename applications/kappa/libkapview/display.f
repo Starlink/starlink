@@ -731,7 +731,6 @@
       REAL ASP0                ! Aspect ratio of the available space
       REAL ASPD                ! Aspect ratio of the data array
       REAL ASPECT              ! Aspect ratio of the DATA picture
-      REAL AXGAP               ! Gap between major tick marks
       REAL DEFMAR              ! Default MARGIN value
       REAL GLBND( NDIM )       ! Low grid co-ord bounds of PGPLOT window
       REAL GUBND( NDIM )       ! Hi grid co-ord bounds of PGPLOT window

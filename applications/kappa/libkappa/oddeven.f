@@ -137,7 +137,6 @@
       INTEGER NEL                ! Number of mapped elements
       INTEGER NCHANG             ! Number of changed pixels
       INTEGER PNTIN( 1 )         ! Pointer to the inpyut mapped data
-      INTEGER PNTINW             ! Pointer to work space
       INTEGER PNTOUT( 1 )        ! Pointer to output mapped data
       INTEGER SDIM( NDF__MXDIM ) ! Significant NDF dimensions
       REAL THRDEF                ! Suggested default threshold for
