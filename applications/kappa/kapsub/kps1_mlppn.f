@@ -72,8 +72,6 @@
 
 *  Arguments Given:
       CHARACTER PARAM*(*)
-      INTEGER IPLOT
-      INTEGER NDISP
 
 *  Arguments Returned:
       INTEGER IGRP
