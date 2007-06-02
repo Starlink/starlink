@@ -8,7 +8,7 @@
 #include "rec1.h"                /* Internal rec_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
-   int rec_release_block ( int slot, int bloc )
+   int rec_release_block ( int slot, INT_BIG bloc )
    {
 /*+                                                                         */
 /* Name:                                                                    */

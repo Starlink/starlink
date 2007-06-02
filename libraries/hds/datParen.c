@@ -8,6 +8,7 @@
 #include "rec.h"                 /* Public rec_ definitions                 */
 #include "str.h"                 /* Character string import/export macros   */
 #include "dat1.h"                /* Internal dat_ definitions               */
+#include "hds.h"
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
 /* F77_INTEGER_FUNCTION(dat_paren)( struct STR *locator1_str,
@@ -18,7 +19,7 @@
  */
  
 int
-datParen(HDSLoc *locator1,
+datParen(const HDSLoc *locator1,
          HDSLoc **locator2,
          int *status)
 {
@@ -175,7 +176,7 @@ structure (possible programming error).",
 /* Record Vector of its parent record.                                      */
          rec_get_rid( &hanpar, &ridpar );
          rec_get_rcl( &hantop, &rcltop );
-         rec_locate_data( &hantop, rcltop.dlen, 0, 'R', &crv );
+         rec_locate_data( &hantop, rcltop.dlen, (INT_BIG)0, 'R', &crv );
 
 /* Search this Component Record Vector for the component entry that has a   */
 /* Record ID matching that of the parent object.                            */
@@ -197,7 +198,7 @@ structure (possible programming error).",
          }
 
 /* Release the Component Record Vector.                                     */
-         rec_release_data( &hantop, rcltop.dlen, 0, 'R', &crv );
+         rec_release_data( &hantop, rcltop.dlen, (INT_BIG)0, 'R', &crv );
       }
 
 /* Obtain the Object Descriptor Label from the parent object and test if    */
@@ -213,7 +214,7 @@ structure (possible programming error).",
 /* Obtain the Record ID of the parent structure's Component Record and      */
 /* locate the Structure Record Vector for the parent object.                */
             rec_get_rid( &hancmp, &ridcmp );
-            rec_locate_data( &hanpar, rclpar.dlen, 0, 'R', &srv );
+            rec_locate_data( &hanpar, rclpar.dlen, (INT_BIG)0, 'R', &srv );
 
 /* Search for the Structure Record Vector element which has a Record ID     */
 /* matching that of the parent structure's Component Record.                */
@@ -228,7 +229,7 @@ structure (possible programming error).",
             }
 
 /* Release the Structure Record Vector.                                     */
-            rec_release_data( &hanpar, rclpar.dlen, 0, 'R', &srv );
+            rec_release_data( &hanpar, rclpar.dlen, (INT_BIG)0, 'R', &srv );
          }
       }
 

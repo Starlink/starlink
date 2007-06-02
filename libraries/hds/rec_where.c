@@ -11,7 +11,7 @@
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
    int rec_where( const struct HAN *han, INT_BIG length, 
-                  INT_BIG offset, INT_BIG *bloc, int *bytoff )
+                  INT_BIG offset, INT_BIG *bloc, INT_BIG *bytoff )
    {
 /*+                                                                         */
 /* Name:                                                                    */
@@ -41,7 +41,7 @@
 /*       Pointer to an 64-bit integer to receive the container file block   */
 /*       number in which the requested data segment begins (the first block */
 /*       in the file is no. 1 ).                                            */
-/*    int *bytoff                                                           */
+/*    INT_BIG *bytoff                                                       */
 /*       Pointer to an integer to receive the (zero based) byte offset      */
 /*       within the block at which the requested data segment begins.       */
 
@@ -98,7 +98,7 @@
          if ( offset + length > rcl.dlen )
          {
             hds_gl_status = DAT__INCHK;
-            emsSeti( "DLEN", rcl.dlen );
+            dat1emsSetBigu( "DLEN", rcl.dlen );
             rec1_fmsg( "FILE", han->slot );
             emsRep( "REC_WHERE_1",
                        "Requested data extends beyond the end of the record; \

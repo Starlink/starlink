@@ -116,10 +116,10 @@
 
 /* Check that the requested data segment does not extend beyond the size of */
 /* the record's Dynamic Domain. Report an error if it does.                 */
-         if ( offset + length > rcl.dlen )
+	if ( (UINT_BIG)(offset + length) > rcl.dlen )
          {
             hds_gl_status = DAT__INCHK;
-            emsSeti( "DLEN", rcl.dlen );
+            dat1emsSetBigu( "DLEN", rcl.dlen );
             rec1_fmsg( "FILE", han->slot );
             emsRep( "REC_LOCATE_DATA_1",
                        "Requested data extends beyond the end of the record; \
@@ -160,7 +160,7 @@ modified (possible programming error).",
 /* be returned via the public interface.                                    */
          if ( !rcl.chain )
          {
-            rec_alloc_xmem( length, (void **) pntr );
+	   rec_alloc_xmem( (size_t)length, (void **) pntr );
             if ( _ok( hds_gl_status ) )
             {
 

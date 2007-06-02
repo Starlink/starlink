@@ -123,8 +123,8 @@
       if ( !rec_ga_fcv[ slot ].open )
       {
          hds_gl_status = DAT__FILWR;
-         emsSeti( "FIRST", bloc );
-         emsSeti( "LAST", bloc + size - 1 );
+         dat1emsSetBigi( "FIRST", bloc );
+         dat1emsSetBigi( "LAST", bloc + size - 1 );
          emsSeti( "SLOT", slot );
          emsRep( "REC1_WRITE_FILE_1",
                     "Unable to write blocks ^FIRST:^LAST to file on HDS \
@@ -192,7 +192,7 @@ internal slot ^SLOT; container file is not open (internal programming error).",
          if ((writeok = !fseek( iochan, ( bloc - 1 ) * REC__SZBLK, SEEK_SET )))
 #endif
          {
-            fwrite( buffer, 1, size * REC__SZBLK, iochan );
+	   fwrite( buffer, 1, (size_t)(size * REC__SZBLK), iochan );
 
 /* Note of an error occurred and clear the error indicator.                 */
             if ( ferror( iochan ) )
@@ -207,8 +207,8 @@ internal slot ^SLOT; container file is not open (internal programming error).",
          {
             hds_gl_status = DAT__FILWR;
             emsSyser( "MESSAGE", errno );
-            emsSeti( "FIRST", ( bloc - 1 ) * REC__SZBLK + 1 );
-            emsSeti( "LAST", ( bloc + size - 1 ) * REC__SZBLK );
+            dat1emsSetBigi( "FIRST", ( bloc - 1 ) * REC__SZBLK + 1 );
+            dat1emsSetBigi( "LAST", ( bloc + size - 1 ) * REC__SZBLK );
             rec1_fmsg( "FILE", slot );
             emsRep( "REC1_WRITE_FILE_2",
                        "Unable to write bytes ^FIRST:^LAST to the file ^FILE - \

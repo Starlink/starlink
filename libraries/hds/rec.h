@@ -79,7 +79,7 @@ extern const struct RID rec_gl_ridzero;	/* Null record ID		    */
       int rec_get_rcl( const struct HAN *han, struct RCL *rcl );
       int rec_get_rid( const struct HAN *han, struct RID *rid );
       int rec_list_files( void );
-      int rec_locate_block( int slot, int bloc, char mode,
+      int rec_locate_block( int slot, INT_BIG bloc, char mode,
                             unsigned char **lrb );
       int rec_locate_data( const struct HAN *han, INT_BIG length,
                            INT_BIG offset, char mode, unsigned char **pntr );
@@ -89,7 +89,7 @@ extern const struct RID rec_gl_ridzero;	/* Null record ID		    */
       int rec_reall_mem( int size, void **pntr );
       void rec_refcnt( const struct HAN *han, int inc, int *refcnt,
 		       int *status );
-      int rec_release_block ( int slot, int bloc );
+      int rec_release_block ( int slot, INT_BIG bloc );
       int rec_release_data( const struct HAN *han, INT_BIG length,
                             INT_BIG offset, char mode, unsigned char **pntr );
       int rec_reset_record( const struct HAN *han );
@@ -99,7 +99,7 @@ extern const struct RID rec_gl_ridzero;	/* Null record ID		    */
       void rec_stop( void );
       int rec_unlock( const struct HAN *han );
       int rec_where( const struct HAN *han, INT_BIG length, INT_BIG offset,
-                    INT_BIG *bloc, int *bytoff );
+                    INT_BIG *bloc, INT_BIG *bytoff );
       void rec_wild_file( const char *fspec, INT fspec_len,
 		          struct WLD **context, int *alldone, char **fname,
 			  INT *fname_len );

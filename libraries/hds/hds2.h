@@ -19,7 +19,7 @@
 int
 datWhere(HDSLoc *locator,
          INT_BIG *block,
-         int *offset,
+         INT_BIG *offset,
          int *status);
 
 

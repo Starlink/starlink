@@ -2887,14 +2887,15 @@ F77_SUBROUTINE(dat_where)( CHARACTER(locator),
 /* Local variables.     */
    HDSLoc locator_c;
    INT_BIG bloc;
-   
+   INT_BIG OFFSET;
+
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
    dat1_import_floc( locator, locator_length, &locator_c, status);
 
 /* Call pure C routine                                       */
-   datWhere( &locator_c, &bloc, offset, status );
+   datWhere( &locator_c, &bloc, &OFFSET, status );
 
    if (bloc <= INT_MAX) {
      *block = (F77_INTEGER_TYPE)bloc;
@@ -2905,6 +2906,18 @@ F77_SUBROUTINE(dat_where)( CHARACTER(locator),
        dat1emsSetBigi( "BLOCK", bloc );
        emsSeti( "MAX", INT_MAX );
        emsRep( " ", "DAT_WHERE: Position overflows Fortran integer (^BLOCK > ^MAX)", status );
+     }
+   }
+
+   if (OFFSET <= INT_MAX) {
+     *offset = (F77_INTEGER_TYPE)OFFSET;
+   } else {
+     *offset = 0;
+     if (*status != DAT__OK) {
+       *status = DAT__DTRNC;
+       dat1emsSetBigi( "OFFSET", OFFSET );
+       emsSeti( "MAX", INT_MAX );
+       emsRep( " ", "DAT_WHERE: Position offset overflows Fortran integer (^BLOCK > ^MAX)", status );
      }
    }
 }
