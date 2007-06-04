@@ -467,24 +467,29 @@ FORCE:
 #========================================================================
 # Rules for Fortran compilation, simple and generic
 #========================================================================
+# Note these would be simpler if $(<:.gen=.f) worked on Tru64 UNIX with
+# a VPATH set (loses subdirectory in name).
 
 .f.o:
 	$(FC) -c $(FCFLAGS) $(STAR_FCFLAGS) $<
 
 .gen.o:
 	$(FGENERIC) -t n $<
-	$(FC) -c $(FCFLAGS) $(STAR_FCFLAGS) $(<:%.gen=%.f)
-	rm -f $(<:%.gen=%.f)
+	f=`echo $< | sed 's:\.gen:\.f:'` ;\
+	$(FC) -c $(FCFLAGS) $(STAR_FCFLAGS) $$f ;\
+	rm -f $$f
 
 .gsc.o:
 	$(FGENERIC) -t rlidc $<
-	$(FC) -c $(FCFLAGS) $(STAR_FCFLAGS) $(<:%.gsc=%.f)
-	rm -f $(<:%.gsc=%.f)
+	f=`echo $< | sed 's:\.gsc:\.f:'` ;\
+	$(FC) -c $(FCFLAGS) $(STAR_FCFLAGS) $$f ;\
+	rm -f $$f
 
 .gsn.o:
 	$(FGENERIC) -t rlid $<
-	$(FC) -c $(FCFLAGS) $(STAR_FCFLAGS) $(<:%.gsn=%.f)
-	rm -f $(<:%.gsn=%.f)
+	f=`echo $< | sed 's:\.gsn:\.f:'` ;\
+	$(FC) -c $(FCFLAGS) $(STAR_FCFLAGS) $$f ;\
+	rm -f $$f
 
 #============================================================================
 # Dummy targets to keep build system happy
