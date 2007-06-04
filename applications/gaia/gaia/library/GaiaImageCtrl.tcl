@@ -166,7 +166,7 @@ itcl::class gaia::GaiaImageCtrl {
       #  Add info panel
       feedback "info panel..."
 
-      # Info panel, GaiaImagePanel object used to display image controls
+      #  Info panel, GaiaImagePanel object used to display image controls
       itk_component add info {
          gaia::GaiaImagePanel $panel.info \
             -image $this \
@@ -887,13 +887,67 @@ itcl::class gaia::GaiaImageCtrl {
       }
    }
 
-   #  Save zoom and scroll for reseting.
+   #  Save zoom and scroll for resetting.
    protected method save_zoom_ {} {
       lassign [$image_ scale] lastzoom_($nlastzoom_,Z) dummy
       lassign [$canvas_ xview] lastzoom_($nlastzoom_,XS) dummy
       lassign [$canvas_ yview] lastzoom_($nlastzoom_,YS) dummy
       incr nlastzoom_
    }
+
+   #  Make the zoom window. Overridden to use an instance of GaiaImageZoomView
+   #  class. Need to keep in sync with RtdImageCtrl.
+   protected method make_zoom_window { panel } {
+      if { ! $itk_option(-with_zoom_window) } {
+         return
+      }
+      feedback "zoom window..."
+
+      #  Set on/off by default
+      global ::$panel.zoom.dozoom
+      set $panel.zoom.dozoom $itk_option(-dozoom)
+
+      if { $itk_option(-use_zoom_view) } {
+
+         # Zoom window.
+         itk_component add zoom {
+            gaia::GaiaImageZoomView $panel.zoom \
+               -target_image $this \
+               -verbose $itk_option(-verbose) \
+               -width $itk_option(-zoom_width) \
+               -height $itk_option(-zoom_height) \
+               -factor $itk_option(-zoom_factor) \
+               -propagate $itk_option(-zoom_view_propagate) \
+               -usexshm $itk_option(-usexshm) \
+               -usexsync $itk_option(-usexsync) \
+               -borderwidth 3 \
+               -relief groove
+         }
+      } else {
+         # Zoom window: this version is not really supported any more...
+         itk_component add zoom {
+            rtd::RtdImageZoom $panel.zoom \
+               -target_image $this \
+               -width $itk_option(-zoom_width) \
+               -height $itk_option(-zoom_height) \
+               -factor $itk_option(-zoom_factor) \
+               -usexshm $itk_option(-usexshm) \
+               -usexsync $itk_option(-usexsync) \
+               -borderwidth 3 \
+               -relief groove
+         }
+      }
+      if { "$itk_option(-panel_orient)" == "vertical" } {
+         pack $itk_component(zoom) -side top -fill both -expand 0
+      } else {
+         pack $itk_component(zoom) -side left -fill both -expand 0
+      }
+      
+      #  Tell the base class to use this zoom window when entered.
+      config -zoomwin $itk_component(zoom)
+   }
+   
+
 
    #  Display a popup window listing the HDUs in the current image.
    public method display_fits_hdus {} {
