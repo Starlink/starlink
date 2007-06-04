@@ -28,6 +28,10 @@
     Compressed NDFs (.gz and .Z) can now be opened directly in the cube
     toolbox. 
 
+    Very small images (a few pixels wide or tall) now fill the zoom window,
+    so thay they can be inspected. Previously small images did not show
+    correctly. 
+
     GAIA 3.3-7
     ==========
 
