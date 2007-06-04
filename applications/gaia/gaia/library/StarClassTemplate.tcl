@@ -1,6 +1,6 @@
 #+
 #  Name:
-#     <StarClass>
+#     <GaiaClass>
 
 #  Type of Module:
 #     [incr Tcl] class
@@ -11,9 +11,9 @@
 
 #  Invocations:
 #
-#        <StarClass> object_name [configuration options]
+#        <GaiaClass> object_name [configuration options]
 #
-#     This creates an instance of a <StarClass> object. The return is
+#     This creates an instance of a <GaiaClass> object. The return is
 #     the name of the object.
 #
 #        object_name configure -configuration_options value
@@ -33,8 +33,7 @@
 #     This object inherits no other classes.
 
 #  Copyright:
-#     Copyright (C) 2000-2005 Central Laboratory of the Research Councils.
-#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2007 Science and Technology Facilities Council
 #     All Rights Reserved.
 
 #  Licence:
@@ -54,7 +53,7 @@
 #     02111-1307, USA
 
 #  Authors:
-#     PWD: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (JAC, Durham University)
 #     {enter_new_authors_here}
 
 #  History:
@@ -66,9 +65,9 @@
 
 #.
 
-#itk::usual <StarClass> {}
+#itk::usual <GaiaClass> {}
 
-itcl::class <scope>::<StarClass> {
+itcl::class <scope>::<GaiaClass> {
    
    #  Inheritances:
    #  -------------
