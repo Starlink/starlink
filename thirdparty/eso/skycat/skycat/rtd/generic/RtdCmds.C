@@ -21,6 +21,9 @@
 *                          with value RTD_BLANK. Do not use image size.
 *                 18/01/07 Back to mband, clip that at 0.5->width/height+0.5
 *                          so that measurement happens to the edge.
+*                 04/06/07 Increase upper limit of zoom factor (supports
+*                          adaptive zoom in GAIA for very small, one pixel,
+*                          images).
 */
 
 /************************************************************************
@@ -3513,8 +3516,8 @@ int RtdImage::zoomCmd(int argc, char* argv[])
 	if (Tcl_GetInt(interp_, argv[2], &zoomFactor) != TCL_OK)
 	    return TCL_ERROR;  
  
-	if (zoomFactor < 1 || zoomFactor > 10) 
-	    return error("zoomFactor should be between 1 and 10");
+	if (zoomFactor < 1 || zoomFactor > 160) 
+	    return error("zoomFactor should be between 1 and 160");
 
 	Tk_Window zoomWin = Tk_NameToWindow(interp_, argv[1], tkwin_);
 	if (zoomWin == NULL) 
@@ -3603,8 +3606,8 @@ int RtdImage::zoomviewCmd(int argc, char* argv[])
 	if (argc > 4 && Tcl_GetInt(interp_, argv[4], &count) != TCL_OK)
 	    return TCL_ERROR;  
 
-	if (zoomFactor < 1 || zoomFactor > 10) 
-	    return error("zoomFactor should be between 1 and 10");
+	if (zoomFactor < 1 || zoomFactor > 160) 
+	    return error("zoomFactor should be between 1 and 160");
 
 	// allow an optional second zoom view
 	RtdImage*& view = (count == 1) ? zoomView_ : zoomView2_;
