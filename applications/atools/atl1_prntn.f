@@ -60,6 +60,8 @@
 *  History:
 *     22-SEP-2006 (DSB):
 *        Original version.
+*     4-JUN-2007 (DSB):
+*        Check for bad values.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -100,7 +102,11 @@
       DO I = 1, NP
          IAT = 2   
          DO J = 1, NAX
-            CALL CHR_PUTD( AXVAL( I, J ), BUF, IAT )
+            IF( AXVAL( I, J ) .NE. AST__BAD ) THEN
+               CALL CHR_PUTD( AXVAL( I, J ), BUF, IAT )
+            ELSE
+               CALL CHR_APPND( '<bad>', BUF, IAT )
+            END IF
             IAT = IAT + 1
          END DO
          CALL MSG_OUT( ' ', BUF( :IAT ), STATUS )
@@ -125,7 +131,13 @@
 *  Write the values to the file.
             DO J = 1, NAX
                DO I = 1, NP
-                  CALL CHR_DTOC( AXVAL( I, J ), BUF, NC )               
+
+                  IF( AXVAL( I, J ) .NE. AST__BAD ) THEN
+                     CALL CHR_DTOC( AXVAL( I, J ), BUF, NC )
+                  ELSE
+                     BUF = '<bad>'
+                     NC = 5
+                  END IF
                   CALL FIO_WRITE( FD, BUF( : NC ), STATUS )
                END DO
             END DO
