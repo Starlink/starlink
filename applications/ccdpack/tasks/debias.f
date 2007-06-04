@@ -767,6 +767,10 @@
       IPWRK = 0
       IPOUT = 0
       IPBIAS = 0
+      LBNDL( 1 ) = 1
+      LBNDL( 2 ) = 1
+      UBNDL( 1 ) = 1
+      UBNDL( 2 ) = 1
 
 ************************************************************************
 *  Open Logfile and write program introduction. Find out if NDF
