@@ -39,27 +39,9 @@
 *     zero will be returned for IACB2. The same value will also be
 *     returned if the routine should fail for any reason.
 
-*  Algorithm:
-*     -  Initialise the returned ACB index before checking the
-*     inherited global status.
-*     -  Find the first and last non-blank characters in the dimension
-*     bounds string.
-*     -  If the string is blank, then simply clone the ACB entry.
-*     -  Otherwise, check that the string has enclosing parentheses and
-*     report an error if it does not.
-*     -  Otherwise, obtain the NDF's bounds and number of dimensions.
-*     -  Remove the enclosing parentheses (supply a blank bounds
-*     expression if '()' was specified) and parse the dimension bounds
-*     expression.
-*     -  If an error occurs, then report contextual information.
-*     -  Otherwise, calculate the actual lower and upper bounds of each
-*     dimension in pixels.
-*     -  If an error occurs, then report context information and quit.
-*     -  Select the section from the NDF.
-*     -  Report further context information if needed.
-
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -80,6 +62,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     DSB: David S Berry (JACH, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -92,6 +75,8 @@
 *        Added contextual error reports.
 *     22-OCT-1991 (RFWS):
 *        Removed unused variable.
+*     21-MAY-2007 (DSB):
+*        Add support for sections given in terms of WCS coords.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -108,11 +93,18 @@
       INCLUDE 'NDF_PAR'          ! NDF_ public constants      
       INCLUDE 'NDF_CONST'        ! NDF_ private constants
       INCLUDE 'NDF_ERR'          ! NDF_ error codes
+      INCLUDE 'AST_PAR'          ! AST_ constants and functions
 
 *  Global Variables:
+      INCLUDE 'NDF_DCB'          ! NDF_ Data Control Block
+*        DCB_ALOC( NDF__MXDIM, NDF__MXDCB ) = CHARACTER * ( DAT__SZLOC ) (Read)
+*           Locators to axis structure elements.
+
       INCLUDE 'NDF_ACB'          ! NDF_ Access Control Block
 *        ACB_DID( NDF__MXACB ) = INTEGER (Read)
 *           ARY_ system identifier for the NDF's data array.
+*        ACB_IDCB( NDF__MXACB ) = INTEGER (Read)
+*           Index to data object entry in the DCB.
 
 *  Arguments Given:
       INTEGER IACB1
@@ -125,21 +117,36 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      DOUBLE PRECISION DFLBND( NDF__MXDIM ) ! Default lower bounds
+      DOUBLE PRECISION DFUBND( NDF__MXDIM ) ! Default upper bounds
+      DOUBLE PRECISION GLBND( NDF__MXDIM )  ! Lower GRID bound
+      DOUBLE PRECISION GUBND( NDF__MXDIM )  ! Upper GRID bound
       DOUBLE PRECISION VALUE1( NDF__MXDIM ) ! First bound specifier
       DOUBLE PRECISION VALUE2( NDF__MXDIM ) ! Second bound specifier
+      DOUBLE PRECISION XL( NDF__MXDIM ) ! GRID coords at min WCS axis value
+      DOUBLE PRECISION XU( NDF__MXDIM ) ! GRID coords at max WCS axis value
       INTEGER F                  ! First non-blank character position
       INTEGER I                  ! Loop counter for dimensions
+      INTEGER ICURR              ! Index of original current Frame
+      INTEGER IDCB               ! Index to data object entry in the DCB
+      INTEGER IWCS               ! AST pointer to WCS FrameSet
       INTEGER L                  ! Last non-blank character position
       INTEGER LBND( DAT__MXDIM ) ! Lower dimension bounds
-      INTEGER LBNDD( NDF__MXDIM ) ! Default lower bounds
+      INTEGER LBNDD( NDF__MXDIM )! NDF lower pixel bounds
+      INTEGER NAX                ! No. of axes in chosen coord system
       INTEGER NDIM               ! Number of section dimensions
       INTEGER NDIMD              ! Input NDF number of dimensions
       INTEGER UBND( DAT__MXDIM ) ! Upper dimension bounds
-      INTEGER UBNDD( NDF__MXDIM ) ! Default upper bounds
-      LOGICAL ISBND( NDF__MXDIM ) ! Are VALUEs explicit bounds?
+      INTEGER UBNDD( NDF__MXDIM )! NDF upper pixel bounds
+      INTEGER WCSMAP             ! AST pointer to WCS Mapping
+      LOGICAL ISBND( NDF__MXDIM )! Are VALUEs explicit bounds?
+      LOGICAL ISDEF1( NDF__MXDIM ) ! Is VALUE1 a defalut value?
+      LOGICAL ISDEF2( NDF__MXDIM ) ! Is VALUE2 a defalut value?
       LOGICAL ISPIX1( NDF__MXDIM ) ! Is VALUE1 a pixel index?
       LOGICAL ISPIX2( NDF__MXDIM ) ! Is VALUE2 a pixel index?
-
+      LOGICAL HASWCS             ! Does the NDF have a WCS component?
+      LOGICAL WCSSEC             ! Use WCS section syntax?
+      LOGICAL USEWCS             ! Use WCS instead of AXIS?
 *.
 
 *  Initialise the returned ACB index.
@@ -168,23 +175,108 @@
      :                 'the NDF ^NDF -- enclosing parenthesis ' //
      :                 'missing.', STATUS )
 
-*  Otherwise, obtain the NDF's bounds and number of dimensions.
+*  Otherwise, decide if the section is given in terms of pixe/axis
+*  coordinates or WCS coordinates.
       ELSE
+
+*  If the opening parenthesis is followed by an asterisk  "*" the section 
+*  refers to WCS coords (in which case step over the asterisk). Otherwise, 
+*  it refers to pixel/axis coords.
+         IF( STR( F + 1 : F + 1 ) .EQ. '*' ) THEN
+            WCSSEC = .TRUE.
+            F = F + 1
+         ELSE
+            WCSSEC = .FALSE.
+         END IF
+
+*  Get the pixel bounds of the NDF.
          CALL ARY_BOUND( ACB_DID( IACB1 ), NDF__MXDIM, LBNDD, UBNDD,
      :                   NDIMD, STATUS )
+
+*  Get the WCS FrameSet. Also get a flag indicating if the WCS FrameSet
+*  was stored explicitly in the NDF, or is a default FrameSet containing 
+*  just PIXEL, AXIS and GRID Frames.
+         CALL NDF1_RDWCS( IACB1, IWCS, STATUS )
+         CALL NDF1_WSTA( IACB1, HASWCS, STATUS )
+
+*  Indicate that we have not yet changed the current Frame in the FrameSet.
+         ICURR = AST__NOFRAME
+
+*  If we are using WCS syntax, the default bounds are the WCS values at
+*  the edges of the bounding box containing the whole NDF.
+         IF( WCSSEC ) THEN
+
+*  Store the bounds of the NDF in double precision GRID coords.
+            DO I = 1, NDIMD
+               GLBND( I ) = 0.5D0
+               GUBND( I ) = DBLE( UBNDD( I ) - LBNDD( I ) ) + 1.5D0
+            END DO
+
+*  For efficiency, extract the Mapping from the WCS FrameSet and pass it
+*  to AST_MAPBOX.
+            WCSMAP = AST_GETMAPPING( IWCS, AST__BASE, AST__CURRENT,
+     :                               STATUS )
+
+*  Get the corresponding bounds on each WCS axis. These are used as the
+*  defaults for any bounds that are not specified in the supplied string.
+            NAX = AST_GETI( IWCS, 'Nout', STATUS )
+            DO I = 1, NAX
+               CALL AST_MAPBOX( WCSMAP, GLBND, GUBND, .TRUE., I,
+     :                          DFLBND( I ), DFUBND( I ), XL, XU, 
+     :                          STATUS )
+            END DO
+
+*  Annul the WCS Mapping
+            CALL AST_ANNUL( WCSMAP, STATUS )
+
+*  If we are not using WCS syntax, the default bounds are the pixel
+*  indices at the edges of the NDF.
+         ELSE
+            NAX = NDIMD
+            DO I = 1, NAX
+               DFLBND( I ) = DBLE( LBNDD( I ) ) 
+               DFUBND( I ) = DBLE( UBNDD( I ) ) 
+            END DO
+
+*  See if the NDF has a defined AXIS structure. Obtain an index to the data 
+*  object entry in the DCB and ensure that axis structure information is 
+*  available. Then use the locator to the first axis structure element to 
+*  determine the state.
+            IDCB = ACB_IDCB( IACB1 )
+            CALL NDF1_DA( IDCB, STATUS )
+            IF ( STATUS .EQ. SAI__OK ) THEN
+               IF( DCB_ALOC( 1, IDCB ) .NE. DAT__NOLOC ) THEN
+
+*  If we are not using WCS syntax, and the NDF has defined AXIS
+*  structures, make the AXIS Frame the curent Frame in the WCS FrameSet so
+*  that the parsing routines (NDF1_PSNDE etc) can use the AST_UNFORMAT
+*  method to read the axis values supplied in STR. First note the
+*  original current Frame so that it can be re-instated later.
+                  ICURR = AST_GETI( IWCS, 'Current', STATUS)            
+                  CALL AST_SETI( IWCS, 'Current', 3 )
+                  USEWCS = .FALSE.
+               ELSE
+                  USEWCS = .TRUE.
+               END IF
+            END IF
+         END IF       
+
          IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Remove the enclosing parentheses (supply a blank bounds expression
 *  if '()' was specified) and parse the dimension bounds expression.
-            IF ( STR( F : L ) .EQ. '()' ) THEN
-               CALL NDF1_PSNDE( ' ', NDIMD, LBNDD, UBNDD,
-     :                          VALUE1, VALUE2, NDIM,
-     :                          ISPIX1, ISPIX2, ISBND, STATUS )
+            IF ( .NOT. WCSSEC .AND. STR( F : L ) .EQ. '()' .OR.
+     :           WCSSEC .AND. STR( F : L ) .EQ. '*)' ) THEN
+               CALL NDF1_PSNDE( ' ', NAX, DFLBND, DFUBND, IWCS,
+     :                          WCSSEC, VALUE1, VALUE2, NDIM,
+     :                          ISPIX1, ISPIX2, ISBND, ISDEF1, ISDEF2,
+     :                          STATUS )
             ELSE
                CALL NDF1_PSNDE( STR( F + 1 : L - 1 ),
-     :                          NDIMD, LBNDD, UBNDD,
-     :                          VALUE1, VALUE2, NDIM,
-     :                          ISPIX1, ISPIX2, ISBND, STATUS )
+     :                          NAX, DFLBND, DFUBND, IWCS,
+     :                          WCSSEC, VALUE1, VALUE2, NDIM,
+     :                          ISPIX1, ISPIX2, ISBND, ISDEF1, ISDEF2,
+     :                          STATUS )
             END IF
 
 *  If an error occurs, then report contextual information.
@@ -197,24 +289,43 @@
 *  Otherwise, calculate the actual lower and upper bounds of each
 *  dimension in pixels.
             ELSE
-               DO 1 I = 1, NDIM
-                  CALL NDF1_AXLIM( I, IACB1, VALUE1( I ), VALUE2( I ),
-     :                             ISPIX1( I ), ISPIX2( I ), ISBND( I ),
-     :                             LBND( I ), UBND( I ), STATUS )
+
+*  If we are using WCS syntax, we do all axes together,
+               IF( WCSSEC ) THEN
+                  CALL NDF1_WCLIM( IWCS, NDIM, NDIMD, VALUE1, VALUE2, 
+     :                             ISBND, LBND, UBND, STATUS )
+
+*  For the old pixel/axis syntax, do each axis independently unless
+*  floating point values are being interpreted as WCS values
+               ELSE IF( .NOT. USEWCS ) THEN
+
+                  DO 1 I = 1, NDIM
+                     CALL NDF1_AXLIM( I, IACB1, VALUE1( I ), 
+     :                                VALUE2( I ), ISPIX1( I ), 
+     :                                ISPIX2( I ), ISBND( I ), 
+     :                                LBND( I ), UBND( I ), STATUS )
 
 *  If an error occurs, then report context information and quit.
-                  IF ( STATUS .NE. SAI__OK ) THEN
-                     CALL MSG_SETI( 'DIM', I )
-                     CALL MSG_SETC( 'SECTION', STR( F : L ) )
-                     CALL ERR_REP( 'NDF1_NCUT_DIM',
-     :                             'Error in dimension ^DIM of the ' //
-     :                             'NDF section specification ' //
-     :                             '''^SECTION''.',
-     :                             STATUS )
-                     GO TO 2
-                  END IF
- 1             CONTINUE              
- 2             CONTINUE              
+                     IF ( STATUS .NE. SAI__OK ) THEN
+                        CALL MSG_SETI( 'DIM', I )
+                        CALL MSG_SETC( 'SECTION', STR( F : L ) )
+                        CALL ERR_REP( 'NDF1_NCUT_DIM',
+     :                                'Error in dimension ^DIM of the'//
+     :                                ' NDF section specification '//
+     :                                '''^SECTION''.',
+     :                                STATUS )
+                        GO TO 2
+                     END IF
+ 1                CONTINUE              
+ 2                CONTINUE              
+
+*  If we are using the old syntax, but non-integer values are being
+*  interpretde as WCS values...
+               ELSE
+                  CALL NDF1_WPLIM( IWCS, NDIM, LBNDD, UBNDD, VALUE1, 
+     :                             VALUE2, ISPIX1, ISPIX2, ISBND, 
+     :                             ISDEF1, ISDEF2, LBND, UBND, STATUS )
+               END IF
 
 *  Select the section from the NDF.
                CALL NDF1_CUT( IACB1, NDIM, LBND, UBND, IACB2, STATUS )
@@ -228,6 +339,13 @@
                END IF
             END IF
          END IF
+
+*  Restore the original current Frame, then free the WCS FrameSet pointer.
+         IF( ICURR .NE. AST__NOFRAME ) THEN 
+            CALL AST_SETI( IWCS, 'Current', ICURR, STATUS )
+         END IF
+         IF( IWCS .NE. AST__NULL ) CALL AST_ANNUL( IWCS, STATUS )
+
       END IF
        
 *  Call error tracing routine and exit.

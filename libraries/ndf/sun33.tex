@@ -7,12 +7,12 @@
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {33.8}
-\newcommand{\stardocauthors}   {R.F.~Warren-Smith}
-\newcommand{\stardocdate}      {10th July 2006}
+\newcommand{\stardocauthors}   {R.F.~Warren-Smith \& D.S.~Berry}
+\newcommand{\stardocdate}      {4th June 2007}
 \newcommand{\stardoctitle}     {NDF \\ [1ex]
                                 Routines for Accessing the\\
                                 Extensible N-Dimensional Data Format}
-\newcommand{\stardocversion}   {Version 1.6}
+\newcommand{\stardocversion}   {Version 1.7}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -5006,40 +5006,60 @@ image, while
 would specify a section which is the same size as the original image, but
 displaced so that it is centred on pixel (10,~20).
 
-\subsection{\xlabel{using_axis_coordinates_to_specify_sections}\label{ss:axissections}Using Axis Coordinates to Specify Sections}
+\subsection{\xlabel{using_axis_coordinates_to_specify_sections}\label{ss:axissections}Using
+WCS Coordinates to Specify Sections}
 
-A further variation is that numerical values in subscript expressions may be
-specified either as integers, in which case they refer to pixel indices, or as
-floating-point numbers,\footnote{Here, a floating-point number is one containing
-a decimal point and/or an exponent. Double-precision arithmetic is used to
-process these values, but either double- or single-precision notation may be
-used when supplying them.} in which case they refer to \st{axis\/} coordinates
-(for a description of \st{axis\/} coordinates, see \S\ref{ss:axiscoordinates}).
-Both linear and non-linear \st{axis\/} coordinates are supported, the values
-supplied being automatically converted into the corresponding pixel indices
-before use. For instance:
+Most of the previous examples use pixel indices to define the required
+NDF section. However, sections may also be specified within the coordinate 
+system represented by the current Frame in the NDFs WCS FrameSet. Pixel
+indices should always be supplied as integer values within subscript 
+expressions (that is, they should not include a decimal point). Anything 
+that is non-integer will be interpreted as a WCS value.
 
-\small
-\begin{quote}
-\begin{center}
-\hi{spectrum(6500.0:7250.0)}
-\end{center}
-\end{quote}
-\normalsize
+In previous versions of the NDF library, non-integer values were interpreted 
+as \st{axis\/} coordinates rather than WCS coordinates (for a description of 
+\st{axis\/} coordinates, see \S\ref{ss:axiscoordinates}). In order to
+retain backwards compatibility, the current version of the NDF library
+will continue to use this convention if the NDF has an explicitly 
+defined \st{axis\/} coordinate system. Otherwise, non-integer values will
+be interpreted as  current WCS Frame values.
 
-could be used to select the appropriate region of a spectrum calibrated
-in Angstroms, while:
+The \xref{FrameSet}{sun210}{AST_UNFORMAT} method is used to read each
+string representing an axis value. Thus the strings should be supplied in
+a format which AST\_UNFORMAT can understand. Some classes of coordinate
+system (\st{e.g.\/} celestial longitude and latitude, or time) can use a
+colon`:' as a separator between sexagisimal field. Since a colon is also
+used to separate the upper and lower bounds in an NDF subscript expression,
+steps must be taken to differentiate the two uses of the colon character. 
+This can be done in two ways:
 
-\small
-\begin{quote}
-\begin{center}
-\hi{spectrum(5500.0}$\sim$\hi{21)}
-\end{center}
-\end{quote}
-\normalsize
+\begin{enumerate}
+\item One method is to use alternative sexagisimal field separators. For
+instance time (and Right Ascension) values can use use ``hms''
+separators in place of colon separators. Thus an RA value of ``12:02:1.1'' 
+can also be supplied as ``12h02m1.1s''. Similarly, a Declination value of 
+``-23:45:12.2'' can also be supplied as ``-23d45m12.2s''.
+\item Another method is to use semi-colon ``;'' instead of colon ``:'' as
+the NDF subscript expression separator. This works with all classes of
+coordinate system, but leaves some degree of ambiguity. For instance,
+a subscript expression of ``12:34'' could mean ``use pixel indices 12 to
+34'', or could mean ``use the single RA or Dec value 12:34''. In cases,
+where such ambiguity is significant, sexagisimal fields should be
+identified explicitly using the appropriate ``dhms'' separator, as
+described in the previous point.
+\end{enumerate}
 
-would select a 21-pixel wide region of the spectrum centred on 5500.0
-Angstroms.
+If an NDF section is specified as ``$(L_{1}:U_{1},L_{2}:U_{2},  ...  L_{i},U_{i})$'', 
+the axis values $L_{i}$ and $U_{i}$ will be interpreted as pixel index
+values for pixel axis $i$ if the values are integer. If the values are
+non-integer, they will be interpreted as values for WCS axis $i$. The
+distinction between WCS axis $I$ and pixel axis $I$ is important since
+pixel axis $I$ does not necessarily correspond to WCS axis $I$ (for
+instance the WCS axes may be rotated or permuted).
+
+If the WCS axes are rotated, the NDF section actually used will be a box
+just large enough to hold the requested range of WCS axis values.
+
 
 \subsection{\xlabel{changing_dimensionality}Changing Dimensionality}
 
@@ -5062,12 +5082,22 @@ programming interface when \htmlref{NDF\_SECT}{NDF_SECT} is called (see
 
 \subsection{\xlabel{mixing_bounds_expressions}Mixing Bounds Expressions}
 
-In the last example (in \S\ref{ss:axissections}) both \st{axis\/} coordinates
-and pixel indices were mixed in the same subscript expression. In fact, any of
+WCS (or \st{axis\/} coordinates can be mixed with pixel indices in the same 
+subscript expression. In fact, any of
 the features described earlier may be combined when specifying an NDF section,
-the only restriction being that when the shape of the resulting section is
+the only restrictions being:
+
+\begin{enumerate}
+\item When the shape of the resulting section is
 expressed in pixel indices, the lower bound must not exceed the upper bound in
-any dimension. Thus, all the following might be used as valid specifications for
+any dimension. 
+\item If the bounds for an axis are specified by centre and width values
+(rather than as lower and upper bounds), then a WCS value should not be
+used with a pixel index. That is, the centre and width values must both
+refer to the same coordinate system.
+\end{enumerate}
+
+Thus, all the following might be used as valid specifications for
 NDF sections:
 
 \small
@@ -5076,7 +5106,7 @@ NDF sections:
 \begin{tabular}{l}
 \hi{ndf(3.7)}\\
 \hi{ndf(,5:)}\\
-\hi{ndf(-77:13.8,,4)}\\
+\hi{ndf(-77:12h22m12s,,4)}\\
 \hi{ndf(66}$\sim$\hi{9,4:17)}\\
 \hi{ndf(}$\sim$\hi{5,6}$\sim$\hi{)}\\
 \hi{ndf(}$\sim$\hi{,:)}\\
@@ -5087,7 +5117,17 @@ NDF sections:
 \end{quote}
 \normalsize
 
-Many other combinations are obviously possible.
+Many other combinations are obviously possible. In cases where some
+bounds are given in pixel indices and some in WCS coordinates, two boxes
+will be formed; one representing the pixel index bounds and one
+representing the WCS bounds. The actual NDF section used will be the
+overlap of the two boxes. The pixel box will inherit any pixel index
+limits supplied in the bounds expression, and will use default values for
+any missing limits. These default pixel index bounds are just the bounds
+of the base NDF. Likewise, the WCS box will inherit any WCS limits
+supplied in the bounds expression, and will use default values for any
+missing limits. The default WCS limits are the bounds of a box that just
+includes the whole pixel box.
 
 
 \section{\xlabel{merging_and_matching_ndf_attributes}MERGING AND MATCHING NDF ATTRIBUTES}
@@ -18825,16 +18865,27 @@ of the NDF\_ library).
 reflect recent changes to the library.
 \end{enumerate}
 
-\subsection{\xlabel{list_of_most_recent_changes}Changes Introduced in V1.6}
+\subsection{Changes Introduced in V1.6}
 
 The following describes the most significant changes which occurred in
-the NDF\_ system between versions V1.5 and V1.6 (the current version):
+the NDF\_ system between versions V1.5 and V1.6:
 
 \begin{enumerate}
 \item Limited support for NDF array components stored in ``scaled'' form
 has been introduced. The new routine NDF\_PTSZx will associate scale and
 zero values with an existing array component, thus converting it into a
 scaled array. See \S\ref{ss:scaledform}.
+
+\end{enumerate}
+
+\subsection{\xlabel{list_of_most_recent_changes}Changes Introduced in V1.7}
+
+The following describes the most significant changes which occurred in
+the NDF\_ system between versions V1.6 and V1.7 (the current version):
+
+\begin{enumerate}
+\item NDF sections expressions can now include WCS axis values.
+See \S\ref{ss:axissections}.
 
 \end{enumerate}
 

@@ -1,5 +1,6 @@
-      SUBROUTINE NDF1_PSNDE( STR, NDIM, LBND, UBND, VALUE1, VALUE2,
-     :                       NVAL, ISPIX1, ISPIX2, ISBND, STATUS )
+      SUBROUTINE NDF1_PSNDE( STR, NAX, LBND, UBND, IWCS, WCSSEC, VALUE1, 
+     :                       VALUE2, NVAL, ISPIX1, ISPIX2, ISBND, 
+     :                       ISDEF1, ISDEF2, STATUS )
 *+
 *  Name:
 *     NDF1_PSNDE
@@ -11,8 +12,9 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL NDF1_PSNDE( STR, NDIM, LBND, UBND, VALUE1, VALUE2, NVAL,
-*                      ISPIX1, ISPIX2, ISBND, STATUS )
+*     CALL NDF1_PSNDE( STR, NAX, LBND, UBND, IWCS, WCSSEC, VALUE1, 
+*                      VALUE2, NVAL, ISPIX1, ISPIX2, ISBND, ISDEF1, 
+*                      ISDEF2, STATUS )
 
 *  Description:
 *     The routine parses an NDF section bound expression (such as
@@ -25,32 +27,65 @@
 *  Arguments:
 *     STR = CHARACTER * ( * ) (Given)
 *        String containing the expression to be parsed.
-*     NDIM = INTEGER (Given)
-*        Number of NDF bounds.
-*     LBND( NDIM ) = INTEGER (Given)
-*        NDF lower bounds (used to calculate defaults).
-*     UBND( NDIM ) = INTEGER (Given)
-*        NDF upper bounds (used to calculate defaults).
+*     NAX = INTEGER (Given)
+*        Number of axes for which default bounds are available. If WCSSEC
+*        is .TRUE., this should be the number of WCS axes. Otherwise it
+*        should be the number of pixel axes.
+*     LBND( NAX ) = DOUBLE PRECISION (Given)
+*        Axis lower bounds (used to calculate defaults). These should be
+*        pixel coordinates.
+*     UBND( NAX ) = DOUBLE PRECISION (Given)
+*        Axis upper bounds (used to calculate defaults). These should be
+*        WCS axis values if WCSSEC is .TRUE., and should be pixel coordinates
+*        otherwise.
+*     IWCS = INTEGER (Given)
+*        An AST pointer to the NDF's WCS FrameSet. If WCSSEC is .FALSE.,
+*        then the current Frame should be set to AXIS if the NDF has any
+*        defined AXIS structures. 
+*     WCSSEC = LOGICAL (Given)
+*        If .TRUE., then the section specifier uses WCS syntax. Otherwise, 
+*        it uses the old pixel/axis syntax. In WCS syntax, the supplied
+*        STR string should contain a specification for the bounds on each
+*        WCS axis, supplied in the order of the WCS axes. Each bound
+*        specification must be given using WCS axis values. The number of
+*        bounds specifications must equal the number of WCS axes (supplied 
+*        in NAX). If WCSSEC is .FALSE., the supplied STR string should 
+*        contain a specification for the bounds on each pixel axis, supplied 
+*        in the order of the pixel axes. Each bound specification must be 
+*        given using either pixel indices (integers), or axis values
+*        (non-integers). If non-integers are used but the axis does not
+*        have any associated axis coordinates, then the values are
+*        assumed to refer to the corresponding WCS axis. The number of
+*        bounds specifications must equal the number of pixel axes (supplied 
+*        in NAX). 
 *     VALUE1( NDF__MXDIM ) = DOUBLE PRECISION (Returned)
 *        First value specifying section bounds for each dimension.
 *     VALUE2( NDF__MXDIM ) = DOUBLE PRECISION (Returned)
 *        Second value specifying section bounds for each dimension.
 *     NVAL = INTEGER (Returned)
-*        Number of dimensions for which values are returned (cannot
-*        exceed NDF__MXDIM).
+*        Number of axes for which values are returned (cannot exceed 
+*        NDF__MXDIM).
 *     ISPIX1( NDF__MXDIM ) = LOGICAL (Returned)
 *        .FALSE. ==> the corresponding VALUE1 value is to be
-*        interpreted as an axis coordinate value, .TRUE. ==> it is a
-*        pixel index.
+*        interpreted as a WCS or axis coordinate value, .TRUE. ==> it 
+*        is a pixel index.
 *     ISPIX2( NDF__MXDIM ) = LOGICAL (Returned)
 *        .FALSE. ==> the corresponding VALUE2 value is to be
-*        interpreted as an axis coordinate value, .TRUE. ==> it is a
-*        pixel index.
+*        interpreted as a WCS or axis coordinate value, .TRUE. ==> it 
+*        is a pixel index.
 *     ISBND( NDF__MXDIM ) = LOGICAL (Returned)
 *        .TRUE. ==> the corresponding VALUE1 and VALUE2 values specify
 *        the lower and upper bounds of the section directly, .FALSE.
 *        ==> VALUE1 specifies the centre of the dimension's extent and
 *        VALUE2 specifies the dimension's size.
+*     ISDEF1( NDF__MXDIM ) = LOGICAL (Returned)
+*        .TRUE. ==> the corresponding VALUE1 value is a default value and
+*        was not specified in the supplied string. .FALSE. ==> VALUE1
+*        was specified explicitly in the supplied string.
+*     ISDEF2( NDF__MXDIM ) = LOGICAL (Returned)
+*        .TRUE. ==> the corresponding VALUE2 value is a default value and
+*        was not specified in the supplied string. .FALSE. ==> VALUE2
+*        was specified explicitly in the supplied string.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -61,35 +96,9 @@
 *     if it does. It need not match the number of NDF dimensions
 *     supplied.
 
-*  Algorithm:
-*     -  Initialise.
-*     -  Loop to extract each dimension bound field from the
-*     expression.
-*     -  If we are still within the bounds of the expression string,
-*     then search for the end of the next field (the last character
-*     before a comma or end of string). Note if a comma did not
-*     terminate this field.
-*     -  If we are outside the bounds of the expression, but have to
-*     make one more pass to process the (blank) field following a final
-*     comma, then use the end of string as the end of the field.
-*     -  Increment the count of dimension bounds and report an error if
-*     this exceeds the maximum number of dimensions.
-*     -  Set up values of the NDF lower and upper bounds for the
-*     current dimension.
-*     -  If the field does not exist (i.e. there are two consecutive
-*     commas or a comma at the start or end of the string) then use the
-*     default values for the current dimension.
-*     -  Otherwise, find the first and last non-blank characters in the
-*     current dimension field.
-*     -  If the field is blank, then apply the default bounds.
-*     -  Otherwise, parse the field to determine the values which
-*     specify the dimension bounds.
-*     -  Make a contextual error report if an error occurs.
-*     -  Increment the pointer to the start of the next field and
-*     return to process it.
-
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -110,11 +119,14 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     DSB: David S Berry (JACH, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
 *     15-FEB-1991 (RFWS):
 *        Original version.
+*     21-MAY-2007 (DSB):
+*        Add support for sections given in terms of WCS coords.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -130,12 +142,15 @@
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants      
       INCLUDE 'NDF_ERR'          ! NDF_ error codes
+      INCLUDE 'AST_PAR'          ! AST_ constants and functions
 
 *  Arguments Given:
       CHARACTER * ( * ) STR
-      INTEGER NDIM
-      INTEGER LBND( NDIM )
-      INTEGER UBND( NDIM )
+      INTEGER NAX
+      DOUBLE PRECISION LBND( NAX )
+      DOUBLE PRECISION UBND( NAX )
+      INTEGER IWCS
+      LOGICAL WCSSEC
 
 *  Arguments Returned:
       DOUBLE PRECISION VALUE1( NDF__MXDIM )
@@ -144,19 +159,20 @@
       LOGICAL ISPIX1( NDF__MXDIM )
       LOGICAL ISPIX2( NDF__MXDIM )
       LOGICAL ISBND( NDF__MXDIM )
+      LOGICAL ISDEF1( NDF__MXDIM )
+      LOGICAL ISDEF2( NDF__MXDIM )
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      DOUBLE PRECISION LBND0     ! Default lower dimension bound
+      DOUBLE PRECISION UBND0     ! Default upper dimension bound
       INTEGER F                  ! First non-blank character in field
       INTEGER I1                 ! First character position in field
       INTEGER I2                 ! Last character position in field
       INTEGER L                  ! Last non-blank character in field
-      INTEGER LBND0              ! Default lower dimension bound
-      INTEGER UBND0              ! Default upper dimension bound
       LOGICAL COMMA              ! Comma terminated a field?
-
 *.
 
 *  Check inherited global status.
@@ -195,10 +211,19 @@
 *  Increment the count of dimension bounds and report an error if this
 *  exceeds the maximum number of dimensions.
          NVAL = NVAL + 1
-         IF ( NVAL .GT. NDF__MXDIM ) THEN
+         IF ( WCSSEC .AND. NVAL .GT. NAX ) THEN
             STATUS = NDF__BNDIN
             CALL MSG_SETC( 'SECTION', STR )
-            CALL MSG_SETI( 'NDIM', NVAL )
+            CALL MSG_SETI( 'MXDIM', NAX )
+            CALL ERR_REP( 'NDF1_PSNDE_XS',
+     :                    'Too many WCS axes given in the NDF ' //
+     :                    'section expression ''(^SECTION)''; the ' //
+     :                    'maximum number of WCS axes is ^MXDIM.',
+     :                    STATUS )
+
+         ELSE IF( NVAL .GT. NDF__MXDIM ) THEN
+            STATUS = NDF__BNDIN
+            CALL MSG_SETC( 'SECTION', STR )
             CALL MSG_SETI( 'MXDIM', NDF__MXDIM )
             CALL ERR_REP( 'NDF1_PSNDE_XS',
      :                    'Too many dimensions given in the NDF ' //
@@ -206,26 +231,28 @@
      :                    'maximum number of NDF dimensions is ^MXDIM.',
      :                    STATUS )
 
-*  Set up values of the NDF lower and upper bounds for the current
+*  Set up values of the default lower and upper bounds for the current
 *  dimension.
          ELSE
-            IF ( NVAL .LE. NDIM ) THEN
+            IF ( NVAL .LE. NAX ) THEN
                LBND0 = LBND( NVAL )
                UBND0 = UBND( NVAL )
             ELSE
-               LBND0 = 1
-               UBND0 = 1
+               LBND0 = 1.0D0
+               UBND0 = 1.0D0
             END IF
 
 *  If the field does not exist (i.e. there are two consecutive commas
 *  or a comma at the start or end of the string) then use the default
 *  values for the current dimension.
             IF ( I1 .GT. I2 ) THEN
-               VALUE1( NVAL ) = DBLE( LBND0 )
-               VALUE2( NVAL ) = DBLE( UBND0 )
-               ISPIX1( NVAL ) = .TRUE.
-               ISPIX2( NVAL ) = .TRUE.
+               VALUE1( NVAL ) = LBND0
+               VALUE2( NVAL ) = UBND0
+               ISPIX1( NVAL ) = ( .NOT. WCSSEC )
+               ISPIX2( NVAL ) = ( .NOT. WCSSEC )
                ISBND( NVAL ) = .TRUE.
+               ISDEF1( NVAL ) = .TRUE.
+               ISDEF2( NVAL ) = .TRUE.
 
 *  Otherwise, find the first and last non-blank characters in the
 *  current dimension field.
@@ -234,21 +261,25 @@
 
 *  If the field is blank, then apply the default bounds.
                IF ( F .GT. L ) THEN
-                  VALUE1( NVAL ) = DBLE( LBND0 )
-                  VALUE2( NVAL ) = DBLE( UBND0 )
-                  ISPIX1( NVAL ) = .TRUE.
-                  ISPIX2( NVAL ) = .TRUE.
+                  VALUE1( NVAL ) = LBND0
+                  VALUE2( NVAL ) = UBND0
+                  ISPIX1( NVAL ) = ( .NOT. WCSSEC )
+                  ISPIX2( NVAL ) = ( .NOT. WCSSEC )
                   ISBND( NVAL ) = .TRUE.
+                  ISDEF1( NVAL ) = .TRUE.
+                  ISDEF2( NVAL ) = .TRUE.
 
 *  Otherwise, parse the field to determine the values which specify the
 *  dimension bounds.
                ELSE
                   F = F + I1 - 1
                   L = L + I1 - 1
-                  CALL NDF1_PSNDF( STR( F : L ), LBND0, UBND0,
-     :                             VALUE1( NVAL ), VALUE2( NVAL ),
-     :                             ISPIX1( NVAL ), ISPIX2( NVAL ),
-     :                             ISBND( NVAL ), STATUS )
+                  CALL NDF1_PSNDF( STR( F : L ), LBND0, UBND0, NVAL, 
+     :                             IWCS, WCSSEC, VALUE1( NVAL ), 
+     :                             VALUE2( NVAL ), ISPIX1( NVAL ), 
+     :                             ISPIX2( NVAL ), ISBND( NVAL ), 
+     :                             ISDEF1( NVAL ), ISDEF2( NVAL ), 
+     :                             STATUS )
 
 *  Make a contextual error report if an error occurs.
                   IF ( STATUS .NE. SAI__OK ) THEN

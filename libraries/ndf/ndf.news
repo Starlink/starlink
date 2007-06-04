@@ -4,6 +4,9 @@ NDF Library
    Subsecond accuracy has been restored to history recording
    (was lost in the switch to Unix)
 
+V1.7
+   NDF sections may now be given in terms of WCS coordinates.
+
 V1.6-2
    Limited support for NDF array components stored in scaled form is now 
    available.
