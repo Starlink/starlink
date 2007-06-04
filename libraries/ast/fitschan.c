@@ -760,6 +760,10 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        In CnvType, use input type rather than output type when checking
 *        for a COMMENT card. Also, return a null data value buffer for a
 *        COMMENT card.
+*     4-JUN-2007 (DSB):
+*        In CLASSFromStore, create a DELTAV header even if it is equal to
+*        the spectral CDELT value. Also, convert spatial reference point
+*        to (az,el) and write out as headers AZIMUTH and ELEVATIO.
 *class--
 */
 
@@ -1216,7 +1220,7 @@ static int AIPSFromStore( AstFitsChan *, FitsStore *, const char *, const char *
 static int AIPSPPFromStore( AstFitsChan *, FitsStore *, const char *, const char * );
 static int AddEncodingFrame( AstFitsChan *, AstFrameSet *, int, const char *, const char * );
 static int AddVersion( AstFitsChan *, AstFrameSet *, int, int, FitsStore *, double *, char, const char *, const char * );
-static int CLASSFromStore( AstFitsChan *, FitsStore *, const char *, const char * );
+static int CLASSFromStore( AstFitsChan *, FitsStore *, AstFrameSet *, const char *, const char * );
 static int CardType( AstFitsChan * );
 static int CheckFitsName( const char *, const char *, const char * );
 static int ChrLen( const char * );
@@ -1234,7 +1238,7 @@ static int FindLonLatSpecAxes( FitsStore *, char, int *, int *, int *, const cha
 static int FindString( int, const char *[], const char *, const char *, const char *, const char * );
 static int FitOK( int, double *, double * );
 static int FitsEof( AstFitsChan * );
-static int FitsFromStore( AstFitsChan *, FitsStore *, int, const char *, const char * );
+static int FitsFromStore( AstFitsChan *, FitsStore *, int, AstFrameSet *, const char *, const char * );
 static int FitsGetCom( AstFitsChan *, const char *, char ** );
 static int FullForm( const char *, const char *, int );
 static int GetFiducialWCS( AstWcsMap *, AstMapping *, int, int, double *, double * );
@@ -4204,7 +4208,8 @@ static int ChrLen( const char *string ){
 }
 
 static int CLASSFromStore( AstFitsChan *this, FitsStore *store, 
-                           const char *method, const char *class ){
+                           AstFrameSet *fs, const char *method, 
+                           const char *class ){
 /*
 *  Name:
 *     CLASSFromStore
@@ -4217,7 +4222,8 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
 
 *  Synopsis:
 *     int CLASSFromStore( AstFitsChan *this, FitsStore *store, 
-*                         const char *method, const char *class )
+*                         AstFrameSet *fs, const char *method, 
+*                         const char *class )
 
 *  Class Membership:
 *     FitsChan
@@ -4238,6 +4244,9 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
 *        Pointer to the FitsChan.
 *     store
 *        Pointer to the FitsStore.
+*     fs
+*        Pointer to the FrameSet from which the values in the FitsStore
+*        were derived.
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
@@ -4252,6 +4261,14 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
 */
 
 /* Local Variables: */
+   AstFrame *azelfrm;  /* (az,el) frame */
+   AstFrame *curfrm;   /* Current Frame in supplied FrameSet */
+   AstFrame *radecfrm; /* Spatial frame for CRVAL values */
+   AstFrameSet *fsconv1;/* FrameSet connecting "curfrm" & "radecfrm" */
+   AstFrameSet *fsconv2;/* FrameSet connecting "curfrm" & "azelfrm" */
+   AstMapping *map1;   /* Axis permutation to get (lonaxis,lataxis) = (0,1) */
+   AstMapping *map2;   /* Mapping from FITS CTYPE to (az,el) */
+   AstMapping *map3;   /* Mapping from (lon,lat) to (az,el) */
    char *comm;         /* Pointer to comment string */
    char *cval;         /* Pointer to string keyword value */
    char combuf[80];    /* Buffer for FITS card comment */
@@ -4262,9 +4279,11 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
    char spectype[MXCTYPELEN];/* Spectral axis CTYPE */
    const char *srcsys; /* Pointer to rest frame string for source velocity */
    double *cdelt;      /* Pointer to CDELT array */
+   double azel[ 2 ];   /* Reference (az,el) values */
    double cdl;         /* CDELT term */
    double cdlat_lon;   /* Off-diagonal CD element */
    double cdlon_lat;   /* Off-diagonal CD element */
+   double crval[ 3 ];  /* CRVAL values converted to rads, etc */
    double delta;       /* Spectral axis increment */
    double equ;         /* Epoch of reference equinox */
    double fd;          /* Fraction of a day */
@@ -4273,6 +4292,7 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
    double lonval;      /* CRVAL for longitude axis */
    double mjd99;       /* MJD at start of 1999 */
    double p1, p2;      /* Projection parameters */
+   double radec[ 2 ];  /* Reference (lon,lat) values */
    double rf;          /* Rest freq (Hz) */
    double specfactor;  /* Factor for converting internal spectral units */
    double srcvel;      /* Apparent radial velocity of source */
@@ -4287,9 +4307,9 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
    int iymdf[ 4 ];     /* Year, month, date, fractional day */
    int j;              /* Axis index */
    int jj;             /* SlaLib status */
-   int naxis;          /* No. of axes */
    int naxis2;         /* Length of pixel axis 2 */
    int naxis3;         /* Length of pixel axis 3 */
+   int naxis;          /* No. of axes */
    int ok;             /* Is FitsSTore OK for IRAF encoding? */
    int prj;            /* Projection type */
 
@@ -4605,6 +4625,7 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
          if( val == AST__BAD ) {
             ok = 0;
          } else {
+            crval[ i ] = val;
             if( i == axspec ) {
                val *= specfactor;
                if( !strncmp( spectype, "FREQ", 4 ) ) val -= rf;
@@ -4648,13 +4669,14 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
                    AST__FLOAT, "Pixel size" );
       }
 
-/* Older versions of CLASS require DELTAV to be present if the spectral
-   axis describes anything other than velocity. */
+/* Older versions of CLASS require DELTAV to be present. */
       if( axspec != -1 ) {
          if( strncmp( spectype, "VELO", 4 ) ) {
             delta = -AST__C*cdelt[ axspec ]/rf;
-            SetValue( this, "DELTAV", &delta, AST__FLOAT, "[m/s] Velocity resolution" );
+         } else {
+            delta = cdelt[ axspec ];
          }
+         SetValue( this, "DELTAV", &delta, AST__FLOAT, "[m/s] Velocity resolution" );
       }
 
 /* Reference equinox */
@@ -4709,6 +4731,53 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
          cval = " ";
          SetValue( this, "LINE", &cval, AST__STRING, NULL );
       }
+
+/* AZIMUTH and ELEVATIO - the (az,el) equivalent of CRVAL. We need a
+   Mapping from the CTYPE spatial system to (az,el). This depends on all 
+   the extra info like telescope position, epoch, etc.  This info is in
+   the current Frame in the supplied FrameSet. First get a conversion 
+   from a sky frame with default axis ordering to the supplied Frame. All
+   the extra info is picked up from the supplied Frame since it is not set
+   in the template. */
+      curfrm = astGetFrame( fs, AST__CURRENT );
+      radecfrm = (AstFrame *) astSkyFrame( "Permute=0,MinAxes=3,MaxAxes=3" );
+      fsconv1 = astFindFrame( curfrm, radecfrm, "" );
+
+/* Now get conversion from the an (az,el) Frame to the supplied Frame. */
+      azelfrm = (AstFrame *) astSkyFrame( "System=AZEL,Permute=0,MinAxes=3,MaxAxes=3" );
+      fsconv2 = astFindFrame( curfrm, azelfrm, "" );
+
+/* If both conversions werew possible, concatenate their Mappings to get
+   a Mapping from (lon,lat) in the CTYPE system, to (az,el). */
+      if( fsconv1 && fsconv2 ) {
+         map1 = astGetMapping( fsconv1, AST__CURRENT, AST__BASE );
+         map2 = astGetMapping( fsconv2, AST__BASE, AST__CURRENT );
+         map3 = (AstMapping *) astCmpMap( map1, map2, 1, "" );
+
+/* Store the CTYPE (ra,dec) values in the default order. */
+         radec[ 0 ] = crval[ axlon ]*AST__DD2R;
+         radec[ 1 ] = crval[ axlat ]*AST__DD2R;
+
+/* Transform to (az,el), normalise, convert to degrees and store. */
+         astTranN( map3, 1, 2, 1, radec, 1, 2, 1, azel );
+         if( azel[ 0 ] != AST__BAD && azel[ 1 ] != AST__BAD ) {
+            astNorm( azelfrm, azel );
+            azel[ 0 ] *= AST__DR2D;
+            azel[ 1 ] *= AST__DR2D;
+            SetValue( this, "AZIMUTH", azel, AST__FLOAT, "[Deg] Telescope azimuth" );
+            SetValue( this, "ELEVATIO", azel + 1, AST__FLOAT, "[Deg] Telescope elevation" );
+         }
+
+/* Free resources */
+         map1 = astAnnul( map1 );
+         map2 = astAnnul( map2 );
+         map3 = astAnnul( map3 );
+         fsconv1 = astAnnul( fsconv1 );
+         fsconv2 = astAnnul( fsconv2 );
+      }
+      radecfrm = astAnnul( radecfrm );
+      azelfrm = astAnnul( azelfrm );
+      curfrm = astAnnul( curfrm );
 
    }
 
@@ -8814,7 +8883,7 @@ static int FitOK( int n, double *act, double *est ) {
 }
 
 static int FitsFromStore( AstFitsChan *this, FitsStore *store, int encoding, 
-                          const char *method, const char *class ){
+                          AstFrameSet *fs, const char *method, const char *class ){
 /*
 *  Name:
 *     FitsFromStore
@@ -8827,7 +8896,7 @@ static int FitsFromStore( AstFitsChan *this, FitsStore *store, int encoding,
 
 *  Synopsis:
 *     int FitsFromStore( AstFitsChan *this, FitsStore *store, int encoding, 
-*                        const char *method, const char *class )
+*                        AstFrameSet *fs, const char *method, const char *class )
 
 *  Class Membership:
 *     FitsChan
@@ -8850,6 +8919,8 @@ static int FitsFromStore( AstFitsChan *this, FitsStore *store, int encoding,
 *        Pointer to the FitsStore.
 *     encoding
 *        The encoding to use.
+*     fs 
+*        The FrameSet from which the values in the FitsStore were derived.
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
@@ -8896,7 +8967,7 @@ static int FitsFromStore( AstFitsChan *this, FitsStore *store, int encoding,
       ret = AIPSPPFromStore( this, store, method, class );
 
    } else if( encoding == FITSCLASS_ENCODING ){
-      ret = CLASSFromStore( this, store, method, class );
+      ret = CLASSFromStore( this, store, fs, method, class );
 
 /* Standard FITS-WCS encoding */
    } else {
@@ -30936,7 +31007,8 @@ static int Write( AstChannel *this_channel, AstObject *object ) {
 /* Now put header cards describing the contents of the FitsStore into the 
    supplied FitsChan, using the requested encoding. Zero or one is
    returned depending on whether the information could be encoded. */
-               ret = FitsFromStore( this, store, encoding, method, class );
+               ret = FitsFromStore( this, store, encoding, 
+                                    (AstFrameSet *) object, method, class );
 
 /* Release the resources used by the FitsStore. */
                store = FreeStore( store );      
