@@ -61,6 +61,8 @@ f     The Box class does not define any new routines beyond those
 *        Original version.
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
+*     5-JUN-2007 (DSB):
+*        Improve astSimplify algorithm.
 *class--
 */
 
@@ -2288,6 +2290,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    AstFrame *frm;                /* Pointer to current Frame */
    AstMapping *map;              /* Base -> current Mapping */
    AstMapping *result;           /* Result pointer to return */
+   AstPointSet *basemesh;        /* Mesh of base Frame positions */
    AstPointSet *mesh;            /* Mesh of current Frame positions */
    AstPointSet *ps1;             /* Box corners in base Frame */
    AstPointSet *ps2;             /* Box corners in current Frame */
@@ -2528,10 +2531,22 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    fitting Box, to within the uncertainty of the Region. */
       if( astRegPins( newbox, mesh, NULL, NULL ) ) {
 
+/* If so, check that the inverse is true (we need to transform the
+   simplified boxes mesh into the base Frame of he original box for use by
+   astRegPins). */
+         (void) astAnnul( mesh );
+         mesh = astRegMesh( newbox );
+         basemesh = astTransform( map, mesh, 0, NULL );
+         if( astRegPins( new, basemesh, NULL, NULL ) ) {
+
 /* If so, use the new Box in place of the original. */
-         (void) astAnnul( new );
-         new = astClone( newbox );
-         simpler = 1;
+            (void) astAnnul( new );
+            new = astClone( newbox );
+            simpler = 1;
+         }
+
+/* Free resources. */
+         basemesh = astAnnul( basemesh );
 
 /* If the transformed Box is not itself a Box, see if it can be
    represented accuractely by a Polygon. This is only p[ossible for
