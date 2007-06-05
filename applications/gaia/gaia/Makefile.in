@@ -120,7 +120,8 @@ RANLIB		= @RANLIB@
 RANLIB_STUB	= @RANLIB_STUB@
 SHLIB_CFLAGS	= @SHLIB_CFLAGS@
 SHLIB_LD	= @SHLIB_LD@
-SHLIB_LD_LIBS	= @PKG_LIBS@ @SHLIB_LD_LIBS@ @SHLIB_LD_CXX_LIBS@ $(FCLIBS)
+SHLIB_LD_LIBS	= @SHLIB_PKG_LIBS@ @SHLIB_LD_LIBS@ @SHLIB_LD_CXX_LIBS@ $(FCLIBS)
+LD_LIBS		= @PKG_LIBS@ @SHLIB_LD_LIBS@ @SHLIB_LD_CXX_LIBS@ $(FCLIBS)
 STLIB_LD	= @STLIB_LD@
 #TCL_DEFS	= @TCL_DEFS@
 TCL_BIN_DIR	= @TCL_BIN_DIR@
@@ -305,13 +306,13 @@ $(PKG_LIB_FILE): $(PKG_OBJECTS) $(MERGE_OBJECTS)
 
 $(PACKAGE_NAME)_wish$(EXEEXT): tkAppInit.o initFortran.o $(PKG_LIB_FILE)
 	$(LTLINK) $(LDFLAGS) tkAppInit.o initFortran.o $(PKG_LIB_FILE) \
-	      $(LD_SEARCH_FLAGS) $(SHLIB_LD_LIBS) \
+	      $(LD_SEARCH_FLAGS) $(LD_LIBS) \
               -litcl3.3 -litk3.3 -ltclx8.4 $(itcl_BUILD_SPEC) $(FCLIBS) \
 	      -o $(PACKAGE_NAME)_wish$(EXEEXT)
 
 $(PACKAGE_NAME)_tcl$(EXEEXT): tclAppInit.o initFortran.o ast_tclerr.o
 	$(LTLINK) $(LDFLAGS) tclAppInit.o initFortran.o \
-	      $(LD_SEARCH_FLAGS) $(SHLIB_LD_LIBS) -litcl3.3 -ltclx8.4 \
+	      $(LD_SEARCH_FLAGS) $(LD_LIBS) -litcl3.3 -ltclx8.4 \
 	      $(itcl_BUILD_SPEC) $(TCL_LIB_SPEC) $(FCLIBS) ast_tclerr.o \
 	      -o $(PACKAGE_NAME)_tcl$(EXEEXT)
 
