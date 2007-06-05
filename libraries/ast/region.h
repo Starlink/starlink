@@ -125,6 +125,7 @@ typedef struct AstRegionVtab {
    void (* RegSetAttrib)( AstRegion *, const char *, char ** );
    void (* RegClearAttrib)( AstRegion *, const char *, char ** );
    void (* GetRegionBounds)( AstRegion *, double *, double * );
+   void (* ShowMesh)( AstRegion *, int );
    void (* GetUncBounds)( AstRegion *, double *, double * );
    void (* GetRegionBounds2)( AstRegion *, double *, double * );
    void (* ClearUnc)( AstRegion * );
@@ -239,6 +240,7 @@ int astMaskUS_( AstRegion *, AstMapping *, int, int, const int[], const int[], u
 void astSetUnc_( AstRegion *, AstRegion * );
 AstRegion *astGetUnc_( AstRegion *, int );
 void astGetRegionBounds_( AstRegion *, double *, double * );
+void astShowMesh_( AstRegion *, int );
 
 #if defined(astCLASS)            /* Protected */
 void astGetUncBounds_( AstRegion *, double *, double * );
@@ -379,6 +381,7 @@ astINVOKE(V,astMaskUS_(astCheckRegion(this),(map?astCheckMapping(map):NULL),insi
 #define astSetUnc(this,unc) astINVOKE(V,astSetUnc_(astCheckRegion(this),unc?astCheckRegion(unc):NULL))
 #define astGetUnc(this,def) astINVOKE(O,astGetUnc_(astCheckRegion(this),def))
 #define astGetRegionBounds(this,lbnd,ubnd) astINVOKE(V,astGetRegionBounds_(astCheckRegion(this),lbnd,ubnd))
+#define astShowMesh(this,format) astINVOKE(V,astShowMesh_(astCheckRegion(this),format))
 
 /* Interfaces to protected member functions. */
 /* ----------------------------------------- */

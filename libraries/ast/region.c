@@ -117,6 +117,8 @@ c     - astMask<X>: Mask a region of a data grid
 f     - AST_MASK<X>: Mask a region of a data grid
 c     - astSetUnc: Associate a new uncertainty with a Region
 f     - AST_SETUNC: Associate a new uncertainty with a Region
+c     - astShowMesh: Display a mesh of points on the surface of a Region
+f     - AST_SHOWMESH: Display a mesh of points on the surface of a Region
 
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
@@ -844,6 +846,7 @@ static void PermAxes( AstFrame *, const int[] );
 static void RegBaseBox( AstRegion *this, double *, double * );
 static void RegBaseBox2( AstRegion *this, double *, double * );
 static void RegSetAttrib( AstRegion *, const char *, char ** );
+static void ShowMesh( AstRegion *this, int );
 static void GetRegionBounds( AstRegion *this, double *, double * );
 static void GetUncBounds( AstRegion *this, double *, double * );
 static void GetRegionBounds2( AstRegion *this, double *, double * );
@@ -4067,6 +4070,7 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name ) {
    vtab->SetUnc = SetUnc;
    vtab->GetUnc = GetUnc;
    vtab->GetUncBounds = GetUncBounds;
+   vtab->ShowMesh = ShowMesh;
    vtab->GetRegionBounds = GetRegionBounds;
    vtab->GetRegionBounds2 = GetRegionBounds2;
    vtab->RegOverlay = RegOverlay;
@@ -7456,7 +7460,7 @@ static void GetUncBounds( AstRegion *this, double *lbnd, double *ubnd ){
 /*
 *+
 *  Name:
-*     astGetRegionBounds
+*     astGetUncBounds
 
 *  Purpose:
 *     Returns the bounding box of Region.
@@ -8560,6 +8564,117 @@ f        The global status.
       astError( AST__NCPIN, "The uncertainty Region must be an instance of "
                 "a centro-symetric subclass of Region (e.g. Box, Circle, "
                 "Ellipse, etc)." );
+   }
+}
+
+static void ShowMesh( AstRegion *this, int format ){
+/*
+*++
+*  Name:
+c     astShowMesh
+f     AST_SHOWMESH
+
+*  Purpose:
+*     Display a mesh of points covering the surface of a Region.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "region.h"
+c     void astShowMesh( AstRegion *this, int format )
+f     CALL AST_SHOWMESH( THIS, FORMAT, STATUS )
+
+*  Class Membership:
+*     Region method.
+
+*  Description:
+c     This function 
+f     This routine
+*     writes a table to standard output containing the axis values at a
+*     mesh of points covering the surface of the supplied Region. Each row
+*     of output contains a tab-separated list of axis values, one for
+*     each axis in the Frame encapsulated by the Region. The number of
+*     points in the mesh is determined by the MeshSize attribute.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Region.
+c     format
+f     FORMAT = LOGICAL (Given)
+*        A boolean value indicating if the displayed axis values should
+*        be formatted according to the Format attribute associated with
+*        the Frame's axis. Otherwise, they are displayed as simple
+*        floating point values.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*--
+*/
+
+/* Local Variables: */
+   AstPointSet *ps;           /* PointSet holding mesh */
+   char *buffer = NULL;       /* Buffer for line output text */
+   char buf[ 40 ];            /* Buffer for floating poitn value */
+   double **ptr;              /* Pointers to the mesh data */
+   int i;                     /* Axis index */
+   int j;                     /* Position index */
+   int nax;                   /* Number of axes */
+   int nc;                    /* Number of characters in buffer */
+   int np;                    /* Number of axis values per position */
+
+/* Check the inherited status. */
+   if( !astOK ) return;
+
+/* Get a PointSet holding the mesh */
+   ps = astRegMesh( this );
+   if( ps ) {
+
+/* Get the number of axis values per position, and the number of positions. */
+      nax = astGetNcoord( ps );
+      np = astGetNpoint( ps );
+
+/* Get a pointer to the mesh data, and check it can be used. */
+      ptr = astGetPoints( ps );
+      if( ptr ) {
+
+/* Loop round all positions. */
+         for( j = 0; j < np; j++ ) {
+
+/* Reset the current buffer length to zero. */
+            nc = 0;
+
+/* Loop round all axes */
+            for( i = 0; i < nax; i++ ){
+
+/* If the axis value is bad, append "<bad> in the end of the output buffer. */
+               if( ptr[ i ][ j ] == AST__BAD ){
+                  buffer = astAppendString( buffer, &nc, "<bad>" );
+
+/* Otherwise, if required, append the formatted value to the end of the
+   buffer. */
+               } else if( format ){
+                  buffer = astAppendString( buffer, &nc, 
+                                         astFormat( this, i, ptr[ i ][ j ] ) );
+
+/* Otherwise, append the floating point value to the end of the buffer. */
+               } else {
+                  sprintf( buf, "%g", ptr[ i ][ j ] );
+                  buffer = astAppendString( buffer, &nc, buf );
+               }   
+/* Add a separating tab to the end of the buffer. */
+               buffer = astAppendString( buffer, &nc, "\t" );
+            }
+
+/* Display the line buffer. */
+            printf( "%s\n", buffer );
+         }
+      }
+
+/* Release resources. */
+      ps = astAnnul( ps );
+      buffer = astFree( buffer );
    }
 }
 
@@ -11129,6 +11244,10 @@ void astResetCache_( AstRegion *this ){
 void astGetRegionBounds_( AstRegion *this, double *lbnd, double *ubnd ){
    if ( !astOK ) return;
    (**astMEMBER(this,Region,GetRegionBounds))( this, lbnd, ubnd );
+}
+void astShowMesh_( AstRegion *this, int format ){
+   if ( !astOK ) return;
+   (**astMEMBER(this,Region,ShowMesh))( this, format );
 }
 void astGetUncBounds_( AstRegion *this, double *lbnd, double *ubnd ){
    if ( !astOK ) return;

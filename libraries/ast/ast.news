@@ -30,7 +30,9 @@ variances (if supplied).
 returns the normalised value of the Unit attribute for an axis. Here,
 "normalisation" means cancelling redundant units, etc. So for instance, a
 Unit value of "s*(m/s)" would result in a NormUnit value of "m".
-
+- A new method astShowMesh has been added to the Region class. It
+displays a mesh of points covering the surface of a Region by writing out
+a table of axis values to standard output.
 
 Main Changes in Version 4.4
 ---------------------------

@@ -22,6 +22,7 @@
 *     AST_OVERLAP
 *     AST_SETUNC
 *     AST_GETUNC
+*     AST_SHOWMESH
 
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
@@ -218,6 +219,18 @@ F77_SUBROUTINE(ast_getregionbounds)( INTEGER(THIS),
    astAt( "AST_GETREGIONBOUNDS", NULL, 0 );
    astWatchSTATUS(
       astGetRegionBounds( astI2P( *THIS ), LBND, UBND );
+   )
+}
+
+F77_SUBROUTINE(ast_showmesh)( INTEGER(THIS),
+                              LOGICAL(FORMAT),
+                              INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_LOGICAL(FORMAT)
+
+   astAt( "AST_SHOWMESH", NULL, 0 );
+   astWatchSTATUS(
+      astShowMesh( astI2P( *THIS ), F77_ISTRUE( *FORMAT ) ? 1 : 0 );
    )
 }
 
