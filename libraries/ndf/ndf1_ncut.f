@@ -77,6 +77,9 @@
 *        Removed unused variable.
 *     21-MAY-2007 (DSB):
 *        Add support for sections given in terms of WCS coords.
+*     5-JUN-2007 (DSB):
+*        - Interpret non-integers as AXIS only if there is no explicit WCS.
+*        - New interface for ndf1_wclim.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -127,7 +130,6 @@
       DOUBLE PRECISION XU( NDF__MXDIM ) ! GRID coords at max WCS axis value
       INTEGER F                  ! First non-blank character position
       INTEGER I                  ! Loop counter for dimensions
-      INTEGER ICURR              ! Index of original current Frame
       INTEGER IDCB               ! Index to data object entry in the DCB
       INTEGER IWCS               ! AST pointer to WCS FrameSet
       INTEGER L                  ! Last non-blank character position
@@ -144,7 +146,6 @@
       LOGICAL ISDEF2( NDF__MXDIM ) ! Is VALUE2 a defalut value?
       LOGICAL ISPIX1( NDF__MXDIM ) ! Is VALUE1 a pixel index?
       LOGICAL ISPIX2( NDF__MXDIM ) ! Is VALUE2 a pixel index?
-      LOGICAL HASWCS             ! Does the NDF have a WCS component?
       LOGICAL WCSSEC             ! Use WCS section syntax?
       LOGICAL USEWCS             ! Use WCS instead of AXIS?
 *.
@@ -180,8 +181,8 @@
       ELSE
 
 *  If the opening parenthesis is followed by an asterisk  "*" the section 
-*  refers to WCS coords (in which case step over the asterisk). Otherwise, 
-*  it refers to pixel/axis coords.
+*  refers purely to WCS coords (in which case step over the asterisk). 
+*  Otherwise, it may contain a mix of axis/wcs coords and pixel indices.
          IF( STR( F + 1 : F + 1 ) .EQ. '*' ) THEN
             WCSSEC = .TRUE.
             F = F + 1
@@ -193,14 +194,8 @@
          CALL ARY_BOUND( ACB_DID( IACB1 ), NDF__MXDIM, LBNDD, UBNDD,
      :                   NDIMD, STATUS )
 
-*  Get the WCS FrameSet. Also get a flag indicating if the WCS FrameSet
-*  was stored explicitly in the NDF, or is a default FrameSet containing 
-*  just PIXEL, AXIS and GRID Frames.
+*  Get the WCS FrameSet. 
          CALL NDF1_RDWCS( IACB1, IWCS, STATUS )
-         CALL NDF1_WSTA( IACB1, HASWCS, STATUS )
-
-*  Indicate that we have not yet changed the current Frame in the FrameSet.
-         ICURR = AST__NOFRAME
 
 *  If we are using WCS syntax, the default bounds are the WCS values at
 *  the edges of the bounding box containing the whole NDF.
@@ -238,27 +233,11 @@
                DFUBND( I ) = DBLE( UBNDD( I ) ) 
             END DO
 
-*  See if the NDF has a defined AXIS structure. Obtain an index to the data 
-*  object entry in the DCB and ensure that axis structure information is 
-*  available. Then use the locator to the first axis structure element to 
-*  determine the state.
-            IDCB = ACB_IDCB( IACB1 )
-            CALL NDF1_DA( IDCB, STATUS )
-            IF ( STATUS .EQ. SAI__OK ) THEN
-               IF( DCB_ALOC( 1, IDCB ) .NE. DAT__NOLOC ) THEN
+*  If the current WCS Frame is the AXIS Frame, we interpret non-integer
+*  values using the AXIS-based code written by RFWS. Otherwise we use new
+*  WCS-based code.
+            USEWCS = ( AST_GETC( IWCS, 'Domain', STATUS ) .EQ. 'AXIS' )
 
-*  If we are not using WCS syntax, and the NDF has defined AXIS
-*  structures, make the AXIS Frame the curent Frame in the WCS FrameSet so
-*  that the parsing routines (NDF1_PSNDE etc) can use the AST_UNFORMAT
-*  method to read the axis values supplied in STR. First note the
-*  original current Frame so that it can be re-instated later.
-                  ICURR = AST_GETI( IWCS, 'Current', STATUS)            
-                  CALL AST_SETI( IWCS, 'Current', 3 )
-                  USEWCS = .FALSE.
-               ELSE
-                  USEWCS = .TRUE.
-               END IF
-            END IF
          END IF       
 
          IF ( STATUS .EQ. SAI__OK ) THEN
@@ -292,7 +271,8 @@
 
 *  If we are using WCS syntax, we do all axes together,
                IF( WCSSEC ) THEN
-                  CALL NDF1_WCLIM( IWCS, NDIM, NDIMD, VALUE1, VALUE2, 
+                  CALL NDF1_WCLIM( IWCS, NDIM, NDIMD, LBNDD, UBNDD,
+     :                             ISDEF1, ISDEF2, VALUE1, VALUE2, 
      :                             ISBND, LBND, UBND, STATUS )
 
 *  For the old pixel/axis syntax, do each axis independently unless
@@ -340,10 +320,7 @@
             END IF
          END IF
 
-*  Restore the original current Frame, then free the WCS FrameSet pointer.
-         IF( ICURR .NE. AST__NOFRAME ) THEN 
-            CALL AST_SETI( IWCS, 'Current', ICURR, STATUS )
-         END IF
+*  Free the WCS FrameSet pointer.
          IF( IWCS .NE. AST__NULL ) CALL AST_ANNUL( IWCS, STATUS )
 
       END IF
