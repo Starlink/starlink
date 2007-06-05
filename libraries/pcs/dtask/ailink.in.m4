@@ -500,7 +500,7 @@ cmpdtask="$LIBTOOL --mode=compile @FC@ @FCFLAGS@ $extra_mode_args @STAR_FCFLAGS@
 $verbose && echo $cmpdtask
 eval $cmpdtask
 
-linkcmd="$LIBTOOL --mode=link @FC@ @FCFLAGS@ $extra_mode_args @STAR_LDFLAGS@ \
+linkcmd="$LIBTOOL --mode=link @FC@ @FCFLAGS@ @STAR_FCFLAGS@ $extra_mode_args @STAR_LDFLAGS@ \
         -o $EXENAME \
         $linkextraflags \
         @libdir@/dtask_main.o \
