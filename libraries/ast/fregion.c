@@ -63,6 +63,7 @@
 #include "f77.h"                 /* FORTRAN <-> C interface macros (SUN/209) */
 #include "c2f77.h"               /* F77 <-> C support functions/macros */
 #include "error.h"               /* Error reporting facilities */
+#include "memory.h"              /* Memory management facilities */
 #include "region.h"              /* C interface to the Region class */
 
 /* FORTRAN interface functions. */
@@ -224,13 +225,19 @@ F77_SUBROUTINE(ast_getregionbounds)( INTEGER(THIS),
 
 F77_SUBROUTINE(ast_showmesh)( INTEGER(THIS),
                               LOGICAL(FORMAT),
-                              INTEGER(STATUS) ) {
+                              CHARACTER(TTL),
+                              INTEGER(STATUS)
+                              TRAIL(TTL) ) {
    GENPTR_INTEGER(THIS)
    GENPTR_LOGICAL(FORMAT)
+   GENPTR_CHARACTER(TTL)
+   char *ttl;
 
    astAt( "AST_SHOWMESH", NULL, 0 );
    astWatchSTATUS(
-      astShowMesh( astI2P( *THIS ), F77_ISTRUE( *FORMAT ) ? 1 : 0 );
+      ttl = astString( TTL, TTL_length );
+      astShowMesh( astI2P( *THIS ), F77_ISTRUE( *FORMAT ) ? 1 : 0, ttl );
+      ttl = astFree( ttl );
    )
 }
 

@@ -846,7 +846,7 @@ static void PermAxes( AstFrame *, const int[] );
 static void RegBaseBox( AstRegion *this, double *, double * );
 static void RegBaseBox2( AstRegion *this, double *, double * );
 static void RegSetAttrib( AstRegion *, const char *, char ** );
-static void ShowMesh( AstRegion *this, int );
+static void ShowMesh( AstRegion *this, int, const char * );
 static void GetRegionBounds( AstRegion *this, double *, double * );
 static void GetUncBounds( AstRegion *this, double *, double * );
 static void GetRegionBounds2( AstRegion *this, double *, double * );
@@ -8567,7 +8567,7 @@ f        The global status.
    }
 }
 
-static void ShowMesh( AstRegion *this, int format ){
+static void ShowMesh( AstRegion *this, int format, const char *ttl ){
 /*
 *++
 *  Name:
@@ -8582,8 +8582,8 @@ f     AST_SHOWMESH
 
 *  Synopsis:
 c     #include "region.h"
-c     void astShowMesh( AstRegion *this, int format )
-f     CALL AST_SHOWMESH( THIS, FORMAT, STATUS )
+c     void astShowMesh( AstRegion *this, int format, const char *ttl )
+f     CALL AST_SHOWMESH( THIS, FORMAT, TTL, STATUS )
 
 *  Class Membership:
 *     Region method.
@@ -8596,6 +8596,9 @@ f     This routine
 *     of output contains a tab-separated list of axis values, one for
 *     each axis in the Frame encapsulated by the Region. The number of
 *     points in the mesh is determined by the MeshSize attribute.
+*
+*     The table is preceeded by a given title string, and followed by a
+*     single line containing the word "ENDMESH".
 
 *  Parameters:
 c     this
@@ -8607,6 +8610,9 @@ f     FORMAT = LOGICAL (Given)
 *        be formatted according to the Format attribute associated with
 *        the Frame's axis. Otherwise, they are displayed as simple
 *        floating point values.
+c     ttl
+f     TTL = CHARACTER * ( * ) (Given)
+*        A title to display before displaying the first position.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
@@ -8638,6 +8644,9 @@ f        The global status.
 /* Get a pointer to the mesh data, and check it can be used. */
       ptr = astGetPoints( ps );
       if( ptr ) {
+
+/* Display the title. */
+         if( ttl ) printf( "\n%s\n\n", ttl );
 
 /* Loop round all positions. */
          for( j = 0; j < np; j++ ) {
@@ -8671,6 +8680,9 @@ f        The global status.
             printf( "%s\n", buffer );
          }
       }
+
+/* Print out a marker for th eend of the list. */
+      printf( "ENDMESH\n\n" );
 
 /* Release resources. */
       ps = astAnnul( ps );
@@ -11245,9 +11257,9 @@ void astGetRegionBounds_( AstRegion *this, double *lbnd, double *ubnd ){
    if ( !astOK ) return;
    (**astMEMBER(this,Region,GetRegionBounds))( this, lbnd, ubnd );
 }
-void astShowMesh_( AstRegion *this, int format ){
+void astShowMesh_( AstRegion *this, int format, const char *ttl ){
    if ( !astOK ) return;
-   (**astMEMBER(this,Region,ShowMesh))( this, format );
+   (**astMEMBER(this,Region,ShowMesh))( this, format,ttl );
 }
 void astGetUncBounds_( AstRegion *this, double *lbnd, double *ubnd ){
    if ( !astOK ) return;
