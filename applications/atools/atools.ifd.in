@@ -1697,6 +1697,35 @@ iraf! {
           }
       }
 
+      action astshowmesh {
+         helplib {$ATOOLS_HELP}
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The Region}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter format {
+            position 2
+            type _LOGICAL
+            prompt {Format the displayed axis values?}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter ttl {
+            position 3
+            type LITERAL
+            prompt {Title to display before the table of axis values}
+            ppath CURRENT
+            helpkey *
+          }
+      }
+
       action astunformat {
          helplib {$ATOOLS_HELP}
          parameter this {

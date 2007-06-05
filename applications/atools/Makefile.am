@@ -23,7 +23,7 @@ atools_mon_TASKS = astcopy astaddframe astclear astget astset asttest \
  astgetregbounds astunformat asttran1 asttran2 astmapregion astcmpregion \
  astmathmap astsetactunit astgetactunit astpolymap astswitchmap asttranmap \
  astdsbframe astfluxframe astsfluxframe astpolygon astellipse astmapsplit \
- astselectormap astinterval astbox
+ astselectormap astinterval astbox astshowmesh
 
 FSRC = \
  atl1_gtfrm.f \
@@ -98,7 +98,8 @@ astsetactunit.ifc astset.ifc astsetrefpos.ifc astsfluxframe.ifc \
 astshiftmap.ifc astsimplify.ifc astskyframe.ifc asttimeframe.ifc astspecframe.ifc \
 asttest.ifc asttran1.ifc asttran2.ifc astswitchmap.ifc asttranmap.ifc asttrann.ifc \
 astunitmap.ifc astwinmap.ifc atlhelp.ifc astmapsplit.ifc atools_mon.ifc \
-astselectormap.ifc astmapregion.ifc astcmpregion.ifc astgetregbounds.ifc
+astselectormap.ifc astmapregion.ifc astcmpregion.ifc astgetregbounds.ifc \
+astshowmesh.ifc
 
 IFL_FILES = astaddframe.ifl astclear.ifl astcmpframe.ifl astcmpmap.ifl \
 astconvert.ifl astcopy.ifl astdsbframe.ifl astellipse.ifl \
@@ -112,6 +113,7 @@ astsetactunit.ifl astset.ifl astsetrefpos.ifl astsfluxframe.ifl \
 astshiftmap.ifl astsimplify.ifl astskyframe.ifl astspecframe.ifl asttimeframe.ifl \
 asttest.ifl asttran1.ifl asttran2.ifl astswitchmap.ifl asttranmap.ifl asttrann.ifl \
 astmapsplit.ifl astunitmap.ifl astwinmap.ifl atlhelp.ifl atools_mon.ifl \
-astselectormap.ifl astmapregion.ifl astcmpregion.ifl astgetregbounds.ifl
+astselectormap.ifl astmapregion.ifl astcmpregion.ifl astgetregbounds.ifl \
+astshowmesh.ifl
 
 CLEANFILES = $(MISC_FILES) $(IFC_FILES) $(IFL_FILES)
