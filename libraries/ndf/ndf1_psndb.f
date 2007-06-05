@@ -30,9 +30,7 @@
 *        is .FALSE., then the AXIS value is the index of a pixel axis.
 *        Otherwise, it is the index of a WCS axis.
 *     IWCS = INTEGER (Given)
-*        An AST pointer to the NDF's WCS FrameSet. If WCSSEC is .FALSE.,
-*        then the current Frame should be set to AXIS if the NDF has any
-*        defined AXIS structures. 
+*        An AST pointer to the NDF's WCS FrameSet. 
 *     WCSSEC = LOGICAL (Given)
 *        If .TRUE., then the section specifier uses "WCS syntax". Otherwise, 
 *        it uses the old pixel/axis syntax. In WCS syntax, the supplied
@@ -43,10 +41,7 @@
 *        is .FALSE., the supplied STR string should contain a specification 
 *        for the bounds on each pixel axis, supplied in the order of the 
 *        pixel axes. Each bound specification must be given using either 
-*        pixel indices (integers), or axis values (non-integers). If 
-*        non-integers are used but the axis does not have any associated 
-*        axis coordinates, then the values are assumed to refer to the 
-*        corresponding axis of the current WCS Frame. 
+*        pixel indices (integers), or WCS values (non-integers). 
 *     VALUE = DOUBLE PRECISION (Returned)
 *        Dimension bound value.
 *     ISPIX = LOGICAL (Returned)
