@@ -1,8 +1,10 @@
 How to add a new public class to AST:
 
-1) Edit the files templateclass.c templateclass.h and ftemplateclass.c,
-and for each, do the following:
+1) Make copies of the three files templateclass.c templateclass.h and 
+   ftemplateclass.c, replacing "templateclass" in the file name by the
+   lower case name of the new class.
 
+2) Edit each of the files created above and do the following:
   - Replace TemplateClass with capitalised class name
   - Replace templateclass with lower case class name
   - Replace TEMPLATECLASS with upper case class name
@@ -11,10 +13,9 @@ and for each, do the following:
   - Replace all occurrences of >>> with suitable text
   - Add all the classes new functionality
 
-2) Add the three new files to CVS
+3) Add the three new files to CVS
 
-3) Edit the following files to include reference to the new class
-
+4) Edit the following files to include reference to the new class
    - ast_par.source
    - builddocs.in
    - loader.c
@@ -22,7 +23,7 @@ and for each, do the following:
    - sun_master.tex
    - ast.news
 
-4) Add a test program to the ast_tester script in the ast_tester directory
+5) Add a test program to the ast_tester script in the ast_tester directory
 
-5) Commit all changes to CVS.
+6) Commit all changes to CVS.
 
