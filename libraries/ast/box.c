@@ -63,6 +63,10 @@ f     The Box class does not define any new routines beyond those
 *        Override astGetObjSize.
 *     5-JUN-2007 (DSB):
 *        Improve astSimplify algorithm.
+*     6-JUN-2007 (DSB):
+*        Change the iterating algorithm in MakeGrid so that it uses
+*        pixel index rather than axis value. This is more robust against 
+*        rounding errors.
 *class--
 */
 
@@ -881,23 +885,23 @@ static int MakeGrid( int naxes, double **ptr, int ip, double *lbnd,
 */
 
 /* Local Variables: */
-   double *p;            /* Pointer to array holding current sample position */
    double *step;         /* Pointer to array holding axis step sizes */
-   double *upad;         /* Pointer to array holding padded upper limits */
+   int *maxi;            /* Pointer to array of maximum index values */
+   int *pi;              /* Pointer to array holding current sample indices */
    int i;                /* Axis index */
    int ipp;              /* Index of next point */
 
 /* Check the global error status. */
    if ( !astOK ) return 0;
 
-/* Allocate memory to hold the current position.*/
-   p = astMalloc( sizeof( double )*(size_t) naxes );
+/* Allocate memory to hold the max indices on each axis. */
+   maxi = astMalloc( sizeof( int )*(size_t) naxes );
+
+/* Allocate memory to hold the indices of the current position.*/
+   pi = astMalloc( sizeof( int )*(size_t) naxes );
 
 /* Allocate memory to hold the step size for each axis. */
    step = astMalloc( sizeof( double )*(size_t) naxes );
-
-/* Allocate memory to hold the padded upper limits on each axis. */
-   upad = astMalloc( sizeof( double )*(size_t) naxes );
    if( astOK ) {
 
 /* For every axis, set up the step size, initialise the current position to 
@@ -905,12 +909,12 @@ static int MakeGrid( int naxes, double **ptr, int ip, double *lbnd,
    safety marging to allow for rounding errors. */
       for( i = 0; i < naxes; i++ ) {
          step[ i ] = ( ubnd[ i ] - lbnd[ i ] )/(np_axis-1);
-         p[ i ] = lbnd[ i ];
-         upad[ i ] = ubnd[ i ] + 0.5*step[ i ];
+         pi[ i ] = 0;
+         maxi[ i ] = np_axis - 1;
       }
+      maxi[ iaxis ] = 0;
       step[ iaxis ] = 0.0;
-      p[ iaxis ] = axval;
-      upad[ iaxis ] = axval;
+      pi[ iaxis ] = 0;
 
 /* Initialise the index of the next position to store. */
       ipp = ip;
@@ -922,17 +926,22 @@ static int MakeGrid( int naxes, double **ptr, int ip, double *lbnd,
 
 /* Add the current point to the supplied array,and increment the index of
    the next point to add. */
-         for( i = 0; i < naxes; i++ ) ptr[ i ][ ipp ] = p[ i ];
+         for( i = 0; i < naxes; i++ ) {
+            if( i == iaxis ) {
+               ptr[ i ][ ipp ] = axval;
+            } else {
+               ptr[ i ][ ipp ] = lbnd[ i ] + pi[ i ]*step[ i ];
+            }
+         }
          ipp++;      
 
 /* We now move the current position on to the next sample */
-         i = ( iaxis == 0 ) ? 1 : 0;
+         i = 0;
          while( i < naxes ) {
-            p[ i ] += step[ i ];
-            if( step[ i ] == 0.0 || p[ i ] > upad[ i ] ) {
-               p[ i ] = lbnd[ i ];
+            pi[ i ]++;
+            if( pi[ i ] > maxi[ i ] ) {
+               pi[ i ] = 0;
                i++;
-               if( i == iaxis ) i++;
             } else {
                break;
             }
@@ -943,9 +952,9 @@ static int MakeGrid( int naxes, double **ptr, int ip, double *lbnd,
    }
 
 /* Free resources. */
-   p = astFree( p );
+   maxi = astFree( maxi );
+   pi = astFree( pi );
    step = astFree( step );
-   upad = astFree( upad );
 
 /* Return the result. */
    return astOK ? ( ipp - ip ): 0 ;
