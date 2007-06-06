@@ -79,6 +79,11 @@
 *  History:
 *     1-JUN-2007 (DSB):
 *        Original version.
+*     6-JUN-2007 (DSB):
+*        Correct conversion of pixel index "centre/width" values to 
+*        upper/lower bounds. Also report an error if thereis no overlap
+*        between the pixel and WCS boxes. Also, do not clip the supplied
+*        WCS box at the edges of hte NDF if no pixel limits were given.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -138,6 +143,7 @@
       INTEGER WBOX
       INTEGER WBOXP
       LOGICAL ALLPIX
+      LOGICAL ALLWCS
 *.
 
 *  Check inherited global status.
@@ -213,8 +219,8 @@
 *  bounds set to AST__BAD.
             IF( ISPIX1( I ) ) THEN
                DELTA = DBLE( NINT( VALUE2( I ) )/2 )
-               PLBND( I ) = VALUE1( I )  - 0.5D0 - DELTA
-               PUBND( I ) = VALUE1( I )  - 0.5D0 + DELTA
+               PLBND( I ) = VALUE1( I )  - 1.0D0 - DELTA
+               PUBND( I ) = PLBND( I ) + VALUE2( I )
 
 *  If WCS, then use the NDF Bounds as the pixel box and store the WCS box
 *  bounds.
@@ -252,6 +258,9 @@
 *  Get the current WCS coordinate Frame.
          CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
 
+*  Indicate that we have not yet found any pixel index bounds
+         ALLWCS = .TRUE.
+   
 *  Ensure the WCS box is complete by replacing any AST__BAD values by the
 *  appropriate limit than encompasses the whole pixel box. Check each WCS 
 *  axis.
@@ -261,7 +270,10 @@
 *  bounds.
             IF( WLBND( I ) .EQ. AST__BAD .OR. 
      :          WUBND( I ) .EQ. AST__BAD ) THEN
-	    
+
+*  Inidcate that at least one axis was specified by pixel index bounds.
+               ALLWCS = .FALSE.
+
 *  Map the pixel box into WCS coords and get the limits of the box on
 *  this WCS axis.
                CALL AST_MAPBOX( MAP, PLBND, PUBND, .FALSE., I, V1, V2,
@@ -309,30 +321,52 @@
          PFRM = AST_GETFRAME( IWCS, 2, STATUS )
          WBOXP = AST_MAPREGION( WBOX, MAP, PFRM, STATUS )
 
+*  If all bounds were specified as WCS  values, find the bounds (in 
+*  PIXEL coords) of the above Box, and store in PLBND/PUBND. 
+         IF( ALLWCS ) THEN
+            CALL AST_GETREGIONBOUNDS( WBOXP, PLBND, PUBND, STATUS )
+
+*  Otherwise, we restrict the returned section to the overlap of the WCS 
+*  and PIXEL boxes.
+         ELSE
+
 *  Replace any defaulted bounds in the pixel box with bad values. This
 *  causes AST_INTERVAL to ignore the bound, making the axis value
 *  unlimited.
-         DO I = 1, NAX
-            IF( ISBND( I ) ) THEN
-               IF( ISDEF1( I ) .OR. .NOT. ISPIX1( I ) ) 
-     :                                            PLBND( I ) = AST__BAD
-               IF( ISDEF2( I ) .OR. .NOT. ISPIX2( I ) ) 
-     :                                            PUBND( I ) = AST__BAD
-            END IF
-         END DO
+            DO I = 1, NAX
+               IF( ISBND( I ) ) THEN
+                  IF( ISDEF1( I ) .OR. .NOT. ISPIX1( I ) ) 
+     :                                             PLBND( I ) = AST__BAD
+                  IF( ISDEF2( I ) .OR. .NOT. ISPIX2( I ) ) 
+     :                                             PUBND( I ) = AST__BAD
+               END IF
+            END DO
 
 *  Define an AST Interval within the PIXEL Frame, using the bounds stored 
 *  in PLBND/PUBND.
-         PBOX = AST_INTERVAL( PFRM, PLBND, PUBND, AST__NULL, ' ', 
-     :                        STATUS )
+            PBOX = AST_INTERVAL( PFRM, PLBND, PUBND, AST__NULL, ' ', 
+     :                           STATUS )
 
 *  Now form a compound region that is the intersection of the two aboves
 *  Boxes (both now defined in the PIXEL Frame).
-         CMPREG = AST_CMPREGION( PBOX, WBOXP, AST__AND, ' ', STATUS )
+            CMPREG = AST_CMPREGION( PBOX, WBOXP, AST__AND, ' ', STATUS )
 
 *  Find the bounds (in PIXEL coords) of the compound Region, and store in
 *  PLBND/PUBND. 
-         CALL AST_GETREGIONBOUNDS( CMPREG, PLBND, PUBND, STATUS )
+            CALL AST_GETREGIONBOUNDS( CMPREG, PLBND, PUBND, STATUS )
+
+*  Report an error if the pixel and WCS boxes do not overlap.
+            DO I = 1, NAX
+               IF ( PLBND( I ) .GT. PUBND( I ) .AND.
+     :              STATUS .EQ. SAI__OK ) THEN
+                  STATUS = NDF__BNDIN
+                  CALL ERR_REP( 'NDF1_WPLIM_NOV', 'The requested '//
+     :                          'section does not contain any pixels.',
+     :                          STATUS )
+               END IF
+            END DO
+
+         END IF
 
 *  End the AST context. 
          CALL AST_END( STATUS )
