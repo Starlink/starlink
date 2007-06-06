@@ -161,7 +161,8 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *        to astSetC.
 *     30-MAY-2006 (DSB):
 *        Correct the correction made to handle commas within attribute
-*        values.
+*     6-JUN-2007 (DSB):
+*        Fix harmless compiler warnings.
 *class--
 */
 
@@ -246,7 +247,7 @@ static void Clear( AstObject *, const char * );
 static void ClearAttrib( AstObject *, const char * );
 static void ClearID( AstObject * );
 static void ClearIdent( AstObject * );
-static void EmptyObjectCache();
+static void EmptyObjectCache( void );
 static void SetAttrib( AstObject *, const char * );
 static void SetID( AstObject *, const char * );
 static void SetIdent( AstObject *, const char * );
@@ -989,7 +990,7 @@ static void Dump( AstObject *this, AstChannel *channel ) {
    astWriteEnd( channel, astGetClass( this ) );
 }
 
-static void EmptyObjectCache(){
+static void EmptyObjectCache( void ){
 /*
 *  Name:
 *     EmptyObjectCache
@@ -3998,8 +3999,6 @@ void astEnd_( void );
 void astExemptId_( AstObject * );
 void astExportId_( AstObject * );
 void astSetId_( void *, const char *, ... );
-int astVersion_( void );
-int astEscapes_( int );
 
 /* External Interface Functions. */
 /* ----------------------------- */
@@ -5422,7 +5421,7 @@ f        This routine applies to all Objects.
 *--
 */
 
-   return AST__VMAJOR*1E6 + AST__VMINOR*1E3 + AST__RELEASE;
+   return (int) AST__VMAJOR*1E6 + AST__VMINOR*1E3 + AST__RELEASE;
 }
 
 int astEscapes_( int new_value ) {
