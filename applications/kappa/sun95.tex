@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.32}
 \newcommand{\stardocnumber}    {95.32}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2007 May 23}
+\newcommand{\stardocdate}      {2007 June 4}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.7-6}
+\newcommand{\stardocversion}   {1.7-7}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -13885,12 +13885,21 @@ KAPPA: \htmlref{ARDGEN}{ARDGEN},
          the text {\tt "COFRAME(SKY,System=FK5)"} would indicate that positions
          are specified in RA/DEC (FK5,J2000).  The statement {\tt "COFRAME(PIXEL)"}
          indicates explicitly that positions are specified in pixel
-         co-ordinates.
+         co-ordinates.  The ARDFILE parameter is only accessed if
+         parameter REGION is given a null ({\tt{!}}) value.
       }
       \sstsubsection{
          DEVICE = \htmlref{DEVICE}{se:selgradev} (Read)
       }{
          The plotting device. {\tt [}Current graphics device{\tt{]}}
+      }
+      \sstsubsection{
+         REGION = FILENAME (Read)
+      }{
+         The name of a file containing an AST Region to be outlined, or 
+         null ({\tt{!}}) if the ARD region defined by parameter ARDFILE is to be
+         outlined.  Suitable files can be created using the ATOOLS
+         package.  {\tt [!]}
       }
       \sstsubsection{
          REGVAL = \_INTEGER (Read)
@@ -13904,7 +13913,8 @@ KAPPA: \htmlref{ARDGEN}{ARDGEN},
          supplied, then all regions with indices greater than or equal
          to the absolute value of the supplied index are outlined.  See
          SUN/183 for further information on the numbering of regions
-         within an ARD description. {\tt [0]}
+         within an ARD description.  The REGVAL parameter is only accessed 
+         if parameter REGION is given a null ({\tt{!}}) value.  {\tt [0]}
       }
       \sstsubsection{
          STYLE = \htmlref{GROUP}{se:groups} (Read)
@@ -14181,7 +14191,8 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
       relative.   Fixed values include the FWHM or background level.
       Relative constraints define the properties of secondary beam
       features with respect to the primary (first given) feature, and
-      can specify amplitude ratios, and beam separations.
+      can specify amplitude ratios, and beam separations in Cartesian
+      or polar co-ordinates.
 
       Four methods are available for obtaining the initial positions,
       selected using parameter MODE:
@@ -14189,7 +14200,7 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
       \ssthitemlist{
 
          \sstitem
-         from the parameter system (see parameter INIT);
+         from the parameter system (see parameters POS, POS2--POS5);
 
          \sstitem
          using a graphics cursor to indicate the feature in a previously
@@ -14206,15 +14217,16 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
       In the first two modes the application loops, asking for new
       feature co-ordinates until it is told to quit or encounters an
       error or the maximum number of features is reached.  The last is
-      five, unless parameter SEPARATION defines the location of the
+      five, unless parameters POS2---POS5 define the location of the 
       secondary beams and then only the primary beam's position is
       demanded.
 
-      The fit coefficients and their errors are stored in results
-      parameters, which can be used to pass them coefficients on to
-      another application.  Also a lsiting of the fit may be written
-      to a log file geared more towards human readers, including details
-      of the input parameters (see parameter LOGFILE).
+      BEAMFIT both reports and stores in parameters its results. 
+      These are fit coefficients and their errors, and the offsets 
+      and position angles of the beam features with respect to the 
+      primary beam.  Also a listing of the fit results may be written
+      to a log file geared more towards human readers, including 
+      details of the input parameters (see parameter LOGFILE).  
    }
    \sstusage{
       \mbox{beamfit ndf [mode]} 
@@ -14222,7 +14234,7 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
                   incat=? \\
                   \mbox{[beams]} \\
                   coin=? \\
-                  \mbox{[beams]} init1 init2-init5=?
+                  \mbox{[beams]} pos pos2-pos5=?
                   \end{tabular} }
         \right.$ 
         \newline\latexelsehtml{\hspace*{9.45em}}{~~~~~~~~~~~~~~~~~~}
@@ -14244,14 +14256,15 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
       \sstsubsection{
          BEAMS = \_INTEGER (Read)
       }{
-         The number of beam positions to fit.  This will normally be 1,
-         unless a chopped observation is supplied, when there may be two
-         or three beam positions.  This parameter is ignored  for {\tt "File"}
-         and {\tt "Catalogue"} modes, where the number comes from the number
-         of beam positions read from the files; and for "Interface" mode
-         when the beam position is supplied on the command line.
-         In all modes there is a maximum of five positions, which for
-         {\tt "File"} or {\tt "Catalogue"} modes will be the first five. {\tt [1]}
+         The number of beam positions to fit.  This will normally be
+	 1, unless a chopped observation is supplied, when there may
+	 be two or three beam positions.  This parameter is ignored
+	 for {\tt "File"} and {\tt "Catalogue"} modes, where the
+	 number comes from the number of beam positions read from the
+	 files; and for "Interface" mode when the beam position POS is
+	 supplied on the command line without BEAMS.  In all modes
+	 there is a maximum of five positions, which for {\tt "File"}
+	 or {\tt "Catalogue"} modes will be the first five.  {\tt [1]}
       }
       \sstsubsection{
          COIN =  FILENAME (Read)
@@ -14330,9 +14343,22 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          FIXPOS = \_LOGICAL (Read)
       }{
          If {\tt TRUE}, the supplied position of each beam is used and
-         the centre co-ordinates of the beam are not fit.  {\tt FALSE} means
-         that the centre is to be fitted.  It is advisable not to use
-         this option in the inaccurate {\tt "Cursor"} mode.  {\tt [FALSE]}
+         the centre co-ordinates of the beam features are not fit. 
+         {\tt FALSE} causes the initial estimate of the location of each 
+         beam to come from the source selected by parameter MODE, and 
+         all these locations are part of the fitting process (however
+         note the exception when FIXSEP={\tt TRUE}.  It is advisable not to 
+         use this option in the inaccurate {\tt "Cursor"} mode.  {\tt [FALSE]}
+      }
+      \sstsubsection{
+         FIXSEP = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, the separations of secondary beams from the primary
+         beam are fixed, and this takes precedence over parameter
+         FIXPOS.  If {\tt FALSE}, the beam separations are free to be fitted
+         (although it is actually the centres being fit). 
+         It is advisable not to use this option in the inaccurate 
+         {\tt "Cursor"} mode.  {\tt [FALSE]}
       }
       \sstsubsection{
          INCAT = FILENAME (Read)
@@ -14341,25 +14367,6 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          guesses at the beam positions, such as produced by applications
          CURSOR, LISTMAKE, \emph{etc.}  It is only accessed if parameter MODE
          is given the value {\tt "Catalogue"}.
-      }
-      \sstsubsection{
-         INIT1-INIT5 = LITERAL (Read)
-      }{
-         An initial guess at the co-ordinates of the next beam to be
-         fitted, in the current co-ordinate Frame of the NDF (supplying
-         a colon {\tt ":"} will display details of the current co-ordinate
-         Frame).  The primary feature's position is given by INIT1, and
-         any secondary beams by INIT2 through INIT5, the parameter name
-         incrementing by 1 for each subsequent beam feature.  The total
-         number required is equal to the value of parameter BEAMS.
-
-         A position should be supplied as a list of formatted WCS axis
-         values separated by spaces or commas.  INIT1-INIT5 parameters
-         are only accessed if parameter MODE is given the value
-         {\tt "Interface"}.  If the initial co-ordinates are supplied on the
-         command line only one beam will be fit; otherwise the
-         application will ask for further beams that may be terminated
-         by supplying the null value ({\tt{!}}).
       }
       \sstsubsection{
          LOGFILE = FILENAME (Read)
@@ -14410,7 +14417,8 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          \ssthitemlist{
 
             \sstitem
-            {\tt "Interface"} -- positions are obtained using parameter INIT.
+            {\tt "Interface"} -- positions are obtained usingparameters POS,
+            POS2--POS5.
 
             \sstitem
             {\tt "Cursor"} -- positions are obtained using the graphics cursor
@@ -14463,33 +14471,77 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          attributes are ignored (no error is reported).  {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
+         POLAR = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, the co-ordinates supplied through POS2--POS5 are
+         interpreted in polar co-ordinates (offset, position angle) 
+         about the primary beam.  The radial co-ordinate is a distance 
+         measured in units of the latitude axis if the current WCS Frame
+         is a SkyFrame, or the first axis for other Frames.  For a 
+         SkyFrame current WCS Frame, position angle follows the standard
+         convention of North through East.  For other Frames the angle 
+         is measured from the second axis anticlockwise, \emph{e.g.} for a 
+         PIXEL Frame it would be from $Y$ through negative $X$, not the 
+         standard $X$ through $Y$.
+
+         If {\tt FALSE}, the co-ordinates are the regular axis co-ordinates in 
+         the current Frame.  
+
+         POLAR is only accessed when there is more than one beam to fit.
+         {\tt [TRUE]}
+      }
+      \sstsubsection{
+         POS = LITERAL (Read)
+      }{
+         When MODE = {\tt "Interface"} POS specifies the co-ordinates of the 
+         primary beam position.  This is either merely an initial guess
+         for the fit, or if parameter FIXPOS is {\tt TRUE}, it defines a
+         fixed location.  It is specified in the current co-ordinate 
+         Frame of the NDF (supplying a colon {\tt ":"} will display details of
+         the current co-ordinate Frame).  A position should be supplied 
+         either as a list of formatted WCS axis values separated by 
+         spaces or commas.
+
+         If the initial co-ordinates are supplied on the command line 
+         without BEAMS specified only one beam will be fit.
+      }
+      \sstsubsection{
+         POS2-POS5 = LITERAL (Read)
+      }{
+         When MODE = {\tt "Interface"} these parameters specify the co-ordinates
+         of the secondary beam positions.  For each parameter the
+         supplied location may be merely an initial guess for the fit, 
+         or if parameter FIXPOS is {\tt TRUE}, it defines a fixed location,
+         unless parameter FIXSEP is {\tt TRUE}, whereupon it defines a fixed 
+         separation from the primary beam.
+
+         For POLAR = {\tt FALSE} each distance should be given as a single
+         literal string containing a space- or comma-separated list of 
+         formatted axis values measured in the current co-ordinate Frame 
+         of the NDF.  The allowed formats depends on the class of the 
+         current Frame.  Supplying a single colon {\tt ":"} will display 
+         details of the current Frame, together with an indication of 
+         the format required for each axis value, and a new parameter 
+         value is then obtained.
+
+         If parameter POLAR is {\tt TRUE}, POS2--POS5 may be given as an 
+         offset followed by a position angle.  See parameter POLAR for 
+         more details of the sense of the angle and the offset 
+         co-ordinates.
+
+         The parameter name increments by 1 for each subsequent beam 
+         feature.  Thus POS2 applies to the first secondary beam
+         (second position in all), POS3 is for the second secondary 
+         beam, and so on.  As the total number of parameters required is 
+         one fewer than the value of parameter BEAMS, POS2--POS5 are 
+         only accessed when BEAMS exceeds 1.
+      }
+      \sstsubsection{
          QUIET = \_LOGICAL (Read)
       }{
          If {\tt TRUE} then the fit parameters are not displayed on the
          screen.  Output parameters and files are still created.
          {\tt [FALSE]}
-      }
-      \sstsubsection{
-         SEP1-SEP4 = LITERAL (Read)
-      }{
-         If number of beam positions given by BEAMS is more than one,
-         each parameter specifies fixed separations along each axis
-         of a secondary beam position to that of the primary.  Thus you
-         should supply one fewer offset pairs than the number of beam
-         positions via these parameters.  SEP1 applies to the first
-         secondary beam, SEP2 is for the second secondary beam, and so
-         on.
-
-         Each distance should be given as a single literal string
-         containing a space- or comma-separated list of axis values
-         measured in the current co-ordinate Frame of the NDF.  The
-         allowed formats depends on the class of the current Frame.
-         Supplying a single colon {\tt ":"} will display details of the
-         current Frame, together with an indication of the format
-         required for each axis value, and a new parameter value is then
-         obtained.
-
-         A null value means fit to all beam positions.  {\tt [!]}
       }
       \sstsubsection{
          VARIANCE = \_LOGICAL (Read)
@@ -14531,6 +14583,17 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          measured in the current co-ordinate Frame of the NDF.
       }
       \sstsubsection{
+         OFFSET( ) = LITERAL (Write)
+      }{
+         The formatted offset and its error of each secondary beam 
+         feature with respect to the primary beam.  They are measured in
+         the current Frame of the NDF along a latitude axis if that is a
+         SkyFrame, or the first axis otherwise.  The number of values
+         stored is twice the number of beams.  The array alternates an
+         offset, then its corresponding error, appearing in beam order 
+         starting with the first secondary beam.
+      }
+      \sstsubsection{
          ORIENT( 2 ) = \_DOUBLE (Write)
       }{
          The primary beam position's orientation and its error, measured
@@ -14539,7 +14602,19 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          angle is from the $X$-axis through $Y$.
       }
       \sstsubsection{
-         RMS = \_DOUBLE (Write)
+         PA() = \_REAL (Write)
+      }{
+         The position angle and its errors of each secondary beam
+         feature ith respect to the primary beam.  They are measured in
+         the current Frame of the NDF from North through East if that is
+         a SkyFrame, or anticlockwise from the $Y$ axis otherwise.  The
+         number of values stored is twice the number of beams.  The
+         array alternates a position angle, then its corresponding 
+         error, appearing in beam order starting with the first
+         secondary beam.
+      }
+      \sstsubsection{
+         RMS = \_REAL (Write)
       }{
          The primary beam position's root mean-squared deviation from
          the fit.
@@ -14551,9 +14626,8 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
       }{
          This finds the Gaussian coefficients of the primary beam
          feature in the NDF called mars\_3pos, using the supplied
-         co-ordinates (5.0,$-$3.5) for the initial guess for the
          beam's centre.  The co-ordinates are measured in the NDF's
-         current co-ordinate Frame.  In this case they offsets in
+         current co-ordinate Frame.  In this case they are offsets in
          arcseconds.
       }
       \sstexamplesubsection{
@@ -14562,13 +14636,19 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          As above but now the background is fixed to be zero.
       }
       \sstexamplesubsection{
-         beamfit ndf=mars\_3pos mode=interface beams=1 fixfwhm=16.5
+         beamfit mars\_3pos i pos="5.0,-3.5"
       }{
-         As above but now the Gaussian is constrained to have
-         a FWHM of 16.5 arcseconds and be circular.
+         As the first example.  The presence of POS indicates a single
+         is required.
       }
       \sstexamplesubsection{
-         beamfit mars\_3pos in beams=1 fixfwhm=16.5 fitarea=51
+         beamfit ndf=mars\_3pos mode=interface beams=1 pos="5.0,-3.5" fixfwhm=16.5
+      }{
+         As above but now the Gaussian is constrained to have a FWHM of
+         16.5 arcseconds and be circular.
+      }
+      \sstexamplesubsection{
+         beamfit mars\_3pos in beams=1 fixfwhm=16.5 fitarea=51 pos="5.,-3.5"
       }{
          As above but now the fitted data is restricted to areas
          51$\times$51 pixels about the initial guess positions.  All
@@ -14584,13 +14664,26 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          polarity.
       }
       \sstexamplesubsection{
-         beamfit mars\_3pos int 2 "5.0,-3.5" sep1=-60.5,0.6" fixpos
+         beamfit mars\_3pos int 2 "5.0,-3.5" pos2="60.0,90" fixpos
       }{
          This finds the Gaussian coefficients of the primary beam
          feature and a secondary feature in the NDF called mars\_3pos.
          The supplied co-ordinates (5.0,$-$3.5) define the centre, \emph{i.e.}
          they are not fitted.  Also the secondary beam is fixed at
-         ($-$55.5,$-$2.9).
+         60 arcseconds towards the East (position angle 90 degrees).
+      }
+      \sstexamplesubsection{
+         beamfit mars\_3pos int 2 "5.0,-3.5" pos2="60.0,90" fixsep
+      }{
+         As the previous example, except now the separation of the
+         second position is fixed at 60 arcseconds towards the East from
+         the primary beam, instead of being an absolute location.
+      }
+      \sstexamplesubsection{
+         beamfit mars\_3pos int 2 "5.0,-3.5" pos2="-60.5,0.6" polar=f fixpos
+      }{
+         As the last-but-one example, but now location of the secondary
+         beam is fixed at ($-$55.5,$-$2.9).
       }
       \sstexamplesubsection{
          beamfit mode=cu beams=1
@@ -14602,37 +14695,28 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          database.
       }
       \sstexamplesubsection{
-         beamfit mode=cu beams=3 sep1="-60.5,0.6" sep2="59.5,-1.7"
+         beamfit uranus cu 2 mark=ce plotstyle='colour=red' marker=3
       }{
-         This is like the previous example except it finds the Gaussian
-         coefficients of the primary beam feature and two secondary
-         features in an NDF.  The graphics cursor indicates the
-         approximate centre of the primary feature.  The secondary
-         features have fixed offsets from the primary, measured in
-         the current Frame of the NDF displayed.
-      }
-      \sstexamplesubsection{
-         beamfit jupiter cu 2 mark=ce plotstyle='colour=red' marker=3
-      }{
-         This fits to two beam features in the NDF called jupiter
+         This fits to two beam features in the NDF called uranus
          via the graphics cursor on the current graphics device.  The
          beam positions are marked using a red asterisk.
       }
       \sstexamplesubsection{
-         beamfit jupiter file 4 coin=features.dat logfile=jupiter.log
+         beamfit uranus file 4 coin=features.dat logfile=uranus.log
       }{
-         This fits to the beam features in the NDF called jupiter.  The
+         This fits to the beam features in the NDF called uranus.  The
          initial positions are given in the text file {\tt features.dat} in
          the current co-ordinate Frame.  Only the first four positions
-         will be used.  A log of selected input parameter values,
-         and the fitted coefficients and errors is written to the text
-         file {\tt jupiter.log}.
+         will be used.  The last three positions are in polar
+         co-ordinates with respect to the primary beam.  A log of 
+         selected input parameter values, and the fitted coefficients 
+         and errors is written to the text file {\tt uranus.log}.
       }
       \sstexamplesubsection{
-         beamfit jupiter mode=cat incat=jove
+         beamfit uranus mode=cat incat=uranus\_beams polar=f
       }{
          This example reads the initial guess positions from the
-         positions list in file {\tt jove.FIT}.  The number of beam
+         positions list in file {\tt uranus\_beams.FIT}.  The number of beam
          features fit is the number of positions in the catalogue
          subject to a maximum of five.  The input file may, for
          instance, have been created using the application CURSOR.
@@ -15820,13 +15904,13 @@ KAPPA: \htmlref{ADD}{ADD},
          positions are marked using a red symbol.
       }
       \sstexamplesubsection{
-         centroid cluster i '"21.7,5007.1"'
+         centroid cluster i "21.7,5007.1"
       }{
          This finds the centroid of the object in the two-dimensional NDF
          called cluster around the current Frame co-ordinate (21.7,5007.1).
       }
       \sstexamplesubsection{
-         centroid arp244(6,,) i '"40,30"' toler=0.01
+         centroid arp244(6,,) i "40,30" toler=0.01
       }{
          This finds the two-dimensional centroid of the feature near
          pixel (6,40,30) in the three-dimensional NDF called arp244 (assuming
@@ -52340,6 +52424,12 @@ The following applications have been modified:
       \begin{itemize}
          \item This now propagates the {UNITS}{apndf:units}~ component
          if it is the same in both input NDFs.
+      \end{itemize}
+
+   \item [\htmlref{ARDPLOT}{ARDPLOT}] \mbox{}
+      \begin{itemize}
+         \item This can now can draw outlines around AST regions as well
+         as ARD regions specified through a new REGION parameter.
       \end{itemize}
 
    \item [\htmlref{DIV}{DIV}] \mbox{}
