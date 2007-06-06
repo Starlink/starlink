@@ -193,6 +193,7 @@ PKG_LIBS="${PKG_LIBS} ${STAR_LDFLAGS} -latl `ard_link -myerr -mygrf` \
 #  On Alphas we get unwanted flags to control the address space. 
 #  Remove these when building shareable library.
 SHLIB_PKG_LIBS="`echo $PKG_LIBS| sed 's:-Wl,-D -Wl,40800000 -Wl,-T -Wl,30000000::g'`"
+AC_SUBST(SHLIB_PKG_LIBS)
 
 #  Restore full tcl.m4 CFLAGS.
 CFLAGS="$old_CFLAGS"
