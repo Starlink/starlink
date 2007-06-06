@@ -84,7 +84,9 @@
 *     21-MAY-2007 (DSB):
 *        Original version.
 *     5-JUN-2007 (DSB):
-*        Use better defaults if bounds on one or more axes are known.
+*        Use better defaults if bounds on one or more axes are defaulted.
+*     6-JUN-2007 (DSB):
+*        Exclude "centre/width" bounds from the check described above.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -164,13 +166,13 @@
      :                  'of WCS axes (^NWCS) in the NDF.', STATUS )
 
 *  Otherwise, ensure we have upper and lower bounds on all WCS axes.
-*  Set a flag if any WCS limits were defaulted.
+*  Set a flag if any WCS limits were defaulted (but only if there were
+*  supplied as upper/lower bound).
       ELSE
          CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
          DEF = .FALSE.
 
          DO I = 1, NWCS
-            IF( ISDEF1( I ) .OR. ISDEF2( I ) ) DEF = .TRUE.
 
             IF( .NOT. ISBND( I ) ) THEN
                VALUE1( I ) = AST_AXOFFSET( CFRM, I, VALUE1( I ), 
@@ -178,6 +180,9 @@
                VALUE2( I ) = AST_AXOFFSET( CFRM, I, VALUE1( I ), 
      :                                     VALUE2( I ), STATUS )
                ISBND( I ) = .TRUE.
+
+            ELSE IF( ISDEF1( I ) .OR. ISDEF2( I ) ) THEN
+               DEF = .TRUE.
             END IF
 
          END DO
@@ -196,7 +201,7 @@
 *  Only proceed if the Mapping is defined.
          ELSE
 
-*  If any WCS limitied was defaulte=d, it will have bene set to the value
+*  If any WCS limit was defaulted, it will have been set to the value
 *  that encloses the whole NDF. But the non-defaulted limits have
 *  restricted the area of interest and so these defaults may no longer be
 *  appropriate. We now find better defaults for any missing limits that

@@ -123,6 +123,8 @@
 *        Added check that dimension extents are at least 1 pixel.
 *     21-MAY-2007 (DSB):
 *        Add support for sections given in terms of WCS coords.
+*     6-JUN-2007 (DSB):
+*        Allow zero increments on a WCS axis.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -271,8 +273,9 @@
      :                       'a positive number of pixels is required.',
      :                       STATUS )
 
-*  If the extent is in WCS coords, then the value itself must be positive.
-            ELSE IF ( WCSSEC .AND. VALUE2 .LE. 0 ) THEN
+*  If the extent is in WCS coords, then the value itself must be
+*  non-negative.
+            ELSE IF ( WCSSEC .AND. VALUE2 .LT. 0 ) THEN
 
                ATTR = 'Label('
                IAT = 6

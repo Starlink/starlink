@@ -81,9 +81,11 @@
 *        Original version.
 *     6-JUN-2007 (DSB):
 *        Correct conversion of pixel index "centre/width" values to 
-*        upper/lower bounds. Also report an error if thereis no overlap
+*        upper/lower bounds. Also report an error if there is no overlap
 *        between the pixel and WCS boxes. Also, do not clip the supplied
 *        WCS box at the edges of hte NDF if no pixel limits were given.
+*        Also, provide WCS defaults for the centre if the centre is
+*        defaulted in a "centre/width" axis.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -121,21 +123,25 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      DOUBLE PRECISION PLBND( NDF__MXDIM )
+      DOUBLE PRECISION CENPIX( NDF__MXDIM )
+      DOUBLE PRECISION CENWCS( NDF__MXDIM )
       DOUBLE PRECISION DELTA
-      DOUBLE PRECISION WUBND( NDF__MXDIM )
-      DOUBLE PRECISION V1
-      DOUBLE PRECISION WLBND( NDF__MXDIM )
-      DOUBLE PRECISION V2
-      DOUBLE PRECISION DUBNDD( NDF__MXDIM )
       DOUBLE PRECISION DLBNDD( NDF__MXDIM )
+      DOUBLE PRECISION DUBNDD( NDF__MXDIM )
+      DOUBLE PRECISION PLBND( NDF__MXDIM )
       DOUBLE PRECISION PUBND( NDF__MXDIM )
+      DOUBLE PRECISION V1
+      DOUBLE PRECISION V2
+      DOUBLE PRECISION WLBND( NDF__MXDIM )
+      DOUBLE PRECISION WUBND( NDF__MXDIM )
       DOUBLE PRECISION XL( NDF__MXDIM )
       DOUBLE PRECISION XU( NDF__MXDIM )
       INTEGER CFRM
       INTEGER CMPREG
       INTEGER I
+      INTEGER J
       INTEGER MAP
+      INTEGER NPIX
       INTEGER NWCS
       INTEGER PBOX
       INTEGER PFRM
@@ -149,13 +155,45 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get the number of WCS axes in the NDF.
+*  Begin an AST context. 
+      CALL AST_BEGIN( STATUS )
+
+*  Get the number of pixel and WCS axes in the NDF.
+      NPIX = AST_GETI( IWCS, 'Nin', STATUS )
       NWCS = AST_GETI( IWCS, 'Nout', STATUS )
+
+*  Get the current WCS Frame -> PIXEL mapping.
+      MAP = AST_GETMAPPING( IWCS, AST__CURRENT, 2, STATUS )      
 
 *  Initialise a box that encloses the required section of WCS space.
       DO I = 1, NWCS
          WLBND( I ) = AST__BAD    
          WUBND( I ) = AST__BAD    
+      END DO
+
+*  If any axis that has been specified using "centre/width" format has a
+*  WCS width value and a defaulted centre value, then we use a default
+*  equal to the axis value at the centre of the NDF.
+      CENWCS( 1 ) = AST__BAD
+      DO I = 1, NAX
+         IF( .NOT. ISBND( I ) .AND. ISPIX1( I ) .AND.
+     :       .NOT. ISPIX2( I ) .AND. ISDEF1( I ) ) THEN
+
+            IF( CENWCS( 1 ) .EQ. AST__BAD ) THEN
+
+               DO J = 1, NPIX
+                  CENPIX( J ) = 0.5*( UBNDD( I ) + LBNDD( I ) - 1 )
+               END DO
+
+               CALL AST_TRANN( MAP, 1, NAX, 1, CENPIX, .FALSE., NWCS, 
+     :                         1, CENWCS, STATUS )
+
+            END IF
+
+            VALUE1( I ) = CENWCS( I )
+            ISPIX1( I ) = .FALSE.
+            
+         END IF
       END DO
 
 *  Indicate that so far we have not found any WCS bounds.
@@ -248,12 +286,6 @@
 *  specified using WCS coordinates we need to find the overlap, in pixel
 *  indices, between the WCS box and the pixel box.
       IF( .NOT. ALLPIX .AND. STATUS .EQ. SAI__OK ) THEN
-
-*  Begin an AST context. 
-         CALL AST_BEGIN( STATUS )
-
-*  Get the current WCS Frame -> PIXEL mapping.
-         MAP = AST_GETMAPPING( IWCS, AST__CURRENT, 2, STATUS )      
 
 *  Get the current WCS coordinate Frame.
          CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
@@ -368,8 +400,6 @@
 
          END IF
 
-*  End the AST context. 
-         CALL AST_END( STATUS )
       END IF
 
 *  Convert the pixel coordinate box to pixel indices.
@@ -384,6 +414,9 @@
             END IF
          END DO
       END IF
+
+*  End the AST context. 
+      CALL AST_END( STATUS )
 
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_WPLIM', STATUS )

@@ -236,7 +236,7 @@
 *  If the current WCS Frame is the AXIS Frame, we interpret non-integer
 *  values using the AXIS-based code written by RFWS. Otherwise we use new
 *  WCS-based code.
-            USEWCS = ( AST_GETC( IWCS, 'Domain', STATUS ) .EQ. 'AXIS' )
+            USEWCS = ( AST_GETC( IWCS, 'Domain', STATUS ) .NE. 'AXIS' )
 
          END IF       
 
