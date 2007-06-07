@@ -116,6 +116,10 @@
 *        strings to compare them to the default strings. If they are the
 *        same then the default values are used directly, rather than the
 *        unformatted user-supplied strings.
+*     7-JUN-2007 (DSB):
+*        Pass the FrameSet pointer to KPG1_DSFRM, rather than the current
+*        Frame pointer. This is so that KPG1_DSFRM can calculate the
+*        pixel sizes.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -303,7 +307,7 @@
 *  Otherwise, if the supplied string is just a colon, display a description 
 *  of the Current Frame, and the default format.
          ELSE IF( POS( F : L ) .EQ. ':' ) THEN
-            CALL KPG1_DSFRM( CURFRM, 'A position is required in the '//
+            CALL KPG1_DSFRM( IWCS, 'A position is required in the '//
      :                       'following co-ordinate frame:', .TRUE.,
      :                       STATUS )
 
