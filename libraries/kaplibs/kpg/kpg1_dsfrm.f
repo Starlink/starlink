@@ -62,6 +62,8 @@
 *        Modified to display details of WCS SpecFrames.
 *     1-MAY-2007 (DSB):
 *        Display pixel size at first pixel.
+*     7-JUN-2007 (DSB):
+*        Display meaningful text if the pixel scale cannot be found.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -139,6 +141,10 @@
 
 *  Get the Frame dimensionality.
       FRMNAX = AST_GETI( CFRM, 'NAXES', STATUS )
+
+*  Initialise things
+      FPIXSC = '(unavailable)'
+      UPIXSC = ' '
 
 *  Only proceed if we have a FrameSet.
       IF( GOTFS ) THEN
