@@ -176,10 +176,14 @@ LIBS=
 AC_FC_LIBRARY_LDFLAGS
 LIBS=$old_LIBS
 
-#  One platform check. Solaris 8 includes libcx, which isn't required and
-#  causes issues with shareable libraries (when not linked with FC). Strip
+#  Hack for intel darwin g95, includes libgcc_eh.a, but that causes symbols
+#  to clash with the official compiler.
+FCLIBS="`echo $FCLIBS | sed 's:-lgcc_eh::g'`"
+
+#  Solaris 8 includes libcx, which isn't required and causes issues with 
+#  shareable libraries (when not linked with FC). Strip
 #  that out.        
-FCLIBS=`echo $FCLIBS | sed 's:-lcx::g'`
+FCLIBS="`echo $FCLIBS | sed 's:-lcx::g'`"
 
 STAR_LARGEFILE_SUPPORT
 
