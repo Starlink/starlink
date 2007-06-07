@@ -142,9 +142,11 @@
 *  Get the Frame dimensionality.
       FRMNAX = AST_GETI( CFRM, 'NAXES', STATUS )
 
-*  Initialise things
-      FPIXSC = '(unavailable)'
-      UPIXSC = ' '
+*  Initialise things.
+      DO I = 1, FRMNAX
+         FPIXSC( I ) = '(unavailable)'
+         UPIXSC( I ) = ' '
+      END DO
 
 *  Only proceed if we have a FrameSet.
       IF( GOTFS ) THEN
