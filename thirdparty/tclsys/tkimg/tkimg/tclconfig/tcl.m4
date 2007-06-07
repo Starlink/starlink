@@ -1267,7 +1267,7 @@ dnl	    fi
 	    LDFLAGS="-prebind"
 	    LD_SEARCH_FLAGS=""
 	    CFLAGS_OPTIMIZE="-O3"
-	    EXTRA_CFLAGS="-arch ppc -pipe"
+	    EXTRA_CFLAGS="-pipe"
 	    ;;
 	NEXTSTEP-*)
 	    SHLIB_CFLAGS=""
