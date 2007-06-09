@@ -1,5 +1,6 @@
       SUBROUTINE KPS1_BFLOG( LOGF, FD, PIXEL, MAP, CFRM, NAXC, NBEAM, 
-     :                       NCOEF, P, SIGMA, RMS, DPREC, STATUS )
+     :                       NCOEF, P, SIGMA, POLAR, POLSIG, RMS, DPREC,
+     :                       STATUS )
 *+
 *  Name:
 *     KPS1_BFLOG
@@ -12,7 +13,7 @@
 
 *  Invocation:
 *     CALL KPS1_BFLOG( LOGF, FD, PIXEL, MAP, CFRM, NAXC, NCOEF, P, 
-*                      SIGMA, RMS, DPREC, STATUS )
+*                      SIGMA, POLAR, POLSIG, RMS, DPREC, STATUS )
 
 *  Description:
 *     The supplied parameters are reported and logged to the file 
@@ -56,6 +57,17 @@
 *        co-ordinates are measured in the reporting frame when argument
 *        PIXEL is .FALSE. (the normal value), or in the PIXEL Frame if
 *        PIXEL is .TRUE.
+*     POLAR( 2, NBEAM ) =  DOUBLE PRECISION (Given)
+*         The polar co-ordinates of the beam features with respect to
+*         the primary beam measured in the current co-ordinate Frame.
+*         The orientation is a position angle in degrees, measured from
+*         North through East if the current Frame is a Skyframe, or 
+*         anticlockwise from the Y axis otherwise.  The POLAR(*,1)
+*         values of the primary beam are ignored.
+*     POLSIG( 2, NBEAM ) =  DOUBLE PRECISION (Given)
+*         The standard-deviation errors associated with the polar 
+*          co-ordinates supplied in argument POLAR.  The POLSIG(*,1)
+*         values of the primary beam are ignored.
 *     RMS = DOUBLE PRECISION (Given)
 *        The RMS residual in pixels.
 *     DPREC = CHARACTER ( * ) (Given)
@@ -103,6 +115,9 @@
 *     2007 May 25 (MJC):
 *        Widen the output buffer and message wrap for long orientation
 *        lines.
+*     2007 May 30 (MJC):
+*        Add POLAR and POLSIG arguments to report polar co-ordinates of
+*        secondary-beam features.
 *     {enter_further_changes_here}
 
 *-
@@ -128,14 +143,13 @@
       INTEGER NCOEF
       DOUBLE PRECISION P( NCOEF, NBEAM )
       DOUBLE PRECISION SIGMA( NCOEF, NBEAM )
+      DOUBLE PRECISION POLAR( 2, NBEAM )
+      DOUBLE PRECISION POLSIG( 2, NBEAM )
       DOUBLE PRECISION RMS
       CHARACTER*(*) DPREC
 
 *  Status:
       INTEGER STATUS             ! Global status
-
-*  External References:
-      DOUBLE PRECISION SLA_DBEAR ! Bearing of one position from another
 
 *  Local Constants:
       DOUBLE PRECISION PI
@@ -151,7 +165,6 @@
       INTEGER FRM2               ! Copied reporting Frame
       DOUBLE PRECISION FWHM      ! Full-width half maximum
       DOUBLE PRECISION FWHME     ! FWHM error
-      INTEGER I                  ! Loop count
       INTEGER IB                 ! Beam loop count
       LOGICAL ISSKY              ! Is the current Frame a SkyFrame?
       INTEGER LAT                ! Index to latitude axis in SkyFrame
@@ -163,7 +176,6 @@
       INTEGER REPAX              ! Axis used for reporting distances
       DOUBLE PRECISION S2FWHM    ! Standard deviation to FWHM
       DOUBLE PRECISION THETA     ! Orientation in degrees
-      CHARACTER*30 UNITS( 2 )    ! Units along widths
 
 *.
 
@@ -285,6 +297,103 @@
          END IF
          IF ( LOGF ) CALL FIO_WRITE( FD, BUF( : LBUF ), STATUS )
          CALL MSG_OUTIF( MSG__NORM, ' ', BUF( : LBUF ), STATUS )
+
+*  Polar radius of secondary beam positions
+*  ----------------------------------------
+
+*  Note store the two separately as they have to be loaded as separate
+*  lines because of the different units.
+         IF ( IB .GT. 1 ) THEN
+
+*  Display the pixel co-ordinates...
+            IF ( PIXEL ) THEN
+               CALL MSG_SETR( 'RAD', SNGL( POLAR( 1, IB ) ) )
+               CALL MSG_SETC( 'UNIT', 'pixels' )
+
+            ELSE
+
+*  Display the current Frame's co-ordinates of the beam separation.
+               CALL MSG_SETC( 'RAD', AST_FORMAT( FRM2, 1, 
+     :                                           POLAR( 1, IB ),
+     :                                           STATUS ) )
+
+*  Form the Unit attribute name for this axis.
+               IF ( .NOT. ISSKY ) THEN
+                  ATTR = 'UNIT('
+                  LATTR = 5
+                  CALL CHR_PUTI( REPAX, ATTR, LATTR )
+                  CALL CHR_APPND( ')', ATTR, LATTR )
+
+*  Get the Unit value.
+                  CALL MSG_SETC( 'UNIT', AST_GETC( CFRM, 
+     :                                             ATTR( : LATTR ), 
+     :                                             STATUS ) )
+
+*  It would be messy inserting both of the expected sexagesimal formats.
+               ELSE
+                  CALL MSG_SETC( 'UNIT', ' ' )
+               END IF
+            END IF
+
+            IF ( POLSIG( 1, IB ) .EQ. VAL__BADD ) THEN
+               CALL MSG_LOAD( 'KPS1_BFLOG_MSG8', '    Offset      '/
+     :                     /'    : ^RAD ^UNIT', BUF, LBUF, STATUS )
+
+            ELSE
+               IF ( PIXEL ) THEN
+                  CALL MSG_SETR( 'RADE', SNGL( POLSIG( 1, IB ) ) )
+               ELSE
+
+*  Polar radius errors
+*  -------------------
+                  CALL MSG_SETC( 'RADE',
+     :                           AST_FORMAT( FRM2, 1, POLSIG( 1, IB ), 
+     :                                       STATUS ) )
+               END IF
+               CALL MSG_LOAD( 'KPS1_BFLOG_MSG8E', '    Offset      '/
+     :                        /'    : ^RAD +/- ^RADE ^UNIT',
+     :                        BUF, LBUF, STATUS )
+            END IF
+            IF ( LOGF ) CALL FIO_WRITE( FD, BUF( : LBUF ), STATUS )
+            CALL MSG_OUTIF( MSG__NORM, ' ', BUF( : LBUF ), STATUS )
+
+*  Position angle of secondary beam positions
+*  ------------------------------------------
+
+* Format to left-justify the angle to two decimal places.
+            WRITE ( FORMAT, '(''F'',I1,''.2'')' ) 
+     :        MAX( 0, INT( LOG10( POLAR( 2, IB ) + VAL__EPSD ) ) ) + 4
+            CALL MSG_FMTR( 'PA', FORMAT, SNGL( POLAR( 2, IB ) ) )
+
+            IF ( PIXEL .OR. .NOT. ISSKY ) THEN
+               CALL MSG_SETC( 'SENSE', 
+     :                        '(measured anticlockwise from Y)' )
+            ELSE
+               CALL MSG_SETC( 'SENSE',
+     :                        '(measured from North through East)' )
+            END IF
+
+*  Position-angle errors
+*  ---------------------
+            IF ( POLSIG( 2, IB ) .EQ. VAL__BADD ) THEN
+               CALL MSG_LOAD( 'KPS1_BFLOG_MSG9', '    Position Angle '/
+     :                        /' : ^PA degrees ^SENSE', BUF, LBUF,
+     :                        STATUS )
+
+            ELSE
+
+* Format to left-justify the angle to two decimal places.
+               WRITE ( FORMAT, '(''F'',I1,''.2'')' ) 
+     :           MAX( 0, INT( LOG10( POLSIG( 2, IB ) + VAL__EPSD ) ) ) +
+     :           4
+               CALL MSG_FMTR( 'PAE', FORMAT, SNGL( POLSIG( 2, IB ) ) )
+               CALL MSG_LOAD( 'KPS1_BFLOG_MSG9E', '    Position Angle '/
+     :                        /' : ^PA +/- ^PAE degrees ^SENSE',
+     :                        BUF, LBUF, STATUS )
+            END IF
+            IF ( LOGF ) CALL FIO_WRITE( FD, BUF( : LBUF ), STATUS )
+            CALL MSG_OUTIF( MSG__NORM, ' ', BUF( : LBUF ), STATUS )
+         END IF
 
 *  FWHMs
 *  =====
