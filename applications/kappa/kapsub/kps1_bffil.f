@@ -1,7 +1,7 @@
       SUBROUTINE KPS1_BFFIL( INDF, MAP1, MAP2, MAP3, RFRM, VAR, NPOS, 
      :                       NAXR, NAXIN, INPOS, GOTID, ID, LOGF, FDL, 
-     :                       FIXCON, AMPRAT, OFFSET, NPAR, FPAR, SLBND,
-     :                       SUBND, FAREA, FITREG, STATUS ) 
+     :                       FIXCON, AMPRAT, NPAR, FPAR, SLBND, SUBND,
+     :                       FAREA, FITREG, STATUS ) 
 *+
 *  Name:
 *     KPS1_BFFIL
@@ -15,8 +15,8 @@
 *  Invocation:
 *     CALL KPS1_BFFIL( INDF, MAP1, MAP2, MAP3, RFRM, VAR, NPOS, NAXR,
 *                      NAXIN, INPOS, GOTID, ID, LOGF, FDL, FIXCON,
-*                      AMPRAT, OFFSET, NPAR, FPAR, SLBND, SUBND,
-*                      FAREA, FITREG, STATUS )
+*                      AMPRAT, NPAR, FPAR, SLBND, SUBND, FAREA, FITREG,
+*                      STATUS )
 
 *  Description:
 *     This routine finds the Gaussian fits to a batch of image
@@ -58,9 +58,13 @@
 *        The number of axes in the Frame in which the initial guess
 *        positions are supplied.
 *     INPOS( NPOS, NAXIN ) = DOUBLE PRECISION (Given)
-*        The initial guesses at the beam positions.  These should be
-*        in the co-ordinate system defined by MAP1 and MAP3.  Only the
-*        first beam position is accessed when FIXCON(6) is .TRUE.
+*        The beam positions that are one of four options: initial 
+*        guesses to be fit, fixed locations, or in the case of secondary
+*        beam positions separations in absolute or relative polar 
+*        co-ordinates.  The meaning depends on the settings of the 
+*        fourth and sixth elements of argument FIXCON, and argument
+*        POLPAR.   All should be in the co-ordinate system defined by
+*        MAP1 and MAP3 (albeit transformed for polar co-ordinates). 
 *     GOTID = LOGICAL (Given)
 *        If TRUE then the position identifiers supplied in ID are used.
 *        Otherwise identifiers equal to the position index are used.
@@ -85,10 +89,6 @@
 *     AMPRAT( BF__MXPOS - 1 ) = REAL (Given)
 *        The ratios of the secondary beam `sources' to the first beam. 
 *        These ratios contrain the fitting provided FIXCON(5) is .TRUE.
-*     OFFSET( BF__MXPOS - 1, BF__NDIM ) = DOUBLE PRECISION (Given)
-*        The separations of the secondary beam 'sources' to the first
-*        beam.  These offsets contrain the fitting provided FIXCON(6) is 
-*        .TRUE.
 *     NPAR = INTEGER (Given)
 *        The maximum number of fit parameters.
 *     FPAR( NPAR ) = DOUBLE PRECISION (Given)
@@ -155,6 +155,15 @@
 *        PIXPOS arguments.
 *     2007 May 29 (MJC):
 *        Make arguments the same type in MAX and MIN function calls.
+*     2007 May 31 (MJC):
+*        Use new APIs for calculating and reporting polar co-ordinates
+*        of secondary features.
+*     2007 June 4 (MJC):
+*        Second redesign: no longer are offsets supplied from BEAMFIT 
+*        itself through the OFFSET argument.  Thus locations read from
+*        a file or catalogue can be an initial guess or a fixed value,
+*        or in the case of secondary beams be separations from the 
+*        primary.  Removed unused variables.
 *     {enter_further_changes_here}
 
 *-
@@ -200,7 +209,6 @@
       INTEGER FDL
       LOGICAL FIXCON( BF__NCON )
       REAL AMPRAT( BF__MXPOS - 1 )
-      DOUBLE PRECISION OFFSET( BF__MXPOS - 1, BF__NDIM )
       INTEGER NPAR
       DOUBLE PRECISION FPAR( NPAR )
       INTEGER SLBND( 2 )
@@ -211,9 +219,6 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  External References:
-      INTEGER CHR_LEN            ! Used length of a string
-
 *  Local Constants:
       INTEGER NUMCO              ! Number of graphics co-ordinates
       PARAMETER ( NUMCO = BF__MXPOS * NDF__MXDIM )
@@ -221,27 +226,22 @@
 *  Local Variables:
       CHARACTER*( NDF__SZFTP ) DTYPE ! Numeric type for results
       INTEGER EL                 ! Number of mapped elements
-      DOUBLE PRECISION ERROR( BF__MXPOS, NDF__MXDIM ) ! Error on each
-                                 ! axis
       INTEGER FLBND( BF__NDIM )  ! Fit region lower bounds
       DOUBLE PRECISION FPOS( 2, BF__NDIM ) ! Position in current Frame
       INTEGER FUBND( BF__NDIM )  ! Fit region upper bounds
       INTEGER HBOX( BF__NDIM )   ! Half-sizes of the region
       INTEGER I                  ! Position index
-      INTEGER IDENT              ! Position identifier
-      INTEGER IPW1               ! Pointer to work array
       CHARACTER*( NDF__SZTYP ) ITYPE ! Data type for processing(dummy)
       INTEGER J                  ! Axis index
-      INTEGER K                  ! Index
       INTEGER NDFS               ! Identifier for NDF section
       LOGICAL OK                 ! Is this position OK?
       DOUBLE PRECISION POFSET( BF__MXPOS, BF__NDIM ) ! Pixel offsets
+      DOUBLE PRECISION POLAR( 2, BF__MXPOS ) ! Polar co-ordinates
+      DOUBLE PRECISION POLSIG( 2, BF__MXPOS ) ! Polar co-ordinate errors
       DOUBLE PRECISION POS( 2, BF__NDIM ) ! Pixel position
       DOUBLE PRECISION PIXPOS( BF__MXPOS, BF__NDIM ) ! Pixel position
-      DOUBLE PRECISION REPPOS( BF__MXPOS, NDF__MXDIM ) ! Beam position,
-                                 ! reporting Frame
       DOUBLE PRECISION RMS       ! Root mean squared deviation to fit
-      DOUBLE PRECISION RP( BF__NCOEF, BF__MXPOS ) ! Fit coeeficients
+      DOUBLE PRECISION RP( BF__NCOEF, BF__MXPOS ) ! Fit coefficients
                                  ! reporting Frame
       DOUBLE PRECISION RSIGMA( BF__NCOEF, BF__MXPOS ) ! Fit errors,
                                  ! reporting Frame
@@ -273,18 +273,16 @@
      :                 'to map pixel positions into the Current '//
      :                 'co-ordinate Frame is not defined.', STATUS )
 
-      ELSE IF ( ( FIXCON( 3 ) .OR. FIXCON( 6 ) ) .AND.
+      ELSE IF ( ( FIXCON( 3 ) ) .AND.
      :          .NOT. AST_GETL( MAP2, 'TRANINVERSE', STATUS ) ) THEN
          CALL MSG_OUT( 'KPS1_BFFIL_MSG3','The Mapping required to '//
      :                 'convert distances expressed in the Current '//
      :                 'co-ordinate Frame into pixels co-ordinates '//
      :                 'is not defined.', STATUS )
          CALL MSG_OUT( 'KPS1_BFFIL_MSG4','Fitting will include '//
-     :                 'width and separations of the beam features.',
-     :                 STATUS )
+     :                 'widths of the beam features.', STATUS )
 
          FIXCON( 3 ) = .FALSE.
-         FIXCON( 6 ) = .FALSE.
       END IF
 
 *  See if we are running in verbose mode.
@@ -316,19 +314,6 @@
 
 *  Fixed separations.
 *  ==================
-
-*  Apply offsets if there are fixed separations.
-      IF ( FIXCON( 6 ) .AND. NPOS .GT. 1 ) THEN
-         DO I = 2, NPOS
-            DO J = 1, BF__NDIM
-               INPOS( I, J ) = INPOS( I, J ) + OFFSET( I - 1 , J )
-            END DO
-         END DO
-      END IF
-
-*  Transform the supplied positions to the PIXEL Frame of the NDF.
-      CALL AST_TRANN( MAP1, NPOS, NAXIN, NPOS, INPOS, .TRUE., BF__NDIM,
-     :                BF__MXPOS, PIXPOS, STATUS )
 
 *  Derive pixel offsets.
       IF ( FIXCON( 6 ) .AND. NPOS .GT. 1 ) THEN
@@ -470,16 +455,16 @@
 *  Convert the pixel coefficients to the reporting Frame, also
 *  changing the widths from standard deviations to FWHMs.
             CALL KPS1_BFCRF( MAP2, RFRM, NAXR, NPOS, BF__NCOEF, FPAR, 
-     :                       SIGMA, RP, RSIGMA, STATUS )
+     :                       SIGMA, RP, RSIGMA, POLAR, POLSIG, STATUS )
 
 *  Log the results and residuals if required.
             CALL KPS1_BFLOG( LOGF, FDL, .FALSE., MAP2, RFRM, NAXR,
-     :                       NPOS, BF__NCOEF, RP, RSIGMA, RMS, 
-     :                       DTYPE, STATUS )
+     :                       NPOS, BF__NCOEF, RP, RSIGMA, POLAR, 
+     :                       POLSIG, RMS, DTYPE, STATUS )
 
 *  Write primary beam's fit to output parameters.
             CALL KPS1_BFOP( RFRM, MAP2, NAXR, NPAR, RP, RSIGMA,
-     :                      RMS, STATUS )
+     :                      NPOS, POLAR, POLSIG, RMS, STATUS )
 
          ELSE
             CALL MSG_OUTIF( MSG__NORM, 'KPS1_BF_MSG5',
@@ -497,3 +482,4 @@
  999  CONTINUE
 
       END
+      
