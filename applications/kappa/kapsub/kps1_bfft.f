@@ -94,6 +94,9 @@
 *        Pass constraint flags as an array to shorten the API.
 *     2007 May 14 (MJC):
 *        Support fixed separations.
+*     2007 June 6 (MJC):
+*        Back to using declared arrays for the unidimensional arrays
+*        passed to PDA_LMERR.
 *     {enter_further_changes_here}
 
 *-
@@ -165,11 +168,13 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      INTEGER CHR_LEN            ! Returns used length of a string
       EXTERNAL KPS1_BFFN         ! Subroutine for evaluating the
                                  ! residuals
 
 *  Local Constants:
+      INTEGER MXCOEF             ! Maximum number of coefficients
+      PARAMETER ( MXCOEF = BF__NCOEF * BF__MXPOS )
+
       INTEGER WIDTH              ! Width of region in which to estimate
       PARAMETER ( WIDTH = 5 )    ! amplitude
 
@@ -178,7 +183,7 @@
       DOUBLE PRECISION CORREL( BF__NCOEF, BF__NCOEF ) ! Two-param correlations
       DOUBLE PRECISION COVAR( BF__NCOEF, BF__NCOEF ) ! Covariance
       LOGICAL FIXORI             ! Fix the orientation?
-      LOGICAL FLAG( BF__NCOEF )  ! Problem parameter during inversion?
+      LOGICAL FLAG( MXCOEF )     ! Problem parameter during inversion?
       DOUBLE PRECISION FS        ! Sum of squared residuals
       INTEGER GO                 ! Offset to current Gaussian's coeffs
       INTEGER I                  ! Loop count
@@ -189,16 +194,12 @@
       INTEGER IPCOVA             ! Pointer to covariance array
       INTEGER IPCURV             ! Pointer to curvature array
       INTEGER IPDRES             ! Pointer to displaced-fit residuals
-      INTEGER IPFLAG             ! Pointer to PDA flags
-      INTEGER IPIVOT             ! Pointer to pivot array
       INTEGER IPJAC              ! Pointer to Jacobian
       INTEGER IPREG              ! Pointer to small-region work array 
-      INTEGER IPSD               ! Pointer to standard deviations
       INTEGER IPWEF              ! Pointer to a work array for the
                                  ! functions evaluated at XC
       INTEGER IPWNA1             ! Pointer to a PDA work array
       INTEGER IPWNA2             ! Pointer to a PDA work array
-      INTEGER IPWORK             ! Pointer to work array
       INTEGER J                  ! Array index
       INTEGER LW                 ! Size of a PDA work array
       INTEGER MAXPOS             ! Index of maximum value
@@ -214,18 +215,17 @@
       INTEGER NPOS               ! Number of data values
       REAL PERCNT( 2 )           ! The percentiles
       DOUBLE PRECISION PERVAL( 2 ) ! The values at the percentiles
-      INTEGER PIVOT( BF__NCOEF ) ! Pivot indices
+      INTEGER PIVOT( MXCOEF )    ! Pivot indices
       INTEGER RLBND( BF__NDIM )  ! Lower bounds of small region
       INTEGER RDIMS( BF__NDIM )  ! Dimensions of small region about beam
       INTEGER REL                ! Number of elements in small region
       DOUBLE PRECISION RMEAN     ! Mean value ibn the small region
       INTEGER RUBND( BF__NDIM )  ! Upper bounds of small region
       INTEGER START              ! Index of 1st char in projection name
-      DOUBLE PRECISION SD( BF__NCOEF * BF__MXPOS ) ! Std. deviations of
-                                 ! fitted parameters
+      DOUBLE PRECISION SD( MXCOEF ) ! Std. deviations of fitted params
       DOUBLE PRECISION SUM       ! Sum of values in the small region
-      DOUBLE PRECISION XC( BF__NCOEF * BF__MXPOS ) ! Free parameters
-      DOUBLE PRECISION WORK( BF__NCOEF ) ! Work array
+      DOUBLE PRECISION XC( MXCOEF ) ! Free parameters
+      DOUBLE PRECISION WORK( MXCOEF ) ! Work array
 
 *.
 
@@ -465,12 +465,8 @@
       CALL PSX_CALLOC( NPOS, '_DOUBLE', IPDRES, STATUS )
       CALL PSX_CALLOC( NPOS * N, '_DOUBLE', IPJAC, STATUS )
       CALL PSX_CALLOC( N * N, '_DOUBLE', IPCURV, STATUS )
-      CALL PSX_CALLOC( N, '_INTEGER', IPIVOT, STATUS )
-      CALL PSX_CALLOC( N, '_DOUBLE', IPWORK, STATUS )
-      CALL PSX_CALLOC( N, '_DOUBLE', IPSD, STATUS )
       CALL PSX_CALLOC( N * N, '_DOUBLE', IPCORR, STATUS )
       CALL PSX_CALLOC( N * N, '_DOUBLE', IPCOVA, STATUS )
-      CALL PSX_CALLOC( N, '_LOGICAL', IPFLAG, STATUS )
 
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -484,16 +480,9 @@
      :                %VAL( CNF_PVAL( IPWEF ) ), 5, 
      :                %VAL( CNF_PVAL( IPDRES ) ),
      :                %VAL( CNF_PVAL( IPJAC ) ),
-     :                %VAL( CNF_PVAL( IPCURV ) ), 
-     :                %VAL( CNF_PVAL( IPIVOT ) ),
-     :                %VAL( CNF_PVAL( IPWORK ) ),
-     :                %VAL( CNF_PVAL( IPSD ) ),
+     :                %VAL( CNF_PVAL( IPCURV ) ), PIVOT, WORK, SD,
      :                %VAL( CNF_PVAL( IPCORR ) ),
-     :                %VAL( CNF_PVAL( IPCOVA ) ), 
-     :                %VAL( CNF_PVAL( IPFLAG ) ), STATUS )
-
-      CALL VEC_DTOD( .FALSE., N, %VAL( CNF_PVAL( IPSD ) ), SD, IERR, 
-     :               NERR, STATUS )
+     :                %VAL( CNF_PVAL( IPCOVA ) ), FLAG, STATUS )
 
 *  Place the fitted errors into the full array.  Non-fitted values
 *  will have bad errors.
@@ -541,6 +530,8 @@
       CALL PSX_FREE( IPDRES, STATUS )
       CALL PSX_FREE( IPJAC, STATUS )
       CALL PSX_FREE( IPCURV, STATUS )
+      CALL PSX_FREE( IPCORR, STATUS )
+      CALL PSX_FREE( IPCOVA, STATUS )
       CALL PSX_FREE( IPWEF, STATUS )
 
       END
