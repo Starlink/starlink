@@ -1,4 +1,5 @@
-      SUBROUTINE KPS1_BFOP( RFRM, MAP, NAXR, NP, P, SIGMA, RMS, STATUS )
+      SUBROUTINE KPS1_BFOP( RFRM, MAP, NAXR, NP, P, SIGMA, NBEAM,
+     :                      POLAR, POLSIG, RMS, STATUS )
 *+
 *  Name:
 *     KPS1_BFOP
@@ -10,13 +11,14 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_BFOP( RFRM, MAP, NAXR, NP, P, SIGMA, RMS, STATUS )
+*     CALL KPS1_BFOP( RFRM, MAP, NAXR, NP, P, SIGMA, NBEAM, POLAR,
+*                     POLSIG, RMS, STATUS )
 
 *  Description:
 *     The supplied Gaussian parameters from BEAMFIT are written to the
 *     environment.  Each output parameter is a two-element vector
 *     containing the fit coefficient in the first element, and its error
-*     in the second.
+*     in the second for the primary beam. 
 *
 *     The parameters written are as follows.
 *
@@ -32,7 +34,20 @@
 *        AMP      _DOUBLE   The amplitude of the Gaussian beam
 *        BACK     _DOUBLE   The background level
 *        RMS      _DOUBLE   The RMS of the fit
-
+*
+*    Two further parameters are written if the number of beam
+*    positions is more than one.  Each is an array of length twice the
+*    number of secondary beams, storing alternatinng value then error 
+*    for each secondary beam position, starting with the first and 
+*    progressing in order.
+*
+*        OFFSET   LITERAL   The radial offsets of the secondary beam
+*                           positions from the primary beam, each 
+*                           formatted as a single single string in the
+*                           reference co-ordinate Frame
+*        PA      _REAL      The position angles of the secondary beam
+*                           positions with respect to the primary beam.
+*
 *  Arguments:
 *     RFRM = INTEGER (Given)
 *        A pointer to the reporting Frame (i.e. the Frame in which
@@ -53,6 +68,19 @@
 *        The errors in the fit parameters.   Spatial co-ordinates should
 *        be measured in the reporting Frame.  Only the first BF_MXCOEF 
 *        elements are used.
+*     NBEAM = INTEGER (Given)
+*        The number of beam positions.
+*     POLAR( 2, NBEAM ) =  DOUBLE PRECISION (Given)
+*         The polar co-ordinates of the beam features with respect to
+*         the primary beam measured in the current co-ordinate Frame.
+*         The orientation is a position angle in degrees, measured from
+*         North through East if the current Frame is a Skyframe, or 
+*         anticlockwise from the Y axis otherwise.  The POLAR(*,1)
+*         values of the primary beam are ignored.
+*     POLSIG( 2, NBEAM ) =  DOUBLE PRECISION (Given)
+*         The standard-deviation errors associated with the polar 
+*          co-ordinates supplied in argument POLAR.  The POLSIG(*,1)
+*         values of the primary beam are ignored.
 *     RMS = REAL (Given)
 *        The RMS residual in pixels.
 *     STATUS = INTEGER (Given and Returned)
@@ -87,6 +115,9 @@
 *        Original version.
 *     2007 May 21 (MJC):
 *        Remove the conversions from PIXEL to the reporting Frame.
+*     2007 May 30 (MJC):
+*        Add NBEAM, POLAR, and POLSIG arguments to report polar
+*        co-ordinates of secondary-beam features.
 *     {enter_further_changes_here}
 
 *-
@@ -100,6 +131,7 @@
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
       INCLUDE 'NDF_PAR'          ! NDF constants 
       INCLUDE 'AST_PAR'          ! AST constants and functions
+      INCLUDE 'BF_PAR'           ! BEAMFIT constants
 
 *  Arguments Given:
       INTEGER RFRM
@@ -108,12 +140,18 @@
       INTEGER NP
       DOUBLE PRECISION P( NP )
       DOUBLE PRECISION SIGMA( NP )
+      INTEGER NBEAM
+      DOUBLE PRECISION POLAR( 2, NBEAM )
+      DOUBLE PRECISION POLSIG( 2, NBEAM )
       REAL RMS
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
+      INTEGER BUFSIZ             ! Buffers' dimension
+      PARAMETER ( BUFSIZ = 2 * ( BF__MXPOS - 1 ) )
+
       DOUBLE PRECISION PI
       PARAMETER ( PI = 3.1415926535898 )
 
@@ -123,13 +161,15 @@
 *  Local Variables:
       CHARACTER*50 AXVAL         ! A formatted axis value
       INTEGER IAT                ! No. of characters currently in buffer
+      INTEGER IB                 ! Beam loop counter
       INTEGER J                  ! Loop count
-      INTEGER LBUF               ! Used length of BUF
-      CHARACTER*128 LINE( 2 )    ! Buffer for output text
+      INTEGER K                  ! Loop count
+      CHARACTER*128 LINE( BUFSIZ ) ! Buffer for output text
       DOUBLE PRECISION S2FWHM    ! Sigma-to-FWHM conversion
-      DOUBLE PRECISION THETA     ! Orientation in degrees
-      DOUBLE PRECISION WORK( 2 ) ! Work array for storing values and
-                                 ! errors
+      DOUBLE PRECISION WORK( 2 ) ! Work array for storing values
+                                 ! and errors
+      REAL WORKER( BUFSIZ )      ! Work array for storing values
+                                 ! and errors
 
 *.
 
@@ -206,6 +246,41 @@
 
 *  RMS
 *  ===
-      CALL PAR_PUT0D( 'RMS', RMS, STATUS )
+      CALL PAR_PUT0R( 'RMS', RMS, STATUS )
+
+      
+*  OFFSET and PA
+*  =============
+      IF ( NBEAM .GT. 1 ) THEN
+         K = 0
+         DO IB = 2, NBEAM
+
+*  Now write the secondary-beam polar position and error out to the output
+*  parameters.  The complete set of values (separated by spaces) is 
+*  written to OFFSET.
+            K = K + 1
+            LINE( K ) = AST_FORMAT( RFRM, 1, POLAR( 1, IB ), STATUS )
+
+            K = K + 1
+            IF ( POLSIG( 1, IB ) .NE. VAL__BADD ) THEN
+               LINE( K ) = AST_FORMAT( RFRM, 1, POLSIG( 1, IB ), 
+     :                                 STATUS )
+            ELSE
+               LINE( K ) = 'bad'
+            END IF
+
+*  PA
+*  ==
+            WORKER( K - 1 ) = SNGL( POLAR( 2, IB ) )
+            IF ( POLSIG( 1, IB ) .NE. VAL__BADD ) THEN
+               WORKER( K ) = SNGL( POLSIG( 2, IB ) )
+            ELSE
+               WORKER( K ) = VAL__BADR
+            END IF
+         END DO
+
+         CALL PAR_PUT1C( 'OFFSET', K, LINE, STATUS )
+         CALL PAR_PUT1R( 'PA', K, WORKER, STATUS )
+      END IF
 
       END
