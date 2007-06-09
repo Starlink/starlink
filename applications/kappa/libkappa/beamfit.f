@@ -32,12 +32,13 @@
 *     relative.   Fixed values include the FWHM or background level.
 *     Relative constraints define the properties of secondary beam
 *     features with respect to the primary (first given) feature, and
-*     can specify amplitude ratios, and beam separations.  
+*     can specify amplitude ratios, and beam separations in Cartesian
+*     or polar co-ordinates.
 *
 *     Four methods are available for obtaining the initial positions, 
 *     selected using parameter MODE:
 *
-*     - from the parameter system (see parameter INIT);
+*     - from the parameter system (see parameters POS, POS2--POS5);
 *
 *     - using a graphics cursor to indicate the feature in a previously
 *     displayed data array (see parameter DEVICE);
@@ -50,21 +51,22 @@
 *     In the first two modes the application loops, asking for new
 *     feature co-ordinates until it is told to quit or encounters an
 *     error or the maximum number of features is reached.  The last is
-*     five, unless parameters SEP1-SEP4 defines the location of the 
+*     five, unless parameters POS2---POS5 define the location of the 
 *     secondary beams and then only the primary beam's position is 
 *     demanded.
 *
-*     The fit coefficients and their errors are stored in results
-*     parameters, which can be used to pass them coefficients on to 
-*     another application.  Also a lsiting of the fit may be written
-*     to a log file geared more towards human readers, including details
-*     of the input parameters (see parameter LOGFILE).  
+*     BEAMFIT both reports and stores in parameters its results. 
+*     These are fit coefficients and their errors, and the offsets 
+*     and position angles of the beam features with respect to the 
+*     primary beam.  Also a listing of the fit results may be written
+*     to a log file geared more towards human readers, including 
+*     details of the input parameters (see parameter LOGFILE).  
 *
 *  Usage:
 *     beamfit ndf [mode] { incat=?
 *                        { [beams]
 *                        { coin=?
-*                        { [beams] init1 init2-init5=?
+*                        { [beams] pos pos2-pos5=?
 *                        mode
 
 *  ADAM Parameters:
@@ -86,13 +88,14 @@
 *        or three beam positions.  This parameter is ignored  for "File" 
 *        and "Catalogue" modes, where the number comes from the number 
 *        of beam positions read from the files; and for "Interface" mode
-*        when the beam position is supplied on the command line.
-*        In all modes there is a maximum of five positions, which for
-*        "File" or "Catalogue" modes will be the first five.  [1]
+*        when the beam position POS is supplied on the command line 
+*        without BEAMS.  In all modes there is a maximum of five 
+*        positions, which for "File" or "Catalogue" modes will be the 
+*        first five.  [1]
 *     CENTRE( 2 ) = LITERAL (Write)
 *        The formatted co-ordinates and their errors of the primary
 *        beam in the current co-ordinate Frame of the NDF.  
-*     COIN =  FILENAME (Read)
+*     COIN = FILENAME (Read)
 *        Name of a text file containing the initial guesses at the 
 *        co-ordinates of beams to be fitted.  It is only accessed if 
 *        parameter MODE is given the value "File".  Each line should
@@ -144,30 +147,24 @@
 *        fit.  [!]
 *     FIXPOS = _LOGICAL (Read)
 *        If TRUE, the supplied position of each beam is used and
-*        the centre co-ordinates of the beam are not fit.  FALSE means
-*        that the centre is to be fitted.  It is advisable not to use 
-*        this option in the inaccurate "Cursor" mode.  [FALSE]
+*        the centre co-ordinates of the beam features are not fit. 
+*        FALSE causes the initial estimate of the location of each 
+*        beam to come from the source selected by parameter MODE, and 
+*        all these locations are part of the fitting process (however
+*        note the exception when FIXSEP = TRUE.  It is advisable not to
+*        use this option in the inaccurate "Cursor" mode.  [FALSE]
+*     FIXSEP = _LOGICAL (Read)
+*        If TRUE, the separations of secondary beams from the primary
+*        beam are fixed, and this takes precedence over parameter
+*        FIXPOS.  If FALSE, the beam separations are free to be fitted
+*        (although it is actually the centres being fit).  It is 
+*        advisable not to use this option in the inaccurate "Cursor" 
+*        mode.  [FALSE]
 *     INCAT = FILENAME (Read)
 *        A catalogue containing a positions list giving the initial
 *        guesses at the beam positions, such as produced by applications
 *        CURSOR, LISTMAKE, etc.  It is only accessed if parameter MODE 
 *        is given the value "Catalogue". 
-*     INIT1-INIT5 = LITERAL (Read)
-*        An initial guess at the co-ordinates of the next beam to be 
-*        fitted, in the current co-ordinate Frame of the NDF (supplying 
-*        a colon ":" will display details of the current co-ordinate 
-*        Frame).  The primary feature's position is given by INIT1, and 
-*        any secondary beams by INIT2 through INIT5, the parameter name
-*        incrementing by 1 for each subsequent beam feature.  The total
-*        number required is equal to the value of parameter BEAMS.
-*
-*        A position should be supplied as a list of formatted WCS axis
-*        values separated by spaces or commas.  INIT1-INIT5 parameters
-*        are only accessed if parameter MODE is given the value 
-*        "Interface".  If the initial co-ordinates are supplied on the
-*        command line only one beam will be fit; otherwise the 
-*        application will ask for further beams that may be terminated
-*        by supplying the null value (!). 
 *     LOGFILE = FILENAME (Read)
 *        Name of the text file to log the results.  If null, there
 *        will be no logging.  Note this is intended for the human reader
@@ -203,7 +200,8 @@
 *        The mode in which the initial co-ordinates are to be obtained. 
 *        The supplied string can be one of the following values.
 *
-*        - "Interface" -- positions are obtained using parameter INIT.
+*        - "Interface" -- positions are obtained using parameters POS,
+*        POS2--POS5.
 *
 *        - "Cursor" -- positions are obtained using the graphics cursor
 *        of the device specified by parameter DEVICE.
@@ -220,11 +218,28 @@
 *        displayed data, as recorded in the graphics database.  In other
 *        modes, there is no run-time default and the user must supply a
 *        value.  []
+*     OFFSET( ) = LITERAL (Write)
+*        The formatted offset and its error of each secondary beam 
+*        feature with respect to the primary beam.  They are measured in
+*        the current Frame of the NDF along a latitude axis if that is a
+*        SkyFrame, or the first axis otherwise.  The number of values
+*        stored is twice the number of beams.  The array alternates an
+*        offset, then its corresponding error, appearing in beam order 
+*        starting with the first secondary beam.
 *     ORIENT( 2 ) = _DOUBLE (Write)
 *        The primary beam position's orientation and its error, measured
 *        in degrees.  If the current WCS frame is a SKY Frame, the angle
 *        is measured from North through East.  For other Frames the 
 *        angle is from the X-axis through Y.
+*     PA() = _REAL (Write)
+*        The position angle and its errors of each secondary beam
+*        feature ith respect to the primary beam.  They are measured in
+*        the current Frame of the NDF from North through East if that is
+*        a SkyFrame, or anticlockwise from the Y axis otherwise.  The
+*        number of values stored is twice the number of beams.  The
+*        array alternates a position angle, then its corresponding 
+*        error, appearing in beam order starting with the first
+*        secondary beam.
 *     PLOTSTYLE = LITERAL (Read)
 *        A group of attribute settings describing the style to use when
 *        drawing the graphics markers specified by parameter MARK.  
@@ -249,32 +264,70 @@
 *        "Plotting Attributes" in SUN/95 for a description of the 
 *        available attributes.  Any unrecognised attributes are ignored
 *        (no error is reported).  [current value]
+*     POLAR = _LOGICAL (Read)
+*        If TRUE, the co-ordinates supplied through POS2--POS5 are
+*        interpreted in polar co-ordinates (offset, position angle) 
+*        about the primary beam.  The radial co-ordinate is a distance 
+*        measured in units of the latitude axis if the current WCS Frame
+*        is a SkyFrame, or the first axis for other Frames.  For a 
+*        SkyFrame current WCS Frame, position angle follows the standard
+*        convention of North through East.  For other Frames the angle 
+*        is measured from the second axis anticlockwise, e.g. for a 
+*        PIXEL Frame it would be from Y through negative X, not the 
+*        standard X through Y.
+*
+*        If FALSE, the co-ordinates are the regular axis co-ordinates in 
+*        the current Frame.  
+*
+*        POLAR is only accessed when there is more than one beam to fit.
+*        [TRUE]
+*     POS = LITERAL (Read)
+*        When MODE = "Interface" POS specifies the co-ordinates of the 
+*        primary beam position.  This is either merely an initial guess
+*        for the fit, or if parameter FIXPOS is TRUE, it defines a
+*        fixed location.  It is specified in the current co-ordinate 
+*        Frame of the NDF (supplying a colon ":" will display details of
+*        the current co-ordinate Frame).  A position should be supplied 
+*        either as a list of formatted WCS axis values separated by 
+*        spaces or commas.
+
+*        If the initial co-ordinates are supplied on the command line 
+*        without BEAMS specified only one beam will be fit.
+*     POS2-POS5 = LITERAL (Read)
+*        When MODE = "Interface" these parameters specify the co-ordinates
+*        of the secondary beam positions.  For each parameter the
+*        supplied location may be merely an initial guess for the fit, 
+*        or if parameter FIXPOS is TRUE, it defines a fixed location,
+*        unless parameter FIXSEP is TRUE, whereupon it defines a fixed 
+*        separation from the primary beam.
+*
+*        For POLAR = FALSE each distance should be given as a single
+*        literal string containing a space- or comma-separated list of 
+*        formatted axis values measured in the current co-ordinate Frame 
+*        of the NDF.  The allowed formats depends on the class of the 
+*        current Frame.  Supplying a single colon ":" will display 
+*        details of the current Frame, together with an indication of 
+*        the format required for each axis value, and a new parameter 
+*        value is then obtained.
+
+*        If parameter POLAR is TRUE, POS2--POS5 may be given as an 
+*        offset followed by a position angle.  See parameter POLAR for 
+*        more details of the sense of the angle and the offset 
+*        co-ordinates.
+*
+*        The parameter name increments by 1 for each subsequent beam 
+*        feature.  Thus POS2 applies to the first secondary beam
+*        (second position in all), POS3 is for the second secondary 
+*        beam, and so on.  As the total number of parameters required is 
+*        one fewer than the value of parameter BEAMS, POS2--POS5 are 
+*        only accessed when BEAMS exceeds 1.
 *     QUIET = _LOGICAL (Read)
 *        If TRUE then the fit parameters are not displayed on the 
 *        screen.  Output parameters and files are still created.  
 *        [FALSE]
-*     RMS = _DOUBLE (Write)
+*     RMS = _REAL (Write)
 *        The primary beam position's root mean-squared deviation from
 *        the fit.
-*     SEP1-SEP4 = LITERAL (Read)
-*        If number of beam positions given by BEAMS is more than one,
-*        each parameter specifies fixed separations along each axis 
-*        of a secondary beam position to that of the primary.  Thus you 
-*        should supply one fewer offset pairs than the number of beam 
-*        positions via these parameters.  SEP1 applies to the first 
-*        secondary beam, SEP2 is for the second secondary beam, and so
-*        on.
-*
-*        Each distance should be given as a single literal string 
-*        containing a space- or comma-separated list of axis values 
-*        measured in the current co-ordinate Frame of the NDF.  The
-*        allowed formats depends on the class of the current Frame.
-*        Supplying a single colon ":" will display details of the
-*        current Frame, together with an indication of the format 
-*        required for each axis value, and a new parameter value is then
-*        obtained.
-
-*        A null value means fit to all beam positions.  [!]
 *     VARIANCE = _LOGICAL (Read)
 *        If TRUE, then any VARIANCE component present within the input
 *        NDF will be used to weight the fit; the weight used for each
@@ -286,59 +339,61 @@
 *     beamfit mars_3pos i 1 "5.0,-3.5"
 *        This finds the Gaussian coefficients of the primary beam
 *        feature in the NDF called mars_3pos, using the supplied
-*        co-ordinates (5.0,-3.5) for the initial guess for the
-*        beam's centre.  The co-ordinates are measured in the NDF's
-*        current co-ordinate Frame.  In this case they offsets in
+*        co-ordinates (5.0,-3.5) for the initial guess for the beam's
+*        centre.  The co-ordinates are measured in the NDF's current
+*        co-ordinate Frame.  In this case they are offsets in
 *        arcseconds.
-*     beamfit ndf=mars_3pos mode=interface beams=1 init1="5.0,-3.5"
+*     beamfit ndf=mars_3pos mode=interface beams=1 pos="5.0,-3.5"
 *             fixback=0.0
 *        As above but now the background is fixed to be zero.
-*     beamfit ndf=mars_3pos mode=interface beams=1 fixfwhm=16.5
-*        As above but now the Gaussian is constrained to have
-*        a FWHM of 16.5 arcseconds and be circular.
-*     beamfit mars_3pos in beams=1 fixfwhm=16.5 fitarea=51
-*        As above but now the fitted data is restricted to areas
-*        51x51 pixels about the initial guess positions.  All
-*        the other examples use the full array.
+*     beamfit ndf=mars_3pos mode=interface beams=1 pos="5.0,-3.5" 
+*             fixfwhm=16.5
+*        As above but now the Gaussian is constrained to have a FWHM of
+*        16.5 arcseconds and be circular.
+*     beamfit mars_3pos in beams=1 fixfwhm=16.5 fitarea=51 pos="5.,-3.5"
+*        As above but now the fitted data is restricted to areas 51x51
+*        pixels about the initial guess positions.  All the other 
+*        examples use the full array.
 *     beamfit mars_3pos int 3 "5.0,-3.5" ampratio=-0.5
 *        As the first example except this finds the Gaussian 
 *        coefficients of the primary beam feature and two secondary 
 *        features.  The secondary features have fixed amplitudes that 
 *        are half that of the primary feature and of the opposite
 *        polarity.
-*     beamfit mars_3pos int 2 "5.0,-3.5" sep1="-60.5,0.6" fixpos
+*     beamfit mars_3pos int 2 "5.0,-3.5" pos2="60.0,90" fixpos
 *        This finds the Gaussian coefficients of the primary beam
 *        feature and a secondary feature in the NDF called mars_3pos.
 *        The supplied co-ordinates (5.0,-3.5) define the centre, i.e.
 *        they are not fitted.  Also the secondary beam is fixed at
-*        (-55.5,-2.9).
+*        60 arcseconds towards the East (position angle 90 degrees).
+*     beamfit mars_3pos int 2 "5.0,-3.5" pos2="60.0,90" fixsep
+*        As the previous example, except now the separation of the
+*        second position is fixed at 60 arcseconds towards the East from
+*        the primary beam, instead of being an absolute location.
+*     beamfit mars_3pos int 2 "5.0,-3.5" pos2="-60.5,0.6" polar=f fixpos
+*        As the last-but-one example, but now location of the secondary
+*        beam is fixed at (-55.5,-2.9).
 *     beamfit mode=cu beams=1
 *        This finds the Gaussian coefficients of the primary beam
 *        feature of an NDF, using the graphics cursor on the current 
 *        graphics device to indicate the approximate centre of the 
 *        feature.  The NDF being analysed comes from the graphics
 *        database.
-*     beamfit mode=cu beams=3 sep1="-60.5,0.6" sep2="59.5,-1.7"
-*        This is like the previous example except it finds the Gaussian
-*        coefficients of the primary beam feature and two secondary 
-*        features in an NDF.  The graphics cursor indicates the 
-*        approximate centre of the primary feature.  The secondary
-*        features have fixed offsets from the primary, measured in
-*        the current Frame of the NDF displayed.
-*     beamfit jupiter cu 2 mark=ce plotstyle='colour=red' marker=3
-*        This fits to two beam features in the NDF called jupiter 
+*     beamfit uranus cu 2 mark=ce plotstyle='colour=red' marker=3
+*        This fits to two beam features in the NDF called uranus 
 *        via the graphics cursor on the current graphics device.  The
 *        beam positions are marked using a red asterisk.
-*     beamfit jupiter file 4 coin=features.dat logfile=jupiter.log
-*        This fits to the beam features in the NDF called jupiter.  The
+*     beamfit uranus file 4 coin=features.dat logfile=uranus.log
+*        This fits to the beam features in the NDF called uranus.  The
 *        initial positions are given in the text file features.dat in
 *        the current co-ordinate Frame.  Only the first four positions
-*        will be used.  A log of selected input parameter values, 
-*        and the fitted coefficients and errors is written to the text
-*        file jupiter.log.
-*     beamfit jupiter mode=cat incat=jove
+*        will be used.  The last three positions are in polar
+*        co-ordinates with respect to the primary beam.  A log of 
+*        selected input parameter values, and the fitted coefficients 
+*        and errors is written to the text file uranus.log.
+*     beamfit uranus mode=cat incat=uranus_beams polar=f
 *        This example reads the initial guess positions from the
-*        positions list in file jove.FIT.  The number of beam
+*        positions list in file uranus_beams.FIT.  The number of beam
 *        features fit is the number of positions in the catalogue
 *        subject to a maximum of five.  The input file may, for
 *        instance, have been created using the application CURSOR.
@@ -391,6 +446,26 @@
 *  History:
 *     2007 January 17 (MJC):
 *        Original version based on CENTROID.
+*     2007 April 27 (MJC):
+*        Add FIXAMP and FIXRAT.  Changed to concurrent fitting of
+*        multiple Gaussians, from a series of fits to individual
+*        Gaussians.
+*     2007 May 11 (MJC):
+*        Use an array for the fixed parameters.
+*     2007 May 14 (MJC):
+*        Add SEPARATION parameters.
+*     2007 May 22 (MJC):
+*        Improve and correct documentation.  Made SEPARATION a series of
+*        parameters SEP--SEP4 to allow command-line access.  Revise
+*        calls to routines whose APIs have changed.
+*     2007 June 1 (MJC):
+*        Add parameters OFFSET, PA, and POLAR.
+*     2007 June 4 (MJC):
+*        Polar co-ordinates demanded a further restructuring of the code
+*        and revised parameters.  Parameter FIXSEP was introduced, 
+*        SEP1--SEP4 were removed, and INIT1--INIT5 have become POS and 
+*        POS2--POS5 overloading meanings depending on the values of
+*        FIXPOS and FIXSEP.
 *     {enter_further_changes_here}
 
 *-
@@ -445,6 +520,7 @@
       INTEGER ID0                ! Identifier for first output position
       INTEGER IMARK              ! PGPLOT marker type
       INTEGER INDF               ! Input NDF identifier
+      DOUBLE PRECISION INPOL( 2 ) ! Pole co-ordinates
       LOGICAL INTERF             ! Interface mode selected?
       INTEGER IPIC               ! AGI identifier for last data picture
       INTEGER IPIC0              ! AGI identifier for original current 
@@ -488,6 +564,8 @@
                                  ! parameter
       DOUBLE PRECISION OFF1( NDF__MXDIM ) ! Separation for one position
       DOUBLE PRECISION OFFSET( BF__MXPOS - 1, NDF__MXDIM )! Separations
+      LOGICAL POLAR              ! Use polar co-ordinates for 
+                                 ! INIT2-INIT5 and SEP-SEP4?
       LOGICAL POSC               ! Centre fixed at supplied position?
       LOGICAL QUIET              ! Suppress screen output?
       CHARACTER*256 REFNAM       ! Reference name
@@ -495,6 +573,7 @@
       INTEGER SDIM( BF__NDIM )   ! Significant dimensions of the NDF
       CHARACTER*4 SEPAR          ! SEPn parameter name
       INTEGER SLBND( BF__NDIM )  ! Significant lower bounds of the image
+      CHARACTER*3 SPARAM         ! Parameter root for fixed separations
       INTEGER STATE              ! State of parameter INIT
       INTEGER SUBND( BF__NDIM )  ! Significant upper bounds of the image
       CHARACTER*80 TITLE         ! Title for output positions list
@@ -645,11 +724,14 @@
 *  "Interface" mode.
       ELSE IF ( INTERF ) THEN
 
-*  If the initial co-ordinates are supplied on the command line we 
-*  know that only one beam is to be fitted.
-         CALL LPG_STATE( 'INIT1', STATE, STATUS )
+*  If the initial co-ordinates are supplied on the command line and
+*  without BEAMS, we know that only one beam is to be fitted.
+         CALL LPG_STATE( 'POS', STATE, STATUS )
          IF ( STATE .EQ. SUBPAR__ACTIVE ) THEN
-            NPOS = 1
+            CALL LPG_STATE( 'BEAMS', STATE, STATUS )
+            IF ( STATE .NE. SUBPAR__ACTIVE ) THEN
+               NPOS = 1
+            END IF
          END IF
       END IF
 
@@ -883,6 +965,7 @@
 
 *  Obtain the FIXFWHM parameter value(s).  There is no dynamic default.
       FWHM( 1 ) = AST__BAD
+      FWHM( 2 ) = AST__BAD
       CALL KPG1_GTAXV( 'FIXFWHM', BF__NDIM, .FALSE., CFRM, WAX, FWHM,
      :                 NVAL, STATUS )
       
@@ -917,6 +1000,8 @@
          END IF
       END IF
 
+*  Positions
+*  ---------
 *  Use the initial co-ordinates rather than fitting.
       CALL PAR_GET0L( 'FIXPOS', FIXCON( 4 ), STATUS )
 
@@ -941,32 +1026,15 @@
 
 *  Are the separations fixed?
 *  --------------------------
-      FIXCON( 6 ) = .FALSE.
+      CALL PAR_GET0L( 'FIXSEP', FIXCON( 6 ), STATUS )
+
+      POLAR = .FALSE.
       IF ( NPOS .GT. 1 ) THEN
-         I = 1
-         DO WHILE ( MORE )
 
-*  Obtain the SEPn parameter value(s).  There is no dynamic default.
-            WRITE ( SEPAR, '(''SEP'',I1)' ) I
-            OFF1( 1 ) = AST__BAD            
-            CALL KPG1_GTPOS( SEPAR, IWCS, .FALSE., OFF1, BC, STATUS )
-      
-            IF ( STATUS .EQ. PAR__NULL ) THEN
-               CALL ERR_ANNUL( STATUS )
+*  Are the POS2--POS5 parameters to be specified in polar co-ordinates 
+*  about the primary beam's centre?  A null defaults to TRUE.
+         CALL PAR_GTD0L( 'POLAR', .TRUE., .TRUE., POLAR, STATUS )
 
-*  All valid offsets must be supplied.  So after an error disregard
-*  any earlier valid values.
-               FIXCON( 6 ) = .FALSE.
-               MORE = .FALSE.
-            ELSE
-               FIXCON( 6 ) = .TRUE.
-               DO J = 1, BF__NDIM
-                  OFFSET( I, J ) = OFF1( J )
-               END DO
-               I = I + 1
-               MORE = I .LT. NPOS
-            END IF
-         END DO
       END IF
 
 *  Record input data in the log file.
@@ -1006,14 +1074,15 @@
 *  ==============
 
 *  Process all the supplied beams together as a single batch in
-*  non-interactive modes.
+*  non-interactive modes.  These invoke the routine KPS1_BFOP that
+*  records all the results parameters.
       IF ( CAT .OR. FILE ) THEN
 
 *  Find the beam parameters and determine errors, and report them.
          CALL KPS1_BFFIL( INDF, MAP3, MAP1, MAP2, CFRM, VAR, NPOS, 
      :                    NAXC, NAXIN, %VAL( CNF_PVAL( IPIN ) ), CAT, 
      :                    %VAL( CNF_PVAL( IPID ) ), LOGF, FDL, FIXCON,
-     :                    AMPRAT, OFFSET, MXCOEF, FPAR, SLBND, SUBND, 
+     :                    AMPRAT, MXCOEF, FPAR, SLBND, SUBND, 
      :                    FAREA, FITREG, STATUS )
 
 *  In interactive modes, find each beam individually, waiting for the
@@ -1022,10 +1091,10 @@
 
 *  Fit the beams obtained interactively, and determine errors. 
 *  Display the results.
-         CALL KPS1_BFINT( INDF, MAP3, MAP1, MAP2, CFRM, VAR, NPOS,
-     :                    'INIT', CURSOR, MARK, IMARK, NAXC, NAXIN,
-     :                    LOGF, FDL, FIXCON, AMPRAT, OFFSET, MXCOEF,
-     :                    FPAR, SLBND, SUBND, FAREA, FITREG, STATUS )
+         CALL KPS1_BFINT( INDF, IWCS, MAP3, MAP1, MAP2, CFRM, VAR, NPOS,
+     :                    POLAR, 'POS', CURSOR, MARK, IMARK, NAXC, 
+     :                    NAXIN, LOGF, FDL, FIXCON, AMPRAT, MXCOEF,
+     *                    FPAR, SLBND, SUBND, FAREA, FITREG, STATUS )
 
       END IF
 
