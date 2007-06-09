@@ -1,18 +1,19 @@
       SUBROUTINE KPS1_BFCRF( MAP, CFRM, NAXC, NBEAM, NCOEF, PP, PSIGMA,
-     :                       RP, RSIGMA, STATUS )
+     :                       RP, RSIGMA, POLAR, POLSIG, STATUS )
 *+
 *  Name:
 *     KPS1_BFCRF
 
 *  Purpose:
-*     Converts the pixel coefficients of the fit into the refrence Frame
+*     Converts the pixel coefficients of the fit into the reference 
+*     Frame
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
 *     CALL KPS1_BFCRF( MAP, CFRM, NAXC, NCOEF, PP, PSIGMA, RP,
-*                      RSIGMA, STATUS )
+*                      RSIGMA, POLAR, POLSIG, STATUS )
 
 *  Description:
 *     This converts the spatial coefficients and their errors from 
@@ -24,6 +25,11 @@
 *     radians, and for SkyFrames it is measured from the North via East,
 *     converted from X-axis through Y.  Data-value coefficients (e.g. 
 *     amplitude) are unchanged.
+*
+*     In addition it computes and returns the polar co-ordinates of the
+*     secondary beams with respect to the primary in the reporting 
+*     Frame.  The orientation is measured North through East for a 
+*     SkyFrame, and from the Y axis anticlockwise for other Frames.
 
 *     This routine makes it easier to write the results to a
 *     logfile or to output parameters and is more efficient
@@ -50,9 +56,20 @@
 *     RP( NCOEF, NBEAM ) = DOUBLE PRECISION (Returned)
 *        The fit parameters with spatial coefficients measured in the
 *        reporting Frame.
-*     RSIGMA( NCOEF, NBEAM ) = DOUBLE PRECISION (Given)
+*     RSIGMA( NCOEF, NBEAM ) = DOUBLE PRECISION (Returned)
 *        The errors in the fit parameters measuered in the reporting
 *        Frame.
+*     POLAR( 2, NBEAM ) =  DOUBLE PRECISION (Returned)
+*         The polar co-ordinates of the beam features with respect to
+*         the primary beam measured in the current co-ordinate Frame.
+*         The orientation is a position angle in degrees, measured from
+*         North through East if the current Frame is a Skyframe, or 
+*         anticlockwise from the Y axis otherwise.  The POLAR(*,1)
+*         values of the primary beam are set to 0.0 and bad values.
+*     POLSIG( 2, NBEAM ) =  DOUBLE PRECISION (Returned)
+*         The standard-deviation errors associated with the polar 
+*          co-ordinates supplied in argument POLAR.  The POLSIG(*,1)
+*         values of the primary beam are set to 0.0 and bad values.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -87,6 +104,9 @@
 *     2007 May 25 (MJC):
 *        Fixed repeated typo's such that the PSIGMA values are now 
 *        assigned.
+*     2007 May 30 (MJC):
+*        Add POLAR and POLSIG arguments and calculate polar co-ordinates
+*        of secondary-beam features with error propagation.
 *     {enter_further_changes_here}
 
 *-
@@ -113,6 +133,8 @@
 *  Arguments Returned:
       DOUBLE PRECISION RP( NCOEF, NBEAM )
       DOUBLE PRECISION RSIGMA( NCOEF, NBEAM )
+      DOUBLE PRECISION POLAR( 2, NBEAM )
+      DOUBLE PRECISION POLSIG( 2, NBEAM )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -127,11 +149,16 @@
       DOUBLE PRECISION R2D       ! Radians to degrees
       PARAMETER ( R2D = 180.0D0 / PI )
 
+      DOUBLE PRECISION TWOPI
+      PARAMETER ( TWOPI = 2.0D0 * PI )
+
 *  Local Variables:
       DOUBLE PRECISION A( NDF__MXDIM ) ! Start of distance (A to B)
       DOUBLE PRECISION B( NDF__MXDIM ) ! End of distance (A to B)
+      DOUBLE PRECISION DATAN     ! Differentiating atan factor 
       DOUBLE PRECISION DX        ! Increment along first axis
       DOUBLE PRECISION DY        ! Increment along second axis
+      DOUBLE PRECISION GRAD      ! Gradient DY/DX
       INTEGER I                  ! Loop count
       INTEGER IB                 ! Beam loop count
       LOGICAL ISSKY              ! Is the current Frame a SkyFrame?
@@ -141,7 +168,12 @@
       INTEGER MINOR              ! Index to minor-FWHM value and error
       DOUBLE PRECISION POS( 2, NDF__MXDIM ) ! Reporting positions
       DOUBLE PRECISION PIXPOS( 2, 2 ) ! Pixel positions
+      DOUBLE PRECISION SX        ! Co-ordinate sum along longitude axis
+      DOUBLE PRECISION SY        ! Co-ordinate sum along latitude axis
       REAL THETA                 ! Orientation in degrees
+      DOUBLE PRECISION VAR       ! Variance
+      DOUBLE PRECISION VARX      ! Sum of longitude-axis variances
+      DOUBLE PRECISION VARY      ! Sum of latitude-axis variances
 
 *.
 
@@ -172,7 +204,7 @@
 *  Centre
 *  ------
 
-*  Transform the supplied positions and errors from the PIXEL Frame 
+*  Transform the fitted beam positions and errors from the PIXEL Frame
 *  of the NDF to the reporting Frame.
          PIXPOS( 1, 1 ) = PP( 1, IB )
          PIXPOS( 1, 2 ) = PP( 2, IB )
@@ -226,7 +258,7 @@
 *  Widths
 *  ------
 
-*  Transform the supplied positions and widths from the PIXEL Frame 
+*  Transform the fitted positions and widths from the PIXEL Frame 
 *  of the NDF to the reporting Frame.
          PIXPOS( 1, 1 ) = PP( 1, IB )
          PIXPOS( 1, 2 ) = PP( 2, IB )
@@ -256,7 +288,7 @@
 *  Bad values for the errors in the FWHM indicate no value exists.
          IF ( PSIGMA( MAJOR, IB ) .NE. VAL__BADD ) THEN
 
-*  Transform the supplied positions and width errors from the PIXEL 
+*  Transform the fitted positions and width errors from the PIXEL 
 *  Frame of the NDF to the reporting Frame.
             PIXPOS( 1, 1 ) = PP( 1, IB )
             PIXPOS( 1, 2 ) = PP( 2, IB )
@@ -287,7 +319,7 @@
 *  Orientation
 *  ===========
 
-*  Transform the supplied positions and a unit vector along the
+*  Transform the fitted positions and a unit vector along the
 *  orientation from the centre measured in the PIXEL Frame of the 
 *  NDF to the reporting Frame.
          PIXPOS( 1, 1 ) = PP( 1, IB )
@@ -310,7 +342,7 @@
      :                         POS( 2, LON ), POS( 2, LAT ) )
 
 *  If it's not a SkyFrame assume Euclidean geometry.  Also by
-*  definition orientation is 0 degrees for a cicrular beam.  The
+*  definition orientation is 0 degrees for a circular beam.  The
 *  transformation can lead to small perturbation of the original
 *  zero degrees.
          ELSE
@@ -335,6 +367,139 @@
 
 *  Note no need to revise the orientation error.
          RP( 5, IB ) = THETA
+
+*  Polar co-ordinates
+*  ==================
+         IF ( IB .EQ. 1 ) THEN
+            POLAR( 1, 1 ) = 0.0D0
+            POLAR( 2, 1 ) = VAL__BADD
+            POLSIG( 1, 1 ) = 0.0D0
+            POLSIG( 2, 1 ) = VAL__BADD
+         ELSE
+
+*  Radius
+*  ------
+*  Transform the primary-beam and secondary position centre measured in 
+*  the PIXEL Frame of the NDF to the reporting Frame.
+            PIXPOS( 1, 1 ) = PP( 1, 1 )
+            PIXPOS( 1, 2 ) = PP( 2, 1 )
+            PIXPOS( 2, 1 ) = PP( 1, IB )
+            PIXPOS( 2, 2 ) = PP( 2, IB )
+            CALL AST_TRANN( MAP, 2, 2, 2, PIXPOS, .TRUE., NAXC, 2, POS,
+     :                      STATUS )
+
+*  Normalize the current Frame co-ordinates.
+            CALL AST_NORM( CFRM, POS, STATUS )
+
+*  Need to determine the distances for the separation.  Use the
+*  reporting axis.
+            DO I = 1, NAXC
+               A( I ) = POS( 1, I )
+               B( I ) = POS( 2, I )
+            END DO
+            POLAR( 1, IB ) = AST_DISTANCE( CFRM, A, B, STATUS )
+
+*  Use the partial derivatives of the polar radius function against the
+*  four variables: (x,y) for the primary and secondary positions.  This
+*  Taylor-expansion is good to first order.  One should evaluate JCJ^T 
+*  matrices where J is the Jacobian and C is the covariance matrix to 
+*  propagate the errors.
+
+*  First assume that the primary beam position is exactly known.
+*  Then that the secondary beam is exactly known, adding the variances.
+            DX = ( POS( 2, 1 ) - POS( 1, 1 ) ) / POLAR( 1, IB )
+            DY = ( POS( 2, 2 ) - POS( 1, 2 ) ) / POLAR( 1, IB )
+            VAR = DX * DX * RSIGMA( 1, IB ) * RSIGMA( 1, IB ) +
+     :            DY * DY * RSIGMA( 2, IB ) * RSIGMA( 2, IB ) +
+     :            DX * DX * RSIGMA( 1, 1 ) * RSIGMA( 1, 1 ) +
+     :            DY * DY * RSIGMA( 2, 1 ) * RSIGMA( 2, 1 )
+
+            IF ( VAR .GT. 0.0D0 ) THEN
+               POLSIG( 1, IB ) = SQRT( VAR )
+            ELSE
+               POLSIG( 1, IB ) = VAL__BADD
+            END IF            
+
+*  Position angle
+*  --------------
+*  Use spherical geometry for a Skyframe.  We shall need the
+*  differences to derive the position-angle error; for convenience
+*  use the Euclidean notation
+             IF ( ISSKY ) THEN
+               DX = POS( 2, LON ) - POS( 1, LON )
+               DY = POS( 2, LAT ) - POS( 1, LAT )
+
+*   Obtain the bearing of the vector between the centre and
+*   the unit displacement.
+               THETA = SLA_DBEAR( POS( 1, LON ), POS( 1, LAT ),
+     :                            POS( 2, LON ), POS( 2, LAT ) )
+
+*  If it's not a SkyFrame assume Euclidean geometry.  Also by
+*  definition orientation is 0 degrees for a circular beam.  The
+*  transformation can lead to small perturbation of the original
+*  zero degrees.
+            ELSE
+               DX = POS( 2, 1 ) - POS( 1, 1 )
+               DY = POS( 2, 2 ) - POS( 1, 2 )
+               IF ( DX .NE. 0.0D0 .OR. DY .NE. 0.0D0 ) THEN
+
+*  Switch from the customary X through Y to Y through negative X, i.e.
+*  add pi/2 radians, but also the ATAN function returns values in the
+*  range -pi to +pi and we require 0 to 2pi.
+                  THETA = ATAN2( DY, DX ) + 0.5D0 * PI
+               ELSE
+                  THETA = 0.0D0
+               END IF
+            END IF
+
+*  Ensure that the result in the range 0 to 360 degrees.
+            IF ( THETA .LT. 0 ) THEN
+               THETA = ( THETA + TWOPI )
+
+            ELSE IF ( THETA .GT. TWOPI ) THEN
+               THETA = ( THETA - TWOPI )
+
+            END IF
+
+            POLAR( 2, IB ) = THETA * R2D
+
+*  Sum the variances along the two axes.
+            VARX = RSIGMA( 1, 1 )  * RSIGMA( 1, 1 ) +
+     :             RSIGMA( 1, IB ) * RSIGMA( 1, IB )
+            VARY = RSIGMA( 2, 1 )  * RSIGMA( 2, 1 ) +
+     :             RSIGMA( 2, IB ) * RSIGMA( 2, IB )
+
+*  Use the partial derivatives of the polar position-angle function
+*  against the four variables: (x,y) for the primary and secondary
+*  positions.  First deal with the special cases.
+            IF ( ABS( DX ) .LT. VAL__EPSD .AND.
+     :           ABS( DY ) .LT. VAL__EPSD ) THEN
+               POLSIG( 2, IB ) = VAL__BADD
+
+*  PA = 0 or 180.  Combine the first axis errors, then determine the
+*  corresponding small angle (hence the need for both ATAN2 arguemnts
+*  to be positive.
+            ELSE IF ( ABS( DX ) .LT. VAL__EPSD ) THEN
+               POLSIG( 2, IB ) = ATAN2( ABS( B( 2 ) - A( 2 ) ),
+     :                                  SQRT( VARX ) ) * R2D
+
+*  Now deal with PA = 90 or 270. 
+            ELSE IF ( ABS( DY ) .LT. VAL__EPSD ) THEN
+               POLSIG( 2, IB ) = ATAN2( SQRT( VARY ), 
+     :                                  ABS( B( 1 ) - A( 1 ) ) ) * R2D
+
+            ELSE
+               GRAD = DY / DX
+               DATAN = 1.0D0 / ( 1 + GRAD * GRAD ) / DX
+               VAR = DATAN * DATAN * ( GRAD * GRAD * VARX + VARY ) 
+
+               IF ( VAR .GT. 0.0D0 ) THEN
+                  POLSIG( 2, IB ) = SQRT( VAR ) * R2D
+               ELSE
+                  POLSIG( 2, IB ) = VAL__BADD
+               END IF
+            END IF
+         END IF
       END DO
 
       END
