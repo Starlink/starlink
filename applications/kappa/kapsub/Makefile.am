@@ -70,12 +70,12 @@ kps1_zprguw.f kps1_zprgw.f linplt.f listsb.f lsfun1.f med3d.f medwts.f \
 medwv.f shifts.f shiftx.f shifty.f statv.f thrsr.f kps1_lmkgd.f \
 kps1_grdsc.f
 
-# This is more ffor comment as Fortrtran dependencies aren't supported.
-kps1_bffil.o: BF_PAR BF_COM
-kps1_bffn.o: BF_PAR BF_COM
-kps1_bfft.o: BF_PAR BF_COM
-kps1_bfftg.o: BF_PAR BF_COM
-kps1_bfint.o: BF_PAR BF_COM
+# This is more for comment as Fortrtran dependencies aren't supported.
+kps1_bffill.o: BF_PAR BF_COM
+kps1_bffn.lo: BF_PAR BF_COM
+kps1_bfft.lo: BF_PAR BF_COM
+kps1_bfftg.lo: BF_PAR BF_COM
+kps1_bfint.lo: BF_PAR BF_COM
 
 C_ROUTINES = kps1_luted.c
 
