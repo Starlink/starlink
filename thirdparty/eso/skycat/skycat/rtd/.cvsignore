@@ -3,5 +3,12 @@ config.log
 config.status
 install
 makefile.mk
+pkgIndex.tcl
 rtdConfig.sh
 tmp
+rtd
+rtdClient
+rtdCubeDisplay
+rtdServer
+rtd_version.tcl
+tRtd
