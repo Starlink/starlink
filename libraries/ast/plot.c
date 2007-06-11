@@ -4,14 +4,14 @@
 *     Plot
 
 *  Purpose:
-*     Provide facilities for graphical output.
+*     Provide facilities for 2D graphical output.
 
 *  Constructor Function:
 c     astPlot
 f     AST_PLOT
 
 *  Description:
-*     This class provides facilities for producing graphical output.
+*     This class provides facilities for producing 2D graphical output.
 *     A Plot is a specialised form of FrameSet, in which the base
 *     Frame describes a "graphical" coordinate system and is
 *     associated with a rectangular plotting area in the underlying
@@ -619,6 +619,8 @@ f     - Title: The Plot title drawn using AST_GRID
 *     17-MAY-2007 (DSB)
 *        Exclude corner positions when determining the range of axis
 *        values covered by the plot. This gives better default gap sizes.
+*     11-JUN-2007 (DSB)
+*        Plug memory leak in astInitPlot.
 *class--
 */
 
@@ -17499,7 +17501,7 @@ void astInitPlotVtab_(  AstPlotVtab *vtab, const char *name ) {
    astSetCopy( (AstObjectVtab *) vtab, Copy );
 
 /* Declare the class dump function. */
-   astSetDump( vtab, Dump, "Plot", "Provide facilities for graphical output" );
+   astSetDump( vtab, Dump, "Plot", "Provide facilities for 2D graphical output" );
 
 /* Initialise the external structure used to store information about the 
    most recent curve drawn by astGridLine. The number of breaks in the curve 
@@ -27211,7 +27213,7 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
 *        the name of the class to which the new object belongs (it is this
 *        pointer value that will subsequently be returned by the astGetClass
 *        method).
-*     fset
+*     frame
 *        A pointer to the Frame or Frameset to be annotated.
 *     graphbox
 *        A pointer to an array of 4 values giving the graphics coordinates 
@@ -27434,6 +27436,7 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    earlier. This leaves the graphics frame with index 1 in the 
    returned  Plot. We use the linear mapping initially. */
       astAddFrame( (AstFrameSet *) new, 1, map, fset );
+      map = astAnnul( map );
 
 /* Set the current Frame in the Plot to be the physical coordinate Frame 
    (with index incremented by one because the graphics Frame has been added). */
