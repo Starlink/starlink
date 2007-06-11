@@ -5,3 +5,6 @@ install
 makefile.mk
 tclutilConfig.sh
 tmp
+pkgIndex.tcl
+tclutil.sh
+tclutil_version.tcl
