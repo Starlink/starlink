@@ -5,3 +5,4 @@ config.status
 install
 tmp
 makefile.mk
+pkgIndex.tcl
