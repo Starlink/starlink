@@ -620,7 +620,7 @@ f     - Title: The Plot title drawn using AST_GRID
 *        Exclude corner positions when determining the range of axis
 *        values covered by the plot. This gives better default gap sizes.
 *     11-JUN-2007 (DSB)
-*        Plug memory leak in astInitPlot.
+*        Plug memory leaks.
 *class--
 */
 
@@ -24293,7 +24293,8 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    and compares them with the old labels in "labels". If any of the new labels
    are longer than the corresponding old labels, then a null pointer is
    returned. Otherwise, a pointer is returned to the new set of labels. */
-         newlabels = CheckLabels2( this, frame, axis, ticks, nmajor, oldlabels, refval );
+         newlabels = CheckLabels2( this, frame, axis, ticks, nmajor, 
+                                   oldlabels, refval );
 
 /* Free the old labels unless they are the orignal labels (which are
    needed below). */
@@ -24317,6 +24318,14 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
          oldlabels = newlabels;
       }
 
+/* Free any remaining labels. */
+      if( oldlabels && oldlabels != labels ) {
+         for( i = 0; i < nmajor; i++ ){
+            if( oldlabels[ i ] ) oldlabels[ i ] = (char *) astFree( (void *) oldlabels[ i ] );
+         }
+         oldlabels = (char **) astFree( (void *) oldlabels );
+      }
+
 /* Now loop round increasing the number of digits in the formatted labels 
    from the lowest usable value found above until all adjacent labels are 
    different. An arbitrary upper limit of 1000 is used for Digits to stop it 
@@ -24326,6 +24335,12 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 /* Store the new Digits value. */
          astSetAxisDigits( ax, digits );
          
+/* Free memory used to hold the current set of labels. A new set will be
+   created by the following call to CheckLabels. */
+         if( labels ) {
+            for( i = 0; i < nmajor; i++ ) labels[ i ] = astFree( labels[ i ] );
+         }
+
 /* Break out of the loop if a Digits value has been found which results
    in all adjacent labels being different. Note the format used (we know 
    the Format attribute is currently unset, but the default Format string
