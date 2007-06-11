@@ -12,3 +12,6 @@ make_skycatlib.sh
 sta01999
 timestamp
 tmp
+cat_version.tcl
+pkgIndex.tcl
+tclIndex
