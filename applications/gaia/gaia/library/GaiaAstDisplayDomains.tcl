@@ -201,7 +201,7 @@ itcl::class gaia::GaiaAstDisplayDomains {
       set i 0
       set lwidth 15
       foreach {domain dims} "$domains_" {
-         set lwidth [expr max([string length $domain],$lwidth)]
+         set lwidth [expr int(max([string length $domain],$lwidth))]
       }
 
       # Get the current base domain frame index.
