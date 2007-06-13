@@ -156,6 +156,8 @@
 *        Big changes to smf_rebincube_xxx functions.
 *     2007-04-23 (EC):
 *        Add smf_terr
+*     2007-06-13 (EC):
+*        Added smf_open_file and smf_dtype_sz.c
 
 *     {enter_further_changes_here}
 
@@ -587,7 +589,7 @@ void smf_calcmodel_com( smfData *res, AstKeyMap *keymap,
 			double *map, double *mapvar, smfData *model, 
 			int flags, int *status );
 
-void smf_calcmodel_ast( smfData *res, AstKeyMap *keymap, 
+void smf_calcmodel_ast( smfData *res, AstKeyMap *keymap, int *lut,  
 			double *map, double *mapvar, smfData *model, 
 			int flags, int *status );
 
@@ -612,5 +614,11 @@ void smf_rebinsparse( smfData *data, int ifile, AstFrame *ospecfrm, AstMapping *
                       int ubnd_out[ 3 ], int genvar, float *data_array, 
                       float *var_array, int *ispec, float *texp_array, 
                       float *ton_array, double *fcon, int *status );
+
+
+void smf_open_model( Grp *igrp, int index, char *mode, smfData **data,
+		     int *status );
+
+size_t smf_dtype_sz( const smf_dtype dtype, int *status );
 
 #endif /* SMF_DEFINED */
