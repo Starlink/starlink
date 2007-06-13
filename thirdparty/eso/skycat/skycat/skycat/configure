@@ -10022,7 +10022,7 @@ _ACEOF
 		    LIBS="$LIBS -lpthread -lmach -lexc"
 		else
 		    CFLAGS="$CFLAGS -pthread"
-		    LDFLAGS="$LDFLAGS -pthread"
+		    #LDFLAGS="$LDFLAGS -pthread"
 		fi
 	    fi
 

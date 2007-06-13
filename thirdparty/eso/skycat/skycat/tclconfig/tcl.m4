@@ -1607,7 +1607,8 @@ dnl AC_CHECK_TOOL(AR, ar, :)
 		    LIBS="$LIBS -lpthread -lmach -lexc"
 		else
 		    CFLAGS="$CFLAGS -pthread"
-		    LDFLAGS="$LDFLAGS -pthread"
+                    # PWD: don't need this.
+		    #LDFLAGS="$LDFLAGS -pthread"
 		fi
 	    fi
 
