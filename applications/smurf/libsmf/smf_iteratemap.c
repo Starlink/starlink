@@ -69,6 +69,8 @@
 *        Put map estimation in first chunk loop, only ast in second
 *     2007-05-17 (EC)
 *        Added missing status checks
+*     2007-06-13 (EC):
+*        - Use new DIMM binary file format 
 
 
 *  Notes:
@@ -126,16 +128,14 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   /* Local Variables */
   int added;                    /* Number of names added to group */
   int astndf;                   /* Astronomical signal NDF identifier */
-  smfData *ast;                 /* Pointer to astronomical data struct */
+  smfData *ast=NULL;            /* Pointer to astronomical data struct */
   double *ast_data=NULL;        /* Pointer to DATA component of ast */
   Grp *astgrp=NULL;             /* Group of ast model files */
   const char *astname;          /* Name of astmodel group */
   const char *asttemp=NULL;     /* Pointer to static strings created by ast */
   int atmndf;                   /* Atmospheric signal NDF identifier */
   const char *atmname;          /* Name of atmmodel group */
-  /*smfData *cum;*/                 /* Pointer to input data struct */
-  /*Grp *cumgrp=NULL;*/             /* Group of cumulative model files */
-  smfData *data;                /* Pointer to source data struct */
+  smfData *data=NULL;           /* Pointer to source data struct */
   double *data_data=NULL;       /* Pointer to DATA component of data */
   int dimmflags;                /* Control flags for DIMM model components */
   dim_t dsize;                  /* Size of data arrays in containers */
@@ -146,7 +146,9 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   int isize;                    /* Number of files in input group */
   dim_t j;                      /* Loop counter */
   dim_t k;                      /* Loop counter */
-  int *lut=NULL;                /* Pointing lookup table */
+  smfData *lut=NULL;            /* Pointer to pointing LUT data struct */
+  int *lut_data=NULL;           /* Pointer to DATA component of lut */
+  Grp *lutgrp=NULL;             /* Group of lut model files */
   void *mapptr[3];              /* Pointer to array of mapped components */
   double mean;                  /* Estimate of mean */
   smfData **modeldata=NULL;     /* Array of pointers to model data */
@@ -159,12 +161,12 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   int nmodels=0;                /* Number of model components / iteration */
   int nndf;                     /* Residual noise NDF identifier */
   const char *nname;            /* Name of noisemodel group */
-  smfData *noi;                 /* Pointer to noise model data struct */
+  smfData *noi=NULL;            /* Pointer to noise model data struct */
   Grp *noigrp=NULL;             /* Group of noi model files */
   int numiter;                  /* Total number iterations */
   int pass;                     /* Two pass parsing of MODELORDER */
   int rebinflags;               /* Flags to control rebinning */
-  smfData *res;                 /* Pointer to residual data struct */
+  smfData *res=NULL;            /* Pointer to residual data struct */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   double *res_var=NULL;         /* Pointer to DATA component of res */
   Grp *resgrp=NULL;             /* Group of model residual files */
@@ -248,15 +250,15 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   msgOut(" ", "SMF_ITERATEMAP: Create model containers", status);
 
   if( nmodels > 0 ) {
-    modeldata = smf_malloc( nmodels, sizeof(*modeldata), 0, status );  
-    modelgrps = smf_malloc( nmodels, sizeof(*modelgrps), 0, status );  
+    modeldata = smf_malloc( nmodels, sizeof(*modeldata), 1, status );  
+    modelgrps = smf_malloc( nmodels, sizeof(*modelgrps), 1, status );  
   }
 
   /* These always get made */
-  /*smf_model_create( igrp, SMF__CUM, &cumgrp, status );*/
+
   smf_model_create( igrp, SMF__RES, &resgrp, status );
+  smf_model_create( igrp, SMF__LUT, &lutgrp, status ); 
   smf_model_create( igrp, SMF__AST, &astgrp, status );
-  smf_model_create( igrp, SMF__NOI, &noigrp, status );
 
   /* Dynamically created models */
   for( j=0; j<nmodels; j++ ) {
@@ -280,12 +282,19 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 	       status);
 
         /* Open files */
-        /*smf_open_file( cumgrp, i, "UPDATE", 0, &cum, status );*/
-        smf_open_file( resgrp, i, "UPDATE", 1, &res, status );
-        smf_open_file( astgrp, i, "UPDATE", 0, &ast, status );
+
+	/*
+	  smf_open_file( resgrp, i, "UPDATE", 1, &res, status );
+	  smf_open_file( astgrp, i, "UPDATE", 0, &ast, status );
+	*/
+
+	smf_open_model( resgrp, i, "UPDATE", &res, status );
+	smf_open_model( lutgrp, i, "READ", &lut, status );
+	smf_open_model( astgrp, i, "UPDATE", &ast, status );
 
 	for( j=0; j<nmodels; j++ ) {
-	  smf_open_file( modelgrps[j], i, "UPDATE", 0, &modeldata[j], status );
+	  smf_open_model( modelgrps[j], i, "UPDATE", &modeldata[j], status );
+	  /*smf_open_file( modelgrps[j], i, "UPDATE", 0, &modeldata[j], status );*/
 	}
 
 	/* Call the model calculations in the desired order. */
@@ -306,6 +315,11 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 	      (*modelptr)( res, keymap, map, mapvar, modeldata[j],
 			   dimmflags, status );
 	    }
+
+	    /* If bad status set exit condition */
+	    if( *status != SAI__OK ) {
+	      j = nmodels;
+	    }
 	  }
 	}
 
@@ -319,10 +333,9 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 	  ast_data = (double *)(ast->pntr)[0];
 	  res_data = (double *)(res->pntr)[0];
 	  res_var = (double *)(res->pntr)[1];
-	
-	  /*printf( "here1 %i\n", *status );*/
+	  lut_data = (int *)(lut->pntr)[0];
+
 	  dsize = (ast->dims)[0]*(ast->dims)[1]*(ast->dims)[2];
-	  /*printf( "here2 %i\n", *status );*/
 
 	  for( k=0; k<dsize; k++ ) {	  
 	    res_data[k] += ast_data[k];
@@ -336,12 +349,12 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 	}
 
 	/* Load the LUT from the mapcoord extension */
-	smf_open_mapcoord( res, status );
+	/* smf_open_mapcoord( res, status ); */
 
 	if( *status == SAI__OK ) {
 	  /* Should check if bad status due to lack of extension, in
 	     which case try calculating it */
-	  lut = res->lut;
+	  /*lut = res->lut;*/
 
 	  /* Setup rebin flags */
 	  rebinflags = 0;
@@ -358,15 +371,15 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 	/* Rebin the residual + astronomical signal into a map */
 
 	msgOut(" ", "SMF_ITERATEMAP: Rebin residual to estimate MAP", status);
-	smf_simplerebinmap( res_data, res_var, lut, dsize,
+	smf_simplerebinmap( res_data, res_var, lut_data, dsize,
 			    rebinflags, map, weights, mapvar,
 			    msize, status );
 	  
-
         /* Close files */
-        /*smf_close_file( &cum, status );*/
+
         smf_close_file( &res, status );
         smf_close_file( &ast, status );    
+        smf_close_file( &lut, status );    
 
 	for( j=0; j<nmodels; j++ ) {
 	  smf_close_file( &modeldata[j], status );
@@ -379,15 +392,18 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 
       /*if( iter == 1 ) return;*/
 
-
       if( *status == SAI__OK ) {
 	msgOut(" ", "SMF_ITERATEMAP: Calculate ast", status);
 
         for( i=1; i<=isize; i++ ) {
-	  smf_open_file( astgrp, i, "UPDATE", 0, &ast, status );
-	  smf_open_file( resgrp, i, "UPDATE", 0, &res, status );
-	  /*smf_open_file( cumgrp, i, "UPDATE", 0, &cum, status );*/
-	  /*smf_open_file( noigrp, i, "UPDATE", 0, &noi, status );*/
+	  smf_open_model( astgrp, i, "UPDATE", &ast, status );
+	  smf_open_model( resgrp, i, "UPDATE", &res, status );
+	  smf_open_model( lutgrp, i, "READ", &lut, status );
+
+	  /*
+	    smf_open_file( astgrp, i, "UPDATE", 0, &ast, status );
+	    smf_open_file( resgrp, i, "UPDATE", 0, &res, status );
+	  */
 
 	  /* Calculate the AST model component. It is a special model
 	     because it assumes that the map contains the best current
@@ -395,17 +411,17 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
              separate loop since the map estimate gets updated by
              each chunk in the main model component loop */
 
-	  smf_calcmodel_ast( res, keymap, map, mapvar, ast, 0, status );
-	  
+	  if( *status == SAI__OK ) {
+	    lut_data = (int *)(lut->pntr)[0];
+	    smf_calcmodel_ast( res, keymap, lut_data, map, mapvar, ast, 0, 
+			       status );
+	  }
+
 	  /* Finally calculate the noise from the residual */
 
-	  /*smf_calcmodel_noi( cum, res, keymap, map, mapvar, noi, 0, status );
-	   */
- 
 	  smf_close_file( &ast, status );    
 	  smf_close_file( &res, status );
-	  /*smf_close_file( &cum, status );*/
-	  /*smf_close_file( &noi, status );*/
+	  smf_close_file( &lut, status );
         }
       }
     }
@@ -413,15 +429,12 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 
   /* Cleanup */
 
-  /*if( cumgrp ) grpDelet( &cumgrp, status );*/
   if( resgrp ) grpDelet( &resgrp, status );
   if( astgrp ) grpDelet( &astgrp, status );  
 
   for( j=0; j<nmodels; j++ ) {
     if( modelgrps[j] ) grpDelet( &(modelgrps[j]), status );
-
   }
 
   if( modeltyps ) smf_free( modeltyps, status );
-
 }

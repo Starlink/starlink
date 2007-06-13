@@ -13,7 +13,7 @@
 *     Library routine
 
 *  Invocation:
-*     smf_calcmodel_ast( smfData *res, AstKeyMap *keymap, 
+*     smf_calcmodel_ast( smfData *res, AstKeyMap *keymap, int *lut,
 *                        double *map, double *mapvar, smfData *model, 
 *                        int flags, int *status);
 
@@ -22,6 +22,8 @@
 *        The residual signal from previously calculated model components
 *     keymap = AstKeyMap * (Given)
 *        Parameters that control the iterative map-maker
+*     lut = int * (Given)
+*        Lookup table for map pixel of each data point
 *     map = double * (Given)
 *        Buffer containing current estimate of the map (must match the LUT
 *        in the mapcoord extension of the res data structure)
@@ -55,6 +57,9 @@
 *        Modified bit flags
 *     2007-05-23 (EC)
 *        Removed CUM calculation
+*     2007-06-13 (EC)
+*        pointing lut supplied as extra parameter to accomodate 
+*        new DIMM file format
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -96,13 +101,12 @@
 
 #define FUNC_NAME "smf_calcmodel_ast"
 
-void smf_calcmodel_ast( smfData *res, AstKeyMap *keymap, 
+void smf_calcmodel_ast( smfData *res, AstKeyMap *keymap, int *lut, 
 			double *map, double *mapvar, smfData *model, 
 			int flags, int *status) {
 
   /* Local Variables */
   dim_t i;                      /* Loop counter */
-  int *lut=NULL;                /* Pointing lookup table */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   dim_t ndata;                  /* Number of data points */
   double *res_data=NULL;        /* Pointer to DATA component of res */
@@ -110,16 +114,6 @@ void smf_calcmodel_ast( smfData *res, AstKeyMap *keymap,
   
   /* Main routine */
   if (*status != SAI__OK) return;
-
-  /* Load the LUT from the mapcoord extension */
-
-  smf_open_mapcoord( res, status );
-  lut = res->lut;
-
-  if( *status == SAI__OK ) {
-    /* Should check if bad status due to lack of extension, in
-       which case try calculating it */
-  }
 
   /* Get pointers to DATA components */
   res_data = (double *)(res->pntr)[0];
