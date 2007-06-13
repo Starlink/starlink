@@ -40,6 +40,8 @@
 *        Changed technique/interface to look like smf_dtype_string
 *     2007-02-12 (EC):
 *        Return simple string, form grpex in smf_model_create instead
+*     2007-06-13 (EC):
+*        Added LUT
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -118,6 +120,10 @@ char *smf_model_getname( smf_modeltype type, int *status) {
 
   case SMF__EXT:
     retval = "ext";
+    break;
+
+  case SMF__LUT:
+    retval = "lut";
     break;
 
   default:
