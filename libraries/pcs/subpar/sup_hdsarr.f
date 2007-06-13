@@ -144,11 +144,10 @@
 
 *.
 
-
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
       STRUCARR = .FALSE.
       SLICE = .FALSE.
+
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *   Look for brackets
       LBRACK = INDEX ( COMPONENT, '(' )
