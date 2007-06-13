@@ -82,6 +82,10 @@
 *     2007-03-05 (EC):
 *        Add SMF__DIMM_FIRSTCOMP/FIRSTITER bit flags;
 *        Add SMF__EXT to smf_modeltype
+*     2007-06-13 (EC):
+*        Add SMF__LUT to smf_modeltype
+*        Add SMF__DIMM_SUFFIX
+*        Add DIMMbuf and DIMMlen to smfData
 *     {enter_further_changes_here}
 
 
@@ -143,7 +147,12 @@ typedef enum smf_modeltype {
   SMF__COM=3,             /* Common-mode signal */
   SMF__NOI=4,             /* Noise model */
   SMF__EXT=5,             /* Extinction correction */
+  SMF__LUT=6,             /* Pointing LUT */
 } smf_modeltype;
+
+/* suffix for simple binary files that store DIMM model components */
+
+#define SMF__DIMM_SUFFIX ".dimm"
 
 /* Bit flags for smf_calcmodel* model component calculations */
 #define SMF__DIMM_FIRSTCOMP 1
@@ -236,6 +245,8 @@ typedef struct smfData {
   smfDream *dream;           /* DREAM parameters */
   smf_dtype dtype;           /* Data type of DATA and VARIANCE arrays */
   void * pntr[3];            /* Array of pointers to DATA/VARIANCE/QUALITY */
+  void * DIMMbuf;            /* Pntr to entire mapped file if DIMM component */
+  size_t DIMMlen;            /* size of DIMM mapped array */
   dim_t dims[NDF__MXDIM];    /* Dimensions of data array */
   int ndims;                 /* Number of active dimensions in "dims" */
   int refcount;              /* Reference count for data object */
