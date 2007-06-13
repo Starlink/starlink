@@ -48,6 +48,7 @@
 *  Authors:
 *     Tim Jenness (TIMJ)
 *     Andy Gibb (UBC)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -57,6 +58,8 @@
 *        Add scanfit polynomial initialization
 *     2006-07-01 (AGG):
 *        Change args to smf_free
+*     2007-06-13 (EC):
+*        Initialize data->DIMMbuf and data->DIMMlen
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -149,7 +152,8 @@ smf_create_smfData( int flags, int * status ) {
   for (i = 0; i < NDF__MXDIM; i++ ) {
     (data->dims)[i] = 0;
   }
-
+  data->DIMMbuf = NULL;
+  data->DIMMlen = 0;
   data->lut = NULL;
   return data;
 
