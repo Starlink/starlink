@@ -1,10 +1,10 @@
 /*
 *+
 *  Name:
-*     smf_dtype_size
+*     smf_dtype_sz
 
 *  Purpose:
-*     Return size of data type primitive given smfData in bytes
+*     Return size of data type primitive given smf_dtype in bytes
 
 *  Language:
 *     Starlink ANSI C
@@ -13,11 +13,11 @@
 *     C function
 
 *  Invocation:
-*     size_t smf_dtype_size( const smfData * data, int * status );
+*     size_t smf_dtype_sz( const smf_dtype dtype, int * status );
 
 *  Arguments:
-*     data = const smfData* (Given)
-*        Data struct to check
+*     dtype = const smf_dtype (Given)
+*        Data stype to check
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -32,15 +32,12 @@
 *     data type. Status is set to bad if the data type is not understood.
 
 *  Authors:
-*     Tim Jenness (JAC, Hawaii)
 *     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
-*     2006-01-24 (TIMJ):
-*        Initial version.
 *     2007-06-13 (EC):
-*        Moved the switch on dtype to new routine smf_dtype_sz.c
+*        Initial version factors code out from smf_dtype_size.c
 
 *  Notes:
 *     - See also smf_dtype_check, smf_dtype_string
@@ -70,11 +67,7 @@
 *-
 */
 
-/* System includes */
-#include <string.h>
-
 /* Starlink includes */
-#include "ast.h"
 #include "sae_par.h"
 #include "mers.h"
 
@@ -84,31 +77,34 @@
 #include "smf_err.h"
 
 /* Simple default string for errRep */
-#define FUNC_NAME "smf_dtype_size"
+#define FUNC_NAME "smf_dtype_sz"
 
-size_t smf_dtype_size( const smfData* data, int * status ) {
-  int itype;
-
-  /* Set a default value */
-  size_t retval = 0;
+size_t smf_dtype_sz( const smf_dtype dtype, int *status ) {
   
-  /* Check entry status */
+  size_t retval = 0;
+
   if (*status != SAI__OK) return retval;
-
-  /* check that we have a smfData */
-  if ( data == NULL ) {
-    *status = SAI__ERROR;
-    errRep( FUNC_NAME,
-	    "Supplied smfData is a NULL pointer. Possible programming error.",
-	    status);
-    return retval;
-  }
-
+  
   /* now switch on data type */
-
-  itype = data->dtype;
-
-  retval = smf_dtype_sz( itype, status );
+  switch( dtype ) {
+  case SMF__INTEGER:
+    retval = sizeof(int);
+    break;
+  case SMF__FLOAT:
+    retval = sizeof(float);
+    break;
+  case SMF__DOUBLE:
+    retval = sizeof(double);
+    break;
+  case SMF__USHORT:
+    retval = sizeof(short);
+    break;
+  default:
+    retval = 0;
+    *status = SMF__BDTYP;
+    msgSeti( "TC", dtype );
+    errRep(FUNC_NAME, "Unable to determine size of datatype. Data typecode was ^TC", status );
+  }
 
   return retval;
 }
