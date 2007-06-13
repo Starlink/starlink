@@ -75,6 +75,8 @@
 *        Free detname memory.
 *     2006-1-19 (DSB):
 *        Free tsys memory.
+*     2007-06-13 (EC)
+*        If smfData associated with DIMM component, free resources
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -102,6 +104,12 @@
 *-
 */
 
+
+/* General includes */
+#include <sys/mman.h>
+#include <sys/stat.h>
+
+/* SMURF and STARLINK includes */
 #include "smf.h"
 #include "smf_typ.h"
 #include "sae_par.h"
@@ -139,6 +147,7 @@ void smf_close_file( smfData ** data, int * status ) {
   /* Process reference count */
   /* Only proceed if the decremented reference count is 0 */
   (*data)->refcount--;
+
   if ((*data)->refcount > 0 ) return;
   
   /* Get the header and file, since we need them for checking */
@@ -170,6 +179,28 @@ void smf_close_file( smfData ** data, int * status ) {
   } else {
     /* no file - data is ours to free */
     freedata = 1;
+  }
+
+  /* If this smfData is associated with a mapped DIMM model component
+     file, unmap rather than freeing */
+
+  if( (*data)->DIMMbuf ) {
+
+    /* Synchronize and then try to unmap */
+
+    if( msync((*data)->DIMMbuf, (*data)->DIMMlen, MS_ASYNC ) == -1 ) {
+      *status = SAI__ERROR;
+      errRep( ERRFUNC, "Unable to synch model container file", status ); 
+    } else if( munmap( (*data)->DIMMbuf, (*data)->DIMMlen ) == -1 ) {
+      *status = SAI__ERROR;
+      errRep( ERRFUNC, "Unable to unmap model container file", status ); 
+    } else {
+      (*data)->DIMMbuf = NULL;
+      (*data)->DIMMlen = 0;
+    }
+    
+    /* Don't subsequently try to free the data array */
+    freedata = 0;
   }
 
   /* Tidy up the header */
