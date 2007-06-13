@@ -52,6 +52,8 @@
 *        Initial Version
 *     2007-03-05 (EC)
 *        Modified bit flags
+*     2007-06-13 (EC)
+*        Fixed res_data pointer assignment bug
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -114,7 +116,7 @@ void smf_calcmodel_noi( smfData *res, AstKeyMap *keymap,
   if (*status != SAI__OK) return;
 
   /* Get pointers to DATA components */
-  res_data = (double *)(res->pntr)[1];
+  res_data = (double *)(res->pntr)[0];
   res_var = (double *)(res->pntr)[1];
   model_data = (double *)(model->pntr)[0];
 
@@ -138,7 +140,9 @@ void smf_calcmodel_noi( smfData *res, AstKeyMap *keymap,
       /* Loop over time and store the model component / variance for RES */
       for( j=0; j<ntslice; j++ ) {
 	model_data[j*nbolo + i] = sigma;
-	res_var[j*nbolo + i] = var;
+	if( res_var ) {
+	  res_var[j*nbolo + i] = var;
+	}
       }
     }    
   }
