@@ -7,6 +7,12 @@
  data arrays.
 
 
+Changes introduced at V0.0-34:
+
+   - Fix a bug that could cause spurious values to appear the catalogue
+   columns produced using the ExtraCols configuration parameter.
+
+
 Changes introduced at V0.0-33:
 
    - FINDCLUMPS has a new output parameter called NCLUMPS to which is

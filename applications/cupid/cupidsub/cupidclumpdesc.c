@@ -161,6 +161,9 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 *        converted to "deg" easily later on (using active units).
 *     8-MAY-2007 (DSB):
 *        Fix bug in conversion of non-sky axis values from pixel to wcs.
+*     14-JUN-2007 (DSB):
+*        Make "ncomp" static. Fixes spurious values appearing in the
+*        extra columsn created using the ExtraCols config parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -203,7 +206,6 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
    int k;                   /* Pixel index on 3rd pixel axis */
    int lbnd[ 3 ];           /* Lower NDF pixel bounds */   
    int n;                   /* Number of good pixels indices */
-   int ncomp;               /* No. of components in the CUPID extension */
    int ndim;                /* Number of pixel axes */   
    int nel;                 /* Number of elements in mapped array */
    int px;                  /* X pixel index at peak value */
@@ -212,6 +214,7 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
    int there;               /* Has the NDF got a CUPID extension? */
    int ubnd[ 3 ];           /* Upper NDF pixel bounds */   
 
+   static int ncomp;        /* No. of components in the CUPID extension */
    static int skyaxis[ 3 ]; /* Flags indicating which axes are skyaxes */
    static const char *pnames[ MXPAR ];  /* Parameter names to return */
    static char name_buf[ MXPAR ][ MXNAMLEN ];/* Buffers for parameter names */
