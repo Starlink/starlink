@@ -146,6 +146,7 @@ hdsClose(HDSLoc **locator,
 
    if(!_ok(*status))
       return *status;
+   hds_gl_status = DAT__OK;
 
 /* Import the locator */
    _call(dat1_import_loc(*locator, &lcp ))
@@ -167,5 +168,5 @@ hdsClose(HDSLoc **locator,
    dat1_free_hdsloc(locator );
 
 /* Exit the routine.                                                        */
-      return hds_gl_status;
+   return hds_gl_status;
 }
