@@ -107,6 +107,8 @@
 *        Original version.
 *     2007 April 26 (MJC):
 *        Added PIXEL argument.
+*     2007 April 30 (MJC):
+*        Add NBEAM argument so that all beam features are reported.
 *     2007 May 10 (MJC):
 *        Added DPREC argument.  Convert orientation into reporting
 *        Frame.
@@ -252,7 +254,7 @@
 *  Display the current Frame's co-ordinates of the beam centre.
             CALL MSG_SETC( 'XP', AST_FORMAT( CFRM, 1, P( 1, IB ),
      :                                       STATUS ) )
-            CALL MSG_SETC( 'YP', AST_FORMAT( CFRM, 1, P( 2, IB ),
+            CALL MSG_SETC( 'YP', AST_FORMAT( CFRM, 2, P( 2, IB ),
      :                                       STATUS ) )
 
 *  Form the Unit attribute name for this axis.
@@ -313,7 +315,7 @@
             ELSE
 
 *  Display the current Frame's co-ordinates of the beam separation.
-               CALL MSG_SETC( 'RAD', AST_FORMAT( FRM2, 1, 
+               CALL MSG_SETC( 'RAD', AST_FORMAT( FRM2, REPAX, 
      :                                           POLAR( 1, IB ),
      :                                           STATUS ) )
 
@@ -346,9 +348,9 @@
 
 *  Polar radius errors
 *  -------------------
-                  CALL MSG_SETC( 'RADE',
-     :                           AST_FORMAT( FRM2, 1, POLSIG( 1, IB ), 
-     :                                       STATUS ) )
+                  CALL MSG_SETC( 'RADE', AST_FORMAT( FRM2, REPAX, 
+     :                                               POLSIG( 1, IB ), 
+     :                                               STATUS ) )
                END IF
                CALL MSG_LOAD( 'KPS1_BFLOG_MSG8E', '    Offset      '/
      :                        /'    : ^RAD +/- ^RADE ^UNIT',
