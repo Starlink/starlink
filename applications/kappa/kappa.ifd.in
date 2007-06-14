@@ -7499,7 +7499,7 @@ package kappa {
             ppath DEFAULT
             vpath DEFAULT
             default TRUE
-            prompt {Use polar co-ordinates for INI2-INI5 and SEP1-SEP4 parameters?}
+            prompt {Use polar co-ordinates for POS2)--POS5 parameters?}
             helpkey *
           }
 
@@ -7548,48 +7548,30 @@ package kappa {
             helpkey *
           }
 
+         parameter resid {
+            type NDF
+            access WRITE
+            vpath DEFAULT
+            prompt {NDF for the map of the residuals}
+            default !
+            helpkey *
+          }
+
          parameter rms {
             access WRITE
-            type _DOUBLE
+            type _REAL
             vpath INTERNAL
-            prompt {Object to contain the rms of the fit for the primary beam}
+            prompt {Object to contain the rms of the fit}
             helpkey *
           }
 
-         parameter sep1 {
+         parameter title {
             type LITERAL
-            ppath CURRENT DEFAULT
             vpath DEFAULT
-            prompt {Offset of the second beam from the primary}
-            helpkey *
-            default !
-          }
-
-         parameter sep2 {
-            type LITERAL
+            prompt {Title for residuals NDF}
             ppath CURRENT DEFAULT
-            vpath PROMPT
-            prompt {Offset of the third beam from the primary}
-            helpkey *
             default !
-          }
-
-         parameter sep3 {
-            type LITERAL
-            ppath CURRENT DEFAULT
-            vpath PROMPT
-            prompt {Offset of the fourth beam position from the primary}
             helpkey *
-            default !
-          }
-
-         parameter sep4 {
-            type LITERAL
-            ppath CURRENT DEFAULT
-            vpath PROMPT
-            prompt {Offset of the fifth beam position from the primary}
-            helpkey *
-            default !
           }
 
          parameter variance {
