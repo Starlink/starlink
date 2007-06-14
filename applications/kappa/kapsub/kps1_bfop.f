@@ -33,7 +33,7 @@
 *                           degrees
 *        AMP      _DOUBLE   The amplitude of the Gaussian beam
 *        BACK     _DOUBLE   The background level
-*        RMS      _DOUBLE   The RMS of the fit
+*        RMS      _REAL     The RMS of the fit
 *
 *    Two further parameters are written if the number of beam
 *    positions is more than one.  Each is an array of length twice the
@@ -81,7 +81,7 @@
 *         The standard-deviation errors associated with the polar 
 *          co-ordinates supplied in argument POLAR.  The POLSIG(*,1)
 *         values of the primary beam are ignored.
-*     RMS = REAL (Given)
+*     RMS = DOUBLE PRECISION (Given)
 *        The RMS residual in pixels.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -118,6 +118,8 @@
 *     2007 May 30 (MJC):
 *        Add NBEAM, POLAR, and POLSIG arguments to report polar
 *        co-ordinates of secondary-beam features.
+*     2007 June 11 (MJC):
+*        Made RMS single precision.
 *     {enter_further_changes_here}
 
 *-
@@ -143,7 +145,7 @@
       INTEGER NBEAM
       DOUBLE PRECISION POLAR( 2, NBEAM )
       DOUBLE PRECISION POLSIG( 2, NBEAM )
-      REAL RMS
+      DOUBLE PRECISION RMS
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -246,7 +248,7 @@
 
 *  RMS
 *  ===
-      CALL PAR_PUT0R( 'RMS', RMS, STATUS )
+      CALL PAR_PUT0R( 'RMS', SNGL( RMS ), STATUS )
 
       
 *  OFFSET and PA
