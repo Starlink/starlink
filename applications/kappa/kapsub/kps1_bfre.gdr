@@ -1,0 +1,184 @@
+      SUBROUTINE KPS1_BFRE<T>( LBND, UBND, IN, NPOS, NPAR, FPAR, OUT,
+     :                       STATUS )
+*+
+*  Name:
+*     KPS1_BFREx
+
+*  Purpose:
+*     Evaluates the two-dimensional residual map of a BEAMFIT fit.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPS1_BFREx( LBND, UBND, INARR, NPOS, NPAR, FPAR, OUT,
+*                      STATUS )
+
+*  Description:
+*     This routine evaluates within an array the BEAMFIT multi-Gaussian
+*     fit and subtracts from it the array that was fitted to derive the
+*     residuals, that it returns as two-dimensional image.
+
+*  Arguments:
+*     LBND( 2 ) = INTEGER (Given)
+*        The lower bounds of the pixel axes.
+*     UBND( 2 ) = INTEGER (Given)
+*        The upper bounds of the pixel axes.
+*     IN( LBND(1):UBND(1), LBND(2):UBND(2) ) = ? (Given)
+*        The array that was fitted.
+*     NPOS = INTEGER (Given)
+*        The number of beam positions fitted.
+*     NPAR = INTEGER (Given)
+*        The number of fit coefficients
+*     FPAR( NPAR ) = DOUBLE PRECISION (Given)
+*        The coefficients of the fit in the PIXEL Frame.  The width
+*         measures are standard deviations.
+*     OUT( LBND(1):UBND(1), LBND(2):UBND(2) ) = ? (Returned)
+*        The residuals at every element.
+*     STATUS = INTEGER (Given)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for double-precision and single-precision
+*     floating-point data types: replace "x" in the routine name by D
+*     or R as appropriate.  The IN and OUT arguments must have the data
+*     type specified.
+
+*  Copyright:
+*     Copyright (C) 2007 Particle Physics and Astronomy Research
+*     Council.  All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2007 June 8 (MJC):
+*        Original version.
+*     {enter_further_changes_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+      INCLUDE 'BF_PAR'           ! BEAMFIT constants
+
+*  Arguments Given:
+      INTEGER LBND( 2 )
+      INTEGER UBND( 2 )
+      <TYPE> IN( LBND( 1 ):UBND( 1 ), LBND( 2 ):UBND( 2 ) )
+      INTEGER NPOS
+      INTEGER NPAR
+      DOUBLE PRECISION FPAR( NPAR )
+
+*  Arguments Returned:
+      <TYPE> OUT( LBND( 1 ):UBND( 1 ), LBND( 2 ):UBND( 2 ) )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      DOUBLE PRECISION BACK( BF__MXPOS ) ! Backgrounds
+      INTEGER BPO                ! Beam position offset within
+                                 ! coefficient array
+      DOUBLE PRECISION CT        ! Cosine of the orientation
+      DOUBLE PRECISION E1        ! Work variable
+      DOUBLE PRECISION E2        ! Work variable
+      DOUBLE PRECISION E3        ! Work variable
+      DOUBLE PRECISION E4        ! Work variable
+      DOUBLE PRECISION E5        ! Work variable
+      DOUBLE PRECISION E6        ! Work variable
+      DOUBLE PRECISION GI        ! Sum of Gaussians' intensity at pixel
+      INTEGER I                  ! Loop counter
+      INTEGER IG                 ! Gaussian counter
+      INTEGER J                  ! Loop counter
+      REAL SIGMA                 ! The Gaussian width along the minor
+                                 ! axis
+      DOUBLE PRECISION ST        ! Sine of the orientation
+      DOUBLE PRECISION XX        ! X pixel co-ordinate
+      DOUBLE PRECISION YY        ! Y pixel co-ordinate
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise the backgrounds to use just the first measure.  We could 
+*  have had one fewer coefficient per beam, but it's easier to code 
+*  and follow if there are a fixed BF__NCOEF coefficients per beam 
+*  position.
+      DO IG = 1, NPOS
+         BPO = ( IG - 1 ) * BF__NCOEF
+         BACK( IG ) = 0.0D0
+      END DO
+
+*  Only need to apply the background level once.
+      BACK( 1 ) = FPAR( 7 )
+
+*  Loop for each line.
+      DO J = LBND( 2 ), UBND( 2 )
+         YY = DBLE( J ) - 0.5D0
+
+*  Loop for each column. 
+         DO I = LBND( 1 ), UBND( 1 )
+            IF ( IN( I, J ) .NE. VAL__BAD<T> ) THEN
+               XX = DBLE( I ) - 0.5D0
+
+               GI = 0.0D0
+               DO IG = 1, NPOS
+                  BPO = ( IG - 1 ) * BF__NCOEF
+
+*  Define useful variables.
+                  CT = COS( FPAR( 5 + BPO ) )
+                  ST = SIN( FPAR( 5 + BPO ) )
+
+*  Evaluate sum of Gaussians.  Recall FPAR( 1 + BPO ) and 
+*  FPAR( 2 + BPO ) are the x and y centre co-ordinates respectively for
+*  the IGth Gaussian.   FPAR( 3 + BPO ) and  FPAR( 4  + BPO ) are the 
+*  major- and minor-axis standard deviations respectively.
+                  E1 = ( XX - FPAR( 1 + BPO ) ) * CT +
+     :                 ( YY - FPAR( 2 + BPO ) ) * ST
+                  E2 = ( YY - FPAR( 2 + BPO ) ) * CT - 
+     :                 ( XX - FPAR( 1 + BPO ) ) * ST
+                  E3 = E1 * E1 / ( FPAR( 3 + BPO ) *  FPAR( 3 + BPO ) )
+                  E4 = E2 * E2 / ( FPAR( 4 + BPO ) *  FPAR( 4 + BPO ) )
+                  E5 = EXP( -0.5 * ( E3 + E4 ) )
+                  E6 = E5 * FPAR( 6 + BPO ) + BACK( IG )
+                  GI = GI + E6
+               END DO
+ 
+*  Form the residual.
+               OUT( I, J ) = NUM_DTO<T>( GI ) - IN( I, J )
+
+            ELSE
+               OUT( I, J ) = VAL__BAD<T>
+            END IF
+         END DO
+
+      END DO
+
+      END
