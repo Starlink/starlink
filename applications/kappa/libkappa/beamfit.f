@@ -88,10 +88,10 @@
 *        or three beam positions.  This parameter is ignored  for "File" 
 *        and "Catalogue" modes, where the number comes from the number 
 *        of beam positions read from the files; and for "Interface" mode
-*        when the beam position POS is supplied on the command line 
-*        without BEAMS.  In all modes there is a maximum of five 
-*        positions, which for "File" or "Catalogue" modes will be the 
-*        first five.  [1]
+*        when the beam positions POS, POS2, etc. are supplied in full
+*        on the command line without BEAMS.  In all modes there is a 
+*        maximum of five positions, which for "File" or "Catalogue" 
+*        modes will be the first five.  [1]
 *     CENTRE( 2 ) = LITERAL (Write)
 *        The formatted co-ordinates and their errors of the primary
 *        beam in the current co-ordinate Frame of the NDF.  
@@ -292,14 +292,15 @@
 *        spaces or commas.
 
 *        If the initial co-ordinates are supplied on the command line 
-*        without BEAMS specified only one beam will be fit.
+*        without BEAMS the number of contigious POS, POS2,... parameters
+*        specifies the number of beams to be fit.
 *     POS2-POS5 = LITERAL (Read)
-*        When MODE = "Interface" these parameters specify the co-ordinates
-*        of the secondary beam positions.  For each parameter the
-*        supplied location may be merely an initial guess for the fit, 
-*        or if parameter FIXPOS is TRUE, it defines a fixed location,
-*        unless parameter FIXSEP is TRUE, whereupon it defines a fixed 
-*        separation from the primary beam.
+*        When MODE = "Interface" these parameters specify the 
+*        co-ordinates of the secondary beam positions.  For each 
+*        parameter the supplied location may be merely an initial guess 
+*        for the fit, or if parameter FIXPOS is TRUE, it defines a fixed
+*        location, unless parameter FIXSEP is TRUE, whereupon it defines 
+*        a fixed separation from the primary beam.
 *
 *        For POLAR = FALSE each distance should be given as a single
 *        literal string containing a space- or comma-separated list of 
@@ -325,9 +326,19 @@
 *        If TRUE then the fit parameters are not displayed on the 
 *        screen.  Output parameters and files are still created.  
 *        [FALSE]
+*     RESID = NDF (Write)
+*        The map of the residuals of the fit.  It inherits the
+*        properties of the input NDF, except that its data type is 
+*        _DOUBLE or _REAL depending on the precision demanded by the 
+*         type of IN, and no variance is propagated.  A null (!) value 
+*         requests that no residual map be created.  [!]
 *     RMS = _REAL (Write)
 *        The primary beam position's root mean-squared deviation from
 *        the fit.
+*     TITLE = LITERAL (Read)
+*        The title for the NDF to contain the residuals of the fit.
+*        If null (!) is entered the NDF will not contain a title.  
+*        ["KAPPA - BEAMFIT"]
 *     VARIANCE = _LOGICAL (Read)
 *        If TRUE, then any VARIANCE component present within the input
 *        NDF will be used to weight the fit; the weight used for each
@@ -354,12 +365,14 @@
 *        As above but now the fitted data is restricted to areas 51x51
 *        pixels about the initial guess positions.  All the other 
 *        examples use the full array.
-*     beamfit mars_3pos int 3 "5.0,-3.5" ampratio=-0.5
+*     beamfit mars_3pos int 3 "5.0,-3.5" ampratio=-0.5 resid=mars_res
 *        As the first example except this finds the Gaussian 
 *        coefficients of the primary beam feature and two secondary 
 *        features.  The secondary features have fixed amplitudes that 
 *        are half that of the primary feature and of the opposite
-*        polarity.
+*        polarity.  The residuals after subtracting the fit are stored
+*        in NDF mars_res.  In all the other examples no residual map
+*        is created.
 *     beamfit mars_3pos int 2 "5.0,-3.5" pos2="60.0,90" fixpos
 *        This finds the Gaussian coefficients of the primary beam
 *        feature and a secondary feature in the NDF called mars_3pos.
@@ -453,7 +466,7 @@
 *     2007 May 11 (MJC):
 *        Use an array for the fixed parameters.
 *     2007 May 14 (MJC):
-*        Add SEPARATION parameters.
+*        Add SEPARATION parameter.
 *     2007 May 22 (MJC):
 *        Improve and correct documentation.  Made SEPARATION a series of
 *        parameters SEP--SEP4 to allow command-line access.  Revise
@@ -466,6 +479,10 @@
 *        SEP1--SEP4 were removed, and INIT1--INIT5 have become POS and 
 *        POS2--POS5 overloading meanings depending on the values of
 *        FIXPOS and FIXSEP.
+*     2007 June 8 (MJC):
+*        Add RESID parameter and calculation of the residual-image NDF.
+*        Rework derivation of the number of positions from the command
+*        line.  Remove unused variables.
 *     {enter_further_changes_here}
 
 *-
@@ -479,7 +496,7 @@
       INCLUDE 'AST_PAR'          ! AST constants and functions
       INCLUDE 'NDF_PAR'          ! NDF definitions
       INCLUDE 'MSG_PAR'          ! Message-system constants
-      INCLUDE 'SUBPAR_PAR'       ! SUBPAR constants
+      INCLUDE 'PAR_PAR'          ! Parameter-system constants
       INCLUDE 'PAR_ERR'          ! Parameter-system errors
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
@@ -505,6 +522,8 @@
       LOGICAL CURSOR             ! Cursor mode was selected
       LOGICAL DESC               ! Describe the current Frame?
       INTEGER DIMS( BF__NDIM )   ! Dimensions of NDF
+      CHARACTER*( NDF__SZFTP ) DTYPE ! Numeric type for results
+      INTEGER EL                 ! Number of mapped elements
       LOGICAL FAREA              ! Full data area to be used?
       INTEGER FDL                ! File description of logfile
       LOGICAL FILE               ! File mode was selected?
@@ -512,33 +531,31 @@
       DOUBLE PRECISION FPAR( MXCOEF ) ! Stores fixed parameter values
       LOGICAL FIXCON( BF__NCON ) ! Constraints set?
       DOUBLE PRECISION FWHM( BF__NDIM ) ! Fixed FWHM
-      LOGICAL FXFWHM             ! FWHM of the Gaussian fixed?
       LOGICAL GOTLOC             ! Locator to the NDF obtained?
       LOGICAL GOTNAM             ! Reference name of the NDF obtained?
       LOGICAL HASVAR             ! Errors to be calculated
       INTEGER I                  ! Loop counter
-      INTEGER ID0                ! Identifier for first output position
       INTEGER IMARK              ! PGPLOT marker type
-      INTEGER INDF               ! Input NDF identifier
       DOUBLE PRECISION INPOL( 2 ) ! Pole co-ordinates
       LOGICAL INTERF             ! Interface mode selected?
+      INTEGER IPD                ! Pointer to input data array
       INTEGER IPIC               ! AGI identifier for last data picture
       INTEGER IPIC0              ! AGI identifier for original current 
                                  ! picture
       INTEGER IPID               ! Pointer to array of position 
                                  ! identifiers
-      INTEGER IPIX               ! Index of PIXEL Frame in IWCS
-      INTEGER IPLOT              ! Plot obtained from graphics database
       INTEGER IPIN               ! Pointer to array of supplied 
                                  ! positions
-      INTEGER IPOUT              ! Pointer to array of output positions
-      INTEGER IPW1               ! Pointer to work space
-      INTEGER IPW2               ! Pointer to work space
+      INTEGER IPIX               ! Index of PIXEL Frame in IWCS
+      INTEGER IPLOT              ! Plot obtained from graphics database
+      INTEGER IPRES              ! Pointer to residuals data array
+      CHARACTER*( NDF__SZTYP ) ITYPE ! Data type for residuals map
       INTEGER IWCS               ! WCS FrameSet from input NDF
       INTEGER IWCSG              ! FrameSet read from input catalogue
       INTEGER J                  ! Loop counter and index
       CHARACTER*(DAT__SZLOC) LOCI ! Locator for input data structure
       LOGICAL LOGF               ! Write log of positions to text file?
+      LOGICAL LOOP               ! Loop for more cmd-line POS params?
       INTEGER MAP1               ! Mapping from PIXEL Frame to Current 
                                  ! Frame
       INTEGER MAP2               ! Mapping from supplied Frame to 
@@ -553,9 +570,8 @@
       INTEGER NAXC               ! Number of axes in current NDF Frame
       INTEGER NAXIN              ! Number of axes in supplied Frame
       INTEGER NC                 ! Character column counter
-      INTEGER NCI                ! Character column counter of image 
-                                 ! names
-      INTEGER NCOEF              ! Number of fit coefficients
+      INTEGER NDFI               ! Input NDF identifier
+      INTEGER NDFR               ! Residuals map's NDF identifier
       CHARACTER*256 NDFNAM       ! Name of input IMAGE
       INTEGER NDIMS              ! Number of significant dimensions of 
                                  ! the NDF
@@ -564,8 +580,9 @@
                                  ! parameter
       DOUBLE PRECISION OFF1( NDF__MXDIM ) ! Separation for one position
       DOUBLE PRECISION OFFSET( BF__MXPOS - 1, NDF__MXDIM )! Separations
-      LOGICAL POLAR              ! Use polar co-ordinates for 
-                                 ! INIT2-INIT5 and SEP-SEP4?
+      CHARACTER*( PAR__SZNAM + 1 ) PARNAM ! Parameter name for the
+                                 ! current initial beam position
+      LOGICAL POLAR              ! Use polar co-ordinates for POS2-POS5?
       LOGICAL POSC               ! Centre fixed at supplied position?
       LOGICAL QUIET              ! Suppress screen output?
       CHARACTER*256 REFNAM       ! Reference name
@@ -574,7 +591,7 @@
       CHARACTER*4 SEPAR          ! SEPn parameter name
       INTEGER SLBND( BF__NDIM )  ! Significant lower bounds of the image
       CHARACTER*3 SPARAM         ! Parameter root for fixed separations
-      INTEGER STATE              ! State of parameter INIT
+      INTEGER STATE              ! State of POSx parameter
       INTEGER SUBND( BF__NDIM )  ! Significant upper bounds of the image
       CHARACTER*80 TITLE         ! Title for output positions list
       LOGICAL VAR                ! Use variance for weighting
@@ -594,9 +611,6 @@
       MARK = ' '
 
 *  Initialise pointers for valgrind.
-      IPW1 = 0
-      IPW2 = 0
-      IPOUT = 0
       IPIN = 0
       IPID = 0
 
@@ -725,14 +739,31 @@
       ELSE IF ( INTERF ) THEN
 
 *  If the initial co-ordinates are supplied on the command line and
-*  without BEAMS, we know that only one beam is to be fitted.
-         CALL LPG_STATE( 'POS', STATE, STATUS )
-         IF ( STATE .EQ. SUBPAR__ACTIVE ) THEN
-            CALL LPG_STATE( 'BEAMS', STATE, STATUS )
-            IF ( STATE .NE. SUBPAR__ACTIVE ) THEN
-               NPOS = 1
+*  without BEAMS, we count the number of beams to be fitted.  The
+*  parameter names must be contiguous.
+         I = 1
+         CALL LPG_STATE( 'BEAMS', STATE, STATUS )
+         LOOP = STATE .NE. PAR__ACTIVE
+
+         DO WHILE ( I .LE. BF__MXPOS .AND. LOOP )
+
+*  Create separate parameter names for each beam position.
+            PARNAM = 'POS'
+            IF ( I .GT. 1 ) THEN
+               NC = 3
+               CALL CHR_PUTI( I, PARNAM, NC )
             END IF
-         END IF
+
+*  Was the parameter supplied on the command line?
+            CALL LPG_STATE( PARNAM, STATE, STATUS )
+
+            IF ( STATE .EQ. PAR__ACTIVE ) THEN
+               NPOS = I
+            ELSE
+               LOOP = .FALSE.
+            END IF
+            I = I + 1
+         END DO
       END IF
 
 *  Obtain the NDF & WCS Frame
@@ -741,10 +772,10 @@
 *  Obtain the NDF.  If the name is given on the command line it will be 
 *  used.  If not, the database data reference is used, if there is one. 
 *  Otherwise, the user is prompted.
-      CALL KPG1_ASREF( 'NDF', 'READ', GOTNAM, REFNAM, INDF, STATUS )
+      CALL KPG1_ASREF( 'NDF', 'READ', GOTNAM, REFNAM, NDFI, STATUS )
 
 *  Check that there is variance present in the NDF.
-      CALL NDF_STATE( INDF, 'Variance', HASVAR, STATUS )
+      CALL NDF_STATE( NDFI, 'Variance', HASVAR, STATUS )
 
 *  If all input have variance components, see if input variances are to 
 *  be used as weights.
@@ -757,10 +788,10 @@
 *  We need to know how many significant axes there are (i.e. pixel axes
 *  spanning more than a single pixel), and there must not be more than
 *  two.
-      CALL KPG1_SGDIM( INDF, BF__NDIM, SDIM, STATUS )
+      CALL KPG1_SGDIM( NDFI, BF__NDIM, SDIM, STATUS )
 
 *  Now get the WCS FrameSet from the NDF.
-      CALL KPG1_ASGET( INDF, BF__NDIM, .TRUE., .FALSE., .FALSE., SDIM, 
+      CALL KPG1_ASGET( NDFI, BF__NDIM, .TRUE., .FALSE., .FALSE., SDIM, 
      :                 SLBND, SUBND, IWCS, STATUS )
       DO I = 1, BF__NDIM
          DIMS( I ) = SUBND( I ) - SLBND( I ) + 1
@@ -1035,6 +1066,7 @@
 *  about the primary beam's centre?  A null defaults to TRUE.
          CALL PAR_GTD0L( 'POLAR', .TRUE., .TRUE., POLAR, STATUS )
 
+      print *, 'npos=', NPOS, '  polar=', POLAR
       END IF
 
 *  Record input data in the log file.
@@ -1045,7 +1077,7 @@
 *  --------
 *  Store the NDF name in the logfile, aligning with the rest of the
 *  output.
-         CALL NDF_MSG( 'NAME', INDF )
+         CALL NDF_MSG( 'NAME', NDFI )
          CALL MSG_LOAD( 'DATASET', '    NDF             : ^NAME',
      :                  BUFOUT, NC, STATUS )
          CALL FIO_WRITE( FDL, BUFOUT( : NC ), STATUS )
@@ -1079,11 +1111,11 @@
       IF ( CAT .OR. FILE ) THEN
 
 *  Find the beam parameters and determine errors, and report them.
-         CALL KPS1_BFFIL( INDF, MAP3, MAP1, MAP2, CFRM, VAR, NPOS, 
+         CALL KPS1_BFFIL( NDFI, MAP3, MAP1, MAP2, CFRM, VAR, NPOS, 
      :                    NAXC, NAXIN, %VAL( CNF_PVAL( IPIN ) ), CAT, 
      :                    %VAL( CNF_PVAL( IPID ) ), LOGF, FDL, FIXCON,
-     :                    AMPRAT, MXCOEF, FPAR, SLBND, SUBND, 
-     :                    FAREA, FITREG, STATUS )
+     :                    AMPRAT, SLBND, SUBND, FAREA, FITREG, 
+     :                    MXCOEF, FPAR, STATUS )
 
 *  In interactive modes, find each beam individually, waiting for the
 *  user to supply a new one before continuing each time.
@@ -1091,12 +1123,61 @@
 
 *  Fit the beams obtained interactively, and determine errors. 
 *  Display the results.
-         CALL KPS1_BFINT( INDF, IWCS, MAP3, MAP1, MAP2, CFRM, VAR, NPOS,
+         CALL KPS1_BFINT( NDFI, IWCS, MAP3, MAP1, MAP2, CFRM, VAR, NPOS,
      :                    POLAR, 'POS', CURSOR, MARK, IMARK, NAXC, 
-     :                    NAXIN, LOGF, FDL, FIXCON, AMPRAT, MXCOEF,
-     *                    FPAR, SLBND, SUBND, FAREA, FITREG, STATUS )
+     :                    NAXIN, LOGF, FDL, FIXCON, AMPRAT, SLBND,
+     :                    SUBND, FAREA, FITREG, MXCOEF, FPAR, STATUS )
 
       END IF
+
+*  Create residuals map
+*  ====================
+      CALL ERR_MARK
+
+*  Start a new NDF context.
+      CALL NDF_BEGIN
+
+*  Create a new NDF, by propagating the shape, size, WCS, etc. from the
+*  input NDF,
+      CALL LPG_PROP( NDFI, 'NOLABEL,WCS,AXIS', 'RESID', NDFR, STATUS )
+
+*  Determine the data type to use for the residuals map.
+      CALL NDF_MTYPE( '_REAL,_DOUBLE', NDFI, NDFI, 'Data', ITYPE,
+     :                DTYPE, STATUS )
+
+*  Map it for write access.
+      CALL KPG1_MAP( NDFR, 'Data', ITYPE, 'WRITE', IPRES, EL, STATUS )
+
+*  Map the input data array.
+      CALL KPG1_MAP( NDFI, 'Data', ITYPE, 'READ', IPD, EL, STATUS )
+
+*  Fill the data array with the evaluated point-spread function less
+*  the original array.
+      IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+         CALL KPS1_BFRED( SLBND, SUBND, %VAL( CNF_PVAL( IPD ) ), NPOS,
+     :                    MXCOEF, FPAR, %VAL( CNF_PVAL( IPRES ) ), 
+     :                    STATUS )
+      ELSE
+         CALL KPS1_BFRER( SLBND, SUBND, %VAL( CNF_PVAL( IPD ) ), NPOS,
+     :                    MXCOEF, FPAR, %VAL( CNF_PVAL( IPRES ) ), 
+     :                    STATUS )
+      END IF
+
+*  Store a title.
+      CALL NDF_CINP( 'TITLE', NDFR, 'TITLE', STATUS )
+
+*  Store a label.
+      CALL NDF_CPUT( 'BEAMFIT residuals map', NDFR, 'Lab', STATUS )
+
+*  A null status can be ignored.  This means that no output NDF was
+*  required.
+      IF ( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+
+*  End the NDF context.
+      CALL NDF_END( STATUS )
+      
+      CALL ERR_RLSE
+
 
 *  Tidy up.
 *  ========
