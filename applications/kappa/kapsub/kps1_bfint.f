@@ -1,7 +1,7 @@
       SUBROUTINE KPS1_BFINT( INDF, IWCS, MAP1, MAP2, MAP3, RFRM, VAR,
      :                       NPOS, POLPAR, PARAM, CURSOR, MARK, MARKER,
      :                       NAXR, NAXIN, LOGF, FDL, FIXCON, AMPRAT, 
-     :                       NPAR, FPAR, SLBND, SUBND, FAREA, FITREG, 
+     :                       SLBND, SUBND, FAREA, FITREG, NPAR, FPAR, 
      :                       STATUS ) 
 *+
 *  Name:
@@ -16,8 +16,8 @@
 *  Invocation:
 *     CALL KPS1_BFINT( INDF, IWCS, MAP1, MAP2, MAP3, RFRM, VAR, NPOS, 
 *                      POLPAR, PARAM, CURSOR, MARK, MARKER, NAXR, NAXIN,
-*                      LOGF, FDL, FIXCON, AMPRAT, NPAR, FPAR, 
-*                      SLBND, SUBND, FAREA, FITREG, STATUS )
+*                      LOGF, FDL, FIXCON, AMPRAT, SLBND, SUBND, FAREA, 
+*                      FITREG, NPAR, FPAR, STATUS )
 
 *  Description:
 *     This routine finds the Gaussian fits to a batch of image beam
@@ -106,11 +106,6 @@
 *     AMPRAT( BF__MXPOS - 1 ) = REAL (Given)
 *        The ratios of the secondary beam 'sources' to the first beam.  
 *        These ratios constrain the fitting provided FIXCON(5) is .TRUE.
-*     NPAR = INTEGER (Given)
-*        The maximum number of fit parameters.
-*     FPAR( NPAR ) = DOUBLE PRECISION (Given)
-*        The fixed fit parameters.  Any free parameters take the value
-*        VAL__BADD.  See KPS1_BFFN for a list of the parameters.
 *     SLBND( 2 ) = INTEGER (Given) 
 *        The lower pixel index bounds of the significant axes of the 
 *        NDF.
@@ -125,6 +120,18 @@
 *        in pixels.  The box is centred around each beam position.  Each
 *        value must be at least 9.  It is only accessed if FAREA is 
 *        .FALSE.
+*     NPAR = INTEGER (Given)
+*        The maximum number of fit parameters.
+*     FPAR( NPAR ) = DOUBLE PRECISION (Given and Returned)
+*        On entry this is the fixed fit parameters.  Any free parameters 
+*        take the value VAL__BADD.  See KPS1_BFFN for a list of the 
+*        parameters.
+*
+*        On exit it contains the coefficients of the fit in the PIXEL
+*        Frame.   Any supplied non-bad (i.e. fixed) values are
+*        unchanged, other than possible transformation of co-ordinates
+*        to pixels; but the other elements are returned holding the best
+*        value of the corresponding fit parameter.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -184,6 +191,9 @@
 *        defined by cursor or parameter can be an initial guess or a 
 *        fixed value, or in the case of secondary beams be separations 
 *        from the primary.  More tidying.
+*     2007 June 8 (MJC):
+*        Moved NPAR and FPAR to the end of the non-STATUS arguments (as 
+*        FPAR is modified.
 *     {enter_further_changes_here}
 
 *-
@@ -234,12 +244,14 @@
       INTEGER FDL
       LOGICAL FIXCON( BF__NCON )
       REAL AMPRAT( BF__MXPOS - 1 )
-      INTEGER NPAR
-      DOUBLE PRECISION FPAR( NPAR )
       INTEGER SLBND( 2 )
       INTEGER SUBND( 2 )
       LOGICAL FAREA
       INTEGER FITREG( 2 )
+      INTEGER NPAR
+
+*  Arguments Given and Returned:
+      DOUBLE PRECISION FPAR( NPAR )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -703,7 +715,13 @@
       CALL KPS1_BFFT( PIXPOS, FLBND, FUBND, FIXCON, AMPRAT, 
      :                POFSET, NPAR, FPAR, SIGMA, RMS, STATUS )
 
-      IF ( .NOT. FAREA ) CALL NDF_ANNUL( NDFS, STATUS )
+*  Free resources.
+      IF ( FAREA ) THEN
+         IF ( VAR ) CALL NDF_UNMAP( INDF, 'Variance', STATUS )
+         CALL NDF_UNMAP( INDF, 'Data', STATUS )
+      ELSE
+         CALL NDF_ANNUL( NDFS, STATUS )
+      END IF
 
 *  If a fit could not be found...
       IF ( STATUS .EQ. SAI__OK ) THEN
