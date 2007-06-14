@@ -1,5 +1,12 @@
 HDS Library
 -----------
+   Version 5.0-5
+   =============
+
+   A bug in the HDS_CLOSE routine has been fixed. Previously if you
+   called this routine just after another HDS routine had returned
+   an error status it would fail to execute. Note that HDS_CLOSE is
+   deprecated and you should be using a simple DAT_ANNUL instead.
 
    Version 5.0-4
    =============
