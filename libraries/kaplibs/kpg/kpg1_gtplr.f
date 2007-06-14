@@ -14,17 +14,18 @@
 *     CALL KPG1_GTPLR( PARAM, IWCS, NULL, POLE, PAORIG, CC, BC, STATUS )
 
 *  Description:
-*     This routine obtains a spatial position from the environment, 
-*     using a specified parameter.  The user supplies the position in 
-*     polar co-ordinates about a suppled centre within the co-ordinate 
-*     system of the Current Frame in the supplied WCS FrameSet.  This
-*     Frame must have two axes, otherwise co-ordinates will be
-*     interpreted as Cartesian.
+*     This routine obtains a two-dimensional spatial position from the 
+*     environment, using a specified parameter.  The user supplies the 
+*     position in polar co-ordinates about a supplied centre within the
+*     co-ordinate system of the Current Frame in the supplied WCS 
+*     FrameSet.  This FrameSet must have two axes, otherwise the routine
+*     will exit with an error.
 
 *     To be acceptable, the supplied position must correspond to a valid
-*     position (on all axes) in the Base Frame of the supplied FrameSet.
+*     position (on both axes) in the Base Frame of the supplied FrameSet.
 *     If a Frame is supplied instead of a FrameSet this restriction is 
-*     not imposed.  The current Frame must have two axes.
+*     not imposed, however polar co-ordinates cannot be supplied,
+*     only regular co-ordinates along both axes.
 *
 *     If the polar position supplied in argument CC on entry is valid 
 *     (i.e. does not contain any AST__BAD values), then it is used as a
@@ -63,26 +64,24 @@
 *        specifies the origin for the position angle in degrees from 
 *        the the first WCS axis.  The normal convention is for this to
 *        be zero (i.e. from X in a Cartesian co-ordinate system) but 
-*        anothmay be 90 for 
+*        another may be 90 for starting from up or Y.
 *     POLE( 2 )  = DOUBLE PRECISION (Given)
 *        The position of the pole of the polar co-ordinates measured
 *        in the current co-ordinate Frame along each axis.  If any of 
 *        the co-ordinates are bad, the routine will issue a warning that
-*        it is unable to handle polar co-ordinates and will expect 
+*        it is unable to handle polar co-ordinates and will expect two
 *        spatial positions like routine KPG1_GTPOS.  This can be aborted
 *        (!!) at the parameter prompt.
 *     CC( 2 ) = DOUBLE PRECISION (Given and Returned)
 *        On entry, holds the position to use as the dynamic default for 
 *        the parameter, in the Current Frame of the supplied FrameSet 
 *        (or Frame).  On exit, it holds the supplied position in the 
-*        Current Frame.  There should be one element for each axis in 
-*        the Current Frame.  The first element is the radius, and
-*        subsequent  elements are angles.
+*        Current Frame.  There should be one element for both axes.
 *     BC( 2 ) = DOUBLE PRECISION (Returned)
 *        Returned holding the Base Frame position corresponding to the
 *        supplied Current Frame position.  If a Frame is supplied for 
 *        IWCS instead of a FrameSet, then BC will not be accessed.  The 
-*        returned values will be good on all axes.
+*        returned values will be good on both axes.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -121,6 +120,10 @@
 *  History:
 *     2007 June 1 (MJC):
 *        Original version based upon DSB's KPG1_GTPOS.
+*     2007 June 12 (MJC):
+*        Fixed incomplete coding for SkyFrame-to-polar mapping, in 
+*        particular transform radius to 90-latitude and ensure longitude
+*        is measured in degrees North via East.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -161,11 +164,22 @@
 *  Local Constants:
       INTEGER NAX
       PARAMETER ( NAX = 2 )      ! Number WCS axes
-      
+
+      DOUBLE PRECISION PI
+      PARAMETER ( PI = 3.1415926535898 )
+
+      DOUBLE PRECISION HALFPI
+      PARAMETER ( HALFPI = 0.5D0 * PI )
+
+      DOUBLE PRECISION TWOPI
+      PARAMETER ( TWOPI = 2.0D0 * PI )
+                                    
 *  Local Variables:
-      CHARACTER*10 ATT           ! AST attribute name
+      CHARACTER*12 ATT           ! AST attribute name
       INTEGER BASFRM             ! Pointer to the Base Frame
       INTEGER BPMAP              ! Base-Polar mapping
+      CHARACTER*125 BUFFER       ! Buffer for swapping expreessions
+      INTEGER COPWCS             ! Deep copy of current FrameSet
       INTEGER CPMAP              ! Cartesian-Polar mapping
       INTEGER CURFRM             ! Pointer to the Current Frame
       CHARACTER*30 DOM           ! Domain of current frame
@@ -190,6 +204,8 @@
       LOGICAL ISSKY              ! Is the current Frame a SkyFrame?
       INTEGER L                  ! Index of last non-blank character
       CHARACTER*30 LAB( NAX )    ! Axis labels
+      INTEGER LAT                ! Index to latitude axis in SkyFrame
+      INTEGER LON                ! Index to longitude axis in SkyFrame
       LOGICAL LOOP               ! Get a new parameter value?
       INTEGER MAP                ! Simplified FrameSet Mapping
       INTEGER NBAXES             ! No. of axes in base Frame
@@ -199,14 +215,18 @@
       DOUBLE PRECISION PC( 2 )   ! Polar co-ordinates
       INTEGER POLFRM             ! Pointer to new polar Frame
       CHARACTER*255 POS          ! Position string
+      LOGICAL SWITCH             ! Switch supplied polar co-ordinates?
       CHARACTER*10 SYM( NAX )    ! Axis symbols
+      INTEGER UNITAX             ! Axis to be used for radius units
       CHARACTER*50 UNITS         ! Axis units
-      
 
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Access required frames and attributes, and mapping.
+*  ===================================================
 
 *  See if a FrameSet has been supplied.
       GOTFS = AST_ISAFRAMESET( IWCS, STATUS )
@@ -215,8 +235,9 @@
 *  number of axes in the Base Frame.  Also get a simplified Mapping for 
 *  the FrameSet.
       IF ( GOTFS ) THEN
-         CURFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )         
-         BASFRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )         
+         CURFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
+         BASFRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
+         IBASIS = AST_GETI( IWCS, 'CURRENT', STATUS )
          ICURR = AST_GETI( IWCS, 'Current', STATUS )
          NBAXES = AST_GETI( BASFRM, 'NAXES', STATUS )
          CALL AST_ANNUL( BASFRM, STATUS )
@@ -235,26 +256,38 @@
      :                 '(Programming error)', STATUS )
       END IF
 
-*  Get the number of axes in the Current Frame and see if it is a
-*  SkyFrame.
+*  Get the number of axes in the Current Frame.  This routine demands
+*  two axes.
       NCAXES = AST_GETI( CURFRM, 'NAXES', STATUS )
 
       IF ( NCAXES .NE. NAX ) THEN
+         STATUS = SAI__ERROR
          CALL MSG_SETC( 'PARAM', PARAM )
-         CALL MSG_OUT( 'KPG1_GTPLR_M2', 'Current Frame does not '//
+         CALL ERR_REP( 'KPG1_GTPLR_0', 'Current Frame does not '//
      :                 'have two axes.  Parameter %^PARAM will '//
      :                 'interpret co-ordinates as regular axis '//
      :                 'values.  (Programming error)', STATUS )
-         GOODPO = .FALSE.
-      ELSE
-         GOODPO = .TRUE.
+         GO TO 999
       END IF
+      GOODPO = .TRUE.
 
-      ISSKY =  AST_ISASKYFRAME( CURFRM, STATUS )
+*  Note the Domain of the Current Frame for use in messages.
+      DOM = AST_GETC( CURFRM, 'DOMAIN', STATUS )
+
+*  Is the current frame a SkyFrame?
+      ISSKY = AST_ISASKYFRAME( CURFRM, STATUS )
+
+*  Check and set co-ordinates of the supplied pole.
+*  ================================================
+      COPWCS = IWCS
+      IF ( GOTFS .AND. GOODPO ) THEN
+
+*  As we do not want to affect the supplied FrameSet's use beyond this
+*  routine, we make a deep copy and modify that.
+         COPWCS = AST_COPY( IWCS, STATUS )
 
 *  See if a good position has been supplied in POLE.  At the same time,
 *  set the pole position for a SkyFrame.
-      IF ( GOTFS .AND. GOODPO ) THEN
          GOODPO = .TRUE.
          DO I = 1, NCAXES
             IF ( POLE( I ) .EQ. AST__BAD .OR.
@@ -264,7 +297,7 @@
                IAT = 7
                CALL CHR_PUTI( I, ATT, IAT )
                CALL CHR_APPND( ')', ATT, IAT )
-               CALL AST_SETD( CURFRM, ATT( : IAT ), POLE( I ), STATUS )
+               CALL AST_SETD( COPWCS, ATT( : IAT ), POLE( I ), STATUS )
             END IF
          END DO
 
@@ -275,11 +308,58 @@
      :                    'wil interpret co-ordinates as regular '//
      :                    'axis values.  (Programming error)', STATUS )
 
-*  Switch to polar co-ordinates in the SkyFrame.
-         ELSE IF ( ISSKY ) THEN
-            CALL AST_SETC( CURFRM, 'SkyRefIs' , 'Pole', STATUS )
+*  Define mappings from Sky to user-supplied co-ordinates.
+*  =======================================================
+         ELSE 
+            IF ( ISSKY ) THEN
 
-         ELSE
+*  Switch the North pole to its new co-ordinates.
+               CALL AST_SETC( COPWCS, 'SkyRefIs' , 'Pole', STATUS )
+
+*  Determine which is the latitude and longitude axes.
+               LAT = AST_GETI( CURFRM, 'LatAxis', STATUS )
+               LON = AST_GETI( CURFRM, 'LonAxis', STATUS )
+               SWITCH = LAT .GT. LON
+
+*  Units will come from the latitude axis.
+               UNITAX = LAT
+
+*  Create the mappings.  We need the first co-ordinate to be radius
+*  and the second to be a position angle.  Not sure if it's a bug in
+*  this routine or in AST that generates angles 360-PA instead of PA
+*  when the pole is rotated.
+               FOREXP( 1 ) = 'R = '
+               IAT = 4
+               CALL CHR_PUTD( HALFPI, FOREXP( 1 ), IAT )
+               CALL CHR_APPND( ' - LAT', FOREXP( 1 ), IAT )
+
+               FOREXP( 2 ) = 'THETA = '
+               IAT = 8
+               CALL CHR_PUTD( TWOPI, FOREXP( 2 ), IAT )
+               CALL CHR_APPND( ' - LON', FOREXP( 2 ), IAT )
+
+               INVEXP( 1 ) = 'LAT = '
+               IAT = 6
+               CALL CHR_PUTD( HALFPI, INVEXP( 1 ), IAT )
+               CALL CHR_APPND( ' - R', INVEXP( 1 ), IAT )
+
+               INVEXP( 2 ) = 'LON = '
+               IAT = 6
+               CALL CHR_PUTD( TWOPI, INVEXP( 2 ), IAT )
+               CALL CHR_APPND( ' - THETA', INVEXP( 2 ), IAT )
+                  
+               IF ( SWITCH ) THEN
+                  BUFFER = INVEXP( 1 )
+                  INVEXP( 1 ) = INVEXP( 2 )
+                  INVEXP( 2 ) = BUFFER
+               END IF
+
+*  Define mappings from 'Cartesian' to polar.
+*  ===========================================
+            ELSE
+
+*  Units will come from the first axis by convention.
+               UNITAX = 1
 
 *  Create a MathMap of the conversion to polar with a pole at
 *  supplied co-ordinates.  Note that offsets are in parentheses
@@ -288,83 +368,110 @@
 
 *  Forward mapping
 *  ---------------
-            IAT = 0
-            FOREXP( 1 ) = ' '
-            CALL CHR_APPND( 'R = SQRT( ( X - (', FOREXP( 1 ), IAT )
-            CALL CHR_PUTD( POLE( 1 ), FOREXP( 1 ), IAT )
-            CALL CHR_APPND( ') ) * ( X - (', FOREXP( 1 ), IAT )
-            CALL CHR_PUTD( POLE( 1 ), FOREXP( 1 ), IAT )
-            CALL CHR_APPND( ') ) + ( Y - (', FOREXP( 1 ), IAT )
-            CALL CHR_PUTD( POLE( 2 ), FOREXP( 1 ), IAT )
-            CALL CHR_APPND( ') ) * ( Y - (', FOREXP( 1 ), IAT )
-            CALL CHR_PUTD( POLE( 2 ), FOREXP( 1 ), IAT )
-            CALL CHR_APPND( ') ) )', FOREXP( 1 ), IAT )
+               IAT = 0
+               FOREXP( 1 ) = ' '
+               CALL CHR_APPND( 'R = SQRT( ( X - (', FOREXP( 1 ), IAT )
+               CALL CHR_PUTD( POLE( 1 ), FOREXP( 1 ), IAT )
+               CALL CHR_APPND( ') ) * ( X - (', FOREXP( 1 ), IAT )
+               CALL CHR_PUTD( POLE( 1 ), FOREXP( 1 ), IAT )
+               CALL CHR_APPND( ') ) + ( Y - (', FOREXP( 1 ), IAT )
+               CALL CHR_PUTD( POLE( 2 ), FOREXP( 1 ), IAT )
+               CALL CHR_APPND( ') ) * ( Y - (', FOREXP( 1 ), IAT )
+               CALL CHR_PUTD( POLE( 2 ), FOREXP( 1 ), IAT )
+               CALL CHR_APPND( ') ) )', FOREXP( 1 ), IAT )
 
-            IAT = 0
-            FOREXP( 2 ) = ' '
-            CALL CHR_APPND( 'THETA = MOD( ATAN2D( Y - (', FOREXP( 2 ), 
-     :                      IAT )
-            CALL CHR_PUTD( POLE( 2 ), FOREXP( 2 ), IAT )
-            CALL CHR_APPND( '),  X - (', FOREXP( 2 ), IAT )
-            CALL CHR_PUTD( POLE( 1 ), FOREXP( 2 ), IAT )
-            CALL CHR_APPND( ') ) - (', FOREXP( 2 ), IAT )
-            CALL CHR_PUTD( PAORIG, FOREXP( 2 ), IAT )
-            CALL CHR_APPND( '), 360.0D0 )', FOREXP( 2 ), IAT )
+               IAT = 0
+               FOREXP( 2 ) = ' '
+               CALL CHR_APPND( 'THETA = MOD( ATAN2D( Y - (', 
+     :                         FOREXP( 2 ), IAT )
+               CALL CHR_PUTD( POLE( 2 ), FOREXP( 2 ), IAT )
+               CALL CHR_APPND( '),  X - (', FOREXP( 2 ), IAT )
+               CALL CHR_PUTD( POLE( 1 ), FOREXP( 2 ), IAT )
+               CALL CHR_APPND( ') ) - (', FOREXP( 2 ), IAT )
+               CALL CHR_PUTD( PAORIG, FOREXP( 2 ), IAT )
+               CALL CHR_APPND( '), 360.0D0 )', FOREXP( 2 ), IAT )
 
 *  Inverse mapping
 *  ---------------
-            IAT = 0
-            INVEXP( 1 ) = ' '
-            CALL CHR_APPND( 'X = R * COSD( THETA + (', INVEXP( 1 ), 
-     :                      IAT )
-            CALL CHR_PUTD( PAORIG, INVEXP( 1 ), IAT )
-            CALL CHR_APPND( ') ) + (', INVEXP( 1 ), IAT )
-            CALL CHR_PUTD( POLE( 1 ), INVEXP( 1 ), IAT )
-            CALL CHR_APPND( ')', INVEXP( 1 ), IAT )
+               IAT = 0
+               INVEXP( 1 ) = ' '
+               CALL CHR_APPND( 'X = R * COSD( THETA + (', INVEXP( 1 ), 
+     :                         IAT )
+               CALL CHR_PUTD( PAORIG, INVEXP( 1 ), IAT )
+               CALL CHR_APPND( ') ) + (', INVEXP( 1 ), IAT )
+               CALL CHR_PUTD( POLE( 1 ), INVEXP( 1 ), IAT )
+               CALL CHR_APPND( ')', INVEXP( 1 ), IAT )
 
-            IAT = 0
-            INVEXP( 2 ) = ' '
-            CALL CHR_APPND( 'Y = R * SIND( THETA + (', INVEXP( 2 ),
-     :                      IAT )
-            CALL CHR_PUTD( PAORIG, INVEXP( 2 ), IAT )
-            CALL CHR_APPND( ') ) + (', INVEXP( 2 ), IAT )
-            CALL CHR_PUTD( POLE( 2 ), INVEXP( 2 ), IAT )
-            CALL CHR_APPND( ')', INVEXP( 2 ), IAT )
+               IAT = 0
+               INVEXP( 2 ) = ' '
+               CALL CHR_APPND( 'Y = R * SIND( THETA + (',
+     :                         INVEXP( 2 ), IAT )
+               CALL CHR_PUTD( PAORIG, INVEXP( 2 ), IAT )
+               CALL CHR_APPND( ') ) + (', INVEXP( 2 ), IAT )
+               CALL CHR_PUTD( POLE( 2 ), INVEXP( 2 ), IAT )
+               CALL CHR_APPND( ')', INVEXP( 2 ), IAT )
+            END IF
 
+*  Create new Frame in user-supplied polar co-ordinates.
+*  =====================================================
+
+*  For a transformed SkyFrame, the expected co-ordinates are still as
+*  before, Lat,Long.  So a radius from the pole will be latitude 
+*  90-radius, and the angle must be in longitude hours.  For most cases
+*  this means a flip of the axis order.
+
+*  Create and simplify a MathMap for either new Frame.
             CPMAP = AST_MATHMAP( NAX, NAX, NAX, FOREXP, NAX, INVEXP,
      :                           'SimpFI=1,SimpIF=1', STATUS )
-
-*  Simplify the Mapping.
             CPMAP = AST_SIMPLIFY( CPMAP, STATUS )
 
-            IBASIS = AST_GETI( IWCS, 'CURRENT', STATUS )
-            POLFRM = AST_COPY( CURFRM, STATUS )      
-            CALL AST_ADDFRAME( IWCS, IBASIS, CPMAP, POLFRM, STATUS )
+*  Add the newly created polar Frame to the FrameSet.
+            POLFRM = AST_COPY( CURFRM, STATUS )
+            CALL AST_ADDFRAME( COPWCS, ICURR, CPMAP, POLFRM, STATUS )
 
 *  Describe the new Frame in case the user enters ":" at the prompt.
             CALL AST_SETC( POLFRM, 'TITLE', 'Polar co-ordinates',
      :                     STATUS )
             CALL AST_SETC( POLFRM, 'LABEL(1)', 'Radius offset', STATUS )
-            CALL AST_SETC( POLFRM, 'LABEL(2)', 
-     :                     'Position angle (from Y anticlockwise)',
-     :                     STATUS )
-            
-            UNITS = AST_GETC( POLFRM, 'UNIT(1)', STATUS )
+            IF ( ISSKY ) THEN
+               CALL AST_SETC( POLFRM, 'LABEL(2)', 
+     :                        'Position angle (North through East)',
+     :                        STATUS )
+            ELSE
+               CALL AST_SETC( POLFRM, 'LABEL(2)', 
+     :                        'Position angle (from Y anticlockwise)',
+     :                        STATUS )
+            END IF
+
+            ATT = 'Unit('
+            IAT = 5
+            CALL CHR_PUTI( UNITAX, ATT, IAT )
+            CALL CHR_APPND( ')', ATT, IAT )
+            UNITS = AST_GETC( POLFRM, ATT( : IAT ), STATUS )
+
+            CALL AST_SETC( POLFRM, 'FORMAT(1)', 'dms', STATUS )
+            CALL AST_SETC( POLFRM, 'FORMAT(2)', 'd', STATUS )
+
             CALL AST_SETC( POLFRM, 'UNIT(1)', UNITS, STATUS )
-            CALL AST_SETC( POLFRM, 'UNIT(2)', 'degrees', STATUS )
+            CALL AST_SETC( POLFRM, 'UNIT(2)', 'deg', STATUS )
+
+            IF ( ISSKY ) CALL AST_SET( POLFRM, 'AsTime(2)=0', STATUS )
 
 *  Now we're make our new Frame current.
             CURFRM = POLFRM
 
 *  Form a compound mapping between the Base Frame and the newly created
 *  polar Frame.
-            BPMAP = AST_GETMAPPING( IWCS, AST__BASE, AST__CURRENT,
+            BPMAP = AST_GETMAPPING( COPWCS, AST__BASE, AST__CURRENT,
      :                              STATUS )
             BPMAP = AST_SIMPLIFY( BPMAP, STATUS )
 
 *  Otherwise, create a default Frame of POLAR class.
          END IF
       END IF
+
+*  Validate the dynamic default.
+*  =============================
 
 *  See if a good position has been supplied in CC.  At the same time,
 *  save the axis labels and symbols for use in messages.  Also, form a 
@@ -433,8 +540,8 @@
          DPOS = ' '
       END IF
 
-*  Note the Domain of the Current Frame for use in messages.
-      DOM = AST_GETC( CURFRM, 'DOMAIN', STATUS )
+*  Obtain and validate user-supplied polar co-ordinates.
+*  =====================================================
 
 *  Loop until a valid position has been obtained from the user, or an 
 *  error occurs.
@@ -466,12 +573,12 @@
 *  description of the Current Frame, and the default format.
          ELSE IF ( POS( F : L ) .EQ. ':' .AND.
      :             STATUS .EQ. SAI__OK ) THEN
-            CALL KPG1_DSFRM( IWCS, 'A position is required in the '//
+            CALL KPG1_DSFRM( COPWCS, 'A position is required in the '//
      :                       'following co-ordinate frame:', .TRUE.,
      :                       STATUS )
 
             CALL MSG_SETC( 'FMT', FMT )
-            CALL MSG_OUT( 'KPG1_GTPLR_M4', '      Suggested format: '//
+            CALL MSG_OUT( 'KPG1_GTPLR_M3', '      Suggested format: '//
      :                    '^FMT', STATUS )
             CALL MSG_BLANK( STATUS )
 
@@ -544,8 +651,8 @@
 *  Read the value for the next axis.  NC is the number of characters
 *  read by AST_UNFORMAT including trailing spaces.
                I = I + 1
-               NC = AST_UNFORMAT( CURFRM, I, POS( IPOS:IEND ), CC( I ), 
-     :                            STATUS ) 
+               NC = AST_UNFORMAT( CURFRM, I, POS( IPOS:IEND ), 
+     :                            CC( I ), STATUS )
 
 *  Get the last character read by AST_UNFORMAT.  If there are no 
 *  characters left, pretend the last character read was a space (i.e. 
@@ -642,17 +749,9 @@
 *  FrameSet.  This is not done if a Frame was supplied.
             IF ( GOTFS ) THEN
 
-               IF ( GOODPO .AND. .NOT. ISSKY ) THEN
-
-*  Convert from polar into Current Frame axis values.
-                  CALL AST_TRANN( BPMAP, 1, NCAXES, 1, CC, .FALSE., 
-     :                            NBAXES, 1, BC, STATUS ) 
-               ELSE
-
-*  Transform the supplied `Cartesian' position into the Base Frame.
-                  CALL AST_TRANN( MAP, 1, NCAXES, 1, CC, .FALSE.,
-     :                            NBAXES, 1, BC, STATUS )
-               END IF
+*  Convert the supplied position into the Base Frame
+               CALL AST_TRANN( BPMAP, 1, NCAXES, 1, CC, .FALSE., 
+     :                         NBAXES, 1, BC, STATUS ) 
 
 *  See if this gave a good Base Frame position.
                GOOD = .TRUE.
@@ -692,7 +791,7 @@
 *  Indicate what sort of position is required.
             CALL MSG_SETC( 'DOM', DOM )
             CALL MSG_SETC( 'PAR', PARAM )
-            CALL MSG_OUT( 'KPG1_GTPLR_M5', 'Please supply a new ^DOM '//
+            CALL MSG_OUT( 'KPG1_GTPLR_M4', 'Please supply a new ^DOM '//
      :                    'Domain position for parameter %^PAR.', 
      :                    STATUS )
 
@@ -703,22 +802,34 @@
 
       END DO
 
+*  Convert to polar to original current Frame's co-ordinates.
+*  ==========================================================
+
 *  Convert polar co-ordinates to along each WCS axis of the original
 *  current Frame.
       IF ( GOTFS .AND. GOODPO ) THEN
-         CALL AST_TRANN( CPMAP, 1, NCAXES, 1, CC, .FALSE., NCAXES,
-     :                   1, PC, STATUS ) 
+         IF ( ISSKY ) THEN
 
-         DO I = 1, NCAXES
-            CC( I ) = PC( I )
-         END DO
+*  For a SkyFrame convert the Base Frame co-ordinates to axis
+*  co-ordinates.
+            CALL AST_TRANN( MAP, 1, NCAXES, 1, BC, .TRUE., NCAXES,
+     :                      1, CC, STATUS )
 
-*  Restore the original current Frame.
-         CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
+*  The Cartesian-polar mapping has all we need.
+         ELSE
+            CALL AST_TRANN( CPMAP, 1, NCAXES, 1, CC, .FALSE., NCAXES,
+     :                      1, PC, STATUS ) 
+
+            DO I = 1, NCAXES
+               CC( I ) = PC( I )
+            END DO
+
+         END IF
+
       END IF
 
-*  Annul the pointer to the current Frame.
-      CALL AST_ANNUL( CURFRM, STATUS )
+*  Annul the pointer to the copied FramSet.
+      IF ( GOTFS ) CALL AST_ANNUL( COPWCS, STATUS )
 
 *  If an error has occurred, return AST__BAD values.
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -734,6 +845,10 @@
          END IF
 
       END IF
+
+*  Error reports
+*  =============
+  999 CONTINUE
 
 *  If a parameter abort value was supplied, re-report the error
 *  with a more-appropriate message.
