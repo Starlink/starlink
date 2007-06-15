@@ -60,6 +60,7 @@
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
 /*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
+/*    BC: Brad Cavanagh (JAC, Hawaii)
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
@@ -71,6 +72,9 @@
 /*       Call hdsStop rather than duplicating code                          */
 /*    28-NOV-2006 (BC):                                                     */
 /*       Replace hdsStop with hds1_cleanup.                                 */
+/*    14-JUN-2006 (BC):                                                     */
+/*       Allow for HDS_DISABLE_CLEANUP environment variable to disable HDS  */
+/*       cleanup from happening.                                            */
 /*    {@enter_changes_here@}                                                */
 
 /* Bugs:                                                                    */
@@ -82,6 +86,13 @@
       int status = DAT__OK;      /* Local status for hdsStop                */
 
 /*.                                                                         */
+
+/* Check for presence of HDS_DISABLE_CLEANUP environment variable.          */
+      if( getenv( "HDS_DISABLE_CLEANUP" ) )
+      {
+        printf( "HDS cleanup disabled.\n" );
+        return;
+      }
 
 /* Close down everything                                                    */
       hds1_cleanup( &status );
