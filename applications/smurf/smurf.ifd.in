@@ -140,6 +140,8 @@
 #         Add missing helpkey
 #     10-MAY-2007 (TIMJ):
 #         Add dumpocscfg
+#     15-JUN-2007 (TIMJ):
+#         Add gettsys
 #     {enter_changes_here}
 
 #  Bugs:
@@ -1203,6 +1205,10 @@ package @PACKAGE@ {
 
     command dumpocscfg {
 	obey {@PERL@ $SMURF_DIR/dumpocscfg}
+    }
+
+    command gettsys {
+        obey {@PERL@ $SMURF_DIR/gettsys}
     }
 
    icl {defhelp @PACKAGE@ $@PACKAGE_UPCASE@_HELP 0}

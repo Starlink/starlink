@@ -1,0 +1,270 @@
+#!/star/Perl/bin/perl
+
+=head1 NAME
+
+gettsys - Retrieve TSYS (or TRX) from ACSIS data files
+
+=head1 SYNOPSIS
+
+  gettsys --statistics a20070105_00050_01_0001.sdf
+  gettsys -trx --receptor h10 a20070105_00050_01_0001.sdf
+
+=head1 DESCRIPTION
+
+Simple program to list TSYS or TRX information for receptors from
+an ACSIS data file. Optionally, calculates statistics.
+
+=head1 OPTIONS
+
+The following options are supported:
+
+=over 4
+
+=item B<-help>
+
+Print help information.
+
+=item B<-version>
+
+Print version information.
+
+=item B<-man>
+
+Print the full documentation to STDOUT.
+
+=item B<-trx>
+
+Lists all TRX values for each receptor instead of TSYS.
+
+=item B<-receptor>
+
+Only report information for the current receptor.
+
+=item B<-statistics>
+
+Report statistics in addition to the values. For tabular
+form, the statistics are included at the end of the table
+as additional lines of median, mean and standard deviation.
+
+=back
+
+=cut
+
+use strict;
+use warnings;
+use NDF;
+use Statistics::Descriptive;
+use Getopt::Long;
+use Pod::Usage;
+
+my ($help, $man, $version, $statistics, $trx, $receptor);
+my $ostatus = GetOptions( "help" => \$help,
+			  "man" => \$man,
+			  "version" => \$version,
+			  "statistics" => \$statistics,
+			  "trx" => \$trx,
+			  "receptor=s" => \$receptor,
+                         );
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose =>2) if $man;
+if ($version) {
+    my $id = '$Id$';
+    print "gettemps - Retrieve temperature information from ACSIS file\n";
+    print " CVS revision: $id\n";
+    exit;
+}
+
+my @files = @ARGV;
+if (@files > 1) {
+    die "Currently only supports a single file as argument\n";
+}
+
+my $status = &NDF::SAI__OK;
+err_begin($status);
+
+# just open with HDS
+hds_open( $files[0], "READ", my $loc, $status);
+dat_find( $loc, "MORE", my $mloc, $status);
+dat_find( $mloc, "ACSIS", my $aloc, $status);
+dat_find( $aloc, "TSYS", my $tsysloc, $status );
+dat_find( $aloc, "TRX", my $trxloc, $status );
+dat_find( $aloc, "RECEPTORS", my $nloc, $status );
+dat_annul( $aloc, $status);
+dat_annul($mloc, $status);
+
+# get the names
+dat_shape($nloc, 7, my @dim, my $ndim, $status);
+dat_getvc($nloc, $dim[0], my @names, my $nlines, $status)
+  if $status == &NDF::SAI__OK;
+dat_annul($nloc, $status);
+
+# TSYS
+my $ntsys = 0;
+my @tsys;
+my @trx;
+dat_shape($tsysloc, 2, my @tsysdim, $ndim, $status );
+dat_getvr($tsysloc, ($tsysdim[0]*$tsysdim[1]), @tsys, $ntsys, $status)
+  if ($status == &NDF::SAI__OK);
+dat_annul($tsysloc, $status);
+
+# TRX
+dat_getvr($trxloc, $ntsys, @trx, $ntsys, $status);
+dat_annul($trxloc, $status);
+
+# cleanup
+dat_annul($loc, $status );
+
+my $exit;
+if ($status != &NDF::SAI__OK) {
+  $exit = 1;
+}
+
+err_end( $status );
+exit if $exit;
+
+# Now rearrange the data
+my %TSYS;
+my %TRX;
+
+# initialise
+for my $recep (@names) {
+    $TSYS{$recep} = [];
+    $TRX{$recep} = [];
+}
+
+my $ntrx = 0; # most TRX numbers available for any receptor
+$ntsys = 0;   # This will now be the most TSYS numbers available for a receptor
+my $i = 0;
+while ($i < @tsys) {
+    my $pushed_tsys;
+    my $pushed_trx;
+    for my $recep (@names) {
+      # store it - if it is a new value
+      # note that this means it is possible for different numbers of
+      # values for a receptor
+	if (!@{$TSYS{$recep}} || ($tsys[$i] != $TSYS{$recep}->[-1])) {
+	    push(@{$TSYS{$recep}}, $tsys[$i]);
+	    $pushed_tsys++;
+	}
+	if (!@{$TRX{$recep}} || ($trx[$i] != $TRX{$recep}->[-1])) {
+	    push(@{$TRX{$recep}}, $trx[$i]);
+	    $pushed_trx++;
+	}
+	$i++;
+    }
+    $ntsys++ if $pushed_tsys;
+    $ntrx++ if $pushed_trx;
+}
+
+# Decide which set of temperatures we are using
+my $ref = ($trx ? \%TRX : \%TSYS);
+my $count = ($trx ? $ntrx : $ntsys );
+
+if ($receptor) {
+  $receptor = uc($receptor);
+  # we have a receptor
+  if (exists $ref->{$receptor}) {
+    for my $val (@{$ref->{$receptor}}) {
+      my ($newval, $format) = format_value( $val );
+      printf($format. "\n", $newval);
+    }
+    if ($statistics) {
+      my ($mean, $stdev, $median) = calc_stats(@{$ref->{$receptor}});
+      $stdev = 0 if !defined $stdev;
+      printf("Mean=%.1f +/- %.1f\n",$mean,$stdev);
+      printf("Median=%.1f\n",$median);
+    }
+  } else {
+    die "Receptor '$receptor' is not present in these data\n";
+  }
+} else {
+  # all receptors
+  # print out a header
+  printf( "%6s " x scalar(@names) ."\n", @names );
+  for my $row (0..$count) {
+    my @values;
+    my @format;
+    for my $name (@names) {
+      my $val = $ref->{$name}->[$row];
+      my ($newval, $format) = format_value( $val );
+      push(@format, $format);
+      push(@values, $newval);
+    }
+    printf( join(" ",@format)."\n", @values);
+  }
+
+  if ($statistics) {
+    # calculate the statistics
+    my (@mean, @median, @stdev);
+    for my $name (@names) {
+      my ($mean, $stdev, $median) = calc_stats( @{$ref->{$name}} );
+      $stdev = 0 if !defined $stdev;
+      push(@mean, $mean);
+      push(@median, $median);
+      push(@stdev, $stdev);
+    }
+
+    printf( "%6.1f " x scalar(@names)." [median]\n", @median);
+    printf( "%6.1f " x scalar(@names)." [mean]\n", @mean);
+    printf( "%6.1f " x scalar(@names)." [stdev]\n", @stdev);
+  }
+}
+
+
+exit;
+
+# given a tsys/trx return the value and format
+# converts bad values to "*"
+sub format_value {
+  my $val = shift;
+  my ($newval, $format);
+  if (defined $val) {
+    if ($val > -1E20) {
+      $newval = $val;
+      $format = "%6.1f";
+    } else {
+      # bad value
+      $newval = " *" ;
+      $format = "%-6s";
+    }
+  } else {
+    $newval = " ";
+    $format = "%-6s";
+  }
+  return ($newval, $format);
+}
+
+# calc statistics
+# ($mean, $standard_deviation, $median) = calc_stats( @numbers );
+
+sub calc_stats {
+  my @n = grep { defined $_ && $_ > -1E20 } @_;
+  return (0,0,0) if !@n;
+  my $stats = Statistics::Descriptive::Full->new();
+  $stats->add_data(@n);
+  return ($stats->mean, $stats->standard_deviation, $stats->median);
+}
+
+
+=head1 AUTHOR
+
+Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>
+
+Copyright (C) 2007 Science and Technology Facilities Council.
+All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place,Suite 330, Boston, MA  02111-1307, USA
+
+=cut
+

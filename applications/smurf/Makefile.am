@@ -42,7 +42,7 @@ smurf_mon_LDADD = libsmurf/libsmurf.la libsc2sim/libsc2sim.la \
 DYNSCRIPTS = smurf.sh smurf.csh smurf.icl
 
 # Install without modification
-STATICSCRIPTS = scripts/jcmtstate2cat scripts/dumpocscfg
+STATICSCRIPTS = scripts/jcmtstate2cat scripts/dumpocscfg scripts/gettsys
 
 # IFL files
 IFL_FILES = $(smurf_mon_TASKS:=.ifl) smurf_mon.ifl
