@@ -77,6 +77,8 @@
 *        Free tsys memory.
 *     2007-06-13 (EC)
 *        If smfData associated with DIMM component, free resources
+*     2007-06-14 (EC)
+*        Moved DIMM file info into smfFile, so handle closing there
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -170,6 +172,26 @@ void smf_close_file( smfData ** data, int * status ) {
       /* Annul the NDF (which will unmap things) */
       ndfAnnul( &(file->ndfid), status );
       	
+    } else if( file->DIMMbuf ) {
+      /* File is a simplified DIMM model component. Here we need
+         to synchronize and unmap the memory, and then close the file
+	 descriptor. */
+
+      if( msync(file->DIMMbuf, file->DIMMlen, MS_ASYNC ) == -1 ) {
+	*status = SAI__ERROR;
+	errRep( ERRFUNC, "Unable to synch model container file", status ); 
+      } else if( munmap( file->DIMMbuf, file->DIMMlen ) == -1 ) {
+	*status = SAI__ERROR;
+	errRep( ERRFUNC, "Unable to unmap model container file", status ); 
+      } else if( close( file->DIMMfd ) == -1 ) {
+	*status = SAI__ERROR;
+	errRep( ERRFUNC, "Unable to close model container file", status ); 
+      } else {
+	file->DIMMfd = 0;
+	file->DIMMbuf = NULL;
+	file->DIMMlen = 0;
+      }
+
     } else {
       /* No file so free the data */
       freedata = 1;
@@ -181,27 +203,6 @@ void smf_close_file( smfData ** data, int * status ) {
     freedata = 1;
   }
 
-  /* If this smfData is associated with a mapped DIMM model component
-     file, unmap rather than freeing */
-
-  if( (*data)->DIMMbuf ) {
-
-    /* Synchronize and then try to unmap */
-
-    if( msync((*data)->DIMMbuf, (*data)->DIMMlen, MS_ASYNC ) == -1 ) {
-      *status = SAI__ERROR;
-      errRep( ERRFUNC, "Unable to synch model container file", status ); 
-    } else if( munmap( (*data)->DIMMbuf, (*data)->DIMMlen ) == -1 ) {
-      *status = SAI__ERROR;
-      errRep( ERRFUNC, "Unable to unmap model container file", status ); 
-    } else {
-      (*data)->DIMMbuf = NULL;
-      (*data)->DIMMlen = 0;
-    }
-    
-    /* Don't subsequently try to free the data array */
-    freedata = 0;
-  }
 
   /* Tidy up the header */
   if (hdr != NULL) {

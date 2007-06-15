@@ -86,6 +86,8 @@
 *        Add SMF__LUT to smf_modeltype
 *        Add SMF__DIMM_SUFFIX
 *        Add DIMMbuf and DIMMlen to smfData
+*     2007-06-13 (EC):
+*        Added DIMMfd and moved DIMMbuf and DIMMlen to smfFile
 *     {enter_further_changes_here}
 
 
@@ -174,6 +176,9 @@ typedef enum smf_modeltype {
 /* Global information about the data file itself */
 
 typedef struct smfFile {
+  void * DIMMbuf;            /* Pntr to entire mapped file if DIMM file */
+  int DIMMfd;                /* DIMM file descriptor */
+  size_t DIMMlen;            /* size of DIMM mapped array */
   int ndfid;                 /* NDF ID of file if opened by SMURF */
   int isSc2store;            /* True if file opened by sc2store library */
   int isTstream;             /* True if file contains time series data */
@@ -245,8 +250,6 @@ typedef struct smfData {
   smfDream *dream;           /* DREAM parameters */
   smf_dtype dtype;           /* Data type of DATA and VARIANCE arrays */
   void * pntr[3];            /* Array of pointers to DATA/VARIANCE/QUALITY */
-  void * DIMMbuf;            /* Pntr to entire mapped file if DIMM component */
-  size_t DIMMlen;            /* size of DIMM mapped array */
   dim_t dims[NDF__MXDIM];    /* Dimensions of data array */
   int ndims;                 /* Number of active dimensions in "dims" */
   int refcount;              /* Reference count for data object */

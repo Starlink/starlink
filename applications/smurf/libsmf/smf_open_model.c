@@ -42,6 +42,9 @@
 *  History:
 *     2007-06-13 (EC):
 *        Initial version.
+*     2007-06-14(EC)
+*        Move file information to smfFile from smfData, 
+*        added file description and file name.
 
 *  Notes:
 
@@ -175,8 +178,7 @@ void smf_open_model( Grp *igrp, int index, char *mode, smfData **data,
   }
 
   /* Allocate memory for empty smfdata and fill relevant parts */
-  *data = smf_create_smfData( SMF__NOCREATE_HEAD | SMF__NOCREATE_DA |
-			      SMF__NOCREATE_FILE, status );
+  *data = smf_create_smfData( SMF__NOCREATE_HEAD | SMF__NOCREATE_DA, status );
 
   if( *status == SAI__OK ) {
     /* Data type from header */
@@ -185,9 +187,14 @@ void smf_open_model( Grp *igrp, int index, char *mode, smfData **data,
     /* Data pointer points to memory AFTER HEADER */
     (*data)->pntr[0] = (void *) dataptr;
 
-    /* Store pointer to entire mapped array for later un-mapping */
-    (*data)->DIMMbuf = buf;
-    (*data)->DIMMlen = datalen+headlen;
+    /* Store pointer to entire mapped array for later un-mapping, as well
+       as the length of the mapped buffer and file descriptor */
+    (*data)->file->DIMMbuf = buf;
+    (*data)->file->DIMMlen = datalen+headlen;
+    (*data)->file->DIMMfd = fd;
+
+    /* Copy the DIMM filename into the smfFile */
+    strncpy( (*data)->file->name, name, SMF_PATH_MAX );
 
     /* Dimensions of data array */
     (*data)->ndims = ndims;

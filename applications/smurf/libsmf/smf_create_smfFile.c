@@ -33,6 +33,7 @@
 
 *  Authors:
 *     Tim Jenness (TIMJ)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -40,6 +41,8 @@
 *        Initial version.
 *     2006-01-27 (TIMJ):
 *        No longer have xloc member
+*     2007-06-14 (EC):
+*        Initialize DIMMbuf, DIMMfd and DIMMlen for DIMM model components
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -99,6 +102,9 @@ smf_create_smfFile( int * status ) {
   }
 
   /* Initialise smfFile */
+  file->DIMMbuf = NULL;
+  file->DIMMfd = 0;
+  file->DIMMlen = 0;
   file->ndfid = NDF__NOID;
   file->mapcoordid = NDF__NOID;
   file->isSc2store = 0;
