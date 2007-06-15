@@ -146,7 +146,9 @@ hdsClose(HDSLoc **locator,
 
    if(!_ok(*status))
       return *status;
-   hds_gl_status = DAT__OK;
+   hds_gl_status = DAT__OK; /* PWD: line restored from HDS3, without this
+                             * this routine doesn't execute on occasion. I
+                             * expect it's just a slip of the hand... */
 
 /* Import the locator */
    _call(dat1_import_loc(*locator, &lcp ))
