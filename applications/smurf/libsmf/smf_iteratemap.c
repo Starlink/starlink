@@ -71,6 +71,8 @@
 *        Added missing status checks
 *     2007-06-13 (EC):
 *        - Use new DIMM binary file format 
+*     2007-06-14 (EC):
+*        - If config file has exportndf set, export DIMM components to *.sdf
 
 
 *  Notes:
@@ -139,6 +141,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   double *data_data=NULL;       /* Pointer to DATA component of data */
   int dimmflags;                /* Control flags for DIMM model components */
   dim_t dsize;                  /* Size of data arrays in containers */
+  int exportNDF=0;              /* If set export DIMM files to NDF at end */
   int flag;                     /* Flag */
   dim_t i;                      /* Loop counter */
   int indf;                     /* Input data NDF identifier */
@@ -179,13 +182,18 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   /* Get size of the input group */
   grpGrpsz( igrp, &isize, status );
 
-  /* Get/check the CONFIG parameters stored in the keymap */
+  /* Parse the CONFIG parameters stored in the keymap */
 
   if( *status == SAI__OK ) {
     /* Number of iterations */
     if( !astMapGet0I( keymap, "NUMITER", &numiter ) ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "DIMM Failed: NUMITER unspecified", status);      
+    }
+
+    /* Will we export components to NDF at the end? */
+    if( !astMapGet0I( keymap, "EXPORTNDF", &exportNDF ) ) {
+      exportNDF = 0;
     }
 
     /* Type and order of models to fit from MODELORDER keyword */
@@ -241,10 +249,13 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
     }
   } 
 
-  printf("%i model components: ", nmodels);
-  for( i=0; i<nmodels; i++ ) 
-    printf( "%s ", smf_model_getname(modeltyps[i],status) );
-  printf( "\n" );
+  msgSeti("NUMCOMP",nmodels);
+  msgOut(" ", "SMF_ITERATEMAP: ^NUMCOMP model components in solution: ", 
+	 status);
+  for( i=0; i<nmodels; i++ ) {
+    msgSetc("MNAME", smf_model_getname(modeltyps[i],status) );
+    msgOut(" ", "  ^MNAME", status ); 
+  }
 
   /* Create groups of NDFs for time-series model components */
   msgOut(" ", "SMF_ITERATEMAP: Create model containers", status);
@@ -281,12 +292,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 	msgOut(" ", "SMF_ITERATEMAP: Calculate time-stream model components", 
 	       status);
 
-        /* Open files */
-
-	/*
-	  smf_open_file( resgrp, i, "UPDATE", 1, &res, status );
-	  smf_open_file( astgrp, i, "UPDATE", 0, &ast, status );
-	*/
+        /* Open model files */
 
 	smf_open_model( resgrp, i, "UPDATE", &res, status );
 	smf_open_model( lutgrp, i, "READ", &lut, status );
@@ -294,7 +300,6 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 
 	for( j=0; j<nmodels; j++ ) {
 	  smf_open_model( modelgrps[j], i, "UPDATE", &modeldata[j], status );
-	  /*smf_open_file( modelgrps[j], i, "UPDATE", 0, &modeldata[j], status );*/
 	}
 
 	/* Call the model calculations in the desired order. */
@@ -352,9 +357,6 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 	/* smf_open_mapcoord( res, status ); */
 
 	if( *status == SAI__OK ) {
-	  /* Should check if bad status due to lack of extension, in
-	     which case try calculating it */
-	  /*lut = res->lut;*/
 
 	  /* Setup rebin flags */
 	  rebinflags = 0;
@@ -400,11 +402,6 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 	  smf_open_model( resgrp, i, "UPDATE", &res, status );
 	  smf_open_model( lutgrp, i, "READ", &lut, status );
 
-	  /*
-	    smf_open_file( astgrp, i, "UPDATE", 0, &ast, status );
-	    smf_open_file( resgrp, i, "UPDATE", 0, &res, status );
-	  */
-
 	  /* Calculate the AST model component. It is a special model
 	     because it assumes that the map contains the best current
 	     estimate of the astronomical sky. It gets called in this
@@ -423,6 +420,32 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 	  smf_close_file( &res, status );
 	  smf_close_file( &lut, status );
         }
+      }
+    }
+
+    /* Export DIMM model components to NDF files.
+       Note that we don't do LUT since it is originall an extension in the
+       input flatfield data */
+  
+    if( exportNDF ) {
+      msgOut(" ", "SMF_ITERATEMAP: Export model components to NDF files.", 
+	     status);
+      
+      for( i=1; i<=isize; i++ ) {    /* Chunk loop */
+	smf_open_model( resgrp, i, "READ", &res, status );
+	smf_model_NDFexport( res, res->file->name, status );
+	smf_close_file( &res, status );
+	
+	smf_open_model( astgrp, i, "READ", &ast, status );
+	smf_model_NDFexport( ast, ast->file->name, status );
+	smf_close_file( &ast, status );
+	
+	for( j=0; j<nmodels; j++ ) { /* Dynamic model component loop */
+	  smf_open_model( modelgrps[j], i, "READ", &modeldata[j], status );
+	  smf_model_NDFexport( modeldata[j], (modeldata[j])->file->name, 
+			       status );
+	  smf_close_file( &modeldata[j], status );
+	}
       }
     }
   }
