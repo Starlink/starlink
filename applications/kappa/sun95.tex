@@ -14261,10 +14261,11 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
 	 be two or three beam positions.  This parameter is ignored
 	 for {\tt "File"} and {\tt "Catalogue"} modes, where the
 	 number comes from the number of beam positions read from the
-	 files; and for "Interface" mode when the beam position POS is
-	 supplied on the command line without BEAMS.  In all modes
-	 there is a maximum of five positions, which for {\tt "File"}
-	 or {\tt "Catalogue"} modes will be the first five.  {\tt [1]}
+	 files; and for "Interface" mode when the beam positions POS, 
+         POS2, \emph{etc.} are supplied in full on the command line 
+         without BEAMS.  In all modes there is a maximum of five 
+         positions, which for {\tt "File"} or {\tt "Catalogue"} modes 
+         will be the first five.  {\tt [1]}
       }
       \sstsubsection{
          COIN =  FILENAME (Read)
@@ -14484,8 +14485,8 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          PIXEL Frame it would be from $Y$ through negative $X$, not the 
          standard $X$ through $Y$.
 
-         If {\tt FALSE}, the co-ordinates are the regular axis co-ordinates in 
-         the current Frame.  
+         If {\tt FALSE}, the co-ordinates are the regular axis co-ordinates
+         in the current Frame.  
 
          POLAR is only accessed when there is more than one beam to fit.
          {\tt [TRUE]}
@@ -14493,27 +14494,32 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
       \sstsubsection{
          POS = LITERAL (Read)
       }{
-         When MODE = {\tt "Interface"} POS specifies the co-ordinates of the 
-         primary beam position.  This is either merely an initial guess
-         for the fit, or if parameter FIXPOS is {\tt TRUE}, it defines a
-         fixed location.  It is specified in the current co-ordinate 
-         Frame of the NDF (supplying a colon {\tt ":"} will display details of
-         the current co-ordinate Frame).  A position should be supplied 
-         either as a list of formatted WCS axis values separated by 
-         spaces or commas.
+         When MODE = {\tt "Interface"} POS specifies the co-ordinates
+	 of the primary beam position.  This is either merely an
+	 initial guess for the fit, or if parameter FIXPOS is {\tt
+	 TRUE}, it defines a fixed location.  It is specified in the
+	 current co-ordinate Frame of the NDF (supplying a colon {\tt
+	 ":"} will display details of the current co-ordinate Frame).
+	 A position should be supplied either as a list of formatted
+	 WCS axis values separated by spaces or commas.
 
          If the initial co-ordinates are supplied on the command line 
-         without BEAMS specified only one beam will be fit.
+	 without BEAMS the number of contigious POS, POS2,\ldots
+	 parameters specifies the number of beams to be fit.  If the
+	 initial co-ordinates are supplied on the command line without
+	 BEAMS specified only one beam will be fit.
+
       }
       \sstsubsection{
          POS2-POS5 = LITERAL (Read)
       }{
-         When MODE = {\tt "Interface"} these parameters specify the co-ordinates
-         of the secondary beam positions.  For each parameter the
-         supplied location may be merely an initial guess for the fit, 
-         or if parameter FIXPOS is {\tt TRUE}, it defines a fixed location,
-         unless parameter FIXSEP is {\tt TRUE}, whereupon it defines a fixed 
-         separation from the primary beam.
+         When MODE = {\tt "Interface"} these parameters specify the
+	 co-ordinates of the secondary beam positions.  For each
+	 parameter the supplied location may be merely an initial
+	 guess for the fit, or if parameter FIXPOS is {\tt TRUE}, it
+	 defines a fixed location, unless parameter FIXSEP is {\tt
+	 TRUE}, whereupon it defines a fixed separation from the
+	 primary beam.
 
          For POLAR = {\tt FALSE} each distance should be given as a single
          literal string containing a space- or comma-separated list of 
@@ -14542,6 +14548,22 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          If {\tt TRUE} then the fit parameters are not displayed on the
          screen.  Output parameters and files are still created.
          {\tt [FALSE]}
+      }
+      \sstsubsection{
+         RESID = NDF (Write)
+      }{
+         The map of the residuals of the fit.  It inherits the
+         properties of the input NDF, except that its data type is 
+         \_DOUBLE or \_REAL depending on the precision demanded by the 
+         type of IN, and no variance is propagated.  A null ({\tt{!}}) value 
+         requests that no residual map be created.  {\tt [!]}
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         The title for the NDF to contain the residuals of the fit.
+         If null ({\tt{!}}) is entered the NDF will not contain a title.  
+         {\tt ["KAPPA - BEAMFIT"]}
       }
       \sstsubsection{
          VARIANCE = \_LOGICAL (Read)
@@ -14655,13 +14677,15 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          the other examples use the full array.
       }
       \sstexamplesubsection{
-         beamfit mars\_3pos int 3 "5.0,-3.5" ampratio=-0.5
+         beamfit mars\_3pos int 3 "5.0,-3.5" ampratio=-0.5 resid=mars\_res
       }{
          As the first example except this finds the Gaussian
          coefficients of the primary beam feature and two secondary
          features.  The secondary features have fixed amplitudes that
          are half that of the primary feature and of the opposite
-         polarity.
+         polarity.  The residuals after subtracting the fit are stored
+         in NDF mars\_res.  In all the other examples no residual map
+         is created.
       }
       \sstexamplesubsection{
          beamfit mars\_3pos int 2 "5.0,-3.5" pos2="60.0,90" fixpos
