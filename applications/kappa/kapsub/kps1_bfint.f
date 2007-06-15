@@ -731,11 +731,11 @@
 *  coefficients for each beam.
          DO I = 1, NPOS
             DO J = 1, BF__NDIM
-               K = I + ( J - 1 ) * BF__NCOEF
+               K = J + ( I - 1 ) * BF__NCOEF
                IF ( FPAR( K ) .NE. VAL__BADD ) THEN
-                  PIXPOS( J, I ) = FPAR( K )
+                  PIXPOS( I, J ) = FPAR( K )
                ELSE
-                  PIXPOS( J, I ) = AST__BAD
+                  PIXPOS( I, J ) = AST__BAD
                END IF
             END DO
          END DO
