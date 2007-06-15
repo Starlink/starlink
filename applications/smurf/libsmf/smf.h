@@ -157,7 +157,9 @@
 *     2007-04-23 (EC):
 *        Add smf_terr
 *     2007-06-13 (EC):
-*        Added smf_open_file and smf_dtype_sz.c
+*        Add smf_open_file and smf_dtype_sz.c
+*     2007-06-13 (EC):
+*        Add smf_model_NDFexport
 
 *     {enter_further_changes_here}
 
@@ -620,5 +622,7 @@ void smf_open_model( Grp *igrp, int index, char *mode, smfData **data,
 		     int *status );
 
 size_t smf_dtype_sz( const smf_dtype dtype, int *status );
+
+void smf_model_NDFexport( const smfData *data, const char *name, int *status );
 
 #endif /* SMF_DEFINED */
