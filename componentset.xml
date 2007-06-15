@@ -176,7 +176,7 @@ Starlink applications, and a number of other common data formats.
 </component>
 
 <component id="cupid" support="S">
-  <version>0.0-33</version>
+  <version>0.0-34</version>
   <path>applications/cupid</path>
   <description>CUPID - AST applications</description>
   <abstract><p>
@@ -2815,7 +2815,7 @@ No longer under active control.
 </component>
 
 <component id="hds" support="S">
-  <version>5.0-4</version>
+  <version>5.0-5</version>
   <path>libraries/hds</path>
   <description>Hierarchical Data System</description>
   <abstract>
