@@ -1,8 +1,0 @@
-*.cache
-Makefile
-config.h
-config.log
-config.status
-sextractor-tpx.spec
-sextractor.spec
-stamp-h1

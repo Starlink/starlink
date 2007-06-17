@@ -1,7 +1,0 @@
-*.hlp
-.deps
-.libs
-Makefile
-Makefile.in
-libsmurf.la
-*.lo

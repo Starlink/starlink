@@ -1,8 +1,0 @@
-*.html
-images.*
-WARNINGS
-sun226.css
-labels.pl
-^sun226fig.gif
-*.gif
-internals.pl
