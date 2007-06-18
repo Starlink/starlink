@@ -15,7 +15,7 @@
  * Allan Brighton  26 Sep 97  Created
  */
 
-#include "WorldCoords.hxx"
+#include "WorldCoords.h"
 #include "ImageCoords.h"
 
 /*

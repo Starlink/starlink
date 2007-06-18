@@ -13,6 +13,7 @@
  */
 static const char* const rcsId="@(#) $Id: Tclutil.C,v 1.5 2006/01/25 22:21:38 abrighto Exp $";
 
+using namespace std;
 #include <cstdlib>
 #include <csignal>
 #include <cstdio>
@@ -29,8 +30,6 @@ static const char* const rcsId="@(#) $Id: Tclutil.C,v 1.5 2006/01/25 22:21:38 ab
 #include "tcl.h"
 #include "tk.h"
 #include "error.h"
-
-using namespace std;
 
 // Since we have to link the BLT library anyway (because we're using the BLT C interface) 
 // call the init routine directly

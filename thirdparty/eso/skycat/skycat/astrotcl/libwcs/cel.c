@@ -253,6 +253,7 @@ const char *celrev_errmsg[] = {
    "Invalid coordinate transformation parameters",
    "Invalid projection parameters",
    "Invalid value of (x,y)"};
+ 
 
 int
 celset(pcode, cel, prj)

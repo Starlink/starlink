@@ -22,7 +22,7 @@
  */
 
 
-#include "WorldCoords.hxx"
+#include "WorldCoords.h"
 
 /* 
  * This class is used internally for reference counting.

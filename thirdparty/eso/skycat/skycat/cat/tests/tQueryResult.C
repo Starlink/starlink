@@ -16,7 +16,7 @@ using namespace std;
 #include <stdlib.h>
 #include "Mem.h"
 #include "error.h"
-#include "WorldCoords.hxx"
+#include "WorldCoords.h"
 #include "QueryResult.h"
 
 /* 

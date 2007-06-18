@@ -6,8 +6,6 @@
 * who       when      what
 * --------  --------  ----------------------------------------------
 * pbiereic  01/03/01  created 
-* pdraper   16/12/05  change SOCKLEN_T to socklen_t. This typedef
-*                     is guaranteed in define.h
 */
 
 /************************************************************************

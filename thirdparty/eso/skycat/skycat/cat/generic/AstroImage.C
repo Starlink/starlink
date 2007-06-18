@@ -15,6 +15,7 @@
  */
 static const char* const rcsId="@(#) $Id$";
 
+
 using namespace std;
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -192,7 +193,7 @@ int AstroImage::getImage(const WorldOrImageCoords& pos, double width, double hei
 int AstroImage::getImage(const char* url)
 {
     // open the tmp file
-    std::ofstream f(tmpfile_);
+    ofstream f(tmpfile_);
     if (!f) {
 	return error("could not open file for writing", tmpfile_);
     }
@@ -210,7 +211,7 @@ int AstroImage::getImage(const char* url)
     // if the Content-type is not recognized...
     if (strncmp(ctype, "image/", 6) != 0) {
 	// check if it might still be a FITS file:
-	std::ifstream is(tmpfile_);
+	ifstream is(tmpfile_);
 	char buf[81];
 	if (is && is.get(buf, 80) && strncmp(buf, "SIMPLE", 6) == 0)
 	    return 0;

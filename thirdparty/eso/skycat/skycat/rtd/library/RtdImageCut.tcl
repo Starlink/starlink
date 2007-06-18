@@ -156,7 +156,6 @@ itcl::class rtd::RtdImageCut {
 	# Someone also changed the default symbol to circle also - why?
 	regsub -all {\.} v$graph_.xVector _ xVector_ 
 	regsub -all {\.} v$graph_.yVector _ yVector_ 
-
 	if {$tcl_version >= 8.0} {
 	    $graph_ legend config -hide 1
 	    if {![info exists $xVector_]} {

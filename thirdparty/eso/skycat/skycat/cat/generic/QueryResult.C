@@ -12,6 +12,7 @@
  */
 static const char* const rcsId="@(#) $Id: QueryResult.C,v 1.1.1.1 2006/01/12 16:36:40 abrighto Exp $";
 
+
 using namespace std;
 #include <cstdio>
 #include <cstdlib>

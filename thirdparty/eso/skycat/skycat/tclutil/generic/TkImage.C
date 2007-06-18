@@ -19,6 +19,8 @@
 static const char* const rcsId="@(#) $Id: TkImage.C,v 1.1.1.1 2006/01/12 16:41:06 abrighto Exp $";
 
 
+
+using namespace std;
 #include <cstdlib>
 #include <cctype>
 #include <iostream>
@@ -34,7 +36,6 @@ static const char* const rcsId="@(#) $Id: TkImage.C,v 1.1.1.1 2006/01/12 16:41:0
 #include "ErrorHandler.h"
 #include "TkImage.h"
 
-using namespace std;
 
 /*
  * Constructor - create the image and install the tcl command of the

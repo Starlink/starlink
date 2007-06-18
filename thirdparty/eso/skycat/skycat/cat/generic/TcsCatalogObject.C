@@ -21,7 +21,7 @@ using namespace std;
 #include <sstream>
 #include <cstring>
 #include "error.h"
-#include "WorldCoords.hxx"
+#include "WorldCoords.h"
 #include "TcsCatalogObject.h"
 
 

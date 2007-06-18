@@ -16,13 +16,13 @@
  */
 static const char* const rcsId="@(#) $Id: TclAstroImage.C,v 1.2 2006/03/26 13:22:33 abrighto Exp $";
 
+
 using namespace std;
 #include <cctype>
 #include <cstdio>
 #include <iostream>
 #include <cstdlib>
 #include <unistd.h>
-
 #include <sstream>
 #include <cstring>
 #ifdef HAVE_CONFIG_H
