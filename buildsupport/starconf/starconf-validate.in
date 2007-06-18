@@ -153,37 +153,32 @@ foreach $r (@required_files) {
     }
 }
 
-# Checkins.  First get the list of entries
-if ( -d "CVS" && -f "CVS/Entries" ) {
-    open (ENT, "<CVS/Entries") || die "Can't open CVS/Entries\n";
-    @allent = ();
-    while (<ENT>) {
-        if (m{^/}) {
-            my @entline = split(m{/});
-            push(@allent, $entline[1]);
-        }
-    }
-    close(ENT);
-    @allcvsfiles = ();
-    push(@allcvsfiles, @definitely_required);
-    push(@allcvsfiles, @required_files);
-    push(@allcvsfiles, @extra_checkins);
-    foreach $f (@allcvsfiles) {
-        if (! grep (m{^$f$}, @allent)) {
+# Subversion checkins.
+if ( -d ".svn" && -f ".svn/entries" ) {
+    @allsvnfiles = ();
+    push(@allsvnfiles, @definitely_required);
+    push(@allsvnfiles, @required_files);
+    push(@allsvnfiles, @extra_checkins);
+    foreach $f (@allsvnfiles) {
+        $result = `svn status -v $f`;
+        #  Return will be empty string, or "?   filename"
+        if ( ! $result || ( $result =~ /^\?/ ) ) {
             #print "$progname: file $f is not checked in, but should be\n";
             push(@list_err_not_checked_in, $f);
             $nwarnings++;
         }
     }
     foreach $f (@non_checkins) {
-        if (grep (m{^$f$}, @allent)) {
+        $result = `svn status -v $f`;
+        #  Return will be empty string, "I   filename" or "?   filename"
+        if ( $result && ! ( $result =~ /^I/ ) && ! ( $result =~ /^\?/ ) ) {
             #print "$progname: file $f is checked in, but shouldn't be\n";
             push(@list_err_checked_in, $f);
             $nwarnings++;
         }
     }
 } else {
-    print "$progname: no CVS directory, or no Entries file\n";
+    print "$progname: no .svn directory not a subversion checkout\n";
     $nwarnings++;
 }
 
