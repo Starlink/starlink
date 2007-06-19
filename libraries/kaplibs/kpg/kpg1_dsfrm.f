@@ -16,12 +16,26 @@
 *     This routine displays a textual description of the Current Frame 
 *     in the supplied AST FrameSet.
 
+*  ADAM Parameters:
+*     The following ADAM parameter names are hard-wired into this routine:
+*
+*     FPIXSCALE() = LITERAL (Write)
+*        The pixel scale values as displayed on standard output by this
+*        routine. Celestial axes are in arc-seconds, all other axes are
+*        in the units of the corresponding current frame axis. This
+*        parameter is only written if the TEXT string starts with 
+*        "NDFTRACE:".
+
 *  Arguments:
 *     FSET = INTEGER (Given)
 *        An AST pointer to the FrameSet.
 *     TEXT = CHARACTER * ( * ) (Given)
 *        Text to display before the Frame description. May contain MSG
-*        tokens.
+*        tokens. This may be prefixed with a string that indicates
+*        further processing options. Currently the only such string
+*        recognised is "ndftrace:", which causes the pixel scales to be
+*        written out to the output parameter FPIXSCALE. Any such string is
+*        not included in the displayed title.
 *     FULL = LOGICAL (Given)
 *        Display full information?
 *     STATUS = INTEGER (Given and Returned)
@@ -29,6 +43,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998, 1999, 2000, 2003 Central Laboratory of the Research Councils.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -64,6 +79,11 @@
 *        Display pixel size at first pixel.
 *     7-JUN-2007 (DSB):
 *        Display meaningful text if the pixel scale cannot be found.
+*     19-JUN-2007 (DSB):
+*        Allow pixel scales to be written to an output parameter. To
+*        avoid changing the calling signature of this function, control 
+*        over this feature is provided via a special string flag supplied
+*        at the start of TEXT.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -85,7 +105,10 @@
       LOGICAL FULL
 
 *  Status:
-      INTEGER STATUS            ! Global status
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      LOGICAL CHR_SIMLR          ! Case insensitive string comparison
 
 *  Local Variables :
       CHARACTER ATTRIB*20        ! AST Frame attribute name
@@ -107,9 +130,11 @@
       INTEGER IGRID              ! Index of GRID Frame in FrameSet
       INTEGER INV1               ! Invert attribute for first component
       INTEGER INV2               ! Invert attribute for second component
+      INTEGER ITEXT              ! Index of start of text string to display
       INTEGER NDIM               ! Number of dimensions
       INTEGER TOP                ! Index of last Frame to be checked
       LOGICAL GOTFS              ! Was a FrameSet supplied?
+      LOGICAL NDFTRA             ! Was this routine called from NDFTRACE?
       LOGICAL SERIES             ! Frames in series?
 *.
 
@@ -118,6 +143,15 @@
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
+
+*  See if the TEXT string starts with one of the special control flag strings.
+      IF( CHR_SIMLR( TEXT( :9 ), 'NDFTRACE:' ) ) THEN
+         ITEXT = 10
+         NDFTRA = .TRUE.
+      ELSE
+         ITEXT = 1
+         NDFTRA = .FALSE.
+      END IF
 
 *  Get a pointer to the Frame to be described.
       GOTFS = AST_ISAFRAMESET( FSET, STATUS ) 
@@ -137,7 +171,7 @@
       END IF      
 
 *  Display the global properties of the Frame.
-      CALL KPG1_DSFR1( CFRM, TEXT, 8, FULL, STATUS )
+      CALL KPG1_DSFR1( CFRM, TEXT( ITEXT: ), 8, FULL, STATUS )
 
 *  Get the Frame dimensionality.
       FRMNAX = AST_GETI( CFRM, 'NAXES', STATUS )
@@ -251,6 +285,11 @@
          CALL MSG_BLANK( STATUS )
 
       END DO
+
+*  If called from NDFTRACE,store the pixel scales in an output parameter.
+      IF( NDFTRA ) THEN
+         CALL PAR_PUT1C( 'FPIXSCALE', FRMNAX, FPIXSC, STATUS )
+      END IF
 
 *  If the current Frame is a CmpFrame, we now display details of its
 *  component Frames.
