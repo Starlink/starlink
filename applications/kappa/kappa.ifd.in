@@ -1263,6 +1263,14 @@ package kappa {
             helpkey *
           }
 
+         parameter fpixscale {
+            size *
+            type LITERAL
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
          parameter funit {
             size *
             type LITERAL

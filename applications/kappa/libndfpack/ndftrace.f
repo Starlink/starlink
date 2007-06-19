@@ -127,6 +127,11 @@
 *     FORM = LITERAL (Write)
 *        The storage form of the NDF's data array. This will be "SIMPLE",
 *        "PRIMITIVE" or "SCALED".
+*     FPIXSCALE( ) = LITERAL (Write)
+*        The nominal WCS pixel scale for each axis in the current WCS
+*        Frame. For celestial axes, the value stored will be in 
+*        arc-seconds. For other axes, the value stored will be in the
+*        units given by the corresponding element of FUNIT.
 *     FTITLE( ) = LITERAL (Write)
 *        The title of each co-ordinate Frame stored in the WCS component
 *        of the NDF.  The elements in this parameter correspond to those
@@ -306,6 +311,11 @@
 *        Use KPG1_CGET (which removes escape sequences) instead of NDF_CGET.
 *     12-JUL-2006 (DSB):
 *        Include information about scaled arrays. Reorder declarations.
+*     19-JUN-2007 (DSB):
+*        Add control string to KPG1_DSFRM calls that indicates that the
+*        call is being made from NDFTRACE. This causes extra output
+*        parameters to be written within KPG1_DSFRM. Specifically, the
+*        WCS pixel scales are written to the new output parameter FPIXSCALE.
 *     {enter_further_changes_here}
 
 *-
@@ -1191,15 +1201,15 @@
                CALL MSG_SETI( 'INDEX', IFRAME )
                IF( FULLWC ) THEN
                   CALL KPG1_DSFRM( IWCS, 
-     :                           '      Frame index: ^INDEX', 
+     :                  'NDFTRACE:      Frame index: ^INDEX', 
      :                             FULLFR, STATUS )
 
                ELSE IF( FULLFR ) THEN
                   CALL KPG1_DSFRM( IWCS, 
-     :                           '        Index               : ^INDEX',
+     :                  'NDFTRACE:        Index               : ^INDEX',
      :                             FULLFR, STATUS )
                ELSE
-                  CALL KPG1_DSFRM( IWCS, ' ', FULLFR, STATUS )
+                  CALL KPG1_DSFRM( IWCS, 'NDFTRACE: ', FULLFR, STATUS )
 
                END IF
 
