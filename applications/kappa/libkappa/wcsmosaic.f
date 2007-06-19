@@ -88,6 +88,16 @@
 *        than the value supplied for ACC (in pixels), then a smaller
 *        region is used.  High accuracy is paid for by longer run times.
 *        [0.05]
+*     FLBND( ) = _DOUBLE (Write)
+*        The lower bounds of the bounding box enclosing the output NDF 
+*        in the current WCS Frame. The number of elements in this parameter 
+*        is equal to the number of axes in the current WCS Frame. Celestial 
+*        axis values will be in units of radians.
+*     FUBND( ) = _DOUBLE (Write)
+*        The upper bounds of the bounding box enclosing the output NDF 
+*        in the current WCS Frame. The number of elements in this parameter 
+*        is equal to the number of axes in the current WCS Frame. Celestial 
+*        axis values will be in units of radians.
 *     GENVAR = _LOGICAL (Read)
 *        If TRUE, output variances are generated based on the spread of 
 *        input pixel values contributing to each output pixel.  Any
@@ -293,8 +303,9 @@
 *     processing.
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics & Astronomy Research
-*     Council. All Rights Reserved.
+*     Copyright (C) 2005-2006 Particle Physics & Astronomy Research Council. 
+*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -341,6 +352,8 @@
 *        Renamed USEVAR to the KAPPA standard of VARIANCE.
 *     4-MAY-2007 (DSB):
 *        Add new argument NUSED to calls to AST_REBINSEQ.
+*     19-JUN-2007 (DSB):
+*        New output parameters FLBND and FUBND.
 *     {enter_further_changes_here}
 
 *-
@@ -365,7 +378,13 @@
       CHARACTER MESS*60      ! Message text
       CHARACTER METHOD*13    ! Interpolation method to use.
       CHARACTER TY_IN*(NDF__SZTYP) ! Numeric type for processing
+      DOUBLE PRECISION FLBND( NDF__MXDIM ) ! Lower WCS bounds of output 
+      DOUBLE PRECISION FUBND( NDF__MXDIM ) ! Upper WCS bounds of output 
+      DOUBLE PRECISION GLBND( NDF__MXDIM ) ! Lower GRID bounds of output 
+      DOUBLE PRECISION GUBND( NDF__MXDIM ) ! Upper GRID bounds of output 
       DOUBLE PRECISION PARAMS( 2 )! Param values passed to AST_RESAMPLE
+      DOUBLE PRECISION XL( NDF__MXDIM ) ! GRID position at lower limit
+      DOUBLE PRECISION XU( NDF__MXDIM ) ! GRID position at upper limit
       INTEGER DLBND( NDF__MXDIM )! Defaults for LBND
       INTEGER DUBND( NDF__MXDIM )! Defaults for UBND
       INTEGER EL             ! Number of array elements mapped
@@ -382,11 +401,13 @@
       INTEGER IPV1           ! Pntr. to input variance array
       INTEGER IPV2           ! Pntr. to output variance array
       INTEGER IPW            ! Pntr. to work array
+      INTEGER IWCSR          ! WCS FrameSet for reference NDF
       INTEGER LBND( NDF__MXDIM ) ! Indices of lower-left corner of o/p
       INTEGER LBND1( NDF__MXDIM )! Indices of lower-left corner of input
       INTEGER MAP            ! AST id for (pix_in->pix_out) Mapping
       INTEGER MAXPIX         ! Initial scale size in pixels
       INTEGER METHOD_CODE    ! Integer identifier for spreading method 
+      INTEGER NAX            ! No. of axes in reference WCS Frame
       INTEGER NDIM           ! Number of pixel axes in output NDF
       INTEGER NDIM1          ! Number of pixel axes in input NDF
       INTEGER NPAR           ! No. of required interpolation parameters
@@ -401,7 +422,6 @@
       LOGICAL VARWGT         ! Use i/p variances as weights?
       REAL ERRLIM            ! Positional accuracy in pixels
       REAL WLIM              ! Minimum good output weight
-
 *.
 
 *  Check inherited global status.
@@ -441,7 +461,7 @@
 *  Mappings from the input PIXEL Frames to the output PIXEL Frame.
       CALL PSX_CALLOC( SIZE, '_INTEGER', IPMAP, STATUS )
       CALL KPS1_WMOS0( INDFR, IGRP1, NDIM, DLBND, DUBND, HASVAR,
-     :                 %VAL( CNF_PVAL( IPMAP ) ), STATUS )
+     :                 %VAL( CNF_PVAL( IPMAP ) ), IWCSR, STATUS )
 
 *  Set the default bounds for the output NDF.
       CALL PAR_DEF1I( 'LBND', NDIM, DLBND, STATUS )
@@ -466,6 +486,24 @@
 *  Write the output pixel bounds to output parameters LBOUND and UBOUND.
       CALL PAR_PUT1I( 'LBOUND', NDIM, LBND, STATUS )
       CALL PAR_PUT1I( 'UBOUND', NDIM, UBND, STATUS )
+
+*  Convert these pixel index bounds to WCS bounds, and write them out to 
+*  the FLBND and FUBND output parameters.
+      DO I = 1, NDIM
+         GLBND( I ) = 0.5D0
+         GUBND( I ) = DBLE( UBND( I ) - LBND( I ) ) + 1.5D0
+      END DO
+
+      NAX = AST_GETI( IWCSR, 'Naxes', STATUS )
+      DO I = 1, NAX
+         CALL AST_MAPBOX( IWCSR, GLBND, GUBND, .TRUE., I, FLBND( I ),
+     :                    FUBND( I ), XL, XU, STATUS )
+      END DO
+
+      CALL AST_NORM( IWCSR, FLBND, STATUS )
+      CALL AST_NORM( IWCSR, FUBND, STATUS )
+      CALL PAR_PUT1D( 'FLBND', NAX, FLBND, STATUS )
+      CALL PAR_PUT1D( 'FUBND', NAX, FUBND, STATUS )
 
 *  Get the pixel spreading method to be used.
       CALL PAR_CHOIC( 'METHOD', 'SincSinc', 'Nearest,Bilinear,'//

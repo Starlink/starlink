@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_WMOS0( INDFR, IGRP, NDIM, LBND, UBND, USEVAR, 
-     :                       MAPS, STATUS )
+     :                       MAPS, IWCSR, STATUS )
 *+
 *  Name:
 *     KPS1_WMOS0
@@ -12,7 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_WMOS0( INDFR, IGRP, NDIM, LBND, UBND, USEVAR, MAPS, STATUS )
+*     CALL KPS1_WMOS0( INDFR, IGRP, NDIM, LBND, UBND, USEVAR, MAPS, 
+*                      IWCSR, STATUS )
 
 *  Description:
 *     This routine extracts the global information required by WCSMOSAIC
@@ -43,11 +44,14 @@
 *        different to the usual Starlink convention for pixel coordinates 
 *        which has integral values at the edges of each pixel, but it is the 
 *        convention required by AST_REBINSEQ.
+*     IWCSR = INTEGER (Returned)
+*        The WCS FrameSet from the reference NDF.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -88,6 +92,8 @@
 *        was right after all, since the pixel coordinate system used by 
 *        "maps" has integer values at the *centre* of each pixel (not the
 *        edges as normal in Starlink sw).
+*     19-JUN-2007 (DSB):
+*        Added argument IWCSR.
 *     {enter_further_changes_here}
 
 *-
@@ -111,6 +117,7 @@
       INTEGER UBND( NDIM )
       LOGICAL USEVAR
       INTEGER MAPS( * )
+      INTEGER IWCSR
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -136,7 +143,6 @@
       INTEGER IPIXR              ! Index of PIXEL Frame in ref. NDF FrameSet
       INTEGER IU                 ! Integer upper bound
       INTEGER IWCS1              ! AST pointer to input WCS FrameSet
-      INTEGER IWCSR              ! AST pointer to reference WCS FrameSet
       INTEGER J                  ! Axis count
       INTEGER LBND1( NDF__MXDIM )! Lower bounds of input NDF
       INTEGER NDIM1              ! No. of pixel axes in input NDF 
@@ -265,6 +271,10 @@
       END DO
 
  999  CONTINUE
+
+*  Export the IWCSR pointer to the parent AST context so that it will not
+*  be annulled by the following call to AST_END.
+      CALL AST_EXPORT( IWCSR, STATUS )
 
 *  End the AST context
       CALL AST_END( STATUS )

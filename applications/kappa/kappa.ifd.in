@@ -17012,6 +17012,22 @@ iraf! {
             helpkey *
           }
 
+         parameter flbnd {
+            size *
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
+         parameter fubnd {
+            size *
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
          parameter genvar {
             type _LOGICAL
             vpath DEFAULT
