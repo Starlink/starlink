@@ -88,7 +88,8 @@ AC_HEADER_STDC
 # Determine a full path for the chosen compiler to ensure that the
 # libtiff configure tool is using the same one as ourselves.
 
-TIFFCC=`echo "$CC" | sed -e 's/-pipe//'`
+#  Pick first word, that's without any CFLAGS.
+TIFCC=`expr "$CC" : '\([^\ ]*\)'`
 TIFFCC=`which $TIFFCC 2>/dev/null`
 
 #--------------------------------------------------------------------
