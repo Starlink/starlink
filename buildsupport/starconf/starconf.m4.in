@@ -259,6 +259,23 @@ current_MANIFESTS=$STARLINK/manifests
 : ${STAR_MANIFEST_DIR='$(prefix)/manifests'}
 AC_SUBST(STAR_MANIFEST_DIR)
 
+# Each package updates the "starlink.version" file installed into the
+# manifests directory. This tracks the subversion version number for
+# the current code state by running the svnversion program on the
+# _whole_ tree (this isn't very nice, but is required by the JAC).
+# Define SVNVERSION as the program to run, but allow it to be 
+# overridden (most likely by ":" to avoid the overhead).
+# Also requires that STAR_SOURCE_ROOT_DIR is defined to locate the
+# head of the source tree.
+: ${SVNVERSION='svnversion'}
+if test "${SVNVERSION}" = "svnversion"; then
+   AC_PATH_PROG(SVNVERSION, svnversion)
+fi
+AC_SUBST(SVNVERSION)
+
+: ${STAR_SOURCE_ROOT_DIR=''}
+AC_SUBST(STAR_SOURCE_ROOT_DIR)
+
 # Although PACKAGE_VERSION is a default output variable, it isn't
 # added as a Makefile variable by default.  We need it below, however,
 # so add it now.
