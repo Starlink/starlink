@@ -91,6 +91,7 @@ if %?INSTALLMANIFEST%
 install: %maybe_BUILT_SOURCES% all-am
 	if test -n "$(STAR_MANIFEST_DIR)" -a $(MANIFEST) = false; then \
 	    $(MAKE) SHELL=/bin/sh $(AM_MAKEFLAGS) install-manifest; \
+	    $(MAKE) SHELL=/bin/sh $(AM_MAKEFLAGS) install-svnversion; \
 	else \
 	    $(MAKE) $(AM_MAKEFLAGS) $(REAL_INSTALL); \
 	fi
@@ -175,6 +176,19 @@ else !%?INSTALLMANIFEST%
 install:%maybe_BUILT_SOURCES% $(REAL_INSTALL)
 endif !%?INSTALLMANIFEST%
 
+## If SVNVERSION has been defined then we want to run svnversion on the 
+## tree to generate a unique id for the source code state. The problem
+## here is locating the head of the tree, so that is solved using an
+## additional variable STAR_SOURCE_ROOT_DIR.
+.PHONY: install-svnversion
+install-svnversion:
+	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
+	@if test -n "$(SVNVERSION)"; then \
+	   if test -d "$(STAR_SOURCE_ROOT_DIR)"; then \
+	      cd $(STAR_SOURCE_ROOT_DIR) && \
+	      $(SVNVERSION) > $(DESTDIR)$(STAR_MANIFEST_DIR)/starlink.version; \
+	   fi; \
+	fi
 
 .PHONY: install-am
 install-am: all-am
