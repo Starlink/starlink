@@ -621,6 +621,12 @@ f     - Title: The Plot title drawn using AST_GRID
 *        values covered by the plot. This gives better default gap sizes.
 *     11-JUN-2007 (DSB)
 *        Plug memory leaks.
+*     20-JUN-2007 (DSB)
+*        - Add attribute GrfContext.
+*        - Pass the GrfContext attribute value to each external grf function.
+*        External code that uses the astGrfSet function must be changed
+*        so that the external grf functions registered using astGrfSet 
+*        accept this new parameter.
 *class--
 */
 
@@ -1592,6 +1598,11 @@ static int TestForceExterior( AstPlot * );
 static void ClearForceExterior( AstPlot * );
 static void SetForceExterior( AstPlot *, int );
 
+static int GetGrfContext( AstPlot * );
+static int TestGrfContext( AstPlot * );
+static void ClearGrfContext( AstPlot * );
+static void SetGrfContext( AstPlot *, int );
+
 static int GetBorder( AstPlot * );
 static int TestBorder( AstPlot * );
 static void ClearBorder( AstPlot * );
@@ -2123,6 +2134,51 @@ astMAKE_CLEAR(Plot,ForceExterior,forceexterior,-1)
 astMAKE_GET(Plot,ForceExterior,int,0,(this->forceexterior == -1 ? 0 : this->forceexterior))
 astMAKE_SET(Plot,ForceExterior,int,forceexterior,( value ? 1 : 0 ))
 astMAKE_TEST(Plot,ForceExterior,( this->forceexterior != -1 ))
+
+/* GrfContext */
+/* ---------- */
+/*
+*att++
+*  Name:
+*     GrfContext
+
+*  Purpose:
+*     Identifier for a graphics context.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer.
+
+*  Description:
+*     This attribute is provided as a means of communicating context
+*     information from the calling application to any graphics functions
+*     registered with a Plot using the
+c     astGrfSet function.
+f     AST_GRFSET routine.
+*     The value of the GrfContext attribute is passed as the first 
+c parameter
+f argument
+*     to each such function each time the function is called to perform
+*     some graphics operation. The attribute can be set to any integer
+*     value and does not affect the internal operation of AST in any way.
+*     What ever value is stored will simply be passed on to each of the
+*     registered graphics functions, and it is up to each such function
+*     to interpret the value in what ever way is appropriate. 
+*
+*     The attribute has a default value of zero.
+
+*  Applicability:
+*     Plot
+*        All Plots have this attribute.
+
+*att--
+*/
+astMAKE_CLEAR(Plot,GrfContext,grfcontext,(INT_MAX-123))
+astMAKE_GET(Plot,GrfContext,int,0,(this->grfcontext == (INT_MAX-123) ? 0 : this->grfcontext))
+astMAKE_SET(Plot,GrfContext,int,grfcontext,value)
+astMAKE_TEST(Plot,GrfContext,( this->grfcontext != (INT_MAX-123) ))
 
 /*
 *att++
@@ -5192,7 +5248,8 @@ static int CGCapWrapper( AstPlot *this, int cap, int value ) {
 */
 
    if( !astOK ) return 0;
-   return ( (AstGCapFun) this->grffun[ AST__GCAP ] )( cap, value );
+   return ( (AstGCapFun) this->grffun[ AST__GCAP ] )
+                 ( astGetGrfContext(this), cap, value );
 }
 
 static int CGAttrWrapper( AstPlot *this, int attr, double value, 
@@ -5247,8 +5304,8 @@ static int CGAttrWrapper( AstPlot *this, int attr, double value,
 
 */
    if ( !astOK ) return 0;
-   return ( (AstGAttrFun) this->grffun[ AST__GATTR ] )( attr, value, old_value, 
-                                                        prim );
+   return ( (AstGAttrFun) this->grffun[ AST__GATTR ] )
+                      ( astGetGrfContext(this), attr, value, old_value, prim );
 }
 
 static int CGFlushWrapper( AstPlot *this ) {
@@ -5280,7 +5337,8 @@ static int CGFlushWrapper( AstPlot *this ) {
 
 */
    if ( !astOK ) return 0;
-   return ( (AstGFlushFun) this->grffun[ AST__GFLUSH ])();
+   return ( (AstGFlushFun) this->grffun[ AST__GFLUSH ])
+                        ( astGetGrfContext(this) );
 }
 
 static int CGLineWrapper( AstPlot *this, int n, const float *x, 
@@ -5320,7 +5378,8 @@ static int CGLineWrapper( AstPlot *this, int n, const float *x,
 
 */
    if ( !astOK ) return 0;
-   return ( (AstGLineFun) this->grffun[ AST__GLINE ])( n, x, y );
+   return ( (AstGLineFun) this->grffun[ AST__GLINE ])
+            ( astGetGrfContext(this), n, x, y );
 }
 
 static int CGMarkWrapper( AstPlot *this, int n, const float *x, 
@@ -5363,7 +5422,8 @@ static int CGMarkWrapper( AstPlot *this, int n, const float *x,
 
 */
    if ( !astOK ) return 0;
-   return ( (AstGMarkFun) this->grffun[ AST__GMARK ])( n, x, y, type );
+   return ( (AstGMarkFun) this->grffun[ AST__GMARK ])
+          ( astGetGrfContext(this), n, x, y, type );
 
 }
 
@@ -5426,8 +5486,8 @@ static int CGTextWrapper( AstPlot *this, const char *text, float x, float y,
 
 */
    if ( !astOK ) return 0;
-   return ( (AstGTextFun) this->grffun[ AST__GTEXT ])( text, x, y, just, upx, 
-                                                       upy );
+   return ( (AstGTextFun) this->grffun[ AST__GTEXT ])
+          ( astGetGrfContext(this), text, x, y, just, upx, upy );
 }
 
 static int CGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
@@ -5497,8 +5557,8 @@ static int CGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
 
 */
    if ( !astOK ) return 0;
-   return ( (AstGTxExtFun) this->grffun[ AST__GTXEXT ])( text, x, y, just, upx,
-                                                         upy, xb, yb );
+   return ( (AstGTxExtFun) this->grffun[ AST__GTXEXT ])
+                ( astGetGrfContext(this), text, x, y, just, upx, upy, xb, yb );
 }
 
 static int CGQchWrapper( AstPlot *this, float *chv, float *chh ) {
@@ -5537,7 +5597,8 @@ static int CGQchWrapper( AstPlot *this, float *chv, float *chh ) {
 *        axis
 */
    if ( !astOK ) return 0;
-   return ( (AstGQchFun) this->grffun[ AST__GQCH ])( chv, chh );
+   return ( (AstGQchFun) this->grffun[ AST__GQCH ])
+                             ( astGetGrfContext(this), chv, chh );
 }
 
 static int CGScalesWrapper( AstPlot *this, float *alpha, float *beta ) {
@@ -5574,7 +5635,8 @@ static int CGScalesWrapper( AstPlot *this, float *alpha, float *beta ) {
 *        Y axis (i.e. Ynorm = beta*Yworld).
 */
    if ( !astOK ) return 0;
-   return ( (AstGScalesFun) this->grffun[ AST__GSCALES ])( alpha, beta );
+   return ( (AstGScalesFun) this->grffun[ AST__GSCALES ])
+                           ( astGetGrfContext(this), alpha, beta );
 }
 
 static int CheckLabels( AstPlot *this, AstFrame *frame, int axis, 
@@ -6416,6 +6478,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* ------------- */
    } else if ( !strcmp( attrib, "forceexterior" ) ) {
       astClearForceExterior( this );
+
+/* GrfContext */
+/* ---------- */
+   } else if ( !strcmp( attrib, "grfcontext" ) ) {
+      astClearGrfContext( this );
 
 /* Invisible. */
 /* ---------- */
@@ -13576,6 +13643,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
          result = buff;
       }
 
+/* GrfContext */
+/* ---------- */
+   } else if ( !strcmp( attrib, "grfcontext" ) ) {
+      ival = astGetGrfContext( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
+
 /* Invisible. */
 /* ---------- */
    } else if ( !strcmp( attrib, "invisible" ) ) {
@@ -15334,6 +15410,13 @@ f     to "graphics cordinates" as defined by the GRAPHBOX parameter of
 f     the AST_PLOT call which created the Plot.
 c     to "graphics cordinates" as defined by the graphbox parameter of
 c     the astPlot call which created the Plot.
+*
+c     The first parameter ("grfcon")
+f     The first argument (GRFCON)
+*     for each function is an integer value that can be used by the
+*     called function to establish the context in which it is being called.
+*     The integer value passed to the function is the current value of
+*     the Plot's GrfContext attribute.
 
 *  Attr:
 *     The "Attr" function returns the current value of a specified graphics
@@ -15341,9 +15424,12 @@ c     the astPlot call which created the Plot.
 *     value is converted to an integer value if necessary before use.
 *     It requires the following interface:
 *
-c     int Attr( int attr, double value, double *old_value, int prim )
-f     INTEGER FUNCTION ATTR( ATT, VAL, OLDVAL, PRIM )
+c     int Attr( int grfcon, int attr, double value, double *old_value, int prim )
+f     INTEGER FUNCTION ATTR( GRFCON, ATT, VAL, OLDVAL, PRIM )
 *
+c     - grfcon - 
+f     - GRFCON = INTEGER (Given) -
+*       The current value of the Plot's GrfContext attribute.
 c     - attr - An integer value identifying the required attribute. 
 c       The following symbolic values are defined in grf.h:
 f     - ATT = INTEGER (Given) - An integer identifying the required attribute. 
@@ -15374,9 +15460,12 @@ f       Identified by the following values defined in GRF_PAR:
 *     The "Cap" function is called to determine if the grf module has a 
 *     given capability, as indicated by the "cap" argument:
 *
-c     int Cap( int cap, int value )
-f     INTEGER FUNCTION CAP( CAP, VALUE )
+c     int Cap( int grfcon, int cap, int value )
+f     INTEGER FUNCTION CAP( GRFCON, CAP, VALUE )
 *
+c     - grfcon - 
+f     - GRFCON = INTEGER (Given) -
+*       The current value of the Plot's GrfContext attribute.
 c     - cap - 
 f     - CAP = INTEGER (Given)
 *        The capability being inquired about. This will be one of the
@@ -15434,16 +15523,23 @@ f        The value returned by the function depends on the value of CAP
 *     by flushing any pending graphics to the output device. It
 *     requires the following interface:
 *
-c     int Flush()
-f     INTEGER FUNCTION FLUSH()
+c     int Flush( int grfcon )
+f     INTEGER FUNCTION FLUSH( GRFCON )
+*
+c     - grfcon - 
+f     - GRFCON = INTEGER (Given) -
+*       The current value of the Plot's GrfContext attribute.
 
 *  Line:
 *     The "Line" function displays lines joining the given positions and 
 *     requires the following interface:
 *
-c     int Line( int n, const float *x, const float *y )
-f     INTEGER FUNCTION LINE( N, X, Y )
+c     int Line( int grfcon, int n, const float *x, const float *y )
+f     INTEGER FUNCTION LINE( GRFCON, N, X, Y )
 *
+c     - grfcon - 
+f     - GRFCON = INTEGER (Given) -
+*       The current value of the Plot's GrfContext attribute.
 c     - n - The number of positions to be joined together.
 f     - N = INTEGER (Given) - The number of positions to be joined together.
 c     - x - A pointer to an array holding the "n" x values.
@@ -15455,9 +15551,12 @@ f     - Y( N ) = REAL (Given) - An array holding the "n" y values.
 *     The "Mark" function displays markers at the given positions. It 
 *     requires the following interface:
 *
-c     int Mark( int n, const float *x, const float *y, int type )
-f     INTEGER FUNCTION MARK( N, X, Y, TYPE )
+c     int Mark( int grfcon, int n, const float *x, const float *y, int type )
+f     INTEGER FUNCTION MARK( GRFCON, N, X, Y, TYPE )
 *
+c     - grfcon - 
+f     - GRFCON = INTEGER (Given) -
+*       The current value of the Plot's GrfContext attribute.
 c     - n - The number of positions to be marked.
 f     - N = INTEGER (Given) - The number of positions to be marked.
 c     - x - A pointer to an array holding the "n" x values.
@@ -15474,9 +15573,12 @@ f       the type of marker symbol required.
 *     and horizontally in graphics coordinates. It requires the following 
 *     interface:
 *
-c     int Qch( float *chv, float *chh )
-f     INTEGER FUNCTION QCH( CHV, CHH )
+c     int Qch( int grfcon, float *chv, float *chh )
+f     INTEGER FUNCTION QCH( GRFCON, CHV, CHH )
 *
+c     - grfcon - 
+f     - GRFCON = INTEGER (Given) -
+*       The current value of the Plot's GrfContext attribute.
 c     - chv - A pointer to the float which is to receive the height of
 f     - CHV = REAL (Returned) The height of
 *     characters drawn with a vertical baseline. This will be an 
@@ -15494,9 +15596,12 @@ f     - CHH = REAL (Returned) The height of
 *     right, and 3) Y values increase from bottom to top. It requires the 
 *     following interface:
 *
-c     int Scales( float *alpha, float *beta )
-f     INTEGER FUNCTION SCALES( ALPHA, BETA )
+c     int Scales( int grfcon, float *alpha, float *beta )
+f     INTEGER FUNCTION SCALES( GRFCON, ALPHA, BETA )
 *
+c     - grfcon - 
+f     - GRFCON = INTEGER (Given) -
+*       The current value of the Plot's GrfContext attribute.
 c     - alpha - A pointer to the float which is to receive the
 f     - ALPHA = REAL (Returned) The 
 *     scale for the X axis (i.e. Xnorm = alpha*Xworld).
@@ -15509,10 +15614,13 @@ f     - BETA = REAL (Returned) The
 *     position using a specified justification and up-vector. It 
 *     requires the following interface:
 *
-c     int Text( const char *text, float x, float y, const char *just,
+c     int Text( int grfcon, const char *text, float x, float y, const char *just,
 c               float upx, float upy )
-f     INTEGER FUNCTION TEXT( TEXT, X, Y, JUST, UPX, UPY )
+f     INTEGER FUNCTION TEXT( GRFCON, TEXT, X, Y, JUST, UPX, UPY )
 *
+c     - grfcon - 
+f     - GRFCON = INTEGER (Given) -
+*       The current value of the Plot's GrfContext attribute.
 c     - text - Pointer to a null-terminated character string to be displayed.
 f     - TEXT = CHARACTER * ( * ) (Given) - The string to be displayed.
 c     - x - The reference x coordinate.
@@ -15549,10 +15657,13 @@ f     - UPX = REAL (Given) - The y component of the up-vector for the text.
 *     Text function described above. The returned box includes any leading 
 *     or trailing spaces. It requires the following interface:
 *
-c     int TxExt( const char *text, float x, float y, const char *just,
+c     int TxExt( int grfcon, const char *text, float x, float y, const char *just,
 c                float upx, float upy, float *xb, float *yb )
-f     INTEGER FUNCTION TXEXT( TEXT, X, Y, JUST, UPX, UPY, XB, YB )
+f     INTEGER FUNCTION TXEXT( GRFCON, TEXT, X, Y, JUST, UPX, UPY, XB, YB )
 *
+c     - grfcon - 
+f     - GRFCON = INTEGER (Given) -
+*       The current value of the Plot's GrfContext attribute.
 c     - text - Pointer to a null-terminated character string to be displayed.
 f     - TEXT = CHARACTER * ( * ) (Given) - The string to be displayed.
 c     - x - The reference x coordinate.
@@ -17337,6 +17448,11 @@ void astInitPlotVtab_(  AstPlotVtab *vtab, const char *name ) {
    vtab->SetForceExterior = SetForceExterior;
    vtab->GetForceExterior = GetForceExterior;
    vtab->TestForceExterior = TestForceExterior;
+
+   vtab->ClearGrfContext = ClearGrfContext;
+   vtab->SetGrfContext = SetGrfContext;
+   vtab->GetGrfContext = GetGrfContext;
+   vtab->TestGrfContext = TestGrfContext;
 
    vtab->ClearInvisible = ClearInvisible;
    vtab->SetInvisible = SetInvisible;
@@ -21752,6 +21868,13 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
         && ( nc >= len ) ) {
       astSetForceExterior( this, ival );
 
+/* GrfContext */
+/* ---------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "grfcontext= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetGrfContext( this, ival );
+
 /* Invisible. */
 /* ---------- */
    } else if ( nc = 0,
@@ -22814,6 +22937,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* ------------- */
    } else if ( !strcmp( attrib, "forceexterior" ) ) {
       result = astTestForceExterior( this );
+
+/* GrfContext */
+/* ---------- */
+   } else if ( !strcmp( attrib, "grfcontext" ) ) {
+      result = astTestGrfContext( this );
 
 /* Invisible. */
 /* ---------- */
@@ -26639,6 +26767,12 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    ival = set ? GetForceExterior( this ) : astGetForceExterior( this );
    astWriteInt( channel, "FrcExt", set, 1, ival, "Force exterior labelling?" );
 
+/* GrfContext. */
+/* ----------- */
+   set = TestGrfContext( this );
+   ival = set ? GetGrfContext( this ) : astGetGrfContext( this );
+   astWriteInt( channel, "GrfCon", set, 0, ival, "Graphics context identifier" );
+
 /* Invisible. */
 /* ---------- */
    set = TestInvisible( this );
@@ -27480,8 +27614,8 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    cause a default value of 1 (yes) to be used. */
       new->tickall = -1;
 
-/* Force exterior labelling, even if they appear to be unjustified? */
-      new->forceexterior = -1;
+/* Graphics context identifier */
+      new->grfcontext = INT_MAX - 123;
 
 /* Shoudl ast Grid draw a boundary round the regions of valid coordinates? 
    Store a value of -1 to indicate that no value has yet been set. This will 
@@ -27830,6 +27964,11 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 /* -------- */
       new->forceexterior = astReadInt( channel, "frcext", -1 );
       if ( TestForceExterior( new ) ) SetForceExterior( new, new->forceexterior );
+
+/* GrfContext */
+/* ---------- */
+      new->grfcontext = astReadInt( channel, "grfcon", INT_MAX - 123 );
+      if ( TestGrfContext( new ) ) SetGrfContext( new, new->grfcontext );
 
 /* Invisible. */
 /* ---------- */

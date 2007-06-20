@@ -21285,6 +21285,35 @@ current version):
 
 \begin{enumerate}
 
+
+
+\item The Plot class has a new attribute called GrfContext that can be used
+to comminicate context information between an application and any
+graphics functions registered with the Plot class via the 
+c+
+astGrfSet function.
+c-
+f+
+AST\_GRFSET routine.
+f-
+\item Functions registered with the Plot class using 
+c+
+astGrfSet 
+c-
+f+
+AST\_GRFSET
+f-
+now take a new additional integer parameter, ``grfcon''. The Plot class
+sets this parameter to the value of the Plot's GrfContext attribute before
+calling the graphics function. NOTE, THIS CHANGE WILL REQUIRE EXISTING 
+CODE THAT USES 
+c+
+astGrfSet 
+c-
+f+
+AST\_GRFSET
+f-
+TO BE MODIFIED TO INCLUDE THE NEW PARAMETER.
 \item The 
 c+
 astRebinSeq functions

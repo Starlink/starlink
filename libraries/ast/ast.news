@@ -22,6 +22,16 @@ array. This is necessary to correct a flaw in the calculation of output
 variances based on the spread of input values. NOTE, THIS CHANGE WILL
 REQUIRE EXISTING CODE THAT USES ASTREBINSEQ TO BE MODIFIED TO INCLUDE THE
 NEW PARAMETER (CALLED "NUSED").
+- The Plot class has a new attribute called GrfContext that can be used
+to comminicate context information between an application and any
+graphics functions registered with the Plot class via the astGrfSet
+(AST_GRFSET) function.
+- Functions registered with the Plot class using astGrfSet (AST_GRFSET)
+now take a new additional integer parameter, "grfcon". The Plot class
+sets this parameter to value of the Plot's GrfContext attribute before
+calling the graphics function. NOTE, THIS CHANGE WILL REQUIRE EXISTING 
+CODE THAT USES astGrfSet (AST_GRFSET) TO BE MODIFIED TO INCLUDE THE
+NEW PARAMETER.
 -  Support has been added for the FITS-WCS "HPX" projection (HEALPix).
 -  A new flag "AST__VARWGT" can be supplied to astRebinSeq. This causes 
 the input data values to be weighted using the reciprocals of the input

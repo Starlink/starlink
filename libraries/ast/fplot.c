@@ -404,12 +404,14 @@ static int FGAttrWrapper( AstPlot *this, int attr, double value,
                           double *old_value, int prim ) {
    DECLARE_DOUBLE(OLDVAL);
    int ret;
-
+   int grfcon;
    if ( !astOK ) return 0;
+   grfcon = astGetGrfContext( this );
 
-   ret = ( *(int (*)( INTEGER(attr), DOUBLE(value), DOUBLE(old_value),
-                       INTEGER(prim) ))
-                  this->grffun[ AST__GATTR ])(  INTEGER_ARG(&attr),
+   ret = ( *(int (*)( INTEGER(grfcon), INTEGER(attr), DOUBLE(value), 
+                      DOUBLE(old_value), INTEGER(prim) ))
+                  this->grffun[ AST__GATTR ])(  INTEGER_ARG(&grfcon),
+                                                INTEGER_ARG(&attr),
                                                 DOUBLE_ARG(&value), 
                                                 DOUBLE_ARG(&OLDVAL),  
                                                 INTEGER_ARG(&prim) );
@@ -418,25 +420,33 @@ static int FGAttrWrapper( AstPlot *this, int attr, double value,
 }
 
 static int FGFlushWrapper( AstPlot *this ) {
+   int grfcon;
    if ( !astOK ) return 0;
-   return ( *(int (*)()) this->grffun[ AST__GFLUSH ])();
+   grfcon = astGetGrfContext( this );
+   return ( *(int (*)(INTEGER(grfcon))) this->grffun[ AST__GFLUSH ])(INTEGER_ARG(&grfcon));
 }
 
 static int FGLineWrapper( AstPlot *this, int n, const float *x, 
                           const float *y ) {
+   int grfcon;
    if ( !astOK ) return 0;
-   return ( *(int (*)( INTEGER(n), REAL_ARRAY(x), REAL_ARRAY(y) ))
-                  this->grffun[ AST__GLINE ])(  INTEGER_ARG(&n),
+   grfcon = astGetGrfContext( this );
+   return ( *(int (*)( INTEGER(grfcon), INTEGER(n), REAL_ARRAY(x), REAL_ARRAY(y) ))
+                  this->grffun[ AST__GLINE ])(  INTEGER_ARG(&grfcon),
+                                                INTEGER_ARG(&n),
                                                 REAL_ARRAY_ARG(x), 
                                                 REAL_ARRAY_ARG(y) );
 }
 
 static int FGMarkWrapper( AstPlot *this, int n, const float *x, 
                           const float *y, int type ) {
+   int grfcon;
    if ( !astOK ) return 0;
-   return ( *(int (*)( INTEGER(n), REAL_ARRAY(x), REAL_ARRAY(y),
+   grfcon = astGetGrfContext( this );
+   return ( *(int (*)( INTEGER(grfcon), INTEGER(n), REAL_ARRAY(x), REAL_ARRAY(y),
                        INTEGER(type) ))
-                  this->grffun[ AST__GMARK ])(  INTEGER_ARG(&n),
+                  this->grffun[ AST__GMARK ])(  INTEGER_ARG(&grfcon),
+                                                INTEGER_ARG(&n),
                                                 REAL_ARRAY_ARG(x), 
                                                 REAL_ARRAY_ARG(y),
                                                 INTEGER_ARG(&type) );
@@ -450,7 +460,9 @@ static int FGTextWrapper( AstPlot *this, const char *text, float x, float y,
    int ftext_length;
    int fjust_length;
 
+   int grfcon;
    if ( !astOK ) return 0;
+   grfcon = astGetGrfContext( this );
 
    ftext_length = strlen( text );
    if( ftext_length > LTEXT_length ) ftext_length = LTEXT_length;
@@ -460,10 +472,11 @@ static int FGTextWrapper( AstPlot *this, const char *text, float x, float y,
    if( fjust_length > LJUST_length ) fjust_length = LJUST_length;
    astStringExport( just, LJUST, fjust_length );
 
-   return ( *(int (*)( CHARACTER(LTEXT), REAL(x), REAL(y),
+   return ( *(int (*)( INTEGER(grfcon), CHARACTER(LTEXT), REAL(x), REAL(y),
                        CHARACTER(LJUST), REAL(upx), REAL(upy)
                        TRAIL(ftext) TRAIL(fjust) ) )
                   this->grffun[ AST__GTEXT ])( 
+                                      INTEGER_ARG(&grfcon),
                                       CHARACTER_ARG(LTEXT),
                                       REAL_ARG(&x),
                                       REAL_ARG(&y), 
@@ -475,9 +488,12 @@ static int FGTextWrapper( AstPlot *this, const char *text, float x, float y,
 }
 
 static int FGCapWrapper( AstPlot *this, int cap, int value ) {
+   int grfcon;
    if ( !astOK ) return 0;
-   return ( *(int (*)( INTEGER(cap), INTEGER(value) ) )
+   grfcon = astGetGrfContext( this );
+   return ( *(int (*)( INTEGER(grfcon), INTEGER(cap), INTEGER(value) ) )
                   this->grffun[ AST__GCAP ])( 
+                                      INTEGER_ARG(&grfcon),
                                       INTEGER_ARG(&cap),
                                       INTEGER_ARG(&value) );
 }
@@ -490,7 +506,9 @@ static int FGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
    int ftext_length;
    int fjust_length;
 
+   int grfcon;
    if ( !astOK ) return 0;
+   grfcon = astGetGrfContext( this );
 
    ftext_length = strlen( text );
    if( ftext_length > LTEXT_length ) ftext_length = LTEXT_length;
@@ -500,11 +518,12 @@ static int FGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
    if( fjust_length > LJUST_length ) fjust_length = LJUST_length;
    astStringExport( just, LJUST, fjust_length );
 
-   return ( *(int (*)( CHARACTER(LTEXT), REAL(x), REAL(y),
+   return ( *(int (*)( INTEGER(grfcon), CHARACTER(LTEXT), REAL(x), REAL(y),
                        CHARACTER(LJUST), REAL(upx), REAL(upy),
                        REAL_ARRAY(xb), REAL_ARRAY(yb) TRAIL(ftext) 
                        TRAIL(fjust) ) )
                   this->grffun[ AST__GTXEXT ])( 
+                                                INTEGER_ARG(&grfcon),
                                                 CHARACTER_ARG(LTEXT),
                                                 REAL_ARG(&x),
                                                 REAL_ARG(&y), 
@@ -518,15 +537,19 @@ static int FGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
 }
 
 static int FGQchWrapper( AstPlot *this, float *chv, float *chh ) {
+   int grfcon;
    if ( !astOK ) return 0;
-   return ( *(int (*)( REAL(chv), REAL(chh) ) )
-                  this->grffun[ AST__GQCH ])( REAL_ARG(chv), REAL_ARG(chh) );
+   grfcon = astGetGrfContext( this );
+   return ( *(int (*)( INTEGER(grfcon), REAL(chv), REAL(chh) ) )
+                  this->grffun[ AST__GQCH ])( INTEGER_ARG(&grfcon), REAL_ARG(chv), REAL_ARG(chh) );
 }
 
 static int FGScalesWrapper( AstPlot *this, float *alpha, float *beta ) {
+   int grfcon;
    if ( !astOK ) return 0;
-   return ( *(int (*)( REAL(alpha), REAL(beta) ) )
-                  this->grffun[ AST__GSCALES ])( REAL_ARG(alpha), REAL_ARG(beta) );
+   grfcon = astGetGrfContext( this );
+   return ( *(int (*)( INTEGER(grfcon), REAL(alpha), REAL(beta) ) )
+                  this->grffun[ AST__GSCALES ])( INTEGER_ARG(&grfcon), REAL_ARG(alpha), REAL_ARG(beta) );
 }
 
 
