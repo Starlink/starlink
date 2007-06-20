@@ -124,6 +124,9 @@ ALL_TARGETS = \
 SUBDIRS = @subdirs@
 @SET_MAKE@
 LN_S=@LN_S@
+INSTALL = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+SVNVERSION = @SVNVERSION@
 
 # Java support: need a java runtime.  The Java programs below use the
 # jar in $(BUILDSUPPORTCP), which is installed
@@ -155,6 +158,12 @@ world: $(ALL_TARGETS)
 	fi
 	rm -f world-stamp
 	date >world-stamp
+	$(INSTALL_DATA) world-stamp $(MANIFESTS)/world-stamp
+	- if test -n "$(SVNVERSION)"; then \
+	   rm -f starlink.version; \
+	   $(SVNVERSION) > starlink.version; \
+	   $(INSTALL_DATA) starlink.version $(MANIFESTS)/starlink.version; \
+	fi
 
 # Avoid doing anything if the variable JAVA is NOJAVA -- this is true if
 # we're using this file unconfigured during bootstrap (see ./bootstrap

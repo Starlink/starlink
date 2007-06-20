@@ -29,6 +29,16 @@ AC_ARG_VAR([JAVA], [Location of java runtime])
 AC_PROG_MAKE_SET
 AC_PROG_LN_S
 
+dnl    Locate svnversion command, if not already defined.
+: ${SVNVERSION='svnversion'}
+if test "${SVNVERSION}" = "svnversion"; then
+   AC_PATH_PROG(SVNVERSION, svnversion)
+fi
+AC_SUBST(SVNVERSION)
+
+dnl    Need to install the world-stamp and starlink.version files.
+AC_PROG_INSTALL
+
 dnl    The following list of active directories must be maintained by hand
 dnl
 dnl    Do NOT mention buildsupport in AC_CONFIG_SUBDIRS.  If we
