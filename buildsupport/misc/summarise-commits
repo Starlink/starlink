@@ -1,422 +1,607 @@
-#! /usr/bin/perl -w
+#!/usr/bin/perl -w
 
-use Getopt::Std;
-use Net::SMTP;
-use Time::Local;
+=head1 NAME
 
+summarise-commits - Summarise commits in a subversion repository
+
+=head1 SYNOPSIS
+
+  summarise-commits -startrev NNNN -repos starlink
+
+=head1 DESCRIPTION
+
+Create an HTML page of changes made to a repository since the last
+time this program was run (or from the supplied revision number).
+
+=over 4
+
+=item B<-help>
+
+Print help information.
+
+=item B<-version>
+
+Print version information.
+
+=item B<-man>
+
+Print the full documentation to STDOUT.
+
+=item B<-startrev>
+
+Start from this revision. Otherwise starts from one above the most recent
+revision that was extracted last time this command was run.
+
+=item B<-repos>
+
+The name of the repository to process. This value corresponds to special settings
+that are indexed by repository name. Default is "starlink".
+
+=item B<-noemail>
+
+Disable the mailing of report summary. Mail message is not sent if no revisions
+have been committed since the last time this ran.
+
+=back
+
+=cut
+
+use warnings;
 use strict;
+use File::Spec;
+use Pod::Usage;
+use Getopt::Long;
+use Net::SMTP;
+$| = 1; # unbuffered
 
-# Config:
-# URL where cvsweb lives 
-my $cvswebhome = 'http://cvsweb.starlink.ac.uk/cvsweb.cgi';
+# Restrict PATH
+$ENV{PATH} = "/usr/bin:/opt/local/bin";
 
-# Where the results will be reported to be
-my $reporturl = 'http://cvs.starlink.ac.uk/~nxg/summarise-commits.html';
+# Mail SMTP server
+my $MAILHOST = "mailhost";
 
-# Where a report will be mailed to; undef suppresses this
-my $reportmail = undef;
+# Repository root path without the last directory included (which in JAC
+# case is the directory that contains all subversion repositories)
+my $REPO_ROOT = "/jac_sw/svnroot";
 
-# ...from
-my $reportfrom = 'ussc@star.rl.ac.uk';
+# Base Prefix to strip from reports (usually does not vary for reports
+# and will be augmented if an additional filter has been applied)
+my $IGNORE_PREFIX = "trunk/";
 
-# ...via mail host
-my $mailhost = $ENV{MAILHOST} || 'rlsaxps.bnsc.rl.ac.uk';
+# We could read these from a config file if this is to become a general
+# program for subversion use but for now use a hash
 
-# The path to a directory which holds the TOP-LEVEL of a checkout,
-# or undef if we're starting in the correct place
-my $checkoutdir = '.';
-# on rlspc0, use /home/vmwareshare/rhel30linux_i386/build/build-home/MakeWorld/
+my %SETTINGS = (
+		scicom => {
+			   # Base URL for viewvc links
+			   viewvchome => "http://cvsweb.jach.hawaii.edu/viewvc/",
+			   # Directory name of the subversion tree relative to root path
+			   svnroot => "scicom",
+			   # URL root dir where report web page will appear
+			   reporturlroot => "http://www.jach.hawaii.edu/software",
+			   # Where mail message will be sent
+			   reportmail => 'scicom@jach.hawaii.edu',
+			   # Local directory on the web server for web page and .revision file
+			   reportdir => '/web/html/software',
+			   # Name of report web file
+			   reportfile => 'summarize-commits.html',
+			   # Filter used to restrict report to specific part of repository tree
+			   file_filter => '',
+			   # indicates that the viewvc has root requirement
+			   hasviewvcroot => 1,
+			  },
+		oracdr => {
+			   # Base URL for viewvc links
+			   viewvchome => "http://www.oracdr.org/viewvc/",
+			   # Directory name of the subversion tree relative to root path
+			   svnroot => "oracdr",
+			   # URL root dir where report web page will appear
+			   reporturlroot => "http://www.oracdr.org",
+			   # Where mail message will be sent
+			   reportmail => 'oracdr@jach.hawaii.edu',
+			   # Local directory on the web server for web page and .revision file
+			   reportdir => '/web/oracdr.org',
+			   # Name of report web file
+			   reportfile => 'summarize-commits.html',
+			   # Filter used to restrict report to specific part of repository tree
+			   file_filter => '',
+			   # indicates that the viewvc has root requirement
+			   hasviewvcroot => 0,
+			  },
+		starlink => {
+			   # Base URL for viewvc links
+			   viewvchome => "http://starlink.jach.hawaii.edu/viewvc/",
+			   # Directory name of the subversion tree relative to root path
+			   svnroot => "starlink",
+			   # URL root dir where report web page will appear
+			   reporturlroot => "http://starlink.jach.hawaii.edu/",
+			   # Where mail message will be sent
+			   reportmail => 'stardev@jiscmail.ac.uk',
+			   # Local directory on the web server for web page and .revision file
+			   reportdir => '/web/starlink',
+			   # Name of report web file
+			   reportfile => 'summarize-commits.html',
+			   # Filter used to restrict report to specific part of repository tree
+			   file_filter => '',
+			   # indicates that the viewvc has root requirement
+			   hasviewvcroot => 0,
+			  },
+		smurf => {
+			   # Base URL for viewvc links
+			   viewvchome => "http://starlink.jach.hawaii.edu/viewvc/",
+			   # Directory name of the subversion tree relative to root path
+			   svnroot => "starlink",
+			   # URL root dir where report web page will appear
+			   reporturlroot => "http://starlink.jach.hawaii.edu/",
+			   # Where mail message will be sent
+			   reportmail => 'scuba2dr_dev@phas.ubc.ca',
+			   # Local directory on the web server for web page and .revision file
+			   reportdir => '/web/starlink',
+			   # Name of report web file
+			   reportfile => 'summarize-commits-smurf.html',
+			   # Filter used to restrict report to specific part of repository tree
+			   file_filter => 'applications/smurf',
+			   # indicates that the viewvc has root requirement
+			   hasviewvcroot => 0,
+			  },
+);
 
-# The module or path which is to be examined.  If undef, then the entire
-# repository is examined
-my $module = undef;
-
-# verbose flag
-my $verbose = 0;
-
-# See Getopt::Std for the reason for this voodoo
-$Getopt::Std::STANDARD_HELP_VERSION = 1
-    # redundant reference to this variable (it's not in old versions of
-    # Getopt (?), so we get a spurious `possible typo' warning then).
-    unless $Getopt::Std::STANDARD_HELP_VERSION;
-
-# Prototypes
-sub sendmail(%);
-sub Usage();
-sub escape_html($);
-
-
-# ======================================================================
-# Define classes CVSLog, CVSLogRevision and CVSLogEntry
-#
-#
-{
-    # Class CVSLog represents a sequence of CVS log entries, as read from
-    # the output of 'cvs log'.  The information is read from the
-    # filehandle passed as argument.
-    package CVSLog;
-
-    sub read(*) {
-        my $fh = shift;
-        my @newlog = ();
-        while (<$fh>) {
-            next if (/^\?/);
-            next if (/^ *$/);
-            
-            if (/^RCS file/) {
-                print STDERR $_ if $verbose;
-                # a commit entry
-                my $r = CVSLogEntry::read(*$fh);
-                push (@newlog, $r);
-                next;
-            }
-            die "Unrecognised text $_ in commit entry";
-        }
-        my $self = {};
-        $self->{array} = \@newlog;
-        return bless $self, 'CVSLog';
-    }
-
-    sub get_entries() {
-        my $self = shift;
-        if (! $self->{sorted}) {
-            my @t = sort sort_log_entry @{$self->{array}};
-            $self->{array} = \@t;
-        }
-        return @{$self->{array}};
-    }
-
-    sub get_nentries() {
-        my $self = shift;
-        my @t = @{$self->{array}};
-        return $#t;
-    }
-
-    sub have_entries() {
-        my $self = shift;
-        return $self->get_nentries() >= 0;
-    }
-
-    sub sort_log_entry {
-	# Sort on sort_string() first -- this groups related entries
-	# together.  If two have the same sort_string(), then sort on
-	# the filename -- sorts entries within groups.
-	my $s = $a->sort_string cmp $b->sort_string;
-	if ($s == 0) {
-	    return $a->file cmp $b->file;
-	} else {
-	    return $s;
-	}
-    }
+# Argument parsing
+my ($help, $man, $version, $startrev, $repos);
+my $email = 1; # default to sending email
+my $ostatus = GetOptions( "help" => \$help,
+                          "man" => \$man,
+                          "version" => \$version,
+			  "startrev=s" => \$startrev,
+			  "repos=s" => \$repos,
+			  "email!" => \$email,
+                         );
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose =>2) if $man;
+if ($version) {
+    my $id = '$Id$';
+    print "summarize-commits: Provide summary of recent commits to subversion\n";
+    print " Revision: $id\n";
+    exit;
 }
 
-{
-    # CVSLogRevision represents a single commit. Reads the information
-    # from the filehandle passed as argument.  Depends on the caller
-    # having the file in the correct place.
-    package CVSLogRevision;
-
-    sub read(*) {
-        my $fh = shift;
-
-        my $entry = {};
-        my $l = <$fh>;              # first line
-        if ($l =~ /^revision *(.*)/) {
-            $entry->{revision} = $1;
-        } else {
-            printf STDERR "Can't parse revision line <%s>\n", $l;
-            return undef;
-        }
-
-        $l = <$fh>;                 # second line
-        if ($l =~ /^date: *([0-9 :+-]*); *author: *([^;]*); *state: *([^;]*)/) {
-            $entry->{date} = $1;
-            $entry->{author} = $2;
-            $entry->{state} = $3;
-        } else {
-            printf STDERR "Can't parse log entry <%s>\n", $l;
-            return undef;
-        }
-        my $lastrev = 1;            # default -- return this at end of file
-        while (<$fh>) {
-            if (/^-----/) {
-                $lastrev = 0;
-                last;
-            }
-            if (/^=====/) {
-                $lastrev = 1;
-                last;
-            }
-            $entry->{message} = '' unless defined($entry->{message});
-            $entry->{message} .= $_;
-        }
-        $entry->{lastrev} = $lastrev;
-
-        return bless $entry, 'CVSLogRevision';
-    }
-
-    sub author {
-        my $self = shift;
-        return $self->{author} || '';
-    }
-
-    sub date {
-        my $self = shift;
-        return $self->{date} || '';
-    }
-
-    sub state {
-        my $self = shift;
-        return $self->{state} || '';
-    }
-
-    sub revision {
-        my $self = shift;
-        return $self->{revision} || '';
-    }
-
-    sub message {
-        my $self = shift;
-        return $self->{message} || '';
-    }
-
-    sub last_entry {
-        my $self = shift;
-        return $self->{lastrev};
-    }
+# Validate revision
+if ($startrev) {
+  if ($startrev !~ /^(\d+)$/) {
+    die "Supplied revision ($startrev) does not look like an integer\n";
+  } else {
+    # untaint
+    $startrev = $1;
+  }
 }
 
-{
-    # Class CVSLogEntry is the record of commits to a single
-    # CVS-controlled file.
-    package CVSLogEntry;
-
-    # Read the history of a single file from the filehandle passed as
-    # argument.  Depends on the caller having the file in the correct place.
-    sub read(*) {
-        my $fh = shift;
-        my $entry = {};             # reference to anonymous hash
-        while (<$fh>) {
-            if (/^Working[^:]*: *(.*)/) {
-                $entry->{file} = $1;
-            } elsif (/^head: *(.*)/) {
-                $entry->{head} = $1;
-            } elsif (/^----/) {
-                # Start of the list of revisions
-                my $rev;
-                my @revs = ();
-                do {
-                    $rev = CVSLogRevision::read(*$fh);
-                    push (@revs, $rev);
-                } until ($rev->last_entry);
-                $entry->{revisions} = \@revs;
-                last;
-            } elsif (/^====/) {
-                # shouldn't see this, but stop here anyway
-                last;
-            }
-            # else discard
-        }
-        return bless $entry, 'CVSLogEntry';
+# Select the correct set of configuration parameters
+if ($repos) {
+  die "Specified repository ($repos) is not understood\n"
+    if !exists $SETTINGS{$repos};
+  # now untaint $repos
+  for my $k (keys %SETTINGS) {
+    if ($k eq $repos) {
+      $repos = $k;
+      last;
     }
-
-    # The file being controlled
-    sub file {
-        my $self = shift;
-        return $self->{file} || '';
-    }
-
-    # The current head revision
-    sub head {
-        my $self = shift;
-        return $self->{head} || '';
-    }
-
-    # Return an array of CVSLogRevision objects.
-    sub revisions {
-        my $self = shift;
-        return @{$self->{revisions} || []};
-    }
-
-    # A string indicating the component this is part of, for sorting
-    # purposes.  This is basically just the first two elements of the path,
-    # but it's TOP for the top level, and the first three elements for
-    # java/ and thirdparty/ (yes, SPECIAL-CASE this).
-    sub sort_string {
-        my $self = shift;
-	unless (defined($self->{sort_string})) {
-	    my @s = split(m{/}, $self->{file});
-	    my $prefixlen;
-	    if ($#s == 0) {
-		$prefixlen = 0;
-	    } elsif ($#s == 1) {
-		$prefixlen = 1;
-	    } elsif ($s[0] eq "java" or $s[0] eq "thirdparty") {
-		$prefixlen = 3;
-	    } else {
-		$prefixlen = 2;
-	    }
-	    $self->{sort_string} = ($prefixlen == 0
-				    ? "TOP"
-				    : join('/',@s[0..$prefixlen-1]));
-	}
-	return $self->{sort_string};
-    }
-}
-
-# DateTime handles simple dates
-{
-    package DateTime;
-
-    # DateTime::read(xxx) returns an object representing the given time.
-    # The argument is an ISO date in the form yyyy-mm-dd, 
-    # or yyyy-mm-ddThh:mm or hh:mm.
-    #
-    # Silently return undef if the date is unparseable
-    sub parse($) {
-        my $datestring = shift;
-        my ($year, $month, $day, $hour, $min);
-        my $self = {};
-        if (($year, $month, $day)
-            = ($datestring =~ m{^(\d\d\d\d)-(\d\d)-(\d\d)$})) {
-            $self->{secs} = Time::Local::timelocal(0,0,0, $day, $month-1, $year-1900);
-        } elsif (($year, $month, $day, $hour, $min)
-                 = ($datestring =~ m{^(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d)})) {
-            $self->{secs} = Time::Local::timelocal(0, $min, $hour,
-                                                   $day, $month-1, $year-1900);
-        } elsif (($hour, $min) =
-                 ($datestring =~ m{^(\d\d):(\d\d)})) {
-            my @v = localtime(time());
-            $self->{secs} = Time::Local::timelocal(0, $min, $hour,
-                                                   $v[3], $v[4], $v[5]);
-        } else {
-            return undef;
-        }
-        return bless $self, "DateTime";
-    }
-
-    # return a DateTime representing 'now'
-    sub now() {
-        my $self = {};
-        $self->{secs} = time();
-        return bless $self, "DateTime";
-    }
-
-    # Return the given time in the format CVS requires
-    sub cvsdate() {
-        my $self = shift;
-        my @v = localtime($self->{secs});
-        return sprintf("%04d-%02d-%02d %02d:%02d",
-                       $v[5]+1900, $v[4]+1, $v[3], $v[2], $v[1]);
-    }
-
-    sub humandate() {
-	my $self = shift;
-	my @v = localtime($self->{secs});
-	my @months = qw(January February March April May June
-                        July August September October November December);
-	return sprintf("%d %s %4d, %d:%02d",
-                       $v[3], $months[$v[4]], $v[5]+1900, $v[2], $v[1]);
-    }
-
-    # Return another DateTime object representing a copy of this one
-    sub copy() {
-        my $self = shift;
-        my $newone = {};
-        $newone->{secs} = $self->{secs};
-        return bless $newone, "DateTime";
-    }
-
-    # Change the represented time the given number of secondsinto the future
-    # (may be negative)
-    sub delta(\$) {
-        my $self = shift;
-        my $offset = shift;
-        $self->{secs} += $offset;
-    }
-}
-
-# ======================================================================
-
-my $startdate;
-my $enddate;
-
-my %myopts;
-getopts('c:f:hM:m:o:v', \%myopts);
-
-while ($#ARGV >= 0) {
-    if (defined($startdate)) {
-        $enddate =  DateTime::parse($ARGV[0]);
-        if ($enddate) {
-            # parsed as date -- nothing more to do
-        } elsif ($ARGV[0] =~ m{^([+-]?\d+)$}) {
-            my $interval = 0 + $1; # coerce into a number
-            $enddate = $startdate->copy;
-            if ($interval > 0) {
-                # this delta specifies the enddate, relative to the start
-                $enddate->delta($interval * 86400);
-            } else {
-                # interval negative -- specifies startdate
-                $startdate->delta($interval * 86400);
-            }
-        } elsif ($ARGV[0] eq 'now') {
-            $enddate = DateTime::now();
-        } else {
-            die "Unparseable second arg: $ARGV[0]\n";
-        }
-    } elsif ($ARGV[0] eq 'now') {
-        $startdate = DateTime::now();
-    } else {
-        $startdate = DateTime::parse($ARGV[0]);
-        if (!$startdate) {
-            die "Unparseable date: $ARGV[0]\n";
-        }
-    }
-} continue {
-    shift @ARGV;
-}
-
-$checkoutdir = $myopts{c} if defined $myopts{c};
-$reportfrom = $myopts{f}  if defined $myopts{f};
-$reportmail = $myopts{m}  if defined $myopts{m};
-$module = $myopts{M} if defined $myopts{M};
-$verbose = defined $myopts{v};
-
-Usage() if $myopts{h};
-
-if (defined $myopts{o}) {
-    open(HTML, ">$myopts{o}") 
-        || die "Can't open file <".$myopts{o}."> to write";
+  }
 } else {
-    open(HTML, ">-")
-        || die "Can't reopen stdout for output";
+  $repos = 'starlink';
+}
+my %CFG = %{$SETTINGS{$repos}};
+
+# These are the derived values from those parameters
+
+# location of repository
+my $reposdir = File::Spec->catdir($REPO_ROOT, $CFG{svnroot});
+die "Unable to find the repository directory ($reposdir)\n"
+  if !-d $reposdir;
+
+# Name of file containing the revision that was processed last time
+# this ran
+my $revfile = ".revision-$CFG{svnroot}";
+
+# if we have a filter in place, append the last part of the path to the revfile
+if ($CFG{file_filter}) {
+  my @dirs = File::Spec->splitdir( $CFG{file_filter} );
+  $revfile .= "-$dirs[-1]";
+}
+
+# Calculate the path to the revision file (we will need it later)
+my $revfilepath = File::Spec->catfile($CFG{reportdir}, $revfile);
+
+# report URL 
+my $reporturl = $CFG{reporturlroot} ."/$CFG{reportfile}";
+
+# now we can start
+
+# Work out a starting revision
+my $baserev;
+if ($startrev) {
+  # we have an override
+  $baserev = $startrev;
+} elsif (-e $revfilepath) {
+  open(my $fh, "< $revfilepath") or
+    die "Error opening revision history file '$revfilepath' : $!";
+  $baserev = <$fh>;
+  chomp($baserev);
+  $baserev++; # since we want to start from the next one
+  close($fh) or die "Error closing file '$revfilepath': $!";
+} else {
+  die "Do not know which revision to use as reference! Consider using -startrev\n";
+}
+
+my $endrev = youngest_rev();
+
+if ($endrev - $baserev > 100) {
+  die "Unexpectedly large number of revisions to process ($baserev to $endrev)\n";
+}
+
+if ($baserev > $endrev) {
+  die "Largest revision number in repository is $endrev (you supplied $baserev)\n";
+}
+
+my %INFO;   # revision info
+my %ALLFILES; # look up of file to revision
+
+# need to find out date range even if we are not interested in all revisions
+my ($earliest, $latest);
+{
+  my %info = get_info( $baserev );
+  $earliest = $info{date};
+  %info = get_info( $endrev );
+  $latest = $info{date};
+}
+
+# loop over each revision, getting information;
+for my $rev ($baserev .. $endrev) {
+  my @files = changed_files( $rev );
+
+  # if we have a file filter we should jump in at this point to only include
+  # revisions that are relevant. If any file matches then we include the
+  # whole revision since the assumption is that non-matching files in this
+  # revision are still relevant
+  my $keeprev = 1;
+  if ($CFG{file_filter}) {
+    my $pattern = quotemeta($CFG{file_filter});
+    my $found = 0;
+    for my $f (@files) {
+      if ($f =~ /$pattern/) {
+	$found = 1;
+	last;
+      }
+    }
+    $keeprev = 0 unless $found;
+  }
+  next unless $keeprev;
+
+
+  # Store general info
+  my %info = get_info( $rev );
+  $info{files} = \@files;
+  $INFO{$rev} = \%info;
+
+  # store reverse lookup
+  for my $f (@files) {
+    if (exists $ALLFILES{$f}) {
+      push(@{$ALLFILES{$f}}, $rev);
+    } else {
+      $ALLFILES{$f} = [ $rev ];
+    }
+  }
+}
+
+# Group files by hierarchy
+my @SORTED = sort sort_log_entry keys %ALLFILES;
+
+# HTML page
+my $htmlfile = File::Spec->catfile($CFG{reportdir}, $CFG{reportfile});
+open(my $HTML, "> $htmlfile") or die "Error opening HTML output $htmlfile: $!";
+
+print $HTML <DATA>;
+print $HTML "<body>\n";
+if (keys %INFO) {
+  print $HTML "<h1>Commits between $earliest to $latest (Rev $baserev to $endrev)</h1>\n";
+} else {
+  print $HTML "<h1>Commit log (since Revision ".&revhtml($baserev -1 ).")</h1>\n";
+}
+
+if (keys %ALLFILES) {
+      print $HTML "<table>\n<tr><th>File</th><th>author</th></tr>\n";
+
+      # go through the files
+      my $lastprefix = '';
+      my $i=0;
+      for my $file (@SORTED) {
+	my $filtered = $file;
+	$filtered =~ s/^$IGNORE_PREFIX//;
+	my $this_prefix = sort_string( $file );
+	if ($this_prefix ne $lastprefix) {
+	  printf $HTML "<tr class='entry'><td colspan='2'>%s</td></tr>\n",
+	    $this_prefix;
+	  $lastprefix = $this_prefix;
+	}
+
+	my %authors;
+	for my $rev (@{$ALLFILES{$file}}) {
+	  my $a = $INFO{$rev}{author};
+	  $authors{$a}++;
+	}
+	printf $HTML "<tr class='r%d'><td><a href='#c%d' >%s</a></td>".
+	  "<td>%s</td></tr>\n",
+	    $i %2, $i++, $filtered, join(",",sort keys %authors);
+
+      }
+
+      print $HTML "</table>\n";
+
+      # Now create the detailed log - sorted by file
+      $i = 0;
+      for my $file (@SORTED) {
+	my $filtered = $file;
+	$filtered =~ s/^$IGNORE_PREFIX//;
+
+	printf($HTML "<h2><a name='c%d' href='%s/%s?%s"."view=log'\n >%s</a></h2>\n",
+	       $i++, $CFG{viewvchome}, $file, ($CFG{hasviewvcroot}? "root=$CFG{svnroot}&":""), $filtered);
+
+	my $latest_rev = $ALLFILES{$file}->[-1];
+	print $HTML "<P>Most recent revision: ".&revhtml($latest_rev)."</p>\n";
+	  
+	print $HTML "<h3>History</h3>\n";
+	  
+	for my $rev (reverse @{$ALLFILES{$file}}) {
+	  printf($HTML
+		 "<div class='onerevision'>\n<p>".
+		 &revhtml($rev) .
+		 ", %s (%s)</p>\n<pre>\n%s</pre>\n</div>", 
+		 $INFO{$rev}{author},
+		 $INFO{$rev}{date}, escape_html($INFO{$rev}{log}));
+	}
+
+      }
+
+} else {
+  print $HTML "<P>No commits in this period.</p>\n";
+}
+
+print $HTML "</body></html>\n";
+close($HTML);
+
+# Construct the email (which just has changed files in it)
+# Do nothing if nothing has been committed
+if ($email && keys %ALLFILES && $CFG{reportmail}) {
+  my @email;
+  push(@email,"\nRepository commits in period $earliest to $latest (revision ".
+       "$baserev to revision $endrev)\n\n");
+  push(@email, "See $reporturl for more details\n\n");
+  push(@email, "Committed files\n\n");
+
+  for my $file (@SORTED) {
+    my $filtered = $file;
+    $filtered =~ s/^$IGNORE_PREFIX//;
+    push(@email, "\t$filtered\n");
+  }
+  sendmail({
+	    from => $ENV{USER} .'@jach.hawaii.edu',
+	    to => $CFG{reportmail},
+	    subject => "Recent repository commits",
+	    mailhost => $MAILHOST,
+	    message => \@email});
+
 }
 
 
-
-chdir ($checkoutdir) if defined $checkoutdir;
-unless (-d "CVS") {
-    print STDERR "This script must be run in a checkout directory\n";
-    exit 1;
+# Done, so write the new marker file
+if (open my $revhdl, ">", $revfilepath) {
+  print $revhdl $endrev ."\n";
+  close($revhdl);
+} else {
+  warn "Could not write marker file for revision $endrev into $revfilepath\n";
 }
-print STDERR "Using checkout in $checkoutdir\n" if $verbose;
-print STDERR "...module $module\n" if $verbose && $module;
 
-# Read in the list of commit info entries
-my $cvslogcmd = sprintf("cvs -q log -N -S -d '%s<%s'",
-                        $startdate->cvsdate, $enddate->cvsdate);
-$cvslogcmd .= " $module" if $module;
+exit;
 
-print STDERR "Running command: $cvslogcmd\n" if $verbose;
+# wrappers to svnlook (ooh - global variables)
 
-open(COMMITS, "$cvslogcmd |") || die "Can't read commit info";
-my $cvslog = CVSLog::read(*COMMITS);
-close(COMMITS);
+sub youngest_rev {
+  my $young = `svnlook youngest $reposdir`;
+  chomp($young);
+  if ($young =~ /^(\d+)$/) {
+    $young = $1; # untaint
+  } else {
+    die "unexpected value returned from snvlook youngest: $young\n";
+  }
+  return $young;
+}
 
-defined $cvslog || die "Error reading commit log";
+# Get list of files that have been modified
+# Arg is revision number
+sub changed_files {
+  my $rev = shift;
+  my @lines = `svnlook changed -r $rev $reposdir`;
+  my @files;
+  for my $l (@lines) {
+    chomp($l);
+    my ($change, $file) = split(/\s+/, $l);
+    push(@files, $file);
+  }
+  return @files;
+}
 
+# Get the basic info for the revision
+# %info = get_info( $rev );
+# keys are: "author", "log", "date"
 
-print HTML <<'EOD';
+sub get_info {
+  my $rev = shift;
+  my %info;
+  my @lines = `svnlook info -r $rev $reposdir`;
+  chomp(@lines);
+  $info{author} = $lines[0];
+  $info{date} = $lines[1];
+  $info{log} = join(" ",@lines[3..$#lines]);
+  return %info;
+}
+
+# send the email
+sub sendmail {
+    my $param = shift;
+
+    unless ($param->{to}
+            && $param->{from}
+            && $param->{subject}
+            && $param->{mailhost}
+            && $param->{message}) {
+        return 0;
+    }
+
+    my $smtp = Net::SMTP->new($param->{mailhost});
+    defined $smtp || do {
+        print STDERR "Can't open SMTP connection to ".$param->{mailhost}."\n";
+        return 0;
+    };
+
+    my $status = 1;
+    
+    $status &= $smtp->mail($param->{from});
+    $status || print "Error mail\n";
+    $status &= $smtp->recipient($param->{to});
+    $status || print "Error recipient\n";
+    $status &= $smtp->data();
+    $status || print "Error data\n";
+    $status &= $smtp->datasend("To: ".$param->{to}."\n");
+    $status &= $smtp->datasend("From: ".$param->{from}."\n");
+    $status &= $smtp->datasend("Subject: ".$param->{subject}."\n");
+    $status &= $smtp->datasend("Date: ".localtime()."\n");
+    $status &= $smtp->datasend("\n");
+    foreach my $line (@{$param->{message}}) {
+        chomp($line);
+        $status &= $smtp->datasend($line . "\n");
+    }
+    $status &= $smtp->dataend;
+    $status &= $smtp->quit;
+    $status || print "Error quit\n";
+
+    return $status;
+}
+
+# Embedded HTML pointing to a particular revision
+
+sub revhtml {
+  my $rev = shift;
+  return sprintf "<a href='%s?view=rev&%s"."revision=%d'>%d</a>",
+    $CFG{viewvchome}, ($CFG{hasviewvcroot} ? "root=$CFG{svnroot}&" : ""), $rev, $rev;
+}
+
+# A string indicating the component this is part of, for sorting
+# purposes.  This is basically just the first two elements of the path,
+# but it's TOP for the top level, and the first three elements for
+# thirdparty/ (yes, SPECIAL-CASE this).
+sub sort_string {
+  my $path = shift;
+  my $sort_string;
+  if (defined $path) {
+    $path =~ s/^$IGNORE_PREFIX//;
+    my @s = File::Spec->splitdir( $path );
+    my $prefixlen;
+    if ($#s == 0) {
+      $prefixlen = 0;
+    } elsif ($#s == 1) {
+      $prefixlen = 1;
+    } elsif ($s[0] eq "thirdparty") {
+      $prefixlen = 3;
+    } else {
+      $prefixlen = 2;
+    }
+    $sort_string = ($prefixlen == 0
+		    ? "TOP"
+		    : join('/',@s[0..$prefixlen-1]));
+  }
+  return $sort_string;
+}
+
+sub sort_log_entry {
+  # Sort on sort_string() first -- this groups related entries
+  # together.  If two have the same sort_string(), then sort on
+  # the filename -- sorts entries within groups.
+  # branches and tags should always come down the bottom
+
+  # Get local copies for local modification
+  my $acmp = $a; my $bcmp = $b;
+
+  # see if we have branches or tags
+  my $abranch = ($acmp =~ /^branches\//);
+  my $bbranch = ($bcmp =~ /^branches\//);
+  my $atag    = ($acmp =~ /^tags\//); # yes, only needed if !$abranch
+  my $btag    = ($bcmp =~ /^tags\//);
+
+  if ($abranch && $bbranch) {
+    # normal comparison within like tree
+    $acmp =~ s/^branches\///;
+    $bcmp =~ s/^branches\///;
+  } elsif ($atag && $btag) {
+    # normal comparison within tag tree
+    $acmp =~ s/^tags\///;
+    $bcmp =~ s/^tags\///;
+  } elsif ($abranch) {
+    # this is a branch but the other is not
+    # return -1 or +1 depending on whether b is a tag or trunk
+    return ($btag ? -1 : +1 );
+  } elsif ($bbranch) {
+    # B is a branch but A is not
+    return ($atag ? +1 : -1 );
+  } elsif ($atag) {
+    # a is a tag but b is either trunk or branch (which both sort higher)
+    return 1;
+  } elsif ($btag) {
+    # b is a tag but a is higher
+    return -1;
+  }
+
+  # continue with sort because we are all part of the same tree
+  my $s = sort_string($acmp) cmp sort_string($bcmp);
+  if ($s == 0) {
+    return $acmp cmp $bcmp;
+  } else {
+    return $s;
+  }
+}
+
+# Given a string, do HTML escapes of <, >, and &
+sub escape_html {
+    my $s = shift;
+    $s =~ s/&/&amp;/g;
+    $s =~ s/</&lt;/g;
+    $s =~ s/>/&gt;/g;
+    return $s;
+}
+
+=head1 AUTHOR
+
+Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>,
+Norman Gray E<lt>norman@ASTRO.GLA.AC.UKE<gt>
+
+Copyright (C) 2005 Particle Physcis and Astronomy Research Council.
+Copyright (C) 2007 Science and Technology Facilities Council.
+All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place,Suite 330, Boston, MA  02111-1307, USA
+
+=cut
+
+__DATA__
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 <head>
@@ -472,210 +657,3 @@ tr.entry {
 }
 </style>
 </head>
-<body>
-EOD
-printf HTML "<h1>Commits %sbetween %s and %s</h1>\n",
-	    ($module ? "to module $module " : ""),
-            $startdate->humandate, $enddate->humandate;
-
-
-    
-my $i = 0;
-my $lastprefix = '';
-if ($cvslog->have_entries) {
-    print HTML "<table>\n<tr><th>File</th><th>author</th><th>revision</th></tr>\n";
-
-    foreach my $e ($cvslog->get_entries) {
-
-        if ($e->sort_string ne $lastprefix) {
-	    printf HTML ("<tr class='entry'><td colspan='3'>%s</td></tr>\n",
-			 $e->sort_string);
-	    $lastprefix = $e->sort_string;
-	}
-
-        my @revs = $e->revisions;
-        my $l = $revs[0];
-        printf(HTML
-               "<tr class='r%d'><td><a href='#c%d' >%s</a></td><td>%s</td><td>%s</td></tr>\n",
-               $i % 2, $i++, $e->file, $l->author, $l->revision);
-    }
-    print HTML "</table>\n";
-} else {
-    print HTML "<p>No commits in this period.</p>\n";
-}
-
-$i = 0;
-foreach my $e ($cvslog->get_entries) {
-    printf(HTML
-           "<h2><a name='c%d' href='%s/%s'\n  >%s</a></h2>\n",
-           $i++, $cvswebhome, $e->file, $e->file);
-
-
-    my @revision_list = $e->revisions;
-    if ($#revision_list < 0) {
-        # This shouldn't happen!
-        printf HTML "<p><strong>No revisions!</strong></p>\n";
-    } else {
-        print HTML "<p>Head revision: " . $e->head . "</p>\n";
-
-        print HTML "<h3>History</h3>\n";
-
-        foreach my $revent ($e->revisions()) {
-            printf(HTML
-                   "<div class='onerevision'>\n<p>%s, %s (%s)%s</p>\n<pre>\n%s</pre>\n</div>\n",
-                   $revent->revision,
-                   $revent->author,
-                   $revent->date,
-                   ($revent->state ne 'Exp' ? " (<strong>".$revent->state."</strong>)" : ''),
-                   escape_html($revent->message));
-        }
-    }
-
-}
-
-print HTML "</body>\n</html>\n";
-
-close(HTML);
-
-# Send a notification email if there was a non-zero set of entries
-if (defined $reportmail && $cvslog->have_entries) {
-
-    my @msg = ("",
-               "CVS commits in period " . $startdate->humandate
-	           . " to " . $enddate->humandate,
-               "",
-               "See <$reporturl> for more details.",
-               "",
-               "Committed files:",
-               "");
-    foreach my $e ($cvslog->get_entries) {
-        push(@msg, "    ".$e->file);
-    }
-
-    sendmail({ from => $reportfrom,
-               to => $reportmail,
-               subject => "Recent CVS commits",
-               mailhost => $mailhost,
-               message => \@msg });
-}
-
-
-
-exit 0;
-
-
-sub sendmail(%) {
-    my $param = shift;
-
-    unless ($param->{to}
-            && $param->{from}
-            && $param->{subject}
-            && $param->{mailhost}
-            && $param->{message}) {
-        return 0;
-    }
-
-    my $smtp = Net::SMTP->new($param->{mailhost});
-    defined $smtp || do {
-        print STDERR "Can't open SMTP connection to ".$param->{mailhost}."\n";
-        return 0;
-    };
-
-    my $status = 1;
-    
-    $status &= $smtp->mail($param->{from});
-    $status || print "Error mail\n";
-    $status &= $smtp->recipient($param->{to});
-    $status || print "Error recipient\n";
-    $status &= $smtp->data();
-    $status || print "Error data\n";
-    $status &= $smtp->datasend("To: ".$param->{to}."\n");
-    $status &= $smtp->datasend("From: ".$param->{from}."\n");
-    $status &= $smtp->datasend("Subject: ".$param->{subject}."\n");
-    $status &= $smtp->datasend("Date: ".localtime()."\n");
-    $status &= $smtp->datasend("\n");
-    foreach my $line (@{$param->{message}}) {
-        $status &= $smtp->datasend($line . "\n");
-    }
-    $status &= $smtp->dataend;
-    $status &= $smtp->quit;
-    $status || print "Error quit\n";
-
-    return $status;
-}
-
-# Given a string, do HTML escapes of <, >, and &
-sub escape_html ($) {
-    my $s = shift;
-    $s =~ s/&/&amp;/g;
-    $s =~ s/</&lt;/g;
-    $s =~ s/>/&gt;/g;
-    return $s;
-}
-
-
-sub Usage() {
-    HELP_MESSAGE(*STDERR);
-    exit 1;
-}
-
-# For HELP_MESSAGE and VERSION_MESSAGE, see the docs for Getopt::Std
-
-sub HELP_MESSAGE {
-    my $fh = shift;
-
-    my $progname = $0;
-    $progname =~ s,.*/,,;
-
-    printf $fh <<"EOD";
-Usage: $0 [options] date delta
-       $0 [options] startdate enddate
-
-Arguments:
-    startdate, enddate: reference dates for interval:
-               format yyyy-mm-dd, yyyy-mm-ddThh:mm, hh:mm or the string 'now'
-    delta:     number of days for period, can be either '-n' or '+n'
-
-Options:
-    -c path         path to the top-level of a current checkout
-                    (default: $checkoutdir)
-    -f sender-addr  sender of report (only if -m is present)
-                    (default: $reportfrom)
-    -h              show this help
-    -m recipient    send report mail message to recipient
-EOD
-    printf $fh "                    (default: "
-        . ($reportmail ? $reportmail : "not sent") . ")\n";
-    printf $fh <<"EOD";
-    -M module       module to examine; as with most CVS commands, this 
-                    refers to both a module name and a path
-                    (default: full checkout)
-    -o file         where to place the report file (default: stdout)
-    -v              send chatter to STDERR (default: silent)
-
-Environment:
-    MAILHOST        SMTP server to use to send report mail message
-                    (default: $mailhost)
-
-Examples (presuming the current directory is the top level of the checkout):
-    $progname 2005-01-01T12:00 now
-        commits from midday 2005-01-01 to present
-    $progname 2005-01-01 +2
-        from 2005-01-01 to 2005-01-03
-    $progname now -2
-        commits from two days ago to present
-    $progname 00:00 -5
-        commits from five days before last midnight
-    $progname -c /my/checkout -M path/to/dir 00:00 -2
-        commits from two days to present, in the checkout rooted at
-        /my/checkout and examining only the files in /my/checkout/path/to/dir
-EOD
-#    exit 1;
-}
-
-sub VERSION_MESSAGE {
-    my $fh = shift;
-    my $progname = $0;
-    $progname =~ s,.*/,,;
-    print $fh "$progname" . ' $Revision$' . "\n";
-}
