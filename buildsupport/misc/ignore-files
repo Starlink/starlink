@@ -1,0 +1,116 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+ignore-files - Update svn:ignore property for directory tree
+
+=head1 SYNOPSIS
+
+  ./ignore-files
+
+=head1 DESCRIPTION
+
+Simple program to traverse a directory tree, updating the svn:ignore
+property with any files that are unknown to subversion. Run it from the
+directory you wish to start modifying. Remember to commit the changes
+after it has run
+
+There are no arguments. The subversion command must be in your path.
+
+=cut
+
+use strict;
+use File::Temp;
+use Cwd;
+use File::Find;
+
+my %DONEDIRS; # Only want to process directories once
+
+find(\&wanted, ".");
+
+exit;
+
+# Routine to decide whether this directory is worth processing
+sub wanted {
+    return if $File::Find::dir =~ /\/\.svn/;
+    return if exists $DONEDIRS{$File::Find::dir};
+    $DONEDIRS{$File::Find::dir}++;
+    return unless -d ".svn"; # only process subversion directories
+    print $File::Find::dir."\n";
+    &fixignore();
+}
+
+# Assumes that pwd is the directory of choice
+sub fixignore {
+
+    my @new = `svn status`;
+
+    return unless @new;
+
+# work out the ignorable files
+    my @ignore;
+    for my $line (@new) {
+	chomp($line);
+	my ($status, $file) = split (/\s+/,$line);
+	# We have a unknown file
+	if ($status eq '?') {
+	    # ignore it if it comes from a subdirectory
+	    # (assume unix file names)
+	    next if $file =~ /\//;
+
+	    # Store it
+	    push(@ignore, $file);
+	}
+    }
+    return unless @ignore;
+
+# get the directory properties
+    my @lines = `svn proplist -v svn:ignore .`;
+
+    my @CURRENT;
+    my $started;
+    for my $line (@lines) {
+	chomp($line);
+	if (!$started) {
+	    if ($line =~ /svn:ignore : (.*)/) {
+		push(@CURRENT, $1);
+		$started = 1;
+		next;
+	    } else {
+		next;
+	    }
+	}
+	next if $line =~ /\//; # sub dir
+	push(@CURRENT, $line) if $line;
+    }
+
+    my $temp = new File::Temp();
+    for my $file (@CURRENT, @ignore) {
+	print $temp "$file\n";
+    }
+    close($temp);
+    system "svn propset svn:ignore -F $temp .";
+    return;
+}
+
+=head1 AUTHOR
+
+Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>
+
+Copyright (C) 2007 Science and Technology Facilities Council.
+All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place,Suite 330, Boston, MA  02111-1307, USA
+
+=cut
