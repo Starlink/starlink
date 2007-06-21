@@ -163,6 +163,9 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *        Correct the correction made to handle commas within attribute
 *     6-JUN-2007 (DSB):
 *        Fix harmless compiler warnings.
+*     21-JUN-2007 (DSB):
+*        - In astSet<X>, ignore trailing spaces in the attribute name.
+*        - In VSet, use astVsprintf to format the setting string.
 *class--
 */
 
@@ -2381,12 +2384,13 @@ void astSet##code##_( AstObject *this, const char *attrib, type value ) { \
 \
 /* Obtain the length of the attribute name and allocate memory to hold \
    this name plus the format specifier to be appended to it. */ \
-   len = (int) strlen( attrib ); \
+   len = (int) astChrLen( attrib ); \
    setting = astMalloc( (size_t) ( len + fmtlen + 2 ) ); \
 \
 /* Make a copy of the attribute name in the allocated memory. */ \
    if ( astOK ) { \
-      (void) memcpy( setting, attrib, (size_t) ( len + 1 ) ); \
+      (void) memcpy( setting, attrib, (size_t) len ); \
+      setting[ len ] = 0; \
 \
 /* Append "=", followed by the format specifier, to construct a \
    suitable "setting" string for use by astSet. */ \
@@ -2427,7 +2431,7 @@ void astSetC_( AstObject *this, const char *attrib, const char *value ) {
 /* Check the global status. */
    if ( !astOK ) return;
 
-/* Produce a copy of the supplied attribute vcalue in which any commas
+/* Produce a copy of the supplied attribute value in which any commas
    are replaced by carriage returns ("\r"). */
    newv = astMalloc( (size_t)( strlen( value ) + 1 ) );
    if( newv ) {
@@ -2446,12 +2450,13 @@ void astSetC_( AstObject *this, const char *attrib, const char *value ) {
    
 /* Obtain the length of the attribute name and allocate memory to hold
    this name plus the format specifier to be appended to it. */
-      len = (int) strlen( attrib );
+      len = (int) astChrLen( attrib );
       setting = astMalloc( (size_t) ( len + 5 ) );
 
 /* Make a copy of the attribute name in the allocated memory. */
       if ( astOK ) {
-         (void) memcpy( setting, attrib, (size_t) ( len + 1 ) );
+         (void) memcpy( setting, attrib, (size_t) len );
+         setting[ len ] = 0;
 
 /* Append "=", followed by the format specifier, to construct a
    suitable "setting" string for use by astSet. */
@@ -2856,11 +2861,14 @@ static void VSet( AstObject *this, const char *settings, va_list args ) {
 *        Pointer to the Object.
 *     settings
 *        Pointer to a null-terminated string containing a
-*        comma-separated list of attribute settings.
+*        comma- or newline- separated list of attribute settings.
 *     args
 *        The variable argument list which contains values to be
 *        substituted for any "printf"-style format specifiers that
-*        appear in the "settings" string.
+*        appear in the "settings" string. Note, invoking this function 
+*        will, in general, result in the "args" structure being in an
+*        undefined state on exit. Therefore no further use should be 
+*        made of the "args" structure after calling this function.
 
 *  Notes:
 *     - Attribute names are not case sensitive.
@@ -2885,23 +2893,17 @@ static void VSet( AstObject *this, const char *settings, va_list args ) {
 *-
 */
 
-/* Local Constants: */
-   const int min_buff_len = 1024; /* Minimum size of formatting buffer */
-
 /* Local Variables: */
    char *assign;                 /* Pointer to assigment substring */
    char *assign_end;             /* Pointer to null at end of assignment */
    char *buff1;                  /* Pointer to temporary string buffer */
    char *buff2;                  /* Pointer to temporary string buffer */
-   char *buff3;                  /* Pointer to temporary string buffer */
    char *eq1;                    /* Pointer to 1st equals sign */
-   int buff_len;                 /* Length of temporary buffer */
+   int eqeq;                     /* Does settings contain more than 1 equals signs? */
    int i;                        /* Loop counter for characters */
    int j;                        /* Offset for revised assignment character */
    int len;                      /* Length of settings string */
    int lo;                       /* Convert next character to lower case? */
-   int nc;                       /* Number of vsprintf output characters */
-   int stat;                     /* Value of errno after an error */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -2911,130 +2913,89 @@ static void VSet( AstObject *this, const char *settings, va_list args ) {
    len = (int) strlen( settings );
    if ( len != 0 ) {
 
-/* Allocate memory and store a copy of the string. */
-      buff1 = astStore( NULL, settings, (size_t) ( len + 1 ) );
-      if ( astOK ) {
+/* Get a flag indicating if the supplied string contains more than one
+   equals sign. */
+      eq1 = strchr( settings, '=' );
+      eqeq = eq1 && strchr( eq1 + 1, '=' );
 
-/* Convert each comma in the string into '\n'. This is to distinguish
-   commas initially present from those introduced by the formatting to
-   be performed below. We only do this if there is more than one equals
+/* Substitute values for any printf format specifiers in the supplied 
+   settings string. The expanded string is returned in dynamically
+   allocated memory. Each comma in the supplied string is first converted
+   into '\n' before subtituting values for the format specifiers. This is 
+   to distinguish commas initially present from those introduced by the 
+   formatting. We only do this if there is more than one equals
    sign in the setting string, since otherwise any commas are probably 
    characters contained within a string attribute value. */
-         eq1 = strchr( buff1, '=' );
-         if( eq1 && strchr( eq1 + 1, '=' ) ) {
-            for ( i = 0; i < len; i++ ) {
-               if ( buff1[ i ] == ',' ) buff1[ i ] = '\n';
-            }
-         }
-
-/* Calculate a size for a further buffer twice the size of the first
-   one.  Ensure it is not less than a minimum size and then allocate
-   this buffer. */
-         buff_len = 2 * len;
-         if ( buff_len < min_buff_len ) buff_len = min_buff_len;
-         buff2 = astMalloc( (size_t) ( buff_len + 1 ) );
-         if ( astOK ) {
-
-/* Use "vsprintf" to substitute values for any format specifiers in
-   the "settings" string, writing the resulting string into the second
-   buffer. */
-            errno = 0;
-            nc = vsprintf( buff2, buff1, args );
-
-/* The possibilities for error detection are limited here, but check
-   if an error value was returned and report an error. Include
-   information from errno if it was set. */
-            if ( nc < 0 ) {
-               stat = errno;
-               astError( AST__ATSER, "astVSet(%s): Error formatting an "
-                         "attribute setting%s%s.", astGetClass( this ),
-                         stat? " - " : "", stat ? strerror( stat ) : "" );
-               astError( AST__ATSER, "The setting string was \"%s\".",
-                         settings );
-
-/* Also check that the result buffer did not overflow. If it did,
-   memory will probably have been corrupted but this cannot be
-   prevented with "vsprintf" (although we try and make the buffer
-   large enough). Report the error and abort. */
-            } else if ( nc > buff_len ) {
-               astError( AST__ATSER, "astVSet(%s): Internal buffer overflow "
-                         "while formatting an attribute setting - the result "
-                         "exceeds %d characters.", astGetClass( this ),
-                         buff_len );
-               astError( AST__ATSER, "The setting string was \"%s\".",
-                         settings );
+      buff1 = astVsprintf( settings, eqeq, args );
 
 /* If all is OK, loop to process each formatted attribute assignment
    (these are now separated by '\n' characters). */
-	    } else {
-               assign = buff2;
-               while ( assign ) {
+      if( astOK ) {
+         assign = buff1;
+         while ( assign ) {
 
 /* Change the '\n' at the end of each assignment to a null to
    terminate it. */
-                  if ( ( assign_end = strchr( assign, '\n' ) ) ) {
-                     *assign_end = '\0';
-                  }
+            if ( ( assign_end = strchr( assign, '\n' ) ) ) {
+               *assign_end = '\0';
+            }
 
 /* Before making the assignment, loop to remove white space and upper
    case characters from the attribute name. */
-                  lo = 1;
-                  for ( i = j = 0; assign[ i ]; i++ ) {
+            lo = 1;
+            for ( i = j = 0; assign[ i ]; i++ ) {
 
 /* Note when an '=' sign is encountered (this signals the end of the
    attribute name). */
-                     if ( assign[ i ] == '=' ) lo = 0;
+               if ( assign[ i ] == '=' ) lo = 0;
 
 /* Before the '=' sign, convert all characters to lower case and move
    everything to the left to eliminate white space. Afer the '=' sign,
    copy all characters to their new location unchanged. astSetC replaces 
    commas in the attribute value by '\r' characters. Reverse this now. */
-                     if ( !lo || !isspace( assign[ i ] ) ) {
-                        if( assign[ i ] == '\r' ) {
-                           assign[ j++ ] = ',';
-                        } else {
-                           assign[ j++ ] = ( lo ? tolower( assign[ i ] ) :
-                                               assign[ i ] );
-                        }
-                     }
+               if ( !lo || !isspace( assign[ i ] ) ) {
+                  if( assign[ i ] == '\r' ) {
+                     assign[ j++ ] = ',';
+                  } else {
+                     assign[ j++ ] = ( lo ? tolower( assign[ i ] ) :
+                                         assign[ i ] );
                   }
+               }
+            }
 
 /* Terminate the revised assignment string and pass it to astSetAttrib
    to make the assignment (unless the string was all blank, in which
    case we ignore it). */
-                  assign[ j ] = '\0';
-                  if ( j ) {
+            assign[ j ] = '\0';
+            if ( j ) {
 
 /* If there are no characters to the right of the equals sign append a
    space after the equals sign. Without this, a string such as "Title=" 
    would not be succesfully matched against the attribute name "Title"
    within SetAttrib. */
-                     if( assign[ j - 1 ] == '=' ) {
-                        buff3 = astStore( NULL, assign, 
-                                          (size_t) j + 2 );
-                        if ( astOK ) {
-                           buff3[ j ] = ' ';
-                           buff3[ j + 1 ] = '\0';
-                           astSetAttrib( this, buff3 );
-                        }
-                        buff3 = astFree( buff3 );
-
-                     } else {
-                        astSetAttrib( this, assign );
-                     }
+               if( assign[ j - 1 ] == '=' ) {
+                  buff2 = astStore( NULL, assign, 
+                                    (size_t) j + 2 );
+                  if ( astOK ) {
+                     buff2[ j ] = ' ';
+                     buff2[ j + 1 ] = '\0';
+                     astSetAttrib( this, buff2 );
                   }
+                  buff2 = astFree( buff2 );
+
+               } else {
+                  astSetAttrib( this, assign );
+               }
+            }
 
 /* Check for errors and abort if any assignment fails. Otherwise,
    process the next assignment substring. */
-                  if ( !astOK ) break;
-                  assign = assign_end ? assign_end + 1 : NULL;
-               }
-	    }
+            if ( !astOK ) break;
+            assign = assign_end ? assign_end + 1 : NULL;
          }
+      }
 
 /* Free the memory allocated for string buffers. */
-         buff2 = astFree( buff2 );
-      }
       buff1 = astFree( buff1 );
    }
 }

@@ -93,6 +93,8 @@
 *     4-JAN-2007 (DSB):
 *        Move definition of astCLASS macro so that it comes before the
 *        inclusion of the AST include files (which test for astCLASS).
+*     21-JUN-2007 (DSB):
+*        Added astVsprintf.
 */
 
 /* Configuration results. */
@@ -2112,6 +2114,136 @@ int astSscanf_( const char *str, const char *fmt, ...) {
    return ret;
 
 }
+
+char *astVsprintf_( const char *format, int split, va_list args ) {
+/*
+*+
+*  Name:
+*     astVsprintf
+
+*  Purpose:
+*     A wrapper for the stdio vsprintf function.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "object.h"
+*     char *astVsprintf( const char *format, int split, va_list args )
+
+*  Description:
+*     This function is a wrapper for the ansi vsprintf function. It
+*     returns the formatted string in a dynamic memory buffer, unlike
+*     ansi vsprintf that uses a supplied buffer.
+
+*  Parameters:
+*     format
+*        A format string suitable for use with printf, etc.
+*     split
+*        If non-zero, all commas in the supplied format string are
+*        replaced by newline characters before substituting values 
+*        for any printf format specifiers in the string. Thus, the
+*        returned string will only contain commas introduced by the 
+*        substitution process.
+*     args
+*        The variable argument list which contains values to be
+*        substituted for any "printf"-style format specifiers that
+*        appear in the "format" string. Note, invoking this function 
+*        will, in general, result in the "args" structure being in an
+*        undefined state on exit. Therefore no further use should be 
+*        made of the "args" structure after calling this function.
+
+*  Returned Value:
+*     A pointer to dynamically allocated memory containing the expanded
+*     format string. This should be freed using astFree when no longer
+*     needed.
+
+*  Notes:
+*     - A NULL pointer is returned if an error occurs.
+*-
+*/
+
+/* Local Constants: */
+   const int min_buff_len = 1024; /* Minimum size of formatting buffer */
+
+/* Local Variables: */
+   char *format2;                /* Format with commas changed to newlines */
+   char *result;                 /* Pointer to returned string buffer */
+   int buff_len;                 /* Length of temporary buffer */
+   int i;                        /* Loop counter for characters */
+   int len;                      /* Length of settings string */
+   int nc;                       /* Number of vsprintf output characters */
+   int stat;                     /* Value of errno after an error */
+
+/* Initialise */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain the length of the "format" string. */
+   len = (int) strlen( format );
+
+/* If commas are being replaced by newlines, we take a copy of the
+   supplied string and modify it. */
+   if( split ) {
+      format2 = astStore( NULL, format, (size_t) ( len + 1 ) );
+      if ( astOK ) {
+         for ( i = 0; i < len; i++ ) {
+            if ( format2[ i ] == ',' ) format2[ i ] = '\n';
+         }
+      }
+
+   } else {
+     format2 = (char *) format;
+   }
+
+/* Calculate a size for a further buffer twice the size of the first
+   one.  Ensure it is not less than a minimum size and then allocate
+   this buffer. */
+   buff_len = 2 * len;
+   if ( buff_len < min_buff_len ) buff_len = min_buff_len;
+   result = astMalloc( (size_t) ( buff_len + 1 ) );
+   if ( astOK ) {
+
+/* Use "vsprintf" to substitute values for any format specifiers in
+   the "format" string, writing the resulting string into the second
+   buffer. */
+      errno = 0;
+      nc = vsprintf( result, format2, args );
+
+/* The possibilities for error detection are limited here, but check
+   if an error value was returned and report an error. Include
+   information from errno if it was set. */
+      if ( nc < 0 ) {
+         stat = errno;
+         astError( AST__ATSER, "astVsprintf: Error formatting string \"%s\".", format );
+         if( stat ) astError( AST__ATSER, "Error was \"%s\".", strerror( stat ) );
+      
+/* Also check that the result buffer did not overflow. If it did,
+   memory will probably have been corrupted but this cannot be
+   prevented with "vsprintf" (although we try and make the buffer
+   large enough). Report the error and abort. */
+      } else if ( nc > buff_len ) {
+         astError( AST__ATSER, "astVsprintf: Error formatting string \"%s\".", format );
+         astError( AST__ATSER, "Internal buffer overflow while formatting "
+                   "a string - the result exceeds %d characters.", buff_len );
+      }
+   }
+
+/* Free the copy of the supplied format string. */
+   if( split ) format2 = astFree( format2 );
+
+/* If an error has occurred, free the returned pointer. */
+   if( !astOK ) result = astFree( result );
+
+/* Return the result. */
+   return result;
+}
+
+
+
+
 
 
 /* The remaining functions are used only when memory debugging is

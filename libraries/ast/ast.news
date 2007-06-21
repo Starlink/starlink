@@ -43,6 +43,8 @@ Unit value of "s*(m/s)" would result in a NormUnit value of "m".
 - A new method astShowMesh has been added to the Region class. It
 displays a mesh of points covering the surface of a Region by writing out
 a table of axis values to standard output.
+- A bug has been fixed that could segmentation violations when setting 
+attribute values.
 
 Main Changes in Version 4.4
 ---------------------------

@@ -217,6 +217,10 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 *        Override astEqual.
 *     30-JUN-2006 (DSB):
 *        Allow astAbbrev to have a null "str1" value.
+*     21-JUN-2007 (DSB):
+*        In VSet, use astVsprintf to format the string before calling the
+*        parent Vset. This avoids the re-use of the variable argument list 
+*        structure, which can cause the structure to become undefined.
 *class--
 */
 
@@ -8899,11 +8903,14 @@ static void VSet( AstObject *this_object, const char *settings,
 /* Local Variables: */
    AstFrame *save_frame;         /* Saved pointer to integrity Frame */
    AstFrameSet *this;            /* Pointer to FrameSet structure */
+   char *buff;                   /* Buffer for expanded settings string */
+   char *c;                      /* Next character to examine */
+   char *eq1;                    /* Pointer to 1st equals sign */
    const char *save_method;      /* Saved pointer to method name */
+   int eqeq;                     /* Does settings contain more than 1 equals signs? */
    int len;                      /* Length of settings string */
    int ok;                       /* Status OK? */
    int save_lost;                /* Saved integrity modified flag */
-   char buff[ 255 ];             /* Buffer for expanded settings string */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -8912,6 +8919,21 @@ static void VSet( AstObject *this_object, const char *settings,
    zero. If it is, there is nothing more to do. */
    len = (int) strlen( settings );
    if ( len != 0 ) {
+
+/* Get a flag indicating if the supplied string contains more than one
+   equals sign. */
+      eq1 = strchr( settings, '=' );
+      eqeq = eq1 && strchr( eq1 + 1, '=' );
+
+/* Substitute values for any printf format specifiers in the supplied 
+   settings string. The expanded string is returned in dynamically
+   allocated memory. Each comma in the supplied string is first converted
+   into '\n' before subtituting values for the format specifiers. This is 
+   to distinguish commas initially present from those introduced by the 
+   formatting. We only do this if there is more than one equals
+   sign in the setting string, since otherwise any commas are probably 
+   characters contained within a string attribute value. */
+      buff = astVsprintf( settings, eqeq, args );
 
 /* Obtain a pointer to the FrameSet structure. */
       this = (AstFrameSet *) this_object;
@@ -8933,7 +8955,7 @@ static void VSet( AstObject *this_object, const char *settings,
 
 /* Invoke the parent astVSet method to set the FrameSet's attribute
    values and note if this succeeds. */
-      (*parent_vset)( this_object, settings, args );
+      (*parent_vset)( this_object, buff, args );
       ok = astOK;
 
 /* Restore the FrameSet's integrity. */
@@ -8943,9 +8965,12 @@ static void VSet( AstObject *this_object, const char *settings,
    information. */
       if ( !astOK && ok ) {
 
-/* Use "vsprintf" to substitute values for any format specifiers in
-   the "settings" string, writing the resulting string into the buffer. */
-         vsprintf( buff, settings, args );
+/* Replace any newlines in "buff" with commas. Newlines may have been
+   introduced by the above call to astVsprintf. */
+         c = buff - 1;
+         while( *(++c) ) {
+            if( *c == '\n' ) *c = ',';
+         }
 
 /* Display the message. */
          astError( astStatus, "Unable to accommodate the attribute setting "
@@ -8956,6 +8981,9 @@ static void VSet( AstObject *this_object, const char *settings,
       integrity_frame = save_frame;
       integrity_lost = save_lost;
       integrity_method = save_method;
+
+/* Free resources. */
+      buff = astFree( buff );
    }
 }
 
