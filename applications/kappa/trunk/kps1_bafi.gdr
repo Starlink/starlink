@@ -7,7 +7,7 @@
 *     KPS1_BAFIx
 
 *  Purpose:
-*     Fills bad-pixel regions in a two-dimensional image.
+*     Fills bad-pixel regions in a two--dimensional image.
 
 *  Language:
 *     Starlink Fortran 77
@@ -72,11 +72,6 @@
 *     -  The state of the replacements (iteration, smoothing length,
 *     maximum change, rms change) is tabulated for verbose reporting.
 
-*  Prior Requirements:
-*     -  The input variance array should be propagated from the input
-*     dataset.  This was done to reduce memory requirements, which are
-*     already large.
-
 *  Algorithm:
 *     Iterate, replacing each bad pixel with a weighted mean of its
 *     valid neighbours in the same row and column.  The weights
@@ -97,6 +92,11 @@
 *
 *     See the Notes in FILLBAD for additional details and background to
 *     the algorithm.
+
+*  Prior Requirements:
+*     -  The input variance array should be propagated from the input
+*     dataset.  This was done to reduce memory requirements, which are
+*     already large.
 
 *  Copyright:
 *     Copyright (C) 1995, 1998 Central Laboratory of the Research
@@ -130,9 +130,6 @@
 *        Added protection against division by zero if there are any
 *        zero variance values.
 *     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       
