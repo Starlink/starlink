@@ -5,7 +5,7 @@
 *     KPS1_MDRFx
 
 *  Purpose:
-*     Expands a 2-dimensional array by reflection about its edges.
+*     Expands a two-dimensional array by reflection about its edges.
 
 *  Language:
 *     Starlink Fortran 77
@@ -41,16 +41,16 @@
 *        The number of lines/columns in the output array which will be
 *        padded by reflection.
 *     IDIM1 = INTEGER (Given)
-*        The first dimension of the input 2-dimensional array.
+*        The first dimension of the input two-dimensional array.
 *     IDIM2 = INTEGER (Given)
-*        The second dimension of the input 2-dimensional array.
+*        The second dimension of the input two-dimensional array.
 *     ARRIN( IDIM1, IDIM2 ) = ? (Given)
 *        Data to be copied into the central section of the output
 *        array.
 *     ODIM1 = INTEGER (Given)
-*        The first dimension of the output 2-dimensional array.
+*        The first dimension of the output two-dimensional array.
 *     ODIM2 = INTEGER (Given)
-*        The second dimension of the output 2-dimensional array.
+*        The second dimension of the output two-dimensional array.
 *     ARROUT( ODIM1, ODIM2 ) = ? (Returned)
 *        Will contain input data array in central section and will be
 *        padded at the edge of the array by a reflection about the
@@ -64,39 +64,6 @@
 *     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
 *     ARRIN and ARROUT arguments to the routine must have the data
 *     type specified.
-
-*  Algorithm:
-*     If no error then
-*        Copy input array into central area of output array
-*        For the first STEP lines of the output array
-*           Calculate the index to the line in the output array which is
-*             the same number of lines away from the line corresponding
-*             to the first line of the input array but on the opposite
-*             side of it
-*           Copy all the points in this line corresponding to an input
-*             array line into the current line
-*        Endfor
-*        For the last STEP lines of the output array
-*           Calculate the index to the line in the output array which is
-*             the same number of lines away from the line corresponding
-*             to the last line of the input array but on the opposite
-*             side of it
-*           Copy all the points in this line corresponding to an input
-*             array line into the current line
-*        Endfor
-*        For all lines of output array
-*           For the first STEP points in the line
-*              Copy the value of the point which is equidistant from the
-*                point corresponding to the first point of an input
-*                array line but on the opposite side of it
-*           Endfor
-*           For the last STEP points in the line
-*              Copy the value of the point which is equidistant from the
-*                point corresponding to the last point of an input
-*                array line but on the opposite side of it
-*           Endfor
-*        Endfor
-*     Endif
 
 *  Copyright:
 *     Copyright (C) 1983-1984, 1986, 1989, 1993 Science & Engineering
@@ -144,9 +111,6 @@
 *     1995 July 27 (MJC):
 *        Made generic (from MEDREF).  Used a modern prologue and style.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 
