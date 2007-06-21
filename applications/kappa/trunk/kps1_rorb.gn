@@ -47,20 +47,20 @@
 *        Index to subsection for rotation along shorter dimension of
 *        input array.
 *     IDIM1 = INTEGER (Given)
-*        The first dimension of the input 2-dimensional array.
+*        The first dimension of the input two-dimensional array.
 *     IDIM2 = INTEGER (Given)
-*        The second dimension of the input 2-dimensional array.
+*        The second dimension of the input two-dimensional array.
 *     ARRIN( IDIM1, IDIM2 ) = ? (Given)
 *        Data to be rotated.
 *     ODIM1 = INTEGER (Given)
-*        The first dimension of the output 2-dimensional array.
+*        The first dimension of the output two-dimensional array.
 *     ODIM2 = INTEGER (Given)
-*        The second dimension of the output 2-dimensional array.
+*        The second dimension of the output two-dimensional array.
 *     ARROUT( ODIM1, ODIM2 ) = ? (Returned)
 *        Will hold the rotated data.
 *     WORK( ROTSIZ, ROTSIZ ) = ? (Returned)
 *        Workspace to hold sub-sections for rotation.
-*     STATUS = INTEGER( UPDATE )
+*     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
@@ -70,20 +70,6 @@
 *     data type specified.
 *     - If the number of right-angles for rotation is not 1 or 3 then
 *     STATUS will be set to SAI__ERROR and an error reported.
-
-*  Algorithm:
-*     If no error on entry then
-*        If number of clockwise 90 degree rotates is 1 or 3 then
-*           Transfer square subsection of input image, pointed at by
-*             INDEXL and INDEXS, into the work array
-*           Rotate the work array using subroutine ROTAS2
-*           Calculate the positon subsection should have in the output
-*             array
-*           Transfer work array to output array
-*        Else
-*           Set status and report error
-*        Endif
-*      Endif
 
 *  Copyright:
 *     Copyright (C) 1983-1984, 1986, 1988-1989 Science & Engineering
@@ -128,9 +114,6 @@
 *        variable declarations.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
 
 *  Type Definitions:
@@ -169,7 +152,7 @@
                                  ! dimension
       INTEGER XIN                ! Index to element in input-array line
       INTEGER XOUT               ! Index to element in output-array line
-      INTEGER Y                  ! Index to element in subsection, second
+      INTEGER Y                  ! Index to element in subsection, 2nd
                                  ! dimension
       INTEGER YIN                ! Index to input-array line
       INTEGER YOUT               ! Index to output-array line
