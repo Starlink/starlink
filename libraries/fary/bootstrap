@@ -1,5 +1,5 @@
 #! /bin/sh -
-# original bootstrap file, installed by starconf 1.2, rnum=1002000
+# original bootstrap file, installed by starconf 1.3, rnum=1003000
 # If you _need_ to change this file, delete `original' in the line above,
 # or else starconf may overwrite it with an updated version.
 #
