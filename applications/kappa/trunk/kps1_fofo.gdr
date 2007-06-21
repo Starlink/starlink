@@ -10,7 +10,7 @@
 *  Language:
 *     Starlink Fortran 77
 
-*  Invocation
+*  Invocation:
 *     CALL KPS1_FOFOx( M, N, UNTANG, DATA, WIM1, WIM2, WIM3, STATUS )
 
 *  Description:
@@ -84,9 +84,6 @@
 *     1995 March 30 (MJC):
 *        Made generic from FFTFOR.
 *     {enter_further_changes_here}
-
-*   Bugs:
-*      {note_any_bugs_here}
 
 *-
 *  Type Definitions:
