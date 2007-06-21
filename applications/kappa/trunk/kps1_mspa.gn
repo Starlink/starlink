@@ -6,8 +6,8 @@
 *     KPS1_MSPAx
 
 *  Purpose:
-*     Evaluates a bivariate Chebyshev polynomial series for all elements
-*     of a two-dimensional data array, using x and y axis co-ordinates.
+*     Evaluates a bivariate Chebyshev polynomial series for a 
+*     two-dimensional data array.
 
 *  Language:
 *     Starlink Fortran 77
@@ -18,6 +18,11 @@
 *                       OUTARR, STATUS )
 
 *  Description:
+*     This routine evaluates a bivariate Chebyshev polynomial series for 
+*     all elements of a two-dimensional data array, using its x and y 
+*     axis centre co-ordinates.  The axis centres must lie within
+*     supplied ranges; pixels outside these ranges are given the bad
+*     value.
 
 *  Arguments:
 *     DIM1 = INTEGER (Given)
