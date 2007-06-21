@@ -181,7 +181,6 @@ kpg1_debug.f \
 kpg1_dnag2r.f \
 kpg1_dr2nag.f \
 kpg1_dsfr1.f \
-kpg1_dsfrm.f \
 kpg1_env0r.f \
 kpg1_envdf.f \
 kpg1_fftbd.f \
@@ -276,6 +275,7 @@ kpg1_astrm.f \
 kpg1_avlut.f \
 kpg1_ccpro.f \
 kpg1_crout.f \
+kpg1_dsfrm.f \
 kpg1_gaxlb.f \
 kpg1_getim.f \
 kpg1_getyp.f \
