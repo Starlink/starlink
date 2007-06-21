@@ -85,9 +85,6 @@
 *        Replaced NAG calls.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_new_bugs_here}
-
 *-
 
 *  Type Definitions:
@@ -124,7 +121,7 @@
 
 *  Local Variables:
       DOUBLE PRECISION DIFF      ! Normalised maximum difference between
-                                 ! the data value and the value to change
+                                 ! data value and the value to change 
                                  ! for them to be regarded as identical
       DOUBLE PRECISION DVAL      ! Random sample value
       DOUBLE PRECISION FPOLD     ! Floating-point value to be replaced
