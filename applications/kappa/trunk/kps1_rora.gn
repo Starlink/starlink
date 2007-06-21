@@ -5,7 +5,7 @@
 *     KPS1_RORAx
 
 *  Purpose:
-*     Rotates a subsection of 2-dimnensional array by 90, 180 or 270
+*     Rotates a subsection of two-dimnensional array by 90, 180 or 270
 *     degrees.
 
 *  Language:
@@ -15,7 +15,7 @@
 *     CALL KPS1_RORAx( NUMRA, XSIZE, YSIZE, XEXT, YEXT, ARRAY, STATUS )
 
 *  Description:
-*     The XEXT by YEXT section of the input 2-dimensional array ARRAY,
+*     The XEXT by YEXT section of the input two-dimensional array ARRAY,
 *     of dimensions XSIZE, YSIZE, is rotated through NUMRA right angles
 *     in the clockwise direction.  ARRAY will hold the rotated data on
 *     exit from the routine.
@@ -44,62 +44,6 @@
 *     ARRAY argument must have the data type specified.
 *     - If the number of right-angles for rotation is not 1, 2, or 3
 *     then STATUS will be set to SAI__ERROR and an error reported.
-
-*  Algorithm:
-*     If no error on entry then
-*        If no. of right angles to rotate is 1 then
-*           Perform 90 degree rotate clockwise
-*           For x from 1 to half the maximum extent to be rotated
-*              For y from x to maximum extent to be rotated - x
-*                                  save becomes array( xswap,     y )
-*                 array( xswap,     y ) becomes array( yswap, xswap )
-*                 array( yswap, xswap ) becomes array(     x, yswap )
-*                 array(     x, yswap ) becomes array(     y,     x )
-*                 array(     y,     x ) becomes save
-*                 Where xswap is the maximum extent to be rotated +1 - x
-*                 and   yswap is the maximum extent to be rotated +1 - y
-*              End for
-*           End for
-*        Elseif number of right angles to rotate is 2 then
-*           Perform 180 degree rotate
-*           For y from 1 to half the maximum extent to be rotated
-*              For x from 1 to the first dimension extent to be rotated
-*                                  save becomes array(     x,     y )
-*                 array(     x,     y ) becomes array( xswap, yswap )
-*                 array( xswap, yswap ) becomes save
-*                 where xswap is the first dimension extent + 1 - x
-*                 and   yswap is the second dimension extent + 1 - y
-*              End for
-*           End for
-*           If maximum extent to be rotated is an odd number then
-*              Set y to half maximum extent plus one
-*              For x from 1 to half the first dimension extent to be
-*                rotated
-*                              save becomes array(     x, y )
-*                 array(     x, y ) becomes array( xswap, y )
-*                 array( xswap, y ) becomes save
-*                 where xswap is the first dimension extent + 1 - x
-*              End for
-*           End if
-*        Elseif no. of right angles to rotate is 3 then
-*           Perform 90 degree rotate anti-clockwise, equivalent to 270
-*             degree rotate clockwise
-*           For x from 1 to half the maximum extent to be rotated
-*              For y from x to the maximum extent to be rotated - x
-*                                  save becomes array(     y,     x )
-*                 array(     y,     x ) becomes array(     x, yswap )
-*                 array(     x, yswap ) becomes array( yswap, xswap )
-*                 array( yswap, xswap ) becomes array( xswap,     y )
-*                 array( xswap,     y ) becomes save
-*                 where xswap is the maximum extent to be rotated +1 - x
-*                 and   yswap is the maximum extent to be rotated +1 - y
-*              End for
-*           End for
-*        Else
-*           Number of right angles to rotate is incorrect
-*           Set status and report error
-*        Endif
-*     Endif
 
 *  Copyright:
 *     Copyright (C) 1983-1984, 1986, 1988-1989 Science & Engineering
@@ -143,9 +87,6 @@
 *        Made generic from ROTAS2.  Used an SST prologue and modern
 *        variable declarations.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 
