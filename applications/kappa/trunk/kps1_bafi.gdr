@@ -35,7 +35,7 @@
 *        Whether or not associated variance information is to be
 *        processed and included in the weighting.
 *     INVAR( NPIX, NLINES ) = ? (Given)
-*        The input variance array.
+*        The input variance array. 
 *     NITER = INTEGER (Given)
 *        The number of iterations required.
 *     SIZE = REAL (Given and Returned)
@@ -66,9 +66,8 @@
 
 *  Notes:
 *     -  There is a routine for each numeric data type: replace "x" in
-*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
-*     data and variance arrays supplied to this routine must have the
-*     data type specified.
+*     the routine name by D or R as appropriate.  The data and variance 
+*     arrays supplied to this routine must have the data type specified.
 *     -  The state of the replacements (iteration, smoothing length,
 *     maximum change, rms change) is tabulated for verbose reporting.
 
