@@ -1,4 +1,4 @@
-      INTEGER FUNCTION ARD1_GLINE( N, X, Y )
+      INTEGER FUNCTION ARD1_GLINE( GRFCON, N, X, Y )
 *+
 *  Name:
 *     ARD1_GLINE
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     RESULT = ARD1_GLINE( N, X, Y )
+*     RESULT = ARD1_GLINE( GRFCON, N, X, Y )
 
 *  Description:
 *     A polyline is drawn into the 2-dimensional B array joining the 
@@ -18,6 +18,8 @@
 *     common from ARD1_KDRAW.
 
 *  Arguments:
+*     GRFCON = INTEGER (Given)
+*        The value of GrfContext attribute in the calling Plot.
 *     N = INTEGER (Given)
 *        The number of points in the polyline.
 *     X( N ) = REAL (Given)
@@ -30,6 +32,7 @@
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -55,6 +58,8 @@
 *  History:
 *     15-JUN-2001 (DSB):
 *        Original version.
+*     21-JUN-2007 (DSB):
+*        Added GRFCON argument.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -92,6 +97,7 @@
 *           ARD "drawing" routines.
 
 *  Arguments Given:
+      INTEGER GRFCON
       INTEGER N
       REAL X( N )
       REAL Y( N )

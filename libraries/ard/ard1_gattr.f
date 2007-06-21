@@ -1,4 +1,4 @@
-      INTEGER FUNCTION ARD1_GATTR(  ATT, VAL, OLDVAL, PRIM )
+      INTEGER FUNCTION ARD1_GATTR(  GRFCON, ATT, VAL, OLDVAL, PRIM )
 *+
 *  Name:
 *     ARD1_GATTR
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     RESULT = ARD1_GATTR(  ATT, VAL, OLDVAL, PRIM )
+*     RESULT = ARD1_GATTR(  GRFCON, ATT, VAL, OLDVAL, PRIM )
 
 *  Description:
 *     This is a dummy routine to allow ARD to use the graphics
@@ -18,6 +18,8 @@
 *     pixel arrays.
 
 *  Arguments:
+*     GRFCON = INTEGER (Given)
+*        The value of hte GrfContext attribute in the calling Plot.
 *     ATT = INTEGER (Given)
 *        An integer identifying the required attribute. 
 *     VAL = DOUBLE PRECISION (Given) 
@@ -33,6 +35,7 @@
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -58,6 +61,8 @@
 *  History:
 *     15-JUN-2001 (DSB):
 *        Original version.
+*     21-JUN-2007 (DSB):
+*        Add GRFCON argument.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -69,6 +74,7 @@
       IMPLICIT NONE              ! No implicit typing
 
 *  Arguments Given:
+      INTEGER GRFCON
       INTEGER ATT 
       DOUBLE PRECISION VAL
       INTEGER PRIM 
