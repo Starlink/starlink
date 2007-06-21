@@ -77,6 +77,8 @@
 *        Added AST_BOUNDINGBOX.
 *     8-JAN-2003 (DSB):
 *        Include "string.h".
+*     10-JUL-2006 (DSB):
+*        Add AST_STRIPESCAPES
 *     21-JUN-2007 (DSB):
 *        - Avoid use of protected astGetGrfContext function.
 *        - Change data type of GrfContext from integer to AST Object pointer.
