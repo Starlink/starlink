@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!perl -w
 
 =head1 NAME
 
@@ -216,11 +216,16 @@ my $reporturl = $CFG{reporturlroot} ."/$CFG{reportfile}";
 
 # now we can start
 
+# Get the youngest revision
+my $endrev = youngest_rev();
+
 # Work out a starting revision
 my $baserev;
 if ($startrev) {
   # we have an override
   $baserev = $startrev;
+  die "Largest revision number in repository is $endrev (you supplied $baserev)\n"
+    if ($baserev > $endrev); 
 } elsif (-e $revfilepath) {
   open(my $fh, "< $revfilepath") or
     die "Error opening revision history file '$revfilepath' : $!";
@@ -232,14 +237,8 @@ if ($startrev) {
   die "Do not know which revision to use as reference! Consider using -startrev\n";
 }
 
-my $endrev = youngest_rev();
-
 if ($endrev - $baserev > 100) {
   die "Unexpectedly large number of revisions to process ($baserev to $endrev)\n";
-}
-
-if ($baserev > $endrev) {
-  die "Largest revision number in repository is $endrev (you supplied $baserev)\n";
 }
 
 my %INFO;   # revision info
@@ -248,10 +247,12 @@ my %ALLFILES; # look up of file to revision
 # need to find out date range even if we are not interested in all revisions
 my ($earliest, $latest);
 {
-  my %info = get_info( $baserev );
-  $earliest = $info{date};
-  %info = get_info( $endrev );
-  $latest = $info{date};
+  if ($baserev <= $endrev) {
+    my %info = get_info( $baserev );
+    $earliest = $info{date};
+    %info = get_info( $endrev );
+    $latest = $info{date};
+  }
 }
 
 # loop over each revision, getting information;
