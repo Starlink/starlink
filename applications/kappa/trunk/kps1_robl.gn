@@ -59,50 +59,6 @@
 *     - If an error occurs during the execution of this routine STATUS
 *     will be returned containing the appropriate error value.
 
-*  Algorithm:
-*     If no error on entry then
-*        ENDL is the position of the start of the last rotation box
-*          along the longer side of the input array
-*        ENDS is the position of the start of the last rotation box
-*          along the shorter side of the input array
-*        INDEXL is a pointer to the position of the start of the
-*          rotation box along the longer side of the input array
-*        INDEXS is a pointer to the position of the start of the
-*          rotation box along the shorter side of the input array
-*        ROTSIZ is the size of the rotation box
-*        Move along longest side of input array
-*        For INDEXL from 1, in steps of ROTSIZ, to a value less than or
-*          equal to ENDL
-*           Move along shortest side of input array
-*           For INDEXS from 1, in steps or ROTSIZ, to a value less than
-*             or equal to ENDS
-*              Rotate box pointed at by INDEXL, INDEXS
-*           End for
-*           If shorter dimension of input array is not exactly divisible
-*             by ROTSIZ then
-*              There will be some data left unrotated so set INDEXS to
-*                point at ENDS
-*              Rotate box
-*           Endif
-*        Endfor
-*        If the longer dimension of the input array is not exactly
-*          divisible by ROTSIZ then
-*           There will be some data left unrotated so set INDEXL to
-*             point at ENDL
-*           Move along shortest side of input array
-*           For INDEXS from 1, in steps or ROTSIZ, to a value less than
-*             or equal to ENDS
-*              Rotate box pointed at by INDEXL, INDEXS
-*           End for
-*           If shorter dimension of input array is not exactly divisible
-*             by ROTSIZ then
-*              There will be some data left unrotated so set INDEXS to
-*                point at ENDS
-*              Rotate box
-*           Endif
-*        Endif
-*     Endif
-
 *  Copyright:
 *     Copyright (C) 1983-1984, 1986, 1989 Science & Engineering
 *     Research Council. Copyright (C) 1995 Central Laboratory of the
@@ -142,9 +98,6 @@
 *        Made generic from ROTAS4.  Used an SST prologue and modern
 *        variable declarations.  Corrected grammatical errors.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 
