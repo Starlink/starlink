@@ -114,7 +114,7 @@
 *     KFH: K.F.Hartley (RGO)
 *     APH: A.P.Horsfield (RGO)
 *     SC: S.Chan (RGO)
-*     MJC:Malcolm J. Currie (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -126,7 +126,7 @@
 *        RAPI2D style; renamed parameters section to arguments and
 *        added access; made more general by making the number of
 *        bins/colour indices an argument, and also four associated work
-*        arrays; removed PAR calls - parameters now supplied as
+*        arrays; removed PAR calls---parameters now supplied as
 *        arguments; removed tabs; relocated 'local' variables to import
 *        etc.; corrected error-handling and tidied.
 *     1988 June 22 (MJC):
@@ -145,9 +145,6 @@
 *        Added new CUMUL argument set to .TRUE. to KPG1_GHSTx call
 *        and thus eliminate the HIST array argument.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 
@@ -181,23 +178,24 @@
                                  ! relating colour to pen number
       DOUBLE PRECISION C0        ! Minimum value of the calculated
                                  ! cumulative frequency chart
-      DOUBLE PRECISION COEFF( 0:7, 0:6 ) ! Coefficients of the equations to be
-                                 ! solved for least squares fit
+      DOUBLE PRECISION COEFF( 0:7, 0:6 ) ! Coefficients of the equations
+                                 ! to be solved for least squares fit
       INTEGER I                  ! General variable
       INTEGER J                  ! General variable
       INTEGER K                  ! General variable
       INTEGER LOWER              ! Lowest part of the cumulative
                                  ! frequency chart to which the
                                  ! polynomial will be fitted.
-      DOUBLE PRECISION MAXVAL    ! Maximum value of cofficient. Used for
+      DOUBLE PRECISION MAXVAL    ! Maximum value of cofficient, used for
                                  ! partial pivoting
       DOUBLE PRECISION POLCO( 0:6 ) ! Polynomial coefficients
-      INTEGER POS                ! Row containing the largest coefficient
-      DOUBLE PRECISION SHADE     ! Relative amounts of each colour wanted
+      INTEGER POS                ! Row containing largest coefficient
+      DOUBLE PRECISION SHADE     ! Relative amounts of each colour
+                                 ! wanted
       DOUBLE PRECISION STEP      ! Difference in pen value between
                                  ! successive pens
-      DOUBLE PRECISION SUM( 0:12 ) ! sums of powers of pen numbers between
-                                 ! 0 and 12
+      DOUBLE PRECISION SUM( 0:12 ) ! sums of powers of pen numbers 
+                                 ! between 0 and 12
       DOUBLE PRECISION TEMP      ! General variable
       INTEGER UPPER              ! Largest part of the cumulative
                                  ! frequency chart to be used for the
