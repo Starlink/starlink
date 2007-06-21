@@ -124,15 +124,15 @@ typedef void (* AstGrfFun)( void );
 
 /* Interfaces for specific Grf funstions implemented in C (other languages
    may have different interfaces). */
-typedef int (* AstGAttrFun)( int, int, double, double *, int );
-typedef int (* AstGFlushFun)( int );
-typedef int (* AstGLineFun)( int, int, const float *, const float * );
-typedef int (* AstGMarkFun)( int, int, const float *, const float *, int );
-typedef int (* AstGTextFun)( int, const char *, float, float, const char *, float, float );
-typedef int (* AstGCapFun)( int, int, int );
-typedef int (* AstGTxExtFun)( int, const char *, float, float, const char *, float, float, float *, float * );
-typedef int (* AstGScalesFun)( int, float *, float * );
-typedef int (* AstGQchFun)( int, float *, float * );
+typedef int (* AstGAttrFun)( AstObject *, int, double, double *, int );
+typedef int (* AstGFlushFun)( AstObject * );
+typedef int (* AstGLineFun)( AstObject *, int, const float *, const float * );
+typedef int (* AstGMarkFun)( AstObject *, int, const float *, const float *, int );
+typedef int (* AstGTextFun)( AstObject *, const char *, float, float, const char *, float, float );
+typedef int (* AstGCapFun)( AstObject *, int, int );
+typedef int (* AstGTxExtFun)( AstObject *, const char *, float, float, const char *, float, float, float *, float * );
+typedef int (* AstGScalesFun)( AstObject *, float *, float * );
+typedef int (* AstGQchFun)( AstObject *, float *, float * );
 
 /* A general interface into which Grf Wrapper functions should be cast 
    before being passed as an argument to astGrfWrapper. */
@@ -261,7 +261,7 @@ typedef struct AstPlot {
    int grfnstack;
    AstGat **gat;
    int ngat;
-   int grfcontext;
+   AstObject *grfcontext;
    float hmarkx;
    float hmarky;
 
@@ -284,6 +284,7 @@ typedef struct AstPlotVtab {
 /* Properties (e.g. methods) specific to this class. */
    int (* Border)( AstPlot * );
    void (* BoundingBox)( AstPlot *, float[2], float[2] );
+   void (* SetGrfContext)( AstPlot *, AstObject * );
    void (* Clip)( AstPlot *, int, const double [], const double [] );
    int (* CvBrk)( AstPlot *, int, double *, double *, double * );
    void (* GridLine)( AstPlot *, int, const double [], double );
@@ -317,11 +318,6 @@ typedef struct AstPlotVtab {
    int (* TestForceExterior)( AstPlot * );
    void (* SetForceExterior)( AstPlot *, int );
    void (* ClearForceExterior)( AstPlot * );
-
-   int (* GetGrfContext)( AstPlot * );
-   int (* TestGrfContext)( AstPlot * );
-   void (* SetGrfContext)( AstPlot *, int );
-   void (* ClearGrfContext)( AstPlot * );
 
    int (* GetInvisible)( AstPlot * );
    int (* TestInvisible)( AstPlot * );
@@ -529,6 +525,7 @@ AstPlot *astLoadPlot_( void *, size_t, AstPlotVtab *,
    const char *astStripEscapes_( const char * );
    int astFindEscape_( const char *, int *, int *, int * );
    int astBorder_( AstPlot * );
+   void astSetGrfContext_( AstPlot *, AstObject * );
    void astBoundingBox_( AstPlot *, float[2], float[2] );
    void astClip_( AstPlot *, int, const double [], const double [] );
    void astGridLine_( AstPlot *, int, const double [], double );
@@ -567,11 +564,6 @@ AstPlot *astLoadPlot_( void *, size_t, AstPlotVtab *,
    int astTestForceExterior_( AstPlot * );
    void astSetForceExterior_( AstPlot *, int );
    void astClearForceExterior_( AstPlot * );
-
-   int astGetGrfContext_( AstPlot * );
-   int astTestGrfContext_( AstPlot * );
-   void astSetGrfContext_( AstPlot *, int );
-   void astClearGrfContext_( AstPlot * );
 
    int astGetInvisible_( AstPlot * );
    int astTestInvisible_( AstPlot * );
@@ -788,6 +780,9 @@ astINVOKE(O,astLoadPlot_(mem,size,vtab,name,astCheckChannel(channel)))
    pointer to the wrong sort of object is supplied. */
 
 
+#define astSetGrfContext(this,grfcon) \
+astINVOKE(V,astSetGrfContext_(astCheckPlot(this),astCheckObject(grfcon)))
+
 #define astBorder(this) \
 astINVOKE(V,astBorder_(astCheckPlot(this)))
 
@@ -884,15 +879,6 @@ astINVOKE(V,astGetForceExterior_(astCheckPlot(this)))
 astINVOKE(V,astSetForceExterior_(astCheckPlot(this),frcext))
 #define astTestForceExterior(this) \
 astINVOKE(V,astTestForceExterior_(astCheckPlot(this)))
-
-#define astClearGrfContext(this) \
-astINVOKE(V,astClearGrfContext_(astCheckPlot(this)))
-#define astGetGrfContext(this) \
-astINVOKE(V,astGetGrfContext_(astCheckPlot(this)))
-#define astSetGrfContext(this,grfcon) \
-astINVOKE(V,astSetGrfContext_(astCheckPlot(this),grfcon))
-#define astTestGrfContext(this) \
-astINVOKE(V,astTestGrfContext_(astCheckPlot(this)))
 
 #define astClearBorder(this) \
 astINVOKE(V,astClearBorder_(astCheckPlot(this)))
