@@ -35,7 +35,7 @@
 *        Whether or not associated variance information is to be
 *        processed and included in the weighting.
 *     INVAR( NPIX, NLINES ) = ? (Given)
-*        The input variance array. 
+*        The input variance array.
 *     NITER = INTEGER (Given)
 *        The number of iterations required.
 *     SIZE = REAL (Given and Returned)
@@ -129,7 +129,7 @@
 *     21-MAY-1998 (DSB):
 *        Added protection against division by zero if there are any
 *        zero variance values.
-*     {enter_changes_here}
+*     {enter_further_changes_here}
 
 *-
       
