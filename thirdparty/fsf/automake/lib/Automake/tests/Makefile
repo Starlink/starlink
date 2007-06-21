@@ -56,12 +56,12 @@ REAL_INSTALL = install-am
 # Set to : to emit manifest lines, too
 # (don't actually do this here -- it's done within install-manifest below).
 MANIFEST = false
-ACLOCAL = perllibdir=/loc/pwda/pdraper/starlink_cvs/source/thirdparty/fsf/automake"/lib:./lib" /loc/pwda/pdraper/starlink_cvs/source/thirdparty/fsf/automake/aclocal --acdir=m4
-AMTAR = ${SHELL} /loc/pwda/pdraper/starlink_cvs/source/thirdparty/fsf/automake/lib/missing --run tar
+ACLOCAL = perllibdir=/export/data/timj/starbuild/thirdparty/fsf/automake"/lib:./lib" /export/data/timj/starbuild/thirdparty/fsf/automake/aclocal --acdir=m4
+AMTAR = ${SHELL} /export/data/timj/starbuild/thirdparty/fsf/automake/lib/missing --run tar
 APIVERSION = 1.9
-AUTOCONF = ${SHELL} /loc/pwda/pdraper/starlink_cvs/source/thirdparty/fsf/automake/lib/missing --run autoconf
-AUTOHEADER = ${SHELL} /loc/pwda/pdraper/starlink_cvs/source/thirdparty/fsf/automake/lib/missing --run autoheader
-AUTOMAKE = perllibdir=/loc/pwda/pdraper/starlink_cvs/source/thirdparty/fsf/automake"/lib:./lib" /loc/pwda/pdraper/starlink_cvs/source/thirdparty/fsf/automake/automake --libdir=lib
+AUTOCONF = ${SHELL} /export/data/timj/starbuild/thirdparty/fsf/automake/lib/missing --run autoconf
+AUTOHEADER = ${SHELL} /export/data/timj/starbuild/thirdparty/fsf/automake/lib/missing --run autoheader
+AUTOMAKE = perllibdir=/export/data/timj/starbuild/thirdparty/fsf/automake"/lib:./lib" /export/data/timj/starbuild/thirdparty/fsf/automake/automake --libdir=lib
 AWK = gawk
 CYGPATH_W = echo
 DEFS = -DPACKAGE_NAME=\"Starlink\ Automake\" -DPACKAGE_TARNAME=\"automake\" -DPACKAGE_VERSION=\"1.9.6-starlink\" -DPACKAGE_STRING=\"Starlink\ Automake\ 1.9.6-starlink\" -DPACKAGE_BUGREPORT=\"ussc@star.rl.ac.uk\" -DPACKAGE=\"automake\" -DVERSION=\"1.9.6-starlink\" 
@@ -78,7 +78,7 @@ LIBOBJS =
 LIBS = 
 LN = ln
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /loc/pwda/pdraper/starlink_cvs/source/thirdparty/fsf/automake/lib/missing --run makeinfo
+MAKEINFO = ${SHELL} /export/data/timj/starbuild/thirdparty/fsf/automake/lib/missing --run makeinfo
 MODIFICATION_DELAY = 2
 PACKAGE = automake
 PACKAGE_BUGREPORT = ussc@star.rl.ac.uk
@@ -87,10 +87,10 @@ PACKAGE_STRING = Starlink Automake 1.9.6-starlink
 PACKAGE_TARNAME = automake
 PACKAGE_VERSION = 1.9.6-starlink
 PATH_SEPARATOR = :
-PERL = /usr/local/bin/perl
+PERL = /local/bin/perl
 SET_MAKE = 
 SHELL = /bin/sh
-STAR_MANIFEST_DIR = /export/pwda/pdraper/starlink_cvs/build/manifests
+STAR_MANIFEST_DIR = /export/data/timj/star64/manifests
 STRIP = 
 TEX = tex
 VERSION = 1.9.6-starlink
@@ -108,7 +108,7 @@ exec_prefix = ${prefix}
 host_alias = 
 includedir = ${prefix}/include
 infodir = ${prefix}/info
-install_sh = /loc/pwda/pdraper/starlink_cvs/source/thirdparty/fsf/automake/lib/install-sh
+install_sh = /export/data/timj/starbuild/thirdparty/fsf/automake/lib/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localstatedir = ${prefix}/var
@@ -116,7 +116,7 @@ mandir = ${prefix}/man
 mkdir_p = mkdir -p -- .
 oldincludedir = /usr/include
 pkgvdatadir = ${datadir}/automake-1.9
-prefix = /export/pwda/pdraper/starlink_cvs/build/buildsupport
+prefix = /export/data/timj/star64/buildsupport
 program_transform_name = s,x,x,
 sbindir = ${exec_prefix}/sbin
 sharedstatedir = ${prefix}/com
