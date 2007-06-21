@@ -19,7 +19,7 @@
 
 *  Arguments:
 *     GRFCON = INTEGER (Given)
-*        The value of GrfContext attribute in the calling Plot.
+*        An AST Object stored using astSetGrfContext, or AST__NULL.
 *     N = INTEGER (Given)
 *        The number of points in the polyline.
 *     X( N ) = REAL (Given)

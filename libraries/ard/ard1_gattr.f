@@ -19,7 +19,7 @@
 
 *  Arguments:
 *     GRFCON = INTEGER (Given)
-*        The value of hte GrfContext attribute in the calling Plot.
+*        An AST Object stored using astSetGrfContext, or AST__NULL.
 *     ATT = INTEGER (Given)
 *        An integer identifying the required attribute. 
 *     VAL = DOUBLE PRECISION (Given) 
