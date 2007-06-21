@@ -43,7 +43,25 @@
 /*       The global status value current on exit.                           */
 
 /* Copyright:                                                               */
-/*    Copyright (C) 1992 Science & Engineering Research Council             */
+/*    Copyright (C) 1991, 1992 Science & Engineering Research Council       */
+/*    Copyright (C) 2007 Science and Technology Facilities Council          */
+/*    All Rights Reserved                                                   */
+
+/*  Licence:                                                                */
+/*     This program is free software; you can redistribute it and/or        */
+/*     modify it under the terms of the GNU General Public License as       */
+/*     published by the Free Software Foundation; either version 2 of       */
+/*     the License, or (at your option) any later version.                  */
+
+/*     This program is distributed in the hope that it will be              */
+/*     useful, but WITHOUT ANY WARRANTY; without even the implied           */
+/*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR              */
+/*     PURPOSE. See the GNU General Public License for more details.        */
+
+/*     You should have received a copy of the GNU General Public            */
+/*     License along with this program; if not, write to the Free           */
+/*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,       */
+/*     MA 02111-1307, USA                                                   */
 
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
@@ -59,6 +77,9 @@
 /*    7-SEP-1992 (RFWS):                                                    */
 /*       Installed initialisation of the global native data representation  */
 /*       information.                                                       */
+/*    20-JUN-2007 (TIMJ):                                                   */
+/*       Add HDS_DISABLE_CLEANUP (useful for debugging) to disable          */
+/*       the exit handler.                                                  */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -99,25 +120,29 @@
             hds_gl_active = 1;
 
 /* On the first (successful) invocation of this routine, declare hds1_exit  */
-/* as an exit handler.                                                      */
+/* as an exit handler. (if we want it)                                      */
             if ( first )
             {
-               if ( !atexit( hds1_exit ) )
-               {
-                  first = 0;
-               }
+	      /* see if we want an exit handler */
+	      if (!getenv( "HDS_DISABLE_CLEANUP")) {
+		    if ( !atexit( hds1_exit ) )
+		      {
+			first = 0;
+		      }
 
 /* If an error occurred, then report it.                                    */
-               else
-               {
-                  hds_gl_status = DAT__FATAL;
-                  emsSyser( "MESSAGE", errno );
-                  emsRep( "DAT1_INIT_1",
-                             "Error establishing an exit handler for HDS - \
-^MESSAGE",
-                             &hds_gl_status );
-               }
-            }
+		    else
+		      {
+			hds_gl_status = DAT__FATAL;
+			emsSyser( "MESSAGE", errno );
+			emsRep( "DAT1_INIT_1",
+				"Error establishing an exit handler for HDS - ^MESSAGE",
+				&hds_gl_status );
+		      }
+	      } else {
+		first = 0;
+	      }
+	    }
          }
       }
 

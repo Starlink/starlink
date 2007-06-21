@@ -40,6 +40,8 @@
 /* Copyright:                                                               */
 /*    Copyright (C) 1992 Science & Engineering Research Council             */
 /*    Copyright (C) 2006 Particle Physics and Astronomy Research Council    */
+/*    Copyright (C) 2007 Science and Technology Facilities Council          */
+/*    All Rights Reserved                                                   */
 
 /*  Licence:                                                                */
 /*     This program is free software; you can redistribute it and/or        */
@@ -60,7 +62,7 @@
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
 /*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
-/*    BC: Brad Cavanagh (JAC, Hawaii)
+/*    BC: Brad Cavanagh (JAC, Hawaii)                                       */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
@@ -75,6 +77,9 @@
 /*    14-JUN-2006 (BC):                                                     */
 /*       Allow for HDS_DISABLE_CLEANUP environment variable to disable HDS  */
 /*       cleanup from happening.                                            */
+/*    20-JUN-2006 (TIMJ):                                                   */
+/*       Move exit handler disabling to dat1_init.c. It seems that a SEGV   */
+/*       can corrupt the environment which leads to a getenv segv.          */
 /*    {@enter_changes_here@}                                                */
 
 /* Bugs:                                                                    */
@@ -86,13 +91,6 @@
       int status = DAT__OK;      /* Local status for hdsStop                */
 
 /*.                                                                         */
-
-/* Check for presence of HDS_DISABLE_CLEANUP environment variable.          */
-      if( getenv( "HDS_DISABLE_CLEANUP" ) )
-      {
-        printf( "HDS cleanup disabled.\n" );
-        return;
-      }
 
 /* Close down everything                                                    */
       hds1_cleanup( &status );
