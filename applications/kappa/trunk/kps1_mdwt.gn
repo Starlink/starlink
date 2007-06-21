@@ -8,7 +8,7 @@
 *     KPS1_MDWTx
 
 *  Purpose:
-*     Performs 2-dimensional weighted median filtering of an array.
+*     Performs two-dimensional weighted median filtering of an array.
 
 *  Language:
 *     Starlink Fortran 77
@@ -63,15 +63,15 @@
 *     SAMINF( SAMSIZ, 3 ) = INTEGER (Given)
 *        The x-y offsets and weights for the elements of the filter.
 *     IDIM1 = INTEGER (Given)
-*        The first dimension of the input 2-dimensional array.
+*        The first dimension of the input two-dimensional array.
 *     IDIM2 = INTEGER (Given)
-*        The second dimension of the input 2-dimensional array.
+*        The second dimension of the input two-dimensional array.
 *     ARRIN( IDIM1, IDIM2 ) = ? (Given)
 *        Data array to be filtered.
 *     ODIM1 = INTEGER (Given)
-*        The first dimension of the output 2-dimensional array.
+*        The first dimension of the output two-dimensional array.
 *     ODIM2 = INTEGER (Given)
-*        The second dimension of the output 2-dimensional array.
+*        The second dimension of the output two-dimensional array.
 *     SAMPLE( SAMSIZ ) = DOUBLE PRECISION (Returned)
 *        Used to store the data to be sorted.
 *     SAMWT( SAMSIZ ) = INTEGER (Returned)
@@ -91,48 +91,6 @@
 *     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
 *     ARRIN and ARROUT arguments to the routine must have the data
 *     type specified.
-
-*  Algorithm:
-*     If no error on entry then
-*        initialise CHANGE to FALSE
-*        For all lines of output image
-*           Calculate position of corresponding input image line
-*           For all points in output image line
-*              Calculate position of corresponding input image point
-*              Initialise running totals of weight and number in sample
-*              For number of points in sample
-*                 Calculate position of point for inclusion in sample
-*                 If pixel is valid then
-*                    Add to running total of actual number of values in
-*                      sample to be sorted
-*                    Store value of point in sample array
-*                    Store weight of point in SAMWT array
-*                    Increment running total of weight
-*                 Endif
-*              Endfor
-*              Compute position of median in sorted sample using summed
-*                weight
-*              If insufficient valid pixels have been used to form the
-*                sample or median is too small then
-*                Set output pixel to be input pixel value
-*              Else
-*                 Sort sample array until median is found
-*                 If difference between input image point and median is
-*                  greater than specified diffrence then
-*                    set CHANGE to TRUE
-*                    If damping is required then
-*                      Output image point becomes mid way between the
-*                       old value and the median
-*                    Else
-*                      Output image point becomes median
-*                    Endif
-*                 Else
-*                   Output image point becomes input image point
-*                 Endif
-*              Endif
-*           Endfor
-*        Endfor
-*     Endif
 
 *  Copyright:
 *     Copyright (C) 1983-1984, 1986, 1989, 1993 Science & Engineering
@@ -182,9 +140,6 @@
 *        Made generic (from MEDWTS).  Used a modern prologue and style.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
 
 *  Type Definitions:
@@ -219,7 +174,8 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER ACTMED             ! Actual median position in sorted sample
+      INTEGER ACTMED             ! Actual median position in sorted 
+                                 ! sample
       INTEGER ACTSAM             ! Actual number of values in SAMPLE for
                                  ! sorting, i.e. exclusion of invalid
                                  ! pixels
@@ -228,7 +184,8 @@
       DOUBLE PRECISION CURVAL    ! Current smallest value during sorting
       INTEGER CURWT              ! Weight corresponding to currents
                                  ! smallest value
-      DOUBLE PRECISION DELTA     ! Difference between a data value and the median
+      DOUBLE PRECISION DELTA     ! Difference between a data value and 
+                                 ! the median
       DOUBLE PRECISION  MEDIAN   ! Value of median for testing against
                                  ! input image points
       INTEGER OFSETX             ! Offset in X to input image points
@@ -260,7 +217,7 @@
 *  values are changed by the filter.
       CHANGE = .FALSE.
 
-*  Apply the 2-dimensional weighted median filter for all lines of the
+*  Apply the two-dimensional weighted median filter for all lines of the
 *  output image.
       DO Y = 1, ODIM2
 
