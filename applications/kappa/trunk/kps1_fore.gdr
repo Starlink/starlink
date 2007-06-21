@@ -4,18 +4,20 @@
 *     KPS1_FOREx
 
 *  Purpose:
-*     Does a reverse FFT of a 2-d array held in Hermitian form.
+*     Does a reverse FFT of a two-dimensional array held in Hermitian
+*     form.
 
 *  Language:
 *     Starlink Fortran 77
 
-*  Invocation
+*  Invocation:
 *     CALL KPS1_FOREx( M, N, IN, OUT, WORK, STATUS )
 
 *  Description:
-*     Does a reverse FFT of a single 2-d array which is assumed to be
-*     an FFT held in Hermitian form, with the zero-frequency pixel at
-*     the array centre.  The output is a single real array.
+*     Does a reverse FFT of a single two-dimensional array that is 
+*     assumed to be an FFT held in Hermitian form, with the 
+*     zero-frequency pixel at the array centre.  The output is a single
+*     real array.
 
 *  Arguments:
 *     M = INTEGER (Given)
@@ -82,9 +84,6 @@
 *        Added IN argument to avoid violation of the ANSI standard in
 *        call to KPG1_FFTBx.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 *  Type Definitions:

@@ -10,11 +10,11 @@
 *  Language:
 *     Starlink Fortran 77
 
-*  Invocation
+*  Invocation:
 *     CALL KPS1_FORIx( M, N, A, B, STATUS )
 
 *  Description:
-*     Converts a 2-dimensional array held in modulus and phase form to
+*     Converts a two-dimensional array held in modulus and phase form to
 *     complex form (separate real and imaginary parts).
 
 *  Arguments:
@@ -84,9 +84,6 @@
 *        Made generic from REALIM.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
@@ -105,7 +102,7 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local variables:
+*  Local Variables:
       <LTYPE> IM                 ! Imaginary part of complex vector
       INTEGER J                  ! Pixel count
       INTEGER K                  ! Line count
