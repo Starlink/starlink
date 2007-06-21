@@ -16,7 +16,7 @@
 *                      STATUS )
 
 *  Description:
-*     This routine takes an input 2-dimensional array and rotates it
+*     This routine takes an input two-dimensional array and rotates it
 *     clockwise by an arbitrary angle into the output array.  It uses
 *     the nearest-neighbour method to derive output values.  The value
 *     of the pixel in the input array which is nearest to the
@@ -30,17 +30,17 @@
 
 *  Arguments:
 *     IDIM1 = INTEGER (Given)
-*        The first dimension of the input 2-dimensional array.
+*        The first dimension of the input two-dimensional array.
 *     IDIM2 = INTEGER (Given)
-*        The second dimension of the input 2-dimensional array.
+*        The second dimension of the input two-dimensional array.
 *     INARR( IDIM1, IDIM2 ) = ? (Given)
 *        The input array to rotate.
 *     ANGLE = REAL  (Given)
 *        The rotation angle in degrees.
 *     ODIM1 = INTEGER (Given)
-*        The first dimension of the output 2-dimensional array.
+*        The first dimension of the output two-dimensional array.
 *     ODIM2 = INTEGER (Given)
-*        The second dimension of the output 2-dimensional array.
+*        The second dimension of the output two-dimensional array.
 *     OUTARR( ODIM1, ODIM2 ) = ? (Returned)
 *        The rotated array.
 *     STATUS = INTEGER (Given and Returned)
@@ -50,25 +50,6 @@
 *     -  There is a routine for each numeric data type: replace "x" in
 *     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
 *     INARR and OUTARR arguments must have the data type specified.
-
-*  Algorithm:
-*     If status not o.k. - return
-*     Set up co-ordinates of the two array centres
-*     Compute sine and cosine of the angle of rotation
-*     For all lines in output array
-*        Compute y distance of current line from output array centre
-*        For all pixels in current line in output array
-*           Compute x distance of current line from output array centre
-*           Get the co-ordinates in the input array from which the
-*             current output-array co-ordinates have been transformed
-*           If this point exists in the input array then
-*              Set output array pixel to that value
-*           Else
-*              Output array pixel is invalid
-*           Endif
-*        Endfor
-*     Endfor
-*     Return
 
 *  Copyright:
 *     Copyright (C) 1985-1986, 1988-1989 Science & Engineering Research
@@ -115,8 +96,6 @@
 *        inline for greater efficiency.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
 *-
 
 *  Type Definitions:
