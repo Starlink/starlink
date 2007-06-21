@@ -5,23 +5,23 @@
 *     KPS1_FOPRx
 
 *  Purpose:
-*     Prepares a 2-d array for being Fourier transformed.
+*     Prepares a two-dimensional array for being Fourier transformed.
 
 *  Language:
 *     Starlink Fortran 77
 
-*  Invocation
+*  Invocation:
 *     CALL KPS1_FOPRx( NCOLI, NLINI, IN, NCOLO, NLINO, FILL, ZERO, OUT,
 *                      STATUS )
 
 *  Description:
-*     The input 2-d array is copied to an output array.  It replaces
-*     invalid pixels by a prescribed value in the output.  If the input 
-*     array is not as big as the output, the output array is padded
-*     with pixels with the same defined value.  If the input is larger
-*     than the output only the pixels that lie within the output
-*     array's bounds are copied.  If no input array is given, then
-*     the output array is filled with zeros.
+*     The input two-dimensional array is copied to an output array.  It 
+*     replaces invalid pixels by a prescribed value in the output.  If 
+*     the input array is not as big as the output, the output array is 
+*     padded with pixels with the same defined value.  If the input is 
+*     larger than the output only the pixels that lie within the output
+*     array's bounds are copied.  If no input array is given, then the
+*     output array is filled with zeros.
 
 *  Arguments:
 *     NCOLI = INTEGER (Given)
@@ -43,18 +43,18 @@
 *     STATUS = INTEGER (Given)
 *        The global status.
 
+*  Notes:
+*     -  There is a routine for real and double-precision floating-
+*     point data: replace "x" in the routine name by D or R as
+*     appropriate.  The arrays and fill value supplied to the routine
+*     must have the data type specified.
+
 *  Algorithm:
 *     - If the output is to be filled with zeroes then do so.
 *     - Otherwise copy the input array, or a subset thereof, to the
 *       output, replacing any bad pixels with the fill value.  Pad the
 *       end of each line if necessary, and finally pad any remaining
 *       lines in the output.
-
-*  Notes:
-*     -  There is a routine for real and double-precision floating-
-*     point data: replace "x" in the routine name by D or R as
-*     appropriate.  The arrays and fill value supplied to the routine
-*     must have the data type specified.
 
 *  Copyright:
 *     Copyright (C) 1988, 1990 Science & Engineering Research Council.
@@ -99,9 +99,6 @@
 *        Made generic from FTPREP.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
 
 *  Type Definitions:
@@ -112,12 +109,12 @@
       INCLUDE 'PRM_PAR'          ! Magic-value constants
 
 *  Arguments Given:
-      <TYPE> FILL
       INTEGER NCOLI
       INTEGER NLINI
+      <TYPE> IN( NCOLI, NLINI )
       INTEGER NCOLO 
       INTEGER NLINO
-      <TYPE> IN( NCOLI, NLINI )
+      <TYPE> FILL
       LOGICAL ZERO
 
 *  Arguments Returned:
@@ -126,7 +123,7 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local variables:
+*  Local Variables:
       INTEGER J                  ! Pixel count
       INTEGER K                  ! Line count
       LOGICAL PADLIN             ! Columns are to be padded at the end
