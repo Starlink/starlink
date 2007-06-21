@@ -28524,7 +28524,7 @@ void astClearLogPlot_( AstPlot *this, int axis ) {
    (**astMEMBER(this,Plot,ClearLogPlot))( this, axis ); 
 }
 
-void astGrfContext_( AstPlot *this, AstObject *grfcon ) {
+void astSetGrfContext_( AstPlot *this, AstObject *grfcon ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Plot,SetGrfContext))( this, grfcon );
 }
