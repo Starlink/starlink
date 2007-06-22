@@ -1,4 +1,7 @@
 
+# We need KAP_ERR and BF_PAR
+AM_FCFLAGS = -I.. -I../kapsub
+
 noinst_LTLIBRARIES = libkappa.la
 noinst_DATA = kapmon.hlp
 
@@ -26,16 +29,6 @@ F_ROUTINES = $(F1_ROUTINES) $(F2_ROUTINES) $(F3_ROUTINES)
 
 C_ROUTINES = makesnr.c
 
-beamfit.f: BF_PAR
-
-BF_PAR: ../kapsub/BF_PAR
-	$(LN_S) ../kapsub/BF_PAR ./BF_PAR
-
-wcsalign.f: KAP_ERR
-
-KAP_ERR: ../KAP_ERR
-	$(LN_S) ../KAP_ERR ./KAP_ERR
-
 # Create help for this library
 kapmon.hlp: $(F_ROUTINES) $(C_ROUTINES)
 	-rm -f kapmon.hlp.1 kapmon.hlp.2 kapmon.hlp
@@ -49,4 +42,4 @@ kapmon.hlp: $(F_ROUTINES) $(C_ROUTINES)
 	-rm all.c
 	cat kapmon.hlp.1 kapmon.hlp.2 > kapmon.hlp
 
-CLEANFILES = kapmon.hlp KAP_ERR
+CLEANFILES = kapmon.hlp
