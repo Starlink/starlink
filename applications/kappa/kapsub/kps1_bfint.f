@@ -1,8 +1,8 @@
-      SUBROUTINE KPS1_BFINT( INDF, IWCS, MAP1, MAP2, MAP3, RFRM, VAR,
-     :                       NPOS, POLPAR, PARAM, CURSOR, MARK, MARKER,
-     :                       NAXR, NAXIN, LOGF, FDL, FIXCON, AMPRAT, 
-     :                       SLBND, SUBND, FAREA, FITREG, REFPOS,
-     :                       NPAR, FPAR, STATUS ) 
+      SUBROUTINE KPS1_BFINT( INDF, IWCS, IPLOT, MAP1, MAP2, MAP3, RFRM, 
+     :                       VAR, NPOS, POLPAR, PARAM, CURSOR, MARK, 
+     :                       MARKER, NAXR, NAXIN, LOGF, FDL, FIXCON, 
+     *                       AMPRAT, SLBND, SUBND, FAREA, FITREG, 
+     :                       REFPOS, NPAR, FPAR, STATUS ) 
 *+
 *  Name:
 *     KPS1_BFINT
@@ -14,10 +14,10 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_BFINT( INDF, IWCS, MAP1, MAP2, MAP3, RFRM, VAR, NPOS, 
-*                      POLPAR, PARAM, CURSOR, MARK, MARKER, NAXR, NAXIN,
-*                      LOGF, FDL, FIXCON, AMPRAT, SLBND, SUBND, FAREA, 
-*                      FITREG, REFPOS, NPAR, FPAR, STATUS )
+*     CALL KPS1_BFINT( INDF, IWCS, IPLOT, MAP1, MAP2, MAP3, RFRM, VAR, 
+*                      NPOS, POLPAR, PARAM, CURSOR, MARK, MARKER, NAXR, 
+*                      NAXIN, LOGF, FDL, FIXCON, AMPRAT, SLBND, SUBND, 
+*                      FAREA, FITREG, REFPOS, NPAR, FPAR, STATUS )
 
 *  Description:
 *     This routine finds the Gaussian fits to a batch of image beam
@@ -46,6 +46,9 @@
 *        The input NDF.
 *     IWCS = INTEGER (Given)
 *        The FrameSet associated with the NDF.
+*     IPLOT = INTEGER (Given)
+*        The identfier of the plot obtained from graphics database.
+*        It is only accessed in Cursor mode when Mark='ELLIPSE'.
 *     MAP1 = INTEGER (Given) 
 *        The AST Mapping from the Frame in which the initial guess
 *        positions are supplied, to the PIXEL Frame of the NDF.
@@ -79,8 +82,8 @@
 *        Get initial positions using the cursor? If not, get them using
 *        the parameter given by PARAM.
 *     MARK = CHARACTER * ( * ) (Given) 
-*        What positions are to be marked?  Can be "INITIAL", "FIT" or 
-*        "NONE".
+*        What positions are to be marked?  Can be "INITIAL", "FIT", 
+*        'ELLIPSE' or "NONE".
 *     MARKER = INTEGER (Given) 
 *        The PGPLOT number for the marker type to mark the positions
 *        specified by MARK.
@@ -203,6 +206,9 @@
 *        FPAR is modified.
 *     2007 June 15 (MJC):
 *        Added REFPOS argument, propagated through to other routines.
+*     2007 June 18 (MJC):
+*        Added IPLOT argument and ellipse plotting.  Moved results 
+*        graphics to new routine.
 *     {enter_further_changes_here}
 
 *-
@@ -236,6 +242,7 @@
 *  Arguments Given:
       INTEGER INDF
       INTEGER IWCS
+      INTEGER IPLOT
       INTEGER MAP1
       INTEGER MAP2
       INTEGER MAP3
@@ -277,8 +284,6 @@
       CHARACTER*30 AMES(2)       ! Instructions on cursor use
       INTEGER ACT                ! Cursor action index
       DOUBLE PRECISION BC( BF__NDIM ) ! Base co-ordinates
-      INTEGER CMARK              ! Marker to use when marking beam
-                                 ! positions
       CHARACTER*( NDF__SZFTP ) DTYPE ! Numeric type for results
       DOUBLE PRECISION DX        ! Increment along first axis
       DOUBLE PRECISION DY        ! Increment along second axis
@@ -351,8 +356,9 @@
      :                 'pixel Frame of the NDF is not defined.',
      :                 STATUS )
 
-      ELSE IF ( CURSOR .AND. MARK( 1 : 1 ) .EQ. 'F' .AND.
-     :         .NOT. AST_GETL( MAP1, 'TRANINVERSE', STATUS ) ) THEN
+      ELSE IF ( CURSOR .AND. ( MARK( 1 : 1 ) .EQ. 'F' .OR. 
+     :                         MARK( 1 : 1 ) .EQ. 'E' ) .AND.
+     :          .NOT. AST_GETL( MAP1, 'TRANINVERSE', STATUS ) ) THEN
          CALL MSG_OUT( 'KPS1_BFINT_MSG1','The Mapping required '//
      :                 'to map the beam positions into the '//
      :                 'graphics co-ordinate Frame is not defined.',
@@ -442,20 +448,9 @@
          AMES( 2 ) = 'Exit'
       END IF
 
-*  Store the markers to use.
-      IF ( MARK( 1 : 1 ) .EQ. 'F' ) THEN
-         CMARK = MARKER
-         IMARK = -999
-
-      ELSE IF ( MARK( 1 : 1 ) .EQ. 'I' ) THEN
-         CMARK = -999
-         IMARK = MARKER
-
-      ELSE
-         CMARK = -999
-         IMARK = -999
-
-      END IF
+*  Store the input marker to use.
+      IMARK = -999
+      IF ( MARK( 1 : 1 ) .EQ. 'I' ) IMARK = MARKER
 
 *  Abort if an error has occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
@@ -751,31 +746,19 @@
          END DO
 
 *  Now report the results.
-*  ======================
+*  =======================
 
-*  Mark the beam position on the screen if required.
-         IF ( CURSOR .AND. CMARK .GT. -32 ) THEN
+*  Indicate the location, size, and shape of the beam
+*  --------------------------------------------------
 
-*  First transform beam positions from pixel to graphics co-ordinates.
-            CALL AST_TRANN( MAP1, NPOS, BF__NDIM, BF__MXPOS, PIXPOS,
-     :                      .FALSE., 2, BF__MXPOS, INCEN, STATUS )
-
-            DO I = 1, NPOS
-  
-*  Replace any bad graphics axis values with the original values.
-               IF ( INCEN( I, 1 ) .EQ. AST__BAD ) 
-     :           INCEN( I, 1 ) = INPOS( I, 1 )
-               IF ( INCEN( I, 2 ) .EQ. AST__BAD )
-     :           INCEN( I, 2 ) = INPOS( I, 2 )
-
-*  Mark it.
-               IF ( INCEN( I, 1 ) .NE. AST__BAD .AND. 
-     :              INCEN( I, 2 ) .NE. AST__BAD ) THEN
-                  CALL PGPT( 1, REAL( INCEN( I, 1 ) ),
-     :                       REAL( INCEN( I, 2 ) ), CMARK )
-               END IF
-            END DO
+*  The selection of what appears depends on MARK and MARKER.
+         IF ( CURSOR ) THEN
+             CALL KPS1_BFPRE( IPLOT, MAP1, NPOS, NAXIN, MARK, MARKER,
+     :                        NPAR, FPAR, STATUS )
          END IF
+
+*  Convert the results to the reporting Frame.
+*  -------------------------------------------
 
 *  Convert the pixel coefficients to the reporting Frame, also
 *  changing the widths from standard deviations to FWHMs.
@@ -801,6 +784,9 @@
          ELSE
             REFOFF( 2 ) = VAL__BADD
          END IF            
+
+*  Output
+*  ------
 
 *  Log the results and residuals if required.
          CALL KPS1_BFLOG( LOGF, FDL, .FALSE., MAP2, RFRM, NAXR,
