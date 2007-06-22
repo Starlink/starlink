@@ -13482,7 +13482,7 @@ f     pointer.
    options string to the astVSet method to initialise the new
    XmlChan's attributes. */
       va_start( args, options );
-      astVSet( new, options, args );
+      astVSet( new, options, NULL, args );
       va_end( args );
 
 /* If an error occurred, clean up by deleting the new object. */
@@ -13560,7 +13560,7 @@ AstXmlChan *astXmlChanId_( const char *(* source)( void ),
    options string to the astVSet method to initialise the new
    XmlChan's attributes. */
       va_start( args, options );
-      astVSet( new, options, args );
+      astVSet( new, options, NULL, args );
       va_end( args );
 
 /* If an error occurred, clean up by deleting the new object. */
@@ -13734,7 +13734,7 @@ AstXmlChan *astXmlChanForId_( const char *(* source)( void ),
    options string to the astVSet method to initialise the new
    XmlChan's attributes. */
       va_start( args, options );
-      astVSet( new, options, args );
+      astVSet( new, options, NULL, args );
       va_end( args );
 
 /* If an error occurred, clean up by deleting the new object. */

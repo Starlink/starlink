@@ -306,6 +306,9 @@
 *     26-MAY-2006 (DSB):
 *        Make all system includes unconditional, so that makeh is not
 *        confused when creating ast.h.
+*     22-JUN-2007 (DSB):
+*        Make astVSet return a pointer to dynamic memory holding the 
+*        expanded setting string.
 *--
 */
 
@@ -1212,7 +1215,7 @@ typedef struct AstObjectVtab {
    void (* SetID)( AstObject *, const char * );
    void (* SetIdent)( AstObject *, const char * );
    void (* Show)( AstObject * );
-   void (* VSet)( AstObject *, const char *, va_list );
+   void (* VSet)( AstObject *, const char *, char **, va_list );
 
    int (* GetObjSize)( AstObject * );
 
@@ -1346,7 +1349,7 @@ void astSetDelete_( AstObjectVtab *, void (*)( AstObject * ) );
 void astSetDump_( AstObjectVtab *, void (*)( AstObject *, AstChannel * ), const char *, const char * );
 void astSetID_( AstObject *, const char * );
 void astSetIdent_( AstObject *, const char * );
-void astVSet_( AstObject *, const char *, va_list );
+void astVSet_( AstObject *, const char *, char **, va_list );
 #endif
 
 /* Function interfaces. */
@@ -1483,8 +1486,8 @@ astINVOKE(V,astSetDelete_((AstObjectVtab *)(vtab),delete))
 astINVOKE(V,astSetDump_((AstObjectVtab *)(vtab),dump,class,comment))
 #define astSetID(this,id) astINVOKE(V,astSetID_(astCheckObject(this),id))
 #define astSetIdent(this,id) astINVOKE(V,astSetIdent_(astCheckObject(this),id))
-#define astVSet(this,settings,args) \
-astINVOKE(V,astVSet_(astCheckObject(this),settings,args))
+#define astVSet(this,settings,text,args) \
+astINVOKE(V,astVSet_(astCheckObject(this),settings,text,args))
 #define astTestAttrib(this,attrib) \
 astINVOKE(V,astTestAttrib_(astCheckObject(this),attrib))
 #define astTestID(this) astINVOKE(V,astTestID_(astCheckObject(this)))

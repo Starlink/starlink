@@ -4278,7 +4278,7 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Obtain the variable argument list and pass it along with the options string
    to the astVSet method to initialise the new SlaMap's attributes. */
       va_start( args, options );
-      astVSet( new, options, args );
+      astVSet( new, options, NULL, args );
       va_end( args );
 
 /* If an error occurred, clean up by deleting the new object. */
@@ -4346,7 +4346,7 @@ AstSlaMap *astSlaMapId_( int flags, const char *options, ... ) {
 /* Obtain the variable argument list and pass it along with the options string
    to the astVSet method to initialise the new SlaMap's attributes. */
       va_start( args, options );
-      astVSet( new, options, args );
+      astVSet( new, options, NULL, args );
       va_end( args );
 
 /* If an error occurred, clean up by deleting the new object. */

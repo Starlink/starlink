@@ -1851,7 +1851,7 @@ AstSwitchMap *astSwitchMap_( void *fsmap_void, void *ismap_void, int nroute,
    options string to the astVSet method to initialise the new SwitchMap's
    attributes. */
          va_start( args, options );
-         astVSet( new, options, args );
+         astVSet( new, options, NULL, args );
          va_end( args );
 
 /* If an error occurred, clean up by deleting the new object. */
@@ -2099,7 +2099,7 @@ f     function is invoked with STATUS set to an error value, or if it
    options string to the astVSet method to initialise the new SwitchMap's
    attributes. */
          va_start( args, options );
-         astVSet( new, options, args );
+         astVSet( new, options, NULL, args );
          va_end( args );
 
 /* If an error occurred, clean up by deleting the new object. */

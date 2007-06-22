@@ -101,8 +101,6 @@
 *     2-MAR-2006 (DSB):
 *        Only use astSscanf if the system on which AST was configured
 *        showed the non-ANSI behaviour reported by Bill Joye.
-*     21-JUN-2007 (DSB):
-*        Added astVsprintf.
 *-
 */
 
@@ -114,7 +112,6 @@
 
 /* C header files. */
 /* --------------- */
-#include <stdarg.h>
 #include <stddef.h>
 #include "error.h"    
 
@@ -133,7 +130,6 @@ int astChrMatch_( const char *, const char * );
 int astChrMatchN_( const char *, const char *, size_t );
 char **astStringArray_( const char *, int, int );
 char *astString_( const char *, int );
-char *astVsprintf_( const char *, int, va_list );
 int astSscanf_( const char *str, const char *format, ...);
 size_t astSizeOf_( const void * );
 size_t astTSizeOf_( const void * );
@@ -184,7 +180,6 @@ void astEndPM_( void );
 #define astSscanf astERROR_INVOKE(sscanf)
 #endif
 #define astChrSplit(str,n) astERROR_INVOKE(astChrSplit_(str,n))
-#define astVsprintf(format,split,args) astERROR_INVOKE(astVsprintf_(format,split,args))
 
 
 /* Functions used for debugging memory leaks, etc */

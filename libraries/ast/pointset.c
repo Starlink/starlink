@@ -2335,7 +2335,7 @@ AstPointSet *astPointSet_( int npoint, int ncoord, const char *options, ... ) {
    options string to the astVSet method to initialise the new
    PointSet's attributes. */
       va_start( args, options );
-      astVSet( new, options, args );
+      astVSet( new, options, NULL, args );
       va_end( args );
 
 /* If an error occurred, clean up by deleting the new object. */
@@ -2407,7 +2407,7 @@ AstPointSet *astPointSetId_( int npoint, int ncoord,
    options string to the astVSet method to initialise the new
    PointSet's attributes. */
       va_start( args, options );
-      astVSet( new, options, args );
+      astVSet( new, options, NULL, args );
       va_end( args );
 
 /* If an error occurred, clean up by deleting the new object. */
