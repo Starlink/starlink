@@ -97,16 +97,9 @@ if (@list) {
   }
 
 } else {
-  # Try  to open /star/admin/status
-  my $status = File::Spec->catfile( $StarConfig{'Star'}, 'admin', 'status');
-
-  # Open it if we can, else forget it
-  open(STATUS, "< $status") or die "Could not open file $status\n";
-
-  my @lines = <STATUS>;
-  close(STATUS);
-  print $lines[$#lines];
-
+  # Global value
+  my $string = starversion_string( 'starlink' );
+  print "".(defined $string ? $string : 'UNKNOWN') ."\n";
 }
 
 
