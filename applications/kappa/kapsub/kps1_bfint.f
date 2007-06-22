@@ -1,8 +1,8 @@
       SUBROUTINE KPS1_BFINT( INDF, IWCS, MAP1, MAP2, MAP3, RFRM, VAR,
      :                       NPOS, POLPAR, PARAM, CURSOR, MARK, MARKER,
      :                       NAXR, NAXIN, LOGF, FDL, FIXCON, AMPRAT, 
-     :                       SLBND, SUBND, FAREA, FITREG, NPAR, FPAR, 
-     :                       STATUS ) 
+     :                       SLBND, SUBND, FAREA, FITREG, REFPOS,
+     :                       NPAR, FPAR, STATUS ) 
 *+
 *  Name:
 *     KPS1_BFINT
@@ -17,7 +17,7 @@
 *     CALL KPS1_BFINT( INDF, IWCS, MAP1, MAP2, MAP3, RFRM, VAR, NPOS, 
 *                      POLPAR, PARAM, CURSOR, MARK, MARKER, NAXR, NAXIN,
 *                      LOGF, FDL, FIXCON, AMPRAT, SLBND, SUBND, FAREA, 
-*                      FITREG, NPAR, FPAR, STATUS )
+*                      FITREG, REFPOS, NPAR, FPAR, STATUS )
 
 *  Description:
 *     This routine finds the Gaussian fits to a batch of image beam
@@ -28,7 +28,10 @@
 *     as fixed positions or specify secondary-beam separations in axis
 *     or polar co-ordinates depending on the selected constraints.  The
 *     routine also estimates the errors on the fitted parameters, and
-*     presents the results to a log file and the screen.
+*     presents the results to a log file and the screen.  Amongst the
+*     results are the rms of the fit, the offset of the primary beam
+*     from a reference point, and the polar co-ordinates of secondary
+*     beams from the primary beam's location.
 *
 *     All the co-ordinates are converted to pixel co-ordinates before
 *     any fits are made and reported.  This enables the required AST
@@ -120,6 +123,10 @@
 *        in pixels.  The box is centred around each beam position.  Each
 *        value must be at least 9.  It is only accessed if FAREA is 
 *        .FALSE.
+*     REFPOS( BF__NDIM ) = DOUBLE PRECISION (Given)
+*        The reference position measured in the current WCS Frame.  The
+*        offset of the primary beam with respect to this points is 
+*        calculated, reported, and written to an output parameter.
 *     NPAR = INTEGER (Given)
 *        The maximum number of fit parameters.
 *     FPAR( NPAR ) = DOUBLE PRECISION (Given and Returned)
@@ -194,6 +201,8 @@
 *     2007 June 8 (MJC):
 *        Moved NPAR and FPAR to the end of the non-STATUS arguments (as 
 *        FPAR is modified.
+*     2007 June 15 (MJC):
+*        Added REFPOS argument, propagated through to other routines.
 *     {enter_further_changes_here}
 
 *-
@@ -248,6 +257,7 @@
       INTEGER SUBND( 2 )
       LOGICAL FAREA
       INTEGER FITREG( 2 )
+      DOUBLE PRECISION REFPOS( BF__NDIM )
       INTEGER NPAR
 
 *  Arguments Given and Returned:
@@ -270,6 +280,8 @@
       INTEGER CMARK              ! Marker to use when marking beam
                                  ! positions
       CHARACTER*( NDF__SZFTP ) DTYPE ! Numeric type for results
+      DOUBLE PRECISION DX        ! Increment along first axis
+      DOUBLE PRECISION DY        ! Increment along second axis
       INTEGER EL                 ! Number of mapped elements
       INTEGER FLBND( BF__NDIM )  ! Fit region lower bounds
       DOUBLE PRECISION FPOS( 2, BF__NDIM ) ! Position in current Frame
@@ -292,6 +304,7 @@
       INTEGER NCP                ! Number of characters in parameter
                                  ! name
       INTEGER NP                 ! Number of cursor position supplied
+      DOUBLE PRECISION OFFVAR    ! Offset variance
       LOGICAL OK                 ! Is this position OK?
       CHARACTER*( PAR__SZNAM + 1 ) PARNAM ! Parameter name for the
                                  ! current initial beam position
@@ -300,6 +313,8 @@
       DOUBLE PRECISION POLAR( 2, BF__MXPOS ) ! Polar co-ordinates
       DOUBLE PRECISION POLSIG( 2, BF__MXPOS ) ! Polar co-ordinate errors
       DOUBLE PRECISION POS( 2, BF__NDIM ) ! Pixel position
+      DOUBLE PRECISION PRIPOS( BF__NDIM )! Primary pos, current Frame
+      DOUBLE PRECISION REFOFF( 2 ) ! Offset & error from reference point
       DOUBLE PRECISION RMS       ! Root mean squared deviation to fit
       DOUBLE PRECISION RP( BF__NCOEF, BF__MXPOS ) ! Fit coeeficients
                                  ! reporting Frame
@@ -503,9 +518,6 @@
 *  parameter is incremented for each beam position to make them
 *  distinct for command-line usage.
          ELSE
-            IF ( .NOT. SINGLE ) CALL MSG_OUTIF( MSG__NORM, ' ', ' ',
-     :                                          STATUS )
-
 *  Create separate parameter names for each beam position.
             IF ( NBPS .EQ. 0 ) THEN
                PARNAM = PARAM
@@ -532,8 +544,6 @@
                CALL KPG1_GTPOS( PARNAM, RFRM, .FALSE., INCO, BC, 
      :                          STATUS )
             END IF
-            IF ( .NOT. SINGLE ) CALL MSG_OUTIF( MSG__NORM, ' ', ' ',
-     :                                          STATUS )
 
 *  If an abort value was supplied, do not annul the error but indicate that 
 *  the loop should be left.
@@ -762,7 +772,7 @@
                IF ( INCEN( I, 1 ) .NE. AST__BAD .AND. 
      :              INCEN( I, 2 ) .NE. AST__BAD ) THEN
                   CALL PGPT( 1, REAL( INCEN( I, 1 ) ),
-     :                      REAL( INCEN( I, 2 ) ), CMARK )
+     :                       REAL( INCEN( I, 2 ) ), CMARK )
                END IF
             END DO
          END IF
@@ -772,14 +782,34 @@
          CALL KPS1_BFCRF( MAP2, RFRM, NAXR, NPOS, BF__NCOEF, FPAR, 
      :                    SIGMA, RP, RSIGMA, POLAR, POLSIG, STATUS )
 
+*  Find the offset of the primary beam with respect to the reference
+*  point, now both locations are konwn in the reporting Frame.
+         DO J = 1, BF__NDIM
+            PRIPOS( J ) = RP( J, 1 )
+         END DO
+         REFOFF( 1 ) = AST_DISTANCE( RFRM, REFPOS, PRIPOS, STATUS )
+
+*  Assume that the reference position is exactly known, and the only
+*  variance comes from the spatial errors of the fitted primary beam.
+         DX = ( REFPOS( 1 ) - PRIPOS( 1 ) ) / REFOFF( 1 )
+         DY = ( REFPOS( 2 ) - PRIPOS( 2 ) ) / REFOFF( 1 )
+         OFFVAR = DX * DX * RSIGMA( 1, 1 ) * RSIGMA( 1, 1 ) +
+     :           DY * DY * RSIGMA( 2, 1 ) * RSIGMA( 2, 1 )
+
+         IF ( OFFVAR .GT. 0.0D0 ) THEN
+            REFOFF( 2 ) = SQRT( OFFVAR )
+         ELSE
+            REFOFF( 2 ) = VAL__BADD
+         END IF            
+
 *  Log the results and residuals if required.
          CALL KPS1_BFLOG( LOGF, FDL, .FALSE., MAP2, RFRM, NAXR,
-     :                    NPOS, BF__NCOEF, RP, RSIGMA, POLAR, 
+     :                    NPOS, BF__NCOEF, RP, RSIGMA, REFOFF, POLAR, 
      :                    POLSIG, RMS, DTYPE, STATUS )
 
 *  Write primary beam's fit to output parameters.
          CALL KPS1_BFOP( RFRM, MAP2, NAXR, NPAR, RP, RSIGMA,
-     :                   NPOS, POLAR, POLSIG, RMS, STATUS )
+     :                   NPOS, REFOFF, POLAR, POLSIG, RMS, STATUS )
 
       ELSE
          CALL MSG_OUTIF( MSG__NORM, 'KPS1_BFINT_MSG5',
