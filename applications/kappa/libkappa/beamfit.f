@@ -626,6 +626,7 @@
       CHARACTER*4 SEPAR          ! SEPn parameter name
       INTEGER SLBND( BF__NDIM )  ! Significant lower bounds of the image
       CHARACTER*3 SPARAM         ! Parameter root for fixed separations
+      CHARACTER*7 SKYREF         ! Value of Frame attribute SkyRefIs
       INTEGER STATE              ! State of POSx parameter
       INTEGER SUBND( BF__NDIM )  ! Significant upper bounds of the image
       CHARACTER*80 TITLE         ! Title for output positions list
@@ -732,7 +733,7 @@
 
 *  Set the PGPLOT viewport and AST Plot for this DATA picture.  The 
 *  PGPLOT viewport is set equal to the selected picture, with world 
-*  co-ordinates giving millimetres form the bottom-left corner of the 
+*  co-ordinates giving millimetres from the bottom-left corner of the 
 *  view surface.  The returned Plot may include a Frame with Domain 
 *  AGI_DATA representing AGI DATA co-ordinates (defined by a TRANSFORM 
 *  structure stored with the picture in the database).
@@ -1003,13 +1004,14 @@
 *  at the origin.
       GOTREF = .FALSE.
       IF ( ISSKY ) THEN
-         IF ( AST_GETC( CFRM, 'SkyRefIs', STATUS ) .EQ. 'Origin' ) THEN
+         SKYREF = AST_GETC( CFRM, 'SkyRefIs', STATUS )      
+         IF ( SKYREF .EQ. 'Origin' ) THEN
             REFPOS( 1 ) = 0.0D0
             REFPOS( 2 ) = 0.0D0
 
 *  Extract the co-ordinates of the reference position in the current
 *  Frame.  These are in radians.
-         ELSE
+         ELSE IF ( SKYREF .NE. 'Ignored' ) THEN
             DO I = 1, BF__NDIM
                ATT = 'SkyRef('
                NC = 7
@@ -1017,9 +1019,9 @@
                CALL CHR_APPND( ')', ATT, NC )
                REFPOS( I ) = AST_GETD( CFRM, ATT( : NC ), STATUS )
             END DO
+            GOTREF = REFPOS( 1 ) .NE. VAL__BADD .AND. 
+     :               REFPOS( 2 ) .NE. VAL__BADD
          END IF
-         GOTREF = REFPOS( 1 ) .NE. VAL__BADD .AND. 
-     :            REFPOS( 2 ) .NE. VAL__BADD
       END IF
 
       IF ( .NOT. GOTREF ) THEN
@@ -1205,9 +1207,9 @@
 
 *  Fit the beams obtained interactively, and determine errors. 
 *  Display the results.
-         CALL KPS1_BFINT( NDFI, IWCS, MAP3, MAP1, MAP2, CFRM, VAR, NPOS,
-     :                    POLAR, 'POS', CURSOR, MARK, IMARK, NAXC, 
-     :                    NAXIN, LOGF, FDL, FIXCON, AMPRAT, SLBND,
+         CALL KPS1_BFINT( NDFI, IWCS, IPLOT, MAP3, MAP1, MAP2, CFRM, 
+     :                    VAR, NPOS, POLAR, 'POS', CURSOR, MARK, IMARK,
+     :                    NAXC, NAXIN, LOGF, FDL, FIXCON, AMPRAT, SLBND,
      :                    SUBND, FAREA, FITREG, REFPOS, MXCOEF, FPAR,
      :                    STATUS )
 
