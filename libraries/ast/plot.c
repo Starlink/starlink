@@ -631,6 +631,9 @@ f     - Title: The Plot title drawn using AST_GRID
 *        accept this new parameter.
 *     21-JUN-2007 (DSB)
 *        - Change GrfContext to be an Object rather than an integer.
+*     22-JUN-2007 (DSB)
+*        - Do not dump the GrfContext Object since it may cause an
+*        infinite dumping loop.
 *class--
 */
 
@@ -26824,12 +26827,6 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    ival = set ? GetForceExterior( this ) : astGetForceExterior( this );
    astWriteInt( channel, "FrcExt", set, 1, ival, "Force exterior labelling?" );
 
-/* GrfContext. */
-/* ----------- */
-   if( this->grfcontext ) {
-      astWriteObject( channel, "GrfCon", 1, 0, this->grfcontext, "Graphics context" );
-   }
-
 /* Invisible. */
 /* ---------- */
    set = TestInvisible( this );
@@ -28022,10 +28019,6 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
       new->forceexterior = astReadInt( channel, "frcext", -1 );
       if ( TestForceExterior( new ) ) SetForceExterior( new, new->forceexterior );
 
-/* GrfContext */
-/* ---------- */
-      new->grfcontext = astReadObject( channel, "grfcon", NULL );
-
 /* Invisible. */
 /* ---------- */
       new->invisible = astReadInt( channel, "invsbl", -1 );
@@ -28334,6 +28327,9 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 
 /* Now do instance variables which are not attributes. */
 /* =================================================== */
+
+/* We have no graphics context. */
+      new->grfcontext =NULL;
 
 /* Initialise the protected Ink attribute so that visible ink is used. */
       new->ink = -1;
