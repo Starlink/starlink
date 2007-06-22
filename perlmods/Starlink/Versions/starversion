@@ -5,6 +5,8 @@
 # History:
 #   2000 May 30 (TIMJ)
 #     First version
+#   2007 Jun 21 (TIMJ)
+#     Update for subversion (and make world)
 
 use strict;
 
@@ -17,7 +19,7 @@ use Pod::Usage;
 # Globals
 use vars qw/ $VERSION /;
 
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 # Parse options
 my %options = ();
@@ -39,15 +41,12 @@ my @list;
 
 # if we have set -all then we need to determine the list ourselves
 if ($options{'all'}) {
-  my $dir = File::Spec->catdir($StarConfig{'Star'}, 'dates');
-  opendir(DATES, $dir) or die "Failed to open directory $dir with -all: $!\n";
+  my $dir = File::Spec->catdir($StarConfig{'Star'}, 'manifests');
+  opendir(my $MANIFESTS, $dir)
+    or die "Failed to open directory $dir with -all: $!\n";
   # Loop over all the files, storing the valid ones
-  foreach (sort readdir(DATES)) {
-    if (/_datestamp$/) {
-      s/_datestamp$//;
-      push(@list, $_);
-    }
-  }
+  @list = grep /\w/, readdir($MANIFESTS);
+  closedir($MANIFESTS) or die "Error closing directory $dir: $!\n";
 
 } else {
   @list = @ARGV;
@@ -183,11 +182,9 @@ package and -1 if the supplied version number is greater than the
 installed package.
 
 
-If no application is specified, the program prints the current status
-of the Starlink installation as stored in the C</star/admin/status>.
-This contains the last time the system was updated.
-
-
+If no application is specified, the program prints the current
+repository version number of the installed tree which would have been
+installed as part of 'make world'.
 
 =head1 ARGUMENTS
 
@@ -214,7 +211,7 @@ B<-major> or B<-minor>.
 
 =item B<-all>
 
-List version numbers for all packages listed in C<$STARLINK/dates>.
+List version numbers for all packages listed in C<$STARLINK/manifests>.
 This overrides any list of packages supplied on the command-line.
 
 =item B<-compare>
@@ -253,7 +250,8 @@ Version number of C<starversion>.
 =head1 AUTHOR
 
 Tim Jenness. Copyright (C) 2000 Particle Physics and Astronomy
-Research Council. All Rights Reserved.
+Research Council. Copyright (C) 2007 Science and Technology Facilities
+Council. All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software

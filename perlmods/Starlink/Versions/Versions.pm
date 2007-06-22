@@ -18,6 +18,9 @@ Starlink::Versions - determine version numbers of Starlink applications
    ...
  }
 
+ # Print global version number
+ print starversion( 'starlink' );
+
 =head1 DESCRIPTION
 
 When writing Perl programs that make use of Starlink applications
@@ -47,7 +50,7 @@ use base qw/ Exporter /;
 use vars qw/ $VERSION @EXPORT_OK $DEBUG %EXPORT_TAGS/;
 
 use Symbol;             # For lexical file handles
-use Starlink::Config;   # For location of root starlink dir
+use Starlink::Config qw/ :override /; # For location of root starlink dir
 use File::Spec;         # For catfile()
 
 @EXPORT_OK = qw/ 
@@ -61,7 +64,7 @@ use File::Spec;         # For catfile()
 		'Funcs' => [ @EXPORT_OK ],
 		);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 $DEBUG = 0;
 
 # This is the cache used to store the version numbers 
@@ -96,11 +99,20 @@ installed).
 
 If the previous method does not work look in directory
 
+  $PROG_DIR/../../manifests
+
+and parse the manifest files for a version number.
+
+=item 3
+
+If the previous method does not work look in directory
+
   $PROG_DIR/../../dates/
 
 for a file call C<prog_datestamp>. These files are written during
 a standard Starlink install and contain package and version information.
-The file is searched for a version string.
+The file is searched for a version string. This will only work for old
+Starlink installations.
 
 =item 3
 
@@ -108,6 +120,8 @@ If no environment variable C<PROG_DIR> can be found (or the directory
 does not exist), query C<Starlink::Config> for the location of the
 standard Starlink directory and look in file
 
+  $STARLINK/manifests/prog
+or
   $STARLINK/dates/prog_datestamp
 
 for a version string. The Starlink directory will not be searched
@@ -118,7 +132,7 @@ tree).
 
 =back
 
-If these methds fail undefined values are returned. Note that
+If these methods fail undefined values are returned. Note that
 this module will not look explicitly in a Starlink install tree
 unless it can not work out a directory tree to search as an alternative.
 
@@ -141,15 +155,23 @@ Figaro uses C<FIG_DIR> rather than C<FIGARO_DIR>.
 
 =item B<StarX>
 
-The starx date-stamp file is called C<starX_datestamp>.
+The starx date-stamp file is called C<starX_datestamp>. This is not
+an issue for manifest-based installations.
 
 =item B<hdstrace>
 
 Hdstrace has an application directory that is not in the
 standard location of C</star/bin/app/>. Rather it uses
 C</star/bin>. In cases where the application dir ends in
-C<bin> the location of the datestamp directory is assumed
-to be C<../dates> rather than C<../../dates>.
+C<bin> the location of the manifests or datestamp directory is assumed
+to be C<../manifests> rather than C<../../manifests>.
+
+=item B<starlink>
+
+This is a special case referring to the global installation version
+number found in $STARLINK/manifests/starlink.version. For the global
+version it is not possible to obtain major, minor and patchlevel components,
+only a single string.
 
 =back
 
@@ -834,6 +856,30 @@ sub _get_version_from_appdir ($) {
   return (@version);
 }
 
+=item B<_get_global_version>
+
+Used to obtain the global version number from the manifests directory.
+
+  $version = _get_global_version();
+
+Return undef if nothing can be found.
+
+=cut
+
+sub _get_global_version {
+  my $dir = _get_standard_manifest_dir;
+  # Get the filename
+  print "Using manifest dir = $dir\n" if $DEBUG;
+  my $file = _get_manifest_file($dir, 'starlink.version');
+  print "Opening manifest file $file\n" if $DEBUG;
+  my $sym = gensym;
+  open( $sym, "< $file" ) || return;
+  my $version = <$sym>;
+  chomp($version);
+  close($sym);
+  return $version;
+}
+
 =item B<_get_version>
 
 Retrieve the version number using a variety of techniques.
@@ -863,27 +909,42 @@ sub _get_version ($) {
   # Check to see if the hash is used and return immediately if it is
   return %{ $CACHE{ $app } } if exists $CACHE{ $app };
 
+  # Special case 'starlink'
+  if ($app eq 'starlink') {
+    my $global = _get_global_version();
+    if (defined $global) {
+      $CACHE{$app} = {
+		      MAJOR => undef,
+		      MINOR => undef,
+		      PATCHLEVEL => undef,
+		      VERSION => undef,
+		      STRING => $global,
+		     };
+    }
+    return ();
+  }
+
   my @version;
   # see if we have a PROG_DIR
   if (defined _get_app_dir( $app ) ) {
     @version = _get_version_from_appdir( $app );
 
-    # Read from datestamp file if could not get from appdir
-    @version = _get_version_from_datestamp( 1, $app )
-      unless defined $version[0];
-
     # Now try a manifest file
     @version = _get_version_from_manifest( 1, $app )
       unless defined $version[0];
 
+    # Read from datestamp file if could not get from appdir
+    @version = _get_version_from_datestamp( 1, $app )
+      unless defined $version[0];
 
   } else {
-    # Okay, no PROG_DIR defined so look in /star (or wherever)
-    @version = _get_version_from_datestamp( 0, $app );
-
     # now try manifest
     @version = _get_version_from_manifest( 0, $app ) 
       unless defined $version[0];
+
+    # Okay, no PROG_DIR defined so look in /star (or wherever)
+    @version = _get_version_from_datestamp( 0, $app );
+
   }
 
   # If we have something we need to cache, cache it
