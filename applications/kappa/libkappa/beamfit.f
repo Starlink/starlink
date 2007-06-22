@@ -56,11 +56,13 @@
 *     demanded.
 *
 *     BEAMFIT both reports and stores in parameters its results. 
-*     These are fit coefficients and their errors, and the offsets 
-*     and position angles of the beam features with respect to the 
-*     primary beam.  Also a listing of the fit results may be written
-*     to a log file geared more towards human readers, including 
-*     details of the input parameters (see parameter LOGFILE).  
+*     These are fit coefficients and their errors, the offsets and
+*     position angles of the secondary beam features with respect to 
+*     the primary beam, and the offset of the primary beam from a
+*     reference position.  Also a listing of the fit results may be 
+*     written to a log file geared more towards human readers, 
+*     including details of the input parameters (see parameter
+*     LOGFILE).  
 *
 *  Usage:
 *     beamfit ndf [mode] { incat=?
@@ -183,6 +185,9 @@
 *
 *        - "Fit" -- The corresponding fit position is marked.
 *
+*        - "Ellipse" -- As "Fit" but it also plots an ellipse at the
+*        FWHM radii and orientation.
+*
 *        - "None" -- No positions are marked.
 *
 *        [current value]
@@ -221,11 +226,11 @@
 *     OFFSET( ) = LITERAL (Write)
 *        The formatted offset and its error of each secondary beam 
 *        feature with respect to the primary beam.  They are measured in
-*        the current Frame of the NDF along a latitude axis if that is a
-*        SkyFrame, or the first axis otherwise.  The number of values
-*        stored is twice the number of beams.  The array alternates an
-*        offset, then its corresponding error, appearing in beam order 
-*        starting with the first secondary beam.
+*        the current Frame of the NDF along a latitude axis if that
+*        Frame is in the SKY Domain, or the first axis otherwise.  The 
+*        number of values stored is twice the number of beams.  The
+*        array alternates an offset, then its corresponding error,
+*        appearing in beam order starting with the first secondary beam.
 *     ORIENT( 2 ) = _DOUBLE (Write)
 *        The primary beam position's orientation and its error, measured
 *        in degrees.  If the current WCS frame is a SKY Frame, the angle
@@ -233,16 +238,16 @@
 *        angle is from the X-axis through Y.
 *     PA() = _REAL (Write)
 *        The position angle and its errors of each secondary beam
-*        feature ith respect to the primary beam.  They are measured in
+*        feature with respect to the primary beam.  They are measured in
 *        the current Frame of the NDF from North through East if that is
-*        a SkyFrame, or anticlockwise from the Y axis otherwise.  The
+*        a SKY Domain, or anticlockwise from the Y axis otherwise.  The
 *        number of values stored is twice the number of beams.  The
 *        array alternates a position angle, then its corresponding 
 *        error, appearing in beam order starting with the first
 *        secondary beam.
 *     PLOTSTYLE = LITERAL (Read)
 *        A group of attribute settings describing the style to use when
-*        drawing the graphics markers specified by parameter MARK.  
+*        drawing the graphics markers specified by parameter MARK.
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text 
@@ -269,8 +274,8 @@
 *        interpreted in polar co-ordinates (offset, position angle) 
 *        about the primary beam.  The radial co-ordinate is a distance 
 *        measured in units of the latitude axis if the current WCS Frame
-*        is a SkyFrame, or the first axis for other Frames.  For a 
-*        SkyFrame current WCS Frame, position angle follows the standard
+*        is a a SKY Domain, or the first axis for other Frames.  For a 
+*        SKY current WCS Frame, position angle follows the standard
 *        convention of North through East.  For other Frames the angle 
 *        is measured from the second axis anticlockwise, e.g. for a 
 *        PIXEL Frame it would be from Y through negative X, not the 
@@ -288,11 +293,11 @@
 *        fixed location.  It is specified in the current co-ordinate 
 *        Frame of the NDF (supplying a colon ":" will display details of
 *        the current co-ordinate Frame).  A position should be supplied 
-*        either as a list of formatted WCS axis values separated by 
-*        spaces or commas.
+*        as a list of formatted WCS axis values separated by spaces or
+*        commas.
 
 *        If the initial co-ordinates are supplied on the command line 
-*        without BEAMS the number of contigious POS, POS2,... parameters
+*        without BEAMS the number of contiguous POS, POS2,... parameters
 *        specifies the number of beams to be fit.
 *     POS2-POS5 = LITERAL (Read)
 *        When MODE = "Interface" these parameters specify the 
@@ -326,6 +331,27 @@
 *        If TRUE then the fit parameters are not displayed on the 
 *        screen.  Output parameters and files are still created.  
 *        [FALSE]
+*     REFOFF( 2 ) = LITERAL (Write)
+*        The formatted offset followed by its error of the primary beam 
+*        with respect to the reference position (see parameter REFPOS).
+*        These are measured in the current Frame of the NDF along a 
+*        latitude axis if that Frame is in the SKY Domain, or the first
+*        axis otherwise.  The error is derived entirely from the
+*        uncertainities in the fitted position of the primary beam,
+*        i.e. the reference position has no error attasched to it.  By
+*        definition the error is zero when FIXPOS is TRUE.
+*     REFPOS = LITERAL (Read)
+*        The reference position.  The offset of the primary beam with
+*        respect to this point is reported and stored in parameter
+*        REFOFF.  It is only accessed if the current WCS Frame in the
+*        NDF is not a SKY Domain.
+
+*        The co-ordinates are specified in the current WCS Frame of the
+*        NDF (supplying a colon ":" will display details of the current
+*        co-ordinate Frame).  A position should be supplied either as a
+*        list of formatted WCS axis values separated by spaces or 
+*        commas.  A null value (!) requests that the centre of the
+*        supplied map is deemed to be the reference position.
 *     RESID = NDF (Write)
 *        The map of the residuals of the fit.  It inherits the
 *        properties of the input NDF, except that its data type is 
@@ -483,6 +509,9 @@
 *        Add RESID parameter and calculation of the residual-image NDF.
 *        Rework derivation of the number of positions from the command
 *        line.  Remove unused variables.
+*     2007 June 15 (MJC):
+*        Added parameters REFPOS and REFOUT, and Ellipse option to
+*        MARK.
 *     {enter_further_changes_here}
 
 *-
@@ -514,10 +543,13 @@
 
 *  Local Variables:
       REAL AMPRAT( BF__MXPOS - 1 ) ! Amplitude ratios
+      
       DOUBLE PRECISION ATTR( 20 )! Saved graphics attribute values
-      DOUBLE PRECISION BC( NDF__MXDIM )! Dummy base co-ordinates
+      CHARACTER*9 ATT            ! AST attribute name
+      DOUBLE PRECISION BC( BF__NDIM )! Dummy base co-ordinates
       CHARACTER*132  BUFOUT      ! Buffer for writing the logfile
       LOGICAL CAT                ! Catalogue mode was selected
+      DOUBLE PRECISION CENTRE( BF__NDIM ) ! Map centre pixel co-ords
       INTEGER CFRM               ! Pointer to Current Frame of the NDF
       LOGICAL CURSOR             ! Cursor mode was selected
       LOGICAL DESC               ! Describe the current Frame?
@@ -533,10 +565,12 @@
       DOUBLE PRECISION FWHM( BF__NDIM ) ! Fixed FWHM
       LOGICAL GOTLOC             ! Locator to the NDF obtained?
       LOGICAL GOTNAM             ! Reference name of the NDF obtained?
+      LOGICAL GOTREF             ! Reference position obtained?
       LOGICAL HASVAR             ! Errors to be calculated
       INTEGER I                  ! Loop counter
       INTEGER IMARK              ! PGPLOT marker type
       DOUBLE PRECISION INPOL( 2 ) ! Pole co-ordinates
+      LOGICAL ISSKY              ! Current Frame in SKY Domain?
       LOGICAL INTERF             ! Interface mode selected?
       INTEGER IPD                ! Pointer to input data array
       INTEGER IPIC               ! AGI identifier for last data picture
@@ -586,6 +620,7 @@
       LOGICAL POSC               ! Centre fixed at supplied position?
       LOGICAL QUIET              ! Suppress screen output?
       CHARACTER*256 REFNAM       ! Reference name
+      DOUBLE PRECISION REFPOS( BF__NDIM ) ! Reference position
       DOUBLE PRECISION S2FWHM    ! Standard deviation to FWHM
       INTEGER SDIM( BF__NDIM )   ! Significant dimensions of the NDF
       CHARACTER*4 SEPAR          ! SEPn parameter name
@@ -704,7 +739,7 @@
          CALL KPG1_GDGET( IPIC, AST__NULL, .TRUE., IPLOT, STATUS )
 
 *  See what markers are to be drawn.
-         CALL PAR_CHOIC( 'MARK', 'Fit', 'Fit,Initial,None',
+         CALL PAR_CHOIC( 'MARK', 'Fit', 'Fit,Ellipse,Initial,None',
      :                   .FALSE., MARK, STATUS )
 
 *  If so, get the marker type, and set the plotting style.
@@ -817,6 +852,9 @@
       MAP1 = AST_SIMPLIFY( AST_GETMAPPING( IWCS, IPIX, AST__CURRENT, 
      :                                     STATUS ), STATUS )
 
+*  Is it a sky domain?
+      ISSKY = AST_ISASKYFRAME( CFRM, STATUS )
+
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Obtain the AST Frame of input beam co-ordinates.
@@ -910,13 +948,14 @@
          END IF
       END IF
 
+
+*  Additional Parameters
+*  =====================
+
 *  Obtain the number of beam positions if it's not been determined
 *  already.
       IF ( NPOS .EQ. -1 ) CALL PAR_GDR0I( 'BEAMS', 1, 1, BF__MXPOS, 
      :                                    .FALSE., NPOS, STATUS )
-
-*  Additional Parameters
-*  =====================
 
 *  Initialise in case there may be more.
       DO I = 1, MXCOEF
@@ -926,7 +965,7 @@
 *  We need to specify which axis to use for the widths and separations.
 *  By convention this is the latitude axis of a SkyFrame or the first 
 *  axis otherwise.
-      IF ( AST_ISASKYFRAME( CFRM, STATUS ) ) THEN
+      IF ( ISSKY ) THEN
          WAX = AST_GETI( CFRM, 'LATAXIS', STATUS )
       ELSE
          WAX = 1
@@ -955,6 +994,50 @@
       DO  I = 1, BF__NDIM
          FITREG( I ) = MIN( DIMS( I ), FITREG( I ) )
       END DO
+
+*  Reference position
+*  ------------------
+
+*  SkyRefIs origin means an offset plot about the reference position,
+*  so therefore in this co-ordinate system the reference position is
+*  at the origin.
+      GOTREF = .FALSE.
+      IF ( ISSKY ) THEN
+         IF ( AST_GETC( CFRM, 'SkyRefIs', STATUS ) .EQ. 'Origin' ) THEN
+            REFPOS( 1 ) = 0.0D0
+            REFPOS( 2 ) = 0.0D0
+
+*  Extract the co-ordinates of the reference position in the current
+*  Frame.  These are in radians.
+         ELSE
+            DO I = 1, BF__NDIM
+               ATT = 'SkyRef('
+               NC = 7
+               CALL CHR_PUTI( I, ATT, NC )
+               CALL CHR_APPND( ')', ATT, NC )
+               REFPOS( I ) = AST_GETD( CFRM, ATT( : NC ), STATUS )
+            END DO
+         END IF
+         GOTREF = REFPOS( 1 ) .NE. VAL__BADD .AND. 
+     :            REFPOS( 2 ) .NE. VAL__BADD
+      END IF
+
+      IF ( .NOT. GOTREF ) THEN
+
+*  Find the image centre in PIXEL co-ordinates and convert the location 
+*  to the current Frame.
+         DO I = 1, BF__NDIM
+            CENTRE( I ) = 0.5D0 * ( DBLE( SLBND( I ) + SUBND( I ) ) ) -
+     :                    0.5D0 
+         END DO
+
+         CALL AST_TRANN( MAP1, 1, BF__NDIM, 1, CENTRE, .TRUE., BF__NDIM,
+     :                   1, REFPOS, STATUS )
+
+*  Obtain the reference position.  Use the map centre as the dynamic 
+*  default when a null is supplied.
+         CALL KPG1_GTPOS( 'REFPOS', CFRM, .TRUE., REFPOS, BC, STATUS )
+      END IF
 
 *  Is the amplitude fixed?
 *  -----------------------
@@ -1066,7 +1149,6 @@
 *  about the primary beam's centre?  A null defaults to TRUE.
          CALL PAR_GTD0L( 'POLAR', .TRUE., .TRUE., POLAR, STATUS )
 
-      print *, 'npos=', NPOS, '  polar=', POLAR
       END IF
 
 *  Record input data in the log file.
@@ -1114,7 +1196,7 @@
          CALL KPS1_BFFIL( NDFI, MAP3, MAP1, MAP2, CFRM, VAR, NPOS, 
      :                    NAXC, NAXIN, %VAL( CNF_PVAL( IPIN ) ), CAT, 
      :                    %VAL( CNF_PVAL( IPID ) ), LOGF, FDL, FIXCON,
-     :                    AMPRAT, SLBND, SUBND, FAREA, FITREG, 
+     :                    AMPRAT, SLBND, SUBND, FAREA, FITREG, REFPOS,
      :                    MXCOEF, FPAR, STATUS )
 
 *  In interactive modes, find each beam individually, waiting for the
@@ -1126,7 +1208,8 @@
          CALL KPS1_BFINT( NDFI, IWCS, MAP3, MAP1, MAP2, CFRM, VAR, NPOS,
      :                    POLAR, 'POS', CURSOR, MARK, IMARK, NAXC, 
      :                    NAXIN, LOGF, FDL, FIXCON, AMPRAT, SLBND,
-     :                    SUBND, FAREA, FITREG, MXCOEF, FPAR, STATUS )
+     :                    SUBND, FAREA, FITREG, REFPOS, MXCOEF, FPAR,
+     :                    STATUS )
 
       END IF
 
