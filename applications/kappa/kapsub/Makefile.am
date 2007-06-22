@@ -15,7 +15,7 @@ kps1_bfftg.f kps1_bfhd.f  kps1_bfint.f kps1_bflog.f kps1_bfop.f \
 kps1_ccmpp.f kps1_ccmqn.f kps1_cenab.f kps1_cenad.f \
 kps1_cenai.f kps1_cenar.f kps1_cenaub.f kps1_cenauw.f kps1_cenaw.f \
 kps1_cenbt.f kps1_cenhd.f kps1_censg.f kps1_censh.f kps1_cff2d.f \
-kps1_cff2r.f kps1_chsha.f kps1_clnsr.f kps1_clpa0.f kps1_clpal.f \
+kps1_cff2r.f kps1_chsha.f kps1_clpa0.f kps1_clpal.f \
 kps1_clpa2.f kps1_cntdr.f kps1_cntgd.f kps1_cntky.f \
 kps1_cntpn.f kps1_cntsc.f kps1_cntst.f kps1_cnvfp.f kps1_cnvlv.f \
 kps1_clptm.f kps1_clpky.f kps1_clpcp.f kps1_cnvrp.f kps1_cremg.f kps1_crets.f \
@@ -105,7 +105,8 @@ KPG_DR_GEN = kps1_med.gdr kps1_mmv.gdr kps1_clps.gdr kps1_subi.gdr \
 KPG_BDIRW_GEN = kps1_dscl.gbdirw
 
 KPG_GN_GEN = kps1_inle.gn kps1_inli.gn kps1_inls.gn kps1_lft.gn \
-             kps1_lftq.gn kps1_lfts.gn kps1_mfrm.gn kps1_slae.gn
+             kps1_lftq.gn kps1_lfts.gn kps1_mfrm.gn kps1_slae.gn \
+             kps1_clns.gn
 
 KPG_R_GEN = kps1_pgft.gr
 
