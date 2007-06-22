@@ -107,6 +107,10 @@
 *     2007 May 30 (MJC):
 *        Add POLAR and POLSIG arguments and calculate polar co-ordinates
 *        of secondary-beam features with error propagation.
+*     2007 June 20 (MJC):
+*        Correct the calculation of the orientation: allowing for flipped
+*        longitude SKY axis and adjust non-SKY Frame angles to Y via
+*        negative X.
 *     {enter_further_changes_here}
 
 *-
@@ -318,10 +322,10 @@
 
 *  Orientation
 *  ===========
-
 *  Transform the fitted positions and a unit vector along the
 *  orientation from the centre measured in the PIXEL Frame of the 
-*  NDF to the reporting Frame.
+*  NDF to the reporting Frame.  Want to the orientation to go with
+*  negative X (positive SkyFrame) 
          PIXPOS( 1, 1 ) = PP( 1, IB )
          PIXPOS( 1, 2 ) = PP( 2, IB )
          PIXPOS( 2, 1 ) = PP( 1, IB ) + SIN( PP( 5, IB ) )
@@ -336,21 +340,27 @@
 *  Reverse these if the axis order is swapped in the SkyFrame.
          IF ( ISSKY ) THEN
 
-*   Obtain the bearing of the vector between the centre and
-*   the unit displacement.
+*  Obtain the bearing of the vector between the centre and the unit
+*  displacement.
             THETA = SLA_DBEAR( POS( 1, LON ), POS( 1, LAT ),
      :                         POS( 2, LON ), POS( 2, LAT ) )
+
+*   When we have a longitude along the first axis, the positive
+*   expected by SLA_DBEAR is the opposite of what we supplied,
+*   so the orientation is corrected for this mirror flip..
+            IF ( LON .EQ. 1 ) THETA = PI - THETA
 
 *  If it's not a SkyFrame assume Euclidean geometry.  Also by
 *  definition orientation is 0 degrees for a circular beam.  The
 *  transformation can lead to small perturbation of the original
-*  zero degrees.
+*  zero degrees.  Switch to Y through negative X (from the normal
+*  X through Y) as per the requirements.
          ELSE
             DX = POS( 2, 1 ) - POS( 1, 1 )
             DY = POS( 2, 2 ) - POS( 1, 2 )
             IF ( DX .NE. 0.0D0 .OR. DY .NE. 0.0D0 .AND. 
      :          ABS( PP( 3, IB ) - PP( 4, IB ) ) .GT. VAL__EPSD ) THEN
-               THETA = ATAN2( DY, DX )
+               THETA = 0.5D0 * PI - ATAN2( DY, DX )
             ELSE
                THETA = 0.0D0
             END IF
