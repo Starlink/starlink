@@ -1,18 +1,20 @@
-	FUNCTION NY(LU)
-	BYTE INY
+	LOGICAL FUNCTION NY(LU)
+        IMPLICIT NONE
+        INTEGER LU
+	LOGICAL INY
+        CHARACTER*(1) ANSWER
 C
-10	READ (LU,13) INY
+10	READ (LU,13) ANSWER
 13	FORMAT (A1)
 C
-	IF (INY.EQ.'N'.OR.INY.EQ.'Y') GOTO 900
-C
-        IF ( INY .EQ. 'n' ) THEN
-          INY = 'N'
+        NY = .FALSE.
+        IF ( ANSWER .EQ. 'n' .OR. ANSWER .EQ. 'N') THEN
+          NY = .FALSE.
           GOTO 900
         ENDIF
  
-        IF ( INY .EQ. 'y' ) THEN
-          INY = 'Y'
+        IF ( ANSWER .EQ. 'y' .OR. ANSWER .EQ. 'Y') THEN
+          NY = .TRUE.
           GOTO 900
         ENDIF
  
@@ -20,6 +22,6 @@ C
 23	FORMAT (' A simple "N" or "Y" will suffice . . .')
 	GOTO 10
 C
-900	NY = INY
-	RETURN
+900	CONTINUE
+        RETURN
 	END

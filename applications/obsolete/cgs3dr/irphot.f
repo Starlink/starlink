@@ -42,7 +42,7 @@
 
       CHARACTER IN_FILE*60, OUT_FILE*60
       CHARACTER OBJ*10, UT*8
-      BYTE INY, NY, MORE
+      LOGICAL INY, NY, MORE
       INTEGER I, LU, N, LAST_RUN, RUN, NSTDS,NUM_NS,NUM_QS
       REAL TEMP,TEMP1,TEMP2,TEMP3,TEMP4,TEMP5
       REAL N_EXT, Q_EXT, NSUM, NSUM2, QSUM, QSUM2,SIGMAN,SIGMAQ
@@ -222,7 +222,7 @@
 70    WRITE ( LU, 73 )
 73    FORMAT ( ' Flag any (more) runs as STANDARDS? ', $ )
       MORE = NY(5)
-      IF ( MORE .EQ. 'N') GOTO 110
+      IF ( .NOT. MORE ) GOTO 110
 80    WRITE ( LU, 83 )
 83    FORMAT ( ' Enter run number: ', $ )
       READ ( 5, * ) RUN
@@ -249,7 +249,7 @@
 110   WRITE ( LU, 113 )
 113   FORMAT ( ' Unflag any standards? ', $ )
       MORE = NY(5)
-      IF ( MORE .EQ. 'Y' ) THEN
+      IF ( MORE  ) THEN
 120     WRITE ( LU, 123 )
 123     FORMAT ( ' Enter run number: ', $ )
         READ ( 5, * ) RUN
@@ -276,7 +276,7 @@
 
       WRITE ( LU, 127 )
 127   FORMAT ( ' Derive/fix extinction value(s)? ', $ )
-      IF (NY(5) .EQ. 'N' ) GOTO 180
+      IF (.NOT. NY(5)  ) GOTO 180
 
 C     Decide on extinctions
 
@@ -400,7 +400,7 @@ C     Decide on extinctions
  
       WRITE ( LU, 323 )
 323   FORMAT ( ' Output the results in Janskys? ', $ )
-      IF ( NY(5) .EQ. 'N' ) GOTO 400
+      IF ( .NOT. NY(5)  ) GOTO 400
 
 *     Output in Jy, given alpha Lyr calibration
 
@@ -445,7 +445,7 @@ C     Decide on extinctions
       WRITE ( LU, 433 )
 433   FORMAT ( ' Continue? ', $ )
       INY = NY(5)
-      IF ( INY .EQ. 'Y' ) GOTO 10
+      IF ( INY  ) GOTO 10
       GOTO 990
  
 C
