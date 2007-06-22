@@ -634,6 +634,9 @@ f     - Title: The Plot title drawn using AST_GRID
 *     22-JUN-2007 (DSB)
 *        - Do not dump the GrfContext Object since it may cause an
 *        infinite dumping loop.
+*        - Allow a NULL vtab to be supplied when initialising a Plot
+*        structure. This causes the vtab defined locally within this 
+*        class to be used so that the new object behaves as a simple Plot.
 *class--
 */
 
@@ -27410,7 +27413,8 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
 *        table will be initialised by this function.
 *     vtab
 *        Pointer to the start of the virtual function table to be associated
-*        with the new Plot.
+*        with the new Plot. If NULL, the vtab associated with this class
+*        (Plot) will be used.
 *     name
 *        Pointer to a constant null-terminated character string which contains
 *        the name of the class to which the new object belongs (it is this
@@ -27468,8 +27472,18 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    fset = NULL;
    mess = NULL;
 
+/* If no vtab was supplied, use the vtab for this class (Plot). */
+   if( !vtab ) {
+      vtab = &class_vtab;
+      if ( !class_init ) {
+         astInitPlotVtab( vtab, name );
+         class_init = 1;
+      }
+
 /* If necessary, initialise the virtual function table. */
-   if ( init ) astInitPlotVtab( vtab, name );
+   } else if ( init ) {
+      astInitPlotVtab( vtab, name );
+   }
 
 /* Initialise. */
    new = NULL;
