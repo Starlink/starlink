@@ -27476,7 +27476,7 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    if( !vtab ) {
       vtab = &class_vtab;
       if ( !class_init ) {
-         astInitPlotVtab( vtab, name );
+         astInitPlotVtab( vtab, "Plot" );
          class_init = 1;
       }
 
