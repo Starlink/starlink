@@ -186,7 +186,7 @@
 *        - "Fit" -- The corresponding fit position is marked.
 *
 *        - "Ellipse" -- As "Fit" but it also plots an ellipse at the
-*        FWHM radii and orientation.
+*        HWHM radii and orientation.
 *
 *        - "None" -- No positions are marked.
 *
@@ -274,7 +274,7 @@
 *        interpreted in polar co-ordinates (offset, position angle) 
 *        about the primary beam.  The radial co-ordinate is a distance 
 *        measured in units of the latitude axis if the current WCS Frame
-*        is a a SKY Domain, or the first axis for other Frames.  For a 
+*        is a SKY Domain, or the first axis for other Frames.  For a 
 *        SKY current WCS Frame, position angle follows the standard
 *        convention of North through East.  For other Frames the angle 
 *        is measured from the second axis anticlockwise, e.g. for a 
@@ -338,7 +338,7 @@
 *        latitude axis if that Frame is in the SKY Domain, or the first
 *        axis otherwise.  The error is derived entirely from the
 *        uncertainities in the fitted position of the primary beam,
-*        i.e. the reference position has no error attasched to it.  By
+*        i.e. the reference position has no error attached to it.  By
 *        definition the error is zero when FIXPOS is TRUE.
 *     REFPOS = LITERAL (Read)
 *        The reference position.  The offset of the primary beam with
