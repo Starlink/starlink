@@ -12,7 +12,7 @@ kps1_agncm.f kps1_agncp.f kps1_agndl.f kps1_agndr.f kps1_agndw.f \
 kps1_agnls.f kps1_agnms.f kps1_agnst.f kps1_agnwc.f kps1_bafid.f \
 kps1_bafir.f kps1_bfcrf.f kps1_bffil.f kps1_bffn.f  kps1_bfft.f  \
 kps1_bfftg.f kps1_bfhd.f  kps1_bfint.f kps1_bflog.f kps1_bfop.f \
-kps1_ccmpp.f kps1_ccmqn.f kps1_cenab.f kps1_cenad.f \
+kps1_bfpre.f kps1_ccmpp.f kps1_ccmqn.f kps1_cenab.f kps1_cenad.f \
 kps1_cenai.f kps1_cenar.f kps1_cenaub.f kps1_cenauw.f kps1_cenaw.f \
 kps1_cenbt.f kps1_cenhd.f kps1_censg.f kps1_censh.f kps1_cff2d.f \
 kps1_cff2r.f kps1_chsha.f kps1_clpa0.f kps1_clpal.f \
