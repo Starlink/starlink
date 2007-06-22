@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.32}
 \newcommand{\stardocnumber}    {95.32}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2007 June 4}
+\newcommand{\stardocdate}      {2007 June 21}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.7-7}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -14222,11 +14222,13 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
       demanded.
 
       BEAMFIT both reports and stores in parameters its results. 
-      These are fit coefficients and their errors, and the offsets 
-      and position angles of the beam features with respect to the 
-      primary beam.  Also a listing of the fit results may be written
-      to a log file geared more towards human readers, including 
-      details of the input parameters (see parameter LOGFILE).  
+      These are fit coefficients and their errors, the offsets and
+      position angles of the secondary beam features with respect to 
+      the primary beam, and the offset of the primary beam from a
+      reference position.  Also a listing of the fit results may be 
+      written to a log file geared more towards human readers, 
+      including details of the input parameters (see parameter
+      LOGFILE).  
    }
    \sstusage{
       \mbox{beamfit ndf [mode]} 
@@ -14391,7 +14393,8 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
             button is pressed is marked.
 
             \sstitem
-             {\tt "Fit"} -- The corresponding fit position is marked.
+             {\tt "Ellipse"} -- As "Fit" but it also plots an ellipse at the
+             HWHM radii and orientation.
 
             \sstitem
              {\tt "None"} -- No positions are marked.
@@ -14478,8 +14481,8 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          interpreted in polar co-ordinates (offset, position angle) 
          about the primary beam.  The radial co-ordinate is a distance 
          measured in units of the latitude axis if the current WCS Frame
-         is a SkyFrame, or the first axis for other Frames.  For a 
-         SkyFrame current WCS Frame, position angle follows the standard
+         is a SKY DOMAIN or the first axis for other Frames.  For a 
+         SKY current WCS Frame, position angle follows the standard
          convention of North through East.  For other Frames the angle 
          is measured from the second axis anticlockwise, \emph{e.g.} for a 
          PIXEL Frame it would be from $Y$ through negative $X$, not the 
@@ -14500,15 +14503,14 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
 	 TRUE}, it defines a fixed location.  It is specified in the
 	 current co-ordinate Frame of the NDF (supplying a colon {\tt
 	 ":"} will display details of the current co-ordinate Frame).
-	 A position should be supplied either as a list of formatted
+	 A position should be supplied as a list of formatted
 	 WCS axis values separated by spaces or commas.
 
          If the initial co-ordinates are supplied on the command line 
-	 without BEAMS the number of contigious POS, POS2,\ldots
+	 without BEAMS the number of contiguous POS, POS2,\ldots
 	 parameters specifies the number of beams to be fit.  If the
 	 initial co-ordinates are supplied on the command line without
 	 BEAMS specified only one beam will be fit.
-
       }
       \sstsubsection{
          POS2-POS5 = LITERAL (Read)
@@ -14548,6 +14550,21 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          If {\tt TRUE} then the fit parameters are not displayed on the
          screen.  Output parameters and files are still created.
          {\tt [FALSE]}
+      }
+      \sstsubsection{
+         REFPOS = LITERAL (Read)
+      }{
+         The reference position.  The offset of the primary beam with
+         respect to this point is reported and stored in parameter
+         REFOFF.  It is only accessed if the current WCS Frame in the
+         NDF is not a SKY Domain.
+
+         The co-ordinates are specified in the current WCS Frame of the
+         NDF (supplying a colon {\tt ":"} will display details of the current
+         co-ordinate Frame).  A position should be supplied either as a
+         list of formatted WCS axis values separated by spaces or 
+         commas.  A null value ({\tt{!}}) requests that the centre of the
+         supplied map is deemed to be the reference position.
       }
       \sstsubsection{
          RESID = NDF (Write)
@@ -14609,11 +14626,11 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
       }{
          The formatted offset and its error of each secondary beam 
          feature with respect to the primary beam.  They are measured in
-         the current Frame of the NDF along a latitude axis if that is a
-         SkyFrame, or the first axis otherwise.  The number of values
-         stored is twice the number of beams.  The array alternates an
-         offset, then its corresponding error, appearing in beam order 
-         starting with the first secondary beam.
+         the current Frame of the NDF along a latitude axis if that
+         Frame is in the SKY Domain, or the first axis otherwise.  The 
+         number of values stored is twice the number of beams.  The
+         array alternates an offset, then its corresponding error,
+         appearing in beam order starting with the first secondary beam.
       }
       \sstsubsection{
          ORIENT( 2 ) = \_DOUBLE (Write)
@@ -14627,13 +14644,25 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          PA() = \_REAL (Write)
       }{
          The position angle and its errors of each secondary beam
-         feature ith respect to the primary beam.  They are measured in
+         feature with respect to the primary beam.  They are measured in
          the current Frame of the NDF from North through East if that is
-         a SkyFrame, or anticlockwise from the $Y$ axis otherwise.  The
+         a SKY Domain, or anticlockwise from the $Y$ axis otherwise.  The
          number of values stored is twice the number of beams.  The
          array alternates a position angle, then its corresponding 
          error, appearing in beam order starting with the first
          secondary beam.
+      }
+      \sstsubsection{
+         REFOFF( 2 ) = LITERAL (Write)
+      }{
+         The formatted offset followed by its error of the primary beam 
+         with respect to the reference position (see parameter REFPOS).
+         These are measured in the current Frame of the NDF along a 
+         latitude axis if that Frame is in the SKY Domain, or the first
+         axis otherwise.  The error is derived entirely from the
+         uncertainities in the fitted position of the primary beam,
+         \emph{i.e.} the reference position has no error attached to 
+         it.  By definition the error is zero when FIXPOS is {\tt TRUE}.
       }
       \sstsubsection{
          RMS = \_REAL (Write)
@@ -34493,6 +34522,14 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          The storage form of the NDF's data array.
       }
       \sstsubsection{
+         FPIXSCALE( ) = LITERAL (Write)
+     }{
+         The nominal WCS pixel scale for each axis in the current WCS
+         Frame.  For celestial axes, the value stored will be in 
+         arcseconds.  For other axes, the value stored will be in the
+         units given by the corresponding element of FUNIT.
+      }
+      \sstsubsection{
          FTITLE( ) = LITERAL (Write)
       }{
          The title of each co-ordinate Frame stored in the WCS component of
@@ -46716,6 +46753,22 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
    }
    \sstresparameters{
       \sstsubsection{
+         FLBND( ) = \_DOUBLE (Write)
+      }{
+         The lower bounds of the bounding box enclosing the output NDF 
+         in the current WCS Frame.  The number of elements in this parameter 
+         is equal to the number of axes in the current WCS Frame.  Celestial 
+         axis values will be in units of radians.
+      }
+      \sstsubsection{
+         FUBND( ) = \_DOUBLE (Write)
+      }{
+         The upper bounds of the bounding box enclosing the output NDF 
+         in the current WCS Frame.  The number of elements in this parameter 
+         is equal to the number of axes in the current WCS Frame.  Celestial 
+         axis values will be in units of radians.
+      }
+      \sstsubsection{
          LBOUND() = \_INTEGER (Write)
       }{
          The lower pixel bounds of the output NDF.  Note, values will be
@@ -52479,7 +52532,7 @@ The following applications have been modified:
 
    \item [\htmlref{LINPLOT}{LINPLOT}] \mbox{}
       \begin{itemize}
-      \item There is a noew parameter ALIGNSYS that specifies the
+      \item There is a new parameter ALIGNSYS that specifies the
        co-ordinate system in which a new plot and an existing plot are
        aligned when ALIGN is {\tt TRUE}.
       \end{itemize}
@@ -52497,8 +52550,16 @@ The following applications have been modified:
 
    \item [\htmlref{NDFTRACE}{NDFTRACE}] \mbox{}
       \begin{itemize}
-      \item It now reports a nominal pixel scale.
+      \item It now reports a nominal pixel scale in output parameter
+       FPIXSCALE.
       \end{itemize}
+
+   \item [\htmlref{NDFTRACE}{NDFTRACE}] \mbox{}
+      \begin{itemize} 
+         \item There is a new output parameter, FPIXSCALE, to store
+         the nominal pixel scale or each axis in the current WCS Frame.
+      \end{itemize}
+
 
    \item [\htmlref{ROTATE}{ROTATE}] \mbox{}
       \begin{itemize}
@@ -52537,6 +52598,8 @@ The following applications have been modified:
       \item \htmlref{VARIANCE}{apndf:variance}~ components may be used to weight 
       the input data if a new parameter VARIANCE is set to {\tt TRUE}.
       VARIANCE defaults to the current behaviour.
+      \item New output parameters FLBND and FUBND record the WCS bounds
+      of the output NDF.
       \end{itemize}
 
 \end{description}
