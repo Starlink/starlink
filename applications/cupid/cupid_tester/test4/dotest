@@ -1,0 +1,77 @@
+#!/bin/tcsh
+#
+#  Test Description:
+#     FellWalker: 2D data containing a mix of well separated gaussians and 
+#     overlapping Gaussians, with high noise.
+#
+#  Test Notes:
+
+rm testout.sdf testout.FIT dotest.fail >& /dev/null
+
+$CUPID_DIR/findclumps in="testdata" \
+                      out=testout \
+                      method=fellwalker \
+                      config="'noise=rms,allowedge=0'" \
+                      deconv=no \
+                      outcat=testout.FIT \
+                      repconf=no \
+                      ilevel=0 \
+                      accept
+
+$KAPPA_DIR/sub testout testmodel diff
+$KAPPA_DIR/stats diff > /dev/null
+
+set wantsum=0
+set wantmin=0
+set wantmax=0
+set wantsigma=0
+set wantngood=11972
+set wantnclump=34
+
+set got=`$KAPPA_DIR/parget total stats`
+set err=`$KAPPA_DIR/calc "'qif(2*abs(pa-pb)/abs(pa+pb)>0.001,1,0)'" pa=$got pb=$wantsum`
+if( "$err" == "1" ) then
+   echo "   Sum is $got, should be $wantsum"
+   touch dotest.fail
+endif
+
+
+set got=`$KAPPA_DIR/parget minimum stats`
+set err=`$KAPPA_DIR/calc "'qif(2*abs(pa-pb)/abs(pa+pb)>0.001,1,0)'" pa=$got pb=$wantmin`
+if( "$err" == "1" ) then
+   echo "   Min is $got, should be $wantmin"
+   touch dotest.fail
+endif
+
+set got=`$KAPPA_DIR/parget maximum stats`
+set err=`$KAPPA_DIR/calc "'qif(2*abs(pa-pb)/abs(pa+pb)>0.001,1,0)'" pa=$got pb=$wantmax`
+if( "$err" == "1" ) then
+   echo "   Max is $got, should be $wantmax"
+   touch dotest.fail
+endif
+
+set got=`$KAPPA_DIR/parget sigma stats`
+set err=`$KAPPA_DIR/calc "'qif(2*abs(pa-pb)/abs(pa+pb)>0.001,1,0)'" pa=$got pb=$wantsigma`
+if( "$err" == "1" ) then
+   echo "   Sigma is $got, should be $wantsigma"
+   touch dotest.fail
+endif
+
+set got=`$KAPPA_DIR/parget numgood stats`
+set err=`$KAPPA_DIR/calc "'qif(2*abs(pa-pb)/abs(pa+pb)>0.001,1,0)'" pa=$got pb=$wantngood`
+if( "$err" == "1" ) then
+   echo "   NGood is $got, should be $wantngood"
+   touch dotest.fail
+endif
+
+
+$CURSA_DIR/catheader testout.FIT > /dev/null
+set nrow=`$KAPPA_DIR/parget ROWS catheader`
+if( "$nrow" != "$wantnclump" ) then
+   echo "   NClump is $nrow, should be $wantnclump"
+   touch dotest.fail
+endif
+
+
+rm diff.sdf testout.sdf testout.FIT
+
