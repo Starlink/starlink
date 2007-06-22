@@ -23,8 +23,6 @@
 *     the projection parameters, they are omitted from the optimisation.
 
 *  Arguments:
-*     PIXPOS( BF__MXPOS, NDF__MXDIM ) = DOUBLE PRECISION (Given)
-*        The initial guesses for the x-y pixel co-ordinate of the beams.
 *     FLBND( BF__NDIM ) = INTEGER (Given)
 *        The lower pixel bounds of the data to be fitted.
 *     FUBND( BF__NDIM ) = INTEGER (Given)
@@ -59,6 +57,31 @@
 *        The RMS residual.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
+
+*  Notes:
+*     -  The supplied initial co-ordinates are not necessarily used
+*     directly.  Instead they are used to form marginal profiles about
+*     the location.  Filtering of those marginal profiles removes the 
+*     effect of neighbouring sources (see KPS1_CLNS) and from the 
+*     profiles the routine estimates of the initial Gaussian parameters.
+*     This gives more consistent and robust values.  The 
+*     Levenberg-Marquardt method seems temperamental to the start 
+*     location.  While the centre position found for different start
+*     points agree within their errors, it is somewhat disconcerting to
+*     users.  This extra stage avoids that and appears to minimise those
+*     errors further boosting the user's confidence in the fitted
+*     coefficients.
+
+*     Should there be a problem with this filtering and fitting the
+*     initial co-ordinates as supplied are used by the main fit process.
+*     Also the nominal initial FWHMs are set at 5.
+*     -  The mean of the data is used to estimate the initial background
+*     level.
+*     -  The 4 and 96 percentiles in an 11-by-11-pixel region (or the
+*     full fit area if it is smaller) provide a guess for the initial
+*     amplitude.  The mean in the same region indicates which to use and
+*     to discover whether the beam is positive or negative with respect
+*     to the background.
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
@@ -97,6 +120,9 @@
 *     2007 June 6 (MJC):
 *        Back to using declared arrays for the unidimensional arrays
 *        passed to PDA_LMERR.
+*     2007 June 15 (MJC):
+*        Use marginal profiles to estimate the initial Gaussian 
+*        parameters.  Add the Notes.
 *     {enter_further_changes_here}
 
 *-
@@ -175,13 +201,21 @@
       INTEGER MXCOEF             ! Maximum number of coefficients
       PARAMETER ( MXCOEF = BF__NCOEF * BF__MXPOS )
 
+      DOUBLE PRECISION PI
+      PARAMETER ( PI = 3.1415926535898 )
+
+      DOUBLE PRECISION R2D       ! Radians to degrees
+      PARAMETER ( R2D = 180.0D0 / PI )
+
       INTEGER WIDTH              ! Width of region in which to estimate
       PARAMETER ( WIDTH = 5 )    ! amplitude
 
 *  Local Variables:
+      REAL AXRAT                 ! Initial beam axis ratio
       LOGICAL BAD                ! Array may contain bad values?
       DOUBLE PRECISION CORREL( BF__NCOEF, BF__NCOEF ) ! Two-param correlations
       DOUBLE PRECISION COVAR( BF__NCOEF, BF__NCOEF ) ! Covariance
+      INTEGER DIMS( BF__NDIM )   ! Dimensions
       LOGICAL FIXORI             ! Fix the orientation?
       LOGICAL FLAG( MXCOEF )     ! Problem parameter during inversion?
       DOUBLE PRECISION FS        ! Sum of squared residuals
@@ -190,6 +224,7 @@
       INTEGER IERR               ! Location of first conversion error
       INTEGER IFAIL              ! PDA error status
       INTEGER IG                 ! Gaussian counter
+      DOUBLE PRECISION INIT( BF__NDIM ) ! Refined initial co-ordinates
       INTEGER IPCORR             ! Pointer to correlation array
       INTEGER IPCOVA             ! Pointer to covariance array
       INTEGER IPCURV             ! Pointer to curvature array
@@ -213,6 +248,7 @@
       INTEGER NERR               ! Number of numerical error
       INTEGER NGOOD              ! Number of good values
       INTEGER NPOS               ! Number of data values
+      REAL ORIENT                ! Initial orientation of beam
       REAL PERCNT( 2 )           ! The percentiles
       DOUBLE PRECISION PERVAL( 2 ) ! The values at the percentiles
       INTEGER PIVOT( MXCOEF )    ! Pivot indices
@@ -223,6 +259,7 @@
       INTEGER RUBND( BF__NDIM )  ! Upper bounds of small region
       INTEGER START              ! Index of 1st char in projection name
       DOUBLE PRECISION SD( MXCOEF ) ! Std. deviations of fitted params
+      REAL SIGMIN                ! Initial minor-axis standard deviation
       DOUBLE PRECISION SUM       ! Sum of values in the small region
       DOUBLE PRECISION XC( MXCOEF ) ! Free parameters
       DOUBLE PRECISION WORK( MXCOEF ) ! Work array
@@ -268,12 +305,13 @@
       END DO
 
 *  Number of functions is the number of pixels to fit.
-      NPOS = ( FUBND( 1 ) - FLBND( 1 ) + 1 ) *
-     :       ( FUBND( 2 ) - FLBND( 2 ) + 1 )
+      DIMS( 1 ) = FUBND( 1 ) - FLBND( 1 ) + 1
+      DIMS( 2 ) = FUBND( 2 ) - FLBND( 2 ) + 1
+      NPOS = DIMS( 1 ) * DIMS( 2 )
 
 *  Obtain some initial values to guide the fitting.
 *  ================================================
-     
+
 *  Use the mean as a first guess at the background.
       CALL KPG1_MEAND( NPOS, %VAL( CNF_PVAL( IPWD ) ), MEAN, STATUS )
 
@@ -285,15 +323,35 @@
       N = 0
       DO IG = 1, NBEAMS
 
+*  Use moments to estimate the fit parameters.  The INIT array
+*  contains the fitted estimates for the centroid.
+         CALL ERR_MARK
+         INIT( 1 ) = PIXPOS( IG, 1 )
+         INIT( 2 ) = PIXPOS( IG, 2 )
+         CALL KPS1_STPAD( DIMS( 1 ), DIMS( 2 ),
+     :                    %VAL( CNF_PVAL( IPWD ) ), FLBND, 1, 
+     :                    MIN( 15, DIMS( 1 ), DIMS( 2 ) ), INIT, SIGMIN,
+     :                    AXRAT, ORIENT, NGOOD, WORK, STATUS )
+
+*  Something went wrong, say the array supplied is too small, and revert
+*  to semi-arbitrary default initial values for the coefficients.
+         IF ( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_ANNUL( STATUS )
+            SIGMIN = 5.0
+            AXRAT = 1.0
+            ORIENT = 0.0
+            INIT( 1 ) = PIXPOS( IG, 1 )
+            INIT( 2 ) = PIXPOS( IG, 2 )
+         ELSE
+            AXRAT = MAX( AXRAT, 0.1 )
+         END IF
+         CALL ERR_RLSE
+
 *  Choose a region about the chosen point.
-         RLBND( 1 ) = MAX( NINT( PIXPOS( IG, 1 ) + 0.5 ) - WIDTH,
-     :                           LBND( 1 ) )
-         RLBND( 2 ) = MAX( NINT( PIXPOS( IG, 2 ) + 0.5 ) - WIDTH,
-     :                           LBND( 2 ) )
-         RUBND( 1 ) = MIN( NINT( PIXPOS( IG, 1 ) + 0.5 ) + WIDTH, 
-     :                           UBND( 1 ) )
-         RUBND( 2 ) = MIN( NINT( PIXPOS( IG, 2 ) + 0.5 ) + WIDTH,
-     :                           UBND( 2 ) )
+         RLBND( 1 ) = MAX( NINT( INIT( 1 ) + 0.5 ) - WIDTH, LBND( 1 ) )
+         RLBND( 2 ) = MAX( NINT( INIT( 2 ) + 0.5 ) - WIDTH, LBND( 2 ) )
+         RUBND( 1 ) = MIN( NINT( INIT( 1 ) + 0.5 ) + WIDTH, UBND( 1 ) )
+         RUBND( 2 ) = MIN( NINT( INIT( 2 ) + 0.5 ) + WIDTH, UBND( 2 ) )
 
 *  Obtain some workspace for the region.
          RDIMS( 1 ) = RUBND( 1 ) - RLBND( 1 ) + 1
@@ -327,23 +385,23 @@
 *  search through, and count the number of parameters to fit. 
          IF ( .NOT. ( POSC .OR. ( SEPARC .AND. IG .GT. 1 ) ) ) THEN
             N = N + 2
-            XC( N - 1 ) = PIXPOS( IG, 1 )
-            XC( N ) = PIXPOS( IG, 2 )
+            XC( N - 1 ) = INIT( 1 )
+            XC( N ) = INIT( 2 )
          END IF
 
 *  Unlike the fixed FWHM and background, each fixed position is
 *  determined after the initial values for the P array (copied to the
 *  PC array in COMMON).
-         PC( 1, IG ) = PIXPOS( IG, 1 )
-         PC( 2, IG ) = PIXPOS( IG, 2 )
+         PC( 1, IG ) = INIT( 1 )
+         PC( 2, IG ) = INIT( 2 )
 
 *  Just a guess for a circular beam.  PC( 3 ) to PC( 5 ) should
 *  already be filled from BEAMFIT itself, if a fixed value is
 *  wanted.
          IF ( .NOT. FWHMC ) THEN
             N = N + 2
-            XC( N - 1 ) = 5.0D0
-            XC( N ) = 5.0D0
+            XC( N - 1 ) = DBLE( SIGMIN / AXRAT )
+            XC( N ) = DBLE( SIGMIN )
             PC( 3, IG ) = XC( N - 1 )
             PC( 4, IG ) = XC( N )
          END IF
@@ -352,7 +410,7 @@
 *  different fixed widths were supplied.
          IF ( .NOT. ORIC ) THEN
             N = N + 1
-            XC( N ) = 0.0D0
+            XC( N ) = DBLE( ORIENT ) * R2D
             PC( 5, IG ) = XC( N )
          END IF
 
