@@ -1,0 +1,276 @@
+{ Procedures for initialising the CGS3 DR system.
+{
+{ Authors:
+{  Alan Bridger (JAC::AB)
+{  John Lightfoot (ROE::JFL)
+{
+{ History:
+{  ??-Jun-90: Original (ROE::JFL, JAC::AB)
+{  26-Sep-91: Modified for Starlink release (JAC::AB)
+{   7-Nov-91: Added REDUCE procedures (JAC::AB)
+{   7-Nov-91: Added APLOT, APLOTH, DEFINE_STD, DIVSTD procedures (JAC::AB)
+{   8-Nov-91: Added LINE and AUTO options to APLOT and APLOTH (JAC::AB)
+{  12-Nov-91: Correct smal bug in APLOT (JAC::AB)
+{  18-Nov-91: Add CGS3_43 (JAC::AB)
+{  18-Nov-91: Add EXTRACT3 and ADJOIN3 (JAC::AB)
+{  19-Nov-91: Add REDUCE_POLRUN (JAC::AB)
+{  14-Dec-92: Update REDUCE_POL* procedures, including CGS3POL and EPLOT (JAC::AB)
+{  14-Dec-92: Replace ADJOIN3 with ADJOIN which seems to be OK now (JAC::AB)
+{   6-Jan-93: New version, using a control task to replace the major
+{             (by now rather baroque) procedures. (JAC::AB)
+{  14-Nov-95: Add RED3_PHRED (JAC::AB)
+{  16-Nov-95: Add REDUCE_PHOT(JAC::KEVIN)
+{  22-Nov-95: Put in defstring to run photometry reduction program
+{  06-Dec-95: change directories to unix style
+{  12/20-Dec-95: various changes to get it going (PND, KK)
+{  27-Feb-96: changed references from cgs3_dr to cgs3dr
+{  01-Mar-96: changed TSP action definitions
+{  06-Mar-96: changed CGS3POL to a red3 action
+{  26-Apr-96: added params (e.g. runnum to command lines for rr, rg, etc.)
+
+SET NOSAVE
+SET NOCHECKPARS
+
+PROC LOAD_CGS3DR
+  LOADW $RED3_DIR/red3 red3
+  LOADW $FIG_DIR/figaro1 figaro1
+  LOADW $CGS3DR_DIR/cgs3dr cgs3dr
+  SEND cgs3dr SET FIGARO_TASK figaro1
+  SEND cgs3dr SET REDUCTION_TASK red3
+  DATE = getenv("TODAY2")
+  DATADIR = getenv("DATADIR")
+  RODIR = getenv("DATADIR")
+  SEND cgs3dr SET DATADIR (STRING(DATADIR))
+  SEND cgs3dr SET RODIR (STRING(DATADIR))
+  SEND cgs3dr SET DATE (STRING(DATE))
+  PRINT " "
+  PRINT "Initialised for CGS3 data reduction"
+  PRINT " "
+  PRINT "Primary facilities available:"
+  PRINT " "
+  DEFSTRING INIT OBEYW cgs3dr INIT 
+  PRINT "INIT         - (Re)Initialise the system with a given date"
+  DEFSTRING REDUCE_RUN OBEYW cgs3dr REDUCE_RUN RUNNUM=
+  PRINT "REDUCE_RUN   - Reduce a single CGS3 run"
+  DEFSTRING REDUCE_GRP OBEYW cgs3dr REDUCE_GRP GRPNUM=
+  PRINT "REDUCE_GRP   - Reduce a set of CGS3 runs defined as a group"
+  DEFSTRING REDUCE_PHOT OBEYW cgs3dr REDUCE_PHOT PHOTNUM=
+  PRINT "REDUCE_PHOT (or just PHOT)  - Extract data from a run as photometry data"
+  DEFSTRING REDUCE_GROUP OBEYW cgs3dr REDUCE_GRP GRPNUM=
+  DEFSTRING RG OBEYW cgs3dr REDUCE_GRP GRPNUM=
+  DEFSTRING RR OBEYW cgs3dr REDUCE_RUN RUNNUM=
+  DEFSTRING PHOT OBEYW cgs3dr REDUCE_PHOT PHOTNUM=
+  DEFSTRING REDUCE_PHOT OBEYW cgs3dr REDUCE_PHOT PHOTNUM=
+  DEFSTRING IRPHOT $CGS3DR_DIR/irphot
+  PRINT "IRPHOT       - Run standalone program to reduce photometry from PHOT output"
+  DEFSTRING SET_PAR   OBEYW cgs3dr SETPAR
+  DEFSTRING SETPAR    OBEYW cgs3dr SETPAR
+  PRINT "SETPAR       - Modify the value of a CGS3DR parameter"
+  DEFSTRING SHOPAR OBEYW cgs3dr SHOPAR
+  PRINT "SHOPAR       - Show the values of the CGS3DR parameters"
+  PRINT "INIT_POL     - Initialise the system for polarimetry reduction"
+END PROC
+
+PROC INIT_CGS3DR
+  DATE = STRING(getenv("TODAY2"))
+  IF (DATE <> "")
+    PRINT Setting up to work on data from (DATE)
+    INIT DATE=(STRING(DATE))
+  ELSE
+    INIT
+  ENDIF
+  SETPAR PLOTTING=T VERBOSE=T DIVBYSKY=T CYCBYCYC=F CYCBEG=1 CYCEND=0 NSIGMA=3 ICHANBEG=1 ICHANEND=32 VERBOSE_PH=F
+END PROC
+
+PROC INIT_POL
+  LOADW $TSP_DIR/tsp_mon tsp_mon
+  DEFSTRING PPLOT OBEYW tsp_mon PPLOT
+  DEFSTRING TSP_SPLOT OBEYW tsp_mon TSP_PLOT
+  DEFSTRING FPLOT OBEYW tsp_mon FPLOT
+  DEFSTRING LTCORR OBEYW tsp_mon LTCORR
+  DEFSTRING PHASEPLOT OBEYW tsp_mon PHASEPLOT
+  DEFSTRING QPLOT OBEYW tsp_mon QPLOT
+  DEFSTRING QUMERGE OBEYW tsp_mon QUMERGE
+  DEFSTRING QUPLOT OBEYW tsp_mon QUPLOT
+  DEFSTRING QUSUB OBEYW tsp_mon QUSUB
+  DEFSTRING RFIGARO OBEYW tsp_mon RFIGARO
+  DEFSTRING RHDSPLOT OBEYW tsp_mon RHDSPLOT
+  DEFSTRING RHSP3 OBEYW tsp_mon RHSP3
+  DEFSTRING RIRPS OBEYW tsp_mon RIRPS
+  DEFSTRING TBIN OBEYW tsp_mon TBIN
+  DEFSTRING TMERGE OBEYW tsp_mon TMERGE
+  DEFSTRING TSPLOT OBEYW tsp_mon TSPLOT
+  DEFSTRING TSHIFT OBEYW tsp_mon TSHIFT
+  DEFSTRING TDERIV OBEYW tsp_mon TDERIV
+  DEFSTRING CCD2STOKES OBEYW tsp_mon CCD2STOKES
+  DEFSTRING IPCS2STOKES OBEYW tsp_mon IPCS2STOKES
+  DEFSTRING FLIP OBEYW tsp_mon FLIP
+  DEFSTRING REVERSE OBEYW tsp_mon REVERSE
+  DEFSTRING TSP_COMBINE OBEYW tsp_mon TSP_COMBINE
+  DEFSTRING CALFIT OBEYW tsp_mon CALFIT
+  DEFSTRING CALIB OBEYW tsp_mon CALIB
+  DEFSTRING TSP_XCOPY OBEYW tsp_mon TSP_XCOPY
+  DEFSTRING SUBSET OBEYW tsp_mon SUBSET
+  DEFSTRING PTHETA OBEYW tsp_mon PTHETA
+  DEFSTRING TSP_SCRUNCH OBEYW tsp_mon TSP_SCRUNCH
+  DEFSTRING TSP_SPFLUX OBEYW tsp_mon TSP_SPFLUX
+  DEFSTRING RTURKU OBEYW tsp_mon RTURKU
+  DEFSTRING RHATHSP OBEYW tsp_mon RHATHSP
+  DEFSTRING SUBTRACT OBEYW tsp_mon SUBTRACT
+  DEFSTRING CMULT OBEYW tsp_mon CMULT
+  DEFSTRING BUILD3D OBEYW tsp_mon BUILD3D
+  DEFSTRING DISPLAY OBEYW tsp_mon DISPLAY
+  DEFSTRING RCCDTS OBEYW tsp_mon RCCDTS
+  DEFSTRING SKYSUB OBEYW tsp_mon SKYSUB
+  DEFSTRING CCDPHOT OBEYW tsp_mon CCDPHOT
+  DEFSTRING CCDPOL OBEYW tsp_mon CCDPOL
+  DEFSTRING TLIST OBEYW tsp_mon TLIST
+  DEFSTRING TSETBAD OBEYW tsp_mon TSETBAD
+  DEFSTRING RHATPOL OBEYW tsp_mon RHATPOL
+  DEFSTRING LHATPOL OBEYW tsp_mon LHATPOL
+  DEFSTRING EPLOT OBEYW tsp_mon EPLOT
+  DEFSTRING CCD2POL OBEYW tsp_mon CCD2POL
+  DEFSTRING LMERGE OBEYW tsp_mon LMERGE
+  DEFSTRING CALFITPA OBEYW tsp_mon CALFITPA
+  DEFSTRING CALPA OBEYW tsp_mon CALPA
+  DEFSTRING TSP_FLCONV OBEYW tsp_mon TSP_FLCONV
+  DEFSTRING TSP_EXTIN OBEYW tsp_mon ESP_EXTIN
+  DEFSTRING TSP_RCGS2 OBEYW tsp_mon TSP_RCGS2
+  DEFSTRING TSP_IRFLUX OBEYW tsp_mon TSP_IRFLUX
+  DEFSTRING DIVIDE OBEYW tsp_mon DIVIDE
+  DEFSTRING TSPROFILE OBEYW tsp_mon TSPROFILE
+  DEFSTRING TSEXTRACT OBEYW tsp_mon TSEXTRACT
+  DEFSTRING TEXTIN OBEYW tsp_mon TEXTIN
+  DEFSTRING IMOTION OBEYW tsp_mon IMOTION
+  DEFSTRING SHIFTADD OBEYW tsp_mon SHIFTADD
+  DEFSTRING ROTPA OBEYW tsp_mon ROTPA
+  DEFSTRING IMPOL OBEYW tsp_mon IMPOL
+  DEFSTRING CGS4POL OBEYW tsp_mon CGS4POL
+  DEFSTRING CGS3POL OBEYW red3 CGS3POL
+  PRINT " "
+  PRINT "Ready for CGS3 spectropolarimetry data reduction"
+  PRINT " "
+END PROC
+
+PROC EXIT
+  KILLW red3
+  CHECKTASK tsp_mon (EXISTS)
+  IF (EXISTS)
+     KILLW tsp_mon
+  ENDIF
+  KILLW figaro1
+  KILLW cgs3dr
+  #EXIT
+END PROC
+
+{ APLOT - AutoPLOT a given spectrum
+PROC APLOT INPUT LINE AUTO
+   IF (UNDEFINED(INPUT))
+      INPUT 'Enter filename to plot: ' (INPUT)
+   END IF
+   IF (UNDEFINED(LINE))
+      LLINE = FALSE
+   ELSE
+      SS = SUBSTR(LINE,1,1)
+      IF (SS = 'T') OR  (SS = 't') OR (SS = 'Y') OR (SS = 'y')
+         LLINE = TRUE
+      ELSE
+         LLINE = FALSE
+      END IF
+   END IF
+   IF (UNDEFINED(AUTO))
+      LAUTO = TRUE
+   ELSE
+      SS = SUBSTR(AUTO,1,1)
+      IF (SS = 'T') OR  (SS = 't') OR (SS = 'Y') OR (SS = 'y')
+         LAUTO = TRUE
+      ELSE
+         LAUTO = FALSE
+      END IF
+   END IF
+   IF (LLINE)
+      SPLOT (INPUT) WHOLE=T AUTOSCALE=(LAUTO) LABEL=(INPUT) COLOUR=W HARDCOPY=F \
+   ELSE
+      ESPLOT (INPUT) WHOLE=T AUTOSCALE=(LAUTO) LABEL=(INPUT) COLOUR=W HARDCOPY=F \
+   END IF
+END PROC
+
+{ APLOTH - AutoPLOT a given spectrum to hard copy and print it
+PROC APLOTH INPUT LINE AUTO
+   IF (UNDEFINED(INPUT))
+      INPUT 'Enter filename to plot: ' (INPUT)
+   END IF
+   IF (UNDEFINED(LINE))
+      LLINE = FALSE
+   ELSE
+      SS = SUBSTR(LINE,1,1)
+      IF (SS = 'T') OR  (SS = 't') OR (SS = 'Y') OR (SS = 'y')
+         LLINE = TRUE
+      ELSE
+         LLINE = FALSE
+      END IF
+   END IF
+   IF (UNDEFINED(AUTO))
+      LAUTO = TRUE
+   ELSE
+      SS = SUBSTR(AUTO,1,1)
+      IF (SS = 'T') OR  (SS = 't') OR (SS = 'Y') OR (SS = 'y')
+         LAUTO = TRUE
+      ELSE
+         LAUTO = FALSE
+      END IF
+   END IF
+   IF (LLINE)
+      SPLOT (INPUT) WHOLE=T AUTOSCALE=(LAUTO) LABEL=(INPUT) COLOUR=W HARDCOPY=T \
+   ELSE
+      ESPLOT (INPUT) WHOLE=T AUTOSCALE=(LAUTO) LABEL=(INPUT) COLOUR=W HARDCOPY=T \
+   END IF
+   sh lp -c gks74.ps
+END PROC
+
+PROC RED3
+   DEFHELP RED3 $RED3_DIR/red3
+   DEFHELP Reducing_data $RED3_DIR/red3
+   PRINT " "
+   PRINT "Other Functions available:-"
+   DEFSTRING CGS3_41 obeyw red3 cgs3_41
+   DEFHELP CGS3_41 $RED3_DIR/red3
+   PRINT "    CGS3_41"
+   DEFSTRING CGS3_42 obeyw red3 cgs3_42
+   DEFHELP CGS3_42 $RED3_DIR/red3
+   PRINT "    CGS3_42"
+   DEFSTRING CGS3_43 obeyw red3 cgs3_43
+   DEFHELP CGS3_43 $RED3_DIR/red3
+   PRINT "    CGS3_43"
+   DEFSTRING CGS3_DET obeyw red3 cgs3_det
+   DEFHELP CGS3_DET $RED3_DIR/red3
+   PRINT "    CGS3_DET"
+   DEFSTRING CGS3_BAD_CYCLE obeyw red3 cgs3_bad_cycle
+   DEFHELP CGS3_BAD_CYCLE $RED3_DIR/red3
+   PRINT "    CGS3_BAD_CYCLE"
+   DEFSTRING BLACK_BODY obeyw red3 black_body
+   DEFHELP BLACK_BODY $RED3_DIR/red3
+   PRINT "    BLACK_BODY"
+{   DEFSTRING ADJOIN3 obeyw red3 adjoin3
+{   DEFHELP ADJOIN3 $RED3_DIR/red3
+{   PRINT "    ADJOIN3"
+   DEFSTRING EXTRACT3 obeyw red3 extract3
+   DEFHELP EXTRACT3 $RED3_DIR/red3
+   PRINT "    EXTRACT3"
+   DEFSTRING SCALE obeyw red3 scale
+   DEFHELP SCALE $RED3_DIR/red3
+   PRINT "    SCALE"
+   DEFSTRING CGS3_PHRED obeyw red3 cgs3_phred
+   PRINT "    CGS3_PHRED"
+   PRINT " "
+   PRINT "Type HELP RED3 for more information"
+   PRINT " "
+   SOFT
+   HARD
+ENDPROC
+
+FIGARO
+LOAD_CGS3DR
+RED3
+INIT_CGS3DR
+INIT

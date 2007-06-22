@@ -1,0 +1,52 @@
+*+ CGS3DR_CMN.INC include file for CGS3DR system
+*
+* Author:
+*  Alan Bridger (JAC::AB)
+*  Kevin Krisciunas (JAC::KEVIN)
+*  Phil Daly (JAC::PND)
+* History:
+*  27-Nov-91: Original (JAC::AB)
+*  15-Dec-92: Add tasks and directories (JAC::AB)
+*  31-Dec-92: Add GDEVICE (JAC::AB)
+*   7-Jan-93: Add PLOTTING,VERBOSE,DIVBYSTD,STANDARD (JAC::AB)
+*   8-Feb-93: Add NSIGMA (JAC::AB)
+*  13-Jun-95: Add DIVBYSKY, CYCBYCYC, CYCBEG, CYCEND (JAC::AB)
+*  16-Nov-95: Add ICHANBEG, ICHANEND, VERBOSE_PH (JAC::KEVIN)
+*  13-Dec-95: Reformatted for Unix/Fortran Standard (JAC::PND)
+*  08-Mar-96: expanded length of monolith names
+*
+*-
+      CHARACTER*5  UTDAYMONTH     ! UT date in form ddmmm
+      CHARACTER*6  SUTDATE        ! Short form of UT date, yymmdd
+      CHARACTER*8  UTDATE         ! UT date of obervations to work on, yyyymmdd
+      CHARACTER*20 REDUCTION_TASK ! Name of CGS3 reduction monolith
+      CHARACTER*20 FIGARO_TASK    ! Name of Figaro monolith
+      CHARACTER*20 TSP_TASK       ! Name of TSP monolith
+      CHARACTER*40 GDEVICE        ! Graphics device
+      CHARACTER*80 DATADIR        ! Directory where raw data are
+      CHARACTER*80 RODIR          ! Directory where reduced data goes
+      CHARACTER*80 STANDARD       ! Name of standard to divide by
+      COMMON /CGS3DRC/ UTDAYMONTH, SUTDATE, UTDATE, REDUCTION_TASK,
+     :        FIGARO_TASK, TSP_TASK, GDEVICE, DATADIR, RODIR, STANDARD
+      SAVE /CGS3DRC/
+
+      LOGICAL      PLOTTING       ! If to plot results
+      LOGICAL      VERBOSE        ! If to report whats going on
+      LOGICAL      DIVBYSKY       ! If to divide by a sky 
+      LOGICAL      DIVBYSTD       ! If to divide by a standard
+      LOGICAL      CYCBYCYC       ! If to reduce cycle by cycle
+      LOGICAL      VERBOSE_PH     ! If "photometry" output is verbose
+      COMMON /CGS3DRL/ PLOTTING, VERBOSE, DIVBYSKY, DIVBYSTD, CYCBYCYC, 
+     :        VERBOSE_PH
+      SAVE /CGS3DRL/
+
+      INTEGER      CYCBEG         ! starting cycle to reduce
+      INTEGER      CYCEND         ! ending cycle to reduce
+      INTEGER      ICHANBEG       ! starting channel for "photometry" (1)
+      INTEGER      ICHANEND       ! ending channel for "photometry" (32)
+      COMMON /CGS3DRI/ CYCBEG, CYCEND, ICHANBEG, ICHANEND
+      SAVE /CGS3DRI/
+
+      REAL         NSIGMA         ! Number of sigma to use in rejection criteria
+      COMMON /CGS3DRR/ NSIGMA
+      SAVE /CGS3DRR/

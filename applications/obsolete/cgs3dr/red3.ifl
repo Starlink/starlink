@@ -1,0 +1,560 @@
+#+
+monolith RED3
+#
+# Description :
+#   This is the interface file for the RED3 data reduction monolith
+#   for CGS3.
+#
+# Deficiencies :
+#   More help entries are needed.
+#
+# Authors :
+#   J Lightfoot (ROE::JFL)
+#   A Bridger (JAC::AB)
+#
+# History :
+#   July 1990: Original version (JFL)
+#   24-Sep-90: Addition of SCALE (JAC::AB)
+#   11-Oct-90: Addition of RCGS2 and IRFLUX (JAC::AB)
+#    7-Oct-90: Addition of CGS2FF (JAC::AB)
+#   26-Sep-91: Removed lots of stuff that is now in Figaro V3 (JAC::AB)
+#   18-Nov-91: Add CGS3_43 and STARTSCAN/ENDSCAN parametes to CGS3_42 (JAC::AB)
+#   18-Nov-91: Put EXTRACT3 and ADJOIN3 back (JAC::AB)
+#    8-Jan-93: Add NSIGMA to CGS3_41 (JAC::AB)
+#    8-Feb-95: Add NSIGMA to CGS3_42 (JAC::AB)
+#   13-Nov-95: Add cgs3_phred (JAC::KK)
+#    4-Mar-96: add cgs3pol
+# endhistory
+#-
+
+#----------------------------------------------------------------------
+
+   interface BLACK_BODY
+
+      # Calculates a normalised black body spectrum for the wavelengths
+      # defined by the x-axis of a template file.
+
+      parameter TEMPLATE
+         position 1
+         type '_CHAR'
+         vpath 'PROMPT'
+         ppath 'DYNAMIC,CURRENT,DEFAULT'
+         prompt 'Name of template structure'
+         help 'The DSA structure containing the template wavelength axis'
+      endparameter
+
+      parameter BB_TEMP
+         position 2
+         type '_REAL'
+         vpath 'PROMPT'
+         ppath 'DYNAMIC,CURRENT,DEFAULT'
+         prompt 'Temperature of black-body'
+         help 'The temperature of the black-body spectrum to be calculated'
+      endparameter
+
+      parameter REFWAVE
+         position 3
+         type '_REAL'
+         vpath 'PROMPT'
+         ppath 'DYNAMIC,CURRENT,DEFAULT'
+         prompt 'Wavelength at which black-body is to be normalised'
+         help ' '
+      endparameter
+
+      parameter REFFLUX
+         position 4
+         type '_REAL'
+         vpath 'PROMPT'
+         ppath 'DYNAMIC,CURRENT,DEFAULT'
+         prompt 'Value to which reference wavelength should be set'
+         help ' '
+      endparameter
+
+      parameter OUTPUT
+         position 5
+         type '_CHAR'
+         vpath 'PROMPT'
+         ppath 'DYNAMIC,CURRENT,DEFAULT'
+         prompt 'Name of output structure'
+         help 'The DSA structure to contain the black body spectrum'
+      endparameter
+
+   endinterface
+
+#----------------------------------------------------------------------
+
+   interface CGS3_41
+ 
+      parameter INPUT
+         position 1
+         type '_CHAR'
+         vpath 'prompt'
+         prompt 'Input raw CGS3 spectrum'
+      endparameter
+
+      parameter OUTPUT
+         position 5
+         type '_CHAR'
+         vpath 'prompt'
+         prompt 'Output filename'
+      endparameter
+
+      parameter STARTSCAN
+         position 2
+         type '_INTEGER'
+         vpath 'prompt'
+         prompt 'First scan to extract'
+         help 'First scan/cycle/beampair to extract from the file'
+      endparameter
+
+      parameter ENDSCAN
+         position 3
+         type '_INTEGER'
+         vpath 'prompt'
+         prompt 'Last scan to extract'
+         help 'Last scan/cycle/beampair to extract from the file'
+      endparameter
+
+      parameter NSIGMA
+         position 4
+         type '_REAL'
+         vpath 'prompt'
+         prompt 'Nsigma rejection limit'
+         help 'Scans more thatn NSIGMA*s.d. from the mean scan level are rejected''
+      endparameter
+
+   endinterface
+
+
+#----------------------------------------------------------------------
+
+   interface CGS3_42
+ 
+      parameter INPUT
+         position 1
+         type '_CHAR'
+         vpath 'prompt'
+         prompt 'Input raw CGS3 spectrum'
+      endparameter
+
+      parameter OUTPUT
+         position 5
+         type '_CHAR'
+         vpath 'prompt'
+         prompt 'Output filename'
+      endparameter
+
+      parameter STARTSCAN
+         position 2
+         type '_INTEGER'
+         vpath 'prompt'
+         prompt 'First scan to extract'
+         help 'First scan/cycle/beampair to extract from the file'
+      endparameter
+
+      parameter ENDSCAN
+         position 3
+         type '_INTEGER'
+         vpath 'prompt'
+         prompt 'Last scan to extract'
+         help 'Last scan/cycle/beampair to extract from the file'
+      endparameter
+
+      parameter NSIGMA
+         position 4
+         type '_REAL'
+         vpath 'prompt'
+         prompt 'Nsigma rejection limit'
+         help 'Scans more thatn NSIGMA*s.d. from the mean scan level are rejected''
+      endparameter
+
+   endinterface
+
+#----------------------------------------------------------------------
+
+   interface CGS3_43
+ 
+      parameter INPUT
+         position 1
+         type '_CHAR'
+         vpath 'prompt'
+         prompt 'Input raw CGS3 spectrum'
+      endparameter
+
+      parameter OUTPUT
+         position 2
+         type '_CHAR'
+         vpath 'prompt'
+         prompt 'Output filename'
+      endparameter
+
+   endinterface
+
+#----------------------------------------------------------------------
+
+   interface CGS3_BAD_CYCLE
+
+      parameter  IMAGE
+         position 1
+         type    '_CHAR'
+         vpath   'PROMPT'
+         ppath   'DYNAMIC,CURRENT,DEFAULT'
+         prompt  'Name of image to work on'
+      endparameter
+
+      parameter  BAD_CYCLE
+         position 2
+         type    '_INTEGER'
+         vpath   'PROMPT'
+         ppath   'DYNAMIC,CURRENT,DEFAULT'
+         prompt  'Cycle to be set bad, -1 to finish'
+      endparameter
+
+   endinterface
+
+   interface SCALE
+
+      # Scales an input image/spectrum by a factor and constant according
+      # to the formula output = FACTOR*input + CONSTANT
+
+      parameter INPUT
+         position 1
+         type '_CHAR'
+         vpath 'PROMPT'
+         ppath 'DYNAMIC,CURRENT,DEFAULT'
+         prompt 'Name of input data'
+         help 'The DSA structure containing the input data'
+      endparameter
+
+      parameter FACTOR
+         position 2
+         type '_REAL'
+         vpath 'PROMPT'
+         ppath 'DYNAMIC,CURRENT,DEFAULT'
+         prompt 'Factor to multiply data by'
+         help 'The data set will be multiplied by this factor'
+      endparameter
+
+      parameter CONSTANT
+         position 3
+         type '_REAL'
+         vpath 'PROMPT'
+         ppath 'DYNAMIC,CURRENT,DEFAULT'
+         prompt 'Constant to add to data'
+         help 'This will be added to the data after multiplication by FACTOR'
+      endparameter
+
+      parameter OUTPUT
+         position 4
+         type '_CHAR'
+         vpath 'PROMPT'
+         ppath 'DYNAMIC,CURRENT,DEFAULT'
+         prompt 'Name of output structure'
+         help 'The DSA structure to contain the scaled data'
+      endparameter
+
+      parameter ERRORS
+         position 5
+         type '_CHAR'
+         vpath 'PROMPT'
+         ppath 'DYNAMIC,CURRENT,DEFAULT'
+         prompt 'Type of error propagation to be used'
+         help 'Valid responses are NONE or GUASSIAN'
+         in 'NONE','GAUSSIAN'
+         default 'GAUSSIAN'
+      endparameter
+
+   endinterface
+
+#----------------------------------------------------------------------
+
+   interface CGS3_DET
+ 
+      parameter INPUT
+         position 1
+         type '_CHAR'
+         vpath 'prompt'
+         prompt 'Input raw CGS3 calibration data'
+      endparameter
+
+      parameter OUTPUT
+         position 5
+         type '_CHAR'
+         vpath 'prompt'
+         prompt 'Output filename'
+      endparameter
+
+      parameter DETECTOR
+         position 2
+         type '_INTEGER'
+         vpath 'prompt'
+         prompt 'Detector spectrum to extract'
+         help 'Detector spectrum to extract from the file'
+      endparameter
+
+      parameter STARTSCAN
+         position 3
+         type '_INTEGER'
+         vpath 'prompt'
+         prompt 'First scan to extract'
+         help 'First scan/cycle/beampair to extract from the file'
+      endparameter
+
+      parameter ENDSCAN
+         position 4
+         type '_INTEGER'
+         vpath 'prompt'
+         prompt 'Last scan to extract'
+         help 'Last scan/cycle/beampair to extract from the file'
+      endparameter
+
+   endinterface
+
+#----------------------------------------------------------------------
+
+   INTERFACE ADJOIN3
+
+#   **********************************************************************
+#   *                          A D J O I N                               *
+#   *     ADJOIN is a Figaro routine whose primary function is to        *
+#   *     append one spectrum to another.  That is, given two spectra,   *
+#   *     it produces one output spectrum where the .X and .Z arrays     *
+#   *     are formed by appending the second spectrum data onto the end  *
+#   *     of the data from the first.  In detail, ADJOIN is a little     *
+#   *     more complex, since it produces a spectrum in which the        *
+#   *     X data (the contents of the data object .X.DATA) increase.     *
+#   *     This may involve the sorting of the various arrays, so ADJOIN  *
+#   *     can be regarded as a program that merges two spectra into      *
+#   *     increasing X order.                                            *
+#   **********************************************************************
+
+      PARAMETER  SPECTRUM
+         POSITION 1
+         TYPE    '_CHAR'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'First of the two spectra to be adjoined'
+#         TEXT    -------------------------------------------------------
+#                 ADJOIN appends the second of two spectra onto the
+#                 first.  SPECTRUM is the first of the two.  If neither
+#                 has any X information (ie no wavelength array), the
+#                 order will be first and then second.  If one or both
+#                 have X data, the resulting spectrum will be in order of 
+#                 X value. 
+#                 -------------------------------------------------------
+      ENDPARAMETER
+
+      PARAMETER  SPECTRUM1
+         POSITION 2
+         TYPE    '_CHAR'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  '2nd of the two spectra to be adjoined'
+#         TEXT    ---------------------------------------------------
+#                 SPECTRUM1 specifies the second of the two spectra.
+#                 Note that it is the structure of the first spectrum
+#                 that is copied to the output spectrum.  Only data
+#                 arrays will be copied from the second.
+#                 ---------------------------------------------------
+      ENDPARAMETER
+
+      PARAMETER  OUTPUT
+         POSITION 3
+         TYPE    '_CHAR'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'Name of resulting spectrum'
+#         TEXT    ------------------------------------------------------
+#                 OUTPUT is the name of the resulting spectrum.  Note
+#                 that ADJOIN always produces a new file, even if OUTPUT
+#                 has the same name as one of the input spectra.  OUTPUT
+#                 will have essentially the same structure as the first
+#                 spectrum, but any data array found in the .X or .Z
+#                 structure of both input spectra, with the same length
+#                 as the .Z.DATA array in both spectra, will appear in
+#                 OUTPUT as an array whose length is the sum of the two
+#                 arrays.  (.Z.ERRORS, for example, would be adjoined).
+#                 ------------------------------------------------------
+      ENDPARAMETER 
+
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE EXTRACT3
+
+      PARAMETER  IMAGE
+         POSITION 1
+         TYPE    '_CHAR'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'Name of image to extract data from'
+      ENDPARAMETER
+
+      PARAMETER  YSTART
+         POSITION 2
+         TYPE    '_REAL'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'First y-value to be used'
+      ENDPARAMETER
+
+      PARAMETER  YEND
+         POSITION 3
+         TYPE    '_REAL'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'Last y-value to be used'
+      ENDPARAMETER
+
+      PARAMETER  SPECTRUM
+         POSITION 4
+         TYPE    '_CHAR'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'Name of spectrum to be generated'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+# extract latest run and treat as photometry
+
+interface CGS3_PHRED
+ 
+   parameter SPECT
+ 
+      position 1
+      type '_char'   
+      default 16jun0071
+      prompt 'Enter input FILENAME'
+      help 'Do not enclose in quotes'
+      vpath 'prompt'
+      ppath 'dynamic,current,default'
+   endparameter
+ 
+   parameter FILE
+ 
+      position 2
+      type '_char'   
+      default listing
+      prompt 'Enter output FILENAME'
+      help 'Do not enclose in quotes'
+      vpath 'prompt'
+      ppath 'dynamic,current,default'
+   endparameter
+ 
+   parameter STARTSCAN
+ 
+      position 3
+      type '_integer'
+      default 1
+      prompt 'Enter starting scan number'
+      vpath 'prompt'
+      ppath 'dynamic,current,default'
+   endparameter
+ 
+   parameter ENDSCAN
+ 
+      position 4
+      type '_integer'
+      default 0
+      prompt 'Enter ending scan number (0 means do all)'
+      vpath 'prompt'
+      ppath 'dynamic,current,default'
+   endparameter
+ 
+   parameter IST
+ 
+      position 5
+      type '_integer'
+      default 1
+      prompt 'Enter starting detector number'
+      vpath 'prompt'
+      ppath 'dynamic,current,default'
+   endparameter
+ 
+   parameter IEND
+ 
+      position 6
+      type '_integer'
+      default 32
+      prompt 'Enter ending detector number'
+      vpath 'prompt'
+      ppath 'dynamic,current,default'
+   endparameter
+ 
+   parameter SIGMA_LIM
+ 
+      position 7
+      type '_real'
+      default 3.0
+      prompt 'Enter number standard deviations for data exclusion'
+      vpath 'prompt'
+      ppath 'dynamic,current,default'
+   endparameter
+ 
+   parameter VERBOSE   # No/Yes parameter
+ 
+      position 8
+      type '_logical'
+      default N
+      prompt 'Write verbose output to file? Enter N or Y'
+      vpath 'prompt'
+      ppath 'dynamic,current,default'
+   endparameter
+   
+endinterface
+
+#----------------------------------------------------------------------
+
+# for reducing polarimetr
+
+INTERFACE CGS3POL
+
+  PARAMETER POS1
+    TYPE '_CHAR'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 1
+    PROMPT 'FIGARO Input file for 0.0 degrees'
+  ENDPARAMETER
+
+  PARAMETER POS2
+    TYPE '_CHAR'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 2
+    PROMPT 'FIGARO Input file for 45.0 degrees'
+  ENDPARAMETER
+
+  PARAMETER POS3
+    TYPE '_CHAR'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 3
+    PROMPT 'FIGARO Input file for 22.5 degrees'
+  ENDPARAMETER
+
+  PARAMETER POS4
+    TYPE '_CHAR'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 4
+    PROMPT 'FIGARO Input file for 67.5 degrees'
+  ENDPARAMETER
+
+  PARAMETER OUTPUT
+    TYPE 'NDF'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 5
+    PROMPT 'Output Dataset'
+  ENDPARAMETER
+                   
+ENDINTERFACE
+
+
+endmonolith

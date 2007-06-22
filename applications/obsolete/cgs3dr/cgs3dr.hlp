@@ -1,0 +1,434 @@
+1 CGS3DR
+
+The CGS3 DR system is collection of ADAM tasks used in coordination to
+reduce CGS3 spectroscopic, or spectropolarimetric, data. The two
+CGS3-specific tasks in it are RED3, an ADAM A-task monolith which
+contains a set of tasks designed to reduce CGS3 data from its raw form
+to "ordinary" spectra, and CGS3_DR, which is a control task which uses
+RED3, the Figaro monolith and optionally TSP to reduce CGS3 data in a
+controlled sequence. This allows simple reduction of the basic spectra,
+assuming a standard observing sequence, with little intervention. It
+also allows semi-automatic on-line data reduction.
+
+2 INIT
+
+Initialises the CGS3 DR system.  Various parameters are set up, but 
+in particular the date of the data being worked on is required, and the
+grpahics device is opened. In normal use INIT is issued just once, by
+the system when it starts up - the user is expected to supply the date
+of the data being worked on in the form yyyymmdd.  However, the user may
+also re-issue INIT at any time during a reduction session and change the
+date of the data set being worked on.  
+
+2 SETPAR
+
+2 SHOPAR
+
+2 REDUCE_RUN runnum
+
+Reduces a single run, or an object run/sky run pair, in the latter case
+dividing the object run by the sky.  If it discovers that the run was
+taken with sky division turned on then it ASSUMES that RUNNUM-1 is the SKY,
+which is standard observing procedure. Produces output files called
+RUNrunnum and RUNrunnum-1, the latter being the sky. It may also be used
+to reduce a sky, specifying the sky run number. 
+If the run number is not given on the command line it will prompt for
+it.
+
+Example of use:
+
+   ICL> REDUCE_RUN 23
+
+This will reduce raw data from run 22 into RUN22 and raw data from run 23
+into RUN23 and then divide RUN23 by RUN22, again producing RUN23.
+
+If the data taken is discovered to be spectropolarimetric then
+REDUCE_RUN knows this and works in exactly the same way, except that the
+RUNrunnum spectra are 2-d images of 4 spectra - being the four waveplate
+positions, which are then split into RUNrunnum_1, _2, _3, and _4, for
+the four waveplate positions and then converted to a TSP dataset using
+the TSP function CGS3POL.  From that point TSP may be used to
+examine the data.
+
+2 REDUCE_GRP runnum
+
+Reduces and plots a single run, or more commonly a series of runs taken
+to produce the oversampling. RUNNUM is the first GROUP run number, 
+The routines qorks out whether or not it needs to divide each run by a
+sky, and how many runs there are in the fully sampled spectrum.
+If ther is no sky division then the routine will reduce spectra RUNNUM,
+RUNNUM+1, RUNNUM+2, etc up to how ever many were taken for the
+oversampling, and then merge them all for a final reduced oversampled 
+spectrum.
+If there was sky division then the routine will reduce spectra RUNNUM,
+RUNNUM+2, RUNNUM+4, etc, dividing each by RUNNUM-1, RUNNUM+1,
+RUNNUM+3,respectively, up to the number taken and then merge them all for 
+a final reduced oversampled spectrum which has been divded by a sky.
+The routine produces all of the intermediate RUNn files that
+REDUCE_RUN produces and also produces an GRPrunnum final result.
+It also plots OBJrunnum as it builds up.
+If the parameters are not given on the command line it will prompt for
+them.
+
+Example of use:
+
+   ICL> REDUCE_GRP 33
+
+This will reduce raw data from run 33 into RUN33 and raw data from run 32
+into RUN32 and then divide RUN33 by RUN32, repeat this with RUNs
+35 and 34 and then merge RUN33 and RUN35 to produce OBJ33. It plots
+OBJ33 after each merge operation.  Note that the number of the final
+over-sampled spectrum is taken from the first object (cf CGS4).
+
+If the data taken is discovered to be spectropolarimetric then
+REDUCE_GRP also knows this, like REDUCE_RUN and again works in exactly 
+the same way. This time the 4 waveplate positions for the final merged
+spectra are produced, in files GRPrunnum_p, and then converted to a 
+final merged TSP dataset call GRPrunnum_P, using CGS3POL. From that 
+point TSP may be used to examine the data.
+
+
+1 RED3
+
+RED3 is an ADAM A-task monolith which contains a set of tasks designed
+to help in the reduction of spectra taken with the CGS3 spectrograph
+at UKIRT. In addition spectra taken with the CGS2 spectrograph, or the
+UKT6/9 CVF may also be reduced with RED3. Standard Figaro commands may
+be used on the output from these tasks. Data input/output is performed
+using DSA, parameters are obtained via the normal ADAM mechanisms.
+
+Note that CGS3 data files are already in Figaro format, written using
+the AAO's Data Recording Task, but the four dimensional data file used
+needs to be reduced using CGS3_41 or CGS3_42 before normal Figaro
+commands can access the data.
+
+2 BLACK_BODY
+
+Calculates a normalised black body spectrum for the wavelengths
+defined by the x-axis of a template file.
+
+3 TEMPLATE
+
+The DSA structure containing the template wavelength axis.
+
+3 BB_TEMP
+
+The temperature of the black-body spectrum to be calculated.
+
+3 REFWAVE
+
+Wavelength at which black-body is to be normalised.
+
+3 REFFLUX
+
+Value to which reference wavelength should be set.
+
+3 OUTPUT
+
+The DSA structure to contain the black body spectrum.
+
+2 CGS3_41
+
+Using a raw (from the telescope) CGS3 data file this coadds scans
+(cycles or beampairs) to produce a one dimensional spectrum that can
+be input to standard Figaro routines. Error and quality arrays are
+also produced. If the data were single beam data the scans are simply
+coadded, if they were two beam data the left minus rights are
+calculated and then coadded.
+
+Note that CGS3 raw data is stored in a four dimensional data array,
+the four axes being polarimeter plate position, wavelength, beam
+position and scan (cycle) number. For ordinary spectra the polarimeter
+plate position dimension is always 1, and the beam position dimension
+will be 1 or 2. The wavelength axis should contain 32 elements. Note
+that the wavelength axis for this data is 'Y' in Figaro terms, though
+it becomes 'X' after extraction. Also the raw data is stored with the
+wavelength axis reversed. CGS3_41 also takes care of this.
+ 
+3 INPUT
+
+Input raw CGS3 spectrum to extract a spectrum from.
+
+3 OUTPUT
+
+Output spectrum to be produced.
+
+3 STARTSCAN
+
+First scan/cycle/beampair (the words are used synonymously) to extract
+from the file.
+
+3 ENDSCAN
+
+Last scan/cycle/beampair to extract from the file.
+
+
+2 CGS3_42
+
+3 Spectroscopic_data
+
+Using a raw (from the telescope) CGS3 data file that contains two beam
+data (beamswitched) this calculates the right minus left for each beam
+and forms a two dimensional array of scan/cycle number versus
+wavelength that may be accessed by normal Figaro routines. This
+'image' may be looked at using standard Figaro routines and 'bad' or
+poor scans identified. A normal one dimensional spectrum may then be
+extracted using Figaro's EXTRACT or RED3's EXTRACT4 (the latter copes
+with the errors on the data and ignores "BAD" scans set by
+CGS3_BAD_CYCLE).
+
+Note that CGS3 raw data is stored in a four dimensional data array,
+the four axes being polarimeter plate position, wavelength, beam
+position and scan (cycle) number. For ordinary spectra the polarimeter
+plate position dimension is always 1, and the beam position dimension
+will be 1 or 2. The wavelength axis should contain 32 elements. Note
+that the wavelength axis for this data is 'Y' in Figaro terms, though
+it becomes 'X' after extraction. Also the raw data is stored with the
+wavelength axis reversed. CGS3_42 also takes care of this.
+ 
+4 INPUT
+
+Input raw CGS3 spectrum to extract from.
+
+4 OUTPUT
+
+Output 2D spectrum to be produced.
+
+
+3 Spectropolarimetric_data
+
+Using a raw (from the telescope) CGS3 data file that contains two beam
+polarimetry data (beamswitched) this calculates the right minus left 
+for each beam and sums them from STARTSCAN to ENDSCAN, forming a two 
+dimensional array of polarimeter plate position versus wavelength that 
+may be accessed by normal Figaro routines.
+
+Note that CGS3 raw data is stored in a four dimensional data array,
+the four axes being polarimeter plate position, wavelength, beam
+position and scan (cycle) number. For polarimetry spectra the polarimeter
+plate position dimension is always 4, and the beam position dimension
+will be 1 or 2. The wavelength axis should contain 32 elements. Note
+that the wavelength axis for this data is 'Y' in Figaro terms, though
+it becomes 'X' after extraction. Also the raw data is stored with the
+wavelength axis reversed. CGS3_42 also takes care of this.
+ 
+4 INPUT
+
+Input raw CGS3 spectrum to extract from.
+
+4 STARTSCAN
+
+First scan/cycle/beampair (the words are used synonymously) to extract
+from the file.
+
+4 ENDSCAN
+
+Last scan/cycle/beampair to extract from the file.
+
+4 OUTPUT
+
+Output 2D spectrum to be produced.
+
+
+2 CGS3_43
+
+Using a raw (from the telescope) CGS3 data file that contains two beam
+data (beamswitched) this calculates the right minus left for each beam
+and forms a three dimensional array of scan/cycle number versus
+wavelength versus polarimeter plate position.
+
+Note that CGS3 raw data is stored in a four dimensional data array,
+the four axes being polarimeter plate position, wavelength, beam
+position and scan (cycle) number. For polarimetric spectra the polarimeter
+plate position dimension is always 4, and the beam position dimension
+will be 1 or 2. The wavelength axis should contain 32 elements. Note
+that the wavelength axis for this data is 'Y' in Figaro terms, though
+it becomes 'X' after extraction. Also the raw data is stored with the
+wavelength axis reversed. CGS3_43 also takes care of this.
+ 
+3 INPUT
+
+Input raw CGS3 spectrum to extract from.
+
+3 OUTPUT
+
+Output cube to be produced.
+
+
+2 CGS3_BAD_CYCLE
+
+Allows poor or bad scans/cycles (identified from an image produced by
+CGS3_42) to be removed, or set to "BAD". The data and errors in the
+specified scan will be set to zero.
+
+3 IMAGE
+
+Name of image to work on.
+
+3 BAD_CYCLE
+
+Cycle to be set bad, enter -1 to finish.
+
+2 ADJOIN3
+
+ADJOIN3 is the CGS3 version of the Figaro routine whose primary function 
+is to append one spectrum to another. That is, given two spectra, it 
+produces one output spectrum where the .X and .Z arrays are formed by 
+appending the second spectrum data onto the end of the data from the first.
+In detail, ADJOIN is a little more complex, since it produces a spectrum
+in which the X data (the contents of the data object .X.DATA) increase
+This may involve the sorting of the various arrays, so ADJOIN can be
+regarded as a program that merges two spectra into increasing X order.
+This version of ADJOIN is taken from the standard Figaro version, but
+is modifed to cope with errors on the data and to remove a small bug.
+
+3 SPECTRUM
+
+First of the two spectra to be adjoined.  ADJOIN appends the second of
+two spectra onto the first. SPECTRUM is the first of the two. If
+neither has any X information (ie no wavelength array), the order will
+be first and then second. If one or both have X data, the resulting
+spectrum will be in order of  X value. 
+
+3 SPECTRUM1
+
+Second of the two spectra to be adjoined. SPECTRUM1 specifies the
+second of the two spectra. Note that it is the structure of the first
+spectrum that is copied to the output spectrum. Only data arrays will
+be copied from the second.
+
+3 OUTPUT
+
+Name of resulting spectrum. OUTPUT is the name of the resulting
+spectrum. Note that ADJOIN always produces a new file, even if OUTPUT
+has the same name as one of the input spectra. OUTPUT will have
+essentially the same structure as the first spectrum, but any data
+array found in the .X or .Z structure of both input spectra, with the
+same length as the .Z.DATA array in both spectra, will appear in
+OUTPUT as an array whose length is the sum of the two arrays.
+(.Z.ERRORS, for example, would be adjoined).
+
+2 EXTRACT3
+
+This is identical to the standard Figaro EXTRACT function, except that
+it also deals with the errors on the data and it ignores any scans set
+by the CGS3_BAD_CYCLE function if it is working on the output from
+CGS3_42.
+
+3 IMAGE
+
+Name of two dimensional image to extract data from.
+
+3 YSTART
+
+First y-value to be used.
+
+3 YEND
+
+Last y-value to be used.
+
+3 SPECTRUM
+
+Name of one dimensional spectrum to be generated.
+
+2 SCALE
+
+Scales an input image/spectrum by a factor and constant according
+to the formula output = FACTOR*input + CONSTANT.
+
+3 INPUT
+
+The DSA structure containing the input data.
+
+3 FACTOR
+
+Factor to multiply data by.
+
+3 CONSTANT
+
+Constant to add to data, after multiplication by FACTOR.
+
+3 OUTPUT
+
+The DSA structure to contain the scaled output data.
+
+3 ERRORS
+
+Type of error propagation to be used. Valid responses are NONE or GAUSSIAN.
+
+2 CGS3_DET
+
+This function extracts a "detector spectrum" (scan across a detector)
+from a data file obtained by the CGS3 calibration mode.  This function
+is unlikely to be useful anywhere else.
+
+3 INPUT
+
+Input raw CGS3 calibration data.
+
+3 OUTPUT
+
+Output filename for detector scan.
+
+3 DETECTOR
+
+Detector spectrum to extract from the file.
+
+3 STARTSCAN
+
+First scan/cycle/beampair to extract from the file.
+
+3 ENDSCAN
+
+Last scan/cycle/beampair to extract from the file.
+
+2 Reducing_data
+
+3 CGS3
+
+The main steps in reducing CGS3 data are as follows:
+
+      1. Extract an object sub-spectrum using CGS3_41.
+      2. Extract the corresponding sky spectrum using CGS3_41 (the sky
+         spectrum will usually be the preceding file.)
+      3. Divide the extract object by the extracted sky.
+      4. Repeat steps 1 to 3 for each sub-spectrum for this object.
+      5. Merge the extracted sub-spectra using ADJOIN to form the fully
+         sampled spectrum.
+
+In addition it is possible to use CGS3_42 instead of CGS3_41 in steps 1
+and 2. This will produce a two-dimensional image of wavelength
+against scan number. This may be displayed using standard Figaro
+display functions and bad scans identified. CGS3_BAD_CYCLE will then
+mark these scans as bad and EXTRACT may be used to extract the
+spectrum, ignoring the bad scans.
+
+Also between steps 4 and 5 it is possible to use a combination of
+Figaro's ISTAT and RED3's SCALE to adjust the level of sub-spectra
+if the sky transmission was variable.
+
+Figaro's ESPLOT may be used to plot the spectra with error bars.
+
+After this suitable use of BLACK_BODY and the arithmetic functions, or
+of IRFLUX may be used to flux calibrate the spectrum, if desired, and
+standard Figaro functions may be used to analyse the spectra. Note, of
+course, that many Figaro functions throw away the errors, or make them 
+invalid.
+
+3 CGS2_or_CVF
+
+CGS2 (or CVF) COADD data simply needs to be extracted into Figaro
+format with RCGS2, and then it may be reduced/analysed as needed,
+since it is already a fully sampled spectrum. It is not flux
+calibrated and BLACK_BODY plus arithmetic or IRFLUX may be used to do
+this.
+
+CGS2 scans may be extracted into Figaro format with RCGS2 and then
+added together with IADD.
+
+Figaro's ESPLOT may be used to plot the spectra with error bars.
+
+Standard Figaro functions may be used to analyse the spectra. Note, of
+course, that many Figaro functions throw away the errors, or make them 
+invalid.
+

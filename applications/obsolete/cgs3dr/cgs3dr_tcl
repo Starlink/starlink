@@ -1,0 +1,202 @@
+#!STAR_BIN/awish -file
+#+
+# tcl/tk interface to the cgs3dr system.
+#-
+
+# Global variables
+    global env
+    global cgs3Bitmaps
+
+# Path and file names that may need to be cutomised
+    set tclAdamLib    STAR_LIB/tk/adam
+    set cgs3Bitmaps   $env(CGS3DR_DIR)
+    set cgs3drTclLib  $env(CGS3DR_DIR)
+
+# Set up library search path
+    lappend auto_path [exec /usr/bin/pwd] $cgs3drTclLib $tclAdamLib
+
+# Create default directories
+    if {![file exists $env(HOME)/adam]} {exec /usr/bin/mkdir $env(HOME)/adam}
+
+# Set some option roots
+    option add *background                    wheat 
+    option add *foreground                    black
+    option add *Scrollbar.background          khaki
+    option add *Scrollbar.activeBackground    palegreen
+    option add *Button.background             pink
+    option add *Button.activeBackground       palegreen
+    option add *Button.activeForeground       red
+    option add *Menubar.activeBackground      palegreen
+    option add *Menubar.activeForeground      red
+    option add *Menubutton.background         wheat
+    option add *Menubutton.foreground         black
+    option add *Menubutton.activeBackground   palegreen
+    option add *Menubutton.activeForeground   red
+    option add *Menu.background               wheat
+    option add *Menu.foreground               black
+    option add *Menu.activeBackground         palegreen
+    option add *Menu.activeForeground         red
+    option add *Radiobutton.background        wheat
+    option add *Radiobutton.activeBackground  palegreen
+    option add *Radiobutton.activeForeground  red
+    option add *Checkbutton.background        wheat
+    option add *Frame.background              wheat
+    option add *Label.background              wheat
+    option add *Listbox.background            wheat
+    option add *Listbox.selectbackground      palegreen
+    option add *Listbox.highlightcolor        palegreen
+    option add *Text.background               snow
+    option add *Entry.background              snow
+    option add *Button.width                  14
+    option add *Radiobutton.width             12
+    option add *Radiobutton.relief            flat
+    option add *Entry.relief                  sunken
+    option add *Entry.width                   10
+    option add *Entry.font                    -adobe-helvetica-medium-o-normal--*-140-*
+    option add *Label.font                    -adobe-helvetica-bold-r-normal--*-140-*
+    option add *Listbox.font                  -adobe-helvetica-bold-r-normal--*-140-*
+    option add *Radiobutton.font              -adobe-helvetica-bold-r-normal--*-140-*
+    option add *Checkbutton.font              -adobe-helvetica-bold-r-normal--*-140-*
+    option add *Button.font                   -adobe-helvetica-bold-r-normal--*-140-*
+    option add *Menubar.font                  -adobe-helvetica-bold-r-normal--*-140-*
+    option add *Menu.font                     -adobe-helvetica-bold-r-normal--*-140-*
+    option add *Menubutton.font               -adobe-helvetica-bold-r-normal--*-140-*
+
+# Get arguments and set environmental variables
+    wm withdraw .
+    cgs3drGetArgs [lindex $argv 0] [lindex $argv 1]
+    wm deiconify .
+
+# Set global task variables
+    global FigTask
+    set FigTask "cgs3dr error : No such task"
+    global Red3Task
+    set Red3Task "cgs3dr error : No such task"
+    global Cgs3drTask
+    set Cgs3drTask "cgs3dr error : No such task"
+    global TspTask
+    set TspTask "cgs3dr error : No such task"
+
+# Use the top level for `traffic light' task load status
+    frame .tf3 -relief sunken -bd 2
+    frame .tr3 -relief sunken -bd 2
+    frame .tc3 -relief sunken -bd 2
+    frame .tt3 -relief sunken -bd 2
+    pack  .tf3 .tr3 .tc3 .tt3 -side left -padx 1m -pady 1m
+    label .tf3.box -bitmap @$cgs3Bitmaps/stop.xbm -bg orange -fg black
+    pack .tf3.box -in .tf3
+    label .tr3.box -bitmap @$cgs3Bitmaps/stop.xbm -bg orange -fg black
+    pack .tr3.box -in .tr3
+    label .tc3.box -bitmap @$cgs3Bitmaps/stop.xbm -bg orange -fg black
+    pack .tc3.box -in .tc3
+    label .tt3.box -bitmap @$cgs3Bitmaps/stop.xbm -bg orange -fg black
+    pack .tt3.box -in .tt3
+    .tf3.box configure -bitmap @$cgs3Bitmaps/stop.xbm  -bg red -fg black
+    .tr3.box configure -bitmap @$cgs3Bitmaps/stop.xbm  -bg red -fg black
+    .tc3.box configure -bitmap @$cgs3Bitmaps/stop.xbm -bg red -fg black
+    .tt3.box configure -bitmap @$cgs3Bitmaps/stop.xbm -bg red -fg black
+    update idletasks
+
+    wm title      . "CGS3 Data Reduction VPKG_VERS Status of Loading Tasks"
+    wm iconbitmap . @$cgs3Bitmaps/icon.xbm
+    wm iconname   . "CGS3DR"
+    wm minsize    . 1 1
+
+    after 1000
+    update idletasks
+    .tf3.box configure -bitmap @$cgs3Bitmaps/fig.xbm  -bg red -fg black
+    .tr3.box configure -bitmap @$cgs3Bitmaps/red3.xbm  -bg red -fg black
+    .tc3.box configure -bitmap @$cgs3Bitmaps/cgs3dr.xbm -bg red -fg black
+    .tt3.box configure -bitmap @$cgs3Bitmaps/tsp.xbm -bg red -fg black
+    update idletasks
+
+# Load tasks
+    set FigTask [cgs3drLoadTask figaro1]
+    set Red3Task [cgs3drLoadTask red3]
+    set Cgs3drTask [cgs3drLoadTask cgs3dr]
+    set TspTask [cgs3drLoadTask tsp]
+
+# Create cgs3dr frame
+    toplevel .$env(PID)cgs3dr
+    wm withdraw .$env(PID)cgs3dr
+    toplevel .$env(PID)cgs3dr_plot
+    wm withdraw .$env(PID)cgs3dr_plot
+    frame .$env(PID)cgs3dr.mb -relief raised -bd 2
+    pack .$env(PID)cgs3dr.mb -fill x
+    menubutton .$env(PID)cgs3dr.mb.file -text File -menu .$env(PID)cgs3dr.mb.file.menu -underline 0
+    pack .$env(PID)cgs3dr.mb.file -side left
+    menu .$env(PID)cgs3dr.mb.file.menu
+    menubutton .$env(PID)cgs3dr.mb.options -text Options -menu .$env(PID)cgs3dr.mb.options.menu -underline 0
+    pack .$env(PID)cgs3dr.mb.options -side left
+    menu .$env(PID)cgs3dr.mb.options.menu
+    menubutton .$env(PID)cgs3dr.mb.help -text Help -menu .$env(PID)cgs3dr.mb.help.menu -underline 0
+    pack .$env(PID)cgs3dr.mb.help -side right
+    menu .$env(PID)cgs3dr.mb.help.menu
+
+    .$env(PID)cgs3dr.mb.file.menu add command -underline 1 -label Exit -command "cgs3drExit"
+    .$env(PID)cgs3dr.mb.file.menu add command -underline 1 -label Print -command "cgs3drPrint"
+    .$env(PID)cgs3dr.mb.options.menu add command -underline 0 -label "Set New Directory/Date" -command "cgs3drUTdate"
+    .$env(PID)cgs3dr.mb.options.menu add separator
+    .$env(PID)cgs3dr.mb.options.menu add command -underline 0 -label "Clear Text Widget" -command "cgs3drClear"
+    .$env(PID)cgs3dr.mb.options.menu add separator
+    .$env(PID)cgs3dr.mb.options.menu add command -underline 13 -label "Send Task an Action" -command "cgs3drTalk"
+    .$env(PID)cgs3dr.mb.help.menu add command -underline 0 -label "Author(s)" -command "cgs3drVersions author"
+    .$env(PID)cgs3dr.mb.help.menu add command -underline 0 -label "Tcl/tk Version" -command "cgs3drVersions tcl/tk"
+    .$env(PID)cgs3dr.mb.help.menu add command -underline 9 -label "Portable-CGS3DR Version" -command "cgs3drVersions cgs3dr"
+    .$env(PID)cgs3dr.mb.help.menu add separator
+    .$env(PID)cgs3dr.mb.help.menu add command -underline 5 -label "CGS3 WWW Page" \
+      -command {exec /usr/local/bin/netscape -install http://www.jach.hawaii.edu/~jkd/cgs3man.www &}
+    
+# Build the cgs3dr interface widget tree and bind actions to task
+    set cgs3drWidgets [buildCgs3drWidgets .$env(PID)cgs3dr]
+    pack $cgs3drWidgets
+    set plotWidgets [buildPlotWidgets .$env(PID)cgs3dr_plot]
+    pack $plotWidgets
+    bindCgs3drWidgets
+
+# Set window titles
+    wm title      .$env(PID)cgs3dr "CGS3 Data Reduction VPKG_VERS"
+    wm iconname   .$env(PID)cgs3dr CGS3DR
+    wm iconbitmap .$env(PID)cgs3dr @$cgs3Bitmaps/icon.xbm
+    wm minsize    .$env(PID)cgs3dr 500 375
+    wm protocol   .$env(PID)cgs3dr WM_DELETE_WINDOW {.$env(PID)cgs3dr.mb.file.menu invoke Exit}
+    wm title      .$env(PID)cgs3dr_plot "CGS3 Data Reduction VPKG_VERS Display"
+    wm iconname   .$env(PID)cgs3dr_plot Plot3
+    wm iconbitmap .$env(PID)cgs3dr_plot @$cgs3Bitmaps/icon.xbm
+    wm minsize    .$env(PID)cgs3dr_plot 500 375
+    wm protocol   .$env(PID)cgs3dr_plot WM_DELETE_WINDOW {.$env(PID)cgs3dr.mb.file.menu invoke Exit}
+    update idletasks
+
+# Initialise the fig task
+    after 1000
+    .tf3.box configure -bitmap @$cgs3Bitmaps/fig.xbm -bg green -fg black
+    update idletasks
+
+# Initialise the red3 task
+    after 1000
+    .tr3.box configure -bitmap @$cgs3Bitmaps/red3.xbm -bg green -fg black
+    update idletasks
+
+# Initialise the cgs3dr task
+    after 1000
+    cgs3drInit
+    .tc3.box configure -bitmap @$cgs3Bitmaps/cgs3dr.xbm -bg green -fg black
+    update idletasks
+
+# Initialise the red3 task
+    after 1000
+    .tt3.box configure -bitmap @$cgs3Bitmaps/tsp.xbm -bg green -fg black
+    update idletasks
+
+# Now de-iconify the tasks 
+    after 2000
+    .tf3.box configure -bitmap @$cgs3Bitmaps/go.xbm -bg green -fg black
+    .tr3.box configure -bitmap @$cgs3Bitmaps/go.xbm -bg green -fg black
+    .tc3.box configure -bitmap @$cgs3Bitmaps/go.xbm -bg green -fg black
+    .tt3.box configure -bitmap @$cgs3Bitmaps/go.xbm -bg green -fg black
+    update idletasks
+    cgs3drCursor arrow green black
+    wm withdraw .
+    update idletasks
+    if {[winfo exists .$env(PID)cgs3dr_plot]==1} {wm deiconify .$env(PID)cgs3dr_plot}
+    if {[winfo exists .$env(PID)cgs3dr]==1} {wm deiconify .$env(PID)cgs3dr}

@@ -1,0 +1,208 @@
+# CGS3DR Control Monolith
+#
+# Description:
+#  This is the interface file for the control task that controls the
+#  CGS3 DR system.
+# Author:
+#  Alan Bridger (JAC::AB)
+# History:
+#  14-Dec-92: Original (JAC::AB)
+#   7-Jan-93: Add control parameters (JAC::AB)
+#  13-Jun-95: Add further controls: DIVBYSKY, CYCBYCYC, CYCBEG, CYCEND (JAC::AB)
+#  16-Nov-95: Add REDUCE_PHOT, ICHANBEG, ICHANEND, VERBOSE_PH (JAC::KK)
+#  05-Dec-95: change directories of tasks
+#  06-Dec-95: make it into an Itask ifl file
+#  27-Feb-96: rename from cgs3_dr.ifl
+#  0-Mar-96: change tsp to tsp_mon (and eliminate leading $TSP_DIR/)
+#
+interface CGS3DR
+ 
+   parameter DATE
+      type '_CHAR'
+      vpath 'PROMPT'
+      ppath 'DYNAMIC,CURRENT,DEFAULT'
+      prompt 'Date of data to work on'
+      help 'Enter the date of the data to work on, in the form YYYYMMDD.'
+    endparameter
+
+    parameter REDUCTION_TASK
+      type '_CHAR'
+      vpath 'DEFAULT'
+      ppath 'DEFAULT'
+      default '$RED3_DIR/red3'
+    endparameter
+
+    parameter FIGARO_TASK
+      type '_CHAR'
+      vpath 'DEFAULT'
+      ppath 'DEFAULT'
+      default '$FIG_DIR/figaro1'
+    endparameter
+
+    parameter TSP_TASK
+      type '_CHAR'
+      vpath 'DEFAULT'
+      ppath 'DEFAULT'
+      default 'tsp_mon'
+    endparameter
+
+    parameter DATADIR
+      type '_CHAR'
+      vpath 'DEFAULT'
+      ppath 'DEFAULT'
+      default 'DATADIR'
+    endparameter
+
+    parameter RODIR
+      type '_CHAR'
+      vpath 'DEFAULT'
+      ppath 'DEFAULT'
+      default 'RODIR'
+    endparameter
+
+    parameter GDEVICE
+      type '_CHAR'
+      vpath 'DEFAULT'
+      ppath 'DEFAULT'
+      default 'xwindows'
+    endparameter
+
+    parameter PLOTTING
+      type '_LOGICAL'
+      vpath 'DEFAULT'
+      ppath 'DEFAULT'
+      default TRUE
+    endparameter
+
+    parameter VERBOSE
+      type '_LOGICAL'
+      vpath 'DEFAULT'
+      ppath 'DEFAULT'
+      default TRUE
+    endparameter
+
+    parameter DIVBYSKY
+      type '_LOGICAL'
+      vpath 'DEFAULT'
+      ppath 'DEFAULT'
+      default TRUE
+    endparameter
+
+    parameter CYCBYCYC
+      type '_LOGICAL'
+      vpath 'DEFAULT'
+      ppath 'DEFAULT'
+      default FALSE
+    endparameter
+
+    parameter DIVBYSTD
+      type '_LOGICAL'
+      vpath 'DEFAULT'
+      ppath 'DEFAULT'
+      default FALSE
+    endparameter
+
+    parameter CYCBEG
+      type '_INTEGER'
+      vpath 'DEFAULT'
+      ppath 'DEFAULT'
+      default 1
+    endparameter
+
+    parameter CYCEND
+      type '_INTEGER'
+      vpath 'DEFAULT'
+      ppath 'DEFAULT'
+      default 0
+    endparameter
+
+    parameter NSIGMA
+      type '_REAL'
+      vpath 'DEFAULT'
+      ppath 'DEFAULT'
+      default 3.0
+    endparameter
+
+    parameter STANDARD
+      type '_CHAR'
+      vpath 'DEFAULT'
+      ppath 'DEFAULT'
+      default ' '
+    endparameter
+
+    parameter ICHANBEG
+      type '_INTEGER'
+      vpath 'DEFAULT'
+      ppath 'DEFAULT'
+      default 1
+    endparameter
+
+    parameter ICHANEND
+      type '_INTEGER'
+      vpath 'DEFAULT'
+      ppath 'DEFAULT'
+      default 32
+    endparameter
+
+    parameter VERBOSE_PH
+      type '_LOGICAL'
+      vpath 'DEFAULT'
+      ppath 'DEFAULT'
+      default FALSE
+    endparameter
+
+    parameter RUNNUM
+      type '_INTEGER'
+      vpath 'PROMPT'
+      ppath 'DYNAMIC,CURRENT,DEFAULT'
+      prompt 'Number of run to reduce'
+      help 'Enter the run number of the data to be reduced.'
+    endparameter
+
+    parameter GRPNUM
+      type '_INTEGER'
+      vpath 'PROMPT'
+      ppath 'DYNAMIC,CURRENT,DEFAULT'
+      prompt 'Number of group to reduce (first run)'
+      help 'Enter the first object run number of the group to be reduced.'
+    endparameter
+
+    parameter PHOTNUM
+      type '_INTEGER'
+      vpath 'PROMPT'
+      ppath 'DYNAMIC,CURRENT,DEFAULT'
+      prompt 'Number of run to reduce'
+      help 'Enter the run number of the data to be reduced.'
+    endparameter
+
+    action INIT
+      obey
+      endobey
+    endaction
+
+    action SETPAR
+      obey
+      endobey
+    endaction
+
+    action SHOPAR
+      obey
+      endobey
+    endaction
+
+    action REDUCE_RUN
+      obey
+      endobey
+    endaction
+
+    action REDUCE_GRP
+      obey
+      endobey
+    endaction
+
+    action REDUCE_PHOT
+      obey
+      endobey
+    endaction
+
+endinterface

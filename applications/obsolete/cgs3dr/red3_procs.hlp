@@ -1,0 +1,119 @@
+
+
+CGS3DR Useful procedures.
+
+
+REDUCE_RUN runnum divbysky
+
+Reduces a single run, or an object run/sky run pair, in the latter case
+dividing the object run by the sky.  Simple-mindly includes all of the
+cycles in the reduction.  It ASSUMES that RUNNUM-1 is a SKY. Produces 
+output files called RUNrunnum and RUNrunnum-1, the latter being the sky.
+Obviously it could be used to reduce a sky, specifying the sky run number
+and not dividing by a sky.
+If the parameters are not given on the command line it will prompt for
+them.
+
+Examples of use:
+
+   ICL> REDUCE_RUN 23 T
+
+This will reduce raw data from run 22 into RUN22 and raw data from run 23
+into RUN23 and then divide RUN23 by RUN22, again producing RUN23.
+
+   ICL> REDUCE_RUN 25 F
+
+This will reduce raw data from run 25 into RUN25. RUN25 will not be divided
+by a sky.
+
+
+REDUCE runnum divbysky nspect
+
+Reduces and plots a single run, or more commonly a series of runs taken
+to produce the oversampling. RUNNUM is the first OBJECT run number, 
+DIVBYSKY indicates whether or not SKY subspectra were taken in between the
+object spectra and thus whether each obejct subspectrum is divided by a
+sky, and NSPECT is the number of sub-spectra taken.
+If DIVBYSKY is false then the routine will reduce spectra RUNNUM,
+RUNNUM+1, RUNNUM+2, etc up to NSPECT worth and then merge them all for
+a final reduced oversampled spectrum.
+If DIVBYSKY is true then the routine will reduce spectra RUNNUM,
+RUNNUM+2, RUNNUM+4, etc, dividing each by RUNNUM-1, RUNNUM+1,
+RUNNUM+3,respectively, up to NSPECT worth and then merge them all for 
+a final reduced oversampled spectrum which has been divded by a sky.
+The routine produces all of the intermediate RUNn files that
+REDUCE_RUN produces and also produces an OBJrunnum final result.
+It also plots OBJrunnum as it builds up.
+If the parameters are not given on the command line it will prompt for
+them.
+
+Examples of use:
+
+   ICL> REDUCE 33 T 2
+
+This will reduce raw data from run 33 into RUN33 and raw data from run 32
+into RUN32 and then divide RUN33 by RUN32, repeat this with RUNs
+35 and 34 and then merge RUN33 and RUN35 to produce OBJ33. It plots
+OBJ33 after each merge operation.  Note that the number of the final
+over-sampled spectrum is taken from the first object (cf CGS4).
+
+   ICL> REDUCE 40 F 3
+
+This will reduce raw data from run 40 into RUN40 and raw data from run 41
+into RUN41 and then merge them into OBJ40. It will then reduce raw
+data from run 42 into RUN42 and merge this with OBJ40, to produce a
+new OBJ40.  OBJ40 is plotted at each merge operation.
+
+
+APLOT filename line
+
+Produces an autoscaled plot of the spectrum in filename. If line is true 
+then it will produce a line plot, otherwise, or if line omitted, it will
+plot with error bars. No further control is possible and users should
+use normal Figaro commands for more sophisticated plotted.
+
+Example of use:
+
+   ICL> APLOT RUN33
+
+Plots RUN33 using autoscale as an error bar plot.
+
+   ICL> APLOT RUN33 T
+
+Plots RUN33 as a lineplot, autoscaling.
+
+
+APLOTH filename line
+
+Exactly the same as APLOT except that the plot is produced on the
+hardcopy device and sent to the printer.  Note that the sending to the
+printer assumes it is a postscript plot.
+
+
+REDUCE_POLRUN runnum divbysky
+
+Reduces a single polarimetry run, or an object run/sky run pair, 
+in the latter case dividing the object run by the sky.  Simple-mindly 
+includes all of the cycles in the reduction.  It ASSUMES that RUNNUM-1 
+is a SKY. Produces output files called RUNrunnum and RUNrunnum-1, the 
+latter being the sky, and also RUNrunnum_p where p is the IRPOL plate
+position, and takes values from 1 to 4. It does not (yet) produce
+any polarization results.
+
+If the parameters are not given on the command line it will prompt for
+them.
+
+Examples of use:
+
+   ICL> REDUCE_POLRUN 23 T
+
+This will reduce raw data from run 22 into RUN22 and raw data from run 23
+into RUN23 and then extract the four plate positions from RUN23 into
+RUN23_1, RUN23_2, RUN23_3, RUN23_4 and divide each of these by RUN22, 
+again producing RUN23_p (p = 1,2,3,4).
+
+   ICL> REDUCE_POLRUN 25 F
+
+This will reduce raw data from run 25 into RUN25 and RUN25_p. The RUN25_p
+files will not be divided by a sky.
+
