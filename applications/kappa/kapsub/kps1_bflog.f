@@ -131,6 +131,9 @@
 *        position directly under its the header co-ordinates
 *        description.  Create non-blank units for SkyFrame polar offset
 *        co-ordinates.
+*     2007 June 20 (MJC):
+*        Apply MSG tuning regardless of the Frame.  Correct non-SKY
+*        SENSE.
 *     {enter_further_changes_here}
 
 *-
@@ -573,18 +576,19 @@
 *  Orientation
 *  ===========
          IF  ( PIXEL .OR. .NOT. ISSKY ) THEN
-            CALL MSG_SETC( 'SENSE', '(measured from X through Y)' )
+            CALL MSG_SETC( 'SENSE', '(measured anticlockwise from Y)
          ELSE
 
 *  Reverse these if the axis order is swapped in the SkyFrame.
             CALL MSG_SETC( 'SENSE',
      :                     '(measured from North through East)' )
 
+         END IF
+
 *  The message may generate a line longer than 80 characters especially
 *  if there is an uncertainty too.   Now 80 is normlly where a line will
 *  wrap.  Tune to allow longer lines.
-            CALL MSG_TUNE( 'SZOUT', 100, STATUS )
-         END IF
+         CALL MSG_TUNE( 'SZOUT', 100, STATUS )
 
 *  Display the major-axis orientation, formatting to have left-justified
 *  to two decimal places, unless it's circular then omit reporting the
