@@ -1,6 +1,6 @@
       SUBROUTINE KPS1_BFLOG( LOGF, FD, PIXEL, MAP, CFRM, NAXC, NBEAM, 
-     :                       NCOEF, P, SIGMA, POLAR, POLSIG, RMS, DPREC,
-     :                       STATUS )
+     :                       NCOEF, P, SIGMA, REFOFF, POLAR, POLSIG,
+     :                       RMS, DPREC, STATUS )
 *+
 *  Name:
 *     KPS1_BFLOG
@@ -13,7 +13,8 @@
 
 *  Invocation:
 *     CALL KPS1_BFLOG( LOGF, FD, PIXEL, MAP, CFRM, NAXC, NCOEF, P, 
-*                      SIGMA, POLAR, POLSIG, RMS, DPREC, STATUS )
+*                      SIGMA, REFOFF, POLAR, POLSIG, RMS, DPREC,
+*                      STATUS )
 
 *  Description:
 *     The supplied parameters are reported and logged to the file 
@@ -57,6 +58,9 @@
 *        co-ordinates are measured in the reporting frame when argument
 *        PIXEL is .FALSE. (the normal value), or in the PIXEL Frame if
 *        PIXEL is .TRUE.
+*     REFOFF( 2 ) = DOUBLE PRECISION (Given)
+*        The offset of the primary beam with respect to the reference
+*        point measured in the current WCS Frame, followed by its error.
 *     POLAR( 2, NBEAM ) =  DOUBLE PRECISION (Given)
 *         The polar co-ordinates of the beam features with respect to
 *         the primary beam measured in the current co-ordinate Frame.
@@ -120,6 +124,13 @@
 *     2007 May 30 (MJC):
 *        Add POLAR and POLSIG arguments to report polar co-ordinates of
 *        secondary-beam features.
+*     2007 June 15 (MJC):
+*        Add REFOFF argument and report its values.  Qualify sense of 
+*        polar co-ordinates in the output now there are two different 
+*        offsets.  Move RMS report to the end thereby placing the
+*        position directly under its the header co-ordinates
+*        description.  Create non-blank units for SkyFrame polar offset
+*        co-ordinates.
 *     {enter_further_changes_here}
 
 *-
@@ -145,6 +156,7 @@
       INTEGER NCOEF
       DOUBLE PRECISION P( NCOEF, NBEAM )
       DOUBLE PRECISION SIGMA( NCOEF, NBEAM )
+      DOUBLE PRECISION REFOFF( 2 )
       DOUBLE PRECISION POLAR( 2, NBEAM )
       DOUBLE PRECISION POLSIG( 2, NBEAM )
       DOUBLE PRECISION RMS
@@ -222,16 +234,6 @@
          CALL AST_SETC( FRM2, ATTR( : LATTR ), '%-12.3F', STATUS )
       END IF
 
-*  Give a title for the parameter values which are to be displayed.
-      CALL MSG_SETD( 'RMS', RMS )
-      CALL MSG_LOAD( 'KPS1_BFLOG_MSG1', '    RMS fit error   : ^RMS',
-     :               BUF, LBUF, STATUS )
-      IF ( LOGF ) CALL FIO_WRITE( FD, BUF( : LBUF ), STATUS )
-      CALL MSG_OUTIF( MSG__NORM, ' ', BUF( : LBUF ), STATUS )
-
-      IF ( LOGF ) CALL FIO_WRITE( FD, ' ', STATUS )
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
-
 *  Now do the screen and log file output.
 
 *  Report each fit in turn.
@@ -300,12 +302,69 @@
          IF ( LOGF ) CALL FIO_WRITE( FD, BUF( : LBUF ), STATUS )
          CALL MSG_OUTIF( MSG__NORM, ' ', BUF( : LBUF ), STATUS )
 
+*  Offset (polar radius) of primary beam with to the reference point
+*  -----------------------------------------------------------------
+         IF ( IB .EQ. 1 ) THEN
+
+*  Display the pixel co-ordinates...
+            IF ( PIXEL ) THEN
+               CALL MSG_SETR( 'OFF', SNGL( REFOFF( 1 ) ) )
+               CALL MSG_SETC( 'UNIT', 'pixels' )
+
+            ELSE
+
+*  Display the current Frame's co-ordinates of the beam offset
+               CALL MSG_SETC( 'OFF', AST_FORMAT( FRM2, REPAX, 
+     :                                           REFOFF( 1 ), STATUS ) )
+
+*  Form the Unit attribute name for the selected axis.
+               ATTR = 'UNIT('
+               LATTR = 5
+               CALL CHR_PUTI( REPAX, ATTR, LATTR )
+               CALL CHR_APPND( ')', ATTR, LATTR )
+               IF ( ISSKY ) THEN
+
+*  Get the Unit value.  We use the arcseconds Format for a SkyFrame.
+                  CALL MSG_SETC( 'UNIT', AST_GETC( FRM2,
+     :                                             ATTR( : LATTR ), 
+     :                                             STATUS ) )
+               ELSE
+                  CALL MSG_SETC( 'UNIT', AST_GETC( CFRM,
+     :                                             ATTR( : LATTR ), 
+     :                                             STATUS ) )
+               END IF
+            END IF
+
+            IF ( REFOFF( 2 ) .EQ. VAL__BADD ) THEN
+               CALL MSG_LOAD( 'KPS1_BFLOG_MSG3', '    Offset      '/
+     :                        /'    : ^OFF ^UNIT from reference point',
+     :                        BUF, LBUF, STATUS )
+
+            ELSE
+               IF ( PIXEL ) THEN
+                  CALL MSG_SETR( 'OFFE', SNGL( REFOFF( 2 ) ) )
+               ELSE
+
+*  Offset error of primary beam with to the reference point
+*  --------------------------------------------------------
+                  CALL MSG_SETC( 'OFFE', AST_FORMAT( FRM2, REPAX, 
+     :                                               REFOFF( 2 ), 
+     :                                               STATUS ) )
+               END IF
+               CALL MSG_LOAD( 'KPS1_BFLOG_MSG3E', '    Offset      '/
+     :                        /'    : ^OFF +/- ^OFFE ^UNIT from '/
+     :                        /'reference point', BUF, LBUF, STATUS )
+            END IF
+            IF ( LOGF ) CALL FIO_WRITE( FD, BUF( : LBUF ), STATUS )
+            CALL MSG_OUTIF( MSG__NORM, ' ', BUF( : LBUF ), STATUS )
+
+
 *  Polar radius of secondary beam positions
 *  ----------------------------------------
 
 *  Note store the two separately as they have to be loaded as separate
 *  lines because of the different units.
-         IF ( IB .GT. 1 ) THEN
+         ELSE
 
 *  Display the pixel co-ordinates...
             IF ( PIXEL ) THEN
@@ -319,27 +378,28 @@
      :                                           POLAR( 1, IB ),
      :                                           STATUS ) )
 
-*  Form the Unit attribute name for this axis.
-               IF ( .NOT. ISSKY ) THEN
-                  ATTR = 'UNIT('
-                  LATTR = 5
-                  CALL CHR_PUTI( REPAX, ATTR, LATTR )
-                  CALL CHR_APPND( ')', ATTR, LATTR )
+*  Form the Unit attribute name for the selected axis.
+               ATTR = 'UNIT('
+               LATTR = 5
+               CALL CHR_PUTI( REPAX, ATTR, LATTR )
+               CALL CHR_APPND( ')', ATTR, LATTR )
+               IF ( ISSKY ) THEN
 
-*  Get the Unit value.
-                  CALL MSG_SETC( 'UNIT', AST_GETC( CFRM, 
+*  Get the Unit value.  We use the arcseconds Format for a SkyFrame.
+                  CALL MSG_SETC( 'UNIT', AST_GETC( FRM2,
      :                                             ATTR( : LATTR ), 
      :                                             STATUS ) )
-
-*  It would be messy inserting both of the expected sexagesimal formats.
                ELSE
-                  CALL MSG_SETC( 'UNIT', ' ' )
+                  CALL MSG_SETC( 'UNIT', AST_GETC( CFRM,
+     :                                             ATTR( : LATTR ), 
+     :                                             STATUS ) )
                END IF
             END IF
 
             IF ( POLSIG( 1, IB ) .EQ. VAL__BADD ) THEN
-               CALL MSG_LOAD( 'KPS1_BFLOG_MSG8', '    Offset      '/
-     :                     /'    : ^RAD ^UNIT', BUF, LBUF, STATUS )
+               CALL MSG_LOAD( 'KPS1_BFLOG_MSG4', '    Offset      '/
+     :                        /'    : ^RAD ^UNIT from primary beam', 
+     :                       BUF, LBUF, STATUS )
 
             ELSE
                IF ( PIXEL ) THEN
@@ -352,9 +412,9 @@
      :                                               POLSIG( 1, IB ), 
      :                                               STATUS ) )
                END IF
-               CALL MSG_LOAD( 'KPS1_BFLOG_MSG8E', '    Offset      '/
-     :                        /'    : ^RAD +/- ^RADE ^UNIT',
-     :                        BUF, LBUF, STATUS )
+               CALL MSG_LOAD( 'KPS1_BFLOG_MSG4E', '    Offset      '/
+     :                        /'    : ^RAD +/- ^RADE ^UNIT from '/
+     :                        /'primary beam', BUF, LBUF, STATUS )
             END IF
             IF ( LOGF ) CALL FIO_WRITE( FD, BUF( : LBUF ), STATUS )
             CALL MSG_OUTIF( MSG__NORM, ' ', BUF( : LBUF ), STATUS )
@@ -378,7 +438,7 @@
 *  Position-angle errors
 *  ---------------------
             IF ( POLSIG( 2, IB ) .EQ. VAL__BADD ) THEN
-               CALL MSG_LOAD( 'KPS1_BFLOG_MSG9', '    Position Angle '/
+               CALL MSG_LOAD( 'KPS1_BFLOG_MSG5', '    Position Angle '/
      :                        /' : ^PA degrees ^SENSE', BUF, LBUF,
      :                        STATUS )
 
@@ -389,7 +449,7 @@
      :           MAX( 0, INT( LOG10( POLSIG( 2, IB ) + VAL__EPSD ) ) ) +
      :           4
                CALL MSG_FMTR( 'PAE', FORMAT, SNGL( POLSIG( 2, IB ) ) )
-               CALL MSG_LOAD( 'KPS1_BFLOG_MSG9E', '    Position Angle '/
+               CALL MSG_LOAD( 'KPS1_BFLOG_MSG5E', '    Position Angle '/
      :                        /' : ^PA +/- ^PAE degrees ^SENSE',
      :                        BUF, LBUF, STATUS )
             END IF
@@ -441,7 +501,7 @@
          IF ( SIGMA( MAJOR, IB ) .EQ. VAL__BADD ) THEN
 
 *  So report and log just the FWHM values in the desired Frame.
-            CALL MSG_LOAD( 'KPS1_BFLOG_MSG3', '    FWHM (major)'/
+            CALL MSG_LOAD( 'KPS1_BFLOG_MSG6', '    FWHM (major)'/
      :                     /'    : ^FWHM ^UNIT', BUF, LBUF, STATUS )
 
 *  We have errors on the widths.
@@ -455,7 +515,7 @@
      :                                             STATUS ) )
             END IF
 
-            CALL MSG_LOAD( 'KPS1_BFLOG_MSG3E', '    FWHM (major)'/
+            CALL MSG_LOAD( 'KPS1_BFLOG_MSG6E', '    FWHM (major)'/
      :                     /'    : ^FWHM +/- ^FWHME ^UNIT',
      :                     BUF, LBUF, STATUS )
          END IF
@@ -487,7 +547,7 @@
          IF ( SIGMA( MINOR, IB ) .EQ. VAL__BADD ) THEN
 
 *  So report and log just the FWHM value in the desired Frame.
-            CALL MSG_LOAD( 'KPS1_BFLOG_MSG4', '    FWHM (minor)'/
+            CALL MSG_LOAD( 'KPS1_BFLOG_MSG7', '    FWHM (minor)'/
      :                     /'    : ^FWHM ^UNIT', BUF, LBUF, STATUS )
 
 *  We have errors on the widths.
@@ -501,7 +561,7 @@
      :                                             STATUS ) )
             END IF
 
-            CALL MSG_LOAD( 'KPS1_BFLOG_MSG4E', '    FWHM (minor)'/
+            CALL MSG_LOAD( 'KPS1_BFLOG_MSG7E', '    FWHM (minor)'/
      :                     /'    : ^FWHM +/- ^FWHME ^UNIT',
      :                     BUF, LBUF, STATUS )
          END IF
@@ -535,12 +595,12 @@
      :           MAX( 0, INT( LOG10( THETA + VAL__EPSD ) ) ) + 4
             CALL MSG_FMTR( 'OR', FORMAT, REAL( THETA ) )
             IF ( SIGMA( 5, IB ) .EQ. VAL__BADD ) THEN
-               CALL MSG_LOAD( 'KPS1_BFLOG_MSG5', '    Orientation    '/
+               CALL MSG_LOAD( 'KPS1_BFLOG_MSG8', '    Orientation    '/
      :                        /' : ^OR degrees ^SENSE', BUF, LBUF,
      :                        STATUS )
             ELSE
                CALL MSG_FMTR( 'ORE', 'G9.3', SNGL( SIGMA( 5, IB ) ) )
-               CALL MSG_LOAD( 'KPS1_BFLOG_MSG5E', '    Orientation    '/
+               CALL MSG_LOAD( 'KPS1_BFLOG_MSG8E', '    Orientation    '/
      :                        /' : ^OR +/- ^ORE degrees ^SENSE',
      :                        BUF, LBUF, STATUS )
             END IF
@@ -570,7 +630,7 @@
          IF ( SIGMA( 6, IB ) .EQ. VAL__BADD ) THEN
 
 *  Display the amplitude.
-            CALL MSG_LOAD( 'KPS1_BFLOG_MSG6', '    Amplitude   '/
+            CALL MSG_LOAD( 'KPS1_BFLOG_MSG9', '    Amplitude   '/
      :                     /'    : ^AMP', BUF, LBUF, STATUS )
 
          ELSE
@@ -585,7 +645,7 @@
             END IF
 
 *  Display the amplitude and its error.
-            CALL MSG_LOAD( 'KPS1_BFLOG_MSG6E', '    Amplitude   '/
+            CALL MSG_LOAD( 'KPS1_BFLOG_MSG9E', '    Amplitude   '/
      :                     /'    : ^AMP +/- ^AMPE',
      :                     BUF, LBUF, STATUS )
          END IF
@@ -611,7 +671,7 @@
 
 *  Display the background level.
             IF ( SIGMA( 7, IB ) .EQ. VAL__BADD ) THEN
-               CALL MSG_LOAD( 'KPS1_BFLOG_MSG7', '    Background  '/
+               CALL MSG_LOAD( 'KPS1_BFLOG_MSG10', '    Background  '/
      :                        /'    : ^BGD', BUF, LBUF, STATUS )
             ELSE
 
@@ -626,7 +686,7 @@
                END IF
 
 *  Display the background level and its error.
-               CALL MSG_LOAD( 'KPS1_BFLOG_MSG7E', '    Background  '/
+               CALL MSG_LOAD( 'KPS1_BFLOG_MSG10E', '    Background  '/
      :                        /'    : ^BGD +/- ^BGDE',
      :                        BUF, LBUF, STATUS )
             END IF
@@ -637,6 +697,16 @@
          IF ( LOGF ) CALL FIO_WRITE( FD, ' ', STATUS )
          CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
       END DO
+
+*  Give a title for the parameter values which are to be displayed.
+      CALL MSG_SETD( 'RMS', RMS )
+      CALL MSG_LOAD( 'KPS1_BFLOG_MSG1', '    RMS fit error   : ^RMS',
+     :               BUF, LBUF, STATUS )
+      IF ( LOGF ) CALL FIO_WRITE( FD, BUF( : LBUF ), STATUS )
+      CALL MSG_OUTIF( MSG__NORM, ' ', BUF( : LBUF ), STATUS )
+
+      IF ( LOGF ) CALL FIO_WRITE( FD, ' ', STATUS )
+      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
 
       CALL AST_ANNUL( FRM2, STATUS )
 
