@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_BFOP( RFRM, MAP, NAXR, NP, P, SIGMA, NBEAM,
-     :                      POLAR, POLSIG, RMS, STATUS )
+     :                      REFOFF, POLAR, POLSIG, RMS, STATUS )
 *+
 *  Name:
 *     KPS1_BFOP
@@ -11,8 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_BFOP( RFRM, MAP, NAXR, NP, P, SIGMA, NBEAM, POLAR,
-*                     POLSIG, RMS, STATUS )
+*     CALL KPS1_BFOP( RFRM, MAP, NAXR, NP, P, SIGMA, NBEAM, REFOFF,
+*                     POLAR, POLSIG, RMS, STATUS )
 
 *  Description:
 *     The supplied Gaussian parameters from BEAMFIT are written to the
@@ -34,6 +34,11 @@
 *        AMP      _DOUBLE   The amplitude of the Gaussian beam
 *        BACK     _DOUBLE   The background level
 *        RMS      _REAL     The RMS of the fit
+*
+*    In addition there is always a further vector parameter
+*
+*        REFOFF   LITERAL   The offset of the primary beam with respect
+*                           to a reference position, and its error.
 *
 *    Two further parameters are written if the number of beam
 *    positions is more than one.  Each is an array of length twice the
@@ -70,6 +75,9 @@
 *        elements are used.
 *     NBEAM = INTEGER (Given)
 *        The number of beam positions.
+*     REFOFF( 2 ) = DOUBLE PRECISION (Given)
+*        The offset of the primary beam with respect to the reference
+*        point measured in the current WCS Frame, followed by its error.
 *     POLAR( 2, NBEAM ) =  DOUBLE PRECISION (Given)
 *         The polar co-ordinates of the beam features with respect to
 *         the primary beam measured in the current co-ordinate Frame.
@@ -120,6 +128,8 @@
 *        co-ordinates of secondary-beam features.
 *     2007 June 11 (MJC):
 *        Made RMS single precision.
+*     2007 June 15 (MJC):
+*        Add REFOFF argument and parameter.
 *     {enter_further_changes_here}
 
 *-
@@ -143,6 +153,7 @@
       DOUBLE PRECISION P( NP )
       DOUBLE PRECISION SIGMA( NP )
       INTEGER NBEAM
+      DOUBLE PRECISION REFOFF( 2 )
       DOUBLE PRECISION POLAR( 2, NBEAM )
       DOUBLE PRECISION POLSIG( 2, NBEAM )
       DOUBLE PRECISION RMS
@@ -250,9 +261,24 @@
 *  ===
       CALL PAR_PUT0R( 'RMS', SNGL( RMS ), STATUS )
 
+*  OFFSET of primary beam
+*  ======================
+
+*  Write the primary-beam offset and error out to the output
+*  parameter.  Both values are written to REFOFF.
+      LINE( 1 ) = AST_FORMAT( RFRM, 1, REFOFF( 1 ), STATUS )
+
+      IF ( REFOFF( 2 ) .NE. VAL__BADD ) THEN
+         LINE( 2 ) = AST_FORMAT( RFRM, 1, REFOFF( 2 ), STATUS )
+      ELSE
+         LINE( 2 ) = 'bad'
+      END IF
+
+      CALL PAR_PUT1C( 'REFOFF', 2, LINE, STATUS )
+
       
-*  OFFSET and PA
-*  =============
+*  OFFSET and PA of secondary beam positions
+*  =========================================
       IF ( NBEAM .GT. 1 ) THEN
          K = 0
          DO IB = 2, NBEAM
