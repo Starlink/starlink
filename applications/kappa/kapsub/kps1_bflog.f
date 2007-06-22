@@ -576,7 +576,7 @@
 *  Orientation
 *  ===========
          IF  ( PIXEL .OR. .NOT. ISSKY ) THEN
-            CALL MSG_SETC( 'SENSE', '(measured anticlockwise from Y)
+            CALL MSG_SETC( 'SENSE', '(measured anticlockwise from Y)' )
          ELSE
 
 *  Reverse these if the axis order is swapped in the SkyFrame.
