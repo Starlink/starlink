@@ -137,6 +137,8 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *  History:
 *     16-JAN-2006 (DSB):
 *        Original version.
+*     22-JUN-2007 (DSB):
+*        Add rejection of clumps that touch the edge of an array.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -162,6 +164,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int *ipa;            /* Pointer to clump assignment array */
    int *nrem;           /* Pointer to array holding clump populations */
    int *pa;             /* Pointer to next element of the ipa array */
+   int allow_edge;      /* Accept clumps that touch the edge of an array? */
    int dims[3];         /* Pointer to array of array dimensions */
    int el;              /* Number of elements in array */
    int i;               /* Loop count */
@@ -175,6 +178,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int more;            /* Continue looping? */
    int ngood;           /* Number of good clumps */
    int nlow;            /* Number of clumps with low peaks */
+   int nedge;           /* Number of clumps that touch an edge of the array */
    int nthin;           /* Number of clumps that span only a single pixel */
    int nsmall;          /* Number of clumps with too few pixels */
    int skip[3];         /* Pointer to array of axis skips */
@@ -278,6 +282,9 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Get the lowest allowed clump peak value. */
       minhgt = cupidConfigRMS( fwconfig, "MINHEIGHT", rms, mindip + noise, status );
 
+/* See if clumps are allowed to touch an edge of the data array. */
+      allow_edge = cupidConfigI( fwconfig, "ALLOWEDGE", 1, status );
+
 /* Get the minimum allowed number of pixels in a clump. */
       minpix = cupidDefMinPix( ndim, beamcorr, noise, minhgt, status );
       minpix = cupidConfigI( fwconfig, "MINPIX", minpix, status );
@@ -356,6 +363,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       nlow = 0;
       ngood = 0;
       nthin = 0;
+      nedge = 0;
       for( i = 0; i <= maxid; i++ ) {
          j = 3*i;
          if( nrem[ i ] <= minpix ) {
@@ -368,6 +376,12 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                   ( clbnd[ j + 1 ] == cubnd[ j + 1 ] && ndim > 1 ) || 
                   ( clbnd[ j + 2 ] == cubnd[ j + 2 ] && ndim > 2 ) ) {
             nthin++;           
+
+         } else if ( !allow_edge && ( 
+           clbnd[ j     ] < 3 || cubnd[ j     ] > dims[ 0 ] - 1 ||
+         ( clbnd[ j + 1 ] < 3 || cubnd[ j + 1 ] > dims[ 1 ] - 1 ) && ndim > 1  ||
+         ( clbnd[ j + 2 ] < 3 || cubnd[ j + 2 ] > dims[ 2 ] - 1 ) && ndim > 2 ) ){
+            nedge++;
 
          } else {
             igood[ ngood++ ] = i;
@@ -397,6 +411,15 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                msgSeti( "N", nthin );
                msgOut( "", "^N clumps rejected because they spans only a single "
                        "pixel along one or more axes.", status );
+            }
+            if( nedge == 1 ) {
+               msgOut( "", "1 clump rejected because it touches an edge "
+                       "of the array.", status );
+
+            } else if( nedge > 1 ) {
+               msgSeti( "N", nedge );
+               msgOut( "", "^N clumps rejected because they touch an edge "
+                       "of the array.", status );
             }
          }        
       }         

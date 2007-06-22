@@ -7,6 +7,14 @@
  data arrays.
 
 
+Changes introduced at V0.0-35:
+
+   - Add configuration parameter FellWalker.AllowEdge that can be set to
+   zero to reject clumps that touch an edge of the array. Note, unlike
+   ClumpFind.AllowEdge, FellWalker.AllowEdge defaults to 1 (this is to
+   retain backward compatibility with previous versions of CUPID).
+
+
 Changes introduced at V0.0-34:
 
    - Fix a bug that could cause spurious values to appear the catalogue

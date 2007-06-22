@@ -617,6 +617,9 @@ void findclumps( int *status ) {
 *     Values for these parameters can be specified using the CONFIG parameter. 
 *     Default values are shown in square brackets:
 *
+*     - FellWalker.AllowEdge: If set to a zero value, then clumps are
+*     rejected if they touch any edge of the data array. If non-zero, then
+*     such clumps are retained. [1]
 *     - FellWalker.CleanIter: This gives the number of times to apply the 
 *     cellular automata which cleans up the filled clumps. This cellular 
 *     automata replaces each clump index by the most commonly occuring 
@@ -707,6 +710,8 @@ void findclumps( int *status ) {
 *        Added output parameter NCLUMPS.
 *     9-MAY-2007 (DSB):
 *        Report the config parameters even if no clumps are found.
+*     22-JUN-2007 (DSB):
+*        Added config parameter FellWalker.AllowEdge.
 *     {enter_further_changes_here}
 
 *  Bugs:
