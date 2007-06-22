@@ -921,7 +921,7 @@ sub _get_version ($) {
 		      STRING => $global,
 		     };
     }
-    return ();
+    return (defined $global ? %{ $CACHE{$app} } : () );
   }
 
   my @version;
