@@ -48,6 +48,9 @@
 *     2007-03-20 (TIMJ):
 *        Initial version. Refactored from code by David Berry
 *        and Brad Cavanagh from smurf_makecube.c
+*     2007-06-22 (TIMJ):
+*        Use OBSIDSS in preference to OBSID. Try to build OBSID from
+*        OBSID and SUBSYSNR if OBSID is missing.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -56,6 +59,7 @@
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2007 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -83,45 +87,60 @@
 #include "sae_par.h"
 #include "ast.h"
 #include "star/atl.h"
+#include "merswrap.h"
 
 void
 smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
 		 AstKeyMap ** obsidmap, int * status ) {
 
    AstFitsChan *temphdr = NULL;/* FitsChan holding temporary FITS headers */
-   char *obsid = NULL;         /* Value of current file's OBSID header */
+   char *obsid = NULL;         /* Value of current file's OBSIDSS header */
+   char tempobs[80];           /* Temp space if we need to build OBSIDSS */
+   char obsidss[80];           /* Temp space for the built OBSIDSS */
 
   if ( *status != SAI__OK ) return;
 
 /* If this is the first file, get a copy of the input NDFs FITS extension
    (held in a FitsChan). This FitsChan will be used to hold the FITS
-   header for the output NDF. Add this NDF's OBSID FITS header to the
-   KeyMap, if there is an OBSID header. */
+   header for the output NDF. Also create the output key map at this point. */
+
       if( *outhdr == NULL ) {
          *outhdr = astCopy( inhdr );
 
          *obsidmap = astKeyMap( "" );
 
-         if( astGetFitsS( *outhdr, "OBSID", &obsid ) ) {
-            astMapPut0I( *obsidmap, obsid, 1, NULL );
-         }
-
 /* If this is not the first file, merge the input NDF's FITS extension
    into the output NDF's FITS extension by removing any headers from the
    output FITS extension that do not have identical values in the input
-   FITS extension. Also, check to see if the OBSID FITS header is unique
-   and, if so, place it in the KeyMap. Do so before merging the headers
-   in case this information is lost upon merging. */
+   FITS extension. */
       } else {
-
-         if( astGetFitsS( inhdr, "OBSID", &obsid ) ) {
-           astMapPut0I( *obsidmap, obsid, 1, NULL );
-         }
 
          atlMgfts( 3, inhdr, *outhdr, &temphdr, status );
          (void) astAnnul( *outhdr );
          *outhdr = temphdr;
       }
 
+      /* Work out the OBSID - note that we obtain the value from the input FITS
+	 header so that we do not risk losing the value after merginf of the
+	 FITS headers. CADC require that it is OBSIDSS that is unique and the
+	 thing that should be tracked. */
+      if( astGetFitsS( inhdr, "OBSIDSS", &obsid ) ) {
+	astMapPut0I( *obsidmap, obsid, 1, NULL );
+      } else if ( astGetFitsS( inhdr, "OBSID", &obsid ) ) {
+	/* Have an OBSID - so look for a SUBSYSNR - note that
+	   SCUBA-2 will not have one but we guarantee that it will
+	   have OBSIDSS so we should not end up in this branch */
+	/* need a local copy */
+	strncpy( tempobs, obsid, 80);
+	if ( astGetFitsS( inhdr, "SUBSYSNR", &obsid) ) {
+	  snprintf( obsidss, 80, "%s_%s", tempobs, obsid );
+	  astMapPut0I( *obsidmap, obsidss, 1, NULL );
+	} else {
+	  if (*status == SAI__OK) {
+	    *status = SAI__ERROR;
+	    errRep("", "Could not form OBSIDSS value since OBSIDSS is missing and so is SUBSYSNR", status);
+	  }
+	}
 
+      }
 }
