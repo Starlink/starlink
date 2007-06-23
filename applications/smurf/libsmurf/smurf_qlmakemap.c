@@ -72,12 +72,15 @@
 *        Changed smf_correct_extinction interface
 *     2007-03-20 (TIMJ):
 *        Write an output FITS header
+*     2007-06-22 (TIMJ):
+*        Rework to handle PRV* as well as OBS*
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
-*     Council and the University of British Columbia.  All Rights
-*     Reserved.
+*     Council. Copyright (C) 2006-2007 University of British Columbia.
+*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -147,6 +150,7 @@ void smurf_qlmakemap( int *status ) {
   AstFrameSet *outframeset = NULL; /* Frameset containing sky->output map mapping */
   int outsize;               /* Number of files in output group */
   float pixsize = 3.0;       /* Size of an output map pixel in arcsec */
+  AstKeyMap * prvkeymap = NULL; /* Keymap of input files for PRVxxx headers */
   int size;                  /* Number of files in input group */
   int smfflags = 0;          /* Flags for creating a new smfData */
   char system[10];           /* Celestial coordinate system for output image */
@@ -200,6 +204,9 @@ void smurf_qlmakemap( int *status ) {
 			(ubnd_out[1]-lbnd_out[1]+1), sizeof(double),
 			1, status );
 
+  /* Create provenance keymap */
+  prvkeymap = astKeyMap( "" );
+
   /* Loop over each input file, subtracting bolometer drifts, a mean
      sky level (per timeslice), correcting for extinction and
      regridding the data into the output map */
@@ -207,6 +214,11 @@ void smurf_qlmakemap( int *status ) {
   for ( i=1; i<=size && *status == SAI__OK; i++ ) {
     /* Read data from the ith input file in the group */
     smf_open_and_flatfield( igrp, NULL, i, &data, status );
+
+    /* Store the filename in the keymap for later - the GRP would be fine
+       as is but we use a keymap in order to reuse smf_fits_add_prov */
+    if (*status == SAI__OK)
+      astMapPut0I( prvkeymap, data->file->name, 1, NULL );
 
     /* Handle output FITS header creation */
     smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obsidmap, status );
@@ -233,8 +245,12 @@ void smurf_qlmakemap( int *status ) {
 
 /* Retrieve the unique OBSID keys from the KeyMap and populate the OBSnnnnn
    and PROVCNT headers from this information. */
-  smf_fits_add_prov( fchan, obsidmap, status ); 
+  smf_fits_add_prov( fchan, "OBS", obsidmap, status ); 
+  smf_fits_add_prov( fchan, "PRV", prvkeymap, status ); 
   
+  astAnnul( prvkeymap );
+  astAnnul( obsidmap );
+
 /* If the FitsChan is not empty, store it in the FITS extension of the
    output NDF (any existing FITS extension is deleted). */
   if( astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );

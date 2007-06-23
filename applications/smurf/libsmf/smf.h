@@ -160,12 +160,14 @@
 *        Add smf_open_file and smf_dtype_sz.c
 *     2007-06-13 (EC):
 *        Add smf_model_NDFexport
-
+*     2007-06-22 (TIMJ):
+*        Add string arg to smf_fits_add_prov
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
+*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     Copyright (C) 2005-2007 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -346,8 +348,9 @@ size_t smf_dtype_size( const smfData* data, int * status );
 void smf_fit_poly(const smfData *data, const int order, double *poly,  
                   int *status);
 
-void smf_fits_add_prov( AstFitsChan * hdr, const AstKeyMap * obsidmap,
-                      int * status);
+void smf_fits_add_prov( AstFitsChan * hdr, const char * keyroot,
+			const AstKeyMap * idmap,
+			int * status);
 
 void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, 
                       int *status);

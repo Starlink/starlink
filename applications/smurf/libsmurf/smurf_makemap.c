@@ -156,12 +156,15 @@
 *        Changed smf_correct_extinction interface
 *     2007-03-20 (TIMJ):
 *        Write an output FITS header
+*     2007-06-22 (TIMJ):
+*        Rework to handle PRV* as well as OBS*
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
-*     Council and the University of British Columbia. All Rights
-*     Reserved.
+*     Council. Copyright (C) 2005-2007 University of British Columbia.
+*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -246,6 +249,7 @@ void smurf_makemap( int *status ) {
   AstFrameSet *outfset=NULL; /* Frameset containing sky->output mapping */
   int parstate;              /* State of ADAM parameters */
   float pixsize=3;           /* Size of an output map pixel in arcsec */
+  AstKeyMap * prvkeymap = NULL; /* Keymap of input files for PRVxxx headers */
   int size;                  /* Number of files in input group */
   int smfflags=0;            /* Flags for smfData */
   char system[10];           /* Celestial coordinate system for output image */
@@ -453,6 +457,9 @@ void smurf_makemap( int *status ) {
 
   }
 
+  /* Create provenance keymap */
+  prvkeymap = astKeyMap( "" );
+
   /* Create WEIGHTS extension in the output file and map pointer to
      weights array */
   weightsloc = smf_get_xloc ( odata, "SCU2RED", "SCUBA2_WT_ARR", "WRITE", 
@@ -512,6 +519,11 @@ void smurf_makemap( int *status ) {
 		 status);
 	}
       }
+
+      /* Store the filename in the keymap for later - the GRP would be fine
+	 as is but we use a keymap in order to reuse smf_fits_add_prov */
+      if (*status == SAI__OK)
+	astMapPut0I( prvkeymap, data->file->name, 1, NULL );
 
       /* Handle output FITS header creation */
       if (*status == SAI__OK)
@@ -574,6 +586,11 @@ void smurf_makemap( int *status ) {
           errRep(FUNC_NAME, "Bad status calculating MAPCOORD", status);      
         }
 
+	/* Store the filename in the keymap for later - the GRP would be fine
+	   as is but we use a keymap in order to reuse smf_fits_add_prov */
+	if (*status == SAI__OK)
+	  astMapPut0I( prvkeymap, data->file->name, 1, NULL );
+
 	/* Handle output FITS header creation (since the file is open and
 	   he header is available) */
 	smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obsidmap, status );
@@ -599,8 +616,12 @@ void smurf_makemap( int *status ) {
 
 /* Retrieve the unique OBSID keys from the KeyMap and populate the OBSnnnnn
    and PROVCNT headers from this information. */
-  smf_fits_add_prov( fchan, obsidmap, status ); 
+  smf_fits_add_prov( fchan, "OBS", obsidmap, status ); 
+  smf_fits_add_prov( fchan, "PRV", prvkeymap, status ); 
   
+  astAnnul( prvkeymap );
+  astAnnul( obsidmap );
+
 /* If the FitsChan is not empty, store it in the FITS extension of the
    output NDF (any existing FITS extension is deleted). */
   if( astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );
