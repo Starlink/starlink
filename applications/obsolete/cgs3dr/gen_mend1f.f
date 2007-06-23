@@ -54,7 +54,7 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-      INCLUDE 'ADAM_ERR'
+      INCLUDE 'SAE_PAR'
 *    Import :
       INTEGER
      :  DIM                  ! Dimension of arrays

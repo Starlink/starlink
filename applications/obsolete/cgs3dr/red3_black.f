@@ -34,8 +34,8 @@ C
 C
 C    ADAM stuff
 C
-      INCLUDE 'ADAM_ERR'
-      INCLUDE  'SAE_PAR'
+      INCLUDE 'SAE_PAR'
+
 C
 C    Input parameters
 C
@@ -69,7 +69,7 @@ C
      :    OUTPUT*80,            ! name of file to contain output BB spectrum
      :    CHAR_ARRAY(2)*32      ! data and axis labels
 
-      IF ( STATUS .NE. ADAM__OK) RETURN
+      IF ( STATUS .NE. SAI__OK) RETURN
 C
 C    Initial settings
 C
@@ -82,7 +82,7 @@ C
       CALL DSA_NAMED_INPUT ('TEMPLATE', TEMPLATE, STATUS)
       CALL DSA_SEEK_AXIS ('TEMPLATE', 1, EXIST, STATUS)
       IF (.NOT. EXIST) THEN
-         IF (STATUS .EQ. ADAM__OK) THEN
+         IF (STATUS .EQ. SAI__OK) THEN
             CALL DSA_WRUSER ('Template file does not have an '//
      :         'axis1 array.\N')
             STATUS = SAI__ERROR
@@ -90,7 +90,7 @@ C
       ENDIF
       CALL DSA_AXIS_SIZE ('TEMPLATE', 1, 10, NDIM, DIMS, NELM, STATUS)
       IF (NDIM .NE. 1) THEN
-         IF (STATUS .EQ. ADAM__OK) THEN
+         IF (STATUS .EQ. SAI__OK) THEN
             CALL DSA_WRUSER ('Template file does not have 1-D '//
      :         'axis1 array.\N')
             STATUS = SAI__ERROR
@@ -142,26 +142,26 @@ C
 C
 C    copy the wavelength array
 C
-      IF (STATUS .EQ. ADAM__OK) THEN
+      IF (STATUS .EQ. SAI__OK) THEN
          CALL GEN_MOVE (4*DIMS(1), %VAL(A1_PTR), %VAL(OUT_A1_PTR))
       ENDIF
 C
 C    call routine to create black body
 C
-      IF (STATUS .EQ. ADAM__OK) THEN
+      IF (STATUS .EQ. SAI__OK) THEN
          CALL GEN_BBSPC (REFWAVE, TEMPERATURE, %VAL(OUT_A1_PTR), 
      :      DIMS(1), %VAL(D_PTR))
       ENDIF
 C
 C    multiply the BB by the reference flux
 C
-      IF (STATUS .EQ. ADAM__OK) THEN
+      IF (STATUS .EQ. SAI__OK) THEN
          CALL GEN_MULCAF (%VAL(D_PTR), DIMS(1), REFFLUX, %VAL(D_PTR))
       ENDIF
 C
 C    fill error and quality arrays with zeros and good quality
 C
-      IF (STATUS .EQ. ADAM__OK) THEN
+      IF (STATUS .EQ. SAI__OK) THEN
          CALL GEN_CFILL (1, DIMS(1), 0.0, %VAL(V_PTR))
          CALL GEN_FILL (DIMS(1), 0, %VAL(Q_PTR))
       ENDIF

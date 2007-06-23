@@ -42,7 +42,6 @@ C
 C
 C     Global constants
 C
-      INCLUDE 'ADAM_ERR'
       INCLUDE 'SAE_PAR'
 C
 C     Local variables
@@ -61,7 +60,7 @@ C
       CHARACTER*40 CITEMS(2)
 
 
-      IF (STATUS .NE. ADAM__OK) RETURN
+      IF (STATUS .NE. SAI__OK) RETURN
 
       CALL DSA_OPEN(STATUS)
 
@@ -194,7 +193,7 @@ C       Coerce the axis 2 data
       END IF
 
 C    Reduce the input data into the output file
-      IF (STATUS .EQ. ADAM__OK) THEN
+      IF (STATUS .EQ. SAI__OK) THEN
          IF (NPOL .EQ. 1) THEN
             CALL CGS3_1 (NWAVE, NBEAMS, NCYC, %val(IPTR), 
      :       %val(AIPTR), %val(OPTR), %val(AOPTR), %val(A2OPTR))

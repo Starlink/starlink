@@ -35,7 +35,6 @@ C-
       IMPLICIT NONE
 
 C     GLOBAL VARIABLES
-      INCLUDE 'ADAM_ERR'
       INCLUDE 'SAE_PAR'
 
       INTEGER STATUS
@@ -75,7 +74,7 @@ C     Initial values
 C
       FAULT=.FALSE.
 
-      IF (STATUS .NE. ADAM__OK) RETURN
+      IF (STATUS .NE. SAI__OK) RETURN
 C
 C     Get SPECTRUM. Open the file and check data dimensions.
 C
@@ -96,7 +95,7 @@ C
       CALL DSA_GET_AXIS_INFO ('SPECT', 1, 1, UNITS, 0, 0, STATUS)
       CALL DSA_GET_AXIS_INFO ('SPECT1', 1, 1, UNITS1, 0, 0, STATUS)
       IF (UNITS1.NE.UNITS) THEN
-         IF (STATUS .EQ. ADAM__OK) THEN
+         IF (STATUS .EQ. SAI__OK) THEN
             CALL PAR_WRUSER(
      :           'Warning: X-axis units for the two spectra differ.',
      :                                                         STATUS)
@@ -105,7 +104,7 @@ C
       CALL DSA_GET_DATA_INFO ('SPECT', 1, UNITS, 0, 0, STATUS)
       CALL DSA_GET_DATA_INFO ('SPECT1', 1, UNITS1, 0, 0, STATUS)
       IF (UNITS1.NE.UNITS) THEN
-         IF (STATUS .EQ. ADAM__OK) THEN
+         IF (STATUS .EQ. SAI__OK) THEN
             CALL PAR_WRUSER(
      :           'Warning: Data units for the two spectra differ.',
      :                                                         STATUS)
@@ -141,7 +140,7 @@ C
       CALL DSA_SEEK_ERRORS ('SPECT1', ERRORS1, STATUS)
       IF ((ERRORS.AND.(.NOT.ERRORS1)).OR.((.NOT.ERRORS).AND.ERRORS1))
      :                                                         THEN
-         IF (STATUS .EQ. ADAM__OK) THEN
+         IF (STATUS .EQ. SAI__OK) THEN
             CALL DSA_WRUSER (
      :         'Warning: only one array has an error array.\N')
             CALL DSA_WRUSER (
@@ -190,7 +189,7 @@ C     Check the X order of the two files.  We try to put the one with
 C     the lower X values into the output spectrum first, to avoid the 
 C     sorting overhead.  Check for an overlap in values.
 C
-      IF (STATUS .EQ. ADAM__OK) THEN
+      IF (STATUS .EQ. SAI__OK) THEN
          CALL GEN_RANGEF(%VAL(A_PTR),1,NX,XMAX,XMIN)
          CALL GEN_RANGEF(%VAL(A1_PTR),1,NX1,X1MAX,X1MIN)
       ENDIF
@@ -202,7 +201,7 @@ C
          REVERSE=.FALSE.
       END IF
       IF (OVRLAP) THEN
-         IF (STATUS .EQ. ADAM__OK) THEN
+         IF (STATUS .EQ. SAI__OK) THEN
             CALL DSA_WRUSER(
      :         'Note: There is an overlap between the X-ranges '//
      :         'of the two spectra.')
@@ -211,7 +210,7 @@ C
      :         'spectrum\N')
          ENDIF
       ELSE IF (REVERSE) THEN
-         IF (STATUS .EQ. ADAM__OK) THEN
+         IF (STATUS .EQ. SAI__OK) THEN
             CALL DSA_WRUSER(
      :         'Note: The first spectrum begins at a higher ')
             CALL DSA_WRUSER (
@@ -262,12 +261,12 @@ C
 C     Copy the input X arrays into the output X array.  
 C
       IF (REVERSE) THEN
-         IF (STATUS .EQ. ADAM__OK) THEN
+         IF (STATUS .EQ. SAI__OK) THEN
             CALL GEN_MOVE(NX1*4,%VAL(A1_PTR),%VAL(AO_PTR))
             CALL GEN_MOVE(NX*4,%VAL(A_PTR),%VAL(AO_PTR+NX1*4))
          ENDIF
       ELSE
-         IF (STATUS .EQ. ADAM__OK) THEN
+         IF (STATUS .EQ. SAI__OK) THEN
             CALL GEN_MOVE(NX*4,%VAL(A_PTR),%VAL(AO_PTR))
             CALL GEN_MOVE(NX1*4,%VAL(A1_PTR),%VAL(AO_PTR+NX*4))
          ENDIF
@@ -280,7 +279,7 @@ C     one the sort vector and one the workspace needed by the indirect
 C     sorting routine GEN_FVSORT.
 C
       SORT=.FALSE.
-      IF (STATUS .EQ. ADAM__OK) THEN
+      IF (STATUS .EQ. SAI__OK) THEN
          IF (.NOT.GEN_INCCHK(%VAL(AO_PTR),NX+NX1)) THEN
             IF (.NOT.OVRLAP) THEN
                CALL DSA_WRUSER(
@@ -294,7 +293,7 @@ C
             CALL DSA_GET_WORKSPACE (BYTES, ADDRESS, W_SLOT, STATUS)
             VW_PTR = ADDRESS
             WK_PTR=VW_PTR+(NX+NX1)*4
-            IF (STATUS .EQ. ADAM__OK) THEN
+            IF (STATUS .EQ. SAI__OK) THEN
                CALL GEN_QFISORT(%VAL(AO_PTR),NX+NX1,%VAL(VW_PTR))
                CALL GEN_FVSORT(%VAL(VW_PTR),NX+NX1,1,%VAL(WK_PTR),
      :            %VAL(AO_PTR))
@@ -306,7 +305,7 @@ C     Now copy the data, error and quality arrays as necessary into
 C     the output structure. Sort them according to the sorted axis
 C     array as required
 C
-      IF (STATUS .EQ. ADAM__OK) THEN
+      IF (STATUS .EQ. SAI__OK) THEN
          IF (REVERSE) THEN
             CALL GEN_MOVE(NX1*4,%VAL(D1_PTR),%VAL(DO_PTR))
             CALL GEN_MOVE(NX*4,%VAL(D_PTR),%VAL(DO_PTR+NX1*4))
@@ -330,7 +329,7 @@ C
                CALL GEN_MOVE(NX1*4,%VAL(V1_PTR),%VAL(VO_PTR+NX*4))
             ENDIF
          ENDIF
-         IF (SORT.AND.(STATUS .EQ. ADAM__OK)) THEN
+         IF (SORT.AND.(STATUS .EQ. SAI__OK)) THEN
             CALL GEN_FVSORT(%VAL(VW_PTR),NX+NX1,1,
      :                                    %VAL(WK_PTR),%VAL(DO_PTR))
             IF (QUAL) THEN

@@ -28,7 +28,6 @@ C
 C
 C     Global constants
 C
-      INCLUDE 'ADAM_ERR'
       INCLUDE 'SAE_PAR'
 C
 C     Local variables
@@ -45,7 +44,7 @@ C
       CHARACTER*80 INPUT
 
 
-      IF (STATUS .NE. ADAM__OK) RETURN
+      IF (STATUS .NE. SAI__OK) RETURN
 
       CALL DSA_OPEN(STATUS)
 C
@@ -83,7 +82,7 @@ C
      :      STATUS)
       ENDIF
   
-      IF (STATUS .EQ. ADAM__OK) THEN
+      IF (STATUS .EQ. SAI__OK) THEN
          FINISHED = .FALSE.
          DO WHILE (.NOT.FINISHED)
 C
@@ -91,7 +90,7 @@ C     Read the cycle numbers to be set bad
 C
             CALL PAR_GET0I ('BAD_CYCLE',BAD_CYCLE,STATUS)
             CALL PAR_CANCL ('BAD_CYCLE',STATUS)
-            IF (STATUS .EQ. ADAM__OK) THEN
+            IF (STATUS .EQ. SAI__OK) THEN
                IF (BAD_CYCLE .GT. 0) THEN
 C
 C     Set them bad, and fill the corresponding data and variance areas 

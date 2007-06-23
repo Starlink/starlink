@@ -53,8 +53,8 @@
         CALL MSG_SETC( 'OUTVAL', OUTVAL(1:CHR_LEN(OUTVAL)) )
         CALL MSG_SETI( 'TIMEOUT', TIMEOUT )
         CALL MSG_OUT( ' ', 'CGS3DR_OBEYW: '/
-     :   /'Called ^TASK_NAME ^ACTION action with parameters INVAL = ^INVAL, '/
-     :   /'OUTVAL = ^OUTVAL, TIMEOUT = ^TIMEOUT', STATUS )
+     :   /'Called ^TASK_NAME ^ACTION action with parameters INVAL = '/
+     :   /'^INVAL, OUTVAL = ^OUTVAL, TIMEOUT = ^TIMEOUT', STATUS )
       ENDIF
 
 *    Call the action
@@ -68,8 +68,8 @@
         CALL MSG_SETI( 'TSTAT', TMP_STATUS )
         CALL MSG_SETC( 'TNAME', TASK_NAME )
         CALL MSG_SETC( 'TACNT', ACTION )
-        CALL ERR_REP( ' ', 'CGS3DR_OBEYW: '/
-     :   /'Failed to start ^TACNT action in ^TNAME task, Status = ^TSTAT', STATUS )
+        CALL ERR_REP( ' ', 'CGS3DR_OBEYW: Failed to start '/
+     :   /'^TACNT action in ^TNAME task, Status = ^TSTAT', STATUS )
       ENDIF
 
 *    Wait for completion
@@ -82,8 +82,8 @@
         CALL MSG_SETI( 'TSTAT', TMP_STATUS )
         CALL MSG_SETC( 'TNAME', TASK_NAME )
         CALL MSG_SETC( 'TACNT', ACTION )
-        CALL ERR_REP( ' ', 'CGS3DR_OBEYW: '/
-     :   /'Failed to complete ^TACNT action in ^TNAME task, Status = ^TSTAT', STATUS )
+        CALL ERR_REP( ' ', 'CGS3DR_OBEYW: Failed to complete '/
+     :   /'^TACNT action in ^TNAME task, Status = ^TSTAT', STATUS )
       ENDIF
 
       END

@@ -81,7 +81,8 @@ C
 *  Check that it is one dimensional
          IF (NDIM .NE. 1) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( ' ', 'Dimensions of Input File Invalid', STATUS)
+            CALL ERR_REP( ' ', 'Dimensions of Input File Invalid',
+     :           STATUS)
             GOTO 100
          ELSE
 
@@ -131,7 +132,8 @@ C
 *  Check that its dimensions match those of the previous frame
                 IF (NDIM.NE.1 .OR. DIMS2(1).NE.DIMS(1)) THEN
                   STATUS = SAI__ERROR
-                  CALL ERR_REP(' ','Dimensions of Input File Invalid', STATUS)
+                  CALL ERR_REP(' ','Dimensions of Input File Invalid',
+     :                 STATUS)
                   GOTO 100
                 ENDIF
 
@@ -164,7 +166,8 @@ C
 *  Check that its dimensions match those of the previous frames
                 IF (NDIM.NE.1 .OR. DIMS2(1).NE.DIMS(1)) THEN
                   STATUS = SAI__ERROR
-                  CALL ERR_REP(' ','Dimensions of Input File Invalid', STATUS)
+                  CALL ERR_REP(' ','Dimensions of Input File Invalid',
+     :                 STATUS)
                   GOTO 100
                 ENDIF
 
@@ -197,7 +200,8 @@ C
 *  Check that the dimensions match those of the previous frames
                 IF (NDIM.NE.1 .OR. DIMS2(1).NE.DIMS(1)) THEN
                   STATUS = SAI__ERROR
-                  CALL ERR_REP(' ','Dimensions of Input File Invalid', STATUS)
+                  CALL ERR_REP(' ','Dimensions of Input File Invalid',
+     :                 STATUS)
                   GOTO 100
                 ENDIF
 

@@ -66,7 +66,7 @@
       WRITE ( LU, 23 ) 
 23    FORMAT ( / ' Enter name of input file: ', $ )
       READ ( 5, 33 ) IN_FILE
-      OPEN ( UNIT = 1, NAME=IN_FILE(1:60), TYPE='OLD', ERR=960)
+      OPEN ( UNIT=1,FILE=IN_FILE(1:60),STATUS='OLD',ERR=960)
 33    FORMAT (A60)
 
       I = 0
@@ -76,7 +76,7 @@
      :   TEMP3,TEMP4,TEMP5
       IF ( TEMP4 .GT. 0.0 ) THEN	! only apparent detections
 
-        IF ( IF_RUN(RUN) .EQ. .TRUE.) THEN
+        IF ( IF_RUN(RUN) ) THEN
           WRITE ( LU, 41 ) RUN
 41        FORMAT ( ' *** Warning! Multiple occurrence of run ', I4, /
      :             '     Only the last one will be used.' )
@@ -175,7 +175,7 @@
           SIGMAN = TEMP / SQRT ( FLOAT (NUM_NS) )
           DO I = 1,LAST_RUN
             IF ( FILTER(I) .EQ. 'N' .AND.
-     :           IF_STD(I) .EQ. .TRUE. ) THEN
+     :           IF_STD(I) ) THEN
               TEMP1 = MAG(I) - N_EXT * AMASS(I)
               ZP = CAT_VAL(I) - TEMP1
               DIFF = NZP - ZP	! zero point differential from mean
@@ -196,7 +196,7 @@
           SIGMAQ = TEMP / SQRT ( FLOAT (NUM_QS) )
           DO I = 1,LAST_RUN
             IF ( FILTER(I) .EQ. 'Q' .AND.
-     :           IF_STD(I) .EQ. .TRUE. ) THEN
+     :           IF_STD(I) ) THEN
               TEMP1 = MAG(I) - N_EXT * AMASS(I)
               ZP = CAT_VAL(I) - TEMP1
               DIFF = QZP - ZP	! zero point differential from mean
@@ -254,7 +254,8 @@
 123     FORMAT ( ' Enter run number: ', $ )
         READ ( 5, * ) RUN
         IF ( .NOT. IF_RUN(RUN) ) THEN
-          WRITE(*,'(1X,A)') 'Invalid run # (non-defined or negative signal)'
+          WRITE(*,'(1X,A)') 
+     :          'Invalid run # (non-defined or negative signal)'
           GOTO 120
         ENDIF
         IF ( IF_STD(RUN)) THEN
@@ -262,7 +263,8 @@
           NSTDS = NSTDS - 1
           IF_CHANGED = .TRUE.
         ELSE
-          WRITE(*,'(1X,A)') 'That run is not presently flagged as a standard'
+          WRITE(*,'(1X,A)') 
+     :          'That run is not presently flagged as a standard'
         ENDIF
         GOTO 110
       ELSE
@@ -270,7 +272,8 @@
       ENDIF
       
       IF ( NSTDS .LE. 0 ) THEN
-        WRITE(*,'(1X,A)') 'You have not flagged any observations as stds!'
+        WRITE(*,'(1X,A)') 
+     :        'You have not flagged any observations as stds!'
         GOTO 70
       ENDIF
 
@@ -312,7 +315,7 @@ C     Decide on extinctions
         READ ( 5, 187 ) OUT_FILE
 187     FORMAT ( A60 )
  
-        OPEN ( UNIT=1, NAME=OUT_FILE(1:60), TYPE='NEW', ERR=960 )
+        OPEN ( UNIT=1,FILE=OUT_FILE(1:60),STATUS='NEW',ERR=960 )
 
         WRITE ( 1, 193 ) IN_FILE
 193     FORMAT ( ' Input file was: ', A /

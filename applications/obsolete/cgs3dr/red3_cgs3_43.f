@@ -32,7 +32,6 @@ C
 C
 C     Global constants
 C
-      INCLUDE 'ADAM_ERR'
       INCLUDE 'SAE_PAR'
 C
 C     Local variables
@@ -49,7 +48,7 @@ C
       CHARACTER*40 CITEMS(2)
 
 
-      IF (STATUS .NE. ADAM__OK) RETURN
+      IF (STATUS .NE. SAI__OK) RETURN
 
       CALL DSA_OPEN(STATUS)
 C
@@ -149,7 +148,7 @@ C
 C
 C     Reduce the input data into the output file
 C
-      IF (STATUS .EQ. ADAM__OK) THEN
+      IF (STATUS .EQ. SAI__OK) THEN
          CALL CGS3_3 (NWAVE, NBEAMS, NCYC, NPOL, VARIANCE, %val(IPTR), 
      :      %val(IVPTR), %val(AIPTR), %val(OPTR), %val(OVPTR), 
      :      %val(AOPTR), %val(A2OPTR))

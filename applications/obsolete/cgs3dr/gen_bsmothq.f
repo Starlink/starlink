@@ -63,7 +63,7 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-      INCLUDE 'ADAM_ERR'
+      INCLUDE 'SAE_PAR'
 *    Import :
       INTEGER
      :  NELM                ! Dimensions of the data arrays
@@ -109,7 +109,7 @@
 
 *   Check for error on entry
 
-      IF ( STATUS .EQ. ADAM__OK ) THEN
+      IF ( STATUS .EQ. SAI__OK ) THEN
 
 *      Initialise the half box size. (Note this is integer arithmetic,
 *      so the value will be rounded down. 2/2=1 and 3/2=1). Ensure that

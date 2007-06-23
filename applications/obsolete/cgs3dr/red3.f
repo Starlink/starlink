@@ -36,7 +36,6 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-      INCLUDE 'ADAM_ERR'
       INCLUDE 'SAE_PAR'
       INCLUDE 'PAR_PAR'
       INCLUDE 'PRM_PAR'
@@ -48,17 +47,13 @@
 *    Local Constants :
 *    Local variables :
 *    Global variables :
-      INCLUDE 'NUM_CMN'
 *    Internal References :
 *    Local data :
 *-
 
-      IF( STATUS .EQ. ADAM__OK ) THEN
+      IF( STATUS .EQ. SAI__OK ) THEN
 
         CALL TASK_GET_NAME ( NAME, STATUS )
-
-*       declare arithmetic trap
-         NUM_ERROR = SAI__OK
 
          IF ( NAME .EQ. 'BLACK_BODY') THEN
 

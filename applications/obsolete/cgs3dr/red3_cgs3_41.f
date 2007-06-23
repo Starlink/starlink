@@ -38,8 +38,8 @@ C+
 C
 C     Global constants
 
-      INCLUDE 'ADAM_ERR'
       INCLUDE 'SAE_PAR'
+
 C
 C     ADAM status
 C
@@ -59,7 +59,7 @@ C
       CHARACTER*40 CITEMS(2)
 
 
-      IF (STATUS .NE. ADAM__OK) RETURN
+      IF (STATUS .NE. SAI__OK) RETURN
 
 C    Initialization of DSA routines
       CALL DSA_OPEN(STATUS)
@@ -146,7 +146,7 @@ C    Get workspace
 
 C    Call routine to coadd Right-Lefts and switch round the axis array
 C    to increase with array index
-      IF (STATUS .EQ. ADAM__OK) THEN
+      IF (STATUS .EQ. SAI__OK) THEN
          CALL CGS3_2 (NWAVE,NBEAMS,NCYC,%val(IPTR),%val(AIPTR),
      :      STARTSCAN,ENDSCAN,%val(OPTR),%val(OVPTR),%val(AOPTR),
      :      %val(SUMPTR),%val(SUMSQPTR),%val(SCPTR),NSIGMA)

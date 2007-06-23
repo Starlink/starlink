@@ -386,7 +386,8 @@
 *             ...and then plot
                IF (PLOTTING) THEN
                   STRINGS(1) = STRINGS(5)
-                  STRINGS(2) = 'DEVICE="'//GDEVICE(1:CHR_LEN(GDEVICE))//'"'
+                  STRINGS(2) = 'DEVICE="'/
+     :                 /GDEVICE(1:CHR_LEN(GDEVICE))//'"'
                   STRINGS(3) = 'LABEL='//STRINGS(5)
                   STRINGS(4) = 'AUTO=T'
                   CALL CHR_FILL( ' ', INVAL )

@@ -30,7 +30,6 @@ C+
 C
 C     ADAM stuff
 C
-      INCLUDE 'ADAM_ERR'
       INCLUDE 'SAE_PAR'
 C
 C     Input parameters
@@ -67,7 +66,7 @@ C
 
       REAL FACTOR, CONSTANT         ! FACTOR and CONSTANT applied to data
 
-      IF (STATUS .NE. ADAM__OK) RETURN
+      IF (STATUS .NE. SAI__OK) RETURN
 C
 C     Initial settings
 C
@@ -90,7 +89,7 @@ C     Get FACTOR and CONSTANT
 C
 C     Open output image
 C
-      IF (STATUS .EQ. ADAM__OK) THEN
+      IF (STATUS .EQ. SAI__OK) THEN
 
          CALL DSA_WRUSER ('WARNING. Currently INPUT is being used ')
          CALL DSA_WRUSER ('as the template for the OUTPUT file, ') 
@@ -164,7 +163,7 @@ C
 
       END IF
 
-      IF (STATUS .NE. ADAM__OK) GO TO 500
+      IF (STATUS .NE. SAI__OK) GO TO 500
 C
 C     Operate on the image data
 C

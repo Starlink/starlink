@@ -42,7 +42,6 @@ C
 C 
 C     ADAM include files
 C
-      INCLUDE 'ADAM_ERR'
       INCLUDE 'SAE_PAR'
 C
 C     ADAM status
@@ -84,7 +83,7 @@ C
       INTEGER   NEW_FILE, NO_DATA
       PARAMETER (NEW_FILE=1, NO_DATA=1)
 
-      IF (STATUS .NE. ADAM__OK) RETURN
+      IF (STATUS .NE. SAI__OK) RETURN
 
 !      CALL DSA_WRUSER (
 !     :'This is NOT the standard Figaro version of EXTRACT. It will ')
@@ -123,7 +122,7 @@ C
      :   STATUS)
       CALL PAR_GET0R ('YSTART',YSTART,STATUS)
       CALL PAR_GET0R ('YEND',YEND,STATUS)
-      IF (STATUS .EQ. ADAM__OK) THEN
+      IF (STATUS .EQ. SAI__OK) THEN
          IYST = GEN_BSEARCH (%VAL(APTR),NY,YSTART)
          IYEN = GEN_BSEARCH (%VAL(APTR),NY,YEND)
       ENDIF
@@ -176,12 +175,12 @@ C
       ENDIF
 
       IF (MAX(IYST,1) .EQ. MIN(IYEN,NY)) THEN
-         IF (VARIANCE .AND. (STATUS .EQ. ADAM__OK)) THEN
+         IF (VARIANCE .AND. (STATUS .EQ. SAI__OK)) THEN
 !            CALL DSA_WRUSER (
 !     :'The spectrum variance will be copied from the input image.\N')
          ENDIF
       ELSE
-         IF (STATUS .EQ. ADAM__OK) THEN
+         IF (STATUS .EQ. SAI__OK) THEN
 !            CALL DSA_WRUSER (
 !     :'The spectrum variance will be calculated from the spread ')
 !            CALL DSA_WRUSER (
@@ -197,7 +196,7 @@ C
 C
 C     Perform the extraction
 C
-      IF (STATUS .EQ. ADAM__OK) THEN
+      IF (STATUS .EQ. SAI__OK) THEN
          CALL FIGE_XTRACT(%VAL(IPTR),%VAL(IVPTR),%VAL(IQPTR),NX,NY,
      :      IYST,IYEN,VARIANCE,QUALITY,FLAGGED,FBAD,%VAL(SPTR),
      :      %VAL(SVPTR),%VAL(SQPTR),%VAL(NUMPTR),%VAL(SUMPTR),
