@@ -4,7 +4,7 @@
 
 <component id="@PACKAGE@">
   <version>@PACKAGE_VERSION@</version>
-  <path>applications/surf2</path>
+  <path>applications/smurf</path>
   <description>SURF2 - SCUBA-2 User Reduction Facility</description>
   <abstract><p>
 SURF2 is a set of ADAM tasks necessary for reducing raw

@@ -2046,7 +2046,7 @@ $(MANIFESTS)/smurf: \
 		$(MANIFESTS)/sst \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem
-	cd applications/surf2 \
+	cd applications/smurf \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/snx: \
