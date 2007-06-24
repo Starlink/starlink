@@ -289,6 +289,30 @@ $(MANIFESTS)/cfitsio: \
 	cd thirdparty/heasarc/cfitsio \
 	  && $(MAKE_CPT)
 
+# Component cgs3dr is OBSOLETE -- do not build
+$(MANIFESTS)/cgs3dr: \
+		$(MANIFESTS)/ary \
+		$(MANIFESTS)/ast \
+		$(MANIFESTS)/chr \
+		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ems \
+		$(MANIFESTS)/figaro \
+		$(MANIFESTS)/fio \
+		$(MANIFESTS)/hds \
+		$(MANIFESTS)/hlp \
+		$(MANIFESTS)/mers \
+		$(MANIFESTS)/ndf \
+		$(MANIFESTS)/par \
+		$(MANIFESTS)/pcs \
+		$(MANIFESTS)/prm \
+		$(MANIFESTS)/psx \
+		$(MANIFESTS)/sae \
+		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/tsp
+	cd applications/obsolete/cgs3dr \
+	  && $(MAKE_CPT)
+
 # Component chart is OBSOLETE -- do not build
 $(MANIFESTS)/chart: \
 		$(MANIFESTS)/chr \
@@ -803,6 +827,23 @@ $(MANIFESTS)/fio: \
 	cd libraries/fio \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/fluxes: \
+		$(MANIFESTS)/chr \
+		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ems \
+		$(MANIFESTS)/fio \
+		$(MANIFESTS)/hds \
+		$(MANIFESTS)/hlp \
+		$(MANIFESTS)/mers \
+		$(MANIFESTS)/par \
+		$(MANIFESTS)/pcs \
+		$(MANIFESTS)/psx \
+		$(MANIFESTS)/sae \
+		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/starmem
+	cd applications/fluxes \
+	  && $(MAKE_CPT)
+
 # Component gaia has configure dependencies on { blt itcl tcl tk },
 # which must be built before this component is configured.
 $(MANIFESTS)/gaia: \
@@ -1164,6 +1205,54 @@ $(MANIFESTS)/itcl: \
 		$(MANIFESTS)/tk
 	cd thirdparty/tclsys/itcl \
 	  && $(CONFIG_CPT) \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/jcmtdr: \
+		$(MANIFESTS)/agi \
+		$(MANIFESTS)/ary \
+		$(MANIFESTS)/ast \
+		$(MANIFESTS)/atl \
+		$(MANIFESTS)/cat \
+		$(MANIFESTS)/chr \
+		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ems \
+		$(MANIFESTS)/figaro \
+		$(MANIFESTS)/fio \
+		$(MANIFESTS)/generic \
+		$(MANIFESTS)/gks \
+		$(MANIFESTS)/gns \
+		$(MANIFESTS)/graphpar \
+		$(MANIFESTS)/grp \
+		$(MANIFESTS)/gsd \
+		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hds \
+		$(MANIFESTS)/hlp \
+		$(MANIFESTS)/idi \
+		$(MANIFESTS)/kaplibs \
+		$(MANIFESTS)/mag \
+		$(MANIFESTS)/mers \
+		$(MANIFESTS)/ncar \
+		$(MANIFESTS)/ndf \
+		$(MANIFESTS)/ndg \
+		$(MANIFESTS)/one \
+		$(MANIFESTS)/par \
+		$(MANIFESTS)/pcs \
+		$(MANIFESTS)/pda \
+		$(MANIFESTS)/pgp \
+		$(MANIFESTS)/pgplot \
+		$(MANIFESTS)/prm \
+		$(MANIFESTS)/psx \
+		$(MANIFESTS)/ref \
+		$(MANIFESTS)/sae \
+		$(MANIFESTS)/sgs \
+		$(MANIFESTS)/shl \
+		$(MANIFESTS)/sla \
+		$(MANIFESTS)/snx \
+		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starx \
+		$(MANIFESTS)/trn
+	cd applications/jcmtdr \
 	  && $(MAKE_CPT)
 
 # Component jpeg is a configure dependency, so is configurable in place.
@@ -1933,6 +2022,33 @@ $(MANIFESTS)/sla: \
 	cd libraries/sla \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/smurf: \
+		$(MANIFESTS)/ary \
+		$(MANIFESTS)/ast \
+		$(MANIFESTS)/chr \
+		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ems \
+		$(MANIFESTS)/fio \
+		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hds \
+		$(MANIFESTS)/hlp \
+		$(MANIFESTS)/mers \
+		$(MANIFESTS)/messgen \
+		$(MANIFESTS)/ndf \
+		$(MANIFESTS)/one \
+		$(MANIFESTS)/par \
+		$(MANIFESTS)/pcs \
+		$(MANIFESTS)/prm \
+		$(MANIFESTS)/psx \
+		$(MANIFESTS)/sae \
+		$(MANIFESTS)/shl \
+		$(MANIFESTS)/sla \
+		$(MANIFESTS)/sst \
+		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/starmem
+	cd applications/surf2 \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/snx: \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
@@ -1947,6 +2063,47 @@ $(MANIFESTS)/snx: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem
 	cd libraries/snx \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/specx: \
+		$(MANIFESTS)/agi \
+		$(MANIFESTS)/ary \
+		$(MANIFESTS)/ast \
+		$(MANIFESTS)/chr \
+		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ems \
+		$(MANIFESTS)/figaro \
+		$(MANIFESTS)/fio \
+		$(MANIFESTS)/generic \
+		$(MANIFESTS)/gks \
+		$(MANIFESTS)/gns \
+		$(MANIFESTS)/graphpar \
+		$(MANIFESTS)/grp \
+		$(MANIFESTS)/gsd \
+		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hds \
+		$(MANIFESTS)/hlp \
+		$(MANIFESTS)/idi \
+		$(MANIFESTS)/mers \
+		$(MANIFESTS)/ndf \
+		$(MANIFESTS)/one \
+		$(MANIFESTS)/par \
+		$(MANIFESTS)/pcs \
+		$(MANIFESTS)/pda \
+		$(MANIFESTS)/pgp \
+		$(MANIFESTS)/pgplot \
+		$(MANIFESTS)/prm \
+		$(MANIFESTS)/psx \
+		$(MANIFESTS)/ref \
+		$(MANIFESTS)/sae \
+		$(MANIFESTS)/sgs \
+		$(MANIFESTS)/shl \
+		$(MANIFESTS)/sla \
+		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starx \
+		$(MANIFESTS)/trn
+	cd applications/specx \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/spt: \
@@ -2037,6 +2194,27 @@ $(MANIFESTS)/sun248: \
 		$(MANIFESTS)/dvi2bitmap \
 		$(MANIFESTS)/sgmlkit
 	cd docs/sun/248 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/surf: \
+		$(MANIFESTS)/ary \
+		$(MANIFESTS)/ast \
+		$(MANIFESTS)/chr \
+		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ems \
+		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hds \
+		$(MANIFESTS)/hlp \
+		$(MANIFESTS)/mers \
+		$(MANIFESTS)/ndf \
+		$(MANIFESTS)/pcs \
+		$(MANIFESTS)/prm \
+		$(MANIFESTS)/psx \
+		$(MANIFESTS)/sae \
+		$(MANIFESTS)/sla \
+		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/starmem
+	cd applications/surf \
 	  && $(MAKE_CPT)
 
 # Component tcl is a configure dependency, so is configurable in place.
@@ -2149,6 +2327,7 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/extractor \
 	$(MANIFESTS)/figaro \
 	$(MANIFESTS)/fio \
+	$(MANIFESTS)/fluxes \
 	$(MANIFESTS)/gaia \
 	$(MANIFESTS)/generic \
 	$(MANIFESTS)/graphpar \
@@ -2163,6 +2342,7 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/img \
 	$(MANIFESTS)/info \
 	$(MANIFESTS)/init \
+	$(MANIFESTS)/jcmtdr \
 	$(MANIFESTS)/jpl \
 	$(MANIFESTS)/kaplibs \
 	$(MANIFESTS)/kappa \
@@ -2202,10 +2382,13 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/sgs \
 	$(MANIFESTS)/shl \
 	$(MANIFESTS)/sla \
+	$(MANIFESTS)/smurf \
+	$(MANIFESTS)/specx \
 	$(MANIFESTS)/sst \
 	$(MANIFESTS)/star2html \
 	$(MANIFESTS)/starmem \
 	$(MANIFESTS)/startcl \
+	$(MANIFESTS)/surf \
 	$(MANIFESTS)/trn \
 	$(MANIFESTS)/xdisplay
 

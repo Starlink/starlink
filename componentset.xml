@@ -176,7 +176,7 @@ Starlink applications, and a number of other common data formats.
 </component>
 
 <component id="cupid" support="S">
-  <version>0.0-34</version>
+  <version>0.0-35</version>
   <path>applications/cupid</path>
   <description>CUPID - AST applications</description>
   <abstract><p>
@@ -647,6 +647,45 @@ and its coordinates are displayed.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
+<component id="fluxes">
+  <version>1.1-4</version>
+  <path>applications/fluxes</path>
+  <description>FLUXES - JCMT Postion and Flux Density Calibration</description>
+  <abstract><p>
+FLUXES calculates accurate topocentric positions of the planets and also
+integrated flux densities of five of them at several wavelengths.
+These provide calibration information at the effective frequencies and
+beam-sizes employed by the UKT14 and SCUBA receivers on the
+JCMT telescope based on Mauna Kea, Hawaii.
+  </p></abstract>
+  <dependencies >
+    <build>pcs</build><build>sae</build><build>mers</build><build>fio</build><build>par</build><link>fio</link><link>sla</link><link>jpl</link><link>mers</link><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Tim Jenness</name>
+      <uname>timj</uname>
+    </person>
+    <person>
+      <name>Grant Privett</name>
+      <uname>gjp</uname>
+    </person>
+    <person>
+      <name>Henry Matthews</name>
+      <uname>hem</uname>
+    </person>
+    <person>
+      <name>Graeme Watt</name>
+      <uname>gdw</uname>
+    </person>
+    <person>
+      <name>Catherine Hohenkerk</name>
+    </person>
+  </developers>
+  <documentation> sun213</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
 <component id="gaia" support="S">
   <version>4.0-0</version>
   <path>applications/gaia</path>
@@ -856,7 +895,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>1.7-6</version>
+  <version>1.7-7</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -1007,6 +1046,27 @@ them.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
+<component id="cgs3dr" status="obsolete" support="U">
+  <version>1.0-0</version>
+  <path>applications/obsolete/cgs3dr</path>
+  <description>CGS3DR - CGS3 Data Reduction</description>
+  <abstract><p>
+      
+  </p></abstract>
+  <dependencies >
+    <build>pcs</build><build option='link'>ary</build><build option='link'>ndf</build><build option='link'>prm</build><build option='link'>fio</build><build option='link'>tsp</build><build option='link'>figaro</build><build option='link'>chr</build><build option='link'>ndf</build><build option='link'>par</build><build option='link'>sae</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Alan Bridger</name>
+      <uname>ab</uname>
+      <role>owner</role>
+    </person>
+  </developers>
+  <documentation> sun206</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
 <component id="chart" status="obsolete" support="U">
   <version>4.0-1</version>
   <path>applications/obsolete/chart</path>
@@ -1132,6 +1192,42 @@ file extension stored in the standard Starlink NDF data format.
     </person>
   </developers>
   <documentation> sun41</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
+<component id="jcmtdr">
+  <version>1.2-3</version>
+  <path>applications/jcmtdr</path>
+  <description>JCMTDR - Applications for Reducing JCMT GSD Data</description>
+  <abstract><p>
+  JCMTDR is a Starlink applications that is intended to replace NOD2 for the
+  reduction of continuum on-the-fly mapping data obtained with UKT14 or the
+  heterodyne instruments using the IFD on the James Clerk Maxwell Telescope.
+  This programme is intended for reduction of archive data and of heterodyne
+  beam maps.
+  </p></abstract>
+  <dependencies >
+    <build>pcs</build><build>sla</build><build>hlp</build><build>ndf</build><build>prm</build><build>fio</build><build>gsd</build><build>pda</build><build>figaro</build><build>kaplibs</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>John Lightfoot</name>
+      <uname>jfl</uname>
+    </person>
+    <person>
+      <name>P A Harrison</name>
+      <uname>pah</uname>
+    </person>
+    <person>
+      <name>Horst Meyerdierks</name>
+      <uname>hme</uname>
+    </person>
+    <person>
+      <name>Tim Jenness</name>
+      <uname>timj</uname>
+    </person>
+  </developers>
+  <documentation> sun132 sc1</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
@@ -1401,6 +1497,67 @@ package.
   </copyright>
 </component>
 
+<component id="smurf">
+  <version>0.2.2</version>
+  <path>applications/surf2</path>
+  <description>SURF2 - SCUBA-2 User Reduction Facility</description>
+  <abstract><p>
+SURF2 is a set of ADAM tasks necessary for reducing raw
+Submillimetre Common-User Bolometer Array 2 (SCUBA-2) data obtained from
+the James Clerk Maxwell Telescope. The tasks allows one to completely
+reduce your SCUBA-2 data.
+  </p></abstract>
+  <dependencies >
+    <build>pcs</build><sourceset>messgen</sourceset><build>ast</build><build>sae</build><build>pcs</build><build>mers</build><build>ndf</build><build>shl</build><link>ndf</link><link>ast</link><link>hlp</link><link>ndg</link><link>shl</link><sourceset>sst</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Tim Jenness</name>
+      <uname>timj</uname>
+    </person>
+  </developers>
+  <documentation></documentation>
+  <bugreports>t.jenness@jach.hawaii.edu</bugreports>
+</component>
+
+<component id="specx">
+  <version>6.8-5</version>
+  <path>applications/specx</path>
+  <description>SPECX - A millimetre wave spectral reduction package</description>
+  <abstract><p>
+SPECX is a general purpose mm and submm
+spectral line data reduction system.
+   </p></abstract>
+  <dependencies >
+    <build>shl</build><build>gsd</build><build>pgplot</build><build>fio</build><build>psx</build><build>chr</build><build>ndf</build><build>figaro</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>R Padman</name>
+      <uname>rp</uname>
+    </person>
+    <person>
+      <name>Horst Meyerdierks</name>
+      <uname>hme</uname>
+    </person>
+    <person>
+      <name>Remo Tilanus</name>
+      <uname>rpt</uname>
+    </person>
+    <person>
+      <name>Tim Jenness</name>
+      <uname>timj</uname>
+      <email>t.jenness@jach.hawaii.edu</email>
+    </person>
+    <person>
+      <name>Alan Chipperfield</name>
+      <uname>ajc</uname>
+    </person>
+  </developers>
+  <documentation> sun17 sc8 </documentation>
+  <bugreports>t.jenness@jach.hawaii.edu</bugreports>
+</component>
+
 <component id="spt" support="U">
   <version>1.3-1</version>
   <path>applications/spt</path>
@@ -1555,6 +1712,33 @@ UNIX).
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
+<component id="surf">
+  <version>1.6-12</version>
+  <path>applications/surf</path>
+  <description>SURF - SCUBA User Reduction Facility</description>
+  <abstract><p>
+SURF is a set of ADAM tasks necessary for reducing demodulated
+Submillimetre Common-User Bolometer Array (SCUBA) data obtained from
+the James Clerk Maxwell Telescope. The tasks allows one to completely
+re-reduce your SCUBA data.
+  </p></abstract>
+  <dependencies >
+    <build>pcs</build><build>sae</build><build>prm</build><build>pcs</build><build>mers</build><build>ndf</build><link>ndf</link><link>fio</link><link>sla</link><link>hlp</link><link>pda</link><link>prm</link><link>agi</link><link>kaplibs</link><link>pgplot</link><link>grp</link><link>ndg</link><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Tim Jenness</name>
+      <uname>timj</uname>
+    </person>
+    <person>
+      <name>John Lightfoot</name>
+      <uname>jfl</uname>
+    </person>
+  </developers>
+  <documentation> sun216 ssn72 sc10 sc11 </documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
 <component id="tsp" support="U">
   <version>2.3-3</version>
   <path>applications/tsp</path>
@@ -1608,7 +1792,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="starconf" buildsupport="yes" support="U">
-  <version>1.2</version>
+  <version>1.3</version>
   <path>buildsupport/starconf</path>
   <description>Starlink autoconf support</description>
   <dependencies>

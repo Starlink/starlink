@@ -41,6 +41,7 @@ ALL_TARGETS = \
 	$(MANIFESTS)/esp \
 	$(MANIFESTS)/extractor \
 	$(MANIFESTS)/extreme \
+	$(MANIFESTS)/fluxes \
 	$(MANIFESTS)/figaro \
 	$(MANIFESTS)/findcoords \
 	$(MANIFESTS)/fio \
@@ -94,9 +95,12 @@ ALL_TARGETS = \
 	$(MANIFESTS)/sgs \
 	$(MANIFESTS)/shl \
 	$(MANIFESTS)/sla \
+	$(MANIFESTS)/smurf \
+	$(MANIFESTS)/specx \
 	$(MANIFESTS)/spt \
 	$(MANIFESTS)/sst \
 	$(MANIFESTS)/starmem \
+	$(MANIFESTS)/surf \
 	$(MANIFESTS)/tcl \
 	$(MANIFESTS)/tclx \
 	$(MANIFESTS)/tk \
