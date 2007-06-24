@@ -834,11 +834,13 @@ $(MANIFESTS)/fluxes: \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
+		$(MANIFESTS)/jpl \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
+		$(MANIFESTS)/sla \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem
 	cd applications/fluxes \
