@@ -37,9 +37,9 @@ to Starlink document SSN/78, which also contains some FAQs.  Details of this
 document are at the end of this README.
 
 This procedure will not build the Starlink _Java_ applications.  They are
-built separately, using the procedure described in java/source/README.  You do
-not need to build any of the Starlink classic applications to build the Java
-ones.
+built separately, using the procedure described in java/source/README
+(currently only from the old Starlink CVS repository).  You do not need to
+build any of the Starlink classic applications to build the Java ones.
 
  Preparation
  -----------
@@ -236,14 +236,14 @@ specific component, the instructions are slightly different.
 
  - Now you can go into a specific directory and build the library or
    application as normal (a bootstrap is required in the directory if
-   you are building from a CVS checkout)
+   you are building from a subversion checkout)
 
       % ./bootstrap
       % ./configure -C
       % make
       % make install
 
- - After a `cvs update' in a component, it is possible that some
+ - After updating a component from the repository, it is possible that some
    generated files will be out of date (if configure.ac or Makefile.am
    had been updated).  Any required updating is generally handled
    automatically by makefile rules, but if you wish to guarantee that
@@ -256,9 +256,9 @@ specific component, the instructions are slightly different.
 Updating the source set
 -----------------------
 
-The `make world' command will not _re_build the tree after you do a CVS
-update, possibly unexpectedly.  For a detailed explanation of why this is so,
-see the `General FAQs' in SSN/78, described below.
+The `make world' command will not _re_build the tree after you do an update
+from the source repository, possibly unexpectedly.  For a detailed explanation
+of why this is so, see the `General FAQs' in SSN/78, described below.
 
 
 Platform specific build notes
@@ -377,3 +377,17 @@ interest to thise building the system from a checkout, though most
 address quite specific details of how to configure software to work
 within the Starlink source tree.
 
+
+Subversion repository
+---------------------
+
+In June 2007 the Starlink source code was moved to a subversion repository
+now held at the JAC. Part of the reason for this was to introduce a
+system-wide versioning system so that changes in the source code used in
+incremental releases could be more easily tracked. To enable this you need to
+have the svnversion command on the build machine and to have defined the 
+environment variable STAR_SOURCE_ROOT_DIR to point at the head of the source
+code (the directory containing this file), before configuring the source tree.
+Now each install of a package will update the manifest/starlink.version
+file to contain a compact version number for the working copy of all current
+sources.
