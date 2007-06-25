@@ -240,6 +240,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *     21-MAY-2007 (DSB):
 *        Use rather than ignore the value returned by astTestAxisDigits in 
 *        TestAttrib.
+*     25-JUN-2007 (DSB):
+*        Documentation typos.
 *class--
 */
 
@@ -1206,11 +1208,11 @@ c     astAxAngle
 f     AST_AXANGLE = DOUBLE PRECISION
 *        The angle in radians, from the positive direction of the
 *        specified axis, to the line AB. If the Frame is 2-dimensional,
-*        it will be in the range $\pm \pi$, and positive rotation is in
+*        it will be in the range [-PI/2,+PI/2], and positive rotation is in
 *        the same sense as rotation from the positive direction of axis 2
 *        to the positive direction of axis 1. If the Frame has more than 2
 *        axes, a positive value will always be returned in the range zero
-*        to $\pi$.
+*        to PI.
 
 *  Notes:
 c     - The geodesic curve used by this function is the path of
@@ -1348,7 +1350,7 @@ f     AST_AXDISTANCE = DOUBLE PRECISION
 
 *  Notes:
 *     - This function will return a "bad" result value (AST__BAD) if
-*     any of the input vaues has this value.
+*     any of the input values has this value.
 *     - A "bad" value will also be returned if this function is
 c     invoked with the AST error status set, or if it should fail for
 f     invoked with STATUS set to an error value, or if it should fail for
@@ -1515,7 +1517,7 @@ f     AST_AXOFFSET = DOUBLE PRECISION
 
 *  Notes:
 *     - This function will return a "bad" result value (AST__BAD) if
-*     any of the input vaues has this value.
+*     any of the input values has this value.
 *     - A "bad" value will also be returned if this function is
 c     invoked with the AST error status set, or if it should fail for
 f     invoked with STATUS set to an error value, or if it should fail for
