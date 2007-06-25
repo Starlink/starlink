@@ -637,6 +637,8 @@ f     - Title: The Plot title drawn using AST_GRID
 *        - Allow a NULL vtab to be supplied when initialising a Plot
 *        structure. This causes the vtab defined locally within this 
 *        class to be used so that the new object behaves as a simple Plot.
+*     25-JUN-2007 (DSB)
+*        Free the graphics context object when then the Plot is deleted.
 *class--
 */
 
@@ -26678,6 +26680,10 @@ static void Delete( AstObject *obj ) {
    for( i = this->ngat - 1; i >= 0; i-- ) {
      this->gat[ i ] = astFree( this->gat[ i ] );
    }
+
+/* Free the graphics context pointer. */
+   if( this->grfcontext ) this->grfcontext = astAnnul( this->grfcontext );
+
 }
 
 /* Copy constructor. */
