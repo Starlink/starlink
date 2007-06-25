@@ -638,7 +638,8 @@ f     - Title: The Plot title drawn using AST_GRID
 *        structure. This causes the vtab defined locally within this 
 *        class to be used so that the new object behaves as a simple Plot.
 *     25-JUN-2007 (DSB)
-*        Free the graphics context object when then the Plot is deleted.
+*        - Free the graphics context object when then the Plot is deleted.
+*        - Fix memory leak in FullForm.
 *class--
 */
 
@@ -12431,6 +12432,7 @@ static int FullForm( const char *list, const char *test, const char *text,
          ret = i;
          if( ChrLen( option ) == len ) {
             nmatch = 1;
+            option = astFree( option );
             break;
          } else {
             nmatch++;
