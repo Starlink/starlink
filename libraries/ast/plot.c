@@ -640,6 +640,9 @@ f     - Title: The Plot title drawn using AST_GRID
 *     25-JUN-2007 (DSB)
 *        - Free the graphics context object when then the Plot is deleted.
 *        - Fix memory leak in FullForm.
+*        - Since the grfcontext object is only used by external code, store 
+*          a public object identifier for it in the Plot structure rather 
+*          than a true C pointer.
 *class--
 */
 
@@ -2143,47 +2146,6 @@ astMAKE_CLEAR(Plot,ForceExterior,forceexterior,-1)
 astMAKE_GET(Plot,ForceExterior,int,0,(this->forceexterior == -1 ? 0 : this->forceexterior))
 astMAKE_SET(Plot,ForceExterior,int,forceexterior,( value ? 1 : 0 ))
 astMAKE_TEST(Plot,ForceExterior,( this->forceexterior != -1 ))
-
-/* GrfContext */
-/* ---------- */
-/*
-*att++
-*  Name:
-*     GrfContext
-
-*  Purpose:
-*     Object describing a graphics context.
-
-*  Type:
-*     Public attribute.
-
-*  Synopsis:
-*     Integer.
-
-*  Description:
-*     This attribute is provided as a means of communicating context
-*     information from the calling application to any graphics functions
-*     registered with a Plot using the
-c     astGrfSet function.
-f     AST_GRFSET routine.
-*     The value of the GrfContext attribute is passed as the first 
-c parameter
-f argument
-*     to each such function each time the function is called to perform
-*     some graphics operation. The attribute can be set to any integer
-*     value and does not affect the internal operation of AST in any way.
-*     What ever value is stored will simply be passed on to each of the
-*     registered graphics functions, and it is up to each such function
-*     to interpret the value in what ever way is appropriate. 
-*
-*     The attribute has a default value of zero.
-
-*  Applicability:
-*     Plot
-*        All Plots have this attribute.
-
-*att--
-*/
 
 /*
 *att++
@@ -5251,10 +5213,8 @@ static int CGCapWrapper( AstPlot *this, int cap, int value ) {
 *     requested by "cap".
 
 */
-
    if( !astOK ) return 0;
-   return ( (AstGCapFun) this->grffun[ AST__GCAP ] )
-                 ( astMakeId( this->grfcontext ), cap, value );
+   return ( (AstGCapFun) this->grffun[ AST__GCAP ] )( this->grfcontextId, cap, value );
 }
 
 static int CGAttrWrapper( AstPlot *this, int attr, double value, 
@@ -5308,9 +5268,8 @@ static int CGAttrWrapper( AstPlot *this, int attr, double value,
 *           GRF__TEXT
 
 */
-   if ( !astOK ) return 0;
-   return ( (AstGAttrFun) this->grffun[ AST__GATTR ] )
-                      (astMakeId( this->grfcontext ), attr, value, old_value, prim );
+   if( !astOK ) return 0;
+   return ( (AstGAttrFun) this->grffun[ AST__GATTR ] )( this->grfcontextId, attr, value, old_value, prim );
 }
 
 static int CGFlushWrapper( AstPlot *this ) {
@@ -5341,9 +5300,9 @@ static int CGFlushWrapper( AstPlot *this ) {
 *        The Plot.
 
 */
-   if ( !astOK ) return 0;
-   return ( (AstGFlushFun) this->grffun[ AST__GFLUSH ])
-                        (astMakeId( this->grfcontext ) );
+   if( !astOK ) return 0;
+   return ( (AstGFlushFun) this->grffun[ AST__GFLUSH ])( this->grfcontextId );
+
 }
 
 static int CGLineWrapper( AstPlot *this, int n, const float *x, 
@@ -5382,9 +5341,8 @@ static int CGLineWrapper( AstPlot *this, int n, const float *x,
 *        A pointer to an array holding the "n" y values.
 
 */
-   if ( !astOK ) return 0;
-   return ( (AstGLineFun) this->grffun[ AST__GLINE ])
-            (astMakeId( this->grfcontext ), n, x, y );
+   if( !astOK ) return 0;
+   return ( (AstGLineFun) this->grffun[ AST__GLINE ])( this->grfcontextId, n, x, y );
 }
 
 static int CGMarkWrapper( AstPlot *this, int n, const float *x, 
@@ -5426,10 +5384,8 @@ static int CGMarkWrapper( AstPlot *this, int n, const float *x,
 *        required.
 
 */
-   if ( !astOK ) return 0;
-   return ( (AstGMarkFun) this->grffun[ AST__GMARK ])
-          (astMakeId( this->grfcontext ), n, x, y, type );
-
+   if( !astOK ) return 0;
+   return ( (AstGMarkFun) this->grffun[ AST__GMARK ])( this->grfcontextId, n, x, y, type );
 }
 
 static int CGTextWrapper( AstPlot *this, const char *text, float x, float y,
@@ -5490,9 +5446,8 @@ static int CGTextWrapper( AstPlot *this, const char *text, float x, float y,
 *        bottom to top on the screen.
 
 */
-   if ( !astOK ) return 0;
-   return ( (AstGTextFun) this->grffun[ AST__GTEXT ])
-          (astMakeId( this->grfcontext ), text, x, y, just, upx, upy );
+   if( !astOK ) return 0;
+   return ( (AstGTextFun) this->grffun[ AST__GTEXT ])( this->grfcontextId, text, x, y, just, upx, upy );
 }
 
 static int CGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
@@ -5561,9 +5516,8 @@ static int CGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
 *        each corner of the bounding box.
 
 */
-   if ( !astOK ) return 0;
-   return ( (AstGTxExtFun) this->grffun[ AST__GTXEXT ])
-                (astMakeId( this->grfcontext ), text, x, y, just, upx, upy, xb, yb );
+   if( !astOK ) return 0;
+   return ( (AstGTxExtFun) this->grffun[ AST__GTXEXT ])( this->grfcontextId, text, x, y, just, upx, upy, xb, yb );
 }
 
 static int CGQchWrapper( AstPlot *this, float *chv, float *chh ) {
@@ -5601,9 +5555,8 @@ static int CGQchWrapper( AstPlot *this, float *chv, float *chh ) {
 *        characters drawn vertically. This will be an increment in the Y
 *        axis
 */
-   if ( !astOK ) return 0;
-   return ( (AstGQchFun) this->grffun[ AST__GQCH ])
-                             (astMakeId( this->grfcontext ), chv, chh );
+   if( !astOK ) return 0;
+   return ( (AstGQchFun) this->grffun[ AST__GQCH ])( this->grfcontextId, chv, chh );
 }
 
 static int CGScalesWrapper( AstPlot *this, float *alpha, float *beta ) {
@@ -5639,9 +5592,8 @@ static int CGScalesWrapper( AstPlot *this, float *alpha, float *beta ) {
 *        A pointer to the location at which to return the scale for the
 *        Y axis (i.e. Ynorm = beta*Yworld).
 */
-   if ( !astOK ) return 0;
-   return ( (AstGScalesFun) this->grffun[ AST__GSCALES ])
-                           (astMakeId( this->grfcontext ), alpha, beta );
+   if( !astOK ) return 0;
+   return ( (AstGScalesFun) this->grffun[ AST__GSCALES ])( this->grfcontextId, alpha, beta );
 }
 
 static int CheckLabels( AstPlot *this, AstFrame *frame, int axis, 
@@ -22412,12 +22364,12 @@ f        The global status.
    if ( !astOK ) return;
 
 /* Annul any existing grfcontex Object in the Plot. */
-   if( this->grfcontext ) {
-      this->grfcontext = astAnnul( this->grfcontext );
+   if( this->grfcontextId ) {
+      this->grfcontextId = astAnnulId( this->grfcontextId );
    }
 
 /* Store any new grfcontext Object. */
-   if( grfcon ) this->grfcontext = astClone( grfcon );
+   if( grfcon ) this->grfcontextId = astMakeId( astClone( grfcon ) );
 }
 
 static void SetLogPlot( AstPlot *this, int axis, int ival ){
@@ -26684,7 +26636,7 @@ static void Delete( AstObject *obj ) {
    }
 
 /* Free the graphics context pointer. */
-   if( this->grfcontext ) this->grfcontext = astAnnul( this->grfcontext );
+   if( this->grfcontextId ) this->grfcontextId = astAnnulId( this->grfcontextId );
 
 }
 
@@ -27691,7 +27643,7 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
       new->tickall = -1;
 
 /* Graphics context identifier */
-      new->grfcontext = NULL;
+      new->grfcontextId = 0;
 
 /* Shoudl ast Grid draw a boundary round the regions of valid coordinates? 
    Store a value of -1 to indicate that no value has yet been set. This will 
@@ -28351,7 +28303,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 /* =================================================== */
 
 /* We have no graphics context. */
-      new->grfcontext =NULL;
+      new->grfcontextId = 0;
 
 /* Initialise the protected Ink attribute so that visible ink is used. */
       new->ink = -1;
