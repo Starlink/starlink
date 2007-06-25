@@ -42,9 +42,11 @@
 *  History:
 *     2007-06-13 (EC):
 *        Initial version.
-*     2007-06-14(EC)
+*     2007-06-14 (EC)
 *        Move file information to smfFile from smfData, 
-*        added file description and file name.
+*        added file descriptor and file name.
+*     2007-06-25 (EC)
+*        Header length is now static / padded to multiple of pagesize 
 
 *  Notes:
 
@@ -99,21 +101,21 @@ void smf_open_model( Grp *igrp, int index, char *mode, smfData **data,
   void *buf=NULL;               /* Pointer to total container buffer */
   size_t datalen=0;             /* Size of data buffer in bytes */
   double *dataptr=NULL;         /* Pointer to data portion of buffer */
-  dim_t dims[NDF__MXDIM];       /* Dimensions of data array */
-  smf_dtype dtype=SMF__NULL;    /* Type of data stored in component */
   int fd=0;                     /* File descriptor */
+  smfData head;                 /* Header for the file */
   size_t headlen=0;             /* Size of header in bytes */ 
   dim_t i;                      /* Loop counter */
   int mflags=0;                 /* bit flags for mmap */
   char name[GRP__SZNAM+1];      /* Name of container file */
   size_t ndata=0;               /* Number of elements in data array */
-  int ndims;                    /* Number of dims in data array */
   int oflags=0;                 /* bit flags for open */
+  long pagesize=0;              /* Size of memory page used by mmap */
   char *pname=NULL;             /* Poiner to fname */
+  long remainder=0;             /* Extra length beyond integer pagesuze */
 
   if ( *status != SAI__OK ) return;
 
-  /* Obtain a character string corresponding to the file name */
+  /* Obtain the file name */
   pname = name;
   grpGet( igrp, index, 1, &pname, GRP__SZNAM, status );
 
@@ -134,24 +136,10 @@ void smf_open_model( Grp *igrp, int index, char *mode, smfData **data,
     } else {
   
       /* Read the header */
-
-      if( read( fd, &dtype, sizeof(dtype) ) == -1 ) {               /* dtype */
+      
+      if( read( fd, &head, sizeof(head) ) == -1 ) { 
 	*status = SAI__ERROR;
-	errRep( FUNC_NAME, "Unable to read dtype from container header", 
-		status ); 
-      } else if( read( fd, &ndims, sizeof(ndims) ) == -1 ) {        /* ndims */
-	*status = SAI__ERROR;
-	errRep( FUNC_NAME, "Unable to read ndims from container header", 
-		status ); 
-      } else {
-	if( ndims < 1 ) {
-	  *status = SAI__ERROR;
-	  errRep( FUNC_NAME, "Container header has bad dimensions", status ); 
-	} else if( read( fd, dims, ndims*sizeof(dims[0]) ) == -1 ) { /* dims */
-	  *status = SAI__ERROR;
-	  errRep( FUNC_NAME, "Unable to read dims from container header", 
-		  status ); 
-	}
+      	errRep( FUNC_NAME, "Unable to read container header",  status );
       }
     }
   }
@@ -159,47 +147,46 @@ void smf_open_model( Grp *igrp, int index, char *mode, smfData **data,
   /* Calculate buffer sizes */
 
   if( *status == SAI__OK ) {
-    ndata = 1;
-    for( i=0; i<ndims; i++ ) {
-      ndata *= dims[i];
-    }
-    
-    datalen = ndata * smf_dtype_sz(dtype,status);
-    headlen = sizeof(dtype) + sizeof(ndims) + ndims*sizeof(dims[0]);
 
-    /* map the data */
-    if( (buf = mmap( 0, datalen+headlen, mflags, MAP_SHARED, fd, 0 ) ) == 
-	MAP_FAILED ) {
+    /* Header must fit into integer multiple of pagesize so that the data 
+       array starts on a page boundary */
+    pagesize = sysconf(_SC_PAGESIZE);
+    headlen = sizeof(head);
+    remainder = headlen % pagesize;
+    if( remainder  ) headlen = headlen - remainder + pagesize;
+
+    /* Length of data array buffer */
+    ndata = 1;
+    for( i=0; i<head.ndims; i++ ) {
+      ndata *= head.dims[i];
+    }
+    datalen = ndata * smf_dtype_sz(head.dtype,status); 
+
+    /* map the data array, after the header*/
+    if( (buf = mmap( 0, datalen, mflags, MAP_SHARED, fd, headlen ) ) 
+	== MAP_FAILED ) {
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "Unable to map model container file", status ); 
-    } else {
-      dataptr = buf + headlen;
-    }
+    } 
   }
 
   /* Allocate memory for empty smfdata and fill relevant parts */
   *data = smf_create_smfData( SMF__NOCREATE_HEAD | SMF__NOCREATE_DA, status );
 
   if( *status == SAI__OK ) {
-    /* Data type from header */
-    (*data)->dtype = dtype;
-
+    /* Data from file header */
+    (*data)->dtype = head.dtype;
+    (*data)->ndims = head.ndims;
+    memcpy( (*data)->dims, head.dims, sizeof( head.dims ) );
+    
     /* Data pointer points to memory AFTER HEADER */
-    (*data)->pntr[0] = (void *) dataptr;
+    (*data)->pntr[0] = buf;
 
-    /* Store pointer to entire mapped array for later un-mapping, as well
-       as the length of the mapped buffer and file descriptor */
-    (*data)->file->DIMMbuf = buf;
-    (*data)->file->DIMMlen = datalen+headlen;
-    (*data)->file->DIMMfd = fd;
+    /* Store the file descriptor to enable us to unmap when we close */
+    (*data)->file->fd = fd;
 
     /* Copy the DIMM filename into the smfFile */
     strncpy( (*data)->file->name, name, SMF_PATH_MAX );
-
-    /* Dimensions of data array */
-    (*data)->ndims = ndims;
-    for( i=0; i<ndims; i++ ) {
-      (*data)->dims[i] = dims[i];
-    }
   }
+
 }

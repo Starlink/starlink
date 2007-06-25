@@ -88,6 +88,8 @@
 *        Add DIMMbuf and DIMMlen to smfData
 *     2007-06-13 (EC):
 *        Added DIMMfd and moved DIMMbuf and DIMMlen to smfFile
+*     2007-06-25 (EC):
+*        Removed DIMMbuf/DIMMlen, renamed DIMMfd to fd in smfFile
 *     {enter_further_changes_here}
 
 
@@ -153,7 +155,6 @@ typedef enum smf_modeltype {
 } smf_modeltype;
 
 /* suffix for simple binary files that store DIMM model components */
-
 #define SMF__DIMM_SUFFIX ".dimm"
 
 /* Bit flags for smf_calcmodel* model component calculations */
@@ -176,9 +177,7 @@ typedef enum smf_modeltype {
 /* Global information about the data file itself */
 
 typedef struct smfFile {
-  void * DIMMbuf;            /* Pntr to entire mapped file if DIMM file */
-  int DIMMfd;                /* DIMM file descriptor */
-  size_t DIMMlen;            /* size of DIMM mapped array */
+  int fd;                    /* file descriptor if data array was mmap'd */
   int ndfid;                 /* NDF ID of file if opened by SMURF */
   int isSc2store;            /* True if file opened by sc2store library */
   int isTstream;             /* True if file contains time series data */

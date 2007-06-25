@@ -43,6 +43,8 @@
 *        No longer have xloc member
 *     2007-06-14 (EC):
 *        Initialize DIMMbuf, DIMMfd and DIMMlen for DIMM model components
+*     2007-06-25 (EC):
+*        Simplified removed DIMMbuf/DIMMlen, renamed DIMMfd to fd.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -102,9 +104,7 @@ smf_create_smfFile( int * status ) {
   }
 
   /* Initialise smfFile */
-  file->DIMMbuf = NULL;
-  file->DIMMfd = 0;
-  file->DIMMlen = 0;
+  file->fd = 0;
   file->ndfid = NDF__NOID;
   file->mapcoordid = NDF__NOID;
   file->isSc2store = 0;

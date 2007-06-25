@@ -79,6 +79,8 @@
 *        If smfData associated with DIMM component, free resources
 *     2007-06-14 (EC)
 *        Moved DIMM file info into smfFile, so handle closing there
+*     2007-06-25 (EC)
+*        Check for file descriptor if unmap is required
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -125,12 +127,15 @@
 void smf_close_file( smfData ** data, int * status ) {
 
   smfDA   * da;           /* pointer to smfDA in smfData */
-  smfHead * hdr;          /* pointer to smfHead in smfData */
-  int       i;            /* loop counter */
+  size_t datalen=0;       /* Size of data buffer in bytes */
+  smfDream *dream = NULL; /* Pointer to smfDream in smfData */
   smfFile * file;         /* pointer to smfFile in smfData */
   int       freedata = 0; /* should the data arrays be freed? */
+  smfHead * hdr;          /* pointer to smfHead in smfData */
+  int       i;            /* loop counter */
   int       isSc2store = 0; /* is this sc2Store data */
-  smfDream *dream = NULL; /* Pointer to smfDream in smfData */
+  size_t ndata=0;         /* Number of elements in data array */
+
 
   /* we need to be able to clean up even if input status is bad -
      this requires some defensive programming. */
@@ -172,24 +177,28 @@ void smf_close_file( smfData ** data, int * status ) {
       /* Annul the NDF (which will unmap things) */
       ndfAnnul( &(file->ndfid), status );
       	
-    } else if( file->DIMMbuf ) {
-      /* File is a simplified DIMM model component. Here we need
-         to synchronize and unmap the memory, and then close the file
-	 descriptor. */
+    } else if( file->fd ) {
+      /* Array was mmap'd to a file, and must now be synch'd and unmapped,
+         and the file descriptor closed */
 
-      if( msync(file->DIMMbuf, file->DIMMlen, MS_ASYNC ) == -1 ) {
+      /* Length of data array buffer */
+      ndata = 1;
+      for( i=0; i<(*data)->ndims; i++ ) {
+	ndata *= (*data)->dims[i];
+      }
+      datalen = ndata * smf_dtype_sz((*data)->dtype,status); 
+
+      if( msync( (*data)->pntr[0], datalen, MS_ASYNC ) == -1 ) {
 	*status = SAI__ERROR;
 	errRep( ERRFUNC, "Unable to synch model container file", status ); 
-      } else if( munmap( file->DIMMbuf, file->DIMMlen ) == -1 ) {
+      } else if( munmap( (*data)->pntr[0], datalen ) == -1 ) {
 	*status = SAI__ERROR;
 	errRep( ERRFUNC, "Unable to unmap model container file", status ); 
-      } else if( close( file->DIMMfd ) == -1 ) {
+      } else if( close( file->fd ) == -1 ) {
 	*status = SAI__ERROR;
 	errRep( ERRFUNC, "Unable to close model container file", status ); 
       } else {
-	file->DIMMfd = 0;
-	file->DIMMbuf = NULL;
-	file->DIMMlen = 0;
+	file->fd = 0;
       }
 
     } else {

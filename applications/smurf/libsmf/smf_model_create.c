@@ -54,6 +54,8 @@
 *        - Set initial variance to 1 
 *     2007-06-13 (EC):
 *        - Use new DIMM binary file format 
+*     2007-06-25 (EC)
+*        Header length is now static / padded to multiple of pagesize 
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -106,37 +108,33 @@ void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp,
 
   /* Local Variables */
   int added=0;                  /* Number of names added to group */
+  void *buf=NULL;               /* Pointer to total container buffer */
   int copyinput=0;              /* If set, container is copy of input */
-  dim_t dims[NDF__MXDIM];       /* Size of model dimensions */
-  smf_dtype dtype=SMF__NULL;    /* Type of data stored in component */
+  size_t datalen=0;             /* Size of data buffer in bytes */
+  void *dataptr=NULL;           /* Pointer to data portion of buffer */
+  int fd=0;                     /* File descriptor */
   int flag=0;                   /* Flag */
   char fname_grpex[GRP__SZNAM+1];/* String for holding filename grpex */
+  smfData head;                 /* Header for the file */
+  size_t headlen=0;             /* Size of header in bytes */ 
+  void *headptr=NULL;           /* Pointer to header portion of buffer */
   dim_t i;                      /* Loop counter */
   smfData *idata=NULL;          /* Pointer to input smfdata data */
   int indf=0;                   /* NDF ID for propagation */
   int isize=0;                  /* Number of files in input group */
   dim_t j;                      /* Loop counter */
-  int lbnd[NDF__MXDIM];         /* Dimensions of container */
-  void *mapptr[3]={NULL,NULL,NULL};/* Pointer to array of mapped components */
   char *mname=NULL;             /* String model component name */
   int mndf=0;                   /* NDF ID for propagation */
   int msize=0;                  /* Number of files in model group */
-  int ndims=0;                  /* Number of dimensions in container */
+  size_t ndata=0;               /* Number of elements in data array */
   int nmap=0;                   /* Number of elements mapped */
+  long pagesize=0;              /* Size of memory page used by mmap */
   smfData *tempdata=NULL;       /* Temporary smfData pointer */
-  int ubnd[NDF__MXDIM];         /* Dimensions of container */
 
   char name[GRP__SZNAM+1];      /* Name of container file without suffix */
   char *pname=NULL;             /* Poiner to fname */
+  long remainder=0;             /* Extra length beyond integer pagesuze */
   char suffix[] = SMF__DIMM_SUFFIX; /* String containing model suffix */
-
-  void *buf=NULL;               /* Pointer to total container buffer */
-  void *headptr=NULL;           /* Pointer to header portion of buffer */
-  void *dataptr=NULL;           /* Pointer to data portion of buffer */
-  size_t headlen=0;             /* Size of header in bytes */ 
-  size_t datalen=0;             /* Size of data buffer in bytes */
-  size_t ndata=0;               /* Number of elements in data array */
-  int fd=0;                     /* File descriptor */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -189,20 +187,22 @@ void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp,
     
     if( *status == SAI__OK ) {
       
+      /* initialzie the header */
+
+      memset( &head, 0, sizeof(head) );
+      head.dtype=SMF__NULL;
+
       /* Determine dimensions of model component */
       
       switch( mtype ) {
 
       case SMF__CUM: /* Cumulative model */
 	copyinput = 0;
-	dtype = SMF__DOUBLE;
-	ndims = 3;
-	lbnd[0] = 1;
-	lbnd[1] = 1;
-	lbnd[2] = 1;
-	ubnd[0] = (idata->dims)[0];
-	ubnd[1] = (idata->dims)[1];
-	ubnd[2] = (idata->dims)[2];
+	head.dtype = SMF__DOUBLE;
+	head.ndims = 3;
+	head.dims[0] = (idata->dims)[0];
+	head.dims[1] = (idata->dims)[1];
+	head.dims[2] = (idata->dims)[2];
 	break;
 
       case SMF__RES: /* Model residual */
@@ -211,98 +211,86 @@ void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp,
 
       case SMF__AST: /* Time-domain projection of map */
 	copyinput = 0;
-	dtype = SMF__DOUBLE;
-	ndims = 3;
-	lbnd[0] = 1;
-	lbnd[1] = 1;
-	lbnd[2] = 1;
-	ubnd[0] = (idata->dims)[0];
-	ubnd[1] = (idata->dims)[1];
-	ubnd[2] = (idata->dims)[2];
+	head.dtype = SMF__DOUBLE;
+	head.ndims = 3;
+	head.dims[0] = (idata->dims)[0];
+	head.dims[1] = (idata->dims)[1];
+	head.dims[2] = (idata->dims)[2];
 	break;
 	
       case SMF__COM: /* Single-valued common-mode at each time step */
 	copyinput = 0;
-	dtype = SMF__DOUBLE;
-	ndims = 1;
-	lbnd[0] = 1;
-	ubnd[0] = (idata->dims)[2];
+	head.dtype = SMF__DOUBLE;
+	head.ndims = 1;
+	head.dims[0] = (idata->dims)[2];
 	break;
 	
       case SMF__NOI: /* Noise model */
 	copyinput = 0;
-	dtype = SMF__DOUBLE;
-	ndims = 3;
-	lbnd[0] = 1;
-	lbnd[1] = 1;
-	lbnd[2] = 1;
-	ubnd[0] = (idata->dims)[0];
-	ubnd[1] = (idata->dims)[1];
-	ubnd[2] = (idata->dims)[2];
+	head.dtype = SMF__DOUBLE;
+	head.ndims = 3;
+	head.dims[0] = (idata->dims)[0];
+	head.dims[1] = (idata->dims)[1];
+	head.dims[2] = (idata->dims)[2];
 	break;
 
       case SMF__EXT: /* Extinction correction - gain for each bolo/time */
 	copyinput = 0;
-	dtype = SMF__DOUBLE;
-	ndims = 3;
-	lbnd[0] = 1;
-	lbnd[1] = 1;
-	lbnd[2] = 1;
-	ubnd[0] = (idata->dims)[0];
-	ubnd[1] = (idata->dims)[1];
-	ubnd[2] = (idata->dims)[2];
+	head.dtype = SMF__DOUBLE;
+	head.ndims = 3;
+	head.dims[0] = (idata->dims)[0];
+	head.dims[1] = (idata->dims)[1];
+	head.dims[2] = (idata->dims)[2];
 	break;
 
       case SMF__LUT: /* Pointing LookUp Table for each data point */
 	copyinput = 0;
-	dtype = SMF__INTEGER;
-	ndims = 3;
-	lbnd[0] = 1;
-	lbnd[1] = 1;
-	lbnd[2] = 1;
-	ubnd[0] = (idata->dims)[0];
-	ubnd[1] = (idata->dims)[1];
-	ubnd[2] = (idata->dims)[2];
+	head.dtype = SMF__INTEGER;
+	head.ndims = 3;
+	head.dims[0] = (idata->dims)[0];
+	head.dims[1] = (idata->dims)[1];
+	head.dims[2] = (idata->dims)[2];
 	break;
       }
 
-      /* Propagate more information from template if copying */
+      /* Propagate information from template if copying */
 
       if( copyinput ) { /* If copying input, copy data dimensions directly */
-	dtype = idata->dtype; /* Inherit data type from template */
-	ndims = idata->ndims;
-	for( j=0; j<ndims; j++ ) {
-	  lbnd[j] = 0;
-	  ubnd[j] = (idata->dims)[j];
+	head.dtype = idata->dtype; /* Inherit data type from template */
+	head.ndims = idata->ndims;
+	for( j=0; j<head.ndims; j++ ) {
+	  head.dims[j] = (idata->dims)[j];
 	}
       } 
 
       /* Calculate the size of the data buffer. Format:
 
 	 Header:
-         dtype = [integer]
-         ndims = [integer] 
-         dims  = [integer]*ndims
+	 smfData with only dtype, ndims and dims defined
 
          Data:
 	 buf   = [smf_dtype] * dims[0] * dims[1] * ...
       */
-      
+
+      /* Header must fit into integer multiple of pagesize so that the data 
+         array starts on a page boundary (for later mmap) */
+      pagesize = sysconf(_SC_PAGESIZE);
+      headlen = sizeof(head);
+      remainder = headlen % pagesize;
+      if( remainder  ) headlen = headlen - remainder + pagesize;
+
+      /* Length of data array buffer */
       ndata = 1;
-      for( j=0; j<ndims; j++ ) {
-	ndata *= ubnd[j];
+      for( j=0; j<head.ndims; j++ ) {
+	ndata *= head.dims[j];
       }
-     
-      /* Length of data array buffer and header in bytes */
-      datalen = ndata * smf_dtype_sz(dtype,status); 
-      headlen = sizeof(dtype) + sizeof(ndims) + ndims*sizeof(dims[0]);
+      datalen = ndata * smf_dtype_sz(head.dtype,status); 
 
       /* Obtain a character string corresponding to the file name */
       pname = name;
       grpGet( *mgrp, i, 1, &pname, GRP__SZNAM, status );
 
       /* Create the model container */
-
       if( (fd = open( name, O_RDWR | O_CREAT | O_TRUNC, 
 		      S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH )) == -1 ) {
 	*status = SAI__ERROR;
@@ -315,13 +303,10 @@ void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp,
 
       if( *status == SAI__OK ) {
 
-	/* Write the header */
-	((smf_dtype *) headptr)[0] = dtype;
-	((int *)(headptr + sizeof(dtype)))[0] = ndims;
-
-	for( j=0; j<ndims; j++ ) {
-	  ((dim_t *)(headptr + sizeof(dtype) + sizeof(ndims)))[j] = ubnd[j];
-	}
+	/* Write the header. memset to 0 first since much of this space is
+           padding to make it a multiple of the page size */
+	memset( headptr, 0, headlen );
+	memcpy( headptr, &head, sizeof(head) );
 
 	/* Initialize the data buffer */
 	if( copyinput ) {
@@ -364,41 +349,6 @@ void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp,
 
       smf_close_file( &idata, status );
 
-      /* Create the model container */
- 
-      
-      //if( copyinput ) { /* Make a copy of the template file */
-      //	ndgNdfas( igrp, i, "READ", &indf, status );
-      //	ndgNdfpr( indf, "DATA,VARIANCE,QUALITY", *mgrp, i, &mndf, status );
-      //	ndfAnnul( &indf, status );
-
-	/* Map to ensure that the DATA array is defined on exit */
-      //	ndfMap( mndf, "DATA,", "_DOUBLE", "UPDATE", &mapptr[0], &nmap, 
-      //		status );
-
-	/* Map to ensure that the VARAINCE array is defined on exit */
-      //	ndfMap( mndf, "VARIANCE", "_DOUBLE", "WRITE", &mapptr[1], &nmap, 
-      //		status );
-
-	/* Initialize VARIANCE component of residuals to 1 */
-      //	if( (*status == SAI__OK) && (mapptr[1]) ) {
-      //	  for( j=0; j<nmap; j++ ) {
-      //	    ((double *)(mapptr[1]))[j] = 1; 
-      //	  }
-      //	}
-
-      //	ndfAnnul( &mndf, status );
-	
-      //      } else {          /* Make a new empty container */
-	/*
-	smf_open_newfile( *mgrp, i, SMF__DOUBLE, ndims, lbnd, ubnd, 
-			  SMF__MAP_VAR, &tempdata, status );
-	*/
-	  
-      //	smf_open_newfile( *mgrp, i, SMF__DOUBLE, ndims, lbnd, ubnd, 
-      //			  0, &tempdata, status );
-      //	smf_close_file( &tempdata, status );
-      //      }
     }
   }
 }
