@@ -261,7 +261,7 @@ typedef struct AstPlot {
    int grfnstack;
    AstGat **gat;
    int ngat;
-   AstObject *grfcontext;
+   AstObject *grfcontextId;
    float hmarkx;
    float hmarky;
 
