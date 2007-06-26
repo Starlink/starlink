@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_BFCRF( MAP, CFRM, NAXC, NBEAM, NCOEF, PP, PSIGMA,
+      SUBROUTINE KPS1_BFCRF( MAP, IWCS, NAXC, NBEAM, NCOEF, PP, PSIGMA,
      :                       RP, RSIGMA, POLAR, POLSIG, STATUS )
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_BFCRF( MAP, CFRM, NAXC, NCOEF, PP, PSIGMA, RP,
+*     CALL KPS1_BFCRF( MAP, IWCS, NAXC, NCOEF, PP, PSIGMA, RP,
 *                      RSIGMA, POLAR, POLSIG, STATUS )
 
 *  Description:
@@ -40,8 +40,8 @@
 *     MAP = INTEGER (Given)
 *        The AST Mapping from the PIXEL Frame of the NDF to the
 *        reporting Frame.
-*     CFRM = INTEGER (Given) 
-*        A pointer to the current Frame of the NDF.
+*     IWCS = INTEGER (Given)
+*        The FrameSet of two-dimensional frames associated with the NDF.
 *     NAXC = INTEGER (Given) 
 *        The number of axes in CFRM.
 *     NBEAM = INTEGER (Given)
@@ -111,6 +111,10 @@
 *        Correct the calculation of the orientation: allowing for flipped
 *        longitude SKY axis and adjust non-SKY Frame angles to Y via
 *        negative X.
+*     2007 June 25 (MJC):
+*        Used a purely AST approach to derive the position angle.  This
+*        needed argument CFRM (current Frame identifier) to be replaced
+*        by IWCS.
 *     {enter_further_changes_here}
 
 *-
@@ -127,7 +131,7 @@
 
 *  Arguments Given:
       INTEGER MAP
-      INTEGER CFRM
+      INTEGER IWCS
       INTEGER NAXC
       INTEGER NBEAM
       INTEGER NCOEF
@@ -157,32 +161,45 @@
       PARAMETER ( TWOPI = 2.0D0 * PI )
 
 *  Local Variables:
-      DOUBLE PRECISION A( NDF__MXDIM ) ! Start of distance (A to B)
-      DOUBLE PRECISION B( NDF__MXDIM ) ! End of distance (A to B)
+      DOUBLE PRECISION A( 2 )    ! Start of distance (A to B)
+      DOUBLE PRECISION B( 2 )    ! End of distance (A to B)
+      INTEGER CFRM               ! Current/reporting Frame
       DOUBLE PRECISION DATAN     ! Differentiating atan factor 
       DOUBLE PRECISION DX        ! Increment along first axis
       DOUBLE PRECISION DY        ! Increment along second axis
       DOUBLE PRECISION GRAD      ! Gradient DY/DX
       INTEGER I                  ! Loop count
       INTEGER IB                 ! Beam loop count
+      INTEGER IPIX               ! Index of PIXEL Frame in IWCS
       LOGICAL ISSKY              ! Is the current Frame a SkyFrame?
+      DOUBLE PRECISION JUNK      ! Unused angle
       INTEGER LAT                ! Index to latitude axis in SkyFrame
       INTEGER LON                ! Index to longitude axis in SkyFrame
       INTEGER MAJOR              ! Index to major-FWHM value and error
       INTEGER MINOR              ! Index to minor-FWHM value and error
-      DOUBLE PRECISION POS( 2, NDF__MXDIM ) ! Reporting positions
+      INTEGER PFRM               ! PIXEL Frame
+      DOUBLE PRECISION POS( 2, 2 ) ! Reporting positions
       DOUBLE PRECISION PIXPOS( 2, 2 ) ! Pixel positions
       DOUBLE PRECISION SX        ! Co-ordinate sum along longitude axis
       DOUBLE PRECISION SY        ! Co-ordinate sum along latitude axis
-      REAL THETA                 ! Orientation in degrees
+      REAL THETA                 ! Orientation in radians
       DOUBLE PRECISION VAR       ! Variance
       DOUBLE PRECISION VARX      ! Sum of longitude-axis variances
       DOUBLE PRECISION VARY      ! Sum of latitude-axis variances
+      DOUBLE PRECISION XIN( 2 )  ! X co-ordinate pair to convert
+      DOUBLE PRECISION XOUT( 2 ) ! Converted X co-ordinate pair
+      DOUBLE PRECISION YIN( 2 )  ! Y co-ordinate pair to convert
+      DOUBLE PRECISION YOUT( 2 ) ! Converted Y co-ordinate pair
 
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Obtain the current Frame and PIXEL Frames from the FrameSet.
+      CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
+      CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
+      PFRM = AST_GETFRAME( IWCS, IPIX, STATUS )
 
 *  Find the latitude and longitude axes needed for the origin of the
 *  orientation.  
@@ -322,49 +339,37 @@
 
 *  Orientation
 *  ===========
-*  Transform the fitted positions and a unit vector along the
-*  orientation from the centre measured in the PIXEL Frame of the 
-*  NDF to the reporting Frame.  Want to the orientation to go with
-*  negative X (positive SkyFrame) 
-         PIXPOS( 1, 1 ) = PP( 1, IB )
-         PIXPOS( 1, 2 ) = PP( 2, IB )
-         PIXPOS( 2, 1 ) = PP( 1, IB ) + SIN( PP( 5, IB ) )
-         PIXPOS( 2, 2 ) = PP( 2, IB ) + COS( PP( 5, IB ) )
-         CALL AST_TRANN( MAP, 2, 2, 2, PIXPOS, .TRUE., NAXC, 2, POS,
-     :                   STATUS )
 
-*  Normalize the current Frame co-ordinates.
-         CALL AST_NORM( CFRM, POS, STATUS )
+*  Find a PIXEL position that is offset from the centre by a small
+*  amount (one pixel).  Take account of the different definition of the
+*  fitted orientation and the angle needed by AST_OFFSET2.
+         A( 1 ) = PP( 1, IB )
+         A( 2 ) = PP( 2, IB )
+         JUNK = AST_OFFSET2( PFRM, A, 0.5D0 * PI - PP( 5, IB ), 1.0D0,
+     :                       B, STATUS )
 
-*  Use spherical geometry for a Skyframe.
-*  Reverse these if the axis order is swapped in the SkyFrame.
-         IF ( ISSKY ) THEN
+*  Transform the central and offset pixel positions into the reporting
+*  Frame.
+         XIN( 1 ) = A( 1 )
+         XIN( 2 ) = B( 1 )
+         YIN( 1 ) = A( 2 )
+         YIN( 2 ) = B( 2 )
+         CALL AST_TRAN2( MAP, 2, XIN, YIN, .TRUE., XOUT, YOUT, STATUS )
 
-*  Obtain the bearing of the vector between the centre and the unit
-*  displacement.
-            THETA = SLA_DBEAR( POS( 1, LON ), POS( 1, LAT ),
-     :                         POS( 2, LON ), POS( 2, LAT ) )
+*  Find the angle, as seen from the first point, between the positive
+*  direction of the second current Frame axis, and the line joining the
+*  two points.  Positive rotation is in the same sense as rotation from
+*  the positive direction of the second current Frame axis to the
+*  positive direction of the first current Frame axis.
+         A( 1 ) = XOUT( 1 )
+         A( 2 ) = YOUT( 1 )
+         B( 1 ) = XOUT( 2 )
+         B( 2 ) = YOUT( 2 )
+         THETA = AST_AXANGLE( CFRM, A, B, 2, STATUS )
 
-*   When we have a longitude along the first axis, the positive
-*   expected by SLA_DBEAR is the opposite of what we supplied,
-*   so the orientation is corrected for this mirror flip..
-            IF ( LON .EQ. 1 ) THETA = PI - THETA
-
-*  If it's not a SkyFrame assume Euclidean geometry.  Also by
-*  definition orientation is 0 degrees for a circular beam.  The
-*  transformation can lead to small perturbation of the original
-*  zero degrees.  Switch to Y through negative X (from the normal
-*  X through Y) as per the requirements.
-         ELSE
-            DX = POS( 2, 1 ) - POS( 1, 1 )
-            DY = POS( 2, 2 ) - POS( 1, 2 )
-            IF ( DX .NE. 0.0D0 .OR. DY .NE. 0.0D0 .AND. 
-     :          ABS( PP( 3, IB ) - PP( 4, IB ) ) .GT. VAL__EPSD ) THEN
-               THETA = 0.5D0 * PI - ATAN2( DY, DX )
-            ELSE
-               THETA = 0.0D0
-            END IF
-         END IF
+*  For a non-SkyFrame we want the angle measured from the second axis
+*  through negative first axis (to mimic Skyframe's North via East).
+         IF ( .NOT. ISSKY ) THETA = -THETA
 
 *  Ensure that the result in the range 0 to 180 degrees.
          IF ( THETA .LT. 0 ) THEN
@@ -434,7 +439,7 @@
 *  --------------
 *  Use spherical geometry for a Skyframe.  We shall need the
 *  differences to derive the position-angle error; for convenience
-*  use the Euclidean notation
+*  use the Euclidean notation.
              IF ( ISSKY ) THEN
                DX = POS( 2, LON ) - POS( 1, LON )
                DY = POS( 2, LAT ) - POS( 1, LAT )
