@@ -172,8 +172,10 @@
 *        Use astFitsSetCN instead of astFitsSetS for COMMENT lines
 *     2007-05-22 (EC):
 *        Hard-wire obsgeo keywords to Mauna Kea - not Socorro NM!
-*     2007-05-2e (EC):
+*     2007-05-23 (EC):
 *        Derive obsgeo keywords from telpos using smf_terr
+*     2007-06-26 (EC):
+*        Derive OBSIDSS keyword from OBSID and inx->lambda
 
 
 *  Copyright:
@@ -242,7 +244,7 @@ const char dateobs[],    /* String representing UTC DATE-OBS */
 const char obsid[],      /* unique obsid for this observation (given) */
 const double *posptr,    /* Pointing offsets from map centre (given) */
 int jigsamples,          /* Number of jiggle samples (given) */
-const double jigptr[][2], /* Array of X, Y jiggle positions (given) */
+const double jigptr[][2],/* Array of X, Y jiggle positions (given) */
 const int obsnum,        /* Observation number (given) */
 const int nsubscan,      /* Sub-scan number (given) */
 const char obstype[],    /* Observation type, e.g. SCIENCE (given)*/
@@ -289,6 +291,7 @@ int *status              /* Global status (given and returned) */
 				      to output image */
    int ncoeff = 2;                 /* Number of coefficients in polynomial fit */
    double obsgeo[3];               /* Cartesian geodetic observatory coords. */
+   char obsidss[84];               /* OBSID + wavelength */
    double *poly;                   /* Pointer to polynomial fit solution */
    double rad;                     /* RA of observation in degrees */
    double *rdata;                  /* Pointer to flatfielded data */
@@ -361,6 +364,11 @@ int *status              /* Global status (given and returned) */
    /* Observation, date & pointing */
    astSetFitsCN ( fitschan, "COMMENT", "", "-- Observation & date parameters --", 0 );
    astSetFitsS ( fitschan, "OBSID", obsid, "Unique observation ID", 0 );
+
+   sprintf( obsidss, "%s_%i", obsid, (int) (inx->lambda*1e6) );
+   astSetFitsS ( fitschan, "OBSIDSS", obsidss, 
+   		 "Unique observation/wavelength ID", 0 );
+
    astSetFitsS ( fitschan, "OBJECT", "SMURF", "Object Name", 0 );
    astSetFitsL ( fitschan, "STANDARD", 0, "True if source is a calibrator", 0 );
    astSetFitsI ( fitschan, "OBSNUM", obsnum, "Observation Number", 0 );
