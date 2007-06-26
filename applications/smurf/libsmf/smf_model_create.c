@@ -126,15 +126,15 @@ void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp,
   char *mname=NULL;             /* String model component name */
   int mndf=0;                   /* NDF ID for propagation */
   int msize=0;                  /* Number of files in model group */
+  char name[GRP__SZNAM+1];      /* Name of container file without suffix */
   size_t ndata=0;               /* Number of elements in data array */
   int nmap=0;                   /* Number of elements mapped */
   long pagesize=0;              /* Size of memory page used by mmap */
-  smfData *tempdata=NULL;       /* Temporary smfData pointer */
-
-  char name[GRP__SZNAM+1];      /* Name of container file without suffix */
   char *pname=NULL;             /* Poiner to fname */
   long remainder=0;             /* Extra length beyond integer pagesuze */
   char suffix[] = SMF__DIMM_SUFFIX; /* String containing model suffix */
+  smfData *tempdata=NULL;       /* Temporary smfData pointer */
+
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -298,10 +298,11 @@ void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp,
       }
       
       buf = smf_malloc( headlen+datalen, 1, 0, status );
-      headptr = buf;
-      dataptr = buf + headlen;
 
       if( *status == SAI__OK ) {
+
+	headptr = buf;
+	dataptr = buf + headlen;
 
 	/* Write the header. memset to 0 first since much of this space is
            padding to make it a multiple of the page size */
