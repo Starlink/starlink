@@ -1,6 +1,6 @@
-      SUBROUTINE KPS1_BFFIL( INDF, MAP1, MAP2, MAP3, RFRM, VAR, NPOS, 
-     :                       NAXR, NAXIN, INPOS, GOTID, ID, LOGF, FDL, 
-     :                       FIXCON, AMPRAT, SLBND, SUBND, FAREA, 
+      SUBROUTINE KPS1_BFFIL( INDF, IWCS, MAP1, MAP2, MAP3, RFRM, VAR, 
+     :                       NPOS, NAXR, NAXIN, INPOS, GOTID, ID, LOGF, 
+     :                       FDL, FIXCON, AMPRAT, SLBND, SUBND, FAREA, 
      :                       FITREG, REFPOS, NPAR, FPAR, STATUS ) 
 *+
 *  Name:
@@ -13,8 +13,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_BFFIL( INDF, MAP1, MAP2, MAP3, RFRM, VAR, NPOS, NAXR,
-*                      NAXIN, INPOS, GOTID, ID, LOGF, FDL, FIXCON,
+*     CALL KPS1_BFFIL( INDF, IWCS, MAP1, MAP2, MAP3, RFRM, VAR, NPOS, 
+*                      NAXR, NAXIN, INPOS, GOTID, ID, LOGF, FDL, FIXCON,
 *                      AMPRAT, SLBND, SUBND, FAREA, FITREG, REFPOS,
 *                      NPAR, FPAR, STATUS )
 
@@ -39,6 +39,8 @@
 *  Arguments:
 *     INDF = INTEGER (Given)
 *        The identifier of the input NDF.
+*     IWCS = INTEGER (Given)
+*        The FrameSet associated with the NDF.
 *     MAP1 = INTEGER (Given)
 *        The AST Mapping from the Frame in which the initial guess
 *        positions are supplied, to the PIXEL Frame of the NDF.
@@ -183,6 +185,9 @@
 *        FPAR is modified.
 *     2007 June 15 (MJC):
 *        Added REFPOS argument, propagated through to other routines.
+*     2007 June 25 (MJC):
+*        Added IWCS FrameSet identifier argument and passed it to
+*        KPS1_BFCRF.
 *     {enter_further_changes_here}
 
 *-
@@ -213,6 +218,7 @@
 
 *  Arguments Given:
       INTEGER INDF
+      INTEGER IWCS
       INTEGER MAP1
       INTEGER MAP2
       INTEGER MAP3
@@ -487,7 +493,7 @@
 
 *  Convert the pixel coefficients to the reporting Frame, also
 *  changing the widths from standard deviations to FWHMs.
-            CALL KPS1_BFCRF( MAP2, RFRM, NAXR, NPOS, BF__NCOEF, FPAR, 
+            CALL KPS1_BFCRF( MAP2, IWCS, NAXR, NPOS, BF__NCOEF, FPAR, 
      :                       SIGMA, RP, RSIGMA, POLAR, POLSIG, STATUS )
 
 *  Find the offset of the primary beam with respect to the reference
