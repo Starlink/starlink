@@ -209,6 +209,8 @@
 *     2007 June 18 (MJC):
 *        Added IPLOT argument and ellipse plotting.  Moved results 
 *        graphics to new routine.
+*     2007 June 25 (MJC):
+*        Passed FrameSet identifier to KPS1_BFCRF.
 *     {enter_further_changes_here}
 
 *-
@@ -762,7 +764,7 @@
 
 *  Convert the pixel coefficients to the reporting Frame, also
 *  changing the widths from standard deviations to FWHMs.
-         CALL KPS1_BFCRF( MAP2, RFRM, NAXR, NPOS, BF__NCOEF, FPAR, 
+         CALL KPS1_BFCRF( MAP2, IWCS, NAXR, NPOS, BF__NCOEF, FPAR, 
      :                    SIGMA, RP, RSIGMA, POLAR, POLSIG, STATUS )
 
 *  Find the offset of the primary beam with respect to the reference
