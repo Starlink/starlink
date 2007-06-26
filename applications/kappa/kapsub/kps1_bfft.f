@@ -123,6 +123,9 @@
 *     2007 June 15 (MJC):
 *        Use marginal profiles to estimate the initial Gaussian 
 *        parameters.  Add the Notes.
+*     2007 June 25 (MJC):
+*        Switch ORIENT to radians to be compatible with its use within
+*        KPS1_STPAD.
 *     {enter_further_changes_here}
 
 *-
@@ -204,9 +207,6 @@
       DOUBLE PRECISION PI
       PARAMETER ( PI = 3.1415926535898 )
 
-      DOUBLE PRECISION R2D       ! Radians to degrees
-      PARAMETER ( R2D = 180.0D0 / PI )
-
       INTEGER WIDTH              ! Width of region in which to estimate
       PARAMETER ( WIDTH = 5 )    ! amplitude
 
@@ -248,7 +248,7 @@
       INTEGER NERR               ! Number of numerical error
       INTEGER NGOOD              ! Number of good values
       INTEGER NPOS               ! Number of data values
-      REAL ORIENT                ! Initial orientation of beam
+      REAL ORIENT                ! Initial orientation of beam (radians)
       REAL PERCNT( 2 )           ! The percentiles
       DOUBLE PRECISION PERVAL( 2 ) ! The values at the percentiles
       INTEGER PIVOT( MXCOEF )    ! Pivot indices
@@ -410,7 +410,7 @@
 *  different fixed widths were supplied.
          IF ( .NOT. ORIC ) THEN
             N = N + 1
-            XC( N ) = DBLE( ORIENT ) * R2D
+            XC( N ) = DBLE( ORIENT )
             PC( 5, IG ) = XC( N )
          END IF
 

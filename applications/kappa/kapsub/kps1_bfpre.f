@@ -76,6 +76,8 @@
 *  History:
 *     2007 June 18 (MJC):
 *        Original version.
+*     2007 June 25 (MJC):
+*        The fitted orientation is now in radians.
 *     {enter_changes_here}
 
 *-
@@ -109,9 +111,6 @@
 
       DOUBLE PRECISION PIBY2
       PARAMETER ( PIBY2 = 0.5D0 * PI )
-
-      DOUBLE PRECISION R2D       ! Radians to degrees
-      PARAMETER ( R2D = 180.0D0 / PI )
 
 *  Local Variables:
       REAL AXRIN                 ! Axis ratio, PIXEL Frame
@@ -220,14 +219,15 @@
             IF ( MARK( 1 : 1 ) .EQ. 'E' ) THEN
 
 *  Assemble the relevant parameters in the required data types.
-*  Sky position angles are already correct (albeit in degrees) but
-*  Cartesian systems are Y through negative X and KPS1_ELMAP wants 
+*  Sky position angles are already correct.  However, for Cartesian 
+*  systems the position angle is measured from positive Y through 
+*  negative X and KPS1_ELMAP wants the opposite polarity.
                K = ( I - 1 ) * BF__NCOEF
                WIDIN = REAL( MIN( FPAR( 3 + K ), FPAR( K + 4 ) ) )
                AXRIN = WIDIN /
      :                 REAL( MAX( FPAR( 3 + K ), FPAR( K + 4 ) ) )
 
-               ORIN = REAL( 0.5D0 * PI - FPAR( K + 5 )/ R2D )
+               ORIN = REAL( 0.5D0 * PI - FPAR( K + 5 ) )
 
 *  Transform Gaussian ellipse from pixel to graphics co-ordinates.
                CALL KPS1_ELMAP( .FALSE., BASFRM, FPAR( K + 1 ),
