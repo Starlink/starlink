@@ -643,6 +643,9 @@ f     - Title: The Plot title drawn using AST_GRID
 *        - Since the grfcontext object is only used by external code, store 
 *          a public object identifier for it in the Plot structure rather 
 *          than a true C pointer.
+*     26-JUN-2007 (DSB)
+*        Honour the LabelUp attribute value even if labels are drawn
+*        around the edges of the plot.
 *class--
 */
 
@@ -2412,8 +2415,13 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 *
 *     If the LabelUp value of a Plot axis is non-zero, it causes
 *     numerical labels for that axis to be plotted upright (i.e. as
-*     normal, horizontal text), otherwise (the default) these labels
-*     rotate to follow the axis to which they apply.
+*     normal, horizontal text), otherwise labels are drawn parallel to 
+*     the axis to which they apply.
+*
+*     The default is to produce upright labels if the labels are placed
+*     around the edge of the plot, and to produce labels that follow the 
+*     axes if the labels are placed within the interior of the plot (see
+*     attribute Labelling).
 
 *  Applicability:
 *     Plot
@@ -2431,7 +2439,7 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 *att--
 */
 /* Are numerical labels to be displayed on each axis? Has a value of -1 when 
-not set yielding a value of 1 (yes) for both axes. */
+not set yielding a value of 0 (no) for both axes. */
 MAKE_CLEAR(LabelUp,labelup,-1,2)
 MAKE_GET(LabelUp,int,0,( this->labelup[axis] == -1 ? 0 : this->labelup[axis] ),2)
 MAKE_TEST(LabelUp,( this->labelup[axis] != -1 ),2)
@@ -10153,6 +10161,7 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
    int ok;                /* Can the current tick mark be labelled on the edge? */
    int labfound;          /* Label value has already been used? */
    int tick;              /* Tick index */
+   int upright;           /* Draw all labels upright? */
 
 /* Check the global status. */
    if( !astOK ) return 0;
@@ -10204,6 +10213,13 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
 /* For each axis, identify the the usable edge labels. */
    for( axis = 0; axis < 2; axis++ ){
 
+/* See if labels for this axis are to be drawn upright. */
+      if( astTestLabelUp( this, axis ) ) { 
+         upright = astGetLabelUp( this, axis );
+      } else {
+         upright = 1;
+      }
+
 /* Store the required gap between the label text and the axis. */
       txtgap = astGetNumLabGap( this, axis )*mindim;
 
@@ -10218,7 +10234,9 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
       if( edge == 0 ){
 
 /* Choose the justification based on the sign of the text gap. */
-         if( txtgap > 0.0 ){
+         if( !upright ) {
+            just[ axis ] = "BC";
+         } else if( txtgap > 0.0 ){
             just[ axis ] = "CR";
          } else if( txtgap < 0.0 ){
             just[ axis ] = "CL";
@@ -10267,7 +10285,10 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
          
 /* Do the same if the labels are to go on the right-hand edge. */
       } else if( edge == 2 ){
-         if( txtgap > 0.0 ){
+
+         if( !upright ) {
+            just[ axis ] = "BC";
+         } else if( txtgap > 0.0 ){
             just[ axis ] = "CL";
          } else if( txtgap < 0.0 ){
             just[ axis ] = "CR";
@@ -10381,8 +10402,20 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
 
                (labellist + naxlab)->text = (char *) astStore( NULL, (void *) text, strlen(text) + 1 );
                (labellist + naxlab)->just = (char *) astStore( NULL, (void *) just[ axis ], strlen(just[ axis ]) + 1 );
-               (labellist + naxlab)->upx = 0.0;
-               (labellist + naxlab)->upy = 1.0;
+
+/* The up vector depends on which edge is being labelled and whether all
+   labels are being drawn upright or not. */
+               if( edge == 1 || edge == 3 || upright ) {
+                  (labellist + naxlab)->upx = 0.0;
+                  (labellist + naxlab)->upy = 1.0;
+               } else if( edge == 0 ) {
+                  (labellist + naxlab)->upx = -1.0;
+                  (labellist + naxlab)->upy = 0.0;
+               } else {
+                  (labellist + naxlab)->upx = 1.0;
+                  (labellist + naxlab)->upy = 0.0;
+               }
+
                (labellist + naxlab)->val = (info->ticks)[ tick ];
                naxlab++;
 

@@ -22,6 +22,11 @@ array. This is necessary to correct a flaw in the calculation of output
 variances based on the spread of input values. NOTE, THIS CHANGE WILL
 REQUIRE EXISTING CODE THAT USES ASTREBINSEQ TO BE MODIFIED TO INCLUDE THE
 NEW PARAMETER (CALLED "NUSED").
+- The Plot class now honours the value of the LabelUp attribute even if
+numerical labels are placed around the edge of the Plot. Previously
+LabelUp was only used if the labels were drawn within the interior of 
+the plot. The LabelUp attribute controls whether numerical labels are 
+drawn horizontally or parallel to the axis they describe.
 - The Plot class has a new attribute called GrfContext that can be used
 to comminicate context information between an application and any
 graphics functions registered with the Plot class via the astGrfSet
