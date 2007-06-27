@@ -27,17 +27,20 @@
 *        Pointer to global status.
 
 *  Description:
-*     This routine performs a boxcar average of an input array over a
-*     given window, replacing values in the array with the appropriate
-*     average value. If the window size exceeds the size of the input
-*     array then the routine will replace the array values with the
-*     mean of the entire array.
+*     This routine performs an in-place boxcar average of an input
+*     array over a given window, replacing values in the array with
+*     the appropriate average value. If the window size exceeds the
+*     size of the input array then the routine will replace the array
+*     values with the mean of the entire array. The half-windows at
+*     the start and end are filled with the nearest calculated smooth
+*     values.
 
 *  Notes: 
 *     Does not deal with bad values
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Edward Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -45,6 +48,9 @@
 *        Initial test version
 *     2006-10-11 (AGG):
 *        Change int arguments to size_t
+*     2007-06-27 (EC):
+*        Changed algorithm to calculate a "smooth" boxcar (old algorithm
+*     assigned same smooth value to all samples within disjoint windows)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -96,9 +102,10 @@ void smf_boxcar1 ( double *series, const size_t ninpts, size_t window, int *stat
   /* Local variables */
   size_t i;                   /* Loop counter */
   size_t j;                   /* Loop counter */
-  double smooth;              /* Smoothed value */
-  size_t next;                /* Next starting element */
-
+  double pad=0;               /* Pad value */
+  double *seriescopy;         /* Copy of the time series */
+  double sum;                 /* Sum of values in the window */
+  
   /* Check status */
   if (*status != SAI__OK) return;
 
@@ -113,31 +120,49 @@ void smf_boxcar1 ( double *series, const size_t ninpts, size_t window, int *stat
     window = ninpts;
   }
 
-  /* Initialize the sum and next index */
-  smooth = 0;
-  next = window - 1;
-  /* Loop over the points in the input array */
-  for ( i=0; i<ninpts; i++ ) {
-    if ( i == next ) {
-      /* Calculate mean */
-      smooth /= (double)window;
-      /* Back fill series with smoothed values */
-      for ( j=0; j<window; j++) {
-	series[i-j] = smooth;
+  /* Make a copy of the time series that won't get altered as we go */
+  seriescopy = smf_malloc( ninpts, sizeof(*series), 0, status );
+
+  if( *status == SAI__OK ) {
+    memcpy( seriescopy, series, ninpts*sizeof(*series) );
+
+    sum = 0;
+
+    for( i=0; i<ninpts; i++ ) {
+      /* sum another point from the unaltered array */
+      sum += seriescopy[i];
+
+      /* If we have a full window start calculating smooth values */
+      if( i >= (window-1) ) {
+	series[i-window/2] = sum / (double) window;
+
+	/* Subtract off the first sample in the window here before adding in
+           a new point next time around the loop */
+	sum -= seriescopy[i-(window-1)];
       }
-      /* Set next starting index */
-      next += window;
-      /* If bigger tha array size, set next starting index to the
-	 array size */
-      if ( next > ninpts) {
-	next = ninpts - 1;
-      }
-      /* Reset the smoothed value to zero */
-      smooth = 0;
-    } else {
-      /* Accumulate the sum */
-      smooth += series[i];
     }
-  }  
+
+    /* Pad the start and end half-windows with nearest smoothed value */
+
+    if( (ninpts == window) && ((ninpts % 2) == 0 ) ) {
+      /* In this special case modify the algorithm to correctly pad the
+	 entire array with the single mean value */
+      pad = series[ninpts-1-window/2];
+      for( i=0; i<ninpts; i++ ) {
+    	series[i] = pad;
+      }
+    } else { 
+      /* Otherwise pad value comes one sample after/before the ends of the
+         half-windows */ 
+      for( i=0; i<window/2; i++ ) {
+    	series[i] = series[window/2+1];
+    	series[ninpts-1-i] = series[ninpts-2-window/2];
+      }
+    }
+  }
+
+  /* Clean Up */
+
+  if( seriescopy ) smf_free( seriescopy, status );
 
 }
