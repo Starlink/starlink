@@ -44,7 +44,7 @@ dist-hook:
 ##  Post-installation tasks. The on-line help ends up in
 ##  $(starhelpdir), that should be $(starhelpdir).htx for showme etc.
 ##  to work.
-post-install-local:
+install-data-hook:
 	- $(mkdir_p) $(starhelpdir)
 	cd $(starhelpdir)/..; \
 	pwd=`pwd`; \
