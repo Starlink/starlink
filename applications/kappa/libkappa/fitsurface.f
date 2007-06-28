@@ -4,7 +4,7 @@
 *     FITSURFACE
 
 *  Purpose:
-*     Fits a polynomial surface to 2-dimensional data array.
+*     Fits a polynomial surface to two-dimensional data array.
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,7 +20,7 @@
 *        The global status.
 
 *  Description:
-*     This task fits a surface to a 2-dimensional data array stored
+*     This task fits a surface to a two-dimensional data array stored
 *     array within an NDF data structure.  At present it only
 *     permits a fit with a polynomial, and the coefficients of that
 *     surface are stored in a POLYNOMIAL structure (SGP/38) as an
@@ -44,7 +44,7 @@
 *        The type of fit.  It must be either "Polynomial" for a
 *        polynomial or "Spline" for a bi-cubic spline. ["Polynomial"]
 *     NDF  = NDF (Update)
-*        The NDF containing the 2-dimensional data array to be fitted.
+*        The NDF containing the two-dimensional data array to be fitted.
 *     NXPAR = _INTEGER (Read)
 *        The number of fitting parameters to be used in the x
 *        direction.  It must be in the range 1 to 15 for a polynomial
@@ -136,7 +136,9 @@
 *     read by MAKESURFACE to create a NDF of the fitted surface.  Also
 *     stored in the SURFACEFIT extension are the r.m.s. deviation to the
 *     fit (component RMS), the maximum absolute deviation (component
-*     RSMAX), and the co-ordinate system (component COSYS).
+*     RSMAX), and the co-ordinate system (component COSYS) translated to 
+*     AST Domain names AXIS (for parameter COSYS="Data") and PIXEL
+*     (World).
 
 *  Related Applications:
 *     KAPPA: MAKESURFACE, SURFIT.
@@ -159,12 +161,14 @@
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council.
 *     Copyright (C) 1995-1997, 2003-2004 Central Laboratory of the
-*     Research Councils. All Rights Reserved.
+*     Research Councils.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -174,8 +178,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     SMB: Steven M. Beard (ROE)
@@ -218,7 +222,11 @@
 *        Check that the values obtained for XMAX, XMIN, YMAX and YMIN are
 *        usable. 
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2007 June 28 (MJC):
+*        Translate COSYS values to AXIS and PIXEL to bring it more into
+*        modern AST parlance.  Use new KPS1_FSWPE routine to create
+*        SURFACEFIT extension.
 *     {enter_further_changes_here}
 
 *-
@@ -248,8 +256,8 @@
                                  ! polynomial coefficients
       PARAMETER ( MCHOEF = MXPAR * MXPAR )
 
-      INTEGER NDIM               ! Maximum number of dimensions.
-      PARAMETER ( NDIM = 2 )     ! Only 2-dimensional arrays can be handled.
+      INTEGER NDIM               ! Maximum number of dimensions---only 
+      PARAMETER ( NDIM = 2 )     ! two-dimensional arrays can be handled
 
 *  Local Variables:
       INTEGER APTR               ! Pointer to workspace
@@ -551,6 +559,9 @@
             CALL PAR_GDR0D( 'YMAX', YMAX, YMAX, VAL__MAXD, .TRUE., YMAX, 
      :                      STATUS ) 
 
+*  Polynomial fit
+*  ==============
+
 *  Check which type of surface fit is required.
             IF ( FITYPE( 1:3 ) .EQ. 'POL' ) THEN
 
@@ -601,24 +612,12 @@
 *  named SURFACEFIT.  The coefficients will be stored in a structure
 *  within this called FIT of type POLYNOMIAL (see SGP/38 for a
 *  description of the contents of a POLYNOMIAL structure).
-               CALL NDF_XNEW( NDFI, 'SURFACEFIT', 'EXT',
-     :                        0, 0, XLOC, STATUS )
+               CALL KPS1_FSWPE( NDFI, XMIN, XMAX, YMIN, YMAX, NXPAR, 
+     :                          NYPAR, MCHOEF, CHCOEF, VARIAN, NCOEF, 
+     :                          SNGL( RSMAX ), RMS, COSYS, STATUS )
 
-               CALL DAT_NEW( XLOC, 'FIT', 'POLYNOMIAL', 0, 0, STATUS )
-               CALL DAT_FIND( XLOC, 'FIT', FLOC, STATUS )
-
-               CALL KPG1_PL2PU( FLOC, 'CHEBYSHEV', NXPAR, NYPAR, .TRUE.,
-     :                          XMIN, XMAX, YMIN, YMAX, CHCOEF, VARIAN,
-     :                          WORK, STATUS )
-
-*  In addition to the coefficients, write the RMS error, the maximum
-*  residual to the SURFACEFIT extension, and the co-ordinate system.
-               CALL NDF_XPT0R( RMS, NDFI, 'SURFACEFIT', 'RMS', STATUS )
-               CALL NDF_XPT0R( SNGL( RSMAX ), NDFI, 'SURFACEFIT',
-     :                         'RESIDMAX', STATUS )
-               CALL NDF_XPT0C( COSYS, NDFI, 'SURFACEFIT', 'COSYS', 
-     :                         STATUS )
-
+*  Spline fitting.
+*  ===============
             ELSE IF ( FITYPE( 1:3 ) .EQ. 'SPL' ) THEN
                CALL MSG_OUT( ' ', 'Spline fitting not '/
      :                       /'implemented yet.', STATUS )
