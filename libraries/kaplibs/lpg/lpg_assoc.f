@@ -71,6 +71,8 @@
 *        Original version.
 *     15-MAR-2004 (DSB):
 *        Modified to put the opened NDF into the OPNLST group.
+*     28-JUN-2007 (DSB):
+*        Added value for argument VERB to the NDG_ASSO1 call.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -240,7 +242,7 @@
 *  result in the user being prompted for a new parameter value.
          CALL PAR_STATE( UPAR, STATE, STATUS )
          IF( STATE .EQ. SUBPAR__CANCEL ) THEN
-            CALL NDG_ASSO1( PARAM, MODE, INDF, FIELDS, STATUS )
+            CALL NDG_ASSO1( PARAM, VERB, MODE, INDF, FIELDS, STATUS )
             
 *  Store the new value in the group, replacing the old value, and store
 *  the new list of names as the parameter's current value.
