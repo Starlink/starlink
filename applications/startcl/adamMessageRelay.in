@@ -1,4 +1,12 @@
-#! @ATCLSH@
+#!/bin/sh
+# The next lines are executed by /bin/sh, but not Tcl \
+if test -f @ATCLSH@; then \
+   exec @ATCLSH@ $0 ${1+"$@"} ; \
+else \
+   exec atclsh $0 ${1+"$@"}; \
+fi
+# Which sees it as an extended comment.
+
 #
 # This script acts as a "go-between" between a tk application and adam 
 # tasks. The tk application cannot communicate directly with an adam
