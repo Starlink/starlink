@@ -113,7 +113,7 @@ FIO1_SERR_PC_LINUX: FIO1_SERR_PC_LINUX.F
 	rm -f $@
 	mv FIO1_SERR_PC_LINUX.tmp $@
 
-BUILT_SOURCES = $(PRIVATE_INCLUDES)
+BUILT_SOURCES = $(PRIVATE_INCLUDES) $(include_MESSAGES)
 
 # fiotest is an ADAM monolith
 # Note that fio_test.f is not used anywhere but there is no calling
