@@ -4,8 +4,8 @@
 *     MAKESURFACE
 
 *  Purpose:
-*     Creates a 2-dimensional NDF from the coefficients of a polynomial
-*     surface
+*     Creates a two-dimensional NDF from the coefficients of a 
+*     polynomial surface
 
 *  Language:
 *     Starlink Fortran 77
@@ -21,9 +21,9 @@
 *        The global status.
 
 *  Description:
-*     The coefficients describing a 2-dimensional polynomial surface
+*     The coefficients describing a two-dimensional polynomial surface
 *     are read from a SURFACEFIT extension in an NDF (written by
-*     FITSURFACE), and are used to create a 2-dimensional surface of
+*     FITSURFACE), and are used to create a two-dimensional surface of
 *     specified size and extent.  The surface is written to a new NDF.
 *
 *     The size and extent of the surface may be obtained from a template
@@ -78,9 +78,9 @@
 
 *  Examples:
 *     makesurface flatin flatout \
-*        This generates a 2-dimensional image in the NDF called flatout
-*        using the surface fit stored in the 2-dimensional NDF flatin.
-*        The created image has the same data type, bounds, and
+*        This generates a two-dimensional image in the NDF called 
+*        flatout using the surface fit stored in the two-dimensional NDF
+*        flatin.  The created image has the same data type, bounds, and
 *        co-ordinate limits as the data array of flatin.
 *     makesurface flatin flatout type=_wo lbound=[1,1] ubound=[320,512]
 *        As the previous example, except that the data array in flatout
@@ -93,15 +93,15 @@
 *        increasing pixel index), the output image will be correctly
 *        oriented.
 *     makesurface flatin flatout template title="Surface fit"
-*        This generates a 2-dimensional image in the NDF called flatout
-*        using the surface fit stored in the 2-dimensional NDF flatin.
-*        The created image inherits the attributes of the NDF called
-*        template.  The title of flatout is "Surface fit".
+*        This generates a two-dimensional image in the NDF called 
+*        flatout using the surface fit stored in the two-dimensional NDF
+*        flatin.  The created image inherits the attributes of the NDF 
+*        called template.  The title of flatout is "Surface fit".
 
 *  Notes:
 *     -  The polynomial surface fit is stored in SURFACEFIT extension,
 *     component FIT of type POLYNOMIAL, variant CHEBYSHEV.  This
-*     extension is created by FITSURFACE.    Also read from the
+*     extension is created by FITSURFACE.  Also read from the
 *     SURFACEFIT extension is the co-ordinate system (component COSYS).
 *     -  When LIKE=!, COSYS="Data" and the original NDF had an axis that
 *     decreased with increasing pixel index, you may want to flip the
@@ -131,13 +131,15 @@
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1997-1998, 2004 Central Laboratory of the
-*     Research Councils. Copyright (C) 2006 Particle Physics &
-*     Astronomy Research Council. All Rights Reserved.
+*     Research Councils. 
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -147,8 +149,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     SMB: Steven M. Beard (ROE)
@@ -182,6 +184,8 @@
 *        Use CNF_PVAL.
 *     2006 April 12 (MJC):
 *        Remove unused variable.
+*     2007 June 28 (MJC):
+*        Allow for COSYS to be AXIS, PIXEL, or GRID.
 *     {enter_further_changes_here}
 
 *-
@@ -201,9 +205,8 @@
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
-      INTEGER MAXDIM             ! Maximum number of dimensions.
-      PARAMETER ( MAXDIM = 2 )   ! Only 2-dimensional arrays can be
-                                 ! handled
+      INTEGER MAXDIM             ! Maximum number of dimensions---only
+      PARAMETER ( MAXDIM = 2 )   ! two-dimensional arrays can be handled
 
       INTEGER MXPAR              ! Maximum number of fit parameters
       PARAMETER ( MXPAR = 15 )
@@ -399,8 +402,12 @@
                      XDIM = UBND( 1 ) - LBND( 1 ) + 1
                      YDIM = UBND( 2 ) - LBND( 2 ) + 1
 
-*  Is the surface is defined in terms of data co-ordinates?
-                     IF ( COSYS .EQ. 'DATA' ) THEN
+*  DATA or AXIS
+*  ------------
+*  Is the surface is defined in terms of data co-ordinates (now called
+*  AXIS)?
+                     IF ( COSYS .EQ. 'DATA' .OR. 
+     :                    COSYS .EQ. 'AXIS' ) THEN
 
 *  Map the axis arrays of the new NDF for read access.
                         CALL NDF_AMAP( NDFO, 'CENTRE', SDIM( 1 ),
@@ -418,21 +425,39 @@
      :                                   YMIN, YMAX,
      :                                   STATUS )
 
+*  WORLD or PIXEL
+*  --------------
                      ELSE
 
 *  Get some workspace the length of the two axes.
                         CALL PSX_CALLOC( XDIM, '_DOUBLE', XPTR, STATUS )
                         CALL PSX_CALLOC( YDIM, '_DOUBLE', YPTR, STATUS )
 
+                        IF ( COSYS .EQ. 'WORLD' .OR. 
+     :                       COSYS .EQ. 'PIXEL' ) THEN
+
 *  Fill the work arrays with pixel co-ordinates.
-                        CALL KPG1_SSAZD( XDIM, 1.0D0,
-     :                                   DBLE( LBND( 1 ) ) - 0.5D0,
-     :                                   %VAL( CNF_PVAL( XPTR ) ) , 
-     :                                   STATUS )
-                        CALL KPG1_SSAZD( YDIM, 1.0D0,
-     :                                   DBLE( LBND( 2 ) ) - 0.5D0,
-     :                                   %VAL( CNF_PVAL( YPTR ) ) , 
-     :                                   STATUS )
+                           CALL KPG1_SSAZD( XDIM, 1.0D0,
+     :                                      DBLE( LBND( 1 ) ) - 0.5D0,
+     :                                      %VAL( CNF_PVAL( XPTR ) ) , 
+     :                                      STATUS )
+                           CALL KPG1_SSAZD( YDIM, 1.0D0,
+     :                                      DBLE( LBND( 2 ) ) - 0.5D0,
+     :                                      %VAL( CNF_PVAL( YPTR ) ) , 
+     :                                      STATUS )
+                        ELSE
+                           CALL KPG1_SSAZD( XDIM, 1.0D0, 
+     :                                      DBLE( LBND( 1 ) ),
+     :                                      %VAL( CNF_PVAL( XPTR ) ) , 
+     :                                      STATUS )
+                           CALL KPG1_SSAZD( YDIM, 1.0D0,
+     :                                      DBLE( LBND( 2 ) ),
+     :                                      %VAL( CNF_PVAL( YPTR ) ) , 
+     :                                      STATUS )
+                        END IF
+
+*  GRID
+*  ----
 
 *  Record that there is workspace to free.
                         OBWORK = .TRUE.
