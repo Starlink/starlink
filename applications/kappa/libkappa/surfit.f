@@ -21,7 +21,7 @@
 *        The global status.
 
 *  Description:
-*     The background of a 2-dimensional data array in the supplied NDF
+*     The background of a two-dimensional data array in the supplied NDF
 *     structure is estimated by condensing the array into equally sized
 *     rectangular bins, fitting a spline or polynomial surface to the
 *     bin values, and finally evaluating the surface for each pixel in
@@ -96,7 +96,7 @@
 *        Name of the file to log the binned array and errors before and
 *        after fitting.  If null, there will be no logging. [!]
 *     IN = NDF (Read)
-*        NDF containing the 2-dimensional data array to be fitted.
+*        NDF containing the two-dimensional data array to be fitted.
 *     KNOTS( 2 ) = _INTEGER (Read)
 *        The number of interior knots used for the bi-cubic-spline fit
 *        along the x and y axes.  These knots are equally spaced within
@@ -121,7 +121,7 @@
 *        accessed when FITTYPE="Polynomial".  The default is the current
 *        value, which is 4 initially. []
 *     OUT = NDF (Write)
-*        NDF to contain the fitted 2-dimensional data array.
+*        NDF to contain the fitted two-dimensional data array.
 *     RMS = _REAL (Write)
 *        An output parameter in which is stored the RMS deviation of the 
 *        fit from the original data (per pixel).
@@ -145,9 +145,16 @@
 *        during estimation (e.g. ones beyond the thresholds or were
 *        clipped). [!]
 
+*  Notes:
+*     A polynomial surface fit is stored in a SURFACEFIT extension,
+*     component FIT of type POLYNOMIAL, variant CHEBYSHEV.  For further
+*     details see SGP/38.  Also stored in the SURFACEFIT extension is 
+*     the r.m.s. deviation to the fit (component RMS); and the 
+*     co-ordinate system component COSYS, set to "GRID".
+
 *  Examples:
 *     surfit comaB comaB_bg
-*        This calculates the surface fit to the 2-dimensional NDF
+*        This calculates the surface fit to the two-dimensional NDF
 *        called comaB using the current defaults.  The evaluated fit is
 *        stored in the NDF called comaB_bg.
 *     surfit comaB comaB_bg poly median order=5 bindim=[24,30]
@@ -165,8 +172,8 @@
 *        each bin is the mean after clipping twice at 2 then once at
 *        3 standard deviations.
 *     surfit in=irasorion out=sback evaluate=all fittype=s knots=7
-*        This calculates the surface fit to the 2-dimensional NDF called
-*        irasorion.  The fit is evaluated at every pixel and the
+*        This calculates the surface fit to the two-dimensional NDF 
+*        called irasorion.  The fit is evaluated at every pixel and the
 *        resulting array stored in the NDF called sback.  A spline with
 *        seven knots along each axis is used to fit the surface.
 
@@ -185,12 +192,14 @@
 
 *  Copyright:
 *     Copyright (C) 1996, 1998, 2000, 2004 Central Laboratory of the
-*     Research Councils. All Rights Reserved.
+*     Research Councils. 
+*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -200,8 +209,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK).
@@ -219,7 +228,10 @@
 *     12-APR-2000 (DSB):
 *        Added parameter RMS.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2007 June 28 (MJC):
+*        Now writes a SURFACEFIT structure for polynomial coefficients, like
+*        application FITSURFACE.
 *     {enter_further_changes_here}
 
 *-
@@ -412,6 +424,7 @@
       REAL THRLO                 ! Lower threshold
       REAL THRHI                 ! Upper threshold
       INTEGER UBND( NDIM )       ! Upper bound of data array
+      DOUBLE PRECISION VARIAN( MCHOEF ) ! Variance of Chebyshev coeffs.
       INTEGER WOBT               ! Number of work arrays successfully
                                  ! created and mapped
       REAL WLIMIT                ! Minimum fraction of good pixels in a
@@ -1292,6 +1305,22 @@
      :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                       RMSF, STATUS )
          END IF
+
+*  SURFIT does not know the variance at present.  So for now we
+*  set them to undefined (bad) values for the purposes of the SURFACEFIT
+*  extension.
+         DO I = 1, NCOEF
+            VARIAN( I ) = VAL__BADD
+         END DO
+
+*  If the fit has been successful, write the results to an extension
+*  named SURFACEFIT.  The coefficients will be stored in a structure
+*  within this called FIT of type POLYNOMIAL (see SGP/38 for a
+*  description of the contents of a POLYNOMIAL structure).
+*  RSMAX is not known so set it to the bad value.
+         CALL KPS1_FSWPE( NDFO, DXMIN, DXMAX, DYMIN, DYMAX, NXPAR, 
+     :                    NYPAR, MCHOEF, CHCOEF, VARIAN, NCOEF, 
+     :                    VAL__BADR, RMS, 'GRID', STATUS )
 
 *  Fit a bi-cubic spline.
 *  ======================
