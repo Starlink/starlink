@@ -9,7 +9,7 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = qw(encode_qp decode_qp);
 
-$VERSION = "3.03";
+$VERSION = "3.07";
 
 use MIME::Base64;  # will load XS version of {en,de}code_qp()
 
@@ -90,10 +90,11 @@ call them as:
   $encoded = MIME::QuotedPrint::encode($decoded);
   $decoded = MIME::QuotedPrint::decode($encoded);
 
-Perl v5.6 and better allow extended Unicode characters in strings.
+Perl v5.8 and better allow extended Unicode characters in strings.
 Such strings cannot be encoded directly, as the quoted-printable
-encoding is only defined for single-byte characters.  The solution is to use the Encode
-module to select the byte encoding you want.  For example:
+encoding is only defined for single-byte characters.  The solution is
+to use the Encode module to select the byte encoding you want.  For
+example:
 
     use MIME::QuotedPrint qw(encode_qp);
     use Encode qw(encode);

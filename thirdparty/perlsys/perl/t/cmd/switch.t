@@ -1,6 +1,6 @@
 #!./perl
 
-# $RCSfile$$Revision$$Date$
+# $RCSfile: switch.t,v $$Revision$$Date$
 
 print "1..18\n";
 

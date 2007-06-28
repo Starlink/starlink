@@ -24,10 +24,7 @@ $VERSION = '1.01';
 # Lloyd, Ladd -> L300
 # Lukasiewicz, Lissajous -> L222
 #
-# $Log$
-# Revision 1.1  2005/02/05 04:43:32  timj
-# Initial revision
-#
+# $Log: soundex.pl,v $
 # Revision 1.2  1994/03/24  00:30:27  mike
 # Subtle bug (any excuse :-) spotted by Rich Pinder <rpinder@hsc.usc.edu>
 # in the way I handles leasing characters which were different but had

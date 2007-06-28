@@ -215,7 +215,7 @@ the TTY to use for debugging i/o.
 =item * noTTY 
 
 if set, goes in NonStop mode.  On interrupt, if TTY is not set,
-uses the value of noTTY or F</tmp/perldbtty$$> to find TTY using
+uses the value of noTTY or F<$HOME/.perldbtty$$> to find TTY using
 Term::Rendezvous.  Current variant is to have the name of TTY in this
 file.
 
@@ -911,7 +911,7 @@ sub eval {
 #   + Fix a side-effect of bug #24674 in the perl debugger ("odd taint bug")
 # Changes: 1.24: Mar 03, 2004 Richard Foley <richard.foley@rfi.net>
 #   + Added command to save all debugger commands for sourcing later.
-#   + Added command to display parent inheritence tree of given class.
+#   + Added command to display parent inheritance tree of given class.
 #   + Fixed minor newline in history bug.
 # Changes: 1.25: Apr 17, 2004 Richard Foley <richard.foley@rfi.net>
 #   + Fixed option bug (setting invalid options + not recognising valid short forms)
@@ -2034,8 +2034,8 @@ to enter commands and have a valid context to be in.
             $term || &setterm;
             print_help(<<EOP);
 Debugged program terminated.  Use B<q> to quit or B<R> to restart,
-  use B<O> I<inhibit_exit> to avoid stopping after program termination,
-  B<h q>, B<h R> or B<h O> to get additional info.  
+  use B<o> I<inhibit_exit> to avoid stopping after program termination,
+  B<h q>, B<h R> or B<h o> to get additional info.  
 EOP
 
             # Set the DB::eval context appropriately.
@@ -2743,7 +2743,7 @@ in this and all call levels above this one.
                     # sure that the line specified really is breakable.
                     #
                     # On the other hand, if there was a subname supplied, the
-                    # preceeding block has moved us to the proper file and
+                    # preceding block has moved us to the proper file and
                     # location within that file, and then scanned forward
                     # looking for the next executable line. We have to make
                     # sure that one was found.
@@ -6004,8 +6004,8 @@ sub setterm {
             eval "require Term::Rendezvous;" or die;
 
             # See if we have anything to pass to Term::Rendezvous.
-            # Use /tmp/perldbtty$$ if not.
-            my $rv = $ENV{PERLDB_NOTTY} || "/tmp/perldbtty$$";
+            # Use $HOME/.perldbtty$$ if not.
+            my $rv = $ENV{PERLDB_NOTTY} || "$ENV{HOME}/.perldbtty$$";
 
             # Rendezvous and get the filehandles.
             my $term_rv = new Term::Rendezvous $rv;
@@ -6634,7 +6634,7 @@ sub get_list {
 The C<catch()> subroutine is the essence of fast and low-impact. We simply
 set an already-existing global scalar variable to a constant value. This 
 avoids allocating any memory possibly in the middle of something that will
-get all confused if we do, particularily under I<unsafe signals>.
+get all confused if we do, particularly under I<unsafe signals>.
 
 =cut
 
@@ -8312,7 +8312,7 @@ Find all the subroutines that might match in this package
 
 =item *
 
-Add C<postpone>, C<load>, and C<compile> as possibles (we may be completing the keyword itself
+Add C<postpone>, C<load>, and C<compile> as possibles (we may be completing the keyword itself)
 
 =item *
 

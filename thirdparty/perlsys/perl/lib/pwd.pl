@@ -9,12 +9,9 @@
 #
 # Suggested alternative: Cwd
 #
-;# $RCSfile$$Revision$$Date$
+;# $RCSfile: pwd.pl,v $$Revision$$Date$
 ;#
-;# $Log$
-;# Revision 1.1  2005/02/05 04:43:18  timj
-;# Initial revision
-;#
+;# $Log:	pwd.pl,v $
 ;#
 ;# Usage:
 ;#	require "pwd.pl";

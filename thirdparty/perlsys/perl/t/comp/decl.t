@@ -1,6 +1,6 @@
 #!./perl
 
-# $RCSfile$$Revision$$Date$
+# $RCSfile: decl.t,v $$Revision$$Date$
 
 # check to see if subroutine declarations work everwhere
 

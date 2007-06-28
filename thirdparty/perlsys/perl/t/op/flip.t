@@ -1,6 +1,6 @@
 #!./perl
 
-# $RCSfile$$Revision$$Date$
+# $RCSfile: flip.t,v $$Revision$$Date$
 
 chdir 't' if -d 't';
 

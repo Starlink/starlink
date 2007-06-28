@@ -4,10 +4,7 @@
  * Author:	Matthias Neeracher <neeri@iis.ee.ethz.ch>
  *		Adapted from dl_dlopen.xs reference implementation by
  *              Paul Marquess (pmarquess@bfsec.bt.co.uk)
- * $Log$
- * Revision 1.1  2005/02/05 04:42:26  timj
- * Initial revision
- *
+ * $Log: dl_mac.xs,v $
  * Revision 1.3  1998/04/07 01:47:24  neeri
  * MacPerl 5.2.0r4b1
  *

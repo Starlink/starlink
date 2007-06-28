@@ -145,6 +145,7 @@ unless (ord("A") == 193){
 	 'MIME-B'             => 'Encode::MIME::Header',
 	 'MIME-Q'             => 'Encode::MIME::Header',
 
+	 'MIME-Header-ISO_2022_JP' => 'Encode::MIME::Header::ISO_2022_JP',
 	);
 }
 

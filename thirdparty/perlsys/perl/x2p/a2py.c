@@ -1,15 +1,10 @@
-/* $RCSfile$$Revision$$Date$
+/*    a2py.c
  *
  *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
  *    2000, 2001, 2002, by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
- *
- * $Log$
- * Revision 1.1  2005/02/05 04:44:29  timj
- * Initial revision
- *
  */
 
 #if defined(OS2) || defined(WIN32) || defined(NETWARE)
@@ -57,6 +52,10 @@ usage()
            "\n                  many fields.\n");
     exit(1);
 }
+#endif
+
+#ifdef __osf__
+#pragma message disable (mainparm) /* We have the envp in main(). */
 #endif
 
 int
@@ -428,7 +427,14 @@ yylex(void)
 		maxfld = tmp;
 	    XOP(FIELD);
 	}
+	for (d = s; isALPHA(*s) || isDIGIT(*s) || *s == '_'; )
+	    s++;
 	split_to_array = set_array_base = TRUE;
+	if (d != s)
+	{
+	    yylval = string(d,s-d);
+	    XTERM(SVFIELD);
+	}
 	XOP(VFIELD);
 
     case '/':			/* may either be division or pattern */

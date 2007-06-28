@@ -1,5 +1,5 @@
 %{
-/* $RCSfile$$Revision$$Date$
+/* $RCSfile: a2p.y,v $$Revision$$Date$
  *
  *    Copyright (C) 1991, 1992, 1993, 1994, 1996, 1997, 1999, 2000,
  *    by Larry Wall and others
@@ -7,10 +7,7 @@
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
  *
- * $Log$
- * Revision 1.1  2005/02/05 04:44:29  timj
- * Initial revision
- *
+ * $Log:	a2p.y,v $
  */
 
 #include "INTERN.h"
@@ -47,7 +44,7 @@ int ends = Nullop;
 %left NOT
 %right '^'
 %left INCR DECR
-%left FIELD VFIELD
+%left FIELD VFIELD SVFIELD
 
 %%
 
@@ -140,11 +137,12 @@ expr	: term
 	| expr '?' expr ':' expr
 		{ $$ = oper3(OCOND,$1,$3,$5); }
 	| variable ASGNOP cond
-		{ $$ = oper3(OASSIGN,$2,$1,$3);
-			if ((ops[$1].ival & 255) == OFLD)
-			    lval_field = TRUE;
-			if ((ops[$1].ival & 255) == OVFLD)
-			    lval_field = TRUE;
+		{
+		    $$ = oper3(OASSIGN,$2,$1,$3);
+		    if ((ops[$1].ival & 255) == OFLD)
+			lval_field = TRUE;
+		    else if ((ops[$1].ival & 255) == OVFLD)
+			lval_field = TRUE;
 		}
 	;
 
@@ -172,13 +170,37 @@ term	: variable
 	| term IN VAR
 		{ $$ = oper2(ODEFINED,aryrefarg($3),$1); }
 	| variable INCR
-		{ $$ = oper1(OPOSTINCR,$1); }
+		{
+		    $$ = oper1(OPOSTINCR,$1);
+		    if ((ops[$1].ival & 255) == OFLD)
+			lval_field = TRUE;
+		    else if ((ops[$1].ival & 255) == OVFLD)
+			lval_field = TRUE;
+		}
 	| variable DECR
-		{ $$ = oper1(OPOSTDECR,$1); }
+		{
+		    $$ = oper1(OPOSTDECR,$1);
+		    if ((ops[$1].ival & 255) == OFLD)
+			lval_field = TRUE;
+		    else if ((ops[$1].ival & 255) == OVFLD)
+			lval_field = TRUE;
+		}
 	| INCR variable
-		{ $$ = oper1(OPREINCR,$2); }
+		{
+		    $$ = oper1(OPREINCR,$2);
+		    if ((ops[$2].ival & 255) == OFLD)
+			lval_field = TRUE;
+		    else if ((ops[$2].ival & 255) == OVFLD)
+			lval_field = TRUE;
+		}
 	| DECR variable
-		{ $$ = oper1(OPREDECR,$2); }
+		{
+		    $$ = oper1(OPREDECR,$2);
+		    if ((ops[$2].ival & 255) == OFLD)
+			lval_field = TRUE;
+		    else if ((ops[$2].ival & 255) == OVFLD)
+			lval_field = TRUE;
+		}
 	| '-' term %prec UMINUS
 		{ $$ = oper1(OUMINUS,$2); }
 	| '+' term %prec UMINUS
@@ -255,6 +277,8 @@ variable: VAR
 		{ $$ = oper2(OVAR,aryrefarg($1),$3); }
 	| FIELD
 		{ $$ = oper1(OFLD,$1); }
+	| SVFIELD
+		{ $$ = oper1(OVFLD,oper1(OVAR,$1)); }
 	| VFIELD term
 		{ $$ = oper1(OVFLD,$2); }
 	;

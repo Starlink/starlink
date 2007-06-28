@@ -1,6 +1,6 @@
 #!./perl
 
-# $RCSfile$$Revision$$Date$
+# $RCSfile: unshift.t,v $$Revision$$Date$
 
 print "1..2\n";
 

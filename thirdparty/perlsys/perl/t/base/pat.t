@@ -1,6 +1,6 @@
 #!./perl
 
-# $RCSfile$$Revision$$Date$
+# $RCSfile: pat.t,v $$Revision$$Date$
 
 print "1..2\n";
 

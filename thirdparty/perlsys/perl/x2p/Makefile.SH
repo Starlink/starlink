@@ -27,12 +27,9 @@ esac
 echo "Extracting x2p/Makefile (with variable substitutions)"
 rm -f Makefile
 cat >Makefile <<!GROK!THIS!
-# $RCSfile$$Revision$$Date$
+# $RCSfile: Makefile.SH,v $$Revision$$Date$
 #
-# $Log$
-# Revision 1.1  2005/02/05 04:44:29  timj
-# Initial revision
-#
+# $Log:	Makefile.SH,v $
 
 CC = $cc
 BYACC = $byacc
@@ -114,12 +111,10 @@ a2p$(EXE_EXT): $(obj) a2p$(OBJ_EXT)
 
 # I now supply a2p.c with the kits, so the following section is
 # used only if you force byacc to run by saying
-# make  run_byacc
+#    make run_byacc
+# byacc 1.8.2 or 1.9 are recommended.
 
-check_byacc:
-	@$(BYACC) -V 2>&1 | grep 'version 1\.8\.2'
-
-run_byacc:	FORCE check_byacc
+run_byacc:	FORCE
 	@ echo Expect many shift/reduce and reduce/reduce conflicts
 	$(BYACC) a2p.y
 	rm -f a2p.c
@@ -178,6 +173,10 @@ shlist:
 
 $(plextract):
 	../miniperl -I../lib $@.PL
+
+find2perl: find2perl.PL
+
+s2p: s2p.PL
 
 malloc.c: ../malloc.c
 	rm -f malloc.c

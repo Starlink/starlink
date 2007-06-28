@@ -2,7 +2,7 @@
 
 $^I = $^O eq 'VMS' ? '_bak' : '.bak';
 
-# $RCSfile$$Revision$$Date$
+# $RCSfile: inplace.t,v $$Revision$$Date$
 
 print "1..2\n";
 

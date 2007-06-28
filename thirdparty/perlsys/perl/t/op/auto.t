@@ -1,6 +1,6 @@
 #!./perl
 
-# $RCSfile$$Revision$$Date$
+# $RCSfile: auto.t,v $$Revision$$Date$
 
 print "1..37\n";
 

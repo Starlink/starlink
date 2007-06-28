@@ -1,15 +1,10 @@
-/* $RCSfile$$Revision$$Date$
+/*    util.h
  *
- *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1999, 2000,
+ *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1999, 2000, 2005
  *    by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
- *
- * $Log$
- * Revision 1.1  2005/02/05 04:44:30  timj
- * Initial revision
- *
  */
 
 /* is the string for makedir a directory name or a filename? */
@@ -23,21 +18,15 @@
     int		eaccess();
 #endif
 
-char	*getwd();
-int	makedir();
-
 char * cpy2 ( char *to, char *from, int delim );
 char * cpytill ( char *to, char *from, int delim );
 void growstr ( char **strptr, int *curlen, int newlen );
 char * instr ( char *big, char *little );
-char * safecpy ( char *to, char *from, int len );
 char * savestr ( char *str );
-void croak ( char *pat, ... );
-void fatal ( char *pat, ... );
-void warn  ( char *pat, ... );
+void fatal ( const char *pat, ... );
+void warn  ( const char *pat, ... );
 int prewalk ( int numit, int level, int node, int *numericptr );
 
 Malloc_t safemalloc (MEM_SIZE nbytes);
-Malloc_t safecalloc (MEM_SIZE elements, MEM_SIZE size);
 Malloc_t saferealloc (Malloc_t where, MEM_SIZE nbytes);
 Free_t   safefree (Malloc_t where);

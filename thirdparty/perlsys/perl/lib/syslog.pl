@@ -1,10 +1,7 @@
 #
 # syslog.pl
 #
-# $Log$
-# Revision 1.1  2005/02/05 04:43:18  timj
-# Initial revision
-#
+# $Log:	syslog.pl,v $
 # 
 # tom christiansen <tchrist@convex.com>
 # modified to use sockets by Larry Wall <lwall@jpl-devvax.jpl.nasa.gov>

@@ -15,10 +15,7 @@
 # The remaining of this leading shell comment may be removed if you
 # include this script in your own package.
 #
-# $Log$
-# Revision 1.1  2005/02/05 04:41:58  timj
-# Initial revision
-#
+# $Log: configure,v $
 # Revision 3.0.1.1  1995/07/25  14:16:21  ram
 # patch56: created
 #

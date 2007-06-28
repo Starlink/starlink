@@ -1,6 +1,6 @@
 #!./perl
 
-# $RCSfile$$Revision$$Date$
+# $RCSfile: elsif.t,v $$Revision$$Date$
 
 sub foo {
     if ($_[0] == 1) {

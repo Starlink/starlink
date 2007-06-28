@@ -1,6 +1,6 @@
 #!./perl
 
-# $RCSfile$$Revision$$Date$
+# $RCSfile: cond.t,v $$Revision$$Date$
 
 print "1..4\n";
 
