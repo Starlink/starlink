@@ -1431,7 +1431,6 @@ AC_DEFUN([STAR_PLATFORM_SOURCES],
          [
 $_star_docs_only && AC_MSG_ERROR([STAR_[]PLATFORM_SOURCES in docs-only dir])
 AC_REQUIRE([AC_CANONICAL_BUILD])dnl
-AC_REQUIRE([AC_PROG_LN_S])dnl
 m4_ifval([$1], [], [AC_FATAL([$0: no target-file-list given])])dnl
 m4_ifval([$2], [], [AC_FATAL([$0: no platform-list given])])dnl
 AC_FOREACH([TargetFile], [$1],
@@ -1468,7 +1467,7 @@ else
     for _t in $1
     do
         if test -f $srcdir/$_t$_star_tmp; then
-            (cd $srcdir; rm -f $_t; $LN_S $_t$_star_tmp $_t)
+            (cd $srcdir; rm -f $_t; cp -p $_t$_star_tmp $_t)
         else
             AC_MSG_WARN([platform $_star_tmp matched, but no file $_t$_star_tmp found])
         fi
