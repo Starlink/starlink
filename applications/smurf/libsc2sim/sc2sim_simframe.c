@@ -121,6 +121,12 @@
 *        Set SYSTEM to GAPPT if we're observing a planet
 *     2007-02-28 (AGG):
 *        Fix major memory leak by annulling bolo2azel mapping
+*     2007-06-27 (EC):
+*        - Changed skynoise task so that simulated sky images are
+*        normalized.  Now the atmosphere value sampled from these
+*        images are scaled on-the-fly by the photon noise and mean
+*        atmospheric level added on.
+*       
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -212,18 +218,20 @@ int *status                  /* global status (given and returned) */
    double flux;                    /* flux at bolometer in pW */
    double fnoise;                  /* 1/f noise value */
    int i;                          /* loop counter */
-   double meanatm;                 /* mean expected atmospheric signal (pW) */
+   int lbnd_in[2];                 /* Pixel bounds for astTranGrid */
+   double meanatm;                 /* Mean boresight atmosphere level */
    double phase;                   /* 1/f phase calculation */
    int pos;                        /* lookup in noise coefficients */
+   double sigma;                   /* photon noise standard deviation */
+   double *skycoord=NULL;          /* az & el coordinates */
    double skytrans;                /* sky transmission (%) */
    double time = 0.0;              /* time from start of observation */
+   int ubnd_in[2];
    double xpos;                    /* X measurement position */
    double xsky;                    /* X position on sky screen */
    double ypos;                    /* Y measurement position */
    double ysky;                    /* Y position on sky screen */
-   double *skycoord=NULL;          /* az & el coordinates */
-   int lbnd_in[2];                 /* Pixel bounds for astTranGrid */
-   int ubnd_in[2];
+   double zenatm;                  /* zenith atmospheric signal (pW) */
   
     /* Check status */
    if ( !StatusOkP(status) ) return;
@@ -295,67 +303,92 @@ int *status                  /* global status (given and returned) */
      time = start_time + frame * samptime;
    }
 
-   /* Get the mean atmospheric signal */
-   sc2sim_calctrans ( inx.lambda, &skytrans, sinx.tauzen, status );
-   sc2sim_atmsky ( inx.lambda, skytrans, &meanatm, status );
+   /* Get the zenith atmospheric signal */ 
+   sc2sim_calctrans( inx.lambda, &skytrans, sinx.tauzen, status );
+   sc2sim_atmsky( inx.lambda, skytrans, &zenatm, status );
 
    if( *status == SAI__OK ) {
      for ( bol=0; bol<nbol; bol++ ) {
 
-       /* Calculate the elevation correction. */
+       /* Calculate the elevation and airmass */
        airmass = 1.0 / sin ( skycoord[nbol + bol] );
        xpos = position[0] + xbc[bol] + 0.5 * (double)astnaxes[0] * astscale;
        ypos = position[1] + ybc[bol] + 0.5 * (double)astnaxes[1] * astscale;
        
-       /* Get the observed astronomical value in Jy and convert it to pW. */
+       /* Get the observed astronomical value in Jy and convert it to pW.
+          This value is not yet corrected for atmospheric transmission! */
        astvalue = dbuf[bol];
-       astvalue = astvalue * 1.0e-5 * AST__DPI * 0.25 * DIAMETER 
-	 * DIAMETER * sinx.bandGHz;
+       astvalue = astvalue * sinx.jy2pw;
        
-       /* Lookup atmospheric emission - offset to near centre of the atm frame.
-	  A typical windspeed moves the sky screen at equivalent to 5000 arcsec
-	  per sec.
-	  The scalar ATMVALUE contains the atmosphere map value for the 
-	  current position (XPOS,YPOS). */
-       
-       xsky = xpos + sinx.atmxvel * time + sinx.atmzerox;
-       ysky = ypos + sinx.atmyvel * time + sinx.atmzeroy;
+       /* Calculate mean atmospheric emission at current airmass
+	  from zenith emission */
+       meanatm = zenatm * ( 1.0 - exp(-sinx.tauzen * airmass) ) / 
+	 ( 1.0 - exp(-sinx.tauzen) );
 
-       /* If the add atmospheric emission flag is set, use bilinear interpolation
-	  to find the atmvalue from the input file. */
+       /* Calculate the photon noise from this mean loading */
+       sc2sim_getsigma( sinx.refload, sinx.refnoise, 
+			meanatm + telemission, &sigma, status );
+
+       /* Initialize atmvalue to 0 */
+       atmvalue = 0;
+
+       /* If the add atmospheric emission flag is set, use bilinear
+	  interpolation to find the atmvalue from the input sky noise
+          image */
        if ( sinx.add_atm == 1 ) {
-	 
+
+	 /* Lookup atmospheric emission - offset to near centre of the
+	    atm frame.  A typical windspeed moves the sky screen at
+	    equivalent to 5000 arcsec per sec.  The scalar ATMVALUE
+	    contains the atmosphere map value for the current position
+	    (XPOS,YPOS). */
+       
+	 xsky = xpos + sinx.atmxvel * time + sinx.atmzerox;
+	 ysky = ypos + sinx.atmyvel * time + sinx.atmzeroy;
+
          sc2sim_getbilinear ( xsky, ysky, atmscale, atmnaxes[0], atmsim, 
 			      &atmvalue, status );
-	 
+
          if ( !StatusOkP(status) ) {
-	   printf ( "sc2sim_simframe: failed to interpolate sky bol=%d x=%e y=%e\n",
+	   printf( "sc2sim_simframe: failed to interpolate sky bol=%d x=%e y=%e\n",
 		    bol, xpos, ypos );
+
 	   break;
-         }
-	 /* Apply the elevation correction */
-	 atmvalue = atmvalue * ( 1.0 - exp(-sinx.tauzen * airmass) ) 
- 	            / ( 1.0 - exp(-sinx.tauzen) );
+         } else {
+
+	   /* If we successfully sampled a brightness from the sky
+	      noise simulation, and we have the normalization of the
+	      noise power spectrum at the knee frequency (sigma),
+	      scale the normalized sky noise value by sigma and add on
+	      the mean level */
+
+	   //printf("atmvalue=%lf sigma=%lf zenatm=%lf meanatm=%lf\n", 
+	   //	  atmvalue, sigma, zenatm, meanatm);
+
+	   //atmvalue = atmvalue*sigma + meanatm;
+
+	   atmvalue = atmvalue*sigma + meanatm;
+	 }
        
        } else {
-         /* Otherwise, set atmvalue to a fake mean level */
+         /* Otherwise, set atmvalue to smooth meanatm value */
          atmvalue = meanatm;
        }
 
        /* Calculate atmospheric transmission for this bolometer */
-       sc2sim_atmtrans ( inx.lambda, atmvalue, &skytrans, status );
+       sc2sim_atmtrans ( inx.lambda, meanatm, &skytrans, status );
        
        if( *status == SAI__OK ) {
 	 /*  Add atmospheric and telescope emission.
-	     TELEMISSION is a constant value for all bolometers. */
+	     TELEMISSION is a constant value for all bolometers. 
+             The 0.01 is needed because skytrans is a % */
 	 flux = 0.01 * skytrans * astvalue + atmvalue + telemission;
        }	 
 
-       /*  Add offset due to photon noise */
+       /*  Add photon noise */
        if ( sinx.add_pns == 1 ) {
-         sc2sim_addpnoise ( inx.lambda, sinx.bandGHz, sinx.aomega, 
-		            samptime, &flux, status );
-	 
+         sc2sim_addpnoise( sinx.refload, sinx.refnoise, samptime, &flux, 
+			   status );
        }
        
        /* Add heater, assuming mean heater level is set to add onto meanatm and

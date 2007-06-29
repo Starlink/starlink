@@ -97,6 +97,9 @@
 *        Changed from using XML files to AstKeyMaps
 *     2006-10-18 (EC):
 *        Extra status checking
+*     2007-06-29 (EC):
+*        Hard-wire sky level for digitisation coefficients since they get
+*        updated in sc2sim_simulate
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -158,11 +161,11 @@ void sc2sim_instrinit( struct sc2sim_obs_struct *inx,
   double instap[2];              /* Focal plane instrument offsets */
   int j;                         /* loop counter */
   double lst;                    /* local sidereal time in radians */
-  double meanatm;                /* mean expected atmospheric signal (pW) */
   int nbol=0;                    /* total number of bolometers */
   double p;                      /* parallactic angle (radians) */
   double photonsigma;            /* typical photon noise level in pW */
   double samptime;               /* sample time in sec */
+  double startatm;               /* mean expected atmospheric signal (pW) */
   JCMTState state;               /* Telescope state at one time slice */
   int subnum;                    /* subarray number */
   double telpos[3];              /* Geodetic location of the telescope */
@@ -196,11 +199,15 @@ void sc2sim_instrinit( struct sc2sim_obs_struct *inx,
       translate input power in pico Watts to output current in Amp. */
   sc2sim_response ( inx->lambda, SC2SIM__NCOEFFS, coeffs, status );
 
+  /* Assume a dummy atmospheric loading in pW to calculate digitization
+     parameters. This part will get re-calculated in sc2sim_simulate when
+     we actually know what the loading is at the observation start */
+
+  startatm = 10;
+
   /*  Calculate the parameters for simulating digitisation */
-  sc2sim_calctrans ( inx->lambda, &trans, sinx->tauzen, status );
-  sc2sim_atmsky ( inx->lambda, trans, &meanatm, status );   
-  sc2sim_getsigma ( inx->lambda, sinx->bandGHz, sinx->aomega,
-                    (sinx->telemission+meanatm), &photonsigma, status );
+  sc2sim_getsigma ( sinx->refload, sinx->refnoise,
+                    (sinx->telemission+startatm), &photonsigma, status );
    
   sc2sim_getscaling ( SC2SIM__NCOEFFS, coeffs, inx->targetpow, photonsigma,
                       digmean, digscale, digcurrent, status );
@@ -216,19 +223,15 @@ void sc2sim_instrinit( struct sc2sim_obs_struct *inx,
   /* Get the subsystem number */ 
   sc2ast_name2num( sinx->subname, &subnum, status );
 
-  /* Get the native x- and y- (GRID) coordinates of each bolometer */
-   
-  /*sc2sim_bolnatcoords( *xbolo, *ybolo, &nbol, status );*/
-
-  /* KLUDGE */
-  smf_get_gridcoords( *xbolo, *ybolo, BOLROW, BOLCOL, status );
-
-  /* Since sc2sim_simframe still needs xbc & ybc to interpolate values from
+  /* Get the native x- and y- (GRID) coordinates of each bolometer 
+     Since sc2sim_simframe still needs xbc & ybc to interpolate values from
      the sky noise image, calculate them here. Get rid of the old call
      to sc2sim_bolcoords. For now just make a dummy scuba2 frameset at
      some fixed elevation. To do this properly we would actually want to
      calculate xbc and ybc on-the-fly as the telescope points at different
      regions of the sky. */
+
+  smf_get_gridcoords( *xbolo, *ybolo, BOLROW, BOLCOL, status );
 
   /* Check to make sure that all the relevant elements of JCMTState are set! */
   state.tcs_az_ac1 = 0;
@@ -268,27 +271,6 @@ void sc2sim_instrinit( struct sc2sim_obs_struct *inx,
       (*xbc)[j] *= DR2AS;
       (*ybc)[j] *= DR2AS;
     }
-     
-    /* Setup world coordinate information and get the bolometer positions in
-       Nasmyth and native coordinates */
-    /*
-      lst = inx->ra;
-      sc2sim_telpos ( inx->ra, inx->dec, lst, &azimuth, elevation, &p, 
-      status );
-    */
-     
-    /*
-      sc2sim_bolcoords ( sinx->subname, inx->ra, inx->dec, *elevation, p,
-      "NASMYTH", &nbol, *xbc, *ybc, status );
-    */
-    /* Convert Nasmyth coordinates from mm to arcsec */
-    /*
-      for ( j=0; j<nbol; j++ ) {
-      (*xbc)[j] *= MM2SEC;
-      (*ybc)[j] *= MM2SEC;
-      }
-    */
-     
      
     sc2sim_getspread ( nbol, *pzero, *heater, status );
   }

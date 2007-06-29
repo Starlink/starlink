@@ -63,6 +63,11 @@
 *        Add OBSID to ndfwrdata and use const
 *     2007-04-02 (AGG):
 *        Add more FITS headers to ndfwrdata
+*     2007-06-27 (EC):
+*        Removed sigma from interface to sc2sim_invf2d
+*     2007-06-29 (EC):
+*        Simplified bolometer noise model changes interface to
+*        sc2sim_getsigma and sc2sim_addpnoise
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -111,19 +116,18 @@
 #define PIBY2 (AST__DPI/2.0)           /* Math constant */
 #define DIAMETER 15.0                  /* Diameter JCMT in metres */
 #define MM2SEC 5.144                   /* plate scale at Nasmyth */
-
 #define BOLCOL 32                      /* number of columns in a subarray */
 #define BOLROW 40                      /* number of rows in a subarray */
 
-void sc2sim_addpnoise 
-(
-double lambda,       /* wavelength in metres (given) */
-double bandGHz,      /* bandwidth in GHZ (given) */
-double aomega,       /* geometrical optical factor (given) */
-double integ_time,   /* Effective integration time in sec (given) */
-double *flux,        /* Flux value in pW (given and returned) */
-int *status          /* global status (given and returned) */
-);
+/* Given a value in Jy multiply by this constant, and the bandwidth in
+   GHz (35 for 850um) to calculate pW */
+
+//#define JY2PW (1.0e-5*AST__DPI*0.25*DIAMETER*DIAMETER)
+
+
+
+void sc2sim_addpnoise( double flux_0, double sig_0, double integ_time,
+		       double *flux, int *status );
 
 void sc2sim_atmsky 
 (
@@ -406,15 +410,8 @@ int *size,           /* number of samples in pattern (returned) */
 int *status          /* global status (given and returned) */
 );
 
-void sc2sim_getsigma
-( 
-double lambda,         /* wavelength in metres (given) */
-double bandGHz,        /* bandwidth in GHz (given) */
-double aomega,         /* geometrical factor (given) */
-double flux,           /* sky power per pixel in pW (given) */
-double *sigma,         /* photon noise in pW (returned) */
-int *status            /* global status (given and returned) */
-);
+double sc2sim_getsigma( double flux_0, double sig_0, double flux, double *sig,
+			int *status );
 
 void sc2sim_getsimpar 
 ( 
@@ -517,7 +514,6 @@ int *status       /* global status (given and returned) * */
 
 void sc2sim_invf2d 
 ( 
-double sigma,     /* white noise level (given) */
 double corner,    /* corner frequency in per arcsec (given) */
 double p,         /* power law to be used (given) */
 double pixsize,   /* pixel size in arcsec (given) */

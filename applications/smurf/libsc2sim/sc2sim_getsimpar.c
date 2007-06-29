@@ -44,6 +44,10 @@
 *        Don't free constant memory used by AST
 *     2006-11-01 (AGG):
 *        Put reasonable default values for ast/atm names
+*     2007-06-29 (EC)
+*        Changed bolometer noise model:
+*        -removed guessatm, aomega, bandGHz
+*        -added jy2pw, refload, refnoise
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -105,9 +109,6 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
    if ( !astMapGet0I ( keymap, "ADD_PNS", &(sinx->add_pns) ) )
       sinx->add_pns = 0; 
 
-   if ( !astMapGet0D ( keymap, "AIRMASS", &(sinx->airmass) ) )
-      sinx->airmass = 1.2; 
-
    if ( !astMapGet0D ( keymap, "ANANG", &(sinx->anang) ) )
       sinx->anang = 0.0; 
 
@@ -116,9 +117,6 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
 
    if ( !astMapGet0D ( keymap, "ANTRANS", &(sinx->antrans) ) )
       sinx->antrans = 100.0; 
-
-   if ( !astMapGet0D ( keymap, "AOMEGA", &(sinx->aomega) ) )
-      sinx->aomega = 0.179;
 
    if ( !astMapGet0C ( keymap, "ASTNAME", &temp ) )
       strncpy ( sinx->astname, "ast.sdf", SC2SIM__FLEN );
@@ -157,9 +155,6 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
    if ( !astMapGet0D ( keymap, "ATSTART", &(sinx->atstart) ) )
       sinx->atstart = 5.0;  
 
-   if ( !astMapGet0D ( keymap, "BANDGHZ", &(sinx->bandGHz) ) )
-      sinx->bandGHz = 35.0;
-
    if ( !astMapGet0D ( keymap, "BLINDANG", &(sinx->blindang) ) )
       sinx->blindang = 10.0;  
 
@@ -181,8 +176,8 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
    if ( !astMapGet0I ( keymap, "FLUX2CUR", &(sinx->flux2cur) ) )
       sinx->flux2cur = 1;
 
-   if ( !astMapGet0D ( keymap, "MEANATM", &(sinx->meanatm) ) )
-      sinx->meanatm = 7.0;
+   if ( !astMapGet0D ( keymap, "JY2PW", &(sinx->jy2pw) ) )
+      sinx->jy2pw = 2.3e-3;
 
    if ( !astMapGet0D ( keymap, "NASANG", &(sinx->nasang) ) )
       sinx->nasang = 90.0;
@@ -195,6 +190,12 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
 
    if ( !astMapGet0I ( keymap, "NCYCLE", &(sinx->ncycle) ) )
       sinx->ncycle = 1;
+
+   if ( !astMapGet0D ( keymap, "REFLOAD", &(sinx->refload) ) )
+      sinx->refload = 7.4;
+
+   if ( !astMapGet0D ( keymap, "REFNOISE", &(sinx->refnoise) ) )
+      sinx->refnoise = 6.5e-5;
 
    if ( !astMapGet0D ( keymap, "SMU_TERR", &(sinx->smu_terr) ) )
       sinx->smu_terr = 0.0;

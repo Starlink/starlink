@@ -13,17 +13,15 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2sim_invf2d ( double sigma, double corner, double p, 
+*     sc2sim_invf2d ( double corner, double p, 
 *                     double pixsize, int size, double *fnoise,
 *                     double *spectrum, int *status )
 
 *  Arguments:
-*     sigma = double (Given)
-*        White noise level
 *     corner = double (Given)
-*        Corner frequency
+*        Corner (1/f knee) frequency
 *     p = double (Given)
-*        Power law to be used
+*        Power law to be used (2 is the typical value)
 *     pixsize = double (Given)
 *        Pixsize is arcsec
 *     size = int* (Given)
@@ -37,8 +35,9 @@
 
 *  Description:
 *     Return a 2-D image containing spatial noise following a power law with
-*     exponent p which would give a specified noise corner if combined with 
-*     white spatial noise of given sigma.
+*     exponent p which would gives power normalized to 1 pW at the corner
+*     (1/f knee) frequency at which point the noise will be dominated
+*     by photon noise rather than sky variations.
 *
 *     Simulate an f**(-p) noise field by generating a white noise image, 
 *     Fourier transforming it, applying an f**(-p) law, then transforming back
@@ -47,10 +46,15 @@
 *  Authors:
 *     B.D.Kelly (ROE)
 *     J.Balfour (UBC) 
+*     Ed Chapin (UBC)
 
 *  History :
 *     2006-09-25 (JB):
 *        Split from dsim.c
+*     2007-06-27 (EC):
+*        Removed sigma argument so that the image is normalized to a power
+*        of 1 pW at the 1/f knee (or "corner") frequency. The map can then be
+*        easily scaled on-the-fly when we do scan simulations.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -85,7 +89,6 @@
 
 void sc2sim_invf2d 
 ( 
-double sigma,     /* white noise level (given) */
 double corner,    /* corner frequency in per arcsec (given) */
 double p,         /* power law to be used (given) */
 double pixsize,   /* pixel size in arcsec (given) */
@@ -123,7 +126,9 @@ int *status       /* global status (given and returned) */
 
    /* Modify to give 1/f characteristics */
    counttonu = 1.0 / ( pixsize * (double)size * 0.5 );
-   fscale = sigma * pow ( corner, p );
+
+   /* fscale = sigma * pow ( corner, p ); */
+   fscale = pow( corner, p );
 
    for ( j=0; j<size; j++ ) {
 

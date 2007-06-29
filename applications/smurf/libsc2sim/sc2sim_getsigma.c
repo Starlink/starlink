@@ -4,7 +4,7 @@
 *     sc2sim_getsigma.c
 
 *  Purpose:
-*     Calculate photon noise
+*     Calculate photon noise (NEP) in pW/sqrt(Hz)
 
 *  Language:
 *     Starlink ANSI C
@@ -13,20 +13,18 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2sim_getsigma ( double lambda, double bandGHx, double aomega, 
-*                       double flux, double *sigma, int *status )
+*     sc2sim_getsigma ( double flux_0, double sig_0,
+*                       double flux, double *sig, int *status )
 
 *  Arguments:
-*     lambda = double (Given)
-*        Wavelength in metres
-*     bandGHz = double (Given)
-*        Bandwidth in GHz
-*     aomega = double (Given)
-*        Geometrical factor
+*     flux_0 = double (Given)
+*        Reference power per pixel in pW
+*     sig_0 = double (Given)
+*        NEP at reference power in pW/sqrt(Hz)
 *     flux = double (Given)
-*        Sky power per pixel in pW
-*     sigma = double* (Returned)
-*        Photon noise in pW
+*        Power per pixel in pW
+*     sig = double* (Returned)
+*        NEP in pW/sqrt(hz)
 *     status = int* (Given and Returned)
 *        Pointer to global status.  
 
@@ -39,6 +37,9 @@
 *  History :
 *     2006-07-20 (JB):
 *        Split from dsim.c
+*     2007-06-29 (EC):
+*        Removed physical model for noise and replaced with simple scaling
+*        from reference power/noise
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -71,26 +72,11 @@
 /* SC2SIM includes */
 #include "sc2sim.h"
 
-void sc2sim_getsigma
-( 
-double lambda,         /* wavelength in metres (given) */
-double bandGHz,        /* bandwidth in GHz (given) */
-double aomega,         /* geometrical factor (given) */
-double flux,           /* sky power per pixel in pW (given) */
-double *sigma,         /* photon noise in pW (returned) */
-int *status            /* global status (given and returned) */
-)
-
-{
-   /* Local variables */
-   double coherence;   /* spatial coherence of the beam */
-
+double sc2sim_getsigma( double flux_0, double sig_0, double flux, double *sig,
+			int *status ) {
    /* Check status */
    if ( !StatusOkP(status) ) return;
 
-   coherence = ( 1.0 + exp ( -aomega ) ) / ( 2.0 + aomega );
-
-   *sigma = 1.0e12 * sqrt ( 2.0 * flux * 1.0e-12 * H * C / lambda 
-        + flux * flux * 1.0e-24 * coherence / ( bandGHz * 1.0e9 ) );
-
+   /* Assume NEP follows Poisson statistics and scale from a reference */
+   *sig = sig_0*sqrt( flux/flux_0 );
 }

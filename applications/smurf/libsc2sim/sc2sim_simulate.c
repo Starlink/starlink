@@ -218,6 +218,9 @@
 *        Moved telpos into sinx
 *     2007-05-29 (AGG):
 *        Minor change to error messages if atm/ast files could not be opened.
+*     2007-06-29 (EC):
+*        Try to re-set digitisation coefficients once the sky level is known,
+*        overriding values calculated in sc2sim_instrinit
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -356,6 +359,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double diam;                    /* Angular diameter of planet */
   int *digits=NULL;               /* output data buffer */
   int *dksquid=NULL;              /* dark squid values */
+  int dodigcalc=1;                /* If set, calculate digitization pars */
   double drytau183;               /* Broadband 183 GHz zenith optical depth */
   double dtt = 0;                 /* Time difference between UTC and TT */
   double exptime = 0.0;           /* Subimage exposure time */
@@ -389,9 +393,10 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   int k;                          /* loop counter */
   int lastframe;                  /* number of frames in the last chunk */
   char loclcrd[SZFITSCARD];       /* Coordinate frame */
-  double *lst=NULL;               /* local apparent sidereal time at time step */
+  double *lst=NULL;               /* local appar. sidereal time at time step */
   char lstend[SZFITSCARD];        /* LST at end of sub-scan */
   char lststart[SZFITSCARD];      /* LST at start of sub-scan */
+  double meanatm;                 /* Atmos. emission at start airmass */
   double *mjuldate=NULL;          /* modified Julian date each sample */
   int narray = 0;                 /* number of subarrays to generate */
   int nflat[8];                   /* number of flat coeffs per bol */
@@ -400,9 +405,10 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   int nterms=0;                   /* number of 1/f noise frequencies */
   char obsid[80];                 /* OBSID for each observation */
   char obstype[SZFITSCARD];       /* Observation type, e.g. SCIENCE */
-  FILE *ofile = NULL;             /* File pointer to check for existing files */
+  FILE *ofile = NULL;             /* File pointer to check for existing files*/
   double phi;                     /* latitude (radians) */
   int planet = 0;                 /* Flag to indicate planet observation */
+  double pnoise=0;                /* photon noise due to atmosphere */
   double *posptr=NULL;            /* pointing: nasmyth offsets (arcsec) */ 
   double pwvlos;                  /* mm precip. wat. vapor. line of site */
   double pwvzen = 0;              /* zenith precipital water vapour (mm) */
@@ -418,6 +424,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double sky_el=0;                /* effective el on sky (bor+jig) */
   double sky_x_hor=0;             /* effective x hor. off. on sky (bor+jig) */
   double sky_y_hor=0;             /* effective y hor. off. on sky (bor+jig) */
+  double skytrans;                /* sky transmission */
   JCMTState state;                /* Telescope state at one time slice */
   double start_time=0.0;          /* time of start of current scan */
   char subarrays[8][80];          /* list of parsed subarray names */
@@ -437,6 +444,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double twater;                  /* water line temp. for WVM simulation */
   char utdate[SZFITSCARD];        /* UT date in YYYYMMDD form */
   double vmax[2];                 /* telescope maximum velocities (arcsec) */
+  double zenatm;                  /* zenith atmospheric emission */
 
   if ( *status != SAI__OK) return;
 
@@ -1156,14 +1164,15 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       
           /* simulate one frame of data */
           if( *status == SAI__OK ) {
-            sc2sim_simframe ( *inx, *sinx, astnaxes, astscale, astdata->pntr[0], 
-			      atmnaxes, atmscale, atmdata->pntr[0], coeffs, 
-			      fs, heater, nbol, frame, nterms, noisecoeffs, 
-			      pzero, samptime, timesincestart, 
-			      sinx->telemission, 
-			      weights, sky2map, xbolo, ybolo, xbc, ybc, 
+            sc2sim_simframe ( *inx, *sinx, astnaxes, astscale, 
+			      astdata->pntr[0], atmnaxes, atmscale, 
+			      atmdata->pntr[0], coeffs, fs, heater, nbol, 
+			      frame, nterms, noisecoeffs, pzero, samptime, 
+			      timesincestart, sinx->telemission, weights, 
+			      sky2map, xbolo, ybolo, xbc, ybc, 
 			      &(posptr[( (curchunk * maxwrite) + frame )*2]), 
-                              &(dbuf[(k*nbol*maxwrite) + (nbol*frame)]), status );
+                              &(dbuf[(k*nbol*maxwrite) + (nbol*frame)]), 
+			      status );
 	  }
 
           /* Annul sc2 frameset for this time slice */
@@ -1313,6 +1322,38 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
            a file */
         for ( k = 0; k < narray; k++ ) {
 
+	  /* If we haven't calculate parameters for the digitization yet,
+             do it now before the first digitise call. This will override
+             the guess parameters provided by sc2sim_instrinit */
+
+	  if( dodigcalc ) {
+	    
+	    /* Get photon noise level */
+	    sc2sim_calctrans( inx->lambda, &skytrans, sinx->tauzen, status );
+	    sc2sim_atmsky( inx->lambda, skytrans, &zenatm, status );
+	    meanatm = zenatm * ( 1.0 - exp(-sinx->tauzen * airmass[0]) ) / 
+	      ( 1.0 - exp(-sinx->tauzen) );
+	    sc2sim_getsigma( sinx->refload, sinx->refnoise, 
+			     sinx->telemission + meanatm, &pnoise, status );
+
+	    /* Calculate scaling coefficients */
+
+	    printf("Skynoise: %f %f %f %f\n",
+		   sinx->refload, sinx->refnoise, meanatm+sinx->telemission, 
+		   pnoise );
+	    printf("Old digitization: %f %f %f\n",
+		   digmean, digscale, digcurrent);
+
+	    sc2sim_getscaling ( SC2SIM__NCOEFFS, coeffs, inx->targetpow, 
+				pnoise, &digmean, &digscale, &digcurrent, 
+				status );
+
+	    printf("New digitization: %f %f %f\n",
+		   digmean, digscale, digcurrent);
+
+	    dodigcalc = 0;
+	  }
+
 	  /* Digitise the numbers */
           if( !hitsonly && ( *status == SAI__OK ) ) {
 	    sc2sim_digitise ( nbol*(frame+1), &dbuf[k*maxwrite*nbol], 
@@ -1382,7 +1423,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	    /* HST start/end */
 
 	    /* Write the data out to a file */
-	    sc2sim_ndfwrdata( inx, sinx, tauCSO, filename, lastframe, nflat[k], 
+	    sc2sim_ndfwrdata( inx, sinx, tauCSO, filename, lastframe, nflat[k],
 			      flatname[k], head, digits, dksquid, flatcal[k], 
 			      flatpar[k], INSTRUMENT, filter, dateobs, obsid,
 			      &(posptr[(curchunk*maxwrite)*2]), jigsamples, 

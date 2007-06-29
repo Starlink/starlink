@@ -13,16 +13,14 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2sim_addpnoise( double lambda, double bandGHz, double aomega, 
-*                       double integ_time, double *flux, int *status )
+*     sc2sim_addpnoise( double flux_0, double sig_0, double integ_time,
+*                       double *flux, int *status ) {
 
 *  Arguments:
-*     lambda = double (Given)
-*        Wavelength in metres
-*     bandGHz = double (Given)
-*        Bandwidth in GHz (Given)
-*     aomega = double (Given)
-*        Geometrical optical factor
+*     flux_0 = double (Given)
+*        Reference power per pixel in pW
+*     sig_0 = double (Given)
+*        NEP at reference power in pW/sqrt(Hz)
 *     integ_time = double (Given)
 *        Effective integration time in sec
 *     flux = double* (Given and Returned)
@@ -52,6 +50,9 @@
 *        Split from dsim.c
 *     2006-09-22 (JB):
 *        Removed dream.h requirements
+*     2007-06-29 (EC):
+*        Removed physical model for noise and replaced with simple scaling
+*        from reference power/noise
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -84,17 +85,8 @@
 /* SC2SIM includes */
 #include "sc2sim.h"
 
-void sc2sim_addpnoise 
-(
-double lambda,       /* wavelength in metres (given) */
-double bandGHz,      /* bandwidth in GHZ (given) */
-double aomega,       /* geometrical optical factor (given) */
-double integ_time,   /* Effective integration time in sec (given) */
-double *flux,        /* Flux value in pW (given and returned) */
-int *status          /* global status (given and returned) */
-)
-
-{
+void sc2sim_addpnoise( double flux_0, double sig_0, double integ_time,
+		       double *flux, int *status ) {
 
    double err;                  /* error offset */
    double sigma;                /* NEP in pW */
@@ -103,14 +95,16 @@ int *status          /* global status (given and returned) */
    if ( !StatusOkP(status) ) return;
 
    /* Calculate the dispersion due to photon noise */
-   sc2sim_getsigma ( lambda, bandGHz, aomega, *flux, 
-                     &sigma, status );
+   sc2sim_getsigma( flux_0, sig_0, *flux, &sigma, status );
  
    /* Calculate a random number and scale it to the required sigma */
-   err = sc2sim_drand ( sigma );
+   err = sc2sim_drand( sigma );
 
    /* Correct for the integration time - factor 2 because sigma is per root
       Hz */
-   *flux = *flux + err / sqrt(2.0*integ_time);
+   /* *flux = *flux + err / sqrt(2.0*integ_time); */
+
+   /* err is already measured /sqrt(Hz) so no factor of 2 needed */
+   *flux = *flux + err/sqrt(integ_time);
 
 }

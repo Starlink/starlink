@@ -76,8 +76,6 @@
 *            Atm reference velocity.
 *          bandGHz (double) : 35.0 (GHz)
 *            Bandwidth in GHz.
-*          meanatm (double) : 7.0 (pW)
-*            Mean expeected atmospheric signal.
 *          tauzen (double) : 0.052583
 *            Optical depth at 225 GHz at the zenith.
 *
@@ -92,8 +90,14 @@
 *     {enter_new_authors_here}
 
 *  History :
-*     2003-11-12: Original version (BDK)
-*     2006-09-26: Converted to smurf_skynoise (JB)
+*     2003-11-12: 
+*        Original version (BDK)
+*     2006-09-26: 
+*        Converted to smurf_skynoise (JB)
+*     2007-06-27 (EC):
+*        - Removed sigma from interface to sc2sim_invf2d; it will now be used
+*          to scale the sky noise on-the-fly in sc2sim_simframe
+*        - For same reason removed calculation of meanatm from here
 *     
 *     {enter_further_changes_here}
 
@@ -168,17 +172,15 @@ void smurf_skynoise ( int *status ) {
    int indf;                       /* NDF identifier */
    int j;                          /* loop counter */
    int lbnd[2];                    /* lower bounds of pixel array */
-   double meanatm;                 /* mean expected atmospheric signal (pW) */
    int n;                          /* Number of elements mapped */
    Grp *obsGrp = NULL;             /* Group containing obs parameter file */
    AstKeyMap *obskeymap=NULL;      /* AstKeyMap for obs parameters */
    int osize = 0;                  /* Size of obsGrp */
    double pixsize;                 /* simulate pixel size */
    int rseed;                      /* seed for random number generator */
-   double sigma;                   /* dispersion at corner frequency */
    Grp *simGrp = NULL;             /* Group containing sim parameter file */
    AstKeyMap *simkeymap=NULL;      /* AstKeyMap for sim parameters */
-   int size;                       /* width of square area simulated in pixels */
+   int size;                       /* width of square area in pixels */
    double skytrans;                /* sky transmission (%) */
    double *spectrum;               /* complex array for holding 2D spectrum */
    int ssize = 0;                  /* Size of simGrp */
@@ -225,10 +227,6 @@ void smurf_skynoise ( int *status ) {
       msgOutif(MSG__VERB," ","^FNAME already exists, overwriting.", status);
    }
 
-   /*  Calculate corrected photon noise corresponding to sky flux */  
-   sc2sim_getsigma ( inx.lambda, sinx.bandGHz, sinx.aomega, 
-                     sinx.meanatm, &sigma, status );
-
    /* 15m at 600m subtends 5156 arcsec */     
    pixsize = 2500.0;
    size = 512;
@@ -245,21 +243,11 @@ void smurf_skynoise ( int *status ) {
    ndfMap ( indf, "DATA", "_DOUBLE", "WRITE", &atmsim, &n, status );
 
    /* Calculate the 2-D noise field */
-   sc2sim_invf2d ( sigma, corner, exp, pixsize, size, atmsim, 
-                   spectrum, status );
-
-   /* Get the mean atmospheric signal */
-   sc2sim_calctrans ( inx.lambda, &skytrans, sinx.tauzen, status );
-   sc2sim_atmsky ( inx.lambda, skytrans, &meanatm, status );
-
-   /* Add the mean value */
-   for ( j=0; j<size*size; j++ ) {
-      atmsim[j] += meanatm;   
-   }
+   sc2sim_invf2d ( corner, exp, pixsize, size, atmsim, spectrum, status );
 
    /* Add the FITS data to the output file */
    fitschan = astFitsChan ( NULL, NULL, "" ); 
-   astSetFitsF ( fitschan, "SIGMA", sigma, "dispersion at corner frequency", 0 );
+
    astSetFitsF ( fitschan, "CORNER", corner, "corner frequency in 1/arcsec", 0 );
    astSetFitsF ( fitschan, "EXPONENT", exp, 
                  "frequency exponent of inverse power law", 0 );
