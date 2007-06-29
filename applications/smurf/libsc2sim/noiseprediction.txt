@@ -1,0 +1,9 @@
+Some predicted SCUBA-2 noise numbers from Dennis Kelly:
+
+lambda     trans    sky     tel    total    Photon NEP  NEFD/pixel
+(um)        (%)    (pW)     (pW)   (pW)     (pW/rtHz)   (mJy/rtHz)
+
+850          85       3.4    4     7.4     6.5*10^-5     32
+850          20      16.4    4    20.4     9.5*10^-5    177
+450          50      56     29    85       2.9*10^-4     75
+450          5      111     29   140       3.7*10^-4    760
