@@ -317,7 +317,7 @@
                                  ! of pixels
       INTEGER BINSIZ             ! The number of pixels in a bin
       CHARACTER * ( 132 ) BUFFER ! Buffer for writing to the logfile
-      DOUBLE PRECISION CHCOEF( MCHOEF )   ! Chebyshev coefficients of the fit
+      DOUBLE PRECISION CHCOEF( MCHOEF ) ! Chebyshev coefficients of the fit
       REAL CLIP( MXCLIP )        ! Clipping sigmas during binning
       REAL CLIPF( MXCLIP )       ! Clipping sigmas after binning and
                                  ! fitting
@@ -1309,7 +1309,7 @@
 *  SURFIT does not know the variance at present.  So for now we
 *  set them to undefined (bad) values for the purposes of the SURFACEFIT
 *  extension.
-         DO I = 1, NCOEF
+         DO I = 1, MCHOEF
             VARIAN( I ) = VAL__BADD
          END DO
 
@@ -1319,8 +1319,8 @@
 *  description of the contents of a POLYNOMIAL structure).
 *  RSMAX is not known so set it to the bad value.
          CALL KPS1_FSWPE( NDFO, DXMIN, DXMAX, DYMIN, DYMAX, NXPAR, 
-     :                    NYPAR, MCHOEF, CHCOEF, VARIAN, NCOEF, 
-     :                    VAL__BADR, RMS, 'GRID', STATUS )
+     :                    NYPAR, MCHOEF, CHCOEF, VARIAN, VAL__BADR, 
+     :                    RMS, 'GRID', STATUS )
 
 *  Fit a bi-cubic spline.
 *  ======================

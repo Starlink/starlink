@@ -1,6 +1,6 @@
       SUBROUTINE KPS1_FSWPE( NDFI, XMIN, XMAX, YMIN, YMAX, NXPAR, NYPAR, 
-     :                       MCHOEF, CHCOEF, VARIAN, NCOEF, RSMAX, RMS,
-     :                       COSYS, STATUS )
+     :                       MCOEF, CHCOEF, VARIAN, RSMAX, RMS, COSYS,
+     :                       STATUS )
 *+
 *  Name:
 *     KPS1_FSWEX
@@ -14,8 +14,8 @@
 
 *  Invocation:
 *      CALL KPS1_FSWPE( NDFI, XMIN, XMAX, YMIN, YMAX, NXPAR, NYPAR, 
-*                       MCHOEF, CHCOEF, VARIAN, NCOEF, RSMAX, RMS,
-*                       COSYS, STATUS )
+*                       MCOEF, CHCOEF, VARIAN, RSMAX, RMS, COSYS, 
+*                       STATUS )
 
 *  Description:
 *     This routine creates a SURFACEFIT extension in a supplied NDF.
@@ -45,19 +45,16 @@
 *     NYPAR = INTEGER (Given)
 *        The number of parameters of the FIT in the y direction, i.e
 *        the degree of the polynomial plus one.
-*     MCHOEF = INTEGER (Given)
+*     MCOEF = INTEGER (Given)
 *        The dimension of the array of Chebyshev coefficients.
-*     CHCOEF( MCHOEF ) = DOUBLE PRECISION (Given)
+*     CHCOEF( MCOEF ) = DOUBLE PRECISION (Given)
 *        The Chebyshev polynomial coefficients, in the order increasing
 *        x power for each increasing y power.  Thus coefficient Aij in
 *        the standard convention is %CHCOEF(i*(%NYPAR)+j+1).  The array
 *        may be rectangular, i.e. the highest x and y orders do not
 *        have to be the same.
-*     VARIAN( MCHOEF ) = DOUBLE PRECISION (Given)
+*     VARIAN( MCOEF ) = DOUBLE PRECISION (Given)
 *        The variance of the Chebyshev coefficients.
-*     NCOEF = INTEGER (Given)
-*        The number of Chebyshev coefficients.  It must not exceed 
-*        MCHOEF.
 *     RSMAX = REAL (Given)
 *        The maximum residual.
 *     RMS = REAL (Given)
@@ -95,6 +92,8 @@
 *  History:
 *     2007 June 28 (MJC):
 *        Original version based upon code in FITSURFACE from 1993.
+*     2007 June 29 (MJC):
+*        Remove unused NCOEF argument.
 *     {enter_further_changes_here}
 
 *-
@@ -114,10 +113,9 @@
       DOUBLE PRECISION YMAX
       INTEGER NXPAR
       INTEGER NYPAR
-      INTEGER MCHOEF
-      DOUBLE PRECISION CHCOEF( MCHOEF )
-      DOUBLE PRECISION VARIAN( MCHOEF )
-      INTEGER NCOEF
+      INTEGER MCOEF
+      DOUBLE PRECISION CHCOEF( MCOEF )
+      DOUBLE PRECISION VARIAN( MCOEF )
       DOUBLE PRECISION RSMAX
       DOUBLE PRECISION RMS
       CHARACTER*(*) COSYS

@@ -613,7 +613,7 @@
 *  within this called FIT of type POLYNOMIAL (see SGP/38 for a
 *  description of the contents of a POLYNOMIAL structure).
                CALL KPS1_FSWPE( NDFI, XMIN, XMAX, YMIN, YMAX, NXPAR, 
-     :                          NYPAR, MCHOEF, CHCOEF, VARIAN, NCOEF, 
+     :                          NYPAR, MCHOEF, CHCOEF, VARIAN,
      :                          SNGL( RSMAX ), RMS, COSYS, STATUS )
 
 *  Spline fitting.
