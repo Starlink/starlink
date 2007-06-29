@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.32}
 \newcommand{\stardocnumber}    {95.32}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2007 June 21}
+\newcommand{\stardocdate}      {2007 June 28}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.7-7}
+\newcommand{\stardocversion}   {1.7-8}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -24563,7 +24563,9 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
       read by MAKESURFACE to create a NDF of the fitted surface.  Also
       stored in the SURFACEFIT extension are the r.m.s. deviation to the
       fit (component RMS), the maximum absolute deviation (component
-      RSMAX), and the co-ordinate system (component COSYS).
+      RSMAX), and the co-ordinate system (component COSYS) translated to 
+      AST Domain names AXIS (for parameter COSYS="Data") and PIXEL
+      ({\tt "World"}).
    }
    \sstdiytopic{
       Related Applications
@@ -26546,6 +26548,7 @@ KAPPA: \htmlref{HISTOGRAM}{HISTOGRAM},
 \htmlref{NDFTRACE}{NDFTRACE},
 \htmlref{NUMB}{NUMB},
 \htmlref{STATS}{STATS};
+\xref{ESP}{sun180}{}: \xref{HISTPEAK}{sun180}{HISTPEAK};
 \xref{FIGARO}{sun86}{}: \xref{ISTAT}{sun86}{ISTAT}.
    }
    \sstimplementationstatus{
@@ -43933,6 +43936,13 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          The RMS deviation of the fit from the original data (per pixel).
       }
    }
+   \sstnotes{
+      A polynomial surface fit is stored in a SURFACEFIT extension,
+      component FIT of type POLYNOMIAL, variant CHEBYSHEV.  For further
+      details see \xref{SGP/38}{sgp38}{}.  Also stored in the SURFACEFIT 
+      extension is the r.m.s. deviation to the fit (component RMS); and the 
+      co-ordinate system component COSYS, set to {\tt "GRID"}.
+   }
    \sstexamples{
       \sstexamplesubsection{
          surfit comaB comaB\_bg
@@ -52525,6 +52535,12 @@ The following applications have been modified:
          the current behaviour.
       \end{itemize}
 
+   \item [\htmlref{FITSURFACE}{FITSURFACE}] \mbox{}
+      \begin{itemize}
+         \item This now writes PIXEL or AXIS values to the SURFACEFIT.COSYS 
+         component to bring it into line with AST usage.
+      \end{itemize}
+
    \item [\htmlref{HISTAT}{HISTAT}] \mbox{}
       \begin{itemize}
          \item See the STATS changes below.
@@ -52535,6 +52551,12 @@ The following applications have been modified:
       \item There is a new parameter ALIGNSYS that specifies the
        co-ordinate system in which a new plot and an existing plot are
        aligned when ALIGN is {\tt TRUE}.
+      \end{itemize}
+
+   \item [\htmlref{MAKESURFACE}{MAKESURFACE}] \mbox{}
+      \begin{itemize}
+         \item This recognises GRID, PIXEL, and AXIS values for the
+         SURFACEFIT.COSYS component.
       \end{itemize}
 
    \item [\htmlref{MFITTREND}{MFITTREND}] \mbox{}
@@ -52591,6 +52613,13 @@ The following applications have been modified:
       \begin{itemize}
          \item This now propagates the UNITS component if it is the same
          in both input NDFs.
+      \end{itemize}
+
+   \item [\htmlref{SURFIT}{SURFIT}] \mbox{}
+      \begin{itemize}
+         \item For the polynomial fit type, SURFIT creates a SURFACEFIT 
+         extension in the output NDF to hold the polynomial coefficients 
+         just as \htmlref{FITSURFACE}{FITSURFACE} does.
       \end{itemize}
 
    \item [\htmlref{WCSMOSAIC}{WCSMOSAIC}] \mbox{}
