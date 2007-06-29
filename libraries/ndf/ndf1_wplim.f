@@ -88,6 +88,8 @@
 *        defaulted in a "centre/width" axis.
 *     8-JUN-2007 (DSB):
 *        Added support for mixed-mode "centre/width" bounds.
+*     29-JUN-2007 (DSB):
+*        Correct final conversion from pixel coords to pixel indices.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -578,13 +580,13 @@ c      write(*,*) '   '
 *  Convert the pixel coordinate box to pixel indices.
       IF( STATUS .EQ. SAI__OK ) THEN
          DO I = 1, NAX
-            LBND( I ) = NINT( PLBND( I ) ) + 1
-            UBND( I ) = NINT( PUBND( I ) )
-            IF ( LBND( I ) .GT. UBND( I ) ) THEN
-               TEMP = LBND( I )
-               LBND( I ) = UBND( I )
-               UBND( I ) = TEMP
+            IF ( PLBND( I ) .GT. PUBND( I ) ) THEN
+               TEMP = PLBND( I )
+               PLBND( I ) = PUBND( I )
+               PUBND( I ) = TEMP
             END IF
+            UBND( I ) = NINT( PUBND( I ) ) 
+            LBND( I ) = UBND( I ) - NINT( PUBND( I ) - PLBND( I ) ) + 1 
          END DO
       END IF
 
