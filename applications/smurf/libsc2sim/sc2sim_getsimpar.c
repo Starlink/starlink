@@ -48,6 +48,7 @@
 *        Changed bolometer noise model:
 *        -removed guessatm, aomega, bandGHz
 *        -added jy2pw, refload, refnoise
+*        Modified default values of atmyvalue and atmrefnu
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -135,7 +136,7 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
       strncpy ( sinx->atmname, temp, SC2SIM__FLEN );
 
    if ( !astMapGet0D ( keymap, "ATMREFNU", &(sinx->atmrefnu) ) )
-      sinx->atmrefnu = 0.5;  
+      sinx->atmrefnu = 1.0;  
 
    if ( !astMapGet0D ( keymap, "ATMREFVEL", &(sinx->atmrefvel) ) )
       sinx->atmrefvel = 15.0; 
@@ -144,7 +145,7 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
       sinx->atmxvel = 5000.0; 
 
    if ( !astMapGet0D ( keymap, "ATMYVEL", &(sinx->atmyvel) ) )
-      sinx->atmyvel = 0.0; 
+      sinx->atmyvel = 200.0; 
 
    if ( !astMapGet0D ( keymap, "ATMZEROX", &(sinx->atmzerox) ) )
       sinx->atmzerox = 5000.0;  
