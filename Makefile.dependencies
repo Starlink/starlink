@@ -176,12 +176,15 @@ $(MANIFESTS)/atools: \
 # Component autoconf is a buildsupport component
 $(MANIFESTS)/autoconf:
 	cd thirdparty/fsf/autoconf \
+	    && if test -f bootstrap; then \
+	       ./bootstrap > bootstrap.log; \
+	    fi \
 	    && if test -n "$$BUILDSUPPORT_PREFIX"; then \
 	        ./configure --prefix=$$BUILDSUPPORT_PREFIX \
 	            >configure-output.log; \
 	    elif test ! -f Makefile; then \
 	        { t="Directory unconfigured but BUILDSUPPORT_PREFIX undefined";\
-	          echo $$t >configure-output.log; echo $$t >&2; \
+ 	          echo $$t >configure-output.log; echo $$t >&2; \
 	          exit 1; }; \
 	    else \
 	        echo "No configuration necessary" >configure-output.log; \
@@ -193,12 +196,15 @@ $(MANIFESTS)/automake: \
 		$(MANIFESTS)/autoconf \
 		$(MANIFESTS)/libtool
 	cd thirdparty/fsf/automake \
+	    && if test -f bootstrap; then \
+	       ./bootstrap > bootstrap.log; \
+	    fi \
 	    && if test -n "$$BUILDSUPPORT_PREFIX"; then \
 	        ./configure --prefix=$$BUILDSUPPORT_PREFIX \
 	            >configure-output.log; \
 	    elif test ! -f Makefile; then \
 	        { t="Directory unconfigured but BUILDSUPPORT_PREFIX undefined";\
-	          echo $$t >configure-output.log; echo $$t >&2; \
+ 	          echo $$t >configure-output.log; echo $$t >&2; \
 	          exit 1; }; \
 	    else \
 	        echo "No configuration necessary" >configure-output.log; \
@@ -1417,12 +1423,15 @@ $(MANIFESTS)/kaprh: \
 # Component libtool is a buildsupport component
 $(MANIFESTS)/libtool:
 	cd thirdparty/fsf/libtool \
+	    && if test -f bootstrap; then \
+	       ./bootstrap > bootstrap.log; \
+	    fi \
 	    && if test -n "$$BUILDSUPPORT_PREFIX"; then \
 	        ./configure --prefix=$$BUILDSUPPORT_PREFIX \
 	            >configure-output.log; \
 	    elif test ! -f Makefile; then \
 	        { t="Directory unconfigured but BUILDSUPPORT_PREFIX undefined";\
-	          echo $$t >configure-output.log; echo $$t >&2; \
+ 	          echo $$t >configure-output.log; echo $$t >&2; \
 	          exit 1; }; \
 	    else \
 	        echo "No configuration necessary" >configure-output.log; \
@@ -1432,12 +1441,15 @@ $(MANIFESTS)/libtool:
 # Component m4 is a buildsupport component
 $(MANIFESTS)/m4:
 	cd thirdparty/fsf/m4 \
+	    && if test -f bootstrap; then \
+	       ./bootstrap > bootstrap.log; \
+	    fi \
 	    && if test -n "$$BUILDSUPPORT_PREFIX"; then \
 	        ./configure --prefix=$$BUILDSUPPORT_PREFIX \
 	            >configure-output.log; \
 	    elif test ! -f Makefile; then \
 	        { t="Directory unconfigured but BUILDSUPPORT_PREFIX undefined";\
-	          echo $$t >configure-output.log; echo $$t >&2; \
+ 	          echo $$t >configure-output.log; echo $$t >&2; \
 	          exit 1; }; \
 	    else \
 	        echo "No configuration necessary" >configure-output.log; \
@@ -2148,12 +2160,15 @@ $(MANIFESTS)/starconf: \
 		$(MANIFESTS)/automake \
 		$(MANIFESTS)/libtool
 	cd buildsupport/starconf \
+	    && if test -f bootstrap; then \
+	       ./bootstrap > bootstrap.log; \
+	    fi \
 	    && if test -n "$$BUILDSUPPORT_PREFIX"; then \
 	        ./configure --prefix=$$BUILDSUPPORT_PREFIX \
 	            >configure-output.log; \
 	    elif test ! -f Makefile; then \
 	        { t="Directory unconfigured but BUILDSUPPORT_PREFIX undefined";\
-	          echo $$t >configure-output.log; echo $$t >&2; \
+ 	          echo $$t >configure-output.log; echo $$t >&2; \
 	          exit 1; }; \
 	    else \
 	        echo "No configuration necessary" >configure-output.log; \
