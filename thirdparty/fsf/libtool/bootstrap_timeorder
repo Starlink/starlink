@@ -1,0 +1,21 @@
+#  Establish the time order of some files directories.
+#  Don't want to regenerate these automatically.
+configure.ac
+aclocal.m4
+configure
+Makefile.in
+#cdemo/Makefile.in
+#demo/Makefile.in
+#depdemo/Makefile.in
+#depdemo/l1/Makefile.in
+#depdemo/l2/Makefile.in
+#depdemo/l3/Makefile.in
+#depdemo/l4/Makefile.in
+doc/Makefile.in
+#f77demo/Makefile.in
+libltdl/Makefile.in
+#mdemo/Makefile.in
+#mdemo2/Makefile.in
+#pdemo/Makefile.in
+#tagdemo/Makefile.in
+tests/Makefile.in
