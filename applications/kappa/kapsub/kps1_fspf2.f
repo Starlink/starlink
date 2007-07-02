@@ -112,7 +112,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -122,15 +122,15 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
-*     1990 Jan 30 (MJC):
+*     1990 January 30 (MJC):
 *        Original version based on EDRS code.
 *     1991 July 5 (MJC):
 *        Passed A and AA as arguments plus their dimension, the maximum
@@ -156,8 +156,10 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      DOUBLE PRECISION XMIN, XMAX ! X bounds of the fit
-      DOUBLE PRECISION YMIN, YMAX ! Y bounds of the fit
+      DOUBLE PRECISION XMIN      ! X lower bound of the fit
+      DOUBLE PRECISION XMAX      ! X upper bound of the fit
+      DOUBLE PRECISION YMIN      ! Y lower bound of the fit
+      DOUBLE PRECISION YMAX      ! Y upper bound of the fit
       INTEGER NXPAR              ! X degree of the polynomial plus 1
       INTEGER NYPAR              ! Y degree of the polynomial plus 1
       LOGICAL FIRST              ! Weights are to be squared?
