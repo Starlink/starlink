@@ -20,6 +20,8 @@
 *     relationship twice.
 
 *  Arguments:
+*     NPTS = INTEGER (Given)
+*        The number of evaluations to perform at constant Y position.
 *     XMIN = ? (Given)
 *        The lower endpoint of the range of the fit along the first
 *        dimension.  The Chebyshev series representation is in terms of
