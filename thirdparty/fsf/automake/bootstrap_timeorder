@@ -1,0 +1,13 @@
+#  Establish the time order of some files directories.
+#  Don't want to regenerate these automatically.
+configure.ac
+aclocal.m4
+configure
+Makefile.in
+doc/Makefile.in
+lib/Automake/Makefile.in
+lib/Automake/tests/Makefile.in
+lib/Makefile.in
+lib/am/Makefile.in
+m4/Makefile.in
+tests/Makefile.in
