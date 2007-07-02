@@ -67,10 +67,10 @@ TESTS = gns_test gnsrun_gks
 check_PROGRAMS = gns_test gnsrun_gks
 
 gnsrun_gks_SOURCES = gnsrun_gks.f
-gnsrun_gks_LDADD = libgns.la `psx_link` `ems_link` `chr_link` `gks_link` `gwm_link`
+gnsrun_gks_LDADD = libgns.la `psx_link` `err_link` `chr_link` `gks_link` `gwm_link`
 
 gns_test_SOURCES = gns_test.f
-gns_test_LDADD = libgns.la `psx_link` `ems_link` `chr_link` `gks_link` `gwm_link`
+gns_test_LDADD = libgns.la `psx_link` `err_link` `chr_link` `gks_link` `gwm_link`
 
 CLEANFILES = gns_ididevices gns_gksdevices GNS_ERR
 
