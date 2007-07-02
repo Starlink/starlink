@@ -117,7 +117,7 @@ public class GenerateDependencies {
                 && flatdepsStream == null)
                 Usage();
 
-            javax.xml.parsers.DocumentBuilder db 
+            javax.xml.parsers.DocumentBuilder db
                     = javax.xml.parsers.DocumentBuilderFactory
                     .newInstance().newDocumentBuilder();
             Document dom = db.parse(xmlinput);
@@ -131,7 +131,7 @@ public class GenerateDependencies {
                 // return value below.
                 Component.newComponent((Element)componentList.item(i));
             }
-            
+
         } catch (IOException e) {
             System.err.println("IOException: " + e);
         } catch (org.xml.sax.SAXException e) {
@@ -165,8 +165,11 @@ public class GenerateDependencies {
     }
 
     private static void Usage() {
-        System.err.println("GenerateDependencies [--test] [--verbose] [--makefile[=filename]] [--buildsequence=filename] [--flatdeps=filename] xml-file");
-        System.err.println("    At least one of --makefile, --buildsequence or --flatdeps must be specified");
+        System.err.println("GenerateDependencies [--test] [--verbose] "+
+                           "[--makefile[=filename]] [--buildsequence=filename] "+
+                           "[--flatdeps=filename] xml-file");
+        System.err.println("    At least one of --makefile, --buildsequence " + 
+                           "or --flatdeps must be specified");
         System.exit(1);
     }
 
@@ -228,9 +231,21 @@ public class GenerateDependencies {
 
         String manifestString = "$(MANIFESTS)/";
         String newlineString = " \\\n\t\t";
-        String makeBuildsupportString = "\t    && if test -n \"$$BUILDSUPPORT_PREFIX\"; then \\\n\t        ./configure --prefix=$$BUILDSUPPORT_PREFIX \\\n\t            >configure-output.log; \\\n\t    elif test ! -f Makefile; then \\\n\t        { t=\"Directory unconfigured but BUILDSUPPORT_PREFIX undefined\";\\\n\t          echo $$t >configure-output.log; echo $$t >&2; \\\n\t          exit 1; }; \\\n\t    else \\\n\t        echo \"No configuration necessary\" >configure-output.log; \\\n\t    fi";
+        String makeBuildsupportString =
+            "\t    && if test -f bootstrap; then \\\n" + 
+            "\t       ./bootstrap > bootstrap.log; \\\n" +
+            "\t    fi \\\n" +
+            "\t    && if test -n \"$$BUILDSUPPORT_PREFIX\"; then \\\n" +
+            "\t        ./configure --prefix=$$BUILDSUPPORT_PREFIX \\\n" +
+            "\t            >configure-output.log; \\\n" +
+            "\t    elif test ! -f Makefile; then \\\n" +
+            "\t        { t=\"Directory unconfigured but BUILDSUPPORT_PREFIX undefined\";\\\n " +
+            "\t          echo $$t >configure-output.log; echo $$t >&2; \\\n" +
+            "\t          exit 1; }; \\\n\t    else \\\n" +
+            "\t        echo \"No configuration necessary\" >configure-output.log; \\\n" +
+            "\t    fi";
         String runConfigureString = "\t  && $(CONFIG_CPT)";
-        
+
         String makeString = "\t  && $(MAKE_CPT)";
         String cdString = "\tcd ";
 
@@ -273,13 +288,19 @@ public class GenerateDependencies {
             for (int i=0; i<banner.length; i++)
                 makefile.println(banner[i]);
 
-            makefile.println("CONFIG_CPT=test -f config.status \\\n  || ./configure >configure-output.log 2>configure-output.log.err \\\n  || { cat configure-output.log.err; false; }");
-            makefile.println("MAKE_CPT=(make && make install) >make.log 2>make.log.err \\\n  || { cat make.log.err; false; }");
+            makefile.println("CONFIG_CPT=test -f config.status \\\n" +
+                             "  || " +
+                             "./configure >configure-output.log 2>configure-output.log.err \\\n" +
+                             "  || " +
+                             "{ cat configure-output.log.err; false; }");
+            makefile.println("MAKE_CPT=(make && make install) >make.log 2>make.log.err \\\n" +
+                             "  || " +
+                             "{ cat make.log.err; false; }");
             makefile.println();
         }
 
         java.util.List allbuildsupport = new java.util.LinkedList();
-        
+
         for (Iterator ci = Component.allComponents(); ci.hasNext(); ) {
             Component c = (Component) ci.next();
 
@@ -329,8 +350,9 @@ public class GenerateDependencies {
                 componentType = "confdep";
             if (c.getBuildsupport() != Component.BUILDSUPPORT_NO) {
                 if (componentType != null) {
-                    System.err.println("Warning: Component " + c 
-                                       + " is a buildsupport component, but is also marked as a configure dependency -- latter ignored");
+                    System.err.println("Warning: Component " + c
+                                       + " is a buildsupport component, but is also " +
+                                       "marked as a configure dependency -- latter ignored");
                 }
                 componentType = "buildsupport";
             }
@@ -340,7 +362,7 @@ public class GenerateDependencies {
                 makefile.println("# Component " + c
                  + " is a configure dependency, so is configurable in place.");
             if (componentType == "buildsupport")
-                makefile.println("# Component " + c 
+                makefile.println("# Component " + c
                                    + " is a buildsupport component");
             Set confdeps = c.getCompleteDependencies(Dependency.CONFIGURE);
             if (confdeps != null && confdeps.size() > 0) {
@@ -457,7 +479,7 @@ public class GenerateDependencies {
             makefile.println();
         }
     }
-    
+
     /**
      * Creates a list of all the dependencies in an order which
      * respects the dependencies.  That is, each (Component) element
@@ -470,7 +492,7 @@ public class GenerateDependencies {
     private static List makeBuildSequence() {
         List buildSeq = new java.util.ArrayList();
         Set seenCpts = new java.util.HashSet();
-        
+
         for (Iterator cpts=Component.allComponents(); cpts.hasNext(); ) {
             Component cpt = (Component)cpts.next();
             pseudoMake(cpt, buildSeq, seenCpts);
@@ -722,7 +744,8 @@ public class GenerateDependencies {
         public static Component newComponent(Element el) {
             Component rval;
             if (componentsResolved) {
-                System.err.println("Error: component network locked: one of the query methods has been called");
+                System.err.println("Error: component network locked: "+
+                                   "one of the query methods has been called");
                 rval = null;
             } else {
                 Component c = new Component(el);
@@ -789,7 +812,7 @@ public class GenerateDependencies {
                                    + " has bad buildsupport attribute: " + s);
                 System.exit(1);
             }
-                
+
             return ret;
         }
 
@@ -876,7 +899,7 @@ public class GenerateDependencies {
         public Set getDeps(String type) {
             if (!componentsResolved)
                 resolveComponents();
-        
+
             Set rval = (Set)allDirectDependencies.get(type);
             if (rval == null)
                 rval = emptySet;
@@ -923,9 +946,9 @@ public class GenerateDependencies {
                                             boolean errorCircular,
                                             int recurseLevel) {
             assert type != null;
-            
+
             boolean foundCircular = false;
-            
+
             if (!componentsResolved)
                 resolveComponents();
 
@@ -948,7 +971,7 @@ public class GenerateDependencies {
                 }
             }
             marks.add(type);
-            
+
             // collectedDeps is a Set of Dependency objects
             Set collectedDeps = new java.util.TreeSet();
             for (Iterator i=getDeps(type).iterator(); i.hasNext(); ) {
@@ -976,7 +999,7 @@ public class GenerateDependencies {
                              (type == Dependency.LINK ? false : true),
                              recurseLevel+1);
                 }
-                
+
                 if (cdeps == null) {
                     // We found circular dependencies.  As we work our
                     // way back up the call tree, print out the
@@ -1016,7 +1039,7 @@ public class GenerateDependencies {
                 c.extractElementDependencySets();
             }
         }
-            
+
         private void extractElementDependencySets() {
             // allDirectDependencies is a hash of (type, Set-of-Dependency)
             // pairs.
@@ -1028,7 +1051,7 @@ public class GenerateDependencies {
                   ("Element does not have exactly one <dependencies> element");
                 System.exit(1);
             }
-            
+
             NodeList nl = depElements.item(0).getChildNodes();
             for (int i=0; i<nl.getLength(); i++) {
                 Node n = nl.item(i);
@@ -1085,7 +1108,7 @@ public class GenerateDependencies {
                 return false;
             }
         }
-        public int compareTo(Object o) 
+        public int compareTo(Object o)
                 throws ClassCastException {
             if (equals(o))
                 return 0;
@@ -1128,7 +1151,7 @@ public class GenerateDependencies {
 
         /** Flag is true when we have expanded dependencies */
         private static boolean dependenciesAreExpanded = false;
-        
+
         /**
          * Set of all the components which are a configure dependency
          * of some component.  This starts off as a set of component
@@ -1198,7 +1221,7 @@ public class GenerateDependencies {
 
         public String toString() {
             return dependsOnComponent.getName();
-        }            
+        }
 
         /** Returns true if the type is one of the legal ones */
         private boolean typeOK(String type) {
@@ -1222,7 +1245,7 @@ public class GenerateDependencies {
                 return false;
             }
         }
-        public int compareTo(Object o) 
+        public int compareTo(Object o)
                 throws ClassCastException {
             if (equals(o))
                 return 0;
@@ -1270,7 +1293,7 @@ public class GenerateDependencies {
                         public boolean equals(Object o) {
                             return o == simpleComparatorImpl;
                         }
-                        public int compare(Object o1, Object o2) 
+                        public int compare(Object o1, Object o2)
                                 throws ClassCastException {
                             return ((Dependency)o1).component()
                                     .compareTo(((Dependency)o2).component());
