@@ -184,7 +184,8 @@
 *  but that could be quite inefficient for large arrays.  The
 *  folloeing identifies a run of pixels at the same Y co-ordinate.
 *  If the pixels are higgledy-piggledy then the following slows it 
-*  down further, howver in the vast majority of cases it will save time.
+*  down further, however in the vast majority of cases it will save 
+*  time.
          YLINE = Y( I )
          NEWLIN = .FALSE.
          J = I + 1
@@ -197,7 +198,7 @@
          END DO
          NEVAL = J - I
 
-*  Evaluate the fitted surface at all pixels in the line
+*  Evaluate the fitted surface at all pixels in the line.
          CALL KPG1_CHE2D( NEVAL, XMIN, XMAX, X( I ), YMIN, YMAX, YLINE,
      :                    NXPAR - 1, NYPAR - 1, MCHOEF, CHCOEF, MXPAR,
      :                    PX, FIT( I ), STATUS )
