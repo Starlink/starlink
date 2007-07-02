@@ -189,7 +189,7 @@
          YLINE = Y( I )
          NEWLIN = .FALSE.
          J = I + 1
-         DO WHILE ( J .LE. NBIN .OR. NEWLIN )
+         DO WHILE ( J .LE. NBIN .AND. .NOT. NEWLIN )
             IF ( ( Y( J ) - YLINE ) .LT. VAL__EPSD ) THEN
                J = J + 1
             ELSE
@@ -204,7 +204,7 @@
      :                    PX, FIT( I ), STATUS )
 
 *  Form residuals and sums for the rms error of the fit.
-         DO K = I, I + NPTEV - 1
+         DO K = I, I + NEVAL - 1
             IF ( Z( K ) .NE. VAL__BADD ) THEN
                RESID( K ) = FIT( K ) - Z( K )
                SUMSQ = SUMSQ + RESID( K ) ** 2
