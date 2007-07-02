@@ -22676,16 +22676,16 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
    }{
       \begin{refs}
       \item  Wells, D.C., Greisen, E.W. \& Harten, R.H. 1981,
-      {\it Astron.  Astrophys.  Suppl.  Ser.} {\bf 44}, 363.
+      {\em Astron.  Astrophys.  Suppl.  Ser.} {\bf 44}, 363.
 
       \item  Greisen, E.W. \& Harten, R.H. 1981,
-      {\it Astron.  Astrophys.  Suppl.  Ser.} {\bf 44}, 371.
+      {\em Astron.  Astrophys.  Suppl.  Ser.} {\bf 44}, 371.
 
       \item  Grosb{\o}l, P., Harten, R.H., Greisen, E.W \& Wells, D.C.
-      1988 {\it Astron.  Astrophys.  Suppl.  Ser.} {\bf 73}, 359.
+      1988 {\em Astron.  Astrophys.  Suppl.  Ser.} {\bf 73}, 359.
 
       \item  Harten, R.H., Grosb{\o}l, P., Greisen, E.W \& Wells, D.C.
-      1988 {\it Astron.  Astrophys.  Suppl.  Ser.} {\bf 73}, 365.
+      1988 {\em Astron.  Astrophys.  Suppl.  Ser.} {\bf 73}, 365.
 
       \end{refs}
    }
@@ -23027,8 +23027,11 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
    \sstdiytopic{
       References
    }{
-      {``A User's Guide for the Flexible Image Transport System (FITS)''},
+      \begin{refs}
+      \item {\em "A User's Guide for the Flexible Image Transport System (FITS)"},
       NASA/Science Office of Science and Technology (1994).
+
+      \end{refs}
    }
    \sstdiytopic{
       Related Applications
@@ -23578,16 +23581,16 @@ KAPPA: \htmlref{FITSHEAD}{FITSHEAD},
    }{
       \begin{refs}
       \item  Wells, D.C., Greisen, E.W. \& Harten, R.H. 1981,
-      {\it Astron.  Astrophys.  Suppl.  Ser.} {\bf 44}, 363.
+      {\em Astron.  Astrophys.  Suppl.  Ser.} {\bf 44}, 363.
 
       \item  Greisen, E.W. \& Harten, R.H. 1981,
-      {\it Astron.  Astrophys.  Suppl.  Ser.} {\bf 44}, 371.
+      {\em Astron.  Astrophys.  Suppl.  Ser.} {\bf 44}, 371.
 
       \item  Grosb{\o}l, P., Harten, R.H., Greisen, E.W \& Wells, D.C.
-      1988 {\it Astron.  Astrophys.  Suppl.  Ser.} {\bf 73}, 359.
+      1988 {\em Astron.  Astrophys.  Suppl.  Ser.} {\bf 73}, 359.
 
       \item  Harten, R.H., Grosb{\o}l, P., Greisen, E.W \& Wells, D.C.
-      1988 {\it Astron.  Astrophys.  Suppl.  Ser.} {\bf 73}, 365.
+      1988 {\em Astron.  Astrophys.  Suppl.  Ser.} {\bf 73}, 365.
 
       \end{refs}
    }
@@ -24292,7 +24295,7 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
       References
    }{
       \begin{refs}
-      \item {\tt "A User's Guide for the Flexible Image Transport System (FITS)"},
+      \item {\em "A User's Guide for the Flexible Image Transport System (FITS)"},
       NASA/Science Office of Science and Technology (1994).
 
       \end{refs}
@@ -26341,6 +26344,8 @@ KAPPA: \htmlref{HISCOM}{HISCOM},
 
          \sstitem
          the number of pixels omitted.
+
+         The mode may be obtained in different ways (see parameter METHOD).
       }
    }
    \sstusage{
@@ -26367,9 +26372,56 @@ KAPPA: \htmlref{HISCOM}{HISCOM},
          will take place. {\tt [!]}
       }
       \sstsubsection{
+         METHOD = LITERAL (Read)
+      }{
+         The method used to evaluate the mode.  The choices are as
+         follows.
+
+         \ssthitemlist{
+
+            \sstitem 
+             {\tt "Histogram"} --- This finds the peak of an optimally
+	     binned histogram, the mode being the central value of
+	     that bin.  The number of bins may be altered given
+	     through parameter NUMBIN, however it is recommended to
+	     use the optimal binsize derived from the prescription of
+	     Freedman \& Diatonis.
+
+            \sstitem
+            {\tt "Moments"} --- As {\tt "Histogram"} but the mode is
+	    the weighted centroid from the moments of the peak bin and
+	    its neighbours.  The neighbours are those bins either side
+	    of the peak in a continuous sequence whose membership
+	    exceeds the peak value less three times the Poisson error
+	    of the peak bin.  Thus it gives an interpolated mode and
+	    does reduce the effect of noise.
+
+            \sstitem
+            {\tt "Pearson"} --- This uses the 3 * median - 2 * mean
+	    formula devised by Pearson.  See the first two References.
+	    This assumes that the median is bracketed by the mode and
+	    mean and only a mildly skew unimodal distribution.  This
+	    often applies to an image of the sky.
+         }
+         {\tt ["Moments"]}
+      }
+      \sstsubsection{
          NDF = NDF (Read)
       }{
          The NDF data structure to be analysed.
+      }
+      \sstsubsection{
+         NUMBIN = \_INTEGER (Read)
+      }{
+         The number of histogram bins to be used for the coarse
+	 histogram to evaluate the mode.  It is only accessed when
+	 METHOD={"Histogram"} or {\tt "Moments"}.  This must lie in
+	 the range 10 to 10000.  The suggested default is calculated
+	 dynamically depending on the data spread and number of values
+	 (using the prescription of Freedman \& Diaconis).  For
+	 integer data it is advisble to use the dynamic default or an
+	 integer multiple thereof to avoid creating non-integer wide
+	 bins.  {\tt []}
       }
       \sstsubsection{
          PERCENTILES( 100 ) = \_REAL (Read)
@@ -26446,9 +26498,9 @@ KAPPA: \htmlref{HISCOM}{HISCOM},
       \sstsubsection{
          MODE = \_DOUBLE (Write)
       }{
-         The modal value of all the valid pixels in the NDF array.  It
-         is estimated from 3 $*$ median - 2 $*$ mean.  This is only valid
-         for moderately skew distributions.
+         The modal value of all the valid pixels in the NDF array.
+         The method used to obtain the mode is governed by parameter 
+         METHOD.
       }
       \sstsubsection{
          NUMBAD = \_INTEGER (Write)
@@ -26489,6 +26541,13 @@ KAPPA: \htmlref{HISCOM}{HISCOM},
          array in the NDF called image.
       }
       \sstexamplesubsection{
+         histat image method=his
+      }{
+         As above but the the mode is the centre of peak bin in the 
+         optimally distributed histogram rather than sub-bin 
+         interpolated using neighbouring bins.
+      }
+      \sstexamplesubsection{
          histat ndf=spectrum variance
       }{
          Computes and displays simple ordered statistics for the
@@ -26502,11 +26561,12 @@ KAPPA: \htmlref{HISCOM}{HISCOM},
          the variance values before doing so.
       }
       \sstexamplesubsection{
-         histat halley logfile=stats.dat
+         histat halley logfile=stats.dat method=pearson
       }{
          Computes ordered statistics for the data array in the NDF
          called halley, and writes the results to a logfile called
-         {\tt stats.dat}.
+         {\tt stats.dat}.  The mode is derived using the Pearson 
+         formula.
       }
       \sstexamplesubsection{
          histat ngc1333 percentiles=[0.25,0.75]
@@ -26539,6 +26599,19 @@ KAPPA: \htmlref{HISCOM}{HISCOM},
          interpolation within a bin is used, so the largest errors arise
          near the median.
       }
+   }
+   \sstdiytopic{
+      References
+   }{
+      \begin{refs}
+      \item Moroney, M.J., 1957, {\em Facts from Figures} (Pelican)
+      \item Goad, L.E. 1980, {\em Statistical Filtering of Cosmic-Ray Events
+        from Astronomical CCD Images} in {\em Applications of Digital Image 
+        Processing to Astronomy}, SPIE {\bf 264}, 136.
+      \item Freedman, D. \& Diaconis, P. 1981, {\em On the histogram as a density
+        estimator: L2 theory}, Zeitschrift f"{u}r 
+        Wahrscheinlichkeitstheorie und verwandte Gebiete {\bf 57}, 453.
+      \end{refs}
    }
    \sstdiytopic{
       Related Applications
@@ -31651,19 +31724,20 @@ KAPPA: \htmlref{COLLAPSE}{COLLAPSE},
          EXP = LITERAL (Read)
       }{
          The mathematical expression to be evaluated for each NDF
-         pixel, \emph{e.g.} {\tt "(IA-IB$+$2)$*$PX"}.  In this expression, input NDFs are
-         denoted by the variables IA, IB, \ldots IZ, while constants may
-         either be given literally or represented by the variables PA,
-         PB, \ldots  PZ.  Values for those NDFs and constants which appear
-         in the expression will be requested via the application's
-         parameter of the same name.
+	 pixel, \emph{e.g.} {\tt "(IA-IB$+$2)$*$PX"}.  In this
+	 expression, input NDFs are denoted by the variables IA, IB,
+	 \ldots IZ, while constants may either be given literally or
+	 represented by the variables PA, PB, \ldots PZ.  Values for
+	 those NDFs and constants which appear in the expression will
+	 be requested via the application's parameter of the same
+	 name.
 
-         Fortran-77 syntax is used for specifying the expression, which
-         may contain the usual intrinsic functions, plus a few extra
-         ones.  An appendix in \xref{SUN/61}{sun61}{} gives a full description of the
-         syntax used and an up to date list of the functions available.
-         The expression may be up to 132 characters long and is case
-         insensitive.
+         Fortran-77 syntax is used for specifying the expression,
+	 which may contain the usual intrinsic functions, plus a few
+	 extra ones.  An appendix in \xref{SUN/61}{sun61}{} gives a
+	 full description of the syntax used and an up to date list of
+	 the functions available. The expression may be up to 132
+	 characters long and is case insensitive.
       }
       \sstsubsection{
          FA-FZ = LITERAL (Read)
@@ -52515,7 +52589,7 @@ The following applications have been modified:
 
    \item [\htmlref{ARDPLOT}{ARDPLOT}] \mbox{}
       \begin{itemize}
-         \item This can now can draw outlines around AST regions as well
+         \item This can now draw outlines around AST regions as well
          as ARD regions specified through a new REGION parameter.
       \end{itemize}
 
@@ -52543,6 +52617,8 @@ The following applications have been modified:
 
    \item [\htmlref{HISTAT}{HISTAT}] \mbox{}
       \begin{itemize}
+         \item New parameters METHOD and NUMBIN permit other ways to obtain
+         the mode including the peak bin of an optimally binned histogram.
          \item See the STATS changes below.
       \end{itemize}
 
@@ -52572,16 +52648,11 @@ The following applications have been modified:
 
    \item [\htmlref{NDFTRACE}{NDFTRACE}] \mbox{}
       \begin{itemize}
-      \item It now reports a nominal pixel scale in output parameter
-       FPIXSCALE.
-      \end{itemize}
-
-   \item [\htmlref{NDFTRACE}{NDFTRACE}] \mbox{}
-      \begin{itemize} 
+         \item It now reports a nominal pixel scale in output parameter
+         FPIXSCALE.
          \item There is a new output parameter, FPIXSCALE, to store
          the nominal pixel scale or each axis in the current WCS Frame.
       \end{itemize}
-
 
    \item [\htmlref{ROTATE}{ROTATE}] \mbox{}
       \begin{itemize}

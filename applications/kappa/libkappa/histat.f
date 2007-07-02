@@ -34,6 +34,8 @@
 *     -  the total number of pixels in the NDF,
 *     -  the number of pixels used in the statistics, and
 *     -  the number of pixels omitted.
+*
+*     The mode may be obtained in different ways (see Parameter METHOD).
 
 *  Usage:
 *     histat ndf [comp] [percentiles] [logfile]
@@ -53,16 +55,16 @@
 *        value is supplied (the default), then no logging of results
 *        will take place. [!]
 *     MAXCOORD( ) = _DOUBLE (Write)
-*        A 1-dimensional array of values giving the WCS co-ordinates of
-*        the centre of the (first) maximum-valued pixel found in the
+*        A one-dimensional array of values giving the WCS co-ordinates
+*        of the centre of the (first) maximum-valued pixel found in the
 *        NDF array.  The number of co-ordinates is equal to the number
 *        of NDF dimensions.
 *     MAXIMUM = _DOUBLE (Write)
 *        The maximum pixel value found in the NDF array.
 *     MAXPOS( ) = _INTEGER (Write)
-*        A 1-dimensional array of pixel indices identifying the (first)
-*        maximum-valued pixel found in the NDF array.  The number of
-*        indices is equal to the number of NDF dimensions.
+*        A one-dimensional array of pixel indices identifying the
+*        (first) maximum-valued pixel found in the NDF array.  The 
+*        number of indices is equal to the number of NDF dimensions.
 *     MAXWCS = LITERAL (Write)
 *        The formatted WCS co-ordinates at the maximum pixel value. The
 *        individual axis values are comma separated.
@@ -70,30 +72,64 @@
 *        The mean value of all the valid pixels in the NDF array.
 *     MEDIAN = _DOUBLE (Write)
 *        The median value of all the valid pixels in the NDF array.
+*     METHOD = LITERAL (Read)
+*        The method used to evaluate the mode.  The choices are as
+*        follows.
+*
+*        - "Histogram" -- This finds the peak of an optimally binned 
+*        histogram, the mode being the central value of that bin.  The 
+*        number of bins may be altered given through parameter NUMBIN,
+*        however it is recommended to use the optimal binsize derived 
+*        from the prescription of Freedman & Diatonis.
+*
+*        - "Moments" -- As "Histogram" but the mode is the weighted 
+*        centroid from the moments of the peak bin and its neighbours.  
+*        The neighbours are those bins either side of the peak in a 
+*        continuous sequence whose membership exceeds the peak value
+*        less three times the Poisson error of the peak bin.  Thus it
+*        gives an interpolated mode and does reduce the effect of 
+*        noise.
+*
+*        - "Pearson" -- This uses the 3 * median $-$ 2 * mean formula
+*        devised by Pearson.  See the first two References.  This 
+*        assumes that the median is bracketed by the mode and mean and 
+*        only a mildly skew unimodal distribution.  This often applies 
+*        to an image of the sky.
+*
+*        ["Moments"]
 *     MINCOORD( ) = _DOUBLE (Write)
-*        A 1-dimensional array of values giving the WCS co-ordinates of
-*        the centre of the (first) minimum-valued pixel found in the
+*        A one-dimensional array of values giving the WCS co-ordinates
+*        of the centre of the (first) minimum-valued pixel found in the
 *        NDF array.  The number of co-ordinates is equal to the number
 *        of NDF dimensions.
 *     MINIMUM = _DOUBLE (Write)
 *        The minimum pixel value found in the NDF array.
 *     MINPOS( ) = _INTEGER (Write)
-*        A 1-dimensional array of pixel indices identifying the (first)
-*        minimum-valued pixel found in the NDF array. The number of
-*        indices is equal to the number of NDF dimensions.
+*        A one-dimensional array of pixel indices identifying the 
+*        (first) minimum-valued pixel found in the NDF array.  The 
+*        number of indices is equal to the number of NDF dimensions.
 *     MINWCS = LITERAL (Write)
 *        The formatted WCS co-ordinates at the minimum pixel value. The
 *        individual axis values are comma separated.
 *     MODE = _DOUBLE (Write)
-*        The modal value of all the valid pixels in the NDF array.  It
-*        is estimated from 3 * median - 2 * mean.  This is only valid
-*        for moderately skew distributions.
+*        The modal value of all the valid pixels in the NDF array.
+*        The method used to obtain the mode is governed by parameter 
+*        METHOD.
 *     NDF = NDF (Read)
 *        The NDF data structure to be analysed.
 *     NUMBAD = _INTEGER (Write)
 *        The number of pixels which were either not valid or were
 *        rejected from the statistics during iterative K-sigma
 *        clipping.
+*     NUMBIN = _INTEGER (Read)
+*        The number of histogram bins to be used for the coarse
+*        histogram to evaluate the mode.  It is only accessed when 
+*        METHOD="Histogram" or "Moments".  This must lie in the range 
+*        10 to 10000.  The suggested default is calculated dynamically 
+*        depending on the data spread and number of values (using the 
+*        prescription of Freedman & Diaconis).  For integer data it is
+*        advisble to use the dynamic default or an integer multiple 
+*        thereof to avoid creating non-integer wide bins.  []
 *     NUMGOOD = _INTEGER (Write)
 *        The number of NDF pixels which actually contributed to the
 *        computed statistics.
@@ -114,6 +150,10 @@
 *     histat image
 *        Computes and displays simple ordered statistics for the data
 *        array in the NDF called image.
+*     histat image method=his
+*        As above but the the mode is the centre of peak bin in the 
+*        optimally distributed histogram rather than sub-bin 
+*        interpolated using neighbouring bins.
 *     histat ndf=spectrum variance
 *        Computes and displays simple ordered statistics for the
 *        variance array in the NDF called spectrum.
@@ -121,10 +161,10 @@
 *        Computes and displays ordered statistics for the variance
 *        array in the NDF called spectrum, but takes the square root of
 *        the variance values before doing so.
-*     histat halley logfile=stats.dat
+*     histat halley logfile=stats.dat method=pearson
 *        Computes ordered statistics for the data array in the NDF
 *        called halley, and writes the results to a logfile called
-*        stats.dat.
+*        stats.dat.  The mode is derived using the Pearson formula.
 *     histat ngc1333 percentiles=[0.25,0.75]
 *        Computes ordered statistics for the data array in the NDF
 *        called ngc1333, including the quartile values.
@@ -148,6 +188,15 @@
 *     interpolation within a bin is used, so the largest errors arise
 *     near the median.
 
+*  References:
+*     Moroney, M.J., 1957, "Facts from Figures" (Pelican)
+*     Goad, L.E. 1980, "Statistical Filtering of Cosmic-Ray Events
+*       from Astronomical CCD Images in "Applications of Digital Image 
+*       Processing to Astronomy", SPIE 264, 136.
+*     Freedman, D. & Diaconis, P. 1981, "On the histogram as a density
+*        estimator: L2 theory", Zeitschrift fur 
+*        Wahrscheinlichkeitstheorie und verwandte Gebiete 57, 453.
+
 *  Related Applications:
 *     KAPPA: HISTOGRAM, MSTATS, NDFTRACE, NUMB, STATS; ESP: HISTPEAK;
 *     Figaro: ISTAT.
@@ -165,8 +214,9 @@
 *  Copyright:
 *     Copyright (C) 1991, 1994 Science & Engineering Research Council.
 *     Copyright (C) 2000, 2004 Central Laboratory of the Research
+*     Councils. 
 *     Copyright (C) 2007 Science & Technology Facilities Council.
-*     Councils. All Rights Reserved.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -201,11 +251,16 @@
 *        for the histogram.  Uses improved algorithm for calculating
 *        the median and percentiles.
 *     6-AUG-2004 (DSB):
-*        Display current Frame WCS coords at max and min pixel positions.
+*        Display current Frame WCS coords at max and min pixel 
+*        positions.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
 *     18-MAY-2007 (DSB):
 *        Added parameters MINWCS and MAXWCS.
+*     2007 June 29 (MJC):
+*        Extend to calculate the mode from an optimally binned 
+*        histogram through new parameters METHOD and NUMBIN.  Added
+*        References.
 *     {enter_further_changes_here}
 
 *-
@@ -235,9 +290,9 @@
 *  Local Variables:
       LOGICAL BAD                ! There may be bad values in the array
       CHARACTER * ( SZBUF ) BUF  ! Text buffer
-      CHARACTER * ( 8 ) COMP     ! Name of array component to analyse
-      CHARACTER * ( 255 ) MAXWCS ! Formatted max WCS position
-      CHARACTER * ( 255 ) MINWCS ! Formatted max WCS position
+      CHARACTER*8 COMP           ! Name of array component to analyse
+      CHARACTER*255 MAXWCS       ! Formatted max WCS position
+      CHARACTER*255 MINWCS       ! Formatted max WCS position
       DOUBLE PRECISION DMAX      ! Max. value of pixels in array
       DOUBLE PRECISION DMIN      ! Min. value of pixels in array
       LOGICAL DOPRCT             ! Percentiles have been supplied
@@ -250,17 +305,19 @@
       INTEGER LBND( NDF__MXDIM ) ! NDF lower bounds
       LOGICAL LOGFIL             ! Log file is required
       DOUBLE PRECISION MAXC( NDF__MXDIM ) ! Co-ordinates of max. pixel
-      CHARACTER * ( 8 ) MCOMP    ! Component name for mapping arrays
+      CHARACTER*8 MCOMP          ! Component name for mapping arrays
       INTEGER MAXP( NDF__MXDIM ) ! Indices of maximum-valued pixel
       INTEGER MINP( NDF__MXDIM ) ! Indices of minimum-valued pixel
       DOUBLE PRECISION MEAN      ! Mean of pixels in array
       DOUBLE PRECISION MEDIAN    ! Median of pixels in array
+      CHARACTER*9 METHOD         ! Method for determining the mode
       DOUBLE PRECISION MINC( NDF__MXDIM ) ! Co-ordinates of min. pixel
       DOUBLE PRECISION MODE      ! Mode of pixels in array
       INTEGER NC                 ! No. characters in text buffer
       INTEGER NDF                ! NDF identifier
       INTEGER NDIM               ! Number of NDF dimensions
       INTEGER NGOOD              ! No. valid pixels in array
+      INTEGER NUMBIN             ! Number of histogram bins
       INTEGER NUMPER             ! Number of percentiles
       INTEGER NWCS               ! Number of WCS axes
       REAL PERCNT( NPRCTL )      ! Percentiles
@@ -271,17 +328,18 @@
       LOGICAL THERE              ! Array component exists
       CHARACTER * ( NDF__SZTYP ) TYPE ! Numeric type for processing
       INTEGER UBND( NDF__MXDIM ) ! NDF upper bounds
+      LOGICAL USEHIS             ! Use histogram to find the mode
 
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Obtain the NDF array component.
+*  ===============================
+
 *  Begin an NDF context.
       CALL NDF_BEGIN
-
-*  Initialise whether or not the logfile is required.
-      LOGFIL = .FALSE.
 
 *  Obtain the NDF to be analysed.
       CALL LPG_ASSOC( 'NDF', 'READ', NDF, STATUS )
@@ -308,9 +366,17 @@
 *  Exit if something has gone wrong.  Good status is required before
 *  obtaining the percentiles.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
-      
+
+*  Percentiles
+*  ===========
+
+*  Inquire the method used to calculate the mode.
+      CALL PAR_CHOIC( 'METHOD', 'Moments', 'Histogram,Moments,Pearson', 
+     :                .TRUE., METHOD, STATUS )
+      USEHIS = METHOD .EQ. 'HISTOGRAM' .OR. METHOD .EQ. 'MOMENTS'
+
 *  Defer error reporting and obtain an array of percentiles to be
-*  calculated. Constrain the values to be between the minimum and
+*  calculated.  Constrain the values to be between the minimum and
 *  maximum data values.
       CALL ERR_MARK
       CALL PAR_GDRVR( 'PERCENTILES', NPRCTL, 0.0, 100.0, PERCNT, NUMPER,
@@ -320,12 +386,17 @@
 *  Null is a valid response to say do not compute percentiles.  Make
 *  the number of percentiles one and flag the value, so that the
 *  display routines can handle and recognise there are no percentile
-*  values to report.
+*  values to report.  The exception is when we need an inter-quartile
+*  range.
          DOPRCT = .FALSE.
          IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
-            NUMPER = 1
-            PERCNT( 1 ) = VAL__BADR
+            IF ( USEHIS ) THEN
+               NUMPER = 0
+            ELSE
+               NUMPER = 1
+               PERCNT( 1 ) = VAL__BADR
+            END IF
          END IF
          
       ELSE
@@ -333,65 +404,19 @@
       END IF
       CALL ERR_RLSE
 
-*  Obtain an optional file for logging the results.  Start a new error
-*  context as null is a valid value.
-      CALL ERR_MARK
-      CALL FIO_ASSOC( 'LOGFILE', 'WRITE', 'LIST', 132, IFIL, STATUS )
-
-*  Null is a valid response to say do create a logfile.  Record this
-*  fact.  CLose the new error context/.
-      IF ( STATUS .NE. SAI__OK ) THEN
-
-         LOGFIL = .FALSE.
-         IF ( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
-      ELSE
-         LOGFIL = .TRUE.
-      END IF
-      CALL ERR_RLSE
-
-*  Display the NDF name, also sending it to the logfile if necessary.
-*  Cannot use MSG_BLANK because the message is optional.
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
-      IF ( LOGFIL ) CALL FIO_WRITE( IFIL, ' ', STATUS )
-      CALL NDF_MSG( 'NDF', NDF )
-      CALL MSG_LOAD( 'NDFNAME',
-     :               '   Pixel ordered statistics for the NDF '/
-     :               /'structure ^NDF', BUF, NC, STATUS )
-      IF ( STATUS .EQ. SAI__OK ) THEN
-         CALL MSG_SETC( 'MESSAGE', BUF( : NC ) )
-         CALL MSG_OUTIF( MSG__NORM, ' ', '^MESSAGE', STATUS )
-         IF ( LOGFIL ) CALL FIO_WRITE( IFIL, BUF( : NC ), STATUS )
+*  We need extra percentiles to derive the inter-quartile range for
+*  the histogram method to derive the mode.
+      IF ( USEHIS ) THEN
+         IF ( NUMPER .LT. NPRCTL - 1 ) THEN
+            PERCNT( NUMPER + 1 ) = 25.0
+            PERCNT( NUMPER + 2 ) = 75.0
+            NUMPER = NUMPER + 2
+            DOPRCT = .TRUE.
+         END IF
       END IF
 
-*  Display (and log) the NDF's title.  Cannot use MSG_BLANK because
-*  the message is optional.
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
-      IF ( LOGFIL ) CALL FIO_WRITE( IFIL, ' ', STATUS )
-      CALL NDF_CMSG( 'TITLE', NDF, 'Title', STATUS )
-      CALL MSG_LOAD( 'NDFTITLE',
-     :               '      Title                     : ^TITLE',
-     :               BUF, NC, STATUS )
-      IF ( STATUS .EQ. SAI__OK ) THEN
-         CALL MSG_SETC( 'MESSAGE', BUF( : NC ) )
-         CALL MSG_OUTIF( MSG__NORM, ' ', '^MESSAGE', STATUS )
-         IF ( LOGFIL ) CALL FIO_WRITE( IFIL, BUF( : NC ), STATUS )
-      END IF
-
-*  Display (and log) the name of the component being analysed.
-      CALL MSG_SETC( 'COMP', MCOMP )
-      CALL MSG_LOAD( 'NDFCOMP',
-     :               '      NDF array analysed        : ^COMP',
-     :               BUF, NC, STATUS )
-      IF ( STATUS .EQ. SAI__OK ) THEN
-         CALL MSG_SETC( 'MESSAGE', BUF( : NC ) )
-         CALL MSG_OUTIF( MSG__NORM, ' ', '^MESSAGE', STATUS )
-         IF ( LOGFIL ) CALL FIO_WRITE( IFIL, BUF( : NC ), STATUS )
-      END IF
-
-*  If a logfile is in use, display its name.
-      IF ( LOGFIL ) CALL MSG_OUTIF( MSG__NORM, 'LOG',
-     :              '      Logging to file           : $LOGFILE',
-     :                            STATUS )
+*  Obtain the statistics.
+*  ======================
 
 *  Obtain the numeric type of the NDF array component to be analysed.
       CALL NDF_TYPE( NDF, COMP, TYPE, STATUS )
@@ -449,6 +474,121 @@
      :                     NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ), DMAX,
      :                     SUM, MEAN, MEDIAN, MODE, PERVAL, STATUS )
       END IF
+
+*  Determine the mode using an histogram-peak approach.
+      IF ( USEHIS ) THEN
+
+*  Call the appropriate routine to compute the histogram and hence the
+*  derive the mode.  The optimum bin width is derived from which the
+*  optimum number of bins is derived but the user is allowed to modify
+*  that through parameter NUMBIN.
+         IF ( TYPE .EQ. '_BYTE' ) THEN
+             CALL KPS1_HSMOB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                        'NUMBIN', METHOD, DMAX, DMIN, NGOOD, 
+     :                        NUMPER, PERCNT, PERVAL, MODE, STATUS )
+
+         ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
+            CALL KPS1_HSMOUB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                        'NUMBIN', METHOD, DMAX, DMIN, NGOOD, 
+     :                        NUMPER, PERCNT, PERVAL, MODE, STATUS )
+
+         ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
+            CALL KPS1_HSMOD( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                       'NUMBIN', METHOD, DMAX, DMIN, NGOOD, 
+     :                       NUMPER, PERCNT, PERVAL, MODE, STATUS )
+ 
+         ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
+            CALL KPS1_HSMOI( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                       'NUMBIN', METHOD, DMAX, DMIN, NGOOD, 
+     :                       NUMPER, PERCNT, PERVAL, MODE, STATUS )
+
+         ELSE IF ( TYPE .EQ. '_REAL' ) THEN
+            CALL KPS1_HSMOR( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                       'NUMBIN', METHOD, DMAX, DMIN, NGOOD, 
+     :                       NUMPER, PERCNT, PERVAL, MODE, STATUS )
+
+         ELSE IF ( TYPE .EQ. '_WORD' ) THEN
+             CALL KPS1_HSMOW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                        'NUMBIN', METHOD, DMAX, DMIN, NGOOD, 
+     :                        NUMPER, PERCNT, PERVAL, MODE, STATUS )
+
+         ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
+            CALL KPS1_HSMOUW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                        'NUMBIN', METHOD, DMAX, DMIN, NGOOD, 
+     :                        NUMPER, PERCNT, PERVAL, MODE, STATUS )
+
+         END IF
+      END IF
+
+*  Logging
+*  =======
+
+*  Initialise whether or not the logfile is required.
+      LOGFIL = .FALSE.
+
+*  Obtain an optional file for logging the results.  Start a new error
+*  context as null is a valid value.
+      CALL ERR_MARK
+      CALL FIO_ASSOC( 'LOGFILE', 'WRITE', 'LIST', 132, IFIL, STATUS )
+
+*  Null is a valid response to say do create a logfile.  Record this
+*  fact.  Close the new error context.
+      IF ( STATUS .NE. SAI__OK ) THEN
+
+         LOGFIL = .FALSE.
+         IF ( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+      ELSE
+         LOGFIL = .TRUE.
+      END IF
+      CALL ERR_RLSE
+
+*  Display the NDF name, also sending it to the logfile if necessary.
+*  Cannot use MSG_BLANK because the message is optional.
+      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      IF ( LOGFIL ) CALL FIO_WRITE( IFIL, ' ', STATUS )
+      CALL NDF_MSG( 'NDF', NDF )
+      CALL MSG_LOAD( 'NDFNAME',
+     :               '   Pixel ordered statistics for the NDF '/
+     :               /'structure ^NDF', BUF, NC, STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
+         CALL MSG_SETC( 'MESSAGE', BUF( : NC ) )
+         CALL MSG_OUTIF( MSG__NORM, ' ', '^MESSAGE', STATUS )
+         IF ( LOGFIL ) CALL FIO_WRITE( IFIL, BUF( : NC ), STATUS )
+      END IF
+
+*  Display (and log) the NDF's title.  Cannot use MSG_BLANK because
+*  the message is optional.
+      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      IF ( LOGFIL ) CALL FIO_WRITE( IFIL, ' ', STATUS )
+      CALL NDF_CMSG( 'TITLE', NDF, 'Title', STATUS )
+      CALL MSG_LOAD( 'NDFTITLE',
+     :               '      Title                     : ^TITLE',
+     :               BUF, NC, STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
+         CALL MSG_SETC( 'MESSAGE', BUF( : NC ) )
+         CALL MSG_OUTIF( MSG__NORM, ' ', '^MESSAGE', STATUS )
+         IF ( LOGFIL ) CALL FIO_WRITE( IFIL, BUF( : NC ), STATUS )
+      END IF
+
+*  Display (and log) the name of the component being analysed.
+      CALL MSG_SETC( 'COMP', MCOMP )
+      CALL MSG_LOAD( 'NDFCOMP',
+     :               '      NDF array analysed        : ^COMP',
+     :               BUF, NC, STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
+         CALL MSG_SETC( 'MESSAGE', BUF( : NC ) )
+         CALL MSG_OUTIF( MSG__NORM, ' ', '^MESSAGE', STATUS )
+         IF ( LOGFIL ) CALL FIO_WRITE( IFIL, BUF( : NC ), STATUS )
+      END IF
+
+*  If a logfile is in use, display its name.
+      IF ( LOGFIL ) CALL MSG_OUTIF( MSG__NORM, 'LOG',
+     :              '      Logging to file           : $LOGFILE',
+     :                            STATUS )
+
+
+*  Report the statistics.
+*  ======================
 
 *  Obtain the NDF bounds and initialise the indices of the minimum and
 *  maximim pixel positions and co-ordinates.
@@ -532,7 +672,7 @@
       IF ( DOPRCT ) CALL PAR_PUT1D( 'PERVAL', NUMPER, PERVAL, STATUS )
 
 *  Arrive here if an error occurs.
-  999 CONTINUE     
+  999 CONTINUE
 
 *  End the NDF context.
       CALL NDF_END( STATUS )

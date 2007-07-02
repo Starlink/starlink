@@ -1263,22 +1263,6 @@ package kappa {
             helpkey *
           }
 
-         parameter fpixscale {
-            size *
-            type LITERAL
-            access WRITE
-            vpath INTERNAL
-            helpkey *
-          }
-
-         parameter funit {
-            size *
-            type LITERAL
-            access WRITE
-            vpath INTERNAL
-            helpkey *
-          }
-
          parameter avariance {
             size *
             type _LOGICAL
@@ -1367,6 +1351,14 @@ package kappa {
             helpkey *
           }
 
+         parameter fpixscale {
+            size *
+            type LITERAL
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
          parameter ftitle {
             size *
             type LITERAL
@@ -1399,6 +1391,14 @@ package kappa {
             ppath CURRENT DEFAULT
             default FALSE
             prompt {Display full WCS information?}
+            helpkey *
+          }
+
+         parameter funit {
+            size *
+            type LITERAL
+            access WRITE
+            vpath INTERNAL
             helpkey *
           }
 
@@ -7556,6 +7556,23 @@ package kappa {
             helpkey *
           }
 
+         parameter refoff {
+            size *
+            access WRITE
+            type LITERAL
+            vpath INTERNAL
+            prompt {Object to contain the offset of the primary beam with respect to the reference point and its error}
+            helpkey *
+          }
+
+         parameter refpos {
+            type LITERAL
+            vpath DYNAMIC
+            ppath DYNAMIC
+            prompt {Reference position}
+            helpkey *
+          }
+
          parameter resid {
             type NDF
             access WRITE
@@ -10654,6 +10671,15 @@ package kappa {
             helpkey *
           }
 
+         parameter method {
+            type LITERAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Method for estimating the mode}
+            default Pearson
+            helpkey *
+          }
+
          parameter mincoord {
             size *
             type _DOUBLE
@@ -10710,6 +10736,14 @@ package kappa {
             access WRITE
             vpath DEFAULT
             default 0
+            helpkey *
+          }
+
+         parameter numbin {
+            type _INTEGER
+            vpath DYNAMIC
+            ppath DYNAMIC
+            prompt {Number of histogram bins to compute mode}
             helpkey *
           }
 
