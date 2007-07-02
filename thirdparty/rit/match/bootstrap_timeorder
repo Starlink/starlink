@@ -1,0 +1,4 @@
+#  Establish the time order of some pre-generated autotools files.
+#  Don't want to regenerate these.
+match-0.8/configure
+match-0.8/Makefile.in
