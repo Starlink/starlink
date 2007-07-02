@@ -46,10 +46,10 @@
 *        Lower end of the y range of the fit.  It must not be less
 *        than the y position of the last pixel in the data array.
 *     NXPAR = INTEGER (Given)
-*        The number of parameters of the FIT in the x direction, i.e
+*        The number of parameters of the fit in the x direction, i.e
 *        the degree of the polynomial plus one.
 *     NYPAR = INTEGER (Given)
-*        The number of parameters of the FIT in the y direction, i.e
+*        The number of parameters of the fit in the y direction, i.e
 *        the degree of the polynomial plus one.
 *     MCHOEF = INTEGER (Given)
 *        The dimension of the array of Chebyshev coefficients.
@@ -74,22 +74,17 @@
 *  Notes:
 *     -  Uses the magic-value method for bad or undefined pixels.
 
-*  Algorithm:
-*     -  Initialise the rms sums.
-*     -  Scan through the pixels.
-*     -  Evaluate the Chebyshev surface at the pixel.
-*     -  Form residuals and sums for the rms error of the fit.
-*     -  At the end of the loop calculate the rms error.
-
 *  Copyright:
 *     Copyright (C) 1990 Science & Engineering Research Council.
 *     Copyright (C) 1995-1996 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils. 
+*     Copyright (C) 2007 Science & Technology Facilites Council
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -99,15 +94,15 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
-*     1990 Jan 30 (MJC):
+*     1990 January 30 (MJC):
 *        Original version.
 *     1995 August 3 (MJC):
 *        Renamed from PLY2EB.  Used a modern-style prologue and coding.
@@ -115,6 +110,9 @@
 *        argument.
 *     1996 October 8 (MJC):
 *        Removed NAG.
+*     2007 June 30 (MJC):
+*        Made more efficient by looking for contiguous series of pixels
+*        at the same Y co-ordinate.
 *     {enter_further_changes_here}
 
 *-
@@ -131,8 +129,10 @@
       DOUBLE PRECISION X( * )    ! X co-ordinates of the data
       DOUBLE PRECISION Y( * )    ! Y co-ordinates of the data
       DOUBLE PRECISION Z( * )    ! Data values
-      DOUBLE PRECISION XMIN, XMAX ! X bounds of the fit
-      DOUBLE PRECISION YMIN, YMAX ! Y bounds of the fit
+      DOUBLE PRECISION XMIN      ! X lower bound of the fit
+      DOUBLE PRECISION XMAX      ! X upper bound of the fit
+      DOUBLE PRECISION YMIN      ! Y lower bound of the fit
+      DOUBLE PRECISION YMAX      ! Y upper bound of the fit
       INTEGER NXPAR              ! X degree of the polynomial plus 1
       INTEGER NYPAR              ! Y degree of the polynomial plus 1
       INTEGER MCHOEF             ! Dimension of Chebyshev coeff. array
@@ -155,10 +155,15 @@
 
 *  Local Variables:
       INTEGER I                  ! Loop counter
+      INTEGER J                  ! Loop counter
+      INTEGER K                  ! Loop counter
+      LOGICAL NEWLIN             ! Current pixel is in a new line?
       INTEGER NPT                ! Number of points used to calculate
                                  ! the rms
+      INTEGER NEVAL              ! Number of points to evaluate
       DOUBLE PRECISION PX( MXPAR ) ! Work array
       DOUBLE PRECISION SUMSQ     ! Sum of the square of differences
+      DOUBLE PRECISION YLINE     ! Y co-ordinate for a line of values
 
 *.
 
@@ -171,23 +176,45 @@
       NPT = 0
 
 *  Scan through the pixels.
-      DO I = 1, NBIN
+      I = 1
+      DO WHILE ( I .LE. NBIN )
 
-*  Evaluate the fitted surface at all pixels.  This has to be a
-*  pixel at a time because the following routine will only process
-*  an array of x co-oridnates at a constant y co-ordinate.
-         CALL KPG1_CHE2D( 1, XMIN, XMAX, X( I ), YMIN, YMAX, Y( I ),
+*  The evaluation routine works for a series of X co-ordinates at
+*  a constant Y co-ordinate.  Now it could be called for each position
+*  but that could be quite inefficient for large arrays.  The
+*  folloeing identifies a run of pixels at the same Y co-ordinate.
+*  If the pixels are higgledy-piggledy then the following slows it 
+*  down further, howver in the vast majority of cases it will save time.
+         YLINE = Y( I )
+         NEWLIN = .FALSE.
+         J = I + 1
+         DO WHILE ( J .LE. NBIN .OR. NEWLIN )
+            IF ( ( Y( J ) - YLINE ) .LT. VAL__EPSD ) THEN
+               J = J + 1
+            ELSE
+               NEWLIN = .TRUE.
+            END IF
+         END DO
+         NEVAL = J - I
+
+*  Evaluate the fitted surface at all pixels in the line
+         CALL KPG1_CHE2D( NEVAL, XMIN, XMAX, X( I ), YMIN, YMAX, YLINE,
      :                    NXPAR - 1, NYPAR - 1, MCHOEF, CHCOEF, MXPAR,
      :                    PX, FIT( I ), STATUS )
 
 *  Form residuals and sums for the rms error of the fit.
-         IF ( Z( I ) .NE. VAL__BADD ) THEN
-            RESID( I ) = FIT( I ) - Z( I )
-            SUMSQ = SUMSQ + RESID( I ) ** 2
-            NPT = NPT + 1
-         ELSE
-            RESID( I ) = VAL__BADD
-         END IF
+         DO K = I, I + NPTEV - 1
+            IF ( Z( K ) .NE. VAL__BADD ) THEN
+               RESID( K ) = FIT( K ) - Z( K )
+               SUMSQ = SUMSQ + RESID( K ) ** 2
+               NPT = NPT + 1
+            ELSE
+               RESID( K ) = VAL__BADD
+            END IF
+         END DO
+
+*  Proceed to the next line of pixels.
+         I = J
 
 *  End of the loop through the pixels.
       END DO
