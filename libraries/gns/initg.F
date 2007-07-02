@@ -22,6 +22,7 @@
 *  Copyright:
 *     Copyright (C) 1989-1992 Science & Engineering Research Council.
 *     Copyright (C) 1995, 2004 Central Laboratory of the Research
+*     Copyright (C) 2007 Science and Technology Facilities Council.
 *     Councils. All Rights Reserved.
 
 *  Licence:
@@ -67,6 +68,8 @@
 *     19-JUN-2006 (PWD):
 *        Change error messages so that it's easier to say which file is
 *        corrupt.
+*     02-JUL-2007 (PWD):
+*        Include database name in error reports.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -121,6 +124,9 @@
 *   Calculate record length in local units
 *   We assume we are using variables that are 4 bytes long
       RECLEN = RECSIZ * 4 / BYTEPRU
+
+*   Initialise name so we know when it has just been opened.
+      NAMFNG = ' '
 
       IF (STATUS.EQ.0) THEN
 
@@ -321,4 +327,10 @@
      :              STATUS )
       CLOSE (UNIT=LUNGKS)
   999 CONTINUE
+
+      IF ( STATUS .NE. 0 .AND. NAMFNG .NE. ' ' ) THEN
+         CALL MSG_SETC( 'FILENAME', NAMFNG )
+         CALL EMS_REP( 'GNS_INITG_NAMESFILE',
+     :                 'GNS names database: ^FILENAME', STATUS )
+      END IF
       END       
