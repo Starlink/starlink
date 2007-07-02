@@ -166,8 +166,14 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *     21-JUN-2007 (DSB):
 *        In astSet<X>, ignore trailing spaces in the attribute name.
 *     22-JUN-2007 (DSB):
-*        Make astVSet return a pointer to dynamic memory holding the 
+*        - Make astVSet return a pointer to dynamic memory holding the 
 *        expanded setting string.
+*        - Add astSetVtab, and astCast.
+*     27-JUN-2007 (DSB):
+*        Modify astInitObject so that it ignores the supplied "size" value
+*        if some memory is supplied.
+*     2-JULY-2007 (DSB):
+*        Fix memory access problem in VSet.
 *class--
 */
 
@@ -2275,6 +2281,103 @@ void astSetDump_( AstObjectVtab *vtab,
    astEndPM;
 }
 
+void astSetVtab_( AstObject *this, AstObjectVtab *vtab ) {
+/*
+*+
+*  Name:
+*     astSetVtab
+
+*  Purpose:
+*     Change the virtual function table associated with an Object.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "object.h"
+*     void astSetVtab( AstObject *this, AstObjectVtab *vtab ) 
+
+*  Class Membership:
+*     Object method.
+
+*  Description:
+*     This function changes the virtual function table associated with an
+*     Object. This may be needed, for instance, if a super-class
+*     initialises a parent class structure with a NULL vtab, causing the
+*     vtab of the parent class to be used instead of the super-class.
+*     Whilst the super-class object is being constructed its inherited methods
+*     will be determined by the parent class. Once the super-class object
+*     has been constructed, it can invoke this fuction in order to 
+*     set the vtab to the super-class vtab, thus causing the method
+*     implementations provided by the super-cvlass to be used.
+
+*  Parameters:
+*     this
+*        Pointer to the Object to be modified.
+*     vtab
+*        Pointer to the virtual function table to store in the Object.
+*-
+*/
+   if( this ) this->vtab = vtab;
+}
+
+AstObject *astCast_( AstObject *this, AstObject *obj ) {
+/*
+*+
+*  Name:
+*     astCast
+
+*  Purpose:
+*     Cast an Object into an instance of a sub-class.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "object.h"
+*     AstObject *astCast( AstObject *this, AstObject *obj ) 
+
+*  Class Membership:
+*     Object method.
+
+*  Description:
+*     This function returns a deep copy of the supplied Object, but cast into
+*     an instance of the ancestor class specified by "obj".
+
+*  Parameters:
+*     this
+*        Pointer to the Object to be cast.
+*     obj
+*        Pointer to an Object that defines the class of the returned Object. 
+*        The returned Object will be of the same class as "obj". "this" 
+*        should be a sub-class of "obj".
+*-
+*/
+
+/* Local Variables: */
+   AstObjectVtab *old_vtab;
+   AstObject *new;
+
+/* Check pointer have been supplied. */
+   if( this && obj ) {
+
+/* Temporarily change the vtab of the supplied object to the supplied
+   vtab. */
+      old_vtab = this->vtab;
+      this->vtab = obj->vtab;
+
+/* Now take a copy of the object (now considered to be an instance of the
+   class specified by "vtab"). */
+      new = astCopy( this );
+
+/* Re-instate the original Object vtab. */
+      this->vtab = old_vtab;
+   }
+
+/* Return the copy pointer. */
+   return new;
+}
+
 /*
 *++
 *  Name:
@@ -2963,7 +3066,7 @@ static void VSet( AstObject *this, const char *settings, char **text,
             if( text ) {
                *text = astStore( NULL, buff2, nc + 1 );
                if( *text ) {
-                  for ( i = 0; i < len; i++ ) {
+                  for ( i = 0; i <= nc; i++ ) {
                      if ( (*text)[ i ] == '\n' ) (*text)[ i ] = ',';
                   }
                }
@@ -3717,6 +3820,11 @@ AstObject *astInitObject_( void *mem, size_t size, int init,
       } else {
          mem = astMalloc( size );
       }
+
+/* If memory had already been allocated, adjust the "size" value to match
+   the size of the allocated memory. */
+   } else {
+      size = astSizeOf( mem );
    }      
 
 /* Obtain a pointer to the new Object. */
