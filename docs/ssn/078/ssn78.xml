@@ -4633,7 +4633,30 @@ $(RECURSIVE_TARGETS):
           <p>That's it!</p>
 
         </subsubsect>
+
+        <subsubsect id="bootstrap-timeorder" indexkey="bootstrap!timeorder">
+          <subhead>
+            <title>Time order of third-party sources</title>
+          </subhead>
+        <p>
+          When importing third-party code that includes pre-created
+          <code>configure</code> scripts, <code>Makefile.in</code> etc., 
+          that you do not want to re-generate automatically, because they have
+          inconsistent timestamps -- that is say a Makefile.in file is older
+          than an associated Makefile.am, because the initial import
+          was in the wrong order or too quick (file systems typically resolve
+          at one second intervals), then you may need to re-establish the
+          time ordering of some files, but only if the imported build
+          system is sensitive to these changes. The way to do this is
+          by creating a file <code>bootstrap_timeorder</code> that
+          contains a list of relative file names (to the directory 
+          containing the <code>bootstrap</code> script), in the order
+          from oldest to newest. Look for an example of one of these
+          files in the source tree.
+        </subsubsect>
+
       </subsect>
+
 
       <subsect id="autoconfing-docs" export="export"
         indexkey="documentation">

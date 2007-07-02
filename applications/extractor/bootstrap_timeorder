@@ -1,0 +1,22 @@
+#  Establish the time order of some files in the "thirdparty" directories.
+#  Don't want to regenerate these.
+./extract/acx_prog_cc_optim.m4
+./extract/configure.ac
+./extract/aclocal.m4
+./extract/config.h.in
+./extract/configure
+./extract/Makefile.in
+./extract/src/Makefile.in
+./extract/src/wcs/Makefile.in
+./extract/src/fits/Makefile.in
+#
+./sextractor/acx_prog_cc_optim.m4
+./sextractor/configure.ac
+./sextractor/aclocal.m4
+./sextractor/config.h.in
+./sextractor/configure
+./sextractor/Makefile.in
+./sextractor/man/Makefile.in
+./sextractor/src/Makefile.in
+./sextractor/src/wcs/Makefile.in
+./sextractor/src/fits/Makefile.in
