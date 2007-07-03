@@ -362,11 +362,6 @@ int *status                  /* global status (given and returned) */
 	      scale the normalized sky noise value by sigma and add on
 	      the mean level */
 
-	   //printf("atmvalue=%lf sigma=%lf zenatm=%lf meanatm=%lf\n", 
-	   //	  atmvalue, sigma, zenatm, meanatm);
-
-	   //atmvalue = atmvalue*sigma + meanatm;
-
 	   atmvalue = atmvalue*sigma + meanatm;
 	 }
        
