@@ -172,11 +172,4 @@ int *status       /* global status (given and returned) */
       fnoise[j] = fourfact * spectrum[2*j];
    }
 
-   /* Generate a set of random numbers with a bell-shaped distribution
-      and add onto the 1/f noise */
-   /*
-      for ( j=0; j<size*size; j++ ) {
-         fnoise[j] = fnoise[j] + dsim_drand ( sigma );
-   }
-   */
 }

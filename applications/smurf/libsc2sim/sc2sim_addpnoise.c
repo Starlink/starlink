@@ -100,10 +100,6 @@ void sc2sim_addpnoise( double flux_0, double sig_0, double integ_time,
    /* Calculate a random number and scale it to the required sigma */
    err = sc2sim_drand( sigma );
 
-   /* Correct for the integration time - factor 2 because sigma is per root
-      Hz */
-   /* *flux = *flux + err / sqrt(2.0*integ_time); */
-
    /* err is already measured /sqrt(Hz) so no factor of 2 needed */
    *flux = *flux + err/sqrt(integ_time);
 

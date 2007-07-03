@@ -121,8 +121,6 @@ int *status          /* global status (given and returned) */
    ixpix = (int)xpix;
    iypix = (int)ypix;
 
-   /*   printf("ixpix = %d, iypix = %d, size = %d\n",ixpix,iypix,size);*/
-
    /* Since ATM image has periodic boundary conditions, we can just
       return to the lower edge of the image if we go outside */
    if ( ixpix+1 >= size ) {
