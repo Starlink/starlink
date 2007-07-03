@@ -124,6 +124,8 @@
 *        Remove unused variable and wrapped long lines.
 *     18-MAY-2007 (DSB):
 *        Added argument FACTS.
+*     3-JULY-2007 (DSB):
+*        Corrected calculation of the Mapping parameters.
 *     {enter_further_changes_here}
 
 *-
@@ -196,8 +198,8 @@
 *  Construct a Mapping to do the transformation.  It must map between
 *  coordinate systems in which the coordinate of the centre of a pixel
 *  is given by its pixel index.
-      T1 = 0.5D0*DBLE( DIMI( IDIM ) )
-      T2 = 0.5D0*DBLE( DIMO( IDIM ) )
+      T1 = 0.5D0*DBLE( DIMI( IDIM ) + 1 )
+      T2 = 0.5D0*DBLE( DIMO( IDIM ) + 1 )
       T3 = DBLE( DIMI( IDIM ) ) + 0.5D0
       MAP = AST_WINMAP( 1, T1, T3, T2, ( T3 - T1 )*FACTS( IDIM ) + T2,
      :                  ' ', STATUS )
@@ -237,16 +239,28 @@
  
 *  Copy the line we will resample from the input arrays into work
 *  buffers.
+
+          write(*,*) 'Input data : '
+
+
          IO = OFFI
          IF ( HASVAR ) THEN
             DO I = 1, DIMI( IDIM )
                DATWKI( I ) = DATI( IO )
                VARWKI( I ) = VARI( IO )
                IO = IO + STRIDI( IDIM )
+
+          write(*,*) i,' ',DATWKI( I ), ' -> ', 
+     :               nint( i*0.0846557199256495+0.0714433430111967 )
+
             END DO
          ELSE
             DO I = 1, DIMI( IDIM )
                DATWKI( I ) = DATI( IO )
+
+          write(*,*) i,' ',DATWKI( I ), ' -> ', 
+     :              nint( i*0.0846557199256495+0.0714433430111967 )
+
                IO = IO + STRIDI( IDIM )
             END DO
          END IF
@@ -259,17 +273,26 @@
      :                                  1, DIMO( IDIM ), DATWKO, VARWKO,
      :                                  STATUS )
 
+          write(*,*) ' '
+          write(*,*) ' '
+          write(*,*) 'Output data : '
+
+       call ast_show( map, status )
+
+
 *  Copy the resampled line from work buffers into the output arrays.
          IO = OFFO
          IF ( HASVAR ) THEN
             DO I = 1, DIMO( IDIM )
                DATO( IO ) = DATWKO( I )
                VARO( IO ) = VARWKO( I )
+          write(*,*) i,' ',DATWKO( I )
                IO = IO + STRIDO( IDIM )
             END DO
          ELSE
             DO I = 1, DIMO( IDIM )
                DATO( IO ) = DATWKO( I )
+          write(*,*) i,' ',DATWKO( I )
                IO = IO + STRIDO( IDIM )
             END DO
          END IF
