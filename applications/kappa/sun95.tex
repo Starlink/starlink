@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.32}
 \newcommand{\stardocnumber}    {95.32}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2007 June 28}
+\newcommand{\stardocdate}      {2007 July 2}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.7-8}
+\newcommand{\stardocversion}   {1.7-9}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -52317,16 +52317,24 @@ The following applications have been modified:
          value of that pixel.
       \end{itemize}
 
+      \item [\htmlref{COLLAPSE}{COLLAPSE}] \mbox{}
+      \begin{itemize}
+         \item There are eleven new statistics available to estimate
+         the output values, intended for cube analysis.
+         \item The collapsed NDF is now physically smaller than the
+         input NDF.
+      \end{itemize}
+
       \item [\htmlref{CONTOUR}{CONTOUR}] \mbox{}
       \begin{itemize}
          \item Parameter MODE has a new option to calculate contour heights
-          called {\tt "Scale"}.  This sets a specified number of contour 
-          levels to be equally spaced between two pixel values that you 
-          supply.
+         called {\tt "Scale"}.  This sets a specified number of contour 
+         levels to be equally spaced between two pixel values that you 
+         supply.
          \item Parameter AXIS now defaults to null ({\tt{!}}), causing
-          axes to be drawn if and only if the graphics device is cleared 
-          before the contours are plotted, as controlled by the parameter
-          CLEAR.
+         axes to be drawn if and only if the graphics device is cleared 
+         before the contours are plotted, as controlled by the parameter
+         CLEAR.
       \end{itemize}
 
    \item [\htmlref{CONVOLVE}{CONVOLVE}] \mbox{}
@@ -52341,16 +52349,16 @@ The following applications have been modified:
    \item [\htmlref{COPYBAD}{COPYBAD}] \mbox{}
       \begin{itemize}
          \item COPYBAD now has an extra parameter called INVERT which, if set
-               TRUE, causes output pixels to be set bad if the corresponding 
-               pixels in the reference NDF are good.
+         TRUE, causes output pixels to be set bad if the corresponding 
+         pixels in the reference NDF are good.
       \end{itemize}
 
    \item [\htmlref{CURSOR}{CURSOR}] \mbox{}
       \begin{itemize}
          \item CURSOR can now display the pixel value at each selected
-          position (if the position falls within the bounds of a displayed 
-          NDF). This is controlled via the new parameters SHOWDATA and
-          COMP.
+         position (if the position falls within the bounds of a displayed 
+         NDF).  This is controlled via the new parameters SHOWDATA and
+         COMP.
          \item The format of the displayed results has been changed so
          that the axis symbols and units are on a separate line to the
          axis values.

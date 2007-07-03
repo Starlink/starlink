@@ -107,9 +107,9 @@
    modified comprises one pixel, OLDVAL stores the original value of 
    that pixel.
 
-   o  COLLAPSE has a new parameter WCSATTS which can be used to provide
-   alternative attributes for the current WCS co-ordinate Frame within
-   the input NDF.
+   o  COLLAPSE has eleven new statistics available to estimate
+   the output values, intended for cube analysis.  The collapsed NDF 
+   is now physically smaller than the input NDF.
 
    o  CONTOUR parameter MODE has a new option to calculate contour 
    heights called "Scale".  This sets a specified number of contour 
