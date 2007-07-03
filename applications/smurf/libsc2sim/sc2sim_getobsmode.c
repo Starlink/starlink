@@ -13,7 +13,7 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2sim_getobsmode ( char *name, int *status )
+*     obsMode sc2sim_getobsmode ( char *name, int *status )
 
 *  Arguments:
 *     name = char* (Given)
@@ -21,12 +21,13 @@
 *     status = int* (Given and Returned)
 *        Pointer to global status.  
 
+*  Return Value:
+*     obsMode = enumerated type of SCUBA2 observing mode (defined in
+*     sc2sim_struct.h)
+
 *  Description:
 *     Given a string for the observation return the enumerated value
-*     as defined in dsim_struct.h. Valid modes:
-*     stare, dstare, dream, pong, polspin, heatrun, hits
-* 
-*     Returns none if the string could not be matched to a valid type
+*     as defined in sc2sim_struct.h. 
 
 *  Authors:
 *     Ed Chapin (UBC)
@@ -39,6 +40,8 @@
 *        Split from dsim.c
 *     2006-11-21 (JB):
 *        Add liss mode
+*     2007-07-03 (EC): 
+*        Made enumerated types more readable / fixed up null return value
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -71,25 +74,19 @@
 /* SC2SIM includes */
 #include "sc2sim.h"
 
-obsMode sc2sim_getobsmode
-( 
-char *name,         /* string containing name of observing mode */
-int *status         /* global status (given and returned) */
-)
-
-{
+obsMode sc2sim_getobsmode( char *name, int *status ) {
    /* Check status */
-   if ( !StatusOkP(status) ) return none;
+   if ( !StatusOkP(status) ) return MODE__NONE;
 
-   if( strcmp( name, "STARE" ) == 0 ) return stare;
-   else if( strcmp( name, "DSTARE" ) == 0 ) return dstare;
-   else if( strcmp( name, "DREAM" ) == 0 ) return dream;
-   else if( strcmp( name, "PONG" ) == 0 ) return pong;
-   else if( strcmp( name, "POLSPIN" ) == 0 ) return polspin;
-   else if( strcmp( name, "HEATRUN" ) == 0 ) return heatrun;
-   else if( strcmp( name, "BOUS" ) == 0 ) return bous;
-   else if( strcmp( name, "SINGLESCAN" ) == 0 ) return singlescan;
-   else if( strcmp( name, "LISS" ) == 0 ) return liss;
-   else return none;
+   if( strcmp( name, "STARE" ) == 0 ) return MODE__STARE;
+   else if( strcmp( name, "DSTARE" ) == 0 ) return MODE__DSTARE;
+   else if( strcmp( name, "DREAM" ) == 0 ) return MODE__DREAM;
+   else if( strcmp( name, "PONG" ) == 0 ) return MODE__PONG;
+   else if( strcmp( name, "POLSPIN" ) == 0 ) return MODE__POLSPIN;
+   else if( strcmp( name, "HEATRUN" ) == 0 ) return MODE__HEATRUN;
+   else if( strcmp( name, "BOUS" ) == 0 ) return MODE__BOUS;
+   else if( strcmp( name, "SINGLESCAN" ) == 0 ) return MODE__SINGLESCAN;
+   else if( strcmp( name, "LISS" ) == 0 ) return MODE__LISS;
+   else return MODE__NONE;
 
 }

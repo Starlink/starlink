@@ -221,6 +221,9 @@
 *     2007-06-29 (EC):
 *        Try to re-set digitisation coefficients once the sky level is known,
 *        overriding values calculated in sc2sim_instrinit
+*     2007-07-03 (EC): 
+*        Made obsMode and mapCoordframe enumerated types more readable.
+*
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -634,7 +637,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
        complete the observation */
     switch( mode ) {
       
-      case stare:
+      case MODE__STARE:
         /* Stare just points at a nasmyth offset of 0 from the map centre */
 	msgOutif(MSG__VERB, " ", "Do a STARE observation", status );
         count = inx->numsamples;
@@ -645,7 +648,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
         break;
 
-      case dream:
+      case MODE__DREAM:
         /* Call sc2sim_getpat to get the dream pointing solution */
         msgOutif(MSG__VERB, " ", "Do a DREAM observation", status );
        
@@ -673,7 +676,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
 	break;
 
-      case singlescan:
+      case MODE__SINGLESCAN:
         /* Call sc2sim_getsinglescan to get scan pointing solution */
 	msgOutif(MSG__VERB, " ", "Do a SINGLESCAN observation", status );
         accel[0] = 432.0;
@@ -686,7 +689,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       
         break;
 
-      case bous:
+      case MODE__BOUS:
         /* Call sc2sim_getbous to get boustrophedon pointing solution */
 	msgOutif(MSG__VERB, " ", "Do a BOUS observation", status );
         accel[0] = 432.0;
@@ -700,7 +703,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       
         break;
 
-      case liss:
+      case MODE__LISS:
         /* Call sc2sim_getliss to get lissjous pointing solution */
 	msgOutif(MSG__VERB, " ", "Do a LISSAJOUS observation", status );
 
@@ -717,7 +720,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         break; 
       
     
-      case pong:
+      case MODE__PONG:
         /* Get pong pointing solution */
 
         vmax[0] = inx->vmax;        /*200.0;*/
@@ -982,7 +985,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	   that it can be written to the JCMTState structure */
 	switch( coordframe ) {
 	  
-	case nasmyth:
+	case FRAME__NASMYTH:
 	  /* Get boresight tanplate offsets in Nasmyth coordinates (radians) */
 	  bor_x_nas = (posptr[curframe*2] - instap[0])*DAS2R;
 	  bor_y_nas = (posptr[curframe*2+1] - instap[1])*DAS2R;
@@ -1007,7 +1010,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
 	  break;
 	  
-	case azel:
+	case FRAME__AZEL:
 	  /* posptr and jigpat already give the azel tanplane offsets */
 	  bor_x_hor = (posptr[curframe*2])*DAS2R;
 	  bor_y_hor = (posptr[curframe*2+1])*DAS2R;
@@ -1017,7 +1020,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	  jig_y_hor[frame] = DAS2R*jigpat[curframe%jigsamples][1];
 	  break;
 	  
-	case radec:
+	case FRAME__RADEC:
 	  /* posptr and jigpat give the RADec tanplane offsets */
 	  bor_x_cel = (posptr[curframe*2])*DAS2R;
 	  bor_y_cel = (posptr[curframe*2+1])*DAS2R;
@@ -1409,7 +1412,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
             strcpy ( sinx->subname, subarrays[k] );
 
 	    /* Number of .In images KLUDGE */
-	    if ( mode == dream || mode == stare ) {
+	    if ( mode == MODE__DREAM || mode == MODE__STARE ) {
 	      nimage = maxwrite / 200;
 	    }
 	    /* LST start/end */

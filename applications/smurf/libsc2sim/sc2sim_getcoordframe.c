@@ -13,7 +13,7 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2sim_getcoordframe ( char *name, int *status )
+*     mapCoordframe sc2sim_getcoordframe ( char *name, int *status )
 
 *  Arguments:
 *     name = char* (Given)
@@ -21,12 +21,14 @@
 *     status = int* (Given and Returned)
 *        Pointer to global status.  
 
+*  Return Value:
+*     mapCoordframe = enumerated type of coordinate frame (defined in
+*     sc2sim_struct.h)
+
 *  Description:
 *     Given a string for the observation return the enumerated value
-*     as defined in dsim_struct.h. Valid modes:
+*     as defined in sc2sim_struct.h. Valid modes:
 *     stare, dstare, dream, pong, polspin, heatrun, hits
-* 
-*     Returns none if the string could not be matched to a valid type
 
 *  Authors:
 *     Ed Chapin (UBC)
@@ -35,6 +37,8 @@
 *  History :
 *     2006-09-14 (EC):
 *        Original
+*     2007-07-03 (EC): 
+*        Made enumerated types more readable / fixed up null return value
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -69,11 +73,11 @@
 
 mapCoordframe sc2sim_getcoordframe( char *name, int *status ) {
    /* Check status */
-   if ( !StatusOkP(status) ) return none;
+   if ( !StatusOkP(status) ) return FRAME__NOCOORD;
 
-   if( strcmp( name, "NASMYTH" ) == 0 ) return nasmyth;
-   else if( strcmp( name, "AZEL" ) == 0 ) return azel;
-   else if( strcmp( name, "RADEC" ) == 0 ) return radec;
-   else return nocoord;
+   if( strcmp( name, "NASMYTH" ) == 0 ) return FRAME__NASMYTH;
+   else if( strcmp( name, "AZEL" ) == 0 ) return FRAME__AZEL;
+   else if( strcmp( name, "RADEC" ) == 0 ) return FRAME__RADEC;
+   else return FRAME__NOCOORD;
 
 }

@@ -42,6 +42,7 @@
     29Jun2007 : Simplified bolometer noise, changed sc2sim_sim_struct: (EC)
                 -removed guessatm, aomega, bandGHz
                 -added jy2pw, refload, refnoise
+    03Jul2007 : Made obsMode/mapCoordframe enumerated types more readable (EC)
 */
 #include "libsc2sim/sc2sim_par.h"
 
@@ -56,11 +57,13 @@ struct bolpix             /* pixel location of bolometer */
        };
 
 /* Enumerated type for observing modes */
-typedef enum {stare, dstare, dream, pong, polspin, heatrun, 
-              bous, singlescan, liss, none} obsMode;
+typedef enum {MODE__STARE, MODE__DSTARE, MODE__DREAM, MODE__PONG, 
+	      MODE__POLSPIN, MODE__HEATRUN, 
+              MODE__BOUS, MODE__SINGLESCAN, MODE__LISS, MODE__NONE} obsMode;
 
 /* Enumerated type for map coordinate frame */
-typedef enum {nasmyth, azel, radec, nocoord} mapCoordframe;
+typedef enum {FRAME__NASMYTH, FRAME__AZEL, FRAME__RADEC, FRAME__NOCOORD} 
+  mapCoordframe;
 
 struct sc2sim_obs_struct      /* parameters read from obs input file */
 {
@@ -139,7 +142,6 @@ struct sc2sim_sim_struct      /* parameters read from sim input file */
   double anang;               /* polarisation angle of analyser (deg) */
   double anpol;               /* polarisation of analyser (%) */
   double antrans;             /* transmission of analyser (%) */
-  //double aomega;              /* coupling factor 0.179(850) 0.721(450) */
   char astname[SC2SIM__FLEN];  /* name of file for ast simulation */
   double astpol;              /* polarisation of source (%) */
   char atmname[SC2SIM__FLEN];  /* name of file for atm simulation */
@@ -151,7 +153,6 @@ struct sc2sim_sim_struct      /* parameters read from sim input file */
   double atmzeroy;            /* atm background offset in Y (arcsec) */
   double atend;               /* Ambient temperature at end (Celcius) */
   double atstart;             /* Ambient temperature at start (Celcius) */
-  //double bandGHz;             /* bandwidth in GHz */
   double blindang;            /* polarisation angle of blind (deg) */
   double blindpol;            /* polarisation of blind (%) */
   double blindtrans;          /* transmission of blind (%) */
@@ -159,7 +160,6 @@ struct sc2sim_sim_struct      /* parameters read from sim input file */
   double casspol;             /* polarisation of Cass optics (%) */
   double casstrans;           /* transmission of Cass optics (%) */
   int flux2cur;               /* Convert power to current 1=yes, 0=no */
-  //double guessatm;            /* guess expected atmospheric signal pW */
   double jy2pw;               /* Jy to pW conversion modulo atm transmission */
   double nasang;              /* polarisation angle of Nasmyth optics (deg) */
   double naspol;              /* polarisation of Nasmyth optics (%) */
