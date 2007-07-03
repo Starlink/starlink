@@ -454,6 +454,7 @@
 *     2006-06-09:  added to smurf_sim (jb)
 *     2006-08-18:  fixed memory leak (elc)
 *     2006-08-21:  removed unused variables (jb)
+*     2007-07-03:  made obsMode enumerated type more readable (EC)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -617,14 +618,14 @@ void smurf_sc2sim( int *status ) {
    mode = sc2sim_getobsmode( inx.obsmode, status );
    coordframe = sc2sim_getcoordframe( inx.coordframe, status );
 
-   if ( mode == heatrun ) {
+   if ( mode == MODE__HEATRUN ) {
 
      /* Do a heatrun */
 
      sc2sim_heatrun ( &inx, &sinx, coeffs, digcurrent, digmean, digscale, filter,
                       heater, nbol, pzero, inx.steptime, status );
 
-   } else if ( mode == stare || mode == dream ) {
+   } else if ( mode == MODE__STARE || mode == MODE__DREAM ) {
 
       /* Do a simulation */
 
@@ -642,8 +643,8 @@ void smurf_sc2sim( int *status ) {
 			pzero, rseed, inx.steptime, weights, xbc, xbolo, ybc, 
 			ybolo, hitsonly, overwrite, simstats, status);
 
-   }  else if ( mode == pong || mode == singlescan || mode == bous || 
-                mode == liss ) {
+   }  else if ( mode == MODE__PONG || mode == MODE__SINGLESCAN || 
+		mode == MODE__BOUS || mode == MODE__LISS ) {
 
       /* Do a simulation */
 
