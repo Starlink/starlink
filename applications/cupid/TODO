@@ -1,3 +1,7 @@
+3/7/2007:
+   - G.Fuller requests "Do not prompt for RMS in FINDCLUMPS if RMS is 
+   provided in the config file".
+
 25/9/06:
    - Provide an option to re-apply the beam width smoothing to the
    results returned in the catalogue. [Done]
