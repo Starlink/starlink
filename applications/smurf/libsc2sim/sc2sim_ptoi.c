@@ -54,6 +54,8 @@
 *        Trap obviously out of range values
 *     2006-07-21 (JB):
 *        Split from dsim.c
+*     2007-07-04 (EC):
+*        Removed hard limits on input power from 0--200 pW
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -83,18 +85,8 @@
 /* SC2SIM includes */
 #include "sc2sim.h"
 
-void sc2sim_ptoi
-( 
-double flux,       /* input flux in pW (given) */
-int ncoeffs,       /* number of coefficients describing response curve
-                      (given) */
-double coeffs[],   /* array to hold response curve coefficients (given) */
-double pzero,      /* calibration offset in pW (given) */
-double *current,   /* signal from bolometer in amps (returned) */
-int *status        /* global status (given and returned) */
-)
-
-{
+void sc2sim_ptoi( double flux, int ncoeffs, double coeffs[], double pzero, 
+		  double *current, int *status ) {
    /* Local variables */
    double p;
 
@@ -103,12 +95,6 @@ int *status        /* global status (given and returned) */
 
    p = flux + pzero;
 
-   if ( ( p > 0.0 ) && ( p < 200.0 ) ) {
-      *current = coeffs[0] + coeffs[1] * p + coeffs[2] * p*p + 
-        coeffs[3] * p*p*p + coeffs[4] * p*p*p*p + coeffs[5] * p*p*p*p*p;
-   } else {
-      *status = DITS__APP_ERROR;
-      printf ( "sc2sim_ptoi: flux value, %g, outside bolometer range (0-200)\n", p );
-   }
-
+   *current = coeffs[0] + coeffs[1] * p + coeffs[2] * p*p + 
+     coeffs[3] * p*p*p + coeffs[4] * p*p*p*p + coeffs[5] * p*p*p*p*p;
 }
