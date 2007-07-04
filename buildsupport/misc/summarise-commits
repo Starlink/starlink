@@ -42,6 +42,10 @@ that are indexed by repository name. Default is "starlink".
 Disable the mailing of report summary. Mail message is not sent if no revisions
 have been committed since the last time this ran.
 
+=item B<-stdout>
+
+Send HTML to standard output rather than to the default file.
+
 =back
 
 =cut
@@ -147,7 +151,7 @@ my %SETTINGS = (
 );
 
 # Argument parsing
-my ($help, $man, $version, $startrev, $repos);
+my ($help, $man, $version, $startrev, $repos, $stdout);
 my $email = 1; # default to sending email
 my $ostatus = GetOptions( "help" => \$help,
                           "man" => \$man,
@@ -155,6 +159,7 @@ my $ostatus = GetOptions( "help" => \$help,
 			  "startrev=s" => \$startrev,
 			  "repos=s" => \$repos,
 			  "email!" => \$email,
+			  "stdout" => \$stdout,
                          );
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose =>2) if $man;
@@ -297,8 +302,14 @@ for my $rev ($baserev .. $endrev) {
 my @SORTED = sort sort_log_entry keys %ALLFILES;
 
 # HTML page
-my $htmlfile = File::Spec->catfile($CFG{reportdir}, $CFG{reportfile});
-open(my $HTML, "> $htmlfile") or die "Error opening HTML output $htmlfile: $!";
+my $HTML;
+if ($stdout) {
+  # write to standard output instead
+  $HTML = *STDOUT;
+} else {
+  my $htmlfile = File::Spec->catfile($CFG{reportdir}, $CFG{reportfile});
+  open($HTML, "> $htmlfile") or die "Error opening HTML output $htmlfile: $!";
+}
 
 print $HTML <DATA>;
 print $HTML "<body>\n";
@@ -308,7 +319,22 @@ if (keys %INFO) {
   print $HTML "<h1>Commit log (since Revision ".&revhtml($baserev -1 ).")</h1>\n";
 }
 
+if (keys %INFO) {
+  
+  # Start off with the revision messages
+  for my $rev (reverse sort { $a <=> $b } keys %INFO) {
+    printf($HTML
+	   "<div class='onerevision'>\n<p>".
+	   &revhtml($rev) .
+	   ", %s</p>\n<pre>\n%s</pre>\n</div>", 
+	   $INFO{$rev}{author}, escape_html($INFO{$rev}{log}));
+  }
+
+}
+
 if (keys %ALLFILES) {
+
+      # Modified files
       print $HTML "<table>\n<tr><th>File</th><th>author</th></tr>\n";
 
       # go through the files
@@ -367,7 +393,7 @@ if (keys %ALLFILES) {
 }
 
 print $HTML "</body></html>\n";
-close($HTML);
+close($HTML) unless $stdout;
 
 # Construct the email (which just has changed files in it)
 # Do nothing if nothing has been committed
@@ -376,6 +402,15 @@ if ($email && keys %ALLFILES && $CFG{reportmail}) {
   push(@email,"\nRepository commits in period $earliest to $latest (revision ".
        "$baserev to revision $endrev)\n\n");
   push(@email, "See $reporturl for more details\n\n");
+  push(@email, "Revisions:\n\n");
+  for my $rev (reverse sort { $a <=> $b } keys %INFO) {
+    push(@email, "\t$rev:\n");
+    my @lines = split ("\n", $INFO{$rev}{log});
+    for my $l (@lines) {
+      push(@email, "\t  $l\n");
+    }
+  }
+  push(@email, "\n");
   push(@email, "Committed files\n\n");
 
   for my $file (@SORTED) {
@@ -441,7 +476,7 @@ sub get_info {
   chomp(@lines);
   $info{author} = $lines[0];
   $info{date} = $lines[1];
-  $info{log} = join(" ",@lines[3..$#lines]);
+  $info{log} = join("\n",@lines[3..$#lines]);
   return %info;
 }
 
