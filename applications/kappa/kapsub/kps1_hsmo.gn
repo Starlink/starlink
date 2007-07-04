@@ -164,9 +164,9 @@
       INTEGER I                  ! Loop counter
       LOGICAL INTTYP             ! Integer data type?
       INTEGER MAXPOS             ! Position of the maximum
-      <LTYPE> MAXV               ! Minimum value in the array
+      INTEGER MAXV               ! Minimum value in the array
       INTEGER MINPOS             ! Position of the minimum (not used)
-      <LTYPE> MINV               ! Maximum value in the array
+      INTEGER MINV               ! Maximum value in the array
       DOUBLE PRECISION MODEI     ! Histogram index of the mode
       INTEGER NBAD               ! Number of bad values in the histogram
       INTEGER NUMBIN             ! Number of bins in the histogram
