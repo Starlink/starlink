@@ -43,6 +43,7 @@
                 -removed guessatm, aomega, bandGHz
                 -added jy2pw, refload, refnoise
     03Jul2007 : Made obsMode/mapCoordframe enumerated types more readable (EC)
+    04Jul2007 : Added spike_t0/p0/p1/alpha to sc2sim_sim_struct (EC)
 */
 #include "libsc2sim/sc2sim_par.h"
 
@@ -168,6 +169,10 @@ struct sc2sim_sim_struct      /* parameters read from sim input file */
   double refload;             /* Reference load in pW */
   double refnoise;            /* Reference NEP in pW/sqrt(Hz) @ refload */
   double smu_terr;            /* SMU timing error */
+  double spike_alpha;         /* Index of spike p-law distribution */
+  double spike_p0;            /* Minimum spike power (Jy) */
+  double spike_p1;            /* Peak spike power (Jy) */
+  double spike_t0;            /* Mean time between bolometer spikes (s) */
   char subname[80];           /* name of subarray */
   double telemission;         /* telescope background pW per pixel */
   double telpos[3];           /* telescope W. lon/lat/altitude (deg/deg/m) */

@@ -49,6 +49,20 @@ refload=7.4
 # 6.5e-5 pW/sqrt(Hz) at 850um and 2.9e-4 pW at 450um
 refnoise=6.5e-5
 
+# Spikes: t0 = mean time between spikes in seconds, p0 is the minimum
+# power, and p1 the maximum power, in non-extinction corrected Jy, and
+# alpha is the index of a p-law distribution for the spikes: 
+# n(P) = A p^alpha where A is a scale chosen to normalize this curve
+# integrated from p0 to p1. Alpha = -1.5 roughly matches the energy
+# spectrum of cosmic ray hits detected with BLAST at an altitude of
+# about 40 km.
+
+spike_t0        = 20
+spike_p0        = 1
+spike_p1        = 1000
+spike_alpha     = -1.5
+
+
 # NO LONGER USED! 
 #
 # Wavelength-dependent parameters:

@@ -49,6 +49,8 @@
 *        -removed guessatm, aomega, bandGHz
 *        -added jy2pw, refload, refnoise
 *        Modified default values of atmyvalue and atmrefnu
+*     2007-07-04 (EC):
+*        Added cosmic ray spikes, parameters spike_p0/p1/t0/alpha
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -200,6 +202,18 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
 
    if ( !astMapGet0D ( keymap, "SMU_TERR", &(sinx->smu_terr) ) )
       sinx->smu_terr = 0.0;
+
+   if ( !astMapGet0D ( keymap, "SPIKE_ALPHA", &(sinx->spike_alpha) ) )
+      sinx->spike_alpha = -1.5;
+
+   if ( !astMapGet0D ( keymap, "SPIKE_P0", &(sinx->spike_p0) ) )
+      sinx->spike_p0 = 1.0;
+
+   if ( !astMapGet0D ( keymap, "SPIKE_P1", &(sinx->spike_p1) ) )
+      sinx->spike_p1 = 1000.0;
+
+   if ( !astMapGet0D ( keymap, "SPIKE_T0", &(sinx->spike_t0) ) )
+      sinx->spike_t0 = 20.0;
 
    if ( !astMapGet0C ( keymap, "SUBNAME", &temp ) ) 
       strncpy ( sinx->subname, "s8a", SC2SIM__FLEN );

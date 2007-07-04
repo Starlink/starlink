@@ -126,6 +126,8 @@
 *        normalized.  Now the atmosphere value sampled from these
 *        images are scaled on-the-fly by the photon noise and mean
 *        atmospheric level added on.
+*     2007-07-04 (EC):
+*        - Added cosmic ray spikes
 *       
 *     {enter_further_changes_here}
 
@@ -215,6 +217,7 @@ int *status                  /* global status (given and returned) */
    AstCmpMap *bolo2map=NULL;       /* Combined mapping bolo->map coordinates */
    AstMapping *bolo2sky=NULL;      /* Mapping bolo->celestial coordinates */
    double current;                 /* bolometer current in amps */
+   double exponent;                /* Exponent of spike power law integral */
    double flux;                    /* flux at bolometer in pW */
    double fnoise;                  /* 1/f noise value */
    int i;                          /* loop counter */
@@ -225,6 +228,7 @@ int *status                  /* global status (given and returned) */
    double sigma;                   /* photon noise standard deviation */
    double *skycoord=NULL;          /* az & el coordinates */
    double skytrans;                /* sky transmission (%) */
+   double spike;                   /* Spike value */
    double time = 0.0;              /* time from start of observation */
    int ubnd_in[2];
    double xpos;                    /* X measurement position */
@@ -329,6 +333,32 @@ int *status                  /* global status (given and returned) */
        sc2sim_getsigma( sinx.refload, sinx.refnoise, 
 			meanatm + telemission, &sigma, status );
 
+       /* Add spikes if desired. In a given sample there is approximately
+          a inx.steptime/sinx.spike_t0 chance of there being a spike. Spikes
+          probably don't correlate with opacity, so the units are
+          non-extinction corrected Jy. The brightness distribution
+          is a power-law with fixed lower and upper limits */
+
+       spike = 0;
+       if( sinx.spike_t0 != 0 ) {
+
+	 if( sinx.spike_alpha == -1 ) {
+	   *status == SAI__ERROR;
+	   errRep(FUNC_NAME, "Spike power-law alpha can't be -1.",status);
+	   spike = 0;
+	   break;
+	 } else if( (((double) rand())/((double)RAND_MAX)) <
+		    inx.steptime/sinx.spike_t0 ) {
+	   
+	   exponent = sinx.spike_alpha+1;
+	   spike = pow( (((double) rand())/((double) RAND_MAX)) *
+			( pow(sinx.spike_p1,exponent) - 
+			  pow(sinx.spike_p0,exponent) ) +
+			pow(sinx.spike_p0,exponent), 1./exponent ) *
+	     sinx.jy2pw;	   
+	 }
+       }
+
        /* Initialize atmvalue to 0 */
        atmvalue = 0;
 
@@ -377,7 +407,7 @@ int *status                  /* global status (given and returned) */
 	 /*  Add atmospheric and telescope emission.
 	     TELEMISSION is a constant value for all bolometers. 
              The 0.01 is needed because skytrans is a % */
-	 flux = 0.01 * skytrans * astvalue + atmvalue + telemission;
+	 flux = 0.01 * skytrans * astvalue + atmvalue + telemission + spike;
        }	 
 
        /*  Add photon noise */
