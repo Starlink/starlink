@@ -4,6 +4,20 @@ configure.ac
 aclocal.m4
 configure
 Makefile.in
+doc/Makefile.in
+libltdl/configure.ac
+libltdl/aclocal.m4
+libltdl/configure
+libltdl/config-h.in
+libltdl/Makefile.in
+tests/Makefile.in
+
+# Not touched for speed, don't think these are built very often.
+#mdemo/Makefile.in
+#mdemo2/Makefile.in
+#pdemo/Makefile.in
+#tagdemo/Makefile.in
+#f77demo/Makefile.in
 #cdemo/Makefile.in
 #demo/Makefile.in
 #depdemo/Makefile.in
@@ -11,11 +25,3 @@ Makefile.in
 #depdemo/l2/Makefile.in
 #depdemo/l3/Makefile.in
 #depdemo/l4/Makefile.in
-doc/Makefile.in
-#f77demo/Makefile.in
-libltdl/Makefile.in
-#mdemo/Makefile.in
-#mdemo2/Makefile.in
-#pdemo/Makefile.in
-#tagdemo/Makefile.in
-tests/Makefile.in
