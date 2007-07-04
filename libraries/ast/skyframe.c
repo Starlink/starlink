@@ -191,6 +191,10 @@ f     The SkyFrame class does not define any new routines beyond those
 *        SkyFrame contained within a CmpFrame. This involves changes in
 *        Match and the removal of the local versions of SetMaxAxes and
 *        SetMinAxes.
+*     4-JUL-2007 (DSB):
+*        Modified GetLast to use the correct solar to sidereal conversion
+*        factor. As a consequence the largest acceptable epoch gap before 
+*        the LAST needs to be recalculated has been increased.
 *class--
 */
 
@@ -2653,18 +2657,19 @@ static double GetLAST( AstSkyFrame *this ) {
 
 /* The "last" component of the SkyFrame structure holds the accurate 
    LAST at the moment in time given by the "eplast" (a TDB MJD) component 
-   of the SkyFrame structure. If the current value of hte SkyFrame's
-   Epoch attribute is not much different to "eplast" (within 0.001 of a
-   day , or 87 seconds), then the returned LAST value is the "last" value 
-   plus the difference between Epoch and "eplast", converted from solar to 
-   sidereal time, then converted to radians. If this approximation cannot
-   be used, invoke SetLast to recalculate the accurate LAST and update
-   the "eplast" and "last" values. */
+   of the SkyFrame structure. If the current value of the SkyFrame's
+   Epoch attribute is not much different to "eplast" (within 0.4 of a day), 
+   then the returned LAST value is the "last" value plus the difference 
+   between Epoch and "eplast", converted from solar to sidereal time, 
+   then converted to radians. This approximation seems to be good to less
+   than a tenth of an arcsecond. If this approximation cannot be used, 
+   invoke SetLast to recalculate the accurate LAST and update the "eplast" 
+   and "last" values. */
    if( this->eplast != AST__BAD ) {
       delta_epoch = astGetEpoch( this ) - this->eplast;
 
-      if( fabs( delta_epoch ) < 0.001 ) {
-         result = this->last + 2*AST__DPI*0.997269566*delta_epoch;
+      if( fabs( delta_epoch ) < 0.4 ) {
+         result = this->last + 2*AST__DPI*delta_epoch/0.997269566;
 
       } else {
          SetLast( this );
