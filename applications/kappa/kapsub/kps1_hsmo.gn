@@ -222,7 +222,8 @@
       END IF
 
 *  This is the optimum bin width.
-      OPTWID = 2.0D0 * ( P75 - P25 ) / DBLE( NGOOD ) ** ( 1.0D0 / 3.0D0 )
+      OPTWID = 2.0D0 * 
+     :         ( P75 - P25 ) / DBLE( NGOOD ) ** ( 1.0D0 / 3.0D0 )
 
 *  Need to take care with integer data such that the bin size must be
 *  an integer too, otherwise a sawtooth histogram could result.
@@ -255,8 +256,8 @@
 *  =================
 
 *  Find the index of the peak bin.
-      CALL KPG1_MXMN<T>( .FALSE., NUMBIN, %VAL( CNF_PVAL( HPNTR ) ), 
-     :                   NBAD, MAXV, MINV, MAXPOS, MINPOS, STATUS ) 
+      CALL KPG1_MXMNI( .FALSE., NUMBIN, %VAL( CNF_PVAL( HPNTR ) ), 
+     :                 NBAD, MAXV, MINV, MAXPOS, MINPOS, STATUS ) 
 
 *  Just check that we have a valid histogram.
       IF ( MAXV .GT. 0 .AND. STATUS .EQ. SAI__OK ) THEN
