@@ -3,6 +3,9 @@
 ## Library linking script.
 dist_bin_SCRIPTS = cfitsio_link
 
+## Create the imcopy, fitscopy and listhead binaries, very useful.
+bin_SCRIPTS = cfitsio/imcopy cfitsio/fitscopy cfitsio/listhead
+
 ## XXX what about libtool and shareable versions? Different file types.
 lib_LIBRARIES = cfitsio/libcfitsio.a
 
@@ -33,6 +36,16 @@ $(include_HEADERS) $(EXAMPLE_SOURCES):
 cfitsio/libcfitsio.a:
 	(cd cfitsio; export CFLAGS; unset CFLAGS; $(MAKE))
 
+# The utility programs are created by cfitsio.
+cfitsio/imcopy: cfitsio/imcopy.c cfitsio/libcfitsio.a
+	(cd cfitsio; make imcopy )
+
+cfitsio/fitscopy: cfitsio/fitscopy.c cfitsio/libcfitsio.a
+	(cd cfitsio; make fitscopy )
+
+cfitsio/listhead: cfitsio/listhead.c cfitsio/libcfitsio.a
+	(cd cfitsio; make listhead )
+
 #  Clean recurses into cfitsio.
 clean-local:
 	(cd cfitsio; make clean )
@@ -50,7 +63,7 @@ dist-hook:
 	rm -rf `find $(distdir) -name CVS`
 	(cd $(distdir)/cfitsio; make distclean);
 
-# Run the cfitsio test. 
+# Run the cfitsio test.
 check:
 	(cd cfitsio; \
 	make testprog; \

@@ -15,3 +15,7 @@
  HEASARC at the NASA Goddard Space Flight Center for permission to release 
  CFITSIO with the Starlink software.
 
+ 05-JUL-2007:
+ 
+ The utility programs "imcopy", "fitscopy" and "listhead" are now built
+ and installed by default.
