@@ -64,11 +64,14 @@
 *        Add GRIDSTEP keyword
 *     2007-04-05 (AGG):
 *        Change OBSMODE to SAM_MODE
+*     2007-07-05 (AGG):
+*        Add status check before accessing gridext pointer to ensure
+*        smooth error reporting
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2006-2007 University of British Columbia. All
+*     Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -339,9 +342,11 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
 				 "_INTEGER", 1, lbnd, ubnd, status);
 	ndfMap( gridndf, "DATA", "_INTEGER", "WRITE", &gridext, &nelem, 
 		status);
-	/* Copy gridminmax into gridext */
-	for (j=0; j<nelem; j++) {
-	  gridext[j] = gridminmax[j];
+	/* If all is well, copy gridminmax into gridext */
+	if ( *status == SAI__OK ) {
+	  for (j=0; j<nelem; j++) {
+	    gridext[j] = gridminmax[j];
+	  }
 	}
 	/* Write grid size into output file */
 	ndfXpt0d( gridstep, ofile->ndfid, "DREAM", "GRID_SIZE", status);
