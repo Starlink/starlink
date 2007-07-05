@@ -51,6 +51,8 @@
 *        Split from dsim.c
 *     2007-04-04 (AGG):
 *        Wrap out-of-range indices
+*     2007-07-05 (AGG):
+*        Allow for multiple wraps
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -123,17 +125,17 @@ int *status          /* global status (given and returned) */
 
    /* Since ATM image has periodic boundary conditions, we can just
       return to the lower edge of the image if we go outside */
-   if ( ixpix+1 >= size ) {
+   if ( ixpix > size ) {
      nwraps = ixpix / size;
-     ixpix -= (size - 2);
+     ixpix -= (nwraps*(size) - 1);
    }
-   if ( iypix+1 >= size ) {
+   if ( iypix > size ) {
      nwraps = iypix / size;
-     iypix -=  (size - 2);
+     iypix -=  (nwraps*(size) - 1);
    }
 
-   if ( ( ixpix > 0 ) && ( ixpix+1 < size ) &&
-        ( iypix > 0 ) && ( iypix+1 < size ) ) {
+   if ( ( ixpix > 0 ) && ( ixpix <= size ) &&
+        ( iypix > 0 ) && ( iypix <= size ) ) {
       a = image [ ixpix + size*iypix ];
       b = image [ ixpix+1 + size*iypix ];
       c = image [ ixpix + size*(iypix+1) ];
@@ -149,7 +151,7 @@ int *status          /* global status (given and returned) */
       *status = SAI__ERROR;
       msgSeti("XPIX", ixpix);
       msgSeti("YPIX", iypix);
-      errRep( FUNC_NAME, "data point outside image ^XPIX ^YPIX", status);
+      errRep( FUNC_NAME, "Data point outside image ^XPIX ^YPIX", status);
    }
 
 }
