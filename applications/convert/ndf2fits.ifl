@@ -25,6 +25,8 @@
 #        Added ENCODING.
 #     2006 April 5 (MJC):
 #        Added CONTAINER and MERGE.
+#     2007 July 6 (MJC):
+#        Added CHECKSUMS.
 #     {enter_further_changes_here}
 
 #-
@@ -42,6 +44,14 @@ interface NDF2FITS
       helpkey     '*'
 #     in          'N', '-1', '0', '8', '16', '32', '-32', '-64'
       default     '0'
+   endparameter
+
+   parameter      CHECKSUM       # Write CHECKSUM and DATASUM headers?
+      type        '_LOGICAL'
+      prompt      'Write CHECKSUM and DATASUM headers?'
+      vpath       'DEFAULT'
+      default     TRUE
+      helpkey     '*'
    endparameter
 
    parameter      COMP           # Data, quality or variance?

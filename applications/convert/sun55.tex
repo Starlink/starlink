@@ -23,10 +23,10 @@
                                 A.J.Chipperfield\\
                                 D.S.Berry\\
                                 A.C.Davenhall}
-\newcommand{\stardocdate}      {2007 March 14}
+\newcommand{\stardocdate}      {2007 July 6}
 \newcommand{\stardoctitle}     {CONVERT\\
                                 A Format-conversion Package}
-\newcommand{\stardocversion}   {Version 1.5-9}
+\newcommand{\stardocversion}   {Version 1.5-10}
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {
 The \CONVERT\ package contains utilities for converting data files
@@ -4225,6 +4225,13 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          \texttt{[0]}
       }
       \sstsubsection{
+         CHECKSUM = \_LOGICAL (Read)
+      }{
+         If \texttt{TRUE}, each header and data unit in the FITS file will
+         contain the integrity-check keywords CHECKSUM and DATASUM 
+         immediately before the END card.  \texttt{[TRUE]}
+      }
+      \sstsubsection{
          COMP = LITERAL (Read)
       }{
          The list of array components to attempt to transfer to each
@@ -7153,5 +7160,11 @@ behaves as if BITPIX=\texttt{-1} were specified.
 value of \texttt{"FITS-WCS(CD)"}.  This is the same as
 \texttt{"FITS-WCS"} except that it uses the old CD matrix formalism 
 to describe the data array's rotation and scaling.
+
+\section{Release Notes -- V1.5-10}
+
+\htmlref{NDF2FITS}{NDF2FITS} writes integrity check keywords CHECKSUM
+and DATASUM at the end of each header if new parameter CHECKSUMS is 
+\texttt{TRUE}.
 
 \end{document}

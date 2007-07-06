@@ -67,6 +67,10 @@
 *        be in the file may be used.  If more than one line is required
 *        to enter the information at a prompt then place a "-" at the
 *        end of each line where a continuation line is desired.  [0]
+*     CHECKSUM = _LOGICAL (Read)
+*        If TRUE, each header and data unit in the FITS file will
+*        contain the integrity-check keywords CHECKSUM and DATASUM
+*        immediately before the END card.  [TRUE]
 *     COMP = LITERAL (Read)
 *        The list of array components to attempt to transfer to each
 *        FITS file.  The acceptable values are "D" for the main data
@@ -540,6 +544,8 @@
 *        special values.
 *     14-MAR-2004 (DSB):
 *        Added FITS-WCS(CD) encoding.
+*     2007 July 6 (MJC):
+*        Added CHECKSUM parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -586,6 +592,7 @@
       CHARACTER * ( 3 ) CBP      ! Character form of a BITPIX value
       LOGICAL CFLAG              ! A group requires further input via 
                                  ! continuation lines?
+      LOGICAL CHECKS             ! Write CHECKSUM and DATASUM headers?
       CHARACTER * ( DAT__SZLOC ) CLOC ! Locator to a component
       CHARACTER * ( DAT__SZNAM ) CNAME ! Component name
       CHARACTER * ( DAT__SZNAM ) CTYPE ! Component type
@@ -1038,6 +1045,9 @@
 *  Determine whether or not the HISTORY component is to be propagated.
       CALL PAR_GET0L( 'PROHIS', PROHIS, STATUS )
 
+*  Determine whether or not the integrity headers are to be written.
+      CALL PAR_GET0L( 'CHECKSUM', CHECKS, STATUS )
+
 *  Abort if there has been an error.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -1346,7 +1356,8 @@
 *  Finally convert the NDF to the FITS file, as best we can.
                CALL COF_NDF2F( NDF, FILNAM, NAPRES, ARRPRE, BITPIX, 
      :                         BLOCKF, ORIGIN, PROFIT, PROEXT, PROHIS,
-     :                         ENCOD, NATIVE, FOPEN, FCLOSE, STATUS )
+     :                         CHECKS, ENCOD, NATIVE, FOPEN, FCLOSE, 
+     :                         STATUS )
 
 *  There are no arrays to transfer to the FITS file for the .HEADER
 *  NDF.
@@ -1359,15 +1370,16 @@
 *  we are not processing a data array for the header NDF.
 
 *  Convert the NDF to the FITS file.
-               CALL COF_NDF2F( NDF, FILNAM, 1, 'HEADER', -32,
-     :                         BLOCKF, ORIGIN, PROFIT, PROEXT, PROHIS, 
+               CALL COF_NDF2F( NDF, FILNAM, 1, 'HEADER', -32, BLOCKF,
+     :                         ORIGIN, PROFIT, PROEXT, PROHIS, CHECKS,
      :                         ENCOD, NATIVE, FOPEN, FCLOSE, STATUS )
             ELSE
 
 *  Convert the NDF to the FITS file.
                CALL COF_NDF2F( NDF, FILNAM, NAPRES, ARRPRE, BITPIX,
-     :                         BLOCKF, ORIGIN, PROFIT, PROEXT, PROHIS, 
-     :                         ENCOD, NATIVE, FOPEN, FCLOSE, STATUS )
+     :                         BLOCKF, ORIGIN, PROFIT, PROEXT, PROHIS,
+     :                         CHECKS, ENCOD, NATIVE, FOPEN, FCLOSE, 
+     :                         STATUS )
             END IF
  
 *  Tidy the NDF.

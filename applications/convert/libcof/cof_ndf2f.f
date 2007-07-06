@@ -1,5 +1,5 @@
       SUBROUTINE COF_NDF2F( NDF, FILNAM, NOARR, ARRNAM, BITPIX, BLOCKF,
-     :                      ORIGIN, PROFIT, PROEXT, PROHIS, ENCOD, 
+     :                      ORIGIN, PROFIT, PROEXT, PROHIS, SUMS, ENCOD, 
      :                      NATIVE, FOPEN, FCLOSE, STATUS )
 *+
 *  Name:
@@ -66,6 +66,9 @@
 *        If .TRUE., any NDF history records are written to the primary
 *        FITS header as HISTORY cards.  These follow the mandatory
 *        headers and any merged FITS-extension headers (see PROFIT).
+*     SUMS = LOGICAL (Given)
+*        If .TRUE., DATASUM and CHECKSUM headers are written to each
+*        HDU.
 *     ENCOD = CHARACTER * ( * ) (Given)
 *        The encoding to use. If this is blank, then a default encoding 
 *        is chosen based on the contents of the FITS extension. The
@@ -249,6 +252,9 @@
 *     2007 January 5 (MJC):
 *        Allowed propagation of scaled arrays, selected if BITPIX set to
 *        the new special value of 1.
+*     2007 July 6 (MJC):
+*        Write CHECKSUM and DATASUM headers if new argument SUMS is
+*        .TRUE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -278,6 +284,7 @@
       LOGICAL PROFIT
       LOGICAL PROEXT
       LOGICAL PROHIS
+      LOGICAL SUMS
       CHARACTER * ( * ) ENCOD
       LOGICAL NATIVE
       LOGICAL FOPEN
@@ -596,6 +603,7 @@
             CALL NDF_STATE( NDF, 'History', HISPRE, STATUS )
             IF ( HISPRE ) CALL COF_WHISR( NDF, FUNIT, STATUS )
          END IF
+
          IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Determine the block-floating point conversion and blank value.
@@ -996,6 +1004,10 @@
             CALL NDF_UNMAP( NDF, ARRNAM( ICOMP ), STATUS )
 
          END IF
+
+*  Write integrity-check headers.
+         IF ( SUMS ) CALL FTPCKS( FUNIT, STATUS )
+
       END DO
 
 *  Process extensions.
@@ -1053,6 +1065,9 @@
                      CALL COF_2DFEX( XNAME, XLOC, FUNIT, STATUS )
 
                   END IF
+
+*  Write integrity-check headers.
+                  IF ( SUMS ) CALL FTPCKS( FUNIT, STATUS )
 
 *  Annul the locator so it may be reused.
                   CALL DAT_ANNUL( XLOC, STATUS )
