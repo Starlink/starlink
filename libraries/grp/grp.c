@@ -56,10 +56,14 @@
 *        Add grpIndex
 *     20-NOV-2006 (DSB):
 *        Add grpSetcs
+*     6-JUL-2006 (DSB):
+*        Use "const Grp *" pointers for group parameters that are not
+*        changed by the changed by the called function.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -223,7 +227,7 @@ static int grpSlot( int igrp, int *status ){
 
 F77_SUBROUTINE(grp_grpsz)( INTEGER(IGRP), INTEGER(SIZE), INTEGER(STATUS) );
 
-void grpGrpsz( Grp *grp, int *size, int *status ){
+void grpGrpsz( const Grp *grp, int *size, int *status ){
    DECLARE_INTEGER(IGRP);
    DECLARE_INTEGER(SIZE);
    DECLARE_INTEGER(STATUS);
@@ -274,7 +278,7 @@ F77_SUBROUTINE(grp_get)( INTEGER(IGRP), INTEGER(INDEX), INTEGER(SIZE),
    string for which a pointer has been supplied in "names". This length
    should include room for the trailing null. */
 
-void grpGet( Grp *grp, int index, int size, char *const *names, int len, 
+void grpGet( const Grp *grp, int index, int size, char *const *names, int len, 
              int *status ){
    DECLARE_INTEGER(IGRP);
    DECLARE_INTEGER(INDEX);
@@ -310,7 +314,7 @@ F77_SUBROUTINE(grp_valid)( INTEGER(IGRP),
                            LOGICAL(VALID),
                            INTEGER(STATUS) );
 
-void grpValid( Grp *grp, int *valid, int *status ){
+void grpValid( const Grp *grp, int *valid, int *status ){
    DECLARE_INTEGER(IGRP);
    DECLARE_LOGICAL(VALID);
    DECLARE_INTEGER(STATUS);
@@ -400,7 +404,7 @@ F77_SUBROUTINE(grp_infoi)(INTEGER(IGRP),
 			  INTEGER(STATUS)
 			  TRAIL(ITEM));
 
-void grpInfoi( Grp *grp, int index, const char *item, int *value, 
+void grpInfoi( const Grp *grp, int index, const char *item, int *value, 
 	       int *status) {
   DECLARE_INTEGER(IGRP);
   DECLARE_INTEGER(INDEX);
@@ -432,7 +436,7 @@ F77_SUBROUTINE(grp_infoc)( INTEGER(igrp), INTEGER(index),
                            CHARACTER(item), CHARACTER(value),
                            INTEGER(status) TRAIL(item) TRAIL(value) );
 
-void grpInfoc( Grp *grp, int index, const char *item, char *value, 
+void grpInfoc( const Grp *grp, int index, const char *item, char *value, 
 	       size_t value_len, int *status) {
   DECLARE_INTEGER(IGRP);
   DECLARE_INTEGER(INDEX);

@@ -49,10 +49,14 @@
 *        Add grpIndex
 *     20-NOV-2006 (DSB):
 *        Add grpSetcs
+*     6-JUL-2006 (DSB):
+*        Use "const Grp *" pointers for group parameters that are not
+*        changed by the changed by the called function.
 
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -117,13 +121,13 @@ typedef struct Grp Grp;
 Grp * grpCopy( const Grp *, int, int, int, int * );
 void grpDelet( Grp **, int * );
 void grpGrpex( const char *, const Grp *, Grp *, int *, int *, int *, int * );
-void grpGrpsz( Grp *, int *, int * );
-void grpGet( Grp *, int, int, char *const *, int, int * );
-void grpInfoc( Grp *, int , const char *, char *, size_t, int * );
-void grpInfoi( Grp *, int, const char *, int *, int * );
+void grpGrpsz( const Grp *, int *, int * );
+void grpGet( const Grp *, int, int, char *const *, int, int * );
+void grpInfoc( const Grp *, int , const char *, char *, size_t, int * );
+void grpInfoi( const Grp *, int, const char *, int *, int * );
 Grp *grpNew( const char *, int * );
 void grpPut1( Grp *, const char *, int, int * );
-void grpValid( Grp *, int *, int * );
+void grpValid( const Grp *, int *, int * );
 void grpIndex( const char *, const Grp *, int, int *, int * );
 void grpSetcs( Grp *, int, int * );
 
