@@ -42,6 +42,8 @@
 *  History:
 *     2007-07-05 (TIMJ):
 *        Initial version.
+*     2007-07-06 (TIMJ):
+*        Strip path from filename
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -79,12 +81,16 @@
 #include "ast.h"
 #include "merswrap.h"
 
+#include <string.h>
+
 void
 smf_accumulate_prov( AstKeyMap * prvmap, const smfFile * file, const Grp* igrp,
                 int index, int * status ) {
 
-  char filename[GRP__SZNAM + 1];    /* name of file from Grp */
-  char *pname = NULL;         /* pointer to start of name */
+  char filename[GRP__SZNAM + 1];    /* buffer for filename */
+  char *pname = NULL;               /* pointer to start of name */
+  size_t flen;                      /* Length of filename */
+  int i;                            /* Counter */
 
   if ( *status != SAI__OK ) return;
 
@@ -92,7 +98,9 @@ smf_accumulate_prov( AstKeyMap * prvmap, const smfFile * file, const Grp* igrp,
     /* Look at the smfFile struct */
     if (file->name) {
       /* Look for name inside smfFile */
-      pname = file->name;
+      strncpy( filename, file->name, GRP__SZNAM);
+      filename[GRP__SZNAM] = '\0';
+      pname = filename;
     }
   }
 
@@ -107,10 +115,29 @@ smf_accumulate_prov( AstKeyMap * prvmap, const smfFile * file, const Grp* igrp,
   if (pname == NULL && *status == SAI__OK) {
     *status = SAI__ERROR;
     errRep( "", "Unable to determine filename for provenance tracking", status );
+    return;
   }
 
   /* Need to strip directory information and any file suffix that may have crept
      in */
+  flen = strlen( pname );
+  
+  /* Look for extension - truncate at first "." */
+  for (i = flen; i > 0 ; i--) {
+    if ( filename[i] == '.' ) {
+      filename[i] = '\0';
+      flen = strlen( filename );
+      break;
+    }
+  }
+
+  /* Remove directory path */
+  for (i = flen; i > 0; i-- ) {
+    if ( filename[i] == '/' && i < flen) {
+      pname = &(filename[i+1]);
+      break;
+    }
+  }
 
   /* Store it in the keymap */
   astMapPut0I( prvmap, pname, 1, NULL );
