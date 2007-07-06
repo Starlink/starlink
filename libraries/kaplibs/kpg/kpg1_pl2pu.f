@@ -24,7 +24,7 @@
 *     the structure are written as DOUBLE PRECISION.
 *
 *     It is assumed the calling programme has a one-dimensional array of
-*     coefficients, where COEFF( (IX-1)*NYPAR + IY ) contains the
+*     coefficients, where COEFF( ( IX - 1 ) * NYPAR + IY ) contains the
 *     coefficient for the (IX,IY)th term (with NYPAR being the total
 *     number of Y terms).  Such a one-dimensional array is used by the
 *     NAG routines and defined in the NAG manual (see Chapter E02 on
@@ -39,7 +39,7 @@
 *     XMAX, YMIN and YMAX.  Note that these are compulsory when
 *     VARNT='CHEBYSHEV' but optional when VARNT='SIMPLE'.  In the latter
 *     case the logical parameter LIMITS will be used to decide whether
-*     to write the limits.
+*     to write the limits.  All the components have type _DOUBLE.
 
 *  Arguments:
 *     LOC = CHARACTER * ( DAT__SZLOC ) (Given)
@@ -155,21 +155,21 @@
       DOUBLE PRECISION COEFF( NXPAR * NYPAR )
       DOUBLE PRECISION VARIAN( NXPAR * NYPAR )
 
-*  Arguments returned:
+*  Arguments Returned:
       DOUBLE PRECISION WORK( NXPAR, NYPAR )
 
 *  Status:
       INTEGER STATUS
 
-*  External references:
+*  External References:
       INTEGER CHR_LEN            ! Character length determining function
 
-*  Local constants:
+*  Local Constants:
       INTEGER MAXDIM             ! Only two-dimensional polynomials can
                                  ! be handled
       PARAMETER ( MAXDIM = 2 )
 
-*  Local variables:
+*  Local Variables:
       INTEGER CLEN               ! Character length
       INTEGER DIM( MAXDIM )      ! Dimensions of coefficients array
       INTEGER IX                 ! Loop counter
