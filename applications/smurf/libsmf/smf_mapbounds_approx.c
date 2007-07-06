@@ -83,6 +83,8 @@
 *     2007-07-05 (TIMJ):
 *        Protect a strcmp AZEL comparison because astGetC can return
 *        NULL pointer.
+*     2007-07-06 (AGG):
+*        Remove attempts to retrieve non-existent FITS headers
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -249,11 +251,7 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
       /* 84 comes from 2 x 40 detectors + 4 inter-sub-array gap */
       mapwdth = sqrt(2.0) * 84 * bolospacing * cos( (AST__DPIBY2/2.0) - theta);
       maphght = mapwdth;
-    }
-    /* Retrieve RA, Dec from header */
-    smf_fits_getD( hdr, "RA", &lon_0, status );
-    smf_fits_getD( hdr, "DEC", &lat_0, status );
-
+    }    
     smf_fits_getD( hdr, "MAP_X", &mapx, status );
     smf_fits_getD( hdr, "MAP_Y", &mapy, status );
     smf_fits_getD( hdr, "INSTAP_X", &instapx, status );
