@@ -74,6 +74,8 @@
 *        Write an output FITS header
 *     2007-06-22 (TIMJ):
 *        Rework to handle PRV* as well as OBS*
+*     2007-07-05 (TIMJ):
+*        Fix provenance file name handling.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -218,7 +220,7 @@ void smurf_qlmakemap( int *status ) {
     /* Store the filename in the keymap for later - the GRP would be fine
        as is but we use a keymap in order to reuse smf_fits_add_prov */
     if (*status == SAI__OK)
-      astMapPut0I( prvkeymap, data->file->name, 1, NULL );
+      smf_accumulate_prov( prvkeymap, data->file, igrp, i, status );
 
     /* Handle output FITS header creation */
     smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obsidmap, status );

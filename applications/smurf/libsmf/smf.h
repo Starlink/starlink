@@ -162,6 +162,8 @@
 *        Add smf_model_NDFexport
 *     2007-06-22 (TIMJ):
 *        Add string arg to smf_fits_add_prov
+*     2007-07-05 (TIMJ):
+*        Add smf_accumulate_prov.
 *     {enter_further_changes_here}
 
 *  Copyright:
