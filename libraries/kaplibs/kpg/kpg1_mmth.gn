@@ -2,7 +2,7 @@
      :                         MINMUM, MAXPOS, MINPOS, STATUS )
 *+
 *  Name:
-*     KPG1_MXMNx
+*     KPG1_MMTHx
 
 *  Purpose:
 *     Returns the maximum and minimum values of an array within
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation
-*     CALL KPG1_MXMNx( BAD, EL, ARRAY, THRESH, NINVAL, MAXMUM,
-*    :                 MINMUM, MAXPOS, MINPOS, STATUS )
+*     CALL KPG1_MMTHx( BAD, EL, ARRAY, THRESH, NINVAL, MAXMUM,
+*                      MINMUM, MAXPOS, MINPOS, STATUS )
 
 *  Description:
 *     This routine returns the maximum and minimum values of an input

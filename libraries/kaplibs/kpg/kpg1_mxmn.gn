@@ -12,7 +12,7 @@
 
 *  Invocation
 *     CALL KPG1_MXMNx( BAD, EL, ARRAY, NINVAL, MAXMUM,
-*    :                 MINMUM, MAXPOS, MINPOS, STATUS )
+*                      MINMUM, MAXPOS, MINPOS, STATUS )
 
 *  Description:
 *     This routine returns the maximum and minimum values of an input
