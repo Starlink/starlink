@@ -64,6 +64,7 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -79,6 +80,9 @@
 *     2007-02-26 (AGG):
 *        New calculation of map bounds including when the input map
 *        sizes are zero (assumed to be from stare/dream data)
+*     2007-07-05 (TIMJ):
+*        Protect a strcmp AZEL comparison because astGetC can return
+*        NULL pointer.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -392,14 +396,18 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
      handedness. Note lon_0 and lat_0 will already be in degrees
      (unlike smf_mapbounds). */
   fitschan = astFitsChan ( NULL, NULL, "" );
-  if ( !strcmp( astGetC( skyframe, "SYSTEM" ), "AZEL" ) ) {
-    sc2ast_makefitschan( 0.0, 0.0, (pixsize*DAS2D), (pixsize*DAS2D),
-			 lon_0, lat_0,
-			 "AZ---TAN", "EL---TAN", fitschan, status );
-  } else {
-    sc2ast_makefitschan( 0.0, 0.0, (-pixsize*DAS2D), (pixsize*DAS2D),
-			 lon_0, lat_0,
-			 "RA---TAN", "DEC--TAN", fitschan, status );
+  if (*status == SAI__OK) {
+    /* Need to protect strcmp with status because astGetC can return
+       NULL pointer and on some systems that causes a SEGV in strcmp */
+    if ( !strcmp( astGetC( skyframe, "SYSTEM" ), "AZEL" ) ) {
+      sc2ast_makefitschan( 0.0, 0.0, (pixsize*DAS2D), (pixsize*DAS2D),
+			   lon_0, lat_0,
+			   "AZ---TAN", "EL---TAN", fitschan, status );
+    } else {
+      sc2ast_makefitschan( 0.0, 0.0, (-pixsize*DAS2D), (pixsize*DAS2D),
+			   lon_0, lat_0,
+			   "RA---TAN", "DEC--TAN", fitschan, status );
+    }
   }
   astClear( fitschan, "Card" );
   fs = astRead( fitschan );
