@@ -538,8 +538,10 @@
 *        input spectra there were in total.
 *     8-MAY-2007 (DSB):
 *        Change default BADMASK to "OR".
-*     2007-06-22 (TIMJ):
+*     22-JUN-2007 (TIMJ):
 *        Rework to handle PRV* as well as OBS*
+*     06-JUL-2007 (TIMJ):
+*        Use smf_accumulate_prov
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
