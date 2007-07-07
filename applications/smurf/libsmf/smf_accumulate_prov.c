@@ -122,16 +122,18 @@ smf_accumulate_prov( AstKeyMap * prvmap, const smfFile * file, const Grp* igrp,
      in */
   flen = strlen( pname );
   
-  /* Look for extension - truncate at first "." */
+  /* Look for extension - truncate at first "." and break at first "/" */
   for (i = flen; i > 0 ; i--) {
     if ( filename[i] == '.' ) {
       filename[i] = '\0';
       flen = strlen( filename );
       break;
+    } else if ( filename[i] == '/') {
+      break;
     }
   }
 
-  /* Remove directory path */
+  /* Remove directory path (inefficient loop through the string a second time) */
   for (i = flen; i > 0; i-- ) {
     if ( filename[i] == '/' && i < flen) {
       pname = &(filename[i+1]);
