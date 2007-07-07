@@ -1244,7 +1244,7 @@ void smurf_makecube( int *status ) {
 
 /* Store the filename in the keymap for later - the GRP would be fine
    as is but we use a keymap in order to reuse smf_fits_add_prov */
-      astMapPut0I( prvkeymap, pname, 1, NULL );
+      smf_accumulate_prov( prvkeymap, data->file, NULL, 0, status );
 
 /* Check that the input data type is single precision. */
       if( data->dtype != SMF__FLOAT ) {
