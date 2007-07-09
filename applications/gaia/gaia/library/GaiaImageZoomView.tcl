@@ -146,6 +146,13 @@ itcl::class gaia::GaiaImageZoomView {
       rtd::RtdImageZoomView::enter_image $image
    }
 
+   #  Reset adaptive zoom when leaving image, so it is not reused
+   #  without being updated.
+   public method leave_image {image} {
+      set factor_ $itk_option(-factor)
+      RtdImageZoomView::leave_image $image
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
    
