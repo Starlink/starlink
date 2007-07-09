@@ -135,9 +135,6 @@ void sc2sim_smupath ( int nvert, double vertex_t, int jig_vert[][2],
 
    if ( !StatusOkP(status) ) return;
 
-   /* Convert steptime to millisec for this routine */
-   /*   steptime *= 1000.0;*/
-
    /* Make the number of positions in the Jiggle Path, and check the size */
    np = nppp * nvert;
 
