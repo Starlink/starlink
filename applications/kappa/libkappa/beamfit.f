@@ -338,7 +338,7 @@
 *        latitude axis if that Frame is in the SKY Domain, or the first
 *        axis otherwise.  The error is derived entirely from the
 *        uncertainities in the fitted position of the primary beam,
-*        i.e. the reference position has no error attasched to it.  By
+*        i.e. the reference position has no error attached to it.  By
 *        definition the error is zero when FIXPOS is TRUE.
 *     REFPOS = LITERAL (Read)
 *        The reference position.  The offset of the primary beam with
@@ -512,6 +512,9 @@
 *     2007 June 15 (MJC):
 *        Added parameters REFPOS and REFOUT, and Ellipse option to
 *        MARK.
+*     2007 July 9 (MJC):
+*        Do not ignore SkyRef attribute for the reference position when 
+*        the SkyRefIs attribute is set to Ignored.
 *     {enter_further_changes_here}
 
 *-
@@ -1011,7 +1014,7 @@
 
 *  Extract the co-ordinates of the reference position in the current
 *  Frame.  These are in radians.
-         ELSE IF ( SKYREF .NE. 'Ignored' ) THEN
+         ELSE
             DO I = 1, BF__NDIM
                ATT = 'SkyRef('
                NC = 7
