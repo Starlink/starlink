@@ -4,7 +4,7 @@
 *     smf_average_data
 
 *  Purpose:
-*     Store a 2-D image inside a SCU2RED extension
+*     Average SCUBA-2 timestream data
 
 *  Language:
 *     Starlink ANSI C
@@ -13,14 +13,14 @@
 *     Library routine
 
 *  Invocation:
-*     smf_average_data( const smfData *data, const int start,  int nslice, 
+*     smf_average_data( const smfData *data, int start,  int nslice, 
 *                       const int interval, double **avdata, size_t *nelem,
 *                       int *status);
 
 *  Arguments:
 *     data = const smfData * (Given)
 *        Input data
-*     start = const int (Given)
+*     start = int (Given)
 *        Index of starting time slice
 *     nslice = int (Given)
 *        Number of time slices to average together
@@ -34,7 +34,6 @@
 *        Pointer to global status.
 
 *  Description: 
-
 *     This routine....  For DREAM data, interval should be set to the
 *     number of samples per cycle (nsampsycle); for STARE it should be
 *     1.
@@ -43,7 +42,7 @@
 *     start to the desired starting index.
 *
 *     To average the whole time series into a single frame, set nslice
-*     to 0.
+*     to 0, irrespective of the value of interval.
 
 *  Notes:
 
@@ -55,11 +54,14 @@
 *  History:
 *     2006-08-21 (AGG):
 *        Initial version
+*     2007-07-06 (AGG):
+*        - Ignore bad values
+*        - Check averaging window is a factor of the number of samples
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2006-2007 University of British Columbia. All
+*     Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -113,15 +115,18 @@
 
 #define FUNC_NAME "smf_average_data"
 
-void smf_average_data( const smfData *data, const int start,  int nslice, 
+void smf_average_data( const smfData *data, int start,  int nslice, 
 		       const int interval, double **avdata, size_t *nelem, int *status) {
 
-  int base;
+  int base;                 /* Base index */
+  double currentdata;       /* Value of current data point */
   int i;                    /* Loop counter */
   int j;                    /* Loop counter */
   int k;                    /* Loop counter */
+  int lastslice;            /* Index of the last time slice in the current sum */
   int nbol;                 /* Number of data points per timeslice (bolometers) */
   int nframes;              /* Number of time slices in input data */
+  int nsamples;             /* Number of time slices in the average */
   int noutslice = 1;        /* Number of output time slices */
   int offset;               /* Offset into output array for current data value */
   double sum;               /* Sum of input data */
@@ -159,6 +164,7 @@ void smf_average_data( const smfData *data, const int start,  int nslice,
   if ( nslice < 1 || nslice > nframes ) {
     if ( nslice == 0 ) {
       nslice = nframes;
+      start = 0;
     } else {
       if ( *status == SAI__OK ) {
 	*status = SAI__ERROR;
@@ -189,14 +195,23 @@ void smf_average_data( const smfData *data, const int start,  int nslice,
   /* Also calculate the number of elements in the output data */
   if ( interval != 1 ) {
     noutslice = nframes / nslice;
-    /*    if ( interval * nslice != nframes ) {
-      msgSeti("T", nframes);
-      msgSeti("N", nslice);
-      msgSeti("I", interval);
-      msgSeti("P", nslice*interval);
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Inconsistent request: the number of slices to average (^N) multiplied by the interval between slices (^I) is not equal to the number of time slices in the input data (^P != ^T)", status);
-      }*/
+    /* Add 1 to the number of output slices if nslice is not a factor
+       of nframes */
+    if ( noutslice != nframes%nslice ) {
+      /* Tell user - would be good to store this knowledge in the
+	 output file somehow */
+      msgSeti("S",nslice);
+      msgSeti("N",noutslice);
+      msgSeti("F",nframes);
+      msgOutif(MSG__VERB, FUNC_NAME, 
+	       "Warning: time stream does not contain an integer number of output time slices: noutslice * nslice (^N * ^S) != nframes (^F)", 
+	       status);
+      msgOutif(MSG__VERB, FUNC_NAME, 
+	       "The final image will be made up from fewer samples than the rest", 
+	       status);
+      /* Increment the number of output slices */
+      noutslice++;
+    }
   } else {
     noutslice = interval;
   }
@@ -214,16 +229,26 @@ void smf_average_data( const smfData *data, const int start,  int nslice,
     /* Begin by looping over the number of output time slices */
     for ( i=0; i<noutslice; i++ ) {
       offset = i*nbol;
+      if (i == noutslice - 1) {
+	lastslice = nframes;
+      } else {
+	lastslice = base + nslice;
+      }
       /* Then for each element in the current output time slice.... */
       for ( j=0; j<nbol; j++ ) {
 	sum = 0.0;
+	nsamples = 0;
 	/* Sum all the contributions from that element in the desired
 	   range of time slices */
-	for ( k=base; k<base+nslice; k++ ) {
-	  sum += tstream[j + k*nbol];
+	for ( k=base; k<lastslice; k++ ) {
+	  currentdata = tstream[j + k*nbol];
+	  if ( currentdata != VAL__BADD ) {
+	    sum += currentdata;
+	    nsamples++;
+	  }
 	}
 	/* Calculate the average and store it in the output array */
-	sum /= nslice;
+	sum /= nsamples;
 	(*avdata)[j + offset] = sum;
       }
     }
