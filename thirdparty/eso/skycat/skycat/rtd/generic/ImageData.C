@@ -52,6 +52,11 @@
  * Peter W. Draper 08/01/07  Return a fake range in autoSetCutLevels for a
  *                           one pixel image. 
  * pbiereic        09/10/05  fixed bug in 'getYline4'
+ * Peter W. Draper 09/09/07  changed getIndex to not use a correction when
+ *                           zoomed at factor 1 or less. Looking at a 1x1
+ *                           image this gives a 1/2 pixel border where
+ *                           the value is reported (previously this was
+ *                           asymmetric).
  */
 static const char* const rcsId="@(#) $Id: ImageData.C,v 1.1.1.1 2006/01/12 16:38:59 abrighto Exp $";
 
@@ -907,8 +912,8 @@ int ImageData::getIndex(double x, double y, int& ix, int& iy)
 {
     // get integer index in raw image for pixel value
     if (xScale_ > 1) {
-	ix = int(x-0.5);
-	iy = int(y-0.5);
+	ix = int(x-1.0);
+	iy = int(y-1.0);
     } 
     else {
 	ix = int(x-1.0);
