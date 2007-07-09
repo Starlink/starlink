@@ -27,6 +27,9 @@
 /* include tclInt.h for access to namespace API */
 /*#include "tclInt.h"*/
 
+/* Define Blt_Init prototype */
+int Blt_Init( Tcl_Interp *interp );
+
 #ifdef TK_TEST
 EXTERN int		Tktest_Init _ANSI_ARGS_((Tcl_Interp *interp));
 #endif /* TK_TEST */
