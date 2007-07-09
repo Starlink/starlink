@@ -134,6 +134,9 @@
 *     2007 June 20 (MJC):
 *        Apply MSG tuning regardless of the Frame.  Correct non-SKY
 *        SENSE.
+*     2007 July 9 (MJC):
+*        For a SkyFrame report centre errors in arcseconds instead of
+*        sexagesimal. 
 *     {enter_further_changes_here}
 
 *-
@@ -274,8 +277,9 @@
      :                                          STATUS ) )
 
 *  It would be messy inserting both of the expected sexagesimal formats.
+*  Report errors in arcseconds.
             ELSE
-               CALL MSG_SETC( 'UNIT', ' ' )
+               CALL MSG_SETC( 'UNIT', 'arcsec' )
             END IF
          END IF
 
@@ -291,12 +295,22 @@
 
 *  Centre errors
 *  -------------
-               CALL MSG_SETC( 'XE',
-     :                        AST_FORMAT( CFRM, 1, SIGMA( 1, IB ), 
-     :                                    STATUS ) )
-               CALL MSG_SETC( 'YE',
-     :                        AST_FORMAT( CFRM, 2, SIGMA( 2, IB ),
-     :                                    STATUS ) )
+               IF ( ISSKY ) THEN
+                  CALL MSG_SETC( 'XE',
+     :                           AST_FORMAT( FRM2, 2, SIGMA( 1, IB ), 
+     :                                       STATUS ) )
+                  CALL MSG_SETC( 'YE',
+     :                           AST_FORMAT( FRM2, 2, SIGMA( 2, IB ),
+     :                                       STATUS ) )
+
+               ELSE
+                  CALL MSG_SETC( 'XE',
+     :                           AST_FORMAT( CFRM, 1, SIGMA( 1, IB ), 
+     :                                       STATUS ) )
+                  CALL MSG_SETC( 'YE',
+     :                           AST_FORMAT( CFRM, 2, SIGMA( 2, IB ),
+     :                                       STATUS ) )
+               END IF
             END IF
             CALL MSG_LOAD( 'KPS1_BFLOG_MSG2E', '    Centre      '/
      :                     /'    : (^XP,^YP) +/- (^XE,^YE) ^UNIT',
