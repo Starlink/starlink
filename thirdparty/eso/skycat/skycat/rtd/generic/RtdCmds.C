@@ -24,6 +24,10 @@
 *                 04/06/07 Increase upper limit of zoom factor (supports
 *                          adaptive zoom in GAIA for very small, one pixel,
 *                          images).
+*                 09/07/07 Reset zoomFactor_ when stopping a zoomed view.
+*                          Will be re-used in reference counted copies
+*                          (inappropriately when extra high factors are in
+*                          use, leading to memory allocation errors).
 */
 
 /************************************************************************
@@ -3626,6 +3630,9 @@ int RtdImage::zoomviewCmd(int argc, char* argv[])
 	if (argc > 1 && Tcl_GetInt(interp_, argv[1], &count) != TCL_OK)
 	    return TCL_ERROR;  
 	RtdImage*& view = (count == 1) ? zoomView_ : zoomView2_;
+        
+        //  Reset zoomfactor for reference counted copies.
+	view->zoomFactor_ = 1;
 	view = NULL;
     }
     else if (strcmp(argv[0], "slow") == 0) {
