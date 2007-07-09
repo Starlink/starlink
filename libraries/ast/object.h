@@ -108,6 +108,9 @@
 *           Clear the value of the ID attribute for an Object.
 *        astClearIdent
 *           Clear the value of the Ident attribute for an Object.
+*        astCast
+*           Return a deep copy of an object, cast into an instance of a
+*           parent class.
 *        astDump
 *           Write an Object to a Channel.
 *        astEqual
@@ -132,6 +135,8 @@
 *           Declare a destructor for an Object.
 *        astSetDump
 *           Declare a dump function for an Object.
+*        astSetVtab
+*           Chaneg the virtual function table associated with an Object.
 *        astSetID
 *           Set the value of the ID attribute for an Object.
 *        astSetIdent
@@ -307,8 +312,9 @@
 *        Make all system includes unconditional, so that makeh is not
 *        confused when creating ast.h.
 *     22-JUN-2007 (DSB):
-*        Make astVSet return a pointer to dynamic memory holding the 
+*        - Make astVSet return a pointer to dynamic memory holding the 
 *        expanded setting string.
+*        - Add ast astSetVtab and astCast.
 *--
 */
 
@@ -1322,6 +1328,8 @@ void astShow_( AstObject * );
 
 #if defined(astCLASS)            /* Protected */
 
+AstObject *astCast_( AstObject *, AstObject * );
+
 int astGetObjSize_( AstObject * );
 
 int astTestUseDefs_( AstObject * );
@@ -1347,6 +1355,7 @@ void astSetAttrib_( AstObject *, const char * );
 void astSetCopy_( AstObjectVtab *, void (*)( const AstObject *, AstObject * ) );
 void astSetDelete_( AstObjectVtab *, void (*)( AstObject * ) );
 void astSetDump_( AstObjectVtab *, void (*)( AstObject *, AstChannel * ), const char *, const char * );
+void astSetVtab_( AstObject *, AstObjectVtab * );
 void astSetID_( AstObject *, const char * );
 void astSetIdent_( AstObject *, const char * );
 void astVSet_( AstObject *, const char *, char **, va_list );
@@ -1484,6 +1493,10 @@ astINVOKE(V,astSetCopy_((AstObjectVtab *)(vtab),copy))
 astINVOKE(V,astSetDelete_((AstObjectVtab *)(vtab),delete))
 #define astSetDump(vtab,dump,class,comment) \
 astINVOKE(V,astSetDump_((AstObjectVtab *)(vtab),dump,class,comment))
+#define astSetVtab(object,vtab) \
+astINVOKE(V,astSetVtab_((AstObject *)object,(AstObjectVtab *)(vtab)))
+#define astCast(this,obj) \
+astINVOKE(V,astCast_((AstObject *)(this),(AstObject *)(obj)))
 #define astSetID(this,id) astINVOKE(V,astSetID_(astCheckObject(this),id))
 #define astSetIdent(this,id) astINVOKE(V,astSetIdent_(astCheckObject(this),id))
 #define astVSet(this,settings,text,args) \

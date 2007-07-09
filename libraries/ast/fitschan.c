@@ -764,6 +764,11 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        In CLASSFromStore, create a DELTAV header even if it is equal to
 *        the spectral CDELT value. Also, convert spatial reference point
 *        to (az,el) and write out as headers AZIMUTH and ELEVATIO.
+*     9-JUL-2007 (DSB):
+*        Fixed bug in DSBSetUp - previously, this function assumed that
+*        the supplied DSBSpecFrame represented frequency, and so gave
+*        incorrect values for IF and DSBCentre if the header described
+*        velocity.
 *class--
 */
 
@@ -6818,39 +6823,38 @@ static void DSBSetUp( AstFitsChan *this, FitsStore *store,
 */
 
 /* Local Variables: */
-   AstDSBSpecFrame *dsb2;  /* New DSBSpecFrame in which StdOfRest is topo */
+   AstDSBSpecFrame *dsb_src; /* New DSBSpecFrame in which StdOfRest is source */
+   AstDSBSpecFrame *dsb_topo;/* New DSBSpecFrame in which StdOfRest is topo */
    AstFrameSet *fs;        /* FrameSet connecting two standards of rest */
    double dsbcentre;       /* Topocentric reference (CRVAL) frequency */
    double in[2];           /* Source rest and image frequencies */
    double lo;              /* Topocentric Local Oscillator frequency */
    double out[2];          /* Topocentric rest and image frequencies */
-   int oldsor;             /* Original value for the StdOfRest attribute */
-   int sorset;             /* Was the StdOfRest attribute set originally? */
    
 /* Check the global status. */
    if ( !astOK ) return;
 
-/* Get a Mapping from the standard of rest of the source to the standard of 
-   rest of the observer. First note the original standard of rest and then
-   set it to source. */
-   sorset = astTestStdOfRest( dsb );
-   oldsor = sorset ? astGetStdOfRest( dsb ) : AST__NOSOR;
-   astSetStdOfRest( dsb, AST__SCSOR );
+/* In order to determine the topocentric IF, we need the topocentric 
+   frequencies corresponding to the RESTFREQ and IMAGFREQ values in the 
+   FITS header. The values stored in the FITS header are measured in Hz, 
+   in the source's rest frame, so we need a mapping from frequency in the
+   source rest frame to topocentric frequency. Take a copy of the supplied
+   DSBSpecFrame and then set its attributes to represent frequency in the
+   sources rest frame. */
+   dsb_src = astCopy( dsb );
+   astSetStdOfRest( dsb_src, AST__SCSOR );
+   astSetSystem( dsb_src, AST__FREQ );
+   astSetUnit( dsb_src, 0, "Hz" );
 
-/* Now take a copy of the SpecFrame and set it to use the standard of
-   rest of the observer. */   
-   dsb2 = (AstDSBSpecFrame *) astCopy( dsb );
-   astSetStdOfRest( dsb2, AST__TPSOR );
-
+/* Take a copy of this DSBSpecFrame and set its standard of rest to
+   topocentric. */
+   dsb_topo = astCopy( dsb_src );
+   astSetStdOfRest( dsb_topo, AST__TPSOR );
+      
 /* Now get the Mapping between these. */
-   fs = astConvert( dsb, dsb2, "" );
-
-/* Re-instate the orignal attribute values in the supplied Frame. */
-   if( sorset ) {
-      astSetStdOfRest( dsb, oldsor );
-   } else {
-      astClearStdOfRest( dsb );
-   }
+   fs = astConvert( dsb_src, dsb_topo, "" );
+   dsb_src = astAnnul( dsb_src );
+   dsb_topo = astAnnul( dsb_topo );
 
 /* Check a conversion was found. */
    if( fs != NULL ) {
@@ -6876,10 +6880,12 @@ static void DSBSetUp( AstFitsChan *this, FitsStore *store,
 /* To calculate the topocentric IF we need the topocentric frequency
    equivalent of CRVAL. So take a copy of the DSBSpecFrame, then set it to
    represent topocentric frequency, and read back the DSBCentre value. */
-         dsb2 = astAnnul( dsb2 );
-         dsb2 = astCopy( dsb );
-         astSet( dsb2, "System=freq,StdOfRest=topo,unit(1)=Hz" );
-         dsbcentre = astGetD( dsb2, "DSBCentre" );
+         dsb_topo = astCopy( dsb );
+         astSetStdOfRest( dsb_topo, AST__TPSOR );
+         astSetSystem( dsb_topo, AST__FREQ );
+         astSetUnit( dsb_topo, 0, "Hz" );
+         dsbcentre = astGetD( dsb_topo, "DSBCentre" );
+         dsb_topo = astAnnul( dsb_topo );
 
 /* We also need the topocentric Local Oscillator frequency. This is
    assumed to be half way between the topocentric IMAGFREQ and RESTFREQ
@@ -6898,9 +6904,6 @@ static void DSBSetUp( AstFitsChan *this, FitsStore *store,
       fs = astAnnul( fs );
 
    }
-
-/* Free resources. */
-   dsb2 = astAnnul( dsb2 );
 }
 
 static int DSSFromStore( AstFitsChan *this, FitsStore *store, 
