@@ -20,7 +20,7 @@
 *     npoints = int (Given)
 *        Total number of sky positions sample in simulation
 *     samptime = double (Given)
-*        Integration time per sample in milliseconds
+*        Integration time per sample in seconds
 *     maxwrite = int (Given)
 *        Number of samples to write out to the current file
 *     nbol = int (Given)
@@ -57,6 +57,11 @@
 *        Minor change to units reported
 *     2007-03-20 (TIMJ):
 *        Make sure strings are terminated.
+*     2007-05-22 (AGG):
+*        Units of samptime are now SECONDS!
+*     2007-07-09 (AGG):
+*        Refactor usage calculations so short simulations don't report
+*        0 MB usage
 
 *  Copyright:
 *     Copyright (C) 2007 University of British Columbia and Particle Physics and
@@ -111,7 +116,7 @@ void sc2sim_simstats ( int npoints, double samptime, int maxwrite, int nbol,
 
   printf("\n ---- Reporting simulation statistics: ---- \n\n");
   /* Report length of time covered by simulation */
-  simlength = npoints * samptime / 1000.0;
+  simlength = npoints * samptime;
   if ( simlength > 60 && simlength < 3600 ) {
     simlength /= 60.0;
     strncpy( temp, "min", SZTEMP );
@@ -125,7 +130,7 @@ void sc2sim_simstats ( int npoints, double samptime, int maxwrite, int nbol,
 
   /* Now estimate how long it will take : 142 s of data takes
      about 400 sec to run on a 1.6 GHz Opteron */
-  simlength = 400.0 * (npoints * samptime / 1000.0) / 142.0;
+  simlength = 400.0 * (npoints * samptime) / 142.0;
   if ( simlength > 60 && simlength < 3600 ) {
     simlength /= 60.0;
     strncpy( temp, "min", SZTEMP );
@@ -139,16 +144,15 @@ void sc2sim_simstats ( int npoints, double samptime, int maxwrite, int nbol,
   
   /* And finally tell user how much data this will generate (not
      including headers) */
-  printf( "  ...and will generate ~ %d MB of raw data\n", 
-	  (int)((double)(npoints/3.1e6)*nbol*narray*sizeof(double)));
+  printf( "  ...and will generate ~ %4.1f MB of raw data\n", 
+	  ( ( (double)(npoints*nbol*narray*sizeof(double)) ) / 3.1e6) );
   
   /* Report memory usage if desired: this adds up all the sizes of the
      smf_mallocs below as well as the allocation for posptr */
   printf("  ...and needs at least %d MB of memory\n", 
-	 (int)(( (maxwrite/1000)*( ( 12 + nbol*narray)*sizeof(double) 
-				   + sizeof(*head) 
-				   + (nbol + nboly)*sizeof(int) )
-		 + 2*(npoints/1000)*sizeof(double) ) /1000 ));
+	 (int)(( maxwrite*( ( 12 + nbol*narray)*sizeof(double) 
+			    + sizeof(*head) + (nbol + nboly)*sizeof(int) ) 
+		 + 2*npoints*sizeof(double) ) /1e6 ));
 
   printf("\n ---- You have been warned! ----\n");
 }

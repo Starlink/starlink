@@ -160,8 +160,8 @@ int *status           /* global status (given and returned) */
          return;
       }
 
-      /* Note: steptime is in SECONDS, so convert to ms */
-      vertex_t = 1000.0 * steptime * smu_samples;
+      /* Note: steptime is in SECONDS */
+      vertex_t = steptime * smu_samples;
       sc2sim_smupath ( nvert, vertex_t, jig_vert, jig_stepx, jig_stepy, 
                       move_code, smu_samples, steptime, smu_offset,
                       *cycle_samples, pattern, status );

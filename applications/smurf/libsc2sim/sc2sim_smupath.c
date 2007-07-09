@@ -28,7 +28,7 @@
 *        =5 : Visit 5 points on a '+'
 *        =8 : Visit 8 points on a star. (This is the best)
 *     vertex_t = double (Given)
-*        Time for movement between vertices in msec
+*        Time for movement between vertices in sec
 *     jig_vert = int[][2] (Given)   
 *        Table with relative vertex coordinates in time
 *     jig_stepx = double (Given)
@@ -44,7 +44,7 @@
 *        The number of calculated coordinates in the path
 *        between 2 successive vertices
 *     steptime = double (Given)
-*        Time between samples in msec
+*        Time between samples in sec
 *     smu_offset = double (Given)
 *        smu timing offset in msec
 *     pathsz = int (Given)
@@ -78,10 +78,12 @@
 *        pass-in pathsz, change constant name to DREAM__MXVERT
 *     2006-09-15 (JB):
 *        Convert to sc2sim_smupath from dream_smupath
+*     2007-07-06 (AGG):
+*        Times are now in seconds, not ms
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
+*     Council, University of British Columbia. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -132,6 +134,9 @@ void sc2sim_smupath ( int nvert, double vertex_t, int jig_vert[][2],
    double vertxy[SC2SIM__MXVERT][2]; /* coordinates of jiggle vertices */
 
    if ( !StatusOkP(status) ) return;
+
+   /* Convert steptime to millisec for this routine */
+   /*   steptime *= 1000.0;*/
 
    /* Make the number of positions in the Jiggle Path, and check the size */
    np = nppp * nvert;
