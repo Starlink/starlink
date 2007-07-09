@@ -122,7 +122,9 @@ itcl::class gaia::GaiaImageZoomView {
    public method enter_image {image} {
 
       #  Calculate adjusted scale factor.
-      if { $itk_option(-propagate) } {
+      set w [$image_ width]
+      set h [$image_ height]
+      if { $itk_option(-propagate) && $w > 0 && $h > 0 } {
 
          #  Scale used in main window (*itk_option(-factor) is expected scale).
          lassign [$image scale] target_scale_
@@ -131,8 +133,8 @@ itcl::class gaia::GaiaImageZoomView {
          }
 
          #  Scales needed to fill window.
-         set fw [expr 1+$itk_option(-width)/([$image_ width]*$target_scale_)]
-         set fh [expr 1+$itk_option(-height)/([$image_ height]*$target_scale_)]
+         set fw [expr 1+$itk_option(-width)/($w*$target_scale_)]
+         set fh [expr 1+$itk_option(-height)/($h*$target_scale_)]
 
          #  Pick largest, but never smaller than the expected scale factor.
          set f [max $fw $fh $itk_option(-factor)]
