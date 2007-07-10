@@ -63,6 +63,8 @@
 *        accordingly, store FITS headers and WCS
 *     2007-04-10 (AGG):
 *        Remove creation of MAPDATA extension, rename BZ_IMAGE to BOLZERO
+*     2007-07-10 (AGG):
+*        Remove unnecessary HDS locator variable 
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -141,7 +143,6 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
   int nboly;                       /* Number of bolometers in the Y direction */
   int ntot;                        /* Total number of elements */
   int place;                       /* NDF placeholder */
-  HDSLoc *seq_loc = NULL;          /* HDS locator */
   int seqend;                      /* End index */
   int seqstart;                    /* Starting index */
   int slice;                       /* Index of current time slice */
@@ -253,7 +254,6 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
   ndfAnnul ( &uindf, status );
 
   /* Free the locators for the frame */
-  datAnnul ( &seq_loc, status );
   datAnnul ( &bz_imloc, status );
 
   astEnd;
