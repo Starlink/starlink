@@ -78,11 +78,9 @@
 *        pass-in pathsz, change constant name to DREAM__MXVERT
 *     2006-09-15 (JB):
 *        Convert to sc2sim_smupath from dream_smupath
-*     2007-07-06 (AGG):
-*        Times are now in seconds, not ms
 
 *  Copyright:
-*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
 *     Council, University of British Columbia. All Rights Reserved.
 
 *  Licence:
