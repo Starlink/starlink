@@ -404,7 +404,7 @@ if ($email && keys %ALLFILES && $CFG{reportmail}) {
   push(@email, "See $reporturl for more details\n\n");
   push(@email, "Revisions:\n\n");
   for my $rev (reverse sort { $a <=> $b } keys %INFO) {
-    push(@email, "\t$rev:\n");
+    push(@email, "\t$rev (".$INFO{$rev}{author}."):\n");
     my @lines = split ("\n", $INFO{$rev}{log});
     for my $l (@lines) {
       push(@email, "\t  $l\n");
