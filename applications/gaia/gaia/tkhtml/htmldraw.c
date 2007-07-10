@@ -404,14 +404,13 @@ void HtmlBlockDraw(
   }else{
     /* We are dealing with a single HtmlElement which contains something
     ** other than plain text. */
-    int top, btm, cntr;
+      int top, btm;
     int cnt, w;
     char zBuf[30];
     switch( src->base.type ){
       case Html_LI:
         x = src->li.x;
         y = src->li.y;
-        cntr = (top+btm)/2;
         switch( src->li.type ){
           case LI_TYPE_Enum_1:
             sprintf(zBuf,"%d.",src->li.cnt);

@@ -1578,6 +1578,7 @@ int gaiaNDFGetFitsChan( int ndfid, AstFitsChan **fitschan, char **error_mess )
 int gaiaNDFWriteFitsChan( int ndfid, AstFitsChan *fitschan, char **error_mess )
 {
     HDSLoc *fitsloc = NULL;
+    char *ptr;
     char card[81];
     int i;
     int ncard[1];
@@ -1605,11 +1606,12 @@ int gaiaNDFWriteFitsChan( int ndfid, AstFitsChan *fitschan, char **error_mess )
 
     /*  Write the FITS channel to it */
     if ( status == SAI__OK ) {
+        ptr = (char *) fitsptr;
         astClear( fitschan, "Card" );
         for ( i = 0; i < ncards; i++ ) {
             astFindFits( fitschan, "%f", card, 1 );
-            memcpy( fitsptr, card, 80 );
-            fitsptr += 80;
+            memcpy( ptr, card, 80 );
+            ptr += 80;
         }
 
     }
