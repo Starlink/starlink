@@ -9,8 +9,6 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  3 Aug 96  Created, added call to "sys_error()", set status_
  * Peter W. Draper 23 Jan 97 Added cast to MAP_FAILED comparison (OSF/1).
- *                 21 Nov 97 Added fix for OSF/1 problems with statvfs
- *                           include.
  *                 23 Oct 00 Expanded error messages to be a little
  *                           more informative to an end user.
  */
@@ -28,15 +26,7 @@ static const char* const rcsId="@(#) $Id: Mem_Map.C,v 1.1.1.1 2006/01/12 16:41:0
 #include "Mem_Map.h"
 #include <cstdio>
 #ifdef HAVE_SYS_STATVFS_H
-#ifdef __alpha   // Extern "C" & prototypes missing on OSF/1
-extern "C" {
-#endif
 #include <sys/statvfs.h>
-int statvfs(const char *, struct statvfs *);
-int fstatvfs(int, struct statvfs *);
-#ifdef __alpha
-}
-#endif
 #endif
 
 //----------------------------------------------------------------------------

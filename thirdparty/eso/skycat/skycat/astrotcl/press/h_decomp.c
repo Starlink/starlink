@@ -877,8 +877,8 @@ static int	makefits
     PR_CHECK( char_out( line, 80 ) );
 
     (void) sprintf( line, "%10.10s'%*.*s'%*s%48s", "DATATYPE=", 
-	    strlen( datatype), strlen( datatype ), datatype, 
-	    22-strlen( datatype), "/", "" );
+                    (int)strlen( datatype), (int)strlen( datatype ), datatype, 
+                    22-(int)strlen( datatype), "/", "" );
     PR_CHECK( char_out( line, 80 ) );
 
     (void) sprintf( line, "%-80.80s", "END" );

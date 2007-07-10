@@ -41,12 +41,12 @@ private:
     inline byte lookup(byte b) {
 	if ( !haveBlank_ ) return b;
 	if ( b != blank_ ) return b;
-	return LOOKUP_BLANK;
+	return blank_;
     } 
     inline unsigned long llookup(byte b) {
 	if ( !haveBlank_ ) return b;
 	if ( b != blank_ ) return b;
-	return LOOKUP_BLANK;
+	return blank_;
     }
 
     // return NTOH converted value evtl. subtracted with corresponding bias value

@@ -93,7 +93,7 @@ public:
 	LOOKUP_MIN = -32767,	// minimum image value allowed
 	LOOKUP_MAX = 32767,	// maximum image value allowed
 	LOOKUP_OFF = 32768,	// offset from allocated array to zero (0x8000)
-	LOOKUP_BLANK = 32768    // end bin for blank pixel
+	LOOKUP_BLANK = -32768   // end bin for blank pixel
     };
     
 protected:

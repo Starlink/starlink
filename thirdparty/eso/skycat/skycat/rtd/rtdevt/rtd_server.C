@@ -93,8 +93,8 @@ typedef void (*MySigFunc)(int);  // prototype cast to keep Sun cc quiet
 /*
  * Globals needed for cleanup() after signals
  */
-int       socketFd  = 0;
-rtdSERVER *mainLoop = NULL;     // rtdSERVER object
+static int       socketFd  = 0;
+static rtdSERVER *mainLoop = NULL;     // rtdSERVER object
 
 
 void usage(void)

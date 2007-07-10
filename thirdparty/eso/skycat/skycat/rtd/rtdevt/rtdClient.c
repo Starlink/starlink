@@ -44,6 +44,7 @@ static const char* const rcsId="@(#) $Id: rtdClient.c,v 1.1.1.1 2006/01/12 16:39
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>

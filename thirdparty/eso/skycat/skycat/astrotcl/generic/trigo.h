@@ -52,6 +52,11 @@ double cosd(), sind(), tand();
 #if _TEMPLATES_
 int 	tr_ou 	(double o[2] , double u[3]);
 int 	tr_uo 	(double u[3] , double o[2]);
+int     tr_uu   (double u1[3], double u2[3], double R[3][3]);
+int     tr_uu1  (double u1[3], double u2[3], double R[3][3]);
+int     tr_Euler(double Euler_angles[3], double R[3][3] );
+int     prej_u  (double u0[3], double u1[3], double eq0, double eq1 );
+
 	/* Surface of a `rectangle' on the sphere */
 double	surf_o	(double o1[2], double o2[2]);		/* Pos. in degrees */
 double	surf_p	(double p1[2], double p2[2]);		/* On gnomonic proj. */

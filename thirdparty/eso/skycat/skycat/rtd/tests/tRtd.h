@@ -39,7 +39,7 @@ typedef struct opts {
     int  shmEndian;	// native byte order, big or little Endian data
     int  useFits;	// use Fits file for generating the image
     int  dataType;	// image data type
-};
+} opts;
 
 void errexit(const char* msg1, const char* msg2 = "");
 void cleanup(int i=0);

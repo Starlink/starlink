@@ -1704,7 +1704,7 @@ char	*header;	/* FITS image header */
     /* Add blank lines if new header is smaller than the old header */
     else if (nbnew < nbold) {
 	strcpy (oldheader, header);
-	head = ksearch (oldheader,"END");
+	endhead = ksearch (oldheader,"END");
 	lasthead = oldheader + nbold;
 	while (endhead < lasthead)
 	    *(endhead++) = ' ';

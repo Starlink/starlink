@@ -25,6 +25,7 @@ static const char* const rcsId="@(#) $Id: rtd_remote.c,v 1.1.1.1 2006/01/12 16:3
 #include <string.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <signal.h>
 #include <sys/time.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>

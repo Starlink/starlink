@@ -17,6 +17,7 @@ static char SccsId[] = "%W%  %G%";
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "histeq.h"		/* define SubrangeLink, List */
 
 

@@ -18,6 +18,7 @@
 /*===========================================================================
  *             Define Here Your Specific Implementation
  *===========================================================================*/
+#define _TEMPLATES_	1	/* Function templates	*/
 
 #if 0				/* Example */
 #define CC_ENV		_TURBOC
