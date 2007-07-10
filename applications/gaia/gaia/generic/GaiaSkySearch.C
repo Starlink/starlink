@@ -602,13 +602,13 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
 
     // free memory allocated for split Tcl lists and return the status
     if (colNames)
-	free(colNames);
+	ckfree((char *)colNames);
     if (colIndexes)
 	delete[] colIndexes;
     if (symb)
-	free(symb);
+	ckfree((char *)symb);
     if (exprList)
-	free(exprList);
+	ckfree((char *)exprList);
 
     return status;
 }
