@@ -1,7 +1,8 @@
       SUBROUTINE KPS1_BFFIL( INDF, IWCS, MAP1, MAP2, MAP3, RFRM, VAR, 
      :                       NPOS, NAXR, NAXIN, INPOS, GOTID, ID, LOGF, 
      :                       FDL, FIXCON, AMPRAT, SLBND, SUBND, FAREA, 
-     :                       FITREG, REFPOS, NPAR, FPAR, STATUS ) 
+     :                       FITREG, REFPOS, REFLAB, NPAR, FPAR, 
+     :                       STATUS )
 *+
 *  Name:
 *     KPS1_BFFIL
@@ -16,7 +17,7 @@
 *     CALL KPS1_BFFIL( INDF, IWCS, MAP1, MAP2, MAP3, RFRM, VAR, NPOS, 
 *                      NAXR, NAXIN, INPOS, GOTID, ID, LOGF, FDL, FIXCON,
 *                      AMPRAT, SLBND, SUBND, FAREA, FITREG, REFPOS,
-*                      NPAR, FPAR, STATUS )
+*                      REFLAB, NPAR, FPAR, STATUS )
 
 *  Description:
 *     This routine finds the Gaussian fits to a batch of image
@@ -112,6 +113,12 @@
 *        The reference position measured in the current WCS Frame.  The
 *        offset of the primary beam with respect to this points is 
 *        calculated, reported, and written to an output parameter.
+*     REFLAB = CHARACTER * (*) (Given)
+*        Label used to describe reference position in the output.   At 
+*        present it should be either "map centre", if that was used in
+*        the absence of a reference position stored with the original
+*        dataset; or "sky reference position".  If another value is 
+*        supplied, "reference position" will be used.
 *     NPAR = INTEGER (Given)
 *        The maximum number of fit parameters.
 *     FPAR( NPAR ) = DOUBLE PRECISION (Given and Returned)
@@ -188,6 +195,8 @@
 *     2007 June 25 (MJC):
 *        Added IWCS FrameSet identifier argument and passed it to
 *        KPS1_BFCRF.
+*     2007 July 9 (MJC):
+*        Added REFLAB argument passed to KPS1_BFLOG.
 *     {enter_further_changes_here}
 
 *-
@@ -239,6 +248,7 @@
       LOGICAL FAREA
       INTEGER FITREG( 2 )
       DOUBLE PRECISION REFPOS( BF__NDIM )
+      CHARACTER*(*) REFLAB
       INTEGER NPAR
 
 *  Arguments Given and Returned:
@@ -518,8 +528,8 @@
 
 *  Log the results and residuals if required.
             CALL KPS1_BFLOG( LOGF, FDL, .FALSE., MAP2, RFRM, NAXR,
-     :                       NPOS, BF__NCOEF, RP, RSIGMA, REFOFF, POLAR,
-     :                       POLSIG, RMS, DTYPE, STATUS )
+     :                       NPOS, BF__NCOEF, RP, RSIGMA, REFOFF, 
+     :                       REFLAB, POLAR, POLSIG, RMS, DTYPE, STATUS )
 
 *  Write primary beam's fit to output parameters.
             CALL KPS1_BFOP( RFRM, MAP2, NAXR, NPAR, RP, RSIGMA,

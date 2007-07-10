@@ -514,7 +514,8 @@
 *        MARK.
 *     2007 July 9 (MJC):
 *        Do not ignore SkyRef attribute for the reference position when 
-*        the SkyRefIs attribute is set to Ignored.
+*        the SkyRefIs attribute is set to Ignored.  Record which
+*        reference point is being used.
 *     {enter_further_changes_here}
 
 *-
@@ -622,6 +623,7 @@
       LOGICAL POLAR              ! Use polar co-ordinates for POS2-POS5?
       LOGICAL POSC               ! Centre fixed at supplied position?
       LOGICAL QUIET              ! Suppress screen output?
+      CHARACTER*22 REFLAB        ! Label describing reference point
       CHARACTER*256 REFNAM       ! Reference name
       DOUBLE PRECISION REFPOS( BF__NDIM ) ! Reference position
       DOUBLE PRECISION S2FWHM    ! Standard deviation to FWHM
@@ -1024,6 +1026,7 @@
             END DO
             GOTREF = REFPOS( 1 ) .NE. VAL__BADD .AND. 
      :               REFPOS( 2 ) .NE. VAL__BADD
+            IF ( GOTREF ) REFLAB = 'sky reference position'
          END IF
       END IF
 
@@ -1042,6 +1045,7 @@
 *  Obtain the reference position.  Use the map centre as the dynamic 
 *  default when a null is supplied.
          CALL KPG1_GTPOS( 'REFPOS', CFRM, .TRUE., REFPOS, BC, STATUS )
+         REFLAB = 'map centre'
       END IF
 
 *  Is the amplitude fixed?
@@ -1202,7 +1206,7 @@
      :                    NAXC, NAXIN, %VAL( CNF_PVAL( IPIN ) ), CAT, 
      :                    %VAL( CNF_PVAL( IPID ) ), LOGF, FDL, FIXCON,
      :                    AMPRAT, SLBND, SUBND, FAREA, FITREG, REFPOS,
-     :                    MXCOEF, FPAR, STATUS )
+     :                    REFLAB, MXCOEF, FPAR, STATUS )
 
 *  In interactive modes, find each beam individually, waiting for the
 *  user to supply a new one before continuing each time.
@@ -1213,8 +1217,8 @@
          CALL KPS1_BFINT( NDFI, IWCS, IPLOT, MAP3, MAP1, MAP2, CFRM, 
      :                    VAR, NPOS, POLAR, 'POS', CURSOR, MARK, IMARK,
      :                    NAXC, NAXIN, LOGF, FDL, FIXCON, AMPRAT, SLBND,
-     :                    SUBND, FAREA, FITREG, REFPOS, MXCOEF, FPAR,
-     :                    STATUS )
+     :                    SUBND, FAREA, FITREG, REFPOS, REFLAB, MXCOEF,
+     :                    FPAR, STATUS )
 
       END IF
 

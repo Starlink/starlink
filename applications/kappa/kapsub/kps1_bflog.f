@@ -1,6 +1,6 @@
       SUBROUTINE KPS1_BFLOG( LOGF, FD, PIXEL, MAP, CFRM, NAXC, NBEAM, 
-     :                       NCOEF, P, SIGMA, REFOFF, POLAR, POLSIG,
-     :                       RMS, DPREC, STATUS )
+     :                       NCOEF, P, SIGMA, REFOFF, REFLAB, POLAR, 
+     :                       POLSIG, RMS, DPREC, STATUS )
 *+
 *  Name:
 *     KPS1_BFLOG
@@ -13,8 +13,8 @@
 
 *  Invocation:
 *     CALL KPS1_BFLOG( LOGF, FD, PIXEL, MAP, CFRM, NAXC, NCOEF, P, 
-*                      SIGMA, REFOFF, POLAR, POLSIG, RMS, DPREC,
-*                      STATUS )
+*                      SIGMA, REFOFF, REFLAB, POLAR, POLSIG, RMS, 
+*                      DPREC, STATUS )
 
 *  Description:
 *     The supplied parameters are reported and logged to the file 
@@ -61,17 +61,23 @@
 *     REFOFF( 2 ) = DOUBLE PRECISION (Given)
 *        The offset of the primary beam with respect to the reference
 *        point measured in the current WCS Frame, followed by its error.
+*     REFLAB = CHARACTER * (*) (Given)
+*        Label used to describe reference position in the output.   At 
+*        present it should be either "map centre", if that was used in
+*        the absence of a reference position stored with the original
+*        dataset; or "sky reference position".  If another value is 
+*        supplied, "reference position" will be used.
 *     POLAR( 2, NBEAM ) =  DOUBLE PRECISION (Given)
-*         The polar co-ordinates of the beam features with respect to
-*         the primary beam measured in the current co-ordinate Frame.
-*         The orientation is a position angle in degrees, measured from
-*         North through East if the current Frame is a Skyframe, or 
-*         anticlockwise from the Y axis otherwise.  The POLAR(*,1)
-*         values of the primary beam are ignored.
+*        The polar co-ordinates of the beam features with respect to
+*        the primary beam measured in the current co-ordinate Frame.
+*        The orientation is a position angle in degrees, measured from
+*        North through East if the current Frame is a Skyframe, or 
+*        anticlockwise from the Y axis otherwise.  The POLAR(*,1)
+*        values of the primary beam are ignored.
 *     POLSIG( 2, NBEAM ) =  DOUBLE PRECISION (Given)
-*         The standard-deviation errors associated with the polar 
-*          co-ordinates supplied in argument POLAR.  The POLSIG(*,1)
-*         values of the primary beam are ignored.
+*        The standard-deviation errors associated with the polar 
+*        co-ordinates supplied in argument POLAR.  The POLSIG(*,1)
+*        values of the primary beam are ignored.
 *     RMS = DOUBLE PRECISION (Given)
 *        The RMS residual in pixels.
 *     DPREC = CHARACTER ( * ) (Given)
@@ -136,7 +142,8 @@
 *        SENSE.
 *     2007 July 9 (MJC):
 *        For a SkyFrame report centre errors in arcseconds instead of
-*        sexagesimal. 
+*        sexagesimal.  Added REFLAB argument to indicate which reference
+*        point was used.
 *     {enter_further_changes_here}
 
 *-
@@ -163,6 +170,7 @@
       DOUBLE PRECISION P( NCOEF, NBEAM )
       DOUBLE PRECISION SIGMA( NCOEF, NBEAM )
       DOUBLE PRECISION REFOFF( 2 )
+      CHARACTER*(*) REFLAB
       DOUBLE PRECISION POLAR( 2, NBEAM )
       DOUBLE PRECISION POLSIG( 2, NBEAM )
       DOUBLE PRECISION RMS
@@ -352,9 +360,16 @@
                END IF
             END IF
 
+            IF ( REFLAB( 1:10 ) .NE. 'map centre' .AND.
+     :           REFLAB( 1:22 ) .NE. 'sky reference position' ) THEN
+               CALL MSG_SETC( 'LABEL', 'reference position' )
+            ELSE
+               CALL MSG_SETC( 'LABEL', REFLAB )
+            END IF
+
             IF ( REFOFF( 2 ) .EQ. VAL__BADD ) THEN
                CALL MSG_LOAD( 'KPS1_BFLOG_MSG3', '    Offset      '/
-     :                        /'    : ^OFF ^UNIT from reference point',
+     :                        /'    : ^OFF ^UNIT from ^LABEL',
      :                        BUF, LBUF, STATUS )
 
             ELSE
@@ -370,11 +385,10 @@
                END IF
                CALL MSG_LOAD( 'KPS1_BFLOG_MSG3E', '    Offset      '/
      :                        /'    : ^OFF +/- ^OFFE ^UNIT from '/
-     :                        /'reference point', BUF, LBUF, STATUS )
+     :                        /'^LABEL', BUF, LBUF, STATUS )
             END IF
             IF ( LOGF ) CALL FIO_WRITE( FD, BUF( : LBUF ), STATUS )
             CALL MSG_OUTIF( MSG__NORM, ' ', BUF( : LBUF ), STATUS )
-
 
 *  Polar radius of secondary beam positions
 *  ----------------------------------------
