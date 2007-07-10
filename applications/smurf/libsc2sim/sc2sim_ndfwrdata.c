@@ -176,7 +176,9 @@
 *        Derive obsgeo keywords from telpos using smf_terr
 *     2007-06-26 (EC):
 *        Derive OBSIDSS keyword from OBSID and inx->lambda
-
+*     2007-07-10 (AGG):
+*        - Use instrume argument for writing INSTRUME keyword
+*        - Initialize dreamweights file name to null string
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
@@ -268,7 +270,6 @@ int *status              /* Global status (given and returned) */
 {
    /* Local variables */
    double coadd[2*DREAM__MXBOL];   /* Coadded values in output image */
-   double decd;                    /* Dec of observation in degrees */
    int dims[2];                    /* Extent of output image */
    AstFitsChan *fitschan;          /* FITS headers */
    int fitsfind;
@@ -293,14 +294,13 @@ int *status              /* Global status (given and returned) */
    double obsgeo[3];               /* Cartesian geodetic observatory coords. */
    char obsidss[84];               /* OBSID + wavelength */
    double *poly;                   /* Pointer to polynomial fit solution */
-   double rad;                     /* RA of observation in degrees */
    double *rdata;                  /* Pointer to flatfielded data */
    int seqend;                     /* RTS index of last frame in output image */
    int seqstart;                   /* RTS index of first frame in output image */
    JCMTState state;                /* Dummy JCMT state structure for creating WCS */
    int subnum;                     /* sub array index */
    AstFrameSet *wcs;               /* WCS frameset for output image */
-   char weightsname[81];           /* Name of weights file for DREAM 
+   char weightsname[SZFITSCARD] = "\0";           /* Name of weights file for DREAM 
 				      reconstruction */
    double x_max = 0;               /* X extent of pointing centre offsets */
    double x_min = 0;               /* X extent of pointing centre offsets */
@@ -426,7 +426,7 @@ int *status              /* Global status (given and returned) */
 
    /* SCUBA-2 */
    astSetFitsCN ( fitschan, "COMMENT", "", "-- SCUBA-2 specific parameters --", 0 );
-   astSetFitsS ( fitschan, "INSTRUME", "SCUBA-2", "Instrument name - SCUBA-2", 0 );
+   astSetFitsS ( fitschan, "INSTRUME", instrume, "Instrument name - SCUBA-2", 0 );
    astSetFitsS ( fitschan, "SUBARRAY", sinx->subname, "subarray name", 0 );
    astSetFitsS ( fitschan, "SHUTTER", "", "Shutter position for dark frames", 0 );
    astSetFitsS ( fitschan, "FILTER", filter, "filter used", 0 );
