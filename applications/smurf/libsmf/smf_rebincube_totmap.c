@@ -51,6 +51,8 @@
 *  History:
 *     23-APR-2006 (DSB):
 *        Initial version.
+*     11-JUL-2007 (DSB):
+*        Speed optimisations.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -100,14 +102,21 @@ AstMapping *smf_rebincube_totmap( smfData *data, dim_t itime,
 /* Local Variables */
    AstFrame *sf1 = NULL;       /* Pointer to copy of input current Frame */
    AstFrame *skyin = NULL;     /* Pointer to current Frame in input WCS FrameSet */
+   AstFrame *skyout = NULL;    /* Pointer to output sky Frame in "fs" */
    AstFrameSet *fs = NULL;     /* WCS FramesSet from input */           
    AstFrameSet *swcsin = NULL; /* Spatial WCS FrameSet for current time slice */
    AstMapping *azel2usesys = NULL;/* Mapping from AZEL to the output sky frame */
    AstMapping *fsmap = NULL;   /* Mapping extracted from FrameSet */
+   AstMapping *grid2sky = NULL;/* Mapping from input grid to sky coords */
+   AstMapping *result;         /* Returned Mapping */
+   AstMapping *tmap1;          /* Mapping from input GRID to input sky coords */
+   const char *system;         /* Coordinate system */
    double a;                   /* Longitude value */
    double b;                   /* Latitude value */
    int ibasein;                /* Index of base Frame in input WCS FrameSet */
    smfHead *hdr = NULL;        /* Pointer to data header for this time slice */
+
+   static int have_azel = 0;   /* Is input sky system an azel system ? */
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return NULL;
@@ -124,16 +133,18 @@ AstMapping *smf_rebincube_totmap( smfData *data, dim_t itime,
    smf_tslice_ast( data, itime, 1, status );
    swcsin = hdr->wcs;
 
-/* Find out how to convert from input GRID coords to the output sky frame.
-   Note, we want absolute sky coords here, even if the target is moving.
-   Record the original base frame before calling astConvert so that it can 
-   be re-instated later (astConvert modifies the base Frame). */
-   astInvert( swcsin );
-   ibasein = astGetI( swcsin, "Base" );
-   fs = astConvert( swcsin, abskyfrm, "SKY" );
-   astSetI( swcsin, "Base", ibasein );
-   astInvert( swcsin );
+/* Get the current Frame from the input WCS FrameSet. If this is the first 
+   time slice, see if the current Frame is an AZEL Frame (it is assumed 
+   that all subsequent time slices will have the same system as the first). */
+   skyin = astGetFrame( swcsin, AST__CURRENT );
+   if( itime == 0 ) {
+      system = astGetC( skyin, "System" );
+      have_azel = system ? !strcmp( system, "AZEL" ) : 0;
+   }
 
+/* Get a FrameSet containing a Mapping from the input sky system to the 
+   output absolute sky system. */
+   fs = astConvert( skyin, abskyfrm, "" );
    if( fs == NULL ) {
       if( *status == SAI__OK ) {
          *status = SAI__ERROR;
@@ -141,8 +152,8 @@ AstMapping *smf_rebincube_totmap( smfData *data, dim_t itime,
                  "current input file is not compatible with the "
                  "spatial coordinate system in the first input file.", 
                  status );
-         return NULL;
       }
+      return NULL;
    }
 
 /* The "fs" FrameSet has input GRID coords as its base Frame, and output
@@ -152,45 +163,72 @@ AstMapping *smf_rebincube_totmap( smfData *data, dim_t itime,
    FrameSet is also modified automatically). */
    if( moving ) {
 
-/* Get the Mapping from AZEL (at the current input epoch) to the output
-   sky system. Use it to convert the telescope base pointing position from 
-   (az,el) to the requested system. */
-      skyin = astGetFrame( swcsin, AST__CURRENT );
-      sf1 = astCopy( skyin );
-      astSetC( sf1, "System", "AZEL" );
-      azel2usesys = astConvert( sf1, abskyfrm, "" );
+/* Get the Mapping from AZEL (at the current input epoch) to the output sky 
+   system. If the input sky coordinate system is AZEL, then we already have 
+   the required FrameSet in "fs". */
+      if( ! have_azel ) {
+         sf1 = astCopy( skyin );
+         astSetC( sf1, "System", "AZEL" );
+         azel2usesys = astConvert( sf1, abskyfrm, "" );
+         sf1 = astAnnul( sf1 );
+      } else {
+         azel2usesys = astClone( fs );
+      }
+
+/* Use this FrameSet to convert the telescope base position from (az,el) to 
+   the requested system. */
       astTran2( azel2usesys, 1, &(hdr->state->tcs_az_bc1),
                 &(hdr->state->tcs_az_bc2), 1, &a, &b );
-
-/* Explicitly annul these objects for efficiency in this tight loop. */
       azel2usesys = astAnnul( azel2usesys );
-      sf1 = astAnnul( sf1 );
-      skyin = astAnnul( skyin );
 
-/* Modified the FrameSet to represent offsets from this origin. We use the 
-   FrameSet pointer "fs" rather than a pointer to the current Frame within 
-   the FrameSet. This means that the Mapping in the FrameSet will be 
-   modified to remap the current Frame. */
-      astSetD( fs, "SkyRef(1)", a );
-      astSetD( fs, "SkyRef(2)", b );
+/* Store the reference point in the current Frame of the FrameSet (using
+   the current Frame pointer rather than the FrameSet pointer avoid the
+   extra time spent re-mapping the FrameSet - the FrameSet will be re-mapped
+   when we set SkyRefIs below). */
+      skyout = astGetFrame( fs, AST__CURRENT );
+      astSetD( skyout, "SkyRef(1)", a );
+      astSetD( skyout, "SkyRef(2)", b );
+
+/* Modified the SkyRefIs attribute in the FrameSet so that the current
+   Frame represents offsets from the origin (set above). We use the FrameSet
+   pointer "fs" now rather than "skyout" so that the Mapping in the FrameSet
+   will be modified to remap the current Frame. */
       astSet( fs, "SkyRefIs=origin" );
 
 /* Get the Mapping and then clear the SkyRef attributes (this is because
    the current Frame in "fs" may be "*skyframe" and we do not want to make a
    permanent change to *skyframe). */
       fsmap = astGetMapping( fs, AST__BASE, AST__CURRENT );
-      astClear( fs, "SkyRef(1)" );
-      astClear( fs, "SkyRef(2)" );
       astClear( fs, "SkyRefIs" );
+      astClear( skyout, "SkyRef(1)" );
+      astClear( skyout, "SkyRef(2)" );
+
+      skyout = astAnnul( skyout );
 
 /* If the target is not moving, just get the Mapping. */
    } else {
       fsmap = astGetMapping( fs, AST__BASE, AST__CURRENT );
    }
 
-/* The output from "fsmap" now corresponds to the input to "oskymap", whether 
-   the target is moving or not. Combine the input GRID to output SKY Mapping 
-   with the output SKY to output pixel Mapping supplied in "oskymap". */
-   return (AstMapping *) astCmpMap( fsmap, oskymap, 1, "" );
+/* Get the mapping from the input grid coordinate system to the output sky 
+   system. */
+   tmap1 = astGetMapping( swcsin, AST__BASE, AST__CURRENT );
+   grid2sky = (AstMapping *) astCmpMap( tmap1, fsmap, 1, "" );
+   tmap1 = astAnnul( tmap1 );
+   fsmap = astAnnul( fsmap );
+
+/* The output from "grid2sky" now corresponds to the input to "oskymap", 
+   whether the target is moving or not. Combine the input GRID to output 
+   SKY Mapping with the output SKY to output pixel Mapping supplied in 
+   "oskymap". */
+   result = (AstMapping *) astCmpMap( grid2sky, oskymap, 1, "" );
+
+/* Free remaining resources since this function will be called in a tight
+   loop, and so relying on astBegin/End would be inefficient. */
+   grid2sky = astAnnul( grid2sky );
+   skyin = astAnnul( skyin );
+
+/* Return the required mapping. */
+   return result;
 }
 
