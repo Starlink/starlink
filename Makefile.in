@@ -165,7 +165,7 @@ world: $(ALL_TARGETS)
 	$(INSTALL_DATA) world-stamp $(MANIFESTS)/world-stamp
 	- if test -n "$(SVNVERSION)"; then \
 	   rm -f starlink.version; \
-	   $(SVNVERSION) > starlink.version; \
+	   $(SVNVERSION) . > starlink.version; \
 	   $(INSTALL_DATA) starlink.version $(MANIFESTS)/starlink.version; \
 	fi
 
