@@ -195,6 +195,9 @@ f     The SkyFrame class does not define any new routines beyond those
 *        Modified GetLast to use the correct solar to sidereal conversion
 *        factor. As a consequence the largest acceptable epoch gap before 
 *        the LAST needs to be recalculated has been increased.
+*     11-JUL-2007 (DSB):
+*        Override astSetEpoch and astClearEpoch by implementations which
+*        update the LAST value stored in the SkyFrame.
 *class--
 */
 
@@ -664,14 +667,16 @@ static int (* parent_testattrib)( AstObject *, const char * );
 static int (* parent_testformat)( AstFrame *, int );
 static int (* parent_unformat)( AstFrame *, int, const char *, double * );
 static void (* parent_clearattrib)( AstObject *, const char * );
+static void (* parent_clearepoch)( AstFrame * );
 static void (* parent_clearformat)( AstFrame *, int );
+static void (* parent_clearobslon)( AstFrame * );
 static void (* parent_clearsystem)( AstFrame * );
 static void (* parent_overlay)( AstFrame *, const int *, AstFrame * );
 static void (* parent_setattrib)( AstObject *, const char * );
+static void (* parent_setepoch)( AstFrame *, double );
 static void (* parent_setformat)( AstFrame *, int, const char * );
-static void (* parent_setsystem)( AstFrame *, AstSystemType );
-static void (* parent_clearobslon)( AstFrame * );
 static void (* parent_setobslon)( AstFrame *, double );
+static void (* parent_setsystem)( AstFrame *, AstSystemType );
 
 /* Factors for converting between hours, degrees and radians. */
 static double hr2rad;
@@ -736,6 +741,7 @@ static int TestProjection( AstSkyFrame * );
 static int Unformat( AstFrame *, int, const char *, double * );
 static void ClearAsTime( AstSkyFrame *, int );
 static void ClearAttrib( AstObject *, const char * );
+static void ClearEpoch( AstFrame * );
 static void ClearEquinox( AstSkyFrame * );
 static void ClearNegLon( AstSkyFrame * );
 static void ClearObsLon( AstFrame * );
@@ -752,6 +758,7 @@ static void Overlay( AstFrame *, const int *, AstFrame * );
 static void Resolve( AstFrame *, const double [], const double [], const double [], double [], double *, double * );
 static void SetAsTime( AstSkyFrame *, int, int );
 static void SetAttrib( AstObject *, const char * );
+static void SetEpoch( AstFrame *, double );
 static void SetEquinox( AstSkyFrame *, double );
 static void SetNegLon( AstSkyFrame *, int );
 static void SetObsLon( AstFrame *, double );
@@ -1083,6 +1090,54 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else {
       (*parent_clearattrib)( this_object, attrib );
    }
+}
+
+static void ClearEpoch( AstFrame *this_frame ) {
+/*
+*  Name:
+*     ClearEpoch
+
+*  Purpose:
+*     Clear the value of the Epoch attribute for a SkyFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     void ClearEpoch( AstFrame *this )
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astClearEpoch method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function clears the Epoch value and updates the LAST value
+*     stored in the SkyFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+
+*/
+
+/* Local Variables: */
+   AstSkyFrame *this;            /* Pointer to the SkyFrame structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the SkyFrame structure. */
+   this = (AstSkyFrame *) this_frame;
+
+/* Invoke the parent method to clear the Frame epoch. */
+   (*parent_clearepoch)( this_frame );
+
+/* Now get the new LAST value corresponding to the cleared Epoch.
+   If the original and cleared epoch are significantly different, this
+   will cause the new LAST to be calculated accurately and stored in the
+   SkyFrame. */
+   (void) GetLAST( this );
 }
 
 static void ClearObsLon( AstFrame *this ) {
@@ -3639,6 +3694,12 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name ) {
    frame->SubFrame = SubFrame;
    parent_unformat = frame->Unformat;
    frame->Unformat = Unformat;
+
+   parent_setepoch = frame->SetEpoch;
+   frame->SetEpoch = SetEpoch;
+
+   parent_clearepoch = frame->ClearEpoch;
+   frame->ClearEpoch = ClearEpoch;
 
 /* Store replacement pointers for methods which will be over-ridden by new
    member functions implemented here. */
@@ -7038,6 +7099,55 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    } else {
       (*parent_setattrib)( this_object, setting );
    }
+}
+
+static void SetEpoch( AstFrame *this_frame, double val ) {
+/*
+*  Name:
+*     SetEpoch
+
+*  Purpose:
+*     Set the value of the Epoch attribute for a SkyFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     void SetEpoch( AstFrame *this, double val )
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astSetEpoch method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function clears the Epoch value and updates the LAST value
+*     stored in the SkyFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+*     val
+*        New Epoch value.
+
+*/
+
+/* Local Variables: */
+   AstSkyFrame *this;            /* Pointer to the SkyFrame structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the SkyFrame structure. */
+   this = (AstSkyFrame *) this_frame;
+
+/* Invoke the parent method to set the Frame epoch. */
+   (*parent_setepoch)( this_frame, val );
+
+/* Now get the new LAST value corresponding to the new Epoch. If the 
+   original and new epoch are significantly different, this will cause 
+   the new LAST to be calculated accurately and stored in the SkyFrame. */
+   (void) GetLAST( this );
 }
 
 static void SetLast( AstSkyFrame *this ) {
