@@ -30,17 +30,21 @@
 
 *  Notes:
 *     This routine makes the assumption that there cannot be more than
-*     2*SMF__MXSMF smfDatas in a smfArray, essentially allowing the
+*     SMF__MXSMF smfDatas in a smfArray, essentially allowing the
 *     grouping of all four SCUBA-2 subarrays at both
 *     wavelengths. Something a little more flexible is desireable.
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
 *     2006-06-02 (AGG):
 *        Initial version
+*     2007-07-10 (EC):
+*        Changed smfArray.sdata to static array and altered behaviour
+*        so that smfArray.ndat reflects true number of allocated smfData. 
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -95,7 +99,7 @@ void smf_addto_smfArray( smfArray *ary, const smfData *data, int *status ) {
   ndat = ary->ndat;
 
   /* Check for valid number of smfData pointers */
-  if ( ndat < 1 || ndat > 2*SMF__MXSMF ) {
+  if ( ndat < 0 || ndat >= SMF__MXSMF ) {
     if ( *status == SAI__OK ) {
       msgSeti("N",ndat);
       *status = SAI__ERROR;
@@ -106,21 +110,15 @@ void smf_addto_smfArray( smfArray *ary, const smfData *data, int *status ) {
     }
   }
 
-  /* Loop over pointers in the smfArray */
-  for ( i=0; i<ndat; i++ ) {
-    /* Check if pointer is NULL and if so point to input smfData */
-    if ( (ary->sdata)[i] == NULL ) {
-      (ary->sdata)[i] = data;
-      /* Done so return */
-      return;
-    } else if ( i == ndat - 1 ) {
-      if ( *status == SAI__OK ) {
-	*status = SAI__ERROR;
-	errRep(FUNC_NAME, 
-	       "Unable to add smfData to current smfArray: all pointers set", 
-	       status);
-      }
-    }
+  /* add pointer to sdata if there is enough space */
+  if( ndat < SMF__MXSMF-1 ) {
+    (ary->sdata)[ndat] = data;
+    (ary->ndat)++;
+  } else if( *status == SAI__OK ) {
+    *status = SAI__ERROR;
+    errRep(FUNC_NAME, 
+	   "Unable to add smfData to current smfArray: all pointers set", 
+	   status);
   }
 
   return;

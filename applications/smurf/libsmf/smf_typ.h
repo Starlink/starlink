@@ -90,6 +90,10 @@
 *        Added DIMMfd and moved DIMMbuf and DIMMlen to smfFile
 *     2007-06-25 (EC):
 *        Removed DIMMbuf/DIMMlen, renamed DIMMfd to fd in smfFile
+*     2007-07-10 (EC):
+*        -increased SMF__MXSMF to 8 from 4
+*        -made smfData.sdata static array of size SMF__MXSMF
+*        -modified smf_calcmodelptr prototype
 *     {enter_further_changes_here}
 
 
@@ -131,7 +135,7 @@
 #include "smurf_typ.h"
 #define SMF_PATH_MAX GRP__SZNAM
 #define SMF_NAME_MAX GRP__SZFNM
-#define SMF__MXSMF 4 /* Maximum number of smfDatas in a smfArray */
+#define SMF__MXSMF 8 /* Maximum number of smfDatas in a smfArray */
 
 /* Different data types supported by SMURF */
 
@@ -263,7 +267,7 @@ typedef struct smfData {
    smfDatas */
 
 typedef struct smfArray {
-  smfData **sdata;           /* Pointers to smfDatas */
+  smfData *sdata[SMF__MXSMF];/* Pointers to smfDatas */
   int ndat;                  /* Number of smfDatas in current smfArray */
 } smfArray;
 
@@ -277,7 +281,7 @@ typedef struct smfGroup {
 } smfGroup;
 
 /* Prototype for function pointer to different models used by DIMM */
-typedef void(*smf_calcmodelptr)( smfData*, AstKeyMap*, double*, 
-				 double*, smfData*, int, int* );
+typedef void(*smf_calcmodelptr)( smfArray*, AstKeyMap*, double*, double*, 
+				 smfArray*, int, int* );
 
 #endif /* SMF_TYP_DEFINED */

@@ -32,12 +32,13 @@
 
 *  Notes:
 *     This routine makes the assumption that there cannot be more than
-*     2*SMF__MXSMF smfDatas in a smfArray, essentially allowing the
+*     SMF__MXSMF smfDatas in a smfArray, essentially allowing the
 *     grouping of all four SCUBA-2 subarrays at both
 *     wavelengths. Something a little more flexible is desireable.
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -46,6 +47,10 @@
 *     2006-07-07 (AGG):
 *        Allocate space for smfDatas, increase maximum size to
 *        2*SMF__MXSMF
+*     2007-07-10 (EC):
+*        smfArray.sdata is now static array with SMF__MXSMF entries, and
+*        smfArray.ndat is initialized to 0 (incremented with each 
+*        smf_addto_smfArray call)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -89,7 +94,7 @@
 
 #define FUNC_NAME "smf_create_smfArray"
 
-smfArray *smf_create_smfArray( const size_t size, int * status ) {
+smfArray *smf_create_smfArray( int * status ) {
 
   /* Need to make sure that any memory we malloc will be freed on error 
      so make sure we NULL all pointers first. */
@@ -107,39 +112,13 @@ smfArray *smf_create_smfArray( const size_t size, int * status ) {
     goto CLEANUP;
   }
 
-  if ( size < 1 ) {
-    if ( *status == SAI__OK ) {
-      msgSeti("S",size);
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Invalid number, ^S, of smfDatas requested", 
-	     status);
-      goto CLEANUP;
-    }
-  }
-  /* Check that we're not asking to create more smfDatas than we're
-     allowed to */
-  if ( size > 2*SMF__MXSMF ) {
-    if ( *status == SAI__OK ) {
-      msgSeti("S",size);
-      msgSeti("M",SMF__MXSMF);
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, 
-	     "Too many smfDatas requested: size, ^S, exceeds maximum of ^M", 
-	     status);
-      goto CLEANUP;
-    }
-  }
-
-  /* Allocate space for smfDatas */
-  ary->sdata = smf_malloc( size, sizeof(smfData), 0, status );;
-
-  /* Set each pointer to NULL */
-  for ( i=0; i<size; i++) {
+  /* Set each smfData pointer to NULL */
+  for ( i=0; i<SMF__MXSMF; i++) {
     (ary->sdata)[i] = NULL;
   }
 
-  /* Set number of requested smfDatas */
-  ary->ndat = size;
+  /* Initialize number of smfDatas */
+  ary->ndat = 0;
 
   return ary;
 
