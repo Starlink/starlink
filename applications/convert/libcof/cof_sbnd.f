@@ -45,6 +45,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     AJC: Alan J. Chipperfield (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -55,6 +56,8 @@
 *     2004 September 10 (TIMJ):
 *        Fix valgrind warning with uninitialised KEYWRD on entry
 *        to fitsio routine
+*        When extension has a symbolic type of IMAGE use that
+*        to override the XTENSION value (for compressed images).
 *     {enter_changes_here}
 
 *  Bugs:
@@ -96,6 +99,7 @@
       INTEGER I                  ! Loop counter
       CHARACTER * ( 8 ) KEYWRD   ! FITS keyword for a lower bound
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of the NDF
+      INTEGER HDUTYP             ! Type of HDU.
       INTEGER NDIM               ! Dimensionality of the NDF
       INTEGER NHDU               ! Number of the current HDU
       INTEGER PCOUNT             ! FITS PCOUNT value (not used)
@@ -122,6 +126,12 @@
 *  Obtain the value of the XTENSION keyword.
          CALL COF_GKEYC( FUNIT, 'XTENSION', THERE, XTENS, COMENT,
      :                   STATUS )
+
+         CALL FTGHDT( FUNIT, HDUTYP, STATUS )
+         IF ( XTENS .EQ. 'BINTABLE' .AND. HDUTYP .EQ. 0 ) THEN
+            XTENS = 'IMAGE'
+         END IF
+
          IF ( .NOT. ( THERE .AND. STATUS .EQ. SAI__OK
      :        .AND. XTENS .EQ. 'IMAGE' ) ) THEN
             STATUS = SAI__ERROR

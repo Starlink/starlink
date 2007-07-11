@@ -36,11 +36,15 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
 *     1996 January 25 (MJC):
 *        Original version.
+*     2007 July 11 (PWD):
+*        When extension has a symbolic type of IMAGE use that
+*        to override the XTENSION value (for compressed images).
 *     {enter_changes_here}
 
 *  Bugs:
@@ -68,6 +72,7 @@
 
 *  Local Variables:
       CHARACTER * ( 48 ) COMENT  ! Keyword comment
+      INTEGER HDUTYP             ! Current HDU type
       INTEGER NC                 ! Number of characters in a component
       INTEGER NHDU               ! Number of the current HDU
       LOGICAL THERE              ! Keyword is present?
@@ -89,6 +94,13 @@
 *  Obtain the value of the XTENSION keyword.
          CALL COF_GKEYC( FUNIT, 'XTENSION', THERE, XTENS, COMENT,
      :                   STATUS )
+
+         CALL FTGHDT( FUNIT, HDUTYP, STATUS )
+         IF ( XTENS .EQ. 'BINTABLE' .AND. HDUTYP .EQ. 0 ) THEN
+            XTENS = 'IMAGE'
+         END IF
+
+
          IF ( .NOT. ( THERE .AND. STATUS .EQ. SAI__OK
      :        .AND. XTENS .EQ. 'IMAGE' ) ) THEN
             STATUS = SAI__ERROR
