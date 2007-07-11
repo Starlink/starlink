@@ -24,9 +24,13 @@
 *        Pointer to global status.
 
 *  Description:
-*     
+*     The DIMM uses an ordered array of function pointers to each model
+*     calculation. Given a smf_modeltype return the appropriate function
+*     pointer.
 
 *  Notes:
+*     This function will not return a pointer to smf_calmodel_ast since its
+*     prototype has the additional parameter "lut" and is a special case.
 
 *  Authors:
 *     Edward Chapin (UBC)
@@ -37,6 +41,8 @@
 *        Initial Version
 *     2007-05-17 (EC)
 *        Added SMF__NOI
+*     2007-07-10 (EC):
+*        Fixed problem with function pointer cast
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -80,7 +86,7 @@
 
 #define FUNC_NAME "smf_model_getptr"
 
-smf_calcmodelptr *smf_model_getptr( smf_modeltype type, int *status) {
+smf_calcmodelptr smf_model_getptr( smf_modeltype type, int *status) {
 
   /* Local Variables */
   smf_calcmodelptr *retval = NULL;
@@ -90,20 +96,16 @@ smf_calcmodelptr *smf_model_getptr( smf_modeltype type, int *status) {
 
   switch( type ) {
 
-  case SMF__AST:
-    retval = (smf_calcmodelptr *) &smf_calcmodel_ast;
-    break;
-    
   case SMF__COM:
-    retval = (smf_calcmodelptr *) &smf_calcmodel_com;
+    retval = (smf_calcmodelptr) &smf_calcmodel_com;
     break;
 
   case SMF__EXT:
-    retval = (smf_calcmodelptr *) &smf_calcmodel_ext;
+    retval = (smf_calcmodelptr) &smf_calcmodel_ext;
     break;
 
   case SMF__NOI:
-    retval = (smf_calcmodelptr *) &smf_calcmodel_noi;
+    retval = (smf_calcmodelptr) &smf_calcmodel_noi;
     break;
 
   default:
