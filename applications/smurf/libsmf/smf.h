@@ -164,8 +164,14 @@
 *        Add string arg to smf_fits_add_prov
 *     2007-07-05 (TIMJ):
 *        Add smf_accumulate_prov.
-*     {enter_further_changes_here}
+*     2007-07-10 (EC):
+*        -Add smf_open_related_model
+*        -changed interface for smf_create_smfArray
+*        -changed interface for smf_model_create
+*        -changed interface for smf_calcmodel_*
+*        -changed return value of smf_calcmodelptr
 
+*     {enter_further_changes_here}
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -300,7 +306,7 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
                         const double telpos[3], double steptime, 
                         AstFrameSet **fset, int *status );
 
-smfArray *smf_create_smfArray( const size_t size, int *status );
+smfArray *smf_create_smfArray( int *status );
 
 smfDA * smf_create_smfDA( int * status );
 
@@ -428,8 +434,8 @@ void smf_mapbounds_approx( Grp *igrp, int index, char *system, double pixsize,
 			   int *lbnd_out, int *ubnd_out, AstFrameSet **outframeset, 
 			   int *moving, int *status );
 
-void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp, 
-		       int *status);
+void smf_model_create( const smfGroup *igrp, smf_modeltype mtype, 
+		       smfGroup **mgroup, int *status);
 
 char *smf_model_getname( smf_modeltype type, int *status);
 
@@ -592,23 +598,23 @@ void smf_terr( double phi, double h, double lambda, double pos[3] );
 
 void smf_instap_get( smfHead * hdr, int * status );
 
-void smf_calcmodel_com( smfData *res, AstKeyMap *keymap, 
-			double *map, double *mapvar, smfData *model, 
+void smf_calcmodel_com( smfArray *res, AstKeyMap *keymap, 
+			double *map, double *mapvar, smfArray *model, 
 			int flags, int *status );
 
-void smf_calcmodel_ast( smfData *res, AstKeyMap *keymap, int *lut,  
-			double *map, double *mapvar, smfData *model, 
+void smf_calcmodel_ast( smfArray *res, AstKeyMap *keymap, smfArray *lut,  
+			double *map, double *mapvar, smfArray *model, 
 			int flags, int *status );
 
-void smf_calcmodel_noi( smfData *res, AstKeyMap *keymap, 
-			double *map, double *mapvar, smfData *model, 
+void smf_calcmodel_noi( smfArray *res, AstKeyMap *keymap, 
+			double *map, double *mapvar, smfArray *model, 
 			int flags, int *status );
 
-void smf_calcmodel_ext( smfData *res, AstKeyMap *keymap, 
-			double *map, double *mapvar, smfData *model, 
+void smf_calcmodel_ext( smfArray *res, AstKeyMap *keymap, 
+			double *map, double *mapvar, smfArray *model, 
 			int flags, int *status );
 
-smf_calcmodelptr *smf_model_getptr( smf_modeltype type, int *status);
+smf_calcmodelptr smf_model_getptr( smf_modeltype type, int *status);
 
 void smf_labelunit( Grp *igrp,  int size, smfData *odata, int *status );
 
@@ -629,5 +635,9 @@ void smf_open_model( Grp *igrp, int index, char *mode, smfData **data,
 size_t smf_dtype_sz( const smf_dtype dtype, int *status );
 
 void smf_model_NDFexport( const smfData *data, const char *name, int *status );
+
+void smf_open_related_model( const smfGroup *group, const int subindex, 
+			     const char *accmode, smfArray **relfiles, 
+			     int *status );
 
 #endif /* SMF_DEFINED */
