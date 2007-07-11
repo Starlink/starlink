@@ -13,12 +13,12 @@
 *     Library routine
 
 *  Invocation:
-*     smf_calcmodel_ext( smfData *res, AstKeyMap *keymap, 
-*                        double *map, double *mapvar, smfData *model, 
+*     smf_calcmodel_ext( smfArray *res, AstKeyMap *keymap, 
+*                        double *map, double *mapvar, smfArray *model, 
 *                        int flags, int *status);
 
 *  Arguments:
-*     res = smfData * (Given and Returned)
+*     res = smfArray * (Given and Returned)
 *        The residual signal from previously calculated model components
 *     keymap = AstKeyMap * (Given)
 *        Parameters that control the iterative map-maker
@@ -27,7 +27,7 @@
 *        in the mapcoord extension of the res data structure)
 *     mapvar = double * (Given)
 *        Buffer containing current variance estimate corresponding to map
-*     model = smfData * (Returned)
+*     model = smfArray * (Returned)
 *        The data structure that will store the calculated model parameters
 *     flags = int (Given )
 *        Control flags: 
@@ -53,6 +53,8 @@
 *     2007-03-05 (EC):
 *        Initial Version
 *        Modified data array indexing to avoid unnecessary multiplies
+*     2007-07-10 (EC):
+*        Use smfArray instead of smfData
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -94,14 +96,15 @@
 
 #define FUNC_NAME "smf_calcmodel_ext"
 
-void smf_calcmodel_ext( smfData *res, AstKeyMap *keymap, 
-			double *map, double *mapvar, smfData *model, 
+void smf_calcmodel_ext( smfArray *res, AstKeyMap *keymap, 
+			double *map, double *mapvar, smfArray *model, 
 			int flags, int *status) {
 
   /* Local Variables */
   dim_t base;                   /* Store base index for data array offsets */
   const char *extmethod=NULL;   /* Pointer to static strings created by ast */
   dim_t i;                      /* Loop counter */
+  int idx=0;                    /* Index within subgroup */
   dim_t j;                      /* Loop counter */
   double mean;                  /* Array mean */
   double *model_data=NULL;      /* Pointer to DATA component of model */
@@ -121,36 +124,31 @@ void smf_calcmodel_ext( smfData *res, AstKeyMap *keymap,
     errRep(FUNC_NAME, "Error: EXT_METHOD not specified", status);
   } else {
 
-    /* Get pointers to DATA components */
-    res_data = (double *)(res->pntr)[0];
-    model_data = (double *)(model->pntr)[0];
+    /* Loop over index in subgrp (subarray) */
+    for( idx=0; idx<res->ndat; idx++ ) {
 
-    if( (res_data == NULL) || (model_data == NULL) ) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Null data in inputs", status);      
-    } else {
-    
-      /* Get the raw data dimensions */
-      nbolo = (res->dims)[0] * (res->dims)[1];
-      ntslice = (res->dims)[2];
-      ndata = nbolo*ntslice;
+      /* Get pointers to DATA components */
+      res_data = (double *)(res->sdata[idx]->pntr)[0];
+      model_data = (double *)(model->sdata[idx]->pntr)[0];
 
-      /* If SMF_DIMM_FIRSTITER set, call the extinction correction
-	 routine for the residual model component, and store the corrections 
-	 for each data point to use in subsequent iterations */
-      if( flags & SMF__DIMM_FIRSTITER ) {
-	smf_correct_extinction( res, extmethod, 0, 0, model_data, status );
-
+      if( (res_data == NULL) || (model_data == NULL) ) {
+	*status = SAI__ERROR;
+	errRep(FUNC_NAME, "Null data in inputs", status);      
       } else {
-	/* If this is not the first iteration, apply the previously 
-	   calculated correction to both cumulative and residual model
-	   components */
-	/*
-	for( i=0; i<ndata; i++ ) {
-	  res_data[i] *= model_data[i];
-	  cum_data[i] *= model_data[i];
-	}
-	*/
+    
+	/* Get the raw data dimensions */
+	nbolo = (res->sdata[idx]->dims)[0] * (res->sdata[idx]->dims)[1];
+	ntslice = (res->sdata[idx]->dims)[2];
+	ndata = nbolo*ntslice;
+
+	/* If SMF_DIMM_FIRSTITER set, call the extinction correction
+	   routine for the residual model component, and store the corrections 
+	   for each data point to use in subsequent iterations */
+	if( flags & SMF__DIMM_FIRSTITER ) {
+	  smf_correct_extinction( res->sdata[idx], extmethod, 0, 0, model_data,
+				  status );
+	  
+	} 
       }
     }
   }

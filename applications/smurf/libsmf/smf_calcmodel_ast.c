@@ -13,23 +13,23 @@
 *     Library routine
 
 *  Invocation:
-*     smf_calcmodel_ast( smfData *res, AstKeyMap *keymap, int *lut,
-*                        double *map, double *mapvar, smfData *model, 
+*     smf_calcmodel_ast( smfArray *res, AstKeyMap *keymap, smfArray *lut,
+*                        double *map, double *mapvar, smfArray *model, 
 *                        int flags, int *status);
 
 *  Arguments:
-*     res = smfData * (Given and Returned)
+*     res = smfArray * (Given and Returned)
 *        The residual signal from previously calculated model components
 *     keymap = AstKeyMap * (Given)
 *        Parameters that control the iterative map-maker
-*     lut = int * (Given)
+*     lut = smfArray* (Given)
 *        Lookup table for map pixel of each data point
 *     map = double * (Given)
 *        Buffer containing current estimate of the map (must match the LUT
 *        in the mapcoord extension of the res data structure)
 *     mapvar = double * (Given)
 *        Buffer containing current variance estimate corresponding to map
-*     model = smfData * (Returned)
+*     model = smfArray * (Returned)
 *        The data structure that will store the calculated model parameters
 *     flags = int (Given )
 *        Control flags: 
@@ -60,6 +60,8 @@
 *     2007-06-13 (EC)
 *        pointing lut supplied as extra parameter to accomodate 
 *        new DIMM file format
+*     2007-07-10 (EC)
+*        Use smfArray instead of smfData
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -101,44 +103,52 @@
 
 #define FUNC_NAME "smf_calcmodel_ast"
 
-void smf_calcmodel_ast( smfData *res, AstKeyMap *keymap, int *lut, 
-			double *map, double *mapvar, smfData *model, 
+void smf_calcmodel_ast( smfArray *res, AstKeyMap *keymap, smfArray *lut, 
+			double *map, double *mapvar, smfArray *model, 
 			int flags, int *status) {
 
   /* Local Variables */
   dim_t i;                      /* Loop counter */
+  int idx=0;                    /* Index within subgroup */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   dim_t ndata;                  /* Number of data points */
   double *res_data=NULL;        /* Pointer to DATA component of res */
+  int *lut_data=NULL;           /* Pointer to DATA component of lut */
   double sigma;                 /* Array standard deviation */ 
   
   /* Main routine */
   if (*status != SAI__OK) return;
 
-  /* Get pointers to DATA components */
-  res_data = (double *)(res->pntr)[0];
-  model_data = (double *)(model->pntr)[0];
+  /* Loop over index in subgrp (subarray) */
+  for( idx=0; idx<res->ndat; idx++ ) {
 
-  if( (res_data == NULL) || (lut == NULL) || (model_data == NULL) ) {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, "Null data / pointing LUT in inputs", status);      
-  } else {
-
-    /* Get the raw data dimensions */
-    ndata = (res->dims)[0] * (res->dims)[1] * (res->dims)[2];
-
-    /* Loop over data points */ 
-    for( i=0; i<ndata; i++ ) {
-      if( lut[i] != VAL__BADI ) {
-	/* Add previous iteration of the model back into the residual */
-	res_data[i] += model_data[i];
+    /* Get pointers to DATA components */
+    res_data = (double *)(res->sdata[idx]->pntr)[0];
+    lut_data = (int *)(lut->sdata[idx]->pntr)[0];
+    model_data = (double *)(model->sdata[idx]->pntr)[0];
+      
+    if( (res_data == NULL) || (lut_data == NULL) || (model_data == NULL) ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Null data in inputs", status);      
+    } else {
 	
-	/* calculate new model using the map/LUT */
-	model_data[i] = map[lut[i]];
+      /* Get the raw data dimensions */
+      ndata = (res->sdata[idx]->dims)[0] * (res->sdata[idx]->dims)[1] * 
+	(res->sdata[idx]->dims)[2];
 	
-	/* update the residual model */
-	res_data[i] -= model_data[i];
-      }
-    }    
+      /* Loop over data points */ 
+      for( i=0; i<ndata; i++ ) {
+	if( lut_data[i] != VAL__BADI ) {
+	  /* Add previous iteration of the model back into the residual */
+	  res_data[i] += model_data[i];
+	    
+	  /* calculate new model using the map/LUT */
+	  model_data[i] = map[lut_data[i]];
+	    
+	  /* update the residual model */
+	  res_data[i] -= model_data[i];
+	}
+      } 
+    }
   }
 }

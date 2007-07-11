@@ -13,12 +13,12 @@
 *     Library routine
 
 *  Invocation:
-*     smf_calcmodel_noi( smfData *res, AstKeyMap *keymap, 
-*                        double *map, double *mapvar, smfData *model, 
+*     smf_calcmodel_noi( smfArray *res, AstKeyMap *keymap, 
+*                        double *map, double *mapvar, smfArray *model, 
 *                        int flags, int *status);
 
 *  Arguments:
-*     res = smfData * (Given and Returned)
+*     res = smfArray * (Given and Returned)
 *        The residual signal from previously calculated model components
 *     keymap = AstKeyMap * (Given)
 *        Parameters that control the iterative map-maker
@@ -27,7 +27,7 @@
 *        in the mapcoord extension of the res data structure)
 *     mapvar = double * (Given)
 *        Buffer containing current variance estimate corresponding to map
-*     model = smfData * (Returned)
+*     model = smfArray * (Returned)
 *        The data structure that will store the calculated model parameters
 *     flags = int (Given )
 *        Control flags: 
@@ -54,6 +54,8 @@
 *        Modified bit flags
 *     2007-06-13 (EC)
 *        Fixed res_data pointer assignment bug
+*     2007-07-10 (EC)
+*        Use smfArray instead of smfData
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -94,12 +96,13 @@
 
 #define FUNC_NAME "smf_calcmodel_noi"
 
-void smf_calcmodel_noi( smfData *res, AstKeyMap *keymap, 
-			double *map, double *mapvar, smfData *model, 
+void smf_calcmodel_noi( smfArray *res, AstKeyMap *keymap, 
+			double *map, double *mapvar, smfArray *model, 
 			int flags, int *status) {
 
   /* Local Variables */
   dim_t i;                      /* Loop counter */
+  int idx=0;                    /* Index within subgroup */
   dim_t j;                      /* Loop counter */
   double mean;                  /* Array mean */
   double *model_data=NULL;      /* Pointer to DATA component of model */
@@ -115,36 +118,39 @@ void smf_calcmodel_noi( smfData *res, AstKeyMap *keymap,
   /* Main routine */
   if (*status != SAI__OK) return;
 
-  /* Get pointers to DATA components */
-  res_data = (double *)(res->pntr)[0];
-  res_var = (double *)(res->pntr)[1];
-  model_data = (double *)(model->pntr)[0];
-
-  if( (res_data == NULL) || (model_data == NULL) ) {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, "Null data in inputs", status);      
-  } else {
-    
-    /* Get the raw data dimensions */
-    nbolo = (res->dims)[0] * (res->dims)[1];
-    ntslice = (res->dims)[2];
-    ndata = nbolo*ntslice;
-
-    for( i=0; i<nbolo; i++ ) {
-      /* Don't need to adjust res since this model component is just
-         a weight calculation. Measure the sample standard deviation for
-	 each bolometer assuming it is stationary in time... */
-      smf_calc_stats( res, "b", i, 0, 0, &mean, &sigma, status );
-      var = sigma*sigma;
+  /* Loop over index in subgrp (subarray) */
+  for( idx=0; idx<res->ndat; idx++ ) {
       
-      /* Loop over time and store the model component / variance for RES */
-      for( j=0; j<ntslice; j++ ) {
-	model_data[j*nbolo + i] = sigma;
-	if( res_var ) {
-	  res_var[j*nbolo + i] = var;
+    /* Get pointers to DATA components */
+    res_data = (double *)(res->sdata[idx]->pntr)[0];
+    res_var = (double *)(res->sdata[idx]->pntr)[1];
+    model_data = (double *)(model->sdata[idx]->pntr)[0];
+
+    if( (res_data == NULL) || (model_data == NULL) ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Null data in inputs", status);      
+    } else {
+    
+      /* Get the raw data dimensions */
+      nbolo = (res->sdata[idx]->dims)[0] * (res->sdata[idx]->dims)[1];
+      ntslice = (res->sdata[idx]->dims)[2];
+      ndata = nbolo*ntslice;
+
+      for( i=0; i<nbolo; i++ ) {
+	/* Measure the sample standard deviation for
+	   each bolometer assuming it is stationary in time... */
+	smf_calc_stats( res->sdata[idx], "b", i, 0, 0, &mean, &sigma, status );
+	var = sigma*sigma;
+      
+	/* Loop over time and store the model component / variance for RES */
+	for( j=0; j<ntslice; j++ ) {
+	  model_data[j*nbolo + i] = sigma;
+	  if( res_var ) {
+	    res_var[j*nbolo + i] = var;
+	  }
 	}
-      }
-    }    
+      } 
+    }   
   }
 }
 

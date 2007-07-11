@@ -13,12 +13,12 @@
 *     Library routine
 
 *  Invocation:
-*     smf_calcmodel_com( smfData *res, AstKeyMap *keymap, 
-*                        double *map, double *mapvar, smfData *model, 
+*     smf_calcmodel_com( smfArray *res, AstKeyMap *keymap, 
+*                        double *map, double *mapvar, smfArray *model, 
 *                        int flags, int *status);
 
 *  Arguments:
-*     res = smfData * (Given and Returned)
+*     res = smfArray * (Given and Returned)
 *        The residual signal from previously calculated model components
 *     keymap = AstKeyMap * (Given)
 *        Parameters that control the iterative map-maker
@@ -27,7 +27,7 @@
 *        in the mapcoord extension of the res data structure)
 *     mapvar = double * (Given)
 *        Buffer containing current variance estimate corresponding to map
-*     model = smfData * (Returned)
+*     model = smfArray * (Returned)
 *        The data structure that will store the calculated model parameters
 *     flags = int (Given )
 *        Control flags: 
@@ -56,6 +56,8 @@
 *     2007-05-23 (EC)
 *        - Removed CUM calculation
 *        - Added COM_BOXCAR parameter to CONFIG file
+*     2007-07-10 (EC)
+*        Use smfArray instead of smfData
 
 *     {enter_further_changes_here}
 
@@ -98,8 +100,8 @@
 
 #define FUNC_NAME "smf_calcmodel_com"
 
-void smf_calcmodel_com( smfData *res, AstKeyMap *keymap, 
-			double *map, double *mapvar, smfData *model, 
+void smf_calcmodel_com( smfArray *res, AstKeyMap *keymap, 
+			double *map, double *mapvar, smfArray *model, 
 			int flags, int *status) {
 
   /* Local Variables */
@@ -107,6 +109,7 @@ void smf_calcmodel_com( smfData *res, AstKeyMap *keymap,
   int boxcar=0;                 /* width in samples of boxcar filter */ 
   int do_boxcar=0;              /* flag to do boxcar smooth */
   dim_t i;                      /* Loop counter */
+  int idx=0;                    /* Index within subgroup */
   dim_t j;                      /* Loop counter */
   double mean;                  /* Array mean */
   double *model_data=NULL;      /* Pointer to DATA component of model */
@@ -120,57 +123,61 @@ void smf_calcmodel_com( smfData *res, AstKeyMap *keymap,
   /* Main routine */
   if (*status != SAI__OK) return;
 
-  /* Checl for smoothing parameters in the CONFIG file */
+  /* Check for smoothing parameters in the CONFIG file */
   if( astMapGet0I( keymap, "COM_BOXCAR", &boxcar) ) {
     do_boxcar = 1;
   }
 
-  /* Get pointers to DATA components */
-  res_data = (double *)(res->pntr)[0];
-  model_data = (double *)(model->pntr)[0];
-
-  if( (res_data == NULL) || (model_data == NULL) ) {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, "Null data in inputs", status);      
-  } else {
+  /* Loop over index in subgrp (subarray) */
+  for( idx=0; idx<res->ndat; idx++ ) {
     
-    /* Get the raw data dimensions */
-    nbolo = (res->dims)[0] * (res->dims)[1];
-    ntslice = (res->dims)[2];
-    ndata = nbolo*ntslice;
+    /* Get pointers to DATA components */
+    res_data = (double *)(res->sdata[idx]->pntr)[0];
+    model_data = (double *)(model->sdata[idx]->pntr)[0];
 
-    for( i=0; i<ntslice; i++ ) {
+    if( (res_data == NULL) || (model_data == NULL) ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Null data in inputs", status);      
+    } else {
+    
+      /* Get the raw data dimensions */
+      nbolo = (res->sdata[idx]->dims)[0] * (res->sdata[idx]->dims)[1];
+      ntslice = (res->sdata[idx]->dims)[2];
+      ndata = nbolo*ntslice;
 
-      base = i*nbolo;  /* Index to first data point in i'th time slice */
+      for( i=0; i<ntslice; i++ ) {
 
-      /* Add previous iteration of the model back into the residual */
-      lastmean = model_data[i];
+	base = i*nbolo;  /* Index to first data point in i'th time slice */
 
-      for( j=0; j<nbolo; j++ ) {
-	res_data[base + j] += lastmean;
+	/* Add previous iteration of the model back into the residual */
+	lastmean = model_data[i];
+
+	for( j=0; j<nbolo; j++ ) {
+	  res_data[base + j] += lastmean;
+	}
+
+	/* Now calculate the new model as array average at this time slice */
+	smf_calc_stats( res->sdata[idx], "t", i, 0, 0, &mean, &sigma, status );
+	model_data[i] = mean;
+
       }
-
-      /* Now calculate the new model as array average at this time slice */
-      smf_calc_stats( res, "t", i, 0, 0, &mean, &sigma, status );
-      model_data[i] = mean;
-
-    }
      
-    /* boxcar smooth if desired */
-    if( do_boxcar ) {
-      smf_boxcar1( model_data, ntslice, boxcar, status );
-    }
-
-    /* Remove common mode from the residual */
-    for( i=0; i<ntslice; i++ ) {
-      base = i*nbolo;  /* Index to first data point in i'th time slice */
-
-      /* Loop over bolometer */
-      for( j=0; j<nbolo; j++ ) {
-	/* update the residual model */
-	res_data[base + j] -= model_data[i];
+      /* boxcar smooth if desired */
+      if( do_boxcar ) {
+	smf_boxcar1( model_data, ntslice, boxcar, status );
       }
-    }    
+
+      /* Remove common mode from the residual */
+      for( i=0; i<ntslice; i++ ) {
+	base = i*nbolo;  /* Index to first data point in i'th time slice */
+
+	/* Loop over bolometer */
+	for( j=0; j<nbolo; j++ ) {
+	  /* update the residual model */
+	  res_data[base + j] -= model_data[i];
+	}
+      }    
+    }
   }
 }
 
