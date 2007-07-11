@@ -56,6 +56,8 @@
 *        Split from dsim.c
 *     2007-07-04 (EC):
 *        Removed hard limits on input power from 0--200 pW
+*     2007-07-11 (EC):
+*        Huge (or tiny) input powers are clipped to the range 0--200 pW
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -94,6 +96,10 @@ void sc2sim_ptoi( double flux, int ncoeffs, double coeffs[], double pzero,
    if ( !StatusOkP(status) ) return;
 
    p = flux + pzero;
+
+   /* clip values that have ridiculous ranges */
+   if( p < 0.0 ) p = 0;
+   if( p > 200.0 ) p = 200.;
 
    *current = coeffs[0] + coeffs[1] * p + coeffs[2] * p*p + 
      coeffs[3] * p*p*p + coeffs[4] * p*p*p*p + coeffs[5] * p*p*p*p*p;
