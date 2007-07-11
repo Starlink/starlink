@@ -1512,6 +1512,11 @@ fi
 # probably needs rethinking as g95 also has a g95_runtime_stop() function,
 # that should be called.
 #
+# Intel Fortran needs the for_rtl_init_ function, there is also a
+# for_rtl_finish_ to run during closedown. The intel compiler signature
+# is to have "IFORT" in the --version string.
+#
+#
 AC_DEFUN([STAR_INITIALISE_FORTRAN],
    [AC_CACHE_CHECK([how to initialise the Fortran RTL],
        [star_cv_initialise_fortran],
@@ -1521,11 +1526,17 @@ AC_DEFUN([STAR_INITIALISE_FORTRAN],
                 star_cv_initialise_fortran=g95-start
             elif "$FC" --version 2>&1 < /dev/null | grep 'Fortran 95' > /dev/null; then
                 star_cv_initialise_fortran=gfortran-setarg
+            elif "$FC" --version 2>&1 < /dev/null | grep 'IFORT' > /dev/null; then
+                star_cv_initialise_fortran=ifort-setarg
             else
                 star_cv_initialise_fortran=g77-setarg
             fi
         else
-            star_cv_initialise_fortran=
+            if "$FC" --version 2>&1 < /dev/null | grep 'IFORT' > /dev/null; then
+                star_cv_initialise_fortran=ifort-setarg
+            else
+                star_cv_initialise_fortran=
+            fi
         fi])
     AH_TEMPLATE([STAR_INITIALISE@&t@_FORTRAN],
        [Define to a function call which will initialise the Fortran RTL])
@@ -1541,6 +1552,10 @@ AC_DEFUN([STAR_INITIALISE_FORTRAN],
       gfortran-setarg)
         AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
                   [{extern void _gfortran_set_args(int,char**); _gfortran_set_args(argc, argv);}])
+        ;;
+      ifort-setarg)
+        AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
+                  [{extern void for_rtl_init_(int*,char**); for_rtl_init_(&argc, argv);}])
         ;;
       *) 
         AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],[])
