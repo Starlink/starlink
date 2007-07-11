@@ -186,7 +186,7 @@ install-svnversion:
 	@if test -n "$(SVNVERSION)"; then \
 	   if test -d "$(STAR_SOURCE_ROOT_DIR)"; then \
 	      cd $(STAR_SOURCE_ROOT_DIR) && \
-	      $(SVNVERSION) > $(DESTDIR)$(STAR_MANIFEST_DIR)/starlink.version; \
+	      $(SVNVERSION) . > $(DESTDIR)$(STAR_MANIFEST_DIR)/starlink.version; \
 	   fi; \
 	fi
 
