@@ -73,6 +73,9 @@
 *        - Use new DIMM binary file format 
 *     2007-06-14 (EC):
 *        - If config file has exportndf set, export DIMM components to *.sdf
+*     2007-07-10 (EC):
+*        - Use smfGroups and smfArrays instead of groups and smfdatas
+*        - fixed problem with function pointer type casting
 
 
 *  Notes:
@@ -128,52 +131,40 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 		     int msize, int *status ) {
 
   /* Local Variables */
-  int added;                    /* Number of names added to group */
-  int astndf;                   /* Astronomical signal NDF identifier */
-  smfData *ast=NULL;            /* Pointer to astronomical data struct */
+  smfArray *ast;                /* Astronomical signal */
   double *ast_data=NULL;        /* Pointer to DATA component of ast */
-  Grp *astgrp=NULL;             /* Group of ast model files */
-  const char *astname;          /* Name of astmodel group */
+  smfGroup *astgroup=NULL;      /* smfGroup of ast model files */
   const char *asttemp=NULL;     /* Pointer to static strings created by ast */
-  int atmndf;                   /* Atmospheric signal NDF identifier */
-  const char *atmname;          /* Name of atmmodel group */
-  smfData *data=NULL;           /* Pointer to source data struct */
-  double *data_data=NULL;       /* Pointer to DATA component of data */
   int dimmflags;                /* Control flags for DIMM model components */
   dim_t dsize;                  /* Size of data arrays in containers */
   int exportNDF=0;              /* If set export DIMM files to NDF at end */
   int flag;                     /* Flag */
   dim_t i;                      /* Loop counter */
+  int idx=0;                    /* index within subgroup */
+  smfGroup *igroup=NULL;        /* smfGroup corresponding to igrp */
   int indf;                     /* Input data NDF identifier */
   dim_t iter;                   /* Iteration number */
   int isize;                    /* Number of files in input group */
   dim_t j;                      /* Loop counter */
   dim_t k;                      /* Loop counter */
-  smfData *lut=NULL;            /* Pointer to pointing LUT data struct */
+  dim_t l;                      /* Loop counter */
+  smfArray *lut;                /* Pointing LUT for each file */
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
-  Grp *lutgrp=NULL;             /* Group of lut model files */
-  void *mapptr[3];              /* Pointer to array of mapped components */
-  double mean;                  /* Estimate of mean */
-  smfData **modeldata=NULL;     /* Array of pointers to model data */
-  Grp **modelgrps=NULL;         /* Array of group ptrs/ each model component */
-  smf_modeltype *modeltyps=NULL; /* Array of model types */
+  smfGroup *lutgroup=NULL;      /* smfGroup of lut model files */
+  smfArray **modeldata=NULL;    /* Array of pointers smfArrays for e. model */
+  smfGroup **modelgroups=NULL;  /* Array of group ptrs/ each model component */
+  smf_modeltype *modeltyps=NULL;/* Array of model types */
   char modelname[4];            /* Name of current model component */
   smf_calcmodelptr modelptr=NULL; /* Pointer to current model calc function */
   int nbolo;                    /* Number of bolometers */
   int nmap;                     /* Number of elements mapped */
   int nmodels=0;                /* Number of model components / iteration */
-  int nndf;                     /* Residual noise NDF identifier */
-  const char *nname;            /* Name of noisemodel group */
-  smfData *noi=NULL;            /* Pointer to noise model data struct */
-  Grp *noigrp=NULL;             /* Group of noi model files */
   int numiter;                  /* Total number iterations */
   int pass;                     /* Two pass parsing of MODELORDER */
   int rebinflags;               /* Flags to control rebinning */
-  smfData *res=NULL;            /* Pointer to residual data struct */
+  smfArray *res=NULL;           /* Residual signal */
   double *res_data=NULL;        /* Pointer to DATA component of res */
-  double *res_var=NULL;         /* Pointer to DATA component of res */
-  Grp *resgrp=NULL;             /* Group of model residual files */
-  double sigma;                 /* Estimate of standard deviation */
+  smfGroup *resgroup=NULL;      /* smfGroup of model residual files */
   smf_modeltype thismodel;      /* Type of current model */
 
   /* Main routine */
@@ -257,23 +248,28 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
     msgOut(" ", "  ^MNAME", status ); 
   }
 
+  /* Create an ordered smfGrp which keeps track of files corresponding to
+     different subarrays (observed simultaneously), as well as time-ordering
+     the files */
+
+  smf_grp_related( igrp, isize, 1, &igroup, status );
+
   /* Create groups of NDFs for time-series model components */
   msgOut(" ", "SMF_ITERATEMAP: Create model containers", status);
 
   if( nmodels > 0 ) {
     modeldata = smf_malloc( nmodels, sizeof(*modeldata), 1, status );  
-    modelgrps = smf_malloc( nmodels, sizeof(*modelgrps), 1, status );  
+    modelgroups = smf_malloc( nmodels, sizeof(*modelgroups), 1, status );  
   }
 
   /* These always get made */
-
-  smf_model_create( igrp, SMF__RES, &resgrp, status );
-  smf_model_create( igrp, SMF__LUT, &lutgrp, status ); 
-  smf_model_create( igrp, SMF__AST, &astgrp, status );
+  smf_model_create( igroup, SMF__RES, &resgroup, status );
+  smf_model_create( igroup, SMF__LUT, &lutgroup, status ); 
+  smf_model_create( igroup, SMF__AST, &astgroup, status );
 
   /* Dynamically created models */
   for( j=0; j<nmodels; j++ ) {
-    smf_model_create( igrp, modeltyps[j], &modelgrps[j], status );
+    smf_model_create( igroup, modeltyps[j], &modelgroups[j], status );
   }
 
   /* Start the main iteration loop */
@@ -285,21 +281,22 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
       msgOut(" ", "SMF_ITERATEMAP: Iteration ^ITER / ^NUMITER ---------------",
              status);
       
-      for( i=1; i<=isize; i++ ) {
-	msgSeti("CHUNK", i);
-	msgSeti("NUMCHUNK", isize);
+      for( i=0; i<igroup->ngroups; i++ ) {
+	msgSeti("CHUNK", i+1);
+	msgSeti("NUMCHUNK", igroup->ngroups);
 	msgOut(" ", "SMF_ITERATEMAP: Chunk ^CHUNK / ^NUMCHUNK", status);
 	msgOut(" ", "SMF_ITERATEMAP: Calculate time-stream model components", 
 	       status);
 
         /* Open model files */
 
-	smf_open_model( resgrp, i, "UPDATE", &res, status );
-	smf_open_model( lutgrp, i, "READ", &lut, status );
-	smf_open_model( astgrp, i, "UPDATE", &ast, status );
+	smf_open_related_model( resgroup, i, "UPDATE", &res, status );
+	smf_open_related_model( lutgroup, i, "READ", &lut, status );
+	smf_open_related_model( astgroup, i, "UPDATE", &ast, status );
 
 	for( j=0; j<nmodels; j++ ) {
-	  smf_open_model( modelgrps[j], i, "UPDATE", &modeldata[j], status );
+	  smf_open_related_model( modelgroups[j], i, "UPDATE", &modeldata[j], 
+				  status );
 	}
 
 	/* Call the model calculations in the desired order. */
@@ -328,79 +325,78 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 	  }
 	}
 
-	/* Once all the other map components have been calculated, but the
+	/* Once all the other map components have been calculated put the
            previous iteration of AST back into the residual, zero ast,
            and rebin the noise+astro signal into the map */
 
-	if( *status == SAI__OK ) {
-
-	  /* Add last iteration of astronomical signal back in to residual */
-	  ast_data = (double *)(ast->pntr)[0];
-	  res_data = (double *)(res->pntr)[0];
-	  res_var = (double *)(res->pntr)[1];
-	  lut_data = (int *)(lut->pntr)[0];
-
-	  dsize = (ast->dims)[0]*(ast->dims)[1]*(ast->dims)[2];
-
-	  for( k=0; k<dsize; k++ ) {	  
-	    res_data[k] += ast_data[k];
-	  
-	    /* Set ast_data back to 0 since we've moved all of the signal
-	       into the map, and then it will get re-estimated by
-	       calcmodel_ast at the start of the next iteration. */
-	  
-	    ast_data[k] = 0;
-	  }
-	}
-
-	/* Load the LUT from the mapcoord extension */
-	/* smf_open_mapcoord( res, status ); */
-
-	if( *status == SAI__OK ) {
-
-	  /* Setup rebin flags */
-	  rebinflags = 0;
-	  if( i == 1 ) {
-	    rebinflags = rebinflags | AST__REBININIT;
-	  }
-	    
-	  if( i == isize ) {
-	    rebinflags = rebinflags | AST__REBINEND;
-	  }
-	    
-	}
-
-	/* Rebin the residual + astronomical signal into a map */
-
 	msgOut(" ", "SMF_ITERATEMAP: Rebin residual to estimate MAP", status);
-	smf_simplerebinmap( res_data, res_var, lut_data, dsize,
-			    rebinflags, map, weights, mapvar,
-			    msize, status );
+
+	if( *status == SAI__OK ) {
+
+	  /* Loop over subgroup index (subarray) */
+	  for( idx=0; idx<res->ndat; idx++ ) {
+
+	    /* Add last iter. of astronomical signal back in to residual */
+	    ast_data = (double *)(ast->sdata[idx]->pntr)[0];
+	    res_data = (double *)(res->sdata[idx]->pntr)[0];
+	    lut_data = (int *)(lut->sdata[idx]->pntr)[0];
+	    
+	    dsize = (ast->sdata[idx]->dims)[0]*(ast->sdata[idx]->dims)[1]*
+	      (ast->sdata[idx]->dims)[2];
+
+	    for( k=0; k<dsize; k++ ) {	  
+	      res_data[k] += ast_data[k];
+	      
+	      /* Set ast_data back to 0 since we've moved all of the signal
+		 into the residual, and then it will get re-estimated by
+		 calcmodel_ast after we finish estimating the map. */
+	      
+	      ast_data[k] = 0;
+	    }
+
+	    /* Setup rebin flags */
+	    rebinflags = 0;
+	    if( (i == 0) && (idx == 0) ) {   
+	      /* First call to rebin clears the arrays */
+	      rebinflags = rebinflags | AST__REBININIT;
+	    }
+	    
+	    if( (i == igroup->ngroups-1) && (idx == res->ndat-1) ) {
+	      /* Final call to rebin re-normalizes */
+	      rebinflags = rebinflags | AST__REBINEND;
+	    }
+	    
+	  }
 	  
+	  /* Rebin the residual + astronomical signal into a map */
+
+	  smf_simplerebinmap( res_data, NULL, lut_data, dsize,
+			      rebinflags, map, weights, mapvar,
+			      msize, status );
+	}
+
         /* Close files */
 
-        smf_close_file( &res, status );
-        smf_close_file( &ast, status );    
-        smf_close_file( &lut, status );    
+        smf_close_related( &res, status );
+        smf_close_related( &ast, status );    
+        smf_close_related( &lut, status );    
 
 	for( j=0; j<nmodels; j++ ) {
-	  smf_close_file( &modeldata[j], status );
+	  smf_close_related( &modeldata[j], status );
 	}
 
 	/* Set exit condition if bad status was set */
 	if( *status != SAI__OK ) i=isize+1;
       }
       
-
-      /*if( iter == 1 ) return;*/
-
       if( *status == SAI__OK ) {
 	msgOut(" ", "SMF_ITERATEMAP: Calculate ast", status);
 
-        for( i=1; i<=isize; i++ ) {
-	  smf_open_model( astgrp, i, "UPDATE", &ast, status );
-	  smf_open_model( resgrp, i, "UPDATE", &res, status );
-	  smf_open_model( lutgrp, i, "READ", &lut, status );
+	for( i=0; i<igroup->ngroups; i++ ) {
+
+	  smf_open_related_model( astgroup, i, "UPDATE", &ast, status );
+	  smf_open_related_model( resgroup, i, "UPDATE", &res, status );
+	  smf_open_related_model( lutgroup, i, "READ", &lut, status );
 
 	  /* Calculate the AST model component. It is a special model
 	     because it assumes that the map contains the best current
@@ -409,55 +405,72 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
              each chunk in the main model component loop */
 
 	  if( *status == SAI__OK ) {
-	    lut_data = (int *)(lut->pntr)[0];
-	    smf_calcmodel_ast( res, keymap, lut_data, map, mapvar, ast, 0, 
+	    smf_calcmodel_ast( res, keymap, lut, map, mapvar, ast, 0, 
 			       status );
 	  }
+	  /* Close files */
 
-	  /* Finally calculate the noise from the residual */
-
-	  smf_close_file( &ast, status );    
-	  smf_close_file( &res, status );
-	  smf_close_file( &lut, status );
+	  smf_close_related( &ast, status );    
+	  smf_close_related( &res, status );
+	  smf_close_related( &lut, status );
         }
       }
     }
 
     /* Export DIMM model components to NDF files.
-       Note that we don't do LUT since it is originall an extension in the
-       input flatfield data */
+       Note that we don't do LUT since it is originally an extension in the
+       input flatfielded data */
   
-    if( exportNDF ) {
+    if( exportNDF && (*status == SAI__OK) ) {
       msgOut(" ", "SMF_ITERATEMAP: Export model components to NDF files.", 
 	     status);
       
-      for( i=1; i<=isize; i++ ) {    /* Chunk loop */
-	smf_open_model( resgrp, i, "READ", &res, status );
-	smf_model_NDFexport( res, res->file->name, status );
-	smf_close_file( &res, status );
-	
-	smf_open_model( astgrp, i, "READ", &ast, status );
-	smf_model_NDFexport( ast, ast->file->name, status );
-	smf_close_file( &ast, status );
-	
-	for( j=0; j<nmodels; j++ ) { /* Dynamic model component loop */
-	  smf_open_model( modelgrps[j], i, "READ", &modeldata[j], status );
-	  smf_model_NDFexport( modeldata[j], (modeldata[j])->file->name, 
-			       status );
-	  smf_close_file( &modeldata[j], status );
+      for( i=0; i<igroup->ngroups; i++ ) {  /* Chunk loop */
+	msgSeti("CHUNK", i+1);
+	msgSeti("NUMCHUNK", igroup->ngroups);
+	msgOut(" ", "  Chunk ^CHUNK / ^NUMCHUNK", status);
+
+	/* Open subgroup */
+	smf_open_related_model( resgroup, i, "READ", &res, status );
+	smf_open_related_model( astgroup, i, "READ", &ast, status );
+	for( k=0; k<nmodels; k++ ) { 
+	  smf_open_related_model( modelgroups[k], i, "READ", &modeldata[k], 
+				  status );
 	}
+
+	/* Loop over elements of subgroup and export */
+	for( idx=0; idx<res->ndat; idx++ ) {
+	  smf_model_NDFexport( res->sdata[idx], res->sdata[idx]->file->name, 
+			       status );
+	  smf_model_NDFexport( ast->sdata[idx], ast->sdata[idx]->file->name, 
+			       status );
+	  for( k=0; k<nmodels; k++ ) { 
+	    smf_model_NDFexport( modeldata[k]->sdata[idx], 
+				 modeldata[k]->sdata[idx]->file->name, status);
+	  }
+	}
+
+	/* Close subgroup */
+	smf_close_related( &res, status );
+	smf_close_related( &ast, status );
+	for( k=0; k<nmodels; k++ ) { 
+	  smf_close_related( &modeldata[k], status );
+	}
+
       }
     }
   }
 
   /* Cleanup */
 
-  if( resgrp ) grpDelet( &resgrp, status );
-  if( astgrp ) grpDelet( &astgrp, status );  
+  if( resgroup ) smf_close_smfGroup( &resgroup, status );
+  if( astgroup ) smf_close_smfGroup( &astgroup, status );  
+  if( lutgroup ) smf_close_smfGroup( &lutgroup, status );  
 
   for( j=0; j<nmodels; j++ ) {
-    if( modelgrps[j] ) grpDelet( &(modelgrps[j]), status );
+    if( modelgroups[j] ) smf_close_smfGroup( &(modelgroups[j]), status );
   }
 
   if( modeltyps ) smf_free( modeltyps, status );
+
 }
