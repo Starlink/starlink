@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_open_related( const smfGroup *group, const int subindex, 
-*                       const char *accmodesmfArray **relfiles,
+*                       const char *accmode, smfArray **relfiles,
 *                       int *status );
 
 *  Arguments:
@@ -40,6 +40,7 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -47,6 +48,8 @@
 *        Initial version
 *     2006-09-28 (AGG):
 *        Add file access mode to API
+*     2007-07-10 (EC):
+*        Changed interface to smf_create_smfArray
 
 *  Copyright:
 *     Copyright (C) 2006 University of British Columbia.  All Rights
@@ -117,7 +120,7 @@ void smf_open_related ( const smfGroup *group, const int subindex, const char *a
   grp = group->grp;
   nrelated = group->nrelated;
 
-  *relfiles = smf_create_smfArray( nrelated, status );
+  *relfiles = smf_create_smfArray( status );
 
   for (i=0; i<nrelated; i++) {
     /* Select correct array of indices */
