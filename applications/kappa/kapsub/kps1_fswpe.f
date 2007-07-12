@@ -3,10 +3,10 @@
      :                       STATUS )
 *+
 *  Name:
-*     KPS1_FSWEX
+*     KPS1_FSWPE
 
 *  Purpose:
-*     Writes the SURFACEFIT.FIT NDF extension for storing fit 
+*     Writes the SURFACEFIT.FIT NDF extension for storing Chebyshev fit 
 *     coefficients.
 
 *  Language:
@@ -19,10 +19,10 @@
 
 *  Description:
 *     This routine creates a SURFACEFIT extension in a supplied NDF.
-*     Within in that in makes a FIT structure of type POLYNOMIAL for 
-*     storing the fit coefficients; plus RMS, RESIDMAX, and COSYS
-*     objects for the rms difference of the fit, the maximum residual, 
-*     and the co-ordinate system respectively.  
+*     Within in that in makes a FIT structure of type POLYNOMIAL,
+*     variant CHEBYSHEV, for storing the fit coefficients; plus RMS, 
+*     RESIDMAX, and COSYS objects for the rms difference of the fit,
+*     the maximum residual, and the co-ordinate system respectively.  
 
 *  Arguments:
 *     NDFI = INTEGER (Given)
@@ -68,6 +68,7 @@
 
 *  Copyright:
 *     Copyright (C) 2007 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -116,8 +117,8 @@
       INTEGER MCOEF
       DOUBLE PRECISION CHCOEF( MCOEF )
       DOUBLE PRECISION VARIAN( MCOEF )
-      DOUBLE PRECISION RSMAX
-      DOUBLE PRECISION RMS
+      REAL RSMAX
+      REAL RMS
       CHARACTER*(*) COSYS
 
 *  Status:
