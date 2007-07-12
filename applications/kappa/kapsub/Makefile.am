@@ -12,7 +12,8 @@ kps1_agnch.f kps1_agncm.f kps1_agncp.f kps1_agndl.f kps1_agndr.f \
 kps1_agndw.f kps1_agnls.f kps1_agnms.f kps1_agnst.f kps1_agnwc.f \
 kps1_bfcrf.f kps1_bffil.f kps1_bffn.f  kps1_bfft.f  \
 kps1_bfftg.f kps1_bfhd.f  kps1_bfint.f kps1_bflog.f kps1_bfop.f \
-kps1_bfpre.f kps1_ccmpp.f kps1_ccmqn.f kps1_cenab.f kps1_cenad.f \
+kps1_bfpre.f kps1_bs2ge.f kps1_bs2pu.f \
+kps1_ccmpp.f kps1_ccmqn.f kps1_cenab.f kps1_cenad.f \
 kps1_cenai.f kps1_cenar.f kps1_cenaub.f kps1_cenauw.f kps1_cenaw.f \
 kps1_cenbt.f kps1_cenhd.f kps1_censg.f kps1_censh.f kps1_cff2d.f \
 kps1_cff2r.f kps1_chsha.f kps1_clpa0.f kps1_clpal.f \
@@ -22,8 +23,8 @@ kps1_clptm.f kps1_clpky.f kps1_clpcp.f kps1_cnvrp.f kps1_cremg.f \
 kps1_crets.f kps1_curfm.f kps1_curhd.f kps1_curdv.f kps1_discl.f \
 kps1_dnrth.f kps1_dtpcl.f kps1_elgau.f kps1_elmap.f \
 kps1_elpr1.f kps1_elpr2.f kps1_elpr3.f kps1_elpr4.f kps1_elpr5.f \
-kps1_errcl.f kps1_fspe2.f kps1_fspf2.f kps1_fswpe.f kps1_gaups.f \
-kps1_glibd.f kps1_glibr.f kps1_glidd.f kps1_glidr.f kps1_gligt.f \
+kps1_errcl.f kps1_fspe2.f kps1_fspf2.f kps1_fswpe.f kps1_fswse.f \
+kps1_gaups.f kps1_glibd.f kps1_glibr.f kps1_glidd.f kps1_glidr.f kps1_gligt.f \
 kps1_gliwd.f kps1_gliwr.f kps1_grdsc.f kps1_hscem.f kps1_icblu.f kps1_inmat.f \
 kps1_ks2tr.f kps1_kspro.f kps1_lapl.f  kps1_lftps.f kps1_lftsv.f \
 kps1_lmkgd.f kps1_lmkpc.f kps1_lmkst.f kps1_look.f  kps1_look1.f \
@@ -36,11 +37,11 @@ kps1_mlpml.f kps1_mlpmp.f kps1_mlpnd.f kps1_mlpng.f kps1_mlppn.f \
 kps1_msa.f   kps1_mss.f   kps1_mthcd.f kps1_mthcr.f kps1_nmplt.f \
 kps1_op1.f   kps1_op2.f   kps1_plclc.f kps1_plcpy.f kps1_plmsk.f \
 kps1_polyv.f kps1_prflt.f kps1_prfmk.f kps1_prfsm.f kps1_psdim.f \
-kps1_psevl.f kps1_psplt.f kps1_pswcs.f kps1_putc.f kps1_putl.f \
+kps1_psevl.f kps1_psplt.f kps1_pswcs.f kps1_putc.f  kps1_putl.f \
 kps1_puts.f  kps1_putvl.f kps1_pxdpm.f kps1_robos.f kps1_rofwd.f \
 kps1_rosiz.f kps1_saxlk.f kps1_skyf2.f kps1_skyf3.f kps1_skyf4.f \
 kps1_skyfn.f kps1_skyft.f kps1_stqa0.f kps1_stqa1.f \
-kps1_supeb.f kps1_supei.f kps1_supev.f kps1_supf.f kps1_suseb.f \
+kps1_supeb.f kps1_supei.f kps1_supev.f kps1_supf.f  kps1_suseb.f \
 kps1_susei.f kps1_susev.f kps1_susf.f  kps1_trop1.f kps1_trop2.f \
 kps1_vecky.f kps1_vecpl.f kps1_vect.f  kps1_wala0.f kps1_wala7.f \
 kps1_wieap.f kps1_wiecp.f kps1_wiecs.f kps1_wiefl.f kps1_wiefp.f \
@@ -81,18 +82,18 @@ KPG_DR_GEN = kps1_med.gdr kps1_mmv.gdr kps1_clps.gdr kps1_subi.gdr \
              kps1_oea.gdr kps1_cpwd.gdr kps1_bfre.gdr kps1_bafi.gdr \
              kps1_fofo.gdr kps1_fohe.gdr kps1_fopp.gdr kps1_fopr.gdr \
              kps1_foqu.gdr kps1_fore.gdr kps1_fori.gdr kps1_heqp.gdr \
-             kps1_sucl.gdr kps1_susk.gdr
+             kps1_sucl.gdr kps1_susk.gdr kps1_xyzw.gdr
 
 KPG_DIR_GEN = kps1_trdr.gdir kps1_trnd.gdir kps1_trnv.gdir
 
 KPG_BDIRW_GEN = kps1_dscl.gbdirw kps1_fain.gbdirw
 
-KPG_GN_GEN = kps1_inle.gn kps1_inli.gn kps1_inls.gn kps1_lft.gn \
-             kps1_lftq.gn kps1_lfts.gn kps1_mfrm.gn kps1_slae.gn \
-             kps1_clns.gn kps1_mdrf.gn kps1_mdrp.gn kps1_mdwt.gn \
-             kps1_mspa.gn kps1_nom1.gn kps1_plcp.gn kps1_put.gn \
-             kps1_robl.gn kps1_ronn.gn kps1_rora.gn kps1_rorb.gn \
-             kps1_rprf.gn kps1_zprg.gn kps1_hsmo.gn
+KPG_GN_GEN = kps1_clns.gn kps1_hsmo.gn kps1_inle.gn kps1_inli.gn \
+             kps1_inls.gn kps1_lft.gn  kps1_lftq.gn kps1_lfts.gn \
+             kps1_mfrm.gn kps1_mdrf.gn kps1_mdrp.gn kps1_mdwt.gn \
+             kps1_mspa.gn kps1_mssa.gn kps1_nom1.gn kps1_plcp.gn \
+             kps1_put.gn  kps1_robl.gn kps1_ronn.gn kps1_rora.gn \
+             kps1_rorb.gn kps1_rprf.gn kps1_slae.gn kps1_zprg.gn
 
 KPG_R_GEN = kps1_pgft.gr
 

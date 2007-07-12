@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.32}
 \newcommand{\stardocnumber}    {95.32}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2007 July 2}
+\newcommand{\stardocdate}      {2007 July 10}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.7-9}
+\newcommand{\stardocversion}   {1.7-10}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -7807,8 +7807,8 @@ attribute of the sky Frame, we could say:
       effects are overridden if a Format string is set explicitly for an 
       axis.
 
-      The default Digits value for a Frame is {\tt 7}.  If a value less than 1 is 
-      supplied, then {\tt 1} is used instead.
+      The default Digits value for a Frame is {\tt 7}.  If a value fewer
+      than 1 is supplied, then {\tt 1} is used instead.
 
       If the Frame is actually a \xref{SkyFrame}{sun210}{SkyFrame}~
       (\emph{e.g.}~ describes celestial longitude and latitude), then the {\att
@@ -8972,7 +8972,7 @@ The \PGPLOT\ ref\ graphics package which is used by \KAPPA\
 draws images and line graphics using a set of `pens'.  The number of pens 
 available is limited to 256, even on 16- or 24-bit graphics devices which
 nominally have `millions' of colours.  On 8 bit graphics devices, the
-number of available pens may be less than 256 if any other applications
+number of available pens may be fewer than 256 if any other applications
 have `grabbed' colours for their own use\footnote{Netscape is notorious 
 for this.  If you have problems allocating sufficient colours, try killing
 any netscape browsers you have running.}. 
@@ -22238,7 +22238,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          NITER = \_INTEGER (Read)
       }{
          The number of iterations of the relaxation algorithm.  This
-         value cannot be less than two, since this is the minimum
+         value cannot be fewer than two, since this is the minimum
          number required to ensure that all bad values are assigned a
          replacement value.  The more iterations used, the finer the
          detail in the replacement function and the closer it will
@@ -24418,7 +24418,14 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
       outliers.
    }
    \sstusage{
-      fitsurface ndf [fittype] nxpar nypar
+      fitsurface ndf [fittype]
+        $\left\{ {\begin{tabular}{l}
+                  nxpar nypar \\
+                  \mbox{[knots]}
+                  \end{tabular} }
+        \right.$
+        \newline\latexelsehtml{\hspace*{12.5em}}{~~~~~~~~~~~~~~~~~~~~~~}
+        \makebox[0mm][c]{\small fittype}
    }
    \sstparameters{
       \sstsubsection{
@@ -24438,6 +24445,23 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          polynomial or {\tt "Spline"} for a bi-cubic spline. {\tt ["Polynomial"]}
       }
       \sstsubsection{
+         KNOTS( 2 ) = \_INTEGER (Read)
+      }{
+         The number of interior knots used for the bi-cubic-spline fit
+	 along the \textit{x} and \textit{y} axes.  These knots are
+	 equally spaced within the image.  Both values must be in the
+	 range 0 to 11.  If you supply a single value, it applies to
+	 both axes.  Thus {\tt 1} creates one interior knot, {\tt [5,4]} 
+         gives five along the \textit{x} axis and four along
+	 the \textit{y} direction.  Increasing this parameter values
+	 increases the flexibility of the surface.  Normally, {\tt 4}
+	 is a reasonable value.  The upper limit of acceptable values
+	 will be reduced along each axis when its binned array
+	 dimension is fewer than 29.  KNOTS is only accessed when
+	 FITTYPE={\tt "Spline"}.  The default is the current value,
+	 which is {\tt 4} initially. {\tt[]}
+      }
+      \sstsubsection{
          NDF  = NDF (Update)
       }{
          The NDF containing the two-dimensional data array to be fitted.
@@ -24445,24 +24469,26 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
       \sstsubsection{
          NXPAR = \_INTEGER (Read)
       }{
-         The number of fitting parameters to be used in the x
-         direction.  It must be in the range 1 to 15 for a polynomial
-         fit, and 4 to 15 for a bi-cubic-spline fit.  Thus 1 gives a
-         constant, 2 a linear fit, 3 a quadratic \emph{etc}.  Increasing this
-         parameter increases the flexibility of the surface in the x
-         direction.  The upper limit of acceptable values will be
+         The number of fitting parameters to be used in the \textit{x}
+	 direction.  It must be in the range 1 to 15 for a polynomial
+	 fit.  Thus {\tt 1} gives a constant, {\tt 2} a linear fit, 
+         {\tt 3} a quadratic \emph{etc}.  Increasing this parameter 
+         increases the flexibility of the surface in the \textit{x} 
+         direction.  The upper limit of acceptable values will be 
          reduced for arrays with an \textit{x} dimension fewer than 29.
+         NXPAR is only accessed when FITTYPE={\tt "Polynomial"}.
       }
       \sstsubsection{
          NYPAR = \_INTEGER (Read)
       }{
-         The number of fitting parameters to be used in the y
-         direction.  It must be in the range 1 to 15 for a polynomial
-         fit, and 4 to 15 for a bi-cubic-spline fit.  Thus 1 gives a
-         constant, 2 a linear fit, 3 a quadratic \emph{etc}.  Increasing this
-         parameter increases the flexibility of the surface in the y
-         direction.  The upper limit of acceptable values will be
+         The number of fitting parameters to be used in the \textit{y}
+	 direction.  It must be in the range 1 to 15 for a polynomial
+	 fit.  Thus {\tt 1} gives a constant, {\tt 2} a linear fit, 
+         {\tt 3} a quadratic \emph{etc}.  Increasing this parameter 
+         increases the flexibility of the surface in the \textit{y} 
+         direction.  The upper limit of acceptable values will be 
          reduced for arrays with a \textit{y} dimension fewer than 29.
+         NYPAR is only accessed when FITTYPE={\tt "Polynomial"}.
       }
       \sstsubsection{
          OVERWRITE = \_LOGICAL (Read)
@@ -24484,54 +24510,61 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
       \sstsubsection{
          XMAX = \_DOUBLE (Read)
       }{
-         The maximum \textit{x} value to be used in the fit.  This must be
-         greater than or equal to the \textit{x} co-ordinate of the right-hand
-         pixel in the data array.  Normally this parameter is
-         automatically set to the maximum \textit{x} co-ordinate found in the
-         data, but this mechanism can be overridden by specifying XMAX
-         on the command line.  The parameter is provided to allow the
-         fit limits to be fine tuned for special purposes.  It should
-         not normally be altered.  If a null ({\tt{!}}) value is supplied, the
-         value used is the maximum \textit{x} co-ordinate of the fitted data. {\tt [!]}
+         The maximum \textit{x} value to be used in the fit.  This
+	 must be greater than or equal to the \textit{x} co-ordinate
+	 of the right-hand pixel in the data array.  Normally this
+	 parameter is automatically set to the maximum \textit{x}
+	 co-ordinate found in the data, but this mechanism can be
+	 overridden by specifying XMAX on the command line.  The
+	 parameter is provided to allow the fit limits to be fine
+	 tuned for special purposes.  It should not normally be
+	 altered.  If a null ({\tt{!}}) value is supplied, the value
+	 used is the maximum \textit{x} co-ordinate of the fitted
+	 data. {\tt [!]}
       }
       \sstsubsection{
          XMIN = \_DOUBLE (Read)
       }{
-         The minimum \textit{x} value to be used in the fit.  This must be
-         smaller than or equal to the \textit{x} co-ordinate of the left-hand
-         pixel in the data array.  Normally this parameter is
-         automatically set to the minimum \textit{x} co-ordinate found in the
-         data, but this mechanism can be overridden by specifying XMIN
-         on the command line.  The parameter is provided to allow the
-         fit limits to be fine tuned for special purposes.  It should
-         not normally be altered.  If a null ({\tt{!}}) value is supplied, the
-         value used is the minimum \textit{x} co-ordinate of the fitted data. {\tt [!]}
+         The minimum \textit{x} value to be used in the fit.  This
+	 must be smaller than or equal to the \textit{x} co-ordinate
+	 of the left-hand pixel in the data array.  Normally this
+	 parameter is automatically set to the minimum \textit{x}
+	 co-ordinate found in the data, but this mechanism can be
+	 overridden by specifying XMIN on the command line.  The
+	 parameter is provided to allow the fit limits to be fine
+	 tuned for special purposes.  It should not normally be
+	 altered.  If a null ({\tt{!}}) value is supplied, the value
+	 used is the minimum \textit{x} co-ordinate of the fitted
+	 data. {\tt [!]}
       }
       \sstsubsection{
          YMAX = \_DOUBLE (Read)
       }{
-         The maximum \textit{y} value to be used in the fit.  This must be
-         greater than or equal to the \textit{y} co-ordinate of the top pixel in
-         the data array.  Normally this parameter is automatically set
-         to the maximum \textit{y} co-ordinate found in the data, but this
-         mechanism can be overridden by specifying YMAX on the command
-         line.  The parameter is provided to allow the fit limits to be
-         fine tuned for special purposes.  It should not normally be
-         altered.  If a null ({\tt{!}}) value is supplied, the value used is the
-         maximum \textit{y} co-ordinate of the fitted data. {\tt [!]}
+         The maximum \textit{y} value to be used in the fit.  This
+	 must be greater than or equal to the \textit{y} co-ordinate
+	 of the top pixel in the data array.  Normally this parameter
+	 is automatically set to the maximum \textit{y} co-ordinate
+	 found in the data, but this mechanism can be overridden by
+	 specifying YMAX on the command line.  The parameter is
+	 provided to allow the fit limits to be fine tuned for special
+	 purposes.  It should not normally be altered.  If a null
+	 ({\tt{!}}) value is supplied, the value used is the maximum
+	 \textit{y} co-ordinate of the fitted data. {\tt [!]}
       }
       \sstsubsection{
          YMIN = \_DOUBLE (Read)
       }{
-         The minimum \textit{y} value to be used in the fit.  This must be
-         smaller than or equal to the \textit{y} co-ordinate of the bottom pixel
-         in the data array.  Normally this parameter is automatically
-         set to the minimum \textit{y} co-ordinate found in the data, but this
-         mechanism can be overridden by specifying YMIN on the command
-         line.  The parameter is provided to allow the fit limits to be
-         fine tuned for special purposes.  It should not normally be
-         altered.  If a null ({\tt{!}}) value is supplied, the value used is the
-         minimum \textit{y} co-ordinate of the fitted data. {\tt [!]}
+         The minimum \textit{y} value to be used in the fit.  This
+	 must be smaller than or equal to the \textit{y} co-ordinate
+	 of the bottom pixel in the data array.  Normally this
+	 parameter is automatically set to the minimum \textit{y}
+	 co-ordinate found in the data, but this mechanism can be
+	 overridden by specifying YMIN on the command line.  The
+	 parameter is provided to allow the fit limits to be fine
+	 tuned for special purposes.  It should not normally be
+	 altered.  If a null ({\tt{!}}) value is supplied, the value
+	 used is the minimum \textit{y} co-ordinate of the fitted
+	 data. {\tt [!]}
       }
    }
    \sstexamples{
@@ -24550,25 +24583,48 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          is used to weight the data values.
       }
       \sstexamplesubsection{
+         fitsurface virgo fittype=spl
+      }{
+         As the previous example except a B-spline fit is made using
+         four interior knots along both axes.
+      }
+      \sstexamplesubsection{
+         fitsurface virgo fittype=spl knots=[10,7]
+      }{
+         As the previous example except now there are ten interior knots
+         along the \textit{x} axis and seven along the \textit{y} axis.
+      }
+      \sstexamplesubsection{
          fitsurface mkn231 nxpar=6 nypar=2 cosys=d xmin=-10.0 xmax=8.5
       }{
          This fits a polynomial surface to the data array in the NDF
          called mkn231.  A fifth order is used along the \textit{x} direction,
          but only a linear fit along the \textit{y} direction.  The fit is made
-         between \textit{x} data co-ordinates -10.0 to 8.5.  The variance
+         between \textit{x} data co-ordinates $-$10.0 to 8.5.  The variance
          weights the data values.  The coefficients of the fitted
          surface are stored in an extension of mkn231.
       }
    }
    \sstnotes{
-      The polynomial surface fit is stored in SURFACEFIT extension,
-      component FIT of type POLYNOMIAL, variant CHEBYSHEV.  This is
-      read by MAKESURFACE to create a NDF of the fitted surface.  Also
-      stored in the SURFACEFIT extension are the r.m.s. deviation to the
-      fit (component RMS), the maximum absolute deviation (component
-      RSMAX), and the co-ordinate system (component COSYS) translated to 
-      AST Domain names AXIS (for parameter COSYS="Data") and PIXEL
-      ({\tt "World"}).
+      A polynomial surface fit is stored in a SURFACEFIT extension,
+      component FIT of type POLYNOMIAL, variant CHEBYSHEV or BSPLINE.
+      This is read by MAKESURFACE to create a NDF of the fitted surface.
+ 
+      For further details of the CHEBYSHEV variant see
+      \xref{SGP/38}{sgp38}{}.  The CHEBYSHEV variant includes the fitting 
+      variance for each coefficient.
+
+      The BSPLINE variant structure is provisional.  It contain the
+      spline coefficients in the two-dimensional DATA\_ARRAY component,
+      the knots in XKNOTS and YKNOTS arrays, and a scaling factor to
+      restore the original values after spline evaluation recorded in 
+      component SCALE.  All of these components have type \_REAL.
+ 
+      Also stored in the SURFACEFIT extension are the r.m.s. deviation
+      to the fit (component RMS), the maximum absolute deviation
+      (component RSMAX), and the co-ordinate system (component COSYS)
+      translated to AST Domain names AXIS (for parameter COSYS={\tt "Data"})
+      and PIXEL ({\tt "World"}).
    }
    \sstdiytopic{
       Related Applications
@@ -30848,7 +30904,7 @@ KAPPA: \htmlref{LUTABLE}{LUTABLE},
       }{
          The output NDF into which the colour table is to be stored.
          Its second dimension equals the number of colour-table
-         entries that are stored.  This will be less than the
+         entries that are stored.  This will be fewer than the
          total number of colour indices on the device if FULL is {\tt FALSE}.
          No NDF is created if a null ({\tt{!}}) value is given.
       }
@@ -31387,7 +31443,7 @@ KAPPA: \htmlref{DISPLAY}{DISPLAY},
       NDF or given explicitly.
 
       Elements in the new NDF outside the defined range of the
-      polynomial will be set to bad values.
+      polynomial or spline will be set to bad values.
    }
    \sstusage{
       makesurface in out [like] type=? lbound=? ubound=? xlimit=? ylimit=?
@@ -31501,16 +31557,18 @@ KAPPA: \htmlref{DISPLAY}{DISPLAY},
 
          \sstitem
          The polynomial surface fit is stored in SURFACEFIT extension,
-         component FIT of type POLYNOMIAL, variant CHEBYSHEV.  This
-         extension is created by FITSURFACE.   Also read from the
-         SURFACEFIT extension is the co-ordinate system (component COSYS).
+	 component FIT of type POLYNOMIAL, variant CHEBYSHEV or
+	 BSPLINE.  This extension is created by FITSURFACE.  Also read
+	 from the SURFACEFIT extension is the co-ordinate system
+	 (component COSYS).
 
          \sstitem
-         When LIKE={\tt{!}}, COSYS={\tt "Data"} and the original NDF had an axis that
-         decreased with increasing pixel index, you may want to flip the
-         co-ordinate limits (via parameters XLIMIT or YLIMIT) to match
-         the original sense of the axis, otherwise the created surface will
-         be flipped with respect to the image from which it was fitted.
+         When LIKE={\tt{!}}, COSYS={\tt "Data"} or {\tt "Axis"} and
+	 the original NDF had an axis that decreased with increasing
+	 pixel index, you may want to flip the co-ordinate limits (via
+	 parameters XLIMIT or YLIMIT) to match the original sense of
+	 the axis, otherwise the created surface will be flipped with
+	 respect to the image from which it was fitted.
       }
    }
    \sstdiytopic{
@@ -33076,7 +33134,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
 	 CPU-time-efficient way possible.
 
          To do this requires the use of additional memory (of order
-	 one less than the dimensionality of the NDF itself, times the
+	 one fewer than the dimensionality of the NDF itself, times the
 	 polynomial order squared).  To minimise the use of memory and
 	 get the fastest possible determinations you should not use
 	 weighting and assert that the input data do not have any BAD
@@ -35020,7 +35078,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          The widths of the margins to leave for axis annotation, given
          as fractions of the corresponding dimension of the current picture.
          Four values may be given, in the order - bottom, right, top, left.
-         If less than four values are given, extra values are used equal to
+         If fewer than four values are given, extra values are used equal to
          the first supplied value.  If these margins are too narrow any axis
          annotation may be clipped.  If a null ({\tt{!}}) value is supplied, the
          value used is {\tt 0.15} (for all edges) if annotated axes are produced, 
@@ -39176,7 +39234,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
          SCALE( ) = \_DOUBLE (Read)
       }{
          Axis scaling factors which are used to modify the supplied Mapping.
-         If the number of supplied values is less than the number of output
+         If the number of supplied values is fewer than the number of output
          axes associated with the Mapping, the final supplied value is
          duplicated for the missing axes.  In effect, transformed input
          co-ordinate axis values would be multiplied by these factors to
@@ -40023,7 +40081,7 @@ KAPPA: \htmlref{FLIP}{FLIP},
          The widths of the margins to leave for axis annotation, given
          as fractions of the corresponding dimension of the current picture.
          Four values may be given, in the order - bottom, right, top, left.
-         If less than four values are given, extra values are used equal to
+         If fewer  than four values are given, extra values are used equal to
          the first supplied value.  If these margins are too narrow any axis
          annotation may be clipped.  If a null ({\tt{!}}) value is supplied, the
          value used is {\tt 0.15} (for all edges) if annotated axes are produced, 
@@ -40344,7 +40402,7 @@ KAPPA: \htmlref{NORMALIZE}{NORMALIZE}.
       }{
          The minimum number of polygons which can be used.  For
          instance, this can be set to {\tt 2} to ensure that at least two
-         polygons are used.  The supplied value must be less than or
+         polygons are used.  The supplied value must be fewer than or
          equal to the value given for MAXPOLY and must be greater than
          zero. {\tt [1]}
       }
@@ -41810,7 +41868,7 @@ KAPPA: \htmlref{SETAXIS}{SETAXIS}.
       }
    }
    \sstnotes{
-      If the number of new pixel origin values is less than the number
+      If the number of new pixel origin values is fewer than the number
       of NDF dimensions, then the pixel origin of the extra dimensions
       will remain unchanged.  If the number of values exceeds the number
       of NDF dimensions, then the excess values will be ignored.
@@ -43884,7 +43942,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          Array of limits for progressive clipping of pixel values
          during the binning process in units of standard deviation.  A
          null value means only unclipped statistics are computed and
-         presented.  Between 1 and 5 values may be supplied. {\tt [2,3]}
+         presented.  Between one and five values may be supplied. {\tt [2,3]}
       }
       \sstsubsection{
          ESTIMATOR = \htmlref{LITERAL}{se:parmenu} (Read)
@@ -43949,7 +44007,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          increases the flexibility of the surface.  Normally, {\tt 4} is a
          reasonable value.  The upper limit of acceptable values will
          be reduced along each axis when its binned array dimension is
-         less than 29.  KNOTS is only accessed when FITTYPE={\tt "Spline"}.
+         fewer than 29.  KNOTS is only accessed when FITTYPE={\tt "Spline"}.
          The default is the current value, which is 4 initially. {\tt []}
       }
       \sstsubsection{
@@ -43962,7 +44020,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          linear fit along the \textit{y} axis.  Increasing this parameter values
          increases the flexibility of the surface.  The upper limit of
          acceptable values will be reduced along each axis when its
-         binned array dimension is less than 29.  ORDER is only
+         binned array dimension is fewer than 29.  ORDER is only
          accessed when FITTYPE={\tt "Polynomial"}.  The default is the current
          value, which is {\tt 4} initially. {\tt []}
       }
@@ -44012,10 +44070,21 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
    }
    \sstnotes{
       A polynomial surface fit is stored in a SURFACEFIT extension,
-      component FIT of type POLYNOMIAL, variant CHEBYSHEV.  For further
-      details see \xref{SGP/38}{sgp38}{}.  Also stored in the SURFACEFIT 
-      extension is the r.m.s. deviation to the fit (component RMS); and the 
-      co-ordinate system component COSYS, set to {\tt "GRID"}.
+      component FIT of type POLYNOMIAL, variant CHEBYSHEV or BSPLINE.
+
+      For further details of the CHEBYSHEV variant see 
+      \xref{SGP/38}{sgp38}{}.  The CHEBYSHEV variant includes the fitting 
+      variance for each coefficient.
+
+      The BSPLINE variant structure is provisional.  It contain the
+      spline coefficients in the two-dimensional DATA\_ARRAY component, 
+      the knots in XKNOTS and YKNOTS arrays, and a scaling factor to 
+      restore the original values in SCALE.  All of these components have 
+      type \_REAL.
+
+      Also stored in the SURFACEFIT extension is the r.m.s. deviation
+      to the fit (component RMS); and the co-ordinate system component
+      COSYS, set to {\tt "GRID"}.
    }
    \sstexamples{
       \sstexamplesubsection{
@@ -49278,7 +49347,7 @@ is needed urgently.
   \item  \htmlref{SURFIT}{SURFIT} has more constraints to prevent problems with small
     arrays.  It obtains the value of ESTIMATOR after the number of
     values in a bin is known, its default becomes the median when
-    the bins comprise less than 12 pixels.
+    the bins comprise fewer than 12 pixels.
 
 \end{itemize}
 
@@ -52169,7 +52238,7 @@ The following applications have been modified:
                combines more than 300 input values, the output variance
                is estimated as $\pi/2$ times the variance on the weighted
                mean of the input values.  If each output value combines
-               less than 300 input values, the output variance is
+               fewer than 300 input values, the output variance is
                calculated as before using the order statistics
                variance-covariance array.
       \end{itemize}
@@ -52591,8 +52660,8 @@ The following applications have been modified:
 
    \item [\htmlref{ADD}{ADD}] \mbox{}
       \begin{itemize}
-         \item This now propagates the {UNITS}{apndf:units}~ component
-         if it is the same in both input NDFs.
+         \item This now propagates the \htmlref{UNITS}{apndf:units}~ 
+         component if it is the same in both input NDFs.
       \end{itemize}
 
    \item [\htmlref{ARDPLOT}{ARDPLOT}] \mbox{}
@@ -52607,6 +52676,7 @@ The following applications have been modified:
          normalised form. 
       \end{itemize}
 
+   \goodbreak
    \item [\htmlref{COLLAPSE}{COLLAPSE}] \mbox{}
       \begin{itemize}
          \item It can now correctly collapse along a sky co-ordinate
@@ -52619,6 +52689,9 @@ The following applications have been modified:
 
    \item [\htmlref{FITSURFACE}{FITSURFACE}] \mbox{}
       \begin{itemize}
+         \item Added bi-cubic spline fitting and parameter KNOTS for
+         that.  It creates a new provisional BSPLINE variant of the 
+         POLYNOMIAL structure in the NDF being fitted.
          \item This now writes PIXEL or AXIS values to the SURFACEFIT.COSYS 
          component to bring it into line with AST usage.
       \end{itemize}
@@ -52639,6 +52712,9 @@ The following applications have been modified:
 
    \item [\htmlref{MAKESURFACE}{MAKESURFACE}] \mbox{}
       \begin{itemize}
+         \item This reads the provisional BSPLINE variant of the
+         POLYNOMIAL structure, and thus evaluates a spline fit of the 
+         input NDF.
          \item This recognises GRID, PIXEL, and AXIS values for the
          SURFACEFIT.COSYS component.
       \end{itemize}
@@ -52669,6 +52745,7 @@ The following applications have been modified:
          element, or a cube with two single-element dimensions.
       \end{itemize}
 
+   \goodbreak
    \item [\htmlref{SQORST}{SQORST}] \mbox{}
       \begin{itemize}
          \item There is a new MODE ={\tt "PixelScale"} option, and new
@@ -52696,6 +52773,9 @@ The following applications have been modified:
 
    \item [\htmlref{SURFIT}{SURFIT}] \mbox{}
       \begin{itemize}
+         \item This now uses singular value decomposition to solve the normal
+         equations and hence provide the variances of the Chebyshev polynomial
+         coefficients, stored in the SURFACEFIT extension. 
          \item For the polynomial fit type, SURFIT creates a SURFACEFIT 
          extension in the output NDF to hold the polynomial coefficients 
          just as \htmlref{FITSURFACE}{FITSURFACE} does.

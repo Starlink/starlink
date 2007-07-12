@@ -4,7 +4,7 @@
 *     SURFIT
 
 *  Purpose:
-*     Fits a polynomial or bi-cubic spline surface to 2-dimensional
+*     Fits a polynomial or bi-cubic spline surface to two-dimensional
 *     data array.
 
 *  Language:
@@ -57,21 +57,21 @@
 *        both dimensions.  The minimum value is 2.  The maximum may be
 *        constrained by the number of polynomial terms, such that in
 *        each direction there are at least as many bins as terms.  If a 
-*        null (!) value is supplied, the value used is such that 32 bins 
-*        are created along each axis. [!]
+*        null (!) value is supplied, the value used is such that 32 bins
+*        are created along each axis.  [!]
 *     CLIP() = _REAL (Read)
 *        Array of limits for progressive clipping of pixel values
 *        during the binning process in units of standard deviation.  A
 *        null value means only unclipped statistics are computed and
-*        presented.  Between 1 and 5 values may be supplied. [2,3]
+*        presented.  Between one and five values may be supplied.  [2,3]
 *     ESTIMATOR = LITERAL (Read)
 *        The estimator for the bin.  It must be one of the following
 *        values: "Mean" for the mean value, "Ksigma" for the mean with
 *        kappa-sigma clipping; "Mode" for the mode, and "Median" for
 *        the median.  "Mode" is only available when there are at least
-*        twelve pixels in a bin.  If a null (!) value is supplied, "Median"
-*        is used if there are less than 6 values in a bin, and "Mode" is 
-*        used otherwise. [!]
+*        twelve pixels in a bin.  If a null (!) value is supplied, 
+*        "Median" is used if there are fewer than 6 values in a bin, and
+*        "Mode" is used otherwise.  [!]
 *     EVALUATE = LITERAL (Read)
 *        The method by which the resulting data array is to be
 *        evaluated from the surface-fit.  It must be either
@@ -81,13 +81,13 @@
 *        surface-fit is evaluated for every pixel.  The latter is
 *        slower, but can produce more-accurate results, unless the
 *        surface is well behaved.  The default is the current value,
-*        which is initially set to "Interpolate". []
+*        which is initially set to "Interpolate".  []
 *     FITCLIP() = _REAL (Read)
 *        Array of limits for progressive clipping of the binned array
 *        in units of the rms deviation of the fit.  A null value (!)
 *        means no clipping of the binned array will take place.
 *        Between 1 and 5 values may be supplied.  The default is the
-*        current value, which is ! initially. []
+*        current value, which is ! initially.  []
 *     FITTYPE = LITERAL (Read)
 *        The type of fit.  It must be either "Polynomial" for a
 *        Chebyshev polynomial or "Spline" for a bi-cubic spline.  The
@@ -107,7 +107,7 @@
 *        increases the flexibility of the surface.  Normally, 4 is a
 *        reasonable value.  The upper limit of acceptable values will
 *        be reduced along each axis when its binned array dimension is
-*        less than 29.  KNOTS is only accessed when FITTYPE="Spline".
+*        fewer than 29.  KNOTS is only accessed when FITTYPE="Spline".
 *        The default is the current value, which is 4 initially. []
 *     ORDER( 2 ) = _INTEGER (Read)
 *        The orders of the fits along the x and y directions.  Both
@@ -117,40 +117,51 @@
 *        linear fit along the y.  Increasing this parameter values
 *        increases the flexibility of the surface.  The upper limit of
 *        acceptable values will be reduced along each axis when its
-*        binned array dimension is less than 29.  ORDER is only
+*        binned array dimension is fewer than 29.  ORDER is only
 *        accessed when FITTYPE="Polynomial".  The default is the current
 *        value, which is 4 initially. []
 *     OUT = NDF (Write)
 *        NDF to contain the fitted two-dimensional data array.
 *     RMS = _REAL (Write)
-*        An output parameter in which is stored the RMS deviation of the 
+*        An output parameter in which is stored the RMS deviation of the
 *        fit from the original data (per pixel).
 *     THRHI = _REAL (Read)
 *        Upper threshold above which values will be excluded from the
 *        analysis to derive representative values for the bins.  If it
-*        is null (!) there will be no upper threshold. [!]
+*        is null (!) there will be no upper threshold.  [!]
 *     THRLO = _REAL (Read)
 *        Lower threshold below which values will be excluded from the
 *        analysis to derive representative values for the bins.  If it
-*        is null (!) there will be no lower threshold. [!]
+*        is null (!) there will be no lower threshold.  [!]
 *     TITLE = LITERAL (Read)
 *        Value for the title of the output NDF.  A null value will cause
 *        the title of the NDF supplied for parameter IN to be used
-*        instead. [!]
+*        instead.  [!]
 *     WLIM = _REAL (Read)
 *        The minimum fraction of good pixels in a bin that permits the
 *        bin to be included in the fit.  Here good pixels are ones that
 *        participated in the calculation of the bin's representative
 *        value. So they exclude both bad pixels and ones rejected
 *        during estimation (e.g. ones beyond the thresholds or were
-*        clipped). [!]
+*        clipped).  [!]
 
 *  Notes:
 *     A polynomial surface fit is stored in a SURFACEFIT extension,
-*     component FIT of type POLYNOMIAL, variant CHEBYSHEV.  For further
-*     details see SGP/38.  Also stored in the SURFACEFIT extension is 
-*     the r.m.s. deviation to the fit (component RMS); and the 
-*     co-ordinate system component COSYS, set to "GRID".
+*     component FIT of type POLYNOMIAL, variant CHEBYSHEV or BSPLINE.
+*
+*     For further details of the CHEBYSHEV variant see SGP/38.  The
+*     CHEBYSHEV variant includes the fitting variance for each 
+*     coefficient.
+*
+*     The BSPLINE variant structure is provisional.  It contain the
+*     spline coefficients in the two-dimensional DATA_ARRAY component,
+*     the knots in XKNOTS and YKNOTS arrays, and a scaling factor to
+*     restore the original values after spline evaluation recorded in
+*     component SCALE.  All of these components have type _REAL.
+*
+*     Also stored in the SURFACEFIT extension is the r.m.s. deviation 
+*     to the fit (component RMS); and the co-ordinate system component 
+*     COSYS, set to "GRID".
 
 *  Examples:
 *     surfit comaB comaB_bg
@@ -230,8 +241,13 @@
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL.
 *     2007 June 28 (MJC):
-*        Now writes a SURFACEFIT structure for polynomial coefficients, like
-*        application FITSURFACE.
+*        Now writes a SURFACEFIT structure for polynomial coefficients,
+*        like application FITSURFACE.
+*     2007 July 3 (MJC):
+*        Use singular value decomposition to solve the normal
+*        equations and to provide the variances of the polynomial 
+*        coefficients, stored in the SURFACEFIT extension.  Writes a
+*        SURFACEFIT structure for bi-cubic spline fitting.  
 *     {enter_further_changes_here}
 
 *-
@@ -293,7 +309,7 @@
       PARAMETER ( MXWORK = 15 )  ! obtained 
 
       INTEGER NDIM               ! Dimensionality of arrays
-      PARAMETER ( NDIM = 2 )     ! 2-d only
+      PARAMETER ( NDIM = 2 )     ! two-dimensional only
 
       INTEGER OPTBIN             ! Default number of bins
       PARAMETER ( OPTBIN = 32 )
@@ -305,25 +321,29 @@
       INTEGER ACTVAL             ! Number of parameter values supplied
       LOGICAL ALL                ! All pixels are evaluated without
                                  ! interpolation
-      LOGICAL AUTO               ! Automatic clipping of the fitted binned
+      LOGICAL AUTO               ! Automatic clipping of fitted binned
                                  ! data
       LOGICAL BAD                ! Input NDF may contain bad pixels
       INTEGER BINMAX( NDIM )     ! Maximum number of pixels in a bin
                                  ! along each axis
       INTEGER BINMIN( NDIM )     ! Minimum number of pixels in a bin
                                  ! along each axis
-      REAL BINNED( MXBIN, MXBIN ) ! Binned data or weights used for logging
-      INTEGER BINPTR             ! Mnemonic pointer to workspace for a bin
-                                 ! of pixels
+      REAL BINNED( MXBIN, MXBIN ) ! Binned data or weights used for 
+                                 ! logging
+      INTEGER BINPTR             ! Mnemonic pointer to workspace for a 
+                                 ! bin of pixels
       INTEGER BINSIZ             ! The number of pixels in a bin
       CHARACTER * ( 132 ) BUFFER ! Buffer for writing to the logfile
-      DOUBLE PRECISION CHCOEF( MCHOEF ) ! Chebyshev coefficients of the fit
+      DOUBLE PRECISION CHCOEF( MCHOEF ) ! Chebyshev coefficients of fit
       REAL CLIP( MXCLIP )        ! Clipping sigmas during binning
       REAL CLIPF( MXCLIP )       ! Clipping sigmas after binning and
                                  ! fitting
       REAL COEFF( MBCOEF )       ! B-spline coefficients of the fit
+      INTEGER CPTR               ! Pointer to mapped covariance matrix
       CHARACTER * ( 100 ) DATNAM ! Name of input and output IMAGEs
       INTEGER DIMS( NDIM )       ! Dimensions of both data arrays
+      DOUBLE PRECISION DRMS      ! RMS difference of the input and
+                                 ! output data arrays
       REAL DSCALE                ! Scale factor applied before logging
                                  ! the fit and residuals, and must be
                                  ! re-applied in reciprocal
@@ -361,16 +381,22 @@
       LOGICAL LOTHRS             ! There is a lower threshold set?
       INTEGER M                  ! Loop counter
       INTEGER MAXBIN             ! Total number of bins
-      INTEGER MAXORD( NDIM )     ! Maximum ORDER values
       INTEGER MAXKNO( NDIM )     ! Maximum KNOT values
-      INTEGER MINORD( NDIM )     ! Minimum ORDER values
+      DOUBLE PRECISION MAXMUM    ! Maximum value
+      INTEGER MAXORD( NDIM )     ! Maximum ORDER values
+      INTEGER MAXPOS             ! Index of maximum array value
       INTEGER MINKNO( NDIM )     ! Minimum KNOT values
+      DOUBLE PRECISION MINMUM    ! Minimum value
+      INTEGER MINORD( NDIM )     ! Minimum ORDER values
+      INTEGER MINPOS             ! Index of minimum array value
       INTEGER MPCOEF             ! Maximum number of polynomial
                                  ! coefficients for chosen NXPAR and
                                  ! NYPAR
-      INTEGER NBIN               ! Number of bins with defined statistics
+      INTEGER MPTR               ! Pointer to SVD V matrix
+      INTEGER NBIN               ! No. of bins with defined statistics
       INTEGER NC                 ! Character column counter
-      INTEGER NCI                ! Character column counter of image names
+      INTEGER NCI                ! Character column counter of image 
+                                 ! names
       INTEGER NCLIP              ! Number of clips of the data
       INTEGER NCLIPF             ! Number of clips of the fitted binned
                                  ! data
@@ -381,6 +407,7 @@
                                  ! statistics (a copy before clipping)
       INTEGER NEQPTR             ! Mnemonic pointer to normal-equation
                                  ! workspace
+      INTEGER NINVAL             ! Number of bad values
       INTEGER NIWS               ! Storage space size for spline fit
       INTEGER NKNOT( NDIM )      ! Number of knots in each direction
       INTEGER NLWS               ! Storage space size to allow for A
@@ -408,19 +435,20 @@
                                  ! output data arrays
       REAL RMSF                  ! RMS difference of the fitted and raw
                                  ! binned data
+      DOUBLE PRECISION RSMAX     ! Maximum residual
       INTEGER S1                 ! Used to eval size of spline workspace
       INTEGER S2                 ! Used to eval size of spline workspace
       INTEGER SDIM( NDF__MXDIM ) ! Significant NDF dimensions
-      REAL SCALE                 ! Scale factor applied before fitting to
-                                 ! improve the fit and must be
+      REAL SCALE                 ! Scale factor applied before fitting
+                                 ! to improve the fit and must be
                                  ! re-applied in reciprocal
       INTEGER SEVPTR             ! Mnemonic pointer to spline-evaluation
                                  ! workspace
       INTEGER SIWPTR             ! Mnemonic pointer to spline workspace
       INTEGER SLWPTR             ! Mnemonic pointer to spline workspace
       INTEGER SWPTR              ! Mnemonic pointer to spline workspace
-      INTEGER TBNPTR             ! Mnemonic pointer to workspace for a bin
-                                 ! of pixels after thresholding
+      INTEGER TBNPTR             ! Mnemonic pointer to workspace for a 
+                                 ! bin of pixels after thresholding
       REAL THRLO                 ! Lower threshold
       REAL THRHI                 ! Upper threshold
       INTEGER UBND( NDIM )       ! Upper bound of data array
@@ -881,8 +909,8 @@
          CALL FIO_WRITE( FDL, ' ', STATUS )
       END IF
 
-*  Calculate dimensions of work arrays.
-*  ====================================
+*  Calculate dimensions and set data type of work arrays.
+*  ======================================================
       ALL = .FALSE.
       IF ( EVMETH( 1:3 ) .EQ. 'ALL' ) ALL = .TRUE.
 
@@ -894,8 +922,8 @@
 
 *  Calculate the number of free fitting parameters.
          MPCOEF = ( MIN( NXPAR, NYPAR ) *
-     :            ( MIN( NXPAR, NYPAR ) + 1 ) ) / 2
-     :            + ABS( NXPAR - NYPAR )
+     :            ( MIN( NXPAR, NYPAR ) + 1 ) ) / 2 +
+     :            ABS( NXPAR - NYPAR )
 
 *  The PDA library routine for solving the normal equations is only
 *  available in double precision (even though the Chebyshev evaluations
@@ -950,9 +978,9 @@
 *  subroutine calls with several pointers passed, and so it is quite
 *  easier to mix them up via array indices.  X for x position, Y for y
 *  position, Z for the data, W for the weights, G for general workspace
-*  and FIT for storing the fitted data.  The existing array names are
-*  used because they are easier for the creation and annulling the
-*  workspace.
+*  RES for the residuals, and FIT for storing the fitted data.  The 
+*  existing array names are used because they are easier for the 
+*  creation and annulling the workspace.
       XPTR = WPNTR( 1 )
       YPTR = WPNTR( 2 )
       ZPTR = WPNTR( 3 )
@@ -1085,7 +1113,8 @@
 *  Map the input and output arrays.
 *  ================================
 
-*  Map the input and output data arrays.
+*  Map the input and output data arrays.  The binning routines take
+*  a _REAL array as input but generate _REAL or _DOUBLE vectors.
       CALL KPG1_MAP( NDFI, 'Data', '_REAL', 'READ', PNTRI, EL, STATUS )
       CALL KPG1_MAP( NDFO, 'Data', '_REAL', 'WRITE', PNTRO, EL, STATUS )
 
@@ -1111,7 +1140,7 @@
             CALL KPS1_SUBID( DIMS( 1 ), DIMS( 2 ), 
      :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                       IX, IY, ESTIMA, NCLIP, CLIP, THRLO, THRHI,
-     :                       WLIMIT, MAXBIN, %VAL( CNF_PVAL( BINPTR ) ), 
+     :                       WLIMIT, MAXBIN, %VAL( CNF_PVAL( BINPTR ) ),
      :                       DUMMY,
      :                       %VAL( CNF_PVAL( XPTR ) ), 
      :                       %VAL( CNF_PVAL( YPTR ) ), 
@@ -1136,7 +1165,7 @@
             CALL KPS1_SUBIR( DIMS( 1 ), DIMS( 2 ), 
      :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                       IX, IY, ESTIMA, NCLIP, CLIP, THRLO, THRHI,
-     :                       WLIMIT, MAXBIN, %VAL( CNF_PVAL( BINPTR ) ), 
+     :                       WLIMIT, MAXBIN, %VAL( CNF_PVAL( BINPTR ) ),
      :                       DUMMY,
      :                       %VAL( CNF_PVAL( XPTR ) ), 
      :                       %VAL( CNF_PVAL( YPTR ) ), 
@@ -1202,36 +1231,52 @@
          DYMIN = 0.5D0
          DYMAX = DBLE( DIMS( 2 ) ) + 0.5D0
 
+*  Map work arrays (MPCOEF x MPCOEF) in size to hold the covariance 
+*  matrix, and a work array used by routine KPS1_FSPF2 below.
+         CALL PSX_CALLOC( MPCOEF * MPCOEF, '_DOUBLE', CPTR, STATUS )
+         CALL PSX_CALLOC( MPCOEF * MPCOEF, '_DOUBLE', MPTR, STATUS )
+
 *  Indicates whether or not the weights have to be squared to give the
 *  correct values for the Chebyshev least-squares fit.
          FIRST = .TRUE.
 
          DO M = 0, NCLIPF
 
-*  Fit the polynomial surface to the binned array.
-            CALL KPS1_SUPF( DXMIN, DXMAX, DYMIN, DYMAX, NXPAR, NYPAR,
-     :                      FIRST, NBIN, MPCOEF, MAXBIN, 
-     :                      %VAL( CNF_PVAL( XPTR ) ),
-     :                      %VAL( CNF_PVAL( YPTR ) ), 
-     :                      %VAL( CNF_PVAL( ZPTR ) ), 
-     :                      %VAL( CNF_PVAL( WPTR ) ),
-     :                      %VAL( CNF_PVAL( NEQPTR ) ), 
-     :                      CHCOEF, NCOEF, STATUS )
+*  Fit a polynomial surface to the binned array.  Use this routine in
+*  preference to KPS1_SUPF because it computes the variance of the
+coefficients.
+            CALL KPS1_FSPF2( DXMIN, DXMAX, DYMIN, DYMAX, NXPAR, NYPAR,
+     :                       FIRST, NBIN, MPCOEF, MAXBIN,
+     :                       %VAL( CNF_PVAL( XPTR ) ), 
+     :                       %VAL( CNF_PVAL( YPTR ) ), 
+     :                       %VAL( CNF_PVAL( ZPTR ) ),
+     :                       %VAL( CNF_PVAL( WPTR ) ), 
+     :                       %VAL( CNF_PVAL( NEQPTR ) ), 
+     :                       %VAL( CNF_PVAL( MPTR ) ),
+     :                       %VAL( CNF_PVAL( CPTR ) ), 
+     :                       CHCOEF, VARIAN, NCOEF, STATUS )
+
             FIRST = .FALSE.
 
 *  Evaluate and log the the rms error of the fit.
 *  ==============================================
 
-*  Evaluate the surface at each bin and obtain the rms error of the
-*  fit.
-            CALL KPS1_SUPEB( %VAL( CNF_PVAL( XPTR ) ), 
-     :                       %VAL( CNF_PVAL( YPTR ) ), 
-     :                       %VAL( CNF_PVAL( ZPTR ) ),
-     :                       NBIN, DXMIN, DXMAX, DYMIN, DYMAX, NXPAR,
-     :                       NYPAR, MCHOEF, CHCOEF, NCOEF,
+*  Evaluate the surface at each bin and obtain the RMS error and the
+*  residuals of the fit.
+            CALL KPS1_FSPE2( NBIN, %VAL( CNF_PVAL( XPTR ) ), 
+     :                       %VAL( CNF_PVAL( YPTR ) ),
+     :                       %VAL( CNF_PVAL( ZPTR ) ), 
+     :                       DXMIN, DXMAX, DYMIN, DYMAX, 
+     :                       NXPAR, NYPAR, MCHOEF, CHCOEF, NCOEF,
      :                       %VAL( CNF_PVAL( FITPTR ) ), 
-     :                       %VAL( CNF_PVAL( RESPTR ) ), RMS,
+     :                       %VAL( CNF_PVAL( RESPTR ) ), DRMS, STATUS )
+
+*  Determine the maximum absolute residual.
+            CALL KPG1_MXMND( BAD, NBIN, %VAL( CNF_PVAL( RESPTR ) ), 
+     :                       NINVAL, MAXMUM, MINMUM, MAXPOS, MINPOS, 
      :                       STATUS )
+            RSMAX = MAX( ABS( MAXMUM ), ABS( MINMUM ) )
+            RMS = SNGL( DRMS )
 
 *  Report the latest rms error.  It should be decreasing each cycle.
             NC = 0
@@ -1282,7 +1327,7 @@
 *  Fill the output data array.
 *  ===========================
 
-*  Clipping (if any) has now completed. Evaluate the fit for the
+*  Clipping (if any) has now completed.  Evaluate the fit for the
 *  original pixels, by one of two methods.
          IF ( ALL .AND. STATUS .EQ. SAI__OK ) THEN
 
@@ -1306,20 +1351,12 @@
      :                       RMSF, STATUS )
          END IF
 
-*  SURFIT does not know the variance at present.  So for now we
-*  set them to undefined (bad) values for the purposes of the SURFACEFIT
-*  extension.
-         DO I = 1, MCHOEF
-            VARIAN( I ) = VAL__BADD
-         END DO
-
 *  If the fit has been successful, write the results to an extension
 *  named SURFACEFIT.  The coefficients will be stored in a structure
 *  within this called FIT of type POLYNOMIAL (see SGP/38 for a
 *  description of the contents of a POLYNOMIAL structure).
-*  RSMAX is not known so set it to the bad value.
          CALL KPS1_FSWPE( NDFO, DXMIN, DXMAX, DYMIN, DYMAX, NXPAR, 
-     :                    NYPAR, MCHOEF, CHCOEF, VARIAN, VAL__BADR, 
+     :                    NYPAR, MCHOEF, CHCOEF, VARIAN, SNGL( RSMAX ),
      :                    RMS, 'GRID', STATUS )
 
 *  Fit a bi-cubic spline.
@@ -1355,8 +1392,7 @@
      :                      XKNOT, YKNOT, %VAL( CNF_PVAL( SWPTR ) ), 
      :                      %VAL( CNF_PVAL( SLWPTR ) ),
      :                      %VAL( CNF_PVAL( SIWPTR ) ), 
-     :                      COEFF, NCOEF, SCALE,
-     :                      STATUS )
+     :                      COEFF, NCOEF, SCALE, STATUS )
 
             FIRST = .FALSE.
 
@@ -1384,6 +1420,12 @@
      :                       NELM, NXKNOT, NYKNOT, XKNOT, YKNOT, NCOEF,
      :                       COEFF, DSCALE, %VAL( CNF_PVAL( FITPTR ) ),
      :                       %VAL( CNF_PVAL( RESPTR ) ), RMS, STATUS )
+
+*  Determine the maximum absolute residual.
+            CALL KPG1_MXMND( BAD, NELM, %VAL( CNF_PVAL( RESPTR ) ), 
+     :                       NINVAL, MAXMUM, MINMUM, MAXPOS, MINPOS, 
+     :                       STATUS )
+            RSMAX = MAX( ABS( MAXMUM ), ABS( MINMUM ) )
 
 *  Report the latest rms error. It should be decreasing each cycle.
 *  Note the RMS is already scaled correctly at this point during the
@@ -1468,6 +1510,14 @@
 *  logging.
          NBIN = NBIN - 2
 
+*  If the fit has been successful, write the results to an extension
+*  named SURFACEFIT.  The coefficients will be stored in a structure
+*  within this called FIT of type POLYNOMIAL (see SGP/38 for a
+*  description of the contents of a POLYNOMIAL structure).
+         CALL KPS1_FSWSE( NDFO, NXKNOT, NYKNOT, XKNOT, YKNOT, MCHOEF, 
+     :                    COEFF, SCALE, SNGL( RSMAX ), RMS, 'GRID',
+     :                    STATUS )
+
       END IF
 
 *  Report the fitted data and residuals to the log file.
@@ -1481,7 +1531,7 @@
 
 *  First convert the x-y list of binned values into a full array.
          CALL LD2AR( MXBIN, NY, REAL( IX ), REAL( IY ), NBIN,
-     :               %VAL( CNF_PVAL( XPTR ) ), %VAL( CNF_PVAL( YPTR ) ), 
+     :               %VAL( CNF_PVAL( XPTR ) ), %VAL( CNF_PVAL( YPTR ) ),
      :               %VAL( CNF_PVAL( FITPTR ) ),
      :               BINNED, STATUS )
 
@@ -1497,7 +1547,7 @@
 
 *  First convert the x-y list of binned values into a full array.
          CALL LD2AR( MXBIN, NY, REAL( IX ), REAL( IY ), NBIN,
-     :               %VAL( CNF_PVAL( XPTR ) ), %VAL( CNF_PVAL( YPTR ) ), 
+     :               %VAL( CNF_PVAL( XPTR ) ), %VAL( CNF_PVAL( YPTR ) ),
      :               %VAL( CNF_PVAL( RESPTR ) ),
      :               BINNED, STATUS )
 

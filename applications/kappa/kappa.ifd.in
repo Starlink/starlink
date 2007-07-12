@@ -10070,6 +10070,16 @@ package kappa {
             helpkey *
           }
 
+         parameter knots {
+            size *
+            type _INTEGER
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Number of interior knots (1-11)}
+            helpkey *
+            default 4
+          }
+
          parameter ndf {
             position 1
             type NDF

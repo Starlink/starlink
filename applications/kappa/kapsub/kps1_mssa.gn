@@ -1,0 +1,272 @@
+      SUBROUTINE KPS1_MSSA<T>( DIM1, DIM2, XAXIS, XMIN, XMAX, YAXIS,
+     :                         YMIN, YMAX, NXKNOT, NYKNOT, XKNOT, YKNOT,
+     :                         SCALE, NCOEF, COEFF, WORK, OUTARR,
+     :                         STATUS )
+*+
+*  Name:
+*     KPS1_MSSAx
+
+*  Purpose:
+*     Evaluates a bivariate B-spline bi-cubic polynomial series for a
+*     two-dimensional data array.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*      CALL KPS1_MSSAx( DIM1, DIM2, XAXIS, XMIN, XMAX, YAXIS, YMIN,
+*                       YMAX, NXKNOT, NYKNOT, XKNOT, YKNOT, SCALE, 
+*                       NCOEF, COEFF, WORK, OUTARR, STATUS )
+
+*  Description:
+*     This routine evaluates a bivariate B-spline bi-cubic polynomial for 
+*     all elements of a two-dimensional data array, using its x and y 
+*     axis centre co-ordinates.  The axis centres must lie within
+*     supplied ranges; pixels outside these ranges are given the bad
+*     value.
+
+*  Arguments:
+*     DIM1 = INTEGER (Given)
+*        The first dimension of the data array.
+*     DIM2 = INTEGER (Given)
+*        The second dimension of the data array.
+*     XAXIS( DIM1 ) = REAL (Given)
+*        X axis array, giving the x co-ordinate of the centre of each
+*        column in the array.  Any columns in the array which are
+*        outside the x-axis range XMIN to XMAX will be returned as
+*        bad values.
+*     XMIN = REAL (Given)
+*        Lower end of the x range of the fit.
+*     XMAX = REAL (Given)
+*        Upper end of the x range of the fit.
+*     YAXIS( DIM1 ) = REAL (Given)
+*        Y axis array, giving the y co-ordinate of the centre of each
+*        column in the array.  Any rows in the array which are outside
+*        the y-axis range YMIN to YMAX will be returned as bad values.
+*     YMIN = REAL (Given)
+*        Lower end of the y range of the fit.
+*     YMAX = REAL (Given)
+*        Lower end of the y range of the fit.
+*     NXKNOT = INTEGER (Given)
+*        The number of interior knots in the x direction.
+*     NYKNOT = INTEGER (Given)
+*        The number of interior knots in the y direction.
+*     XKNOT( NXKNOT + 8 ) = REAL (Given)
+*        The x positions of complete set of knots associated with x.
+*     YKNOT( NYKNOT + 8 ) = REAL (Given)
+*        The y positions of complete set of knots associated with y.
+*     SCALE = REAL (Given)
+*        The scale factor applied to the data values before calculating
+*        the spline.
+*     NCOEF = INTEGER (Given)
+*        The number of bi-cubic coefficients.  It must equal 
+*        (%NXKNOT+4) * (%NYKNOT+4).
+*     COEFF( NCOEF ) = REAL (Given)
+*        The bi-cubic B-spline coefficients, defined at the knots in the
+*        order increasing x knot, then increasing y.  Thus coefficient
+*        Cij in the standard convention is %COEFF((i-1)*(%NYKNOT+4)+j).
+*     WORK( DIM1 ) = REAL (Returned)
+*        Workspace for intermediate results.
+*     OUTARR( DIM1, DIM2 ) = ? (Returned)
+*        The fitted array.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+*     OUTARR argument supplied to the routine must have the data type
+*     specified.
+*     -  Uses the magic-value method for bad or undefined pixels.
+
+*  Copyright:
+*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2007 July 9 (MJC):
+*        Original version derived from KPS1_MSPA.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! Bad-pixel definitions
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL funxction      
+
+*  Arguments Given:
+      INTEGER DIM1
+      INTEGER DIM2
+      REAL XAXIS( DIM1 )
+      REAL XMIN
+      REAL XMAX
+      REAL YAXIS( DIM1 )
+      REAL YMIN
+      REAL YMAX
+      INTEGER NXKNOT
+      INTEGER NYKNOT
+      REAL XKNOT( NXKNOT + 8 )
+      REAL YKNOT( NYKNOT + 8 )
+      REAL SCALE
+      INTEGER NCOEF
+      REAL COEFF( NCOEF )
+
+*  Arguments Returned:
+      REAL WORK( DIM1 )
+      <TYPE> OUTARR( DIM1, DIM2 )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Constants:
+      INTEGER MXPAR              ! Maximum number of parameters which
+                                 ! can be handled in each direction
+      PARAMETER ( MXPAR = 15 )
+
+*  Local Variables:
+      INTEGER I                  ! Loop counter
+      INTEGER IFAIL              ! PDA error status
+      INTEGER J                  ! Loop counter
+      INTEGER MFIRST             ! Lower limit of of valid columns
+      INTEGER MLAST              ! Upper limit of valid columns
+      INTEGER NPOINT             ! Storage space size for spline eval
+      INTEGER PANPTR             ! Pointer: panel-ordering workspace
+      INTEGER SEVPTR             ! Pointer: spline-evaluation workspace
+
+*  Internal References:
+      <LTYPE> VAL_RTO<T>         ! Conversion from double precision
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Obtain workspace.
+      NPOINT = 4 * ( DIM1 + 1 )
+      CALL PSX_CALLOC( NPOINT, '_REAL', PANPTR, STATUS )
+      CALL PSX_CALLOC( DIM1 + 1, '_INTEGER', SEVPTR, STATUS )
+
+*  Determine the range of x-axis values which are within the valid
+*  range.  It is assumed there is one contiguous run of good x-axis
+*  values, with any out of range values occurring at the beginning or
+*  end of the XAXIS array.  MFIRST and MLAST will denote the first and
+*  last x values within the good run.
+      I = 1
+      DO WHILE ( ( ( XAXIS( I ) .LT. XMIN ) .OR.
+     :             ( XAXIS( I ) .GT. XMAX ) ) .AND. ( I .LE. DIM1 ) )
+         I = I + 1
+      END DO
+      MFIRST = I
+
+      I = DIM1
+      DO WHILE ( ( ( XAXIS( I ) .LT. XMIN ) .OR.
+     :             ( XAXIS( I ) .GT. XMAX ) ) .AND. ( I .GE. 1 ) )
+         I = I - 1
+      END DO
+      MLAST = I
+
+*  Check there is a least one good value.
+      IF ( MLAST .GE. MFIRST ) THEN
+
+*  Scan through the bins a line at a time. Note for efficiency reasons
+*  the fitting for a whole line is made in a single call.
+         DO J = 1, DIM2
+
+*  Check that the Y co-ordinate for this line is within the valid range.
+            IF ( ( YAXIS( J ) .GE. YMIN ) .AND.
+     :           ( YAXIS( J ) .LE. YMAX ) ) THEN
+
+*  Evaluate the fitted surface for all pixels in the line between
+*  columns MFIRST and MLAST.
+*  Evaluate the polynomial for each pixel a line at time.
+*  Evaluate the fitted surface for pixels in the line.  By definition
+*  we are using a bi-cubic.
+               CALL PDA_BISPEV( XKNOT, NXKNOT + 8, YKNOT, NYKNOT + 8, 
+     :                          COEFF, 3, 3, XAXIS( MFIRST ), 
+     :                          MLAST - MFIRST + 1, YAXIS( J ), 1, 
+     :                          WORK, %VAL( CNF_PVAL( PANPTR ) ), 
+     :                          NPOINT, %VAL( CNF_PVAL( SEVPTR ) ), 
+     :                          DIM1 + 1, IFAIL, STATUS )
+
+*  Test for an error.
+               IF ( IFAIL .NE. 0 ) THEN
+                  STATUS = SAI__ERROR
+                  CALL MSG_SETI( 'IFAIL', IFAIL )
+                  CALL ERR_REP( 'KPS1_MSSA<T>_PDA',
+     :              'KPS1_MSSA<T>: Error ^IFAIL returned by '/
+     :               /'PDA_BISPEV evaluation.', STATUS )
+                  GO TO 999
+               END IF
+
+*  Return the polynomial values, setting the regions outside the run of
+*  good pixels to bad values.  (Note that the first and third loops may
+*  execute zero times if there are no bad pixels).
+               DO I = 1, MFIRST - 1
+                  OUTARR( I, J ) = VAL__BAD<T>
+               END DO
+
+               IF ( SCALE .GT. 0.0 ) THEN
+                  DO I = MFIRST, MLAST
+                     OUTARR( I, J ) = VAL_RTO<T>( .TRUE., 
+     :                                            WORK( I ) / SCALE,
+     :                                            STATUS )
+                  END DO
+               ELSE
+                  DO I = MFIRST, MLAST
+                     OUTARR( I, J ) = VAL_RTO<T>( .TRUE., WORK( I ),
+     :                                            STATUS )
+                  END DO
+               END IF
+
+               DO I = MLAST + 1, DIM1
+                  OUTARR( I, J ) = VAL__BAD<T>
+               END DO
+            ELSE
+
+*  All x co-ordinates lie outside the range.  Fill the line with bad
+*  values.
+               DO I = 1, DIM1
+                  OUTARR( I, J ) = VAL__BAD<T>
+               END DO
+            END IF
+
+*  End of the loops through the line of pixels.
+         END DO
+
+      ELSE
+
+*  Y co-ordinate is the outside range.  Fill the line with bad values.
+         DO J = 1, DIM2
+            DO I = 1, DIM1
+               OUTARR( I, J ) = VAL__BAD<T>
+            END DO
+         END DO
+      END IF
+
+  999 CONTINUE
+
+      END

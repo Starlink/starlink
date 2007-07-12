@@ -30,7 +30,7 @@
 *     NDF or given explicitly.
 *
 *     Elements in the new NDF outside the defined range of the
-*     polynomial will be set to bad values.
+*     polynomial or spline will be set to bad values.
 
 *  Usage:
 *     makesurface in out [like] type=? lbound=? ubound=? xlimit=?
@@ -100,14 +100,15 @@
 
 *  Notes:
 *     -  The polynomial surface fit is stored in SURFACEFIT extension,
-*     component FIT of type POLYNOMIAL, variant CHEBYSHEV.  This
-*     extension is created by FITSURFACE.  Also read from the
+*     component FIT of type POLYNOMIAL, variant CHEBYSHEV or BSPLINE.  
+*     This extension is created by FITSURFACE.  Also read from the
 *     SURFACEFIT extension is the co-ordinate system (component COSYS).
-*     -  When LIKE=!, COSYS="Data" and the original NDF had an axis that
-*     decreased with increasing pixel index, you may want to flip the
-*     co-ordinate limits (via parameters XLIMIT or YLIMIT) to match
-*     the original sense of the axis, otherwise the created surface will
-*     be flipped with respect to the image from which it was fitted.
+*     -  When LIKE=!, COSYS="Data" or "Axis" and the original NDF had an
+*     axis that decreased with increasing pixel index, you may want to 
+*     flip the co-ordinate limits (via parameters XLIMIT or YLIMIT) to 
+*     match the original sense of the axis, otherwise the created 
+*     surface will be flipped with respect to the image from which it 
+*     was fitted.
 
 *  Related Applications:
 *     KAPPA: FITSURFACE, SURFIT.
@@ -121,12 +122,6 @@
 *     -  All non-complex numeric data types can be handled.  Processing
 *     is performed in single- or double-precision floating point, as
 *     appropriate.
-
-*  Implementation Deficiencies:
-*     The ability to generate a spline surface is not yet available.
-*     One could be implemented using the subroutines called by SURFIT,
-*     but standard SPLINE data structure would need to be designed
-*     first.
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council.
@@ -186,6 +181,8 @@
 *        Remove unused variable.
 *     2007 June 28 (MJC):
 *        Allow for COSYS to be AXIS, PIXEL, or GRID.
+*     2007 July 6 (MJC):
+*        Added support and restructured for BSPLINE variant.
 *     {enter_further_changes_here}
 
 *-
@@ -215,12 +212,30 @@
                                  ! polynomial coefficients
       PARAMETER ( MCHOEF = MXPAR * MXPAR )
 
+      INTEGER MXKNOT             ! Maximum number of interior knots that
+                                 ! can be handled in each direction.
+      PARAMETER ( MXKNOT = MXPAR - 4 )
+
+      INTEGER MTKNOT             ! Maximum total number of knots that
+                                 ! can be handled in each direction.
+      PARAMETER ( MTKNOT = MXKNOT + 8 )
+
+      INTEGER MBCOEF             ! Maximum number of B-spline
+                                 ! coefficients
+      PARAMETER ( MBCOEF = MXPAR * MXPAR )
+
 *  Local Variables:
+      CHARACTER * ( NDF__SZTYP ) ATYPE ! Algorithm data type
       DOUBLE PRECISION CHCOEF( MCHOEF ) ! Chebyshev polynomial coeffs
+      REAL COEFF( MBCOEF )       ! B-spline coefficients of the fit
       CHARACTER * ( 5 ) COSYS    ! Co-ordinate system
       LOGICAL CREVAR             ! Create variance array?
       INTEGER DPTR( 2 )          ! Pointer to data and variance arrays
       CHARACTER * ( NDF__SZFTP ) DTYPE ! Destination data type
+      DOUBLE PRECISION DXMAX     ! Maximum x for NDF to be created
+      DOUBLE PRECISION DXMIN     ! Minimum x for NDF to be created
+      DOUBLE PRECISION DYMAX     ! Maximum y for NDF to be created
+      DOUBLE PRECISION DYMIN     ! Minimum y for NDF to be created
       INTEGER EL                 ! Number of elements
       CHARACTER * ( DAT__SZLOC ) FLOC ! Locator to FIT structure
                                  ! within SURFACEFIT
@@ -238,8 +253,10 @@
       INTEGER NDFI               ! ID of NDF containing coefficients
       INTEGER NDFO               ! ID of new NDF to contain surface
       INTEGER NDIM               ! Number of dimensions
+      INTEGER NXKNOT             ! Number of knots in x direction
       INTEGER NXPAR              ! Number of fitting parameters in x
                                  ! direction
+      INTEGER NYKNOT             ! Number of knots in y direction
       INTEGER NYPAR              ! Number of fitting parameters in y
                                  ! direction
       LOGICAL OBWORK             ! Workspace obtained?
@@ -254,12 +271,16 @@
       DOUBLE PRECISION ROUND( 2 )! Rounding needed to compare
                                  ! co-ordinate limits as SUBPAR loses
                                  ! accuracy
+      REAL SCALE                 ! Scale factor applied before fitting
+                                 ! to improve the fit and must be
+                                 ! re-applied in reciprocal
       INTEGER SDIM( MAXDIM )     ! Indices of significant dimensions
       LOGICAL STATE              ! NDF component is defined?
       CHARACTER * ( 80 ) TITLE   ! Title of NDF
       CHARACTER * ( DAT__SZTYP ) TYPE ! Data type of new NDF
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF
       CHARACTER * ( 40 ) UNITS   ! Data units of NDF
+      LOGICAL VALID              ! HDS locator is valid?
       DOUBLE PRECISION VARIAN( MCHOEF ) ! Chebyshev coeff's variances
       CHARACTER * ( DAT__SZTYP ) VARNT ! Variant of FIT structure
       LOGICAL VARPRE             ! Chebyshev coeff's variance present?
@@ -269,19 +290,21 @@
       INTEGER XDIM               ! First (x) dimension of data array
       CHARACTER * ( 40 ) XLABEL  ! X-axis label of NDF
       CHARACTER * ( DAT__SZLOC ) XLOC ! Locator to SURFACEFIT extension
+      REAL XKNOT( MTKNOT )       ! Spline knots in x direction
       DOUBLE PRECISION XLIMIT( MAXDIM ) ! Co-ordinate range in x for
                                  ! NDF to be created
-      DOUBLE PRECISION XMAX      ! Maximum x for NDF to be created
-      DOUBLE PRECISION XMIN      ! Minimum x for NDF to be created
+      REAL XMAX                  ! Maximum x for NDF to be created
+      REAL XMIN                  ! Minimum x for NDF to be created
       INTEGER XPTR               ! Pointer to x-axis array
       LOGICAL XROUND( 2 )        ! Supplied x limits out of bounds?
       CHARACTER * ( 40 ) XUNITS  ! X-axis units of NDF
       INTEGER YDIM               ! Second (y) dimension of data array
       CHARACTER * ( 40 ) YLABEL  ! Y-axis label of NDF
+      REAL YKNOT( MTKNOT )       ! Spline knots in y direction
       DOUBLE PRECISION YLIMIT( MAXDIM ) ! Co-ordinate range in y for
                                  ! NDF to be created
-      DOUBLE PRECISION YMAX      ! Maximum y for NDF to be created
-      DOUBLE PRECISION YMIN      ! Minimum y for NDF to be created
+      REAL YMAX                  ! Maximum y for NDF to be created
+      REAL YMIN                  ! Minimum y for NDF to be created
       INTEGER YPTR               ! Pointer to y-axis array
       LOGICAL YROUND( 2 )        ! Supplied y limits out of bounds
       CHARACTER * ( 40 ) YUNITS  ! Y-axis units of NDF
@@ -311,7 +334,11 @@
 *  cannot be accessed.
       CALL NDF_XLOC( NDFI, 'SURFACEFIT', 'READ', XLOC, STATUS )
       CALL DAT_FIND( XLOC, 'FIT', FLOC, STATUS )
+      CALL CMP_GET0C( FLOC, 'VARIANT', VARNT, STATUS )
       CALL DAT_TYPE( FLOC, FTYPE, STATUS )
+
+*  Obtain the co-ordinate system.
+      CALL NDF_XGT0C( NDFI, 'SURFACEFIT', 'COSYS', COSYS, STATUS )
 
       OBWORK = .FALSE.
 
@@ -321,42 +348,64 @@
       END DO
 
 *  Check everything has worked so far.
-      IF ( STATUS .EQ. SAI__OK ) THEN
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Check that the type of the FIT structure is recognised.  It should
 *  either be POLYNOMIAL or SPLINE.
-         IF ( FTYPE .EQ. 'POLYNOMIAL' ) THEN
+*      IF ( FTYPE .EQ. 'POLYNOMIAL' ) THEN
+
+*  Check that the type of variant can be dealt with.
+      IF ( VARNT .EQ. 'CHEBYSHEV' ) THEN
 
 *  Read the polynomial structure to obtain the coefficients and
 *  variances, and the x-y limits, and check this has worked.
-            CALL KPG1_PL2GE( FLOC, MXPAR, VARNT, NXPAR, NYPAR, LIMITS,
-     :                       PXMIN, PXMAX, PYMIN, PYMAX, CHCOEF,
-     :                       VARPRE, VARIAN, WORK, STATUS )
+         CALL KPG1_PL2GE( FLOC, MXPAR, VARNT, NXPAR, NYPAR, LIMITS,
+     :                    PXMIN, PXMAX, PYMIN, PYMAX, CHCOEF,
+     :                    VARPRE, VARIAN, WORK, STATUS )
 
 *  Determine whether or not a variance array is to be created.  It isn't
 *  when the polynomial structure does not contain a VARIANCE component.
-            IF ( VARPRE ) THEN
-               CALL PAR_GET0L( 'VARIANCE', CREVAR, STATUS )
-            ELSE
-               CREVAR = .FALSE.
-            END IF
+         IF ( VARPRE ) THEN
+            CALL PAR_GET0L( 'VARIANCE', CREVAR, STATUS )
+         ELSE
+            CREVAR = .FALSE.
+         END IF
 
-*  Obtain the co-ordinate system.
-            CALL NDF_XGT0C( NDFI, 'SURFACEFIT', 'COSYS', COSYS, STATUS )
-
-            IF ( STATUS .EQ. SAI__OK ) THEN
+         IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Determine the number of non-zero coefficients actually used.
-               NCOEF = 0
-               DO I = 1, MCHOEF
+         NCOEF = 0
+         DO I = 1, MCHOEF
+            IF ( ABS( CHCOEF( I ) ) .GT. VAL__SMLD ) THEN
+               NCOEF = NCOEF + 1
+            END IF
+         END DO
 
-                  IF ( ABS( CHCOEF( I ) ) .GT. VAL__SMLD ) THEN
-                     NCOEF = NCOEF + 1
-                  END IF
-               END DO
+         ATYPE = '_DOUBLE'
 
 *  Check that the type of variant can be dealt with.
-               IF ( VARNT .EQ. 'CHEBYSHEV' ) THEN
+      ELSE IF ( VARNT .EQ. 'BSPLINE' ) THEN
+         CALL KPS1_BS2GE( FLOC, MXPAR, NXKNOT, NYKNOT, XKNOT, YKNOT,
+     :                    SCALE, COEFF, WORK, STATUS )
+
+*  PDA spline code works in single precision.
+         ATYPE = '_REAL'
+
+*  There's no variance as yet in the SPLINE variant.
+         CREVAR = .FALSE.
+
+*  Set the fit limits from the exterior knots.
+         PXMIN = DBLE( XKNOT( 1 ) )
+         PXMAX = DBLE( XKNOT( NXKNOT + 8 ) )
+         PYMIN = DBLE( YKNOT( 1 ) )
+         PYMAX = DBLE( YKNOT( NYKNOT + 8 ) )
+
+      ELSE
+         STATUS = SAI__ERROR
+         CALL MSG_SETC( 'VARTN', VARNT )
+         CALL ERR_REP( ' ', 'Polynomials of variant ^VARNT cannot be '/
+     :                 /'dealt with at present.', STATUS )
+      END IF
 
 *  Attempt to open a template NDF, which the output NDF will be based
 *  on.  This may be the same as the input NDF.  If a NULL response is
@@ -365,412 +414,449 @@
 *  a mark is set in the error stack, which is later released with
 *  ERR_RLSE.  This allows errors encountered after the mark to be
 *  annulled without affecting earlier ones.
-                  CALL ERR_MARK
-                  CALL KPG1_GTNDF( 'LIKE', MAXDIM, .TRUE., 'READ',
-     :                             LIKEID, SDIM, LBND, UBND, STATUS )
+      CALL ERR_MARK
+      CALL KPG1_GTNDF( 'LIKE', MAXDIM, .TRUE., 'READ', LIKEID, SDIM,
+     :                 LBND, UBND, STATUS )
 
-                  IF ( STATUS .EQ. SAI__OK ) THEN
+      IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Remove the mark set in the error stack above.
-                     CALL ERR_RLSE
+         CALL ERR_RLSE
 
 *  For ease of use just have bounds with elements one and two.
-                     LBND( 1 ) = LBND( SDIM( 1 ) )
-                     LBND( 2 ) = LBND( SDIM( 2 ) )
-                     UBND( 1 ) = UBND( SDIM( 1 ) )
-                     UBND( 2 ) = UBND( SDIM( 2 ) )
+         LBND( 1 ) = LBND( SDIM( 1 ) )
+         LBND( 2 ) = LBND( SDIM( 2 ) )
+         UBND( 1 ) = UBND( SDIM( 1 ) )
+         UBND( 2 ) = UBND( SDIM( 2 ) )
 
 *  Create a new NDF using the supplied template, propagating the data
 *  and axis arrays, the title, label and history but NOT the SURFACEFIT
 *  extension.
-                     CALL LPG_PROP( LIKEID, 'DATA,UNITS,AXIS,TITLE,'/
-     :                              /'LABEL,HISTORY,WCS,'/
-     :                              /'NOEXTENSION(SURFACEFIT)',
-     :                              'OUT', NDFO, STATUS )
+         CALL LPG_PROP( LIKEID, 'DATA,UNITS,AXIS,TITLE,LABEL,HISTORY,'/
+     :                  /'WCS,NOEXTENSION(SURFACEFIT)', 'OUT', NDFO,
+     :                  STATUS )
 
 *  Obtain the bounds of the NDF just created.
-                     CALL NDF_BOUND( NDFO, MAXDIM, LBND, UBND,
-     :                               NDIM, STATUS )
+         CALL NDF_BOUND( NDFO, MAXDIM, LBND, UBND, NDIM, STATUS )
 
 *  For ease of use just have bounds with elements one and two.
-                     LBND( 1 ) = LBND( SDIM( 1 ) )
-                     LBND( 2 ) = LBND( SDIM( 2 ) )
-                     UBND( 1 ) = UBND( SDIM( 1 ) )
-                     UBND( 2 ) = UBND( SDIM( 2 ) )
+         LBND( 1 ) = LBND( SDIM( 1 ) )
+         LBND( 2 ) = LBND( SDIM( 2 ) )
+         UBND( 1 ) = UBND( SDIM( 1 ) )
+         UBND( 2 ) = UBND( SDIM( 2 ) )
 
 *  Evaluate the dimensions.
-                     XDIM = UBND( 1 ) - LBND( 1 ) + 1
-                     YDIM = UBND( 2 ) - LBND( 2 ) + 1
+         XDIM = UBND( 1 ) - LBND( 1 ) + 1
+         YDIM = UBND( 2 ) - LBND( 2 ) + 1
 
 *  DATA or AXIS
 *  ------------
 *  Is the surface is defined in terms of data co-ordinates (now called
 *  AXIS)?
-                     IF ( COSYS .EQ. 'DATA' .OR. 
-     :                    COSYS .EQ. 'AXIS' ) THEN
+         IF ( COSYS .EQ. 'DATA' .OR. COSYS .EQ. 'AXIS' ) THEN
 
 *  Map the axis arrays of the new NDF for read access.
-                        CALL NDF_AMAP( NDFO, 'CENTRE', SDIM( 1 ),
-     :                                 '_DOUBLE', 'READ', XPTR, EL,
-     :                                 STATUS )
-                        CALL NDF_AMAP( NDFO, 'CENTRE', SDIM( 2 ),
-     :                                 '_DOUBLE', 'READ', YPTR, EL,
-     :                                 STATUS )
+            CALL NDF_AMAP( NDFO, 'CENTRE', SDIM( 1 ), ATYPE, 'READ',
+     :                     XPTR, EL, STATUS )
+            CALL NDF_AMAP( NDFO, 'CENTRE', SDIM( 2 ), ATYPE, 'READ', 
+     :                     YPTR, EL, STATUS )
 
 *  Determine the bounds of the axes of the template NDF.
-                        CALL KPG1_AXBND( XDIM, %VAL( CNF_PVAL( XPTR ) ),
-     :                                   XMIN, XMAX,
-     :                                   STATUS )
-                        CALL KPG1_AXBND( YDIM, %VAL( CNF_PVAL( YPTR ) ),
-     :                                   YMIN, YMAX,
-     :                                   STATUS )
+            IF ( ATYPE .EQ. '_REAL' ) THEN
+               CALL KPG1_AXBNR( XDIM, %VAL( CNF_PVAL( XPTR ) ), XMIN,
+     :                          XMAX, STATUS )
+               CALL KPG1_AXBNR( YDIM, %VAL( CNF_PVAL( YPTR ) ), YMIN,
+     :                          YMAX, STATUS )
+
+            ELSE
+               CALL KPG1_AXBND( XDIM, %VAL( CNF_PVAL( XPTR ) ), DXMIN, 
+     :                          DXMAX, STATUS )
+               CALL KPG1_AXBND( YDIM, %VAL( CNF_PVAL( YPTR ) ), DYMIN,
+     :                          DYMAX, STATUS )
+            END IF
 
 *  WORLD or PIXEL
 *  --------------
-                     ELSE
+         ELSE
 
 *  Get some workspace the length of the two axes.
-                        CALL PSX_CALLOC( XDIM, '_DOUBLE', XPTR, STATUS )
-                        CALL PSX_CALLOC( YDIM, '_DOUBLE', YPTR, STATUS )
+            CALL PSX_CALLOC( XDIM, ATYPE, XPTR, STATUS )
+            CALL PSX_CALLOC( YDIM, ATYPE, YPTR, STATUS )
 
-                        IF ( COSYS .EQ. 'WORLD' .OR. 
-     :                       COSYS .EQ. 'PIXEL' ) THEN
+            IF ( COSYS .EQ. 'WORLD' .OR. COSYS .EQ. 'PIXEL' ) THEN
+               IF ( ATYPE .EQ. '_REAL' ) THEN
 
-*  Fill the work arrays with pixel co-ordinates.
-                           CALL KPG1_SSAZD( XDIM, 1.0D0,
-     :                                      DBLE( LBND( 1 ) ) - 0.5D0,
-     :                                      %VAL( CNF_PVAL( XPTR ) ) , 
-     :                                      STATUS )
-                           CALL KPG1_SSAZD( YDIM, 1.0D0,
-     :                                      DBLE( LBND( 2 ) ) - 0.5D0,
-     :                                      %VAL( CNF_PVAL( YPTR ) ) , 
-     :                                      STATUS )
-                        ELSE
-                           CALL KPG1_SSAZD( XDIM, 1.0D0, 
-     :                                      DBLE( LBND( 1 ) ),
-     :                                      %VAL( CNF_PVAL( XPTR ) ) , 
-     :                                      STATUS )
-                           CALL KPG1_SSAZD( YDIM, 1.0D0,
-     :                                      DBLE( LBND( 2 ) ),
-     :                                      %VAL( CNF_PVAL( YPTR ) ) , 
-     :                                      STATUS )
-                        END IF
+*  Fill the work arrays with pixel co-ordinates of the required type.
+                  CALL KPG1_SSAZR( XDIM, 1.0D0,
+     :                             DBLE( LBND( 1 ) ) - 0.5D0,
+     :                             %VAL( CNF_PVAL( XPTR ) ), STATUS )
+                  CALL KPG1_SSAZR( YDIM, 1.0D0, 
+     :                             DBLE( LBND( 2 ) ) - 0.5D0,
+     :                             %VAL( CNF_PVAL( YPTR ) ), STATUS )
+     
+               ELSE
+                  CALL KPG1_SSAZD( XDIM, 1.0D0, 
+     :                             DBLE( LBND( 1 ) ) - 0.5D0,
+     :                             %VAL( CNF_PVAL( XPTR ) ), STATUS )
+                  CALL KPG1_SSAZD( YDIM, 1.0D0, 
+     :                             DBLE( LBND( 2 ) ) - 0.5D0,
+     :                             %VAL( CNF_PVAL( YPTR ) ), STATUS )
+               END IF
 
 *  GRID
 *  ----
+            ELSE
+               IF ( ATYPE .EQ. '_REAL' ) THEN
+                  CALL KPG1_SSAZR( XDIM, 1.0D0, DBLE( LBND( 1 ) ),
+     :                             %VAL( CNF_PVAL( XPTR ) ),  STATUS )
+                  CALL KPG1_SSAZR( YDIM, 1.0D0, DBLE( LBND( 2 ) ),
+     :                             %VAL( CNF_PVAL( YPTR ) ), STATUS )
+     
+               ELSE
+                  CALL KPG1_SSAZD( XDIM, 1.0D0, DBLE( LBND( 1 ) ),
+     :                             %VAL( CNF_PVAL( XPTR ) ),  STATUS )
+                  CALL KPG1_SSAZD( YDIM, 1.0D0, DBLE( LBND( 2 ) ),
+     :                             %VAL( CNF_PVAL( YPTR ) ), STATUS )
+               END IF
+            END IF
+
 
 *  Record that there is workspace to free.
-                        OBWORK = .TRUE.
+            OBWORK = .TRUE.
 
 *  Obtain the limits of the axes.
-                        XMIN = DBLE( LBND( 1 ) ) - 0.5D0
-                        YMIN = DBLE( LBND( 2 ) ) - 0.5D0
-                        XMAX = DBLE( UBND( 1 ) ) - 0.5D0
-                        YMAX = DBLE( UBND( 2 ) ) - 0.5D0
-                     END IF
+            IF ( ATYPE .EQ. '_DOUBLE' ) THEN
+               DXMIN = DBLE( LBND( 1 ) ) - 0.5D0
+               DYMIN = DBLE( LBND( 2 ) ) - 0.5D0
+               DXMAX = DBLE( UBND( 1 ) ) - 0.5D0
+               DYMAX = DBLE( UBND( 2 ) ) - 0.5D0
+
+            ELSE
+               XMIN = REAL( LBND( 1 ) ) - 0.5
+               YMIN = REAL( LBND( 2 ) ) - 0.5
+               XMAX = REAL( UBND( 1 ) ) - 0.5
+               YMAX = REAL( UBND( 2 ) ) - 0.5
+            END IF
+         END IF
 
 *  LIKE=!
-                  ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
+      ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
 
 *  Annul the PAR__NULL error.  (Note that ERR_ANNUL will only annul
 *  errors back to the last ERR_MARK).
-                     CALL ERR_ANNUL( STATUS )
-                     CALL ERR_RLSE
+         CALL ERR_ANNUL( STATUS )
+         CALL ERR_RLSE
 
 *  Obtain the data type of the output NDF, using the type of the input
 *  NDF as a dynamic default.  Only allow the primitive numeric types.
-                     CALL NDF_TYPE( NDFI, 'DATA', INTYPE, STATUS )
-                     CALL PAR_CHOIC( 'TYPE', INTYPE, '_DOUBLE,_REAL,'/
-     :                               /'_INTEGER,_WORD,_BYTE,_UBYTE',
-     :                               .TRUE., TYPE, STATUS )
+         CALL NDF_TYPE( NDFI, 'DATA', INTYPE, STATUS )
+         CALL PAR_CHOIC( 'TYPE', INTYPE, '_DOUBLE,_REAL,_INTEGER,'/
+     :                   /'_WORD,_BYTE,_UBYTE', .TRUE., TYPE, STATUS )
 
 *  Obtain the required type and bounds for the new NDF, using the
 *  attributes of the input NDF as a default.
-                     CALL PAR_DEF1I( 'LBOUND', MAXDIM, LBND, STATUS )
-                     CALL PAR_GET1I( 'LBOUND', MAXDIM, LBND, NDIM,
-     :                               STATUS )
+         CALL PAR_DEF1I( 'LBOUND', MAXDIM, LBND, STATUS )
+         CALL PAR_GET1I( 'LBOUND', MAXDIM, LBND, NDIM, STATUS )
 
-                     CALL PAR_DEF1I( 'UBOUND', MAXDIM, UBND, STATUS )
-                     CALL PAR_GET1I( 'UBOUND', MAXDIM, UBND, NDIM,
-     :                               STATUS )
+         CALL PAR_DEF1I( 'UBOUND', MAXDIM, UBND, STATUS )
+         CALL PAR_GET1I( 'UBOUND', MAXDIM, UBND, NDIM, STATUS )
 
-                     XDIM = UBND( 1 ) - LBND( 1 ) + 1
-                     YDIM = UBND( 2 ) - LBND( 2 ) + 1
+         XDIM = UBND( 1 ) - LBND( 1 ) + 1
+         YDIM = UBND( 2 ) - LBND( 2 ) + 1
 
 *  Create a new NDF of the right type and size from scratch.
-                     CALL LPG_CREAT( 'OUT', TYPE, MAXDIM, LBND, UBND,
-     :                               NDFO, STATUS )
+         CALL LPG_CREAT( 'OUT', TYPE, MAXDIM, LBND, UBND, NDFO, STATUS )
 
 *  Initialise the axis system.
-                     CALL NDF_ACRE( NDFO, STATUS )
+         CALL NDF_ACRE( NDFO, STATUS )
 
 *  Obtain the title of the output NDF, using the title of the input
 *  NDF as the default, where there is one, if the user supplies a null
 *  response.
-                     CALL NDF_STATE( NDFI, 'TITLE', STATE, STATUS )
-                     IF ( STATE ) THEN
-                        CALL NDF_CGET( NDFI, 'TITLE', TITLE, STATUS )
-                        CALL NDF_CPUT( TITLE, NDFO, 'TITLE', STATUS )
-                     END IF
-                     CALL NDF_CINP( 'TITLE', NDFO, 'TITLE', STATUS )
+         CALL NDF_STATE( NDFI, 'TITLE', STATE, STATUS )
+         IF ( STATE ) THEN
+            CALL NDF_CGET( NDFI, 'TITLE', TITLE, STATUS )
+            CALL NDF_CPUT( TITLE, NDFO, 'TITLE', STATUS )
+         END IF
+         CALL NDF_CINP( 'TITLE', NDFO, 'TITLE', STATUS )
 
 *  Propagate the label of the input NDF, if there is one present, to
 *  the output NDF.
-                     CALL NDF_STATE( NDFI, 'LABEL', STATE, STATUS )
-                     IF ( STATE ) THEN
-                        CALL NDF_CGET( NDFI, 'LABEL', LABEL, STATUS )
-                        CALL NDF_CPUT( LABEL, NDFO, 'LABEL', STATUS )
-                     END IF
+         CALL NDF_STATE( NDFI, 'LABEL', STATE, STATUS )
+         IF ( STATE ) THEN
+            CALL NDF_CGET( NDFI, 'LABEL', LABEL, STATUS )
+            CALL NDF_CPUT( LABEL, NDFO, 'LABEL', STATUS )
+         END IF
 
 *  Propagate the label of the input NDF, if there is one present, to
 *  the output NDF.
-                     CALL NDF_STATE( NDFI, 'UNITS', STATE, STATUS )
-                     IF ( STATE ) THEN
-                        CALL NDF_CGET( NDFI, 'UNITS', UNITS, STATUS )
-                        CALL NDF_CPUT( UNITS, NDFO, 'UNITS', STATUS )
-                     END IF
+         CALL NDF_STATE( NDFI, 'UNITS', STATE, STATUS )
+         IF ( STATE ) THEN
+            CALL NDF_CGET( NDFI, 'UNITS', UNITS, STATUS )
+            CALL NDF_CPUT( UNITS, NDFO, 'UNITS', STATUS )
+         END IF
 
 *  Propagate the x-axis label of the input NDF, if there is one
 *  present, to the output NDF.
-                     CALL NDF_ASTAT( NDFI, 'LABEL', SDIM( 1 ), STATE,
-     :                               STATUS )
-                     IF ( STATE ) THEN
-                        CALL NDF_ACGET( NDFI, 'LABEL', SDIM( 1 ),
-     :                                  XLABEL, STATUS )
-                        CALL NDF_ACPUT( XLABEL, NDFO, 'LABEL',
-     :                                  SDIM( 1 ), STATUS )
-                     END IF
+         CALL NDF_ASTAT( NDFI, 'LABEL', SDIM( 1 ), STATE, STATUS )
+         IF ( STATE ) THEN
+            CALL NDF_ACGET( NDFI, 'LABEL', SDIM( 1 ), XLABEL, STATUS )
+            CALL NDF_ACPUT( XLABEL, NDFO, 'LABEL', SDIM( 1 ), STATUS )
+         END IF
 
 *  Propagate the y-axis label of the input NDF, if there is one
 *  present, to the output NDF.
-                     CALL NDF_ASTAT( NDFI, 'LABEL', SDIM( 2 ), STATE,
-     :                               STATUS )
-                     IF ( STATE ) THEN
-                        CALL NDF_ACGET( NDFI, 'LABEL', SDIM( 2 ),
-     :                                  YLABEL, STATUS )
-                        CALL NDF_ACPUT( YLABEL, NDFO, 'LABEL',
-     :                                  SDIM( 2 ), STATUS )
-                     END IF
+         CALL NDF_ASTAT( NDFI, 'LABEL', SDIM( 2 ), STATE, STATUS )
+         IF ( STATE ) THEN
+            CALL NDF_ACGET( NDFI, 'LABEL', SDIM( 2 ), YLABEL, STATUS )
+            CALL NDF_ACPUT( YLABEL, NDFO, 'LABEL', SDIM( 2 ), STATUS )
+         END IF
 
 *  Propagate the x-axis units of the input NDF, if there is one
 *  present, to the output NDF.
-                     CALL NDF_ASTAT( NDFI, 'UNITS', SDIM( 1 ), STATE,
-     :                               STATUS )
-                     IF ( STATE ) THEN
-                        CALL NDF_ACGET( NDFI, 'UNITS', SDIM( 1 ),
-     :                                  XUNITS, STATUS )
-                        CALL NDF_ACPUT( XUNITS, NDFO, 'UNITS',
-     :                                  SDIM( 1 ), STATUS )
-                     END IF
+         CALL NDF_ASTAT( NDFI, 'UNITS', SDIM( 1 ), STATE, STATUS )
+         IF ( STATE ) THEN
+            CALL NDF_ACGET( NDFI, 'UNITS', SDIM( 1 ), XUNITS, STATUS )
+            CALL NDF_ACPUT( XUNITS, NDFO, 'UNITS', SDIM( 1 ), STATUS )
+         END IF
 
 *  Propagate the y-axis label of the input NDF, if there is one
 *  present, to the output NDF.
-                     CALL NDF_ASTAT( NDFI, 'UNITS', SDIM( 2 ), STATE,
-     :                               STATUS )
-                     IF ( STATE ) THEN
-                        CALL NDF_ACGET( NDFI, 'UNITS', SDIM( 2 ),
-     :                                  YUNITS, STATUS )
-                        CALL NDF_ACPUT( YUNITS, NDFO, 'UNITS',
-     :                                  SDIM( 2 ), STATUS )
-                     END IF
+         CALL NDF_ASTAT( NDFI, 'UNITS', SDIM( 2 ), STATE, STATUS )
+         IF ( STATE ) THEN
+            CALL NDF_ACGET( NDFI, 'UNITS', SDIM( 2 ), YUNITS, STATUS )
+            CALL NDF_ACPUT( YUNITS, NDFO, 'UNITS', SDIM( 2 ), STATUS )
+         END IF
 
 *  Obtain the required co-ordinate range for this polynomial, using the
-*  full range of the polynomial as a default.  The NDF will be filled
-*  with bad values outside the range of the polynomial.
-                     XLIMIT( 1 ) = PXMIN
-                     XLIMIT( 2 ) = PXMAX
-                     CALL PAR_DEF1D( 'XLIMIT', MAXDIM, XLIMIT, STATUS )
-                     CALL PAR_EXACD( 'XLIMIT', MAXDIM, XLIMIT, STATUS )
-                     XMIN = XLIMIT( 1 )
-                     XMAX = XLIMIT( 2 )
+*  full range of the polynomial as a default, or for a spline the
+*  defaults cover the extreme knots that are just exterior to the 
+*  original array's bounds.  If this is not accurate enough the SPLINE 
+*  variant would need modification to record the limits. The NDF will be 
+*  filled with bad values outside the range of the polynomial.
+         XLIMIT( 1 ) = PXMIN
+         XLIMIT( 2 ) = PXMAX
+         YLIMIT( 1 ) = PYMIN
+         YLIMIT( 2 ) = PYMAX
 
-                     YLIMIT( 1 ) = PYMIN
-                     YLIMIT( 2 ) = PYMAX
-                     CALL PAR_DEF1D( 'YLIMIT', MAXDIM, YLIMIT, STATUS )
-                     CALL PAR_EXACD( 'YLIMIT', MAXDIM, YLIMIT, STATUS )
-                     YMIN = YLIMIT( 1 )
-                     YMAX = YLIMIT( 2 )
+         CALL PAR_DEF1D( 'XLIMIT', MAXDIM, XLIMIT, STATUS )
+         CALL PAR_EXACD( 'XLIMIT', MAXDIM, XLIMIT, STATUS )
+         DXMIN = XLIMIT( 1 )
+         DXMAX = XLIMIT( 2 )
+
+         CALL PAR_DEF1D( 'YLIMIT', MAXDIM, YLIMIT, STATUS )
+         CALL PAR_EXACD( 'YLIMIT', MAXDIM, YLIMIT, STATUS )
+         DYMIN = YLIMIT( 1 )
+         DYMAX = YLIMIT( 2 )
 
 *  Map the axis-centre arrays of the new NDF for write access.
-                     CALL NDF_AMAP( NDFO, 'CENTRE', 1, '_DOUBLE',
-     :                              'UPDATE', XPTR, EL, STATUS )
-                     CALL NDF_AMAP( NDFO, 'CENTRE', 2, '_DOUBLE',
-     :                              'UPDATE', YPTR, EL, STATUS )
+         CALL NDF_AMAP( NDFO, 'CENTRE', 1, ATYPE, 'UPDATE', XPTR,
+     :                  EL, STATUS )
+         CALL NDF_AMAP( NDFO, 'CENTRE', 2, ATYPE, 'UPDATE', YPTR,
+     :                  EL, STATUS )
 
-*  Fill the axis arrays with appropriate values.
-                     IF ( XDIM .EQ. 1 )  THEN
-                        CALL KPG1_SSAZD( XDIM, 0.0D0, XMIN,
-     :                                   %VAL( CNF_PVAL( XPTR ) ), 
-     :                                   STATUS )
-                     ELSE
-                        CALL KPG1_SSAZD( XDIM, ( XMAX - XMIN ) /
-     :                                   DBLE( XDIM - 1 ), XMIN,
-     :                                   %VAL( CNF_PVAL( XPTR ) ), 
-     :                                   STATUS )
-                     END IF
+*  Fill the axis arrays with appropriate values of the appropriate
+*  data type.  Note the the scale and offset arguments to KPG1_SSAZx
+*  are double precision not the generic type.
+         IF ( ATYPE .EQ. '_REAL' ) THEN
+            IF ( XDIM .EQ. 1 )  THEN
+               CALL KPG1_SSAZR( XDIM, 0.0D0, DXMIN, 
+     :                          %VAL( CNF_PVAL( XPTR ) ), STATUS )
+            ELSE
+               CALL KPG1_SSAZR( XDIM, 
+     :                          ( DXMAX - DXMIN ) / DBLE( XDIM - 1 ), 
+     :                          DXMIN, %VAL( CNF_PVAL( XPTR ) ),
+     :                          STATUS )
+            END IF
 
-                     IF ( YDIM .EQ. 1 )  THEN
-                        CALL KPG1_SSAZD( YDIM, 0.0D0, YMIN,
-     :                                   %VAL( CNF_PVAL( YPTR ) ), 
-     :                                   STATUS )
-                     ELSE
-                        CALL KPG1_SSAZD( YDIM, ( YMAX - YMIN ) /
-     :                                   DBLE( YDIM - 1 ), YMIN,
-     :                                   %VAL( CNF_PVAL( YPTR ) ), 
-     :                                   STATUS )
-                     END IF
-                  END IF
+            IF ( YDIM .EQ. 1 )  THEN
+               CALL KPG1_SSAZR( YDIM, 0.0D0, DYMIN, 
+     :                          %VAL( CNF_PVAL( YPTR ) ), STATUS )
+            ELSE
+               CALL KPG1_SSAZR( YDIM, 
+     :                          ( DYMAX - DYMIN ) / DBLE( YDIM - 1 ), 
+     :                          DYMIN, %VAL( CNF_PVAL( YPTR ) ), 
+     :                          STATUS )
+            END IF
+
+* We need single-precision versions of the limits from the parameter
+* double-precision values.
+            XMIN = REAL( DXMIN )
+            XMAX = REAL( DXMAX )
+            YMIN = REAL( DYMIN )
+            YMAX = REAL( DYMAX )
+
+        ELSE
+            IF ( XDIM .EQ. 1 )  THEN
+               CALL KPG1_SSAZD( XDIM, 0.0D0, DXMIN, 
+     :                          %VAL( CNF_PVAL( XPTR ) ), STATUS )
+            ELSE
+               CALL KPG1_SSAZD( XDIM, 
+     :                          ( DXMAX - DXMIN ) / DBLE( XDIM - 1 ), 
+     :                          DXMIN, %VAL( CNF_PVAL( XPTR ) ),
+     :                          STATUS )
+            END IF
+
+            IF ( YDIM .EQ. 1 )  THEN
+               CALL KPG1_SSAZD( YDIM, 0.0D0, DYMIN, 
+     :                          %VAL( CNF_PVAL( YPTR ) ), STATUS )
+            ELSE
+               CALL KPG1_SSAZD( YDIM, 
+     :                          ( DYMAX - DYMIN ) / DBLE( YDIM - 1 ), 
+     :                          DYMIN, %VAL( CNF_PVAL( YPTR ) ),
+     :                          STATUS )
+            END IF
+         END IF
+      END IF
+
+*  We need the double-precision bounds for the rounding check.
+      IF ( ATYPE .EQ. '_REAL' ) THEN
+         DXMIN = DBLE( XMIN )
+         DXMAX = DBLE( XMAX )
+         DYMIN = DBLE( YMIN )
+         DYMAX = DBLE( YMAX )
 
 *  Specify the rounding for fuzzy co-ordinate limits.
-                  ROUND( 1 ) = 1.0D0 - VAL__EPSD * 1.0D3
-                  ROUND( 2 ) = 1.0D0 + VAL__EPSD * 1.0D3
+         ROUND( 1 ) = 1.0D0 - DBLE( VAL__EPSR ) * 1.0D3
+         ROUND( 2 ) = 1.0D0 + DBLE( VAL__EPSR ) * 1.0D3
+
+      ELSE
+         ROUND( 1 ) = 1.0D0 - VAL__EPSD * 1.0D3
+         ROUND( 2 ) = 1.0D0 + VAL__EPSD * 1.0D3
+      END IF
 
 *  In order to test for pixels outside the range, we have to allow for
 *  fuzzy edges due to truncation of significant figures inside the
 *  parmerer system.  The sense of the fuzziness depends on the sense of
 *  the axis (shaving off some for an increasing co-ordinate with pixel
 *  index at lower limit and vice versa).
-                  IF ( XMIN .LT. XMAX ) THEN
-                     XROUND( 1 ) = ABS( XMIN ) .LT. ABS( PXMIN ) *
-     :                             ROUND( 1 )
-                     XROUND( 2 ) = ABS( XMAX ) .GT. ABS( PXMAX ) *
-     :                             ROUND( 2 )
-                  ELSE
-                     XROUND( 1 ) = ABS( XMIN ) .GT. ABS( PXMIN ) *
-     :                             ROUND( 2 )
-                     XROUND( 2 ) = ABS( XMAX ) .LT. ABS( PXMAX ) *
-     :                             ROUND( 1 )
-                  END IF
+      IF ( DXMIN .LT. DXMAX ) THEN
+         XROUND( 1 ) = ABS( DXMIN ) .LT. ABS( PXMIN ) * ROUND( 1 )
+         XROUND( 2 ) = ABS( DXMAX ) .GT. ABS( PXMAX ) * ROUND( 2 )
+      ELSE
+         XROUND( 1 ) = ABS( DXMIN ) .GT. ABS( PXMIN ) * ROUND( 2 )
+         XROUND( 2 ) = ABS( DXMAX ) .LT. ABS( PXMAX ) * ROUND( 1 )
+      END IF
 
-                  IF ( YMIN .LT. YMAX ) THEN
-                     YROUND( 1 ) = ABS( YMIN ) .LT. ABS( PYMIN ) *
-     :                             ROUND( 1 )
-                     YROUND( 2 ) = ABS( YMAX ) .GT. ABS( PYMAX ) *
-     :                             ROUND( 2 )
-                  ELSE
-                     YROUND( 1 ) = ABS( YMIN ) .GT. ABS( PYMIN ) *
-     :                             ROUND( 2 )
-                     YROUND( 2 ) = ABS( YMAX ) .LT. ABS( PYMAX ) *
-     :                             ROUND( 1 )
-                  END IF
+      IF ( DYMIN .LT. DYMAX ) THEN
+         YROUND( 1 ) = ABS( DYMIN ) .LT. ABS( PYMIN ) * ROUND( 1 )
+         YROUND( 2 ) = ABS( DYMAX ) .GT. ABS( PYMAX ) * ROUND( 2 )
+      ELSE
+         YROUND( 1 ) = ABS( DYMIN ) .GT. ABS( PYMIN ) * ROUND( 2 )
+         YROUND( 2 ) = ABS( DYMAX ) .LT. ABS( PYMAX ) * ROUND( 1 )
+      END IF
 
 *  Any pixels in the NDF outside the valid range of the polynomial will
-*  be set to bad values.  Report if this
-*  is going to happen.
-                  IF ( XROUND( 1 ) .OR. XROUND( 2 ) .OR.
-     :                 YROUND( 1 ) .OR. YROUND( 2 ) ) THEN
+*  be set to bad values.  Report if this is going to happen.
+      IF ( XROUND( 1 ) .OR. XROUND( 2 ) .OR.
+     :     YROUND( 1 ) .OR. YROUND( 2 ) ) THEN
 
-                     CALL MSG_OUT( ' ', 'N.B:  Some points lie '/
-     :                 /'outside the valid range of the surface '/
-     :                 /'fit', STATUS )
-                     CALL MSG_OUT( ' ', '      and will be set '/
-     :                 /'to bad values.', STATUS )
-                  END IF
+         CALL MSG_OUT( ' ', 'N.B:  Some points lie outside of the '/
+     :                 /'valid range of the surface fit', STATUS )
+         CALL MSG_OUT( ' ', '      and will be set to bad values.',
+     :                 STATUS )
+      END IF
 
 *  Determine the processing type of the output array.
-                  CALL NDF_MTYPE( '_REAL,_DOUBLE', NDFO, NDFO, 'Data',
-     :                            ITYPE, DTYPE, STATUS )
+      CALL NDF_MTYPE( '_REAL,_DOUBLE', NDFO, NDFO, 'Data', ITYPE,
+     :                DTYPE, STATUS )
 
 *  Map the data array (and possibly the variance) of the new NDF for
 *  write access.
-                  IF ( CREVAR ) THEN
-                     CALL KPG1_MAP( NDFO, 'Data,Variance', ITYPE,
-     :                             'WRITE/BAD', DPTR, EL, STATUS )
-                  ELSE
-                     CALL KPG1_MAP( NDFO, 'Data', ITYPE,
-     :                             'WRITE/BAD', DPTR, EL, STATUS )
-                  END IF
+      IF ( CREVAR ) THEN
+         CALL KPG1_MAP( NDFO, 'Data,Variance', ITYPE,
+     :                  'WRITE/BAD', DPTR, EL, STATUS )
+      ELSE
+         CALL KPG1_MAP( NDFO, 'Data', ITYPE,
+     :                  'WRITE/BAD', DPTR, EL, STATUS )
+      END IF
 
 *  Map some workspace for the evaluation of the polynomial.
-                  CALL PSX_CALLOC( XDIM, '_DOUBLE', WPTR, STATUS )
+      CALL PSX_CALLOC( XDIM, ATYPE, WPTR, STATUS )
 
 *  Check everything has worked so far.  (This test guards against
-*  KPS1_FSPAx being called with junk for the mapped data pointers).
-                  IF ( STATUS .EQ. SAI__OK ) THEN
+*  KPS1_MSPAx and KPS1_MSSAx being called with junk for the mapped 
+*  data pointers).
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Polynomial evaluation
+*  =====================
+      IF ( VARNT .EQ. 'CHEBYSHEV' ) THEN
 
 *  Calculate the polynomial at each pixel, calling the routine of the
 *  appropriate data type.
-                     IF ( ITYPE .EQ. '_REAL' ) THEN
-                        CALL KPS1_MSPAR( XDIM, YDIM, 
-     :                                   %VAL( CNF_PVAL( XPTR ) ),
-     :                                   PXMIN, PXMAX, 
-     :                                   %VAL( CNF_PVAL( YPTR ) ),
-     :                                   PYMIN, PYMAX, NXPAR, NYPAR,
-     :                                   MCHOEF, CHCOEF, 
-     :                                   %VAL( CNF_PVAL( WPTR ) ),
-     :                                   %VAL( CNF_PVAL( DPTR( 1 ) ) ), 
-     :                                   STATUS )
+         IF ( ITYPE .EQ. '_REAL' ) THEN
+            CALL KPS1_MSPAR( XDIM, YDIM, %VAL( CNF_PVAL( XPTR ) ),
+     :                       PXMIN, PXMAX, %VAL( CNF_PVAL( YPTR ) ),
+     :                       PYMIN, PYMAX, NXPAR, NYPAR, MCHOEF, 
+     :                       CHCOEF, %VAL( CNF_PVAL( WPTR ) ),
+     :                       %VAL( CNF_PVAL( DPTR( 1 ) ) ), STATUS )
 
-                     ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                        CALL KPS1_MSPAD( XDIM, YDIM, 
-     :                                   %VAL( CNF_PVAL( XPTR ) ),
-     :                                   PXMIN, PXMAX, 
-     :                                   %VAL( CNF_PVAL( YPTR ) ),
-     :                                   PYMIN, PYMAX, NXPAR, NYPAR,
-     :                                   MCHOEF, CHCOEF, 
-     :                                   %VAL( CNF_PVAL( WPTR ) ),
-     :                                   %VAL( CNF_PVAL( DPTR( 1 ) ) ), 
-     :                                   STATUS )
-                     END IF
-
-*  Create the variance array.
-                     IF ( CREVAR ) THEN
-
-                        IF ( ITYPE .EQ. '_REAL' ) THEN
-                           CALL KPS1_MSPAR( XDIM, YDIM, 
-     :                                      %VAL( CNF_PVAL( XPTR ) ),
-     :                                      PXMIN, PXMAX, 
-     :                                      %VAL( CNF_PVAL( YPTR ) ),
-     :                                      PYMIN, PYMAX, NXPAR, NYPAR,
-     :                                      MCHOEF, VARIAN,
-     :                                      %VAL( CNF_PVAL( WPTR ) ),
-     :                                      
-     :   %VAL( CNF_PVAL( DPTR( 2 ) ) ), STATUS )
-
-                        ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                           CALL KPS1_MSPAD( XDIM, YDIM, 
-     :                                      %VAL( CNF_PVAL( XPTR ) ),
-     :                                      PXMIN, PXMAX, 
-     :                                      %VAL( CNF_PVAL( YPTR ) ),
-     :                                      PYMIN, PYMAX, NXPAR, NYPAR,
-     :                                      MCHOEF, VARIAN,
-     :                                      %VAL( CNF_PVAL( WPTR ) ),
-     :                                      
-     :   %VAL( CNF_PVAL( DPTR( 2 ) ) ), STATUS )
-                        END IF
-
-                     END IF
-                  END IF
-
-               ELSE
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETC( 'VARTN', VARNT )
-                  CALL ERR_REP( ' ', 'Polynomials of variant '/
-     :              /'^VARNT cannot be dealt with at present.', STATUS )
-               END IF
-
-*  Tidy up the workspace.
-               CALL PSX_FREE( WPTR, STATUS )
-               IF ( OBWORK ) THEN
-                  CALL PSX_FREE( XPTR, STATUS )
-                  CALL PSX_FREE( YPTR, STATUS )
-               END IF
-
-            END IF
-
-         ELSE IF ( FTYPE .EQ. 'SPLINE' ) THEN
-            CALL MSG_OUT( ' ', 'Sorry, SPLINE surfaces have not '/
-     :                    /'been implemented yet.', STATUS )
-
-         ELSE
-            STATUS = SAI__ERROR
-            CALL MSG_SETC( 'FTYPE', FTYPE )
-            CALL ERR_REP( ' ', 'Unknown surface type, ^FTYPE.', STATUS )
+         ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+            CALL KPS1_MSPAD( XDIM, YDIM, %VAL( CNF_PVAL( XPTR ) ),
+     :                       PXMIN, PXMAX, %VAL( CNF_PVAL( YPTR ) ),
+     :                       PYMIN, PYMAX, NXPAR, NYPAR, MCHOEF, 
+     :                       CHCOEF, %VAL( CNF_PVAL( WPTR ) ),
+     :                       %VAL( CNF_PVAL( DPTR( 1 ) ) ), STATUS )
          END IF
 
-      ELSE
-         CALL ERR_REP( ' ', 'Error while accessing input NDF.', STATUS )
+*  Create the variance array.
+         IF ( CREVAR ) THEN
+
+            IF ( ITYPE .EQ. '_REAL' ) THEN
+               CALL KPS1_MSPAR( XDIM, YDIM, %VAL( CNF_PVAL( XPTR ) ),
+     :                          PXMIN, PXMAX, %VAL( CNF_PVAL( YPTR ) ),
+     :                          PYMIN, PYMAX, NXPAR, NYPAR, MCHOEF, 
+     :                          VARIAN, %VAL( CNF_PVAL( WPTR ) ),
+     :                          %VAL( CNF_PVAL( DPTR( 2 ) ) ), STATUS )
+
+            ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+               CALL KPS1_MSPAD( XDIM, YDIM, %VAL( CNF_PVAL( XPTR ) ),
+     :                          PXMIN, PXMAX, %VAL( CNF_PVAL( YPTR ) ),
+     :                          PYMIN, PYMAX, NXPAR, NYPAR, MCHOEF, 
+     :                          VARIAN, %VAL( CNF_PVAL( WPTR ) ),
+     :                          %VAL( CNF_PVAL( DPTR( 2 ) ) ), STATUS )
+            END IF
+         END IF
+
+*  B-spline evaluation
+*  ===================
+      ELSE IF ( VARNT .EQ. 'BSPLINE' ) THEN
+
+*  Calculate the spline at each pixel, calling the routine of the
+*  appropriate data type.
+         IF ( ITYPE .EQ. '_REAL' ) THEN
+            CALL KPS1_MSSAR( XDIM, YDIM, %VAL( CNF_PVAL( XPTR ) ),
+     :                       XMIN, XMAX, %VAL( CNF_PVAL( YPTR ) ),
+     :                       YMIN, YMAX, NXKNOT, NYKNOT, XKNOT,
+     :                       YKNOT, SCALE, NCOEF, COEFF, 
+     :                       %VAL( CNF_PVAL( WPTR ) ),
+     :                       %VAL( CNF_PVAL( DPTR( 1 ) ) ), STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+            CALL KPS1_MSSAD( XDIM, YDIM, %VAL( CNF_PVAL( XPTR ) ),
+     :                       XMIN, XMAX, %VAL( CNF_PVAL( YPTR ) ),
+     :                       YMIN, YMAX, NXKNOT, NYKNOT, XKNOT,
+     :                       YKNOT, SCALE, NCOEF, COEFF, 
+     :                       %VAL( CNF_PVAL( WPTR ) ),
+     :                       %VAL( CNF_PVAL( DPTR( 1 ) ) ), STATUS )
+         END IF
       END IF
+
+*  Tidy up the workspace.
+      CALL PSX_FREE( WPTR, STATUS )
+      IF ( OBWORK ) THEN
+         CALL PSX_FREE( XPTR, STATUS )
+         CALL PSX_FREE( YPTR, STATUS )
+      END IF
+
+  999 CONTINUE
+  
+      CALL DAT_VALID( XLOC, VALID, STATUS )
+      IF ( VALID ) CALL DAT_ANNUL( XLOC, STATUS )
+
+      CALL DAT_VALID( FLOC, VALID, STATUS )
+      IF ( VALID ) CALL DAT_ANNUL( FLOC, STATUS )
 
 *  Close the NDF context, regardless of the status.
       CALL NDF_END( STATUS )
