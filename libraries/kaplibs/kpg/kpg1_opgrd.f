@@ -504,6 +504,12 @@
 *  the central position (XC,YC).
          SPC0 = DBLE( ( HISTSZ + 1 )/2 )
 
+c      write(*,*) 
+c      write(*,*) 
+c      write(*,*) 'Doing coarse search'
+c      write(*,*) 
+c      write(*,*) 
+
 *  Imagine a line passing through the centre position (XC,YC). We step 
 *  through all orientations of this line in units of 3 degrees. Zero angle
 *  corresponds to the second axis in the initial projection (i.e. celestial 
@@ -542,6 +548,12 @@
             MXAMP = -1.0
             MXWAVE = 0.0
             	    
+c      write(*,*) 
+c      write(*,*) 
+c      write(*,*) 'Doing fine search'
+c      write(*,*) 
+c      write(*,*) 
+
             DO IANG = -15, 15
                ANG = ANG0 + 0.1*DBLE( IANG )*AST__DD2R
                CALL KPG1_OPGR2( NPOS, XOUT, YOUT, ANG, SPC, XC, YC, 
@@ -552,6 +564,14 @@
 
 *  Calculate the wavelength of the periodicity at right angles to the above 
 *  chosen direction.
+
+c      write(*,*) 
+c      write(*,*) 
+c      write(*,*) 'Finding wavelen at right angles '
+c      write(*,*) 
+c      write(*,*) 
+            
+
             PAMP = -1.0
             PWAVE = 0.0
             CALL KPG1_OPGR2( NPOS, XOUT, YOUT, MXANG + AST__DPIBY2, 
@@ -940,6 +960,11 @@
 *        compared to the noise in the auto-correlation. This may happen
 *        for instance if there are very few positions are supplied (e.g.
 *        a regular grid of 5 points).
+*     12-JUL-2007 (DSB):
+*        Modify the estimate of the noise in the auto-correlation value. 
+*        it is now the weighted mean of the change between adjacent
+*        auto-correlation values (each weight is the reciprocal of the
+*        auto-correlation value).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -992,7 +1017,9 @@
       DOUBLE PRECISION POW
       DOUBLE PRECISION SINANG
       DOUBLE PRECISION SUM2
-      DOUBLE PRECISION SUMSUM
+      DOUBLE PRECISION SUMINC
+      DOUBLE PRECISION SUMW
+      DOUBLE PRECISION W
       DOUBLE PRECISION USUM
       DOUBLE PRECISION WBIN
       DOUBLE PRECISION WBIN2
@@ -1005,7 +1032,6 @@
       INTEGER J
       INTEGER MAXSH
       INTEGER MINSH
-      INTEGER NSUM
       INTEGER SHIFT
       LOGICAL MORE             
 *.
@@ -1094,8 +1120,8 @@ c      write(*,*) 'Ang: ',ang*ast__dr2d,' sum2: ',sum2,' mxamp: ',mxamp
          LSUM2 = SUM2
          SHIFT = 1
          MINSUM = SUM2
-         SUMSUM = 0.0
-         NSUM = 0
+         SUMINC = 0.0
+         SUMW = 0.0
    
 *  Loop over increasing shifts until we have found the minimum.
          MORE = .TRUE.
@@ -1115,9 +1141,18 @@ c      write(*,*) 'Ang: ',ang*ast__dr2d,' sum2: ',sum2,' mxamp: ',mxamp
                J = J + 1
             END DO
 
-*  Increment sums used to find the mean auto-correlation value.
-            SUMSUM = SUMSUM + SUM2
-            NSUM = NSUM + 1
+*  Increment sums used to find the weighted mean of the change between 
+*  adjacent auto-correlation values. The weight is the recprocal of the
+*  auto-correlation value, thus giving greater weight to the lower,
+*  background, values and tending to ignore the steep edges of the peaks
+*  in the auto-correlation function.
+            IF( SUM2 .GT. 1.0 ) THEN
+               W = 1.0/SUM2
+            ELSE
+               W = 1.0
+            END IF
+            SUMINC = SUMINC + W*ABS( SUM2 - LSUM2 )
+            SUMW = SUMW + W
 
 *  If the SUM2 value is smaller than the smallest value found so far,
 *  record it and reset the count of larger SUM2 values found since the
@@ -1161,6 +1196,9 @@ c     :           'function at ',minsh
 *  shift and is greater than the subsequent two values. In case no such
 *  point is found, we also record the largest value found, and the mean of
 *  all values (except for the first point at zero shift).
+
+c         write(*,*) 'Shift, histsz: ',shift, histsz
+
          IF( SHIFT .LT. HISTSZ ) THEN
 
             MAXSH = -1
@@ -1186,8 +1224,13 @@ c     :           'function at ',minsh
                   J = J + 1
                END DO
 
-               SUMSUM = SUMSUM + SUM2
-               NSUM = NSUM + 1
+               IF( SUM2 .GT. 1.0 ) THEN
+                  W = 1.0/SUM2
+               ELSE
+                  W = 1.0
+               END IF
+               SUMINC = SUMINC + W*ABS( SUM2 - LSUM2 )
+               SUMW = SUMW + W
 
                IF( SUM2 .GT. MAXSUM ) THEN
                   MAXSUM = SUM2
@@ -1213,10 +1256,11 @@ c     :           'function at ',minsh
 
 
 *  If no peak was found that was more than half the value at zero shift,
-*  use the maximum value found so long as it is more than 10 times the mean 
-*  value.
+*  use the maximum value found so long as it is more than 10 times the 
+*  noise in the auto-correlation function. This noise is estimated as the
+*  weighted mean of the variation between adjacent auto-correlation values.
             IF( SHIFT .EQ. HISTSZ .AND. MAXSH .NE. -1 ) THEN
-               IF( MAXSUM .GT. 10.0*SUMSUM/NSUM ) SHIFT = MAXSH
+               IF( MAXSUM .GT. 10.0*(SUMINC/SUMW) ) SHIFT = MAXSH
             END IF
 
          END IF
