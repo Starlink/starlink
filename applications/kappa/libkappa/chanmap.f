@@ -298,6 +298,9 @@
 *        GRID, then the output contains a suitable 3D current Frame.
 *     2007 May 17 (MJC):
 *        Correct problems with use of KPG1_WCFAX.
+*     2007 July 11 (MJC):
+*         The NDF need not have exactly three significant dimensions.
+*
 *     {enter_further_changes_here}
 
 *-
@@ -523,9 +526,9 @@
 *  Get an AST pointer to a FrameSet describing the co-ordinate Frames
 *  present in the NDF's WCS component.  Modify it to ensure that the 
 *  Base, PIXEL and Current frames all have three dimensions.  The NDF 
-*  must have exactly three significant dimensions (i.e. axes 
+*  need not have exactly three significant dimensions (i.e. axes 
 *  spanning more than one pixel).
-      CALL KPG1_ASGET( INDFI, NDIM, .TRUE., .TRUE., .TRUE., SDIM, 
+      CALL KPG1_ASGET( INDFI, NDIM, .FALSE., .TRUE., .TRUE., SDIM, 
      :                 LBND, UBND, IWCS, STATUS )
 
 *  Extract the current and base Frames, and get the number of axes in 
