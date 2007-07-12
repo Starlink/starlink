@@ -160,6 +160,9 @@
 *        Rework to handle PRV* as well as OBS*
 *     2007-07-05 (TIMJ):
 *        Fix provenance file name handling.
+*     2007-07-12 (EC):
+*        Add moving to smf_bbrebinmap interface
+*        Add moving to smf_calc_mapcoord interface
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -536,11 +539,12 @@ void smurf_makemap( int *status ) {
 	/* Retrieve the NDF identifier for this input file */   
 	ndgNdfas ( igrp, i, "READ", &indf, status );
 	/* Rebin the data onto the output grid with bad bolometer mask */ 
-	smf_bbrebinmap(data, indf, i, size, outfset, lbnd_out, ubnd_out, 
-		       map, variance, weights, status );
+	smf_bbrebinmap(data, indf, i, size, outfset, moving, lbnd_out, 
+		       ubnd_out, map, variance, weights, status );
       } else {
 
 	msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Beginning the REBIN step", status);
+
      	/* Rebin the data onto the output grid without bad bolometer mask */
 	smf_rebinmap(data, i, size, outfset, moving, lbnd_out, ubnd_out, 
 		     map, variance, weights, status );
@@ -584,7 +588,7 @@ void smurf_makemap( int *status ) {
           errRep(FUNC_NAME, "Bad status opening smfData", status);      
         }
           
-        smf_calc_mapcoord( data, outfset, lbnd_out, ubnd_out, status );
+        smf_calc_mapcoord( data, outfset, moving, lbnd_out, ubnd_out, status );
         if( *status != SAI__OK) {
           errRep(FUNC_NAME, "Bad status calculating MAPCOORD", status);      
         }
@@ -647,4 +651,5 @@ void smurf_makemap( int *status ) {
   } else {
     msgOutif(MSG__VERB," ","MAKEMAP failed.", status);
   }
+
 }

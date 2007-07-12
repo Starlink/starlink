@@ -47,6 +47,9 @@
 *        Only re-calculate LUT when necessary
 *     2006-08-15 (EC):
 *        Fixed off-by-one errors in *bnd_in
+*     2007-07-12 (EC):
+*        -adding moving to interface
+*        -Replaced calculation of bolo2map with a call to smf_rebincube_totmap
 
 *  Notes:
 
@@ -91,13 +94,13 @@
 
 #define FUNC_NAME "smf_calc_mapcoord"
 
-void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, 
+void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving, 
 		   int *lbnd_out, int *ubnd_out, int *status ) {
 
   /* Local Variables */
 
-  AstMapping *bolo2sky=NULL;   /* Mapping bolo->celestial coordinates */
-  AstCmpMap *bolo2map=NULL;    /* Combined mapping bolo->map coordinates */
+  AstSkyFrame *abskyfrm = NULL; /* Output SkyFrame (always absolute) */
+  AstMapping *bolo2map=NULL;   /* Combined mapping bolo->map coordinates */
   int bndndf=NDF__NOID;        /* NDF identifier for map bounds */
   void *data_index[1];         /* Array of pointers to mapped arrays in ndf */
   int docalc=1;                /* If set calculate the LUT */
@@ -112,6 +115,7 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset,
   AstMapping *map2sky_old=NULL;/* Existing mapping map->celestial coord. */
   HDSLoc *mapcoordloc=NULL;    /* HDS locator to the MAPCOORD extension */
   AstFrameSet *oldfset=NULL;   /* Pointer to existing WCS info */
+  AstSkyFrame *oskyfrm = NULL; /* SkyFrame from the output WCS Frameset */
   int ubnd[1];                 /* Pixel bounds for 1d pointing array */
   int ubnd_in[2];              /* Pixel bounds for asttrangrid */
   int ubnd_old[2];             /* Pixel bounds for existing LUT */
@@ -292,6 +296,19 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset,
       
       outmapcoord = smf_malloc( nbolo*2, sizeof(double), 0, status );
       
+
+      /* Retrieve the sky2map mapping from the output frameset (actually
+	 map2sky) */
+      oskyfrm = astGetFrame( outfset, AST__CURRENT );
+      sky2map = astGetMapping( outfset, AST__BASE, AST__CURRENT );
+      /* Invert it to get Output SKY to output map coordinates */
+      astInvert( sky2map );
+      /* Create a SkyFrame in absolute coordinates */
+      abskyfrm = astCopy( oskyfrm );
+      astClear( abskyfrm, "SkyRefIs" );
+      astClear( abskyfrm, "SkyRef(1)" );
+      astClear( abskyfrm, "SkyRef(2)" );
+
       if( *status == SAI__OK ) {
 	/* Calculate bounds in the input array. 
 	   Note: I had to swap the ranges for the two axes from what seemed to
@@ -303,20 +320,12 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset,
 	
 	/* Loop over time slices */
 	for( i=0; i<(data->dims)[2]; i++ ) {
-	  smf_tslice_ast( data, i, 1, status);
-	  
+
+	  /* Calculate the bolometer to map-pixel transformation for tslice */
+	  bolo2map = smf_rebincube_totmap( data, i, abskyfrm, sky2map, moving, 
+				     status );	  
+
 	  if( *status == SAI__OK ) {
-	    
-	    /* Get bolo -> sky mapping 
-	       Set the System attribute for the SkyFframe in input WCS 
-	       FrameSet and extract the IN_PIXEL->Sky mapping. */ 
-	    astSetC( (data->hdr)->wcs, "SYSTEM", system );
-	    bolo2sky = astGetMapping( data->hdr->wcs, AST__BASE, 
-				      AST__CURRENT );
-	    
-	    /* Concatenate Mappings to get IN_PIXEL->tanplane offset Mapping */
-	    bolo2map = astCmpMap( bolo2sky, sky2map, 1, "" );
-	    
 	    astTranGrid( bolo2map, 2, lbnd_in, ubnd_in, 0.1, 1000000, 1,
 			 2, nbolo, outmapcoord );
 	    
@@ -335,7 +344,6 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset,
 	    }
 	  }
 	  /* clean up ast objects */
-	  bolo2sky = astAnnul( bolo2sky );
 	  bolo2map = astAnnul( bolo2map );
 	}
 	/* Break out of loop over time slices if bad status */
@@ -391,9 +399,11 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset,
     if( map2sky_old ) map2sky_old = astAnnul( map2sky_old );	
     if( oldfset ) oldfset = astAnnul( oldfset );
     if (sky2map) sky2map  = astAnnul( sky2map );
-    if (bolo2sky) bolo2sky = astAnnul( bolo2sky );
     if (bolo2map) bolo2map = astAnnul( bolo2map );
     
+    if( abskyfrm ) abskyfrm = astAnnul( abskyfrm );
+    if( oskyfrm ) oskyfrm = astAnnul( oskyfrm );  
+
     ndfAnnul( &lutndf, status );    
     datAnnul( &mapcoordloc, status );
 

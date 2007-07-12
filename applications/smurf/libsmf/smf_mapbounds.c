@@ -86,6 +86,8 @@
 *     2007-03-07 (AGG):
 *        Annul relevant AST objects every time slice to minimize
 *        memory usage
+*     2007-07-12 (EC):
+*        Replaced calculation of bolo2map with a call to smf_rebincube_totmap
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -138,13 +140,10 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
                     int *status ) {
 
   /* Local Variables */
-  double a;                    /* Longitude value */
-  AstFrame *abskyframe = NULL; /* Output Absolute SkyFrame */
+  AstSkyFrame *abskyframe = NULL; /* Output Absolute SkyFrame */
   double az[ 2 ];              /* Azimuth values */
   AstMapping *azel2usesys = NULL; /* Mapping form AZEL to requested system */
-  double b;                    /* Latitude value */
-  AstMapping *bolo2sky = NULL; /* Mapping bolo->celestial coordinates */
-  AstCmpMap *bolo2map = NULL;  /* Combined mapping bolo->map
+  AstMapping *bolo2map = NULL; /* Combined mapping bolo->map
 				  coordinates, WCS->GRID Mapping from
 				  input WCS FrameSet */
   smfData *data = NULL;        /* pointer to  SCUBA2 data struct */
@@ -267,15 +266,20 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
 
       /* Get the astrometry for all the time slices in this data file */
       for( j=0; j<(data->dims)[2]; j++ ) {
-        smf_tslice_ast( data, j, 1, status);
+
+	/* smf_tslice_ast only needs to get called once to set up framesets */
+
+	if( data->hdr->wcs == NULL ) {
+	  smf_tslice_ast( data, j, 1, status);
+	}
 
         swcsin = hdr->wcs;
+
 	/* Retrieve input SkyFrame */
         skyin = astGetFrame( swcsin, AST__CURRENT );
 
 	/* Create output SkyFrame */
         if ( skyframe == NULL ) {
-
           /* Determine the tracking coordinate system, and choose
              the celestial coordinate system for the output cube. */
           if( !strncmp( system, "TRACKING", 8 ) ) {
@@ -421,72 +425,9 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
 
         } /* End WCS FrameSet construction */
 
-        /* Find out how to convert from input GRID coords to the output
-           sky frame.  Note, we want absolute sky coords here, even if
-           the target is moving.  Record the original base frame before
-           calling astConvert so that it can be re-instated later
-           (astConvert modifies the base Frame). */
-	astInvert( swcsin );
-	ibasein = astGetI( swcsin, "BASE" );
-        fs = astConvert( swcsin, abskyframe, "SKY" );
-	astSetI( swcsin, "BASE", ibasein );
-	astInvert( swcsin );
-
-        /* The "fs" FrameSet has input GRID coords as its base Frame,
-           and output (absolute) sky coords as its current frame. If
-           the target is moving, modify this so that the current Frame
-           represents offsets from the current telescope base pointing
-           position (the mapping in the "fs" FrameSet is also modified
-           automatically). */
-        if( *moving ) {
-          /* Get the Mapping from AZEL (at the current input epoch) to
-             the (absolute) output sky system. Use it to convert the
-             telescope base pointing position from (az,el) to the
-             requested system. */
-          skyin = astGetFrame( swcsin, AST__CURRENT );
-          sf1 = astCopy( skyin );
-          astSetC( sf1, "System", "AZEL" );
-          azel2usesys = astConvert( sf1, abskyframe, "" );
-          astTran2( azel2usesys, 1, &(hdr->state->tcs_az_bc1),
-                    &(hdr->state->tcs_az_bc2), 1, &a, &b );
-
-          /* Explicitly annul these objects for efficiency in this
-             tight loop. */
-          azel2usesys = astAnnul( azel2usesys );
-          sf1 = astAnnul( sf1 );
-          skyin = astAnnul( skyin );
-
-          /* Modified the FrameSet to represent offsets from this
-             origin. We use the FrameSet pointer "fs" rather than a
-             pointer to the current Frame within the FrameSet. This
-             means that the Mapping in the FrameSet will be modified
-             to remap the current Frame. */
-          astSetD( fs, "SkyRef(1)", a );
-          astSetD( fs, "SkyRef(2)", b );
-          astSet( fs, "SkyRefIs=origin" );
-
-          /* Get the Mapping and then clear the SkyRef attributes
-             (this is because the current Frame in "fs" may be
-             "skyframe" and we do not want to make a permanent change
-             to the output skyframe). */
-          bolo2sky = astGetMapping( fs, AST__BASE, AST__CURRENT );
-          astClear( fs, "SkyRef(1)" );
-          astClear( fs, "SkyRef(2)" );
-          astClear( fs, "SkyRefIs" );
-        } else {
-          /* If the target is not moving, just get the Mapping. */
-          bolo2sky = astGetMapping( fs, AST__BASE, AST__CURRENT );
-        }
-
-	/* KLUDGE: map bolo 0,0 -> ra,dec */
-	//double xin, yin, xout, yout;
-	//xin=0; yin=0;
-	//astTran2( bolo2sky, 1, &xin, &yin, 1, &xout, &yout );
-	//printf("ooga: %lf,%lf ---> %lf,%lf\n", xin, yin, xout, yout);
-	/* ------------------------------ */
-
-	/* Create the input GRID to output map mapping */
-        bolo2map = astCmpMap( bolo2sky, sky2map, 1, "" );
+	/* Calculate the bolo to map-pixel transformation for this tslice */
+	bolo2map = smf_rebincube_totmap( data, j, abskyframe, sky2map, 
+					 *moving, status );
 
         if ( *status == SAI__OK ) {
           /* Check corner pixels in the array for their projected extent
@@ -513,7 +454,6 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
         }
 	/* Explicitly annul these mappings each time slice for reduced
 	   memory usage */
-	if (bolo2sky) bolo2sky = astAnnul( bolo2sky );
 	if (bolo2map) bolo2map = astAnnul( bolo2map );
 	if (fs) fs = astAnnul( fs );
 	if ( skyin ) skyin = astAnnul( skyin );
@@ -523,7 +463,6 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
       }
       /* Annul any remaining Ast objects before moving on to the next file */
       if (fs) fs = astAnnul( fs );
-      if (bolo2sky) bolo2sky = astAnnul( bolo2sky );
       if (bolo2map) bolo2map = astAnnul( bolo2map );
     }
 
@@ -556,7 +495,6 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
  
  CLEANUP:
   if (sky2map) sky2map  = astAnnul( sky2map );
-  if (bolo2sky) bolo2sky = astAnnul( bolo2sky );
   if (bolo2map) bolo2map = astAnnul( bolo2map );
   if (fitschan) fitschan = astAnnul( fitschan );
 

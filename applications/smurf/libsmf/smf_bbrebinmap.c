@@ -56,6 +56,9 @@
 *        Cloned from smf_rebinmap
 *     2007-5-3 (DSB)
 *        Adapt to new astRebinSeq signature.
+*     2007-07-12 (EC):
+*        -adding moving to interface
+*        -Replaced calculation of bolo2map with a call to smf_rebincube_totmap
 
 *     {enter_further_changes_here}
 
@@ -101,18 +104,19 @@
 
 #define FUNC_NAME "smf_bbrebinmap"
 
-void smf_bbrebinmap( smfData *data,  int indf, int index, int size, AstFrameSet *outfset,
-                   int *lbnd_out, int *ubnd_out, double *map, double *variance,
-		   double *weights, int *status ) {
+void smf_bbrebinmap( smfData *data,  int indf, int index, int size, 
+		     AstFrameSet *outfset, int moving, int *lbnd_out, 
+		     int *ubnd_out, double *map, double *variance, 
+		     double *weights, int *status ) {
 
   /* Local Variables */
+  AstSkyFrame *abskyfrm = NULL; /* Output SkyFrame (always absolute) */
   int baddims;                  /* Number of dimensions in bad pixel mask */
   int badflag = 0;              /* Flag to indicate using bad pixel mask */
   int *badpixels;               /* Array of pixels with good/bad values */
   int bdims[2];                 /* Dimensions of bad pixel mask */
   int bndf;                     /* NDF identifier of bad pixel extension */
-  AstMapping *bolo2sky=NULL;    /* Mapping bolo->celestial coordinates */
-  AstCmpMap *bolo2map=NULL;     /* Combined mapping bolo->map coordinates */
+  AstMapping *bolo2map=NULL;    /* Combined mapping bolo->map coordinates */
   double  *boldata;             /* Pointer to bolometer data */
   HDSLoc *bpmloc=NULL;          /* NDF extension for bad bolometer mask */
   smfHead *hdr=NULL;            /* Pointer to data header this time slice */
@@ -122,6 +126,7 @@ void smf_bbrebinmap( smfData *data,  int indf, int index, int size, AstFrameSet 
   int n;                        /* Number of elements mapped by ndfMap */
   int nbol = 0;                 /* # of bolometers in the sub-array */
   int nused;                    /* No. of input values used */
+  AstSkyFrame *oskyfrm = NULL;  /* SkyFrame from the output WCS Frameset */
   int place;                    /* NDF placeholder */
   int rebinflags;               /* Control the rebinning procedure */
   AstMapping *sky2map=NULL;     /* Mapping celestial->map coordinates */
@@ -133,6 +138,18 @@ void smf_bbrebinmap( smfData *data,  int indf, int index, int size, AstFrameSet 
 
   /* Get the system from the outfset */
   system = astGetC( outfset, "system" );
+
+  /* Retrieve the sky2map mapping from the output frameset (actually
+     map2sky) */
+  oskyfrm = astGetFrame( outfset, AST__CURRENT );
+  sky2map = astGetMapping( outfset, AST__BASE, AST__CURRENT );
+  /* Invert it to get Output SKY to output map coordinates */
+  astInvert( sky2map );
+  /* Create a SkyFrame in absolute coordinates */
+  abskyfrm = astCopy( oskyfrm );
+  astClear( abskyfrm, "SkyRefIs" );
+  astClear( abskyfrm, "SkyRef(1)" );
+  astClear( abskyfrm, "SkyRef(2)" );
 
   /* Calculate bounds in the input array */
   nbol = (data->dims)[0] * (data->dims)[1];
@@ -176,98 +193,72 @@ void smf_bbrebinmap( smfData *data,  int indf, int index, int size, AstFrameSet 
 
   }
 
-  for( i=0; i<(data->dims)[2]; i++ ) {
-	
-    smf_tslice_ast( data, i, 1, status);
-	
-    if( *status == SAI__OK ) {
-      hdr = data->hdr;
-	  
-      /* Get bolo -> sky mapping 
-	 Set the System attribute for the SkyFframe in input WCS 
-	 FrameSet and extract the IN_PIXEL->Sky mapping. */	  
-
-      astSetC( hdr->wcs, "SYSTEM", system );
-      bolo2sky = astGetMapping( data->hdr->wcs, AST__BASE, 
-				AST__CURRENT );
-	  
-      /* Create sky to output grid mapping 
-	 using the base coordinates to get the coordinates of the 
-	 tangent point if it hasn't been done yet. */
-	  
-      if( sky2map == NULL ) { 
-	/* Extract the Sky->REF_PIXEL mapping. */
-	astSetC( outfset, "SYSTEM", system );
-	sky2map = astGetMapping( outfset, AST__CURRENT, 
-				 AST__BASE );
-      }
-	  
-      /* Concatenate Mappings to get IN_PIXEL->REF_PIXEL Mapping */
-      bolo2map = astCmpMap( bolo2sky, sky2map, 1, "" );
-
-      /*  Rebin this time slice*/
-      rebinflags = 0;
-      if ( badflag == 1 )
-         rebinflags = rebinflags | AST__USEBAD;         /* Flags use bad vals */
-      if( (index == 1) && (i == 0) )                    /* Flags start rebin */
-	rebinflags = rebinflags | AST__REBININIT;
-
-      if( (index == size) && (i == (data->dims)[2]-1) ) /* Flags end rebin */
-	rebinflags = rebinflags | AST__REBINEND;
-      boldata = (data->pntr)[0];
+  for( i=0; (i<(data->dims)[2]) && (*status == SAI__OK); i++ ) {
+    
+    /* Calculate the bolometer to map-pixel transformation for this tslice */
+    bolo2map = smf_rebincube_totmap( data, i, abskyfrm, sky2map, moving, 
+				     status );
+    
+    /*  Rebin this time slice*/
+    rebinflags = 0;
+    if ( badflag == 1 )
+      rebinflags = rebinflags | AST__USEBAD;         /* Flags use bad vals */
+    if( (index == 1) && (i == 0) )                    /* Flags start rebin */
+      rebinflags = rebinflags | AST__REBININIT;
+    
+    if( (index == size) && (i == (data->dims)[2]-1) ) /* Flags end rebin */
+      rebinflags = rebinflags | AST__REBINEND;
+    boldata = (data->pntr)[0];
          
-      /* If a bad pixel mask was retrieved, use it to flag the data
-         from bad bolometers with VAL__BADD */
-      if ( badflag == 1 ) {
-         for ( j = 0; j < bdims[0]*bdims[1]; j++ ) {
-	    if ( badpixels[j] > 0 ) {
-	       boldata[i*nbol + j] = VAL__BADD;
-            }
-	 }
+    /* If a bad pixel mask was retrieved, use it to flag the data
+       from bad bolometers with VAL__BADD */
+    if ( badflag == 1 ) {
+      for ( j = 0; j < bdims[0]*bdims[1]; j++ ) {
+	if ( badpixels[j] > 0 ) {
+	  boldata[i*nbol + j] = VAL__BADD;
+	}
       }
-
-      astRebinSeqD(bolo2map, 0.0,
-		   2, lbnd_in, ubnd_in,
-		   &(boldata[i*nbol]),
-		   NULL, 
-		   AST__NEAREST, NULL, rebinflags, 
-                   0.1, 1000000, VAL__BADD,
-		   2,lbnd_out,ubnd_out,
-		   lbnd_in, ubnd_in,
-		   map, variance, weights, &nused );
-
-      /* clean up ast objects */
-      bolo2sky = astAnnul( bolo2sky );
-      bolo2map = astAnnul( bolo2map );
     }
-
+    
+    astRebinSeqD(bolo2map, 0.0,
+		 2, lbnd_in, ubnd_in,
+		 &(boldata[i*nbol]),
+		 NULL, 
+		 AST__NEAREST, NULL, rebinflags, 
+		 0.1, 1000000, VAL__BADD,
+		 2,lbnd_out,ubnd_out,
+		 lbnd_in, ubnd_in,
+		 map, variance, weights, &nused );
+    
+    /* clean up ast objects */
+    bolo2map = astAnnul( bolo2map );
+    
+  
     /* Break out of loop over time slices if bad status */
     if (*status != SAI__OK) goto CLEANUP;
   }
 
   /* Free resources */
-
+  
   if ( badflag == 1 ) {
-     ndfUnmap ( bndf, "DATA", status );
-     ndfAnnul ( &bndf, status );
+    ndfUnmap ( bndf, "DATA", status );
+    ndfAnnul ( &bndf, status );
   }
-
+  
   ndfAnnul ( &indf, status );
-
+  
   /* Close the data file */
   /*  if( data != NULL ) {
-    smf_close_file( &data, status);
-    data = NULL;
-    }*/
-
-
+      smf_close_file( &data, status);
+      data = NULL;
+      }*/
+  
+  
   /* Clean Up */
  CLEANUP:
   if (sky2map) sky2map  = astAnnul( sky2map );
-  if (bolo2sky) bolo2sky = astAnnul( bolo2sky );
   if (bolo2map) bolo2map = astAnnul( bolo2map );
-
-  /*  if( data != NULL )
-      smf_close_file( &data, status);*/
+  if ( abskyfrm ) abskyfrm = astAnnul( abskyfrm );
+  if ( oskyfrm ) oskyfrm = astAnnul( oskyfrm );  
 
 }

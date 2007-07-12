@@ -75,6 +75,8 @@
 *        skyframe is not azel.
 *        - Avoid remapping the FrameSet more often than is necessary when
 *        setting and clearing the SkyRef attributes.
+*     2007-07-12 (EC):
+*        Replaced calculation of bolo2map with a call to smf_rebincube_totmap
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -125,16 +127,9 @@ void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outfset,
 		   double *variance, double *weights, int *status ) {
 
   /* Local Variables */
-  double a;                     /* Longitude value */
   AstSkyFrame *abskyfrm = NULL; /* Output SkyFrame (always absolute) */
-  AstMapping *azel2usesys = NULL;/* Mapping from AZEL to the output sky frame */
-  double b;                     /* Latitude value */
-  AstMapping *bolo2sky = NULL;  /* Mapping bolo->celestial coordinates */
-  AstCmpMap *bolo2map = NULL;   /* Combined mapping bolo->map coordinates */
+  AstMapping *bolo2map = NULL;  /* Combined mapping bolo->map coordinates */
   double  *boldata = NULL;      /* Pointer to bolometer data */
-  AstFrameSet *fs = NULL;       /* WCS FramesSet from input */           
-  int have_azel;                /* Is the input sky system an AZEL system? */
-  smfHead *hdr = NULL;          /* Pointer to data header this time slice */
   dim_t i;                      /* Loop counter */
   int ibasein;                  /* Index of base Frame in input WCS FrameSet */
   int lbnd_in[2];               /* Lower pixel bounds for input maps */
@@ -142,14 +137,8 @@ void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outfset,
   int nused;                    /* No. of input values used */
   AstSkyFrame *oskyfrm = NULL;  /* SkyFrame from the output WCS Frameset */
   int rebinflags;               /* Control the rebinning procedure */
-  AstFrame *sf1 = NULL;         /* Pointer to copy of input current Frame */
   AstMapping *sky2map=NULL;     /* Mapping from celestial->map coordinates */
-  AstFrame *skyin = NULL;       /* Pointer to current Frame in input WCS FrameSet */
-  AstFrame *skyout = NULL;      /* Pointer to output sky Frame in "fs" */
-  AstFrameSet *swcsin = NULL;   /* Spatial WCS FrameSet for current time slice */
   const char *system;           /* Coordinate system */
-  AstMapping *tmap1;            /* Mapping from input GRID to input sky coords */
-  AstMapping *tmap2;            /* Mapping from input sky to output sky coords */
   int ubnd_in[2];               /* Upper pixel bounds for input maps */
 
   /* Main routine */
@@ -195,144 +184,34 @@ void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outfset,
     }
   }
 
-  /* Initialise a flag indicating if the time slice framesets have an
-     azel current frame. */
-  have_azel = 0;
-
   /* Loop over all time slices in the data */
   for( i=0; (i<(data->dims)[2]) && (*status == SAI__OK); i++ ) {
-	
-    smf_tslice_ast( data, i, 1, status);
-	
-    if( *status == SAI__OK ) {
-      hdr = data->hdr;
-      swcsin = hdr->wcs;
+       
+    /* Calculate the bolometer to map-pixel transformation for this tslice */
+    bolo2map = smf_rebincube_totmap( data, i, abskyfrm, sky2map, moving, 
+				     status );
 
+    /* Rebin this time slice */
+    rebinflags = 0;
+    if( (index == 1) && (i == 0) )                    /* Flags start rebin */
+      rebinflags = rebinflags | AST__REBININIT;
 
-      /* Get the current Frame from the input WCS FrameSet. If this is the
-         first time slice, see if the current Frame is an AZEL Frame (it is
-         assumed that all subsequent time slices will have the same system
-         as the first). */
-      skyin = astGetFrame( swcsin, AST__CURRENT );
-      if( i == 0 ) {
-         system = astGetC( skyin, "System" );
-         have_azel = system ? !strcmp( system, "AZEL" ) : 0;
-      }
-
-      /* Get a FrameSet containing a Mapping from the input sky system to the 
-         output absolute sky system. */
-      fs = astConvert( skyin, abskyfrm, "" );
-      if( fs == NULL ) {
-         if( *status == SAI__OK ) {
-            *status = SAI__ERROR;
-            errRep( FUNC_NAME, "The spatial coordinate system in the "
-                    "current input file is not compatible with the "
-                    "spatial coordinate system in the first input file.", 
-                    status );
-         }
-         break;
-      }
-
-      /* The "fs" FrameSet has output (absolute) sky coords as its current 
-         frame. If the target is moving, modify this so that the current 
-	 Frame represents offsets from the current telescope base pointing
-	 position (the mapping in the "fs" FrameSet is also modified
-	 automatically). */
-      if( moving ) {
-
-	 /* Get the Mapping from AZEL (at the current input epoch) to
-	   the output sky system. If the input sky coordinate system is
-           AZEL, then we already have the required FrameSet in "fs". */
-         if( ! have_azel ) {
-            sf1 = astCopy( skyin );
-            astSetC( sf1, "System", "AZEL" );
-            azel2usesys = astConvert( sf1, abskyfrm, "" );
-            sf1 = astAnnul( sf1 );
-         } else {
-            azel2usesys = astClone( fs );
-         }
-
-	 /* Use this FrameSet to convert the telescope base position from 
-           (az,el) to the requested system. */
-         astTran2( azel2usesys, 1, &(hdr->state->tcs_az_bc1),
-                   &(hdr->state->tcs_az_bc2), 1, &a, &b );
-
-	 /* Explicitly annul these objects for efficiency in this
-	    tight loop. */
-         azel2usesys = astAnnul( azel2usesys );
-
-         /* Store the reference point in the current Frame of the
-            FrameSet (using the current Frame pointer rather than the 
-            FrameSet pointer avoid the extra time spent re-mapping the 
-            FrameSet - the FrameSet will be re-mapped when we set 
-            SkyRefIs below). */
-         skyout = astGetFrame( fs, AST__CURRENT );
-         astSetD( skyout, "SkyRef(1)", a );
-         astSetD( skyout, "SkyRef(2)", b );
-
-	 /* Modified the SkyRefIs attribute in the FrameSet so that the
-            current Frame represents offsets from the origin (set above). 
-	    We use the FrameSet pointer "fs" now rather than "skyout" so
-            that the Mapping in the FrameSet will be modified to remap 
-            the current Frame. */
-         astSet( fs, "SkyRefIs=origin" );
-
-	 /* Get the Mapping from input sky coords to output offsets and then 
-            clear the SkyRef attributes (this because the current Frame in 
-            "fs" may be "*skyframe" we do not want to make a permanent change 
-            to *skyframe). */
-         tmap2 = astGetMapping( fs, AST__BASE, AST__CURRENT );
-         astClear( fs, "SkyRefIs" );
-         astClear( skyout, "SkyRef(1)" );
-         astClear( skyout, "SkyRef(2)" );
-
-         skyout = astAnnul( skyout );
-
-      } else {
-	 /* If the target is not moving, just get the Mapping. */
-         tmap2 = astGetMapping( fs, AST__BASE, AST__CURRENT );
-      }
-
-      /* Get the mapping from the input grid coordinate system to the
-         output sky system. */
-      tmap1 = astGetMapping( swcsin, AST__BASE, AST__CURRENT );
-      bolo2sky = (AstMapping *) astCmpMap( tmap1, tmap2, 1, "" );
-      tmap1 = astAnnul( tmap1 );
-      tmap2 = astAnnul( tmap2 );
-
-      /* The output from "bolo2sky" now corresponds to the input to
-	 "sky2map", whether the target is moving or not. Combine the
-	 input GRID to output SKY Mapping with the output SKY to
-	 output pixel Mapping supplied in "sky2map". */
-      bolo2map = astCmpMap( bolo2sky, sky2map, 1, "" );
-
-      /* Rebin this time slice */
-      rebinflags = 0;
-      if( (index == 1) && (i == 0) )                    /* Flags start rebin */
-	rebinflags = rebinflags | AST__REBININIT;
-
-      if( (index == size) && (i == (data->dims)[2]-1) ) /* Flags end rebin */
-	rebinflags = rebinflags | AST__REBINEND;
+    if( (index == size) && (i == (data->dims)[2]-1) ) /* Flags end rebin */
+      rebinflags = rebinflags | AST__REBINEND;
 	  
-      astRebinSeqD( bolo2map, 0.0, 2, lbnd_in, ubnd_in, &(boldata[i*nbol]),
-		    NULL, AST__NEAREST, NULL, rebinflags, 0.1, 1000000, 
-		    VAL__BADD, 2, lbnd_out, ubnd_out, lbnd_in, ubnd_in,
-		    map, variance, weights, &nused );
+    astRebinSeqD( bolo2map, 0.0, 2, lbnd_in, ubnd_in, &(boldata[i*nbol]),
+		  NULL, AST__NEAREST, NULL, rebinflags, 0.1, 1000000, 
+		  VAL__BADD, 2, lbnd_out, ubnd_out, lbnd_in, ubnd_in,
+		  map, variance, weights, &nused );
 
-      /* clean up ast objects */
-      if ( bolo2sky ) bolo2sky = astAnnul( bolo2sky );
-      if ( bolo2map ) bolo2map = astAnnul( bolo2map );
-      if ( fs ) fs = astAnnul( fs );
-      if( skyin ) skyin = astAnnul( skyin );
-    }
+    /* clean up ast objects */
+    if ( bolo2map ) bolo2map = astAnnul( bolo2map );
+    
   }
 
   /* Clean Up */
   if ( sky2map ) sky2map  = astAnnul( sky2map );
-  if ( bolo2sky ) bolo2sky = astAnnul( bolo2sky );
   if ( bolo2map ) bolo2map = astAnnul( bolo2map );
-  if ( fs ) fs = astAnnul( fs );
-
   if ( abskyfrm ) abskyfrm = astAnnul( abskyfrm );
   if ( oskyfrm ) oskyfrm = astAnnul( oskyfrm );
 

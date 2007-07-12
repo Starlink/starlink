@@ -170,6 +170,8 @@
 *        -changed interface for smf_model_create
 *        -changed interface for smf_calcmodel_*
 *        -changed return value of smf_calcmodelptr
+*     2007-07-12 (EC):
+*        Added moving to smf_bbrebinmap and smf_calc_mapcoord
 
 *     {enter_further_changes_here}
 *  Copyright:
@@ -215,9 +217,9 @@ void smf_average_data( const smfData *data, int start, int nslice,
 		       const int interval, double **avdata, size_t *nelem, int *status);
 
 void smf_bbrebinmap( smfData *data,  int indf, int index, int size, 
-                     AstFrameSet *outfset, int *lbnd_out, int *ubnd_out, 
-                     double *map, double *variance, double *weights, 
-                     int *status );
+                     AstFrameSet *outfset, int moving, int *lbnd_out, 
+		     int *ubnd_out, double *map, double *variance, 
+		     double *weights, int *status );
 
 void smf_boxcar1 ( double *series, const size_t ninpts, size_t window, int *status);
 
@@ -228,8 +230,8 @@ void smf_calc_stats( const smfData *data, const char *mode, const int index,
 double smf_calc_covar ( const smfData *data, const int i, const int j,
 			int lo, int hi, int *status);
 
-void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int *lbnd_out,
-                        int *ubnd_out, int *status );
+void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving, 
+			int *lbnd_out, int *ubnd_out, int *status );
 
 void smf_calc_skyrot( smfData *data, double maxangle, int *nsamples, int *status );
 
