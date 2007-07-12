@@ -31,7 +31,7 @@
 \medskip
 \medskip
 \begin{center}
-{\Large Version 2.4 \\}
+{\Large Version 2.5 \\}
 \end{center}
 \bigskip
 \vskip 2.5cm
@@ -46,7 +46,7 @@ USA}
 \vfill
 \bigskip
 \begin{center}
-{\Large January 2004\\}
+{\Large December 2004\\}
 \end{center}
 \vfill
 \end{titlepage}
@@ -57,7 +57,7 @@ USA}
 \chapter{Introduction }
 \pagenumbering{arabic}
 
- 
+
 \section{ A Brief Overview}
 
 CFITSIO is a machine-independent library of routines for reading and
@@ -92,13 +92,13 @@ and the XMM/ESTEC project in The Netherlands made especially significant
 contributions that resulted in many of the new features that appeared
 in v2.0 of CFITSIO.
 
- 
+
 \section{Sources of FITS Software and Information}
 
 The latest version of the CFITSIO source code,
 documentation, and example programs are available on the World-Wide
 Web or via anonymous ftp from:
- 
+
 \begin{verbatim}
         http://heasarc.gsfc.nasa.gov/fitsio
         ftp://legacy.gsfc.nasa.gov/software/fitsio/c
@@ -106,7 +106,7 @@ Web or via anonymous ftp from:
 
 Any questions, bug reports, or suggested enhancements related to the CFITSIO
 package should be sent to the primary author:
- 
+
 \begin{verbatim}
         Dr. William Pence                 Telephone:  (301) 286-4599
         HEASARC, Code 662                 E-mail: pence@tetra.gsfc.nasa.gov
@@ -115,23 +115,12 @@ package should be sent to the primary author:
 \end{verbatim}
 This User's Guide assumes that readers already have a general
 understanding of the definition and structure of FITS format files.
-Further information about FITS formats is available in the `FITS User's
-Guide' and the `NOST FITS Standard', which are available from the NASA
-Science Office of Standards and Technology at the address given below.
-Both of these documents are available electronically from their Web
-site and via anonymous ftp at nssdc.gsfc.nasa.gov in the /pub/fits
-directory. Any questions about FITS formats should be directed to the
-NOST, at:
- 
-\begin{verbatim}
-        NASA, Science Office of Standards and Technology
-        Code 633.2,
-        Goddard Space Flight Center
-        Greenbelt MD 20771, USA
-        WWW: http://fits.gsfc.nasa.gov/
-        E-mail: fits@fits.gsfc.nasa.gov
-        (301) 286-2899
-\end{verbatim}
+Further information about FITS formats is available from the FITS Support
+Office at {\tt http://fits.gsfc.nasa.gov}.  In particular, the
+'NOST FITS Standard' gives the authoritative definition of the FITS data
+format, and the  `FITS User's Guide' provides additional historical background
+and practical advice on using FITS files.
+
 The HEASARC also provides a very sophisticated FITS file analysis
 program called `Fv' which can be used to display and edit the contents
 of any FITS file as well as construct new FITS files from scratch. The
@@ -144,13 +133,13 @@ most Unix platforms, Mac PCs, and Windows PCs.
 CFITSIO users may also be interested in the FTOOLS package of programs
 that can be used to manipulate and analyze FITS format files.
 Fv and FTOOLS are available from their respective Web sites at:
- 
+
 \begin{verbatim}
         http://fv.gsfc.nasa.gov
         http://heasarc.gsfc.nasa.gov/ftools
 \end{verbatim}
 
- 
+
 \section{Acknowledgements}
 
 The development of the powerful features in CFITSIO was made
@@ -182,7 +171,9 @@ then wrote the parsing routines used by CFITSIO based on Lammers'
 design, combined with other techniques such as the CFITSIO iterator
 routine to further enhance the data processing throughput.  This effort
 also benefited from a much earlier lexical parsing routine that was
-developed by Kent Blackburn (NASA/GSFC).
+developed by Kent Blackburn (NASA/GSFC). More recently, Craig Markwardt
+(NASA/GSFC) implemented additional functions (median, average, stddev)
+and other enhancements to the lexical parser.
 
 The CFITSIO iterator function is loosely based on similar ideas
 developed for the XMM Data Access Layer.
@@ -226,7 +217,7 @@ Peter Teuben, James Theiler, Doug Tody, Shiro Ueno, Steve Walton, Archie
 Warnock, Alan Watson, Dan Whipple, Wim Wimmers, Peter Young, Jianjun Xu,
 and Nelson Zarate.
 
- 
+
 \section{Legal Stuff}
 
 Copyright (Unpublished--all rights reserved under the copyright laws of
@@ -278,7 +269,7 @@ standard version.
 
 \chapter{ Creating the CFITSIO Library }
 
- 
+
 \section{Building the Library}
 
 The CFITSIO code is contained in about 40 C source files (*.c) and header
@@ -286,7 +277,7 @@ files (*.h). On VAX/VMS systems 2 assembly-code files (vmsieeed.mar and
 vmsieeer.mar) are also needed.
 
 CFITSIO has currently been tested on the following platforms:
- 
+
 \begin{verbatim}
   OPERATING SYSTEM           COMPILER
    Sun OS                     gcc and cc (3.0.1)
@@ -310,11 +301,11 @@ CFITSIO has currently been tested on the following platforms:
 CFITSIO will probably run on most other Unix platforms.  Cray
 supercomputers are currently not supported.
 
- 
+
 \subsection{Unix Systems}
 
 The CFITSIO library is built on Unix systems by typing:
- 
+
 \begin{verbatim}
  >  ./configure [--prefix=/target/installation/path]
  >  make          (or  'make shared')
@@ -328,7 +319,7 @@ is run and not some other system-wide configure script.  The optional
 'prefix' argument to configure gives the path to the directory where
 the CFITSIO library and include files should be installed via the later
 'make install' command. For example,
- 
+
 \begin{verbatim}
    > ./configure --prefix=/usr1/local
 \end{verbatim}
@@ -343,7 +334,7 @@ not copied into your program at link time and instead the program
 locates the necessary library code at run time, normally through
 LD\_LIBRARY\_PATH or some other method. The advantages of using a shared
 library are:
- 
+
 \begin{verbatim}
    1.  Less disk space if you build more than 1 program
    2.  Less memory if more than one copy of a program using the shared
@@ -356,7 +347,7 @@ library are:
    4.  No run-time penalty.
 \end{verbatim}
 The disadvantages are:
- 
+
 \begin{verbatim}
    1. More hassle at runtime.  You have to either build the programs
       specially or have LD_LIBRARY_PATH set right.
@@ -382,16 +373,18 @@ then they may be omitted from the build by typing 'make all-nofitsio'
 instead of simply typing 'make'.  This will reduce the size
 of the CFITSIO library slightly.
 
-Most 32-bit operating systems have only supported disk files up to
-2.1GB (2**31 bytes) in size.  Starting with version 2.1 of CFITSIO,
-FITS files larger than this limit (up to 6 terabytes) can be read and
-written on platforms which support large files (e.g., Solaris).  To
-enable this feature, CFITSIO must be compiled with the
-`-D\_FILE\_OFFSET\_BITS=64' compiler flag.  All programs which link to
-the CFITSIO library must also be compiled with this flag or must
-include this preprocessor definition at the start of the source code
-file. See the `CFITSIO Size Limitations' section in Chapter 4 for
-further details.
+Most 32-bit operating systems have only supported disk files up to 2.1GB
+(2**31 bytes) in size.  Starting with version 2.1 of CFITSIO, FITS files
+larger than this limit (up to 6 terabytes) can be read and written on
+platforms that support large files (e.g., at least some LINUX platforms
+and Solaris).  To enable this
+feature, CFITSIO must be compiled with the '-D\_LARGEFILE\_SOURCE' and
+`-D\_FILE\_OFFSET\_BITS=64'
+compiler flags.  Some platforms may also require the `-D\_LARGE\_FILES'
+compiler flag.   It appears that in most cases it is not necessary to
+also include these compiler flags when compiling programs that link to
+the CFITSIO library. See the `CFITSIO Size Limitations'
+section in Chapter 4 for further details.
 
 It may not be possible to staticly link programs that use CFITSIO on
 some platforms (namely, on Solaris 2.6) due to the network drivers
@@ -399,7 +392,7 @@ some platforms (namely, on Solaris 2.6) due to the network drivers
 make both a dynamic and a static version of the CFITSIO library, but
 network file access will not be possible using the static version.
 
- 
+
 \subsection{VMS}
 
 On VAX/VMS and ALPHA/VMS systems the make\_gfloat.com command file may
@@ -411,7 +404,7 @@ used in the group.c module may require that programs using CFITSIO be
 linked with the ALPHA\$LIBRARY:VAXCRTL.OLB library.  See the example
 link line in the next section of this document.
 
- 
+
 \subsection{Windows PCs}
 
 A precompiled DLL version of CFITSIO is available for IBM-PC users of
@@ -426,7 +419,7 @@ makefile.bc or makefile.vcc  files.  Finally, the makepc.bat file gives
 an example of  building CFITSIO with the Borland C++ v4.5 compiler
 using older DOS commands.
 
- 
+
 \subsection{Macintosh PCs}
 
 When building on Mac OS-X, users should follow the Unix instructions,
@@ -444,13 +437,13 @@ Pro 5 project.  Note that this only has been tested for the PPC and
 probably won't work on 68k Macs.
 
 
- 
+
 \section{Testing the Library}
 
 The CFITSIO library should be tested by building and running
 the testprog.c program that is included with the release.
 On Unix systems, type:
- 
+
 \begin{verbatim}
     % make testprog
     % testprog > testprog.lis
@@ -459,7 +452,7 @@ On Unix systems, type:
 \end{verbatim}
  On VMS systems,
 (assuming cc is the name of the C compiler command), type:
- 
+
 \begin{verbatim}
     $ cc testprog.c
     $ link testprog, cfitsio/lib, alpha$library:vaxcrtl/lib
@@ -477,7 +470,7 @@ which can be ignored).
 
 The Fortran wrappers in CFITSIO may be tested with the testf77
 program on Unix systems with:
- 
+
 \begin{verbatim}
     % f77 -o testf77 testf77.f -L. -lcfitsio -lnsl -lsocket
   or
@@ -504,7 +497,7 @@ format.
 A few other utility programs are included with CFITSIO; the first four
 of this programs can be compiled an linked by typing `make
 program\_name' where `program\_name' is the actual name of the program:
- 
+
 \begin{verbatim}
     speed - measures the maximum throughput (in MB per second)
               for writing and reading FITS files with CFITSIO.
@@ -520,7 +513,7 @@ program\_name' where `program\_name' is the actual name of the program:
     iter_a, iter_b, iter_c - examples of the CFITSIO iterator routine
 \end{verbatim}
 
- 
+
 \section{Linking Programs with CFITSIO}
 
 When linking applications software with the CFITSIO library, several
@@ -537,7 +530,7 @@ Note that when upgrading to a newer version of CFITSIO it is usually
 necessary to recompile, as well as relink, the programs that use CFITSIO,
 because the definitions in fitsio.h often change.
 
- 
+
 \section{Getting Started with CFITSIO}
 
 In order to effectively use the CFITSIO library it is recommended that
@@ -567,7 +560,7 @@ Interface routines described in Chapter 5.
 the following chapters to become familiar with the functionality that
 they provide.
 
- 
+
 \section{Example Program}
 
 The following listing shows an example of how to use the CFITSIO
@@ -577,7 +570,7 @@ included with the CFITSIO distribution for other example routines.
 This program creates a new FITS file, containing a FITS image.  An
 `EXPOSURE' keyword is written to the header, then the image data are
 written to the FITS file before closing the FITS file.
- 
+
 \begin{verbatim}
 #include "fitsio.h"  /* required by every program that uses CFITSIO  */
 main()
@@ -660,7 +653,7 @@ with fill characters (ASCII blanks or zeros).
 Each Header Unit consists of any number of 80-character keyword records
 or `card images' which have the
 general form:
- 
+
 \begin{verbatim}
   KEYNAME = value / comment string
   NULLKEY =       / comment: This keyword has no value
@@ -726,18 +719,19 @@ TFORMn -- the data type of the column
 TUNITn -- the physical units of the column (optional)
 \end{itemize}
 
-Users should refer to the NOST documentation for more details about the
-required keywords and their allowed values.
+Users should refer to the FITS Support Office at {\tt http://fits.gsfc.nasa.gov}
+for futher information about the FITS format and related software
+packages.
 
 
 \chapter{ Programming Guidelines }
 
- 
+
 \section{CFITSIO Definitions}
 
 Any program that uses the CFITSIO interface must include the fitsio.h
 header file with the statement
- 
+
 \begin{verbatim}
   #include "fitsio.h"
 \end{verbatim}
@@ -759,7 +753,7 @@ A number of symbolic constants are also defined in fitsio.h for the
 convenience of application programmers.  Use of these symbolic
 constants rather than the actual numeric value will help to make the
 source code more readable and easier for others to understand.
- 
+
 \begin{verbatim}
 String Lengths, for use when allocating character arrays:
 
@@ -850,7 +844,7 @@ Image compression algorithm definitions
   #define PLIO_1      31
 \end{verbatim}
 
- 
+
 \section{Current Header Data Unit (CHDU)}
 
 The concept of the Current Header and Data Unit, or CHDU, is
@@ -869,7 +863,7 @@ within the opened HDU,  Other CFITSIO routines are provided to move to
 and open any other existing HDU within the FITS file or to append or
 insert new HDUs in the FITS file.
 
- 
+
 \section{Function Names and Variable Datatypes}
 
 Most of the CFITSIO routines have both a short name as well as a
@@ -885,7 +879,7 @@ routines is indicated by the suffix of the routine name.  The short
 routine names have a 1 or 2 character suffix (e.g., 'j' in 'ffpkyj')
 while the long routine names have a 4 character or longer suffix
 as shown in the following table:
- 
+
 \begin{verbatim}
     Long      Short  Data
     Names     Names  Type
@@ -937,7 +931,7 @@ equivalent to '\_\_int64'.  If the compiler does not support a 8-byte
 integer data type then LONGLONG is defined to be equivalent to 'long'.
 Note that the C format specifier to print out these long integer values
 is "\%lld" on most unix machines, except on OSF platforms where "\%ld"
-must be used.  On Windows platform which have the \_\_int64 data type,
+must be used.  On Windows platform that have the \_\_int64 data type,
 the format specifier is "\%INT64d".
 
 When dealing with the FITS byte data type it is important to remember
@@ -960,7 +954,7 @@ supported in ANSI C so these data types should be interpreted as pairs
 of float or double values, respectively, where the first  value in each
 pair is the real part, and the second is the imaginary part.
 
- 
+
 \section{Support for Unsigned Integers and Signed Bytes}
 
 Although FITS does not directly support unsigned integers as one of its
@@ -987,7 +981,7 @@ ULONG\_IMG) and for the TFORMn value in the case of binary tables (`U'
 and `V') which programmers can use when creating FITS files containing
 unsigned integer values.  The following code fragment illustrates how
 to write a FITS 1-D primary array of unsigned 16-bit integers:
- 
+
 \begin{verbatim}
       unsigned short uarray[100];
       int naxis, status;
@@ -1024,7 +1018,7 @@ for a signed byte column.  These non-standard data type codes are not
 actually written into the FITS file but instead are just used internally
 within CFITSIO.  The following code fragment illustrates how to use
 these features:
- 
+
 \begin{verbatim}
       unsigned short uarray[100];
       unsigned int  varray[100];
@@ -1071,7 +1065,7 @@ CFITSIO to write the keywords appropriate for a signed 8-bit byte column
 with TFORMn = '1B' and TZEROn = -128.  The calls to fits\_write\_col
 then write the arrays of unsigned integer values to the columns.
 
- 
+
 \section{Dealing with Character Strings}
 
 The character string values in a FITS header or in an ASCII column in a
@@ -1102,7 +1096,7 @@ enough space to hold the longest possible string, {\bf including} the
 terminating NULL character.  The fitsio.h file contains the following
 defined constants which programmers are strongly encouraged to use
 whenever they are allocating space for char arrays:
- 
+
 \begin{verbatim}
 #define FLEN_FILENAME 1025 /* max length of a filename */
 #define FLEN_KEYWORD   72  /* max length of a keyword  */
@@ -1114,14 +1108,14 @@ whenever they are allocating space for char arrays:
 \end{verbatim}
 For example, when declaring a char array to hold the value string
 of FITS keyword, use the following statement:
- 
+
 \begin{verbatim}
     char value[FLEN_VALUE];
 \end{verbatim}
 Note that FLEN\_KEYWORD is longer than needed for the nominal 8-character
 keyword name because the HIERARCH convention supports longer keyword names.
 
- 
+
 \section{Implicit Data Type Conversion}
 
 The CFITSIO routines that read and write numerical data can perform
@@ -1141,7 +1135,7 @@ In addition, any table column may be read as if it contained string values.
 In the case of numeric columns the returned string will be formatted
 using the TDISPn display format if it exists.
 
- 
+
 \section{Data Scaling}
 
 When reading numerical data values in the primary array or a
@@ -1149,7 +1143,7 @@ table column, the values will be scaled automatically by the BSCALE and
 BZERO (or TSCALn and TZEROn) header values if they are
 present in the header.  The scaled data that is returned to the reading
 program will have
- 
+
 \begin{verbatim}
         output value = (FITS value) * BSCALE + BZERO
 \end{verbatim}
@@ -1173,7 +1167,7 @@ routines to define or override the scaling keywords in the header
 unscaled values into the FITS file). If scaling is performed, the
 inverse scaled output value that is written into the FITS file will
 have
- 
+
 \begin{verbatim}
          FITS value = ((input value) - BZERO) / BSCALE
 \end{verbatim}
@@ -1182,7 +1176,7 @@ writing to table columns).  Rounding to the nearest integer, rather
 than truncation, is performed when writing integer data types to the
 FITS file.
 
- 
+
 \section{Support for IEEE Special Values}
 
 The ANSI/IEEE-754 floating-point number standard defines certain
@@ -1202,7 +1196,7 @@ program without any modification.  This is not fully supported on
 VAX/VMS machines, however, where there is no easy way to bypass the
 default interpretation of the IEEE special values.
 
- 
+
 \section{Error Status Values and the Error Message Stack}
 
 Nearly all the CFITSIO routines return an error status value
@@ -1210,7 +1204,7 @@ in 2 ways: as the value of the last parameter in the function call,
 and as the returned value of the function itself.  This provides
 some flexibility in the way programmers can test if an error
 occurred, as illustrated in the following 2 code fragments:
- 
+
 \begin{verbatim}
     if ( fits_write_record(fptr, card, &status) )
          printf(" Error occurred while writing keyword.");
@@ -1250,7 +1244,7 @@ function fits\_report\_error will print out the entire error message
 stack, or alternatively one may call fits\_read\_errmsg to get the
 error messages one at a time.
 
- 
+
 \section{Variable-Length Arrays in Binary Tables}
 
 CFITSIO provides easy-to-use support for reading and writing data in
@@ -1264,7 +1258,7 @@ CFITSIO will automatically scan the table when it is closed to
 determine the maximum length of the vector and will append this value
 to the TFORMn value.
 
-The same routines which read and write data in an ordinary fixed length
+The same routines that read and write data in an ordinary fixed length
 binary table extension are also used for variable length fields,
 however, the routine parameters take on a slightly different
 interpretation as described below.
@@ -1327,7 +1321,7 @@ more than this will cause an error status to be returned.  One can
 determine the number of elements in each row of a variable column with
 the fits\_read\_descript routine.
 
- 
+
 \section{Multiple Access to the Same FITS File}
 
 CFITSIO supports simultaneous read and write access to multiple HDUs in
@@ -1355,7 +1349,7 @@ before switching to the  other, so it would still be prudent to
 minimize the number of times one switches back and forth between doing
 I/O to different HDUs in the same file.
 
- 
+
 \section{When the Final Size of the FITS HDU is Unknown}
 
 It is not required to know the total size of a FITS data array or table
@@ -1395,11 +1389,11 @@ backward compatibility with software that initially creates a table
 with a large number of rows, than decreases the NAXIS2 value to the
 actual smaller value just before closing the table.
 
- 
+
 \section{CFITSIO Size Limitations}
 
 CFITSIO places very few restrictions on the size of FITS files that it
-reads or writes.  There are a few limits, however, which may affect
+reads or writes.  There are a few limits, however, that may affect
 some extreme cases:
 
 1.  The maximum number of FITS files that may be simultaneously opened
@@ -1420,23 +1414,24 @@ records that have been read or written in the FITS files.  If the number
 of opened files is greater than NIOBUF, then CFITSIO may waste more time
 flushing and re-reading or re-writing the same records in the FITS files.
 
-2.  By default, CFITSIO can handle FITS files up to 2.1 GB in size
-(2**31 bytes).  This file size limit is often imposed by 32-bit
-operating systems.  More recently, as 64-bit operating systems become
-more common, an industry-wide standard (at least on Unix systems) has
-been developed to support larger sized files (see
-http://ftp.sas.com/standards/large.file/).  Starting with version 2.1
-of CFITSIO, larger FITS files up to 6 terabytes in size may be read and
-written on certain supported platforms.  In order to support these
-larger files, CFITSIO must be compiled with the
-`-D\_FILE\_OFFSET\_BITS=64' compiler flag.  All programs which link to
-the CFITSIO library must also be compiled with this flag or must
-include this preprocessor definition at the start of the source code
-file.  This causes the compiler to allocate 8-bytes instead of 4-bytes
-for the `off\_t' data type which is used to store file offset
-positions.
+2.  By default, CFITSIO can handle FITS files up to 2.1 GB in size (2**31
+bytes).  This file size limit is often imposed by 32-bit operating
+systems.  More recently, as 64-bit operating systems become more common, an
+industry-wide standard (at least on Unix systems) has been developed to
+support larger sized files (see http://ftp.sas.com/standards/large.file/).
+Starting with version 2.1 of CFITSIO, larger FITS files up to 6 terabytes
+in size may be read and written on supported platforms.  In order
+to support these larger files, CFITSIO must be compiled with the
+'-D\_LARGEFILE\_SOURCE' and  `-D\_FILE\_OFFSET\_BITS=64' compiler flags.
+Some platforms may also require the `-D\_LARGE\_FILES' compiler flag.
+ This causes the compiler to allocate 8-bytes instead of
+4-bytes for the `off\_t' data type that is used to store file offset
+positions.  It appears that in most cases it is not necessary to
+also include these compiler flags when compiling programs that link to
+the CFITSIO library.
 
-If CFITSIO is compiled with the -D\_FILE\_OFFSET\_BITS=64 flag on a
+If CFITSIO is compiled with the -D\_LARGEFILE\_SOURCE
+and -D\_FILE\_OFFSET\_BITS=64 flags on a
 platform that supports large files, then it can read and write FITS
 files that contain up to 2**31 2880-byte FITS records, or approximately
 6 terabytes in size.  It is still required that the value of the NAXISn
@@ -1447,9 +1442,8 @@ image (given by the NAXISn keywords), the total width of a table
 the total size of the variable-length array heap in binary tables
 (PCOUNT keyword) must be less than this limit.
 
-Currently, support for large files within CFITSIO has only been tested
-on the Solaris 2.6 operating system using the Sun cc compiler or gcc
-2.95.2.
+Currently, support for large files within CFITSIO has been tested
+on the Linux, Solaris, and IBM AIX operating systems.
 
 \chapter{Basic CFITSIO Interface Routines }
 
@@ -1487,19 +1481,19 @@ immediately exit without doing anything.  A non-zero output value
 indicates that an error occurred in the function.  In most cases the
 status value is also returned as the value of the function itself.
 
- 
+
 \section{CFITSIO Error Status Routines}
 
- 
+
 \begin{description}
 \item[1 ] Return a descriptive text string (30 char max.) corresponding to
    a CFITSIO error status code.\label{ffgerr}
 \end{description}
- 
+
 \begin{verbatim}
   void fits_get_errstatus / ffgerr (int status, > char *err_text)
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ] Return the top (oldest) 80-character error message from the
     internal CFITSIO stack of error messages and shift any remaining
@@ -1508,11 +1502,11 @@ status value is also returned as the value of the function itself.
    a value = 0 and a null error message when the error stack is empty.
 \label{ffgmsg}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_read_errmsg / ffgmsg (char *err_msg)
 \end{verbatim}
- 
+
 \begin{description}
 \item[3 ] Print out the error message corresponding to the input status
     value and all the error messages on the CFITSIO stack to the specified
@@ -1520,11 +1514,11 @@ status value is also returned as the value of the function itself.
     status value = 0 then this routine does nothing.
 \label{ffrprt}
 \end{description}
- 
+
 \begin{verbatim}
   void fits_report_error / ffrprt (FILE *stream, > status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[4 ]The fits\_write\_errmark routine puts an invisible marker on the
    CFITSIO error stack.  The fits\_clear\_errmark routine can then be
@@ -1535,23 +1529,26 @@ status value is also returned as the value of the function itself.
    without any arguments.
 \label{ffpmrk}  \label{ffcmsg}
 \end{description}
- 
+
 \begin{verbatim}
   void fits_write_errmark / ffpmrk (void)
   void fits_clear_errmark / ffcmrk (void)
   void fits_clear_errmsg / ffcmsg (void)
 \end{verbatim}
 
- 
+
 \section{FITS File Access Routines}
 
- 
+
 \begin{description}
 \item[1 ] Open an existing data file. \label{ffopen}
 
- 
+
 \begin{verbatim}
 int fits_open_file / ffopen
+    (fitsfile **fptr, char *filename, int iomode, > int *status)
+
+int fits_open_diskfile / ffdkopen
     (fitsfile **fptr, char *filename, int iomode, > int *status)
 
 int fits_open_data / ffdopn
@@ -1572,6 +1569,13 @@ within the FITS file that should be moved to and opened (e.g.,
 \verb-myfile.fits+3- or \verb-myfile.fits[3]- moves to the 3rd extension within
 the file, and \verb-myfile.fits[events]- moves to the extension with the
 keyword EXTNAME = 'EVENTS').
+
+The fits\_open\_diskfile routine is similar to the fits\_open\_file routine
+except that it does not support the extended filename syntax in the input
+file name.  This routine simply tries to open the specified input file
+on magnetic disk.  This routine is mainly for use in cases where the
+filename (or directory path) contains square or curly bracket characters
+that would confuse the extended filename parser.
 
 The fits\_open\_data routine is similar to the fits\_open\_file routine
 except that it will move to the first HDU containing significant data,
@@ -1595,7 +1599,7 @@ and dimensions of the array must be specified in square brackets
 following the name of the file (e.g.  'rawfile.dat[i512,512]' opens a
 512 x 512 short integer image).  See the `Extended File Name Syntax'
 chapter for more details on how to specify the raw file name.  The raw
-file is converted on the fly into a virtual FITS image in memory which
+file is converted on the fly into a virtual FITS image in memory that
 is then opened by the application program with READONLY access.
 
 Programs can read the input file from the 'stdin' file stream if a dash
@@ -1614,13 +1618,13 @@ the full file filtering syntax.
 When opening an image, a rectangular subset of the physical image may be
 opened by listing the first and last pixel in each dimension (and
 optional pixel skipping factor):
- 
+
 \begin{verbatim}
 myimage.fits[101:200,301:400]
 \end{verbatim}
 will create and open a 100x100 pixel virtual image of that section of
 the physical image, and \verb+myimage.fits[*,-*]+ opens a virtual image
-which is the same size as the physical image but has been flipped in
+that is the same size as the physical image but has been flipped in
 the vertical direction.
 
 When opening a table, the filtering syntax can be used to add or delete
@@ -1651,13 +1655,16 @@ file twice, move to 2 different extensions within the file, and then
  read and write data in those extensions in any order.
 \end{description}
 
- 
+
 \begin{description}
 \item[2 ]  Create and open a new empty output FITS file. \label{ffinit}
 
- 
+
 \begin{verbatim}
 int fits_create_file / ffinit
+    (fitsfile **fptr, char *filename, > int *status)
+
+int fits_create_diskfile / ffdkinit
     (fitsfile **fptr, char *filename, > int *status)
 \end{verbatim}
 
@@ -1673,7 +1680,7 @@ character ('-') or the string 'stdout' is given as the filename. Similarly,
 '-.gz' or 'stdout.gz' will cause the file to be gzip compressed before
 it is written out to the stdout stream.
 
-Optionally, the name of a template file which is used to define the
+Optionally, the name of a template file that is used to define the
 structure of the new file may be specified in parentheses following the
 output file name. The template file may be another FITS file, in which
 case the new file, at the time it is opened, will be an exact copy of
@@ -1682,9 +1689,17 @@ will be filled with zeros. Alternatively, the template file may be an
 ASCII format text file containing directives that define the keywords to be
 created in each HDU of the file. See the 'Extended File Name Syntax'
  section for a complete description of the template file syntax.
+
+The fits\_create\_diskfile routine is similar to the fits\_create\_file routine
+except that it does not support the extended filename syntax in the input
+file name.  This routine simply tries to create the specified file
+on magnetic disk.  This routine is mainly for use in cases where the
+filename (or directory path) contains square or curly bracket characters
+ that would confuse the extended filename parser.
 \end{description}
 
- 
+
+
 \begin{description}
 \item[3 ] Close a previously opened FITS file.  The first routine simply
 closes the file, whereas the second one also DELETES THE FILE, which
@@ -1692,19 +1707,19 @@ can be useful in cases where a FITS file has been partially created,
 but then an error occurs which prevents it from being completed.
  \label{ffclos} \label{ffdelt}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_close_file / ffclos (fitsfile *fptr, > int *status)
 
   int fits_delete_file / ffdelt (fitsfile *fptr, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[4 ]Return the name, I/O mode (READONLY or READWRITE), and/or the file
 type (e.g. 'file://', 'ftp://') of the opened FITS file. \label{ffflnm}
  \label{ffflmd} \label{ffurlt}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_file_name / ffflnm (fitsfile *fptr, > char *filename, int *status)
 
@@ -1712,13 +1727,13 @@ type (e.g. 'file://', 'ftp://') of the opened FITS file. \label{ffflnm}
 
   int fits_url_type / ffurlt (fitsfile *fptr, > char *urltype, int *status)
 \end{verbatim}
- 
+
 \section{HDU Access Routines}
 
 The following functions perform operations on Header-Data Units (HDUs)
 as a whole.
 
- 
+
 \begin{description}
 \item[1 ] Move to a different HDU in the file.  The first routine moves to a
     specified absolute HDU number (starting with 1 for the primary
@@ -1737,7 +1752,7 @@ as a whole.
     unchanged and a status = BAD\_HDU\_NUM will be returned.
   \label{ffmahd} \label{ffmrhd} \label{ffmnhd}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_movabs_hdu / ffmahd
       (fitsfile *fptr, int hdunum, > int *hdutype, int *status)
@@ -1748,38 +1763,38 @@ as a whole.
   int fits_movnam_hdu / ffmnhd
       (fitsfile *fptr, int hdutype, char *extname, int extver, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ] Return the total number of HDUs in the FITS file.
    The current HDU remains unchanged. \label{ffthdu}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_get_num_hdus / ffthdu
       (fitsfile *fptr, > int *hdunum, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[3 ] Return the number of the current HDU (CHDU) in the FITS file (where
     the primary array = 1).  This function returns the HDU number
    rather than a status value.  \label{ffghdn}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_get_hdu_num / ffghdn
       (fitsfile *fptr, > int *hdunum)
 \end{verbatim}
- 
+
 \begin{description}
 \item[4 ] Return the type of the current HDU in the FITS file.  The possible
    values for hdutype are: IMAGE\_HDU, ASCII\_TBL, or BINARY\_TBL.  \label{ffghdt}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_get_hdu_type / ffghdt
       (fitsfile *fptr, > int *hdutype, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[5 ] Copy all or part of the HDUs in the FITS file associated with infptr
     and append them to the end of the FITS file associated with
@@ -1792,24 +1807,24 @@ as a whole.
     the input file will be unchanged, and the last HDU in the output
    file will be the current HDU.  \label{ffcpfl}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_copy_file / ffcpfl
       (fitsfile *infptr, fitsfile *outfptr, int previous, int current,
           int following, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[6 ] Copy the current HDU from the FITS file associated with infptr and append it
     to the end of the FITS file associated with outfptr.  Space may be
    reserved for MOREKEYS additional keywords in the output header. \label{ffcopy}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_copy_hdu / ffcopy
       (fitsfile *infptr, fitsfile *outfptr, int morekeys, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[7 ]  Copy the header (and not the data) from the CHDU associated with infptr
     to the CHDU associated with outfptr.  If the current output HDU
@@ -1817,12 +1832,12 @@ as a whole.
     HDU will be appended to the output file.   An empty output data unit
    will be created with all values initially = 0). \label{ffcphd}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_copy_header / ffcphd
       (fitsfile *infptr, fitsfile *outfptr, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[8 ]  Delete the CHDU in the FITS file.  Any following HDUs will be shifted
     forward in the file, to fill in the gap created by the deleted
@@ -1837,12 +1852,12 @@ as a whole.
     pointer may be given for
    hdutype if the returned value is not needed. \label{ffdhdu}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_delete_hdu / ffdhdu
       (fitsfile *fptr, > int *hdutype, int *status)
 \end{verbatim}
- 
+
 \section{Header Keyword Read/Write Routines}
 
 These routines read or write keywords in the Current Header Unit
@@ -1860,10 +1875,10 @@ when doing wild card searchs.  A status value of KEY\_NO\_EXIST is
 returned if the specified keyword to be read is not found in the
 header.
 
- 
+
 \subsection{Keyword Reading Routines}
 
- 
+
 \begin{description}
 \item[1 ] Return the number of existing keywords (not counting the
     END keyword) and the amount of space currently available for more
@@ -1874,12 +1889,12 @@ header.
     null pointer may be entered for the morekeys parameter if it's
    value is not needed. \label{ffghsp}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_get_hdrspace / ffghsp
       (fitsfile *fptr, > int *keysexist, int *morekeys, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ] Return the specified keyword.  In the first routine,
     the datatype parameter specifies the desired returned data type of the
@@ -1901,7 +1916,7 @@ header.
     If a NULL comment pointer is supplied then the comment string
    will not be returned. \label{ffgky} \label{ffgkey} \label{ffgcrd}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_read_key / ffgky
       (fitsfile *fptr, int datatype, char *keyname, > DTYPE *value,
@@ -1914,7 +1929,7 @@ header.
   int fits_read_card / ffgcrd
       (fitsfile *fptr, char *keyname, > char *card, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[3 ] Return the nth header record in the CHU.  The first keyword
    in the header is at keynum = 1;  if keynum = 0 then these routines
@@ -1928,7 +1943,7 @@ header.
    then the comment string will not be
   returned. \label{ffgrec} \label{ffgkyn}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_read_record / ffgrec
       (fitsfile *fptr, int keynum, > char *card, int *status)
@@ -1937,7 +1952,7 @@ header.
       (fitsfile *fptr, int keynum, > char *keyname, char *value,
        char *comment, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[4 ] Return the next keyword whose name matches one of the strings in
     'inclist' but does not match any of the strings in 'exclist'.
@@ -1951,13 +1966,13 @@ header.
     This routine returns status = KEY\_NO\_EXIST if a matching
    keyword is not found. \label{ffgnxk}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_find_nextkey / ffgnxk
       (fitsfile *fptr, char **inclist, int ninc, char **exclist,
        int nexc, > char *card, int  *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[5 ] Return the physical units string from an existing keyword.  This
     routine uses a local convention, shown in the following example,
@@ -1965,18 +1980,18 @@ header.
     beginning of the keyword comment field.  A null string is returned
    if no units are defined for the keyword.  \label{ffgunt}
 \end{description}
- 
+
 \begin{verbatim}
      VELOCITY=                 12.3 / [km/s] orbital speed
 
   int fits_read_key_unit / ffgunt
       (fitsfile *fptr, char *keyname, > char *unit, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[6 ] Concatenate the header keywords in the CHDU into a single long
     string of characters.  This provides a convenient way of passing
-    all the header information in a FITS HDU to other subroutines.
+    all or part of the header information in a FITS HDU to other subroutines.
     Each 80-character fixed-length keyword record is appended to the
     output character string, in order, with no intervening separator or
     terminating characters. The last header record is terminated with
@@ -1995,17 +2010,17 @@ header.
     If no additional keywords are to be excluded, then set nexc = 0 and
    specify NULL for the the **header  parameter.  \label{ffhdr2str}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_hdr2str
       (fitsfile *fptr, int nocomments, char **exclist, int nexc,
       > char **header, int *nkeys, int *status)
 \end{verbatim}
 
- 
+
 \subsection{Keyword Writing Routines}
 
- 
+
 \begin{description}
 \item[1 ] Write a keyword of the appropriate data type into the
     CHU.  The first routine simply appends a new keyword whereas the
@@ -2021,7 +2036,7 @@ header.
     comment parameter in which case the  keyword comment
    field will be unmodified or left blank.  \label{ffpky} \label{ffuky}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_key / ffpky
       (fitsfile *fptr, int datatype, char *keyname, DTYPE *value,
@@ -2031,7 +2046,7 @@ header.
       (fitsfile *fptr, int datatype, char *keyname, DTYPE *value,
           char *comment, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ] Write a keyword with a null or undefined value (i.e., the
     value field in the keyword is left blank).  The first routine
@@ -2042,7 +2057,7 @@ header.
     comment
    field will be unmodified or left blank. \label{ffpkyu} \label{ffukyu}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_key_null / ffpkyu
       (fitsfile *fptr, char *keyname, char *comment, > int *status)
@@ -2050,13 +2065,13 @@ header.
   int fits_update_key_null / ffukyu
       (fitsfile *fptr, char *keyname, char *comment, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[3 ] Write (append) a COMMENT or HISTORY keyword to the CHU.  The comment or
     history string will be continued over multiple keywords if it is longer
    than 70 characters. \label{ffpcom} \label{ffphis}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_comment / ffpcom
       (fitsfile *fptr, char *comment, > int *status)
@@ -2064,7 +2079,7 @@ header.
   int fits_write_history / ffphis
       (fitsfile *fptr, char *history, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[4 ] Write the DATE keyword to the CHU. The keyword value will contain
     the current system date as a character string in 'yyyy-mm-ddThh:mm:ss'
@@ -2072,24 +2087,24 @@ header.
     routine will simply update the keyword value with the current date.
    \label{ffpdat}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_date / ffpdat
       (fitsfile *fptr, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[5 ]Write a user specified keyword record into the CHU.  This is
    a low--level routine which can be used to write any arbitrary
    record into the header.  The record must conform to the all
   the FITS format requirements. \label{ffprec}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_record / ffprec
       (fitsfile *fptr, char *card, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[6 ]Update an 80-character record in the CHU.  If a keyword with the input
    name already exists, then it is overwritten by the value of card.  This
@@ -2097,47 +2112,47 @@ header.
    If the keyword doesn't already exist then a new keyword card is appended
   to the header. \label{ffucrd}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_update_card / ffucrd
       (fitsfile *fptr, char *keyname, char *card, > int *status)
 \end{verbatim}
 
- 
+
 \begin{description}
 \item[7 ] Modify (overwrite) the comment field of an existing keyword. \label{ffmcom}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_modify_comment / ffmcom
       (fitsfile *fptr, char *keyname, char *comment, > int *status)
 \end{verbatim}
 
- 
+
 \begin{description}
 \item[8 ] Write the physical units string into an existing keyword.  This
     routine uses a local convention, shown in the following example,
     in which the keyword units are enclosed in square brackets in the
    beginning of the keyword comment field.  \label{ffpunt}
 \end{description}
- 
+
 \begin{verbatim}
      VELOCITY=                 12.3 / [km/s] orbital speed
 
   int fits_write_key_unit / ffpunt
       (fitsfile *fptr, char *keyname, char *unit, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[9 ] Rename an existing keyword, preserving the current value
    and comment fields. \label{ffmnam}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_modify_name / ffmnam
       (fitsfile *fptr, char *oldname, char *newname, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[10]  Delete a keyword record.  The space occupied by
     the keyword is reclaimed by moving all the following header records up
@@ -2147,7 +2162,7 @@ header.
     Wild card characters may be used when specifying the name of the keyword
    to be deleted. \label{ffdrec} \label{ffdkey}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_delete_record / ffdrec
       (fitsfile *fptr, int   keynum,  > int *status)
@@ -2155,7 +2170,7 @@ header.
   int fits_delete_key / ffdkey
       (fitsfile *fptr, char *keyname, > int *status)
 \end{verbatim}
- 
+
 \section{Primary Array or IMAGE Extension I/O Routines}
 
 These routines read or write data values in the primary data array (i.e.,
@@ -2183,7 +2198,7 @@ specified by 'datatype'.  The data values are also automatically scaled
 by the BSCALE and BZERO keyword values as they are being read or written
 in the FITS array.
 
- 
+
 \begin{description}
 \item[1 ] Get the data type or equivalent data type of the image.  The
     first routine returns the physical data type of the FITS image, as
@@ -2198,7 +2213,7 @@ in the FITS array.
     the pixel values span the range of an unsigned short integer and
    the returned data type will be USHORT\_IMG. \label{ffgidt}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_get_img_type / ffgidt
       (fitsfile *fptr, > int *bitpix, int *status)
@@ -2206,7 +2221,7 @@ in the FITS array.
   int fits_get_img_equivtype / ffgiet
       (fitsfile *fptr, > int *bitpix, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ] Get the number of dimensions, and/or the size of
     each dimension in the image .  The number of axes in the image is
@@ -2214,7 +2229,7 @@ in the FITS array.
     naxes array (a maximum of maxdim dimensions will be returned).
    \label{ffgidm} \label{ffgisz} \label{ffgipr}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_get_img_dim / ffgidm
       (fitsfile *fptr, > int *naxis, int *status)
@@ -2226,32 +2241,32 @@ in the FITS array.
       (fitsfile *fptr, int maxdim, > int *bitpix, int *naxis, long *naxes,
        int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[3 ]Create a new primary array or IMAGE extension with a specified
    data type and size.  If the FITS file is currently empty then a
    primary array is created, otherwise a new IMAGE extension is
   appended to the file. \label{ffcrim}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_create_img / ffcrim
       ( fitsfile *fptr, int bitpix, int naxis, long *naxes, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[4 ] Write a rectangular subimage (or the whole image) to the FITS data
     array.  The fpixel and lpixel arrays give the coordinates of the
     first (lower left corner) and last (upper right corner) pixels in
    FITS image to be written to.  \label{ffpss}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_subset / ffpss
       (fitsfile *fptr, int datatype, long *fpixel, long *lpixel,
        DTYPE *array, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[5 ] Write pixels into the FITS data array.  'fpixel' is an array of
    length NAXIS which gives the coordinate of the starting pixel to be
@@ -2269,7 +2284,7 @@ in the FITS array.
    nulval, then the null value is ignored and this routine behaves
   the same as fits\_write\_pix.   \label{ffppx} \label{ffppxn}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_pix / ffppx
       (fitsfile *fptr, int datatype, long *fpixel, long nelements,
@@ -2279,7 +2294,7 @@ in the FITS array.
       (fitsfile *fptr, int datatype, long *fpixel, long nelements,
        DTYPE *array, DTYPE *nulval, > int *status);
 \end{verbatim}
- 
+
 \begin{description}
 \item[6 ] Set FITS data array elements equal to the appropriate null pixel
     value. For integer FITS arrays, the FITS null value is defined by
@@ -2289,12 +2304,12 @@ in the FITS array.
     'firstelem' is a scalar giving the  offset to the first pixel to be
     written in the equivalent 1-dimensional array of image pixels. \label{ffpprn}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_null_img / ffpprn
       (fitsfile *fptr, long firstelem, long nelements, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[7 ] Read a rectangular subimage (or the whole image) from the FITS
     data array.  The fpixel and lpixel arrays give the coordinates of
@@ -2305,13 +2320,13 @@ in the FITS array.
     unless nulval = 0 or *nulval = 0, in which case no checks for
    undefined pixels will be performed.  \label{ffgsv}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_read_subset / ffgsv
       (fitsfile *fptr, int  datatype, long *fpixel, long *lpixel, long *inc,
        DTYPE *nulval, > DTYPE *array, int *anynul, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[8 ] Read pixels from the FITS data array.  'fpixel' is the starting
     pixel location and is an array of length NAXIS such that fpixel[0]
@@ -2331,7 +2346,7 @@ in the FITS array.
     undefined pixels will have the corresponding nullarray element set
    equal to TRUE (= 1).  \label{ffgpxv}  \label{ffgpxf}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_read_pix / ffgpxv
       (fitsfile *fptr, int  datatype, long *fpixel, long nelements,
@@ -2341,7 +2356,7 @@ in the FITS array.
       (fitsfile *fptr, int  datatype, long *fpixel, long nelements,
        > DTYPE *array, char *nullarray, int *anynul, int *status)
 \end{verbatim}
- 
+
 \section{Image Compression}
 
 CFITSIO now transparently supports 2 types of image compression:
@@ -2374,7 +2389,7 @@ images (using a lossy compression algorithm) than simply compressing
 the image using gzip or compress.
 
 A detailed description of this format is available at:
- 
+
 \begin{verbatim}
 http://heasarc.gsfc.nasa.gov/docs/software/fitsio/
        compression/compress_image.html
@@ -2432,7 +2447,7 @@ parameters in square brackets following the root disk file name.   The
 can be used for this purpose to compress or uncompress images.  Here
 are some examples of the extended file name syntax for specifying
 tile-compressed output images:
- 
+
 \begin{verbatim}
     myfile.fit[compress]    - use the default compression algorithm (Rice)
                               and the default tile size (row by row)
@@ -2454,7 +2469,7 @@ tiling pattern that is to be used.  There are 3 routines for specifying
 the various compression parameters and 3 corresponding routines to
 return the current values of the parameters:
 \label{ffsetcomp}  \label{ffgetcomp}
- 
+
 \begin{verbatim}
   int fits_set_compression_type(fitsfile *fptr, int comptype, int *status)
   int fits_set_tile_dim(fitsfile *fptr, int ndim, long *tilesize, int *status)
@@ -2478,7 +2493,7 @@ A small example program called 'imcopy' is included with CFITSIO that
 can be used to compress (or uncompress) any FITS image.  This
 program can be used to experiment with the various compression options
 on existing FITS images as shown in these examples:
- 
+
 \begin{verbatim}
 1)  imcopy infile.fit 'outfile.fit[compress]'
 
@@ -2523,7 +2538,7 @@ on existing FITS images as shown in these examples:
        using the gzip algorithm.
 
 \end{verbatim}
- 
+
 \section{ASCII and Binary Table Routines}
 
 These routines perform read and write operations on columns of data in
@@ -2538,10 +2553,10 @@ code to perform the same operation, and the resulting program oftens
 runs faster because the FITS files are read and written using the most
 efficient block size.
 
- 
+
 \subsection{Create New Table}
 
- 
+
 \begin{description}
 \item[1 ]Create a new ASCII or bintable table extension. If
    the FITS file is currently empty then a dummy primary array will be
@@ -2562,23 +2577,23 @@ efficient block size.
    recommended that the names be
   unique within the first 16 characters. \label{ffcrtb}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_create_tbl / ffcrtb
       (fitsfile *fptr, int tbltype, long naxis2, int tfields, char *ttype[],
        char *tform[], char *tunit[], char *extname, int *status)
 \end{verbatim}
- 
+
 \subsection{Column Information Routines}
 
- 
+
 \begin{description}
 \item[1 ]  Get the number of rows or columns in the current FITS table.
      The number of rows is given by the NAXIS2 keyword and the
      number of columns is given by the TFIELDS keyword in the header
     of the table. \label{ffgnrw}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_get_num_rows / ffgnrw
       (fitsfile *fptr, > long *nrows, int *status);
@@ -2587,7 +2602,7 @@ efficient block size.
       (fitsfile *fptr, > int *ncols, int *status);
 \end{verbatim}
 
- 
+
 \begin{description}
 \item[2 ] Get the table column number (and name) of the column whose name
 matches an input template name.   If casesen  = CASESEN then the column
@@ -2617,7 +2632,7 @@ recommended that all the column names in a given table be unique within
 the first 8 characters, and strongly recommended that the names be
  unique within the first 16 characters. \label{ffgcno} \label{ffgcnn}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_get_colnum / ffgcno
       (fitsfile *fptr, int casesen, char *templt, > int *colnum,
@@ -2627,7 +2642,7 @@ the first 8 characters, and strongly recommended that the names be
       (fitsfile *fptr, int casesen, char *templt, > char *colname,
        int *colnum, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[3 ] Return the data type, vector repeat value, and the width in bytes
     of a column in an ASCII or binary table.  Allowed values for the
@@ -2671,7 +2686,7 @@ the first 8 characters, and strongly recommended that the names be
    and TSCALn = 0.12, then the returned typecode
   will be TFLOAT. \label{ffgtcl}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_get_coltype / ffgtcl
       (fitsfile *fptr, int colnum, > int *typecode, long *repeat,
@@ -2681,7 +2696,7 @@ the first 8 characters, and strongly recommended that the names be
       (fitsfile *fptr, int colnum, > int *typecode, long *repeat,
        long *width, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[4 ] Return the display width of a column.  This is the length
     of the string that will be returned by the fits\_read\_col routine
@@ -2689,26 +2704,26 @@ the first 8 characters, and strongly recommended that the names be
     determined by the TDISPn keyword, if present, otherwise by the data
    type of the column. \label{ffgcdw}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_get_col_display_width / ffgcdw
       (fitsfile *fptr, int colnum, > int *dispwidth, int *status)
 \end{verbatim}
 
- 
+
 \begin{description}
 \item[5 ] Return the number of and size of the dimensions of a table column in
     a binary table. Normally this information is given by the TDIMn keyword,
     but if this keyword is not present then this routine returns naxis = 1
    and naxes[0] equal to the repeat count in the TFORM keyword. \label{ffgtdm}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_read_tdim / ffgtdm
       (fitsfile *fptr, int colnum, int maxdim, > int *naxis,
        long *naxes, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[6 ] Decode the input TDIMn keyword string (e.g. '(100,200)') and return the
     number of and size of the dimensions of a binary table column. If the input
@@ -2716,28 +2731,28 @@ the first 8 characters, and strongly recommended that the names be
     and naxes[0] equal to the repeat count in the TFORM keyword. This routine
    is called by fits\_read\_tdim.  \label{ffdtdm}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_decode_tdim / ffdtdm
       (fitsfile *fptr, char *tdimstr, int colnum, int maxdim, > int *naxis,
        long *naxes, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[7 ] Write a TDIMn keyword whose value has the form '(l,m,n...)'
     where l, m, n... are the dimensions of a multidimension array
    column in a binary table. \label{ffptdm}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_tdim / ffptdm
       (fitsfile *fptr, int colnum, int naxis, long *naxes, > int *status)
 \end{verbatim}
 
- 
+
 \subsection{Routines to Edit Rows or Columns}
 
- 
+
 \begin{description}
 \item[1 ] Insert or delete rows in an ASCII or binary table. When inserting rows
     all the rows following row FROW are shifted down by NROWS rows;  if
@@ -2752,7 +2767,7 @@ the first 8 characters, and strongly recommended that the names be
     reflect the new number of rows in the
    table. \label{ffirow} \label{ffdrow} \label{ffdrws} \label{ffdrrg}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_insert_rows / ffirow
       (fitsfile *fptr, long firstrow, long nrows, > int *status)
@@ -2766,7 +2781,7 @@ the first 8 characters, and strongly recommended that the names be
   int fits_delete_rowlist / ffdrws
       (fitsfile *fptr, long *rowlist, long nrows, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ] Insert or delete column(s) in an ASCII or binary
     table.  When inserting, COLNUM specifies the column number that the
@@ -2780,7 +2795,7 @@ the first 8 characters, and strongly recommended that the names be
     TDMAXn, TCTYPn, TCRPXn, TCRVLn, TCDLTn, TCROTn,
    and TCUNIn. \label{fficol} \label{fficls} \label{ffdcol}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_insert_col / fficol
       (fitsfile *fptr, int colnum, char *ttype, char *tform,
@@ -2792,7 +2807,7 @@ the first 8 characters, and strongly recommended that the names be
 
   int fits_delete_col / ffdcol(fitsfile *fptr, int colnum, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[3 ] Copy a column from one HDU to another (or to the same HDU).  If
     create\_col = TRUE, then a new column will be inserted in the output
@@ -2804,24 +2819,24 @@ the first 8 characters, and strongly recommended that the names be
     The standard indexed keywords that related to the column (e.g., TDISPn,
    TUNITn, TCRPXn, TCDLTn, etc.) will also be copied. \label{ffcpcl}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_copy_col / ffcpcl
       (fitsfile *infptr, fitsfile *outfptr, int incolnum, int outcolnum,
        int create_col, > int *status);
 \end{verbatim}
- 
+
 \begin{description}
 \item[4 ] Modify the vector length of a binary table column (e.g.,
     change a column from TFORMn = '1E' to '20E').  The vector
    length may be increased or decreased from the current value. \label{ffmvec}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_modify_vector_len / ffmvec
       (fitsfile *fptr, int colnum, long newveclen, > int *status)
 \end{verbatim}
- 
+
 \subsection{Read and Write Column Data Routines}
 
 The following routines write or read data values in the current ASCII
@@ -2859,7 +2874,7 @@ case of binary tables the 'nelements' parameter specifies the total
 number of vector values to be read or written (continuing on subsequent
 rows if required) and not the number of table cells.
 
- 
+
 \begin{description}
 \item[1 ] Write elements into an ASCII or binary table column.
 \end{description}
@@ -2877,7 +2892,7 @@ rows if required) and not the number of table cells.
    be used to write to variable length array columns.  The third routine
    simply writes undefined pixel values to the column.
    \label{ffpcl} \label{ffpcn} \label{ffpclu}
- 
+
 \begin{verbatim}
   int fits_write_col / ffpcl
       (fitsfile *fptr, int datatype, int colnum, long firstrow,
@@ -2892,7 +2907,7 @@ rows if required) and not the number of table cells.
        (fitsfile *fptr, int colnum, long firstrow, long firstelem,
         long nelements, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ] Read elements from an ASCII or binary table column.  The data type
     parameter specifies the data type of the `nulval' and `array'  pointers;
@@ -2913,7 +2928,7 @@ rows if required) and not the number of table cells.
     including the null terminating character) can be determined with
     the fits\_get\_col\_display\_width routine.  The following TDISPn
     display formats are currently supported:
- 
+
 \begin{verbatim}
     Iw.m   Integer
     Ow.m   Octal integer
@@ -2928,7 +2943,7 @@ rows if required) and not the number of table cells.
     decimal.  The .m field is optional.
    \label{ffgcv} \label{ffgcf}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_read_col / ffgcv
       (fitsfile *fptr, int datatype, int colnum, long firstrow, long firstelem,
@@ -2939,7 +2954,7 @@ rows if required) and not the number of table cells.
       long nelements, DTYPE *array, char *nullarray, int *anynul, int *status)
 \end{verbatim}
 
- 
+
 \subsection{Row Selection and Calculator Routines}
 
 These routines all parse and evaluate an input string containing a user
@@ -2956,38 +2971,38 @@ complex and extend over multiple lines of the file.  Lines  that begin
 with 2 slash characters ('//') will  be ignored and may be used to add
 comments to the file.
 
- 
+
 \begin{description}
 \item[1 ] Evaluate a boolean expression over the indicated rows, returning an
  array of flags indicating which rows evaluated to TRUE/FALSE  \label{fffrow}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_find_rows / fffrow
       (fitsfile *fptr,  char *expr, long firstrow, long nrows,
       > long *n_good_rows, char *row_status,  int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ] Find the first row which satisfies the input boolean expression \label{ffffrw}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_find_first_row / ffffrw
       (fitsfile *fptr,  char *expr, > long *rownum, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[3 ]Evaluate an expression on all rows of a table.  If the input and output
 files are not the same, copy the TRUE rows to the output file.  If the
 files are the same, delete the FALSE rows (preserve the TRUE rows). \label{ffsrow}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_select_rows / ffsrow
       (fitsfile *infptr, fitsfile *outfptr,  char *expr,  > int *status )
 \end{verbatim}
- 
+
 \begin{description}
 \item[4 ] Calculate an expression for the indicated rows of a table, returning
 the results, cast as datatype (TSHORT, TDOUBLE, etc), in array.  If
@@ -2996,13 +3011,13 @@ of elements returned may be less than nelements if nelements is not an
 even multiple of the result dimension.  Call fits\_test\_expr to obtain
 the dimensions of the results.  \label{ffcrow}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_calc_rows / ffcrow
       (fitsfile *fptr,  int datatype, char *expr, long firstrow,
        long nelements, void *nulval, > void *array,  int *anynul, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[5 ]Evaluate an expression and write the result either to a column (if
 the expression is a function of other columns in the table) or to a
@@ -3020,13 +3035,13 @@ exist, then the name of the keyword must be preceded with a '\#' character,
 otherwise the result will be written to a column with that name.
  \label{ffcalc}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_calculator / ffcalc
       (fitsfile *infptr, char *expr, fitsfile *outfptr, char *parName,
        char *parInfo, >  int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[6 ] This calculator routine is similar to the previous routine, except
 that the expression is only evaluated over the specified
@@ -3034,7 +3049,7 @@ row ranges.  nranges specifies the number of row ranges, and firstrow
 and lastrow give the starting and ending row number of each range.
  \label{ffcalcrng}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_calculator_rng / ffcalc_rng
       (fitsfile *infptr, char *expr, fitsfile *outfptr, char *parName,
@@ -3042,11 +3057,11 @@ and lastrow give the starting and ending row number of each range.
        >  int *status)
 \end{verbatim}
 
- 
+
 \begin{description}
 \item[7 ]Evaluate the given expression and return information on the result. \label{fftexp}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_test_expr / fftexp
       (fitsfile *fptr, char *expr, > int *datatype, long *nelem, int *naxis,
@@ -3054,10 +3069,10 @@ and lastrow give the starting and ending row number of each range.
 \end{verbatim}
 
 
- 
+
 \section{Utility Routines}
 
- 
+
 \subsection{File Checksum Routines}
 
 The following routines either compute or validate the checksums for the
@@ -3076,7 +3091,7 @@ proceedings of the ADASS IV conference in Baltimore in November 1994
 and a later revision in June 1995.  See Appendix B for the definition
 of the parameters used in these routines.
 
- 
+
 \begin{description}
 \item[1 ] Compute and write the DATASUM and CHECKSUM keyword values for the CHDU
     into the current header.  If the keywords already exist, their values
@@ -3084,12 +3099,12 @@ of the parameters used in these routines.
     has been modified since the original keyword
    values were computed). \label{ffpcks}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_chksum / ffpcks
       (fitsfile *fptr, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ] Update the CHECKSUM keyword value in the CHDU, assuming that the
     DATASUM keyword exists and already has the correct value.  This routine
@@ -3097,12 +3112,12 @@ of the parameters used in these routines.
     data unit checksum, encodes the value into an ASCII string, and writes
    the string to the CHECKSUM keyword. \label{ffupck}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_update_chksum / ffupck
       (fitsfile *fptr, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[3 ] Verify the CHDU by computing the checksums and comparing
     them with the keywords.  The data unit is verified correctly
@@ -3114,49 +3129,49 @@ of the parameters used in these routines.
     if the DATASUM or CHECKSUM keyword is not present, or value = -1
    if the computed checksum is not correct. \label{ffvcks}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_verify_chksum / ffvcks
       (fitsfile *fptr, > int *dataok, int *hduok, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[4 ] Compute and return the checksum values for the CHDU
     without creating or modifying the
     CHECKSUM and DATASUM keywords.  This routine is used internally by
    ffvcks, but may be useful in other situations as well. \label{ffgcks}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_get_chksum/ /ffgcks
       (fitsfile *fptr, > unsigned long *datasum, unsigned long *hdusum,
        int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[5 ] Encode a checksum value
     into a 16-character string.  If complm is non-zero (true) then the 32-bit
    sum value will be complemented before encoding. \label{ffesum}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_encode_chksum / ffesum
       (unsigned long sum, int complm, > char *ascii);
 \end{verbatim}
- 
+
 \begin{description}
 \item[6 ] Decode a 16-character checksum string into a unsigned long value.
     If is non-zero (true). then the 32-bit sum value will be complemented
     after decoding.  The checksum value is also returned as the
    value of the function. \label{ffdsum}
 \end{description}
- 
+
 \begin{verbatim}
   unsigned long fits_decode_chksum / ffdsum
            (char *ascii, int complm, > unsigned long *sum);
 \end{verbatim}
 
- 
+
 \subsection{Date and Time Utility Routines}
 
 The following routines help to construct or parse the FITS date/time
@@ -3168,7 +3183,7 @@ are in UTC.  The older 'dd/mm/yy' date format may not be used for dates
 after 01 January 2000.  See Appendix B for the definition of the
 parameters used in these routines.
 
- 
+
 \begin{description}
 \item[1 ] Get the current system date.  C already provides standard
     library routines for getting the current date and time,
@@ -3176,13 +3191,13 @@ parameters used in these routines.
     the Fortran FITSIO library.  The returned year has 4 digits
     (1999, 2000, etc.) \label{ffgsdt}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_get_system_date/ffgsdt
       ( > int *day, int *month, int *year, int *status )
 \end{verbatim}
 
- 
+
 \begin{description}
 \item[2 ] Get the current system date and time string ('YYYY-MM-DDThh:mm:ss').
 The time will be in UTC/GMT if available, as indicated by a returned timeref
@@ -3190,13 +3205,13 @@ value = 0.  If the returned value of timeref = 1 then this indicates that
 it was not possible to convert the local time to UTC, and thus the local
 time was returned.
 \end{description}
- 
+
 \begin{verbatim}
   int fits_get_system_time/ffgstm
       (> char *datestr, int  *timeref, int *status)
 \end{verbatim}
 
- 
+
 \begin{description}
 \item[3 ] Construct a date string from the input date values.  If the year
 is between 1900 and 1998, inclusive, then the returned date string will
@@ -3204,13 +3219,13 @@ have the old FITS format ('dd/mm/yy'), otherwise the date string will
 have the new FITS format ('YYYY-MM-DD').  Use fits\_time2str instead
  to always return a date string using the new FITS format. \label{ffdt2s}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_date2str/ffdt2s
       (int year, int month, int day, > char *datestr, int *status)
 \end{verbatim}
 
- 
+
 \begin{description}
 \item[4 ] Construct a new-format date + time string ('YYYY-MM-DDThh:mm:ss.ddd...').
   If the year, month, and day values all = 0 then only the time is encoded
@@ -3218,27 +3233,27 @@ have the new FITS format ('YYYY-MM-DD').  Use fits\_time2str instead
   decimal places of fractional seconds to include in the string.  If `decimals'
  is negative, then only the date will be return ('YYYY-MM-DD').
 \end{description}
- 
+
 \begin{verbatim}
   int fits_time2str/fftm2s
       (int year, int month, int day, int hour, int minute, double second,
       int decimals, > char *datestr, int *status)
 \end{verbatim}
 
- 
+
 \begin{description}
 \item[5 ] Return the date as read from the input string, where the string may be
 in either the old ('dd/mm/yy')  or new ('YYYY-MM-DDThh:mm:ss' or
 'YYYY-MM-DD') FITS format.  Null pointers may be supplied for any
   unwanted output date parameters.
 \end{description}
- 
+
 \begin{verbatim}
   int fits_str2date/ffs2dt
       (char *datestr, > int *year, int *month, int *day, int *status)
 \end{verbatim}
 
- 
+
 \begin{description}
 \item[6 ] Return the date and time as read from the input string, where the
 string may be in either the old  or new FITS format.  The returned hours,
@@ -3249,47 +3264,47 @@ date is not included in the input string ('hh:mm:ss.ddd...').  Null
 pointers may be supplied for any unwanted output date and time
 parameters.
 \end{description}
- 
+
 \begin{verbatim}
   int fits_str2time/ffs2tm
       (char *datestr, > int *year, int *month, int *day, int *hour,
       int *minute, double *second, int *status)
 \end{verbatim}
 
- 
+
 \subsection{General Utility Routines}
 
 The following utility routines may be useful for certain applications.
 
- 
+
 \begin{description}
 \item[1 ] Return the revision number of the CFITSIO library.
     The revision number will be incremented with each new
    release of CFITSIO. \label{ffvers}
 \end{description}
- 
+
 \begin{verbatim}
   float fits_get_version / ffvers ( > float *version)
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ] Write an 80-character message to the CFITSIO error stack.  Application
     programs should not normally write to the stack, but there may be
    some situations where this is desirable. \label{ffpmsg}
 \end{description}
- 
+
 \begin{verbatim}
   void fits_write_errmsg / ffpmsg (char *err_msg)
 \end{verbatim}
- 
+
 \begin{description}
 \item[3 ] Convert a character string to uppercase (operates in place). \label{ffupch}
 \end{description}
- 
+
 \begin{verbatim}
   void fits_uppercase / ffupch (char *string)
 \end{verbatim}
- 
+
 \begin{description}
 \item[4 ]  Compare the input template string against the reference string
     to see if they match.  The template string may contain wildcard
@@ -3302,12 +3317,12 @@ The following utility routines may be useful for certain applications.
     exact (i.e., if no wildcard characters were used in the match).
    Both strings must be 68 characters or less in length. \label{ffcmps}
 \end{description}
- 
+
 \begin{verbatim}
   void fits_compare_str / ffcmps
        (char *templt, char *string, int casesen, > int *match, int *exact)
 \end{verbatim}
- 
+
 \begin{description}
 \item[5 ]Split a string containing a list of names (typically file names or column
    names) into individual name tokens by a sequence of calls to
@@ -3326,30 +3341,30 @@ The following utility routines may be useful for certain applications.
    the end of the previous name.  It returns NULL when no further names
   are found.  \label{splitnames}
 \end{description}
- 
+
 \begin{verbatim}
    char *fits_split_names(char *namelist)
 \end{verbatim}
    The following example shows how a string would be split into 3 names:
- 
+
 \begin{verbatim}
     myfile[1][bin (x,y)=4], file2.fits  file3.fits
     ^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^  ^^^^^^^^^^
         1st name             2nd name    3rd name
 \end{verbatim}
- 
+
 \begin{description}
 \item[6 ] Test that the keyword name contains only legal characters (A-Z,0-9,
     hyphen, and underscore) or that the keyword record contains only legal
    printable ASCII characters  \label{fftkey} \label{fftrec}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_test_keyword / fftkey (char *keyname, > int *status)
 
   int fits_test_record / fftrec (char *card, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[7 ] Test whether the current header contains any NULL (ASCII 0) characters.
     These characters are illegal in the header, but they will go undetected
@@ -3363,11 +3378,11 @@ The following utility routines may be useful for certain applications.
     value is not necessarily equal to the status value).
    \label{ffnchk}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_null_check / ffnchk (char *card, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[8 ] Parse a header keyword record and return the name of the keyword,
     and the length of the name.
@@ -3375,12 +3390,12 @@ The following utility routines may be useful for certain applications.
     record, except under the HIERARCH convention where the name can
    be up to 70 characters in length. \label{ffgknm}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_get_keyname / ffgknm
       (char *card, > char *keyname, int *keylength, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[9 ] Parse a header keyword record, returning the value (as
     a literal character string) and comment strings.  If the keyword has no
@@ -3388,53 +3403,53 @@ The following utility routines may be useful for certain applications.
     returned and the comment string is set equal to column 9 - 80 of the
    input string. \label{ffpsvc}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_parse_value / ffpsvc
       (char *card, > char *value, char *comment, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[10] Construct an array indexed keyword name (ROOT + nnn).
     This routine appends the sequence number to the root string to create
    a keyword name (e.g., 'NAXIS' + 2 = 'NAXIS2') \label{ffkeyn}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_make_keyn / ffkeyn
       (char *keyroot, int value, > char *keyname, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[11]  Construct a sequence keyword name (n + ROOT).
     This routine concatenates the sequence number to the front of the
    root string to create a keyword name (e.g., 1 + 'CTYP' = '1CTYP') \label{ffnkey}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_make_nkey / ffnkey
       (int value, char *keyroot, > char *keyname, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[12] Determine the data type of a keyword value string. This routine
     parses the keyword value string  to determine its data type.
     Returns 'C', 'L', 'I', 'F' or 'X', for character string, logical,
    integer, floating point, or complex, respectively. \label{ffdtyp}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_get_keytype / ffdtyp
       (char *value, > char *dtype, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[13] Return the class of an input header record.  The record is classified
     into one of the following categories (the class values are
     defined in fitsio.h).  Note that this is one of the few CFITSIO
    routines that does not return a status value. \label{ffgkcl}
 \end{description}
- 
+
 \begin{verbatim}
        Class  Value             Keywords
   TYP_STRUC_KEY  10  SIMPLE, BITPIX, NAXIS, NAXISn, EXTEND, BLOCKED,
@@ -3467,7 +3482,7 @@ The following utility routines may be useful for certain applications.
 
   int fits_get_keyclass / ffgkcl (char *card)
 \end{verbatim}
- 
+
 \begin{description}
 \item[14] Parse the 'TFORM' binary table column format string.
     This routine parses the input TFORM character string and returns the
@@ -3476,13 +3491,13 @@ The following utility routines may be useful for certain applications.
     B for the allowed values for the returned typecode parameter.  A
    null pointer may be given for any output parameters that are not needed. \label{ffbnfm}
 \end{description}
- 
+
 \begin{verbatim}
    int fits_binary_tform / ffbnfm
        (char *tform, > int *typecode, long *repeat, long *width,
         int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[15] Parse the 'TFORM' keyword value that defines the column format in
     an ASCII table.  This routine parses the input TFORM character
@@ -3500,13 +3515,13 @@ The following utility routines may be useful for certain applications.
     and 'Dw.d' format columns will have datacode = TDOUBLE. A null
    pointer may be given for any output parameters that are not needed. \label{ffasfm}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_ascii_tform / ffasfm
       (char *tform, > int *typecode, long *width, int *decimals,
        int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[16] Calculate the starting column positions and total ASCII table width
     based on the input array of ASCII table TFORM values.  The SPACE input
@@ -3514,13 +3529,13 @@ The following utility routines may be useful for certain applications.
     (it is recommended to have one space between columns for better human
    readability). \label{ffgabc}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_get_tbcol / ffgabc
       (int tfields, char **tform, int space, > long *rowlen,
        long *tbcol, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[17] Parse a template header record and return a formatted 80-character string
     suitable for appending to (or deleting from) a FITS header file.
@@ -3530,7 +3545,7 @@ The following utility routines may be useful for certain applications.
     fits\_delete\_key routines
    to append or modify a FITS header record. \label{ffgthd}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_parse_template / ffgthd
       (char *templt, > char *card, int *keytype, int *status)
@@ -3539,7 +3554,7 @@ The following utility routines may be useful for certain applications.
     (1) the KEYNAME, (2) the VALUE, and (3) the COMMENT string.  The
     TEMPLATE string must adhere to the following format:
 
- 
+
 \begin{description}
 \item[- ]     The KEYNAME token must begin in columns 1-8 and be a maximum  of 8
         characters long.  A legal FITS keyword name may only
@@ -3551,7 +3566,7 @@ The following utility routines may be useful for certain applications.
        (with a blank keyword name).
 \end{description}
 
- 
+
 \begin{description}
 \item[- ]     The VALUE token must be separated from the KEYNAME token by one or more
         spaces and/or an '=' character.  The data type of the VALUE token
@@ -3561,13 +3576,13 @@ The following utility routines may be useful for certain applications.
        string of numeric digits) by enclosing it in single quotes.
 \end{description}
 
- 
+
 \begin{description}
 \item[- ]     The COMMENT token is optional, but if present must be separated from
        the VALUE token by at least one blank space and a  '/' character.
 \end{description}
 
- 
+
 \begin{description}
 \item[- ]     One exception to the above rules is that if the first non-blank
         character in the first 8 characters of the template string is a
@@ -3577,7 +3592,7 @@ The following utility routines may be useful for certain applications.
        deleted from the FITS header.
 \end{description}
 
- 
+
 \begin{description}
 \item[- ]     The second exception is that if the template string starts with
         a minus sign and is followed by 2 tokens (without an equals sign between
@@ -3593,7 +3608,7 @@ The following utility routines may be useful for certain applications.
 
     The keytype output parameter indicates how the returned CARD string
     should be interpreted:
- 
+
 \begin{verbatim}
         keytype                  interpretation
         -------          -------------------------------------------------
@@ -3611,7 +3626,7 @@ The following utility routines may be useful for certain applications.
             2            END record; do not explicitly write it to the FITS file.
 \end{verbatim}
      EXAMPLES:  The following lines illustrate valid input template strings:
- 
+
 \begin{verbatim}
       INTVAL 7 / This is an integer keyword
       RVAL           34.6   /     This is a floating point keyword
@@ -3626,7 +3641,7 @@ The following utility routines may be useful for certain applications.
       # the following template line modifies the NAME keyword to OBJECT
       - NAME OBJECT
 \end{verbatim}
- 
+
 \begin{description}
 \item[18]  Parse the input string containing a list of rows or row ranges, and
      return integer arrays containing the first and last row in each
@@ -3641,23 +3656,23 @@ The following utility routines may be useful for certain applications.
      means all the rows in the table, from 1 - maxrows.
    \label{ffrwrg}
 \end{description}
- 
+
 \begin{verbatim}
     int fits_parse_range / ffrwrg(char *rowlist, long maxrows, int maxranges, >
        int *numranges, long *rangemin, long *rangemax, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[19]  Check that the Header fill bytes (if any) are all blank.  These are the bytes
      that may follow END keyword and before the beginning of data unit,
      or the end of the HDU if there is no data unit.
    \label{ffchfl}
 \end{description}
- 
+
 \begin{verbatim}
     int ffchfl(fitsfile *fptr, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[20]  Check that the Data fill bytes (if any) are all zero (for IMAGE or
      BINARY Table HDU) or all blanks (for ASCII table HDU).  These file
@@ -3665,7 +3680,7 @@ The following utility routines may be useful for certain applications.
      before the physical end of the HDU.
      \label{ffcdfl}
 \end{description}
- 
+
 \begin{verbatim}
     int ffcdfl(fitsfile *fptr, > int *status)
 \end{verbatim}
@@ -3737,13 +3752,13 @@ The following 2 sections describe these steps in more detail.  There
 are also several example programs included with the CFITSIO
 distribution which illustrate how to use the iterator function.
 
- 
+
 \section{The Iterator Work Function}
 
 The user-supplied iterator work function must have the following set of
 input parameters (the function can be given any desired name):
 
- 
+
 \begin{verbatim}
   int user_fn( long totaln, long offset, long firstn, long nvalues,
                int narrays, iteratorCol *data,  void *userPointer )
@@ -3817,7 +3832,7 @@ image dimensions then these parameters can be passed via the
 userPointer structure.
 
 The iteratorCol structure is currently defined as follows:
- 
+
 \begin{verbatim}
 typedef struct  /* structure for the iterator function column information */
 {
@@ -3877,7 +3892,7 @@ control to the driver routine after writing any output arrays to the
 FITS file.  CFITSIO does not considered this to be an error condition,
 so any further processing by the application program will continue normally.
 
- 
+
 \section{The Iterator Driver Function}
 
 The iterator driver function must open the necessary FITS files and
@@ -3915,12 +3930,14 @@ iotype -- defines whether the data array is to be input to the
           work function (i.e, read from the FITS file), or output
           from the work function (i.e., written to the FITS file) or
           both.  Allowed values are InputCol, OutputCol, or InputOutputCol.
+	  Variable-length array columns are supported as InputCol or
+	  InputOutputCol types, but may not be used for an OutputCol type.
 \end{itemize}
 
 After the driver routine has initialized all these parameters, it
 can then call the CFITSIO iterator function:
 
- 
+
 \begin{verbatim}
   int fits_iterate_data(int narrays, iteratorCol *data, long offset,
       long nPerLoop, int (*workFn)( ), void *userPointer, int *status);
@@ -3949,7 +3966,10 @@ can then call the CFITSIO iterator function:
                     for greatest efficiency.
                     If nPerLoop is negative, then all the rows
                     or pixels will be passed at one time, and the work
-                    function will only be called once.
+                    function will only be called once.  If any variable
+		    length arrays are being processed, then the nPerLoop
+		    value is ignored, and the iterator will always process
+		    one row of the table at a time.
 
 \item
    *workFn     - the name (actually the address) of the work function
@@ -3979,7 +3999,7 @@ work function returns a non-zero status value.  The iterator then frees
 the memory that it initially allocated and returns control to the
 driver routine that called it.
 
- 
+
 \section{Guidelines for Using the Iterator Function}
 
 The totaln, offset, firstn, and nvalues parameters that are passed to
@@ -4003,6 +4023,11 @@ initialization step or during the clean up step after the last set of
 data has been processed.  Extra FITS file I/O during the main
 processing loop of the work function can seriously degrade the speed of
 the program.
+
+If variable-length array columns are being processed, then the iterator
+will operate on one row of the table at a time.  In this case the
+the repeat element in the interatorCol structure will be set equal to
+the number of elements in the current row that is being processed.
 
 One important feature of the iterator is that the first element in each
 array that is passed to the work function gives the value that is used
@@ -4030,7 +4055,7 @@ writes out a 2D histogram image.  That work function in turn calls
 another work function that reads the  `X' and `Y' columns in a table to
 calculate the value of each 2D histogram image pixel. Graphically, the
 program structure can be described as:
- 
+
 \begin{verbatim}
  driver --> iterator --> work1_fn --> iterator --> work2_fn
 \end{verbatim}
@@ -4042,13 +4067,13 @@ as they have the same length.   The length of the first table column or
 image array is used by the iterator if they do not all have the same
 length.
 
- 
+
 \section{Complete List of Iterator Routines}
 
 All of the iterator routines are listed below.  Most of these routines
 do not have a corresponding short function name.
 
- 
+
 \begin{description}
 \item[1 ]  Iterator `constructor' functions that set
    the value of elements in the iteratorCol structure
@@ -4059,7 +4084,7 @@ do not have a corresponding short function name.
    name, the other the column number). \label{ffiterset}
 \end{description}
 
- 
+
 \begin{verbatim}
   int fits_iter_set_file(iteratorCol *col, fitsfile *fptr);
 
@@ -4077,13 +4102,13 @@ do not have a corresponding short function name.
   int fits_iter_set_by_num(iteratorCol *col, fitsfile *fptr,
           int colnum, int datatype,  int iotype);
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ]  Iterator `accessor' functions that return the value of the
      element in the iteratorCol structure
     that describes a particular data column or array \label{ffiterget}
 \end{description}
- 
+
 \begin{verbatim}
   fitsfile * fits_iter_get_file(iteratorCol *col);
 
@@ -4107,11 +4132,11 @@ do not have a corresponding short function name.
 
   char * fits_iter_get_tdisp(iteratorCol *col);
 \end{verbatim}
- 
+
 \begin{description}
 \item[3 ]  The CFITSIO iterator function \label{ffiter}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_iterate_data(int narrays,  iteratorCol *data, long offset,
             long nPerLoop,
@@ -4124,40 +4149,37 @@ do not have a corresponding short function name.
 
 \chapter{ Celestial Coordinate System Routines }
 
-The FITS community has adopted a set of keyword conventions that are
-used to  specify the transformation that is needed to convert between
-pixel locations in an image and the corresponding celestial coordinates
-on the sky.  or more generally, to specify world coordinates that
-are to be associated with any pixel location in an n-dimensional FITS
-array. CFITSIO is distributed with a simple set of World Coordinate
-System routines that support a limited set of celestial projections.
-These routines were derived from functions in the Classic AIPS software
-package developed in the 1980s.  These routines DO NOT support all the
-new conventions in the WCS papers that have recently been approved as
-part of the official FITS standard.
-
-Rather than using the WCS routines distributed with CFITSIO, it is
-STRONGLY RECOMMENDED that software developers use a more sophisticated
+The FITS community has adopted a set of keyword conventions that define
+the transformations needed to convert between pixel locations in an
+image and the corresponding celestial coordinates on the sky, or more
+generally, that define world coordinates that are to be associated with
+any pixel location in an n-dimensional FITS array. CFITSIO is distributed
+with a couple of self-contained World Coordinate System (WCS) routines,
+however, these routines DO NOT support all the latest WCS conventions,
+so it is STRONGLY RECOMMENDED that software developers use a more robust
 external WCS library.  Several recommended libraries are:
 
- 
+
 \begin{verbatim}
   WCSLIB -  supported by Mark Calabretta
   WCSTools - supported by Doug Mink
   AST library - developed by the U.K. Starlink project
 \end{verbatim}
 
-More information about the WCS keyword conventions and links
-to all of these libraries can be found on the FITS Support Office
-web site at http://fits.gsfc.nasa.gov under the WCS link.
+More information about the WCS keyword conventions and links to all of
+these WCS libraries can be found on the FITS Support Office web site at
+http://fits.gsfc.nasa.gov under the WCS link.
 
-Each of these libraries has a routine that will ingest a list of header
-keywords from which the transformations between pixel coordinates and
-world coordinates can be derived.  The following CFITSIO routine may
-be used to copy the keywords in any FITS header into a long character
-string that can then be passed to the WCS library routine:
+The functions provided in these external WCS libraries will need
+access to the  WCS information contained in the FITS file headers.
+One convenient way to pass this information to the extermal library is
+to use the fits\_hdr2str routine in CFITSIO (defined below) to copy the
+header keywords into one long string, and then pass this string to an
+interface routine in the external library that will extract
+the necessary WCS information (e.g., see the astFitsChan and astPutCards
+routines in the Starlink AST library).
 
- 
+
 \begin{description}
 \item[1 ] Concatenate the header keywords in the CHDU into a single long
     string of characters. Each 80-character fixed-length keyword
@@ -4178,14 +4200,14 @@ string that can then be passed to the WCS library routine:
     If no additional keywords are to be excluded, then set nexc = 0 and
    specify NULL for the the **header  parameter.  \label{hdr2str}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_hdr2str
       (fitsfile *fptr, int nocomments, char **exclist, int nexc,
       > char **header, int *nkeys, int *status)
 \end{verbatim}
 
- 
+
 \section{ Self-contained WCS Routines}
 
 The following routines DO NOT support the more recent WCS conventions
@@ -4194,14 +4216,14 @@ the following routines ARE NOW DEPRECATED.  It is STRONGLY RECOMMENDED
 that software developers not use these routines, and instead use an
 external WCS library, as described in the previous section.
 
-These routines are included only for backward compatibility with
+These routines are included mainly for backward compatibility with
 existing software.  They support the following standard map
 projections: -SIN, -TAN, -ARC, -NCP, -GLS, -MER, and -AIT (these are the
 legal values for the coordtype parameter).  These routines are based
 on similar functions in Classic AIPS.  All the angular quantities are
 given in units of degrees.
 
- 
+
 \begin{description}
 \item[1 ] Get the values of the basic set of standard FITS celestial coordinate
     system keywords from the header of a FITS image (i.e., the primary
@@ -4227,14 +4249,14 @@ given in units of degrees.
     particular application, or whether more precise WCS transformations
    must be performed using new-style WCS keywords directly. \label{ffgics}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_read_img_coord / ffgics
       (fitsfile *fptr, > double *xrefval, double *yrefval,
        double *xrefpix, double *yrefpix, double *xinc, double *yinc,
        double *rot, char *coordtype, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ] Get the values of the standard FITS celestial coordinate system
     keywords from the header of a FITS table where the X and Y (or RA
@@ -4244,19 +4266,19 @@ given in units of degrees.
     fits\_pix\_to\_world and fits\_world\_to\_pix routines that perform
    the coordinate transformations. \label{ffgtcs}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_read_tbl_coord / ffgtcs
       (fitsfile *fptr, int xcol, int ycol, > double *xrefval,
        double *yrefval, double *xrefpix, double *yrefpix, double *xinc,
        double *yinc, double *rot, char *coordtype, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[3 ]  Calculate the celestial coordinate corresponding to the input
     X and Y pixel location in the image. \label{ffwldp}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_pix_to_world / ffwldp
       (double xpix, double ypix, double xrefval, double yrefval,
@@ -4264,12 +4286,12 @@ given in units of degrees.
        double rot, char *coordtype, > double *xpos, double *ypos,
        int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[4 ]  Calculate the X and Y pixel location corresponding to the input
     celestial coordinate in the image. \label{ffxypx}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_world_to_pix / ffxypx
       (double xpos, double ypos, double xrefval, double yrefval,
@@ -4333,10 +4355,10 @@ indirectly referencing itself (thus creating an infinite loop) is protected
 against; in fact, neither function will attempt to copy or delete an HDU
 twice.
 
- 
+
 \section{Grouping Table Routines}
 
- 
+
 \begin{description}
 \item[1 ]Create (append) a grouping table at the end of the current FITS file
    pointed to by fptr. The grpname parameter provides the grouping table
@@ -4348,12 +4370,12 @@ twice.
    position columns), GT\_ID\_REF\_URI (ID by reference and FITS file URI
   columns), and GT\_ID\_POS\_URI (ID by position and FITS file URI columns). \label{ffgtcr}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_create_group / ffgtcr
       (fitsfile *fptr, char *grpname, int grouptype, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ]Create (insert) a grouping table just after the CHDU of the current FITS
    file pointed to by fptr. All HDUs below the the insertion point will be
@@ -4366,12 +4388,12 @@ twice.
    position columns), GT\_ID\_REF\_URI (ID by reference and FITS file URI
   columns), and GT\_ID\_POS\_URI (ID by position and FITS file URI columns) \label{ffgtis}.
 \end{description}
- 
+
 \begin{verbatim}
   int fits_insert_group / ffgtis
       (fitsfile *fptr, char *grpname, int grouptype, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[3 ]Change the structure of an existing grouping table pointed to by
    gfptr. The grouptype parameter (see fits\_create\_group() for valid
@@ -4384,12 +4406,12 @@ twice.
    existing members will be filled with the null values appropriate to the
   column type. \label{ffgtch}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_change_group / ffgtch
       (fitsfile *gfptr, int grouptype, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[4 ]Remove the group defined by the grouping table pointed to by gfptr, and
    optionally all the group member HDUs. The rmopt parameter specifies the
@@ -4402,12 +4424,12 @@ twice.
    If rmopt == OPT\_RM\_ALL, then other groups that contain the deleted members
   of gfptr are updated to reflect the deletion accordingly. \label{ffgtrm}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_remove_group / ffgtrm
       (fitsfile *gfptr, int rmopt, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[5 ]Copy (append) the group defined by the grouping table pointed to by infptr,
    and optionally all group member HDUs, to the FITS file pointed to by
@@ -4424,12 +4446,12 @@ twice.
    copied to a single FITS file pointed to by outfptr regardless of their
   file distribution in the original group.  \label{ffgtcp}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_copy_group / ffgtcp
       (fitsfile *infptr, fitsfile *outfptr, int cpopt, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[6 ] Merge the two groups defined by the grouping table HDUs infptr and outfptr
     by combining their members into a single grouping table. All member HDUs
@@ -4438,12 +4460,12 @@ twice.
     OPT\_MRG\_MOV then infptr is deleted after the merge. In both cases,
    the GRPIDn and GRPLCn keywords of the member HDUs are updated accordingly. \label{ffgtmg}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_merge_groups / ffgtmg
       (fitsfile *infptr, fitsfile *outfptr, int mgopt, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[7 ]"Compact" the group defined by grouping table pointed to by gfptr. The
    compaction is achieved by merging (via fits\_merge\_groups()) all direct
@@ -4455,12 +4477,12 @@ twice.
    does nothing. Note that this function is not recursive, i.e., only the
   direct member HDUs of gfptr are considered for merging. \label{ffgtcm}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_compact_group / ffgtcm
       (fitsfile *gfptr, int cmopt, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[8 ]Verify the integrity of the grouping table pointed to by gfptr to make
    sure that all group members are accessible and that all links to other
@@ -4469,12 +4491,12 @@ twice.
    value) or the first group link to fail (if negative value). If gfptr is
   successfully verified then firstfailed contains a return value of 0. \label{ffgtvf}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_verify_group / ffgtvf
       (fitsfile *gfptr, > long *firstfailed, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[9 ] Open a grouping table that contains the member HDU pointed to by mfptr.
     The grouping table to open is defined by the grpid parameter, which
@@ -4491,12 +4513,12 @@ twice.
     In the above example, if grpid == 3, then the group specified by GRPID5
    would be opened. \label{ffgtop}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_open_group / ffgtop
       (fitsfile *mfptr, int group, > fitsfile **gfptr, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[10]  Add a member HDU to an existing grouping table pointed to by gfptr.
    The member HDU may either be pointed to mfptr (which must be positioned
@@ -4507,27 +4529,27 @@ twice.
    Note that if the member HDU is already a member of the group then it will
   not be added a second time. \label{ffgtam}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_add_group_member / ffgtam
       (fitsfile *gfptr, fitsfile *mfptr, int hdupos, > int *status)
 \end{verbatim}
 
- 
+
 \section{Group Member Routines}
 
- 
+
 \begin{description}
 \item[1 ] Return the number of member HDUs in a grouping table gfptr. The number
     member HDUs is just the NAXIS2 value (number of rows) of the grouping
    table. \label{ffgtnm}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_get_num_members / ffgtnm
       (fitsfile *gfptr, > long *nmembers, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ]  Return the number of groups to which the HDU pointed to by mfptr is
      linked, as defined by the number of GRPIDn/GRPLCn keyword records that
@@ -4536,12 +4558,12 @@ twice.
      are continuous (ie no gaps) and are re-enumerated to eliminate gaps if
     found.  \label{ffgmng}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_get_num_groups / ffgmng
       (fitsfile *mfptr, > long *nmembers, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[3 ] Open a member of the grouping table pointed to by gfptr. The member to
     open is identified by its row number within the grouping table as given
@@ -4550,12 +4572,12 @@ twice.
     resides in a FITS file different from the grouping table HDU then the
    member file is first opened readwrite and, failing this, opened readonly. \label{ffgmop}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_open_member / ffgmop
       (fitsfile *gfptr, long member, > fitsfile **mfptr, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[4 ]Copy (append) a member HDU of the grouping table pointed to by gfptr.
    The member HDU is identified by its row number within the grouping table
@@ -4567,12 +4589,12 @@ twice.
    an entry in gfptr for the copied member, and OPT\_MCP\_REPL which replaces
   the original member entry with the copied member entry. \label{ffgmcp}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_copy_member / ffgmcp
       (fitsfile *gfptr, fitsfile *mfptr, long member, int cpopt, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[5 ]Transfer a group member HDU from the grouping table pointed to by
    infptr to the grouping table pointed to by outfptr. The member HDU to
@@ -4582,13 +4604,13 @@ twice.
    a member of outfptr and remains a member of infptr. If tfopt == OPT\_MCP\_MOV
   then the member HDU is deleted from infptr after the transfer to outfptr. \label{ffgmtf}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_transfer_member / ffgmtf
       (fitsfile *infptr, fitsfile *outfptr, long member, int tfopt,
        > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[6 ]Remove a member HDU from the grouping table pointed to by gfptr. The
    member HDU to be deleted is identified by its row number in the grouping
@@ -4598,7 +4620,7 @@ twice.
    member's GRPIDn/GRPLCn keywords, and OPT\_RM\_MBR which removes the member
   HDU entry from the grouping table and deletes the member HDU itself. \label{ffgmrm}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_remove_member / ffgmrm
       (fitsfile *fptr, long member, int rmopt, > int *status)
@@ -4614,10 +4636,10 @@ interface routines while others duplicate the functionality of the
 basic routines but have a slightly different calling sequence.
 See Appendix B for the definition of each function parameter.
 
- 
+
 \section{FITS File Access Routines}
 
- 
+
 \begin{description}
 \item[1 ] Open an existing FITS file residing in core computer memory.  This
 routine is analogous to fits\_open\_file.   The 'filename'  is
@@ -4642,14 +4664,14 @@ memory, and/or specifying a larger deltasize value may help to reduce
 the number of reallocation calls and make the application program run
  faster. \label{ffomem}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_open_memfile / ffomem
       (fitsfile **fptr, const char *filename, int mode, void **memptr,
        size_t *memsize, size_t deltasize,
        void *(*mem_realloc)(void *p, size_t newsize), int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ] Create a new FITS file residing in core computer memory.  This
 routine is analogous to fits\_create\_file.    In general, the
@@ -4671,14 +4693,14 @@ deltasize value may help to reduce the number of reallocation calls
 and make the application program run
  faster. \label{ffimem}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_create_memfile / ffimem
       (fitsfile **fptr, void **memptr,
        size_t *memsize, size_t deltasize,
        void *(*mem_realloc)(void *p, size_t newsize), int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[3 ] Reopen a FITS file that was previously opened with
     fits\_open\_file or fits\_create\_file.  The new fitsfile
@@ -4690,13 +4712,13 @@ and make the application program run
     need to explicitly call this routine.
 \label{ffreopen}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_reopen_file / ffreopen
       (fitsfile *openfptr, fitsfile **newfptr, > int *status)
 \end{verbatim}
 
- 
+
 \begin{description}
 \item[4 ]  Create a new FITS file, using a template file to define its
   initial size and structure.  The template may be another FITS HDU
@@ -4707,13 +4729,13 @@ and make the application program run
   section)
 \label{fftplt}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_create_template / fftplt
       (fitsfile **fptr, char *filename, char *tpltfile > int *status)
 \end{verbatim}
 
- 
+
 \begin{description}
 \item[5 ] Parse the input filename or URL into its component parts: the file
 type (file://, ftp://, http://, etc), the base input file name, the
@@ -4723,13 +4745,13 @@ specifier, the binning specifier, and the column specifier.  Null
 strings will be returned for any components that are not present
  in the input file name. \label{ffiurl}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_parse_input_url / ffiurl
       (char *filename, > char *filetype, char *infile, char *outfile, char
        *extspec, char *filter, char *binspec, char *colspec, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[6 ] Parse the input filename and return the HDU number that would be
 moved to if the file were opened with fits\_open\_file.  The returned
@@ -4752,12 +4774,12 @@ been opened, rather than calling fits\_parse\_input\_url followed by a
 call to fits\_open\_file.
  \label{ffextn}
 \end{description}
- 
+
 \begin{verbatim}
    int fits_parse_extnum / ffextn
        (char *filename, > int *hdunum, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[7 ]Parse the input file name and return the root file name.  The root
 name includes the file type if specified, (e.g.  'ftp://' or 'http://')
@@ -4766,14 +4788,35 @@ filename.  It does not include the HDU name or number, or any filtering
 specifications.
  \label{ffrtnm}
 \end{description}
- 
+
 \begin{verbatim}
    int fits_parse_rootname / ffrtnm
        (char *filename, > char *rootname, int *status);
 \end{verbatim}
- 
+
 \begin{description}
-\item[8 ]Flush any internal buffers of data to the output FITS file. These
+\item[8 ]Test if the input file or a compressed version of the file (with
+a .gz, .Z, .z, or .zip extension) exists on disk.  The returned value of
+the 'exists' parameter will have 1 of the 4 following values:
+
+\begin{verbatim}
+   2:  the file does not exist, but a compressed version does exist
+   1:  the disk file does exist
+   0:  neither the file nor a compressed version of the file exist
+  -1:  the input file name is not a disk file (could be a ftp, http,
+       smem, or mem file, or a file piped in on the STDIN stream)
+\end{verbatim}
+
+ \label{ffexist}
+\end{description}
+
+\begin{verbatim}
+   int fits_file_exists / ffexist
+       (char *filename, > int *exists, int *status);
+\end{verbatim}
+
+\begin{description}
+\item[9 ]Flush any internal buffers of data to the output FITS file. These
    routines rarely need to be called, but can be useful in cases where
    other processes need to access the same FITS file in real time,
    either on disk or in memory.  These routines also help to ensure
@@ -4800,7 +4843,7 @@ specifications.
    updated by the application program after each row is written.
   \label{ffflus}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_flush_file / ffflus
       (fitsfile *fptr, > int *status)
@@ -4811,10 +4854,10 @@ specifications.
       (Note:  The second argument must be 0).
 \end{verbatim}
 
- 
+
 \section{HDU Access Routines}
 
- 
+
 \begin{description}
 \item[1 ] Get the byte offsets in the FITS file to the start of the header
     and the start and end of the data in the CHDU. The difference
@@ -4827,7 +4870,7 @@ specifications.
     data type which can support offsets in large files greater than
    2.1GB in size. \label{ffghad}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_get_hduoff / ffghof
        (fitsfile *fptr, > off_t *headstart, off_t *datastart, off_t *dataend,
@@ -4837,19 +4880,19 @@ specifications.
        (fitsfile *fptr, > long *headstart, long *datastart, long *dataend,
         int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ] Create (append) a new empty HDU at the end of the FITS file.
     This is now  the CHDU but it is completely empty and has
     no header keywords.  It is recommended that fits\_create\_img or
  fits\_create\_tbl be used instead of this routine. \label{ffcrhd}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_create_hdu / ffcrhd
       (fitsfile *fptr, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[3 ] Insert a new IMAGE extension immediately following the CHDU, or
     insert a new Primary Array at the beginning of the file.  Any
@@ -4863,12 +4906,12 @@ specifications.
     array) will become the CHDU.  Refer to Chapter 9 for a list of
    pre-defined bitpix values.  \label{ffiimg}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_insert_img / ffiimg
       (fitsfile *fptr, int bitpix, int naxis, long *naxes, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[4 ] Insert a new ASCII or binary table extension immediately following the CHDU.
     Any following extensions will be shifted down to make room for the
@@ -4889,7 +4932,7 @@ specifications.
     pcount must specify the expected final size of the data heap,
    otherwise pcount must = 0. \label{ffitab} \label{ffibin}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_insert_atbl / ffitab
       (fitsfile *fptr, long rowlen, long nrows, int tfields, char *ttype[],
@@ -4899,7 +4942,7 @@ specifications.
       (fitsfile *fptr, long nrows, int tfields, char **ttype,
       char **tform, char **tunit, char *extname, long pcount, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[5 ] Modify the size, dimensions, and/or data type of the current
     primary array or image extension. If the new image, as specified
@@ -4913,12 +4956,12 @@ specifications.
     This routine rewrites the BITPIX, NAXIS, and NAXISn keywords
    with the appropriate values for the new image. \label{ffrsim}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_resize_img / ffrsim
       (fitsfile *fptr, int bitpix, int naxis, long *naxes, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[6 ] Copy the data (and not the header) from the CHDU associated with infptr
     to the CHDU associated with outfptr. This will overwrite any data
@@ -4929,12 +4972,12 @@ specifications.
     which define the structure of the HDU must be written to the
    output CHDU before calling this routine. \label{ffcpdt}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_copy_data / ffcpdt
       (fitsfile *infptr, fitsfile *outfptr, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[7 ] This routine forces CFITSIO to rescan the current header keywords that
     define the structure of the HDU (such as the NAXIS and BITPIX
@@ -4945,18 +4988,18 @@ specifications.
     rarely be necessary to call this routine because CFITSIO
    internally calls it in most situations. \label{ffrdef}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_set_hdustruc / ffrdef
       (fitsfile *fptr, > int *status)   (DEPRECATED)
 \end{verbatim}
- 
+
 \section{Specialized Header Keyword Routines}
 
- 
+
 \subsection{Header Information Routines}
 
- 
+
 \begin{description}
 \item[1 ] Reserve space in the CHU for MOREKEYS more header keywords.
     This routine may be called to allocate space for additional keywords
@@ -4965,12 +5008,12 @@ specifications.
     however it is more efficient to preallocate the required space
    if the size is known in advance. \label{ffhdef}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_set_hdrsize / ffhdef
       (fitsfile *fptr, int morekeys, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ] Return the number of keywords in the header (not counting the END
     keyword) and the current position
@@ -4979,16 +5022,16 @@ specifications.
     that was read). A value of 1 is returned if the pointer is
    positioned at the beginning of the header. \label{ffghps}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_get_hdrpos / ffghps
       (fitsfile *fptr, > int *keysexist, int *keynum, int *status)
 \end{verbatim}
 
- 
+
 \subsection{Read and Write the Required Keywords}
 
- 
+
 \begin{description}
 \item[1 ] Write the primary header or IMAGE extension keywords into the CHU.
   The simpler fits\_write\_imghdr routine is equivalent to calling
@@ -5002,7 +5045,7 @@ specifications.
   instead of these routines to write the
  required header keywords. \label{ffphpr} \label{ffphps}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_imghdr / ffphps
       (fitsfile *fptr, int bitpix, int naxis, long *naxes, > int *status)
@@ -5011,7 +5054,7 @@ specifications.
       (fitsfile *fptr, int simple, int bitpix, int naxis, long *naxes,
        long pcount, long gcount, int extend, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ] Write the ASCII table header keywords into the CHU.  The optional
     TUNITn and EXTNAME keywords are written only if the input pointers
@@ -5021,13 +5064,13 @@ specifications.
     given = 0, then CFITSIO will calculate the default rowlength based on
    the tbcol and ttype values. \label{ffphtb}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_atblhdr / ffphtb
       (fitsfile *fptr, long rowlen, long nrows, int tfields, char **ttype,
        long *tbcol, char **tform, char **tunit, char *extname, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[3 ] Write the binary table header keywords into the CHU.   The optional
    TUNITn and EXTNAME keywords are written only if the input pointers
@@ -5047,20 +5090,20 @@ specifications.
    then the modifying program is responsible for also updating the TFORM
   keyword value.  \label{ffphbn}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_btblhdr / ffphbn
       (fitsfile *fptr, long nrows, int tfields, char **ttype,
        char **tform, char **tunit, char *extname, long pcount, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[4 ] Read the required keywords from the CHDU (image or table).  When
     reading from an IMAGE extension the SIMPLE and EXTEND parameters are
     ignored.  A null pointer may be supplied for any of the returned
    parameters that are not needed. \label{ffghpr} \label{ffghtb} \label{ffghbn}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_read_imghdr / ffghpr
       (fitsfile *fptr, int maxdim, > int *simple, int *bitpix, int *naxis,
@@ -5076,7 +5119,7 @@ specifications.
        char **ttype, char **tform, char **tunit, char *extname,
        long *pcount, int *status)
 \end{verbatim}
- 
+
 \subsection{Write Keyword Routines}
 
 These routines simply append a new keyword to the header and do not
@@ -5087,7 +5130,7 @@ Appendix B for the definition of the parameters used in these
 routines.
 
 
- 
+
 \begin{description}
 \item[1 ]  Write (append) a new keyword of the appropriate data type into the CHU.
      A null pointer may be entered for the comment parameter, which
@@ -5100,7 +5143,7 @@ routines.
      and will use a fixed format rather than an exponential format,
     depending on the magnitude of the value. \label{ffpkyx}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_key_str / ffpkys
       (fitsfile *fptr, char *keyname, char *value, char *comment,
@@ -5118,7 +5161,7 @@ routines.
       (fitsfile *fptr, char *keyname, DTYPE *numval, int decimals,
       char *comment, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ] Write (append) a string valued keyword into the CHU which may be longer
     than 68 characters in length.  This uses the Long String Keyword
@@ -5135,7 +5178,7 @@ routines.
     will
    simply return without doing anything. \label{ffpkls} \label{ffplsw}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_key_longstr / ffpkls
       (fitsfile *fptr, char *keyname, char *longstr, char *comment,
@@ -5144,7 +5187,7 @@ routines.
   int fits_write_key_longwarn / ffplsw
       (fitsfile *fptr, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[3 ] Write (append) a numbered sequence of keywords into the CHU.  The
     starting index number (nstart) must be greater than 0. One may
@@ -5156,7 +5199,7 @@ routines.
     One may also enter a null pointer for the comment parameter to
    leave the comment field of the keyword blank. \label{ffpknx}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_keys_str / ffpkns
       (fitsfile *fptr, char *keyroot, int nstart, int nkeys,
@@ -5170,7 +5213,7 @@ routines.
       (fitsfile *fptr, char *keyroot, int nstart, int nkey,
        DTYPE *numval, int decimals, char **comment, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[4 ]Copy an indexed keyword from one HDU to another, modifying
     the index number of the keyword name in the process.  For example,
@@ -5180,13 +5223,13 @@ routines.
     If the input keyword does not exist, then this routine simply
    returns without indicating an error. \label{ffcpky}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_copy_key / ffcpky
       (fitsfile *infptr, fitsfile *outfptr, int innum, int outnum,
        char *keyroot, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[5 ]Write (append) a `triple precision' keyword into the CHU in F28.16 format.
     The floating point keyword value is constructed by concatenating the
@@ -5195,24 +5238,24 @@ routines.
     be used to read this keyword value, because the other keyword reading
    routines will not preserve the full precision of the value. \label{ffpkyt}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_key_triple / ffpkyt
       (fitsfile *fptr, char *keyname, long intval, double frac,
        char *comment, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[6 ]Write keywords to the CHDU that are defined in an ASCII template file.
    The format of the template file is described under the fits\_parse\_template
   routine. \label{ffpktp}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_key_template / ffpktp
       (fitsfile *fptr, const char *filename, > int *status)
 \end{verbatim}
- 
+
 \subsection{Insert Keyword Routines}
 
 These insert routines are somewhat less efficient than the `update' or
@@ -5221,18 +5264,18 @@ must be shifted down to make room for the inserted keyword.  See
 Appendix B for the definition of the parameters used in these
 routines.
 
- 
+
 \begin{description}
 \item[1 ] Insert a new keyword record into the CHU at the specified position
     (i.e., immediately preceding the (keynum)th keyword in the header.)
   \label{ffirec}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_insert_record / ffirec
       (fitsfile *fptr, int keynum, char *card, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ] Insert a new keyword into the CHU.  The new keyword is inserted
     immediately following the last keyword that has been read from the
@@ -5249,7 +5292,7 @@ routines.
      and will use a fixed format rather than an exponential format,
     depending on the magnitude of the value. \label{ffikyx}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_insert_card / ffikey
       (fitsfile *fptr, char *card, > &status)
@@ -5270,24 +5313,24 @@ routines.
       (fitsfile *fptr, char *keyname, DTYPE *numval, int decimals,
        char *comment, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[3 ] Insert a new keyword with an undefined, or null, value into the CHU.
    The value string of the keyword is left blank in this case. \label{ffikyu}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_insert_key_null / ffikyu
       (fitsfile *fptr, char *keyname, char *comment, > int *status)
 \end{verbatim}
 
- 
+
 \subsection{Read Keyword Routines}
 
 Wild card characters may be used when specifying the name of the
 keyword to be read.
 
- 
+
 \begin{description}
 \item[1 ] Read a keyword value (with the appropriate data type) and comment from
     the CHU.  If a NULL comment pointer is given on input, then the comment
@@ -5297,7 +5340,7 @@ keyword to be read.
     ffgkys will reset the value to a null string).
   \label{ffgkyx} \label{ffgkls}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_read_key_str / ffgkys
       (fitsfile *fptr, char *keyname, > char *value, char *comment,
@@ -5315,7 +5358,7 @@ keyword to be read.
        int *status)
 
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ] Read a sequence of indexed keyword values (e.g., NAXIS1, NAXIS2, ...).
     The input starting index number (nstart) must be greater than 0.
@@ -5327,7 +5370,7 @@ keyword to be read.
     the input root name then these routines do not return a non-zero
    status value and instead simply return nfound = 0. \label{ffgknx}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_read_keys_str / ffgkns
       (fitsfile *fptr, char *keyname, int nstart, int nkeys,
@@ -5337,7 +5380,7 @@ keyword to be read.
       (fitsfile *fptr, char *keyname, int nstart, int nkeys,
        > DTYPE *numval, int *nfound, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[3 ] Read the value of a floating point keyword, returning the integer and
     fractional parts of the value in separate routine arguments.
@@ -5345,13 +5388,13 @@ keyword to be read.
     useful for reading the 'triple precision' keywords written by ffpkyt.
   \label{ffgkyt}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_read_key_triple / ffgkyt
       (fitsfile *fptr, char *keyname, > long *intval, double *frac,
        char *comment, int *status)
 \end{verbatim}
- 
+
 \subsection{Modify Keyword Routines}
 
 These routines modify the value of an existing keyword.  An error is
@@ -5360,27 +5403,27 @@ used when specifying the name of the keyword to be modified.  See
 Appendix B for the definition of the parameters used in these
 routines.
 
- 
+
 \begin{description}
 \item[1 ] Modify (overwrite) the nth 80-character header record in the CHU. \label{ffmrec}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_modify_record / ffmrec
       (fitsfile *fptr, int keynum, char *card, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ] Modify (overwrite) the 80-character header record for the named keyword
     in the CHU.  This can be used to overwrite the name of the keyword as
    well as its value and comment fields. \label{ffmcrd}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_modify_card / ffmcrd
       (fitsfile *fptr, char *keyname, char *card, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[5 ] Modify the value and comment fields of an existing keyword in the CHU.
     The `longstr' version has the same functionality as the `str'
@@ -5398,7 +5441,7 @@ routines.
     exponential format,
    depending on the magnitude of the value. \label{ffmkyx}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_modify_key_[str, longstr] / ffm[kys, kls]
       (fitsfile *fptr, char *keyname, char *value, char *comment,
@@ -5416,7 +5459,7 @@ routines.
       (fitsfile *fptr, char *keyname, DTYPE *numval, int decimals,
        char *comment, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[6 ] Modify the value of an existing keyword to be undefined, or null.
     The value string of the keyword is set to blank.
@@ -5424,15 +5467,15 @@ routines.
     input COMMENT parameter equal to
    the ampersand character (\&) or by entering a null pointer.  \label{ffmkyu}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_modify_key_null / ffmkyu
       (fitsfile *fptr, char *keyname, char *comment, > int *status)
 \end{verbatim}
- 
+
 \subsection{Update Keyword Routines}
 
- 
+
 \begin{description}
 \item[1 ] These update routines modify the value, and optionally the comment field,
     of the keyword if it already exists, otherwise the new keyword is
@@ -5450,7 +5493,7 @@ routines.
     format rather than an exponential format,
    depending on the magnitude of the value. \label{ffukyx}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_update_key_[str, longstr] / ffu[kys, kls]
       (fitsfile *fptr, char *keyname, char *value, char *comment,
@@ -5469,7 +5512,7 @@ routines.
        char *comment, > int *status)
 \end{verbatim}
 
- 
+
 \section{Define Data Scaling and Undefined Pixel Parameters}
 
 These routines set or modify the internal parameters used by CFITSIO
@@ -5484,7 +5527,7 @@ this value.  These routines do not create or modify the corresponding
 header keyword values.  See Appendix B for the definition of the
 parameters used in these routines.
 
- 
+
 \begin{description}
 \item[1 ] Reset the scaling factors in the primary array or image extension; does
     not change the BSCALE and BZERO keyword values and only affects the
@@ -5494,12 +5537,12 @@ parameters used in these routines.
     The inverse formula is used when writing data values to the FITS
    file. \label{ffpscl}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_set_bscale / ffpscl
       (fitsfile *fptr, double scale, double zero, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ] Reset the scaling parameters for a table column; does not change
     the TSCALn or TZEROn keyword values and only affects the automatic
@@ -5509,49 +5552,49 @@ parameters used in these routines.
     inverse formula is used when writing data values to the FITS file.
    \label{fftscl}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_set_tscale / fftscl
       (fitsfile *fptr, int colnum, double scale, double zero,
        > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[3 ] Define the integer value to be used to signify undefined pixels in the
     primary array or image extension.  This is only used if BITPIX = 8, 16,
     or 32.  This does not create or change the value of the BLANK keyword in
    the header. \label{ffpnul}
 \end{description}
- 
+
 \begin{verbatim}
-  int fits_set_imgnul / ffpnul
+  int fits_set_imgnull / ffpnul
       (fitsfile *fptr, long nulval, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[4 ] Define the string to be used to signify undefined pixels in
     a column in an ASCII table.  This does not create or change the value
    of the TNULLn keyword. \label{ffsnul}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_set_atblnull / ffsnul
       (fitsfile *fptr, int colnum, char *nulstr, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[5 ] Define the value to be used to signify undefined pixels in
     an integer column in a binary table (where TFORMn = 'B', 'I', or 'J').
     This does not create or  change the value of the TNULLn keyword.
    \label{fftnul}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_set_btblnull / fftnul
       (fitsfile *fptr, int colnum, long nulval, > int *status)
 \end{verbatim}
 
- 
+
 \section{Specialized FITS Primary Array or IMAGE Extension I/O Routines}
 
 These routines read or write data values in the primary data array
@@ -5627,12 +5670,12 @@ be more convenient to use in some circumstances, however, it requires
 an additional array of logical values which can be unwieldy when working
 with large data arrays.
 
- 
+
 \begin{description}
 \item[1 ] Write elements into the FITS data array.
  \label{ffppr} \label{ffpprx} \label{ffppn} \label{ffppnx}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_img / ffppr
       (fitsfile *fptr, int datatype, long firstelem, long nelements,
@@ -5652,35 +5695,35 @@ with large data arrays.
       (fitsfile *fptr, long group, long firstelem,
            long nelements, DTYPE *array, DTYPE nulval, > int *status);
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ]Set data array elements as undefined. \label{ffppru}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_img_null / ffppru
       (fitsfile *fptr, long group, long firstelem, long nelements,
        > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[3 ] Write values into group parameters.  This routine only applies
     to the `Random Grouped' FITS format which has been used for
     applications in radio interferometry, but is officially deprecated
    for future use.  \label{ffpgpx}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_grppar_[byt, sht, usht, int, uint, lng, ulng, lnglng, flt, dbl] /
       ffpgp[b,i,ui,k,uk,j,uj,jj,e,d]
       (fitsfile *fptr, long group, long firstelem, long nelements,
        > DTYPE *array, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[4 ] Write a 2-D or 3-D image into the data array. \label{ffp2dx} \label{ffp3dx}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_2d_[byt, sht, usht, int, uint, lng, ulng, lnglng, flt, dbl] /
       ffp2d[b,i,ui,k,uk,j,uj,jj,e,d]
@@ -5692,23 +5735,23 @@ with large data arrays.
       (fitsfile *fptr, long group, long dim1, long dim2,
        long naxis1, long naxis2, long naxis3, DTYPE *array, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[5 ]  Write an arbitrary data subsection into the data array. \label{ffpssx}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_subset_[byt, sht, usht, int, uint, lng, ulng, lnglng, flt, dbl] /
       ffpss[b,i,ui,k,uk,j,uj,jj,e,d]
       (fitsfile *fptr, long group, long naxis, long *naxes,
        long *fpixel, long *lpixel, DTYPE *array, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[6 ] Read elements from the FITS data array.
     \label{ffgpv} \label{ffgpvx} \label{ffgpf} \label{ffgpfx}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_read_img / ffgpv
       (fitsfile *fptr, int  datatype, long firstelem, long nelements,
@@ -5728,28 +5771,28 @@ with large data arrays.
        (fitsfile *fptr, long group, long firstelem, long nelements,
        > DTYPE *array, char *nullarray, int *anynul, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[7 ] Read values from group parameters.  This routine only applies
     to the `Random Grouped' FITS format which has been used for
     applications in radio interferometry, but is officially deprecated
    for future use. \label{ffggpx}
 \end{description}
- 
+
 \begin{verbatim}
   int  fits_read_grppar_[byt, sht, usht, int, uint, lng, ulng, lnglng, flt, dbl] /
        ffggp[b,i,ui,k,uk,j,uj,jj,e,d]
        (fitsfile *fptr, long group, long firstelem, long nelements,
        > DTYPE *array, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[8 ]  Read 2-D or 3-D image from the data array.  Undefined
      pixels in the array will be set equal to the value of 'nulval',
      unless nulval=0 in which case no testing for undefined pixels will
     be performed. \label{ffg2dx} \label{ffg3dx}
 \end{description}
- 
+
 \begin{verbatim}
   int  fits_read_2d_[byt, sht, usht, int, uint, lng, ulng, lnglng, flt, dbl] /
        ffg2d[b,i,ui,k,uk,j,uj,jj,e,d]
@@ -5762,12 +5805,12 @@ with large data arrays.
        long dim2, long naxis1, long naxis2, long naxis3,
        > DTYPE *array, int *anynul, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[9 ]   Read an arbitrary data subsection from the data array.
       \label{ffgsvx} \label{ffgsfx}
 \end{description}
- 
+
 \begin{verbatim}
   int  fits_read_subset_[byt, sht, usht, int, uint, lng, ulng, lnglng, flt, dbl] /
        ffgsv[b,i,ui,k,uk,j,uj,jj,e,d]
@@ -5782,13 +5825,13 @@ with large data arrays.
        char *nullarray, int *anynul, int *status)
 \end{verbatim}
 
- 
+
 \section{Specialized FITS ASCII and Binary Table Routines}
 
- 
+
 \subsection{General Column Routines}
 
- 
+
 \begin{description}
 \item[1 ] Get information about an existing ASCII or binary table column.   A null
     pointer may be given for any of the output parameters that are not
@@ -5801,7 +5844,7 @@ with large data arrays.
     repeat=20.   All the returned parameters are scalar quantities.
    \label{ffgacl} \label{ffgbcl}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_get_acolparms / ffgacl
     (fitsfile *fptr, int colnum, > char *ttype, long *tbcol,
@@ -5813,19 +5856,19 @@ with large data arrays.
        char *typechar, long *repeat, double *scale, double *zero,
        long *nulval, char *tdisp, int  *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ] Return optimal number of rows to read or write at one time for
     maximum I/O efficiency.  Refer to the
     ``Optimizing Code'' section in Chapter 5 for more discussion on how
    to use this routine. \label{ffgrsz}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_get_rowsize / ffgrsz
       (fitsfile *fptr, long *nrows, *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[3 ] Define the zero indexed byte offset of the 'heap' measured from
     the start of the binary table data.  By default the heap is assumed
@@ -5838,12 +5881,12 @@ with large data arrays.
     written (with ffphbn)
    but before any data is written to the table. \label{ffpthp}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_theap / ffpthp
       (fitsfile *fptr, long theap, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[4 ] Test the contents of the binary table variable array heap, returning
     the size of the heap, the number of unused bytes that are not currently
@@ -5852,13 +5895,13 @@ with large data arrays.
     any of the descriptors point to invalid addresses  out of range of the
     heap. \label{fftheap}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_test_heap / fftheap
       (fitsfile *fptr, > long *heapsize, long *unused, long *overlap,
        int *validheap, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[5 ] Re-pack the vectors in the binary table variable array heap to recover
     any unused space.  Normally, when a vector in a variable length
@@ -5870,13 +5913,13 @@ with large data arrays.
     duplicate copies of the bytes for each vector, which will actually
    expand the size of the heap. \label{ffcmph}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_compress_heap / ffcmph
       (fitsfile *fptr, > int *status)
 \end{verbatim}
 
- 
+
 \subsection{Low-Level Table Access Routines}
 
 The following 2 routines provide low-level access to the data in ASCII
@@ -5888,12 +5931,12 @@ the table.  These routines do not perform any machine dependent data
 conversion or byte swapping.  See Appendix B for the definition of the
 parameters used in these routines.
 
- 
+
 \begin{description}
 \item[1 ] Read or write a consecutive array of bytes from an ASCII or binary
    table \label{ffgtbb}  \label{ffptbb}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_read_tblbytes / ffgtbb
       (fitsfile *fptr, long firstrow, long firstchar, long nchars,
@@ -5904,16 +5947,16 @@ parameters used in these routines.
        unsigned char *values, > int *status)
 \end{verbatim}
 
- 
+
 \subsection{Write Column Data Routines}
 
- 
+
 \begin{description}
 \item[1 ] Write elements into an ASCII or binary table column (in the CDU).
     The data type of the array is implied by the suffix of the
    routine name. \label{ffpcls}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_col_str / ffpcls
       (fitsfile *fptr, int colnum, long firstrow, long firstelem,
@@ -5924,34 +5967,34 @@ parameters used in these routines.
       (fitsfile *fptr, int colnum, long firstrow,
            long firstelem, long nelements, DTYPE *array, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ] Write elements into an ASCII or binary table column
     substituting the appropriate FITS null value for any elements that
     are equal to the nulval parameter.  This routines must not be used to
    write to  variable length array columns.  \label{ffpcnx}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_colnull_[log, byt, sht, usht, int, uint, lng, ulng, lnglng, flt, dbl] /
       ffpcn[l,b,i,ui,k,uk,j,uj,jj,e,d]
       (fitsfile *fptr, int colnum, long firstrow, long firstelem,
        long nelements, DTYPE *array, DTYPE nulval, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[3 ] Write string elements into a binary table column (in the CDU)
     substituting the FITS null value for any elements that
     are equal to the nulstr string.  This routine must NOT be
    used to write to  variable length array columns. \label{ffpcns}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_colnull_str / ffpcns
       (fitsfile *fptr, int colnum, long firstrow, long firstelem,
        long nelements, char **array, char *nulstr, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[4 ] Write bit values into a binary byte ('B') or bit ('X') table column (in
     the CDU).  Larray is an array of characters corresponding to the
@@ -5977,26 +6020,26 @@ parameters used in these routines.
     columns (e.g.,  '1X' through '8X' is equivalent
    to '1B', and '9X' through '16X' is equivalent to '2B').  \label{ffpclx}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_write_col_bit / ffpclx
       (fitsfile *fptr, int colnum, long firstrow, long firstbit,
        long nbits, char *larray, > int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[5 ] Write the descriptor for a variable length column in a binary table.
     This routine can be used in conjunction with ffgdes to enable
     2 or more arrays to point to the same storage location to save
    storage space if the arrays are identical. \label{ffpdes}
 \end{description}
- 
+
 \begin{verbatim}
     int fits_write_descript / ffpdes
         (fitsfile *fptr, int colnum, long rownum, long repeat,
          long offset, > int *status)
 \end{verbatim}
- 
+
 \subsection{Read Column Data Routines}
 
 Two types of routines are provided to get the column data which differ
@@ -6020,7 +6063,7 @@ parameters used in these routines.
     including the null terminating character) can be determined with
     the fits\_get\_col\_display\_width routine.  The following TDISPn
     display formats are currently supported:
- 
+
 \begin{verbatim}
     Iw.m   Integer
     Ow.m   Octal integer
@@ -6034,7 +6077,7 @@ parameters used in these routines.
     the minimum number of digits displayed, and d is the number of
     digits to the right of the decimal.  The .m field is optional.
 
- 
+
 \begin{description}
 \item[1 ] Read elements from an ASCII or binary table column (in the CDU).  These
     routines return the values of the table column array elements.  Undefined
@@ -6043,7 +6086,7 @@ parameters used in these routines.
     be performed. The ANYF parameter is set to true if any of the returned
    elements are undefined. \label{ffgcvx}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_read_col_str / ffgcvs
       (fitsfile *fptr, int colnum, long firstrow, long firstelem,
@@ -6056,7 +6099,7 @@ parameters used in these routines.
        long nelements, DTYPE nulval, > DTYPE *array, int *anynul,
        int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[2 ] Read elements and null flags from an ASCII or binary table column (in the
     CHDU).  These routines return the values of the table column array elements.
@@ -6064,7 +6107,7 @@ parameters used in these routines.
     set equal to TRUE.  The anynul parameter is set to true if any of the
    returned elements are undefined. \label{ffgcfx}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_read_colnull_str / ffgcfs
       (fitsfile *fptr, int colnum, long firstrow, long firstelem,
@@ -6077,7 +6120,7 @@ parameters used in these routines.
        long firstelem, long nelements, > DTYPE *array,
        char *nullarray, int *anynul, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[3 ] Read an arbitrary data subsection from an N-dimensional array
     in a binary table vector column.  Undefined pixels
@@ -6089,7 +6132,7 @@ parameters used in these routines.
     array.  The INC parameter specifies the sampling interval in
    each dimension between the data elements that will be returned. \label{ffgsvx2}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_read_subset_[byt, sht, usht, int, uint, lng, ulng, lnglng, flt, dbl] /
       ffgsv[b,i,ui,k,uk,j,uj,jj,e,d]
@@ -6097,7 +6140,7 @@ parameters used in these routines.
        long *lpixel, long *inc, DTYPE nulval, > DTYPE *array, int *anynul,
        int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[4 ] Read an arbitrary data subsection from an N-dimensional array
     in a binary table vector column.  Any Undefined
@@ -6109,7 +6152,7 @@ parameters used in these routines.
     interval in each dimension between the data elements that will be
    returned. \label{ffgsfx2}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_read_subsetnull_[byt, sht, usht, int, uint, lng, ulng, lnglng, flt, dbl] /
       ffgsf[b,i,ui,k,uk,j,uj,jj,e,d]
@@ -6117,7 +6160,7 @@ parameters used in these routines.
        long *fpixel, long *lpixel, long *inc, > DTYPE *array,
        char *nullarray, int *anynul, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[5 ] Read bit values from a byte ('B') or bit (`X`) table column (in the
     CDU).  Larray is an array of logical values corresponding to the
@@ -6142,13 +6185,13 @@ parameters used in these routines.
     were 'B' columns (e.g.,  '8X' is equivalent to '1B', and '16X' is
    equivalent to '2B').  \label{ffgcx}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_read_col_bit / ffgcx
       (fitsfile *fptr, int colnum, long firstrow, long firstbit,
        long nbits, > char *larray, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[6 ] Read any consecutive set of bits from an 'X' or 'B' column and
     interpret them as an unsigned n-bit integer.  nbits must be less
@@ -6158,13 +6201,13 @@ parameters used in these routines.
     1 = the most significant bit of the first element of the column.
    \label{ffgcxui}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_read_col_bit_[usht, uint] / ffgcx[ui,uk]
       (fitsfile *fptr, int colnum, long firstrow, long, nrows,
        long firstbit, long nbits, > DTYPE *array, int *status)
 \end{verbatim}
- 
+
 \begin{description}
 \item[7 ] Return the descriptor for a variable length column in a binary table.
     The descriptor consists of 2 integer parameters: the number of elements
@@ -6173,7 +6216,7 @@ parameters used in these routines.
     returns the descriptors for a range of rows in the table.
    \label{ffgdes}
 \end{description}
- 
+
 \begin{verbatim}
   int fits_read_descript / ffgdes
       (fitsfile *fptr, int colnum, long rownum, > long *repeat,
@@ -6186,7 +6229,7 @@ parameters used in these routines.
 
 \chapter{ Extended File Name Syntax }
 
- 
+
 \section{Overview}
 
 CFITSIO supports an extended syntax when specifying the name of the
@@ -6351,7 +6394,7 @@ dimensions, so the resulting image is 512 x 512 pixels in size.
 \item
 The final example combines many of these feature into one complex
 expression (it is broken into several lines for clarity):
- 
+
 \begin{verbatim}
    ftp://legacy.gsfc.nasa.gov/data/sample.fits.gz[EVENTS]
    [col phacorr = pha * 1.1 - 0.3][phacorr >= 5.0 && phacorr <= 14.0]
@@ -6370,7 +6413,7 @@ the final 2-D image in the primary array of the opened file.
 The full extended CFITSIO FITS file name can contain several different
 components depending on the context.  These components are described in
 the following sections:
- 
+
 \begin{verbatim}
 When creating a new file:
    filetype://BaseFilename(templateName)[compress]
@@ -6388,13 +6431,13 @@ of the order, however, the colFilter specifier, if present, will be
 processed first by CFITSIO, followed by the rowFilter specifier, and
 finally by the binSpec specifier.
 
- 
+
 \section{Filetype}
 
 The type of file determines the medium on which the file is located
 (e.g., disk or network) and, hence, which internal device driver is used by
 CFITSIO to read and/or write the file.  Currently supported types are
- 
+
 \begin{verbatim}
         file://  - file on local magnetic disk (default)
         ftp://   - a readonly file accessed with the anonymous FTP protocol.
@@ -6416,20 +6459,20 @@ CFITSIO to read and/or write the file.  Currently supported types are
 If the filetype is not specified, then type file:// is assumed.
 The double slashes '//' are optional and may be omitted in most cases.
 
- 
+
 \subsection{Notes about HTTP proxy servers}
 
 A proxy HTTP server may be used by defining the address (URL) and port
 number of the proxy server with the http\_proxy environment variable.
 For example
- 
+
 \begin{verbatim}
     setenv http_proxy http://heasarc.gsfc.nasa.gov:3128
 \end{verbatim}
 will cause CFITSIO to use port 3128 on the heasarc proxy server whenever
 reading a FITS file with HTTP.
 
- 
+
 \subsection{Notes about the root filetype}
 
 The original rootd server can be obtained from:
@@ -6438,7 +6481,7 @@ but, for it to work correctly with CFITSIO one has to use a modified
 version which supports a command to return the length of the file.
 This modified version is available in rootd subdirectory
 in the CFITSIO ftp area at
- 
+
 \begin{verbatim}
       ftp://legacy.gsfc.nasa.gov/software/fitsio/c/root/rootd.tar.gz.
 \end{verbatim}
@@ -6449,12 +6492,12 @@ The rootd server works with the ROOT TNetFile class. It allows remote
 access to ROOT database files in either read or write mode. By default
 TNetFile assumes port 432 (which requires rootd to be started as root).
 To run rootd via inetd add the following line to /etc/services:
- 
+
 \begin{verbatim}
   rootd     432/tcp
 \end{verbatim}
 and to /etc/inetd.conf, add the following line:
- 
+
 \begin{verbatim}
   rootd stream tcp nowait root /user/rdm/root/bin/rootd rootd -i
 \end{verbatim}
@@ -6463,7 +6506,7 @@ You can also start rootd by hand running directly under your private
 account (no root system privileges needed). For example to start
 rootd listening on port 5151 just type:   \verb+rootd -p 5151+
 Notice that no \& is needed. Rootd will go into background by itself.
- 
+
 \begin{verbatim}
   Rootd arguments:
     -i                says we were started by inetd
@@ -6477,7 +6520,7 @@ Notice that no \& is needed. Rootd will go into background by itself.
 Rootd can also be configured for anonymous usage (like anonymous ftp).
 To setup rootd to accept anonymous logins do the following (while being
 logged in as root):
- 
+
 \begin{verbatim}
    - Add the following line to /etc/passwd:
 
@@ -6514,7 +6557,7 @@ home directory, therefore only files below the home directory can be
 accessed.  Anonymous mode only works when the server is started via
 inetd.
 
- 
+
 \subsection{Notes about the shmem filetype:}
 
 Shared memory files are currently supported on most Unix platforms,
@@ -6523,7 +6566,7 @@ kernel and `live' independently of processes. They are not deleted (by
 default) when the process which created them terminates, although they
 will disappear if the system is rebooted.  Applications can create
 shared memory files in CFITSIO by calling:
- 
+
 \begin{verbatim}
    fit_create_file(&fitsfileptr, "shmem://h2", &status);
 \end{verbatim}
@@ -6536,7 +6579,7 @@ and on their names, may be developed in the future.
 
 When opening an already existing FITS file in shared memory one calls
 the usual CFITSIO routine:
- 
+
 \begin{verbatim}
    fits_open_file(&fitsfileptr, "shmem://h7", mode, &status)
 \end{verbatim}
@@ -6562,13 +6605,13 @@ currently residing in the system and managed by the shared memory
 driver. To get a list of all the shared memory objects, run the system
 utility program `ipcs  [-a]'.
 
- 
+
 \section{Base Filename}
 
 The base filename is the name of the file optionally including the
 director/subdirectory path, and in the case of `ftp', `http', and `root'
 filetypes, the machine identifier.  Examples:
- 
+
 \begin{verbatim}
     myfile.fits
     !data.fits
@@ -6622,7 +6665,7 @@ program (with READONLY access).  In this case the data type and
 dimensions of the image must be specified in square brackets following
 the filename (e.g. rawfile.dat[ib512,512]). The first character (case
 insensitive) defines the data type of the array:
- 
+
 \begin{verbatim}
      b         8-bit unsigned byte
      i        16-bit signed integer
@@ -6645,7 +6688,7 @@ separating it with a ':' from the last dimension value.  If omitted, it
 is assumed that the offset = 0.  This parameter may be used to skip
 over any header information in the file that precedes the binary data.
 Further examples:
- 
+
 \begin{verbatim}
   raw.dat[b10000]           1-dimensional 10000 pixel byte array
   raw.dat[rb400,400,12]     3-dimensional floating point big-endian array
@@ -6670,14 +6713,14 @@ FITS files to be piped between tasks in memory rather than having to
 create temporary intermediate FITS files on disk.  For example if task1
 creates an output FITS file, and task2 reads an input FITS file, the
 FITS file may be piped between the 2 tasks by specifying
- 
+
 \begin{verbatim}
    task1 - | task2 -
 \end{verbatim}
 where the vertical bar is the Unix piping symbol.  This assumes that the 2
 tasks read the name of the FITS file off of the command line.
 
- 
+
 \section{Output File Name when Opening an Existing File}
 
 An optional output filename may be specified in parentheses immediately
@@ -6769,7 +6812,7 @@ rather confusing, so users should use a certain amount of caution when
 using the output file specifier with FTP or HTTP file types, to make
 sure they get the behavior that they expect.
 
- 
+
 \section{Template File Name when Creating a New File}
 
 When a new FITS file is created with a call to fits\_create\_file, the
@@ -6783,7 +6826,7 @@ template file may also be an ASCII text file, where each line (in
 general) describes one FITS keyword record.  The format of the ASCII
 template file is described in the following Template Files chapter.
 
- 
+
 \section{Image Tile-Compression Specification}
 
 When specifying the name of the output FITS file to be created, the
@@ -6792,7 +6835,7 @@ format (see section 5.5, ``Primary Array or IMAGE Extension I/O
 Routines'') by enclosing the compression parameters in square brackets
 following the root disk file name.  Here are some examples of the
 syntax for specifying tile-compressed output images:
- 
+
 \begin{verbatim}
     myfile.fit[compress]    - use Rice algorithm and default tile size
 
@@ -6804,7 +6847,7 @@ syntax for specifying tile-compressed output images:
     myfile.fit[compress Rice 100,100;2] - as above, and use noisebits = 2
 \end{verbatim}
 
- 
+
 \section{HDU Location Specification}
 
 The optional HDU location specifier defines which HDU (Header-Data
@@ -6854,7 +6897,7 @@ the expression will be used.  The row selection expression has the same
 syntax as described in the Row Filter Specifier section, below.
 
  Examples:
- 
+
 \begin{verbatim}
    myfile.fits[3] - open the 3rd HDU following the primary array
    myfile.fits+3  - same as above, but using the FTOOLS-style notation
@@ -6868,7 +6911,7 @@ syntax as described in the Row Filter Specifier section, below.
                    greater than 100.
 \end{verbatim}
 
- 
+
 \section{Image Section}
 
 A virtual file containing a rectangular subsection of an image can be
@@ -6885,7 +6928,7 @@ a binary table. In the later 2 cases the extension name or number must
 be specified before the image section specifier.
 
  Examples:
- 
+
 \begin{verbatim}
   myfile.fits[1:512:2, 2:512:2] -  open a 256x256 pixel image
               consisting of the odd numbered columns (1st axis) and
@@ -6921,7 +6964,7 @@ the world coordinate system keywords in the header of the image
 section, if they exist, so that the coordinate associated with each
 pixel in the image section will be computed correctly.
 
- 
+
 \section{Column and Keyword Filtering Specification}
 
 The optional column/keyword filtering specifier is used to modify the
@@ -7011,7 +7054,7 @@ that begin with 2 slash characters ('//') will be ignored and may be
 used to add comments into the file.
 
 Examples:
- 
+
 \begin{verbatim}
    [col Time;rate]               - only the Time and rate columns will
                                    appear in the filtered input file.
@@ -7028,7 +7071,7 @@ Examples:
                                    it by the EXPOSURE keyword value.
 \end{verbatim}
 
- 
+
 \section{Row Filtering Specification}
 
     When entering the name of a FITS table that is to be opened by a
@@ -7047,7 +7090,7 @@ Examples:
     the times in a Good Time Intervals (GTI) extension, or on spatial
     position as given in a SAO-style region file.
 
- 
+
 \subsection{General Syntax}
 
     The row filtering  expression can be an arbitrarily  complex series
@@ -7086,7 +7129,7 @@ Examples:
 
     Boolean   operators can be  used in  the expression  in either their
     Fortran or C forms.  The following boolean operators are available:
- 
+
 \begin{verbatim}
     "equal"         .eq. .EQ. ==  "not equal"          .ne.  .NE.  !=
     "less than"     .lt. .LT. <   "less than/equal"    .le.  .LE.  <= =<
@@ -7103,55 +7146,65 @@ by a backslash to force the UNIX shell to ignore it.
     The expression may  also include arithmetic operators and functions.
     Trigonometric  functions use  radians,  not degrees.  The  following
     arithmetic  operators and  functions  can be  used in the expression
-    (function names are case insensitive):
+    (function names are case insensitive). A null value will be returned
+    in case of illegal operations such as divide by zero, sqrt(negative)
+    log(negative), log10(negative), arccos(.gt. 1), arcsin(.gt. 1).
 
- 
+
 \begin{verbatim}
-    "addition"           +          "subtraction"          -
-    "multiplication"     *          "division"             /
-    "negation"           -          "exponentiation"       **   ^
-    "absolute value"     abs(x)     "cosine"               cos(x)
-    "sine"               sin(x)     "tangent"              tan(x)
-    "arc cosine"         arccos(x)  "arc sine"             arcsin(x)
-    "arc tangent"        arctan(x)  "arc tangent"          arctan2(x,y)
-    "exponential"        exp(x)     "square root"          sqrt(x)
-    "natural log"        log(x)     "common log"           log10(x)
-    "modulus"            i % j      "random # [0.0,1.0)"   random()
-    "minimum"            min(x,y)   "maximum"              max(x,y)
-    "if-then-else"       b?x:y
+    "addition"          +          "subtraction"          -
+    "multiplication"    *          "division"             /
+    "negation"          -          "exponentiation"       **   ^
+    "absolute value"    abs(x)     "cosine"                cos(x)
+    "sine"              sin(x)     "tangent"               tan(x)
+    "arc cosine"        arccos(x)  "arc sine"              arcsin(x)
+    "arc tangent"       arctan(x)  "arc tangent"           arctan2(x,y)
+    "hyperbolic cos"    cosh(x)    "hyperbolic sin"        sinh(x)
+    "hyperbolic tan"    tanh(x)    "round to nearest int"  round(x)
+    "round down to int" floor(x)   "round up to int"       ceil(x)
+    "exponential"       exp(x)     "square root"           sqrt(x)
+    "natural log"       log(x)     "common log"            log10(x)
+    "modulus"           i % j      "random # [0.0,1.0)"    random()
+    "minimum"           min(x,y)   "maximum"               max(x,y)
+    "cumulative sum"    accum(x)   "sequential difference" seqdiff(x)
+    "if-then-else"      b?x:y
 \end{verbatim}
 
     An alternate syntax for the min and max functions  has only a single
     argument which  should be  a  vector value (see  below).  The result
     will be the minimum/maximum element contained within the vector.
 
-    There are three functions that are primarily for use with SAO region
-    files and the  FSAOI  task, but they  can  be  used  directly.  They
-    return  a  boolean true   or  false  depending   on  whether a   two
-    dimensional point is in the region or not:
- 
+    The accum(x) function forms the cumulative sum of x, element by element.
+    Vector columns are supported simply by performing the summation process
+    through all the values.  Null values are treated as 0.  The seqdiff(x)
+    function forms the sequential difference of x, element by element.
+    The first value of seqdiff is the first value of x.  A single null
+    value in x causes a pair of nulls in the output.  The seqdiff and
+    accum functions are functional inverses, i.e., seqdiff(accum(x)) == x
+    as long as no null values are present.
+
+    The  following  type  casting  operators  are  available,  where the
+    inclosing parentheses are required and taken  from  the  C  language
+    usage. Also, the integer to real casts values to double precision:
+
 \begin{verbatim}
-    "point in a circular region"
-          circle(xcntr,ycntr,radius,Xcolumn,Ycolumn)
-
-    "point in an elliptical region"
-         ellipse(xcntr,ycntr,xhlf_wdth,yhlf_wdth,rotation,Xcolumn,Ycolumn)
-
-    "point in a rectangular region"
-             box(xcntr,ycntr,xfll_wdth,yfll_wdth,rotation,Xcolumn,Ycolumn)
-
-    where
-       (xcntr,ycntr) are the (x,y) position of the center of the region
-       (xhlf_wdth,yhlf_wdth) are the (x,y) half widths of the region
-       (xfll_wdth,yfll_wdth) are the (x,y) full widths of the region
-       (radius) is half the diameter of the circle
-       (rotation) is the angle(degrees) that the region is rotated with
-             respect to (xcntr,ycntr)
-       (Xcoord,Ycoord) are the (x,y) coordinates to test, usually column
-             names
-       NOTE: each parameter can itself be an expression, not merely a
-             column name or constant.
+                "real to integer"    (int) x     (INT) x
+                "integer to real"    (float) i   (FLOAT) i
 \end{verbatim}
+
+    In addition, several constants are built in  for  use  in  numerical
+    expressions:
+
+
+\begin{verbatim}
+        #pi              3.1415...      #e             2.7182...
+        #deg             #pi/180        #row           current row number
+        #null         undefined value   #snull         undefined string
+\end{verbatim}
+
+    A  string constant must  be enclosed  in quotes  as in  'Crab'.  The
+    "null" constants  are useful for conditionally  setting table values
+    to a NULL, or undefined, value (eg., "col1==-99 ? \#NULL : col1").
 
     There is also a function for testing if  two  values  are  close  to
     each  other,  i.e.,  if  they are "near" each other to within a user
@@ -7159,7 +7212,7 @@ by a backslash to force the UNIX shell to ignore it.
     integer  or  real  and  represent  the two values who's proximity is
     being tested to be within the specified tolerance, also  an  integer
     or real:
- 
+
 \begin{verbatim}
                     near(value_1, value_2, tolerance)
 \end{verbatim}
@@ -7167,26 +7220,28 @@ by a backslash to force the UNIX shell to ignore it.
     the expression will evaluate to NULL unless the undefined  value  is
     not   actually   required  for  evaluation,  e.g. "TRUE  .or.  NULL"
     evaluates to TRUE. The  following  two  functions  allow  some  NULL
-    detection  and  handling:  ISNULL(x)  and  DEFNULL(x,y).  The former
+    detection  and  handling:
+
+\begin{verbatim}
+         "a null value?"              ISNULL(x)
+         "define a value for null"    DEFNULL(x,y)
+\end{verbatim}
+    The former
     returns a boolean value of TRUE if the  argument  x  is  NULL.   The
     later  "defines"  a  value  to  be  substituted  for NULL values; it
     returns the value of x if x is not NULL, otherwise  it  returns  the
     value of y.
 
-    The  following  type  casting  operators  are  available,  where the
-    inclosing parentheses are required and taken  from  the  C  language
-    usage. Also, the integer to real casts values to double precision:
- 
-\begin{verbatim}
-                "real to integer"    (int) x     (INT) x
-                "integer to real"    (float) i   (FLOAT) i
-\end{verbatim}
+
+
+
+\subsection{Bit Masks}
 
     Bit  masks can be used to select out rows from bit columns (TFORMn =
     \#X) in FITS files. To represent the mask,  binary,  octal,  and  hex
     formats are allowed:
 
- 
+
 \begin{verbatim}
                  binary:   b0110xx1010000101xxxx0001
                  octal:    o720x1 -> (b111010000xxx001)
@@ -7204,7 +7259,7 @@ by a backslash to force the UNIX shell to ignore it.
     all  rows  having  the bit pattern 0010011, the selection expression
     would be:
 
- 
+
 \begin{verbatim}
                             flags == b0010011
     or
@@ -7215,7 +7270,7 @@ by a backslash to force the UNIX shell to ignore it.
     than  equal,  greater  than  and  greater than equal to a particular
     boolean value:
 
- 
+
 \begin{verbatim}
                             flags <= bxxx010xx
                             flags .gt. bxxx100xx
@@ -7233,7 +7288,7 @@ by a backslash to force the UNIX shell to ignore it.
     operators. All of these operators result in a bit  field  which  can
     then be used with the equal operator. For example:
 
- 
+
 \begin{verbatim}
                           (!flags) == b1101100
                           (flags & b1000001) == bx000001
@@ -7242,21 +7297,7 @@ by a backslash to force the UNIX shell to ignore it.
     Bit  fields can be appended as well using the '+' operator.  Strings
     can be concatenated this way, too.
 
-    In addition, several constants are built in  for  use  in  numerical
-    expressions:
 
- 
-\begin{verbatim}
-        #pi              3.1415...      #e             2.7182...
-        #deg             #pi/180        #row           current row number
-        #null         undefined value   #snull         undefined string
-\end{verbatim}
-
-    A  string constant must  be enclosed  in quotes  as in  'Crab'.  The
-    "null" constants  are useful for conditionally  setting table values
-    to a NULL, or undefined, value (eg., "col1==-99 ? \#NULL : col1").
-
- 
 \subsection{Vector Columns}
 
     Vector columns can also be used  in  building  the  expression.   No
@@ -7273,17 +7314,31 @@ by a backslash to force the UNIX shell to ignore it.
     Arithmetic and logical operations are all performed on an element by
     element basis.  Comparing two vector columns,  eg  "COL1  ==  COL2",
     thus  results  in  another vector of boolean values indicating which
-    elements of the two vectors are equal.  Two functions are  available
-    which   operate   on  vectors:  SUM(x)  and  NELEM(x).   The  former
-    literally sums all the elements in x, returning a scalar value.   If
-    x  is  a  boolean  vector,  SUM returns the number of TRUE elements.
-    The latter, NELEM, returns the  number  of  elements  in  vector  x.
-    (NELEM  also  operates  on  bit  and string columns, returning their
-    column widths.)  As an example, to test whether all elements of  two
-    vectors  satisfy  a  given  logical  comparison,  one  can  use  the
-    expression
+    elements of the two vectors are equal.
 
- 
+    Eight functions are available that operate on a vector and return a
+    scalar result:
+
+\begin{verbatim}
+    "minimum"      MIN(V)          "maximum"               MAX(V)
+    "average"      AVERAGE(V)      "median"                MEDIAN(V)
+    "sumation"     SUM(V)          "standard deviation"    STDDEV(V)
+    "# of values"  NELEM(V)        "# of non-null values"  NVALID(V)
+\end{verbatim}
+    where V represents the name of a vector column or a manually
+    constructed vector using curly brackets as described below.  The
+    first 6 of these functions ignore any null values in the vector when
+    computing the result.
+
+    The SUM function literally sums all  the elements in x,  returning a
+    scalar value.   If V  is  a  boolean  vector, SUM returns the number
+    of TRUE elements. The NELEM function  returns the number of elements
+    in vector V whereas NVALID return the number of non-null elements in
+    the  vector.   (NELEM  also  operates  on  bit  and string  columns,
+    returning their column widths.)  As an example, to  test whether all
+    elements of two vectors satisfy a  given logical comparison, one can
+    use the expression
+
 \begin{verbatim}
               SUM( COL1 > COL2 ) == NELEM( COL1 )
 \end{verbatim}
@@ -7328,7 +7383,7 @@ by a backslash to force the UNIX shell to ignore it.
     vectors, will be expanded out with  each of its elements becoming an
     element in the constructed vector.
 
- 
+
 \subsection{Good Time Interval Filtering}
 
     A common filtering method involves selecting rows which have a time
@@ -7342,13 +7397,20 @@ by a backslash to force the UNIX shell to ignore it.
     each row of the input table  and returns TRUE  or FALSE depending
     whether the row is inside or outside the  good time interval.  The
     syntax is
- 
+
 \begin{verbatim}
       gtifilter( [ "gtifile" [, expr [, "STARTCOL", "STOPCOL" ] ] ] )
+    or
+      gtifilter( [ 'gtifile' [, expr [, 'STARTCOL', 'STOPCOL' ] ] ] )
 \end{verbatim}
     where  each "[]" demarks optional parameters.  Note that  the quotes
     around the gtifile and START/STOP column are required.  Either single
-    or double quotes may be used. The gtifile,
+    or double quotes may be used.  In cases where this expression is
+    entered on the Unix command line, enclose the entire expression in
+    double quotes, and then use single quotes within the expression to
+    enclose the 'gtifile' and other terms.  It is also usually possible
+    to do the reverse, and enclose the whole expression in single quotes
+    and then use double quotes within the expression.  The gtifile,
     if specified,  can be blank  ("") which will  mean to use  the first
     extension  with   the name "*GTI*"  in   the current  file,  a plain
     extension  specifier (eg, "+2",  "[2]", or "[STDGTI]") which will be
@@ -7363,7 +7425,7 @@ by a backslash to force the UNIX shell to ignore it.
 
     In  its  simplest form, no parameters need to be provided -- default
     values will be used.  The expression "gtifilter()" is equivalent to
- 
+
 \begin{verbatim}
        gtifilter( "", TIME, "*START*", "*STOP*" )
 \end{verbatim}
@@ -7377,13 +7439,13 @@ by a backslash to force the UNIX shell to ignore it.
     searches   for   TIMEZERO/I/F   keywords  in  the  current  and  GTI
     extensions, applying a relative time offset, if necessary.
 
- 
+
 \subsection{Spatial Region Filtering}
 
     Another common  filtering method selects rows based on whether the
     spatial position associated with each row is located within a given
     2-dimensional region.  The syntax for this high-level filter is
- 
+
 \begin{verbatim}
        regfilter( "regfilename" [ , Xexpr, Yexpr [ , "wcs cols" ] ] )
 \end{verbatim}
@@ -7404,7 +7466,7 @@ by a backslash to force the UNIX shell to ignore it.
     determine if each row is inside or outside the area specified in
     the region file.  Alternate position column names, or expressions,
     may be entered if needed, as in
- 
+
 \begin{verbatim}
         regfilter("region.reg", XPOS, YPOS)
 \end{verbatim}
@@ -7432,7 +7494,7 @@ by a backslash to force the UNIX shell to ignore it.
     generated from this image (in image pixel units) to filter the
     ROSAT events file, then the X and Y column values must be converted
     to corresponding pixel units as in:
- 
+
 \begin{verbatim}
         regfilter("rosat.reg", X/32.+.5, Y/32.+.5)
 \end{verbatim}
@@ -7451,7 +7513,7 @@ by a backslash to force the UNIX shell to ignore it.
     used, otherwise an error will be returned.
 
     These region shapes are supported (names are case insensitive):
- 
+
 \begin{verbatim}
        Point         ( X1, Y1 )               <- One pixel square region
        Line          ( X1, Y1, X2, Y2 )       <- One pixel wide region
@@ -7491,10 +7553,37 @@ by a backslash to force the UNIX shell to ignore it.
     at examples of region file produced by fv/POW or ds9 for further
     details of the region file format.
 
+    There are three functions that are primarily for use with SAO region
+    files and the  FSAOI  task, but they  can  be  used  directly.  They
+    return  a  boolean true   or  false  depending   on  whether a   two
+    dimensional point is in the region or not:
 
- 
+\begin{verbatim}
+    "point in a circular region"
+          circle(xcntr,ycntr,radius,Xcolumn,Ycolumn)
+
+    "point in an elliptical region"
+         ellipse(xcntr,ycntr,xhlf_wdth,yhlf_wdth,rotation,Xcolumn,Ycolumn)
+
+    "point in a rectangular region"
+             box(xcntr,ycntr,xfll_wdth,yfll_wdth,rotation,Xcolumn,Ycolumn)
+
+    where
+       (xcntr,ycntr) are the (x,y) position of the center of the region
+       (xhlf_wdth,yhlf_wdth) are the (x,y) half widths of the region
+       (xfll_wdth,yfll_wdth) are the (x,y) full widths of the region
+       (radius) is half the diameter of the circle
+       (rotation) is the angle(degrees) that the region is rotated with
+             respect to (xcntr,ycntr)
+       (Xcoord,Ycoord) are the (x,y) coordinates to test, usually column
+             names
+       NOTE: each parameter can itself be an expression, not merely a
+             column name or constant.
+\end{verbatim}
+
+
 \subsection{Example Row Filters}
- 
+
 \begin{verbatim}
     [ binary && mag <= 5.0]        - Extract all binary stars brighter
                                      than  fifth magnitude (note that
@@ -7544,7 +7633,7 @@ by a backslash to force the UNIX shell to ignore it.
                                      row in the table.
 \end{verbatim}
 
- 
+
 \section{ Binning or Histogramming Specification}
 
 The optional binning specifier is enclosed in square brackets and can
@@ -7573,7 +7662,7 @@ the image will have a 32-bit floating point data type by default.
 The histogram image may have from 1 to 4 dimensions (axes), depending
 on the number of columns that are specified.  The general form of the
 binning specification is:
- 
+
 \begin{verbatim}
  [bin{bijrd}  Xcol=min:max:binsize, Ycol= ..., Zcol=..., Tcol=...; weight]
 \end{verbatim}
@@ -7584,7 +7673,9 @@ number may be given instead of the name, preceded by a pound sign
 CFITSIO will first try to use the 'preferred column' as specified by
 the CPREF keyword if it exists (e.g., 'CPREF = 'DETX,DETY'), otherwise
 column names 'X', 'Y', 'Z', and 'T' will be assumed for each of the 4
-axes, respectively.
+axes, respectively.  In cases where the column name could be confused
+with an arithmetic expression, enclose the column name in parentheses to
+force the name to be interpreted literally.
 
 Each column name may be followed by an equals sign and then the lower
 and upper range of the histogram, and the size of the histogram bins,
@@ -7597,7 +7688,7 @@ the value of that keyword is substituted into the expression.
 Default values for the min, max and binsize quantities will be
 used if not explicitly given in the binning expression as shown
 in these examples:
- 
+
 \begin{verbatim}
     [bin x = :512:2]  - use default minimum value
     [bin x = 1::2]    - use default maximum value
@@ -7620,7 +7711,7 @@ A shortcut notation is allowed if all the columns/axes have the same
 binning specification.  In this case all the column names may be listed
 within parentheses, followed by the (single) binning specification, as
 in:
- 
+
 \begin{verbatim}
     [bin (X,Y)=1:512:2]
     [bin (X,Y) = 5]
@@ -7652,7 +7743,7 @@ ignored and may be used to add comments into the file.
 
  Examples:
 
- 
+
 \begin{verbatim}
     [bini detx, dety]                - 2-D, 16-bit integer histogram
                                        of DETX and DETY columns, using
@@ -7692,12 +7783,12 @@ template file may also be an ASCII text file, where each line (in
 general) describes one FITS keyword record.  The format of the ASCII
 template file is described in the following sections.
 
- 
+
 \section{Detailed Template Line Format}
 
 The format of each ASCII template line closely follows the format of a
 FITS keyword record:
- 
+
 \begin{verbatim}
   KEYWORD = KEYVALUE / COMMENT
 \end{verbatim}
@@ -7732,7 +7823,7 @@ that will fit in a single FITS keyword record) are permitted using the
 CFITSIO long string convention. They can either be specified as a
 single long line in the template, or by using multiple lines where the
 continuing lines contain the 'CONTINUE' keyword, as in this example:
- 
+
 \begin{verbatim}
   LONGKEY = 'This is a long string value that is contin&'
   CONTINUE  'ued over 2 records' / comment field goes here
@@ -7760,7 +7851,7 @@ starting with the first extension following the Primary HDU.
 previous HDU will be closed at this point and processing of the next
 extension begins.
 
- 
+
 \section{Auto-indexing of Keywords}
 
 If a template keyword name ends with a "\#" character, it is said to be
@@ -7772,7 +7863,7 @@ FIRST indexed keyword in each template HDU definition is used as the
 cause the index value to be incremented.  This behavior can be rather
 subtle, as illustrated in the following examples in which the TTYPE
 keyword is the incrementor in both cases:
- 
+
 \begin{verbatim}
   TTYPE# = TIME
   TFORM# = 1D
@@ -7781,7 +7872,7 @@ keyword is the incrementor in both cases:
 \end{verbatim}
 will create TTYPE1, TFORM1, TTYPE2, and TFORM2 keywords.  But if the
 template looks like,
- 
+
 \begin{verbatim}
   TTYPE# = TIME
   TTYPE# = RATE
@@ -7791,7 +7882,7 @@ template looks like,
 this results in a FITS files with  TTYPE1, TTYPE2, TFORM2, and TFORM2,
 which is probably not what was intended!
 
- 
+
 \section{Template Parser Directives}
 
 In addition to the template lines which define individual keywords, the
@@ -7811,7 +7902,7 @@ Each GROUP contains 0 or more member blocks (HDUs or GROUPs). Member
 blocks of type GROUP can contain their own member blocks. The GROUP
 definition itself occupies one FITS file HDU of special type (GROUP
 HDU), so if a template specifies 1 group with 1 member HDU like:
- 
+
 \begin{verbatim}
 \group
 grpdescr = 'demo'
@@ -7820,7 +7911,7 @@ xtension bintable
 \end
 \end{verbatim}
 then the parser creates a FITS file with 3 HDUs :
- 
+
 \begin{verbatim}
 1) dummy PHDU
 2) GROUP HDU (has 1 member, which is bintable in HDU number 3)
@@ -7833,11 +7924,11 @@ can define additional columns in a GROUP HDU using TFORMn and TTYPEn
 For a more complicated example of a template file using the group directives,
 look at the sample.tpl file that is included in the CFITSIO distribution.
 
- 
+
 \section{Formal Template Syntax}
 
 The template syntax can formally be defined as follows:
- 
+
 \begin{verbatim}
     TEMPLATE = BLOCK [ BLOCK ... ]
 
@@ -7859,7 +7950,7 @@ can be either HDU (Header Data Unit) or a GROUP. For each block the parser
 creates 1 (or more for GROUPs) FITS file HDUs.
 
 
- 
+
 \section{Errors}
 
 In general the fits\_execute\_template() function tries to be as atomic
@@ -7869,12 +7960,12 @@ will (try to) delete the top level BLOCK (with all its children if any)
 in which the error occurred, then it will stop reading the template file
 and it will return with an error.
 
- 
+
 \section{Examples}
 
 1. This template file will create a 200 x 300 pixel image, with 4-byte
 integer pixel values, in the primary HDU:
- 
+
 \begin{verbatim}
   SIMPLE = T
   BITPIX = 32
@@ -7892,7 +7983,7 @@ XTENSION = TABLE or BINTABLE to define whether it is an ASCII or binary
 table, and NAXIS2 to define the number of rows in the table.  Two
 template lines are then needed to define the name (TTYPEn) and FITS data
 format (TFORMn) of the columns, as in this example:
- 
+
 \begin{verbatim}
   xtension = bintable
   naxis2 = 40
@@ -7925,7 +8016,7 @@ Programmers should be cautious about using these features, especially
 if the FITS files that are produced are expected to be processed by
 other software systems which do not use the CFITSIO interface.
 
- 
+
 \section{64-Bit Long Integers}
 
 CFITSIO can read and write FITS images or table columns containing
@@ -7956,7 +8047,7 @@ the 64-bit double data type is probably the most useful in this case.
 It only provides about 52-bits of precision in the mantissa, however,
 so some lose of precision is possible.
 
- 
+
 \section{Long String Keyword Values.}
 
 The length of a standard FITS string keyword is limited to 68
@@ -7971,7 +8062,7 @@ in column 9. The string value may be continued in this way over as many
 additional CONTINUE keywords as is required.  The following lines
 illustrate this continuation convention which is used in the value of
 the STRKEY keyword:
- 
+
 \begin{verbatim}
 LONGSTRN= 'OGIP 1.0'    / The OGIP Long String Convention may be used.
 STRKEY  = 'This is a very long string keyword&'  / Optional Comment
@@ -7986,7 +8077,7 @@ already exist.
 
 This long string convention is supported by the following CFITSIO
 routines:
- 
+
 \begin{verbatim}
     fits_write_key_longstr  - write a long string keyword value
     fits_insert_key_longstr - insert a long string keyword value
@@ -8005,7 +8096,7 @@ when it is no longer needed.
 
 The following 2 routines also have limited support for this long string
 convention,
- 
+
 \begin{verbatim}
       fits_modify_key_str - modify an existing string keyword value
       fits_update_key_str - update a string keyword value
@@ -8024,7 +8115,7 @@ fits\_write\_key\_longstr routine must be called instead to write long
 strings.  This routine can also be used to write ordinary string values
 less than 68 characters in length.
 
- 
+
 \section{Arrays of Fixed-Length Strings in Binary Tables}
 
 The definition of the FITS binary table extension format does not
@@ -8050,7 +8141,7 @@ character column (with the form 'rA:SSTRw/nnn)'.  This appendix was not
 officially voted on by the IAU and hence is still provisional.  CFITSIO
 does not currently support this proposal.
 
- 
+
 \section{Keyword Units Strings}
 
 One limitation of the current FITS Standard is that it does not define
@@ -8068,7 +8159,7 @@ immediately follows the slash '/' comment field delimiter and a single
 space character.  The following examples illustrate keywords that use
 this convention:
 
- 
+
 \begin{verbatim}
 EXPOSURE=               1800.0 / [s] elapsed exposure time
 V_HELIO =                16.23 / [km s**(-1)] heliocentric velocity
@@ -8084,7 +8175,7 @@ The fits\_read\_key\_unit and fits\_write\_key\_unit routines in
 CFITSIO read and write, respectively, the keyword unit strings in an
 existing keyword.
 
- 
+
 \section{HIERARCH Convention for Extended Keyword Names}
 
 CFITSIO supports the HIERARCH keyword convention which allows keyword
@@ -8092,7 +8183,7 @@ names that are longer then 8 characters and may contain the full range
 of printable ASCII text characters.  This convention
 was developed at the European Southern Observatory (ESO)  to support
 hierarchical FITS keyword such as:
- 
+
 \begin{verbatim}
 HIERARCH ESO INS FOCU POS = -0.00002500 / Focus position
 \end{verbatim}
@@ -8109,7 +8200,7 @@ HIERARCH).
 This convention allows a much broader range of keyword names
 than is allowed by the FITS Standard.  Here are more examples
 of such keywords:
- 
+
 \begin{verbatim}
 HIERARCH LongKeyword = 47.5 / Keyword has > 8 characters, and mixed case
 HIERARCH XTE$TEMP = 98.6 / Keyword contains the '$' character
@@ -8138,7 +8229,7 @@ keyword.  The current implementation allows any ASCII text character
 (ASCII 32 to ASCII 126) in the keyword name except for the '='
 character.  A space is also required on either side of the equal sign.
 
- 
+
 \section{Tile-Compressed Image Format}
 
 CFITSIO supports a convention for compressing n-dimensional images and
@@ -8190,7 +8281,7 @@ internally manages the data I/O and describes some strategies that may
 be used to optimize the processing speed of software that uses
 CFITSIO.
 
- 
+
 \section{How CFITSIO Manages Data I/O}
 
 Many CFITSIO operations involve transferring only a small number of
@@ -8245,7 +8336,7 @@ being read then flushed from a IO buffer multiple times.
 The following section gives more specific suggestions for optimizing
 the use of CFITSIO.
 
- 
+
 \section{Optimization Strategies}
 
 1.  When dealing with a FITS primary array or IMAGE extension, it is
@@ -8424,6 +8515,7 @@ fits\_copy\_hdu       & \pageref{ffcopy} \\
 fits\_copy\_header    & \pageref{ffcphd} \\
 fits\_copy\_key           & \pageref{ffcpky} \\
 fits\_copy\_member    & \pageref{ffgmcp} \\
+fits\_create\_diskfile    & \pageref{ffinit} \\
 fits\_create\_file    & \pageref{ffinit} \\
 fits\_create\_group  & \pageref{ffgtcr} \\
 fits\_create\_hdu     & \pageref{ffcrhd} \\
@@ -8434,9 +8526,10 @@ fits\_create\_template & \pageref{fftplt} \\
 fits\_date2str  & \pageref{ffdt2s} \\
 fits\_decode\_chksum  & \pageref{ffdsum} \\
 fits\_decode\_tdim    & \pageref{ffdtdm} \\
-fits\_delete\_col   & \pageref{ffdcol} \\
+
 \end{tabular}
 \begin{tabular}{lr}
+fits\_delete\_col   & \pageref{ffdcol} \\
 fits\_delete\_file    & \pageref{ffdelt} \\
 fits\_delete\_hdu     & \pageref{ffdhdu} \\
 fits\_delete\_key     & \pageref{ffdkey} \\
@@ -8445,6 +8538,7 @@ fits\_delete\_rowlist & \pageref{ffdrws} \\
 fits\_delete\_rowrange & \pageref{ffdrrg} \\
 fits\_delete\_rows  & \pageref{ffdrow} \\
 fits\_encode\_chksum  & \pageref{ffesum} \\
+fits\_file\_exists    & \pageref{ffexist} \\
 fits\_file\_mode      & \pageref{ffflmd} \\
 fits\_file\_name      & \pageref{ffflnm} \\
 fits\_find\_first\_row    & \pageref{ffffrw} \\
@@ -8467,10 +8561,10 @@ fits\_get\_hdrspace      & \pageref{ffghsp} \\
 fits\_get\_hdu\_num    & \pageref{ffghdn} \\
 fits\_get\_hdu\_type   & \pageref{ffghdt} \\
 fits\_get\_hduaddr    & \pageref{ffghad} \\
-fits\_get\_hduoff    & \pageref{ffghad} \\
-fits\_get\_img\_dim & \pageref{ffgidm} \\
 \end{tabular}
 \begin{tabular}{lr}
+fits\_get\_hduoff    & \pageref{ffghad} \\
+fits\_get\_img\_dim & \pageref{ffgidm} \\
 fits\_get\_img\_equivtype & \pageref{ffgidt} \\
 fits\_get\_img\_param & \pageref{ffgipr} \\
 fits\_get\_img\_size & \pageref{ffgisz} \\
@@ -8501,11 +8595,11 @@ fits\_insert\_key\_TYP    & \pageref{ffikyx} \\
 fits\_insert\_record     & \pageref{ffirec} \\
 fits\_insert\_rows  & \pageref{ffirow} \\
 fits\_iterate\_data   & \pageref{ffiter} \\
-fits\_make\_keyn      & \pageref{ffkeyn} \\
-fits\_make\_nkey      & \pageref{ffnkey} \\
 \end{tabular}
 \newpage
 \begin{tabular}{lr}
+fits\_make\_keyn      & \pageref{ffkeyn} \\
+fits\_make\_nkey      & \pageref{ffnkey} \\
 fits\_merge\_groups  & \pageref{ffgtmg} \\
 fits\_modify\_card       & \pageref{ffmcrd} \\
 fits\_modify\_comment    & \pageref{ffmcom} \\
@@ -8519,6 +8613,7 @@ fits\_movnam\_hdu     & \pageref{ffmnhd} \\
 fits\_movrel\_hdu     & \pageref{ffmrhd} \\
 fits\_null\_check     & \pageref{ffnchk} \\
 fits\_open\_data      & \pageref{ffopen} \\
+fits\_open\_diskfile    & \pageref{ffopen} \\
 fits\_open\_file      & \pageref{ffopen} \\
 fits\_open\_image      & \pageref{ffopen} \\
 fits\_open\_table      & \pageref{ffopen} \\
@@ -8550,11 +8645,12 @@ fits\_read\_img         & \pageref{ffgpv} \\
 fits\_read\_img\_coord & \pageref{ffgics} \\
 fits\_read\_img\_TYP     & \pageref{ffgpvx} \\
 fits\_read\_imghdr       & \pageref{ffghpr} \\
+
+\end{tabular}
+\begin{tabular}{lr}
 fits\_read\_imgnull & \pageref{ffgpf} \\
 fits\_read\_imgnull\_TYP & \pageref{ffgpfx} \\
 fits\_read\_key          & \pageref{ffgky} \\
-\end{tabular}
-\begin{tabular}{lr}
 fits\_read\_key\_longstr  & \pageref{ffgkls} \\
 fits\_read\_key\_triple   & \pageref{ffgkyt} \\
 fits\_read\_key\_unit     & \pageref{ffgunt} \\
@@ -8600,10 +8696,11 @@ fits\_update\_chksum  & \pageref{ffupck} \\
 fits\_update\_key        & \pageref{ffuky} \\
 fits\_update\_key\_null   & \pageref{ffukyu} \\
 fits\_update\_key\_TYP    & \pageref{ffukyx} \\
-fits\_uppercase      & \pageref{ffupch} \\
-fits\_url\_type      & \pageref{ffurlt} \\
 \end{tabular}
 \begin{tabular}{lr}
+
+fits\_uppercase      & \pageref{ffupch} \\
+fits\_url\_type      & \pageref{ffurlt} \\
 fits\_verify\_chksum  & \pageref{ffvcks} \\
 fits\_verify\_group  & \pageref{ffgtvf} \\
 fits\_world\_to\_pix & \pageref{ffxypx} \\
@@ -8677,6 +8774,8 @@ ffdcol   & \pageref{ffdcol} \\
 ffdelt    & \pageref{ffdelt} \\
 ffdhdu     & \pageref{ffdhdu} \\
 ffdkey     & \pageref{ffdkey} \\
+ffdkinit  & \pageref{ffinit} \\
+ffdkopen      & \pageref{ffopen} \\
 ffdopn      & \pageref{ffopen} \\
 ffdrec  & \pageref{ffdrec} \\
 ffdrow  & \pageref{ffdrow} \\
@@ -8688,6 +8787,7 @@ ffdtdm   & \pageref{ffdtdm} \\
 ffdtyp    & \pageref{ffdtyp} \\
 ffeqty    & \pageref{ffgtcl} \\
 ffesum  & \pageref{ffesum} \\
+ffexest  & \pageref{ffexist} \\
 ffextn   & \pageref{ffextn} \\
 ffffrw    & \pageref{ffffrw} \\
 ffflmd      & \pageref{ffflmd} \\
@@ -8698,11 +8798,11 @@ fffrow    & \pageref{fffrow} \\
 ffg2d\_      & \pageref{ffg2dx} \\
 ffg3d\_      & \pageref{ffg3dx} \\
 ffgabc      & \pageref{ffgabc} \\
+\end{tabular}
+\begin{tabular}{lr}
 ffgacl  & \pageref{ffgacl} \\
 ffgbcl  & \pageref{ffgbcl} \\
 ffgcdw  & \pageref{ffgcdw} \\
-\end{tabular}
-\begin{tabular}{lr}
 ffgcf    & \pageref{ffgcf} \\
 ffgcf\_    & \pageref{ffgcfx} \\
 ffgcks     & \pageref{ffgcks} \\
@@ -8747,11 +8847,12 @@ ffgmrm   & \pageref{ffgmrm} \\
 ffgmsg    & \pageref{ffgmsg} \\
 ffgmtf  & \pageref{ffgmtf} \\
 ffgncl     & \pageref{ffgnrw} \\
+
+\end{tabular}
+\begin{tabular}{lr}
 ffgnrw     & \pageref{ffgnrw} \\
 ffgnxk      & \pageref{ffgnxk} \\
 ffgpf & \pageref{ffgpf} \\
-\end{tabular}
-\begin{tabular}{lr}
 ffgpf\_ & \pageref{ffgpfx} \\
 ffgpv         & \pageref{ffgpv} \\
 ffgpv\_     & \pageref{ffgpvx} \\
@@ -8796,11 +8897,12 @@ ffirow  & \pageref{ffirow} \\
 ffitab    & \pageref{ffitab} \\
 ffiter   & \pageref{ffiter} \\
 ffiurl & \pageref{ffiurl} \\
+
+\end{tabular}
+\begin{tabular}{lr}
 ffkeyn      & \pageref{ffkeyn} \\
 ffmahd     & \pageref{ffmahd} \\
 ffmcom    & \pageref{ffmcom} \\
-\end{tabular}
-\begin{tabular}{lr}
 ffmcrd       & \pageref{ffmcrd} \\
 ffmkls    & \pageref{ffmkyx} \\
 ffmkyu   & \pageref{ffmkyu} \\
@@ -8845,11 +8947,12 @@ ffpmsg   & \pageref{ffpmsg} \\
 ffpnul    & \pageref{ffpnul} \\
 ffppn     & \pageref{ffppn} \\
 ffppn\_ & \pageref{ffppnx} \\
+
+\end{tabular}
+\begin{tabular}{lr}
 ffppr        & \pageref{ffppr} \\
 ffpprn & \pageref{ffpprn} \\
 ffppru & \pageref{ffppru} \\
-\end{tabular}
-\begin{tabular}{lr}
 ffppr\_    & \pageref{ffpprx} \\
 ffppx & \pageref{ffppx} \\
 ffppxn & \pageref{ffppxn} \\
@@ -8899,7 +9002,7 @@ ffxypx & \pageref{ffxypx} \\
 
 
 \chapter{Parameter Definitions }
- 
+
 \begin{verbatim}
 anynul   - set to TRUE (=1) if any returned values are undefined, else FALSE
 array    - array of numerical data values to read or write
@@ -8965,6 +9068,7 @@ err_text - error message string corresponding to error number (30 chars max)
 exact    - TRUE (=1) if the strings match exactly;
            FALSE (=0) if wildcards are used
 exclist  - array of pointers to keyword names to be excluded from search
+exists   - flag indicating whether the file or compressed file exists on disk
 expr     - boolean or arithmetic expression
 extend   - TRUE (=1) if FITS file may have extensions, else FALSE (=0)
 extname  - value of the EXTNAME keyword (null-terminated)
@@ -9153,7 +9257,7 @@ The following table lists all the error status codes used by CFITSIO.
 Programmers are encouraged to use the symbolic mnemonics (defined in
 the file fitsio.h) rather than the actual integer status values to
 improve the readability of their code.
- 
+
 \begin{verbatim}
  Symbolic Const    Value     Meaning
  --------------    -----  -----------------------------------------

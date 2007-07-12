@@ -32,7 +32,7 @@
 \medskip
 \medskip
 \begin{center}
-{\Large Version 2.4\\}
+{\Large Version 2.5\\}
 \end{center}
 \bigskip
 \vskip 2.5cm
@@ -47,7 +47,7 @@ USA}
 \vfill
 \bigskip
 \begin{center}
-{\Large January 2004\\}
+{\Large July 2004\\}
 \end{center}
 \vfill
 \end{titlepage}
@@ -112,23 +112,12 @@ package should be sent to the primary author:
 \end{verbatim}
 This User's Guide assumes that readers already have a general
 understanding of the definition and structure of FITS format files.
-Further information about FITS formats is available in the `FITS User's
-Guide' and the `NOST FITS Standard', which are available from the NASA
-Science Office of Standards and Technology at the address given below.
-Both of these documents are available electronically from their Web
-site and via anonymous ftp at nssdc.gsfc.nasa.gov in the /pub/fits
-directory. Any questions about FITS formats should be directed to the
-NOST, at:
+Further information about FITS formats is available from the FITS Support
+Office at {\tt http://fits.gsfc.nasa.gov}.  In particular, the
+'NOST FITS Standard' gives the authoritative definition of the FITS data
+format, and the  `FITS User's Guide' provides additional historical background
+and practical advice on using FITS files.
 
-\begin{verbatim}
-        NASA, Science Office of Standards and Technology
-        Code 633.2,
-        Goddard Space Flight Center
-        Greenbelt MD 20771, USA
-        WWW: http://fits.gsfc.nasa.gov/
-        E-mail: fits@fits.gsfc.nasa.gov
-        (301) 286-2899
-\end{verbatim}
 CFITSIO users may also be interested in the FTOOLS package of programs
 that can be used to manipulate and analyze FITS format files.
 Information about FTOOLS can be obtained on the Web or via anonymous
@@ -151,14 +140,47 @@ source files (*.c) and header files (*.h). On VAX/VMS systems 2
 assembly-code files (vmsieeed.mar and vmsieeer.mar) are also needed.
 
 The Fortran interface subroutines to the C CFITSIO routines are located
-in the f77\_wrap1.c and f77\_wrap2.c files.  These are relatively simple
+in the f77\_wrap1.c, through f77\_wrap4.c files.  These are relatively simple
 'wrappers' that translate the arguments in the Fortran subroutine into
 the appropriate format for the corresponding C routine.  This
 translation is performed transparently to the user by a set of C macros
 located in the cfortran.h file.  Unfortunately cfortran.h does not
 support every combination of C and Fortran compilers so the Fortran
-interface is not supported on all platforms.  This is especially true
-for PC and Mac users (see further notes below).
+interface is not supported on all platforms. (see further notes below).
+
+A standard combination of C and Fortran compilers will be assumed by
+default, but one may also specify a particular Fortran compiler by
+doing:
+
+\begin{verbatim}
+ >  setenv CFLAGS -DcompilerName=1
+\end{verbatim}
+(where 'compilerName' is the name of the compiler) before running
+the configure command.  The currently recognized compiler
+names are:
+
+\begin{verbatim}
+ g77Fortran
+ IBMR2Fortran
+ CLIPPERFortran
+ pgiFortran
+ NAGf90Fortran
+ f2cFortran
+ hpuxFortran
+ apolloFortran
+ sunFortran
+ CRAYFortran
+ mipsFortran
+ DECFortran
+ vmsFortran
+ CONVEXFortran
+ PowerStationFortran
+ AbsoftUNIXFortran
+ AbsoftProFortran
+ SXFortran
+\end{verbatim}
+Alternatively, one may edit the CFLAGS line in the Makefile to add the
+'-DcompilerName' flag after running the './configure' command.
 
 The CFITSIO library is built on Unix systems by typing:
 
@@ -249,8 +271,8 @@ these dll libraries.  If these libraries do not work with a particular
 Fortran compiler, then there are 2 possible solutions.  The first
 solution would be to modify the file cfortran.h for that particular
 combination of C and Fortran compilers, and then rebuild the CFITSIO
-dll library.  This will require, however, a great deal of expertise in
-mixed language programming which the author of CFITSIO cannot provide.
+dll library.  This will require, however, a some expertise in
+mixed language programming.
 The other solution is to use the older v5.03 Fortran-77 implementation
 of FITSIO that is still available from the FITSIO web-site.  This
 version is no longer supported, but it does provide the basic functions
@@ -549,7 +571,9 @@ then wrote the parsing routines used by CFITSIO based on Lammers'
 design, combined with other techniques such as the CFITSIO iterator
 routine to further enhance the data processing throughput.  This effort
 also benefited from a much earlier lexical parsing routine that was
-developed by Kent Blackburn (NASA/GSFC).
+developed by Kent Blackburn (NASA/GSFC). More recently, Craig Markwardt
+(NASA/GSFC) implemented additional functions (median, average, stddev)
+and other enhancements to the lexical parser.
 
 The CFITSIO iterator function is loosely based on similar ideas
 developed for the XMM Data Access Layer.
@@ -697,8 +721,9 @@ TFORMn -- the datatype of the column
 TUNITn -- the physical units of the column (optional)
 \end{itemize}
 
-Users should refer to the NOST documentation for more details about the
-required keywords and their allowed values.
+Users should refer to the FITS Support Office at {\tt http://fits.gsfc.nasa.gov}
+for futher information about the FITS format and related software
+packages.
 
 
 \chapter{  Extended File Name Syntax }
@@ -1599,7 +1624,9 @@ by a backslash to force the UNIX shell to ignore it.
     The expression may  also include arithmetic operators and functions.
     Trigonometric  functions use  radians,  not degrees.  The  following
     arithmetic  operators and  functions  can be  used in the expression
-    (function names are case insensitive):
+    (function names are case insensitive). A null value will be returned
+    in case of illegal operations such as divide by zero, sqrt(negative)
+    log(negative), log10(negative), arccos(.gt. 1), arcsin(.gt. 1).
 
 
 \begin{verbatim}
@@ -1610,10 +1637,14 @@ by a backslash to force the UNIX shell to ignore it.
     "sine"               sin(x)     "tangent"              tan(x)
     "arc cosine"         arccos(x)  "arc sine"             arcsin(x)
     "arc tangent"        arctan(x)  "arc tangent"          arctan2(x,y)
+    "hyperbolic cos"     cosh(x)    "hyperbolic sin"       sinh(x)
+    "hyperbolic tan"     tanh(x)    "round to nearest int" round(x)
+    "round down to int"  floor(x)   "round up to int"      ceil(x)
     "exponential"        exp(x)     "square root"          sqrt(x)
     "natural log"        log(x)     "common log"           log10(x)
     "modulus"            i % j      "random # [0.0,1.0)"   random()
     "minimum"            min(x,y)   "maximum"              max(x,y)
+    "cumulative sum"    accum(x)   "sequential difference" seqdiff(x)
     "if-then-else"       b?x:y
 \end{verbatim}
 
@@ -1621,33 +1652,37 @@ by a backslash to force the UNIX shell to ignore it.
     argument which  should be  a  vector value (see  below).  The result
     will be the minimum/maximum element contained within the vector.
 
-    There are three functions that are primarily for use with SAO region
-    files and the  FSAOI  task, but they  can  be  used  directly.  They
-    return  a  boolean true   or  false  depending   on  whether a   two
-    dimensional point is in the region or not:
+    The accum(x) function forms the cumulative sum of x, element by element.
+    Vector columns are supported simply by performing the summation process
+    through all the values.  Null values are treated as 0.  The seqdiff(x)
+    function forms the sequential difference of x, element by element.
+    The first value of seqdiff is the first value of x.  A single null
+    value in x causes a pair of nulls in the output.  The seqdiff and
+    accum functions are functional inverses, i.e., seqdiff(accum(x)) == x
+    as long as no null values are present.
+
+    The  following  type  casting  operators  are  available,  where the
+    inclosing parentheses are required and taken  from  the  C  language
+    usage. Also, the integer to real casts values to double precision:
 
 \begin{verbatim}
-    "point in a circular region"
-          circle(xcntr,ycntr,radius,Xcolumn,Ycolumn)
-
-    "point in an elliptical region"
-         ellipse(xcntr,ycntr,xhlf_wdth,yhlf_wdth,rotation,Xcolumn,Ycolumn)
-
-    "point in a rectangular region"
-             box(xcntr,ycntr,xfll_wdth,yfll_wdth,rotation,Xcolumn,Ycolumn)
-
-    where
-       (xcntr,ycntr) are the (x,y) position of the center of the region
-       (xhlf_wdth,yhlf_wdth) are the (x,y) half widths of the region
-       (xfll_wdth,yfll_wdth) are the (x,y) full widths of the region
-       (radius) is half the diameter of the circle
-       (rotation) is the angle(degrees) that the region is rotated with
-             respect to (xcntr,ycntr)
-       (Xcoord,Ycoord) are the (x,y) coordinates to test, usually column
-             names
-       NOTE: each parameter can itself be an expression, not merely a
-             column name or constant.
+                "real to integer"    (int) x     (INT) x
+                "integer to real"    (float) i   (FLOAT) i
 \end{verbatim}
+
+    In addition, several constants are built in  for  use  in  numerical
+    expressions:
+
+
+\begin{verbatim}
+        #pi              3.1415...      #e             2.7182...
+        #deg             #pi/180        #row           current row number
+        #null         undefined value   #snull         undefined string
+\end{verbatim}
+
+    A  string constant must  be enclosed  in quotes  as in  'Crab'.  The
+    "null" constants  are useful for conditionally  setting table values
+    to a NULL, or undefined, value (eg., "col1==-99 ? \#NULL : col1").
 
     There is also a function for testing if  two  values  are  close  to
     each  other,  i.e.,  if  they are "near" each other to within a user
@@ -1663,20 +1698,20 @@ by a backslash to force the UNIX shell to ignore it.
     the expression will evaluate to NULL unless the undefined  value  is
     not   actually   required  for  evaluation,  e.g. "TRUE  .or.  NULL"
     evaluates to TRUE. The  following  two  functions  allow  some  NULL
-    detection  and  handling:  ISNULL(x)  and  DEFNULL(x,y).  The former
+    detection  and  handling:
+
+\begin{verbatim}
+         "a null value?"              ISNULL(x)
+         "define a value for null"    DEFNULL(x,y)
+\end{verbatim}
+    The former
     returns a boolean value of TRUE if the  argument  x  is  NULL.   The
     later  "defines"  a  value  to  be  substituted  for NULL values; it
     returns the value of x if x is not NULL, otherwise  it  returns  the
     value of y.
 
-    The  following  type  casting  operators  are  available,  where the
-    inclosing parentheses are required and taken  from  the  C  language
-    usage. Also, the integer to real casts values to double precision:
 
-\begin{verbatim}
-                "real to integer"    (int) x     (INT) x
-                "integer to real"    (float) i   (FLOAT) i
-\end{verbatim}
+\subsection{Bit Masks}
 
     Bit  masks can be used to select out rows from bit columns (TFORMn =
     \#X) in FITS files. To represent the mask,  binary,  octal,  and  hex
@@ -1738,20 +1773,6 @@ by a backslash to force the UNIX shell to ignore it.
     Bit  fields can be appended as well using the '+' operator.  Strings
     can be concatenated this way, too.
 
-    In addition, several constants are built in  for  use  in  numerical
-    expressions:
-
-
-\begin{verbatim}
-        #pi              3.1415...      #e             2.7182...
-        #deg             #pi/180        #row           current row number
-        #null         undefined value   #snull         undefined string
-\end{verbatim}
-
-    A  string constant must  be enclosed  in quotes  as in  'Crab'.  The
-    "null" constants  are useful for conditionally  setting table values
-    to a NULL, or undefined, value (eg., "col1==-99 ? \#NULL : col1").
-
 
 \subsection{Vector Columns}
 
@@ -1769,16 +1790,30 @@ by a backslash to force the UNIX shell to ignore it.
     Arithmetic and logical operations are all performed on an element by
     element basis.  Comparing two vector columns,  eg  "COL1  ==  COL2",
     thus  results  in  another vector of boolean values indicating which
-    elements of the two vectors are equal.  Two functions are  available
-    which   operate   on  vectors:  SUM(x)  and  NELEM(x).   The  former
-    literally sums all the elements in x, returning a scalar value.   If
-    x  is  a  boolean  vector,  SUM returns the number of TRUE elements.
-    The latter, NELEM, returns the  number  of  elements  in  vector  x.
-    (NELEM  also  operates  on  bit  and string columns, returning their
-    column widths.)  As an example, to test whether all elements of  two
-    vectors  satisfy  a  given  logical  comparison,  one  can  use  the
-    expression
+    elements of the two vectors are equal.
 
+    Eight functions are available that operate on a vector and return a
+    scalar result:
+
+\begin{verbatim}
+    "minimum"      MIN(V)          "maximum"               MAX(V)
+    "average"      AVERAGE(V)      "median"                MEDIAN(V)
+    "sumation"     SUM(V)          "standard deviation"    STDDEV(V)
+    "# of values"  NELEM(V)        "# of non-null values"  NVALID(V)
+\end{verbatim}
+    where V represents the name of a vector column or a manually
+    constructed vector using curly brackets as described below.  The
+    first 6 of these functions ignore any null values in the vector when
+    computing the result.
+
+    The SUM function literally sums all  the elements in x,  returning a
+    scalar value.   If x  is  a  boolean  vector, SUM returns the number
+    of TRUE elements. The NELEM function  returns the number of elements
+    in vector x whereas NVALID return the number of non-null elements in
+    the  vector.   (NELEM  also  operates  on  bit  and string  columns,
+    returning their column widths.)  As an example, to  test whether all
+    elements of two vectors satisfy a  given logical comparison, one can
+    use the expression
 
 \begin{verbatim}
               SUM( COL1 > COL2 ) == NELEM( COL1 )
@@ -1843,7 +1878,13 @@ by a backslash to force the UNIX shell to ignore it.
       gtifilter( [ "gtifile" [, expr [, "STARTCOL", "STOPCOL" ] ] ] )
 \end{verbatim}
     where  each "[]" demarks optional parameters.  Note that  the quotes
-    around the gtifile and START/STOP column are required.  The gtifile,
+    around the gtifile and START/STOP column are required.  Either single
+    or double quotes may be used.  In cases where this expression is
+    entered on the Unix command line, enclose the entire expression in
+    double quotes, and then use single quotes within the expression to
+    enclose the 'gtifile' and other terms.  It is also usually possible
+    to do the reverse, and enclose the whole expression in single quotes
+    and then use double quotes within the expression.  The gtifile,
     if specified,  can be blank  ("") which will  mean to use  the first
     extension  with   the name "*GTI*"  in   the current  file,  a plain
     extension  specifier (eg, "+2",  "[2]", or "[STDGTI]") which will be
@@ -1986,6 +2027,33 @@ by a backslash to force the UNIX shell to ignore it.
     at examples of region file produced by fv/POW or ds9 for further
     details of the region file format.
 
+    There are three functions that are primarily for use with SAO region
+    files and the  FSAOI  task, but they  can  be  used  directly.  They
+    return  a  boolean true   or  false  depending   on  whether a   two
+    dimensional point is in the region or not:
+
+\begin{verbatim}
+    "point in a circular region"
+          circle(xcntr,ycntr,radius,Xcolumn,Ycolumn)
+
+    "point in an elliptical region"
+         ellipse(xcntr,ycntr,xhlf_wdth,yhlf_wdth,rotation,Xcolumn,Ycolumn)
+
+    "point in a rectangular region"
+             box(xcntr,ycntr,xfll_wdth,yfll_wdth,rotation,Xcolumn,Ycolumn)
+
+    where
+       (xcntr,ycntr) are the (x,y) position of the center of the region
+       (xhlf_wdth,yhlf_wdth) are the (x,y) half widths of the region
+       (xfll_wdth,yfll_wdth) are the (x,y) full widths of the region
+       (radius) is half the diameter of the circle
+       (rotation) is the angle(degrees) that the region is rotated with
+             respect to (xcntr,ycntr)
+       (Xcoord,Ycoord) are the (x,y) coordinates to test, usually column
+             names
+       NOTE: each parameter can itself be an expression, not merely a
+             column name or constant.
+\end{verbatim}
 
 
 \subsection{Example Row Filters}
@@ -2079,7 +2147,9 @@ number may be given instead of the name, preceded by a pound sign
 CFITSIO will first try to use the 'preferred column' as specified by
 the CPREF keyword if it exists (e.g., 'CPREF = 'DETX,DETY'), otherwise
 column names 'X', 'Y', 'Z', and 'T' will be assumed for each of the 4
-axes, respectively.
+axes, respectively.  In cases where the column name could be confused
+with an arithmetic expression, enclose the column name in parentheses to
+force the name to be interpreted literally.
 
 Each column name may be followed by an equals sign and then the lower
 and upper range of the histogram, and the size of the histogram bins,
@@ -2440,23 +2510,24 @@ records that have been read or written in the FITS files.  If the number
 of opened files is greater than NIOBUF, then CFITSIO may waste more time
 flushing and re-reading or re-writing the same records in the FITS files.
 
-2.  By default, CFITSIO can handle FITS files up to 2.1 GB in size
-(2**31 bytes).  This file size limit is often imposed by 32-bit
-operating systems.  More recently, as 64-bit operating systems become
-more common, an industry-wide standard (at least on Unix systems) has
-been developed to support larger sized files (see
-http://ftp.sas.com/standards/large.file/).  Starting with version 2.1
-of CFITSIO, larger FITS files up to 6 terabytes in size may be read and
-written on certain supported platforms.  In order to support these
-larger files, CFITSIO must be compiled with the
-`-D\_FILE\_OFFSET\_BITS=64' compiler flag.  All programs which link to
-the CFITSIO library must also be compiled with this flag or must
-include this preprocessor definition at the start of the source code
-file.  This causes the compiler to allocate 8-bytes instead of 4-bytes
-for the `off\_t' datatype which is used to store file offset
-positions.
+2.  By default, CFITSIO can handle FITS files up to 2.1 GB in size (2**31
+bytes).  This file size limit is often imposed by 32-bit operating
+systems.  More recently, as 64-bit operating systems become more common, an
+industry-wide standard (at least on Unix systems) has been developed to
+support larger sized files (see http://ftp.sas.com/standards/large.file/).
+Starting with version 2.1 of CFITSIO, larger FITS files up to 6 terabytes
+in size may be read and written on supported platforms.  In order
+to support these larger files, CFITSIO must be compiled with the
+'-D\_LARGEFILE\_SOURCE' and `-D\_FILE\_OFFSET\_BITS=64' compiler flags.
+Some platforms may also require the `-D\_LARGE\_FILES' compiler flag.
+ This causes the compiler to allocate 8-bytes instead of
+4-bytes for the `off\_t' datatype which is used to store file offset
+positions.  It appears that in most cases it is not necessary to
+also include these compiler flags when compiling programs that link to
+the CFITSIO library.
 
-If CFITSIO is compiled with the -D\_FILE\_OFFSET\_BITS=64 flag on a
+If CFITSIO is compiled with the -D\_LARGEFILE\_SOURCE
+and -D\_FILE\_OFFSET\_BITS=64 flags on a
 platform that supports large files, then it can read and write FITS
 files that contain up to 2**31 2880-byte FITS records, or approximately
 6 terabytes in size.  It is still required that the value of the NAXISn
@@ -2467,9 +2538,8 @@ image (given by the NAXISn keywords), the total width of a table
 the total size of the variable-length array heap in binary tables
 (PCOUNT keyword) must be less than this limit.
 
-Currently, support for large files within CFITSIO has only been tested
-on the Solaris 2.6 operating system using the Sun cc compiler or gcc
-2.95.2.
+Currently, support for large files within CFITSIO has been tested
+on the Linux, Solaris, and IBM AIX operating systems.
 
 
 \section{Multiple Access to the Same FITS File}
@@ -3384,11 +3454,14 @@ used by these interface routines.
    open IRAF images (.imh format files) and raw binary data arrays
    with READONLY access by first converting them on the fly into
    virtual FITS images.  See the `Extended File Name Syntax' chapter
-  for more details.
+   for more details.  The second routine simply opens the specified
+   file without trying to interpret the filename using the extended
+  filename syntax.
 \end{description}
 
 \begin{verbatim}
         FTOPEN(unit,filename,rwmode, > blocksize,status)
+        FTDKOPEN(unit,filename,rwmode, > blocksize,status)
 \end{verbatim}
 
 \begin{description}
@@ -3427,10 +3500,14 @@ used by these interface routines.
 \begin{description}
 \item[4 ]Open and initialize a new empty FITS file.   A template file may also be
    specified to define the structure of the new file (see section 4.2.4).
+   The second routine simply creates the specified
+   file without trying to interpret the filename using the extended
+  filename syntax.
 \end{description}
 
 \begin{verbatim}
         FTINIT(unit,filename,blocksize, > status)
+        FTDKINIT(unit,filename,blocksize, > status)
 \end{verbatim}
 
 \begin{description}
@@ -3776,6 +3853,23 @@ if a HDU name or number is not specified as part of the filename.
 \end{verbatim}
 
 \begin{description}
+\item[11]  Return the Fortran unit number that corresponds to the C fitsfile
+pointer value, or vice versa.  These 2 C routines may be useful in
+mixed language programs where both C and Fortran subroutines need
+to access the same file.  For example, if a FITS file is opened
+with unit 12 by a Fortran subroutine, then a C routine within the
+same program could get the fitfile pointer value to access the same file
+by calling  'fptr = CUnit2FITS(12)'.  These routines return a value
+of zero if an error occurs.
+\end{description}
+
+\begin{verbatim}
+      int       CFITS2Unit(fitsfile *ptr);
+      fitsfile* CUnit2FITS(int unit);
+\end{verbatim}
+
+
+\begin{description}
 \item[11]  Parse the input filename and return the HDU number that would be
 moved to if the file were opened with FTNOPN.    The returned HDU
 number begins with 1 for the primary array, so for example, if the
@@ -3852,6 +3946,25 @@ specifications.
        FTRTNM(filename, > rootname, status)
 \end{verbatim}
 
+
+\begin{description}
+\item[16] Test if the input file or a compressed version of the file (with
+a .gz, .Z, .z, or .zip extension) exists on disk.  The returned value of
+the 'exists' parameter will have 1 of the 4 following values:
+
+\begin{verbatim}
+   2:  the file does not exist, but a compressed version does exist
+   1:  the disk file does exist
+   0:  neither the file nor a compressed version of the file exist
+  -1:  the input file name is not a disk file (could be a ftp, http,
+       smem, or mem file, or a file piped in on the STDIN stream)
+\end{verbatim}
+
+\end{description}
+
+\begin{verbatim}
+      FTEXIST(filename, > exists, status);
+\end{verbatim}
 
 \section{HDU-Level Operations \label{FTMAHD}}
 
@@ -4021,14 +4134,12 @@ and so on.
     determine whether the current HDU, and/or any following HDUs in the
     input file will be copied to the output file. If all 3 parameters are
     true, then the entire input file will be copied.  On return, the current
-    HDU in the input file will be unchanged, and the last HDU will be the
+    HDU in the input file will be unchanged, and the last copied HDU will be the
    current HDU in the output file.
 \end{description}
 
 \begin{verbatim}
-  int fits_copy_file / ffcpfl
-      (fitsfile *infptr, fitsfile *outfptr, int previous, int current,
-          int following, > int *status)
+        FTCPFL(iunit, ounit, previous, current, following, > status)
 \end{verbatim}
 
 \begin{description}
@@ -5778,22 +5889,15 @@ and lastrow give the starting and ending row number of each range.
 
 \section{Celestial Coordinate System Subroutines \label{FTGICS}}
 
-The FITS community has adopted a set of keyword conventions that are
-used to  specify the transformation that is needed to convert between
-pixel locations in an image and the corresponding celestial coordinates
-on the sky.  or more generally, to specify world coordinates that
-are to be associated with any pixel location in an n-dimensional FITS
-array. CFITSIO is distributed with a simple set of World Coordinate
-System routines that support a limited set of celestial projections.
-These routines were derived from functions in the Classic AIPS software
-package developed in the 1980s.  These routines DO NOT support all the
-new conventions in the WCS papers that have recently been approved as
-part of the official FITS standard.
-
-Rather than using the WCS routines distributed with FITSIO, it is
-STRONGLY RECOMMENDED that software developers use a more sophisticated
+The FITS community has adopted a set of keyword conventions that define
+the transformations needed to convert between pixel locations in an
+image and the corresponding celestial coordinates on the sky, or more
+generally, that define world coordinates that are to be associated with
+any pixel location in an n-dimensional FITS array. CFITSIO is distributed
+with a couple of self-contained World Coordinate System (WCS) routines,
+however, these routines DO NOT support all the latest WCS conventions,
+so it is STRONGLY RECOMMENDED that software developers use a more robust
 external WCS library.  Several recommended libraries are:
-
 
 \begin{verbatim}
   WCSLIB -  supported by Mark Calabretta
@@ -5801,24 +5905,25 @@ external WCS library.  Several recommended libraries are:
   AST library - developed by the U.K. Starlink project
 \end{verbatim}
 
-More information about the WCS keyword conventions and links
-to all of these libraries can be found on the FITS Support Office
-web site at http://fits.gsfc.nasa.gov under the WCS link.
+More information about the WCS keyword conventions and links to all of
+these WCS libraries can be found on the FITS Support Office web site at
+http://fits.gsfc.nasa.gov under the WCS link.
 
-Each of these libraries has a routine that will ingest a list of header
-keywords from which the transformations between pixel coordinates and
-world coordinates can be derived.  Programmers may use FITSIO to read
-the header keywords and construct a long character array containing
-all the keywords.  This character array can then be passed to the
-WCS library routine.
+The functions provided in these external WCS libraries will need access to
+the  WCS information contained in the FITS file headers.  One convenient
+way to pass this information to the extermal library is to use  FITSIO
+to copy the header keywords into one long character string, and then
+pass this string to an interface routine in the external library that
+will extract the necessary WCS information (e.g., see the astFitsChan
+and astPutCards routines in the Starlink AST library).
 
-The following routines DO NOT support the more recent WCS conventions
+The following FITSIO routines DO NOT support the more recent WCS conventions
 that have been approved as part of the FITS standard.  Consequently,
 the following routines ARE NOW DEPRECATED.  It is STRONGLY RECOMMENDED
 that software developers not use these routines, and instead use an
-external WCS library, as described in the previous section.
+external WCS library, as described above.
 
-These routines are included only for backward compatibility with
+These routines are included mainly for backward compatibility with
 existing software.  They support the following standard map
 projections: -SIN, -TAN, -ARC, -NCP, -GLS, -MER, and -AIT (these are the
 legal values for the coordtype parameter).  These routines are based
@@ -6443,18 +6548,22 @@ The following utility subroutines may be useful for certain applications:
 
 \begin{verbatim}
         FTOPEN(unit,filename,rwmode, > blocksize,status)
+        FTDKOPEN(unit,filename,rwmode, > blocksize,status)
         FTNOPN(unit,filename,rwmode, > status)
         FTDOPN(unit,filename,rwmode, > status)
         FTTOPN(unit,filename,rwmode, > status)
         FTIOPN(unit,filename,rwmode, > status)
         FTREOPEN(unit, > newunit, status)
         FTINIT(unit,filename,blocksize, > status)
+        FTDKINIT(unit,filename,blocksize, > status)
         FTTPLT(unit, filename, tplfilename, > status)
         FTFLUS(unit, > status)
         FTCLOS(unit, > status)
         FTDELT(unit, > status)
         FTGIOU( > iounit, status)
         FTFIOU(iounit, > status)
+	CFITS2Unit(fitsfile *ptr)   (C routine)
+        CUnit2FITS(int unit)        (C routine)
         FTEXTN(filename, > nhdu, status)
         FTFLNM(unit, > filename, status)
         FTFLMD(unit, > iomode, status)
@@ -6462,6 +6571,7 @@ The following utility subroutines may be useful for certain applications:
         FTIURL(filename, > filetype, infile, outfile, extspec, filter,
                binspec, colspec, status)
         FTRTNM(filename, > rootname, status)
+        FTEXIST(filename, > exist, status)
 \end{verbatim}
  HDU-Level Operations: page~\pageref{FTMAHD}
 
@@ -6801,6 +6911,7 @@ errtext - (character*30) descriptive error message corresponding to error number
 casesen - (logical) true if column name matching is case sensitive
 exact - (logical) do the strings match exactly, or were wildcards used?
 exclist  (character array) list of names to be excluded from search
+exists   - flag indicating whether the file or compressed file exists on disk
 extend - (logical) true if there may be extensions following the primary data
 extname - (character) value of the EXTNAME keyword (if not blank)
 fbit - (integer) first bit in the field to be read or written
