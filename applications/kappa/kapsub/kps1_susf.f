@@ -85,11 +85,11 @@
 *     IWS( NIWS ) = INTEGER (Returned)
 *        Work space.
 *     COEFF( * ) = REAL (Returned)
-*        The bicubic B-spline coefficients, defined at the knots in the
+*        The bi-cubic B-spline coefficients, defined at the knots in the
 *        order increasing x knot, then increasing y.  Thus coefficient
 *        Cij in the standard convention is %COEFF((i-1)*(%NYKNOT+8)+j).
 *     NCOEF = INTEGER (Returned)
-*        The number of bicubic coefficients. 
+*        The number of bi-cubic coefficients. 
 *     SCALE = REAL (Returned)
 *        The scale factor applied to the data values before calculating
 *        the spline. 
@@ -116,12 +116,12 @@
 *     Copyright (C) 1990-1991 Science & Engineering Research Council.
 *     Copyright (C) 1996-1997 Central Laboratory of the Research
 *     Councils. Copyright (C) 2006 Particle Physics & Astronomy
-*     Research Council. All Rights Reserved.
+*     Research Council.  All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -131,15 +131,15 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
-*     1990 Jan 31 (MJC):
+*     1990 January 31 (MJC):
 *        Original version based on some EDRS code.
 *     1991 July 5 (MJC):
 *        Passed NWS and WS as arguments.  Validates input number of
@@ -317,7 +317,7 @@
 *  See if the fit was not unique.
       IF ( IFAIL .LT. -2 ) THEN
          CALL MSG_OUTIF( MSG__NORM, 'KPS1_SUSF_NUFIT1',
-     :     'The bicubic spline surface is not uniquely defined '/
+     :     'The bi-cubic spline surface is not uniquely defined '/
      :     /'by the data.', STATUS )
          CALL MSG_OUTIF( MSG__NORM,'KPS1_SUSF_NUFIT2',
      :     'Examine the output image to see whether or '/
