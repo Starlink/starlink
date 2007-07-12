@@ -7,7 +7,7 @@
 
 *  Purpose:
 *     Fits a polynomial surface by least squares to an input
-*     2-dimensional array.
+*     two-dimensional array.
 
 *  Language:
 *     Starlink Fortran 77
