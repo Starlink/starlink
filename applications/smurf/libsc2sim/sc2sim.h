@@ -545,7 +545,7 @@ const char dateobs[],     /* DateObs string for FITS header */
 const char obsid[],       /* Observation ID string */
 const double *posptr,     /* Pointing offsets from map centre */
 int jigsamples,           /* Number of jiggle samples (given) */
-double jigptr[][2], /* Array of X, Y jiggle positions (given) */
+const double jigptr[][2], /* Array of X, Y jiggle positions (given) */
 const int obsnum,         /* Observation number (given) */		 
 const int nsubscan,       /* Sub-scan number (given) */			 
 const char obstype[],     /* Observation type, e.g. SCIENCE (given)*/	 
