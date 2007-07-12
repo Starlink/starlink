@@ -154,6 +154,7 @@
 
 *  Authors:
 *     David S Berry (JAC, UClan)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -163,6 +164,8 @@
 *        Added parameter naccept.
 *     11-MAY-2007 (DSB):
 *        Correct calculation of spectral overlap factor (tfac).
+*     12-JUL-2007 (EC):
+*        -Changed name of smf_rebincube_totmap to smf_rebin_totmap
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -344,8 +347,8 @@ void smf_rebincube_nn( smfData *data, int index, int size, dim_t nchan,
    to be done first since it stores details of the current time slice 
    in the "smfHead" structure inside "data", and this is needed by
    subsequent functions. */
-      totmap = smf_rebincube_totmap( data, itime, abskyfrm, oskymap, moving, 
-                                     status );
+      totmap = smf_rebin_totmap( data, itime, abskyfrm, oskymap, moving, 
+				 status );
       if( !totmap ) break;
 
 /* Get the effective exposure time, the total exposure time, and the

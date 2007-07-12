@@ -141,6 +141,7 @@
 
 *  Authors:
 *     David S Berry (JAC, UClan)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -148,6 +149,8 @@
 *        Initial version.
 *     18-MAY-2006 (DSB):
 *        Corrections to handle cases where there is only 1 detector.
+*     12-JUL-2007 (EC):
+*        -Changed name of smf_rebincube_totmap to smf_rebin_totmap
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -371,8 +374,8 @@ void smf_rebincube_ast( smfData *data, int index, int size, dim_t nchan,
    to be done first since it stores details of the current time slice 
    in the "smfHead" structure inside "data", and this is needed by
    subsequent functions. */
-      totmap = smf_rebincube_totmap( data, itime, abskyfrm, oskymap, moving, 
-                                     status );
+      totmap = smf_rebin_totmap( data, itime, abskyfrm, oskymap, moving, 
+				 status );
       if( !totmap ) break;
 
 /* Get the effective exposure time, the total exposure time, and the

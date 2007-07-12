@@ -171,7 +171,8 @@
 *        -changed interface for smf_calcmodel_*
 *        -changed return value of smf_calcmodelptr
 *     2007-07-12 (EC):
-*        Added moving to smf_bbrebinmap and smf_calc_mapcoord
+*        -Added moving to smf_bbrebinmap and smf_calc_mapcoord
+*        -Changed name of smf_rebincube_totmap to smf_rebin_totmap
 
 *     {enter_further_changes_here}
 *  Copyright:
@@ -576,10 +577,10 @@ const double *smf_rebincube_tcon( smfHead *hdr, dim_t itime, double fcon,
                                   float *texp, float *teff, double *tcon, 
                                   int *status );
 
-AstMapping *smf_rebincube_totmap( smfData *data, dim_t itime, 
-                                  AstSkyFrame *abskyfrm, 
-                                  AstMapping *oskymap, int moving, 
-                                  int *status );
+AstMapping *smf_rebin_totmap( smfData *data, dim_t itime, 
+			      AstSkyFrame *abskyfrm, 
+			      AstMapping *oskymap, int moving, 
+			      int *status );
 
 void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos, 
                    int autogrid, Grp *detgrp, double par[ 7 ], 

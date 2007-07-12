@@ -87,7 +87,8 @@
 *        Annul relevant AST objects every time slice to minimize
 *        memory usage
 *     2007-07-12 (EC):
-*        Replaced calculation of bolo2map with a call to smf_rebincube_totmap
+*        -Replaced calculation of bolo2map with a call to smf_rebincube_totmap
+*        -Changed name of smf_rebincube_totmap to smf_rebin_totmap
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -426,8 +427,8 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
         } /* End WCS FrameSet construction */
 
 	/* Calculate the bolo to map-pixel transformation for this tslice */
-	bolo2map = smf_rebincube_totmap( data, j, abskyframe, sky2map, 
-					 *moving, status );
+	bolo2map = smf_rebin_totmap( data, j, abskyframe, sky2map, 
+				     *moving, status );
 
         if ( *status == SAI__OK ) {
           /* Check corner pixels in the array for their projected extent

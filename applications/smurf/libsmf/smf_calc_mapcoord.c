@@ -50,6 +50,7 @@
 *     2007-07-12 (EC):
 *        -adding moving to interface
 *        -Replaced calculation of bolo2map with a call to smf_rebincube_totmap
+*        -Changed name of smf_rebincube_totmap to smf_rebin_totmap
 
 *  Notes:
 
@@ -322,8 +323,8 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
 	for( i=0; i<(data->dims)[2]; i++ ) {
 
 	  /* Calculate the bolometer to map-pixel transformation for tslice */
-	  bolo2map = smf_rebincube_totmap( data, i, abskyfrm, sky2map, moving, 
-				     status );	  
+	  bolo2map = smf_rebin_totmap( data, i, abskyfrm, sky2map, moving, 
+				       status );	  
 
 	  if( *status == SAI__OK ) {
 	    astTranGrid( bolo2map, 2, lbnd_in, ubnd_in, 0.1, 1000000, 1,
