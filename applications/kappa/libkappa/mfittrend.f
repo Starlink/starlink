@@ -222,6 +222,14 @@
 *     12-MAY-2007 (DSB):
 *        Add code to identify the required pixel ranges in cases where the
 *        WCS->pixel transformation is not defined.
+*     2007 July 12 (MJC):
+*        Adapted COLLAPSE code to determine the alignment of pixel with
+*        WCS axes.  This attempts first to split the current Frame into
+*        parallel mappings including one that is solely detrending axis,
+*        before finding the largest projection of the vector joining
+*        two test points.
+*     {enter_further_changes_here}
+
 *-
 
 *  Type Definitions:
@@ -274,6 +282,8 @@
                                  ! axis
       DOUBLE PRECISION PRJMAX    ! Maximum vector length projected on to
                                  ! an axis
+      DOUBLE PRECISION PXHIGH    ! High pixel bound of collapse axis 
+      DOUBLE PRECISION PXLOW     ! Low pixel bound of collapse axis 
       INTEGER AREA               ! Area of axes orthogonal to fit axis
       INTEGER AXMAP              ! PIXEL->WCS Mapping for fitted axis
       INTEGER CFRM               ! Current frame
@@ -310,12 +320,14 @@
       INTEGER NDFS               ! NDF identifier of section
       INTEGER NDIM               ! Number of NDF dimensions
       INTEGER NERR               ! Number of errors
+      INTEGER NFEED              ! Number of pixel axes feeding WCS axis
       INTEGER NRANGE             ! Number of range values (not pairs)
       INTEGER ORDER              ! The order of the polynomial to fit
       INTEGER OUTAX( NDF__MXDIM )! Output axes fed by current pixel axis
-      INTEGER OUTMAP             ! Mapping frm current pixel axis to WCS
       INTEGER OUTNDF             ! NDF identifier of output NDF
+      INTEGER PIXAXE( NDF__MXDIM )! Pixel axis indices feeding WCS axis
       INTEGER RANGES( MAXRNG )   ! The fit ranges pixels
+      INTEGER TMAP               ! Temporary mapping
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF
       LOGICAL AUTO               ! Determine regions automatically?
       LOGICAL CLIPRE             ! Clip the outlier residuals?
@@ -422,7 +434,7 @@
       NAXC = AST_GETI( CFRM, 'NAXES', STATUS )
       TTLC = AST_GETC( CFRM, 'TITLE', STATUS )
 
-*  Get axis to fit the polynomials to. Default is last axis in the WCS.
+*  Get axis to fit the polynomials to.  Default is last axis in the WCS.
       IF ( NDIM .NE. 1 ) THEN
          IAXIS = NAXC
          CALL KPG1_GTAXI( 'AXIS', CFRM, 1, IAXIS, STATUS )
@@ -473,7 +485,7 @@
 *  Ranges must come in pairs.
             IF ( 2 * ( NRANGE / 2 ) .NE. NRANGE ) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP( 'MFITTREND_ERR4',
+               CALL ERR_REP( 'MFITTREND_ERR1',
      :                       'Range values must be supplied in pairs',
      :                       STATUS )
                GO TO 999
@@ -481,39 +493,85 @@
          END IF
       END IF
 
-*  Obtain the NDF axis corresponding to the WCS axis.
-*  --------------------------------------------------
+*  Determine which pixel axis is most nearly aligned with the selected 
+*  WCS axis.
+*  ===================================================================
 
-*  Indicate that we can use the full inverse Mapping for identifying the
-*  pixel ranges to use.
-      AXMAP = AST__NULL
+*  First see if the Mapping can be split into two parallel Mappings; one
+*  that feeds just the selected WCS axis, and another that feeds all the
+*  other axes.
+      CALL AST_INVERT( MAP, STATUS )
+      CALL AST_MAPSPLIT( MAP, 1, IAXIS, PIXAXE, TMAP, STATUS )
+      CALL AST_INVERT( MAP, STATUS )
 
-*  WCS axes can be permuted, rotated etc. so we must check. How we do
-*  this check depends on whether or not the inverse transformation (from WCS
-*  to PIXEL coords) is defined. First deal with cases where an inverse
-*  transformation is available.
-      IF ( AST_GETL( MAP, 'TRANINVERSE', STATUS ) ) THEN
+*  If so, check that the WCS axis is fed by one and only one pixel axis,
+*  and get its index.
+      JAXIS = 0
 
-*  Find an arbitrary position within the NDF which has valid current
-*  Frame co-ordinates. Both pixel and current Frame co-ordinates for
+      IF ( TMAP .NE. AST__NULL ) THEN
+         NFEED = AST_GETI( TMAP, 'NOUT', STATUS )
+         IF ( NFEED .EQ. 1 ) THEN
+            JAXIS = PIXAXE( 1 )
+
+*  If high and low axis values were supplied, using the Mapping produced
+*  by AST_MAPSPLIT to get the corresponding pixel positions.
+            IF ( .NOT. USEALL ) THEN
+               CALL AST_TRAN1( TMAP, 1, DRANGE( 2 ), .TRUE., PXHIGH,
+     :                         STATUS )
+               CALL AST_TRAN1( TMAP, 1, DRANGE( 1 ), .TRUE., PXLOW,
+     :                         STATUS )
+            END IF
+         END IF
+      END IF
+
+*  Find an arbitrary position within the NDF which has valid current 
+*  Frame co-ordinates. Both pixel and current Frame co-ordinates for 
 *  this position are returned.
-         DO I = 1, NDIM
-            DLBND( I ) = DBLE( LBND( I ) - 1 )
-            DUBND( I ) = DBLE( UBND( I ) )
-         END DO
-         CALL KPG1_ASGDP( MAP, NDIM, NAXC, DLBND, DUBND, PIXPOS, CURPOS,
-     :                    STATUS )
+      DO I = 1, NDIM
+         DLBND( I ) = DBLE( LBND( I ) - 1 )
+         DUBND( I ) = DBLE( UBND( I ) )
+      END DO
+      CALL KPG1_ASGDP( MAP, NDIM, NAXC, DLBND, DUBND, PIXPOS, CURPOS, 
+     :                 STATUS )
    
-*  Create two copies of these current Frame co-ordinates.
+
+*  If the Mapping could not be split using AST_MAPSPLIT, we attempt to
+*  analyse it by transforming positions, in order to find the pixel axis
+*  which is most nearly parallel to the selected WCS axis.
+      IF ( JAXIS .EQ. 0 ) THEN
+
+*  We require both forward and inverse transformations.
+         IF ( .NOT. AST_GETL( MAP, 'TRANINVERSE', STATUS ) .AND.
+     :        STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL NDF_MSG( 'NDF', INNDF )
+            CALL MSG_SETC( 'T', TTLC )
+            CALL ERR_REP( 'MFITTREND_ERR2', 'The transformation from '//
+     :                    'the current co-ordinate Frame of ''^NDF'' '//
+     :                    '(^T) to pixel co-ordinates is not defined.', 
+     :                    STATUS )
+         
+         ELSE IF ( .NOT. AST_GETL( MAP, 'TRANFORWARD', STATUS ) .AND.
+     :             STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL NDF_MSG( 'NDF', INNDF )
+            CALL MSG_SETC( 'T', TTLC )
+            CALL ERR_REP( 'MFITTREND_ERR3', 'The transformation from '//
+     :                    'pixel co-ordinates to the current '//
+     :                    'co-ordinate Frame of ''^NDF'' (^T) is not '//
+     :                    'defined.', STATUS )
+         END IF
+
+*  Create two copies of the good current Frame co-ordinates.
          DO I = 1, NAXC
             CPOS( 1, I ) = CURPOS( I )
             CPOS( 2, I ) = CURPOS( I )
-         END DO
+         END DO 
    
-*  If no ranges were supplied, modify the values in these positions by
-*  an arbitrary amount.
+*  If no ranges were supplied, modify the collapse axis values in these 
+*  positions by an arbitrary amount.
          IF ( AUTO .OR. USEALL ) THEN
-            IF ( CURPOS( IAXIS ) .NE. 0.0 ) THEN
+            IF ( CURPOS( IAXIS ) .NE. 0.0D0 ) THEN
                CPOS( 1, IAXIS ) = 0.99 * CURPOS( IAXIS )
                CPOS( 2, IAXIS ) = 1.01 * CURPOS( IAXIS )
             ELSE
@@ -521,20 +579,21 @@
                CPOS( 2, IAXIS ) = CURPOS( IAXIS ) - 1.0D-4
             END IF
    
-*  Use the first set of ranges.
+*  If ranges values for the collapse axis were supplied, substitute the
+*  first pair into these positions. 
          ELSE
             CPOS( 1, IAXIS ) = DRANGE( 2 )
             CPOS( 2, IAXIS ) = DRANGE( 1 )
          END IF
    
-*  Transform these two positions into pixel co-ordinates (this uses the
-*  inverse transformation defined by MAP).
+*  Transform these two positions into pixel co-ordinates.
          CALL AST_TRANN( MAP, 2, NAXC, 2, CPOS, .FALSE., NDIM, 2, PPOS,
-     :                   STATUS )
+     :                   STATUS ) 
    
 *  Find the pixel axis with the largest projection of the vector joining
-*  these two pixel positions. The ranges apply to this axis. Report an
-*  error if the positions do not have valid pixel co-ordinates.
+*  these two pixel positions.  The collapse will occur along this pixel
+*  axis.  Report an error if the positions do not have valid pixel
+*  co-ordinates.
          PRJMAX = -1.0
          DO I = 1, NDIM
             IF ( PPOS( 1, I ) .NE. AST__BAD .AND.
@@ -548,62 +607,26 @@
    
             ELSE IF ( STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP( 'MFITTREND_ERR5', 'The WCS information '//
-     :                       'is too complex (cannot find two valid '//
-     :                       'pixel positions). Change current frame'//
-     :                       ' to PIXEL and try again', STATUS )
+               CALL ERR_REP( 'MFITTREND_ERR4', 'The WCS information '/
+     :                       /'is too complex (cannot find two valid '/
+     :                       /'pixel positions).', STATUS )
                GO TO 999
             END IF
+   
          END DO
-
-*  Now deal with cases where no inverse transformation is available.
-      ELSE
-
-*  Loop through each pixel axis until a pixel axis is found which has an
-*  affect on the selected WCS axis. We skip pixel axes that are spanned
-*  by only a single pixel since these cannot be used as a basis for a
-*  polynomial fit.
-         JAXIS = 0
-         DO I = 1, NDIM
-            IF( JAXIS .EQ. 0 .AND. DIMS( I ) .GT. 1 ) THEN 
-
-*  Try splitting the pixel->WCS Mapping into parallel Mappings, returning
-*  the Mapping that Maps the current pixel axis into one or more WCS axes.
-*  This may or may not be possible depending on the nature of the Mapping.
-               CALL AST_MAPSPLIT( MAP, 1, I, OUTAX, OUTMAP, STATUS )
-
-*  See if the Mapping could be split. 
-               IF( OUTMAP .NE. AST__NULL ) THEN
-
-*  The Mapping returned by AST_MAPSPLIT has one input, corresponding to
-*  the current pixel axis, but may have more than one output (that is, a
-*  given pixel axis may affect the value of more than one WCS axis). Loop
-*  round each output, checking to see if the output is the requested WCS
-*  axis. If this mapping generates the WCS axis which is being fitted, save 
-*  the Mapping for later use.
-                  NAXO = AST_GETI( OUTMAP, 'Nout', STATUS )
-                  DO J = 1, NAXO
-                     IF( OUTAX( J ) .EQ. IAXIS ) THEN
-                        JAXIS = I
-                        IF( NAXO .EQ. 1 ) AXMAP = AST_CLONE( OUTMAP, 
-     :                                                       STATUS )
-                     END IF
-                  END DO
-
-               END IF
-
+   
+*  Report an error if the selected WCS axis is independent of pixel
+*  position.
+         IF ( PRJMAX .EQ. 0.0 ) THEN
+            IF ( STATUS .EQ. SAI__OK ) THEN
+               STATUS = SAI__ERROR
+               CALL MSG_SETI( 'I', IAXIS )   
+               CALL ERR_REP( 'MFTTREND_ERR5', 'The specified WCS '/
+     :                       /'axis (axis ^I) has a constant value '/
+     :                       /'over the whole NDF and so cannot be '/
+     :                       /'collapsed.', STATUS )
             END IF
-
-         END DO
-
-*  Report an error if this did not work.
-         IF( JAXIS .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
-            STATUS = SAI__ERROR
-            CALL NDF_MSG( 'NDF', INNDF )
-            CALL MSG_SETI( 'WCS', IAXIS )
-            CALL ERR_REP( 'MFITTREND_ERR1', 'Cannot identify a '//
-     :                    'suitable pixel axis corresponding to '//
-     :                    'WCS axis ^WCS in ^NDF.', STATUS )
+            GO TO 999
          END IF
 
       END IF
@@ -663,7 +686,7 @@
 *  Record the ranges to a parameter.
          CALL PAR_PUT1I( 'ARANGES', NRANGE, RANGES, STATUS )
 
-*  OK, use NDF axis JAXIS. Pick full extent if no values were given.
+*  OK, use NDF axis JAXIS.  Pick full extent if no values were given.
       ELSE IF ( USEALL ) THEN
          RANGES( 1 ) = LBND( JAXIS )
          RANGES( 2 ) = UBND( JAXIS )
@@ -674,7 +697,7 @@
          DO I = 1, NRANGE, 2
 
 *  If MAP has an inverse, we can use MAP directly.
-            IF( AXMAP .EQ. AST__NULL ) THEN
+            IF ( AXMAP .EQ. AST__NULL ) THEN
                CPOS( 1, IAXIS ) = DRANGE( I + 1 )
                CPOS( 2, IAXIS ) = DRANGE( I )
 
