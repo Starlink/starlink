@@ -42,7 +42,10 @@
 *     subsequent invocation of ZAPLIN.
 
 *  Usage:
-*     zaplin in out [title] colin=? lincol=? columns=? lines=?
+*     zaplin in out [title] { lincol=? 
+*                           { columns=? lines=?
+*                           { colin=?
+*                           mode
 
 *  ADAM Parameters:
 *     COLIN = FILENAME (Read)
