@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     sc2sim_getinvf ( double sigma, double corner, double samptime, 
-                       double nterms, double *noisecoeffs, int *status )
+                       int nterms, double *noisecoeffs, int *status )
 
 *  Arguments:
 *     sigma = double (Given)
@@ -23,7 +23,7 @@
 *        Corner frequency, where 1/f dispersion=sigma
 *     samptime = double (Given)
 *        Time per data sample
-*     nterms = double (Given)
+*     nterms = int (Given)
 *        Number of frequencies calculated
 *     noisecoeffs = double* (Returned)
 *        1/f spectrum 
@@ -47,6 +47,8 @@
 *        Extend up to twice the corner frequency
 *     2006-07- (JB):
 *        Split from dsim.c
+*     2007-07-12 (AGG):
+*        Redefine nterms as int rather than double
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -81,7 +83,7 @@ void sc2sim_getinvf
 double sigma,        /* dispersion of broad-band noise (given) */ 
 double corner,       /* corner frequency, where 1/f dispersion=sigma (given)*/
 double samptime,     /* time per data sample (given) */
-double nterms,       /* number of frequencies calculated (given) */
+int nterms,          /* number of frequencies calculated (given) */
 double *noisecoeffs, /* 1/f spectrum (returned) */
 int *status          /* global status (given and returned) */
 )

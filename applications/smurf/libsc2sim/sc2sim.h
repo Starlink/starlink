@@ -68,6 +68,8 @@
 *     2007-06-29 (EC):
 *        Simplified bolometer noise model changes interface to
 *        sc2sim_getsigma and sc2sim_addpnoise
+*     2007-07-12 (AGG):
+*        Redefine nterms as int rather than double in sc2sim_getinvf.c
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -293,7 +295,7 @@ void sc2sim_getinvf
 double sigma,        /* dispersion of broad-band noise (given) */ 
 double corner,       /* corner frequency, where 1/f dispersion=sigma (given)*/
 double samptime,     /* time per data sample (given) */
-double nterms,       /* number of frequencies calculated (given) */
+int nterms,          /* number of frequencies calculated (given) */
 double *noisecoeffs, /* 1/f spectrum (returned) */
 int *status          /* global status (given and returned) */
 );
@@ -543,7 +545,7 @@ const char dateobs[],     /* DateObs string for FITS header */
 const char obsid[],       /* Observation ID string */
 const double *posptr,     /* Pointing offsets from map centre */
 int jigsamples,           /* Number of jiggle samples (given) */
-const double jigptr[][2], /* Array of X, Y jiggle positions (given) */
+double jigptr[][2], /* Array of X, Y jiggle positions (given) */
 const int obsnum,         /* Observation number (given) */		 
 const int nsubscan,       /* Sub-scan number (given) */			 
 const char obstype[],     /* Observation type, e.g. SCIENCE (given)*/	 
