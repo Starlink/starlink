@@ -128,6 +128,9 @@
 *     17-FEB-2006 (DSB):
 *        Add initialisation of default value for new pseudo-attribute
 *        FileInTitle.
+*     13-JUL-2007 (DSB):
+*        Prevent KAPPA pseudo-attributes being reset when overlaying a
+*        temporary style on top of a previously established style.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -186,8 +189,9 @@
       IF( STATUS .NE. SAI__OK ) CLASS = 'AST Object'
 
 *  If the Object is a Plot, reset KAPPA pseudo-attributes to default
-*  values.
-      IF( CLASS .EQ. 'Plot' ) THEN
+*  values. Do not do this if overlaying a temporary style onto of a 
+*  previously defined style.
+      IF( CLASS .EQ. 'Plot' .AND. PARAM .NE. 'TEMPSTYLE' ) THEN
          CALL GRF_SETTBG( 0 )
          CALL KPG1_SETASTDSB( .TRUE. )
          CALL KPG1_SETASTFIT( .FALSE. )
