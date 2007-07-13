@@ -607,8 +607,6 @@ AC_DEFUN([STAR_CNF_BLANK_COMMON],
         else
             star_cv_blank_common_fortran=
         fi])
-    AH_TEMPLATE([BLANK_COMMON_SYMBOL],
-       [Define symbol used to access the Fortran blank common block])
     case "$star_cv_blank_common_fortran" in
       gfortran)
         AC_SUBST([BLANK_COMMON_SYMBOL], [__BLNK__] )
@@ -674,6 +672,39 @@ AC_DEFUN([STAR_PRM_COMPATIBLE_SYMBOLS],
             STAR_FFLAGS="$STAR_FFLAGS $star_cv_prm_compatible_symbols"
          fi
 ])# STAR_PRM_COMPATIBLE_SYMBOLS
+
+# STAR_CNF_TRAIL_TYPE
+# -------------------
+#
+# Work out what type to use for the trailing lengths of character strings
+# passed from C to Fortran. See the "TRAIL" descriptions in SUN/209.
+#
+# For most compilers the maximum length of a string is limited to a 32bit
+# unsigned int, but for others, this can be a 64bit unsigned long. Currently
+# the only compiler with 64bit strings is 64bit Intel fortran.
+#
+# A programmatic tests have not been successful as long can work when
+# int is prescribed as often when optimising alignment boundaries are
+# set to 4 byte (double), so we must use specific compiler checks.
+#
+# The side-effect of this macros is to define TRAIL_TYPE to either "int"
+# or "long". Use the CNF include file "f77.h" to not worry about this.
+#
+AC_DEFUN([STAR_CNF_TRAIL_TYPE],
+   [AC_CACHE_CHECK([type used for Fortran string lengths],
+       [star_cv_cnf_trail_type],
+       [AC_REQUIRE([AC_PROG_FC])
+       if test "$ac_cv_fc_compiler_gnu" = no; then
+          if "$FC" -V 2>&1 < /dev/null | grep 'Intel.*64' > /dev/null; then
+             star_cv_trail_type=long
+          else
+             star_cv_trail_type=int
+          fi
+       else
+           star_cv_trail_type=int
+       fi])
+    AC_SUBST([TRAIL_TYPE], $star_cv_trail_type )
+])# STAR_CNF_TRAIL_TYPE
 
 # STAR_PATH_TCLTK([minversion=0], [options=''])
 # ---------------------------------------------
