@@ -52,6 +52,9 @@ STAR_CNF_F2C_COMPATIBLE
 dnl   Determine the symbol used for blank common. Defines BLANK_COMMON_SYMBOL.
 STAR_CNF_BLANK_COMMON
 
+dnl   Type used for trailing lengths of character strings, int or long.
+STAR_CNF_TRAIL_TYPE
+
 dnl   This package has no dependencies
 
 STAR_LATEX_DOCUMENTATION(sun209)
