@@ -1039,6 +1039,14 @@ c      write(*,*)
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Initialise things to avoid compiler warnings.
+      DSUM = 0.0
+      USUM = 0.0
+      COUNT = 0.0
+      MINSH = 0.0
+      MAXSUM = 0.0
+      MAXSH = 0.0
+
 *  Get the cos and sin of the supplied angle.
       COSANG = COS( ANG )
       SINANG = SIN( ANG )
