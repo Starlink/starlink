@@ -74,12 +74,15 @@
 
 
 *  Copyright:
+*     Copyright (C) 2007 Science and Technology Facilities Council.
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 *  History:
 *     1997 March 19 (timj)
 *        Separate from MODIFY
+*     2007 July 13 (TIMJ):
+*        Allow POLMAP observations to be adjusted.
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -285,6 +288,7 @@
 *     pointing corrections for MAP observations
 
       IF (OBSERVING_MODE .EQ. 'MAP' 
+     :     .OR. OBSERVING_MODE .EQ. 'POLMAP'
      :     .OR. OBSERVING_MODE .EQ. 'FOCUS'
      :     .OR. OBSERVING_MODE .EQ. 'ALIGN'
      :     .OR. OBSERVING_MODE .EQ. 'POINTING') THEN
