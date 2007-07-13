@@ -431,6 +431,21 @@ itcl::class gaia::GaiaSearch {
       }
    }
 
+   #  Pop up a dialog to set the plot symbols to use for this catalog.
+   #  Override to use GaiaSymbolConfig and offer local symbols.
+   public method set_plot_symbols {} {
+      set columns $headings_
+      if {[llength $columns] == 0} {
+         info_dialog "Please make a query first so that the column names are known" $w_
+         return
+      }
+      utilReUseWidget gaia::GaiaSymbolConfig $w_.symconf \
+         -catalog $itk_option(-catalog) \
+         -astrocat [code $w_.cat] \
+         -columns $columns \
+         -command [code $this plot]
+   }
+
    #  Configuration options (public variables):
    #  =========================================
 
