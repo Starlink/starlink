@@ -282,10 +282,9 @@
                                  ! axis
       DOUBLE PRECISION PRJMAX    ! Maximum vector length projected on to
                                  ! an axis
-      DOUBLE PRECISION PXHIGH    ! High pixel bound of collapse axis 
-      DOUBLE PRECISION PXLOW     ! Low pixel bound of collapse axis 
+      DOUBLE PRECISION PXHIGH    ! High pixel bound of fitted axis 
+      DOUBLE PRECISION PXLOW     ! Low pixel bound of fitted axis 
       INTEGER AREA               ! Area of axes orthogonal to fit axis
-      INTEGER AXMAP              ! PIXEL->WCS Mapping for fitted axis
       INTEGER CFRM               ! Current frame
       INTEGER DIMS( NDF__MXDIM ) ! Dimensions of NDF
       INTEGER EL                 ! Number of mapped elements
@@ -314,7 +313,6 @@
       INTEGER MAP                ! PIXEL Frame to Current Frame Mapping
                                  ! pointer
       INTEGER NAXC               ! Number of axes in current frame
-      INTEGER NAXO               ! No. of WCS axes fed by pixel axis
       INTEGER NCLIP              ! Number of clips of averaged data
       INTEGER NCSECT             ! Number of characters in section
       INTEGER NDFS               ! NDF identifier of section
@@ -323,7 +321,6 @@
       INTEGER NFEED              ! Number of pixel axes feeding WCS axis
       INTEGER NRANGE             ! Number of range values (not pairs)
       INTEGER ORDER              ! The order of the polynomial to fit
-      INTEGER OUTAX( NDF__MXDIM )! Output axes fed by current pixel axis
       INTEGER OUTNDF             ! NDF identifier of output NDF
       INTEGER PIXAXE( NDF__MXDIM )! Pixel axis indices feeding WCS axis
       INTEGER RANGES( MAXRNG )   ! The fit ranges pixels
@@ -589,7 +586,7 @@
 *  Transform these two positions into pixel co-ordinates.
          CALL AST_TRANN( MAP, 2, NAXC, 2, CPOS, .FALSE., NDIM, 2, PPOS,
      :                   STATUS ) 
-   
+
 *  Find the pixel axis with the largest projection of the vector joining
 *  these two pixel positions.  The collapse will occur along this pixel
 *  axis.  Report an error if the positions do not have valid pixel
@@ -697,11 +694,11 @@
          DO I = 1, NRANGE, 2
 
 *  If MAP has an inverse, we can use MAP directly.
-            IF ( AXMAP .EQ. AST__NULL ) THEN
+            IF ( TMAP .EQ. AST__NULL ) THEN
                CPOS( 1, IAXIS ) = DRANGE( I + 1 )
                CPOS( 2, IAXIS ) = DRANGE( I )
 
-               CALL AST_TRANN( MAP, 2, NAXC, 2, CPOS, .FALSE., NDIM, 2,
+               CALL AST_TRANN( MAP, 2, NAXC, 2, CPOS, .TRUE., NDIM, 2,
      :                         PPOS, STATUS )
 
 *  Find the projection of the two test points onto the axis.
@@ -713,7 +710,7 @@
 *  Otherwise, we use the single-input single-output Mapping that generates 
 *  the requested WCS axis.
             ELSE
-               CALL AST_TRAN1( AXMAP, 2, DRANGE( I ), .FALSE., PRANGE, 
+               CALL AST_TRAN1( TMAP, 2, DRANGE( I ), .TRUE., PRANGE, 
      :                         STATUS )
 
                JLO = KPG1_FLOOR( REAL( MIN( PRANGE( 1 ),
