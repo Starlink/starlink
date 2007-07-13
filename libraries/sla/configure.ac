@@ -83,6 +83,9 @@ AC_FC_LIBRARY_LDFLAGS
 #  not float.
 STAR_CNF_F2C_COMPATIBLE
 
+#  Determine type of Fortran character string lengths.
+STAR_CNF_TRAIL_TYPE
+
 AC_CONFIG_HEADERS([config.h])
 
 dnl    Declare the build and use dependencies for this package
