@@ -64,7 +64,7 @@ itcl::class cat::SymbolConfig {
 	    
 	pack \
 	    [LabelWidget $f.cols.label \
-		 -text "Colums:" \
+		 -text "Columns:" \
 		 -labelwidth $itk_option(-labelwidth) \
 		 -anchor $itk_option(-anchor) \
 		 -labelfont $itk_option(-labelfont)] \
