@@ -58,7 +58,8 @@
 *        - Added COM_BOXCAR parameter to CONFIG file
 *     2007-07-10 (EC)
 *        Use smfArray instead of smfData
-
+*     2007-07-13 (EC):
+*        Calculate only 1 model component for each smfArray
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -102,7 +103,7 @@
 
 void smf_calcmodel_com( smfArray *res, AstKeyMap *keymap, 
 			double *map, double *mapvar, smfArray *model, 
-			int flags, int *status) {
+			int flags, int *status ) {
 
   /* Local Variables */
   dim_t base;                   /* Store base index for data array offsets */
@@ -111,14 +112,18 @@ void smf_calcmodel_com( smfArray *res, AstKeyMap *keymap,
   dim_t i;                      /* Loop counter */
   int idx=0;                    /* Index within subgroup */
   dim_t j;                      /* Loop counter */
-  double mean;                  /* Array mean */
+  double mean=0;                /* Array mean */
   double *model_data=NULL;      /* Pointer to DATA component of model */
-  dim_t nbolo;                  /* Number of bolometers */
-  dim_t ndata;                  /* Total number of data points */
-  dim_t ntslice;                /* Number of time slices */
+  dim_t nbolo=0;                /* Number of bolometers */
+  dim_t ndata=0;                /* Total number of data points */
+  dim_t ntslice=0;              /* Number of time slices */
   double lastmean;              /* Mean from previous iteration */
   double *res_data=NULL;        /* Pointer to DATA component of res */
-  double sigma;                 /* Array standard deviation */ 
+  double sigma=0;               /* Array standard deviation */ 
+  dim_t thisnbolo=0;            /* Check each file same dims as first */
+  dim_t thisndata=0;            /* "                                  */
+  dim_t thisntslice=0;          /* "                                  */
+  double *weight;               /* Weight at each point in model */
                                    
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -128,40 +133,84 @@ void smf_calcmodel_com( smfArray *res, AstKeyMap *keymap,
     do_boxcar = 1;
   }
 
+  /* The common mode signal is stored as a 1d array for the entire subgroup.
+     The corresponding smfData is at position 0 in the model sdata. */
+  
+  if( model->sdata[0] ) {
+    /* Pointer to model data array */
+    model_data = (double *)(model->sdata[0]->pntr)[0];
+    /* Temporary buffer to store weights */
+    weight = smf_malloc( (model->sdata[0]->dims)[0], sizeof(*weight), 1,
+			 status );
+  } else {
+    *status = SAI__ERROR;
+    errRep(FUNC_NAME, "Model smfData was not loaded!", status);      
+  }
+
+
   /* Loop over index in subgrp (subarray) */
-  for( idx=0; idx<res->ndat; idx++ ) {
+  for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
+
+    /* Obtain dimensions of the data */
+    thisnbolo = (res->sdata[idx]->dims)[0] * (res->sdata[idx]->dims)[1];
+    thisntslice = (res->sdata[idx]->dims)[2];
+    thisndata = nbolo*ntslice;
     
-    /* Get pointers to DATA components */
+    if( idx == 0 ) {
+      /* Store dimensions of the first file */
+      nbolo = thisnbolo;
+      ntslice = thisntslice;
+      ndata = thisndata;
+    } else {
+      /* Check that dimensions haven't changed */
+      if( (thisnbolo != nbolo) || (thisntslice != ntslice) || 
+	  (thisndata != ndata) ) {
+	*status = SAI__ERROR;
+	errRep(FUNC_NAME, "smfData's in smfArray have different dimensions!", 
+	       status);      
+      }
+
+    }
+
+    /* Get pointer to DATA component of residual */
     res_data = (double *)(res->sdata[idx]->pntr)[0];
-    model_data = (double *)(model->sdata[idx]->pntr)[0];
 
     if( (res_data == NULL) || (model_data == NULL) ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Null data in inputs", status);      
     } else {
     
-      /* Get the raw data dimensions */
-      nbolo = (res->sdata[idx]->dims)[0] * (res->sdata[idx]->dims)[1];
-      ntslice = (res->sdata[idx]->dims)[2];
-      ndata = nbolo*ntslice;
-
       for( i=0; i<ntslice; i++ ) {
-
+	
 	base = i*nbolo;  /* Index to first data point in i'th time slice */
 
-	/* Add previous iteration of the model back into the residual */
-	lastmean = model_data[i];
+	/* If this is the first subarray add the previous iteration of the 
+	   model back into the residual, and then set the model to 0. */
+	if( idx == 0 ) {
 
-	for( j=0; j<nbolo; j++ ) {
-	  res_data[base + j] += lastmean;
+	  lastmean = model_data[i];
+
+	  for( j=0; j<nbolo; j++ ) {
+	    res_data[base + j] += lastmean;
+	  }
+
+	  model_data[i] = 0;
 	}
 
-	/* Now calculate the new model as array average at this time slice */
+	/* Now calculate the new contribution to the model from the current
+	   sub-array average at this time slice */
 	smf_calc_stats( res->sdata[idx], "t", i, 0, 0, &mean, &sigma, status );
-	model_data[i] = mean;
-
+	model_data[i] += mean;
+	weight[i] ++;
       }
      
+      /* Re-normalize the model */
+      for( i=0; i<ntslice; i++ ) {
+	if( weight[i] ) {
+	  model_data[i] /= weight[i];
+	}
+      }
+
       /* boxcar smooth if desired */
       if( do_boxcar ) {
 	smf_boxcar1( model_data, ntslice, boxcar, status );
@@ -179,6 +228,9 @@ void smf_calcmodel_com( smfArray *res, AstKeyMap *keymap,
       }    
     }
   }
+
+  /* Clean up */
+  if( weight) smf_free( weight, status );
 }
 
 

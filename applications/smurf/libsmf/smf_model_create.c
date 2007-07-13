@@ -58,6 +58,8 @@
 *        Header length is now static / padded to multiple of pagesize 
 *     2007-07-10 (EC):
 *        Use smfGroups & smfArrays instead of groups and smfDatas
+*     2007-07-13 (EC):
+*        Only create one smfData per subgroup for SMF__COM models
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -179,6 +181,17 @@ void smf_model_create( const smfGroup *igroup, smf_modeltype mtype,
   /* Loop over subgroups */
   for( i=0; i<(*mgroup)->ngroups; i++ ) {
 
+    /* For models that only have one file per subgroup, fix up 
+       mgroup such that only the first filename in each subgroup
+       is used. Do this by setting remaining elements of mgroup->subgroups
+       to 0. */
+
+    if( mtype == SMF__COM ) {
+      for( j=1; j<(*mgroup)->nrelated; j++ ) {
+	(*mgroup)->subgroups[i][j] = 0;
+      }
+    }
+
     /* Loop over elements of subgroup */
     for( j=0; j<(*mgroup)->nrelated; j++ ) {
     
@@ -240,7 +253,7 @@ void smf_model_create( const smfGroup *igroup, smf_modeltype mtype,
 	    head.dims[2] = (idata->dims)[2];
 	    break;
 	    
-	  case SMF__COM: /* Single-valued common-mode at each time step */
+	  case SMF__COM: /* Common-mode at each time step */
 	    copyinput = 0;
 	    head.dtype = SMF__DOUBLE;
 	    head.ndims = 1;
@@ -316,7 +329,7 @@ void smf_model_create( const smfGroup *igroup, smf_modeltype mtype,
 	  if( (fd = open( name, O_RDWR | O_CREAT | O_TRUNC, 
 			  S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH )) == -1 ) {
 	    *status = SAI__ERROR;
-	    errRep( FUNC_NAME, "Unable to open model container file", status ); 
+	    errRep( FUNC_NAME, "Unable to open model container file", status );
 	  }
       
 	  buf = smf_malloc( headlen+datalen, 1, 0, status );
