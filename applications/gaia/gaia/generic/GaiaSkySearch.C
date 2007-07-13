@@ -614,6 +614,87 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
 }
 
 
+/*
+ * Parse the given symbol info and set the values of the last 7 args from
+ * it. Overridden to support GAIA symbols. Note it's a copy because the types 
+ * are hardcoded.
+ */
+int GaiaSkySearch::parse_symbol( const QueryResult& r, int argc, char** argv, 
+                                 char*& shape, char*& fg, char*& bg, 
+                                 char*& ratio, char*& angle, char*& label, 
+                                 char*& cond )
+{
+    static char* symbols[] = {
+	"arrow",
+        "arc",
+	"circle",
+	"compass",
+	"cross",
+	"diamond",
+	"ellipse",
+	"line",
+	"plus",
+	"square",
+	"triangle",
+        "rotbox",
+        "xrange",
+        "yrange"
+    };
+    static int nsymbols = sizeof(symbols)/sizeof(char*);
+    int found = 0;
+    
+    if (argc < 1)
+	return error("empty plot symbol");
+
+    // symbol shape
+    shape = argv[0];
+    for (int i = 0; i < nsymbols; i++) {
+	if (strcmp(shape, symbols[i]) == 0) {
+	    found++;
+	    break;
+	}
+    }
+    if (!found)
+	return error("invalid plot symbol");
+
+    // color
+    if (argc >= 2) {
+	if (strlen(argv[1])) {
+	    fg = bg = argv[1];
+	}
+    }
+    
+    // ratio
+    if (argc >= 3) {
+	if (strlen(argv[2])) {
+	    ratio = argv[2];
+	}
+    }
+
+    // angle
+    if (argc >= 4) {
+	if (strlen(argv[3])) {
+	    angle = argv[3];
+	}
+    }
+
+    // label
+    if (argc >= 5) {
+	if (strlen(argv[4])) {
+	    label = argv[4];
+	}
+    }
+
+    // cond
+    if (argc >= 6) {
+	if (strlen(argv[5])) {
+	    cond = argv[5];
+	}
+    }
+    
+    return TCL_OK;
+}
+
 /**
  *  Set or get the values used to offset image coordinates when
  *  plotted.  These are the NDF origin values and are used to

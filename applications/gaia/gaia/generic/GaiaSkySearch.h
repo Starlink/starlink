@@ -20,7 +20,7 @@
  *     Copyright (C) 1998-2005 Central Laboratory of the Research Councils.
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
  *     All Rights Reserved.
- 
+
  *  Licence:
  *     This program is free software; you can redistribute it and/or
  *     modify it under the terms of the GNU General Public License as
@@ -49,7 +49,7 @@
 
 #include "SkySearch.h"
 
-class GaiaSkySearch : public SkySearch 
+class GaiaSkySearch : public SkySearch
 {
 
  protected:
@@ -57,29 +57,34 @@ class GaiaSkySearch : public SkySearch
     //  Origins to be added to plot image coordinates.
     double xOrigin_;
     double yOrigin_;
-    
+
  public:
-    
+
     //  Constructor.
-    GaiaSkySearch( Tcl_Interp *interp, const char *cmdname, 
-                   const char *instname);
-    
+    GaiaSkySearch( Tcl_Interp *interp, const char *cmdname,
+                   const char *instname );
+
     //  Destructor.
     ~GaiaSkySearch();
-    
+
     //  Entry point from Tcl
-    static int astroCatCmd( ClientData, Tcl_Interp *interp, 
+    static int astroCatCmd( ClientData, Tcl_Interp *interp,
                             int argc, char *argv[] );
-    
+
     //  Call a member function by name.
     virtual int call( const char *name, int len, int argc, char  *argv[] );
-    
+
     //  Plot command (overriden to sort out X,Y -v- RA/Dec clash).
-    virtual int plot_objects( Skycat *image, const QueryResult& r, 
-                              const char *cols, const char *symbol, 
+    virtual int plot_objects( Skycat *image, const QueryResult& r,
+                              const char *cols, const char *symbol,
                               const char *expr );
-    
-    
+
+    // Parse the given symbol info and set the values of the last 7 args
+    virtual int parse_symbol( const QueryResult& r, int nsymb, char** symb,
+                              char*& shape, char*& fg, char*& bg,
+                              char*& ratio, char*& angle, char*& label,
+                              char*& cond );
+
     // -- tcl subcommands --
     virtual int openCmd( int argc, char *argv[] );
     virtual int saveCmd( int argc, char *argv[] );
