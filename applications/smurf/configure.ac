@@ -73,7 +73,6 @@ fi
 
 
 dnl    External libraries
-LDFLAGS="$LDFLAGS -L/usr/lib64"
 AC_CHECK_LIB( [gslcblas], [cblas_dsdot], [], [
          echo "Error! Couldn't find libgslcblas. Retry with --with-gsl option?"
         exit -1
