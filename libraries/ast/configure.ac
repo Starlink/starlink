@@ -73,6 +73,9 @@ STAR_DECLARE_DEPENDENCIES(build, sla)
 #  not float.
 STAR_CNF_F2C_COMPATIBLE
 
+#  Determine the type of Fortran character string lengths.
+STAR_CNF_TRAIL_TYPE
+
 #   Declare the message file.  
 STAR_MESSGEN(ast_err.msg)
 

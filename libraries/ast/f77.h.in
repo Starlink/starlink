@@ -197,6 +197,9 @@
 *        effects g77 under 64-bit, when the f2c bindings expect the return
 *        value of a REAL function to be a double, not a float. Note this 
 *        file is now a branch of the CNF version (no starmem dependency).
+*      13-JUL-2007 (PWD):
+*        Parameterise the type of Fortran character string lengths. Can
+*        be long.
 *     {enter_further_changes_here}
 *        
 
@@ -386,7 +389,7 @@
 /*  variables.								    */
 
 #define CHARACTER(X)             F77_CHARACTER_TYPE *CNF_CONST X
-#define TRAIL(X)                 ,int X ## _length
+#define TRAIL(X)                 ,@TRAIL_TYPE@ X ## _length
 #define CHARACTER_ARRAY(X)       F77_CHARACTER_TYPE *CNF_CONST X
 
 
@@ -679,7 +682,7 @@
 /*  Macros to handle character dummy arguments.				    */
 
 #undef  TRAIL
-#define TRAIL(X) ,int X/**/_length
+#define TRAIL(X) ,@TRAIL_TYPE@ X/**/_length
 
 
 /*  ---  Declare variables  ---						    */
