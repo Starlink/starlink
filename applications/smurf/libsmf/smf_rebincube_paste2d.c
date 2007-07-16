@@ -116,6 +116,8 @@
 *        Initial version.
 *     2-MAY-2007 (DSB):
 *        Added parameter naccept.
+*     16-JUL-2007 (DSB):
+*        Ignore input spectra that contain no good data.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -178,7 +180,7 @@ void smf_rebincube_paste2d( int badmask, dim_t nchan, int nchanout,
 
 /* We first paste the input spectrum into the work array, which is used
    as a temporary staging area for the input spectrum, prior to pasting it
-   into the output cube. This is done so that he number of input channels
+   into the output cube. This is done so that the number of input channels
    that correspond to each output channel can be normalised out. Initialise
    the work array to hold zero at every output channel, except for those 
    output channels to which no input channels contribute. Store bad values 
@@ -212,7 +214,7 @@ void smf_rebincube_paste2d( int badmask, dim_t nchan, int nchanout,
 /* If the input and output spectra are both good at this channel, then paste 
    the input pixel value into the work array, dividing it by the number of 
    input channels that contribute to the output channel. In effect, this 
-   causes the fina output channel value to be the mean of all the input
+   causes the final output channel value to be the mean of all the input
    channels that contribute to the output channel. */
             } else {
                work[ ochan ] += ( *qdata )/specpop[ ochan ];
@@ -230,7 +232,7 @@ void smf_rebincube_paste2d( int badmask, dim_t nchan, int nchanout,
    if( badmask == 0 ) {
 
 /* If this is the first spectrum to be included in the output spectrum, we 
-   only ignore it if is contains no good data. */
+   only ignore it if it contains no good data. */
       if( wgt_array[ iv0 ] == 0.0 ) {
          qdata = work;
          for( ochan = 0; ochan < nchanout; ochan++, qdata++ ) {
@@ -261,6 +263,18 @@ void smf_rebincube_paste2d( int badmask, dim_t nchan, int nchanout,
             }
          }
       }
+
+/* If we are using "AND" or "OR" for BADMASK, we can ignore the spectrum
+   if it contains no good data. */
+   } else {
+      qdata = work;
+      for( ochan = 0; ochan < nchanout; ochan++, qdata++ ) {
+         if( *qdata != VAL__BADR ) {
+            qdata = NULL;
+            break;
+         }
+      }
+      if( qdata != NULL ) ignore = 1;
    }
 
 /* Check the detector is still good. */
