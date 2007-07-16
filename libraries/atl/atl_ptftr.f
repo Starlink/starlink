@@ -68,7 +68,10 @@
 *  History:
 *     9-FEB-2007 (DSB):
 *        Original version.
-
+*     16-JUL-2007 (DSB):
+*        Modified to check that the stored keyword value can be
+*        formatted. A warning message is issued if not, and the 
+*        card is deleted.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -119,5 +122,38 @@
          DVAL = AST__UNDEFF
       END IF
       CALL AST_SETFITSF( THIS, NAME, DVAL, COMMNT, .TRUE., STATUS )
+
+*  Format the new keyword value. If this fails, annul the error, issue a
+*  warning, and delete the card from the FitsChan. 
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL AST_CLEAR( THIS, 'Card', STATUS )
+         FOUND = AST_FINDFITS( THIS, NAME, CARD, .FALSE., STATUS )
+
+         IF( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_ANNUL( STATUS )
+            CALL AST_DELFITS( THIS, STATUS )
+            FOUND = .FALSE.
+         END IF
+
+         IF( .NOT. FOUND ) THEN
+
+            CALL MSG_BLANK( STATUS )
+
+            CALL MSG_SETR( 'V', VALUE )
+            CALL MSG_SETC( 'F', NAME )
+            CALL MSG_OUT( ' ', 'WARNING: Cannot store the value ^V '//
+     :                    'for FITS header ^F.', STATUS )
+
+            CALL MSG_SETC( 'F', NAME )
+            CALL MSG_OUT( ' ', 'No value will be stored for FITS '//
+     :                    'header ^F.', STATUS )
+
+*  If it was formatted and found, modify the current card to be the one
+*  following the card just added.
+         ELSE
+            FOUND = AST_FINDFITS( THIS, '%f', CARD, .TRUE., STATUS )
+         END IF
+
+      END IF
 
       END
