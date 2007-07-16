@@ -18,10 +18,10 @@
 *     a count and pointer in COMMON.
 *
 *     Header inheritance will only occur if keyword INHERIT is T for the given
-*     HDU and there are some save primary header cards. It is assumed that
+*     HDU and there are some save primary header cards.  It is assumed that
 *     unwanted primary cards, such as HISTORY and COMMENT will not have been
-*     saved
-*     
+*     saved.
+*
 *     A mask is maintained for the saved primary header keywords and the 
 *     corresponding element set FALSE if a current header keyword overrides
 *     the  primary header.  Any primary header keywords which have not been 
@@ -120,44 +120,47 @@
 *  Get the length of the filename.
       NCF = CHR_LEN( FILE )
 
-*  Set default to merged header same as extension header 
+*  Set default to merged header same as extension header.
       FUNITM = FUNITE
 
-*  See if there's anything to inherit
+*  See if there's anything to inherit.
       IF ( NPHEAD .GT. 0 ) THEN
 
-*  See if we need to inherit i.e  INHERIT T is present.
-         CALL COF_GKEYL(
-     :     FUNITE, 'INHERIT', THERE, INHERIT, COMENT, STATUS )
+*  See if we need to inherit i.e.  INHERIT=T is present.
+         CALL COF_GKEYL( FUNITE, 'INHERIT', THERE, INHERIT, COMENT,
+     :                   STATUS )
 
          IF ( (STATUS .EQ. SAI__OK ) .AND. THERE .AND. INHERIT ) THEN      
-*  Get memory for the primary header mask
+
+*  Get memory for the primary header mask.
             CALL PSX_CALLOC( NPHEAD, '_LOGICAL', PMASK, STATUS )
-            CALL CON_CONSL(
-     :     .TRUE., NPHEAD, %VAL(CNF_PVAL(PMASK) ), STATUS )
+            CALL CON_CONSL( .TRUE., NPHEAD, %VAL( CNF_PVAL( PMASK ) ),
+     :                      STATUS )
             IF ( STATUS .EQ. SAI__OK ) THEN
            
-*  Get a free unit number and open a  FITS file in memory
+*  Get a free unit number and open a  FITS file in memory.
                CALL FTGIOU( FUNITM, FSTAT )
                CALL FTINIT( FUNITM, 'mem://', 1, FSTAT )
                IF ( FSTAT .NE. FITSOK ) THEN
-*  Failed to open new unit
+
+*  Failed to open new unit.
                   CALL COF_FIOER( FSTAT, 'COF_MRGHD_GHEAD', 'FTGREC',
-     :             'Error opening temporary FITS for merged header',
-     :             STATUS )
+     :              'Error opening temporary FITS for merged header',
+     :              STATUS )
 
                ELSE
 
-*  Allocate space for the max size of the merged header 
+*  Allocate space for the maximum size of the merged header.
                   CALL COF_NHEAD( FUNITE, FILE, NHEAD, STATUS )
                   IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  The first card must be a SIMPLE card as the airlock should look like
-*  a primary header
+*  a primary header.
                      CARD = 1
                      CALL FTPREC( FUNITM, SIMPLE, FSTAT )
 
                      DO IHEAD = 1, NHEAD
+
 *  Obtain the header.
                         CALL FTGREC( FUNITE, IHEAD, HEADER, FSTAT )
 
@@ -173,8 +176,8 @@
      :                       STATUS )
                            GOTO 980
 
-                        ELSE
 *  Ignore extension-only keywords
+                        ELSE
                            IF ( .NOT. ( ( HEADER(1:8) .EQ. 'XTENSION' )
 !     :                  .OR. ( HEADER(1:8) .EQ. 'EXTNAME' ) 
 !     :                  .OR. ( HEADER(1:8) .EQ. 'EXTVER' ) 
@@ -184,16 +187,17 @@
      :                  .OR. ( HEADER(1:8) .EQ. 'PCOUNT' ) 
      :                  .OR. ( HEADER(1:8) .EQ. 'GCOUNT' ) ) ) THEN
                   
+*  Eliminate similar keywords from the primary header...
                               IF ( HEADER .NE. ' ' ) THEN                 
-*  Eliminate similar keywords from the primary header
-                                 CALL COF_CHKP( 
-     :                             HEADER(1:8), %VAL(CNF_PVAL(H0_PTR)),
-     :                             NPHEAD, %VAL(CNF_PVAL(PMASK)),
-     :                             STATUS )
+                                 CALL COF_CHKP( HEADER(1:8), 
+     :                                          %VAL(CNF_PVAL(H0_PTR)),
+     :                                          NPHEAD, 
+     :                                          %VAL(CNF_PVAL(PMASK)),
+     :                                          STATUS )
                               END IF
 
-*  and write the header to the merged header
-*  Keep a count of the number of cards written
+*  and write the header to the merged header.  Keep a count of the 
+*  number of cards written.
                               CARD = CARD + 1
                               CALL FTPREC( FUNITM, HEADER, FSTAT )
 
@@ -203,14 +207,15 @@
 
                      END DO  ! For each header card
 
-*  Now add anything not eliminated from the primary header
-                     CALL COF_ADDP( FUNITM, %VAL(CNF_PVAL(H0_PTR)),
-     :                 NPHEAD, %VAL(CNF_PVAL(PMASK)), CARD, STATUS )
+*  Now add anything not eliminated from the primary header.
+                     CALL COF_ADDP( FUNITM, %VAL( CNF_PVAL( H0_PTR ) ),
+     :                              NPHEAD, %VAL( CNF_PVAL( PMASK) ),
+     :                              CARD, STATUS )
 
-*  Free the PMASK memory
+*  Free the PMASK memory.
                      CALL PSX_FREE( PMASK )
                      
-*  Add the END card
+*  Add the END card.
                      HEADER = 'END'
                      CALL FTPREC( FUNITM, HEADER, FSTAT )
                      
