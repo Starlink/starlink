@@ -69,12 +69,13 @@
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2005 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -84,8 +85,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -94,6 +95,8 @@
 *  History:
 *     2005 October 6 (MJC):
 *        Original version, derived from FITSMOD code.
+*     2007 July 16 (MJC):
+*        Fix bug where a card string was passed instead of a card index.
 *     {enter_further_changes_here}
 
 *-
@@ -125,7 +128,7 @@
 *  Local Variables:
       INTEGER ATEMPT             ! Number of attempts to obtain a
                                  ! valid keyword
-      CHARACTER * ( FITSLN ) CARD ! FITS header card of the keyword
+      INTEGER CARD               ! Index to header card of the keyword
       CHARACTER * ( 60 ) COMENT ! FITS header card's comment
       INTEGER EL                 ! Number of FITS headers in extension
       INTEGER FTSPNT( 1 )        ! Pointer to mapped FITS X
