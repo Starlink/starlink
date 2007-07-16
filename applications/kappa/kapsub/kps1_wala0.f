@@ -130,6 +130,9 @@
 *        Add argument AUTOBN.
 *     2006 April 12 (MJC):
 *        Remove unused variables and wrapped long lines.
+*     16-JUL-2007 (DSB):
+*        Copy RestFreq and IF from input to output, rather than from ref
+*        to output, if aligning in velocity.
 *     {enter_further_changes_here}
 
 *-
@@ -168,40 +171,39 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER ASYS1*30         ! Input alignment system
+      CHARACTER ASYSR*30         ! Reference alignement system
+      CHARACTER ATTR*30          ! Attribute name
       CHARACTER DTYPE*(NDF__SZFTP) ! Data type
       CHARACTER TY_IN*(NDF__SZTYP) ! Numeric type for processing
       DOUBLE PRECISION DUMMY( 1 ) ! Dummy array
-      DOUBLE PRECISION PLBND1( NDF__MXDIM ) ! Lower pixel co-ord bounds 
-                                 ! in input
-      DOUBLE PRECISION PLBND2( NDF__MXDIM ) ! Lower pixel co-ord bounds 
-                                  ! in output
-      DOUBLE PRECISION PUBND1( NDF__MXDIM ) ! Upper pixel co-ord bounds
-                                 ! in input
-      DOUBLE PRECISION PUBND2( NDF__MXDIM ) ! Upper pixel co-ord bounds
-                                 ! in output
+      DOUBLE PRECISION PLBND1( NDF__MXDIM ) ! Lower i/p pixel bounds 
+      DOUBLE PRECISION PLBND2( NDF__MXDIM ) ! Lower o/p pixel bounds 
+      DOUBLE PRECISION PUBND1( NDF__MXDIM ) ! Upper i/p pixel bounds
+      DOUBLE PRECISION PUBND2( NDF__MXDIM ) ! Upper o/p pixel bounds
       DOUBLE PRECISION TOL       ! Max. tolerable geometrical distortion
-      DOUBLE PRECISION XL( NDF__MXDIM ) ! I/p position of output lower 
-                                 ! bound
-      DOUBLE PRECISION XU( NDF__MXDIM ) ! I/p position of output upper 
-                                 ! bound
+      DOUBLE PRECISION XL( NDF__MXDIM ) ! I/p pos. of o/p lower bound
+      DOUBLE PRECISION XU( NDF__MXDIM ) ! I/p pos. of o/p upper bound
       INTEGER BAD_PIXELS         ! Value returned from AST_RESAMPLE<x>
+      INTEGER CFRM1              ! I/p NDF current Frame
+      INTEGER CFRMR              ! Reference current Frame
       INTEGER EL                 ! No. of elements in a mapped array
       INTEGER FLAGS              ! Sum of AST__USEBAD and AST__USEVAR
+      INTEGER FS                 ! FrameSet defining output current Frame
       INTEGER I                  ! Loop count
+      INTEGER IAT                ! Length of string
+      INTEGER ICUR               ! Index of original currrent Frame
       INTEGER IPD1               ! Pointer to input data array
       INTEGER IPD2               ! Pointer to output data array
-      INTEGER IPIX2              ! Index of PIXEL Frame in output NDF 
-                                 ! FrameSet
-      INTEGER IPIXR              ! Index of PIXEL Frame in ref. NDF 
-                                 ! FrameSet
+      INTEGER IPIX2              ! Index of PIXEL Frame in o/p FrameSet
+      INTEGER IPIXR              ! Index of PIXEL Frame in ref. FrameSet
       INTEGER IPQ1               ! Pointer to input quality array
       INTEGER IPQ2               ! Pointer to output quality array
       INTEGER IPV1               ! Pointer to input variance array
       INTEGER IPV2               ! Pointer to output variance array
-      INTEGER IWCS2              ! AST pointer to original output WCS 
-                                 ! FrameSet
-      INTEGER IWCSR2             ! AST pointer to new output WCS 
-                                 ! FrameSet
+      INTEGER IWCS1              ! Original input WCS FrameSet
+      INTEGER IWCS2              ! Original output WCS FrameSet
+      INTEGER IWCSR2             ! New output WCS FrameSet
       INTEGER J                  ! Loop count
       INTEGER LBND1( NDF__MXDIM ) ! Lower bounds of input NDF
       INTEGER LBND2( NDF__MXDIM ) ! Lower bounds of output NDF
@@ -211,14 +213,14 @@
       INTEGER MAP3               ! AST Mapping (ref. GRID -> o/p GRID)
       INTEGER MAP5               ! AST Mapping (i/p GRID -> o/p GRID)
       INTEGER MAPR               ! AST Mapping (ref. GRID -> ref. PIXEL)
+      INTEGER NAX                ! No. of current Frame axes
       INTEGER NDIM1              ! No. of pixel axes in input NDF
-      INTEGER RESULT             ! Dummy value returned from AST_RESAMPLE<x>
+      INTEGER RESULT             ! Value returned from AST_RESAMPLE<x>
       INTEGER UBND1( NDF__MXDIM ) ! Upper bounds of input NDF
       INTEGER UBND2( NDF__MXDIM ) ! Upper bounds of output NDF
       INTEGER UGRID1( NDF__MXDIM ) ! Upper bounds of input grid co-ords
       INTEGER UGRID2( NDF__MXDIM ) ! Upper bounds of output grid co-ords
-      LOGICAL BAD_DV             ! Bad pixels present in DATA/VARIANCE 
-                                 ! arrays?
+      LOGICAL BAD_DV             ! Bad pixels in DATA/VARIANCE arrays?
       LOGICAL QUAL               ! Are quality values to be copied?
       LOGICAL VAR                ! Are variance values to be copied?
 *.
@@ -348,6 +350,59 @@
 *  Re-map the GRID Frame in the copy of the reference WCS FrameSet so
 *  that it corresponds to the GRID Frame in the output NDF.
       CALL AST_REMAPFRAME( IWCSR2, AST__BASE, MAP3, STATUS )
+
+*  If the data has a spectral axis, and if the spectral axis has been
+*  aligned in velocoty, we propagate certain attributes from the input
+*  SpecFrame to the output SpecFrame. Otherwise, all attributes are
+*  propagated from the reference NDF. First get the WCS FrameSet from 
+*  the input NDF, and get a pointer to its current Frame.
+      CALL KPG1_GTWCS( INDF1, IWCS1, STATUS )
+      CFRM1 = AST_GETFRAME( IWCS1, AST__CURRENT, STATUS )
+
+*  Get a pointer to the current Frame in the output WCS FrameSet.
+      CFRMR = AST_GETFRAME( IWCSR2, AST__CURRENT, STATUS ) 
+
+*  Loop round all the axes in the current Frame.
+      NAX = AST_GETI( CFRMR, 'Naxes', STATUS )
+      DO I = 1, NAX
+
+*  Get the value of the AlignSystem attribute for the I'th axis in the
+*  current frame of both the input and output FrameSets.
+         ATTR = 'AlignSystem('
+         IAT = 12
+         CALL CHR_PUTI( I, ATTR, IAT )
+         CALL CHR_APPND( ')', ATTR, IAT )
+
+         ASYS1 = AST_GETC( CFRM1, ATTR( : IAT ), STATUS ) 
+         ASYSR = AST_GETC( CFRMR, ATTR( : IAT ), STATUS ) 
+
+*  If the AlignSystem value for either Frame is one of the spectral
+*  velocity values, then the I'th axis must be the spectral axis.
+         IF( ASYS1 .EQ. 'VRAD' .OR. ASYS1 .EQ. 'VOPT' .OR.
+     :       ASYS1 .EQ. 'VELO' .OR. ASYSR .EQ. 'VRAD' .OR. 
+     :       ASYSR .EQ. 'VOPT' .OR. ASYSR .EQ. 'VELO' ) THEN
+
+*  Copy selected SpecFrame attributes from input to output.
+            CALL AST_SETD( CFRMR, 'RestFreq', 
+     :                     AST_GETD( CFRM1, 'RestFreq', STATUS ), 
+     :                     STATUS )
+
+*  Now copy the DSBSpecFrame attributes that are to be retained in the 
+*  output NDF. If the spectral axis is a simple SpecFrame rather than a
+*  DSBSpecFrame, an error will be reported when we attempt to access
+*  these attributes. So we check status first and then annul any
+*  error that arises whilst copying these attributes.
+            IF( STATUS .EQ. SAI__OK ) THEN
+
+               CALL AST_SETD( CFRMR, 'IF', 
+     :                        AST_GETD( CFRM1, 'IF', STATUS ), 
+     :                        STATUS )
+
+               IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+            END IF
+
+         END IF         
+      END DO
 
 *  Store this FrameSet in the output NDF.
       CALL NDF_PTWCS( IWCSR2, INDF2, STATUS )
