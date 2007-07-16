@@ -60,6 +60,8 @@
 *        Use smfArray instead of smfData
 *     2007-07-13 (EC):
 *        Calculate only 1 model component for each smfArray
+*     2007-07-16 (EC):
+*        Modified range checking for range of smfData's in smfArray
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -154,8 +156,8 @@ void smf_calcmodel_com( smfArray *res, AstKeyMap *keymap,
     /* Obtain dimensions of the data */
     thisnbolo = (res->sdata[idx]->dims)[0] * (res->sdata[idx]->dims)[1];
     thisntslice = (res->sdata[idx]->dims)[2];
-    thisndata = nbolo*ntslice;
-    
+    thisndata = thisnbolo*thisntslice;
+
     if( idx == 0 ) {
       /* Store dimensions of the first file */
       nbolo = thisnbolo;
@@ -166,6 +168,7 @@ void smf_calcmodel_com( smfArray *res, AstKeyMap *keymap,
       if( (thisnbolo != nbolo) || (thisntslice != ntslice) || 
 	  (thisndata != ndata) ) {
 	*status = SAI__ERROR;
+
 	errRep(FUNC_NAME, "smfData's in smfArray have different dimensions!", 
 	       status);      
       }
