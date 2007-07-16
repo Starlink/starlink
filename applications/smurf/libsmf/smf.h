@@ -173,6 +173,8 @@
 *     2007-07-12 (EC):
 *        -Added moving to smf_bbrebinmap and smf_calc_mapcoord
 *        -Changed name of smf_rebincube_totmap to smf_rebin_totmap
+*     2007-07-16 (EC):
+*        -Added copysubgroups to smf_construct_smfGroup
 
 *     {enter_further_changes_here}
 *  Copyright:
@@ -301,7 +303,8 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 
 smfGroup * 
 smf_construct_smfGroup( Grp *igrp, int **subgroups, const int ngroups, 
-			const int nrelated, int *status );
+			const int nrelated, const int copysubgroups, 
+			int *status );
 
 void smf_create_lutwcs( int clearcache, const double *fplane_x, 
 			const double *fplane_y, const int n_pix, 

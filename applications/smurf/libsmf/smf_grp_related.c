@@ -54,6 +54,8 @@
 *     2006-10-11 (AGG):
 *        Additional checks for relatedness: wavelength and dimensions
 *        of data array
+*     2007-07-16 (EC):
+*        -Changed smf_construct_smfGroup interface
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -269,7 +271,8 @@ void smf_grp_related (  Grp *igrp, const int grpsize, const int grpbywave, smfGr
   }
 
   /* Create the smfGroup */
-  *group = smf_construct_smfGroup( igrp, subgroups, ngroups, nelem, status );
+  *group = smf_construct_smfGroup( igrp, subgroups, ngroups, nelem, 0, 
+				   status );
 
  CLEANUP:
   smf_free( starts, status );

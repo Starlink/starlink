@@ -60,6 +60,8 @@
 *        Use smfGroups & smfArrays instead of groups and smfDatas
 *     2007-07-13 (EC):
 *        Only create one smfData per subgroup for SMF__COM models
+*     2007-07-16 (EC):
+*        -Changed smf_construct_smfGroup interface
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -174,7 +176,7 @@ void smf_model_create( const smfGroup *igroup, smf_modeltype mtype,
      mgrp afterward. */
 
   *mgroup = smf_construct_smfGroup( mgrp, igroup->subgroups, igroup->ngroups,
-				   igroup->nrelated, status );
+				    igroup->nrelated, 1, status );
 
   if( mgrp ) grpDelet( &mgrp, status );
 

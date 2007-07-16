@@ -14,7 +14,9 @@
 
 *  Invocation:
 *     smfGroup* = smf_construct_smfGroup( Grp *igrp, int **subgroups, 
-*				          const int ngroups, const int nrelated, 
+*				          const int ngroups, 
+*                                         const int nrelated,
+*                                         const int copysubgroups, 
 *                                         int *status );
 
 *  Arguments:
@@ -24,8 +26,10 @@
 *        Pointer to array of pointers to arrays of indices into Grp
 *     ngroups = int (Given)
 *        Number of subgroups in the smfGroup
-*     nrelated = in (Given)
+*     nrelated = int (Given)
 *        Maximum number of related files in the smfGroup
+*     subgroups = int (Given)
+*        If non-zero copy subgroups rather than using subgroups itself
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -39,14 +43,19 @@
 
 
 *  Notes:
+*     If making a new smfGroup using the the same grouping as another
+*     smfGroup use the copysubgroups flag to avoid sharing the memory.
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
 *     2006-06-24 (AGG):
 *        Initial version
+*     2007-07-16 (EC):
+*        Added copysubgroups
 
 *  Copyright:
 *     Copyright (C) 2006 University of British Columbia.  All Rights
@@ -97,13 +106,16 @@
 
 #define FUNC_NAME "smf_construct_smfGroup"
 
-smfGroup *smf_construct_smfGroup ( Grp *igrp, int **subgroups, const int ngroups, 
-				   const int nrelated, int *status ) {
+smfGroup *smf_construct_smfGroup( Grp *igrp, int **subgroups, 
+				  const int ngroups,  const int nrelated, 
+				  const int copysubgroups, int *status ) {
 
   /* Local variables */
   smfGroup *group = NULL;
   int isize;
-
+  dim_t i, j;
+  int **newsubgroups=NULL;
+  
   if ( *status != SAI__OK ) return NULL;
 
   /* Allocate space for smfGroup */
@@ -121,9 +133,30 @@ smfGroup *smf_construct_smfGroup ( Grp *igrp, int **subgroups, const int ngroups
     goto CLEANUP;
   }
 
-  group->subgroups = subgroups;
-  group->ngroups = ngroups;
-  group->nrelated = nrelated;
+  if( copysubgroups ) {
+    /* Make a copy of subgroups if requested */
+    newsubgroups = smf_malloc( ngroups, sizeof(*newsubgroups), 1, status );
+    for( i=0; i<ngroups; i++ ) {
+      newsubgroups[i] = smf_malloc( nrelated, sizeof(**newsubgroups), 0, 
+				    status );
+      if( *status == SAI__OK ) {
+	memcpy( newsubgroups[i], subgroups[i], 
+		sizeof(**newsubgroups)*nrelated );
+      }
+    }
+
+    if( *status == SAI__OK ) {
+      group->subgroups = newsubgroups;
+    }
+  } else {
+    /* Otherwise use the input subgroups */
+    group->subgroups = subgroups;
+  }
+
+  if( *status == SAI__OK ) {
+    group->ngroups = ngroups;
+    group->nrelated = nrelated;
+  }
 
   return group;
 
