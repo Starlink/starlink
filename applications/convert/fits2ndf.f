@@ -37,11 +37,18 @@
 *     A more general facility is also provided to associate specified
 *     FITS extensions with NDF components by means of entries in a text
 *     file (see the EXTABLE parameter).
-
+*
 *     Details of the supported special formats and rules for processing
 *     them are given in topic "Special Formats"; the general-case
 *     processing rules are described in the "Notes".
-
+*
+*     FITS2NDF can also process both external and internal compressed
+*     FITS files.  The external compression applies to the whole file 
+*     and FITS2NDF recognises gzip (.gz) and UNIX compress (.Z) formats.
+*     Internal compressions are where a large image is tiled and each
+*     tile is compressed.  The supported formats are Rice, the IRAF 
+*     PLIO, and GZIP.
+*
 *     Both NDF and FITS use the term extension, and they mean different
 *     things.  Thus to avoid confusion in the descriptions below, the
 *     term `sub-file' is used to refer to a FITS IMAGE, TABLE or

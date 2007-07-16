@@ -193,6 +193,16 @@
 *     files will be propagated, regardless of the value of PROEXTS.
 
 *  Special Formats:
+*     o  Compressed
+*        It can process both external and internal compressed FITS 
+*        files.  
+*         -  The external compression applies to the whole file and the
+*        conversion recognises gzip (.gz) and UNIX compress (.Z)
+*        formats.
+*        -  Internal compressions are where a large image is tiled and
+*        each tile is compressed.  The supported formats are Rice, the
+*        IRAF PLIO, and GZIP.
+*
 *     o  NDF2FITS
 *
 *        -  This is recognised by the presence of an HDUCLAS1 keyword
@@ -270,7 +280,6 @@
 *     DSB: David S. Berry (STARLINK)
 *     AJC: Alan J. Chipperfield (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
-*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -350,8 +359,6 @@
 *     2007 January 3 (MJC):
 *        Make argument FMTCNV character to allow for FMTCNV=Native, and
 *        create a scaled NDF array for that case.
-*     2007 July 9 (PWD):
-*        Added support for compressed images.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -704,12 +711,6 @@
      :                            BUFFER, STATUS )
                   GOTO 999
 
-               END IF
-
-*  Some binary tables are compressed images, check for that.
-               CALL FTGHDT( FUNITD, HDUTYP, FSTAT )
-               IF ( XTENS .EQ. 'BINTABLE' .AND. HDUTYP .EQ. 0 ) THEN
-                  XTENS = 'IMAGE'
                END IF
             END IF
 
@@ -1164,14 +1165,12 @@
      :                               ITYPE, STATUS )
 
 *  Specify the bounds of the NDF array component unless it has already
-*  been done, in which case check for compatibility. Note use FUNITD
-*  not FUNITH, these could be compressed images, which have to be
-*  accessed using the original headers, not merged ones.
+*  been done, in which case check for compatibility.
                      IF ( NEWNDF ) THEN
-                        CALL COF_SBND( FUNITD, NDFE, 'LBOUND', .FALSE.,
+                        CALL COF_SBND( FUNITH, NDFE, 'LBOUND', .FALSE.,
      :                                 STATUS )
                      ELSE
-                        CALL COF_SBND( FUNITD, NDFE, 'LBOUND', .TRUE.,
+                        CALL COF_SBND( FUNITH, NDFE, 'LBOUND', .TRUE.,
      :                                 STATUS )
                         IF ( STATUS .NE. SAI__OK ) THEN
                            CALL MSG_SETC( 'NDF', NDFNAM )

@@ -23,7 +23,7 @@
                                 A.J.Chipperfield\\
                                 D.S.Berry\\
                                 A.C.Davenhall}
-\newcommand{\stardocdate}      {2007 July 6}
+\newcommand{\stardocdate}      {2007 July 13}
 \newcommand{\stardoctitle}     {CONVERT\\
                                 A Format-conversion Package}
 \newcommand{\stardocversion}   {Version 1.5-10}
@@ -1989,6 +1989,13 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       the general-case
       processing rules are described in the 
       \htmlref{\texttt{"}Notes\texttt{"}}{fits2ndf_notes}.
+
+      FITS2NDF can also process both external and internal compressed
+      FITS files.  The external compression applies to the whole file
+      and FITS2NDF recognises {\bf gzip} (\texttt{.gz}) and UNIX 
+      {\bf compress} (\texttt{.Z}) formats.  Internal compressions are
+      where a large image is tiled and each tile is compressed.  The
+      supported formats are Rice, the IRAF PLIO, and GZIP.
 
       Both NDF and FITS use the term extension, and they mean different
       things.  Thus to avoid confusion in the descriptions below, the term
@@ -7162,6 +7169,9 @@ value of \texttt{"FITS-WCS(CD)"}.  This is the same as
 to describe the data array's rotation and scaling.
 
 \section{Release Notes -- V1.5-10}
+
+\htmlref{FITS2NDF}{FITS2NDF} supports externally and internally compressed
+FITS files.
 
 \htmlref{NDF2FITS}{NDF2FITS} writes integrity check keywords CHECKSUM
 and DATASUM at the end of each header if new parameter CHECKSUMS is 
