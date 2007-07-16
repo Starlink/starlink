@@ -32,6 +32,9 @@
  * Peter W. Draper 01/11/06  Changed getMinMax to deal with images that
  *                           have a dimension of 1 (but not both).
  *                 08/01/07  Changed getMinMax to deal with 1x1 case too.
+ *                 16/07/07  When first pixel is blank or NaN make sure
+ *                           failed check for a valid pixel tests both
+ *                           blank and NaN, not just NaN.
  *
  * This file is included in the .C files for classes derived from class
  * ImageData. The file defines a number of member functions that are
@@ -228,7 +231,7 @@ void CLASS_NAME::getMinMax()
 		break;
 	    value = getVal(rawImage, p);
 	}
-	if (ISNAN(value))
+	if (value == blank_ || ISNAN(value))
 	    value = 0;
 	minValue_ = maxValue_ = value;
 	for (int y = y0; y <= y1; y+=yincr) {
