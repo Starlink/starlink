@@ -20,8 +20,8 @@
     using built-in methods, rather than an external filter. The primary
     headers are now merged into such images as needed.
 
-    Reading FITS catalogues is now handled using built-in methods. This
-    should be more efficient.
+    Reading FITS catalogues is now also handled using built-in methods. 
+    This should be more efficient.
 
     FITS catalogues can now have 64 bit integer columns ('K' type).
 
@@ -35,6 +35,7 @@
     The rotatable box graphics item can now be used as a catalogue symbol.
 
     The "File->Reopen" item now works for cubes as does "gaiadisp".
+
 
     GAIA 3.3-7
     ==========
