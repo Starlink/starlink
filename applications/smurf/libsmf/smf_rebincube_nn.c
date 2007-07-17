@@ -166,6 +166,8 @@
 *        Correct calculation of spectral overlap factor (tfac).
 *     12-JUL-2007 (EC):
 *        -Changed name of smf_rebincube_totmap to smf_rebin_totmap
+*     17-JUL-2007 (DSB):
+*        Only update exposure time arrays if the spectrum is used.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -242,6 +244,7 @@ void smf_rebincube_nn( smfData *data, int index, int size, dim_t nchan,
    int *spectab = NULL;        /* I/p->o/p channel number conversion table */
    int found;                  /* Was current detector name found in detgrp? */
    int ichan;                  /* Input channel index */
+   int naccept_old;            /* Previous number of accepted spectra */
    int ochan;                  /* Output channel index */
    int gxout;                  /* Output X grid index */
    int gyout;                  /* Output Y grid index */
@@ -414,6 +417,7 @@ void smf_rebincube_nn( smfData *data, int index, int size, dim_t nchan,
                if( !ignore ) {
 
                   ddata = tdata + idet*nchan;
+                  naccept_old = *naccept;
 
                   if( is2d ) {
                      smf_rebincube_paste2d( badmask, nchan, nchanout, spectab, 
@@ -433,8 +437,9 @@ void smf_rebincube_nn( smfData *data, int index, int size, dim_t nchan,
    output spectrum that receives this input spectrum. Scale the exposure 
    times of this time slice in order to reduce its influence on the 
    output expsoure times if it does not have much spectral overlap with
-   the output cube. */
-                  if( texp != VAL__BADR ) {
+   the output cube. Only update the exposure time arrays if the spectrum
+   was used (as shown by an increase in the number of accepted spectra). */
+                  if( texp != VAL__BADR && *naccept > naccept_old ) {
                      texp_array[ iv0 ] += texp*tfac;
                      teff_array[ iv0 ] += teff*tfac;
                   }
