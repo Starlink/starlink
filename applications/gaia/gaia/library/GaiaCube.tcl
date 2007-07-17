@@ -427,11 +427,11 @@ itcl::class gaia::GaiaCube {
    #  -----------
    destructor  {
 
-      #  Close and release the cube.
-      if { $cubeaccessor_ != {} } {
-         $cubeaccessor_ close
-         set cubeaccessor_ {}
-      }
+      #  Release the cube.
+      catch {release}
+
+      #  Stop interactions.
+      catch {halt}
 
       #  Delete the NDF image slice.
       if { $section_name_ != {} } {
@@ -445,23 +445,6 @@ itcl::class gaia::GaiaCube {
          }
       }
 
-      #  Close spectrum plot, also removes any graphics and bindings.
-      catch {
-         $itk_component(spectrum) close
-      }
-
-      #  Halt any animations.
-      catch {
-         $itk_component(animation) stop
-      }
-
-      #  Destroy FITS headers window.
-      if { $fitsheaders_ != {} } {
-         catch {
-            destroy $fitsheaders_
-         }
-      }
-      
    }
 
    #  Methods:
@@ -470,6 +453,11 @@ itcl::class gaia::GaiaCube {
    #  Close window.
    public method close {} {
       wm withdraw $w_
+      halt
+   }
+
+   #  Halt all interactive operations.
+   public method halt {} {
 
       #  Close spectrum plot.
       $itk_component(spectrum) close
@@ -479,12 +467,34 @@ itcl::class gaia::GaiaCube {
 
       #  If displaying a channel map remove the markers.
       $itk_component(chanmap) close
+
+      #  Destroy FITS headers window.
+      if { $fitsheaders_ != {} } {
+         catch {
+            destroy $fitsheaders_
+         }
+      }
    }
 
    #  Undo some of the effects of close. Do not reopen cube, that would
-   #  be expensive and reset too much.
+   #  be expensive and reset too much. Do that using release close/halt.
    public method open {} {
       $itk_component(spectrum) open
+   }
+
+   #  Release the cube, making ready for new cube or object destruction.
+   #  Don't use this unless that's what you want. Returns 1 if a cube
+   #  was open.
+   public method release {} {
+      if { $cubeaccessor_ != {} } {
+         set isopen [$cubeaccessor_ close]
+         set cubeaccessor_ {}
+         set itk_option(-cube) {}
+         set ndfname_ {}
+         set last_cube_ {}
+         return $isopen
+      }
+      return 0
    }
 
    #  Open a new cube, restoring the current extraction limits, if possible.
@@ -720,6 +730,11 @@ itcl::class gaia::GaiaCube {
          #  callbacks).
          update
 
+         #  Cube may have been waiting for clear.
+         if { $cubeaccessor_ == {} } {
+            return
+         }
+
          #  Now delete old image slice (waited until released).
          if { $oldname != {} } {
             catch {::file delete $oldname} msg
@@ -835,10 +850,12 @@ itcl::class gaia::GaiaCube {
    #  coordinates. This should be done only when necessary (end of animation,
    #  slice slider drag etc.).
    public method update_wcs {} {
-      set index [axis_pixel2grid $plane_]
-      set frameset [$cubeaccessor_ getimagewcs $axis_ $index]
-      if { $frameset != 0 } {
-         $itk_option(-rtdimage) astreplace $frameset
+      if { $cubeaccessor_ != {} } {
+         set index [axis_pixel2grid $plane_]
+         set frameset [$cubeaccessor_ getimagewcs $axis_ $index]
+         if { $frameset != 0 } {
+            $itk_option(-rtdimage) astreplace $frameset
+         }
       }
    }
 
