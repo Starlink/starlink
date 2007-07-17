@@ -206,7 +206,6 @@ itcl::class gaia::GaiaAstCopy {
    #  Create a new instance of this object.
    protected method clone_me_ {} {
       if { $itk_option(-clone_cmd) != {} } {
-         after 10000 [code $this cmdtrace on]
          eval $itk_option(-clone_cmd)
       }
    }
