@@ -34,6 +34,8 @@
 
     The rotatable box graphics item can now be used as a catalogue symbol.
 
+    The "File->Reopen" item now works for cubes as does "gaiadisp".
+
     GAIA 3.3-7
     ==========
 
