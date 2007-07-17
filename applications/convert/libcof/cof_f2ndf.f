@@ -196,7 +196,7 @@
 *     o  Compressed
 *        It can process both external and internal compressed FITS 
 *        files.  
-*         -  The external compression applies to the whole file and the
+*        -  The external compression applies to the whole file and the
 *        conversion recognises gzip (.gz) and UNIX compress (.Z)
 *        formats.
 *        -  Internal compressions are where a large image is tiled and
