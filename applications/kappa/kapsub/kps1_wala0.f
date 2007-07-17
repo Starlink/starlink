@@ -133,6 +133,8 @@
 *     16-JUL-2007 (DSB):
 *        Copy RestFreq and IF from input to output, rather than from ref
 *        to output, if aligning in velocity.
+*     17-JUL-2007 (DSB):
+*        Extend range of velocity systems to include redshift and beta.
 *     {enter_further_changes_here}
 
 *-
@@ -379,8 +381,10 @@
 *  If the AlignSystem value for either Frame is one of the spectral
 *  velocity values, then the I'th axis must be the spectral axis.
          IF( ASYS1 .EQ. 'VRAD' .OR. ASYS1 .EQ. 'VOPT' .OR.
-     :       ASYS1 .EQ. 'VELO' .OR. ASYSR .EQ. 'VRAD' .OR. 
-     :       ASYSR .EQ. 'VOPT' .OR. ASYSR .EQ. 'VELO' ) THEN
+     :       ASYS1 .EQ. 'VELO' .OR. ASYS1 .EQ. 'ZOPT' .OR.
+     :       ASYS1 .EQ. 'BETA' .OR. ASYSR .EQ. 'VRAD' .OR. 
+     :       ASYSR .EQ. 'VOPT' .OR. ASYSR .EQ. 'VELO' .OR. 
+     :       ASYSR .EQ. 'ZOPT' .OR. ASYSR .EQ. 'BETA' ) THEN
 
 *  Copy selected SpecFrame attributes from input to output.
             CALL AST_SETD( CFRMR, 'RestFreq', 
