@@ -32,7 +32,6 @@ static char initScript[] = \
  tcl_findLibrary gaia " PACKAGE_VERSION " " PACKAGE_VERSION " \
  GaiaInit.tcl GAIA_LIBRARY gaia_library \n\
  lappend auto_path $gaia_library \n\
- puts \"gaia_library = $gaia_library\" \n\
 ";
 
 
