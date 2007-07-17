@@ -533,10 +533,14 @@ itcl::class gaia::Gaia {
       #  keyboard shortcuts and the "save region" removing.
       set m [get_menu File]
       bind $w_  <Control-o> [code $image_ open]
-      bind $w_  <Control-v> [code $image_ reopen]
+      bind $w_  <Control-v> [code $this reopen]
       bind $w_  <Control-s> [code $image_ save_as]
       catch {$m delete "Save region as..."}
 
+      #  Make reopen work locally so we can release cubes.
+      $m entryconfigure "Reopen" -command [code $this reopen]
+
+      #  Insert cube entry.
       set index [$m index "Reopen"]
       insert_menuitem $m $index command "Open cube..." \
          {Open a cube and display image sections from it} \
@@ -1428,6 +1432,14 @@ itcl::class gaia::Gaia {
          set imagename [lindex $args 0]
 	 set namer [GaiaImageName \#auto -imagename $imagename]
 	 if { [$namer exists] } {
+            
+            #  Release any cubes before proceeding, otherwise this holds
+            #  dataset open when we'd like to reopen if needed here (will
+            #  return to file_loaded_ after reading file).
+            if { $itk_option(-check_for_cubes) } {
+               maybe_release_cube_
+            }
+
 	    $namer absolute
             set fullname [$namer fullname 0]
             set hdunum [$namer fitshdunum]
@@ -1583,6 +1595,34 @@ itcl::class gaia::Gaia {
 	 incr index
 	 set argv [lreplace $argv $index $index $filename]
       }
+   }
+
+   #  Re-open the current file. Remaps the data and informs any toolboxes
+   #  with direct access (cube).
+   public method reopen {} {
+      lassign [maybe_release_cube_] cube_open cube_name
+
+      #  Don't open cube slices, they have just been released.
+      if { ! [[$image_ get_image] volatile] } {
+         $image_ reopen
+      } else {
+         #  Instead fully re-open the cube.
+         $itk_component(opencube) configure -cube $cube_name
+      }
+   }
+
+   #  If a cube is currently loaded release it. Returns if release
+   #  happened and the name of the cube.
+   protected method maybe_release_cube_ {} {
+      set cube_open 0
+      set cube_name {}
+      if { [info exists itk_component(opencube) ] && 
+           [winfo exists $itk_component(opencube) ] } {
+         set cube_name [$itk_component(opencube) cget -cube]
+         set cube_open [$itk_component(opencube) release]
+         $itk_component(opencube) halt
+      }
+      return [list $cube_open $cube_name]
    }
 
    #  Return the name of the GaiaImageCtrl so that other external
