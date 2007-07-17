@@ -1,3 +1,6 @@
+  Puana Release:
+  ==============
+
     GAIA 4.0-0
     ==========
 
@@ -36,6 +39,14 @@
 
     The "File->Reopen" item now works for cubes as does "gaiadisp".
 
+    Data values are now only reported when moving over part of the image.
+    Previously reports continued for an additional pixel to the bottom
+    and left.
+
+    When the first pixel has a NaN or blank value and has less than 10
+    pixels the lower value is now correctly set, rather than being
+    left at the bad pixel value.
+
 
     GAIA 3.3-7
     ==========
@@ -57,7 +68,7 @@
     The spectral cube window will now retain some settings between
     sessions. These include the background and line colours.
 
-    FITS spectra now have the extraction meta-data add to their headers.
+    FITS spectra now have the extraction meta-data added to their headers.
 
     The rebin cube tools now correct use "mean" as the combination method.
     Previously "sum" was used until either "mean" or "sum" was explicitly
@@ -81,7 +92,6 @@
     The SMURF extension data are now ignored in their dimensions do not
     match the cube. This probably means the cube has had addition processing
     that makes the extension data invalid (or at least misleading).
-
 
   Hokulei Release:
   ================
