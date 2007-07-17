@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 @SET_MAKE@
-RECURSIVE_TARGETS = all clean
+RECURSIVE_TARGETS = all clean distclean
 
 $(RECURSIVE_TARGETS):
 	cd skycat/tclutil; $(MAKE) $@
