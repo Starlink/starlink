@@ -472,6 +472,7 @@ itcl::class gaia::GaiaCube {
       if { $fitsheaders_ != {} } {
          catch {
             destroy $fitsheaders_
+            set fitsheaders_ {}
          }
       }
    }
