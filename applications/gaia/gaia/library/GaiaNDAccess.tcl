@@ -135,13 +135,16 @@ itcl::class gaia::GaiaNDAccess {
       set handle_ [${type_}::open [$namer_ fullname 0]]
    }
 
-   #  Close the dataset, if open.
+   #  Close the dataset, if open, returns 1 in that case.
    public method close {} {
       if { $handle_ != {} } {
          if { $type_ == "fits" } {
             # FITS data needs unmapping, NDF happens automatically.
             unmap "*"
          }
+
+         flush stdout
+
          ${type_}::close $handle_
          set handle_ {}
          unset addr_
@@ -153,7 +156,9 @@ itcl::class gaia::GaiaNDAccess {
          set tdims_ {}
          set bounds_ {}
          set tbounds_ {}
+         return 1
       }
+      return 0
    }
 
    #  Acquire an already opened dataset by name and "handle".
