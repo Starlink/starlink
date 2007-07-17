@@ -220,6 +220,10 @@ libraries:
 tclIndex:
 	(cd $(srcdir)/library; $(TCLSH_PROG) mkIndex.tcl)
 
+#  Scripts created by configure depend on their .in files and config.status
+#  (since they are cleaned).
+rtd: rtd.in config.status
+	./config.status
 
 #========================================================================
 # Your doc target should differentiate from doc builds (by the developer)
