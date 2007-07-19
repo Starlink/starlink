@@ -1,0 +1,6 @@
+Mon Apr 23 10:31:58 2001  Brian Gough  <bjg@network-theory.co.uk>
+
+	* unified error handling conventions to _e for error handling
+ 	functions and no suffix for plain functions, so _impl functions
+ 	are no longer needed.
+

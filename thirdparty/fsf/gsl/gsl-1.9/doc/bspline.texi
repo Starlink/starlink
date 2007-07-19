@@ -1,0 +1,158 @@
+@cindex basis splines, B-splines
+@cindex splines, basis
+
+This chapter describes functions for the computation of smoothing
+basis splines (B-splines). The header file @file{gsl_bspline.h}
+contains prototypes for the bspline functions and related declarations.
+
+@menu
+* Overview of B-splines::
+* Initializing the B-splines solver::
+* Constructing the knots vector::
+* Evaluation of B-spline basis functions::
+* Example programs for B-splines::
+* References and Further Reading::
+@end menu
+
+@node Overview of B-splines
+@section Overview
+@cindex basis splines, overview
+
+B-splines are commonly used as basis functions to fit smoothing
+curves to large data sets. To do this, the abscissa axis is
+broken up into some number of intervals, where the endpoints
+of each interval are called @dfn{breakpoints}. These breakpoints
+are then converted to @dfn{knots} by imposing various continuity
+and smoothness conditions at each interface. Given a nondecreasing
+knot vector @math{t = \{t_0, t_1, \dots, t_{n+k-1}\}}, the
+@math{n} basis splines of order @math{k} are defined by
+@tex
+\beforedisplay
+$$
+B_{i,1}(x) = \left\{\matrix{1, & t_i \le x < t_{i+1}\cr
+                            0, & else}\right.
+$$
+$$
+B_{i,k}(x) = \left[(x - t_i)/(t_{i+k-1} - t_i)\right] B_{i,k-1}(x) +
+             \left[(t_{i+k} - x)/(t_{i+k} - t_{i+1})\right] B_{i+1,k-1}(x)
+$$
+\afterdisplay
+@end tex
+@ifinfo
+
+@example
+B_(i,1)(x) = (1, t_i <= x < t_(i+1)
+             (0, else
+B_(i,k)(x) = [(x - t_i)/(t_(i+k-1) - t_i)] B_(i,k-1)(x) + [(t_(i+k) - x)/(t_(i+k) - t_(i+1))] B_(i+1,k-1)(x)
+@end example
+
+@end ifinfo
+for @math{i = 0, \dots, n-1}. The common case of cubic B-splines
+is given by @math{k = 4}. The above recurrence relation can be
+evaluated in a numerically stable way by the de Boor algorithm.
+
+If we define appropriate knots on an interval @math{[a,b]} then
+the B-spline basis functions form a complete set on that interval.
+Therefore we can expand a smoothing function as
+@tex
+\beforedisplay
+$$
+f(x) = \sum_{i=0}^{n-1} c_i B_{i,k}(x)
+$$
+\afterdisplay
+@end tex
+@ifinfo
+
+@example
+f(x) = \sum_i c_i B_(i,k)(x)
+@end example
+
+@end ifinfo
+given enough @math{(x_j, f(x_j))} data pairs. The @math{c_i} can
+be readily obtained from a least-squares fit.
+
+@node Initializing the B-splines solver
+@section Initializing the B-splines solver
+@cindex basis splines, initializing
+
+@deftypefun {gsl_bspline_workspace *} gsl_bspline_alloc (const size_t @var{k}, const size_t @var{nbreak})
+This function allocates a workspace for computing B-splines of order
+@var{k}. The number of breakpoints is given by @var{nbreak}. This
+leads to @math{n = nbreak + k - 2} basis functions. Cubic B-splines
+are specified by @math{k = 4}. The size of the workspace is
+@math{O(5k + nbreak)}.
+@end deftypefun
+
+@deftypefun void gsl_bspline_free (gsl_bspline_workspace * @var{w})
+This function frees the memory associated with the workspace @var{w}.
+@end deftypefun
+
+@node Constructing the knots vector
+@section Constructing the knots vector
+@cindex knots
+
+@deftypefun int gsl_bspline_knots (const gsl_vector * @var{breakpts}, gsl_bspline_workspace * @var{w})
+This function computes the knots associated with the given breakpoints
+and stores them internally in @code{w->knots}.
+@end deftypefun
+
+@deftypefun int gsl_bspline_knots_uniform (const double a, const double b, gsl_bspline_workspace * @var{w})
+This function assumes uniformly spaced breakpoints on @math{[a,b]}
+and constructs the corresponding knot vector using the previously
+specified @var{nbreak} parameter. The knots are stored in
+@code{w->knots}.
+@end deftypefun
+
+@node Evaluation of B-spline basis functions
+@section Evaluation of B-splines
+@cindex basis splines, evaluation
+
+@deftypefun int gsl_bspline_eval (const double @var{x}, gsl_vector * @var{B}, gsl_bspline_workspace * @var{w})
+This function evaluates all B-spline basis functions at the position
+@var{x} and stores them in @var{B}, so that the @math{i}th element
+of @var{B} is @math{B_i(x)}. @var{B} must be of length
+@math{n = nbreak + k - 2}. This value is also stored in @code{w->n}.
+It is far more efficient to compute all of the basis functions at
+once than to compute them individually, due to the nature of the
+defining recurrence relation.
+@end deftypefun
+
+@node Example programs for B-splines
+@section Example programs for B-splines
+@cindex basis splines, examples
+
+The following program computes a linear least squares fit to data using
+cubic B-spline basis functions with uniform breakpoints. The data is
+generated from the curve @math{y(x) = \cos{(x)} \exp{(-0.1 x)}} on
+@math{[0, 15]} with gaussian noise added.
+
+@example
+@verbatiminclude examples/bspline.c
+@end example
+
+The output can be plotted with @sc{gnu} @code{graph}.
+
+@example
+$ ./a.out > bspline.dat
+$ graph -T ps -X x -Y y -x 0 15 -y -1 1.3 < bspline.dat > bspline.ps
+@end example
+
+@iftex
+@sp 1
+@center @image{bspline,3.4in}
+@end iftex
+
+@node References and Further Reading
+@section References and Further Reading
+
+Further information on the algorithms described in this section can be
+found in the following book,
+
+@itemize @asis
+C. de Boor, @cite{A Practical Guide to Splines} (1978), Springer-Verlag,
+ISBN 0-387-90356-9.
+@end itemize
+
+@noindent
+A large collection of B-spline routines is available in the
+@sc{pppack} library available at @uref{http://www.netlib.org/pppack}.

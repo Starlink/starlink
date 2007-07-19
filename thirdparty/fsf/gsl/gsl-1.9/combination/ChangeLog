@@ -1,0 +1,28 @@
+2003-07-30  Brian Gough  <bjg@network-theory.co.uk>
+
+	* init.c (gsl_combination_alloc): set c->data to NULL when k=0
+
+2003-04-12  Szymon Jaroszewicz  <sj@cs.umb.edu>
+
+	* combination.c (gsl_combination_valid): fix a typo in error
+	message
+
+2003-03-22  Brian Gough  <bjg@network-theory.co.uk>
+
+	* combination.c (gsl_combination_memcpy): added memcpy function
+
+2003-03-21  Brian Gough  <bjg@network-theory.co.uk>
+
+	* combination.c (gsl_combination_valid): fix bug in test for
+	validity (cj<ci not ci<cj)
+
+	* test.c (main): added tests of gsl_combination_valid
+
+Sat Jan 26 22:39:03 2002  Brian Gough  <bjg@network-theory.co.uk>
+
+	* test.c: use unsigned loop variables
+
+Sat Dec  8 18:22:06 2001  Szymon Jaroszewicz  <sj@cs.umb.edu>
+
+	* added combination support to GSL
+

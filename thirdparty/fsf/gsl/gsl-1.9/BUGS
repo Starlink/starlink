@@ -1,0 +1,201 @@
+This file is the GSL bug tracking system.  The CVS version of this
+file should be kept up-to-date.
+
+----------------------------------------------------------------------
+BUG#1 -- gsl_sf_hyperg_2F1_e fails for some arguments 
+
+From: keith.briggs@bt.com
+Subject: gsl_sf_hyperg_2F1 bug report
+Date: Thu, 31 Jan 2002 12:30:04 -0000
+
+gsl_sf_hyperg_2F1_e fails with arguments (1,13,14,0.999227196008978,&r).
+It should return 53.4645... .
+
+#include <gsl/gsl_sf.h>
+#include <stdio.h>
+
+int main (void)
+{
+  gsl_sf_result r;
+  gsl_sf_hyperg_2F1_e (1,13,14,0.999227196008978,&r);
+  printf("r = %g %g\n", r.val, r.err);
+}
+
+NOTES: The program overflows the maximum number of iterations in
+gsl_sf_hyperg_2F1, due to the presence of a nearby singularity at
+(c=a+b,x=1) so the sum is slowly convergent.
+
+The exact result is 53.46451441879150950530608621 as calculated by
+gp-pari using sumpos(k=0,gamma(a+k)*gamma(b+k)*gamma(c)*gamma(1)/
+(gamma(c+k)*gamma(1+k)*gamma(a)*gamma(b))*x^k)
+
+The code needs to be extended to handle the case c=a+b. This is the
+main problem. The case c=a+b is special and needs to be computed
+differently.  There is a special formula given for it in Abramowitz &
+Stegun 15.3.10
+
+As reported by Lee Warren <warren@atom.chem.utk.edu> another set of
+arguments which fail are:
+
+#include <gsl/gsl_sf.h>
+#include <stdio.h>
+
+int main (void)
+{
+  gsl_sf_result r;
+  gsl_sf_hyperg_2F1_e (-1, -1, -0.5, 1.5, &r);
+  printf("r = %g %g\n", r.val, r.err);
+}
+
+The correct value is -2.
+
+See also, 
+
+From: Olaf Wucknitz <wucknitz@jive.nl>
+To: bug-gsl@gnu.org
+Subject: [Bug-gsl] gsl_sf_hyperg_2F1
+
+Hi,
+
+I am having a problem with gsl_sf_hyperg_2F1.
+With the parameters (-0.5, 0.5, 1, x) the returned values show a jump at 
+x=0.5. For x<0.5 the results seem to be correct, while for x>0.5 they 
+aren't.
+The function gsl_sf_hyperg_2F1_e calls hyperg_2F1_series for x<0.5, but
+hyperg_2F1_reflect for x>0.5. The latter function checks for c-a-b being 
+an integer (which it is in my case). If I change one of the parameters 
+a,b,c by a small amount, the other branch of the function is taken and the 
+results are correct again.
+Unfortunately I know too little about the numerics of 2F1 to suggest a 
+patch at the moment.
+
+Regards,
+Olaf Wucknitz
+-- 
+Joint Institute for VLBI in Europe                wucknitz@jive.nl
+
+----------------------------------------------------------------------
+BUG#44 -- gamma_inc_P and gamma_inc_Q only satisfy P+Q=1 within errors
+
+The sum of gamma_inc_P and gamma_inc_Q doesn't always satisfy the
+identity P+Q=1 exactly (although it is correct within errors), due the
+slightly different branch conditions for the series and continued
+fraction expansions.  These could be made identical so that P+Q=1 exactly.
+
+#include <stdio.h>
+#include <gsl/gsl_sf_gamma.h>
+
+int
+main (void)
+{
+  gsl_sf_result r1, r2;
+  double a = 0.3, x = 1.0;
+  gsl_sf_gamma_inc_P_e (a, x, &r1);
+  gsl_sf_gamma_inc_Q_e (a, x, &r2);
+  printf("%.18e\n", r1.val);
+  printf("%.18e\n", r2.val);
+  printf("%.18e\n", r1.val + r2.val);
+}
+
+$ ./a.out
+9.156741562411074842e-01
+8.432584375889111417e-02
+9.999999999999985567e-01
+
+
+----------------------------------------------------------------------
+BUG#49 - fdjacobian step size causes problems
+
+From: eknecronzontas <eknecronzontas@yahoo.com>
+To: help-gsl@gnu.org
+Subject: [Help-gsl] Bug (or not?) in multiroots/fdjacobian.c
+Date: Thu, 8 Jun 2006 13:38:49 -0700 (PDT)
+
+Since I can't quite decide if this is a bug, I'll post
+it here first...
+
+The stepsize for finite-differencing in
+gsl-1.8/multiroots/fdjacobian.c is specified by the
+lines
+
+> double xj = gsl_vector_get (x, j);
+> double dx = epsrel * fabs (xj);
+
+This is, of course mathematically correct.
+Nevertheless, the behavior is less than ideal if one
+of the elements of the vector 'x' is sufficiently
+small. This occurs often if one component of the root
+happens to be zero. If this occurs, then 'dx' can be
+so small that one of the columns of the Jacobian is
+identically zero. This immediately leads to NAN's
+which are not easy to trace.
+
+---------------------------------------------------------------------
+BUG#50 - gsl_linalg_solve_symm_tridiag requires positive definite matrix
+
+A zero on the diagonal will cause NaNs even though a reasonable
+solution could be computed in principle. 
+
+#include <gsl/gsl_linalg.h>
+
+int main (void)
+{
+  double d[] = { 0.00, 1.21, 0.80, 1.55, 0.76 } ;
+  double e[] = { 0.82, 0.39, 0.09, 0.68 } ;
+  double b[] = { 0.07, 0.62, 0.81, 0.11, 0.65} ;
+  double x[] = { 0.00, 0.00, 0.00, 0.00, 0.00} ;
+
+  gsl_vector_view dv = gsl_vector_view_array(d, 5);
+  gsl_vector_view ev = gsl_vector_view_array(e, 4);
+  gsl_vector_view bv = gsl_vector_view_array(b, 5);
+  gsl_vector_view xv = gsl_vector_view_array(x, 5);
+
+  gsl_linalg_solve_symm_tridiag(&dv.vector, &ev.vector, &bv.vector, &xv.vector);
+  gsl_vector_fprintf(stdout, &xv.vector, "% .5f");
+
+  d[0] += 1e-5;
+  gsl_linalg_solve_symm_tridiag(&dv.vector, &ev.vector, &bv.vector, &xv.vector);
+  gsl_vector_fprintf(stdout, &xv.vector, "% .5f");
+}
+
+$ ./a.out
+ nan
+ nan
+ nan
+ nan
+ nan
+ 0.13626
+ 0.08536
+ 1.03840
+-0.60009
+ 1.39219
+
+
+----------------------------------------------------------------------
+BUG#52 - beta functions do not handle negative arguments 
+
+The beta functions (complete and incomplete) are well defined for
+non-integer negative arguments in terms of the gamma function but
+return domain errors or nans.  The relation of I_x(a,b,x) = (1/a) x^a
+2F1(a,1-b,a+1,x)/B(a,b) could be documented even if it is not
+implemented.
+
+DONE for beta function, still needed for incomplete beta function.
+
+----------------------------------------------------------------------
+BUG#57 - incorrect rounding error in deriv functions?
+
+Needs a factor of 1/h^2 ?
+
+From: Rene Girard <rg_linux1@yahoo.ca>
+To: help-gsl@gnu.org
+Subject: [Help-gsl] Origin of 2nd round-off term "dy" in function	central_deriv.c
+
+double dy = GSL_MAX(fabs(r3),fabs(r5))* fabs(x)*GSL_DBL_EPSILON
+
+I understand the rest of the function very well and I am able to
+derive the equation for the optimal stepsize "h_opt" in function
+"gsl_deriv_central.c"; however, I am trying to look for a derivation
+for the expression of "dy".
+----------------------------------------------------------------------
+Last assigned bug number = 57
