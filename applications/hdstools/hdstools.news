@@ -1,6 +1,6 @@
 1 HDSTOOLS
 
-  Version 1.0 of the HDSTOOLS package is released.
+  Version 1.0-2 of the HDSTOOLS package is released.
 
   This consists of a number tools for inspecting and editing HDS files.
   They are slight modifications of the tools available in the Asterix
@@ -24,3 +24,7 @@
   HRETYPE  - Change the type of an HDS structure object.
   HTAB     - Display one or more vector objects in table form.
   HWRITE   - Write an HDS object into formatted/unformatted file.
+
+2 Changes_in_version_1.0-2
+
+  o Now works properly on 64-bit
