@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="hdstools" support="S">
-  <version>1.0</version>
+  <version>1.0-2</version>
   <path>applications/hdstools</path>
   <description>HDSTOOLS - Tools To Display and Edit HDS Objects</description>
   <abstract><p>
