@@ -58,6 +58,7 @@
 *    RJV: R.J. Vallance (Birmingham University)
 *    DJA: D.J. Allan (Birmingham University)
 *    AJC: A.J. Chipperfield (Starlink, RAL)
+*    TIMJ: Tim Jenness (JAC, Hawaii)
 
 * History :
 *    ??-???-???? (RJV):
@@ -73,6 +74,8 @@
 *       Improve prologue
 *       Get it working for CHAR values
 *       Get value before mapping to avoid corrupting files on error
+*     18-JUL-2007 (TIMJ):
+*       Add CNF_PVAL for 64-bit
 *-
 *    Type Definitions :
       IMPLICIT NONE
@@ -81,6 +84,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'MSG_PAR'
+      INCLUDE 'CNF_PAR'
 
 *    Status :
       INTEGER STATUS
@@ -145,7 +149,7 @@
                   CALL DAT_GET0C(VALOC,CHARVAL,STATUS)
                   CALL DAT_MAPV(OBJLOC,TYPE,'WRITE',OPTR,NVAL,STATUS)
                   CALL ARR_INIT1C(
-     &              NVAL, %VAL(OPTR), CHARVAL, TRUNC, STATUS,
+     &              NVAL, %VAL(CNF_PVAL(OPTR)), CHARVAL, TRUNC, STATUS,
      &              %VAL(CLEN) )
                   IF( ( STATUS.EQ.SAI__OK ) .AND. TRUNC ) THEN
                      CALL MSG_OUTIF( MSG__NORM, ' ',
@@ -163,13 +167,14 @@
                      CALL DAT_MAPV(
      &                 OBJLOC,'_DOUBLE', 'WRITE',OPTR,NVAL,STATUS)
                      CALL ARR_INIT1D(
-     &                 NUMVAL, NVAL, %VAL(OPTR), STATUS )
+     &                 NUMVAL, NVAL, %VAL(CNF_PVAL(OPTR)), STATUS )
 
                   ELSE
                      CALL DAT_GET0I(VALOC,INTVAL,STATUS)
                      CALL DAT_MAPV(
      &                 OBJLOC,'_INTEGER', 'WRITE',OPTR,NVAL,STATUS)
-                     CALL ARR_INIT1I( INTVAL, NVAL, %VAL(OPTR), STATUS )
+                     CALL ARR_INIT1I( INTVAL, NVAL, 
+     :                                %VAL(CNF_PVAL(OPTR)), STATUS )
                   ENDIF
 
 *             Logicals
@@ -177,7 +182,8 @@
                   CALL DAT_GET0L(VALOC,LOGVAL,STATUS)
                   CALL DAT_MAPV(
      &              OBJLOC,'_LOGICAL','WRITE',OPTR,NVAL,STATUS)
-                  CALL ARR_INIT1L( LOGVAL, NVAL, %VAL(OPTR), STATUS )
+                  CALL ARR_INIT1L( LOGVAL, NVAL, %VAL(CNF_PVAL(OPTR)), 
+     :                             STATUS )
                ENDIF
 
                CALL DAT_UNMAP(OBJLOC,STATUS)

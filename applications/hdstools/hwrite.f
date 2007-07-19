@@ -52,6 +52,7 @@
 *    RF:  Ray Forbes (Birmingham University)
 *    DJA: D.J. Allan (Birmingham University)
 *    AJC: A.J. Chipperfield (Starlink, RAL)
+*    TIMJ: Tim Jenness (JAC, Hawaii)
 
 * History:
 *    ??-??-???? (RF):
@@ -69,6 +70,8 @@
 *       _DOUBLE G -> G25.16
 *       _INTEGER I -> I11
 *       _LOGICAL L -> L1
+*     18-JUL-2007 (TIMJ):
+*       Add CNF_PVAL for 64-bit
 *-
 
 *    Type Definitions :
@@ -79,6 +82,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'MSG_PAR'
+      INCLUDE 'CNF_PAR'
 
 *    Status :
       INTEGER status
@@ -151,24 +155,29 @@
         IF (PRIM) THEN
           IF ( type .eq. '_LOGICAL' ) THEN
             CALL DAT_MAPV(LOC,TYPE,'READ',PTR,NVAL,STATUS)
-	    CALL HWRITE_LPUT ( LUN, BINARY, FMT,%VAL(PTR), NVAL,STATUS)
+	    CALL HWRITE_LPUT ( LUN, BINARY, FMT,%VAL(CNF_PVAL(PTR)), 
+     :                  NVAL,STATUS)
 	  ELSEIF (( type .eq. '_INTEGER' )  .OR.
      &         ( type .eq. '_UWORD'   )  .OR.
      &         ( type .eq. '_WORD'    )  .OR.
      &         ( type .eq. '_UBYTE'   )  .OR.
      &         ( type .eq. '_BYTE'    )) THEN
             CALL DAT_MAPV(LOC,'_INTEGER','READ',PTR,NVAL,STATUS)
-            CALL HWRITE_IPUT ( LUN, BINARY, FMT,%VAL(PTR),NVAL,STATUS)
+            CALL HWRITE_IPUT ( LUN, BINARY, FMT,%VAL(CNF_PVAL(PTR)),
+     :                         NVAL,STATUS)
           ELSEIF ( type .eq. '_REAL' ) THEN
             CALL DAT_MAPV(LOC,TYPE,'READ',PTR,NVAL,STATUS)
-            CALL HWRITE_RPUT ( LUN, BINARY, FMT,%VAL(PTR),NVAL,STATUS)
+            CALL HWRITE_RPUT ( LUN, BINARY, FMT,%VAL(CNF_PVAL(PTR)),
+     :                         NVAL,STATUS)
           ELSEIF ( type .eq. '_DOUBLE' ) THEN
             CALL DAT_MAPV(LOC,TYPE,'READ',PTR,NVAL,STATUS)
-            CALL HWRITE_DPUT ( lun, BINARY, FMT,%VAL(PTR),NVAL,STATUS)
+            CALL HWRITE_DPUT ( lun, BINARY, FMT,%VAL(CNF_PVAL(PTR)),
+     :                         NVAL,STATUS)
           ELSEIF ( type(1:5) .eq. '_CHAR' ) THEN
             CALL DAT_CLEN(LOC,CLEN,STATUS)
             CALL DAT_MAPV(LOC,TYPE,'READ',PTR,NVAL,STATUS)
-            CALL HWRITE_CPUT ( lun, BINARY,%VAL(PTR),NVAL,FMT,STATUS,
+            CALL HWRITE_CPUT ( lun, BINARY,%VAL(CNF_PVAL(PTR)),
+     :                         NVAL,FMT,STATUS,
      &        %VAL(CLEN))
           ENDIF
 

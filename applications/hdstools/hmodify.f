@@ -61,6 +61,7 @@
 *    RJV: R.J. Vallance (Birmingham University)
 *    DJA: D.J. Allan (Birmingham University)
 *    AJC: A.J. Chipperfield (Starlink, RAL)
+*    TIMJ: Tim Jenness (JAC, Hawaii)
 
 * History :
 *    ??-???-19?? (RJV):
@@ -80,6 +81,8 @@
 *       Switch order of mapping to minimise chance of corrupting object
 *        due to having mapped WRITE.
 *       Allow HDS to decide if it can convert different types
+*     18-JUL-2007 (TIMJ):
+*       Add CNF_PVAL for 64-bit
 *-
 
 *    Type Definitions :
@@ -89,6 +92,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'MSG_PAR'
+      INCLUDE 'CNF_PAR'
 
 *    Status :
       INTEGER STATUS
@@ -157,7 +161,8 @@
      &                 VALOC,'_CHAR','READ',VPTR,NVAL,STATUS)
                      CALL DAT_MAPV(OBJLOC,TYPE,'WRITE',OPTR,NVAL,STATUS)
                      CALL ARR_COP1C(
-     &                 NVAL,%VAL(VPTR),%VAL(OPTR),TRUNC,STATUS,
+     &                 NVAL,%VAL(CNF_PVAL(VPTR)),%VAL(CNF_PVAL(OPTR)),
+     :                 TRUNC,STATUS,
      &                 %VAL(CLENV),%VAL(CLENO))
 
 *                  Warn if truncation occurred
@@ -175,7 +180,8 @@
      &                 VALOC,'_DOUBLE','READ',VPTR,NVAL,STATUS)
                      CALL DAT_MAPV(
      &                 OBJLOC,'_DOUBLE','WRITE',OPTR,NVAL,STATUS)
-                     CALL ARR_COP1D(NVAL,%VAL(VPTR),%VAL(OPTR),STATUS)
+                     CALL ARR_COP1D(NVAL,%VAL(CNF_PVAL(VPTR)),
+     :                              %VAL(CNF_PVAL(OPTR)),STATUS)
 
 *               Logicals
                   ELSEIF (TYPE.EQ.'_LOGICAL') THEN
@@ -183,7 +189,8 @@
      &                 VALOC,'_LOGICAL','READ',VPTR,NVAL,STATUS)
                      CALL DAT_MAPV(
      &                 OBJLOC,'_LOGICAL','WRITE',OPTR,NVAL,STATUS)
-                     CALL ARR_COP1L(NVAL,%VAL(VPTR),%VAL(OPTR),STATUS)
+                     CALL ARR_COP1L(NVAL,%VAL(CNF_PVAL(VPTR)),
+     :                              %VAL(CNF_PVAL(OPTR)),STATUS)
                   ENDIF
 
                   CALL DAT_UNMAP(OBJLOC,STATUS)

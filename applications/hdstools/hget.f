@@ -96,6 +96,7 @@
 *    DJA: David J. Allan (Birmingham University)
 *    RB: Richard Beard (ROSAT, University of Birmingham)
 *    AJC: Alan J. Chipperfield (Starlink, RAL)
+*    TIMJ: Tim Jenness (JAC, Hawaii)
 
 *    History :
 *     21-APR-1991 (DJA):
@@ -110,6 +111,8 @@
 *        V2.1-0  Get VALUE as correct type and convert to string
 *      6-SEP-2001 (AJC):
 *        V3.0-0 Remove Asterix stuff
+*     18-JUL-2007 (TIMJ):
+*       Add CNF_PVAL for 64-bit
 *-
 *    Type Definitions :
       IMPLICIT NONE
@@ -119,6 +122,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'MSG_PAR'
+      INCLUDE 'CNF_PAR'
 
 *    Status :
       INTEGER STATUS
@@ -275,7 +279,8 @@
              IF ( STATUS .EQ. SAI__OK ) THEN
 
 *          Get the min and max values and pixel indices
-               CALL ARR_PRANG1R( NELM, %VAL(PTR), INDMIN, MINVAL, 
+               CALL ARR_PRANG1R( NELM, %VAL(CNF_PVAL(PTR)), 
+     :                           INDMIN, MINVAL,
      :                        INDMAX, MAXVAL, STATUS )
 
 *

@@ -50,6 +50,7 @@
 *    RCF: R.J. Forbes (Birmingham University)
 *    DJA: D.J. Allan (Birmingham University)
 *    AJC: A.J. Chipperfield (Starlink, RAL)
+*    TIMJ: Tim Jenness (JAC, Hawaii)
 
 * History:
 *     02-JUN-1987 (RCF):
@@ -66,6 +67,8 @@
 *        _REAL G -> G20.0
 *        _DOUBLE G -> G25.0
 *        _INTEGER I -> I11
+*     18-JUL-2007 (TIMJ):
+*       Add CNF_PVAL for 64-bit
 *-
 
 *    Type Definitions :
@@ -76,6 +79,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'MSG_PAR'
+      INCLUDE 'CNF_PAR'
 
 *    Status :
       INTEGER status
@@ -137,24 +141,28 @@
 
    	  IF ( type .eq. '_LOGICAL' ) THEN
             CALL DAT_MAPV(LOC,TYPE,'WRITE',PTR,NVAL,STATUS)
-	    CALL HREAD_LPUT ( LUN, BINARY,%VAL(PTR),NVAL,STATUS)
+	    CALL HREAD_LPUT ( LUN, BINARY,%VAL(CNF_PVAL(PTR)),NVAL,STATUS)
 	  ELSEIF (( type .eq. '_INTEGER' )  .OR.
      &         ( type .eq. '_UWORD'   )  .OR.
      &         ( type .eq. '_WORD'    )  .OR.
      &         ( type .eq. '_UBYTE'   )  .OR.
      &         ( type .eq. '_BYTE'    )) THEN
             CALL DAT_MAPV(LOC,'_INTEGER','WRITE',PTR,NVAL,STATUS)
-            CALL HREAD_IPUT ( LUN, BINARY,%VAL(PTR),NVAL,STATUS)
+            CALL HREAD_IPUT ( LUN, BINARY,%VAL(CNF_PVAL(PTR)),
+     :                        NVAL,STATUS)
           ELSEIF ( type .eq. '_REAL' ) THEN
             CALL DAT_MAPV(LOC,TYPE,'WRITE',PTR,NVAL,STATUS)
-            CALL HREAD_RPUT ( LUN, BINARY,%VAL(PTR),NVAL,STATUS)
+            CALL HREAD_RPUT ( LUN, BINARY,%VAL(CNF_PVAL(PTR)),
+     :                        NVAL,STATUS)
           ELSEIF ( type .eq. '_DOUBLE' ) THEN
             CALL DAT_MAPV(LOC,TYPE,'WRITE',PTR,NVAL,STATUS)
-            CALL HREAD_DPUT ( lun, BINARY,%VAL(PTR),NVAL,STATUS)
+            CALL HREAD_DPUT ( lun, BINARY,%VAL(CNF_PVAL(PTR)),
+     :                        NVAL,STATUS)
           ELSEIF ( type(1:5) .eq. '_CHAR' ) THEN
             CALL DAT_CLEN(LOC,CLEN,STATUS)
             CALL DAT_MAPV(LOC,TYPE,'WRITE',PTR,NVAL,STATUS)
-            CALL HREAD_CPUT ( lun, BINARY,%VAL(PTR),NVAL,STATUS,
+            CALL HREAD_CPUT ( lun, BINARY,%VAL(CNF_PVAL(PTR)),
+     :                        NVAL,STATUS,
      &        %VAL(CLEN))
           ENDIF
 

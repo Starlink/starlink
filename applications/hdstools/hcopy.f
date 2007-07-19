@@ -65,6 +65,7 @@
 *    DJA:  D J Allan (Birmingham University)
 *    AJC:  A J Chipperfield (Starlink, RAL)
 *    BC:   Brad Cavanagh (Joint Astronomy Centre, Hawaii)
+*    TIMJ: Tim Jenness (JAC, Hawaii)
 
 * History :
 *    19-JAN-1984 (JCMP):
@@ -99,6 +100,8 @@
 *       V3.0-0 Complete re-write
 *    02-FEB-2007 (BC):
 *       V3.0-1 Close HDS locator when finished, initialise locators.
+*     18-JUL-2007 (TIMJ):
+*       Add CNF_PVAL for 64-bit
 *-
 
 *    Type Definitions :
@@ -108,6 +111,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'MSG_PAR'
+      INCLUDE 'CNF_PAR'
 
 *    Status :
       INTEGER STATUS
@@ -301,7 +305,8 @@
      &                 OLOC,'_CHAR','WRITE',OPTR,NVAL,STATUS)
 *                  Copy the data - Note truncation can't occur here
                      CALL ARR_COP1C(
-     &                 NVAL,%VAL(IPTR),%VAL(OPTR),TRUNC,STATUS,
+     &                 NVAL,%VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(OPTR)),
+     :                 TRUNC,STATUS,
      &                 %VAL(CLENI),%VAL(CLENI))
 
 *               Treat all numeric types as double precision
@@ -310,7 +315,8 @@
      &                 ILOC,'_DOUBLE','READ',IPTR,NVAL,STATUS)
                      CALL DAT_MAPV(
      &                 OLOC,'_DOUBLE','WRITE',OPTR,NVAL,STATUS)
-                     CALL ARR_COP1D(NVAL,%VAL(IPTR),%VAL(OPTR),STATUS)
+                     CALL ARR_COP1D(NVAL,%VAL(CNF_PVAL(IPTR)),
+     :                              %VAL(CNF_PVAL(OPTR)),STATUS)
 
 *               Logicals
                   ELSEIF (TYPE.EQ.'_LOGICAL') THEN
@@ -318,7 +324,8 @@
      &                 ILOC,'_LOGICAL','READ',IPTR,NVAL,STATUS)
                      CALL DAT_MAPV(
      &                 OLOC,'_LOGICAL','WRITE',OPTR,NVAL,STATUS)
-                     CALL ARR_COP1L(NVAL,%VAL(IPTR),%VAL(OPTR),STATUS)
+                     CALL ARR_COP1L(NVAL,%VAL(CNF_PVAL(IPTR)),
+     :                              %VAL(CNF_PVAL(OPTR)),STATUS)
 
                   ELSE
 *               Unrecognised type
