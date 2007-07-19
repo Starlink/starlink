@@ -138,7 +138,7 @@ system are supported.
 </component>
 
 <component id="convert" support="S">
-  <version>1.5-9</version>
+  <version>1.5-10</version>
   <path>applications/convert</path>
   <description>CONVERT -- format-conversion package</description>
   <abstract><p>
@@ -741,7 +741,7 @@ and the ability to query on-line (WWW) catalogues.
 </component>
 
 <component id="hdstools" support="S">
-  <version>1.0</version>
+  <version>1.0-2</version>
   <path>applications/hdstools</path>
   <description>HDSTOOLS - Tools To Display and Edit HDS Objects</description>
   <abstract><p>
@@ -895,7 +895,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>1.7-7</version>
+  <version>1.7-10</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -4071,6 +4071,30 @@ Ultrix and for SunOS and may still work for them.
       targets.  The Fortran patches were submitted
       to automake-patches@gnu.org in January 2004, and were being
       examined after that.</p></notes>
+</component>
+
+<component id="cfitsio" support="U">
+  <version>2.510</version>
+  <path>thirdparty/heasarc/cfitsio</path>
+  <description>CFITSIO -- C and Fortran libraries for access to FITS files
+        </description>
+  <abstract><p>
+The CFITSIO package is a series of C functions that provide easy access
+to FITS files on disk.  It was written by William D. Pence of HEASARC
+(High Energy Astrophysics Science Archive Research Center) at the
+Goddard Space Flight Center, USA.  Starlink is grateful to William
+Pence for giving his permission for CFITSIO to be released on Starlink.
+</p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>William Pence</name>
+    </person>
+  </developers>
+  <documentation> sun227</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
 <component id="libtool" buildsupport="yes" support="U">
