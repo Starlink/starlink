@@ -89,11 +89,14 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     22-FEB-1990 (RFWS):
 *        Original version.
+*     19-JUL-2007 (TIMJ):
+*        Initialise return value regardless of STATUS.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -123,6 +126,8 @@
       INTEGER IACB               ! Index to the NDF entry in the ACB
 
 *.
+
+      BAD = .FALSE.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
