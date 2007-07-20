@@ -78,6 +78,8 @@
 *        - fixed problem with function pointer type casting
 *     2007-07-13 (EC):
 *        - use arrays of pointers to all chunks to store modeldata/modelgroups
+*     2007-07-20 (EC):
+*        - fixed freeing of modeldata
 
 *  Notes:
 
@@ -510,7 +512,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
     
     /* Free modelgroups and modeldata */
     if( modelgroups ) smf_free( modelgroups, status );
-    if( modeldata ) smf_free( modelgroups, status );
+    if( modeldata ) smf_free( modeldata, status );
 
     /* finally close igroup */
     smf_close_smfGroup( &igroup, status );
