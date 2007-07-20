@@ -173,6 +173,7 @@
 
 *    Map the input LUT.
 
+      PNTRI( 1 ) = 0
       CALL KPG1_MAP( NDFL, 'Data', '_REAL', 'READ', PNTRI, EL, STATUS )
 
 *    Obtain the maximum and minimum values.
