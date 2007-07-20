@@ -2328,6 +2328,9 @@ package polpack {
       }
    }
 
+   command makecube {
+      obey {$POLPACK_DIR/makecube.csh}      
+   }
 
    icl {defhelp kappa $KAPPA_HELP 0}
 
