@@ -1239,7 +1239,8 @@
          END IF
 
          IF ( ESTIM .EQ. 'COMAX' .OR. ESTIM .EQ. 'COMIN' .OR.
-     :        ESTIM .EQ. 'IWC' .OR. ESTIM .EQ. 'IWD' ) THEN
+     :        ESTIM .EQ. 'IWC' .OR. ESTIM .EQ. 'IWD' .OR.
+     :        ESTIM .EQ. 'INTEG' ) THEN
              CALL PSX_FREE( IPCO, STATUS )
              IF ( HIGHER ) CALL PSX_FREE( IPW3, STATUS )
          END IF
