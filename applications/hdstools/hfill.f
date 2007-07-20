@@ -75,7 +75,8 @@
 *       Get it working for CHAR values
 *       Get value before mapping to avoid corrupting files on error
 *     18-JUL-2007 (TIMJ):
-*       Add CNF_PVAL for 64-bit
+*       - Add CNF_PVAL for 64-bit
+*       - Cancel input parameter on exit to prevent Locator leak warning
 *-
 *    Type Definitions :
       IMPLICIT NONE
@@ -204,5 +205,7 @@
          CALL DAT_ANNUL(OBJLOC,STATUS)
 
       ENDIF
+
+      CALL DAT_CANCL('INP', STATUS)
 
       END
