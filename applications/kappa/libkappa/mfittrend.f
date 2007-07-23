@@ -228,6 +228,9 @@
 *        parallel mappings including one that is solely detrending axis,
 *        before finding the largest projection of the vector joining
 *        two test points.
+*     2007 July 19 (MJC):
+*        Used new KPG1_ASAPA to identify pixel axis corresponding to
+*        the detrended WCS axis, rather than inline code.
 *     {enter_further_changes_here}
 
 *-
@@ -266,22 +269,13 @@
       CHARACTER ITYPE * ( NDF__SZTYP ) ! Numeric type for processing
       CHARACTER * ( DAT__SZLOC ) LOC ! Locator for the input NDF
       CHARACTER * ( 80 ) SECT    ! Section specifier
-      CHARACTER * ( 255 ) TTLC   ! Title of original current Frame
       DOUBLE PRECISION CPOS( 2, NDF__MXDIM ) ! Two current Frame 
                                  ! positions
       DOUBLE PRECISION CURPOS( NDF__MXDIM ) ! A valid current Frame 
                                  ! position
-      DOUBLE PRECISION DLBND( NDF__MXDIM ) ! Lower bounds, pixel co-ords
       DOUBLE PRECISION DRANGE( MAXRNG ) ! Fit ranges world co-ordinates
-      DOUBLE PRECISION DUBND( NDF__MXDIM ) ! Upper bounds, pixel co-ords
-      DOUBLE PRECISION PIXPOS( NDF__MXDIM ) ! A valid pixel Frame
-                                 ! position
       DOUBLE PRECISION PPOS( 2, NDF__MXDIM ) ! Two pixel Frame positions
       DOUBLE PRECISION PRANGE( MAXRNG ) ! Fit ranges pixel co-ordinates
-      DOUBLE PRECISION PRJ       ! Vector length projected on to a pixel
-                                 ! axis
-      DOUBLE PRECISION PRJMAX    ! Maximum vector length projected on to
-                                 ! an axis
       DOUBLE PRECISION PXHIGH    ! High pixel bound of fitted axis 
       DOUBLE PRECISION PXLOW     ! Low pixel bound of fitted axis 
       INTEGER AREA               ! Area of axes orthogonal to fit axis
@@ -321,10 +315,9 @@
       INTEGER NFEED              ! Number of pixel axes feeding WCS axis
       INTEGER NRANGE             ! Number of range values (not pairs)
       INTEGER ORDER              ! The order of the polynomial to fit
+      INTEGER OTOMAP             ! One-to-one mapping
       INTEGER OUTNDF             ! NDF identifier of output NDF
-      INTEGER PIXAXE( NDF__MXDIM )! Pixel axis indices feeding WCS axis
       INTEGER RANGES( MAXRNG )   ! The fit ranges pixels
-      INTEGER TMAP               ! Temporary mapping
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF
       LOGICAL AUTO               ! Determine regions automatically?
       LOGICAL CLIPRE             ! Clip the outlier residuals?
@@ -414,13 +407,8 @@
          COMP = 'Data'
       END IF
 
-*  Get the fit ranges.
-*  ===================
-      USEALL = .FALSE.
-
-*  Manual or automatic estimation?
-      CALL PAR_GET0L( 'AUTO', AUTO, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GO TO 999
+*  Obtain WCS information.
+*  =======================
 
 *  Get the WCS FrameSet from the NDF.
       CALL KPG1_GTWCS( INNDF, IWCS, STATUS )
@@ -429,7 +417,6 @@
 *  units of the ranges.
       CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
       NAXC = AST_GETI( CFRM, 'NAXES', STATUS )
-      TTLC = AST_GETC( CFRM, 'TITLE', STATUS )
 
 *  Get axis to fit the polynomials to.  Default is last axis in the WCS.
       IF ( NDIM .NE. 1 ) THEN
@@ -446,6 +433,20 @@
       MAP = AST_GETMAPPING( IWCS, IPIX, AST__CURRENT, STATUS )
 
       IF ( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Get the fit ranges.
+*  ===================
+      USEALL = .TRUE.
+
+*  Manual or automatic estimation?
+      CALL PAR_GET0L( 'AUTO', AUTO, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Initialise the ranges here so that it applies to both automatic
+*  mode and when user specifies the whole range.
+      DO I = 1, MAXRNG
+         DRANGE( I ) = AST__BAD
+      END DO
 
       IF ( AUTO ) THEN
          CALL MSG_BLANK( STATUS )
@@ -467,16 +468,12 @@
 *  Get the ranges to use. These values are transformed from current
 *  co-ordinates along the fit axis to pixel co-ordinates on some
 *  NDF axis (we've yet to determine).
-         DO I = 1, MAXRNG
-            DRANGE( I ) = AST__BAD
-         END DO
          CALL KPG1_GTAXV( 'RANGES', MAXRNG, .FALSE., CFRM, IAXIS,
      :                    DRANGE, NRANGE, STATUS )
 
 *  If a null value was supplied then we should use the full extent.
          IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
-            USEALL = .TRUE.
          ELSE
 
 *  Ranges must come in pairs.
@@ -487,146 +484,19 @@
      :                       STATUS )
                GO TO 999
             END IF
+
+*  We are not use all the range.
+            USEALL = .FALSE.
          END IF
       END IF
 
 *  Determine which pixel axis is most nearly aligned with the selected 
 *  WCS axis.
-*  ===================================================================
-
-*  First see if the Mapping can be split into two parallel Mappings; one
-*  that feeds just the selected WCS axis, and another that feeds all the
-*  other axes.
-      CALL AST_INVERT( MAP, STATUS )
-      CALL AST_MAPSPLIT( MAP, 1, IAXIS, PIXAXE, TMAP, STATUS )
-      CALL AST_INVERT( MAP, STATUS )
-
-*  If so, check that the WCS axis is fed by one and only one pixel axis,
-*  and get its index.
-      JAXIS = 0
-
-      IF ( TMAP .NE. AST__NULL ) THEN
-         NFEED = AST_GETI( TMAP, 'NOUT', STATUS )
-         IF ( NFEED .EQ. 1 ) THEN
-            JAXIS = PIXAXE( 1 )
-
-*  If high and low axis values were supplied, using the Mapping produced
-*  by AST_MAPSPLIT to get the corresponding pixel positions.
-            IF ( .NOT. USEALL ) THEN
-               CALL AST_TRAN1( TMAP, 1, DRANGE( 2 ), .TRUE., PXHIGH,
-     :                         STATUS )
-               CALL AST_TRAN1( TMAP, 1, DRANGE( 1 ), .TRUE., PXLOW,
-     :                         STATUS )
-            END IF
-         END IF
-      END IF
-
-*  Find an arbitrary position within the NDF which has valid current 
-*  Frame co-ordinates. Both pixel and current Frame co-ordinates for 
-*  this position are returned.
-      DO I = 1, NDIM
-         DLBND( I ) = DBLE( LBND( I ) - 1 )
-         DUBND( I ) = DBLE( UBND( I ) )
-      END DO
-      CALL KPG1_ASGDP( MAP, NDIM, NAXC, DLBND, DUBND, PIXPOS, CURPOS, 
+*  Determine which pixel axis is most nearly aligned with the selected 
+*  WCS axis.
+      CALL KPG1_ASAPA( INNDF, CFRM, MAP, IAXIS, DRANGE( 1 ),
+     :                 DRANGE( 2 ), JAXIS, PXLOW, PXHIGH, OTOMAP, 
      :                 STATUS )
-   
-
-*  If the Mapping could not be split using AST_MAPSPLIT, we attempt to
-*  analyse it by transforming positions, in order to find the pixel axis
-*  which is most nearly parallel to the selected WCS axis.
-      IF ( JAXIS .EQ. 0 ) THEN
-
-*  We require both forward and inverse transformations.
-         IF ( .NOT. AST_GETL( MAP, 'TRANINVERSE', STATUS ) .AND.
-     :        STATUS .EQ. SAI__OK ) THEN
-            STATUS = SAI__ERROR
-            CALL NDF_MSG( 'NDF', INNDF )
-            CALL MSG_SETC( 'T', TTLC )
-            CALL ERR_REP( 'MFITTREND_ERR2', 'The transformation from '//
-     :                    'the current co-ordinate Frame of ''^NDF'' '//
-     :                    '(^T) to pixel co-ordinates is not defined.', 
-     :                    STATUS )
-         
-         ELSE IF ( .NOT. AST_GETL( MAP, 'TRANFORWARD', STATUS ) .AND.
-     :             STATUS .EQ. SAI__OK ) THEN
-            STATUS = SAI__ERROR
-            CALL NDF_MSG( 'NDF', INNDF )
-            CALL MSG_SETC( 'T', TTLC )
-            CALL ERR_REP( 'MFITTREND_ERR3', 'The transformation from '//
-     :                    'pixel co-ordinates to the current '//
-     :                    'co-ordinate Frame of ''^NDF'' (^T) is not '//
-     :                    'defined.', STATUS )
-         END IF
-
-*  Create two copies of the good current Frame co-ordinates.
-         DO I = 1, NAXC
-            CPOS( 1, I ) = CURPOS( I )
-            CPOS( 2, I ) = CURPOS( I )
-         END DO 
-   
-*  If no ranges were supplied, modify the collapse axis values in these 
-*  positions by an arbitrary amount.
-         IF ( AUTO .OR. USEALL ) THEN
-            IF ( CURPOS( IAXIS ) .NE. 0.0D0 ) THEN
-               CPOS( 1, IAXIS ) = 0.99 * CURPOS( IAXIS )
-               CPOS( 2, IAXIS ) = 1.01 * CURPOS( IAXIS )
-            ELSE
-               CPOS( 1, IAXIS ) = CURPOS( IAXIS ) + 1.0D-4
-               CPOS( 2, IAXIS ) = CURPOS( IAXIS ) - 1.0D-4
-            END IF
-   
-*  If ranges values for the collapse axis were supplied, substitute the
-*  first pair into these positions. 
-         ELSE
-            CPOS( 1, IAXIS ) = DRANGE( 2 )
-            CPOS( 2, IAXIS ) = DRANGE( 1 )
-         END IF
-   
-*  Transform these two positions into pixel co-ordinates.
-         CALL AST_TRANN( MAP, 2, NAXC, 2, CPOS, .FALSE., NDIM, 2, PPOS,
-     :                   STATUS ) 
-
-*  Find the pixel axis with the largest projection of the vector joining
-*  these two pixel positions.  The collapse will occur along this pixel
-*  axis.  Report an error if the positions do not have valid pixel
-*  co-ordinates.
-         PRJMAX = -1.0
-         DO I = 1, NDIM
-            IF ( PPOS( 1, I ) .NE. AST__BAD .AND.
-     :           PPOS( 2, I ) .NE. AST__BAD ) THEN
-   
-               PRJ = ABS( PPOS( 1, I ) - PPOS( 2, I ) )
-               IF ( PRJ .GT. PRJMAX ) THEN
-                  JAXIS = I
-                  PRJMAX = PRJ
-               END IF
-   
-            ELSE IF ( STATUS .EQ. SAI__OK ) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP( 'MFITTREND_ERR4', 'The WCS information '/
-     :                       /'is too complex (cannot find two valid '/
-     :                       /'pixel positions).', STATUS )
-               GO TO 999
-            END IF
-   
-         END DO
-   
-*  Report an error if the selected WCS axis is independent of pixel
-*  position.
-         IF ( PRJMAX .EQ. 0.0 ) THEN
-            IF ( STATUS .EQ. SAI__OK ) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI( 'I', IAXIS )   
-               CALL ERR_REP( 'MFTTREND_ERR5', 'The specified WCS '/
-     :                       /'axis (axis ^I) has a constant value '/
-     :                       /'over the whole NDF and so cannot be '/
-     :                       /'collapsed.', STATUS )
-            END IF
-            GO TO 999
-         END IF
-
-      END IF
 
 *  Automatic mode to define ranges.
 *  --------------------------------
@@ -694,7 +564,7 @@
          DO I = 1, NRANGE, 2
 
 *  If MAP has an inverse, we can use MAP directly.
-            IF ( TMAP .EQ. AST__NULL ) THEN
+            IF ( OTOMAP .EQ. AST__NULL ) THEN
                CPOS( 1, IAXIS ) = DRANGE( I + 1 )
                CPOS( 2, IAXIS ) = DRANGE( I )
 
@@ -710,7 +580,7 @@
 *  Otherwise, we use the single-input single-output Mapping that generates 
 *  the requested WCS axis.
             ELSE
-               CALL AST_TRAN1( TMAP, 2, DRANGE( I ), .TRUE., PRANGE, 
+               CALL AST_TRAN1( OTOMAP, 2, DRANGE( I ), .TRUE., PRANGE, 
      :                         STATUS )
 
                JLO = KPG1_FLOOR( REAL( MIN( PRANGE( 1 ),

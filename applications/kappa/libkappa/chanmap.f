@@ -300,7 +300,9 @@
 *        Correct problems with use of KPG1_WCFAX.
 *     2007 July 11 (MJC):
 *         The NDF need not have exactly three significant dimensions.
-*
+*     2007 July 19 (MJC):
+*        Used new KPG1_ASAPA to identify pixel axis corresponding to
+*        the collapsed WCS axis, rather than inline code.
 *     {enter_further_changes_here}
 
 *-
@@ -359,18 +361,14 @@
                                  ! array
       INTEGER CFRM               ! Original Current Frame pointer
       CHARACTER COMP * ( 13 )    ! List of components to process
-      DOUBLE PRECISION CPOS( 2, NDIM ) ! Two current Frame 
-                                 ! positions
       DOUBLE PRECISION CURPOS( NDIM ) ! Valid current Frame position
       INTEGER D                  ! A dimension size
-      DOUBLE PRECISION DLBND( NDIM ) ! Lower bounds in pixel co-ords
       DOUBLE PRECISION DLBNDI( NDIM ) ! Slab inverse lower bounds in 
                                  ! GRID collapsed-axis co-ords
       DOUBLE PRECISION DLBNDS( NDIM - 1 ) ! Slab lower bounds in GRID 
                                  ! co-ords along uncollapsed axes
       CHARACTER DOM*( 20 )       ! Original current Frame Domain name
       CHARACTER DTYPE*( NDF__SZFTP ) ! Numeric type for output arrays
-      DOUBLE PRECISION DUBND( NDIM ) ! Upper bounds in pixel co-ords
       DOUBLE PRECISION DUBNDI( NDIM ) ! Inverse slab upper bounds in 
                                  ! GRID collapsed-axis co-ords
       DOUBLE PRECISION DUBNDS( NDIM - 1 ) ! Slab upper bounds in GRID 
@@ -387,7 +385,6 @@
       INTEGER GFRMO              ! Output GRID Frame pointer
       INTEGER GMAP               ! Pointer to Mapping from GRID Frame 
                                  ! to Current Frame, input NDF
-      DOUBLE PRECISION GRDPOS( NDIM ) ! Valid grid Frame position
       LOGICAL HIGHER             ! Significant dimensions above collapse
                                  ! axis?
       INTEGER I                  ! Loop count
@@ -465,16 +462,13 @@
       INTEGER OFFSET( NDF__MXDIM ) ! Channel-image pixel offsets within
                                  ! output array
       INTEGER OPERM( NDIM )      ! Output permutation
+      INTEGER OTOMAP             ! One-to-one mapping
       INTEGER PERMAP             ! PermMap pointer
-      REAL PIXPCH                ! Collapse-axis pixels per channel
-      DOUBLE PRECISION PIXPOS( NDF__MXDIM ) ! Valid pixel Frame position
-      INTEGER PLACE              ! NDF placeholder
-      DOUBLE PRECISION PPOS( 2, NDF__MXDIM ) ! Two pixel Frame positions
       INTEGER PFRMI              ! Input PIXEL Frame pointer
-      DOUBLE PRECISION PRJ       ! Vector length projected on to a pixel
-                                 ! axis
-      DOUBLE PRECISION PRJMAX    ! Maximum vector length projected on to
-                                 ! an axis
+      REAL PIXPCH                ! Collapse-axis pixels per channel
+      INTEGER PLACE              ! NDF placeholder
+      DOUBLE PRECISION PXHIGH    ! High pixel bound of collapse axis
+      DOUBLE PRECISION PXLOW     ! Low pixel bound of collapse axis
       CHARACTER ROIDOM*20        ! Domain name for an ROI Region
       INTEGER ROUMAP( MAXCHN )   ! Route maps for each channel
       INTEGER SDIM( NDIM )       ! Significant dimensions
@@ -619,91 +613,11 @@
          USEALL = .FALSE.
       END IF
 
+
 *  Determine which pixel axis is most nearly aligned with the selected 
 *  WCS axis.
-*  ===================================================================
-
-*  Find an arbitrary position within the NDF which has valid current 
-*  Frame co-ordinates. Both pixel and current Frame co-ordinates for 
-*  this position are returned.
-      DO I = 1, NDIM
-         DLBND( I ) = DBLE( LBND( I ) - 1 )
-         DUBND( I ) = DBLE( UBND( I ) )
-      END DO
-      CALL KPG1_ASGDP( MAP, NDIM, NAXC, DLBND, DUBND, PIXPOS, CURPOS, 
-     :                 STATUS )
-
-*  Convert the pixel position into a grid position.
-      DO I = 1, NDIM
-         GRDPOS( I ) = PIXPOS( I ) - LBND( I ) + 1.5
-      END DO 
-
-*  Create two copies of these current Frame co-ordinates.
-      DO I = 1, NAXC
-         CPOS( 1, I ) = CURPOS( I )
-         CPOS( 2, I ) = CURPOS( I )
-      END DO 
-
-*  If no high and low values for the collapse axis were supplied, modify
-*  the collapse axis values in these positions by an arbitrary amount.
-      IF ( USEALL ) THEN
-         IF ( CURPOS( IAXIS ) .NE. 0.0 ) THEN
-            CPOS( 1, IAXIS ) = 0.99 * CURPOS( IAXIS )
-            CPOS( 2, IAXIS ) = 1.01 * CURPOS( IAXIS )
-         ELSE
-            CPOS( 1, IAXIS ) = CURPOS( IAXIS ) + 1.0D-4
-            CPOS( 2, IAXIS ) = CURPOS( IAXIS ) - 1.0D-4
-         END IF
-
-*  If high and low values for the collapse axis were supplied,
-*  substitute these into these positions.
-      ELSE
-         CPOS( 1, IAXIS ) = AXHIGH
-         CPOS( 2, IAXIS ) = AXLOW
-      END IF
-
-*  Transform these two positions into pixel co-ordinates.
-      CALL AST_TRANN( MAP, 2, NAXC, 2, CPOS, .FALSE., NDIM, 2, PPOS,
-     :                STATUS ) 
-
-*  Find the pixel axis with the largest projection of the vector joining
-*  these two pixel positions.  The collapse will occur along this pixel
-*  axis.  Report an error if the positions do not have valid pixel
-*  co-ordinates.
-      PRJMAX = -1.0
-      DO I = 1, NDIM
-         IF ( PPOS( 1, I ) .NE. AST__BAD .AND.
-     :        PPOS( 2, I ) .NE. AST__BAD ) THEN
-
-            PRJ = ABS( PPOS( 1, I ) - PPOS( 2, I ) )
-            IF ( PRJ .GT. PRJMAX ) THEN
-               JAXIS = I
-               PRJMAX = PRJ
-            END IF
-
-         ELSE IF ( STATUS .EQ. SAI__OK ) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP( 'CHANMAP_ERR3', 'The WCS information is '//
-     :                    'too complex (cannot find two valid pixel '//
-     :                    'positions).', STATUS )
-            GO TO 999
-         END IF
-
-      END DO
-
-*  Report an error if the selected WCS axis is independent of pixel
-*  position.
-      IF ( PRJMAX .EQ. 0.0 ) THEN
-         IF ( STATUS .EQ. SAI__OK ) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETI( 'I', IAXIS )   
-            CALL ERR_REP( 'CHANMAP_ERR3B', 'The specified WCS axis '//
-     :                    '(axis ^I) has a constant value over the '//
-     :                    'whole NDF and so cannot be collapsed.',
-     :                    STATUS )
-         END IF
-         GO TO 999
-      END IF
+      CALL KPG1_ASAPA( INDFI, CFRM, MAP, IAXIS, AXLOW, AXHIGH,
+     :                 JAXIS, PXLOW, PXHIGH, OTOMAP, STATUS )
 
 *  Derive the pixel-index bounds along the collapse axis.
 *  ======================================================
@@ -719,10 +633,8 @@
       ELSE
 
 *  Find the projection of the two test points on to the collapse axis.
-         JLO = KPG1_FLOOR( REAL( MIN( PPOS( 1, JAXIS ), 
-     :                                PPOS( 2, JAXIS ) ) ) ) + 1
-         JHI = KPG1_CEIL( REAL( MAX( PPOS( 1, JAXIS ), 
-     :                               PPOS( 2, JAXIS ) ) ) )
+         JLO = KPG1_FLOOR( REAL( MIN( PXHIGH, PXLOW ) ) ) + 1
+         JHI = KPG1_CEIL( REAL( MAX( PXHIGH, PXLOW ) ) )
 
 *  Ensure these are within the bounds of the pixel axis.
          JLO = MAX( LBND( JAXIS ), JLO )
