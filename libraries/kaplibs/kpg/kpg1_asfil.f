@@ -200,7 +200,7 @@
 
 *  Give a context message.
          CALL MSG_SETC( 'PARAM1', PARAM1 )
-         CALL ERR_REP( 'KPG1_ASFIL_ERR3', 'Error obtained a set of '//
+         CALL ERR_REP( 'KPG1_ASFIL_ERR3', 'Error obtaining a set of '//
      :                 'formatted positions using parameter %^PARAM1.',
      :                  STATUS )
 
