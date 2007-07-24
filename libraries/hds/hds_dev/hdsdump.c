@@ -59,6 +59,9 @@
 *      chip needs to be global (do not know why) to allow
 *      one of my test HDS files to dump without segv.
 *      Factor out fseek code.
+*     19-JUL-2007 (BKM):
+*      Logic went wrong when a chained structure or component used more
+*      than 1 HDS block - corrected by malloc()ing the correct buffer size.
 *     {enter_further_changes_here}
 
 *-
@@ -101,7 +104,7 @@ main(int argc, char **argv)
    INT_BIG cblk;
    HDS_PTYPE axsz;
    UINT_BIG size, tpdb, tlrb;
-   unsigned char tblk[REC__SZBLK];			   /* Temporary block buffer */
+   unsigned char *tblk;			                  /* Temporary block buffer */
 
 /* Program entry point */
 
@@ -115,7 +118,7 @@ main(int argc, char **argv)
       perror("hds file open error");
       exit(1);
    } else
-      printf("\nHDS dump - BKM/TIMJ 20060719 - file %s\n\n", argv[1] );
+      printf("\nHDS dump - BKM/TIMJ 20070719 - file %s\n\n", argv[1] );
    if( fread( block, 1, REC__SZBLK, fp) != REC__SZBLK ) {
       perror("HCB block read error");
       fclose( fp );
@@ -219,7 +222,8 @@ main(int argc, char **argv)
                if( rcl.chain )
                {
                   printf("  From chained block:\n");
-                  read_block( fp, cblk, REC__SZBLK, tblk );
+                  tblk = malloc(rcl.dlen);
+                  read_block( fp, cblk, rcl.dlen, tblk );
                   ptr = tblk;
                }
                if(odl.naxes == 0) {
@@ -235,6 +239,8 @@ main(int argc, char **argv)
                      ptr += (rcl.extended ? 8: 4);
                   }
                }
+               if( rcl.chain )
+                  free(tblk);
                break;
             case DAT__COMPONENT:
                i = (int) *ptr;
@@ -243,7 +249,8 @@ main(int argc, char **argv)
                if( rcl.chain )
                {
                   printf("  From chained block:\n");
-                  read_block( fp, cblk, REC__SZBLK, tblk );
+                  tblk = malloc(rcl.dlen);
+                  read_block( fp, cblk, rcl.dlen, tblk );
                   ptr = tblk;
                }
                for(j =0; j<i; j++ ) {
@@ -256,6 +263,8 @@ main(int argc, char **argv)
                      add_block( rid.bloc );
                   ptr += SZCRV;
                }
+               if( rcl.chain)
+                  free(tblk);
                break;
             case DAT__PRIMITIVE:
                dat1_unpack_odl( ptr, &odl );
@@ -374,9 +383,9 @@ void read_block ( FILE * fp, INT_BIG bloc, size_t nbytes, void * ptr ) {
    int readok = 1;
 
 #if HAVE_FSEEKO
-   seek_stat = fseeko(fp, (bloc - 1) * nbytes, SEEK_SET);
+   seek_stat = fseeko(fp, (bloc - 1) * REC__SZBLK, SEEK_SET);
 #else
-   seek_stat = fseek(fp, (bloc - 1) * nbytes, SEEK_SET);
+   seek_stat = fseek(fp, (bloc - 1) * REC__SZBLK, SEEK_SET);
 #endif
 
    if (seek_stat == 0) {
