@@ -126,6 +126,14 @@ typedef void AstInterval;
 typedef void CmpRegion;
 #endif
 
+#if ( (AST_MAJOR_VERS == 3 && AST_MINOR_VERS >= 7) || AST_MAJOR_VERS >= 4 )
+#define HASTIMEFRAME
+#define HASTIMEMAP
+#else
+typedef void AstTimeFrame;
+typedef void AstTimeMap;
+#endif
+
 /* between v3.0 and v3.4 astRate returned the second derivative */
 #if ( AST_MAJOR_VERS == 3 && AST_MINOR_VERS < 5 )
 #define RATE_HAS_SECOND_DERIVATIVE 1
@@ -1104,6 +1112,23 @@ new( class, options )
  OUTPUT:
   RETVAL
 
+MODULE = Starlink::AST   PACKAGE = Starlink::AST::TimeFrame
+
+AstTimeFrame *
+new( class, options )
+  char * class
+  char * options
+ CODE:
+#ifndef HASTIMEFRAME
+   Perl_croak(aTHX_ "TimeFrame: Please upgrade to AST V3.7 or greater");
+#else
+  ASTCALL(
+   RETVAL = astTimeFrame( options );
+  )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
+#endif
+ OUTPUT:
+  RETVAL
 
 MODULE = Starlink::AST   PACKAGE = Starlink::AST::SlaMap
 
@@ -1154,6 +1179,23 @@ new( class, nin, flags, options )
  OUTPUT:
   RETVAL
 
+MODULE = Starlink::AST   PACKAGE = Starlink::AST::TimeMap
+
+AstTimeMap *
+new( flags, options )
+  int flags
+  char * options
+ CODE:
+#ifndef HASTIMEMAP
+   Perl_croak(aTHX_ "TimeMap: Please upgrade to AST V3.7 or greater");
+#else
+  ASTCALL(
+   RETVAL = astTimeMap( flags, options );
+  )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
+#endif
+ OUTPUT:
+  RETVAL
 
 MODULE = Starlink::AST   PACKAGE = Starlink::AST::TranMap
 

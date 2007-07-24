@@ -1,4 +1,9 @@
-2007-01-30  Tim Jenness  <timj@apele.jach.hawaii.edu>
+2007-07-24  Light Of My Life  <tjenness@cpan.org>
+
+	* AST.pm: Add TimeFrame and TimeMap 
+	* AST.xs: Add TimeFrame and TimeMap
+
+2007-01-30  Tim Jenness  <tjenness@cpan.org>
 
 	* AST.xs: Fix region handling and add Polygon and Interval. 
 

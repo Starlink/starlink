@@ -454,6 +454,9 @@ use base qw/ Starlink::AST::Mapping /;
 package Starlink::AST::ZoomMap;
 use base qw/ Starlink::AST::Mapping /;
 
+package Starlink::AST::TimeMap;
+use base qw/ Starlink::AST::TimeMap /;
+
 package Starlink::AST::Frame;
 use base qw/ Starlink::AST::Mapping /;
 
@@ -685,5 +688,8 @@ use base qw/ Starlink::AST::SpecFrame /;
 
 package Starlink::AST::SpecFluxFrame;
 use base qw/ Starlink::AST::CmpFrame /;
+
+package Starlink::AST::TimeFrame;
+use base qw/ Starlink::AST::Frame /;
 
 1;
