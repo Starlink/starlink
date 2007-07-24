@@ -3632,7 +3632,9 @@ int RtdImage::zoomviewCmd(int argc, char* argv[])
 	RtdImage*& view = (count == 1) ? zoomView_ : zoomView2_;
         
         //  Reset zoomfactor for reference counted copies.
-	view->zoomFactor_ = 1;
+        if ( view != NULL ) {
+	   view->zoomFactor_ = 1;
+        }
 	view = NULL;
     }
     else if (strcmp(argv[0], "slow") == 0) {
