@@ -24,16 +24,16 @@ test "${ZSH_VERSION+set}" = set && alias -g '${1+"$@"}'='"$@"'
 # To simplify relocation use local variables rather than using the
 # @bindir@ everywhere
 relocate=0
-if test "${STAR_RELOC}" != ""; then
-    if [ -e ${STAR_RELOC} ]; then
-        if [ -e ${STAR_RELOC}/bin ]; then
+if test "${STARLINK_DIR}" != ""; then
+    if [ -e ${STARLINK_DIR} ]; then
+        if [ -e ${STARLINK_DIR}/bin ]; then
             relocate=1
         fi
     fi
 fi
 
 if [ ${relocate} -ne 0 ]; then
-    exec_prefix=${STAR_RELOC}
+    exec_prefix=${STARLINK_DIR}
     bindir=${exec_prefix}/bin
     staretcdir=${exec_prefix}/etc
     starhelpdir=${exec_prefix}/help
