@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_BFRE<T>( LBND, UBND, IN, NPOS, NPAR, FPAR, OUT,
-     :                       STATUS )
+      SUBROUTINE KPS1_BFRE<T>( DIM1, DIM2, IN, LBND, NPOS, NPAR, FPAR,
+     :                       OUT, STATUS )
 *+
 *  Name:
 *     KPS1_BFREx
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_BFREx( LBND, UBND, INARR, NPOS, NPAR, FPAR, OUT,
+*     CALL KPS1_BFREx( DIM1, DIM2, IN, LBND, NPOS, NPAR, FPAR, OUT,
 *                      STATUS )
 
 *  Description:
@@ -20,12 +20,14 @@
 *     residuals, that it returns as two-dimensional image.
 
 *  Arguments:
+*     DIM1 = INTEGER (Given)
+*        The dimension of the first pixel axes.
+*     DIM2 = INTEGER (Given)
+*        The dimension of the first pixel axes.
+*     IN( DIM1, DIM2 ) = ? (Given)
+*        The array that was fitted.
 *     LBND( 2 ) = INTEGER (Given)
 *        The lower bounds of the pixel axes.
-*     UBND( 2 ) = INTEGER (Given)
-*        The upper bounds of the pixel axes.
-*     IN( LBND(1):UBND(1), LBND(2):UBND(2) ) = ? (Given)
-*        The array that was fitted.
 *     NPOS = INTEGER (Given)
 *        The number of beam positions fitted.
 *     NPAR = INTEGER (Given)
@@ -33,7 +35,7 @@
 *     FPAR( NPAR ) = DOUBLE PRECISION (Given)
 *        The coefficients of the fit in the PIXEL Frame.  The width
 *         measures are standard deviations.
-*     OUT( LBND(1):UBND(1), LBND(2):UBND(2) ) = ? (Returned)
+*     OUT( DIM1, DIM2 ) = ? (Returned)
 *        The residuals at every element.
 *     STATUS = INTEGER (Given)
 *        The global status.
@@ -71,6 +73,8 @@
 *  History:
 *     2007 June 8 (MJC):
 *        Original version.
+*     2007 July 25 (MJC):
+*        Change API for strict compilers.
 *     {enter_further_changes_here}
 
 *-
@@ -84,15 +88,16 @@
       INCLUDE 'BF_PAR'           ! BEAMFIT constants
 
 *  Arguments Given:
+      INTEGER DIM1
+      INTEGER DIM2
+      <TYPE> IN( DIM1, DIM2 )
       INTEGER LBND( 2 )
-      INTEGER UBND( 2 )
-      <TYPE> IN( LBND( 1 ):UBND( 1 ), LBND( 2 ):UBND( 2 ) )
       INTEGER NPOS
       INTEGER NPAR
       DOUBLE PRECISION FPAR( NPAR )
 
 *  Arguments Returned:
-      <TYPE> OUT( LBND( 1 ):UBND( 1 ), LBND( 2 ):UBND( 2 ) )
+      <TYPE> OUT( DIM1, DIM2 )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -140,13 +145,13 @@
       BACK( 1 ) = FPAR( 7 )
 
 *  Loop for each line.
-      DO J = LBND( 2 ), UBND( 2 )
-         YY = DBLE( J ) - 0.5D0
+      DO J = 1, DIM2
+         YY = DBLE( LBND( 2 ) + J - 1 ) - 0.5D0
 
 *  Loop for each column. 
-         DO I = LBND( 1 ), UBND( 1 )
+         DO I = 1, DIM1
             IF ( IN( I, J ) .NE. VAL__BAD<T> ) THEN
-               XX = DBLE( I ) - 0.5D0
+               XX = DBLE( LBND( 1 ) + I - 1 ) - 0.5D0
 
                GI = 0.0D0
                DO IG = 1, NPOS

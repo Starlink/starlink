@@ -1246,13 +1246,13 @@
 *  Fill the data array with the evaluated point-spread function less
 *  the original array.
       IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPS1_BFRED( SLBND, SUBND, %VAL( CNF_PVAL( IPD ) ), NPOS,
-     :                    MXCOEF, FPAR, %VAL( CNF_PVAL( IPRES ) ), 
-     :                    STATUS )
+         CALL KPS1_BFRED( DIMS( 1 ), DIMS( 2 ), %VAL( CNF_PVAL( IPD ) ),
+     :                    SLBND, NPOS, MXCOEF, FPAR,
+     :                    %VAL( CNF_PVAL( IPRES ) ), STATUS )
       ELSE
-         CALL KPS1_BFRER( SLBND, SUBND, %VAL( CNF_PVAL( IPD ) ), NPOS,
-     :                    MXCOEF, FPAR, %VAL( CNF_PVAL( IPRES ) ), 
-     :                    STATUS )
+         CALL KPS1_BFRER( DIMS( 1 ), DIMS( 2 ), %VAL( CNF_PVAL( IPD ) ),
+     :                    SLBND, NPOS, MXCOEF, FPAR, 
+     :                    %VAL( CNF_PVAL( IPRES ) ), STATUS )
       END IF
 
 *  Store a title.
