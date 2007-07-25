@@ -59,8 +59,10 @@
 /*    23-MAY-2000: (BKM):                                                   */
 /*       Revise STK storage algorithm to accept (and efficiently pack)      */
 /*       64-bit pointers                                                    */
-/*    14-JUN-2002: (BKM)                                                    */
+/*    14-JUN-2002 (BKM):                                                    */
 /*       Choice of HDS V3 (32-bit) or HDS-V4 (64-bit) HCB                   */
+/*    24-JUL-2007 (BKM):                                                    */
+/*       Positively identify if writing HCB in HDS3 or HDS4 format!         */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -132,7 +134,7 @@
 /* no problems except that this space cannot then be reused.                */
 /* The LRB and PDB entries are stored alternately.                          */
 
-   if (hds_gl_64bit)
+   if (hcb->version == REC__VERSION4)
    {
       ix_lrb = 0;
       ix_pdb = REC__MXSTK - 1;
