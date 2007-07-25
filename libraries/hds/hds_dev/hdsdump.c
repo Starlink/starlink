@@ -62,6 +62,9 @@
 *     19-JUL-2007 (BKM):
 *      Logic went wrong when a chained structure or component used more
 *      than 1 HDS block - corrected by malloc()ing the correct buffer size.
+*     25-JUL-2007 (BKM):
+*      Logic again wrong when LRB contents referred to items in preceeding
+*      blocks.
 *     {enter_further_changes_here}
 
 *-
@@ -99,6 +102,7 @@ main(int argc, char **argv)
    unsigned char *ptr;
    char *type;
    char axtype[DAT__SZTYP+1];
+   unsigned int cbm;					   /* Chip Bit Mask */
 
    int i, j;
    INT_BIG cblk;
@@ -118,7 +122,7 @@ main(int argc, char **argv)
       perror("hds file open error");
       exit(1);
    } else
-      printf("\nHDS dump - BKM/TIMJ 20070719 - file %s\n\n", argv[1] );
+      printf("\nHDS dump - BKM/TIMJ 20070725 - file %s\n\n", argv[1] );
    if( fread( block, 1, REC__SZBLK, fp) != REC__SZBLK ) {
       perror("HCB block read error");
       fclose( fp );
@@ -169,6 +173,17 @@ main(int argc, char **argv)
       tlrb++;
       cur_block = nxtblk[0];
       read_block( fp, cur_block, REC__SZBLK, block );
+      printf("\n\n**** LRB block %d", cur_block);
+      cbm = (block[1] << 8 | block[0]);
+      if( cbm == 0x7fff)
+	 printf("  (All chips used)\n");
+      else {
+         printf("  (Free chips ");
+         for(i =0; i < REC__MXCHIP; i++)
+            if(!(cbm & (1<<i)))
+               printf("%d, ", i);
+         printf(")\n");
+      }
 
       for( chip=0; chip < REC__MXCHIP ; chip+=rcl.size ) {
          ptr = block + REC__SZCBM + (chip * REC__SZCHIP ); 
@@ -202,7 +217,7 @@ main(int argc, char **argv)
                dat1_unpack_crv( ptr, 0, &rid );
                printf(" Name = %s Next record = (%" HDS_INT_BIG_S",%d)\n",
                         name, rid.bloc, rid.chip );
-               if( rid.bloc != cur_block)
+               if( rid.bloc > cur_block)
                   add_block( rid.bloc );
                break;
             case DAT__STRUCTURE:
@@ -234,7 +249,7 @@ main(int argc, char **argv)
                   for(axsz=0; axsz<odl.axis[i]; axsz++) {  
 		     dat1_unpack_srv( ptr, &rid );
                      printf("  (%" HDS_INT_BIG_S",%d)\n",rid.bloc, rid.chip);
-                     if( rid.bloc != cur_block )
+                     if( rid.bloc > cur_block )
                         add_block( rid.bloc);
                      ptr += (rcl.extended ? 8: 4);
                   }
