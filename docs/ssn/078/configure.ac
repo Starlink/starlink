@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(ssn78.xml)
 STAR_DEFAULTS(docs-only)
 
 STAR_XML_DOCUMENTATION(ssn78)
-LATEX2DVI='$$LATEX "\\batchmode\\input $$1" && makeindex $$1 && $$LATEX "\\batchmode\\input $$1"'
+LATEX2DVI='export TEXINPUTS=..:; $$LATEX "\\batchmode\\input $$1" && makeindex $$1 && $$LATEX "\\batchmode\\input $$1"'
 AC_PATH_PROGS(METAPOST, [mp mpost])
 
 dnl  The default here isn't terribly reliable, since it relies on
