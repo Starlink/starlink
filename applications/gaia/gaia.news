@@ -37,7 +37,7 @@
 
     The rotatable box graphics item can now be used as a catalogue symbol.
 
-    The "File->Reopen" item now works for cubes as does "gaiadisp".
+    Re-opening modified cubes now works (via File->Re-open and gaiadisp).
 
     Data values are now only reported when moving over part of the image.
     Previously reports continued for an additional pixel to the bottom
