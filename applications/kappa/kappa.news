@@ -1,8 +1,111 @@
+1 KAPPA_Version_1.7
+
+   A new release of KAPPA (V1.7-10) has been made.  The main changes
+   are listed below.  For complete details of all changes, see the 
+   "Release Notes" appendix in SUN/95.
+
+2 New_applications
+
+   o  BEAMFIT fits up to five Gaussians to beam features in a 
+   two-dimensional NDF, given initial co-ordinates defined in one
+   of four modes.  Various fixed and relative constraints may be
+   placed. It reports the coefficients and associated errors to
+   the terminal, an optional logfile, and to results parameters.
+
+2 Modified_applications
+
+   o  ADD now propagates the UNITS component if it is the same in 
+   both input NDFs.
+
+   o  ARDPLOT can now draw outlines around AST regions as well as
+   ARD regions specified through a new REGION parameter.
+
+   o  DIV now propagates any UNITS, combining them into a normalised
+   form. 
+
+   o  COLLAPSE can now correctly collapse along a sky co-ordinate 
+   axis such as right-ascension or declination.  
+   
+   o  COLLAPSE: The co-ordinate extent over which the collapse occurs
+   may be retained in a dummy dimension provided a new parameter TRIM
+   is set to FALSE.  The default of TRUE gives the current behaviour.
+
+   o  FITSURFACE supports bi-cubic spline fitting and there is a new
+   parameter KNOTS for that.  It creates a new provisional BSPLINE 
+   variant of the POLYNOMIAL structure in the NDF being fitted.
+   
+   o  FITSURFACE now writes PIXEL or AXIS values to the 
+   SURFACEFIT.COSYS component to bring it into line with AST usage.
+
+   o  HISTAT has new parameters METHOD and NUMBIN that permit other 
+   ways to obtain the mode including the peak bin of an optimally 
+   binned histogram.
+   
+   o  HISTAT has additional and modified results parameters.  See 
+   the STATS changes below.
+
+   o  LINPLOT has a new parameter ALIGNSYS that specifies the
+   co-ordinate system in which a new plot and an existing plot are
+   aligned when ALIGN is TRUE.
+
+   o  MAKESURFACE reads the provisional BSPLINE variant of the
+   POLYNOMIAL structure, and thus evaluates a spline fit of the 
+   input NDF.
+   
+   o  MAKESURFACE recognises GRID, PIXEL, and AXIS values for the
+   SURFACEFIT.COSYS component.
+
+   o  MFITTREND can now cope without an inverse WCS transformation.
+
+   o  MULT now propagates any UNITS, combining them into a normalised
+   form. 
+
+   o  NDFTRACE now reports a nominal pixel scale in output parameter
+   FPIXSCALE.
+   
+   o  NDFTRACE has a new output parameter, FPIXSCALE, to store
+   the nominal pixel scale or each axis in the current WCS Frame.
+
+   o  A bug in ROTATE introduced at previous release is fixed.  It can
+   again rotate a two-dimensional array with a dimension of one
+   element, or a cube with two single-element dimensions.
+
+   o  SQORST has a new MODE ="PixelScale" option, and new 
+   corresponding PIXSCALE and AXIS parameters.  These allow the WCS
+   scales per pixel to be modified.  So for example, it can resample
+   a spectral cube into a cube with a specified channel width.
+
+   o  STATS There are two new output parameters---MAXWCS and
+   MINWCS---that hold formatted WCS co-ordinates of the maximum- and
+   minimum-valued pixels.  MAXCOORD and MINCOORD parameters now
+   contain the corresponding numerical WCS co-ordinates, provided the
+   NDF being analysed has a WCS FrameSet; otherwise they continue to
+   hold the AXIS-component values.
+
+   o  SUB now propagates the UNITS component if it is the same in
+   both input NDFs.
+
+   o  SURFIT This now uses singular value decomposition to solve the 
+   normal equations and hence provide the variances of the Chebyshev
+   polynomial coefficients, stored in the SURFACEFIT extension. 
+   
+   o  For the polynomial fit type, SURFIT creates a SURFACEFIT 
+   extension in the output NDF to hold the polynomial coefficients 
+   just as FITSURFACE does.
+
+   o  WCSMOSAIC: VARIANCE components may be used to weight the
+   input data if a new parameter VARIANCE is set to TRUE.
+   Parameter VARIANCE defaults to the current behaviour.
+
+   o  WCSMOSAIC has new output parameters FLBND and FUBND to record
+   the WCS bounds of the output NDF.
+
+
 1 KAPPA_Version_1.6
 
-   A new release of KAPPA (v1.6) is under development.  The main 
-   changes are thus far listed below.  For complete details of all 
-   changes, see the "Release Notes" appendix in SUN/95.
+   A new release of KAPPA (V1.6-5) is available.  The main changes 
+   are listed below.  For complete details of all changes, see 
+   the "Release Notes" appendix in SUN/95.
 
 2 New_applications
 
@@ -59,7 +162,7 @@
 
 1 KAPPA_Version_1.5
 
-   A new release of KAPPA (v1.5) has been made.  The main changes are
+   A new release of KAPPA (V1.5) has been made.  The main changes are
    listed below.  For complete details of all changes, see the 
    "Release Notes" appendix in SUN/95.
 
