@@ -1,3 +1,18 @@
+1 CONVERT_Version_1.5-10
+
+FITS2NDF supports externally and internally compressed FITS files.
+
+NDF2FITS writes integrity check keywords CHECKSUM and DATASUM at the
+end of each header if new parameter CHECKSUMS is TRUE.
+
+
+1 CONVERT_Version_1.5-9
+
+NDF2FITS parameter ENCODING has a new allowed value of "FITS-WCS(CD)".
+This is the same as "FITS-WCS" except that it uses the old CD matrix
+formalism to describe the data array's rotation and scaling.
+
+
 1 CONVERT_Version_1.5-8
 
  FITS2NDF parameter FMTCNV has a new allowed value of "Native"
