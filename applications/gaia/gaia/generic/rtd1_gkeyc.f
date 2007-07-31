@@ -17,14 +17,14 @@
 
 *  Description:
 *     This routine searches a buffer containing the header card images
-*     from a FITS file for a keyword NAME; and returns its value (as a
+*     from a FITS file for a keyword NAME and returns its value (as a
 *     character string), and the number of the card image within the
 *     buffer array that contains the named keyword.  The search ends
 *     when the next end of a header block, marked by the END keyword,
 *     is encountered or the buffer is exhausted.  If the keyword is
 *     present THERE is true, otherwise it is false.  If the keyword is
 *     expected to be present more than once then the argument NOCCUR
-*     controls which occurrece will be retrieved. If a keyword is not
+*     controls which occurrence will be retrieved. If a keyword is not
 *     found then no error results and the argument VALUE remains
 *     unmodified.
 *
@@ -53,7 +53,7 @@
 *        keyword should be used, if, multiple ones are expected. (Any
 *        value less then equal to 1 indicates the first occurrence)
 *     THERE = LOGICAL (Returned)
-*        If true the keyword %NAME is present (regardless of exit
+*        If true the keyword NAME is present (regardless of exit
 *        status).
 *     VALUE = CHARACTER * ( * ) (Returned)
 *        The value of the keyword.  The string is truncated to the
@@ -68,7 +68,8 @@
 
 *  Copyright:
 *     Copyright (C) 2000 Central Laboratory of the Research Councils
-*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council
+*     Copyright (C) 2007 Science and Technology Facilities Council
 *     All Rights Reserved.
 
 *  Licence:
@@ -123,10 +124,12 @@
 *     21-JUL-1994 (PWD):
 *        Re-created flexible formatting after SCCS crisis.
 *     12-SEP-1994 (PWD):
-*        Added ability to read occurence for multiple FITS keywords.
+*        Added ability to read occurrence for multiple FITS keywords.
 *     08-DEC-2000 (PWD):
 *        Changed to test for 'END ' rather than 'END'. A standard
 *        END keyword should be blank up to the eighth column.
+*     31-JUL-2007 (PWD):
+*        Don't start search when NCARD is 0. This reads BUFFER(0).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -148,8 +151,7 @@
       INTEGER NOCCUR
 
 *  Arguments Returned:
-      LOGICAL THERE              ! Card containing the keyword is
-                                 ! present
+      LOGICAL THERE              ! Card containing the keyword is present
       CHARACTER * ( * ) VALUE    ! Value of the keyword
       INTEGER CARD               ! Number of the card image containing
                                  ! keyword NAME
@@ -201,7 +203,13 @@
 *  Initialise some variables.
       CARD = MAX( 1, SCARD )
       THERE = .FALSE.
+      VALUE = ' '
       NF = 0
+
+*  If header contains no cards, then nothing to do.
+      IF ( NCARD .LE. 0 ) THEN
+         RETURN
+      END IF
 
 *  Remove blanks from the keyword to be searched for, and make it
 *  uppercase for comparisons.
