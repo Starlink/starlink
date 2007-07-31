@@ -59,7 +59,7 @@
 *        If true the keyword NAME is present (regardless of exit
 *        status).
 *     VALUE = <TYPE> (Returned)
-*        The value of the keyword.
+*        The value of the keyword. Unmodified if not found.
 *     CARD = INTEGER (Returned)
 *        The number of the card containing the named keyword.  If the
 *        card could not be found this is set to the position of the
@@ -123,6 +123,8 @@
 *     08-DEC-2000 (PWD):
 *        Changed to test for 'END ' rather than 'END'. A standard
 *        END keyword should be blank up to the eighth column.
+*     31-JUL-2007 (PWD):
+*        Don't start search when NCARD is 0. This reads BUFFER(0).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -197,6 +199,11 @@
       CARD = MAX( 1, SCARD )
       THERE = .FALSE.
       NF = 0
+
+*  If header contains no cards, then nothing to do.
+      IF ( NCARD .LE. 0 ) THEN
+         RETURN
+      END IF
 
 *  Remove blanks from the keyword to be searched for, and make it
 *  uppercase for comparisons.  Find its effective length.
