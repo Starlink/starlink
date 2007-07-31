@@ -1,8 +1,7 @@
 1 SURF - SCUBA User Reduction Facility -update
                                                      Expires: ????.??.??
 
-  This is the release V1.6-12 of SURF. It will be 
-  distributed on the Summer 2003 Starlink CD-ROM.
+  This is the release V1.6-13 of SURF.
 
   The SCUBA User Reduction Facility (SURF) is a collection of applications
   for use in reducing mapping and photometry data from the Submillimetre
@@ -27,13 +26,16 @@
   pipeline. See SUN/230.
 
   More information can be found in document SUN/216 (use `findme surf'
-  or `showme sun216' on a Starlink system), or on the JCMT software WWW
-  pages (http://www.jach.hawaii.edu/JACdocs/JCMT/software/scuba).
+  or `showme sun216' on a Starlink system).
 
   A mailing list exists for discussing SCUBA data reduction techniques.
   The list is at scubadr@jach.hawaii.edu.
   To subscribe please send a message to majordomo@jach.hawaii.edu with
   an empty subject and containing the message 'subscribe scubadr <your email>'
+
+2 New_in_version_1_6_13
+
+  - CHANGE_POINTING command can now accept POLMAP observations.
 
 2 New_in_version_1_6_12
 
