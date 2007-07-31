@@ -38,6 +38,10 @@ smurf_mon_LDADD = libsmurf/libsmurf.la libsc2sim/libsc2sim.la \
                   libsmf/libsmf.la libacsis/libacsis.la libaztec/libaztec.la \
                   `$(srcdir)/smurf_link_adam`
 
+##  Any misc files that have no where else.
+dist_starnews_DATA = smurf.news
+dist_pkgdata_DATA = LICENCE
+
 # Dynamically generated scripts
 DYNSCRIPTS = smurf.sh smurf.csh smurf.icl
 
