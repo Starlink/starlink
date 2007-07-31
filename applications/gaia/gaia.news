@@ -8,7 +8,7 @@
     version 3.0-1. This has meant a major overhaul of the GAIA build
     system.
 
-    The spectral offsets from the centre of the observation of cube
+    The spectral offsets from the centre of observation of a cube
     now preserve the sense of the direction by including a sign
     (negative for west and south).
 
@@ -17,9 +17,9 @@
     by a single channel.
 
     When merging FITS headers from the primary data unit into those of an 
-    extensions the INHERIT keyword is now checked.
+    extension the INHERIT keyword is now checked.
 
-    Inline compressed images (RICE) are now extracted more efficiently
+    Inline compressed images (e.g. RICE) are now extracted more efficiently
     using built-in methods, rather than an external filter. The primary
     headers are now merged into such images as needed.
 
@@ -31,9 +31,8 @@
     Compressed NDFs (.gz and .Z) can now be opened directly in the cube
     toolbox. 
 
-    Very small images (a few pixels wide or tall) now fill the zoom window,
-    so thay they can be inspected. Previously small images did not show
-    correctly. 
+    Very small images (a few pixels wide or tall) now fill the zoom window.
+    Previously small images did not show correctly. 
 
     The rotatable box graphics item can now be used as a catalogue symbol.
 
@@ -61,7 +60,7 @@
     The various bounds for extracting spectra etc. should now work
     correctly when the lower bound is greater than the upper bound.
 
-    Increased the output length of a TST catalogue line to 4096
+    The output length of a TST catalogue line has been increased to 4096
     characters. Previously this was 1024 which has become restricting
     (causing some failures to read FITS catalogues with many columns).
 
