@@ -5,8 +5,9 @@
 *     KPG1_ASPRP
 
 *  Purpose:
-*     Propagate the WCS component from one NDF to another with the same
-*     number of axes, allowing for a linear mapping of the pixel coordinates.
+*     Propagates the WCS component from one NDF to another with the same
+*     number of axes, allowing for a linear mapping of the pixel 
+*     co-ordinates.
 
 *  Language:
 *     Starlink Fortran 77
@@ -16,11 +17,11 @@
 
 *  Description:
 *     This routine copies the WCS FrameSet from INDF1, re-mapping the
-*     GRID Frame in the process so that pixel coordinates in the output
-*     NDF are related to pixel coordinates in the input NDF by the 
-*     supplied linear transformation. The mapping from pixel coordinates 
-*     in INDF1 ("PIX1") to the corresponding pixel coordinates in INDF2 
-*     ("PIX2") is:
+*     GRID Frame in the process so that pixel co-ordinates in the output
+*     NDF are related to pixel co-ordinates in the input NDF by the 
+*     supplied linear transformation. The mapping from pixel 
+*     co-ordinates in INDF1 ("PIX1") to the corresponding pixel 
+*     co-ordinates in INDF2 ("PIX2") is:
 *
 *        PIX2 = MATRIX . PIX1 + OFFSET 
 *
@@ -34,11 +35,12 @@
 *        The number of dimensions. This should be the value returned by
 *        NDF_BOUND for INDF2.
 *     INDF1 = INTEGER (Given)
-*        An identifier for the source NDF. If this does not have NDIM pixel 
-*        axes, a NDF section with NDIM axes will be obtained from the
-*        supplied NDF.
+*        An identifier for the source NDF. If this does not have NDIM 
+*        pixel axes, a NDF section with NDIM axes will be obtained from 
+*        the supplied NDF.
 *     INDF2 = INTEGER (Given)
-*        An identifier for the destination NDF. This must have NDIM pixel axes.
+*        An identifier for the destination NDF. This must have NDIM 
+*         pixel axes.
 *     MATRIX( NDIM, NDIM ) = DOUBLE PRECISION (Given)
 *        The matrix connecting PIX1 and PIX2.
 *     OFFSET( NDIM ) = DOUBLE PRECISION (Given)
@@ -102,7 +104,6 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER DOMAIN*5         ! Frame Domain
       DOUBLE PRECISION INA( NDF__MXDIM ) ! Corner "A" of window in input Frame
       DOUBLE PRECISION INB( NDF__MXDIM ) ! Corner "B" of window in input Frame
       DOUBLE PRECISION OUTA( NDF__MXDIM )! Corner "A" of window in output Frame
@@ -154,7 +155,7 @@
       MTRMAP = AST_MATRIXMAP( NDIM, NDIM, 0, MATRIX, ' ', STATUS )
 
 *  Create a WinMap which gives the required shift of pixel origin. 
-*  Map a window in pixel coordinates covering 1000 pixels on each 
+*  Map a window in pixel co-ordinates covering 1000 pixels on each 
 *  axis (a typical image size).
       DO I = 1, NDIM
          INA( I ) = 0.0D0 
@@ -165,8 +166,8 @@
 
       WINMAP = AST_WINMAP( NDIM, INA, INB, OUTA, OUTB, ' ', STATUS )
 
-*  Concatenate these two mappings in series to get the mapping from pixel
-*  coords in INDF1 to pixel coords in INDF2.
+*  Concatenate these two mappings in series to get the mapping from 
+*  pixel co-ords in INDF1 to pixel co-ords in INDF2.
       P12MAP = AST_CMPMAP( MTRMAP, WINMAP, .TRUE., ' ', STATUS )
 
 *  Get the WCS FrameSet from the input NDF. If no WCS component is
@@ -291,7 +292,7 @@
       IF( STATUS .NE. SAI__OK ) THEN
          CALL NDF_MSG( 'NDF', INDF2 )
          CALL ERR_REP( 'KPG1_ASPRP_5', 'The output ''^NDF'' will have'//
-     :                 ' no World Coordinate System information.', 
+     :                 ' no World co-ordinate System information.', 
      :                 STATUS )
          CALL ERR_FLUSH( STATUS )
          CALL NDF_RESET( INDF2, 'WCS', STATUS )

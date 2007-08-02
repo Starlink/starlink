@@ -4,7 +4,7 @@
 *     KPG1_OPGRD
 
 *  Purpose:
-*     Get the parameters of an optimal projection for a given set of sky
+*     Gets the parameters of an optimal projection for a given set of sky
 *     positions.
 
 *  Language:
@@ -14,23 +14,23 @@
 *     CALL KPG1_OPGRD( NPOS, POS, WEST, PAR, RDIAM, STATUS )
 
 *  Description:
-*     This routine calculates the parameters of a tangent plane projection
-*     that gives an optimal representation of a set of supplied sky
-*     positions. The projection parameters are the normal FITS CRPIX1/2,
-*     CRVAL1/2, CDELT1/2 and CROTA2 parameters. They are chosen in order
-*     to maximise the number of sky positions that fall close to the
-*     centre of a pixel.
+*     This routine calculates the parameters of a tangent-plane 
+*     projection that gives an optimal representation of a set of 
+*     supplied sky positions. The projection parameters are the normal 
+*     FITS CRPIX1/2, CRVAL1/2, CDELT1/2 and CROTA2 keywords. They are 
+*     chosen in order to maximise the number of sky positions that fall 
+*     close to the centre of a pixel.
 
 *  Arguments:
 *     NPOS = INTEGER (Given)
 *        The number of sky positions.
 *     POS( 2, NPOS ) = DOUBLE PRECISION (Given)
-*        The sky positions. These should be (longitude,latitude) values, in 
-*        radians, in any celestial coordinate system.
+*        The sky positions. These should be (longitude,latitude) values, 
+*        in radians, in any celestial co-ordinate system.
 *     WEST = LOGICAL (Given)
 *        If .TRUE., then it is assumed that the X grid axis increases
 *        westwards (assuming north is parallel to +ve Y). This is the
-*        case for most celestial coordinate systems such as (RA,Dec) etc. 
+*        case for most celestial co-ordinate systems such as (RA,Dec) etc. 
 *        If .FALSE., then it is assumed that the X grid axis increases
 *        eastwards (assuming north is parallel to +ve Y). This is the
 *        case for a few systems such as (az,el) and geographic 
@@ -49,8 +49,8 @@
 *        (no matter what the value of WEST). Returned pixel sizes are 
 *        rounded to the nearest tenth of an arc-second.
 *     RDIAM = DOUBLE PRECISION (Returned)
-*        The diameter of the circle that just encloses all the supplied sky
-*        positions, in radians.
+*        The diameter of the circle that just encloses all the supplied
+*        sky positions, in radians.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -165,7 +165,7 @@
 *     KPG1_OPGR1
 
 *  Purpose:
-*     Do the work for KPG1_OPGRD.
+*     Does the work for KPG1_OPGRD.
 
 *  Language:
 *     Starlink Fortran 77
@@ -175,23 +175,23 @@
 *                      STATUS )
 
 *  Description:
-*     This routine calculates the parameters of a tangent plane projection
-*     that gives an optimal representation of a set of supplied sky
-*     positions. The projection parameters are the normal FITS CRPIX1/2,
-*     CRVAL1/2, CDELT1/2 and CROTA2 parameters. They are chosen in order
-*     to maximise the number of sky positions that fall close to the
-*     centre of a pixel.
+*     This routine calculates the parameters of a tangent-plane 
+*     projection that gives an optimal representation of a set of 
+*     supplied sky positions. The projection parameters are the normal 
+*     FITS CRPIX1/2, CRVAL1/2, CDELT1/2 and CROTA2 keywords. They are 
+*     chosen in order to maximise the number of sky positions that fall 
+*     close to the centre of a pixel.
 
 *  Arguments:
 *     NPOS = INTEGER (Given)
 *        The number of sky positions.
 *     POS( 2, NPOS ) = DOUBLE PRECISION (Given)
-*        The sky positions. These should be (longitude,latitude) values, in 
-*        radians, in any celestial coordinate system.
+*        The sky positions. These should be (longitude,latitude) values,
+*        in radians, in any celestial co-ordinate system.
 *     WEST = LOGICAL (Given)
 *        If .TRUE., then it is assumed that the X grid axis increases
 *        westwards (assuming north is parallel to +ve Y). This is the
-*        case for most celestial coordinate systems such as (RA,Dec) etc. 
+*        case for most celestial co-ordinate systems such as (RA,Dec) etc. 
 *        If .FALSE., then it is assumed that the X grid axis increases
 *        eastwards (assuming north is parallel to +ve Y). This is the
 *        case for a few systems such as (az,el) and geographic 
@@ -218,8 +218,8 @@
 *     YOUT( NPOS ) = DOUBLE PRECISION (Given and Returned)
 *        Work space.
 *     RDIAM = DOUBLE PRECISION (Returned)
-*        The diameter of the circle that just encloses all the supplied sky
-*        positions, in radians.
+*        The diameter of the circle that just encloses all the supplied
+*        sky positions, in radians.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -310,10 +310,6 @@
       DOUBLE PRECISION PANG
       DOUBLE PRECISION PAR0( 7 )
       DOUBLE PRECISION PWAVE
-      DOUBLE PRECISION SDX
-      DOUBLE PRECISION SDX2
-      DOUBLE PRECISION SDY
-      DOUBLE PRECISION SDY2
       DOUBLE PRECISION SPC
       DOUBLE PRECISION SPC0
       DOUBLE PRECISION XC
@@ -331,8 +327,6 @@
       INTEGER IGOOD
       INTEGER IPHIST
       INTEGER MAP
-      INTEGER ND
-      LOGICAL MORE
       LOGICAL OK
       LOGICAL OPTY          
       REAL DX
@@ -376,8 +370,8 @@
 *  Set up an initial projection. This uses 1 arc-min square pixels with 
 *  north upwards, and X either east or west. Any supplied reference point
 *  is used, but if no reference point is supplied the first good supplied 
-*  position is used as the reference point, and this point is placed at grid 
-*  coords (1,1).
+*  position is used as the reference point, and this point is placed at
+*  grid co-ordinates (1,1).
       PAR0( 1 ) = 1.0D0
       PAR0( 2 ) = 1.0D0
 
@@ -435,11 +429,11 @@
       MAP = AST_GETMAPPING( FS, AST__BASE, AST__CURRENT, STATUS )
 
 *  Use the AST Mapping to transform the supplied sky positions into the 
-*  the grid coordinate system described by the initial projection. 
+*  the grid co-ordinate system described by the initial projection. 
       CALL AST_TRAN2( MAP, NPOS, AIN, BIN, .FALSE., XOUT, YOUT, STATUS )
  
 *  Find the bounding box of the supplied positions within the initial
-*  grid coordinate system.
+*  grid co-ordinate system.
       XHI = VAL__MIND
       YHI = VAL__MIND
       XLO = VAL__MAXD
@@ -483,7 +477,7 @@
      :               ( SQRT( REAL( NPOS ) ) - 1.0 )
       END IF
 
-*  Store the grid coords at the centre of the bounding box.
+*  Store the grid co-ordinates at the centre of the bounding box.
       XC = 0.5*( XHI + XLO )
       YC = 0.5*( YHI + YLO )
 
@@ -500,7 +494,7 @@
          HISTSZ = DIAM/SPC
          CALL PSX_CALLOC( HISTSZ, '_REAL', IPHIST, STATUS )
 
-*  Store the grid coordinate within this work array that will correspond to
+*  Store the grid co-ordinate within this work array that will correspond to
 *  the central position (XC,YC).
          SPC0 = DBLE( ( HISTSZ + 1 )/2 )
 
@@ -543,7 +537,7 @@ c      write(*,*)
 *  found above. The cone is 3 degrees wide and we use 0.1 degree intervals. 
 *  In this loop the IANG variable is angular offset from ANG0 in units of 
 *  0.1 degree. This time, we use linear interpolation to create the 
-*  histogram, to get a more accurate result.
+*  histogram, to get a more-accurate result.
             ANG0 = MXANG
             MXAMP = -1.0
             MXWAVE = 0.0
@@ -661,15 +655,15 @@ c      write(*,*)
          PAR0( 1 ) = 1.0
          PAR0( 2 ) = 1.0
 
-*  If no reference point sky coords were supplied, use the centre of the
-*  bounding box (if reference point sky coords were supplied they will
+*  If no reference point sky co-ordinates were supplied, use the centre of the
+*  bounding box (if reference point sky co-ordinates were supplied they will
 *  already be stored in PAR0(3) and PAR0(4) ).
          IF( PAR( 3 ) .EQ. AST__BAD .OR. PAR( 4 ) .EQ. AST__BAD ) THEN
 
-*  Find the celestial coordinates at the centre of the bounding box.
+*  Find the celestial co-ordinates at the centre of the bounding box.
             CALL AST_TRAN2( MAP, 1, XC, YC, .TRUE., XOUT, YOUT, STATUS )
 
-*  Report an error if the celestial coords are bad. 
+*  Report an error if the celestial co-ordinates are bad. 
             IF( XOUT( 1 ) .EQ. VAL__MIND ) THEN
                IF( STATUS .EQ. SAI__OK ) THEN
                   STATUS = SAI__ERROR
@@ -692,7 +686,8 @@ c      write(*,*)
 *  We now find a small (less than one pixel) change to PAR0(1) and
 *  PAR0(2) that causes more samples to be projected to the centre of the
 *  corresponding pixel. First create a Mapping from the above projection
-*  parameters and use it to map the supplied sky positions into grid coords.
+*  parameters and use it to map the supplied sky positions into grid 
+*  co-ordinates.
          FC = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS )
          CALL AST_SETFITSS( FC, 'CTYPE1', 'RA---TAN', ' ', .TRUE., 
      :                      STATUS )
@@ -733,23 +728,24 @@ c      write(*,*)
 *  pixels. 
          CALL KPG1_OPGR4( NPOS, XOUT, YOUT, DX, DY, STATUS )
 
-*  If the reference point sky coords were supplied, modify the CRPIX1/2
-*  values to put the refence point at the right place, leaving CRVAL1/2 
-*  unchanged.
+*  If the reference point sky co-ordinates were supplied, modify the 
+*  CRPIX1/2 values to put the refence point at the right place, leaving 
+*  CRVAL1/2 unchanged.
          IF( PAR( 3 ) .NE. AST__BAD .OR. 
      :       PAR( 4 ) .NE. AST__BAD ) THEN
             PAR0( 1 ) = PAR0( 1 ) + DX
             PAR0( 2 ) = PAR0( 2 ) + DY
 
-*  If the reference point sky coords were not supplied, modify the CRVAL1/2
-*  values so that CRPIX1/2 can retain the existing nice integer values.
+*  If the reference point sky co-ordinates were not supplied, modify the
+*  CRVAL1/2 values so that CRPIX1/2 can retain the existing nice integer
+*  values.
          ELSE
 
 *  Modify the CRPIX values ( PAR0(1) and PAR0(2) ) accordingly.
             NPAR1 = PAR0( 1 ) - DX
             NPAR2 = PAR0( 2 ) - DY
 
-*  Find the sky coords corresponding to this position, and use them as
+*  Find the sky co-ordinates corresponding to this position, and use them as
 *  the new CRVAL1/2 values ( PAR0(3) and PAR0(4) ).
             CALL AST_TRAN2( MAP, 1, NPAR1, NPAR2, .TRUE., PAR0( 3 ), 
      :                      PAR0( 4 ), STATUS )
@@ -877,20 +873,20 @@ c      write(*,*)
 *     NPOS = INTEGER (Given)
 *        The number of sky positions.
 *     X( NPOS ) = DOUBLE PRECISION (Given)
-*        The X grid coordinates.
+*        The X grid co-ordinates.
 *     Y( NPOS ) = DOUBLE PRECISION (Given)
-*        The Y grid coordinates.
+*        The Y grid co-ordinates.
 *     ANG = DOUBLE PRECISION (Given)
 *        The angle of the line, in radians. Measured from the grid Y axis 
 *        through the grid X axis.
 *     SPC = DOUBLE PRECISION (Given)
 *        The length of each bin in the histogram, in units of grid pixels.
 *     XC = DOUBLE PRECISION (Given)
-*        The X grid coord of a point on the line.
+*        The X grid co-ordinate of a point on the line.
 *     YC = DOUBLE PRECISION (Given)
-*        The Y grid coord of a point on the line.
+*        The Y grid co-ordinate of a point on the line.
 *     SPC0 = DOUBLE PRECISION (Given)
-*        The grid coordinate within the HIST array, onto which the
+*        The grid co-ordinate within the HIST array, onto which the
 *     LIN = LOGICAL (Given)
 *        Should the histogram be formed using nearest neighbour or linear
 *        interpolation?
@@ -1012,9 +1008,7 @@ c      write(*,*)
       DOUBLE PRECISION MAXSUM
       DOUBLE PRECISION MINSUM
       DOUBLE PRECISION NEWAMP
-      DOUBLE PRECISION NEWSPA
       DOUBLE PRECISION NEWWAV
-      DOUBLE PRECISION POW
       DOUBLE PRECISION SINANG
       DOUBLE PRECISION SUM2
       DOUBLE PRECISION SUMINC
@@ -1028,7 +1022,6 @@ c      write(*,*)
       INTEGER I
       INTEGER IBIN
       INTEGER IBIN2
-      INTEGER IFREQ
       INTEGER J
       INTEGER MAXSH
       INTEGER MINSH
@@ -1450,9 +1443,10 @@ c     :           histsz,')'
 *     CALL KPG1_OPGR4( N, X, Y, A, B, STATUS )
 
 *  Description:
-*     This routine finds a small fractional shift in grid coordinates (less 
-*     than 1 pixel on each axis) that results in the supplied set of grid
-*     positions being close the centre of the corresponding pixels.
+*     This routine finds a small fractional shift in grid co-ordinates
+*     less than one pixel on each axis) that results in the supplied set
+*     of grid positions being close the centre of the corresponding 
+*     pixels.
 
 *  Arguments:
 *     N = INTEGER (Given)

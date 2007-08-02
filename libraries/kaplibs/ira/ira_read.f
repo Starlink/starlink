@@ -4,7 +4,7 @@
 *     IRA_READ
 
 *  Purpose:
-*     Get an identifier for astrometry information stored in an HDS
+*     Gets an identifier for astrometry information stored in an HDS
 *     astrometry structure.
 
 *  Language:
@@ -109,8 +109,6 @@
       LOGICAL   DEF              ! True if AS is in a defined state.
       DOUBLE PRECISION EQU       ! The epoch of the reference equinox
                                  ! specified in component SCS.
-      LOGICAL   FWDEX            ! True if a TRANSFORM structure exists
-                                 ! for the forward mapping.
       CHARACTER NAME*(IRA__SZSCS)! Name of Sky Coordinate System, with
                                   ! no equinox specifier.
       INTEGER   NP               ! Actual number of projection
@@ -119,8 +117,6 @@
                                  ! parameters.
       CHARACTER PROJN*(IRA__SZPRJ)! Value of PROJ_NAME component.
       CHARACTER SCS*(IRA__SZSCS)! Value of SCS component.
-      LOGICAL   THERE            ! True if PROJ_NAME component exists in
-                                 ! the AS.
       CHARACTER TYPE*(DAT__SZTYP)! HDS type of the astrometry structure.
 *.
 

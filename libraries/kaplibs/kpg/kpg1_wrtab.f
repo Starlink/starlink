@@ -129,7 +129,6 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER CVAL*80          ! Character value obtained for the parameter
       INTEGER IBASE              ! Index of base Frame 
       INTEGER ICURR              ! Index of current Frame 
       INTEGER IDEF               ! Index of default catalogue Frame 

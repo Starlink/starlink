@@ -7,7 +7,7 @@
 *     Gets an AST Object using an environment parameter.
 
 *  Description:
-*     Get an AST Object from an NDF, FITS file or text file using an 
+*     Gets an AST Object from an NDF, FITS file or text file using an 
 *     environment parameter.
 
 *  Language:
@@ -95,7 +95,6 @@
 
 *  External References:
       EXTERNAL ISA
-      LOGICAL CHR_SIMLR
 
 *  Local Variables:
       INTEGER IAST2

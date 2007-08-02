@@ -197,7 +197,6 @@
       INTEGER IBASIS             ! Index of basis Frame
       INTEGER ICURR              ! Index of the original Current Frame
       INTEGER IEND               ! End of field passed to AST_UNFORMAT
-      DOUBLE PRECISION INPOL( 2 ) ! Pole co-ordinates
       CHARACTER*125 INVEXP( NAX ) ! Inverse expressions for
                                  ! MathMap
       INTEGER IPOS               ! Index of next character to be read

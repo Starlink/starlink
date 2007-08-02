@@ -4,7 +4,7 @@
 *     KPG1_DSFR1
 
 *  Purpose:
-*     Display a textual description of the Current Frame in a FrameSet.
+*     Displays a textual description of the Current Frame in a FrameSet.
 
 *  Language:
 *     Starlink Fortran 77
@@ -13,10 +13,10 @@
 *     CALL KPG1_DSFR1( FRM, TEXT, NIND, FULL, STATUS )
 
 *  Description:
-*     This routine displays a textual description of the supplied AST Frame.
-*     The displayed information does not include any axis-specific details 
-*     which are common to all classes of Frame (such as axis units, labels, 
-*     etc).
+*     This routine displays a textual description of the supplied AST 
+*     Frame.  The displayed information does not include any 
+*     axis-specific details that are common to all classes of Frame 
+*     (such as axis units, labels, etc).
 
 *  Arguments:
 *     FRM = INTEGER (Given)
@@ -144,9 +144,7 @@
       DOUBLE PRECISION MJD       ! Modified Julian Date corresponding to Epoch
       DOUBLE PRECISION SRCVEL    ! Source velocity 
       DOUBLE PRECISION TIMEOR    ! Time Origin
-      DOUBLE PRECISION TMP       ! Temporary storage
       INTEGER FRM2               ! Modified copy of supplied Frame
-      INTEGER FS                 ! FrameSet connecting original and modified Frames
       INTEGER IAT                ! Current length of a string
       INTEGER ID                 ! Day of month
       INTEGER IHMSF( 4 )         ! Hours, mins, secs, fraction of sec

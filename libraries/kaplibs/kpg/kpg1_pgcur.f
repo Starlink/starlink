@@ -6,7 +6,7 @@
 *     KPG1_PGCUR
 
 *  Purpose:
-*     Use the cursor to get a set of points.
+*     Uses the cursor to get a set of points.
 
 *  Language:
 *     Starlink Fortran 77
@@ -212,7 +212,6 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      CHARACTER CHR_LOWER        ! Lower case equivalent character
       INTEGER PGBAND             ! Zero if an error occurred
 
 *  Local Variables:

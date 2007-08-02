@@ -127,10 +127,7 @@
       DOUBLE PRECISION
      :        A(4,4),
      :        B(4,2),
-     :        ANS(4,2),
-     :        WK1(4),
-     :        AA(4,4),
-     :        BB(4,2)
+     :        WK1(4)
 
       INTEGER
      :        I,

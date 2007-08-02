@@ -344,8 +344,6 @@
                                  ! hierarchical)
       INTEGER KLPPOS             ! Column of keyword left parenthesis
       INTEGER KOC                ! Keyword occurrence number
-      INTEGER L( 4 )             ! Lengths of the words in a line of the
-                                 ! translation file
       CHARACTER * ( 132 ) LINE   ! Buffer for file reading
       INTEGER LKEY               ! Length of the keyword
       INTEGER LPOSK              ! Length of the positional keyword

@@ -4,7 +4,7 @@
 *     KPG1_PIXSC
 
 *  Purpose:
-*     Determine pixel scales at a given grid position.
+*     Determines pixel scales at a given grid position.
 
 *  Language:
 *     Starlink Fortran 77
@@ -23,8 +23,8 @@
 *     IWCS = INTEGER (Given)
 *        The FrameSet.
 *     AT( * ) = DOUBLE PRECISION (Given)
-*        The position in GRID coords at which the pixel scales are to be
-*        determined. Note, the pixel scales may vary across the data
+*        The position in GRID co-ordinates at which the pixel scales are
+*        to be determined. Note, the pixel scales may vary across the data
 *        array if the WCS Mappings are non-linear. The array should have
 *        one element for each GRID axis.
 *     PIXSC( * ) = DOUBLE PRECISION (Returned)
@@ -120,7 +120,6 @@
       DOUBLE PRECISION QGRID( NDF__MXDIM )
       DOUBLE PRECISION XIN( 2 )
       DOUBLE PRECISION XOUT( 2 )
-      INTEGER FAXIS
       INTEGER FGRID
       INTEGER FWCS
       INTEGER I
@@ -161,8 +160,8 @@
          CALL AST_TRANN( MAP, 2, NPIX, 2, IN, .TRUE., NWCS, 2, OUT, 
      :                   STATUS )
 
-*  Save a copy of the WCS coords at the AT point. Initialise Q to be the
-*  same as the AT point.
+*  Save a copy of the WCS co-ordinates at the AT point. Initialise Q to 
+*  be the same as the AT point.
          DO I = 1, NWCS
             ATWCS( I ) = OUT( 1, I )
             Q( I ) = ATWCS( I ) 
@@ -171,8 +170,8 @@
 *  Now loop round each WCS axis.
          DO I = 1, NWCS
 
-*  Get the coords of a point that is a small distance away from AT along
-*  the current WCS axis.
+*  Get the co-ordinates of a point that is a small distance away from AT
+*  along the current WCS axis.
             Q( I ) = OUT( 2, I ) 
 
 *  Find the geodesic distance in the WCS frame between this point and the 

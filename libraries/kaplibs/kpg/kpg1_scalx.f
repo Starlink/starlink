@@ -5,7 +5,7 @@
 *     KPG1_SCALX
 
 *  Purpose:
-*     Copy array values into another array, scaling them in the process.
+*     Copies array values into another array, scaling them in the process.
 
 *  Language:
 *     Starlink Fortran 77
@@ -117,15 +117,6 @@
       DOUBLE PRECISION VAL_BTOD
       DOUBLE PRECISION VAL_UBTOD
 
-*  Local Variables:
-      BYTE BMN                   ! Min value
-      BYTE BMX                   ! Max value
-      INTEGER IMN                ! Min value
-      INTEGER IMX                ! Max value
-      INTEGER*2 WMN              ! Min value
-      INTEGER*2 WMX              ! Max value
-      REAL RMN                   ! Min value
-      REAL RMX                   ! Max value
 *.
 
 *  Check the inherited global status.

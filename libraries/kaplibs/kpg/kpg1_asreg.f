@@ -4,7 +4,7 @@
 *     KPG1_ASREG
 
 *  Purpose:
-*     Register all AST IntraMaps known by KAPPA.
+*     Registers all AST IntraMaps known by KAPPA.
 
 *  Language:
 *     Starlink Fortran 77
@@ -52,8 +52,8 @@
 *     21-SEP-1998 (DSB):
 *        Original version.
 *     12-SEP-2005 (TIMJ):
-*        - CONTACT and AUTHOR now in KPG_PAR
-*        - Factor out into graphical and non-graphical mappings
+*        - CONTACT and AUTHOR now in KPG_PAR.
+*        - Factor out into graphical and non-graphical mappings.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -71,16 +71,12 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  External References:
-
-*  Local Variables:
-      CHARACTER PURPOSE*80
 *.
 
 *  Check the global inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  non-Graphical mappings
+*  Non-graphical mappings
       CALL KPG1_ASRGN( STATUS )
 
 *  Graphical mappings

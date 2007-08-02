@@ -4,7 +4,7 @@
 *     KPG1_WCAXC
 
 *  Purpose:
-*     Obtain co-ordinates for an axis from a WCS component FrameSet.
+*     Obtains co-ordinates for an axis from a WCS component FrameSet.
 
 *  Language:
 *     Starlink Fortran 77
@@ -94,9 +94,7 @@
 *  Local Variables:
       INTEGER DIMS( NDF__MXDIM ) ! Dimensions of the NDF
       INTEGER IAX                ! Axes loop counter
-      INTEGER IAXIS              ! Index of the AXIS Frame
       INTEGER ICURR              ! Index of Current Frame 
-      INTEGER IERR               ! Position of first numerical error
       INTEGER IP                 ! Pointer to mapped AXIS Centre array
       INTEGER IPIXEL             ! Index of the PIXEL Frame 
       INTEGER MAP1               ! n-D PIXEL to n-D AXIS mapping
@@ -105,7 +103,6 @@
       INTEGER MAP4               ! 1-D PIXEL to n-D AXIS mapping
       INTEGER MAP5               ! 1-D PIXEL to 1-D AXIS mapping
       INTEGER NDIM               ! Number of dimensions
-      INTEGER NERR               ! Number of numerical errors
       INTEGER OUTPRM( NDF__MXDIM ) ! Indices of corresponding axes
 
 *.

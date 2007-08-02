@@ -192,7 +192,6 @@
       PARAMETER ( VALLN = 70 )
 
 *  Local Variables:
-      INTEGER CARDLN             ! Used length of a card image
       INTEGER CDKYLN             ! Length of the keyword of a card
       CHARACTER * ( HKEYLN ) CMPKEY ! Compound name
       INTEGER CMPLN              ! Length of compound name

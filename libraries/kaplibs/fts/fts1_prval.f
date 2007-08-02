@@ -107,9 +107,6 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  External References:
-      INTEGER CHR_LEN            ! Used length of a string
-
 *  Local Constants:
       INTEGER VALLN              ! Maximum number of characters in a
                                  ! FITS header card value
@@ -117,7 +114,6 @@
 
 *  Local Variables:
       INTEGER COCCUR             ! Local positive copy of the count
-      CHARACTER * ( VALLN ) CVALUE ! Value (as string)
       INTEGER DCARD              ! Dummy card number
       DOUBLE PRECISION DVALUE    ! FITS value
       INTEGER IVALUE             ! FITS value

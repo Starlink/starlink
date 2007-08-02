@@ -79,7 +79,6 @@
 *  Local Variables:
       CHARACTER HEADER*80        ! A FITS header
       CHARACTER MESS*1024        ! The warning message
-      CHARACTER NDFNAM*256       ! The NDF name
       CHARACTER VALUE*80         ! A FITS keyword value
       INTEGER HLEN               ! Used length of string
       INTEGER IAT                ! Used length of MESS

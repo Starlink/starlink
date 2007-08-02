@@ -150,7 +150,6 @@
       INTEGER IENCOD             ! Index of the current encoding
       INTEGER INPRM( NDF__MXDIM )! Indices of corresponding o/p axis
       INTEGER IWCS               ! AST identifier for NDF's WCS information
-      INTEGER MAP                ! AXIS -> Current Mapping
       INTEGER NATOBJ             ! AST identifier for the native FrameSet
       INTEGER NDIM               ! Dimensionality of the NDF
       INTEGER NDIMF              ! Dimensionality of the FITS Base Frame

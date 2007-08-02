@@ -4,7 +4,7 @@
 *     KPG1_ASSTY
 
 *  Purpose:
-*     Check for synonyms and colour names in AST attribute settings.
+*     Checks for synonyms and colour names in AST attribute settings.
 
 *  Language:
 *     Starlink Fortran 77
@@ -100,7 +100,6 @@
 *  External References:
       INTEGER CHR_LEN            ! Significant length of a string
       LOGICAL KPG1_SHORT         ! Is string an allowed abbreviation?
-      LOGICAL CHR_SIMLR          ! Are strings equal apart from case?
 
       INTEGER KPG1_GETASTING     ! GRP identifier for group holding synonyms.
       INTEGER KPG1_GETASTNPS     ! Number of defined synonyms

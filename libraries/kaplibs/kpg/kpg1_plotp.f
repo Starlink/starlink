@@ -6,7 +6,7 @@
 *     KPG1_PLOTP
 
 *  Purpose:
-*     Create a new DATA picture, with optionally ancillary pictures.
+*     Creates a new DATA picture, with optionally ancillary pictures.
 
 *  Language:
 *     Starlink Fortran 77
@@ -182,7 +182,6 @@
 
 *  Local Variables:
       INTEGER I                  ! Loop count
-      INTEGER IAT                ! No. of characters in string
       REAL DX1                   ! X coord at left of window
       REAL DX2                   ! X coord at right of window
       REAL DY1                   ! Y coord at bottom of window

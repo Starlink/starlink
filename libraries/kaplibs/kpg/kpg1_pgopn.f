@@ -4,7 +4,7 @@
 *     KPG1_PGOPN
 
 *  Purpose:
-*     Open the AGI database and activate a PGPLOT workstation.
+*     Opens the AGI database and activate a PGPLOT workstation.
 
 *  Language:
 *     Starlink Fortran 77
@@ -33,9 +33,9 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 1999, 2002, 2003, 2004 Central Laboratory of the Research Councils.
-*     Copyright (C) 2005, 2006 Particle Physics & Astronomy Research Council.
-*     All Rights Reserved.
+*     Copyright (C) 1999, 2002, 2003, 2004 Central Laboratory of the 
+*     Research Councils.  Copyright (C) 2005, 2006 Particle Physics & 
+*     Astronomy Research Council.  All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -98,7 +98,6 @@
       CHARACTER CHR_UPPER        ! Return an uppercase character
 
 *  Local Variables:
-      INTEGER IPICB              ! Base picture identifier
       REAL ROLD, GOLD, BOLD      ! Default background RGB values 
       REAL R, G, B               ! User's background RGB values 
 *.

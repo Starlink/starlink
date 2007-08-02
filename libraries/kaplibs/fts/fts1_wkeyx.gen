@@ -117,16 +117,14 @@
 
 *  Local Variables:
       INTEGER CARDLN             ! Used length of a card image
-      CHARACTER * ( VALLN ) CHRVAL  ! The value in characters
+      LOGICAL COMPND             ! Compound-keyword flag
       INTEGER COMPOS             ! Position to start the comment and
                                  ! its delimiter
-      LOGICAL COMPND             ! Compound-keyword flag
-      CHARACTER * ( KEYLN ) CRDKEY ! Keyword of a card image
       INTEGER EQUALS             ! The position of equal sign
       INTEGER KEYLEN             ! Length of specified keyword
       CHARACTER * ( HKEYLN ) KEYWRD  ! Specified keyword
-      CHARACTER * ( VALLN ) VALSTR ! String expression of keyword value
       INTEGER VALN               ! Length of the keyword value
+      CHARACTER * ( VALLN ) VALSTR ! String expression of keyword value
 
 *.
 

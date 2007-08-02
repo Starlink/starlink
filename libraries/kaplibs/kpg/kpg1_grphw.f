@@ -305,7 +305,7 @@
 
 *  Local Variables:
       CHARACTER PLMODE*5      ! LMODE parameter name
-      DOUBLE PRECISION BOX(4) ! Bounding box for plot
+      DOUBLE PRECISION BOX( 4 ) ! Bounding box for plot
       INTEGER AXMAPS( 2 )     ! 1-D Mappings for each axis
       INTEGER I               ! Loop index
       INTEGER IFRM            ! Pointer to defaults Frame 
@@ -318,9 +318,6 @@
       LOGICAL AXES            ! Draw axes?
       LOGICAL LVAL            ! Unused logical argument
       REAL DEFMAR             ! Default margin value
-      REAL DELTA              ! Axis range
-      REAL HI                 ! Y at high end of error bar
-      REAL LO                 ! Y at low end of error bar
       REAL MARGIN( 4 )        ! Margins for plot annotation
       REAL XLEFT              ! X at left edge
       REAL XMAX               ! Maximum X in plot

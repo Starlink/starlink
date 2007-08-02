@@ -102,7 +102,6 @@
       INTEGER J                  ! Axis count
       INTEGER MAP                ! Mapping
       INTEGER NAX                ! No. of axes in next Frame
-      INTEGER NAXES              ! No. of axes in template Frame
       INTEGER NFRM               ! No. of Frames in Target FrameSet
       INTEGER NOUT               ! No. of axes in required Domain
       INTEGER OUTPRM( NDF__MXDIM )! Indices of required axes

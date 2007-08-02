@@ -22,9 +22,9 @@
 
 *  Arguments:
 *     FRAME = INTEGER (Given)
-*        An AST pointer to the Frame in which the polyline is defined. This
-*        is used to define geodesic curves joining the supplied profile
-*        positions. Only accessed if GEO is .TRUE.
+*        An AST pointer to the Frame in which the polyline is defined.
+*        This is used to define geodesic curves joining the supplied
+*        profile positions. Only accessed if GEO is .TRUE.
 *     ARRDIM = INTEGER (Given)
 *        The size of the first dimension of POS.
 *     NAX = INTEGER (Given)
@@ -39,8 +39,8 @@
 *        invalid positions are supplied.
 *     GEO = LOGICAL (Given)
 *        Should the poly-line be constructed from geodesic curves in the 
-*        supplied Frame? If not, the poly-line is made up of straight line 
-*        segments in the supplied Frame.
+*        supplied Frame? If not, the poly-line is made up of
+*        straight-line segments in the supplied Frame.
 *     NSAMP = INTEGER (Given)
 *        The number of samples required along the poly-line.
 *     DELTA = DOUBLE PRECISION (Given and Returned)
@@ -123,7 +123,6 @@
       INTEGER I                  ! Loop count
       INTEGER IROOT              ! Index of root position
       INTEGER ISAMP              ! Sample index
-      INTEGER J                  ! Axis count
 *.
 
 *  Check the global inherited status.

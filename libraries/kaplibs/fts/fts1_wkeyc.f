@@ -148,7 +148,6 @@
       INTEGER CARDLN             ! Used length of a card image
       LOGICAL COMCRD             ! Commentary-keyword flag
       LOGICAL COMPND             ! Compound-keyword flag
-      CHARACTER * ( KEYLN ) CRDKEY ! Keyword of a card image
       INTEGER ENDPOS             ! End column of part of value
                                  ! extracted
       INTEGER EQUALS             ! The position of equal sign

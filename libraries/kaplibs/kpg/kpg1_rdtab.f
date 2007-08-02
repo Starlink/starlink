@@ -165,7 +165,6 @@
       LOGICAL DONE               ! Have we read enough AST Objects?
       LOGICAL GOTRD              ! Found RA and DEC columns in catalogue?
       LOGICAL GOTXY              ! Found X and Y columns in catalogue?
-      LOGICAL THERE              ! Was FrameSet found?
 *.
 
 *  Initialise.

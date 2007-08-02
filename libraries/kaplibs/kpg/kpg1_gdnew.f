@@ -6,7 +6,7 @@
 *     KPG1_GDNEW
 
 *  Purpose:
-*     Create a new DATA picture with ancillary pictures.
+*     Creates a new DATA picture with ancillary pictures.
 
 *  Language:
 *     Starlink Fortran 77
@@ -186,9 +186,7 @@
 *  Local Variables:
       INTEGER I                  ! Ancillary picture index
       LOGICAL FILL               ! Create largest possible DATA picture?
-      REAL ALPHA                 ! Normalised width excluding the DATA pic
       REAL ASPECT                ! The aspect ratio to use
-      REAL BETA                  ! Normalised height excluding the DATA pic
       REAL CXI                   ! Current picture width in inches
       REAL CXL                   ! X at left of current picture in inches
       REAL CXR                   ! X at right of current picture in inches
@@ -201,8 +199,6 @@
       REAL DYB                   ! Y at bottom of DATA picture in inches
       REAL DYI                   ! Height of DATA picture in inches
       REAL DYT                   ! Y at top of DATA picture in inches
-      REAL FH                    ! Used height within FRAME picture
-      REAL FW                    ! Used width within FRAME picture
       REAL FXI                   ! Width of FRAME picture in inches
       REAL FXL                   ! X at left of FRAME picture in inches
       REAL FXR                   ! X at right of FRAME picture in inches
@@ -226,8 +222,6 @@
       REAL SXR                   ! X at right of ancillary pictures in inches
       REAL SYB                   ! Y at bottom of ancillary pictures in inches
       REAL SYT                   ! Y at top of ancillary pictures in inches
-      REAL SZHP                  ! Total normalised height of horizontal pic.s
-      REAL SZVP                  ! Total normalised width of vertical pic.s
 *.
 
 *  Initialise returned values.

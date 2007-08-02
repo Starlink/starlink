@@ -116,21 +116,21 @@ c      INCLUDE 'GNS_PAR'          ! GNS constants
       PARAMETER( MAXOPT = 40 )
 
 *  Local Variables:
-c      CHARACTER ACLASS( MAXOPT )*( GNS__SZKEY) ! The array of class options
+c     CHARACTER ACLASS( MAXOPT )*( GNS__SZKEY) ! The array of class options
       CHARACTER VAL*1            ! PGPLOT information string
       INTEGER CI1                ! Minimum colour index 
-      INTEGER I                  ! Loop counter
+c     INTEGER I                  ! Loop counter
       INTEGER ICOL               ! Index of colour keyword in criteria
       INTEGER ICUR               ! Index of cursor keyword in criteria
-      INTEGER MAXNOC             ! Maximum length of the array elements
-      INTEGER MCH( MAXOPT )      ! Number of initial characters to compare to 
-                                 ! obtain each class option uniquely
-      INTEGER MINCH              ! Number of initial characters to compare to 
-                                 ! obtain a class uniquely
-      INTEGER NCLASS             ! Number of acceptable classes supplied
+c     INTEGER MAXNOC             ! Maximum length of the array elements
+c     INTEGER MCH( MAXOPT )      ! Number of initial characters to compare to 
+c                                ! obtain each class option uniquely
+c     INTEGER MINCH              ! Number of initial characters to compare to 
+c                                ! obtain a class uniquely
+c     INTEGER NCLASS             ! Number of acceptable classes supplied
       INTEGER NCRIT              ! Number of characters in the criteria
       INTEGER VLEN               ! Length of PGPLOT information string
-      LOGICAL LOOP               ! Loop searching for a class to match?
+c     LOGICAL LOOP               ! Loop searching for a class to match?
 
 *.
 

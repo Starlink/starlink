@@ -4,7 +4,7 @@
 *     FTS1_WCSAX
 
 *  Purpose:
-*     Re-create AXIS structures from a WCS component FrameSet.
+*     Re-creates AXIS structures from a WCS component FrameSet.
 
 *  Language:
 *     Starlink Fortran 77
@@ -59,7 +59,7 @@
 *     1-DEC-1997 (DSB):
 *        Original version.
 *     2004 September 1 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -101,7 +101,6 @@
       INTEGER MAP5               ! 1-D PIXEL to 1-D AXIS mapping
       INTEGER NC                 ! No. of characters in text
       INTEGER OUTPRM( NDF__MXDIM ) ! Indices of corresponding axes
-      LOGICAL THERE              ! Is an AXIS coordinate system defined?
 
 *.
 

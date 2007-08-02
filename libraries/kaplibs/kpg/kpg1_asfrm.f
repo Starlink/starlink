@@ -5,7 +5,7 @@
 *     KPG1_ASFRM
 
 *  Purpose:
-*     Set the current Frame in a FrameSet to a Frame specified through
+*     Sets the current Frame in a FrameSet to a Frame specified through
 *     the environment.
 
 *  Language:
@@ -149,9 +149,6 @@
       CHARACTER OBJ*255          ! The value of the supplied message TOKEN
       CHARACTER SCSNAM*(IRA__SZSCS) ! IRAS90 name for sky coordinate system
       CHARACTER T1*16            ! Terminated domain name
-      CHARACTER TEXT*50          ! Text 
-      DOUBLE PRECISION DEFEP     ! Epoch of observation
-      DOUBLE PRECISION EPOCH     ! Epoch of observation
       DOUBLE PRECISION EQU       ! Equinox 
       INTEGER FRM                ! Pointer to matching Frame
       INTEGER IAT	         ! Current length of string

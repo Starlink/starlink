@@ -4,7 +4,7 @@
 *     KPG1_PGLOC
 
 *  Purpose:
-*     Locate a component of an HDS structure relating to the currently
+*     Locates a component of an HDS structure relating to the currently
 *     opened PGPLOT device.
 
 *  Language:
@@ -102,8 +102,6 @@
       INTEGER I                  ! Component index
       INTEGER IFILE              ! Index of ";"
       INTEGER IW                 ! Index of "XWINDOW"
-      INTEGER LENGTH             ! Length of string returned by PGQINF
-      INTEGER NC                 ! Number of characters in the buffer
       INTEGER NCOMP              ! Number of components in LOC
       LOGICAL THERE              ! Does component exist?
 *.

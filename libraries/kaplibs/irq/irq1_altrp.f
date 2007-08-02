@@ -5,7 +5,7 @@
 *     IRQ1_ALTRP
 
 *  Purpose:
-*     Convert an algebraic quality expression to a reverse polish form.
+*     Converts an algebraic quality expression to a reverse-Polish form.
 
 *  Language:
 *     Starlink Fortran 77
@@ -168,8 +168,6 @@
                                  ! operator.
       CHARACTER QEXP*(IRQ__SZQEX)! The quality expression with an
                                  ! appended "=" symbol.
-      CHARACTER QEXP2*(IRQ__SZQEX)! The quality expression with no spaces
-                                 ! adjacent to any dot.
       INTEGER QNMEND             ! Position of end of a quality name.
       INTEGER STACK( 0:IRQ__NSYMS )! "First In Last Out"  stack used for
                                  ! temporary storage of symbols.
@@ -438,7 +436,7 @@
       END DO
 
 *  All the symbols in the expression have now been classified.
-*  Initialise the operator stack for converting to reverse polish.
+*  Initialise the operator stack for converting to reverse Polish.
       DO I = 0, NSYMB
          STACK( I ) = 0
       END DO

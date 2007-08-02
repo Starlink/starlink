@@ -4,7 +4,7 @@
 *     KPG1_SRCTA
 
 *  Purpose:
-*     Read AST_ data as text from a GRP group.
+*     Reads AST_ data as text from a GRP group.
 
 *  Language:
 *     Starlink Fortran 77
@@ -114,12 +114,9 @@
       CHARACTER * ( SZTEXT ) TEXT ! Buffer for AST_ text
       INTEGER DIM                 ! Size of GRP group
       INTEGER L                   ! Number of characters in AST_ text
-      INTEGER LENGTH              ! Length if HDS object in characters
-      INTEGER NDIM                ! Number of HDS object dimensions
       LOGICAL AGAIN               ! Loop to read another line?
 
       SAVE DIM      
-      SAVE LENGTH
 *.
 
 *  Check inherited global status.
