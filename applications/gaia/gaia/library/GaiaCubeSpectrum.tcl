@@ -895,6 +895,11 @@ itcl::class gaia::GaiaCubeSpectrum {
          -command [code $this set_combination_type_ "median"]
    }
 
+   #  Just read a description from a file.
+   public method read_ard_file {file} {
+      $toolbox_ read_description $file
+   }
+
    #  Set the combination type used for regions.
    protected method set_combination_type_ {value} {
       set combination_type_ $value

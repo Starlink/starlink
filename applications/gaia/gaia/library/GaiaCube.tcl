@@ -103,6 +103,10 @@ itcl::class gaia::GaiaCube {
       set File [add_menubutton "File" left]
       configure_menubutton File -underline 0
 
+      #  Add item to read an ARD region from a file.
+      $File add command -label {Read ARD region...} \
+         -command [code $this read_ard_region_]
+
       #  Add the close menu item.
       $File add command -label Close \
          -command [code $this close] \
@@ -1007,6 +1011,13 @@ itcl::class gaia::GaiaCube {
       set last_component_ $component_
    }
 
+   #  Read a region from an ARD file.
+   protected method read_ard_region_ {} {
+      utilReUseWidget util::FileSelect $w_.ardselect -title "Choose ARD file"
+      if {[$w_.ardselect activate]} {
+         $itk_component(spectrum) read_ard_file [$w_.ardselect get]
+      }
+   }
 
    #  ==========================================
    #  Utility methods for various helper classes
