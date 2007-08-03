@@ -277,7 +277,8 @@ itcl::class gaia::StarArdList {
             $objects_($selected_) create_and_resize \
                [code $this created_object $selected_]
          } else { 
-            $objects_($selected_) createard "$desc"
+            $objects_($selected_) createard "$desc" \
+               [code $this created_object $selected_]
          }
       } else {
          error "Unknown ARD region type \"$type\""
