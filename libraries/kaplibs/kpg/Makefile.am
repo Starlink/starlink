@@ -278,6 +278,7 @@ kpg1_ccpro.f \
 kpg1_crout.f \
 kpg1_dsfrm.f \
 kpg1_gaxlb.f \
+kpg1_gchmv.f \
 kpg1_getim.f \
 kpg1_getyp.f \
 kpg1_gilst.f \
@@ -289,6 +290,7 @@ kpg1_grlm1.f \
 kpg1_grlm2.f \
 kpg1_grlm3.f \
 kpg1_gtaxi.f \
+kpg1_gtaxm.f \
 kpg1_gtaxv.f \
 kpg1_gtchv.f \
 kpg1_gtgrp.f \
