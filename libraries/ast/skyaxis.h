@@ -49,11 +49,14 @@
 *        values should be formatted for display as times (instead of
 *        angles). It is used to determine the default format to use if
 *        no explicit value has been set for the Format attribute.
+*     CentreZero (integer)
+*        A boolean value which indicates whether a SkyAxis value should
+*        be normalised into the range [-PI,+PI] or [0,2.PI] when astNorm 
+*        is used.
 *     IsLatitude (integer)
 *        A boolean value which indicates whether a SkyAxis is a
-*        latitude axis (as opposed to a longitude axis). It is used by
-*        the astAxisNorm method to determine how to wrap angles into
-*        an acceptable range for display. It also determines the
+*        latitude axis (as opposed to a longitude axis). It is used to
+*        determine default axis labels and symbols. It also determines the
 *        default value for the "AsTime" attribute (since longitudes on
 *        the sky are usually expressed as times).
 
@@ -103,20 +106,29 @@
 *     Protected:
 *        astClearAxisAsTime
 *           Clear the AsTime attribute for a SkyAxis.
+*        astClearAxisCentreZero
+*           Clear the CentreZero attribute for a SkyAxis.
 *        astClearAxisIsLatitude
 *           Clear the IsLatitude attribute for a SkyAxis.
 *        astGetAxisAsTime
 *           Obtain the value of the AsTime attribute for a SkyAxis.
 *        astGetAxisIsLatitude
 *           Obtain the value of the IsLatitude attribute for a SkyAxis.
+*        astGetAxisCentreZero
+*           Obtain the value of the CentreZero attribute for a SkyAxis.
 *        astSetAxisAsTime
 *           Set a value for the AsTime attribute of a SkyAxis.
 *        astSetAxisIsLatitude
 *           Set a value for the IsLatitude attribute of a SkyAxis.
+*        astSetAxisCentreZero
+*           Set a value for the CentreZero attribute of a SkyAxis.
 *        astTestAxisAsTime
 *           Test if a value has been set for the AsTime attribute of a SkyAxis.
 *        astTestAxisIsLatitude
 *           Test if a value has been set for the IsLatitude attribute of a
+*           SkyAxis.
+*        astTestAxisCentreZero
+*           Test if a value has been set for the CentreZero attribute of a
 *           SkyAxis.
 
 *  Other Class Functions:
@@ -210,6 +222,7 @@ typedef struct AstSkyAxis {
    char *skyformat;              /* Pointer to sky format string */
    int as_time;                  /* Format angles as time (hours)? */
    int is_latitude;              /* SkyAxis is a latitude axis? */
+   int centrezero;               /* Normalised range is zero-centred? */
 } AstSkyAxis;
 
 /* Virtual function table. */
@@ -228,12 +241,16 @@ typedef struct AstSkyAxisVtab {
 /* Properties (e.g. methods) specific to this class. */
    int (* GetAxisAsTime)( AstSkyAxis * );
    int (* GetAxisIsLatitude)( AstSkyAxis * );
+   int (* GetAxisCentreZero)( AstSkyAxis * );
    int (* TestAxisAsTime)( AstSkyAxis * );
    int (* TestAxisIsLatitude)( AstSkyAxis * );
+   int (* TestAxisCentreZero)( AstSkyAxis * );
    void (* ClearAxisAsTime)( AstSkyAxis * );
    void (* ClearAxisIsLatitude)( AstSkyAxis * );
+   void (* ClearAxisCentreZero)( AstSkyAxis * );
    void (* SetAxisAsTime)( AstSkyAxis *, int );
    void (* SetAxisIsLatitude)( AstSkyAxis *, int );
+   void (* SetAxisCentreZero)( AstSkyAxis *, int );
 } AstSkyAxisVtab;
 #endif
 
@@ -270,12 +287,16 @@ AstSkyAxis *astLoadSkyAxis_( void *, size_t, AstSkyAxisVtab *,
 #if defined(astCLASS)            /* Protected */
 int astGetAxisAsTime_( AstSkyAxis * );
 int astGetAxisIsLatitude_( AstSkyAxis * );
+int astGetAxisCentreZero_( AstSkyAxis * );
 int astTestAxisAsTime_( AstSkyAxis * );
 int astTestAxisIsLatitude_( AstSkyAxis * );
+int astTestAxisCentreZero_( AstSkyAxis * );
 void astClearAxisAsTime_( AstSkyAxis * );
 void astClearAxisIsLatitude_( AstSkyAxis * );
+void astClearAxisCentreZero_( AstSkyAxis * );
 void astSetAxisAsTime_( AstSkyAxis *, int );
 void astSetAxisIsLatitude_( AstSkyAxis *, int );
+void astSetAxisCentreZero_( AstSkyAxis *, int );
 #endif
 
 /* Function interfaces. */
@@ -339,5 +360,16 @@ astINVOKE(V,astSetAxisIsLatitude_(astCheckSkyAxis(this),value))
 astINVOKE(V,astTestAxisAsTime_(astCheckSkyAxis(this)))
 #define astTestAxisIsLatitude(this) \
 astINVOKE(V,astTestAxisIsLatitude_(astCheckSkyAxis(this)))
+
+#define astClearAxisCentreZero(this) \
+astINVOKE(V,astClearAxisCentreZero_(astCheckSkyAxis(this)))
+#define astGetAxisCentreZero(this) \
+astINVOKE(V,astGetAxisCentreZero_(astCheckSkyAxis(this)))
+#define astSetAxisCentreZero(this,value) \
+astINVOKE(V,astSetAxisCentreZero_(astCheckSkyAxis(this),value))
+#define astTestAxisCentreZero(this) \
+astINVOKE(V,astTestAxisCentreZero_(astCheckSkyAxis(this)))
+
+
 #endif
 #endif

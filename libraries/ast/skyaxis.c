@@ -102,6 +102,8 @@ f     only within textual output (e.g. from AST_WRITE).
 *        Override astGetObjSize.
 *     30-JUN-2006 (DSB):
 *        Guard against a null "str1" value in AxisAbbrev.
+*     7-AUG-2007 (DSB):
+*        Added CentreZero attribute.
 *class--
 */
 
@@ -209,16 +211,19 @@ static int AxisUnformat( AstAxis *, const char *, double * );
 static int GetAxisAsTime( AstSkyAxis * );
 static int GetAxisDirection( AstAxis * );
 static int GetAxisIsLatitude( AstSkyAxis * );
+static int GetAxisCentreZero( AstSkyAxis * );
 static int TestAttrib( AstObject *, const char * );
 static int TestAxisAsTime( AstSkyAxis * );
 static int TestAxisFormat( AstAxis * );
 static int TestAxisIsLatitude( AstSkyAxis * );
+static int TestAxisCentreZero( AstSkyAxis * );
 static void AxisNorm( AstAxis *, double * );
 static void AxisOverlay( AstAxis *, AstAxis * );
 static void ClearAttrib( AstObject *, const char * );
 static void ClearAxisAsTime( AstSkyAxis * );
 static void ClearAxisFormat( AstAxis * );
 static void ClearAxisIsLatitude( AstSkyAxis * );
+static void ClearAxisCentreZero( AstSkyAxis * );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
@@ -227,6 +232,7 @@ static void SetAttrib( AstObject *, const char * );
 static void SetAxisAsTime( AstSkyAxis *, int );
 static void SetAxisFormat( AstAxis *, const char * );
 static void SetAxisIsLatitude( AstSkyAxis *, int );
+static void SetAxisCentreZero( AstSkyAxis *, int );
 
 /* Member functions. */
 /* ================= */
@@ -997,7 +1003,7 @@ static void AxisNorm( AstAxis *this_axis, double *value ) {
 *
 *     For a SkyAxis that is a longitude axis, values are wrapped into
 *     the range zero to 2*pi, while for a latitude axis, they are
-*     wrapped into the range -pi to +pi. The astAxisIsLatitude method
+*     wrapped into the range -pi to +pi. The astAxisCentreZero method
 *     is used to determine which algorithm to apply.
 
 *  Parameters:
@@ -1010,7 +1016,7 @@ static void AxisNorm( AstAxis *this_axis, double *value ) {
 
 /* Local Variables: */
    AstSkyAxis *this;             /* Pointer to the SkyAxis structure */
-   int is_latitude;              /* SkyAxis is a latitude axis? */
+   int centrezero;               /* SkyAxis range centred on zero? */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -1018,15 +1024,14 @@ static void AxisNorm( AstAxis *this_axis, double *value ) {
 /* Obtain a pointer to the SkyAxis structure. */
    this = (AstSkyAxis *) this_axis;
 
-/* If the coordinate value is bad, then return it
-   unchanged. Otherwise, determine if the SkyAxis is a latitude
-   axis. */
+/* If the coordinate value is bad, then return it unchanged. Otherwise, 
+   determine if the SkyAxis range is centred on zero or PI. */
    if ( *value != AST__BAD ) {
-      is_latitude = astGetAxisIsLatitude( this );
+      centrezero = astGetAxisCentreZero( this );
 
 /* Wrap the value into the appropriate range. */
-      if ( astOK ) *value = is_latitude ? palSlaDrange( *value ) :
-                                          palSlaDranrm( *value );
+      if ( astOK ) *value = centrezero ? palSlaDrange( *value ) :
+                                         palSlaDranrm( *value );
    }
 }
 
@@ -1167,6 +1172,11 @@ static void AxisOverlay( AstAxis *template_axis, AstAxis *result ) {
       if ( astTestAxisIsLatitude( template ) ) {
          astSetAxisIsLatitude( result, astGetAxisIsLatitude( template ) );
       }
+
+/* Also overlay the CentreZero attribute. */
+      if ( astTestAxisCentreZero( template ) ) {
+         astSetAxisCentreZero( result, astGetAxisCentreZero( template ) );
+      }
    }
 }
 
@@ -1222,6 +1232,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* ----------- */
    } else if ( !strcmp( attrib, "islatitude" ) ) {
       astClearAxisIsLatitude( this );
+
+/* CentreZero. */
+/* ----------- */
+   } else if ( !strcmp( attrib, "centrezero" ) ) {
+      astClearAxisCentreZero( this );
 
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
@@ -2274,6 +2289,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    AstSkyAxis *this;             /* Pointer to the SkyAxis structure */
    const char *result;           /* Pointer value to return */
    int as_time;                  /* AsTime attribute value */
+   int centrezero;               /* CentreZero attribute value */
    int is_latitude;              /* IsLatitude attribute value */
    static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
@@ -2306,6 +2322,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
       is_latitude = astGetAxisIsLatitude( this );
       if ( astOK ) {
          (void) sprintf( buff, "%d", is_latitude );
+         result = buff;
+      }
+
+/* CentreZero. */
+/* ----------- */
+   } else if ( !strcmp( attrib, "centrezero" ) ) {
+      centrezero= astGetAxisCentreZero( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", centrezero );
          result = buff;
       }
 
@@ -2952,12 +2977,16 @@ void astInitSkyAxisVtab_(  AstSkyAxisVtab *vtab, const char *name ) {
    virtual methods for this class. */
    vtab->ClearAxisAsTime = ClearAxisAsTime;
    vtab->ClearAxisIsLatitude = ClearAxisIsLatitude;
+   vtab->ClearAxisCentreZero = ClearAxisCentreZero;
    vtab->GetAxisAsTime = GetAxisAsTime;
    vtab->GetAxisIsLatitude = GetAxisIsLatitude;
+   vtab->GetAxisCentreZero = GetAxisCentreZero;
    vtab->SetAxisAsTime = SetAxisAsTime;
    vtab->SetAxisIsLatitude = SetAxisIsLatitude;
+   vtab->SetAxisCentreZero = SetAxisCentreZero;
    vtab->TestAxisAsTime = TestAxisAsTime;
    vtab->TestAxisIsLatitude = TestAxisIsLatitude;
+   vtab->TestAxisCentreZero = TestAxisCentreZero;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -3282,6 +3311,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Local Variables: */
    AstSkyAxis *this;             /* Pointer to the SkyAxis structure */
    int as_time;                  /* Format values as times? */
+   int centrezero;               /* SkyAxis range centred on zero? */
    int is_latitude;              /* SkyAxis is a latitude axis? */
    int len;                      /* Length of setting string */
    int nc;                       /* Number of characters read by astSscanf */
@@ -3314,6 +3344,13 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
         ( 1 == astSscanf( setting, "islatitude= %d %n", &is_latitude, &nc ) )
         && ( nc >= len ) ) {
       astSetAxisIsLatitude( this, is_latitude );
+
+/* CentreZero. */
+/* ----------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "centrezero= %d %n", &centrezero, &nc ) )
+        && ( nc >= len ) ) {
+      astSetAxisCentreZero( this, centrezero );
 
 /* Pass any unrecognised attribute setting to the parent method for further
    interpretation. */
@@ -3435,6 +3472,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* ----------- */
    } else if ( !strcmp( attrib, "islatitude" ) ) {
       result = astTestAxisIsLatitude( this );
+
+/* CentreZero. */
+/* ----------- */
+   } else if ( !strcmp( attrib, "centrezero" ) ) {
+      result = astTestAxisCentreZero( this );
 
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
@@ -4035,6 +4077,16 @@ astMAKE_GET(SkyAxis,AxisIsLatitude,int,0,( this->is_latitude != -INT_MAX ?
 astMAKE_SET(SkyAxis,AxisIsLatitude,int,is_latitude,( value != 0 ))
 astMAKE_TEST(SkyAxis,AxisIsLatitude,( this->is_latitude != -INT_MAX ))
 
+/* CentreZero. */
+/* ----------- */
+/* The value is constrained to be -INT_MAX, 0 or 1, with -INT_MAX for
+   "undefined". The default value is equal to the value of IsLatitude. */
+astMAKE_CLEAR(SkyAxis,AxisCentreZero,centrezero,-INT_MAX)
+astMAKE_GET(SkyAxis,AxisCentreZero,int,0,( this->centrezero != -INT_MAX ?
+                                           this->centrezero : astGetAxisIsLatitude( this ) ))
+astMAKE_SET(SkyAxis,AxisCentreZero,int,centrezero,( value != 0 ))
+astMAKE_TEST(SkyAxis,AxisCentreZero,( this->centrezero != -INT_MAX ))
+
 /* Copy constructor. */
 /* ----------------- */
 static void Copy( const AstObject *objin, AstObject *objout ) {
@@ -4205,6 +4257,14 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    astWriteInt( channel, "IsLat", set, 0, ival,
                 ival ? "Latitude axis (not longitude)" :
                        "Longitude axis (not latitude)" );
+
+/* CentreZero. */
+/* ----------- */
+   set = TestAxisCentreZero( this );
+   ival = set ? GetAxisCentreZero( this ) : astGetAxisCentreZero( this );
+   astWriteInt( channel, "CnZer", set, 0, ival,
+                ival ? "Display axis values in range -PI -> +PI" :
+                       "Display axis values in range 0 -> 2.PI" );
 
 /* AsTime. */
 /* ------- */
@@ -4456,6 +4516,7 @@ AstSkyAxis *astInitSkyAxis_( void *mem, size_t size, int init,
 /* Initialise all attributes to their "undefined" values. */
       new->as_time = -INT_MAX;
       new->is_latitude = -INT_MAX;
+      new->centrezero = -INT_MAX;
       new->skyformat = NULL;
 
 /* If an error occurred, clean up by deleting the new SkyAxis. */
@@ -4598,6 +4659,13 @@ AstSkyAxis *astLoadSkyAxis_( void *mem, size_t size,
       new->is_latitude = astReadInt( channel, "islat", -INT_MAX );
       if ( TestAxisIsLatitude( new ) ) {
          SetAxisIsLatitude( new, new->is_latitude );
+      }
+
+/* CentreZero. */
+/* ----------- */
+      new->centrezero = astReadInt( channel, "cnzer", -INT_MAX );
+      if ( TestAxisCentreZero( new ) ) {
+         SetAxisCentreZero( new, new->centrezero );
       }
 
 /* AsTime. */
