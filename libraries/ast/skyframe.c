@@ -198,6 +198,11 @@ f     The SkyFrame class does not define any new routines beyond those
 *     11-JUL-2007 (DSB):
 *        Override astSetEpoch and astClearEpoch by implementations which
 *        update the LAST value stored in the SkyFrame.
+*     7-AUG-2007 (DSB):
+*        - Set a value for the CentreZero attribute when extracting a
+*        SkyAxis from a SkyFrame in function SubFrame.
+*        - In SubFrame, clear extended attributes such as System after
+*        all axis attributes have been "fixated.
 *class--
 */
 
@@ -7842,23 +7847,28 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
          SET_AXIS(Symbol)
          SET_AXIS(Unit)
 
-/* Clear attributes which have an extended range of values allowed by
-   this class. */
-         astClearSystem( temp );
-
 /* Now handle axis attributes for which there are no SkyFrame access
    methods.  For these we require a pointer to the temporary
    SkyFrame's Axis object. */
          ax = astGetAxis( temp, target_axis );
 
-/* Set an explicit value for the IsLatitude attribute. */
-         astSetAxisIsLatitude( ax,
-                               ( astValidateAxis( temp, target_axis,
-                                                  "astSubFrame" ) == 1 ) );
+/* Set an explicit value for the IsLatitude and CentreZero attributes. */
+         if( astValidateAxis( temp, target_axis, "astSubFrame" ) == 1 ) {
+            astSetAxisIsLatitude( ax, 1 );
+            astSetAxisCentreZero( ax, 1 );
+
+         } else {
+            astSetAxisIsLatitude( ax, 0 );
+            astSetAxisCentreZero( ax, astGetNegLon( temp ) );
+         }
 
 /* Annul the Axis object pointer. */
          ax = astAnnul( ax );
       }
+
+/* Clear attributes which have an extended range of values allowed by
+   this class. */
+      astClearSystem( temp );
 
 /* Invoke the astSubFrame method inherited from the Frame class to
    produce the result Frame by selecting the required set of axes and
