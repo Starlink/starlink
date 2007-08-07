@@ -62,9 +62,9 @@
 *     5-MAR-2007 (DSB):
 *        Correct logic for deciding whether to convert GRID axes to PIXEL
 *        axes.
-*     6-AUG-2007 (DSB):
-*        Return without action if the original current Frame is the base 
-*        Frame.
+*     7-AUG-2007 (DSB):
+*        Check that there are some non-GRID axes in the current Frame
+*        before using the non-GRID axes.
 *-
       
 *  Type Definitions:
@@ -122,147 +122,150 @@
 *  Get the NDF WCS FrameSet.
       CALL NDF_GTWCS( INDF, IWCS, STATUS )
 
-*  Return without action if the current Frame is the base Frame.
-      IF( AST_GETI( IWCS, 'Base', STATUS ) .NE.
-     :    AST_GETI( IWCS, 'Current', STATUS ) ) THEN
-
 *  Get pointers to the GRID (base) Frame and WCS (current) Frame.
-         GFRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
-         WFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
+      GFRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
+      WFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
 
 *  Get the number of GRID axes and the number of WCS axes.
-         NGRID = AST_GETI( GFRM, 'Naxes', STATUS )
-         NWCS = AST_GETI( WFRM, 'Naxes', STATUS )
+      NGRID = AST_GETI( GFRM, 'Naxes', STATUS )
+      NWCS = AST_GETI( WFRM, 'Naxes', STATUS )
 
 *  Get the Mapping from current Frame (WCS) to base Frame (GRID).
-         MAP = AST_GETMAPPING( IWCS, AST__CURRENT, AST__BASE, STATUS )
+      MAP = AST_GETMAPPING( IWCS, AST__CURRENT, AST__BASE, STATUS )
 
 *  Indicate that we have not yet found any unidentifiable GRID axes in
 *  the current Frame.
-         OK = .TRUE.
+      OK = .TRUE.
 
 *  Initialise the number of grid and non-grid axes found in the current
 *  Frame.
-         NG = 0
-         NNONG = 0
+      NG = 0
+      NNONG = 0
 
 *  Check each current Frame axis in turn.
-         DO I = 1, NWCS
+      DO I = 1, NWCS
 
 *  See if its Domain is GRID.
-            ATTR = 'Domain('
-            IAT = 7
-            CALL CHR_PUTI( I, ATTR, IAT )
-            CALL CHR_APPND( ')', ATTR, IAT )
-            IF( AST_GETC( WFRM, ATTR( : IAT ), STATUS ) .EQ. 
-     :          'GRID' ) THEN
+         ATTR = 'Domain('
+         IAT = 7
+         CALL CHR_PUTI( I, ATTR, IAT )
+         CALL CHR_APPND( ')', ATTR, IAT )
+         IF( AST_GETC( WFRM, ATTR( : IAT ), STATUS ) .EQ. 
+     :       'GRID' ) THEN
 
 *  If it is, get the index of the associated base Frame axis. Set a flag
 *  if this is not possible.
-               INAX = I
-               CALL AST_MAPSPLIT( MAP, 1, INAX, OUTAX, TMAP, STATUS )
-               IF( TMAP .NE. AST__NULL ) THEN 
-                  IF( AST_GETI( TMAP, 'Nout', STATUS ) .EQ. 1 ) THEN         
-                     NG = NG + 1
-                     GAXID( NG ) = I
-                     AXG( NG ) = OUTAX( 1 )
-                     AX( I ) = OUTAX( 1 )
-                  ELSE
-                     OK = .FALSE.
-                  END IF
-   
+            INAX = I
+            CALL AST_MAPSPLIT( MAP, 1, INAX, OUTAX, TMAP, STATUS )
+            IF( TMAP .NE. AST__NULL ) THEN 
+               IF( AST_GETI( TMAP, 'Nout', STATUS ) .EQ. 1 ) THEN         
+                  NG = NG + 1
+                  GAXID( NG ) = I
+                  AXG( NG ) = OUTAX( 1 )
+                  AX( I ) = OUTAX( 1 )
                ELSE
                   OK = .FALSE.
                END IF
-   
+
             ELSE
-               NNONG = NNONG + 1
-               NGAXID( NNONG ) = I
-               AX( I ) = 0
+               OK = .FALSE.
             END IF
-   
-         END DO
+
+         ELSE
+            NNONG = NNONG + 1
+            NGAXID( NNONG ) = I
+            AX( I ) = 0
+         END IF
+
+      END DO
 
 *  Do nothing more if unidentifiable GRID axes were found in the current
 *  Frame, or if no GRID axes were found.
-         IF( OK .AND. NG .GT. 0 ) THEN
+      IF( OK .AND. NG .GT. 0 ) THEN
 
 *  Create a Frame containing just the non-GRID current Frame axes.
+         IF( NNONG .GT. 0 ) THEN
             NGFRM = AST_PICKAXES( WFRM, NNONG, NGAXID, TMAP, STATUS )
+         ELSE
+            NGFRM = AST__NULL
+         END IF
 
 *  Find the index of the PIXEL Frame.
-            CALL KPG1_ASFFR( IWCS, 'PIXEL', IPFRM, STATUS )
+         CALL KPG1_ASFFR( IWCS, 'PIXEL', IPFRM, STATUS )
 
 *  Create a Frame containing the PIXEL axes that correspond to the GRID
 *  axes found in the current Frame.
-            PFRM = AST_PICKAXES( AST_GETFRAME( IWCS, IPFRM, STATUS ), 
-     :                           NG, AXG, TMAP, STATUS )
+         PFRM = AST_PICKAXES( AST_GETFRAME( IWCS, IPFRM, STATUS ), 
+     :                        NG, AXG, TMAP, STATUS )
 
 *  Combine these two Frames, and then permute the axes in the combined
 *  Frame to put them back into the order used by the original current Frame.
+         IF( NGFRM .NE. AST__NULL ) THEN 
             NEWFRM = AST_CMPFRAME( NGFRM, PFRM, ' ', STATUS )
-   
-            DO I = 1, NNONG
-               PERM( NGAXID( I ) ) = I
-            END DO
-   
-            DO I = 1, NG
-               PERM( GAXID( I ) ) = I + NNONG
-            END DO
-   
-            CALL AST_PERMAXES( NEWFRM, PERM, STATUS )
+         ELSE
+            NEWFRM = AST_CLONE( PFRM, STATUS )
+         END IF   
 
+         DO I = 1, NNONG
+            PERM( NGAXID( I ) ) = I
+         END DO
+
+         DO I = 1, NG
+            PERM( GAXID( I ) ) = I + NNONG
+         END DO
+
+         CALL AST_PERMAXES( NEWFRM, PERM, STATUS )
+  
 *  Now create a Mapping form the original current Frame to this new Frame. 
 *  Values for non-GRID axes are just copied using a UnitMap. Values for 
 *  GRID axes are converted into the corresponding PIXEL axis value using
 *  a ShiftMap. First get the pixel origin from the NDF.
-            CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+         CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
 *  Clear the MAP pointer so that we can use it as a pointer to a parallel
 *  CmpMap that combines 1D Mappings for all the current Frame axes.
-            CALL AST_ANNUL( MAP, STATUS )
+         CALL AST_ANNUL( MAP, STATUS )
 
 *  Now loop round each current Frame axis.
-            DO I = 1, NWCS 
+         DO I = 1, NWCS 
          
 *  If this is a non-GRID axis, create a UnitMap.
-               IF( AX( I ) .EQ. 0 ) THEN
-                  TMAP = AST_UNITMAP( 1, ' ', STATUS )
+            IF( AX( I ) .EQ. 0 ) THEN
+               TMAP = AST_UNITMAP( 1, ' ', STATUS )
 
 *  If this is a GRID axis, create a ShiftMap that shifts a GRID value
 *  into a PIXEL value on the current axis.
-               ELSE
-                  SHIFT = DBLE( LBND( AX( I ) ) ) - 1.5D0
-                  TMAP = AST_SHIFTMAP( 1, SHIFT, ' ', STATUS )
-               END IF
+            ELSE
+               SHIFT = DBLE( LBND( AX( I ) ) ) - 1.5D0
+               TMAP = AST_SHIFTMAP( 1, SHIFT, ' ', STATUS )
+            END IF
 
 *  Add the above Mapping into the running parallel CmpMap.
-               IF( MAP .EQ. AST__NULL ) THEN
-                  MAP = TMAP
-               ELSE               
-                  MAP = AST_CMPMAP( MAP, TMAP, .FALSE., ' ', STATUS )
-               END IF
-   
-            END DO
+            IF( MAP .EQ. AST__NULL ) THEN
+               MAP = TMAP
+            ELSE               
+               MAP = AST_CMPMAP( MAP, TMAP, .FALSE., ' ', STATUS )
+            END IF
+
+         END DO
 
 *  Now add the new Frame into the WCS FrameSet, using the above Mapping
 *  to connect it to the original current Frame. It becomes the new
 *  current Frame, so first record the index of the original current Frame.
-            ICUR = AST_GETI( IWCS, 'Current', STATUS )
-            CALL AST_ADDFRAME( IWCS, AST__CURRENT, MAP, NEWFRM, STATUS )
+         ICUR = AST_GETI( IWCS, 'Current', STATUS )
+         CALL AST_ADDFRAME( IWCS, AST__CURRENT, MAP, NEWFRM, STATUS )
 
 *  Remove the original current Frame (unless it was also the base Frame).
-            IF( AST_GETI( IWCS, 'Base', STATUS ) .NE. ICUR ) THEN
-               CALL AST_REMOVEFRAME( IWCS, ICUR, STATUS )
-            END IF
+         IF( AST_GETI( IWCS, 'Base', STATUS ) .NE. ICUR ) THEN
+            CALL AST_REMOVEFRAME( IWCS, ICUR, STATUS )
+         END IF
 
 *  Simplify the Mappings in the FrameSet.
-            CALL KPG1_ASSIM( IWCS, STATUS )
+         CALL KPG1_ASSIM( IWCS, STATUS )
 
 *  Store the new WCS FrameSet in the NDF.
-            CALL NDF_PTWCS( IWCS, INDF, STATUS )
+         CALL NDF_PTWCS( IWCS, INDF, STATUS )
 
-         END IF
       END IF
 
 *  End the AST context.
