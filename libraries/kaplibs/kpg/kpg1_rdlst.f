@@ -29,7 +29,7 @@
 *     and Y, and Domain GRID. If there is also a column named Z, then
 *     the Frame will be 3D, with a Z axis.
 *
-*     Hoqwever the FrameSet is obtained, it is assumed that the columns
+*     However the FrameSet is obtained, it is assumed that the columns
 *     containing the axis values have CAT names equal to the Symbol
 *     attribute of the corresponding AST Axis. The catalogue columns from
 *     which to read the axis values are chosen by matching column names

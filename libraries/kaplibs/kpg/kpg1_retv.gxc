@@ -20,13 +20,13 @@
 *     EL = INTEGER (Given)
 *        The number of elements in the array.
 *     ARRAY( EL ) = ? (Given)
-*        The array to be sorted.
+*        The input array.
 *     NVAL = INTEGER (Given)
 *        The number of element values to return.
 *     INDEX( NVAL ) = INTEGER (Given)
 *        The indices of the array elements to be returned.
 *     VALUES( NVAL ) = ? (Returned)
-*        The value of the Xth aray element.
+*        The value of the Xth array element.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 

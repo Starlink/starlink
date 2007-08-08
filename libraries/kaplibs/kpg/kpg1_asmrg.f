@@ -4,7 +4,7 @@
 *     KPG1_ASMRG
 
 *  Purpose:
-*     Merge two FrameSets by aligning them in a common Frame.
+*     Merges two FrameSets by aligning them in a common Frame.
 
 *  Language:
 *     Starlink Fortran 77
@@ -35,10 +35,10 @@
 *     the alignment Frame then a warning is issued.
 *
 *     If the above attempt to align the Frames directly using astConvert
-*     fails, then a further attempt is made if oneof the two Frames is a
+*     fails, then a further attempt is made if one of the two Frames is a
 *     SpecFrame or SkyFrame, and the other Frame is a CmpFrame. In this
 *     case, the CmpFrame is searched for a Frame that can be aligned with
-*     the SkyFrame or SpecFrame. If this is succesful, the other axes i
+*     the SkyFrame or SpecFrame. If this is succesful, the other axes in
 *     the CmpFrame are fed bad values by the Mapping which connects the
 *     two Frames.
 
