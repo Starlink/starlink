@@ -6,11 +6,10 @@
 #include "sae_par.h"
 #include "ast.h"
 #include "ndf.h"
-#include "sc2ast.h"
 #include "Ers.h"
 
-/* Following include is for JCMTState definition */
-#include "jcmt/state.h"
+#include "sc2ast.h"
+
 
 static char errmess[132];              /* For DRAMA error messages */
 
@@ -470,7 +469,7 @@ int *status             /* global status (given and returned) */
       astSetD( skyframe, "ObsLon", -telpos[0] );
       astSetD( skyframe, "ObsLat", telpos[1] );
 
-      printf("telpos: %lf %lf\n", telpos[0], telpos[1] );
+      printf("telpos: %e %e\n", telpos[0], telpos[1] );
 
       astExempt( skyframe );
    }
@@ -796,7 +795,7 @@ int *status              /* global status (given and returned) */
    AstMatrixMap *matmap;
    AstCmpMap *m1;
    AstWcsMap *wcsmap;
-   double t1, t2, t3, ct, cn, st, sn, mat[ 3 ][ 3 ];
+   double mat[ 3 ][ 3 ];
 
 /* Check the inherited status. */
    if ( *status != SAI__OK ) return NULL;
