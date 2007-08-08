@@ -117,7 +117,7 @@ maths median mstats mult noglobals nomagic normalize numb outset parget \
 paste permaxes pixdupe psf rift regrid rotate segment setmagic shadow \
 slide sqorst stats sub substitute surfit thresh trandat trig wiener   \
 zaplin listmake listshow profile wcsalign wcsmosaic wcstran kapversion \
-kaphelp mfittrend makesnr oddeven cumulvec beamfit
+kaphelp mfittrend makesnr oddeven cumulvec beamfit pluck
 
 KAPVIEW_TASKS = ardplot clinplot colcomp contour cursor drawsig \
 drawnorth display elprof gdclear gdnames gdset gdstate linplot lutable \
@@ -262,8 +262,9 @@ psf.ifc regrid.ifc rift.ifc add.ifc aperadd.ifc \
 ardgen.ifc ardmask.ifc block.ifc cadd.ifc calc.ifc \
 calpol.ifc cdiv.ifc centroid.ifc chanmap.ifc chpix.ifc \
 cmult.ifc collapse.ifc compadd.ifc compave.ifc compick.ifc \
-convolve.ifc copybad.ifc creframe.ifc csub.ifc cumulvec.ifc div.ifc \
-beamfit.ifc pow.ifc ndfpack_mon.ifc kapview_mon.ifc kappa_mon.ifc
+convolve.ifc copybad.ifc creframe.ifc csub.ifc cumulvec.ifc \
+div.ifc beamfit.ifc pluck.ifc pow.ifc ndfpack_mon.ifc \
+kapview_mon.ifc kappa_mon.ifc
 
 
 BUILT_IFL_FILES = kappa_mon.ifl beamfit.ifl chanmap.ifl \
@@ -298,7 +299,7 @@ lutview.ifl mlinplot.ifl native.ifl ndfcompress.ifl ndfcopy.ifl \
 ndfpack_mon.ifl ndftrace.ifl paldef.ifl palentry.ifl \
 palread.ifl palsave.ifl piccur.ifl picdef.ifl \
 picempty.ifl picentire.ifl picin.ifl piclabel.ifl \
-piclist.ifl picsel.ifl pictrans.ifl picvis.ifl \
+piclist.ifl picsel.ifl pictrans.ifl picvis.ifl pluck.ifl \
 qualtobad.ifl remqual.ifl reshape.ifl scatter.ifl \
 setaxis.ifl setbad.ifl setbb.ifl setbound.ifl \
 setext.ifl setlabel.ifl setnorm.ifl setorigin.ifl \

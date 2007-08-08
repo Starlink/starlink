@@ -1,0 +1,470 @@
+      SUBROUTINE KPS1_PLRS<T>( MAPIO, PARAMS, CONTNR, PATH, RESET, 
+     :                         INTERP, RSPARS, TOL, NDFI, IWCS, NDIM, 
+     :                         LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
+*+
+*  Name:
+*     KPS1_PLRSx
+
+*  Purpose:
+*     Resamples about a location and stores the resulting slice in an 
+*     NDF.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPS1_PLRSx( MAPIO, PARAMS, CONTNR, PATH, RESET, INTERP, 
+*                      RSPARS, TOL, NDFI, IWCS, NDIM, LBNDI, UBNDI, 
+*                      LBNDO, UBNDO, STATUS )
+
+*  Description:
+*     This routine applies a mapping to an input NDF to create an
+*     output NDF with one or more fewer significant dimensions.  The 
+*     output pixel values are determined by resampling.  A selection of
+*     resampling methods are available.
+*
+*     The output NDFs may be stored in an HDS container file (see
+*     arguments CONTNR, PATH, and RESET) in an HDS_CONTAINER type
+*     top-level structure.
+
+*  Arguments:
+*     MAPIO = INTEGER (Given)
+*        The mapping from input to output NDF.  This should be a
+*        ShiftMap between the GRID co-ordinates in the input and output
+*        NDFs.  At least one of the shifts should be zero belonging to
+*        a retained axis.        
+*     PARAMS( 2 ) = CHARACTER * ( * ) (Given)
+*        The names of environment parameters.  The elements are
+*        respectively for acquiring the name of the output NDF or
+*        container file, and the title of the output NDFs.
+*     CONTNR = LOGICAL (Given)
+*        If set to .TRUE., the output NDFs are written as components of
+*        an HDS container file specified through parameter PARAMS(2).
+*        Otherwise each NDF is written to its own file.
+*     PATH = CHARACTER * ( * ) (Given)
+*        If CONTNR is .TRUE. this is the path (including the name) to 
+*        the container file.
+*     RESET = LOGICAL (Given)
+*        If .TRUE along with CONTNR = .TRUE. it indicates that the
+*        counter for NDFs in the container file should be reset to 1.
+*     INTERP = INTEGER (Given)
+*        The resampling-scheme identifier for AST_RESAMPLE<T>.
+*     RSPARS( 2 ) = DOUBLE PRECISION (Given)
+*        Qualifying parameters required by the Sinc, SincSinc, SincCos, 
+*        SincGauss, Somb, SombCos, and Gauss interpolation methods in
+*        AST_RESAMPLE<T>.
+*
+*        RSPARS( 1 ) is required by all the above schemes.  It is used 
+*        to specify how many pixels are to contribute to the interpolated
+*        result on either side of the interpolation in each dimension. 
+*        Typically, a value of 2 is appropriate and the minimum allowed 
+*        value is 1 (i.e. one pixel on each side).  A value of zero or 
+*        fewer indicates that a suitable number of pixels should be 
+*        calculated automatically.
+*
+*        RSPARS( 2 ) is required only by the SombCos, Gauss, SincSinc, 
+*        SincCos, and SincGauss schemes.  For the SombCos, SincSinc, and
+*        SincCos schemes, it specifies the number of pixels at which the
+*        envelope of the function goes to zero.  The minimum value is
+*        1.0, and the run-time default value is 2.0.  For the Gauss and
+*        SincGauss scheme, it specifies the full-width at half-maximum
+*        (FWHM) of the Gaussian envelope.  The minimum value is 0.1, and
+*        the run-time default is 1.0.  On astronomical images and 
+*        spectra, good results are often obtained by approximately 
+*        matching the FWHM of the envelope function, given by RSPARS(2),
+*        to the point-spread function of the input data.  
+*     TOL = DOUBLE PRECISION (Given)
+*        The maximum tolerable geometrical distortion which may be
+*        introduced as a result of approximating non-linear Mappings 
+*        by a set of piece-wise linear transforms.  The resampling
+*        algorithm uses approximate non-linear co-ordinate 
+*        transformations in order to improve performance, and this 
+*        parameter controls how inaccurate the resulting approximation
+*        is allowed to be, as a displacement in pixels of the input NDF. 
+*        A value of zero will ensure that no such approximation is done,
+*        at the expense of increasing execution time.
+*     NDFI = INTEGER (Given)
+*        The identifier of the input NDF to be resampled.
+*     IWCS = INTEGER (Given) 
+*        The FrameSet associated with the input NDF.
+*     NDIM = INTEGER (Given)
+*        The number of input dimensions.
+*     LBNDI( NDIM ) = INTEGER (Given)
+*        The lower bounds of the input data array.
+*     UBNDI( NDIM ) = INTEGER (Given)
+*        The upper bounds of the input data array.
+*     LBNDO( NDIM ) = INTEGER (Given)
+*        The lower bounds of the output data array.
+*     UBNDO( NDIM ) = INTEGER (Given)
+*        The upper bounds of the output data array.
+*     STATUS = INTEGER (Given)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B, UB as appropriate.  The 
+*     array supplied to the routine must have the data type specified.
+*     -  The resampling applies to both the data array and any variance
+*     array present.  The bad-pixel flag is set.
+*     -  The AXIS structure is propagated.  The array components of
+*     the insignificant AXIS structures created here have one element
+*     whose value corresponds to the corresponding input value, obtained
+*     by linear interpolation.
+
+*  Copyright:
+*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2007 July 13 (MJC):
+*        Original version derived from code in REGRID.
+*     2007 July 26 (MJC):
+*        Added AXIS propagation.
+*     {enter_further_changes_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'AST_PAR'          ! AST constants and functions
+      INCLUDE 'DAT_PAR'          ! Data-system constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'PRM_PAR'          ! Bad-pixel constants
+      INCLUDE 'MSG_PAR'          ! Message-system constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+
+*  Arguments Given:
+      INTEGER MAPIO
+      CHARACTER*(*) PARAMS( 2 )
+      LOGICAL CONTNR
+      CHARACTER*(*) PATH
+      LOGICAL RESET
+      INTEGER INTERP
+      DOUBLE PRECISION RSPARS( 2 )
+      DOUBLE PRECISION TOL
+      INTEGER NDFI
+      INTEGER IWCS
+      INTEGER NDIM
+      INTEGER LBNDI( NDIM )
+      INTEGER UBNDI( NDIM )
+      INTEGER LBNDO( NDIM )
+      INTEGER UBNDO( NDIM )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      CHARACTER*8 ACOMP( 3 )     ! Axis array components to process
+      INTEGER APNTRI             ! Pointer to input axis array
+      INTEGER APNTRO             ! Pointer to input axis array
+      DOUBLE PRECISION AXVAL( 2 ) ! Bracketing axis array values
+      LOGICAL BAD                ! May there be bad pixels?
+      INTEGER ELI                ! Number of elements in input NDF
+      INTEGER ELO                ! Number of elements in output NDF
+      INTEGER FLAGS              ! Flags sent to AST_RESAMPLE<X>
+      DOUBLE PRECISION FRAC      ! Linear interpolation fraction
+      DOUBLE PRECISION GPI( NDF__MXDIM ) ! Input grid position
+      DOUBLE PRECISION GPO( NDF__MXDIM ) ! Output grid position
+      INTEGER GILBND             ! Grid interpolation lower bound
+      INTEGER GIUBND             ! Grid interpolation upper bound
+      INTEGER GLBNDI( NDF__MXDIM ) ! GRID lower bounds input NDF
+      INTEGER GUBNDI( NDF__MXDIM ) ! GRID upper bounds input NDF
+      INTEGER GLBNDO( NDF__MXDIM ) ! GRID lower bounds output NDF
+      INTEGER GUBNDO( NDF__MXDIM ) ! GRID upper bounds output NDF
+      LOGICAL HASAX              ! Does input NDF have AXIS component?
+      LOGICAL HASAXA             ! Input NDF has AXIS array component?
+      LOGICAL HASVAR             ! Does input NDF have AXIS component?
+      INTEGER I                  ! Loop counter
+      INTEGER ICOMP              ! Loop counter of AXIS array compoents
+      INTEGER IGP                ! Grid index below input grid position
+                                 ! element
+      INTEGER IPDATI             ! Pointer to input Data array
+      INTEGER IPDATO             ! Pointer to output Data array
+      INTEGER IPVARI             ! Pointer to input Variance array
+      INTEGER IPVARO             ! Pointer to output Variance array
+      INTEGER J                  ! Loop counter
+      INTEGER MAXPIX             ! Maximum size of linear approximation 
+                                 ! region
+      INTEGER NBAD               ! Number of bad pixels
+      INTEGER NC                 ! No. of characters in NDF path so far
+      INTEGER NCOMP              ! No. of components within cell of AXIS
+                                 ! array
+      CHARACTER*270 NDFNAM       ! NDF name
+      INTEGER NDFO               ! NDF identifier of output NDF
+      DOUBLE PRECISION NEWVAL    ! New axis array value for fixed axes
+      INTEGER NNDF               ! Number of NDFs
+      INTEGER WCSO               ! Pointer to output NDF's WCS
+
+*  Local Data:
+      DATA ACOMP / 'Centre', 'Width', 'Variance' /
+
+      SAVE NNDF
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+      FLAGS = 0
+
+*  Get the bounds of the output NDF.
+*  =================================
+
+*  Do a check that there is some overlap between the requested range
+*  and the resampled image of the NDF.  Also, set the initial scale size
+*  for the Mapping linear approximation algorithm to be equal to the 
+*  largest dimension (see AST_RESAMPLE<X> documentation).
+      MAXPIX = 50
+      DO I = 1, NDIM
+         MAXPIX = MAX( MAXPIX, UBNDO( I ) - LBNDO( I ) + 1 )
+      END DO
+
+*  Ensure that MAXPIX is larger than the largest dimension.
+      MAXPIX = MAXPIX + 1
+
+*  Obtain placeholder to NDF in container file.
+*  ====================
+      IF ( CONTNR ) THEN
+         IF ( RESET ) NNDF = 1
+
+*  Obtain a placeholder for the output NDF given by the absolute
+*  filename.
+         NDFNAM = ' '
+         NC = 0
+         CALL CHR_PUTC( PATH, NDFNAM, NC )
+         CALL CHR_PUTC( '.PLUCK_', NDFNAM, NC )
+         CALL CHR_PUTI( NNDF, NDFNAM, NC )
+
+*  Store the name in the parameter.
+         CALL AIF_PTFNM( PARAMS( 1 ), NDFNAM, STATUS )
+         CALL MSG_SETC( 'NDF', NDFNAM )
+         CALL MSG_OUTIF( MSG__NORM, ' ', 'Creating ^NDF.', STATUS )
+
+*  Ready for the next invocation.
+         NNDF = NNDF + 1
+      END IF
+
+*  Create and configure the output NDF.
+*  ====================================
+
+*  See if the input NDF has a VARIANCE component.
+      CALL NDF_STATE( NDFI, 'VARIANCE', HASVAR, STATUS )
+
+*  See if the input NDF has an AXIS component.
+      CALL NDF_STATE( NDFI, 'AXIS', HASAX, STATUS )
+
+*  Create a new NDF by propagation from the input one.  We can only use
+*  the LPG wildcard if there is only one output file.
+      IF ( CONTNR .OR. RESET ) THEN
+         CALL LPG_PROP( NDFI, 'AXIS,UNIT', PARAMS( 1 ), NDFO, STATUS )
+      ELSE
+         CALL NDF_PROP( NDFI, 'AXIS,UNIT', PARAMS( 1 ), NDFO, STATUS )
+      END IF
+
+*  Get a title for the new NDF from the parameter system.
+      CALL NDF_CINP( PARAMS( 2 ), NDFO, 'TITLE', STATUS )
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Set the Data and possibly VARIANCE component data types.
+      CALL NDF_STYPE( '<HTYPE>', NDFO, 'DATA', STATUS )
+      IF ( HASVAR ) THEN
+         CALL NDF_STYPE( '<HTYPE>', NDFO, 'VARIANCE', STATUS )
+      END IF
+
+*  Set the shape of the output NDF.
+      CALL NDF_SBND( NDIM, LBNDO, UBNDO, NDFO, STATUS )
+
+*  Map the array components.
+*  =========================
+
+*  Map the Data array of the input and output NDFs.
+      CALL NDF_MAP( NDFI, 'DATA', '<HTYPE>', 'READ', IPDATI, ELI, 
+     :              STATUS )
+      CALL NDF_MAP( NDFO, 'DATA', '<HTYPE>', 'WRITE', IPDATO, ELO,
+     :              STATUS )
+
+*  Find out if there may be bad pixels in the mapped Data array.
+      CALL NDF_BAD( NDFI, 'DATA', .FALSE., BAD, STATUS )
+
+*  Map the VARIANCE component of the input and output NDFs if we are
+*  processing variances.
+      IF ( HASVAR ) THEN
+         CALL NDF_MAP( NDFI, 'VARIANCE', '<HTYPE>', 'READ', IPVARI,
+     :                 ELI, STATUS )
+         CALL NDF_MAP( NDFO, 'VARIANCE', '<HTYPE>', 'WRITE', IPVARO,
+     :                 ELO, STATUS )
+
+*  Unless we already know of bad values in the Data component, see 
+*  whether the VARIANCE component may contain them.
+         IF ( .NOT. BAD ) THEN
+            CALL NDF_BAD( NDFI, 'VARIANCE', .FALSE., BAD, STATUS )
+         END IF
+
+*  Record the fact that variances should be processed.
+         FLAGS = FLAGS + AST__USEVAR
+      ELSE
+         IPVARI = IPDATI
+         IPVARO = IPDATO
+      END IF
+
+*  If either the DATA or VARIANCE component of the input NDF may have
+*  bad values, record this fact.
+      IF ( BAD ) THEN
+         FLAGS = FLAGS + AST__USEBAD
+      END IF
+
+*  Perform the resampling.
+*  =======================
+
+*  For the resampling the retained axes bounds must be switched to
+*  GRID co-ordinates.
+      DO I = 1, NDIM
+         GLBNDI( I ) = 1
+         GUBNDI( I ) = UBNDI( I ) - LBNDI( I ) + 1
+         
+         GLBNDO( I ) = 1
+         GUBNDO( I ) = UBNDO( I ) - LBNDO( I ) + 1
+      END DO
+
+*  Perform the resampling according to data type.
+      NBAD = AST_RESAMPLE<T>( MAPIO, NDIM, GLBNDI, GUBNDI,
+     :                       %VAL( CNF_PVAL( IPDATI ) ), 
+     :                       %VAL( CNF_PVAL( IPVARI ) ), INTERP,
+     :                       AST_NULL, RSPARS, FLAGS, TOL, MAXPIX,
+     :                       VAL__BAD<T>, NDIM, GLBNDO, GUBNDO, GLBNDO,
+     :                       GUBNDO, %VAL( CNF_PVAL( IPDATO ) ), 
+     :                       %VAL( CNF_PVAL( IPVARO ) ), STATUS )
+
+*  Update the WCS.
+*  ===============
+
+*  Use the Mapping from input to output to remap the GRID Frame in the 
+*  input WCS FrameSet.
+      CALL KPG1_GTWCS( NDFI, WCSO, STATUS )
+      CALL AST_REMAPFRAME( WCSO, AST__BASE, MAPIO, STATUS )
+
+*  Store this modified WCS FrameSet in the output NDF.
+      CALL NDF_PTWCS( WCSO, NDFO, STATUS )
+
+*  Correct the AXIS structure for axes not retained.
+*  =================================================
+
+*  The copied AXIS structure has been reshaped, but its arrays
+*  will the wrong values.  Alter the value stored in each such 
+*  mono-element AXIS array component to correspond to the chosen fixed
+*  location along that pixel axis.  This achieved by linear 
+*  interpolation of the bracketting elements in the input array.
+      IF ( HASAX ) THEN
+
+*  Transform the new AXIS GRID positions of 1 for the fixed axes to
+*  the original locations.  Here we should strictly obtain the number
+*  of WCS axes instead of using the number of NDF axes, but we are tied
+*  to pixel/grid axes.
+         DO I = 1, NDIM
+            GPO( I ) = 1.0D0
+         END DO
+         CALL AST_TRANN( MAPIO, 1, NDIM, 1, GPO, .FALSE.,
+     :                   NDIM, 1, GPI, STATUS )
+
+         DO I = 1, NDIM
+
+*  Loop through the potential axis arrays.
+            DO ICOMP = 1, 3
+               CALL NDF_ASTAT( NDFI, ACOMP( ICOMP ), I, HASAXA, STATUS )
+               IF ( HASAXA ) THEN
+
+*  Work in double precision, but the orignla type if different, will be
+*  restored when unmapped.
+                  CALL NDF_AMAP( NDFI, ACOMP( ICOMP ), I, '_DOUBLE', 
+     :                           'READ', APNTRI, ELI, STATUS )
+                  CALL NDF_AMAP( NDFO, ACOMP( ICOMP ), I, '_DOUBLE',
+     :                           'WRITE', APNTRO, ELO, STATUS )
+
+*  Find the limits of the section to extract from the axis array. 
+*  These are the two pixels spanning the fractional grid co-ordinate
+*  in the input NDF.
+                  IGP = INT( GPI( I ) )
+                  GILBND = MAX( 1, IGP )
+                  GIUBND = MIN( GUBNDI( I ), IGP + 1 )
+
+*  Positions beyond the extreme grid positions cannot be interpolated, so we 
+*  can merely extract the end value. 
+                  CALL KPG1_RETRD( ELI, GILBND, 
+     :                             %VAL( CNF_PVAL( APNTRI ) ),
+     :                             AXVAL( 1 ), STATUS )
+                  IF ( GILBND .EQ. GIUBND ) THEN
+                     NEWVAL = AXVAL( 1 )
+                  ELSE
+                     CALL KPG1_RETRD( ELI, GIUBND, 
+     :                                %VAL( CNF_PVAL( APNTRI ) ),
+     :                                AXVAL( 2 ), STATUS )
+
+*  Linear interpolate the grid position to obtain a new output NDF
+*  axis value.  This may not be appropriate for the WIDTH...
+*  Also check for undefined values.
+                     IF ( AXVAL( 1 ) .NE. VAL__BADD .AND.
+     :                    AXVAL( 2 ) .NE. VAL__BADD ) THEN
+                        FRAC = GPI( I ) - DBLE( IGP )
+                        NEWVAL = ( 1.0D0 - FRAC ) * AXVAL( 1 ) +
+     :                           FRAC * AXVAL( 2 )
+                     ELSE
+                        NEWVAL = VAL__BADD
+                     END IF
+                  END IF
+
+*  Insert the interpolated axis-array value into the output NDF.
+                  CALL KPG1_STORD( ELO, 1, NEWVAL, 
+     :                             %VAL( CNF_PVAL( APNTRO ) ), STATUS )
+
+*  Unmap the axis arrays for the current dimension and component.
+                  CALL NDF_AUNMP( NDFI, ACOMP( ICOMP ), I, STATUS )
+                  CALL NDF_AUNMP( NDFO, ACOMP( ICOMP ), I, STATUS )
+               END IF
+            END DO
+         END DO
+      END IF
+
+*  Bad-pixel flag
+*  ==============
+ 
+*  We can set the bad pixels flag according to the bad pixel count 
+*  returned from AST_RESAMPLE<X>.
+      BAD = NBAD .GT. 0
+      CALL NDF_SBAD( BAD, NDFO, 'DATA', STATUS )
+      IF ( HASVAR ) CALL NDF_SBAD( BAD, NDFO, 'VARIANCE', STATUS )
+
+*  Tidy
+*  ====
+  999 CONTINUE
+
+*  Just unmap the input data.
+      CALL NDF_UNMAP( NDFI, 'Data', STATUS )
+      IF ( HASVAR ) CALL NDF_UNMAP( NDFI, 'Variance', STATUS )
+
+*  Free resources associated with the output NDF.
+      CALL NDF_ANNUL( NDFO, STATUS )
+
+      END

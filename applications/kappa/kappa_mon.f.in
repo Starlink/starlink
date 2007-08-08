@@ -103,6 +103,8 @@
 *        Added CUMULVEC.
 *     2007 March 16 (MJC):
 *        Added BEAMFIT.
+*     2007 July 18 (MJC):
+*        Added PLUCK.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -479,6 +481,10 @@
 *  Expands an NDF by pixel duplication.
          ELSE IF ( NAME .EQ. 'PIXDUPE' ) THEN
             CALL PIXDUPE ( STATUS )
+
+*  Plucks slices from an NDF at arbitrary positions.
+         ELSE IF ( NAME .EQ. 'PLUCK' ) THEN
+            CALL PLUCK ( STATUS )
 
 *  Takes the specified power of each pixel of a data array.
          ELSE IF ( NAME .EQ. 'POW' ) THEN

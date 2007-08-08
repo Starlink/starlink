@@ -12,12 +12,12 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun95.32}
+\newcommand{\stardocsource}    {sun95.33}
 \newcommand{\stardocnumber}    {95.32}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2007 July 10}
+\newcommand{\stardocdate}      {2007 July 31}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.7-10}
+\newcommand{\stardocversion}   {1.8}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -4118,7 +4118,7 @@ It is often useful to specify values for some of the attributes of the current
       This attribute controls the appearance of annotated axes by
       determining what to draw for a spectral axis representing a dual
       sideband spectrum. The sideband selected using the
-      \xref{SideBand}{sun210}{SideBand} attribute will always be
+      \xref{\att SideBand}{sun210}{SideBand} attribute will always be
       annotated on the edge of the Plot selected using the
       \htmlattref{Edge(axis)}{Edge(axis)} attribute. In addition, if the
       DrawDSB attribute is non-zero (the default) the other sideband will
@@ -12105,6 +12105,8 @@ picture.}
  Creates a new FRAME picture defined by co-ordinate bounds.}
 \menuitem{PIXDUPE}{
  Expands an NDF by pixel duplication.}
+\menuitem{PLUCK}{
+ Plucks slices from an NDF at arbitrary positions.}
 \menuitem{POW}{
  Takes the specified power of each  pixel of a data array.}
 \menuitem{PROFILE}{
@@ -12522,6 +12524,8 @@ functions as follows.
  Compresses an NDF so that it occupies less disk space.
 \classitem{PIXDUPE}
  Expands an NDF by pixel duplication.
+\classitem{PLUCK}
+ Plucks slices from an NDF at arbitrary positions.
 \classitem{REGRID}
  Uses an arbitrary mapping to regrid an NDF.
 \classitem{SQORST}
@@ -12544,6 +12548,8 @@ functions as follows.
  Copies an NDF (or \htmlref{NDF section}{se:ndfsect}) to a new location.
 \classitem{PERMAXES}
  Permutes the axes of an NDF.
+\classitem{PLUCK}
+ Plucks slices from an NDF at arbitrary positions.
 \classitem{PROFILE}
  Creates a one-dimensional profile through an \textit{n}-dimensional NDF.
 \classitem{REGRID}
@@ -12773,6 +12779,8 @@ WCS component of an NDF.
 \label{cl:regrid}
 \item {\large\bf Resampling and transformations}
 \begin{description}
+\classitem{PLUCK}
+ Plucks slices from an NDF at arbitrary positions.
 \classitem{REGRID}
  Uses an arbitrary mapping to regrid an NDF.
 \classitem{WCSALIGN}
@@ -14389,15 +14397,15 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          \ssthitemlist{
 
             \sstitem
-             {\tt "Initial"} -- The position of the cursor when the mouse
+             {\tt "Initial"} --- The position of the cursor when the mouse
             button is pressed is marked.
 
             \sstitem
-             {\tt "Ellipse"} -- As "Fit" but it also plots an ellipse at the
+             {\tt "Ellipse"} --- As "Fit" but it also plots an ellipse at the
              HWHM radii and orientation.
 
             \sstitem
-             {\tt "None"} -- No positions are marked.
+             {\tt "None"} --- No positions are marked.
 
          }
           {\tt [}current value{\tt{]}}
@@ -14421,19 +14429,19 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          \ssthitemlist{
 
             \sstitem
-            {\tt "Interface"} -- positions are obtained usingparameters POS,
+            {\tt "Interface"} --- positions are obtained usingparameters POS,
             POS2--POS5.
 
             \sstitem
-            {\tt "Cursor"} -- positions are obtained using the graphics cursor
+            {\tt "Cursor"} --- positions are obtained using the graphics cursor
             of the device specified by parameter DEVICE.
 
             \sstitem
-            {\tt "Catalogue"} -- positions are obtained from a positions list
+            {\tt "Catalogue"} --- positions are obtained from a positions list
             using parameter INCAT.
 
             \sstitem
-            {\tt "File"} -- positions are obtained from a text file using
+            {\tt "File"} --- positions are obtained from a text file using
             parameter COIN.
             {\tt [}current value{\tt{]}}
          }
@@ -14480,7 +14488,8 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          If {\tt TRUE}, the co-ordinates supplied through POS2--POS5 are
          interpreted in polar co-ordinates (offset, position angle) 
          about the primary beam.  The radial co-ordinate is a distance 
-         measured in units of the latitude axis if the current WCS Frame
+         measured in units of the latitude axis if the 
+         \htmlref{current WCS Frame}{se:curframe}~
          is a SKY DOMAIN or the first axis for other Frames.  For a 
          SKY current WCS Frame, position angle follows the standard
          convention of North through East.  For other Frames the angle 
@@ -14636,8 +14645,8 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          ORIENT( 2 ) = \_DOUBLE (Write)
       }{
          The primary beam position's orientation and its error, measured
-         in degrees.  If the current WCS frame is a SKY Frame, the angle
-         is measured from North through East.  For other Frames the
+         in degrees.  If the \htmlref{current WCS Frame}{se:curframe}~ is a SKY Frame, 
+         the angle is measured from North through East.  For other Frames the
          angle is from the $X$-axis through $Y$.
       }
       \sstsubsection{
@@ -15595,17 +15604,17 @@ KAPPA: \htmlref{ADD}{ADD},
       \sstitemlist{
 
          \sstitem
-         From the parameter system (see parameter INIT).
+         from the parameter system (see parameter INIT);
 
          \sstitem
          Using a graphics cursor to indicate the feature in a previously
-         displayed data array (see parameter DEVICE).
+         displayed data array (see parameter DEVICE);
 
          \sstitem
-         From a specified positions list (see parameter INCAT).
+         from a specified positions list (see parameter INCAT); or
 
          \sstitem
-         From a simple text file containing a list of co-ordinates (see
+         from a simple text file containing a list of co-ordinates (see
          parameter COIN).
 
       }
@@ -15689,7 +15698,7 @@ KAPPA: \htmlref{ADD}{ADD},
          contain the formatted axis values for a single position, in the
          current Frame of the NDF.  Axis values can be separated by
          spaces, tabs or commas.  The file may contain comment lines
-         with the first character \# or !.
+         with the first character {\tt \#} or {\tt !}.
       }
       \sstsubsection{
          DESCRIBE = \_LOGICAL (Read)
@@ -15799,10 +15808,10 @@ KAPPA: \htmlref{ADD}{ADD},
          \ssthitemlist{
 
             \sstitem
-            {\tt "Interface"}: positions are obtained using parameter INIT.
+            {\tt "Interface"} --- positions are obtained using parameter INIT.
 
             \sstitem
-            {\tt "Cursor"}: --- positions are obtained using the graphics cursor of
+            {\tt "Cursor"} --- positions are obtained using the graphics cursor of
                the device specified by parameter DEVICE.
 
             \sstitem
@@ -16191,58 +16200,58 @@ KAPPA: \htmlref{PASTE}{PASTE},
          \ssthitemlist{
 
             \sstitem
-            {\tt "Mean"} -- Mean value
+            {\tt "Mean"}  --- Mean value
 
             \sstitem
-            {\tt "WMean"}  -- Weighted mean in wich each data value is weighted
+            {\tt "WMean"}  --- Weighted mean in wich each data value is weighted
                         by the reciprocal of the associated variance.  
 
             \sstitem
-            {\tt "Mode"}   -- Modal value
+            {\tt "Mode"}   --- Modal value
 
             \sstitem
-            {\tt "Median"} -- Median value.  Note that this is extremely memory
+            {\tt "Median"} --- Median value.  Note that this is extremely memory
                         and CPU intensive for large datasets; use with 
                         care!  If strange things happen, use {\tt "Mean"}.
 
             \sstitem
-            {\tt "Absdev"} -- Mean absolute deviation from the unweighted mean.
+            {\tt "Absdev"} --- Mean absolute deviation from the unweighted mean.
 
             \sstitem
-            {\tt "Comax"}  -- Co-ordinate of the maximum value.
+            {\tt "Comax"}  --- Co-ordinate of the maximum value.
 
             \sstitem
-            {\tt "Comin"}  -- Co-ordinate of the minimum value.
+            {\tt "Comin"}  --- Co-ordinate of the minimum value.
 
             \sstitem
-            {\tt "Integ"}  -- Integrated value, being the sum of the products 
+            {\tt "Integ"}  --- Integrated value, being the sum of the products 
                         of the value and pixel width in world
                         co-ordinates.
 
             \sstitem
-            {\tt "Iwc"}    -- Intensity-weighted co-ordinate, being the sum of 
+            {\tt "Iwc"}    --- Intensity-weighted co-ordinate, being the sum of 
                         each value times its co-ordinate, all divided by
                         the integrated value (see the {\tt "Integ"} option).
 
             \sstitem
-            {\tt "Iwd"}    -- Intensity-weighted dispersion of the
+            {\tt "Iwd"}    --- Intensity-weighted dispersion of the
                         co-ordinate, normalised like {\tt "Iwc"} by the 
                         integrated value.
 
             \sstitem
-            {\tt "Max"}    -- Maximum value.
+            {\tt "Max"}    --- Maximum value.
 
             \sstitem
-            {\tt "Min"}    -- Minimum value.
+            {\tt "Min"}    --- Minimum value.
 
             \sstitem
-            {\tt "Rms"}    -- Root-mean-square value.
+            {\tt "Rms"}    --- Root-mean-square value.
 
             \sstitem
-            {\tt "Sigma"}  -- Standard deviation about the unweighted mean.
+            {\tt "Sigma"}  --- Standard deviation about the unweighted mean.
 
             \sstitem
-            {\tt "Sum"}    -- The total value.
+            {\tt "Sum"}    --- The total value.
          }
          The selection is restricted if each channel contains three
          or fewer pixels.  For instance, measures of dispersion like
@@ -16286,9 +16295,9 @@ KAPPA: \htmlref{PASTE}{PASTE},
          the pixel with index I covers a range of pixel co-ordinates
          from ($I-1$) to $I$).
 
-         Note, HIGH and LOW should not be equal.  If a null value (!) is
-         supplied for either HIGH or LOW, the entire range of the axis
-         fragmented into channels.  {\tt [!]}
+         Note, HIGH and LOW should not be equal.  If a null value 
+         ({\tt{!}}) is supplied for either HIGH or LOW, the entire range 
+         of the axis fragmented into channels.  {\tt [!]}
       }
       \sstsubsection{
          NCHAN = \_INTEGER (Read)
@@ -16632,7 +16641,8 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
       limits.
 
       This application will typically be used to display a grid of
-      spectra taken from a cube in which the current WCS Frame
+      spectra taken from a cube in which the 
+      \htmlref{current WCS Frame}{se:curframe}~
       includes one spectral axis (\emph{e.g.} frequency) and two
       spatial axes (\emph{e.g.} RA and Dec).  For this reason the
       following documentation refers to the `spectral axis' and the
@@ -16811,12 +16821,12 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          \ssthitemlist{
 
             \sstitem
-            {\tt "Range"} -- The minimum and maximum data values in the
+            {\tt "Range"} --- The minimum and maximum data values in the
             supplied cube are used as the defaults for YBOT and YTOP.  No
             other sub-strings are needed by this option.
 
             \sstitem
-            {\tt "Extended"} -- The minimum and maximum data values in the
+            {\tt "Extended"} --- The minimum and maximum data values in the
             cube are extended by percentages of the data range, specified
             by the second and third sub-strings.  For instance, if the
             value {\tt "Ex,10,5"} is supplied, then the default for YBOT is set
@@ -16827,7 +16837,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
             supplied, both values default to {\tt "2.5"}.
 
             \sstitem
-            {\tt "Percentile"} -- The default values for YBOT and YTOP are
+            {\tt "Percentile"} --- The default values for YBOT and YTOP are
             set to the specified percentiles of the data in the supplied
             cube.  For instance, if the value {\tt "Per,10,99"} is supplied,
             then the default for YBOT is set so that the lowest 10\% of
@@ -16838,7 +16848,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
             no values are supplied, the values default to {\tt "5,95"}.
 
             \sstitem
-            {\tt "Sigma"} -- The default values for YBOT and YTOP are set to
+            {\tt "Sigma"} --- The default values for YBOT and YTOP are set to
             the specified numbers of standard deviations below and above
             the mean of the data.  For instance, if the value
             {\tt "sig,1.5,3.0"} is supplied, then the default for YBOT is set
@@ -17517,58 +17527,58 @@ XV; PBMPLUS; NETPBM.
          \ssthitemlist{
 
             \sstitem
-            {\tt "Mean"} -- Mean value
+            {\tt "Mean"} --- Mean value
 
             \sstitem
-            {\tt "WMean"}  -- Weighted mean in wich each data value is weighted
+            {\tt "WMean"}  --- Weighted mean in wich each data value is weighted
                         by the reciprocal of the associated variance.  
 
             \sstitem
-            {\tt "Mode"}   -- Modal value
+            {\tt "Mode"}   --- Modal value
 
             \sstitem
-            {\tt "Median"} -- Median value.  Note that this is extremely memory
+            {\tt "Median"} --- Median value.  Note that this is extremely memory
                         and CPU intensive for large datasets; use with 
                         care!  If strange things happen, use {\tt "Mean"}. \\
 
             \sstitem
-            {\tt "Absdev"} -- Mean absolute deviation from the unweighted mean.
+            {\tt "Absdev"} --- Mean absolute deviation from the unweighted mean.
 
             \sstitem
-            {\tt "Comax"}  -- Co-ordinate of the maximum value.
+            {\tt "Comax"}  --- Co-ordinate of the maximum value.
 
             \sstitem
-            {\tt "Comin"}  -- Co-ordinate of the minimum value.
+            {\tt "Comin"}  --- Co-ordinate of the minimum value.
 
             \sstitem
-            {\tt "Integ"}  -- Integrated value, being the sum of the products 
+            {\tt "Integ"}  --- Integrated value, being the sum of the products 
                         of the value and pixel width in world
                         co-ordinates.
 
             \sstitem
-            {\tt "Iwc"}    -- Intensity-weighted co-ordinate, being the sum of 
+            {\tt "Iwc"}    --- Intensity-weighted co-ordinate, being the sum of 
                         each value times its co-ordinate, all divided by
                         the integrated value (see the {\tt "Integ"} option).
 
             \sstitem
-            {\tt "Iwd"}    -- Intensity-weighted dispersion of the
+            {\tt "Iwd"}    --- Intensity-weighted dispersion of the
                         co-ordinate, normalised like {\tt "Iwc"} by the 
                         integrated value.
 
             \sstitem
-            {\tt "Max"}    -- Maximum value.
+            {\tt "Max"}    --- Maximum value.
 
             \sstitem
-            {\tt "Min"}    -- Minimum value.
+            {\tt "Min"}    --- Minimum value.
 
             \sstitem
-            {\tt "Rms"}    -- Root-mean-square value.
+            {\tt "Rms"}    --- Root-mean-square value.
 
             \sstitem
-            {\tt "Sigma"}  -- Standard deviation about the unweighted mean.
+            {\tt "Sigma"}  --- Standard deviation about the unweighted mean.
 
             \sstitem
-            {\tt "Sum"}    -- The total value.
+            {\tt "Sum"}    --- The total value.
          }
          {\tt ["Mean"]}
       }
@@ -20640,8 +20650,8 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          area on the screen.  If SQRPIX is {\tt FALSE}, then the default 
          value for YMAGN is chosen so that each pixel occupies a rectangular 
          area on the screen matching the pixel aspect ratio at the centre of 
-         the image, determined  within the current WCS Frame.  {\tt[!]}
-
+         the image, determined  within the \htmlref{current WCS 
+         Frame}{se:curframe}~ {\tt[!]}
 
          The vertical magnification for the image.  The default
          value of 1.0 corresponds to 'normal' magnification in which the
@@ -27899,18 +27909,19 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
       \sstsubsection{
          ALIGNSYS = LITERAL (Read)
       }{
-         This is only used if a {\tt TRUE} value is supplied for parameter 
-         ALIGN.  It specifies the co-ordinate system in which the new plot
-         and the existing plot are aligned (for further details see the
-         description of the AlignSystem attribute in SUN/211).  The supplied 
-         name should be a valid co-ordinate system name for the horizontal 
-         axis (see the description of the "System" attribute in SUN/211 
-         for a list of these names).  It may also take the special value 
-         "Data", in which case alignment occurs in the co-ordinate system 
-         represented by the current WCS Frame in the supplied NDF.  If a 
-         null ({\tt{!}}) value is supplied.  The alignment system is 
-         determined by the current value of AlignSystem attribute in the 
-         supplied NDF.  {\tt ["Data"]}
+         This is only used if a {\tt TRUE} value is supplied for parameter
+	 ALIGN.  It specifies the co-ordinate system in which the new plot and
+	 the existing plot are aligned (for further details see the
+	 description of the {\xref{\att{AlignSystem}}{sun210}{AlignSystem}}
+	 attribute in \xref{SUN/210}{sun210}{}.).  The supplied name should be
+	 a valid co-ordinate system name for the horizontal axis (see the
+	 description of the {\xref{\att{System}}{sun210}{System}} attribute in
+	 SUN/210 for a list of these names).  It may also take the special
+	 value {\tt "Data"}, in which case alignment occurs in the co-ordinate
+	 system represented by the \htmlref{current WCS Frame}{se:curframe}~
+	 in the supplied NDF.  If a null ({\tt{!}}) value is supplied.  The
+	 alignment system is determined by the current value of {\att
+	 AlignSystem} attribute in the supplied NDF.  {\tt ["Data"]}
       }
       \sstsubsection{
          AXES = \_LOGICAL (Read)
@@ -31678,8 +31689,8 @@ KAPPA: \htmlref{FITSURFACE}{FITSURFACE},
       }{
          This transposes the two-dimensional NDF image so that its \textit{x} pixel
          co-ordinates are in the \textit{y} direction and vice versa.  The ordering
-         of the axes within the current WCS Frame will only be changed if
-         the Domain of the current Frame is PIXEL or AXES.  For instance,
+         of the axes within the \htmlref{current WCS Frame}{se:curframe}~ will only 
+         be changed if the Domain of the current Frame is PIXEL or AXES.  For instance,
          if the current Frame has Domain {\tt "SKY"}, with axis 1 being RA and
          axis 2 being DEC, then these will be unchanged in the output NDF.
          However, the Mapping which is used to relate (RA,DEC) positions
@@ -34212,19 +34223,19 @@ KAPPA: \htmlref{ADD}{ADD},
          \ssthitemlist{
 
             \sstitem
-            {\tt "\_INTEGER"} -- 4-byte signed integers
+            {\tt "\_INTEGER"} --- 4-byte signed integers
 
             \sstitem
-            {\tt "\_WORD"} -- 2-byte signed integers
+            {\tt "\_WORD"} --- 2-byte signed integers
 
             \sstitem
-            {\tt "\_UWORD"} -- 2-byte unsigned integers
+            {\tt "\_UWORD"} --- 2-byte unsigned integers
 
             \sstitem
-            {\tt "\_BYTE"} -- 1-byte signed integers
+            {\tt "\_BYTE"} --- 1-byte signed integers
 
             \sstitem
-            {\tt "\_UBYTE"} -- 1-byte unsigned integers
+            {\tt "\_UBYTE"} --- 1-byte unsigned integers
 
          }
          The same data type is used for both DATA and (if required)
@@ -34320,48 +34331,49 @@ KAPPA: \htmlref{ADD}{ADD},
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         A \htmlref{title}{apndf:title} for the output NDF.  A null value (the default) will
-         cause the title of the NDF supplied for parameter IN to be
-         used instead. {\tt [!]}
+         A \htmlref{title}{apndf:title} for the output NDF.  A null value 
+         (the default) will cause the title of the NDF supplied for 
+         parameter IN to be used instead. {\tt [!]}
       }
       \sstsubsection{
          TRIM = \_LOGICAL (Read)
       }{
-         If {\tt TRUE}, then the number of pixel axes in the output NDF will be
-         reduced if necessary to remove any pixel axes which span only a
-         single pixel.  For instance if {\tt stokes} is a three-dimensional data cube with
-         pixel bounds (1:100,-50:40,1:3), and the parameter IN is given the
-         value {\tt "stokes(,,2)"}, then the dimensionality of the output depends
-         on the setting of TRIM: if TRIM={\tt FALSE} the output is three-dimensional with pixel
-         bounds (1:100,-50:40,2:2) and if TRIM={\tt TRUE} the output is two-dimensional with
-         pixel bounds (1:100,-50:40).  In this example, the third pixel
-         axis spans only a single pixel and is consequently removed if
-         TRIM={\tt TRUE}.  {\tt [FALSE]}
+         If {\tt TRUE}, then the number of pixel axes in the output NDF will
+	 be reduced if necessary to remove any pixel axes which span only a
+	 single pixel.  For instance if {\tt stokes} is a three-dimensional
+	 data cube with pixel bounds (1:100,-50:40,1:3), and the parameter IN
+	 is given the value {\tt "stokes(,,2)"}, then the dimensionality of
+	 the output depends on the setting of TRIM: if TRIM={\tt FALSE} the
+	 output is three-dimensional with pixel bounds (1:100,-50:40,2:2) and
+	 if TRIM={\tt TRUE} the output is two-dimensional with pixel bounds
+	 (1:100,-50:40).  In this example, the third pixel axis spans only a
+	 single pixel and is consequently removed if TRIM={\tt TRUE}.  {\tt
+	 [FALSE]}
       }
       \sstsubsection{
          TRIMWCS = \_LOGICAL (Read)
       }{
          This parameter is only accessed if parameter TRIM is {\tt TRUE}.  It
-         controls the number of axes in the current WCS \htmlref{co-ordinate Frame}{se:domains}~ 
-         of the output NDF.  If TRIMWCS={\tt YES}, then the current Frame in the
-         output NDF will have the same number of axes as there are pixel
-         axes in the output NDF.  If this involves removing axes, then the
-         axes to retain are specified by parameter USEAXIS.  If TRIMWCS={\tt NO}
-         then all axes are retained in the current WCS Frame of the
-         output NDF. Using the example in the description of the TRIM
-         parameter, if the input NDF {\tt stokes} has a three-dimensional current WCS Frame
-         with axes (Ra,Dec,Stokes) and TRIMWSC=YES, then an axis will be
-         removed from the current Frame to make it 2 dimensional (that
-         is, to match the number of pixel axes remaining after the
-         removal of insignificant pixel axes).  The choice of which two
-         axes to retain is controlled by parameter USEAXIS.  If, on the
-         other hand, TRIMWCS was set to {\tt FALSE}, then the output NDF would
-         still have two pixel axes, but the current WCS Frame would retain
-         all three axes from the input NDF.  If one or more current Frame
-         axes are removed, the transformation from the current Frame to
-         pixel Frame may become undefined resulting in some WCS operations
-         being unusable.  The inverse of this transformation (from pixel
-         Frame to current Frame) is unchanged however. {\tt [TRUE]}
+	 controls the number of axes in the current WCS \htmlref{co-ordinate
+	 Frame}{se:domains}~ of the output NDF. If TRIMWCS={\tt YES}, then the
+	 current Frame in the output NDF will have the same number of axes as
+	 there are pixel axes in the output NDF.  If this involves removing
+	 axes, then the axes to retain are specified by parameter USEAXIS.  If
+	 TRIMWCS={\tt NO} then all axes are retained in the \htmlref{current
+	 WCS Frame}{se:curframe}~ of the output NDF. Using the example in the
+	 description of the TRIM parameter, if the input NDF {\tt stokes} has
+	 a three-dimensional current WCS Frame with axes (Ra,Dec,Stokes) and
+	 TRIMWSC=YES, then an axis will be removed from the current Frame to
+	 make it 2 dimensional (that is, to match the number of pixel axes
+	 remaining after the removal of insignificant pixel axes). The choice
+	 of which two axes to retain is controlled by parameter USEAXIS.  If,
+	 on the other hand, TRIMWCS was set to {\tt FALSE}, then the output
+	 NDF would still have two pixel axes, but the current WCS Frame would
+	 retain all three axes from the input NDF.  If one or more current
+	 Frame axes are removed, the transformation from the current Frame to
+	 pixel Frame may become undefined resulting in some WCS operations
+	 being unusable.  The inverse of this transformation (from pixel Frame
+	 to current Frame) is unchanged however. {\tt [TRUE]}
       }
       \sstsubsection{
          USEAXIS = LITERAL (Read)
@@ -34464,7 +34476,7 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
 
          \sstitem
          attributes of the current \htmlref{co-ordinate Frame}{se:domains}~ in the \htmlref{WCS}{apndf:wcs} component
-         (title, domain, and ,optionally, axis labels and axis units, plus the
+         (title, domain, and, optionally, axis labels and axis units, plus the
          system epoch and projection for sky co-ordinate Frames). In addition 
          the bounding box of the NDF within the Frame is displayed.
 
@@ -34641,7 +34653,8 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
       \sstsubsection{
          FLABEL( ) = LITERAL (Write)
       }{
-         The axis labels from the current WCS Frame of the NDF.
+         The axis labels from the \htmlref{current WCS 
+         Frame}{se:curframe}~ of the NDF.
       }
       \sstsubsection{
          FLBND( ) = \_DOUBLE (Write)
@@ -38108,6 +38121,379 @@ KAPPA: \htmlref{COMPADD}{COMPADD},
       }
    }
 }
+
+\sstroutine{
+   PLUCK
+}{
+   Plucks slices from an NDF at arbitrary positions
+}{
+   \sstdescription{
+      This application's function is to extract data at scientifically
+      relevant points such as the spatial location of a source or
+      wavelength of a spectral feature, rather than at data sampling
+      points (for which \htmlref{NDFCOPY}{NDFCOPY} is appropriate).
+      This is achieved by the extraction of interpolated slices from
+      an \NDFref{NDF}.  A slice is located at a supplied set of
+      co-ordinates in the \htmlref{current WCS Frame}{se:curframe}~
+      for some but not all axes, and it possesses one fewer
+      significant dimension per supplied co-ordinate.  The slices run
+      parallel to pixel axes of the NDF.
+
+      The interpolation uses one of a selection of resampling methods
+      to effect the non-integer shifts along the fixed axes, applied to
+      each output element along the retained axes (see the METHOD,
+      PARAMS, and TOL parameters).
+
+      Three routes are available for obtaining the fixed positions,
+      selected using parameter MODE:
+
+      \sstitemlist{
+
+         \sstitem
+         from the parameter system (see parameter POS);
+
+         \sstitem
+         from a specified positions list (see parameter INCAT); or
+
+         \sstitem
+         from a simple text file containing a list of co-ordinates (see
+         parameter COIN).
+
+      }
+      In the first mode the application loops, asking for new extraction
+      co-ordinates until it is told to quit or encounters an error.
+      However there is no looping if the position has been supplied on
+      the command line.
+
+      Each extracted dataset is written to a new NDF, which however, may
+      reside in a single container file (see the CONTAINER parameter).
+   }
+   \sstusage{
+      pluck in axes out method [mode]
+         $\left\{ {\begin{tabular}{l}
+                   pos \\
+                   coin=? \\
+                   incat=?
+                   \end{tabular} }
+          \right.$
+          \newline\latexelsehtml{\hspace*{15.85em}}{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+          \makebox[0mm][c]{\small mode}
+   }
+   \sstparameters{
+      \sstsubsection{
+         AXES( ) = \_INTEGER (Read)
+      }{
+         The WCS axis or axes to remain in the output NDF.   The slice
+         will therefore contain an array comprising all the elements
+         along these axes.  The maximum number of axes is one fewer
+         than the number of WCS axes in the NDF.
+
+         Each axis can be specified by its integer index within the
+         current Frame of the input NDF (in the range 1 to the number
+         of axes in the current Frame), or by its symbol string.  A list
+         of acceptable values is displayed if an illegal value is
+         supplied.  If the axes of the current Frame are not parallel to
+         the NDF pixel axes, then the pixel axis which is most nearly
+         parallel to the specified current Frame axis will be used.
+      }
+      \sstsubsection{
+         COIN = FILENAME (Read)
+      }{
+         Name of a text file containing the co-ordinates of slices to
+         be plucked.  It is only accessed if parameter MODE is given the
+         value {\tt "File"}.  Each line should contain the formatted axis
+         values for a single position, in the current Frame of the NDF.
+         Axis values can be separated by spaces, tabs or commas.  The
+         file may contain comment lines with the first character 
+         {\tt \#} or {\tt !}.
+      }
+      \sstsubsection{
+         CONTAINER = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, each slice extracted is written as an NDF component of
+         the HDS container file specified by the OUT parameter.  The $n$th
+         component will be named PLUCK\_$n$.  If set {\tt FALSE}, each 
+         extraction is written to a separate file.  On-the-fly format 
+         conversion to foreign formats is not possible when 
+         CONTAINER={\tt TRUE}.  {\tt [FALSE]}
+      }
+      \sstsubsection{
+         DESCRIBE = \_LOGICAL (Read)
+      }{
+         If TRUE, a detailed description of the co-ordinate Frame in
+         which the fixed co-ordinates are to be supplied is displayed
+         before the positions themselves.  It is ignored if
+         MODE={\tt "Catalogue"}.  {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         INCAT = FILENAME (Read)
+      }{
+         A catalogue containing a positions list giving the co-ordinates
+         of the fixed positions, such as produced by applications 
+         \htmlref{CURSOR}{CURSOR}, \htmlref{LISTMAKE}{LISTMAKE},
+         \emph{etc.}  It is only accessed if parameter MODE is given
+         the value {\tt "Catalogue"}.  The catalogue should have a WCS Frame
+         common with the NDF, so that the NDF and catalogue FrameSets
+         can be aligned.
+      }
+      \sstsubsection{
+         MODE = \htmlref{LITERAL}{se:parmenu} (Read)
+      }{
+         The mode in which the initial co-ordinates are to be obtained.
+         The supplied string can be one of the following values.
+
+         \ssthitemlist{
+
+            \sstitem
+            {\tt "Interface"} --- positions are obtained using parameter POS.
+
+            \sstitem
+            {\tt "Catalogue"} --- positions are obtained from a positions list
+              using parameter INCAT.
+
+            \sstitem
+            {\tt "File"} --- positions are obtained from a text file using
+              parameter COIN.
+
+         }
+         {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The NDF structure containing the data to be extracted.  It
+         must have at least two dimensions.
+      }
+      \sstsubsection{
+         METHOD = LITERAL (Read)
+      }{
+         The method to use when sampling the input pixel values.  For 
+         details of these schemes, see the descriptions of routine 
+         \xref{AST\_RESAMPLEx}{sun210}{AST_RESAMPLEX} in 
+         \xref{SUN/210}{sun210}{}.  METHOD can take the following values.
+
+         \ssthitemlist{
+
+            \sstitem
+            {\tt "Linear"} --- When resampling, the output pixel values are
+            calculated by linear interpolation in the input NDF among the
+            two nearest pixel values along each axis chosen by AXES.  This 
+            method produces smoother output NDFs than the
+            nearest-neighbour scheme, but is marginally slower.
+
+            \sstitem
+            {\tt "Sinc"} --- Uses the ${\rm sinc}({\pi}x)$ kernel, where 
+            $x$ is the pixel offset from the interpolation point and
+            ${\rm sinc}(z)=\sin(z)/z$.  Use of this scheme is not recommended.
+
+            \sstitem
+            {\tt "SincSinc"} --- Uses the ${\rm sinc}({\pi}x){\rm sinc}(k{\pi}x)$ 
+            kernel.  A valuable general-purpose scheme, intermediate in its visual
+            effect on NDFs between the linear option and using the
+            nearest neighbour.
+
+            \sstitem
+            {\tt "SincCos"} --- Uses the  ${\rm sinc}({\pi}x)\cos(k{\pi}x)$ 
+            kernel.  Gives similar results to the {\tt "SincSinc"} scheme.
+
+            \sstitem
+            {\tt "SincGauss"} --- Uses the ${\rm sinc}({\pi}x)e^{-kx^2}$ 
+            kernel.  Good results can be obtained by matching the FWHM of the
+            envelope function to the point-spread function of the
+            input data (see parameter PARAMS).
+
+            \sstitem
+            {\tt "Somb"} --- Uses the  ${\rm somb}({\pi}x)$ kernel, where 
+            $x$ is the pixel offset from the interpolation point, and 
+            ${\rm somb}(z)=2*J_{1}(z)/z$ ($J_1$ is the first-order Bessel 
+            function of the first kind.  This scheme is similar to the 
+            {\tt "Sinc"} scheme.
+
+            \sstitem
+            {\tt "SombCos"} --- Uses the ${\rm somb}({\pi}x)\cos(k{\pi}x)$ 
+            kernel.  This scheme is similar to the {\tt "SincCos"} scheme.
+
+            \sstitem
+            {\tt "BlockAve"}  --- Block averaging over all pixels in the
+            surrounding $N$-dimensional cube.
+
+         }
+         All methods propagate variances from input to output, but the
+         variance estimates produced by interpolation schemes need to be
+         treated with care since the spatial smoothing produced by these
+         methods introduces correlations in the variance estimates.
+         {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The name for the output NDF, or the name of the single
+         container file if CONTAINER={\tt TRUE}.
+      }
+      \sstsubsection{
+         PARAMS( 2 ) = \_DOUBLE (Read)
+      }{
+         An optional array which consists of additional parameters
+         required by the Sinc, SincSinc, SincCos, SincGauss, Somb,
+         SombCos, and Gauss methods.
+
+         PARAMS(1) is required by all the above schemes.  It is used
+	 to specify how many pixels are to contribute to the
+	 interpolated result on either side of the interpolation in
+	 each dimension.  Typically, a value of {\tt 2} is appropriate
+	 and the minimum allowed value is {\tt 1} (\emph{i.e.} one
+	 pixel on each side).  A value of zero or fewer indicates that
+	 a suitable number of pixels should be calculated
+	 automatically. {\tt [0]}
+
+         PARAMS(2) is required only by the SombCos, Gauss, SincSinc,
+         SincCos, and SincGauss schemes.  For the SombCos, SincSinc, and
+         SincCos schemes, it specifies the number of pixels at which the
+         envelope of the function goes to zero.  The minimum value is
+         1.0, and the run-time default value is 2.0.  For the Gauss and
+         SincGauss scheme, it specifies the full-width at half-maximum
+         (FWHM) of the Gaussian envelope.  The minimum value is 0.1, and
+         the run-time default is 1.0.  On astronomical images and
+         spectra, good results are often obtained by approximately
+         matching the FWHM of the envelope function, given by PARAMS(2),
+         to the point-spread function of the input data.  []
+      }
+      \sstsubsection{
+         POS( ) = LITERAL (Read)
+      }{
+         An the co-ordinates of the next slice to be extracted, in the
+         current co-ordinate Frame of the NDF (supplying a colon {\tt ":"}
+         will display details of the current co-ordinate Frame).  The
+         position should be supplied as a list of formatted axis values
+         separated by spaces or commas.  POS is only accessed if
+         parameter MODE is given the value {\tt "Interface"}.  If the
+         co-ordinates are supplied on the command line only one
+         slice will be extracted; otherwise the application will ask
+         for further positions which may be terminated by supplying the
+         null value ({\tt{!}}).
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         A Title for every output NDF structure.  A null value ({\tt{!}})
+         propagates the title from the input NDF to all output NDFs.
+         {\tt [!]}
+      }
+      \sstsubsection{
+         TOL = \_DOUBLE (Read)
+      }{
+         The maximum tolerable geometrical distortion which may be
+         introduced as a result of approximating non-linear Mappings
+         by a set of piece-wise linear transforms.  Both
+         algorithms approximate non-linear co-ordinate transformations
+         in order to improve performance, and this parameter controls
+         how inaccurate the resulting approximation is allowed to be,
+         as a displacement in pixels of the input NDF.  A value of
+         zero will ensure that no such approximation is done, at the
+         expense of increasing execution time. {\tt [0.05]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         pluck omc1 pos="5:35:13.7,-5:22:13.6" axes=FREQ
+            method=sincgauss params=[3,5] out=omc1\_trap
+      }{
+         The NDF omc1 is a spectral-imaging cube with
+         (Right ascension, declination, frequency) World Co-ordinate
+         axes.  This example extracts a spectrum at 
+         RA=$5{\hr}35{\mn}13.{\us}7$, Dec=$-5{\dgs}22{\arcm}13.{\uarcs}6$
+         using the SincGauss interpolation method.
+         Three pixels either side of the point are used to interpolate,
+         the full-width half-maximum of the Gaussian is five pixels.
+         The resultant spectrum called omc1\_trap, is still a cube, but
+         its spatial dimensions each only have one element.
+      }
+      \sstexamplesubsection{
+         pluck omc1 mode=cat incat=a axes=FREQ container out=omc1\_spectra
+      }{
+         This example reads the fixed positions from the
+         positions list in file {\tt a.FIT}.  The selected spectra are stored
+         in an HDS container file called {\tt omc1\_spectra.sdf}.
+      }
+      \sstexamplesubsection{
+         pluck omc1 pos=3.45732E11 axes="RA,Dec" method=lin out=peakplane
+      }{
+         This example extracts a plane from omc1 at frequency
+         3.45732E11 Hz using linear interpolation and stores it in NDF
+         peakplane.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         In Interface or File modes all positions should be supplied in
+         the current co-ordinate Frame of the NDF.  A description of the
+         co-ordinate Frame being used is given if parameter DESCRIBE is set
+         to a {\tt TRUE} value.  Application \htmlref{WCSFRAME}{WCSFRAME} 
+         can be used to change the current co-ordinate Frame of the
+	 NDF before running this application if required.
+
+         \sstitem
+         The output NDF has the same dimensionality as the input NDF,
+         although the axes with fixed co-ordinates (those not specified
+         by the AXES parameter) are degenerate, having bounds of 1:1.
+         The retention of these insignificant axes enables the
+         co-ordinates of where the slice originated to be recorded.
+         Such fixed co-ordinates may be examined with say 
+         \htmlref{NDFTRACE}{NDFTRACE}.  NDFCOPY may be used to trim the 
+         degenerate axes if their presence
+         prevents some old non-KAPPA tasks from operating.
+
+         \sstitem
+         In Catalogue or File modes the table file need only contain
+         columns supplying the fixed positions.  In this case the
+         co-ordinates along the retained axes are deemed to be independent,
+         that is they do not affect the shifts required of the other axes.
+         In practice this assumption only affects File mode, as catalogues
+         made with CURSOR or LISTMAKE will contain WCS information.
+
+         In Interface mode representaive co-ordinates along retained axes
+         are the midpoints of the bounds of an array that would contain the
+         resampled copy of the whole input array.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+KAPPA: \htmlref{NDFCOPY}{NDFCOPY},
+\htmlref{REGRID}{REGRID}.
+   }
+   \sstimplementationstatus{
+      \ssthitemlist{
+
+         \sstitem
+         The \htmlref{LABEL}{apndf:label}, \htmlref{UNITS}{apndf:units}, and 
+         \htmlref{HISTORY}{apndf:history}~ components, and all extensions
+         are propagated.  \htmlref{TITLE}{apndf:title} is controlled by the 
+         TITLE parameter.  DATA, \htmlref{VARIANCE}{apndf:variance}, 
+         \htmlref{AXIS}{apndf:axis}, and \htmlref{WCS}{apndf:wcs} are 
+         propagated after appropriate modification.  The
+         \htmlref{QUALITY}{apndf:quality} component is not propagated.
+
+         \sstitem
+         The processing of \htmlref{bad pixels}{se:masking} and automatic
+         \htmlref{quality masking}{se:qualitymask} are supported.
+
+         \sstitem
+         All \htmlref{non-complex numeric data types}{ap:HDStypes} can be handled.
+
+         \sstitem
+         The minimum number of dimensions in the input NDF is two.
+
+         \sstitem
+         Processing a group of input NDFs is not supported unless
+         CONTAINER={\tt TRUE} or when only one output NDF is created per
+         input file.
+      }
+   }
+}
+
 \sstroutine{
    POW
 }{
@@ -39113,7 +39499,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
          \ssthitemlist{
 
             \sstitem
-            {\tt "Bilinear"} -- When resampling, the output pixel values are
+            {\tt "Bilinear"} --- When resampling, the output pixel values are
             calculated by bi-linear interpolation among the four nearest pixels
             values in the input NDF.  When rebinning, the input pixel value
             is divided up bi-linearly between the four nearest output pixels.
@@ -39121,34 +39507,34 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
             is marginally slower.
 
             \sstitem
-            {\tt "Nearest"} -- When resampling, the output pixel values are assigned
+            {\tt "Nearest"} --- When resampling, the output pixel values are assigned
             the value of the single nearest input pixel.  When rebinning,
             the input pixel value is assigned completely to the single
             nearest output pixel.
 
             \sstitem
-            {\tt "Sinc"} -- Uses the ${\rm sinc}({\pi}x)$ kernel, where $x$ is the pixel
+            {\tt "Sinc"} --- Uses the ${\rm sinc}({\pi}x)$ kernel, where $x$ is the pixel
             offset from the interpolation point (resampling) or transformed
             input pixel centre (rebinning), and ${\rm sinc}(z)=\sin(z)/z$.  Use of this
             scheme is not recommended.
 
             \sstitem
-            {\tt "SincSinc"} -- Uses the ${\rm sinc}({\pi}x){\rm sinc}(k{\pi}x)$ kernel.  A
+            {\tt "SincSinc"} --- Uses the ${\rm sinc}({\pi}x){\rm sinc}(k{\pi}x)$ kernel.  A
             valuable general-purpose scheme, intermediate in its visual effect
             on NDFs between the bi-linear and nearest-neighbour schemes.
 
             \sstitem
-            {\tt "SincCos"} -- Uses the ${\rm sinc}({\pi}x)\cos(k{\pi}x)$ kernel.  Gives
+            {\tt "SincCos"} --- Uses the ${\rm sinc}({\pi}x)\cos(k{\pi}x)$ kernel.  Gives
             similar results to the {\tt "Sincsinc"} scheme.
 
             \sstitem
-            {\tt "SincGauss"} -- Uses the ${\rm sinc}({\pi}x)e^{-kx^2}$ kernel.  Good
+            {\tt "SincGauss"} --- Uses the ${\rm sinc}({\pi}x)e^{-kx^2}$ kernel.  Good
             results can be obtained by matching the FWHM of the
             envelope function to the point-spread function of the
             input data (see parameter PARAMS).
 
             \sstitem
-            {\tt "Somb"} -- Uses the ${\rm somb}({\pi}x)$ kernel, where $x$ is the pixel
+            {\tt "Somb"} --- Uses the ${\rm somb}({\pi}x)$ kernel, where $x$ is the pixel
             offset from the interpolation point (resampling) or transformed
             input pixel centre (rebinning), and
             ${\rm somb}(z)=2*J_{1}(z)/z$ ($J_1$ is the
@@ -39156,18 +39542,18 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
             similar to the {\tt "Sinc"} scheme.
 
             \sstitem
-            {\tt "SombCos"} -- Uses the ${\rm somb}({\pi}x)\cos(k{\pi}x)$ kernel.  This 
+            {\tt "SombCos"} --- Uses the ${\rm somb}({\pi}x)\cos(k{\pi}x)$ kernel.  This 
             scheme is similar to the {\tt "SincCos"} scheme.
 
             \sstitem
-            {\tt "Gauss"} -- Uses the $e^{-kx^2}$ kernel.  This option is only
+            {\tt "Gauss"} --- Uses the $e^{-kx^2}$ kernel.  This option is only
             available when rebinning (\emph{i.e.} if REBIN is set to {\tt TRUE}).
             The FWHM of the Gaussian is given by parameter PARAMS(2), and
             the point at which to truncate the Gaussian to zero is given by
             parameter PARAMS(1).
 
             \sstitem
-            {\tt "BlockAve"}  -- Block averaging over all pixels in the
+            {\tt "BlockAve"}  --- Block averaging over all pixels in the
             surrounding $N$-dimensional cube. This option is only available
             when resampling (\emph{i.e.} if REBIN is set to {\tt FALSE}).
 
@@ -39201,25 +39587,27 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
          required by the Sinc, SincSinc, SincCos, SincGauss, Somb,
          SombCos, and Gauss methods.
 
-         PARAMS(1) is required by all the above schemes.
-         It is used to specify how many pixels are to contribute to the
-         interpolated result on either side of the interpolation or binning
-         point in each dimension.  Typically, a value of {\tt 2} is appropriate and
-         the minimum allowed value is {\tt 1} (\emph{i.e.} one pixel on each side).
-         A value of zero or fewer indicates that a suitable number of pixels
-         should be calculated automatically. {\tt [0]}
+         PARAMS(1) is required by all the above schemes.  It is used to
+	 specify how many pixels are to contribute to the interpolated
+	 result on either side of the interpolation or binning point
+	 in each dimension.  Typically, a value of {\tt 2} is
+	 appropriate and the minimum allowed value is {\tt 1}
+	 (\emph{i.e.} one pixel on each side). A value of zero or
+	 fewer indicates that a suitable number of pixels should be
+	 calculated automatically. {\tt [0]}
 
-         PARAMS(2) is required only by the Gauss, SincSinc, SincCos, and
-         SincGauss schemes.  For the SombCos, SincSinc, and SincCos
-         schemes, it specifies the number of pixels at which the envelope
-         of the function goes to zero.  The minimum value is 1.0, and the
-         run-time default value is 2.0.  For the Gauss and SincGauss scheme, it
-         specifies the full-width at half-maximum (FWHM) of the Gaussian
-         envelope.  The minimum value is 0.1, and the run-time default is
-         1.0.  On astronomical images and spectra, good results are often
-         obtained by approximately matching the FWHM of the envelope
-         function, given by PARAMS(2), to the point-spread function of the
-         input data. {\tt []}
+         PARAMS(2) is required only by the Gauss, SincSinc, SincCos,
+	 and SincGauss schemes.  For the SombCos, SincSinc, and
+	 SincCos schemes, it specifies the number of pixels at which
+	 the envelope of the function goes to zero.  The minimum value
+	 is {\tt 1.0}, and the run-time default value is {\tt 2.0}.
+	 For the Gauss and SincGauss scheme, it specifies the
+	 full-width at half-maximum (FWHM) of the Gaussian envelope.
+	 The minimum value is {\tt 0.1}, and the run-time default is
+	 {\tt 1.0}.  On astronomical images and spectra, good results
+	 are often obtained by approximately matching the FWHM of the
+	 envelope function, given by PARAMS(2), to the point-spread
+	 function of the input data. {\tt []}
       }
       \sstsubsection{
          REBIN = \_LOGICAL (Read)
@@ -39885,7 +40273,8 @@ KAPPA: \htmlref{CADD}{CADD},
       }{
          This rotates the NDF called m31 so that north is vertical and
          stores the results in an NDF called m31r.  This assumes that the
-         current WCS Frame in the input NDF is a celestial co-ordinate Frame.
+         \htmlref{current WCS Frame}{se:curframe}~ in the input NDF is a 
+         celestial co-ordinate Frame.
       }
       \sstexamplesubsection{
          rotate angle=180 out=sn in=ns
@@ -45718,7 +46107,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          \ssthitemlist{
 
             \sstitem
-            {\tt "Bilinear"} -- When resampling, the output pixel values are
+            {\tt "Bilinear"} --- When resampling, the output pixel values are
             calculated by bi-linear interpolation among the four nearest pixels
             values in the input NDF.  When rebinning, the input pixel value
             is divided up bi-linearly between the four nearest output pixels.
@@ -45726,34 +46115,34 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
             is marginally slower.
 
             \sstitem
-            {\tt "Nearest"} -- When resampling, the output pixel values are assigned
+            {\tt "Nearest"} --- When resampling, the output pixel values are assigned
             the value  of the single nearest input pixel.  When rebinning,
             the input pixel value is assigned completely to the single
             nearest output pixel.
 
             \sstitem
-            {\tt "Sinc"} -- Uses the ${\rm sinc}({\pi}x)$ kernel, where $x$ is the pixel
+            {\tt "Sinc"} --- Uses the ${\rm sinc}({\pi}x)$ kernel, where $x$ is the pixel
             offset from the interpolation point (resampling) or transformed
             input pixel centre (rebinning), and ${\rm sinc}(z)=\sin(z)/z$.  Use of this
             scheme is not recommended.
 
             \sstitem
-            {\tt "SincSinc"} -- Uses the ${\rm sinc}({\pi}x){\rm sinc}(k{\pi}x)$ kernel.  A
+            {\tt "SincSinc"} --- Uses the ${\rm sinc}({\pi}x){\rm sinc}(k{\pi}x)$ kernel.  A
             valuable general-purpose scheme, intermediate in its visual effect
             on NDFs between the bi-linear and nearest-neighbour schemes.
 
             \sstitem
-            {\tt "SincCos"} -- Uses the ${\rm sinc}({\pi}x)\cos(k{\pi}x)$ kernel.  Gives
+            {\tt "SincCos"} --- Uses the ${\rm sinc}({\pi}x)\cos(k{\pi}x)$ kernel.  Gives
             similar results to the {\tt "Sincsinc"} scheme.
 
             \sstitem
-            {\tt "SincGauss"} -- Uses the ${\rm sinc}({\pi}x)e^{-kx^2}$ kernel.  Good
+            {\tt "SincGauss"} --- Uses the ${\rm sinc}({\pi}x)e^{-kx^2}$ kernel.  Good
             results can be obtained by matching the FWHM of the
             envelope function to the point-spread function of the
             input data (see parameter PARAMS).
 
             \sstitem
-            {\tt "Somb"} -- Uses the ${\rm somb}({\pi}x)$ kernel, where $x$ is the pixel
+            {\tt "Somb"} --- Uses the ${\rm somb}({\pi}x)$ kernel, where $x$ is the pixel
             offset from the interpolation point (resampling) or transformed
             input pixel centre (rebinning), and
             ${\rm somb}(z)=2*J_{1}(z)/z$ ($J_1$ is the
@@ -45761,11 +46150,11 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
             similar to the {\tt "Sinc"} scheme.
 
             \sstitem
-            {\tt "SombCos"} -- Uses the ${\rm somb}({\pi}x)\cos(k{\pi}x)$ kernel.  This 
+            {\tt "SombCos"} --- Uses the ${\rm somb}({\pi}x)\cos(k{\pi}x)$ kernel.  This 
             scheme is similar to the {\tt "SincCos"} scheme.
 
             \sstitem
-            {\tt "Gauss"} -- Uses the $e^{-kx^2}$ kernel.  This option is only
+            {\tt "Gauss"} --- Uses the $e^{-kx^2}$ kernel.  This option is only
             available when rebinning (\emph{i.e.} if REBIN is set to {\tt TRUE}).
             The FWHM of the Gaussian is given by parameter PARAMS(2), and
             the point at which to truncate the Gaussian to zero is given by
@@ -45843,16 +46232,17 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          calculated automatically. {\tt [0]}
 
          PARAMS(2) is required only by the Gauss, SombCos, SincSinc,
-         SincCos, and SincGauss schemes.  For the SombCos, SincSinc and
-         SincCos schemes, it specifies the number of pixels at which the
-         envelope of the function goes to zero.  The minimum value is 1.0, and the
-         run-time default value is 2.0.  For the Gauss and SincGauss scheme, it
-         specifies the full-width at half-maximum (FWHM) of the Gaussian
-         envelope.  The minimum value is 0.1, and the run-time default is
-         1.0.  On astronomical NDFs and spectra, good results are often
-         obtained by approximately matching the FWHM of the envelope
-         function, given by PARAMS(2), to the point-spread function of the
-         input data. {\tt []}
+	 SincCos, and SincGauss schemes.  For the SombCos, SincSinc
+	 and SincCos schemes, it specifies the number of pixels at
+	 which the envelope of the function goes to zero.  The minimum
+	 value is {\tt 1.0}, and the run-time default value is {\tt
+	 2.0}.  For the Gauss and SincGauss scheme, it specifies the
+	 full-width at half-maximum (FWHM) of the Gaussian envelope.
+	 The minimum value is {\tt 0.1}, and the run-time default is
+	 {\tt 1.0}.  On astronomical NDFs and spectra, good results
+	 are often obtained by approximately matching the FWHM of the
+	 envelope function, given by PARAMS(2), to the point-spread
+	 function of the input data. {\tt []}
       }
       \sstsubsection{
          REBIN = \_LOGICAL (Read)
@@ -46153,18 +46543,19 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       \sstsubsection{
          REMAP = \_LOGICAL (Read)
       }{
-         Only accessed if MODE is {\tt "Set"}.  If REMAP is {\tt TRUE}, then the
-         \htmlref{Mappings}{se:curframe}~ which connect the current Frame to the other Frames
-         within the \htmlref{WCS FrameSet}{se:curframe}~ will be modified (if necessary) to
-         maintain the FrameSet integrity.  For instance, if the current
-         Frame of the NDF represents FK5 RA and DEC, and you change
-         {\att System} from {\tt "FK5"} to {\tt "Galactic"}, then the Mappings which connect
-         the SKY Frame to the other Frames (\emph{e.g.} PIXEL, AXIS) will
-         be modified so that each pixel corresponds to the correct
-         Galactic co-ordinates.  If REMAP is {\tt FALSE}, then the Mappings will
-         not be changed.  This can be useful if the FrameSet has incorrect
-         attribute values for some reason, which need to be corrected
-         without altering the Mappings to take account of the change. {\tt [TRUE]}
+         Only accessed if MODE is {\tt "Set"}.  If REMAP is {\tt TRUE}, then
+	 the \htmlref{Mappings}{se:curframe}~ which connect the current Frame
+	 to the other Frames within the \htmlref{WCS FrameSet}{se:curframe}~
+	 will be modified (if necessary) to maintain the FrameSet integrity.
+	 For instance, if the current Frame of the NDF represents FK5 RA and
+	 DEC, and you change {\att System} from {\tt "FK5"} to {\tt
+	 "Galactic"}, then the Mappings which connect the SKY Frame to the
+	 other Frames (\emph{e.g.} PIXEL, AXIS) will be modified so that each
+	 pixel corresponds to the correct Galactic co-ordinates.  If REMAP is
+	 {\tt FALSE}, then the Mappings will not be changed.  This can be
+	 useful if the FrameSet has incorrect attribute values for some
+	 reason, which need to be corrected without altering the Mappings to
+	 take account of the change. {\tt [TRUE]}
       }
    }
    \sstresparameters{
@@ -46742,7 +47133,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       }{
          A value which specifies an initial scale size in pixels for the
          adaptive algorithm which approximates non-linear 
-         \htmlref{Mappings}{se:curframe} with piece-wise linear
+         \htmlref{Mappings}{se:curframe}~ with piece-wise linear
          transformations.  If MAXPIX is larger than sny
          dimension of the region of the output grid being used, a
          first attempt will be made to approximate the Mapping by a
@@ -46765,47 +47156,47 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          \ssthitemlist{
 
             \sstitem
-            {\tt "Bilinear"} -- The input pixel value is divided bi-linearly
+            {\tt "Bilinear"} --- The input pixel value is divided bi-linearly
             between  the four nearest output pixels.  This produces smoother
             output NDFs than the nearest-neighbour scheme, but is
             marginally slower.
 
             \sstitem
-            {\tt "Nearest"} -- The input pixel value is assigned completely to
+            {\tt "Nearest"} --- The input pixel value is assigned completely to
             the single nearest output pixel.
 
             \sstitem
-            {\tt "Sinc"} -- Uses the ${\rm sinc}({\pi}x)$ kernel, where $x$ is
+            {\tt "Sinc"} --- Uses the ${\rm sinc}({\pi}x)$ kernel, where $x$ is
             the pixel offset from the transformed input pixel centre, and
             ${\rm sinc}(z)=\sin(z)/z$.  Use of this scheme is not recommended.
 
             \sstitem
-            {\tt "SincSinc"} -- Uses the ${\rm sinc}({\pi}x){\rm sinc}(k{\pi}x)$
+            {\tt "SincSinc"} --- Uses the ${\rm sinc}({\pi}x){\rm sinc}(k{\pi}x)$
             kernel.  This is a valuable general-purpose scheme, intermediate in
             its visual effect on NDFs between the bilinear and nearest-neighbour 
             schemes.
 
             \sstitem
-            {\tt "SincCos"} -- Uses the ${\rm sinc}({\pi}x)\cos(k{\pi}x)$ kernel.  
+            {\tt "SincCos"} --- Uses the ${\rm sinc}({\pi}x)\cos(k{\pi}x)$ kernel.  
             It gives similar results to the {\tt "Sincsinc"} scheme.
 
             \sstitem
-            {\tt "SincGauss"} -- Uses the ${\rm sinc}({\pi}x)e^{-kx^2}$ kernel. 
+            {\tt "SincGauss"} --- Uses the ${\rm sinc}({\pi}x)e^{-kx^2}$ kernel. 
             Good results can be obtained by matching the FWHM of the
             envelope function to the point-spread function of the
             input data (see parameter PARAMS).
 
             \sstitem
-            {\tt "Somb"} -- Uses the  ${\rm somb}({\pi}x)$ kernel, where
+            {\tt "Somb"} --- Uses the  ${\rm somb}({\pi}x)$ kernel, where
             ${\rm somb}(z)=2*J_{1}(z)/z$ ($J_1$ is the first-order Bessel function
             of the first kind).  This scheme is similar to the {\tt "Sinc"} scheme.
 
             \sstitem
-            {\tt "SombCos"} -- Uses the ${\rm somb}({\pi}x)\cos(k{\pi}x)$ kernel. 
+            {\tt "SombCos"} --- Uses the ${\rm somb}({\pi}x)\cos(k{\pi}x)$ kernel. 
             This scheme is similar to the {\tt "SincCos"} scheme.
 
             \sstitem
-            {\tt "Gauss"} -- Uses the $e^{-kx^2}$ kernel.  The FWHM of the
+            {\tt "Gauss"} --- Uses the $e^{-kx^2}$ kernel.  The FWHM of the
             Gaussian is given by parameter PARAMS(2), and the point at
             which to truncate the Gaussian to zero is given by parameter
             PARAMS(1).
@@ -46845,22 +47236,24 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          required by the Sinc, SincSinc, SincCos, SincGauss, Somb,
          SombCos and Gauss methods.
 
-         PARAMS( 1 ) is required by all the above schemes.  It is used
-         to specify how many output pixels on either side of the central
-         output pixel are to receive contribution from the corresponding
-         input pixel.  Typically, a value of {\tt 2} is appropriate and the
-         minimum allowed value is {\tt 1} (\emph{i.e.} one pixel on each side).  A
-         value of zero or fewer indicates that a suitable number of
-         pixels should be calculated automatically. {\tt [0]}
+         PARAMS(1) is required by all the above schemes.  It is used
+	 to specify how many output pixels on either side of the
+	 central output pixel are to receive contribution from the
+	 corresponding input pixel.  Typically, a value of {\tt 2} is
+	 appropriate and the minimum allowed value is {\tt 1}
+	 (\emph{i.e.} one pixel on each side).  A value of zero or
+	 fewer indicates that a suitable number of pixels should be
+	 calculated automatically. {\tt [0]}
 
-         PARAMS( 2 ) is required only by the Gauss, SombCos, SincSinc,
-         SincCos, and SincGauss schemes. For the SombCos, SincSinc and
-         SincCos schemes, it specifies the number of output pixels at
-         which the envelope of the function goes to zero.  The minimum
-         value is 1.0, and the run-time default value is 2.0.  For the
-         Gauss and SincGauss scheme, it specifies the full-width at
-         half-maximum (FWHM) of the Gaussian envelope.  The minimum
-         value is 0.1, and the run-time default is 1.0. {\tt []}
+         PARAMS(2) is required only by the Gauss, SombCos, SincSinc,
+	 SincCos, and SincGauss schemes. For the SombCos, SincSinc and
+	 SincCos schemes, it specifies the number of output pixels at
+	 which the envelope of the function goes to zero.  The minimum
+	 value is {\tt 1.0}, and the run-time default value is {\tt
+	 2.0}.  For the Gauss and SincGauss scheme, it specifies the
+	 full-width at half-maximum (FWHM) of the Gaussian envelope.
+	 The minimum value is {\tt 0.1}, and the run-time default is
+	 {\tt 1.0}. {\tt []}
       }
       \sstsubsection{
          REF = NDF (Read)
@@ -46909,9 +47302,9 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          FLBND( ) = \_DOUBLE (Write)
       }{
          The lower bounds of the bounding box enclosing the output NDF 
-         in the current WCS Frame.  The number of elements in this parameter 
-         is equal to the number of axes in the current WCS Frame.  Celestial 
-         axis values will be in units of radians.
+         in the \htmlref{current WCS Frame}{se:curframe}.  The number of elements 
+         in this parameter is equal to the number of axes in the current WCS 
+         Frame.  Celestial axis values will be in units of radians.
       }
       \sstsubsection{
          FUBND( ) = \_DOUBLE (Write)
@@ -48975,7 +49368,7 @@ identify the components.
 \begin{description}
 
 \label{apndf:data}
-\item[{\bf DATA}] -- the main data array (called DATA\_ARRAY for
+\item[{\bf DATA}] --- the main data array (called DATA\_ARRAY for
 historical reasons) is the only component which must be present in an
 NDF.  In the case of {\tt example.sdf}, is a one-dimensional array of
 real type with 856 elements. It can have up to seven dimensions.  It
@@ -48992,7 +49385,7 @@ have been a one-dimensional array like this,
 rather than the structure shown above.
 
 \label{apndf:origin}
-\item[{\bf ORIGIN}] -- an array of the indices of the first pixel along
+\item[{\bf ORIGIN}] --- an array of the indices of the first pixel along
 each axis, defaulting to 1.  See \hyperref{Pixel Indices, Pixel
 Co-ordinates, and Grid Co-ordinates}{Section~}{}{se:pixgrd}~ for further
 information and a graphic.  ORIGIN may be set with task
@@ -49000,14 +49393,14 @@ information and a graphic.  ORIGIN may be set with task
 section}{se:ndfsect}.
 
 \label{apndf:bpflag}
-\item[{\bf BAD\_PIXEL}] -- the bad-pixel flag indicating whether there
+\item[{\bf BAD\_PIXEL}] --- the bad-pixel flag indicating whether there
 may be \htmlref{bad pixels}{se:masking} present.  See
 \hyperref{Bad-pixel Flag Values}{SETBAD}{}{setbad:badpixelflag} for further
 information.  The flag may be set with task
 \htmlref{SETBAD}{SETBAD}.
 
 \label{apndf:title}
-\item[{\bf TITLE}] -- the  character string {\tt "HR6259 - AAT fibre
+\item[{\bf TITLE}] --- the  character string {\tt "HR6259 - AAT fibre
 data"} describes the contents of the NDF.  The NDF's TITLE might be
 used as the title of a graph \emph{etc.} It may be set with task
 \htmlref{SETTITLE}{SETTITLE}.  Applications that create an NDF assign
@@ -49015,19 +49408,19 @@ a TITLE to the NDF via a parameter, called TITLE unless the
 application generates several NDFs.
 
 \label{apndf:label}
-\item[{\bf LABEL}] -- the character string {\tt "Flux"} describes the
+\item[{\bf LABEL}] --- the character string {\tt "Flux"} describes the
 quantity represented in the NDF's main data array.  The LABEL is
 intended for use on the axis of graphs \emph{etc.}  It may be set
 using the task \htmlref{SETLABEL}{SETLABEL}.
 
 \label{apndf:units}
-\item[{\bf UNITS}] -- this character string describes the physical units
+\item[{\bf UNITS}] --- this character string describes the physical units
 of the quantity stored in the main data array, in this case,
 {\tt "Counts/s"}.  It may be set via the command
 \htmlref{SETUNITS}{SETUNITS}.  
 
 \label{apndf:quality}
-\item[{\bf QUALITY}] -- this component is used to indicate the quality
+\item[{\bf QUALITY}] --- this component is used to indicate the quality
 of each element in the main data array, for example whether each pixel
 is vignetted or not.  The quality structure contains a quality array
 and a BADBITS value, both of which {\em must\/} be of type
@@ -49043,14 +49436,14 @@ QUALITY bits are arbitrary.  See the task \htmlref{SETBB}{SETBB}.
 To enter new quality information, use the SETQUAL command.
 
 \label{apndf:variance}
-\item[{\bf VARIANCE}] -- the variance array is the same shape and size
+\item[{\bf VARIANCE}] --- the variance array is the same shape and size
 as the main data array and contains the errors associated with the
 individual data values.  These are stored as {\em variance\/}
 estimates for each pixel.  VARIANCE may be set with the
 \htmlref{SETVAR}{SETVAR} command.
 
 \label{apndf:axis}
-\item[{\bf AXIS}] -- the AXIS structure may contain axis information for
+\item[{\bf AXIS}] --- the AXIS structure may contain axis information for
 any dimension of the NDF's main array.  In this case, the main data
 array is only one-dimensional, therefore only the AXIS(1) structure is
 present.  This structure contains the actual axis data array of pixel
@@ -49065,7 +49458,7 @@ an axis normalisation flag.  For more information see
 \hyperref{`Co-ordinate Frames, Axes and Domains'}{Section~}{}{se:domains}.
 
 \label{apndf:wcs}
-\item[{\bf WCS}] -- this component provides an alternative, and superior,
+\item[{\bf WCS}] --- this component provides an alternative, and superior,
 method for storing co-ordinate information.  The AXIS structure described
 above has the severe limitation that it can only describe co-ordinate
 systems in which all axes are independent (\emph{i.e.} the value on
@@ -49091,7 +49484,7 @@ create them from scratch (\emph{e.g.} \htmlref{WCSADD}{WCSADD},
 Co-ordinate Systems}{Section~}{}{se:wcsuse} for more information.
 
 \label{apndf:history}
-\item[{\bf HISTORY}] -- this component provides a record of the
+\item[{\bf HISTORY}] --- this component provides a record of the
 processing history of the NDF.  Only the first of three records is
 shown for {\tt example.sdf}.  This indicates that the spectrum was
 extracted from fibre data using the \FIGARO\ FINDSP command on
@@ -49102,7 +49495,7 @@ history recording or delete the history records.
 commentary with \htmlref{HISCOM}{HISCOM}.
 
 \label{apndf:extensions}
-\item[{\bf EXTENSIONs}] -- the purpose of extensions is to store
+\item[{\bf EXTENSIONs}] --- the purpose of extensions is to store
 non-standard items.  These auxiliary data could be information about
 the original observing setup, such as the airmass during the
 observation or the temperature of the detector; they may be
@@ -50208,30 +50601,30 @@ Styles and Attributes''}{se:style}} relates the use of graphical style parameter
                   using these old parameters are indicated): 
 
                \begin{description}
-                  \item[ABSLAB] -- Use the STYLE parameter to specify a
+                  \item[ABSLAB] --- Use the STYLE parameter to specify a
                                    value for the plotting attribute 
                                    \htmlattref{Label(1)}{Label(axis)}.
-                  \item[BORDER] -- Set AXES=TRUE, and suppress everything
+                  \item[BORDER] --- Set AXES=TRUE, and suppress everything
                                    but the border by setting suitable plotting 
                                    attributes (\emph{e.g.} {\tt MajTickLen=0, 
                                    MinTickLen=0, TextLab=0} \emph{etc.}).
-                  \item[CONCOL] -- Use the \htmlattref{Colour(Cont)}{Colour(element)}~ plotting 
+                  \item[CONCOL] --- Use the \htmlattref{Colour(Cont)}{Colour(element)}~ plotting 
                                    attribute (or parameter PENS).
-                  \item[COSYS] -- Use application WCSFRAME to set the required 
+                  \item[COSYS] --- Use application WCSFRAME to set the required 
                                   co-ordinate Frame first.
-                  \item[FONT] -- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
-                  \item[MAJTIC] -- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
-                  \item[MINTIC] -- Use the {\att MinTick} plotting attribute.
-                  \item[ORDLAB] -- Use {\att Label(2)} plotting attribute.
-                  \item[OUTTIC] -- Use \htmlattref{MajTickLen}{MajTickLen}~ and
+                  \item[FONT] --- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
+                  \item[MAJTIC] --- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
+                  \item[MINTIC] --- Use the {\att MinTick} plotting attribute.
+                  \item[ORDLAB] --- Use {\att Label(2)} plotting attribute.
+                  \item[OUTTIC] --- Use \htmlattref{MajTickLen}{MajTickLen}~ and
                                    \htmlattref{MinTickLen}{MinTickLen}~ 
                                    plotting attributes.
-                  \item[PLTITL] -- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
-                  \item[PXSIZE] -- Create the picture first using PICDEF,
+                  \item[PLTITL] --- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
+                  \item[PXSIZE] --- Create the picture first using PICDEF,
                                    specifying the required picture size using 
                                    the new parameter SIZE.
-                  \item[PYSIZE] -- See PXSIZE.
-                  \item[THICK] -- Use the \htmlattref{Width}{Width(element)}~ plotting attributes.
+                  \item[PYSIZE] --- See PXSIZE.
+                  \item[THICK] --- Use the \htmlattref{Width}{Width(element)}~ plotting attributes.
                \end{description}
 
             \item The following new parameters have been added: KEYPOS, 
@@ -50239,12 +50632,12 @@ Styles and Attributes''}{se:style}} relates the use of graphical style parameter
          
             \item The following parameters have been modified:
                \begin{description}
-                  \item [AXES] -- Axes are now annotated with the current
+                  \item [AXES] --- Axes are now annotated with the current
                                co-ordinate Frame of the NDF.
-                  \item [CLEAR] -- Setting CLEAR={\tt FALSE} cause the new contour map
+                  \item [CLEAR] --- Setting CLEAR={\tt FALSE} cause the new contour map
                                to be aligned spatially with any existing DATA 
                                picture (if possible).
-                  \item [KEY] -- The appearance of the key can now be controlled
+                  \item [KEY] --- The appearance of the key can now be controlled
                               using parameter KEYSTYLE, and the position of the
                               key can be controlled using parameter KEYPOS.
                \end{description}
@@ -50272,16 +50665,16 @@ Styles and Attributes''}{se:style}} relates the use of graphical style parameter
 
             \item The following parameters have been removed: 
                \begin{description}
-                  \item [COLOUR] -- Use the STYLE parameter to specify values
+                  \item [COLOUR] --- Use the STYLE parameter to specify values
                                     for the \htmlattref{Colour}{Colour(element)} plotting attributes.
-                  \item [COSYS] -- Use parameter FRAME.
-                  \item [DOUBLE] -- Double precision is now always used.
-                  \item [XC] -- Use parameters LASTPOS and LASTDIM.
-                  \item [XP] -- Specify an output catalogue using parameter 
+                  \item [COSYS] --- Use parameter FRAME.
+                  \item [DOUBLE] --- Double precision is now always used.
+                  \item [XC] --- Use parameters LASTPOS and LASTDIM.
+                  \item [XP] --- Specify an output catalogue using parameter 
                                 OUTCAT, and then read the required positions 
                                 using application \htmlref{LISTSHOW}{LISTSHOW}.
-                  \item [YC] -- Use parameters LASTPOS and LASTDIM.
-                  \item [YP] -- See XP.
+                  \item [YC] --- Use parameters LASTPOS and LASTDIM.
+                  \item [YP] --- See XP.
                \end{description}
 
             \item The following new parameters have been added: DESCRIBE,
@@ -50290,7 +50683,7 @@ Styles and Attributes''}{se:style}} relates the use of graphical style parameter
          
             \item The following parameters have been modified:
                \begin{description}
-                  \item [PLOT] -- Option {\tt "Cross"} has been changed (it now
+                  \item [PLOT] --- Option {\tt "Cross"} has been changed (it now
                                produces a full-screen cross-hair), and 
                                the new options {\tt "Mark"}, {\tt "Chain"}, 
                                {\tt "Box"}, {\tt "Vline"}, {\tt "Hline"},
@@ -50316,24 +50709,24 @@ Styles and Attributes''}{se:style}} relates the use of graphical style parameter
             \item The following parameters have been removed: 
 
                \begin{description}
-                  \item[ABSLAB] -- Use the STYLE parameter to specify a
+                  \item[ABSLAB] --- Use the STYLE parameter to specify a
                                    value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
-                  \item[BCOLOUR] -- Use the \htmlattref{Colour(Border)}{Colour(element)}~ plotting 
+                  \item[BCOLOUR] --- Use the \htmlattref{Colour(Border)}{Colour(element)}~ plotting 
                                    attribute.
-                  \item[BWIDTH] -- Use the \htmlattref{Width(Border)}{Width(element)}~ plotting 
+                  \item[BWIDTH] --- Use the \htmlattref{Width(Border)}{Width(element)}~ plotting 
                                    attribute.
-                  \item[COSYS] -- Use application WCSFRAME to set the required 
+                  \item[COSYS] --- Use application WCSFRAME to set the required 
                                   co-ordinate Frame first.
-                  \item[FONT] -- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
-                  \item[MAJTIC] -- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
-                  \item[MINTIC] -- Use the {\att MinTick} plotting attribute.
-                  \item[ORDLAB] -- Use {\att Label(2)} plotting attribute.
-                  \item[OUTTIC] -- Use \htmlattref{MajTickLen}{MajTickLen}~ and \htmlattref{MinTickLen}{MinTickLen}~ 
+                  \item[FONT] --- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
+                  \item[MAJTIC] --- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
+                  \item[MINTIC] --- Use the {\att MinTick} plotting attribute.
+                  \item[ORDLAB] --- Use {\att Label(2)} plotting attribute.
+                  \item[OUTTIC] --- Use \htmlattref{MajTickLen}{MajTickLen}~ and \htmlattref{MinTickLen}{MinTickLen}~ 
                                    plotting attributes.
-                  \item[PLTITL] -- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
-                  \item[SQUASH] -- Specify the required scale factors explicitly 
+                  \item[PLTITL] --- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
+                  \item[SQUASH] --- Specify the required scale factors explicitly 
                                    using parameters XMAGN and YMAGN.
-                  \item[THICK] -- Use the \htmlattref{Width}{Width(element)}~ plotting attributes.
+                  \item[THICK] --- Use the \htmlattref{Width}{Width(element)}~ plotting attributes.
                \end{description}
 
             \item The following new parameters have been added: BORSTYLE, 
@@ -50341,28 +50734,28 @@ Styles and Attributes''}{se:style}} relates the use of graphical style parameter
          
             \item The following parameters have been modified:
                \begin{description}
-                  \item [AXES] -- Axes are now annotated with the current
+                  \item [AXES] --- Axes are now annotated with the current
                                co-ordinate Frame of the NDF.  The default
                                value is now the current value (initially
                                {\tt TRUE}) instead of {\tt FALSE}.
-                  \item [BORDER] -- The default value is now the current value 
+                  \item [BORDER] --- The default value is now the current value 
                                (initially {\tt FALSE}) instead of {\tt FALSE}.
-                  \item [CENTRE] -- This is now a literal string value 
+                  \item [CENTRE] --- This is now a literal string value 
                                which should be given the formatted 
                                co-ordinates of the position to put at the
                                centre of the picture.  These co-ordinates
                                should be expressed within the current 
                                co-ordinate Frame of the NDF.
-                  \item [CLEAR] -- The default value is now the current value
+                  \item [CLEAR] --- The default value is now the current value
                                instead of {\tt FALSE}.
-                  \item [FILL] -- The default value is now {\tt TRUE} if the input
+                  \item [FILL] --- The default value is now {\tt TRUE} if the input
                                NDF is one-dimensional, and {\tt FALSE} otherwise.
-                  \item [XMAGN] -- This used to be the number of device
+                  \item [XMAGN] --- This used to be the number of device
                                pixels per NDF pixel along the horizontal
                                axis.  It is now a scaling factor, with a
                                value of 1.0 producing an image which just
                                fills the available width on the screen.
-                  \item [YMAGN] -- This has been changed in the same way as
+                  \item [YMAGN] --- This has been changed in the same way as
                                XMAGN.
                  \end{description}
 
@@ -50397,28 +50790,28 @@ Styles and Attributes''}{se:style}} relates the use of graphical style parameter
             \item The following parameters have been removed: 
 
                \begin{description}
-                  \item[ABSLAB] -- Use the STYLE parameter to specify a value
+                  \item[ABSLAB] --- Use the STYLE parameter to specify a value
                                    for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
-                  \item[ABSLIM] -- Use parameters YBOT and YTOP.
-                  \item[AXLIM] -- Use parameter ALIGN.
-                  \item[COSYS] -- Use application WCSFRAME to set the required co-ordinate Frame first.
-                  \item[ERRCOL] -- Use the \htmlattref{Colour(ErrBars)}{Colour(element)}~ plotting attribute.
-                  \item[FONT] -- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
-                  \item[LINCOL] -- Use the {\att Colour(Lines)} plotting attribute.
-                  \item[MAJTIC] -- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
-                  \item[MINTIC] -- Use the {\att MinTick} plotting attribute.
-                  \item[ORDLAB] -- Use {\att Label(2)} plotting attribute.
-                  \item[ORDLIM] -- Use parameters XLEFT and XRIGHT.
-                  \item[OUTTIC] -- Use \htmlattref{MajTickLen}{MajTickLen}~ and 
+                  \item[ABSLIM] --- Use parameters YBOT and YTOP.
+                  \item[AXLIM] --- Use parameter ALIGN.
+                  \item[COSYS] --- Use application WCSFRAME to set the required co-ordinate Frame first.
+                  \item[ERRCOL] --- Use the \htmlattref{Colour(ErrBars)}{Colour(element)}~ plotting attribute.
+                  \item[FONT] --- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
+                  \item[LINCOL] --- Use the {\att Colour(Lines)} plotting attribute.
+                  \item[MAJTIC] --- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
+                  \item[MINTIC] --- Use the {\att MinTick} plotting attribute.
+                  \item[ORDLAB] --- Use {\att Label(2)} plotting attribute.
+                  \item[ORDLIM] --- Use parameters XLEFT and XRIGHT.
+                  \item[OUTTIC] --- Use \htmlattref{MajTickLen}{MajTickLen}~ and 
                                    \htmlattref{MinTickLen}{MinTickLen}~ plotting attributes.
-                  \item[PLTITL] -- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
-                  \item[PXSIZE] -- Create the picture first using PICDEF,
+                  \item[PLTITL] --- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
+                  \item[PXSIZE] --- Create the picture first using PICDEF,
                                    specifying the required picture size using 
                                    the new parameter SIZE.
-                  \item[PYSIZE] -- See PXSIZE.
-                  \item[SYMCOL] -- Use the {\att Colour(Symbols)} plotting attribute.
-                  \item[THICK] -- Use the \htmlattref{Width}{Width(element)}~ plotting attributes.
-                  \item[XLOG] -- Logarithmic \textit{x} axes are not currently supported.
+                  \item[PYSIZE] --- See PXSIZE.
+                  \item[SYMCOL] --- Use the {\att Colour(Symbols)} plotting attribute.
+                  \item[THICK] --- Use the \htmlattref{Width}{Width(element)}~ plotting attributes.
+                  \item[XLOG] --- Logarithmic \textit{x} axes are not currently supported.
                \end{description}
 
             \item The following new parameters have been added: ALIGN,
@@ -50427,10 +50820,10 @@ Styles and Attributes''}{se:style}} relates the use of graphical style parameter
          
             \item The following parameters have been modified:
                \begin{description}
-                  \item [MODE] -- The option of supplying an integer marker type
+                  \item [MODE] --- The option of supplying an integer marker type
                                has been removed (replaced by parameter MARKER).
                                Options {\tt "Mark"} and {\tt "Chain"} have been added.
-                  \item [YLOG] -- Logarithmic data values are now
+                  \item [YLOG] --- Logarithmic data values are now
                                represented as equally spaced values of 
                                $\log(data)$, instead of logarithmically
                                spaced values of $data$.
@@ -50484,15 +50877,15 @@ Styles and Attributes''}{se:style}} relates the use of graphical style parameter
 
 \subsection{New applications}
 \begin{description}
-   \item [\htmlref{CHAIN}{CHAIN}] -- Concatenates a series of NDFs, in the order
+   \item [\htmlref{CHAIN}{CHAIN}] --- Concatenates a series of NDFs, in the order
          supplied and treated as vectors, to form a one-dimensional output
          NDF.  The dimensions of the NDFs may be different, and indeed so
          may their dimensionalities.
 
-   \item [\htmlref{COPYBAD}{COPYBAD}] -- Copies the bad pixels from one
+   \item [\htmlref{COPYBAD}{COPYBAD}] --- Copies the bad pixels from one
          NDF into another.
 
-   \item [\htmlref{LISTMAKE}{LISTMAKE}] -- Creates a catalogue holding a
+   \item [\htmlref{LISTMAKE}{LISTMAKE}] --- Creates a catalogue holding a
          \emph{positions list}.  These are used to communicate positions
          between applications, together with associated \htmlref{WCS}{apndf:wcs} information.
          In addition to numerical axis values, they also contain an
@@ -50501,7 +50894,7 @@ Styles and Attributes''}{se:style}} relates the use of graphical style parameter
          user in a file or in response to parameter prompts.  Alternatively,
          the pixel centres in a specified NDF may be used.
 
-   \item [\htmlref{LISTSHOW}{LISTSHOW}] -- Shows a sub-set of the positions
+   \item [\htmlref{LISTSHOW}{LISTSHOW}] --- Shows a sub-set of the positions
          contained within a \emph{positions list} catalogue, in any 
          of the \htmlref{co-ordinate Frame}{se:domains}~ s described within the 
          catalogue.  It can also write the selected positions to a new
@@ -50509,42 +50902,42 @@ Styles and Attributes''}{se:style}} relates the use of graphical style parameter
          can also be marked on the \htmlref{current graphics device}{se:devglobal}
          in a variety of ways.
 
-   \item [\htmlref{PROFILE}{PROFILE}] -- Produces a one-dimensional NDF
+   \item [\htmlref{PROFILE}{PROFILE}] --- Produces a one-dimensional NDF
          containing a profile through an \textit{n}-dimensional NDF, retaining the
          current co-ordinate Frame of the \textit{n}-dimensional NDF.  The data
          values in the output NDF are samples taken along a specified
          one-dimensional curve through the input NDF. 
     
-   \item [\htmlref{RESHAPE}{RESHAPE}] -- This application reshapes an NDF to 
+   \item [\htmlref{RESHAPE}{RESHAPE}] --- This application reshapes an NDF to 
          create another NDF by copying array values.  The array components 
          in the input NDF are treated as vectors.  Each output array is 
          filled in order with values from the input vector, until it is 
          full or the input vector is exhausted.  
 
-   \item [\htmlref{WCSADD}{WCSADD}] -- Allows a new co-ordinate Frame to be
+   \item [\htmlref{WCSADD}{WCSADD}] --- Allows a new co-ordinate Frame to be
          added into the WCS component of an NDF.  The new Frame must be
          linearly related to an existing Frame.
 
-   \item [\htmlref{WCSALIGN}{WCSALIGN}] -- Resamples a group of
+   \item [\htmlref{WCSALIGN}{WCSALIGN}] --- Resamples a group of
          two-dimensional NDFs in order to align them with a specified
          reference NDF.  The WCS information within the NDFs is used to
          determine the transformations required to achieve alignment.
 
-   \item [\htmlref{WCSATTRIB}{WCSATTRIB}] -- Allows attributes within the
+   \item [\htmlref{WCSATTRIB}{WCSATTRIB}] --- Allows attributes within the
          WCS component of an NDF to be examined or changed.
 
-   \item [\htmlref{WCSCOPY}{WCSCOPY}] -- Copies the WCS component from one
+   \item [\htmlref{WCSCOPY}{WCSCOPY}] --- Copies the WCS component from one
          NDF to another.  One use of this is to allow WCS information to
          be re-instated in an NDF after being stripped out by an
          application which does not propagate WCS information.
 
-   \item [\htmlref{WCSFRAME}{WCSFRAME}] -- Allows the current co-ordinate
+   \item [\htmlref{WCSFRAME}{WCSFRAME}] --- Allows the current co-ordinate
          Frame within an NDF to be examined and changed.
    
-   \item [\htmlref{WCSREMOVE}{WCSREMOVE}] -- Removes one or more co-ordinate
+   \item [\htmlref{WCSREMOVE}{WCSREMOVE}] --- Removes one or more co-ordinate
          Frames from the WCS component of an NDF.
 
-   \item [\htmlref{WCSTRAN}{WCSTRAN}] -- Transforms a position from one NDF 
+   \item [\htmlref{WCSTRAN}{WCSTRAN}] --- Transforms a position from one NDF 
          WCS co-ordinate Frame to another.
 
 \end{description}
@@ -50579,7 +50972,7 @@ Styles and Attributes''}{se:style}} relates the use of graphical style parameter
     clipping of labels on certain devices.
 
 \item Trailing spaces are now stripped from the \htmlattref{Title}{Title}~ attribute of the 
-    current WCS Frame.
+    \htmlref{current WCS Frame}{se:curframe}.
 
 \item A bug in \htmlref{MATHS}{MATHS}~ which could cause zero variances to be produced sometimes
     when using double precision data has been fixed.
@@ -50652,7 +51045,7 @@ The following applications have been modified:
             (alternatives to using these old parameters are indicated):
 
                \begin{description}
-                  \item[COSYS] -- Use application WCSFRAME to set the required
+                  \item[COSYS] --- Use application WCSFRAME to set the required
                                   \htmlref{co-ordinate Frame}{se:domains}~  first.
                \end{description}
 
@@ -50663,21 +51056,21 @@ The following applications have been modified:
             \item The following parameters have been modified:
                \begin{description}
 
-                  \item[CENTRE] -- This is now a string parameter in
+                  \item[CENTRE] --- This is now a string parameter in
                   which is returned the formatted co-ordinates of the
                   last centroid position, in the current Frame of the
                   NDF.
 
-                  \item[INIT] -- This is now a string parameter which
+                  \item[INIT] --- This is now a string parameter which
                   should be given the co-ordinates of the initial guess
                   in the Current Frame of the NDF.
 
-                  \item[MARK] -- Now indicates whether the initial or
+                  \item[MARK] --- Now indicates whether the initial or
                   final positions should be marked on the screen.
 
-                  \item[MODE] -- Now accepts the extra value "Catalogue".
+                  \item[MODE] --- Now accepts the extra value "Catalogue".
 
-                  \item[XCEN,YCEN] -- These are now string parameters
+                  \item[XCEN,YCEN] --- These are now string parameters
                   which return the formatted \textit{x} and \textit{y} co-ordinates of the
                   last centroid position, in the current Frame of the
                   NDF.
@@ -50723,12 +51116,12 @@ The following applications have been modified:
                   using these old parameters are indicated): 
 
                \begin{description}
-                  \item[LINESTYLE] -- Use the STYLE parameter to specify a
+                  \item[LINESTYLE] --- Use the STYLE parameter to specify a
                                    value for the plotting attribute 
                                    \htmlattref{Style(Lines)}{Style(element)}.
-                  \item[SIGCOL] -- Use the \htmlattref{Colour(Lines)}{Colour(element)}~
+                  \item[SIGCOL] --- Use the \htmlattref{Colour(Lines)}{Colour(element)}~
                                    plotting attributes.
-                  \item[THICK]  -- Use the \htmlattref{Width(Lines)}{Width(element)}~ 
+                  \item[THICK]  --- Use the \htmlattref{Width(Lines)}{Width(element)}~ 
                                    plotting attributes. 
                \end{description}
 
@@ -50766,19 +51159,19 @@ The following applications have been modified:
                   using these old parameters are indicated): 
 
                \begin{description}
-                  \item[ABSLAB] -- Use the STYLE parameter to specify a
+                  \item[ABSLAB] --- Use the STYLE parameter to specify a
                                    value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
-                  \item[FONT]   -- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
-                  \item[MAJTIC] -- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
-                  \item[MINTIC] -- Use the {\att MinTick} plotting attribute.
-                  \item[ORDLAB] -- Use {\att Label(2)} plotting attribute.
-                  \item[OUTTIC] -- Use \htmlattref{MajTickLen}{MajTickLen}~ and \htmlattref{MinTickLen}{MinTickLen}~ 
+                  \item[FONT]   --- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
+                  \item[MAJTIC] --- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
+                  \item[MINTIC] --- Use the {\att MinTick} plotting attribute.
+                  \item[ORDLAB] --- Use {\att Label(2)} plotting attribute.
+                  \item[OUTTIC] --- Use \htmlattref{MajTickLen}{MajTickLen}~ and \htmlattref{MinTickLen}{MinTickLen}~ 
                                    plotting attributes.
-                  \item[PLTITL] -- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
-                  \item[PXSIZE] -- Create the picture first with the
+                  \item[PLTITL] --- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
+                  \item[PXSIZE] --- Create the picture first with the
                                    required picture size using PICDEF.
-                  \item[PYSIZE] -- See PXSIZE.
-                  \item[THICK]  -- Use the \htmlattref{Width}{Width(element)}~ plotting attributes.
+                  \item[PYSIZE] --- See PXSIZE.
+                  \item[THICK]  --- Use the \htmlattref{Width}{Width(element)}~ plotting attributes.
                \end{description}
 
             \item The following new parameters have been added: AXES, MARGIN, 
@@ -50787,11 +51180,11 @@ The following applications have been modified:
             \item The following parameters have been modified:
                \begin{description}
 
-                  \item[XLOG] -- If a logarithmic horizontal axis is 
+                  \item[XLOG] --- If a logarithmic horizontal axis is 
                   requested, the axis is now annotated with equally spaced
                   values of the logarithm (base 10) of the data value.
 
-                  \item[YLOG] -- If a logarithmic vertical axis is requested, 
+                  \item[YLOG] --- If a logarithmic vertical axis is requested, 
                   the vertical axis is now annotated with equally spaced
                   values of the logarithm (base 10) of the pixel count.
 
@@ -50829,12 +51222,12 @@ The following applications have been modified:
 
                \begin{description}
 
-                  \item[ANNOTA] -- Use the STYLE parameter to specify
+                  \item[ANNOTA] --- Use the STYLE parameter to specify
                   which elements of the annotation (if any) are required.
                   For instance, set {\tt "NumLab(1)=0"} to suppress the
                   numerical data values.
 
-                  \item[OUTLINE] -- Use the STYLE parameter to specify
+                  \item[OUTLINE] --- Use the STYLE parameter to specify
                   which elements of the annotation (if any) are required.
                   For instance, set {\tt "BORDER=0"} to suppress the box drawn
                   around the colour ramp.
@@ -50847,11 +51240,11 @@ The following applications have been modified:
             \item The following parameters have been modified:
                \begin{description}
 
-                  \item[LBOUND] -- Now gives the lower bounds in the
+                  \item[LBOUND] --- Now gives the lower bounds in the
                   co-ordinate Frame specified by parameter FRAME.  The
                   parameter type is now LITERAL rather than \_REAL.
 
-                  \item[UBOUND] -- Now gives the upper bounds in the
+                  \item[UBOUND] --- Now gives the upper bounds in the
                   co-ordinate Frame specified by parameter FRAME.  The
                   parameter type is now LITERAL rather than \_REAL.
 
@@ -50896,37 +51289,37 @@ The following applications have been modified:
 
                \begin{description}
 
-                  \item[ABSLAB] -- Use the STYLE parameter to specify a
+                  \item[ABSLAB] --- Use the STYLE parameter to specify a
                   value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
 
-                  \item[FONT] -- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
+                  \item[FONT] --- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
 
-                  \item[LBSIZE] -- Use the \htmlattref{Size(Labels)}{Size(element)}~ 
+                  \item[LBSIZE] --- Use the \htmlattref{Size(Labels)}{Size(element)}~ 
                                    plotting attribute.
 
-                  \item[MAJTIC] -- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
+                  \item[MAJTIC] --- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
 
-                  \item[MINTIC] -- Use the {\att MinTick} plotting attribute.
+                  \item[MINTIC] --- Use the {\att MinTick} plotting attribute.
 
-                  \item[ORDLAB] -- Use {\att Label(2)} plotting attribute.
+                  \item[ORDLAB] --- Use {\att Label(2)} plotting attribute.
 
-                  \item[OUTTIC] -- Use \htmlattref{MajTickLen}{MajTickLen}~ and 
+                  \item[OUTTIC] --- Use \htmlattref{MajTickLen}{MajTickLen}~ and 
                                    \htmlattref{MinTickLen}{MinTickLen}~ plotting attributes.
 
-                  \item[PLTITL] -- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
+                  \item[PLTITL] --- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
 
-                  \item[PXSIZE] -- Create the picture first using PICDEF,
+                  \item[PXSIZE] --- Create the picture first using PICDEF,
                   the required picture size using the SIZE.
 
-                  \item[PYSIZE] -- See PXSIZE.
+                  \item[PYSIZE] --- See PXSIZE.
 
-                  \item[TICLN] -- Use the \htmlattref{MajTickLen}{MajTickLen}~ and 
+                  \item[TICLN] --- Use the \htmlattref{MajTickLen}{MajTickLen}~ and 
                                   \htmlattref{MinTickLen}{MinTickLen}~ plotting attributes.
 
-                  \item[XLOG] -- Logarithmic \textit{x} axes are not currently
+                  \item[XLOG] --- Logarithmic \textit{x} axes are not currently
                   supported.
 
-                  \item[YLIMIT] -- Use new parameters YBOT and YTOP.
+                  \item[YLIMIT] --- Use new parameters YBOT and YTOP.
 
                \end{description}
 
@@ -50937,18 +51330,18 @@ The following applications have been modified:
             \item The following parameters have been modified:
                \begin{description}
 
-                  \item[LNINDX] -- Ranges of pixel indices are now
+                  \item[LNINDX] --- Ranges of pixel indices are now
                   specified using a colon ({\tt ":"}) instead of a hyphen
                   ({\tt "-"}).  So for instance, pixel rows 5 to 10 would now
                   be given as {\tt "5:10"} and not {\tt "5-10"}.
 
-                  \item[OFFSET] -- Now double precision.
+                  \item[OFFSET] --- Now double precision.
 
-                  \item[SPACE] -- Now accepts the additional value {\tt "None"}
+                  \item[SPACE] --- Now accepts the additional value {\tt "None"}
                   which specifies that all curves should be drawn with
                   the same vertical zero point.
 
-                  \item[YLOG] -- If a logarithmic vertical axis is requested, 
+                  \item[YLOG] --- If a logarithmic vertical axis is requested, 
                   the vertical axis is now annotated with equally spaced
                   values of the logarithm (base 10) of the supplied data.
                   Also, the curves are drawn with the vertical offsets
@@ -50969,16 +51362,16 @@ The following applications have been modified:
                   using these old parameters are indicated): 
 
                \begin{description}
-                  \item[ABSLAB] -- Use the STYLE parameter to specify a
+                  \item[ABSLAB] --- Use the STYLE parameter to specify a
                                    value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
-                  \item[FONT] -- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
-                  \item[MAJTIC] -- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
-                  \item[MINTIC] -- Use the {\att MinTick} plotting attribute.
-                  \item[ORDLAB] -- Use {\att Label(2)} plotting attribute.
-                  \item[OUTTIC] -- Use \htmlattref{MajTickLen}{MajTickLen}~ and 
+                  \item[FONT] --- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
+                  \item[MAJTIC] --- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
+                  \item[MINTIC] --- Use the {\att MinTick} plotting attribute.
+                  \item[ORDLAB] --- Use {\att Label(2)} plotting attribute.
+                  \item[OUTTIC] --- Use \htmlattref{MajTickLen}{MajTickLen}~ and 
                                    \htmlattref{MinTickLen}{MinTickLen}~ 
                                    plotting attributes.
-                  \item[PTITLE] -- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
+                  \item[PTITLE] --- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
                \end{description}
 
             \item The following new parameters have been added: AXES, MARGIN, 
@@ -51043,34 +51436,34 @@ The following applications have been modified:
 
                \begin{description}
 
-                  \item[ABSLAB] -- Use the STYLE parameter to specify a
+                  \item[ABSLAB] --- Use the STYLE parameter to specify a
                   value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
 
-                  \item[COSYS] -- Use application WCSFRAME to set the required
+                  \item[COSYS] --- Use application WCSFRAME to set the required
                                   co-ordinate Frame first.
-                  \item[FONT] -- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
+                  \item[FONT] --- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
 
-                  \item[MAJTIC] -- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
+                  \item[MAJTIC] --- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
 
-                  \item[MINTIC] -- Use the {\att MinTick} plotting attribute.
+                  \item[MINTIC] --- Use the {\att MinTick} plotting attribute.
 
-                  \item[ORDLAB] -- Use {\att Label(2)} plotting attribute.
+                  \item[ORDLAB] --- Use {\att Label(2)} plotting attribute.
 
-                  \item[OUTTIC] -- Use \htmlattref{MajTickLen}{MajTickLen}~ and \htmlattref{MinTickLen}{MinTickLen}~ plotting attributes.
+                  \item[OUTTIC] --- Use \htmlattref{MajTickLen}{MajTickLen}~ and \htmlattref{MinTickLen}{MinTickLen}~ plotting attributes.
 
-                  \item[PLTITL] -- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
+                  \item[PLTITL] --- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
 
-                  \item[PXSIZE] -- Create the picture first using PICDEF,
+                  \item[PXSIZE] --- Create the picture first using PICDEF,
                   the required picture size using the SIZE.
 
-                  \item[PYSIZE] -- See PXSIZE.
+                  \item[PYSIZE] --- See PXSIZE.
 
-                  \item[RADUNITS] -- Use application WCSFRAME to set the required
+                  \item[RADUNITS] --- Use application WCSFRAME to set the required
                                   co-ordinate Frame first, or set the Unit
                                   attribute for axis 1 of the input NDF
                                   using application \htmlref{WCSATTRIB}{WCSATTRIB}.
 
-                  \item[SCALE] -- Use application WCSFRAME to set the required
+                  \item[SCALE] --- Use application WCSFRAME to set the required
                                   co-ordinate Frame first.  Create a new
                                   Frame if necessary using application \htmlref{WCSADD}{WCSADD}.
 
@@ -51082,7 +51475,7 @@ The following applications have been modified:
             \item The following parameters have been modified:
                \begin{description}
 
-                  \item[OUT] -- The pixel origin is no longer [1,1].
+                  \item[OUT] --- The pixel origin is no longer [1,1].
                   Instead, the pixel bounds are chosen to align the model
                   PSF with the first fitted star in pixel co-ordinates.
                   As a consequence, the PSF centre may not be exactly at
@@ -51145,30 +51538,30 @@ The following applications have been modified:
                   using these old parameters are indicated): 
 
                \begin{description}
-                  \item[ABSLAB] -- Use the STYLE parameter to specify a
+                  \item[ABSLAB] --- Use the STYLE parameter to specify a
                                    value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
-                  \item[BORDER] -- Set AXES={\tt TRUE}, and suppress everything
+                  \item[BORDER] --- Set AXES={\tt TRUE}, and suppress everything
                                    but the border by setting suitable plotting 
                                    attributes (\emph{e.g.} {\tt MajTickLen=0, 
                                    MinTickLen=0, TextLab=0} \emph{etc.}).
-                  \item[COSYS] -- Use application WCSFRAME to set the required 
+                  \item[COSYS] --- Use application WCSFRAME to set the required 
                                    co-ordinate Frame first.
-                  \item[FONT] -- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
-                  \item[MAJTIC] -- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
-                  \item[MINTIC] -- Use the {\att MinTick} plotting attribute.
-                  \item[ORDLAB] -- Use {\att Label(2)} plotting attribute.
-                  \item[OUTTIC] -- Use \htmlattref{MajTickLen}{MajTickLen}~ and 
+                  \item[FONT] --- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
+                  \item[MAJTIC] --- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
+                  \item[MINTIC] --- Use the {\att MinTick} plotting attribute.
+                  \item[ORDLAB] --- Use {\att Label(2)} plotting attribute.
+                  \item[OUTTIC] --- Use \htmlattref{MajTickLen}{MajTickLen}~ and 
                                    \htmlattref{MinTickLen}{MinTickLen}~ 
                                    plotting attributes.
-                  \item[PLTITL] -- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
-                  \item[PXSIZE] -- Create the picture first using PICDEF,
+                  \item[PLTITL] --- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
+                  \item[PXSIZE] --- Create the picture first using PICDEF,
                                    specifying the required picture size using 
                                    the new parameter SIZE.
-                  \item[PYSIZE] -- See PXSIZE.
-                  \item[THICK] -- Use the \htmlattref{Width}{Width(element)}~ plotting attributes.
-                  \item[VECCOL] -- Use the \htmlattref{Colour(vectors)}{Colour(element)}~ 
+                  \item[PYSIZE] --- See PXSIZE.
+                  \item[THICK] --- Use the \htmlattref{Width}{Width(element)}~ plotting attributes.
+                  \item[VECCOL] --- Use the \htmlattref{Colour(vectors)}{Colour(element)}~ 
                                    plotting attributes.
-                  \item[VTYPE] -- Use the new parameter ARROW.
+                  \item[VTYPE] --- Use the new parameter ARROW.
                \end{description}
 
             \item The following new parameters have been added: ARROW,
@@ -51176,12 +51569,12 @@ The following applications have been modified:
          
             \item The following parameters have been modified:
                \begin{description}
-                  \item [AXES] -- Axes are now annotated with the current
+                  \item [AXES] --- Axes are now annotated with the current
                                   co-ordinate Frame of the NDF.
-                  \item [CLEAR] -- Setting CLEAR={\tt FALSE} cause the new contour map
+                  \item [CLEAR] --- Setting CLEAR={\tt FALSE} cause the new contour map
                                to be aligned spatially with any existing DATA 
                                picture (if possible).
-                  \item [KEY] -- The appearance of the key can now be controlled
+                  \item [KEY] --- The appearance of the key can now be controlled
                               using parameter KEYSTYLE, and the position of the
                               key can be controlled using parameter KEYPOS.
                \end{description}
@@ -51198,11 +51591,11 @@ The following applications have been modified:
 
 \subsection{New applications}
 \begin{description}
-   \item [\htmlref{COLCOMP}{COLCOMP}] -- Produces a colour composite image 
+   \item [\htmlref{COLCOMP}{COLCOMP}] --- Produces a colour composite image 
     from 1, 2 or 3 individual NDFs.
-   \item [\htmlref{SCATTER}{SCATTER}] -- Displays a scatter plot between
+   \item [\htmlref{SCATTER}{SCATTER}] --- Displays a scatter plot between
     data in two \textit{n}-dimension NDFs.
-   \item [\htmlref{KAPVERSION}{KAPVERSION}] -- Check the version number of the 
+   \item [\htmlref{KAPVERSION}{KAPVERSION}] --- Check the version number of the 
     installed package.
 \end{description}
 
@@ -51349,12 +51742,12 @@ The following applications have been modified:
             (alternatives to using these old parameters are indicated):
 
             \begin{description}
-               \item[NCX1, NCX2, etc.] -- Set FRAME={\tt "BASEPIC"} and use X1, 
+               \item[NCX1, NCX2, etc.] --- Set FRAME={\tt "BASEPIC"} and use X1, 
                    X2, \emph{etc.}, remembering that NCX1 \emph{etc.} 
                    referred to a Frame in which the longer axis had 
                    unit length, where-as the \emph{shorter} axis has 
                    unit length in the BASEPIC Frame .
-               \item[WCX1, WCX2, etc.] -- Set FRAME=! and use X1, X2,
+               \item[WCX1, WCX2, etc.] --- Set FRAME=! and use X1, X2,
                    \emph{etc.}
             \end{description}
 
@@ -51462,19 +51855,19 @@ The following applications have been modified:
             (alternatives to using these old parameters are indicated):
 
             \begin{description}
-               \item[AXES] -- Use new parameter USEAXIS.  Note, if the
+               \item[AXES] --- Use new parameter USEAXIS.  Note, if the
                data array has more than 2 dimensions and the axes of the 
                current co-ordinate Frame are not parallel to the pixel
                axes, it is usually advisable to set the current co-ordinate
                Frame to PIXEL before using SEGMENT.
 
-               \item[CLEAR] -- Use command {\tt gdclear current} before
+               \item[CLEAR] --- Use command {\tt gdclear current} before
                runnning SEGMENT.
 
-               \item[COLOUR] -- Use the new STYLE parameter to set the
+               \item[COLOUR] --- Use the new STYLE parameter to set the
                \htmlattref{Colour}{Colour(element)}~ attribute.
 
-               \item[COSYS] -- Use application WCSFRAME to set the required 
+               \item[COSYS] --- Use application WCSFRAME to set the required 
                                co-ordinate Frame first.
             \end{description}
 
@@ -51484,18 +51877,18 @@ The following applications have been modified:
          \item The following parameters have been changed:
 
             \begin{description}
-               \item[COORDS] -- Now has type LITERAL instead of \_REAL.
+               \item[COORDS] --- Now has type LITERAL instead of \_REAL.
                The position should be given as a pair of formatted axis
                value within the current co-ordinate Frame of the first 
                specified input NDF.
 
-               \item[MODE] -- Now recognizes {\tt "Catalogue"} as a valid
+               \item[MODE] --- Now recognizes {\tt "Catalogue"} as a valid
                value.
 
-               \item[PLOT] -- New values {\tt "Chain"} and {\tt "Mark"} replace 
+               \item[PLOT] --- New values {\tt "Chain"} and {\tt "Mark"} replace 
                the old value {\tt "Cross"}.
 
-               \item[POLY1-POLY20] -- The supplied files should now
+               \item[POLY1-POLY20] --- The supplied files should now
                contain positions in the current co-ordinate Frame of the 
                first specified input NDF.
 
@@ -51532,9 +51925,9 @@ The following applications have been modified:
             (alternatives to using these old parameters are indicated):
 
             \begin{description}
-               \item[COSYS] -- Use application WCSFRAME to set the required 
+               \item[COSYS] --- Use application WCSFRAME to set the required 
                                co-ordinate Frame first.
-               \item[MARK] -- Use new parameter PLOT to specify the type
+               \item[MARK] --- Use new parameter PLOT to specify the type
                               of graphics to mark each position with.
             \end{description}
 
@@ -51544,14 +51937,14 @@ The following applications have been modified:
          \item The following parameters have been changed:
 
             \begin{description}
-               \item[COLIN] -- The text file supplied for parameter COLIN
+               \item[COLIN] --- The text file supplied for parameter COLIN
                should now contain axis values in the current co-ordinate 
                Frame of the input NDF.
-               \item[COLOUT] -- The created text file contains axis values 
+               \item[COLOUT] --- The created text file contains axis values 
                in the current co-ordinate Frame of the input NDF.
-               \item[COLUMNS] -- The supplied values should now refer to the
+               \item[COLUMNS] --- The supplied values should now refer to the
                first axis in the current co-ordinate Frame of the input NDF.
-               \item[LINES] -- The supplied values should now refer to the
+               \item[LINES] --- The supplied values should now refer to the
                second axis in the current co-ordinate Frame of the input NDF.
             \end{description}
 
@@ -52309,7 +52702,8 @@ ABORT.
 
 \item The \htmlref{NDFTRACE}{NDFTRACE} application now displays the
 bounds of the NDF within each WCS Frame if FULLFRAME is set to YES.
-Also, the bounds of the NDF within the current WCS Frame are written to
+Also, the bounds of the NDF within the \htmlref{current WCS
+Frame}{se:curframe}~ are written to
 the new output parameters FLBND and FUBND.
 
 \item The \htmlref{BLOCK}{BLOCK} application can now smooth
@@ -52638,7 +53032,7 @@ The following applications have been modified:
       \end{itemize}
 \end{description}
 
-\section{\xlabel{se_changes}Release Notes---V1.7\label{se:changes}}
+\section{Release Notes---V1.7}
 
 \subsection{New Commands}
 The following new applications have been added:
@@ -52735,7 +53129,8 @@ The following applications have been modified:
          \item It now reports a nominal pixel scale in output parameter
          FPIXSCALE.
          \item There is a new output parameter, FPIXSCALE, to store
-         the nominal pixel scale or each axis in the current WCS Frame.
+         the nominal pixel scale or each axis in the \htmlref{current
+         WCS Frame}{se:curframe}.
       \end{itemize}
 
    \item [\htmlref{ROTATE}{ROTATE}] \mbox{}
@@ -52792,6 +53187,32 @@ The following applications have been modified:
 
 \end{description}
 
+\section{\xlabel{se_changes}Release Notes---V1.8\label{se:changes}}
+
+\subsection{New Commands}
+The following new applications have been added:
+
+\begin{description}
+   \item [\htmlref{PLUCK}{PLUCK}] \mbox{}
+   This extracts slices parallel to pixel axes from an NDF.  The slices
+   are nominated positions that are not at pixel centres.  Thus it can
+   be used for example, with a spectral imaging cube to extract spectra
+   at specified equatorial co-ordinates, or an image at a given spectral
+   co-ordinate.
+\end{description}
+
+\subsection{Modified Commands}
+The following applications have been modified:
+
+\begin{description}
+
+   \item [\htmlref{PSF}{PSF}] \mbox{}
+      \begin{itemize}
+         \item The new output parameter TOTAL returns the total flux
+         for the fitted S\'{e}rsic function.
+      \end{itemize}
+
+\end{description}
 
 \begin{latexonly}
 \newpage
@@ -53107,6 +53528,8 @@ functions as follows.
  Compresses an NDF so that it occupies less disk space.
 \classitem{PIXDUPE}
  Expands an NDF by pixel duplication.
+\classitem{PLUCK}
+ Plucks slices from an NDF at arbitrary positions.
 \classitem{REGRID}
  Uses an arbitrary mapping to regrid an NDF.
 \classitem{SQORST}
@@ -53129,6 +53552,8 @@ functions as follows.
  Copies an NDF (or NDF section) to a new location.
 \classitem{PERMAXES}
  Permutes the axes of an NDF.
+\classitem{PLUCK}
+ Plucks slices from an NDF at arbitrary positions.
 \classitem{PROFILE}
  Creates a one-dimensional profile through an \textit{n}-dimensional NDF.
 \classitem{REGRID}
@@ -53355,6 +53780,8 @@ functions as follows.
 %
 \item {\large\bf Resampling and transformations}
 \begin{description}
+\classitem{PLUCK}
+ Plucks slices from an NDF at arbitrary positions.
 \classitem{REGRID}
  Uses an arbitrary mapping to regrid an NDF.
 \classitem{WCSALIGN}

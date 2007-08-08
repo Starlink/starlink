@@ -35,7 +35,8 @@ kps1_lucsm.f kps1_lucy.f  kps1_mdset.f kps1_mfaur.f kps1_mfgns.f \
 kps1_mlpcp.f kps1_mlpcv.f kps1_mlpfs.f kps1_mlpky.f kps1_mlplb.f \
 kps1_mlpml.f kps1_mlpmp.f kps1_mlpnd.f kps1_mlpng.f kps1_mlppn.f \
 kps1_msa.f   kps1_mss.f   kps1_mthcd.f kps1_mthcr.f kps1_nmplt.f \
-kps1_op1.f   kps1_op2.f   kps1_plclc.f kps1_plcpy.f kps1_plmsk.f \
+kps1_op1.f   kps1_op2.f   kps1_plclc.f kps1_plcpy.f kps1_plfil.f \
+kps1_plint.f kps1_plmsk.f \
 kps1_polyv.f kps1_prflt.f kps1_prfmk.f kps1_prfsm.f kps1_psdim.f \
 kps1_psevl.f kps1_psplt.f kps1_pswcs.f kps1_putc.f  kps1_putl.f \
 kps1_puts.f  kps1_putvl.f kps1_pxdpm.f kps1_robos.f kps1_rofwd.f \
@@ -93,7 +94,8 @@ KPG_GN_GEN = kps1_clns.gn kps1_hsmo.gn kps1_inle.gn kps1_inli.gn \
              kps1_mfrm.gn kps1_mdrf.gn kps1_mdrp.gn kps1_mdwt.gn \
              kps1_mspa.gn kps1_mssa.gn kps1_nom1.gn kps1_plcp.gn \
              kps1_put.gn  kps1_robl.gn kps1_ronn.gn kps1_rora.gn \
-             kps1_rorb.gn kps1_rprf.gn kps1_slae.gn kps1_zprg.gn
+             kps1_rorb.gn kps1_rprf.gn kps1_slae.gn kps1_zprg.gn \
+             kps1_plrs.gn
 
 KPG_R_GEN = kps1_pgft.gr
 

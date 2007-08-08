@@ -14189,6 +14189,133 @@ iraf! {
 
       }
 
+      action pluck {
+         alias {plu(ck)}
+
+         helplib {$KAPPA_HELP}
+
+          parameter axes {
+            position 2
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Indices of WCS axes to be retained in the output NDF}
+            helpkey *
+            size *
+          }
+
+         parameter coin {
+            type FILENAME
+            ppath CURRENT
+            prompt {Text file containing initial positions}
+            helpkey *
+          }
+
+         parameter container {
+            type _LOGICAL
+            prompt {Store the NDF slices in a single HDS container file?}
+            vpath DEFAULT
+            ppath CURRENT,DEFAULT
+            default FALSE
+            helpkey *
+          }
+
+         parameter describe {
+            type _LOGICAL
+            prompt {Is the co-ordinate Frame to be described?}
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            helpkey *
+          }
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Input NDF}
+            helpkey *
+         }
+
+         parameter incat {
+            type FILENAME
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.CATALOGUE
+            prompt {Catalogue containing fixed co-ordinates}
+            helpkey *
+          }
+
+         parameter mode {
+            position 5
+            type LITERAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Mode used to obtain positions of slices}
+            default Interface
+            helpkey *
+          }
+
+         parameter method {
+            position 4
+            type LITERAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Re-sampling method}
+            helpkey *
+            default {Nearest}
+         }
+
+         parameter out {
+            position 3
+            type NDF
+            access WRITE
+            vpath PROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Output NDF}
+            helpkey *
+         }
+
+         parameter params {
+            size *
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Auxiliary resampling parameters}
+            helpkey *
+         }
+
+         parameter pos {
+            type LITERAL
+            ppath CURRENT DYNAMIC
+            prompt {Position of slice}
+            helpkey *
+          }
+
+         parameter title {
+            type LITERAL
+            vpath DEFAULT
+            prompt {Title for output NDF}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter tol {
+            type _DOUBLE
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default 0.05
+            prompt {Tolerance for linear transformation approximation}
+            helpkey *
+         }
+
+      }
+
+
       action pow {
 
          helplib {$KAPPA_HELP}
