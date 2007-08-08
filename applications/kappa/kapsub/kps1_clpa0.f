@@ -28,8 +28,8 @@
 *        The original number of pixels along the pixel axis which is 
 *        being removed.
 *     POS( * ) = DOUBLE PRECISION (Given)
-*        The base Frame coords of a position which has good current Frame
-*        coords.
+*        The base-Frame co-ordinates of a position that has good 
+*        current Frame co-ordinatess.
 *     TRIM = LOGICAL (Given)
 *        If .TRUE., then the collapsed WCS and pixel axes are removed 
 *        from the returned FrameSet. Otherwise, they are retained and 

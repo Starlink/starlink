@@ -667,7 +667,7 @@
 *  Abort if an error occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Silent running, but first record the exisitng reporting level.
+*  Silent running, but first record the existing reporting level.
       CALL MSG_IFLEV( MSGFIL )
       IF ( QUIET ) CALL MSG_IFSET( MSG__QUIET, STATUS )
 
