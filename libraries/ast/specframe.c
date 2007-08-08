@@ -133,6 +133,9 @@ f     - AST_GETREFPOS: Get reference position in any celestial system
 *        SpecFrame contained within a CmpFrame. This involves changes in
 *        Match and the removal of the local versions of SetMaxAxes and
 *        SetMinAxes.
+*     8-AUG-2007 (DSB):
+*        Changed Overlay to avoid the possibility of making permanent
+*        changes to the supplied template Frame.
 *class--
 */
 
@@ -2958,6 +2961,7 @@ static int Match( AstFrame *template_frame, AstFrame *target,
             frame0 = astAnnul( frame0 );
          }
       }
+
    }
 
 /* Check at least one SpecFrame axis was found it the target. Store the
@@ -2973,6 +2977,7 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    Frames which effects the required coordinate conversion. */
       match = astSubFrame( target, template, 1, *target_axes, *template_axes,
                            map, result );
+
    }
 
 /* If an error occurred, or conversion to the result Frame's
@@ -2985,6 +2990,7 @@ static int Match( AstFrame *template_frame, AstFrame *target,
       if( *result ) *result = astAnnul( *result );
       match = 0;
    }
+
 
 /* Return the result. */
    return match;
@@ -3240,14 +3246,13 @@ static void Overlay( AstFrame *template, const int *template_axes,
 *     In this case, these attributes will not be transferred.
 */
 
-
 /* Local Variables: */
-   const char *new_class;        /* Pointer to template class string */
-   const char *old_class;        /* Pointer to result class string */
-   const char *method;           /* Pointer to method string */
+   AstFrame *templt;             /* Copy of supplied template Frame */
    AstSystemType new_system;     /* Code identifying new cordinates */
    AstSystemType old_system;     /* Code identifying old coordinates */
-   int resetSystem;              /* Was the template System value cleared? */
+   const char *method;           /* Pointer to method string */
+   const char *new_class;        /* Pointer to template class string */
+   const char *old_class;        /* Pointer to result class string */
    int specframe;                /* Result Frame is a SpecFrame? */
 
 /* Check the global error status. */
@@ -3262,11 +3267,20 @@ static void Overlay( AstFrame *template, const int *template_axes,
    old_system = astGetSystem( result );
    new_system = astGetSystem( template );
 
+/* It may be necessary to make temporary changes to the template Frame
+   below. In order to ensure that we make no permanent changes to the
+   supplied frame, we will, if necessary, take a deep copy of the
+   supplied Frame, storing a pointer to the copy in "templt". If it is
+   not necessary to make any changes to the template, we still want
+   "templt" to hold a usable pointer, so we initialise it now to hold a
+   clone of the supplied pointer. This pointer will be replaced by a
+   pointer to a deep copy (if required) below. */
+   templt = astClone( template );
+
 /* If the result Frame is a SpecFrame, we must test to see if overlaying its
    System attribute will change the type of coordinate system it describes. 
    Determine the value of this attribute for the result and template 
    SpecFrames. */
-   resetSystem = 0;
    specframe = astIsASpecFrame( result );
    if( specframe ) {
 
@@ -3292,20 +3306,19 @@ static void Overlay( AstFrame *template, const int *template_axes,
 
 /* If the result Frame is not a SpecFrame, we must temporarily clear the
    System value since the System values used by this class are only
-   appropriate to this class. */
+   appropriate to this class. Use a deep copy to avoid the danger of
+   making any permanent changes to the suppied Frame. */
    } else {
       if( astTestSystem( template ) ) {
-         astClearSystem( template );
-         resetSystem = 1;
+         templt = astAnnul( templt );
+         templt = astCopy( template );
+         astClearSystem( templt );
       }
    }
 
 /* Invoke the parent class astOverlay method to transfer attributes inherited
    from the parent class. */
-   (*parent_overlay)( template, template_axes, result );
-
-/* Reset the System value if necessary */
-   if( resetSystem ) astSetSystem( template, new_system );
+   (*parent_overlay)( templt, template_axes, result );
 
 /* Check if the result Frame is a SpecFrame or from a class derived from
    SpecFrame. If not, we cannot transfer SpecFrame attributes to it as it is
@@ -3334,6 +3347,9 @@ static void Overlay( AstFrame *template, const int *template_axes,
       OVERLAY(StdOfRest)
       OVERLAY(SpecOrigin)
    }
+
+/* Free resources */
+   templt = astAnnul( templt );
 
 /* Undefine macros local to this function. */
 #undef OVERLAY
