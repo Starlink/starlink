@@ -363,6 +363,7 @@ void findback( int *status ){
 
 /* Report the bounds of the slice if required. */
       if( ilevel > 0 ) {
+          msgBlank( status );
           msgSeti( "I", islice + 1 );
           msgSeti( "N", nslice );
           msgOut( "", "   Processing slice ^I of ^N...", status );
