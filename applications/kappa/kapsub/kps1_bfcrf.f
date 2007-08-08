@@ -115,6 +115,8 @@
 *        Used a purely AST approach to derive the position angle.  This
 *        needed argument CFRM (current Frame identifier) to be replaced
 *        by IWCS.
+*     2007 August 6 (MJC):
+*        Pass only single positions to AST_NORM.
 *     {enter_further_changes_here}
 
 *-
@@ -235,7 +237,8 @@
      :                   STATUS )
 
 *  Normalize the supplied current Frame position.
-         CALL AST_NORM( CFRM, POS, STATUS )
+         CALL AST_NORM( CFRM, POS( 1, 1 ), STATUS )
+         CALL AST_NORM( CFRM, POS( 2, 1 ), STATUS )
 
          RP( 1, IB ) = POS( 1, 1 )
          RP( 2, IB ) = POS( 1, 2 )
@@ -289,7 +292,8 @@
      :                   STATUS )
 
 *  Normalize the current Frame co-ordinates.
-         CALL AST_NORM( CFRM, POS, STATUS )
+         CALL AST_NORM( CFRM, POS( 1, 1 ), STATUS )
+         CALL AST_NORM( CFRM, POS( 2, 1 ), STATUS )
 
 *  Need to determine the distances for the beam widths.  Use the
 *  reporting axis.
@@ -319,7 +323,8 @@
      :                      STATUS )
 
 *  Normalize the current Frame co-ordinates.
-            CALL AST_NORM( CFRM, POS, STATUS )
+            CALL AST_NORM( CFRM, POS( 1, 1 ), STATUS )
+            CALL AST_NORM( CFRM, POS( 2, 1 ), STATUS )
 
 *  Need to determine the distance for the error bars.  For convenience
 *  we fudge it here if NAXC exceeds 2.  We're keeping higher axes 
@@ -404,7 +409,8 @@
      :                      STATUS )
 
 *  Normalize the current Frame co-ordinates.
-            CALL AST_NORM( CFRM, POS, STATUS )
+            CALL AST_NORM( CFRM, POS( 1, 1 ), STATUS )
+            CALL AST_NORM( CFRM, POS( 2, 1 ), STATUS )
 
 *  Need to determine the distances for the separation.  Use the
 *  reporting axis.
