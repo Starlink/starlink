@@ -175,6 +175,8 @@
 *        -Changed name of smf_rebincube_totmap to smf_rebin_totmap
 *     2007-07-16 (EC):
 *        -Added copysubgroups to smf_construct_smfGroup
+*     2007-08-09 (EC):
+*        -Changed interface for smf_model_create
 
 *     {enter_further_changes_here}
 *  Copyright:
@@ -441,7 +443,8 @@ void smf_mapbounds_approx( Grp *igrp, int index, char *system, double pixsize,
 			   int *moving, int *status );
 
 void smf_model_create( const smfGroup *igrp, smf_modeltype mtype, 
-		       smfGroup **mgroup, int *status);
+		       smfGroup **mgroup, int leaveopen, smfArray **mdata, 
+		       int *status);
 
 char *smf_model_getname( smf_modeltype type, int *status);
 

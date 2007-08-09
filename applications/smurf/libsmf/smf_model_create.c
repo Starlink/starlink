@@ -14,7 +14,8 @@
 
 *  Invocation:
 *     smf_model_create( const smfGroup *igroup, smf_modeltype mtype, 
-*                       smfGroup **mgroup, int *status);
+*                       smfGroup **mgroup, int leaveopen,
+*                       smfArray **mdata, int *status);
 
 *  Arguments:
 *     igroup = const smfGroup * (Given)
@@ -23,15 +24,27 @@
 *        Type of model component to create
 *     mgroup = smfGroup ** (Returned)
 *        Pointer to smfGroup pointer that will contain model file names
+*     leaveopen = int (Given )
+*        If true, don't close files once created and store in mdata
+*     mdata = smfArray ** (Given and Returned)
+*        Container to store data is leaveopen is set: array of
+*        smfArray pointers. The top-level array must already be
+*        allocated (same number of elements as ngroups in igroup), but
+*        the individual smfArrays get allocated here.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-*     Given a group of input (template) data files, this routine creates
-*     new NDF files with dimensions appropriate for the model parameters.
-*     For example, a common-model signal is represented by a 1-dimensional 
-*     array as a function of time. The names of the containers are the same as
-*     the input templated, with a suffix added.
+*     Given a group of input (template) data files, this routine
+*     creates new NDF files with dimensions appropriate for the model
+*     parameters.  For example, a common-model signal is represented
+*     by a 1-dimensional array as a function of time. The names of the
+*     containers are the same as the input templated, with a suffix
+*     added. The containers can be stored in smfArrays if leavelopen
+*     is set. In this case it is up to the caller to first generate an
+*     array of smfArray pointers (mdata) which then get new smfArrays
+*     assigned to them. In this case it is up to the caller to close
+*     the smfArrays.
 
 *  Notes:
 
@@ -62,6 +75,9 @@
 *        Only create one smfData per subgroup for SMF__COM models
 *     2007-07-16 (EC):
 *        -Changed smf_construct_smfGroup interface
+*     2007-08-09 (EC):
+*        -use mmap rather than fwrite for creation
+*        -option to leave files open, store in smfArrays
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -91,8 +107,9 @@
 */
 
 /* General includes */
-//#include <sys/mman.h>
+#include <sys/mman.h>
 #include <sys/stat.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -110,12 +127,14 @@
 #define FUNC_NAME "smf_model_create"
 
 void smf_model_create( const smfGroup *igroup, smf_modeltype mtype, 
-		       smfGroup **mgroup, int *status) {
+		       smfGroup **mgroup, int leaveopen, smfArray **mdata, 
+		       int *status) {
 
   /* Local Variables */
   int added=0;                  /* Number of names added to group */
   void *buf=NULL;               /* Pointer to total container buffer */
   int copyinput=0;              /* If set, container is copy of input */
+  smfData *data = NULL;         /* Data struct for file */
   size_t datalen=0;             /* Size of data buffer in bytes */
   void *dataptr=NULL;           /* Pointer to data portion of buffer */
   int fd=0;                     /* File descriptor */
@@ -334,14 +353,28 @@ void smf_model_create( const smfGroup *igroup, smf_modeltype mtype,
 	    errRep( FUNC_NAME, "Unable to open model container file", status );
 	  }
       
-	  buf = smf_malloc( headlen+datalen, 1, 0, status );
+	  /* First truncate the file to make it the correct size, and then
+             map it (without the ftruncate bus errors are generated under
+             linux when the memory is subsequently accessed...) */
 
 	  if( *status == SAI__OK ) {
+	    if( ftruncate( fd, datalen+headlen ) == -1 ) {
+	      *status = SAI__ERROR;
+	      errRep( FUNC_NAME, "Unable to re-size container file", 
+		      status ); 
+	    } else if( (buf = mmap( 0, datalen+headlen, PROT_READ | PROT_WRITE,
+				    MAP_SHARED, fd, 0 ) ) == MAP_FAILED ) {
+	      *status = SAI__ERROR;
+	      errRep( FUNC_NAME, "Unable to map model container file", 
+		      status ); 
+	    }
+	  }
 
+	  if( *status == SAI__OK ) {
 	    headptr = buf;
 	    dataptr = buf + headlen;
 
-	    /* Write the header. memset to 0 first since much of this space is
+	    /* Fill the header. memset to 0 first since much of this space is
 	       padding to make it a multiple of the page size */
 	    memset( headptr, 0, headlen );
 	    memcpy( headptr, &head, sizeof(head) );
@@ -368,20 +401,73 @@ void smf_model_create( const smfGroup *igroup, smf_modeltype mtype,
 	    }
 	  }
 
-	  /* Write buffer and close the container */
-
 	  if( *status == SAI__OK ) {
 
-	    if( write( fd, buf, headlen+datalen ) == -1 ) {
-	      *status = SAI__ERROR;
-	      errRep( FUNC_NAME, "Unable to write model container file", 
-		      status ); 
-	    }
-	
-	    if( close( fd ) == -1 ) {
-	      *status = SAI__ERROR;
-	      errRep( FUNC_NAME, "Unable to close model container file", 
-		      status ); 
+	    /* If leaveopen set, pack the data into a smfArray */
+	    if( leaveopen ) {
+
+	      /* If this is the first element of the subgroup create
+                 the smfArray */
+	      if( j == 0 ) {
+		mdata[i] = smf_create_smfArray( status );
+	      }
+
+	      /* Create a smfData for this element of the subgroup */
+	      data = smf_create_smfData( SMF__NOCREATE_HEAD | 
+					 SMF__NOCREATE_DA, status );
+
+	      if( *status == SAI__OK ) {
+		/* Data from file header */
+		data->dtype = head.dtype;
+		data->ndims = head.ndims;
+		memcpy( data->dims, head.dims, sizeof( head.dims ) );
+    
+		/* Data pointer points to mmap'd memory AFTER HEADER */
+		data->pntr[0] = dataptr;
+
+		/* Store the file descriptor to enable us to unmap when we 
+		   close */
+		data->file->fd = fd;
+
+		/* Copy the DIMM filename into the smfFile */
+		strncpy( data->file->name, name, SMF_PATH_MAX );
+
+		/* Add the smfData to the smfArray */
+		smf_addto_smfArray( mdata[i], data, status );
+	      }
+
+	      /* Synchronize and unmap the header portion of the mmap'd 
+                 memory since it will not get free'd by smf_close_file */
+
+	      if( msync( buf, headlen, MS_ASYNC ) == -1 ) {
+		*status = SAI__ERROR;
+		errRep( FUNC_NAME, 
+			"Unable to synch header in model container file", 
+			status ); 
+	      } else if( munmap( buf, headlen ) == -1 ) {
+		*status = SAI__ERROR;
+		errRep( FUNC_NAME, 
+			"Unable to unmap header in model container file", 
+			status ); 
+	      }
+	    } else {
+
+	      /* If leaveopen not set write buffer to file and close 
+		 container */
+
+	      if( msync( buf, headlen+datalen, MS_ASYNC ) == -1 ) {
+		*status = SAI__ERROR;
+		errRep( FUNC_NAME, "Unable to synch model container file", 
+			status ); 
+	      } else if( munmap( buf, headlen+datalen ) == -1 ) {
+		*status = SAI__ERROR;
+		errRep( FUNC_NAME, "Unable to unmap model container file", 
+			status ); 
+	      } else if( close( fd ) == -1 ) {
+		*status = SAI__ERROR;
+		errRep( FUNC_NAME, "Unable to close model container file", 
+			status ); 
+	      }
 	    }
 	  }
 
