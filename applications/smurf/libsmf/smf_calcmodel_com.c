@@ -62,7 +62,11 @@
 *        Calculate only 1 model component for each smfArray
 *     2007-07-16 (EC):
 *        Modified range checking for range of smfData's in smfArray
+*     2007-08-09 (EC):
+*        Fixed bug in replacement of model in residual before calculating
+*        new model for current iteration.
 *     {enter_further_changes_here}
+
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -116,6 +120,7 @@ void smf_calcmodel_com( smfArray *res, AstKeyMap *keymap,
   dim_t j;                      /* Loop counter */
   double mean=0;                /* Array mean */
   double *model_data=NULL;      /* Pointer to DATA component of model */
+  double *model_data_copy=NULL; /* Copy of model_data */
   dim_t nbolo=0;                /* Number of bolometers */
   dim_t ndata=0;                /* Total number of data points */
   dim_t ntslice=0;              /* Number of time slices */
@@ -141,6 +146,21 @@ void smf_calcmodel_com( smfArray *res, AstKeyMap *keymap,
   if( model->sdata[0] ) {
     /* Pointer to model data array */
     model_data = (double *)(model->sdata[0]->pntr)[0];
+
+    /* Copy of model data array */
+    model_data_copy = smf_malloc( (model->sdata[0]->dims)[0], 
+			  sizeof(*model_data_copy), 1, status );
+
+    if( *status == SAI__OK ) {
+      memcpy( model_data_copy, model_data, (model->sdata[0]->dims)[0] *
+	      sizeof(*model_data_copy) );
+
+      /* Set model_data to 0 now since it will now be re-calculated */
+      memset( model_data, 0, (model->sdata[0]->dims)[0] * 
+	      sizeof(*model_data_copy) );
+    }
+
+
     /* Temporary buffer to store weights */
     weight = smf_malloc( (model->sdata[0]->dims)[0], sizeof(*weight), 1,
 			 status );
@@ -187,17 +207,14 @@ void smf_calcmodel_com( smfArray *res, AstKeyMap *keymap,
 	
 	base = i*nbolo;  /* Index to first data point in i'th time slice */
 
-	/* If this is the first subarray add the previous iteration of the 
-	   model back into the residual, and then set the model to 0. */
-	if( idx == 0 ) {
 
-	  lastmean = model_data[i];
+	/* Add the previous iteration of the model back into the residual, 
+	   and then set the model to 0. */
 
-	  for( j=0; j<nbolo; j++ ) {
-	    res_data[base + j] += lastmean;
-	  }
+	lastmean = model_data_copy[i];
 
-	  model_data[i] = 0;
+	for( j=0; j<nbolo; j++ ) {
+	  res_data[base + j] += lastmean;
 	}
 
 	/* Now calculate the new contribution to the model from the current
@@ -206,34 +223,41 @@ void smf_calcmodel_com( smfArray *res, AstKeyMap *keymap,
 	model_data[i] += mean;
 	weight[i] ++;
       }
-     
-      /* Re-normalize the model */
-      for( i=0; i<ntslice; i++ ) {
-	if( weight[i] ) {
-	  model_data[i] /= weight[i];
-	}
-      }
-
-      /* boxcar smooth if desired */
-      if( do_boxcar ) {
-	smf_boxcar1( model_data, ntslice, boxcar, status );
-      }
-
-      /* Remove common mode from the residual */
-      for( i=0; i<ntslice; i++ ) {
-	base = i*nbolo;  /* Index to first data point in i'th time slice */
-
-	/* Loop over bolometer */
-	for( j=0; j<nbolo; j++ ) {
-	  /* update the residual model */
-	  res_data[base + j] -= model_data[i];
-	}
-      }    
     }
+  }
+    
+  /* Re-normalize the model */
+  for( i=0; i<ntslice; i++ ) {
+    if( weight[i] ) {
+      model_data[i] /= weight[i];
+    }
+  }
+
+  /* boxcar smooth if desired */
+  if( do_boxcar ) {
+    smf_boxcar1( model_data, ntslice, boxcar, status );
+  }
+
+  /* remove common mode from residual */
+  for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
+    /* Get pointer to DATA component of residual */
+    res_data = (double *)(res->sdata[idx]->pntr)[0];
+
+    /* Remove common mode from the residual */
+    for( i=0; i<ntslice; i++ ) {
+      base = i*nbolo;  /* Index to first data point in i'th time slice */
+      
+      /* Loop over bolometer */
+      for( j=0; j<nbolo; j++ ) {
+	/* update the residual model */
+	res_data[base + j] -= model_data[i];
+      }
+    }    
   }
 
   /* Clean up */
   if( weight) smf_free( weight, status );
+  if( model_data_copy ) smf_free( model_data_copy, status );
 }
 
 
