@@ -79,7 +79,7 @@ all:
 all-nofitsio:
 		${MAKE} stand_alone "FITSIO_SRC="
 
-stand_alone:	libcfitsio.a
+stand_alone:	libcfitsio.a shared
 
 libcfitsio.a:	${OBJECTS}
 		ar rv libcfitsio.a ${OBJECTS}; \
