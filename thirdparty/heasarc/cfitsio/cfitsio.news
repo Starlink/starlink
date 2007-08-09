@@ -19,3 +19,7 @@
  
  The utility programs "imcopy", "fitscopy" and "listhead" are now built
  and installed by default.
+
+ 09-JUL-2007:
+
+ The shared library is now built by default.
