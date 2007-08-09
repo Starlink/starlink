@@ -87,7 +87,11 @@ AC_CHECK_LIB( [netcdf], [free_NC_attr], [], [
         echo "Warning! Couldn't find libnetcdf. impaztec task won't be available."
         ] )
 
-
+dnl    fail if we don't have ability to do memory mapping
+AC_CHECK_FUNCS( mmap msync munmap ftruncate, [], [
+         echo "Error! Couldn't find mmap, msync, munmap or ftruncate"
+        exit -1
+        ] )
 
 AC_CHECK_HEADERS(math.h)
 AC_CHECK_HEADERS(gsl/gsl_math.h)
