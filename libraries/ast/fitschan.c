@@ -769,6 +769,9 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        the supplied DSBSpecFrame represented frequency, and so gave
 *        incorrect values for IF and DSBCentre if the header described
 *        velocity.
+*     9-AUG-2007 (DSB):
+*        Changed GetEncoding so that critcal keywords are ignored if
+*        there are no CTYPE, CRPIX or CRVAL keywords in the header.
 *class--
 */
 
@@ -10154,6 +10157,13 @@ static int GetEncoding( AstFitsChan *this ){
 *     9) Keywords matching CRVALi = FITS-WCS encoding
 *     10) The PLTRAH keyword = DSS encoding
 *     11) If none of the above keywords are found, Native encoding is assumed.
+*
+*     For cases 2) to 9), a check is also made that the header contains
+*     at least one of each keyword CTYPE, CRPIX and CRVAL. If not, then
+*     the checking process continues to the next case. This goes some way
+*     towards ensuring that the critical keywords used to determine the
+*     encoding are part of a genuine WCS description and have not just been 
+*     left in the header by accident.
 
 *  Parameters:
 *     this
@@ -10170,6 +10180,7 @@ static int GetEncoding( AstFitsChan *this ){
 /* Local Variables... */
    int ret;            /* Returned value */
    int icard;          /* Index of current card on entry */
+   int haswcs;         /* Any CRVAL, CTYPE and CRPIX found? */
 
 /* Check the global status. */
    if( !astOK ) return UNKNOWN_ENCODING;
@@ -10181,6 +10192,11 @@ static int GetEncoding( AstFitsChan *this ){
 /* Otherwise, check for the existence of certain critcal keywords... */
    } else {
 
+/* See if the header contains some CTYPE, CRPIX and CRVAL keywords. */
+      haswcs = astKeyFields( this, "CTYPE%d", 0, NULL, NULL ) &&
+               astKeyFields( this, "CRPIX%d", 0, NULL, NULL ) &&
+               astKeyFields( this, "CRVAL%d", 0, NULL, NULL );
+
 /* Save the current card index, and rewind the FitsChan. */
       icard = astGetCard( this );
       astClearCard( this );
@@ -10191,12 +10207,12 @@ static int GetEncoding( AstFitsChan *this ){
          ret = NATIVE_ENCODING;
 
 /* Otherwise, look for a FITS-CLASS signature... */
-      } else if( LooksLikeClass( this, "astGetEncoding", "AstFitsChan" ) ){
+      } else if( haswcs && LooksLikeClass( this, "astGetEncoding", "AstFitsChan" ) ){
          ret = FITSCLASS_ENCODING;
 
 /* Otherwise, if the FitsChan contains any CTYPE keywords which have the
    peculiar form used by AIPS, then use "FITS-AIPS" or "FITS-AIPS++" encoding. */
-      } else if( HasAIPSSpecAxis( this, "astGetEncoding", "AstFitsChan" ) ){
+      } else if( haswcs && HasAIPSSpecAxis( this, "astGetEncoding", "AstFitsChan" ) ){
          if( astKeyFields( this, "CD%1d_%1d", 0, NULL, NULL ) ||
              astKeyFields( this, "PROJP%d", 0, NULL, NULL ) ||
              astKeyFields( this, "LONPOLE", 0, NULL, NULL ) ||
@@ -10208,19 +10224,19 @@ static int GetEncoding( AstFitsChan *this ){
 
 /* Otherwise, if the FitsChan contains any keywords with the format 
    "PCiiijjj" then return "FITS-PC" encoding. */
-      } else if( astKeyFields( this, "PC%3d%3d", 0, NULL, NULL ) ){
+      } else if( haswcs && astKeyFields( this, "PC%3d%3d", 0, NULL, NULL ) ){
          ret = FITSPC_ENCODING;
 
 /* Otherwise, if the FitsChan contains any keywords with the format 
    "CDiiijjj" then return "FITS-IRAF" encoding. */
-      } else if( astKeyFields( this, "CD%3d%3d", 0, NULL, NULL ) ){
+      } else if( haswcs && astKeyFields( this, "CD%3d%3d", 0, NULL, NULL ) ){
          ret = FITSIRAF_ENCODING;
 
 /* Otherwise, if the FitsChan contains any keywords with the format 
    "CDi_j"  AND there is a RADECSYS. PROJPi or CmVALi keyword, then return 
    "FITS-IRAF" encoding. If "CDi_j" is present but none of the others
    are, return "FITS-WCS" encoding. */
-      } else if( astKeyFields( this, "CD%1d_%1d", 0, NULL, NULL ) ) {
+      } else if( haswcs && astKeyFields( this, "CD%1d_%1d", 0, NULL, NULL ) ) {
 
          if( (  astKeyFields( this, "RADECSYS", 0, NULL, NULL ) &&
                !astKeyFields( this, "RADESYS", 0, NULL, NULL ) ) ||
@@ -10237,23 +10253,24 @@ static int GetEncoding( AstFitsChan *this ){
 
 /* Otherwise, if the FitsChan contains any keywords with the format 
    RADECSYS. PROJPi or CmVALi keyword, then return "FITS-PC" encoding. */
-      } else if( ( astKeyFields( this, "RADECSYS", 0, NULL, NULL ) &&
+      } else if( haswcs && (
+                   ( astKeyFields( this, "RADECSYS", 0, NULL, NULL ) &&
                    !astKeyFields( this, "RADESYS", 0, NULL, NULL ) ) ||
 
                  ( astKeyFields( this, "PROJP%d", 0, NULL, NULL ) &&
                    !astKeyFields( this, "PV%d_%d", 0, NULL, NULL ) ) ||
 
-                 astKeyFields( this, "C%1dVAL%d", 0, NULL, NULL ) ) {
+                 astKeyFields( this, "C%1dVAL%d", 0, NULL, NULL ) ) ) {
          ret = FITSPC_ENCODING;
 
 /* Otherwise, if the FitsChan contains any keywords with the format 
    "CROTAi" then return "FITS-AIPS" encoding. */
-      } else if( astKeyFields( this, "CROTA%d", 0, NULL, NULL ) ){
+      } else if( haswcs && astKeyFields( this, "CROTA%d", 0, NULL, NULL ) ){
          ret = FITSAIPS_ENCODING;
 
 /* Otherwise, if the FitsChan contains any keywords with the format 
    "CRVALi" then return "FITS-WCS" encoding. */
-      } else if( astKeyFields( this, "CRVAL%d", 0, NULL, NULL ) ){
+      } else if( haswcs && astKeyFields( this, "CRVAL%d", 0, NULL, NULL ) ){
          ret = FITSWCS_ENCODING;
 
 /* Otherwise, if the FitsChan contains the "PLTRAH" keywords, use "DSS" 
@@ -32169,6 +32186,11 @@ f     affects the behaviour of the AST_WRITE and AST_READ routines when
 *     case when using an empty FitsChan), then NATIVE encoding is
 *     used.
 *
+*     Except for the NATIVE and DSS encodings, all the above checks 
+*     also require that the header contains at least one CTYPE, CRPIX and
+*     CRVAL keyword (otherwise the checking process continues to the next
+*     case). 
+*
 *     Setting an explicit value for the Encoding attribute always
 *     over-rides this default behaviour.
 *
@@ -34241,7 +34263,7 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
 /* Encoding. */
 /* --------- */
       text = astReadString( channel, "encod", UNKNOWN_STRING );
-      if( strcmp( text, UNKNOWN_STRING ) ) {
+      if( text && strcmp( text, UNKNOWN_STRING ) ) {
          new->encoding = FindString( MAX_ENCODING + 1, xencod, text, 
                                      "the FitsChan component 'Encod'", 
                                      "astRead", astGetClass( channel ) );
