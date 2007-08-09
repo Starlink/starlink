@@ -27,6 +27,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
+*     Copyright (C) 2007 Science and Technology Facilities Council
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -46,11 +47,14 @@
 
 *  Authors:
 *     MBT: Mark Taylor (STARLINK - IoA)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
 *     02-MAR-1999 (MBT):
 *        Original version.
+*     09-JUL-2007 (PWD):
+*        Don't pass empty strings to AST.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -88,7 +92,7 @@
       CALL FIO_READ( CCD1_ASTFD, LINE, NCHAR, STATUS )
 
 *  If line was read successfully, pass line to AST system.
-      IF ( STATUS .EQ. SAI__OK ) THEN
+      IF ( STATUS .EQ. SAI__OK .AND. NCHAR .GT. 0 ) THEN
          CALL AST_PUTLINE( LINE, NCHAR, STATUS )
 
 *  If end of file was reached, tell that to the AST system.
