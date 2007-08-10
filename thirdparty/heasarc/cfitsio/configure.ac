@@ -16,6 +16,23 @@ AC_CONFIG_SRCDIR([cfitsio.news])
 dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
 
+dnl    Copied from CFITSIO configure.in. Find out the suffix used 
+dnl    for shareable libraries. Default is ".so".
+SHLIB_SUFFIX=".so"
+case "`uname -s`" in
+    Darwin*)
+        SHLIB_SUFFIX=".dylib"
+	;;
+    HP-UX*)
+        SHLIB_SUFFIX=".sl"
+	;;
+    CYGWIN*)
+        SHLIB_SUFFIX=".dll"
+	;;
+    *)
+esac
+AC_SUBST(SHLIB_SUFFIX)
+
 dnl    To configure CFITSIO proper we just run ./configure in the
 dnl    cfitsio sub-directory. Do not invoke AC_CONFIG_SUBDIRS,
 dnl    since that prompts autoreconf to try to reconfigure that directory, and

@@ -6,8 +6,11 @@ dist_bin_SCRIPTS = cfitsio_link
 ## Create the imcopy, fitscopy and listhead binaries, very useful.
 bin_SCRIPTS = cfitsio/imcopy cfitsio/fitscopy cfitsio/listhead
 
-## XXX what about libtool and shareable versions? Different file types.
+## The libraries, static and shared. Note shared needs special handling
+## as automake doesn't like the unknown extension.
 lib_LIBRARIES = cfitsio/libcfitsio.a
+liblibdir = $(libdir)
+liblib_SCRIPTS = cfitsio/libcfitsio@SHLIB_SUFFIX@
 
 # There are no sources for libcfits in this directory.
 cfitsio_libcfitsio_a_SOURCES =
@@ -29,12 +32,15 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ mud162.tex mud167.tex mud166.tex
 
 # Headers and example sources are made within cfitsio
 $(include_HEADERS) $(EXAMPLE_SOURCES):
-	(cd cfitsio; export CFLAGS; unset CFLAGS; $(MAKE))
+	(cd cfitsio; export CFLAGS; unset CFLAGS; $(MAKE) all)
 
 # Must be a separate target from above, otherwise automake doesn't notice,
 # and adds its own, conflicting, target.
 cfitsio/libcfitsio.a:
-	(cd cfitsio; export CFLAGS; unset CFLAGS; $(MAKE))
+	(cd cfitsio; export CFLAGS; unset CFLAGS; $(MAKE) all)
+
+$(liblib_SCRIPTS):
+	(cd cfitsio; export CFLAGS; unset CFLAGS; $(MAKE) shared)
 
 # The utility programs are created by cfitsio.
 cfitsio/imcopy: cfitsio/imcopy.c cfitsio/libcfitsio.a
