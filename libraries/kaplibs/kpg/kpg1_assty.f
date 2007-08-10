@@ -70,6 +70,9 @@
 *        Original version.
 *     14-SEP-2005 (TIMJ):
 *        Use common block accessor functions
+*     10-AUG-2007 (DSB):
+*        Use CHR_CLEAN so that TABs as well as spaces are removed from
+*        the attribute name.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -145,7 +148,7 @@
 *  See if there is an equals in the supplied string.
       EQUALS = INDEX( SETTNG, '=' )
 
-*  If no equals sign is found return a balnk value.
+*  If no equals sign is found return a blank value.
       IF( EQUALS .EQ. 0 ) THEN
          NAME = SETTNG
          VALUE = ' '
@@ -161,6 +164,7 @@
 
       ELSE
          NAME = SETTNG( : EQUALS - 1 )
+         CALL CHR_CLEAN( NAME )
          CALL CHR_RMBLK( NAME )
          CALL CHR_UCASE( NAME )
       END IF
