@@ -133,6 +133,8 @@ c     - astGetFits<X>: Get a keyword value from a FitsChan
 f     - AST_GETFITS<X>: Get a keyword value from a FitsChan
 c     - astSetFits<X>: Store a new keyword value in a FitsChan
 f     - AST_SETFITS<X>: Store a new keyword value in a FitsChan
+c     - astPurgeWCS: Delete all WCS-related cards in a FitsChan
+c     - AST_PURGEWCS: Delete all WCS-related cards in a FitsChan
 c     - astPutFits: Store a FITS header card in a FitsChan
 f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 c     - astPutCards: Stores a set of FITS header card in a FitsChan
@@ -772,6 +774,10 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *     9-AUG-2007 (DSB):
 *        Changed GetEncoding so that critcal keywords are ignored if
 *        there are no CTYPE, CRPIX or CRVAL keywords in the header.
+*     10-AUG-2007 (DSB):
+*        - Changed GetEncoding so that FITS_PC is not returned if there are
+*        any CDi_j or PCi_j keywords in the header.
+*        - Added astPurgeWCS method.
 *class--
 */
 
@@ -1303,12 +1309,13 @@ static void CreateKeyword( AstFitsChan *, const char *, char [ FITSNAMLEN + 1 ] 
 static void DSBSetUp( AstFitsChan *, FitsStore *, AstDSBSpecFrame *, char, double, const char *, const char * );
 static void DSSToStore( AstFitsChan *, FitsStore *, const char *, const char * );
 static void DelFits( AstFitsChan * );
+static void PurgeWCS( AstFitsChan * );
 static void Delete( AstObject * );
 static void DeleteCard( AstFitsChan *, const char *, const char * );
 static void DistortMaps( AstFitsChan *, FitsStore *, char, int , AstMapping **, AstMapping **, AstMapping **, AstMapping **, const char *, const char * );
 static void Dump( AstObject *, AstChannel * );
 static void Empty( AstFitsChan * );
-static void FindWcs( AstFitsChan *, int, const char *, const char * );
+static void FindWcs( AstFitsChan *, int, int, int, const char *, const char * );
 static void FixNew( AstFitsChan *, int, int, const char *, const char * );
 static void FixUsed( AstFitsChan *, int, int, int, const char *, const char * );
 static void FormatCard( AstFitsChan *, char *, const char * );
@@ -4610,7 +4617,7 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
    if( ok ) {
 
 /* Find the last WCS related card. */
-      FindWcs( this, 1, method, class );
+      FindWcs( this, 1, 1, 0, method, class );
 
 /* Get and save CRPIX for all pixel axes. These are required, so break
    if they are not available. */
@@ -8547,7 +8554,8 @@ static int FindLonLatSpecAxes( FitsStore *store, char s, int *axlon, int *axlat,
 
 }
 
-static void FindWcs( AstFitsChan *this, int last, const char *method, const char *class ){
+static void FindWcs( AstFitsChan *this, int last, int all, int rewind, 
+                     const char *method, const char *class ){
 /*
 *  Name:
 *     FindWcs
@@ -8560,15 +8568,18 @@ static void FindWcs( AstFitsChan *this, int last, const char *method, const char
 
 *  Synopsis:
 *     #include "fitschan.h"
-*     void FindWcs( AstFitsChan *this, int last, const char *method, const char *class  )
+*     void FindWcs( AstFitsChan *this, int last, int all, int rewind,
+*                   const char *method, const char *class )
 
 *  Class Membership:
 *     FitsChan member function.
 
 *  Description:
-*     A search is made through the FitsChan for the first or last card which
-*     relates to a FITS WCS keyword (any encoding). The next card becomes 
-*     the current card. Cards marked as having been read are included.
+*     A search is made through the FitsChan for the first or last card 
+*     which relates to a FITS WCS keyword (any encoding). If "last" is
+*     non-zero, the next card becomes the current card. If "last" is
+*     zero, the WCS card is left as the current card. Cards marked as 
+*     having been read are included or not, as specified by "all".
 
 *  Parameters:
 *     this
@@ -8576,6 +8587,14 @@ static void FindWcs( AstFitsChan *this, int last, const char *method, const char
 *     last
 *        If non-zero, the last WCS card is searched for. Otherwise, the
 *        first WCS card is searched for.
+*     all
+*        If non-zero, then cards marked as having been read are included
+*        in the search. Otherwise such cards are ignored.
+*     rewind
+*        Only used if "last" is zero (i.e. the first card is being
+*        searched for). If "rewind" is non-zero, then the search starts 
+*        from the first card in the FitsChan. If zero, the search starts 
+*        from the current card.
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
@@ -8598,17 +8617,21 @@ static void FindWcs( AstFitsChan *this, int last, const char *method, const char
 /* Check the global status. */
    if( !astOK ) return;
 
-/* Indicate that we should not skip over cards marked as having been
-   read. */
+/* Indicate that we should, or should not, skip over cards marked as having 
+   been read. */
    old_ignoreused = IgnoreUsed;
-   IgnoreUsed = 0;
+   IgnoreUsed = all ? 0 : 1;
 
-/* Set the FitsChan to start or end of file. */
+/* If required, set the FitsChan to start or end of file. */
    if( last ) {
       astSetCard( this, INT_MAX );
-   } else {
+   } else if( rewind ) {
       astClearCard( this );
    }
+
+/* If the current card is marked as used, and we are skipping used cards,
+   move on to the next unused card */
+   if( CARDUSED( this->card ) ) MoveCard( this, last?-1:1, method, class );
 
 /* Check each card moving backwards from the end to the start, or
    forwards from the start to the end, until a WCS keyword is found, 
@@ -8954,7 +8977,7 @@ static int FitsFromStore( AstFitsChan *this, FitsStore *store, int encoding,
    keywords either over-write pre-existing cards for the same keyword, or
    (if no pre-existing card exists) are inserted after the last WCS related
    keyword. */
-   FindWcs( this, 1, method, class );
+   FindWcs( this, 1, 1, 0, method, class );
 
 /* Do each non-standard FITS encoding... */
    if( encoding == DSS_ENCODING ){
@@ -10152,7 +10175,8 @@ static int GetEncoding( AstFitsChan *this ){
 *     5) Any keywords matching CDiiijjj = FITS-IRAF encoding
 *     6) Any keywords matching CDi_j, AND at least one of RADECSYS, PROJPi
 *        or CmVALi = FITS-IRAF encoding
-*     7) Any keywords RADECSYS, PROJPi or CmVALi = FITS-PC encoding
+*     7) Any keywords RADECSYS, PROJPi or CmVALi, and no CDi_j or PCi_j
+*        keywords, = FITS-PC encoding
 *     8) Any keywords matching CROTAi = FITS-AIPS encoding
 *     9) Keywords matching CRVALi = FITS-WCS encoding
 *     10) The PLTRAH keyword = DSS encoding
@@ -10178,9 +10202,11 @@ static int GetEncoding( AstFitsChan *this ){
 */
 
 /* Local Variables... */
-   int ret;            /* Returned value */
-   int icard;          /* Index of current card on entry */
+   int hascd;          /* Any CDi_j keywords found? */
+   int haspc;          /* Any PCi_j keywords found? */
    int haswcs;         /* Any CRVAL, CTYPE and CRPIX found? */
+   int icard;          /* Index of current card on entry */
+   int ret;            /* Returned value */
 
 /* Check the global status. */
    if( !astOK ) return UNKNOWN_ENCODING;
@@ -10196,6 +10222,12 @@ static int GetEncoding( AstFitsChan *this ){
       haswcs = astKeyFields( this, "CTYPE%d", 0, NULL, NULL ) &&
                astKeyFields( this, "CRPIX%d", 0, NULL, NULL ) &&
                astKeyFields( this, "CRVAL%d", 0, NULL, NULL );
+
+/* See if there are any CDi_j keywords. */
+      hascd = astKeyFields( this, "CD%1d_%1d", 0, NULL, NULL );
+
+/* See if there are any PCi_j keywords. */
+      haspc = astKeyFields( this, "PC%1d_%1d", 0, NULL, NULL );
 
 /* Save the current card index, and rewind the FitsChan. */
       icard = astGetCard( this );
@@ -10213,7 +10245,7 @@ static int GetEncoding( AstFitsChan *this ){
 /* Otherwise, if the FitsChan contains any CTYPE keywords which have the
    peculiar form used by AIPS, then use "FITS-AIPS" or "FITS-AIPS++" encoding. */
       } else if( haswcs && HasAIPSSpecAxis( this, "astGetEncoding", "AstFitsChan" ) ){
-         if( astKeyFields( this, "CD%1d_%1d", 0, NULL, NULL ) ||
+         if( hascd ||
              astKeyFields( this, "PROJP%d", 0, NULL, NULL ) ||
              astKeyFields( this, "LONPOLE", 0, NULL, NULL ) ||
              astKeyFields( this, "LATPOLE", 0, NULL, NULL ) ) {
@@ -10236,7 +10268,7 @@ static int GetEncoding( AstFitsChan *this ){
    "CDi_j"  AND there is a RADECSYS. PROJPi or CmVALi keyword, then return 
    "FITS-IRAF" encoding. If "CDi_j" is present but none of the others
    are, return "FITS-WCS" encoding. */
-      } else if( haswcs && astKeyFields( this, "CD%1d_%1d", 0, NULL, NULL ) ) {
+      } else if( haswcs && hascd ) {
 
          if( (  astKeyFields( this, "RADECSYS", 0, NULL, NULL ) &&
                !astKeyFields( this, "RADESYS", 0, NULL, NULL ) ) ||
@@ -10252,8 +10284,9 @@ static int GetEncoding( AstFitsChan *this ){
          }
 
 /* Otherwise, if the FitsChan contains any keywords with the format 
-   RADECSYS. PROJPi or CmVALi keyword, then return "FITS-PC" encoding. */
-      } else if( haswcs && (
+   RADECSYS. PROJPi or CmVALi keyword, then return "FITS-PC" encoding, 
+   so long as there are no FITS-WCS equivalent keywords. */
+      } else if( haswcs && !haspc && !hascd && (
                    ( astKeyFields( this, "RADECSYS", 0, NULL, NULL ) &&
                    !astKeyFields( this, "RADESYS", 0, NULL, NULL ) ) ||
 
@@ -14916,6 +14949,7 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name ) {
    vtab->PutCards = PutCards;   
    vtab->PutFits = PutFits;   
    vtab->DelFits = DelFits;   
+   vtab->PurgeWCS = PurgeWCS;
    vtab->RetainFits = RetainFits;   
    vtab->FindFits = FindFits;   
    vtab->KeyFields = KeyFields;
@@ -19732,7 +19766,7 @@ next:
 
 /* Set the current card so that it points to the last WCS-related keyword
    in the FitsChan (whether previously read or not). */
-      FindWcs( this, 1, method, class );
+      FindWcs( this, 1, 1, 0, method, class );
    }
 
 /* Annul the array holding the primary PC matrix. */
@@ -19864,6 +19898,80 @@ static void PreQuote( const char *value,
    string. */
    if ( dquotes ) string[ j++ ] = '"';
    string[ j ] = '\0';
+}
+
+static void PurgeWCS( AstFitsChan *this ){
+/*
+*++
+*  Name:
+c     astPurgeWCS
+f     AST_PURGEWCS
+
+*  Purpose:
+*     Delete all cards in the FitsChan describing WCS information.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "fitschan.h"
+c     void astPurgeWCS( AstFitsChan *this )
+f     CALL AST_PURGEWCS( THIS, STATUS )
+
+*  Class Membership:
+*     FitsChan method.
+
+*  Description:
+c     This function 
+f     This routine
+*     deletes all cards in a FitsChan that relate to any of the recognised 
+*     WCS encodings. On exit, the current card is the first remaining card 
+*     in the FitsChan.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the FitsChan.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*--
+*/
+
+/* Local Variables: */
+   AstObject *obj;
+
+/* Check the global status. */
+   if( !astOK ) return;
+
+/* Loop round attempting to read AST objects form the FitsChan. This will
+   flag cards as used that are involved in the creation of these object
+   (including NATIVE encodings). */
+   astClearCard( this );
+   obj = astRead( this );
+   while( obj ) {
+      obj = astAnnul( obj );
+      astClearCard( this );
+      obj = astRead( this );
+   }
+
+/* We now loop round to remove any spurious WCS-related cards left in the
+   FitsChan that did not form part of a complete WCS encoding. Find the 
+   first WCS-related card left in the FitsChan. */
+   FindWcs( this, 0, 0, 1, "DeleteWcs", "FitsChan" );
+
+/* Loop round marking each WCS-related card as used until none are left */
+   while( this->card ) {
+
+/* Mark the current card as having been read. */
+      ( (FitsCard*) this->card )->flags = USED;
+
+/* Find the next WCS-related card. */
+      FindWcs( this, 0, 0, 0, "DeleteWcs", "FitsChan" );
+   }
+
+/* Rewind the FitsChan. */
+   astClearCard( this );
 }
 
 static void PutCards( AstFitsChan *this, const char *cards ) {
@@ -27952,7 +28060,7 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
    if( !astGetFitsI( this, "NAXIS", &naxis ) ) naxis = -1;
 
 /* Find the last WCS related card. */
-   FindWcs( this, 1, method, class );
+   FindWcs( this, 1, 1, 0, method, class );
 
 /* Loop round all co-ordinate versions */
    sup = GetMaxS( &(store->crval) );
@@ -28303,7 +28411,7 @@ next:
 
 /* Set the current card so that it points to the last WCS-related keyword
    in the FitsChan (whether previously read or not). */
-      FindWcs( this, 1, method, class );
+      FindWcs( this, 1, 1, 0, method, class );
    }
 
 /* Return zero or ret depending on whether an error has occurred. */
@@ -34451,6 +34559,11 @@ void astPutFits_( AstFitsChan *this, const char *card, int overwrite ){
 void astDelFits_( AstFitsChan *this ){
    if( !astOK ) return;
    (**astMEMBER(this,FitsChan,DelFits))(this);
+}
+
+void astPurgeWCS_( AstFitsChan *this ){
+   if( !astOK ) return;
+   (**astMEMBER(this,FitsChan,PurgeWCS))(this);
 }
 
 void astRetainFits_( AstFitsChan *this ){
