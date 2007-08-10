@@ -825,7 +825,7 @@ int StarRtdImage::volatileCmd( int argc, char *argv[] )
 //   file is FITS, in which case FITS-WCS overrides Native as the
 //   default. A second attempt to encode the WCS is made if a suitable
 //   encoding form passed as an optional argument (normally this will
-//   be FITS-WCS or DSS) and a successful FITS- WCS has not already
+//   be FITS-WCS or DSS) and a successful FITS-WCS has not already
 //   been written.
 //
 //   The return from this function is either TCL_OK for success
@@ -851,59 +851,40 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
 
             //  WCS has been modified so we need to store this in the headers,
             //  before saving the file. The stratedy is to clear the headers
-            //  of any existing WCS content and then write the new WCS. This
-            //  supercedes the old method which was to read a single WCS and
-            //  then try to write the new WCS using that encoding.
+            //  of any existing WCS content and then write the new WCS.
             Mem oldhead = image_->header();
             int ncard = (int) oldhead.size() / FITSCARD;
             AstFitsChan *chan;
             gaiaUtilsGtFitsChan( (char *) oldhead.ptr(), ncard, &chan );
 
-            //  Read the headers until no more WCS's can be extracted. The
-            //  default encoding is what AST's returns as the first valid
-            //  read.
-            const char *default_encoding = NULL;
-            const char *test_encoding = NULL;
-            astSet( chan, "Clean=1" );
-            int failed = 0;
-
-            while ( failed < 2 ) {
-                astClear( chan, "Card" );
-                if ( default_encoding == NULL ) {
-                    test_encoding = astGetC( chan, "Encoding" );
-                }
-                AstFrameSet *tmpset = (AstFrameSet *) astRead( chan );
-                if ( !astOK ) {
-                    astClearStatus;
-                }
-                if ( tmpset != AST__NULL && astIsAFrameSet( tmpset ) ) {
-                    if ( default_encoding == NULL ) {
-                        default_encoding = test_encoding;
-                    }
-                    tmpset = (AstFrameSet *) astAnnul( tmpset );
-                } else {
-                    failed++;
-                }
+            //  Read the headers once, this determines the default encoding.
+            astClear( chan, "Card" );
+            const char *default_encoding = astGetC( chan, "Encoding" );
+            AstFrameSet *tmpset = (AstFrameSet *) astRead( chan );
+            if ( !astOK ) {
+                astClearStatus;
             }
+            if ( tmpset != AST__NULL && astIsAFrameSet( tmpset ) ) {
+                tmpset = (AstFrameSet *) astAnnul( tmpset );
 
-            if ( default_encoding != NULL ) {
-
-                // A successful initial default encoding is the permanent
-                // default for writing back.
+                //  A successful initial default encoding is the permanent
+                //  default for writing back.
                 astSet( chan, "Encoding=%s", default_encoding );
             }
             else {
-
-                // Nothing read from the channel. So default encoding is
-                // untrustworthy. If this was a FITS file with no WCS then
-                // writing a Native encoding is bad, but is the correct thing
-                // to do for an NDF, but NDF channels should always read since
-                // they have PIXEL etc., so just need to test for FITS image.
+                //  Nothing read from the channel. So default encoding is
+                //  untrustworthy. If this was a FITS file with no WCS then
+                //  writing a Native encoding is bad, but is the correct thing
+                //  to do for an NDF, but NDF channels should always read since
+                //  they have PIXEL etc., so just need to test for FITS image.
                 if ( isfits() ) {
                     astSet( chan, "Encoding=FITS-WCS" );
                     default_encoding = astGetC( chan, "Encoding" );
                 }
             }
+
+            //  Clear the channel of all existing WCS information.
+            astPurgeWCS( chan );
 
             //  If the card position is still at the beginning for any reason
             //  then we should move it past the standard headers, these are
@@ -968,12 +949,11 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
                 }
             }
 
-            //  Now try with the given encoding (which shouldn't be
-            //  native), if this is the same as that just written, or
-            //  is just another FITS-* encoding then do nothing. Too
-            //  many FITS encodings are a bad things (mixes CD, PC
-            //  etc. keywords which is difficult to maintain). Note
-            //  DSS gets through.
+            //  Now try with the given encoding (which shouldn't be native),
+            //  if this is the same as that just written, or is just another
+            //  FITS-* encoding then do nothing. Too many FITS encodings are a
+            //  bad things (mixes CD, PC etc. keywords which is difficult to
+            //  maintain). Note DSS gets through.
             if ( argc == 2 ) {
                 if ( strcmp( argv[1], default_encoding ) != 0 &&
                      ( strncmp( argv[1], "FITS-", 5 ) == 0 &&
@@ -1062,7 +1042,8 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             set_result( message.str().c_str() );
         }
         return result;
-    } else {
+    } 
+    else {
         return TCL_OK;
     }
 }
