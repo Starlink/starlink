@@ -1,6 +1,7 @@
     The cube toolbox can now read an ARD region from a file.
 
-
+    When saving an image with a new WCS the strategy for removing redundant
+    information from FITS headers has been improved.
 
   Puana Release:
   ==============
