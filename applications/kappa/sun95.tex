@@ -39143,6 +39143,12 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          axis length to that of the minor axis.
       }
       \sstsubsection{
+         CENTRE = LITERAL (Write)
+      }{
+         The formatted co-ordinates of the first fitted star position,
+         in the current Frame of the NDF.
+      }
+      \sstsubsection{
          FWHM = \_REAL (Write)
       }{
          The seeing-disc size: the full width at half maximum across the
@@ -39168,6 +39174,16 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          current Frame axis ({\tt "X"}) towards the second current Frame axis
          ({\tt "Y"}).
       }
+      \sstsubsection{
+         TOTAL = \_REAL (Write)
+      }{
+         The flux of the fitted function integrated to infinite radius.
+         Its unit is the product of the data unit of the input NDF and
+         the square of the radial unit, such as pixel or arcsec, for
+         the current WCS Frame, when NORM={\tt FALSE}.  When NORM={\tt TRUE}, 
+         TOTAL is just measured in the squared radial unit.  Therefore, for 
+         direct comparison of total flux, the same units must be used.
+       }
    }
    \sstexamples{
       \sstexamplesubsection{

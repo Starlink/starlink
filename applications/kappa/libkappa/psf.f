@@ -65,9 +65,9 @@
 *     AXISR = _REAL (Write)
 *        The axis ratio of the star images: the ratio of the major
 *        axis length to that of the minor axis.
-*     CENTRE  = LITERAL (Write)
-*        The formatted co-ordinates of the first fitted star position, in
-*        the current Frame of the NDF.  
+*     CENTRE = LITERAL (Write)
+*        The formatted co-ordinates of the first fitted star position,
+*        in the current Frame of the NDF.  
 *     CLEAR = _LOGICAL (Read)
 *        If TRUE the current picture is cleared before the plot is 
 *        drawn.  If CLEAR is FALSE not only is the existing plot 
@@ -104,7 +104,7 @@
 *     FWHM = _REAL (Write)
 *        The seeing-disc size: the full width at half maximum across the
 *        minor axis of the stars.  It is in units defined by the current
-*        Frame of the NDF. For instance, a value in arc-seconds will be
+*        Frame of the NDF. For instance, a value in arcseconds will be
 *        reported if the current Frame is a SKY Frame, but pixels will
 *        be used if it is a PIXEL Frame.
 *     GAMMA = _REAL (Write)
@@ -230,6 +230,13 @@
 *        The title for the NDF to contain the fitted point-spread
 *        function.  If null (!) is entered the NDF will not contain a
 *        title.  ["KAPPA - PSF"]
+*     TOTAL = _REAL (Write)
+*        The flux of the fitted function integrated to infinite radius.
+*        Its unit is the product of the data unit of the input NDF and
+*        the square of the radial unit, such as pixel or arcsec, for
+*        the current WCS Frame, when NORM=FALSE.  When NORM=TRUE, TOTAL 
+*        is just measured in the squared radial unit.  Therefore, for 
+*        direct comparison of total flux, the same units must be used.
 *     USEAXIS = GROUP (Read)
 *        USEAXIS is only accessed if the current co-ordinate Frame of 
 *        the NDF has more than two axes.  A group of two strings should 
@@ -241,12 +248,9 @@
 *        values is displayed if an illegal value is supplied.  If a null
 *        (!) value is supplied, the axes with the same indices as the 
 *        two significant NDF pixel axes are used.  [!]
-*     CENTRE  = LITERAL (Write)
-*        The formatted co-ordinates of the first fitted star position, in
-*        the current Frame of the NDF.  
 *     XCEN  =  LITERAL (Write)
-*         The formatted X co-ordinate of the first fitted star position, in the 
-*         current co-ordinate Frame of the NDF. 
+*         The formatted X co-ordinate of the first fitted star position,
+*         in the current co-ordinate Frame of the NDF. 
 *     XLEFT = _REAL (Read)
 *        The axis value to place at the left hand end of the horizontal
 *        axis of the plot.  If a null (!) value is supplied, a suitable
@@ -265,8 +269,8 @@
 *        default value will be found and used.  The value supplied may 
 *        be greater than or less than the value supplied for YTOP.  [!]
 *     YCEN  =  LITERAL (Write)
-*         The formatted Y co-ordinate of the first fitted star position, in the 
-*         current co-ordinate Frame of the NDF. 
+*         The formatted Y co-ordinate of the first fitted star position,
+*         in the current co-ordinate Frame of the NDF. 
 *     YTOP = _REAL (Read)
 *        The axis value to place at the top end of the vertical axis of 
 *        the plot.  If a null (!) value is supplied, a suitable default
@@ -298,7 +302,7 @@
 *        function".
 
 *  Notes:
-*     -  Values for the FWHM seeing are given in arc-seconds if the
+*     -  Values for the FWHM seeing are given in arcseconds if the
 *     Current co-ordinate Frame of the NDF is a SKY Frame.
 *     -  The stars used to determine the mean image parameters should
 *     be chosen to represent those whose magnitudes are to be found
@@ -361,7 +365,9 @@
 *  Copyright:
 *     Copyright (C) 1990-1993 Science & Engineering Research Council.
 *     Copyright (C) 1998-2001, 2004, 2006 Particle Physics & Astronomy
-*     Research Council.  All Rights Reserved.
+*     Research Council.  
+*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -447,8 +453,10 @@
 *     2006 December 30 (MJC):
 *        Expanded the description of the fitting algorithm.
 *     15-FEB-2007 (TIMJ):
-*        Modify arguments to KPS1_SPAR<X>. Document XCEN, YCEN and CENTRE
+*        Modify arguments to KPS1_SPAR<X>.  Document XCEN, YCEN and CENTRE
 *        parameters.
+*     2007 August 8: (MJC)
+*        Added TOTAL output parameter.
 *     {enter_further_changes_here}
 
 *-
@@ -467,13 +475,19 @@
 *  Status:
       INTEGER STATUS           ! Global status
 
+*  External References:
+      DOUBLE PRECISION KPS1_GAMLN ! ln Gamma function
+
 *  Local Constants:
       INTEGER NDIM             ! 2-d data arrays only
       PARAMETER ( NDIM = 2 )
 
       INTEGER NCHLIN           ! Maximum number of characters in an 
       PARAMETER ( NCHLIN = 132 ) ! input record
- 
+
+      REAL PI
+      PARAMETER ( PI = 3.141592654 )
+             
 *  Local Variables:
       CHARACTER BUFFER*( NCHLIN )! Buffer to store output string
       CHARACTER DTYPE*( NDF__SZFTP ) ! HDS type of the data values
@@ -534,12 +548,14 @@
       REAL CUT                  ! Threshold to which the output PSF must
                                 ! extend
       REAL FWHM                 ! FWHM of the star images
+      REAL GAMFUN               ! Gamma-function at 2/GAMMA
       REAL GAMMA                ! Radial fall-off parameter
       REAL PX                   ! X pixel co-ord at first fitted star
       REAL PY                   ! Y pixel co-ord at first fitted star
       REAL RANGE                ! Number of image profile widths to
                                 ! which radial profile is to be fitted
       REAL THETA                ! Orientation of the star images
+      REAL TOTAL                ! Total flux
 
 *.
 
@@ -675,7 +691,7 @@
 
       END IF
 
-*  Store the name of the coordinate file or catalogue in the log file.
+*  Store the name of the co-ordinate file or catalogue in the log file.
       IF ( LOGPOS .AND. NAME .NE. ' ' ) THEN
          NC = 3
          BUFFER = ' '
@@ -838,6 +854,25 @@
      :                    PX, PY, AMP, STATUS )
 
       END IF
+
+*  Store the total flux
+*  ====================
+
+*  Evaluate the total flux.  Use the better logarithmic gamma function
+*  (not to be confused with the exponent gamma). 
+      IF ( STATUS .EQ. SAI__OK ) THEN
+         GAMFUN = EXP( SNGL( KPS1_GAMLN( 2.0D0 / DBLE( GAMMA ) ) ) )
+
+*  Use the widely documented formula.  The scalelength squared is 
+*  the geometric mean of the FWHM values to allow for the elliptical 
+*  shape.  Also correct to standard deviation, noting that relationship
+*  between the dispersion and FWHM is a function of the shape exponent.
+         TOTAL = PI * AMP * FWHM * FWHM * AXISR * GAMFUN /
+     :            ( GAMMA * 2.0 * ( LOG( 2.0 ) )**( 2.0 / GAMMA ) )
+
+      END IF
+
+      CALL PAR_PUT0R( 'TOTAL', TOTAL, STATUS )
 
 *  Find the dimensions of the NDF to contain the PSF.
 *  ==================================================

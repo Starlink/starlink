@@ -14602,6 +14602,15 @@ iraf! {
             helpkey *
           }
 
+         parameter total {
+            access WRITE
+            type _REAL
+            vpath DEFAULT
+            prompt {Object to contain the total flux of the fitted profile}
+            default 0.0
+            helpkey *
+          }
+
          parameter useaxis {
             type LITERAL
             vpath DEFAULT
