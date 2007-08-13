@@ -138,7 +138,7 @@
 *     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 *     02111-1307, USA.
 
-**  Authors:
+*  Authors:
 *     RFWS: R.F. Warren-Smith (Durham Univ.)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -191,7 +191,7 @@
       REAL RANGE
       LOGICAL GAUSS
       INTEGER NXY
-      REAL POS( NXY, 2 )
+      DOUBLE PRECISION POS( NXY, 2 )
       REAL WT( NXY )
       REAL RSCALE
       REAL RSCL2
