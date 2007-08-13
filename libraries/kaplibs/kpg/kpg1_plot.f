@@ -197,6 +197,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -225,6 +226,10 @@
 *     4-DEC-1998 (DSB):
 *        Added facilities for storing a TRANSFORM structure with the new
 *        DATA picture for the benefit of non-AST applications.
+*     13-AUG-2007 (DSB):
+*        Only store WCS information in the AGI database if the device is
+*        cleared upon opening. This stops the database file growing too
+*        large.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -339,12 +344,20 @@
 *  Set the attributes of the Plot to give the required Plotting style.     
       CALL KPG1_ASSET( APP, 'STYLE', IPLOT, STATUS )
 
-*  Save the Plot and data reference with the new DATA picture. If possible,
-*  a TRANSFORM structure is stored with the AGI picture giving "AGI Data"
-*  co-ords for the benefit of non_AST applications. The Data co-ordinates
-*  are defined by any AXIS Frame in the Plot.
-      CALL KPG1_PLOTS( IPLOT, IPICD, DATREF, ICURR0, DOMAIN, 'AXIS', 
-     :                 STATUS )
+*  Unless we are drawing over an existing plot, save the Plot and data 
+*  reference with the new DATA picture. If possible, a TRANSFORM structure 
+*  is stored with the AGI picture giving "AGI Data" co-ords for the benefit 
+*  of non_AST applications. The Data co-ordinates are defined by any AXIS 
+*  Frame in the Plot. We do not save WCS with the DATA picture if is is
+*  drawn over the top of an existing data picture. This prevents the
+*  database size from growing (WCS information can be very large). When
+*  aligning subsequent pictures, pictures without WCS are ignored, resulting
+*  in aligment occurring with the original picture (i.e. the one that was
+*  not drawn over the top of another picture).
+      IF( IPICD0 .EQ. -1 ) THEN
+         CALL KPG1_PLOTS( IPLOT, IPICD, DATREF, ICURR0, DOMAIN, 'AXIS', 
+     :                    STATUS )
+      END IF
 
 *  Export the Plot pointer so that it does not get annulled by the
 *  following call to AST_END. If an error has occurred, the pointer will
