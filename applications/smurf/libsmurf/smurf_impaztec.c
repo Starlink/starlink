@@ -35,6 +35,7 @@
 *     Mitch Crowe (UBC)
 *     Edward Chapin (UBC)
 *     Jen Balfour (UBC)
+*     Christa VanLaerhoven (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -62,6 +63,9 @@
 *        Removed dream & dxml includes
 *     2006-11-28 (JB):
 *        Corrected calculation for modified julian date.
+*     2007-07-20 (CVL):
+*        Ignore data points until observation actually starts (when
+*        ra, dec, az, el start updating).
 
 *     {enter_further_changes_here}
 
@@ -176,6 +180,7 @@ void smurf_impaztec( int *status ) {
   int framesize=0;             /* # data points per timeslice (nbolos) */
   size_t framespersecond;      /* frames per second */
   double *full_bolosig=NULL;   /* all bolo signals [NBOLOSxNFRAMES] */
+  double ha;                   /* hour angle */
   struct JCMTState *head=NULL; /* header data for each frame  */
   int hour;                    /* hour of beginning of observation */
   dim_t i;                     /* loop counter */
@@ -183,6 +188,9 @@ void smurf_impaztec( int *status ) {
   dim_t j;                     /* loop counter */
   HDSLoc *jcmtstateloc = NULL; /* HDS locator to JCMTSTATE structure */
   int lbnd[3];                 /* Dimensions of the DATA component */
+  double lst_coord=0;          /* LST derived from the coordinates ra,az,el
+			          for the current frame */
+  double lst_coord_prev=0;     /* as above for the frame previous */
   double map_hght;             /* Map height in arcsec */
   double map_wdth;             /* Map width in arcsec  */
   double map_pa;               /* Map PA in degrees  */
@@ -199,6 +207,7 @@ void smurf_impaztec( int *status ) {
   char ndffile[MAXSTRING];     /* output NDF file name */
   int nflat;                   /* number of flat coeffs per bol  */
   int nframes;                 /* number of time steps in netCDF data format */
+  int ngframes;                /* number of good frames */
   int nmap=0;                  /* Number of elements mapped */
   int nrow;                    /* number of bolometers in row */
   int numsamples;              /* number of samples  */
@@ -213,8 +222,10 @@ void smurf_impaztec( int *status ) {
   int sec;                     /* second of beginning of observation */
   size_t seconds;              /* seconds in observation */
   int starttime;               /* seconds since noon, UT */
+  int startframe;               /* frame at which observation starts */
   double telpos[3];            /* Geodetic location of the telescope */
   double *tempbuff = NULL;     /* throwaway buffer for using calctime */
+  double tmp;                  /* throwaway variable for using slaDh2e */
   double *time = NULL;         /* arrays for storing per-frame header data */
   char time_str[MAXSTRING];
   double *trackactc1 = NULL;
@@ -230,7 +241,6 @@ void smurf_impaztec( int *status ) {
   double y_min = 0;
   double y_max = 0;
   int yr;                      /* year of beginning of observation */
-
  
   /* Main routine */
 
@@ -359,68 +369,86 @@ void smurf_impaztec( int *status ) {
     nc_getSignal ( ncid, "jcmt_azElBaseC2", azelbasec2, status );
 
 
-    /* KLUDGE : Print out some of the pointing info */
-    int azdeg, eldeg, azmin, elmin;
-    double az, el, azsec, elsec;
-    int rahr = ra * 24 / ( 2 * 3.1415926536 );
-    int ramin = ra * 1440 / ( 2 * 3.1415926536 ) - ( rahr * 60 );
-    double rasec = ra * 86400 / ( 2 * 3.1415926536 ) - ( rahr * 3600 )
-                 - ( ramin * 60 ); 
-    int decdeg = dec * 360 / ( 2 * 3.1415926536 );
-    int decmin = dec * 21600 / ( 2 * 3.1415926536 ) - ( decdeg * 60 );
-    double decsec = dec * 1296000 / ( 2 * 3.1415926536 ) - ( decdeg * 3600 )
-                  - ( decmin * 60 );
-
-    printf ( "ra : %i:%i:%f\n", rahr, ramin, rasec );
-    printf ( "dec : %i:%i:%f\n", decdeg, decmin, decsec );
+    /* DIAGNOSTIC : Print out some of the pointing info */
+    /*
+    double lst_fr_azel, dec_fr_azel, ha, tel_lat, lst_diff;
+    tel_lat = telpos[1]*2*3.1415926536/360.0; // telescope lat in radians
 
     for ( i = 0; i < nframes; i++ ) {
+
       az = azelactc1[i];
       el = azelactc2[i];
-      azdeg = az * 360 / ( 2 * 3.1415926536 );
-      azmin = az * 21600 / ( 2 * 3.1415926536 ) - ( azdeg * 60 );
-      azsec = az * 1296000 / ( 2 * 3.1415926536 ) - ( azdeg * 3600 )
-                  - ( azmin * 60 );
-      eldeg = el * 360 / ( 2 * 3.1415926536 );
-      elmin = el * 21600 / ( 2 * 3.1415926536 ) - ( eldeg * 60 );
-      elsec = el * 1296000 / ( 2 * 3.1415926536 ) - ( eldeg * 3600 )
-                  - ( elmin * 60 );
+      this_ra = trackactc1[i];
+      this_dec = trackactc2[i];
 
-      printf ( "JD : %f   Az : %i:%i:%f   El : %i:%i:%f\n",
-	       mjuldate[i] + 2400000.5, azdeg, azmin, azsec, 
-               eldeg, elmin, elsec ); 
+      slaDh2e(az, el, tel_lat, &ha, &dec_fr_azel);
+      lst_fr_azel = ha + this_ra;
+      lst_diff = tempbuff[i] - lst_fr_azel;
+
+      // note: tempbuff contains LAST
+      printf ( "%i LAST: %f LST_derived: %f lst_diff: %f ra: %f dec: %f dec_derived: %f az: %f el: %f\n",
+	       i, tempbuff[i], lst_fr_azel, lst_diff, this_ra, this_dec,
+	       dec_fr_azel, az, el);
 
       i += 999;
 
     }
+    // end diagnostic
+    */
 
+    /* Because AzTEC starts recording data before an observation
+       acutally starts determine the frame at which the observation
+       starts. This can be determined from the ra, az, el because
+       their values do not update when the observation is not in
+       progress. The easiest way to see when they are updating is to
+       derive an LST from them which will be constant when they are
+       not updating. */
     for ( i = 0; i < nframes; i++ ) {      
+
+      lst_coord_prev = lst_coord;
+      slaDh2e( azelactc1[i], azelactc2[i], telpos[1]*2*3.1415926536/360.0,
+	       &ha, &tmp);
+      lst_coord = ha + trackactc1[i]; // LST derived from coordinates
+				      // (az, el, and ra)
+      if( (lst_coord - lst_coord_prev)>0.0 && i!=0) {
+	/* frames from here on are good */
+	startframe=i;
+	printf("start frame: %i n_good_frames: %i\n",
+	       startframe, nframes-startframe);
+	ra = trackactc1[i]; dec=trackactc2[i];
+	break;
+      }
+      printf("This file contains no good frames? LST(coords) is constant.\n");
+    }
+    ngframes = nframes - startframe; // number of good frames
+
+    for( i=0; i<ngframes; i++) {
       head[i].rts_num = i;   
-      head[i].rts_end = mjuldate[i];
-      head[i].tcs_airmass = airmass[i];
-      head[i].tcs_tr_ac1 = trackactc1[i];
-      head[i].tcs_tr_ac2 = trackactc2[i];
-      head[i].tcs_tr_dc1 = trackdemandc1[i];
-      head[i].tcs_tr_dc2 = trackdemandc2[i];
-      head[i].tcs_tr_bc1 = trackactc1[0]; /* trackbasec1[i]; strange values? */
-      head[i].tcs_tr_bc2 = trackactc2[0]; /* trackbasec2[i]; strange values? */
-      head[i].tcs_az_ac1 = azelactc1[i];
-      head[i].tcs_az_ac2 = azelactc2[i];  
-      head[i].tcs_az_dc1 = azeldemandc1[i];
-      head[i].tcs_az_dc2 = azeldemandc2[i];
-      head[i].tcs_az_bc1 = azelbasec1[i];
-      head[i].tcs_az_bc2 = azelbasec2[i]; 
+      head[i].rts_end = mjuldate[i+startframe];
+      head[i].tcs_airmass = airmass[i+startframe];
+      head[i].tcs_tr_ac1 = trackactc1[i+startframe];
+      head[i].tcs_tr_ac2 = trackactc2[i+startframe];
+      head[i].tcs_tr_dc1 = trackdemandc1[i+startframe];
+      head[i].tcs_tr_dc2 = trackdemandc2[i+startframe];
+      head[i].tcs_tr_bc1 = trackactc1[0+startframe]; /* trackbasec1[i]; strange values? */
+      head[i].tcs_tr_bc2 = trackactc2[0+startframe]; /* trackbasec2[i]; strange values? */
+      head[i].tcs_az_ac1 = azelactc1[i+startframe];
+      head[i].tcs_az_ac2 = azelactc2[i+startframe];  
+      head[i].tcs_az_dc1 = azeldemandc1[i+startframe];
+      head[i].tcs_az_dc2 = azeldemandc2[i+startframe];
+      head[i].tcs_az_bc1 = azelbasec1[i+startframe];
+      head[i].tcs_az_bc2 = azelbasec2[i+startframe]; 
       
-      posptr[2*i +0] = azelactc1[i];
-      posptr[2*i +1] = azelactc2[i];
+      posptr[2*i +0] = azelactc1[i+startframe];
+      posptr[2*i +1] = azelactc2[i+startframe];
       
     } 
 
     /* Additional FITS header information */
 
     amstart = head[0].tcs_airmass;
-    amend = head[nframes-1].tcs_airmass;
-    numsamples = nframes;
+    amend = head[ngframes-1].tcs_airmass;
+    numsamples = ngframes;
     ncol = nbolos;
 
   }
@@ -439,7 +467,7 @@ void smurf_impaztec( int *status ) {
   lbnd[0] = 1;
   ubnd[1] = nrow;
   lbnd[1] = 1;
-  ubnd[2] = nframes;
+  ubnd[2] = ngframes;
   lbnd[2] = 1;
   
   ndfNew ( "_DOUBLE", 3, lbnd, ubnd, &place, &indf, status );
@@ -458,8 +486,8 @@ void smurf_impaztec( int *status ) {
     nc_error( nc_get_var_double(ncid,varid_h1b1+i,bolosig), status );
     
     if( *status == SAI__OK ) {
-      for(j=0;j<nframes;j++) {
-	full_bolosig[j*nbolos + i] = bolosig[j];
+      for(j=0;j<ngframes;j++) {
+	full_bolosig[j*nbolos + i] = bolosig[j+startframe];
       }
     } else {
       /* Exit if bad status was set */
@@ -486,7 +514,7 @@ void smurf_impaztec( int *status ) {
   astSetFitsS ( fitschan, "TELESCOP", "JCMT", "Name of telescope", 0 );
    
   /* Determine extent of the map from posptr + known size of the arrays */
-  for( i=0; i<numsamples; i++ ) {
+  for ( i=0; i<numsamples; i++ ) {
     
     if( i == 0 ) {
       x_min = posptr[0];
@@ -520,7 +548,7 @@ void smurf_impaztec( int *status ) {
   /* Create storage for Header values for each frame - store in JCMTSTATE */
   ndfXnew( indf, JCMT__EXTNAME, JCMT__EXTTYPE, 0, 0, &jcmtstateloc, status );
 
-  sc2store_headcremap ( jcmtstateloc, nframes, INST__SCUBA2, status );
+  sc2store_headcremap ( jcmtstateloc, ngframes, INST__SCUBA2, status );
 
   /* Store the JCMState one frame at a time */
   for( j=0; j<numsamples; j++ ) {
