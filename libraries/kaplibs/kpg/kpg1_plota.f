@@ -100,6 +100,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -125,6 +126,9 @@
 *  History:
 *     14-JUL-1998 (DSB):
 *        Original version.
+*     13-AUG-2007 (DSB):
+*        Change KPG1_AGFND to KPG1_GDFND so that only DATA pictures with
+*        WCS Plots are considered.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -212,8 +216,9 @@
 *  Otherwise, see if the current picture is a DATA picture or contains a 
 *  DATA picture. If found, the DATA picture becomes the current picture 
 *  and its AGI id is returned. If not found an error will be reported.
+*  Only pictures containing a WCS Plot are considered.
       ELSE 
-         CALL KPG1_AGFND( 'DATA', IPICD, STATUS )
+         CALL KPG1_GDFND( 'DATA', IPICD, STATUS )
 
 *  If no DATA picture was found, we cannot align DATA pictures. Annul the 
 *  error if STAT is UNKNOWN.
