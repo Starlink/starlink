@@ -152,6 +152,7 @@
 
 *  If not, find the preceeding picture with the required name.
             ELSE
+               IF ( IPICT .NE. IPICC ) CALL AGI_ANNUL( IPICT, STATUS )
                CALL AGI_RCP( NAME, IPIC, IPICT, STATUS )  
                IPIC = -1
             END IF
