@@ -1673,9 +1673,12 @@
 
 *  Save the Plot and data reference with the new DATA picture.  The 
 *  Frame with index ICURR0 is made the current Frame for the Plot in
-*  the AGI database.
-      CALL KPG1_PLOTS( IPLOT, IPICD, NDFNAM( : NC ), ICURR0, 
-     :                 'AGI_WORLD', 'DATAPLOT', STATUS )
+*  the AGI database. Only add WCS to the picture if the graphics device
+*  was cleared on opening. This keeps the size of the database down.
+      IF( IPICD0 .EQ. -1 ) THEN 
+         CALL KPG1_PLOTS( IPLOT, IPICD, NDFNAM( : NC ), ICURR0, 
+     :                    'AGI_WORLD', 'DATAPLOT', STATUS )
+      END IF
 
 *  Ensure the Title attribute of the Plot has a useful value.
       CALL KPG1_ASTTL( IPLOT, IWCS, INDF, STATUS )
