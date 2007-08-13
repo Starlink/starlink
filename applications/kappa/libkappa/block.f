@@ -372,6 +372,9 @@
          CALL PSX_CALLOC( BOXSIZ, '_INTEGER', WPNTR2, STATUS )
       END IF
 
+*  Only proceed around the loop if everything is satisfactory.
+      IF ( STATUS .NE. SAI__OK ) GOTO 990
+
 *  Initialise bad flags
       BADDAT = .FALSE.
       BADVAR = .FALSE.
@@ -390,7 +393,7 @@
 *  Map these input and output arrays.
          CALL KPG1_MAP( NDF1B, COMP, ITYPE, 'READ', PNTR1, EL, STATUS )
          CALL KPG1_MAP( NDF2B, COMP, ITYPE, 'WRITE', PNTR2, EL, STATUS )
-         IF ( STATUS .NE. SAI__OK ) GO TO 999
+         IF ( STATUS .NE. SAI__OK ) GO TO 990
 
 *  Apply smoothing to the mapped data array, using the appropriate
 *  numeric type of processing.
@@ -484,13 +487,15 @@
          CALL NDF_SBAD( BADVAR, NDF2, 'Variance', STATUS )
       END IF
 
-*  Release the temporary workspace arrays.
-      CALL PSX_FREE( WPNTR1, STATUS )
-      CALL PSX_FREE( WPNTR2, STATUS )
-
 *  Obtain a new title for the output NDF, with the default value
 *  being the input title.
       CALL KPG1_CCPRO( 'TITLE', 'Title', NDF1, NDF2, STATUS )
+
+  990 CONTINUE
+
+*  Release the temporary workspace arrays.
+      CALL PSX_FREE( WPNTR1, STATUS )
+      CALL PSX_FREE( WPNTR2, STATUS )
 
 *  End the NDF context.
   999 CONTINUE

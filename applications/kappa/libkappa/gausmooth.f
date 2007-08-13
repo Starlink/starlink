@@ -348,7 +348,7 @@
 
 *  Exit if an error occurred.  This is needed because the significant
 *  dimensions are used as array indices.
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
+      IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Determine its dimensions (note that only two significant dimensions
 *  can be accommodated).  Then ignore non-significant dimensions.
@@ -383,6 +383,9 @@
          END IF
       END IF
 
+*  Allow for an abort.
+      IF ( STATUS .NE. SAI__OK ) GOTO 999
+
 *  Convert the value(s) obtained to a value for the Gaussian standard
 *  deviation SIGMA.
       DO I = 1, NOFWHM
@@ -401,7 +404,7 @@
          BOXDEF( 1 ) = 2 * NINT( 3.0 * SIGMA( 1 ) ) + 1
          CALL PAR_DEF1I( 'BOX', 1, BOXDEF, STATUS )
 
-         IF ( STATUS .NE. SAI__OK ) GO TO 99
+         IF ( STATUS .NE. SAI__OK ) GO TO 999
          CALL PAR_GDRVI( 'BOX', NDIM, 1, VAL__MAXI, BOX, NVAL, STATUS )
 
          IF( STATUS .EQ. PAR__NULL ) THEN
@@ -410,7 +413,7 @@
             NVAL = 1
 
          ELSE IF ( STATUS .NE. SAI__OK ) THEN
-            GO TO 99
+            GO TO 999
 
          END IF
 
@@ -420,6 +423,9 @@
 *  Obtain the orientation of the ellipse.
          CALL PAR_GDR0R( 'ORIENT', VAL__BADR, 0.0, 180.0, .FALSE.,
      :                   ORIENT, STATUS )
+
+*  Allow for an abort.
+         IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Convert it to radians.
          RORI = ORIENT * 1.7454329E-02
@@ -451,7 +457,7 @@
          BOXDEF( 2 ) = 2 * NINT( ABS( YMAX ) ) + 1
          CALL PAR_DEF1I( 'BOX', NDIM, BOXDEF, STATUS )
 
-         IF( STATUS .NE. SAI__OK ) GO TO 99
+         IF( STATUS .NE. SAI__OK ) GO TO 999
          CALL PAR_GDRVI( 'BOX', NDIM, 1, VAL__MAXI, BOX, NVAL, STATUS )
 
          IF( STATUS .EQ. PAR__NULL ) THEN
@@ -460,7 +466,7 @@
             BOX( 2 ) = BOXDEF( 2 )
             NVAL = 2
          ELSE IF ( STATUS .NE. SAI__OK ) THEN
-            GO TO 99
+            GO TO 999
          END IF
 
          IBOX = MAX( BOX( 1 ), 1 ) / 2
@@ -554,6 +560,9 @@
 
       END IF
 
+*  Only proceed around the loop if everything is satisfactory.
+      IF ( STATUS .NE. SAI__OK ) GOTO 990
+
 *  Loop around planes.
 *  ===================
 
@@ -575,7 +584,7 @@
 *  Map these input and output arrays.
          CALL KPG1_MAP( NDFIB, COMP, ITYPE, 'READ', PNTR1, EL, STATUS )
          CALL KPG1_MAP( NDFOB, COMP, ITYPE, 'WRITE', PNTR2, EL, STATUS )
-         IF ( STATUS .NE. SAI__OK ) GO TO 99
+         IF ( STATUS .NE. SAI__OK ) GO TO 990
 
 *  Perform smoothing using a circular Gaussian PSF.
 *  ================================================
@@ -696,8 +705,14 @@
 *  Set the output bad-pixel flag of the variance array.
       IF ( VAR ) CALL NDF_SBAD( BADVAR, NDFO, 'Variance', STATUS )
 
+*  Obtain a new title for the output NDF.  The input NDF's title was
+*  already propagated by the LPG_PROP call and so a null value will
+*  leave it unaltered.
+      CALL NDF_CINP( 'TITLE', NDFO, 'Title', STATUS )
+
 *  Tidy up.
 *  ========
+ 990  CONTINUE
 
 *  Release the temporary workspace arrays.
       CALL PSX_FREE( WPNTR1, STATUS )
@@ -708,13 +723,8 @@
          IF ( ITYPE .EQ. '_DOUBLE' ) CALL PSX_FREE( WPNTR2, STATUS )
       END IF
 
-*  Obtain a new title for the output NDF.  The input NDF's title was
-*  already propagated by the LPG_PROP call and so a null value will
-*  leave it unaltered.
-      CALL NDF_CINP( 'TITLE', NDFO, 'Title', STATUS )
-
 *  End the NDF context.
-   99 CONTINUE
+  999 CONTINUE
       CALL NDF_END( STATUS )
 
 *  If an error occurred, then report contextual information.
