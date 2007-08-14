@@ -5847,12 +5847,7 @@ int StarRtdImage::readonlyCmd( int argc, char *argv[] )
 //-
 int StarRtdImage::remoteTclCmd( int argc, char* argv[] )
 {
-     if ( Tcl_Eval( interp_, argv[0] ) == TCL_OK ) {
-         return set_result( interp_->result );
-     } else {
-         set_result( interp_->result );
-         return TCL_ERROR;
-     }
+    return Tcl_Eval( interp_, argv[0] );
 }
 
 //+
