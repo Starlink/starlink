@@ -179,6 +179,8 @@
 *     2007-07-10 (AGG):
 *        - Use instrume argument for writing INSTRUME keyword
 *        - Initialize dreamweights file name to null string
+*     2007-08-13 (AGG):
+*        Write out consistent coordinate system for DREAM/STARE images
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
@@ -225,6 +227,7 @@
 #include "sc2da/sc2ast.h"
 #include "sc2da/sc2math.h"
 #include "sc2da/dream_par.h"
+#include "jcmt/state.h"
 
 void sc2sim_ndfwrdata
 ( 
@@ -270,6 +273,7 @@ int *status              /* Global status (given and returned) */
 {
    /* Local variables */
    double coadd[2*DREAM__MXBOL];   /* Coadded values in output image */
+   char cosys[JCMT__SZTCS_TR_SYS+1]; /* Tracking coordinate system */
    int dims[2];                    /* Extent of output image */
    AstFitsChan *fitschan;          /* FITS headers */
    int fitsfind;
@@ -613,6 +617,14 @@ int *status              /* Global status (given and returned) */
        instap[1] = DAS2R * inx->instap_y;
      }
 
+     /* Set coordinate system */
+     strncpy( cosys, head[0].tcs_tr_sys, JCMT__SZTCS_TR_SYS+1);
+     if ( strncmp( cosys, "APP", 3 ) == 0 ) {
+       strncpy( cosys, "GAPPT", 5);
+     } else if (strncmp( cosys, "J2000", 5 ) == 0) {
+       strncpy( cosys, "ICRS", 4);
+     }
+
      /* Loop over number of images */
      for ( k=0; k<nsubim; k++ ) {
        /* Initialize sums to zero */
@@ -653,7 +665,9 @@ int *status              /* Global status (given and returned) */
        /* Construct WCS FrameSet */
        sc2ast_createwcs( subnum, &state, instap, sinx->telpos, &wcs, status );
        /* This should be user defined... */
-       astSetC( wcs, "SYSTEM", "ICRS" );
+       astSetC( wcs, "SYSTEM", cosys );
+       astSetD( wcs, "SkyRef(1)", head[midpt].tcs_tr_ac1);
+       astSetD( wcs, "SkyRef(2)", head[midpt].tcs_tr_ac2);
 
        /* Increment seqstart/end for FITS header */
        seqstart++;
