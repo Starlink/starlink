@@ -181,6 +181,8 @@
 *        - Initialize dreamweights file name to null string
 *     2007-08-13 (AGG):
 *        Write out consistent coordinate system for DREAM/STARE images
+*     2007-08-14 (AGG):
+*        Write out planet name for planet simulations
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
@@ -295,6 +297,7 @@ int *status              /* Global status (given and returned) */
    int midpt;                      /* RTS index of midpoint in range contributing 
 				      to output image */
    int ncoeff = 2;                 /* Number of coefficients in polynomial fit */
+   char objectname[JCMT__SZTCS_SOURCE+1]; /* Name of object */
    double obsgeo[3];               /* Cartesian geodetic observatory coords. */
    char obsidss[84];               /* OBSID + wavelength */
    double *poly;                   /* Pointer to polynomial fit solution */
@@ -373,6 +376,27 @@ int *status              /* Global status (given and returned) */
    astSetFitsS ( fitschan, "OBSIDSS", obsidss, 
    		 "Unique observation/wavelength ID", 0 );
 
+   /* Set object name - use planet name if known */
+   if ( inx->planetnum != -1 ) {
+     if ( inx->planetnum == 2 ) {
+       strncpy( objectname, "VENUS", 5 );
+     } else if ( inx->planetnum == 3 ) {
+       strncpy( objectname, "MOON", 4 );
+     } else if ( inx->planetnum == 4 ) {
+       strncpy( objectname, "MARS", 4 );
+     } else if ( inx->planetnum == 5 ) {
+       strncpy( objectname, "JUPITER", 7 );
+     } else if ( inx->planetnum == 6 ) {
+       strncpy( objectname, "SATURN", 6 );
+     } else if ( inx->planetnum == 7 ) {
+       strncpy( objectname, "URANUS", 5 );
+     } else if ( inx->planetnum == 8 ) {
+       strncpy( objectname, "NEPTUNE", 7 );
+     }
+   } else {
+     /* Generic name... */
+     strncpy( objectname, "SMURF", 5 );
+   }
    astSetFitsS ( fitschan, "OBJECT", "SMURF", "Object Name", 0 );
    astSetFitsL ( fitschan, "STANDARD", 0, "True if source is a calibrator", 0 );
    astSetFitsI ( fitschan, "OBSNUM", obsnum, "Observation Number", 0 );
@@ -618,7 +642,7 @@ int *status              /* Global status (given and returned) */
      }
 
      /* Set coordinate system */
-     strncpy( cosys, head[0].tcs_tr_sys, JCMT__SZTCS_TR_SYS+1);
+     strncpy( cosys, head[0].tcs_tr_sys, JCMT__SZTCS_TR_SYS );
      if ( strncmp( cosys, "APP", 3 ) == 0 ) {
        strncpy( cosys, "GAPPT", 5);
      } else if (strncmp( cosys, "J2000", 5 ) == 0) {
