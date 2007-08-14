@@ -79,9 +79,11 @@ extern "C" {
 }
 
 //
-//  Image options (used for image configuration). Note inheriting this struct
-//  seems to cause the "invalid access to non-static data member" warning
-//  from g++ (using the plain struct in RTD doesn't do that).
+//  Image options used for image configuration. Note inheriting this struct
+//  means that it is no longer POD (in the C++ sense), so cannot be used with
+//  the offsetof macro. To work around that we implement a runtime function
+//  that determines the offset from an actual instance (note we need to extend
+//  Rtd_Options as RtdImageOptions requires that type).
 //
 typedef struct Gaia_Options : Rtd_Options
 {
@@ -117,13 +119,35 @@ class StarRtdImageOptions : public RtdImageOptions
     }
 };
 
+//  Define an in-line function that returns the offset of a known member in
+//  the Gaia_Options struct. Use runtime implementation to avoid POD issues
+//  with offsetof macro.
+inline int Gaia_Options_Offset( const char* member )
+{
+    static Gaia_Options opt;
+    static Gaia_Options *ptr = &opt;
+    if ( member[0] == 'a' && member[1] == 's' ) {
+        return (char *)&ptr->ast_tag - (char *)ptr;
+    }
+    if ( member[0] == 'c' && member[1] == 'o' ) {
+        return (char *)&ptr->component - (char *)ptr;
+    }
+    if ( member[0] == 'p' && member[1] == 'l' ) {
+        return (char *)&ptr->plot_wcs - (char *)ptr;
+    }
+    if ( member[0] == 'u' && member[1] == 'k' ) {
+        return (char *)&ptr->ukirt_ql - (char *)ptr;
+    }
+    return 0;
+}
+
 //  Define the Tk config options specific to GAIA.
-#define GAIA_OPTION(x) Tk_Offset(Gaia_Options, x)
+#define GAIA_OPTION(x) (Gaia_Options_Offset(x))
 #define GAIA_OPTIONS \
-{TK_CONFIG_STRING, "-ast_tag",   NULL, NULL, "ast_element", GAIA_OPTION(ast_tag),   0, NULL}, \
-{TK_CONFIG_STRING, "-component", NULL, NULL, "data",        GAIA_OPTION(component), 0, NULL}, \
-{TK_CONFIG_INT,    "-plot_wcs",  NULL, NULL, "1",           GAIA_OPTION(plot_wcs),  0, NULL}, \
-{TK_CONFIG_INT,    "-ukirt_ql",  NULL, NULL, "0",           GAIA_OPTION(ukirt_ql),  0, NULL}
+{TK_CONFIG_STRING, "-ast_tag",   NULL, NULL, "ast_element", GAIA_OPTION("ast_tag"),   0, NULL}, \
+{TK_CONFIG_STRING, "-component", NULL, NULL, "data",        GAIA_OPTION("component"), 0, NULL}, \
+{TK_CONFIG_INT,    "-plot_wcs",  NULL, NULL, "1",           GAIA_OPTION("plot_wcs"),  0, NULL}, \
+{TK_CONFIG_INT,    "-ukirt_ql",  NULL, NULL, "0",           GAIA_OPTION("ukirt_ql"),  0, NULL}
 
 class StarRtdImage : public Skycat
 {
