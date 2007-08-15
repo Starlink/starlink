@@ -115,6 +115,8 @@
 *        Used a purely AST approach to derive the position angle.  This
 *        needed argument CFRM (current Frame identifier) to be replaced
 *        by IWCS.
+*     2007 August 6 (MJC):
+*        Pass only single positions to AST_NORM.
 *     {enter_further_changes_here}
 
 *-
@@ -180,6 +182,7 @@
       INTEGER PFRM               ! PIXEL Frame
       DOUBLE PRECISION POS( 2, 2 ) ! Reporting positions
       DOUBLE PRECISION PIXPOS( 2, 2 ) ! Pixel positions
+      DOUBLE PRECISION SPOS( 2 ) ! Single reporting position
       DOUBLE PRECISION SX        ! Co-ordinate sum along longitude axis
       DOUBLE PRECISION SY        ! Co-ordinate sum along latitude axis
       REAL THETA                 ! Orientation in radians
@@ -234,8 +237,14 @@
          CALL AST_TRANN( MAP, 2, 2, 2, PIXPOS, .TRUE., NAXC, 2, POS,
      :                   STATUS )
 
-*  Normalize the supplied current Frame position.
-         CALL AST_NORM( CFRM, POS, STATUS )
+*  Normalize the supplied current Frame position.  Need dummy array
+*  because of AST_TRANN's requirement that the co-ordinates for the
+*  point runs along the second dimension.
+         SPOS( 1 ) = POS( 1, 1 )
+         SPOS( 2 ) = POS( 1, 2 )
+         CALL AST_NORM( CFRM, SPOS, STATUS )
+         POS( 1, 1 ) = SPOS( 1 )
+         POS( 1, 2 ) = SPOS( 2 )
 
          RP( 1, IB ) = POS( 1, 1 )
          RP( 2, IB ) = POS( 1, 2 )
@@ -288,8 +297,14 @@
          CALL AST_TRANN( MAP, 2, 2, 2, PIXPOS, .TRUE., NAXC, 2, POS,
      :                   STATUS )
 
-*  Normalize the current Frame co-ordinates.
-         CALL AST_NORM( CFRM, POS, STATUS )
+*  Normalize the supplied current Frame position.  Need dummy array
+*  because of AST_TRANN's requirement that the co-ordinates for the
+*  point runs along the second dimension.
+         SPOS( 1 ) = POS( 1, 1 )
+         SPOS( 2 ) = POS( 1, 2 )
+         CALL AST_NORM( CFRM, SPOS, STATUS )
+         POS( 1, 1 ) = SPOS( 1 )
+         POS( 1, 2 ) = SPOS( 2 )
 
 *  Need to determine the distances for the beam widths.  Use the
 *  reporting axis.
@@ -318,8 +333,14 @@
             CALL AST_TRANN( MAP, 2, 2, 2, PIXPOS, .TRUE., NAXC, 2, POS,
      :                      STATUS )
 
-*  Normalize the current Frame co-ordinates.
-            CALL AST_NORM( CFRM, POS, STATUS )
+*  Normalize the supplied current Frame position.  Need dummy array
+*  because of AST_TRANN's requirement that the co-ordinates for the
+*  point runs along the second dimension.
+            SPOS( 1 ) = POS( 1, 1 )
+            SPOS( 2 ) = POS( 1, 2 )
+            CALL AST_NORM( CFRM, SPOS, STATUS )
+            POS( 1, 1 ) = SPOS( 1 )
+            POS( 1, 2 ) = SPOS( 2 )
 
 *  Need to determine the distance for the error bars.  For convenience
 *  we fudge it here if NAXC exceeds 2.  We're keeping higher axes 
@@ -403,8 +424,14 @@
             CALL AST_TRANN( MAP, 2, 2, 2, PIXPOS, .TRUE., NAXC, 2, POS,
      :                      STATUS )
 
-*  Normalize the current Frame co-ordinates.
-            CALL AST_NORM( CFRM, POS, STATUS )
+*  Normalize the supplied current Frame position.  Need dummy array
+*  because of AST_TRANN's requirement that the co-ordinates for the
+*  point runs along the second dimension.
+            SPOS( 1 ) = POS( 1, 1 )
+            SPOS( 2 ) = POS( 1, 2 )
+            CALL AST_NORM( CFRM, SPOS, STATUS )
+            POS( 1, 1 ) = SPOS( 1 )
+            POS( 1, 2 ) = SPOS( 2 )
 
 *  Need to determine the distances for the separation.  Use the
 *  reporting axis.
