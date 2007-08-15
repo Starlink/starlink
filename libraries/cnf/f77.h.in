@@ -206,6 +206,9 @@
 *      25-SEP-2006 (PWD):
 *        Introduced F77_CREATE_IMPORT_CHARACTER. Match length of 
 *        F77_CREATE_CHARACTER to result from cnfCref.
+*      13-JUL-2007 (PWD):
+*        Parameterise the type of Fortran character string lengths. Can
+*        be long.
 *     {enter_further_changes_here}
 *        
 
