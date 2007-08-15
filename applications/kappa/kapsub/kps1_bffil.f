@@ -331,6 +331,10 @@
 *  See if we are running in verbose mode.
       CALL KPG1_VERB( VERB, 'KAPPA', STATUS )
 
+*  Transform the supplied positions to the PIXEL Frame of the NDF.
+      CALL AST_TRANN( MAP1, NPOS, NAXIN, NPOS, INPOS, .TRUE., BF__NDIM,
+     :                BF__MXPOS, PIXPOS, STATUS )
+
 *  Map the data and variance arrays from the whole NDF.  Copy the
 *  use-variance flag to COMMON.
       USEVAR = VAR
