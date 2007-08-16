@@ -17,7 +17,6 @@ lib_LTLIBRARIES = libdipso.la
 include_HEADERS = $(PUBLIC_INCLUDES)
 
 libdipso_la_SOURCES = $(F_ROUTINES) $(FPP_ROUTINES) $(C_ROUTINES) $(BLOCK_DATA_FILES)
-libdipso_la_LIBADD = -lsnx `ncar_link`
 
 F_ROUTINES = abload.f abscal.f acheck.f arb.f arith.f arrow.f arysrt.f \
  asterix.f atfit.f atlasrd.f axmat.f badchk.f bbint.f bbody.f calcfx.f \
