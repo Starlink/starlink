@@ -778,6 +778,13 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        - Changed GetEncoding so that FITS_PC is not returned if there are
 *        any CDi_j or PCi_j keywords in the header.
 *        - Added astPurgeWCS method.
+*     13-AUG-2007 (DSB):
+*        - Include the DSS keywords AMDX%d and AMDY%d in FindWCS.
+*     16-AUG-2007 (DSB):
+*        - Force all FITS-CLASS headers to contain frequency axes
+*        (velocity axes seem not to be recognised properly by CLASS).
+*        - Change the CLASS "VELO-LSR" header to be the velocity at the
+*        reference channel, not the source velocity.
 *class--
 */
 
@@ -1425,7 +1432,6 @@ static int AddEncodingFrame( AstFitsChan *this, AstFrameSet *fs, int encoding,
    AstMapping *map;       /* Mapping from what we have to what we want */
    AstSkyFrame *skyfrm;   /* Pointer to SkyFrame */
    AstSpecFrame *specfrm; /* Pointer to SpecFrame */
-   AstStdOfRestType sor;  /* Spectral standard of rest */
    AstSystemType sys;     /* Frame coordinate system */
    int i;                 /* Axis index */
    int naxc;              /* No. of axes in original current Frame */
@@ -1462,33 +1468,17 @@ static int AddEncodingFrame( AstFitsChan *this, AstFrameSet *fs, int encoding,
 /* Cannot do anything if either is missing. */
       if( specfrm && skyfrm ) {
 
-/* If the spectral axis is neither frequency nor radio velocity, set it to
-   frequency. Also set spectral units of "Hz" or "m/s" */
+/* If the spectral axis is not frequency, set it to frequency. Also set 
+   spectral units of "Hz". */
          sys = astGetSystem( specfrm );
-         if( sys != AST__FREQ && sys != AST__VRADIO ) {
+         if( sys != AST__FREQ ) {
             astSetSystem( specfrm, AST__FREQ );
             sys = AST__FREQ;
          }
 
-/* For frequency axes, ensure the standard of rest is Source and units
-   are "Hz". */       
-         if( sys == AST__FREQ ){
-            astSetUnit( specfrm, 0, "Hz" );
-            astSetStdOfRest( specfrm, AST__SCSOR );
- 
-/* For radio velocity axes, ensure the standard of rest is one of LSRK, 
-   Heliocentric, Geocentric or Topocentric, and units are "m/s". */
-         } else {
-            astSetUnit( specfrm, 0, "m/s" );
-            sor = astGetStdOfRest( specfrm );
-            if( sor != AST__TPSOR &&
-                sor != AST__GESOR &&
-                sor != AST__HLSOR &&
-                sor != AST__LKSOR ) {
-               sor = AST__LKSOR;
-               astSetStdOfRest( specfrm, sor );
-            }
-         }
+/* Ensure the standard of rest is Source and units are "Hz". */       
+         astSetUnit( specfrm, 0, "Hz" );
+         astSetStdOfRest( specfrm, AST__SCSOR );
  
 /* The celestial axes must be either FK4, FK5 or galactic. */
          sys = astGetSystem( skyfrm );
@@ -1504,7 +1494,7 @@ static int AddEncodingFrame( AstFitsChan *this, AstFrameSet *fs, int encoding,
             astSetC( skyfrm, "Equinox", "B1950.0" );
          }
 
-/* Combine the spectraland celestial Frames into a single CmpFrame with
+/* Combine the spectral and celestial Frames into a single CmpFrame with
    the spectral axis being the first axis. */
          cmpfrm = astCmpFrame( specfrm, skyfrm, "" );
 
@@ -4277,6 +4267,8 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
 
 /* Local Variables: */
    AstFrame *azelfrm;  /* (az,el) frame */
+   AstFrame *velofrm;  /* Frame for reference velocity value */
+   AstFrame *freqfrm;  /* Frame for reference frequency value */
    AstFrame *curfrm;   /* Current Frame in supplied FrameSet */
    AstFrame *radecfrm; /* Spatial frame for CRVAL values */
    AstFrameSet *fsconv1;/* FrameSet connecting "curfrm" & "radecfrm" */
@@ -4310,10 +4302,7 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
    double radec[ 2 ];  /* Reference (lon,lat) values */
    double rf;          /* Rest freq (Hz) */
    double specfactor;  /* Factor for converting internal spectral units */
-   double srcvel;      /* Apparent radial velocity of source */
-   double tmp;         /* Intermediate value */
    double val;         /* General purpose value */
-   double zsource;     /* Redshift of source */
    int axlat;          /* Index of latitude FITS WCS axis */
    int axlon;          /* Index of longitude FITS WCS axis */
    int axspec;         /* Index of spectral FITS WCS axis */
@@ -4433,64 +4422,20 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
       } else {
          if( !strncmp( cval, "FREQ", astChrLen( cval ) ) ) {
             strcpy( spectype, "FREQ" );
-         } else if( !strncmp( cval, "VRAD", astChrLen( cval ) ) ) {
-            strcpy( spectype, "VELO" );
-         } else if( !strncmp( cval, "WAVE", astChrLen( cval ) ) ) {
-            strcpy( spectype, "WAVELENG" );
          } else {
             ok = 0;
          }
       }
 
-/* If OK, check the SPECSYS value and add the CLASS equivalent onto the
-   end of the CTYPE value (only done for velocity - for frequency and
-   wavelength the SPECSYS must be SOURCE).*/
+/* If OK, check the SPECSYS value is SOURCE. */
       cval = GetItemC( &(store->specsys), 0, s, NULL, method, class );
       if( !cval ) {
          ok = 0;
       } else if( ok ) {
-         if( !strcmp( spectype, "VELO" ) ) {
-            if( !strncmp( cval, "LSRK", astChrLen( cval ) ) ) {
-               strcpy( spectype+4, "-LSR" );
-            } else if( !strncmp( cval, "HELIOCEN", astChrLen( cval ) ) ) {
-               strcpy( spectype+4, "-HEL" );
-            } else if( !strncmp( cval, "GEOCENTR", astChrLen( cval ) ) ) {
-               strcpy( spectype+4, "-GEO" );
-            } else if( !strncmp( cval, "TOPOCENT", astChrLen( cval ) ) ) {
-               strcpy( spectype+4, "-TOP" );
-            } else {
-               ok = 0;
-            }
-         } else {
-            if( strncmp( cval, "SOURCE", astChrLen( cval ) ) ) ok = 0;
-         }
+         if( strncmp( cval, "SOURCE", astChrLen( cval ) ) ) ok = 0;
       }
 
-/* Create the keyword name which indicates the source velocity. */
-      cval = GetItemC( &(store->ssyssrc), 0, s, NULL, method, class );
-      if( ok && cval ) {
-         if( !strncmp( cval, "LSRK", astChrLen( cval ) ) ) {
-            srcsys = "VELO-LSR";
-         } else if( !strncmp( cval, "HELIOCEN", astChrLen( cval ) ) ) {
-            srcsys = "VELO-HEL";
-         } else if( !strncmp( cval, "GEOCENTR", astChrLen( cval ) ) ) {
-            srcsys = "VELO-GEO";
-         } else if( !strncmp( cval, "TOPOCENT", astChrLen( cval ) ) ) {
-            srcsys = "VELO-TOP";
-         } else {
-            ok = 0;
-         }
-         zsource = GetItem( &( store->zsource ), 0, 0, s, NULL, method, class );
-         if( zsource == AST__BAD ) {
-            ok = 0;
-         } else {
-            tmp = zsource + 1.0;
-            tmp *= tmp;
-            srcvel = AST__C*( ( tmp - 1.0 )/( tmp + 1.0 ) );
-         }
-      }
-
-/* If still OK, ensure the spectral axis units are Hz or m/s. */
+/* If still OK, ensure the spectral axis units are Hz. */
       cval = GetItemC( &(store->cunit), axspec, s, NULL, method, class );
       if( !cval ) {
          ok = 0;
@@ -4503,10 +4448,6 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
             specfactor = 1.0E6;
          } else if( !strcmp( cval, "GHz" ) ) {
             specfactor = 1.0E9;
-         } else if( !strcmp( cval, "m/s" ) ) {
-            specfactor = 1.0;
-         } else if( !strcmp( cval, "km/s" ) ) {
-            specfactor = 1.0E3;
          } else {
             ok = 0;
          }
@@ -4599,7 +4540,6 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
 
    }
 
-
 /* If the spatial Frame covers more than a single Frame and requires a LONPOLE 
    or LATPOLE keyword, it cannot be encoded using FITS-CLASS. However since 
    FITS-CLASS imposes a no rotation restriction, it can tolerate lonpole 
@@ -4610,7 +4550,6 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
       if( GetItem( &(store->latpole), 0, 0, s, NULL, method, class )
           != AST__BAD ) ok = 0;
    }
-
 
 /* Only create the keywords if the FitsStore conforms to the requirements
    of the FITS-CLASS encoding. */
@@ -4643,9 +4582,9 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
             crval[ i ] = val;
             if( i == axspec ) {
                val *= specfactor;
-               if( !strncmp( spectype, "FREQ", 4 ) ) val -= rf;
+               val -= rf;
             }
-            sprintf( combuf, "Value at ref. pixel on axis %d", i + 1 );
+            sprintf( combuf, "Freq at ref. pixel on axis %d", i + 1 );
             SetValue( this, FormatKey( "CRVAL", i + 1, -1, s ), &val, 
                       AST__FLOAT, combuf );
          }
@@ -4727,9 +4666,6 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
 /* Rest frequency */
       SetValue( this, "RESTFREQ", &rf, AST__FLOAT, "[Hz] Rest frequency" );
 
-/* Source velocity */
-      if( srcsys ) SetValue( this, srcsys, &srcvel, AST__FLOAT, "[m/s] Source velocity" );
-
 /* The image frequency corresponding to the rest frequency (only used for
    double sideband data). */
       val = GetItem( &(store->imagfreq), 0, 0, s, NULL, method, class );
@@ -4747,6 +4683,56 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
          SetValue( this, "LINE", &cval, AST__STRING, NULL );
       }
 
+/* CLASS expects the VELO-LSR keyword to hold the radio velocity of the
+   reference channel (NOT of the source I was told!!) with respect to the 
+   LSRK rest frame. The "crval" array holds the frequency of the
+   reference channel in the source rest frame, so we need to convert this
+   to get the value for VELO-LSR. Create a SpecFrame describing the
+   required frame (other attributes such as Epoch etc are left unset and
+   so will be picked up from the supplied FrameSet). We set MinAxes
+   and MaxAxes so that the Frame can be used as a template to match the 3D
+   current Frame in the supplied FrameSet. */
+      velofrm = (AstFrame *) astSpecFrame( "System=vrad,StdOfRest=lsrk,"
+                                           "Unit=m/s,MinAxes=3,MaxAxes=3" );
+
+/* Get the current Frame from the supplied FrameSet and find the spectral
+   axis using the above "velofrm" as a template. */
+      curfrm = astGetFrame( fs, AST__CURRENT );
+      fsconv1 = astFindFrame( curfrm, velofrm, "" );
+
+/* If OK, extract the SpecFrame from the returned FraneSet (this will
+   have the attribute values that were assigned explicitly to "velofrm"
+   and will have inherited all unset attributes from the supplied
+   FrameSet). */
+      if( fsconv1 ) {
+         velofrm = astAnnul( velofrm );
+         velofrm = astGetFrame( fsconv1, AST__CURRENT );
+         fsconv1 = astAnnul( fsconv1 );
+
+/* Take a copy of the velofrm and modify its attributes so that it
+   describes frequency in the sources rest frame in units of Hz. This is
+   the system that CLASS expects for the CRVAL3 keyword. */
+         freqfrm = astCopy( velofrm );
+         astSet( freqfrm, "System=freq,StdOfRest=Source,Unit=Hz");       
+
+/* Get a Mapping from frequency to velocity. */
+         fsconv1 = astConvert( freqfrm, velofrm, "" );
+         if( fsconv1 ) {
+
+/* Use this Mapping to convert the spectral crval value from frequency to
+   velocity. */
+            val = crval[ axspec ]*specfactor;
+            astTran1( fsconv1, 1, &val, 1, &val );
+
+/* Source velocity */
+            SetValue( this, "VELO-LSR", &val, AST__FLOAT, "[m/s] Reference velocity" );
+
+/* Free remaining resources. */
+            fsconv1 = astAnnul( fsconv1 );            
+         }
+      }
+      velofrm = astAnnul( velofrm );
+
 /* AZIMUTH and ELEVATIO - the (az,el) equivalent of CRVAL. We need a
    Mapping from the CTYPE spatial system to (az,el). This depends on all 
    the extra info like telescope position, epoch, etc.  This info is in
@@ -4754,7 +4740,6 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
    from a sky frame with default axis ordering to the supplied Frame. All
    the extra info is picked up from the supplied Frame since it is not set
    in the template. */
-      curfrm = astGetFrame( fs, AST__CURRENT );
       radecfrm = (AstFrame *) astSkyFrame( "Permute=0,MinAxes=3,MaxAxes=3" );
       fsconv1 = astFindFrame( curfrm, radecfrm, "" );
 
@@ -6874,7 +6859,7 @@ static void DSBSetUp( AstFitsChan *this, FitsStore *store,
    observer. */
       in[ 0 ] = astGetRestFreq( dsb );
       in[ 1 ] = GetItem( &(store->imagfreq), 0, 0, s, NULL, method, class );
-      astTran1( fs, 2, in, 2, out );
+      astTran1( fs, 2, in, 1, out );
       
 /* The intermediate frequency is half the distance between these two
    frequencies. Note, the IF value is signed so as to put the rest
@@ -8676,8 +8661,9 @@ static void FindWcs( AstFitsChan *this, int last, int all, int rewind,
              Match( keyname, "C%1dNIT%d", 0, NULL, &nfld, method, class ) ||
              Match( keyname, "CNPIX1", 0, NULL, &nfld, method, class ) ||
              Match( keyname, "CNPIX2", 0, NULL, &nfld, method, class ) ||
-             Match( keyname, "PPO3", 0, NULL, &nfld, method, class ) ||
-             Match( keyname, "PPO6", 0, NULL, &nfld, method, class ) ||
+             Match( keyname, "PPO%d", 0, NULL, &nfld, method, class ) ||
+             Match( keyname, "AMDX%d", 0, NULL, &nfld, method, class ) ||
+             Match( keyname, "AMDY%d", 0, NULL, &nfld, method, class ) ||
              Match( keyname, "XPIXELSZ", 0, NULL, &nfld, method, class ) ||
              Match( keyname, "YPIXELSZ", 0, NULL, &nfld, method, class ) ||
              Match( keyname, "PLTRAH", 0, NULL, &nfld, method, class ) ||
@@ -32541,9 +32527,10 @@ f     no data will be written to the FitsChan and AST_WRITE will
 
 *  The FITS-CLASS Encoding:
 *     The FITS-CLASS encoding uses the conventions of the CLASS project.
-*     These are described at:
+*     These are described in the section "Developer Manual"/"CLASS FITS
+*     Format" contained in the CLASS documentation at:
 *     
-*     http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/node47.html
+*     http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/class.html.
 *
 *     This encoding is similar to FITS-AIPS with the following restrictions:
 *
@@ -32554,10 +32541,12 @@ f     no data will be written to the FitsChan and AST_WRITE will
 *       will therefore be inaccurate (typically by up to about 0.5 km/s)
 *       unless suitable values are assigned to these attributes after the
 *       FrameSet has been created.
-*     - There must be at least 3 WCS axes, of which one must be a linear 
-*       frequency axis or a linear radio velocity axis (but note that there
-*       is a bug in CLASS version "aug04a" and earlier which can cause radio 
-*       velocity axes to be mis-interpreted in some situations). 
+*     - When writing a FrameSet to a FITS-CLASS header, the current Frame
+*       in the FrameSet must have at least 3 WCS axes, of which one must be 
+*       a linear spectral axis. The spectral axis in the created header will 
+*       always describe frequency. If the spectral axis in the supplied 
+*       FrameSet refers to some other system (e.g. radio velocity, etc),
+*       then it will be converted to frequency.
 *     - There must be a pair of celestial axes - either (RA,Dec) or 
 *       (GLON,GLAT). RA and Dec must be either FK4/B1950 or FK5/J2000.
 *     - A limited range of projection codes (TAN, ARC, STG, AIT, SFL, SIN) 
@@ -32566,9 +32555,9 @@ f     no data will be written to the FitsChan and AST_WRITE will
 *       parameters must both be zero.
 *     - No rotation of the celestial axes is allowed, unless the spatial
 *       axes are degenerate (i.e. cover only a single pixel).
-*     - For velocity axes, the spectral standard of rest must be one of LSRK, 
-*       Heliocentric, Geocentric or Topocentric. For frequency axes, the 
-*       standard of rest must be Source.
+*     - The frequency axis in the created header will always describe
+*       frequency in the source rest frame. If the supplied FrameSet uses
+*       some other standard of rest then suitable conversion will be applied.
 *     - The source velocity must be defined. In other words, the SpecFrame 
 *       attributes SourceVel and SourceVRF must have been assigned values.
 *     - The frequency axis in a FITS-CLASS header does not represent
