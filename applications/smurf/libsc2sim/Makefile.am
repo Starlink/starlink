@@ -9,6 +9,7 @@ sc2sim_calctime.c sc2sim_calctrans.c sc2sim_digitise.c sc2sim_drand.c \
 sc2sim_fft2d.c sc2sim_fitheat.c sc2sim_four1.c sc2sim_getast_wcs.c \
 sc2sim_getbilinear.c sc2sim_getcoordframe.c sc2sim_getbous.c \
 sc2sim_getcurvepong.c sc2sim_getinvf.c sc2sim_getliss.c \
+sc2sim_getmicstp.c \
 sc2sim_getobsmode.c sc2sim_getobspar.c sc2sim_getpat.c \
 sc2sim_getpongends.c sc2sim_getpongvert.c \
 sc2sim_getscaling.c sc2sim_getscanseg.c sc2sim_getscansegsize.c \
