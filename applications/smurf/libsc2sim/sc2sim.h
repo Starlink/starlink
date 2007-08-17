@@ -70,6 +70,8 @@
 *        sc2sim_getsigma and sc2sim_addpnoise
 *     2007-07-12 (AGG):
 *        Redefine nterms as int rather than double in sc2sim_getinvf.c
+*     2007-08-15 (CV):
+*        Added sc2sim_getmicstp        
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -314,6 +316,14 @@ int nmaps,           /* number of cycles of the pattern */
 int *lisscount,      /* number of positions in pattern (returned) */
 double **posptr,     /* list of positions (returned) */
 int *status          /* global status (given and returned) */
+);
+
+void sc2sim_getmicstp
+(
+struct sc2sim_obs_struct *inx,
+int count,
+double *posptr,
+int *status
 );
 
 obsMode sc2sim_getobsmode
