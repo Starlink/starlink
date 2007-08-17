@@ -138,6 +138,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *  History:
 *     5-OCT-2005 (DSB):
 *        Original version.
+*     17-AUG-2007 (DSB):
+*        Add velocity gradient to "extracols" information.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -483,6 +485,10 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
                   d = par[ 7 ] - cupidGC.initpars[ 7 ];
                   shiftsq += d*d;
                   astMapPut0D( extra, "GCINITFWHM3", cupidGC.initpars[8], NULL );
+
+                  astMapPut0D( extra, "GCVELGRAD1", par[ 9 ], NULL );
+                  astMapPut0D( extra, "GCVELGRAD2", par[ 10 ], NULL );
+
                }
             }
    
