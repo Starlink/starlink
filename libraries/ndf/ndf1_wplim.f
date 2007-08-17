@@ -90,6 +90,8 @@
 *        Added support for mixed-mode "centre/width" bounds.
 *     29-JUN-2007 (DSB):
 *        Correct final conversion from pixel coords to pixel indices.
+*     17-AUG-2007 (DSB):
+*        Improve error messages.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -487,13 +489,21 @@ c      write(*,*) '   '
 
 *  Re-calculate the PIXEL bounds using the central PIXEL value and the
 *  supplied PIXEL width.
-                        ISPIX1( I ) = .TRUE.
-                        VALUE1( I ) = CENPIX( I )
+                        IF( CENPIX( I ) .NE. AST__BAD ) THEN
+                           ISPIX1( I ) = .TRUE.
+                           VALUE1( I ) = CENPIX( I )
+   
+                           DELTA = DBLE( NINT( VALUE2( I ) )/2 )
+                           PLBND( I ) = VALUE1( I )  - 1.0D0 - DELTA
+                           PUBND( I ) = PLBND( I ) + VALUE2( I )
 
-                        DELTA = DBLE( NINT( VALUE2( I ) )/2 )
-                        PLBND( I ) = VALUE1( I )  - 1.0D0 - DELTA
-                        PUBND( I ) = PLBND( I ) + VALUE2( I )
+                        ELSE IF( STATUS .EQ. SAI__OK ) THEN
+                           STATUS = NDF__BNDIN
+                           CALL ERR_REP( 'NDF1_WPLIM_NOV', 'The WCS '//
+     :                   'coordinates at the centre of the requested'//
+     :                   ' section are invalid.', STATUS )
 
+                        END IF
                      ELSE 
                         ALLPIX = .FALSE.
                      END IF
