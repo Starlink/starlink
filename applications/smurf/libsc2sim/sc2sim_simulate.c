@@ -103,6 +103,7 @@
 *     David Berry (JAC, UCLan)
 *     B.D.Kelly (ROE)
 *     Jen Balfour (UBC)
+*     Christa VanLaerhoven (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -225,6 +226,8 @@
 *        Made obsMode and mapCoordframe enumerated types more readable.
 *     2007-07-06 (AGG):
 *        Initialize FITS header strings
+*     2007-08-15 (CV):
+*        Added microstepping ability for STARE observations
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -336,7 +339,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double *bor_ra=NULL;            /* telescope r.a. spherical coordinates */
   double bor_y_cel=0;             /* boresight y-celestial tanplane offset */
   double bor_y_hor=0;             /* boresight y-horizontal tanplane offset */
-  double bor_y_nas=0;             /* boresight y-nasmyth tanplane offset */
+  double bor_y_nas=0;             /* boresight y-nasmyt0h tanplane offset */
   double bor_x_cel=0;             /* boresight y-celestial tanplane offset */
   double bor_x_hor=0;             /* boresight x-horizontal tanplane offset */
   double bor_x_nas=0;             /* boresight x-nasmyth tanplane offset */
@@ -348,6 +351,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   int curchunk;                   /* current chunk of simulation */
   int curframe;                   /* current frame in context of entire
                                      simulation (not just this chunk) */
+  int curms;                      /* current microstep (loop counter) */
   char *curtok=NULL;              /* current subarray name being parsed */
   char dateobs[SZFITSCARD] = "\0";       /* DATE-OBS string for observation */
   int date_da;                    /* day corresponding to MJD */
@@ -379,6 +383,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 					all subarrays */
   double *flatpar[8];             /* flatfield parameters for all subarrays */
   int frame;                      /* frame counter */
+  int frmperms;                   /* number of frames per microstep */
   AstFrameSet *fs=NULL;           /* frameset for tanplane projection */
   int obscounter;                 /* Counter for observation number
 				     portion of output filename */
@@ -647,6 +652,12 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
           memset( posptr, 0, count*2*sizeof(double) );
         }
 
+	/* if microstepping turned on superimpose microstep pattern on
+	   to posptr */
+	if ( inx->nmicstep > 1 ) {
+	  sc2sim_getmicstp ( inx, count, posptr, status );
+	}
+
         break;
 
       case MODE__DREAM:
@@ -874,15 +885,29 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   slaMappa( 2000.0, inx->mjdaystart, amprms );
 
 
+  /* determine values of variables used for looping: nmicstp,
+     frmperms, chunks, maxwrite */
+
+  /* determine number of frames per microstep */
+  frmperms = count / inx->nmicstep; /* NOTE: will round down number of
+				 frames simulated if count not
+				 divisable by nmicstp */
+
+  /* adjust maxwrite */
+  if ( maxwrite > frmperms ) { maxwrite = frmperms; }
+
   /* Determine how many `chunks' of size maxwrite are required to
      complete the pattern, and how many frames are in the last
      chunk */
-  chunks = ceil ( (double)count / maxwrite );
+  chunks = ceil ( (double)frmperms / maxwrite );
 
-  /* For each chunk, determine the data for the corresponding
+  /* loop over microsteps */
+  for ( curms = 0; curms < inx->nmicstep; curms++ ) {
+
+    /* For each chunk, determine the data for the corresponding
      frames.  At the last frame, write the data for each 
      subarray to a file */
-  for ( curchunk = 0; curchunk < chunks && (*status == SAI__OK); curchunk++ ) {
+  for (curchunk = 0; curchunk < chunks && (*status == SAI__OK); curchunk++) {
 
     /* Adjust the lastframe value depending on whether this is the
        last chunk */
@@ -894,67 +919,66 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
        of count (ie no remainder), so check if we have zero
        remainder. */
     if ( ( chunks != 1 ) && ( curchunk == ( chunks - 1 ) ) ) {
-      lastframe = count % maxwrite;
+      lastframe = frmperms % maxwrite;
       if ( lastframe == 0 ) {
-	lastframe = maxwrite;
+        lastframe = maxwrite;
       }
     }
 
     /* Increment mjdaystart (UTC) to the beginning of this chunk, then
        calculate the UT1/LAST at each timestep */
-    totaltime = (double)(curchunk * maxwrite) * samptime;
-    start_time = inx->mjdaystart + (totaltime / SPD); 
-
+    totaltime = ((double)(curms * frmperms) + (double)(curchunk * maxwrite))
+	* samptime;
+    start_time = inx->mjdaystart + (totaltime / SPD);
     taiutc = slaDat( start_time );
-
-    sc2sim_calctime( (sinx->telpos[0])*DD2R, start_time, inx->dut1, samptime, 
+    sc2sim_calctime( (sinx->telpos[0])*DD2R, start_time, inx->dut1, samptime,
 		     lastframe, mjuldate, lst, status ); 
 
     /* If we're not simulating a planet observation then we only need
-       to calculate the apparent RA, Dec once */
+     to calculate the apparent RA, Dec once */
     if ( !planet ) {
       /* Convert BASE RA, Dec to apparent RA, Dec for current epoch.
-	 Use quick conversion - should be more than good enough */
-      slaMapqkz( inx->ra, inx->dec, amprms, &raapp, &decapp ); 
+         Use quick conversion - should be more than good enough */
+      slaMapqkz( inx->ra, inx->dec, amprms, &raapp, &decapp );
     }
 
     /* Retrieve the values for this chunk */
     for ( frame = 0; frame < lastframe && (*status == SAI__OK); frame++ ) {
 
-      curframe = ( curchunk * maxwrite ) + frame;
+      curframe = ( curms * frmperms ) + ( curchunk * maxwrite ) + frame;
 
       /* Telescope latitude */
       phi = (sinx->telpos[1])*DD2R;
 
       /* If we are simulating a planet observation, calculate apparent
-	 RA, Dec at each time step - actually don't need to do this if
-	 the simulation is short, say 1 min or less but in the first
-	 instance let's do it the correct way. Update it only every
-	 100 frames or 0.5 sec, else use the previous one */
+         RA, Dec at each time step - actually don't need to do this if
+         the simulation is short, say 1 min or less but in the first
+         instance let's do it the correct way. Update it only every
+         100 frames or 0.5 sec, else use the previous one */
       if ( planet ) {
-	if ( frame%100 == 0 ) {
-	  /* Calculate the TT from UTC start_time and TT-UTC from slaDtt */
-	  tt = start_time + (curframe*samptime + dtt ) / SPD;
-	  slaRdplan( tt, inx->planetnum, -DD2R*(sinx->telpos)[0], 
+        if ( frame%100 == 0 ) {
+          /* Calculate the TT from UTC start_time and TT-UTC from slaDtt */
+          tt = start_time + (curframe*samptime + dtt ) / SPD;
+          slaRdplan( tt, inx->planetnum, -DD2R*(sinx->telpos)[0], 
 		     DD2R*(sinx->telpos)[1], &raapp, &decapp, &diam );
 
-	  /* Store RA Dec in inx struct so they can be written as FITS
-	     headers. Note these are APPARENT RA, Dec which are more
-	     relevant for planets */
-	  inx->ra = raapp;
-	  inx->dec = decapp;
+          /* Store RA Dec in inx struct so they can be written as FITS
+             headers. Note these are APPARENT RA, Dec which are more
+             relevant for planets */
+          inx->ra = raapp;
+          inx->dec = decapp;
 	  /* Create frameset to allow sky2map mapping to be determined */
 	  fitschan = astFitsChan ( NULL, NULL, "" );
 	  sc2ast_makefitschan( astnaxes[0]/2.0, astnaxes[1]/2.0, 
 			       (-astscale*DAS2D), (astscale*DAS2D),
 			       raapp*DR2D, decapp*DR2D,
 			       "RA---TAN", "DEC--TAN", fitschan, status );
-	  astClear( fitschan, "Card" );
-	  fitswcs = astRead( fitschan );
-	  /* Extract the Sky->REF_PIXEL mapping. */
-	  astSetC( fitswcs, "SYSTEM", "GAPPT" );
-	  sky2map = astGetMapping( fitswcs, AST__CURRENT, AST__BASE );
-	}
+          astClear( fitschan, "Card" );
+          fitswcs = astRead( fitschan );
+          /* Extract the Sky->REF_PIXEL mapping. */
+          astSetC( fitswcs, "SYSTEM", "GAPPT" );
+          sky2map = astGetMapping( fitswcs, AST__CURRENT, AST__BASE );
+        }
       }
 
       /* Calculate hour angle */
@@ -965,11 +989,11 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
       /* Issue an error if the source is below 20 degrees */
       if ( temp2 < 0.35 ) {
-	if ( *status == SAI__OK ) {
-	  *status = SAI__ERROR;
-	  errRep(" ", "Source is below 20 deg elevation", status);
-	  goto CLEANUP;
-	}
+        if ( *status == SAI__OK ) {
+          *status = SAI__ERROR;
+          errRep(" ", "Source is below 20 deg elevation", status);
+          goto CLEANUP;
+        }
       }
 
       /* Parallactic angle */
@@ -981,9 +1005,9 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         base_p[frame] = temp3;
 
         /* The scan pattern (posptr) is defined as a series of offsets
-	   in ARCSEC in the map coordinate frame. Depending on the
-	   frame chosen, project the pattern into AzEl and RADec so
-	   that it can be written to the JCMTState structure */
+           in ARCSEC in the map coordinate frame. Depending on the
+           frame chosen, project the pattern into AzEl and RADec so
+           that it can be written to the JCMTState structure */
 	switch( coordframe ) {
 	  
 	case FRAME__NASMYTH:
@@ -1174,7 +1198,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 			      frame, nterms, noisecoeffs, pzero, samptime, 
 			      timesincestart, sinx->telemission, weights, 
 			      sky2map, xbolo, ybolo, xbc, ybc, 
-			      &(posptr[( (curchunk * maxwrite) + frame )*2]), 
+			      &(posptr[curframe*2]), 
                               &(dbuf[(k*nbol*maxwrite) + (nbol*frame)]), 
 			      status );
 	  }
@@ -1196,7 +1220,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
           /* RTS -------------------------------------------------------*/
 	  /* Sequence number */
-          head[j].rts_num = ( curchunk * maxwrite ) + j;           
+          head[j].rts_num = ( curms * frmperms ) + ( curchunk * maxwrite ) + j;
 	  /* Calculate TAI corresponding to MID-TIME of sample and store */
 	  head[j].tcs_tai = mjuldate[j] + (taiutc - inx->dut1 + 0.5*samptime)/SPD;
 
@@ -1370,8 +1394,9 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
 	    obscounter = 1;
             sprintf( filename, "%s%04i%02i%02i_%05d_%04d", 
-                     subarrays[k], date_yr, date_mo, date_da, obscounter, curchunk + 1 );
-	    /* If we are not overwriting existing files see if the file exists */
+                     subarrays[k], date_yr, date_mo, date_da, obscounter,
+		     (curms * chunks) + curchunk + 1 );
+	    /*If we are not overwriting existing files see if the file exists*/
 	    if ( !overwrite ) {
 	      fileexists = 1;
 	      while ( fileexists ) {
@@ -1385,13 +1410,15 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 		  fclose(ofile);
 		  obscounter++;
 		  sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k], 
-			   date_yr, date_mo, date_da, obscounter, curchunk + 1 );
+			   date_yr, date_mo, date_da, obscounter,
+			   (curms * chunks) + curchunk + 1 );
 		} else {
 		  /* If not, unset fileexists flag, increment counter
 		     and set new file name */
 		  fileexists = 0;
 		  sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k], 
-			   date_yr, date_mo, date_da, obscounter, curchunk + 1 );
+			   date_yr, date_mo, date_da, obscounter,
+			   (curms * chunks) + curchunk + 1 );
 		}
 	      }
 	    }
@@ -1430,9 +1457,9 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	    sc2sim_ndfwrdata( inx, sinx, tauCSO, filename, lastframe, nflat[k],
 			      flatname[k], head, digits, dksquid, flatcal[k], 
 			      flatpar[k], INSTRUMENT, filter, dateobs, obsid,
-			      &(posptr[(curchunk*maxwrite)*2]), jigsamples, 
-                              &(jigpat[0]), 
-			      obscounter, curchunk+1, obstype, utdate, 
+			      &(posptr[curframe*2]), jigsamples, 
+                              &(jigpat[0]), obscounter,
+			      (curms * chunks) + curchunk+1, obstype, utdate, 
 			      head[0].tcs_az_bc1, 
 			      head[lastframe-1].tcs_az_bc1,
 			      head[0].tcs_az_bc2, 
@@ -1460,7 +1487,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     }/* for all frames in this chunk */
    
   }/* for each chunk */
-  
+  } /* for each microstep */
+
   /* Release memory. */
 
   /* Free buffers that get allocated for each subarray */
