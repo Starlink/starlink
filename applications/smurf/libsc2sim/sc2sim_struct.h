@@ -5,6 +5,7 @@
     A.G. Gibb (agg@astro.ubc.ca)
     E.L. Chapin (echapin@phas.ubc.ca)
     J. Balfour (jbalfour@phas.ubc.ca)
+    C. VanLaerhoven (clvl@phas.ubc.ca)
 
    History :
     14Feb2003 : original (bdk)
@@ -44,6 +45,7 @@
                 -added jy2pw, refload, refnoise
     03Jul2007 : Made obsMode/mapCoordframe enumerated types more readable (EC)
     04Jul2007 : Added spike_t0/p0/p1/alpha to sc2sim_sim_struct (EC)
+    15Aug2007 : Added microstepping parameters to sc2sim_obs_struct (CV)
 */
 #include "libsc2sim/sc2sim_par.h"
 
@@ -103,12 +105,17 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
   double lambda;              /* wavelength in metres */
   double liss_angle;          /* angle of pattern relative to telescope
 				 axes in radians anticlockwise */
-  double mjdaystart;          /* Modified julian date at start */      
+  double mjdaystart;          /* Modified julian date at start */
+  double mspat_x[SC2SIM__MXMSTP]; /* microstep pattern offsets in x
+				    (units: number of detectors) */
+  double mspat_y[SC2SIM__MXMSTP]; /* microstep pattern offsets in y
+				    (units: number of decectors) */
   int nbolx;                  /* number of bolometers in X */
   int nboly;                  /* number of bolometers in Y */
   int ngrid;                  /* Nr of reconstruction points for single
 				 bolometer */
   double nmaps;               /* Number of times to repeat pattern */
+  int nmicstep;               /* number of microsteps */
   int numsamples;             /* number of samples in STARE */
   int nvert;                  /* Nr of vertices in the Jiggle pattern */
   char obsmode[80];           /* Type of observation */
