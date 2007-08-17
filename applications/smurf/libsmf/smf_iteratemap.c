@@ -83,6 +83,9 @@
 *     2007-08-09 (EC):
 *        - changed index order for model
 *        - added memiter flag to config file - avoids doing file i/o 
+*     2007-08-17 (EC):
+*        Added nofile flag to smf_model_create to avoid creating .dimm files
+*        in memiter=1 case.
 
 *  Notes:
 
@@ -158,7 +161,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
   smfGroup *lutgroup=NULL;      /* smfGroup of lut model files */
   int memiter=0;                /* If set iterate completely in memory */
-  smfArray ***model=NULL;       /* Array of pointers smfArrays for e. model */
+  smfArray ***model=NULL;       /* Array of pointers smfArrays for ea. model */
   smfGroup **modelgroups=NULL;  /* Array of group ptrs/ each model component */
   smf_modeltype *modeltyps=NULL;/* Array of model types */
   char modelname[4];            /* Name of current model component */
@@ -293,9 +296,12 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
     lut = smf_malloc( nchunks, sizeof(*lut), 1, status );
     ast = smf_malloc( nchunks, sizeof(*ast), 1, status );
 
-    smf_model_create( igroup, SMF__RES, &resgroup, memiter, res, status );
-    smf_model_create( igroup, SMF__LUT, &lutgroup, memiter, lut, status ); 
-    smf_model_create( igroup, SMF__AST, &astgroup, memiter, ast, status );
+    smf_model_create( igroup, SMF__RES, &resgroup, memiter, memiter, res, 
+		      status );
+    smf_model_create( igroup, SMF__LUT, &lutgroup, memiter, memiter, lut, 
+		      status ); 
+    smf_model_create( igroup, SMF__AST, &astgroup, memiter, memiter, ast, 
+		      status );
   }
 
   /* Dynamic components */
@@ -311,7 +317,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
       model[i] = smf_malloc( nchunks, sizeof(**model), 1, status );
 
       smf_model_create( igroup, modeltyps[i], &modelgroups[i], memiter, 
-			model[i], status );
+			memiter, model[i], status );
     }
   }
 

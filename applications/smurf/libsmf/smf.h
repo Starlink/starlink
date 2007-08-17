@@ -177,6 +177,8 @@
 *        -Added copysubgroups to smf_construct_smfGroup
 *     2007-08-09 (EC):
 *        -Changed interface for smf_model_create
+*     2007-08-17 (EC):
+*        -Added nofile to smf_model_create interface
 
 *     {enter_further_changes_here}
 *  Copyright:
@@ -443,8 +445,8 @@ void smf_mapbounds_approx( Grp *igrp, int index, char *system, double pixsize,
 			   int *moving, int *status );
 
 void smf_model_create( const smfGroup *igrp, smf_modeltype mtype, 
-		       smfGroup **mgroup, int leaveopen, smfArray **mdata, 
-		       int *status);
+		       smfGroup **mgroup, int nofile, int leaveopen, 
+		       smfArray **mdata, int *status);
 
 char *smf_model_getname( smf_modeltype type, int *status);
 
