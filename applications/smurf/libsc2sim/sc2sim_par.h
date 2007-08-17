@@ -5,6 +5,7 @@
      16Jun2003: move NWEIGHTS to dream_par.h (bdk)
      04Feb2005: remove TELEMISSION, ASTSCALE, ASTSIZE, ATMSCALE, ATMSIZE (bdk)
      22SEP2006: add DREAM parameters, change to SC2SIM paramters (jb)
+     15Aug2007: add SC2SIM_MXMS - maximum number of microsteps (cv)
 */
 
 #define SC2SIM__NCOEFFS 6         /* no. of coeffs for bolometer response */
@@ -24,3 +25,5 @@
 #define SC2SIM__MXSIM 1024  /* maximum number of values simulated */
 #define SC2SIM__MXSAM 512   /* maximum number of samples in a path */
 #define SC2SIM__OVER 50     /* computational oversampling factor */
+
+#define SC2SIM__MXMSTP 10     /* maximum number of microsteps */
