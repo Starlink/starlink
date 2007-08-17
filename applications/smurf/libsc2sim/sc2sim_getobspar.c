@@ -33,6 +33,7 @@
 *     J. Balfour (UBC)
 *     A.G. Gibb (UBC)
 *     E. Chapin (UBC)
+*     C. VanLaerhoven (UBC)
 *     {enter_new_authors_here}
 
 *  History :
@@ -72,6 +73,8 @@
 *        Add Venus to list of supported planets
 *     2007-02-01 (AGG):
 *        Might as well finish the job - Saturn and Neptune are now supported
+*     2007-08-15 (CV):
+*        Added microstepping parameters - nmicstep, mspat_x/y
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
@@ -128,6 +131,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    int ix;                /* grid offset */
    int iy;                /* grid offset */
    int j = 0;             /* Array index */
+   int n = 0;             /* array index */
    int nvert_x=0;         /* Number of jig_x vertices */
    int nvert_y=0;         /* Number of jig_Y vertices */
    double ra;             /* Double representation of RA */
@@ -327,6 +331,46 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    if ( !astMapGet0D ( keymap, "MJDAYSTART", &(inx->mjdaystart) ) )
       inx->mjdaystart = 53795.0;
 
+   memset( inx->mspat_x, 0, SC2SIM__MXMSTP*sizeof(double) );
+   if ( astMapGet0C ( keymap, "MSPAT_X", &temp ) ) {
+
+     /* Parse the string and retrieve the values */
+     n = 0;
+     curtok = strtok ( temp, ";" );
+     while ( curtok != NULL ){
+	if ( n >= SC2SIM__MXMSTP ) {
+	  *status = SAI__ERROR;
+          msgOut(" ",
+		 "Length of microstep pattern in x exceeds length allowed",
+		 status); 
+         return;
+	}
+        inx->mspat_x[n] = atof ( curtok );
+	curtok = strtok ( NULL, ";" );
+	n++;
+     }
+   }
+
+   memset( inx->mspat_y, 0, SC2SIM__MXMSTP*sizeof(double) );
+   if ( astMapGet0C ( keymap, "MSPAT_Y", &temp ) ) {
+
+     /* Parse the string and retrieve the values */
+     n = 0;
+     curtok = strtok ( temp, ";" );
+     while ( curtok != NULL ){
+	if ( n >= SC2SIM__MXMSTP ) {
+	  *status = SAI__ERROR;
+          msgOut(" ",
+		 "Length of microstep pattern in y exceeds length allowed",
+		 status); 
+         return;
+	}
+        inx->mspat_y[n] = atof ( curtok );
+	curtok = strtok ( NULL, ";" );
+	n++;
+     }
+   }
+
    if ( !astMapGet0I ( keymap, "NBOLX", &(inx->nbolx) ) )
       inx->nbolx = 40;
 
@@ -359,6 +403,20 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
              "Too many reconstruction grid points requested", status); 
       return;
    }      
+
+
+   if ( !astMapGet0I ( keymap, "NMICSTEP", &(inx->nmicstep) ) ) {
+      inx->nmicstep = 1;
+   }
+   else {
+     if ( inx->nmicstep > SC2SIM__MXMSTP ) {
+       *status = SAI__ERROR;
+       msgOut(" ",
+	      "Number of microsteps greater than allowed",
+	      status );
+       return;
+     }
+   }
 
    if ( !astMapGet0I ( keymap, "NUMSAMPLES", &(inx->numsamples) ) )
       inx->numsamples = 128; 
