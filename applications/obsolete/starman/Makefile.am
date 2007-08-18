@@ -125,3 +125,11 @@ data/tbweed_in.sdf data/unccd_in.sdf
 #  deficiencies in ifd2star
 $(IFL_FILES) $(DYNSCRIPTS): starman.ifd
 	$(IFD2STAR) starman
+
+# Help files
+HELP_SOURCES = starman_help_a.hlp starman_help_m.hlp
+starhelp_DATA = $(HELP_SOURCES:.hlp=.shl)
+
+#  Rule for building the help library from the help source.
+.hlp.shl:
+	@HLIB@ $<
