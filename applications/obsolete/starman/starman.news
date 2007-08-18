@@ -18,3 +18,7 @@
  be seen with "starmandemo". 
 
  Alan Penny                   RAL                    1995 June 
+
+2 Changes_in_V2.0-1
+
+  o Use GNU Autotools build system

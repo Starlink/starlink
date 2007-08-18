@@ -25,7 +25,7 @@ C  Contains:-
 C  T_STARMANHELP    Uses the help system to read STARMAN_HELP_M.SHL
 C  STHE_DOIT        Does the Starmanhelp
 C  STHE_GETHELP     Prints help text from a library of help information.
-C  STHE_KPG1_SCRSZ  Get the width and height of the screen
+C  ONE_SCRSZ  Get the width and height of the screen
 C  STHE_PTHLPO      (Fn) Output a line of HELP
 C  STHE_GTHLPI      (Fn) Gets one line input during an help session.
 C  STHE_SREAD       Read, condition, paraphrase and classify a string.
@@ -271,7 +271,7 @@ Cbegin
 *  Find the height and width of the screen.  Use the full screen area.
 *  A zero or negative LBOT (which occurs when there is an error) will
 *  suppress paging.
-      CALL STHE_KPG1_SCRSZ( WIDTH, LBOT, STATUS )
+      CALL ONE_SCRSZ( WIDTH, LBOT, STATUS )
       LTOP = 1
 
 *  Get help.
@@ -301,46 +301,6 @@ Cbegin
       END IF
 
       END
-
-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-C STHE_KPG1_SCRSZ --  Get the width and height of the screen
-C  If error or the width not positive, returns 80 characters by 24 lines.
-C
-C   Alan Chipperfield (STARLINK) Malcolm J. Currie (STARLINK)
-C   alan penny                     ral              1994 Dec
-
-      SUBROUTINE STHE_KPG1_SCRSZ( WIDTH, HEIGHT, STATUS )
-
-      implicit none
-      include 'SAE_PAR'
-
-      INTEGER WIDTH		!The width of the screen in characters.
-      INTEGER HEIGHT		!The height of the screen in lines.
-      INTEGER STATUS            ! Global status
-C--
-*  External References:
-      EXTERNAL STHE_TRMSZ
-      INTEGER STHE_TRMSZ         ! C function for actually obtaining
-
-*  Local Variables:
-      INTEGER ISTAT              ! Local status
-Cbegin
-
-*  Check the inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Inquire the terminal size.  
-      ISTAT = STHE_TRMSZ ( WIDTH, HEIGHT )
-
-*  If this failed to get a good value, set default which causes no
-*  paging.
-      IF ( ( ISTAT .NE. 1 ) .OR. ( WIDTH .LE. 0 ) ) THEN
-         WIDTH = 80
-         HEIGHT = 0
-      END IF
-
-      END
-
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C STHE_PTHLPO -- (Fn) Output a line of HELP

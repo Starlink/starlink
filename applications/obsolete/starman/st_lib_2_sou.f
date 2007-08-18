@@ -100,55 +100,55 @@ C WRKCAN      Cancel work space name connection
 
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-CXC AJRAN -- (FN) Random number generator - uniform between 0 and 1
-CXC
-CXC   a j penny                    ral                 1991 Nov
-CX
-CX      real function ajran ( rvd )
-CX
-CX      implicit none
-CX      include 'NDF_PAR'
-CX      include 'SAE_PAR'
-CX
-CX      real    rvd	!i: dummy number, not used
-CXC--
-CX      real rv
-CX      integer status, nran, maxn
-CXCbegin
-CX
-CX
-CX      status = SAI__OK
-CX      call psx_rand ( nran, maxn, rv, status )
-CX      ajran = rv
-CX
-CX
-CX      end
-CX
-CXCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-CXC AJSEED -- Set seed for Random number generator 
-CXC
-CXC   a j penny                    ral                 1991 Nov
-CX
-CX      subroutine ajseed ( nran )
-CX
-CX      implicit none
-CX      include 'NDF_PAR'
-CX      include 'SAE_PAR'
-CX      include 'ST_LIMITS_INC'
-CX
-CX      integer	nran	!i: Seed
-CXC--
-CX      integer status
-CXCbegin
-CX
-CX
-CX      status = SAI__OK
-CX      call psx_srand ( nran, status )
-CX
-CX
-CX      end
-CX
-CX
+C AJRAN -- (FN) Random number generator - uniform between 0 and 1
+C
+C   a j penny                    ral                 1991 Nov
+
+      real function ajran ( rvd )
+
+      implicit none
+      include 'NDF_PAR'
+      include 'SAE_PAR'
+
+      real    rvd	!i: dummy number, not used
+C--
+      real rv
+      integer status, nran, maxn
+Cbegin
+
+
+      status = SAI__OK
+      call psx_rand ( nran, maxn, rv, status )
+      ajran = rv
+
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C AJSEED -- Set seed for Random number generator 
+C
+C   a j penny                    ral                 1991 Nov
+
+      subroutine ajseed ( nran )
+
+      implicit none
+      include 'NDF_PAR'
+      include 'SAE_PAR'
+      include 'ST_LIMITS_INC'
+
+      integer	nran	!i: Seed
+C--
+      integer status
+Cbegin
+
+
+      status = SAI__OK
+      call psx_srand ( nran, status )
+
+
+      end
+
+
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C AJDATE -- Return character string with date and time
@@ -2730,7 +2730,7 @@ Cbegin
       if ( text(1:1).eq.'0' .or. text(1:1).eq.'1' .or.
      +     text(1:1).eq.'+' ) then
 C     prepend a space
-         call msg_setc('TEXT', buffer)
+         call msg_setc('TEXT', text)
          call msg_out ( ' ', ' ^TEXT', istat )
       elseif ( text.eq.' ' ) then
          call msg_out ( ' ', '  ', istat )

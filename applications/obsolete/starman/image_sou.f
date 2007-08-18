@@ -2544,7 +2544,7 @@ C   alan penny                     ral           1991 May
 
       implicit none
       include 'imcut.inc'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
       include 'STARMAN_INC'
       include 'ST_LIMITS_INC'
 C--
@@ -2651,7 +2651,7 @@ C   alan penny                     ral           1991 May
       subroutine imc_doitr ( in, out, nxo, nyo )
 
       implicit none
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
       include 'imcut.inc'
 C--
       real        in(NX,NY)		!i: Input image
@@ -2789,7 +2789,7 @@ C   alan penny                     ral           1991 May
       subroutine imc_doits ( in, out, nxo, nyo )
 
       implicit none
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
       include 'imcut.inc'
 C--
       integer*2   in(NX,NY)		!i: Input image
@@ -2944,7 +2944,7 @@ C   alan penny                     ral           1991 May
 
       implicit none
       include 'STARMAN_INC'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
 C--
       integer kout, ierr, ka
       character*1000 topt
@@ -3001,7 +3001,7 @@ C  alan penny                 ral                1990-06-15
 
       implicit none
       include 'imdes.inc'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
       include 'STARMAN_INC'
 C--
       logical more, amore, paging, onlyone
@@ -3084,7 +3084,7 @@ C  alan penny                 ral                1990-06-15
 
       implicit none
       include 'imdes.inc'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
       include 'STARMAN_INC'
 C--
       logical more, paging, some
@@ -3168,7 +3168,7 @@ C  p morris      leeds                   Jun 1992
 
       implicit none
       include 'STARMAN_INC'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
 C--
       integer ierr, iv, ka
       real rv
@@ -3235,7 +3235,7 @@ C  p morris             leeds       jun 1992
       implicit none
       include 'imdes.inc'
       include 'STARMAN_INC'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
 C--
       integer ierr, ncount, nval, ka
       character descr*20
@@ -3313,7 +3313,7 @@ C   alan penny                ral      1990 jan
       implicit none
       include 'imdes.inc'
       include 'STARMAN_INC'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
 C--
       character*60 atext(10000)
       character*8  adescr(10000)
@@ -4928,7 +4928,7 @@ C   alan penny                ral          1990 Jan
 
       implicit none
 
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
       include 'STARMAN_INC'
       include 'ST_LIMITS_INC'
       include 'ST_DS_GEN_INC'
@@ -5174,7 +5174,7 @@ C alan penny                    ral            1991 March
       implicit none
       include 'imjoin.inc'
       include 'STARMAN_INC'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
 C---
       integer istat, k, kk, px(4), py(4), pmx, pmy
       real rv
@@ -5330,7 +5330,7 @@ C alan penny                    ral            1991 March
 
       implicit none
       include 'imjoin.inc'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
       include 'STARMAN_INC'
       include 'ST_LIMITS_INC'
 C---
@@ -5523,7 +5523,7 @@ C alan penny                    ral            1991 March
 
       implicit none
       include 'imjoin.inc'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
       include 'STARMAN_INC'
       include 'ST_LIMITS_INC'
 C--
@@ -5767,7 +5767,7 @@ C alan penny                    ral            1991 March
       implicit none
       include 'imjoin.inc'
       include 'ST_LIMITS_INC'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
 
       integer      nxc			!i: Input image X size
       integer      nyc			!i: Input image Y size
@@ -5849,7 +5849,7 @@ C alan penny                    ral            1991 March
 
       implicit none
       include 'imjoin.inc'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
       include 'ST_LIMITS_INC'
 
       integer      nxc			!i: Input image X size
@@ -5933,7 +5933,7 @@ C alan penny                    ral            1991 March
       implicit none
       include 'imjoin.inc'
       include 'ST_LIMITS_INC'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
 C--
       integer      nxc			!i: Input image X size
       integer      nyc			!i: Input image Y size
@@ -6071,7 +6071,7 @@ C alan penny                    ral            1991 March
       implicit none
       include 'imjoin.inc'
       include 'ST_LIMITS_INC'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
 C--
       integer      nxc			!i: Input image X size
       integer      nyc			!i: Input image Y size
@@ -6209,7 +6209,7 @@ C alan penny                    ral            1991 March
       implicit none
       include 'imjoin.inc'
       include 'ST_LIMITS_INC'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
 C--
       integer      nxc			!i: Input image X size
       integer      nyc			!i: Input image Y size
@@ -6330,7 +6330,7 @@ C alan penny                    ral            1991 March
       implicit none
       include 'imjoin.inc'
       include 'ST_LIMITS_INC'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
 C--
       integer      nxc			!i: Input image X size
       integer      nyc			!i: Input image Y size
@@ -6685,7 +6685,7 @@ C  alan penny                  ral              1993 Dec
 
       implicit none
       include 'imkey.inc'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
       include 'STARMAN_INC'
 C--
       integer istat
@@ -6730,7 +6730,7 @@ C  alan penny                         RAL                1991 Dec
 
       implicit none
       include 'imkey.inc'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
       include 'STARMAN_INC'
       include 'ST_LIMITS_INC'
 C--
@@ -6844,7 +6844,7 @@ C  alan penny                RAL                1991 Dec
 
       implicit none
       include 'imkey.inc'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
 C--
       real rv
       integer*2 isv
@@ -6880,7 +6880,7 @@ C  alan penny                     RAL            1991 Dec
 
       implicit none
       include 'imkey.inc'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
       include 'STARMAN_INC'
 
       integer    nxa		!i:   X size of image
@@ -6946,7 +6946,7 @@ C  alan penny                     RAL            1991 Dec
 
       implicit none
       include 'imkey.inc'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
       include 'STARMAN_INC'
 
       integer    nxa		!i:   X size of image
@@ -7386,7 +7386,7 @@ C   alan penny                     ral           1991 May
 
       implicit none
       include 'STARMAN_INC'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
 C--
       integer ierr, ipo, nxo, nyo, k
       character title*50, thelp*68
@@ -7444,7 +7444,7 @@ C   alan penny                     ral           1991 May
       subroutine imr_doitr ( in, out, nxo, nyo, kopt )
 
       implicit none
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
 C--
       real        in(NX,NY)		!i: Input image
       integer     nxo			!i: Output image X size
@@ -7504,7 +7504,7 @@ C   alan penny                     ral           1991 May
       subroutine imr_doits ( in, out, nxo, nyo, kopt )
 
       implicit none
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
 C--
       integer*2   in(NX,NY)		!i: Input image
       integer     nxo			!i: Output image X size
@@ -8170,7 +8170,7 @@ C   alan penny                     ral           1991 May
 
       implicit none
       include 'STARMAN_INC'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
 C--
       integer nxs, nxe, nys, nye, ierr
 Cbegin
@@ -8211,7 +8211,7 @@ C  alan penny                ral                      1990-06-15
       subroutine ims_astat ( nxs, nxe, nys, nye )
 
       implicit none
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
       include 'STARMAN_INC'
 
       integer   nxs		!i: X start of area
@@ -8589,7 +8589,7 @@ C alan penny          ral                   1991 April
 
       implicit none
       include 'imtype.inc'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
       include 'STARMAN_INC'
       include 'ST_LIMITS_INC'
 C--
@@ -8704,7 +8704,7 @@ C alan penny          ral                   1991 April
 
       implicit none
       include 'imtype.inc'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
       include 'STARMAN_INC'
 C--
       integer kopt, kin
@@ -8761,7 +8761,7 @@ C alan penny          ral                   1991 April
 
       implicit none
       include 'imtype.inc'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
       include 'STARMAN_INC'
       include 'ST_LIMITS_INC'
 C--
@@ -8823,7 +8823,7 @@ C alan penny          ral                   1991 April
 
       implicit none
       include 'imtype.inc'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
       include 'ST_LIMITS_INC'
 
       real       in(NX,NY)	!i: Input data
@@ -8861,7 +8861,7 @@ C alan penny          ral                   1991 April
 
       implicit none
       include 'imtype.inc'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
       include 'ST_LIMITS_INC'
 
       real       in(NX,NY)	!i: Input data
@@ -8900,7 +8900,7 @@ C alan penny          ral                   1991 April
 
       implicit none
       include 'imtype.inc'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
       include 'ST_LIMITS_INC'
 
       integer    in(NX,NY)	!i: Input data
@@ -8938,7 +8938,7 @@ C alan penny          ral                   1991 April
 
       implicit none
       include 'imtype.inc'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
       include 'ST_LIMITS_INC'
 
 C--
@@ -8995,7 +8995,7 @@ C alan penny          ral                   1991 April
 
       implicit none
       include 'imtype.inc'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
       include 'ST_LIMITS_INC'
 
 C--
@@ -9077,7 +9077,7 @@ C   alan penny                     ral           1991 May
 
       implicit none
       include 'STARMAN_INC'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
 C--
       integer   ierr, ipo
       real      bot, top
@@ -9115,7 +9115,7 @@ C   alan penny                     ral           1995 Jan
 
       implicit none
       include 'STARMAN_INC'
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
 
       integer       ipo		!o: Pointer to output array
       real          bot		!o: Lower limit to INVALID range
@@ -9187,7 +9187,7 @@ C   alan penny                     ral           1995 Jan
       subroutine imwe_doitr ( in, out, bot, top )
 
       implicit none
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
 
       real        in(NX*NY)	!i: Input image
       real        out(NX*NY)	!o: Output image
@@ -9225,7 +9225,7 @@ C   alan penny                     ral           1995 Jan
       subroutine imwe_doits ( in, out, bot, top )
 
       implicit none
-      include 'image.inc'
+      include 'ST_IMAGE_INC'
 
       integer*2   in(NX*NY)	!i: Input image
       integer*2   out(NX*NY)	!o: Output image

@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@" status="obsolete" support="U">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/obsolete/starman</path>
+  <description>STARMAN - Stellar Photometry and Image/Table Handling</description>
+  <abstract><p>
+STARMAN is a stellar photometry package designed for the reduction of data
+from imaging systems. Its main components are:- crowded-field photometry
+programs; aperture photometry programs; a star finding program; a CCD
+reduction program.
+  </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Alan J. Penny</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
