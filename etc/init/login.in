@@ -557,6 +557,12 @@ endif
  endif
 
 #
+#  STARMAN
+ if (-e ${bindir}/starman/starman.csh) then
+    setenv STARMAN_DIR ${bindir}/starman
+ endif
+ 
+#
 #  FROG
  if ( -e ${starjavadir}/bin/frog ) then
     setenv FROG_DIR ${starjavadir}/bin/frog

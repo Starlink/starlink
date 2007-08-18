@@ -379,6 +379,12 @@ if test -f ${bindir}/sst/sst.sh; then
    export SST_HELP=${starhelpdir}/sst/sst
 fi
 
+#  STARMAN
+
+if test -f ${bindir}/starman/starman.sh; then
+   export STARMAN_DIR=${bindir}/starman
+fi
+
 #  STILTS
 
 if test -x ${starjavadir}/bin/stilts; then
@@ -667,6 +673,16 @@ if test -f ${bindir}/sst/sst.sh; then
 else
   sst () { ${staretcdir}/notinst sst; }
   sstsetup () { ${staretcdir}/notinst sst; }
+fi
+
+# STARMAN
+
+if test -f ${bindir}/starman/starman.sh; then
+  starman () { . $STARMAN_DIR/starman.sh; }
+  starmansetup () { . $STARMAN_DIR/starman.sh; }
+else
+  starman () { ${staretcdir}/notinst starman; }
+  starmansetup () { ${staretcdir}/notinst starman; }
 fi
 
 # SURF
