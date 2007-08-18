@@ -3,6 +3,7 @@
 bin_PROGRAMS = s_refresh
 bin_SCRIPTS = $(DYNSCRIPTS) $(PUBLICSCRIPTS)
 bin_MONOLITHS = starman1_mon starman2_mon starman3_mon starman4_mon
+staretc_DATA = $(DATAFILES)
 
 s_refresh_SOURCES = s_refresh.c
 s_refresh_LDADD = `starx_link`
@@ -49,9 +50,11 @@ tbtran_make tbvalue tbweed unccd
 IFL_FILES = $(TASKS:=.ifl) starman1_mon.ifl \
 	starman2_mon.ifl starman3_mon.ifl starman4_mon.ifl
 
-PUBLICSCRIPTS = starmandemo starmanhypergripe starmanhyperhelp \
-	starman.csh starman.icl
+PUBLICSCRIPTS = starmandemo starmanhypergripe starmanhyperhelp
 
+DYNSCRIPTS = starman.csh starman.sh starman.icl
+
+BUILT_SOURCES = $(DYNSCRIPTS) $(IFL_FILES)
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
@@ -88,3 +91,37 @@ PRIVATE_INCLUDES =  \
 	ds_gen.h   dsx_gen.h  image.h ds_lut.h \
 	dsx_lut.h    lut.h  ds_panel.h   dsx_panel.h  virt.h
 
+DATAFILES = data/addstars_in.sdf data/addstars_instars.sdf	      \
+data/addstars_profile.sdf data/automag_in.sdf data/average_in1.sdf    \
+data/average_in2.sdf data/average_inchi1.sdf data/average_inchi2.sdf  \
+data/chi_in.sdf data/diagram_in2.sdf data/diagram_in3.sdf	      \
+data/dustring_in.sdf data/galaxy.sdf data/imcalc_ina.sdf	      \
+data/imcalc_inb.sdf data/imcube_in.sdf data/imcut_in.sdf	      \
+data/imdes_in.sdf data/imfits_dr_in data/imflash_in.sdf		      \
+data/imjoin_in1.sdf data/imjoin_in2.sdf data/imkey_in.sdf	      \
+data/import_in.sdf data/imrotate_in.sdf data/imsmooth_in.sdf	      \
+data/imstat_in.sdf data/imtype_in.sdf data/imweed_in.sdf	      \
+data/interact_in.sdf data/mag_stars_v.sdf data/measure_in.sdf	      \
+data/measure_instars.sdf data/measure_profile.sdf data/profile_in.sdf \
+data/profile_instars.sdf data/radius_in.sdf data/simplemag_in.sdf     \
+data/simplemag_instars.sdf data/sprinkle_cluster.sdf		      \
+data/starfind_in.sdf data/stars_r_rotated.sdf data/stars_v.sdf	      \
+data/tbcalc_ina.sdf data/tbcalc_inb.sdf data/tbchart_in.sdf	      \
+data/tbcomps_in.sdf data/tbcut_in.sdf data/tbdes_in.sdf		      \
+data/tbjoin_in1.sdf data/tbjoin_in2.sdf data/tblist_in.sdf	      \
+data/tbload_in data/tbmatch_in1.sdf data/tbmatch_in2.sdf	      \
+data/tbnative_in.sdf data/tbnmatch_in1.sdf data/tbnmatch_in2.sdf      \
+data/tbnmatch_in3.sdf data/tbplot_im.sdf data/tbplot_in1.sdf	      \
+data/tbplot_in2.sdf data/tbpmatch_in1.sdf data/tbpmatch_in2.sdf	      \
+data/tbrenum_in.sdf data/tbsheet_in.sdf data/tbsort_in.sdf	      \
+data/tbstat_in1.sdf data/tbstat_in2.sdf data/tbtran_auto_in.sdf	      \
+data/tbtran_auto_master.sdf data/tbtran_do_in.sdf		      \
+data/tbtran_make_in1.sdf data/tbtran_make_in2.sdf data/tbvalue_in.sdf \
+data/tbweed_in.sdf data/unccd_in.sdf
+
+
+#  Generate ifl and startup scripts from the ifd file and then do any
+#  necessary post processing of the generated files to overcome
+#  deficiencies in ifd2star
+$(IFL_FILES) $(DYNSCRIPTS): starman.ifd
+	$(IFD2STAR) starman

@@ -41,6 +41,6 @@ dnl    No use dependencies
 
 STAR_LATEX_DOCUMENTATION(sun141)
 
-AC_CONFIG_FILES([Makefile component.xml])
+AC_CONFIG_FILES([Makefile component.xml starman.ifd])
 
 AC_OUTPUT
