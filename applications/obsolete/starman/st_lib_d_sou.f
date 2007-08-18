@@ -729,10 +729,12 @@ C  alan penny                  ral         1990 jan
       real           imr                !i: Real image
       character*(*)  type		!i: Image type ("REAL', 'SHORT' )
       integer        kopt		!i: 0=Flash,no type; 1=Flash; 2=Display
-      equivalence (imr, im)
+      integer*2      dummy(2)
+      equivalence (imr, dummy)
 C--
 Cbegin
-
+      dummy(1) = im(1)
+      dummy(2) = im(2)
       
       if ( type.eq.'REAL' ) then
          call ds_dispr ( imr, mx, my, kopt )
