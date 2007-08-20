@@ -455,7 +455,7 @@ smf_modeltype smf_model_gettype( const char *modelname, int *status );
 void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, 
 			      smfData **ffdata, int *status);
 
-void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
+void smf_open_file( Grp * igrp, int index, const char * mode, int withHdr,
 		    smfData ** data, int *status);
 
 void smf_open_mapcoord( smfData *data, int *status );

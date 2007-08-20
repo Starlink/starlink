@@ -13,7 +13,7 @@
 *     Library routine
 
 *  Invocation:
-*     smf_open_file( Grp * ingrp, int index, char * mode, int withHdr,
+*     smf_open_file( Grp * ingrp, int index, const char * mode, int withHdr,
 *                    smfData ** data, int *status);
 
 *  Arguments:
@@ -21,7 +21,7 @@
 *        NDG group identifier
 *     index = int (Given)
 *        Index corresponding to required file in group
-*     mode = char * (Given)
+*     mode = const char * (Given)
 *        File access mode
 *     withHdr = int (Given)
 *        If true, populate the smfHead component. Otherwise leave null.
@@ -186,7 +186,7 @@
 
 #define FUNC_NAME "smf_open_file"
 
-void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
+void smf_open_file( Grp * igrp, int index, const char * mode, int withHdr,
 		    smfData ** data, int *status) {
 
   char dtype[NDF__SZTYP+1];  /* String for DATA type */
@@ -205,7 +205,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
   int isFlat = 1;            /* Flag to indicate if file flatfielded */
   int isTseries = 0;         /* Flag to specify whether the data are
 				in time series format */
-  int itype = SMF__NULL;     /* Data type for DATA (and VARIANCE) array(s) */
+  smf_dtype itype = SMF__NULL; /* Data type for DATA (and VARIANCE) array(s) */
   int i;                     /* Loop counter */
   int nout;                  /* Number of output pixels */
   int *tdata;                /* Pointer to raw time series data (DATA cpt) */
