@@ -16,8 +16,19 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- All FITS-CLASS headers are now created with a frequency axis. If the
+FrameSet supplied to astWrite contains a velocity axis (or any other form
+of spectral axis) it will be converted to an equivalent frequency axis
+before being used to create the FITS-CLASS header.
+
+- The value stored in the FITS-CLASS keyword "VELO-LSR" has been changed
+from the velocity of the source to the velocity of the reference channel.
+
+- Addition of a new method call astPurgeWCS (AST_PURGEWCS) to the FitsChan 
+class. This method removes all WCS-related header cards from a FitsChan.
+
 - The astRebinSeq functions now have an extra parameter that is used to
-record the total number of input data val;ues added into the output
+record the total number of input data values added into the output
 array. This is necessary to correct a flaw in the calculation of output
 variances based on the spread of input values. NOTE, THIS CHANGE WILL
 REQUIRE EXISTING CODE THAT USES ASTREBINSEQ TO BE MODIFIED TO INCLUDE THE
@@ -28,7 +39,7 @@ LabelUp was only used if the labels were drawn within the interior of
 the plot. The LabelUp attribute controls whether numerical labels are 
 drawn horizontally or parallel to the axis they describe.
 - The Plot class has a new attribute called GrfContext that can be used
-to comminicate context information between an application and any
+to communicate context information between an application and any
 graphics functions registered with the Plot class via the astGrfSet
 (AST_GRFSET) function.
 - Functions registered with the Plot class using astGrfSet (AST_GRFSET)

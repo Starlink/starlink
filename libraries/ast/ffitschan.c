@@ -15,6 +15,7 @@
 
 *  Routines Defined:
 *     AST_DELFITS
+*     AST_PURGEWCS
 *     AST_FINDFITS
 *     AST_FITSCHAN
 *     AST_ISAFITSCHAN
@@ -333,6 +334,16 @@ F77_SUBROUTINE(ast_delfits)( INTEGER(THIS),
    astAt( "AST_DELFITS", NULL, 0 );
    astWatchSTATUS(
       astDelFits( astI2P( *THIS ) );   
+   )
+}
+
+F77_SUBROUTINE(ast_purgewcs)( INTEGER(THIS),
+                             INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+
+   astAt( "AST_PURGEWCS", NULL, 0 );
+   astWatchSTATUS(
+      astPurgeWCS( astI2P( *THIS ) );   
    )
 }
 

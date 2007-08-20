@@ -21287,6 +21287,31 @@ current version):
 
 
 
+\item All FITS-CLASS headers are now created with a frequency axis. If the
+FrameSet supplied to 
+c+
+astWrite
+c-
+f+
+AST\_WRITE
+f-
+contains a velocity axis (or any other form
+of spectral axis) it will be converted to an equivalent frequency axis
+before being used to create the FITS-CLASS header.
+
+\item The value stored in the FITS-CLASS keyword ``VELO-LSR'' has been changed
+from the velocity of the source to the velocity of the reference channel.
+
+\item Addition of a new method call 
+c+
+astPurgeWCS
+c-
+f+
+AST\_PURGEWCS
+f-
+to the FitsChan 
+class. This method removes all WCS-related header cards from a FitsChan.
+
 \item The Plot class has a new attribute called GrfContext that can be used
 to comminicate context information between an application and any
 graphics functions registered with the Plot class via the 
