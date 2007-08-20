@@ -87,7 +87,7 @@
 #define FUNC_NAME "smf_dtype_size"
 
 size_t smf_dtype_size( const smfData* data, int * status ) {
-  int itype;
+  smf_dtype itype;
 
   /* Set a default value */
   size_t retval = 0;
