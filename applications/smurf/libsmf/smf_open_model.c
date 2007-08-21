@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_open_model( Grp *igrp, int index, char *mode, smfData **data,
+*     smf_open_model( Grp *igrp, int index, const char *mode, smfData **data,
 *                     int *status ) {
 
 *  Arguments:
@@ -21,8 +21,8 @@
 *        NDG group identifier
 *     index = int (Given)
 *        Index corresponding to required file in group
-*     mode = char * (Given)
-*        File access mode
+*     mode = const char * (Given)
+*        File access mode. "R" for read-only otherwise assumed to be read/write
 *     data = smfData ** (Returned)
 *        Pointer to pointer smfData struct to be filled with file info and data
 *        Should be freed using smf_close_file.
@@ -42,15 +42,19 @@
 *  History:
 *     2007-06-13 (EC):
 *        Initial version.
-*     2007-06-14 (EC)
+*     2007-06-14 (EC):
 *        Move file information to smfFile from smfData, 
 *        added file descriptor and file name.
-*     2007-06-25 (EC)
+*     2007-06-25 (EC):
 *        Header length is now static / padded to multiple of pagesize 
+*     2007-08-20 (TIMJ):
+*        Use const char * mode
 
 *  Notes:
 
 *  Copyright:
+*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     Copyright (C) 2006-2007 University of British Columbia.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -95,7 +99,7 @@
 
 #define FUNC_NAME "smf_open_model"
 
-void smf_open_model( Grp *igrp, int index, char *mode, smfData **data,
+void smf_open_model( Grp *igrp, int index, const char *mode, smfData **data,
 		     int *status ) {
   
   void *buf=NULL;               /* Pointer to total container buffer */

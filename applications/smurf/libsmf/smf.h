@@ -644,7 +644,7 @@ void smf_rebinsparse( smfData *data, int ifile, AstFrame *ospecfrm, AstMapping *
                       float *ton_array, double *fcon, int *status );
 
 
-void smf_open_model( Grp *igrp, int index, char *mode, smfData **data,
+void smf_open_model( Grp *igrp, int index, const char *mode, smfData **data,
 		     int *status );
 
 size_t smf_dtype_sz( const smf_dtype dtype, int *status );
