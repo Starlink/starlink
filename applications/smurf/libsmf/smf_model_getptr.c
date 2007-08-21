@@ -43,6 +43,8 @@
 *        Added SMF__NOI
 *     2007-07-10 (EC):
 *        Fixed problem with function pointer cast
+*     2007-08-21 (EC):
+*        Fixed up warnings caused by incorrect return type
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -89,10 +91,10 @@
 smf_calcmodelptr smf_model_getptr( smf_modeltype type, int *status) {
 
   /* Local Variables */
-  smf_calcmodelptr *retval = NULL;
+  smf_calcmodelptr retval = NULL;
 
   /* Main routine */
-  if (*status != SAI__OK) return;
+  if (*status != SAI__OK) return NULL;
 
   switch( type ) {
 

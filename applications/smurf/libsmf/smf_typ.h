@@ -94,6 +94,8 @@
 *        -increased SMF__MXSMF to 8 from 4
 *        -made smfData.sdata static array of size SMF__MXSMF
 *        -modified smf_calcmodelptr prototype
+*     2007-08-21 (EC):
+*        Added SMF__NUL to typedef smf_modeltype
 *     {enter_further_changes_here}
 
 
@@ -149,13 +151,14 @@ typedef enum smf_dtype {
 
 /* Different types of model components used by iterative map-maker */
 typedef enum smf_modeltype {
-  SMF__CUM=0,             /* Cumulative time-stream model */
-  SMF__RES=1,             /* Residual time-stream signal */
-  SMF__AST=2,             /* Astronomical time-stream signal */
-  SMF__COM=3,             /* Common-mode signal */
-  SMF__NOI=4,             /* Noise model */
-  SMF__EXT=5,             /* Extinction correction */
-  SMF__LUT=6,             /* Pointing LUT */
+  SMF__NUL=0,             /* Null model */
+  SMF__CUM=1,             /* Cumulative time-stream model */
+  SMF__RES=2,             /* Residual time-stream signal */
+  SMF__AST=3,             /* Astronomical time-stream signal */
+  SMF__COM=4,             /* Common-mode signal */
+  SMF__NOI=5,             /* Noise model */
+  SMF__EXT=6,             /* Extinction correction */
+  SMF__LUT=7,             /* Pointing LUT */
 } smf_modeltype;
 
 /* suffix for simple binary files that store DIMM model components */

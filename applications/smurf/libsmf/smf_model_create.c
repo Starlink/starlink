@@ -83,6 +83,8 @@
 *        -option to leave files open, store in smfArrays
 *     2007-08-17 (EC):
 *        Added nofile flag
+*     2007-08-21 (EC):
+*        Fixed up warnings caused by ambiguous pointer math
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -390,7 +392,7 @@ void smf_model_create( const smfGroup *igroup, smf_modeltype mtype,
 
 	    if( *status == SAI__OK ) {
 	      headptr = buf;
-	      dataptr = buf + headlen;
+	      dataptr = (smfData*)buf + headlen;
 
 	      /* Fill the header. memset to 0 first since much of this space is
 		 padding to make it a multiple of the page size */

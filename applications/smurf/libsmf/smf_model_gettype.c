@@ -33,6 +33,8 @@
 *  History:
 *     2007-03-05 (EC):
 *        Initial Version
+*     2007-08-21 (EC):
+*        Added typedef SMF__NUL
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -83,7 +85,7 @@ smf_modeltype smf_model_gettype( const char *modelname, int *status ) {
   char tempstring[4];
   
   /* Main routine */
-  if (*status != SAI__OK) return;
+  if (*status != SAI__OK) return SMF__NUL;
 
   /* Make copy, convert to upper case */
 
@@ -114,5 +116,5 @@ smf_modeltype smf_model_gettype( const char *modelname, int *status ) {
     errRep(FUNC_NAME, "Invalid model name ^MNAME", status);        
   }
 
-  return 0;
+  return SMF__NUL;
 }
