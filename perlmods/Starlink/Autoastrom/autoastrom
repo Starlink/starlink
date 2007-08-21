@@ -1,4 +1,6 @@
-#!/local/perl/bin/perl
+
+eval 'exec starperl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
 
 use strict;
 
