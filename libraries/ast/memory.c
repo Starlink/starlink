@@ -93,6 +93,8 @@
 *     4-JAN-2007 (DSB):
 *        Move definition of astCLASS macro so that it comes before the
 *        inclusion of the AST include files (which test for astCLASS).
+*     27-JUN-2007 (DSB):
+*        Added astIsDynamic.
 */
 
 /* Configuration results. */
@@ -908,6 +910,60 @@ void *astGrow_( void *ptr, int n, size_t size ) {
 
 /* Return the result. */
    return new;
+}
+
+int astIsDynamic_( const void *ptr ) {
+/*
+*+
+*  Name:
+*     astIsDynamic
+
+*  Purpose:
+*     Returns a flag indicating if memory was allocated dynamically.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     size_t astSizeOf( const void *ptr )
+
+*  Description:
+*     This function takes a pointer to a region of memory and tests if
+*     the memory has previously been dynamically allocated using other
+*     functions from this module. It does this by checking for the
+*     presence of a "magic" number in the header which precedes the
+*     allocated memory. If the magic number is not present (or the
+*     pointer is invalid for any other reason), zero is returned.
+*     Otherwise 1 is returned.
+
+*  Parameters:
+*     ptr
+*        Pointer to test.
+
+*  Returned Value:
+*     Non-zero if the memory was allocated dynamically. Zero is returned
+*     if the supplied pointer is NULL.
+
+*  Notes:
+*     - A value of zero is returned if this function is invoked with
+*     the global error status set, or if it fails for any reason.
+*-
+*/
+
+/* Local Variables: */
+   Memory *isdynmem;               /* Pointer to memory header */ \
+
+/* Check the global error status and the supplied pointer. */
+   if ( !astOK || ! ptr ) return 0;
+
+/* Derive a pointer to the memory header that precedes the 
+   supplied region of memory. */ 
+   isdynmem = (Memory *) ( (char *) ptr - SIZEOF_MEMORY ); 
+
+/* Check if the "magic number" in the header is valid, returning non-zero
+   if it is. */
+   return ( isdynmem->magic == MAGIC( isdynmem, isdynmem->size ) );
 }
 
 void *astMalloc_( size_t size ) {

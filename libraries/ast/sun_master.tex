@@ -24,7 +24,7 @@ f+
 \newcommand{\stardocnumber}    {210.22}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {14th March 2007}
+\newcommand{\stardocdate}      {20th July 2007}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -21276,16 +21276,39 @@ timescales such as UT1 and atomic based timescales such as UTC.
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V4.5}
+\subsection{Changes Introduced in V4.5}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V4.4 and V4.5 (the
-current version):
+The following describes the most significant changes that
+occurred in the AST library between versions V4.4 and V4.5:
 
 \begin{enumerate}
 
 
+
+\item All FITS-CLASS headers are now created with a frequency axis. If the
+FrameSet supplied to 
+c+
+astWrite
+c-
+f+
+AST\_WRITE
+f-
+contains a velocity axis (or any other form
+of spectral axis) it will be converted to an equivalent frequency axis
+before being used to create the FITS-CLASS header.
+
+\item The value stored in the FITS-CLASS keyword ``VELO-LSR'' has been changed
+from the velocity of the source to the velocity of the reference channel.
+
+\item Addition of a new method call 
+c+
+astPurgeWCS
+c-
+f+
+AST\_PURGEWCS
+f-
+to the FitsChan 
+class. This method removes all WCS-related header cards from a FitsChan.
 
 \item The Plot class has a new attribute called GrfContext that can be used
 to comminicate context information between an application and any
@@ -21361,6 +21384,20 @@ drawn horizontally or parallel to the axis they describe.
 
 \item A bug has been fixed that could segmentation violations when setting 
 attribute values.
+
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V4.6}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V4.5 and V4.6 (the
+current version):
+
+\begin{enumerate}
+
+\item A new class called Plot3D has been added. The Plot3D class allows
+the creation of 3-dimensional annotated coordinate grids.
 
 \end{enumerate}
 

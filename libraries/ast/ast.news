@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V4.5) of the Starlink AST (astrometry) library is
+   A new release (V4.6) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -15,6 +15,24 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
+
+-  Addition of a new class called Plot3D that provides facilities for
+producing 3-dimensional annotated coordinate grids.
+
+
+Main Changes in Version 4.5
+---------------------------
+
+- All FITS-CLASS headers are now created with a frequency axis. If the
+FrameSet supplied to astWrite contains a velocity axis (or any other form
+of spectral axis) it will be converted to an equivalent frequency axis
+before being used to create the FITS-CLASS header.
+
+- The value stored in the FITS-CLASS keyword "VELO-LSR" has been changed
+from the velocity of the source to the velocity of the reference channel.
+
+- Addition of a new method call astPurgeWCS (AST_PURGEWCS) to the FitsChan 
+class. This method removes all WCS-related header cards from a FitsChan.
 
 - The astRebinSeq functions now have an extra parameter that is used to
 record the total number of input data val;ues added into the output

@@ -84,6 +84,7 @@
 /* Interface definitions. */
 /* ---------------------- */
 #include "frameset.h"              /* Parent FrameSet class */
+#include "keymap.h"              
 
 /* C header files. */
 /* --------------- */
@@ -91,7 +92,7 @@
 
 /* Macros. */
 /* ======= */
-#define AST__NPID      15   /* No. of different genuine plot object id's */
+#define AST__NPID      20   /* No. of different genuine plot object id's */
 
 #define AST__GATTR	0   /* Identifiers for GRF functions */
 #define AST__GFLUSH	1   /* Note, if any items are added or changed here, */
@@ -107,6 +108,38 @@
 
 #if defined(astCLASS)       /* Protected */
 #define AST__MXBRK     100  /* Max. no. of breaks in a drawn curve */
+
+/* Identifiers for the graphical elements of an annotated coord grid.
+   "Pseudo-elements" (i.e. values used to indicate a group of other
+   genuine elements) should come at the end of the list. The number of
+   genuine elements should be stored in AST__NPID. */
+#define AST__BORDER_ID       0 /* Id for astBorder curves */
+#define AST__CURVE_ID        1 /* Id for astCurve, astGenCurve or astPolyCurve curves */
+#define AST__TITLE_ID        2 /* Id for textual title */
+#define AST__MARKS_ID        3 /* Id for marks drawn by astMark */
+#define AST__TEXT_ID         4 /* Id for text strings drawn by astText */
+#define AST__AXIS1_ID        5 /* Id for axis 1 through interior tick marks */
+#define AST__AXIS2_ID        6 /* Id for axis 2 through interior tick marks */
+#define AST__AXIS3_ID        7 /* Id for axis 2 through interior tick marks */
+#define AST__NUMLAB1_ID      8 /* Id for numerical labels */
+#define AST__NUMLAB2_ID      9 /* Id for numerical labels */
+#define AST__NUMLAB3_ID     10 /* Id for numerical labels */
+#define AST__TEXTLAB1_ID    11 /* Id for textual axis labels */
+#define AST__TEXTLAB2_ID    12 /* Id for textual axis labels */
+#define AST__TEXTLAB3_ID    13 /* Id for textual axis labels */
+#define AST__TICKS1_ID      14 /* Id for major and minor tick marks */
+#define AST__TICKS2_ID      15 /* Id for major and minor tick marks */
+#define AST__TICKS3_ID      16 /* Id for major and minor tick marks */
+#define AST__GRIDLINE1_ID   17 /* Id for axis 1 astGridLine AST__curves */
+#define AST__GRIDLINE2_ID   18 /* Id for axis 2 astGridLine AST__curves */
+#define AST__GRIDLINE3_ID   19 /* Id for axis 2 astGridLine AST__curves */
+#define AST__AXES_ID        20 /* Id for axes through interior tick marks */
+#define AST__NUMLABS_ID     21 /* Id for numerical labels */
+#define AST__TEXTLABS_ID    22 /* Id for textual axis labels */
+#define AST__GRIDLINE_ID    23 /* Id for astGridLine AST__curves */
+#define AST__TICKS_ID       24 /* Id for major and minor tick marks */
+
+
 #endif
 
 /* Type Definitions */
@@ -124,15 +157,15 @@ typedef void (* AstGrfFun)( void );
 
 /* Interfaces for specific Grf funstions implemented in C (other languages
    may have different interfaces). */
-typedef int (* AstGAttrFun)( AstObject *, int, double, double *, int );
-typedef int (* AstGFlushFun)( AstObject * );
-typedef int (* AstGLineFun)( AstObject *, int, const float *, const float * );
-typedef int (* AstGMarkFun)( AstObject *, int, const float *, const float *, int );
-typedef int (* AstGTextFun)( AstObject *, const char *, float, float, const char *, float, float );
-typedef int (* AstGCapFun)( AstObject *, int, int );
-typedef int (* AstGTxExtFun)( AstObject *, const char *, float, float, const char *, float, float, float *, float * );
-typedef int (* AstGScalesFun)( AstObject *, float *, float * );
-typedef int (* AstGQchFun)( AstObject *, float *, float * );
+typedef int (* AstGAttrFun)( AstKeyMap *, int, double, double *, int );
+typedef int (* AstGFlushFun)( AstKeyMap * );
+typedef int (* AstGLineFun)( AstKeyMap *, int, const float *, const float * );
+typedef int (* AstGMarkFun)( AstKeyMap *, int, const float *, const float *, int );
+typedef int (* AstGTextFun)( AstKeyMap *, const char *, float, float, const char *, float, float );
+typedef int (* AstGCapFun)( AstKeyMap *, int, int );
+typedef int (* AstGTxExtFun)( AstKeyMap *, const char *, float, float, const char *, float, float, float *, float * );
+typedef int (* AstGScalesFun)( AstKeyMap *, float *, float * );
+typedef int (* AstGQchFun)( AstKeyMap *, float *, float * );
 
 /* A general interface into which Grf Wrapper functions should be cast 
    before being passed as an argument to astGrfWrapper. */
@@ -186,23 +219,33 @@ typedef struct AstPlot {
 /* Attributes specific to objects in this class. */
    double *clip_lbnd;
    double *clip_ubnd;
-   double centre[ 2 ];
-   double gap[ 2 ];
-   double loggap[ 2 ];
-   double labelat[ 2 ];
-   double majticklen[ 2 ];
-   double minticklen[ 2 ];
-   double numlabgap[ 2 ];
+   double centre[ 3 ];
+   double gap[ 3 ];
+   double loggap[ 3 ];
+   double labelat[ 3 ];
+   double majticklen[ 3 ];
+   double minticklen[ 3 ];
+   double numlabgap[ 3 ];
    double size[ AST__NPID ];
-   double textlabgap[ 2 ];
+   double textlabgap[ 3 ];
    double titlegap;
    double tol;
-   double ucentre[ 2 ];
-   double ugap[ 2 ];
-   double uloggap[ 2 ];
-   double ulblat[ 2 ];
-   double umjtkln[ 2 ];
+   double ucentre[ 3 ];
+   double ugap[ 3 ];
+   double uloggap[ 3 ];
+   double ulblat[ 3 ];
+   double umjtkln[ 3 ];
    double width[ AST__NPID ];
+   double *majtickgx[ 3 ];
+   double *majtickgy[ 3 ];
+   double *mintickgx[ 3 ];
+   double *mintickgy[ 3 ];
+   int majtickcount[ 3 ];
+   int mintickcount[ 3 ];
+   int nmajtickval[ 3 ];
+   double *majtickval[ 3 ];
+   int nmintickval[ 3 ];
+   double *mintickval[ 3 ];
    double xhi;
    double xlo;
    double yhi;
@@ -214,39 +257,39 @@ typedef struct AstPlot {
    int clip;
    int clipop;
    int colour[ AST__NPID ];
-   int drawaxes[ 2 ];
-   int abbrev[ 2 ];
+   int drawaxes[ 3 ];
+   int abbrev[ 3 ];
    int escape;
    int drawtitle;
-   int edge[ 2 ];
+   int edge[ 3 ];
    int font[ AST__NPID ];
    int grf;
    int grid;
    int invisible;
    int labelling;
-   int labelunits[ 2 ];
-   int labelup[ 2 ];
-   int mintick[ 2 ];
-   int numlab[ 2 ];
+   int labelunits[ 3 ];
+   int labelup[ 3 ];
+   int mintick[ 3 ];
+   int numlab[ 3 ];
    int style[ AST__NPID ];
-   int textlab[ 2 ];
+   int textlab[ 3 ];
    int tickall;
    int forceexterior;
    int uborder;
-   int uedge[ 2 ];
+   int uedge[ 3 ];
    int ugrid;
    int ulbling;
-   int ulbunit[ 2 ];
-   int ulgtk[ 2 ];
-   int ulglb[ 2 ];
-   int umintk[ 2 ];
-   int utxtlb[ 2 ];
+   int ulbunit[ 3 ];
+   int ulgtk[ 3 ];
+   int ulglb[ 3 ];
+   int umintk[ 3 ];
+   int utxtlb[ 3 ];
    int xrev;
    int yrev;      
    int ink;
-   int logplot[ 2 ];
-   int logticks[ 2 ];
-   int loglabel[ 2 ];
+   int logplot[ 3 ];
+   int logticks[ 3 ];
+   int loglabel[ 3 ];
    AstGrfFun grffun[AST__NGRFFUN];
    AstGAttrWrap GAttr;
    AstGFlushWrap GFlush;
@@ -261,7 +304,8 @@ typedef struct AstPlot {
    int grfnstack;
    AstGat **gat;
    int ngat;
-   AstObject *grfcontextId;
+   AstKeyMap *grfcontext;
+   AstKeyMap *grfcontextID;
    float hmarkx;
    float hmarky;
 
@@ -282,11 +326,16 @@ typedef struct AstPlotVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
+   AstPointSet *(* GetDrawnTicks)( AstPlot *, int, int );
+   void (* SetTickValues)( AstPlot *, int, int, double *, int, double * );
+   void (* DrawExtraTicks)( AstPlot *, int, AstPointSet * );
    int (* Border)( AstPlot * );
    void (* BoundingBox)( AstPlot *, float[2], float[2] );
-   void (* SetGrfContext)( AstPlot *, AstObject * );
+   AstKeyMap *(* GetGrfContext)( AstPlot * );
    void (* Clip)( AstPlot *, int, const double [], const double [] );
    int (* CvBrk)( AstPlot *, int, double *, double *, double * );
+   void (* CopyPlotDefaults)( AstPlot *, int, AstPlot *, int );
+   void (* Mirror)( AstPlot *, int );
    void (* GridLine)( AstPlot *, int, const double [], double );
    void (* Curve)( AstPlot *, const double [], const double [] );
    void (* GenCurve)( AstPlot *, AstMapping * );
@@ -297,7 +346,7 @@ typedef struct AstPlotVtab {
    void (* GrfWrapper)( AstPlot *, const char *, AstGrfWrap );
    void (* Grid)( AstPlot * ); 
    void (* Mark)( AstPlot *, int, int, int, const double *, int  ); 
-   void (* Text)( AstPlot *, const char *, const double [], const float [2], const char * );
+   void (* Text)( AstPlot *, const char *, const double [], const float [], const char * );
 
    double (* GetTol)( AstPlot * );
    int (* TestTol)( AstPlot * );
@@ -522,10 +571,11 @@ AstPlot *astLoadPlot_( void *, size_t, AstPlotVtab *,
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
+   AstKeyMap *astGrfConID_( AstPlot * );
    const char *astStripEscapes_( const char * );
    int astFindEscape_( const char *, int *, int *, int * );
    int astBorder_( AstPlot * );
-   void astSetGrfContext_( AstPlot *, AstObject * );
+   AstKeyMap *astGetGrfContext_( AstPlot * );
    void astBoundingBox_( AstPlot *, float[2], float[2] );
    void astClip_( AstPlot *, int, const double [], const double [] );
    void astGridLine_( AstPlot *, int, const double [], double );
@@ -537,13 +587,19 @@ AstPlot *astLoadPlot_( void *, size_t, AstPlotVtab *,
    void astGrfPop_( AstPlot * );
    void astGenCurve_( AstPlot *, AstMapping * );
    void astPolyCurve_( AstPlot *, int, int, int, const double * );
-   void astText_( AstPlot *, const char *, const double [], const float [2], const char * );
+   void astText_( AstPlot *, const char *, const double [], const float [], const char * );
 
    void astGrfWrapper_( AstPlot *, const char *, AstGrfWrap );
    int astGrfFunID_( const char *, const char *, const char *  );
 
 #if defined(astCLASS)            /* Protected */
    int astCvBrk_( AstPlot *, int, double *, double *, double * );
+   void astCopyPlotDefaults_( AstPlot *, int, AstPlot *, int );
+   void astMirror_( AstPlot *, int );
+   AstPointSet *astGetDrawnTicks_( AstPlot *, int, int );
+   void astSetTickValues_( AstPlot *, int, int, double *, int, double * );
+   void astDrawExtraTicks_( AstPlot *, int, AstPointSet * );
+   void astGrfAttrs_( AstPlot *, int, int, int, const char *, const char * );
 
    double astGetTol_( AstPlot * );
    int astTestTol_( AstPlot * );
@@ -780,8 +836,8 @@ astINVOKE(O,astLoadPlot_(mem,size,vtab,name,astCheckChannel(channel)))
    pointer to the wrong sort of object is supplied. */
 
 
-#define astSetGrfContext(this,grfcon) \
-astINVOKE(V,astSetGrfContext_(astCheckPlot(this),astCheckObject(grfcon)))
+#define astGetGrfContext(this) \
+astINVOKE(O,astGetGrfContext_(astCheckPlot(this)))
 
 #define astBorder(this) \
 astINVOKE(V,astBorder_(astCheckPlot(this)))
@@ -826,14 +882,33 @@ astINVOKE(V,astGrfPop_(astCheckPlot(this)))
 #define astGrfFunID astGrfFunID_
 #define astFindEscape astFindEscape_
 #define astStripEscapes(text) astStripEscapes_(text)
+#define astGrfConID(this) astGrfConID_(this)
 
 #define astGrfWrapper(this,name,wrapper) \
 astINVOKE(V,astGrfWrapper_(astCheckPlot(this),name,wrapper))
 
 #if defined(astCLASS)            /* Protected */
 
+#define astGrfAttrs(this,id,set,prim,method,class) \
+astGrfAttrs_(astCheckPlot(this),id,set,prim,method,class )
+
 #define astCvBrk(this,ibrk,brk,vbrk,len) \
 astINVOKE(V,astCvBrk_(astCheckPlot(this),ibrk,brk,vbrk,len))
+
+#define astCopyPlotDefaults(this,axis,dplot,daxis) \
+astINVOKE(V,astCopyPlotDefaults_(astCheckPlot(this),axis,astCheckPlot(dplot),daxis))
+
+#define astMirror(this,axis) \
+astINVOKE(V,astMirror_(astCheckPlot(this),axis))
+
+#define astGetDrawnTicks(this,axis,major) \
+astINVOKE(O,astGetDrawnTicks_(astCheckPlot(this),axis,major))
+
+#define astSetTickValues(this,axis,nmajor,major,nminor,minor) \
+astINVOKE(V,astSetTickValues_(astCheckPlot(this),axis,nmajor,major,nminor,minor))
+
+#define astDrawExtraTicks(this,axis,pset) \
+astINVOKE(V,astDrawExtraTicks_(astCheckPlot(this),axis,astCheckPointSet(pset)))
 
 #define astClearTol(this) \
 astINVOKE(V,astClearTol_(astCheckPlot(this)))

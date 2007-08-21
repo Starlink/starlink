@@ -1,0 +1,227 @@
+#if !defined( PLOT3D_INCLUDED ) /* Include this file only once */
+#define PLOT3D_INCLUDED
+/*
+*+
+*  Name:
+*     plot3d.h
+
+*  Type:
+*     C include file.
+
+*  Purpose:
+*     Define the interface to the Plot3D class.
+
+*  Invocation:
+*     #include "plot3d.h"
+
+*  Description:
+*     This include file defines the interface to the Plot3D class
+*     and provides the type definitions, function prototypes and
+*     macros, etc. needed to use this class.
+
+*  Copyright:
+*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public Licence as
+*     published by the Free Software Foundation; either version 2 of
+*     the Licence, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public Licence for more details.
+*     
+*     You should have received a copy of the GNU General Public Licence
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     DSB: David S. Berry (Starlink)
+
+*  History:
+*     6-JUN-2007 (DSB):
+*        Original version.
+*-
+*/
+
+/* Include files. */
+/* ============== */
+/* Interface definitions. */
+/* ---------------------- */
+#include "object.h"              /* Base Object class */
+#include "plot.h"               /* Parent Plot class */
+
+/* Macros. */
+/* ======= */
+
+#if defined(astCLASS)            /* Protected */
+
+#endif
+
+/* Type Definitions. */
+/* ================= */
+
+/* Plot3D structure. */
+/* ------------------- */
+/* This structure contains all information that is unique to each object in
+   the class (e.g. its instance variables). */
+typedef struct AstPlot3D {
+
+/* Attributes inherited from the parent class. */
+   AstPlot plot;               /* Parent class structure */
+
+/* Attributes specific to objects in this class. */
+   AstPlot *plotxy;            /* Plot describing the XY plane */
+   AstPlot *plotxz;            /* Plot describing the XZ plane */
+   AstPlot *plotyz;            /* Plot describing the YZ plane */
+   double gbox[6];             /* Graphics box */
+   int pix_frame;              /* Index of original base Frame */
+   int rootcorner;             /* Corner at junction of the annotated axes */
+   int baseplot;               /* The Plot that is used to label 2 3D axes */
+   int axis_plot1[3];          /* The Plot used to label each 3D axis */
+   int axis_index1[3];         /* The axis index within the axis_plot1 Plot */
+   int axis_plot2[3];          /* The other Plot touching each 3D axis */
+   int axis_index2[3];         /* The axis index within the axis_plot2 Plot */
+   double norm[3];             /* Normal vector for text plane */
+} AstPlot3D;
+
+/* Virtual function table. */
+/* ----------------------- */
+/* This table contains all information that is the same for all objects in the
+   class (e.g. pointers to its virtual functions). */
+#if defined(astCLASS)            /* Protected */
+typedef struct AstPlot3DVtab {
+
+/* Properties (e.g. methods) inherited from the parent class. */
+   AstPlotVtab plot_vtab;      /* Parent class virtual function table */
+
+/* Unique flag value to determine class membership. */
+   int *check;                   /* Check value */
+
+   int (* GetRootCorner)( AstPlot3D * );
+   int (* TestRootCorner)( AstPlot3D * );
+   void (* SetRootCorner)( AstPlot3D *, int );
+   void (* ClearRootCorner)( AstPlot3D * );
+
+   double (* GetNorm)( AstPlot3D *, int );
+   int (* TestNorm)( AstPlot3D *, int );
+   void (* SetNorm)( AstPlot3D *, int, double );
+   void (* ClearNorm)( AstPlot3D *, int );
+
+} AstPlot3DVtab;
+#endif
+
+/* Function prototypes. */
+/* ==================== */
+/* Prototypes for standard class functions. */
+/* ---------------------------------------- */
+astPROTO_CHECK(Plot3D)         /* Check class membership */
+astPROTO_ISA(Plot3D)           /* Test class membership */
+
+/* Constructor. */
+#if defined(astCLASS)            /* Protected */
+AstPlot3D *astPlot3D_( void *, const float *, const double *, const char *, ... );
+#else
+AstPlot3D *astPlot3DId_( void *, const float [], const double [], const char *, ... );
+#endif
+
+#if defined(astCLASS)            /* Protected */
+
+/* Initialiser. */
+AstPlot3D *astInitPlot3D_( void *, size_t, int, AstPlot3DVtab *, 
+                           const char *, AstFrame *, const float *, 
+                           const double * );
+
+/* Vtab initialiser. */
+void astInitPlot3DVtab_( AstPlot3DVtab *, const char * );
+
+/* Loader. */
+AstPlot3D *astLoadPlot3D_( void *, size_t, 
+                                         AstPlot3DVtab *,
+                                         const char *, AstChannel *channel );
+#endif
+
+/* Prototypes for member functions. */
+/* -------------------------------- */
+
+#if defined(astCLASS)            /* Protected */
+
+   int astGetRootCorner_( AstPlot3D * );
+   int astTestRootCorner_( AstPlot3D * );
+   void astSetRootCorner_( AstPlot3D *, int );
+   void astClearRootCorner_( AstPlot3D * );
+
+   double astGetNorm_( AstPlot3D *, int );
+   int astTestNorm_( AstPlot3D *, int );
+   void astSetNorm_( AstPlot3D *, int, double );
+   void astClearNorm_( AstPlot3D *, int );
+
+#endif
+
+/* Function interfaces. */
+/* ==================== */
+/* These macros are wrap-ups for the functions defined by this class
+   to make them easier to invoke (e.g. to avoid type mis-matches when
+   passing pointers to objects from derived classes). */
+
+/* Interfaces to standard class functions. */
+/* --------------------------------------- */
+/* Some of these functions provide validation, so we cannot use them
+   to validate their own arguments. We must use a cast when passing
+   object pointers (so that they can accept objects from derived
+   classes). */
+
+/* Check class membership. */
+#define astCheckPlot3D(this) astINVOKE_CHECK(Plot3D,this)
+
+/* Test class membership. */
+#define astIsAPlot3D(this) astINVOKE_ISA(Plot3D,this)
+
+/* Constructor. */
+#if defined(astCLASS)            /* Protected */
+#define astPlot3D astINVOKE(F,astPlot3D_)
+#else
+#define astPlot3D astINVOKE(F,astPlot3DId_)
+#endif
+
+#if defined(astCLASS)            /* Protected */
+
+/* Initialiser. */
+#define astInitPlot3D(mem,size,init,vtab,name,frame,graph,base) \
+astINVOKE(O,astInitPlot3D_(mem,size,init,vtab,name,frame,graph,base))
+
+/* Vtab Initialiser. */
+#define astInitPlot3DVtab(vtab,name) astINVOKE(V,astInitPlot3DVtab_(vtab,name))
+/* Loader. */
+#define astLoadPlot3D(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadPlot3D_(mem,size,vtab,name,astCheckChannel(channel)))
+
+#endif
+
+/* Interfaces to public member functions. */
+/* -------------------------------------- */
+
+/* Interfaces to protected member functions. */
+/* ----------------------------------------- */
+/* Here we make use of astCheckPlot3D to validate Plot3D pointers
+   before use. This provides a contextual error report if a pointer to
+   the wrong sort of object is supplied. */
+
+#if defined(astCLASS)            /* Protected */
+
+#define astGetRootCorner(this) astINVOKE(V,astGetRootCorner_(astCheckPlot3D(this)))
+#define astTestRootCorner(this) astINVOKE(V,astTestRootCorner_(astCheckPlot3D(this)))
+#define astClearRootCorner(this) astINVOKE(V,astClearRootCorner_(astCheckPlot3D(this)))
+#define astSetRootCorner(this,value) astINVOKE(V,astSetRootCorner_(astCheckPlot3D(this),value))
+
+#define astGetNorm(this,axis) astINVOKE(V,astGetNorm_(astCheckPlot3D(this),axis))
+#define astTestNorm(this,axis) astINVOKE(V,astTestNorm_(astCheckPlot3D(this),axis))
+#define astClearNorm(this,axis) astINVOKE(V,astClearNorm_(astCheckPlot3D(this),axis))
+#define astSetNorm(this,axis,value) astINVOKE(V,astSetNorm_(astCheckPlot3D(this),axis,value))
+
+#endif
+#endif

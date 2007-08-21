@@ -115,6 +115,7 @@ c     - astBoundingBox: Returns a bounding box for previously drawn graphics
 c     - astClip: Set up or remove clipping for a Plot
 c     - astCurve: Draw a geodesic curve
 c     - astGenCurve: Draw a generalized curve
+c     - astGetGrfContext: Get the graphics context for a Plot
 c     - astGrfPop: Retrieve previously saved graphics functions
 c     - astGrfPush: Save the current graphics functions 
 c     - astGrfSet: Register a graphics routine for use by a Plot
@@ -122,13 +123,13 @@ c     - astGrid: Draw a set of labelled coordinate axes
 c     - astGridLine: Draw a grid line (or axis) for a Plot
 c     - astMark: Draw a set of markers for a Plot
 c     - astPolyCurve: Draw a series of connected geodesic curves
-c     - astSetGrfContext: Set up or remove a graphics context for a Plot
 c     - astText: Draw a text string for a Plot
 f     - AST_BORDER: Draw a border around valid regions of a Plot
 f     - AST_BOUNDINGBOX: Returns a bounding box for previously drawn graphics
 f     - AST_CLIP: Set up or remove clipping for a Plot
 f     - AST_CURVE: Draw a geodesic curve
 f     - AST_GENCURVE: Draw a generalized curve
+f     - AST_GETGRFCONTEXT: Get the graphics context for a Plot
 f     - AST_GRFPOP: Retrieve previously saved graphics functions
 f     - AST_GRFPUSH: Save the current graphics functions 
 f     - AST_GRFSET: Register a graphics routine for use by the Plot class
@@ -136,7 +137,6 @@ f     - AST_GRID: Draw a set of labelled coordinate axes
 f     - AST_GRIDLINE: Draw a grid line (or axis) for a Plot
 f     - AST_MARK: Draw a set of markers for a Plot
 f     - AST_POLYCURVE: Draw a series of connected geodesic curves
-f     - AST_SETGRFCONTEXT: Set up or remove a graphics context for a Plot
 f     - AST_TEXT: Draw a text string for a Plot
 
 *  Graphical Elements:
@@ -646,6 +646,11 @@ f     - Title: The Plot title drawn using AST_GRID
 *     26-JUN-2007 (DSB)
 *        Honour the LabelUp attribute value even if labels are drawn
 *        around the edges of the plot.
+*     28-JUN-2007 (DSB)
+*        - Make all axis attribute arrays 3 elements long rather than 2.
+*        - Add the protected methods astCopyPlotDefaults and astMirror.
+*        - Add public method astGetGrfContext, remove astSetGrfContext.
+*        - Fix memory leak.
 *class--
 */
 
@@ -673,26 +678,6 @@ f     - Title: The Plot title drawn using AST_GRID
 #define MAJTICKS_MAX   14 /* Max. number of major ticks or grid lines */
 #define MAJTICKS_MIN    6 /* Min. number of major ticks or grid lines */
 #define EDGETICKS_DIM 100 /* No. of edge samples used to find tick marks */
-#define BORDER_ID       0 /* Id for astBorder curves */
-#define CURVE_ID        1 /* Id for astCurve, astGenCurve or astPolyCurve curves */
-#define TITLE_ID        2 /* Id for textual title */
-#define MARKS_ID        3 /* Id for marks drawn by astMark */
-#define TEXT_ID         4 /* Id for text strings drawn by astText */
-#define AXIS1_ID        5 /* Id for axis 1 through interior tick marks */
-#define AXIS2_ID        6 /* Id for axis 2 through interior tick marks */
-#define NUMLAB1_ID      7 /* Id for numerical labels */
-#define NUMLAB2_ID      8 /* Id for numerical labels */
-#define TEXTLAB1_ID     9 /* Id for textual axis labels */
-#define TEXTLAB2_ID    10 /* Id for textual axis labels */
-#define TICKS1_ID      11 /* Id for major and minor tick marks */
-#define TICKS2_ID      12 /* Id for major and minor tick marks */
-#define GRIDLINE1_ID   13 /* Id for axis 1 astGridLine curves */
-#define GRIDLINE2_ID   14 /* Id for axis 2 astGridLine curves */
-#define AXES_ID        15 /* Id for axes through interior tick marks */
-#define NUMLABS_ID     16 /* Id for numerical labels */
-#define TEXTLABS_ID    17 /* Id for textual axis labels */
-#define GRIDLINE_ID    18 /* Id for astGridLine curves */
-#define TICKS_ID       19 /* Id for major and minor tick marks */
 #define LEFT            0 /* Id for the left edge of the plotting area */
 #define TOP             1 /* Id for the top edge of the plotting area */
 #define RIGHT           2 /* Id for the right edge of the plotting area */
@@ -747,7 +732,8 @@ f     - Title: The Plot title drawn using AST_GRID
 *     nval
 *        Specifies the number of values in the multi-valued attribute. The
 *        "axis" values supplied to the created function should be in the
-*        range zero to (nval - 1).
+*        range zero to (nval - 1). If a value of 0 is supplied, the
+*        value of the Plot's Nin attribute is used instead.
 
 *  Notes:
 *     -  To avoid problems with some compilers, you should not leave any white
@@ -766,11 +752,11 @@ static void Clear##attr( AstPlot *this, int axis ) { \
    if ( !astOK ) return; \
 \
 /* Validate the axis index. */ \
-   if( axis < 0 || axis >= nval ){ \
+   if( axis < 0 || axis >= ( nval ? nval : astGetNin( this ) ) ){ \
       astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
                 #attr " - it should be in the range 1 to %d.", \
                 "astClear" #attr, astGetClass( this ), \
-                axis + 1, nval ); \
+                axis + 1, ( nval ? nval : astGetNin( this ) ) ); \
 \
 /* Assign the "clear" value. */ \
    } else { \
@@ -836,7 +822,8 @@ void astClear##attr##_( AstPlot *this, int axis ) { \
 *     nval
 *        Specifies the number of values in the multi-valued attribute. The
 *        "axis" values supplied to the created function should be in the
-*        range zero to (nval - 1).
+*        range zero to (nval - 1). If a value of 0 is supplied, the
+*        value of the Plot's Nin attribute is used instead.
 
 *  Notes:
 *     -  To avoid problems with some compilers, you should not leave any white
@@ -859,11 +846,11 @@ static type Get##attr( AstPlot *this, int axis ) { \
    if ( !astOK ) return result; \
 \
 /* Validate the axis index. */ \
-   if( axis < 0 || axis >= nval ){ \
+   if( axis < 0 || axis >= ( nval ? nval : astGetNin( this ) ) ){ \
       astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
                 #attr " - it should be in the range 1 to %d.", \
                 "astGet" #attr, astGetClass( this ), \
-                axis + 1, nval ); \
+                axis + 1, ( nval ? nval : astGetNin( this ) ) ); \
 \
 /* Assign the result value. */ \
    } else { \
@@ -932,9 +919,10 @@ type astGet##attr##_( AstPlot *this, int axis ) { \
 *         An expression that evaluates to the value to be assigned to the
 *         component.
 *      nval
-*         Specifies the number of values in the multi-valued attribute. The
-*         "axis" values supplied to the created function should be in the
-*         range zero to (nval - 1).
+*        Specifies the number of values in the multi-valued attribute. The
+*        "axis" values supplied to the created function should be in the
+*        range zero to (nval - 1). If a value of 0 is supplied, the
+*        value of the Plot's Nin attribute is used instead.
 
 *  Notes:
 *     -  To avoid problems with some compilers, you should not leave any white
@@ -953,11 +941,11 @@ static void Set##attr( AstPlot *this, int axis, type value ) { \
    if ( !astOK ) return; \
 \
 /* Validate the axis index. */ \
-   if( axis < 0 || axis >= nval ){ \
+   if( axis < 0 || axis >= ( nval ? nval : astGetNin( this ) ) ){ \
       astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
                 #attr " - it should be in the range 1 to %d.", \
                 "astSet" #attr, astGetClass( this ), \
-                axis + 1, nval ); \
+                axis + 1, ( nval ? nval : astGetNin( this ) ) ); \
 \
 /* Store the new value in the structure component. */ \
    } else { \
@@ -1017,9 +1005,10 @@ void astSet##attr##_( AstPlot *this, int axis, type value ) { \
 *         value. This can use the string "axis" to represent the zero-based
 *         index of the value within the attribute.
 *      nval
-*         Specifies the number of values in the multi-valued attribute. The
-*         "axis" values supplied to the created function should be in the
-*         range zero to (nval - 1).
+*        Specifies the number of values in the multi-valued attribute. The
+*        "axis" values supplied to the created function should be in the
+*        range zero to (nval - 1). If a value of 0 is supplied, the
+*        value of the Plot's Nin attribute is used instead.
 
 *  Notes:
 *     -  To avoid problems with some compilers, you should not leave any white
@@ -1042,11 +1031,11 @@ static int Test##attr( AstPlot *this, int axis ) { \
    if ( !astOK ) return result; \
 \
 /* Validate the axis index. */ \
-   if( axis < 0 || axis >= nval ){ \
+   if( axis < 0 || axis >= ( nval ? nval : astGetNin( this ) ) ){ \
       astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
                 #attr " - it should be in the range 1 to %d.", \
                 "astTest" #attr, astGetClass( this ), \
-                axis + 1, nval ); \
+                axis + 1, ( nval ? nval : astGetNin( this ) ) ); \
 \
 /* Assign the result value. */ \
    } else { \
@@ -1118,7 +1107,8 @@ int astTest##attr##_( AstPlot *this, int axis ) { \
 *     nval
 *        Specifies the number of values in the multi-valued attribute. The
 *        "axis" values supplied to the created function should be in the
-*        range zero to (nval - 1).
+*        range zero to (nval - 1). If a value of 0 is supplied, the
+*        value of the Plot's Nin attribute is used instead.
 
 *  Notes:
 *     -  To avoid problems with some compilers, you should not leave any white
@@ -1142,11 +1132,11 @@ static type GetUsed##attr( AstPlot *this, int axis ) { \
    if ( !astOK ) return result; \
 \
 /* Validate the axis index. */ \
-   if( axis < 0 || axis >= nval ){ \
+   if( axis < 0 || axis >= ( nval ? nval : astGetNin( this ) ) ){ \
       astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
                 #attr " - it should be in the range 1 to %d.", \
                 "astGetUsed" #attr, astGetClass( this ), \
-                axis + 1, nval ); \
+                axis + 1, ( nval ? nval : astGetNin( this ) ) ); \
 \
 /* If the attribute is set, use its normal accessor. */\
    } else if( astTest##attr( this, axis ) ) {\
@@ -1214,9 +1204,10 @@ static type GetUsed##attr( AstPlot *this, int axis ) { \
 *         An expression that evaluates to the value to be assigned to the
 *         component.
 *      nval
-*         Specifies the number of values in the multi-valued attribute. The
-*         "axis" values supplied to the created function should be in the
-*         range zero to (nval - 1).
+*        Specifies the number of values in the multi-valued attribute. The
+*        "axis" values supplied to the created function should be in the
+*        range zero to (nval - 1). If a value of 0 is supplied, the
+*        value of the Plot's Nin attribute is used instead.
 
 *  Notes:
 *     -  To avoid problems with some compilers, you should not leave any white
@@ -1236,11 +1227,11 @@ static void SetUsed##attr( AstPlot *this, int axis, type value ) { \
    if ( !astOK ) return; \
 \
 /* Validate the axis index. */ \
-   if( axis < 0 || axis >= nval ){ \
+   if( axis < 0 || axis >= ( nval ? nval : astGetNin( this ) ) ){ \
       astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
                 #attr " - it should be in the range 1 to %d.", \
                 "astSetUsed" #attr, astGetClass( this ), \
-                axis + 1, nval ); \
+                axis + 1, ( nval ? nval : astGetNin( this ) ) ); \
 \
 /* Store the new value in the structure component. */ \
    } else { \
@@ -1474,6 +1465,7 @@ typedef struct TickInfo{
    int nmajor;               /* No. of major tick marks */
    int nminor;               /* No. of minor tick marks */
    double *ticks;            /* Pointer to array of major tick mark values */
+   double *minticks;         /* Pointer to array of minor tick mark values */
    char **labels;            /* Pointer to array of major tick mark labels */
    double *start;            /* Start pos'n on other axis for each curve section */
    double *length;           /* Length on other axis of each curve section */
@@ -1583,10 +1575,11 @@ static AstMapping   *Map4_umap = NULL;
 static CurveData Curve_data;
 
 /* Strings giving the label for the graphics items corresponding to
-   BORDER_ID, GRIDLINE_ID, etc. */
-static char *GrfLabels = "Border Curves Title Markers Strings Axis1 Axis2 "
-                         "NumLab1 NumLab2 TextLab1 TextLab2 Ticks1 Ticks2 "
-                         "Grid1 Grid2 Axes NumLab TextLab Grid Ticks";
+   AST__BORDER_ID, AST__GRIDLINE_ID, etc. */
+static char *GrfLabels = "Border Curves Title Markers Strings Axis1 Axis2 Axis3 "
+                         "NumLab1 NumLab2 NumLab3 TextLab1 TextLab2 TextLab3 "
+                         "Ticks1 Ticks2 Ticks3 Grid1 Grid2 Grid3 Axes NumLab "
+                         "TextLab Grid Ticks";
 
 /* Text values used to represent edges externally. */
 static const char *xedge[4] = { "left", "top", "right", "bottom" };
@@ -1803,13 +1796,13 @@ static TickInfo **GridLines( AstPlot *, double *, double *, int *, const char *,
 static TickInfo *TickMarks( AstPlot *, int, double *, double *, int *, const char *, const char * );
 static char **CheckLabels2( AstPlot *, AstFrame *, int, double *, int, char **, double );
 static char *FindWord( char *, const char *, const char ** );
-static char *GrfItem( int, const char * );
+static char *GrfItem( int, const char *, int * );
 static const char *SplitValue( AstPlot *, const char *, int, int * );
 static const char *JustMB( AstPlot *, int, const char *, float *, float *, float, float, const char *, float, float, float, float, float *, float *, const char *, const char * );
 static double **MakeGrid( AstPlot *, AstFrame *, AstMapping *, int, int, double, double, double, double, int, AstPointSet **, AstPointSet**, int, const char *, const char * );
-static double GetTicks( AstPlot *, int, double *, double **, int *, int *, int, int *, double *, const char *, const char * );
+static double GetTicks( AstPlot *, int, double *, double **, int *, double **, int *, int, int *, double *, const char *, const char * );
 static double GetUseSize( AstPlot *, int );
-static void SetGrfContext( AstPlot *, AstObject * );
+static AstKeyMap *GetGrfContext( AstPlot * );
 static double GetUseWidth( AstPlot *, int );
 static double GoodGrid( AstPlot *, int *, AstPointSet **, AstPointSet **, const char *, const char * );
 static double Typical( int, double *, double, double, double * );
@@ -1832,6 +1825,9 @@ static int Compared( const void *, const void * );
 static int CountGood( int, double * );
 static int Cross( float, float, float, float, float, float, float, float );
 static int CvBrk( AstPlot *, int, double *, double *, double * );
+static void Mirror( AstPlot *, int );
+static AstPointSet *GetDrawnTicks( AstPlot *, int, int );
+static void SetTickValues( AstPlot *, int, int, double *, int, double * );
 static int EdgeCrossings( AstPlot *, int, int, double, double *, double **, const char *, const char * );
 static int EdgeLabels( AstPlot *, int, TickInfo **, CurveData **, int, const char *, const char * );
 static int FindDPTZ( AstFrame *, int, const char *, const char *, int *, int * );
@@ -1845,7 +1841,7 @@ static int GetUseColour( AstPlot *, int );
 static int GetUseFont( AstPlot *, int );
 static int GetUseStyle( AstPlot *, int );
 static int HasEscapes( const char * );
-static int IdFind( int, int *, int * );
+static int IdFind( int, int, int *, int *, int * );
 static int Inside( int, float *, float *, float, float);
 static int IsASkyAxis( AstFrame *, int );
 static int IsASkyFrame( AstObject * );
@@ -1867,6 +1863,7 @@ static void BoundingBox( AstPlot *, float[2], float[2] );
 static void Bpoly( AstPlot *, float, float, const char *, const char * );
 static void Clip( AstPlot *, int, const double [], const double [] );
 static void Copy( const AstObject *, AstObject * );
+static void CopyPlotDefaults( AstPlot *, int, AstPlot *, int );
 static void Crv( AstPlot *this, double *, double *, double *, int, double *, const char *, const char * );
 static void CrvLine( AstPlot *this, double, double, double, double, const char *, const char * );
 static void Curve( AstPlot *, const double [], const double [] );
@@ -1909,12 +1906,12 @@ static void PurgeCdata( CurveData * );
 static void PushGat( AstPlot *, float, const char *, const char * );
 static void RemoveFrame( AstFrameSet *, int );
 static void RightVector( AstPlot *, float *, float *, float *, float *, const char *, const char * );
-static void Text( AstPlot *, const char *, const double [], const float [2], const char *);
+static void SaveTick( AstPlot *, int, double, double, int );
+static void Text( AstPlot *, const char *, const double [], const float [], const char *);
 static void TextLabels( AstPlot *, int, int *, const char *, const char *);
-static void Ticker( AstPlot *, int, int, double, double *, double, const char *, const char *);
+static void Ticker( AstPlot *, int, int, double, double *, double, int, int, const char *, const char *);
 static void TraceBorder( AstPlot *, double **, double **, int, int *, const char *, const char * );
 static void UpdateConcat( float *, float *, float, float, float, float, float *, float *, float, float, float *, float *, float *, float * );
-void GrfAttrs( AstPlot *, int, int, int, const char *, const char * );
 
 /* Functions which access class attributes. */
 /* =======================================  */
@@ -2327,6 +2324,9 @@ f     used.
 *  Applicability:
 *     Plot
 *        All Plots have this attribute.
+*     Plot3D
+*        The Plot3D class ignores this attributes, assuming a value of
+*        zero.
 
 *  Notes:
 *     - The value of this attribute is not saved when the Plot is written
@@ -2372,6 +2372,9 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 *  Applicability:
 *     Plot
 *        All Plots have this attribute.
+*     Plot3D
+*        The Plot3D class ignores this attributes, assuming a value of
+*        zero.
 
 *  Notes:
 *     - The text used for the title is obtained from the Plot's Title
@@ -2440,10 +2443,10 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 */
 /* Are numerical labels to be displayed on each axis? Has a value of -1 when 
 not set yielding a value of 0 (no) for both axes. */
-MAKE_CLEAR(LabelUp,labelup,-1,2)
-MAKE_GET(LabelUp,int,0,( this->labelup[axis] == -1 ? 0 : this->labelup[axis] ),2)
-MAKE_TEST(LabelUp,( this->labelup[axis] != -1 ),2)
-MAKE_SET(LabelUp,int,labelup,( value ? 1 : 0 ),2)
+MAKE_CLEAR(LabelUp,labelup,-1,0)
+MAKE_GET(LabelUp,int,0,( this->labelup[axis] == -1 ? 0 : this->labelup[axis] ),0)
+MAKE_TEST(LabelUp,( this->labelup[axis] != -1 ),0)
+MAKE_SET(LabelUp,int,labelup,( value ? 1 : 0 ),0)
 
 /* DrawAxes */
 /* -------- */
@@ -2498,10 +2501,10 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 */
 /* If non-zero draw a curve through the tick marks. Has a value of -1
    when not set yielding a default value of 1. */
-MAKE_CLEAR(DrawAxes,drawaxes,-1,2)
-MAKE_GET(DrawAxes,int,1,( this->drawaxes[axis] == -1 ? 1 : this->drawaxes[axis] ),2)
-MAKE_TEST(DrawAxes,( this->drawaxes[axis] != -1 ),2)
-MAKE_SET(DrawAxes,int,drawaxes,( value ? 1 : 0 ),2)
+MAKE_CLEAR(DrawAxes,drawaxes,-1,0)
+MAKE_GET(DrawAxes,int,1,( this->drawaxes[axis] == -1 ? 1 : this->drawaxes[axis] ),0)
+MAKE_TEST(DrawAxes,( this->drawaxes[axis] != -1 ),0)
+MAKE_SET(DrawAxes,int,drawaxes,( value ? 1 : 0 ),0)
 
 /* Abbrev */
 /* -------- */
@@ -2544,10 +2547,10 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 *     "test" operation will use just the Abbrev(1) value.
 *att--
 */
-MAKE_CLEAR(Abbrev,abbrev,-1,2)
-MAKE_GET(Abbrev,int,1,( this->abbrev[axis] == -1 ? 1 : this->abbrev[axis] ),2)
-MAKE_TEST(Abbrev,( this->abbrev[axis] != -1 ),2)
-MAKE_SET(Abbrev,int,abbrev,( value ? 1 : 0 ),2)
+MAKE_CLEAR(Abbrev,abbrev,-1,0)
+MAKE_GET(Abbrev,int,1,( this->abbrev[axis] == -1 ? 1 : this->abbrev[axis] ),0)
+MAKE_TEST(Abbrev,( this->abbrev[axis] != -1 ),0)
+MAKE_SET(Abbrev,int,abbrev,( value ? 1 : 0 ),0)
 
 /* Escape. */
 /* ------- */
@@ -2566,12 +2569,15 @@ MAKE_SET(Abbrev,int,abbrev,( value ? 1 : 0 ),2)
 *     Integer (boolean).
 
 *  Description:
-*     This attribute controls the appearance of text strings and
-c     numerical labels drawn by the astGrid and astText functions,
-f     numerical labels drawn by the AST_GRID and AST_TEXT functions,
+*     This attribute controls the appearance of text strings and numerical
+c     labels drawn by the astGrid and (for the Plot class) astText functions,
+f     labels drawn by the AST_GRID and (for the Plot class) AST_TEXT routines,
 *     by determining if any escape sequences contained within the strings
 *     should be used to control the appearance of the text, or should
-*     be printed literally. 
+*     be printed literally. Note, the Plot3D class only interprets escape
+*     sequences within the 
+c     astGrid function.
+f     AST_GRID routine.
 *
 *     If the Escape value of a Plot is one (the default), then any
 *     escape sequences in text strings produce the effects described
@@ -2726,26 +2732,26 @@ f     (remember that Plots suitable for use with AST_GRID may only
 */
 /* The constant value on the other axis at which to place labels for
    each axis. */
-MAKE_CLEAR(LabelAt,labelat,AST__BAD,2)
-MAKE_GET(LabelAt,double,AST__BAD,this->labelat[axis],2)
-MAKE_SET(LabelAt,double,labelat,value,2)
-MAKE_TEST(LabelAt,( this->labelat[axis] != AST__BAD ),2)
+MAKE_CLEAR(LabelAt,labelat,AST__BAD,0)
+MAKE_GET(LabelAt,double,AST__BAD,this->labelat[axis],0)
+MAKE_SET(LabelAt,double,labelat,value,0)
+MAKE_TEST(LabelAt,( this->labelat[axis] != AST__BAD ),0)
 
-MAKE_GET3(LabelAt,double,AST__BAD,this->ulblat[axis],2)
-MAKE_SET3(LabelAt,double,ulblat,value,2)
+MAKE_GET3(LabelAt,double,AST__BAD,this->ulblat[axis],0)
+MAKE_SET3(LabelAt,double,ulblat,value,0)
 
 /* Centre(axis). */
 /* ------------ */
 /* A value at which to place a tick mark. Other ticks marks are spaced at
 regular distances from this one. AST__BAD is stored if no value is supplied, 
 resulting in Plot choosing its own value. */
-MAKE_CLEAR(Centre,centre,AST__BAD,2)
-MAKE_GET(Centre,double,AST__BAD,this->centre[axis],2)
-MAKE_SET(Centre,double,centre,value,2)
-MAKE_TEST(Centre,( this->centre[axis] != AST__BAD ),2)
+MAKE_CLEAR(Centre,centre,AST__BAD,0)
+MAKE_GET(Centre,double,AST__BAD,this->centre[axis],0)
+MAKE_SET(Centre,double,centre,value,0)
+MAKE_TEST(Centre,( this->centre[axis] != AST__BAD ),0)
 
-MAKE_GET3(Centre,double,AST__BAD,this->ucentre[axis],2)
-MAKE_SET3(Centre,double,ucentre,value,2)
+MAKE_GET3(Centre,double,AST__BAD,this->ucentre[axis],0)
+MAKE_SET3(Centre,double,ucentre,value,0)
 
 /* Ink */
 /* --- */
@@ -2810,13 +2816,13 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 */
 /* The gap between tick marks on each axis. AST__BAD is stored if no
 value has been supplied, resulting in default values being found. */
-MAKE_CLEAR(Gap,gap,AST__BAD,2)
-MAKE_SET(Gap,double,gap,value,2)
-MAKE_TEST(Gap,( this->gap[axis] != AST__BAD ),2)
-MAKE_GET(Gap,double,AST__BAD,this->gap[axis],2)
+MAKE_CLEAR(Gap,gap,AST__BAD,0)
+MAKE_SET(Gap,double,gap,value,0)
+MAKE_TEST(Gap,( this->gap[axis] != AST__BAD ),0)
+MAKE_GET(Gap,double,AST__BAD,this->gap[axis],0)
 
-MAKE_SET3(Gap,double,ugap,value,2)
-MAKE_GET3(Gap,double,AST__BAD,this->ugap[axis],2)
+MAKE_SET3(Gap,double,ugap,value,0)
+MAKE_GET3(Gap,double,AST__BAD,this->ugap[axis],0)
 
 /* LogGap(axis). */
 /* ---------- */
@@ -2869,13 +2875,13 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 */
 /* The logarithmic gap between tick marks on each axis. AST__BAD is stored if 
    no value has been supplied, resulting in default values being found. */
-MAKE_CLEAR(LogGap,loggap,AST__BAD,2)
-MAKE_SET(LogGap,double,loggap,value,2)
-MAKE_TEST(LogGap,( this->loggap[axis] != AST__BAD ),2)
-MAKE_GET(LogGap,double,AST__BAD,this->loggap[axis],2)
+MAKE_CLEAR(LogGap,loggap,AST__BAD,0)
+MAKE_SET(LogGap,double,loggap,value,0)
+MAKE_TEST(LogGap,( this->loggap[axis] != AST__BAD ),0)
+MAKE_GET(LogGap,double,AST__BAD,this->loggap[axis],0)
 
-MAKE_SET3(LogGap,double,uloggap,value,2)
-MAKE_GET3(LogGap,double,AST__BAD,this->uloggap[axis],2)
+MAKE_SET3(LogGap,double,uloggap,value,0)
+MAKE_GET3(LogGap,double,AST__BAD,this->uloggap[axis],0)
 
 /* LogPlot. */
 /* -------  */
@@ -2934,8 +2940,8 @@ MAKE_GET3(LogGap,double,AST__BAD,this->uloggap[axis],2)
 */
 /* Are plot axes to be mapped logarithmically? Has a value of -1 when 
 not set yielding a value of 0 (no) for both axes. */
-MAKE_GET(LogPlot,int,0,( this->logplot[axis] == -1 ? 0 : this->logplot[axis] ),2)
-MAKE_TEST(LogPlot,( this->logplot[axis] != -1 ),2)
+MAKE_GET(LogPlot,int,0,( this->logplot[axis] == -1 ? 0 : this->logplot[axis] ),0)
+MAKE_TEST(LogPlot,( this->logplot[axis] != -1 ),0)
 
 /* LogTicks. */
 /* -------  */
@@ -2997,13 +3003,13 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 /* Are ticksto be spaced logarithmically? Has a value of -1 when 
    not set, yeielding a default value equal to the corresponding
    LogPlot value. */
-MAKE_CLEAR(LogTicks,logticks,-1,2)
-MAKE_GET(LogTicks,int,0,( this->logticks[axis] == -1 ? astGetLogPlot(this,axis) : this->logticks[axis] ),2)
-MAKE_TEST(LogTicks,( this->logticks[axis] != -1 ),2)
-MAKE_SET(LogTicks,int,logticks,( value ? 1 : 0 ),2)
+MAKE_CLEAR(LogTicks,logticks,-1,0)
+MAKE_GET(LogTicks,int,0,( this->logticks[axis] == -1 ? astGetLogPlot(this,axis) : this->logticks[axis] ),0)
+MAKE_TEST(LogTicks,( this->logticks[axis] != -1 ),0)
+MAKE_SET(LogTicks,int,logticks,( value ? 1 : 0 ),0)
 
-MAKE_SET3(LogTicks,int,ulgtk,value,2)
-MAKE_GET3(LogTicks,int,0,this->ulgtk[axis],2)
+MAKE_SET3(LogTicks,int,ulgtk,value,0)
+MAKE_GET3(LogTicks,int,0,this->ulgtk[axis],0)
 
 /* LogLabel. */
 /* --------  */
@@ -3050,13 +3056,13 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 */
 /* Are labels to be drawn as 10**x? Has a value of -1 when not set, yeielding 
    a default value equal to the corresponding LogTicks value. */
-MAKE_CLEAR(LogLabel,loglabel,-1,2)
-MAKE_GET(LogLabel,int,0,( this->loglabel[axis] == -1 ? astGetLogTicks(this,axis) : this->loglabel[axis] ),2)
-MAKE_TEST(LogLabel,( this->loglabel[axis] != -1 ),2)
-MAKE_SET(LogLabel,int,loglabel,( value ? 1 : 0 ),2)
+MAKE_CLEAR(LogLabel,loglabel,-1,0)
+MAKE_GET(LogLabel,int,0,( this->loglabel[axis] == -1 ? astGetLogTicks(this,axis) : this->loglabel[axis] ),0)
+MAKE_TEST(LogLabel,( this->loglabel[axis] != -1 ),0)
+MAKE_SET(LogLabel,int,loglabel,( value ? 1 : 0 ),0)
 
-MAKE_SET3(LogLabel,int,ulglb,value,2)
-MAKE_GET3(LogLabel,int,0,this->ulglb[axis],2)
+MAKE_SET3(LogLabel,int,ulglb,value,0)
+MAKE_GET3(LogLabel,int,0,this->ulglb[axis],0)
 
 /* MajTickLen. */
 /* ----------- */
@@ -3109,13 +3115,13 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 */
 /* Fractional length of major tick marks. Has a value of AST__BAD when not 
 set yielding a default value of 0.015. */
-MAKE_CLEAR(MajTickLen,majticklen,AST__BAD,2)
-MAKE_SET(MajTickLen,double,majticklen,value,2)
-MAKE_TEST(MajTickLen,( this->majticklen[axis] != AST__BAD ),2)
-MAKE_GET(MajTickLen,double,0.0,( this->majticklen[axis] == AST__BAD ? 0.015 : this->majticklen[axis]),2)
+MAKE_CLEAR(MajTickLen,majticklen,AST__BAD,0)
+MAKE_SET(MajTickLen,double,majticklen,value,0)
+MAKE_TEST(MajTickLen,( this->majticklen[axis] != AST__BAD ),0)
+MAKE_GET(MajTickLen,double,0.0,( this->majticklen[axis] == AST__BAD ? 0.015 : this->majticklen[axis]),0)
 
-MAKE_SET3(MajTickLen,double,umjtkln,value,2)
-MAKE_GET3(MajTickLen,double,0.0,this->umjtkln[axis],2)
+MAKE_SET3(MajTickLen,double,umjtkln,value,0)
+MAKE_GET3(MajTickLen,double,0.0,this->umjtkln[axis],0)
 
 /* TitleGap. */
 /* --------- */
@@ -3151,6 +3157,9 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 *  Applicability:
 *     Plot
 *        All Plots have this attribute.
+*     Plot3D
+*        The Plot3D class ignores this attributes since it does not draw
+*        a Title.
 
 *  Notes:
 *     - The text used for the title is obtained from the Plot's Title
@@ -3214,10 +3223,10 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 */
 /* Fractional length of minor tick marks. Has a value of AST__BAD when not 
 set yielding a default value of 0.007. */
-MAKE_CLEAR(MinTickLen,minticklen,AST__BAD,2)
-MAKE_SET(MinTickLen,double,minticklen,value,2)
-MAKE_TEST(MinTickLen,( this->minticklen[axis] != AST__BAD ),2)
-MAKE_GET(MinTickLen,double,0.0,( this->minticklen[axis] == AST__BAD ? 0.007 : this->minticklen[axis]),2)
+MAKE_CLEAR(MinTickLen,minticklen,AST__BAD,0)
+MAKE_SET(MinTickLen,double,minticklen,value,0)
+MAKE_TEST(MinTickLen,( this->minticklen[axis] != AST__BAD ),0)
+MAKE_GET(MinTickLen,double,0.0,( this->minticklen[axis] == AST__BAD ? 0.007 : this->minticklen[axis]),0)
 
 /* Labelling. */
 /* ---------- */
@@ -3302,6 +3311,10 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 *  Applicability:
 *     Plot
 *        All Plots have this attribute.
+*     Plot3D
+*        The Plot3D class ignores this attributes. Instead it uses its
+*        own RootCorner attribute to determine which edges of the 3D plot 
+*        to label. 
 
 *  Notes:
 *     - In some circumstances, numerical labels will be drawn along
@@ -3316,13 +3329,13 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
    for axes 0 and 1. Has a value of -1 when not set yielding a value
    of 3 (the bottom edge) for axis 0 and 0 (the left-hand edge) for
    axis 1. */
-MAKE_CLEAR(Edge,edge,-1,2)
-MAKE_GET(Edge,int,0,( this->edge[axis] == -1 ? (axis?LEFT:BOTTOM) : this->edge[axis] ),2)
-MAKE_SET(Edge,int,edge,(abs( value % 4 )),2)
-MAKE_TEST(Edge,( this->edge[axis] != -1 ),2)
+MAKE_CLEAR(Edge,edge,-1,0)
+MAKE_GET(Edge,int,0,( this->edge[axis] == -1 ? (axis?LEFT:BOTTOM) : this->edge[axis] ),0)
+MAKE_SET(Edge,int,edge,(abs( value % 4 )),0)
+MAKE_TEST(Edge,( this->edge[axis] != -1 ),0)
 
-MAKE_GET3(Edge,int,0,this->uedge[axis],2)
-MAKE_SET3(Edge,int,uedge,(abs( value % 4 )),2)
+MAKE_GET3(Edge,int,0,this->uedge[axis],0)
+MAKE_SET3(Edge,int,uedge,(abs( value % 4 )),0)
 
 /* NumLab. */
 /* -------- */
@@ -3370,10 +3383,10 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 */
 /* Are numerical labels to be displayed on each axis? Has a value of
    -1 when not set yielding a value of 1 (yes) for both axes. */
-MAKE_CLEAR(NumLab,numlab,-1,2)
-MAKE_GET(NumLab,int,1,( this->numlab[axis] == -1 ? 1 : this->numlab[axis] ),2)
-MAKE_TEST(NumLab,( this->numlab[axis] != -1 ),2)
-MAKE_SET(NumLab,int,numlab,( value ? 1 : 0 ),2)
+MAKE_CLEAR(NumLab,numlab,-1,0)
+MAKE_GET(NumLab,int,1,( this->numlab[axis] == -1 ? 1 : this->numlab[axis] ),0)
+MAKE_TEST(NumLab,( this->numlab[axis] != -1 ),0)
+MAKE_SET(NumLab,int,numlab,( value ? 1 : 0 ),0)
 
 /* NumLabGap. */
 /* --------- */
@@ -3424,10 +3437,10 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 */
 /* Fractional spacing between numeric labels and axes. Has a value of AST__BAD 
 when not set yielding a default value of 0.01. */
-MAKE_CLEAR(NumLabGap,numlabgap,AST__BAD,2)
-MAKE_GET(NumLabGap,double,0.0,( this->numlabgap[ axis ] == AST__BAD ? 0.01 : this->numlabgap[axis]),2)
-MAKE_SET(NumLabGap,double,numlabgap,value,2)
-MAKE_TEST(NumLabGap,( this->numlabgap[axis] != AST__BAD ),2)
+MAKE_CLEAR(NumLabGap,numlabgap,AST__BAD,0)
+MAKE_GET(NumLabGap,double,0.0,( this->numlabgap[ axis ] == AST__BAD ? 0.01 : this->numlabgap[axis]),0)
+MAKE_SET(NumLabGap,double,numlabgap,value,0)
+MAKE_TEST(NumLabGap,( this->numlabgap[axis] != AST__BAD ),0)
 
 /* MinTick. */
 /* -------- */
@@ -3474,13 +3487,13 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 */
 /* How many divisions are there between major tick marks? Has a value
 of -1 when not set yielding a value of 1 for both axes. */
-MAKE_CLEAR(MinTick,mintick,-1,2)
-MAKE_GET(MinTick,int,1,( this->mintick[axis] == -1 ? 1 : this->mintick[axis] ),2)
-MAKE_TEST(MinTick,( this->mintick[axis] != -1 ),2)
-MAKE_SET(MinTick,int,mintick,( (value < 1)? 1 : value ),2)
+MAKE_CLEAR(MinTick,mintick,-1,0)
+MAKE_GET(MinTick,int,1,( this->mintick[axis] == -1 ? 1 : this->mintick[axis] ),0)
+MAKE_TEST(MinTick,( this->mintick[axis] != -1 ),0)
+MAKE_SET(MinTick,int,mintick,( (value < 1)? 1 : value ),0)
 
-MAKE_GET3(MinTick,int,1,this->umintk[axis],2)
-MAKE_SET3(MinTick,int,umintk,( (value < 1)? 1 : value ),2)
+MAKE_GET3(MinTick,int,1,this->umintk[axis],0)
+MAKE_SET3(MinTick,int,umintk,( (value < 1)? 1 : value ),0)
 
 /* TextLab. */
 /* --------- */
@@ -3534,13 +3547,13 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 */
 /* Are textual labels to be displayed on each axis? Has a value of -1
    when not set yielding a value of 1 (yes) for both axes. */
-MAKE_CLEAR(TextLab,textlab,-1,2)
-MAKE_GET(TextLab,int,1,( this->textlab[axis] == -1 ? 1 : this->textlab[axis] ),2)
-MAKE_TEST(TextLab,( this->textlab[axis] != -1 ),2)
-MAKE_SET(TextLab,int,textlab,( value ? 1 : 0 ),2)
+MAKE_CLEAR(TextLab,textlab,-1,0)
+MAKE_GET(TextLab,int,1,( this->textlab[axis] == -1 ? 1 : this->textlab[axis] ),0)
+MAKE_TEST(TextLab,( this->textlab[axis] != -1 ),0)
+MAKE_SET(TextLab,int,textlab,( value ? 1 : 0 ),0)
 
-MAKE_GET3(TextLab,int,1,this->utxtlb[axis],2)
-MAKE_SET3(TextLab,int,utxtlb,( value ? 1 : 0 ),2)
+MAKE_GET3(TextLab,int,1,this->utxtlb[axis],0)
+MAKE_SET3(TextLab,int,utxtlb,( value ? 1 : 0 ),0)
 
 /* TextLabGap. */
 /* ----------- */
@@ -3596,10 +3609,10 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 */
 /* Fractional spacing between numeric labels and axes. Has a value of AST__BAD 
 when not set yielding a default value of 0.01. */
-MAKE_CLEAR(TextLabGap,textlabgap,AST__BAD,2)
-MAKE_GET(TextLabGap,double,0.0,( this->textlabgap[ axis ] == AST__BAD ? 0.01 : this->textlabgap[axis]),2)
-MAKE_SET(TextLabGap,double,textlabgap,value,2)
-MAKE_TEST(TextLabGap,( this->textlabgap[axis] != AST__BAD ),2)
+MAKE_CLEAR(TextLabGap,textlabgap,AST__BAD,0)
+MAKE_GET(TextLabGap,double,0.0,( this->textlabgap[ axis ] == AST__BAD ? 0.01 : this->textlabgap[axis]),0)
+MAKE_SET(TextLabGap,double,textlabgap,value,0)
+MAKE_TEST(TextLabGap,( this->textlabgap[axis] != AST__BAD ),0)
 
 /* LabelUnits. */
 /* ----------- */
@@ -3654,12 +3667,12 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 */
 /* Are textual labels to include a string describing the axis units? Has a 
 value of -1 when not set yielding a default of 1. */
-MAKE_CLEAR(LabelUnits,labelunits,-1,2)
-MAKE_TEST(LabelUnits,( this->labelunits[axis] != -1 ),2)
-MAKE_SET(LabelUnits,int,labelunits,( value ? 1 : 0 ),2)
+MAKE_CLEAR(LabelUnits,labelunits,-1,0)
+MAKE_TEST(LabelUnits,( this->labelunits[axis] != -1 ),0)
+MAKE_SET(LabelUnits,int,labelunits,( value ? 1 : 0 ),0)
 
-MAKE_GET3(LabelUnits,int,1,this->ulbunit[axis],2)
-MAKE_SET3(LabelUnits,int,ulbunit,( value ? 1 : 0 ),2)
+MAKE_GET3(LabelUnits,int,1,this->ulbunit[axis],0)
+MAKE_SET3(LabelUnits,int,ulbunit,( value ? 1 : 0 ),0)
 
 /* Style. */
 /* ------ */
@@ -3858,7 +3871,7 @@ MAKE_SET(Colour,int,colour,value,AST__NPID)
 MAKE_CLEAR(Width,width,AST__BAD,AST__NPID)
 MAKE_GET(Width,double,1.0,( this->width[axis] == AST__BAD ? 1.0 : this->width[axis] ),AST__NPID)
 MAKE_TEST(Width,( this->width[axis] != AST__BAD ),AST__NPID)
-MAKE_SET(Width,double,width,(value!=0.00)?value:(astError(AST__ATTIN,"astSetWidth(Plot): Invalid zero value supplied for Width(%s) attribute",GrfItem(axis,NULL)),this->width[axis]),AST__NPID)
+MAKE_SET(Width,double,width,(value!=0.00)?value:(astError(AST__ATTIN,"astSetWidth(Plot):Invalid zero value supplied for Width(%s) attribute",GrfItem(axis,NULL,NULL)),this->width[axis]),AST__NPID)
 
 /* Size. */
 /* ----- */
@@ -3908,7 +3921,7 @@ MAKE_SET(Width,double,width,(value!=0.00)?value:(astError(AST__ATTIN,"astSetWidt
 MAKE_CLEAR(Size,size,AST__BAD,AST__NPID)
 MAKE_GET(Size,double,1.0,( this->size[axis] == AST__BAD ? 1.0 : this->size[axis] ),AST__NPID)
 MAKE_TEST(Size,( this->size[axis] != AST__BAD ),AST__NPID)
-MAKE_SET(Size,double,size,(value!=0.00)?value:(astError(AST__ATTIN,"astSetSize(Plot): Invalid zero value supplied for Size(%s) attribute",GrfItem(axis,NULL)),this->size[axis]),AST__NPID)
+MAKE_SET(Size,double,size,(value!=0.00)?value:(astError(AST__ATTIN,"astSetSize(Plot): Invalid zero value supplied for Size(%s) attribute",GrfItem(axis,NULL,NULL)),this->size[axis]),AST__NPID)
 
 /* Member functions. */
 /* ================= */
@@ -4242,11 +4255,11 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
       if( axis == 0 ) {
-         gridid = GRIDLINE2_ID;
+         gridid = AST__GRIDLINE2_ID;
       } else {
-         gridid = GRIDLINE1_ID;         
+         gridid = AST__GRIDLINE1_ID;         
       }
-      GrfAttrs( this, gridid, 1, GRF__LINE, method, class );
+      astGrfAttrs( this, gridid, 1, GRF__LINE, method, class );
 
 /* Set up the externals used to communicate with the Map1 function...
    The number of axes in the physical coordinate system (i.e. the current
@@ -4349,7 +4362,7 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
       Map1_map = astAnnul( Map1_map );
 
 /* Re-establish the original graphical attributes. */
-      GrfAttrs( this, gridid, 0, GRF__LINE, method, class );
+      astGrfAttrs( this, gridid, 0, GRF__LINE, method, class );
 
    }
 
@@ -4801,6 +4814,14 @@ f     RESULT = AST_BORDER( THIS, STATUS )
 *     If the entire plotting area contains valid, unclipped physical
 *     coordinates, then the boundary will just be a rectangular box
 *     around the edges of the plotting area.
+*
+*     If the Plot is a Plot3D, this method is applied individually to
+*     each of the three 2D Plots encapsulated within the Plot3D (each of
+*     these Plots corresponds to a single 2D plane in the 3D graphics
+*     system). In addition, if the entire plotting volume has valid 
+*     coordinates in the 3D current Frame of the Plot3D, then additional 
+*     lines are drawn along the edges of the 3D plotting volume so that 
+*     the entire plotting volume is enclosed within a cuboid grid.
 
 *  Parameters:
 c     this
@@ -4812,8 +4833,8 @@ f        The global status.
 *  Returned Value:
 c     astBorder()
 f     AST_BORDER = LOGICAL
-c        Zero is returned if the plotting area is completely filled by
-f        .FALSE. is returned if the plotting area is completely filled by
+c        Zero is returned if the plotting space is completely filled by
+f        .FALSE. is returned if the plotting space is completely filled by
 *        valid, unclipped physical coordinates (so that only a
 c        rectangular box was drawn around the edge). Otherwise, one is
 f        rectangular box was drawn around the edge). Otherwise, .TRUE. is
@@ -4826,7 +4847,7 @@ c     with the AST error status set, or if it should fail for any
 f     with STATUS set to an error value, or if it should fail for any
 *     reason.
 *     - An error results if either the current Frame or the base Frame
-*     of the Plot is not 2-dimensional.
+*     of the Plot is not 2-dimensional or (for a Plot3D) 3-dimensional.
 *     - An error also results if the transformation between the base
 *     and current Frames of the Plot is not defined (i.e. the Plot's
 *     TranForward attribute is zero).
@@ -4878,7 +4899,7 @@ f     with STATUS set to an error value, or if it should fail for any
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
-   GrfAttrs( this, BORDER_ID, 1, GRF__LINE, method, class );
+   astGrfAttrs( this, AST__BORDER_ID, 1, GRF__LINE, method, class );
 
 /* We first draw the intersections of the regions containing valid
    physical coordinates with the edges of the plotting area. First do
@@ -4903,7 +4924,7 @@ f     with STATUS set to an error value, or if it should fail for any
    inval = Boundary( this, method, class );
 
 /* Re-establish the original graphical attributes. */
-   GrfAttrs( this, BORDER_ID, 0, GRF__LINE, method, class );
+   astGrfAttrs( this, AST__BORDER_ID, 0, GRF__LINE, method, class );
 
 /* Annul the 2d plot. */
    this = astAnnul( this );
@@ -5222,7 +5243,7 @@ static int CGCapWrapper( AstPlot *this, int cap, int value ) {
 
 */
    if( !astOK ) return 0;
-   return ( (AstGCapFun) this->grffun[ AST__GCAP ] )( this->grfcontextId, cap, value );
+   return ( (AstGCapFun) this->grffun[ AST__GCAP ] )( astGrfConID(this), cap, value );
 }
 
 static int CGAttrWrapper( AstPlot *this, int attr, double value, 
@@ -5277,7 +5298,7 @@ static int CGAttrWrapper( AstPlot *this, int attr, double value,
 
 */
    if( !astOK ) return 0;
-   return ( (AstGAttrFun) this->grffun[ AST__GATTR ] )( this->grfcontextId, attr, value, old_value, prim );
+   return ( (AstGAttrFun) this->grffun[ AST__GATTR ] )( astGrfConID(this), attr, value, old_value, prim );
 }
 
 static int CGFlushWrapper( AstPlot *this ) {
@@ -5309,8 +5330,7 @@ static int CGFlushWrapper( AstPlot *this ) {
 
 */
    if( !astOK ) return 0;
-   return ( (AstGFlushFun) this->grffun[ AST__GFLUSH ])( this->grfcontextId );
-
+   return ( (AstGFlushFun) this->grffun[ AST__GFLUSH ])( astGrfConID(this) );
 }
 
 static int CGLineWrapper( AstPlot *this, int n, const float *x, 
@@ -5350,7 +5370,7 @@ static int CGLineWrapper( AstPlot *this, int n, const float *x,
 
 */
    if( !astOK ) return 0;
-   return ( (AstGLineFun) this->grffun[ AST__GLINE ])( this->grfcontextId, n, x, y );
+   return ( (AstGLineFun) this->grffun[ AST__GLINE ])( astGrfConID(this), n, x, y );
 }
 
 static int CGMarkWrapper( AstPlot *this, int n, const float *x, 
@@ -5393,7 +5413,7 @@ static int CGMarkWrapper( AstPlot *this, int n, const float *x,
 
 */
    if( !astOK ) return 0;
-   return ( (AstGMarkFun) this->grffun[ AST__GMARK ])( this->grfcontextId, n, x, y, type );
+   return ( (AstGMarkFun) this->grffun[ AST__GMARK ])( astGrfConID(this), n, x, y, type );
 }
 
 static int CGTextWrapper( AstPlot *this, const char *text, float x, float y,
@@ -5455,7 +5475,7 @@ static int CGTextWrapper( AstPlot *this, const char *text, float x, float y,
 
 */
    if( !astOK ) return 0;
-   return ( (AstGTextFun) this->grffun[ AST__GTEXT ])( this->grfcontextId, text, x, y, just, upx, upy );
+   return ( (AstGTextFun) this->grffun[ AST__GTEXT ])( astGrfConID(this), text, x, y, just, upx, upy );
 }
 
 static int CGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
@@ -5525,7 +5545,7 @@ static int CGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
 
 */
    if( !astOK ) return 0;
-   return ( (AstGTxExtFun) this->grffun[ AST__GTXEXT ])( this->grfcontextId, text, x, y, just, upx, upy, xb, yb );
+   return ( (AstGTxExtFun) this->grffun[ AST__GTXEXT ])( astGrfConID(this), text, x, y, just, upx, upy, xb, yb );
 }
 
 static int CGQchWrapper( AstPlot *this, float *chv, float *chh ) {
@@ -5564,7 +5584,7 @@ static int CGQchWrapper( AstPlot *this, float *chv, float *chh ) {
 *        axis
 */
    if( !astOK ) return 0;
-   return ( (AstGQchFun) this->grffun[ AST__GQCH ])( this->grfcontextId, chv, chh );
+   return ( (AstGQchFun) this->grffun[ AST__GQCH ])( astGrfConID(this), chv, chh );
 }
 
 static int CGScalesWrapper( AstPlot *this, float *alpha, float *beta ) {
@@ -5601,7 +5621,7 @@ static int CGScalesWrapper( AstPlot *this, float *alpha, float *beta ) {
 *        Y axis (i.e. Ynorm = beta*Yworld).
 */
    if( !astOK ) return 0;
-   return ( (AstGScalesFun) this->grffun[ AST__GSCALES ])( this->grfcontextId, alpha, beta );
+   return ( (AstGScalesFun) this->grffun[ AST__GSCALES ])( astGrfConID(this), alpha, beta );
 }
 
 static int CheckLabels( AstPlot *this, AstFrame *frame, int axis, 
@@ -6037,6 +6057,9 @@ static TickInfo **CleanGrid( TickInfo **grid ){
 /* Release the memory holding major tick mark values. */
          (void) astFree( (void *) info->ticks );
 
+/* Release the memory holding minor tick mark values. */
+         (void) astFree( (void *) info->minticks );
+
 /* Release the memory holding curve section starting positions. */
          (void) astFree( (void *) info->start );
 
@@ -6113,13 +6136,19 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    int id2;                      /* Plot object id */
    int id;                       /* Plot object id */
    int len;                      /* Length of attrib string */
+   int nax;                      /* Number of base Frame axes */
    int nc;                       /* No. characters read by astSscanf */
+   int id3;                      /* Third genuine identifier */
+   int nid;                      /* Number of genuine attributes */
 
 /* Check the global error status. */
    if ( !astOK ) return;
 
 /* Obtain a pointer to the Plot structure. */
    this = (AstPlot *) this_object;
+
+/* Get the number of base Frame axis (2 for a Plot, 3 for a Plot3D). */
+   nax = astGetNin( this );
 
 /* Obtain the length of the "attrib" string. */
    len = strlen( attrib );
@@ -6141,8 +6170,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* LabelUp */
 /* ------- */
    } else if ( !strcmp( attrib, "labelup" ) ) {
-      astClearLabelUp( this, 0 );
-      astClearLabelUp( this, 1 );
+      for( axis = 0; axis < nax; axis++ ) astClearLabelUp( this, axis );
 
 /* LabelUp(axis). */
 /* -------------- */
@@ -6154,8 +6182,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* LogPlot */
 /* ------- */
    } else if ( !strcmp( attrib, "logplot" ) ) {
-      astClearLogPlot( this, 0 );
-      astClearLogPlot( this, 1 );
+      for( axis = 0; axis < nax; axis++ ) astClearLogPlot( this, axis );
 
 /* LogPlot(axis). */
 /* -------------- */
@@ -6167,8 +6194,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* LogTicks */
 /* ------- */
    } else if ( !strcmp( attrib, "logticks" ) ) {
-      astClearLogTicks( this, 0 );
-      astClearLogTicks( this, 1 );
+      for( axis = 0; axis < nax; axis++ ) astClearLogTicks( this, axis );
 
 /* LogTicks(axis). */
 /* -------------- */
@@ -6180,8 +6206,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* LogLabel */
 /* ------- */
    } else if ( !strcmp( attrib, "loglabel" ) ) {
-      astClearLogLabel( this, 0 );
-      astClearLogLabel( this, 1 );
+      for( axis = 0; axis < nax; axis++ ) astClearLogLabel( this, axis );
 
 /* LogLabel(axis). */
 /* -------------- */
@@ -6193,8 +6218,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* NumLab. */
 /* ---------- */
    } else if ( !strcmp( attrib, "numlab" ) ) {
-      astClearNumLab( this, 0 );
-      astClearNumLab( this, 1 );
+      for( axis = 0; axis < nax; axis++ ) astClearNumLab( this, axis );
 
 /* NumLab(axis). */
 /* ---------------- */
@@ -6206,8 +6230,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* MinTick. */
 /* ---------- */
    } else if ( !strcmp( attrib, "mintick" ) ) {
-      astClearMinTick( this, 0 );
-      astClearMinTick( this, 1 );
+      for( axis = 0; axis < nax; axis++ ) astClearMinTick( this, axis );
 
 /* MinTick(axis). */
 /* ---------------- */
@@ -6219,8 +6242,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* TextLab. */
 /* ---------- */
    } else if ( !strcmp( attrib, "textlab" ) ) {
-      astClearTextLab( this, 0 );
-      astClearTextLab( this, 1 );
+      for( axis = 0; axis < nax; axis++ ) astClearTextLab( this, axis );
 
 /* TextLab(axis). */
 /* --------------- */
@@ -6232,8 +6254,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* LabelUnits. */
 /* --------- */
    } else if ( !strcmp( attrib, "labelunits" ) ) {
-      astClearLabelUnits( this, 0 );
-      astClearLabelUnits( this, 1 );
+      for( axis = 0; axis < nax; axis++ ) astClearLabelUnits( this, axis );
 
 /* LabelUnits(axis). */
 /* --------------- */
@@ -6253,9 +6274,12 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
                ( 1 == astSscanf( attrib, "style(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
       class =  astGetClass( this );
-      if( IdFind( FullForm( GrfLabels, label, attrib, "astClear", class ), 
-          &id1, &id2 ) ) astClearStyle( this, id2 );
+
+      nid = IdFind( FullForm( GrfLabels, label, attrib, "astClear", class ),
+                    nax, &id1, &id2, &id3 );
       astClearStyle( this, id1 );
+      if( nid > 1 ) astClearStyle( this, id2 );
+      if( nid > 2 ) astClearStyle( this, id3 );
 
 /* Font. */
 /* ----- */
@@ -6268,9 +6292,12 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
                ( 1 == astSscanf( attrib, "font(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
       class =  astGetClass( this );
-      if( IdFind( FullForm( GrfLabels, label, attrib, "astClear", class ), 
-          &id1, &id2 ) ) astClearFont( this, id2 );
+
+      nid = IdFind( FullForm( GrfLabels, label, attrib, "astClear", class ),
+                    nax, &id1, &id2, &id3 );
       astClearFont( this, id1 );
+      if( nid > 1 ) astClearFont( this, id2 );
+      if( nid > 2 ) astClearFont( this, id3 );
 
 /* Colour. */
 /* ------- */
@@ -6283,9 +6310,13 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
                ( 1 == astSscanf( attrib, "colour(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
       class =  astGetClass( this );
-      if( IdFind( FullForm( GrfLabels, label, attrib, "astClear", class ), 
-          &id1, &id2 ) ) astClearColour( this, id2 );
+
+      nid = IdFind( FullForm( GrfLabels, label, attrib, "astClear", class
+),
+                    nax, &id1, &id2, &id3 );
       astClearColour( this, id1 );
+      if( nid > 1 ) astClearColour( this, id2 );
+      if( nid > 2 ) astClearColour( this, id3 );
 
 /* Color. */
 /* ------ */
@@ -6298,9 +6329,12 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
                ( 1 == astSscanf( attrib, "color(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
       class =  astGetClass( this );
-      if( IdFind( FullForm( GrfLabels, label, attrib, "astClear", class ), 
-          &id1, &id2 ) ) astClearColour( this, id2 );
+
+      nid = IdFind( FullForm( GrfLabels, label, attrib, "astClear", class ),
+                    nax, &id1, &id2, &id3 );
       astClearColour( this, id1 );
+      if( nid > 1 ) astClearColour( this, id2 );
+      if( nid > 2 ) astClearColour( this, id3 );
 
 /* Width. */
 /* ------ */
@@ -6313,9 +6347,13 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
                ( 1 == astSscanf( attrib, "width(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
       class =  astGetClass( this );
-      if( IdFind( FullForm( GrfLabels, label, attrib, "astClear", class ), 
-          &id1, &id2 ) ) astClearWidth( this, id2 );
+
+      nid = IdFind( FullForm( GrfLabels, label, attrib, "astClear", class ),
+                    nax, &id1, &id2, &id3 );
+
       astClearWidth( this, id1 );
+      if( nid > 1 ) astClearWidth( this, id2 );
+      if( nid > 2 ) astClearWidth( this, id3 );
 
 /* Size. */
 /* ----- */
@@ -6328,9 +6366,12 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
                ( 1 == astSscanf( attrib, "size(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
       class =  astGetClass( this );
-      if( IdFind( FullForm( GrfLabels, label, attrib, "astClear", class ), 
-          &id1, &id2 ) ) astClearSize( this, id2 );
+
+      nid = IdFind( FullForm( GrfLabels, label, attrib, "astClear", class ),
+                    nax, &id1, &id2, &id3 );
       astClearSize( this, id1 );
+      if( nid > 1 ) astClearSize( this, id2 );
+      if( nid > 2 ) astClearSize( this, id3 );
 
 /* LabelAt(axis). */
 /* -------------- */
@@ -6349,8 +6390,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* Gap. */
 /* ---- */
    } else if ( !strcmp( attrib, "gap" ) ) {
-      astClearGap( this, 0 );
-      astClearGap( this, 1 );
+      for( axis = 0; axis < nax; axis++ ) astClearGap( this, axis );
 
 /* Gap(axis). */
 /* ---------- */
@@ -6362,8 +6402,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* LogGap. */
 /* ----------- */
    } else if ( !strcmp( attrib, "loggap" ) ) {
-      astClearLogGap( this, 0 );
-      astClearLogGap( this, 1 );
+      for( axis = 0; axis < nax; axis++ ) astClearLogGap( this, axis );
 
 /* LogGap(axis). */
 /* ----------------- */
@@ -6375,8 +6414,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* NumLabGap. */
 /* ---------- */
    } else if ( !strcmp( attrib, "numlabgap" ) ) {
-      astClearNumLabGap( this, 0 );
-      astClearNumLabGap( this, 1 );
+      for( axis = 0; axis < nax; axis++ ) astClearNumLabGap( this, axis );
 
 /* NumLabGap(axis). */
 /* ---------------- */
@@ -6388,8 +6426,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* TextLabGap. */
 /* ----------- */
    } else if ( !strcmp( attrib, "textlabgap" ) ) {
-      astClearTextLabGap( this, 0 );
-      astClearTextLabGap( this, 1 );
+      for( axis = 0; axis < nax; axis++ ) astClearTextLabGap( this, axis );
 
 /* TextLabGap(axis). */
 /* ----------------- */
@@ -6406,8 +6443,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* MajTickLen. */
 /* ----------- */
    } else if ( !strcmp( attrib, "majticklen" ) ) {
-      astClearMajTickLen( this, 0 );
-      astClearMajTickLen( this, 1 );
+      for( axis = 0; axis < nax; axis++ ) astClearMajTickLen( this, axis );
 
 /* MajTickLen(axis). */
 /* ----------------- */
@@ -6419,8 +6455,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* MinTickLen. */
 /* ----------- */
    } else if ( !strcmp( attrib, "minticklen" ) ) {
-      astClearMinTickLen( this, 0 );
-      astClearMinTickLen( this, 1 );
+      for( axis = 0; axis < nax; axis++ ) astClearMinTickLen( this, axis );
 
 /* MinTickLen(axis). */
 /* ----------------- */
@@ -6477,14 +6512,12 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* DrawAxes. */
 /* --------- */
    } else if ( !strcmp( attrib, "drawaxes" ) ) {
-      astClearDrawAxes( this, 0 );
-      astClearDrawAxes( this, 1 );
+      for( axis = 0; axis < nax; axis++ ) astClearDrawAxes( this, axis );
 
 /* Abbrev */
 /* ------ */
    } else if ( !strcmp( attrib, "abbrev" ) ) {
-      astClearAbbrev( this, 0 );
-      astClearAbbrev( this, 1 );
+      for( axis = 0; axis < nax; axis++ ) astClearAbbrev( this, axis );
 
 /* DrawAxes(axis). */
 /* --------------- */
@@ -6930,6 +6963,70 @@ static int Compare_LL( const void *elem1, const void *elem2 ){
 /* Return the answer. */
    return ret;
 
+}
+
+static void CopyPlotDefaults( AstPlot *this, int axis, AstPlot *dplot, 
+                             int daxis ){
+/*
+*+
+*  Name:
+*     astCopyPlotDefaults
+
+*  Purpose:
+*     Copy used attribute defaults from one Plot to another.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void astCopyPlotDefaults( AstPlot *this, int axis, AstPlot *dplot, 
+*                               int daxis )
+
+*  Class Membership:
+*     Plot method.
+
+*  Description:
+*     Some of the attributes used by the Plot class have dynamic default
+*     values that are determined during the process of drawing an annotated
+*     grid using astGrid. The dynamic default values are stored in a
+*     separate set of components within the Plot structure. This function 
+*     copies these components from one Plot to another.
+
+*  Parameters:
+*     this
+*        Pointer to a Plot containing the values ot be copied.
+*     axis
+*        The zero-based index of the axis within "this" for which the 
+*        used defaults are to be copied.
+*     dplot
+*        A pointer to another Plot into which the default attribute
+*        values are to be copied.
+*     daxis
+*        The zero based index of the axis within "dplot" which is to
+*        receive the new values.
+
+*-
+*/
+
+/* Check the global status. */
+   if( !astOK ) return;
+
+   dplot->ulglb[ daxis ] = this->ulglb[ axis ];
+   dplot->ulgtk[ daxis ] = this->ulgtk[ axis ];
+   dplot->uloggap[ daxis ] = this->uloggap[ axis ];
+   dplot->ugap[ daxis ] = this->ugap[ axis ];
+   dplot->ucentre[ daxis ] = this->ucentre[ axis ];
+   dplot->uedge[ daxis ] = this->uedge[ axis ];
+   dplot->ulblat[ daxis ] = this->ulblat[ axis ];
+   dplot->ulbunit[ daxis ] = this->ulbunit[ axis ];
+   dplot->umintk[ daxis ] = this->umintk[ axis ];
+   dplot->utxtlb[ daxis ] = this->utxtlb[ axis ];
+   dplot->umjtkln[ daxis ] = this->umjtkln[ axis ];
+
+   dplot->ugrid = this->ugrid;
+   dplot->ulbling = this->ulbling;
+   dplot->uborder = this->uborder;
 }
 
 static int CountGood( int n, double *data ){
@@ -8312,7 +8409,7 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
-      GrfAttrs( this, CURVE_ID, 1, GRF__LINE, method, class );
+      astGrfAttrs( this, AST__CURVE_ID, 1, GRF__LINE, method, class );
 
 /* Set up the externals used to communicate with the Map3 function...
    The number of axes in the physical coordinate system (i.e. the current
@@ -8408,7 +8505,7 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
       Map3_map = astAnnul( Map3_map );
 
 /* Re-establish the original graphical attributes. */
-      GrfAttrs( this, CURVE_ID, 0, GRF__LINE, method, class );
+      astGrfAttrs( this, AST__CURVE_ID, 0, GRF__LINE, method, class );
 
    }
 
@@ -8736,7 +8833,7 @@ static void DrawAxis( AstPlot *this, TickInfo **grid, double *labelat,
    if( !astOK ) return;
 
 /* Not the id value for the first axis. */
-   axisid = AXIS1_ID;
+   axisid = AST__AXIS1_ID;
 
 /* Get a pointer to the current Frame. */
    frm = astGetFrame( this, AST__CURRENT );
@@ -8746,7 +8843,7 @@ static void DrawAxis( AstPlot *this, TickInfo **grid, double *labelat,
 
 /* Establish the correct graphical attributes for this axis as defined by 
    attributes with the supplied Plot. */
-      GrfAttrs( this, axisid, 1, GRF__LINE, method, class );
+      astGrfAttrs( this, axisid, 1, GRF__LINE, method, class );
 
 /* Check the axis is required. */
       if( astGetDrawAxes( this, axis ) ){ 
@@ -8831,10 +8928,10 @@ static void DrawAxis( AstPlot *this, TickInfo **grid, double *labelat,
       }
 
 /* Re-establish the original graphical attributes. */
-      GrfAttrs( this, axisid, 0, GRF__LINE, method, class );
+      astGrfAttrs( this, axisid, 0, GRF__LINE, method, class );
 
 /* Set up the id value for the next axis. */
-      axisid = AXIS2_ID;
+      axisid = AST__AXIS2_ID;
 
    }
 
@@ -9434,7 +9531,7 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 *     Plot member function.
 
 *  Description:
-*     This function draws major and minot tick marks. It uses a different
+*     This function draws major and minor tick marks. It uses a different
 *     technique depending on whether the tick marks are to be put along the
 *     edges of the plotting area, or along a curve through the middle of the
 *     plotting area. The physical axis values at which to put tick marks
@@ -9541,10 +9638,8 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
    int gelid;             /* ID for next graphical element to be drawn */
    int i;                 /* Minor tick mark index */
    int logticks;          /* Are major tick marks logarithmically spaced? */
-   int major;             /* Are major tick marks required? */
    int minhi;             /* Highest minor tick mark index */
    int minlo;             /* Lowest minor tick mark index */
-   int minor;             /* Are minor tick marks required? */
    int nedge;             /* No. of edges to be ticked for each axis */
    int nel;               /* Actual number of tick marks to draw */
    int ntot;              /* Maximum number of tick marks */
@@ -9565,6 +9660,11 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 /* Get the minimum dimension of the plotting ares. */
    mindim = MIN( this->xhi - this->xlo, this->yhi - this->ylo );
 
+/* Information about the drawn tick marks is saved in the Plot structure.
+   Reset this information now so that we are ready to store information
+   about the new ticks that will be drawn by this function invocation. */
+   SaveTick( this, -1, 0.0, 0.0, 0 );
+
 /* If ticks are to be put round the edges of the plotting area... */
 /* ============================================================== */
    if( labelat[ 0 ] == AST__BAD || labelat[ 1 ] == AST__BAD ){
@@ -9576,14 +9676,14 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
       for( ed = 0; ed < nedge; ed++ ){
 
 /* Initialize the id value for graphical element being drawn. */
-         gelid = TICKS1_ID;
+         gelid = AST__TICKS1_ID;
 
 /* Do each axis. */
          for( axis = 0; axis < 2; axis++ ){
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
-            GrfAttrs( this, gelid, 1, GRF__LINE, method, class );
+            astGrfAttrs( this, gelid, 1, GRF__LINE, method, class );
 
 /* Store the length in graphics coordinates of major tick marks for this
    axis. Use a default of zero if a grid has been drawn. */
@@ -9593,15 +9693,8 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
                mjtklen = 0.0;
             }
 
-/* See if major tick marks are required. This is the case if the length of 
-   major tick marks is not zero. */
-            major = ( mjtklen != 0.0 );
-
 /* Store the length in graphics coordinates of minor tick marks. */
             mntklen = astGetMinTickLen( this, axis )*mindim;
-
-/* If the minor tick marks are of zero length, don't draw them. */
-            minor = ( mntklen != 0.0 );
 
 /* Get the edge to be labelled with the axis values. Edge 0 is the left hand 
    edge. Edge 1 is the top edge. Edge 2 is the right-hand edge. Edge 3 is 
@@ -9633,14 +9726,14 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 /* Loop round until all ticks have been done. */
             for( tick = 0; tick < info->nmajor; tick++ ){
 
-/* If ticks are being put at major tick values, draw tick marks at
-   all occurrences of the current major tick value on the selected edge
-   of the plotting area. */
-               if( major ) Ticker( this, edge, axis, *value, gap, mjtklen,
-                                   method, class );
+/* Draw tick marks at all occurrences of the current major tick value on 
+   the selected edge of the plotting area. */
+               Ticker( this, edge, axis, *value, gap, mjtklen,
+                       1, ( ed == 0 ), method, class );
 
-/* If ticks are being put at minor tick values... */
-               if( minor ){
+/* If minor tick mark values were not supplied, calculate them as even
+   intervals between the major tick values. */
+               if( !info->minticks ) {
 
 /* If major ticks are logarithmic, store the difference between minor tick 
    marks. This value will be different for each major tick. Also, since
@@ -9678,13 +9771,11 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
    with index zero, since this corresponds to the position of the major 
    tick mark. */
                      if( i ) Ticker( this, edge, axis, minval, gap, mntklen,
-                                   method, class );
+                                     0, ( ed == 0 ), method, class );
 
 /* Get the axis value at the next minor tick mark. */
                      minval += ( i < 0 ) ? delta2 : delta1;
-   
                   }
-
                }
   
 /* Point to the next major tick value. */
@@ -9692,14 +9783,21 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 
             }
 
+/* If minor tick mark values have been supplied, used them. */
+            if( info->minticks ) {
+               value = info->minticks;
+               for( tick = 0; tick < info->nminor; tick++, value++ ){
+                  Ticker( this, edge, axis, *value, gap, mntklen, 0, 
+                          ( ed == 0 ), method, class );
+               }
+            }
+
 /* Re-establish the original graphical attributes. */
-            GrfAttrs( this, gelid, 0, GRF__LINE, method, class );
+            astGrfAttrs( this, gelid, 0, GRF__LINE, method, class );
 
 /* Set up the id for the next graphical element to be drawn. */
-            gelid = TICKS2_ID;
-
+            gelid = AST__TICKS2_ID;
          } 
-
       }
 
 /* Free the static resources allocated within EdgeCrossings (called
@@ -9718,14 +9816,14 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
       frame = astGetFrame( this, AST__CURRENT );
 
 /* Initialize the id value for graphical element being drawn. */
-      gelid = TICKS1_ID;
+      gelid = AST__TICKS1_ID;
 
 /* Do each axis. */
       for( axis = 0; axis < 2; axis++ ){
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
-         GrfAttrs( this, gelid, 1, GRF__LINE, method, class );
+         astGrfAttrs( this, gelid, 1, GRF__LINE, method, class );
 
 /* Store the length in graphics coordinates of major tick marks for this
    axis. Use a default of zero if a grid has been drawn. */
@@ -9735,15 +9833,8 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
             mjtklen = 0.0;
          }
 
-/* See if major tick marks are required. This is the case if the length of 
-   major tick marks is not zero. */
-         major = ( mjtklen != 0.0 );
-
 /* Store the length in graphics coordinates of minor tick marks. */
          mntklen = astGetMinTickLen( this, axis )*mindim;
-
-/* If the minor tick marks are of zero length, don't draw them. */
-         minor = ( mntklen != 0.0 );
 
 /* Indicate that the tick mark lengths should not be negatated. */
          mjsign = 1.0;
@@ -9763,8 +9854,12 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 
 /* Get the maximum number of tick marks to be drawn on this axis. */
          ntot = 0;
-         if( major ) ntot = info->nmajor;
-         if( minor ) ntot += ( info->nmajor + 1 )*( info->nminor - 1 );
+         ntot = info->nmajor;
+         if( info->minticks ) {
+            ntot += info->nmajor + info->nminor;
+         } else {
+            ntot += ( info->nmajor + 1 )*( info->nminor - 1 );
+         }
 
 /* Pass on to the next axis if no ticks are to be drawn. */
          if( ntot ) {
@@ -9781,53 +9876,99 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 /* Check the pointers can be used. */
             if( astOK ){
 
+/* If the tick values have been supplied using astSetTickValues, just
+   copy them into the above arrays. */
+               if( info->minticks ) {
+
+                  a = ptr1[ axis ];    
+                  b = ptr1[ 1 - axis ];    
+                  majflag = majflags;
+
+                  for( tick = 0; tick <= info->nmajor; tick++ ){
+
+                     val =  info->ticks[ tick ];
+                     if( logticks ) {
+                        diff = val * ( gap[ axis ] - 1.0 );
+                        lblat2 = labelat[ axis ] + 0.2*diff;
+                     } else {
+                        lblat2 = labelat[ axis ] + 0.2*gap[ 1 - axis ];
+                     }
+
+                     *(a++) = val;
+                     *(b++) = labelat[ axis ];
+                     *(a++) = val;
+                     *(b++) = lblat2;
+                     *(majflag++) = 1;
+                  }
+
+                  for( tick = 0; tick <= info->nminor; tick++ ){
+
+                     val =  info->minticks[ tick ];
+                     if( logticks ) {
+                        diff = val * ( gap[ axis ] - 1.0 );
+                        lblat2 = labelat[ axis ] + 0.2*diff;
+                     } else {
+                        lblat2 = labelat[ axis ] + 0.2*gap[ 1 - axis ];
+                     }
+
+                     *(a++) = val;
+                     *(b++) = labelat[ axis ];
+                     *(a++) = val;
+                     *(b++) = lblat2;
+                     *(majflag++) = 0;
+                  }
+
+/* If the tick values were not supplied using astSetTickValues, then we
+   need to calculate the minor tick positions explicitly. */
+               } else {
+
 /* Store pointers to the next point on each axis. "a" always refers to the
    current axis. Also store the value on the other axis at which the tick
    marks starts, and another value on the other axis which is used to
    defined the tick mark directions. */
-               a = ptr1[ axis ];    
-               b = ptr1[ 1 - axis ];    
-               majflag = majflags;
-               lblat = labelat[ axis ];
+                  a = ptr1[ axis ];    
+                  b = ptr1[ 1 - axis ];    
+                  majflag = majflags;
+                  lblat = labelat[ axis ];
 
 /* Store another value on the other axis which is used to defined the tick 
    mark directions, and the difference between minor tick marks. For
    linearly spaced tick marks these values will be the same for all major 
    ticks. Minor ticks are always drawn above the correponding major
    value (i.e. minlo == 1 ) and so we do not need to set delta2. */
-               logticks = astGetLogTicks( this, axis );
-               if( !logticks ) {
-                  lblat2 = labelat[ axis ] + 0.2*gap[ 1 - axis ];
-                  delta1 = gap[ axis  ]/(double)info->nminor;
-               }
+                  logticks = astGetLogTicks( this, axis );
+                  if( !logticks ) {
+                     lblat2 = labelat[ axis ] + 0.2*gap[ 1 - axis ];
+                     delta1 = gap[ axis  ]/(double)info->nminor;
+                  }
 
 /* Store the indicies of the first and last minor tick marks, relative to
    a major tick mark. */
-               minlo = 1;
-               minhi = info->nminor - 1;
+                  minlo = 1;
+                  minhi = info->nminor - 1;
 
 /* Get the axis limits. */
-               axmin = astGetBottom( frame, axis );
-               axmax = astGetTop( frame, axis );
+                  axmin = astGetBottom( frame, axis );
+                  axmax = astGetTop( frame, axis );
 
 /* Loop round until all ticks have been done. We include a hypothetical tick 
    at index -1 (i.e. one gap below the first listed tick value) in order
    to get minor tick marks below the first major tick. But the
    hypothetical major tick value is not included in the list of major tick 
    values to draw. */
-               lasttick = info->nmajor - 1;
-               for( tick = -1; tick <= lasttick; tick++ ){
+                  lasttick = info->nmajor - 1;
+                  for( tick = -1; tick <= lasttick; tick++ ){
 
 /* Get the major tick value. */
-                  if( tick == -1 ) {
-                     if( !logticks ) {
-                        val = (*value) - gap[ axis ];
-                     }else {
-                        val = (*value)/gap[ axis ];
+                     if( tick == -1 ) {
+                        if( !logticks ) {
+                           val = (*value) - gap[ axis ];
+                        }else {
+                           val = (*value)/gap[ axis ];
+                        }
+                     } else {
+                        val = *(value++);
                      }
-                  } else {
-                     val = *(value++);
-                  }
 
 /* Now find the value on the other axis which is used to defined the tick 
    mark directions, and the difference between minor tick marks, in the
@@ -9835,28 +9976,26 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
    different for every major tick. Minor ticks are always drawn above the 
    correponding major value (i.e. minlo == 1 ) and so we do not need to set 
    delta2. */
-                  if( logticks ) {
-                     diff = val * ( gap[ axis ] - 1.0 );
-                     lblat2 = labelat[ axis ] + 0.2*diff;
-                     delta1 = diff / (double)info->nminor;
-                  }
+                     if( logticks ) {
+                        diff = val * ( gap[ axis ] - 1.0 );
+                        lblat2 = labelat[ axis ] + 0.2*diff;
+                        delta1 = diff / (double)info->nminor;
+                     }
 
 /* If major tick marks are required, store the physical coordinates at the 
    start of the major tick mark, and at a point a little way up the major 
    tick mark. */
-                  if( major && tick > -1 ){
-                     *(a++) = val;
-                     *(b++) = lblat;
-                     *(a++) = val;
-                     *(b++) = lblat2;
-                     *(majflag++) = 1;
-                  }
+                     if( tick > -1 ){
+                        *(a++) = val;
+                        *(b++) = lblat;
+                        *(a++) = val;
+                        *(b++) = lblat2;
+                        *(majflag++) = 1;
+                     }
 
-/* If minor tick marks are required, store the points defining the minor tick 
-   marks on either side of this major tick mark. */
-                  if( minor ){
-
-/* Store the axis value at the first minor tick mark. */
+/* Store the points defining the minor tick marks on either side of 
+   this major tick mark. First store the axis value at the first minor 
+   tick mark. */
                      minval = val + minlo*delta1;
 
 /* Loop round all the minor tick marks, storing the physical coordinates
@@ -9873,11 +10012,11 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
                            *(b++) = lblat2;
                            *(majflag++) = 0;
                         }
-
+   
 /* Get the axis value at the next minor tick mark. */
                         minval += delta1;
                      }
-                  } 
+                  }
                }
             }
 
@@ -10015,10 +10154,13 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
                            y1 = y0 + mnsign*mntklen*uy;
                         }
 
-/* Draw the tick mark. */
-                        Bpoly( this, (float) x0, (float) y0, method, class );
-                        Apoly( this, (float) x1, (float) y1, method, class );
-                        Opoly( this, method, class );
+/* Save and draw the tick mark. */
+                        SaveTick( this, axis, x0, y0, *majflag );
+                        if( x0 != x1 || y0 != y1 ) {
+                           Bpoly( this, (float) x0, (float) y0, method, class );
+                           Apoly( this, (float) x1, (float) y1, method, class );
+                           Opoly( this, method, class );
+                        }
                      }
                   }
 
@@ -10035,13 +10177,14 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 /* Annul the PointSets. */
             pset1 = astAnnul( pset1 );
             pset2 = astAnnul( pset2 );
+            pset3 = astAnnul( pset3 );
          }
 
 /* Re-establish the original graphical attributes. */
-         GrfAttrs( this, gelid, 0, GRF__LINE, method, class );
+         astGrfAttrs( this, gelid, 0, GRF__LINE, method, class );
 
 /* Set up the id for the next graphical element to be drawn. */
-         gelid = TICKS2_ID;
+         gelid = AST__TICKS2_ID;
       }
 
 /* Annul the pointers to the Mapping and Frame. */
@@ -10487,14 +10630,14 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
       frame = astGetFrame( this, AST__CURRENT );
 
 /* Initialize the id value for graphical element being drawn. */
-      gelid = NUMLAB1_ID;
+      gelid = AST__NUMLAB1_ID;
 
 /* If required, draw the labels for each axis in turn. */
       for( axis = 0; axis < 2 && ink; axis++ ){
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
-         GrfAttrs( this, gelid, 1, GRF__TEXT, method, class );
+         astGrfAttrs( this, gelid, 1, GRF__TEXT, method, class );
 
 /* Plot them. */
          info = grid[ axis ];
@@ -10502,10 +10645,10 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
                      nedge[ axis ], &box, method, class );
 
 /* Re-establish the original graphical attributes. */
-         GrfAttrs( this, gelid, 0, GRF__TEXT, method, class );
+         astGrfAttrs( this, gelid, 0, GRF__TEXT, method, class );
 
 /* Set up the id for the next graphical element to be drawn. */
-         gelid = NUMLAB2_ID;
+         gelid = AST__NUMLAB2_ID;
 
       }
 
@@ -10718,6 +10861,8 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
       if( pset2 ) pset2 = astAnnul( pset2 );
       if( pset4 ) pset4 = astAnnul( pset4 );
       if( frame ) frame = astAnnul( frame );
+      paxis = -1; 
+      pedge = -1; 
       return 0;
    }
 
@@ -12204,6 +12349,206 @@ static char *FindWord( char *ptr, const char *d, const char **p ) {
    return ret;
 }
 
+static const char *SplitValue( AstPlot *this, const char *value, int axis,
+                               int *split ) {
+/*
+*  Name:
+*     FormatValue
+
+*  Purpose:
+*     Format a coordinate value for a Frame axis.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     static const char *SplitValue( AstPlot *this, const char *value, 
+*                                    int axis, int *split )
+
+*  Class Membership:
+*     Plot member function 
+
+*  Description:
+*     This function splits long formatted values (such as the date/time 
+*     format produced by the TimeFrame class) if possible onto two lines
+*     by inclusion of Plot escape sequences.
+
+*  Parameters:
+*     this
+*        Pointer to the Plot.
+*     value
+*        The formatted coordinate value.
+*     axis
+*        Indicates whether or not short lines should be split by
+*        including a blank first line. If zero, and if "*split" is non-zero, 
+*        then short lines are put onto the second line,and the first line
+*        is blank.
+*     split
+*        Pointer to an integer that controls behaviour:
+*
+*        0 - Split the line if it is too long, and return a value of +1
+*            in *split.
+*        1 - Split the line even if it does not need splitting, making
+*            the first line blank and the second line containing all the 
+*            supplied text (*split is unchanged on exit).
+
+*  Returned Value:
+*     A pointer to a static buffer containing a null-terminated string 
+*     holding the (possibly split) formatted value. This will be a copy of
+*     the supplied pointer if the string does not need to be split.
+
+*  Notes:
+*     -  A NULL pointer will be returned if this function is invoked with the
+*     global error status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   char *d;    
+   const char *result;    
+   float rsp;         
+   int aft_end;
+   int aft_start;
+   int bef_end;
+   int bef_start;
+   int i;
+   int id;
+   int idmin;
+   int imin;
+   int l;
+   int naft;
+   int nbef;
+   int nlong;
+   int nshort;
+   int nsp;       
+   static char buf[ 200 ];
+
+/* Initialise */
+   result = value;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Do nothing more if the formatted value already contains graphical
+   escape sequences, or if graphical escapes sequences are not being
+   interpreted. */
+   if( value && astGetEscape( this ) && !HasEscapes( value ) ) {
+
+/* We split the line if the line is long or if *split was non-zero on
+   entry. In this case always return *split equal to 1. */
+      l = strlen( value );
+      if( *split || l > 9 ) {
+         *split = 1;
+
+/* Find a space close to the centre of the formatted string. */
+         idmin = 2*l;
+         imin = -1;
+         for( i = 0; i < l; i++ ) {
+            if( isspace( value[ i ] ) ) {
+               id = abs( i - l/2 );
+               if( id < idmin ) {
+                  idmin = id;
+                  imin = i;
+               }
+            }
+         }
+
+/* Initialse the pointer into the returned buffer at which the next
+   character will be placed. */
+         d = buf;
+
+/* If no spaces were found... */
+         if( imin == -1 ) {
+
+/*  If axis is zero, we add a blank first line. */
+            if( axis == 0 ) {
+
+/* Fill the first line with spaces. */
+               for( i = 0; i < l; i++ ) *(d++) = ' ';
+
+/* Add an escape sequence that moves down by one character height. */
+               d += sprintf( d, "%%v170+" );
+            }
+
+/* Add the whole of the supplied text. */
+            for( i = 0; i < l; i++ ) *(d++) = value[ i ];
+   
+/* If a space was found... */
+         } else {
+
+/* Find the first and last non-blank characters before the mid-space. */
+            bef_start = -1;
+            bef_end = -1;
+            for( i = 0; i < imin; i++ ) {
+               if( !isspace( value[ i ] ) ) {
+                  if( bef_start == -1 ) bef_start = i;
+                  bef_end = i;
+               }
+            }
+
+/* Find the first and last non-blank characters after the mid-space. */
+            aft_start = -1;
+            aft_end = -1;
+            for( i = imin + 1; i < l; i++ ) {
+               if( !isspace( value[ i ] ) ) {
+                  if( aft_start == -1 ) aft_start = i;
+                  aft_end = i;
+               }
+            }
+
+/* How many significant characters before and after the space? */
+            nbef = bef_end - bef_start + 1;
+            naft = aft_end - aft_start + 1;
+
+/* Get the lengths of the longer and shorter line. */
+            if( nbef > naft ) {
+               nlong = nbef;
+               nshort = naft;
+            } else {
+               nlong = naft;
+               nshort = nbef;
+            }
+
+/* Find the fractional number of spaces before the significant text of the 
+   shorter line.*/
+            rsp = 0.5*( nlong - nshort + 1 );
+  
+/* If the top line is the shorter line, put some spaces in at the start. */
+            if( nbef < naft ) {
+               nsp = (int) rsp;
+               for( i = 0; i < nsp; i++ ) *(d++) = ' ';
+            }
+
+/* Add the significant text from the top line. */
+            for( i = bef_start; i <= bef_end; i++ ) *(d++) = value[ i ];
+
+/* Add an escape sequence that moves down by one character height. */
+            d += sprintf( d, "%%v100+" );
+
+
+/* Add an escape sequence that moves to the left by the required amount. */
+            d += sprintf( d, "%%<%d+", (int) ( 60.0*( (float) nlong - rsp )) );
+
+/* Add the significant text from the bottom line. */
+            for( i = aft_start; i <= aft_end; i++ ) *(d++) = value[ i ];
+
+         }
+
+/* Terminate it. */
+         *d = 0;         
+
+/* Return a pointer to the buffer. */
+         result = buf;         
+      }
+   }
+
+/* If an error occurred, clear the returned value. */
+   if ( !astOK ) result = NULL;
+
+/* Return the result. */
+   return result;
+}
+
 static AstFrameSet *Fset2D( AstFrameSet *fset, int ifrm ) {
 /*
 *  Name:
@@ -12534,6 +12879,106 @@ static void GAttr( AstPlot *this, int attr, double value, double *old_value,
 
 }
 
+static AstKeyMap *GetGrfContext( AstPlot *this ){
+/*
+*++
+*  Name:
+c     astGetGrfContext
+f     AST_GETGRFCONTEXT
+
+*  Purpose:
+*     Return the KeyMap that describes a Plot's graphics context.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "plot.h"
+c     AstKeyMap *astGetGrfContext( AstPlot *this )
+f     RESULT = AST_GETGRFCONTEXT( THIS, STATUS )
+
+*  Class Membership:
+*     Plot method.
+
+*  Description:
+c     This function 
+f     This routine 
+*     returns a reference to a KeyMap that will be passed to any drawing
+c     functions registered using astGrfSet.
+f     routines registered using AST_GRFSET.
+*     This KeyMap can be used by an application to pass information to
+c     the drawing functions
+f     the drawing routines 
+*     about the context in which they are being called. The contents of
+*     the KeyMap are never accessed byt the Plot class itself.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Plot.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astGetGrfContext()
+f     AST_GETGRFCONTEXT = INTEGER
+*        A pointer to the graphics context KeyMap. The returned pointer
+*        should be annulled when it is no longer needed.
+
+*--
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Ensure that a grfcon KeyMap exists. */
+   (void) astGrfConID(this);
+
+/* Return a cloned pointer to the KeyMap. */
+   return astClone( this->grfcontext );
+}
+
+AstKeyMap *astGrfConID_( AstPlot *this ) {
+/*
+*+
+*
+*  Name:
+*     astGrfConID
+
+*  Purpose:
+*     Ensure a GrfContext KeyMap exists and return an ID for it.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     AstKeyMap *astGrfConID( AstPlot *this ) 
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function creates a GrfContext KeyMap if the Plot does not
+*     currently have one, and returns an ID for it.
+
+*  Parameters:
+*     this
+*        The Plot.
+
+*  Returned Value:
+*     ID for the GrfContext KeyMap.
+
+*-
+*/
+   if( !this->grfcontext ) {
+      this->grfcontext = astKeyMap("");
+      this->grfcontextID = astMakeId( astClone( this->grfcontext ) );
+      astExempt( this->grfcontextID );
+   }
+   return this->grfcontextID;
+}
+
 static void GScales( AstPlot *this, float *alpha, float *beta,
                       const char *method, const char *class ) {
 /*
@@ -12781,7 +13226,7 @@ f        The global status.
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
-      GrfAttrs( this, CURVE_ID, 1, GRF__LINE, method, class );
+      astGrfAttrs( this, AST__CURVE_ID, 1, GRF__LINE, method, class );
 
 /* Set up the externals used to communicate with the Map4 function... */
       Map4_ncoord = astGetNout( this );
@@ -12861,7 +13306,7 @@ f        The global status.
       Map4_map = astAnnul( Map4_map );
 
 /* Re-establish the original graphical attributes. */
-      GrfAttrs( this, CURVE_ID, 0, GRF__LINE, method, class );
+      astGrfAttrs( this, AST__CURVE_ID, 0, GRF__LINE, method, class );
 
    }
 
@@ -13568,6 +14013,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    int axis;                     /* Axis number */
    int ival;                     /* Int attribute value */
    int len;                      /* Length of attrib string */
+   int nax;                      /* Number of base Frame axes */
    int nc;                       /* No. characters read by astSscanf */
    static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
@@ -13582,6 +14028,9 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Obtain the length of the attrib string. */
    len = strlen( attrib );
+
+/* Get the number of base Frame axis (2 for a Plot, 3 for a Plot3D). */
+   nax = astGetNin( this );
 
 /* Indicate that the current bound box should not be changed during the
    execution of this function (this may happen if a grid is drawn to get
@@ -13997,7 +14446,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Style. */
 /* ------ */
    } else if ( !strcmp( attrib, "style" ) ) {
-      ival = GetUseStyle( this, BORDER_ID );
+      ival = GetUseStyle( this, AST__BORDER_ID );
       if ( astOK ) {
          (void) sprintf( buff, "%d", ival );
          result = buff;
@@ -14017,7 +14466,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Font. */
 /* ----- */
    } else if ( !strcmp( attrib, "font" ) ) {
-      ival = GetUseFont( this, TEXTLABS_ID );
+      ival = GetUseFont( this, AST__TEXTLABS_ID );
       if ( astOK ) {
          (void) sprintf( buff, "%d", ival );
          result = buff;
@@ -14037,7 +14486,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Colour. */
 /* ------- */
    } else if ( !strcmp( attrib, "colour" ) ) {
-      ival = GetUseColour( this, TEXTLABS_ID );
+      ival = GetUseColour( this, AST__TEXTLABS_ID );
       if ( astOK ) {
          (void) sprintf( buff, "%d", ival );
          result = buff;
@@ -14057,7 +14506,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Color. */
 /* ------ */
    } else if ( !strcmp( attrib, "color" ) ) {
-      ival = GetUseColour( this, TEXTLABS_ID );
+      ival = GetUseColour( this, AST__TEXTLABS_ID );
       if ( astOK ) {
          (void) sprintf( buff, "%d", ival );
          result = buff;
@@ -14077,7 +14526,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Width. */
 /* ------ */
    } else if ( !strcmp( attrib, "width" ) ) {
-      dval = GetUseWidth( this, BORDER_ID );
+      dval = GetUseWidth( this, AST__BORDER_ID );
       if ( astOK ) {
          (void) sprintf( buff, "%.*g", DBL_DIG, dval );
          result = buff;
@@ -14098,7 +14547,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Size. */
 /* ----- */
    } else if ( !strcmp( attrib, "size" ) ) {
-      dval = GetUseSize( this, TEXTLABS_ID );
+      dval = GetUseSize( this, AST__TEXTLABS_ID );
       if ( astOK ) {
          (void) sprintf( buff, "%.*g", DBL_DIG, dval );
          result = buff;
@@ -14209,9 +14658,92 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 #undef BUFF_LEN
 }
 
+static AstPointSet *GetDrawnTicks( AstPlot *this, int axis, int major ){
+/*
+*+
+*  Name:
+*     astGetDrawnTicks
+
+*  Purpose:
+*     Return information about the ticks last drawn by astGrid.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     AstPointSet *GetDrawnTicks( AstPlot *this, int axis, int major )
+
+*  Class Membership:
+*     Plot method.
+
+*  Description:
+*     This function returns a PointSet holding information about the
+*     tick marks (either major and minor) that were drawn by the previous
+*     invocation of astGrid. A NULL pointer is returned if astGrid has
+*     not yet been invoked.
+
+*  Parameters:
+*     this
+*        Pointer to a Plot.
+*     axis
+*        The zero-based axis of the axis for which tick mark information
+*        is required.
+*     major
+*        Supply a non-zero value if information about the major tick
+*        marks is to be returned, and zero if information about the minor
+*        tick marks is to be returned.
+
+*  Returned Value:
+*     A pointSet with one point for every tick of the requested type drawn 
+*     by astGrid for the specified axis. Each point has 2 coordinate values, 
+*     being the graphics coordinates at the start of the tick mark. The 
+*     returned PointSet pointer should be annulled when no longer needed.
+
+*-
+*/
+
+/* Local Variables: */
+   AstPointSet *result = NULL;
+   double *ptr[ 3 ];
+   int n;
+
+/* Check the global status. */
+   if( !astOK ) return result;
+
+/* Report an error if the supplied axis value is incorrect. */
+   if( axis < 0 || axis > 1 ) {
+      astError( AST__INTER, "astGetDrawnTicks(Plot): Supplied \"axis\" "
+                "value is %d - should 0 or 1 (internal AST programming "
+                "error).", axis );
+      n = 0;
+
+/* If OK, get the number of stored tick marks. */
+   } else {
+      n = major ? this->majtickcount[ axis ] : this->mintickcount[ axis ]; 
+   }
+
+/* Check that information is available. */
+   if( n > 0 && astOK ) {
+
+/* Create a PointSet with the required size. */
+      result = astPointSet( n, 2, "" );
+
+/* Store pointers to the arrays within the Plot that hold the required
+   tick marks positions and types. */
+      ptr[ 0 ] = major ? this->majtickgx[ axis ] : this->mintickgx[ axis ];
+      ptr[ 1 ] = major ? this->majtickgy[ axis ] : this->mintickgy[ axis ];
+      astSetPoints( result, ptr );
+   }
+
+/* Return the PointSet. */
+   return result;
+}
+
 static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks, 
-                        int *nmajor, int *nminor, int format_set, int *inval, 
-                        double *refval, const char *method, const char *class ){
+                        int *nmajor, double **minticks, int *nminor, 
+                        int format_set, int *inval, double *refval, 
+                        const char *method, const char *class ){
 /*
 *  Name:
 *     GetTicks
@@ -14225,8 +14757,8 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
 
 *  Synopsis:
 *     #include "plot.h"
-*     double GetTicks( AstPlot *this, int axis, double *cen, 
-*                      double **ticks, int *nmajor, int *nminor, 
+*     double GetTicks( AstPlot *this, int axis, double *cen, double **ticks, 
+*                      int *nmajor, double **minticks, int *nminor, 
 *                      int format_set, int *inval, double *refval, 
 *                      const char *method, const char *class )
 
@@ -14243,6 +14775,11 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
 *     logarithmic ticks) supplied, the specified value is returned, and used
 *     to determine the tick values. If no gap size is supplied, a default
 *     gap size is used and returned.
+*
+*     All this is over-ridden if the astSetTickValues method has been
+*     called to store explicit tick mark values in the Plot structure.
+*     In this case, the values supplied using astSetTickValues are
+*     returned.
 
 *  Parameters:
 *     this
@@ -14257,16 +14794,31 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
 *        is returned.
 *     ticks
 *        Pointer to a place at which to return a pointer to the memory in 
-*        which are stored the tick values to be used. This pointer should be 
-*        freed using astFree when no longer needed. The number of values in
-*        the array is given by the value returned by parameter "nmajor".
+*        which are stored the major tick values to be used. This pointer 
+*        should be freed using astFree when no longer needed. The number of 
+*        values in the array is given by the value returned by parameter
+*        "nmajor".
 *     nmajor
 *        A pointer to a location at which to return the number of major
 *        ticks.
+*     minticks
+*        Pointer to a place at which to return a pointer to the memory in 
+*        which are stored the minor tick values to be used. This pointer 
+*        should be freed using astFree when no longer needed. The number of 
+*        values in the array is given by the value returned by parameter
+*        "nminor". The minor tick marks values returned in this array are
+*        the ones stored in the Plot via a call to the astSetTickValues 
+*        function. If this function has not been called, then a NULL
+*        pointer is returned, and the "nminor" value is returned holding the
+*        number of divisions between major ticks.
 *     nminor
-*        A pointer to a location at which to return the number of division
-*        into which each gap should be divided when drawing minor tick marks.
-*        This is one more than the number of minor tick marks.
+*        A pointer to a location at which to return either the number of 
+*        division into which each gap should be divided when drawing minor 
+*        tick marks (if "*minticks" is returned holding NULL), or the
+*        total number of minor tick values stored in "*minticks" (if
+*        "*minticks" is returned non-NULL). The number of divisions
+*        between major tick values is one more than the number of minor 
+*        tick marks.
 *     format_set
 *        Indicates if an explicit format has been set for the axis. If
 *        not, "cen" is always assumed to be AST__BAD, and any specified 
@@ -14341,6 +14893,7 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
 
 /* Initialise the returned information. */
    *ticks = NULL;
+   *minticks = NULL;
    *nmajor = 0;
    *nminor = 0;
 
@@ -14398,6 +14951,36 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
       }
    }
 
+/* Return the flag indicating if any regions of invalid physical coordinates 
+   were found. */
+   *inval = bad;
+
+/* Return the typical value on the other axis. */
+   *refval = typval[ 1 - axis ];
+
+/* See if any tick marks values have been stored in the Plot structure
+   using astSetTickValues. If so, copy the tick mark values to the
+   returned arrays and exit with a gap size determined by the first two
+   ticks. */
+   if( this->nmajtickval[ axis ] > 0 ) {
+      *ticks = astStore( NULL, this->majtickval[ axis ],
+                         this->nmajtickval[ axis ]*sizeof(double) );
+      *minticks = astStore( NULL, this->mintickval[ axis ],
+                         this->nmintickval[ axis ]*sizeof(double) );
+      *nmajor = this->nmajtickval[ axis ];
+      *nminor = this->nmintickval[ axis ];
+
+      if( *nmajor > 1 && (*ticks)[ 0 ] != AST__BAD &&
+                         (*ticks)[ 1 ] != AST__BAD ) {
+         used_gap = fabs( (*ticks)[ 1 ] - (*ticks)[ 0 ] );
+      } else {
+         used_gap = AST__BAD;
+      }
+
+      return used_gap;
+
+   }
+
 /* See if the user has specified a gap size. The default for astGetLogTicks is 
    determined in DefGaps, so we can now decide whether to use attribute Gap 
    or LogGap to get the user-supplied gap size. Obtain the requested gap 
@@ -14407,13 +14990,6 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
    } else {
       gap = astGetGap( this, axis );
    }
-
-/* Return the flag indicating if any regions of invalid physical coordinates 
-   were found. */
-   *inval = bad;
-
-/* Return the typical value on the other axis. */
-   *refval = typval[ 1 - axis ];
 
 /* Find the maximum and minimum value in the plotting area. DefGap will
    have reported an error if minv*maxv is negative or zero. */
@@ -15390,12 +15966,15 @@ c     the astPlot call which created the Plot.
 *
 c     The first parameter ("grfcon")
 f     The first argument (GRFCON)
-*     for each function is an AST Object pointer that can be used by the
+*     for each function is an AST KeyMap pointer that can be used by the
 *     called function to establish the context in which it is being called.
-*     The Object to pass to the drawing routines should be registered
-*     with the Plot by calling the
-f     AST_SETGRFCONTEXT routine.
-c     astSetGRFContext function.
+*     The contents of the KeyMap are determined by the calling
+*     application, which should obtain a pointer to the KeyMap using the
+f     AST_GETGRFCONTEXT routine,
+c     astGetGRFContext function,
+*     and then store any necessary information in the KeyMap using the
+*     methods of the KeyMap class. Note, the functions listed below
+*     should never annul or delete the supplied KeyMap pointer.
 
 *  Attr:
 *     The "Attr" function returns the current value of a specified graphics
@@ -15408,9 +15987,7 @@ f     INTEGER FUNCTION ATTR( GRFCON, ATT, VAL, OLDVAL, PRIM )
 *
 c     - grfcon - 
 f     - GRFCON = INTEGER (Given) -
-*       An Object previously registered with the Plot using 
-c       astSetGrfContext. Or NULL if no Object has been registered.
-f       AST_SETGRFCONTEXT. Or AST__NULL if no Object has been registered.
+*       A KeyMap containing information passed from the calling application.
 c     - attr - An integer value identifying the required attribute. 
 c       The following symbolic values are defined in grf.h:
 f     - ATT = INTEGER (Given) - An integer identifying the required attribute. 
@@ -15446,9 +16023,7 @@ f     INTEGER FUNCTION CAP( GRFCON, CAP, VALUE )
 *
 c     - grfcon - 
 f     - GRFCON = INTEGER (Given) -
-*       An Object previously registered with the Plot using 
-c       astSetGrfContext. Or NULL if no Object has been registered.
-f       AST_SETGRFCONTEXT. Or AST__NULL if no Object has been registered.
+*       A KeyMap containing information passed from the calling application.
 c     - cap - 
 f     - CAP = INTEGER (Given)
 *        The capability being inquired about. This will be one of the
@@ -15511,9 +16086,7 @@ f     INTEGER FUNCTION FLUSH( GRFCON )
 *
 c     - grfcon - 
 f     - GRFCON = INTEGER (Given) -
-*       An Object previously registered with the Plot using 
-c       astSetGrfContext. Or NULL if no Object has been registered.
-f       AST_SETGRFCONTEXT. Or AST__NULL if no Object has been registered.
+*       A KeyMap containing information passed from the calling application.
 
 *  Line:
 *     The "Line" function displays lines joining the given positions and 
@@ -15524,9 +16097,7 @@ f     INTEGER FUNCTION LINE( GRFCON, N, X, Y )
 *
 c     - grfcon - 
 f     - GRFCON = INTEGER (Given) -
-*       An Object previously registered with the Plot using 
-c       astSetGrfContext. Or NULL if no Object has been registered.
-f       AST_SETGRFCONTEXT. Or AST__NULL if no Object has been registered.
+*       A KeyMap containing information passed from the calling application.
 c     - n - The number of positions to be joined together.
 f     - N = INTEGER (Given) - The number of positions to be joined together.
 c     - x - A pointer to an array holding the "n" x values.
@@ -15543,9 +16114,7 @@ f     INTEGER FUNCTION MARK( GRFCON, N, X, Y, TYPE )
 *
 c     - grfcon - 
 f     - GRFCON = INTEGER (Given) -
-*       An Object previously registered with the Plot using 
-c       astSetGrfContext. Or NULL if no Object has been registered.
-f       AST_SETGRFCONTEXT. Or AST__NULL if no Object has been registered.
+*       A KeyMap containing information passed from the calling application.
 c     - n - The number of positions to be marked.
 f     - N = INTEGER (Given) - The number of positions to be marked.
 c     - x - A pointer to an array holding the "n" x values.
@@ -15567,9 +16136,7 @@ f     INTEGER FUNCTION QCH( GRFCON, CHV, CHH )
 *
 c     - grfcon - 
 f     - GRFCON = INTEGER (Given) -
-*       An Object previously registered with the Plot using 
-c       astSetGrfContext. Or NULL if no Object has been registered.
-f       AST_SETGRFCONTEXT. Or AST__NULL if no Object has been registered.
+*       A KeyMap containing information passed from the calling application.
 c     - chv - A pointer to the float which is to receive the height of
 f     - CHV = REAL (Returned) The height of
 *     characters drawn with a vertical baseline. This will be an 
@@ -15592,9 +16159,7 @@ f     INTEGER FUNCTION SCALES( GRFCON, ALPHA, BETA )
 *
 c     - grfcon - 
 f     - GRFCON = INTEGER (Given) -
-*       An Object previously registered with the Plot using 
-c       astSetGrfContext. Or NULL if no Object has been registered.
-f       AST_SETGRFCONTEXT. Or AST__NULL if no Object has been registered.
+*       A KeyMap containing information passed from the calling application.
 c     - alpha - A pointer to the float which is to receive the
 f     - ALPHA = REAL (Returned) The 
 *     scale for the X axis (i.e. Xnorm = alpha*Xworld).
@@ -15613,9 +16178,7 @@ f     INTEGER FUNCTION TEXT( GRFCON, TEXT, X, Y, JUST, UPX, UPY )
 *
 c     - grfcon - 
 f     - GRFCON = INTEGER (Given) -
-*       An Object previously registered with the Plot using 
-c       astSetGrfContext. Or NULL if no Object has been registered.
-f       AST_SETGRFCONTEXT. Or AST__NULL if no Object has been registered.
+*       A KeyMap containing information passed from the calling application.
 c     - text - Pointer to a null-terminated character string to be displayed.
 f     - TEXT = CHARACTER * ( * ) (Given) - The string to be displayed.
 c     - x - The reference x coordinate.
@@ -15658,9 +16221,7 @@ f     INTEGER FUNCTION TXEXT( GRFCON, TEXT, X, Y, JUST, UPX, UPY, XB, YB )
 *
 c     - grfcon - 
 f     - GRFCON = INTEGER (Given) -
-*       An Object previously registered with the Plot using 
-c       astSetGrfContext. Or NULL if no Object has been registered.
-f       AST_SETGRFCONTEXT. Or AST__NULL if no Object has been registered.
+*       A KeyMap containing information passed from the calling application.
 c     - text - Pointer to a null-terminated character string to be displayed.
 f     - TEXT = CHARACTER * ( * ) (Given) - The string to be displayed.
 c     - x - The reference x coordinate.
@@ -15806,7 +16367,7 @@ int astGrfFunID_( const char *name, const char *method, const char *class ) {
                     "Grf function name (programming error)", method, class );
 }
 
-static char *GrfItem( int item, const char *text ){
+static char *GrfItem( int item, const char *text, int *axis ){
 /*
 *  Name:
 *     GrfItem
@@ -15820,7 +16381,7 @@ static char *GrfItem( int item, const char *text ){
 
 *  Synopsis:
 *     #include "plot.h"
-*     char *GrfItem( int item, const char *text )
+*     char *GrfItem( int item, const char *text, int *axis )
 
 *  Class Membership:
 *     Plot member function.
@@ -15835,6 +16396,10 @@ static char *GrfItem( int item, const char *text ){
 *     text
 *        A pointer to a string which will be appended to the textual
 *        description of the graphical item. May be NULL.
+*     axis
+*        Pointer to a place in which to return the index (0,1, or 2) of
+*        the axis to which the attribute refers, If the attribute does
+*        not refer to a specific axis, -1 is returned.
 
 *  Returned Value:
 *     A pointer to a dynamically allocated string holding the textual 
@@ -15855,62 +16420,94 @@ static char *GrfItem( int item, const char *text ){
    char *ret;               /* Pointer to the returned string */
    int dlen;                /* Length of the item description */
 
-   if( item == BORDER_ID ) {         
+   if( axis ) *axis = -1;
+
+   if( item == AST__BORDER_ID ) {         
       desc = "Border";
 
-   } else if ( item == GRIDLINE_ID ) {     
+   } else if ( item == AST__GRIDLINE_ID ) {     
       desc = "Gridline";
 
-   } else if ( item == GRIDLINE1_ID ) {     
+   } else if ( item == AST__GRIDLINE1_ID ) {     
       desc = "Axis 1 gridline";
+      if( axis ) *axis = 0;
 
-   } else if ( item == GRIDLINE2_ID ) {     
+   } else if ( item == AST__GRIDLINE2_ID ) {     
       desc = "Axis 2 gridline";
+      if( axis ) *axis = 1;
 
-   } else if ( item == CURVE_ID ) {        
+   } else if ( item == AST__GRIDLINE3_ID ) {     
+      desc = "Axis 3 gridline";
+      if( axis ) *axis = 2;
+
+   } else if ( item == AST__CURVE_ID ) {        
       desc = "Curve";
 
-   } else if ( item == NUMLABS_ID ) {      
+   } else if ( item == AST__NUMLABS_ID ) {      
       desc = "Numerical labels";
 
-   } else if ( item == TEXTLABS_ID ) {     
+   } else if ( item == AST__TEXTLABS_ID ) {     
       desc = "Textual labels";
 
-   } else if ( item == TITLE_ID ) {        
+   } else if ( item == AST__TITLE_ID ) {        
       desc = "Title";
 
-   } else if ( item == MARKS_ID ) {        
+   } else if ( item == AST__MARKS_ID ) {        
       desc = "Markers";
 
-   } else if ( item == TEXT_ID ) {         
+   } else if ( item == AST__TEXT_ID ) {         
       desc = "Text string";
 
-   } else if ( item == TICKS_ID ) {        
+   } else if ( item == AST__TICKS_ID ) {        
       desc = "Major and minor ticks";
 
-   } else if ( item == AXIS1_ID ) {         
+   } else if ( item == AST__AXIS1_ID ) {         
       desc = "Axis 1";
+      if( axis ) *axis = 0;
 
-   } else if ( item == AXIS2_ID ) {         
+   } else if ( item == AST__AXIS2_ID ) {         
       desc = "Axis 2";
+      if( axis ) *axis = 1;
 
-   } else if ( item == NUMLAB1_ID ) {         
+   } else if ( item == AST__AXIS3_ID ) {         
+      desc = "Axis 3";
+      if( axis ) *axis = 2;
+
+   } else if ( item == AST__NUMLAB1_ID ) {         
       desc = "Axis 1 numerical labels";
+      if( axis ) *axis = 0;
 
-   } else if ( item == NUMLAB2_ID ) {         
+   } else if ( item == AST__NUMLAB2_ID ) {         
       desc = "Axis 2 numerical labels";
+      if( axis ) *axis = 1;
 
-   } else if ( item == TEXTLAB1_ID ) {         
+   } else if ( item == AST__NUMLAB3_ID ) {         
+      desc = "Axis 3 numerical labels";
+      if( axis ) *axis = 2;
+
+   } else if ( item == AST__TEXTLAB1_ID ) {         
       desc = "Axis 1 textual label";
+      if( axis ) *axis = 0;
 
-   } else if ( item == TEXTLAB2_ID ) {         
+   } else if ( item == AST__TEXTLAB2_ID ) {         
       desc = "Axis 2 textual label";
+      if( axis ) *axis = 1;
 
-   } else if ( item == TICKS1_ID ) {         
+   } else if ( item == AST__TEXTLAB3_ID ) {         
+      desc = "Axis 3 textual label";
+      if( axis ) *axis = 2;
+
+   } else if ( item == AST__TICKS1_ID ) {         
       desc = "Axis 1 tick marks";
+      if( axis ) *axis = 0;
 
-   } else if ( item == TICKS2_ID ) {         
+   } else if ( item == AST__TICKS2_ID ) {         
       desc = "Axis 2 tick marks";
+      if( axis ) *axis = 1;
+
+   } else if ( item == AST__TICKS3_ID ) {         
+      desc = "Axis 3 tick marks";
+      if( axis ) *axis = 2;
 
    } else {
       desc = NULL;
@@ -16050,8 +16647,8 @@ f     CALL AST_GRID( THIS, STATUS )
 *     Plot method.
 
 *  Description:
-c     This function draws a complete annotated set of 2-dimensional
-f     This routine draws a complete annotated set of 2-dimensional 
+c     This function draws a complete annotated set of 
+f     This routine draws a complete annotated set of 
 *     coordinate axes for a Plot with (optionally) a coordinate grid
 *     superimposed. Details of the axes and grid can be controlled by
 *     setting values for the various attributes defined by the Plot
@@ -16065,8 +16662,14 @@ f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
 *  Notes:
+*     - If the supplied Plot is a Plot3D, the axes will be annotated
+*     using three 2-dimensional Plots, one for each 2D plane in the 3D 
+*     current coordinate system. The plots will be "pasted" onto 3 faces
+*     of the cuboid graphics volume specified when the Plot3D was
+*     constructed. The faces to be used can be controlled by the "RootCorner"
+*     attribute.
 *     - An error results if either the current Frame or the base Frame
-*     of the Plot is not 2-dimensional.
+*     of the Plot is not 2-dimensional or (for a Plot3D) 3-dimensional.
 *     - An error also results if the transformation between the base
 *     and current Frames of the Plot is not defined in either
 *     direction (i.e. the Plot's TranForward or TranInverse attribute
@@ -16305,7 +16908,17 @@ f        The global status.
       SetUsedEdge( this_nd, axis, astGetEdge( this, axis ) );
       SetUsedLabelAt( this_nd, axis, labelat[ axis ] );
       SetUsedLabelUnits( this_nd, axis, dounits[ axis ] );
-      SetUsedMinTick( this_nd, axis, grid[ axis ]->nminor );
+
+/* If explicit minor tick values were supplied using astSetTickValues,
+   then set MinTick to the average number of minor tick divisions per major
+   tick division. */
+      if( grid[ axis ]->minticks ) {
+         SetUsedMinTick( this_nd, axis, 
+                         ( grid[ axis ]->nminor + grid[ axis ]->nmajor )/
+                         ( grid[ axis ]->nmajor - 1 ) );
+      } else {
+         SetUsedMinTick( this_nd, axis, grid[ axis ]->nminor );
+      }
 
       if( astTestTextLab( this, axis ) ) {
          SetUsedTextLab( this_nd, axis, astGetTextLab( this, axis ) );
@@ -16741,20 +17354,21 @@ static TickInfo **GridLines( AstPlot *this, double *cen, double *gap,
 
 }
 
-void GrfAttrs( AstPlot *this, int id, int set, int prim, const char *method, const char *class ){
+void astGrfAttrs_( AstPlot *this, int id, int set, int prim, const char *method, const char *class ){
 /*
+*+
 *  Name:
-*     GrfAttrs
+*     astGrfAttrs
 
 *  Purpose:
 *     Establish values for the graphics attributes for a given object.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "plot.h"
-*     void GrfAttrs( AstPlot *this, int id, int set, int prim, const char *method, const char *class )
+*     void astGrfAttrs( AstPlot *this, int id, int set, int prim, const char *method, const char *class )
 
 *  Class Membership:
 *     Plot member function.
@@ -16798,7 +17412,7 @@ void GrfAttrs( AstPlot *this, int id, int set, int prim, const char *method, con
 *     first call and set=0 on the second call. 
 *     -  If a pair of calls is nested within another pair of calls, the
 *     inner pair has no effect.
-
+*-
 */
 
 /* Local Variables: */
@@ -17253,7 +17867,7 @@ static int HasEscapes( const char *text ) {
    return result;
 }
 
-static int IdFind( int id, int *id1, int *id2 ) {
+static int IdFind( int id, int nax, int *id1, int *id2, int *id3 ) {
 /*
 *  Name:
 *     IdFind
@@ -17266,24 +17880,24 @@ static int IdFind( int id, int *id1, int *id2 ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     int IdFind( int id, int *id1, int *id2  )
+*     int IdFind( int id, int nax, int *id1, int *id2, int *id3  )
 
 *  Class Membership:
 *     Plot member function.
 
 *  Description:
 *     The supplied integer should be a numerical identifier for a
-*     graphical element of a plot (MARKS_ID, CURVES_ID, etc), or a
+*     graphical element of a plot (AST__MARKS_ID, AST__CURVES_ID, etc), or a
 *     "psuedo-identifier" which represents two other genuine identifiers. 
 *     If the supplied value is a genuine identifier then it is returned 
 *     in *id1, and *id2 is returned equal to -1. If the supplied value 
 *     is a pseudo-identifier then the two corresponding genuine
 *     identifiers are returned in *id1 and *id2
 
-*     For instance, if "id" is AXIS1_ID (a genuine id), then *id1 is 
-*     returned equal to AXIS1_ID and *id2 is returned equal to -1. If 
-*     "id" is AXES_ID (a pseudo-identifier), then *id1 is returned equal
-*     to AXIS1_ID and *id2 is returned equal to AXIS2_ID.
+*     For instance, if "id" is AST__AXIS1_ID (a genuine id), then *id1 is 
+*     returned equal to AST__AXIS1_ID and *id2 is returned equal to -1. If 
+*     "id" is AST__AXES_ID (a pseudo-identifier), then *id1 is returned equal
+*     to AST__AXIS1_ID and *id2 is returned equal to AST__AXIS2_ID.
 
 *     Genuine identifiers all have values which are less than the value 
 *     of AST__NPID. Pseudo-identifiers have values which are greater than 
@@ -17292,6 +17906,8 @@ static int IdFind( int id, int *id1, int *id2 ) {
 *  Parameters:
 *     id
 *        The supplied identifier (genuine or pseudo).
+*     nax
+*        The number of axes spanning graphics space (2 or 3).
 *     id1
 *        Pointer to the int at which to return the first genuine
 *        identifier corresponding to "id".
@@ -17299,10 +17915,14 @@ static int IdFind( int id, int *id1, int *id2 ) {
 *        Pointer to the int at which to return the second genuine
 *        identifier corresponding to "id" (or -1 if "id" is a genuine
 *        identifier).
+*     id3
+*        Pointer to the int at which to return the third genuine
+*        identifier corresponding to "id" (or -1 if "id" has no third 
+*        genuine identifier).
 
 *  Returned Value:
-*     One is returned if the supplied identifier is a pseudo-identifier,
-*     and zero otherwise.
+*     The number of genuine identifiers corresponding to the supplied
+*     (possibly Pseudo-) identifier. This will be in the range 1 to 3.
 
 */
 
@@ -17312,36 +17932,45 @@ static int IdFind( int id, int *id1, int *id2 ) {
 /* Initialise returned values. */
    *id1 = id;
    *id2 = -1;
+   *id3 = -1;
    ret = 0;
 
 /* Check the local error status. */
    if ( !astOK ) return ret;
 
+/* Assume a genuine identifier was supplied. */
+   ret = 1;
+
 /* Check against all known pseudo-identifier. */
-   if( id == AXES_ID ) {
-      ret = 1;
-      *id1 = AXIS1_ID;
-      *id2 = AXIS2_ID;
+   if( id == AST__AXES_ID ) {
+      ret = nax;
+      *id1 = AST__AXIS1_ID;
+      *id2 = AST__AXIS2_ID;
+      if( nax == 3 ) *id3 = AST__AXIS3_ID;
 
-   } else if( id == GRIDLINE_ID ) {
-      ret = 1;
-      *id1 = GRIDLINE1_ID;
-      *id2 = GRIDLINE2_ID;
+   } else if( id == AST__GRIDLINE_ID ) {
+      ret = nax;
+      *id1 = AST__GRIDLINE1_ID;
+      *id2 = AST__GRIDLINE2_ID;
+      if( nax == 3 ) *id3 = AST__GRIDLINE3_ID;
 
-   } else if( id == NUMLABS_ID ) {
-      ret = 1;
-      *id1 = NUMLAB1_ID;
-      *id2 = NUMLAB2_ID;
+   } else if( id == AST__NUMLABS_ID ) {
+      ret = nax;
+      *id1 = AST__NUMLAB1_ID;
+      *id2 = AST__NUMLAB2_ID;
+      if( nax == 3 ) *id3 = AST__NUMLAB3_ID;
 
-   } else if( id == TEXTLABS_ID ) {
-      ret = 1;
-      *id1 = TEXTLAB1_ID;
-      *id2 = TEXTLAB2_ID;
+   } else if( id == AST__TEXTLABS_ID ) {
+      ret = nax;
+      *id1 = AST__TEXTLAB1_ID;
+      *id2 = AST__TEXTLAB2_ID;
+      if( nax == 3 ) *id3 = AST__TEXTLAB3_ID;
 
-   } else if( id == TICKS_ID ) {
-      ret = 1;
-      *id1 = TICKS1_ID;
-      *id2 = TICKS2_ID;
+   } else if( id == AST__TICKS_ID ) {
+      ret = nax;
+      *id1 = AST__TICKS1_ID;
+      *id2 = AST__TICKS2_ID;
+      if( nax == 3 ) *id3 = AST__TICKS3_ID;
 
    } else if( id >= AST__NPID ) {
       astError( AST__INTER, "AST internal programming error - "
@@ -17425,7 +18054,11 @@ void astInitPlotVtab_(  AstPlotVtab *vtab, const char *name ) {
    vtab->GrfWrapper = GrfWrapper;
    vtab->GenCurve = GenCurve;
    vtab->PolyCurve = PolyCurve;
+   vtab->CopyPlotDefaults = CopyPlotDefaults;
    vtab->CvBrk = CvBrk;
+   vtab->Mirror = Mirror;
+   vtab->GetDrawnTicks = GetDrawnTicks;
+   vtab->SetTickValues = SetTickValues;
    vtab->Grid = Grid; 
    vtab->ClearTol = ClearTol;
    vtab->SetTol = SetTol;
@@ -17583,7 +18216,7 @@ void astInitPlotVtab_(  AstPlotVtab *vtab, const char *name ) {
    vtab->SetSize = SetSize;
    vtab->GetSize = GetSize;
    vtab->TestSize = TestSize;
-   vtab->SetGrfContext = SetGrfContext;
+   vtab->GetGrfContext = GetGrfContext;
 
 /* Save the inherited pointers to methods that will be extended, and replace
    them with pointers to the new member functions. */
@@ -18484,6 +19117,9 @@ static void Labelat( AstPlot *this, TickInfo **grid, CurveData **cdata,
                value++;
 
             }
+
+/* Free resources. */
+            pset2 = astAnnul( pset2 );
          }
    
 /* Use the curve through the origin unless it is significantly shorter
@@ -18654,7 +19290,7 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
       mapping = astGetMapping( this, AST__BASE, AST__CURRENT );
 
 /* Initialize the id value for graphical element being drawn. */
-      gelid = NUMLAB1_ID;
+      gelid = AST__NUMLAB1_ID;
 
 /* Do each axis. */
       for( axis = 0; axis < 2; axis++ ){
@@ -18664,7 +19300,7 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
-         GrfAttrs( this, gelid, 1, GRF__TEXT, method, class );
+         astGrfAttrs( this, gelid, 1, GRF__TEXT, method, class );
 
 /* Get a pointer to the structure containing information describing the 
    positions of the major tick marks along this axis. */  
@@ -18880,7 +19516,7 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
                ll = labellist;
                for( tick = 0; tick < nlab; tick ++ ) {
                   ll->text = (char *) astFree( (void *) ll->text );
-                  ll->just = (char *) astFree( (void *) ll->text );
+                  ll->just = (char *) astFree( (void *) ll->just );
                   ll++;
                }
                labellist = (LabelList *) astFree( (void *) labellist );
@@ -18895,10 +19531,10 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
             if( pset2 ) pset2 = astAnnul( pset2 );
 
 /* Re-establish the original graphical attributes. */
-            GrfAttrs( this, gelid, 0, GRF__TEXT, method, class );
+            astGrfAttrs( this, gelid, 0, GRF__TEXT, method, class );
 
 /* Set up the id for the next graphical element to be drawn. */
-            gelid = NUMLAB2_ID;
+            gelid = AST__NUMLAB2_ID;
 
          }
       }
@@ -20079,7 +20715,7 @@ f     - If any marker position is clipped (see AST_CLIP), then the
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
-   GrfAttrs( this, MARKS_ID, 1, GRF__MARK, method, class );
+   astGrfAttrs( this, AST__MARKS_ID, 1, GRF__MARK, method, class );
 
 /* Create a PointSet to hold the supplied physical coordinates. */
    pset1 = astPointSet( nmark, ncoord, "" );
@@ -20162,10 +20798,57 @@ f     - If any marker position is clipped (see AST_CLIP), then the
    ptr1 = (const double **) astFree( (void *) ptr1 );
 
 /* Re-establish the original graphical attributes. */
-   GrfAttrs( this, MARKS_ID, 0, GRF__MARK, method, class );
+   astGrfAttrs( this, AST__MARKS_ID, 0, GRF__MARK, method, class );
 
 /* Return */
    return;
+}
+
+static void Mirror( AstPlot *this, int axis ){
+/*
+*+
+*  Name:
+*     astMirror
+
+*  Purpose:
+*     Flip a graphics axis of a Plot.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void astMirror( AstPlot *this, int axis )
+
+*  Class Membership:
+*     Plot method.
+
+*  Description:
+*     This function referses the direction of a specified graphics axis
+*     in the Plot.
+
+*  Parameters:
+*     this
+*        Pointer to a Plot.
+*     axis
+*        The zero-based axis of the axis to mirror.
+
+*-
+*/
+
+/* Check the global status. */
+   if( !astOK ) return;
+
+   if( axis == 0 ) {
+      this->xrev = ( this->xrev == 0 );
+
+   } else if( axis == 1 ){
+      this->yrev = ( this->yrev == 0 );
+
+   } else {
+      astError( AST__INTER, "astMirror(%s): Illegal axis index (%d) "
+                "supplied (internal AST programming error).", axis );
+   }   
 }
 
 static void Norm1( AstMapping *map, int axis, int nv, double *vals, 
@@ -21304,7 +21987,7 @@ f        The global status.
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
-         GrfAttrs( this, CURVE_ID, 1, GRF__LINE, method, class );
+         astGrfAttrs( this, AST__CURVE_ID, 1, GRF__LINE, method, class );
 
 /* Loop round each curve segment. */
          for( i = 1 ; i < npoint; i++ ) {
@@ -21402,7 +22085,7 @@ f        The global status.
          Map3( 0, NULL, NULL, NULL, method, class );
 
 /* Re-establish the original graphical attributes. */
-         GrfAttrs( this, CURVE_ID, 0, GRF__LINE, method, class );
+         astGrfAttrs( this, AST__CURVE_ID, 0, GRF__LINE, method, class );
 
       }
 
@@ -21764,6 +22447,104 @@ static void RightVector( AstPlot *this, float *ux, float *uy, float *rx,
 
 }
 
+static void SaveTick( AstPlot *this, int axis, double gx, double gy, 
+                      int major ){
+/*
+*  Name:
+*     SaveTick
+
+*  Purpose:
+*     Save info about a drawn tick in the Plot structure.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void SaveTick( AstPlot *this, int axis, double gx, double gy,
+*                    int major )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This function stores the start position and type of each drawn 
+*     tick in the given Plot.
+
+*  Parameters:
+*     this
+*        Pointer to the Plot.
+*     axis
+*        The zero-based axis index to which the tick refers. If a
+*        negative value is specified then all information about drawn ticks
+*        curently stored in the Plot is erased.
+*     gx
+*        The graphics X position at the start of the tick mark.
+*     gy
+*        The graphics Y position at the start of the tick mark.
+*     major
+*        Non-zero if the tick mark is a major tick.
+
+*/
+
+/* Local Variables: */
+   int i;
+   int *count;
+   double *tickgx;
+   double *tickgy;
+
+/* Free the tick info in the supplied Plot if required. Do this before
+   checking the error status. */
+   if( axis < 0 ) {
+      for( i = 0; i < 3; i++ ) {
+         this->majtickgx[ i ] = astFree( this->majtickgx[ i ] );
+         this->majtickgy[ i ] = astFree( this->majtickgy[ i ] );
+         this->mintickgx[ i ] = astFree( this->mintickgx[ i ] );
+         this->mintickgy[ i ] = astFree( this->mintickgy[ i ] );
+         this->mintickcount[ i ] = 0;
+         this->majtickcount[ i ] = 0;
+      }
+      return;
+   }
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get pointers to the arrays to use, and ensure the arrays are big 
+   enough to hold the new tick. */
+   if( major ) {
+      count = this->majtickcount + axis;
+      tickgx = this->majtickgx[ axis ];
+      tickgy = this->majtickgy[ axis ];
+   } else {
+      count = this->mintickcount + axis;
+      tickgx = this->mintickgx[ axis ];
+      tickgy = this->mintickgy[ axis ];
+   }
+
+/* Ensure the arrays are big enough to hold the new tick. */
+   i = *count;
+   tickgx = astGrow( tickgx, i + 1, sizeof( double ) );
+   tickgy = astGrow( tickgy, i + 1, sizeof( double ) );
+
+/* If memory was allocated succesfully, store the new tick information in
+   the expanded arrays. */
+   if( astOK ) {
+      tickgx[ i ] = gx;
+      tickgy[ i ] = gy;
+      *count = i + 1;
+
+/* Store the potentially updated array pointers. */
+      if( major ) {
+         this->majtickgx[ axis ] = tickgx; 
+         this->majtickgy[ axis ] = tickgy;
+      } else {
+         this->mintickgx[ axis ] = tickgx;
+         this->mintickgy[ axis ] = tickgy;
+      }
+   }
+}
+
 static void SetAttrib( AstObject *this_object, const char *setting ) {
 /*
 *  Name:
@@ -21817,13 +22598,19 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    int id;                       /* Plot object id */
    int ival;                     /* Int attribute value */
    int len;                      /* Length of setting string */
+   int nax;                      /* Number of graphics frame axes */
    int nc;                       /* Number of characters read by astSscanf */
+   int id3;                      /* Third genuine identifier */
+   int nid;                      /* Number of genuine attributes */
 
 /* Check the global error status. */
    if ( !astOK ) return;
 
 /* Obtain a pointer to the Plot structure. */
    this = (AstPlot *) this_object;
+
+/* Get the number of base Frame axis (2 for a Plot, 3 for a Plot3D). */
+   nax = astGetNin( this );
 
 /* Obtain the length of the setting string. */
    len = (int) strlen( setting );
@@ -21909,8 +22696,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    } else if ( nc = 0,
         ( 1 == astSscanf( setting, "drawaxes= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
-      astSetDrawAxes( this, 0, ival );
-      astSetDrawAxes( this, 1, ival );
+      for( axis = 0; axis < nax; axis++ ) astSetDrawAxes( this, axis, ival );
 
 /* DrawAxes(axis). */
 /* --------------- */
@@ -21925,8 +22711,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    } else if ( nc = 0,
         ( 1 == astSscanf( setting, "abbrev= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
-      astSetAbbrev( this, 0, ival );
-      astSetAbbrev( this, 1, ival );
+      for( axis = 0; axis < nax; axis++ ) astSetAbbrev( this, axis, ival );
 
 /* Abbrev(axis). */
 /* --------------- */
@@ -21981,8 +22766,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    } else if ( nc = 0,
         ( 1 == astSscanf( setting, "gap= %lg %n", &dval, &nc ) )
         && ( nc >= len ) ) {
-      astSetGap( this, 0, dval );
-      astSetGap( this, 1, dval );
+      for( axis = 0; axis < nax; axis++ ) astSetGap( this, axis, dval );
 
 /* Gap(axis). */
 /* ---------- */
@@ -21997,8 +22781,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    } else if ( nc = 0,
         ( 1 == astSscanf( setting, "loggap= %lg %n", &dval, &nc ) )
         && ( nc >= len ) ) {
-      astSetLogGap( this, 0, dval );
-      astSetLogGap( this, 1, dval );
+      for( axis = 0; axis < nax; axis++ ) astSetLogGap( this, axis, dval );
 
 /* LogGap(axis). */
 /* ---------- */
@@ -22013,8 +22796,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    } else if ( nc = 0,
         ( 1 == astSscanf( setting, "numlabgap= %lg %n", &dval, &nc ) )
         && ( nc >= len ) ) {
-      astSetNumLabGap( this, 0, dval );
-      astSetNumLabGap( this, 1, dval );
+      for( axis = 0; axis < nax; axis++ ) astSetNumLabGap( this, axis, dval );
 
 /* NumLabGap(axis). */
 /* -------------- */
@@ -22029,8 +22811,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    } else if ( nc = 0,
         ( 1 == astSscanf( setting, "textlabgap= %lg %n", &dval, &nc ) )
         && ( nc >= len ) ) {
-      astSetTextLabGap( this, 0, dval );
-      astSetTextLabGap( this, 1, dval );
+      for( axis = 0; axis < nax; axis++ ) astSetTextLabGap( this, axis, dval );
 
 /* TextLabGap(axis). */
 /* -------------- */
@@ -22045,8 +22826,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    } else if ( nc = 0,
         ( 1 == astSscanf( setting, "labelup= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
-      astSetLabelUp( this, 0, ival );
-      astSetLabelUp( this, 1, ival );
+      for( axis = 0; axis < nax; axis++ ) astSetLabelUp( this, axis, ival );
 
 /* LabelUp(axis). */
 /* -------------- */
@@ -22061,8 +22841,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    } else if ( nc = 0,
         ( 1 == astSscanf( setting, "logplot= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
-      astSetLogPlot( this, 0, ival );
-      astSetLogPlot( this, 1, ival );
+      for( axis = 0; axis < nax; axis++ ) astSetLogPlot( this, axis, ival );
 
 /* LogPlot(axis). */
 /* -------------- */
@@ -22077,8 +22856,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    } else if ( nc = 0,
         ( 1 == astSscanf( setting, "logticks= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
-      astSetLogTicks( this, 0, ival );
-      astSetLogTicks( this, 1, ival );
+      for( axis = 0; axis < nax; axis++ ) astSetLogTicks( this, axis, ival );
 
 /* LogTicks(axis). */
 /* -------------- */
@@ -22093,8 +22871,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    } else if ( nc = 0,
         ( 1 == astSscanf( setting, "loglabel= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
-      astSetLogLabel( this, 0, ival );
-      astSetLogLabel( this, 1, ival );
+      for( axis = 0; axis < nax; axis++ ) astSetLogLabel( this, axis, ival );
 
 /* LogLabel(axis). */
 /* -------------- */
@@ -22109,8 +22886,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    } else if ( nc = 0,
         ( 1 == astSscanf( setting, "numlab= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
-      astSetNumLab( this, 0, ival );
-      astSetNumLab( this, 1, ival );
+      for( axis = 0; axis < nax; axis++ ) astSetNumLab( this, axis, ival );
 
 /* NumLab(axis). */
 /* -------------- */
@@ -22125,8 +22901,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    } else if ( nc = 0,
         ( 1 == astSscanf( setting, "mintick= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
-      astSetMinTick( this, 0, ival );
-      astSetMinTick( this, 1, ival );
+      for( axis = 0; axis < nax; axis++ ) astSetMinTick( this, axis, ival );
 
 /* MinTick(axis). */
 /* -------------- */
@@ -22141,8 +22916,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    } else if ( nc = 0,
         ( 1 == astSscanf( setting, "textlab= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
-      astSetTextLab( this, 0, ival );
-      astSetTextLab( this, 1, ival );
+      for( axis = 0; axis < nax; axis++ ) astSetTextLab( this, axis, ival );
 
 /* TextLab(axis). */
 /* ---------------- */
@@ -22157,8 +22931,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    } else if ( nc = 0,
         ( 1 == astSscanf( setting, "labelunits= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
-      astSetLabelUnits( this, 0, ival );
-      astSetLabelUnits( this, 1, ival );
+      for( axis = 0; axis < nax; axis++ ) astSetLabelUnits( this, axis, ival );
 
 /* LabelUnits(axis). */
 /* ---------------- */
@@ -22182,9 +22955,12 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                               label, &ival, &nc ) )
                && ( nc >= len ) ) {
       class =  astGetClass( this );
-      if( IdFind( FullForm( GrfLabels, label, setting, "astSet", class ), 
-          &id1, &id2 ) ) astSetStyle( this, id2, ival );
+
+      nid = IdFind( FullForm( GrfLabels, label, "Style", "astSet", class ),
+                    nax, &id1, &id2, &id3 );
       astSetStyle( this, id1, ival );
+      if( nid > 1 ) astSetStyle( this, id2, ival );
+      if( nid > 2 ) astSetStyle( this, id3, ival );
 
 /* Font. */
 /* ----- */
@@ -22200,9 +22976,12 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                               label, &ival, &nc ) )
                && ( nc >= len ) ) {
       class =  astGetClass( this );
-      if( IdFind( FullForm( GrfLabels, label, setting, "astSet", class ), 
-          &id1, &id2 ) ) astSetFont( this, id2, ival );
+
+      nid = IdFind( FullForm( GrfLabels, label, "Font", "astSet", class ),
+                    nax, &id1, &id2, &id3 );
       astSetFont( this, id1, ival );
+      if( nid > 1 ) astSetFont( this, id2, ival );
+      if( nid > 2 ) astSetFont( this, id3, ival );
 
 /* Colour. */
 /* ------- */
@@ -22218,9 +22997,12 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                               label, &ival, &nc ) )
                && ( nc >= len ) ) {
       class =  astGetClass( this );
-      if( IdFind( FullForm( GrfLabels, label, setting, "astSet", class ), 
-          &id1, &id2 ) ) astSetColour( this, id2, ival );
+
+      nid = IdFind( FullForm( GrfLabels, label, "Colour", "astSet", class ),
+                    nax, &id1, &id2, &id3 );
       astSetColour( this, id1, ival );
+      if( nid > 1 ) astSetColour( this, id2, ival );
+      if( nid > 2 ) astSetColour( this, id3, ival );
 
 /* Color. */
 /* ------ */
@@ -22236,9 +23018,12 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                               label, &ival, &nc ) )
                && ( nc >= len ) ) {
       class =  astGetClass( this );
-      if( IdFind( FullForm( GrfLabels, label, setting, "astSet", class ), 
-          &id1, &id2 ) ) astSetColour( this, id2, ival );
+
+      nid = IdFind( FullForm( GrfLabels, label, "Color", "astSet", class ),
+                    nax, &id1, &id2, &id3 );
       astSetColour( this, id1, ival );
+      if( nid > 1 ) astSetColour( this, id2, ival );
+      if( nid > 2 ) astSetColour( this, id3, ival );
 
 /* Width. */
 /* ------ */
@@ -22254,9 +23039,12 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                               label, &dval, &nc ) )
                && ( nc >= len ) ) {
       class =  astGetClass( this );
-      if( IdFind( FullForm( GrfLabels, label, setting, "astSet", class ), 
-          &id1, &id2 ) ) astSetWidth( this, id2, dval );
+
+      nid = IdFind( FullForm( GrfLabels, label, "Width", "astSet", class ),
+                    nax, &id1, &id2, &id3 );
       astSetWidth( this, id1, dval );
+      if( nid > 1 ) astSetWidth( this, id2, dval );
+      if( nid > 2 ) astSetWidth( this, id3, dval );
 
 /* Size. */
 /* ----- */
@@ -22272,9 +23060,12 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                               label, &dval, &nc ) )
                && ( nc >= len ) ) {
       class =  astGetClass( this );
-      if( IdFind( FullForm( GrfLabels, label, setting, "astSet", class ), 
-          &id1, &id2 ) ) astSetSize( this, id2, dval );
+
+      nid = IdFind( FullForm( GrfLabels, label, "Size", "astSet", class ),
+                    nax, &id1, &id2, &id3 );
       astSetSize( this, id1, dval );
+      if( nid > 1 ) astSetSize( this, id2, dval );
+      if( nid > 2 ) astSetSize( this, id3, dval );
 
 /* TitleGap. */
 /* ----------- */
@@ -22288,8 +23079,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    } else if ( nc = 0,
         ( 1 == astSscanf( setting, "majticklen= %lg %n", &dval, &nc ) )
         && ( nc >= len ) ) {
-      astSetMajTickLen( this, 0, dval );
-      astSetMajTickLen( this, 1, dval );
+      for( axis = 0; axis < nax; axis++ ) astSetMajTickLen( this, axis, dval );
 
 /* MajTickLen(axis). */
 /* ----------------- */
@@ -22304,8 +23094,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    } else if ( nc = 0,
         ( 1 == astSscanf( setting, "minticklen= %lg %n", &dval, &nc ) )
         && ( nc >= len ) ) {
-      astSetMinTickLen( this, 0, dval );
-      astSetMinTickLen( this, 1, dval );
+      for( axis = 0; axis < nax; axis++ ) astSetMinTickLen( this, axis, dval );
 
 /* MinTickLen(axis). */
 /* ----------------- */
@@ -22333,76 +23122,6 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Undefine macros local to this function. */
 #undef MATCH
-}
-
-static void SetGrfContext( AstPlot *this, AstObject *grfcon ){
-/*
-*++
-*  Name:
-c     astSetGrfContext
-f     AST_SETGRFCONTEXT
-
-*  Purpose:
-*     Store an Object that describes a graphics context.
-
-*  Type:
-*     Public virtual function.
-
-*  Synopsis:
-c     #include "plot.h"
-c     void astSetGrfContext( AstPlot *this, AstObject *grfcon )
-f     CALL AST_SETGRFCONTEXT( THIS, GRFCON, STATUS )
-
-*  Class Membership:
-*     Plot method.
-
-*  Description:
-c     This function 
-f     This routine 
-*     stores a reference to an Object that can be used to pass
-*     information to the low level graphics functions registered using
-c     astGrfSet.
-f     AST_GRFSET.
-*
-*     All graphics functions regsietered using 
-c     astGrfSet
-f     AST_GRFSET
-*     will be passed the supplied Object as their first 
-c     parameter.
-f     argument.
-*     No other use is made of the Object internally within AST, and the
-*     Object may be of any class.
-
-*  Parameters:
-c     this
-f     THIS = INTEGER (Given)
-*        Pointer to the Plot.
-c     grfcon
-f     GRFCON = INTEGER (Given)
-*        Pointer to the Object that is to be passed to the drawing
-*        functions. A reference to the supplied Object is stored in the
-*        Plot rather than a deep copy. This means that any changes 
-*        made to the Object after calling this function will be apparent
-*        in the Object passed to the registered graphics functions. A 
-c        NULL pointer
-f        AST__NULL value
-*        may be supplied, in which case any object previously registered
-*        will be removed.
-f     STATUS = INTEGER (Given and Returned)
-f        The global status.
-*--
-*/
-
-/* Check the global error status. */
-   if ( !astOK ) return;
-
-/* Annul any existing grfcontex Object in the Plot. */
-   if( this->grfcontextId ) {
-      this->grfcontextId = astAnnulId( this->grfcontextId );
-   }
-
-/* Store any new grfcontext Object. */
-   if( grfcon ) this->grfcontextId = astMakeId( astClone( grfcon ) );
 }
 
 static void SetLogPlot( AstPlot *this, int axis, int ival ){
@@ -22473,204 +23192,86 @@ static void SetLogPlot( AstPlot *this, int axis, int ival ){
    }
 } 
 
-static const char *SplitValue( AstPlot *this, const char *value, int axis,
-                               int *split ) {
+static void SetTickValues( AstPlot *this, int axis, int nmajor, double *major,
+                           int nminor, double *minor ){
 /*
+*+
 *  Name:
-*     FormatValue
+*     astSetTickValues
 
 *  Purpose:
-*     Format a coordinate value for a Frame axis.
+*     Store the tick mark values to use for a given Plot axis.
 
 *  Type:
-*     Private function.
+*     Protected virtual function.
 
 *  Synopsis:
 *     #include "plot.h"
-*     static const char *SplitValue( AstPlot *this, const char *value, 
-*                                    int axis, int *split )
+*     void astSetTickValues( AstPlot *this, int axis, int nmajor, 
+*                            double *major, int nminor, double *minor )
 
 *  Class Membership:
-*     Plot member function 
+*     Plot method.
 
 *  Description:
-*     This function splits long formatted values (such as the date/time 
-*     format produced by the TimeFrame class) if possible onto two lines
-*     by inclusion of Plot escape sequences.
+*     This function stores a set of tick mark values that should be used by
+*     subsequent calls to astGrid.
 
 *  Parameters:
 *     this
-*        Pointer to the Plot.
-*     value
-*        The formatted coordinate value.
+*        Pointer to a Plot.
 *     axis
-*        Indicates whether or not short lines should be split by
-*        including a blank first line. If zero, and if "*split" is non-zero, 
-*        then short lines are put onto the second line,and the first line
-*        is blank.
-*     split
-*        Pointer to an integer that controls behaviour:
-*
-*        0 - Split the line if it is too long, and return a value of +1
-*            in *split.
-*        1 - Split the line even if it does not need splitting, making
-*            the first line blank and the second line containing all the 
-*            supplied text (*split is unchanged on exit).
+*        The zero-based index of the axis for which tick marks values
+*        have been supplied.
+*     nmajor
+*        The number of major tick mark values. If zero is supplied then
+*        the other parameters are ignored, and subsequent calls to
+*        astGrid will itself determine the tick values to be used.
+*     major
+*        Pointer to an array holding "nmajor" values for axis "axis" in
+*        the current Frame of the suppled Plot. Major tick marks will be
+*        drawn at these values. 
+*     nminor
+*        The number of minor tick mark values.
+*     minor 
+*        Pointer to an array holding "nminor" values for axis "axis" in
+*        the current Frame of the suppled Plot. Minor tick marks will be
+*        drawn at these values. 
 
-*  Returned Value:
-*     A pointer to a static buffer containing a null-terminated string 
-*     holding the (possibly split) formatted value. This will be a copy of
-*     the supplied pointer if the string does not need to be split.
-
-*  Notes:
-*     -  A NULL pointer will be returned if this function is invoked with the
-*     global error status set, or if it should fail for any reason.
+*-
 */
 
-/* Local Variables: */
-   char *d;    
-   const char *result;    
-   float rsp;         
-   int aft_end;
-   int aft_start;
-   int bef_end;
-   int bef_start;
-   int i;
-   int id;
-   int idmin;
-   int imin;
-   int l;
-   int naft;
-   int nbef;
-   int nlong;
-   int nshort;
-   int nsp;       
-   static char buf[ 200 ];
+/* Check the global status. */
+   if( !astOK ) return;
 
-/* Initialise */
-   result = value;
+/* Report an error if the supplied axis value is incorrect. */
+   if( axis < 0 || axis >= astGetNin( this ) ) {
+      astError( AST__INTER, "astSetTickValues(Plot): Supplied \"axis\" "
+                "value is %d - should in the range 0 to %d (internal AST "
+                "programming error).", axis, astGetNin( this ) - 1 );
 
-/* Check the global error status. */
-   if ( !astOK ) return result;
+/* Otherwise store or clear the values. */
+   } else if( nmajor > 0 ){
+      this->nmajtickval[ axis ] = nmajor;
+      this->majtickval[ axis ] = astStore( this->majtickval[ axis ], major, 
+                                           sizeof( double )*nmajor );
+      this->nmintickval[ axis ] = nminor;
+      this->mintickval[ axis ] = astStore( this->mintickval[ axis ], minor, 
+                                           sizeof( double )*nminor );
 
-/* Do nothing more if the formatted value already contains graphical
-   escape sequences, or if graphical escapes sequences are not being
-   interpreted. */
-   if( value && astGetEscape( this ) && !HasEscapes( value ) ) {
+/* Sort them into increasing order. */
+      qsort( (void *) this->majtickval[ axis ], (size_t) nmajor, 
+             sizeof(double), Compared );
 
-/* We split the line if the line is long or if *split was non-zero on
-   entry. In this case always return *split equal to 1. */
-      l = strlen( value );
-      if( *split || l > 9 ) {
-         *split = 1;
+      qsort( (void *) this->mintickval[ axis ], (size_t) nminor, 
+             sizeof(double), Compared );
 
-/* Find a space close to the centre of the formatted string. */
-         idmin = 2*l;
-         imin = -1;
-         for( i = 0; i < l; i++ ) {
-            if( isspace( value[ i ] ) ) {
-               id = abs( i - l/2 );
-               if( id < idmin ) {
-                  idmin = id;
-                  imin = i;
-               }
-            }
-         }
-
-/* Initialse the pointer into the returned buffer at which the next
-   character will be placed. */
-         d = buf;
-
-/* If no spaces were found... */
-         if( imin == -1 ) {
-
-/*  If axis is zero, we add a blank first line. */
-            if( axis == 0 ) {
-
-/* Fill the first line with spaces. */
-               for( i = 0; i < l; i++ ) *(d++) = ' ';
-
-/* Add an escape sequence that moves down by one character height. */
-               d += sprintf( d, "%%v170+" );
-            }
-
-/* Add the whole of the supplied text. */
-            for( i = 0; i < l; i++ ) *(d++) = value[ i ];
-   
-/* If a space was found... */
-         } else {
-
-/* Find the first and last non-blank characters before the mid-space. */
-            bef_start = -1;
-            bef_end = -1;
-            for( i = 0; i < imin; i++ ) {
-               if( !isspace( value[ i ] ) ) {
-                  if( bef_start == -1 ) bef_start = i;
-                  bef_end = i;
-               }
-            }
-
-/* Find the first and last non-blank characters after the mid-space. */
-            aft_start = -1;
-            aft_end = -1;
-            for( i = imin + 1; i < l; i++ ) {
-               if( !isspace( value[ i ] ) ) {
-                  if( aft_start == -1 ) aft_start = i;
-                  aft_end = i;
-               }
-            }
-
-/* How many significant characters before and after the space? */
-            nbef = bef_end - bef_start + 1;
-            naft = aft_end - aft_start + 1;
-
-/* Get the lengths of the longer and shorter line. */
-            if( nbef > naft ) {
-               nlong = nbef;
-               nshort = naft;
-            } else {
-               nlong = naft;
-               nshort = nbef;
-            }
-
-/* Find the fractional number of spaces before the significant text of the 
-   shorter line.*/
-            rsp = 0.5*( nlong - nshort + 1 );
-  
-/* If the top line is the shorter line, put some spaces in at the start. */
-            if( nbef < naft ) {
-               nsp = (int) rsp;
-               for( i = 0; i < nsp; i++ ) *(d++) = ' ';
-            }
-
-/* Add the significant text from the top line. */
-            for( i = bef_start; i <= bef_end; i++ ) *(d++) = value[ i ];
-
-/* Add an escape sequence that moves down by one character height. */
-            d += sprintf( d, "%%v100+" );
-
-
-/* Add an escape sequence that moves to the left by the required amount. */
-            d += sprintf( d, "%%<%d+", (int) ( 60.0*( (float) nlong - rsp )) );
-
-/* Add the significant text from the bottom line. */
-            for( i = aft_start; i <= aft_end; i++ ) *(d++) = value[ i ];
-
-         }
-
-/* Terminate it. */
-         *d = 0;         
-
-/* Return a pointer to the buffer. */
-         result = buf;         
-      }
+   } else {
+      this->nmajtickval[ axis ] = 0;
+      this->majtickval[ axis ] = astFree( this->majtickval[ axis ] );
+      this->nmintickval[ axis ] = 0;
+      this->mintickval[ axis ] = astFree( this->mintickval[ axis ] );
    }
-
-/* If an error occurred, clear the returned value. */
-   if ( !astOK ) result = NULL;
-
-/* Return the result. */
-   return result;
 }
 
 const char *astStripEscapes_( const char *text ) {
@@ -22951,6 +23552,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    char label[21];               /* Graphics item label */
    int axis;                     /* Axis number */
    int len;                      /* Length of attrib string */
+   int nax;                      /* Number of base Frame axes */
    int nc;                       /* No. characters read by astSscanf */
    int result;                   /* Result value to return */
 
@@ -22962,6 +23564,9 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Obtain a pointer to the Plot structure. */
    this = (AstPlot *) this_object;
+
+/* Get the number of base Frame axis (2 for a Plot, 3 for a Plot3D). */
+   nax = astGetNin( this );
 
 /* Obtain the length of the attrib string. */
    len = strlen( attrib );
@@ -23208,7 +23813,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* Style. */
 /* ------ */
    } else if ( !strcmp( attrib, "style" ) ) {
-      result = TestUseStyle( this, BORDER_ID );
+      result = TestUseStyle( this, AST__BORDER_ID );
 
 /* Style(label). */
 /* ------------- */
@@ -23220,7 +23825,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* Font. */
 /* ----- */
    } else if ( !strcmp( attrib, "font" ) ) {
-      result = TestUseFont( this, TEXTLABS_ID );
+      result = TestUseFont( this, AST__TEXTLABS_ID );
 
 /* Font(label). */
 /* ------------ */
@@ -23232,12 +23837,12 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* Colour. */
 /* ------- */
    } else if ( !strcmp( attrib, "colour" ) ) {
-      result = TestUseColour( this, TEXTLABS_ID );
+      result = TestUseColour( this, AST__TEXTLABS_ID );
 
 /* Color. */
 /* ------- */
    } else if ( !strcmp( attrib, "color" ) ) {
-      result = TestUseColour( this, TEXTLABS_ID );
+      result = TestUseColour( this, AST__TEXTLABS_ID );
 
 /* Colour(label). */
 /* -------------- */
@@ -23256,7 +23861,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* Width. */
 /* ------ */
    } else if ( !strcmp( attrib, "width" ) ) {
-      result = TestUseWidth( this, BORDER_ID );
+      result = TestUseWidth( this, AST__BORDER_ID );
 
 /* Width(label). */
 /* ------------- */
@@ -23268,7 +23873,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* Size. */
 /* ----- */
    } else if ( !strcmp( attrib, "size" ) ) {
-      result = TestUseSize( this, TEXTLABS_ID );
+      result = TestUseSize( this, AST__TEXTLABS_ID );
 
 /* Size(label). */
 /* ------------ */
@@ -23322,7 +23927,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 }
 
 static void Text( AstPlot *this, const char *text, const double pos[], 
-                  const float up[2], const char *just ){
+                  const float up[], const char *just ){
 /*
 *++
 *  Name:
@@ -23338,7 +23943,7 @@ f     AST_TEXT
 *  Synopsis:
 c     #include "plot.h"
 c     void astText( AstPlot *this, const char *text, const double pos[], 
-c                   const float up[ 2 ], const char *just )
+c                   const float up[], const char *just )
 f     CALL AST_TEXT( THIS, TEXT, POS, UP, JUST, STATUS )
 
 *  Class Membership:
@@ -23365,12 +23970,15 @@ f     POS( * ) = DOUBLE PRECISION (Given)
 *        the physical coordinates of the point where the reference
 *        position of the text string is to be placed.
 c     up
-f     UP( 2 ) = REAL (Given)
+f     UP( * ) = REAL (Given)
 *        An array holding the components of a vector in the "up"
 *        direction of the text (in graphical coordinates). For
 c        example, to get horizontal text, the vector {0.0f,1.0f} should
 f        example, to get horizontal text, the vector [0.0,1.0] should
-*        be supplied.
+*        be supplied. For a basic Plot, 2 values should be supplied. For 
+*        a Plot3D, 3 values should be supplied, and the actual up vector
+*        used is the projection of the supplied up vector onto the text plane
+*        specified by the current value of the Plot3D's Norm attribute.
 c     just
 f     JUST = CHARACTER * ( * ) (Given)
 c        Pointer to a null-terminated character string identifying the
@@ -23391,6 +23999,8 @@ f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
 *  Notes:
+*     - The Plot3D class currently does not interpret graphical escape 
+*     sequences contained within text displayed using this method.
 *     - Text is not drawn at positions which have any coordinate equal
 *     to the value AST__BAD (or where the transformation into
 *     graphical coordinates yields coordinates containing the value
@@ -23399,7 +24009,7 @@ c     - If the plotting position is clipped (see astClip), then no
 f     - If the plotting position is clipped (see AST_CLIP), then no
 *     text is drawn.
 *     - An error results if the base Frame of the Plot is not
-*     2-dimensional.
+*     2-dimensional or (for a Plot3D) 3-dimensional.
 *     - An error also results if the transformation between the
 *     current and base Frames of the Plot is not defined (i.e. the
 *     Plot's TranInverse attribute is zero).
@@ -23454,7 +24064,7 @@ f     - If the plotting position is clipped (see AST_CLIP), then no
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
-   GrfAttrs( this, TEXT_ID, 1, GRF__TEXT, method, class );
+   astGrfAttrs( this, AST__TEXT_ID, 1, GRF__TEXT, method, class );
 
 /* Get the number of coordinates in the physical coordinate frame. */
    ncoord = astGetNout( this );   
@@ -23525,7 +24135,7 @@ f     - If the plotting position is clipped (see AST_CLIP), then no
    ptr1 = (const double **) astFree( (void *) ptr1 );
 
 /* Re-establish the original graphical attributes. */
-   GrfAttrs( this, TEXT_ID, 0, GRF__TEXT, method, class );
+   astGrfAttrs( this, AST__TEXT_ID, 0, GRF__TEXT, method, class );
 
 /* Restore the original value of the flag which says whether graphical 
    escape sequences should be incldued in any returned text strings. */
@@ -23631,14 +24241,14 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
    esc = astGetEscape( this );
 
 /* Initialize the id value for graphical element being drawn. */
-   gelid = TEXTLAB1_ID;
+   gelid = AST__TEXTLAB1_ID;
 
 /* Now write a label for each physical axis. */
    for( axis = 0; axis < 2 && astOK; axis++ ){
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
-      GrfAttrs( this, gelid, 1, GRF__TEXT, method, class );
+      astGrfAttrs( this, gelid, 1, GRF__TEXT, method, class );
    
 /* See if the label is to be drawn. If an explicit value has not been set
    for the TextLab attribute, the default is to draw the label if tick
@@ -23779,10 +24389,10 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
       }
 
 /* Re-establish the original graphical attributes. */
-      GrfAttrs( this, gelid, 0, GRF__TEXT, method, class );
+      astGrfAttrs( this, gelid, 0, GRF__TEXT, method, class );
 
 /* Set up the id for the next graphical element to be drawn. */
-      gelid = TEXTLAB2_ID;
+      gelid = AST__TEXTLAB2_ID;
 
    }
 
@@ -23800,7 +24410,7 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
  
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
-      GrfAttrs( this, TITLE_ID, 1, GRF__TEXT, method, class );
+      astGrfAttrs( this, AST__TITLE_ID, 1, GRF__TEXT, method, class );
 
 /* Take a copy of the bounding box which encloses all other parts of the
    annotated grid (this may have been extended by the above code). If 
@@ -23838,7 +24448,7 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
                 xbn, ybn, NULL, method, class );
 
 /* Re-establish the original graphical attributes. */
-      GrfAttrs( this, TITLE_ID, 0, GRF__TEXT, method, class );
+      astGrfAttrs( this, AST__TITLE_ID, 0, GRF__TEXT, method, class );
 
 /* Release the memory allocated to store the title. */
       new_text = (char *) astFree( (void *) new_text );
@@ -24052,8 +24662,8 @@ static void UpdateConcat( float *xbn, float *ybn, float ux, float uy,
 }
 
 static void Ticker( AstPlot *this, int edge, int axis, double value,
-                    double *gap, double tklen, const char *method, 
-                    const char *class ){
+                    double *gap, double tklen, int majtick, int save,
+                    const char *method, const char *class ){
 /*
 *
 *  Name:
@@ -24068,8 +24678,8 @@ static void Ticker( AstPlot *this, int edge, int axis, double value,
 *  Synopsis:
 *     #include "plot.h"
 *     void Ticker( AstPlot *this, int edge, int axis, double value,
-*                  double *gap, double tklen, const char *method, 
-*                  const char *class ){
+*                  double *gap, double tklen, int majtick, int save,
+*                  const char *method, const char *class ){
 
 *  Class Membership:
 *     Plot member function.
@@ -24095,6 +24705,11 @@ static void Ticker( AstPlot *this, int edge, int axis, double value,
 *        tick marks on the two axes.
 *     tklen
 *        The length of the tick, in graphics units.
+*     majtick
+*        Non-zero if the tick mark being drawn is a major tick, and zero
+*        if it is a minor tick.
+*     save
+*        If non-zero, the tick mark position will be saved in the Plot structure.
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
@@ -24195,9 +24810,12 @@ static void Ticker( AstPlot *this, int edge, int axis, double value,
                }
 
 /* Draw the tick mark as a straight line of the specified length. */
-               Bpoly( this, (float) *x, (float) *y, method, class );
-               Apoly( this, (float) xe, (float) ye, method, class );
-               Opoly( this, method, class );
+               if( save ) SaveTick( this, axis, *x, *y, majtick );
+               if( *x != xe || *y != ye ) {
+                  Bpoly( this, (float) *x, (float) *y, method, class );
+                  Apoly( this, (float) xe, (float) ye, method, class );
+                  Opoly( this, method, class );
+               }
             }
                
 /* Move on to the next crossing. */
@@ -24311,6 +24929,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    const char *a;      /* Pointer to next character to consider */
    const char *fmt;    /* Format string actually used */
    double *ticks;      /* Pointer to major tick mark values */
+   double *minticks;   /* Pointer to minor tick mark values */
    double cen0;        /* Supplied value of cen */
    double junk;        /* Unused value */
    double refval;      /* Value for other axis to use when normalizing */
@@ -24331,7 +24950,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 /* If a NULL pointer has been supplied for "this", release the resources
    allocated within GetTicks, and return. */
    if( !this ){
-      (void) GetTicks( NULL, axis, NULL, &ticks, &nmajor, &nminor, 
+      (void) GetTicks( NULL, axis, NULL, &ticks, &nmajor, &minticks, &nminor, 
                        0, inval, &refval, method, class );
       return NULL;
    }      
@@ -24368,8 +24987,8 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 /* Get an initial set of tick mark values. This also establishes defaults for 
    LogTicks and LogLabel attributes, and so must be done before the
    following block which uses the LogLabel attribute. */
-   used_gap = GetTicks( this, axis, cen, &ticks, &nmajor, &nminor, fmtset, 
-                        inval, &refval, method, class );
+   used_gap = GetTicks( this, axis, cen, &ticks, &nmajor, &minticks, &nminor, 
+                        fmtset, inval, &refval, method, class );
 
 /* See if exponential labels using superscript powers are required.  */
    old_format = NULL;
@@ -24411,7 +25030,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 /* If a value has been set for the axis Format, see if the format string 
    contains a wildcard precision specifier ".*". If so, we are free to
    vary the number of digits used in the label in order to produce
-   distinct labels. If no value has been set for the axis FOrmat,we are
+   distinct labels. If no value has been set for the axis Format, we are
    also free to vary the number of digits. */
    digset = 0;
    if( fmtset ) {
@@ -24570,6 +25189,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
          ret->nmajor = nmajor;
          ret->nminor = nminor;
          ret->ticks = ticks;
+         ret->minticks = minticks;
          ret->labels = labels;
          ret->fmt = used_fmt;
          used_fmt = NULL;
@@ -24600,6 +25220,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 /* If an error has occurred, release the returned information. */
    if( !astOK ){
       ticks = (double *) astFree( (void *) ticks );
+      minticks = (double *) astFree( (void *) minticks );
       if( labels ){
          for( i = 0; i < nmajor; i++ ) {
             labels[ i ] = (char *) astFree( (void *) labels[ i ] );
@@ -25708,10 +26329,10 @@ static int GetUseColour( AstPlot *this, int id ) {
 *     id. If an element related to a generic value is being accessed (e.g
 *     "Axes" is generic, "Axis1" and "Axis2" are not), then the colour
 *     for the first set specific value is returned. For example, if the 
-*     Colour for AXES_ID is requested, then the colour for AXIS1_ID will be
-*     returned if set, and otherwise the colour for AXIS2_ID will be returned.
-*     If AXIS2_ID is not set either, then the default for AXIS2_ID will be
-*     returned.
+*     Colour for AST__AXES_ID is requested, then the colour for AST__AXIS1_ID 
+*     will be returned if set, and otherwise the colour for AST__AXIS2_ID will 
+*     be returned. If AST__AXIS2_ID is not set either, then the default for 
+*     AST__AXIS2_ID will be returned.
 
 *  Parameters:
 *     this
@@ -25727,14 +26348,30 @@ static int GetUseColour( AstPlot *this, int id ) {
 /* Local Variables: */
    int id1;        /* First genuine identifier */
    int id2;        /* Second genuine identifier */
+   int id3;        /* Third genuine identifier */
+   int nid;        /* Number of genuine attributes */
 
 /* Check the global error status. */
    if ( !astOK ) return NOCOLOUR;
 
 /* See if the supplied identifier is a psuedo-identifier representing two 
-   other genuine identifiers. If so, return the value of the first set
-   genuine identifier. */
-   if( IdFind( id, &id1, &id2 ) ) id = astTestColour( this, id1 ) ? id1 : id2;
+   or three other genuine identifiers. If so, return the value of the first 
+   set genuine identifier. */
+   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3 );
+   if( nid > 1 ) {
+      if(  astTestColour( this, id1 ) ) {
+         id = id1;
+
+      } else if(  nid > 1 && astTestColour( this, id2 ) ) {
+         id = id2;
+
+      } else if(  nid > 2 && astTestColour( this, id3 ) ) {
+         id = id3;
+
+      } else {
+         id = id1;
+      }
+   }
 
 /* Return the result. */
    return astGetColour( this, id );
@@ -25764,10 +26401,10 @@ static int GetUseFont( AstPlot *this, int id ) {
 *     id. If an element related to a generic value is being accessed (e.g
 *     "Axes" is generic, "Axis1" and "Axis2" are not), then the Font
 *     for the first set specific value is returned. For example, if the 
-*     Font for AXES_ID is requested, then the Font for AXIS1_ID will be
-*     returned if set, and otherwise the Font for AXIS2_ID will be returned.
-*     If AXIS2_ID is not set either, then the default for AXIS2_ID will be
-*     returned.
+*     Font for AST__AXES_ID is requested, then the Font for AST__AXIS1_ID 
+*     will be returned if set, and otherwise the Font for AST__AXIS2_ID will 
+*     be returned. If AST__AXIS2_ID is not set either, then the default for 
+*     AST__AXIS2_ID will be returned.
 
 *  Parameters:
 *     this
@@ -25783,14 +26420,30 @@ static int GetUseFont( AstPlot *this, int id ) {
 /* Local Variables: */
    int id1;        /* First genuine identifier */
    int id2;        /* Second genuine identifier */
+   int id3;        /* Third genuine identifier */
+   int nid;        /* Number of genuine attributes */
 
 /* Check the global error status. */
    if ( !astOK ) return NOFONT;
 
 /* See if the supplied identifier is a psuedo-identifier representing two 
-   other genuine identifiers. If so, return the value of the first set
+   or three other genuine identifiers. If so, return the value of the first set
    genuine identifier. */
-   if( IdFind( id, &id1, &id2 ) ) id = astTestFont( this, id1 ) ? id1 : id2;
+   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3 );
+   if( nid > 1 ) {
+      if(  astTestFont( this, id1 ) ) {
+         id = id1;
+
+      } else if(  nid > 1 && astTestFont( this, id2 ) ) {
+         id = id2;
+
+      } else if(  nid > 2 && astTestFont( this, id3 ) ) {
+         id = id3;
+
+      } else {
+         id = id1;
+      }
+   }
 
 /* Return the result. */
    return astGetFont( this, id );
@@ -25820,10 +26473,10 @@ static double GetUseSize( AstPlot *this, int id ) {
 *     id. If an element related to a generic value is being accessed (e.g
 *     "Axes" is generic, "Axis1" and "Axis2" are not), then the Size
 *     for the first set specific value is returned. For example, if the 
-*     Size for AXES_ID is requested, then the Size for AXIS1_ID will be
-*     returned if set, and otherwise the Size for AXIS2_ID will be returned.
-*     If AXIS2_ID is not set either, then the default for AXIS2_ID will be
-*     returned.
+*     Size for AST__AXES_ID is requested, then the Size for AST__AXIS1_ID 
+*     will be returned if set, and otherwise the Size for AST__AXIS2_ID will 
+*     be returned. If AST__AXIS2_ID is not set either, then the default for 
+*     AXIS2_ID will be returned.
 
 *  Parameters:
 *     this
@@ -25839,14 +26492,30 @@ static double GetUseSize( AstPlot *this, int id ) {
 /* Local Variables: */
    int id1;        /* First genuine identifier */
    int id2;        /* Second genuine identifier */
+   int id3;        /* Third genuine identifier */
+   int nid;        /* Number of genuine attributes */
 
 /* Check the global error status. */
    if ( !astOK ) return NOSIZE;
 
 /* See if the supplied identifier is a psuedo-identifier representing two 
-   other genuine identifiers. If so, return the value of the first set
+   or three other genuine identifiers. If so, return the value of the first set
    genuine identifier. */
-   if( IdFind( id, &id1, &id2 ) ) id = astTestSize( this, id1 ) ? id1 : id2;
+   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3 );
+   if( nid > 1 ) {
+      if(  astTestSize( this, id1 ) ) {
+         id = id1;
+
+      } else if(  nid > 1 && astTestSize( this, id2 ) ) {
+         id = id2;
+
+      } else if(  nid > 2 && astTestSize( this, id3 ) ) {
+         id = id3;
+
+      } else {
+         id = id1;
+      }
+   }
 
 /* Return the result. */
    return astGetSize( this, id );
@@ -25876,10 +26545,10 @@ static int GetUseStyle( AstPlot *this, int id ) {
 *     id. If an element related to a generic value is being accessed (e.g
 *     "Axes" is generic, "Axis1" and "Axis2" are not), then the style
 *     for the first set specific value is returned. For example, if the 
-*     Style for AXES_ID is requested, then the style for AXIS1_ID will be
-*     returned if set, and otherwise the style for AXIS2_ID will be returned.
-*     If AXIS2_ID is not set either, then the default for AXIS2_ID will be
-*     returned.
+*     Style for AST__AXES_ID is requested, then the style for AST__AXIS1_ID 
+*     will be returned if set, and otherwise the style for AST__AXIS2_ID will 
+*     be returned. If AST__AXIS2_ID is not set either, then the default for 
+*     AST__AXIS2_ID will be returned.
 
 *  Parameters:
 *     this
@@ -25895,14 +26564,30 @@ static int GetUseStyle( AstPlot *this, int id ) {
 /* Local Variables: */
    int id1;        /* First genuine identifier */
    int id2;        /* Second genuine identifier */
+   int id3;        /* Third genuine identifier */
+   int nid;        /* Number of genuine attributes */
 
 /* Check the global error status. */
    if ( !astOK ) return NOSTYLE;
 
 /* See if the supplied identifier is a psuedo-identifier representing two 
-   other genuine identifiers. If so, return the value of the first set
+   or three other genuine identifiers. If so, return the value of the first set
    genuine identifier. */
-   if( IdFind( id, &id1, &id2 ) ) id = astTestStyle( this, id1 ) ? id1 : id2;
+   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3 );
+   if( nid > 1 ) {
+      if(  astTestStyle( this, id1 ) ) {
+         id = id1;
+
+      } else if(  nid > 1 && astTestStyle( this, id2 ) ) {
+         id = id2;
+
+      } else if(  nid > 2 && astTestStyle( this, id3 ) ) {
+         id = id3;
+
+      } else {
+         id = id1;
+      }
+   }
 
 /* Return the result. */
    return astGetStyle( this, id );
@@ -25932,10 +26617,10 @@ static double GetUseWidth( AstPlot *this, int id ) {
 *     id. If an element related to a generic value is being accessed (e.g
 *     "Axes" is generic, "Axis1" and "Axis2" are not), then the Width
 *     for the first set specific value is returned. For example, if the 
-*     Width for AXES_ID is requested, then the Width for AXIS1_ID will be
-*     returned if set, and otherwise the Width for AXIS2_ID will be returned.
-*     If AXIS2_ID is not set either, then the default for AXIS2_ID will be
-*     returned.
+*     Width for AST__AXES_ID is requested, then the Width for AST__AXIS1_ID 
+*     will be returned if set, and otherwise the Width for AST__AXIS2_ID will 
+*     be returned. If AST__AXIS2_ID is not set either, then the default for 
+*     AST__AXIS2_ID will be returned.
 
 *  Parameters:
 *     this
@@ -25951,14 +26636,30 @@ static double GetUseWidth( AstPlot *this, int id ) {
 /* Local Variables: */
    int id1;        /* First genuine identifier */
    int id2;        /* Second genuine identifier */
+   int id3;        /* Third genuine identifier */
+   int nid;        /* Number of genuine attributes */
 
 /* Check the global error status. */
    if ( !astOK ) return NOWIDTH;
 
 /* See if the supplied identifier is a psuedo-identifier representing two 
-   other genuine identifiers. If so, return the value of the first set
+   or three other genuine identifiers. If so, return the value of the first set
    genuine identifier. */
-   if( IdFind( id, &id1, &id2 ) ) id = astTestWidth( this, id1 ) ? id1 : id2;
+   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3 );
+   if( nid > 1 ) {
+      if(  astTestWidth( this, id1 ) ) {
+         id = id1;
+
+      } else if(  nid > 1 && astTestWidth( this, id2 ) ) {
+         id = id2;
+
+      } else if(  nid > 2 && astTestWidth( this, id3 ) ) {
+         id = id3;
+
+      } else {
+         id = id1;
+      }
+   }
 
 /* Return the result. */
    return astGetWidth( this, id );
@@ -26007,20 +26708,19 @@ static int TestUseColour( AstPlot *this, int id ) {
 /* Local Variables: */
    int id1;        /* First genuine identifier */
    int id2;        /* Second genuine identifier */
+   int id3;        /* Third genuine identifier */
+   int nid;        /* Number of genuine attributes */
 
 /* Check the global error status. */
    if ( !astOK ) return 0;
 
 /* See if the supplied identifier is a psuedo-identifier representing two 
-   other genuine identifiers. If so, return the logical AND of the test
-   flags for the two genuine identifiers. */
-   if( IdFind( id, &id1, &id2 ) ) {
-      ret = astTestColour( this, id1 ) && astTestColour( this, id2 );
-
-/* Otherwise, test the specified attribute directly. */
-   } else {
-      ret = astTestColour( this, id );
-   }
+   or three other genuine identifiers. If so, return the logical AND of the 
+   test flags for the genuine identifiers. */
+   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3 );
+   ret = astTestColour( this, id1 );
+   if( nid > 1 ) ret = ret && astTestColour( this, id2 );
+   if( nid > 2 ) ret = ret && astTestColour( this, id3 );
 
 /* Return the result. */
    return ret;
@@ -26069,20 +26769,19 @@ static int TestUseFont( AstPlot *this, int id ) {
 /* Local Variables: */
    int id1;        /* First genuine identifier */
    int id2;        /* Second genuine identifier */
+   int id3;        /* Third genuine identifier */
+   int nid;        /* Number of genuine attributes */
 
 /* Check the global error status. */
    if ( !astOK ) return 0;
 
 /* See if the supplied identifier is a psuedo-identifier representing two 
-   other genuine identifiers. If so, return the logical AND of the test
-   flags for the two genuine identifiers. */
-   if( IdFind( id, &id1, &id2 ) ) {
-      ret = astTestFont( this, id1 ) && astTestFont( this, id2 );
-
-/* Otherwise, test the specified attribute directly. */
-   } else {
-      ret = astTestFont( this, id );
-   }
+   or three other genuine identifiers. If so, return the logical AND of the 
+   test flags for the genuine identifiers. */
+   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3 );
+   ret = astTestFont( this, id1 );
+   if( nid > 1 ) ret = ret && astTestFont( this, id2 );
+   if( nid > 2 ) ret = ret && astTestFont( this, id3 );
 
 /* Return the result. */
    return ret;
@@ -26131,20 +26830,19 @@ static int TestUseSize( AstPlot *this, int id ) {
 /* Local Variables: */
    int id1;        /* First genuine identifier */
    int id2;        /* Second genuine identifier */
+   int id3;        /* Third genuine identifier */
+   int nid;        /* Number of genuine attributes */
 
 /* Check the global error status. */
    if ( !astOK ) return 0;
 
 /* See if the supplied identifier is a psuedo-identifier representing two 
-   other genuine identifiers. If so, return the logical AND of the test
-   flags for the two genuine identifiers. */
-   if( IdFind( id, &id1, &id2 ) ) {
-      ret = astTestSize( this, id1 ) && astTestSize( this, id2 );
-
-/* Otherwise, test the specified attribute directly. */
-   } else {
-      ret = astTestSize( this, id );
-   }
+   or three other genuine identifiers. If so, return the logical AND of the 
+   test flags for the genuine identifiers. */
+   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3 );
+   ret = astTestSize( this, id1 );
+   if( nid > 1 ) ret = ret && astTestSize( this, id2 );
+   if( nid > 2 ) ret = ret && astTestSize( this, id3 );
 
 /* Return the result. */
    return ret;
@@ -26193,20 +26891,19 @@ static int TestUseStyle( AstPlot *this, int id ) {
 /* Local Variables: */
    int id1;        /* First genuine identifier */
    int id2;        /* Second genuine identifier */
+   int id3;        /* Third genuine identifier */
+   int nid;        /* Number of genuine attributes */
 
 /* Check the global error status. */
    if ( !astOK ) return 0;
 
 /* See if the supplied identifier is a psuedo-identifier representing two 
-   other genuine identifiers. If so, return the logical AND of the test
-   flags for the two genuine identifiers. */
-   if( IdFind( id, &id1, &id2 ) ) {
-      ret = astTestStyle( this, id1 ) && astTestStyle( this, id2 );
-
-/* Otherwise, test the specified attribute directly. */
-   } else {
-      ret = astTestStyle( this, id );
-   }
+   or three other genuine identifiers. If so, return the logical AND of the 
+   test flags for the genuine identifiers. */
+   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3 );
+   ret = astTestStyle( this, id1 );
+   if( nid > 1 ) ret = ret && astTestStyle( this, id2 );
+   if( nid > 2 ) ret = ret && astTestStyle( this, id3 );
 
 /* Return the result. */
    return ret;
@@ -26255,20 +26952,19 @@ static int TestUseWidth( AstPlot *this, int id ) {
 /* Local Variables: */
    int id1;        /* First genuine identifier */
    int id2;        /* Second genuine identifier */
+   int id3;        /* Third genuine identifier */
+   int nid;        /* Number of genuine attributes */
 
 /* Check the global error status. */
    if ( !astOK ) return 0;
 
 /* See if the supplied identifier is a psuedo-identifier representing two 
-   other genuine identifiers. If so, return the logical AND of the test
-   flags for the two genuine identifiers. */
-   if( IdFind( id, &id1, &id2 ) ) {
-      ret = astTestWidth( this, id1 ) && astTestWidth( this, id2 );
-
-/* Otherwise, test the specified attribute directly. */
-   } else {
-      ret = astTestWidth( this, id );
-   }
+   or three other genuine identifiers. If so, return the logical AND of the 
+   test flags for the genuine identifiers. */
+   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3 );
+   ret = astTestWidth( this, id1 );
+   if( nid > 1 ) ret = ret && astTestWidth( this, id2 );
+   if( nid > 2 ) ret = ret && astTestWidth( this, id3 );
 
 /* Return the result. */
    return ret;
@@ -26669,8 +27365,21 @@ static void Delete( AstObject *obj ) {
    }
 
 /* Free the graphics context pointer. */
-   if( this->grfcontextId ) this->grfcontextId = astAnnulId( this->grfcontextId );
+   if( this->grfcontext ) {
+      this->grfcontext = astAnnul( this->grfcontext );
+      this->grfcontextID = astAnnulId( this->grfcontextID );
+   }
 
+/* Free the information about the tick marks to draw. */
+   for( i = 0; i < 3; i++ ) {
+      this->majtickval[ i ] = astFree( this->majtickval[ i ] );
+      this->mintickval[ i ] = astFree( this->mintickval[ i ] );
+      this->nmajtickval[ i ] = 0;
+      this->nmintickval[ i ] = 0;
+   }
+
+/* Free the information about the drawn tick marks. */
+   SaveTick( this, -1, 0.0, 0.0, 0 );
 }
 
 /* Copy constructor. */
@@ -26705,6 +27414,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 /* Local Variables: */
    AstPlot *in;                 /* Pointer to input Plot */
    AstPlot *out;                /* Pointer to output Plot */
+   int axis;                    /* Zero based axis index */
+   int n;                       /* Number of ticks saved */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -26720,6 +27431,19 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
    out->gat = NULL;
    out->ngat = 0;
 
+   for( axis = 0; axis < 3; axis++ ) {
+      out->majtickgx[ axis ] = NULL;
+      out->majtickgy[ axis ] = NULL;
+      out->majtickcount[ axis ] = 0;
+      out->mintickgx[ axis ] = NULL;
+      out->mintickgy[ axis ] = NULL;
+      out->mintickcount[ axis ] = 0;
+      out->majtickval[ axis ] = NULL;
+      out->nmajtickval[ axis ] = 0;
+      out->mintickval[ axis ] = NULL;
+      out->nmintickval[ axis ] = 0;
+   }
+
 /* Copy the clipping bounds arrays. */
    out->clip_lbnd = (double *) astStore( NULL, (void *) in->clip_lbnd,
                                       sizeof(double)*(size_t)(in->clip_axes) );
@@ -26730,11 +27454,39 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
    out->grfstack = (AstGrfPtrs *) astStore( NULL, (void *) in->grfstack,
                                   sizeof(AstGrfPtrs)*(size_t)(in->grfnstack ));
 
+/* Copy the information about drawn tick marks. */
+   for( axis = 0; axis < 3; axis++ ) {
+      n = in->majtickcount[ axis ];
+      out->majtickgx[ axis ] = (double *) astStore( NULL, in->majtickgx[ axis ],
+                                                    n*sizeof( double ) );
+      out->majtickgy[ axis ] = (double *) astStore( NULL, in->majtickgy[ axis ],
+                                                    n*sizeof( double ) );
+      out->majtickcount[ axis ] = n;
+
+      n = in->mintickcount[ axis ];
+      out->mintickgx[ axis ] = (double *) astStore( NULL, in->mintickgx[ axis ],
+                                                    n*sizeof( double ) );
+      out->mintickgy[ axis ] = (double *) astStore( NULL, in->mintickgy[ axis ],
+                                                    n*sizeof( double ) );
+      out->mintickcount[ axis ] = n;
+
+      n = in->nmajtickval[ axis ];
+      out->majtickval[ axis ] = (double *) astStore( NULL, in->majtickval[ axis ],
+                                                     n*sizeof( double ) );
+      out->nmajtickval[ axis ] = n;
+
+      n = in->nmintickval[ axis ];
+      out->mintickval[ axis ] = (double *) astStore( NULL, in->mintickval[ axis ],
+                                                     n*sizeof( double ) );
+      out->nmintickval[ axis ] = n;
+   }
+
 /* If an error occurred, free any allocated memory. */
    if ( !astOK ) { 
       out->clip_lbnd = (double *) astFree( out->clip_lbnd );     
       out->clip_ubnd = (double *) astFree( out->clip_ubnd );
       out->grfstack = (AstGrfPtrs *) astFree( out->grfstack );
+      SaveTick( out, -1, 0.0, 0.0, 0 );
     }
 }
 
@@ -26772,9 +27524,11 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    char buff[ KEY_LEN + 1 ];     /* Buffer for keyword string */
    char *comment;                /* Pointer to comment string */
    double dval;                  /* Double precision value */
+   int ax;                       /* Axis to which element refers */
    int axis;                     /* Zero based axis index */
    int id;                       /* Zero based graphical object id */
    int ival;                     /* Integer value */
+   int nax;                      /* Number of base Frame axes */
    int set;                      /* Attribute value set? */
 
 /* Check the global error status. */
@@ -26782,6 +27536,10 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Obtain a pointer to the Plot structure. */
    this = (AstPlot *) this_object;
+
+/* Get the number of graphics (base) frame axes - 2 for a Plot, 3 for a
+   Plot3D. */
+   nax = astGetNin( this );
 
 /* Write out values representing the instance variables for the
    Plot class.  Accompany these with appropriate comment strings,
@@ -26859,7 +27617,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* DrawAxesUnits(axis). */
 /* ----------------- */
-   for( axis = 0; axis < 2; axis++ ){
+   for( axis = 0; axis < nax; axis++ ){
       set = TestDrawAxes( this, axis );
       ival = set ? GetDrawAxes( this, axis ) : astGetDrawAxes( this, axis );
       (void) sprintf( buff, "DrwAxs%d", axis + 1 );
@@ -26868,7 +27626,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Abbrev(axis). */
 /* ------------- */
-   for( axis = 0; axis < 2; axis++ ){
+   for( axis = 0; axis < nax; axis++ ){
       set = TestAbbrev( this, axis );
       ival = set ? GetAbbrev( this, axis ) : astGetAbbrev( this, axis );
       (void) sprintf( buff, "Abbrv%d", axis + 1 );
@@ -26883,7 +27641,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* LabelAt(axis). */
 /* -------------- */
-   for( axis = 0; axis < 2; axis++ ){
+   for( axis = 0; axis < nax; axis++ ){
       set = TestLabelAt( this, axis );
       dval = set ? GetLabelAt( this, axis ) : astGetLabelAt( this, axis );
       if( dval != AST__BAD ){
@@ -26894,7 +27652,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Centre(axis). */
 /* ------------ */
-   for( axis = 0; axis < 2; axis++ ){
+   for( axis = 0; axis < nax; axis++ ){
       set = TestCentre( this, axis );
       dval = set ? GetCentre( this, axis ) : astGetCentre( this, axis );
       if( dval != AST__BAD ){
@@ -26907,7 +27665,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ---------- */
 /* Discovering the default value requires a lot of calculation. Only
    write out this attribute if an explicit value has been set. */
-   for( axis = 0; axis < 2; axis++ ){
+   for( axis = 0; axis < nax; axis++ ){
       if( astTestGap( this, axis ) ) {
          dval = astGetGap( this, axis );
          if( dval != AST__BAD ){
@@ -26921,7 +27679,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ------------- */
 /* Discovering the default value requires a lot of calculation. Only
    write out this attribute if an explicit value has been set. */
-   for( axis = 0; axis < 2; axis++ ){
+   for( axis = 0; axis < nax; axis++ ){
       if( astTestLogGap( this, axis ) ) {
          dval = astGetLogGap( this, axis );
          if( dval != AST__BAD ){
@@ -26933,7 +27691,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* NumLabGap(axis). */
 /* ---------------- */
-   for( axis = 0; axis < 2; axis++ ){
+   for( axis = 0; axis < nax; axis++ ){
       set = TestNumLabGap( this, axis );
       dval = set ? GetNumLabGap( this, axis ) : astGetNumLabGap( this, axis );
       if( dval != AST__BAD ) {
@@ -26944,7 +27702,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* TextLabGap(axis). */
 /* ----------------- */
-   for( axis = 0; axis < 2; axis++ ){
+   for( axis = 0; axis < nax; axis++ ){
       set = TestTextLabGap( this, axis );
       dval = set ? GetTextLabGap( this, axis ) : astGetTextLabGap( this, axis );
       if( dval != AST__BAD ) {
@@ -26955,7 +27713,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* LabelUp(axis). */
 /* -------------- */
-   for( axis = 0; axis < 2; axis++ ){
+   for( axis = 0; axis < nax; axis++ ){
       set = TestLabelUp( this, axis );
       ival = set ? GetLabelUp( this, axis ) : astGetLabelUp( this, axis );
       (void) sprintf( buff, "LblUp%d", axis + 1 );
@@ -26964,7 +27722,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* LogPlot(axis). */
 /* -------------- */
-   for( axis = 0; axis < 2; axis++ ){
+   for( axis = 0; axis < nax; axis++ ){
       set = TestLogPlot( this, axis );
       ival = set ? GetLogPlot( this, axis ) : astGetLogPlot( this, axis );
       (void) sprintf( buff, "LgPlt%d", axis + 1 );
@@ -26973,7 +27731,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* LogTicks(axis). */
 /* -------------- */
-   for( axis = 0; axis < 2; axis++ ){
+   for( axis = 0; axis < nax; axis++ ){
       set = TestLogTicks( this, axis );
       ival = set ? GetLogTicks( this, axis ) : astGetLogTicks( this, axis );
       (void) sprintf( buff, "LgTck%d", axis + 1 );
@@ -26982,7 +27740,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* LogLabel(axis). */
 /* -------------- */
-   for( axis = 0; axis < 2; axis++ ){
+   for( axis = 0; axis < nax; axis++ ){
       set = TestLogLabel( this, axis );
       ival = set ? GetLogLabel( this, axis ) : astGetLogLabel( this, axis );
       (void) sprintf( buff, "LgLbl%d", axis + 1 );
@@ -26991,7 +27749,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* NumLab(axis). */
 /* -------------- */
-   for( axis = 0; axis < 2; axis++ ){
+   for( axis = 0; axis < nax; axis++ ){
       set = TestNumLab( this, axis );
       ival = set ? GetNumLab( this, axis ) : astGetNumLab( this, axis );
       (void) sprintf( buff, "NmLbl%d", axis + 1 );
@@ -27000,7 +27758,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* MinTick(axis). */
 /* -------------- */
-   for( axis = 0; axis < 2; axis++ ){
+   for( axis = 0; axis < nax; axis++ ){
       set = TestMinTick( this, axis );
       ival = set ? GetMinTick( this, axis ) : astGetMinTick( this, axis );
       (void) sprintf( buff, "MnTks%d", axis + 1 );
@@ -27010,7 +27768,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* TextLab(axis). */
 /* -------------- */
-   for( axis = 0; axis < 2; axis++ ){
+   for( axis = 0; axis < nax; axis++ ){
       set = TestTextLab( this, axis );
       ival = set ? GetTextLab( this, axis ) : astGetTextLab( this, axis );
       (void) sprintf( buff, "TxLbl%d", axis + 1 );
@@ -27019,7 +27777,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* LabelUnits(axis). */
 /* ----------------- */
-   for( axis = 0; axis < 2; axis++ ){
+   for( axis = 0; axis < nax; axis++ ){
       set = TestLabelUnits( this, axis );
       ival = set ? GetLabelUnits( this, axis ) : astGetLabelUnits( this, axis );
       (void) sprintf( buff, "LbUnt%d", axis + 1 );
@@ -27032,8 +27790,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
       set = TestStyle( this, id );
       ival = set ? GetStyle( this, id ) : astGetStyle( this, id );
       (void) sprintf( buff, "Style%d", id + 1 );
-      comment = GrfItem( id, " line style" );
-      astWriteInt( channel, buff, set, 0, ival, comment );
+      comment = GrfItem( id, " line style", &ax );
+      if( ax < nax - 1 ) astWriteInt( channel, buff, set, 0, ival, comment );
       comment = (char *) astFree( (void *) comment );
    }
 
@@ -27043,8 +27801,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
       set = TestFont( this, id );
       ival = set ? GetFont( this, id ) : astGetFont( this, id );
       (void) sprintf( buff, "Font%d", id + 1 );
-      comment = GrfItem( id, " character font" );
-      astWriteInt( channel, buff, set, 0, ival, comment );
+      comment = GrfItem( id, " character font", &ax );
+      if( ax < nax - 1 ) astWriteInt( channel, buff, set, 0, ival, comment );
       comment = (char *) astFree( (void *) comment );
    }
 
@@ -27054,8 +27812,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
       set = TestColour( this, id );
       ival = set ? GetColour( this, id ) : astGetColour( this, id );
       (void) sprintf( buff, "Col%d", id + 1 );
-      comment = GrfItem( id, " colour index" );
-      astWriteInt( channel, buff, set, 0, ival, comment );
+      comment = GrfItem( id, " colour index", &ax );
+      if( ax < nax - 1 ) astWriteInt( channel, buff, set, 0, ival, comment );
       comment = (char *) astFree( (void *) comment );
    }
 
@@ -27066,8 +27824,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
       dval = set ? GetWidth( this, id ) : astGetWidth( this, id );
       if( dval != AST__BAD ) {
          (void) sprintf( buff, "Width%d", id + 1 );
-         comment = GrfItem( id, " line width" );
-         astWriteDouble( channel, buff, set, 0, dval, comment );
+         comment = GrfItem( id, " line width", &ax );
+         if( ax < nax - 1 ) astWriteDouble( channel, buff, set, 0, dval, comment );
          comment = (char *) astFree( (void *) comment );
       }
    }
@@ -27079,8 +27837,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
       dval = set ? GetSize( this, id ) : astGetSize( this, id );
       if( dval != AST__BAD ) {
          (void) sprintf( buff, "Size%d", id + 1 );
-         comment = GrfItem( id, " character size" );
-         astWriteDouble( channel, buff, set, 0, dval, comment );
+         comment = GrfItem( id, " character size", &ax );
+         if( ax < nax - 1 ) astWriteDouble( channel, buff, set, 0, dval, comment );
          comment = (char *) astFree( (void *) comment );
       }
    }
@@ -27094,7 +27852,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* MajTickLen(axis). */
 /* ----------------- */
-   for( axis = 0; axis < 2; axis++ ){
+   for( axis = 0; axis < nax; axis++ ){
       set = TestMajTickLen( this, axis );
       dval = set ? GetMajTickLen( this, axis ) : astGetMajTickLen( this, axis );
       if( dval != AST__BAD ) {
@@ -27105,7 +27863,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* MinTickLen(axis). */
 /* ----------------- */
-   for( axis = 0; axis < 2; axis++ ){
+   for( axis = 0; axis < nax; axis++ ){
       set = TestMinTickLen( this, axis );
       dval = set ? GetMinTickLen( this, axis ) : astGetMinTickLen( this, axis );
       if( dval != AST__BAD ) {
@@ -27123,17 +27881,11 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Edge(axis). */
 /* ----------- */
-   for( axis = 0; axis < 2; axis++ ){
+   for( axis = 0; axis < nax; axis++ ){
       set = TestEdge( this, axis );
       ival = set ? GetEdge( this, axis ) : astGetEdge( this, axis );
       (void) sprintf( buff, "Edge%d", axis + 1 );
-
-      if( axis == 0 ) {
-         comment = "Edge used to label axis 1";
-      } else {
-         comment = "Edge used to label axis 2";
-      }
-
+      comment = "Edge used to label an axis";
       astWriteString( channel, buff, set, 0, xedge[ival], comment );
    }
 
@@ -27676,7 +28428,8 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
       new->tickall = -1;
 
 /* Graphics context identifier */
-      new->grfcontextId = 0;
+      new->grfcontext = NULL;
+      new->grfcontextID = NULL;
 
 /* Shoudl ast Grid draw a boundary round the regions of valid coordinates? 
    Store a value of -1 to indicate that no value has yet been set. This will 
@@ -27728,18 +28481,6 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    of 1 (yes) to be used. */
       new->drawtitle = -1;
 
-/* Are curves to be drawn through the tick marks even if no grid is
-   produced? Store a value of -1 to indicate that no value has yet been 
-   set. This will cause a default value of 1 (yes) to be used. */
-      new->drawaxes[0] = -1;
-      new->drawaxes[1] = -1;
-
-/* Are adjacent numerical axis labels to be abbreviated by removing matching
-   leading fields? Store a value of -1 to indicate that no value has yet been 
-   set. This will cause a default value of 1 (yes) to be used. */
-      new->abbrev[0] = -1;
-      new->abbrev[1] = -1;
-
 /* Are escape sequences within text strings to be interpreted? If not,
    they are printed literally. Store a value of -1 when not set.
    This will cause a default value of 1 (yes) to be used. */
@@ -27751,69 +28492,6 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    default of zero. */
       new->labelling = -9999;
 
-/* The length of the major tick marks as a fraction of the minimum
-   dimension of the plotting area. Store AST__BAD to indicate that no
-   value has been set. This will cause a default of 0.015 to be used. */
-      new->majticklen[ 0 ] = AST__BAD;
-      new->majticklen[ 1 ] = AST__BAD;
-
-/* The length of the minor tick marks as a fraction of the minimum
-   dimension of the plotting area. Store AST__BAD to indicate that no
-   value has been set. This will cause a default of 0.007 to be used. */
-      new->minticklen[ 0 ] = AST__BAD;
-      new->minticklen[ 1 ] = AST__BAD;
-
-/* Are numeric labels to be drawn upright? Store a value of -1 to indicate 
-   that no value has yet been set. This will cause a default value of 0 (no)
-   to be used. */
-      new->labelup[ 0 ] = -1;
-      new->labelup[ 1 ] = -1;
-
-/* The space between an axis and its numeric labels as a fraction of the 
-   minimum dimension of the plotting area. Store AST__BAD to indicate that no
-   value has been set. This will cause a default of 0.01 to be used. */
-      new->numlabgap[ 0 ] = AST__BAD;
-      new->numlabgap[ 1 ] = AST__BAD;
-      new->textlabgap[ 0 ] = AST__BAD;
-      new->textlabgap[ 1 ] = AST__BAD;
-
-/* The space between the top edge and the grid title as a fraction of the 
-   minimum dimension of the plotting area. Store AST__BAD to indicate that no
-   value has been set. This will cause a default of 0.05 to be used. */
-      new->titlegap = AST__BAD;
-
-/* The edges on which to put labels for axes 1 and 2. Store values of -1
-   to indicate that no values have been set. This will cause default values
-   to be used. */
-      new->edge[ 0 ] = -1;
-      new->edge[ 1 ] = -1;
-
-/* The placement of labels within the plotting area will be done
-   automatically by default. */
-      new->labelat[ 0 ] = AST__BAD;
-      new->labelat[ 1 ] = AST__BAD;
-
-/* The central tick is placed automatically by default. */
-      new->centre[ 0 ] = AST__BAD;
-      new->centre[ 1 ] = AST__BAD;
-
-/* The gap between tick marks and the number of minor tick marks will be
-   found automatically by default. */
-      new->gap[ 0 ] = AST__BAD;
-      new->gap[ 1 ] = AST__BAD;
-      new->loggap[ 0 ] = AST__BAD;
-      new->loggap[ 1 ] = AST__BAD;
-      new->mintick[ 0 ] = -1;
-      new->mintick[ 1 ] = -1;
-
-/* Both axes will be labelled by default. */
-      new->numlab[ 0 ] = -1;
-      new->numlab[ 1 ] = -1;
-      new->textlab[ 0 ] = -1;
-      new->textlab[ 1 ] = -1;
-      new->labelunits[ 0 ] = -1;
-      new->labelunits[ 1 ] = -1;
-
 /* Graphics attributes. Default behaviour is to use the current values. */
       for( id = 0; id < AST__NPID; id++ ){
          new->style[ id ] = -1;
@@ -27823,34 +28501,10 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
          new->size[ id ] = AST__BAD;
       }
 
-/* Log/lin attributes. Default value is to use linear axes. */
-      new->logplot[ 0 ] = -1;
-      new->logplot[ 1 ] = -1;
-
-      new->logticks[ 0 ] = -1;
-      new->logticks[ 1 ] = -1;
-
-      new->loglabel[ 0 ] = -1;
-      new->loglabel[ 1 ] = -1;
-
-/* Initialise the components used to store the values actually used
-   for attributes which have dynamic defaults. */
-      for( axis = 0; axis < 2; axis++ ) {
-         new->ulglb[ axis ] = new->loglabel[ axis ];
-         new->ulgtk[ axis ] = new->logticks[ axis ];
-         new->ugap[ axis ] = new->gap[ axis ];
-         new->ucentre[ axis ] = new->centre[ axis ];
-         new->uedge[ axis ] = new->edge[ axis ];
-         new->ulblat[ axis ] = new->labelat[ axis ];
-         new->ulbunit[ axis ] = new->labelunits[ axis ];
-         new->umintk[ axis ] = new->mintick[ axis ];
-         new->utxtlb[ axis ] = new->textlab[ axis ];
-         new->umjtkln[ axis ] = new->majticklen[ axis ];
-      }
-   
-      new->ugrid = new->grid;
-      new->ulbling = new->labelling;
-      new->uborder = new->border;
+/* The space between the top edge and the grid title as a fraction of the 
+   minimum dimension of the plotting area. Store AST__BAD to indicate that no
+   value has been set. This will cause a default of 0.05 to be used. */
+      new->titlegap = AST__BAD;
 
 /* Initialise the protected Ink attribute so that visible ink is used. */
       new->ink = -1;
@@ -27859,6 +28513,102 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    text within strings which include graphical escape sequences. */
       new->gat = NULL;
       new->ngat = 0;
+
+/* Now set the attribute values for each axis. The arrays stored in the
+   Plot struture allow for 3 graphics axes (e.g. as used by a Plot3D) so
+   we initialise 3 axes here even though the Plot class only uses 2. */
+      for( axis = 0; axis < 3; axis++ ) {
+
+/* Are curves to be drawn through the tick marks even if no grid is
+   produced? Store a value of -1 to indicate that no value has yet been 
+   set. This will cause a default value of 1 (yes) to be used. */
+         new->drawaxes[ axis ] = -1;
+
+/* Are adjacent numerical axis labels to be abbreviated by removing matching
+   leading fields? Store a value of -1 to indicate that no value has yet been 
+   set. This will cause a default value of 1 (yes) to be used. */
+         new->abbrev[ axis ] = -1;
+
+/* The length of the major tick marks as a fraction of the minimum
+   dimension of the plotting area. Store AST__BAD to indicate that no
+   value has been set. This will cause a default of 0.015 to be used. */
+         new->majticklen[ axis ] = AST__BAD;
+
+/* The length of the minor tick marks as a fraction of the minimum
+   dimension of the plotting area. Store AST__BAD to indicate that no
+   value has been set. This will cause a default of 0.007 to be used. */
+         new->minticklen[ axis ] = AST__BAD;
+
+/* Are numeric labels to be drawn upright? Store a value of -1 to indicate 
+   that no value has yet been set. This will cause a default value of 0 (no)
+   to be used. */
+         new->labelup[ axis ] = -1;
+
+/* The space between an axis and its numeric labels as a fraction of the 
+   minimum dimension of the plotting area. Store AST__BAD to indicate that no
+   value has been set. This will cause a default of 0.01 to be used. */
+         new->numlabgap[ axis ] = AST__BAD;
+         new->textlabgap[ axis ] = AST__BAD;
+
+/* The edges on which to put labels for axes 1 and 2. Store values of -1
+   to indicate that no values have been set. This will cause default values
+   to be used. */
+         new->edge[ axis ] = -1;
+
+/* The placement of labels within the plotting area will be done
+   automatically by default. */
+         new->labelat[ axis ] = AST__BAD;
+
+/* The central tick is placed automatically by default. */
+         new->centre[ axis ] = AST__BAD;
+
+/* The gap between tick marks and the number of minor tick marks will be
+   found automatically by default. */
+         new->gap[ axis ] = AST__BAD;
+         new->loggap[ axis ] = AST__BAD;
+         new->mintick[ axis ] = -1;
+
+/* Both axes will be labelled by default. */
+         new->numlab[ axis ] = -1;
+         new->textlab[ axis ] = -1;
+         new->labelunits[ axis ] = -1;
+
+/* Log/lin attributes. Default value is to use linear axes. */
+         new->logplot[ axis ] = -1;
+         new->logticks[ axis ] = -1;
+         new->loglabel[ axis ] = -1;
+
+/* Initialise the components used to store the values actually used
+   for attributes which have dynamic defaults. */
+         new->ulglb[ axis ] = new->loglabel[ axis ];
+         new->ulgtk[ axis ] = new->logticks[ axis ];
+         new->uloggap[ axis ] = new->loggap[ axis ];
+         new->ugap[ axis ] = new->gap[ axis ];
+         new->ucentre[ axis ] = new->centre[ axis ];
+         new->uedge[ axis ] = new->edge[ axis ];
+         new->ulblat[ axis ] = new->labelat[ axis ];
+         new->ulbunit[ axis ] = new->labelunits[ axis ];
+         new->umintk[ axis ] = new->mintick[ axis ];
+         new->utxtlb[ axis ] = new->textlab[ axis ];
+         new->umjtkln[ axis ] = new->majticklen[ axis ];
+
+/* Initialise the arrays used to hold information describing the tick
+   marks that have been drawn for the axis. */
+         new->majtickgx[ axis ] = NULL;
+         new->majtickgy[ axis ] = NULL;
+         new->majtickcount[ axis ] = 0;
+         new->mintickgx[ axis ] = NULL;
+         new->mintickgy[ axis ] = NULL;
+         new->mintickcount[ axis ] = 0;
+         new->nmajtickval[ axis ] = 0;
+         new->majtickval[ axis ] = NULL;
+         new->nmintickval[ axis ] = 0;
+         new->mintickval[ axis ] = NULL;
+      }
+   
+      new->ugrid = new->grid;
+      new->ulbling = new->labelling;
+      new->uborder = new->border;
 
    }
 
@@ -27961,6 +28711,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
    int axis;                     /* Zero based axis index */
    int id;                       /* Zero based graphical object id */
    int i;                        /* Loop count */
+   int nax;                      /* Number of base Frame axes */
 
 /* Initialise. */
    new = NULL;
@@ -27991,6 +28742,10 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
                           channel );
 
    if ( astOK ) {
+
+/* Get the number of graphics (base) frame axes - 2 for a Plot, 3 for a
+   Plot3D. */
+   nax = astGetNin( new );
 
 /* Read input data. */
 /* ================ */
@@ -28053,7 +28808,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 
 /* LabelUp(axis). */
 /* -------------- */
-      for( axis = 0; axis < 2; axis++ ){
+      for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "lblup%d", axis + 1 );
          new->labelup[ axis ] = astReadInt( channel, buff, -1 );
          if ( TestLabelUp( new, axis ) ) SetLabelUp( new, axis,
@@ -28062,7 +28817,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 
 /* LogPlot(axis). */
 /* -------------- */
-      for( axis = 0; axis < 2; axis++ ){
+      for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "lgplt%d", axis + 1 );
          new->logplot[ axis ] = astReadInt( channel, buff, -1 );
          if ( TestLogPlot( new, axis ) ) SetLogPlot( new, axis,
@@ -28071,7 +28826,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 
 /* LogTicks(axis). */
 /* -------------- */
-      for( axis = 0; axis < 2; axis++ ){
+      for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "lgtck%d", axis + 1 );
          new->logticks[ axis ] = astReadInt( channel, buff, -1 );
          if ( TestLogTicks( new, axis ) ) SetLogTicks( new, axis,
@@ -28080,7 +28835,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 
 /* LogLabel(axis). */
 /* -------------- */
-      for( axis = 0; axis < 2; axis++ ){
+      for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "lglbl%d", axis + 1 );
          new->loglabel[ axis ] = astReadInt( channel, buff, -1 );
          if ( TestLogLabel( new, axis ) ) SetLogLabel( new, axis,
@@ -28097,7 +28852,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
          if ( TestDrawAxes( new, 1 ) ) SetDrawAxes( new, 1, new->drawaxes[ 1 ] );
 
       } else {
-         for( axis = 0; axis < 2; axis++ ){
+         for( axis = 0; axis < nax; axis++ ){
             (void) sprintf( buff, "drwaxs%d", axis + 1 );
             new->drawaxes[ axis ] = astReadInt( channel, buff, -1 );
             if ( TestDrawAxes( new, axis ) ) SetDrawAxes( new, axis,
@@ -28115,7 +28870,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
          if ( TestAbbrev( new, 1 ) ) SetAbbrev( new, 1, new->abbrev[ 1 ] );
 
       } else {
-         for( axis = 0; axis < 2; axis++ ){
+         for( axis = 0; axis < nax; axis++ ){
             (void) sprintf( buff, "abbrv%d", axis + 1 );
             new->abbrev[ axis ] = astReadInt( channel, buff, -1 );
             if ( TestAbbrev( new, axis ) ) SetAbbrev( new, axis,
@@ -28131,7 +28886,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 
 /* LabelAt(axis). */
 /* -------------- */
-      for( axis = 0; axis < 2; axis++ ){
+      for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "lblat%d", axis + 1 );
          new->labelat[ axis ] = astReadDouble( channel, buff, AST__BAD );
          if ( TestLabelAt( new, axis ) ) SetLabelAt( new, axis,
@@ -28140,7 +28895,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 
 /* Centre(axis). */
 /* ------------ */
-      for( axis = 0; axis < 2; axis++ ){
+      for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "cen%d", axis + 1 );
          new->centre[ axis ] = astReadDouble( channel, buff, AST__BAD );
          if ( TestCentre( new, axis ) ) SetCentre( new, axis,
@@ -28149,7 +28904,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 
 /* Gap(axis). */
 /* ---------- */
-      for( axis = 0; axis < 2; axis++ ){
+      for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "gap%d", axis + 1 );
          new->gap[ axis ] = astReadDouble( channel, buff, AST__BAD );
          if ( TestGap( new, axis ) ) SetGap( new, axis, new->gap[ axis ] );
@@ -28157,7 +28912,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 
 /* LogGap(axis). */
 /* ------------- */
-      for( axis = 0; axis < 2; axis++ ){
+      for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "lggap%d", axis + 1 );
          new->loggap[ axis ] = astReadDouble( channel, buff, AST__BAD );
          if ( TestLogGap( new, axis ) ) SetLogGap( new, axis, new->loggap[ axis ] );
@@ -28165,7 +28920,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 
 /* NumLabGap(axis). */
 /* -------------- */
-      for( axis = 0; axis < 2; axis++ ){
+      for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "nmgap%d", axis + 1 );
          new->numlabgap[ axis ] = astReadDouble( channel, buff, AST__BAD );
          if ( TestNumLabGap( new, axis ) ) SetNumLabGap( new, axis,
@@ -28174,7 +28929,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 
 /* TextLabGap(axis). */
 /* -------------- */
-      for( axis = 0; axis < 2; axis++ ){
+      for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "txgap%d", axis + 1 );
          new->textlabgap[ axis ] = astReadDouble( channel, buff, AST__BAD );
          if ( TestTextLabGap( new, axis ) ) SetTextLabGap( new, axis,
@@ -28183,7 +28938,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 
 /* NumLab(axis). */
 /* ---------------- */
-      for( axis = 0; axis < 2; axis++ ){
+      for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "nmlbl%d", axis + 1 );
          new->numlab[ axis ] = astReadInt( channel, buff, -1 );
          if ( TestNumLab( new, axis ) ) SetNumLab( new, axis,
@@ -28192,7 +28947,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 
 /* MinTick(axis). */
 /* --------------- */
-      for( axis = 0; axis < 2; axis++ ){
+      for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "mntks%d", axis + 1 );
          new->mintick[ axis ] = astReadInt( channel, buff, -1 );
          if ( TestMinTick( new, axis ) ) SetMinTick( new, axis,
@@ -28201,7 +28956,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 
 /* TextLab(axis). */
 /* -------------- */
-      for( axis = 0; axis < 2; axis++ ){
+      for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "txlbl%d", axis + 1 );
          new->textlab[ axis ] = astReadInt( channel, buff, -1 );
          if ( TestTextLab( new, axis ) ) SetTextLab( new, axis,
@@ -28210,7 +28965,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 
 /* LabelUnits(axis). */
 /* --------------- */
-      for( axis = 0; axis < 2; axis++ ){
+      for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "lbunt%d", axis + 1 );
          new->labelunits[ axis ] = astReadInt( channel, buff, -1 );
          if ( TestLabelUnits( new, axis ) ) SetLabelUnits( new, axis,
@@ -28274,7 +29029,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 /* MajTickLen(axis). */
 /* ----------------- */
       } else {
-         for( axis = 0; axis < 2; axis++ ){
+         for( axis = 0; axis < nax; axis++ ){
             (void) sprintf( buff, "mjtkln%d", axis + 1 );
             new->majticklen[ axis ] = astReadDouble( channel, buff, AST__BAD );
             if ( TestMajTickLen( new, axis ) ) SetMajTickLen( new, axis,
@@ -28294,7 +29049,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 /* MinTickLen(axis). */
 /* ----------------- */
       } else {
-         for( axis = 0; axis < 2; axis++ ){
+         for( axis = 0; axis < nax; axis++ ){
             (void) sprintf( buff, "mntkln%d", axis + 1 );
             new->minticklen[ axis ] = astReadDouble( channel, buff, AST__BAD );
             if ( TestMinTickLen( new, axis ) ) SetMinTickLen( new, axis,
@@ -28317,7 +29072,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 
 /* Edge(axis). */
 /* ----------- */
-      for( axis = 0; axis < 2; axis++ ){
+      for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "edge%d", axis + 1 );
          text = astReadString( channel, buff, " " );
          if( astOK && strcmp( text, " " ) ) {
@@ -28336,7 +29091,8 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 /* =================================================== */
 
 /* We have no graphics context. */
-      new->grfcontextId = 0;
+      new->grfcontext = NULL;
+      new->grfcontextID = NULL;
 
 /* Initialise the protected Ink attribute so that visible ink is used. */
       new->ink = -1;
@@ -28414,6 +29170,22 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
       new->gat = NULL;
       new->ngat = 0;
 
+/* Initialise the arrays used to hold information describing the tick
+   marks for each axis. */
+      for( axis = 0; axis < 3; axis++ ) {
+         new->majtickgx[ axis ] = NULL;
+         new->majtickgy[ axis ] = NULL;
+         new->majtickcount[ axis ] = 0;
+         new->mintickgx[ axis ] = NULL;
+         new->mintickgy[ axis ] = NULL;
+         new->mintickcount[ axis ] = 0;
+
+         new->nmajtickval[ axis ] = 0;
+         new->majtickval[ axis ] = NULL;
+         new->nmintickval[ axis ] = 0;
+         new->mintickval[ axis ] = NULL;
+      }
+
 /* If an error occurred, clean up by deleting the new Plot. */
       if ( !astOK ) new = astDelete( new );
    }
@@ -28443,7 +29215,8 @@ void astBoundingBox_( AstPlot *this, float lbnd[2], float ubnd[2] ){
    (**astMEMBER(this,Plot,BoundingBox))(this,lbnd,ubnd);
 }
 
-void astClip_( AstPlot *this, int iframe, const double lbnd[], const double ubnd[] ){
+void astClip_( AstPlot *this, int iframe, const double lbnd[], 
+const double ubnd[] ){
    if( !astOK ) return;
    (**astMEMBER(this,Plot,Clip))(this,iframe,lbnd,ubnd);
 }
@@ -28459,6 +29232,28 @@ int astCvBrk_( AstPlot *this, int ibrk, double *brk, double *vbrk,
    return (**astMEMBER(this,Plot,CvBrk))(this,ibrk,brk,vbrk,len);
 }
 
+void astMirror_( AstPlot *this, int axis ){
+   if( !astOK ) return;
+   (**astMEMBER(this,Plot,Mirror))(this,axis);
+}
+
+AstPointSet *astGetDrawnTicks_( AstPlot *this, int axis, int major ){
+   if( !astOK ) return NULL;
+   return (**astMEMBER(this,Plot,GetDrawnTicks))(this,axis,major);
+}
+
+void astSetTickValues_( AstPlot *this, int axis, int nmajor, double *major,
+                           int nminor, double *minor ){
+   if( !astOK ) return;
+   (**astMEMBER(this,Plot,SetTickValues))(this,axis,nmajor,major,nminor,minor);
+}
+
+void astCopyPlotDefaults_( AstPlot *this, int axis, AstPlot *dplot, 
+                           int daxis ){
+   if( !astOK ) return;
+   (**astMEMBER(this,Plot,CopyPlotDefaults))(this,axis,dplot,daxis);
+}
+
 int astGetLabelUnits_( AstPlot *this, int axis ){
    if( !astOK ) return 0;
    return (**astMEMBER(this,Plot,GetLabelUnits))(this,axis);
@@ -28471,7 +29266,7 @@ void astMark_( AstPlot *this, int nmark, int ncoord, int indim,
 }
 
 void astText_( AstPlot *this, const char *text, const double pos[], 
-               const float up[2], const char *just ){
+               const float up[], const char *just ){
    if ( !astOK ) return;
    (**astMEMBER(this,Plot,Text))( this, text, pos, up, just );
 }
@@ -28527,9 +29322,9 @@ void astClearLogPlot_( AstPlot *this, int axis ) {
    (**astMEMBER(this,Plot,ClearLogPlot))( this, axis ); 
 }
 
-void astSetGrfContext_( AstPlot *this, AstObject *grfcon ) {
-   if ( !astOK ) return;
-   (**astMEMBER(this,Plot,SetGrfContext))( this, grfcon );
+AstKeyMap *astGetGrfContext_( AstPlot *this ) {
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Plot,GetGrfContext))( this );
 }
 
 /* Special public interface functions. */
@@ -28787,8 +29582,6 @@ f     function is invoked with STATUS set to an error value, or if it
    return astMakeId( new );
 
 }
-
-
 
 
 

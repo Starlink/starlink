@@ -4838,6 +4838,8 @@ static void ClassTrans( AstFitsChan *this, AstFitsChan *ret, int axlat,
    const char *ssyssrc;           /* Pointer to SSYSSRC keyword value string */
    double crval;                  /* CRVAL value */
    double restfreq;               /* Rest frequency (Hz) */
+   double v0;                     /* Ref channel velocity in source frame */
+   double vref;                   /* Ref channel velocity in LSR or whatever */
    double vsource;                /* Source velocity */
    double zsource;                /* Source redshift */
    int axspec;                    /* Index of spectral axis */
@@ -4853,6 +4855,11 @@ static void ClassTrans( AstFitsChan *this, AstFitsChan *ret, int axlat,
                   method, class );
    }
 
+   if( restfreq == AST__BAD ) {
+      astError( AST__BDFTS, "%s(%s): Keyword RESTFREQ not found in CLASS "
+                "FITS header.", method, class );
+   }
+
 /* Get the index of the spectral axis. */
    if( axlat + axlon == 1 ) {
       axspec = 2;
@@ -4865,10 +4872,17 @@ static void ClassTrans( AstFitsChan *this, AstFitsChan *ret, int axlat,
 /* Get the spectral CTYPE value */
    if( GetValue2( ret, this, FormatKey( "CTYPE", axspec + 1, -1, ' ' ),
                   AST__STRING, (void *) &cval, 0, method, class ) ){
-   
+
+/* We can only handle frequency axes at the moment. */
+      if( strcmp( "FREQ    ", cval ) ) {
+         astError( AST__BDFTS, "%s(%s): FITS-CLASS keyword %s has value "
+                   "\"%s\" - CLASS support in AST only includes \"FREQ\" axes.",
+                   method, class, FormatKey( "CTYPE", axspec + 1, -1, ' ' ),
+                   cval );
+
 /* CRVAL for the spectral axis needs to be incremented by RESTFREQ if the
    axis represents frequency. */
-      if( !strncmp( "FREQ", cval, 4 ) && restfreq != AST__BAD ) {
+      } else {
          keyname = FormatKey( "CRVAL", axspec + 1, -1, ' ' );
          if( GetValue2( ret, this, keyname, AST__FLOAT, (void *) &crval, 1, 
                         method, class ) ) {
@@ -4877,12 +4891,10 @@ static void ClassTrans( AstFitsChan *this, AstFitsChan *ret, int axlat,
          }
       } 
 
-/* A blank standard of rest for the spectral axis means "SOURCE" */
-      if( !strncmp( "    ", cval + 4, 4 ) ) {
-         cval = "SOURCE";
-         SetValue( ret, "SPECSYS", (void *) &cval, AST__STRING, NULL );
+/* CLASS frequency axes describe source frame frequencies. */
+      cval = "SOURCE";
+      SetValue( ret, "SPECSYS", (void *) &cval, AST__STRING, NULL );
 
-      }
    }
 
 /* If no projection code is supplied for the longitude and latitude axes, 
@@ -4910,13 +4922,21 @@ static void ClassTrans( AstFitsChan *this, AstFitsChan *ret, int axlat,
    }
 
 
-/* Look for a keyword with name "VELO-...". This specifies the source
-   velocity, in a standard of rest specified by the "..." in the keyword
-   name. */
-   if( GetValue2( ret, this, "VELO-%3c", AST__FLOAT, (void *) &vsource, 0, 
+/* Look for a keyword with name "VELO-...". This specifies the velocity
+   at the reference channel, in a standard of rest specified by the "..." 
+   in the keyword name. */
+   if( GetValue2( ret, this, "VELO-%3c", AST__FLOAT, (void *) &vref, 0, 
                   method, class ) ){
 
-/* Get the keyword nameand find the corresponding SSYSSRC keyword value. */
+/* Calculate the velocity (in the rest frame of the source) corresponding
+   to the frequency at the reference channel. */
+      v0 = AST__C*( restfreq - crval )/restfreq;
+
+/* Assume that the source velocity is the difference between this velocity 
+   and the reference channel velocity given by "VELO-..." */
+      vsource = vref - v0;
+
+/* Get the keyword name and find the corresponding SSYSSRC keyword value. */
       keyname = CardName( this );
       if( !strcmp( keyname, "VELO-HEL" ) ) {
          ssyssrc = "BARYCENT";
@@ -4931,7 +4951,7 @@ static void ClassTrans( AstFitsChan *this, AstFitsChan *ret, int axlat,
 
 /* Convert from velocity to redshift and store as ZSOURCE */
       zsource = sqrt( (AST__C + vsource)/ (AST__C - vsource) ) - 1.0;
-      SetValue( ret, "ZSOURCE", (void *) &vsource, AST__FLOAT, NULL );
+      SetValue( ret, "ZSOURCE", (void *) &zsource, AST__FLOAT, NULL );
    }
 }
 
@@ -6872,6 +6892,10 @@ static void DSBSetUp( AstFitsChan *this, FitsStore *store,
    attributes. */
          astSetD( dsb, "DSBCentre", crval );
 
+
+printf(" rest %g  imag %g  cen %g  (all src)\n", in[0], in[1], crval );
+
+
 /* To calculate the topocentric IF we need the topocentric frequency
    equivalent of CRVAL. So take a copy of the DSBSpecFrame, then set it to
    represent topocentric frequency, and read back the DSBCentre value. */
@@ -6886,6 +6910,9 @@ static void DSBSetUp( AstFitsChan *this, FitsStore *store,
    assumed to be half way between the topocentric IMAGFREQ and RESTFREQ
    values. */
          lo = 0.5*( out[ 1 ] + out[ 0 ] );
+
+printf(" lo %g  rest %g  imag %g  cen %g  (all topo)\n", lo, out[0], out[1], dsbcentre );
+
 
 /* Set the IF to be the difference between the Local Oscillator frequency
    and the CRVAL frequency. */
@@ -10153,7 +10180,7 @@ static int GetEncoding( AstFitsChan *this ){
 *     i, j and m are integers and s is a single upper case character):
 *
 *     1) Any keywords starting with "BEGAST" = Native encoding 
-*     2) ORIGIN keyword with the value 'CLASS-Grenoble' = FITS-CLASS.
+*     2) DELTAV and VELO-xxx keywords = FITS-CLASS.
 *     3) Any AIPS spectral CTYPE values:
 *         Any of CDi_j, PROJP, LONPOLE, LATPOLE = FITS-AIPS++ encoding:
 *         None of the above = FITS-AIPS encoding.
@@ -16278,8 +16305,9 @@ static int LooksLikeClass( AstFitsChan *this, const char *method,
 
 *  Description:
 *     Returns non-zero if the supplied FitsChan probably uses FITS-CLASS
-*     encoding. This is the case if it contains an ORIGIN keyword with
-*     the value 'CLASS-Grenoble'
+*     encoding. This is the case if it contains a DELTAV keyword and a
+*     keyword of the form VELO-xxx", where xxx is one of the accepted
+*     standards of rest.
 
 *  Parameters:
 *     this
@@ -16297,9 +16325,7 @@ static int LooksLikeClass( AstFitsChan *this, const char *method,
 */
 
 /* Local Variables... */
-   int found;          /* Was an ORIGIN ard found in the FitsChan? */
    int ret;            /* Returned value */
-   size_t size;        /* length of string value */
 
 /* Initialise */
    ret = 0;
@@ -16307,27 +16333,13 @@ static int LooksLikeClass( AstFitsChan *this, const char *method,
 /* Check the global status. */
    if( !astOK ) return ret;
 
-/* Clear the Card attribute so that the following search will start with the 
-   first card. */
-   astClearCard( this );
-
-/* Find the first occurrence of an ORIGIN card. */
-   found = FindKeyCard( this, "ORIGIN", method, class );
-
-/* If an ORIGIN card was found, see if it has the value "CLASS-Grenoble". */
-   while( found ) {
-      if( !strncmp( "CLASS-Grenoble", (const char *) CardData( this, &size ), 
-                    14 ) ) {
-         ret = 1;  
-         break;
-
-/* If this ORIGIN card is not "CLASS-Grenoble", Increment the current
-   card pointer and see if there is another ORIGIN card in the FitsChan.
-   Loop to check its value.*/
-      } else {
-         MoveCard( this, 1, method, class );
-         found = FindKeyCard( this, "ORIGIN", method, class );
-      }
+/* See if there is a "DELTAV" card, and a "VELO-xxx" card. */
+   if( astKeyFields( this, "DELTAV", 0, NULL, NULL ) && (
+          astKeyFields( this, "VELO-OBS", 0, NULL, NULL ) ||
+          astKeyFields( this, "VELO-HEL", 0, NULL, NULL ) ||
+          astKeyFields( this, "VELO-EAR", 0, NULL, NULL ) ||
+          astKeyFields( this, "VELO-LSR", 0, NULL, NULL ) ) ) {
+      ret = 1;
    }
 
 /* Return  the result. */
@@ -32247,8 +32259,9 @@ f     affects the behaviour of the AST_WRITE and AST_READ routines when
 *
 *     - If the FitsChan contains any keywords beginning with the
 *     string "BEGAST", then NATIVE encoding is used,
-*     - Otherwise, FITS-CLASS is used if the FitsChan contains an ORIGIN
-*     keyword with the value 'CLASS-Grenoble'.
+*     - Otherwise, FITS-CLASS is used if the FitsChan contains a DELTAV
+*     keyword and a keyword of the form VELO-xxx, where xxx indicates one
+*     of the rest frames used by class (e.g. "VELO-LSR").
 *     - Otherwise, if the FitsChan contains a CTYPE keyword which
 *     represents a spectral axis using the conventions of the AIPS and
 *     AIPS++ projects (e.g. "FELO-LSR", etc), then one of FITS-AIPS or 

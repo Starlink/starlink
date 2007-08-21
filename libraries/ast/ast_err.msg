@@ -157,4 +157,8 @@ TUNAM           <Unknown AST tuning parameter name supplied>
 BDPAR           <Bad value supplied for a public function parameter>
 
 
+! New codes introduced for V4.6
+3DFSET          <Supplied FrameSet does not contain any independent axes>
+PXFRRM          <Attempt to delete original Plot3D base Frame>
+
 .END

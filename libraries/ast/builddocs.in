@@ -54,6 +54,7 @@ goodsource="${srcdir}/axis.c \
             ${srcdir}/pcdmap.c \
             ${srcdir}/permmap.c \
             ${srcdir}/plot.c \
+            ${srcdir}/plot3d.c \
             ${srcdir}/pointlist.c \
             ${srcdir}/pointset.c \
             ${srcdir}/polygon.c \

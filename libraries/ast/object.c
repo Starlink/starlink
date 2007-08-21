@@ -3604,9 +3604,17 @@ f     - A value of .FALSE. will be returned if this function should fail
 /* If it is not a valid Object, then report an error (but only if the
    global error status has not already been set). */
       if ( astOK ) {
+
+#ifdef MEM_DEBUG
+         astError( AST__OBJIN, "astIsAObject(%s): Invalid Object pointer "
+                   "given (points at address %p id %d).", astGetClass( this ),
+                   (void *) this, astMemoryID( (void *) this ) );
+#else
          astError( AST__OBJIN, "astIsAObject(%s): Invalid Object pointer "
                    "given (points at address %p).", astGetClass( this ),
                    (void *) this );
+#endif
+
       }
 
 /* Otherwise, note that the Object is valid. */
@@ -3791,7 +3799,6 @@ AstObject *astInitObject_( void *mem, size_t size, int init,
 
 /* Local Variables: */
    AstObject *new;               /* Pointer to new Object */
-   int dynamic;                  /* Is dynamic memory needed? */
 
 /* Initialise. */
    new = NULL;
@@ -3805,8 +3812,7 @@ AstObject *astInitObject_( void *mem, size_t size, int init,
    length of the free list by one, and nullifying the entry in the list 
    for safety. If the list is originally empty, allocate memory for a new 
    object using astMalloc. */
-   dynamic = ( mem == NULL );
-   if ( dynamic ) {
+   if( !mem ) {
       if( object_caching && vtab->nfree > 0 ) {
          mem = vtab->free_list[ --(vtab->nfree) ];
          vtab->free_list[ vtab->nfree ] = NULL;
@@ -3857,7 +3863,7 @@ AstObject *astInitObject_( void *mem, size_t size, int init,
 
 /* Store the Object size and note if its memory was dynamically allocated. */
          new->size = size;
-         new->dynamic = dynamic;
+         new->dynamic = astIsDynamic( new );
 
 /* Initialise the reference count (of Object pointers in use). */
          new->ref_count = 1;

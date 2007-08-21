@@ -7,7 +7,7 @@ dnl   1.5.  It should work with autoconf versions 2.50 or better, and
 dnl   automake 1.6 or better.
 
 dnl   Initialisation: package name and version number
-AC_INIT(ast, 4.5-1, ussc@star.rl.ac.uk)
+AC_INIT(ast, 4.6, ussc@star.rl.ac.uk)
 
 dnl   Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -73,7 +73,7 @@ STAR_DECLARE_DEPENDENCIES(build, sla)
 #  not float.
 STAR_CNF_F2C_COMPATIBLE
 
-#  Determine the type of Fortran character string lengths.
+# Determine the type of Fortran character string lengths.
 STAR_CNF_TRAIL_TYPE
 
 #   Declare the message file.  

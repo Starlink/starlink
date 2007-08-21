@@ -101,6 +101,8 @@
 *     2-MAR-2006 (DSB):
 *        Only use astSscanf if the system on which AST was configured
 *        showed the non-ANSI behaviour reported by Bill Joye.
+*     27-JUN-2007 (DSB):
+*        Added astIsDynamic.
 *-
 */
 
@@ -132,6 +134,7 @@ char **astStringArray_( const char *, int, int );
 char *astString_( const char *, int );
 int astSscanf_( const char *str, const char *format, ...);
 size_t astSizeOf_( const void * );
+int astIsDynamic_( const void * );
 size_t astTSizeOf_( const void * );
 void *astFree_( void * );
 void *astGrow_( void *, int, size_t );
@@ -168,6 +171,7 @@ void astEndPM_( void );
 #define astMemCaching(flag) astERROR_INVOKE(astMemCaching_(flag))
 #define astRealloc(ptr,size) astERROR_INVOKE(astRealloc_(ptr,size))
 #define astSizeOf(ptr) astERROR_INVOKE(astSizeOf_(ptr))
+#define astIsDynamic(ptr) astERROR_INVOKE(astIsDynamic_(ptr))
 #define astTSizeOf(ptr) astERROR_INVOKE(astTSizeOf_(ptr))
 #define astStore(ptr,data,size) astERROR_INVOKE(astStore_(ptr,data,size))
 #define astAppendString(ptr,len,text) astERROR_INVOKE(astAppendString_(ptr,len,text))

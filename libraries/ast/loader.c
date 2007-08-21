@@ -29,6 +29,7 @@
 #include "pcdmap.h"
 #include "permmap.h"
 #include "plot.h"
+#include "plot3d.h"
 #include "pointlist.h"
 #include "pointset.h"
 #include "polygon.h"
@@ -139,6 +140,7 @@ if ( !strcmp( class, #name ) ) return (AstLoaderType *) astLoad##name##_
    LOAD(PcdMap);
    LOAD(PermMap);
    LOAD(Plot);
+   LOAD(Plot3D);
    LOAD(PointList);
    LOAD(PointSet);
    LOAD(PolyMap);

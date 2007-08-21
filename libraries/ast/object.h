@@ -1304,11 +1304,11 @@ void astSet_( void *, const char *, ... );
 
 #else                            /* Public */
 AstObject *astDeleteId_( AstObject * );
-void astExemptId_( AstObject * );
 void astExportId_( AstObject * );
 void astSetId_( void *, const char *, ... );
 #endif
 
+void astExemptId_( AstObject * );
 AstObject *astAnnulId_( AstObject * );
 AstObject *astClone_( AstObject * );
 AstObject *astCopy_( const AstObject * );
@@ -1427,11 +1427,11 @@ astINVOKE(O,astLoadObject_(mem,size,vtab,name,astCheckChannel(channel)))
 #else                            /* Public */
 #define astAnnul(this) astINVOKE(O,astAnnulId_((AstObject *)(this)))
 #define astDelete(this) astINVOKE(O,astDeleteId_((AstObject *)(this)))
-#define astExempt(this) astINVOKE(V,astExemptId_((AstObject *)(this)))
 #define astExport(this) astINVOKE(V,astExportId_((AstObject *)(this)))
 #define astSet astINVOKE(F,astSetId_)
 #endif
 
+#define astExempt(this) astINVOKE(V,astExemptId_((AstObject *)(this)))
 #define astClear(this,attrib) \
 astINVOKE(V,astClear_(astCheckObject(this),attrib))
 #define astClone(this) astINVOKE(O,astClone_(astCheckObject(this)))

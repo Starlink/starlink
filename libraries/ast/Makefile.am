@@ -44,6 +44,7 @@ GRP_C_ROUTINES = \
     fpcdmap.c \
     fpermmap.c \
     fplot.c \
+    fplot3d.c \
     fpointlist.c \
     fpolygon.c \
     fpolymap.c \
@@ -85,6 +86,7 @@ GRP_C_ROUTINES = \
     pcdmap.c \
     permmap.c \
     plot.c \
+    plot3d.c \
     pointlist.c \
     pointset.c \
     polygon.c \
@@ -171,6 +173,7 @@ AST_H_FILES = \
              fluxframe.h \
              frameset.h \
                 plot.h \
+                   plot3d.h \
              skyframe.h \
              specframe.h \
                 dsbspecframe.h \
@@ -202,6 +205,8 @@ GRP_C_INCLUDE_FILES = \
     err.h \
     f77.h \
     grf.h \
+    grf3d.h \
+    pg3d.h \
     loader.h \
     skyaxis.h \
     pal.h \
@@ -294,9 +299,11 @@ lib_LTLIBRARIES = \
     libast.la \
     libast_err.la \
     libast_ems.la \
+    libast_grf3d.la \
     libast_grf_2.0.la \
     libast_grf_3.2.la \
     libast_pgplot.la \
+    libast_pgplot3d.la \
     libast_pal.la \
     libast_wcslib.la
 
@@ -313,9 +320,11 @@ if !NOPIC
 libast_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_err_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_ems_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
+libast_grf3d_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_grf_2.0_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_grf_3.2_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_pgplot_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
+libast_pgplot3d_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_pal_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_wcslib_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 endif
@@ -337,6 +346,10 @@ libast_err_la_SOURCES = err_null.c
 #  The error reporting module that uses EMS to deliver errors.
 libast_ems_la_SOURCES = err_ems.c
 
+#  The module containing null implementations of the 3D graphics routines 
+#  required by AST 
+libast_grf3d_la_SOURCES = grf3d.c 
+
 #  The module containing null implementations of the graphics routines 
 #  required by AST V2.0
 libast_grf_2_0_la_SOURCES = grf_2.0.c 
@@ -345,8 +358,11 @@ libast_grf_2_0_la_SOURCES = grf_2.0.c
 #  added by AST V3.2 and not present in V2.0
 libast_grf_3_2_la_SOURCES = grf_3.2.c 
 
-#  The graphics module that uses PGPLOT for graphical output.
-libast_pgplot_la_SOURCES = grf_pgplot.c
+#  The graphics module that uses PGPLOT for 2D graphical output.
+libast_pgplot_la_SOURCES = grf_pgplot.c 
+
+#  The graphics module that uses PGPLOT for 3D graphical output.
+libast_pgplot3d_la_SOURCES = grf3d_pgplot.c
 
 #  Modules adapted from the wcslib library.
 libast_wcslib_la_SOURCES = proj.c wcstrig.c tpn.c
