@@ -370,6 +370,10 @@ void smf_fits_add_prov( AstFitsChan * hdr, const char * keyroot,
 			const AstKeyMap * idmap,
 			int * status);
 
+void
+smf_accumulate_prov( AstKeyMap * prvmap, const smfFile * file, const Grp* igrp,
+                int index, int * status );
+
 void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, 
                       int *status);
 
