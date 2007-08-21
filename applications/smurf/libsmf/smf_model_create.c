@@ -392,7 +392,7 @@ void smf_model_create( const smfGroup *igroup, smf_modeltype mtype,
 
 	    if( *status == SAI__OK ) {
 	      headptr = buf;
-	      dataptr = (smfData*)buf + headlen;
+	      dataptr = (char *)buf + headlen;
 
 	      /* Fill the header. memset to 0 first since much of this space is
 		 padding to make it a multiple of the page size */
