@@ -415,7 +415,7 @@ fi
 # AUTOASTROM
 
 if test -f ${bindir}/autoastrom/autoastrom; then
-  autoastrom () { ${exec_prefix}/Perl/bin/perl $AUTOASTROM_DIR/autoastrom ${1+"$@"}; }
+  autoastrom () { starperl $AUTOASTROM_DIR/autoastrom ${1+"$@"}; }
 else
   autoastrom () { ${staretcdir}/notinst autoastrom; }
 fi
