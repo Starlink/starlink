@@ -99,7 +99,7 @@
 
 #define FUNC_NAME "smf_open_model"
 
-void smf_open_model( Grp *igrp, int index, const char *mode, smfData **data,
+void smf_open_model( const Grp *igrp, int index, const char *mode, smfData **data,
 		     int *status ) {
   
   void *buf=NULL;               /* Pointer to total container buffer */

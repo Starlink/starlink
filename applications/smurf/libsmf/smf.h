@@ -459,7 +459,7 @@ smf_modeltype smf_model_gettype( const char *modelname, int *status );
 void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, 
 			      smfData **ffdata, int *status);
 
-void smf_open_file( Grp * igrp, int index, const char * mode, int withHdr,
+void smf_open_file( const Grp * igrp, int index, const char * mode, int withHdr,
 		    smfData ** data, int *status);
 
 void smf_open_mapcoord( smfData *data, int *status );
@@ -644,7 +644,7 @@ void smf_rebinsparse( smfData *data, int ifile, AstFrame *ospecfrm, AstMapping *
                       float *ton_array, double *fcon, int *status );
 
 
-void smf_open_model( Grp *igrp, int index, const char *mode, smfData **data,
+void smf_open_model( const Grp *igrp, int index, const char *mode, smfData **data,
 		     int *status );
 
 size_t smf_dtype_sz( const smf_dtype dtype, int *status );

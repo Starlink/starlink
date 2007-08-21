@@ -13,7 +13,7 @@
 *     Library routine
 
 *  Invocation:
-*     smf_open_file( Grp * ingrp, int index, const char * mode, int withHdr,
+*     smf_open_file( const Grp * ingrp, int index, const char * mode, int withHdr,
 *                    smfData ** data, int *status);
 
 *  Arguments:
@@ -186,7 +186,7 @@
 
 #define FUNC_NAME "smf_open_file"
 
-void smf_open_file( Grp * igrp, int index, const char * mode, int withHdr,
+void smf_open_file( const Grp * igrp, int index, const char * mode, int withHdr,
 		    smfData ** data, int *status) {
 
   char dtype[NDF__SZTYP+1];  /* String for DATA type */
