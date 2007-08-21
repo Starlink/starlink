@@ -197,7 +197,7 @@ int get_aline_(line, prompt, terminate, llen, plen)
 **
 ** NOTE: this routine returns the length of the reply and pads any
 **       remaining characters of line with 'blanks'. In case *terminate
-**       is not 0 a C terminator (NULL char) is written in the last
+**       is not 0 a C terminator (NUL char) is written in the last
 **       position.
 **
 ** Calling from FORTRAN: if called from a FORTRAN main (with line and 
@@ -225,7 +225,7 @@ int  llen, plen;     /*     (in)     Length of line and prompt. Answer  */
   char *do_gets();
   int   i, len, slen;
 
-  line[llen-1] = (char)NULL;         /* make sure string is terminated  */
+  line[llen-1] = '\0';         /* make sure string is terminated  */
 
                                           /* copy and terminate prompt  */
   for (slen = plen-1; slen > 0 && *(prompt+slen-1) == ' '; slen--);
@@ -237,11 +237,11 @@ int  llen, plen;     /*     (in)     Length of line and prompt. Answer  */
       lprompt[slen] = ' ';
       slen++;
     }
-  lprompt[slen] = (char)NULL;
+  lprompt[slen] = '\0';
 
                                     /* get answer from stdin */
 #if HAVE_READLINE
-  if ( (line_read = do_gets(lprompt)) == (char *)NULL )
+  if ( (line_read = do_gets(lprompt)) == NULL )
     {
       return(-1);
     }
@@ -250,22 +250,22 @@ int  llen, plen;     /*     (in)     Length of line and prompt. Answer  */
 #else
   printf("%s", lprompt);
   if ( (line_read = fgets(line, llen, stdin)) == (char *)EOF || 
-        line_read == (char *)NULL )
+        line_read == NULL )
     {
       return(-1);
     }
   len = (int) strlen(line);
-  if (line[len-1] = '\n') 
+  if (line[len-1] == '\n') 
     {
       len = len - 1;
-      line[len] = (char)NULL;
+      line[len] = '\0';
     }
 #endif  
 
   if (*terminate != 0)
     {
-      line[llen] = (char)NULL;            /* make sure it's terminated  */
-      if (len < llen) line[len] = (char)NULL; 
+      line[llen] = '\0';            /* make sure it's terminated  */
+      if (len < llen) line[len] = '\0'; 
     }
   else
     {
@@ -305,10 +305,10 @@ char *prompt;             /*   (in)   Prompt to use  (can be empty: "") */
 
   /* If the buffer has already been allocated, return the memory
      to the free pool. */
-  if (line_read != (char *)NULL)
+  if (line_read != NULL)
     {
       free (line_read);
-      line_read = (char *)NULL;
+      line_read = NULL;
     }
   
   /* Get a line from the user. */
