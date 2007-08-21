@@ -34,6 +34,7 @@
 *     A.G. Gibb (UBC)
 *     E. Chapin (UBC)
 *     C. VanLaerhoven (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History :
@@ -75,10 +76,14 @@
 *        Might as well finish the job - Saturn and Neptune are now supported
 *     2007-08-15 (CV):
 *        Added microstepping parameters - nmicstep, mspat_x/y
+*     2007-08-20 (TIMJ):
+*        Can not use strtok on a const char*
 
 *  Copyright:
+*     Copyright (C) 2007 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Council. Copyright (C) 2005-2007 University of British Columbia.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -336,7 +341,8 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
 
      /* Parse the string and retrieve the values */
      n = 0;
-     curtok = strtok ( temp, ";" );
+     strncpy ( convert, temp, 80 );
+     curtok = strtok ( convert, ";" );
      while ( curtok != NULL ){
 	if ( n >= SC2SIM__MXMSTP ) {
 	  *status = SAI__ERROR;
@@ -356,7 +362,8 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
 
      /* Parse the string and retrieve the values */
      n = 0;
-     curtok = strtok ( temp, ";" );
+     strncpy ( convert, temp, 80 );
+     curtok = strtok ( convert, ";" );
      while ( curtok != NULL ){
 	if ( n >= SC2SIM__MXMSTP ) {
 	  *status = SAI__ERROR;
