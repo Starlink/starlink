@@ -66,6 +66,7 @@
 *     B.D.Kelly (ROE)
 *     J. Balfour (UBC)
 *     E.Chapin (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History :
@@ -100,10 +101,14 @@
 *     2007-06-29 (EC):
 *        Hard-wire sky level for digitisation coefficients since they get
 *        updated in sc2sim_simulate
+*     2007-08-20 (TIMJ):
+*        Fix some intel compiler warnings
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Copyright (C) 2005-2007 University of British Columbia.
+*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
+*     Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -142,6 +147,7 @@
 /* Starlink Includes */
 #include "ast.h"
 #include "sae_par.h"
+#include "mers.h"
 
 #define FUNC_NAME "sc2sim_instrinit"
 
@@ -251,7 +257,7 @@ void sc2sim_instrinit( struct sc2sim_obs_struct *inx,
 
   if( *status == SAI__OK ) {
 
-    printf("NBOL = %li\n", nbol);
+    printf("NBOL = %d\n", nbol);
 
     astSetC( fset, "SYSTEM", "AzEl" );
     astTran2( fset, nbol, *ybolo, *xbolo, 1, *xbc, *ybc );
