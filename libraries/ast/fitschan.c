@@ -785,6 +785,8 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        (velocity axes seem not to be recognised properly by CLASS).
 *        - Change the CLASS "VELO-LSR" header to be the velocity at the
 *        reference channel, not the source velocity.
+*     22-AUG-2007 (DSB):
+*        - Remove debugging printf statements.
 *class--
 */
 
@@ -6892,10 +6894,6 @@ static void DSBSetUp( AstFitsChan *this, FitsStore *store,
    attributes. */
          astSetD( dsb, "DSBCentre", crval );
 
-
-printf(" rest %g  imag %g  cen %g  (all src)\n", in[0], in[1], crval );
-
-
 /* To calculate the topocentric IF we need the topocentric frequency
    equivalent of CRVAL. So take a copy of the DSBSpecFrame, then set it to
    represent topocentric frequency, and read back the DSBCentre value. */
@@ -6910,9 +6908,6 @@ printf(" rest %g  imag %g  cen %g  (all src)\n", in[0], in[1], crval );
    assumed to be half way between the topocentric IMAGFREQ and RESTFREQ
    values. */
          lo = 0.5*( out[ 1 ] + out[ 0 ] );
-
-printf(" lo %g  rest %g  imag %g  cen %g  (all topo)\n", lo, out[0], out[1], dsbcentre );
-
 
 /* Set the IF to be the difference between the Local Oscillator frequency
    and the CRVAL frequency. */
