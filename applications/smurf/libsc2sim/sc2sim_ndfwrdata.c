@@ -121,6 +121,7 @@
 *     A.G. Gibb (UBC)
 *     J. Balfour (UBC)
 *     Tim Jenness (JAC, Hawaii)
+*     C. VanLaerhoven (UBC)
 *     {enter_new_authors_here}
 
 *  History :
@@ -183,6 +184,8 @@
 *        Write out consistent coordinate system for DREAM/STARE images
 *     2007-08-14 (AGG):
 *        Write out planet name for planet simulations
+*     2007-08-22 (CV):
+*        Fixed coordinate system string termination issue
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
@@ -644,9 +647,11 @@ int *status              /* Global status (given and returned) */
      /* Set coordinate system */
      strncpy( cosys, head[0].tcs_tr_sys, JCMT__SZTCS_TR_SYS );
      if ( strncmp( cosys, "APP", 3 ) == 0 ) {
-       strncpy( cosys, "GAPPT", 5);
+       strncpy( cosys, "GAPPT", JCMT__SZTCS_TR_SYS+1 );
+       cosys[5] = '\0'; // to be safe
      } else if (strncmp( cosys, "J2000", 5 ) == 0) {
-       strncpy( cosys, "ICRS", 4);
+       strncpy( cosys, "ICRS", JCMT__SZTCS_TR_SYS+1 );
+       cosys[4] = '\0'; // to be safe
      }
 
      /* Loop over number of images */
