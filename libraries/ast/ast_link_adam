@@ -37,7 +37,7 @@
 #     - ``-fsla'': Ignored. Provided for backward compatibility only.
 #
 #     - ``-grf'': Requests that no arguments be generated to specify which
-#     graphics system is used to display output from the AST library. You
+#     2D graphics system is used to display output from the AST library. You
 #     should use this option only if you have implemented an interface to a
 #     new graphics system yourself and wish to provide your own arguments for
 #     linking with it. This switch differs from the other ``grf'' switches in 
@@ -53,10 +53,10 @@
 #
 #     - ``-grf_v2.0'': This switch is equivalent to the ``-mygrf'' switch.
 #     It indicates that you want to link with your own graphics module which 
-#     implements the graphics interface required by V2.0 of AST.
+#     implements the 2D graphics interface required by V2.0 of AST.
 #
 #     - ``-grf_v3.2'': Indicates that you want to link with your own graphics 
-#     module which implements the graphics interface required by V3.2 of AST.
+#     module which implements the 2D graphics interface required by V3.2 of AST.
 #
 #     - ``-myerr'': Requests that no arguments be generated to specify how
 #     error messages produced by the AST library should be delivered. You
@@ -71,17 +71,37 @@
 #     graphics module which implements the interface used by AST V2.0. It is 
 #     equivalent to the ``-grf_v2.0'' switch.
 #
-#     - ``-pgp'': Requests that the program be linked so that
+#     - ``-pgp'': Requests that the program be linked so that 2D
 #     graphical output from the AST library is displayed via the
 #     Starlink version of the PGPLOT graphics package (which uses GKS
 #     for its output). By default, no graphics package is linked and
 #     this will result in an error at run time if AST routines are
 #     invoked that attempt to generate graphical output.
 #
-#     - ``-pgplot'': Requests that the program be linked so that
+#     - ``-pgplot'': Requests that the program be linked so that 2D
 #     graphical output from the AST library is displayed via the
 #     standard (or ``native'') version of the PGPLOT graphics
 #     package. By default, no graphics package is linked and this will
+#     result in an error at run time if AST routines are invoked that
+#     attempt to generate graphical output.
+#
+#     - ``-grf3d'': Requests that no arguments be generated to specify which
+#     3D graphics system is used to display output from the AST library. You
+#     should use this option only if you have implemented an interface to a
+#     new 3D graphics system yourself and wish to provide your own arguments 
+#     for linking with it. 
+#
+#     - ``-pgp3d'': Requests that the program be linked so that 3D 
+#     graphical output from the AST library is displayed via the
+#     Starlink version of the PGPLOT graphics package (which uses GKS
+#     for its output). By default, no 3D graphics package is linked and
+#     this will result in an error at run time if AST routines are
+#     invoked that attempt to generate graphical output.
+#
+#     - ``-pgplot3d'': Requests that the program be linked so that 3D
+#     graphical output from the AST library is displayed via 
+#     the standard (or ``native'') version of the PGPLOT graphics
+#     package. By default, no 3D graphics package is linked and this will
 #     result in an error at run time if AST routines are invoked that
 #     attempt to generate graphical output.
 
@@ -155,6 +175,8 @@
 #        Added "-fsla" option.
 #     16-JUN-2006 (DSB):
 #        Ignore "-fsla" and "-clsa" options, and always use PAL.
+#     22-AUG-2007 (DSB):
+#        Added "-grf3d", "-pgplot3d" and "-pgp3d" flags.
 #     {enter_changes_here}
 
 #  Bugs:
@@ -173,6 +195,7 @@
 #  Initialise linking options.
       err=''
       grf=''
+      grf3d=''
       sla=''
 
 #  Interpret command line switches.
@@ -195,37 +218,52 @@
             err='my'
             shift;;
 
-#  -grf - Requests no graphics.
+#  -grf - Requests no 2D graphics.
          -grf)
             grf='current'
             shift;;
 
-#  -mygrf - Requests no graphics, except for null implementations of 
+#  -mygrf - Requests no 2D graphics, except for null implementations of 
 #  functions aded to the grf interface after AST V2.0.
          -mygrf)
             grf='v2.0'
             shift;;
 
-#  -grf_v2.0 - Requests no graphics, except for null implementations of 
+#  -grf_v2.0 - Requests no 2D graphics, except for null implementations of 
 #  functions aded to the grf interface after AST V2.0.
          -grf_v2.0)
             grf='v2.0'
             shift;;
 
-#  -grf_v3.2 - Requests no graphics, except for null implementations of 
+#  -grf_v3.2 - Requests no 2D graphics, except for null implementations of 
 #  functions aded to the grf interface after AST V3.2. 
          -grf_v3.2)
             grf='v3.2'
             shift;;
 
-#  -pgp - Requests graphical output through Starlink PGPLOT.
+#  -pgp - Requests 2D graphical output through Starlink PGPLOT.
          -pgp)
             grf='pgp'
             shift;;
 
-#  -pgplot - Requests graphical output through native PGPLOT.
+#  -pgplot - Requests 2D graphical output through native PGPLOT.
          -pgplot)
             grf='pgplot'
+            shift;;
+
+#  -grf3d - Requests no 3D graphics.
+         -grf3d)
+            grf3d='current'
+            shift;;
+
+#  -pgp3d - Requests 3D graphical output through Starlink PGPLOT.
+         -pgp3d)
+            grf3d='pgp'
+            shift;;
+
+#  -pgplot3d - Requests 3D graphical output through native PGPLOT.
+         -pgplot3d)
+            grf3d='pgplot'
             shift;;
 
 #  Once all switches have been read, continue with the rest of the script.
@@ -260,8 +298,8 @@
       *) args="${args} -last_pal";;
       esac
 
-#  Generate arguments for linking the graphics system.
-#  ---------------------------------------------------
+#  Generate arguments for linking the 2D graphics system.
+#  ------------------------------------------------------
       case "${grf}" in
 
 #  If using Starlink PGPLOT, link with the AST PGPLOT interface and
@@ -291,6 +329,29 @@
 #  Default graphics (none) requires linking with all the default (null) AST 
 #  "grf" modules.
       *) args="${args} -last_grf_2.0 -last_grf_3.2";;
+      esac
+
+#  Generate arguments for linking the 3D graphics system.
+#  ------------------------------------------------------
+      case "${grf3d}" in
+
+#  If using Starlink PGPLOT, link with the AST 3D PGPLOT interface and
+#  the Fortran library via the PGP link script (if found).
+      pgp) args="${args} -last_pgplot3d `\`find pgp_link\``"
+           f77='y';;
+
+#  If using native PGPLOT, link with the AST 3D PGPLOT interface and the
+#  Fortran library via the PGPLOT link script (if found).
+      pgplot) args="${args} -last_pgplot3d `\`find pgplot_link\``"
+              f77='y';;
+
+#  If using own 3D graphics which conform to the requirements of the current 
+#  version of AST, do not produce any arguments.
+      current) :;;
+
+#  Default graphics (none) requires linking with all the default (null) AST 
+#  "grf3d" modules.
+      *) args="${args} -last_grf3d";;
       esac
 
 #  Make a second pass through the AST library.
