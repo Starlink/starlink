@@ -1,0 +1,328 @@
+      SUBROUTINE KPG1_KER1<T>( NDIM, DIMS, IN, NAX, AXES, SIZE, CENTRE, 
+     :                         KERNEL, WORK, OUT, STATUS )
+*+
+*  Name:
+*     KPG1_KER1x
+
+*  Purpose:
+*     Smooths an N-dimensional array using a specified 1D kernel.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation
+*     CALL KPG1_KER1<T>( NDIM, DIMS, IN, NAX, AXES, SIZE, CENTRE, KERNEL,
+*                        WORK, OUT, STATUS )
+
+*  Description:
+*     The routine smooths the array IN using a specified 1-dimensional
+*     kernel and returns the result in the array OUT. The 1D kernel can
+*     be used to smooth either a single axis or mutiple axes. If multiple
+*     axes are smoothed, the total smoothing kernel is equivalent to the 
+*     product of the kernels used to smooth each individual axis.
+*
+*     Any output pixel that is contributed to by a bad pixel, or a pixel
+*     that is over the edge of the input data array, is set bad in the 
+*     output.
+
+*  Arguments:
+*     NDIM = INTEGER (Given)
+*        The number of pixel axes in the IN and OUT arrays.
+*     DIMS( NDIM ) = INTEGER (Given)
+*        The length, in pixels, of each dimension of the IN and OUT arrays.
+*     IN( * ) = ? (Given)
+*        The input array, accessed as a 1D vector.
+*     NAX = INTEGER (Given)
+*        The number of axes along which smoothing should be performed.
+*     AXES( NAX ) = INTEGER (Given)
+*        The indices of the pixel axes along which smoothing should be
+*        performed. The first axis is axis 1.
+*     SIZE = INTEGER (Given)
+*        The number of values in the kernel.
+*     CENTRE = INTEGER (Given)
+*        The index of the element within KERNEL that corresponds to the
+*        centre of the kernel.
+*     KERNEL( SIZE ) = ? (Given)
+*        The kernel array. The values in this array are used as supplied
+*        - they are not normalised to a total sum of unity.
+*     WORK( SIZE ) = ? (Given and Returned)
+*        A work array.
+*     OUT( * ) = ? (Returned)
+*        The output array, accessed as a 1D vector.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     - This routine can be used to smooth either DATA or VARIANCE
+*     arrays. If a DATA array is smoothed with a given kernel, the
+*     corresponding VARIANCE array should be smoothed with a kernel 
+*     containing the squares of the values in the original kernel.
+*     - There are routines for processing double precision and real data.
+*     Replace "x" in the routine name by D or R as appropriate.  The
+*     data types of the IN, KERNEL and OUT arguments must match the 
+*     routine used.
+
+*  Copyright:
+*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     DSB: David S Berry (JAC, UCLan)
+*     {enter_new_authors_here}
+
+*  History:
+*     22-AUG-2007 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
+
+*  Arguments Given:
+      INTEGER NDIM
+      INTEGER DIMS( NDIM )
+      <TYPE> IN( * )
+      INTEGER NAX
+      INTEGER AXES( NAX )
+      INTEGER SIZE
+      INTEGER CENTRE
+      <TYPE> KERNEL( SIZE )
+
+*  Arguments Given and Returned:
+      <TYPE> WORK( SIZE )
+      
+*  Arguments Returned:
+      <TYPE> OUT( * )
+
+*  Status:
+      INTEGER STATUS
+
+*  Local Variables:
+      <TYPE> PIXVAL                ! Input pixel value
+      <TYPE> SUM                   ! Sum of weighted input pixel values
+      INTEGER AXIS                 ! Smoothing axis index in IN or OUT
+      INTEGER GHI                  ! Highest grid index to use
+      INTEGER GLO                  ! Lowest grid index to use
+      INTEGER GRID                 ! Grid index at central o/p element
+      INTEGER IAX                  ! Smoothing axis index in AXES
+      INTEGER IDIM                 ! Array axis index
+      INTEGER IEL                  ! Vector index at next i/p element
+      INTEGER IEL0                 ! Vector index at first i/p element
+      INTEGER IK                   ! Index into kernel array
+      INTEGER INEW                 ! Index to store next WORK value
+      INTEGER IOLD                 ! Index of oldest value in WORK 
+      INTEGER IOUT                 ! Vector index at central o/p element
+      INTEGER ISTART               ! Vector index at start of row
+      INTEGER NEL                  ! No. of elements in IN and OUT
+      INTEGER START( NDF__MXDIM )  ! Pixel indices at start of row
+      INTEGER STRIDE( NDF__MXDIM ) ! Vector stride between axis elements
+      LOGICAL GOOD                 ! Are all input pixel values good?
+      LOGICAL MORE                 ! More rows to smooth?
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Get the total number of pixels in the IN and OUT arrays, and the
+*  vector stride between adjacent values on each axis.
+      NEL = DIMS( 1 )
+      STRIDE( 1 ) = 1
+
+      DO IDIM = 2, NDIM
+         NEL = NEL*DIMS( IDIM )
+         STRIDE( IDIM ) = STRIDE( IDIM - 1 )*DIMS( IDIM - 1 )
+      END DO      
+
+*  Copy the input array to the output array.
+      DO IEL = 1, NEL
+         OUT( IEL ) = IN( IEL )
+      END DO
+
+*  Loop round smoothing along each requested pixel axis in turn. Each
+*  smoothing is performed in-situ; the current contents of OUT are
+*  smoothed and replaced in OUT.
+      DO IAX = 1, NAX
+         AXIS = AXES( IAX )
+
+         IF( AXIS .LT. 1 .OR. AXIS .GT. NDIM ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETI( 'AXIS', AXIS )
+            CALL ERR_REP( 'KPG1_KER1x_ERR1', 'KPG1_KER1x: Cannot '//
+     :                    'smooth along pixel axis ^AXIS (possible '//
+     :                    'programming error).', STATUS )
+            CALL MSG_SETI( 'NDIM', NDIM )
+            CALL ERR_REP( 'KPG1_KER1x_ERR2', 'Smoothing axes must '//
+     :                    'be in the range 1 to ^NDIM.', STATUS )
+            GO TO 999
+         END IF
+
+*  Form the largest and smallest value on this axis that can create a
+*  good output value. Axis values outside this range are so close the
+*  the edges of the data array that a kernel centred on such an axis
+*  value would overlap the edges of the array.
+         GLO = CENTRE
+         GHI = DIMS( AXIS ) - SIZE + CENTRE
+
+*  Loop round every row of pixels parallel to the curent smoothing axis.
+*  ISTART holds the vector index of the first element in the row. The
+*  START array holds the grid indices at the first element in the row.
+         ISTART = 1
+         DO IDIM = 1, NDIM
+            START( IDIM ) = 1
+         END DO      
+
+         MORE = .TRUE.
+         DO WHILE( MORE )
+
+*  Loop round every pixel in the current output row, maintaining the
+*  grid index in GRID and the corresponding vector index within IN 
+*  and OUT in IOUT.
+            IOLD = 1
+            INEW = 1
+            IOUT = ISTART
+            DO GRID = 1, DIMS( AXIS )
+
+*  If a kernel centred on this output pixel would overlap the lower edge
+*  of the data cube, store a bad value for the output pixel. We use a work
+*  array as a temporary staging post for the output values. This is to
+*  avoid the new value for the current output pixel being used when 
+*  calculating the values for adjacent output pixel values. Values are
+*  stored in the work array in a cyclical manner, with INEW being the index
+*  of the work element to store the next value in, and IOLD being the
+*  index of the oldest value currently in the work array.
+               IF( GRID .LT. GLO  ) THEN
+                  WORK( INEW ) = VAL__BAD<T>
+
+*  Increment the index at which to store the next new value in the work
+*  array.
+                  INEW = INEW + 1
+                  IF( INEW .GT. SIZE ) INEW = 1
+
+*  If a kernel centred on this output pixel would overlap the upper edge
+*  of the data cube, store a bad value for the output pixel. We store
+*  this value directly in the output array since we will not be wanting
+*  the original output values any more.
+               ELSE IF( GRID .GT. GHI ) THEN
+                  OUT( IOUT ) = VAL__BAD<T>
+
+*  We will not be using the output pixel with the lowest grid index any
+*  more, since the kernel has now moved on to higher pixel indices. So we
+*  can safely copy the new output value for that pixel from the work array
+*  to the output array.
+                  IEL0 = IOUT - ( CENTRE - 1 )*STRIDE( AXIS )
+                  OUT( IEL0 ) = WORK( IOLD )
+
+*  Increment the index of the oldest value remaining in the work array.
+                  IOLD = IOLD + 1
+                  IF( IOLD .GT. SIZE ) IOLD = 1
+
+*  Otherwise, form the sum of the required elements of OUT multiplied by 
+*  the appropriate elements of KERNEL. Note if any bad pixels get
+*  included in the sum.
+               ELSE
+                  IEL = IOUT - ( CENTRE - 1 )*STRIDE( AXIS )
+                  IEL0 = IEL
+                  SUM = 0.0
+                  GOOD = .TRUE.
+                  DO IK = 1, SIZE
+                     PIXVAL = OUT( IEL )
+                     IF( PIXVAL .NE. VAL__BAD<T> ) THEN
+                        SUM = SUM + PIXVAL*KERNEL( IK )
+                     ELSE
+                        GOOD = .FALSE.
+                     END IF
+                     IEL = IEL + STRIDE( AXIS )
+                  END DO
+
+*  Store the output value in the work array.
+                  IF( GOOD ) THEN
+                     WORK( INEW ) = SUM 
+                  ELSE
+                     WORK( INEW ) = VAL__BAD<T>
+                  END IF
+
+*  Increment the index at which to store the next new value in the work
+*  array.
+                  INEW = INEW + 1
+                  IF( INEW .GT. SIZE ) INEW = 1
+
+*  We will not be using the output pixel with the lowest grid index any
+*  more, since the kernel has now moved on to higher pixel indices. So we
+*  can safely copy the new output value for that pixel from the work array
+*  to the output array.
+                  OUT( IEL0 ) = WORK( IOLD )
+
+*  Increment the index of the oldest value remaining in the work array.
+                  IOLD = IOLD + 1
+                  IF( IOLD .GT. SIZE ) IOLD = 1
+
+               END IF
+
+*  Update the vector index of the next output pixel.
+               IOUT = IOUT + STRIDE( AXIS )
+            END DO
+
+*  Find the grid indices and vector index at the start of the next row of
+*  pixels parallel to the current smoothing axis. This is the start of a
+*  "DO... UNTIL" loop.
+ 10         CONTINUE            
+
+*  Update the pixel indices and vector index so that they refer to the
+*  next element on pixel axis 1.
+            IDIM = 1
+            START( 1 ) = START( 1 ) + 1
+            ISTART = ISTART + 1
+
+*  If the end of the axis has been reached, reset the pixel index to the
+*  start of the axis and increment the pixel index on the next axis.
+            DO WHILE( IDIM .LE. NDIM .AND. 
+     :                START( IDIM ) .GT. DIMS( IDIM ) ) 
+               START( IDIM ) = 1
+               IDIM = IDIM + 1
+               START( IDIM ) = START( IDIM ) + 1
+            END DO
+
+*  If the updated pixel indices do not refer to the first pixel in a row
+*  parallel to the current smoothing axis, then move on to the next pixel
+*  by repeating the above code.
+            IF( IDIM .GT. NDIM ) THEN
+               MORE = .FALSE.
+            ELSE IF( START( AXIS ) .NE. 1 ) THEN
+               GO TO 10
+            END IF
+
+         END DO
+
+      END DO
+
+*  Arrive here if an error occurred.
+ 999  CONTINUE
+
+      END
