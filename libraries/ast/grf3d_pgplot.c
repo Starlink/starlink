@@ -170,7 +170,7 @@ F77_SUBROUTINE(pgswin)( REAL(X1), REAL(X2), REAL(Y1), REAL(Y2) );
 F77_SUBROUTINE(pgupdt)( void );
 
 
-/* Public functions defined by th3 grf3D interface. */
+/* Public functions defined by the grf3D interface. */
 /* ================================================ */
 /* All implementations of the grf3d interface must provide implementations
    of all the functions in this block. The corresponding templates are in
