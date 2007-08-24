@@ -90,6 +90,8 @@
 *        Display SourceVel in system specified by SourceSys unless
 *        SourceSys is not set, in which case use main SpecFrame System if
 *        possible.
+*     24-AUG-2007 (DSB):
+*        Display the SkyRef position even if it is ignored.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -302,6 +304,20 @@
                
                CALL MSG_OUT( 'WCS_REF', IND( : NIND )//'^LAB ^REF', 
      :                       STATUS )
+
+            ELSE IF( AST_TEST( FRM, 'SkyRef', STATUS ) ) THEN
+               POSBUF = ' '
+               IAT = 0
+               CALL CHR_APPND( 'Ref. position', POSBUF, IAT )
+               IAT = 20
+               CALL CHR_APPND( ':', POSBUF, IAT )
+
+               CALL MSG_SETC( 'LAB', POSBUF( :IAT ) )
+               CALL MSG_SETC( 'REF', AST_GETC( FRM, 'SkyRef', STATUS ) )
+               
+               CALL MSG_OUT( 'WCS_REF', IND( : NIND )//'^LAB ^REF', 
+     :                       STATUS )
+
             END IF
 
 *  Display the projection.
