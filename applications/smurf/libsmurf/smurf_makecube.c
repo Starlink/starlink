@@ -696,6 +696,7 @@ void smurf_makecube( int *status ) {
    int use_wgt;               /* Use input variance to weight input data? */
    int usedetpos;             /* Should the detpos array be used? */
    int wgtsize;               /* No. of elements in the weights array */
+   smfData *boxes = NULL;     /* Pointer to array of i/p file bounding boxes */
    smfData *data = NULL;      /* Pointer to data struct */
    smfData *effdata = NULL;   /* Pointer to o/p struct holding eff time array */
    smfData *expdata = NULL;   /* Pointer to o/p struct holding exp time array */
@@ -776,7 +777,7 @@ void smurf_makecube( int *status ) {
    output cube, and get the pixel index bounds of the output cube. */
       smf_cubebounds( igrp, size, oskyfrm, autogrid, usedetpos, par, 
                       ( trim ? detgrp : NULL ), moving, lbnd_out, ubnd_out,
-                       &wcsout, &npos, &hasoffexp, status );
+                       &wcsout, &npos, &hasoffexp, &boxes, status );
 
 /* See if the input data should be weighted according to the reciprocal
    of the input variances. This required ACS_OFFEXPOSURE values in the
@@ -1540,6 +1541,7 @@ L998:;
    if( igrp != NULL) grpDelet( &igrp, status);
    if( ogrp != NULL) grpDelet( &ogrp, status);
    if( wgt_array && !savewgt ) wgt_array = astFree( wgt_array );
+   if( boxes ) boxes = astFree( boxes );
 
 /* End the NDF context. */
    ndfEnd( status );
