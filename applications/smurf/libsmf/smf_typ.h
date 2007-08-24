@@ -96,6 +96,8 @@
 *        -modified smf_calcmodelptr prototype
 *     2007-08-21 (EC):
 *        Added SMF__NUL to typedef smf_modeltype
+*     2007-08-21 (DSB):
+*        Added smfBox and smfTile.
 *     {enter_further_changes_here}
 
 
@@ -286,5 +288,29 @@ typedef struct smfGroup {
 /* Prototype for function pointer to different models used by DIMM */
 typedef void(*smf_calcmodelptr)( smfArray*, AstKeyMap*, double*, double*, 
 				 smfArray*, int, int* );
+
+
+/* Represents a box in some 2D cartesian coordinate system. */
+typedef struct smfBox {
+  double lbnd[2];
+  double ubnd[2];
+} smfBox;
+
+/* Represents a single tile from a full size grid. */
+typedef struct smfTile {
+  int xlo;
+  int xhi;
+  int ylo;
+  int yhi;
+  int exlo;
+  int exhi;
+  int eylo;
+  int eyhi;
+  Grp *grp;
+} smfTile;
+
+
+
+
 
 #endif /* SMF_TYP_DEFINED */
