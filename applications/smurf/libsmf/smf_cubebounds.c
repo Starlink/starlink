@@ -17,7 +17,7 @@
 *                     int autogrid, int usedetpos, double par[ 7 ], 
 *                     Grp *detgrp, int moving, int lbnd[ 3 ], int ubnd[ 3 ], 
 *                     AstFrameSet **wcsout, int *npos, int *hasoffexp, 
-*                     int *status );
+*                     smfBox **boxes, int *status );
 
 *  Arguments:
 *     igrp = Grp * (Given)
@@ -73,6 +73,13 @@
 *        Address of an int in which to return a flag indicating if any of
 *        the supplied input files has a OFF_EXPOSURE component in the JCMTSTATE
 *        NDF extension.
+*     boxes = smfBox ** (Returned)
+*        Location at which to returned a pointer to an array of smfBox 
+*        structures. The length of this array is equal to the number of input 
+*        files in group "igrp". Each element of the array holds the bounds 
+*        of the spatial coverage of the corresponding input file, given as 
+*        pixel indices within the output cube. The array should be freed 
+*        using astFree when no longer needed.
 *     status = int * (Given and Returned)
 *        Pointer to inherited status.
 
@@ -145,6 +152,10 @@
 *     15-FEB-2007 (DSB):
 *        Report error if SPECBOUNDS values do not have any overlap with
 *        the spectral range covered by the data.
+*     24-AUG-2007 (DSB):
+*        Added argument "boxes". The bounding box of each input file will
+*        be needed by the algorithm that chooses which input files contribute 
+*        to each tile of the output.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -199,7 +210,8 @@
 void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
                      int autogrid, int usedetpos, double par[ 7 ], 
                      Grp *detgrp, int moving, int lbnd[ 3 ], int ubnd[ 3 ], 
-                     AstFrameSet **wcsout, int *npos, int *hasoffexp, int *status ){
+                     AstFrameSet **wcsout, int *npos, int *hasoffexp, 
+                     smfBox **boxes, int *status ){
 
 /* Local Variables */
    AstCmpFrame *cmpfrm = NULL;  /* Current Frame for output FrameSet */
@@ -220,6 +232,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    AstMapping *oskymap = NULL;  /* Sky <> PIXEL mapping in output FrameSet */
    AstMapping *ospecmap = NULL; /* Spec <> PIXEL mapping in output FrameSet */
    AstMapping *specmap = NULL;  /* PIXEL -> Spec mapping in input FrameSet */
+   smfBox *box;          /* Pointer to bounding box for next input file */
    char *pname = NULL;   /* Name of currently opened data file */
    const char *name;     /* Pointer to current detector name */
    double *xin = NULL;   /* Workspace for detector input grid positions */
@@ -277,8 +290,20 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    given set of FITS-WCS keyword values. */
    fct = astFitsChan ( NULL, NULL, "" );
 
+/* Create the array of returned smfBox structures, and store a pointer to
+   the next one to be initialised. */
+   *boxes = astMalloc( sizeof( smfBox )*size );
+   box = *boxes;
+
 /* Loop round all the input NDFs. */
-   for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++ ) {
+   for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++, box++ ) {
+
+/* Initialise the spatial bounds of section of the the output cube that is
+   contributed to by the current ionput file. */
+      box->lbnd[ 0 ] = VAL__MAXD;
+      box->lbnd[ 1 ] = VAL__MAXD;
+      box->ubnd[ 0 ] = VAL__MIND;
+      box->ubnd[ 1 ] = VAL__MIND;
 
 /* Obtain information about the current input NDF. */
       smf_open_file( igrp, ifile, "READ", 1, &data, status );
@@ -706,8 +731,14 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                   }
                }         
 
-/* If it did, extend the interim grid bounding box to include the detector. */
+/* If it did, extend the interim grid bounding box for the file and for the
+   output cube to include the detector. */
                if( good ) {
+                  if( xout[ irec ] > box->ubnd[ 0 ] ) box->ubnd[ 0 ] = xout[ irec ];
+                  if( xout[ irec ] < box->lbnd[ 0 ] ) box->lbnd[ 0 ] = xout[ irec ];
+                  if( yout[ irec ] > box->ubnd[ 1 ] ) box->ubnd[ 1 ] = yout[ irec ];
+                  if( yout[ irec ] < box->lbnd[ 1 ] ) box->lbnd[ 1 ] = yout[ irec ];
+
                   if( xout[ irec ] > dubnd[ 0 ] ) dubnd[ 0 ] = xout[ irec ];
                   if( xout[ irec ] < dlbnd[ 0 ] ) dlbnd[ 0 ] = xout[ irec ];
                   if( yout[ irec ] > dubnd[ 1 ] ) dubnd[ 1 ] = yout[ irec ];
@@ -828,6 +859,15 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       lbnd[ 1 ] = ceil( dlbnd[ 1 ] - par[ 1 ] + 0.5 );
       ubnd[ 1 ] = ceil( dubnd[ 1 ] - par[ 1 ] + 0.5 );
 
+/* Do the same for the individual input file bounding boxes. */
+      box = *boxes;
+      for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++, box++ ) {
+         box->lbnd[ 0 ] = ceil( box->lbnd[ 0 ] - par[ 0 ] + 0.5 );
+         box->ubnd[ 0 ] = ceil( box->ubnd[ 0 ] - par[ 0 ] + 0.5 );
+         box->lbnd[ 1 ] = ceil( box->lbnd[ 1 ] - par[ 1 ] + 0.5 );
+         box->ubnd[ 1 ] = ceil( box->ubnd[ 1 ] - par[ 1 ] + 0.5 );
+      }
+
 /* Calculate the shifts from interim grid to final grid coords. */
       gshift[ 0 ] = 2.0 - par[ 0 ] - lbnd[ 0 ];
       gshift[ 1 ] = 2.0 - par[ 1 ] - lbnd[ 1 ];
@@ -846,6 +886,15 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       ubnd[ 0 ] = ceil( dubnd[ 0 ] - NINT( par[ 0 ] ) + 0.5 );
       lbnd[ 1 ] = ceil( dlbnd[ 1 ] - NINT( par[ 1 ] ) + 0.5 );
       ubnd[ 1 ] = ceil( dubnd[ 1 ] - NINT( par[ 1 ] ) + 0.5 );
+
+/* Do the same for the individual input file bounding boxes. */
+      box = *boxes;
+      for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++, box++ ) {
+         box->lbnd[ 0 ] = ceil( box->lbnd[ 0 ] - NINT( par[ 0 ] ) + 0.5 );
+         box->ubnd[ 0 ] = ceil( box->ubnd[ 0 ] - NINT( par[ 0 ] ) + 0.5 );
+         box->lbnd[ 1 ] = ceil( box->lbnd[ 1 ] - NINT( par[ 1 ] ) + 0.5 );
+         box->ubnd[ 1 ] = ceil( box->ubnd[ 1 ] - NINT( par[ 1 ] ) + 0.5 );
+      }
 
 /* Calculate the shifts from interim grid to final grid coords. */
       gshift[ 0 ] = 2.0 - NINT( par[ 0 ] ) - lbnd[ 0 ];
@@ -895,6 +944,27 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* End the AST context. This will annul all AST objects created within the
    context (except for those that have been exported from the context). */
    astEnd;
+
+
+
+
+
+
+
+
+
+
+      box = *boxes;
+      for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++, box++ ) {
+         printf( "Box %d: %g->%g  %g->%g\n", ifile, box->lbnd[ 0 ], 
+                 box->ubnd[ 0 ], box->lbnd[ 1 ], box->ubnd[ 1 ] );
+      }
+
+
+
+
+
+
 
 /* Issue a context message if anything went wrong. */
    if( *status != SAI__OK ) errRep( FUNC_NAME, "Unable to determine cube "
