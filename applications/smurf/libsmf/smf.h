@@ -522,7 +522,8 @@ void smf_tslice_ast (smfData * data, int index, int needwcs, int * status );
 void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
                      int autogrid, int usedetpos, double par[ 7 ], 
                      Grp *detgrp, int moving, int lbnd[ 3 ], int ubnd[ 3 ], 
-                     AstFrameSet **wcsout, int *npos, int *hasoffexp, int *status );
+                     AstFrameSet **wcsout, int *npos, int *hasoffexp, 
+                     smfBox **boxes, int *status );
 
 void smf_rebincube( smfData *data, int index, int size, int badmask, int is2d,
                     AstSkyFrame *abskyfrm, AstMapping *oskymap, 
