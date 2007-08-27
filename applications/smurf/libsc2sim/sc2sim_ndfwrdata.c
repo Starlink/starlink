@@ -186,6 +186,8 @@
 *        Write out planet name for planet simulations
 *     2007-08-22 (CV):
 *        Fixed coordinate system string termination issue
+*     2007-08-27 (AGG):
+*        Set SkyRef and coordinate system correctly for DREAM/STARE images
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
@@ -410,6 +412,7 @@ int *status              /* Global status (given and returned) */
 		 "UT date as a string in yyyymmdd format", 0 );
    astSetFitsS ( fitschan, "DATE-OBS", dateobs, 
 		 "Date and time (UTC) of start of sub-scan", 0 );
+   /* Warning: KLUDGE alert!!! DATE-END needs to be calculated properly */
    astSetFitsS ( fitschan, "DATE-END", dateobs, 
 		 "Date and time (UTC) of end of sub-scan", 0 );
    astSetFitsF ( fitschan, "DUT1", inx->dut1, "[d] UT1 - UTC correction", 0 );
@@ -645,7 +648,7 @@ int *status              /* Global status (given and returned) */
      }
 
      /* Set coordinate system */
-     strncpy( cosys, head[0].tcs_tr_sys, JCMT__SZTCS_TR_SYS );
+     strncpy( cosys, head[0].tcs_tr_sys, JCMT__SZTCS_TR_SYS+1 );
      if ( strncmp( cosys, "APP", 3 ) == 0 ) {
        strncpy( cosys, "GAPPT", JCMT__SZTCS_TR_SYS+1 );
        cosys[5] = '\0'; // to be safe
@@ -682,9 +685,14 @@ int *status              /* Global status (given and returned) */
 	  averaged frames for constructing WCS info */
        midpt = (seqstart + seqend) / 2;
 
-       state.tcs_az_ac1 = head[midpt].tcs_az_ac1;
-       state.tcs_az_ac2 = head[midpt].tcs_az_ac2;
-       state.rts_end = head[midpt].rts_end;
+       state.tcs_az_ac1 = head[seqstart].tcs_az_ac1;
+       state.tcs_az_ac2 = head[seqstart].tcs_az_ac2;
+       state.rts_end = head[seqstart].rts_end;
+
+       /* Set DATE-OBS string for this image - UTC */
+       sc2sim_dateobs( inx->mjdaystart + 
+		       ((((nsubscan-1)*numsamples) + (k*framesize))*inx->steptime/SPD),
+		       dateobs, status );
 
        /* Set dimensions of output image */
        ndim = 2;
@@ -693,10 +701,13 @@ int *status              /* Global status (given and returned) */
 
        /* Construct WCS FrameSet */
        sc2ast_createwcs( subnum, &state, instap, sinx->telpos, &wcs, status );
-       /* This should be user defined... */
+
+       /* Set the SkyRef to the current AzEl position and then the
+	  coordinate system. Allow AST to work out the SkyRef in the
+	  new system rather than worrying about it ourselves. */
+       astSetD( wcs, "SkyRef(1)", head[seqstart].tcs_az_ac1 );
+       astSetD( wcs, "SkyRef(2)", head[seqstart].tcs_az_ac2 );
        astSetC( wcs, "SYSTEM", cosys );
-       astSetD( wcs, "SkyRef(1)", head[midpt].tcs_tr_ac1);
-       astSetD( wcs, "SkyRef(2)", head[midpt].tcs_tr_ac2);
 
        /* Increment seqstart/end for FITS header */
        seqstart++;
@@ -710,11 +721,15 @@ int *status              /* Global status (given and returned) */
        astDelFits( fitschan );
        fitsfind = astFindFits( fitschan, "SEQEND", NULL, 0);
        astDelFits( fitschan );
+       fitsfind = astFindFits( fitschan, "DATE-OBS", NULL, 0);
+       astDelFits( fitschan );
        /* Add new entries */
        astSetFitsI( fitschan, "SEQSTART", seqstart, 
 		    "RTS index number of first frame in image", 0);
        astSetFitsI( fitschan, "SEQEND", seqend, 
 		    "RTS index number of last frame in image", 0);
+       astSetFitsS ( fitschan, "DATE-OBS", dateobs, 
+		     "Date and time (UTC) of start of sub-scan", 0 );
 
        /* Convert the AstFitsChan data to a char array */
        smf_fits_export2DA ( fitschan, &nrec, fitsrec, status );
