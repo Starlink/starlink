@@ -3,6 +3,10 @@
     When saving an image with a new WCS the strategy for removing redundant
     information from FITS headers has been improved.
 
+    A problem displaying cubes using the gaiadisp command has been
+    fixed (reported an invalid NDF identifier when the cube spectral 
+    axis changed from that of the previous cube).
+
   Puana Release:
   ==============
 
