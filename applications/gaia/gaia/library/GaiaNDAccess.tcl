@@ -113,7 +113,7 @@ itcl::class gaia::GaiaNDAccess {
 
       #  Release previous dataset, if any.
       close
-      
+
       #  Get underlying data access type. Allow NDFs to be compressed.
       $namer_ configure -imagename $dataset
       if { [string match ".sdf*" [$namer_ type]] } {
@@ -142,8 +142,6 @@ itcl::class gaia::GaiaNDAccess {
             # FITS data needs unmapping, NDF happens automatically.
             unmap "*"
          }
-
-         flush stdout
 
          ${type_}::close $handle_
          set handle_ {}
@@ -406,7 +404,7 @@ itcl::class gaia::GaiaNDAccess {
    #  the attached dataset that is a cube. The bare bones are an NDF of the
    #  correct dimensions and bounds, with an appropriate WCS. No data
    #  components are copied. Returns a new instance of this class wrapping the
-   #  new NDF. 
+   #  new NDF.
    public method createimage {name axis {component "DATA"}} {
       if { $addr_($component) == 0 } {
          error "Must map in cube data before creating an image"
@@ -635,7 +633,7 @@ itcl::class gaia::GaiaNDAccess {
    }
 
    #  Set the value of a FITS card. Will be saved, if the dataset is opened
-   #  for write access. If only one value is given it is assumed to be a 
+   #  for write access. If only one value is given it is assumed to be a
    #  pre-formatted card. The type value should be set to either numeric
    #  or char (numeric avoids surrounding the value in quotes).
    public method fitswrite {keyword {value ""} {comment ""} {type "char"}} {
