@@ -1309,20 +1309,19 @@ itcl::class gaia::Gaia {
       set rtdimage [$image_ get_image]
       set naxis3 [$rtdimage fits get NAXIS3]
       set naxis4 [$rtdimage fits get NAXIS4]
-      if { ( $naxis4 == {} || $naxis4 == 1 ) && $naxis3 != {} } {
 
-         #  Load it into cube browser. Note allow trivial cubes with 
-         #  redundant dimensions 1, or 2, but not 3.
-         if { $naxis3 != 1 } {
-            make_opencube_toolbox
-            set msg {}
-            set result [catch {$itk_component(opencube) configure \
-                                  -cube $itk_option(-file)} msg]
-            if { $result != 0 } {
-               $itk_component(opencube) close
-               if { $msg != {} } {
-                  info_dialog "$msg" $w_
-               }
+      #  Load it into cube browser. Note allow trivial cubes with redundant
+      #  dimensions 1, or 2, but not 3. 
+      if { ( $naxis4 == {} || $naxis4 == 1 ) && $naxis3 != {} && $naxis3 != 1 } {
+         make_opencube_toolbox
+         set msg {}
+         set result [catch {$itk_component(opencube) configure \
+                               -cube $itk_option(-file)} msg]
+         if { $result != 0 } {
+            maybe_release_cube_
+            $itk_component(opencube) close
+            if { $msg != {} } {
+               info_dialog "$msg" $w_
             }
          }
       } else {
@@ -1614,10 +1613,12 @@ itcl::class gaia::Gaia {
    #  If a cube is currently loaded release it. Returns if release
    #  happened and the name of the cube.
    protected method maybe_release_cube_ {} {
+      
       set cube_open 0
       set cube_name {}
       if { [info exists itk_component(opencube) ] && 
            [winfo exists $itk_component(opencube) ] } {
+
          set cube_name [$itk_component(opencube) cget -cube]
          set cube_open [$itk_component(opencube) release]
          $itk_component(opencube) halt
@@ -1682,7 +1683,7 @@ itcl::class gaia::Gaia {
             if { [catch {
                $app register
             } msg] } {
-               puts "Failed to register with a PLASTIC hub: $msg"
+               puts stderr "Failed to register with a PLASTIC hub: $msg"
             }
          }
 
