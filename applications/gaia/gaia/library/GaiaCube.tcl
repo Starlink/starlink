@@ -587,11 +587,15 @@ itcl::class gaia::GaiaCube {
             set axis_ 2
             set axis 3
          }
+
+         #  Set up object to control units. Do this before axis change
+         #  so that cube is available for units query.
+         $spec_coords_ configure -accessor $cubeaccessor_ 
+
+         #  Now apply axis change.
+         $spec_coords_ configure -axis $axis 
          $itk_component(axis) configure -value $axis
          set_step_axis_ $axis
-
-         #  Set up object to control units.
-         $spec_coords_ configure -axis $axis -accessor $cubeaccessor_
 
          #  If the spectral plot is open, then close it. It will be
          #  re-created on next image click.
@@ -1474,7 +1478,7 @@ itcl::class gaia::GaiaCube {
       }
       return $coords
    }
-   
+
    #  =======
    #  FITS headers
    #  =======
