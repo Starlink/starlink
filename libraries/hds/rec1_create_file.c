@@ -6,6 +6,7 @@
 /* ===============							    */
 #include <stddef.h>
 #include <ctype.h>
+#include <unistd.h>
 
 /* VMS version include files:						    */
 /* =========================						    */
@@ -88,6 +89,7 @@
 /* Copyright:								    */
 /*    Copyright (C) 1992 Science & Engineering Research Council		    */
 /*    Copyright (C) 2005 Particle Physics and Astronomy Research Council    */
+/*    Copyright (C) 2007 Science and Technology Facilities Council          */
 
 /*  Licence:                                                                */
 /*     This program is free software; you can redistribute it and/or        */
@@ -109,6 +111,7 @@
 /*    RFWS: R.F. Warren-Smith (STARLINK)				    */
 /*    BKM:  B.K. McIlwrath    (STARLINK)                                    */
 /*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
+/*    PWD: Peter W. Draper (JAC, Durham University)                         */
 /*    {@enter_new_authors_here@}					    */
 
 /* History:								    */
@@ -145,6 +148,9 @@
 /*       Set appropriate FCV bit for 64-bit files                           */
 /*    28-DEC-2005 (TIMJ):                                                   */
 /*       Use DAT__FLEXT rather than hard-coded ".SDF"                       */
+/*    29-AUG-2007 (PWD):                                                    */
+/*       Unlink an existing file before overwriting. This leaves the file   */
+/*       available to other processes that may have it opened.              */
 /*    {@enter_further_changes_here@}					    */
 
 /* Bugs:								    */
@@ -175,6 +181,7 @@
       struct FCV *fcv;		 /* Pointer to File Control Vector element  */
       struct FID *fid;		 /* Pointer to File ID			    */
       INT_BIG alql;              /* Temporary variable to return file size  */
+      int exists = 0;            /* Set to true when file already exists    */
 /*.									    */
 
 /* Check the inherited global status.					    */
@@ -399,15 +406,16 @@
       if ( _ok( hds_gl_status ) )
       {
          if ( stat( fns, &statbuf ) == 0 )
-	 {
+         {
 #if __MINGW32__ || __CYGWIN__
              /* Need windows pseudo inode data */
-             win_get_inodes( fns, &statbuf.st_ino, &statbuf.st_rdev );
+            win_get_inodes( fns, &statbuf.st_ino, &statbuf.st_rdev );
 #endif
 
 /* If the file appears to exist already, then loop to search the File	    */
 /* Control Vector for any slot which is currently open and associated with  */
 /* the same file.							    */
+            exists = 1;
             for ( i = 0; i < rec_gl_endslot; i++ )
             {
 
@@ -433,10 +441,18 @@ name cannot be used to create a new container file.",
 	 }
       }
 
-/* If OK, create the file. This will normally over-write any previous file  */
-/* with the same name. Check for errors.				    */
+/* If OK, create the file. To be careful we unlink any existing file so */
+/* that it can continue to be used by any processes that have it open   */
+/* and then create our new file, which will have a new inode.           */
+/* Check for errors first                                               */
       if ( _ok( hds_gl_status ) )
       {
+         if ( exists ) 
+         {
+/*  Note unlink may fail because of permissions or because this is a     */
+/*  directory. Handle that later.                                        */
+             unlink( fns );
+         }
          iochan = fopen( fns, "w+b" );
 	 if ( iochan == NULL )
 	 {
