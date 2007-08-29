@@ -643,12 +643,6 @@ int *status              /* Global status (given and returned) */
      state.smu_az_chop_y = 0.0;
 
      /*smf_calc_telpos( NULL, "JCMT", telpos, status );*/
-     /*if ( strncmp( inx->instap, " ", 1 ) != 0 ) {
-       sc2sim_instap_calc( inx, instap, status );
-     } else {
-       instap[0] = DAS2R * inx->instap_x;
-       instap[1] = DAS2R * inx->instap_y;
-       } */
      instap[0] = DAS2R * inx->instap_x;
      instap[1] = DAS2R * inx->instap_y;
 
