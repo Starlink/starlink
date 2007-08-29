@@ -293,16 +293,13 @@ itcl::class gaia::GaiaCubeSpectrum {
 
       #  Delete any temporary files.
       if { $temp_files_ != {} } {
-         foreach filename $temp_files_ {
-            if { [file exists $filename] } {
-               catch {::file delete $filename}
-            }
-         }
+         $temp_files_ clear
+         ::delete object $temp_files_
       }
 
       close
       if { $toolbox_ != {} } {
-         delete object $toolbox_
+         ::delete object $toolbox_
       }
 
    }
@@ -656,16 +653,22 @@ itcl::class gaia::GaiaCubeSpectrum {
                              -use_error_dialog $use_error_dialog]
       }
 
-      set filename "GaiaTempSpectrum[incr count_].sdf"
+      if { $temp_files_ == {} } {
+         set temp_files_ [gaia::GaiaTempName \#auto \
+                             -prefix "GaiaTempSpectrum" -type ".sdf"]
+      }
+      set filename [$temp_files_ get_name]
       $spec_writer_ write_as_ndf $filename
 
-      # If in CYGWIN environment convert filename to windows format.
-      # SPLAT is a windows application. Otherwise get absolute name
-      # for SPLAT to locate.
+      #  If in CYGWIN environment convert filename to windows format.
+      #  SPLAT is a windows application. Otherwise get absolute name
+      #  for SPLAT to locate, if needed.
       if { [string match {CYGWIN*} $::tcl_platform(os)] } {
          set filename [exec cygpath -wa $filename]
       } else {
-         set filename "[pwd]/$filename"
+         if { [::file pathtype $filename] != "absolute" } {
+            set filename "[pwd]/$filename"
+         }
       }
 
       if { $compare } {
@@ -673,7 +676,6 @@ itcl::class gaia::GaiaCubeSpectrum {
       } else {
          $splat_disp_ runwith $filename 0 true
       }
-      lappend temp_files_ $filename
    }
 
    #  Extract and display a position as a reference spectrum. The
@@ -1359,8 +1361,7 @@ itcl::class gaia::GaiaCubeSpectrum {
    #  The region data combination type.
    protected variable combination_type_ "mean"
 
-   #  A list of the temporary files we create. These are deleted on object
-   #  destruction.
+   #  Object to manage temporary file names.
    protected variable temp_files_ {}
 
    #  Common variables: (shared by all instances)

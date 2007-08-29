@@ -443,13 +443,13 @@ itcl::class gaia::GaiaArd {
 	 catch {delete object $namer_}
       }
 
-      # Remove all temporary files.
-      if { [info exists tempfiles_] } {
-         foreach f [array names tempfiles_] {
-            if { [file writable $tempfiles_($f)] } {
-               file delete $tempfiles_($f)
-            }
-         }
+      #  Remove all temporary files (non-image).
+      if { $tempfiles_ != {} } {
+         $tempfiles_ clear
+         catch {delete object $tempfiles_}
+      }
+      if { $tempimages_ != {} } {
+         catch {delete object $tempimages_}
       }
    }
 
@@ -486,11 +486,22 @@ itcl::class gaia::GaiaArd {
       }
    }
 
-   #  Determine a name for a new temporary file.
+   #  Determine a name for a new temporary file, non-image.
    protected method make_tmpname_ {} {
-      incr count_
-      set tempfiles_($count_) "GaiaArdIn${count_}.Dat"
-      return $tempfiles_($count_)
+      if { $tempfiles_ == {} } {
+         set tempfiles_ \
+            [gaia::GaiaTempName \#auto -prefix "GaiaArdIn" -type ".Dat"]
+      }
+      return [$tempfiles_ get_name]
+   }
+
+   #  Determine a name for a new temporary image.
+   protected method make_tmpimage_ {} {
+      if { $tempimages_ == {} } {
+         set tempimages_ \
+            [gaia::GaiaTempName \#auto -prefix "GaiaArdImg" -type ".sdf"]
+      }
+      return [$tempimages_ get_name]
    }
 
    #  Save ARD description to a file.
@@ -565,8 +576,6 @@ itcl::class gaia::GaiaArd {
          } else {
             error_dialog "No regions are selected"
          }
-         unset tempfiles_($count_)
-         incr count_ -1
       }
    }
 
@@ -628,7 +637,7 @@ itcl::class gaia::GaiaArd {
 	    set image [$namer_ ndfname]
 
             #  Create a temporary file name.
-            set tmpimage_ "GaiaArdImg${count_}"
+            set tmpimage_ [make_tmpimage_]
 
 	    #  Set command to run on completion.
 	    if { $args != "" } {
@@ -650,8 +659,6 @@ itcl::class gaia::GaiaArd {
          } else {
             error_dialog "No regions are selected"
          }
-         unset tempfiles_($count_)
-         incr count_ -1
       }
    }
 
@@ -692,8 +699,7 @@ itcl::class gaia::GaiaArd {
 	      set image [$namer_ ndfname]
 
               #  Create a temporary file name.
-              incr count_
-              set tmpimage_ "GaiaArdImg${count_}"
+              set tmpimage_ [make_tmpimage_]
 
               #  Make sure that the disk image is up to date.
               save_if_volatile
@@ -710,8 +716,6 @@ itcl::class gaia::GaiaArd {
 	   } else {
               error_dialog "No regions are selected"
 	   }
-	   unset tempfiles_($count_)
-	   incr count_ -1
         }
    }
 
@@ -733,8 +737,7 @@ itcl::class gaia::GaiaArd {
 	 set image [$namer_ ndfname]
 
          #  Create a temporary file name.
-         incr count_
-         set tmpimage_ "GaiaArdImg${count_}"
+         set tmpimage_ [make_tmpimage_]
 
          #  Make sure that the disk image is up to date.
          save_if_volatile
@@ -829,8 +832,11 @@ itcl::class gaia::GaiaArd {
    #  Name of autocrop application.
    protected variable autocrop_ {}
 
-   #  Name of temporary files created.
-   protected variable tempfiles_
+   #  Object to manage non-image temporary files.
+   protected variable tempfiles_ {}
+
+   #  Object to manage image temporary files.
+   protected variable tempimages_ {}
 
    #  Name of image being created.
    protected variable tmpimage_ {}
@@ -846,8 +852,6 @@ itcl::class gaia::GaiaArd {
 
    #  Common variables: (shared by all instances)
    #  -----------------
-   #  Count of temporary files created by this class.
-   common count_ 0
 
    #  New replace option value (from checkbutton)
    common replace_

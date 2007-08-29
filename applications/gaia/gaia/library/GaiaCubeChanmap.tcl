@@ -175,8 +175,9 @@ itcl::class gaia::GaiaCubeChanmap {
       }
 
       #  Create a temporary file name.
-      set tmpimage_ "GaiaTempChanmap${count_}"
       incr count_
+      set tmpimage_ [gaia::GaiaTempName::make_name \
+                        "GaiaTempChanmap" $count_ ".sdf"]
       $maintask_ runwiths "in=$ndfname out=$tmpimage_ axis=$axis \
                           low=$lb high=$ub estimator=$combination_type_ \
                           nchan=$itk_option(-nchan) \

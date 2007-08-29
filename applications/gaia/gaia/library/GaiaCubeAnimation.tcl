@@ -425,7 +425,9 @@ itcl::class gaia::GaiaCubeAnimation {
       set image [::image create photo]
       set canvas [$itk_option(-gaiacube) cget -canvas]
       blt::winop snap $canvas $image
-      set gif "GaiaTempAnimation[incr capcount_].gif"
+      incr capcount_
+      set gif [gaia::GaiaTempName::make_name \
+                  "GaiaTempAnimation" $capcount_ ".gif"]
       lappend capframes_ $gif
       $image write $gif -format gif
       ::image delete $image

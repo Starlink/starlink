@@ -383,11 +383,8 @@ itcl::class gaia::GaiaSpectralPlot {
 
       #  Delete any temporary files.
       if { $temp_files_ != {} } {
-         foreach filename $temp_files_ {
-            if { [file exists $filename] } {
-               catch {::file delete $filename}
-            }
-         }
+         $temp_files_ clear
+         ::delete object $temp_files_
       }
 
       #  Save global properties (should do this once at application exit).
@@ -1124,7 +1121,12 @@ itcl::class gaia::GaiaSpectralPlot {
          set sender [gaia::Gaia::get_plastic_sender]
          if { $sender != {} && $itk_option(-spec_writer) != {} } {
 
-            set filename "GaiaTempPlasticSpectrum[incr count_].fits"
+            if { $temp_files_ == {} } {
+               set temp_files_ [gaia::GaiaTempName \#auto \
+                                   -prefix "GaiaTempPlasticSpectrum" \
+                                   -type ".fits"]
+            }
+            set filename [$temp_files_ get_name]
             $itk_option(-spec_writer) write_as_fits $filename
 
             set shortname [$itk_option(-spec_writer) get_shortname]
@@ -1138,8 +1140,6 @@ itcl::class gaia::GaiaSpectralPlot {
 
             $sender send_spectrum $filename $shortname \
                $coordunit $dataunit $recipients
-
-            lappend temp_files_ $filename
          }
       } msg]} {
          puts "selection send error: $msg"
@@ -1364,8 +1364,7 @@ itcl::class gaia::GaiaSpectralPlot {
    #  Interoperability menu.
    protected variable interopmenu_
 
-   #  A list of the temporary files we create. These are deleted on object
-   #  destruction.
+   #  Object for generating and managing temporary files.
    protected variable temp_files_ {}
 
    #  Global properties handler.

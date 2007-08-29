@@ -1,0 +1,166 @@
+#+
+#  Name:
+#     GaiaTempName
+
+#  Type of Module:
+#     [incr Tcl] class
+
+#  Purpose:
+#     Manage and create temporary files in GAIA.
+
+#  Description:
+#     Creates a unique set of filenames that describe a set of temporary files
+#     for a particular purpose. For instance if the prefix is set to
+#     "GaiaClass" and type to ".sdf" then each call to get_name will return a
+#     filename "GaiaClass<n>.sdf", where <n> is some unique integer.
+#
+#     All the names generated are stored and the associated disk files
+#     can be deleted using the "clear" method (note the unique integer
+#     will not be reset), further names can then be generated and
+#     stored. 
+#
+#     By default the names are not absolute, so will be created
+#     in the default directory, but if the environment variable 
+#     GAIA_TEMP_DIR is set the names will be qualified using the
+#     directory.
+#
+#     If a one off name is required use the make_name method,
+#     but that will require a unique integer.
+
+#  Invocations:
+#
+#        GaiaTempName object_name [configuration options]
+#
+#     This creates an instance of a GaiaTempName.tcl object. The return is
+#     the name of the object.
+#
+#        object_name configure -configuration_options value
+#
+#     Applies any of the configuration options (after the instance has
+#     been created).
+#
+#        object_name method arguments
+#
+#     Performs the given method on this object.
+
+#  Configuration options:
+
+#  Methods:
+
+#  Inheritance:
+#     This object inherits no other classes.
+
+#  Copyright:
+#     Copyright (C) 2007 Science and Technology Facilities Council
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of the
+#     License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+#     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     PWD: Peter Draper (JAC, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     28-AUG-2007 (PWD):
+#        Original version.
+#     {enter_further_changes_here}
+
+#-
+
+#.
+
+itcl::class gaia::GaiaTempName {
+   
+   #  Inheritances:
+   #  -------------
+   
+   #  Nothing
+
+   #  Constructor:
+   #  ------------
+   constructor {args} {
+      
+      #  Evaluate any options.
+      eval configure $args
+   }   
+
+   #  Destructor:
+   #  -----------
+   destructor  {
+      set tmpnames_ {}
+   }
+
+   #  Methods:
+   #  --------
+
+   #  Get the next temporary name.
+   public method get_name {} {
+      incr unique_
+      set tmpname [gaia::GaiaTempName::make_name $prefix $unique_ $type]
+      add_name $tmpname
+      return $tmpname
+   }
+
+   #  Add a name to the list of temporary files. Will be managed and can
+   #  be delete using the clear method.
+   public method add_name {name} {
+      lappend tmpnames_ "$name"
+   }
+
+   #  Clear all the temporary files, deleting any diskfiles.
+   public method clear {} { 
+      foreach f $tmpnames_ {
+         if { [::file exists $f] } {
+            catch {::file delete -force $f}
+         }
+      }
+      set tmpnames_ {}
+   }
+
+   #  Create a temporary file name from a prefix, integer and type.
+   #  This will be made absolute if the GAIA_TEMP_DIR variable is set.
+   public proc make_name {prefix unique type} {
+      if { [info exists ::env(GAIA_TEMP_DIR)] } {
+         set prefix [::file join "$::env(GAIA_TEMP_DIR)" "$prefix"]
+      }
+      return "${prefix}${unique}${type}"
+   }
+
+   #  Configuration options: (public variables)
+   #  ----------------------
+
+   #  The prefix for temporary names.
+   public variable prefix "GaiaTemp"
+
+   #  The file type.
+   public variable type ".sdf"
+   
+   #  Protected variables: (available to instance)
+   #  --------------------
+
+   #  Unique counter for generating names.
+   protected variable unique_ 0
+
+   #  List of valid names.
+   protected variable tmpnames_ {}
+
+   #  Common variables: (shared by all instances)
+   #  -----------------
+
+
+#  End of class definition.
+}

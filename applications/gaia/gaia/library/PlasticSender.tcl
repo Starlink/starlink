@@ -225,7 +225,12 @@ itcl::class gaia::PlasticSender {
    #  The exten argument gives a file extension (e.g. ".fits").
    protected proc get_temp_file_ {exten} {
       set tmpdir ""
-      foreach trydir {/tmp /usr/tmp .} {
+      if { [info exists ::env(GAIA_TEMP_DIR)] } {
+         set trydirs "$::env(GAIA_TEMP_DIR) /tmp /usr/tmp ."
+      } else {
+         set trydirs "/tmp /usr/tmp ."
+      }
+      foreach trydir $trydirs {
          if {[file isdirectory $trydir] && [file writable $trydir]} {
             set tmpdir $trydir
             break

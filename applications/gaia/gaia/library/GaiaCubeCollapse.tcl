@@ -111,8 +111,9 @@ itcl::class gaia::GaiaCubeCollapse {
       }
 
       #  Create a temporary file name.
-      set tmpimage_ "GaiaTempCollapse${count_}"
       incr count_
+      set tmpimage_ [gaia::GaiaTempName::make_name \
+                        "GaiaTempCollapse" $count_ ".sdf"]
 
       #  If the coordinate system isn't default then we need to inform
       #  COLLAPSE to use the correct values (for integrated intensities etc).

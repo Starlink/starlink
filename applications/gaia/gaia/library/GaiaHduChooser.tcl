@@ -168,7 +168,8 @@ itcl::class gaia::GaiaHduChooser {
 
          #  Perform the conversion.
          incr count_
-         set converted_file "GaiaHduImg${count_}.fits"
+         set converted_file [gaia::GaiaTempName::make_name \
+                                "GaiaHduImg" $count_ ".fits"]
          if { [file exists $converted_file] } {
             file delete -force $converted_file
          }

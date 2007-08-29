@@ -91,6 +91,9 @@ itcl::class gaia::GaiaCube {
       set lwidth 18
       set vwidth 10
 
+      #  Object to manage temporary cubes.
+      set tmpfiles_ [gaia::GaiaTempName \#auto]
+
       #  Set window properties.
       wm protocol $w_ WM_DELETE_WINDOW [code $this close]
       wm title $w_ "Display image sections of a cube ($itk_option(-number))"
@@ -443,12 +446,9 @@ itcl::class gaia::GaiaCube {
       }
 
       #  Delete any registered temporary files.
-      foreach filename $temp_files_ {
-         if { [file exists $filename] } {
-            catch {::file delete $filename}
-         }
-      }
-
+      $tmpfiles_ clear
+      delete object $tmpfiles_
+      set tmpfiles_ {}
    }
 
    #  Methods:
@@ -716,7 +716,8 @@ itcl::class gaia::GaiaCube {
 
          #  Set name of the image displayed image section.
          set oldname $section_name_
-         set section_name_ "GaiaTempCubeSection[incr count_].sdf"
+         set section_name_ [gaia::GaiaTempName::make_name \
+                               "GaiaTempCubeSection" [incr count_] ".sdf"]
 
          #  And create the dummy image NDF. Will have axis removed from
          #  the WCS and be the size and type of cube in other axes.
@@ -895,7 +896,7 @@ itcl::class gaia::GaiaCube {
    #  Register a temporary file. These will be deleted along with this
    #  object.
    public method register_temp_file {filename} {
-      lappend temp_files_ $filename
+      $tmpfiles_ add_name $filename
    }
 
    #  Get the coordinate of the current plane along the current axis.
@@ -1607,10 +1608,6 @@ itcl::class gaia::GaiaCube {
    #  by their ref_id.
    protected variable ref_range_controls_
 
-   #  A list of temporary files, these will be deleted when the object
-   #  is destroyed.
-   protected variable temp_files_ ""
-
    #  The ref_id value of the baseline controls. Must be last.
    protected variable baseline_id_ ""
 
@@ -1624,6 +1621,9 @@ itcl::class gaia::GaiaCube {
 
    #  Name of GaiaFITSHeader instance, only set when active.
    protected variable fitsheaders_ {}
+
+   #  Collection of managed temporary files.
+   protected variable tmpfiles_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

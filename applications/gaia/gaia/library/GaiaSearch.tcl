@@ -296,7 +296,9 @@ itcl::class gaia::GaiaSearch {
       }
 
       #  Save these to a temporary catalogue.
-      set name "GaiaTableExtract[incr count_].TAB"
+      incr count_
+      set name [gaia::GaiaTempName::make_name \
+                   "GaiaTableExtract" $count_ ".TAB"]
       $results_ save_to_file $name $selected [$results_ get_headings]
 
       #  And display it.

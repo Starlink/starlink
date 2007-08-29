@@ -16,14 +16,14 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {214.29}
+\newcommand{\stardocnumber}    {214.30}
 \newcommand{\stardocauthors}   {Peter W. Draper, 
                                 Norman Gray, 
                                 David S. Berry \& 
                                 Mark Taylor }
-\newcommand{\stardocdate}      {17th July 2007}
+\newcommand{\stardocdate}      {29th August 2007}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and Image Analysis Tool}
-\newcommand{\stardocversion}   {4.0-0}
+\newcommand{\stardocversion}   {4.0-2}
 \newcommand{\stardocmanual}    {User's Manual}
 
 \newcommand{\stardocabstract} {GAIA is an image display and analysis
@@ -874,6 +874,12 @@ GAIA pre-2.4 used this behaviour by default), then use the command:
 % gaia image_name -focus_follows_mouse 1
 \end{verbatim}
 \end{quote}
+
+Some additional configuration options are only available using environment
+variables. The most useful of these is the \mytt{GAIA\_TEMP\_DIR} variable,
+that defines a directory that will be used for writing most temporary files.
+The default is to write these into the current directory which can be a
+problem when working on read-only data.
 
 \subsection{\xlabel{proxy_servers}Proxy servers}
 Access to the World Wide Web may be restricted (by a firewall or maybe

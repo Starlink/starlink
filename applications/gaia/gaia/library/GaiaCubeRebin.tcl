@@ -225,7 +225,9 @@ itcl::class gaia::GaiaCubeRebin {
 
       #  Create name for the new cube, needs to be different to the 
       #  currently displayed one.
-      set output_name_ "[$itk_component(prefix) get][incr count_].sdf"
+      incr count_
+      set output_name_ [gaia::GaiaTempName::make_name \
+                           "[$itk_component(prefix) get]" $count_ ".sdf"]
       $itk_component(outputfile) configure -value ""
 
       $task runwiths "in=$input_name out=$output_name_ \

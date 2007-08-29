@@ -123,6 +123,7 @@ itcl::class gaia::GaiaImageCtrl {
    #  accept an exit without prompting (this is what all the catches
    #  achieve).
    destructor {
+
       #  The FITS chooser needs to release any temporary files used for
       #  storing in-line compressed images.
       gaia::GaiaHduChooser::release_temporary_files
@@ -551,7 +552,9 @@ itcl::class gaia::GaiaImageCtrl {
       if { [$image_ volatile] } {
 
          #  Create a temporary file name, .sdf shouldn't matter.
-         set tmpname "GaiaImageCtrlTmp[incr count_].sdf"
+         incr count_
+         set tmpname [gaia::GaiaTempName::make_name \
+                         "GaiaImageCtrlTmp" $count_ ".sdf"]
 
          #  Write current image to disk
          if { [catch { $image_ dump $tmpname FITS } msg] == 0 } {
@@ -942,11 +945,11 @@ itcl::class gaia::GaiaImageCtrl {
       } else {
          pack $itk_component(zoom) -side left -fill both -expand 0
       }
-      
+
       #  Tell the base class to use this zoom window when entered.
       config -zoomwin $itk_component(zoom)
    }
-   
+
 
 
    #  Display a popup window listing the HDUs in the current image.

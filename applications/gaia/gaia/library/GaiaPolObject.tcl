@@ -331,10 +331,10 @@ itcl::class gaia::GaiaPolObject {
       if { $tempdir_ == "" } {
          global env
 
-#  First option is to create a new subdirectory within $HDS_SCRATCH.
+#  First option is to create a new subdirectory within $GAIA_TEMP_DIR.
 #  Otherwise, create it within the current directory.
-         if { [info exists env(HDS_SCRATCH)] } {
-            set dir $env(HDS_SCRATCH)
+         if { [info exists env(GAIA_TEMP_DIR)] } {
+            set dir $env(GAIA_TEMP_DIR)
          } {
             set dir [pwd]
          }

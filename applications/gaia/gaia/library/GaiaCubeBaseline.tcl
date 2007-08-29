@@ -224,8 +224,9 @@ itcl::class gaia::GaiaCubeBaseline {
       }
 
       #  Create a temporary file name.
-      set tmpimage_ "GaiaTempCube${count_}"
       incr count_
+      set tmpimage_ [gaia::GaiaTempName::make_name \
+                        "GaiaTempCube" $count_ ".sdf"]
 
       #  Need to determine ranges. Note handle case when coordinate system
       #  doesn't match the disk-file.
