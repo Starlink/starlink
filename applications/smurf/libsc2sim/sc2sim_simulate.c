@@ -228,6 +228,9 @@
 *        Initialize FITS header strings
 *     2007-08-15 (CV):
 *        Added microstepping ability for STARE observations
+*     2007-08-27 (CV):
+*        Changed from microstepping by changing the telescope boresight
+*        pointing to using instrument aperature offsets
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -462,12 +465,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
   /* Setup instap (converted from arcsec to radians) and telpos */
   smf_calc_telpos( NULL, "JCMT", sinx->telpos, status );
-  if ( strncmp( inx->instap, " ", 1 ) != 0 ) {
-    sc2sim_instap_calc( inx, instap, status );
-  } else {
-    instap[0] = DAS2R * inx->instap_x;
-    instap[1] = DAS2R * inx->instap_y;
-  }
+  sc2sim_instap_calc( inx, 0, instap, status );
 
   if( *status == SAI__OK ) {
     /* Calculate year/month/day corresponding to MJD at start */
@@ -651,12 +649,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         if( *status == SAI__OK ) {
           memset( posptr, 0, count*2*sizeof(double) );
         }
-
-	/* if microstepping turned on superimpose microstep pattern on
-	   to posptr */
-	if ( inx->nmicstep > 1 ) {
-	  sc2sim_getmicstp ( inx, count, posptr, status );
-	}
 
         break;
 
@@ -890,8 +882,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
   /* determine number of frames per microstep */
   frmperms = count / inx->nmicstep; /* NOTE: will round down number of
-				 frames simulated if count not
-				 divisable by nmicstp */
+				       frames simulated if count not
+				       divisable by nmicstep */
 
   /* adjust maxwrite */
   if ( maxwrite > frmperms ) { maxwrite = frmperms; }
@@ -903,8 +895,9 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
   /* loop over microsteps */
   for ( curms = 0; curms < inx->nmicstep; curms++ ) {
+    sc2sim_instap_calc( inx, curms, instap, status );
 
-    /* For each chunk, determine the data for the corresponding
+  /* For each chunk, determine the data for the corresponding
      frames.  At the last frame, write the data for each 
      subarray to a file */
   for (curchunk = 0; curchunk < chunks && (*status == SAI__OK); curchunk++) {
