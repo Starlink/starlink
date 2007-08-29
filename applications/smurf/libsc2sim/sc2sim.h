@@ -21,6 +21,7 @@
 *  Authors:
 *     J.Balfour (UBC)
 *     A.G. Gibb (UBC)
+*     C. VanLaerhoven (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -71,7 +72,9 @@
 *     2007-07-12 (AGG):
 *        Redefine nterms as int rather than double in sc2sim_getinvf.c
 *     2007-08-15 (CV):
-*        Added sc2sim_getmicstp        
+*        Added sc2sim_getmicstp
+*     2007-08-27 (CV):
+*        Added mstp (current microstep) to sc2sim_instap_calc        
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -489,7 +492,8 @@ void sc2sim_heatrun ( struct sc2sim_obs_struct *inx,
 
 void sc2sim_instap_calc ( 
 struct sc2sim_obs_struct *inx, 
-double instap[2],        /* Returned focal plane offsets (radians) */
+int mstp,              /* current microstep */
+double instap[2],      /* Returned focal plane offsets (radians) */
 int *status            /* global status (given and returned) */
 );
 
