@@ -13,12 +13,14 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2sim_instap_calc ( struct sc2sim_obs_struct *inx, double instap[2], 
-*                          int *status )
+*     sc2sim_instap_calc ( struct sc2sim_obs_struct *inx, int mstp,
+*                          double instap[2], int *status )
 
 *  Arguments:
 *     inx = sc2sim_obs_struct* (Given)
 *        Pointer to input OBS struct
+*     mstp = int
+*        Current microstep
 *     instap[2] = double (Returned)
 *        Focal plane offsets in radians
 *     status = int* (Given and Returned)
@@ -35,11 +37,14 @@
 
 *  Authors:
 *     A.G. Gibb (UBC)
+*     C. VanLaerhoven (UBC)
 *     {enter_new_authors_here}
 
 *  History :
 *     2007-01-03 (AGG):
 *        Original version
+*     2007-08-27 (CV):
+*        Added microstepping
 
 *  Copyright:
 *     Copyright (C) 2007 University of British Columbia. All Rights
@@ -85,7 +90,8 @@
 void sc2sim_instap_calc
 ( 
 struct sc2sim_obs_struct *inx, /* Pointer to observation struct */
-double instap[2],        /* Returned focal plane offsets (radians) */
+int mstp,              /* current microstep */
+double instap[2],      /* Returned focal plane offsets (radians) */
 int *status            /* global status (given and returned) */
 )
 
@@ -94,6 +100,9 @@ int *status            /* global status (given and returned) */
   /* Local variables */
   double halfx;
   double halfy;
+  double instap_arr[2]={0,0};
+  double instap_ms[2]={0,0};
+  int i;
 
   /* Check status */
   if ( *status != SAI__OK ) return;
@@ -102,28 +111,42 @@ int *status            /* global status (given and returned) */
   halfx = 0.5 * (inx->nbolx + 4) * inx->bol_distx;
   halfy = 0.5 * (inx->nboly + 4) * inx->bol_disty;
 
-  /* Check for valid subarray */
-  if ( strncmp( inx->instap, "s8a", 3 ) == 0 ) {
-    inx->instap_x = halfx;
-    inx->instap_y = -halfy;
-  } else if ( strncmp( inx->instap, "s8b", 3 ) == 0 ) {
-    inx->instap_x = -halfy;
-    inx->instap_y = -halfx;
-  } else if ( strncmp( inx->instap, "s8c", 3 ) == 0 ) {
-    inx->instap_x = -halfx;
-    inx->instap_y = halfy;
-  } else if ( strncmp( inx->instap, "s8d", 3 ) == 0 ) {
-    inx->instap_x = halfy;
-    inx->instap_y = halfx;
-  } else {
-    if ( strncmp( inx->instap, " ", 1 ) == 0 ) {
-      msgSetc("S", inx->instap);
-      msgOutif( MSG__VERB, " ", "Unrecognized subarray name, ^S, assuming zero offsets", status );
+  if  ( strncmp( inx->instap, " ", 1 ) != 0 ) {
+    /* Check for valid subarray */
+    if ( strncmp( inx->instap, "s8a", 3 ) == 0 ) {
+      instap_arr[0] = halfx;
+      instap_arr[1] = -halfy;
+    } else if ( strncmp( inx->instap, "s8b", 3 ) == 0 ) {
+      instap_arr[0] = -halfy;
+      instap_arr[1] = -halfx;
+    } else if ( strncmp( inx->instap, "s8c", 3 ) == 0 ) {
+      instap_arr[0] = -halfx;
+      instap_arr[1] = halfy;
+    } else if ( strncmp( inx->instap, "s8d", 3 ) == 0 ) {
+      instap_arr[0] = halfy;
+      instap_arr[1] = halfx;
+    } else {
+      if ( strncmp( inx->instap, " ", 1 ) == 0 ) {
+	msgSetc("S", inx->instap);
+	msgOutif( MSG__VERB, " ",
+		  "Unrecognized subarray name, ^S, assuming zero offsets",
+		  status );
+      }
+      instap_arr[0] = 0.0;
+      instap_arr[1] = 0.0;
     }
-    inx->instap_x = 0.0;
-    inx->instap_y = 0.0;
-  } 
+  }
+
+  if ( inx->nmicstep > 1 ) {
+    instap_ms[0] = inx->mspat_x[mstp] * inx->bol_distx;
+    instap_ms[1] = inx->mspat_y[mstp] * inx->bol_disty;
+  }
+
+  inx->instap_x = instap_arr[0] + instap_ms[0];
+  inx->instap_y = instap_arr[1] + instap_ms[1];
+
   instap[0] = DAS2R * inx->instap_x;
   instap[1] = DAS2R * inx->instap_y;
+
 }
 
