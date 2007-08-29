@@ -1,5 +1,13 @@
 HDS Library
 -----------
+   Version 5.0-6
+   =============
+
+   When existing files are overwritten they appear corrupted to 
+   any other processes that have the file open. To avoid this 
+   existing files are now unlinked before creating a new file
+   with the same name.
+
    Version 5.0-5
    =============
 
