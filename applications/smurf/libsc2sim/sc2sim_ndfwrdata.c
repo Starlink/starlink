@@ -188,6 +188,9 @@
 *        Fixed coordinate system string termination issue
 *     2007-08-27 (AGG):
 *        Set SkyRef and coordinate system correctly for DREAM/STARE images
+*     2007-08-29 (CV):
+*        Removed call to sc2sim_instap_calc as it was already called in
+*        sc2sim_simulate
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
@@ -640,12 +643,14 @@ int *status              /* Global status (given and returned) */
      state.smu_az_chop_y = 0.0;
 
      /*smf_calc_telpos( NULL, "JCMT", telpos, status );*/
-     if ( strncmp( inx->instap, " ", 1 ) != 0 ) {
+     /*if ( strncmp( inx->instap, " ", 1 ) != 0 ) {
        sc2sim_instap_calc( inx, instap, status );
      } else {
        instap[0] = DAS2R * inx->instap_x;
        instap[1] = DAS2R * inx->instap_y;
-     }
+       } */
+     instap[0] = DAS2R * inx->instap_x;
+     instap[1] = DAS2R * inx->instap_y;
 
      /* Set coordinate system */
      strncpy( cosys, head[0].tcs_tr_sys, JCMT__SZTCS_TR_SYS+1 );
