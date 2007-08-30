@@ -203,6 +203,9 @@ f     The SkyFrame class does not define any new routines beyond those
 *        SkyAxis from a SkyFrame in function SubFrame.
 *        - In SubFrame, clear extended attributes such as System after
 *        all axis attributes have been "fixated.
+*     30-AUG-2007 (DSB):
+*        Override astSetDut1 and astClearDut1 by implementations which
+*        update the LAST value stored in the SkyFrame.
 *class--
 */
 
@@ -672,12 +675,14 @@ static int (* parent_testattrib)( AstObject *, const char * );
 static int (* parent_testformat)( AstFrame *, int );
 static int (* parent_unformat)( AstFrame *, int, const char *, double * );
 static void (* parent_clearattrib)( AstObject *, const char * );
+static void (* parent_cleardut1)( AstFrame * );
 static void (* parent_clearepoch)( AstFrame * );
 static void (* parent_clearformat)( AstFrame *, int );
 static void (* parent_clearobslon)( AstFrame * );
 static void (* parent_clearsystem)( AstFrame * );
 static void (* parent_overlay)( AstFrame *, const int *, AstFrame * );
 static void (* parent_setattrib)( AstObject *, const char * );
+static void (* parent_setdut1)( AstFrame *, double );
 static void (* parent_setepoch)( AstFrame *, double );
 static void (* parent_setformat)( AstFrame *, int, const char * );
 static void (* parent_setobslon)( AstFrame *, double );
@@ -746,6 +751,7 @@ static int TestProjection( AstSkyFrame * );
 static int Unformat( AstFrame *, int, const char *, double * );
 static void ClearAsTime( AstSkyFrame *, int );
 static void ClearAttrib( AstObject *, const char * );
+static void ClearDut1( AstFrame * );
 static void ClearEpoch( AstFrame * );
 static void ClearEquinox( AstSkyFrame * );
 static void ClearNegLon( AstSkyFrame * );
@@ -763,6 +769,7 @@ static void Overlay( AstFrame *, const int *, AstFrame * );
 static void Resolve( AstFrame *, const double [], const double [], const double [], double [], double *, double * );
 static void SetAsTime( AstSkyFrame *, int, int );
 static void SetAttrib( AstObject *, const char * );
+static void SetDut1( AstFrame *, double );
 static void SetEpoch( AstFrame *, double );
 static void SetEquinox( AstSkyFrame *, double );
 static void SetNegLon( AstSkyFrame *, int );
@@ -1095,6 +1102,52 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else {
       (*parent_clearattrib)( this_object, attrib );
    }
+}
+
+static void ClearDut1( AstFrame *this_frame ) {
+/*
+*  Name:
+*     ClearDut1
+
+*  Purpose:
+*     Clear the value of the Dut1 attribute for a SkyFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     void ClearDut1( AstFrame *this )
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astClearDut1 method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function clears the Dut1 value and updates the LAST value
+*     stored in the SkyFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+
+*/
+
+/* Local Variables: */
+   double orig;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Note the original value */
+   orig = astGetDut1( this_frame );
+
+/* Invoke the parent method to clear the Frame Dut1 */
+   (*parent_cleardut1)( this_frame );
+
+/* Recalculate the Local Apparent Sidereal Time value, if the Dut1
+   value has changed. */
+   if( orig != astGetDut1( this_frame ) ) SetLast( (AstSkyFrame *) this_frame );
 }
 
 static void ClearEpoch( AstFrame *this_frame ) {
@@ -3705,6 +3758,12 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name ) {
 
    parent_clearepoch = frame->ClearEpoch;
    frame->ClearEpoch = ClearEpoch;
+
+   parent_setdut1 = frame->SetDut1;
+   frame->SetDut1 = SetDut1;
+
+   parent_cleardut1 = frame->ClearDut1;
+   frame->ClearDut1 = ClearDut1;
 
 /* Store replacement pointers for methods which will be over-ridden by new
    member functions implemented here. */
@@ -7106,6 +7165,58 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    }
 }
 
+static void SetDut1( AstFrame *this_frame, double val ) {
+/*
+*  Name:
+*     SetDut1
+
+*  Purpose:
+*     Set the value of the Dut1 attribute for a SkyFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     void SetDut1( AstFrame *this, double val )
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astSetDut1 method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function clears the Dut1 value and updates the LAST value
+*     stored in the SkyFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+*     val
+*        New Dut1 value.
+
+*/
+
+/* Local Variables: */
+   AstSkyFrame *this;
+   double orig;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the SkyFrame structure. */
+   this = (AstSkyFrame *) this_frame;
+
+/* Note the original Dut1 value. */
+   orig = astGetDut1( this );
+
+/* Invoke the parent method to set the Frame Dut1 value. */
+   (*parent_setdut1)( this_frame, val );
+
+/* Recalculate the Local Apparent Sidereal Time value if the Dut1 value
+   has changed. */
+   if( val != orig ) SetLast( this );
+}
+
 static void SetEpoch( AstFrame *this_frame, double val ) {
 /*
 *  Name:
@@ -7190,6 +7301,7 @@ static void SetLast( AstSkyFrame *this ) {
 /* Local Variables: */
    AstFrameSet *fs;   /* Mapping from TDB offset to LAST offset */
    double epoch;      /* Epoch as a TDB MJD */
+   double dut1;       /* DUT1 value at the SkyFrame's epoch */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -7218,6 +7330,11 @@ static void SetLast( AstSkyFrame *this ) {
 
    astSetObsLat( tdbframe, astGetObsLat( this ) );
    astSetObsLat( lastframe, astGetObsLat( this ) );
+
+/* Store the DUT1 value. */
+   dut1 = astGetDut1( this );
+   astSetDut1( tdbframe, dut1 );
+   astSetDut1( lastframe, dut1 );
 
 /* Get the conversion from tdb mjd offset to last mjd offset. */
    fs = astConvert( tdbframe, lastframe, "" );
