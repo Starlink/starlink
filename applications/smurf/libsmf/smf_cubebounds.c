@@ -156,6 +156,8 @@
 *        Added argument "boxes". The bounding box of each input file will
 *        be needed by the algorithm that chooses which input files contribute 
 *        to each tile of the output.
+*     31-AUG-2007 (DSB):
+*        Remove debugging printf statements.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -944,27 +946,6 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* End the AST context. This will annul all AST objects created within the
    context (except for those that have been exported from the context). */
    astEnd;
-
-
-
-
-
-
-
-
-
-
-      box = *boxes;
-      for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++, box++ ) {
-         printf( "Box %d: %g->%g  %g->%g\n", ifile, box->lbnd[ 0 ], 
-                 box->ubnd[ 0 ], box->lbnd[ 1 ], box->ubnd[ 1 ] );
-      }
-
-
-
-
-
-
 
 /* Issue a context message if anything went wrong. */
    if( *status != SAI__OK ) errRep( FUNC_NAME, "Unable to determine cube "
