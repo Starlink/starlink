@@ -28,6 +28,9 @@
 **    6-OCT-2006 (DSB):
 **       Added palSlaGmsta by translating the corresponding fortran routines 
 **       into C (by hand).
+**    31-AUG-2007 (DSB):
+**       Modify palSlaDe2h and palSlaDh2e to apply correction for diurnal 
+**       aberration.
 */
 
 #include "pal.h"
@@ -1030,17 +1033,95 @@ palSlaDimxv(Q2,Q1,FOBAR);palSlaDcc2s(FOBAR,BAZ,q0);*BAZ=palSlaDranrm(
 float palSlaVdv(float FOO[3],float BAR[3]){return FOO[0]*BAR[0]
 +FOO[1]*BAR[1]+FOO[2]*BAR[2];}
 
-void palSlaDh2e(double az,double el,double phi,double *ha,double *dec){
-double sa,ca,se,ce,sp,cp,x,y,z,r; sa=sin(az); ca=cos(az); se=sin(el);
-ce=cos(el); sp=sin(phi); cp=cos(phi); x=-ca*ce*sp+se*cp; y=-sa*ce;
-z=ca*ce*cp+se*sp; r=sqrt(x*x+y*y); if (r==0.0) { *ha=0.0; } else {
-*ha=atan2(y,x); } *dec=atan2(z,r);}
 
-void palSlaDe2h(double ha,double dec,double phi,double *az,double *el){
-double sh,ch,sd,cd,sp,cp,x,y,z,r,a; sh=sin(ha); ch=cos(ha); sd=sin(dec);
-cd=cos(dec); sp=sin(phi); cp=cos(phi); x=-ch*cd*sp+sd*cp; y=-sh*cd;
-z=ch*cd*cp+sd*sp; r=sqrt(x*x+y*y); if( r == 0.0 ) { a=0.0; } else {
-a=atan2(y,x); } if(a<0.0) a=a+D2PI; *az=a; *el=atan2(z,r); }
+/* Not quite like slaDh2e since it converts from topocentric (az,el) to 
+   apparent (ha,dec). This includes a correction for diurnal aberration. 
+   The magnitude of the diurnal aberration vector should be supplied in 
+   parameter "diurab". The extra code is taken from the Fortran routine 
+   SLA_OAPQK. */
+
+void palSlaDh2e(double az,double el,double phi,double diurab,double *ha,double *dec){
+ double sa,ca,se,ce,sp,cp,x,y,z,r,xmhda,ymhda,zmhda,f;
+
+ sa=sin(az);
+ ca=cos(az);
+ se=sin(el);
+ ce=cos(el);
+ sp=sin(phi);
+ cp=cos(phi);
+
+/* Cartesian (az,el) to Cartesian (ha,dec) - note, +ha, not -ha. */
+ xmhda=-ca*ce*sp+se*cp;
+ ymhda=-sa*ce;
+ zmhda=ca*ce*cp+se*sp;
+
+/* Correct this vector for diurnal aberration. Since the above
+  expressions produce +ha rather than -ha, we do not negate "diurab" 
+  before using it. Compare this to SLA_AOPQK. */
+ f = (1-diurab*ymhda);
+ x = f*xmhda;
+ y = f*(ymhda+diurab);
+ z = f*zmhda;
+
+/* Cartesian (ha,dec) to spherical (ha,dec). */
+ r=sqrt(x*x+y*y);
+ if (r==0.0) { 
+    *ha=0.0;
+ } else {
+    *ha=atan2(y,x);
+ } 
+ *dec=atan2(z,r);
+}
+
+
+/* Not quite like slaDe2h since it converts from apparent (ha,dec) to 
+   topocentric (az,el). This includes a correction for diurnal
+   aberration. The magnitude of the diurnal aberration vector should be 
+   supplied in parameter "diurab". The extra code is taken from the
+   Fortran routine SLA_AOPQK. */
+
+void palSlaDe2h( double ha, double dec, double phi, double diurab, 
+                 double *az, double *el){
+ double sh,ch,sd,cd,sp,cp,x,y,z,r,a,xhd,yhd,zhd,xhdt,yhdt,zhdt,f;
+
+ sh=sin(ha); 
+ ch=cos(ha); 
+ sd=sin(dec);
+ cd=cos(dec);
+ sp=sin(phi);
+ cp=cos(phi);
+
+/* Components of cartesian (-ha,dec) vector. */
+ xhd = ch*cd;
+ yhd = -sh*cd;
+ zhd = sd;
+
+/* Modify the above vector to apply diurnal aberration. */
+ f = (1.0-diurab*yhd);
+ xhdt = f*xhd;
+ yhdt = f*(yhd+diurab);
+ zhdt = f*zhd;
+
+/* Convert to cartesian (az,el). */
+ x=-xhdt*sp+zhdt*cp;
+ y=yhdt;
+ z=xhdt*cp+zhdt*sp;
+
+/* Convert to spherical (az,el). */
+ r=sqrt(x*x+y*y);
+ if( r == 0.0 ) { 
+    a=0.0;
+ } else {
+    a=atan2(y,x);
+ } 
+
+ if(a<0.0) a=a+D2PI;
+
+ *az=a;
+ *el=atan2(z,r);
+}
+
+
 
 double palSlaGmsta( double Dt, double uQ){ static double
 s2r=7.272205216643039903848712E-5; double r,d1,d2,t; if(Dt<uQ) { d1=Dt;

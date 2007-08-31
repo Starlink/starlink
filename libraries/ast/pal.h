@@ -128,7 +128,7 @@ void palSlaDcs2c ( double a, double b, double v[3] );
 
 void palSlaDd2tf ( int ndp, double days, char *sign, int ihmsf[4] );
 
-void palSlaDe2h ( double ha, double dec, double phi,
+void palSlaDe2h ( double ha, double dec, double phi, double diurab,
                double *az, double *el );
 
 void palSlaDeuler ( char *order, double phi, double theta, double psi,
@@ -136,7 +136,8 @@ void palSlaDeuler ( char *order, double phi, double theta, double psi,
 
 void palSlaDfltin ( char *string, int *nstrt, double *dreslt, int *jflag );
 
-void palSlaDh2e ( double az, double el, double phi, double *ha, double *dec);
+void palSlaDh2e( double az, double el, double phi, double diurab, double *ha, 
+                 double *dec);
 
 void palSlaDimxv ( double dm[3][3], double va[3], double vb[3] );
 
