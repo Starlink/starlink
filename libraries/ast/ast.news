@@ -19,6 +19,17 @@ Main Changes in this Version
 -  Addition of a new class called Plot3D that provides facilities for
 producing 3-dimensional annotated coordinate grids.
 
+-  The AZEL coordinate system represented by a SkyFrame has been changed
+from topocentric horizon coordinates to apparent horizon coordinates.
+This means that a correction for diurnal aberration is now included when
+converting between AZEL and other celestial coordinate systems. The
+correction is based on the value of the ObsLat Frame attribute (the
+geodetic latitude of the observer).
+
+-  A bug has been fixed which caused the DUT1 attribute to be ignored
+by the SkyFrame class when finding conversions between AZEL and other
+celestial coordinate systems.
+
 
 Main Changes in Version 4.5
 ---------------------------
