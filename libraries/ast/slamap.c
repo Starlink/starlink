@@ -101,6 +101,15 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 *        Cache results returned by palSlaMappa in order to increase speed.
 *     10-MAY-2006 (DSB):
 *        Override astEqual.
+*     31-AUG-2007 (DSB):
+*        - Modify H2E and E2H conversion functions so that they convert to
+*        and from apparent (HA,Dec) rather than topocentric (HA,Dec) (i.e. 
+*        include a correction for diurnal aberration). This requires an
+*        extra conversion argument holding the magnitude of the diurnal 
+*        aberration vector.
+*        - Correct bug in the simplification of adjacent AMP and MAP
+*        conversions.
+
 *class--
 */
 
@@ -534,9 +543,9 @@ static void AddSlaCvt( AstSlaMap *this, int cvttype, const double *args ) {
 *           Convert dynamical J2000 to ICRS.
 *        AST__HJ2000( )
 *           Convert ICRS to dynamical J2000.
-*        AST__SLA_DH2E( LAT )
+*        AST__SLA_DH2E( LAT, DIURAB )
 *           Convert horizon to equatorial coordinates
-*        AST__SLA_DE2H( LAT )
+*        AST__SLA_DE2H( LAT, DIURAB )
 *           Convert equatorial to horizon coordinates
 *        AST__R2H( LAST )
 *           Convert RA to Hour Angle.
@@ -992,15 +1001,17 @@ static const char *CvtString( int cvt_code, const char **comment,
    case AST__SLA_DH2E:
       result = "H2E";
       *comment = "Horizon to equatorial";
-      *nargs = 1;
+      *nargs = 2;
       arg[ 0 ] = "Geodetic latitude of observer";
+      arg[ 1 ] = "Magnitude of diurnal aberration vector";
       break;
 
    case AST__SLA_DE2H:
       result = "E2H";
       *comment = "Equatorial to horizon";
-      *nargs = 1;
+      *nargs = 2;
       arg[ 0 ] = "Geodetic latitude of observer";
+      arg[ 1 ] = "Magnitude of diurnal aberration vector";
       break;
 
    case AST__R2H:
@@ -2739,9 +2750,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                } else if ( ( PAIR_CVT( AST__SLA_AMP, AST__SLA_MAP ) ||
                              PAIR_CVT( AST__SLA_MAP, AST__SLA_AMP ) ) &&
                            EQUAL( cvtargs[ istep ][ 0 ],
-                                  cvtargs[ istep + 1 ][ 1 ] ) &&
+                                  cvtargs[ istep + 1 ][ 0 ] ) &&
                            EQUAL( cvtargs[ istep ][ 1 ],
-                                  cvtargs[ istep + 1 ][ 0 ] ) ) {
+                                  cvtargs[ istep + 1 ][ 1 ] ) ) {
                   istep++;
                   keep = 0;
 
@@ -2760,7 +2771,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                } else if ( ( PAIR_CVT( AST__SLA_DH2E, AST__SLA_DE2H ) ||
                              PAIR_CVT( AST__SLA_DE2H, AST__SLA_DH2E ) ) &&
                            EQUAL( cvtargs[ istep ][ 0 ],
-                                  cvtargs[ istep + 1 ][ 0 ] ) ) {
+                                  cvtargs[ istep + 1 ][ 0 ] ) &&
+                           EQUAL( cvtargs[ istep ][ 1 ],
+                                  cvtargs[ istep + 1 ][ 1 ] ) ) {
                   istep++;
                   keep = 0;
 
@@ -3081,8 +3094,6 @@ f     these arguments should be given, via the ARGS array, in the
 *     - "SUPGAL": Convert supergalactic coordinates to galactic.
 *     - "J2000H": Convert dynamical J2000.0 to ICRS.
 *     - "HJ2000": Convert ICRS to dynamical J2000.0.
-*     - "H2E" (LAT): Convert horizon coordinates to equatorial.
-*     - "E2H" (LAT): Convert equatorial coordinates to horizon.
 *     - "R2H" (LAST): Convert RA to Hour Angle.
 *     - "H2R" (LAST): Convert Hour Angle to RA.
 *
@@ -3096,8 +3107,9 @@ f     This value should then be supplied to AST_SLAADD in ARGS(1).
 *
 *     In addition the following strings may be supplied for more complex
 *     conversions which do not correspond to any one single SLALIB routine
-*     (DATE is the Modified Julian Date of the observation, and
-*     (OBSX,OBSY,OBZ) are the Heliocentric-Aries-Ecliptic cartesian
+*     (DIURAB is the magnitude of the diurnal aberration vector in units
+*     of "day/(2.PI)", DATE is the Modified Julian Date of the observation, 
+*     and (OBSX,OBSY,OBZ) are the Heliocentric-Aries-Ecliptic cartesian 
 *     coordinates, in metres, of the observer):
 *
 *     - "HPCEQ" (DATE,OBSX,OBSY,OBSZ): Convert Helioprojective-Cartesian coordinates to J2000.0 equatorial.
@@ -3106,7 +3118,14 @@ f     This value should then be supplied to AST_SLAADD in ARGS(1).
 *     - "EQHPR" (DATE,OBSX,OBSY,OBSZ): Convert J2000.0 equatorial coordinates to Helioprojective-Radial.
 *     - "HEEQ" (DATE): Convert helio-ecliptic coordinates to J2000.0 equatorial.
 *     - "EQHE" (DATE): Convert J2000.0 equatorial coordinates to helio-ecliptic.
+*     - "H2E" (LAT,DIRUAB): Convert horizon coordinates to equatorial.
+*     - "E2H" (LAT,DIURAB): Convert equatorial coordinates to horizon.
 *
+*     Note, the "H2E" and "E2H" conversions convert between topocentric
+*     horizon coordinates (azimuth,elevation), and apparent local equatorial
+*     coordinates (hour angle,declination). Thus, the effects of diurnal
+*     aberration are taken into account but the effects of atmospheric
+*     refraction are not.
 
 *--
 */
@@ -3674,13 +3693,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 	    case AST__SLA_DH2E:
                if ( forward ) {
                   TRAN_ARRAY(palSlaDh2e( alpha[ point ], delta[ point ],
-                                      args[ 0 ],
+                                      args[ 0 ], args[ 1 ],
                                       alpha + point, delta + point );)
 
 /* The inverse simply uses the inverse SLALIB function. */
 	       } else {
                   TRAN_ARRAY(palSlaDe2h( alpha[ point ], delta[ point ],
-                                      args[ 0 ],
+                                      args[ 0 ], args[ 1 ],
                                       alpha + point, delta + point );)
 	       }
                break;
@@ -3692,13 +3711,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 	    case AST__SLA_DE2H:
                if ( forward ) {
                   TRAN_ARRAY(palSlaDe2h( alpha[ point ], delta[ point ],
-                                      args[ 0 ],
+                                      args[ 0 ], args[ 1 ],
                                       alpha + point, delta + point );)
 
 /* The inverse simply uses the inverse SLALIB function. */
 	       } else {
                   TRAN_ARRAY(palSlaDh2e( alpha[ point ], delta[ point ],
-                                      args[ 0 ],
+                                      args[ 0 ], args[ 1 ],
                                       alpha + point, delta + point );)
 	       }
                break;
