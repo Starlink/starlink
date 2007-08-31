@@ -156,6 +156,7 @@ typedef struct AstSkyFrame {
    double skyrefp[ 2 ];          /* Point on primary meridian of offset coord system */
    double last;                  /* Local Apparent Sidereal Time */
    double eplast;                /* Epoch used to calculate "last" */
+   double diurab;                /* Magnitude of diurnal aberration vector */
 } AstSkyFrame;
 
 /* Virtual function table. */

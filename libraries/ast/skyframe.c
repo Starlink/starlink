@@ -206,6 +206,14 @@ f     The SkyFrame class does not define any new routines beyond those
 *     30-AUG-2007 (DSB):
 *        Override astSetDut1 and astClearDut1 by implementations which
 *        update the LAST value stored in the SkyFrame.
+*     31-AUG-2007 (DSB):
+*        - Cache the magnitude of the diurnal aberration vector in the
+*        SkyFrame structure for use when correcting for diurnal aberration.
+*        - Modify the azel conversions to handle apparent instead of
+*        topocentric azel (i.e. include correction for diurnal aberration).
+*        SkyFrame structure for use when correcting for diurnal aberration.
+*        - Override astClearObsLat and astSetObsLat by implementations which
+*        reset the magnitude of the diurnal aberration vector.
 *class--
 */
 
@@ -219,6 +227,12 @@ f     The SkyFrame class does not define any new routines beyond those
 /* Define the first and last acceptable System values. */
 #define FIRST_SYSTEM AST__FK4
 #define LAST_SYSTEM AST__AZEL
+
+/* Speed of light (AU per day) (from SLA_AOPPA) */
+#define C 173.14463331
+
+/* Ratio between solar and sidereal time (from SLA_AOPPA) */
+#define SOLSID 1.00273790935
 
 /* Define values for the different values of the SkyRefIs attribute. */
 #define BAD_REF 0
@@ -678,6 +692,7 @@ static void (* parent_clearattrib)( AstObject *, const char * );
 static void (* parent_cleardut1)( AstFrame * );
 static void (* parent_clearepoch)( AstFrame * );
 static void (* parent_clearformat)( AstFrame *, int );
+static void (* parent_clearobslat)( AstFrame * );
 static void (* parent_clearobslon)( AstFrame * );
 static void (* parent_clearsystem)( AstFrame * );
 static void (* parent_overlay)( AstFrame *, const int *, AstFrame * );
@@ -685,6 +700,7 @@ static void (* parent_setattrib)( AstObject *, const char * );
 static void (* parent_setdut1)( AstFrame *, double );
 static void (* parent_setepoch)( AstFrame *, double );
 static void (* parent_setformat)( AstFrame *, int, const char * );
+static void (* parent_setobslat)( AstFrame *, double );
 static void (* parent_setobslon)( AstFrame *, double );
 static void (* parent_setsystem)( AstFrame *, AstSystemType );
 
@@ -727,6 +743,7 @@ static double GetEquinox( AstSkyFrame * );
 static void SetLast( AstSkyFrame * );
 static double GetTop( AstFrame *, int );
 static double Offset2( AstFrame *, const double[2], double, double, double[2] );
+static double GetDiurab( AstSkyFrame * );
 static double GetLAST( AstSkyFrame * );
 static int GetActiveUnit( AstFrame * );
 static int GetAsTime( AstSkyFrame *, int );
@@ -755,6 +772,7 @@ static void ClearDut1( AstFrame * );
 static void ClearEpoch( AstFrame * );
 static void ClearEquinox( AstSkyFrame * );
 static void ClearNegLon( AstSkyFrame * );
+static void ClearObsLat( AstFrame * );
 static void ClearObsLon( AstFrame * );
 static void ClearProjection( AstSkyFrame * );
 static void ClearSystem( AstFrame * );
@@ -773,6 +791,7 @@ static void SetDut1( AstFrame *, double );
 static void SetEpoch( AstFrame *, double );
 static void SetEquinox( AstSkyFrame *, double );
 static void SetNegLon( AstSkyFrame *, int );
+static void SetObsLat( AstFrame *, double );
 static void SetObsLon( AstFrame *, double );
 static void SetProjection( AstSkyFrame *, const char * );
 static void SetSystem( AstFrame *, AstSystemType );
@@ -1196,6 +1215,53 @@ static void ClearEpoch( AstFrame *this_frame ) {
    will cause the new LAST to be calculated accurately and stored in the
    SkyFrame. */
    (void) GetLAST( this );
+}
+
+static void ClearObsLat( AstFrame *this ) {
+/*
+*  Name:
+*     ClearObsLat
+
+*  Purpose:
+*     Clear the value of the ObsLat attribute for a SkyFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     void ClearObsLat( AstFrame *this )
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astClearObsLat method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function clears the ObsLat value.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+
+*/
+
+/* Local Variables: */
+   double orig;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Note the original value */
+   orig = astGetObsLat( this );
+
+/* Invoke the parent method to clear the Frame ObsLat. */
+   (*parent_clearobslat)( this );
+
+/* If the value has changed, indicate that the magnitude of the diurnal 
+   aberration vector needs to be re-calculated. */
+   if( orig != astGetObsLat( this ) ) {
+      ( (AstSkyFrame *) this )->diurab = AST__BAD;
+   }
 }
 
 static void ClearObsLon( AstFrame *this ) {
@@ -2727,6 +2793,58 @@ static const char *GetLabel( AstFrame *this, int axis ) {
    return result;
 }
 
+static double GetDiurab( AstSkyFrame *this ) {
+/*
+*  Name:
+*     GetDiurab
+
+*  Purpose:
+*     Return the magnitude of the diurnal aberration vector.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     double GetDiurab( AstSkyFrame *this )
+
+*  Class Membership:
+*     SkyFrame member function 
+
+*  Description:
+*     This function returns the  magnitude of the diurnal aberration
+*     vector. This value depends only on the observer's geodetic latitude 
+*     (ObsLat) since it assumes an observer altitude of zero.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+
+*  Returned Value:
+*     The magnitude of the diurnal aberration vector.
+
+*/
+
+/* Local Variables: */
+   double uau;
+   double vau;
+
+/* Check the global error status. */
+   if ( !astOK ) return AST__BAD;
+
+/* If the magnitude of the diurnal aberration vector has not yet been
+   found, find it now, and cache it in the SkyFrame structure. The cached
+   value will be reset to AST__BAD if the ObsLat attribute value is 
+   changed. This code is transliterated from SLA_AOPPA. */
+   if( this->diurab == AST__BAD ) {
+      palSlaGeoc( astGetObsLat( this ), 0.0, &uau, &vau );
+      this->diurab = 2*AST__DPI*uau*SOLSID/C;
+   } 
+
+/* Return the result, */
+   return this->diurab;
+}
+
 static double GetLAST( AstSkyFrame *this ) {
 /*
 *  Name:
@@ -3706,11 +3824,17 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name ) {
    parent_gettop = frame->GetTop;
    frame->GetTop = GetTop;
 
+   parent_setobslat = frame->SetObsLat;
+   frame->SetObsLat = SetObsLat;
+
    parent_setobslon = frame->SetObsLon;
    frame->SetObsLon = SetObsLon;
 
    parent_clearobslon = frame->ClearObsLon;
    frame->ClearObsLon = ClearObsLon;
+
+   parent_clearobslat = frame->ClearObsLat;
+   frame->ClearObsLat = ClearObsLat;
 
    parent_getbottom = frame->GetBottom;
    frame->GetBottom = GetBottom;
@@ -4472,6 +4596,7 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
    double equinox;               /* Equinox as Modified Julian Date */
    double equinox_B;             /* Besselian equinox as decimal years */
    double equinox_J;             /* Julian equinox as decimal years */
+   double diurab;                /* Magnitude of diurnal aberration vector */
    double last;                  /* Local Apparent Sidereal Time */
    double lat;                   /* Observers latitude */
    double result_epoch;          /* Result frame Epoch */
@@ -4625,6 +4750,7 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
       equinox = target_equinox;
       epoch = target_epoch;
       last = GetLAST( target );
+      diurab = GetDiurab( target );
       lat = astGetObsLat( target );
       if( astOK && step1 ) {
    
@@ -4729,7 +4855,7 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
       go from geocentric apparent to FK5 J2000. */
          } else if ( system == AST__AZEL ) {
             VerifyMSMAttrs( target, result, 1, "ObsLon ObsLat Epoch", "astMatch" );
-            TRANSFORM_1( "H2E", lat )
+            TRANSFORM_2( "H2E", lat, diurab )
             TRANSFORM_1( "H2R", last )
             TRANSFORM_2( "AMP", epoch, 2000.0 )
    
@@ -4840,7 +4966,7 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
             VerifyMSMAttrs( target, result, 1, "ObsLon ObsLat Epoch", "astMatch" );
             TRANSFORM_2( "MAP", 2000.0, epoch )
             TRANSFORM_1( "R2H", last )
-            TRANSFORM_1( "E2H", lat )
+            TRANSFORM_2( "E2H", lat, diurab )
    
 /* Align in unknown coordinates. */
 /* ------------------------------- */
@@ -4861,6 +4987,7 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
       system = result_system;
       equinox = result_equinox;
       epoch = result_epoch;
+      diurab = GetDiurab( result );
       last = GetLAST( result );
       lat = astGetObsLat( result );
    
@@ -4970,7 +5097,7 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
       go from geocentric apparent to FK5 J2000. */
          } else if ( system == AST__AZEL ) {
             VerifyMSMAttrs( target, result, 3, "ObsLon ObsLat Epoch", "astMatch" );
-            TRANSFORM_1( "H2E", lat )
+            TRANSFORM_2( "H2E", lat, diurab )
             TRANSFORM_1( "H2R", last )
             TRANSFORM_2( "AMP", epoch, 2000.0 )
    
@@ -5081,7 +5208,7 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
             VerifyMSMAttrs( target, result, 3, "ObsLon ObsLat Epoch", "astMatch" );
             TRANSFORM_2( "MAP", 2000.0, epoch )
             TRANSFORM_1( "R2H", last )
-            TRANSFORM_1( "E2H", lat )
+            TRANSFORM_2( "E2H", lat, diurab )
    
 /* To unknown coordinates. */
 /* ----------------------------- */
@@ -7348,6 +7475,56 @@ static void SetLast( AstSkyFrame *this ) {
 
 /* Save the TDB MJD to which this LAST corresponds. */
    this->eplast = astGetEpoch( this );
+}
+
+static void SetObsLat( AstFrame *this, double val ) {
+/*
+*  Name:
+*     SetObsLat
+
+*  Purpose:
+*     Set the value of the ObsLat attribute for a SkyFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     void SetObsLat( AstFrame *this, double val )
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astSetObsLat method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function sets the ObsLat value.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+*     val
+*        New ObsLat value.
+
+*/
+
+/* Local Variables: */
+   double orig;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Note the original ObsLat value. */
+   orig = astGetObsLat( this );
+
+/* Invoke the parent method to set the Frame ObsLat. */
+   (*parent_setobslat)( this, val );
+
+/* If the value has changed, indicate that the magnitude of the diurnal 
+   aberration vector needs to be re-calculated. */
+   if( orig != astGetObsLat( this ) ) {
+      ( (AstSkyFrame *) this )->diurab = AST__BAD;
+   }
+
 }
 
 static void SetObsLon( AstFrame *this, double val ) {
@@ -9760,6 +9937,7 @@ AstSkyFrame *astInitSkyFrame_( void *mem, size_t size, int init,
       new->skyrefp[ 1 ] = AST__BAD;
       new->last = AST__BAD;
       new->eplast = AST__BAD;
+      new->diurab = AST__BAD;
 
 /* Loop to replace the Axis object associated with each SkyFrame axis with
    a SkyAxis object instead. */
@@ -10011,6 +10189,7 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size,
 /* ------------ */
       new->last = AST__BAD;
       new->eplast = AST__BAD;
+      new->diurab = AST__BAD;
 
 /* If an error occurred, clean up by deleting the new SkyFrame. */
       if ( !astOK ) new = astDelete( new );
