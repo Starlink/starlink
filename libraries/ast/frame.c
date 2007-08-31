@@ -11299,8 +11299,9 @@ astMAKE_TEST(Frame,AlignSystem,( this->alignsystem != AST__BADSYSTEM ))
 *        such that geographic north has an azimuth of zero and geographic 
 *        east has an azimuth of +PI/2 radians. The zenith has elevation
 *        +PI/2. When converting to and from other celestial coordinate 
-*        systems, no corrections are applied for atmospheric refraction,
-*        diurnal aberattion or polar motion. Note, unlike most other
+*        systems, no corrections are applied for atmospheric refraction
+*        or polar motion (however, a correction for diurnal aberattion is
+*        applied). Note, unlike most other
 *        celestial coordinate systems, this system is right handed. Also,
 *        unlike other SkyFrame systems, the AzEl system is sensitive to
 *        the timescale in which the Epoch value is supplied. This is
