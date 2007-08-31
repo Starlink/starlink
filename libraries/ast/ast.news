@@ -19,9 +19,7 @@ Main Changes in this Version
 -  Addition of a new class called Plot3D that provides facilities for
 producing 3-dimensional annotated coordinate grids.
 
--  The AZEL coordinate system represented by a SkyFrame has been changed
-from topocentric horizon coordinates to apparent horizon coordinates.
-This means that a correction for diurnal aberration is now included when
+-  A correction for diurnal aberration is now included when
 converting between AZEL and other celestial coordinate systems. The
 correction is based on the value of the ObsLat Frame attribute (the
 geodetic latitude of the observer).
