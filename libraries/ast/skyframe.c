@@ -209,9 +209,8 @@ f     The SkyFrame class does not define any new routines beyond those
 *     31-AUG-2007 (DSB):
 *        - Cache the magnitude of the diurnal aberration vector in the
 *        SkyFrame structure for use when correcting for diurnal aberration.
-*        - Modify the azel conversions to handle apparent instead of
-*        topocentric azel (i.e. include correction for diurnal aberration).
-*        SkyFrame structure for use when correcting for diurnal aberration.
+*        - Modify the azel conversions to include correction for diurnal 
+*        aberration.
 *        - Override astClearObsLat and astSetObsLat by implementations which
 *        reset the magnitude of the diurnal aberration vector.
 *class--

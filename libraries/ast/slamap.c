@@ -3124,8 +3124,8 @@ f     This value should then be supplied to AST_SLAADD in ARGS(1).
 *     Note, the "H2E" and "E2H" conversions convert between topocentric
 *     horizon coordinates (azimuth,elevation), and apparent local equatorial
 *     coordinates (hour angle,declination). Thus, the effects of diurnal
-*     aberration are taken into account but the effects of atmospheric
-*     refraction are not.
+*     aberration are taken into account in the conversions but the effects 
+*     of atmospheric refraction are not.
 
 *--
 */
