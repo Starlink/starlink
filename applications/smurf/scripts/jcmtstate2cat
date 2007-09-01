@@ -2,18 +2,23 @@
 
 =head1 NAME
 
-jcmtstate2cat - convert JCMT state structure into NDF format
+jcmtstate2cat - convert JCMT state structure into TST format
 
 =head1 SYNOPSIS
 
-  jmctstate2cat *.sdf
+  jcmtstate2cat *.sdf
+  jcmtstate2cat *.sdf > state.tst
 
 =head1 DESCRIPTION
 
-Just reads a set of files and writes a cataologue of the state information
+Reads a set of SCUBA-2 or ACSIS files and writes a catalogue of the state information
 to standard out. The output file is in TST format and can be read into the
 TOPCAT application (but may require that TOPCAT is told explicitly that
 the catalogue is in TST format).
+
+This information includes the telescope pointing position (Actual, Demand and Base)
+in both the tracking system and AZEL coordinate frames, jiggle patterns, telescope
+row/offset index amongst others.
 
 =head1 OPTIONS
 
@@ -34,6 +39,22 @@ Print version information.
 Print the full documentation to STDOUT.
 
 =back
+
+=head1 NOTES
+
+Four columns are generated in addition to writing the simple contents
+of the JCMT state structure. "ra" and "dec" contain the tracking
+coordinates taking into account jiggle and chop (noting that if the
+tracking system is GALACTIC the columns will still be called "ra" and
+"dec"). "az" and "el" contain the azimuth and elevation of the
+observation taking account of jiggling and chopping but referenced
+back to the base position for the beginning of the observation. Note
+that jiggle and chop offsets are added onto the actual AZEL
+coordinates (TCS_AZ_AC1 and TCS_AZ_AC2) without attempting to convert
+them to RA/Dec first. This means that the values may not correspond to
+a simple rotation relative to the "ra" and "dec" values if the jiggle
+coordinate system is AZEL. If the jiggle coordinate system if TRACKING
+then the coordinates will be related by a simple rotation.
 
 =cut
 
@@ -69,6 +90,10 @@ my $isfirst = 1;
 my $isfirst_file = 1;
 my @columns;
 my %cols;
+
+my $base_az; # First AZEL Base position for use as reference for az and el columns
+my $base_el;
+
 err_begin($status );
 for my $f (@files) {
     # just open with HDS
@@ -116,7 +141,7 @@ for my $f (@files) {
 	}
 	dat_annul( $iloc, $status );
 	$local{$name} = \@data if exists $cols{$name};
-    } 
+    }
 
     # tidy
     dat_annul( $jloc, $status);
@@ -127,9 +152,15 @@ for my $f (@files) {
     # now dump the contents
     if ($isfirst_file) {
 	print "# This is a TST formatted file\n";
-	print join("\t", "Id", "RA", "DEC", @columns) ,"\n";
+	print join("\t", "Id", "RA", "DEC", "AZ","EL",@columns) ,"\n";
 	print join("\t", map { "--" } (0..($#columns+3))),"\n";
 	$isfirst_file = 0;
+    }
+
+    # Store the first BASE AZEL position for later
+    if (!defined $base_az) {
+      $base_az = $local{TCS_AZ_BC1}->[0];
+      $base_el = $local{TCS_AZ_BC2}->[0];
     }
 
     for my $i ( 0 .. $#{$local{RTS_NUM}} ) {
@@ -152,6 +183,26 @@ for my $f (@files) {
 	push(@slice, Astro::Coords::Angle::Hour->new( $ra )->degrees,
 	    Astro::Coords::Angle->new($dec)->degrees);
 
+        # Now calculate "az" and "el". Complication here is that we calculate the
+        # position after taking out the motion due to the telescope base position
+        # changing. Note that there is no rotation because we do not first convert
+        # each position to RA/Dec and then back to AZEL.
+        my $actual_az_diff = $local{TCS_AZ_AC1}->[$i] - $local{TCS_AZ_BC1}->[$i];
+        my $actual_el_diff = $local{TCS_AZ_AC2}->[$i] - $local{TCS_AZ_BC2}->[$i];
+        my $this_az_base = $base_az + $actual_az_diff;
+        my $this_el_base = $base_el + $actual_el_diff;
+        
+	$xoffset = $local{SMU_AZ_JIG_X}->[$i] + $local{SMU_AZ_CHOP_X}->[$i];
+	$yoffset = $local{SMU_AZ_JIG_Y}->[$i] + $local{SMU_AZ_CHOP_Y}->[$i];
+	$xoffset *= Astro::SLA::DAS2R;
+	$yoffset *= Astro::SLA::DAS2R;
+
+	Astro::SLA::slaDtp2s( $xoffset, $yoffset, $this_az_base, $this_el_base, my $az, my $el );
+
+	push(@slice, Astro::Coords::Angle::Hour->new( $az )->degrees,
+	    Astro::Coords::Angle->new($el)->degrees);
+
+        # And append the remaining columns
 	for my $col (@columns) {
 	    push(@slice, $local{$col}->[$i]);
 	}
@@ -172,7 +223,7 @@ All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
-Foundation; either version 2 of the License, or (at your option) any later
+Foundation; either version 3 of the License, or (at your option) any later
 version.
 
 This program is distributed in the hope that it will be useful,but WITHOUT ANY
@@ -184,4 +235,3 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place,Suite 330, Boston, MA  02111-1307, USA
 
 =cut
-
