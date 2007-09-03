@@ -94,6 +94,9 @@
 *        edges as normal in Starlink sw).
 *     19-JUN-2007 (DSB):
 *        Added argument IWCSR.
+*     3-SEP-2007 (DSB):
+*        Report an error if the reference NDF does not have a defined
+*        inverse WCS transformation.
 *     {enter_further_changes_here}
 
 *-
@@ -164,6 +167,27 @@
 *  Get the WCS FrameSet from the reference NDF. This will be inherited by
 *  the output NDF.
       CALL KPG1_GTWCS( INDFR, IWCSR, STATUS )
+
+*  Check the inverse transformation is available. 
+      IF( .NOT. AST_GETL( IWCSR, 'TranInverse', STATUS ) ) THEN
+
+         IF( STATUS .EQ. SAI__OK ) THEN
+            DOMLST = AST_GETC( IWCSR, 'Domain', STATUS )
+
+            STATUS = SAI__ERROR
+            CALL NDF_MSG( 'NDF', INDFR )
+            CALL ERR_REP( 'KPS1_WMOS0_ERR1', 'Cannot use ^NDF as the '//
+     :                    'reference NDF.', STATUS )
+            
+            CALL MSG_SETC( 'DOM', DOMLST )
+            CALL ERR_REP( 'KPS1_WMOS0_ERR1', 'The inverse WCS '//
+     :                    'transformation (from ^DOM to PIXEL '//
+     :                    'coordinates) is undefined.', STATUS )
+         END IF
+
+         GO TO 999
+
+      END IF
 
 *  Find the index of the PIXEL Frame in the reference NDF.
       CALL KPG1_ASFFR( IWCSR, 'PIXEL', IPIXR, STATUS )
