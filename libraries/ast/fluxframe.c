@@ -73,6 +73,10 @@ f     The FluxFrame class does not define any new routines beyond those
 *        FluxFrame contained within a CmpFrame. This involves changes in
 *        Match and the removal of the local versions of SetMaxAxes and
 *        SetMinAxes.
+*     3-SEP-2007 (DSB):
+*        In SubFrame, since AlignSystem is extended by the FluxFrame class
+*        it needs to be cleared before invoking the parent SubFrame
+*        method in cases where the result Frame is not a SkyFrame.
 *class--
 */
 
@@ -2887,6 +2891,7 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
 /* Clear attributes which have an extended range of values allowed by
    this class. */
       astClearSystem( temp );
+      astClearAlignSystem( temp );
 
 /* Invoke the astSubFrame method inherited from the Frame class to
    produce the result Frame by selecting the required set of axes and
