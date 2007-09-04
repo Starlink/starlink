@@ -337,7 +337,7 @@
 *        supplied for XMAGN, resulting in all pixels being displayed as
 *        squares on the display surface. If a FALSE value is supplied for
 *        SQRPIX, then the default value for YMAGN is chosen to retain the 
-*        pixels original aspect ratio. [current value]
+*        pixels original aspect ratio at the centre of the image. [current value]
 *     STYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to
 *        use for the annotated axes (see parameter AXES). 
@@ -613,6 +613,9 @@
 *     23-APR-2007 (DSB):
 *        Fix bug in selection of CENTRE that caused small chanmap images
 *        to be incorrecly centred.
+*     4-SEP-2007 (DSB):
+*        Attempt to guard against discontinuous WCS mappings that upset
+*        the calculation of the pixel aspect ratio.
 *     {enter_further_changes_here}
 
 *-
@@ -693,6 +696,7 @@
       INTEGER IPLOTR           ! Pointer to AST Plot, Region of Interest
       INTEGER IPWORK           ! Pointer to work array for key
       INTEGER IREG             ! Region index
+      INTEGER ITRY             ! Loop count
       INTEGER IWCS             ! Pointer to WCS FrameSet from the NDF
       INTEGER LBND( NDF__MXDIM )! Lower pixel-index bounds of the image
       INTEGER LDIMS( NDIM )    ! Dimensions of LUT arrays
@@ -741,7 +745,8 @@
       REAL OPUBND( NDIM )      ! High pixel co-ord bounds of NDF overlap
       REAL PCLBND( NDIM )      ! Lo pixel co-ord bounds of PGPLOT window
       REAL PCUBND( NDIM )      ! Hi pixel co-ord bounds of PGPLOT window
-      REAL PIXRAT              ! Pixel aspect ratio
+      REAL PIXRAT              ! Used pixel aspect ratio
+      REAL PRAT                ! Pixel aspect ratio
       REAL WPLBND( NDIM )      ! Low pixel co-ord bounds of NDF section
       REAL WPUBND( NDIM )      ! High pixel co-ord bounds of NDFsection
       REAL X1, X2, Y1, Y2      ! Bounds of current pic viewport in mm
@@ -833,54 +838,102 @@
          GRATX( 3 ) = GRATX( 1 ) 
          GRATY( 3 ) = GRATY( 1 ) + 1.0D0
 
-*  Convert them to the current WCS Frame.
-         CALL AST_TRAN2( IWCS, 3, GRATX, GRATY, .TRUE., CRATX, CRATY, 
-     :                   STATUS )
+*  Some WCS arrangements (e.g. those involving AST SwitchMaps) have
+*  severe discontinuities. It may happen that the three positions stored
+*  in GRATX/Y span such a discontinuity. If this happens, then the aspect
+*  ratio determined from them will be very wrong. To reduce the chanes of
+*  this happening, we calculate the pixel aspect ratio at three positions
+*  close to the centre of the image and then use the value which is 
+*  closest to unity. The first trial point is one pixel below the centre,
+*  the second is at the centre and the third is one pixel above the 
+*  centre. Prepare by subtracting two pixels from each of the above axis
+*  values.
+         GRATX( 1 ) = GRATX( 1 ) - 2
+         GRATY( 1 ) = GRATY( 1 ) - 2
+         GRATX( 2 ) = GRATX( 2 ) - 2
+         GRATY( 2 ) = GRATY( 2 ) - 2
+         GRATX( 3 ) = GRATX( 3 ) - 2
+         GRATY( 3 ) = GRATY( 3 ) - 2
+
+         PIXRAT = VAL__MAXR
+
+         DO ITRY = 1, 3
+
+*  Move up a pixel on each axis.
+            GRATX( 1 ) = GRATX( 1 ) + 1
+            GRATY( 1 ) = GRATY( 1 ) + 1
+            GRATX( 2 ) = GRATX( 2 ) + 1
+            GRATY( 2 ) = GRATY( 2 ) + 1
+            GRATX( 3 ) = GRATX( 3 ) + 1
+            GRATY( 3 ) = GRATY( 3 ) + 1
+
+*  Convert this position to the current WCS Frame.
+            CALL AST_TRAN2( IWCS, 3, GRATX, GRATY, .TRUE., CRATX, CRATY, 
+     :                      STATUS )
 
 *  Find the geodesic distance from point 1 to point 2 (the X pixel size)
-         CC( 1 ) = CRATX( 1 )
-         CC( 2 ) = CRATY( 1 )
-         CCT( 1 ) = CRATX( 2 )
-         CCT( 2 ) = CRATY( 2 )
-         DX = AST_DISTANCE( IWCS, CC, CCT, STATUS )
+            CC( 1 ) = CRATX( 1 )
+            CC( 2 ) = CRATY( 1 )
+            CCT( 1 ) = CRATX( 2 )
+            CCT( 2 ) = CRATY( 2 )
+            DX = AST_DISTANCE( IWCS, CC, CCT, STATUS )
          
 *  Find the geodesic distance from point 1 to point 3 (the Y pixel size)
-         CC( 1 ) = CRATX( 1 )
-         CC( 2 ) = CRATY( 1 )
-         CCT( 1 ) = CRATX( 3 )
-         CCT( 2 ) = CRATY( 3 )
-         DY = AST_DISTANCE( IWCS, CC, CCT, STATUS )
+            CC( 1 ) = CRATX( 1 )
+            CC( 2 ) = CRATY( 1 )
+            CCT( 1 ) = CRATX( 3 )
+            CCT( 2 ) = CRATY( 3 )
+            DY = AST_DISTANCE( IWCS, CC, CCT, STATUS )
          
 *  If the distances were calculated succesfully, use them to determine
-*  the pixel aspect ratio. Otherwise, use a ratio of 1.0
-         IF( DX .NE. AST__BAD .AND. DX .NE. 0.0 .AND.
-     :       DY .NE. AST__BAD .AND. DY .NE. 0.0 ) THEN
-            PIXRAT = DY/DX
+*  the pixel aspect ratio. 
+            IF( DX .NE. AST__BAD .AND. DX .NE. 0.0 .AND.
+     :          DY .NE. AST__BAD .AND. DY .NE. 0.0 ) THEN
+
+               PRAT = DY/DX
+
+*  If this pixel aspect ratio is closer to unity than the previous one,
+*  use it in preference to the previous one. We invert any aspect ratio
+*  that is smaller than unity before doing the comparisons.
+               IF( PIXRAT .GT. 1.0 ) THEN
+                  IF( PRAT .GT. 1.0 ) THEN
+                     IF( PRAT .LT. PIXRAT ) THEN
+                        PIXRAT = PRAT
+                     END IF
+                  ELSE 
+                     IF( 1.0/PRAT .LT. PIXRAT ) THEN
+                        PIXRAT = PRAT
+                     END IF
+                  END IF
+               ELSE
+                  IF( PRAT .GT. 1.0 ) THEN
+                     IF( PRAT .LT. 1.0/PIXRAT ) THEN
+                        PIXRAT = PRAT
+                     END IF
+                  ELSE 
+                     IF( PRAT .GT. PIXRAT ) THEN
+                        PIXRAT = PRAT
+                     END IF
+                  END IF
+               END IF
+            END IF
+         END DO
 
 *  Some images will have unrelated axes (e.g. longslit spectra which have a
 *  spatial axis and a spectral axis). For such images, the pixel aspect
 *  ratio means nothing, and will in general have unusable values. Trap
 *  such values now and replace them with 1.0.
-            IF( PIXRAT .LT. 0.01 .OR. PIXRAT .GT. 100.0 ) THEN
-               CALL MSG_OUT( 'DISPLAY_NSQ', 'Pixels will be displayed'//
-     :                       ' square since the pixel aspect ratio '//
-     :                       'cannot be determined.', STATUS )
-               PIXRAT = 1.0
-            END IF
-
-*  Warn the user if non-square pixels were requested but cannot be
-*  produced.
-         ELSE
+         IF( PIXRAT .LT. 0.01 .OR. PIXRAT .GT. 100.0 ) THEN
             CALL MSG_OUT( 'DISPLAY_NSQ', 'Pixels will be displayed'//
      :                    ' square since the pixel aspect ratio '//
      :                    'cannot be determined.', STATUS )
-            PIXRAT = 1.0D0
+            PIXRAT = 1.0
          END IF
 
 *  Use a default pixel aspect ration of 1.0 if all pixels are to be 
 *  displayed square.
       ELSE
-         PIXRAT = 1.0D0
+         PIXRAT = 1.0
       END IF
 
 *  Determine the width of the margins to leave around the DATA picture.
