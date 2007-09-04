@@ -1474,7 +1474,7 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
                 int *ip = (int *)inPtr;
                 double *op = (double *)*outPtr;
                 for ( i = 0; i < nel; i++ ) {
-                    if ( op[i] != inBlank ) {
+                    if ( ip[i] != inBlank ) {
                         op[i] = ip[i] * bscale + bzero;
                     }
                     else {
@@ -1494,7 +1494,7 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
                 int *ip = (int *)inPtr;
                 double *op = (double *)*outPtr;
                 for ( i = 0; i < nel; i++ ) {
-                    if ( op[i] != VAL__BADI ) {
+                    if ( ip[i] != VAL__BADI ) {
                         op[i] = ip[i] * bscale + bzero;
                     }
                     else {

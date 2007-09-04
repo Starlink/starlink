@@ -10,6 +10,9 @@
     Temporary files created by GAIA can now be placed into a named
     directory by defining the GAIA_TEMP_DIR environment variable.
 
+    A bug reading BITPIX 32 FITS cubes has been fixed. This could result
+    in blank data values not being ignored.
+
   Puana Release:
   ==============
 
