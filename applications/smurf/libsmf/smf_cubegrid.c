@@ -139,6 +139,9 @@
 *     9-AUG-2007 (DSB):
 *        Check for co-incident positions even if the automatic grid
 *        determination algorithm succeeds.
+*     5-SEP-2007 (DSB):
+*        Check for target movement in the output coordinate system,
+*        whatever it is, rather than ICRS.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -428,7 +431,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    stored telescope base pointing position from AZEL to the requested
    output system. Create a Mapping to do this using astConvert, and then
    use the Mapping to transform the stored position. */
-	    sf1 = astCopy( skyin );
+	    sf1 = astCopy( *skyframe );
 	    astSetC( sf1, "System", "AZEL" );
             azel2usesys = astConvert( sf1, *skyframe, "" );
             astTran2( azel2usesys, 1, &(hdr->state->tcs_az_bc1),
@@ -439,7 +442,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 
 /* Determine if the telescope is tracking a moving target such as a planet 
    or asteroid. This is indicated by significant change in the telescope 
-   base pointing position within the ICRS coordinate system. Here, 
+   base pointing position within the output coordinate system. Here, 
    "significant" means more than 1 arc-second. Apparently users will only 
    want to track moving objects if the output cube is in AZEL or GAPPT, so 
    we ignoring a moving base pointing position unless the output system 
@@ -447,14 +450,13 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
             if( !strcmp( usesys, "AZEL" ) ||
                 !strcmp( usesys, "GAPPT" ) ) {
 
-/* Create a Frame representing ICRS. */
-               sf2 = astCopy( skyin );
-               astSetC( sf2, "System", "ICRS" );
+/* Get a copy of the output SkyFrame. */
+               sf2 = astCopy( *skyframe );
 
 /* Set the Epoch for `sf1' andf `sf2' to the epoch of the first time slice, 
-   then use  the Mapping from `sf1' (AzEl) to `sf2' (ICRS) to convert the 
-   telescope base pointing position for the first time slices from (az,el) 
-   to ICRS. */
+   then use  the Mapping from `sf1' (AzEl) to `sf2' (output system) to 
+   convert the telescope base pointing position for the first time slices 
+   from (az,el) to the output system. */
                astSet( sf1, "Epoch=MJD %.*g", DBL_DIG, 
                        (hdr->allState)[ 0 ].rts_end + 32.184/86400.0 );
                astSet( sf2, "Epoch=MJD %.*g", DBL_DIG, 
@@ -463,11 +465,10 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
                el[ 0 ] = (hdr->allState)[ 0 ].tcs_az_bc2;
                astTran2( astConvert( sf1, sf2, "" ), 1, az, el, 1, ra, dec );
 
-
 /* Set the Epoch for `sf1' andf `sf2' to the epoch of the last time slice, 
-   then use  the Mapping from `sf1' (AzEl) to `sf2' (ICRS) to convert the 
-   telescope base pointing position for the last time slices from (az,el) 
-   to ICRS. */
+   then use  the Mapping from `sf1' (AzEl) to `sf2' (output system) to 
+   convert the telescope base pointing position for the last time slices 
+   from (az,el) to the output system. */
                astSet( sf1, "Epoch=MJD %.*g", DBL_DIG, 
                        (hdr->allState)[ hdr->nframes - 1 ].rts_end + 32.184/86400.0 );
                astSet( sf2, "Epoch=MJD %.*g", DBL_DIG, 
@@ -481,7 +482,6 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    greater than 1 arc-sec. */
                sep = slaDsep( ra[ 0 ], dec[ 0 ], ra[ 1 ], dec[ 1 ] );
                *moving = ( sep > AST__DD2R/3600.0 );
-
             } else {
                *moving = 0;
             }
