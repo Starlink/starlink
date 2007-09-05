@@ -135,6 +135,9 @@
 *        to output, if aligning in velocity.
 *     17-JUL-2007 (DSB):
 *        Extend range of velocity systems to include redshift and beta.
+*     5-SEP-2007 (DSB):
+*        Handle identification of spectral axes in cases where input and 
+*        output have different number of axes.
 *     {enter_further_changes_here}
 
 *-
@@ -175,7 +178,6 @@
 *  Local Variables:
       CHARACTER ASYS1*30         ! Input alignment system
       CHARACTER ASYSR*30         ! Reference alignement system
-      CHARACTER ATTR*30          ! Attribute name
       CHARACTER DTYPE*(NDF__SZFTP) ! Data type
       CHARACTER TY_IN*(NDF__SZTYP) ! Numeric type for processing
       DOUBLE PRECISION DUMMY( 1 ) ! Dummy array
@@ -191,10 +193,7 @@
       INTEGER CFRMR              ! Reference current Frame
       INTEGER EL                 ! No. of elements in a mapped array
       INTEGER FLAGS              ! Sum of AST__USEBAD and AST__USEVAR
-      INTEGER FS                 ! FrameSet defining output current Frame
       INTEGER I                  ! Loop count
-      INTEGER IAT                ! Length of string
-      INTEGER ICUR               ! Index of original currrent Frame
       INTEGER IPD1               ! Pointer to input data array
       INTEGER IPD2               ! Pointer to output data array
       INTEGER IPIX2              ! Index of PIXEL Frame in o/p FrameSet
@@ -217,7 +216,11 @@
       INTEGER MAPR               ! AST Mapping (ref. GRID -> ref. PIXEL)
       INTEGER NAX                ! No. of current Frame axes
       INTEGER NDIM1              ! No. of pixel axes in input NDF
+      INTEGER OPSPAX             ! Spectral axis index in output
+      INTEGER IPSPAX             ! Spectral axis index in input
       INTEGER RESULT             ! Value returned from AST_RESAMPLE<x>
+      INTEGER TFRM               ! Temporary Frame pointer
+      INTEGER TMAP               ! Temporary Mapping pointer
       INTEGER UBND1( NDF__MXDIM ) ! Upper bounds of input NDF
       INTEGER UBND2( NDF__MXDIM ) ! Upper bounds of output NDF
       INTEGER UGRID1( NDF__MXDIM ) ! Upper bounds of input grid co-ords
@@ -354,32 +357,45 @@
       CALL AST_REMAPFRAME( IWCSR2, AST__BASE, MAP3, STATUS )
 
 *  If the data has a spectral axis, and if the spectral axis has been
-*  aligned in velocoty, we propagate certain attributes from the input
+*  aligned in velocity, we propagate certain attributes from the input
 *  SpecFrame to the output SpecFrame. Otherwise, all attributes are
 *  propagated from the reference NDF. First get the WCS FrameSet from 
 *  the input NDF, and get a pointer to its current Frame.
       CALL KPG1_GTWCS( INDF1, IWCS1, STATUS )
       CFRM1 = AST_GETFRAME( IWCS1, AST__CURRENT, STATUS )
 
+*  Loop round all the axes in the input current Frame, looking for a spectral
+*  axis. If found, note its AlignSystem value.
+      NAX = AST_GETI( CFRM1, 'Naxes', STATUS )
+      IPSPAX = 0
+      DO I = 1, NAX
+         TFRM = AST_PICKAXES( CFRM1, 1, I, TMAP, STATUS )
+         IF( AST_ISASPECFRAME( TFRM, STATUS ) ) then
+            IPSPAX = I
+            ASYS1 = AST_GETC( TFRM, 'AlignSystem', STATUS ) 
+         END IF
+      END DO         
+
 *  Get a pointer to the current Frame in the output WCS FrameSet.
       CFRMR = AST_GETFRAME( IWCSR2, AST__CURRENT, STATUS ) 
 
-*  Loop round all the axes in the current Frame.
+*  Loop round all the axes in the current Frame, looking for a spectral
+*  axis. If found, note its AlignSystem value.
       NAX = AST_GETI( CFRMR, 'Naxes', STATUS )
+      OPSPAX = 0
       DO I = 1, NAX
+         TFRM = AST_PICKAXES( CFRMR, 1, I, TMAP, STATUS )
+         IF( AST_ISASPECFRAME( TFRM, STATUS ) ) THEN
+            OPSPAX = I
+            ASYSR = AST_GETC( TFRM, 'AlignSystem', STATUS ) 
+         END IF
+      END DO         
 
-*  Get the value of the AlignSystem attribute for the I'th axis in the
-*  current frame of both the input and output FrameSets.
-         ATTR = 'AlignSystem('
-         IAT = 12
-         CALL CHR_PUTI( I, ATTR, IAT )
-         CALL CHR_APPND( ')', ATTR, IAT )
-
-         ASYS1 = AST_GETC( CFRM1, ATTR( : IAT ), STATUS ) 
-         ASYSR = AST_GETC( CFRMR, ATTR( : IAT ), STATUS ) 
+*  If both input and output have a spectral axis...
+      IF( IPSPAX .GT. 0 .AND. OPSPAX .GT. 0 ) THEN
 
 *  If the AlignSystem value for either Frame is one of the spectral
-*  velocity values, then the I'th axis must be the spectral axis.
+*  velocity values, then we copy attribute values from input to output.
          IF( ASYS1 .EQ. 'VRAD' .OR. ASYS1 .EQ. 'VOPT' .OR.
      :       ASYS1 .EQ. 'VELO' .OR. ASYS1 .EQ. 'ZOPT' .OR.
      :       ASYS1 .EQ. 'BETA' .OR. ASYSR .EQ. 'VRAD' .OR. 
@@ -406,7 +422,7 @@
             END IF
 
          END IF         
-      END DO
+      END IF
 
 *  Store this FrameSet in the output NDF.
       CALL NDF_PTWCS( IWCSR2, INDF2, STATUS )
