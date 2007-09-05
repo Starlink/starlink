@@ -80,7 +80,7 @@
 *        Can not use strtok on a const char*
 *     2007-09-05 (CV):
 *        Added a default microstep pattern which is used when nmicstep is set
-*        to -1
+*        to any negative number
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
