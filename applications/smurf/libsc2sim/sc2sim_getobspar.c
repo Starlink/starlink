@@ -78,6 +78,9 @@
 *        Added microstepping parameters - nmicstep, mspat_x/y
 *     2007-08-20 (TIMJ):
 *        Can not use strtok on a const char*
+*     2007-09-05 (CV):
+*        Added a default microstep pattern which is used when nmicstep is set
+*        to -1
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -136,6 +139,10 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    int ix;                /* grid offset */
    int iy;                /* grid offset */
    int j = 0;             /* Array index */
+   double msdefault_x[4] = {0, 5.5, 7.0, 1.5}; /* default microstep pattern
+					     in x in bolometers */
+   double msdefault_y[4] = {0, 1.5, 7.0, 5.5}; /* default microstep pattern
+					     in y in bolometers */
    int n = 0;             /* array index */
    int nvert_x=0;         /* Number of jig_x vertices */
    int nvert_y=0;         /* Number of jig_Y vertices */
@@ -336,48 +343,6 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    if ( !astMapGet0D ( keymap, "MJDAYSTART", &(inx->mjdaystart) ) )
       inx->mjdaystart = 53795.0;
 
-   memset( inx->mspat_x, 0, SC2SIM__MXMSTP*sizeof(double) );
-   if ( astMapGet0C ( keymap, "MSPAT_X", &temp ) ) {
-
-     /* Parse the string and retrieve the values */
-     n = 0;
-     strncpy ( convert, temp, 80 );
-     curtok = strtok ( convert, ";" );
-     while ( curtok != NULL ){
-	if ( n >= SC2SIM__MXMSTP ) {
-	  *status = SAI__ERROR;
-          msgOut(" ",
-		 "Length of microstep pattern in x exceeds length allowed",
-		 status); 
-         return;
-	}
-        inx->mspat_x[n] = atof ( curtok );
-	curtok = strtok ( NULL, ";" );
-	n++;
-     }
-   }
-
-   memset( inx->mspat_y, 0, SC2SIM__MXMSTP*sizeof(double) );
-   if ( astMapGet0C ( keymap, "MSPAT_Y", &temp ) ) {
-
-     /* Parse the string and retrieve the values */
-     n = 0;
-     strncpy ( convert, temp, 80 );
-     curtok = strtok ( convert, ";" );
-     while ( curtok != NULL ){
-	if ( n >= SC2SIM__MXMSTP ) {
-	  *status = SAI__ERROR;
-          msgOut(" ",
-		 "Length of microstep pattern in y exceeds length allowed",
-		 status); 
-         return;
-	}
-        inx->mspat_y[n] = atof ( curtok );
-	curtok = strtok ( NULL, ";" );
-	n++;
-     }
-   }
-
    if ( !astMapGet0I ( keymap, "NBOLX", &(inx->nbolx) ) )
       inx->nbolx = 40;
 
@@ -411,11 +376,14 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       return;
    }      
 
-
+   memset( inx->mspat_x, 0, SC2SIM__MXMSTP*sizeof(double) );
+   memset( inx->mspat_y, 0, SC2SIM__MXMSTP*sizeof(double) );
    if ( !astMapGet0I ( keymap, "NMICSTEP", &(inx->nmicstep) ) ) {
       inx->nmicstep = 1;
    }
    else {
+
+     // check if number of microsteps is greater than allowed
      if ( inx->nmicstep > SC2SIM__MXMSTP ) {
        *status = SAI__ERROR;
        msgOut(" ",
@@ -423,6 +391,70 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
 	      status );
        return;
      }
+
+     // determine what microstep pattern to use
+     if ( inx->nmicstep < 0 ) {
+       // use default pattern
+       inx->nmicstep = 4;
+       for( n=0; n<inx->nmicstep; n++ ) {
+	 inx->mspat_x[n] = msdefault_x[n];
+	 inx->mspat_y[n] = msdefault_y[n];
+       }
+     }
+     else if ( inx->nmicstep == 0 || inx->nmicstep == 1 ) {
+       /* Don't microstep: set nmicstep to 1 (so the for loop in
+	  sc2sim_simulate doesn't break), don't put any offsets in to
+	  mspat_x/y
+	*/
+       inx->nmicstep = 1;
+     }
+     else {
+       // get custom pattern
+
+       // get pattern in x
+       if ( astMapGet0C ( keymap, "MSPAT_X", &temp ) ) {
+
+	 /* Parse the string and retrieve the values */
+	 n = 0;
+	 strncpy ( convert, temp, 80 );
+	 curtok = strtok ( convert, ";" );
+	 while ( curtok != NULL ){
+	   if ( n >= SC2SIM__MXMSTP ) {
+	     *status = SAI__ERROR;
+	     msgOut(" ",
+		    "Length of microstep pattern in x exceeds length allowed",
+		    status); 
+	     return;
+	   }
+	   inx->mspat_x[n] = atof ( curtok );
+	   curtok = strtok ( NULL, ";" );
+	   n++;
+	 }
+       }
+
+       // get pattern in y
+       if ( astMapGet0C ( keymap, "MSPAT_Y", &temp ) ) {
+
+	 /* Parse the string and retrieve the values */
+	 n = 0;
+	 strncpy ( convert, temp, 80 );
+	 curtok = strtok ( convert, ";" );
+	 while ( curtok != NULL ){
+	   if ( n >= SC2SIM__MXMSTP ) {
+	     *status = SAI__ERROR;
+	     msgOut(" ",
+		    "Length of microstep pattern in y exceeds length allowed",
+		    status); 
+	     return;
+	   }
+	   inx->mspat_y[n] = atof ( curtok );
+	   curtok = strtok ( NULL, ";" );
+	   n++;
+	 }
+       }
+
+     } // end getting custom pattern
+
    }
 
    if ( !astMapGet0I ( keymap, "NUMSAMPLES", &(inx->numsamples) ) )
