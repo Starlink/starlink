@@ -3630,6 +3630,10 @@ package surf {
       obey {@PERL@ ${SURF_DIR}/change_nacentre.pl}
    }
 
+   command mapsum {
+      obey {@PERL@ ${SURF_DIR}/mapsum}
+   }
+
    command sculog {
       obey {@PERL@ ${SURF_DIR}/sculog}
    }
