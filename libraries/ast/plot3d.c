@@ -132,6 +132,8 @@ f    AST_GRIDLINE, AST_POLYCURVE.
 *  History:
 *     6-JUN-2007 (DSB):
 *        Original version.
+*     6-SEP-2007 (DSB):
+*        Re-code the astGrid function.
 *class--
 */
 
@@ -3178,32 +3180,27 @@ static void Grid( AstPlot *this_plot ) {
 */
 
 /* Local Variables: */
+   AstPlot *baseplot;
    AstPlot *plot;
    AstPlot3D *this;
-   AstPointSet *minticks0;
-   AstPointSet *cmajticks;
-   AstPointSet *cminticks;
-   AstPointSet *majticks0;
-   AstPointSet *minticks1;
-   AstPointSet *majticks1;
+   AstPointSet *majticks;
+   AstPointSet *minticks;
    AstPointSet *tmp;
-   AstPointSet *pset;
+   AstPointSet *wcsmajticks;
+   AstPointSet *wcsminticks;
+   const char *edge;
    double **ptrmin;
    double **ptrmaj;
-   double *p;
-   double *ptrmin2[2];
-   double *ptrmaj2[2];
    double gcon;
-   int axis0;
-   int axis1;
-   int gaxis_2db[ 2 ];
-   int gaxis_2d[ 3 ];
-   int i;
-   int icon;
+   int base_wax2d;
+   int itick;
+   int new_gaxis;
+   int new_plot;
+   int new_wax2d;
    int nmaj;
    int nmin;
-   int plotid;
-   int wcsaxis;
+   int perm[ 2 ];
+   int rootcorner;
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -3211,325 +3208,210 @@ static void Grid( AstPlot *this_plot ) {
 /* Obtain a pointer to the Plot3D structure. */
    this = (AstPlot3D *) this_plot;
 
-/* Invoke the astGrid method on the plane that is spanned by two real
-   axes. The astGrid methods determines appropriate tick mark values for
-   both WCS axes. */
-   plot = GET_PLOT( this->baseplot );
-   astGrid( plot );
+/* Invoke the astGrid method on the 2D base Plot. Both WCS axes in this
+   Plot are inherited from the 3D FrameSet that was supplied when the Plot3D
+   was constructed, and will be labelled. The other two Plots encapsulated 
+   in the Plot3D only inherit a single axis from the original 3D FrameSet
+   (a dummy axis is used for the second WCS axis in these Plots). */
+   baseplot = GET_PLOT( this->baseplot );
+   astGrid( baseplot );
 
-/* We next use astGrid to draw a grid for the 2D plane that shares the
-   first baseplot WCS axis. This is not so easy because the common axis
-   in the two Plots will not be the same - the baseplot axis will be the
-   genuine axis obtained from the user-supplied 3D FrameSet, but the
-   equivalent axis in the other plot will be a dummy axis. Therefore we
-   stop the astGrid method from determining the tick marks values itself
-   (since it would determine inappropriate ticks if allowed to), and
-   instead use the astSetTickValues method to force astGrid to use the
-   tick marks values we want. (i.e. tick marks that are at the same
-   position in graphics space as the tick marks produced above for the
-   baseplot). The general procedure is to retrieve the 2D graphics
-   positions at the tick marks produced above for the baseplot, convert
-   these into 3D graphics positions (by supplying a constant value for
-   the missing 3rd graphics axis), then convert these 3D positions into
-   2D graphics positions appropriate to the new Plot, convert these from
-   2D graphics coords to 2D WCS coords (using the Plot as a Mapping), and
-   then store these tick marks values in the Plot using astSetTick
-   values. Finally, we call astGrid to produce the grid. The ticks are
-   not specified for the second axis of the new Plot since that axis will
-   be a genuine axis inherited from the user-supplied 3D FrameSet.
+/* We next use astGrid to draw a grid on the 2D plane that shares the first 
+   base plot graphics axis. Get the identifier for this Plot and the 2D
+   graphics axis index within the Plot that corresponds to the first base
+   plot graphics axis. Also get the constant value on the 3rd graphics
+   axis over the base plot */
+   rootcorner = astGetRootCorner( this );
+   if( this->baseplot == XY ) {
+      new_plot = XZ;
+      new_gaxis = 0;
+      gcon = this->gbox[ ( rootcorner & 4 ) ? 5 : 2 ];
 
-   First retrieve the graphics coordinates at the base of each tick mark
-   drawn for WCS axis 0 in the base plot. Extend the PointSets holding
+   } else if( this->baseplot == XZ ) {
+      new_plot = XY;
+      new_gaxis = 0;
+      gcon = this->gbox[ ( rootcorner & 2 ) ? 4 : 1 ];
+
+   } else {
+      new_plot = XY;
+      new_gaxis = 1;
+      gcon = this->gbox[ ( rootcorner & 1 ) ? 3 : 0 ];
+   }
+
+/* Get a pointer to the Plot upon which astGrid is about to be invoked. */
+   plot = GET_PLOT( new_plot );
+
+/* Find which 2D WCS axis was labelled on graphics axis 0 (the bottom or
+   top edge) of the base plot. */
+   if( ( edge = astGetC( baseplot, "Edge(1)" ) ) ) {
+      base_wax2d = ( !strcmp( edge, "bottom" ) || !strcmp( edge, "top" ) ) ? 0 : 1;
+   } else {
+      base_wax2d = 0;
+   }   
+
+/* Get the 2D graphics coords within the base Plot at which the tick
+   marks were drawn for this 2D WCS axis. Extend the PointSets holding
    the major tick values to include an extra tick above and below the
    ticks drawn by astGrid. These extra ticks are placed outside the
    bounds of the plot. This ensures that the curves on the other axis
-   extend the full width of the plot. ExtendTicks also returned the index
-   of the varying graphics axis. Each tick mark is identified by the 2D
-   graphics coordinates of the point at which the tick mark meets the
-   edge of the 2D graphics box. One of these two coordinates will vary
-   from tick to tick, and the other will be constant. The "gaxis0"
-   variable receives the index (0 or 1) of the 2D graphics axis that
-   varies along the set of tick marks for 2D WCS axis 0. "con0" is
-   returned holding the constnat value on the graphics axis that does not
-   vary along the set of tick marks. */
-   tmp = astGetDrawnTicks( plot, 0, 1 );
-   majticks0 = ExtendTicks( plot, tmp );
-   if( tmp ) tmp = astAnnul( tmp );
-   minticks0 = astGetDrawnTicks( plot, 0, 0 );
+   extend the full width of the plot. */
+   tmp = astGetDrawnTicks( baseplot, base_wax2d, 1 );
+   majticks = ExtendTicks( baseplot, tmp );
+   nmaj = astGetNpoint( majticks );
+   ptrmaj = astGetPoints( majticks );
 
-/* Also retrieve the graphics coordinates at the base of each tick mark 
-   drawn for WCS axis 1 in the base plot. Extend the PointSets holding 
-   the major tick values to include an extra tick above and below the 
-   ticks drawn by astGrid. */
-   tmp = astGetDrawnTicks( plot, 1, 1 );
-   majticks1 = ExtendTicks( plot, tmp );
    if( tmp ) tmp = astAnnul( tmp );
-   minticks1 = astGetDrawnTicks( plot, 1, 0 );
+   minticks = astGetDrawnTicks( baseplot, base_wax2d, 0 );
+   nmin = astGetNpoint( minticks );
+   ptrmin = astGetPoints( minticks );
 
-/* Get the 2D graphics axis index in the baseplot corresponding to each of 
-   the 3D graphics axes. The baseplot is 2D and so will only specify positions
-   for 2 of the 3 3D graphics axes. The remaining graphics axis is flagged
-   using an "axis index" of -1, and the constant value for that axis is
-   stored in "gcon". */
+/* All the tick marks will have a constant value for the 2D graphics axis
+   that is not being ticked (axis 1 at the moment). Change this constant 
+   value to be the value appropriate to the new Plot. */
+   if( ptrmaj && ptrmin ) {
+      for( itick = 0; itick < nmaj; itick++ ) ptrmaj[ 1 ][ itick ] = gcon;
+      for( itick = 0; itick < nmin; itick++ ) ptrmin[ 1 ][ itick ] = gcon;
+   }
+
+/* If required, permute the axes in the tick mark positions. */
+   if( new_gaxis != 0 ) {        
+      perm[ 0 ] = 1;
+      perm[ 1 ] = 0;
+      astPermPoints( majticks, 1, perm );
+      astPermPoints( minticks, 1, perm );
+   }
+
+/* Transform the tick mark positions from 2D graphics coords to 2D WCS 
+   coords. */
+   wcsmajticks = astTransform( plot, majticks, 1, NULL );
+   wcsminticks = astTransform( plot, minticks, 1, NULL );
+
+/* Find the index of the 2D WCS axis that will be labelled on the bottom
+   or top edge (i.e. 2D graphics axis zero) of the new Plot. */
+   if( ( edge = astGetC( plot, "Edge(1)" ) ) ) {
+      new_wax2d = ( !strcmp( edge, "bottom" ) || !strcmp( edge, "top" ) ) ? 0 : 1;
+   } else {
+      new_wax2d = 0;
+   }   
+
+/* Use the other WCS axis if we are ticking the left or right edge (i.e.
+   2D graphics axis one) of the new Plot. This gives us the index of the
+   2D WCS axis for which tick values are to be stored in the Plot. */
+   if( new_gaxis == 1 ) new_wax2d = 1 - new_wax2d;
+
+/* Store the tick mark values to be used on this WCS axis. */
+   ptrmaj = astGetPoints( wcsmajticks );
+   ptrmin = astGetPoints( wcsminticks );
+   if( ptrmaj && ptrmin ) {
+      astSetTickValues( plot, new_wax2d, nmaj, ptrmaj[ new_gaxis ], 
+                                         nmin, ptrmin[ new_gaxis ] );
+   }
+
+/* Invoke the astGrid method on this plot. */
+   astGrid( plot );
+
+/* Clear the stored tick values in the plot. */
+   astSetTickValues( plot, new_wax2d, 0, NULL, 0, NULL ); 
+
+/* Free resources */
+   if( wcsmajticks ) wcsmajticks = astAnnul( wcsmajticks );
+   if( wcsminticks ) wcsminticks = astAnnul( wcsminticks );
+   if( majticks ) majticks = astAnnul( majticks );
+   if( minticks ) minticks = astAnnul( minticks );
+
+/* We next use astGrid to draw a grid on the 2D plane that shares the
+   second base plot graphics axis. Get the identifier for this Plot and the 
+   2D graphics axis index within the Plot that corresponds to the first 
+   base plot graphics axis. */
    if( this->baseplot == XY ) {
-      gaxis_2d[ 0 ] = 0;
-      gaxis_2d[ 1 ] = 1;
-      gaxis_2d[ 2 ] = -1;
-      gcon = this->gbox[ ( this->rootcorner & 1 ) ? 5 : 2 ];
+      new_plot = YZ;
+      new_gaxis = 0;
 
    } else if( this->baseplot == XZ ) {
-      gaxis_2d[ 0 ] = 0;
-      gaxis_2d[ 1 ] = -1;
-      gaxis_2d[ 2 ] = 1;
-      gcon = this->gbox[ ( this->rootcorner & 2 ) ? 4 : 1 ];
+      new_plot = YZ;
+      new_gaxis = 1;
 
    } else {
-      gaxis_2d[ 0 ] = -1;
-      gaxis_2d[ 1 ] = 0;
-      gaxis_2d[ 2 ] = 1;
-      gcon = this->gbox[ ( this->rootcorner & 4 ) ? 3 : 0 ];
+      new_plot = XZ;
+      new_gaxis = 1;
    }
 
-/* Find the other plot that spans WCS axis 0 in the base plot. The 
-   index of the equivalent WCS axis within this other plot is put in
-   "wcsaxis". */
-   if( this->baseplot == this->axis_plot1[ 0 ] ) {
-      plotid = this->axis_plot2[ 0 ];
-      wcsaxis = this->axis_index2[ 0 ];
+/* Get a pointer to the Plot upon which astGrid is about to be invoked. */
+   plot = GET_PLOT( new_plot );
 
-   } else if( this->baseplot == this->axis_plot1[ 1 ] ) {
-      plotid = this->axis_plot2[ 1 ];
-      wcsaxis = this->axis_index2[ 1 ];
+/* Find which 2D WCS axis was labelled on graphics axis 1 (the left or
+   right edge) of the base plot. */
+   base_wax2d = 1 - base_wax2d;
 
+/* Get the 2D graphics coords within the base Plot at which the tick
+   marks were drawn for this 2D WCS axis. Extend the PointSets holding
+   the major tick values to include an extra tick above and below the
+   ticks drawn by astGrid. These extra ticks are placed outside the
+   bounds of the plot. This ensures that the curves on the other axis
+   extend the full width of the plot. */
+   tmp = astGetDrawnTicks( baseplot, base_wax2d, 1 );
+   majticks = ExtendTicks( baseplot, tmp );
+   nmaj = astGetNpoint( majticks );
+   ptrmaj = astGetPoints( majticks );
+
+   if( tmp ) tmp = astAnnul( tmp );
+   minticks = astGetDrawnTicks( baseplot, base_wax2d, 0 );
+   nmin = astGetNpoint( minticks );
+   ptrmin = astGetPoints( minticks );
+
+/* All the tick marks will have a constant value for the 2D graphics axis
+   that is not being ticked (axis 0 at the moment). Change this constant 
+   value to be the value appropriate to the new Plot. */
+   if( ptrmaj && ptrmin ) {
+      for( itick = 0; itick < nmaj; itick++ ) ptrmaj[ 0 ][ itick ] = gcon;
+      for( itick = 0; itick < nmin; itick++ ) ptrmin[ 0 ][ itick ] = gcon;
+   }
+
+/* If required, permute the axes in the tick mark positions. */
+   if( new_gaxis != 1 ) {        
+      perm[ 0 ] = 1;
+      perm[ 1 ] = 0;
+      astPermPoints( majticks, 1, perm );
+      astPermPoints( minticks, 1, perm );
+   }
+
+/* Transform the tick mark positions from 2D graphics coords to 2D WCS 
+   coords. */
+   wcsmajticks = astTransform( plot, majticks, 1, NULL );
+   wcsminticks = astTransform( plot, minticks, 1, NULL );
+
+/* Find the index of the 2D WCS axis that will be labelled on the bottom
+   or top edge (i.e. 2D graphics axis zero) of the new Plot. */
+   if( ( edge = astGetC( plot, "Edge(1)" ) ) ) {
+      new_wax2d = ( !strcmp( edge, "bottom" ) || !strcmp( edge, "top" ) ) ? 0 : 1;
    } else {
-      plotid = this->axis_plot2[ 2 ];
-      wcsaxis = this->axis_index2[ 2 ];
+      new_wax2d = 0;
+   }   
+
+/* Use the other WCS axis if we are ticking the left or right edge (i.e.
+   2D graphics axis one) of the new Plot. This gives us the index of the
+   2D WCS axis for which tick values are to be stored in the Plot. */
+   if( new_gaxis == 1 ) new_wax2d = 1 - new_wax2d;
+
+/* Store the tick mark values to be used on this WCS axis. */
+   ptrmaj = astGetPoints( wcsmajticks );
+   ptrmin = astGetPoints( wcsminticks );
+   if( ptrmaj && ptrmin ) {
+      astSetTickValues( plot, new_wax2d, nmaj, ptrmaj[ new_gaxis ], 
+                                         nmin, ptrmin[ new_gaxis ] );
    }
-   plot = GET_PLOT( plotid );
-
-/* Get the 2D graphics axis index in the baseplot corresponding to each of 
-   the 2D graphics axes in this other plot. Only one of these will have a
-   valid value (0 or 1) since the baseplot and the new plot only share 
-   one axis. The other axis will have a value of -1, indicating that it
-   should be set to the constant value specified in "gcon". */
-   if( plotid == XY ) {
-      gaxis_2db[ 0 ] = gaxis_2d[ 0 ];
-      gaxis_2db[ 1 ] = gaxis_2d[ 1 ];
-
-   } else if( plotid == XZ ) {
-      gaxis_2db[ 0 ] = gaxis_2d[ 0 ];
-      gaxis_2db[ 1 ] = gaxis_2d[ 2 ];
-
-   } else {
-      gaxis_2db[ 0 ] = gaxis_2d[ 1 ];
-      gaxis_2db[ 1 ] = gaxis_2d[ 2 ];
-   }
-
-/* Get the number of major and minor tick marks and pointers to the
-   arrays holding the 2D graphics coords at their base point. */
-   nmaj = astGetNpoint( majticks0 );
-   ptrmaj = astGetPoints( majticks0 );
-   nmin = astGetNpoint( minticks0 );
-   ptrmin = astGetPoints( minticks0 );
-
-/* Check pointers can be used safely. */
-   if( astOK ) {
-
-/* Store pointers to the arrays holding the 2D graphics coordinates at the
-   end of the tick marks for the new 2D plot. One axis will inherit the
-   varying graphics axis values from the base plot, and the other will
-   hold a constant value. Note the index of hte 2D graphics axis holding
-   the constant value. */
-      axis0 = gaxis_2db[ 0 ];
-      if( axis0 != -1 ) {
-         ptrmaj2[ 0 ] = ptrmaj[ axis0 ];
-         ptrmaj2[ 1 ] = ptrmaj[ 1 - axis0 ];
-         ptrmin2[ 0 ] = ptrmin[ axis0 ];
-         ptrmin2[ 1 ] = ptrmin[ 1 - axis0 ];
-         icon = 1;
-      } else {
-         axis1 = gaxis_2db[ 1 ];
-         ptrmaj2[ 0 ] = ptrmaj[ 1 - axis1 ];
-         ptrmaj2[ 1 ] = ptrmaj[ axis1 ];
-         ptrmin2[ 0 ] = ptrmin[ 1 - axis1 ];
-         ptrmin2[ 1 ] = ptrmin[ axis1 ];
-         icon = 0;
-      }
-
-/* Fill the array that holds the constant 2D graphics value with the
-   value appropriate to the new Plot. */
-      p = ptrmaj2[ icon ];
-      for( i = 0; i < nmaj; i++ ) *(p++) = gcon;
-
-      p = ptrmin2[ icon ];
-      for( i = 0; i < nmin; i++ ) *(p++) = gcon;
-
-/* Create a PointSet holding the graphics coords at the major ticks 
-   to be used in the new plot. and store the above arrays of axis values
-   in it. */
-      pset = astPointSet( nmaj, 2, "" );
-      astSetPoints( pset, ptrmaj2 );
-
-/* Transform this pointset from graphics coords to WCS coords in the new
-   Plot. */
-      cmajticks = astTransform(  plot, pset, 1, NULL );
-      pset = astAnnul( pset );
-
-/* Also transform minor tick marks from graphics to WCS. */
-      pset = astPointSet( nmin, 2, "" );
-      astSetPoints( pset, ptrmin2 );
-      cminticks = astTransform(  plot, pset, 1, NULL );
-      pset = astAnnul( pset );
-
-/* Get pointers to the arrays holding WCS values. */
-      ptrmaj = astGetPoints( cmajticks );
-      ptrmin = astGetPoints( cminticks );
-
-/* Store the current Frame tick values in the Plot so that they are used
-   in preference to the values found automatically by the Plot class. */
-      if( ptrmaj && ptrmin ){
-         astSetTickValues( plot, wcsaxis, nmaj, ptrmaj[ wcsaxis ], 
-                                          nmin, ptrmin[ wcsaxis ] );
-      }
 
 /* Invoke the astGrid method on this plot. */
-      astGrid( plot );
+   astGrid( plot );
 
 /* Clear the stored tick values in the plot. */
-      astSetTickValues( plot, wcsaxis, 0, NULL, 0, NULL );
+   astSetTickValues( plot, new_wax2d, 0, NULL, 0, NULL ); 
 
 /* Free resources */
-      if( cmajticks ) cmajticks = astAnnul( cmajticks );
-      if( cminticks ) cminticks = astAnnul( cminticks );
-   }
-   if( majticks0 ) majticks0 = astAnnul( majticks0 );
-   if( minticks0 ) minticks0 = astAnnul( minticks0 );
-
-/* We now do the same to draw the grid on the remaining third plane of
-   the graphics cube. First, find the other plot that spans WCS axis 1 
-   in the base plot. The index of the equivalent WCS axis within this 
-   other plot is put in "wcsaxis". */
-   if( this->baseplot == this->axis_plot1[ 0 ] && 
-       plotid != this->axis_plot2[ 0 ] ) {
-      plotid = this->axis_plot2[ 0 ];
-      wcsaxis = this->axis_index2[ 0 ];
-
-   } else if( this->baseplot == this->axis_plot1[ 1 ] && 
-              plotid != this->axis_plot2[ 1 ] ) {
-      plotid = this->axis_plot2[ 1 ];
-      wcsaxis = this->axis_index2[ 1 ];
-
-   } else {
-      plotid = this->axis_plot2[ 2 ];
-      wcsaxis = this->axis_index2[ 2 ];
-   }
-   plot = GET_PLOT( plotid );
-
-/* Get the 2D graphics axis index in the baseplot corresponding to each of 
-   the 2D graphics axes in this other plot. Only one of these will have a
-   valid value (0 or 1) since the baseplot and the new plot only share 
-   one axis. The other axis will have a value of -1, indicating that it
-   should be set to the constant value specified in "gcon". */
-   if( plotid == XY ) {
-      gaxis_2db[ 0 ] = gaxis_2d[ 0 ];
-      gaxis_2db[ 1 ] = gaxis_2d[ 1 ];
-
-   } else if( plotid == XZ ) {
-      gaxis_2db[ 0 ] = gaxis_2d[ 0 ];
-      gaxis_2db[ 1 ] = gaxis_2d[ 2 ];
-
-   } else {
-      gaxis_2db[ 0 ] = gaxis_2d[ 1 ];
-      gaxis_2db[ 1 ] = gaxis_2d[ 2 ];
-   }
-
-/* Get the number of major and minor tick marks and pointers to the
-   arrays holding the 2D graphics coords at their base point. */
-   nmaj = astGetNpoint( majticks1 );
-   ptrmaj = astGetPoints( majticks1 );
-   nmin = astGetNpoint( minticks1 );
-   ptrmin = astGetPoints( minticks1 );
-
-/* Check pointers can be used safely. */
-   if( astOK ) {
-
-/* Store pointers to the arrays holding the 2D graphics coordinates at the
-   end of the tick marks for the new 2D plot. One axis will inherit the
-   varying graphics axis values from the base plot, and the other will
-   hold a constant value. Note the index of hte 2D graphics axis holding
-   the constant value. */
-      axis0 = gaxis_2db[ 0 ];
-      if( axis0 != -1 ) {
-         ptrmaj2[ 0 ] = ptrmaj[ axis0 ];
-         ptrmaj2[ 1 ] = ptrmaj[ 1 - axis0 ];
-         ptrmin2[ 0 ] = ptrmin[ axis0 ];
-         ptrmin2[ 1 ] = ptrmin[ 1 - axis0 ];
-         icon = 1;
-      } else {
-         axis1 = gaxis_2db[ 1 ];
-         ptrmaj2[ 0 ] = ptrmaj[ 1 - axis1 ];
-         ptrmaj2[ 1 ] = ptrmaj[ axis1 ];
-         ptrmin2[ 0 ] = ptrmin[ 1 - axis1 ];
-         ptrmin2[ 1 ] = ptrmin[ axis1 ];
-         icon = 0;
-      }
-
-/* Fill the array that holds the constant 2D graphics value with the
-   value appropriate to the new Plot. */
-      p = ptrmaj2[ icon ];
-      for( i = 0; i < nmaj; i++ ) *(p++) = gcon;
-
-      p = ptrmin2[ icon ];
-      for( i = 0; i < nmin; i++ ) *(p++) = gcon;
-
-/* Create a PointSet holding the graphics coords at the major ticks 
-   to be used in the new plot. and store the above arrays of axis values
-   in it. */
-      pset = astPointSet( nmaj, 2, "" );
-      astSetPoints( pset, ptrmaj2 );
-
-/* Transform this pointset from graphics coords to WCS coords in the new
-   Plot. */
-      cmajticks = astTransform(  plot, pset, 1, NULL );
-      pset = astAnnul( pset );
-
-/* Also transform minor tick marks from graphics to WCS. */
-      pset = astPointSet( nmin, 2, "" );
-      astSetPoints( pset, ptrmin2 );
-      cminticks = astTransform(  plot, pset, 1, NULL );
-      pset = astAnnul( pset );
-
-/* Get pointers to the arrays holding WCS values. */
-      ptrmaj = astGetPoints( cmajticks );
-      ptrmin = astGetPoints( cminticks );
-
-/* Store the current Frame tick values in the Plot so that they are used
-   in preference to the values found automatically by the Plot class. */
-      if( ptrmaj && ptrmin ){
-         astSetTickValues( plot, wcsaxis, nmaj, ptrmaj[ wcsaxis ], 
-                                          nmin, ptrmin[ wcsaxis ] );
-      }
-
-/* Invoke the astGrid method on this plot. */
-      astGrid( plot );
-
-/* Clear the stored tick values in the plot. */
-      astSetTickValues( plot, wcsaxis, 0, NULL, 0, NULL );
-
-/* Free resources */
-      if( cmajticks ) cmajticks = astAnnul( cmajticks );
-      if( cminticks ) cminticks = astAnnul( cminticks );
-   }
-   if( majticks1 ) majticks1 = astAnnul( majticks1 );
-   if( minticks1 ) minticks1 = astAnnul( minticks1 );
-
-/* Copy the default values actually used for any unset attributes from
-   the encapsulated Plots to the parent Plot. */
-   for( axis0 = 0; axis0 < 3; axis0++ ) {
-      astCopyPlotDefaults( GET_PLOT( this->axis_plot1[ axis0 ] ),  
-                           this->axis_index1[ axis0 ],
-                           this_plot, axis0 );
-   }
+   if( wcsmajticks ) wcsmajticks = astAnnul( wcsmajticks );
+   if( wcsminticks ) wcsminticks = astAnnul( wcsminticks );
+   if( majticks ) majticks = astAnnul( majticks );
+   if( minticks ) minticks = astAnnul( minticks );
 
 }
 
@@ -5932,7 +5814,7 @@ static void StoreAxisInfo( AstPlot3D *this, int labelxy[2], int wcsxy[2],
 /* Check the inherited status. */
    if( !astOK ) return;
 
-/* Store information that allows each 3D WCS axis to be associatedf with
+/* Store information that allows each 3D WCS axis to be associated with
    a pair of Plots. Also store the WCS axis within each Plot that
    corresponds to the 3D WCS axis. Do each 3D WCS axis in turn. */
    for( axis3d = 0; axis3d < 3; axis3d++ ) {
