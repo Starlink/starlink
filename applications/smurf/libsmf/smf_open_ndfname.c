@@ -62,6 +62,8 @@
 *     2007-03-07 (AGG):
 *        Initialize output smfData to NULL before checking status to
 *        ensure a NULL pointer in case of error
+*     2007-09-07 (AGG):
+*        Add ndimsmapped to check that the NDF was mapped correctly
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -126,6 +128,7 @@ void smf_open_ndfname( const HDSLoc *loc, char *accmode, char *filename,
   int flags = 0;                /* Flags for creating smfDA, smfFile and 
 				   smfHead components in the output smfData */
   int ndat;                     /* Number of elements mapped in the requested NDF */
+  int ndimsmapped;              /* Number of dimensions in mapped NDF */
   int ndfid;                    /* NDF identifier */
   smfFile *newfile = NULL;      /* New smfFile with details of requested NDF */
   int place;                    /* Placeholder for NDF */
@@ -180,9 +183,17 @@ void smf_open_ndfname( const HDSLoc *loc, char *accmode, char *filename,
   if ( *status != SAI__OK ) {
     errRep( FUNC_NAME, "Unable to map data array: invalid NDF identifier?", status );
   }
-  ndfDim( ndfid, NDF__MXDIM, dims, &ndims, status );
+  /* Retrieve dimensions of mapped array */
+  ndfDim( ndfid, NDF__MXDIM, dims, &ndimsmapped, status );
   if ( *status != SAI__OK ) {
     errRep( FUNC_NAME, "Problem identifying dimensions of requested NDF", status );
+  }
+  /* Consistency check */
+  if ( ndimsmapped != ndims ) {
+    if ( *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRep( FUNC_NAME, "Number of dimensions in new NDF not equal to number of dimensions specified", status );
+    }
   }
 
   temp = dims[0];
