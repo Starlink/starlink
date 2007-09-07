@@ -46,6 +46,7 @@
     03Jul2007 : Made obsMode/mapCoordframe enumerated types more readable (EC)
     04Jul2007 : Added spike_t0/p0/p1/alpha to sc2sim_sim_struct (EC)
     15Aug2007 : Added microstepping parameters to sc2sim_obs_struct (CV)
+    06Sep2007 : Redefine heatnum as an int (agg)
 */
 #include "libsc2sim/sc2sim_par.h"
 
@@ -89,7 +90,7 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
   double grid_step_x;         /* Grid step in X direction */
   double grid_step_y;         /* Grid step in Y direction */
   int gridpts[SC2SIM__MXGRID][2];  /* relative grid coordinates */
-  double heatnum;             /* number of heater settings */
+  int heatnum;                /* number of heater settings */
   double heatstart;           /* initial heater setting (pW) */
   double heatstep;            /* increment of heater setting (pW) */
   double height;              /* min height of pattern (arcsec) */
@@ -105,7 +106,7 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
   double lambda;              /* wavelength in metres */
   double liss_angle;          /* angle of pattern relative to telescope
 				 axes in radians anticlockwise */
-  double mjdaystart;          /* Modified julian date at start */
+  double mjdaystart;          /* Modified julian date at start (UTC) */
   double mspat_x[SC2SIM__MXMSTP]; /* microstep pattern offsets in x
 				    (units: number of detectors) */
   double mspat_y[SC2SIM__MXMSTP]; /* microstep pattern offsets in y

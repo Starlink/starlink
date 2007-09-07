@@ -81,6 +81,8 @@
 *     2007-09-05 (CV):
 *        Added a default microstep pattern which is used when nmicstep is set
 *        to any negative number
+*     2007-09-06 (AGG):
+*        Read HEATNUM as an integer
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -225,7 +227,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    if ( !astMapGet0D ( keymap, "GRID_STEP_Y", &(inx->grid_step_y) ) )
       inx->grid_step_y = 6.28;
 
-   if ( !astMapGet0D ( keymap, "HEATNUM", &(inx->heatnum) ) )
+   if ( !astMapGet0I ( keymap, "HEATNUM", &(inx->heatnum) ) )
       inx->heatnum = 150;
 
    if ( !astMapGet0D ( keymap, "HEATSTART", &(inx->heatstart) ) )
