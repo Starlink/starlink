@@ -83,6 +83,9 @@
 *        to any negative number
 *     2007-09-06 (AGG):
 *        Read HEATNUM as an integer
+*     2007-09-07 (AGG):
+*        - Set targetpow based on wavelength if not specified
+*        - Introduce flag to denote an 850 or 450 um simulation
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -153,10 +156,20 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    char *thischar=NULL;   /* Pointer to current character being upcased */
    int vert_x[SC2SIM__MXVERT]; /* Temporary array for x-vertices */
    int vert_y[SC2SIM__MXVERT]; /* Temporary array for y-vertices */
+   int scuba2lon = 1;     /* Flag to denote whether the simulation is 850 or 450 um */
 
    /* Check status */
    if ( !StatusOkP(status) ) return;
  
+   /* First check for wavelength */
+   if ( !astMapGet0D ( keymap, "LAMBDA", &(inx->lambda) ) )
+      inx->lambda = 0.85e-3;
+
+   /* Set the scuba2lon flag to false - allow some leeway */
+   if ( (8.5e-4 - inx->lambda) > 1.0e-4 ) {
+     scuba2lon = 0;
+   }
+
    if ( !astMapGet0D ( keymap, "BOL_DISTX", &(inx->bol_distx) ) )
       inx->bol_distx = 6.28;
 
@@ -335,9 +348,6 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
        (inx->jig_vert)[i][1] = vert_y[i];
      }
    }
-
-   if ( !astMapGet0D ( keymap, "LAMBDA", &(inx->lambda) ) )
-      inx->lambda = 0.85e-3;
 
    if ( !astMapGet0D ( keymap, "LISS_ANGLE", &(inx->liss_angle) ) )
      inx->liss_angle = 0.0;
@@ -566,8 +576,14 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    if ( !astMapGet0I ( keymap, "SUBSYSNR", &(inx->subsysnr) ) )
       inx->subsysnr = 1;
 
-   if ( !astMapGet0D ( keymap, "TARGETPOW", &(inx->targetpow) ) )
-      inx->targetpow = 25.0;
+   if ( !astMapGet0D ( keymap, "TARGETPOW", &(inx->targetpow) ) ) {
+     /* Set a wavelength-dependent default */
+     if ( scuba2lon == 1 ) {
+       inx->targetpow = 25.0;
+     } else {
+       inx->targetpow = 150.0;
+     }
+   }
 
    if ( !astMapGet0D ( keymap, "VMAX", &(inx->vmax) ) )
      inx->vmax = 200.0;
