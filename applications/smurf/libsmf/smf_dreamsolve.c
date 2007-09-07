@@ -47,11 +47,13 @@
 *        Store GRIDEXT and GRID_SIZE parameters in file
 *     2007-04-05 (AGG):
 *        Change OBSMODE to SAM_MODE
+*     2007-09-07 (AGG):
+*        Add integer npts for call to ndfMap
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2006-2007 University of British Columbia. All
+*     Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -138,6 +140,7 @@ void smf_dreamsolve( smfData *data, int *status ) {
   size_t nelem;                    /* Total number of points */
   int ngrid;                       /* Number of grid points in output map */
   int nframes;                     /* Number of time samples */
+  int npts;                        /* Total number of points (int version) */
   int nsampcycle;                  /* Number of samples per DREAM cycle */
   int nunkno;                      /* Number of unknowns in solution */
   int nvert;                       /* Number of vertices in DREAM pattern */
@@ -239,7 +242,7 @@ void smf_dreamsolve( smfData *data, int *status ) {
     ubnd[0] = 4;
     gridndf = smf_get_ndfid( drmloc, "GRIDEXT", "WRITE", "NEW", 
 			     "_INTEGER", 1, lbnd, ubnd, status);
-    ndfMap( gridndf, "DATA", "_INTEGER", "WRITE", &gridext, &nelem, 
+    ndfMap( gridndf, "DATA", "_INTEGER", "WRITE", &gridext, &npts, 
 	    status);
     if ( *status == SAI__OK ) {
       /* Initialize min/max values - remember the grid may not
