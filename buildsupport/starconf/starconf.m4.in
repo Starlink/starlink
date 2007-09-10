@@ -598,23 +598,15 @@ float fred_() {
 #
 AC_DEFUN([STAR_CNF_BLANK_COMMON],
    [AC_CACHE_CHECK([symbol used for blank common in Fortran],
-       [star_cv_blank_common_fortran],
+       [star_cv_blank_common_symbol],
        [AC_REQUIRE([AC_PROG_FC])
+       star_cv_blank_common_symbol=_BLNK__
        if test "$ac_cv_fc_compiler_gnu" = yes; then
             if "$FC" --version 2>&1 < /dev/null | grep 'Fortran 95' > /dev/null; then
-                star_cv_blank_common_fortran=gfortran
+                star_cv_blank_common_symbol=__BLNK__
             fi
-        else
-            star_cv_blank_common_fortran=
-        fi])
-    case "$star_cv_blank_common_fortran" in
-      gfortran)
-        AC_SUBST([BLANK_COMMON_SYMBOL], [__BLNK__] )
-        ;;
-      *) 
-        AC_SUBST([BLANK_COMMON_SYMBOL], [_BLNK__] )
-        ;;
-    esac
+       fi])
+    AC_SUBST([BLANK_COMMON_SYMBOL], $star_cv_blank_common_symbol )
 ])# STAR_CNF_BLANK_COMMON
 
 # STAR_PRM_COMPATIBLE_SYMBOLS
@@ -692,7 +684,7 @@ AC_DEFUN([STAR_PRM_COMPATIBLE_SYMBOLS],
 #
 AC_DEFUN([STAR_CNF_TRAIL_TYPE],
    [AC_CACHE_CHECK([type used for Fortran string lengths],
-       [star_cv_cnf_trail_type],
+       [star_cv_trail_type],
        [AC_REQUIRE([AC_PROG_FC])
        if test "$ac_cv_fc_compiler_gnu" = no; then
           if "$FC" -V 2>&1 < /dev/null | grep 'Intel.*64' > /dev/null; then
