@@ -60,6 +60,9 @@
 *  History:
 *     13-AUG-2007 (DSB):
 *        Original version.
+*     11-SEP-2007 (DSB):
+*        Do not annul the picture identifier until it has been finished
+*        with.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -152,9 +155,14 @@
 
 *  If not, find the preceeding picture with the required name.
             ELSE
-               IF ( IPICT .NE. IPICC ) CALL AGI_ANNUL( IPICT, STATUS )
                CALL AGI_RCP( NAME, IPIC, IPICT, STATUS )  
+
+*  We have now finished with the IPIC picture identifier, so we can annul
+*  it. We do not do this if IPIC identifiers the current picture since we
+*  still need access to the current picture.
+               IF( IPIC .NE. IPICC ) CALL AGI_ANNUL( IPIC, STATUS )
                IPIC = -1
+
             END IF
 
          END IF
