@@ -1,4 +1,4 @@
-      INTEGER FUNCTION KPG1_ASPLN( N, X, Y )
+      INTEGER FUNCTION KPG1_ASPLN( GRFCON, N, X, Y )
 *+
 *  Name:
 *     KPG1_ASPLN
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     RESULT = KPG1_ASPLN( N, X, Y )
+*     RESULT = KPG1_ASPLN( GRFCON, N, X, Y )
 
 *  Description:
 *     This routine is intended to be registered with an AST Plot (using 
@@ -30,6 +30,8 @@
 *     using AST_GRFSET.
 
 *  Arguments:
+*     GRFCON = INTEGER (Given)
+*        A KeyMap containing information passed from the calling application.
 *     N = INTEGER (Given)
 *        The number of pointsin the polyline.
 *     X( N ) = REAL (Given)
@@ -43,6 +45,7 @@
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -70,6 +73,8 @@
 *        Original version.
 *     12-JUN-2006 (DSB):
 *        Avoid direct access to the KPG_AST common blocks.
+*     11-SEP-2007 (DSB):
+*        Add new GRFCON parameter, required by AST_GRFSET.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -94,6 +99,7 @@
       REAL KPG1_GETASTY2
 
 *  Arguments Given:
+      INTEGER GRFCON
       INTEGER N
       REAL X( N )
       REAL Y( N )
