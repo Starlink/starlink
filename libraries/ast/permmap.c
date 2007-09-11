@@ -75,6 +75,9 @@ f     The PermMap class does not define any new routines beyond those
 *        Change MapSplit so that it does not try to use the
 *        implementation from the parent Mapping class, since this 
 *        class can do a better job.
+*     11-SEP-2007 (DSB):
+*        In MapSplit, check that the permuted axis index is less than the 
+*        number of axes available. Use AST__BAD otherwise.
 *class--
 */
 
@@ -1434,7 +1437,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
    store the input index of the returned Mapping, or constant, which feeds 
    this output and add this output index to the list of returned outputs. */
          iin = outp ? outp[ iout ] : iout;
-         if( iin >= 0 ) {
+         if( iin >= 0 && iin < npin ) {
             for( i = 0; i < nin; i++ ) {
                if( in[ i ] == iin ) {
                   outpm[ nout ] = i;
@@ -1461,7 +1464,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
    the output or constant index in the returned Mapping which feeds this input. */
          ok = 0;
          iout = inp ? inp[ iin ] : iin;
-         if( iout >= 0 ) {
+         if( iout >= 0 && iout < npout ) {
             for( j = 0; j < nout; j++ ) {
                if( result[ j ] == iout ) {
                   ok = 1;
