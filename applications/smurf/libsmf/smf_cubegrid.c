@@ -139,9 +139,6 @@
 *     9-AUG-2007 (DSB):
 *        Check for co-incident positions even if the automatic grid
 *        determination algorithm succeeds.
-*     5-SEP-2007 (DSB):
-*        Check for target movement in the output coordinate system,
-*        whatever it is, rather than ICRS.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -425,6 +422,12 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    and then set its System to the required system. */
             *skyframe = astCopy( skyin );
             astSetC( *skyframe, "System", usesys );
+
+/* If the output is an AZEL grid, ensure that alignment on the sky is
+   performed in the azel coordinate system rather than the default (ICRS). */
+            if( !strcmp( usesys, "AZEL" ) ) {
+               astSetC( *skyframe, "AlignSystem", "AZEL" );
+            }
 
 /* We will later record the telescope base pointing position as the SkyRef 
    attribute in the output SkyFrame. To do this, we need to convert the 

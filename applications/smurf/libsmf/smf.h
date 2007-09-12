@@ -656,4 +656,13 @@ void smf_open_related_model( const smfGroup *group, const int subindex,
 			     const char *accmode, smfArray **relfiles, 
 			     int *status );
 
+smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd, 
+                          int *ubnd, smfBox *boxes, int spread, 
+                          const double params[], int tile_size[ 2 ], 
+                          int *ntiles, int *status );
+
+smfTile *smf_freetiles( smfTile *tiles, int size, int *status );
+
+void smf_reshapendf( smfData **data, smfTile *tile, int *status );
+
 #endif /* SMF_DEFINED */

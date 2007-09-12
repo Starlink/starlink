@@ -298,15 +298,16 @@ typedef struct smfBox {
 
 /* Represents a single tile from a full size grid. */
 typedef struct smfTile {
-  int xlo;
-  int xhi;
-  int ylo;
-  int yhi;
-  int exlo;
-  int exhi;
-  int eylo;
-  int eyhi;
+  int lbnd[ 3 ];
+  int ubnd[ 3 ];
+  int elbnd[ 3 ];
+  int eubnd[ 3 ];
+  int glbnd[ 3 ];
+  int gubnd[ 3 ];
   Grp *grp;
+  int size;
+  AstMapping *map2d;
+  AstMapping *map3d;
 } smfTile;
 
 

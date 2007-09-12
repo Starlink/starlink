@@ -14,9 +14,9 @@
 *     C function
 
 *  Invocation:
-*     tiles = smf_choosetiles( Grp *igrp,  int size, dim_t *lbnd, dim_t *ubnd, 
-*                            smfBox *boxes, int spread, const double params[], 
-*                            dim_t tile_size[ 2 ], int *ntiles, int *status )
+*     tiles = smf_choosetiles( Grp *igrp,  int size, int *lbnd, int *ubnd, 
+*                              smfBox *boxes, int spread, const double params[],
+*                              int tile_size[ 2 ], int *ntiles, int *status )
 
 *  Arguments:
 *     igrp = Grp * (Given)
@@ -44,8 +44,10 @@
 *        See docs for astRebinSeq (SUN/211) for further information. If no 
 *        additional parameters are required, this array is not used and a
 *        NULL pointer may be given. 
-*     tile_size = dim_t[ 2 ] * (Given)
+*     tile_size = int[ 2 ] * (Given)
 *        An array holding the spatial dimensions of each tile, in pixels.
+*        If the first value is less than zero, then a single tile
+*        containing the entire output array is used, with no padding.
 *     ntiles = int * (Returned)
 *        Pointer to an int in which to return the number of tiles needed
 *        to cover the full size grid.
@@ -80,8 +82,12 @@
 *        extended area is equal to the tile area with an additonal
 *        constant-width border that is wide enough to accomodate the 
 *        kernel specified by "spread".
+*        - The bounds of the basic tile area, expressed in the GRID
+*        coordinate system of th eexpanded tile area.
 *        - A pointer to a Grp group holding the names of the input files
 *        that have data falling within the extended tile area.
+*        - An AST Mapping that describes the shift in origin of the GRID
+*        coordinate system from the full sized output array to the tile.
 
 *  Authors:
 *     David S Berry (JAC, UCLan)
@@ -125,15 +131,16 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-smfTile *smf_choosetiles( Grp *igrp,  int size, dim_t *lbnd, 
-                          dim_t *ubnd, smfBox *boxes, int spread, 
-                          const double params[], dim_t tile_size[ 2 ], 
+smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd, 
+                          int *ubnd, smfBox *boxes, int spread, 
+                          const double params[], int tile_size[ 2 ], 
                           int *ntiles, int *status ){
 
 /* Local Variables */
    AstUnitMap *umap = NULL;
    char *pname = NULL;
    char filename[ GRP__SZNAM + 1 ]; 
+   double shift[ 3 ];
    float *w = NULL;
    float *work = NULL;
    float val;
@@ -162,17 +169,51 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, dim_t *lbnd,
 /* Check inherited status */
    if( *status != SAI__OK ) return NULL;
 
+/* If required, produce a description of a single tile that is just large
+   enough to hold the entire output array. */
+   if( tile_size[ 0 ] < 0 ) {
+      *ntiles = 1;
+      result = astMalloc( sizeof( smfTile ) );
+      if( result ) {
+
+/* Store the tile area. */
+         for( i = 0; i < 3; i++ ) {
+            result->lbnd[ i ] = lbnd[ i ];
+            result->ubnd[ i ] = ubnd[ i ];
+         }
+
+/* Store the extended tile area (the same). */
+         for( i = 0; i < 3; i++ ) {
+            result->elbnd[ i ] = lbnd[ i ];
+            result->eubnd[ i ] = ubnd[ i ];
+         }
+
+/* We do not need to re-map the GRID frame of the full sized output WCS
+   FrameSet. */
+         result->map2d = NULL;
+         result->map3d = NULL;
+
+/* Create a GRP group to hold the names of the input files that have data
+   that falls within the bounds of the extended tile area. This is just a
+   copy of the supplied group. */
+         result->grp = grpCopy( igrp, 0, 0, 0, status );
+         result->size = size;
+      }
+
+/* If the tile size is positive, we split the output array into tiles... */
+   } else {
+
 /* Pad the supplied full size grid bounds by adding a border to each
    edge so that the padded dimension is an integer multiple of the supplied
    tile size. This also finds the number of tiles required along the x
    and y pixel axes. */
-   for( i = 0; i < 2; i++ ) {
-      dim = ubnd[ i ] - lbnd[ i ] + 1;
-      numtile[ i ] = 1 + ( ( dim - 1 )/tile_size[ i ] );
-      dimpad =  numtile[ i ]*tile_size[ i ];
-      plbnd[ i ] = lbnd[ i ] - ( dimpad - dim )/2;
-      pubnd[ i ] = dimpad + plbnd[ i ] - 1;
-   }
+      for( i = 0; i < 2; i++ ) {
+         dim = ubnd[ i ] - lbnd[ i ] + 1;
+         numtile[ i ] = 1 + ( ( dim - 1 )/tile_size[ i ] );
+         dimpad =  numtile[ i ]*tile_size[ i ];
+         plbnd[ i ] = lbnd[ i ] - ( dimpad - dim )/2;
+         pubnd[ i ] = dimpad + plbnd[ i ] - 1;
+      }
 
 /* Determine the constant width border by which the basic tile area is to be
    extended to accomodate the specified spreading kernel. We do this by
@@ -180,75 +221,102 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, dim_t *lbnd,
    scheme, and then determining the width of the resulting non-zero pixel
    values. */
 
-   umap = astUnitMap( 1, "" );
-   lbin = 0;
-   ubin = 0;
-   val = 1.0;
-
-   lbout = -1000;
-   ubout = 1000;
-   work = astMalloc( sizeof( float )*( ubout - lbout + 1 ) );
-
-   astRebinF( umap, 0.0, 1, &lbin, &ubin, &val, NULL, spread, params, 0,
-              0.0, 0, VAL__BADR, 1, &lbout, &ubout, &lbin, &ubin, work, 
-              NULL );
-
-   w = work + 1001;
-   while( *w != VAL__BADR && *w != 0.0 ) w++;
-   extend = w  - ( work + 1001 );
-
-   umap = astAnnul( umap );
-   work = astFree( work );
-
+      umap = astUnitMap( 1, "" );
+      lbin = 0;
+      ubin = 0;
+      val = 1.0;
+   
+      lbout = -1000;
+      ubout = 1000;
+      work = astMalloc( sizeof( float )*( ubout - lbout + 1 ) );
+   
+      astRebinF( umap, 0.0, 1, &lbin, &ubin, &val, NULL, spread, params, 0,
+                 0.0, 0, VAL__BADR, 1, &lbout, &ubout, &lbin, &ubin, work, 
+                 NULL );
+   
+      w = work + 1001;
+      while( *w != VAL__BADR && *w != 0.0 ) w++;
+      extend = w  - ( work + 1001 );
+   
+      umap = astAnnul( umap );
+      work = astFree( work );
+   
 /* Return the total number of tiles, and create the returned array. */
-   *ntiles = numtile[ 0 ]*numtile[ 1 ];
-   result = astMalloc( sizeof( smfTile ) * (*ntiles ) );
-
+      *ntiles = numtile[ 0 ]*numtile[ 1 ];
+      result = astMalloc( sizeof( smfTile ) * (*ntiles ) );
+   
 /* Store a pointer to the next tile desription to create. */
-   tile = result;   
-
+      tile = result;   
+   
 /* Loop round each row of tiles. */
-   for( iy = 0; iy < numtile[ 1 ]; iy++ ) {
-
+      for( iy = 0; iy < numtile[ 1 ]; iy++ ) {
+   
 /* Store the y axis bounds of the tiles in this row. */
-      ylo = plbnd[ 1 ] + iy*tile_size[ 1 ];
-      yhi = tile->ylo + tile_size[ 1 ] - 1;
-
+         ylo = plbnd[ 1 ] + iy*tile_size[ 1 ];
+         yhi = ylo + tile_size[ 1 ] - 1;
+   
 /* Loop round each tile in the current row. */
-      for( ix = 0; ix < numtile[ 0 ]; ix++, tile++ ) {
-
+         for( ix = 0; ix < numtile[ 0 ]; ix++, tile++ ) {
+   
 /* Store the tile area. */
-         tile->xlo = plbnd[ 0 ] + ix*tile_size[ 0 ];
-         tile->xhi = tile->xlo + tile_size[ 0 ] - 1;
-         tile->ylo = ylo;
-         tile->yhi = yhi;
-
+            tile->lbnd[ 0 ] = plbnd[ 0 ] + ix*tile_size[ 0 ];
+            tile->ubnd[ 0 ] = tile->lbnd[ 0 ] + tile_size[ 0 ] - 1;
+            tile->lbnd[ 1 ] = ylo;
+            tile->ubnd[ 1 ] = yhi;
+            tile->lbnd[ 2 ] = lbnd[ 2 ];
+            tile->ubnd[ 2 ] = ubnd[ 2 ];
+   
 /* Store the extended tile area. */
-         tile->exlo = tile->xlo - extend;
-         tile->exhi = tile->xhi + extend;
-         tile->eylo = tile->ylo - extend;
-         tile->eyhi = tile->yhi + extend;
+            tile->elbnd[ 0 ] = tile->lbnd[ 0 ] - extend;
+            tile->eubnd[ 0 ] = tile->ubnd[ 0 ] + extend;
+            tile->elbnd[ 1 ] = tile->lbnd[ 1 ] - extend;
+            tile->eubnd[ 1 ] = tile->ubnd[ 1 ] + extend;
+            tile->elbnd[ 2 ] = lbnd[ 2 ];
+            tile->eubnd[ 2 ] = ubnd[ 2 ];
+
+/* Store the bounds of the basic (non-extended) tile in a grid coordinate
+   system that has value (1.0,1.0) at the centre of the first pixel in
+   the extended tile. */
+            tile->glbnd[ 0 ] = tile->lbnd[ 0 ] - tile->elbnd[ 0 ] + 1;
+            tile->gubnd[ 0 ] = tile->ubnd[ 0 ] - tile->elbnd[ 0 ] + 1;
+            tile->glbnd[ 1 ] = tile->lbnd[ 1 ] - tile->elbnd[ 1 ] + 1;
+            tile->gubnd[ 1 ] = tile->ubnd[ 1 ] - tile->elbnd[ 1 ] + 1;
+            tile->glbnd[ 2 ] = tile->lbnd[ 2 ] - tile->elbnd[ 2 ] + 1;
+            tile->gubnd[ 2 ] = tile->ubnd[ 2 ] - tile->elbnd[ 2 ] + 1;
+   
+/* A ShiftMap that describes the shift in the origin of 2D GRID coordinates
+   caused by extracting the extended tile from the full sized output array. 
+   This is the Mapping from the full size GRID coordinate system to the
+   tile GRID coordinate system. */
+            shift[ 0 ] = lbnd[ 0 ] - tile->elbnd[ 0 ];
+            shift[ 1 ] = lbnd[ 1 ] - tile->elbnd[ 1 ];
+            shift[ 2 ] = 0.0;
+            tile->map2d = (AstMapping *) astShiftMap( 2, shift, "" );
+            tile->map3d = (AstMapping *) astShiftMap( 3, shift, "" );
 
 /* Create a GRP group to hold the names of the input files that have data
    that falls within the bounds of the extended tile area. */
-         tile->grp = grpNew( "", status );
-
+            tile->grp = grpNew( "", status );
+   
 /* Find the input files that may overlap the current extended tile area. */
-         box = boxes;
-         for( i = 1; i <= size; i++, box++ ){
-
+            box = boxes;
+            tile->size = 0;
+            for( i = 1; i <= size; i++, box++ ){
+   
 /* Does the bounding box for the i'th input file overlap the extended
-   tile area? If so, include the name of hte i'th input file in the group
-   of file names that contribute to the current tile. */
-            if( box->lbnd[ 0 ] < tile->exhi &&
-                box->ubnd[ 0 ] > tile->exlo &&
-                box->lbnd[ 1 ] < tile->eyhi &&
-                box->ubnd[ 1 ] > tile->eylo ) {
-
-               pname = filename;
-               grpGet( igrp, i, 1, &pname, GRP__SZNAM, status );
-               grpPut1( tile->grp, filename, 0, status );
-
+   tile area? If so, include the name of the input file in the group of 
+   file names that contribute to the current tile. */
+               if( box->lbnd[ 0 ] < tile->eubnd[ 0 ] &&
+                   box->ubnd[ 0 ] > tile->elbnd[ 0 ] &&
+                   box->lbnd[ 1 ] < tile->eubnd[ 1 ] &&
+                   box->ubnd[ 1 ] > tile->elbnd[ 1 ] ) {
+   
+                  pname = filename;
+                  grpGet( igrp, i, 1, &pname, GRP__SZNAM, status );
+                  grpPut1( tile->grp, filename, 0, status );
+                  (tile->size)++;
+   
+               }
             }
          }
       }
