@@ -26,6 +26,9 @@
 #        Original version.
 #     2006 June 21 (MJC):
 #        Restore majticklen setting from the original style file.
+#     13-SEP-2007 (DSB):
+*        Remove "colour(curves)=white" as this causes problems on
+#        hardcopy devices where the background (paper) is white.
 #-
 
 #  Set colours for various elements of the plot.
@@ -35,7 +38,6 @@
       colour(axes)=grey
       colour(numlab)=cyan
       colour(textlab)=cyan
-      colour(curves)=white
 
 #  Enlarge major tick marks to make them more cvisible on small plots.
       majticklen=0.035
