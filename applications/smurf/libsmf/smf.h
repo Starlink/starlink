@@ -179,6 +179,8 @@
 *        -Changed interface for smf_model_create
 *     2007-08-17 (EC):
 *        -Added nofile to smf_model_create interface
+*     2007-09-13 (EC):
+*        -Added smf_dataOrder
 
 *     {enter_further_changes_here}
 *  Copyright:
@@ -664,5 +666,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 smfTile *smf_freetiles( smfTile *tiles, int size, int *status );
 
 void smf_reshapendf( smfData **data, smfTile *tile, int *status );
+
+void smf_dataOrder( smfData *data, int isTordered, int *status );
 
 #endif /* SMF_DEFINED */

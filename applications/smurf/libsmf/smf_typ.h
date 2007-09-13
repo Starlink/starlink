@@ -98,6 +98,8 @@
 *        Added SMF__NUL to typedef smf_modeltype
 *     2007-08-21 (DSB):
 *        Added smfBox and smfTile.
+*     2007-09-13 (EC):
+*        Added isTordered to smfData.
 *     {enter_further_changes_here}
 
 
@@ -259,6 +261,7 @@ typedef struct smfData {
   smf_dtype dtype;           /* Data type of DATA and VARIANCE arrays */
   void * pntr[3];            /* Array of pointers to DATA/VARIANCE/QUALITY */
   dim_t dims[NDF__MXDIM];    /* Dimensions of data array */
+  int isTordered;            /* 0=order by bolo, 1=order by tslice (default) */
   int ndims;                 /* Number of active dimensions in "dims" */
   int refcount;              /* Reference count for data object */
   int virtual;               /* Flag for extracted timeslices */
