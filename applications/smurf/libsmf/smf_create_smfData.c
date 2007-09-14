@@ -62,6 +62,8 @@
 *        Initialize data->DIMMbuf and data->DIMMlen
 *     2007-06-14 (EC):
 *        Moved DIMM file parameters to smfFile
+*     2007-09-14 (EC):
+*        Initialize isTordered
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -148,6 +150,8 @@ smf_create_smfData( int flags, int * status ) {
   data->ncoeff = 0;
   data->poly = NULL;
   data->history = NULL;
+  data->isTordered = 1;
+
   for (i = 0; i < 3; i++ ) {
     (data->pntr)[i] = NULL;
   }
