@@ -1,34 +1,31 @@
-      SUBROUTINE KPS1_MFAUR( INDF, DTAXIS, NCLIP, CLIP, NUMBIN, MAXRNG,
-     :                       NRANGE, RANGES, STATUS )
+      SUBROUTINE KPS1_MFSB( INDF, DTAXIS, NCLIP, CLIP, NUMBIN, MASK, 
+     :                      STATUS )
 *+
 *  Name:
-*     KPS1_MFAUR
+*     KPS1_MFSB
 
 *  Purpose:
-*     Determines automatically ranges of pixels to be included in 
-*     fitting by MFITTREND.
+*     Excludes features by setting them bad in a mask.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_MFAUR( INDF, DTAXIS, NCLIP, CLIP, NUMBIN, MAXRNG, 
-*                      NRANGE, RANGES, STATUS )
+*     CALL KPS1_MFSB( INDF, DTAXIS, NCLIP, CLIP, NUMBIN, MASK, STATUS )
 
 *  Description:
-*     This routine serves MFITTREND.  It averages a section defined 
-*     through the supplied identifier to create a one-dimensional
-*     representative line of data that is being detrended by MFITTREND.
-*     This average line is rebinned by an integer factor to improve
-*     the signal-to-noise ratio.  Then the routine fits a straight 
-*     line to the rebinned data, and sigma-clipped outliers rejected.  
-*     The regions encompassing the unrejected parts of the line are 
-*     returned in the unbinned grid co-ordinates.
+*     This routine serves MFITTREND.  This processes each line whose 
+*     trend is to be fit within the NDF whose identifier is supplied.
+*     The routine rebins by an integer factor to improve the 
+*     signal-to-noise ratio.  Then the routine fits a straight line to 
+*     the rebinned data, and sigma-clipped outliers rejected.  
+*     The regions encompassing the rejected parts of the line are 
+*     set bad in the supplied mask.
 
 *  Arguments:
 *     INDF = INTEGER (Given)
-*        The NDF identifier of the representative section to be 
-*        averaged and analysed.
+*        The NDF identifier of the data to be analysed.  This should be
+*        a copy of the input NDF.
 *     DTAXIS = INTEGER (Given)
 *        The axis index of the dimension that is being detrended.
 *     NCLIP = INTEGER (Given)
@@ -39,19 +36,18 @@
 *     NUMBIN = INTEGER (Given)
 *        The number of bins in the compressed line.  This may be set
 *        to the number of elements in the line to prevent compression.
-*     MAXRNG = INTEGER (Given)
-*        The maximum number of ranges.
-*     NRANGE = INTEGER (Returned)
-*        The number of ranges returned.  This is always a multiple of
-*        two, i.e pairs of lower and upper ranges.
-*     RANGES( MAXRNG ) = INTEGER (Returned)
-*        The ranges to include in the detrending fits found from the 
-*        averaged representative line.
+*     MASK( * ) = BYTE (Returned)
+*        The mask of features.  Features have the bad value VAL__BADB
+*        and the remainder are set to 0.  The supplied array should
+*        have the number of data-array elements contained in the
+*        supplied NDF. 
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Notes:
+
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics & Astronomy Research Council
+*     Copyright (C) 2007 Science & Technology Facilities Council
 *     All Rights Reserved.
 
 *  Licence:
@@ -75,15 +71,11 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     2006 May 31 (MJC):
+*     2007 August 13 (MJC):
 *        Original version.
-*     2007 January 17 (MJC):
-*        Used an NDF section for the padded region being averaged.
-*     2007 March 5 (MJC):
-*        Trim two workspaces to required sizes.
-*     2007 August 10 (MJC):
-*        Add NUMBIN argument.
-*     {enter_further_changes_here}
+*     2007 September 6 (MJC):
+*        Use NDF in read mode and create a mask in new argument MASK.
+*     {enter_changes_here}
 
 *-
 
@@ -101,11 +93,7 @@
       INTEGER NCLIP
       REAL CLIP( NCLIP )
       INTEGER NUMBIN
-      INTEGER MAXRNG
-
-*  Arguments Returned:
-      INTEGER NRANGE
-      INTEGER RANGES( MAXRNG )
+      BYTE MASK( * )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -131,6 +119,7 @@
                                  ! the input NDF
       INTEGER NDIM               ! Number of dimensions
       INTEGER ODIMS( NDF__MXDIM )! Dimensions of output array
+      INTEGER OEL                ! Number of elements in output array
       INTEGER PNTRI( 1 )         ! Pointer to input array component
       INTEGER REF( NDF__MXDIM )  ! I/p pixel co-ords at bottom left of 
                                  ! a compression box
@@ -143,18 +132,22 @@
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
-*  Find the shape and bound of the section.
+
+*  Find the shape and bound of the supplied NDF.
       CALL NDF_DIM( INDF, NDF__MXDIM, IDIMS, NDIM, STATUS )
       CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
+*  Compress along the axis being detrended.
+*  ========================================
+ 
 *  Work out the bounds for the output array and the size of the output 
 *  array from the input array dimensions, compression factor and 
 *  alignment to origin.  Also modify the input bounds so that they 
 *  correspond to the section of the input array that is actually used. 
-      DO I = 1, MAX( 2, NDIM )
+      OEL = 1
+      DO I = 1, NDF__MXDIM
          IF ( I .NE. DTAXIS ) THEN
-            COMPRS( I ) = IDIMS( I )
+            COMPRS( I ) = 1
          ELSE
             NBIN = MIN( IDIMS( I ), NUMBIN )
             COMPRS( I ) = IDIMS( I ) / NBIN
@@ -173,6 +166,7 @@
      :                               / REAL( COMPRS( I ) ) ) - D )
 
          ODIMS( I ) = UBNDO( I ) - LBNDO( I ) + 1
+         OEL = OEL * ODIMS( I )
 
          LBND( I ) = 1 + REF( I ) + COMPRS( I ) * ( LBNDO( I ) - 1 + D )
          UBND( I ) = REF( I ) + COMPRS( I ) * ( UBNDO( I ) + D )
@@ -193,11 +187,10 @@
 *  Map the array component of the section.
       CALL KPG1_MAP( NDFS, 'Data', ITYPE, 'READ', PNTRI, EL, STATUS )
 
-*  Obtain workspace for the averaged spectrum.
-      CALL PSX_CALLOC( ODIMS( DTAXIS ), ITYPE, IPAL, STATUS )
+*  Obtain workspace for the compressed array.
+      CALL PSX_CALLOC( OEL, ITYPE, IPAL, STATUS )
 
-*  Obtain some workspace for the averaging and map them.  First find
-*  the quantity and the type of the counting space required.
+*  Obtain some workspace for the averaging and map them.
       CALL PSX_CALLOC( IDIMS( 1 ), ITYPE, WPNTR1, STATUS )
       CALL PSX_CALLOC( IDIMS( 1 ), '_INTEGER', WPNTR2, STATUS )
 
@@ -230,24 +223,28 @@
 
 *  Perform fits and iteratively reject outliers.
       IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPS1_MFEDR( NCLIP, CLIP, ODIMS( DTAXIS ), 
+         CALL KPS1_MFADR( DTAXIS, NCLIP, CLIP, ODIMS, 
      :                    %VAL( CNF_PVAL( IPAL ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPS1_MFEDD( NCLIP, CLIP, ODIMS( DTAXIS ), 
+         CALL KPS1_MFADD( DTAXIS, NCLIP, CLIP, ODIMS, 
      :                    %VAL( CNF_PVAL( IPAL ) ), STATUS )
       END IF
 
-*  Determine the ranges from the good elements remaining in the line.
+*  Inquire the shape of the full data array.  Earlier we replaced
+*  these with the multiple of binning factor, hence the second
+*  call.
+      CALL NDF_DIM( INDF, NDF__MXDIM, IDIMS, NDIM, STATUS )
+
+*  Transfer the bad pixels from the binned to the unbinned mask
+*  array.
       IF ( ITYPE .EQ. '_REAL' ) THEN
-          CALL KPS1_MFFRR( COMPRS( DTAXIS ), ODIMS( DTAXIS ),
-     :                     %VAL( CNF_PVAL( IPAL ) ), MAXRNG, NRANGE, 
-     :                     RANGES, STATUS )
+         CALL KPS1_MFEBR( COMPRS, IDIMS, %VAL( CNF_PVAL( IPAL ) ),
+     :                    MASK, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-          CALL KPS1_MFFRD( COMPRS( DTAXIS ), ODIMS( DTAXIS ),
-     :                     %VAL( CNF_PVAL( IPAL ) ), MAXRNG, NRANGE, 
-     :                     RANGES, STATUS )
+         CALL KPS1_MFEBD( COMPRS, IDIMS, %VAL( CNF_PVAL( IPAL ) ), 
+     :                    MASK, STATUS )
       END IF
 
 *  We have finished with the averaged line.

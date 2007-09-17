@@ -27,12 +27,11 @@
 *     that only lies within a series of co-ordinate ranges along the
 *     selected axis.
 *
-*     The ranges may be determined automatically.  It this mode the
-*     application averages selected lines, and bins neighbouring pixels
-*     within this average line.  Then it performs a linear fit upon the
-*     binned line, and rejects the outliers, iteratively with
-*     standard-deviation clipping.  The ranges are the intervals between
-*     the rejected points, rescaled to the original pixels.
+*     The ranges may be determined automatically.  There is a choice
+*     of tunable approaches to mask regions to be excluded from the 
+*     fitting to cater for a variety of data sets.  The actual ranges 
+*     used are reported in the current co-ordinate Frame and pixels,
+*     provided they apply to all lines being fitted.
 *
 *     Once the trends have been determined they can either be stored
 *     directly or subtracted from the input data.  If stored directly
@@ -58,7 +57,7 @@
 *     ARANGES() = _INTEGER (Write)
 *        This parameter is only written when AUTO=TRUE, recording the
 *        trend-axis fitting regions determined automatically.  They 
-*        comprise pairs of grid co-ordinates.
+*        comprise pairs of pixel co-ordinates.
 *     AUTO = _LOGICAL (Read)
 *        If TRUE, the ranges that define the trends are determined
 *        automatically, and parameter RANGES is ignored.  [FALSE]
@@ -81,10 +80,54 @@
 *        The input NDF.  On successful completion this may have the
 *        trends subtracted, but only if SUBTRACT and MODIFYIN are both
 *        set TRUE.
+*     MASK = NDF (Write)
+*        The name of the NDF to contain the feature mask.  It is only
+*        accessed for automatic mode and METHOD="Single".  It has the
+*        same bounds as the input NDF and the data array is type _BYTE.
+*        No mask NDF is created if null (!) is supplied  [!]
+*     METHOD = LITERAL (Given)
+*        The method used to define the masked regions in automatic
+*        mode.  Allowed values are as follows.
+*
+*        - "Region" -- This averages trend lines from a selected
+*        representative region given by parameter SECTION and bins 
+*        neighbouring elements within this average line.  Then it 
+*        performs a linear fit upon the binned line, and rejects the 
+*        outliers, iteratively with standard-deviation clipping
+*        (parameter CLIP).  The ranges are the intervals between
+*        the rejected points, rescaled to the original pixels.
+*        They are returned in parameter ARANGES.
+*
+*        This best suited to a low dispersion along the trend axis
+*        and a single concentrated region containing the bulk of the
+*        signal to be excluded from the trend fitting.
+*
+*        - "Single" -- This is like Region except there is neither
+*        averaging of lines nor a single set of ranges.  Each line is
+*        masked independently.  
+*
+*        This is more appropriate when the features being masked
+*        vary widely across the image, and significantly between
+*        adjacent lines.  Some prior smoothing or background tracing
+*        (CUPID:FINDBACK) will usually prove beneficial.
+*
+*        ["Region"]
 *     MODIFYIN = _LOGICAL (Read)
 *        Whether or not to modify the input NDF.  It is only used when
 *        SUBTRACT is TRUE.  If MODIFYIN is FALSE, then an NDF name must
 *        be supplied by the OUT parameter.  [FALSE]
+*     NUMBIN = _INTEGER (Read)
+*        The number of bins in which to compress the trend line for the
+*        automatic range-determination mode.  A single line or even the 
+*        average over a region will often be noisy; this compression 
+*        creates a better signal-to-noise ratio from which to detect 
+*        features to be excluded from the trend fitting.  If NUMBIN is
+*        made too large, weaker features will be lost or stronger 
+*        features will be enlarged and background elements excluded from
+*        the fitting.  The minimum value is 16, and the maximum is such 
+*        that there will be a factor of two compression.  NUMBIN is 
+*        ignored when there are fewer than 32 elements in each line to
+*        be de-trended.  [32]
 *     ORDER = _INTEGER (Read)
 *        The order of the polynomials to be used when trend fitting.
 *        A polynomial of order 0 is a constant and 1 a line, 2 a
@@ -111,10 +154,10 @@
 *     SECTION = LITERAL (Read)
 *        The region from which representative lines are averaged
 *        in automatic mode to determine the regions to fit trends.  It
-*        is therefore only accessed when AUTO=TRUE and the
-*        dimensionality of the input NDF is more than 1.  The value is 
-*        defined as an NDF section, so that ranges can be defined along 
-*        any axis, and be given as pixel indices or axis (data) 
+*        is therefore only accessed when AUTO=TRUE, METHOD="Region", and
+*        the dimensionality of the input NDF is more than 1.  The value
+*        is defined as an NDF section, so that ranges can be defined 
+*        along any axis, and be given as pixel indices or axis (data)
 *        co-ordinates.  The pixel axis corresponding to parameter AXIS
 *        is ignored.   So for example, if the pixel axis were 3 in a
 *        cube, the value "3:5,4," would average all the lines 
@@ -146,7 +189,14 @@
 *        written to the data cube called detrend.
 *     mfittrend in=cube axis=3 auto clip=[2,3] order=4 out=detrend
 *        As above except the fitting ranges are determined automatically
-*        with 2- then 3-sigma clipping.
+*        with 2- then 3-sigma clipping using a representative central
+*        region.
+*     mfittrend cube axis=3 auto method=single order=1 subtract 
+*               out=cube_dt mask=cube_mask
+*        This fits linear trends to the spectral axis of a data cube
+*        called cube, masking spectral features along each line
+*        independently.  The mask pixels are recorded in NDF cube_mask.
+*        The fitted trend are subtracted and stored in NDF cube_dt.
 
 *  Notes:
 *     -  This application attempts to solve the problem of fitting 
@@ -160,11 +210,10 @@
 *     the fastest possible determinations you should not use weighting
 *     and assert that the input data do not have any BAD values (use the
 *     application SETBAD to set the appropriate flag).
-*     -  You may need to determine empirically what is the best
-*     clipping limits and region to average if you choose to use the
-*     automatic range determination.  At present the binning factor
-*     is fixed to give 32 bins, unless the number of elements is
-*     fewer whereupon there is no binning with the averaged line.
+*     -  If you choose to use the automatic range determination.  You 
+*     may need to determine empirically what are the best
+*     clipping limits, binning factor, and for METHOD="Region" the 
+*     region to average.
 
 *  Related Applications:
 *     FIGARO: FITCONT, FITPOLY; CCDPACK: DEBIAS; KAPPA: SETBAD.
@@ -179,7 +228,8 @@
 *     -  Handles data of up to 7 dimensions.
 
 *  Copyright:
-*     Copyright (C) Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
+*     Council.  All Rights reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -225,12 +275,22 @@
 *     2007 July 12 (MJC):
 *        Adapted COLLAPSE code to determine the alignment of pixel with
 *        WCS axes.  This attempts first to split the current Frame into
-*        parallel mappings including one that is solely detrending axis,
+*        parallel mappings including one that is solely de-trending axis,
 *        before finding the largest projection of the vector joining
 *        two test points.
 *     2007 July 19 (MJC):
 *        Used new KPG1_ASAPA to identify pixel axis corresponding to
-*        the detrended WCS axis, rather than inline code.
+*        the de-trended WCS axis, rather than inline code.
+*     2007 August 10 (MJC):
+*        Added METHOD and NUMBIN parameters.
+*     2007 September 6 (MJC):
+*        Create a mask for features detected by the automatic Single
+*        method, rather than attempt to store the mask information in the
+*        data.
+*     2007 September 10 (MJC):
+*        Allow the feature mask to be stored in an output NDF given by
+*        new parameter MASK.  Output the selected regions in the current
+*        co-ordinate Frame.
 *     {enter_further_changes_here}
 
 *-
@@ -264,11 +324,16 @@
       INTEGER MXCLIP             ! Maximum number of clips of the data
       PARAMETER ( MXCLIP = 5 )
 
+      INTEGER OPTBIN              ! Nominal number of bins
+      PARAMETER ( OPTBIN = 32 )
+            
 *  Local Variables:
-      CHARACTER COMP * ( 15 )    ! List of array components to process
-      CHARACTER ITYPE * ( NDF__SZTYP ) ! Numeric type for processing
-      CHARACTER * ( DAT__SZLOC ) LOC ! Locator for the input NDF
-      CHARACTER * ( 80 ) SECT    ! Section specifier
+      CHARACTER*9 ATTR           ! Name of an AST attribute
+      CHARACTER*15 COMP          ! List of array components to process
+      CHARACTER*( NDF__SZTYP ) ITYPE ! Numeric type for processing
+      CHARACTER*( DAT__SZLOC ) LOC ! Locator for the input NDF
+      CHARACTER*9 METHOD         ! Method for determining the mode
+      CHARACTER*80 SECT          ! Section specifier
       DOUBLE PRECISION CPOS( 2, NDF__MXDIM ) ! Two current Frame 
                                  ! positions
       DOUBLE PRECISION CURPOS( NDF__MXDIM ) ! A valid current Frame 
@@ -292,6 +357,8 @@
       INTEGER IPDAT( 2 )         ! Pointer to NDF data & variance comp's
       INTEGER IPIN               ! Pointer to input NDF data
       INTEGER IPIX               ! Index of PIXEL Frame within FrameSet
+      INTEGER IPMASK             ! Pointer to feature mask
+      INTEGER IPMN               ! Pointer to mask NDF's data array
       INTEGER IPRES              ! Pointer to array of residuals
       INTEGER IPTMP( 1 )         ! Pointer to temporary NDF component
       INTEGER IPVAR( 1 )         ! Pointer to NDF variance component
@@ -303,9 +370,12 @@
       INTEGER JAXIS              ! Index of axis within pixel Frame
       INTEGER JHI                ! High pixel index for axis
       INTEGER JLO                ! Low pixel index for axis
+      INTEGER LATTR              ! Used length of ATTR
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of NDF
       INTEGER MAP                ! PIXEL Frame to Current Frame Mapping
                                  ! pointer
+      INTEGER MAXBIN             ! Maximum number of bins for auto mode
+      INTEGER MSKNDF             ! Identifier of the mask NDF
       INTEGER NAXC               ! Number of axes in current frame
       INTEGER NCLIP              ! Number of clips of averaged data
       INTEGER NCSECT             ! Number of characters in section
@@ -314,9 +384,11 @@
       INTEGER NERR               ! Number of errors
       INTEGER NFEED              ! Number of pixel axes feeding WCS axis
       INTEGER NRANGE             ! Number of range values (not pairs)
+      INTEGER NUMBIN             ! Number of bins in automatic mode
       INTEGER ORDER              ! The order of the polynomial to fit
       INTEGER OTOMAP             ! One-to-one mapping
       INTEGER OUTNDF             ! NDF identifier of output NDF
+      INTEGER PLACE              ! Placeholder for temporary NDF
       INTEGER RANGES( MAXRNG )   ! The fit ranges pixels
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF
       LOGICAL AUTO               ! Determine regions automatically?
@@ -324,6 +396,8 @@
       LOGICAL HASBAD             ! Input NDF may have BAD pixels?
       LOGICAL HAVVAR             ! Have a variance component?
       LOGICAL MODIN              ! Modify input NDF by subtracting fits?
+      LOGICAL REGION             ! Representative region auto method?
+      LOGICAL SINGLE             ! Single-line automatic method?
       LOGICAL SUBTRA             ! Subtract fit from data?
       LOGICAL USEALL             ! Use the entire axis?
       LOGICAL USEVAR             ! Use variance as weights in fits?
@@ -463,7 +537,16 @@
      :     'simple linear fit is adequate for detecting features '//
      :     'and not rejecting curvature in the trend.', STATUS )
          CALL MSG_BLANK( STATUS )
+
+*  Inquire the method used to automate the rejection of features and
+*  outliers.
+         CALL PAR_CHOIC( 'METHOD', 'Region', 'Region,Single',
+     :                   .TRUE., METHOD, STATUS )
+         REGION = METHOD .EQ. 'REGION'
+         SINGLE = METHOD .EQ. 'SINGLE'
+
       ELSE
+         SINGLE = .FALSE.       
 
 *  Get the ranges to use. These values are transformed from current
 *  co-ordinates along the fit axis to pixel co-ordinates on some
@@ -492,8 +575,6 @@
 
 *  Determine which pixel axis is most nearly aligned with the selected 
 *  WCS axis.
-*  Determine which pixel axis is most nearly aligned with the selected 
-*  WCS axis.
       CALL KPG1_ASAPA( INNDF, CFRM, MAP, IAXIS, DRANGE( 1 ),
      :                 DRANGE( 2 ), JAXIS, PXLOW, PXHIGH, OTOMAP, 
      :                 STATUS )
@@ -501,6 +582,16 @@
 *  Automatic mode to define ranges.
 *  --------------------------------
       IF ( AUTO ) THEN
+
+*  Obtain the binning factor.  The maximum compression should still
+*  retain at least 16 or all the elements.
+         MAXBIN = DIMS( IAXIS ) / 2
+         IF ( DIMS( IAXIS ) .GE. OPTBIN ) THEN
+            CALL PAR_GDR0I( 'NUMBIN', OPTBIN, OPTBIN / 2 , MAXBIN, 
+     :                      .FALSE., NUMBIN, STATUS )
+         ELSE
+            NUMBIN = DIMS( IAXIS )
+         END IF
 
 *  Obtain the clipping thresholds.
          NCLIP = 0
@@ -518,40 +609,55 @@
 
          END IF
 
+*  Region method
+*  -------------
+
 *  Obtain the NDF section of the test region.
-         CALL KPS1_MFGNS( 'SECTION', JAXIS, NDIM, DIMS, NCSECT,
-     :                    SECT, STATUS )
+         IF ( REGION ) THEN
+            CALL KPS1_MFGNS( 'SECTION', JAXIS, NDIM, DIMS, NCSECT,
+     :                       SECT, STATUS )
 
 *  Obtain a locator to the input NDF.
-         CALL NDF_LOC( INNDF, 'Read', LOC, STATUS )
+            CALL NDF_LOC( INNDF, 'Read', LOC, STATUS )
 
 *  Create the section in the input array.  Allow dfor a null string
 *  for a one-dimensional NDF.
-         IF ( NCSECT .GT. 0 ) THEN
-            CALL NDF_FIND( LOC, '(' // SECT( :NCSECT ) // ')', NDFS,
-     :                     STATUS )
-         ELSE
-            CALL NDF_FIND( LOC, '()', NDFS, STATUS )
-            CALL DAT_ANNUL( LOC, STATUS )
-         END IF
+            IF ( NCSECT .GT. 0 ) THEN
+               CALL NDF_FIND( LOC, '(' // SECT( :NCSECT ) // ')', NDFS,
+     :                        STATUS )
+            ELSE
+               CALL NDF_FIND( LOC, '()', NDFS, STATUS )
+               CALL DAT_ANNUL( LOC, STATUS )
+            END IF
 
 *  Form ranges by averaging the lines in the section, and then
 *  performing a fit, and rejecting outliers.
-         CALL KPS1_MFAUR( NDFS, JAXIS, NCLIP, CLIP, MAXRNG, NRANGE, 
-     :                    RANGES, STATUS )
+            CALL KPS1_MFAUR( NDFS, JAXIS, NCLIP, CLIP, NUMBIN, MAXRNG,
+     :                       NRANGE, RANGES, STATUS )
 
 *  Ensure that we have valid ranges before attempting to use them.
-         IF ( STATUS .NE. SAI__OK ) GOTO 999
+            IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Convert the GRID co-ordinates of the RANGES to pixel co-ordinates.
 *  Also ensure that the selected regions are within the NDF bounds.
-         DO I = 1, NRANGE
-            RANGES( I ) = MAX( MIN( DIMS( JAXIS ), RANGES( I ) ), 1 )
-     :                    + LBND( JAXIS ) - 1
-         END DO
+            DO I = 1, NRANGE
+               RANGES( I ) = MAX( MIN( DIMS( JAXIS ), RANGES( I ) ), 1 )
+     :                       + LBND( JAXIS ) - 1
+            END DO
 
 *  Record the ranges to a parameter.
-         CALL PAR_PUT1I( 'ARANGES', NRANGE, RANGES, STATUS )
+            CALL PAR_PUT1I( 'ARANGES', NRANGE, RANGES, STATUS )
+
+*  Single method
+*  -------------
+         ELSE IF ( SINGLE ) THEN
+
+*  Use NDF axis JAXIS.  Pick full extent.  Features will be flagged
+*  as bad in a mask array.
+            RANGES( 1 ) = LBND( JAXIS )
+            RANGES( 2 ) = UBND( JAXIS )
+            NRANGE = 2
+         END IF
 
 *  OK, use NDF axis JAXIS.  Pick full extent if no values were given.
       ELSE IF ( USEALL ) THEN
@@ -559,6 +665,8 @@
          RANGES( 2 ) = UBND( JAXIS )
          NRANGE = 2
 
+*  User-defined ranges
+*  -------------------
 *  Project the given ranges into pixel co-ordinates.
       ELSE
          DO I = 1, NRANGE, 2
@@ -612,16 +720,82 @@
          END DO
       END IF
 
-*  Tell the user the ranges of pixel being used.
-      CALL MSG_SETI( 'I', JAXIS )
-      CALL MSG_OUT( ' ', '   Fitting NDF axis ^I, using pixel ranges:',
-     :              STATUS )
-      DO I = 1, NRANGE, 2
-         CALL MSG_SETI( 'L', RANGES( I ) )
-         CALL MSG_SETI( 'H', RANGES( I + 1 ) )
-         CALL MSG_OUT( ' ', '      ^L : ^H ', STATUS )
-      END DO
-      CALL MSG_BLANK( STATUS )
+*  Report the ranges.
+*  ------------------
+
+*  Tell the user the ranges of pixel being used.  In the Single automatic
+*  method there are no ranges kept only flagged in each line to de-trend.
+      IF ( .NOT. SINGLE ) THEN
+
+*  Report the ranges in the current co-ordinate frame too, unless it is
+*  PIXEL.
+         IF ( AST__CURRENT .NE. IPIX ) THEN
+            DO I = 1, NRANGE, 2
+
+*  Convert the PIXEL co-ordinates back to the current Frame.
+*  If MAP has an inverse, we can use MAP directly.
+               IF ( OTOMAP .EQ. AST__NULL ) THEN
+                  PPOS( 1, JAXIS ) = RANGES( I + 1 )
+                  PPOS( 2, JAXIS ) = RANGES( I )
+
+                  CALL AST_TRANN( MAP, 2, NDIM, 2, PPOS, .FALSE., NAXC, 
+     :                            2, CPOS, STATUS )
+                  DRANGE( I + 1 ) = CPOS( 1, IAXIS )
+                  DRANGE( I ) = CPOS( 2, IAXIS )
+
+*  Otherwise, we use the single-input single-output Mapping that generates 
+*  the requested WCS axis.
+               ELSE
+                  PRANGE( I ) = DBLE( RANGES( I ) )
+                  PRANGE( I + 1 ) = DBLE( RANGES( I + 1 ) )
+                  CALL AST_TRAN1( OTOMAP, 2, PRANGE( I ), .FALSE., 
+     :                            DRANGE( I ), STATUS )
+
+               END IF
+            END DO
+
+            CALL MSG_SETI( 'I', JAXIS )
+            ATTR = 'UNIT('
+            LATTR = 5
+            CALL CHR_PUTI( IAXIS, ATTR, LATTR )
+            CALL CHR_APPND( ')', ATTR, LATTR )
+
+            CALL MSG_OUT( ' ', 
+     :                    '   Fitting NDF Axis ^I, using ranges in '/
+     :                    /'current co-ordinate Frame (pixels):',
+     :                    STATUS )
+     
+            DO I = 1, NRANGE, 2
+
+*  Get the Unit value.
+               CALL MSG_SETC( 'UNIT', AST_GETC( CFRM, ATTR( : LATTR ),
+     :                        STATUS ) )
+
+               CALL MSG_SETI( 'L', RANGES( I ) )
+               CALL MSG_SETI( 'H', RANGES( I + 1 ) )
+               CALL MSG_SETC( 'LW', AST_FORMAT( CFRM, IAXIS,
+     :                        DRANGE( I ), STATUS ) )
+               CALL MSG_SETC( 'HW', AST_FORMAT( CFRM, IAXIS, 
+     :                        DRANGE( I + 1 ), STATUS ) )
+                                
+               CALL MSG_OUT( ' ', '      ^LW : ^HW ^UNIT  (^L : ^H) ', 
+     :                       STATUS )
+            END DO
+
+*  There are only pixel co-ordinates.
+         ELSE
+            CALL MSG_SETI( 'I', JAXIS )
+            CALL MSG_OUT( ' ', 
+     :                    '   Fitting NDF Axis ^I, using pixel ranges:',
+     :                    STATUS )
+            DO I = 1, NRANGE, 2
+               CALL MSG_SETI( 'L', RANGES( I ) )
+               CALL MSG_SETI( 'H', RANGES( I + 1 ) )
+               CALL MSG_OUT( ' ', '      ^L : ^H ', STATUS )
+            END DO
+         END IF
+         CALL MSG_BLANK( STATUS )
+      END IF
 
 *  Convert ranges into indices of the NDF data arrays by correcting for
 *  the origin.
@@ -705,7 +879,7 @@
          END IF
       END IF
 
-*  Allocate various workspaces. 
+*  Allocate various workspaces.
 *  ============================
 
 *  The requirements for the workspaces depends on the dimensionality. 
@@ -734,6 +908,63 @@
       CALL PSX_CALLOC( AREA * ( ORDER + 1 ), '_INTEGER', IPWRK2,
      :                 STATUS )
 
+*  Make workspace to store a byte mask (to reduce storage required).
+      IF ( SINGLE ) THEN
+         CALL PSX_CALLOC( EL, '_BYTE', IPMASK, STATUS )
+
+*  Create a valid pointer for KPS1_LFTx and KPS1_MFRMx calls.
+      ELSE
+         IPMASK = IPDAT( 1 )
+      END IF
+
+*  Check that we obtained the workspace before attempting to use it.
+      IF ( STATUS .NE. SAI__OK ) GOTO 999
+
+*  Create the mask for Single method.
+*  ==================================
+      IF ( SINGLE ) THEN
+
+*  Form ranges by averaging the lines in the section, and then
+*  performing a fit, and rejecting outliers.
+         CALL KPS1_MFSB( INNDF, JAXIS, NCLIP, CLIP, NUMBIN,
+     :                   %VAL( CNF_PVAL( IPMASK ) ), STATUS )
+
+*  Start a new error context.
+         CALL ERR_MARK
+            
+*  Write the mask to a new NDF.  We do not require quality and variance.
+         CALL LPG_PROP( INNDF, 'Units,Label,Axis,WCS', 'MASK', MSKNDF,
+     :                  STATUS )
+
+         IF ( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+
+         ELSE IF ( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_RLSE
+            GO TO 999
+
+         ELSE
+
+*  Set the data type.
+            CALL NDF_STYPE( '_BYTE', MSKNDF, 'Data', STATUS )
+
+*  Copy the mask array to the created NDF.
+            CALL KPG1_MAP( MSKNDF, 'Data', '_BYTE', 'WRITE', IPMN, EL,
+     :                     STATUS )
+            CALL KPG1_COPY( '_BYTE', EL, IPMASK, IPMN, STATUS )
+
+*  Create a title.
+            CALL NDF_CPUT( 'KAPPA - Mfittrend - Mask', MSKNDF, 'TITLE',
+     :                     STATUS )
+
+*  We are done with the mask NDF.  This will unmap too.
+            CALL NDF_ANNUL( MSKNDF, STATUS )
+         END IF
+
+*  Release the error context.
+         CALL ERR_RLSE
+      END IF
+
 *  Determine the fits.
 *  ===================
 
@@ -741,11 +972,12 @@
 *  higher dimensional data, or just mapping the intersection of ranges, 
 *  or individual ranges, but that would only be good if working with the
 *  last axis (need contiguity).
-      IF ( USEVAR .OR. HASBAD ) THEN
+      IF ( USEVAR .OR. HASBAD .OR. SINGLE ) THEN
          IF ( ITYPE .EQ. '_BYTE' ) THEN
             CALL KPS1_LFTB( ORDER, JAXIS, RANGES, NRANGE, USEVAR,
-     :                      %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
-     :                      %VAL( CNF_PVAL( IPVAR( 1 ) ) ), DIMS,
+     :                      %VAL( CNF_PVAL( IPVAR( 1 ) ) ), 
+     :                      SINGLE, %VAL( CNF_PVAL( IPMASK ) ),
+     :                      DIMS, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                      %VAL( CNF_PVAL( IPAS ) ),
      :                      %VAL( CNF_PVAL( IPBS ) ),
      :                      %VAL( CNF_PVAL( IPWRK1 ) ),
@@ -753,8 +985,9 @@
 
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
             CALL KPS1_LFTUB( ORDER, JAXIS, RANGES, NRANGE, USEVAR,
-     :                       %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
-     :                       %VAL( CNF_PVAL( IPVAR( 1 ) ) ), DIMS,
+     :                       %VAL( CNF_PVAL( IPVAR( 1 ) ) ), 
+     :                       SINGLE, %VAL( CNF_PVAL( IPMASK ) ),
+     :                       DIMS, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                       %VAL( CNF_PVAL( IPAS ) ),
      :                       %VAL( CNF_PVAL( IPBS ) ),
      :                       %VAL( CNF_PVAL( IPWRK1 ) ),
@@ -762,8 +995,9 @@
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL KPS1_LFTD( ORDER, JAXIS, RANGES, NRANGE, USEVAR,
-     :                      %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
-     :                      %VAL( CNF_PVAL( IPVAR( 1 ) ) ), DIMS,
+     :                      %VAL( CNF_PVAL( IPVAR( 1 ) ) ), 
+     :                      SINGLE, %VAL( CNF_PVAL( IPMASK ) ),
+     :                      DIMS, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                      %VAL( CNF_PVAL( IPAS ) ),
      :                      %VAL( CNF_PVAL( IPBS ) ),
      :                      %VAL( CNF_PVAL( IPWRK1 ) ),
@@ -771,8 +1005,9 @@
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL KPS1_LFTI( ORDER, JAXIS, RANGES, NRANGE, USEVAR,
-     :                      %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
-     :                      %VAL( CNF_PVAL( IPVAR( 1 ) ) ), DIMS,
+     :                      %VAL( CNF_PVAL( IPVAR( 1 ) ) ), 
+     :                      SINGLE, %VAL( CNF_PVAL( IPMASK ) ),
+     :                      DIMS, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                      %VAL( CNF_PVAL( IPAS ) ),
      :                      %VAL( CNF_PVAL( IPBS ) ),
      :                      %VAL( CNF_PVAL( IPWRK1 ) ),
@@ -780,8 +1015,9 @@
 
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL KPS1_LFTR( ORDER, JAXIS, RANGES, NRANGE, USEVAR,
-     :                      %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
-     :                      %VAL( CNF_PVAL( IPVAR( 1 ) ) ), DIMS,
+     :                      %VAL( CNF_PVAL( IPVAR( 1 ) ) ), 
+     :                      SINGLE, %VAL( CNF_PVAL( IPMASK ) ),
+     :                      DIMS, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                      %VAL( CNF_PVAL( IPAS ) ),
      :                      %VAL( CNF_PVAL( IPBS ) ),
      :                      %VAL( CNF_PVAL( IPWRK1 ) ),
@@ -789,8 +1025,9 @@
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
             CALL KPS1_LFTW( ORDER, JAXIS, RANGES, NRANGE, USEVAR,
-     :                      %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
-     :                      %VAL( CNF_PVAL( IPVAR( 1 ) ) ), DIMS,
+     :                      %VAL( CNF_PVAL( IPVAR( 1 ) ) ), 
+     :                      SINGLE, %VAL( CNF_PVAL( IPMASK ) ),
+     :                      DIMS, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                      %VAL( CNF_PVAL( IPAS ) ),
      :                      %VAL( CNF_PVAL( IPBS ) ),
      :                      %VAL( CNF_PVAL( IPWRK1 ) ),
@@ -798,8 +1035,9 @@
 
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
             CALL KPS1_LFTUW( ORDER, JAXIS, RANGES, NRANGE, USEVAR,
-     :                       %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
-     :                       %VAL( CNF_PVAL( IPVAR( 1 ) ) ), DIMS,
+     :                       %VAL( CNF_PVAL( IPVAR( 1 ) ) ), 
+     :                       SINGLE, %VAL( CNF_PVAL( IPMASK ) ),
+     :                       DIMS, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
      :                       %VAL( CNF_PVAL( IPAS ) ),
      :                       %VAL( CNF_PVAL( IPBS ) ),
      :                       %VAL( CNF_PVAL( IPWRK1 ) ),
@@ -807,7 +1045,8 @@
          END IF
       ELSE
 
-*  No variances and no bad values, use fastest method.
+*  As there are no variances, no bad values and no mask, we can use 
+*  the fastest method.
          IF ( ITYPE .EQ. '_BYTE' ) THEN
             CALL KPS1_LFTQB( ORDER, JAXIS, RANGES, NRANGE,
      :                       %VAL( CNF_PVAL( IPDAT( 1 ) ) ), DIMS,
@@ -866,7 +1105,7 @@
          END IF
       END IF
 
-* Free up the workspace at the earliest opportunity.
+*  Free up the workspace at the earliest opportunity.
       CALL PSX_FREE( IPAS, STATUS )
       CALL PSX_FREE( IPWRK1, STATUS )
       CALL PSX_FREE( IPWRK2, STATUS )
@@ -876,9 +1115,10 @@
 
 *  Subtract the result from the NDF data or write the evaluated fit.
 *  If evaluating, then we need to map in the data component, may as
-*  well release the input one to save VM.  Note that if resiual reject
+*  well release the input one to save VM.  Note that if residual reject
 *  of points is requested that the IPDAT pointer would be overloaded.
 *  So retain the original pointer for the subtraction forming residuals.
+*  Use the masked array for the Single method.
       IF ( .NOT. SUBTRA ) THEN
          IF ( CLIPRE ) THEN
             IPIN = IPDAT( 1 )
@@ -935,8 +1175,9 @@
 *  Form residuals.
 *  ===============
 
-*  If no detrended data calculated, i.e. the residuals, need to form 
-*  the residuals to reject their outliers.
+*  If no de-trended data calculated, i.e. the residuals, need to form 
+*  the residuals to reject their outliers.  Used the masked array for
+*  the Single method.
       IF ( CLIPRE ) THEN
          IF ( .NOT. SUBTRA ) THEN
             CALL PSX_CALLOC( EL, ITYPE, IPRES, STATUS )
@@ -967,11 +1208,11 @@
      :                        %VAL( CNF_PVAL( IPRES ) ),
      :                        IERR, NERR, STATUS )
  
-            ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-               CALL VEC_SUBR( HASBAD, EL, %VAL( CNF_PVAL( IPIN ) ),
-     :                        %VAL( CNF_PVAL( IPDAT( 1 ) ) ), 
-     :                        %VAL( CNF_PVAL( IPRES ) ),
-     :                        IERR, NERR, STATUS )
+             ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+                CALL VEC_SUBR( HASBAD, EL, %VAL( CNF_PVAL( IPIN ) ),
+     :                         %VAL( CNF_PVAL( IPDAT( 1 ) ) ), 
+     :                         %VAL( CNF_PVAL( IPRES ) ),
+     :                         IERR, NERR, STATUS )
  
             ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                CALL VEC_SUBW( HASBAD, EL, %VAL( CNF_PVAL( IPIN ) ),
@@ -988,7 +1229,8 @@
 
 *  Done with the input data array.
             CALL NDF_UNMAP( INNDF, 'DATA', STATUS )
-
+ 
+*  Use the existing residuals map.
          ELSE
             IPRES = IPDAT( 1 )
          END IF
@@ -1000,42 +1242,49 @@
 *  Derive the the rms of the residuals in the fitting ranges.
          IF ( ITYPE .EQ. '_BYTE' ) THEN
             CALL KPS1_MFRMB( JAXIS, NRANGE, RANGES, CLPRMS, DIMS, 
+     :                       SINGLE, %VAL( CNF_PVAL( IPMASK ) ),
      :                       %VAL( CNF_PVAL( IPRES ) ),
      :                       %VAL( CNF_PVAL( IPCOL ) ), 
      :                       %VAL( CNF_PVAL( IPWRK3 ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
             CALL KPS1_MFRMUB( JAXIS, NRANGE, RANGES, CLPRMS, DIMS, 
+     :                        SINGLE, %VAL( CNF_PVAL( IPMASK ) ),
      :                        %VAL( CNF_PVAL( IPRES ) ),
      :                        %VAL( CNF_PVAL( IPCOL ) ), 
      :                        %VAL( CNF_PVAL( IPWRK3 ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL KPS1_MFRMD( JAXIS, NRANGE, RANGES, CLPRMS, DIMS, 
+     :                       SINGLE, %VAL( CNF_PVAL( IPMASK ) ),
      :                       %VAL( CNF_PVAL( IPRES ) ),
      :                       %VAL( CNF_PVAL( IPCOL ) ), 
      :                       %VAL( CNF_PVAL( IPWRK3 ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL KPS1_MFRMI( JAXIS, NRANGE, RANGES, CLPRMS, DIMS, 
+     :                       SINGLE, %VAL( CNF_PVAL( IPMASK ) ),
      :                       %VAL( CNF_PVAL( IPRES ) ),
      :                       %VAL( CNF_PVAL( IPCOL ) ), 
      :                       %VAL( CNF_PVAL( IPWRK3 ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL KPS1_MFRMR( JAXIS, NRANGE, RANGES, CLPRMS, DIMS, 
+     :                       SINGLE, %VAL( CNF_PVAL( IPMASK ) ),
      :                       %VAL( CNF_PVAL( IPRES ) ),
      :                       %VAL( CNF_PVAL( IPCOL ) ), 
      :                       %VAL( CNF_PVAL( IPWRK3 ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
             CALL KPS1_MFRMW( JAXIS, NRANGE, RANGES, CLPRMS, DIMS, 
+     :                       SINGLE, %VAL( CNF_PVAL( IPMASK ) ),
      :                       %VAL( CNF_PVAL( IPRES ) ),
      :                       %VAL( CNF_PVAL( IPCOL ) ), 
      :                       %VAL( CNF_PVAL( IPWRK3 ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
             CALL KPS1_MFRMUW( JAXIS, NRANGE, RANGES, CLPRMS, DIMS, 
+     :                        SINGLE, %VAL( CNF_PVAL( IPMASK ) ),
      :                        %VAL( CNF_PVAL( IPRES ) ),
      :                        %VAL( CNF_PVAL( IPCOL ) ), 
      :                        %VAL( CNF_PVAL( IPWRK3 ) ), STATUS )
@@ -1045,12 +1294,12 @@
          CALL PSX_FREE( IPWRK3, STATUS )
 
 *  Propagate the bad values to the output.  Recall that if the data 
-*  were already detrended then the array supplied to and amended in
+*  were already de-trended then the array supplied to and amended in
 *  KPS1_MFRM is the output array.
          IF ( .NOT. SUBTRA ) THEN
             
             IF ( ITYPE .EQ. '_BYTE' ) THEN
-               CALL KPG1_CPBDB( EL, %VAL( CNF_PVAL( IPDAT ) ), 
+               CALL KPG1_CPBDB( EL, %VAL( CNF_PVAL( IPDAT( 1 ) ) ), 
      :                          %VAL( CNF_PVAL( IPRES ) ), 
      :                          %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
             ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
@@ -1085,6 +1334,7 @@
             CALL PSX_FREE( IPRES, STATUS )
          END IF
       END IF
+      IF ( SINGLE ) CALL PSX_FREE( IPMASK, STATUS )
 
 *  Obtain the output title and insert it into the result NDF.
       IF ( MODIN ) THEN

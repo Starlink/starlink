@@ -13043,11 +13043,39 @@ iraf! {
             helpkey *
           }
 
+         parameter mask {
+            type NDF
+            access WRITE
+            vpath DEFAULT
+            ppath GLOBAL CURRENT
+            prompt {NDF for the feature mask}
+            helpkey *
+            default !
+          }
+
+         parameter method {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default Region
+            prompt {Method to define masked regions in automatic mode}
+            helpkey *
+          }
+
          parameter modifyin {
             type _LOGICAL
             prompt {Modify the input NDF}
             vpath DEFAULT
             default FALSE
+            helpkey *
+          }
+
+         parameter numbin {
+            type _INTEGER
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default 32
+            prompt {Number of bins for automatic feature rejection}
             helpkey *
           }
 

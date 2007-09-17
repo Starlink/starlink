@@ -16,17 +16,17 @@
 
 *  Description:
 *     The regions encompassing the non-bad elements are determined.
-*     The ranges are resclaed by the binning factor.
+*     The ranges are rescaled by the binning factor.
 
 *  Arguments:
 *     COMPRS = INTEGER (Given)
 *        The binning factor, i.e. the number of elements of the original
-*        unbinned array were ccombined to form one element of ARRAY.
+*        unbinned array were combined to form one element of ARRAY.
 *     CLIP( NCLIP ) = REAL (Given)
 *        The clipping levels in standard deviations for the rejection 
 *        of outliers.
 *     EL = INTEGER (Given)
-*        The number of elements in the line to analysed.
+*        The number of elements in the line to be analysed.
 *     ARRAY( EL ) = ? (Given)
 *        The binned and averaged array.
 *     MAXRNG = INTEGER (Given)
@@ -97,10 +97,6 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Constants:
-      INTEGER OPTBIN              ! Nominal number of bins
-      PARAMETER ( OPTBIN = 32 )
-
 *  Local Variables:
       INTEGER I                  ! Loop counter
       INTEGER K                  ! Loop counter
@@ -121,6 +117,7 @@
       R = 1
       START = .FALSE.
 
+*  Locate the first non-bad element.
       DO WHILE ( I .LE. EL .AND. .NOT. START )
          IF ( ARRAY( I ) .EQ. VAL__BAD<T> ) THEN
             I = I + 1
@@ -139,6 +136,9 @@
          GOTO 999
       END IF
 
+*  Scale the location of the bad values in the compressed array
+*  into the start of a range in the original grid co-ordinates, subject
+*  to the supplied maximum number of ranges.
       I = I + 1
       DO WHILE ( I .LE. EL .AND. R .LE. MAXRNG )
          IF ( ARRAY( I ) .EQ. VAL__BAD<T> ) THEN
