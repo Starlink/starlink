@@ -16745,7 +16745,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          more of the display surface at the cost of different spatial
          scales, and when the spatial axes have markedly different
          dimensions.  The dynamic default is {\tt TRUE} if either of the
-         spatial diensions is one. and {\tt FALSE} otherwise.  {\tt []}
+         spatial dimensions is one. and {\tt FALSE} otherwise.  {\tt []}
       }
       \sstsubsection{
          KEY = \_LOGICAL (Read)
@@ -19181,14 +19181,14 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          good).  {\tt [FALSE]}
       }
       \sstsubsection{
-         REF = NDF (Read)
-      }{
-         NDF containing the bad pixels to be copied to OUT.
-      }
-      \sstsubsection{
          OUT = NDF (Write)
       }{
          The output NDF.
+      }
+      \sstsubsection{
+         REF = NDF (Read)
+      }{
+         NDF containing the bad pixels to be copied to OUT.
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
@@ -20580,7 +20580,8 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          supplied for XMAGN, resulting in all pixels being displayed as
          squares on the display surface.  If a {\tt FALSE} value is supplied for
          SQRPIX, then the default value for YMAGN is chosen to retain the 
-         pixels original aspect ratio.  {\tt [}current value{\tt{]}}
+         pixels original aspect ratio at the centre of the image. 
+         {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          STYLE = \htmlref{GROUP}{se:groups} (Read)
@@ -53229,6 +53230,18 @@ The following applications have been modified:
       \end{itemize}
 
 \end{description}
+
+\subsection{General Changes}
+\begin{itemize}
+
+   \item Graphics tasks that draw over an existing plot, such as
+   \htmlref{LINPLOT}{LINPLOT}, no longer store WCS information in the
+   graphics database when the device is not cleared.  Alignment is
+   with the DATA picture first plotted.  This change makes
+   overplotting of data progressively faster as more plots are
+   overlaid, and it avoids the graphics database growing rapidly.  
+
+\end{itemize}
 
 \begin{latexonly}
 \newpage
