@@ -8,7 +8,7 @@
 int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
                                 int dims[ 3 ], int skip[ 3 ], int slbnd[ 3 ],
                                 double rms, AstKeyMap *config, int *ipa, 
-                                int ilevel, int *status ){
+                                int ilevel, int perspectrum, int *status ){
 /*
 *+
 *  Name:
@@ -24,7 +24,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 *     int cupidFWMain<X>( CGEN_TYPE *array, int nel, int ndim, int dims[ 3 ], 
 *                         int skip[ 3 ], int slbnd[ 3 ], double rms, 
 *                         AstKeyMap *config, int *ipa, int ilevel, 
-*                         int *status )
+*                         int perspectrum, int *status )
 
 *  Description:
 *     This function decide which clump each data pixel belongs to and fills 
@@ -79,6 +79,13 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 *        not in a clump are assigned -1.
 *     ilevel
 *        Amount of information to display.
+*     perspectrum
+*        If non-zero, then each spectrum is processed independently of its
+*        neighbours. A clump that extends across several spectra will be 
+*        split into multiple clumps, each restricted to a single spectrum.
+*        The non-zero value supplied should be the 1-based axis index of
+*        the spectral pixel axis. Should be supplied as zero if "ndim" is
+*        not 3.
 *     status
 *        Pointer to the inherited status value.
 
@@ -95,6 +102,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -123,6 +131,8 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 *     21-MAR-2007 (DSB):
 *        - Improve cleaning of initial mask for 1 and 2 D cases
 *        - Extend diagnostic facilities.
+*     17-SEP-2007 (DSB):
+*        Added "perspectrum" parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -132,7 +142,6 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 */
 
 /* Local Variables: */
-
    CGEN_TYPE *pd;  /* Pointer to next "array" value */
    double *peak_values; /* Pointer to array holding peak value in each clump */
    double flat[ 4 ];/* Array containing most recent data values along route */
@@ -194,6 +203,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    int route_length;/* Number of pixels stored in "route" array */
    int skip0;      /* Total skip from centre to first 3x3x3 neighbour */
    int skip1;      /* Total skip from centre to first extended neighbour */
+   int xlim;       /* Number of x planes in 3x3x3 neighbourhood */
    int ylim;       /* Number of y planes in 3x3x3 neighbourhood */
    int zlim;       /* Number of z planes in 3x3x3 neighbourhood */
 
@@ -301,13 +311,51 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
       count = 0;
 
 /* Store some useful constants. */
-      skip0 = skip[ 0 ] + skip[ 1 ] + skip[ 2 ];
+      if( perspectrum == 1 ) {
+         skip0 = skip[ 0 ];
+      } else if( perspectrum == 2 ) {
+         skip0 = skip[ 1 ];
+      } else if( perspectrum == 3 ) {
+         skip0 = skip[ 2 ];
+      } else {
+         skip0 = skip[ 0 ] + skip[ 1 ] + skip[ 2 ];
+      }
+
       skip1 = maxjump*skip0;
-      zlim = ( ndim > 2 ) ? 3 : 1;
-      ylim = ( ndim > 1 ) ? 3 : 1;
-      nsz = ( ndim > 2 ) ? maxjump : 0;
-      nsy = ( ndim > 1 ) ? maxjump : 0;
-      nsx = maxjump;
+
+      if( perspectrum == 1 ) {
+         xlim = 3;
+         ylim = 0;
+         zlim = 0;
+         nsx = maxjump;
+         nsy = 0;
+         nsz = 0;
+
+      } else if( perspectrum == 2 ) {
+         xlim = 0;
+         ylim = 3;
+         zlim = 0;
+         nsx = 0;
+         nsy = maxjump;
+         nsz = 0;
+
+      } else if( perspectrum == 3 ) {
+         xlim = 0;
+         ylim = 0;
+         zlim = 3;
+         nsx = 0;
+         nsy = 0;
+         nsz = maxjump;
+
+      } else {
+         xlim = 3;
+         ylim = ( ndim > 1 ) ? 3 : 1;
+         zlim = ( ndim > 2 ) ? 3 : 1;
+         nsx = maxjump;
+         nsy = ( ndim > 1 ) ? maxjump : 0;
+         nsz = ( ndim > 2 ) ? maxjump : 0;
+      }
+
       lpercent = 0;
 
 /* Scan through the "work" array, looking for usable pixels which have not
@@ -390,11 +438,11 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    sqrt(2) or sqrt(3) pixels, and can be determined from the number of axes 
    (0, 1, 2 or 3) on which the neighbouring pixel has zero displacement from 
    the central test pixel. "nzero" counts the number of such axes. */
-                     nzero = 3 - ndim;
+                     nzero = perspectrum ? 2 : 3 - ndim;
 
 /* Check the 3x3x3 cube of neighbouring pixels, and determine the one
    with the highest gradient. */
-                     ixoff = iix - 1;
+                     ixoff = iix - xlim/2;
                      iyoff = iiy - ylim/2;
                      izoff = iiz - zlim/2;
 
@@ -408,7 +456,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
                         jvy = jvz;
                         for( jy = 0; jy < ylim; jy++ ) {
                            jvx = jvy;
-                           for( jx = 0; jx < 3; jx++ ) {
+                           for( jx = 0; jx < xlim; jx++ ) {
 
 /* Ignore unusable pixels (which includes edge pixels), but not pixels which 
    have already been assigned to another clump. Also skip the central pixel 
@@ -637,7 +685,11 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    each output pixels by the most commonly occuring value within a 3x3x3 
    cube of input pixels centred on the output pixel. Repeat this process
    a number of times as given by configuration parameter CleanIter. */
-   cleaniter = cupidConfigI( config, "CLEANITER", 1, status );
+   if( ! perspectrum ) {
+      cleaniter = cupidConfigI( config, "CLEANITER", 1, status );
+   } else {
+      cleaniter = 0;
+   }
 
    if( ilevel > 1 ) msgOut( "", "Cleaning clumps", status );
    m1 = work;
@@ -668,7 +720,8 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    clumps. */
    if( ilevel > 1 ) msgOut( "", "Merging adjoining clumps", status );
    CGEN_FUNCTION(cupidFWJoin)( array, nel, ndim, dims, skip, rms, config, 
-                               ipa, peak_values, &ret, ilevel, status );
+                               ipa, peak_values, &ret, ilevel, perspectrum,
+                               status );
    if( ilevel > 1 ) msgOut( "", "Merging completed", status );
 
 /* If required, dump the merged clump mask. */

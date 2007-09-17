@@ -8,7 +8,8 @@
 
 HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                         double *ipv, double rms, AstKeyMap *config, int velax,
-                        int ilevel, double beamcorr[ 3 ], int *status ){
+                        int ilevel, int perspectrum, double beamcorr[ 3 ], 
+                        int *status ){
 /*
 *+
 *  Name:
@@ -25,7 +26,8 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, 
 *                             void *ipd, double *ipv, double rms, 
 *                             AstKeyMap *config, int velax, int ilevel,
-*                             double beamcorr[ 3 ], int *status )
+*                             int perspectrum, double beamcorr[ 3 ], 
+*                             int *status )
 
 *  Description:
 *     This function identifies clumps within a 1, 2 or 3 dimensional data
@@ -65,6 +67,11 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        used if "ndim" is 3. 
 *     ilevel
 *        Amount of screen information to display.
+*     perspectrum
+*        If non-zero, then each spectrum is processed independently of its
+*        neighbours. A clump that extends across several spectra will be 
+*        split into multiple clumps, each restricted to a single spectrum.
+*        Only used if "ndim" is 3.
 *     beamcorr
 *        An array in which is returned the FWHM (in pixels) describing the
 *        instrumental smoothing along each pixel axis. The clump widths
@@ -82,6 +89,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -107,6 +115,8 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *  History:
 *     29-SEP-2005 (DSB):
 *        Original version.
+*     17-SEP-2007 (DSB):
+*        Added "perspectrum" parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -176,10 +186,17 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    astMapPut0A( cfconfig, CUPID__CONFIG, astCopy( config ), NULL );
 
 /* Return the instrumental smoothing FWHMs */
-   beamcorr[ 0 ] = cupidConfigD( cfconfig, "FWHMBEAM", 2.0, status );
-   beamcorr[ 1 ] = beamcorr[ 0 ];
-   if( ndim == 3 ) {
-      beamcorr[ 2 ] = beamcorr[ 0 ];
+   if( !perspectrum ) { 
+      beamcorr[ 0 ] = cupidConfigD( cfconfig, "FWHMBEAM", 2.0, status );
+      beamcorr[ 1 ] = beamcorr[ 0 ];
+      if( ndim == 3 ) {
+         beamcorr[ 2 ] = beamcorr[ 0 ];
+         beamcorr[ velax ]= cupidConfigD( cfconfig, "VELORES", 2.0, status );
+      }
+   } else {
+      beamcorr[ 0 ] = 0.0;
+      beamcorr[ 1 ] = 0.0;
+      beamcorr[ 2 ] = 0.0;
       beamcorr[ velax ]= cupidConfigD( cfconfig, "VELORES", 2.0, status );
    }
 
@@ -187,8 +204,14 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    allow_edge = cupidConfigI( cfconfig, "ALLOWEDGE", 0, status );
 
 /* Get the value which defines whether two pixels are neighbours or not.
-   The default value is equalto the number of axes in the data array. */
-   naxis = cupidConfigI( cfconfig, "NAXIS", ndim, status );
+   The default value is equal to the number of axes in the data array. If
+   we are processing each spectrum indepdently, then we always use a value
+   of 1. */
+   if( !perspectrum ) {
+      naxis = cupidConfigI( cfconfig, "NAXIS", ndim, status );
+   } else {
+      naxis = 1;
+   }
 
 /* Get the RMS noise level to use. */
    rms = cupidConfigD( cfconfig, "RMS", rms, status );
@@ -280,6 +303,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    will find no pixels. */
          if( clevel <= maxrem ) {
             clumps = cupidCFScan( type, ipd, ipa, el, ndim, dims, skip, 
+                                  ( ndim == 3 && perspectrum ) ? ( velax + 1 ) : 0,
                                   clumps, idl, clevel, &index, naxis, ilevel,
                                   idl || ilev < nlevels - 1, slbnd, &maxrem, status );
 
@@ -292,7 +316,10 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       if( ilevel > 1 ) msgBlank( status );
 
 /* Get the minimum number of pixels allowed in a clump.*/
-      if( nlevels > 1 ) {
+      if( perspectrum ) {
+         minpix = 3;
+
+      } else if( nlevels > 1 ) {
          minpix = cupidDefMinPix( ndim, beamcorr, levels[ nlevels - 1 ],
                                                   levels[ nlevels - 2 ], status );
       } else {
@@ -319,9 +346,10 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                nedge++; 
                clumps[ ii ] = cupidCFFreePS( ps, NULL, 0, status );
 
-            } else if( ps->lbnd[ 0 ] == ps->ubnd[ 0 ] || 
+            } else if( ( ndim < 3 || !perspectrum ) && ( 
+                         ps->lbnd[ 0 ] == ps->ubnd[ 0 ] || 
                        ( ps->lbnd[ 1 ] == ps->ubnd[ 1 ] && ndim > 1 ) || 
-                       ( ps->lbnd[ 2 ] == ps->ubnd[ 2 ] && ndim > 2 ) ) {
+                       ( ps->lbnd[ 2 ] == ps->ubnd[ 2 ] && ndim > 2 ) ) ) {
                nthin++;           
                clumps[ ii ] = cupidCFFreePS( ps, NULL, 0, status );
 

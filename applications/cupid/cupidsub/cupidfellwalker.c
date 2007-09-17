@@ -9,7 +9,8 @@
 
 HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                          double *ipv, double rms, AstKeyMap *config, int velax,
-                         int ilevel, double beamcorr[ 3 ], int *status ){
+                         int ilevel, int perspectrum, double beamcorr[ 3 ], 
+                         int *status ){
 /*
 *+
 *  Name:
@@ -26,7 +27,8 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, 
 *                              void *ipd, double *ipv, double rms, 
 *                              AstKeyMap *config, int velax, int ilevel,
-*                              double beamcorr[ 3 ], int *status )
+*                              int perspectrum, double beamcorr[ 3 ], 
+*                              int *status )
 
 *  Description:
 *     This function identifies clumps within a 1, 2 or 3 dimensional data
@@ -95,6 +97,11 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        used if "ndim" is 3. 
 *     ilevel
 *        Amount of screen information to display (in range zero to 6).
+*     perspectrum
+*        If non-zero, then each spectrum is processed independently of its
+*        neighbours. A clump that extends across several spectra will be 
+*        split into multiple clumps, each restricted to a single spectrum.
+*        Only used if "ndim" is 3.
 *     beamcorr
 *        An array in which is returned the FWHM (in pixels) describing the
 *        instrumental smoothing along each pixel axis. The clump widths
@@ -112,6 +119,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -139,6 +147,8 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        Original version.
 *     22-JUN-2007 (DSB):
 *        Add rejection of clumps that touch the edge of an array.
+*     17-SEP-2007 (DSB):
+*        Added "perspectrum" parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -215,10 +225,17 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    astMapPut0A( fwconfig, CUPID__CONFIG, astCopy( config ), NULL );
 
 /* Return the instrumental smoothing FWHMs */
-   beamcorr[ 0 ] = cupidConfigD( fwconfig, "FWHMBEAM", 2.0, status );
-   beamcorr[ 1 ] = beamcorr[ 0 ];
-   if( ndim == 3 ) {
-      beamcorr[ 2 ] = beamcorr[ 0 ];
+   if( ! perspectrum ) {
+      beamcorr[ 0 ] = cupidConfigD( fwconfig, "FWHMBEAM", 2.0, status );
+      beamcorr[ 1 ] = beamcorr[ 0 ];
+      if( ndim == 3 ) {
+         beamcorr[ 2 ] = beamcorr[ 0 ];
+         beamcorr[ velax ]= cupidConfigD( fwconfig, "VELORES", 2.0, status );
+      }
+   } else {
+      beamcorr[ 0 ] = 0.0;
+      beamcorr[ 1 ] = 0.0;
+      beamcorr[ 2 ] = 0.0;
       beamcorr[ velax ]= cupidConfigD( fwconfig, "VELORES", 2.0, status );
    }
 
@@ -247,7 +264,8 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Assign every data pixel to a clump and stores the clumps index in the
    corresponding pixel in "ipa". */
    maxid = cupidFWMain( type, ipd, el, ndim, dims, skip, slbnd, rms, fwconfig,
-                        ipa, ilevel, status );
+                        ipa, ilevel, 
+                        ( ndim > 2 && perspectrum ) ? velax + 1 : 0, status );
 
 /* Abort if no clumps found. */
    if( maxid < 0 ) {
@@ -286,7 +304,11 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       allow_edge = cupidConfigI( fwconfig, "ALLOWEDGE", 1, status );
 
 /* Get the minimum allowed number of pixels in a clump. */
-      minpix = cupidDefMinPix( ndim, beamcorr, noise, minhgt, status );
+      if( ! perspectrum ) {
+         minpix = cupidDefMinPix( ndim, beamcorr, noise, minhgt, status );
+      } else {
+         minpix = 3;
+      }
       minpix = cupidConfigI( fwconfig, "MINPIX", minpix, status );
 
 /* Initialise a list to hold zero for every clump id. These values are
@@ -372,9 +394,10 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          } else if( peakvals[ i ] < minhgt ) {
             nlow++;
 
-         } else if( clbnd[ j ] == cubnd[ j ] || 
+         } else if( ( ndim < 3 || !perspectrum ) && 
+                  ( clbnd[ j ] == cubnd[ j ] || 
                   ( clbnd[ j + 1 ] == cubnd[ j + 1 ] && ndim > 1 ) || 
-                  ( clbnd[ j + 2 ] == cubnd[ j + 2 ] && ndim > 2 ) ) {
+                  ( clbnd[ j + 2 ] == cubnd[ j + 2 ] && ndim > 2 ) ) ) {
             nthin++;           
 
          } else if ( !allow_edge && ( 

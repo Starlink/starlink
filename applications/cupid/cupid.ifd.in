@@ -342,6 +342,16 @@ package cupid {
             helpkey *
           }
 
+         parameter perspectrum {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Process spectra indepdently of neighbouring spectra?}
+            default FALSE
+            helpkey *
+          }
+
          parameter qout {
             type NDF
             access WRITE

@@ -5,8 +5,8 @@
 
 CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel, 
                                             int ndim, int dims[3], int skip[3],
-                                            CupidPixelSet **clumps, int idl,
-                                            double clevel, int *index,
+                                            int perspectrum, CupidPixelSet **clumps, 
+                                            int idl, double clevel, int *index,
                                             int naxis, int ilevel, int newok,
                                             int *slbnd, double *maxpd,
                                             int *status ){
@@ -24,10 +24,10 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 *  Synopsis:
 *     CupidPixelSet **cupidCFScan<X>( CGEN_TYPE *ipd, int *ipa, int nel, 
 *                                     int ndim, int dims[3], int skip[3], 
-*                                     CupidPixelSet **clumps, int idl,
-*                                     double clevel, int *index, int naxis,
-*                                     int ilevel, int newok, int *slbnd, 
-*                                     double *maxpd, int *status )
+*                                     int perspectrum, CupidPixelSet **clumps, 
+*                                     int idl, double clevel, int *index, 
+*                                     int naxis, int ilevel, int newok, 
+*                                     int *slbnd, double *maxpd, int *status )
 
 *  Description:
 *     This function scans the data array for pixels at or above the
@@ -62,6 +62,13 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 *        the array using a single 1D vector index and using nD coords. This
 *        array should have 3 elements even if "ndim" is less than 3, and
 *        the extra elements should be filled with zero's.
+*     perspectrum
+*        If non-zero, then each spectrum is processed independently of its
+*        neighbours. A clump that extends across several spectra will be 
+*        split into multiple clumps, each restricted to a single spectrum.
+*        The non-zero value supplied should be the 1-based axis index of
+*        the spectral pixel axis. Should be supplied as zero if "ndim" is
+*        not 3.
 *     clumps
 *        An array of pointers, each locating a PixelSet structure. The
 *        number of pointers in the array is given by the supplied value 
@@ -93,7 +100,8 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 *        of a specified central pixel. Should be in the range 1 to "ndim". 
 *        For a pixel to be considered to be a neighbour of another pixel,
 *        the two pixels must be no more than 1 pixel away along no more than 
-*        "naxis" axes.
+*        "naxis" axes. The supplied value is ignored and a value of 1 is
+*        used if "perspectrum" is non-zero.
 *     ilevel
 *        Diagnostic information level.
 *     newok
@@ -133,6 +141,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -158,6 +167,8 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 *  History:
 *     24-NOV-2005 (DSB):
 *        Original version.
+*     17-SEP-2007 (DSB):
+*        Added "perspectrum" parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -167,7 +178,6 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 */
 
 /* Local Variables: */
-
    CGEN_TYPE *pd;        /* Pointer to next data pixel */
    CupidPixelSet **ret;  /* The returned pointer */
    CupidPixelSet *ops;   /* Pointer to neighbouring PixelSet */
@@ -241,7 +251,8 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    different types of PixelSets; those which were identified at this contour
    level, and those which were identified at higher contour levels. */
                      cupidCFNebs( ipa, i, x, ndim, dims, skip, hindex, 
-                                  naxis, &n1, &il1,  i1, &n2, &il2, ret, status );
+                                  perspectrum, naxis, &n1, &il1,  i1, &n2, 
+                                  &il2, ret, status );
 
 /* If none of the neighbours of this pixel are assigned to a PixelSet which 
    was identified at this contour level, then we start a new PixelSet. */
@@ -336,7 +347,8 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    transferred out of the new PixelSet.*/
          if( !idl ) {
             while( 1 ) {
-               if( !cupidCFErode( ps, ipa, ndim, dims, skip, naxis, ret, status ) ) break;
+               if( !cupidCFErode( ps, ipa, ndim, dims, skip, perspectrum, 
+                                  naxis, ret, status ) ) break;
             }
 
 /* Otherwise, we use the simpler algorithm implemented in later IDL

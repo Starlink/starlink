@@ -11,8 +11,8 @@ typedef struct Pix {
 } Pix;
 
 int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims, 
-                  int skip[3], int naxis, CupidPixelSet **clumps,
-                  int *status ){
+                  int skip[3], int perspectrum, int naxis, 
+                  CupidPixelSet **clumps, int *status ){
 /*
 *+
 *  Name:
@@ -27,8 +27,8 @@ int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 
 *  Synopsis:
 *     int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims, 
-*                       int skip[3], int naxis, CupidPixelSet **clumps,
-*                       int *status )
+*                       int skip[3], int perspectrum, int naxis, 
+*                       CupidPixelSet **clumps, int *status )
 
 *  Description:
 *     This function transfer all the pixels in PixelSet "ps" which are
@@ -57,12 +57,20 @@ int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 *        pixel along each axis. This allows conversion between indexing
 *        the array using a single 1D vector index and using nD coords.
 *        Unused trailing elements should be filled with zero.
+*     perspectrum
+*        If non-zero, then each spectrum is processed independently of its
+*        neighbours. A clump that extends across several spectra will be 
+*        split into multiple clumps, each restricted to a single spectrum.
+*        The non-zero value supplied should be the 1-based axis index of
+*        the spectral pixel axis. Should be supplied as zero if "ndim" is
+*        not 3.
 *     naxis
 *        Determines which adjoining pixels are considered to be "neighbours" 
 *        of a specified central pixel. Should be in the range 1 to "ndim". 
 *        For a pixel to be considered to be a neighbour of another pixel,
 *        the two pixels must be no more than 1 pixel away along no more than 
-*        "naxis" axes.
+*        "naxis" axes. The supplied value is ignored and a value of 1 is
+*        used if "perspectrum" is non-zero.
 *     clumps
 *        Array holding pointers to all previously defined PixelSets, such 
 *        that a pointer to the PixelSet with index value "i" is stored at 
@@ -76,6 +84,7 @@ int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -101,6 +110,8 @@ int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 *  History:
 *     26-NOV-2005 (DSB):
 *        Original version.
+*     17-SEP-2007 (DSB):
+*        Added "perspectrum" parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -110,7 +121,6 @@ int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 */
 
 /* Local Variables: */
-
    Pix *pix;        /* Pointer to a Pix structure describing transferred pixel */
    Pix *xflist;     /* Pointer to list of Pix structures describing transferred pixels */
    int *v1;         /* Pointer to element at start of this row */
@@ -179,7 +189,7 @@ int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
    if it is adjacent to any other PixelSets. */
             if( *v == old_index ) {
                iv = v - ipa;
-               cupidCFNebs( ipa, iv, x, ndim, dims, skip, old_index, 
+               cupidCFNebs( ipa, iv, x, ndim, dims, skip, old_index, perspectrum,
                             naxis, &n1, &il1,  i1, &n2, &il2, clumps, status );
 
 /* If this pixel adjoins another PixelSet, add its details to the end of the 

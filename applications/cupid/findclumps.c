@@ -257,6 +257,17 @@ void findclumps( int *status ) {
 *        markers identifying the positions of the clumps described in 
 *        file fred.FIT, overlaying the markers on top of the currently
 *        displayed image. [!]
+*     PERSPECTRUM = _LOGICAL (Read)
+*        This parameter is ignored unless the supplied input NDF is
+*        3-dimensional and includes a spectral axis. If so, then a TRUE
+*        value for PERSPECTRUM will cause all spectra within the supplied 
+*        cube to be processed independenly of the neighbouring spectra.
+*        That is, each identified clump will contain pixels from only a
+*        single input spectrum. If a clump extends across multiple
+*        spectra, then it will be split up into multiple clumps, one for
+*        each spectrum. Currently, this parameter can only be used with
+*        the FellWalker and ClumpFind methods. A value of FALSE is always
+*        used for other methods. [FALSE]
 *     QOUT = NDF (Write)
 *        An optional output NDF that is a copy of the input NDF, except
 *        that any Quality component in the input NDF is discarded and a
@@ -511,9 +522,9 @@ void findclumps( int *status ) {
 *     for the other parameters that specify the minimum peak height, the
 *     background level and the instrumental beam widths, limited to be at
 *     least 16 pixels (for 3D data), 7 pixels (for 2D data) or 3 pixels
-*     (for 1D data). If a direct comparison with other implementations
-*     of the ClumpFind algorithm is required, a value of 5 should be used
-*     (for 3D data) or 20 (for 2D data). []
+*     (for 1D data, or if "PERSPECTRUM" is set TRUE). If a direct comparison 
+*     with other implementations of the ClumpFind algorithm is required, a 
+*     value of 5 should be used (for 3D data) or 20 (for 2D data). []
 *     - ClumpFind.Naxis: Controls the way in which contiguous areas of
 *     pixels are located when contouring the data. When a pixel is found
 *     to be at or above a contour level, the adjacent pixels are also checked.
@@ -534,7 +545,8 @@ void findclumps( int *status ) {
 *     "Naxis" is 2, pixels which are at square corners are also considered 
 *     to be adjacent to the central pixel. For one dimensional data, a
 *     value of 1 is always used for "Naxis", and each pixel simply has 2 
-*     adjacent pixels, one on either side. []
+*     adjacent pixels, one on either side. Note, the supplied "naxis"
+*     value is ignored if the ADAM parameter "PERSPECTRUM" is set TRUE. []
 *     - ClumpFind.RMS: The global RMS noise level in the data. The
 *     default value is the value supplied for parameter RMS. []
 *     - ClumpFind.Tlow: The lowest level at which to contour the data
@@ -623,7 +635,9 @@ void findclumps( int *status ) {
 *     - FellWalker.CleanIter: This gives the number of times to apply the 
 *     cellular automata which cleans up the filled clumps. This cellular 
 *     automata replaces each clump index by the most commonly occuring 
-*     value within a 3x3x3 cube (or 2x2 square for 2D data) of neighbours. [1]
+*     value within a 3x3x3 cube (or 2x2 square for 2D data) of neighbours. 
+*     The supplied value is ignored and a value of zero is assumed if 
+*     "PERSPECTRUM" is set TRUE. [1]
 *     - FellWalker.FlatSlope: Any initial section to a walk which has an
 *     average gradient (measured over 4 steps) less than this value will not 
 *     be included in the clump. The value can be supplied either as an 
@@ -712,6 +726,8 @@ void findclumps( int *status ) {
 *        Report the config parameters even if no clumps are found.
 *     22-JUN-2007 (DSB):
 *        Added config parameter FellWalker.AllowEdge.
+*     17-SEP-2007 (DSB):
+*        Added adam parameter PERSPECTRUM.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -784,6 +800,7 @@ void findclumps( int *status ) {
    int nsig;                    /* Number of significant pixel axes */
    int nskyax;                  /* No. of sky axes in current WCS Frame */
    int nspecax;                 /* No. of spectral axes in current WCS Frame */
+   int perspectrum;             /* Process spectra independently? */
    int repconf;                 /* Report configuration? */
    int sdim[ NDF__MXDIM ];      /* The indices of the significant pixel axes */
    int size;                    /* Size of a group */
@@ -907,6 +924,7 @@ void findclumps( int *status ) {
    parGet0l( "WCSPAR", &usewcs, status );
 
 /* If the NDF has 3 pixel axes, identify the velocity axis. */
+   velax = -1;
    if( nsig == 3 && astGetI( iwcs, "Naxes" ) == 3 ) {
 
 /* Search all Frames in the FrameSet, starting with the current Frame. */
@@ -948,7 +966,6 @@ void findclumps( int *status ) {
 /* Identify the pixel axis corresponding to the velocity WCS axis.
    astMapSplit uses one-based axis indices, so we need to convert to and
    from zero-based for further use. */
-      velax = -1;
       if( vax != 0 ) {
          map = astGetMapping( iwcs, AST__CURRENT, AST__BASE );
          astMapSplit( map, 1, &vax, &velax, &tmap );
@@ -1018,7 +1035,6 @@ void findclumps( int *status ) {
       rms = cupidRms( type, ipd, el, subnd[ 0 ] - slbnd[ 0 ] + 1, status );
    }   
 
-
 /* Get the RMS noise level. */
    parDef0d( "RMS", rms, status );
    parGet0d( "RMS", &rms, status );
@@ -1026,6 +1042,23 @@ void findclumps( int *status ) {
 /* Determine which algorithm to use. */
    parChoic( "METHOD", "GAUSSCLUMPS", "GAUSSCLUMPS,CLUMPFIND,REINHOLD,"
              "FELLWALKER", 1, method, 15,  status );
+
+/* If the input is a spectral cube, see if spectra are to be processed 
+   independetly of their neighbouring spectra. */
+   if( velax != -1 && method ){
+      parGet0l( "PERSPECTRUM", &perspectrum, status );
+      if( perspectrum && strcmp( method, "FELLWALKER" ) &&
+                         strcmp( method, "CLUMPFIND" ) && 
+          *status == SAI__OK ){
+         *status = SAI__ERROR;
+         msgSetc( "M", method );
+         errRep( "", "Parameter PERSPECTRUM has been set TRUE, but "
+                 "this option cannot currently be used with METHOD=^M.",
+                 status );
+      }
+   } else {
+      perspectrum = 0;
+   }
 
 /* Abort if an error has occurred. */
    if( *status != SAI__OK ) goto L999;
@@ -1069,19 +1102,21 @@ void findclumps( int *status ) {
 /* Switch for each method */
    if( !strcmp( method, "GAUSSCLUMPS" ) ) {
       ndfs = cupidGaussClumps( type, nsig, slbnd, subnd, ipd, ipv, rms, 
-                                keymap, velax, ilevel, beamcorr, status ); 
+                               keymap, velax, ilevel, beamcorr, status ); 
 
    } else if( !strcmp( method, "CLUMPFIND" ) ) {
       ndfs = cupidClumpFind( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                              keymap, velax, ilevel, beamcorr, status ); 
+                             keymap, velax, ilevel, perspectrum, beamcorr, 
+                             status ); 
       
    } else if( !strcmp( method, "REINHOLD" ) ) {
       ndfs = cupidReinhold( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                              keymap, velax, ilevel, beamcorr, status ); 
+                            keymap, velax, ilevel, beamcorr, status ); 
       
    } else if( !strcmp( method, "FELLWALKER" ) ) {
       ndfs = cupidFellWalker( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                              keymap, velax, ilevel, beamcorr, status ); 
+                              keymap, velax, ilevel, perspectrum, beamcorr, 
+                              status ); 
       
    } else if( *status == SAI__OK ) {
       *status = SAI__ERROR;
@@ -1118,6 +1153,9 @@ void findclumps( int *status ) {
    grpPut1( confgrp, buffer, 0, status );
 
    sprintf( buffer, "WCSPAR = %s", usewcs ? "yes" : "no" );
+   grpPut1( confgrp, buffer, 0, status );
+
+   sprintf( buffer, "PERSPECTRUM = %s", perspectrum ? "YES" : "NO" );
    grpPut1( confgrp, buffer, 0, status );
 
 /* Issue a logfile header for the clump parameters. */

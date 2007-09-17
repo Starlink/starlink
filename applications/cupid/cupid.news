@@ -7,6 +7,14 @@
  data arrays.
 
 
+Changes introduced at V0.0-36:
+
+   - Add parameter "PERSPECTRUM" to FINDCLUMPS. If this parameter is 
+   set TRUE, it causes each spectrum in a spectral cube to be processed
+   independently of its neighbours. This will in general cause lots more
+   clumps to be reported since a single source that spans more than one
+   spectrum will result in multiple clumps.
+
 Changes introduced at V0.0-35:
 
    - Add configuration parameter FellWalker.AllowEdge that can be set to

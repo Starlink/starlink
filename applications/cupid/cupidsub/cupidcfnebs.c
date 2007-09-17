@@ -99,9 +99,9 @@
 
 
 void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3], 
-                  int skip[3], int hindex, int naxis, int *n1, int *il1,  
-                  int i1[27], int *n2, int *il2, CupidPixelSet **clumps,
-                  int *status ){
+                  int skip[3], int hindex, int perspectrum, int naxis, 
+                  int *n1, int *il1, int i1[27], int *n2, int *il2, 
+                  CupidPixelSet **clumps, int *status ){
 /*
 *+
 *  Name:
@@ -115,9 +115,9 @@ void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
 
 *  Synopsis:
 *     void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3], 
-*                     int skip[3], int hindex, int naxis, int *n1, 
-*                     int *il1, int i1[27], int *n2, int *il2, CupidPixelSet **clumps,
-*                     int *status )
+*                       int skip[3], int hindex, int perspectrum, int naxis, 
+*                       int *n1, int *il1, int i1[27], int *n2, int *il2, 
+*                       CupidPixelSet **clumps, int *status )
 
 *  Description:
 *     This function returns information about which, if any, PixelSets 
@@ -152,12 +152,20 @@ void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
 *        then the PixelSet is defined at the contour level containing the
 *        pixel specified by "iv". Otherwise, the PixelSet is defined at a
 *        higher contour level.
+*     perspectrum
+*        If non-zero, then each spectrum is processed independently of its
+*        neighbours. A clump that extends across several spectra will be 
+*        split into multiple clumps, each restricted to a single spectrum.
+*        The non-zero value supplied should be the 1-based axis index of
+*        the spectral pixel axis. Should be supplied as zero if "ndim" is
+*        not 3.
 *     naxis
 *        Determines which adjoining pixels are considered to be "neighbours" 
 *        of a specified central pixel. Should be in the range 1 to "ndim". 
 *        For a pixel to be considered to be a neighbour of another pixel,
 *        the two pixels must be no more than 1 pixel away along no more than 
-*        "naxis" axes.
+*        "naxis" axes. The supplied value is ignored and a value of 1 is
+*        used if "perspectrum" is non-zero.
 *     n1
 *        Location at which to return the number of PixelSets defined at
 *        the current contour level which adjoin the pixel specified by "iv".
@@ -189,6 +197,7 @@ void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -214,6 +223,8 @@ void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
 *  History:
 *     11-JAN-2006 (DSB):
 *        Original version.
+*     17-SEP-2007 (DSB):
+*        Added "perspectrum" parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -233,6 +244,7 @@ void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
    int clump_index;     /* Index of neighbouring clump */
    int i0;              /* 1D vector index of central pixel */
    int i;               /* Axis index */
+   int velax;           /* Zero based velocity axis index */
 
 /* Initialise */
    *n1 = 0;
@@ -244,19 +256,28 @@ void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
 
+/* Store the zero based velocity axis index, if needed. */
+   velax = perspectrum - 1;
+
 /* Save the 1D vector index of the point whose neighbours are being tested. */
    i0 = iv;
 
 /* We now check each immediate neighbour of the supplied pixel. First
    check the pixels which are 1 pixel away along only one of the three axes.
-   This uses local macros defined at the start of this file. */
-   for( i = 0; i < ndim; i++ ) {
-      CHECK_NEIGHBOURS(i);
+   This uses local macros defined at the start of this file. If we are
+   processing spectra independently, only check for neighbours on the
+   spectral axis. */
+   if( !perspectrum ) {
+      for( i = 0; i < ndim; i++ ) {
+         CHECK_NEIGHBOURS(i);
+      }
+   } else {
+      CHECK_NEIGHBOURS(velax);
    }
 
 /* If required, now check the pixels which are 1 pixel away along two axes. 
    For a naxis value of 2, "ndim" must be either 2 or 3 (it cannot be 1). */
-   if( naxis >= 2 ) {
+   if( naxis >= 2 && !perspectrum ) {
 
 /* If not at the upper edge on axis 0, get the 1D and nD coords at the upper 
    neighbour on axis 0. */
