@@ -73,6 +73,10 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
 *  History:
 *     7-DEC-2005 (DSB):
 *        Original version.
+*     18-SEP-2007 (DSB):
+*        Correct calculation of number of contour levels based on TLOW
+*        and TDELTA values.Original version. Previously, the number of
+*        contours was too small by 1.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -163,7 +167,7 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
          cdelta = cupidConfigRMS( config, "DELTAT", rms, cdelta, status );
 
 /* Find the number of levels needed for this deltat. */
-         *nlevels = (int) ( ( maxd - clow )/cdelta );
+         *nlevels = (int) ( ( maxd - clow )/cdelta ) + 1;
 
 /* Allocate the array and fill it with the appropriate contour levels. */
          ret = astMalloc( sizeof( double )*(*nlevels) );
