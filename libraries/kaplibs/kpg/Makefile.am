@@ -333,6 +333,7 @@ kpg1_assty.f \
 kpg1_gdare.f \
 kpg1_gdget.f \
 kpg1_gdfnd.f \
+kpg1_gdfnp.f \
 kpg1_gdold.f \
 kpg1_gdput.f \
 kpg1_gdqpc.f \
