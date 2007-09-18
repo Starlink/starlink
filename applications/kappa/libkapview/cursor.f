@@ -488,6 +488,10 @@
 *        new picture.
 *        - Save on horizontal white space by using different tab positions 
 *        for the first point in a picture.
+*     17-SEP-2007 (DSB):
+*        Use KPG1_GDFNP in place of AGI_RCLP to find the picture in which
+*        to report coordinates. KPG1_GDFNP has an extra requirement that
+*        pictures should have defined WCS.
 *     {enter_further_changes_here}
 
 *-
@@ -994,7 +998,7 @@
             CALL AST_TRAN2( BMAP, 1, DBLE( XC ), DBLE( YC ), .TRUE., 
      :                      XB, YB, STATUS ) 
 
-*  Find the picture in which the reported positon is required. This will
+*  Find the picture in which the reported position is required. This will
 *  depend on MODE. In CURRENT mode the picture never changes. The new
 *  picture is made the current AGI picture.
             IF( IMODE .EQ. DYN .OR. 
@@ -1004,9 +1008,13 @@
                CALL AGI_SELP( IPICB, STATUS )
 
 *  Get the last picture of the chosen name which encompasses the cursor
-*  position. If found it becomes the current AGI picture.
-               CALL AGI_RCLP( NAME, REAL( XB ), REAL( YB ), IPIC2, 
-     :                        STATUS )
+*  position. If found it becomes the current AGI picture. There is an 
+*  extra requirement that the picture should have associated WCS 
+*  information since some applications (e.g. LINPLOT CLEAR=NO) can create 
+*  pictures without WCS which are intended to be ignored by subsequent 
+*  applications.
+               CALL KPG1_GDFNP( NAME, REAL( XB ), REAL( YB ), IPIC2, 
+     :                          STATUS )
 
 *  Watch for the case when there is no picture of that name at the
 *  selected position. Annul the error and use the BASE picture.  
