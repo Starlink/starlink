@@ -144,6 +144,9 @@
 *     9-DEC-2005 (PWD):
 *        Provide current pixel value as dynamic default for NEWVAL if section
 *        contains only 1 pixel.
+*     18-SEP-2007 (DSB):
+*        Correct formatting of bad values when using current pixel value as 
+*        dynamic default for NEWVAL.
 *     {enter_further_changes_here}
 
 *-
@@ -304,8 +307,11 @@
             IF( EL .EQ. 1 ) THEN
                CALL KPG1_MEANR( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
      :                          RVALUE, STATUS )
-               WRITE( SUGDEF, '(G13.6)') RVALUE
-               CALL CHR_LDBLK( SUGDEF )
+               IF( RVALUE .NE. VAL__BADR ) THEN
+                  CALL CHR_RTOC( RVALUE, SUGDEF, NCHAR )
+               ELSE
+                  SUGDEF = 'Bad'
+               END IF
                CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
             END IF
 
@@ -332,8 +338,11 @@
             IF( EL .EQ. 1 ) THEN
                CALL KPG1_MEAND( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
      :                          DVALUE, STATUS )
-               WRITE( SUGDEF, '(G18.11)') RVALUE
-               CALL CHR_LDBLK( SUGDEF )
+               IF( DVALUE .NE. VAL__BADD ) THEN
+                  CALL CHR_DTOC( DVALUE, SUGDEF, NCHAR )
+               ELSE
+                  SUGDEF = 'Bad'
+               END IF
                CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
             END IF
 
@@ -358,7 +367,11 @@
             IF( EL .EQ. 1 ) THEN
                CALL KPG1_MEANI( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
      :                          IVALUE, STATUS )
-               CALL CHR_ITOC( IVALUE, SUGDEF, NCHAR )
+               IF( IVALUE .NE. VAL__BADI ) THEN
+                  CALL CHR_ITOC( IVALUE, SUGDEF, NCHAR )
+               ELSE
+                  SUGDEF = 'Bad'
+               END IF
                CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
             END IF
 
@@ -383,7 +396,12 @@
             IF( EL .EQ. 1 ) THEN
                CALL KPG1_MEANB( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
      :                          BVALUE, STATUS )
-               CALL CHR_ITOC( NUM_BTOI( BVALUE ), SUGDEF, NCHAR )
+               IF( BVALUE .NE. VAL__BADB ) THEN
+                  CALL CHR_ITOC( NUM_BTOI( BVALUE ), SUGDEF, NCHAR )
+               ELSE
+                  SUGDEF = 'Bad'
+               END IF
+
                CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
             END IF
 
@@ -410,7 +428,11 @@
             IF( EL .EQ. 1 ) THEN
                CALL KPG1_MEANUB( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
      :                           BVALUE, STATUS )
-               CALL CHR_ITOC( NUM_UBTOI( BVALUE ), SUGDEF, NCHAR )
+               IF( BVALUE .NE. VAL__BADUB ) THEN
+                  CALL CHR_ITOC( NUM_UBTOI( BVALUE ), SUGDEF, NCHAR )
+               ELSE
+                  SUGDEF = 'Bad'
+               END IF
                CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
             END IF
 
@@ -437,7 +459,11 @@
             IF( EL .EQ. 1 ) THEN
                CALL KPG1_MEANW( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
      :                          WVALUE, STATUS )
-               CALL CHR_ITOC( NUM_WTOI( WVALUE ), SUGDEF, NCHAR )
+               IF( WVALUE .NE. VAL__BADW ) THEN
+                  CALL CHR_ITOC( NUM_WTOI( WVALUE ), SUGDEF, NCHAR )
+               ELSE
+                  SUGDEF = 'Bad'
+               END IF
                CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
             END IF
 
@@ -464,7 +490,11 @@
             IF( EL .EQ. 1 ) THEN
                CALL KPG1_MEANUW( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
      :                           WVALUE, STATUS )
-               CALL CHR_ITOC( NUM_UWTOI( WVALUE ), SUGDEF, NCHAR )
+               IF( WVALUE .NE. VAL__BADUW ) THEN
+                  CALL CHR_ITOC( NUM_UWTOI( WVALUE ), SUGDEF, NCHAR )
+               ELSE
+                  SUGDEF = 'Bad'
+               END IF
                CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
             END IF
             CALL PAR_MIX0I( 'NEWVAL', SUGDEF, NUM_UWTOI( VAL__MINUW ),
