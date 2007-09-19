@@ -14,6 +14,7 @@
  * --------------  --------  ----------------------------------------
  * Allan Brighton  05/10/95  Created
  * pbiereic        17/02/03  Added 'using namespace std'. Removed ::std specs.
+ * Peter W. Draper 19/09/07  Added rgbcolor member.
  */
 
 using namespace std;
@@ -68,6 +69,7 @@ public:
     // member access
     const char* name() const {return name_;}
     ColorMapInfo* next() {return next_;}
+    const RGBColor* rgbcolor() {return rgb_;}
 
     // set the red, green and blue values from the colormap data
     // and interpolate based on the count of available colors
