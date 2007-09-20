@@ -926,7 +926,7 @@ int astIsDynamic_( const void *ptr ) {
 
 *  Synopsis:
 *     #include "memory.h"
-*     size_t astSizeOf( const void *ptr )
+*     int astIsDynamic_( const void *ptr )
 
 *  Description:
 *     This function takes a pointer to a region of memory and tests if
