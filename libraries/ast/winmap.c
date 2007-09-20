@@ -3053,14 +3053,14 @@ static AstWinMap *WinUnit( AstWinMap *wm, AstUnitMap *um, int winv,
    number of axes in it. */
    ninw = astWinTerms( wm, &a, &b );
    
-/* Check the pointers can be used. */
-   if( astOK ){
-
 /* Get the number of axes in the UnitMap. */
-      ninu = astGetNin( um );
+   ninu = astGetNin( um );
 
 /* Create the merged WinMap with unspecified corners. */
-      result = astWinMap( ninw + ninu, NULL, NULL, NULL, NULL, "" );
+   result = astWinMap( ninw + ninu, NULL, NULL, NULL, NULL, "" );
+
+/* Check the pointers can be used. */
+   if( astOK ){
 
 /* If the WinMap applies to the lower axis indices... */
       if( win1 ){
