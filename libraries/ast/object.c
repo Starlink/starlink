@@ -174,6 +174,9 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *        if some memory is supplied.
 *     2-JULY-2007 (DSB):
 *        Fix memory access problem in VSet.
+*     20-SEP-2007 (DSB):
+*        In astDelete, ensure the error status is reset before calling
+*        astGrow to extend the vtab free list.
 *class--
 */
 
@@ -818,6 +821,7 @@ f     value
    int dynamic;                  /* Was memory allocated dynamically? */
    int i;                        /* Loop counter for destructors */
    int ifree;                    /* Index of next slot on free list */
+   int status;                   /* AST error status value */
    size_t size;                  /* Object size */
 
 /* Check the pointer to ensure it identifies a valid Object (this
@@ -850,13 +854,20 @@ f     value
 /* If necessary, free the Object's memory. If object caching is switched
    on, the memory is not in fact freed; it is merely placed onto the end 
    of the list of free memory blocks included in the virtual function table 
-   of the AST class concerned. */
+   of the AST class concerned. astGrow returns immediately if an error
+   has already occurred, so we need to reset the error status explicitly
+   before calling astGrow. */
    if ( dynamic ) {
       if( object_caching ) {
          ifree = (vtab->nfree)++;
+
+         status = astStatus;
+         astClearStatus;
          vtab->free_list = astGrow( vtab->free_list, vtab->nfree, 
                                     sizeof(AstObject *) );
-         if( astOK && vtab->free_list ) vtab->free_list[ ifree ] = this;
+         astSetStatus( status );
+
+         if( vtab->free_list ) vtab->free_list[ ifree ] = this;
       } else {
          (void) astFree( this );
       }
