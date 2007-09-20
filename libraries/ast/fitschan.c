@@ -787,6 +787,9 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        reference channel, not the source velocity.
 *     22-AUG-2007 (DSB):
 *        - Remove debugging printf statements.
+*     20-SEP-2007 (DSB):
+*        Changed FitOK to check that the RMS residual is not more than
+*        a fixed small fraction of the pixel size.
 *class--
 */
 
@@ -1230,7 +1233,7 @@ static const char *GetAttrib( AstObject *, const char * );
 static const char *GetFitsSor( const char * );
 static const char *IsSpectral( const char *, char[5], char[5] );
 static double **OrthVectorSet( int, int, double ** );
-static double *FitLine( AstMapping *, double *, double *, double *, double );
+static double *FitLine( AstMapping *, double *, double *, double *, double, double * );
 static double *OrthVector( int, int, double ** );
 static double *ReadCrval( AstFitsChan *, AstFrame *, char, const char *, const char * );
 static double ChooseEpoch( FitsStore *, char, const char *, const char * );
@@ -1259,7 +1262,7 @@ static int FindBasisVectors( AstMapping *, int, int, double *, AstPointSet *, As
 static int FindKeyCard( AstFitsChan *, const char *, const char *, const char * );
 static int FindLonLatSpecAxes( FitsStore *, char, int *, int *, int *, const char *, const char * );
 static int FindString( int, const char *[], const char *, const char *, const char *, const char * );
-static int FitOK( int, double *, double * );
+static int FitOK( int, double *, double *, double );
 static int FitsEof( AstFitsChan * );
 static int FitsFromStore( AstFitsChan *, FitsStore *, int, AstFrameSet *, const char *, const char * );
 static int FitsGetCom( AstFitsChan *, const char *, char ** );
@@ -8816,7 +8819,7 @@ static int FindString( int n, const char *list[], const char *test,
    return ret;
 }
 
-static int FitOK( int n, double *act, double *est ) {
+static int FitOK( int n, double *act, double *est, double tol ) {
 /*
 *  Name:
 *     FitOK
@@ -8829,7 +8832,7 @@ static int FitOK( int n, double *act, double *est ) {
 
 *  Synopsis:
 *     #include "fitschan.h"
-*     int FitOK( int n, double *act, double *est )
+*     int FitOK( int n, double *act, double *est, double tol )
 
 *  Class Membership:
 *     FitsChan member function.
@@ -8837,8 +8840,7 @@ static int FitOK( int n, double *act, double *est ) {
 *  Description:
 *     This function is supplied with a set of actual data values, and the
 *     corresponding values estimated by some fitting process. It tests
-*     the correlation between these two sets of data and returns 1 if the
-*     correlation is very close to +1. Otherwise it returns zero.
+*     that the RMS residual between them is no more than "tol".
 
 *  Parameters:
 *     n
@@ -8847,6 +8849,8 @@ static int FitOK( int n, double *act, double *est ) {
 *        Pointer to the start of the actual data values.
 *     est
 *        Pointer to the start of the estimated data values.
+*     tol
+*        The largest acceptable RMS error between "act" and "est".
 
 *  Returned Value:
 *     A value of 1 is returned if the two sets of values agree. Zero is
@@ -8858,8 +8862,8 @@ static int FitOK( int n, double *act, double *est ) {
 
 /* Local Variables: */
    int ret, i;   
-   double s1, s2, s3, s4, s5, s6;
-   double *px, *py, den1, den2, denom, r;
+   double s1, s2;
+   double *px, *py, diff, mserr;
 
 /* Initialise */
    ret = 0;
@@ -8867,53 +8871,34 @@ static int FitOK( int n, double *act, double *est ) {
 /* Check the inherited status. */
    if( !astOK ) return ret;
 
-/* Form the sums needed to calculate the correlation coefficient between
-   the actual and estimated values. */
+/* Initialise the sum of the squared residuals, and the number summed. */
    s1 = 0.0;
    s2 = 0.0;
-   s3 = 0.0;
-   s4 = 0.0;
-   s5 = 0.0;
-   s6 = 0.0;
 
+/* Initialise pointers to the next actual and estimated values to use. */
    px = act;
    py = est;
+
+/* Loop round all pairs of good actual and estimate value. */
    for( i = 0; i < n; i++, px++, py++ ){
       if( *px != AST__BAD && *py != AST__BAD ) {
-         s1 += *px;
-         s2 += *py;
-         s3 += (*px)*(*py);
-         s4 += (*px)*(*px);
-         s5 += (*py)*(*py);
-         s6 += 1.0;
+
+/* Increment the sums need to find the RMS residual between the actual
+   and estimated values. */
+         diff = *px - *py;
+         s1 += diff*diff;
+         s2 += 1.0;
       }
    }
 
-/* Normalise the values unless no good points were found. */
-   if( s6 > 0 ) {
-      s1 /= s6;
-      s2 /= s6;
-      s3 /= s6;
-      s4 /= s6;
-      s5 /= s6;
+/* If the sums are usable... */
+   if( s2 > 0.0 ) {
 
-/* If the actual and estimated values are effectively constant (taken as
-   the standard deviation of the points being less than 1E-7 of the mean
-   value), assume the fit is linear. */
-      den1 = ( s4 - s1*s1 );
-      den2 = ( s5 - s2*s2 );
-      denom = den1*den2;
-      if( fabs( den1 ) <= 1.0E-14*s1*s1 && 
-          fabs( den2 ) <= 1.0E-14*s2*s2 ) {
-         ret = 1;
-
-/* Otherwise, check the correlation coefficient between the actual and
-   estimates values is sufficiently high. */
-      } else if( denom > 0.0 ) {
-         r = ( s3 - s1*s2 )/sqrt( denom );
-         ret = ( fabs( r ) > 0.995 );
-      }
-   } 
+/* Form the mean squared residual, and check if it is less than the
+   squared error limit. */
+      mserr = s1/s2;
+      if( mserr < tol*tol ) ret = 1;
+   }
 
 /* Return the result. */
    return ret;
@@ -12017,7 +12002,7 @@ static int FindKeyCard( AstFitsChan *this, const char *name,
 }
 
 static double *FitLine( AstMapping *map, double *g, double *g0, double *w0, 
-                        double dim ){
+                        double dim, double *tol ){
 /*
 *  Name:
 *     FitLine
@@ -12031,7 +12016,7 @@ static double *FitLine( AstMapping *map, double *g, double *g0, double *w0,
 *  Synopsis:
 *     #include "fitschan.h"
 *     double *FitLine( AstMapping *map, double *g, double *g0, double *w0, 
-*                      double dim )
+*                      double dim, double *tol )
 
 *  Class Membership:
 *     FitsChan member function.
@@ -12064,6 +12049,9 @@ static double *FitLine( AstMapping *map, double *g, double *g0, double *w0,
 *        should equal the number of outputs for "map".
 *     dim
 *        The length of the pixel axis, or AST__BAD if unknown.
+*     tol
+*        Pointer to an array holding the tolerance for equality on each 
+*        output axis.
 
 *  Returned Value:
 *     A pointer to dynamically allocated memory holding the required vector
@@ -12214,7 +12202,7 @@ static double *FitLine( AstMapping *map, double *g, double *g0, double *w0,
 /* Test the fit to see if we beleive that the mapping is linear. If
    it is, scale the returned value from units of "per gap" to units of 
    "per pixel". Otherwise,indicate that he returned vector is unusable. */
-            if( FitOK( NP, ptr2[ j ], ptr1[ 0 ] ) ) {
+            if( FitOK( NP, ptr2[ j ], ptr1[ 0 ], tol[ j ] ) ) {
                ret[ j ] /= gap;
             } else {
                ok = 0; 
@@ -17050,6 +17038,7 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
    double *g0;
    double *m;
    double *mat;
+   double *tol;
    double *w0;
    double *y;
    double cd;
@@ -17057,6 +17046,7 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
    double crv;
    double cv;
    double det;
+   double err;
    double k;
    double mxcv;
    double skydiag1;
@@ -17105,6 +17095,7 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
    g = astMalloc( sizeof(double)*(size_t) nin );
    g0 = astMalloc( sizeof(double)*(size_t) nin );
    w0 = astMalloc( sizeof(double)*(size_t) nout );
+   tol = astMalloc( sizeof(double)*(size_t) nout );
    partmat = astMalloc( sizeof(double *)*(size_t) nout );
    lin = astMalloc( sizeof(int)*(size_t) nout );
    pperm = astMalloc( sizeof(int)*(size_t) nout );
@@ -17145,7 +17136,25 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
 /* Save the transformed root position in "w0". This is the grid root
    position represented as a vector within the Intermediate World
    Coordinate system. */
-      for( j = 0; j < nout; j++ ) w0[ j ] = ptrw[ j ][ 0 ];
+      for( j = 0; j < nout; j++ ) {
+         w0[ j ] = ptrw[ j ][ 0 ];
+
+/* Find the tolerance for positions on the j'th IWC axis. This is one
+   hundredth of the largest change in the j'th IWC axis value caused by
+   moving out 1 pixel along any grid axis. */
+         tol[ j ] = 0.0;
+         for( i = 0; i < nin; i++ ) {
+            err = fabs( ptrw[ j ][ i + 1 ] - w0[ j ] );
+            if( err > tol[ j ] ) tol[ j ] = err;     
+         }
+         tol[ j ] *= 0.01;
+
+/* If the tolerance is zero (e.g. as is produced for degenerate axes),
+   then use a tolerance equal to a very small fraction of hte degenerate
+   axis value. If the axis value is zero use a fixed small value. */
+         if( tol[ j ] == 0.0 ) tol[ j ] = w0[ j ]*DBL_EPSILON*1.0E5;
+         if( tol[ j ] == 0.0 ) tol[ j ] = sqrt( DBL_MIN );
+      }       
 
 
 /* The next section finds the CD matrix. 
@@ -17168,7 +17177,7 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
    The IWC vector corresponding to a unit vector along the current input axis 
    is returned if the Mapping is linear. A NULL pointer is returned if the 
    Mapping is not linear. */
-         partmat[ i ] = FitLine( map, g, g0, w0, dim[ i ] );
+         partmat[ i ] = FitLine( map, g, g0, w0, dim[ i ], tol );
 
 /* If unsuccesful, indicate failure and break out of the loop. */
          if( !partmat[ i ] ) {
@@ -17470,6 +17479,7 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
    g = astFree( g );
    g0 = astFree( g0 );
    w0 = astFree( w0 );
+   tol = astFree( tol );
    lin = astFree( lin );
    skycol = astFree( skycol );
    pperm = astFree( pperm );
