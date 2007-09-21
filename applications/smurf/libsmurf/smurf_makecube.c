@@ -566,6 +566,8 @@
 *        Rework to handle PRV* as well as OBS*
 *     06-JUL-2007 (TIMJ):
 *        Use smf_accumulate_prov
+*     21-SEP-2007 (DSB):
+*        Move reporting of WCS bounds to be before the prompt for OUT.
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -1046,34 +1048,6 @@ void smurf_makecube( int *status ) {
    it goes from current Frame to output grid axis. */
    astInvert( ospecmap );
 
-/* Create a group holding the names of the output NDFs. Abort without error 
-   if a null value is supplied. We first get the base name. If only 1
-   tile is being created, we just use the base name as the output NDF name.
-   Otherwise, we create a new group holding a name for each tile which is
-   the basename with "_1", "_2", etc, appended to it. */
-
-   if( *status == SAI__OK ) {
-      ndgCreat ( "OUT", NULL, &ogrp, &outsize, &flag, status );
-
-      if( *status == PAR__NULL ) {
-         errAnnul( status );
-         goto L998;
-      }
-
-      if( ntile > 1 ) {
-         pname = basename;
-         grpGet( ogrp, 1, 1, &pname, GRP__SZNAM, status );
-         grpDelet( &ogrp, status);
-
-         blen = astChrLen( basename );
-         ogrp = grpNew( "", status );
-         for( itile = 0; itile < ntile; itile++ ) {
-            sprintf( basename + blen, "_%d", itile + 1 );            
-            grpPut1( ogrp, basename, 0, status );
-         }
-      }
-   }
-
 /* See if weights are to be saved in the output NDFs. */
    parGet0l( "WEIGHTS", &savewgt, status );
 
@@ -1155,6 +1129,33 @@ void smurf_makecube( int *status ) {
    corner[ 1 ] = gy_out[ 3 ];
    astNorm( oskyfrm, corner );
    parPut1d( "FBL", 2, corner, status );
+
+/* Create a group holding the names of the output NDFs. Abort without error 
+   if a null value is supplied. We first get the base name. If only 1
+   tile is being created, we just use the base name as the output NDF name.
+   Otherwise, we create a new group holding a name for each tile which is
+   the basename with "_1", "_2", etc, appended to it. */
+   if( *status == SAI__OK ) {
+      ndgCreat ( "OUT", NULL, &ogrp, &outsize, &flag, status );
+
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+         goto L998;
+      }
+
+      if( ntile > 1 ) {
+         pname = basename;
+         grpGet( ogrp, 1, 1, &pname, GRP__SZNAM, status );
+         grpDelet( &ogrp, status);
+
+         blen = astChrLen( basename );
+         ogrp = grpNew( "", status );
+         for( itile = 0; itile < ntile; itile++ ) {
+            sprintf( basename + blen, "_%d", itile + 1 );            
+            grpPut1( ogrp, basename, 0, status );
+         }
+      }
+   }
 
 /* Loop round, creating each tile of the output array. Each tile is
    initially made a little larger than required so that edge effects
