@@ -7585,7 +7585,8 @@ package kappa {
          parameter rms {
             access WRITE
             type _REAL
-            vpath INTERNAL
+            vpath DEFAULT
+            default 0
             prompt {Object to contain the rms of the fit}
             helpkey *
           }
