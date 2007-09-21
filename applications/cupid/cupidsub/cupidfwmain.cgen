@@ -133,6 +133,8 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 *        - Extend diagnostic facilities.
 *     17-SEP-2007 (DSB):
 *        Added "perspectrum" parameter.
+*     21-SEP-2007 (DSB):
+*        Move clump merging so that it happens before the clump cleaning.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -271,7 +273,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    }
 
 /* If required, dump the mask indicating which pixel are below the threshold. */
-   if( ilevel > 4 ) {
+   if( ilevel > 0 ) {
       printf("   About to dump initial mask\n" );
       cupidDumpI( ipa, ndim, dims, slbnd, status );
    }
@@ -292,7 +294,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    work = cupidRCA( ipa, NULL, nel, dims, skip, frac, VAL__MAXI, 0, -1, 1, status );
 
 /* If required, dump the mask resulting from the above cleaning. */
-   if( ilevel > 4 ) {
+   if( ilevel > 0 ) {
       printf("   About to dump cleaned initial mask\n" );
       cupidDumpI( work, ndim, dims, slbnd, status );
    }
@@ -675,9 +677,23 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
       msgBlank( status );
    }
 
-/* If required, dump the uncleaned clump mask. */
-   if( ilevel > 4 ) {
-      printf("   About to dump uncleaned clump mask\n" );
+/* If required, dump the unmerged clump mask. */
+   if( ilevel > 0 ) {
+      printf("   About to dump raw clump mask\n" );
+      cupidDumpI( work, ndim, dims, slbnd, status );
+   }
+
+/* Amalgamate adjoining clumps if there is no significant dip between the
+   clumps. */
+   if( ilevel > 1 ) msgOut( "", "Merging adjoining clumps", status );
+   CGEN_FUNCTION(cupidFWJoin)( array, nel, ndim, dims, skip, rms, config, 
+                               work, peak_values, &ret, ilevel, perspectrum,
+                               status );
+   if( ilevel > 1 ) msgOut( "", "Merging completed", status );
+
+/* If required, dump the merged clump mask. */
+   if( ilevel > 0 ) {
+      printf("   About to dump merged but uncleaned clump mask\n" );
       cupidDumpI( work, ndim, dims, slbnd, status );
    }
 
@@ -711,22 +727,8 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    if( m1 != ipa ) memcpy( ipa, work, sizeof( int )*nel );
 
 /* If required, dump the cleaned clump mask. */
-   if( ilevel > 4 ) {
+   if( ilevel > 0 ) {
       printf("   About to dump cleaned clump mask\n" );
-      cupidDumpI( ipa, ndim, dims, slbnd, status );
-   }
-
-/* Amalgamate adjoining clumps if there is no significant dip between the
-   clumps. */
-   if( ilevel > 1 ) msgOut( "", "Merging adjoining clumps", status );
-   CGEN_FUNCTION(cupidFWJoin)( array, nel, ndim, dims, skip, rms, config, 
-                               ipa, peak_values, &ret, ilevel, perspectrum,
-                               status );
-   if( ilevel > 1 ) msgOut( "", "Merging completed", status );
-
-/* If required, dump the merged clump mask. */
-   if( ilevel > 4 ) {
-      printf("   About to dump merged clump mask\n" );
       cupidDumpI( ipa, ndim, dims, slbnd, status );
    }
 
@@ -739,3 +741,11 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    return ret;
 
 }
+
+
+
+
+
+
+
+

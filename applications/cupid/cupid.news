@@ -16,6 +16,10 @@ Changes introduced at V0.0-36:
    spectrum will result in multiple clumps.
    - A bug that caused the top contour level to be ignored when using the
    ClumpFind method within FINDCLUMPS has been fixed.
+   - The FellWalker algorithm has been changed slightly in that adjacent 
+   clumps with shallow dips between them (as specified by FellWalker.MinDip) 
+   are merged before, rather than after, the clumps are cleaned (as 
+   specified by FellWalker.CleanIter).
 
 Changes introduced at V0.0-35:
 
