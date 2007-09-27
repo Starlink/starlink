@@ -68,6 +68,8 @@
 *        Used reordered argument in KPS1_LFTS.
 *     2007 March 6 (MJC):
 *        Correct declared type of WORK1 array.
+*     2007 September 7 (MJC):
+*        Revised KPS1_LFTx argument list.
 *     {enter_further_changes_here}
 
 *-
@@ -171,8 +173,8 @@
 
 *  Fit a linear slope to all the data. 
          CALL KPS1_LFT<T>( ORDER, AXIS, RANGES, MAXRNG, .FALSE., ARRAY,
-     :                     ARRAY, DIMS, AS, COEFF, WORK1, WORK2, 
-     :                     STATUS )
+     :                     .FALSE., ARRAY, DIMS, ARRAY, AS, COEFF, 
+     :                     WORK1, WORK2, STATUS )
 
 *  Copy the flagged (or the initial unflagged array on the first pass)
 *  array to what will become the subtracted-fit array.
