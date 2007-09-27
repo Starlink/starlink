@@ -82,11 +82,6 @@ awish_LDADD = libtclAdam.la libtkGwm.la `nbs_link` `chr_link_adam` \
 	@TCL_LD_SEARCH_FLAGS@ @TCL_LIBS@ @TK_LIBS@ @FCLIBS@ \
         `starX_link`
 
-# For some reason starX_link is different to the other _link scripts. 
-# Stop the attempt to create it by naming the awish dependencies.
-awish_DEPENDENCIES = libtclAdam.la libtkGwm.la
-
-
 # Define what is to be done with which sets of files.
 
 bin_PROGRAMS = $(PUBLIC_EXE)
