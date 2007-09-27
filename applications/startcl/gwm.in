@@ -1,6 +1,11 @@
 #!/bin/sh
-# the next line restarts using wish \
-exec @AWISH@ "$0" "$@"
+# The next lines are executed by /bin/sh, but not Tcl \
+if test -f @AWISH@; then \
+   exec @AWISH@ $0 ${1+"$@"} ; \
+else \
+   exec awish $0 ${1+"$@"}; \
+fi
+# Which sees it as an extended comment.
 
 #
 # gwm.tcl
