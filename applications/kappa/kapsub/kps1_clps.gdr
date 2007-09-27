@@ -169,6 +169,9 @@
 *     2006 December 22 (MJC):
 *        Revise the test for the methods that use covariance, following
 *        the addition of the many new methods.
+*     2007 September 26 (MJC):
+*        Do not create covariance workspace for the median in large
+*        arrays.
 *     {enter_further_changes_here}
 
 *-
@@ -441,7 +444,10 @@
 *  the memory requirements for the covariance array becomes huge for 
 *  large images.  "Median with estimated variances" is treated as a new
 *  IMETH value, 300.
-         IF ( IMETH .EQ. 3 .AND. NLIN .GT. 300 ) IMETH = 300
+         IF ( IMETH .EQ. 3 .AND. NLIN .GT. 300 ) THEN
+            IMETH = 300
+            USECV = .FALSE.
+         END IF
 
 *  Allocate memory.
          CALL PSX_CALLOC( NLIN, '_DOUBLE', IPPP, STATUS )
