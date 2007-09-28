@@ -299,6 +299,12 @@ if ( -e ${bindir}/datacube/datacube.csh ) then
 endif
 
 #
+#  DIPSO
+if ( -e ${bindir}/dipso/dipsosetup ) then
+   setenv DIPSO_DIR ${bindir}/dipso
+endif
+
+#
 #  ESP
 if ( -e ${bindir}/esp/esp.csh) then
    setenv ESP_DIR ${bindir}/esp
