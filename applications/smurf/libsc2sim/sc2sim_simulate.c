@@ -95,6 +95,17 @@
 *     pongsim
 
 *  Notes:
+*     One of the fundamental properties of an astronomical simulator
+*     is time. In the SCUBA-2 simulator the user specifies a start
+*     time as a UTC modified Julian date. The internal time axis is
+*     established as a UT1 MJD. Planet positions are calculated using
+*     Terrestrial Time (TT). The JCMT state structure has two time
+*     entries: TCS_TAI is the TAI time of the current sample and
+*     RTS_END is the TAI at the end of the current sample. The sample
+*     length (steptime) is also taken to be in units of UTC seconds
+*     (which are the same as TAI but NOT the same as the UT/UT1
+*     second). See the documentation for SLALIB for further
+*     information on astronomical time systems.
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -356,7 +367,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                                      simulation (not just this chunk) */
   int curms;                      /* current microstep (loop counter) */
   char *curtok=NULL;              /* current subarray name being parsed */
-  char dateobs[SZFITSCARD] = "\0";       /* DATE-OBS string for observation */
+  char dateobs[SZFITSCARD+1] = "\0";       /* DATE-OBS string for observation */
   int date_da;                    /* day corresponding to MJD */
   double date_df;                 /* day fraction corresponding to MJD */
   int date_mo;                    /* month corresponding to MJD */
@@ -372,7 +383,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   int *dksquid=NULL;              /* dark squid values */
   int dodigcalc=1;                /* If set, calculate digitization pars */
   double drytau183;               /* Broadband 183 GHz zenith optical depth */
-  double dtt = 0;                 /* Time difference between UTC and TT */
+  double dtt = 0;                 /* Time difference between UTC and TT (TT - UTC s)*/
   double exptime = 0.0;           /* Subimage exposure time */
   AstFitsChan *fc=NULL;           /* FITS channels for tanplane projection */
   int fileexists = 1;             /* Flag to denote whether the named
@@ -404,19 +415,19 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double *jig_x_hor=NULL;         /* jiggle x-horizontal tanplane offset (radians) */
   int k;                          /* loop counter */
   int lastframe;                  /* number of frames in the last chunk */
-  char loclcrd[SZFITSCARD] = "\0";       /* Coordinate frame */
+  char loclcrd[SZFITSCARD+1] = "\0";       /* Coordinate frame */
   double *lst=NULL;               /* local appar. sidereal time at time step */
-  char lstend[SZFITSCARD] = "\0";        /* LST at end of sub-scan */
-  char lststart[SZFITSCARD] = "\0";      /* LST at start of sub-scan */
+  char lstend[SZFITSCARD+1] = "\0";        /* LST at end of sub-scan */
+  char lststart[SZFITSCARD+1] = "\0";      /* LST at start of sub-scan */
   double meanatm;                 /* Atmos. emission at start airmass */
-  double *mjuldate=NULL;          /* modified Julian date each sample */
+  double *mjuldate=NULL;          /* Modified Julian date each sample - UT1 */
   int narray = 0;                 /* number of subarrays to generate */
   int nflat[8];                   /* number of flat coeffs per bol */
   int nimage = 0;                 /* Number of subimages within subscan */
   static double noisecoeffs[SC2SIM__MXBOL*3*60]; /* noise coefficients */
   int nterms=0;                   /* number of 1/f noise frequencies */
   char obsid[80];                 /* OBSID for each observation */
-  char obstype[SZFITSCARD] = "\0";       /* Observation type, e.g. SCIENCE */
+  char obstype[SZFITSCARD+1] = "\0";       /* Observation type, e.g. SCIENCE */
   FILE *ofile = NULL;             /* File pointer to check for existing files*/
   double phi;                     /* latitude (radians) */
   int planet = 0;                 /* Flag to indicate planet observation */
@@ -427,7 +438,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double raapp;                   /* Apparent RA */
   double raapp1;                  /* Recalculated apparent RA */
   int rowsize;                    /* row size for flatfield */
-  char scancrd[SZFITSCARD] = "\0";       /* SCAN coordinate frame */
+  char scancrd[SZFITSCARD+1] = "\0";       /* SCAN coordinate frame */
   double sigma;                   /* instrumental white noise */
   char sign[2];                   /* Sign of angle (+/-) */
   Grp *skygrp = NULL;             /* Group of input files */
@@ -438,10 +449,10 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double sky_y_hor=0;             /* effective y hor. off. on sky (bor+jig) */
   double skytrans;                /* sky transmission */
   JCMTState state;                /* Telescope state at one time slice */
-  double start_time=0.0;          /* time of start of current scan */
+  double start_time=0.0;          /* UTC time of start of current scan */
   char subarrays[8][80];          /* list of parsed subarray names */
   int subnum;                     /* Subarray number */
-  double taiutc;                  /* Difference between TAI and UTC time (s) */
+  double taiutc;                  /* Difference between TAI and UTC time (TAI-UTC s) */
   double tauCSO=0;                /* CSO zenith optical depth */
   float tbri[3];                  /* simulated wvm measurements */
   float teff[3];                  /* output of wvmOpt */
@@ -454,7 +465,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 				     calculating planet position */
   float ttau[3];                  /* output of wvmOpt */
   double twater;                  /* water line temp. for WVM simulation */
-  char utdate[SZFITSCARD] = "\0";        /* UT date in YYYYMMDD form */
+  char utdate[SZFITSCARD+1] = "\0";        /* UT date in YYYYMMDD form */
   double vmax[2];                 /* telescope maximum velocities (arcsec) */
   double zenatm;                  /* zenith atmospheric emission */
 
@@ -468,7 +479,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   sc2sim_instap_calc( inx, 0, instap, status );
 
   if( *status == SAI__OK ) {
-    /* Calculate year/month/day corresponding to MJD at start */
+    /* Calculate year/month/day corresponding to MJD at start.
+       Remember that inx->mjdaystart is a UTC date */
     slaDjcl( inx->mjdaystart, &date_yr, &date_mo, &date_da, &date_df, 
              &date_status );
     if( date_status ) {
@@ -561,7 +573,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     /* Set the PLANET flag */
     if ( inx->planetnum != -1 ) {
       planet = 1;
-      dtt = slaDtt( start_time );
+      dtt = slaDtt( start_time ); /* start_time is UTC */
     } else {
       planet = 0;
     }
@@ -876,7 +888,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
      the calculation once per simulation should be fine */
   slaMappa( 2000.0, inx->mjdaystart, amprms );
 
-
+  /* Telescope latitude */
+  phi = DD2R*(sinx->telpos)[1];
   /* determine values of variables used for looping: nmicstp,
      frmperms, chunks, maxwrite */
 
@@ -920,7 +933,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
     /* Increment mjdaystart (UTC) to the beginning of this chunk, then
        calculate the UT1/LAST at each timestep */
-    totaltime = ((double)(curms * frmperms) + (double)(curchunk * maxwrite))
+    totaltime = ((double)(curms * frmperms + curchunk * maxwrite))
 	* samptime;
     start_time = inx->mjdaystart + (totaltime / SPD);
     taiutc = slaDat( start_time );
@@ -940,9 +953,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
       curframe = ( curms * frmperms ) + ( curchunk * maxwrite ) + frame;
 
-      /* Telescope latitude */
-      phi = (sinx->telpos[1])*DD2R;
-
       /* If we are simulating a planet observation, calculate apparent
          RA, Dec at each time step - actually don't need to do this if
          the simulation is short, say 1 min or less but in the first
@@ -950,10 +960,11 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
          100 frames or 0.5 sec, else use the previous one */
       if ( planet ) {
         if ( frame%100 == 0 ) {
-          /* Calculate the TT from UTC start_time and TT-UTC from slaDtt */
-          tt = start_time + (curframe*samptime + dtt ) / SPD;
+          /* Calculate the TT from UT1 mjuldate, DUT1 and TT-UTC from slaDtt */
+	  tt = mjuldate[frame] + ((dtt - inx->dut1) / SPD);
+
           slaRdplan( tt, inx->planetnum, -DD2R*(sinx->telpos)[0], 
-		     DD2R*(sinx->telpos)[1], &raapp, &decapp, &diam );
+		     phi, &raapp, &decapp, &diam );
 
           /* Store RA Dec in inx struct so they can be written as FITS
              headers. Note these are APPARENT RA, Dec which are more
@@ -969,7 +980,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
           astClear( fitschan, "Card" );
           fitswcs = astRead( fitschan );
           /* Extract the Sky->REF_PIXEL mapping. */
-          astSetC( fitswcs, "SYSTEM", "GAPPT" );
+	  astSetC( fitswcs, "SYSTEM", "GAPPT" );
           sky2map = astGetMapping( fitswcs, AST__CURRENT, AST__BASE );
         }
       }
@@ -1076,7 +1087,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       fc = astFitsChan ( NULL, NULL, "" );
 
       if( *status == SAI__OK ) {
-        sc2ast_makefitschan( 0, 0, AST__DR2D, AST__DR2D,
+        sc2ast_makefitschan( 0.0, 0.0, AST__DR2D, AST__DR2D,
 			     base_az[frame]*AST__DR2D, 
 			     base_el[frame]*AST__DR2D,
 			     "CLON-TAN", "CLAT-TAN", fc, status );
@@ -1156,6 +1167,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         state.tcs_tr_dc2 = bor_dec[frame]; 
         state.tcs_tr_ac1 = bor_ra[frame];
         state.tcs_tr_ac2 = bor_dec[frame]; 
+	/* Set BASE position */
 	if (planet) {
 	  state.tcs_tr_bc1 = raapp;
 	  state.tcs_tr_bc2 = decapp;
@@ -1167,7 +1179,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         state.smu_az_jig_y = jig_y_hor[frame];
         state.smu_az_chop_x = 0;
         state.smu_az_chop_y = 0;
-        state.tcs_tai = mjuldate[frame] + (taiutc - inx->dut1  + 0.5*samptime)/SPD;
+        state.tcs_tai = mjuldate[frame] + (taiutc - inx->dut1 + 0.5*samptime)/SPD;
         state.rts_end = state.tcs_tai + 0.5*samptime/SPD;
 
         /* For each subarray, retrieve the wcs frameset, then generate
@@ -1359,18 +1371,9 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
 	    /* Calculate scaling coefficients */
 
-	    printf("Skynoise: %f %f %f %f\n",
-		   sinx->refload, sinx->refnoise, meanatm+sinx->telemission, 
-		   pnoise );
-	    printf("Old digitization: %f %f %f\n",
-		   digmean, digscale, digcurrent);
-
 	    sc2sim_getscaling ( SC2SIM__NCOEFFS, coeffs, inx->targetpow, 
 				pnoise, &digmean, &digscale, &digcurrent, 
 				status );
-
-	    printf("New digitization: %f %f %f\n",
-		   digmean, digscale, digcurrent);
 
 	    dodigcalc = 0;
 	  }
@@ -1475,6 +1478,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       if( *status != SAI__OK ) {
         frame = lastframe;
         curchunk = chunks;
+	curms = inx->nmicstep;
       } 
      
     }/* for all frames in this chunk */
