@@ -66,6 +66,9 @@
 *     2007-07-20 (CVL):
 *        Ignore data points until observation actually starts (when
 *        ra, dec, az, el start updating).
+*     2007-09-26 (CVL):
+*        - rearranged placement of a print statement
+*        - put a non-generic date in the fits header
 
 *     {enter_further_changes_here}
 
@@ -241,6 +244,8 @@ void smurf_impaztec( int *status ) {
   double y_min = 0;
   double y_max = 0;
   int yr;                      /* year of beginning of observation */
+
+  char dateobs[20];
  
   /* Main routine */
 
@@ -315,26 +320,41 @@ void smurf_impaztec( int *status ) {
        midnight' to 'seconds from noon' by subtracting or adding fractions
        of a modified julian day as necessary. */
 
+    dateobs[4]='-'; dateobs[7]='-'; dateobs[10]='T';
+    dateobs[13]=':'; dateobs[16]=':'; dateobs[19]='\0';
+
     /* Get the month, day, and year */
     nc_get_att_text ( ncid, NC_GLOBAL, "date", date_str );
     curtok = strtok ( date_str, "/");
+    for(i=0;i<2;i++) { dateobs[i+5]=curtok[i]; }
     month = atoi ( curtok );
     curtok = strtok ( NULL, "/" );
+    for(i=0;i<2;i++) { dateobs[i+8]=curtok[i]; }
     day = atoi ( curtok );
     curtok = strtok ( NULL, "/" );
+    for(i=0;i<4;i++) { dateobs[i]=curtok[i]; }
     yr = atoi ( curtok );
+    printf("IMPAZTEC date yr: %i mo: %i day: %i\n", yr, month, day);
 
     /* Calculate the base modified julian date */
     slaCaldj ( yr, month, day, &djm, &date_status );
 
     /* Get the hours, minutes, and seconds */
-    nc_get_att_text ( ncid, NC_GLOBAL, "start_time", time_str );  
+    nc_get_att_text ( ncid, NC_GLOBAL, "start_time", time_str );
     curtok = strtok ( time_str, ":");
     hour = atoi ( curtok );
+    int leng=0;
+    while( !curtok[leng]=='\0' ) { leng++; }
+    if(leng==1) { dateobs[11]='0'; dateobs[12]=curtok[0]; }
+    else if(leng<1) { dateobs[11]='0'; dateobs[12]='0'; }
+    else { dateobs[11]=curtok[leng-2]; dateobs[12]=curtok[leng-1]; }
     curtok = strtok ( NULL, ":" );
+    for(i=0;i<2;i++) { dateobs[i+14]=curtok[i]; }
     min = atoi ( curtok );
     curtok = strtok ( NULL, ":" );
+    for(i=0;i<2;i++) { dateobs[i+17]=curtok[i]; }
     sec = atoi ( curtok ); 
+    printf("IMPAZTEC date hr: %i min: %i sec: %i\n", hour, min, sec);
 
     starttime = (hour * 3600) + (min * 60) + sec;
 
@@ -351,6 +371,7 @@ void smurf_impaztec( int *status ) {
     ra = strtod ( ra_str, NULL );
     nc_get_att_text ( ncid, NC_GLOBAL, "jcmt_header_C2", dec_str );
     dec = strtod ( dec_str, NULL );
+    printf("IMPAZTEC ra,dec from jcmt_header: %g %g\n", ra, dec);
 
     /* Calculate the JCMTState at each timeslice */
 
@@ -369,33 +390,6 @@ void smurf_impaztec( int *status ) {
     nc_getSignal ( ncid, "jcmt_azElBaseC2", azelbasec2, status );
 
 
-    /* DIAGNOSTIC : Print out some of the pointing info */
-    /*
-    double lst_fr_azel, dec_fr_azel, ha, tel_lat, lst_diff;
-    tel_lat = telpos[1]*2*3.1415926536/360.0; // telescope lat in radians
-
-    for ( i = 0; i < nframes; i++ ) {
-
-      az = azelactc1[i];
-      el = azelactc2[i];
-      this_ra = trackactc1[i];
-      this_dec = trackactc2[i];
-
-      slaDh2e(az, el, tel_lat, &ha, &dec_fr_azel);
-      lst_fr_azel = ha + this_ra;
-      lst_diff = tempbuff[i] - lst_fr_azel;
-
-      // note: tempbuff contains LAST
-      printf ( "%i LAST: %f LST_derived: %f lst_diff: %f ra: %f dec: %f dec_derived: %f az: %f el: %f\n",
-	       i, tempbuff[i], lst_fr_azel, lst_diff, this_ra, this_dec,
-	       dec_fr_azel, az, el);
-
-      i += 999;
-
-    }
-    // end diagnostic
-    */
-
     /* Because AzTEC starts recording data before an observation
        acutally starts determine the frame at which the observation
        starts. This can be determined from the ra, az, el because
@@ -403,6 +397,7 @@ void smurf_impaztec( int *status ) {
        progress. The easiest way to see when they are updating is to
        derive an LST from them which will be constant when they are
        not updating. */
+    startframe = nframes;
     for ( i = 0; i < nframes; i++ ) {      
 
       lst_coord_prev = lst_coord;
@@ -413,14 +408,32 @@ void smurf_impaztec( int *status ) {
       if( (lst_coord - lst_coord_prev)>0.0 && i!=0) {
 	/* frames from here on are good */
 	startframe=i;
-	printf("start frame: %i n_good_frames: %i\n",
+	printf("IMPAZTEC start frame: %i n_good_frames: %i\n",
 	       startframe, nframes-startframe);
 	ra = trackactc1[i]; dec=trackactc2[i];
+	printf("IMPAZTEC ra,dec from trackact: %g %g\n", ra, dec);
 	break;
       }
-      printf("This file contains no good frames? LST(coords) is constant.\n");
+
     }
     ngframes = nframes - startframe; // number of good frames
+
+    if (ngframes == 0) {
+      printf("This file contains no good frames? LST(coords) is constant.\n");
+      goto CLEANUP;
+    }
+
+    /* DIAGNOSTIC */
+    double tel_lat, lst, ha_azel, ha_tr, dec_fr_azel;
+    tel_lat = telpos[1]*2*3.1415926536/360.0; // telescope lat in radians
+    slaDh2e(azelactc1[startframe], azelactc2[startframe], tel_lat,
+	    &ha_azel, &dec_fr_azel);
+    lst = tempbuff[startframe];
+    ha_tr = lst - trackactc1[startframe];
+    printf("IMPAZTEC ha(az,el): %g ha(lst,ra): %g\n", ha_azel, ha_tr);
+    printf("IMPAZTEC dec: %g dec(az,el): %g\n",
+	   trackactc2[startframe], dec_fr_azel);
+
 
     for( i=0; i<ngframes; i++) {
       head[i].rts_num = i;   
@@ -436,8 +449,8 @@ void smurf_impaztec( int *status ) {
       head[i].tcs_az_ac2 = azelactc2[i+startframe];  
       head[i].tcs_az_dc1 = azeldemandc1[i+startframe];
       head[i].tcs_az_dc2 = azeldemandc2[i+startframe];
-      head[i].tcs_az_bc1 = azelbasec1[i+startframe];
-      head[i].tcs_az_bc2 = azelbasec2[i+startframe]; 
+      head[i].tcs_az_bc1 = azelactc1[0+startframe]; // azelbasec1[i+startframe];
+      head[i].tcs_az_bc2 = azelactc2[0+startframe]; // azelbasec2[i+startframe]; 
       
       posptr[2*i +0] = azelactc1[i+startframe];
       posptr[2*i +1] = azelactc2[i+startframe];
@@ -498,8 +511,9 @@ void smurf_impaztec( int *status ) {
   /* Format the FITS headers */
   /* Add the FITS data to the output file */
   fitschan = astFitsChan ( NULL, NULL, "" );
-  /* Kludged to write generic date */ 
-  astSetFitsS ( fitschan, "DATE-OBS", "YYYY-MM-DDThh:mm:ss", "observation date", 0 );
+  /* Kludged to write generic date */
+  //astSetFitsS ( fitschan, "DATE-OBS", "YYYY-MM-DDThh:mm:ss", "observation date", 0 );
+  astSetFitsS ( fitschan, "DATE-OBS", dateobs, "observation date", 0 );
   rad = ra * AST__DR2D;
   astSetFitsF ( fitschan, "RA", rad, "Right Ascension of observation", 0 );
   decd = dec * AST__DR2D;
@@ -570,7 +584,7 @@ void smurf_impaztec( int *status ) {
   }
 
   /* Free memory */
-  
+ CLEANUP:
   smf_free ( bolosig, status );
   smf_free ( head, status );
   smf_free ( dbuf, status );
