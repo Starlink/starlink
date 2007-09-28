@@ -17,6 +17,10 @@
    o  ADD now propagates the UNITS component if it is the same in 
    both input NDFs.
 
+   o  ARDMASK now has an option to use WCS co-ordinates in the input NDF 
+   as the default co-ordinate system for the supplied ARD description.
+   See the new parameter DEFPIX.
+
    o  ARDPLOT can now draw outlines around AST regions as well as
    ARD regions specified through a new REGION parameter.
 

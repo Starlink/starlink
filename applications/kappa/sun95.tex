@@ -13767,8 +13767,9 @@ KAPPA: \htmlref{ARDPLOT}{ARDPLOT},
          of the image to be masked out, \emph{i.e.} set to bad.  The co-ordinate
          system in which positions within this file are given should be
          indicated by including suitable COFRAME or WCS statements within
-         the file (see SUN/183), but will default to pixel co-ordinates
-         in the absence of any such statements.  For instance, starting the
+         the file (see SUN/183), but will default to pixel co-ordinates or 
+         current WCS Frame co-ordinates in the absence of any such statements
+         (see parameter DEFPIX). For instance, starting the
          file with a line containing the text {\tt "COFRAME(SKY,System=FK5)"} would
          indicate that positions are specified in RA/DEC (FK5,J2000).  The
          statement {\tt "COFRAME(PIXEL)"} indicates explicitly that positions are
@@ -13786,6 +13787,14 @@ KAPPA: \htmlref{ARDPLOT}{ARDPLOT},
       }{
          The constant numerical value to assign to the region, or the string
          {\tt "bad"}. {\tt ["bad"]}
+      }
+      \sstsubsection{
+         DEFPIX = \_LOGICAL (Read)
+      }{
+         If a {\tt TRUE} value is supplied for DEFPIX, then co-ordinates in 
+         the supplied ARD file will be assumed to be pixel coordinates.
+         Otherwise, they are assumed to be in the current WCS co-ordinate 
+         system of the supplied NDF. {\tt [TRUE]}
       }
       \sstsubsection{
          IN = NDF (Read)
@@ -53145,6 +53154,13 @@ The following applications have been modified:
       \begin{itemize}
          \item This can now draw outlines around AST regions as well
          as ARD regions specified through a new REGION parameter.
+      \end{itemize}
+
+   \item [\htmlref{ARDMASK}{ARDMASK}] \mbox{}
+      \begin{itemize}
+         \item  This now has an option to use WCS co-ordinates in the 
+          input NDF as the default co-ordinate system for the supplied 
+          ARD description. See the new parameter DEFPIX.
       \end{itemize}
 
    \item [\htmlref{DIV}{DIV}] \mbox{}

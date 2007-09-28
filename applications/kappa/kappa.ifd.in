@@ -7223,6 +7223,14 @@ package kappa {
             default BAD
             helpkey *
           }
+         parameter defpix {
+            type _LOGICAL
+            vpath DEFAULT
+            prompt {Use pixel co-ordinates by default?}
+            ppath CURRENT DEFAULT
+            default TRUE
+            helpkey *
+          }
          parameter in {
             position 1
             type NDF

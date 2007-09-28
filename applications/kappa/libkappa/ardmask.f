@@ -36,12 +36,13 @@
 *        of the image to be masked out, i.e. set to bad. The co-ordinate 
 *        system in which positions within this file are given should be 
 *        indicated by including suitable COFRAME or WCS statements within 
-*        the file (see SUN/183), but will default to pixel co-ordinates
-*        in the absence of any such statements. For instance, starting the 
-*        file with a line containing the text "COFRAME(SKY,System=FK5)" would
-*        indicate that positions are specified in RA/DEC (FK5,J2000). The
-*        statement "COFRAME(PIXEL)" indicates explicitly that positions are 
-*        specified in pixel co-ordinates. 
+*        the file (see SUN/183), but will default to pixel or current
+*        WCS Frame co-ordinates in the absence of any such statements
+*        (see parameter DEFPIX). For instance, starting the file with a 
+*        line containing the text "COFRAME(SKY,System=FK5)" would indicate 
+*        that positions are specified in RA/DEC (FK5,J2000). The statement 
+*        "COFRAME(PIXEL)" indicates explicitly that positions are specified 
+*        in pixel co-ordinates. 
 *     COMP = LITERAL (Read)
 *        The NDF array component to be masked.  It may be "Data", or
 *        "Variance", or "Error" (where "Error" is equivalent to 
@@ -49,6 +50,11 @@
 *     CONST = LITERAL (Given)
 *        The constant numerical value to assign to the region, or the string 
 *        "bad". ["bad"]
+*     DEFPIX = _LOGICAL (Read)
+*        If a TRUE value is supplied for DEFPIX, then co-ordinates in 
+*        the supplied ARD file will be assumed to be pixel coordinates.
+*        Otherwise, they are assumed to be in the current WCS co-ordinate 
+*        system of the supplied NDF. [TRUE]
 *     IN = NDF (Read)
 *        The name of the source NDF.
 *     INSIDE = _LOGICAL (Read)
@@ -96,7 +102,9 @@
 *  Copyright:
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1995-1998, 2001, 2004 Central Laboratory of the
-*     Research Councils. All Rights Reserved.
+*     Research Councils. 
+*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -150,6 +158,8 @@
 *        Added parameters COMP, CONST and INSIDE.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     27-SEP-2007 (DSB):
+*        Added parameter DEFPIX.
 *     {enter_further_changes_here}
 
 *-
@@ -192,6 +202,7 @@
       INTEGER UBNDI( NDF__MXDIM )! Upper bounds of a box encompassing all internal array elements
       LOGICAL BAD                ! Assign bad values to the region?
       LOGICAL CONT               ! ARD description to continue?
+      LOGICAL DEFPIX             ! Use pixel coords by default?
       LOGICAL INSIDE             ! Assign value to inside of region?
       LOGICAL THERE              ! Does the requested NDF component exist?
       REAL TRCOEF( ( NDF__MXDIM + 1 ) * NDF__MXDIM ) ! Data to world co-ordinate conversions
@@ -250,13 +261,19 @@
       CALL NDF_SIZE( INDF1, EL, STATUS )
       CALL PSX_CALLOC( EL, '_INTEGER', IPMASK, STATUS )
       
+*  See if pixel coordinates are to be assumed if the ard description
+*  contains no specification of the user co-ordinate system.
+      CALL PAR_GET0l( 'DEFPIX', DEFPIX, STATUS )
+
 *  Get the WCS FrameSet from the NDF and use it to establish the WCS
-*  information used by the following cal to ARD_WORK. Select PIXEL
-*  coords as the current Frame first (this means that the default 
-*  cord system in the ard file will be pixel coords).
+*  information used by the following cal to ARD_WORK. If required, 
+*  select PIXEL coords as the current Frame first (this means that 
+*  the default co-ord system in the ard file will be pixel coords).
       CALL KPG1_GTWCS( INDF1, IWCS, STATUS )
-      CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
-      CALL AST_SETI( IWCS, 'CURRENT', IPIX, STATUS )
+      IF( DEFPIX ) THEN 
+         CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
+         CALL AST_SETI( IWCS, 'CURRENT', IPIX, STATUS )
+      END IF
       CALL ARD_WCS( IWCS, ' ', STATUS )
 
 *  Create the mask.  Value 2 should be used to represent pixels
