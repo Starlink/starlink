@@ -48,7 +48,7 @@ dnl    Need a version of Tk wish for astshow script.
 STAR_CHECK_PROGS(wish)
 
 dnl    Configure files.
-AC_CONFIG_FILES([Makefile component.xml astshow.tcl atools.ifd])
+AC_CONFIG_FILES([Makefile component.xml atools.ifd])
 AC_CONFIG_FILES([make_history_help], [chmod 755 make_history_help])
 
 dnl    And the fat lady sings.

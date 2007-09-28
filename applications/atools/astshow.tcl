@@ -1,4 +1,6 @@
-#!@WISH@
+#!/bin/sh    
+# The next line is executed by /bin/sh, but not Tcl \
+exec wish $0 ${1+"$@"}
 #+
 #  Name:
 #     astshow
