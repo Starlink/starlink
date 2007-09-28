@@ -2354,12 +2354,6 @@ package polpack {
          endif
       endif
 #
-#
-#  Set up an environment variable pointing to the help library. This is refered
-#  to within the appliation interface files.
-      setenv POLPACK_HELP INSTALL_HELP/polpack
-
-#
 #  Set up the commands and environment variables needed to export and
 #  import POLPACK extension information to and from foreign data formats.
 #
@@ -2374,8 +2368,8 @@ package polpack {
          setenv NDF_XTN POLPACK
       endif
 
-      setenv NDF_IMP_POLPACK 'INSTALL_BIN/polimp.csh ^ndf'
-      setenv NDF_EXP_POLPACK 'INSTALL_BIN/polexp.csh ^ndf'
+      setenv NDF_IMP_POLPACK '$POLPACK_DIR/polimp.csh ^ndf'
+      setenv NDF_EXP_POLPACK '$POLPACK_DIR/polexp.csh ^ndf'
       setenv NDF_IMP_POLPACK_COMPRESSED ' '
       setenv NDF_EXP_POLPACK_COMPRESSED ' '
       setenv NDF_IMP_POLPACK_GZIP ' '
