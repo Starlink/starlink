@@ -520,6 +520,7 @@ endif
 #  POLPACK
 if ( -e ${bindir}/polpack/polpack.csh ) then
    setenv POLPACK_DIR ${bindir}/polpack
+   setenv POLPACK_HELP ${starhelpdir}/polpack/polpack
 endif
 
 #
