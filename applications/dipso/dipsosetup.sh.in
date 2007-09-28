@@ -6,10 +6,32 @@
 # Clone of dipsosetup [csh]. If this is edited for content
 # make sure edits are synchronized with csh version.
 
-export DIPSODIR=@bindir@
-export DIPSOLIB=@bindir@
-export DIPSOSTARBIN=@prefix@/bin
-export SPECDAT=@staretcdir@
+
+if test "$DIPSO_DIR" = ""; then
+   export DIPSODIR="$DIPSO_DIR"
+   export DIPSOLIB="$DIPSO_DIR"
+
+   STAR="$DIPSO_DIR/../.."
+
+   if test -d "$STAR/bin"; then
+      export DIPSOSTARBIN=`(cd $STAR/bin; pwd)`
+   else
+      export DIPSOSTARBIN=@prefix@/bin
+   fi
+
+   if test -d "$STAR/etc/dipso"; then
+      export SPECDAT=`(cd $STAR/etc/dipso; pwd)`
+   else
+      export SPECDAT=@staretcdir@
+   fi
+
+else
+   export DIPSODIR=@bindir@
+   export DIPSOLIB=@bindir@
+   export DIPSOSTARBIN=@prefix@/bin
+   export SPECDAT=@staretcdir@
+fi
+
 export OWNERDIR=${HOME}
 #
 #

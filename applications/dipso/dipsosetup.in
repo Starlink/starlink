@@ -6,10 +6,31 @@
 # Note that sh version is not automatically synchronized with csh version.
 # please propagate changes to both
 
-setenv DIPSODIR @bindir@
-setenv DIPSOLIB @bindir@
-setenv DIPSOSTARBIN @prefix@/bin
-setenv SPECDAT  @staretcdir@
+if( $?DIPSO_DIR ) then
+   setenv DIPSODIR $DIPSO_DIR
+   setenv DIPSOLIB $DIPSO_DIR
+
+   set star = "$DIPSO_DIR/../.."
+
+   if( -d "$star/bin" ) then
+      setenv DIPSOSTARBIN `(cd $star/bin; pwd)`
+   else
+      setenv DIPSOSTARBIN @prefix@/bin
+   endif
+
+   if( -d "$star/etc/dipso" ) then
+      setenv SPECDAT `(cd $star/etc/dipso; pwd)`
+   else
+      setenv SPECDAT  @staretcdir@
+   endif
+
+else
+   setenv DIPSODIR @bindir@
+   setenv DIPSOLIB @bindir@
+   setenv DIPSOSTARBIN @prefix@/bin
+   setenv SPECDAT  @staretcdir@
+endif
+
 setenv OWNERDIR ${HOME}
 #
 #
