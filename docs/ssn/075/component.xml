@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="ssn75">
+  <version>1</version>
+  <path>docs/ssn/075</path>
+  <description>Writing Catalogue and Image Servers for GAIA and CURSA</description>
+  <abstract><p>
+   GAIA and CURSA can interrogate remote catalogues via the Internet
+   to return lists of objects which satisfy a given criterion.  GAIA
+   can also extract images of a specified region of sky from remote
+   databases.  Similar facilities are also available in other
+   packages, such as the ESO SkyCat image display tool and the Gemini
+   observing tool.  This functionality is achieved by having servers
+   running on the remote systems, These accept queries sent by GAIA
+   etc., interrogate their local copies of the catalogues to find the
+   data which satisfy the query, and return them.  The servers can
+   communicate with GAIA etc. because the query is sent, and the
+   results returned, in a standard format.  This document describes
+   how to write such servers.
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>A. C. Davenhall</name>
+    </person>
+  </developers>
+  <documentation> ssn75</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>2000</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
