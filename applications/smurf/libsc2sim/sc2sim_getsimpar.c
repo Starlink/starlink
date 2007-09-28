@@ -51,6 +51,8 @@
 *        Modified default values of atmyvalue and atmrefnu
 *     2007-07-04 (EC):
 *        Added cosmic ray spikes, parameters spike_p0/p1/t0/alpha
+*     2007-07-13 (AGG):
+*        Check that tauzen is within a valid range
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -225,6 +227,13 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
 
    if ( !astMapGet0D ( keymap, "TAUZEN", &(sinx->tauzen) ) )
       sinx->tauzen = 0.052583;
+   /* Check that tauzen is in range - this should be a
+      wavelength-dependent check, but for simplicity we can stick to
+      one value since tau should never get this low anyway. */
+   if ( sinx->tauzen <= 0.014 ) {
+     printf("TAUZEN out of range (must be >0.014), setting to 0.015\n");
+     sinx->tauzen = 0.015;
+   }
 
    if ( !astMapGet0D ( keymap, "XPOINT", &(sinx->xpoint) ) )
       sinx->xpoint = 20.0;
