@@ -17,7 +17,7 @@
 
 *  Arguments:
 *     mjdaystart = double (Given)
-*        MJD corresponding to first sample in file (TAI)
+*        MJD corresponding to first sample in file
 *     dateobs = char* (Given and Returned)
 *        Dateobs string
 *     status = int* (Given and Returned)
@@ -26,11 +26,11 @@
 *  Description:
 *      This routine constructs the DATE-OBS string for the FITS header
 *      in the output files. The necessary input is the MJD at the
-*      start of the file. Note that the MJD is on
-*      the TAI time scale.
+*      start of the file. The DATE-OBS returned is on the same time
+*      scale as the input so it is the caller's responsibility to
+*      ensure that the returned string corresponds to the time they expect.
 
 *  Notes:
-*      - MJD is a TAI time, not UT
 *      - It's likely that this routine has re-invented the wheel so it may
 *        not be here forever.
 
