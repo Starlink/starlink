@@ -60,5 +60,9 @@ else
 fi
 export CYGWIN
 
-#  And run up the interface.
-@AWISH@ $CURSA_DIR/xcatviewLib/xcatview.tcl ${1+"$@"}
+#  And run up the interface. Use related awish or one found on PATH.
+if test -f @AWISH@; then
+   @AWISH@ $CURSA_DIR/xcatviewLib/xcatview.tcl ${1+"$@"}
+else
+   awish $CURSA_DIR/xcatviewLib/xcatview.tcl ${1+"$@"}
+fi

@@ -56,6 +56,10 @@
 #     24-JAN-2006 (PWD):
 #       Changed CATREM_CONFIG to point at a RAL machine. Still not ideal, but
 #       works for the present.
+#     01-OCT-2007 (PWD):
+#       Use CURSA_DIR to define commands, not baked in paths. Use aliases
+#       to start Perl scripts, not baked in interpreter (note that that
+#       still happens, the scripts are just not ran up using it).
 #-
 #
 
@@ -85,60 +89,70 @@ endif
 #  so thatapplications that have conflicting command names are
 #  still available.
 
-alias catcopy         @bindir@/catcopy
-alias cursa_catcopy   @bindir@/catcopy
+alias catcopy         '$CURSA_DIR/catcopy'
+alias cursa_catcopy   '$CURSA_DIR/catcopy'
 
-alias catheader       @bindir@/catheader
-alias cursa_catheader @bindir@/catheader
+alias catheader       '$CURSA_DIR/catheader'
+alias cursa_catheader '$CURSA_DIR/catheader'
 
-alias catpair         @bindir@/catpair
-alias cursa_catpair   @bindir@/catpair
+alias catpair         '$CURSA_DIR/catpair'
+alias cursa_catpair   '$CURSA_DIR/catpair'
 
-alias catsort         @bindir@/catsort
-alias cursa_catsort   @bindir@/catsort
+alias catsort         '$CURSA_DIR/catsort'
+alias cursa_catsort   '$CURSA_DIR/catsort'
 
-alias catview         @bindir@/catview
-alias cursa_catview   @bindir@/catview
+alias catview         '$CURSA_DIR/catview'
+alias cursa_catview   '$CURSA_DIR/catview'
 
-alias catgscin        @bindir@/catgscin
-alias cursa_catgscin  @bindir@/catgscin
+alias catgscin        '$CURSA_DIR/catgscin'
+alias cursa_catgscin  '$CURSA_DIR/catgscin'
 
-alias catselect       @bindir@/catselect
-alias cursa_catselect @bindir@/catselect
+alias catselect       '$CURSA_DIR/catselect'
+alias cursa_catselect '$CURSA_DIR/catselect'
 
-alias catcoord        @bindir@/catcoord
-alias cursa_catcoord  @bindir@/catcoord
+alias catcoord        '$CURSA_DIR/catcoord'
+alias cursa_catcoord  '$CURSA_DIR/catcoord'
 
-alias catchart        @bindir@/catchart
-alias cursa_catchart  @bindir@/catchart
+alias catchart        '$CURSA_DIR/catchart'
+alias cursa_catchart  '$CURSA_DIR/catchart'
 
-alias catchartrn          @bindir@/catchartrn
-alias cursa_catchartrn    @bindir@/catchartrn
+alias catchartrn          '$CURSA_DIR/catchartrn'
+alias cursa_catchartrn    '$CURSA_DIR/catchartrn'
 
-alias catphotomfit        @bindir@/catphotomfit
-alias cursa_catphotomfit  @bindir@/catphotomfit
+alias catphotomfit        '$CURSA_DIR/catphotomfit'
+alias cursa_catphotomfit  '$CURSA_DIR/catphotomfit'
 
-alias catphotomtrn        @bindir@/catphotomtrn
-alias cursa_catphotomtrn  @bindir@/catphotomtrn
+alias catphotomtrn        '$CURSA_DIR/catphotomtrn'
+alias cursa_catphotomtrn  '$CURSA_DIR/catphotomtrn'
 
-alias catphotomlst        @bindir@/catphotomlst
-alias cursa_catphotomlst  @bindir@/catphotomlst
+alias catphotomlst        '$CURSA_DIR/catphotomlst'
+alias cursa_catphotomlst  '$CURSA_DIR/catphotomlst'
 
-alias catgrid         @bindir@/catphotomlst
-alias cursa_catgrid   @bindir@/catphotomlst
+alias catgrid         '$CURSA_DIR/catphotomlst'
+alias cursa_catgrid   '$CURSA_DIR/catphotomlst'
 
-# Perl scripts.
+#  Perl scripts. Look for the Starlink Perl.
+if ( -e @PERL@ ) then
+   set starperl=@PERL@
+else 
+   if ( -e $STARLINK_DIR/Perl/bin/perl ) then
+      set starperl $STARLINK_DIR/Perl/bin/perl
+   else
+#  No Starlink Perl, see what the default one can achieve.
+      set starperl perl
+   endif
+endif
 
-alias catcdsin        @bindir@/catcdsin
-alias cursa_catcdsin  @bindir@/catcdsin
+alias catcdsin        $starperl '$CURSA_DIR/catcdsin'
+alias cursa_catcdsin  $starperl '$CURSA_DIR/catcdsin'
 
-alias catremote       @bindir@/catremote
-alias cursa_catremote @bindir@/catremote
+alias catremote       $starperl '$CURSA_DIR/catremote'
+alias cursa_catremote $starperl '$CURSA_DIR/catremote'
 
 # tcl/tk script.
 
-alias xcatview        @bindir@/xcatview
-alias cursa_xcatview  @bindir@/xcatview
+alias xcatview        '$CURSA_DIR/xcatview'
+alias cursa_xcatview  '$CURSA_DIR/xcatview'
 
 #
 #  Environment variables for catremote.
@@ -151,19 +165,19 @@ alias cursa_xcatview  @bindir@/xcatview
 #    "java  UrlReader"        -- Java utility.
 #    "wget -q -O -"           -- wget utility (probably RedHat Linux only).
 
-setenv  CATREM_URLREADER @bindir@/geturl
+setenv  CATREM_URLREADER '$CURSA_DIR/geturl'
 
 #
 #  Specify the configuration file to be used.  The URL given here is the
 #  the CURSA default.
 
-setenv  CATREM_CONFIG  http://dev.starlink.ac.uk/~pwd/catremote/cursa.cfg
+setenv CATREM_CONFIG "http://dev.starlink.ac.uk/~pwd/catremote/cursa.cfg"
 
 #
 #  Define the maximum number of objects which may be included in the
 #  returned table.
 
-setenv  CATREM_MAXOBJ  200
+setenv CATREM_MAXOBJ 200
 
 #
 #  Specify whether the URL constituting the query is echoed to the
@@ -171,14 +185,14 @@ setenv  CATREM_MAXOBJ  200
 #    no   -  do not echo the URL (default),
 #    yes  -  echo the URL.
 
-setenv  CATREM_ECHOURL no
+setenv CATREM_ECHOURL no
 
 #
 #  Set the Java CLASSPATH environment variable to pick up the URLreader
 #  (note that CLASSPATH has to be set rather than setting the corresponding
 #  command line option because the latter does not work on alphas).
 
-setenv CLASSPATH @bindir@:/usr/lib/netscape/java/classes
+setenv CLASSPATH "${CURSA_DIR}:/usr/lib/netscape/java/classes"
 
 
 #
