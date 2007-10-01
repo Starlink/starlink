@@ -38,6 +38,9 @@
 *  History:
 *     4-SEP-2007 (DSB):
 *        Initial version.
+*     1-OCT-2007 (DSB):
+*        Ensure the reshaped NDF has the same number of pixel axes 
+*        as the original NDF.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -75,6 +78,8 @@
 void smf_reshapendf( smfData **data, smfTile *tile, int *status ){
 
 /* Local Variables */
+   int dim[ 3 ];
+   int ndim;
    int tndf;
 
 /* Do nothing if no data was supplied. */
@@ -90,9 +95,13 @@ void smf_reshapendf( smfData **data, smfTile *tile, int *status ){
 /* Close the smfData structure holding the NDF description. */
       smf_close_file( data, status );
 
-/* Change the shape of the NDF, and free the clonded NDF identifier. */
+/* Get the number of pixel axes in the original NDF (should be 3 for the
+   main arrays, and 2 for the extension arrays). */
       if( tndf != NDF__NOID ) {
-         ndfSbnd( 3, tile->lbnd, tile->ubnd, tndf, status ); 
+         ndfDim( tndf, 3, dim, &ndim, status ); 
+
+/* Change the shape of the NDF, and free the clonded NDF identifier. */
+         ndfSbnd( ndim, tile->lbnd, tile->ubnd, tndf, status ); 
          ndfAnnul( &tndf, status );
       }
    }          
