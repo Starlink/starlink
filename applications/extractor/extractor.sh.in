@@ -63,12 +63,6 @@ fi
 
 
 #
-#  Set up an environment variable pointing to the help library. 
-#  This is refered to within the appliation interface files.
-
-export EXTRACTOR_HELP=@starhelpdir@/extractor/extractor
-
-#
 #  Locate the installed binaries, scripts etc.
 
 export EXTRACTOR_CONFIG=$EXTRACTOR_DIR/config

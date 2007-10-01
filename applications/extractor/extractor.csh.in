@@ -59,12 +59,6 @@ else
 endif
 
 #
-#  Set up an environment variable pointing to the help library. 
-#  This is refered to within the appliation interface files.
-
-setenv EXTRACTOR_HELP @starhelpdir@/extractor
-
-#
 #  Locate the installed binaries, scripts etc.
 
 setenv EXTRACTOR_CONFIG $EXTRACTOR_DIR/config
