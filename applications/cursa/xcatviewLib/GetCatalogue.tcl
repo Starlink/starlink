@@ -221,6 +221,10 @@ proc GetCatalogue { } {
     bind  .getcatalogue.current.cat  <Return> {set getCatalogueButton "ok" }
 
 #
+#  In the list of catalogues a double-click accepts that catalogue.
+    bind .getcatalogue.spec.cats.list <Double-1> {set getCatalogueButton "ok" }
+
+#
 #   Create a frame to hold the row of buttons.
 
      frame .getcatalogue.buttonrow
