@@ -35,7 +35,7 @@ echo ""
 onintr goto exit
 
 #  Define location of Echwind files.
-setenv ECHWIND_HOME @bindir@/
+setenv ECHWIND_HOME ${ECHWIND_DIR}/
 
 #  Define location of Pgplot files if not already defined.
 if ( ! ${?PGPLOT_DIR} ) then
@@ -60,7 +60,7 @@ setenv ECHWIND_SPECTROGRAPHS ${ECHWIND_HOME}spectrographs.dat
 # The default value for the system detectors file is
 # 'detsystem' in the file 'echwind.ifl'. -- 25 Sep 1996, ACC
 #
-#setenv ECHWIND_DETECTORS     ${ECHWIND_HOME}detectors.dat
+#setenv ECHWIND_DETECTORS     ${ECHWIND_HOME}/detectors.dat
 
 ${ECHWIND_HOME}echwind
 
