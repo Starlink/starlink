@@ -1,4 +1,6 @@
-#!@PERL@
+: # *-*-perl-*-*
+  eval 'exec perl -S $0 "$@"'
+  if $running_under_some_shell;
 #+
 #  Name:
 #     FINDCOORDS
@@ -70,9 +72,8 @@
 #
 #  Set the catremote environment variables.
 
-#    $ENV{"CATREM_URLREADER"} = "/home/acd/starbase/cursa/catremote/geturl/geturl";
     $ENV{"CATREM_URLREADER"} = "$CURSA_DIR/geturl";
-    $ENV{"CATREM_CONFIG"} = "http://www.roe.ac.uk/acdwww/catremote/cursa.cfg";
+    $ENV{"CATREM_CONFIG"} = "http://dev.starlink.ac.uk/~pwd/catremote/cursa.cfg";
     $ENV{"CATREM_MAXOBJ"} = "200";
     $ENV{"CATREM_ECHOURL"} = "no";
 
