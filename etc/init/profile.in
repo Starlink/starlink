@@ -43,6 +43,7 @@ if [ ${relocate} -ne 0 ]; then
     mandir=${exec_prefix}/man
     starjavadir=${exec_prefix}/starjava
 else
+    export STARLINK_DIR=@exec_prefix@
     exec_prefix=@exec_prefix@
     bindir=@bindir@
     staretcdir=@staretcdir@

@@ -3,6 +3,11 @@
  files required by users in order to use the USSC.
 
  History:
+    v1.1-27 1-OCT-2007 (PWD):
+       Always define STARLINK_DIR to point at the root of the installation.
+       STARLINK_DIR can be pre-defined to relocate the installation 
+       (work in progress).
+
     v1.1-26 6-JUL-2004 (TIMJ)
        First autoconf version. Fixes required for logic involving
        obsolete datestamp files and the fact that /star/share no longer

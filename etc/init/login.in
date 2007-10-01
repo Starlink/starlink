@@ -29,6 +29,7 @@ if (${relocate}) then
     set mandir = ${exec_prefix}/man
     set starjavadir = ${exec_prefix}/starjava
 else
+    setenv STARLINK_DIR @exec_prefix@
     set exec_prefix = @exec_prefix@
     set bindir = @bindir@
     set staretcdir = @staretcdir@
