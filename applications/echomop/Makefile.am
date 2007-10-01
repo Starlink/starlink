@@ -224,4 +224,15 @@ echomop.csh: echomop.csh.in
 
 dist_starnews_DATA = echomop.news
 
-
+##  Post-installation tasks. Install additional hypertext docs as
+##  on-line help.
+install-data-hook:
+	- $(mkdir_p) $(starhelpdir)
+	pwd=`pwd`; \
+	cd $(starhelpdir)/..; \
+	rm -rf echomop.htx; \
+	$(mkdir_p) echomop.htx; \
+	cd echomop.htx; \
+	tar xf $$pwd/echomop_hyper.tar
+	pwd="$(starhelpdir)/../echomop.htx";\
+	$(MANIFEST) && tar tf echomop_hyper.tar | sed "s,^,MANIFEST:$$pwd/,"
