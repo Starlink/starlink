@@ -13755,6 +13755,14 @@ KAPPA: \htmlref{ARDPLOT}{ARDPLOT},
       the bad value or a specified constant value.  This value can be
       assigned to either the inside or the outside of the specified
       ARD region.
+
+      If positions in the ARD description are given using a co-ordinate
+      system that has one fewer axes than the input NDF, then each plane
+      in the NDF will be masked independently using the supplied ARD 
+      description. For instance, if a 2-D ARD description that uses (RA,Dec) 
+      to specify positions is used to mask a 3-D (ra,dec,velocity) NDF,
+      then each velocity plane in the NDF will be masked independently.
+
    }
    \sstusage{
       ardmask in ardfile out
