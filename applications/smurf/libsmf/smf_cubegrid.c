@@ -425,9 +425,13 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 
 /* If the output is an AZEL grid, ensure that alignment on the sky is
    performed in the azel coordinate system rather than the default (ICRS). */
+/* 2/10/2007 COMMENTED OUT SINCE TIMJ HAS NOT YET DECIDED WHETHER THIS IS
+   THE RIGHT THING TO DO. 
             if( !strcmp( usesys, "AZEL" ) ) {
                astSetC( *skyframe, "AlignSystem", "AZEL" );
             }
+*/
+
 
 /* We will later record the telescope base pointing position as the SkyRef 
    attribute in the output SkyFrame. To do this, we need to convert the 
