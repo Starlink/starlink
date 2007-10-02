@@ -1,21 +1,15 @@
-#! @AWISH@
 #
-#  Explicit paths for executables etc.  These are edited at install time
-#  and the flag indicating whether xcatview is running on a networked
-#  computer  or not.
+#  Explicit paths for executables etc. These are rooted using the CURSA_DIR
+#  environment variable. The flag indicates whether xcatview is running on a
+#  networked computer or not.
 
     global  catviewExe
     global  catremoteExe
 
-    set     catviewExe   @bindir@/catview
-    set     catremoteExe @bindir@/catremote
-    lappend auto_path    @bindir@/xcatviewLib
+    set     catviewExe   $::env(CURSA_DIR)/catview
+    set     catremoteExe $::env(CURSA_DIR)/catremote
+    lappend auto_path    $::env(CURSA_DIR)/xcatviewLib
     set     networked    @NETWORKED@
-
-#    set     catviewExe   /home/acd/starbase/cursa/atasks/catview
-#    set     catremoteExe /home/acd/starbase/cursa/catremote/catremote
-#    lappend auto_path    /home/acd/starbase/cursa/xcatview/lib
-#    set     networked   "yes"
 
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
