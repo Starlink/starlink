@@ -306,6 +306,18 @@ if ( -e ${bindir}/dipso/dipsosetup ) then
 endif
 
 #
+#  ECHOMOP
+if ( -e ${bindir}/echomop/echomop.csh ) then
+   setenv ECHOMOP_DIR ${bindir}/echomop
+endif
+
+#
+#  ECHWIND
+if ( -e ${bindir}/echwind/echwind.csh ) then
+   setenv ECHWIND_DIR ${bindir}/echwind
+endif
+
+#
 #  ESP
 if ( -e ${bindir}/esp/esp.csh) then
    setenv ESP_DIR ${bindir}/esp
