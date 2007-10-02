@@ -21,6 +21,9 @@
    as the default co-ordinate system for the supplied ARD description.
    See the new parameter DEFPIX.
 
+   o  ARDMASK can now use a 2-D ARD description to mask each plane in a 
+   3D NDF.
+
    o  ARDPLOT can now draw outlines around AST regions as well as
    ARD regions specified through a new REGION parameter.
 

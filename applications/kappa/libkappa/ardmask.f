@@ -26,6 +26,13 @@
 *     the bad value or a specified constant value. This value can be
 *     assigned to either the inside or the outside of the specified 
 *     ARD region.
+*
+*     If positions in the ARD description are given using a co-ordinate
+*     system that has one fewer axes than the input NDF, then each plane
+*     in the NDF will be masked independently using the supplied ARD 
+*     description. For instance, if a 2-D ARD description that uses (RA,Dec) 
+*     to specify positions is used to mask a 3-D (ra,dec,velocity) NDF,
+*     then each velocity plane in the NDF will be masked independently.
 
 *  Usage:
 *     ardmask in ardfile out
@@ -160,6 +167,9 @@
 *        Use CNF_PVAL
 *     27-SEP-2007 (DSB):
 *        Added parameter DEFPIX.
+*     2-OCT-2007 (DSB):
+*        If the ARD description has one less axis than the NDF, mask each
+*        plane in the NDF independently.
 *     {enter_further_changes_here}
 
 *-
@@ -170,6 +180,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constant
+      INCLUDE 'AST_PAR'          ! AST_ public constant and functions
       INCLUDE 'GRP_PAR'          ! GRP_ data constants
       INCLUDE 'PRM_PAR'          ! VAL_ data constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
@@ -183,28 +194,46 @@
       CHARACTER FILNAM*132       ! Name of ARD file
       CHARACTER TYPE*( NDF__SZTYP )  ! Numeric type for processing
       DOUBLE PRECISION CONST     ! The constant to assign
+      INTEGER AWCS               ! New application FrameSet
+      INTEGER AXLOOP             ! Grid axis to be looped over
+      INTEGER AXVAL              ! Pixel index on axis being looped over
       INTEGER EL                 ! Total number of pixels in the image
       INTEGER FD                 ! File descriptor
+      INTEGER PFRM               ! Reduced PIXEL frame
+      INTEGER I                  ! Loop count
       INTEGER IGRP               ! Group identifier
-      INTEGER IPIX               ! Index of PIXEL Frame within IWCS
-      INTEGER LBND( NDF__MXDIM ) ! Lower limit for image index  
-      INTEGER LBNDE( NDF__MXDIM )! Lower bounds of a box encompassing all external array elements
-      INTEGER LBNDI( NDF__MXDIM )! Lower bounds of a box encompassing all internal array elements
       INTEGER INDF1              ! Identifier for the source NDF  
       INTEGER INDF2              ! Identifier for the output NDF
+      INTEGER INDFS              ! Identifier for the output NDF section
+      INTEGER IPIX               ! Index of PIXEL Frame within IWCS
+      INTEGER IPMASK             ! Pointer to ARD logical mask
+      INTEGER IPOUT              ! Pointer to data component of output NDF
       INTEGER IWCS               ! NDF WCS FrameSet
-      INTEGER NDIM               ! Number of dimensions in the image
-      INTEGER IPOUT               ! Pointer to the data component of for the output NDF
-      INTEGER IPMASK             ! Pointer to the ARD logical mask
+      INTEGER J                  ! Loop count
+      INTEGER JUNK               ! Unused Mapping
+      INTEGER LBND( NDF__MXDIM ) ! Lower limit for image index  
+      INTEGER LBNDE( NDF__MXDIM )! Lower bounds of external array elements
+      INTEGER LBNDI( NDF__MXDIM )! Lower bounds of internal array elements
+      INTEGER NDIM               ! Number of pixel axes in the image
+      INTEGER NMASK              ! Number of masking operations
+      INTEGER NWCS               ! Number of axes in the user coords system
+      INTEGER PIXAX( NDF__MXDIM )! Grid axes being picked
+      INTEGER PLBND( NDF__MXDIM )! Lower pixel index bound on picked axes
+      INTEGER PUBND( NDF__MXDIM )! Upper pixel index bound on picked axes
       INTEGER REGVAL             ! Value assignied to the first ARD region
+      INTEGER SPMAP              ! Mapping from user to picked grid axes
       INTEGER UBND( NDF__MXDIM ) ! Upper limit for image index
-      INTEGER UBNDE( NDF__MXDIM )! Upper bounds of a box encompassing all external array elements
-      INTEGER UBNDI( NDF__MXDIM )! Upper bounds of a box encompassing all internal array elements
+      INTEGER UBNDE( NDF__MXDIM )! Upper bounds of external array elements
+      INTEGER UBNDI( NDF__MXDIM )! Upper bounds of internal array elements
+      INTEGER UMAP               ! GRID->user coords Mapping
+      INTEGER UWCS               ! GRID->user coords FrameSet
+      INTEGER WCSAX( NDF__MXDIM )! User axes being picked
       LOGICAL BAD                ! Assign bad values to the region?
       LOGICAL CONT               ! ARD description to continue?
       LOGICAL DEFPIX             ! Use pixel coords by default?
       LOGICAL INSIDE             ! Assign value to inside of region?
       LOGICAL THERE              ! Does the requested NDF component exist?
+      LOGICAL USED               ! Was the grid axis used?
       REAL TRCOEF( ( NDF__MXDIM + 1 ) * NDF__MXDIM ) ! Data to world co-ordinate conversions
 *.
 
@@ -257,10 +286,6 @@
       IGRP = GRP__NOID
       CALL ARD_GRPEX( FILNAM, GRP__NOID, IGRP, CONT, STATUS )
 
-*  Allocate the memory needed for the logical mask array.
-      CALL NDF_SIZE( INDF1, EL, STATUS )
-      CALL PSX_CALLOC( EL, '_INTEGER', IPMASK, STATUS )
-      
 *  See if pixel coordinates are to be assumed if the ard description
 *  contains no specification of the user co-ordinate system.
       CALL PAR_GET0l( 'DEFPIX', DEFPIX, STATUS )
@@ -276,25 +301,12 @@
       END IF
       CALL ARD_WCS( IWCS, ' ', STATUS )
 
-*  Create the mask.  Value 2 should be used to represent pixels
-*  specified by the first keyword in the ARD description. TRCOEF is
-*  ignored because we have previously called ARD_WCS.
-      REGVAL = 2
-      CALL ARD_WORK( IGRP, NDIM, LBND, UBND, TRCOEF, .FALSE., REGVAL,
-     :               %VAL( CNF_PVAL( IPMASK ) ), 
-     :               LBNDI, UBNDI, LBNDE, UBNDE,
-     :               STATUS )
-       
 *  Propagate the bits of the source NDF required.
       CALL LPG_PROP( INDF1, 'Data,Variance,Quality,Axis,Units,WCS', 
      :               'OUT', INDF2, STATUS )
 
 *  Get the title for the output NDF.
       CALL NDF_CINP( 'TITLE', INDF2, 'Title', STATUS )
-
-*  Map the output NDF data array for updating.
-      CALL NDF_MAP( INDF2, COMP, TYPE, 'UPDATE', IPOUT, EL,
-     :              STATUS )
 
 *  Get the string representing the constant value to assign.
       CALL PAR_MIX0D( 'CONST', 'Bad', VAL__MIND, VAL__MAXD, 'Bad',
@@ -308,44 +320,172 @@
 *  region.
       CALL PAR_GET0L( 'INSIDE', INSIDE, STATUS )
 
-*  Correct the output image to have bad pixels where indicated on the
-*  mask.  Call the appropriate routine for the data type.
-      IF( TYPE .EQ. '_REAL' ) THEN
-         CALL KPS1_ARDMR( BAD, CONST, INSIDE, EL, 
-     :                    %VAL( CNF_PVAL( IPMASK ) ),
-     :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
+*  Get a FrameSet connecting PIXEL coords to user coords.
+      CALL ARD_GTWCS( IGRP, NDIM, UWCS, STATUS )
 
-      ELSE IF( TYPE .EQ. '_BYTE' ) THEN
-         CALL KPS1_ARDMB( BAD, CONST, INSIDE, EL, 
-     :                    %VAL( CNF_PVAL( IPMASK ) ),
-     :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
+*  Get the user->pixel Mapping from this FrameSet.
+      UMAP = AST_GETMAPPING( UWCS, AST__CURRENT, AST__BASE, STATUS )
 
-      ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPS1_ARDMD( BAD, CONST, INSIDE, EL, 
-     :                    %VAL( CNF_PVAL( IPMASK ) ),
-     :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
+*  Assume that we will not be looping to mask multiple planes in the NDF.
+      AXLOOP = 0
 
-      ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-         CALL KPS1_ARDMI( BAD, CONST, INSIDE, EL, 
-     :                    %VAL( CNF_PVAL( IPMASK ) ),
-     :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
+*  If there are more pixel axes than WCS axes, we may be able to mask
+*  individual planes repeatedly in the input NDF.
+      NWCS = AST_GETI( UMAP, 'Nin', STATUS )
+      IF( NWCS .LT. NDIM ) THEN
 
-      ELSE IF( TYPE .EQ. '_UBYTE' ) THEN
-         CALL KPS1_ARDMUB( BAD, CONST, INSIDE, EL, 
-     :                     %VAL( CNF_PVAL( IPMASK ) ),
-     :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
+*  Try splitting the user->pixel Mapping up into two parallel Mappings,
+*  and extracting the one that transforms the NWCS current Frame axes into
+*  pixel coords.
+         DO I = 1, NWCS
+            WCSAX( I ) = I 
+         END DO
+         CALL AST_MAPSPLIT( UMAP, NWCS, WCSAX, PIXAX, SPMAP, STATUS )
 
-      ELSE IF( TYPE .EQ. '_UWORD' ) THEN
-         CALL KPS1_ARDMUW( BAD, CONST, INSIDE, EL, 
-     :                     %VAL( CNF_PVAL( IPMASK ) ),
-     :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
+*  If this was possible...
+         IF( SPMAP .NE. AST__NULL ) THEN
 
-      ELSE IF( TYPE .EQ. '_WORD' ) THEN
-         CALL KPS1_ARDMW( BAD, CONST, INSIDE, EL, 
-     :                    %VAL( CNF_PVAL( IPMASK ) ),
-     :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
+*  Get the number of pixel axes that are used to feed the NWCS current
+*  Frame axes. If this is one less than the total number of pixel axes in
+*  the NDF, then we will loop round every plane along the extra pixel axis 
+*  and mask each one.
+            IF( AST_GETI( SPMAP, 'Nout', STATUS ) .EQ. NDIM - 1 ) THEN
+
+*  Identify the un-used pixel axis.
+               DO I = 1, NDIM
+                  USED = .FALSE.
+                  DO J = 1, NDIM - 1
+                     IF( PIXAX( J ) .EQ. I ) USED = .TRUE.
+                  END DO                  
+                  IF( .NOT. USED ) AXLOOP = I
+               END DO
+            END IF
+         END IF
+      END IF
+
+*  If we will be looping to mask multiple planes, change the application
+*  FrameSet so that it spans the reduced number of pixel axes.
+      IF( AXLOOP .NE. 0 ) THEN
+         PFRM = AST_PICKAXES( AST_GETFRAME( UWCS, AST__BASE, STATUS ), 
+     :                        NDIM - 1, PIXAX, JUNK, STATUS )
+         AWCS = AST_FRAMESET( PFRM, ' ', STATUS )
+         CALL AST_INVERT( SPMAP, STATUS )
+         CALL AST_ADDFRAME( AWCS, AST__BASE, SPMAP, 
+     :                      AST_GETFRAME( UWCS, AST__CURRENT, STATUS ),
+     :                      STATUS )
+         CALL ARD_WCS( AWCS, ' ', STATUS )
+
+*  Find the number of pixels in one plane, and store the bounds of the
+*  used plane.
+         EL = 1
+         J = 1
+         DO I = 1, NDIM
+            IF( I .NE. AXLOOP ) THEN
+               EL = EL*( UBND( I ) - LBND( I ) + 1 )
+               PLBND( J ) = LBND( I )
+               PUBND( J ) = UBND( I )
+               J = J + 1
+            END IF
+         END DO
+
+*  Allocate the memory needed for the logical mask array covering one 
+*  plane.
+         CALL PSX_CALLOC( EL, '_INTEGER', IPMASK, STATUS )
+      
+*  Create the mask.  Value 2 should be used to represent pixels
+*  specified by the first keyword in the ARD description. TRCOEF is
+*  ignored because we have previously called ARD_WCS.
+         REGVAL = 2
+         CALL ARD_WORK( IGRP, NDIM - 1, PLBND, PUBND, TRCOEF, .FALSE., 
+     :                  REGVAL, %VAL( CNF_PVAL( IPMASK ) ), LBNDI, 
+     :                  UBNDI, LBNDE, UBNDE, STATUS )
+       
+*  Note how many masking operations will be performed.
+         NMASK = UBND( AXLOOP ) - LBND( AXLOOP ) + 1
+
+*  Note the pixel index of the first plane.
+         AXVAL = LBND( AXLOOP )
+
+*  If we will not be looping, get a mask covering the whole NDF.
+      ELSE
+
+*  Allocate the memory needed for the logical mask array.
+         CALL NDF_SIZE( INDF1, EL, STATUS )
+         CALL PSX_CALLOC( EL, '_INTEGER', IPMASK, STATUS )
+      
+*  Create the mask.  Value 2 should be used to represent pixels
+*  specified by the first keyword in the ARD description. TRCOEF is
+*  ignored because we have previously called ARD_WCS.
+         REGVAL = 2
+         CALL ARD_WORK( IGRP, NDIM, LBND, UBND, TRCOEF, .FALSE., REGVAL,
+     :                  %VAL( CNF_PVAL( IPMASK ) ), LBNDI, UBNDI, LBNDE, 
+     :                  UBNDE, STATUS )
+
+*  Note how many masking operations will be performed.
+         NMASK = 1
 
       END IF
+
+*  Loop round each masking operation.
+      DO I = 1, NMASK
+
+*  Get an NDF identifier for the section to be masked.
+         IF( AXLOOP .GT. 0 ) THEN
+            LBND( AXLOOP ) = AXVAL
+            UBND( AXLOOP ) = AXVAL
+            CALL NDF_SECT( INDF2, NDIM, LBND, UBND, INDFS, STATUS )
+            AXVAL = AXVAL + 1
+         ELSE
+            CALL NDF_CLONE( INDF2, INDFS, STATUS )
+         END IF
+
+*  Map the output NDF section for updating.
+         CALL NDF_MAP( INDFS, COMP, TYPE, 'UPDATE', IPOUT, EL,
+     :                 STATUS )
+
+*  Correct the output image to have bad pixels where indicated on the
+*  mask.  Call the appropriate routine for the data type.
+         IF( TYPE .EQ. '_REAL' ) THEN
+            CALL KPS1_ARDMR( BAD, CONST, INSIDE, EL, 
+     :                       %VAL( CNF_PVAL( IPMASK ) ),
+     :                       %VAL( CNF_PVAL( IPOUT ) ), STATUS )
+         
+         ELSE IF( TYPE .EQ. '_BYTE' ) THEN
+            CALL KPS1_ARDMB( BAD, CONST, INSIDE, EL, 
+     :                       %VAL( CNF_PVAL( IPMASK ) ),
+     :                       %VAL( CNF_PVAL( IPOUT ) ), STATUS )
+         
+         ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
+            CALL KPS1_ARDMD( BAD, CONST, INSIDE, EL, 
+     :                       %VAL( CNF_PVAL( IPMASK ) ),
+     :                       %VAL( CNF_PVAL( IPOUT ) ), STATUS )
+         
+         ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
+            CALL KPS1_ARDMI( BAD, CONST, INSIDE, EL, 
+     :                       %VAL( CNF_PVAL( IPMASK ) ),
+     :                       %VAL( CNF_PVAL( IPOUT ) ), STATUS )
+         
+         ELSE IF( TYPE .EQ. '_UBYTE' ) THEN
+            CALL KPS1_ARDMUB( BAD, CONST, INSIDE, EL, 
+     :                        %VAL( CNF_PVAL( IPMASK ) ),
+     :                       %VAL( CNF_PVAL( IPOUT ) ), STATUS )
+         
+         ELSE IF( TYPE .EQ. '_UWORD' ) THEN
+            CALL KPS1_ARDMUW( BAD, CONST, INSIDE, EL, 
+     :                        %VAL( CNF_PVAL( IPMASK ) ),
+     :                       %VAL( CNF_PVAL( IPOUT ) ), STATUS )
+         
+         ELSE IF( TYPE .EQ. '_WORD' ) THEN
+            CALL KPS1_ARDMW( BAD, CONST, INSIDE, EL, 
+     :                       %VAL( CNF_PVAL( IPMASK ) ),
+     :                       %VAL( CNF_PVAL( IPOUT ) ), STATUS )
+         
+         END IF
+
+*  Annul the section identifier.
+         CALL NDF_ANNUL( INDFS, STATUS )
+
+      END DO
 
 *  Set the bad-pixel flag.
       IF( BAD ) CALL NDF_SBAD( .TRUE., INDF2, COMP, STATUS )
