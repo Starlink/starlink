@@ -108,6 +108,8 @@
 *        Modified to use AST FrameSets instead of linear coeffs.
 *     18-JUL-2001 (DSB):
 *        Modified for ARD version 2.0.
+*     1-OCT-2007 (DSB):
+*        Add IWCS argument to ARD1_ADANL call.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -166,6 +168,7 @@
 
       INTEGER
      :  AWCS,                    ! WCS Frameset supplied by application 
+     :  IWCS,                    ! pixel->user FrameSet
      :  I,                       ! Loop count
      :  INDEX1,                  ! Index for 1st keyword
      :  MSKSIZ,                  ! No. of pixels in mask
@@ -258,7 +261,7 @@
 *  to the ARD description as supplied (i.e. no implicit .OR.s are
 *  inserted).
       CALL ARD1_ADANL( IGRP, NDIM, AWCS, DLBND, DUBND, IPEXPR, IPOPND, 
-     :                 SZEXPR, SZOPND, INP, STATUS )
+     :                 SZEXPR, SZOPND, INP, IWCS, STATUS )
 
 *  Abort if an error has occured.
       IF( STATUS .NE. SAI__OK ) GO TO 999

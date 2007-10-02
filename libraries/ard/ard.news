@@ -1,6 +1,14 @@
      Recent changes
      --------------
 
+ 2.2 (October 2007)
+ ---
+
+    A new routine ARD_GTWCS has been added that returns a FrameSet
+    connecting PIXEL coordinates and user coordinates within a specified 
+    ARD description.
+
+
  2.1 (May 2007)
  ---
 

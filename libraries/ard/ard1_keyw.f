@@ -111,6 +111,9 @@
 *        results in the last non blank character being ignored in the 
 *        supplied ELEM. The question mark has been replaced so that that
 *        CC is assigned ELEM( I : I ) if I == L on entry.
+*     1-OCT-2007 (DSB):
+*        Check that NDIM is not 2 before reporting an error about needing
+*        a DIMENSION statement.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -190,12 +193,16 @@
 *  No dimension statement is needed if NWCS is 2 (because 2 is the
 *  default dimensionality).
          IF( NEEDIM ) THEN
-            STATUS = ARD__BADDM
-            CALL MSG_SETI( 'NWCS', NWCS )
-            CALL ERR_REP( 'ARD1_KEYW_ERR1', 'ARD description is '//
-     :                    'defaulting to 2-dimensions. It should be '//
-     :                    '^NWCS dimensional.', STATUS )
-            GO TO 999
+            IF( NWCS .NE. 2 ) THEN
+               STATUS = ARD__BADDM
+               CALL MSG_SETI( 'NWCS', NWCS )
+               CALL ERR_REP( 'ARD1_KEYW_ERR1', 'ARD description is '//
+     :                       'defaulting to 2-dimensions. It should '//
+     :                       'be ^NWCS dimensional.', STATUS )
+               GO TO 999
+            ELSE
+               NEEDIM = .FALSE.
+            END IF
          END IF
 
 *  Save the current index of the top of the operand stack.

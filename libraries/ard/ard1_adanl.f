@@ -1,5 +1,5 @@
       SUBROUTINE ARD1_ADANL( IGRP, NDIM, AWCS, DLBND, DUBND, IPEXPR, 
-     :                       IPOPND, SZEXPR, SZOPND, INP, STATUS )
+     :                       IPOPND, SZEXPR, SZOPND, INP, IWCS, STATUS )
 *+
 *  Name:
 *     ARD1_ADANL
@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL ARD1_ADANL( IGRP, NDIM, AWCS, DLBND, DUBND, IPEXPR, 
-*                      IPOPND, SZEXPR, SZOPND, INP, STATUS )
+*                      IPOPND, SZEXPR, SZOPND, INP, IWCS, STATUS )
 
 *  Description:
 *     This routine analyses the supplied ARD description by identifying
@@ -76,12 +76,15 @@
 *     INP = INTEGER (Returned)
 *        Returned .TRUE if any INPUT keywords were found in the ARD
 *        description, and .FALSE. otherwise.
+*     IWCS = INTEGER (Returned)
+*        Total FrameSet from pixel to user coords.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 2000, 2001 Central Laboratory of the Research Councils.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -113,6 +116,8 @@
 *        Modified to use AST FrameSets insetad of coeff arrays.
 *     18-JUL-2001 (DSB):
 *        Modified for ARD version 2.0.
+*     1-OCT-2007 (DSB):
+*        Added IWCS argument.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -153,6 +158,7 @@
 
 *  Arguments Returned:
       LOGICAL INP
+      INTEGER IWCS
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -165,16 +171,15 @@
       CHARACTER
      : ELEM*(GRP__SZNAM )        ! Current GRP element
 
-      DOUBLE PRECISION           ! Extra WCS data
-     : WCSDAT( ARD__MXDIM*( ARD__MXDIM + 1 ) )
+      DOUBLE PRECISION           
+     : WCSDAT( ARD__MXDIM*( ARD__MXDIM + 1 ) ) ! Extra WCS data
 
       INTEGER
-     : CFRM,                     ! Pointer to current Frame (i.e. user coords) 
+     : CFRM,                     ! User coordinate Frame
      : I,                        ! Index of next character 
      : IELEM,                    ! Index of next GRP element
      : IEXPR,                    ! Next free entry in expression array
      : IOPND,                    ! Next free entry in operands array
-     : IWCS,                     ! Total FrameSet from pixel to user coords
      : L,                        ! Used length of current GRP element
      : MAP,                      ! AST Mapping from PIXEL to user coords
      : NARG,                     ! No. of arguments obtained so far
@@ -443,6 +448,19 @@
 
       END DO
 
+*  Ensure we have a pixel->user FrameSet.
+      IF( IWCS .EQ. AST__NULL ) THEN
+
+*  Get the pixel (base) frame from the application FrameSet, and store it
+*  in a new FrameSet.
+         IWCS = AST_FRAMESET( AST_GETFRAME( AWCS, AST__BASE, STATUS ),
+     :                        ' ', STATUS )
+
+*  Add the user co-ordinate Frame into the new FrameSet, using the 
+*  Mapping returned by ARD1_STAT to connect it to the existing base Frame.
+         CALL AST_ADDFRAME( IWCS, AST__BASE, MAP, CFRM, STATUS )
+      END IF
+         
 *  Report an error and abort if a null ARD description was supplied.
       IF( IEXPR .EQ. 1 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = ARD__BADDM
@@ -463,6 +481,10 @@
 
 *  Jump to here if an error occurs.
  999  CONTINUE
+
+*  Ensure the IWCS pointer is not annulled by the following call to
+*  AST_END.
+      CALL AST_EXPORT( IWCS, STATUS )
       
 *  End the AST context.
       CALL AST_END( STATUS )

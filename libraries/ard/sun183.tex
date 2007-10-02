@@ -8,11 +8,11 @@
 \newcommand{\stardocsource}    {sun183.6}
 \newcommand{\stardocnumber}    {183.6}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {10th May 2007}
+\newcommand{\stardocdate}      {2nd October 2007}
 \newcommand{\stardoctitle}     {ARD \\ [1ex]
                                 A Textual Language for Describing \\
                                 Regions within a Data Array}
-\newcommand{\stardocversion}   {Version 2.1}
+\newcommand{\stardocversion}   {Version 2.2}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -1944,6 +1944,8 @@ stand-alone version does not contain the routine \htmlref{ARD\_GROUP}{ARD_GROUP}
             {Obtain an ARD description from the environment}
 \noteroutine{ARD\_GRPEX}{( DESC, IGRP1, IGRP2, FLAG, STATUS )}
             {Store an explicitly supplied ARD description in a GRP group}
+\noteroutine{ARD\_GTWCS}{( IGRP, NDIM, IWCS, STATUS )}
+            {Return a FrameSet connecting pixel and user co-ordinates}
 \noteroutine{ARD\_PLOT}{( IGRP, IPLOT, GBOX, REGVAL, STATUS )}
             {Draw the outline of an ARD description on a graphics device}
 \noteroutine{ARD\_PTWCS}{( IWCS, IGRP, STATUS )}
@@ -2356,6 +2358,50 @@ stand-alone version does not contain the routine \htmlref{ARD\_GROUP}{ARD_GROUP}
    }
 }
 \sstroutine{
+   ARD\_GTWCS
+}{
+   Return a FrameSet connecting pixel and user co-ordinates
+}{
+   \sstdescription{
+      This routine returns an AST pointer for a FrameSet describing the
+      relationship between the user co-ordinate system used by the
+      supplied ARD description, and the pixel coordinate Frame of the
+      FrameSet stored by the most recent call to ARD\_WCS.
+   }
+   \sstinvocation{
+      CALL ARD\_GTWCS( IGRP, NDIM, IWCS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         A GRP identifier for the group holding the ARD description.
+      }
+      \sstsubsection{
+         NDIM = INTEGER (Given)
+      }{
+         The number of pixl axes in the mask array.
+      }
+      \sstsubsection{
+         IWCS = INTEGER (Returned)
+      }{
+         An AST pointer to the FrameSet. The base Frame will be the pixel
+         coordinate Frame in the FrameSet supplied via the most recent
+         call to ARD\_WCS. The current Frame will be the user co-ordinate
+         system specified by the supplied ARD description.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         An error is reported if the dimensionality of the ARD
+         description is different to that of the mask array (as specified
+         by argument NDIM).
+      }
+   }
+}
+\sstroutine{
    ARD\_PLOT
 }{
    Plot the boundary of an ARD description
@@ -2653,6 +2699,16 @@ in the application WCS FrameSet. For instance, if the application is an
 (RA,Dec,freq) cube, an ARD expression can be used that refers only to the
 freq axis, in which case the same frequency region will be masked in all
 (ra,dec) planes.
+
+\end{itemize}
+
+\section{Changes Introduced in Version 2.2}
+
+\begin{itemize}
+
+\item A new routine ARD\_GTWCS has been added that returns a FrameSet
+    connecting PIXEL coordinates and user coordinates within a specified 
+    ARD description.
 
 \end{itemize}
 
