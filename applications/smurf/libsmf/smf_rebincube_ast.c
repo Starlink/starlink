@@ -151,6 +151,8 @@
 *        Corrections to handle cases where there is only 1 detector.
 *     12-JUL-2007 (EC):
 *        -Changed name of smf_rebincube_totmap to smf_rebin_totmap
+*     2-OCT-2007 (DSB):
+*        Use nearest neighbour interpolation with the "detlut" LutMap.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -324,7 +326,8 @@ void smf_rebincube_ast( smfData *data, int index, int size, dim_t nchan,
       }
 
 /* Create the LutMap. */
-      lutmap = (AstMapping *) astLutMap( ndet, detlut, 1.0, 1.0, "" );
+      lutmap = (AstMapping *) astLutMap( ndet, detlut, 1.0, 1.0,
+                                         "LutInterp=1" );
 
 /* If we only have 1 detector, use a UnitMap instead of a LutMap (lutMaps
    must have 2 or more table entries). */
