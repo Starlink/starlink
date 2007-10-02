@@ -68,7 +68,7 @@
       endif
 
 #  Run the job
-      @bindir@/cocomain $_tty $_output $_echo $_report $_input $_prompts $_errors
+      $STARLINK_DIR/cocomain $_tty $_output $_echo $_report $_input $_prompts $_errors
 
 end:
       exit
