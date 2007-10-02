@@ -651,6 +651,8 @@ f     - Title: The Plot title drawn using AST_GRID
 *        - Add the protected methods astCopyPlotDefaults and astMirror.
 *        - Add public method astGetGrfContext, remove astSetGrfContext.
 *        - Fix memory leak.
+*     6-SEP-2007 (DSB):
+*        Dump and load any user-specified tick mark values.
 *class--
 */
 
@@ -27528,6 +27530,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    int axis;                     /* Zero based axis index */
    int id;                       /* Zero based graphical object id */
    int ival;                     /* Integer value */
+   int itick;                    /* Tick mark index */
    int nax;                      /* Number of base Frame axes */
    int set;                      /* Attribute value set? */
 
@@ -27946,6 +27949,32 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
                    "Upper X bound of supplied base Frame" );
    astWriteDouble( channel, "Yb2", 1, 1, this->bbox[ 3 ],
                    "Upper Y bound of supplied base Frame" );
+
+/* User-specified tick values */
+   for( axis = 0; axis < 3; axis++ ) {
+
+      if( this->nmajtickval[ axis ] > 0 ) {
+         sprintf( buff, "NMjTk%d", axis + 1 );
+         astWriteInt( channel, buff, 1, 1, this->nmajtickval[ axis ], "" );
+
+         for( itick = 0; itick < this->nmajtickval[ axis ]; itick++ ) {
+            sprintf( buff, "MjTk%d_%d", axis + 1, itick + 1 );
+            astWriteDouble( channel, buff, 1, 1, 
+                            this->majtickval[ axis ][ itick ], "" );
+         }
+      }
+
+      if( this->nmintickval[ axis ] > 0 ) {
+         sprintf( buff, "NMnTk%d", axis + 1 );
+         astWriteInt( channel, buff, 1, 1, this->nmintickval[ axis ], "" );
+
+         for( itick = 0; itick < this->nmintickval[ axis ]; itick++ ) {
+            sprintf( buff, "MnTk%d_%d", axis + 1, itick + 1 );
+            astWriteDouble( channel, buff, 1, 1, 
+                            this->mintickval[ axis ][ itick ], "" );
+         }
+      }
+   }
 
 /* Return. */
    return;
@@ -28711,7 +28740,9 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
    int axis;                     /* Zero based axis index */
    int id;                       /* Zero based graphical object id */
    int i;                        /* Loop count */
+   int itick;                    /* Tick mark index */
    int nax;                      /* Number of base Frame axes */
+   int ntick;                    /* Total number of ticks */
 
 /* Initialise. */
    new = NULL;
@@ -29170,8 +29201,34 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
       new->gat = NULL;
       new->ngat = 0;
 
+/* Arrays holding user-specified major and minot tick mark values. */
+      for( axis = 0; axis < 3; axis++ ) {
+         sprintf( buff, "nmjtk%d", axis + 1 );
+         ntick = astReadInt( channel, buff, 0 );
+         new->nmajtickval[ axis ] = ntick;
+         new->majtickval[ axis ] = astMalloc( ntick*sizeof( double ) );
+
+         for( itick = 0; itick < ntick; itick++ ) {
+            sprintf( buff, "mjtk%d_%d", axis + 1, itick + 1 );
+            new->majtickval[ axis ][ itick ] = astReadDouble( channel, buff, 
+                                                              AST__BAD );
+         }
+
+         sprintf( buff, "nmntk%d", axis + 1 );
+         ntick = astReadInt( channel, buff, 0 );
+         new->nmintickval[ axis ] = ntick;
+         new->mintickval[ axis ] = astMalloc( ntick*sizeof( double ) );
+
+         for( itick = 0; itick < ntick; itick++ ) {
+            sprintf( buff, "mntk%d_%d", axis + 1, itick + 1 );
+            new->mintickval[ axis ][ itick ] = astReadDouble( channel, buff, 
+                                                              AST__BAD );
+         }
+
+      }
+
 /* Initialise the arrays used to hold information describing the tick
-   marks for each axis. */
+   marks that have already been drawn for each axis. */
       for( axis = 0; axis < 3; axis++ ) {
          new->majtickgx[ axis ] = NULL;
          new->majtickgy[ axis ] = NULL;
@@ -29179,11 +29236,6 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
          new->mintickgx[ axis ] = NULL;
          new->mintickgy[ axis ] = NULL;
          new->mintickcount[ axis ] = 0;
-
-         new->nmajtickval[ axis ] = 0;
-         new->majtickval[ axis ] = NULL;
-         new->nmintickval[ axis ] = 0;
-         new->mintickval[ axis ] = NULL;
       }
 
 /* If an error occurred, clean up by deleting the new Plot. */
