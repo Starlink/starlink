@@ -140,6 +140,9 @@ f     - AST_GETREFPOS: Get reference position in any celestial system
 *        In SubFrame, since AlignSystem is extended by the SpecFrame class
 *        it needs to be cleared before invoking the parent SubFrame
 *        method in cases where the result Frame is not a SkyFrame.
+*     2-OCT-2007 (DSB):
+*        In Overlay, clear AlignSystem as well as System before calling
+*        the parent overlay method.
 *class--
 */
 
@@ -3309,14 +3312,15 @@ static void Overlay( AstFrame *template, const int *template_axes,
       }
 
 /* If the result Frame is not a SpecFrame, we must temporarily clear the
-   System value since the System values used by this class are only
-   appropriate to this class. Use a deep copy to avoid the danger of
-   making any permanent changes to the suppied Frame. */
+   System and AlignSystem values since the values used by this class 
+   are only appropriate to this class. Use a deep copy to avoid the danger 
+   of making any permanent changes to the suppied Frame. */
    } else {
       if( astTestSystem( template ) ) {
          templt = astAnnul( templt );
          templt = astCopy( template );
          astClearSystem( templt );
+         astClearAlignSystem( templt );
       }
    }
 

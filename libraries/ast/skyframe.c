@@ -217,6 +217,9 @@ f     The SkyFrame class does not define any new routines beyond those
 *        In SubFrame, since AlignSystem is extended by the SkyFrame class
 *        it needs to be cleared before invoking the parent SubFrame
 *        method in cases where the result Frame is not a SkyFrame.
+*     2-OCT-2007 (DSB):
+*        In Overlay, clear AlignSystem as well as System before calling
+*        the parent overlay method.
 *class--
 */
 
@@ -6398,6 +6401,7 @@ static void Overlay( AstFrame *template, const int *template_axes,
 
 
 /* Local Variables: */
+   AstSystemType new_alignsystem;/* Code identifying new alignment coords */
    AstSystemType new_system;     /* Code identifying new sky cordinates */
    AstSystemType old_system;     /* Code identifying old sky coordinates */
    int axis;                     /* Loop counter for result SkyFrame axes */
@@ -6455,12 +6459,14 @@ static void Overlay( AstFrame *template, const int *template_axes,
       }
 
 /* If the result Frame is not a SkyFrame, we must temporarily clear the
-   System value since the System values used by this class are only
+   System and AlignSystem values since the values used by this class are only
    appropriate to this class. */
    } else {
       if( astTestSystem( template ) ) {
          new_system = astGetSystem( template );
          astClearSystem( template );
+         new_alignsystem = astGetAlignSystem( template );
+         astClearAlignSystem( template );
          reset_system = 1;
       }
    }
@@ -6469,8 +6475,11 @@ static void Overlay( AstFrame *template, const int *template_axes,
    from the parent class. */
    (*parent_overlay)( template, template_axes, result );
 
-/* Reset the System value if necessary */
-   if( reset_system ) astSetSystem( template, new_system );
+/* Reset the System and AlignSYstem values if necessary */
+   if( reset_system ) {
+      astSetSystem( template, new_system );
+      astSetAlignSystem( template, new_alignsystem );
+   }
 
 /* Check if the result Frame is a SkyFrame or from a class derived from
    SkyFrame. If not, we cannot transfer SkyFrame attributes to it as it is

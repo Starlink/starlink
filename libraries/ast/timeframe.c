@@ -130,7 +130,10 @@ f     - AST_CURRENTTIME: Return the current system time
 *     3-SEP-2007 (DSB):
 *        In SubFrame, since AlignSystem is extended by the TimeFrame class
 *        it needs to be cleared before invoking the parent SubFrame
-*        method in cases where the result Frame is not a SkyFrame.
+*        method in cases where the result Frame is not a TimeFrame.
+*     2-OCT-2007 (DSB):
+*        In Overlay, clear AlignSystem as well as System before calling
+*        the parent overlay method.
 *class--
 */
 
@@ -3652,6 +3655,7 @@ static void Overlay( AstFrame *template, const int *template_axes,
    const char *new_class;        /* Pointer to template class string */
    const char *old_class;        /* Pointer to result class string */
    const char *method;           /* Pointer to method string */
+   AstSystemType new_alignsystem;/* Code identifying new alignment coords */
    AstSystemType new_system;     /* Code identifying new cordinates */
    AstSystemType old_system;     /* Code identifying old coordinates */
    int resetSystem;              /* Was the template System value cleared? */
@@ -3686,11 +3690,15 @@ static void Overlay( AstFrame *template, const int *template_axes,
       }
 
 /* If the result Frame is not a TimeFrame, we must temporarily clear the
-   System value since the System values used by this class are only
+   System and AlignSystem values since the values used by this class are only
    appropriate to this class. */
    } else {
       if( astTestSystem( template ) ) {
          astClearSystem( template );
+
+         new_alignsystem = astGetAlignSystem( template );
+         astClearAlignSystem( template );
+
          resetSystem = 1;
       }
    }
@@ -3699,8 +3707,11 @@ static void Overlay( AstFrame *template, const int *template_axes,
    from the parent class. */
    (*parent_overlay)( template, template_axes, result );
 
-/* Reset the System value if necessary */
-   if( resetSystem ) astSetSystem( template, new_system );
+/* Reset the System and AlignSystem values if necessary */
+   if( resetSystem ) {
+      astSetSystem( template, new_system );
+      astSetAlignSystem( template, new_alignsystem );
+   }
 
 /* Check if the result Frame is a TimeFrame or from a class derived from
    TimeFrame. If not, we cannot transfer TimeFrame attributes to it as it is
