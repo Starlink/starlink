@@ -1433,9 +1433,9 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
 /* Loop round each output of the supplied PermMap. */
       for( iout = 0; iout < npout; iout++ ) {
  
-/* Is this output fed by one of the selected inputs or a constant? If so 
-   store the input index of the returned Mapping, or constant, which feeds 
-   this output and add this output index to the list of returned outputs. */
+/* Is this output fed by one of the selected inputs? If so store the input 
+   index of the returned Mapping, which feeds this output and add this 
+   output index to the list of returned outputs. */
          iin = outp ? outp[ iout ] : iout;
          if( iin >= 0 && iin < npin ) {
             for( i = 0; i < nin; i++ ) {
@@ -1446,11 +1446,6 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
                   break;
                }
             }
-
-         } else {
-            outpm[ nout ] = iin;
-            result[ nout ] = iout;
-            nout++;
          }
       }
 
@@ -1461,7 +1456,8 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
          iin = in[ i ];
  
 /* Is this input constant or fed by one of the selected outputs? If so store 
-   the output or constant index in the returned Mapping which feeds this input. */
+   the output or constant index in the returned Mapping which feeds this 
+   input. */
          ok = 0;
          iout = inp ? inp[ iin ] : iin;
          if( iout >= 0 && iout < npout ) {

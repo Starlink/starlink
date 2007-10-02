@@ -1870,6 +1870,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
    int noff;             /* No. of outputs from total lower Mapping */
    int nout1;            /* No. of outputs from split lower Mapping */
    int nout2;            /* No. of outputs from split higher Mapping */
+   int npin;             /* Total no. of CmpMap inputs */
    int ok;               /* Can required Mapping be created? */
    int old_inv1;         /* Original Invert flag for map1 */
    int old_inv2;         /* Original Invert flag for map2 */
@@ -1882,14 +1883,23 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
 /* Check the global error status. */
    if ( !astOK ) return result;
 
-/* Invoke the parent astMapSplit method to see if it can do the job. */
-   result = (*parent_mapsplit)( this_map, nin, in, map );
-
-/* If not, we provide a special implementation here. */
-   if( !result ) {
-
 /* Get a pointer to the CmpMap structure. */
-      this = (AstCmpMap *) this_map;
+   this = (AstCmpMap *) this_map;
+
+/* Get the number of inputs in the supplied CmpMap. */
+   npin = astGetNin( this );
+
+/* Check all input axis indices are valid. */
+   ok = 1;
+   for( i = 0; i < nin; i++ ) {
+      if( in[ i ] < 0 || in[ i ] >= npin ) {
+         ok = 0;
+         break;
+      }
+   }
+
+/* If OK, proceed. */
+   if( ok ) {
 
 /* Get the component Mapping pointers. Set the Invert flags as they were when 
    the CmpMap was created, first saving the current Invert flags so they can 
