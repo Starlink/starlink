@@ -14,9 +14,14 @@
 
 2 Modified_applications
 
-   o  ARDMASK now has an option to use WCS co-ordinates in the input NDF 
-   as the default co-ordinate system for the supplied ARD description.
-   See the new parameter DEFPIX.
+   o  ARDMASK 
+   
+      -  This now has an option to use WCS co-ordinates in the input NDF 
+      as the default co-ordinate system for the supplied ARD description.
+      See the new parameter DEFPIX.
+
+      -  It can now use a two-dimensional ARD description to mask each
+      plane in a three-dimensional NDF.
 
    o  MFITTREND
 
