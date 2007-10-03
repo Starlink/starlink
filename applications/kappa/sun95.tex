@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.33}
 \newcommand{\stardocnumber}    {95.32}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2007 September 13}
+\newcommand{\stardocdate}      {2007 September 28}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.8-1}
+\newcommand{\stardocversion}   {1.8-2}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -13755,14 +13755,6 @@ KAPPA: \htmlref{ARDPLOT}{ARDPLOT},
       the bad value or a specified constant value.  This value can be
       assigned to either the inside or the outside of the specified
       ARD region.
-
-      If positions in the ARD description are given using a co-ordinate
-      system that has one fewer axes than the input NDF, then each plane
-      in the NDF will be masked independently using the supplied ARD 
-      description. For instance, if a 2-D ARD description that uses (RA,Dec) 
-      to specify positions is used to mask a 3-D (ra,dec,velocity) NDF,
-      then each velocity plane in the NDF will be masked independently.
-
    }
    \sstusage{
       ardmask in ardfile out
@@ -53164,15 +53156,6 @@ The following applications have been modified:
          as ARD regions specified through a new REGION parameter.
       \end{itemize}
 
-   \item [\htmlref{ARDMASK}{ARDMASK}] \mbox{}
-      \begin{itemize}
-         \item  This now has an option to use WCS co-ordinates in the 
-          input NDF as the default co-ordinate system for the supplied 
-          ARD description. See the new parameter DEFPIX.
-         \item If a 2-D ARD description is supplied to mask a 3-D NDF,
-         then each plane in the NDF will now be masked independently.
-      \end{itemize}
-
    \item [\htmlref{DIV}{DIV}] \mbox{}
       \begin{itemize}
          \item This now propagates any UNITS, combining them into a
@@ -53314,6 +53297,13 @@ The following new applications have been added:
 The following applications have been modified:
 
 \begin{description}
+
+   \item [\htmlref{ARDMASK}{ARDMASK}] \mbox{}
+      \begin{itemize}
+         \item  This now has an option to use WCS co-ordinates in the 
+          input NDF as the default co-ordinate system for the supplied 
+          ARD description.  See the new parameter DEFPIX.
+      \end{itemize}
 
    \item [\htmlref{MFITTREND}{MFITTREND}] \mbox{}
       \begin{itemize}

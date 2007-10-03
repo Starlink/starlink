@@ -1,3 +1,38 @@
+1 KAPPA_Version_1.8
+
+   A new release of KAPPA (V1.8) is under development,  The main changes
+   so far are listed below.  For complete details of all changes, see
+   the "Release Notes" appendix in SUN/95.
+
+2 New_applications
+
+   o  PLUCK extracts slices parallel to pixel axes from an NDF.  The slices
+   are nominated positions that are not at pixel centres.  Thus it can
+   be used for example, with a spectral imaging cube to extract spectra
+   at specified equatorial co-ordinates, or an image at a given spectral
+   co-ordinate.
+
+2 Modified_applications
+
+   o  ARDMASK now has an option to use WCS co-ordinates in the input NDF 
+   as the default co-ordinate system for the supplied ARD description.
+   See the new parameter DEFPIX.
+
+   o  MFITTREND
+
+      -  There are three new parameters: METHOD allows a choice of
+      automatic de-trending methods.  The first of these handles each
+      line independently, finding and masking features by binning and
+      applying a threshold.  MASK stores the feature mask in an NDF.
+      NUMBIN specifies the number of bins for the automatic mode.
+
+      -  The reported fitting ranges are now given in the current
+      current co-ordinate system, along with the previously listed 
+      pixel ranges in parentheses.
+
+   o  PSF has a new output parameter TOTAL which returns the total flux
+      for the fitted Sersic function.
+
 1 KAPPA_Version_1.7
 
    A new release of KAPPA (V1.7-10) has been made.  The main changes
@@ -16,13 +51,6 @@
 
    o  ADD now propagates the UNITS component if it is the same in 
    both input NDFs.
-
-   o  ARDMASK now has an option to use WCS co-ordinates in the input NDF 
-   as the default co-ordinate system for the supplied ARD description.
-   See the new parameter DEFPIX.
-
-   o  ARDMASK can now use a 2-D ARD description to mask each plane in a 
-   3D NDF.
 
    o  ARDPLOT can now draw outlines around AST regions as well as
    ARD regions specified through a new REGION parameter.
