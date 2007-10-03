@@ -69,7 +69,10 @@
 *     2007-09-26 (CVL):
 *        - rearranged placement of a print statement
 *        - put a non-generic date in the fits header
-
+*        - removed old commented-out diagnostic code
+*     2007-10-02 (CVL):
+*        Ignore data when pointing information has not updated for
+*        more than 20 frames
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -170,6 +173,8 @@ void smurf_impaztec( int *status ) {
   char *curtok = NULL;         /* string tokenizer */
   int date_status;             /* status of date conversion */
   char date_str[MAXSTRING];    /* string rep. of date (MM/DD/YYYY) */
+  char dateobs[20];            /* string of date YYYY/MM/DDThh:mm:ss
+				  for fits header */
   int day;                     /* day of beginning of observation */
   int *dbuf=NULL;              /* simulated data  */
   double dec=0;                /* dec of observation in radians  */
@@ -187,9 +192,11 @@ void smurf_impaztec( int *status ) {
   struct JCMTState *head=NULL; /* header data for each frame  */
   int hour;                    /* hour of beginning of observation */
   dim_t i;                     /* loop counter */
+  int i_good;                  /* index for good frames */
   int indf=0;                  /* NDF id for the file */
   dim_t j;                     /* loop counter */
   HDSLoc *jcmtstateloc = NULL; /* HDS locator to JCMTSTATE structure */
+  int leng=0;                  /* used to count the length of a string */
   int lbnd[3];                 /* Dimensions of the DATA component */
   double lst_coord=0;          /* LST derived from the coordinates ra,az,el
 			          for the current frame */
@@ -207,10 +214,12 @@ void smurf_impaztec( int *status ) {
   char ncfile[MAXSTRING];      /* input NetCDF file name */
   int ncid;                    /* id of netCDF file */
   int ncol;                    /* number of bolometers in column  */
+  int nconst=0;                /* number of sequential frames with constant
+				  pointing data */
   char ndffile[MAXSTRING];     /* output NDF file name */
   int nflat;                   /* number of flat coeffs per bol  */
   int nframes;                 /* number of time steps in netCDF data format */
-  int ngframes;                /* number of good frames */
+  int ngframes=0;              /* number of good frames */
   int nmap=0;                  /* Number of elements mapped */
   int nrow;                    /* number of bolometers in row */
   int numsamples;              /* number of samples  */
@@ -218,6 +227,7 @@ void smurf_impaztec( int *status ) {
   int place=0;                 /* NDF placeholder */
   void *pntr=NULL;             /* Temporary pointer */
   double *posptr=NULL;         /* pointing offsets from map centre */
+  int *quality;                /* for a given frame: 1 is good, 0 is bad */
   double ra=0;                 /* ra of observation in radians  */
   double rad;                  /* RA of observation in degrees */
   char ra_str[MAXSTRING];      /* string rep. of ra */
@@ -245,8 +255,6 @@ void smurf_impaztec( int *status ) {
   double y_max = 0;
   int yr;                      /* year of beginning of observation */
 
-  char dateobs[20];
- 
   /* Main routine */
 
 #ifdef HAVE_LIBNETCDF
@@ -314,6 +322,9 @@ void smurf_impaztec( int *status ) {
     mjuldate = smf_malloc ( nframes, sizeof(*mjuldate), 1, status );
     tempbuff = smf_malloc ( nframes, sizeof(*tempbuff), 1, status );
 
+    quality = smf_malloc ( nframes, sizeof(*quality), 1, status );
+    memset( quality, 0, nframes*sizeof(int) );
+
     /* Calculate the time for each frame.  First, get the modified julian
        date (day) from the "date" attribute of the NETCDF file.  Then, 
        get the time of the first frame and convert it from 'seconds from
@@ -343,7 +354,6 @@ void smurf_impaztec( int *status ) {
     nc_get_att_text ( ncid, NC_GLOBAL, "start_time", time_str );
     curtok = strtok ( time_str, ":");
     hour = atoi ( curtok );
-    int leng=0;
     while( !curtok[leng]=='\0' ) { leng++; }
     if(leng==1) { dateobs[11]='0'; dateobs[12]=curtok[0]; }
     else if(leng<1) { dateobs[11]='0'; dateobs[12]='0'; }
@@ -397,26 +407,49 @@ void smurf_impaztec( int *status ) {
        progress. The easiest way to see when they are updating is to
        derive an LST from them which will be constant when they are
        not updating. */
+    /* Additionally: Durring the scan the pointing information
+       typically stays constant for 8 or 9 frames or sometimes 17 or
+       18 frames. There can be chunks of data where the pointing info
+       is constant for better than 100 frames. -> Say that the first 25
+       frames in chunk of frames with constant pointing are good,
+       the frames following that are 'bad'. In the future one might try
+       interpolating the pointing information over the mid-scan 'bad'
+       frames. */
     startframe = nframes;
     for ( i = 0; i < nframes; i++ ) {      
+
+      printf("%i %f %f %f %f\n", i, trackactc1[i], trackactc2[i],
+	     azelactc1[i], azelactc2[i]);
 
       lst_coord_prev = lst_coord;
       slaDh2e( azelactc1[i], azelactc2[i], telpos[1]*2*3.1415926536/360.0,
 	       &ha, &tmp);
       lst_coord = ha + trackactc1[i]; // LST derived from coordinates
 				      // (az, el, and ra)
+
       if( (lst_coord - lst_coord_prev)>0.0 && i!=0) {
-	/* frames from here on are good */
-	startframe=i;
-	printf("IMPAZTEC start frame: %i n_good_frames: %i\n",
-	       startframe, nframes-startframe);
-	ra = trackactc1[i]; dec=trackactc2[i];
-	printf("IMPAZTEC ra,dec from trackact: %g %g\n", ra, dec);
-	break;
+
+	if(ngframes==0) { startframe=i; }
+	quality[i]=1;
+	ngframes++;
+	//printf("IMPAZTEC i: %5i nconst: %5i\n", i, nconst);
+	nconst=0;
+
+      }
+      else {
+	nconst++;
+
+	if(ngframes>0 && nconst<=20) {
+	  quality[i]=1;
+	  ngframes++;
+	}
+
       }
 
     }
-    ngframes = nframes - startframe; // number of good frames
+
+    printf("IMPAZTEC n_frames: %i n_good_frames: %i startframe: %i\n",
+	   nframes, ngframes, startframe);
 
     if (ngframes == 0) {
       printf("This file contains no good frames? LST(coords) is constant.\n");
@@ -431,31 +464,42 @@ void smurf_impaztec( int *status ) {
     lst = tempbuff[startframe];
     ha_tr = lst - trackactc1[startframe];
     printf("IMPAZTEC ha(az,el): %g ha(lst,ra): %g\n", ha_azel, ha_tr);
-    printf("IMPAZTEC dec: %g dec(az,el): %g\n",
-	   trackactc2[startframe], dec_fr_azel);
+    printf("IMPAZTEC dec(az,el): %g dec: %g\n",
+	   dec_fr_azel, trackactc2[startframe]);
 
+    i_good=0;
+    for( i=0; i<nframes; i++) {
+      if(quality[i]==1) {
+	head[i_good].rts_num = i_good;   
+	head[i_good].rts_end = mjuldate[i];
+	head[i_good].tcs_airmass = airmass[i];
+	head[i_good].tcs_tr_ac1 = trackactc1[i];
+	head[i_good].tcs_tr_ac2 = trackactc2[i];
+	head[i_good].tcs_tr_dc1 = trackdemandc1[i];
+	head[i_good].tcs_tr_dc2 = trackdemandc2[i];
+	head[i].tcs_tr_bc1 = trackactc1[startframe];
+	  /* trackbasec1[i]; strange values? */
+	head[i_good].tcs_tr_bc2 = trackactc2[startframe];
+	  /* trackbasec2[i]; strange values? */
+	head[i_good].tcs_az_ac1 = azelactc1[i];
+	head[i_good].tcs_az_ac2 = azelactc2[i];  
+	head[i_good].tcs_az_dc1 = azeldemandc1[i];
+	head[i_good].tcs_az_dc2 = azeldemandc2[i];
+	head[i_good].tcs_az_bc1 = azelactc1[startframe];
+	  // azelbasec1[i+startframe];
+	head[i_good].tcs_az_bc2 = azelactc2[startframe];
+	  // azelbasec2[i+startframe]; 
+      
+	posptr[2*i_good +0] = azelactc1[i];
+	posptr[2*i_good +1] = azelactc2[i];
 
-    for( i=0; i<ngframes; i++) {
-      head[i].rts_num = i;   
-      head[i].rts_end = mjuldate[i+startframe];
-      head[i].tcs_airmass = airmass[i+startframe];
-      head[i].tcs_tr_ac1 = trackactc1[i+startframe];
-      head[i].tcs_tr_ac2 = trackactc2[i+startframe];
-      head[i].tcs_tr_dc1 = trackdemandc1[i+startframe];
-      head[i].tcs_tr_dc2 = trackdemandc2[i+startframe];
-      head[i].tcs_tr_bc1 = trackactc1[0+startframe]; /* trackbasec1[i]; strange values? */
-      head[i].tcs_tr_bc2 = trackactc2[0+startframe]; /* trackbasec2[i]; strange values? */
-      head[i].tcs_az_ac1 = azelactc1[i+startframe];
-      head[i].tcs_az_ac2 = azelactc2[i+startframe];  
-      head[i].tcs_az_dc1 = azeldemandc1[i+startframe];
-      head[i].tcs_az_dc2 = azeldemandc2[i+startframe];
-      head[i].tcs_az_bc1 = azelactc1[0+startframe]; // azelbasec1[i+startframe];
-      head[i].tcs_az_bc2 = azelactc2[0+startframe]; // azelbasec2[i+startframe]; 
-      
-      posptr[2*i +0] = azelactc1[i+startframe];
-      posptr[2*i +1] = azelactc2[i+startframe];
-      
-    } 
+	i_good++;
+      }
+    }
+    if(i_good != ngframes) {
+      printf("IMPAZTEC i_good after filling JCMTState != ngframes, i_good: %i\n",
+	     i_good);
+    }
 
     /* Additional FITS header information */
 
@@ -495,24 +539,30 @@ void smurf_impaztec( int *status ) {
   /* Re-order the bolometer signals */
   nc_inq_varid(ncid, "h1b1",&varid_h1b1);
   
-  for(i=0; i<nbolos ; i++){
-    nc_error( nc_get_var_double(ncid,varid_h1b1+i,bolosig), status );
+  for(j=0; j<nbolos ; j++){
+    nc_error( nc_get_var_double(ncid,varid_h1b1+j,bolosig), status );
     
     if( *status == SAI__OK ) {
-      for(j=0;j<ngframes;j++) {
-	full_bolosig[j*nbolos + i] = bolosig[j+startframe];
+      i_good=0;
+      for(i=0;i<nframes;i++) {
+	if(quality[i]==1) {
+	  full_bolosig[i_good*nbolos + j] = bolosig[i_good];
+	  i_good++;
+	}
       }
     } else {
       /* Exit if bad status was set */
-      i = nbolos;
+      j = nbolos;
     }
+  }
+  if(i_good != ngframes) {
+    printf("IMPAZTEC i_good after filling bolo signals != ngframes,  i_good: %i\n",
+	   i_good);
   }
 
   /* Format the FITS headers */
   /* Add the FITS data to the output file */
   fitschan = astFitsChan ( NULL, NULL, "" );
-  /* Kludged to write generic date */
-  //astSetFitsS ( fitschan, "DATE-OBS", "YYYY-MM-DDThh:mm:ss", "observation date", 0 );
   astSetFitsS ( fitschan, "DATE-OBS", dateobs, "observation date", 0 );
   rad = ra * AST__DR2D;
   astSetFitsF ( fitschan, "RA", rad, "Right Ascension of observation", 0 );
@@ -609,6 +659,8 @@ void smurf_impaztec( int *status ) {
   smf_free ( azeldemandc2, status );
   smf_free ( azelbasec1, status );
   smf_free ( azelbasec2, status );
+
+  smf_free ( quality, status );
 
   if ( *status == SAI__OK ) {
     msgOutif(MSG__VERB," ", 
