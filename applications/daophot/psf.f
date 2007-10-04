@@ -363,13 +363,13 @@ C
                  STAROK = .FALSE.
                  IF (WATCH .GT. -0.5) THEN
                    CALL TBLANK
-                   WRITE (6,628) ID(ISTAR), DATUM, 7, I, J
+                   WRITE (6,628) ID(ISTAR), DATUM, CHAR(7), I, J
  628               FORMAT (1X, I5, ' has a bad pixel:',  F9.1, 
      .                  ' at position', A1, 2I5)
                  END IF
                ELSE
                  IF (WATCH .GT. -0.5) 
-     .                WRITE (6,628) ID(ISTAR), DATUM, 0, I, J
+     .                WRITE (6,628) ID(ISTAR), DATUM, CHAR(0), I, J
                END IF
 C
 C Replace the defective pixel with an average of surrounding
