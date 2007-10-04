@@ -192,7 +192,7 @@ C-----------------------------------------------------------------------------
          GO TO 700
       END IF
 
-      NBFREQ = PERIOD_FILLB(MAXPTS, B, HWIDTH, PHINC)! Fill the restoring beam
+      NBFREQ = PERIOD_FILLB(MAXPTS-1, B, HWIDTH, PHINC)! Fill the restoring beam
  
 C-----------------------------------------------------------------------------
 C CLEAN the residual spectrum, storing the components in C(0:MS).
