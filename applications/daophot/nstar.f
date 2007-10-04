@@ -234,7 +234,7 @@ C The group is too large.  Type out a message, keep reading until
 C a blank line is encountered, and then go back and start a completely
 C new group.
 C
- 2020 WRITE (6,620) 7, MAXSTR
+ 2020 WRITE (6,620) CHAR(7), MAXSTR
   620 FORMAT (' Group with more than ', A1, I2, ' stars.')
  2030 CALL RDSTAR (2, 3, I, DUM, DUM, DUM, DUM)
       IF (I .LT. 0) GO TO 9000
