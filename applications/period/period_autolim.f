@@ -24,6 +24,7 @@ C=============================================================================
       INCLUDE "mnmxvl.h"
  
       INTEGER NDATA, MAXPTS, IFAIL, I
+      INTEGER INTMAX
       DOUBLE PRECISION DATA(NDATA)
       DOUBLE PRECISION MINFREQ, MAXFREQ, FINTERVAL
       DOUBLE PRECISION FMIN, FMAX, FINT
@@ -105,15 +106,16 @@ C-----------------------------------------------------------------------------
          WRITE (*, *) '** ERROR: minimum frequency in PERIOD_AUTOLIM.'
          IFAIL = 1
       ELSE
+         INTMAX = IDINT((FMAX-FMIN)/FINT) + 2
          IF ( MAXPTS.GT.0 ) THEN
-            IF ( IDINT((FMAX-FMIN)/FINT).GE.MAXPTS ) THEN
+            IF ( INTMAX.GE.MAXPTS ) THEN
                CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: Frequency interval too small'
                WRITE (*, *) '** ERROR: in PERIOD_AUTOLIM.'
                IFAIL = 1
             END IF
          ELSE
-            MAXPTS = IDINT((FMAX-FMIN)/FINT) + 1
+            MAXPTS = INTMAX
          END IF
       END IF
  
