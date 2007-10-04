@@ -18,7 +18,8 @@
 
 *  Arguments:
 *     NDIM = INTEGER (Given)
-*        Number of array dimensions.
+*        Number of array dimensions.  This must be no greater than
+*        NDF__MXDIM.
 *     DIM( NDIM ) = INTEGER (Given)
 *        Input array dimensions.
 *     DIMO( NDIM ) = INTEGER (Given)
@@ -38,12 +39,13 @@
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -53,8 +55,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (DSB)
@@ -66,6 +68,9 @@
 *        Original version.
 *     2006 April 12 (MJC):
 *        Remove unused variable and wrapped long lines.
+*     2007 October 4 (MJC):
+*        Protect against exceeding various array bounds for
+*        NDF__MXDIM-dimensional data.
 *     {enter_further_changes_here}
 
 *-
@@ -93,10 +98,11 @@
 *  Local Variables:
       INTEGER EL                 ! No. of pixels in array
       INTEGER I                  ! Axis index
+      INTEGER IOUT( NDF__MXDIM + 1 ) ! Output pixel indices
       INTEGER J                  ! Index of output pixel
       INTEGER K                  ! Index of input pixel
-      INTEGER IOUT( NDF__MXDIM + 1 ) ! Output pixel indices
-      INTEGER STEPI( NDF__MXDIM + 1 )! Input steps indexed by input axis
+      INTEGER LDIM( NDF__MXDIM + 1 ) ! Copy of o/p dimensions plus dummy
+      INTEGER STEPI( NDF__MXDIM ) ! Input steps indexed by input axis
       INTEGER STEP( NDF__MXDIM + 1 ) ! Input steps indexed by output
                                  ! axis
 
@@ -113,13 +119,17 @@
          STEPI( I ) = EL
          EL = EL * DIM( I )
          IOUT( I ) = 1
+         LDIM( I ) = DIMO( I )
       END DO
+      IOUT( NDIM + 1 ) = 1
+      LDIM( NDIM + 1 ) = 1
 
 *  Permute the step array so that it is indexed by output axis instead 
 *  of input axis.
       DO I = 1, NDIM
          STEP( I ) = STEPI( PERM( I ) )
       END DO
+      STEP( NDIM + 1 ) = EL
 
 *  Initialise the vector index within the input array of the current 
 *  output pixel.
@@ -136,9 +146,9 @@
          I = 1
          IOUT( 1 ) = IOUT( 1 ) + 1
          K = K + STEP( 1 )
-         DO WHILE( IOUT( I ) .GT. DIMO( I ) )
+         DO WHILE( IOUT( I ) .GT. LDIM( I ) .AND. J .LT. EL )
             IOUT( I ) = 1
-            K = K - DIMO( I )*STEP( I )
+            K = K - DIMO( I ) * STEP( I )
             I = I + 1
             IOUT( I ) = IOUT( I ) + 1
             K = K + STEP( I )
