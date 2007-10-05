@@ -17,7 +17,7 @@
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
 \newcommand{\stardocdate}      {2007 October 2}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.8-3}
+\newcommand{\stardocversion}   {1.8-4}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -33033,9 +33033,21 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          CLIP() = \_REAL (Read)
       }{
          Array of standard-deviation limits for progressive clipping 
-         of pixel values while determining the fitting ranges 
-         automatically.  It is therefore only applicable when AUTO={\tt TRUE}.
-         Between one and five values may be supplied.  {\tt [2,2,2.5,3]}
+         of outlying binned (see NUMBIN) pixel values while determining 
+         the fitting ranges automatically.  It is therefore only 
+         applicable when AUTO={\tt TRUE}.  Its purpose is to exclude 
+         features that are not part of the trends.
+
+         Pixels are rejected at the $i$th clipping cycle if they lie 
+         beyond plus or minus CLIP($i$) times the dispersion about the 
+         mean of the remaining good pixels.  Thus lower values of CLIP
+         will reject more pixels.  The normal approach is to start low
+         and progressivley increase the clipping factors, as the 
+         dispersion decreases after the exclusion of features.  The 
+         source of the dispersion depends on the value the METHOD 
+         parameter.  Between one and five values may be supplied. 
+         Supplying the null value ({\tt{!}}), results in 2, 2.5, and 3
+         clipping factors.  {\tt [2,2,2.5,3]}
       }
       \sstsubsection{
          IN = NDF (Read \& Write)
@@ -33066,9 +33078,10 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
             neighbouring elements within this average line.  Then it 
             performs a linear fit upon the binned line, and rejects the 
             outliers, iteratively with standard-deviation clipping
-            (parameter CLIP).  The ranges are the intervals between
-            the rejected points, rescaled to the original pixels.
-            They are returned in parameter ARANGES.
+            (parameter CLIP).  The standard deviation is that of the
+            average line within the region.  The ranges are the 
+            intervals between the rejected points, rescaled to the 
+            original pixels.  They are returned in parameter ARANGES.
 
             This best suited to a low dispersion along the trend axis
             and a single concentrated region containing the bulk of the
@@ -33077,16 +33090,25 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
             \sstitem
             {\tt "Single"} --- This is like {\tt "Region"} except
 	    there is neither averaging of lines nor a single set of
-	    ranges.  Each line is masked independently.
+	    ranges.  Each line is masked independently.  The
+	    dispersion for the clipping of outliers within a line is
+	    the standard deviation within that line.
 
-            This is more appropriate when the features being masked
+             This is more appropriate when the features being masked
             vary widely across the image, and significantly between
             adjacent lines.  Some prior smoothing or background tracing
             (\xref{CUPID}{sun255}{}: \xref{FINDBACK}{sun255}{FINDBACK})
             will usually prove beneficial.
+
+            \sstitem
+            {\tt "Global"} --- This is a variant of {\tt "Single"}.  The 
+            only difference is that the dispersion used to reject features 
+            using the standard deviation of the whole data array.  This
+            is more robust than "{\tt Single"}, however it does not perform
+            rejections well for lines with anomalous noise.
          }
 
-         {\tt ["Region"]}
+         {\tt ["Single"]}
       }
       \sstsubsection{
          MODIFYIN = \_LOGICAL (Read)

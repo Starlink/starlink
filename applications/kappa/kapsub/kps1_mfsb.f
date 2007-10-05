@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_MFSB( INDF, DTAXIS, NCLIP, CLIP, NUMBIN, MASK, 
-     :                      STATUS )
+      SUBROUTINE KPS1_MFSB( INDF, DTAXIS, NCLIP, CLIP, NUMBIN, ALL,
+     :                      MASK, STATUS )
 *+
 *  Name:
 *     KPS1_MFSB
@@ -11,16 +11,19 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_MFSB( INDF, DTAXIS, NCLIP, CLIP, NUMBIN, MASK, STATUS )
+*     CALL KPS1_MFSB( INDF, DTAXIS, NCLIP, CLIP, NUMBIN, ALL, MASK,
+*                     STATUS )
 
 *  Description:
 *     This routine serves MFITTREND.  This processes each line whose 
 *     trend is to be fit within the NDF whose identifier is supplied.
 *     The routine rebins by an integer factor to improve the 
 *     signal-to-noise ratio.  Then the routine fits a straight line to 
-*     the rebinned data, and sigma-clipped outliers rejected.  
-*     The regions encompassing the rejected parts of the line are 
-*     set bad in the supplied mask.
+*     the rebinned data, and sigma-clipped outliers rejected.  There is
+*     a choice of dispersions to use for the clipping, either the 
+*     standard deviation from the whole array or just within the line 
+*     being filtered.  The regions encompassing the rejected parts of 
+*     the line are set bad in the supplied mask.
 
 *  Arguments:
 *     INDF = INTEGER (Given)
@@ -36,6 +39,10 @@
 *     NUMBIN = INTEGER (Given)
 *        The number of bins in the compressed line.  This may be set
 *        to the number of elements in the line to prevent compression.
+*     ALL = LOGICAL ( Given)
+*        If .TRUE., the clipping threshold is a factor of the standard
+*        deviation of the whole data array in the NDF.  If .FALSE., the
+*        dierpsion comes form only the line being filtered.
 *     MASK( * ) = BYTE (Returned)
 *        The mask of features.  Features have the bad value VAL__BADB
 *        and the remainder are set to 0.  The supplied array should
@@ -75,6 +82,8 @@
 *        Original version.
 *     2007 September 6 (MJC):
 *        Use NDF in read mode and create a mask in new argument MASK.
+*     2007 October 2 (MJC):
+*        Add ALL argument.
 *     {enter_changes_here}
 
 *-
@@ -93,6 +102,9 @@
       INTEGER NCLIP
       REAL CLIP( NCLIP )
       INTEGER NUMBIN
+      LOGICAL ALL
+
+*  Arguments Returned:
       BYTE MASK( * )
 
 *  Status:
@@ -221,14 +233,29 @@
 *  Remove the enlarged-section NDF.
       CALL NDF_ANNUL( NDFS, STATUS )
 
-*  Perform fits and iteratively reject outliers.
-      IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPS1_MFADR( DTAXIS, NCLIP, CLIP, ODIMS, 
-     :                    %VAL( CNF_PVAL( IPAL ) ), STATUS )
+*  Perform fits and iteratively reject outliers using the dispersion of
+*  the whole array.
+      IF ( ALL ) THEN
+         IF ( ITYPE .EQ. '_REAL' ) THEN
+            CALL KPS1_MFADR( DTAXIS, NCLIP, CLIP, ODIMS, 
+     :                       %VAL( CNF_PVAL( IPAL ) ), STATUS )
 
-      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPS1_MFADD( DTAXIS, NCLIP, CLIP, ODIMS, 
-     :                    %VAL( CNF_PVAL( IPAL ) ), STATUS )
+         ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+            CALL KPS1_MFADD( DTAXIS, NCLIP, CLIP, ODIMS, 
+     :                       %VAL( CNF_PVAL( IPAL ) ), STATUS )
+         END IF
+
+*  Perform fits and iteratively reject outliers using the dispersion of
+*  from each line being filtered in turn.
+      ELSE
+         IF ( ITYPE .EQ. '_REAL' ) THEN
+            CALL KPS1_MFLDR( DTAXIS, NCLIP, CLIP, ODIMS, 
+     :                       %VAL( CNF_PVAL( IPAL ) ), STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+            CALL KPS1_MFLDD( DTAXIS, NCLIP, CLIP, ODIMS, 
+     :                       %VAL( CNF_PVAL( IPAL ) ), STATUS )
+         END IF
       END IF
 
 *  Inquire the shape of the full data array.  Earlier we replaced

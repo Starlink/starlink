@@ -13066,7 +13066,7 @@ iraf! {
             type LITERAL
             vpath DEFAULT
             ppath CURRENT DEFAULT
-            default Region
+            default Single
             prompt {Method to define masked regions in automatic mode}
             helpkey *
           }

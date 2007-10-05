@@ -73,9 +73,21 @@
 *        be used.  AXIS defaults to the last axis.  [!]
 *     CLIP() = _REAL (Read)
 *        Array of standard-deviation limits for progressive clipping 
-*        of pixel values while determining the fitting ranges 
-*        automatically.  It is therefore only applicable when AUTO=TRUE.
-*        Between one and five values may be supplied.  [2,2,2.5,3]
+*        of outlying binned (see NUMBIN) pixel values while determining 
+*        the fitting ranges automatically.  It is therefore only 
+*        applicable when AUTO=TRUE.  Its purpose is to exclude features
+*        that are not part of the trends.
+*
+*        Pixels are rejected at the ith clipping cycle if they lie 
+*        beyond plus or minus CLIP(i) times the dispersion about the 
+*        mean of the remaining good pixels.  Thus lower values of CLIP
+*        will reject more pixels.  The normal approach is to start low
+*        and progressivley increase the clipping factors, as the 
+*        dispersion decreases after the exclusion of features.  The 
+*        source of the dispersion depends on the value the METHOD 
+*        parameter.  Between one and five values may be supplied. 
+*        Supplying the null value (!), results in 2, 2.5, and 3
+*        clipping factors.  [2,2,2.5,3]
 *     IN = NDF (Read & Write)
 *        The input NDF.  On successful completion this may have the
 *        trends subtracted, but only if SUBTRACT and MODIFYIN are both
@@ -94,24 +106,33 @@
 *        neighbouring elements within this average line.  Then it 
 *        performs a linear fit upon the binned line, and rejects the 
 *        outliers, iteratively with standard-deviation clipping
-*        (parameter CLIP).  The ranges are the intervals between
-*        the rejected points, rescaled to the original pixels.
-*        They are returned in parameter ARANGES.
+*        (parameter CLIP).  The standard deviation is that of the
+*        average line within the region.  The ranges are the 
+*        intervals between the rejected points, rescaled to the 
+*        original pixels.  They are returned in parameter ARANGES.
 *
 *        This best suited to a low dispersion along the trend axis
 *        and a single concentrated region containing the bulk of the
 *        signal to be excluded from the trend fitting.
 *
-*        - "Single" -- This is like Region except there is neither
+*        - "Single" -- This is like "Region" except there is neither
 *        averaging of lines nor a single set of ranges.  Each line is
-*        masked independently.  
+*        masked independently.  The dispersion for the clipping of 
+*        outliers within a line is the standard deviation within that
+*        line.
 *
 *        This is more appropriate when the features being masked
 *        vary widely across the image, and significantly between
 *        adjacent lines.  Some prior smoothing or background tracing
 *        (CUPID:FINDBACK) will usually prove beneficial.
 *
-*        ["Region"]
+*        - "Global" -- This is a variant of "Single".  The only 
+*        difference is that the dispersion used to reject features 
+*        using the standard deviation of the whole data array.  This is
+*        more robust than "Single", however it does not perform
+*        rejections well for lines with anomalous noise.
+
+*        ["Single"]
 *     MODIFYIN = _LOGICAL (Read)
 *        Whether or not to modify the input NDF.  It is only used when
 *        SUBTRACT is TRUE.  If MODIFYIN is FALSE, then an NDF name must
@@ -291,6 +312,10 @@
 *        Allow the feature mask to be stored in an output NDF given by
 *        new parameter MASK.  Output the selected regions in the current
 *        co-ordinate Frame.
+*     2007 October 3 (MJC):
+*        Make the original Single method Global, and introduce a new
+*        Single that uses the standard deviation within the line being
+*        filtered.  Made Single method the default.
 *     {enter_further_changes_here}
 
 *-
@@ -393,6 +418,7 @@
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF
       LOGICAL AUTO               ! Determine regions automatically?
       LOGICAL CLIPRE             ! Clip the outlier residuals?
+      LOGICAL GLOBAL             ! Use the automatic global method?
       LOGICAL HASBAD             ! Input NDF may have BAD pixels?
       LOGICAL HAVVAR             ! Have a variance component?
       LOGICAL MODIN              ! Modify input NDF by subtracting fits?
@@ -540,13 +566,14 @@
 
 *  Inquire the method used to automate the rejection of features and
 *  outliers.
-         CALL PAR_CHOIC( 'METHOD', 'Region', 'Region,Single',
+         CALL PAR_CHOIC( 'METHOD', 'Single', 'Global,Region,Single',
      :                   .TRUE., METHOD, STATUS )
          REGION = METHOD .EQ. 'REGION'
-         SINGLE = METHOD .EQ. 'SINGLE'
+         GLOBAL = METHOD .EQ. 'GLOBAL'
+         SINGLE = METHOD .EQ. 'SINGLE' .OR. GLOBAL
 
       ELSE
-         SINGLE = .FALSE.       
+         SINGLE = .FALSE.
 
 *  Get the ranges to use. These values are transformed from current
 *  co-ordinates along the fit axis to pixel co-ordinates on some
@@ -648,8 +675,8 @@
 *  Record the ranges to a parameter.
             CALL PAR_PUT1I( 'ARANGES', NRANGE, RANGES, STATUS )
 
-*  Single method
-*  -------------
+*  Single methods
+*  --------------
          ELSE IF ( SINGLE ) THEN
 
 *  Use NDF axis JAXIS.  Pick full extent.  Features will be flagged
@@ -926,7 +953,7 @@
 
 *  Form ranges by averaging the lines in the section, and then
 *  performing a fit, and rejecting outliers.
-         CALL KPS1_MFSB( INNDF, JAXIS, NCLIP, CLIP, NUMBIN,
+         CALL KPS1_MFSB( INNDF, JAXIS, NCLIP, CLIP, NUMBIN, GLOBAL,
      :                   %VAL( CNF_PVAL( IPMASK ) ), STATUS )
 
 *  Start a new error context.
