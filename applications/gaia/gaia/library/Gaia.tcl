@@ -159,6 +159,7 @@ set gaia_usage {
 Usage: gaia ?NDF/fitsFile? ?-option value ...?
 
 Options:
+ -autoscale <bool>        - scale image to fit window (disables zoom).
  -always_merge <bool>     - always merge primary & extension headers (MEFs).
  -cat <bool>              - include ESO/Archive catalog extensions (default).
  -catalog  "<c1> <c2> .." - open windows for the given catalogs on startup.
@@ -360,6 +361,11 @@ itcl::class gaia::Gaia {
 
       #  Check if any post display tasks are required.
       after 0 [code $this file_loaded_]
+
+      #  If autoscaling, need to wait for realization the first time.
+      if { $itk_option(-autoscale) } {
+         after 0 [code $this configure -autoscale 1]
+      }
 
       #  Attempt to register as PLASTIC listener, adding callbacks to be
       #  informed when the status of the PLASTIC connection changes.
@@ -2149,6 +2155,17 @@ window gives you access to this."
       if { [info exists itk_component(positions)] } {
          $itk_component(positions) configure -maxshift $itk_option(-maxshift)
       }
+   }
+
+   #  Autoscale images to fit main window (keeps aspect ratio disables zoom).
+   #  Messy as need to use variable of the menu item that controls this
+   #  option. Also needs to be applied after image_ is realized first time.
+   itk_option define -autoscale autoscale AutoScale 0 {
+       global ::$w_.autoscale
+       set $w_.autoscale $itk_option(-autoscale)
+       if { [info exists image_] } {
+          $image_ autoscale $w_.autoscale
+       }
    }
 
    # -- Protected variables --

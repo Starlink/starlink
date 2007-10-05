@@ -224,6 +224,7 @@ itcl::class gaia::GaiaStartup {
       set values_($this,with_pan_window) 1
       set values_($this,with_zoom_window) 1
       set values_($this,zoom_factor) 4
+      set values_($this,autoscale) 0
    }
 
    #  Update the properties object to the local values and cause a
@@ -235,7 +236,7 @@ itcl::class gaia::GaiaStartup {
                    transient_tools transient_spectralplot quiet_exit \
                    min_scale max_scale zoom_factor default_cut default_cmap \
                    default_itt linear_cartesian always_merge check_for_cubes \
-                   isize maxshift" {
+                   isize maxshift autoscale" {
          $props_ set_named_property Gaia $key $values_($this,$key)
       }
       $props_ save_properties
@@ -269,6 +270,8 @@ itcl::class gaia::GaiaStartup {
             $values_($this,isize)
          $itk_option(-gaia) configure -maxshift \
             $values_($this,maxshift)
+         $itk_option(-gaia) configure -autoscale \
+            $values_($this,autoscale)
       }
    }
 
@@ -475,6 +478,18 @@ itcl::class gaia::GaiaStartup {
       add_short_help $itk_component(interopmenu) \
          {Show the main Interop menu for PLASTIC interactions}
       pack $itk_component(interopmenu) -side top -fill x
+
+      #  Autoscale images to fit window.
+      itk_component add autoscale {
+         StarLabelCheck $w_.autoscale \
+            -text "Auto scale:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $lwidth \
+            -variable [scope values_($this,autoscale)]
+      }
+      add_short_help $itk_component(autoscale) \
+         {Auto scale images to fit window, disables zoom}
+      pack $itk_component(autoscale) -side top -fill x
 
       #  Minimum zoom scale.
       itk_component add minscale {

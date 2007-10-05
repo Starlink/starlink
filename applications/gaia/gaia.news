@@ -1,3 +1,8 @@
+    A new command-line option "-autoscale" has been added. This enables
+    the "View->Auto scale" option to scale the image to fit the main window
+    (but disables interactive control of the Scale: value). Also available
+    as a persistent startup option.
+
     The cube toolbox can now read an ARD region from a file.
 
     When saving an image with a new WCS the strategy for removing redundant
