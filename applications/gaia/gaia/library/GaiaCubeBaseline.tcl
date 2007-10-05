@@ -176,8 +176,13 @@ itcl::class gaia::GaiaCubeBaseline {
 
    public method set_bounds {plane_min plane_max} {
 
-      set from [$itk_component(bounds0) cget -from]
-      set to [$itk_component(bounds0) cget -to]
+      if { [info exists lower_limits_] } {
+         set from [$itk_component(bounds0) cget -from]
+         set to [$itk_component(bounds0) cget -to]
+      } else {
+         set from -1
+         set to -1
+      }
 
       #  If the min/max have changed, also reset the ranges (different axis or
       #  unrelated cube). 
