@@ -83,6 +83,8 @@
 *        Convert to using AstFitsChans
 *     2006-12-19 (TIMJ):
 *        sc2store_wrtstream has additional subnum argument
+*     2007-10-05 (AGG):
+*        Rationalize FITS headers, write correct DATE-OBS string
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -114,6 +116,8 @@
 
 /* Starlink includes */
 #include "ndf.h"
+#include "mers.h"
+#include "sae_par.h"
 
 /* SC2SIM includes */
 #include "sc2sim.h"
@@ -143,56 +147,55 @@ int *status        /* global status (given and returned) */
 )
 
 {
-   /* Local variables */
-   AstFitsChan *fitschan;           /* FITS headers */
-   const char fitsrec[SC2STORE__MAXFITS][SZFITSCARD]; /* Store for FITS records */  
-   double fpos = 0;                 /* RA or Dec in degrees */
-   int nrec;                        /* number of FITS header records */
-   int subnum;                      /* subarray index */
+  /* Local variables */
+  char dateobs[SZFITSCARD+1] = "\0"; /* DATE-OBS string for observation */
+  AstFitsChan *fitschan;           /* FITS headers */
+  const char fitsrec[SC2STORE__MAXFITS][SZFITSCARD]; /* Store for FITS records */  
+  int nrec;                        /* number of FITS header records */
+  int subnum;                      /* subarray index */
 
-   /* Check status */
-   if ( !StatusOkP(status) ) return;
+  /* Check status */
+  if ( *status != SAI__OK ) return;
 
-   /* Add the FITS data to the output file */
-   fitschan = astFitsChan ( NULL, NULL, "" );
-   /* Kludged to write generic date */ 
-   astSetFitsS ( fitschan, "DATE-OBS", "YYYY-MM-DDThh:mm:ss", "observation date", 0 );
-   astSetFitsF ( fitschan, "RA", fpos, "Right Ascension of observation", 0 );
-   astSetFitsF ( fitschan, "DEC", fpos, "Declination of observation", 0 );
-   astSetFitsI ( fitschan, "ADD_ATM", sinx->add_atm, 
-                 "flag for adding atmospheric emission", 0 );
-   astSetFitsI ( fitschan, "ADDFNOIS", sinx->add_fnoise, 
-                 "flag for adding 1/f noise", 0 );
-   astSetFitsI ( fitschan, "ADD_PNS", sinx->add_pns, 
-                 "flag for adding photon noise", 0 );
-   astSetFitsF ( fitschan, "HEATVAL", inx->heatstart, "heater setting in pW", 0 );
-   astSetFitsI ( fitschan, "NBOLX", inx->nbolx,
-                 "number of bolometers in X direction", 0 );
-   astSetFitsI ( fitschan, "NBOLY", inx->nboly, 
-                 "number of bolometers in Y direction", 0 );
-   astSetFitsF ( fitschan, "STEPTIME", inx->steptime, "[ms] Time interval between samples", 0 );
-   astSetFitsS ( fitschan, "SUBARRAY", sinx->subname, "subarray name", 0 );
-   astSetFitsI ( fitschan, "NUMSAMP", numsamples, "number of samples", 0 );
-   astSetFitsS ( fitschan, "FILTER", filter, "filter used", 0 );
-   astSetFitsF ( fitschan, "ATSTART", sinx->atstart, 
-                 "Ambient temperature at start (C)", 0 ); 
-   astSetFitsF ( fitschan, "ATEND", sinx->atend, 
-                 "Ambient temperature at end (C)", 0 );
+  /* Add the FITS data to the output file */
+  fitschan = astFitsChan ( NULL, NULL, "" );
 
-   /* Convert the AstFitsChan data to a char array */
-   smf_fits_export2DA ( fitschan, &nrec, fitsrec, status );
+  /* Kludged to write generic date */ 
+  sc2sim_dateobs( inx->mjdaystart, dateobs, status );
+  astSetFitsS ( fitschan, "DATE-OBS", dateobs, "UTC observation date", 0 );
 
-   /* Calculate the sub array index */
-   sc2ast_name2num( sinx->subname, &subnum, status );
+  astSetFitsI ( fitschan, "ADD_HNSE", sinx->add_hnoise, 
+		"Flag for adding heater noise", 0 );
+  astSetFitsS ( fitschan, "FLATNAME", flatname, "Type of flatfield solution", 0 );
+  if ( strncmp(flatname, "TABLE", 5) == 0 ) {
+    astSetFitsF ( fitschan, "HEATVAL", inx->heatstart, "Heater setting in pW", 0 );
+    astSetFitsF ( fitschan, "HEATSTEP", inx->heatstep, "Heater setting in pW", 0 );
+    astSetFitsI ( fitschan, "NFLAT", nflat, "Number of flatfield steps", 0 );
+  } else {
+    astSetFitsI ( fitschan, "NFLAT", nflat, "Number of polynomial coefficients", 0 );
+  } 
+  astSetFitsI ( fitschan, "NBOLX", inx->nbolx,
+		"Number of bolometers in X direction", 0 );
+  astSetFitsI ( fitschan, "NBOLY", inx->nboly, 
+		"Number of bolometers in Y direction", 0 );
+  astSetFitsS ( fitschan, "SUBARRAY", sinx->subname, "Subarray name", 0 );
+  astSetFitsI ( fitschan, "NUMSAMP", numsamples, "Number of samples", 0 );
+  astSetFitsS ( fitschan, "FILTER", filter, "Filter used", 0 );
 
-   /* Store the timestream data */
-   sc2store_wrtstream ( file_name, subnum, nrec, fitsrec, inx->nbolx, 
-                        inx->nboly, numsamples, nflat, flatname, head, 
-                        dbuf, dksquid, fcal, fpar, inx->obsmode, 
-                        inx->jig_vert, inx->nvert, NULL, 0,
-                        status );
+  /* Convert the AstFitsChan data to a char array */
+  smf_fits_export2DA ( fitschan, &nrec, fitsrec, status );
 
-   /* Close the file */
-   sc2store_free ( status );
+  /* Calculate the sub array index */
+  sc2ast_name2num( sinx->subname, &subnum, status );
+
+  /* Store the timestream data */
+  sc2store_wrtstream ( file_name, subnum, nrec, fitsrec, inx->nbolx, 
+		       inx->nboly, numsamples, nflat, flatname, head, 
+		       dbuf, dksquid, fcal, fpar, inx->obsmode, 
+		       inx->jig_vert, inx->nvert, NULL, 0,
+		       status );
+
+  /* Close the file */
+  sc2store_free ( status );
 
 }
