@@ -117,6 +117,9 @@
 *        by IWCS.
 *     2007 August 6 (MJC):
 *        Pass only single positions to AST_NORM.
+*     2007 October 5 (MJC):
+*        Use three points to derive the widths and their errors to allow
+*        for rotation in the transformation.
 *     {enter_further_changes_here}
 
 *-
@@ -180,8 +183,8 @@
       INTEGER MAJOR              ! Index to major-FWHM value and error
       INTEGER MINOR              ! Index to minor-FWHM value and error
       INTEGER PFRM               ! PIXEL Frame
-      DOUBLE PRECISION POS( 2, 2 ) ! Reporting positions
-      DOUBLE PRECISION PIXPOS( 2, 2 ) ! Pixel positions
+      DOUBLE PRECISION POS( 3, 2 ) ! Reporting positions
+      DOUBLE PRECISION PIXPOS( 3, 2 ) ! Pixel positions
       DOUBLE PRECISION SPOS( 2 ) ! Single reporting position
       DOUBLE PRECISION SX        ! Co-ordinate sum along longitude axis
       DOUBLE PRECISION SY        ! Co-ordinate sum along latitude axis
@@ -234,7 +237,7 @@
          PIXPOS( 1, 2 ) = PP( 2, IB )
          PIXPOS( 2, 1 ) = PP( 1, IB ) + PSIGMA( 1, IB )
          PIXPOS( 2, 2 ) = PP( 2, IB ) + PSIGMA( 2, IB )
-         CALL AST_TRANN( MAP, 2, 2, 2, PIXPOS, .TRUE., NAXC, 2, POS,
+         CALL AST_TRANN( MAP, 2, 2, 3, PIXPOS, .TRUE., NAXC, 3, POS,
      :                   STATUS )
 
 *  Normalize the supplied current Frame position.  Need dummy array
@@ -292,9 +295,14 @@
 *  of the NDF to the reporting Frame.
          PIXPOS( 1, 1 ) = PP( 1, IB )
          PIXPOS( 1, 2 ) = PP( 2, IB )
-         PIXPOS( 2, 1 ) = PP( 1, IB ) + PP( MAJOR, IB )
+           
+         PIXPOS( 2, 1 ) = PP( 1, IB )
          PIXPOS( 2, 2 ) = PP( 2, IB ) + PP( MINOR, IB )
-         CALL AST_TRANN( MAP, 2, 2, 2, PIXPOS, .TRUE., NAXC, 2, POS,
+
+         PIXPOS( 3, 1 ) = PP( 1, IB ) + PP( MAJOR, IB )
+         PIXPOS( 3, 2 ) = PP( 2, IB )
+           
+         CALL AST_TRANN( MAP, 3, 2, 3, PIXPOS, .TRUE., NAXC, 3, POS,
      :                   STATUS )
 
 *  Normalize the supplied current Frame position.  Need dummy array
@@ -310,14 +318,14 @@
 *  reporting axis.
          DO I = 1, NAXC
             A( I ) = POS( 1, I )
-            B( I ) = A( I )
+            B( I ) = POS( 2, I )
          END DO
-         B( 1 ) = POS( 2, 1 )
-         RP( 3, IB ) = AST_DISTANCE( CFRM, A, B, STATUS )
-
-         B( 1 ) = A( 1 )
-         B( 2 ) = POS( 2, 2 )
          RP( 4, IB ) = AST_DISTANCE( CFRM, A, B, STATUS )
+
+         DO I = 1, NAXC
+            B( I ) = POS( 3, I )
+         END DO
+         RP( 3, IB ) = AST_DISTANCE( CFRM, A, B, STATUS )
 
 *  Errors in width
 *  ---------------
@@ -328,9 +336,14 @@
 *  Frame of the NDF to the reporting Frame.
             PIXPOS( 1, 1 ) = PP( 1, IB )
             PIXPOS( 1, 2 ) = PP( 2, IB )
-            PIXPOS( 2, 1 ) = PP( 1, IB ) + PSIGMA( MAJOR, IB )
+           
+            PIXPOS( 2, 1 ) = PP( 1, IB )
             PIXPOS( 2, 2 ) = PP( 2, IB ) + PSIGMA( MINOR, IB )
-            CALL AST_TRANN( MAP, 2, 2, 2, PIXPOS, .TRUE., NAXC, 2, POS,
+
+            PIXPOS( 3, 1 ) = PP( 1, IB ) + PSIGMA( MAJOR, IB )
+            PIXPOS( 3, 2 ) = PP( 2, IB )
+           
+            CALL AST_TRANN( MAP, 3, 2, 3, PIXPOS, .TRUE., NAXC, 3, POS,
      :                      STATUS )
 
 *  Normalize the supplied current Frame position.  Need dummy array
@@ -345,17 +358,19 @@
 *  Need to determine the distance for the error bars.  For convenience
 *  we fudge it here if NAXC exceeds 2.  We're keeping higher axes 
 *  fixed anyway.
+*  Need to determine the distances for the beam widths.  Use the
+*  reporting axis.
             DO I = 1, NAXC
                A( I ) = POS( 1, I )
-               B( I ) = A( I )
+               B( I ) = POS( 2, I )
             END DO
-            B( 1 ) = POS( 2, 1 )
+            RSIGMA( 4, IB ) = AST_DISTANCE( CFRM, A, B, STATUS )
 
+            DO I = 1, NAXC
+               B( I ) = POS( 3, I )
+            END DO
             RSIGMA( 3, IB ) = AST_DISTANCE( CFRM, A, B, STATUS )
 
-            B( 1 ) = A( 1 )
-            B( 2 ) = POS( 2, 2 )
-            RSIGMA( 4, IB ) = AST_DISTANCE( CFRM, A, B, STATUS )
          END IF
 
 *  Orientation
@@ -421,7 +436,7 @@
             PIXPOS( 1, 2 ) = PP( 2, 1 )
             PIXPOS( 2, 1 ) = PP( 1, IB )
             PIXPOS( 2, 2 ) = PP( 2, IB )
-            CALL AST_TRANN( MAP, 2, 2, 2, PIXPOS, .TRUE., NAXC, 2, POS,
+            CALL AST_TRANN( MAP, 2, 2, 3, PIXPOS, .TRUE., NAXC, 3, POS,
      :                      STATUS )
 
 *  Normalize the supplied current Frame position.  Need dummy array
