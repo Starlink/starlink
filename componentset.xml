@@ -176,7 +176,7 @@ Starlink applications, and a number of other common data formats.
 </component>
 
 <component id="cupid" support="S">
-  <version>0.0-35</version>
+  <version>0.0-36</version>
   <path>applications/cupid</path>
   <description>CUPID - AST applications</description>
   <abstract><p>
@@ -687,7 +687,7 @@ JCMT telescope based on Mauna Kea, Hawaii.
 </component>
 
 <component id="gaia" support="S">
-  <version>4.0-0</version>
+  <version>4.0-3</version>
   <path>applications/gaia</path>
   <description>GAIA - Graphical Astronomy and Image Analysis</description>
   <abstract><p>
@@ -895,7 +895,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>1.7-10</version>
+  <version>1.8</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -1231,8 +1231,30 @@ file extension stored in the standard Starlink NDF data format.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
+<component id="starman" status="obsolete" support="U">
+  <version>2.0-1</version>
+  <path>applications/obsolete/starman</path>
+  <description>STARMAN - Stellar Photometry and Image/Table Handling</description>
+  <abstract><p>
+STARMAN is a stellar photometry package designed for the reduction of data
+from imaging systems. Its main components are:- crowded-field photometry
+programs; aperture photometry programs; a star finding program; a CCD
+reduction program.
+  </p></abstract>
+  <dependencies >
+    <build>pcs</build><build option='link'>ndf</build><build option='link'>pgp</build><build option='link'>sla</build><build option='link'>hlp</build><build option='link'>starx</build><build option='link'>psx</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Alan J. Penny</name>
+    </person>
+  </developers>
+  <documentation> sun141</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
 <component id="period" support="U">
-  <version>5.0-3</version>
+  <version>5.0-4</version>
   <path>applications/period</path>
   <description>PERIOD - A Time-series analysis package</description>
   <abstract><p>
@@ -1498,7 +1520,7 @@ package.
 </component>
 
 <component id="smurf">
-  <version>0.2.2</version>
+  <version>0.3.1</version>
   <path>applications/smurf</path>
   <description>SURF2 - SCUBA-2 User Reduction Facility</description>
   <abstract><p>
@@ -1713,7 +1735,7 @@ UNIX).
 </component>
 
 <component id="surf">
-  <version>1.6-12</version>
+  <version>1.6-13</version>
   <path>applications/surf</path>
   <description>SURF - SCUBA User Reduction Facility</description>
   <abstract><p>
@@ -2388,6 +2410,40 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
+<component id="ssn75">
+  <version>1</version>
+  <path>docs/ssn/075</path>
+  <description>Writing Catalogue and Image Servers for GAIA and CURSA</description>
+  <abstract><p>
+   GAIA and CURSA can interrogate remote catalogues via the Internet
+   to return lists of objects which satisfy a given criterion.  GAIA
+   can also extract images of a specified region of sky from remote
+   databases.  Similar facilities are also available in other
+   packages, such as the ESO SkyCat image display tool and the Gemini
+   observing tool.  This functionality is achieved by having servers
+   running on the remote systems, These accept queries sent by GAIA
+   etc., interrogate their local copies of the catalogues to find the
+   data which satisfy the query, and return them.  The servers can
+   communicate with GAIA etc. because the query is sent, and the
+   results returned, in a standard format.  This document describes
+   how to write such servers.
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>A. C. Davenhall</name>
+    </person>
+  </developers>
+  <documentation> ssn75</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>2000</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
 <component id="ssn78" support="U">
   <version>0.1</version>
   <path>docs/ssn/078</path>
@@ -2451,7 +2507,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="init" support="S">
-  <version>1.1-26</version>
+  <version>1.1-27</version>
   <path>etc/init</path>
   <description>Starlink initialisation files</description>
   <abstract>
@@ -2567,7 +2623,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ast" support="S">
-  <version>4.5-1</version>
+  <version>4.6-1</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
   <abstract>
@@ -2999,7 +3055,7 @@ No longer under active control.
 </component>
 
 <component id="hds" support="S">
-  <version>5.0-5</version>
+  <version>5.0-6</version>
   <path>libraries/hds</path>
   <description>Hierarchical Data System</description>
   <abstract>
@@ -4073,27 +4129,21 @@ Ultrix and for SunOS and may still work for them.
       examined after that.</p></notes>
 </component>
 
-<component id="cfitsio" support="U">
-  <version>2.510</version>
-  <path>thirdparty/heasarc/cfitsio</path>
-  <description>CFITSIO -- C and Fortran libraries for access to FITS files
-        </description>
-  <abstract><p>
-The CFITSIO package is a series of C functions that provide easy access
-to FITS files on disk.  It was written by William D. Pence of HEASARC
-(High Energy Astrophysics Science Archive Research Center) at the
-Goddard Space Flight Center, USA.  Starlink is grateful to William
-Pence for giving his permission for CFITSIO to be released on Starlink.
-</p></abstract>
+<component id="gsl" support="U">
+  <version>1.9</version>
+  <path>thirdparty/fsf/gsl</path>
+  <description>GNU Scientific Library</description>
   <dependencies >
-    <sourceset>star2html</sourceset>
+    
   </dependencies>
   <developers>
     <person>
-      <name>William Pence</name>
+      <name>Peter W. Draper</name>
+      <uname>pwd</uname>
+      <email>p.w.draper@durham.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
-  <documentation> sun227</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 

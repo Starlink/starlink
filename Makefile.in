@@ -51,6 +51,7 @@ ALL_TARGETS = \
 	$(MANIFESTS)/graphpar \
 	$(MANIFESTS)/grp \
 	$(MANIFESTS)/gsd \
+	$(MANIFESTS)/gsl \
 	$(MANIFESTS)/gwm \
 	$(MANIFESTS)/hds \
 	$(MANIFESTS)/hdstools \

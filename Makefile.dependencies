@@ -978,6 +978,10 @@ $(MANIFESTS)/gsd: \
 	cd libraries/gsd \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/gsl:
+	cd thirdparty/fsf/gsl \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/gwm: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
@@ -2125,6 +2129,11 @@ $(MANIFESTS)/spt: \
 	cd applications/spt \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/ssn75: \
+		$(MANIFESTS)/star2html
+	cd docs/ssn/075 \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/ssn78: \
 		$(MANIFESTS)/dvi2bitmap \
 		$(MANIFESTS)/sgmlkit
@@ -2173,6 +2182,33 @@ $(MANIFESTS)/starconf: \
 	    else \
 	        echo "No configuration necessary" >configure-output.log; \
 	    fi \
+	  && $(MAKE_CPT)
+
+# Component starman is OBSOLETE -- do not build
+$(MANIFESTS)/starman: \
+		$(MANIFESTS)/ary \
+		$(MANIFESTS)/ast \
+		$(MANIFESTS)/chr \
+		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ems \
+		$(MANIFESTS)/gks \
+		$(MANIFESTS)/gns \
+		$(MANIFESTS)/graphpar \
+		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hds \
+		$(MANIFESTS)/hlp \
+		$(MANIFESTS)/mers \
+		$(MANIFESTS)/ndf \
+		$(MANIFESTS)/pcs \
+		$(MANIFESTS)/pgp \
+		$(MANIFESTS)/prm \
+		$(MANIFESTS)/psx \
+		$(MANIFESTS)/sae \
+		$(MANIFESTS)/sla \
+		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starx
+	cd applications/obsolete/starman \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/starmem:
@@ -2401,6 +2437,7 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/sla \
 	$(MANIFESTS)/smurf \
 	$(MANIFESTS)/specx \
+	$(MANIFESTS)/ssn75 \
 	$(MANIFESTS)/sst \
 	$(MANIFESTS)/star2html \
 	$(MANIFESTS)/starmem \
