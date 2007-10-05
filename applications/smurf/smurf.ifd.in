@@ -142,6 +142,8 @@
 #         Add dumpocscfg
 #     15-JUN-2007 (TIMJ):
 #         Add gettsys
+#     05-OCT-2007 (AGG):
+#         Add default value of 1.8 for skynoise exponent
 #     {enter_changes_here}
 
 #  Bugs:
@@ -1191,7 +1193,8 @@ package @PACKAGE@ {
             position 4
             type _DOUBLE
             prompt {Power-Law Exponent}
-            vpath {PROMPT}
+            vpath DEFAULT
+	    default 1.8
             ppath GLOBAL CURRENT
             helpkey *
           }
