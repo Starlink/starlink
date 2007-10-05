@@ -191,6 +191,8 @@
 *     2007-08-29 (CV):
 *        Removed call to sc2sim_instap_calc as it was already called in
 *        sc2sim_simulate
+*     2007-10-05 (AGG):
+*        Add obsend flag
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
@@ -262,6 +264,7 @@ int jigsamples,          /* Number of jiggle samples (given) */
 const double jigptr[][2],/* Array of X, Y jiggle positions (given) */
 const int obsnum,        /* Observation number (given) */
 const int nsubscan,      /* Sub-scan number (given) */
+const int obsend,        /* Flag to indicate whether this is the last file */
 const char obstype[],    /* Observation type, e.g. SCIENCE (given)*/
 const char utdate[],     /* UT date in YYYYMMDD form (given) */
 const double azstart,    /* Azimuth at start of sub-scan (given) */
@@ -409,7 +412,7 @@ int *status              /* Global status (given and returned) */
    astSetFitsL ( fitschan, "STANDARD", 0, "True if source is a calibrator", 0 );
    astSetFitsI ( fitschan, "OBSNUM", obsnum, "Observation Number", 0 );
    astSetFitsI ( fitschan, "NSUBSCAN", nsubscan, "Sub-scan Number", 0 );
-   astSetFitsL ( fitschan, "OBSEND", 0, 
+   astSetFitsL ( fitschan, "OBSEND", obsend, 
 		 "True if frame is last in current observation", 0 );
    astSetFitsS ( fitschan, "UTDATE", utdate, 
 		 "UT date as a string in yyyymmdd format", 0 );

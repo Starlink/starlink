@@ -242,6 +242,9 @@
 *     2007-08-27 (CV):
 *        Changed from microstepping by changing the telescope boresight
 *        pointing to using instrument aperature offsets
+*     2007-10-05 (AGG):
+*        Add subscanno and obsend variables to allow sc2sim_ndfwrdata
+*        to write the correct OBSEND keyword.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -421,11 +424,14 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   char lststart[SZFITSCARD+1] = "\0";      /* LST at start of sub-scan */
   double meanatm;                 /* Atmos. emission at start airmass */
   double *mjuldate=NULL;          /* Modified Julian date each sample - UT1 */
-  int narray = 0;                 /* number of subarrays to generate */
+  int narray = 0;                 /* number of subarrays to generate data for */
   int nflat[8];                   /* number of flat coeffs per bol */
   int nimage = 0;                 /* Number of subimages within subscan */
   static double noisecoeffs[SC2SIM__MXBOL*3*60]; /* noise coefficients */
+  int noutfiles = 1;              /* Total number of output files per subarray */
   int nterms=0;                   /* number of 1/f noise frequencies */
+  int obsend = 0;                 /* Flag to indicate whether current file is last in 
+				     observation */
   char obsid[80];                 /* OBSID for each observation */
   char obstype[SZFITSCARD+1] = "\0";       /* Observation type, e.g. SCIENCE */
   FILE *ofile = NULL;             /* File pointer to check for existing files*/
@@ -452,6 +458,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double start_time=0.0;          /* UTC time of start of current scan */
   char subarrays[8][80];          /* list of parsed subarray names */
   int subnum;                     /* Subarray number */
+  int subscanno;                  /* Sub-scan number (last number in output filanem)*/
   double taiutc;                  /* Difference between TAI and UTC time (TAI-UTC s) */
   double tauCSO=0;                /* CSO zenith optical depth */
   float tbri[3];                  /* simulated wvm measurements */
@@ -906,6 +913,9 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
      chunk */
   chunks = ceil ( (double)frmperms / maxwrite );
 
+  /* Number of output files per subarray */
+  noutfiles = inx->nmicstep * chunks;
+
   /* loop over microsteps */
   for ( curms = 0; curms < inx->nmicstep; curms++ ) {
     sc2sim_instap_calc( inx, curms, instap, status );
@@ -918,6 +928,12 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     /* Adjust the lastframe value depending on whether this is the
        last chunk */
     lastframe = maxwrite;
+
+    /* Sub-scan number to write into filename */
+    subscanno = (curms * chunks) + curchunk + 1;
+    if ( subscanno == noutfiles ) {
+      obsend = 1;
+    }
 
     /* If we have more than 1 chunk, and we are on the final chunk
        then the number of frames in the last file is the remainder of
@@ -1389,9 +1405,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
           if( *status == SAI__OK ) {
 
 	    obscounter = 1;
-            sprintf( filename, "%s%04i%02i%02i_%05d_%04d", 
-                     subarrays[k], date_yr, date_mo, date_da, obscounter,
-		     (curms * chunks) + curchunk + 1 );
+            sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k], 
+		     date_yr, date_mo, date_da, obscounter, subscanno );
 	    /*If we are not overwriting existing files see if the file exists*/
 	    if ( !overwrite ) {
 	      fileexists = 1;
@@ -1406,15 +1421,13 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 		  fclose(ofile);
 		  obscounter++;
 		  sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k], 
-			   date_yr, date_mo, date_da, obscounter,
-			   (curms * chunks) + curchunk + 1 );
+			   date_yr, date_mo, date_da, obscounter, subscanno );
 		} else {
 		  /* If not, unset fileexists flag, increment counter
 		     and set new file name */
 		  fileexists = 0;
 		  sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k], 
-			   date_yr, date_mo, date_da, obscounter,
-			   (curms * chunks) + curchunk + 1 );
+			   date_yr, date_mo, date_da, obscounter, subscanno );
 		}
 	      }
 	    }
@@ -1455,7 +1468,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 			      flatpar[k], INSTRUMENT, filter, dateobs, obsid,
 			      &(posptr[curframe*2]), jigsamples, 
                               &(jigpat[0]), obscounter,
-			      (curms * chunks) + curchunk+1, obstype, utdate, 
+			      subscanno, obsend, obstype, utdate, 
 			      head[0].tcs_az_bc1, 
 			      head[lastframe-1].tcs_az_bc1,
 			      head[0].tcs_az_bc2, 

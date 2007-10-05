@@ -75,6 +75,8 @@
 *        Added sc2sim_getmicstp
 *     2007-08-27 (CV):
 *        Added mstp (current microstep) to sc2sim_instap_calc        
+*     2007-10-05 (AGG):
+*        Add obsend flag
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -562,6 +564,7 @@ int jigsamples,           /* Number of jiggle samples (given) */
 const double jigptr[][2], /* Array of X, Y jiggle positions (given) */
 const int obsnum,         /* Observation number (given) */		 
 const int nsubscan,       /* Sub-scan number (given) */			 
+const int obsend,        /* Flag to indicate whether this is the last file */
 const char obstype[],     /* Observation type, e.g. SCIENCE (given)*/	 
 const char utdate[],      /* UT date in YYYYMMDD form (given) */		 
 const double azstart,     /* Azimuth at start of sub-scan (given) */	 
