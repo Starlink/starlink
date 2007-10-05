@@ -169,8 +169,8 @@ int *status        /* global status (given and returned) */
   astSetFitsS ( fitschan, "FLATNAME", flatname, "Type of flatfield solution", 0 );
   if ( strncmp(flatname, "TABLE", 5) == 0 ) {
     astSetFitsF ( fitschan, "HEATVAL", inx->heatstart, "Heater setting in pW", 0 );
-    astSetFitsF ( fitschan, "HEATSTEP", inx->heatstep, "Heater setting in pW", 0 );
-    astSetFitsI ( fitschan, "NFLAT", nflat, "Number of flatfield steps", 0 );
+    astSetFitsF ( fitschan, "HEATSTEP", inx->heatstep, "Heater power increment in pW", 0 );
+    astSetFitsI ( fitschan, "NFLAT", nflat, "Number of heater steps", 0 );
   } else {
     astSetFitsI ( fitschan, "NFLAT", nflat, "Number of polynomial coefficients", 0 );
   } 
