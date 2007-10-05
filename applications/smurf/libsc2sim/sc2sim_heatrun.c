@@ -88,6 +88,8 @@
 *     2006-09-22 (JB):
 *        Replaced dxml_structs with sc2sim_structs and removed
 *        DREAM-specific code.
+*     2007-10-05 (AGG):
+*        Loop over all requested subarrays
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -145,14 +147,11 @@
 #include "sc2da/sc2math.h"
 #include "sc2da/sc2ast.h"
 
-#include "sc2sim.h"
-
 /* SMURF includes */
+#include "sc2sim.h"
 #include "smurf_par.h"
 #include "libsmurf/smurflib.h"
 #include "libsmf/smf.h"
-
-#include "f77.h"
 
 #define FUNC_NAME "sc2sim_heatrun"
 #define LEN__METHOD 20
@@ -161,181 +160,174 @@ void sc2sim_heatrun ( struct sc2sim_obs_struct *inx,
                       struct sc2sim_sim_struct *sinx, 
                       double coeffs[], double digcurrent, double digmean, 
                       double digscale, char filter[], double *heater, int nbol,
-                      double *pzero, double samptime, int *status)
-{
+                      double *pzero, double samptime, int *status) {
 
-   int bol;                        /* counter for indexing bolometers */
-   double corner;                  /* corner frequency in Hz */
-   double current;                 /* bolometer current in amps */
-   int date_da;                    /* day corresponding to MJD */
-   double date_df;                 /* day fraction corresponding to MJD */
-   int date_mo;                    /* month corresponding to MJD */
-   int date_yr;                    /* year corresponding to MJD */
-   int date_status;                /* status of mjd->calendar date conversion */
-   double *dbuf=NULL;              /* simulated data buffer */
-   int *digits=NULL;               /* output data buffer */
-   int *dksquid=NULL;              /* dark squid values */
-   char filename[SC2SIM__FLEN];    /* name of output file */
-   double *flatcal=NULL;           /* flatfield calibration */
-   char flatname[SC2STORE_FLATLEN];/* flatfield algorithm name */
-   double *flatpar=NULL;           /* flatfield parameters */
-   double flux;                    /* flux at bolometer in pW */
-   static double fnoise[SC2SIM__MXSIM];    /* instr. noise for 1 bolometer */
-   JCMTState *head;                /* per-frame headers */
-   double *heatptr;                /* pointer to list of heater settings */ 
-   int j;                          /* loop counter */
-   int nflat;                      /* number of flat coeffs per bol */
-   int numsamples;                 /* Number of samples in output. */
-   double *output;                 /* series of output values */
-   int sample;                     /* sample counter */
-   double sigma;                   /* instrumental white noise */
+  char arraynames[80];            /* list of unparsed subarray names */
+  int bol;                        /* counter for indexing bolometers */
+  double corner;                  /* corner frequency in Hz */
+  double current;                 /* bolometer current in amps */
+  char *curtok=NULL;              /* current subarray name being parsed */
+  int date_da;                    /* day corresponding to MJD */
+  double date_df;                 /* day fraction corresponding to MJD */
+  int date_mo;                    /* month corresponding to MJD */
+  int date_yr;                    /* year corresponding to MJD */
+  int date_status;                /* status of mjd->calendar date conversion */
+  double *dbuf=NULL;              /* simulated data buffer */
+  int *digits=NULL;               /* output data buffer */
+  int *dksquid=NULL;              /* dark squid values */
+  char filename[SC2SIM__FLEN];    /* name of output file */
+  double *flatcal=NULL;           /* flatfield calibration */
+  char flatname[SC2STORE_FLATLEN];/* flatfield algorithm name */
+  double *flatpar=NULL;           /* flatfield parameters */
+  double flux;                    /* flux at bolometer in pW */
+  static double fnoise[SC2SIM__MXSIM];    /* instr. noise for 1 bolometer */
+  JCMTState *head;                /* per-frame headers */
+  double *heatptr;                /* pointer to list of heater settings */ 
+  int j;                          /* loop counter */
+  int narray = 0;                 /* number of subarrays to generate data for */
+  int nflat;                      /* number of flat coeffs per bol */
+  int numsamples;                 /* Number of samples in output. */
+  double *output;                 /* series of output values */
+  int sample;                     /* sample counter */
+  double sigma;                   /* instrumental white noise */
+  char subarrays[8][80];          /* list of parsed subarray names */
 
-   if ( *status != SAI__OK) return;
+  if ( *status != SAI__OK) return;
 
-   /* Do a heatrun */
+  /* Do a heatrun simulation */
 
-   /* Calculate year/month/day corresponding to MJD at start */
-   slaDjcl( inx->mjdaystart, &date_yr, &date_mo, &date_da, &date_df, 
-	    &date_status );
+  /* Calculate year/month/day corresponding to MJD at start */
+  slaDjcl( inx->mjdaystart, &date_yr, &date_mo, &date_da, &date_df, 
+	   &date_status );
 
-   numsamples = inx->heatnum;
+  numsamples = inx->heatnum;
 
-   /* allocate workspace */
+  /* Allocate workspace */
 
-   output = smf_malloc ( numsamples, sizeof(*output), 1, status );
-   heatptr = smf_malloc ( numsamples, sizeof(*heatptr), 1, status );
-   dbuf = smf_malloc ( numsamples*nbol, sizeof(*dbuf), 1, status );
-   digits = smf_malloc ( numsamples*nbol, sizeof(*digits), 1, status );
-   dksquid = smf_malloc ( numsamples*inx->nboly, sizeof(*dksquid), 1, status );
-   head = smf_malloc ( numsamples, sizeof(*head), 1, status );
+  output = smf_malloc ( numsamples, sizeof(*output), 1, status );
+  heatptr = smf_malloc ( numsamples, sizeof(*heatptr), 1, status );
+  dbuf = smf_malloc ( numsamples*nbol, sizeof(*dbuf), 1, status );
+  digits = smf_malloc ( numsamples*nbol, sizeof(*digits), 1, status );
+  dksquid = smf_malloc ( numsamples*inx->nboly, sizeof(*dksquid), 1, status );
+  head = smf_malloc ( numsamples, sizeof(*head), 1, status );
 
-   /* Generate the list of heater settings */
+  /* Generate the list of heater settings */
+  for ( sample=0; sample<numsamples; sample++ ) {
+    heatptr[sample] = inx->heatstart + (double)sample * inx->heatstep;
+  }
 
-   for ( sample=0; sample<numsamples; sample++ ) {
-      heatptr[sample] = inx->heatstart + (double)sample * inx->heatstep;
-   }
+  /*  Generate a full time sequence for one bolometer at a time */
+  for ( bol=0; bol<nbol; bol++ ) {
 
-   /*  Generate a full time sequence for one bolometer at a time */
+    /* Create an instrumental 1/f noise sequence.
+       Simulate a 1/f noise sequence by generating white noise sequence, 
+       Fourier transforming it, applying a 1/f law, then transforming back
+       again. Generate and add a new white noise sequence.
+       The buffer fnoise contains the noise pattern. */
+    if ( sinx->add_fnoise == 1 ) {
+      sigma = 1.0e-9;
+      corner = 0.01;
+      sc2sim_invf ( sigma, corner, samptime, SC2SIM__MXSIM, fnoise, status );
+    }
 
-   for ( bol=0; bol<nbol; bol++ ) {
-
-      /* Create an instrumental 1/f noise sequence.
-	 Simulate a 1/f noise sequence by generating white noise sequence, 
- 	 Fourier transforming it, applying a 1/f law, then transforming back
-	 again. Generate and add a new white noise sequence.
-	 The buffer fnoise contains the noise pattern. */
-
-      if ( sinx->add_fnoise == 1 ) {
-	 sigma = 1.0e-9;
-	 corner = 0.01;
-	 sc2sim_invf ( sigma, corner, samptime, SC2SIM__MXSIM, fnoise, status );
+    /* Generate a measurement sequence for each bolometer. */
+    for ( sample=0; sample<numsamples; sample++ ) {
+      if ( sinx->add_hnoise == 1 ) {
+	flux = heatptr[sample] * heater[bol];
+      } else {
+	flux = heatptr[sample];
       }
 
-      /* Generate a measurement sequence for each bolometer. */
+      /* Convert to current with bolometer power offset.
+	 The bolometer offset in PZERO(BOL) is added to the FLUX, and then
+	 the power in FLUX is converted to a current in scalar CURRENT with 
+	 help of the polynomial expression with coefficients in COEFFS(*) */
+      sc2sim_ptoi ( flux, SC2SIM__NCOEFFS, coeffs, pzero[bol], 
+		    &current, status);
 
+      /* Store the value. */
+      output[sample] = current;
+    }
+    
+    /* Now output[] contains the values current for all samples in the
+       cycles for this bolometer. */
+    if ( sinx->add_fnoise == 1 ) {
+      /* Add instrumental 1/f noise data in output */
       for ( sample=0; sample<numsamples; sample++ ) {
-
-         if ( sinx->add_hnoise == 1 ) {
-	    flux = heatptr[sample] * heater[bol];
-	 } else {
-	    flux = heatptr[sample];
-	 }
-
-	 /* Convert to current with bolometer power offset.
-	    The bolometer offset in PZERO(BOL) is added to the FLUX, and then
-	    the power in FLUX is converted to a current in scalar CURRENT with 
-	    help of the polynomial expression with coefficients in COEFFS(*) */
-
-	 sc2sim_ptoi ( flux, SC2SIM__NCOEFFS, coeffs, pzero[bol], 
-	               &current, status);
-
-	 /* Store the value. */
-
-	 output[sample] = current;
-
+	output[sample] += fnoise[sample];
       }
+    }
 
-      /* Now output[] contains the values current for all samples in 
-	 the cycles for this bolometer. */
+    for ( sample=0; sample<numsamples; sample++ ) {
+      dbuf[sample*nbol+bol] = output[sample];
+    }
+  }
 
-      if ( sinx->add_fnoise == 1 ) {
+  /* Digitise the numbers */
+  sc2sim_digitise ( nbol*numsamples, dbuf, digmean, digscale, digcurrent,
+		    digits, status );
 
-	 /* Add instrumental 1/f noise data in output */
+  /* Overwrite the original simulation with the digitised version */
+  for ( sample=0; sample<numsamples*nbol; sample++ ) {
+    dbuf[sample] = (double)digits[sample];
+  }
 
-	 for ( sample=0; sample<numsamples; sample++ ) {
-	    output[sample] += fnoise[sample];
-	 }
+  /* Perform the fit */
+  if ( strcmp ( inx->flatname, "POLYNOMIAL" ) == 0 ) {
+    nflat = 6;
+    flatcal = smf_malloc ( nbol*nflat, sizeof(*flatcal), 1, status );
+    flatpar = smf_malloc ( nflat, sizeof(*flatpar), 1, status );
+    strcpy ( flatname, "POLYNOMIAL" );
+    sc2sim_fitheat ( nbol, numsamples, heatptr, dbuf, flatcal, status );
+    for ( j=0; j<nflat; j++ ) {
+      flatpar[j] = j - 2;
+    }
 
-      }
+  } else {
+    /* Generate a simple lookup table */
+    nflat = numsamples;
+    flatcal = smf_malloc ( nbol*nflat, sizeof(*flatcal), 1, status );
+    flatpar = smf_malloc ( nflat, sizeof(*flatpar), 1, status );
+    strcpy ( flatname, "TABLE" );
 
-      for ( sample=0; sample<numsamples; sample++ ) {
-	 dbuf[sample*nbol+bol] = output[sample];
-      }
+    for ( j=0; j<nflat; j++ ) {
+      flatpar[j] = heatptr[j];
+    }
+    for ( j=0; j<nflat*nbol; j++ ) {
+      flatcal[j] = dbuf[j];
+    }
+  }
 
-   }
+  /* Parse the list of subarray names, find out how many subarrays to
+     generate */
+  if( *status == SAI__OK ) {
+    strcpy( arraynames, sinx->subname );
+    curtok = strtok ( arraynames, ";");
+    while ( curtok != NULL && narray < 4 ) {
+      strcpy( subarrays[narray], curtok );
+      narray++;
+      curtok = strtok (NULL, ";");
+    }
+  }
 
-   /* Digitise the numbers */
+  /* Loop over array of subarrays */
+  for ( j = 0; j < narray; j++ ) {
+    /* Get the name of this flatfield solution */
+    sprintf ( filename, "%sheat%04i%02i%02i_00001", subarrays[j], date_yr, 
+	      date_mo, date_da );
 
-   sc2sim_digitise ( nbol*numsamples, dbuf, digmean, digscale, digcurrent,
-                     digits, status );
+    msgSetc( "FILENAME", filename );
+    msgOut(" ", "Writing ^FILENAME", status ); 
+    /* Over-ride subarray name for writing out to file */
+    strcpy ( sinx->subname, subarrays[j] );
 
-   /* Overwrite the original simulation with the digitised version */
+    /* Store the data in output file file_name */
+    sc2sim_ndfwrheat( inx, sinx, filename, numsamples, nflat, flatname, head, 
+		      digits, dksquid, flatcal, flatpar, filter, status );
 
-   for ( sample=0; sample<numsamples*nbol; sample++ ) {
-      dbuf[sample] = (double)digits[sample];
-   }
-
-   /* Perform the fit */
-
-   if ( strcmp ( inx->flatname, "POLYNOMIAL" ) == 0 ) {
-
-      nflat = 6;
-      flatcal = smf_malloc ( nbol*nflat, sizeof(*flatcal), 1, status );
-      flatpar = smf_malloc ( nflat, sizeof(*flatpar), 1, status );
-      strcpy ( flatname, "POLYNOMIAL" );
-      sc2sim_fitheat ( nbol, numsamples, heatptr, dbuf, flatcal, status );
-      
-      for ( j=0; j<nflat; j++ ) {
-	 flatpar[j] = j - 2;
-      }
-
-   } else {
-
-      nflat = numsamples;
-      flatcal = smf_malloc ( nbol*nflat, sizeof(*flatcal), 1, status );
-      flatpar = smf_malloc ( nflat, sizeof(*flatpar), 1, status );
-      strcpy ( flatname, "TABLE" );
-
-      for ( j=0; j<nflat; j++ ) {
-	 flatpar[j] = heatptr[j];
-      }
-
-      for ( j=0; j<nflat*nbol; j++ ) {
-	 flatcal[j] = dbuf[j];
-      }
-
-   }
-
-   /* Get the name of this flatfield solution */
-   sprintf ( filename, "%sheat%04i%02i%02i_00001", sinx->subname, date_yr, 
-             date_mo, date_da );
-
-   msgSetc( "FILENAME", filename );
-   msgOut(" ", "Writing ^FILENAME", status ); 
-
-   /* Store the data in output file file_name */
-   /*   sc2sim_ndfwrheat ( sinx->add_atm, sinx->add_fnoise, sinx->add_pns,
-                      inx->heatstart, inx->heatstep, filename, inx->nbolx, 
-                      inx->nboly, inx->steptime, sinx->subname, numsamples, 
-                      nflat, flatname, head, digits, dksquid, flatcal, 
-                      flatpar, filter, sinx->atstart, sinx->atend, status );*/
-
-   sc2sim_ndfwrheat( inx, sinx, filename, numsamples, nflat, flatname, head, 
-		     digits, dksquid, flatcal, flatpar, filter, status );
-
-   msgSetc( "FILENAME", filename );
-   msgOut(" ", "Done ^FILENAME", status ); 
-
-   msgOutif(MSG__VERB," ", "Heatrun successful.", status ); 
+    msgSetc( "FILENAME", filename );
+    msgOut(" ", "Done ^FILENAME", status ); 
+  }
+  msgOutif(MSG__VERB," ", "Heatrun successful.", status ); 
 
 } 
