@@ -680,19 +680,19 @@ package @PACKAGE@ {
 
          helplib {$SMURF_HELP}
 
-          parameter obsfile {
+          parameter obspar {
             position 1
             type _CHAR
-            prompt {Observation file}
+            prompt {Observation parameters}
             vpath {PROMPT}
             ppath GLOBAL CURRENT
             helpkey *
           }
 
-          parameter simfile {
+          parameter simpar {
             position 2
             type _CHAR
-            prompt {Simulation file}
+            prompt {Simulation parameters}
             vpath {PROMPT}
             ppath GLOBAL CURRENT
             helpkey *

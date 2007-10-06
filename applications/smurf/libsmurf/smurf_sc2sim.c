@@ -42,7 +42,7 @@
 *     for example : s8aheat20060301_00001.sdf.
 
 *  ADAM Parameters:
-*     OBSFILE = GROUP (Read)
+*     OBSPAR = GROUP (Read)
 *          Specifies values for the observation parameters used by 
 *          simulation.  
 *
@@ -128,7 +128,7 @@
 *            Grid step in X direction.
 *          grid_step_y (double) : 6.28 (arcseconds)
 *            Grid step in Y direction.
-*          heatnum (double) : 1.0
+*          heatnum (int) : 1
 *            Number of heater settings.
 *          heatstart (double) : 0.0 (pW)
 *            Initial heater setting.
@@ -294,9 +294,9 @@
 *          targetpow (double) : 25.0 (pW)
 *            Target bolometer power input.
 *
-*     SIMFILE = GROUP (Read)
+*     SIMPAR = GROUP (Read)
 *          Specifies values for the simulation parameters.  See 
-*          the description for OBSFILE for the file format.
+*          the description for OBSPAR for the file format.
 *
 *          The parameter names and their default values are listed
 *          below.  The default values will be used for any unspecified
@@ -401,7 +401,7 @@
 *     SIMSTATS = LOGICAL (Read)
 *          Flag to specify whether to report the properties of the
 *          current simulation given the parameters specified in
-*          SIMFILE and OBSFILE. The simulation is not carried out.
+*          SIMPAR and OBSPAR. The simulation is not carried out.
 *     SIMTYPE = CHAR (Read)
 *          Simulation type : In a 'full' simulation the flux
 *          for each bolometer at each time slice is calculated
@@ -440,6 +440,7 @@
 *                 hits-only flag (JB)
 *     2007-01-26  Added OVERWRITE parameter (AGG)
 *     2007-03-01  Added SIMSTATS parameter (AGG)
+*     2007-10-05  Changed OBSFILE and SIMFILE to OBSPAR and SIMPAR (AGG)
 *     {enter_further_changes_here}
 
 *    History (HEATRUN task):
@@ -573,9 +574,9 @@ void smurf_sc2sim( int *status ) {
 
 
    /* Get input parameters */
-   kpg1Gtgrp ( "OBSFILE", &obsGrp, &osize, status );
+   kpg1Gtgrp ( "OBSPAR", &obsGrp, &osize, status );
    kpg1Kymap ( obsGrp, &obskeymap, status );
-   kpg1Gtgrp ( "SIMFILE", &simGrp, &ssize, status );
+   kpg1Gtgrp ( "SIMPAR", &simGrp, &ssize, status );
    kpg1Kymap ( simGrp, &simkeymap, status );
    parGet0i( "SEED", &rseed, status );
 
