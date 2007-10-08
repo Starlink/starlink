@@ -1,0 +1,193 @@
+<html lang="en">
+<head>
+<title>Installation on Unix - FFTW 3.1.2</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="FFTW 3.1.2">
+<meta name="generator" content="makeinfo 4.8">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Installation-and-Customization.html#Installation-and-Customization" title="Installation and Customization">
+<link rel="prev" href="Installation-and-Customization.html#Installation-and-Customization" title="Installation and Customization">
+<link rel="next" href="Installation-on-non_002dUnix-systems.html#Installation-on-non_002dUnix-systems" title="Installation on non-Unix systems">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This manual is for FFTW
+(version 3.1.2, 23 June 2006).
+
+Copyright (C) 2003 Matteo Frigo.
+
+Copyright (C) 2003 Massachusetts Institute of Technology.
+
+     Permission is granted to make and distribute verbatim copies of
+     this manual provided the copyright notice and this permission
+     notice are preserved on all copies.
+
+     Permission is granted to copy and distribute modified versions of
+     this manual under the conditions for verbatim copying, provided
+     that the entire resulting derived work is distributed under the
+     terms of a permission notice identical to this one.
+
+     Permission is granted to copy and distribute translations of this
+     manual into another language, under the above conditions for
+     modified versions, except that this permission notice may be
+     stated in a translation approved by the Free Software Foundation.
+   -->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+</head>
+<body>
+<div class="node">
+<p>
+<a name="Installation-on-Unix"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="Installation-on-non_002dUnix-systems.html#Installation-on-non_002dUnix-systems">Installation on non-Unix systems</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Installation-and-Customization.html#Installation-and-Customization">Installation and Customization</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Installation-and-Customization.html#Installation-and-Customization">Installation and Customization</a>
+<hr>
+</div>
+
+<h3 class="section">8.1 Installation on Unix</h3>
+
+<p>FFTW comes with a <code>configure</code> program in the GNU style. 
+Installation can be as simple as:
+<a name="index-configure-346"></a>
+<pre class="example">     ./configure
+     make
+     make install
+</pre>
+   <p>This will build the uniprocessor complex and real transform libraries
+along with the test programs.  (We recommend that you use GNU
+<code>make</code> if it is available; on some systems it is called
+<code>gmake</code>.)  The &ldquo;<code>make install</code>&rdquo; command installs the fftw
+and rfftw libraries in standard places, and typically requires root
+privileges (unless you specify a different install directory with the
+<code>--prefix</code> flag to <code>configure</code>).  You can also type
+&ldquo;<code>make check</code>&rdquo; to put the FFTW test programs through their paces. 
+If you have problems during configuration or compilation, you may want
+to run &ldquo;<code>make distclean</code>&rdquo; before trying again; this ensures that
+you don't have any stale files left over from previous compilation
+attempts.
+
+   <p>The <code>configure</code> script chooses the <code>gcc</code> compiler by default,
+if it is available; you can select some other compiler with:
+<pre class="example">     ./configure CC="<i>&lt;the name of your C compiler&gt;</i>"
+</pre>
+   <p>The <code>configure</code> script knows good <code>CFLAGS</code> (C compiler flags)
+<a name="index-compiler-flags-347"></a>for a few systems.  If your system is not known, the <code>configure</code>
+script will print out a warning.  In this case, you should re-configure
+FFTW with the command
+<pre class="example">     ./configure CFLAGS="<i>&lt;write your CFLAGS here&gt;</i>"
+</pre>
+   <p>and then compile as usual.  If you do find an optimal set of
+<code>CFLAGS</code> for your system, please let us know what they are (along
+with the output of <code>config.guess</code>) so that we can include them in
+future releases.
+
+   <p><code>configure</code> supports all the standard flags defined by the GNU
+Coding Standards; see the <code>INSTALL</code> file in FFTW or
+<a href="http://www.gnu.org/prep/standards_toc.html">the GNU web page</a>. 
+Note especially <code>--help</code> to list all flags and
+<code>--enable-shared</code> to create shared, rather than static, libraries. 
+<code>configure</code> also accepts a few FFTW-specific flags, particularly:
+
+     <ul>
+<li><a name="index-portability-348"></a><code>--enable-portable-binary</code>: Disable compiler optimizations that
+would produce unportable binaries. <b>Important:</b> Use this if you are
+distributing compiled binaries to people who many not use exactly the
+same processor as you.
+
+     <li><code>--with-gcc-arch=</code><i>arch</i>: When compiling with <code>gcc</code>, FFTW
+tries to deduce the current CPU in order to tell <code>gcc</code> what
+architecture to tune for; this option overrides that guess
+(i.e. <i>arch</i> should be a valid argument for <code>gcc</code>'s
+<code>-march</code> or <code>-mtune</code> flags).  You might do this because the
+deduced architecture was wrong or because you want to tune for a
+different CPU than the one you are compiling with.  You can use
+<code>--without-gcc-arch</code> to disable architecture-specific tuning
+entirely.  Note that if <code>--enable-portable-binary</code> is enabled
+(above), then we use <code>-mtune</code> but not <code>-march</code>, so the
+resulting binary will run on any architecture even though it is
+optimized for a particular one.
+
+     <li><a name="index-precision-349"></a><code>--enable-float</code>: Produces a single-precision version of FFTW
+(<code>float</code>) instead of the default double-precision (<code>double</code>). 
+See <a href="Precision.html#Precision">Precision</a>.
+
+     <li><a name="index-precision-350"></a><code>--enable-long-double</code>: Produces a long-double precision version of
+FFTW (<code>long double</code>) instead of the default double-precision
+(<code>double</code>).  The <code>configure</code> script will halt with an error
+message is <code>long double</code> is the same size as <code>double</code> on your
+machine/compiler.  See <a href="Precision.html#Precision">Precision</a>.
+
+     <li><a name="index-threads-351"></a><code>--enable-threads</code>: Enables compilation and installation of the
+FFTW threads library (see <a href="Multi_002dthreaded-FFTW.html#Multi_002dthreaded-FFTW">Multi-threaded FFTW</a>), which provides a
+simple interface to parallel transforms for SMP systems.  (By default,
+the threads routines are not compiled.)
+
+     <li><code>--with-openmp</code>, <code>--with-sgimp</code>: In conjunction with
+<code>--enable-threads</code>, causes the multi-threaded FFTW library to use
+OpenMP or SGI MP compiler directives in order to induce parallelism,
+rather than spawning its own threads directly.  (Useful especially for
+programs already employing such directives, in order to minimize
+conflicts between different parallelization mechanisms.)
+
+     <li><a name="index-Fortran_002dcallable-wrappers-352"></a><code>--disable-fortran</code>: Disables inclusion of Fortran-callable
+wrapper routines (see <a href="Calling-FFTW-from-Fortran.html#Calling-FFTW-from-Fortran">Calling FFTW from Fortran</a>) in the standard
+FFTW libraries.  These wrapper routines increase the library size by
+only a negligible amount, so they are included by default as long as
+the <code>configure</code> script finds a Fortran compiler on your system. 
+(To specify a particular Fortran compiler <i>foo</i>, pass
+<code>F77=</code><i>foo</i> to <code>configure</code>.)
+
+     <li><code>--with-slow-timer</code>: Disables the use of hardware cycle counters,
+and falls back on <code>gettimeofday</code> or <code>clock</code>.  This greatly
+worsens performance, and should generally not be used (unless you don't
+have a cycle counter but still really want an optimized plan regardless
+of the time).  See <a href="Cycle-Counters.html#Cycle-Counters">Cycle Counters</a>.
+
+     <li><code>--enable-sse</code>, <code>--enable-sse2</code>, <code>--enable-k7</code>,
+<code>--enable-altivec</code>: Enable the compilation of SIMD code for SSE
+(Pentium III+), SSE2 (Pentium IV+), 3dNow! (AMD K7 and others), or
+AltiVec (PowerPC G4+).  SSE, 3dNow!, and AltiVec only work with
+<code>--enable-float</code> (above), while SSE2 only works in double precision
+(the default).  The resulting code will <em>still work</em> on earlier
+CPUs lacking the SIMD extensions (SIMD is automatically disabled,
+although the FFTW library is still larger).
+          <ul>
+<li>These options, with the exception of <code>--enable-k7</code> (which uses
+assembly), require a compiler supporting SIMD extensions, and compiler
+support is still a bit flaky: see the FFTW FAQ for a list of compiler
+versions that have problems compiling FFTW. 
+<li>With the Linux kernel, you may have to recompile the kernel with the
+option to support SSE/SSE2/AltiVec (see the &ldquo;Processor type and
+features&rdquo; settings). 
+<li>With AltiVec and <code>gcc</code>, you may have to use the
+<code>-mabi=altivec</code> option when compiling any code that links to FFTW,
+in order to properly align the stack; otherwise, FFTW could crash when
+it tries to use an AltiVec feature.  (This is not necessary on MacOS X.) 
+<li>With SSE/SSE2 and <code>gcc</code>, you should use a version of gcc that
+properly aligns the stack when compiling any code that links to FFTW. 
+By default, <code>gcc</code> 2.95 and later versions align the stack as
+needed, but you should not compile FFTW with the <code>-Os</code> option or the
+<code>-mpreferred-stack-boundary</code> option with an argument less than 4. 
+</ul>
+
+   </ul>
+
+   <p><a name="index-compiler-353"></a>To force <code>configure</code> to use a particular C compiler <i>foo</i>
+(instead of the default, usually <code>gcc</code>), pass <code>CC=</code><i>foo</i> to the
+<code>configure</code> script; you may also need to set the flags via the variable
+<code>CFLAGS</code> as described above. 
+<a name="index-compiler-flags-354"></a>
+<!--  -->
+
+   </body></html>
+

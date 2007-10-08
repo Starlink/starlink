@@ -1,0 +1,60 @@
+TODO before FFTW-$2\pi$:
+
+* MPI version
+
+* DCT/DST codelets?  which kinds?
+
+* investigate the addition-chain trig computation
+
+* I can't believe that there isn't a closed form for the omega
+  array in Rader.
+
+* merge genfft-k7 generator with the main genfft branch.
+  genfft-k7 was written by Stefan Kral based on the fftw-2.1 genfft.
+  (The k7 stuff is becoming obsolete because it is not 64-bit clean.
+  We should phase it out in the next release.)
+
+* implement rdft/problem2 for even radices other than 2.
+
+* convolution problem type(s)
+
+* Explore the idea of having n < 0 in tensors, possibly to mean
+  inverse DFT.
+
+* better estimator: possibly, let "other" cost be coef * n, where
+  coef is a per-solver constant determined via some big numerical
+  optimization/fit.
+
+* vector radix, multidimensional codelets
+
+* it may be a good idea to unify all those little loops that do
+  copying, (X[i], X[n-i]) <- (X[i] + X[n-i], X[i] - X[n-i]),
+  and multiplication of vectors by twiddle factors.
+
+* Pruned FFTs (basically, a vecloop that skips zeros).
+
+* Try FFTPACK-style back-and-forth (Stockham) FFT.  (We tried this a
+  few years ago and it was slower, but perhaps matters have changed.)
+
+* dif, difsq simd codelets
+
+* Generate assembly directly for more processors, or maybe fork gcc.  =)
+
+* ensure that threaded solvers generate (block_size % 4 == 0)
+  to allow SIMD to be used.
+
+* consider whether it would be simpler to have a uniform description
+  (IO, m0, m1, W) for twiddle problems, where IO always points
+  to the beginning of the array, W always points to the beginning
+  of the twiddle table, and the problem is solved in the
+  range m \in [m0, m1).  Currently we have a messy situation in which
+  we sometimes use [m0, m1), sometimes we use [mstart, mstart+mcount),
+  and we have to adjust W with the X(twiddle_shift)() hack.  Codelets
+  should obey the uniform protocol as well.
+
+* memoize triggen.
+
+* orb problems with FFTW_PRESERVE_INPUT ought to use SIMD somehow.
+  (Currently they reduce to an r2r problem that does not use SIMD.)
+
+* eliminate alignment hacks, which ought to be obsolete by now.

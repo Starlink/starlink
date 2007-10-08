@@ -1,0 +1,115 @@
+<html lang="en">
+<head>
+<title>Advanced Complex DFTs - FFTW 3.1.2</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="FFTW 3.1.2">
+<meta name="generator" content="makeinfo 4.8">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Advanced-Interface.html#Advanced-Interface" title="Advanced Interface">
+<link rel="prev" href="Advanced-Interface.html#Advanced-Interface" title="Advanced Interface">
+<link rel="next" href="Advanced-Real_002ddata-DFTs.html#Advanced-Real_002ddata-DFTs" title="Advanced Real-data DFTs">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This manual is for FFTW
+(version 3.1.2, 23 June 2006).
+
+Copyright (C) 2003 Matteo Frigo.
+
+Copyright (C) 2003 Massachusetts Institute of Technology.
+
+     Permission is granted to make and distribute verbatim copies of
+     this manual provided the copyright notice and this permission
+     notice are preserved on all copies.
+
+     Permission is granted to copy and distribute modified versions of
+     this manual under the conditions for verbatim copying, provided
+     that the entire resulting derived work is distributed under the
+     terms of a permission notice identical to this one.
+
+     Permission is granted to copy and distribute translations of this
+     manual into another language, under the above conditions for
+     modified versions, except that this permission notice may be
+     stated in a translation approved by the Free Software Foundation.
+   -->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+</head>
+<body>
+<div class="node">
+<p>
+<a name="Advanced-Complex-DFTs"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="Advanced-Real_002ddata-DFTs.html#Advanced-Real_002ddata-DFTs">Advanced Real-data DFTs</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Advanced-Interface.html#Advanced-Interface">Advanced Interface</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Advanced-Interface.html#Advanced-Interface">Advanced Interface</a>
+<hr>
+</div>
+
+<h4 class="subsection">4.4.1 Advanced Complex DFTs</h4>
+
+<pre class="example">     fftw_plan fftw_plan_many_dft(int rank, const int *n, int howmany,
+                                  fftw_complex *in, const int *inembed,
+                                  int istride, int idist,
+                                  fftw_complex *out, const int *onembed,
+                                  int ostride, int odist,
+                                  int sign, unsigned flags);
+</pre>
+   <p><a name="index-fftw_005fplan_005fmany_005fdft-222"></a>
+This plans multidimensional complex DFTs, and is exactly the same as
+<code>fftw_plan_dft</code> except for the new parameters <code>howmany</code>,
+{<code>i</code>,<code>o</code>}<code>nembed</code>, {<code>i</code>,<code>o</code>}<code>stride</code>,
+and {<code>i</code>,<code>o</code>}<code>dist</code>.
+
+   <p><code>howmany</code> is the number of transforms to compute, where the
+<code>k</code>-th transform is of the arrays starting at <code>in+k*idist</code> and
+<code>out+k*odist</code>.  The resulting plans can often be faster than
+calling FFTW multiple times for the individual transforms.  The basic
+<code>fftw_plan_dft</code> interface corresponds to <code>howmany=1</code> (in which
+case the <code>dist</code> parameters are ignored). 
+<a name="index-howmany-parameter-223"></a><a name="index-dist-224"></a>
+The two <code>nembed</code> parameters (which should be arrays of length
+<code>rank</code>) indicate the sizes of the input and output array
+dimensions, respectively, where the transform is of a subarray of size
+<code>n</code>.  (Each dimension of <code>n</code> should be <code>&lt;=</code> the
+corresponding dimension of the <code>nembed</code> arrays.)  That is, the
+input and output arrays are stored in row-major order with size given by
+<code>nembed</code> (not counting the strides and howmany multiplicities). 
+Passing <code>NULL</code> for an <code>nembed</code> parameter is equivalent to
+passing <code>n</code> (i.e. same physical and logical dimensions, as in the
+basic interface.)
+
+   <p>The <code>stride</code> parameters indicate that the <code>j</code>-th element of
+the input or output arrays is located at <code>j*istride</code> or
+<code>j*ostride</code>, respectively.  (For a multi-dimensional array,
+<code>j</code> is the ordinary row-major index.)  When combined with the
+<code>k</code>-th transform in a <code>howmany</code> loop, from above, this means
+that the (<code>j</code>,<code>k</code>)-th element is at <code>j*stride+k*dist</code>. 
+(The basic <code>fftw_plan_dft</code> interface corresponds to a stride of 1.) 
+<a name="index-stride-225"></a>
+For in-place transforms, the input and output <code>stride</code> and
+<code>dist</code> parameters should be the same; otherwise, the planner may
+return <code>NULL</code>.
+
+   <p>Arrays <code>n</code>, <code>inembed</code>, and <code>onembed</code> are not used after
+this function returns.  You can safely free or reuse them.
+
+   <p>So, for example, to transform a sequence of contiguous arrays, stored
+one after another, one would use a <code>stride</code> of 1 and a <code>dist</code>
+of N, where N is the product of the dimensions.  In
+another example, to transform an array of contiguous &ldquo;vectors&rdquo; of
+length M, one would use a <code>howmany</code> of M, a
+<code>stride</code> of M, and a <code>dist</code> of 1. 
+<a name="index-vector-226"></a>
+<!-- =========> -->
+
+   </body></html>
+
