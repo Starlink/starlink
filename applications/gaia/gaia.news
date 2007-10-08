@@ -18,6 +18,9 @@
     A bug reading BITPIX 32 FITS cubes has been fixed. This could result
     in blank data values not being ignored.
 
+    It should now be possible to NDF byte data cubes. Previously these were
+    handled incorrectly.
+
   Puana Release:
   ==============
 

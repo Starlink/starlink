@@ -257,9 +257,10 @@ char const *gaiaArrayTypeToHDS( int type )
  * type that would be used to return an image or spectrum (different for
  * scaled integer FITS data).
  */
-char const *gaiaArrayFullTypeToHDS( int intype, double bscale, double bzero )
+char const *gaiaArrayFullTypeToHDS( int intype, int isfits, double bscale, 
+                                    double bzero )
 {
-    int type = gaiaArrayScaledType( intype, bscale, bzero );
+    int type = gaiaArrayScaledType( intype, isfits, bscale, bzero );
     if ( type >= 0 && type < 7 ) {
         return hdstypes[type];
     }
@@ -269,9 +270,9 @@ char const *gaiaArrayFullTypeToHDS( int intype, double bscale, double bzero )
 /**
  * Convert a local enum type into a type that represents the type that would
  * be used to return an image or spectrum (different for scaled integer FITS
- * data).
+ * data and NDF byte data).
  */
-int gaiaArrayScaledType( int intype, double bscale, double bzero )
+int gaiaArrayScaledType( int intype, int isfits, double bscale, double bzero )
 {
     int outtype = intype;
     int scaled = ( intype < HDS_REAL && ( bscale != 1.0 || bzero != 0.0 ) );
@@ -283,6 +284,9 @@ int gaiaArrayScaledType( int intype, double bscale, double bzero )
         else {
             outtype = HDS_REAL;
         }
+    }
+    else if ( !isfits && intype == HDS_BYTE ) {
+        outtype = HDS_WORD;
     }
     return outtype;
 }
@@ -424,9 +428,9 @@ void gaiaArrayImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
     outPtr = NULL;
     RawImageFromCube( cubeinfo, dims, axis, index, &outPtr, &nel, cnfmalloc );
 
-    /* Normalise the data to remove byte-swapping and unrecognised
-     * BAD values, and convert from a scaled variant. For NDFs this is a
-     * null op. */
+    /* Normalise the data to remove byte-swapping and unrecognised BAD values,
+     * and convert from a scaled variant. For non-byte NDFs this is a null
+     * op. */
     DataNormalise( outPtr, type, nel, cubeinfo->isfits, cubeinfo->haveblank,
                    cubeinfo->blank, cubeinfo->bscale, cubeinfo->bzero,
                    cnfmalloc, 1, &normPtr, &normtype );
@@ -935,8 +939,8 @@ void gaiaArraySpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
     }
 #undef EXTRACT_AND_COPY
 
-    /* Normalise the data to remove byte-swapping and unrecognised
-     * BAD values transform scaled FITS integer data. */
+    /* Normalise the data to remove byte-swapping and unrecognised BAD values
+     * transform scaled FITS integer data and NDF byte data. */
     DataNormalise( *outPtr, intype, *nel, info->isfits, info->haveblank,
                    info->blank, info->bscale, info->bzero, cnfmalloc, 1,
                    &normPtr, outtype );
@@ -990,7 +994,7 @@ void gaiaArraySpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
  *         the number of elements extracted
  *     outtype
  *         the type of the returned data, may be different for scaled FITS
- *         integer types.
+ *         integer types for NDF byte data.
  *
  *  Notes:
  *     If the spectrum isn't within the array bounds then an empty spectrum
@@ -1027,9 +1031,10 @@ void gaiaArrayRegionSpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
     void *tmpPtr;
 
     /* Need to take care when the output type is not the same as the input
-     * type, this happens for scaled FITS data. Allocate memory as this type
-     * not intype. */
-    *outtype = gaiaArrayScaledType( intype, info->bscale, info->bzero );
+     * type, this happens for scaled FITS and NDF byte data. Allocate memory
+     * as this type not intype. */
+    *outtype = gaiaArrayScaledType( intype, info->isfits, info->bscale, 
+                                    info->bzero );
 
     /* Allocate memory for spectrum. Only need "arange" spanning values when
      * that is set. */
@@ -1316,7 +1321,8 @@ void gaiaArrayFree( ARRAYinfo *info, int cnfMalloc )
 
 /**
  *  Normalise an array if this machine does not have native FITS ordering and
- *  the data is in FITS format. Also transform FITS bad values into HDS ones.
+ *  the data is in FITS format. Also transform FITS bad values into HDS ones
+ *  and converts NDF byte data into word.
  *
  *  If a scaled array is created the input data will be freed (since it is
  *  designed to replace this), unless freescaled is set to 0.
@@ -1331,15 +1337,18 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
     int fscaled;
     long length;
 
-    /*  Only applies to FITS data */
+    /*  Only applies to FITS and byte NDF data. */
     if ( ! isfits ) {
-        *outPtr = inPtr;
-        *outtype = intype;
-        return;
+        if ( intype != HDS_BYTE ) {
+            *outPtr = inPtr;
+            *outtype = intype;
+            return;
+        }
     }
+
     /* Byte swap first, note we do this using macros that require integers,
      * so cannot merge with bad checking. Also any scaling must happen with
-     * bad checking. */
+     * bad checking. Naturally nothing to do for byte data. */
 #if BIGENDIAN
     /* Nothing to do */
 #else
@@ -1389,9 +1398,9 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
     }
 #endif
 
-    /* If the data is to be scaled to a floating type, then allocate the
-     * necessary memory. */
-    *outtype = gaiaArrayScaledType( intype, bscale, bzero );
+    /* If the data is to be scaled to a floating type, or converted to word,
+     * then allocate the necessary memory. */
+    *outtype = gaiaArrayScaledType( intype, isfits, bscale, bzero );
     scaled = ( intype != (*outtype) );
     if ( scaled ) {
         length = nel * gaiaArraySizeOf( *outtype );
@@ -1590,41 +1599,58 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
         break;
 
         case HDS_BYTE: {
-            if ( scaled && haveblank ) {
-                char blank = (char) inBlank;
+
+            /* Handle NDF byte conversion to word. */
+            if ( !isfits ) {
                 char *ip = (char *)inPtr;
-                float *op = (float *)*outPtr;
-                float zero = (float) bzero;
-                float scale = (float) bscale;
-                for ( i = 0; i < nel; i++ ) {
-                    if ( ip[i] != blank ) {
-                        op[i] = ip[i] * scale + zero;
-                    }
-                    else {
-                        op[i] = VAL__BADR;
-                    }
-                }
-            }
-            else if ( haveblank ) {
-                char blank = (char) inBlank;
-                char *ptr = (char *)inPtr;
-                for ( i = 0; i < nel; i++ ) {
-                    if ( ptr[i] == blank ) {
-                        ptr[i] = VAL__BADB;
-                    }
-                }
-            }
-            else if ( scaled ) {
-                char *ip = (char *)inPtr;
-                float *op = (float *)*outPtr;
-                float zero = (float) bzero;
-                float scale = (float) bscale;
+                short *op = (short *)*outPtr;
                 for ( i = 0; i < nel; i++ ) {
                     if ( ip[i] != VAL__BADB ) {
-                        op[i] = ip[i] * scale + zero;
+                        op[i] = (short) ip[i];
                     }
                     else {
-                        op[i] = VAL__BADR;
+                        op[i] = VAL__BADW;
+                    }
+                }
+            }
+            else {
+                /* FITS data. */
+                if ( scaled && haveblank ) {
+                    char blank = (char) inBlank;
+                    char *ip = (char *)inPtr;
+                    float *op = (float *)*outPtr;
+                    float zero = (float) bzero;
+                    float scale = (float) bscale;
+                    for ( i = 0; i < nel; i++ ) {
+                        if ( ip[i] != blank ) {
+                            op[i] = ip[i] * scale + zero;
+                        }
+                        else {
+                            op[i] = VAL__BADR;
+                        }
+                    }
+                }
+                else if ( haveblank ) {
+                    char blank = (char) inBlank;
+                    char *ptr = (char *)inPtr;
+                    for ( i = 0; i < nel; i++ ) {
+                        if ( ptr[i] == blank ) {
+                            ptr[i] = VAL__BADB;
+                        }
+                    }
+                }
+                else if ( scaled ) {
+                    char *ip = (char *)inPtr;
+                    float *op = (float *)*outPtr;
+                    float zero = (float) bzero;
+                    float scale = (float) bscale;
+                    for ( i = 0; i < nel; i++ ) {
+                        if ( ip[i] != VAL__BADB ) {
+                            op[i] = ip[i] * scale + zero;
+                        }
+                        else {
+                            op[i] = VAL__BADR;
+                        }
                     }
                 }
             }

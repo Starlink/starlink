@@ -62,14 +62,15 @@ extern "C" {
 
     /* Return the type that will be used to return an image or spectrum as an
      * HDS string */
-    char const *gaiaArrayFullTypeToHDS( int intype, double bscale, 
+    char const *gaiaArrayFullTypeToHDS( int intype, int isfits, double bscale, 
                                         double bzero );
 
     /* Size in bytes of a local type */
     size_t gaiaArraySizeOf( int type );
 
     /* Return the type that will be used to return an image or spectrum */
-    int gaiaArrayScaledType( int intype, double bscale, double bzero );
+    int gaiaArrayScaledType( int intype, int isfits, double bscale, 
+                             double bzero );
 
     /* Convert an array of typed data into simple double precision
        representation. */

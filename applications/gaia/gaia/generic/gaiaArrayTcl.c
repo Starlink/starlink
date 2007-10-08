@@ -473,7 +473,7 @@ static int gaiaArrayRelease( ClientData clientData, Tcl_Interp *interp,
  *   address of memory
  *   basic HDS type
  *   number of elements
- *   full HDS type (used when scaling a variant).
+ *   full HDS type (used when scaling a variant or mapping byte data).
  */
 static int gaiaArrayInfo( ClientData clientData, Tcl_Interp *interp,
                           int objc, Tcl_Obj *CONST objv[] )
@@ -508,6 +508,7 @@ static int gaiaArrayInfo( ClientData clientData, Tcl_Interp *interp,
     Tcl_ListObjAppendElement(interp, resultObj, basictype );
 
     fulltype = Tcl_NewStringObj( gaiaArrayFullTypeToHDS( info->type,
+                                                         info->isfits,
                                                          info->bscale, 
                                                          info->bzero ), -1 );
     Tcl_ListObjAppendElement(interp, resultObj, fulltype );
