@@ -41,6 +41,7 @@ ALL_TARGETS = \
 	$(MANIFESTS)/esp \
 	$(MANIFESTS)/extractor \
 	$(MANIFESTS)/extreme \
+	$(MANIFESTS)/fftw \
 	$(MANIFESTS)/fluxes \
 	$(MANIFESTS)/figaro \
 	$(MANIFESTS)/findcoords \

@@ -4269,6 +4269,24 @@ GKS (SUN/83) should be used.</p></abstract>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
+<component id="fftw" support="U">
+  <version>3.1.2</version>
+  <path>thirdparty/mit/fftw</path>
+  <description>Fastest Fourier Transform in the West</description>
+  <dependencies >
+    
+  </dependencies>
+  <developers>
+    <person>
+      <name>Peter W. Draper</name>
+      <uname>pwd</uname>
+      <email>p.w.draper@durham.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
 <component id="match" support="U">
   <version>0.8-0</version>
   <path>thirdparty/rit/match</path>

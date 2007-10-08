@@ -743,6 +743,10 @@ $(MANIFESTS)/extreme: \
 	cd applications/extreme \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/fftw:
+	cd thirdparty/mit/fftw \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/figaro: \
 		$(MANIFESTS)/agi \
 		$(MANIFESTS)/ary \
