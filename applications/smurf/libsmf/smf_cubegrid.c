@@ -139,6 +139,8 @@
 *     9-AUG-2007 (DSB):
 *        Check for co-incident positions even if the automatic grid
 *        determination algorithm succeeds.
+*     9-OCT-2007 (DSB):
+*        Add a warning if specified detectors are not found in any input file.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -205,8 +207,12 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    AstFrameSet *swcsin = NULL;/* FrameSet describing spatial input WCS */
    AstMapping *azel2usesys = NULL; /* Mapping form AZEL to requested system */
    AstMapping *fsmap = NULL;  /* Mapping from the "fs" FrameSet */
-   Grp *labgrp;               /* GRP group holding detector labels */
+   Grp *alldets = NULL;       /* GRP group holding all detector labels */
+   Grp *labgrp = NULL;        /* GRP group holding used detector labels */
+   char *baddets = NULL;      /* A buffer for a list of bad detector names */
+   char *buf = NULL;          /* A buffer for a text pointer */
    char *pname = NULL;        /* Name of currently opened data file */
+   char detname[ GRP__SZNAM ]; /* Detector name */
    char outcatnam[ 41 ];      /* Output catalogue name */
    char reflat[ 41 ];         /* Reference latitude string */
    char reflon[ 41 ];         /* Reference longitude string */
@@ -238,6 +244,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    double sep;           /* Separation between first and last base positions */
    double skyref[ 2 ];   /* Values for output SkyFrame SkyRef attribute */
    float *pdata;         /* Pointer to next data sample */
+   int baddetslen;       /* Used length of "baddets" string */
    int coin;             /* Are all points effectively co-incident? */
    int found;            /* Was current detector name found in detgrp? */
    int good;             /* Are there any good detector samples? */
@@ -249,6 +256,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    int ispec;            /* Index of current spectral sample */
    int itime;            /* Index of current time slice */
    int nallpos;          /* Number of positions */
+   int ndetgrp;          /* Size of "detgrp" group */
    int nval;             /* Number of values supplied */
    int outcat;           /* Produce an output catalogue holding sample positions? */
    int usedefs;          /* Are default projection parameters being used? */
@@ -386,6 +394,44 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
       allpos = astGrow( allpos, 2*( nallpos + (data->dims)[ 2 ]*
                                               (data->dims)[ 1 ] ),
                         sizeof( double ) );
+
+/* Issue a warning if any of the detector names specified in "detgrp"
+   were not found in the data. First create a group holding the names 
+   of all detector found in the data, then check that each entry in
+   "detgrp" is also in "alldets". */
+      if( detgrp ) {
+
+         alldets = grpNew( "All detector names", status );
+         lab = hdr->detname;
+         for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
+            grpPut1( alldets, lab, 0, status );
+            lab += strlen( lab ) + 1;
+         }
+
+         baddets = NULL;
+         buf = detname;
+         grpGrpsz( detgrp, &ndetgrp, status );
+         for( irec = 1; irec <= ndetgrp; irec++ ) {
+            grpGet( detgrp, irec, 1, &buf, GRP__SZNAM, status );
+            grpIndex( detname, alldets, 1, &found, status );
+            if( !found ) {
+               baddets = astAppendString( baddets, &baddetslen, " " );
+               baddets = astAppendString( baddets, &baddetslen, detname );
+            }
+         }
+
+         if( baddets ) {
+            msgSetc( "DETS", baddets );
+            msgSetc( "FILE", pname );
+            msgOutif( MSG__NORM, " ", "   WARNING: The following "
+                      "detector names supplied for parameter DETECTORS "
+                      "were not found in ^FILE: ^DETS", status );
+            msgBlank( status );
+            baddets = astFree( baddets );
+         }
+
+         grpDelet( &alldets, status );
+      } 
 
 /* Store a pointer to the next input data value */
       pdata = ( data->pntr )[ 0 ];
@@ -897,7 +943,6 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 /* Free resources. */
       allpos2 = astFree( allpos2 );
    } 
-
 
 L999:;
 
