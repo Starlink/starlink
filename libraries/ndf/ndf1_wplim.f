@@ -135,26 +135,41 @@
       DOUBLE PRECISION DLBNDD( NDF__MXDIM )
       DOUBLE PRECISION DUBNDD( NDF__MXDIM )
       DOUBLE PRECISION PLBND( NDF__MXDIM )
+      DOUBLE PRECISION PLBND2( NDF__MXDIM )
       DOUBLE PRECISION PUBND( NDF__MXDIM )
+      DOUBLE PRECISION PUBND2( NDF__MXDIM )
       DOUBLE PRECISION SCALE
       DOUBLE PRECISION V1
       DOUBLE PRECISION V2
       DOUBLE PRECISION WLBND( NDF__MXDIM )
+      DOUBLE PRECISION WLBND1( NDF__MXDIM )
       DOUBLE PRECISION WUBND( NDF__MXDIM )
+      DOUBLE PRECISION WUBND1( NDF__MXDIM )
       DOUBLE PRECISION XL( NDF__MXDIM )
       DOUBLE PRECISION XU( NDF__MXDIM )
       INTEGER CFRM
+      INTEGER CFRM1
       INTEGER CMPREG
+      INTEGER FSMAP
       INTEGER I
+      INTEGER INTERV
       INTEGER J
+      INTEGER JUNK
       INTEGER MAP
+      INTEGER MAP1
+      INTEGER MAP2
       INTEGER NPIX
       INTEGER NWCS
       INTEGER PBOX
       INTEGER PFRM
+      INTEGER PNAX1
+      INTEGER PNAX2
+      INTEGER PPERM( NDF__MXDIM )
       INTEGER TEMP                   
       INTEGER WBOX
       INTEGER WBOXP
+      INTEGER WNAX1
+      INTEGER WPERM( NDF__MXDIM )
       LOGICAL ALLPIX
       LOGICAL ALLWCS
       LOGICAL MIXED
@@ -166,12 +181,30 @@
 *  Begin an AST context. 
       CALL AST_BEGIN( STATUS )
 
+*  Get the pixel->WCS Mapping. Note, the PIXEL Frame is always index 2.
+      FSMAP = AST_GETMAPPING( IWCS, 2, AST__CURRENT, STATUS )
+
+*  Split this Mapping up into two parallel Mappings, one of which (MAP1)
+*  contains those inputs/outputs that have defined inverse transformations, 
+*  and the other of which (MAP2) contains those inputs/outputs that have no 
+*  inverse transformations (either of these Mappings may be AST__NULL). In
+*  addition this returns a Mapping (MAP) that is equivalent to the supplied
+*  pixel->WCS Mapping except that it will always have a defined inverse
+*  (even if this means adding in a transformation that returns bad values).
+*  Arrays are returned that allow the inputs and outputs of the full
+*  Mapping to be associated with the corresponding inputs and outputs of
+*  the component Mappings.
+      CALL NDF1_MPSPT( FSMAP, MAP, MAP1, MAP2, PPERM, WPERM, STATUS )
+
+*  Invert the Mappings so that their forward transformation goes from the 
+*  current Frame to the pixel Frame.
+      CALL AST_INVERT( MAP, STATUS )
+      IF( MAP1 .NE. AST__NULL ) CALL AST_INVERT( MAP1, STATUS )
+      IF( MAP2 .NE. AST__NULL ) CALL AST_INVERT( MAP2, STATUS )
+
 *  Get the number of pixel and WCS axes in the NDF.
       NPIX = AST_GETI( IWCS, 'Nin', STATUS )
       NWCS = AST_GETI( IWCS, 'Nout', STATUS )
-
-*  Get the current WCS Frame -> PIXEL mapping.
-      MAP = AST_GETMAPPING( IWCS, AST__CURRENT, 2, STATUS )      
 
 *  Get the current WCS coordinate Frame.
       CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
@@ -246,7 +279,7 @@
 *  Otherwise the lower limit was specified as a WCS value, so store the
 *  corresponding value as the lower limit of the WCS box, and store the
 *  lower pixel bound of the NDF as the lower bound of the pixel box. Set
-*  the ALLPIX flag to ndicate that at least one bound is specified as a
+*  the ALLPIX flag to indicate that at least one bound is specified as a
 *  WCS value.
             ELSE
                PLBND( I ) = DLBNDD( I )
@@ -367,7 +400,7 @@ c      write(*,*) '   '
                      PLBND( I ) = DLBNDD( I ) 
                      PUBND( I ) = DUBNDD( I ) 
                      
-*  If the centre was origianlly a WCS value, we have some WCS bounds.
+*  If the centre was originally a WCS value, we have some WCS bounds.
                   ELSE
                      ALLPIX = .FALSE.
                   END IF                     
@@ -445,7 +478,7 @@ c      write(*,*) '   '
 
 *  The AST Box class knows nothing about axis normalisation. To avoid
 *  problems ensure that the upper and lower axis values are in the same
-*  "cylce". This applied particularly to RA values where the lower limit 
+*  "cycle". This applied particularly to RA values where the lower limit 
 *  may have a value of (say) 359 degrees and the upper limit be (say) 2
 *  degrees. In this example the following code converts the upper limit
 *  to 361 degrees.
@@ -462,7 +495,7 @@ c      write(*,*) '   WLBND: ',WLBND(1),WLBND(2)
 c      write(*,*) '   WUBND: ',WUBND(1),WUBND(2)
 c      write(*,*) '   '
 
-*  If any centre/values bounds remain in which the centre is a WCS value 
+*  If any centre/width bounds remain in which the centre is a WCS value 
 *  and the width is a pixel value, then we need to convert them into 
 *  upper and lower bounds now, since this will not have been done earlier.
          IF( MIXED ) THEN
@@ -528,15 +561,58 @@ c      write(*,*) '   '
 *  now.
          IF( .NOT. ALLPIX ) THEN
 
-*  Define an AST Box within the current WCS Frame, using the bounds
-*  stored in WLBND/WUBND.
-            WBOX = AST_BOX( CFRM, 1, WLBND, WUBND, AST__NULL, ' ', 
+*  Define an AST Box within the subset of WCS axes that have an inverse
+*  transformation, using the bounds stored in WLBND/WUBND. we will use the 
+*  inverse transformation below to convert the box from WCS to pixel coords.
+            IF( MAP1 .EQ. AST__NULL ) THEN
+               IF( STATUS .EQ. SAI__OK ) THEN
+                  STATUS = NDF__BNDIN
+                  CALL ERR_REP( 'NDF1_WPLIM_NOI', 'The transformation'//
+     :                          ' from WCS to pixel coordinates is '//
+     :                          'undefined.', STATUS )
+               END IF
+               GO TO 999
+            END IF
+
+            WNAX1 = AST_GETI( MAP1, 'Nin', STATUS )
+            DO I = 1, WNAX1
+               WLBND1( I ) = WLBND( WPERM( I ) )
+               WUBND1( I ) = WUBND( WPERM( I ) )
+            END DO
+            CFRM1 = AST_PICKAXES( CFRM, WNAX1, WPERM, JUNK, STATUS )
+            WBOX = AST_BOX( CFRM1, 1, WLBND1, WUBND1, AST__NULL, ' ', 
      :                      STATUS )
 
-*  Map this region into the PIXEL Frame. The resulting Region will (in
-*  general) be a rotated box with curvi-linear edges.
-            PFRM = AST_GETFRAME( IWCS, 2, STATUS )
-            WBOXP = AST_MAPREGION( WBOX, MAP, PFRM, STATUS )
+*  Map this region into the PIXEL Frame (we know that this will work
+*  since we have selected the axes that have the required inverse
+*  transformation). The resulting Region will (in general) be a rotated 
+*  box with curvi-linear edges.
+            PNAX1 = AST_GETI( MAP1, 'Nout', STATUS )
+            PFRM = AST_FRAME( PNAX1, 'Domain=PIXEL', STATUS )
+            WBOXP = AST_MAPREGION( WBOX, MAP1, PFRM, STATUS )
+
+*  If there are any WCS axes that do not have an inverse transformation,
+*  then create an Interval describing the entire extent of the
+*  corresponding pixel axes. Use this Interval to extrude the WBOX1P
+*  region along the extra pixel axes to form a Prism, and re-arraneg the
+*  axes so that they correspond to the original order of pixel axes.
+            IF( MAP2 .NE. AST__NULL ) THEN
+               PNAX2 = AST_GETI( MAP2, 'Nout', STATUS )
+
+               DO I = 1, NPIX
+                  IF( PPERM( I ) .GT. PNAX1 ) THEN
+                     PLBND2( I - PNAX1 ) = DLBNDD( I )
+                     PUBND2( I - PNAX1 ) = DUBNDD( I )
+                  END IF
+               END DO
+
+               PFRM = AST_FRAME( PNAX2, 'Domain=PIXEL', STATUS )
+               INTERV = AST_INTERVAL( PFRM, PLBND2, PUBND2, AST__NULL, 
+     :                                ' ', STATUS )
+               WBOXP = AST_PRISM( WBOXP, INTERV, ' ', STATUS )
+               CALL AST_PERMAXES( WBOXP, PPERM, STATUS )
+
+            END IF
 
 *  If all bounds were specified as WCS  values, find the bounds (in 
 *  PIXEL coords) of the above Box, and store in PLBND/PUBND. 
@@ -561,6 +637,7 @@ c      write(*,*) '   '
 
 *  Define an AST Interval within the PIXEL Frame, using the bounds stored 
 *  in PLBND/PUBND.
+               PFRM = AST_FRAME( NAX, 'Domain=PIXEL', STATUS )
                PBOX = AST_INTERVAL( PFRM, PLBND, PUBND, AST__NULL, ' ', 
      :                              STATUS )
 
@@ -599,6 +676,9 @@ c      write(*,*) '   '
             LBND( I ) = UBND( I ) - NINT( PUBND( I ) - PLBND( I ) ) + 1 
          END DO
       END IF
+
+*  Arrive here if an error occurs.
+ 999  CONTINUE
 
 *  End the AST context. 
       CALL AST_END( STATUS )
