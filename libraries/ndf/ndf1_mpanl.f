@@ -285,8 +285,8 @@
 
 *  Annul AST objects for any inputs that have been used.
          DO J = 1, NIN
-            IF( MAPS( J ) .NE. AST__NULL ) CALL AST__ANNUL( MAPS( J ),
-     :                                                      STATUS )
+            IF( MAPS( J ) .NE. AST__NULL ) CALL AST_ANNUL( MAPS( J ),
+     :                                                     STATUS )
          END DO
 
 *  Return the supplied Mapping.
