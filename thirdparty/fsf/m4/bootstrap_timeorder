@@ -10,3 +10,4 @@ doc/Makefile.in
 #examples/Makefile.in
 lib/Makefile.in
 src/Makefile.in
+stamp-h.in
