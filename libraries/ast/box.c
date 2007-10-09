@@ -67,6 +67,11 @@ f     The Box class does not define any new routines beyond those
 *        Change the iterating algorithm in MakeGrid so that it uses
 *        pixel index rather than axis value. This is more robust against 
 *        rounding errors.
+*     9-OCT-2007 (DSB):
+*        - Fix bug in RegBaseMesh that could cause incorrect meshes for 2D
+*        Boxes.
+*        - In RegBaseMesh, use flat geometry if all axes come from simple
+*        frames or from 1-dimensional specialist frames.
 *class--
 */
 
@@ -1290,8 +1295,11 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
    int iedge;                     /* Edge index */
    int ip;                        /* Index of next point */
    int metric;                    /* Does Frame have a usable metric? */
+   int nax0;                      /* No. of axes in first primary Frame */
+   int nax1;                      /* No. of axes in second primary Frame */
    int naxes;                     /* No. of axes in base Frame */
    int np;                        /* No. of points in returned PointSet */
+   int np0;                       /* No. of points per edge */
    int np_axis;                   /* No. of points per axis in ND box */
    int np_edge[ 4 ];              /* No. of points per edge in 2D box */
    int paxis;                     /* Axis index in primary Frame */
@@ -1352,14 +1360,18 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
          c[ 4 ][ 1 ] = lbnd[ 1 ];
 
 /* See if we can assume that the frame has flat geometry. This is the case 
-   if both axes belong to simple Frames, but may not be the case if either 
-   axis does not belong to a simple Frame. */
+   if both axes belong to simple Frames, or are 1D, but may not be the case 
+   if either axis does not belong to a simple Frame that has more than 1
+   axis. */
          astPrimaryFrame( frm, 0, &pfrm0, &paxis );
          astPrimaryFrame( frm, 1, &pfrm1, &paxis );
          class0 = astGetClass( pfrm0 );
          class1 = astGetClass( pfrm1 );
+         nax0 = astGetNaxes( pfrm0 );
+         nax1 = astGetNaxes( pfrm1 );
          if( astOK ) {
-            flat = !strcmp( class0, "Frame" ) && !strcmp( class1, "Frame" );
+            flat = ( !strcmp( class0, "Frame" ) || nax0 == 1 ) &&
+                   ( !strcmp( class1, "Frame" ) || nax1 == 1 );
          } else {
             flat = 0;
          }
@@ -1461,9 +1473,10 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
 /* If the Frame has no usable metric, give an equal number of points
    (equal to a quarter of the total) to all 4 sides of the box. */
          } else {
-            np = (int) ( 0.25*np );
+            np0 = (int) ( 0.25*np );
+            np = 0;
             for( iedge = 0; iedge < 4; iedge++ ) {
-               np_edge[ iedge ] = np;
+               np_edge[ iedge ] = np0;
                np += np_edge[ iedge ];
             }
          }

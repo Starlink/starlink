@@ -68,6 +68,8 @@ f     The Prism class does not define any new routines beyond those
 *        intervals.
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
+*     9-OCT-2007 (DSB):
+*        Guard against all axes being extrusion axes in EquivPrism.
 *class--
 */
 
@@ -339,7 +341,7 @@ static AstRegion *EquivPrism( AstPrism *this, AstRegion *region ) {
 *        Pointer to the Region.
 
 *  Returned Value:
-*     A pointer to the equivalent Prism or a a clone of the supplied
+*     A pointer to the equivalent Prism or a clone of the supplied
 *     pointer. This should be annulled (using astAnnul) when no longer 
 *     needed.
 
@@ -467,72 +469,75 @@ static AstRegion *EquivPrism( AstPrism *this, AstRegion *region ) {
                   if( outax1[ i ] != -1 ) outax1[ j++ ] = outax1[ i ];
                }
    
-/* Copy the base Frame bounds for these axes. */
+/* Copy the base Frame bounds for these axes. Abort if there are none. */
                nax1 = naxb - nax2;
-               for( i = 0; i < nax1; i++ ) {
-                  lbndt[ i ] = lbnd[ outax1[ i ] ];
-                  if( lbndt[ i ] == -DBL_MAX ) lbndt[ i ] = AST__BAD;
-                  ubndt[ i ] = ubnd[ outax1[ i ] ];
-                  if( ubndt[ i ] == DBL_MAX ) ubndt[ i ] = AST__BAD;
-               }
+               if( nax1 > 0 ) {
+                  for( i = 0; i < nax1; i++ ) {
+                     lbndt[ i ] = lbnd[ outax1[ i ] ];
+                     if( lbndt[ i ] == -DBL_MAX ) lbndt[ i ] = AST__BAD;
+                     ubndt[ i ] = ubnd[ outax1[ i ] ];
+                     if( ubndt[ i ] == DBL_MAX ) ubndt[ i ] = AST__BAD;
+                  }
    
 /* Pick these axes from the base Frame of the Box or Interval. */
-               sfrm1 = astPickAxes( bfrm, nax1, outax1, NULL );
+                  sfrm1 = astPickAxes( bfrm, nax1, outax1, NULL );
    
 /* Create an Interval describing the base axes. */
-               sreg1 = astInterval( sfrm1, lbndt, ubndt, NULL, "" );
+                  sreg1 = astInterval( sfrm1, lbndt, ubndt, NULL, "" );
    
 /* Create a Prism from these two regions. */
-               prism = astPrism( sreg1, sreg2, "" );
+                  prism = astPrism( sreg1, sreg2, "" );
    
 /* The axes in this Prism are in the order defined by the structure of
       the suppied Prism (all the base axes followed by all the extrusion axes).
       This may be different from the order of the base Frame axes in the
       supplied Box or Interval. Get a PermMap which will remap the prism so its 
       axes are in the same order as the original Region's base Frame. */
-               inperm = astMalloc( sizeof( int )*(size_t)naxb );
-               if( inperm ) {
-                  for( i = 0; i < nax1; i++ ) inperm[ i ] = outax1[ i ];
-                  for( i = 0; i < nax2; i++ ) inperm[ i + nax1 ] = outax2[ i ];
-                  pmap = astPermMap( naxb, inperm, naxb, NULL, NULL, "" );
+                  inperm = astMalloc( sizeof( int )*(size_t)naxb );
+                  if( inperm ) {
+                     for( i = 0; i < nax1; i++ ) inperm[ i ] = outax1[ i ];
+                     for( i = 0; i < nax2; i++ ) inperm[ i + nax1 ] = outax2[ i ];
+                     pmap = astPermMap( naxb, inperm, naxb, NULL, NULL, "" );
    
 /* Combine this with the Mapping from the original base Frame to the
-      original current Frame, and simplify it. */
-                  astInvert( map3 );
-                  map6 = (AstMapping *) astCmpMap( pmap, map3, 1, "" );
-                  map7 = astSimplify( map6 );            
+   original current Frame, and simplify it. */
+                     astInvert( map3 );
+                     map6 = (AstMapping *) astCmpMap( pmap, map3, 1, "" );
+                     map7 = astSimplify( map6 );            
    
 /* If this is not a UnitMap, use it to remap the prism into the Region's 
       original current Frame. We do not simplify the result since this could
       turn the final prism back into a Box or Interval! */
-                  if( !astIsAUnitMap( map7 ) ) {
-                     result = astMapRegion( prism, map7, cfrm );
-                  } else {               
-                     result= astClone( prism );
-                  }
+                     if( !astIsAUnitMap( map7 ) ) {
+                        result = astMapRegion( prism, map7, cfrm );
+                     } else {               
+                        result= astClone( prism );
+                     }
    
 /* If the original Region has any non-default uncertainty, get it, and
       set it in the re-ordered, re-mapped Prism. */
-                  if( astTestUnc( region ) ){
-                     unc = astGetUncFrm( region, AST__CURRENT );
-                     astSetUnc( result, unc );
-                     unc = astAnnul( unc );
-                  }
+                     if( astTestUnc( region ) ){
+                        unc = astGetUncFrm( region, AST__CURRENT );
+                        astSetUnc( result, unc );
+                        unc = astAnnul( unc );
+                     }
    
 /* Copy Region attributes from the original Region to the new Prism. */
-                  astRegOverlay( result, region );
+                     astRegOverlay( result, region );
    
 /* Free resources */
-                  inperm = astFree( inperm );
-                  pmap = astAnnul( pmap );
-                  map6 = astAnnul( map6 );
-                  map7 = astAnnul( map7 );
+                     inperm = astFree( inperm );
+                     pmap = astAnnul( pmap );
+                     map6 = astAnnul( map6 );
+                     map7 = astAnnul( map7 );
+                  }
+
+                  sfrm1 = astAnnul( sfrm1 );
+                  sreg1 = astAnnul( sreg1 );
+                  prism = astAnnul( prism );
                }
 
                outax1 = astFree( outax1 );
-               sfrm1 = astAnnul( sfrm1 );
-               sreg1 = astAnnul( sreg1 );
-               prism = astAnnul( prism );
             }
 
             outax2 = astFree( outax2 );
