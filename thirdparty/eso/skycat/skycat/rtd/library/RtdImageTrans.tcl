@@ -125,7 +125,7 @@ itcl::class rtd::RtdImageTrans {
 		-side left -fill x -padx 0.5m -ipadx 0.5m -ipady 0.5m -in $w_.trans_frame
 
 	    add_short_help $itk_component(rotate) \
-		{Rotate: {bitmap b1} = rotate the image by exchanging the X and Y axis}
+		{Exchange: {bitmap b1} = exchange the X and Y axis}
 	    add_short_help $itk_component(flipx) \
 		{Flip X: {bitmap b1} = flip the image about the X axis}
 	    add_short_help $itk_component(flipy) \
