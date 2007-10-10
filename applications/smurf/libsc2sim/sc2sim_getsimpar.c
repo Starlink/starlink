@@ -53,6 +53,8 @@
 *        Added cosmic ray spikes, parameters spike_p0/p1/t0/alpha
 *     2007-07-13 (AGG):
 *        Check that tauzen is within a valid range
+*     2007-10-09 (AGG):
+*        Print out value of tauzen if too low, use msgOut for reporting
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -231,7 +233,9 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
       wavelength-dependent check, but for simplicity we can stick to
       one value since tau should never get this low anyway. */
    if ( sinx->tauzen <= 0.014 ) {
-     printf("TAUZEN out of range (must be >0.014), setting to 0.015\n");
+     msgSetd("T",sinx->tauzen);
+     msgOut("","TAUZEN too low (value = ^T, must be >0.014), setting to 0.015\n",
+	    status);
      sinx->tauzen = 0.015;
    }
 
