@@ -97,10 +97,11 @@ AC_CHECK_HEADERS(math.h)
 AC_CHECK_HEADERS(gsl/gsl_math.h)
 AC_CHECK_HEADERS(slamac.h)
 
-dnl    Build dependencies for this package.
+dnl    Build dependencies for this package. Note now we have gsl, the
+dnl    --with-gsl flag should be reviewed (unnecessary?).
 dnl    Includes: fio, par, sae; 
 dnl    links to: chr, mers, fio, psx, task.
-STAR_DECLARE_DEPENDENCIES([build], [ast sae pcs mers ndf shl])
+STAR_DECLARE_DEPENDENCIES([build], [ast sae pcs mers ndf shl gsl])
 STAR_DECLARE_DEPENDENCIES([link], [ndf ast hlp ndg shl])
 dnl We use the sst package to build documentation (prohlp)
 STAR_DECLARE_DEPENDENCIES([sourceset], [sst])

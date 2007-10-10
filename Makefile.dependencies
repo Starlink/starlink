@@ -2052,6 +2052,7 @@ $(MANIFESTS)/smurf: \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/gsl \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
