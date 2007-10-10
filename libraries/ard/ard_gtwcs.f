@@ -142,8 +142,8 @@
 
 *  Store arbitrary values for the mask bounds.
       DO I = 1, NDIM
-         DLBND( I ) = 0.0;
-         DUBND( I ) = 1000.0;
+         DLBND( I ) = 0.0
+         DUBND( I ) = 1000.0
       END DO
 
 *  Create an algebraic Boolean expression in which operators and
