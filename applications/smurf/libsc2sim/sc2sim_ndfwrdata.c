@@ -193,6 +193,8 @@
 *        sc2sim_simulate
 *     2007-10-05 (AGG):
 *        Add obsend flag
+*     2007-10-09 (AGG):
+*        Correct bug in calculating DATE-OBS for subimages
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
@@ -693,7 +695,7 @@ int *status              /* Global status (given and returned) */
 
        /* Set DATE-OBS string for this image - UTC */
        sc2sim_dateobs( inx->mjdaystart + 
-		       ((((nsubscan-1)*numsamples) + (k*framesize))*inx->steptime/SPD),
+		       ((((nsubscan-1)*numsamples) + k*naver)*inx->steptime/SPD),
 		       dateobs, status );
 
        /* Set dimensions of output image */
