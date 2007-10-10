@@ -88,6 +88,8 @@
 *  History:
 *     8-OCT-2007 (DSB):
 *        Original version.
+*     10-OCT-2007 (DSB):
+*        Terminate MPAX loop early if all axes have been used up.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -185,7 +187,7 @@
          END DO
 
 *  We now loop through all possible combinations of "MPAX" inputs. 
-         MORE = .TRUE.
+         MORE = ( NDONE .LT. NIN )
          DO WHILE( MORE ) 
 
 *  If the current input selection includes any axes that have
