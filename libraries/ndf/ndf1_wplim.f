@@ -93,7 +93,9 @@
 *     17-AUG-2007 (DSB):
 *        Improve error messages.
 *     10-OCT-2007 (DSB):
-*        Handle axes correctly that have no inverse transformation.
+*        - Handle axes correctly that have no inverse transformation.
+*        - Handle cases where the I'th pixel axis does not feed the I'th
+*        WCS axis.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -136,8 +138,10 @@
       DOUBLE PRECISION DELTA
       DOUBLE PRECISION DLBNDD( NDF__MXDIM )
       DOUBLE PRECISION DUBNDD( NDF__MXDIM )
+      DOUBLE PRECISION MAXRNG
       DOUBLE PRECISION PLBND( NDF__MXDIM )
       DOUBLE PRECISION PLBND2( NDF__MXDIM )
+      DOUBLE PRECISION PRANGE
       DOUBLE PRECISION PUBND( NDF__MXDIM )
       DOUBLE PRECISION PUBND2( NDF__MXDIM )
       DOUBLE PRECISION SCALE
@@ -156,6 +160,7 @@
       INTEGER I
       INTEGER INTERV
       INTEGER J
+      INTEGER JJ
       INTEGER JUNK
       INTEGER MAP
       INTEGER MAP1
@@ -457,12 +462,23 @@ c      write(*,*) '   '
                CALL AST_MAPBOX( MAP, PLBND, PUBND, .FALSE., I, V1, V2,
      :                          XL, XU, STATUS )
 
+*  Find the pixel axis that covers the largest range between the
+*  positions at which the upper and lower WCS limits were found.
+               MAXRNG = -1.0
+               DO J = 1, NPIX
+                  PRANGE = ABS( XU( J ) - XL( J ) )
+                  IF( PRANGE .GT. MAXRNG ) THEN
+                     JJ = J
+                     MAXRNG = PRANGE
+                  END IF
+               END DO
+
 *  Whether a WCS value is a "lower" or "upper" bound is determined not by
 *  the WCS values themselves but by which one gives the lower or upper 
 *  value on the corresponding pixel axis. Use this criterion to fill in
 *  values for which ever WCS bound has not been supplied.
                IF( WLBND( I ) .EQ. AST__BAD ) THEN
-                  IF( XL( I ) .LT. XU( I ) ) THEN
+                  IF( XL( JJ ) .LT. XU( JJ ) ) THEN
                      WLBND( I ) = V1
                   ELSE 
                      WLBND( I ) = V2
@@ -470,7 +486,7 @@ c      write(*,*) '   '
                END IF
 
                IF( WUBND( I ) .EQ. AST__BAD ) THEN
-                  IF( XL( I ) .GT. XU( I ) ) THEN
+                  IF( XL( JJ ) .GT. XU( JJ ) ) THEN
                      WUBND( I ) = V1
                   ELSE 
                      WUBND( I ) = V2
@@ -484,6 +500,8 @@ c      write(*,*) '   '
 *  may have a value of (say) 359 degrees and the upper limit be (say) 2
 *  degrees. In this example the following code converts the upper limit
 *  to 361 degrees.
+
+
             DELTA = AST_AXDISTANCE( CFRM, I, WLBND( I ), WUBND( I ),
      :                              STATUS )
             WUBND( I ) = WLBND( I ) + DELTA
