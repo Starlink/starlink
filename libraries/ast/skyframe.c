@@ -220,6 +220,9 @@ f     The SkyFrame class does not define any new routines beyond those
 *     2-OCT-2007 (DSB):
 *        In Overlay, clear AlignSystem as well as System before calling
 *        the parent overlay method.
+*     10-OCT-2007 (DSB):
+*        In MakeSkyMapping, correct the usage of variables "system" and 
+*        "align_sys" when aligning in AZEL.
 *class--
 */
 
@@ -4679,7 +4682,7 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
    
 /* If the target system is the same as the alignment system, neither of the 
    first 2 steps need be done. */
-   if( target_system == align_sys ) {
+      if( target_system == align_sys ) {
          step1 = 0;
          step2 = 0;
       }
@@ -4968,7 +4971,7 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
 /* -------------------------- */
 /* Go from FK5 J2000 to geocentric apparent (MAP), shift RA into hour angle
    (R2H), rotate from equator to horizon (E2H). */
-         } else if ( system == AST__AZEL ) {
+         } else if ( align_sys == AST__AZEL ) {
             VerifyMSMAttrs( target, result, 1, "ObsLon ObsLat Epoch", "astMatch" );
             TRANSFORM_2( "MAP", 2000.0, epoch )
             TRANSFORM_1( "R2H", last )
@@ -5101,7 +5104,7 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
 /* ---------- */
 /* Rotate from horizon to equator (H2E), shift hour angle into RA (H2R),
       go from geocentric apparent to FK5 J2000. */
-         } else if ( system == AST__AZEL ) {
+         } else if ( align_sys == AST__AZEL ) {
             VerifyMSMAttrs( target, result, 3, "ObsLon ObsLat Epoch", "astMatch" );
             TRANSFORM_2( "H2E", lat, diurab )
             TRANSFORM_1( "H2R", last )
