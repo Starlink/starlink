@@ -92,6 +92,8 @@
 *        Correct final conversion from pixel coords to pixel indices.
 *     17-AUG-2007 (DSB):
 *        Improve error messages.
+*     10-OCT-2007 (DSB):
+*        Handle axes correctly that have no inverse transformation.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -561,9 +563,7 @@ c      write(*,*) '   '
 *  now.
          IF( .NOT. ALLPIX ) THEN
 
-*  Define an AST Box within the subset of WCS axes that have an inverse
-*  transformation, using the bounds stored in WLBND/WUBND. we will use the 
-*  inverse transformation below to convert the box from WCS to pixel coords.
+*  Report an error if no axes had an inverse transformation.
             IF( MAP1 .EQ. AST__NULL ) THEN
                IF( STATUS .EQ. SAI__OK ) THEN
                   STATUS = NDF__BNDIN
@@ -574,6 +574,9 @@ c      write(*,*) '   '
                GO TO 999
             END IF
 
+*  Define an AST Box within the subset of WCS axes that have an inverse
+*  transformation, using the bounds stored in WLBND/WUBND. we will use the 
+*  inverse transformation below to convert the box from WCS to pixel coords.
             WNAX1 = AST_GETI( MAP1, 'Nin', STATUS )
             DO I = 1, WNAX1
                WLBND1( I ) = WLBND( WPERM( I ) )
@@ -594,15 +597,15 @@ c      write(*,*) '   '
 *  If there are any WCS axes that do not have an inverse transformation,
 *  then create an Interval describing the entire extent of the
 *  corresponding pixel axes. Use this Interval to extrude the WBOX1P
-*  region along the extra pixel axes to form a Prism, and re-arraneg the
-*  axes so that they correspond to the original order of pixel axes.
+*  region along the extra pixel axes to form a Prism.
             IF( MAP2 .NE. AST__NULL ) THEN
                PNAX2 = AST_GETI( MAP2, 'Nout', STATUS )
 
                DO I = 1, NPIX
-                  IF( PPERM( I ) .GT. PNAX1 ) THEN
-                     PLBND2( I - PNAX1 ) = DLBNDD( I )
-                     PUBND2( I - PNAX1 ) = DUBNDD( I )
+                  J = PPERM( I ) - PNAX1
+                  IF( J .GT. 0 ) THEN
+                     PLBND2( J ) = DLBNDD( I )
+                     PUBND2( J ) = DUBNDD( I )
                   END IF
                END DO
 
@@ -610,9 +613,12 @@ c      write(*,*) '   '
                INTERV = AST_INTERVAL( PFRM, PLBND2, PUBND2, AST__NULL, 
      :                                ' ', STATUS )
                WBOXP = AST_PRISM( WBOXP, INTERV, ' ', STATUS )
-               CALL AST_PERMAXES( WBOXP, PPERM, STATUS )
 
             END IF
+
+*  Re-arrange the axes so that they correspond to the original order of pixel 
+*  axes.
+            CALL AST_PERMAXES( WBOXP, PPERM, STATUS )
 
 *  If all bounds were specified as WCS  values, find the bounds (in 
 *  PIXEL coords) of the above Box, and store in PLBND/PUBND. 
