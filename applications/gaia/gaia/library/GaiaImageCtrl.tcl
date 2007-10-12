@@ -454,6 +454,22 @@ itcl::class gaia::GaiaImageCtrl {
 
       #  Set the default for merging headers.
       set_always_merge_
+
+      #  Set the HDU, if not 0. Need to realise the chooser and wait for it
+      #  to complete the first image selection, then apply this choice.
+      if { $itk_option(-hdu) != 0 } {
+         update
+         after idle [code $this apply_hdu_]
+      }
+   }
+
+   #  Apply the current HDU, provided that it isn't zero. Used when setting
+   #  the HDU initially. After call the HDU value is returned to zero.
+   private method apply_hdu_ {} {
+      if { $itk_option(-hdu) != 0 } {
+         $image_ hdu $itk_option(-hdu)
+         set itk_option(-hdu) 0
+      }
    }
 
    #  Set the precision used to display RA/Dec coordinates. By default
@@ -707,9 +723,10 @@ itcl::class gaia::GaiaImageCtrl {
          set h [$image_ dispheight]
          set_scrollregion 0 0 $w $h
 
-         #  Set the initial FITS HDU.
+         #  Set the initial FITS HDU, but only once.
          if { $itk_option(-hdu) != 0 } {
-            $image_ hdu $itk_option(-hdu)
+            #$image_ hdu $itk_option(-hdu)
+            #configure -hdu 0"
          }
 
       } else {
