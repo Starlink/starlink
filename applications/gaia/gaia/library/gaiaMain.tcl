@@ -114,9 +114,11 @@ if { $argc >= 1 } {
 
       #  Set the HDU, this will be removed from the name, if needed.
       set hdu [.namer fitshdunum]
-      lappend argv "-hdu" 
-      lappend argv "$hdu"
-      incr argc 2
+      if { $hdu != 0 } {
+         lappend argv "-hdu" 
+         lappend argv "$hdu"
+         incr argc 2
+      }
 
       #  Replace the given name by one that GAIA can display.
       set argv [lreplace $argv 0 0 "-file" [.namer fullname 0]]
