@@ -21,6 +21,9 @@
     It should now be possible to NDF byte data cubes. Previously these were
     handled incorrectly.
 
+    The -hdu command-line option will now work again. This allows the selection
+    of a extension when displaying an MEF.
+
   Puana Release:
   ==============
 
