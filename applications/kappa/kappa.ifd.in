@@ -10025,12 +10025,13 @@ package kappa {
           }
 
          parameter size {
+            size *
             position 4
             type _REAL
             vpath DEFAULT
             ppath CURRENT DEFAULT
             default 5.0
-            prompt {Initial scale length in pixels}
+            prompt {Initial scale length in pixels along each dimension}
             helpkey *
           }
 

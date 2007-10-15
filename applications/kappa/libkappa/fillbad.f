@@ -4,7 +4,7 @@
 *     FILLBAD
 
 *  Purpose:
-*     Removes regions of bad values from a 2-dimensional NDF.
+*     Removes regions of bad values from an NDF.
 
 *  Language:
 *     Starlink Fortran 77
@@ -17,9 +17,10 @@
 *        The global status.
 
 *  Description:
-*     This application replaces bad values in a 2-dimensional NDF with
-*     a smooth function which matches the surrounding data.  It can fill
-*     arbitrarily shaped regions of bad values within images.
+*     This application replaces bad values in a NDF with a smooth 
+*     function which matches the surrounding data.  It can fill
+*     arbitrarily shaped regions of bad values within n-dimensional
+*     arrays.
 *
 *     It forms a smooth replacement function for the regions of bad
 *     values by forming successive approximations to a solution of
@@ -41,8 +42,7 @@
 *        The root-mean-squared change in output values which occurred
 *        in the last iteration.
 *     IN = NDF (Read)
-*        The 2-dimensional NDF containing the input image with bad
-*        values.
+*        The NDF containing the input image with bad values.
 *     MEMORY = _LOGICAL (Read)
 *        If this is FALSE, the whole array is processed at the same
 *        time.  If it is TRUE, the array is divided into chunks whose
@@ -57,9 +57,17 @@
 *        match the surrounding good data.  [2]
 *     OUT = NDF (Write)
 *        The NDF to contain the image free of bad values.
-*     SIZE  = _REAL (Read)
-*        The initial scale length in pixels to be used in the first
-*        iteration.  For maximum efficiency, it should normally have a
+*     SIZE( ) = _REAL (Read)
+*        The initial scale lengths in pixels to be used in the first
+*        iteration, along each axis.  If fewer values are supplied than
+*        pixel axes in the NDF, the last value given is repeated for 
+*        the remaining axes.  The size 0 means no fitting across a 
+*        dimension.  For instance, [0,0,5] would be appropriate if the 
+*        spectra along the third dimension of a cube are independent,
+*        and the replacement values are to be derived only within each
+*        spectrum.
+*
+*        For maximum efficiency, a scale length should normally have a
 *        value about half the `size' of the largest invalid region to
 *        be replaced.  (See the Notes section for more details.) [5.0]
 *     TITLE = LITERAL (Read)
@@ -89,18 +97,30 @@
 *       with blocks up to 512 by 512 pixels to reduce the memory
 *       requirements, and no variance information will be used or
 *       propagated.
+*     fillbad in=speccube out=speccube_fill size=[0,0,128] iter=5
+*       Suppose NDF speccube is a spectral imaging cube with the 
+*       spectral axis third.  This example replaces the bad pixels by 
+*       valid values derived from the surrounding good pixel values
+*       within each spectrm, using an initial scale length of 128
+*       channels, iterating five times.  The filled NDF is called
+*       speccube_fill.
+*     fillbad in=speccube out=speccube_fill size=[5,5,128] iter=5
+*       As the previous example, but now the relaxation occurs along
+*       the spatial axes too, initially with a scale length of five
+*       pixels.
 
 *  Notes:
 *     -  The algorithm is based on the relaxation method of repeatedly
-*     replacing each bad pixel with the mean of its four nearest
-*     neighbours.  Such a method converges to the required solution,
-*     but information about the good regions only propagates at a rate
-*     of about one pixel per iteration into the bad regions, resulting
-*     in slow convergence if large areas are to be filled.
+*     replacing each bad pixel with the mean of its two nearest
+*     neighbours along each pixel axis.  Such a method converges to the
+*     required solution, but information about the good regions only 
+*     propagates at a rate of about one pixel per iteration into the 
+*     bad regions, resulting in slow convergence if large areas are to 
+*     be filled.
 *
 *     This application speeds convergence to an acceptable function by
 *     forming the replacement mean from all the pixels in the same
-*     image row and column, using a weight which decreases
+*     axis (such as a row or a column), using a weight which decreases
 *     exponentially with distance and goes to zero after the first good
 *     pixel is encountered in any direction.  If there is variance
 *     information, this is included in the weighting so as to give more
@@ -148,7 +168,10 @@
 *     usually determined by the `size' of the largest invalid region to
 *     be replaced.
 *     -  An error results if the input NDF has no bad values to replace.
-*     -  The progress of the iterations is reported.
+*     -  The progress of the iterations is reported at the normal
+*     reporting level.  The format of the output is slightly different
+*     if the scale lengths vary with pixel axis; an extra axis column 
+*     is included.
 
 *  Related Applications:
 *     KAPPA: CHPIX, GLITCH, MEDIAN, ZAPLIN; Figaro: BCLEAN,
@@ -178,7 +201,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -188,8 +211,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -212,7 +235,10 @@
 *     23-MARCH-2001 (DSB):
 *        Reset the smoothing size before processing each block.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2007 October 11 (MJC):
+*        Made to work with n-dimensional NDFs.  Added final contextual
+*        error message.
 *     {enter_further_changes_here}
 
 *-
@@ -235,35 +261,32 @@
                                  ! blocking
       PARAMETER ( DEFSIZ = 512 )   
 
-      INTEGER NDIM               ! Max. dimension of images the routine
-                                 ! can process
-      PARAMETER ( NDIM = 2 )
-   
       BYTE BADBIT                ! The value the bad-bits mask of the output
       PARAMETER ( BADBIT = 0 )   ! NDF is set to after processing.
 
 
 *  Local Variables:
-      CHARACTER * ( 13 ) COMP    ! The array component(s) of NDF
-      CHARACTER * ( NDF__SZFTP ) DTYPE ! Numeric type for output arrays
-      CHARACTER * ( NDF__SZTYP ) ITYPE ! Numeric type for processing
-      DOUBLE PRECISION CNGMAX    ! Maximum change of value at last iteration
+      LOGICAL BAD                ! Bad pixels present?
+      INTEGER BLDIM( NDF__MXDIM ) ! Size of an block in each dimension
+      INTEGER BLKSIZ             ! Maximum dimension when blocking
                                  ! per block
+      LOGICAL BLOCK              ! Process in blocks?
+      DOUBLE PRECISION CNGMAX    ! Maximum change of value at last iteration
       DOUBLE PRECISION CNGRMS    ! RMS change at last iteration per block
       DOUBLE PRECISION CNGSUM    ! Some of weighted square changes at last 
                                  ! iteration
+      CHARACTER*13 COMP          ! The array component(s) of NDF
+      INTEGER DIM( NDF__MXDIM )  ! Size of the image in each dimension
       DOUBLE PRECISION DMNV      ! Min variance value
       DOUBLE PRECISION DMXV      ! Max variance value
-      DOUBLE PRECISION MAXCNG    ! Maximum change of value at last iteration
-      DOUBLE PRECISION RMSCNG    ! RMS change at last iteration
-      INTEGER BLDIM( NDF__MXDIM ) ! Size of an block in each dimension
-      INTEGER BLKSIZ             ! Maximum dimension when blocking
-      INTEGER DIM( NDF__MXDIM )  ! Size of the image in each dimension
+      CHARACTER*( NDF__SZFTP ) DTYPE ! Numeric type for output arrays
       INTEGER EL                 ! Number of elements in mapped array
       INTEGER I                  ! Loop index
       INTEGER II                 ! Loop index
       INTEGER IDIM               ! Actual number of dimensions of image
+      CHARACTER*( NDF__SZTYP ) ITYPE ! Numeric type for processing
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of block
+      DOUBLE PRECISION MAXCNG    ! Maximum change of value at last iteration
       INTEGER MNVP               ! Index of min variance value
       INTEGER MXVP               ! Index of max variance value
       INTEGER NBAD               ! Number of bad values replaced in a block 
@@ -274,6 +297,7 @@
       INTEGER NDFI               ! NDF identifier for input image
       INTEGER NDFO               ! NDF identifier for output image
       INTEGER NITER              ! Number of iterations
+      INTEGER NSIZE              ! Number of scale lengths supplied
       INTEGER NVBAD              ! Number of bad variance values
       INTEGER PNTRI( 2 )         ! Pointer to the mapped data and variance of 
                                  ! the input image
@@ -283,19 +307,20 @@
       INTEGER PNTW2              ! Pointer to work space
       INTEGER PNTW3              ! Pointer to work space
       INTEGER PNTW4              ! Pointer to work space
+      LOGICAL QUAL               ! Quality array present in output NDF ?
+      REAL RMNV                  ! Min variance value
+      DOUBLE PRECISION RMSCNG    ! RMS change at last iteration
+      REAL RMXV                  ! Max variance value
       INTEGER SDIM( NDF__MXDIM ) ! Significant NDF dimensions
-      INTEGER SLBND( NDIM )      ! Lower bounds of significant dimensions
-      INTEGER SUBND( NDIM )      ! Upper bounds of significant dimensions
+      REAL SIZE( NDF__MXDIM )    ! Scale lengths
+      REAL SIZEF( NDF__MXDIM )   ! Final scale lengths
+      INTEGER SLBND( NDF__MXDIM ) ! Lower bounds of significant dimensions
+      INTEGER SUBND( NDF__MXDIM ) ! Upper bounds of significant dimensions
       INTEGER TOTBAD             ! Total number of bad values replaced
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of block
-      LOGICAL BAD                ! Bad pixels present?
-      LOGICAL BLOCK              ! Process in blocks?
-      LOGICAL QUAL               ! Quality array present in output NDF ?
-      LOGICAL VAR                ! Variance proessing?
-      REAL RMNV                  ! Min variance value
-      REAL RMXV                  ! Max variance value
-      REAL SIZE                  ! Scale length
-      REAL SIZEF                 ! Final Scale length
+      LOGICAL VAR                ! Variance processing?
+      INTEGER WKSIZE             ! Size of smaller work arrays
+
 *.
 
 *  Check the inherited global status.
@@ -320,13 +345,23 @@
 *  ones they are.  Determine its dimensions (note that only two
 *  significant dimensions can be accommodated).  Then ignore
 *  non-significant dimensions.
-      CALL KPG1_GTNDF( 'IN', NDIM, .TRUE., 'READ', NDFI, SDIM,
+      CALL KPG1_GTNDF( 'IN', NDF__MXDIM, .FALSE., 'READ', NDFI, SDIM,
      :                 SLBND, SUBND, STATUS )
-      DIM( 1 ) = SUBND( 1 ) - SLBND( 1 ) + 1
-      DIM( 2 ) = SUBND( 2 ) - SLBND( 2 ) + 1
 
 *  Find the number of dimensions.
       CALL NDF_DIM( NDFI, NDF__MXDIM, BLDIM, IDIM, STATUS )
+      DO I = 1, IDIM
+         DIM( I ) = SUBND( I ) - SLBND( I ) + 1
+      END DO
+
+*  Determine the size of the smaller work arrays.  It's for sums
+*  along each dimension.
+      WKSIZE = 1
+      IF ( IDIM .GT. 1 ) THEN
+         DO I = 1, IDIM - 1
+            WKSIZE = WKSIZE * DIM( I )
+         END DO
+      END IF
 
 *  Exit if an error occurred.
       IF ( STATUS .NE. SAI__OK ) GOTO 999
@@ -381,8 +416,16 @@
 *  Obtain the number of iterations.
       CALL PAR_GDR0I( 'NITER', 2, 2, 100, .FALSE., NITER, STATUS )
 
-*  Obtain the initial smoothing size.
-      CALL PAR_GDR0R( 'SIZE', 5.0, 0.1, 1.0E6, .FALSE., SIZE, STATUS )
+*  Obtain the initial smoothing sizes along each axis.  Pad missing
+*  values with the last value.  Thus a single value suppled will apply
+*  to all dimensions.
+      CALL PAR_DEF1R( 'SIZE', 1, 5.0, STATUS )
+      CALL PAR_GDRVR( 'SIZE', IDIM, 0.0, 1.0E6, SIZE, NSIZE, STATUS )
+      IF ( NSIZE .LT. IDIM ) THEN
+         DO I = NSIZE + 1, IDIM
+            SIZE( I ) = SIZE( NSIZE )
+         END DO
+      END IF
 
 *  Exit if an error occurred.
       IF ( STATUS .NE. SAI__OK ) GOTO 999
@@ -428,8 +471,9 @@
 
 *  Obtain the significant dimensions of the block.
          CALL NDF_BOUND( NDFBI, NDF__MXDIM, LBND, UBND, IDIM, STATUS )
-         DIM( 1 ) = UBND( SDIM( 1 ) ) - LBND( SDIM( 1 ) ) + 1
-         DIM( 2 ) = UBND( SDIM( 2 ) ) - LBND( SDIM( 2 ) ) + 1
+         DO II = 1, IDIM
+            DIM( II ) = UBND( SDIM( II ) ) - LBND( SDIM( II ) ) + 1
+         END DO
 
 *  If blocking, tell the user which block is being done.
          IF( BLOCK ) THEN
@@ -510,23 +554,24 @@
 *  Get the required work space for to hold the sums and weights.
          CALL PSX_CALLOC( EL, ITYPE, PNTW1, STATUS )
          CALL PSX_CALLOC( EL, ITYPE, PNTW2, STATUS )
-         CALL PSX_CALLOC( DIM( 1 ), ITYPE, PNTW3, STATUS )
-         CALL PSX_CALLOC( DIM( 1 ), ITYPE, PNTW4, STATUS )
+         CALL PSX_CALLOC( WKSIZE, ITYPE, PNTW3, STATUS )
+         CALL PSX_CALLOC( WKSIZE, ITYPE, PNTW4, STATUS )
 
 *  Perform the filtering.
 *  ======================
 
-*  Reset the smoothing size for this block.
-         SIZEF = SIZE   
+*  Reset the smoothing size for this block.  The scale length is 
+*  modified in the infill routines below.
+         DO II = 1, IDIM
+            SIZEF( II ) = SIZE( II )
+         END DO
 
 *  Reject pixels deviating from their local mean by more than the
 *  threshold calling the routine of the appropriate data type.
          IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPS1_BAFIR( DIM( 1 ), DIM( 2 ), 
-     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+            CALL KPS1_BAFNR( IDIM, DIM, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                       VAR, %VAL( CNF_PVAL( PNTRI( 2 ) ) ), 
-     :                       NITER, SIZEF,
-     :                       CNGMAX, CNGRMS, NBAD, 
+     :                       NITER, SIZEF, CNGMAX, CNGRMS, NBAD, 
      :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                       %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
      :                       %VAL( CNF_PVAL( PNTW1 ) ),
@@ -535,11 +580,9 @@
      :                       %VAL( CNF_PVAL( PNTW4 ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_BAFID( DIM( 1 ), DIM( 2 ), 
-     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+            CALL KPS1_BAFND( IDIM, DIM, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                       VAR, %VAL( CNF_PVAL( PNTRI( 2 ) ) ), 
-     :                       NITER, SIZEF,
-     :                       CNGMAX, CNGRMS, NBAD, 
+     :                       NITER, SIZEF, CNGMAX, CNGRMS, NBAD, 
      :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                       %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
      :                       %VAL( CNF_PVAL( PNTW1 ) ),
@@ -591,6 +634,13 @@
 
 * End the NDF context.
       CALL NDF_END( STATUS )
+
+*  If an error occurred, then report contextual information.
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'FILLBAD_ERR',
+     :     'FILLBAD: Error filling bad-pixel regions of an NDF '/
+     :     /'using a relaxation algorithm.', STATUS )
+      END IF
 
 *  End the routine.
       

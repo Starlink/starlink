@@ -86,7 +86,7 @@ KPG_DR_GEN = kps1_med.gdr kps1_mmv.gdr kps1_clps.gdr kps1_subi.gdr \
              kps1_fofo.gdr kps1_fohe.gdr kps1_fopp.gdr kps1_fopr.gdr \
              kps1_foqu.gdr kps1_fore.gdr kps1_fori.gdr kps1_heqp.gdr \
              kps1_mfad.gdr kps1_mfeb.gdr kps1_sucl.gdr kps1_susk.gdr \
-             kps1_xyzw.gdr kps1_mfld.gdr
+             kps1_xyzw.gdr kps1_mfld.gdr kps1_bafn.gdr
 
 KPG_DIR_GEN = kps1_trdr.gdir kps1_trnd.gdir kps1_trnv.gdir
 

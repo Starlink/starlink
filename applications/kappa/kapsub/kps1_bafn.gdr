@@ -1,0 +1,617 @@
+      SUBROUTINE KPS1_BAFN<T>( NDIM, DIMS, INARR, VAR, INVAR, NITER,
+     :                         SIZE, CNGMAX, CNGRMS, NBAD, OUTARR,
+     :                         OUTVAR, DSUM, WTSUM, DLAST, WTLAST,
+     :                         STATUS )
+*+
+*  Name:
+*     KPS1_BAFNx
+
+*  Purpose:
+*     Fills bad-pixel regions in an n-dimensional array.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPS1_BAFNx( NDIM, DIMS, INARR, VAR, INVAR, NITER, SIZE,
+*                      CNGMAX, CNGRMS, NBAD, OUTARR, OUTVAR, DSUM,
+*                      WTSUM, DLAST, WTLAST, STATUS )
+
+*  Description:
+*     This routine replaces all the bad pixels in an image with a
+*     solution of Laplace's equation that matches the valid data in
+*     the image at the edges of the invalid regions.  This solution
+*     has zero gradient normal to any image edges which it meets.
+
+*  Arguments:
+*     NDIM = INTEGER (Given)
+*        The number of dimensions.
+*     DIMS( NDIM ) = INTEGER (Given)
+*        The dimensions of the input and output data and variance 
+*        arrays.
+*     INARR( * ) = ? (Given)
+*        The input data array.  Its size is the product of the DIMS
+*        array's elements.
+*     VAR = LOGICAL (Given)
+*        Whether or not associated variance information is to be
+*        processed and included in the weighting.
+*     INVAR( * ) = ? (Given)
+*        The input variance array.  It has the same dimension as INARR. 
+*     NITER = INTEGER (Given)
+*        The number of iterations required.
+*     SIZE( NDIM ) = REAL (Given and Returned)
+*        On entry it is the initial smoothing size along each axis in 
+*        pixels.  A zero value indicates that the dimension should not
+*        be used to fill a bad-pixel hole.  On return they are the final
+*        smoothing sizes.
+*     CNGMAX = DOUBLE PRECISION (Returned)
+*        The maximum absolute change in output values which occurred in
+*        the final iteration.
+*     CNGRMS = DOUBLE PRECISION (Returned)
+*        The RMS change in output values which occurred in the last
+*        iteration.
+*     NBAD = INTEGER (Returned)
+*        The number of invalid pixels replaced.
+*     OUTARR( * ) = ? (Returned)
+*        The output data array free of bad values.  This has the same
+*        dimension as INARR.
+*     OUTVAR( * ) = ? (Returned)
+*        The output variance array free of bad values.  This has the
+*        same dimension as INARR.
+*     DSUM( * ) = ? (Given)
+*        Work array to sum the values.  It must comprise at least the 
+*        number of elements that INARR has.
+*     WTSUM( * ) = ? (Given)
+*        Work array to store the weights.  It must comprise at least the 
+*        number of elements that INARR has.
+*     DLAST( * ) = ? (Given)
+*        Work array for the last summed values.  It should have at
+*        least product of the first NDIM-1 elements of DIMS.
+*     WTLAST( * ) = ? (Given)
+*        Work array for the last set of weights.  It should have at 
+*        least product of the first NDIM-1 elements of DIMS.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D or R as appropriate.  The data and variance 
+*     arrays supplied to this routine must have the data type specified.
+*     -  The state of the replacements (iteration, smoothing length,
+*     maximum change, rms change) is tabulated for verbose reporting.
+
+*  Algorithm:
+*     Iterate, replacing each bad pixel with a weighted mean of its
+*     valid neighbours in the same row and column.  The weights
+*     decrease exponentially with a scale length SIZE and go to zero
+*     after the first valid pixel is encountered.  When there is
+*     variance information this is included in the weighting.  The
+*     length SIZE is reduced by a factor 2 whenever the maximum absolute
+*     change in an iteration is at least a factor 4 less than the
+*     maximum absolute change obtained since the current scale length
+*     was first used.  Iterations stop after NITER have been performed.
+
+*     When there is variance processing the output variance is
+*     reassigned if either the input variance or data value was bad.
+*     Where the input value is good but its associated variance is bad,
+*     the calculation proceeds as if the data value were bad, except
+*     that only the variance is substituted in the output.  The new
+*     variance is the inverse of the sum of the weights.
+*
+*     See the Notes in FILLBAD for additional details and background to
+*     the algorithm.
+
+*  Prior Requirements:
+*     -  The input variance array should be propagated from the input
+*     dataset.  This was done to reduce memory requirements, which are
+*     already large.
+
+*  Copyright:
+*     Copyright (C) 1995, 1998 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2007 October 10 (MJC):
+*        Original version based on KPS1_BAFIx.
+*     {enter_changes_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'NDF_PAR'          ! NDF public constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'MSG_PAR'          ! MSG__ constants
+
+*  Arguments Given:
+      INTEGER NDIM
+      INTEGER DIMS( NDIM )
+      <TYPE> INARR( * )
+      LOGICAL VAR
+      <TYPE> INVAR( * )
+      INTEGER NITER
+
+*  Arguments Given and Returned:
+      REAL SIZE( NDIM )
+
+*  Arguments Returned:
+      DOUBLE PRECISION CNGMAX
+      DOUBLE PRECISION CNGRMS
+      INTEGER NBAD
+      <TYPE> OUTARR( * )
+      <TYPE> OUTVAR( * )
+      <TYPE> DSUM( * )
+      <TYPE> WTSUM( * )
+      <TYPE> DLAST( * )
+      <TYPE> WTLAST( * )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      <LTYPE> DEC                ! Weighting decrement factor
+      DOUBLE PRECISION DIFF      ! Absolute change in new value
+      INTEGER DIRN               ! Direction
+      INTEGER EL                 ! Number of data/variance elements
+      INTEGER FIRST              ! First element in current dimension
+      INTEGER I                  ! Loop counter
+      INTEGER IDIM               ! Dimension counter
+      INTEGER LAST               ! Final element in current dimension
+      INTEGER ITER               ! Iteration loop counter
+      INTEGER J                  ! Loop counter
+      DOUBLE PRECISION LASTMX    ! Last maximum change
+      <LTYPE> NEWVAL             ! New value
+      INTEGER NRMS               ! Number of values used to compute the
+                                 ! rms change
+      INTEGER PIX                ! Pixel index                           
+      CHARACTER * ( 80 ) PRBUF   ! Message buffer
+      DOUBLE PRECISION RMS       ! RMS
+      LOGICAL SAMESZ             ! All the sizes are the same?
+      INTEGER STRIDE( NDF__MXDIM ) ! Strides between dimensions
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+      NBAD = 0
+
+*  Determine whether the scalelengths are the same along all axes.
+      SAMESZ = .TRUE.
+      DO I = 1, NDIM
+         IF ( SIZE( 1 ) .NE. SIZE( I ) ) SAMESZ = .FALSE.
+      END DO
+
+      IF ( SAMESZ .AND. SIZE( 1 ) .LT. VAL__EPS<T> ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'KPS1_BAFNx_ERR1', 
+     :                 'All the scale lengths are zero or negative.',
+     :                 STATUS )
+         GOTO 999
+      END IF
+      
+*  Calculate the stride for each remaining dimension. Also calculate
+*  the strides in the concatenated axes array.
+      STRIDE( 1 ) = 1
+      IF ( NDIM .GT. 1 ) THEN
+         DO I = 2, NDIM
+            STRIDE( I ) = STRIDE( I - 1 ) * DIMS( I - 1 )
+         END DO
+      END IF
+
+*  Find the number of elements and strides.
+      EL = 1
+      DO I = 1, NDIM
+         EL = EL * DIMS( I )
+      END DO
+
+*  Copy the input to the output data array and count the bad values.
+      DO I = 1, EL
+         OUTARR( I ) = INARR( I )
+         IF ( INARR( I ) .EQ. VAL__BAD<T> ) NBAD = NBAD + 1
+      END DO
+
+*  If the progress of the iterations is to be printed (verbose message
+*  reporting), print some headings.
+      CALL MSG_OUTIF( MSG__NORM, 'BLANK', ' ', STATUS )
+      IF ( SAMESZ ) THEN
+         CALL MSG_OUTIF( MSG__NORM, 'HEADING', '      iteration    '/
+     :     /'smoothing length    max. change    rms change', STATUS )
+         CALL MSG_OUTIF( MSG__NORM, 'HEADING2', '     ---------    '/
+     :     /'----------------    -----------    ----------', STATUS )
+     
+      ELSE
+         CALL MSG_OUTIF( MSG__NORM, 'HEADING',  '   iteration   axis  '/
+     :     /' smoothing length    max. change    rms change', STATUS )
+         CALL MSG_OUTIF( MSG__NORM, 'HEADING2', '   ---------   ----  '/
+     :     /' ----------------    -----------    ----------', STATUS )
+      END IF
+
+*  Initialise places to record the changes between iterations.
+      LASTMX = 0.0D0
+      CNGMAX = 0.0D0
+
+*  There are two processing paths depending whether or not variance is
+*  present.
+      IF ( .NOT. VAR ) THEN
+ 
+*  Perform the required number of relaxation iterations.
+         DO ITER = 1, NITER
+ 
+*  Set the maximum absolute change so far.
+            LASTMX = MAX( LASTMX, CNGMAX, 0.0D0 )
+ 
+*  If the max change last iteration was less than 0.25 of the maximum
+*  change so far, reduce the scale size by a factor 2 and reset the
+*  maximum change so far.
+            IF ( CNGMAX * 4.0D0 .LE. LASTMX .AND. ITER .NE. 1 ) THEN
+               DO IDIM = 1, NDIM
+                  SIZE( IDIM ) = SIZE( IDIM ) * 0.5
+               END DO
+               LASTMX = CNGMAX
+            END IF
+
+*  Initialise the maximum absolute change and number of values used to
+*  compute the rms change for this iteration.
+            CNGMAX = 0.0D0
+            NRMS = 0
+ 
+*  Initialise the storage for forming the weighted means.
+            DO  I = 1, EL
+               DSUM( I ) = 0<CONST>
+               WTSUM( I ) = 0<CONST>
+            END DO
+
+*  Loop through each dimension.
+            DO IDIM = 1, NDIM
+
+*  Only include filling across nominated dimensions.
+               IF ( SIZE( IDIM ) .GT. 0 ) THEN
+
+*  Calculate the logarithmic decrement for the weights in going from one
+*  pixel to the next.
+                  DEC = EXP( -1<CONST> / NUM_RTO<T>( SIZE( IDIM ) ) )
+
+*  Scan in both directions.
+                  DO DIRN = -1, 1, 2
+
+                     IF ( DIRN .GE. 0 ) THEN
+                        FIRST = 1
+                        LAST = EL
+                     ELSE
+                        FIRST = EL
+                        LAST = 1
+                     END IF
+ 
+*  Initialise the stores.  DLAST is the weighted sum of previous data
+*  values; WTLAST is the sum of previous weights.
+                     DO I = 1, STRIDE( IDIM )
+                        DLAST( I ) = 0<CONST>
+                        WTLAST( I ) = 0<CONST>
+                     END DO
+
+*  Process along a line along the current dimension.
+                     DO PIX = FIRST, LAST, DIRN
+
+*  Form index to sum arrays that are one duimension fewer than the
+*  current dimension.
+                        I = MOD( PIX - 1, STRIDE( IDIM ) ) + 1
+
+*  If the input pixel is valid, reset the weighted sums.
+                        IF ( INARR( PIX ) .NE. VAL__BAD<T> ) THEN
+                           DLAST( I ) = OUTARR( PIX )
+                           WTLAST( I ) = 1<CONST>
+ 
+*  For invalid locations, form the sums for the weighted mean.
+                        ELSE
+ 
+*  Decrement the previous weight.
+                           WTLAST( I ) = WTLAST( I ) * DEC
+                           DLAST( I ) = DLAST( I ) * DEC
+
+*  Form sums for the replacement value.
+                           DSUM( PIX ) = DSUM( PIX ) + DLAST( I )
+                           WTSUM( PIX ) = WTSUM( PIX ) + WTLAST( I )
+ 
+*  If this pixel has not been replaced before, add it into the current
+*  weighted sums for this line.
+                           IF ( OUTARR( PIX ) .NE. VAL__BAD<T> ) THEN
+                              WTLAST( I ) = WTLAST( I ) + 1<CONST>
+                              DLAST( I ) = DLAST( I ) + OUTARR( PIX )
+                           END IF
+                        END IF
+                     END DO
+                  END DO
+               END IF
+            END DO
+
+*  Scan the invalid pixels, replacing those for which a new weighted
+*  mean can be formed.
+            RMS = 0.0D0
+
+            DO PIX = 1, EL
+
+*  If the input pixel was invalid, and a replacement value can be
+*  found, calculate the replacement value.
+               IF ( INARR( PIX ) .EQ. VAL__BAD<T> .AND.
+     :              WTSUM( PIX ) .GT. 0<CONST> ) THEN
+                  NEWVAL = DSUM( PIX ) / WTSUM( PIX )
+
+*  Cannot compute differences when the output value is still bad.
+                  IF ( OUTARR( PIX ) .NE. VAL__BAD<T> ) THEN
+
+*  Find the maximum absolute change this iteration.
+                     DIFF = ABS( NUM_<T>TOD( NEWVAL - OUTARR( PIX ) ) )
+                     CNGMAX = MAX( CNGMAX, DIFF )
+
+*  Form the sums for the rms change.
+                     RMS = RMS + DIFF * DIFF
+                     NRMS = NRMS + 1
+                  END IF
+
+*  Assign the new output value.
+                  OUTARR( PIX ) = NEWVAL
+               END IF
+            END DO
+
+*  Print the progress of each iteration, if required.  Calculate the
+*  rms and maximum change this iteration.  The first iteration change
+*  values are undefined because the difference is with respect to an
+*  undefined value.
+            IF ( ITER .GT. 1 ) THEN
+               CNGRMS = SQRT( RMS / DBLE( MAX( 1, NRMS ) ) )
+
+               IF ( SAMESZ ) THEN
+                  WRITE( PRBUF, '(6X,I6,9X,G13.6,4X,G13.6,2X,G13.6)' )
+     :              ITER, SIZE, CNGMAX, CNGRMS
+                  CALL MSG_OUTIF( MSG__NORM, 'PROGRESS', PRBUF, STATUS )
+               ELSE
+                  I = 1
+                  WRITE( PRBUF, '(2I9,7X,G13.6,3X,G13.6,2X,G13.6)' )
+     :              ITER, I, SIZE( I ), CNGMAX, CNGRMS
+                  CALL MSG_OUTIF( MSG__NORM, 'PROGRESS', PRBUF, STATUS )
+                  DO I = 2, NDIM
+                     WRITE( PRBUF, '(12X,I6,7X,G13.6)' ) I, SIZE( I )
+                     CALL MSG_OUTIF( MSG__NORM, 'PROGRESS', PRBUF,
+     :                               STATUS )
+                  END DO
+               END IF
+
+            ELSE
+               IF ( SAMESZ ) THEN
+                  WRITE( PRBUF, '(6X,I6,9X,G13.6)' ) ITER, SIZE( 1 )
+                  CALL MSG_OUTIF( MSG__NORM, 'PROGRESS', PRBUF, STATUS )
+               ELSE
+                  I = 1
+                  WRITE( PRBUF, '(2I9,7X,G13.6)' ) ITER, I, SIZE( 1 )
+                  CALL MSG_OUTIF( MSG__NORM, 'PROGRESS', PRBUF, STATUS )
+                  DO I = 2, NDIM
+                     WRITE( PRBUF, '(12X,I6,7X,G13.6)' ) I, SIZE( I )
+                     CALL MSG_OUTIF( MSG__NORM, 'PROGRESS', PRBUF,
+     :                               STATUS )
+                  END DO
+               END IF
+            END IF
+
+         END DO
+
+*  Variance weighting and processing.
+      ELSE
+
+*  Copy the input to the output variance array.  Add to the number of
+*  bad values if the data was good, but the variance was bad.
+         DO PIX = 1, EL
+            OUTVAR( PIX ) = INVAR( PIX )
+            IF ( INARR( PIX ) .NE. VAL__BAD<T> .AND.
+     :           INVAR( PIX ) .EQ. VAL__BAD<T> ) NBAD = NBAD + 1
+         END DO
+
+*  Perform the required number of relaxation iterations.
+         DO ITER = 1, NITER
+
+*  Set the maximum absolute change so far.
+            LASTMX = MAX( LASTMX, CNGMAX, 0.0D0 )
+
+*  If the max change last iteration was less than 0.25 of the maximum
+*  change so far, reduce the scale size by a factor 2 and reset the
+*  maximum change so far.
+            IF ( CNGMAX * 4.0D0 .LE. LASTMX .AND. ITER .NE. 1 ) THEN
+               DO IDIM = 1, NDIM
+                  SIZE( IDIM ) = SIZE( IDIM ) * 0.5
+               END DO
+               LASTMX = CNGMAX
+            END IF
+
+*  Initialise the maximum absolute change and number of values used to
+*  compute the rms change for this iteration.
+            CNGMAX = 0.0D0
+            NRMS = 0
+ 
+*  Initialise the storage for forming the weighted means.
+            DO  I = 1, EL
+               DSUM( I ) = 0<CONST>
+               WTSUM( I ) = 0<CONST>
+            END DO
+
+*  Loop through each dimension.
+            DO IDIM = 1, NDIM
+
+*  Only include filling across nominated dimensions.
+               IF ( SIZE( IDIM ) .GT. 0 ) THEN
+
+*  Calculate the logarithmic decrement for the weights in going from one
+*  pixel to the next.
+                  DEC = EXP( -1<CONST> / NUM_RTO<T>( SIZE( IDIM ) ) )
+
+*  Scan in both directions.
+                  DO DIRN = -1, 1, 2
+
+                     IF ( DIRN .GE. 0 ) THEN
+                        FIRST = 1
+                        LAST = EL
+                     ELSE
+                        FIRST = EL
+                        LAST = 1
+                     END IF
+ 
+*  Initialise the stores.  DLAST is the weighted sum of previous data
+*  values; WTLAST is the sum of previous weights.
+                     DO I = 1, STRIDE( IDIM )
+                        DLAST( I ) = 0<CONST>
+                        WTLAST( I ) = 0<CONST>
+                     END DO
+
+*  Process along a line along the current dimension.
+                     DO PIX = FIRST, LAST, DIRN
+
+*  Form index to sum arrays that are one duimension fewer than the
+*  current dimension.
+                        I = MOD( PIX - 1, STRIDE( IDIM ) ) + 1
+
+*  If the input pixel and variance are valid, reset the weighted sums.
+*  If the input pixel is valid, reset the weighted sums.
+                        IF ( INARR( PIX ) .NE. VAL__BAD<T> .AND.
+     :                       INVAR( PIX ) .NE. VAL__BAD<T> .AND.
+     :                       OUTVAR( PIX ) .GT. 0<CONST> ) THEN
+                           DLAST( I ) = OUTARR( PIX ) / OUTVAR( PIX )
+                           WTLAST( I ) = 1<CONST> / OUTVAR( PIX )
+ 
+*  For invalid locations, form the sums for the weighted mean.
+                        ELSE
+ 
+*  Decrement the previous weight.
+                           WTLAST( I ) = WTLAST( I ) * DEC
+                           DLAST( I ) = DLAST( I ) * DEC
+
+*  Form sums for the replacement value.
+                           DSUM( PIX ) = DSUM( PIX ) + DLAST( I )
+                           WTSUM( PIX ) = WTSUM( PIX ) + WTLAST( I )
+ 
+*  If this pixel or variance has been replaced before, add it into the
+*  current weighted sums for this line.
+                           IF ( OUTARR( PIX ) .NE. VAL__BAD<T> .AND.
+     :                          OUTVAR( PIX ) .NE. VAL__BAD<T> .AND.
+     :                          OUTVAR( PIX ) .GT. 0<CONST> ) THEN
+                              WTLAST( I ) = WTLAST( I ) + 1<CONST> /
+     :                                      OUTVAR( PIX )
+                              DLAST( I ) = DLAST( I ) +
+     :                                     OUTARR( PIX ) / OUTVAR( PIX )
+
+*  If this pixel has not been replaced before, add it into the current
+*  weighted sums for this line.
+                           END IF
+                        END IF
+                     END DO
+                  END DO
+               END IF
+            END DO
+
+*  Scan the invalid pixels, replacing those for which a new weighted
+*  mean can be formed.
+            RMS = 0.0D0
+
+            DO PIX = 1, EL
+
+*  If the input pixel or variance was invalid, and a replacement value
+*  can be found, calculate the replacement value.
+               IF ( ( INARR( PIX ) .EQ. VAL__BAD<T> .OR.
+     :                INVAR( PIX ) .EQ. VAL__BAD<T> ) .AND.
+     :                WTSUM( PIX ) .GT. 0<CONST> ) THEN
+                  NEWVAL = DSUM( PIX ) / WTSUM( PIX )
+
+*  Cannot compute differences when the output value is still bad.
+                  IF ( OUTARR( PIX ) .NE. VAL__BAD<T> ) THEN
+
+*  Find the maximum absolute change this iteration.
+                     DIFF = ABS( NUM_<T>TOD( NEWVAL - OUTARR( PIX ) ) )
+                     CNGMAX = MAX( CNGMAX, DIFF )
+
+*  Form the sums for the rms change.
+                     RMS = RMS + DIFF * DIFF
+                     NRMS = NRMS + 1
+                  END IF
+
+*  Assign the new output values.  Only assign a new output value when
+*  the input was bad, but change the variance if it was bad or there
+*  is a new value.
+                  IF ( INARR( PIX ) .EQ. VAL__BAD<T> )
+     :              OUTARR( PIX ) = NEWVAL
+                  OUTVAR( PIX ) = 2<CONST> / WTSUM( PIX )
+               END IF
+            END DO
+
+*  Print the progress of each iteration, if required.  Calculate the
+*  rms and maximum change this iteration.  The first iteration change
+*  values are undefined because the difference is with respect to an
+*  undefined value.
+            IF ( ITER .GT. 1 ) THEN
+               CNGRMS = SQRT( RMS / DBLE( MAX( 1, NRMS ) ) )
+
+               IF ( SAMESZ ) THEN
+                  WRITE( PRBUF, '(6X,I6,9X,G13.6,4X,G13.6,2X,G13.6)' )
+     :              ITER, SIZE, CNGMAX, CNGRMS
+                  CALL MSG_OUTIF( MSG__NORM, 'PROGRESS', PRBUF, STATUS )
+               ELSE
+                  I = 1
+                  WRITE( PRBUF, '(2I9,7X,G13.6,3X,G13.6,2X,G13.6)' )
+     :              ITER, I, SIZE( I ), CNGMAX, CNGRMS
+                  CALL MSG_OUTIF( MSG__NORM, 'PROGRESS', PRBUF, STATUS )
+                  DO I = 2, NDIM
+                     WRITE( PRBUF, '(12X,I6,7X,G13.6)' ) I, SIZE( I )
+                     CALL MSG_OUTIF( MSG__NORM, 'PROGRESS', PRBUF,
+     :                               STATUS )
+                  END DO
+               END IF
+
+            ELSE
+               IF ( SAMESZ ) THEN
+                  WRITE( PRBUF, '(6X,I6,9X,G13.6)' ) ITER, SIZE( 1 )
+                  CALL MSG_OUTIF( MSG__NORM, 'PROGRESS', PRBUF, STATUS )
+               ELSE
+                  I = 1
+                  WRITE( PRBUF, '(2I9,7X,G13.6)' ) ITER, I, SIZE( 1 )
+                  CALL MSG_OUTIF( MSG__NORM, 'PROGRESS', PRBUF, STATUS )
+                  DO I = 2, NDIM
+                     WRITE( PRBUF, '(12X,I6,7X,G13.6)' ) I, SIZE( I )
+                     CALL MSG_OUTIF( MSG__NORM, 'PROGRESS', PRBUF,
+     :                               STATUS )
+                  END DO
+               END IF
+
+            END IF
+
+         END DO
+
+      END IF
+
+  999 CONTINUE
+ 
+      END

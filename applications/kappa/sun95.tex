@@ -13,11 +13,11 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun95.33}
-\newcommand{\stardocnumber}    {95.32}
+\newcommand{\stardocnumber}    {95.33}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2007 October 2}
+\newcommand{\stardocdate}      {2007 October 11}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.8-4}
+\newcommand{\stardocversion}   {1.8-5}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -11898,7 +11898,7 @@ picture.}
 \menuitem{FFCLEAN}{
  Removes defects from a substantially flat one- or two-dimensional NDF.}
 \menuitem{FILLBAD}{
- Removes regions of bad values from a two-dimensional NDF.}
+ Removes regions of bad values from an NDF.}
 \menuitem{FITSDIN}{
  Reads a {\FITSref}~ disc file composed of simple, group or table objects.}
 \menuitem{FITSEDIT}{
@@ -12739,7 +12739,7 @@ WCS component of an NDF.
 \classitem{FFCLEAN}
  Removes defects from a substantially flat one- or two-dimensional NDF.
 \classitem{FILLBAD}
- Removes regions of bad values from a two-dimensional NDF.
+ Removes regions of bad values from an NDF.
 \classitem{GLITCH}
  Replaces bad pixels in a two-dimensional image with the local median.
 \classitem{MFITTREND}
@@ -22225,12 +22225,12 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
 \sstroutine{
    FILLBAD
 }{
-   Removes regions of bad values from a two-dimensional NDF
+   Removes regions of bad values from an NDF
 }{
    \sstdescription{
-      This application replaces bad values in a two-dimensional \NDFref{NDF} with
-      a smooth function which matches the surrounding data.  It can fill
-      arbitrarily shaped regions of bad values within images.
+      This application replaces bad values in an \NDFref{NDF} with a
+      smooth function which matches the surrounding data.  It can fill
+      arbitrarily shaped regions of bad values within n-dimensional arrays.
 
       It forms a smooth replacement function for the regions of bad
       values by forming successive approximations to a solution of
@@ -22252,8 +22252,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
       \sstsubsection{
          IN = NDF (Read)
       }{
-         The two-dimensional NDF containing the input image with bad
-         values.
+         The NDF containing the input image with bad values.
       }
       \sstsubsection{
          MEMORY = \_LOGICAL (Read)
@@ -22279,10 +22278,18 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          The NDF to contain the image free of bad values.
       }
       \sstsubsection{
-         SIZE  = \_REAL (Read)
+         SIZE( )  = \_REAL (Read)
       }{
-         The initial scale length in pixels to be used in the first
-         iteration.  For maximum efficiency, it should normally have a
+         The initial scale lengths in pixels to be used in the first
+         iteration, along each axis.  If fewer values are supplied than
+         pixel axes in the NDF, the last value given is repeated for 
+         the remaining axes.  The size {\tt 0} means no fitting across a 
+         dimension.  For instance, {\tt [0,0,5]} would be appropriate if
+         the spectra along the third dimension of a cube are independent,
+         and the replacement values are to be derived only within each
+         spectrum.
+
+         For maximum efficiency, a scale length should normally have a
          value about half the `size' of the largest invalid region to
          be replaced.  (See \htmlref{``Notes''}{notes:fillbad}~ section
          for more details.)
@@ -22344,39 +22351,66 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          requirements, and no variance information will be used or
          propagated.
       }
+      \sstexamplesubsection{
+         fillbad in=speccube out=speccube\_fill size=[0,0,128] iter=5
+      }{
+        Suppose NDF speccube is a spectral imaging cube with the 
+        spectral axis third.  This example replaces the bad pixels by 
+        valid values derived from the surrounding good pixel values
+        within each spectrm, using an initial scale length of 128
+        channels, iterating five times.  The filled NDF is called
+        speccube\_fill.
+      }
+      \sstexamplesubsection{
+         fillbad in=speccube out=speccube\_fill size=[5,5,128] iter=5
+      }{
+        As the previous example, but now the relaxation occurs along
+        the spatial axes too, initially with a scale length of five
+        pixels.
+     }
    }
    \label{notes:fillbad}
    \sstnotes{
       \sstitemlist{
 
          \sstitem
-         The algorithm is based on the relaxation method of repeatedly
-         replacing each bad pixel with the mean of its four nearest neighbours.  Such a method converges to the required solution,
-         but information about the good regions only propagates at a rate of about one pixel per iteration into the bad regions, resulting in slow convergence if large areas are to be filled.
 
-         This application speeds convergence to an acceptable function by
-         forming the replacement mean from all the pixels in the same
-         image row and column, using a weight which decreases
-         exponentially with distance and goes to zero after the first good
-         pixel is encountered in any direction.  If there is variance
-         information, this is included in the weighting so as to give more
-         weight to surrounding values with lower variance.  The scale
-         length of the exponential weight is initially set large, to allow
-         rapid propagation of an approximate `smooth' solution into the
-         bad regions---an initially acceptable solution is thus rapidly obtained (often in the first one or two iterations).  The scale
-         length is subsequently reduced by a factor of 2 whenever the
-         maximum absolute change occurring in an iteration has decreased
-         by a factor of 4 since the current scale length was first used.
-         In this way, later iterations introduce progressively finer
-         detail into the solution.  Since this fine detail occurs
-         predominantly close to the `crinkly' edges of the bad regions, the slower propagation of the solution in the later iterations is
-         then less important.
+         The algorithm is based on the relaxation method of repeatedly
+	 replacing each bad pixel with the mean of its two nearest
+	 neighbours along each pixel axis.  Such a method converges to
+	 the required solution, but information about the good regions
+	 only propagates at a rate of about one pixel per iteration
+	 into the bad regions, resulting in slow convergence if large
+	 areas are to be filled.
+
+         This application speeds convergence to an acceptable function
+	 by forming the replacement mean from all the pixels in the
+	 same axis (such as row or a column), using a weight which
+	 decreases exponentially with distance and goes to zero after
+	 the first good pixel is encountered in any direction.  If
+	 there is variance information, this is included in the
+	 weighting so as to give more weight to surrounding values
+	 with lower variance.  The scale length of the exponential
+	 weight is initially set large, to allow rapid propagation of
+	 an approximate `smooth' solution into the bad regions---an
+	 initially acceptable solution is thus rapidly obtained (often
+	 in the first one or two iterations).  The scale length is
+	 subsequently reduced by a factor of 2 whenever the maximum
+	 absolute change occurring in an iteration has decreased by a
+	 factor of 4 since the current scale length was first used.
+	 In this way, later iterations introduce progressively finer
+	 detail into the solution.  Since this fine detail occurs
+	 predominantly close to the `crinkly' edges of the bad
+	 regions, the slower propagation of the solution in the later
+	 iterations is then less important.
 
          When there is variance processing the output variance is
-         reassigned if either the input variance or data value was bad. Where the input value is good but its associated variance is bad,
-         the calculation proceeds as if the data value were bad, except that only the variance is substituted in the output.  The new
-         variance is approximated as twice the inverse of the sum of the
-         weights.
+	 reassigned if either the input variance or data value was
+	 bad. Where the input value is good but its associated
+	 variance is bad, the calculation proceeds as if the data
+	 value were bad, except that only the variance is substituted
+	 in the output.  The new variance is approximated as twice the
+	 inverse of the sum of the weights.
 
          \sstitem
          The price of the above efficiency means that considerable
@@ -22408,7 +22442,10 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          An error results if the input NDF has no bad values to replace. 
 
          \sstitem
-         The progress of the iterations is reported.
+         The progress of the iterations is reported at the normal
+         reporting level.  The format of the output is slightly
+         different if the scale lengths vary with pixel axis; an extra
+         axis column is included.
       }
    }
    \sstdiytopic{
@@ -53343,6 +53380,14 @@ The following applications have been modified:
          to mask each plane in a three-dimensional NDF.
       \end{itemize}
 
+   \item [\htmlref{FILLBAD}{FILLBAD}] \mbox{}
+      \begin{itemize}
+         \item This is no longer limited to two-dimensional data.  The
+         scale lengths (parameter SIZE) may be different along each 
+         pixel axis, and can be disabled along axes by supplying a scale
+         length of zero for that axis.
+      \end{itemize}
+
    \item [\htmlref{MFITTREND}{MFITTREND}] \mbox{}
       \begin{itemize}
          \item There are three new parameters: METHOD allows a choice
@@ -53904,7 +53949,7 @@ functions as follows.
 \classitem{FFCLEAN}
  Removes defects from a substantially flat one- or two-dimensional NDF.
 \classitem{FILLBAD}
- Removes regions of bad values from a two-dimensional NDF.
+ Removes regions of bad values from an NDF.
 \classitem{GLITCH}
  Replaces bad pixels in a two-dimensional image with the local median.
 \classitem{MFITTREND}

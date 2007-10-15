@@ -23,6 +23,13 @@
       -  It can now use a two-dimensional ARD description to mask each
       plane in a three-dimensional NDF.
 
+   o  FILLBAD
+
+      -  This is no longer limited to two-dimensional data.  The scale
+      lengths (parameter SIZE) may be different along each pixel axis,
+      and can be disabled along axes by supplying a scale length of 
+      zero for that axis.
+
    o  MFITTREND
 
       -  There are three new parameters: METHOD allows a choice of
