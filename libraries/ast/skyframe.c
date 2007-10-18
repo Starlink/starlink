@@ -223,6 +223,10 @@ f     The SkyFrame class does not define any new routines beyond those
 *     10-OCT-2007 (DSB):
 *        In MakeSkyMapping, correct the usage of variables "system" and 
 *        "align_sys" when aligning in AZEL.
+*     18-OCT-2007 (DSB):
+*        Compare target and template AlignSystem values in Match, rather
+*        than comparing target and result AlignSystem values in MakeSkyMapping
+*        (since result is basically a copy of target).
 *class--
 */
 
@@ -4625,42 +4629,33 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
    match = 1;
    *map = NULL;
 
-/* If both SkyFrames want alignment to occur in the offset coordinate
-   system, then just return a UnitMap. */
-   if( astGetAlignOffset( result ) && astGetAlignOffset( target ) ) {
-      match = 1;
-      *map = (AstMapping *) astUnitMap( 2, "" );
-
-/* Otherwise, we find the Mapping between the two SkyFrames. */
-   } else {
-
 /* Initialise variables to avoid "used of uninitialised variable"
    messages from dumb compilers. */
-      epoch_B = 0.0;
-      epoch_J = 0.0;
-      equinox_B = 0.0;
-      equinox_J = 0.0;
+   epoch_B = 0.0;
+   epoch_J = 0.0;
+   equinox_B = 0.0;
+   equinox_J = 0.0;
    
 /* Get the two epoch values. */
-      result_epoch = astGetEpoch( result );
-      target_epoch = astGetEpoch( target );
-      
+   result_epoch = astGetEpoch( result );
+   target_epoch = astGetEpoch( target );
+   
 /* Get the two equinox values. */
-      result_equinox = astGetEquinox( result );
-      target_equinox = astGetEquinox( target );
-      
+   result_equinox = astGetEquinox( result );
+   target_equinox = astGetEquinox( target );
+   
 /* Get the two system values. */
-      result_system = astGetSystem( result );
-      target_system = astGetSystem( target );
-      
+   result_system = astGetSystem( result );
+   target_system = astGetSystem( target );
+   
 /* If both systems are unknown, assume they are the same. Return a UnitMap.
    We need to do this, otherwise a simple change of Title (for instance)
    will result in a FrameSet whose current Frame has System=AST__UNKNOWN 
    loosing its integrity. */
-      if( target_system == AST__UNKNOWN && result_system == AST__UNKNOWN ) {
-         *map = (AstMapping *) astUnitMap( 2, "" );
-         return 1;
-      }
+   if( target_system == AST__UNKNOWN && result_system == AST__UNKNOWN ) {
+      *map = (AstMapping *) astUnitMap( 2, "" );
+      return 1;
+   }
    
 /* The total Mapping is divided into two parts in series; the first part
    converts from the target SkyFrame to the alignment system, using the 
@@ -4675,47 +4670,47 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
    in series. Some of these steps may be ommitted if they are effectively
    a UnitMap. Determine which steps need to be included. Assume all need
    to be done to begin with. */
-      step1 = 1;
-      step2 = 1;
-      step3 = 1;
-      step4 = 1;
+   step1 = 1;
+   step2 = 1;
+   step3 = 1;
+   step4 = 1;
    
 /* If the target system is the same as the alignment system, neither of the 
    first 2 steps need be done. */
-      if( target_system == align_sys ) {
-         step1 = 0;
-         step2 = 0;
-      }
+   if( target_system == align_sys ) {
+      step1 = 0;
+      step2 = 0;
+   }
    
 /* If the result system is the same as the alignment system, neither of the 
    last 2 steps need be done. */
-      if( result_system == align_sys ) {
-         step3 = 0;
-         step4 = 0;
-      }
+   if( result_system == align_sys ) {
+      step3 = 0;
+      step4 = 0;
+   }
    
 /* If the two epochs are the same, or if the alignment system is FK5 J2000,
    steps 2 and 3 are not needed. */
-      if( step2 && step3 ) {   
-         if( align_sys == AST__FK5 || result_epoch == target_epoch ) {
-            step2 = 0;
-            step3 = 0;
-         }
+   if( step2 && step3 ) {   
+      if( align_sys == AST__FK5 || result_epoch == target_epoch ) {
+      step2 = 0;
+      step3 = 0;
       }
+   }
    
 /* None are needed if the target and result SkyFrames have the same
    System, Epoch and Equinox. */
-      if(  result_system == target_system &&
-           result_epoch == target_epoch &&
-           result_equinox == target_equinox ) {
-         step1 = 0;
-         step2 = 0;
-         step3 = 0;
-         step4 = 0;
-      }        
+   if(  result_system == target_system &&
+        result_epoch == target_epoch &&
+        result_equinox == target_equinox ) {
+      step1 = 0;
+      step2 = 0;
+      step3 = 0;
+      step4 = 0;
+   }     
    
 /* Create an initial (null) SlaMap. */
-      slamap = astSlaMap( 0, "" );
+   slamap = astSlaMap( 0, "" );
    
 /* Define local macros as shorthand for adding sky coordinate
    conversions to this SlaMap.  Each macro simply stores details of
@@ -4754,22 +4749,22 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
    coordinates expressed using the FK5 system, mean equinox J2000.0. */
    
 /* Obtain the sky coordinate system, equinox, epoch, etc, of the target
-      SkyFrame. */
-      system = target_system;
-      equinox = target_equinox;
-      epoch = target_epoch;
-      last = GetLAST( target );
-      diurab = GetDiurab( target );
-      lat = astGetObsLat( target );
-      if( astOK && step1 ) {
+   SkyFrame. */
+   system = target_system;
+   equinox = target_equinox;
+   epoch = target_epoch;
+   last = GetLAST( target );
+   diurab = GetDiurab( target );
+   lat = astGetObsLat( target );
+   if( astOK && step1 ) {
    
 /* Convert the equinox and epoch values (stored as Modified Julian
    Dates) into the equivalent Besselian and Julian epochs (as decimal
    years). */
-         equinox_B = palSlaEpb( equinox );
-         equinox_J = palSlaEpj( equinox );
-         epoch_B = palSlaEpb( epoch );
-         epoch_J = palSlaEpj( epoch );
+      equinox_B = palSlaEpb( equinox );
+      equinox_J = palSlaEpj( equinox );
+      epoch_B = palSlaEpb( epoch );
+      epoch_J = palSlaEpj( epoch );
    
 /* Formulate the conversion... */
    
@@ -4778,109 +4773,109 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
 /* If necessary, apply the old-style FK4 precession model to bring the
    equinox to B1950.0, with rigorous handling of the E-terms of
    aberration. Then convert directly to FK5 J2000.0 coordinates. */
-         if ( system == AST__FK4 ) {
-            VerifyMSMAttrs( target, result, 1, "Equinox Epoch", "astMatch" );
-            if ( equinox_B != 1950.0 ) {
-               TRANSFORM_1( "SUBET", equinox_B )
-               TRANSFORM_2( "PREBN", equinox_B, 1950.0 )
-               TRANSFORM_1( "ADDET", 1950.0 )
-            }
-            TRANSFORM_1( "FK45Z", epoch_B )
+      if ( system == AST__FK4 ) {
+         VerifyMSMAttrs( target, result, 1, "Equinox Epoch", "astMatch" );
+         if ( equinox_B != 1950.0 ) {
+            TRANSFORM_1( "SUBET", equinox_B )
+            TRANSFORM_2( "PREBN", equinox_B, 1950.0 )
+            TRANSFORM_1( "ADDET", 1950.0 )
+         }
+         TRANSFORM_1( "FK45Z", epoch_B )
    
 /* From FK4 with no E-terms. */
 /* ------------------------- */
 /* This is the same as above, except that we do not need to subtract
       the E-terms initially as they are already absent. */
-         } else if ( system == AST__FK4_NO_E ) {
-            VerifyMSMAttrs( target, result, 1, "Equinox Epoch", "astMatch" );
-            if ( equinox_B != 1950.0 ) {
-               TRANSFORM_2( "PREBN", equinox_B, 1950.0 )
-            }
-            TRANSFORM_1( "ADDET", 1950.0 )
-            TRANSFORM_1( "FK45Z", epoch_B )
+      } else if ( system == AST__FK4_NO_E ) {
+         VerifyMSMAttrs( target, result, 1, "Equinox Epoch", "astMatch" );
+         if ( equinox_B != 1950.0 ) {
+            TRANSFORM_2( "PREBN", equinox_B, 1950.0 )
+         }
+         TRANSFORM_1( "ADDET", 1950.0 )
+         TRANSFORM_1( "FK45Z", epoch_B )
    
 /* From FK5. */
 /* --------- */
 /* We simply need to apply a precession correction for the change of
    equinox.  Omit even this if the equinox is already J2000.0. */
-         } else if ( system == AST__FK5 ) {
-            VerifyMSMAttrs( target, result, 1, "Equinox", "astMatch" );
-            if ( equinox_J != 2000.0 ) {
-               TRANSFORM_2( "PREC", equinox_J, 2000.0 );
-            }
+      } else if ( system == AST__FK5 ) {
+         VerifyMSMAttrs( target, result, 1, "Equinox", "astMatch" );
+         if ( equinox_J != 2000.0 ) {
+            TRANSFORM_2( "PREC", equinox_J, 2000.0 );
+         }
    
 /* From J2000. */
 /* ----------- */
 /* Convert from J2000 to ICRS, then from ICRS to FK5. */
-         } else if ( system == AST__J2000 ) {
-            VerifyMSMAttrs( target, result, 1, "Epoch", "astMatch" );
-            TRANSFORM_0( "J2000H" )
-            TRANSFORM_1( "HFK5Z", epoch_J );
+      } else if ( system == AST__J2000 ) {
+         VerifyMSMAttrs( target, result, 1, "Epoch", "astMatch" );
+         TRANSFORM_0( "J2000H" )
+         TRANSFORM_1( "HFK5Z", epoch_J );
    
 /* From geocentric apparent. */
 /* ------------------------- */
 /* This conversion is supported directly by SLALIB. */
-         } else if ( system == AST__GAPPT ) {
-            VerifyMSMAttrs( target, result, 1, "Epoch", "astMatch" );
-            TRANSFORM_2( "AMP", epoch, 2000.0 )
+      } else if ( system == AST__GAPPT ) {
+         VerifyMSMAttrs( target, result, 1, "Epoch", "astMatch" );
+         TRANSFORM_2( "AMP", epoch, 2000.0 )
    
 /* From ecliptic coordinates. */
 /* -------------------------- */
 /* This conversion is supported directly by SLALIB. */
-         } else if ( system == AST__ECLIPTIC ) {
-            VerifyMSMAttrs( target, result, 1, "Equinox", "astMatch" );
-            TRANSFORM_1( "ECLEQ", equinox )
+      } else if ( system == AST__ECLIPTIC ) {
+         VerifyMSMAttrs( target, result, 1, "Equinox", "astMatch" );
+         TRANSFORM_1( "ECLEQ", equinox )
    
 /* From helio-ecliptic coordinates. */
 /* -------------------------------- */
-         } else if ( system == AST__HELIOECLIPTIC ) {
-            VerifyMSMAttrs( target, result, 1, "Epoch", "astMatch" );
-            TRANSFORM_1( "HEEQ", epoch )
+      } else if ( system == AST__HELIOECLIPTIC ) {
+         VerifyMSMAttrs( target, result, 1, "Epoch", "astMatch" );
+         TRANSFORM_1( "HEEQ", epoch )
    
 /* From galactic coordinates. */
 /* -------------------------- */
 /* This conversion is supported directly by SLALIB. */
-         } else if ( system == AST__GALACTIC ) {
-            TRANSFORM_0( "GALEQ" )
+      } else if ( system == AST__GALACTIC ) {
+         TRANSFORM_0( "GALEQ" )
    
 /* From ICRS. */
 /* ---------- */
 /* This conversion is supported directly by SLALIB. */
-         } else if ( system == AST__ICRS ) {
-            VerifyMSMAttrs( target, result, 1, "Epoch", "astMatch" );
-            TRANSFORM_1( "HFK5Z", epoch_J );
+      } else if ( system == AST__ICRS ) {
+         VerifyMSMAttrs( target, result, 1, "Epoch", "astMatch" );
+         TRANSFORM_1( "HFK5Z", epoch_J );
    
 /* From supergalactic coordinates. */
 /* ------------------------------- */
 /* Convert to galactic coordinates and then to FK5 J2000.0
       equatorial. */
-         } else if ( system == AST__SUPERGALACTIC ) {
-            TRANSFORM_0( "SUPGAL" )
-            TRANSFORM_0( "GALEQ" )
+      } else if ( system == AST__SUPERGALACTIC ) {
+         TRANSFORM_0( "SUPGAL" )
+         TRANSFORM_0( "GALEQ" )
    
 /* From AzEl. */
 /* ---------- */
 /* Rotate from horizon to equator (H2E), shift hour angle into RA (H2R),
       go from geocentric apparent to FK5 J2000. */
-         } else if ( system == AST__AZEL ) {
-            VerifyMSMAttrs( target, result, 1, "ObsLon ObsLat Epoch", "astMatch" );
-            TRANSFORM_2( "H2E", lat, diurab )
-            TRANSFORM_1( "H2R", last )
-            TRANSFORM_2( "AMP", epoch, 2000.0 )
+      } else if ( system == AST__AZEL ) {
+         VerifyMSMAttrs( target, result, 1, "ObsLon ObsLat Epoch", "astMatch" );
+         TRANSFORM_2( "H2E", lat, diurab )
+         TRANSFORM_1( "H2R", last )
+         TRANSFORM_2( "AMP", epoch, 2000.0 )
    
 /* From unknown coordinates. */
 /* ------------------------- */
 /* No conversion is possible. */
-         } else if ( system == AST__UNKNOWN ) {
-            match = 0;
-         }
+      } else if ( system == AST__UNKNOWN ) {
+         match = 0;
       }
+   }
    
 /* Convert _from_ FK5 J2000.0 coordinates _to_ the alignment system. */
 /* ============================================================ */
 /* In this second phase, we convert to the system given by the align_sys
    argument (if required), still using the properties of the target Frame. */
-      if ( astOK && match && step2 ) {
+   if ( astOK && match && step2 ) {
    
 /* Align in FK4. */
 /* --------------- */
@@ -4888,102 +4883,102 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
    appropriate epoch. Then, if necessary, apply the old-style FK4
    precession model to bring the equinox to that required, with
    rigorous handling of the E-terms of aberration. */
-         if ( align_sys == AST__FK4 ) {
-            VerifyMSMAttrs( target, result, 1, "Equinox Epoch", "astMatch" );
-            TRANSFORM_1( "FK54Z", epoch_B )
-            if ( equinox_B != 1950.0 ) {
-               TRANSFORM_1( "SUBET", 1950.0 )
-               TRANSFORM_2( "PREBN", 1950.0, equinox_B )
-               TRANSFORM_1( "ADDET", equinox_B )
-            }
+      if ( align_sys == AST__FK4 ) {
+         VerifyMSMAttrs( target, result, 1, "Equinox Epoch", "astMatch" );
+         TRANSFORM_1( "FK54Z", epoch_B )
+         if ( equinox_B != 1950.0 ) {
+            TRANSFORM_1( "SUBET", 1950.0 )
+            TRANSFORM_2( "PREBN", 1950.0, equinox_B )
+            TRANSFORM_1( "ADDET", equinox_B )
+         }
    
 /* Align in FK4 with no E-terms. */
 /* ------------------------------- */
 /* This is the same as above, except that we do not need to add the
    E-terms at the end. */
-         } else if ( align_sys == AST__FK4_NO_E ) {
-            VerifyMSMAttrs( target, result, 1, "Equinox Epoch", "astMatch" );
-            TRANSFORM_1( "FK54Z", epoch_B )
-            TRANSFORM_1( "SUBET", 1950.0 )
-            if ( equinox_B != 1950.0 ) {
-               TRANSFORM_2( "PREBN", 1950.0, equinox_B )
-            }
+      } else if ( align_sys == AST__FK4_NO_E ) {
+         VerifyMSMAttrs( target, result, 1, "Equinox Epoch", "astMatch" );
+         TRANSFORM_1( "FK54Z", epoch_B )
+         TRANSFORM_1( "SUBET", 1950.0 )
+         if ( equinox_B != 1950.0 ) {
+            TRANSFORM_2( "PREBN", 1950.0, equinox_B )
+         }
    
 /* Align in FK5. */
 /* ------------- */
 /* We simply need to apply a precession correction for the change of
    equinox.  Omit even this if the required equinox is J2000.0. */
-         } else if ( align_sys == AST__FK5 ) {
-            VerifyMSMAttrs( target, result, 1, "Equinox", "astMatch" );
-            if ( equinox_J != 2000.0 ) {
-               TRANSFORM_2( "PREC", 2000.0, equinox_J )
-            }
+      } else if ( align_sys == AST__FK5 ) {
+         VerifyMSMAttrs( target, result, 1, "Equinox", "astMatch" );
+         if ( equinox_J != 2000.0 ) {
+            TRANSFORM_2( "PREC", 2000.0, equinox_J )
+         }
    
 /* Align in J2000. */
 /* --------------- */
 /* Mov from FK5 to ICRS, and from ICRS to J2000. */
-         } else if ( align_sys == AST__J2000 ) {
-            VerifyMSMAttrs( target, result, 1, "Epoch", "astMatch" );
-            TRANSFORM_1( "FK5HZ", epoch_J )
-            TRANSFORM_0( "HJ2000" )
+      } else if ( align_sys == AST__J2000 ) {
+         VerifyMSMAttrs( target, result, 1, "Epoch", "astMatch" );
+         TRANSFORM_1( "FK5HZ", epoch_J )
+         TRANSFORM_0( "HJ2000" )
    
 /* Align in geocentric apparent. */
 /* ------------------------------- */
 /* This conversion is supported directly by SLALIB. */
-         } else if ( align_sys == AST__GAPPT ) {
-            VerifyMSMAttrs( target, result, 1, "Epoch", "astMatch" );
-            TRANSFORM_2( "MAP", 2000.0, epoch )
+      } else if ( align_sys == AST__GAPPT ) {
+         VerifyMSMAttrs( target, result, 1, "Epoch", "astMatch" );
+         TRANSFORM_2( "MAP", 2000.0, epoch )
    
 /* Align in ecliptic coordinates. */
 /* -------------------------------- */
 /* This conversion is supported directly by SLALIB. */
-         } else if ( align_sys == AST__ECLIPTIC ) {
-            VerifyMSMAttrs( target, result, 1, "Equinox", "astMatch" );
-            TRANSFORM_1( "EQECL", equinox )
+      } else if ( align_sys == AST__ECLIPTIC ) {
+         VerifyMSMAttrs( target, result, 1, "Equinox", "astMatch" );
+         TRANSFORM_1( "EQECL", equinox )
    
 /* Align in helio-ecliptic coordinates. */
 /* ------------------------------------ */
-         } else if ( align_sys == AST__HELIOECLIPTIC ) {
-            VerifyMSMAttrs( target, result, 1, "Epoch", "astMatch" );
-            TRANSFORM_1( "EQHE", epoch )
+      } else if ( align_sys == AST__HELIOECLIPTIC ) {
+         VerifyMSMAttrs( target, result, 1, "Epoch", "astMatch" );
+         TRANSFORM_1( "EQHE", epoch )
    
 /* Align in galactic coordinates. */
 /* -------------------------------- */
 /* This conversion is supported directly by SLALIB. */
-         } else if ( align_sys == AST__GALACTIC ) {
-            TRANSFORM_0( "EQGAL" )
+      } else if ( align_sys == AST__GALACTIC ) {
+         TRANSFORM_0( "EQGAL" )
    
 /* Align in ICRS. */
 /* -------------- */
 /* This conversion is supported directly by SLALIB. */
-         } else if ( align_sys == AST__ICRS ) {
-            VerifyMSMAttrs( target, result, 1, "Epoch", "astMatch" );
-            TRANSFORM_1( "FK5HZ", epoch_J )
+      } else if ( align_sys == AST__ICRS ) {
+         VerifyMSMAttrs( target, result, 1, "Epoch", "astMatch" );
+         TRANSFORM_1( "FK5HZ", epoch_J )
    
 /* Align in supergalactic coordinates. */
 /* ------------------------------------- */
 /* Convert to galactic coordinates and then to supergalactic. */
-         } else if ( align_sys == AST__SUPERGALACTIC ) {
-            TRANSFORM_0( "EQGAL" )
-            TRANSFORM_0( "GALSUP" )
+      } else if ( align_sys == AST__SUPERGALACTIC ) {
+         TRANSFORM_0( "EQGAL" )
+         TRANSFORM_0( "GALSUP" )
    
 /* Align in AzEl coordinates. */
 /* -------------------------- */
 /* Go from FK5 J2000 to geocentric apparent (MAP), shift RA into hour angle
    (R2H), rotate from equator to horizon (E2H). */
-         } else if ( align_sys == AST__AZEL ) {
-            VerifyMSMAttrs( target, result, 1, "ObsLon ObsLat Epoch", "astMatch" );
-            TRANSFORM_2( "MAP", 2000.0, epoch )
-            TRANSFORM_1( "R2H", last )
-            TRANSFORM_2( "E2H", lat, diurab )
+      } else if ( align_sys == AST__AZEL ) {
+         VerifyMSMAttrs( target, result, 1, "ObsLon ObsLat Epoch", "astMatch" );
+         TRANSFORM_2( "MAP", 2000.0, epoch )
+         TRANSFORM_1( "R2H", last )
+         TRANSFORM_2( "E2H", lat, diurab )
    
 /* Align in unknown coordinates. */
 /* ------------------------------- */
 /* No conversion is possible. */
-         } else if ( align_sys == AST__UNKNOWN ) {
-            match = 0;
-         }
+      } else if ( align_sys == AST__UNKNOWN ) {
+         match = 0;
       }
+   }
    
 /* Convert _from_ the alignment system _to_ FK5 J2000.0 coordinates */
 /* =========================================================== */
@@ -4993,25 +4988,25 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
    
 /* Obtain the sky coordinate system, equinox, epoch, etc, of the result
    SkyFrame. */
-      system = result_system;
-      equinox = result_equinox;
-      epoch = result_epoch;
-      diurab = GetDiurab( result );
-      last = GetLAST( result );
-      lat = astGetObsLat( result );
+   system = result_system;
+   equinox = result_equinox;
+   epoch = result_epoch;
+   diurab = GetDiurab( result );
+   last = GetLAST( result );
+   lat = astGetObsLat( result );
    
 /* Convert the equinox and epoch values (stored as Modified Julian
    Dates) into the equivalent Besselian and Julian epochs (as decimal
    years). */
-      if( astOK ) {
-         equinox_B = palSlaEpb( equinox );
-         equinox_J = palSlaEpj( equinox );
-         epoch_B = palSlaEpb( epoch );
-         epoch_J = palSlaEpj( epoch );
-      }
+   if( astOK ) {
+      equinox_B = palSlaEpb( equinox );
+      equinox_J = palSlaEpj( equinox );
+      epoch_B = palSlaEpb( epoch );
+      epoch_J = palSlaEpj( epoch );
+   }
    
 /* Check we need to do the conversion. */
-      if ( astOK && match && step3 ) {
+   if ( astOK && match && step3 ) {
    
 /* Formulate the conversion... */
    
@@ -5020,109 +5015,109 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
 /* If necessary, apply the old-style FK4 precession model to bring the
    equinox to B1950.0, with rigorous handling of the E-terms of
    aberration. Then convert directly to FK5 J2000.0 coordinates. */
-         if ( align_sys == AST__FK4 ) {
-            VerifyMSMAttrs( target, result, 3, "Equinox Epoch", "astMatch" );
-            if ( equinox_B != 1950.0 ) {
-               TRANSFORM_1( "SUBET", equinox_B )
-               TRANSFORM_2( "PREBN", equinox_B, 1950.0 )
-               TRANSFORM_1( "ADDET", 1950.0 )
-            }
-            TRANSFORM_1( "FK45Z", epoch_B )
+      if ( align_sys == AST__FK4 ) {
+         VerifyMSMAttrs( target, result, 3, "Equinox Epoch", "astMatch" );
+         if ( equinox_B != 1950.0 ) {
+            TRANSFORM_1( "SUBET", equinox_B )
+            TRANSFORM_2( "PREBN", equinox_B, 1950.0 )
+            TRANSFORM_1( "ADDET", 1950.0 )
+         }
+         TRANSFORM_1( "FK45Z", epoch_B )
    
 /* From FK4 with no E-terms. */
 /* ------------------------- */
 /* This is the same as above, except that we do not need to subtract
    the E-terms initially as they are already absent. */
-         } else if ( align_sys == AST__FK4_NO_E ) {
-            VerifyMSMAttrs( target, result, 3, "Equinox Epoch", "astMatch" );
-            if ( equinox_B != 1950.0 ) {
-               TRANSFORM_2( "PREBN", equinox_B, 1950.0 )
-            }
-            TRANSFORM_1( "ADDET", 1950.0 )
-            TRANSFORM_1( "FK45Z", epoch_B )
+      } else if ( align_sys == AST__FK4_NO_E ) {
+         VerifyMSMAttrs( target, result, 3, "Equinox Epoch", "astMatch" );
+         if ( equinox_B != 1950.0 ) {
+            TRANSFORM_2( "PREBN", equinox_B, 1950.0 )
+         }
+         TRANSFORM_1( "ADDET", 1950.0 )
+         TRANSFORM_1( "FK45Z", epoch_B )
    
 /* From FK5. */
 /* --------- */
 /* We simply need to apply a precession correction for the change of
    equinox.  Omit even this if the equinox is already J2000.0. */
-         } else if ( align_sys == AST__FK5 ) {
-            VerifyMSMAttrs( target, result, 3, "Equinox", "astMatch" );
-            if ( equinox_J != 2000.0 ) {
-               TRANSFORM_2( "PREC", equinox_J, 2000.0 );
-            }
+      } else if ( align_sys == AST__FK5 ) {
+         VerifyMSMAttrs( target, result, 3, "Equinox", "astMatch" );
+         if ( equinox_J != 2000.0 ) {
+            TRANSFORM_2( "PREC", equinox_J, 2000.0 );
+         }
    
 /* From geocentric apparent. */
 /* ------------------------- */
 /* This conversion is supported directly by SLALIB. */
-         } else if ( align_sys == AST__GAPPT ) {
-            VerifyMSMAttrs( target, result, 3, "Epoch", "astMatch" );
-            TRANSFORM_2( "AMP", epoch, 2000.0 )
+      } else if ( align_sys == AST__GAPPT ) {
+         VerifyMSMAttrs( target, result, 3, "Epoch", "astMatch" );
+         TRANSFORM_2( "AMP", epoch, 2000.0 )
    
 /* From ecliptic coordinates. */
 /* -------------------------- */
 /* This conversion is supported directly by SLALIB. */
-         } else if ( align_sys == AST__ECLIPTIC ) {
-            VerifyMSMAttrs( target, result, 3, "Equinox", "astMatch" );
-            TRANSFORM_1( "ECLEQ", equinox )
+      } else if ( align_sys == AST__ECLIPTIC ) {
+         VerifyMSMAttrs( target, result, 3, "Equinox", "astMatch" );
+         TRANSFORM_1( "ECLEQ", equinox )
    
 /* From helio-ecliptic coordinates. */
 /* -------------------------------- */
-         } else if ( align_sys == AST__HELIOECLIPTIC ) {
-            VerifyMSMAttrs( target, result, 3, "Epoch", "astMatch" );
-            TRANSFORM_1( "HEEQ", epoch )
+      } else if ( align_sys == AST__HELIOECLIPTIC ) {
+         VerifyMSMAttrs( target, result, 3, "Epoch", "astMatch" );
+         TRANSFORM_1( "HEEQ", epoch )
    
 /* From galactic coordinates. */
 /* -------------------------- */
 /* This conversion is supported directly by SLALIB. */
-         } else if ( align_sys == AST__GALACTIC ) {
-            TRANSFORM_0( "GALEQ" )
+      } else if ( align_sys == AST__GALACTIC ) {
+         TRANSFORM_0( "GALEQ" )
    
 /* From ICRS. */
 /* ---------- */
 /* This conversion is supported directly by SLALIB. */
-         } else if ( align_sys == AST__ICRS ) {
-            VerifyMSMAttrs( target, result, 3, "Epoch", "astMatch" );
-            TRANSFORM_1( "HFK5Z", epoch_J )
+      } else if ( align_sys == AST__ICRS ) {
+         VerifyMSMAttrs( target, result, 3, "Epoch", "astMatch" );
+         TRANSFORM_1( "HFK5Z", epoch_J )
    
 /* From J2000. */
 /* ----------- */
 /* From J2000 to ICRS, and from ICRS to FK5. */
-         } else if ( align_sys == AST__J2000 ) {
-            VerifyMSMAttrs( target, result, 3, "Epoch", "astMatch" );
-            TRANSFORM_0( "J2000H" )
-            TRANSFORM_1( "HFK5Z", epoch_J )
+      } else if ( align_sys == AST__J2000 ) {
+         VerifyMSMAttrs( target, result, 3, "Epoch", "astMatch" );
+         TRANSFORM_0( "J2000H" )
+         TRANSFORM_1( "HFK5Z", epoch_J )
    
 /* From supergalactic coordinates. */
 /* ------------------------------- */
 /* Convert to galactic coordinates and then to FK5 J2000.0
       equatorial. */
-         } else if ( align_sys == AST__SUPERGALACTIC ) {
-            TRANSFORM_0( "SUPGAL" )
-            TRANSFORM_0( "GALEQ" )
+      } else if ( align_sys == AST__SUPERGALACTIC ) {
+         TRANSFORM_0( "SUPGAL" )
+         TRANSFORM_0( "GALEQ" )
    
 /* From AzEl. */
 /* ---------- */
 /* Rotate from horizon to equator (H2E), shift hour angle into RA (H2R),
       go from geocentric apparent to FK5 J2000. */
-         } else if ( align_sys == AST__AZEL ) {
-            VerifyMSMAttrs( target, result, 3, "ObsLon ObsLat Epoch", "astMatch" );
-            TRANSFORM_2( "H2E", lat, diurab )
-            TRANSFORM_1( "H2R", last )
-            TRANSFORM_2( "AMP", epoch, 2000.0 )
+      } else if ( align_sys == AST__AZEL ) {
+         VerifyMSMAttrs( target, result, 3, "ObsLon ObsLat Epoch", "astMatch" );
+         TRANSFORM_2( "H2E", lat, diurab )
+         TRANSFORM_1( "H2R", last )
+         TRANSFORM_2( "AMP", epoch, 2000.0 )
    
 /* From unknown coordinates. */
 /* ------------------------------- */
 /* No conversion is possible. */
-         } else if ( align_sys == AST__UNKNOWN ) {
-            match = 0;
-         }
+      } else if ( align_sys == AST__UNKNOWN ) {
+         match = 0;
       }
+   }
    
 /* Convert _from_ FK5 J2000.0 coordinates. */
 /* ======================================= */
 /* In this fourth and final phase, we convert to the result coordinate
    system from the intermediate FK5 J2000 sky coordinates generated above. */
-      if ( astOK && match && step4 ) {
+   if ( astOK && match && step4 ) {
    
 /* To FK4. */
 /* ------- */
@@ -5130,137 +5125,136 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
    appropriate epoch. Then, if necessary, apply the old-style FK4
    precession model to bring the equinox to that required, with
    rigorous handling of the E-terms of aberration. */
-         if ( system == AST__FK4 ) {
-            VerifyMSMAttrs( target, result, 3, "Equinox Epoch", "astMatch" );
-            TRANSFORM_1( "FK54Z", epoch_B )
-            if ( equinox_B != 1950.0 ) {
-               TRANSFORM_1( "SUBET", 1950.0 )
-               TRANSFORM_2( "PREBN", 1950.0, equinox_B )
-               TRANSFORM_1( "ADDET", equinox_B )
-            }
+      if ( system == AST__FK4 ) {
+         VerifyMSMAttrs( target, result, 3, "Equinox Epoch", "astMatch" );
+         TRANSFORM_1( "FK54Z", epoch_B )
+         if ( equinox_B != 1950.0 ) {
+            TRANSFORM_1( "SUBET", 1950.0 )
+            TRANSFORM_2( "PREBN", 1950.0, equinox_B )
+            TRANSFORM_1( "ADDET", equinox_B )
+         }
    
 /* To FK4 with no E-terms. */
 /* ----------------------- */
 /* This is the same as above, except that we do not need to add the
    E-terms at the end. */
-         } else if ( system == AST__FK4_NO_E ) {
-            VerifyMSMAttrs( target, result, 3, "Equinox Epoch", "astMatch" );
-            TRANSFORM_1( "FK54Z", epoch_B )
-            TRANSFORM_1( "SUBET", 1950.0 )
-            if ( equinox_B != 1950.0 ) {
-               TRANSFORM_2( "PREBN", 1950.0, equinox_B )
-            }
+      } else if ( system == AST__FK4_NO_E ) {
+         VerifyMSMAttrs( target, result, 3, "Equinox Epoch", "astMatch" );
+         TRANSFORM_1( "FK54Z", epoch_B )
+         TRANSFORM_1( "SUBET", 1950.0 )
+         if ( equinox_B != 1950.0 ) {
+            TRANSFORM_2( "PREBN", 1950.0, equinox_B )
+         }
    
 /* To FK5. */
 /* ------- */
 /* We simply need to apply a precession correction for the change of
    equinox.  Omit even this if the required equinox is J2000.0. */
-         } else if ( system == AST__FK5 ) {
-            VerifyMSMAttrs( target, result, 3, "Equinox", "astMatch" );
-            if ( equinox_J != 2000.0 ) {
-               TRANSFORM_2( "PREC", 2000.0, equinox_J )
-            }
+      } else if ( system == AST__FK5 ) {
+         VerifyMSMAttrs( target, result, 3, "Equinox", "astMatch" );
+         if ( equinox_J != 2000.0 ) {
+            TRANSFORM_2( "PREC", 2000.0, equinox_J )
+         }
    
 /* To geocentric apparent. */
 /* ----------------------- */
 /* This conversion is supported directly by SLALIB. */
-         } else if ( system == AST__GAPPT ) {
-            VerifyMSMAttrs( target, result, 3, "Epoch", "astMatch" );
-            TRANSFORM_2( "MAP", 2000.0, epoch )
+      } else if ( system == AST__GAPPT ) {
+         VerifyMSMAttrs( target, result, 3, "Epoch", "astMatch" );
+         TRANSFORM_2( "MAP", 2000.0, epoch )
    
 /* To ecliptic coordinates. */
 /* ------------------------ */
 /* This conversion is supported directly by SLALIB. */
-         } else if ( system == AST__ECLIPTIC ) {
-            VerifyMSMAttrs( target, result, 3, "Equinox", "astMatch" );
-            TRANSFORM_1( "EQECL", equinox )
+      } else if ( system == AST__ECLIPTIC ) {
+         VerifyMSMAttrs( target, result, 3, "Equinox", "astMatch" );
+         TRANSFORM_1( "EQECL", equinox )
    
 /* To helio-ecliptic coordinates. */
 /* ------------------------------ */
-         } else if ( system == AST__HELIOECLIPTIC ) {
-            VerifyMSMAttrs( target, result, 3, "Epoch", "astMatch" );
-            TRANSFORM_1( "EQHE", epoch )
+      } else if ( system == AST__HELIOECLIPTIC ) {
+         VerifyMSMAttrs( target, result, 3, "Epoch", "astMatch" );
+         TRANSFORM_1( "EQHE", epoch )
    
 /* To galactic coordinates. */
 /* ------------------------ */
 /* This conversion is supported directly by SLALIB. */
-         } else if ( system == AST__GALACTIC ) {
-            TRANSFORM_0( "EQGAL" )
+      } else if ( system == AST__GALACTIC ) {
+         TRANSFORM_0( "EQGAL" )
    
 /* To ICRS. */
 /* -------- */
 /* This conversion is supported directly by SLALIB. */
-         } else if ( system == AST__ICRS ) {
-            VerifyMSMAttrs( target, result, 3, "Epoch", "astMatch" );
-            TRANSFORM_1( "FK5HZ", epoch_J )
+      } else if ( system == AST__ICRS ) {
+         VerifyMSMAttrs( target, result, 3, "Epoch", "astMatch" );
+         TRANSFORM_1( "FK5HZ", epoch_J )
    
 /* To J2000. */
 /* --------- */
 /* From FK5 to ICRS, then from ICRS to J2000. */
-         } else if ( system == AST__J2000 ) {
-            VerifyMSMAttrs( target, result, 3, "Epoch", "astMatch" );
-            TRANSFORM_1( "FK5HZ", epoch_J )
-            TRANSFORM_0( "HJ2000" )
+      } else if ( system == AST__J2000 ) {
+         VerifyMSMAttrs( target, result, 3, "Epoch", "astMatch" );
+         TRANSFORM_1( "FK5HZ", epoch_J )
+         TRANSFORM_0( "HJ2000" )
    
 /* To supergalactic coordinates. */
 /* ----------------------------- */
 /* Convert to galactic coordinates and then to supergalactic. */
-         } else if ( system == AST__SUPERGALACTIC ) {
-            TRANSFORM_0( "EQGAL" )
-            TRANSFORM_0( "GALSUP" )
+      } else if ( system == AST__SUPERGALACTIC ) {
+         TRANSFORM_0( "EQGAL" )
+         TRANSFORM_0( "GALSUP" )
    
 /* To AzEl */
 /* ------- */
 /* Go from FK5 J2000 to geocentric apparent (MAP), shift RA into hour angle
    (R2H), rotate from equator to horizon (E2H). */
-         } else if ( system == AST__AZEL ) {
-            VerifyMSMAttrs( target, result, 3, "ObsLon ObsLat Epoch", "astMatch" );
-            TRANSFORM_2( "MAP", 2000.0, epoch )
-            TRANSFORM_1( "R2H", last )
-            TRANSFORM_2( "E2H", lat, diurab )
+      } else if ( system == AST__AZEL ) {
+         VerifyMSMAttrs( target, result, 3, "ObsLon ObsLat Epoch", "astMatch" );
+         TRANSFORM_2( "MAP", 2000.0, epoch )
+         TRANSFORM_1( "R2H", last )
+         TRANSFORM_2( "E2H", lat, diurab )
    
 /* To unknown coordinates. */
 /* ----------------------------- */
 /* No conversion is possible. */
-         } else if ( system == AST__UNKNOWN ) {
-            match = 0;
-         }
+      } else if ( system == AST__UNKNOWN ) {
+         match = 0;
       }
+   }
    
 /* Now need to take account of the possibility that the input or output
    SkyFrame may represent an offset system rather than a coordinate system. 
    Form the Mapping from the target coordinate system to the associated
    offset system. A UnitMap is returned if the target does not use an
    offset system. */
-      omap = OffsetMap( target );
+   omap = OffsetMap( target );
    
 /* Invert it to get the Mapping from the actual used system (whther
    offsets or coordinates) to the coordinate system. */
-      astInvert( omap );
+   astInvert( omap );
    
 /* Combine it with the slamap created earlier, so that its coordinate
    outputs feed the inputs of the slamap. Annul redundant pointers 
    afterwards. */
-      tmap = (AstMapping *) astCmpMap( omap, slamap, 1, "" );
-      omap = astAnnul( omap );
-      slamap =astAnnul( slamap );
+   tmap = (AstMapping *) astCmpMap( omap, slamap, 1, "" );
+   omap = astAnnul( omap );
+   slamap =astAnnul( slamap );
    
 /* Now form the Mapping from the result coordinate system to the associated
    offset system. A UnitMap is returned if the result does not use an
    offset system. */
-      omap = OffsetMap( result );
+   omap = OffsetMap( result );
    
 /* Combine it with the above CmpMap, so that the CmpMap outputs feed the
    new Mapping inputs. Annul redundant pointers afterwards. */
-      tmap2 = (AstMapping *) astCmpMap( tmap, omap, 1, "" );
-      omap =astAnnul( omap );
-      tmap =astAnnul( tmap );
+   tmap2 = (AstMapping *) astCmpMap( tmap, omap, 1, "" );
+   omap =astAnnul( omap );
+   tmap =astAnnul( tmap );
    
 /* Simplify the Mapping produced above (this eliminates any redundant
    conversions) and annul the original pointer. */
-      *map = astSimplify( tmap2 );
-      tmap2 = astAnnul( tmap2 );
-   }
+   *map = astSimplify( tmap2 );
+   tmap2 = astAnnul( tmap2 );
 
 /* If an error occurred, annul the returned Mapping and clear the
    returned values. */
@@ -8058,12 +8052,24 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
          align_sys = astGetAlignSystem( target );
       }
 
-/* Generate a Mapping that takes account of changes in the sky coordinate
-   system (equinox, epoch, etc.) between the target SkyFrame and the result
-   SkyFrame. If this Mapping can be generated, set "match" to indicate that
-   coordinate conversion is possible. */
-      match = ( MakeSkyMapping( target, (AstSkyFrame *) *result, 
-                                align_sys, map ) != 0 );
+/* If the template is a SkyFrame and both template and target want alignment 
+   to occur in the offset coordinate system, then use UnitMap to connect
+   them. */
+      if( astGetAlignOffset( target ) && template && astIsASkyFrame( template ) ){
+         if( astGetAlignOffset( (AstSkyFrame *) template ) ) {
+            match = 1;
+            *map = (AstMapping *) astUnitMap( 2, "" );
+         }
+      }
+
+/* Otherwise, generate a Mapping that takes account of changes in the sky 
+   coordinate system (equinox, epoch, etc.) between the target SkyFrame and 
+   the result SkyFrame. If this Mapping can be generated, set "match" to 
+   indicate that coordinate conversion is possible. */
+      if( ! *map ) {
+         match = ( MakeSkyMapping( target, (AstSkyFrame *) *result, 
+                                   align_sys, map ) != 0 );
+      }
 
 /* If required, re-instate the original zero value of UseDefs. */
       if( set_usedefs ) {
@@ -9045,7 +9051,7 @@ f     AST_FINDFRAME or AST_CONVERT) as a template to match another (target)
 */
 astMAKE_CLEAR(SkyFrame,AlignOffset,alignoffset,-INT_MAX)
 astMAKE_GET(SkyFrame,AlignOffset,int,0,( ( this->alignoffset != -INT_MAX ) ?
-                                   this->alignoffset : 0 ))
+                                           this->alignoffset : 0 ))
 astMAKE_SET(SkyFrame,AlignOffset,int,alignoffset,( value != 0 ))
 astMAKE_TEST(SkyFrame,AlignOffset,( this->alignoffset != -INT_MAX ))
 
@@ -10457,3 +10463,4 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Return an ID value for the new SkyFrame. */
    return astMakeId( new );
 }
+
