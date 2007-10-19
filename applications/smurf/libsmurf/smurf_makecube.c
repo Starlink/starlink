@@ -464,6 +464,10 @@
 *     - FITS keywords PRVCNT and PRVnnnnn are added to the output FITS
 *     header. These are simply the names of all the input files included
 *     in the output map. PRVCNT indicates how many files are present.
+*     - FITS keywords NUMTILES and TILENUM are added to the output FITS
+*     header. These are the number of tiles used to hold the output data,
+*     and the index of the NDF containing the header, in the range 1 to
+*     NUMTILES. See parameter TILEDIMS.
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -568,6 +572,8 @@
 *        Use smf_accumulate_prov
 *     21-SEP-2007 (DSB):
 *        Move reporting of WCS bounds to be before the prompt for OUT.
+*     19-OCT-2007 (DSB):
+*        Added NUMTILES and TILENUM FITS headers.
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -1647,9 +1653,16 @@ L999:;
    
 /* Free the second work array. */
       work2_array = astFree( work2_array );
+
+/* Store the keywords holding the number of tiles generated and the index
+   of the current tile. */
+      atlPtfti( fchan, "NUMTILES", ntile, 
+                   "No. of tiles covering the field", status );
+      atlPtfti( fchan, "TILENUM", itile, 
+                   "Index of this tile (1->NUMTILES)", status );
    
 /* If the FitsChan is not empty, store it in the FITS extension of the
-      output NDF (any existing FITS extension is deleted). */
+   output NDF (any existing FITS extension is deleted). */
       if( fchan ){
          if( astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );
          fchan = astAnnul( fchan );
