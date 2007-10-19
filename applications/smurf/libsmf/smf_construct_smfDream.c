@@ -48,9 +48,12 @@
 *       does not exist. Currently the caller should check that the
 *       smfDream contains information from the weights file and issue
 *       its own error.
+*     - SAM_MODE FITS header is used to determine DREAM mode. Its absence
+*       implies we are not in DREAM mode.
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -60,11 +63,14 @@
 *        Update prologue, read GRID_SIZE from weights file
 *     2007-04-05 (AGG):
 *        Change OBSMODE to SAM_MODE
+*     2007-10-19 (TIMJ):
+*        Absence of SAM_MODE no longer fatal.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2006-2007 University of British Columbia.
+*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -153,6 +159,14 @@ smfDream *smf_construct_smfDream( smfData *data, const int nvert,
   /* Check we have DREAM data */
   hdr = data->hdr;
   smf_fits_getS( hdr, "SAM_MODE", obsmode, SZFITSCARD, status );
+
+  /* Lab data does not have a SAM_MODE (and absence should be treated
+     as proof that we are not in DREAM mode */
+  if (*status == SMF__NOKWRD) {
+    errAnnul( status );
+    return NULL;
+  }
+
   if ( strncmp( obsmode, "DREAM", 5) == 0 ) {
     /* Check we have valid pointers to the SMU path and jiggle vertices */
     if ( jigpath != NULL && jigvert != NULL ) {
