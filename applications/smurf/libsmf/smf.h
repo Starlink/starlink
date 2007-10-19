@@ -181,6 +181,8 @@
 *        -Added nofile to smf_model_create interface
 *     2007-09-13 (EC):
 *        -Added smf_dataOrder
+*     2007-10-19 (DSB):
+*        -Added specunion to smf_cubebounds.
 
 *     {enter_further_changes_here}
 *  Copyright:
@@ -523,9 +525,9 @@ void smf_tslice_ast (smfData * data, int index, int needwcs, int * status );
 
 void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
                      int autogrid, int usedetpos, double par[ 7 ], 
-                     Grp *detgrp, int moving, int lbnd[ 3 ], int ubnd[ 3 ], 
-                     AstFrameSet **wcsout, int *npos, int *hasoffexp, 
-                     smfBox **boxes, int *status );
+                     Grp *detgrp, int moving, int specunion, int lbnd[ 3 ], 
+                     int ubnd[ 3 ], AstFrameSet **wcsout, int *npos, 
+                     int *hasoffexp, smfBox **boxes, int *status );
 
 void smf_rebincube( smfData *data, int index, int size, int badmask, int is2d,
                     AstSkyFrame *abskyfrm, AstMapping *oskymap, 

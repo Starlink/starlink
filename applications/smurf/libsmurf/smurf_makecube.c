@@ -68,8 +68,8 @@
 *          other schemes, "FIRST" and "OR", are provided which greatly reduce 
 *          the memory requirements, at the expense either of introducing more 
 *          bad pixels into the output ("OR") or producing higher output noise 
-*          levels ("FIRST"). This parameter is only requested if SPREAD is
-*          set to "Nearest":
+*          levels ("FIRST"). The value supplied for this parameter is used
+*          only if SPREAD is set to "Nearest":
 *
 *          - "FIRST" -- The bad pixel mask in each output spectrum is 
 *          inherited from the first input spectrum that contributes to the 
@@ -312,8 +312,16 @@
 *          see what this is, supply a single colon (":") for the parameter 
 *          value. This will display a description of the required spectral 
 *          coordinate system, and then re-prompt for a new parameter value.
-*          The dynamic defaultis the entire spectral range covered by the
-*          input data. []
+*          The dynamic default is determined by the SPECUNION parameter. []
+*     SPECUNION = _LOGICAL (Read)
+*          Determines how the default spectral bounds for the output are
+*          chosen. If a TRUE value is supplied, then the defaults for the 
+*          SPECBOUNDS parameter represent the union of the spectral ranges 
+*          in the input data. Otherwise, they represent the intersection
+*          of the spectral ranges in the input data. This option is 
+*          only available if parameter BADMASK is set to AND. For any 
+*          other value of BADMASK, a value of FALSE is always used for 
+*          SPECUNION. [FALSE]
 *     SPREAD = LITERAL (Read)
 *          The method to use when spreading each input pixel value out
 *          between a group of neighbouring output pixels. If SPARSE is set 
@@ -425,10 +433,6 @@
 *          then WEIGHTS is not accessed and a FALSE value is assumed. [FALSE]
 
 *  Notes:
-*     - For regularly gridded data, the spectral range of the output cube
-*     is determined by the intersection (rather than the union) of the
-*     input spectral ranges. This is done in order to allow a more memory
-*     efficient algorithm to be used.
 *     - A FITS extension is added to the output NDF containing any keywords 
 *     that are common to all input NDFs. To be included in the output
 *     FITS extension, a FITS keyword must be present in the NDF extension
@@ -573,7 +577,8 @@
 *     21-SEP-2007 (DSB):
 *        Move reporting of WCS bounds to be before the prompt for OUT.
 *     19-OCT-2007 (DSB):
-*        Added NUMTILES and TILENUM FITS headers.
+*        - Added NUMTILES and TILENUM FITS headers.
+*        - Added SPECUNION parameter.
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -729,6 +734,7 @@ void smurf_makecube( int *status ) {
    int size;                  /* Number of files in input group */
    int smfflags;              /* Flags for smfData */
    int sparse;                /* Create a sparse output array? */
+   int specunion;             /* O/p spec range = union of i/p spec ranges? */
    int spread = 0;            /* Pixel spreading method */
    int tiledims[2];           /* Dimensions (in pixels) of each output tile */
    int trim;                  /* Trim the output cube to exclude bad pixels? */
@@ -790,6 +796,16 @@ void smurf_makecube( int *status ) {
       }
    }
 
+/* See how the bad pixel mask in each output spectrum is to be determined. */
+   parChoic( "BADMASK", "OR", "AND,OR,FIRST", 1, pabuf, 10, status );
+   if( !strcmp( pabuf, "AND" ) ) {
+      badmask = 2;
+   } else if( !strcmp( pabuf, "OR" ) ) {
+      badmask = 1;
+   } else {
+      badmask = 0;
+   } 
+
 /* Indicate we have no projection parameters as yet. */
    par[ 0 ] = AST__BAD;
    par[ 1 ] = AST__BAD;
@@ -812,15 +828,118 @@ void smurf_makecube( int *status ) {
    smf_cubegrid( igrp,  size, system, usedetpos, autogrid, detgrp, 
                  par, &moving, &oskyfrm, &sparse, &hastsys, status );
 
+/* Get the pixel spreading scheme to use. */
+   if( !sparse ) {
+      parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,"
+                "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS", 
+                1, pabuf, 10, status );
+
+      if( !strcmp( pabuf, "NEAREST" ) ) {
+         spread = AST__NEAREST;
+         nparam = 0;
+   
+      } else if( !strcmp( pabuf, "LINEAR" ) ) {
+         spread = AST__LINEAR;
+         nparam = 0;
+   
+      } else if( !strcmp( pabuf, "SINC" ) ) {      
+         spread = AST__SINC;
+         nparam = 1;
+   
+      } else if( !strcmp( pabuf, "SINCSINC" ) ) {      
+         spread = AST__SINCSINC;
+         nparam = 2;
+   
+      } else if( !strcmp( pabuf, "SINCCOS" ) ) {      
+         spread = AST__SINCCOS;
+         nparam = 2;
+   
+      } else if( !strcmp( pabuf, "SINCGAUSS" ) ) {      
+         spread = AST__SINCGAUSS;
+         nparam = 2;
+   
+      } else if( !strcmp( pabuf, "SOMB" ) ) {      
+         spread = AST__SOMB;
+         nparam = 1;
+   
+      } else if( !strcmp( pabuf, "SOMBCOS" ) ) {      
+         spread = AST__SOMBCOS;
+         nparam = 2;
+   
+      } else if( !strcmp( pabuf, "GAUSS" ) ) {      
+         spread = AST__GAUSS;
+         nparam = 2;
+   
+      } else if( *status == SAI__OK ) {
+         nparam = 0;
+         *status = SAI__ERROR;
+         msgSetc( "V", pabuf );
+         errRep( "", "Support not available for SPREAD = ^V (programming "
+                 "error)", status );
+      }
+
+   } else {
+      spread = AST__NEAREST;
+      nparam = 0;
+   }
+
+/* Get an additional parameter vector if required. */
+   if( nparam > 0 ) parExacd( "PARAMS", nparam, params, status );
+
+/* See how the bad pixel mask in each output spectrum is to be determined. 
+   Also choose whether to use the 2D or the 3D weighting system. The 2D  
+   system assumes that all pixels in a given output spectrum have the
+   same weight and variance, and requires much less memory than the 3D 
+   system. Do not bother asking if we are using a 3d spread function by
+   definition. */
+   if (spread == AST__NEAREST) {
+     parChoic( "BADMASK", "OR", "AND,OR,FIRST", 1, pabuf, 10, status );
+
+     if( !strcmp( pabuf, "AND" ) ) {
+       badmask = 2;
+       is2d = 0;
+
+     } else if( !strcmp( pabuf, "OR" ) ) {
+       badmask = 1;
+       is2d = 1;
+
+     } else {
+       badmask = 0;
+       is2d = 1;
+
+     }
+   } else {
+     badmask = 2;
+     is2d = 0;
+   }
+
+/* BADMASK = OR and FIRST can only be used with SPREAD = Nearest. Report an 
+   error for any other combination. */
+   if( badmask != 2 && spread != AST__NEAREST && *status == SAI__OK) {
+      *status = SAI__ERROR;
+      errRep( "", "Incompatible values supplied for parameters BADMASK "
+              "and SPREAD.", status );
+      errRep( "", "BADMASK values of 'OR' and 'FIRST' can only be used if "
+              "SPREAD is 'Nearest'.", status );
+   }
+
 /* If we are producing an output cube with the XY plane being a spatial
    projection... */
    if( !sparse && *status == SAI__OK ) {
 
+/* See if the output spectral range is to be the intersection or union of
+   the input spectral ramges. */
+      if( badmask != 2 ) {
+         specunion = 1;
+      } else {
+         parGet0l( "SPECUNION", &specunion, status );
+      }
+
 /* Validate the input files, create the WCS FrameSet to store in the
    output cube, and get the pixel index bounds of the output cube. */
       smf_cubebounds( igrp, size, oskyfrm, autogrid, usedetpos, par, 
-                      ( trim ? detgrp : NULL ), moving, lbnd_out, ubnd_out,
-                       &wcsout, &npos, &hasoffexp, &boxes, status );
+                      ( trim ? detgrp : NULL ), moving, specunion, lbnd_out, 
+                      ubnd_out, &wcsout, &npos, &hasoffexp, &boxes, status );
 
 /* See if the input data should be weighted according to the reciprocal
    of the input variances. This required ACS_OFFEXPOSURE values in the
@@ -894,64 +1013,6 @@ void smurf_makecube( int *status ) {
       genvar = 0;
    }
 
-/* Get the pixel spreading scheme to use. */
-   if( !sparse ) {
-      parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,"
-                "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS", 
-                1, pabuf, 10, status );
-
-      if( !strcmp( pabuf, "NEAREST" ) ) {
-         spread = AST__NEAREST;
-         nparam = 0;
-   
-      } else if( !strcmp( pabuf, "LINEAR" ) ) {
-         spread = AST__LINEAR;
-         nparam = 0;
-   
-      } else if( !strcmp( pabuf, "SINC" ) ) {      
-         spread = AST__SINC;
-         nparam = 1;
-   
-      } else if( !strcmp( pabuf, "SINCSINC" ) ) {      
-         spread = AST__SINCSINC;
-         nparam = 2;
-   
-      } else if( !strcmp( pabuf, "SINCCOS" ) ) {      
-         spread = AST__SINCCOS;
-         nparam = 2;
-   
-      } else if( !strcmp( pabuf, "SINCGAUSS" ) ) {      
-         spread = AST__SINCGAUSS;
-         nparam = 2;
-   
-      } else if( !strcmp( pabuf, "SOMB" ) ) {      
-         spread = AST__SOMB;
-         nparam = 1;
-   
-      } else if( !strcmp( pabuf, "SOMBCOS" ) ) {      
-         spread = AST__SOMBCOS;
-         nparam = 2;
-   
-      } else if( !strcmp( pabuf, "GAUSS" ) ) {      
-         spread = AST__GAUSS;
-         nparam = 2;
-   
-      } else if( *status == SAI__OK ) {
-         nparam = 0;
-         *status = SAI__ERROR;
-         msgSetc( "V", pabuf );
-         errRep( "", "Support not available for SPREAD = ^V (programming "
-                 "error)", status );
-      }
-
-   } else {
-      spread = AST__NEAREST;
-      nparam = 0;
-   }
-
-/* Get an additional parameter vector if required. */
-   if( nparam > 0 ) parExacd( "PARAMS", nparam, params, status );
-
 /* See if the output is to be split up into a number of separate tiles,
    each one being stored in a separate output NDF. If a null value is
    supplied for TILEDIMS, annul the error and retina the original NULL 
@@ -980,43 +1041,6 @@ void smurf_makecube( int *status ) {
 
 /* Write the number of tiles being created to an output parameter. */
    parPut0i( "NTILE", ntile, status );
-
-/* See how the bad pixel mask in each output spectrum is to be determined. 
-   Also choose whether to use the 2D or the 3D weighting system. The 2D  
-   system assumes that all pixels in a given output spectrum have the
-   same weight and variance, and requires much less memory than the 3D 
-   system. Do not bother asking if we are using a 3d spread function by
-   definition. */
-   if (spread == AST__NEAREST) {
-     parChoic( "BADMASK", "OR", "AND,OR,FIRST", 1, pabuf, 10, status );
-
-     if( !strcmp( pabuf, "AND" ) ) {
-       badmask = 2;
-       is2d = 0;
-
-     } else if( !strcmp( pabuf, "OR" ) ) {
-       badmask = 1;
-       is2d = 1;
-
-     } else {
-       badmask = 0;
-       is2d = 1;
-
-     }
-   } else {
-     badmask = 2;
-     is2d = 0;
-   }
-
-/* BADMASK = OR and FIRST can only be used with SPREAD = Nearest. Report an 
-   error for any other combination. */
-   if( badmask != 2 && spread != AST__NEAREST && *status == SAI__OK) {
-      *status = SAI__ERROR;
-      errRep( "", "Incompatible values supplied for parameters BADMASK "
-              "and SPREAD.", status );
-      errRep( "", "BADMASK values of 'OR' and 'FIRST' can only be used if "
-              "SPREAD is 'Nearest'.", status );
-   }
 
 /* Output the pixel bounds of the full size output array (not of an
    individual tile). */

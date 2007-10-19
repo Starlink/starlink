@@ -15,9 +15,9 @@
 *  Invocation:
 *     smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
 *                     int autogrid, int usedetpos, double par[ 7 ], 
-*                     Grp *detgrp, int moving, int lbnd[ 3 ], int ubnd[ 3 ], 
-*                     AstFrameSet **wcsout, int *npos, int *hasoffexp, 
-*                     smfBox **boxes, int *status );
+*                     Grp *detgrp, int moving, int specunion, int lbnd[ 3 ], 
+*                     int ubnd[ 3 ], AstFrameSet **wcsout, int *npos, 
+*                     int *hasoffexp, smfBox **boxes, int *status );
 
 *  Arguments:
 *     igrp = Grp * (Given)
@@ -59,6 +59,10 @@
 *        so, each time slice is shifted so that the position specified by 
 *        TCS_AZ_BC1/2 is mapped on to the same pixel position in the
 *        output cube.
+*     specunion = int (Given)
+*        If non-zero, then the output spectral range is the union of the
+*        input spectral ranges. Otherwise it is the intersection of the input
+*        spectral ramges.
 *     lbnd = int [ 3 ] (Returned)
 *        The lower pixel index bounds of the output cube.
 *     ubnd = int [ 3 ] (Returned)
@@ -101,11 +105,7 @@
 *
 *     Note, the bounds of the spatial axes represent the union of the spatial 
 *     coverage of each input NDF, but the bounds of the spectral axis 
-*     represent the intersection (rather than the union) the input spectral 
-*     ranges. This is done so that the code that normalise the output
-*     data sums can assume that the same number of input spectra contributed 
-*     to each channel of an output spectrum, regardless of the output channel 
-*     number.
+*     represent either the intersection or union, as specified by "specunion".
 
 *  Authors:
 *     David S Berry (JAC, UCLan)
@@ -158,6 +158,8 @@
 *        to each tile of the output.
 *     31-AUG-2007 (DSB):
 *        Remove debugging printf statements.
+*     19-OCT-2007 (DSB):
+*        Added parameter "specunion".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -211,9 +213,9 @@
 
 void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
                      int autogrid, int usedetpos, double par[ 7 ], 
-                     Grp *detgrp, int moving, int lbnd[ 3 ], int ubnd[ 3 ], 
-                     AstFrameSet **wcsout, int *npos, int *hasoffexp, 
-                     smfBox **boxes, int *status ){
+                     Grp *detgrp, int moving, int specunion, int lbnd[ 3 ], 
+                     int ubnd[ 3 ], AstFrameSet **wcsout, int *npos, 
+                     int *hasoffexp, smfBox **boxes, int *status ){
 
 /* Local Variables */
    AstCmpFrame *cmpfrm = NULL;  /* Current Frame for output FrameSet */
@@ -502,14 +504,16 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
             specout[ 1 ] = temp;
          }
 
-/* Update the bounds of the output cube on the spectral PIXEL axis. Note, 
-   these bounds represent the overlap region. That is, they are the
-   intersection, not the union, of the spectral bounds obtained from each 
-   individual input file. This is done so that the code that normalises
-   the total data sum in each output pixel can assumed that each pixel
-   had the same number of contributions. */
-         if( specout[ 0 ] > dlbnd[ 2 ] ) dlbnd[ 2 ] = specout[ 0 ];
-         if( specout[ 1 ] < dubnd[ 2 ] ) dubnd[ 2 ] = specout[ 1 ];
+/* Update the bounds of the output cube on the spectral PIXEL axis to
+   hold the bounds of either the union or intersection of the spectral
+   ranges. */
+         if( specunion ) {
+            if( specout[ 0 ] < dlbnd[ 2 ] ) dlbnd[ 2 ] = specout[ 0 ];
+            if( specout[ 1 ] > dubnd[ 2 ] ) dubnd[ 2 ] = specout[ 1 ];
+         } else {
+            if( specout[ 0 ] > dlbnd[ 2 ] ) dlbnd[ 2 ] = specout[ 0 ];
+            if( specout[ 1 ] < dubnd[ 2 ] ) dubnd[ 2 ] = specout[ 1 ];
+         }
       }
 
 /* Allocate work arrays big enough to hold the coords of all the
