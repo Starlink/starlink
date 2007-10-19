@@ -108,6 +108,9 @@ f     The DSBSpecFrame class does not define any new routines beyond those
 *        The default for AlignSideband has been changed from 1 to 0.
 *     8-MAY-2007 (DSB):
 *        Correct initialisation of alignsideband in astInitDSBSpecFrame_.
+*     19-OCT-2007 (DSB):
+*        Ignore SideBand alignment if the AlignSideBand attribute is zero
+*        in either the target or the template.
 *class--
 
 *  Implementation Deficiencies:
@@ -1409,13 +1412,11 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
 */
 
 /* Local Variables: */
-   AstDSBSpecFrame *dsbresult;/* Pointer to the DSBSpecFrame result Frame */
    AstDSBSpecFrame *dsbtarget;/* Pointer to the DSBSpecFrame target Frame */
    AstMapping *map1;          /* Intermediate Mapping */
    AstMapping *map2;          /* Intermediate Mapping */
    AstMapping *map3;          /* Intermediate Mapping */
-   int alignsb_result;        /* The result sideband to be aligned */
-   int alignsb_target;        /* The target sideband to be aligned */
+   int alignsb;               /* Use sidebands to align the Frames? */
    int match;                 /* Coordinate conversion is possible? */
 
 /* Initialise the returned values. */
@@ -1435,13 +1436,14 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
    match = (*parent_subframe)( target_frame, template, result_naxes, 
                                target_axes, template_axes, map, result );
 
-/* If a match occurred, and the result Frame is a DSBSpecFrame, we now 
-   modify the Mapping to take account of DSBSpecFrame-specific attributes. */
-   if( match && astIsADSBSpecFrame( *result ) ) {
+/* If a match occurred, and the result and template Frames are both
+   DSBSpecFrames, we now modify the Mapping to take account of 
+   DSBSpecFrame-specific attributes. */
+   if( match && template && astIsADSBSpecFrame( template ) &&
+                            astIsADSBSpecFrame( *result ) ) {
 
 /* Get pointers to the two DSBSpecFrames */
       dsbtarget = (AstDSBSpecFrame *) target_frame;      
-      dsbresult = (AstDSBSpecFrame *) *result;
 
 /* See whether alignment occurs between sidebands. If the current call to 
    this function is part of the process of restoring a FrameSet's integrity 
@@ -1453,52 +1455,49 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
    usually want to align the DSBSpecFrames as if they were basic SpecFrames
    (that is, ignoring the setting of the SideBand attribute). */
       if( astGetFrameFlags( target_frame ) & AST__INTFLAG ) {
-         alignsb_target = 1;
-         alignsb_result = 1;
+         alignsb = 1;
       } else {
-         alignsb_target = astGetAlignSideBand( dsbtarget );
-         alignsb_result = astGetAlignSideBand( dsbresult );
+         alignsb = astGetAlignSideBand( dsbtarget ) && 
+                   astGetAlignSideBand( (AstDSBSpecFrame *) template );
       }         
+
+/* If we are aligning the sidebands we need to modify the Mapping
+   returned above by the parent SubFrame method. The existing Mapping
+   will convert between the spectral systems represented by the two
+   DSBSpecFrames but will not take account of any difference in
+   sidebands. */
+      if( alignsb ) {
 
 /* Create a Mapping which transforms positions from the target to an exact 
    copy of the target in which the SideBand attribute is set to the
    USB sideband. This will be a UnitMap if the target already represents
-   the USB sideband. If the DSBSpecFrame is to be aligned like a SpecFrme
-   (i.e. ignoring its SideBand attribute) then create a UnitMap instead. */
-      if( alignsb_target ) {
+   the USB sideband. */
          map1 = ToUSBMapping( dsbtarget, "astSubFrame" );
-      } else {
-         map1 = (AstMapping *) astUnitMap( 1, "" );
-      }
 
 /* Create a Mapping which transforms positions from the result to an exact 
    copy of the result in which the SideBand attribute is set to the
    USB sideband. This will be a UnitMap if the target already represents
-   the USB sideband. If the DSBSpecFrame is to be aligned like a SpecFrme
-   (i.e. ignoring its SideBand attribute) then create a UnitMap instead. */
-      if( alignsb_result ) {
-         map2 = ToUSBMapping( dsbresult, "astSubFrame" );
-      } else {
-         map2 = (AstMapping *) astUnitMap( 1, "" );
-      }
+   the USB sideband. */
+         map2 = ToUSBMapping( (AstDSBSpecFrame *) *result, "astSubFrame" );
 
 /* Invert it to get the mapping from the USB to the result. */
-      astInvert( map2 );
+         astInvert( map2 );
 
 /* Form a Mapping which first maps target values to the USB, then applies the 
    Mapping returned by the parent SubFrame method in order to convert between 
    spectral systems, and then converts from the USB to the SideBand of the 
    result. */
-      map3 = (AstMapping *) astCmpMap( map1, *map, 1, "" );
-      map1 = astAnnul( map1 );
-      *map = astAnnul( *map );
-      map1 = (AstMapping *) astCmpMap( map3, map2, 1, "" );
-      map3 = astAnnul( map3 );
-      map2 = astAnnul( map2 );
+         map3 = (AstMapping *) astCmpMap( map1, *map, 1, "" );
+         map1 = astAnnul( map1 );
+         *map = astAnnul( *map );
+         map1 = (AstMapping *) astCmpMap( map3, map2, 1, "" );
+         map3 = astAnnul( map3 );
+         map2 = astAnnul( map2 );
 
 /* Returned the simplified Mapping. */
-      *map = astSimplify( map1 );
-      map1 = astAnnul( map1 );
+         *map = astSimplify( map1 );
+         map1 = astAnnul( map1 );
+      }
    }
 
 /* If an error occurred or no match was found, annul the returned
@@ -2391,24 +2390,26 @@ astMAKE_GET(DSBSpecFrame,SideBand,int,USB,(this->sideband == BADSB ? ((astGetIF(
 *     Integer (boolean).
 
 *  Description:
-*     This attribute controls how a DSBSpecFrame behaves when it is used (by
-c     astFindFrame or astConvert) as a template to match another (target)
-f     AST_FINDFRAME or AST_CONVERT) as a template to match another (target)
-*     DSBSpecFrame. The default value is zero. If non-zero, the value of the SideBand 
-*     attribute is used so that alignment occurs between sidebands. That
-*     is, if one DSBSpecFrame represents USB and the other represents LSB
-*     then 
+*     This attribute controls how a DSBSpecFrame behaves when an attempt
+*     is made to align it with another DSBSpecFrame using 
+c     astFindFrame or astConvert.
+f     AST_FINDFRAME or AST_CONVERT.
+*     If both DSBSpecFrames have a non-zero value for AlignSideBand, the 
+*     value of the SideBand attribute in each DSBSpecFrame is used so that 
+*     alignment occurs between sidebands. That is, if one DSBSpecFrame 
+*     represents USB and the other represents LSB then 
 c     astFindFrame and astConvert
 f     AST_FINDFRAME and AST_CONVERT
 *     will recognise that the DSBSpecFrames represent different sidebands
 *     and will take this into account when constructing the Mapping that
-*     maps positions in one DSBSpecFrame into the other. If AlignSideBand is 
-*     set to zero, then the value of the SideBand attribute is ignored. In 
-*     the above example, this would result in a frequency in the first
-*     DSBSpecFrame being mapped onto the same frequency in the second
-*     DSBSpecFrame, even though those frequencies refer to different
-*     sidebands. In other words, if AlignSideBand is zero, the DSBSpecFrame 
-*     aligns like a basic SpecFrame.
+*     maps positions in one DSBSpecFrame into the other. If AlignSideBand
+*     in either DSBSpecFrame is set to zero, then the values of the SideBand 
+*     attributes are ignored. In the above example, this would result in a 
+*     frequency in the first DSBSpecFrame being mapped onto the same 
+*     frequency in the second DSBSpecFrame, even though those frequencies 
+*     refer to different sidebands. In other words, if either AlignSideBand 
+*     attribute is zero, then the two DSBSpecFrames aligns like basic 
+*     SpecFrames. The default value for AlignSideBand is zero.
 *
 c     When astFindFrame or astConvert 
 f     When AST_FINDFRAME or AST_CONVERT 
@@ -2418,20 +2419,23 @@ f     When AST_FINDFRAME or AST_CONVERT
 *     position in the other. The Mapping is made up of the following steps in 
 *     the indicated order:
 *
-*     - If the target's AlignSideBand value is non-zero, map values from the 
-*     target's current sideband (given by its SideBand attribute) to the
-*     USB. If the target's AlignSideBand value is zero (or if the target
-*     already represents the USB), this step is skipped, leaving the values 
-*     unchanged.
+*     - If both DSBSpecFrames have a value of 1 for the AlignSideBand
+*     attribute, map values from the target's current sideband (given by its 
+*     SideBand attribute) to the USB. If the target already represents the 
+*     USB, this step will leave the values unchanged. If either of the two
+*     DSBSpecFrames have a value of zero for its AlignSideBand attribute,
+*     then this step is omitted.
 *
 *     - Map the values from the spectral system of the target to the spectral 
 *     system of the template. This Mapping takes into account all the
 *     inherited SpecFrame attributes such as System, StdOfRest, Unit, etc.
 *
-*     - If the results's AlignSideBand value is non-zero, map values from the 
-*     USB to the result's current sideband (given by its SideBand attribute).
-*     If the result's AlignSideBand value is zero (or if the result already 
-*     represents the USB), this step is skipped, leaving the values unchanged.
+*     - If both DSBSpecFrames have a value of 1 for the AlignSideBand
+*     attribute, map values from the USB to the result's current sideband 
+*     (given by its SideBand attribute). If the result already represents the 
+*     USB, this step will leave the values unchanged. If either of the two
+*     DSBSpecFrames have a value of zero for its AlignSideBand attribute,
+*     then this step is omitted.
 
 *  Applicability:
 *     DSBSpecFrame
