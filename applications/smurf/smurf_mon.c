@@ -90,12 +90,15 @@
 *        Remove FILE leak checking since it sometimes reports
 *        HDS internal scratch files that are not real leaks. Rely
 *        solely on the locator leak check.
+*     2007-10-19 (TIMJ):
+*        Add RAWUNPRESS
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
-*     Council and the University of British Columbia.  All Rights
-*     Reserved.
+*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2007 Council and the University of British Columbia.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -219,6 +222,8 @@ void smurf_mon( int * status ) {
     smurf_starecalc( status );
   } else if (strcmp( taskname, "SMURFHELP" ) == 0 ) {
     smurf_help( status );
+  } else if (strcmp( taskname, "RAWUNPRESS" ) == 0 ) {
+    smurf_rawunpress( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );
