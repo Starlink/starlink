@@ -85,9 +85,12 @@
 *        sc2store_wrtstream has additional subnum argument
 *     2007-10-05 (AGG):
 *        Rationalize FITS headers, write correct DATE-OBS string
+*     2007-10-22 (TIMJ):
+*        Use new fitsrec definition for sc2store
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
+*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
 *  Licence:
@@ -150,7 +153,7 @@ int *status        /* global status (given and returned) */
   /* Local variables */
   char dateobs[SZFITSCARD+1] = "\0"; /* DATE-OBS string for observation */
   AstFitsChan *fitschan;           /* FITS headers */
-  const char fitsrec[SC2STORE__MAXFITS][SZFITSCARD]; /* Store for FITS records */  
+  const char fitsrec[SC2STORE__MAXFITS+1]; /* Store for FITS records */  
   int nrec;                        /* number of FITS header records */
   int subnum;                      /* subarray index */
 

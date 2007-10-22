@@ -195,8 +195,11 @@
 *        Add obsend flag
 *     2007-10-09 (AGG):
 *        Correct bug in calculating DATE-OBS for subimages
+*     2007-10-22 (TIMJ):
+*        Use new definition for fits header as required by sc2store.
 
 *  Copyright:
+*     Copyright (C) 2007 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
