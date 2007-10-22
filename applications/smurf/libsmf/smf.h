@@ -378,11 +378,11 @@ void
 smf_accumulate_prov( AstKeyMap * prvmap, const smfFile * file, const Grp* igrp,
                 int index, int * status );
 
-void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, 
+void smf_fits_crchan( int nfits, const char * headrec, AstFitsChan ** fits, 
                       int *status);
 
 void smf_fits_export2DA ( const AstFitsChan *fitschan, int *ncards, 
-                          char fitsrec[SC2STORE__MAXFITS][SZFITSCARD], 
+                          char * fitsrec,
                           int *status );
 
 /* Do not return result since we want the interface to remain the same when a

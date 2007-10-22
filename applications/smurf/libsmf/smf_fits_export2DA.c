@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_fits_export2DA ( const AstFitsChan *fitschan, int *ncards, 
-*                          char fitsrec[SC2STORE__MAXFITS][SZFITSCARD], 
+*                          char *fitsrec, 
 *                          int *status )
 
 *  Arguments:
@@ -22,14 +22,15 @@
 *        AstFitsChan containing FITS headers
 *     ncards = int* (Returned)
 *        Number of cards in FITS header
-*     fitsrec = char[SC2STORE__MAXFITS][SZFITSCARD] (Returned)
-*        Character array for converted FITS headers
+*     fitsrec = char* (Returned)
+*        Character array for converted FITS headers. This should be large enough
+*        to hold SC2STORE__MAXFITS headers.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
 *     This routine converts the contents of an AstFitsChan
-*     into a character array for storage in an NDF.
+*     into a character array for storage by the SCUBA-2 DA system.
 
 *  Authors:
 *     Tim Jenness (TIMJ)
@@ -39,9 +40,11 @@
 *  History:
 *     2006-11-01 (JB):
 *        Original version
+*     2007-10-22 (TIMJ):
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
@@ -85,19 +88,20 @@
 #define FUNC_NAME "smf_fits_export2DA"
 
 void smf_fits_export2DA ( const AstFitsChan *fitschan, int *ncards, 
-                          char fitsrec[SC2STORE__MAXFITS][SZFITSCARD], 
+                          char *fitsrec,
                           int *status ) {
 
-   /* Local variables */
-   char card[SZFITSCARD];  /* Current FITS card */
-   int found;              /* Boolean to indicate if a card was found */
-   int i;                  /* Loop counter */
+  /* Local variables */
+  char *outpos = NULL;    /* current position in output buffer */
+  char card[SZFITSCARD];  /* temporary buffer for current card */   
+  int found;              /* Boolean to indicate if a card was found */
+  int i;                  /* Loop counter */
 
-   /* Check status */
-   if (*status != SAI__OK) return;
+  /* Check status */
+  if (*status != SAI__OK) return;
 
-   /* Find the number of cards in this AstFitsChan, and make
-      sure that it is no larger than the maximum allowed */
+  /* Find the number of cards in this AstFitsChan, and make
+     sure that it is no larger than the maximum allowed */
    *ncards = astGetI ( fitschan, "Ncard" );
    if ( *ncards > SC2STORE__MAXFITS ) {
       *status = SAI__ERROR;
@@ -107,16 +111,18 @@ void smf_fits_export2DA ( const AstFitsChan *fitschan, int *ncards,
               "Number of FITS cards ^NC exceeds maximum allowed (^MC)",
               status );
       return;
-   } 
+   }
   
    /* Rewind */
    astClear ( fitschan, "Card");
 
    /* Retrieve all the FITS headers and store them in the character array */
+   outpos = fitsrec;
    for ( i = 0; i <= *ncards; i++ ) {
       found = astFindFits ( fitschan, "%f", card, 1 );
       if ( found ) {
-	 strncpy ( fitsrec[i], card, SZFITSCARD );
+	 strncpy ( outpos, card, SZFITSCARD );	 
+	 outpos += 80;
       } else {
 	break;
       }

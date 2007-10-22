@@ -292,7 +292,7 @@ int *status              /* Global status (given and returned) */
    int dims[2];                    /* Extent of output image */
    AstFitsChan *fitschan;          /* FITS headers */
    int fitsfind;
-   char fitsrec[SC2STORE__MAXFITS][SZFITSCARD]; /* Store for FITS records */
+   char fitsrec[SC2STORE__MAXFITS*80+1]; /* Store for FITS records */
    int framesize;                  /* Number of points in a single `frame' */
    int i;                          /* Loop counter */
    double instap[2];               /* Instrument aperture */

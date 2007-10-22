@@ -236,12 +236,11 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int withHdr,
 
   /* Pasted from readsc2ndf */
   int colsize;               /* number of pixels in column */
-  char headrec[SC2STORE__MAXFITS][81];      /* FITS headers read from sc2store */
+  char fitsrec[SC2STORE__MAXFITS*80+1];      /* FITS headers read from sc2store */
   int maxlen = 81;           /* maximum length of a FITS header */
-  int nfits;                 /* number of FITS headers */
+  unsigned int nfits;        /* number of FITS headers */
   int nframes;               /* number of frames */
   int rowsize;               /* number of pixels in row (returned) */
-  char *phead = NULL;        /* Pointer to FITS headers */
   int flags = 0;             /* Flags for smf_create_smfData */
 
   int gndf;                  /* General purpose NDF identifier (SCU2RED & DREAM) */
@@ -496,9 +495,9 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int withHdr,
       tmpState = NULL;
 
       /* Read time series data from file */
-      sc2store_rdtstream( pname, "READ", SC2STORE_FLATLEN, maxlen,
+      sc2store_rdtstream( pname, "READ", SC2STORE_FLATLEN,
 			  SC2STORE__MAXFITS, 
-			  &nfits, headrec, &colsize, &rowsize, 
+			  &nfits, fitsrec, &colsize, &rowsize, 
 			  &nframes, &(da->nflat), da->flatname,
 			  &tmpState, &tdata, &dksquid, 
 			  &flatcal, &flatpar, &jigvert, &nvert, &jigpath, 
@@ -516,7 +515,6 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int withHdr,
 
 	/* Tdata is malloced by rdtstream for our use */
 	outdata[0] = tdata;
-	phead = &(headrec[0][0]);
 
 	/* Malloc local copies of the flatfield information.
 	   This allows us to close the file immediately so that
@@ -535,7 +533,7 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int withHdr,
 
 	/* Create a FitsChan from the FITS headers */
 	if (withHdr) {
-	  smf_fits_crchan( nfits, phead, &(hdr->fitshdr), status); 
+	  smf_fits_crchan( nfits, fitsrec, &(hdr->fitshdr), status); 
 
 	  /* Instrument must be SCUBA-2 */
 	  /* hdr->instrument = INST__SCUBA2; */
