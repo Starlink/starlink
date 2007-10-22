@@ -1,5 +1,5 @@
-#ifndef HEADGEN___src_sc2math_sc2math_h
-#define HEADGEN___src_sc2math_sc2math_h 
+#ifndef HEADGEN____sc2math_h
+#define HEADGEN____sc2math_h 
  
  
 /*+ sc2math_choles - Factorize symmetric positive definite matrix */
@@ -310,6 +310,34 @@ int nboll,         /* total number of bolometers (given) */
 int bol,           /* number of current bolometer (given) */
 int numsamples,    /* number of data samples (given) */
 double values[],   /* measurements by bolometer (given) */
+int ncal,          /* number of calibration measurements (given) */
+double heat[],     /* calibration heater settings (given) */
+double calval[],   /* calibration measurements for all bolometers (given) */
+double lincal[2],  /* calibration parameters (returned) */
+int *status        /* global status (given and returned) */
+);
+
+/*+ sc2math_setcaldec - set decreasing flatfield calibration */
+
+void sc2math_setcaldec
+( 
+int nboll,         /* total number of bolometers (given) */
+int bol,           /* number of current bolometer (given) */
+double dvalue,     /* representative data number (given) */
+int ncal,          /* number of calibration measurements (given) */
+double heat[],     /* calibration heater settings (given) */
+double calval[],   /* calibration measurements for all bolometers (given) */
+double lincal[2],  /* calibration parameters (returned) */
+int *status        /* global status (given and returned) */
+);
+
+/*+ sc2math_setcalinc - set increasing flatfield calibration */
+
+void sc2math_setcalinc
+( 
+int nboll,         /* total number of bolometers (given) */
+int bol,           /* number of current bolometer (given) */
+double dvalue,     /* representative data number (given) */
 int ncal,          /* number of calibration measurements (given) */
 double heat[],     /* calibration heater settings (given) */
 double calval[],   /* calibration measurements for all bolometers (given) */

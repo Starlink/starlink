@@ -13,6 +13,9 @@
 #include <math.h>
 #include "Dits_Err.h"
 #include "Ers.h"
+#include "sae_par.h"
+#include "prm_par.h"
+#include "dat_par.h"
 #include "sc2math.h"
 #include "dream_par.h"
 
@@ -687,8 +690,9 @@ int *status         /* global status (given and returned) */
 
    History :
     12Jul2005 : original (bdk)
-    05Oct2005 : generalise by adding flatname, nflat and fpar arguments
-                (bdk)
+    05Oct2005 : generalise by adding flatname, nflat and fpar arguments (bdk)
+    30Jul2007 : allow "NULL" flatfield - do nothing (bdk)
+    03Sep2007 : allow for bad values in linear coeffs (bdk)
 */
 
 {
@@ -743,10 +747,21 @@ int *status         /* global status (given and returned) */
 
          for ( j=0; j<nframes; j++ )
          {
-            inptr[j*nboll+i] = inptr[j*nboll+i] * lincal[1] + lincal[0];
+	    if ( ( lincal[0] == VAL__BADD ) || ( lincal[1] == VAL__BADD ) )
+	    {
+	       inptr[j*nboll+i] = VAL__BADD;
+	    }
+	    else
+	    {
+               inptr[j*nboll+i] = inptr[j*nboll+i] * lincal[1] + lincal[0];
+	    }
          }
       }
       free ( temp );
+   }
+   else if ( strcmp ( "NULL", flatname ) == 0 )
+   {
+/* Do nothing - just return the data unchanged */
    }
    else
    {
@@ -1217,6 +1232,7 @@ int *status           /* global status (given and returned) */
    History :
     20Oct2004 : original (bdk)
     13Mar2006 : copied from map.c (agg)
+    24Aug2007 : trap for noiseless data (bdk)
 */
 
 {
@@ -1253,7 +1269,14 @@ int *status           /* global status (given and returned) */
       rden += ximxm * ximxm;
    }
 
-   *grad = rnum / rden;
+   if ( fabs(rden) < 1.0e-10 )
+   {
+      *grad = 0.0;
+   }
+   else
+   {
+      *grad = rnum / rden;
+   }
    *cons = ym - (*grad) * xm;
 }
 
@@ -2177,7 +2200,7 @@ int *status        /* global status (given and returned) */
 /*  Description :
      Given calibration measurements plus actual measurements, select the
      section of the calibration which matches the actual measurements and
-     determine a suitable interpolation formulaa for calibrating the
+     determine a suitable interpolation formula for calibrating the
      actual measurents.
 
      The approach is to find three calibration measurements which bracket
@@ -2188,6 +2211,7 @@ int *status        /* global status (given and returned) */
      B.D.Kelly (ROE)
     History :
      12Aug2005:  original (bdk@roe.ac.uk)
+     03Sep2007:  allow for increasing and decreasing data numbers (bdk)
 */
 
 {
@@ -2206,17 +2230,74 @@ int *status        /* global status (given and returned) */
    }
    mean /= (double)numsamples;
 
+/* Choose interpolation point from calibration tables */
+
+   if ( calval[bol+nboll] > calval[bol] )
+   {
+      sc2math_setcalinc ( nboll, bol, mean, ncal, heat, calval, lincal, 
+        status );
+   }
+   else if ( calval[bol+nboll] < calval[bol] )
+   {
+      sc2math_setcaldec ( nboll, bol, mean, ncal, heat, calval, lincal, 
+        status );
+   }
+   else
+   {
+      lincal[0] = VAL__BADD;
+      lincal[1] = VAL__BADD;
+   }
+}
+
+
+/*+ sc2math_setcaldec - set decreasing flatfield calibration */
+
+void sc2math_setcaldec
+( 
+int nboll,         /* total number of bolometers (given) */
+int bol,           /* number of current bolometer (given) */
+double dvalue,     /* representative data number (given) */
+int ncal,          /* number of calibration measurements (given) */
+double heat[],     /* calibration heater settings (given) */
+double calval[],   /* calibration measurements for all bolometers (given) */
+double lincal[2],  /* calibration parameters (returned) */
+int *status        /* global status (given and returned) */
+)
+
+/*  Description :
+     Given calibration measurements plus a representative data number, 
+     select the section of the calibration which matches the data number and
+     determine a suitable interpolation formula for calibrating the
+     actual measurents.
+
+     The approach is to find two calibration measurements which bracket
+     the representative data number and determine coefficients for a
+     straight-line interpolation.
+
+    Authors :
+     B.D.Kelly (ROE)
+    History :
+     12Aug2005:  original (bdk@roe.ac.uk)
+     03Sep2007:  provide for increasing and decreasing data numbers (bdk)
+*/
+
+{
+   int j;
+
+   if ( !StatusOkP(status) ) return;
+
+
 /* Choose interpolation point from calibration tables 
    Note the tables are assumed to be in increasing order of power,
    decreasing order of data number */
 
-   if ( mean > calval[bol] )
+   if ( dvalue >= calval[bol] )
    {
       lincal[1] = ( heat[1] - heat[0] ) / 
         ( calval[bol+nboll] - calval[bol] );
       lincal[0] = heat[1] - lincal[1] * calval[bol+nboll];
    }
-   else if ( mean < calval[bol+(ncal-1)*nboll] )
+   else if ( dvalue <= calval[bol+(ncal-1)*nboll] )
    {
       lincal[1] = ( heat[ncal-1] - heat[ncal-2] ) / 
         ( calval[bol+(ncal-1)*nboll] - calval[bol+(ncal-2)*nboll] );
@@ -2226,7 +2307,7 @@ int *status        /* global status (given and returned) */
    {
       for ( j=1; j<ncal; j++ )
       {
-         if ( calval[bol+j*nboll] < mean )
+         if ( calval[bol+j*nboll] < dvalue )
          {
             lincal[1] = ( heat[j] - heat[j-1] ) / 
               ( calval[bol+j*nboll] - calval[bol+(j-1)*nboll] );
@@ -2236,6 +2317,82 @@ int *status        /* global status (given and returned) */
       }
    }
 }
+
+
+
+/*+ sc2math_setcalinc - set increasing flatfield calibration */
+
+void sc2math_setcalinc
+( 
+int nboll,         /* total number of bolometers (given) */
+int bol,           /* number of current bolometer (given) */
+double dvalue,     /* representative data number (given) */
+int ncal,          /* number of calibration measurements (given) */
+double heat[],     /* calibration heater settings (given) */
+double calval[],   /* calibration measurements for all bolometers (given) */
+double lincal[2],  /* calibration parameters (returned) */
+int *status        /* global status (given and returned) */
+)
+
+/*  Description :
+     Given calibration measurements plus a representative data number, 
+     select the section of the calibration which matches the data number and
+     determine a suitable interpolation formula for calibrating the
+     actual measurents.
+
+     The approach is to find two calibration measurements which bracket
+     the representative data number and determine coefficients for a
+     straight-line interpolation.
+
+    Authors :
+     B.D.Kelly (ROE)
+    History :
+     12Aug2005:  original (bdk@roe.ac.uk)
+     03Sep2007:  provide for increasing and decreasing data numbers (bdk)
+*/
+
+{
+   int j;
+
+   if ( !StatusOkP(status) ) return;
+
+
+/* Choose interpolation point from calibration tables 
+   Note the tables are assumed to be in increasing order of power,
+   increasing order of data number */
+
+   if ( dvalue <= calval[bol] )
+   {
+      lincal[1] = ( heat[1] - heat[0] ) / 
+        ( calval[bol+nboll] - calval[bol] );
+      lincal[0] = heat[1] - lincal[1] * calval[bol+nboll];
+   }
+   else if ( dvalue >= calval[bol+(ncal-1)*nboll] )
+   {
+      lincal[1] = ( heat[ncal-1] - heat[ncal-2] ) / 
+        ( calval[bol+(ncal-1)*nboll] - calval[bol+(ncal-2)*nboll] );
+      lincal[0] = heat[ncal-1] - lincal[1] * calval[bol+(ncal-1)*nboll];
+   }
+   else
+   {
+      for ( j=1; j<ncal; j++ )
+      {
+         if ( calval[bol+j*nboll] > dvalue )
+         {
+            lincal[1] = ( heat[j] - heat[j-1] ) / 
+              ( calval[bol+j*nboll] - calval[bol+(j-1)*nboll] );
+            lincal[0] = heat[j] - lincal[1] * calval[bol+j*nboll];
+            break;
+         }
+      }
+   }
+}
+
+
+
+
+
+
 
 /*+ sc2math_sigmaclip - do sigma clipping on a straight-line fit */
 
