@@ -12,12 +12,13 @@ SCRIPTS_GAIA = displaycat displaypolcat gaia.csh gaiacmap.sh gaiacut \
 edit = sed -e 's%@sharelibdir\@%$(libdir)%g' \
            -e 's%@TCL_PACKAGE_VERSION\@%$(TCL_PACKAGE_VERSION)%g'
 
-gaia.sh: $(srcdir)/gaia.sh.in
+##  Depend on something that changes when the version number is updated.
+gaia.sh: $(srcdir)/gaia.sh.in ../configure.ac
 	rm -f gaia.sh gaia.sh.tmp
 	$(edit) $(srcdir)/gaia.sh.in > gaia.sh.tmp
 	mv gaia.sh.tmp gaia.sh
 
-tabbedgaia.sh: $(srcdir)/tabbedgaia.sh.in
+tabbedgaia.sh: $(srcdir)/tabbedgaia.sh.in ../configure.ac
 	rm -f tabbedgaia.sh tabbedgaia.sh.tmp
 	$(edit) $(srcdir)/tabbedgaia.sh.in > tabbedgaia.sh.tmp
 	mv tabbedgaia.sh.tmp tabbedgaia.sh
