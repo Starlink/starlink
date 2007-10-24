@@ -1,6 +1,6 @@
       SUBROUTINE COF_NDF2F( NDF, FILNAM, NOARR, ARRNAM, BITPIX, BLOCKF,
-     :                      ORIGIN, PROFIT, PROEXT, PROHIS, SUMS, ENCOD, 
-     :                      NATIVE, FOPEN, FCLOSE, STATUS )
+     :                      ORIGIN, PROFIT, DUPLEX, PROEXT, PROHIS, 
+     :                      SUMS, ENCOD, NATIVE, FOPEN, FCLOSE, STATUS )
 *+
 *  Name:
 *     COF_NDF2F
@@ -13,8 +13,8 @@
 
 *  Invocation:
 *     CALL COF_NDF2F( NDF, FILNAM, NOARR, ARRNAM, BITPIX, BLOCKF,
-*                     ORIGIN, PROFIT, PROEXT, PROHIS, ENCOD, NATIVE, 
-*                     STATUS )
+*                     ORIGIN, PROFIT, DUPLEX, PROEXT, PROHIS, ENCOD, 
+*                     NATIVE, STATUS )
 
 *  Description:
 *     This routine converts an NDF into a FITS file.  It uses as much
@@ -32,9 +32,9 @@
 *        to zero, as it is used for the adjustable array ARRNAM; instead
 *        specify NOARR=1 and and set ARRNAM to 'HEADER'.
 *     ARRNAM( NOARR ) = CHARACTER * ( * ) (Given)
-*        The names of the NDF array components to write to the FITS
-*        file.  These should be in the order to be written.  If the
-*        Data component is present it should be first.
+*        The names (in uppercase) of the NDF array components to write 
+*        to the FITS file.  These should be in the order to be written. 
+*        If the DATA component is present it should be first.
 *     BITPIX = INTEGER (Given)
 *        The number of bits per pixel (FITS BITPIX) required for the
 *        output FITS file.  In addition there are three special values.
@@ -53,11 +53,17 @@
 *        This is used to create the ORIGIN card in the FITS header.
 *        A blank value gives a default of "Starlink Project, U.K.".
 *     PROFIT = LOGICAL (Given)
-*        If .TRUE., the contents of the FITS extension, if present, are
-*        merged into the FITS header.  Certain cards in this extension
+*        If .TRUE., the contents of the FITS airlock, if present, are
+*        merged into the FITS header.  Argument DUPLEX qualifies to
+*        which arrays this applies.  Certain cards in this extension
 *        are not propagated ever and others may only be propagated when
 *        certain standard items are not present in the NDF.  See routine
 *        COF_WHEAD for details.
+*     DUPLEX = LOGICAL (Give)
+*        This qualifies the effect of PROFIT=.TRUE.  A .FALSE. value
+*        means that the airlocks headers only appear with the primary 
+*        array.  Supplying .TRUE., propagates the FITS airlock headers 
+*        for other array components of the NDF.
 *     PROEXT = LOGICAL (Given)
 *        If .TRUE., the NDF extensions (other than the FITS extension)
 *        are propagated to the FITS files as FITS binary-table
@@ -115,12 +121,12 @@
 *        CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- are derived from
 *          the NDF axis structures if possible.  If no linear NDF axis
 *          structures are present, the values in the NDF's FITS 
-*          extension are copied (when argument PROFITS is .TRUE.).  If 
+*          extension are copied (when argument PROFIT is .TRUE.).  If 
 *          any axes are non-linear, all FITS axis information is lost.
 *        OBJECT, LABEL, BUNIT --- the values held in the NDF's title,
 *          label, and units components respectively are used if
 *          they are defined; otherwise any values found in the FITS
-*          extension are used (provided parameter PROFITS is true).
+*          extension are used (provided parameter PROFIT is .TRUE.).
 *        DATE --- is created automatically.
 *        ORIGIN --- inherits any existing ORIGIN card in the NDF FITS
 *          extension, unless you supply a value through argument
@@ -255,6 +261,8 @@
 *     2007 July 6 (MJC):
 *        Write CHECKSUM and DATASUM headers if new argument SUMS is
 *        .TRUE.
+*     2007 October 19 (MJC):
+*        Add DUPLEX argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -282,6 +290,7 @@
       INTEGER BLOCKF
       CHARACTER * ( * ) ORIGIN
       LOGICAL PROFIT
+      LOGICAL DUPLEX
       LOGICAL PROEXT
       LOGICAL PROHIS
       LOGICAL SUMS
@@ -586,7 +595,8 @@
 *
 *  Decide whether or not to propagate the FITS extension.  It will
 *  only appear in the primary array's header, if requested.
-         PROPEX = ( PROFIT .AND. ICOMP .EQ. 1 ) .OR. HDONLY
+         PROPEX = ( PROFIT .AND. ( ICOMP .EQ. 1 .OR. DUPLEX ) ) .OR. 
+     :            HDONLY
 
 *  Is this a multi-NDF container?
          MULTIN = .NOT. ( HDONLY .AND. FOPEN )

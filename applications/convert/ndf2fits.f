@@ -80,7 +80,7 @@
 *        and variance are to be converted if present.  During
 *        processing at least one, if not all, of the requested
 *        components must be present, otherwise an error is reported and
-*        processing turns to the next input NDF.  If the data component
+*        processing turns to the next input NDF.  If the DATA component
 *        is in the list, it will always be processed first into the
 *        FITS primary array.  The order of the variance and quality
 *        in COMP decides the order they will appear in the FITS file.
@@ -107,6 +107,11 @@
 *        separate integrations nodded along a slit or spatially.  Note 
 *        that this is not a group, so a single value applies to all the 
 *        supplied input files.  [FALSE]
+*     DUPLEX = _LOGICAL (Read)
+*        This qualifies the effect of PROFITS=TRUE.  DUPLEX=FALSE means 
+*        that the airlock headers only appear with the primary array.
+*        DUPLEX=TRUE, propagates the FITS airlock headers for other 
+*        array components of the NDF.  [FALSE]
 *     ENCODING = LITERAL (Read)
 *        Controls the FITS keywords which will be used to encode the 
 *        World Co-ordinate System (WCS) information within the FITS 
@@ -282,10 +287,13 @@
 *          the NDF WCS component if possible (see "World Co-ordinate
 *          Systems").  If this is not possible, and if PROFITS is TRUE, 
 *          then they are copied from the NDF's FITS extension.
-*        OBJECT, LABEL, BUNIT --- the values held in the NDF's title,
-*          label, and units components respectively are used if
+*        OBJECT, LABEL, BUNIT --- the values held in the NDF's TITLE,
+*          LABEL, and UNITS components respectively are used if
 *          they are defined; otherwise any values found in the FITS
 *          extension are used (provided parameter PROFITS is TRUE).
+*          For a variance array, BUNIT is assigned to "(<unit>)**2", 
+*          where <unit> is the DATA unit; the BUNIT header is absent
+*          for a quality array.
 *        DATE --- is created automatically.
 *        ORIGIN --- inherits any existing ORIGIN card in the NDF FITS
 *          extension, unless you supply a value through parameter
@@ -546,6 +554,8 @@
 *        Added FITS-WCS(CD) encoding.
 *     2007 July 6 (MJC):
 *        Added CHECKSUM parameter.
+*     2007 October 19 (MJC):
+*        Added DUPLEX parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -598,6 +608,7 @@
       CHARACTER * ( DAT__SZNAM ) CTYPE ! Component type
       CHARACTER * ( 3 ) COMPS    ! Array-component code
       LOGICAL DATSEL             ! True if DATA component was selected
+      LOGICAL DUPLEX             ! Propagate airlock for all array comp?
       CHARACTER * ( 15 ) ENCOD   ! FITS encoding requested for WCS info
       INTEGER FGROUP             ! Group identifier of default list of
                                  ! FITS files
@@ -1039,6 +1050,10 @@
 *  Determine whether or not the FITS extension is to be merged.
       CALL PAR_GET0L( 'PROFITS', PROFIT, STATUS )
 
+*  Determine whether or not the FITS extension is to be merged.
+      DUPLEX = .FALSE.
+      IF ( PROFIT ) CALL PAR_GET0L( 'DUPLEX', DUPLEX, STATUS )
+
 *  Determine whether or not other extensions are to be propagated.
       CALL PAR_GET0L( 'PROEXTS', PROEXT, STATUS )
 
@@ -1355,9 +1370,9 @@
 
 *  Finally convert the NDF to the FITS file, as best we can.
                CALL COF_NDF2F( NDF, FILNAM, NAPRES, ARRPRE, BITPIX, 
-     :                         BLOCKF, ORIGIN, PROFIT, PROEXT, PROHIS,
-     :                         CHECKS, ENCOD, NATIVE, FOPEN, FCLOSE, 
-     :                         STATUS )
+     :                         BLOCKF, ORIGIN, PROFIT, DUPLEX, PROEXT, 
+     :                         PROHIS, CHECKS, ENCOD, NATIVE, FOPEN,
+     :                         FCLOSE, STATUS )
 
 *  There are no arrays to transfer to the FITS file for the .HEADER
 *  NDF.
@@ -1371,15 +1386,16 @@
 
 *  Convert the NDF to the FITS file.
                CALL COF_NDF2F( NDF, FILNAM, 1, 'HEADER', -32, BLOCKF,
-     :                         ORIGIN, PROFIT, PROEXT, PROHIS, CHECKS,
-     :                         ENCOD, NATIVE, FOPEN, FCLOSE, STATUS )
+     :                         ORIGIN, PROFIT, DUPLEX, PROEXT, PROHIS, 
+     :                         CHECKS, ENCOD, NATIVE, FOPEN, FCLOSE,
+     :                         STATUS )
             ELSE
 
 *  Convert the NDF to the FITS file.
                CALL COF_NDF2F( NDF, FILNAM, NAPRES, ARRPRE, BITPIX,
-     :                         BLOCKF, ORIGIN, PROFIT, PROEXT, PROHIS,
-     :                         CHECKS, ENCOD, NATIVE, FOPEN, FCLOSE, 
-     :                         STATUS )
+     :                         BLOCKF, ORIGIN, PROFIT, DUPLEX, PROEXT,
+     :                         PROHIS, CHECKS, ENCOD, NATIVE, FOPEN,
+     :                         FCLOSE, STATUS )
             END IF
  
 *  Tidy the NDF.

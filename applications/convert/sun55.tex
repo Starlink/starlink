@@ -17,16 +17,16 @@
 {Copyright \copyright\ 2005 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {55.22}
+\newcommand{\stardocnumber}    {55.23}
 \newcommand{\stardocauthors}   {Malcolm J. Currie\\
                                 G.J.Privett\\
                                 A.J.Chipperfield\\
                                 D.S.Berry\\
                                 A.C.Davenhall}
-\newcommand{\stardocdate}      {2007 July 13}
+\newcommand{\stardocdate}      {2007 October 19}
 \newcommand{\stardoctitle}     {CONVERT\\
                                 A Format-conversion Package}
-\newcommand{\stardocversion}   {Version 1.5-10}
+\newcommand{\stardocversion}   {Version 1.5-11}
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {
 The \CONVERT\ package contains utilities for converting data files
@@ -2630,7 +2630,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
             ENCODINGS).
             \sstitem
             OBJECT, LABEL, BUNIT --- if present are equated to the NDF's
-            title, label, and units components respectively.
+            TITLE, LABEL, and UNITS components respectively.
             \sstitem
             LBOUND\textit{n} --- if present, this specifies the pixel origin
             for the $\textit{n}^{\rm th}$ dimension.
@@ -2685,11 +2685,11 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
             The conversion is similar to the general case, except
             the processing of FITS sub-files and HISTORY headers.
             \sstitem
-            An IMAGE sub-file converts to an NDF variance-array component,
+            An IMAGE sub-file converts to an NDF VARIANCE component,
             provided the keyword HDUCLAS2 is present and has a value that is
             either \texttt{'VARIANCE'} or \texttt{'ERROR'}.
             \sstitem
-            An IMAGE sub-file converts to an NDF quality-array component,
+            An IMAGE sub-file converts to an NDF QUALITY component,
             provided the keyword HDUCLAS2 is present and has value
             \texttt{'QUALITY'}.
             \sstitem
@@ -2974,8 +2974,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
                CTYPE\textit{n}, CUNIT\textit{n} are
                used to create the NDF axis centres, labels, and units.
                \sstitem
-               The OBJECT, LABEL, BUNIT keywords define the NDF's title,
-               label, and units components respectively, if they are defined.
+               The OBJECT, LABEL, BUNIT keywords define the NDF's TITLE,
+               LABEL, and UNITS components respectively, if they are defined.
                \sstitem
                HISTORY cards in a special format created by NDF2FITS are
                converted back into NDF history records.
@@ -3898,8 +3898,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
                and CDELT{\em{n}}, and must be ignored.
 
             \sstitem
-               If the input NDF contains TITLE, LABEL or UNITS components
-               these are stored with the keywords TITLE, LABEL or BUNIT
+               If the input NDF contains TITLE, LABEL, or UNITS components
+               these are stored with the keywords TITLE, LABEL, or BUNIT
                respectively.
 
             \sstitem
@@ -4250,7 +4250,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          both the data array and variance are to be converted if present.  
          During processing at least one, if not all, of the requested
          components must be present, otherwise an error is reported and
-         processing turns to the next input NDF.  If the data component
+         processing turns to the next input NDF.  If the DATA component
          is in the list, it will always be processed first into the
          FITS primary array.  The order of the variance and quality
          in COMP decides the order they will appear in the FITS file.
@@ -4281,6 +4281,15 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          represent separate integrations nodded along a slit or
          spatially.  Note that this is not a group, so a single value
          applies to all the supplied input files.  \texttt{[FALSE]}
+      }
+      \sstsubsection{
+         DUPLEX = \_LOGICAL (Read)
+      }{
+         This qualifies the effect of PROFITS=\texttt{TRUE}.  
+          DUPLEX=\texttt{FALSE} means that the airlock headers only appear
+          with the primary array.  DUPLEX=\texttt{TRUE}, propagates the 
+          FITS airlock headers for other array components of the NDF. 
+          \texttt{[FALSE]}
       }
       \sstsubsection{
          ENCODING = LITERAL (Read)
@@ -4546,10 +4555,13 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
               they are copied from the NDF's FITS extension.
 
             \sstitem
-            OBJECT, LABEL, BUNIT --- the values held in the NDF's title,
-              label, and units components respectively are used if
+            OBJECT, LABEL, BUNIT --- the values held in the NDF's TITLE,
+              LABEL, and UNITS components respectively are used if
               they are defined; otherwise any values found in the FITS
               extension are used (provided parameter PROFITS is \texttt{TRUE}).
+              For a variance array, BUNIT is assigned to 
+              \texttt{($<unit>$)**2}, where $<unit>$ is the DATA unit; the
+              BUNIT header is absent for a quality array.
 
             \sstitem
             DATE --- is created automatically.
@@ -5245,7 +5257,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 
          \sstitem
          HISTORY headers are propagated from the FITS extension when
-         PROFITS is \texttt{TRUE}, and from the NDF history component when
+         PROFITS is \texttt{TRUE}, and from the NDF HISTORY component when
          PROHIS is \texttt{TRUE}.
 
          \sstitem
@@ -6356,9 +6368,9 @@ the resulting file with IDL. The steps taken might be something like:
 \begin{quote} \begin{verbatim}
 % ndf2ascii in=imagein out=fileout  
 \end{verbatim} \end{quote}
-This will create a file, \texttt{fileout}, containing the data component 
-of the NDF called \texttt{imagein}. If you want to store the variance or 
-quality components you would use \texttt{comp=v} or \texttt{comp=q} respectively
+This will create a file, \texttt{fileout}, containing the DATA component 
+of the NDF called \texttt{imagein}. If you want to store the VARIANCE or 
+QUALITY components you would use \texttt{comp=v} or \texttt{comp=q} respectively
 as additional parameters.
 
 You can then employ a simple IDL batch file such as:
@@ -7176,5 +7188,15 @@ FITS files.
 \htmlref{NDF2FITS}{NDF2FITS} writes integrity check keywords CHECKSUM
 and DATASUM at the end of each header if new parameter CHECKSUMS is 
 \texttt{TRUE}.
+
+\section{Release Notes -- V1.5-11}
+
+\htmlref{NDF2FITS}{NDF2FITS} writes the correct BUNIT keyword value in 
+the IMAGE extension storing the VARIANCE component.  The BUNIT
+keyword is absent for a QUALITY array.
+
+There is a new DUPLEX parameter.  When set \texttt{TRUE} (and PROFITS
+is also \texttt{TRUE}), it permits the FITS airlock headers to appear
+also in the IMAGE extensions for the VARIANCE and QUALITY arrays.
 
 \end{document}

@@ -873,6 +873,8 @@ endinterface
 #        Added CONTAINER and MERGE.
 #     2007 July 6 (MJC):
 #        Added CHECKSUMS.
+#     2007 October 19 (MJC):
+#        Added DUPLEX.
 #     {enter_further_changes_here}
 
 #-
@@ -916,6 +918,14 @@ interface NDF2FITS
       prompt      'Are the input files multi-NDF containers?
       vpath       'DEFAULT'
       ppath       'CURRENT,DEFAULT'
+      default     FALSE
+      helpkey     '*'
+   endparameter
+
+   parameter      DUPLEX         # Propagate the FITS airlock for all arrays
+      type        '_LOGICAL'
+      prompt      'Merge the NDF FITS airlock in the FITS header for all array components?'
+      vpath       'DEFAULT'
       default     FALSE
       helpkey     '*'
    endparameter

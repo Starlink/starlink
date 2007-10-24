@@ -45,10 +45,10 @@
 *     NDF = INTEGER (Given)
 *        The identifier of the NDF.
 *     COMP = CHARACTER * ( * ) (Given)
-*        The array component to write to the HDU.  A special value of
-*        'HEADER' is also recognised; this indicates that no
-*        array-related headers such as BSCALE, BZEROm, and BLANK should
-*        be written, and sets keyword NAXIS to 0.
+*        The array component (in uppercase) to write to the HDU.  A 
+*        special value of 'HEADER' is also recognised; this indicates 
+*        that no array-related headers such as BSCALE, BZEROm, and 
+*        BLANK should be written, and sets keyword NAXIS to 0.
 *     FUNIT = INTEGER (Given)
 *        The logical unit number of the output FITS file.
 *     NFLAGS = INTEGER (Given)
@@ -96,6 +96,9 @@
 *        Use CNF_PVAL.
 *     2006 April 5 (MJC):
 *        Allow for COMP='HEADER'.
+*     2007 October 19 (MJC):
+*        Do not write BUNITS for QUALITY and square the units for
+*        VARIANCE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -156,11 +159,11 @@
 
 *  Local Variables:
       INTEGER   APNTR( NDF__MXDIM ) ! Pointers to NDF axis arrays
-      CHARACTER * ( NDF__SZTYP ) ATYPE ! Data type of the axis centres
+      CHARACTER*( NDF__SZTYP ) ATYPE ! Data type of the axis centres
       LOGICAL   AXIFND            ! NDF contains a linear axis comps.?
       LOGICAL   AXLFND            ! NDF contains axis label?
       LOGICAL   AXUFND            ! NDF contains axis units?
-      CHARACTER C*1               ! Accommodates character string
+      CHARACTER*1 C               ! Accommodates character string
       LOGICAL   DEFORG            ! NDF pixel origins are all 1?
       DOUBLE PRECISION DEND       ! End value for an axis-centre array
       INTEGER   DIMS( NDF__MXDIM ) ! NDF dimensions (axis length)
@@ -171,7 +174,7 @@
       LOGICAL   GOTWCS            ! Does NDF have a WCS component?
       INTEGER   I                 ! Loop variable
       REAL      INCREM            ! Incremental value for axis array
-      CHARACTER KEYWRD * ( SZKEY ) ! Accommodates keyword name
+      CHARACTER*( SZKEY ) KEYWRD  ! Accommodates keyword name
       LOGICAL   LABFND            ! True if NDF LABEL found
       INTEGER   LBND( NDF__MXDIM ) ! NDF lower bounds
       LOGICAL   LINEAR            ! An axis is linear?
@@ -184,8 +187,9 @@
       LOGICAL   THERE             ! NDF has FITS extension?
       LOGICAL   TITFND            ! NDF TITLE found?
       INTEGER   UBND( NDF__MXDIM ) ! NDF upper bounds
+      CHARACTER*28 UNICOM         ! BUNIT comment
       LOGICAL   UNTFND            ! NDF UNITS found?
-      CHARACTER VALUE * ( SZVAL ) ! Accommodates keyword value
+      CHARACTER*( SZVAL ) VALUE   ! Accommodates keyword value
 
 *  Declare and define the NUM_ type conversion functions.
       INCLUDE 'NUM_DEC_CVT'
@@ -549,10 +553,18 @@
 
 *  If an NDF label is found, this is copied to the FITS header card
 *  with keyword BUNIT.
-      IF ( THERE ) THEN
+      IF ( THERE .AND. COMP .NE. 'QUALITY' ) THEN
          CALL NDF_CGET( NDF, 'UNITS', VALUE, STATUS )
          CALL NDF_CLEN( NDF, 'UNITS', NCHAR, STATUS )
          KEYWRD = 'BUNIT  '
+
+         IF ( COMP .EQ. 'VARIANCE' ) THEN
+            VALUE = '('//VALUE( :NCHAR )//')**2'
+            NCHAR = NCHAR + 5
+            UNICOM = 'Units of the Variance array'
+         ELSE
+            UNICOM = 'Units of the primary array'
+         END IF
 
 *  Remove unprintable characters that are not permitted in FITS.
          CALL CHR_CLEAN( VALUE )
@@ -560,7 +572,7 @@
 *  Write the BUNIT card to the FITS header.  68 is the maximum number
 *  of characters that can be accommodated in a header card.
          CALL FTPKYS( FUNIT, KEYWRD, VALUE( :MIN( SZVAL, NCHAR ) ),
-     :                'Units of the primary array', FSTAT )
+     :                UNICOM, FSTAT )
 
 *  Record the fact that the title has been written.
          UNTFND = .TRUE.

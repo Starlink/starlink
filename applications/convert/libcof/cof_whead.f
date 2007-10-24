@@ -77,7 +77,10 @@
 *          to NDF and back to FITS.]
 *        OBJECT, LABEL, BUNIT --- the values held in NDF TITLE, LABEL,
 *          and UNITS respectively are used if present, otherwise any
-*          s found in the FITS extension are used.
+*          units found in the FITS extension are used.  For a variance
+*          array, BUNIT is assigned to "(<unit>)**2", where
+*          <unit> is the unit; for a quality array, the BUNIT header 
+*          is absent.
 *        DATE --- is created automatically.
 *        ORIGIN --- inherits any existing ORIGIN card in the NDF FITS
 *          extension, unless you supply a value through argument
@@ -154,6 +157,8 @@
 *        Added MULTI argument.  Moved code for HDSNAME and HDSTYPE from
 *        COF_NDF2F and filtered any existing keywords with those names
 *        in the FITS airlock.
+*     2007 October 19 (MJC):
+*        Revise documented BUNIT for VARIANCE and QUALITY.
 *     {enter_further_changes_here}
 
 *  Bugs:
