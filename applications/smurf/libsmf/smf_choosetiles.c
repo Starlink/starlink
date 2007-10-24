@@ -86,6 +86,9 @@
 *        coordinate system of th eexpanded tile area.
 *        - A pointer to a Grp group holding the names of the input files
 *        that have data falling within the extended tile area.
+*        - A pointer to an int array holding the zero-based index within the
+*        supplied group of input NDFs (igrp) corresponding to each name
+*        in the group described in the previous point.
 *        - An AST Mapping that describes the shift in origin of the GRID
 *        coordinate system from the full sized output array to the tile.
 
@@ -96,6 +99,10 @@
 *  History:
 *     24-AUG-2007 (DSB):
 *        Initial version.
+*     11-OCT-2007 (DSB):
+*        Added "jndf" compone to the smfTile structure. This holds the
+*        zero-based index within the supplied group of each input NDF that
+*        overlaps the tile.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -198,6 +205,10 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
    copy of the supplied group. */
          result->grp = grpCopy( igrp, 0, 0, 0, status );
          result->size = size;
+
+/* A NULL pointer for "jndf" means that the index of an NDF within a tile
+   is the same as within the group of all input NDFs. */
+         result->jndf = NULL;
       }
 
 /* If the tile size is positive, we split the output array into tiles... */
@@ -297,25 +308,27 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 /* Create a GRP group to hold the names of the input files that have data
    that falls within the bounds of the extended tile area. */
             tile->grp = grpNew( "", status );
-   
+            tile->jndf = astMalloc( sizeof( int )* size );
+            if( tile->jndf ) {   
+
 /* Find the input files that may overlap the current extended tile area. */
-            box = boxes;
-            tile->size = 0;
-            for( i = 1; i <= size; i++, box++ ){
+               box = boxes;
+               tile->size = 0;
+               for( i = 1; i <= size; i++, box++ ){
    
 /* Does the bounding box for the i'th input file overlap the extended
    tile area? If so, include the name of the input file in the group of 
    file names that contribute to the current tile. */
-               if( box->lbnd[ 0 ] < tile->eubnd[ 0 ] &&
-                   box->ubnd[ 0 ] > tile->elbnd[ 0 ] &&
-                   box->lbnd[ 1 ] < tile->eubnd[ 1 ] &&
-                   box->ubnd[ 1 ] > tile->elbnd[ 1 ] ) {
-   
-                  pname = filename;
-                  grpGet( igrp, i, 1, &pname, GRP__SZNAM, status );
-                  grpPut1( tile->grp, filename, 0, status );
-                  (tile->size)++;
-   
+                  if( box->lbnd[ 0 ] < tile->eubnd[ 0 ] &&
+                      box->ubnd[ 0 ] > tile->elbnd[ 0 ] &&
+                      box->lbnd[ 1 ] < tile->eubnd[ 1 ] &&
+                      box->ubnd[ 1 ] > tile->elbnd[ 1 ] ) {
+      
+                     pname = filename;
+                     grpGet( igrp, i, 1, &pname, GRP__SZNAM, status );
+                     grpPut1( tile->grp, filename, 0, status );
+                     tile->jndf[ (tile->size)++ ] = i;
+                  }
                }
             }
          }

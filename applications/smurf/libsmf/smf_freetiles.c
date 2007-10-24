@@ -39,6 +39,8 @@
 *  History:
 *     4-SEP-2007 (DSB):
 *        Initial version.
+*     11-OCT-2007 (DSB):
+*        Free "jndf" component of smfTile structure.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -91,6 +93,7 @@ smfTile *smf_freetiles( smfTile *tiles, int size, int *status ){
       if( tile->map2d ) tile->map2d = astAnnul( tile->map2d );
       if( tile->map3d ) tile->map3d = astAnnul( tile->map3d );
       if( tile->grp ) grpDelet( &(tile->grp), status );
+      if( tile->jndf ) tile->jndf = astFree( tile->jndf );
    }
 
 /* Free the memory used to hold the structures. */

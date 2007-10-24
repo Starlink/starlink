@@ -308,6 +308,7 @@ typedef struct smfTile {
   int glbnd[ 3 ];
   int gubnd[ 3 ];
   Grp *grp;
+  int *jndf;
   int size;
   AstMapping *map2d;
   AstMapping *map3d;

@@ -29,10 +29,21 @@
 
 *  Description:
 *     This routine converts one or more raw data cubes, spanned by
-*     (frequency, detector number, time) axes, into a single output cube
+*     (frequency, detector number, time) axes, into an output cube
 *     spanned by (celestial longitude, celestial latitude, frequency) axes.
 *
-*     The output can be either a regularly gridded tangent plane
+*     Optionally, the output cube can be split up into several separate
+*     NDFs, each containing a spatial tile extracted from the full cube
+*     (see parameter TILEDIMS). These tiles abut exactly in pixel 
+*     co-ordinates and can be combined (for example) using kappa PASTE.
+*
+*     In addition, there is an option to divide the output up into separate
+*     polarisation angle bins (see parameter POLBINSIZE). If this option
+*     is selected, each tile is split up into several output NDFs, each 
+*     one containing the input data relating to a particular range of
+*     polarisation angle. 
+*
+*     The full output cube can be either a regularly gridded tangent plane
 *     projection of the sky, or a sparse array (see parameter SPARSE).
 *     If a tangent plane projection is selected, the parameters of the 
 *     projection from sky to pixel grid coordinates can be specified using 
@@ -118,7 +129,7 @@
 *	   
 *          If a null (!) value is supplied, the positions will be stored 
 *          in the current Frame of the output NDF. [!]
-*     CATEPOCH = DOUBLE PRECISION (Read)
+*     CATEPOCH = _DOUBLE (Read)
 *          The epoch at which the sky positions stored in the output
 *          catalogue were determined. It will only be accessed if an epoch
 *          value is needed to qualify the co-ordinate Frame specified by 
@@ -126,7 +137,7 @@
 *          value, with or without decimal places ("1996.8" for example). 
 *          Such values are interpreted as a Besselian epoch if less than 
 *          1984.0 and as a Julian epoch otherwise. 
-*     CROTA = REAL (Read)
+*     CROTA = _REAL (Read)
 *          The angle, in degrees, from north through east (in the
 *          coordinate system specified by the SYSTEM parameter) to the second
 *          pixel axis in the output cube. The dynamic default value is
@@ -203,13 +214,20 @@
 *     NTILE = _INTEGER (Write)
 *          The number of output tiles used to hold the entire output
 *          array (see parameter TILEDIMS).
+*     NPOLBIN = _INTEGER (Write)
+*          The number of polarisation angle bins used to hold the entire 
+*          output data (see parameter POLBINSIZE).
 *     OUT = NDF (Write)
 *          Output file. If a null (!) value is supplied, the application
 *          will terminate early without creating an output cube, but
 *          without reporting an error. Note, the pixel bounds which the
 *          output cube would have had will still be written to output 
 *          parameters LBOUND and UBOUND, even if a null value is supplied
-*          for OUT.
+*          for OUT. If the output cube is split up into multiple output NDFs 
+*          (e.g. an NDF for each tile - see parameter TILEDIMS - or for each 
+*          polarisation angle bin - see parameter POLBINSIZE), then the
+*          value supplied for "OUT" will be used as the root name to which 
+*          other strings are appended to create the name of each output NDF.
 *     OUTCAT = FILENAME (Write)
 *          An output catalogue in which to store all the spatial detector 
 *          positions used to make the output cube (i.e. those selected using 
@@ -249,10 +267,28 @@
 *          spectra, good results are often obtained by approximately 
 *          matching the FWHM of the envelope function, given by PARAMS(2),
 *          to the point-spread function of the input data.  []
-*     PIXSIZE( 2 ) = REAL (Read)
+*     PIXSIZE( 2 ) = _REAL (Read)
 *          Pixel dimensions in the output image, in arcsec. If only one value 
 *          is supplied, the same value will be used for both axes. The 
 *          dynamic default value is determined by the AUTOGRID parameter. []
+*     POLBINSIZE = _REAL (Read)
+*          The size of the bins used for grouping polarisation analyser angles,
+*          in degrees. The "analyser angle" is the anti-clockwise angle
+*          from celestial north (in the system chosen by parameter SYSTEM) 
+*          to the axis of the "effective analyser" - a rotating analyser that
+*          would have the same effect as the combination of fixed analyser 
+*          and half-wave plate actually present in the polarimeter. The 
+*          supplied value for POLBINSIZE will be modified if required to
+*          ensure that a whole number of bins is used to cover the complete 
+*          range of analyser angles (0 to 360 degrees). A separate output
+*          cube will be created for each bin that is not empty, and each
+*          output NDF will contain a POLPACK extension suitable for use with 
+*          the POLPACK POLCAL command. The NDF name will be the same as
+*          the tile name but with "_p<N>" appended to the end, where "<N>" 
+*          is an integer bin index. The largest value of N is written to
+*          putput parameter NPOLBIN. If a null value (!) is supplied, then a 
+*          single output NDF (without POLPACK extension) is created for each 
+*          tile, containing all input data. [!]
 *     REFLAT = LITERAL (Read)
 *          The formatted celestial latitude value at the tangent point of 
 *          the spatial projection in the output cube. This should be provided 
@@ -576,6 +612,8 @@
 *        Use smf_accumulate_prov
 *     21-SEP-2007 (DSB):
 *        Move reporting of WCS bounds to be before the prompt for OUT.
+*     11-OCT-2007 (DSB):
+*        Create a separate output cube for each polarisation angle bin.
 *     19-OCT-2007 (DSB):
 *        - Added NUMTILES and TILENUM FITS headers.
 *        - Added SPECUNION parameter.
@@ -646,20 +684,21 @@ void smurf_makecube( int *status ) {
    AstFrame *ospecfrm = NULL; /* SpecFrame from the output WCS Frameset */
    AstFrame *tfrm = NULL;     /* Current Frame from output WCS */
    AstFrameSet *wcsout = NULL;/* WCS Frameset for output cube */
-   AstFrameSet *wcstile = NULL;/* WCS Frameset for output tile */
    AstFrameSet *wcsout2d = NULL;/* WCS Frameset describing 2D spatial axes */
+   AstFrameSet *wcstile = NULL;/* WCS Frameset for output tile */
    AstFrameSet *wcstile2d = NULL;/* WCS Frameset describing 2D spatial axes */
-   AstKeyMap *prvkeymap = NULL;  /* KeyMap to hold unique PRVnnnn headers */
    AstKeyMap *obskeymap = NULL;  /* KeyMap to hold unique OBSnnnn headers */
+   AstKeyMap *prvkeymap = NULL;  /* KeyMap to hold unique PRVnnnn headers */
    AstMapping *oskymap = NULL;/* GRID->SkyFrame Mapping from output WCS */
-   AstMapping *tskymap = NULL;/* GRID->SkyFrame Mapping from output tile WCS */
    AstMapping *ospecmap = NULL;/* GRID->SpecFrame Mapping from output WCS */
    AstMapping *tmap = NULL;   /* Base->current Mapping from output WCS */
+   AstMapping *tskymap = NULL;/* GRID->SkyFrame Mapping from output tile WCS */
    AstSkyFrame *abskyfrm = NULL;/* Output SkyFrame (always absolute) */
    AstSkyFrame *oskyfrm = NULL;/* SkyFrame from the output WCS Frameset */
    Grp *detgrp = NULL;        /* Group of detector names */
    Grp *igrp = NULL;          /* Group of input files */
    Grp *ogrp = NULL;          /* Group containing output file */
+   Grp *tgrp = NULL;          /* Temporary Group pointer */
    HDSLoc *smurf_xloc = NULL; /* HDS locator for output SMURF extension */
    HDSLoc *weightsloc = NULL; /* HDS locator of weights array */
    char *pname = NULL;        /* Name of currently opened data file */
@@ -667,6 +706,7 @@ void smurf_makecube( int *status ) {
    char pabuf[ 10 ];          /* Text buffer for parameter value */
    char system[ 10 ];         /* Celestial coord system for output cube */
    char tmpstr[10];           /* temporary unit string */
+   double *pangle;            /* Ptr to array holding angle for each pol bin */
    double corner[2];          /* WCS of a corner (SKY) */
    double fcon;               /* Tsys factor for file */
    double glbnd_out[ 3 ];     /* double prec Lower GRID bounds for output map */
@@ -683,49 +723,56 @@ void smurf_makecube( int *status ) {
    float *exp_array = NULL;   /* Pointer to array of exp times */
    float *ipd = NULL;         /* Pointer to the next output data value */
    float *ipt = NULL;         /* Pointer to the next Tsys value */
-   float *ipw = NULL;         /* Pointer to the next work value */
    float *ipv = NULL;         /* Pointer to the next output variance value */
+   float *ipw = NULL;         /* Pointer to the next work value */
    float *tsys_array = NULL;  /* Pointer to array of tsys values */
    float *var_array = NULL;   /* Pointer to temporary variance array */
    float *var_out = NULL;     /* Pointer to the output variance array */
    float *work2_array = NULL; /* Pointer to temporary work array */
+   float polbinsize;          /* Angular size of polarisation bins */
    float medeff;              /* Median effective integration time in output NDF. */
    float medexp;              /* Median exposure time in output NDF. */
    float medtsys;             /* Median system temperature in output NDF. */
    float teff;                /* Effective integration time */
    float var;                 /* Variance value */
+   int ***ptime;              /* Holds time slice indices for each bol bin */
+   int *pt;                   /* Holds time slice indices for each bol bin */
    int autogrid;              /* Determine projection parameters automatically? */
    int axes[ 2 ];             /* Indices of selected axes */
+   int badmask;               /* How is the output bad pixel mask chosen? */
    int blank;                 /* Was a blank line just output? */
    int blen;                  /* Used length of the "basename" string */
    int el0;                   /* Index of 2D array element */
    int el;                    /* Index of 3D array element */
    int flag;                  /* Is group expression to be continued? */
    int genvar;                /* How to create output Variances */
-   int hastsys;               /* Have some good Tsys values been found? */
    int hasoffexp;             /* Any ACS_OFFEXPOSURE values found in the i/p? */
+   int hastsys;               /* Have some good Tsys values been found? */
    int i;                     /* Loop index */
    int ifile;                 /* Input file index */
-   int itile;                 /* Output tile index */
-   int badmask;               /* How is the output bad pixel mask chosen? */
+   int iout;                  /* Index of next output NDF name */
    int is2d;                  /* Is the weights array 2-dimensional? */
    int ispec;                 /* Index of next spectrum within output NDF */
+   int itile;                 /* Output tile index */
+   int jin;                   /* Input NDF index within igrp */
    int lbnd_out[ 3 ];         /* Lower pixel bounds for full output map */
    int lbnd_wgt[ 4 ];         /* Lower pixel bounds for weight array */
    int moving;                /* Is the telescope base position changing? */
+   int naccept;               /* Number of accepted input spectra */
    int nbad;                  /* No. of o/p pixels with good data but bad variance */
    int ndet;                  /* Number of detectors supplied for "DETECTORS" */
    int nel;                   /* Number of elements in 3D array */
    int neluse;                /* Number of elements used */
    int ngood;                 /* No. of o/p pixels with good data */
    int nparam = 0;            /* No. of parameters required for spreading scheme */
+   int ipbin;                 /* Index of current polarisation angle bin */
+   int npbin;                 /* No. of polarisation angle bins */
    int npos;                  /* Number of samples included in output NDF */
-   int nwgtdim;               /* No. of axes in the weights array */
-   int naccept;               /* Number of accepted input spectra */
    int nreject;               /* Number of rejected input spectra */
    int ntile;                 /* Number of output tiles */
    int nused;                 /* No. of input samples pasted into output cube */
    int nval;                  /* Number of parameter values supplied */
+   int nwgtdim;               /* No. of axes in the weights array */
    int nxy;                   /* Number of elements in a 2D output tile */
    int ondf;                  /* Output NDF identifier */
    int outax[ 2 ];            /* Indices of corresponding output axes */
@@ -751,10 +798,11 @@ void smurf_makecube( int *status ) {
    smfData *tsysdata = NULL;  /* Pointer to o/p struct holding tsys array */
    smfData *wdata = NULL;     /* Pointer to o/p struct holding weights array */
    smfFile *file = NULL;      /* Pointer to data file struct */
+   smfTile *tile = NULL;      /* Pointer to next output tile description */
    smfTile *tiles = NULL;     /* Pointer to array of output tile descriptions */
-   smfTile *tile = NULL;      /* Pointer to next output tile description] */
    void *data_array = NULL;   /* Pointer to the rebinned map data */
    void *wgt_array = NULL;    /* Pointer to the weights map */
+
 
 #if defined(FPTRAP)
    feenableexcept(FE_DIVBYZERO|FE_INVALID|FE_OVERFLOW);
@@ -1160,6 +1208,28 @@ void smurf_makecube( int *status ) {
    astNorm( oskyfrm, corner );
    parPut1d( "FBL", 2, corner, status );
 
+/* Get the polarisation analyser angular bin size, and convert from
+   degrees to radians. Watch for null values, using zero bin size to flag
+   that polarisation analyser angle should be ignored. */
+   if( *status == SAI__OK ) {
+      parGet0r( "POLBINSIZE", &polbinsize, status );
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+         polbinsize = 0.0;
+      } else {
+         polbinsize *= AST__DD2R;
+      }
+   }   
+
+/* Choose a set of polarisation angle bins, and assign each time slice in
+   each input NDF to one of these bins. */
+   ptime = smf_choosepolbins( igrp, size, polbinsize, wcsout2d, &npbin, 
+                              &pangle, status ); 
+
+/* Write the number of polarisation angle bins being created to an output 
+   parameter. */
+   parPut0i( "NPOLBIN", npbin, status );
+
 /* Create a group holding the names of the output NDFs. Abort without error 
    if a null value is supplied. We first get the base name. If only 1
    tile is being created, we just use the base name as the output NDF name.
@@ -1173,6 +1243,7 @@ void smurf_makecube( int *status ) {
          goto L998;
       }
 
+/* Expand the group to hold an output NDF name fo reach tile. */
       if( ntile > 1 ) {
          pname = basename;
          grpGet( ogrp, 1, 1, &pname, GRP__SZNAM, status );
@@ -1184,8 +1255,33 @@ void smurf_makecube( int *status ) {
             sprintf( basename + blen, "_%d", itile + 1 );            
             grpPut1( ogrp, basename, 0, status );
          }
+         outsize = ntile;
+      } else {
+         outsize = 1;
+      }
+         
+/* Expand the group to hold an output NDF name for each polarisation bin
+   and tile. */
+      if( npbin > 1 ) {
+         tgrp = grpNew( "", status );
+         for( itile = 1; itile <= outsize; itile++ ) {
+            pname = basename;
+            grpGet( ogrp, itile, 1, &pname, GRP__SZNAM, status );
+            blen = astChrLen( basename );
+
+            for( ipbin = 0; ipbin < npbin; ipbin++ ){
+               sprintf( basename + blen, "_p%d", ipbin + 1 );            
+               grpPut1( tgrp, basename, 0, status );
+            }
+
+            grpDelet( &ogrp, status);
+            ogrp = tgrp;
+         }
       }
    }
+
+/* Initialise the index of the next output NDF name to use in "ogrp". */
+   iout = 1;
 
 /* Loop round, creating each tile of the output array. Each tile is
    initially made a little larger than required so that edge effects
@@ -1236,447 +1332,481 @@ void smurf_makecube( int *status ) {
       nxy = ( tile->eubnd[ 0 ] - tile->elbnd[ 0 ] + 1 )*
             ( tile->eubnd[ 1 ] - tile->elbnd[ 1 ] + 1 );
 
-/* Create the output NDF to hold the tile. */
-      smfflags = 0;
-      if( genvar && !is2d ) smfflags |= SMF__MAP_VAR;
-      smf_open_newfile( ogrp, itile, SMF__FLOAT, 3, tile->elbnd, tile->eubnd, 
-                        smfflags, &odata, status );
+/* Loop to create a separate output cube for each polarisation bin. */
+      for( ipbin = 0; ipbin < npbin && *status == SAI__OK; ipbin++ ) {
+         if( npbin > 1 ) {
+            if( !blank ) msgBlank( status );
+            msgSeti( "I", ipbin + 1 );
+            msgSeti( "N", npbin );
+            msgOutif( MSG__NORM, "PBIN_MSG1", "      Polarisation bin ^I of "
+                      "^N...", status );
+            msgBlank( status );
+            blank = 1;
+         }
+
+/* Create the output NDF to hold the tile data relating to the current
+   polarisation angle bin. */
+         smfflags = 0;
+         if( genvar && !is2d ) smfflags |= SMF__MAP_VAR;
+         smf_open_newfile( ogrp, iout++, SMF__FLOAT, 3, tile->elbnd, 
+                           tile->eubnd, smfflags, &odata, status );
 
 /* Abort if an error has occurred. */
-      if( *status != SAI__OK ) goto L999;
+         if( *status != SAI__OK ) goto L999;
 
 /* Save some useful pointers. */
-      file = odata->file;
-      ondf = file->ndfid;
-
+         file = odata->file;
+         ondf = file->ndfid;
+   
 /* Create a history component in the output NDF. */
-      ndfHcre( ondf, status );
-
+         ndfHcre( ondf, status );
+   
 /* Copy the Label and Unit strings from the first input NDF, and check
    that all input NDFs have the same Label and Unit strings. */
-      smf_labelunit( igrp, size, odata, status );
-
+         smf_labelunit( igrp, size, odata, status );
+   
 /* Get a pointer to the mapped output data array. */
-      data_array = (odata->pntr)[ 0 ];
-
+         data_array = (odata->pntr)[ 0 ];
+   
 /* If a 3D weights array is being used, the variance will be evaluated for 
    each individual pixel in the output cube. In this case we will have 
    mapped the Variance component in the output cube, so store a pointer to 
    it. */
-      if( !is2d ) {
-         var_array = (odata->pntr)[ 1 ];
-
+         if( !is2d ) {
+            var_array = (odata->pntr)[ 1 ];
+   
 /* Otherwise, the variance is assumed to be the same in every spatial
    slice, so we only need memory to hold one spatial slice (this slice is
    later copied to all slices in the output cube Variance component).
    Also allocate some work arrays of the same size. */
-      } else if( genvar ) {
-         var_array = (float *) astMalloc( nxy*sizeof( float ) );
-      }
-
+         } else if( genvar ) {
+            var_array = (float *) astMalloc( nxy*sizeof( float ) );
+         }
+   
 /* If we are producing a regularly gridded output NDF, we need to
    allocate a work array. */
-      if( !sparse ) {   
-
+         if( !sparse ) {   
+   
 /* Assume for the moment that the weights array is 2-dimensional (i.e. a
    single spatial plane of the output). Store its bounds and calculate its 
    total size in pixels. */
-         nwgtdim = 2;
-         lbnd_wgt[ 0 ] = tile->elbnd[ 0 ];
-         lbnd_wgt[ 1 ] = tile->elbnd[ 1 ];
-         ubnd_wgt[ 0 ] = tile->eubnd[ 0 ];
-         ubnd_wgt[ 1 ] = tile->eubnd[ 1 ];
-         wgtsize = ubnd_wgt[ 0 ] - lbnd_wgt[ 0 ] + 1;
-         wgtsize *= ubnd_wgt[ 1 ] - lbnd_wgt[ 1 ] + 1;
-
+            nwgtdim = 2;
+            lbnd_wgt[ 0 ] = tile->elbnd[ 0 ];
+            lbnd_wgt[ 1 ] = tile->elbnd[ 1 ];
+            ubnd_wgt[ 0 ] = tile->eubnd[ 0 ];
+            ubnd_wgt[ 1 ] = tile->eubnd[ 1 ];
+            wgtsize = ubnd_wgt[ 0 ] - lbnd_wgt[ 0 ] + 1;
+            wgtsize *= ubnd_wgt[ 1 ] - lbnd_wgt[ 1 ] + 1;
+   
 /* If the weights array is in fact 3D, increase its total size and
    increment the number of axes in the weights array. */
-         if( !is2d ) {
-            nwgtdim = 3;
-            lbnd_wgt[ 2 ] = tile->elbnd[ 2 ];
-            ubnd_wgt[ 2 ] = tile->eubnd[ 2 ];
-            wgtsize *= ubnd_wgt[ 2 ] - lbnd_wgt[ 2 ] + 1;
-         }
-
+            if( !is2d ) {
+               nwgtdim = 3;
+               lbnd_wgt[ 2 ] = tile->elbnd[ 2 ];
+               ubnd_wgt[ 2 ] = tile->eubnd[ 2 ];
+               wgtsize *= ubnd_wgt[ 2 ] - lbnd_wgt[ 2 ] + 1;
+            }
+   
 /* If output variances are being created from the spread of input values,
    the weights array needs to be twice the size determined above.
    Implement this as an extra trailing axis with bounds [1:2]. */
-         if( genvar == 1 ) {
-            lbnd_wgt[ nwgtdim ] = 1;
-            ubnd_wgt[ nwgtdim ] = 2;
-            nwgtdim++;
-            wgtsize *= 2;
-         }
-
+            if( genvar == 1 ) {
+               lbnd_wgt[ nwgtdim ] = 1;
+               ubnd_wgt[ nwgtdim ] = 2;
+               nwgtdim++;
+               wgtsize *= 2;
+            }
+   
 /* Create the NDF extension, or allocate the work space, as required. */
-         if( savewgt ) {
-            weightsloc = smf_get_xloc ( odata, "ACSISRED", "WT_ARR", "WRITE", 
-                                        0, 0, status );
-            smf_open_ndfname ( weightsloc, "WRITE", NULL, "WEIGHTS", "NEW", 
-                               "_DOUBLE", nwgtdim, (int *) lbnd_wgt, 
-                               (int *) ubnd_wgt, &wdata, status );
-            if( wdata ) wgt_array = (wdata->pntr)[ 0 ];
-      
-         } else {
-            wgt_array = astMalloc( sizeof( double )*(size_t)wgtsize );
+            if( savewgt ) {
+               weightsloc = smf_get_xloc ( odata, "ACSISRED", "WT_ARR", "WRITE", 
+                                           0, 0, status );
+               smf_open_ndfname ( weightsloc, "WRITE", NULL, "WEIGHTS", "NEW", 
+                                  "_DOUBLE", nwgtdim, (int *) lbnd_wgt, 
+                                  (int *) ubnd_wgt, &wdata, status );
+               if( wdata ) wgt_array = (wdata->pntr)[ 0 ];
+         
+            } else {
+               wgt_array = astMalloc( sizeof( double )*(size_t)wgtsize );
+            }
          }
-      }
-
+   
 /* Create a SMURF extension in the output NDF and create three 2D NDFs in 
    the extension; one for the total exposure time ("on+off"), one for the 
    "on" time, and one for the Tsys values. Each of these 2D NDFs inherits 
    the spatial bounds of the main output NDF. Note, the Tsys array also 
    needs variances to be calculated. Include spatial WCS in each NDF. */
-      smurf_xloc = smf_get_xloc ( odata, "SMURF", "SMURF", "WRITE", 
-                                  0, 0, status );
-
-      smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "EXP_TIME", "NEW", 
-                         "_REAL", 2, (int *) tile->elbnd, 
-                         (int *) tile->eubnd, &expdata, status );
-      if( expdata ) {
-         exp_array = (expdata->pntr)[ 0 ];
-         ndfPtwcs( wcstile2d, expdata->file->ndfid, status );
-      }
-
-      smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "EFF_TIME", "NEW", 
-                         "_REAL", 2, (int *) tile->elbnd, 
-                         (int *) tile->eubnd, &effdata, status );
-      if( effdata ) {
-         eff_array = (effdata->pntr)[ 0 ];
-         ndfPtwcs( wcstile2d, effdata->file->ndfid, status );
-      }
-
-      if( genvar ) {
-         smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "TSYS", "NEW", 
+         smurf_xloc = smf_get_xloc ( odata, "SMURF", "SMURF", "WRITE", 
+                                     0, 0, status );
+   
+         smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "EXP_TIME", "NEW", 
                             "_REAL", 2, (int *) tile->elbnd, 
-                            (int *) tile->eubnd, &tsysdata, status );
-         if( tsysdata ) {
-            tsys_array = (tsysdata->pntr)[ 0 ];
-            ndfPtwcs( wcstile2d, tsysdata->file->ndfid, status );
+                            (int *) tile->eubnd, &expdata, status );
+         if( expdata ) {
+            exp_array = (expdata->pntr)[ 0 ];
+            ndfPtwcs( wcstile2d, expdata->file->ndfid, status );
          }
-      }
-
+   
+         smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "EFF_TIME", "NEW", 
+                            "_REAL", 2, (int *) tile->elbnd, 
+                            (int *) tile->eubnd, &effdata, status );
+         if( effdata ) {
+            eff_array = (effdata->pntr)[ 0 ];
+            ndfPtwcs( wcstile2d, effdata->file->ndfid, status );
+         }
+   
+         if( genvar ) {
+            smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "TSYS", "NEW", 
+                               "_REAL", 2, (int *) tile->elbnd, 
+                               (int *) tile->eubnd, &tsysdata, status );
+            if( tsysdata ) {
+               tsys_array = (tsysdata->pntr)[ 0 ];
+               ndfPtwcs( wcstile2d, tsysdata->file->ndfid, status );
+            }
+         }
+   
 /* Invert the output sky mapping so that it goes from sky to pixel
    coords. */
-      astInvert( tskymap );
-
+         astInvert( tskymap );
+   
 /* Create provenance keymap */
-      prvkeymap = astKeyMap( "" );
-
+         prvkeymap = astKeyMap( "" );
+   
 /* Loop round all the input files that overlap this tile, pasting each one 
    into the output NDF. */
-      naccept = 0;
-      nreject = 0;
-      nused = 0;
-      ispec = 0;
-      for( ifile = 1; ifile <= tile->size && *status == SAI__OK; ifile++ ) {
+         naccept = 0;
+         nreject = 0;
+         nused = 0;
+         ispec = 0;
+         for( ifile = 1; ifile <= tile->size && *status == SAI__OK; ifile++ ) {
+
+/* Get the zero-based index of the current input file (ifile) within the 
+   group of input NDFs (igrp). */
+            jin = ( tile->jndf ) ? tile->jndf[ ifile - 1 ] : ifile - 1;
+   
+/* Does this input NDF have any time slices that fall within the current
+   polarisation bin? Look at the first used time slice index for this
+   input NDF and polarisation angle bin. Only proceed if it is legal.
+   Otherwise, pass on to the next input NDF. */
+            pt = ptime ?  ptime[ jin ][ ipbin ] : NULL;
+            if( !pt || pt[ 0 ] < VAL__MAXI ) {
 
 /* Obtain information about the current input NDF. */
-         smf_open_file( tile->grp, ifile, "READ", 1, &data, status );
-
+               smf_open_file( tile->grp, ifile, "READ", 1, &data, status );
+      
 /* Issue a suitable message and abort if anything went wrong. */
-         if( *status != SAI__OK ) {
-            errRep( FUNC_NAME, "Could not open input data file.", status );
-            break;
-   
-         } else {
-            if( data->file == NULL ) {
-               *status = SAI__ERROR;
-               errRep( FUNC_NAME, "No smfFile associated with smfData.", 
-                       status );
-               break;
-   
-            } else if( data->hdr == NULL ) {
-               *status = SAI__ERROR;
-               errRep( FUNC_NAME, "No smfHead associated with smfData.", 
-                       status );
-               break;
-   
-            } 
-         }
-   
+               if( *status != SAI__OK ) {
+                  errRep( FUNC_NAME, "Could not open input data file.", status );
+                  break;
+         
+               } else {
+                  if( data->file == NULL ) {
+                     *status = SAI__ERROR;
+                     errRep( FUNC_NAME, "No smfFile associated with smfData.", 
+                             status );
+                     break;
+         
+                  } else if( data->hdr == NULL ) {
+                     *status = SAI__ERROR;
+                     errRep( FUNC_NAME, "No smfHead associated with smfData.", 
+                             status );
+                     break;
+         
+                  } 
+               }
+         
 /* Report the name of the input file. */
-         pname =  data->file->name;
-         msgSetc( "FILE", pname );
-         msgSeti( "THISFILE", ifile );
-         msgSeti( "NUMFILES", tile->size );
-         msgOutif( MSG__VERB, " ", 
-                   "SMURF_MAKECUBE: Processing ^THISFILE/^NUMFILES ^FILE",
-                   status );
-   
+               pname =  data->file->name;
+               msgSetc( "FILE", pname );
+               msgSeti( "THISFILE", ifile );
+               msgSeti( "NUMFILES", tile->size );
+               msgOutif( MSG__VERB, " ", 
+                         "SMURF_MAKECUBE: Processing ^THISFILE/^NUMFILES ^FILE",
+                         status );
+
 /* Store the filename in the keymap for later - the GRP would be fine
    as is but we use a keymap in order to reuse smf_fits_add_prov */
-         smf_accumulate_prov( prvkeymap, data->file, NULL, 0, status );
-
+               smf_accumulate_prov( prvkeymap, data->file, NULL, 0, status );
+      
 /* Check that the input data type is single precision. */
-         if( data->dtype != SMF__FLOAT ) {
-            if( *status == SAI__OK ) {
-               msgSetc( "FILE", pname );
-               msgSetc( "DTYPE", smf_dtype_string( data, status ) );
-               *status = SAI__ERROR;
-               errRep( FUNC_NAME, "^FILE has ^DTYPE data type, should "
-                       "be REAL.",  status );
-            }
-            break;
-         }     
-   
+               if( data->dtype != SMF__FLOAT ) {
+                  if( *status == SAI__OK ) {
+                     msgSetc( "FILE", pname );
+                     msgSetc( "DTYPE", smf_dtype_string( data, status ) );
+                     *status = SAI__ERROR;
+                     errRep( FUNC_NAME, "^FILE has ^DTYPE data type, should "
+                             "be REAL.",  status );
+                  }
+                  break;
+               }     
+         
 /* If the detector positions are to calculated on the basis of FPLANEX/Y
    rather than detpos, then free the detpos array in the smfHead
    structure. This will cause smf_tslice_ast to use the fplanex/y values. */
-         if( !usedetpos && data->hdr->detpos ) {
-            smf_free( (double *) data->hdr->detpos, status );      
-            data->hdr->detpos = NULL;
-         }
-   
+               if( !usedetpos && data->hdr->detpos ) {
+                  smf_free( (double *) data->hdr->detpos, status );      
+                  data->hdr->detpos = NULL;
+               }
+         
 /* Handle output FITS header creation/manipulation */
-         smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obskeymap, status );
-   
+               smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obskeymap, status );
+         
 /* Rebin the data into the output grid. */
-         if( !sparse ) {
-            smf_rebincube( data, ifile, size, badmask, is2d, abskyfrm, tskymap,
-                           ospecfrm, ospecmap, detgrp, moving, use_wgt, tile->elbnd, 
-                           tile->eubnd, spread, params, genvar, data_array, 
-                           var_array, wgt_array, exp_array, eff_array, &fcon, 
-                           &nused, &nreject, &naccept, status );
-   
-         } else {
-            smf_rebinsparse( data, ifile, ospecfrm, ospecmap, abskyfrm, detgrp,
-                             tile->elbnd, tile->eubnd, genvar, data_array, var_array, 
-                             &ispec, exp_array, eff_array, &fcon, status );
-         }
-      
-         blank = 0;
-   
+               if( !sparse ) {
+                  smf_rebincube( data, ifile, size, pt, 
+                                 badmask, is2d, abskyfrm, tskymap, ospecfrm, 
+                                 ospecmap, detgrp, moving, use_wgt, tile->elbnd, 
+                                 tile->eubnd, spread, params, genvar, data_array, 
+                                 var_array, wgt_array, exp_array, eff_array, &fcon, 
+                                 &nused, &nreject, &naccept, status );
+         
+               } else {
+                  smf_rebinsparse( data, ifile, pt, 
+                                   ospecfrm, ospecmap, abskyfrm, detgrp,
+                                   tile->elbnd, tile->eubnd, genvar, data_array, var_array, 
+                                   &ispec, exp_array, eff_array, &fcon, status );
+               }
+            
+               blank = 0;
+         
 /* Close the input data file. */
+               if( data != NULL ) {
+                  smf_close_file( &data, status );
+                  data = NULL;
+               }
+            }
+         }
+   
+/* Tell the user how many input spectra were rejected. */
+         if( nreject > 0 ) {
+            if( !blank ) msgBlank( status );
+            msgSeti( "N", nreject );
+            msgSeti( "T", naccept + nreject );
+            msgOutif( MSG__NORM, " ", "WARNING: ^N out of the ^T input spectra "
+                      "were ignored because they included unexpected bad pixel "
+                      "values.", status );
+            msgBlank( status );
+            blank = 1;
+         }
+   
+/* Arrive here if an error occurs. */
+   L999:;
+   
+/* Close the input data file that remains open due to an early exit from
+   the above loop. */
          if( data != NULL ) {
             smf_close_file( &data, status );
             data = NULL;
          }
-      }
-
-/* Tell the user how many input spectra were rejected. */
-      if( nreject > 0 ) {
-         if( !blank ) msgBlank( status );
-         msgSeti( "N", nreject );
-         msgSeti( "T", naccept + nreject );
-         msgOutif( MSG__NORM, " ", "WARNING: ^N out of the ^T input spectra "
-                   "were ignored because they included unexpected bad pixel "
-                   "values.", status );
-         msgBlank( status );
-         blank = 1;
-      }
-
-/* Arrive here if an error occurs. */
-L999:;
-
-/* Close the input data file that remains open due to an early exit from
-   the above loop. */
-      if( data != NULL ) {
-         smf_close_file( &data, status );
-         data = NULL;
-      }
-
+   
 /* Store the WCS FrameSet in the output NDF (if any). */
-      if( wcstile ) ndfPtwcs( wcstile, ondf, status );
-
+         if( wcstile ) ndfPtwcs( wcstile, ondf, status );
+   
 /* If we are creating an output Variance component... */
-      if( genvar && *status == SAI__OK) {
-
+         if( genvar && *status == SAI__OK) {
+   
 /* Count the number of pixel which have a good data value but a bad
    variance value, and count the number which have a good data value. 
    If the weights array is 2-dimensional, cycle through the 2D variance 
    array as we move through the entire 3D output data array. */
-         ngood = 0;
-         nbad = 0;
-         ipd = (float *) data_array;
-         ipv = (float *) var_array;
-         nel = nxy*( tile->eubnd[ 2 ] - tile->elbnd[ 2 ] + 1 );
-   
-         if( !is2d ) {
-   
-            for( el = 0; el < nel; el++, ipd++,ipv++ ) {
-               if( *ipd != VAL__BADR ) {
-                  ngood++;
-                  if( *ipv == VAL__BADR ) nbad++;
-               }
-            }
-   
-         } else {
-   
-            for( el = 0; el < nel; el++, ipd++,ipv++ ) {
-               if( el % nxy == 0 ) ipv = (float *) var_array;
-               if( *ipd != VAL__BADR ) {
-                  ngood++;
-                  if( *ipv == VAL__BADR ) nbad++;
-               }
-            }
-         }
-   
-/* If more than 50% of the good data values have bad variance values,
-      we will erase the variance component. */
-         if( nbad > 0.5*ngood ) {
-            if( !blank ) msgBlank( status );
-            msgOutif( MSG__NORM, " ", "WARNING: More than 50% of the good "
-                      "output data values have bad variances. The output "
-                      "NDF will not contain a Variance array.", status );
-            msgBlank( status );
-            blank = 1;
-   
+            ngood = 0;
+            nbad = 0;
+            ipd = (float *) data_array;
+            ipv = (float *) var_array;
+            nel = nxy*( tile->eubnd[ 2 ] - tile->elbnd[ 2 ] + 1 );
+      
             if( !is2d ) {
-               ndfUnmap( ondf, "Variance", status );
-               ndfReset( ondf, "Variance", status );
-               (odata->pntr)[ 1 ] = NULL;
-               var_array = NULL;
-   
-            } else {
-               var_array = (float *) astFree( var_array );
-            }
-   
-            genvar = 0;
-     
-/* Otherwise, if the output variances are the same for every spatial slice, the
-      "var_array" used above will be a 2D array holding a single slice of the 3D
-      Variance array. In this case we now copy this slice to the output cube. */
-         } else if( is2d ) {
-            ndfMap( ondf, "Variance", "_REAL", "WRITE", (void **) &var_out, &nel, 
-                    status );
-            if( var_out && *status == SAI__OK ) {
-               ipd = (float *) data_array;
-               ipv = (float *) var_out;
-               el0 = 0;
-               for( el = 0; el < nel; el++, el0++, ipd++, ipv++ ) {
-                  if( el0 == nxy ) el0 = 0;
+      
+               for( el = 0; el < nel; el++, ipd++,ipv++ ) {
                   if( *ipd != VAL__BADR ) {
-                     *ipv = var_array[ el0 ];
-                  } else {
-                     *ipv = VAL__BADR;
-                  }
-               }
-            }
-   
-/* If all the input files had the same backend degradation factor and
-      channel width, calculate a 2D array of Tsys values for the output
-      cube. */
-            if( fcon != VAL__BADD ) {
-               for( el0 = 0; el0 < nxy; el0++ ) {
-                  teff = eff_array[ el0 ];
-                  var = var_array[ el0 ];
-                  if( teff != VAL__BADR && teff > 0.0 && 
-                      var != VAL__BADR && var > 0.0 ) {
-                     tsys_array[ el0 ] = sqrt( 0.25*var*teff/fcon );
-                  } else {
-                     tsys_array[ el0 ] = VAL__BADR;
+                     ngood++;
+                     if( *ipv == VAL__BADR ) nbad++;
                   }
                }
       
             } else {
+      
+               for( el = 0; el < nel; el++, ipd++,ipv++ ) {
+                  if( el % nxy == 0 ) ipv = (float *) var_array;
+                  if( *ipd != VAL__BADR ) {
+                     ngood++;
+                     if( *ipv == VAL__BADR ) nbad++;
+                  }
+               }
+            }
+      
+/* If more than 50% of the good data values have bad variance values,
+   we will erase the variance component. */
+            if( nbad > 0.5*ngood ) {
+               if( !blank ) msgBlank( status );
+               msgOutif( MSG__NORM, " ", "WARNING: More than 50% of the good "
+                         "output data values have bad variances. The output "
+                         "NDF will not contain a Variance array.", status );
+               msgBlank( status );
+               blank = 1;
+      
+               if( !is2d ) {
+                  ndfUnmap( ondf, "Variance", status );
+                  ndfReset( ondf, "Variance", status );
+                  (odata->pntr)[ 1 ] = NULL;
+                  var_array = NULL;
+      
+               } else {
+                  var_array = (float *) astFree( var_array );
+               }
+      
+               genvar = 0;
+        
+/* Otherwise, if the output variances are the same for every spatial slice, the
+   "var_array" used above will be a 2D array holding a single slice of the 3D
+   Variance array. In this case we now copy this slice to the output cube. */
+            } else if( is2d ) {
+               ndfMap( ondf, "Variance", "_REAL", "WRITE", (void **) &var_out, &nel, 
+                       status );
+               if( var_out && *status == SAI__OK ) {
+                  ipd = (float *) data_array;
+                  ipv = (float *) var_out;
+                  el0 = 0;
+                  for( el = 0; el < nel; el++, el0++, ipd++, ipv++ ) {
+                     if( el0 == nxy ) el0 = 0;
+                     if( *ipd != VAL__BADR ) {
+                        *ipv = var_array[ el0 ];
+                     } else {
+                        *ipv = VAL__BADR;
+                     }
+                  }
+               }
+      
+/* If all the input files had the same backend degradation factor and
+   channel width, calculate a 2D array of Tsys values for the output
+   cube. */
+               if( fcon != VAL__BADD ) {
+                  for( el0 = 0; el0 < nxy; el0++ ) {
+                     teff = eff_array[ el0 ];
+                     var = var_array[ el0 ];
+                     if( teff != VAL__BADR && teff > 0.0 && 
+                         var != VAL__BADR && var > 0.0 ) {
+                        tsys_array[ el0 ] = sqrt( 0.25*var*teff/fcon );
+                     } else {
+                        tsys_array[ el0 ] = VAL__BADR;
+                     }
+                  }
+         
+               } else {
+                  for( el0 = 0; el0 < nxy; el0++ ) {
+                     tsys_array[ el0 ] = VAL__BADR;
+                  }
+               }
+      
+/* Free the memory used to store the 2D variance information. */
+               var_array = astFree( var_array );
+      
+/* For 3D variances, the output Tsys values are based on the mean
+   variance in every output spectrum. */
+            } else if( fcon != VAL__BADD ) {
+      
+               work2_array = astMalloc( nxy*sizeof( float ) );
+               if( work2_array ) {
+                  ipw = work2_array;
+                  ipt = tsys_array;
+                  for( el = 0; el < nxy; el++ ) {
+                     *(ipw++) = 0.0;
+                     *(ipt++) = 0.0;
+                  }
+         
+                  ipv = var_array;
+                  ipt = tsys_array;
+                  ipw = work2_array;
+         
+                  for( el = 0; el < nel; el++, ipv++, ipt++, ipw++ ) {
+                     if( el % nxy == 0 ) {
+                        ipt = tsys_array;
+                        ipw = work2_array;
+                     }
+         
+                     if( *ipv != VAL__BADR ) {
+                        *(ipw) += 1.0;
+                        *(ipt) += *ipv;
+                     }
+                  }
+         
+                  for( el0 = 0; el0 < nxy; el0++ ) {
+                     teff = eff_array[ el0 ];
+                     var = tsys_array[ el0 ];
+                     if( teff != VAL__BADR && teff > 0.0 &&
+                         work2_array[ el0 ] > 0.0 && var > 0.0 ) {
+                        var /= work2_array[ el0 ];
+                        tsys_array[ el0 ] = sqrt( 0.25*var*teff/fcon );
+                     } else {
+                        tsys_array[ el0 ] = VAL__BADR;
+                     }
+                  }
+               }
+      
+/* For 3D weights and no Variance->Tsys conversion factor, fill the Tsys
+   array with bad values. */
+            } else {
+      
+               if( !blank ) msgBlank( status );
+               msgOutif( MSG__NORM, " ", "WARNING: Cannot create output Tsys "
+                         "values.", status );
+               msgBlank( status );
+               blank = 1;
+      
                for( el0 = 0; el0 < nxy; el0++ ) {
                   tsys_array[ el0 ] = VAL__BADR;
                }
+      
             }
-   
-/* Free the memory used to store the 2D variance information. */
-            var_array = astFree( var_array );
-   
-/* For 3D variances, the output Tsys values are based on the mean
-      variance in every output spectrum. */
-         } else if( fcon != VAL__BADD ) {
-   
-            work2_array = astMalloc( nxy*sizeof( float ) );
-            if( work2_array ) {
-               ipw = work2_array;
-               ipt = tsys_array;
-               for( el = 0; el < nxy; el++ ) {
-                  *(ipw++) = 0.0;
-                  *(ipt++) = 0.0;
-               }
+         }
       
-               ipv = var_array;
-               ipt = tsys_array;
-               ipw = work2_array;
+/* If we created an output Variance component, store the median system 
+   temperature as keyword TSYS in the FitsChan. */
+         if( genvar ) {
+            work2_array = astStore( work2_array, tsys_array, nxy*sizeof( float ) );
+            kpg1Medur( 1, nxy, work2_array, &medtsys, &neluse, status );
+            atlPtftr( fchan, "MEDTSYS", medtsys, 
+                      "[K] Median MAKECUBE system temperature", status );
       
-               for( el = 0; el < nel; el++, ipv++, ipt++, ipw++ ) {
-                  if( el % nxy == 0 ) {
-                     ipt = tsys_array;
-                     ipw = work2_array;
-                  }
-      
-                  if( *ipv != VAL__BADR ) {
-                     *(ipw) += 1.0;
-                     *(ipt) += *ipv;
-                  }
-               }
-      
-               for( el0 = 0; el0 < nxy; el0++ ) {
-                  teff = eff_array[ el0 ];
-                  var = tsys_array[ el0 ];
-                  if( teff != VAL__BADR && teff > 0.0 &&
-                      work2_array[ el0 ] > 0.0 && var > 0.0 ) {
-                     var /= work2_array[ el0 ];
-                     tsys_array[ el0 ] = sqrt( 0.25*var*teff/fcon );
-                  } else {
-                     tsys_array[ el0 ] = VAL__BADR;
-                  }
-               }
-            }
-   
-/* For 3D weights and no Variance->Tsys conversion factor, fill the Tsys
-      array with bad values. */
          } else {
-   
             if( !blank ) msgBlank( status );
             msgOutif( MSG__NORM, " ", "WARNING: Cannot create output Tsys "
-                      "values.", status );
+                      "values since no output variances have been created.",
+                      status );
             msgBlank( status );
             blank = 1;
-   
-            for( el0 = 0; el0 < nxy; el0++ ) {
-               tsys_array[ el0 ] = VAL__BADR;
-            }
-   
          }
-      }
-   
-/* If we created an output Variance component, store the median system 
-      temperature as keyword TSYS in the FitsChan. */
-      if( genvar ) {
-         work2_array = astStore( work2_array, tsys_array, nxy*sizeof( float ) );
-         kpg1Medur( 1, nxy, work2_array, &medtsys, &neluse, status );
-         atlPtftr( fchan, "MEDTSYS", medtsys, 
-                   "[K] Median MAKECUBE system temperature", status );
-   
-      } else {
-         if( !blank ) msgBlank( status );
-         msgOutif( MSG__NORM, " ", "WARNING: Cannot create output Tsys "
-                   "values since no output variances have been created.",
-                   status );
-         msgBlank( status );
-         blank = 1;
-      }
-   
+      
 /* Store the median exposure time as keyword EXP_TIME in the FitsChan.
-      Since kpg1Medur partially sorts the array, we need to take a copy of it
-      first. */
-      work2_array = astStore( work2_array, exp_array, nxy*sizeof( float ) );
-      kpg1Medur( 1, nxy, work2_array, &medexp, &neluse, status );
-      atlPtftr( fchan, "EXP_TIME", medexp, 
-                "[s] Median MAKECUBE exposure time", status );
-   
+   Since kpg1Medur partially sorts the array, we need to take a copy of it
+   first. */
+         work2_array = astStore( work2_array, exp_array, nxy*sizeof( float ) );
+         kpg1Medur( 1, nxy, work2_array, &medexp, &neluse, status );
+         atlPtftr( fchan, "EXP_TIME", medexp, 
+                   "[s] Median MAKECUBE exposure time", status );
+      
 /* Store the median effective integration time as keyword EFF_TIME in the 
-      FitsChan. Since kpg1Medur partially sorts the array, we need to take a 
-      copy of it first. */
-      work2_array = astStore( work2_array, eff_array, nxy*sizeof( float ) );
-      kpg1Medur( 1, nxy, work2_array, &medeff, &neluse, status );
-      atlPtftr( fchan, "EFF_TIME", medeff, 
-                "[s] Median MAKECUBE effective integration time", status );
-   
+   FitsChan. Since kpg1Medur partially sorts the array, we need to take a 
+   copy of it first. */
+         work2_array = astStore( work2_array, eff_array, nxy*sizeof( float ) );
+         kpg1Medur( 1, nxy, work2_array, &medeff, &neluse, status );
+         atlPtftr( fchan, "EFF_TIME", medeff, 
+                   "[s] Median MAKECUBE effective integration time", status );
+      
 /* Retrieve the unique OBSID keys from the KeyMap and populate the OBSnnnnn
-      and OBSCNT headers from this information. */
-      smf_fits_add_prov( fchan, "OBS", obskeymap, status ); 
-      smf_fits_add_prov( fchan, "PRV", prvkeymap, status ); 
-   
+         and OBSCNT headers from this information. */
+         smf_fits_add_prov( fchan, "OBS", obskeymap, status ); 
+         smf_fits_add_prov( fchan, "PRV", prvkeymap, status ); 
+      
 /* Free the second work array. */
-      work2_array = astFree( work2_array );
+         work2_array = astFree( work2_array );
+      
+/* Store the keywords holding the number of tiles generated and the index
+   of the current tile. */
+         atlPtfti( fchan, "NUMTILES", ntile, 
+                   "No. of tiles covering the field", status );
+         atlPtfti( fchan, "TILENUM", itile, 
+                   "Index of this tile (1->NUMTILES)", status );
 
 /* Store the keywords holding the number of tiles generated and the index
    of the current tile. */
@@ -1692,19 +1822,26 @@ L999:;
          fchan = astAnnul( fchan );
       }
 
+/* If required ensure that the output NDF has a POLPACK extension holding
+   the polarisation angle for the data in the output cube. */
+         if( npbin > 1 ) smf_polext( ondf, pangle[ ipbin ], status );
+
 /* For each open output NDF (the main tile NDF, and any extension NDFs),
    first clone the NDF identifier, then close the file (which will unmap
    the NDF arrays), and then reshape the NDF to exclude the boundary 
    that was added to the tile to avoid edge effects. */
-      smf_reshapendf( &expdata, tile, status );
-      smf_reshapendf( &expdata, tile, status );
-      smf_reshapendf( &effdata, tile, status );
-      smf_reshapendf( &tsysdata, tile, status );
-      smf_reshapendf( &wdata, tile, status );
-      smf_reshapendf( &odata, tile, status );
-
+         smf_reshapendf( &expdata, tile, status );
+         smf_reshapendf( &expdata, tile, status );
+         smf_reshapendf( &effdata, tile, status );
+         smf_reshapendf( &tsysdata, tile, status );
+         smf_reshapendf( &wdata, tile, status );
+         smf_reshapendf( &odata, tile, status );
+   
 /* Free other resources related to the current tile. */  
-      if( wgt_array && !savewgt ) wgt_array = astFree( wgt_array );
+         if( wgt_array && !savewgt ) wgt_array = astFree( wgt_array );
+
+/* Next polarisation angle bin. */
+      }
 
 /* End the tile's NDF context. */
       ndfEnd( status );
@@ -1722,6 +1859,7 @@ L998:;
    if( ogrp != NULL) grpDelet( &ogrp, status);
    if( boxes ) boxes = astFree( boxes );
    if( tiles ) tiles = smf_freetiles( tiles, ntile, status );
+   ptime = smf_freepolbins( size, npbin, &pangle, ptime, status ); 
 
 /* End the NDF context. */
    ndfEnd( status );

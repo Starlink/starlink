@@ -15,13 +15,14 @@
 *     C function
 
 *  Invocation:
-*     smf_rebincube_nn( smfData *data, int index, int size, dim_t nchan,
-*                       dim_t ndet, dim_t nslice, dim_t nel, dim_t nxy,
-*                       dim_t nout, dim_t dim[3], int badmask, int is2d,
-*                       AstMapping *ssmap, AstSkyFrame *abskyfrm, 
-*                       AstMapping *oskymap, Grp *detgrp, int moving, 
-*                       int usewgt, int genvar, double tfac, double fcon, 
-*                       float *data_array, float *var_array, double *wgt_array,
+*     smf_rebincube_nn( smfData *data, int index, int size, int *ptime, 
+*                       dim_t nchan, dim_t ndet, dim_t nslice, 
+*                       dim_t nel, dim_t nxy, dim_t nout, dim_t dim[3], 
+*                       int badmask, int is2d, AstMapping *ssmap, 
+*                       AstSkyFrame *abskyfrm, AstMapping *oskymap, 
+*                       Grp *detgrp, int moving, int usewgt, int genvar, 
+*                       double tfac, double fcon, float *data_array, 
+*                       float *var_array, double *wgt_array,
 *                       float *texp_array, float *teff_array, int *nused, 
 *                       int *nreject, int *naccept, int *good_tsys, 
 *                       int *status );
@@ -33,6 +34,12 @@
 *        Index of the current input file within the group of input files.
 *     size = int (Given)
 *        Index of the last input file within the group of input files.
+*     ptime = int * (Given)
+*        Pointer to an array of integers, each one being the index of a 
+*        time slice that is to be pasted into the output cube. If this is 
+*        NULL, then all time slices are used. The values in the array
+*        should be monotonic increasing and should be terminated by a value 
+*        of VAL__MAXI.
 *     nchan = dim_t (Given)
 *        Number of spectral channels in input cube.
 *     ndet = dim_t (Given)
@@ -168,6 +175,8 @@
 *        -Changed name of smf_rebincube_totmap to smf_rebin_totmap
 *     17-JUL-2007 (DSB):
 *        Only update exposure time arrays if the spectrum is used.
+*     11-OCT-2007 (DSB):
+*        Added parameter "ptime".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -211,13 +220,14 @@
 
 #define FUNC_NAME "smf_rebincube_nn"
 
-void smf_rebincube_nn( smfData *data, int index, int size, dim_t nchan,
-                       dim_t ndet, dim_t nslice, dim_t nel, dim_t nxy,
-                       dim_t nout, dim_t dim[3], int badmask, int is2d,
-                       AstMapping *ssmap, AstSkyFrame *abskyfrm, 
-                       AstMapping *oskymap, Grp *detgrp, int moving, 
-                       int usewgt, int genvar, double tfac, double fcon, 
-                       float *data_array, float *var_array, double *wgt_array, 
+void smf_rebincube_nn( smfData *data, int index, int size, 
+                       int *ptime, dim_t nchan, dim_t ndet, dim_t nslice, 
+                       dim_t nel, dim_t nxy, dim_t nout, dim_t dim[3], 
+                       int badmask, int is2d, AstMapping *ssmap, 
+                       AstSkyFrame *abskyfrm, AstMapping *oskymap, 
+                       Grp *detgrp, int moving, int usewgt, int genvar, 
+                       double tfac, double fcon, float *data_array, 
+                       float *var_array, double *wgt_array,
                        float *texp_array, float *teff_array, int *nused, 
                        int *nreject, int *naccept, int *good_tsys, 
                        int *status ){
@@ -241,6 +251,7 @@ void smf_rebincube_nn( smfData *data, int index, int size, dim_t nchan,
    int *specpop = NULL;        /* Input channels per output channel */
    float teff;                 /* Effective integration time */
    float texp;                 /* Total time ( = ton + toff ) */
+   int *nexttime;              /* Pointer to next time slice index to use */
    int *spectab = NULL;        /* I/p->o/p channel number conversion table */
    int found;                  /* Was current detector name found in detgrp? */
    int ichan;                  /* Input channel index */
@@ -335,8 +346,17 @@ void smf_rebincube_nn( smfData *data, int index, int size, dim_t nchan,
       name += strlen( name ) + 1;
    }
 
+/* Initialise a pointer to the ntex time slice index to be used. */
+   nexttime = ptime;
+
 /* Loop round all time slices in the input NDF. */
    for( itime = 0; itime < nslice && *status == SAI__OK; itime++ ) {
+
+/* If this time slice is not being pasted into the output cube, pass on. */
+      if( nexttime ){
+         if( *nexttime != itime ) continue;
+         nexttime++;
+      }
 
 /* Store a pointer to the first input data value in this time slice. */
       tdata = ( (float *) (data->pntr)[ 0 ] ) + itime*timeslice_size;

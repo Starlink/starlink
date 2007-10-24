@@ -941,6 +941,14 @@ package @PACKAGE@ {
             helpkey *
           }
 
+         parameter npolbin {
+            type _INTEGER
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+
          parameter out {
             position 2
             type NDF
@@ -985,6 +993,15 @@ package @PACKAGE@ {
 	    prompt {Message level}
 	    default NORM
 	    vpath DEFAULT	
+	    helpkey *
+	  }
+
+	 parameter polbinsize {
+	    type _REAL
+	    prompt {Angular size of analyser angle bins (degs)}
+	    ppath CURRENT DEFAULT
+	    vpath DEFAULT
+            default !
 	    helpkey *
 	  }
 

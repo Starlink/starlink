@@ -14,12 +14,13 @@
 *     C function
 
 *  Invocation:
-*     smf_rebincube( smfData *data, int index, int size, int badmask,
-*                    int is2d, AstSkyFrame *abskyfrm, AstMapping *oskymap, 
+*     smf_rebincube( smfData *data, int index, int size, 
+*                    int *ptime, int badmask, int is2d, 
+*                    AstSkyFrame *abskyfrm, AstMapping *oskymap, 
 *                    AstFrame *ospecfrm, AstMapping *ospecmap, 
 *                    Grp *detgrp, int moving, int usewgt, int spread, 
-*                    const double params[], dim_t lbnd_out[ 3 ], 
-*                    dim_t ubnd_out[ 3 ], int genvar, float *data_array, 
+*                    const double params[], int lbnd_out[ 3 ], 
+*                    int ubnd_out[ 3 ], int genvar, float *data_array, 
 *                    float *var_array, double *wgt_array, float *texp_array, 
 *                    float *teff_array, double *fcon, int *nused,
 *                    int *nreject, int *naccept, int *status );
@@ -31,6 +32,12 @@
 *        Index of the current input file within the group of input files.
 *     size = int (Given)
 *        Index of the last input file within the group of input files.
+*     ptime = int * (Given)
+*        Pointer to an array of integers, each one being the index of a 
+*        time slice that is to be pasted into the output cube. If this is 
+*        NULL, then all time slices are used. The values in the array
+*        should be monotonic increasing and should be terminated by a value 
+*        of VAL__MAXI.
 *     badmask = int (Given)
 *        Indicates how the bad pixel mask for each output spectrum is
 *        determined. A value of zero causes the bad pixel mask for each
@@ -165,6 +172,8 @@
 *        Add parameter naccept.
 *     25-MAY-2007 (TIMJ):
 *        Allow fcon to drift a little
+*     11-OCT-2007 (DSB):
+*        Added parameter "ptime".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -208,15 +217,16 @@
 
 #define FUNC_NAME "smf_rebincube"
 
-void smf_rebincube( smfData *data, int index, int size, int badmask, int is2d,
-                    AstSkyFrame *abskyfrm, AstMapping *oskymap, 
-                    AstFrame *ospecfrm, AstMapping *ospecmap, Grp *detgrp,
-                    int moving, int usewgt, int lbnd_out[ 3 ], 
-                    int ubnd_out[ 3 ], int spread, const double params[], 
-                    int genvar, float *data_array, float *var_array, 
-                    double *wgt_array, float *texp_array, float *teff_array, 
-                    double *fcon, int *nused, int *nreject, int *naccept, 
-                    int *status ){
+void  smf_rebincube( smfData *data, int index, int size, 
+                     int *ptime, int badmask, int is2d, 
+                     AstSkyFrame *abskyfrm, AstMapping *oskymap, 
+                     AstFrame *ospecfrm, AstMapping *ospecmap, 
+                     Grp *detgrp, int moving, int usewgt, int lbnd_out[ 3 ], 
+                     int ubnd_out[ 3 ], int spread, 
+                     const double params[], int genvar, float *data_array, 
+                     float *var_array, double *wgt_array, float *texp_array, 
+                     float *teff_array, double *fcon, int *nused,
+                     int *nreject, int *naccept, int *status ){
 
 /* Local Variables */
    AstCmpMap *fmap = NULL;     /* Mapping from spectral grid to topo freq Hz */
@@ -413,11 +423,14 @@ void smf_rebincube( smfData *data, int index, int size, int badmask, int is2d,
 /* Return the factor needed for calculating Tsys from the variance. */
    if( index == 1 ) {
       *fcon = fcon2;
+
    } else if (fcon2 == VAL__BADD) {
       *fcon = VAL__BADD;
+
    } else if( fcon2 != *fcon && *fcon != VAL__BADD) {
-      /* fcon can be different by fraction of a percent and still be accurate enough 
-         for our purposes */
+
+/* fcon can be different by fraction of a percent and still be accurate enough 
+   for our purposes */
       double percent = 100.0 * fabs(*fcon - fcon2 ) / *fcon;
       if ( percent > 0.001) {
         msgSetd("ORI", *fcon);
@@ -454,8 +467,8 @@ void smf_rebincube( smfData *data, int index, int size, int badmask, int is2d,
 /* If we are using nearest neighbour rebinning, we can use specialist
    code that is faster than AST. */
    if( spread == AST__NEAREST ) {
-      smf_rebincube_nn( data, index, size, nchan, ndet, nslice, nel, nxy,
-                        nout, dim, badmask, is2d, (AstMapping *) ssmap, 
+      smf_rebincube_nn( data, index, size, ptime, nchan, ndet, nslice, 
+                        nel, nxy, nout, dim, badmask, is2d, (AstMapping *) ssmap, 
                         abskyfrm, oskymap, detgrp, moving, usewgt, genvar, 
                         tfac, fcon2, data_array, var_array, wgt_array, 
                         texp_array, teff_array, nused, nreject, naccept,
@@ -463,11 +476,11 @@ void smf_rebincube( smfData *data, int index, int size, int badmask, int is2d,
 
 /* For all other spreading schemes, we use AST. */
    } else {
-      smf_rebincube_ast( data, index, size, nchan, ndet, nslice, nel, nxy, 
-                         nout, dim, (AstMapping *) ssmap, abskyfrm, oskymap, 
-                         detgrp, moving, usewgt, spread, params, genvar, 
-                         tfac, fcon2, data_array, var_array, wgt_array, texp_array, 
-                         teff_array, &good_tsys, nused, status );
+      smf_rebincube_ast( data, index, size, ptime, nchan, ndet, nslice, 
+                         nel, nxy, nout, dim, (AstMapping *) ssmap, abskyfrm, 
+                         oskymap, detgrp, moving, usewgt, spread, params, 
+                         genvar, tfac, fcon2, data_array, var_array, wgt_array,
+                         texp_array, teff_array, &good_tsys, nused, status );
    }
 
 /* If this is the final pass through this function, convert zero texp_array 

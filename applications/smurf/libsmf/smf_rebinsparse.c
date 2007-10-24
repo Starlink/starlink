@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_rebinsparse( smfData *data, int index, AstFrame *ospecfrm, 
+*     smf_rebinsparse( smfData *data, int index, int *ptime, AstFrame *ospecfrm,
 *                      AstMapping *ospecmap, AstSkyFrame *oskyframe, 
 *                      Grp *detgrp, int lbnd_out[ 3 ], int ubnd_out[ 3 ], 
 *                      int genvar, float *data_array, float *var_array, 
@@ -25,6 +25,12 @@
 *        Pointer to the input smfData structure.
 *     index = int (Given)
 *        Index of the current input file within the group of input files.
+*     ptime = int * (Given)
+*        Pointer to an array of integers, each one being the index of a 
+*        time slice that is to be pasted into the output cube. If this is 
+*        NULL, then all time slices are used. The values in the array
+*        should be monotonic increasing and should be terminated by a value 
+*        of VAL__MAXI.
 *     ospecfrm = AstFrame * (Given)
 *        Pointer to the SpecFrame within the current Frame of the output WCS 
 *        Frameset.
@@ -106,6 +112,8 @@
 *        Check for bad tsys values in the input NDF.
 *     21-FEB-2007 (DSB):
 *        Change ton_array to teff_array.
+*     12-OCT-2007 (DSB):
+*        Added parameter "ptime".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -151,7 +159,7 @@
 /* Returns nearest integer to "x" */
 #define NINT(x) ( ( x > 0 ) ? (int)( x + 0.5 ) : (int)( x - 0.5 ) )
 
-void smf_rebinsparse( smfData *data, int index, AstFrame *ospecfrm, 
+void smf_rebinsparse( smfData *data, int index, int *ptime, AstFrame *ospecfrm,
                       AstMapping *ospecmap, AstSkyFrame *oskyframe, 
                       Grp *detgrp, int lbnd_out[ 3 ], int ubnd_out[ 3 ], 
                       int genvar, float *data_array, float *var_array, 
@@ -172,6 +180,7 @@ void smf_rebinsparse( smfData *data, int index, AstFrame *ospecfrm,
    char *pname = NULL;   /* Name of currently opened data file */
    const char *name;     /* Pointer to current detector name */
    const double *tsys;   /* Pointer to Tsys value for first detector */
+   dim_t timeslice_size; /* No of detector values in one time slice */
    double *spectab = NULL;/* Workspace for spectral output grid positions */
    double *xin = NULL;   /* Workspace for detector input grid positions */
    double *xout = NULL;  /* Workspace for detector output pixel positions */
@@ -188,6 +197,7 @@ void smf_rebinsparse( smfData *data, int index, AstFrame *ospecfrm,
    float texp;           /* Total time ( = ton + toff ) */
    float toff;           /* Off time */
    float ton;            /* On time */
+   int *nexttime;        /* Pointer to next time slice index to use */
    int dim[ 3 ];         /* Output array dimensions */
    int found;            /* Was current detector name found in detgrp? */
    int good;             /* Are there any good detector samples? */
@@ -215,6 +225,9 @@ void smf_rebinsparse( smfData *data, int index, AstFrame *ospecfrm,
    dim[ 0 ] = ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1;
    dim[ 1 ] = ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1;
    dim[ 2 ] = ubnd_out[ 2 ] - lbnd_out[ 2 ] + 1;
+
+/* Store the number of pixels in one time slice */
+   timeslice_size = (data->dims)[ 0 ]*(data->dims)[ 1 ];
 
 /* We want a description of the spectral WCS axis in the input file. If 
    the input file has a WCS FrameSet containing a SpecFrame, use it,
@@ -389,11 +402,20 @@ void smf_rebinsparse( smfData *data, int index, AstFrame *ospecfrm,
       *fcon = VAL__BADD;
    }
 
-/* Store a pointer to the next input data value */
-   pdata = ( data->pntr )[ 0 ];
+/* Initialise a pointer to the ntex time slice index to be used. */
+   nexttime = ptime;
 
 /* Loop round all the time slices in the input file. */
    for( itime = 0; itime < (data->dims)[ 2 ] && *status == SAI__OK; itime++ ) {
+
+/* If this time slice is not being pasted into the output cube, pass on. */
+      if( nexttime ){
+         if( *nexttime != itime ) continue;
+         nexttime++;
+      }
+
+/* Store a pointer to the first input data value in this time slice. */
+      pdata = ( (float *) (data->pntr)[ 0 ] ) + itime*timeslice_size;
 
 /* Get a FrameSet describing the spatial coordinate systems associated with 
    the current time slice of the current input data file. The base frame in 

@@ -181,10 +181,12 @@
 *        -Added nofile to smf_model_create interface
 *     2007-09-13 (EC):
 *        -Added smf_dataOrder
+*     2007-10-12 (DSB):
+*        -Added smf_choosepolbins, smf_freepolbins and smf_polext.
 *     2007-10-19 (DSB):
 *        -Added specunion to smf_cubebounds.
-
 *     {enter_further_changes_here}
+
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -529,16 +531,17 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                      int ubnd[ 3 ], AstFrameSet **wcsout, int *npos, 
                      int *hasoffexp, smfBox **boxes, int *status );
 
-void smf_rebincube( smfData *data, int index, int size, int badmask, int is2d,
+void smf_rebincube( smfData *data, int index, int size, int *ptime, int badmask, int is2d,
                     AstSkyFrame *abskyfrm, AstMapping *oskymap, 
                     AstFrame *ospecfrm, AstMapping *ospecmap, Grp *detgrp,
-                    int moving, int usewgt, int lbnd_out[ 3 ], 
-                    int ubnd_out[ 3 ], int spread, const double params[], 
+                    int moving, int usewgt, 
+                    int lbnd_out[ 3 ], int ubnd_out[ 3 ], 
+                    int spread, const double params[], 
                     int genvar, float *data_array, float *var_array, 
                     double *wgt_array, float *texp_array, float *teff_array, 
                     double *fcon, int *nused, int *nreject, int *naccept, int *status );
 
-void smf_rebincube_ast( smfData *data, int index, int size, dim_t nchan,
+void smf_rebincube_ast( smfData *data, int index, int size, int *ptime, dim_t nchan,
                         dim_t ndet, dim_t nslice, dim_t nel, dim_t nxy, 
                         dim_t nout, dim_t dim[3], AstMapping *ssmap,
                         AstSkyFrame *abskyfrm, AstMapping *oskymap, 
@@ -548,7 +551,7 @@ void smf_rebincube_ast( smfData *data, int index, int size, dim_t nchan,
                         double *wgt_array, float *texp_array, 
                         float *teff_array, int *good_tsys, int *nused, int *status );
 
-void smf_rebincube_nn( smfData *data, int index, int size, dim_t nchan,
+void smf_rebincube_nn( smfData *data, int index, int size, int *ptime, dim_t nchan,
                        dim_t ndet, dim_t nslice, dim_t nel, dim_t nxy,
                        dim_t nout, dim_t dim[3], int badmask, int is2d,
                        AstMapping *ssmap, AstSkyFrame *abskyfrm, 
@@ -642,7 +645,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                        int usedetpos, Grp *detgrp, int lbnd[ 3 ], int ubnd[ 3 ],
                        AstFrameSet **wcsout, int *hasoffexp, int *status );
 
-void smf_rebinsparse( smfData *data, int ifile, AstFrame *ospecfrm, AstMapping *ospecmap, 
+void smf_rebinsparse( smfData *data, int ifile, int *ptime, AstFrame *ospecfrm, AstMapping *ospecmap, 
                       AstSkyFrame *oskyframe, Grp *detgrp, int lbnd_out[ 3 ], 
                       int ubnd_out[ 3 ], int genvar, float *data_array, 
                       float *var_array, int *ispec, float *texp_array, 
@@ -670,5 +673,14 @@ smfTile *smf_freetiles( smfTile *tiles, int size, int *status );
 void smf_reshapendf( smfData **data, smfTile *tile, int *status );
 
 void smf_dataOrder( smfData *data, int isTordered, int *status );
+
+int ***smf_choosepolbins( Grp *igrp, int size, float binsize,
+                          AstFrameSet *wcsout2d, int *npbin, double **pangle, 
+                          int *status );
+
+int ***smf_freepolbins( int nndf, int npbin, double **pangle, int ***ptime, 
+                        int *status );
+
+void smf_polext( int ondf, double angle, int *status );
 
 #endif /* SMF_DEFINED */

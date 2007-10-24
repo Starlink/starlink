@@ -13,9 +13,9 @@
 *     C function
 
 *  Invocation:
-*     smf_rebincube_ast( smfData *data, int index, int size, dim_t nchan,
-*                        dim_t ndet, dim_t nslice, dim_t nel, dim_t nxy,
-*                        dim_t nout, dim_t dim[3], AstMapping *ssmap,
+*     smf_rebincube_ast( smfData *data, int index, int size, int *ptime, 
+*                        dim_t nchan, dim_t ndet, dim_t nslice, dim_t nel, 
+*                        dim_t nxy, dim_t nout, dim_t dim[3], AstMapping *ssmap,
 *                        AstSkyFrame *abskyfrm, AstMapping *oskymap, 
 *                        Grp *detgrp, int moving, int usewgt, int spread, 
 *                        const double params[], int genvar, double tfac, 
@@ -31,6 +31,12 @@
 *        Index of the current input file within the group of input files.
 *     size = int (Given)
 *        Index of the last input file within the group of input files.
+*     ptime = int * (Given)
+*        Pointer to an array of integers, each one being the index of a 
+*        time slice that is to be pasted into the output cube. If this is 
+*        NULL, then all time slices are used. The values in the array
+*        should be monotonic increasing and should be terminated by a value 
+*        of VAL__MAXI.
 *     nchan = dim_t (Given)
 *        Number of spectral channels in input cube.
 *     ndet = dim_t (Given)
@@ -153,6 +159,8 @@
 *        -Changed name of smf_rebincube_totmap to smf_rebin_totmap
 *     2-OCT-2007 (DSB):
 *        Use nearest neighbour interpolation with the "detlut" LutMap.
+*     11-OCT-2007 (DSB):
+*        Added parameter "ptime".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -196,9 +204,9 @@
 
 #define FUNC_NAME "smf_rebincube_ast"
 
-void smf_rebincube_ast( smfData *data, int index, int size, dim_t nchan,
-                        dim_t ndet, dim_t nslice, dim_t nel, dim_t nxy, 
-                        dim_t nout, dim_t dim[3], AstMapping *ssmap,
+void smf_rebincube_ast( smfData *data, int index, int size, int *ptime, 
+                        dim_t nchan, dim_t ndet, dim_t nslice, dim_t nel, 
+                        dim_t nxy, dim_t nout, dim_t dim[3], AstMapping *ssmap,
                         AstSkyFrame *abskyfrm, AstMapping *oskymap, 
                         Grp *detgrp, int moving, int usewgt, int spread, 
                         const double params[], int genvar, double tfac,
@@ -229,6 +237,7 @@ void smf_rebincube_ast( smfData *data, int index, int size, dim_t nchan,
    float *vp = NULL;           /* Pointer to next "varwork" element */
    float teff;                 /* Effective integration time */
    float texp;                 /* Total time ( = ton + toff ) */
+   int *nexttime;              /* Pointer to next time slice index to use */
    int ast_flags;              /* Basic flags to use with astRebinSeq */
    int found;                  /* Was current detector name found in detgrp? */
    int ichan;                  /* Index of current channel */
@@ -362,8 +371,17 @@ void smf_rebincube_ast( smfData *data, int index, int size, dim_t nchan,
    inperm[ 2 ] = 2;
    pmap = astPermMap( 3, inperm, 3, outperm, NULL, "" );
 
+/* Initialise a pointer to the ntex time slice index to be used. */
+   nexttime = ptime;
+
 /* Loop round all time slices in the input NDF. */
    for( itime = 0; itime < nslice && *status == SAI__OK; itime++ ) {
+
+/* If this time slice is not being pasted into the output cube, pass on. */
+      if( nexttime ){
+         if( *nexttime != itime ) continue;
+         nexttime++;
+      }
 
 /* Store a pointer to the first input data value in this time slice. */
       tdata = ( (float *) (data->pntr)[ 0 ] ) + itime*timeslice_size;
