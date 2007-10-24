@@ -242,7 +242,7 @@
 *
 *        Each HDU of the FITS file is processed in turn.  If it matches 
 *        on of the sub-file specifiers in the table, it is used to
-*        create the  specified component of the appropriate NDF in the
+*        create the specified component of the appropriate NDF in the
 *        output file; otherwise the next HDU is processed.  The table is
 *        searched in sub-file set order.  If a table entry is matched it
 *        is removed from the table; this means that the same FITS
@@ -551,7 +551,7 @@
 *        CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- define the NDF's
 *          WCS component (see parameter ENCODINGS).
 *        OBJECT, LABEL, BUNIT --- if present are equated to the NDF's
-*          title, label, and units components respectively.
+*          TITLE, LABEL, and UNITS components respectively.
 *        LBOUNDn --- if present, this specifies the pixel origin for
 *          the nth dimension.
 *     -  Additional sub-files within the FITS files are converted into
@@ -584,6 +584,8 @@
 *     like FITS cards.  The keywords of these FITS cards are derived
 *     from the values of PTYPEm in the main header, where m is the
 *     number of the group parameter.
+*     - You can supply compressed FITS files, such as the Rice
+*     compression.
 
 *  Special Formats:
 *     o  NDF2FITS
@@ -592,11 +594,11 @@
 *     to 'NDF'.  The conversion is similar to the general case, except
 *     the processing of FITS sub-files and HISTORY headers.
 *
-*     -  An IMAGE sub-file converts to an NDF variance-array component,
+*     -  An IMAGE sub-file converts to an NDF VARIANCE component,
 *     provided the HDUCLAS2 keyword is present and has a value that is
 *     either 'VARIANCE' or 'ERROR'.
 *
-*     -  An IMAGE sub-file converts to an NDF quality-array component,
+*     -  An IMAGE sub-file converts to an NDF QUALITY component,
 *     provided the HDUCLAS2 keyword is present and has value 'QUALITY'.
 *
 *     -  FITS ASCII and binary tables become NDF extensions, however,
@@ -804,8 +806,8 @@
 *        NaN values present become bad values in the NDF.
 *        -  The keywords CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn are
 *        used to create the NDF axis centres, labels, and units.
-*        -  The OBJECT, LABEL, BUNIT keywords define the NDF's title,
-*        label, and units components respectively, if they are defined.
+*        -  The OBJECT, LABEL, BUNIT keywords define the NDF's TITLE,
+*        LABEL, and UNITS components respectively, if they are defined.
 *        -  HISTORY cards in a special format created by NDF2FITS are
 *        converted back into NDF history records.
 *        -  The NDF variance is derived from the data array of an
