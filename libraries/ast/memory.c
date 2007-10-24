@@ -95,6 +95,10 @@
 *        inclusion of the AST include files (which test for astCLASS).
 *     27-JUN-2007 (DSB):
 *        Added astIsDynamic.
+*     24-OCT-2007 (DSB):
+*        Zero the size of memory blocks stored in the Cache so that an
+*        error will be reported if an attempt is made to free a memory 
+*        block that has already been freed.
 */
 
 /* Configuration results. */
@@ -796,6 +800,10 @@ void *astFree_( void *ptr ) {
          mem->next = Cache[ size ];
          Cache[ size ] = mem;
 
+/* Set the size to zero to indicate that the memory block has been freed.
+   The size of the block is implied by the Cache element it is stored in. */
+         mem->size = (size_t) 0;
+
 /* Simply free other memory blocks, clearing the "magic number" and size 
    values it contains. This helps prevent accidental re-use of the memory. */
       } else {
@@ -1037,6 +1045,7 @@ void *astMalloc_( size_t size ) {
       if( Use_Cache && mem ) {
          Cache[ size ] = mem->next;
          mem->next = NULL;
+         mem->size = (size_t) size;
 
 /* Otherwise, allocate a new memory block using "malloc". */
       } else {      
@@ -1171,6 +1180,7 @@ int astMemCaching_( int newval ){
             while( Cache[ i ] ) {
                mem = Cache[ i ];
                Cache[ i ] = mem->next;
+               mem->size = (size_t) i;
 
 #ifdef MEM_DEBUG
                if( id_list ) {
