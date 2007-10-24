@@ -181,6 +181,8 @@
 *        -Added nofile to smf_model_create interface
 *     2007-09-13 (EC):
 *        -Added smf_dataOrder
+*     2007-09-13 (EC):
+*        -Added smf_fft_filter and smf_concat_smfGroup
 *     2007-10-12 (DSB):
 *        -Added smf_choosepolbins, smf_freepolbins and smf_polext.
 *     2007-10-19 (DSB):
@@ -682,5 +684,9 @@ int ***smf_freepolbins( int nndf, int npbin, double **pangle, int ***ptime,
                         int *status );
 
 void smf_polext( int ondf, double angle, int *status );
+
+void smf_fft_filter( smfData *data, double srate, int *status );
+
+void smf_concat_smfGroup( smfGroup *igrp, smfArray **concat, int *status );
 
 #endif /* SMF_DEFINED */
