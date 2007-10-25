@@ -59,6 +59,8 @@
 *     6-JUL-2006 (DSB):
 *        Use "const Grp *" pointers for group parameters that are not
 *        changed by the changed by the called function.
+*     25-OCT-2006 (DSB):
+*        Add grpSetsz
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -241,6 +243,26 @@ void grpGrpsz( const Grp *grp, int *size, int *status ){
                         INTEGER_ARG(&STATUS) );
 
    F77_IMPORT_INTEGER( SIZE, *size );
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
+
+F77_SUBROUTINE(grp_setsz)( INTEGER(IGRP), INTEGER(SIZE), INTEGER(STATUS) );
+
+void grpSetsz( Grp *grp, int size, int *status ){
+   DECLARE_INTEGER(IGRP);
+   DECLARE_INTEGER(SIZE);
+   DECLARE_INTEGER(STATUS);
+
+   IGRP = grpC2F( grp, status );
+
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(grp_setsz)( INTEGER_ARG(&IGRP),
+                        INTEGER_ARG(SIZE),
+                        INTEGER_ARG(&STATUS) );
+
    F77_IMPORT_INTEGER( STATUS, *status );
 
    return;

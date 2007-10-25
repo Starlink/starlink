@@ -52,7 +52,8 @@
 *     6-JUL-2006 (DSB):
 *        Use "const Grp *" pointers for group parameters that are not
 *        changed by the changed by the called function.
-
+*     25-OCT-2006 (DSB):
+*        Add grpSetsz
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -88,6 +89,7 @@
 /* Public Constants */
 /* ---------------- */
 
+#define GRP__NOID NULL
 
 /* Note that GRP__NOIDs role in C is to use a NULL pointer. */
 
@@ -130,6 +132,7 @@ void grpPut1( Grp *, const char *, int, int * );
 void grpValid( const Grp *, int *, int * );
 void grpIndex( const char *, const Grp *, int, int *, int * );
 void grpSetcs( Grp *, int, int * );
+void grpSetsz( Grp *, int, int * );
 
 /* Semi-Public function prototypes: For Fortran interface wrappers only */
 /* -------------------------------------------------------------------- */
