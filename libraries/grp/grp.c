@@ -257,10 +257,11 @@ void grpSetsz( Grp *grp, int size, int *status ){
 
    IGRP = grpC2F( grp, status );
 
+   F77_EXPORT_INTEGER( size, SIZE );
    F77_EXPORT_INTEGER( *status, STATUS );
 
    F77_CALL(grp_setsz)( INTEGER_ARG(&IGRP),
-                        INTEGER_ARG(SIZE),
+                        INTEGER_ARG(&SIZE),
                         INTEGER_ARG(&STATUS) );
 
    F77_IMPORT_INTEGER( STATUS, *status );
