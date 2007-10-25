@@ -146,8 +146,10 @@
 #         Add gettsys
 #     05-OCT-2007 (AGG):
 #         Add default value of 1.8 for skynoise exponent
-#     19-OCT-2007 (TIMJ(:
+#     19-OCT-2007 (TIMJ):
 #         Add RAWUNPRESS
+#     25-OCT-2007 (DSB):
+#         Added SPECUNION, POLBINSIZE and NPOLBIN for MAKECUBE
 #     {enter_changes_here}
 
 #  Bugs:
@@ -1039,6 +1041,15 @@ package @PACKAGE@ {
             prompt {Low and high bounds for output spectral axis}
             helpkey *
          }
+
+         parameter specunion {
+            type _LOGICAL
+            ppath CURRENT DEFAULT
+            vpath DEFAULT
+            prompt {Use union of input spectral ranges as default for SPECBOUNDS?}
+            default FALSE
+            helpkey *
+          }
 
 	 parameter tiledims {
 	    type _INTEGER
