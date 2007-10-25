@@ -143,9 +143,13 @@
 *          pixel axis in the output cube. The dynamic default value is
 *          determined by the AUTOGRID parameter. []
 *     DETECTORS = LITERAL (Read)
-*          A group of detector names. Only data from the named detectors
-*          will be included in the output cube and catalogue. If a null (!) 
-*          value is supplied, data from all detectors will be used. [!]
+*          A group of detector names to include in, or exclude from, the
+*          output cube. If the first name starts with a minus sign, then 
+*          the specified detectors are excluded from the output cube (all
+*          other detectors are included). Otherwise, the specified detectors 
+*          are included from the output cube (all other detectors are 
+*          excluded). If a null (!) value is supplied, data from all detectors 
+*          will be used. [!]
 *     FBL( ) = _DOUBLE (Write)
 *          Sky coordinates (radians) of the bottom left corner of the output cube
 *          (the corner with the smallest PIXEL dimension for axis 1 and the smallest
@@ -617,6 +621,8 @@
 *     19-OCT-2007 (DSB):
 *        - Added NUMTILES and TILENUM FITS headers.
 *        - Added SPECUNION parameter.
+*     25-OCT-2007 (DSB):
+*        Modify description of DETECTORS parameter.
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -872,7 +878,9 @@ void smurf_makecube( int *status ) {
    DETECTORS). */
    parGet0l( "TRIM", &trim, status );
 
-/* Calculate the default grid parameters. */
+/* Calculate the default grid parameters. This also modifies the contents
+   of "detgrp" if needed so that it always holds a list of detectors to be
+   included (not excluded). */
    smf_cubegrid( igrp,  size, system, usedetpos, autogrid, detgrp, 
                  par, &moving, &oskyfrm, &sparse, &hastsys, status );
 

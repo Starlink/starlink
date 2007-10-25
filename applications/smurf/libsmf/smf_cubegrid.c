@@ -43,8 +43,10 @@
 *        the first pointing BASE position, CROTA2 is set to zero, CDELT1/2 
 *        are set to 6 arc-seconds.
 *     detgrp = Grp * (Given)
-*        A Group containing the names of the detectors to be stored in the 
-*        output catalogue. All detectors will be used if this group is empty.
+*        A Group of detectors names to include in or exclude from the 
+*        output cube. If the first name begins with a minus sign then the 
+*        contents of the group are replaced on exit by the names of the 
+*        available detectors that were not originally included in the group.
 *     par = double[ 7 ] (Returned)
 *        An array holding the parameters describing the spatial projection
 *        between celestial (longitude,latitude) in the system specified
@@ -141,6 +143,9 @@
 *        determination algorithm succeeds.
 *     9-OCT-2007 (DSB):
 *        Add a warning if specified detectors are not found in any input file.
+*     25-OCT-2007 (DSB):
+*        Use smf_checkdets to ensure detgrp holds detectors to be
+*        included, not excluded.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -207,12 +212,8 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    AstFrameSet *swcsin = NULL;/* FrameSet describing spatial input WCS */
    AstMapping *azel2usesys = NULL; /* Mapping form AZEL to requested system */
    AstMapping *fsmap = NULL;  /* Mapping from the "fs" FrameSet */
-   Grp *alldets = NULL;       /* GRP group holding all detector labels */
    Grp *labgrp = NULL;        /* GRP group holding used detector labels */
-   char *baddets = NULL;      /* A buffer for a list of bad detector names */
-   char *buf = NULL;          /* A buffer for a text pointer */
    char *pname = NULL;        /* Name of currently opened data file */
-   char detname[ GRP__SZNAM ]; /* Detector name */
    char outcatnam[ 41 ];      /* Output catalogue name */
    char reflat[ 41 ];         /* Reference latitude string */
    char reflon[ 41 ];         /* Reference longitude string */
@@ -244,7 +245,6 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    double sep;           /* Separation between first and last base positions */
    double skyref[ 2 ];   /* Values for output SkyFrame SkyRef attribute */
    float *pdata;         /* Pointer to next data sample */
-   int baddetslen;       /* Used length of "baddets" string */
    int coin;             /* Are all points effectively co-incident? */
    int found;            /* Was current detector name found in detgrp? */
    int good;             /* Are there any good detector samples? */
@@ -256,7 +256,6 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    int ispec;            /* Index of current spectral sample */
    int itime;            /* Index of current time slice */
    int nallpos;          /* Number of positions */
-   int ndetgrp;          /* Size of "detgrp" group */
    int nval;             /* Number of values supplied */
    int outcat;           /* Produce an output catalogue holding sample positions? */
    int usedefs;          /* Are default projection parameters being used? */
@@ -396,42 +395,10 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
                         sizeof( double ) );
 
 /* Issue a warning if any of the detector names specified in "detgrp"
-   were not found in the data. First create a group holding the names 
-   of all detector found in the data, then check that each entry in
-   "detgrp" is also in "alldets". */
-      if( detgrp ) {
-
-         alldets = grpNew( "All detector names", status );
-         lab = hdr->detname;
-         for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
-            grpPut1( alldets, lab, 0, status );
-            lab += strlen( lab ) + 1;
-         }
-
-         baddets = NULL;
-         buf = detname;
-         grpGrpsz( detgrp, &ndetgrp, status );
-         for( irec = 1; irec <= ndetgrp; irec++ ) {
-            grpGet( detgrp, irec, 1, &buf, GRP__SZNAM, status );
-            grpIndex( detname, alldets, 1, &found, status );
-            if( !found ) {
-               baddets = astAppendString( baddets, &baddetslen, " " );
-               baddets = astAppendString( baddets, &baddetslen, detname );
-            }
-         }
-
-         if( baddets ) {
-            msgSetc( "DETS", baddets );
-            msgSetc( "FILE", pname );
-            msgOutif( MSG__NORM, " ", "   WARNING: The following "
-                      "detector names supplied for parameter DETECTORS "
-                      "were not found in ^FILE: ^DETS", status );
-            msgBlank( status );
-            baddets = astFree( baddets );
-         }
-
-         grpDelet( &alldets, status );
-      } 
+   were not found in the data. If the supplied group holds the detectors
+   to be excluded, modify it so that it holds the detectors to be
+   included. */
+      smf_checkdets( detgrp, data, status );
 
 /* Store a pointer to the next input data value */
       pdata = ( data->pntr )[ 0 ];

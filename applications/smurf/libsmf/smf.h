@@ -187,6 +187,8 @@
 *        -Added smf_choosepolbins, smf_freepolbins and smf_polext.
 *     2007-10-19 (DSB):
 *        -Added specunion to smf_cubebounds.
+*     2007-10-25 (DSB):
+*        -Added smf_checkdets.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -688,5 +690,7 @@ void smf_polext( int ondf, double angle, int *status );
 void smf_fft_filter( smfData *data, double srate, int *status );
 
 void smf_concat_smfGroup( smfGroup *igrp, smfArray **concat, int *status );
+
+void smf_checkdets( Grp *detgrp, smfData *data, int *status );
 
 #endif /* SMF_DEFINED */
