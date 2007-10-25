@@ -99,6 +99,8 @@
 *        Zero the size of memory blocks stored in the Cache so that an
 *        error will be reported if an attempt is made to free a memory 
 *        block that has already been freed.
+*     25-OCT-2007 (DSB):
+*        Added astRemoveLeadingBlanks.
 */
 
 /* Configuration results. */
@@ -1399,6 +1401,57 @@ void *astRealloc_( void *ptr, size_t size ) {
 
 /* Return the result. */
    return result;   
+}
+
+void astRemoveLeadingBlanks_( char *string ) {
+/*
+*+
+*  Name:
+*     astRemoveLeadingBlanks
+
+*  Purpose:
+*     Remove any leading white space from a string.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     void astRemoveLeadingBlanks( char *string )
+
+*  Description:
+*     This function moves characters in the supplied string to the left
+*     in order to remove any leading white space. 
+
+*  Parameters:
+*     string
+*        Pointer to the string.
+
+*-
+*/
+
+/* Local Variables: */
+   char *c, *d;              
+
+/* Check a string has been supplied. */
+   if( string ){
+
+/* Get a pointer to the first non-white character in the string. */
+      c = string;
+      while( *c && isspace( *c ) ) c++;
+
+/* Do nothing more if there are no leading spaces. */
+      if( c > string ) {
+
+/* Copy all characters (excluding the trailing null) to the left to
+   over-write the leading spaces. */
+         d = string;
+         while( *c ) *(d++) = *(c++);
+
+/* Terminate the returned string. */
+         *d = 0;
+      }
+   }
 }
 
 size_t astSizeOf_( const void *ptr ) {
