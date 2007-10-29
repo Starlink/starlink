@@ -38,6 +38,11 @@
 *  History:
 *     2007-10-19 (EC):
 *        Initial version.
+*     2007-10-29 (EC):
+*        -Fixed loop bounds for addressing DATA/VARIANCE/QUALITY memory
+*        -Inserted Ast status check after copying FITS headers
+*        -Fixed bug in reference file dimensions 
+*        -Modified interface to smf_open_file.
 
 *  Notes:
 *     Currently buggy / not fully implemented.
@@ -80,7 +85,6 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
-
 
 #define FUNC_NAME "smf_concat_smfGroup"
 
@@ -145,8 +149,6 @@ void smf_concat_smfGroup( smfGroup *igrp, smfArray **concat, int *status ) {
       /* Loop over subgroups (number of time chunks) */
       for( j=0; j<igrp->ngroups; j++ ) {
 
-	printf("here1: %i %i %i\n", i, pass, j );
-	
 	/* First pass - get dimensions */
 	if( pass == 0 ) {
 
@@ -247,14 +249,13 @@ void smf_concat_smfGroup( smfGroup *igrp, smfArray **concat, int *status ) {
 	    tlen += dims[2];
 	  }
 
-	  printf("here2: %i\n", tlen );
 	} 
 
 	/* Second pass copy data over to new array */
 	if( (pass == 1) && (*status == SAI__OK) ) {
 
 	  /* Open the file corresponding to this chunk */
-	  smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ", 1, 
+	  smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ", 0, 
 			 &refdata, status );
 
 	  if( *status == SAI__OK ) {
@@ -263,8 +264,6 @@ void smf_concat_smfGroup( smfGroup *igrp, smfArray **concat, int *status ) {
 	    if( j == 0 ) {
 	      tchunk = 0;
  
-	      printf("here3: %i\n", tlen );
-
 	      /* Allocate memory for empty smfData with a smfHead */
 	      data = smf_create_smfData( SMF__NOCREATE_DA, status );
 
@@ -288,28 +287,34 @@ void smf_concat_smfGroup( smfGroup *igrp, smfArray **concat, int *status ) {
 		     coordinates are derived using an AST polyMap */
 		}
 
-		hdr->fitshdr = astCopy( refhdr->fitshdr );
-
-		printf("here4: %i\n", tlen );
-
 		/* Allocate space for the concatenated allState */
 		hdr->nframes = tlen;
-		hdr->allState = smf_malloc( tlen, sizeof(*(hdr->allState)), 0, 
-					    status );
-
+		hdr->allState = smf_malloc( tlen, sizeof(*(hdr->allState)), 
+					    0, status );
+		
 		/* Allocate space in the smfData for DATA/VARAIANCE/QUALITY */
 		data->dtype = smf_dtype_fromstring( refdtype, status );
 		data->dims[0] = refdims[0];
 		data->dims[1] = refdims[1];
 		data->dims[2] = tlen;
 		data->ndims = 3;
-
+		
 		ndata = nbolo*tlen;
 
-		for( k=0; k<2; k++ ) if( havearray[k] ) {
+		for( k=0; k<3; k++ ) if( havearray[k] ) {
 		  if( k == 2 ) sz = smf_dtype_sz( SMF__USHORT, status );
 		  else sz = smf_dtype_sz(data->dtype, status );
 		  data->pntr[k] = smf_malloc(ndata, sz, 0, status);
+		}
+
+		/* Copy over the FITS header */
+		hdr->fitshdr = astCopy( refhdr->fitshdr );
+		if (!astOK) {
+		  if (*status == SAI__OK) {
+		    *status = SAI__ERROR;
+		    errRep( FUNC_NAME, "AST error copying FITS header", 
+			    status);
+		  }
 		}
 	      }
 	    }
@@ -317,32 +322,30 @@ void smf_concat_smfGroup( smfGroup *igrp, smfArray **concat, int *status ) {
 	    /* Copy DATA/QUALITY/VARIANCE and JCMTstate information into
                concatenated smfData */
 
-	    reftlen = data->dims[2];
-	    refndata = reftlen*nbolo;
+	    if( *status == SAI__OK ) {
+	      reftlen = refdata->dims[2];
+	      refndata = reftlen*nbolo;
 
-	    for( k=0; k<2; k++ ) if( havearray[k] ) {
-	      if( k == 2 ) sz = smf_dtype_sz( SMF__USHORT, status );
-	      else sz = smf_dtype_sz(data->dtype, status );
+	      for( k=0; k<3; k++ ) if( havearray[k] ) {
+		if( k == 2 ) sz = smf_dtype_sz( SMF__USHORT, status );
+		else sz = smf_dtype_sz(data->dtype, status );
 	      
-	      hdr = data->hdr;
-	      refhdr = refdata->hdr;	    
+		hdr = data->hdr;
+		refhdr = refdata->hdr;	    
 
-	      printf("here5 \n");
+		if( *status == SAI__OK ) {
+		  memcpy( (char *)data->pntr[k] + tchunk*nbolo*sz,
+			  refdata->pntr[k], refndata*sz );
 
-	      if( *status == SAI__OK ) {
-		printf("ooga1\n");
-		memcpy( (char *)data->pntr[k] + tchunk*nbolo*sz,
-			refdata->pntr[k], refndata*sz );
+		  memcpy( &(hdr->allState[tchunk]), refhdr->allState, 
+			  reftlen*sizeof(*hdr->allState) );
+		}
 
-		printf("ooga2\n");
-		memcpy( &(hdr->allState[tchunk]), refhdr->allState, 
-			reftlen*sizeof(*hdr->allState) );
 	      }
-
-	    }
 	    
-	    /* increment tchunk */
-	    tchunk += reftlen;
+	      /* increment tchunk */
+	      tchunk += reftlen;
+	    }
 	  }
 
 	  /* Close the file we had open */
