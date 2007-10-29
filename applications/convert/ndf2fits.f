@@ -476,6 +476,18 @@
 *     Keywords for the extension level, name, and type appear in the
 *     binary-table header.
 
+*     o JCMT SMURF
+*
+*     Standard processing is used except for the SMURF-type extension.
+*     This contains NDFs such as EXP_TIME and TSYS.  Each such NDF
+*     is treated like the main NDF except that it is assumed that
+*     these extension NDFs have no extensions of their own.  FITS
+*     airlock information and HISTORY are inherited from the parent
+*     NDF.  Also the extension keywords are written: EXTNAME gives the
+*     path to the NDF, EXTLEVEL records the extension hierarchy level,
+*     and EXTTYPE is set to "NDF".  Any non-NDF components of the SMURF
+*     extension are written to a binary table in the normal fashion.
+*
 *  References:
 *     Bailey, J.A. 1997, 2dF Software Report 14, version 0.5.
 *     NASA Office of Standards and Technology, 1994, "A User's Guide

@@ -13,12 +13,14 @@
 
 *  Invocation:
 *     CALL COF_NDF2F( NDF, FILNAM, NOARR, ARRNAM, BITPIX, BLOCKF,
-*                     ORIGIN, PROFIT, DUPLEX, PROEXT, PROHIS, ENCOD, 
-*                     NATIVE, STATUS )
+*                     ORIGIN, PROFIT, DUPLEX, PROEXT, PROHIS, SUMS,
+*                     ENCOD, NATIVE, STATUS )
 
 *  Description:
 *     This routine converts an NDF into a FITS file.  It uses as much
-*     standard NDF information as possible to define the headers...
+*     standard NDF information as possible to define the headers.  See
+*     The Notes for the details.  Multiple NDF container files may be
+*     converted.
 
 *  Arguments:
 *     NDF = INTEGER (Given)
@@ -263,6 +265,10 @@
 *        .TRUE.
 *     2007 October 19 (MJC):
 *        Add DUPLEX argument.
+*     2007 October 25 (MJC):
+*        Implement the revised COF_WHEAD API.
+*     2007 October 26 (MJC):
+*        Implement the further revised COF_WHEAD API.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -326,16 +332,16 @@
       INTEGER BPOUTU             ! Output array's BITPIX unsigned
                                  ! version
       DOUBLE PRECISION BSCALE    ! Block-integer scale factor
-      CHARACTER * ( 200 ) BUFFER ! Buffer for error messages
+      CHARACTER*200  BUFFER      ! Buffer for error messages
       DOUBLE PRECISION BZERO     ! Block-integer offset
-      CHARACTER * ( 48 ) COMENT  ! Comment from FITS-extension header
+      CHARACTER*48 COMENT        ! Comment from FITS-extension header
       DOUBLE PRECISION DELTA     ! Machine precision for scaling
       INTEGER DIMS( NDF__MXDIM ) ! NDF dimensions (axis length)
       LOGICAL E2DF               ! Extension is from 2dF?
       INTEGER EL                 ! Number of elements in array
       LOGICAL FEXIST             ! FITS already exists?
       LOGICAL FITPRE             ! FITS airlock extension is present?
-      CHARACTER FORM * ( NDF__SZFRM ) ! Storage form
+      CHARACTER*( NDF__SZFRM ) FORM ! Storage form
       DOUBLE PRECISION FSCALE    ! Reduction factor for scale
       INTEGER FSTAT              ! FITSIO error status
       INTEGER FSTATC             ! FITSIO error status for file closure
@@ -360,7 +366,7 @@
       INTEGER NEX2PR             ! Number of extensions to process
       LOGICAL NSCALE             ! Array component is scaled in the NDF?
       BYTE NULL8                 ! Null value for BITPIX=8
-      INTEGER * 2 NULL16         ! Null value for BITPIX=16
+      INTEGER*2 NULL16           ! Null value for BITPIX=16
       INTEGER NULL32             ! Null value for BITPIX=32
       REAL NUL_32                ! Null value for BITPIX=-32
       DOUBLE PRECISION NUL_64    ! Null value for BITPIX=-64
@@ -369,14 +375,15 @@
                                  ! current header?
       INTEGER SBYTES             ! No. of bytes per scaled array value
       LOGICAL SCALE              ! The array is to be scaled?
-      CHARACTER SCTYPE * ( DAT__SZTYP )! Data type for scaled arrays
+      CHARACTER*( DAT__SZTYP ) SCTYPE ! Data type for scaled arrays
       LOGICAL SHIFT              ! A BZERO offset is required?
+      LOGICAL SMURF              ! Extension is from SMURF package?
       LOGICAL THERE              ! BITPIX FITS header card ! is present?
-      CHARACTER * ( NDF__SZTYP ) TYPE ! NDF array's data type
+      CHARACTER*( NDF__SZTYP ) TYPE ! NDF array's data type
       LOGICAL VALID              ! The NDF identifier is valid?
-      CHARACTER * ( DAT__SZLOC ) XLOC ! Locator to an NDF extension
-      CHARACTER * ( NDF__SZXNM ) XNAME ! Name of NDF extension
-      CHARACTER * ( DAT__SZTYP ) XTYPE ! Name of NDF extension
+      CHARACTER*( DAT__SZLOC ) XLOC ! Locator to an NDF extension
+      CHARACTER*( NDF__SZXNM ) XNAME ! Name of NDF extension
+      CHARACTER*( DAT__SZTYP ) XTYPE ! Name of NDF extension
       
 *  Save persistent variables.
       SAVE FUNIT, NCF
@@ -603,8 +610,9 @@
 
 *  First write the standard headers, and merge in the FITS extension
 *  when requested to do so.
-         CALL COF_WHEAD( NDF, ARRNAM( ICOMP ), FUNIT, BPOUT, PROPEX,
-     :                   ORIGIN, ENCOD, NATIVE, MULTIN, STATUS )
+         CALL COF_WHEAD( NDF, NDF, ARRNAM( ICOMP ), FUNIT, BPOUT, 
+     :                   PROPEX, ORIGIN, ENCOD, NATIVE, MULTIN, ' ',
+     :                   STATUS )
          IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Determine whether or not there are history records in the NDF.
@@ -1064,8 +1072,11 @@
      :                   XNAME .EQ. 'FIBRES_IFU' ) .AND. 
      :                   XTYPE .EQ. 'FIBRE_EXT'
 
+                  SMURF = ( XTYPE .EQ. 'SMURF' )
+
 *  Skip over the FITS extension.
-                  IF ( XNAME .NE. 'FITS' .AND. .NOT. E2DF ) THEN
+                  IF ( XNAME .NE. 'FITS' .AND. .NOT. E2DF .AND. 
+     :                 .NOT. SMURF ) THEN
 
 *  Process the extension into a hierarchy.
                      CALL COF_THIER( XNAME, XLOC, FUNIT, STATUS )
@@ -1074,6 +1085,14 @@
                   ELSE IF ( E2DF ) THEN
                      CALL COF_2DFEX( XNAME, XLOC, FUNIT, STATUS )
 
+                  ELSE IF ( SMURF ) THEN
+                  
+*  Handle SMURF extension's NDFs as NDFs rather than a general HDS
+*  structure, but also inherit the parent NDFs.
+                     CALL COF_SMURF( XNAME, XLOC, FUNIT, NDF, FILNAM, 
+     :                               NOARR, ARRNAM, BITPIX, BLOCKF, 
+     :                               ORIGIN, PROFIT, DUPLEX, PROHIS, 
+     :                               SUMS, ENCOD, NATIVE, STATUS )
                   END IF
 
 *  Write integrity-check headers.

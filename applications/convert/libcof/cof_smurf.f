@@ -1,0 +1,226 @@
+      SUBROUTINE COF_SMURF( SNAME, LOC, FUNIT, NDF, FILNAM, NOARR, 
+     :                      ARRNAM, BITPIX, BLOCKF, ORIGIN, PROFIT, 
+     :                      DUPLEX, PROHIS, SUMS, ENCOD, 
+     :                      NATIVE, STATUS )
+*+
+*  Name:
+*     COF_SMURF
+
+*  Purpose:
+*     Converts a SMURF extension into FITS extensions.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL COF_SMURF( SNAME, LOC, FUNIT, NDF, FILNAM, NOARR, ARRNAM, 
+*                     BITPIX, BLOCKF, ORIGIN, PROFIT, DUPLEX, 
+*                     PROHIS, ENCOD, NATIVE, STATUS )
+
+*  Description:
+*     This routine converts contents of a SMURF extension to FITS.  Each
+*     NDF is converted in turn in standard fashion.  It is assumed that
+*     the NDFs do not contain their own metadata, thus may inherit the 
+*     metadata in the FITS airlock and HISTORY records from the parent
+*     NDF.  Any other components of the structure are converted to a
+*     binary table, as in the general case of extension conversion.
+*
+*     Most of the arguments are merely passed to the routine that
+*     converts each NDF within the SMURF extension.
+
+*  Arguments:
+*     SNAME = CHARACTER * ( * ) (Given)
+*        The name of structure.  It is used to form the EXTNAME
+*        keyword.
+*     LOC = CHARACTER * ( DAT__SZLOC ) (Given)
+*        Locator to the 2dF extension structure whose contents are to
+*        be converted to binary tables.
+*     FUNIT = INTEGER (Given)
+*        The logical unit number of the output FITS file.
+*     NDF = INTEGER (Given)
+*        The identifier of the parent NDF.
+*     FILNAM = CHARACTER * ( * ) (Given)
+*        The name of the output FITS file.
+*     NOARR = INTEGER (Given)
+*        The number of NDF arrays to copy.  Where there are no arrays,
+*        just a header-only NDF is to be written to the
+*        current header and data unit of the FITS file, do not set this
+*        to zero, as it is used for the adjustable array ARRNAM; instead
+*        specify NOARR=1 and and set ARRNAM to 'HEADER'.
+*     ARRNAM( NOARR ) = CHARACTER * ( * ) (Given)
+*        The names (in uppercase) of the NDF array components to write 
+*        to the FITS file.  These should be in the order to be written. 
+*        If the DATA component is present it should be first.
+*     BITPIX = INTEGER (Given)
+*        The number of bits per pixel (FITS BITPIX) required for the
+*        output FITS file.  In addition there are three special values.
+*        A value of 0 means use the BITPIX of the input array.  A value 
+*        of -1 means use the value of the BITPIX keyword in the NDF's 
+*        FITS extension; if the extension or BITPIX card is absent, the 
+*        BITPIX of the input array is used.  BITPIX=1 requests that any 
+*        scaled arrays in the NDF be copied to the scaled data type.  
+*        In the absence of a scaled array, behaviour reverts to 
+*        BITPIX=-1, which may in turn be effectively BITPIX=0.
+*     BLOCKF = INTEGER (Given)
+*        The blocking factor for the output file.  It must be a positive
+*        integer between 1 and 10.
+*     ORIGIN = CHARACTER * ( * ) (Given)
+*        The name of the institution where the FITS file originates.
+*        This is used to create the ORIGIN card in the FITS header.
+*        A blank value gives a default of "Starlink Project, U.K.".
+*     PROFIT = LOGICAL (Given)
+*        If .TRUE., the contents of the FITS airlock, if present, are
+*        merged into the FITS header.  Argument DUPLEX qualifies to
+*        which arrays this applies.  Certain cards in this extension
+*        are not propagated ever and others may only be propagated when
+*        certain standard items are not present in the NDF.  See routine
+*        COF_WHEAD for details.
+*     DUPLEX = LOGICAL (Give)
+*        This qualifies the effect of PROFIT=.TRUE.  A .FALSE. value
+*        means that the airlocks headers only appear with the primary 
+*        array.  Supplying .TRUE., propagates the FITS airlock headers 
+*        for other array components of the NDF.
+*     PROHIS = LOGICAL (Given)
+*        If .TRUE., any NDF history records are written to the primary
+*        FITS header as HISTORY cards.  These follow the mandatory
+*        headers and any merged FITS-extension headers (see PROFIT).
+*     SUMS = LOGICAL (Given)
+*        If .TRUE., DATASUM and CHECKSUM headers are written to each
+*        HDU.
+*     ENCOD = CHARACTER * ( * ) (Given)
+*        The encoding to use. If this is blank, then a default encoding 
+*        is chosen based on the contents of the FITS extension. The
+*        supplied string should be a recognised AST encoding such as 
+*        'DSS', 'FITS-WCS', 'NATIVE', etc (or a blank string).
+*     NATIVE = LOGICAL (Given)
+*        Should a NATIVE encoding of the WCS info be included in the
+*        header?
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Prior requirements:
+*     -  A primary HDU unit exists in the FITS file, and the file is
+*     open.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2007 October 21 (MJC):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! Data-system constants
+
+*  Arguments Given:
+      CHARACTER * ( * ) SNAME
+      CHARACTER * ( * ) LOC
+      INTEGER FUNIT
+      INTEGER NDF
+      CHARACTER * ( * ) FILNAM
+      INTEGER NOARR
+      CHARACTER * ( * ) ARRNAM( NOARR )
+      INTEGER BITPIX
+      INTEGER BLOCKF
+      CHARACTER * ( * ) ORIGIN
+      LOGICAL PROFIT
+      LOGICAL DUPLEX
+      LOGICAL PROHIS
+      LOGICAL SUMS
+      CHARACTER * ( * ) ENCOD
+      LOGICAL NATIVE
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Constants:
+      INTEGER   FITSOK           ! Value of good FITSIO status
+      PARAMETER ( FITSOK = 0 )
+
+*  Local Variables:
+      CHARACTER*( DAT__SZLOC ) CLOC ! Locator to a SMURF component
+      CHARACTER*256 FILE         ! Name of the HDS file (dummy)
+      INTEGER I                  ! Loop counter
+      INTEGER NCOMP              ! Number of components SMURF extension
+      INTEGER NDFE               ! Extension NDF identifier
+      CHARACTER*68 NAME          ! Name of HDS path
+      INTEGER NLEV               ! Number of hierarchical levels
+      CHARACTER*( DAT__SZTYP ) TYPE ! Type of the NDF component
+      LOGICAL VALID              ! The NDF identifier is valid?
+      
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Validate the NDF identifier.
+*  ============================
+      CALL NDF_VALID( NDF, VALID, STATUS )
+
+*  Report an error if the identifier is not valid.
+      IF ( .NOT. VALID ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'COF_SMURF_INVNDF',
+     :     'COF_SMURF: The identifier to the input NDF is invalid. '/
+     :     /'(Probable programming error.)', STATUS )
+         GOTO 999
+      END IF
+
+*  Validate that we have a SMURF extension.
+      CALL DAT_TYPE( LOC, TYPE, STATUS )
+      IF ( TYPE .NE. 'SMURF' ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'COF_SMURF_NOTSMURFF',
+     :     'COF_SMURF: The supplied extension is not of type SMURF.'/
+     :     /'(Probable programming error.)', STATUS )
+         GOTO 999
+      END IF
+
+*  Find the number of components within the extension.
+      CALL DAT_NCOMP( LOC, NCOMP, STATUS )
+
+*  Enumerate the SMURF extension components.
+      DO I = 1, NCOMP
+         CALL DAT_INDEX( LOC, I, CLOC, STATUS )
+
+*  Get the object's path name and assign it to the extension name.
+         CALL HDS_TRACE( CLOC, NLEV, NAME, FILE, STATUS )
+
+*  Check if the component is an NDF.
+         CALL DAT_TYPE( CLOC, TYPE, STATUS )
+         IF ( TYPE .EQ. 'NDF' ) THEN
+
+*  Obtain an identifier to the NDF.
+            CALL NDF_FIND( CLOC, ' ', NDFE, STATUS )
+
+*  Convert the NDF, but using the parent NDF's metadata.
+            CALL COF_NEX2F( NAME, FUNIT, NDF, NDFE, FILNAM, 1,
+     :                      ARRNAM, BITPIX, BLOCKF, ORIGIN, PROFIT, 
+     :                      DUPLEX, PROHIS, SUMS, ENCOD, NATIVE, 
+     :                      STATUS )
+
+*   Free resources.
+            CALL NDF_ANNUL( NDFE, STATUS )
+         ELSE
+
+*  Process the component into a hierarchy if its a structure.
+            CALL COF_THIER( NAME, CLOC, FUNIT, STATUS )
+         END IF
+
+         CALL DAT_ANNUL( CLOC, STATUS )
+      END DO
+
+  999 CONTINUE      
+
+      END

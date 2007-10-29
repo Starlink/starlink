@@ -1,5 +1,6 @@
-      SUBROUTINE COF_WHEAD( NDF, COMP, FUNIT, BITPIX, PROPEX, ORIGIN,
-     :                      ENCOD, NATIVE, MULTI, STATUS )
+      SUBROUTINE COF_WHEAD( NDFI, NDFFAI, COMP, FUNIT, BITPIX, PROPEX, 
+     :                      ORIGIN, ENCOD, NATIVE, MULTI, EXTNAM, 
+     :                      STATUS )
 *+
 *  Name:
 *     COF_WHEAD
@@ -11,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL COF_WHEAD( NDF, COMP, FUNIT, BITPIX, PROPEX, ORIGIN,
-*                     ENCOD, NATIVE, MULTI, STATUS )
+*     CALL COF_WHEAD( NDFI, NDFFAI, COMP, FUNIT, BITPIX, PROPEX,
+*                     ORIGIN, ENCOD, NATIVE, MULTI, EXTNAM, STATUS )
 
 *  Description:
 *     This routine creates the header section of the primary array or
@@ -30,8 +31,15 @@
 *     over-write any keywords created in stages a) and b).
 
 *  Arguments:
-*     NDF = INTEGER (Given)
-*        The identifier of the NDF.
+*     NDFI = INTEGER (Given)
+*        The identifier of the NDF.  Ths is used to access those
+*        characteristics such as shape and the character components that
+*        are stored outside of the FITS airlock.
+*     NDFFAI = INTEGER (Given)
+*        The identifier of another NDF whose FITS airlock is used.  In
+*        normal circumstances this will be the same identifier as 
+*        argument NDFI.  However, when processing an extension NDF,
+*        this argument may point to the primary NDF.
 *     COMP = CHARACTER * ( * ) (Given)
 *        The array component to write to the HDU.
 *     FUNIT = INTEGER (Given)
@@ -52,7 +60,15 @@
 *     NATIVE = LOGICAL (Given)
 *        Include a NATIVE encoding of the WCS info in the header?
 *     MULTI = LOGICAL (Given)
-*        The input NDF is part of a multi-NDF container file?
+*        This should only be set .TRUE. when input NDF is part of a 
+*        multi-NDF container file,
+*     EXTNAM = CHARACTER * ( * ) (Given)
+*        If the input NDF is part of an extension, set this to the 
+*        extension's path (including its name) within the NDF 
+*        hierarchy.  A blank string indicastes that the NDF being
+*        processed in the primary NDF.  This argument affects the
+*        values or presence of FITS keywords.  See the Notes
+*        for EXTNAME, EXTLEVEL, and EXTTYPE keywords.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -87,7 +103,14 @@
 *          ORIGIN other than the default "Starlink Project, U.K." or
 *          a blank string.
 *        EXTNAME --- is the component name of the object from the COMP
-*          argument.
+*          argument, unless argument EXTNAM is not blank when
+*          EXTNAME is set to EXTNAM. 
+*        EXTLEVEL --- when argument EXTNAM is not blank, this is the 
+*          level in the hierarchical structure of the extension.  A 
+*          top-level extension has value 1, sub-components of this
+*          extension have value 2 and so on.
+*        EXTTYPE --- when argument EXTNAM is not blank, this is set to
+*          "NDF".
 *        HDUCLAS1, HDUCLASn --- "NDF" and the value of COMP
 *          respectively.
 *        XTENSION, BSCALE, BZERO, BLANK and END --- are not propagated
@@ -159,6 +182,10 @@
 *        in the FITS airlock.
 *     2007 October 19 (MJC):
 *        Revise documented BUNIT for VARIANCE and QUALITY.
+*     2007 October 25 (MJC):
+*        Add EXTNAM argument.
+*     2007 October 26 (MJC):
+*        Add NDFFAI argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -177,7 +204,8 @@
       INCLUDE 'MSG_PAR'          ! MSG_ constants
 
 *  Arguments Given:
-      INTEGER   NDF              ! NDF identifier
+      INTEGER   NDFI             ! NDF identifier
+      INTEGER   NDFFAI           ! NDF identifier for FITS airlock
       CHARACTER * ( * ) COMP     ! The array component
       INTEGER   FUNIT            ! Logical-unit number of FITS file
       INTEGER   BITPIX           ! Bits per pixel
@@ -186,9 +214,14 @@
       CHARACTER * ( * ) ENCOD    ! The AST encoding to use for WCS info
       LOGICAL   NATIVE           ! Include NATIVE encoding of WCS info?
       LOGICAL   MULTI            ! Multi-NDF container file?
+      CHARACTER * ( * ) EXTNAM
 
 *  Status:
       INTEGER STATUS             ! Global status
+
+*  External References:
+      INTEGER CHR_LEN            ! Length of a string less trailing
+                                 ! blanks
 
 *  Local Constants:
       INTEGER FITSOK             ! Good status for FITSIO library
@@ -225,6 +258,7 @@
       CHARACTER CRVAL * ( SZKEY ) ! Keyword name of CRVALn
       INTEGER   DIMS( NDF__MXDIM ) ! NDF dimensions (axis length)
       INTEGER   DOTPOS           ! Position of HDS component separator
+      INTEGER   EXTLEV           ! Extension hierarchy level
       LOGICAL   FITSPR           ! FITS extension is present?
       CHARACTER FITSTR * ( SZFITS ) ! FITS header
       INTEGER   FSTAT            ! FITSIO status
@@ -241,7 +275,7 @@
       INTEGER   NCOMP            ! Number of components
       CHARACTER * ( MSG__SZMSG ) NDFNAM ! NDF name for multi-NDF
       INTEGER   NDIM             ! Number of dimensions
-      CHARACTER NULL * ( 1 )     ! ASCII null character
+      CHARACTER NULL*1           ! ASCII null character
       LOGICAL   PRORIG           ! Use supplied ORIGIN argument
       LOGICAL   ROTAX( DAT__MXDIM ) ! An axis is rotated in the FITS
                                  ! extension?
@@ -297,32 +331,73 @@
 *      string.
 *    BLANK --- is created for integer data types from the bad value.
 *
-      CALL COF_WNDFH( NDF, COMP, FUNIT, NFLAGS, BITPIX, LORIGN, 
+      CALL COF_WNDFH( NDFI, COMP, FUNIT, NFLAGS, BITPIX, LORIGN, 
      :                PROPEX, CMPFND, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-*  Write classification and naming headers.
-*  ========================================
+*  Write classification, naming, and extension headers.
+*  ====================================================
       CALL FTPKYS( FUNIT, 'HDUCLAS1', 'NDF', 'Starlink NDF '/
      :             /'(hierarchical n-dim format)', FSTAT )
 
       CALL FTPKYS( FUNIT, 'HDUCLAS2', COMP, 'Array component subclass',
      :             FSTAT )
 
-      IF ( COMP .NE. 'DATA' .AND. COMP .NE. 'HEADER' ) THEN
+      IF ( EXTNAM( 1:1 ) .NE. ' ' ) THEN
+
+*  Write the NDF's component name.
+         NCHAR = CHR_LEN( EXTNAM )
+         CALL FTPKYS( FUNIT, 'EXTNAME', EXTNAM( :MIN( 68, NCHAR ) ), 
+     :                'Component', FSTAT )
+
+*  Set the extension type.
+         CALL FTPKYS( FUNIT, 'EXTTYPE', 'NDF', 'HDS data '/
+     :                /'type of the extension object', FSTAT )
+
+
+      ELSE IF ( COMP .NE. 'DATA' .AND. COMP .NE. 'HEADER' ) THEN
 
 *  Write the NDF's component name.
          CALL FTPKYS( FUNIT, 'EXTNAME', COMP, 'Array component',
      :                FSTAT )
+
       END IF
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
       IF ( FSTAT .GT. FITSOK ) THEN
          CALL COF_FIOER( FSTAT, 'COF_WHEAD_ERR1', 'FTPKYS',
-     :     'Error writing an EXTNAME or HDUCLASn header card.',
+     :     'Error writing an EXTNAME, EXTTYPE or HDUCLASn header card.',
      :     STATUS )
          GOTO 999
+      END IF
+
+      IF ( EXTNAM( 1:1 ) .NE. ' ' ) THEN
+
+*  Count the level delimiters.  The first two words will be the
+*  NDF name and MORE, so initialise so that the first extension has
+*  level 1.
+         DOTPOS = 1
+         EXTLEV = -1
+         DO WHILE ( DOTPOS .LE. NCHAR )
+            CALL CHR_FIND( EXTNAM, '.', .TRUE., DOTPOS )
+            IF ( DOTPOS .LE. NCHAR ) EXTLEV = EXTLEV + 1
+            DOTPOS = DOTPOS + 1
+         END DO
+ 
+*  Set the extension level.
+         IF ( EXTLEV .GT. 0 ) THEN
+            CALL FTPKYJ( FUNIT, 'EXTLEVEL', EXTLEV, 'Level in the '/
+     :                   /'hierarchical structure', FSTAT )
+
+*  Handle a bad status.  Negative values are reserved for non-fatal
+*  warnings.
+            IF ( FSTAT .GT. FITSOK ) THEN
+               CALL COF_FIOER( FSTAT, 'COF_WHEAD_ERR7', 'FTPKYJ',
+     :           'Error writing extension level in header.', STATUS )
+               GOTO 999
+            END IF
+         END IF
       END IF
 
 *  Write additional header cards for the multi-NDF component.
@@ -333,7 +408,7 @@
       IF ( MULTI ) THEN
 
 *  Obtain the NDF name.
-         CALL NDF_MSG( 'NDF', NDF )
+         CALL NDF_MSG( 'NDF', NDFI )
          CALL MSG_LOAD( 'NDFNAME', '^NDF', NDFNAM, NCHAR, STATUS )
          DOTPOS = 1
          CALL CHR_FIND( NDFNAM, '.', .TRUE., DOTPOS )
@@ -370,7 +445,7 @@
 *  =============================================
 
 *  Check for presence of NDF FITS extension.
-      CALL NDF_XSTAT( NDF, 'FITS', FITSPR, STATUS )
+      CALL NDF_XSTAT( NDFFAI, 'FITS', FITSPR, STATUS )
       IF ( FITSPR .AND. PROPEX ) THEN
 
 *  Proceed to merge the headers in the FITS extension into the
@@ -394,7 +469,7 @@
          UNTFND = CMPFND( 6 )
 
 *  Obtain the number of dimensions of the NDF.
-         CALL NDF_DIM( NDF, NDF__MXDIM, DIMS, NDIM, STATUS )
+         CALL NDF_DIM( NDFI, NDF__MXDIM, DIMS, NDIM, STATUS )
 
 *  Initialise the flags that indicate a rotated axis.
          DO I = 1, NDIM
@@ -402,7 +477,7 @@
          END DO
 
 *  Deal with the items in the NDF FITS extension one by one.
-         CALL NDF_XLOC( NDF, 'FITS', 'READ', FTLOC, STATUS )
+         CALL NDF_XLOC( NDFFAI, 'FITS', 'READ', FTLOC, STATUS )
          CALL DAT_SIZE( FTLOC, NCOMP, STATUS )
 
 *  Loop for each header in the NDF FITS extension.
@@ -617,7 +692,7 @@
 
 *  Write out the NDF WCS information.
 *  ==================================
-      CALL COF_FPWCS( FUNIT, NDF, ENCOD, NATIVE, STATUS )
+      CALL COF_FPWCS( FUNIT, NDFI, ENCOD, NATIVE, STATUS )
 
   999 CONTINUE
 

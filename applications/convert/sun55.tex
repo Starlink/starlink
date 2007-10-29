@@ -23,10 +23,10 @@
                                 A.J.Chipperfield\\
                                 D.S.Berry\\
                                 A.C.Davenhall}
-\newcommand{\stardocdate}      {2007 October 19}
+\newcommand{\stardocdate}      {2007 October 26}
 \newcommand{\stardoctitle}     {CONVERT\\
                                 A Format-conversion Package}
-\newcommand{\stardocversion}   {Version 1.5-11}
+\newcommand{\stardocversion}   {Version 1.5-12}
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {
 The \CONVERT\ package contains utilities for converting data files
@@ -4807,6 +4807,20 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 
          Keywords for the extension level, name, and type appear in the
          binary-table header.
+
+         \sstitem
+         JCMT SMURF
+
+         Standard processing is used except for the SMURF-type extension.
+         This contains NDFs such as EXP\_TIME and TSYS.  Each such NDF
+         is treated like the main NDF except that it is assumed that
+         these extension NDFs have no extensions of their own.  FITS
+         airlock information and HISTORY are inherited from the parent
+         NDF.  Also the extension keywords are written: EXTNAME gives the
+         path to the NDF, EXTLEVEL records the extension hierarchy level,
+         and EXTTYPE is set to \texttt{"NDF"}.  Any non-NDF components of 
+         the SMURF extension are written to a binary table in the normal 
+         fashion.
       }
    }
    \sstdiytopic{
@@ -7198,5 +7212,11 @@ keyword is absent for a QUALITY array.
 There is a new DUPLEX parameter.  When set \texttt{TRUE} (and PROFITS
 is also \texttt{TRUE}), it permits the FITS airlock headers to appear
 also in the IMAGE extensions for the VARIANCE and QUALITY arrays.
+
+\section{Release Notes -- V1.5-12}
+
+\htmlref{NDF2FITS}{NDF2FITS} now makes special provision for the JCMT
+SMURF-package extension.  It treats the extension contents as NDFs
+rather than arbitrary HDS structures.
 
 \end{document}
