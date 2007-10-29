@@ -623,6 +623,8 @@
 *        - Added SPECUNION parameter.
 *     25-OCT-2007 (DSB):
 *        Modify description of DETECTORS parameter.
+*     29-OCT-2007 (DSB):
+*        Added Label and Unit values to the extension NDFs.
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -1453,6 +1455,9 @@ void smurf_makecube( int *status ) {
          if( expdata ) {
             exp_array = (expdata->pntr)[ 0 ];
             ndfPtwcs( wcstile2d, expdata->file->ndfid, status );
+            ndfCput( "Total exposure time", expdata->file->ndfid, "Label", 
+                     status ); 
+            ndfCput( "s", expdata->file->ndfid, "Unit", status ); 
          }
    
          smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "EFF_TIME", "NEW", 
@@ -1461,6 +1466,9 @@ void smurf_makecube( int *status ) {
          if( effdata ) {
             eff_array = (effdata->pntr)[ 0 ];
             ndfPtwcs( wcstile2d, effdata->file->ndfid, status );
+            ndfCput( "Effective integration time", effdata->file->ndfid, 
+                     "Label", status ); 
+            ndfCput( "s", effdata->file->ndfid, "Unit", status ); 
          }
    
          if( genvar ) {
@@ -1470,6 +1478,9 @@ void smurf_makecube( int *status ) {
             if( tsysdata ) {
                tsys_array = (tsysdata->pntr)[ 0 ];
                ndfPtwcs( wcstile2d, tsysdata->file->ndfid, status );
+               ndfCput( "Effective system temperature", tsysdata->file->ndfid, 
+                        "Label", status ); 
+               ndfCput( "K", tsysdata->file->ndfid, "Unit", status ); 
             }
          }
    
