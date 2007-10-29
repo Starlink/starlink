@@ -13,8 +13,8 @@
 *     Library routine
 
 *  Invocation:
-*     smf_open_file( const Grp * ingrp, int index, const char * mode, int withHdr,
-*                    smfData ** data, int *status);
+*     smf_open_file( const Grp * ingrp, int index, const char * mode, 
+*                    int flags, smfData ** data, int *status);
 
 *  Arguments:
 *     ingrp = const Grp * (Given)
@@ -23,8 +23,8 @@
 *        Index corresponding to required file in group
 *     mode = const char * (Given)
 *        File access mode
-*     withHdr = int (Given)
-*        If true, populate the smfHead component. Otherwise leave null.
+*     flags = int (Given)
+*        Bitmask controls which components are opened. If 0 open everything.
 *        Mainly required to work around sc2store problems.
 *     data = smfData ** (Returned)
 *        Pointer to pointer smfData struct to be filled with file info and data
@@ -42,6 +42,9 @@
 *  Notes:
 *     - If a file has no FITS header then a warning is issued
 *     - JCMTState is NULL for non-time series data
+*     - The following bit flags defined in smf_typ.h are used for "flags" par:
+*       SMF__NOCREATE_HEAD: Do not allocate smfHead
+*       SMF__NOCREATE_DATA: Do not map DATA/VARIANCE/QUALITY arrays
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -186,7 +189,7 @@
 
 #define FUNC_NAME "smf_open_file"
 
-void smf_open_file( const Grp * igrp, int index, const char * mode, int withHdr,
+void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
 		    smfData ** data, int *status) {
 
   char dtype[NDF__SZTYP+1];  /* String for DATA type */
@@ -236,12 +239,12 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int withHdr,
 
   /* Pasted from readsc2ndf */
   int colsize;               /* number of pixels in column */
-  char fitsrec[SC2STORE__MAXFITS*80+1];      /* FITS headers read from sc2store */
+  char fitsrec[SC2STORE__MAXFITS*80+1];   /* FITS headers read from sc2store */
   int maxlen = 81;           /* maximum length of a FITS header */
   unsigned int nfits;        /* number of FITS headers */
   int nframes;               /* number of frames */
   int rowsize;               /* number of pixels in row (returned) */
-  int flags = 0;             /* Flags for smf_create_smfData */
+  int createflags = 0;       /* Flags for smf_create_smfData */
 
   int gndf;                  /* General purpose NDF identifier (SCU2RED & DREAM) */
   int place;                 /* NDF placeholder for SCANFIT extension */
@@ -328,11 +331,11 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int withHdr,
   }
 
   /* Now we need to create some structures */
-  if (!withHdr) flags |= SMF__NOCREATE_HEAD;
-  if (isFlat)   flags |= SMF__NOCREATE_DA;
+  if (flags & SMF__NOCREATE_HEAD) createflags |= SMF__NOCREATE_HEAD;
+  if (isFlat) createflags |= SMF__NOCREATE_DA;
 
   /* Allocate memory for the smfData */
-  *data = smf_create_smfData( flags, status );
+  *data = smf_create_smfData( createflags, status );
 
   /* If all's well, proceed */
   if ( *status == SAI__OK) {
@@ -398,7 +401,7 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int withHdr,
 	ndfMap( indf, "VARIANCE", dtype, mode, &outdata[1], &nout, status );
       }
 
-      if (withHdr) {
+      if ( !(flags & SMF__NOCREATE_HEAD) ) {
 
 	/* Read the FITS headers */
 	kpgGtfts( indf, &(hdr->fitshdr), status );
@@ -505,7 +508,7 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int withHdr,
 
       if (*status == SAI__OK) {
 	/* Free header info if no longer needed */
-	if (!withHdr && tmpState != NULL) {
+	if ( (flags & SMF__NOCREATE_HEAD) && tmpState != NULL) {
 	  /* can not use smf_free */
 	  free( tmpState );
 	  tmpState = NULL;
@@ -532,7 +535,7 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int withHdr,
 					sizeof(double)* da->nflat);
 
 	/* Create a FitsChan from the FITS headers */
-	if (withHdr) {
+	if ( !(flags & SMF__NOCREATE_HEAD) ) {
 	  smf_fits_crchan( nfits, fitsrec, &(hdr->fitshdr), status); 
 
 	  /* Instrument must be SCUBA-2 */
