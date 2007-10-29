@@ -42,6 +42,7 @@
 *  Authors:
 *     Andy Gibb (UBC)
 *     Tim Jenness (JAC, Hawaii)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -67,7 +68,10 @@
 *        Set SMF_NOCREATE_FILE & SMF__NOCREATE_DA flags for
 *        NULL ffdata when input data are flatfielded
 *     2006-12-20 (TIMJ):
-*        Open related files in UPDATE mode to prevent overwrite of propogated components
+*        Open related files in UPDATE mode to prevent overwrite of propogated 
+*        components
+*     2007-10-29 (EC):
+*        Modified interface to smf_open_file.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -152,7 +156,7 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
      because sc2store can not open two files at once 
      22-Mar-2006: no longer true? hdr needed anyway */
   if (*status == SAI__OK) {
-    smf_open_file( igrp, index, "READ", 1, &data, status);
+    smf_open_file( igrp, index, "READ", 0, &data, status);
     if ( *status != SAI__OK) {
       errRep("", "Unable to open input file(s)", status);
     }
@@ -161,7 +165,7 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
   /* Open the output file for write. If the output grp is NULL then
      ffdata is returned NULL. Use UPDATE mode to retain components such as WCS */
   if (*status == SAI__OK) {
-    smf_open_file( ogrp, index, "UPDATE", 1, ffdata, status);
+    smf_open_file( ogrp, index, "UPDATE", 0, ffdata, status);
     if ( *status == SAI__ERROR) {
       errRep("", "Unable to open output flatfielded file(s)", status);
     }

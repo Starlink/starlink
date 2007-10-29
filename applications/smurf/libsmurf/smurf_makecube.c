@@ -517,6 +517,7 @@
 *     Tim Jenness (JAC, Hawaii)
 *     David Berry (JAC, UCLan)
 *     Brad Cavanagh (JAC, Hawaii)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -625,6 +626,9 @@
 *        Modify description of DETECTORS parameter.
 *     29-OCT-2007 (DSB):
 *        Added Label and Unit values to the extension NDFs.
+*     29-OCT-2007 (EC):
+*        Modified interface to smf_open_file.
+
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -1511,7 +1515,7 @@ void smurf_makecube( int *status ) {
             if( !pt || pt[ 0 ] < VAL__MAXI ) {
 
 /* Obtain information about the current input NDF. */
-               smf_open_file( tile->grp, ifile, "READ", 1, &data, status );
+               smf_open_file( tile->grp, ifile, "READ", 0, &data, status );
       
 /* Issue a suitable message and abort if anything went wrong. */
                if( *status != SAI__OK ) {

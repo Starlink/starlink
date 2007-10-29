@@ -33,11 +33,14 @@
 
 *  Authors:
 *     David S Berry (JAC, UCLan)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
 *     28-NOV-2006 (DSB):
 *        Initial version.
+*     29-OCT-2007 (EC):
+*        Modified interface to smf_open_file.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -107,7 +110,7 @@ void smf_labelunit( Grp *igrp,  int size, smfData *odata, int *status ){
    for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++ ) {
 
 /* Obtain information about the current input NDF. */
-      smf_open_file( igrp, ifile, "READ", 1, &data, status );
+      smf_open_file( igrp, ifile, "READ", 0, &data, status );
 
 /* Get the input NDF identifier. */
       indf = data->file->ndfid;

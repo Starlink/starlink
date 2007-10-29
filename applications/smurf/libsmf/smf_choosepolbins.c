@@ -76,11 +76,15 @@
 
 *  Authors:
 *     David S Berry (JAC, UCLan)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
 *     12-OCT-2007 (DSB):
 *        Initial version.
+*     29-OCT-2007 (EC):
+*        Modified interface to smf_open_file.
+
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -206,7 +210,7 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize,
    for( ifile = 0; ifile < size && *status == SAI__OK; ifile++ ) {
 
 /* Obtain information about the current input NDF. */
-      smf_open_file( igrp, ifile + 1, "READ", 1, &data, status );
+      smf_open_file( igrp, ifile + 1, "READ", 0, &data, status );
       hdr = data->hdr;
 
 /* Store the number of time slices in this input NDF. */

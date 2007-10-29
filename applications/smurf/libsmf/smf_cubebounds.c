@@ -109,6 +109,7 @@
 
 *  Authors:
 *     David S Berry (JAC, UCLan)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -160,6 +161,8 @@
 *        Remove debugging printf statements.
 *     19-OCT-2007 (DSB):
 *        Added parameter "specunion".
+*     29-OCT-2007 (EC):
+*        Modified interface to smf_open_file.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -310,7 +313,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       box->ubnd[ 1 ] = VAL__MIND;
 
 /* Obtain information about the current input NDF. */
-      smf_open_file( igrp, ifile, "READ", 1, &data, status );
+      smf_open_file( igrp, ifile, "READ", 0, &data, status );
 
 /* Issue a suitable message and abort if anything went wrong. */
       if( *status != SAI__OK ) {

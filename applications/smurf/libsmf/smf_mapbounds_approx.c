@@ -65,6 +65,7 @@
 *  Authors:
 *     Andy Gibb (UBC)
 *     Tim Jenness (JAC, Hawaii)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -85,6 +86,8 @@
 *        NULL pointer.
 *     2007-07-06 (AGG):
 *        Remove attempts to retrieve non-existent FITS headers
+*     2007-10-29 (EC):
+*        Modified interface to smf_open_file.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -193,7 +196,7 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
   /* Read data from the given input file in the group - note index
      should be 1 as we use the first file in the Grp to define the map
      bounds */
-  smf_open_file( igrp, index, "READ", 1, &data, status );
+  smf_open_file( igrp, index, "READ", 0, &data, status );
 
   /* Retrieve file name for use feedback */
   file = data->file;

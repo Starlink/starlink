@@ -50,6 +50,8 @@
 *        Add file access mode to API
 *     2007-07-10 (EC):
 *        Changed interface to smf_create_smfArray
+*     2007-10-29 (EC):
+*        Modified interface to smf_open_file.
 
 *  Copyright:
 *     Copyright (C) 2006 University of British Columbia.  All Rights
@@ -130,7 +132,7 @@ void smf_open_related ( const smfGroup *group, const int subindex, const char *a
     index = indices[i];
     /* Open file with this index and add to smfArray */
     if ( index != 0 ) {
-      smf_open_file( grp, index, accmode, 1, &data, status );
+      smf_open_file( grp, index, accmode, 0, &data, status );
       smf_addto_smfArray( *relfiles, data, status );
     }
   }

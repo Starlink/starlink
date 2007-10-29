@@ -38,6 +38,7 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -50,6 +51,8 @@
 *        Factor out remaining code into smf_dream_calcweights
 *     2006-11-10 (AGG):
 *        Set some default values if a config file is not specified
+*     2007-10-29 (EC):
+*        Modified interface to smf_open_file.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -171,7 +174,7 @@ void smurf_dreamweights ( int *status ) {
   /* Loop over number of files */
   for ( i=1; i<= isize; i++) {
     /* Open file */
-    smf_open_file( igrp, i, "READ", 1, &data, status );
+    smf_open_file( igrp, i, "READ", 0, &data, status );
 
     smf_dream_calcweights( data, ogrp, i, gridstep, ngrid, gridminmax, 
 			   &(gridpts[0]), status);

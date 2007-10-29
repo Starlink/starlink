@@ -62,6 +62,7 @@
 
 *  Authors:
 *     David S Berry (JAC, UCLan)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -74,6 +75,8 @@
 *        the spectral range covered by the data.
 *     24-APR-2007 (DSB):
 *        Added hasoffexp argument.
+*     29-OCT-2007 (EC):
+*        Modified interface to smf_open_file.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -210,7 +213,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++ ) {
 
 /* Obtain information about the current input NDF. */
-      smf_open_file( igrp, ifile, "READ", 1, &data, status );
+      smf_open_file( igrp, ifile, "READ", 0, &data, status );
 
 /* Issue a suitable message and abort if anything went wrong. */
       if( *status != SAI__OK ) {

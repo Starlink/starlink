@@ -100,6 +100,8 @@
 *        Added smfBox and smfTile.
 *     2007-09-13 (EC):
 *        Added isTordered to smfData.
+*     2007-10-29 (EC):
+*        Added definition of SMF__NOCREATE_DATA for use by smf_open_file
 *     {enter_further_changes_here}
 
 
@@ -172,12 +174,13 @@ typedef enum smf_modeltype {
 #define SMF__DIMM_FIRSTCOMP 1
 #define SMF__DIMM_FIRSTITER 2
 
-/* Flags for smf_create_smf* 
+/* Flags for smf_create_smf* and smf_open_file
    Must be individual bits in a single integer
 */
 #define SMF__NOCREATE_DA 1
 #define SMF__NOCREATE_HEAD 2
 #define SMF__NOCREATE_FILE 4
+#define SMF__NOCREATE_DATA 8
 
 /* Flags for smf_open_newfile
    Must be individual bits in a single integer
@@ -291,7 +294,6 @@ typedef struct smfGroup {
 /* Prototype for function pointer to different models used by DIMM */
 typedef void(*smf_calcmodelptr)( smfArray*, AstKeyMap*, double*, double*, 
 				 smfArray*, int, int* );
-
 
 /* Represents a box in some 2D cartesian coordinate system. */
 typedef struct smfBox {

@@ -54,6 +54,7 @@
 *  Authors:
 *     Andy Gibb (UBC)
 *     Tim Jenness (JAC, Hawaii)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -65,6 +66,8 @@
 *        Change OBSMODE to SAM_MODE
 *     2007-10-19 (TIMJ):
 *        Absence of SAM_MODE no longer fatal.
+*     2007-10-29 (EC):
+*        Modified interface to smf_open_file.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -200,7 +203,8 @@ smfDream *smf_construct_smfDream( smfData *data, const int nvert,
 	       in a circular loop because the weights data do not
 	       satisfy the condition for reading and storing them in a
 	       smfDream. */
-	    smf_open_file( wtgrp, 1, "READ", 0, &wtdata, status );
+	    smf_open_file( wtgrp, 1, "READ", SMF__NOCREATE_HEAD, &wtdata, 
+			   status );
 	    if ( *status == SAI__OK ) {
 	      /* Get locator to DREAM parameters */
 	      drmloc = smf_get_xloc( wtdata, "DREAM", "DREAM_WEIGHTS", "READ", 0, 

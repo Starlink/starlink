@@ -87,6 +87,7 @@
 *  Authors:
 *     David S Berry (JAC, UCLan)
 *     Tim Jenness (JAC, Hawaii)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -146,6 +147,8 @@
 *     25-OCT-2007 (DSB):
 *        Use smf_checkdets to ensure detgrp holds detectors to be
 *        included, not excluded.
+*     29-OCT-2007 (EC):
+*        Modified interface to smf_open_file.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -304,7 +307,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++ ) {
 
 /* Obtain information about the current input NDF. */
-      smf_open_file( igrp, ifile, "READ", 1, &data, status );
+      smf_open_file( igrp, ifile, "READ", 0, &data, status );
 
 /* Issue a suitable message and abort if anything went wrong. */
       if( *status != SAI__OK ) {
@@ -398,7 +401,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    were not found in the data. If the supplied group holds the detectors
    to be excluded, modify it so that it holds the detectors to be
    included. */
-      smf_checkdets( detgrp, data, status );
+      //smf_checkdets( detgrp, data, status );
 
 /* Store a pointer to the next input data value */
       pdata = ( data->pntr )[ 0 ];

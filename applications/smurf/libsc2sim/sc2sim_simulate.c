@@ -245,6 +245,11 @@
 *     2007-10-05 (AGG):
 *        Add subscanno and obsend variables to allow sc2sim_ndfwrdata
 *        to write the correct OBSEND keyword.
+*     2007-10-26 (EC):
+*        Pass curframe instead of frame to sc2sim_simframe to fix step
+*        in sky-signal bug.
+*     2007-10-29 (EC):
+*        Modified interface to smf_open_file.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -519,14 +524,14 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     grpPut1 ( skygrp, sinx->astname, 1, status );
     grpPut1 ( skygrp, sinx->atmname, 2, status );
 
-    smf_open_file( skygrp, 1, "READ", 1, &astdata, status);
+    smf_open_file( skygrp, 1, "READ", 0, &astdata, status);
     if ( *status != SAI__OK ) {
       msgSetc ( "FILENAME", sinx->astname );
       errRep( " ", "Unable to open astronomical file ^FILENAME", status );
       goto CLEANUP;
     }
 
-    smf_open_file( skygrp, 2, "READ", 1, &atmdata, status);
+    smf_open_file( skygrp, 2, "READ", 0, &atmdata, status);
     if ( *status != SAI__OK ) {
       msgSetc ( "FILENAME", sinx->atmname );
       errRep( " ", "Unable to open atmospheric file ^FILENAME", status);
@@ -1216,7 +1221,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
             sc2sim_simframe ( *inx, *sinx, astnaxes, astscale, 
 			      astdata->pntr[0], atmnaxes, atmscale, 
 			      atmdata->pntr[0], coeffs, fs, heater, nbol, 
-			      frame, nterms, noisecoeffs, pzero, samptime, 
+			      curframe, nterms, noisecoeffs, pzero, samptime, 
 			      timesincestart, sinx->telemission, weights, 
 			      sky2map, xbolo, ybolo, xbc, ybc, 
 			      &(posptr[curframe*2]), 

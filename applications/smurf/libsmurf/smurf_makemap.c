@@ -163,6 +163,8 @@
 *     2007-07-12 (EC):
 *        Add moving to smf_bbrebinmap interface
 *        Add moving to smf_calc_mapcoord interface
+*     2007-10-29 (EC):
+*        Modified interface to smf_open_file.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -269,60 +271,6 @@ void smurf_makemap( int *status ) {
 
   int moving = 0;            /* Is the telescope base position changing? */
 
-  /* Test createwcs ------------------------------------------------ */
-
-  /*
-  double telpos[3]; 
-  double instap[2];
-  JCMTState state;
-
-  int j;
-  FILE *junk;
-  int nbol=1280;
-  double xbolo[1280];
-  double ybolo[1280];
-  double xbc[1280];
-  double ybc[1280];
-
-  smf_calc_telpos( NULL, "JCMT", telpos, status );
-  instap[0] = 0;
-  instap[1] = 0;
-
-  junk = fopen( "junk.txt", "w" );
-
-  for( j=0; j<4; j++ ) {
-
-    state.tcs_az_ac1 = 90.*DD2R;
-    state.tcs_az_ac2 =  10.*DD2R;
-    state.smu_az_jig_x = 0;
-    state.smu_az_jig_y = 0;
-    state.smu_az_chop_x = 0;
-    state.smu_az_chop_y = 0;
-    state.rts_end = 53795;
-
-    sc2ast_createwcs( j, &state, instap, telpos, &outfset, status );
-    
-    astSetC( outfset, "SYSTEM", "J2000" );
-    
-    smf_get_gridcoords( xbolo, ybolo, 40, 32, status );
-    
-
-    astTran2( outfset, nbol, ybolo, xbolo, 1, xbc, ybc ); 
-   
-    astAnnul(outfset);
- 
-    for( i=0; i<nbol; i++ ) {
-      fprintf(junk,"%lf %lf %lf %lf\n", xbolo[i], ybolo[i], xbc[i], ybc[i]);
-    }
-  }
-  fclose(junk);
-
-  return;
-  */
- 
-  /* --------------------------------------------------------------- */
-
-
   /* Main routine */
   ndfBegin();
 
@@ -351,83 +299,6 @@ void smurf_makemap( int *status ) {
   parChoic( "METHOD", "REBIN", 
 	    "REBIN, ITERATE.", 1,
 	    method, LEN__METHOD, status);
-
-
-  /* Test create_lutwcs -------------------------------------------- */
-  /*
-  double telpos[3]; 
-  double instap[2];
-  JCMTState state;
-  
-  int j;
-  FILE *junk;
-  int nbol=144;
-  double xbolo[144];
-  double ybolo[144];
-  double xbc[144];
-  double ybc[144];
-  
-  smfHead * hdr;
-  
-  smf_open_file( igrp, 1, "READ", 1, &data, status );
-
-  hdr = data->hdr;
-  
-  smf_tslice_ast( data, 0, 1, status);
-
-  junk = fopen( "junk.txt", "w" );
-  */
-
-  /*
-  smf_calc_telpos( NULL, "JCMT", telpos, status );
-  instap[0] = 0;
-  instap[1] = 0;
-  
-  state.tcs_az_ac1 = 90.*DD2R;
-  state.tcs_az_ac2 =  45.*DD2R;
-  state.smu_az_jig_x = 0;
-  state.smu_az_jig_y = 0;
-  state.smu_az_chop_x = 0;
-  state.smu_az_chop_y = 0;
-  state.rts_end = 53795;
-
-  printf( "LUT: %lf %lf %i\n", (hdr->fplanex)[0], (hdr->fplaney)[0], 
-	  hdr->ndet );
-
-  smf_create_lutwcs( 0, hdr->fplanex, hdr->fplaney, hdr->ndet, 
-		     &state, instap, telpos, &outfset, status );
-  
-  
-  */
-  /*
-  astSetC( hdr->wcs, "SYSTEM", "AZEL" );
-
-  for( j=0; j<144; j++ ) {
-    xbolo[j] = j+1;
-    ybolo[j] = 1;
-  }
-
-  astTran2( hdr->wcs, nbol, xbolo, ybolo, 1, xbc, ybc ); 
-
-  for( j=0; j<144; j++ ) {
-    xbolo[j] = (hdr->fplanex)[j];
-    ybolo[j] = (hdr->fplaney)[j];
-  }
-
-  printf("nbol=%i\n", nbol);
-
-  for( j=0; j<nbol; j++ ) {
-    fprintf(junk,"%lf %lf %lf %lf\n", 
-	    (hdr->fplanex)[j], (hdr->fplaney)[j], 
-	    xbc[j], ybc[j]);
-  }
-  fclose(junk);
-  return;
-
-  */
-  /*astAnnul(outfset);*/
-  
-  /* --------------------------------------------------------------- */
 
   /* Calculate the map bounds */
   msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Determine map bounds", status);
@@ -583,7 +454,7 @@ void smurf_makemap( int *status ) {
     if( *status == SAI__OK ) {
       for(i=1; i<=size; i++ ) {	
 
-        smf_open_file( igrp, i, "UPDATE", 1, &data, status );
+        smf_open_file( igrp, i, "UPDATE", 0, &data, status );
         if( *status != SAI__OK) {
           errRep(FUNC_NAME, "Bad status opening smfData", status);      
         }

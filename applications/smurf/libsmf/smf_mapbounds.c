@@ -89,6 +89,8 @@
 *     2007-07-12 (EC):
 *        -Replaced calculation of bolo2map with a call to smf_rebincube_totmap
 *        -Changed name of smf_rebincube_totmap to smf_rebin_totmap
+*     2007-10-29 (EC):
+*        Modified interface to smf_open_file.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -190,7 +192,7 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
   /* Loop over all files in the Grp */
   for( i=1; i<=size; i++ ) {
     /* Read data from the ith input file in the group */      
-    smf_open_file( igrp, i, "READ", 1, &data, status );
+    smf_open_file( igrp, i, "READ", 0, &data, status );
     
     if( *status == SAI__OK ) {
       file = data->file;
