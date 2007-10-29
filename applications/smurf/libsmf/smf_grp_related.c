@@ -56,6 +56,8 @@
 *        of data array
 *     2007-07-16 (EC):
 *        -Changed smf_construct_smfGroup interface
+*     2007-10-29 (EC):
+*        Modified interface to smf_open_file; use SMF__NOCREATE_DATA flag.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -173,7 +175,7 @@ void smf_grp_related (  Grp *igrp, const int grpsize, const int grpbywave, smfGr
   /* Loop over files in input Grp: remember Grps are indexed from 1 */
   for (i=1; i<=grpsize; i++) {
     /* First step: open file and read start/end RTS_END values */
-    smf_open_file( igrp, i, "READ", 1, &data, status );
+    smf_open_file( igrp, i, "READ", 0, &data, status );
     hdr = data->hdr;
     /* Set header for first time slice */
     frame = 0;
