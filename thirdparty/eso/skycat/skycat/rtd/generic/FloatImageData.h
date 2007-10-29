@@ -14,6 +14,7 @@
  * Allan Brighton  05/10/95  Created
  * Peter W. Draper 04/03/98  Added llookup
  * P.Biereichel    22/03/99  Added definitions for bias subtraction
+ * Peter W. Draper 29/10/07  Added colorScale
  */
 
 #include <sys/types.h>
@@ -66,6 +67,7 @@ protected:
     float getMedian(float *samples, int n);
     float getBoxVal(float *rawImage, int idx, int wbox, float *samples, int xs);
     float getRMS(float *samples, int n);
+    void colorScale(int ncolors, unsigned long* colors);
 
 public:
     // constructor

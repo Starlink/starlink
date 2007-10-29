@@ -13,6 +13,7 @@
  * --------------  --------  ----------------------------------------
  * Peter W. Draper 30/05/01  Created
  *                 14/11/05  Added bias subtraction members.
+ * Peter W. Draper 29/10/07  Added colorScale
  */
 
 #include <sys/types.h>
@@ -66,6 +67,7 @@ protected:
     double getMedian(double *samples, int n);
     double getBoxVal(double *rawImage, int idx, int wbox, double *samples, int xs);
     double getRMS(double *samples, int n);
+    void colorScale(int ncolors, unsigned long* colors);
 
 public:
     // constructor

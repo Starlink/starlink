@@ -11,6 +11,8 @@
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Peter W. Draper 30/05/01  Created.
+ *                 29/10/07  Add colorScale so that a bin for NaN pixels
+ *                           is always available (shared with blank).
  */
 
 #include <cstdlib>
@@ -78,10 +80,21 @@ void DoubleImageData::initShortConversion()
 
     scaledLowCut_ = scaleToShort(lowCut_);
     scaledHighCut_ = scaleToShort(highCut_);
-    if (haveBlank_)
-	scaledBlankPixelValue_ = LOOKUP_BLANK;
+    scaledBlankPixelValue_ = LOOKUP_BLANK;
 }
 
+/*
+ * Define a scaledBlankPixelValue_ so that we have a blank bin for NaN's
+ * not just blanks (both use same color).
+ */
+void DoubleImageData::colorScale(int ncolors, unsigned long* colors)
+{
+    ImageData::colorScale(ncolors, colors);
+
+    // Always set value for blank pixel in case we have NaNs, not just
+    // when blank is set.
+    lookup_.setPixelColor( scaledBlankPixelValue_, color0_ );
+}
 
 /*
  * Include some standard methods as (cpp macro) templates:
