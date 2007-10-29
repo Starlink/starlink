@@ -24,6 +24,9 @@
     The -hdu command-line option will now work again. This allows the selection
     of a extension when displaying an MEF.
 
+    FITS images containing floating point values will now assign any NaN
+    values to the BLANK pixel colour.
+
   Puana Release:
   ==============
 
