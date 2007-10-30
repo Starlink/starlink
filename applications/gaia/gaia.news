@@ -27,6 +27,9 @@
     FITS images containing floating point values will now assign any NaN
     values to the BLANK pixel colour.
 
+    A memory leak when contouring external images over the displayed image
+    has been fixed.
+
   Puana Release:
   ==============
 
