@@ -611,8 +611,8 @@ int *status              /* Global status (given and returned) */
    sc2store_wrtstream ( file_name, subnum, nrec, fitsrec, inx->nbolx, 
                         inx->nboly, numsamples, nflat, flatname, head, 
                         dbuf, dksquid, fcal, fpar, inx->obsmode, 
-                        inx->jig_vert, inx->nvert, jigptr, jigsamples, 
-                        status );
+                        NULL, 0, inx->jig_vert, inx->nvert, jigptr, jigsamples, 
+                        NULL, status );
 
    /* Create SCU2RED extension for storing polynomial fits and
       reconstructed images */

@@ -195,8 +195,8 @@ int *status        /* global status (given and returned) */
   sc2store_wrtstream ( file_name, subnum, nrec, fitsrec, inx->nbolx, 
 		       inx->nboly, numsamples, nflat, flatname, head, 
 		       dbuf, dksquid, fcal, fpar, inx->obsmode, 
-		       inx->jig_vert, inx->nvert, NULL, 0,
-		       status );
+		       NULL, 0, inx->jig_vert, inx->nvert, NULL, 0,
+		       NULL, status );
 
   /* Close the file */
   sc2store_free ( status );

@@ -209,7 +209,7 @@ int *status        /* global status (given and returned) */
 void sc2store_rdfitshead
 (
 int maxfits,          /* maximum number of header items (given) */
-unsigned int *nfits,  /* number of header items (returned) */
+size_t *nfits,        /* number of header items (returned) */
 char *headers,        /* buffer to hold FITS headers (returned) */
 int *status           /* global status (given and returned) */
 );
@@ -262,7 +262,7 @@ const char *filename,    /* name of HDS container file (given) */
 const char *access,      /* "READ" or "UPDATE" access (given) */
 int flatlen,             /* length of space for flatfield name (given) */
 int maxfits,             /* max number of FITS headers (given) */
-unsigned int *nfits,     /* actual number of FITS headers (returned) */
+size_t *nfits,           /* actual number of FITS headers (returned) */
 char *fitshead,          /* up to maxfits FITS header records (returned) */
 int *colsize,            /* number of pixels in column (returned) */
 int *rowsize,            /* number of pixels in row (returned) */
@@ -281,14 +281,32 @@ int *npath,              /* Number of points in SMU path (returned) */
 int *status              /* global status (given and returned) */
 );
 
+/*+ sc2store_wrconfigxml - Store the CONFIGURE XML */
+
+void sc2store_wrconfigxml
+(
+const char *xmlfile,  /* name of CONFIGURE XML file (given) */
+int *status           /* global status (given and returned) */
+);
+
 /*+ sc2store_wrfitshead - write the FITS headers */
 
 void sc2store_wrfitshead
 (
 int id_ndf,           /* identifier of ndf (given) */
-unsigned int nfits,   /* number of header items (given) */
+int nfits,            /* number of header items (given) */
 const char *headers,  /* string of contiguous 80-byte FITS headers (given) */
 int *status           /* global status (given and returned) */
+);
+
+/*+ sc2store_wrmcehead - Store the MCE headers for each frame */
+
+void sc2store_wrmcehead
+(
+const int numsamples,       /* number of samples (given) */
+const int mceheadsz,        /* number of values per MCE header (given) */
+const int *mcehead,         /* MCE header for each sample (given) */
+int *status                 /* global status (given and returned) */
 );
 
 /*+ sc2store_wrtstream - store SCUBA-2 time stream data as NDF */
@@ -310,10 +328,13 @@ const int *darksquid,       /* dark SQUID time stream data (given) */
 const double *fcal,         /* flat-field calibration (given) */
 const double *fpar,         /* flat-field parameters (given) */
 const char *obsmode,        /* Observing mode (given) */
-int jig_vert[][2],    /* Array of jiggle vertices (given) */
+const int *mcehead,         /* MCE header for each sample (given) */
+const int mceheadsz,        /* number of values per MCE header (given) */
+int jig_vert[][2],          /* Array of jiggle vertices (given) */
 int nvert,                  /* Number of jiggle vertices (given) */
-double jig_path[][2], /* Path of SMU during jiggle cycle (given) */
+double jig_path[][2],       /* Path of SMU during jiggle cycle (given) */
 int npath,                  /* Number of positions in jiggle path (given) */
+const char *xmlfile,        /* name of CONFIGURE XML file (given) */ 
 int *status                 /* global status (given and returned) */
 );
 
