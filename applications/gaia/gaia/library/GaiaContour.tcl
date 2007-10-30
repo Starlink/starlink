@@ -939,7 +939,7 @@ itcl::class gaia::GaiaContour {
 
 	 set rtdimage {}
 	 #  Remove the existing external image, if not using same file.
-	 if { $image_rtd_ != {} && [info exists $image_rtd_ ] } {
+	 if { $image_rtd_ != {} } {
 	    if { "[$image_rtd_ cget -file]" == "$imagefile_" } {
 	       set rtdimage $image_rtd_
 	    } else {
