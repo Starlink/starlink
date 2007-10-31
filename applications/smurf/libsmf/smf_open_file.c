@@ -44,7 +44,8 @@
 *     - JCMTState is NULL for non-time series data
 *     - The following bit flags defined in smf_typ.h are used for "flags" par:
 *       SMF__NOCREATE_HEAD: Do not allocate smfHead
-*       SMF__NOCREATE_DATA: Do not map DATA/VARIANCE/QUALITY arrays
+*       SMF__NOCREATE_DATA: Do not map DATA/VARIANCE/QUALITY arrays (NOT YET
+                            IMPLEMENTED!)
 
 *  Authors:
 *     Andy Gibb (UBC)
