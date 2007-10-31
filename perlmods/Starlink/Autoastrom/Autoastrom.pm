@@ -2044,7 +2044,7 @@ sub _create_frameset {
 
   my $ra = $self->obsdata->{RA}->degrees;
   my $dec = $self->obsdata->{DEC}->degrees;
-  my $scale = $self->obsdata->{SCALE} / 3600;
+  my $scale = $self->obsdata->{SCALE} / 3600.0;
   my $rotangle = $self->obsdata->{ANGLE} * 3.1415926535 / 180.0;
   my $invert = $self->obsdata->{INVERT};
   my $ndf = $self->ndf;
@@ -2069,19 +2069,19 @@ sub _create_frameset {
   my $fits = '';
   $fits .= sprintf( "RADESYS = 'FK5     '           / Mean IAU 1984 equatorial co-ordinates          " );
   $fits .= sprintf( "WCSAXES =                    2 / Number of axes in world co-ordinate system     " );
-  $fits .= sprintf( "CTYPE1  = 'DEC--TAN'           / Dec tangent-plane axis with no distortion      " );
-  $fits .= sprintf( "CTYPE2  = 'RA---TAN'           / RA tangent-plane axis with no distortion       " );
+  $fits .= sprintf( "CTYPE1  = 'RA---TAN'           / RA tangent-plane axis with no distortion       " );
+  $fits .= sprintf( "CTYPE2  = 'DEC--TAN'           / Dec tangent-plane axis with no distortion      " );
   $fits .= sprintf( "CUNIT1  = 'deg     '           / Unit of declination co-ordinates               " );
   $fits .= sprintf( "CUNIT2  = 'deg     '           / Unit of right ascension co-ordinates           " );
-  $fits .= sprintf( "CRVAL1  =   %18.12f / [deg] Declination at the reference pixel       ", $dec );
-  $fits .= sprintf( "CRVAL2  =   %18.12f / [deg] Right ascension at the reference pixel   ", $ra );
-  $fits .= sprintf( "CRPIX1  =                %5.1f / [pixel] Reference pixel along Dec axis         ", $xcen );
-  $fits .= sprintf( "CRPIX2  =                %5.1f / [pixel] Reference pixel along RA axis          ", $ycen );
+  $fits .= sprintf( "CRVAL1  =   %18.12f / [deg] Right ascension at the reference pixel   ", $ra );
+  $fits .= sprintf( "CRVAL2  =   %18.12f / [deg] Declination at the reference pixel       ", $dec );
+  $fits .= sprintf( "CRPIX1  =                %5.1f / [pixel] Reference pixel along RA axis          ", $xcen );
+  $fits .= sprintf( "CRPIX2  =                %5.1f / [pixel] Reference pixel along Dec axis         ", $ycen );
   $fits .= sprintf( "CD1_1   =   %18.12f /                                                ", $sign * $scale * cos( $rotangle ) );
   $fits .= sprintf( "CD1_2   =   %18.12f /                                                ", $sign * $scale * sin( $rotangle ) );
-  $fits .= sprintf( "CD2_1   =   %18.12f /                                                ", -1.0 * $scale * sin( $rotangle ) );
-  $fits .= sprintf( "CD2_2   =   %18.12f /                                                ", $scale * cos( $rotangle ) );
-  $fits .= sprintf( "EQUINOX =   %18.1f /                                                ", $epoch );
+  $fits .= sprintf( "CD2_1   =   %18.12f /                                                ",  -1.0 * $scale * sin( $rotangle ) );
+  $fits .= sprintf( "CD2_2   =   %18.12f /                                                ",         $scale * cos( $rotangle ) );
+  $fits .= sprintf( "EQUINOX =   %18.1f /                                                 ", $epoch );
 
   # Pass the header on to the FitsChan creator.
   my $fitschan = new Starlink::AST::FitsChan;
@@ -2224,7 +2224,8 @@ sub _determine_search_params {
   } elsif( defined( $obsdata ) ) {
     $cencoords = new Astro::Coords( ra => $obsdata->{RA},
                                     dec => $obsdata->{DEC},
-                                    type => 'J2000' );
+                                    type => 'J2000',
+                                    units => 'radians' );
 
     # Distance between centre and corner is...
     my $rad_pixels = sqrt( ( $lbnd[0] - $xcen ) * ( $lbnd[0] - $xcen ) +
