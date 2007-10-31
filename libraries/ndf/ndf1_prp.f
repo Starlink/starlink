@@ -68,6 +68,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -136,6 +137,8 @@
 *     14-JAN-1998 (RFWS):
 *        Fixed bug: propagated WCS information was not being stripped
 *        before writing it to the output data object.
+*     31-OCT-2007 (DSB):
+*        Add call to NDF1_EVENT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -496,6 +499,12 @@
 *  Create a new base NDF entry in the ACB to describe the new data
 *  object.
          CALL NDF1_CRNBN( IDCB2, IACB2, STATUS )
+
+*  Assign the name of the data file to the MSG token "NDF_EVENT"
+         CALL NDF1_DMSG( 'NDF_EVENT', IDCB2 )
+
+*  Raise an NDF event, describing the opening of a new NDF.
+         CALL NDF1_EVENT( 'OPEN_NEW_NDF', STATUS )
 
 *  Propagate any bad-bits override value for the NDF's quality
 *  component to the new ACB entry.

@@ -113,6 +113,8 @@
 *     21-FEB-2006 (DSB):
 *        Changed length of FEXT from 6 to 20 since 6 is not enough for
 *        extensions such as ".sdf.gz" (which is 7 characters long).
+*     31-OCT-2007 (DSB):
+*        Add call to NDF1_EVENT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -770,7 +772,21 @@
             END IF
          END IF
       END IF
- 
+
+*  Assign the name of the data file to the MSG token "NDF_EVENT"
+      CALL NDF1_DMSG( 'NDF_EVENT', ACB_IDCB( IACB ) )
+
+*  Raise an NDF event, describing the opening of an existing NDF.
+      IF( VMODE .EQ. 'READ' ) THEN
+         CALL NDF1_EVENT( 'READ_EXISTING_NDF', STATUS )
+
+      ELSE IF( VMODE .EQ. 'WRITE' ) THEN
+         CALL NDF1_EVENT( 'WRITE_EXISTING_NDF', STATUS )
+
+      ELSE IF( VMODE .EQ. 'UPDATE' ) THEN
+         CALL NDF1_EVENT( 'UPDATE_EXISTING_NDF', STATUS )
+      END IF
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_OPFOR', STATUS )
 

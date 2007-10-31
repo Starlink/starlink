@@ -119,6 +119,8 @@
 *     21-AUG-2000 (DSB):
 *       Release the NDF data object as a whole, and release the DCB slot 
 *       associated with the data object, even if it has no DATA_ARRAY.
+*     31-OCT-2007 (DSB):
+*        Add call to NDF1_EVENT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -233,6 +235,12 @@
 *  If the reference count falls to zero, then the DCB entry must be
 *  released.
       IF ( DCB_REFCT( IDCB ) .LE. 0 ) THEN
+
+*  Assign the name of the data file to the MSG token "NDF_EVENT"
+         CALL NDF1_DMSG( 'NDF_EVENT', IDCB )
+
+*  Raise an NDF event, describing the closing of a new NDF.
+         CALL NDF1_EVENT( 'CLOSE_NDF', STATUS )
 
 *  Ensure that data array information is available in the DCB and derive
 *  the data object bounds and number of dimensions from the ARY_ system

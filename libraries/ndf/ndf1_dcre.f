@@ -94,6 +94,8 @@
 *        entry in the PCB.
 *     29-APR-1994 (RFWS):
 *        Eliminated initialisations now done by NDF1_PLDCB.
+*     31-OCT-2007 (DSB):
+*        Add call to NDF1_EVENT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -182,6 +184,12 @@
 
 *  Create a new base NDF entry in the ACB to describe the new object.
          CALL NDF1_CRNBN( IDCB, IACB, STATUS )
+
+*  Assign the name of the data file to the MSG token "NDF_EVENT"
+         CALL NDF1_DMSG( 'NDF_EVENT', IDCB )
+
+*  Raise an NDF event, describing the opening of a new NDF.
+         CALL NDF1_EVENT( 'OPEN_NEW_NDF', STATUS )
 
 *  If there was an error, then clean up by annulling the identifiers
 *  and locators which may have been acquired.
