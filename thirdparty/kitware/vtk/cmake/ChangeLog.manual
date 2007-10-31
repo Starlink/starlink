@@ -1,0 +1,485 @@
+Changes in CMake 2.4.7
+--- RC 11 ----
+* Fix bug 5238 for cygwin versioned executables 
+
+* Allow for platform choice of executable shared libs install
+
+* Fix @ONLY issues with RC 10
+
+* Add -E make_directory to cmake executable
+--- RC 10 ----
+* Fix rebuild problem with makefiles and cmake vs CMakeSetup 
+--- RC 9 ---
+* Fix problem with \@ in configure files bug# 5130 
+--- RC 8 ---
+* Fix bug 5121 crash with build test on and vs 
+
+* Fix bug 5096 add_library and EXCLUDE_FROM_ALL not working 
+--- RC 7 ---
+* Fix @ in Xcode projects
+
+* add some fixes for FindSWIG.cmake
+
+* Fix new line stuff in UsePkgConfig.cmake
+
+* Add new FindPkgConfig.cmake from CVS 
+
+* improve docs for try_compile and list commands
+
+* fix for bug 4384, preserve sym links in install directory
+
+* Use platform variable for link path exclusion added in RC6
+
+--- RC 6 ---
+* Fix stack reporting bug in macros and include
+
+* Fix double quote in -D flags for vs broken in RC 5
+
+* Fix problem with newer curl and curl_getdate changes
+
+* Do not emit link paths /usr/lib32 and /usr/lib64 with -L
+
+---RC 5 ----
+* Fix for bug# 4423, LANGUAGE property now works in VS IDE
+
+* Fix for RUN_TESTS running the tests twice in VS IDE
+
+* Do not create import libraries for modules on borland
+
+* Fix for FILE(RELATIVE_PATH) # 4482
+
+* Fix for apple lack of support for isystem flag
+
+* Fix for Borland skipping make rules with no depends
+
+* Fix for bug #4423 set source file properties LANGUAGE not always working
+
+* Fix for bug #4462 isystem not supported on OSX
+
+* Fix bug in save of resize of CMakeSetup
+
+* Fix for @@ in file names
+
+* Fix for if command scope issues
+
+* Fix for relative path issue with paths ending in /.
+
+* CMakeSetup saves the size of the dialog from the last run
+
+* Fix for bug 4399, find qt designer on mac
+
+* Fix for bug 4420 include unicode libs in cpack for vs8
+
+* Fix for bug 4414 add_dependencies and set_target_properties can set any target not just the ones in the current directory.
+
+* Add support for cygwin setup packages to setup
+
+* Fix uninstall with DESTDIR
+
+* If COMPILE_FLAGS is changed on a target the object files will now recompile
+
+* Fix Bug 3512 - precompiled header flag mapping on VS.
+
+* Do not run custom commands with relative paths if the working directory is set.
+
+* Fix bugs 3277, 4341, 4341 make pdb files match the target name correctly
+
+* handle user set NODEFAULTLIB correctly in VS projects
+
+* Fix external project for VS 2005 service pack 1 GUID not set correctly
+
+* Fix Kdevelop problem where files could end up duplicated
+
+Changes in CMake 2.4.6
+
+* Remove svn test in ctestctest3 
+
+* Fix for FIND_* order and framworks with PREFIX usage.
+
+* Fix for FindDoxygen and quiet mode.
+
+* Find JavaVM as well as jvm
+
+* Look for ruby1.8 and ruby
+
+* Fix for cpack .tgz.sh and dash
+
+* Fix for finding custom commands from a full path with CMAKE_CFG_INTDIR.
+
+* Fix for Borland make and custom commands that do nothing
+
+
+Changes in CMake 2.4.5
+* Fix for seg fault when a macro runs a bad command BUG# 3815
+
+* Fix fix for foo.dll.lib that does not brea -L/usr/lib in link names
+
+* Fix problem with LIBRARY_OUTPUT_PATH and linking to a dll foo.dll.lib 
+  instead of foo.lib 
+
+* Do not depend on optimized libraries for a debug build and visa versa.
+
+* Fix target name matching custom command output conflict.
+   
+* Fix FindQt3 so that it does not find qt4
+
+* Fix FindKDE4 so that it only looks for kde4-config
+
+Changes in CMake 2.4.4
+
+* CMake Version numbers on module directory
+
+* elseif added
+
+* Fix docs in CheckCSourceCompiles CheckCXXSourceCompiles and diagnostic 
+  output.
+
+* added Check(C/CXX)SourceRuns.cmake, CheckCXXCompilerFlag.cmake, Check
+
+* add static and shared flags to make sure the specified versions of 
+  libraries are used with -static -lfoo -shared -lbar
+
+*  Search for the compiler only once and store a full path. avoids problems
+  with PATH changes in cmake re-runs.
+
+* make sure manifest files are generated with VS 8
+
+* added FindASPELL.cmake, FindBZip2.cmake FindHPELL.cmake, FindJasper.cmake
+  FindLibXml2.cmake, FindLibXslt.cmake, FindOpenSSL.cmake
+
+* fix for bug#3646 GLUT not Glut for framework name
+
+* many fixes for FindKDE3.cmake
+
+* Better FindPNG that honors REQUIRED and looks in more places.
+
+* Support to find python 2.5
+
+* Find Qt3 better
+
+* Find Qt4 better and work with qmake and qmake-qt4 on the same machine.
+
+* Much better FindRuby.cmake
+
+* More stuff marked as advanced in FindTcl and FindSDL
+
+* FindwxWidgets runs shell script wx-config with sh
+
+* Support for cpack and vs8 install libraries
+
+* Darwin shared library create and Fortran now work
+
+* Support for isystem directories INCLUDE_DIRECTORIES (SYSTEM)
+
+* Targets in makefiles to create pre-processed files and assembly files
+  can be turned off with these variables:
+   CMAKE_SKIP_PREPROCESSED_SOURCE_RULES CMAKE_SKIP_ASSEMBLY_SOURCE_RULES
+
+* Support for QNX
+
+* Better default search paths for unix and FIND_* stuff
+
+* Use link /lib and not lib to create static libraries with MS
+
+* Useqt4 works with static qt4 and other fixes
+
+* UseSwig.cmake interface to add extra dependencies.
+
+* Added APPEND option to ADD_CUSTOM_COMMAND, Added VERBATIM option to 
+  ADD_CUSTOM_COMMAND and ADD_CUSTOM_TARGET
+
+* add EXCLUDE_FROM_ALL option  for ADD_LIBRARY and ADD_EXECUTABLE
+
+* Fix automatic computation of binary path to work for subdirectories of out
+  of source directories.  This addresses bug#3592.
+
+* --debug-ouput to cmake that gives stack trace to message send error commands.
+  The stack trace is no longer there without it.
+
+* + can be in a variable
+
+* Do not replace @VAR@ syntax in list files.  This addresses bug #2722
+
+* much faster depend scanning
+
+* do depends on system include directories
+
+* Permission and install directory fixes
+
+* New target property <CONFIG>_LOCATION (Debug, Release, etc)
+
+* fix exclude from all in VS
+
+* fix code completion problem in KDevelop
+
+* Define MSYS when using msys generator
+
+* fix referencece to projects outside the build tree VS 7,8
+
+* Fix ZERO_CHECK to not always try and rebuild
+
+* Fix Xcode universal binary rebuild problem
+
+* add FILE_IS_NEWER to if command
+
+* Add OPTIONAL to INSTALL command fix bug@2922
+
+* add SORT and REVERSE to LIST command
+
+* fix for seg fault bug #3815
+
+* add SYBOLIC as a source file property see SET_SOURCE_FILES_PROPERTIES
+
+* fix ctest valgrind if no coverage is done
+
+* better message if bogus generator is specified.
+
+* Better FindJava and FindJNI
+
+* Fix doxygen.config for CMake
+
+* add CPACK_MODULE_PATH
+
+* Fix configuration for ctest dashboard targets Experimental, Nightly, etc
+
+* Fix FindDoxygen for mac and app-bundles
+
+* Fix CPack simple install test with NSIS
+
+* Allow EXECUTE_PROCESS to strip trailing white space
+
+* Fix mingw echo in makefiles
+
+* Fix Xcode to not mess up -gdwarf-2
+
+* Fix crash when "linking" to custom targets.
+
+* Allow HEADER_FILE_ONLY to not compile the file in VS 7 and 8
+
+* Fix mingw out of binary with spaces in the path.
+
+* Fix for sudo make install (partial)
+
+* Allow installed zlib, curl, expat, xmlrpc to be used.
+
+* Add CMakeDependentOption.cmake module
+
+* Allow projects to set install prefix default
+
+* improved Find/Use wxWidgets
+
+* add support for windows dll version numbers
+
+* Fix message for -G when generator does not exist
+
+* Fix html references in help
+
+* Fix version on .exe cygwin
+
+* allow global timeout in ctest
+
+* Fix some odd cases with custom commands in VS 6
+
+* Fix path suffix stuff with lib64 in FIND_* stuff.
+
+* Fix delete in CMakeSetup to not change the current position in the list
+
+* Fix debug stl run of ctest on Mac
+
+* Use #2 for manifest nt command on dll and #1 on exe
+
+* Add depends from files inside qrc files in qt
+
+* Fix explort_library_depends to work with optimized and debug
+
+Changes in CMake 2.4.3
+
+* fix for 3557 - Under MSVC8 hardcoded TargetEnvironment for MIDL Compiler 
+
+* Fix for Xcode all projects to prevent -fvisibility=hidden flags. This is
+needed to make RTTI work by default.
+
+* better prototype for main in try compile of c programs avoids warnings in
+logs.
+
+* with visual studio do not use incremental linking for release builds by
+default.
+
+* fix bootstrap to use more ansi c main it test compiler
+
+* fix import build settings to do case insensitive match on windows
+
+* fix building in root directory c:/
+
+* Add support for CXX only projects
+
+* Better FindWxWidgets
+
+* Added FindBoose.cmake
+
+* add more fortran file extensions
+
+* Cpack supports multiple packages at the same time
+
+* Fix to FindKDE4 to look for kde4-config first
+
+* Support for env var CMAKE_CONFIG_TYPE in ctest
+
+* Fix for -DVAR=foo on the command line not saving to the cache
+
+* ENH: Added creation of XXX_FIND_COMPONENTS list of all components requested
+  withREQUIRED option.  This addresses the feature request in bug#3494.
+
+* Object files get safe names
+
+* progress is now reported with makefiles
+
+* location of CMakeTmp changed to a varible
+
+* CMAKE_COLOR_MAKEFILE cache variable available to turn off color output
+
+* fixes for FindQt4 on mac.
+
+* Better search paths for finding VTK
+
+* Fix relative path problems in ADD_SUBDIRECTORY
+
+* Fix long link commands on UNIX shells
+
+* Fix depend file names in makefiles for generated headers
+
+* CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS allows for if/endif without variable
+
+* Xcode multiple custom command problem fixed.
+
+* INSTALL_RPATH_USE_LINK_PATH when true will add the link path to the rpath
+
+* Add target/fast rules in the sub directories
+
+* Fix Visual studio C and C++ targets to not add /TP and /TC
+
+* print a context when cmake errors occur
+
+* add rxvt-unicode, cygwin, and screen terminal support for color output
+
+* Fix crash in CMakeSetup when status line is long
+
+* make sure try compile files have a newline at the end
+
+* fix for hp itanium build
+
+Changes in CMake 2.4.2
+
+* Run symlink command from correct directory for executable versions
+
+* Fix for universal binaries and Xcode depend problem
+
+* Changes to LIST command, see --help-command LIST
+
+* Fix FindQT to be able to use full paths to source files
+
+* Fix CPack ZIP on windows command line problem
+
+* Find executables with no extension on windows mingw
+
+* Fix FindQt3 to use QTDIR over path
+
+* Significant speedup in try-compile for nmake
+
+* CPack improvments including tar bzip2
+
+* FindQt4 windows path fix
+
+* Sunos cc optimize flags are correct
+
+* Fix crash with ${} empty variable
+
+* Increase depend speed on Mac OS.
+
+* install command CONFIGURATIONS option.
+
+* Fix MSVC60, MSVC70, MSVC71, MSVC80 definitions for IDE builds
+
+* Fix for C++ compiler being used for c code in VS IDE
+
+Changes in CMake 2.4.1
+
+* Several ctest and cpack bug fixes
+
+* Many updates and fixes for FindQt4.cmake
+
+* Fix CMAKE_REQUIRED_FLAGS in CheckCXXSourceCompiles.cmake 
+
+* Handle running make from a symlinked build tree
+
+* Automatic color ouput detection for shells building with make
+
+* Kdevelop generator handles CMakeFiles directory better
+
+* add correct depend information for fluid 
+
+* allow the cache to be saved even if a fatal error occurs
+
+* fix bug in relative path subdir and add_subdirectoy commands
+
+* support in vs for two object files with the same name
+
+* short file names used for library paths in visual studio
+
+* package target only shows up when you have cpack config files
+
+* Use dl and not -ldl for adding in the dynamic library
+
+* Fix check c/cxx source compiles macros to not clobber log files
+ 
+* Fix nmake version detection of cl and create correct pdb files
+
+* Fix msys bootstrap
+
+* Change color output to be more readable
+
+* Fix vs6 library naming
+
+Changes in CMake 2.4.0
+
+* CPack beta
+
+* Visual Studio 2005 win64 support
+
+* Improved install support
+
+* Improved FIND_PROGRAM, FIND_LIBRARY, FIND_PATH, FIND_FILE
+
+* Improved support for finding/using OSX Frameworks
+
+* Multiple output support for custom commands
+
+* Color output in make with vt100 terminals CMAKE_COLOR_MAKFILE
+
+* Better variables for MSVC MSVC80 
+
+* Library path order is preserved
+
+* Fix for text file busy in xcodebuild runs
+
+* Better bundle support on OSX
+
+* ctest -S scripts can run in new process with new environment
+
+* OSX universal binary support
+
+* Watcom support
+ 
+* MinGW and MSYS support
+
+* Visual studio 2005 manifest support
+
+* Better handling of RPATH, no longer put rpath in install tree
+
+* Fix OUTPUT_NAME 
+
+* ctest captures output from vcexpress
+
+* cmake --help-module can give help for cmake modules
+
+* Lots of bug fixes
