@@ -3,10 +3,13 @@
 @SET_MAKE@
 
 ##  First build CMake, then use that to configure VTK and finall build it.
-##  Note need a softlink so that include files are located using <vtk/>.
+##  Note need a softlink so that include files are located using <vtk/>
+##  (this will need updating for new major versions of VTK).
+##  On OS X we make sure that this is an X11 build, so require all the 
+##  various options below.
 all:
-	( cd cmake-2.4.7 && $(MAKE) )
-	( PATH=`pwd`/cmake-2.4.7/bin:${PATH}; export PATH; \
+	( cd cmake && $(MAKE) )
+	( PATH=`pwd`/cmake/bin:${PATH}; export PATH; \
 	  cd VTK && \
 	  cmake -D BUILD_SHARED_LIBS:BOOL=ON \
 	        -D BUILD_TESTING:BOOL=OFF \
@@ -21,20 +24,19 @@ all:
 
 ##  Automake really requires local versions for these targets.
 distclean-local:
-	( cd cmake-2.4.7; $(MAKE) distclean )
-	( cd VTK; $(MAKE) distclean )
+	( cd cmake && $(MAKE) distclean )
+	( cd VTK && $(MAKE) distclean )
 
 clean-local:
-	( cd cmake-2.4.7; $(MAKE) clean )
-	( cd VTK; $(MAKE) clean )
+	( cd cmake && $(MAKE) clean )
+	( cd VTK && $(MAKE) clean )
 
-EXTRA_DIST =
+EXTRA_DIST = cmake VTK
 
 ##  Before distributing subdirectories we need to clean then up (we get all
-##  the files in these directories). Also remove the CVS trace and any
-##  softlinks.
+##  the files in these directories). Also remove any softlinks. XXX .svn
+##  traces?
 dist-hook:
-	rm -rf `find $(distdir) -type d -name CVS`
 	rm -rf `find $(distdir) -type l`
-	(cd $(distdir)/VTK; make distclean)
-	(cd $(distdir)/cmake-2.4.7; make distclean)
+	(cd $(distdir)/VTK && make distclean)
+	(cd $(distdir)/cmake && make distclean)

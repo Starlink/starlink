@@ -11,22 +11,17 @@ AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
-AC_CONFIG_SRCDIR([vtk-5.0.3.tar.gz])
+AC_CONFIG_SRCDIR([VTK/CMakeLists.txt])
 
 dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
 
 dnl    VTK and CMake do not use any autotools, so most of this is a
-dnl    complete fudge. Configuration consists of unpacking the tarballs
-dnl    and running bootstrap in CMake (this also does a basic build).
+dnl    complete fudge. Configuration consists of running bootstrap in CMake
+dnl    (this also does a basic build). Make runs the local cmake and then
+dnl    make in the VTK directory.
 (
-   cmd="tar zxvf cmake-2.4.7.tar.gz";\
-   echo $cmd; \
-   eval $cmd
-   cmd="tar zxvf vtk-5.0.3.tar.gz";\
-   echo $cmd; \
-   eval $cmd
-   cmd="cd cmake-2.4.7 && ./bootstrap";\
+   cmd="cd cmake && ./bootstrap";\
    echo $cmd; \
    eval $cmd
 )
