@@ -147,10 +147,12 @@ F77_SUBROUTINE(ndf_hndlr)( CHARACTER(EVNAME),
    GENPTR_CHARACTER(EVNAME)
    GENPTR_INTEGER(STATUS)
    GENPTR_LOGICAL(STATUS)
-   char *evname;
-   int ihandler;
    NdfEventHandler *handler_list;
+   char *evname;
    int i;
+   int ihandler;
+   int there;
+   int unused;
 
 /* Check the inherited global status. */
    if ( *STATUS != SAI__OK ) return;
@@ -170,22 +172,35 @@ F77_SUBROUTINE(ndf_hndlr)( CHARACTER(EVNAME),
 /* If adding the handler to the list of registered handlers... */
       if( F77_ISTRUE( *SET ) ) {
 
-/* Find an unused element in the array of handlers. */
+/* Find an unused element in the array of handlers and check to see if
+   the handler is already registered. */
+         there = 0;
+         unused = -1;
          for( i = 0; i < nhandlers[ ihandler ]; i++ ) {
-            if( ! handler_list[ i ] ) break;
+            if( ! handler_list[ i ] ){
+               if( unused == -1 ) unused = i;
+            } else if(  handler_list[ i ] == HANDLR ) {
+               there = 1;
+            }          
          }
+
+/* Do nothing more if the handler is already registered. */
+         if( ! there ) {
 
 /* If no unused element was found, extend the array. */
-         if( i == nhandlers[ ihandler ] ) {
-            astBeginPM;
-            handlers[ ihandler ] = astGrow( handler_list, ++nhandlers[ ihandler ],
-                                            sizeof( NdfEventHandler ) );
-            handler_list = handlers[ ihandler ];
-            astEndPM;
-         }
+            if( unused == -1 ) {
+               astBeginPM;
+               unused = nhandlers[ ihandler ];
+               handlers[ ihandler ] = astGrow( handler_list, 
+                                               ++nhandlers[ ihandler ],
+                                               sizeof( NdfEventHandler ) );
+               handler_list = handlers[ ihandler ];
+               astEndPM;
+            }
 
 /* If OK, store the pointer. */
-         if( astOK ) handler_list[ i ] =  HANDLR;
+            if( astOK ) handler_list[ unused ] =  HANDLR;
+         }
 
 /* If the handler is being unregistered, search for it in the list of
    currently registered handlers, and nullify the array element. */
@@ -300,7 +315,7 @@ F77_SUBROUTINE(ndf1_event)( CHARACTER(EVNAME),
 
 /* If not already done, expand the NDF_EVENT message token. */
             if( !expanded ) {
-               emsMload( "", "^NDF_EVENT", TEXT, &TEXT_length, STATUS );
+               emsMload( "", "^NDF_EVENT", TEXT, (int *) &TEXT_length, STATUS );
                expanded = 1;
             }
 
