@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_calc_mapcoord( smfData *data, AstFrameSet *outfset,
+*     smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving, 
 *                   int *lbnd_out, int *ubnd_out, int *status );
 
 *  Arguments:
@@ -21,6 +21,8 @@
 *        Pointer to smfData struct
 *     outfset = AstFrameSet* (Given)
 *        Frameset containing the sky->output map mapping
+*     moving = int (Given)
+*        Is coordinate system tracking moving object? (if outfset specified)
 *     lbnd_out = double* (Given)
 *        2-element array pixel coord. for the lower bounds of the output map 
 *     ubnd_out = double* (Given)
