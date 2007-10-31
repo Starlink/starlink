@@ -55,6 +55,8 @@
 *        Fix compiler warnings. Check status.
 *     2007-10-22 (TIMJ):
 *        Tidy prologue. Make more robust by checking nfits value.
+*     2007-10-31 (TIMJ):
+*        Fix compiler warning.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -103,7 +105,7 @@ void smf_fits_crchan( int nfits, const char * headrec, AstFitsChan ** fits,
      is to use strlen since we know that all the strings are terminated somewhere.
   */
 
-  char *card = NULL;
+  const char *card = NULL;
   int i;
   int step = 0;
   int single_buffer = 0;
