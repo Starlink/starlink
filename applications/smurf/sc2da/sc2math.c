@@ -666,14 +666,14 @@ int *status         /* global status (given and returned) */
 
 void sc2math_flatten
 (
-int nboll,          /* number of bolometers (given) */
-int nframes,        /* number of frames in scan (given) */
-char *flatname,     /* name of flatfield algorithm (given) */
-int nflat,          /* number of flatfield parameters (given) */
-double *fcal,       /* calibration coefficients (given) */
-double *fpar,       /* calibration parameters (given) */
-double *inptr,      /* measurement values (given and returned) */
-int *status         /* global status (given and returned) */
+int nboll,                /* number of bolometers (given) */
+int nframes,              /* number of frames in scan (given) */
+const char *flatname,     /* name of flatfield algorithm (given) */
+int nflat,                /* number of flatfield parameters (given) */
+const double *fcal,       /* calibration coefficients (given) */
+const double *fpar,       /* calibration parameters (given) */
+double *inptr,            /* measurement values (given and returned) */
+int *status               /* global status (given and returned) */
 )
 
 /* Description :
@@ -693,6 +693,7 @@ int *status         /* global status (given and returned) */
     05Oct2005 : generalise by adding flatname, nflat and fpar arguments (bdk)
     30Jul2007 : allow "NULL" flatfield - do nothing (bdk)
     03Sep2007 : allow for bad values in linear coeffs (bdk)
+    31Oct2007:  use const for appropriate arguments (bdk)
 */
 
 {
@@ -2186,15 +2187,15 @@ double *r     /* Response value (returned) */
 
 void sc2math_setcal
 ( 
-int nboll,         /* total number of bolometers (given) */
-int bol,           /* number of current bolometer (given) */
-int numsamples,    /* number of data samples (given) */
-double values[],   /* measurements by bolometer (given) */
-int ncal,          /* number of calibration measurements (given) */
-double heat[],     /* calibration heater settings (given) */
-double calval[],   /* calibration measurements for all bolometers (given) */
-double lincal[2],  /* calibration parameters (returned) */
-int *status        /* global status (given and returned) */
+int nboll,               /* total number of bolometers (given) */
+int bol,                 /* number of current bolometer (given) */
+int numsamples,          /* number of data samples (given) */
+const double values[],   /* measurements by bolometer (given) */
+int ncal,                /* number of calibration measurements (given) */
+const double heat[],     /* calibration heater settings (given) */
+const double calval[],   /* calibration measurements for all bolometers (given) */
+double lincal[2],        /* calibration parameters (returned) */
+int *status              /* global status (given and returned) */
 )
 
 /*  Description :
@@ -2212,6 +2213,7 @@ int *status        /* global status (given and returned) */
     History :
      12Aug2005:  original (bdk@roe.ac.uk)
      03Sep2007:  allow for increasing and decreasing data numbers (bdk)
+     31Oct2007:  use const for appropriate arguments (bdk)
 */
 
 {
@@ -2254,14 +2256,14 @@ int *status        /* global status (given and returned) */
 
 void sc2math_setcaldec
 ( 
-int nboll,         /* total number of bolometers (given) */
-int bol,           /* number of current bolometer (given) */
-double dvalue,     /* representative data number (given) */
-int ncal,          /* number of calibration measurements (given) */
-double heat[],     /* calibration heater settings (given) */
-double calval[],   /* calibration measurements for all bolometers (given) */
-double lincal[2],  /* calibration parameters (returned) */
-int *status        /* global status (given and returned) */
+int nboll,               /* total number of bolometers (given) */
+int bol,                 /* number of current bolometer (given) */
+const double dvalue,     /* representative data number (given) */
+int ncal,                /* number of calibration measurements (given) */
+const double heat[],     /* calibration heater settings (given) */
+const double calval[],   /* calibration measurements for all bolometers (given) */
+double lincal[2],        /* calibration parameters (returned) */
+int *status              /* global status (given and returned) */
 )
 
 /*  Description :
@@ -2279,6 +2281,7 @@ int *status        /* global status (given and returned) */
     History :
      12Aug2005:  original (bdk@roe.ac.uk)
      03Sep2007:  provide for increasing and decreasing data numbers (bdk)
+     31Oct2007:  use const for appropriate arguments (bdk)
 */
 
 {
@@ -2324,14 +2327,14 @@ int *status        /* global status (given and returned) */
 
 void sc2math_setcalinc
 ( 
-int nboll,         /* total number of bolometers (given) */
-int bol,           /* number of current bolometer (given) */
-double dvalue,     /* representative data number (given) */
-int ncal,          /* number of calibration measurements (given) */
-double heat[],     /* calibration heater settings (given) */
-double calval[],   /* calibration measurements for all bolometers (given) */
-double lincal[2],  /* calibration parameters (returned) */
-int *status        /* global status (given and returned) */
+int nboll,               /* total number of bolometers (given) */
+int bol,                 /* number of current bolometer (given) */
+const double dvalue,     /* representative data number (given) */
+int ncal,                /* number of calibration measurements (given) */
+const double heat[],     /* calibration heater settings (given) */
+const double calval[],   /* calibration measurements for all bolometers (given) */
+double lincal[2],        /* calibration parameters (returned) */
+int *status              /* global status (given and returned) */
 )
 
 /*  Description :
@@ -2349,6 +2352,7 @@ int *status        /* global status (given and returned) */
     History :
      12Aug2005:  original (bdk@roe.ac.uk)
      03Sep2007:  provide for increasing and decreasing data numbers (bdk)
+     31Oct2007:  use const for appropriate arguments (bdk)
 */
 
 {
