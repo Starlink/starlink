@@ -172,7 +172,7 @@
 *  for NDF extensions, then take a copy of it so we can modify it without
 *  making any permanatent changes. Otherwise, create a new empty KeyMap.
       IF( TCB_PXT .NE. AST__NULL ) THEN
-         PXT = AST_COPY( PXT, STATUS )
+         PXT = AST_COPY( TCB_PXT, STATUS )
       ELSE 
          PXT = AST_KEYMAP( ' ', STATUS )
       END IF

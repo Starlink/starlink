@@ -305,6 +305,7 @@
                IF( TCB_PXT .EQ. AST__NULL ) THEN
                   CALL AST_BEGINPM
                   TCB_PXT = AST_KEYMAP( ' ', STATUS )
+                  CALL AST_EXEMPT( TCB_PXT, STATUS )
                   CALL AST_BEGINPM
                END IF
 
