@@ -298,7 +298,7 @@ smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
 		       AstKeyMap *history, int * status );
 
 smfDream *
-smf_construct_smfDream( smfData *data, const int nvert, const int nsampcycle, 
+smf_construct_smfDream( smfData *data, size_t nvert, size_t nsampcycle, 
 			const int *jigvert, const double *jigpath, int * status );
 
 smfFile *
@@ -387,7 +387,7 @@ smf_accumulate_prov( AstKeyMap * prvmap, const smfFile * file, const Grp* igrp,
 void smf_fits_crchan( int nfits, const char * headrec, AstFitsChan ** fits, 
                       int *status);
 
-void smf_fits_export2DA ( const AstFitsChan *fitschan, int *ncards, 
+void smf_fits_export2DA ( const AstFitsChan *fitschan, size_t *ncards, 
                           char * fitsrec,
                           int *status );
 

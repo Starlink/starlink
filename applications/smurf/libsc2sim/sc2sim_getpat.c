@@ -15,7 +15,7 @@
 *     sc2sim_getpat ( int nvert, int smu_samples, double steptime, 
 *                     double smu_offset, int conv-shape, double conv_sig,
 *                     int move_code, double jig_stepx, double jig_stepy,
-*                     int jig_vert[][2], int *cycle_samples, 
+*                     int jig_vert[][2], size_t *cycle_samples, 
 *                     double pattern[][2], int *status )
 
 *  Arguments:
@@ -38,7 +38,7 @@
 *     jig_vert = int[][2] (Given)
 *        Array with relative jiggle coordinates in units
 *        of jiggle steps in case jiggle positions are visited
-*     cycle_samples = int* (Returned)
+*     cycle_samples = size_t* (Returned)
 *        The number of samples per cycle
 *     pattern = double[][2] (Returned)
 *        The array to hold the coordinates of the jiggle
@@ -54,6 +54,8 @@
 *  Authors:
 *     H.W. van Someren Greve (ASTRON)
 *     B.D.Kelly (ROE)
+*     Jennifer Balfour (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History :
@@ -65,10 +67,14 @@
 *        Split from dsim.c
 *     2006-09-22 (JB):
 *        Removed DREAM specific code.
+*     2007-10-31 (TIMJ):
+*        Use size_t
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     Copyright (C) 2002-2006 Particle Physics and Astronomy Research
+*     Council. Copyright (C) 2006 University of British Columbia.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -111,7 +117,7 @@ double jig_stepy,     /* Y interval in arcsec (given) */
 int jig_vert[][2],    /* Array with relative jiggle coordinates in units of
                          jiggle steps in case jiggle positions are 
                          visited (given) */
-int *cycle_samples,   /* The number of samples per cycle (returned) */
+size_t *cycle_samples,   /* The number of samples per cycle (returned) */
 double pattern[][2],  /* The array to hold the coordinates of the jiggle 
                          offsets in arcsec. There are cycle_samples entries 
                          filled. (returned) */

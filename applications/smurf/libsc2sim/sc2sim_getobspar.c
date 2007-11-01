@@ -86,6 +86,8 @@
 *     2007-09-07 (AGG):
 *        - Set targetpow based on wavelength if not specified
 *        - Introduce flag to denote an 850 or 450 um simulation
+*     2007-10-31 (TIMJ):
+*        astMapGet0I uses int not size_t
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -157,6 +159,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    int vert_x[SC2SIM__MXVERT]; /* Temporary array for x-vertices */
    int vert_y[SC2SIM__MXVERT]; /* Temporary array for y-vertices */
    int scuba2lon = 1;     /* Flag to denote whether the simulation is 850 or 450 um */
+   int itemp;          /* Temporary int variable for ast */
 
    /* Check status */
    if ( !StatusOkP(status) ) return;
@@ -355,11 +358,13 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    if ( !astMapGet0D ( keymap, "MJDAYSTART", &(inx->mjdaystart) ) )
       inx->mjdaystart = 53795.0;
 
-   if ( !astMapGet0I ( keymap, "NBOLX", &(inx->nbolx) ) )
-      inx->nbolx = 40;
+   if ( !astMapGet0I ( keymap, "NBOLX", &itemp ) )
+      itemp = 40;
+   inx->nbolx = itemp;
 
-   if ( !astMapGet0I ( keymap, "NBOLY", &(inx->nboly) ) )
-      inx->nboly = 32;   
+   if ( !astMapGet0I ( keymap, "NBOLY", &itemp ) )
+      itemp= 32;   
+   inx->nboly = itemp;
 
    if ( !astMapGet0D ( keymap, "NMAPS", &(inx->nmaps) ) )
      inx->nmaps = 1;
@@ -472,8 +477,9 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    if ( !astMapGet0I ( keymap, "NUMSAMPLES", &(inx->numsamples) ) )
       inx->numsamples = 128; 
 
-   if ( !astMapGet0I ( keymap, "NVERT", &(inx->nvert) ) )
-      inx->nvert = nvert_x;
+   if ( !astMapGet0I ( keymap, "NVERT", &itemp ) )
+      itemp = nvert_x;
+   inx->nvert = itemp;
 
    astMapGet0C ( keymap, "OBSMODE", &temp );
 

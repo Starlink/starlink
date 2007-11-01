@@ -16,12 +16,12 @@
 *     sc2sim_ndfwrdata ( const struct sc2sim_obs_struct *inx, 
 *                        const struct sc2sim_sim_struct *sinx,
 *                        double meanwvm, const char file_name[], 
-*                        int numsamples, int nflat, const char flatname[], 
+*                        size_t numsamples, size_t nflat, const char flatname[], 
 *                        const JCMTState *head, const int *dbuf, const int *dksquid,
 *                        const double *fcal, const double *fpar, 
 *                        const char instrume[], const char filter[], 
 *                        const char dateobs[], const char obsid[], 
-*                        const double *posptr, int jigsamples, 
+*                        const double *posptr, size_t jigsamples, 
 *                        const double jigptr[][2], const int obsnum,       
 *                        const int nsubscan, const char obstype[], 
 *                        const char utdate[], const double azstart,
@@ -42,9 +42,9 @@
 *        225 GHz tau
 *     file_name = const char[] (Given)
 *        Output file name 
-*     numsamples = int (Given)
+*     numsamples = size_t (Given)
 *        Number of samples 
-*     nflat = int (Given)
+*     nflat = size_t (Given)
 *        Number of flat coeffs per bol
 *     flatname = const char[] (Given)
 *        Name of flatfield algorithm 
@@ -68,7 +68,7 @@
 *        Observation ID string
 *     posptr = const double* (Given)
 *        Pointing offsets from map centre
-*     jigsamples = int (Given)
+*     jigsamples = size_t (Given)
 *        Number of jiggle samples in DREAM pattern
 *     jigptr[][2] = double (Given)
 *        Array of jiggle X and Y positions
@@ -197,6 +197,9 @@
 *        Correct bug in calculating DATE-OBS for subimages
 *     2007-10-22 (TIMJ):
 *        Use new definition for fits header as required by sc2store.
+*     2007-10-31 (TIMJ):
+*        DA now uses size_t to count things. A read-only dateobs was being
+*        written to.
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -252,8 +255,8 @@ const struct sc2sim_obs_struct *inx,  /* structure for values from XML (given) *
 const struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
 double meanwvm,          /* Mean 225 GHz tau */
 const char file_name[],  /* output file name (given) */
-int numsamples,          /* number of samples (given) */
-int nflat,               /* number of flat coeffs per bol (given) */
+size_t numsamples,       /* number of samples (given) */
+size_t nflat,            /* number of flat coeffs per bol (given) */
 const char flatname[],   /* name of flatfield algorithm (given) */
 const JCMTState *head,   /* header data for each frame (given) */
 const int *dbuf,         /* simulated data (given) */
@@ -262,11 +265,11 @@ const double *fcal,      /* flatfield calibration (given) */
 const double *fpar,      /* flat-field parameters (given) */
 const char instrume[],   /* String representing instrument (e.g. "SCUBA-2") (given) */
 const char filter[],     /* String representing filter (e.g. "850") (given) */
-const char dateobs[],    /* String representing UTC DATE-OBS */
+const char dateobs[],    /* String representing UTC DATE-OBS (given) */
 const char obsid[],      /* unique obsid for this observation (given) */
 const double *posptr,    /* Pointing offsets from map centre (given) */
-int jigsamples,          /* Number of jiggle samples (given) */
-const double jigptr[][2],/* Array of X, Y jiggle positions (given) */
+size_t jigsamples,          /* Number of jiggle samples (given) */
+double jigptr[][2],/* Array of X, Y jiggle positions (given) */
 const int obsnum,        /* Observation number (given) */
 const int nsubscan,      /* Sub-scan number (given) */
 const int obsend,        /* Flag to indicate whether this is the last file */
@@ -303,7 +306,7 @@ int *status              /* Global status (given and returned) */
    int k;                          /* Loop counter */
    int naver;                      /* Number of frames to average */
    int ndim;                       /* Dimensionality of output image */
-   int nrec;                       /* number of FITS header records */
+   size_t nrec;                    /* number of FITS header records */
    int nsubim;                     /* Number of DREAM/STARE images */
    double map_hght;                /* Map height in arcsec */
    double map_pa;                  /* Map PA in degrees  */
@@ -330,6 +333,7 @@ int *status              /* Global status (given and returned) */
    double y_max = 0;               /* Y extent of pointing centre offsets */
    double y_min = 0;               /* Y extent of pointing centre offsets */
    double zero[2*DREAM__MXBOL];    /* Bolometer zero points */
+   char imdateobs[30];              /* DATE-OBS for IMAGE header */
 
    /* Check status */
    if ( !StatusOkP(status) ) return;
@@ -699,7 +703,7 @@ int *status              /* Global status (given and returned) */
        /* Set DATE-OBS string for this image - UTC */
        sc2sim_dateobs( inx->mjdaystart + 
 		       ((((nsubscan-1)*numsamples) + k*naver)*inx->steptime/SPD),
-		       dateobs, status );
+		       imdateobs, status );
 
        /* Set dimensions of output image */
        ndim = 2;
@@ -735,7 +739,7 @@ int *status              /* Global status (given and returned) */
 		    "RTS index number of first frame in image", 0);
        astSetFitsI( fitschan, "SEQEND", seqend, 
 		    "RTS index number of last frame in image", 0);
-       astSetFitsS ( fitschan, "DATE-OBS", dateobs, 
+       astSetFitsS ( fitschan, "DATE-OBS", imdateobs, 
 		     "Date and time (UTC) of start of sub-scan", 0 );
 
        /* Convert the AstFitsChan data to a char array */

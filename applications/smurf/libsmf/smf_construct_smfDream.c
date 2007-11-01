@@ -13,16 +13,16 @@
 *     Subroutine
 
 *  Invocation:
-*     dream = smf_construct_smfDream( smfData *data, const int nvert, 
-*                                     const int nsampcycle, const int *jigvert, 
+*     dream = smf_construct_smfDream( smfData *data, size_t nvert, 
+*                                     size_t nsampcycle, const int *jigvert, 
 *                                     const double *jigpath, int * status );
 
 *  Arguments:
 *     data = smfData* (Given)
 *        smfData struct for the input raw DREAM data
-*     nvert = const int (Given)
+*     nvert = size_t (Given)
 *        Number of vertices in the DREAM jiggle pattern
-*     nsampcycle = const int (Given)
+*     nsampcycle = size_t (Given)
 *        Number of data samples in a single DREAM cycle
 *     jigvert = const int * (Given)
 *        Array of positions in the DREAM jiggle pattern
@@ -68,6 +68,8 @@
 *        Absence of SAM_MODE no longer fatal.
 *     2007-10-29 (EC):
 *        Modified interface to smf_open_file.
+*     2007-10-31 (TIMJ):
+*        Consistently use size_t
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -118,8 +120,8 @@
 
 #define FUNC_NAME "smf_construct_smfDream"
 
-smfDream *smf_construct_smfDream( smfData *data, const int nvert, 
-				  const int nsampcycle, const int *jigvert, 
+smfDream *smf_construct_smfDream( smfData *data, size_t nvert, 
+				  size_t nsampcycle, const int *jigvert, 
 				  const double *jigpath, int * status ) {
 
   /* Local variables */
@@ -214,7 +216,8 @@ smfDream *smf_construct_smfDream( smfData *data, const int nvert,
 		/* First, the grid weights array */
 		ndfid = smf_get_ndfid(drmloc, "GRIDWTS", "READ", "OLD", "", 0, 
 				      NULL, NULL, status);
-		smf_open_ndf( ndfid, "READ", weightsfile, SMF__DOUBLE, &griddata, status);
+		smf_open_ndf( ndfid, "READ", weightsfile, SMF__DOUBLE, 
+                              &griddata, status);
 		if ( griddata != NULL ) {
 		  nelem = (size_t)((griddata->dims)[0] * (griddata->dims)[1]);
 		  gridwts = smf_malloc( nelem, sizeof(double), 1, status );

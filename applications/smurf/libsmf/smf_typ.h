@@ -231,7 +231,7 @@ typedef struct smfDA {
   double *flatcal;           /* pointer to flatfield calibration */
   double *flatpar;           /* pointer to flatfield parameters */
   char flatname[SC2STORE_FLATLEN]; /* name of flatfield algorithm */
-  int nflat;                 /* number of flat coeffs per bol */
+  size_t nflat;              /* number of flat coeffs per bol */
 } smfDA;
 
 /* This struct stores DREAM parameters */

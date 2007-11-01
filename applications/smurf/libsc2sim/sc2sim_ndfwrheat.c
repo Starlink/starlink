@@ -13,36 +13,38 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2sim_ndfwrheat ( struct sc2sim_obs_struct *inx, 
-*                        struct sc2sim_sim_struct *sinx,
-*                        char file_name[], int numsamples, int nflat, char *flatname, 
-*                        JCMTState *head, int *dbuf, int *dksquid, 
-*                        double *fcal, double *fpar, char filter[], int *status )
+*     sc2sim_ndfwrheat ( const struct sc2sim_obs_struct *inx, 
+*                        const struct sc2sim_sim_struct *sinx,
+*                        const char file_name[], size_t numsamples,
+*                        size_t nflat, const char flatname[], 
+*                        const JCMTState *head, const int *dbuf,
+*                        const int *dksquid, const double *fcal,
+*                        const double *fpar, const char filter[], int *status )
 
 *  Arguments:
-*     inx = sc2sim_obs_struct* (Given)
+*     inx = const sc2sim_obs_struct* (Given)
 *        Pointer to struct with observation parameters
-*     sinx = sc2sim_sim_struct* (Given)
+*     sinx = const sc2sim_sim_struct* (Given)
 *        Pointer to struct with simulation parameters
-*     file_name = char[] (Given)
+*     file_name = const char[] (Given)
 *        Output file name 
-*     numsamples = int (Given)
+*     numsamples = size_t (Given)
 *        Number of samples 
-*     nflat = int (Given)
+*     nflat = size_t (Given)
 *        Number of flat coeffs per bol
-*     flatname = char*
+*     flatname = const char[] (Given)
 *        Name of flatfield algorithm 
-*     head = JCMTState* (Given)
+*     head = const JCMTState* (Given)
 *        Header data for each frame 
-*     dbuf = int* (Given)
+*     dbuf = const int* (Given)
 *        Simulated data
-*     dksquid = int* (Given)
+*     dksquid = const int* (Given)
 *        Dark SQUID time stream data 
-*     fcal = double* (Given)
+*     fcal = const double* (Given)
 *        Flatfield calibration 
-*     fpar = double (Given)
+*     fpar = const double* (Given)
 *        Flat-field parameters
-*     filter = char[] (Given)
+*     filter = const char[] (Given)
 *        String representing filter (e.g. "850") 
 *     status = int* (Given and Returned)
 *        Pointer to global status.  
@@ -87,6 +89,8 @@
 *        Rationalize FITS headers, write correct DATE-OBS string
 *     2007-10-22 (TIMJ):
 *        Use new fitsrec definition for sc2store
+*     2007-10-31 (TIMJ):
+*        Use size_t following sc2store change. Use const.
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -134,18 +138,18 @@
 
 void sc2sim_ndfwrheat
 ( 
-struct sc2sim_obs_struct *inx,  /* structure for values from XML (given) */
-struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
-char file_name[],  /* output file name (given) */
-int numsamples,    /* number of samples (given) */
-int nflat,         /* number of flat coeffs per bol (given) */
-char *flatname,    /* name of flatfield algorithm (given) */
-JCMTState *head,   /* header data for each frame (given) */
-int *dbuf,         /* time stream data (given) */
-int *dksquid,      /* dark SQUID time stream data (given) */
-double *fcal,      /* flat-field calibration (given) */
-double *fpar,      /* flat-field parameters (given) */
-char filter[],     /* String representing filter (e.g. "850") (given) */
+const struct sc2sim_obs_struct *inx, /* structure for values from XML (given) */
+const struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
+const char file_name[],  /* output file name (given) */
+size_t numsamples,    /* number of samples (given) */
+size_t nflat,         /* number of flat coeffs per bol (given) */
+const char flatname[],    /* name of flatfield algorithm (given) */
+const JCMTState *head,   /* header data for each frame (given) */
+const int *dbuf,         /* time stream data (given) */
+const int *dksquid,      /* dark SQUID time stream data (given) */
+const double *fcal,      /* flat-field calibration (given) */
+const double *fpar,      /* flat-field parameters (given) */
+const char filter[],     /* String representing filter (e.g. "850") (given) */
 int *status        /* global status (given and returned) */
 )
 
@@ -153,8 +157,8 @@ int *status        /* global status (given and returned) */
   /* Local variables */
   char dateobs[SZFITSCARD+1] = "\0"; /* DATE-OBS string for observation */
   AstFitsChan *fitschan;           /* FITS headers */
-  const char fitsrec[SC2STORE__MAXFITS+1]; /* Store for FITS records */  
-  int nrec;                        /* number of FITS header records */
+  char fitsrec[SC2STORE__MAXFITS+1]; /* Store for FITS records */  
+  size_t nrec;                     /* number of FITS header records */
   int subnum;                      /* subarray index */
 
   /* Check status */

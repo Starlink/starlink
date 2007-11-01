@@ -13,14 +13,14 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_fits_export2DA ( const AstFitsChan *fitschan, int *ncards, 
+*     smf_fits_export2DA ( const AstFitsChan *fitschan, size_t *ncards, 
 *                          char *fitsrec, 
 *                          int *status )
 
 *  Arguments:
 *     fitschan = const AstFitsChan* (Given)
 *        AstFitsChan containing FITS headers
-*     ncards = int* (Returned)
+*     ncards = size_T* (Returned)
 *        Number of cards in FITS header
 *     fitsrec = char* (Returned)
 *        Character array for converted FITS headers. This should be large enough
@@ -41,10 +41,13 @@
 *     2006-11-01 (JB):
 *        Original version
 *     2007-10-22 (TIMJ):
+*        Tweak for new sc2store interface.
+*     2007-10-31 (TIMJ):
+*        Use size_t to match sc2store.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) Science and Technology Facilities Council.
+*     Copyright (C) 2007 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
@@ -87,7 +90,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_fits_export2DA"
 
-void smf_fits_export2DA ( const AstFitsChan *fitschan, int *ncards, 
+void smf_fits_export2DA ( const AstFitsChan *fitschan, size_t *ncards, 
                           char *fitsrec,
                           int *status ) {
 
@@ -95,7 +98,7 @@ void smf_fits_export2DA ( const AstFitsChan *fitschan, int *ncards,
   char *outpos = NULL;    /* current position in output buffer */
   char card[SZFITSCARD];  /* temporary buffer for current card */   
   int found;              /* Boolean to indicate if a card was found */
-  int i;                  /* Loop counter */
+  size_t i;               /* Loop counter */
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -105,7 +108,7 @@ void smf_fits_export2DA ( const AstFitsChan *fitschan, int *ncards,
    *ncards = astGetI ( fitschan, "Ncard" );
    if ( *ncards > SC2STORE__MAXFITS ) {
       *status = SAI__ERROR;
-      msgSeti("NC", *ncards);
+      msgSeti("NC", (int)*ncards);
       msgSeti("MC", SC2STORE__MAXFITS);
       errRep( FUNC_NAME, 
               "Number of FITS cards ^NC exceeds maximum allowed (^MC)",

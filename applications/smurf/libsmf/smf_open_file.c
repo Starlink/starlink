@@ -135,9 +135,14 @@
 *          because isNDF applied to non-SCUBA2 data
 *     2007-05-29 (AGG):
 *        Check if data type is _REAL and map as _DOUBLE
+*     2007-10-29 (EC):
+*        Add flag controlling header read.
+*     2007-10-31 (TIMJ):
+*        Use size_t following changes to sc2store.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     University of British Columbia.
 *     All Rights Reserved.
@@ -231,26 +236,27 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
   int *jigvert = NULL;       /* Pointer to jiggle vertices in DREAM pattern */
   double *jigpath = NULL;    /* Pointer to jiggle path */
   smfDream *dream = NULL;    /* Pointer to DREAM parameters */
-  int nsampcycle;            /* Number of positions in jiggle path */
-  int nvert;                 /* Number of vertices in DREAM pattern */
+  size_t nsampcycle;         /* Number of positions in jiggle path */
+  size_t nvert;              /* Number of vertices in DREAM pattern */
   int jigvndf;               /* NDF identifier for jiggle vertices */
   int jigpndf;               /* NDF identifier for SMU path */
   smfData *jigvdata = NULL;  /* Jiggle vertex data */
   smfData *jigpdata = NULL;  /* SMU path data */
 
   /* Pasted from readsc2ndf */
-  int colsize;               /* number of pixels in column */
+  size_t colsize;               /* number of pixels in column */
   char fitsrec[SC2STORE__MAXFITS*80+1];   /* FITS headers read from sc2store */
   int maxlen = 81;           /* maximum length of a FITS header */
-  unsigned int nfits;        /* number of FITS headers */
-  int nframes;               /* number of frames */
-  int rowsize;               /* number of pixels in row (returned) */
+  size_t nfits;              /* number of FITS headers */
+  size_t nframes;            /* number of frames */
+  size_t rowsize;            /* number of pixels in row (returned) */
   int createflags = 0;       /* Flags for smf_create_smfData */
 
   int gndf;                  /* General purpose NDF identifier (SCU2RED & DREAM) */
   int place;                 /* NDF placeholder for SCANFIT extension */
   int npoly;                 /* Number points in polynomial coeff array */
-  double *poly;              /* Pointer to array of polynomial coefficients */
+  void *tpoly[1] = { NULL }; /* Temp array of void for ndfMap */
+  double *poly = NULL;       /* Pointer to array of polynomial coefficients */
   double *opoly;             /* Pointer to store in output struct */
   int npdims;                /* Number of dimensions in the polynomial array */
   int pdims[NDF__MXDIM];     /* Size of each dimension */
@@ -364,7 +370,8 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
 	  }
 
 	  /* Read and store the polynomial coefficients */
-	  ndfMap( gndf, "DATA", "_DOUBLE", "READ", &poly, &npoly, status );
+	  ndfMap( gndf, "DATA", "_DOUBLE", "READ", &tpoly[0], &npoly, status );
+          poly = tpoly[0];
 	  ndfDim( gndf, NDF__MXDIM, pdims, &npdims, status );
 	  (*data)->ncoeff = pdims[2];
 	  /* Allocate memory for poly coeffs & copy over */
@@ -432,18 +439,19 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
 	  ndfXloc( indf, JCMT__EXTNAME, "READ", &xloc, status );
 	  /* And need to map the header making sure we have the right components
 	     for this instrument. */
-	  sc2store_headrmap( xloc, ndfdims[2], hdr->instrument, status );
+          nframes = ndfdims[2];
+	  sc2store_headrmap( xloc, nframes, hdr->instrument, status );
 
 	  /* Malloc some memory to hold all the time series data */
-	  hdr->allState = smf_malloc( ndfdims[2], sizeof(JCMTState),
+	  hdr->allState = smf_malloc( nframes, sizeof(JCMTState),
 					 1, status );
 
 	  /* Loop over each element, reading in the information */
 	  tmpState = hdr->allState;
-	  for (i=0; i<ndfdims[2]; i++) {
+	  for (i=0; i<nframes; i++) {
 	    sc2store_headget(i, &(tmpState[i]), status);
 	  }
-	  hdr->nframes = ndfdims[2];
+	  hdr->nframes = nframes;
 	  /* Unmap the headers */
 	  sc2store_headunmap( status );
 

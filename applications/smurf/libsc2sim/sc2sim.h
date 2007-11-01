@@ -110,7 +110,6 @@
 #include "sc2da/Dits_Err.h"
 #include "sc2da/Ers.h"
 #include "jcmt/state.h"
-
 #include "libsc2sim/sc2sim_struct.h"
 #include "libsc2sim/sc2sim_par.h"
 
@@ -360,7 +359,7 @@ int jig_vert[][2],    /* Array with relative jiggle coordinates in units of
                          jiggle steps in case jiggle positions are 
                          visited (given) */
 
-int *cycle_samples,   /* The number of samples per cycle (returned) */
+size_t *cycle_samples,   /* The number of samples per cycle (returned) */
 
 double pattern[][2],  /* The array to hold the coordinates of the jiggle 
                          offsets in arcsec. There are cycle_samples entries 
@@ -547,8 +546,8 @@ const struct sc2sim_obs_struct *inx,  /* structure for values from XML (given) *
 const struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
 double meanwvm,           /* 225 GHz tau */
 const char file_name[],   /* output file name (given) */
-int numsamples,           /* number of samples (given) */
-int nflat,                /* number of flat coeffs per bol (given) */
+size_t numsamples,        /* number of samples (given) */
+size_t nflat,             /* number of flat coeffs per bol (given) */
 const char flatname[],    /* name of flatfield algorithm (given) */
 const JCMTState *head,    /* header data for each frame (given) */
 const int *dbuf,          /* simulated data (given) */
@@ -560,8 +559,8 @@ const char filter[],      /* String representing filter (e.g. "850") (given) */
 const char dateobs[],     /* DateObs string for FITS header */
 const char obsid[],       /* Observation ID string */
 const double *posptr,     /* Pointing offsets from map centre */
-int jigsamples,           /* Number of jiggle samples (given) */
-const double jigptr[][2], /* Array of X, Y jiggle positions (given) */
+size_t jigsamples,        /* Number of jiggle samples (given) */
+double jigptr[][2], /* Array of X, Y jiggle positions (given) */
 const int obsnum,         /* Observation number (given) */		 
 const int nsubscan,       /* Sub-scan number (given) */			 
 const int obsend,        /* Flag to indicate whether this is the last file */
@@ -585,18 +584,18 @@ int *status               /* Global status (given and returned) */
 
 void sc2sim_ndfwrheat
 ( 
-struct sc2sim_obs_struct *inx,      /* structure for values from XML (given) */
-struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
-char file_name[],  /* output file name (given) */
-int numsamples,    /* number of samples (given) */
-int nflat,         /* number of flat coeffs per bol (given) */
-char *flatname,    /* name of flatfield algorithm (given) */
-JCMTState *head,   /* header data for each frame (given) */
-int *dbuf,         /* time stream data (given) */
-int *dksquid,      /* dark SQUID time stream data (given) */
-double *fcal,      /* flat-field calibration (given) */
-double *fpar,      /* flat-field parameters (given) */
-char filter[],     /* String representing filter (e.g. "850") (given) */
+const struct sc2sim_obs_struct *inx,      /* structure for values from XML (given) */
+const struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
+const char file_name[],  /* output file name (given) */
+size_t numsamples,    /* number of samples (given) */
+size_t nflat,         /* number of flat coeffs per bol (given) */
+const char *flatname,    /* name of flatfield algorithm (given) */
+const JCMTState *head,   /* header data for each frame (given) */
+const int *dbuf,         /* time stream data (given) */
+const int *dksquid,      /* dark SQUID time stream data (given) */
+const double *fcal,      /* flat-field calibration (given) */
+const double *fpar,      /* flat-field parameters (given) */
+const char filter[],     /* String representing filter (e.g. "850") (given) */
 int *status        /* global status (given and returned) */
 );
 

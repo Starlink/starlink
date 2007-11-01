@@ -1,52 +1,124 @@
-/*  sc2sim_struct.h - structure definitions for simulator 
+/*
+ *+
+ *  Name:
+ *     sc2sim_struct.h
 
-   Authors :
-    B.D.Kelly (bdk@roe.ac.uk)
-    A.G. Gibb (agg@astro.ubc.ca)
-    E.L. Chapin (echapin@phas.ubc.ca)
-    J. Balfour (jbalfour@phas.ubc.ca)
-    C. VanLaerhoven (clvl@phas.ubc.ca)
+ *  Purpose:
+ *     structure definitions for simulator 
 
-   History :
-    14Feb2003 : original (bdk)
-    26Jun2003 : add separate struct for simulator (bdk)
-    23Jan2004 : add components for Earth's atmospheric emission (bdk)
-    02Feb2004 : add atmrefval and atmrefnu (bdk)
-    26Jan2005 : add xpoint, ypoint (agg)
-    04Feb2005 : add telemission (bdk)
-    08Feb2005 : add polarimeter parameters (bdk)
-    17Feb2005 : add heatstart, heatstep, heatnum (bdk)
-    12May2005 : add ra, dec, subname (bdk)
-    17Jun2005 : add numsamples (bdk)
-    06Oct2005 : add flatname (bdk)
-    24Jan2006 : add pwvzen / atstart / atend (ec)
-    23Feb2006 : add mjdaystart (ec)
-    03Mar2006 : add pong* (ec)
-    15Jun2006 : replace pwvzen with tauzen (jb)
-    29Jun2006 : removed dataname (jb)
-    04Aug2006 : added bous & singlescan parameters (jb)
-    21Aug2006 : Put in ifndef to avoid including multiple times (ec)
-    22Sep2006 : Merge with dxml_struct.h (jb)
-    05Oct2006 : Replace pong_gridcount with pong_height and pong_width (jb)
-    12Oct2006 : Delete wt0_name and wt1_name as they are deprecated (agg)
-    16Oct2006 : Add pong_type (jb)
-    21Nov2006 : Add liss parameters and remove bolfile (deprecated)(jb)
-    22Nov2006 : Add pong_nmaps and liss_nmaps (jb)
-    18Dec2006 : Add DUT1 parameter (agg)
-    18Dec2006 : Replace pattern-specific parameters with general 
-                parameters (jb)
-    21Dec2006 : Add instap & instap_x/y (agg)
-    22Dec2006 : Add planetnum (agg)
-    26Mar2007 : Change units of steptime (formerly sample_t) to
-                seconds, not ms (agg)
-    23May2007 : Added telpos to sc2sim_sim_struct (ec)
-    29Jun2007 : Simplified bolometer noise, changed sc2sim_sim_struct: (EC)
-                -removed guessatm, aomega, bandGHz
-                -added jy2pw, refload, refnoise
-    03Jul2007 : Made obsMode/mapCoordframe enumerated types more readable (EC)
-    04Jul2007 : Added spike_t0/p0/p1/alpha to sc2sim_sim_struct (EC)
-    15Aug2007 : Added microstepping parameters to sc2sim_obs_struct (CV)
-    06Sep2007 : Redefine heatnum as an int (agg)
+ *  Language:
+ *     Starlink ANSI C
+
+ *  Type of Module:
+ *     C include file 
+
+ *  Authors:
+ *     B.D.Kelly (bdk@roe.ac.uk)
+ *     A.G. Gibb (agg@astro.ubc.ca)
+ *     E.L. Chapin (echapin@phas.ubc.ca)
+ *     J. Balfour (jbalfour@phas.ubc.ca)
+ *     C. VanLaerhoven (clvl@phas.ubc.ca)
+ *     T. Jenness (t.jenness@jach.hawaii.edu)
+
+ *  History:
+ *     2003-02-14 (BDK):
+ *        Original.
+ *     2003-06-26 (BDK):
+ *        Add separate struct for simulator.
+ *     2004-01-23 (BDK):
+ *        Add components for Earth's atmospheric emission.
+ *     2004-02-02 (BDK):
+ *        Add atmrefval and atmrefnu.
+ *     2005-01-26 (AGG):
+ *        Add xpoint, ypoint
+ *     2005-02-04 (BDK):
+ *        Add telemission.
+ *     2005-02-08 (BDK):
+ *        Add polarimeter parameters.
+ *     2005-02-17 (BDK):
+ *        Add heatstart, heatstep, heatnum.
+ *     2005-05-12 (BDK):
+ *        Add ra, dec, subname.
+ *     2005-06-17 (BDK):
+ *        Add numsamples.
+ *     2005-10-06 (BDK):
+ *        Add flatname.
+ *     2006-01-24 (EC):
+ *        Add pwvzen / atstart / atend.
+ *     2006-02-23 (EC):
+ *        Add mjdaystart.
+ *     2006-03-03 (EC):
+ *        Add pong*.
+ *     2006-06-14 (JB):
+ *        Replace pwvzen with tauzen.
+ *     2006-06-29 (JB):
+ *        Removed dataname.
+ *     2006-08-04 (JB):
+ *        Added bous & singlescan parameters.
+ *     2006-08-21 (EC):
+ *        Put in ifndef to avoid including multiple times.
+ *     2006-09-22 (JB):
+ *        Merge with dxml_struct.h.
+ *     2006-10-05 (JB):
+ *        Replace pong_gridheight with pong_height and pong_width.
+ *     2006-10-12 (AGG):
+ *        Delete wt0_name and wt1_name as they are deprecated.
+ *     2006-10-16 (JB):
+ *        Add pong_type.
+ *     2006-11-21 (JB):
+ *        Add liss parameters and remove bolfile (deprecated)
+ *     2006-11-22 (JB):
+ *        Add pong_nmaps and liss_nmaps.
+ *     2006-12-18 (AGG):
+ *        Add DUT1 parameter.
+ *     2006-12-18 (JB):
+ *        Replace pattern-specific parameters with general parameters.
+ *     2006-12-21 (AGG)
+ *        Add instap & instap_x/y.
+ *     2006-12-22 (AGG):
+ *        Add planetnum.
+ *     2007-03-26 (AGG):
+ *        Change units of steptime (formerly sample_t) to seconds, not ms
+ *     2007-05-23 (EC):
+ *        Added telpos to sc2sim_sim_struct.
+ *     2007-06-29 (EC):
+ *        Simplified bolometer noise, changed sc2sim_sim_struct:
+ *           -removed guessatm, aomega, bandGHz
+ *           -added jy2pw, refload, refnoise
+ *     2007-07-03 (EC):
+ *        Made obsMode/mapCoordframe enumerated types more readable.
+ *     2007-07-04 (EC):
+ *        Added spike_t0/p0/p1/alpha parameters to sc2sim_sim_struct.
+ *     2007-08-15 (CLV):
+ *        Added microstepping parameters to sc2sim_obs_struct.
+ *     2007-09-06 (AGG):
+ *        Redefine heatnum as an int.
+ *     2007-10-31 (TIMJ):
+ *        Use size_t following sc2store changes.
+
+*  Copyright:
+*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     Copyright (C) 2003-2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2007 University of British Columbia.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 3 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
+ *-
 */
 #include "libsc2sim/sc2sim_par.h"
 
@@ -101,8 +173,8 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
 				 Jiggle positions in arcsec */
   double jig_step_y;          /* The step size in -Y- direction between
 				 Jiggle positions in arcsec */
-  int jig_vert[SC2SIM__MXVERT][2];/* Array with relative vertex coordinates in
-				    units of pixel distance */
+  int jig_vert[SC2SIM__MXVERT][2];/* Array with relative vertex coordinates
+				        in units of pixel distance */
   double lambda;              /* wavelength in metres */
   double liss_angle;          /* angle of pattern relative to telescope
 				 axes in radians anticlockwise */
@@ -111,14 +183,14 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
 				    (units: number of detectors) */
   double mspat_y[SC2SIM__MXMSTP]; /* microstep pattern offsets in y
 				    (units: number of decectors) */
-  int nbolx;                  /* number of bolometers in X */
-  int nboly;                  /* number of bolometers in Y */
+  size_t nbolx;                  /* number of bolometers in X */
+  size_t nboly;                  /* number of bolometers in Y */
   int ngrid;                  /* Nr of reconstruction points for single
 				 bolometer */
   double nmaps;               /* Number of times to repeat pattern */
   int nmicstep;               /* number of microsteps */
   int numsamples;             /* number of samples in STARE */
-  int nvert;                  /* Nr of vertices in the Jiggle pattern */
+  size_t nvert;               /* Nr of vertices in the Jiggle pattern */
   char obsmode[80];           /* Type of observation */
   int planetnum;              /* Number corresponding to a planet */
   int platenum;               /* number of waveplate rotations */

@@ -250,9 +250,12 @@
 *        in sky-signal bug.
 *     2007-10-29 (EC):
 *        Modified interface to smf_open_file.
+*     2007-10-31 (TIMJ):
+*        use size_t for some variables following sc2store mods
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2007 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
 *     Council.  University of British Columbia. All Rights Reserved.
 
@@ -367,7 +370,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double bor_x_nas=0;             /* boresight x-nasmyth tanplane offset */
   int chunks;                     /* number of chunks of size maxwrite
                                      needed to complete the simulation */
-  int colsize;                    /* column size for flatfield */
+  size_t colsize;                 /* column size for flatfield */
   double corner;                  /* corner frequency in Hz */
   int count;                      /* number of samples in full pattern */
   int curchunk;                   /* current chunk of simulation */
@@ -418,7 +421,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   int j;                          /* loop counter */
   double jigpat[SC2SIM__MXSIM][2]; /* pointing: nas jiggle offsets from cen. 
 				      in ARCSEC */
-  int jigsamples=1;               /* number of samples in jiggle pattern */
+  size_t jigsamples=1;            /* number of samples in jiggle pattern */
   double *jig_y_hor=NULL;         /* jiggle y-horizontal tanplane offset (radians) */
   double *jig_x_hor=NULL;         /* jiggle x-horizontal tanplane offset (radians) */
   int k;                          /* loop counter */
@@ -430,7 +433,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double meanatm;                 /* Atmos. emission at start airmass */
   double *mjuldate=NULL;          /* Modified Julian date each sample - UT1 */
   int narray = 0;                 /* number of subarrays to generate data for */
-  int nflat[8];                   /* number of flat coeffs per bol */
+  size_t nflat[8];                /* number of flat coeffs per bol */
   int nimage = 0;                 /* Number of subimages within subscan */
   static double noisecoeffs[SC2SIM__MXBOL*3*60]; /* noise coefficients */
   int noutfiles = 1;              /* Total number of output files per subarray */
@@ -448,7 +451,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double pwvzen = 0;              /* zenith precipital water vapour (mm) */
   double raapp;                   /* Apparent RA */
   double raapp1;                  /* Recalculated apparent RA */
-  int rowsize;                    /* row size for flatfield */
+  size_t rowsize;                 /* row size for flatfield */
   char scancrd[SZFITSCARD+1] = "\0";       /* SCAN coordinate frame */
   double sigma;                   /* instrumental white noise */
   char sign[2];                   /* Sign of angle (+/-) */

@@ -11,6 +11,8 @@
     15May2007 : declare global HDSLOCs static (bdk)
     12Jul2007 : change names of static variables by prefixing them all with
                 sc2store_ (bdk)
+    30Oct2007 : standardise on size_t where possible for variables representing
+                number of items (bdk)
 */
 
 #include <string.h>
@@ -69,12 +71,12 @@ static int sc2store_zindf;                   /* NDF identifier for compression z
 
 void sc2store_compress 
 ( 
-int nval,               /* number of values in frame (given) */
+size_t nval,            /* number of values in frame (given) */
 const int stackz[],     /* stackzero frame to be subtracted (given) */
 int digits[],           /* integer values (given and returned) */
 int *bzero,             /* zero offset for compressed values (returned) */
 unsigned short data[],  /* compressed values (returned) */
-int *npix,              /* number of incompressible values (returned) */
+size_t *npix,           /* number of incompressible values (returned) */
 int pixnum[],           /* indices of incompressible values (returned) */
 int pixval[],           /* incompressible values (returned) */
 int *status             /* global status (given and returned) */
@@ -95,7 +97,7 @@ int *status             /* global status (given and returned) */
 {
    int j;               /* loop counter */
    int temp;            /* intermediate compressed value */
-   int bmax;
+   int bmax;            /* maximum data value */
 
    if ( !StatusOkP(status) ) return;
 
@@ -138,9 +140,9 @@ int *status             /* global status (given and returned) */
 
 void sc2store_credream
 (
-int nvert,               /* Number of vertices in DREAM pattern (given)  */
+size_t nvert,            /* Number of vertices in DREAM pattern (given)  */
 int **jigvert,           /* Pointer to stored jiggle vertices (returned) */
-int npath,               /* Number of points along SMU path in DREAM pattern 
+size_t npath,            /* Number of points along SMU path in DREAM pattern 
 			    (given) */
 double **jigpath,        /* Pointer to stored jiggle path (returned) */
 int *status              /* Global status (given and returned) */
@@ -151,76 +153,101 @@ int *status              /* Global status (given and returned) */
 
 */
 {
-  int el;
-  int lbnd[2];
-  int ubnd[2];
-  int place;
+   int el;
+   int lbnd[2];
+   int ubnd[2];
+   int place;
 
-  /* Get new HDS locator for DREAM extension  */
-  ndfXnew ( sc2store_indf, "DREAM", "DREAM_PAR", 0, 0, &sc2store_drmloc, status );
-  if ( sc2store_drmloc == NULL ) {
-    if ( *status == SAI__OK) {
-      *status = SAI__ERROR;
-      errRep("", "Unable to create NDF extension for DREAM", status);
-    }
-  }
+/* Get new HDS locator for DREAM extension  */
 
-  /* Create NDF for jigvert array */
-  ndfPlace ( sc2store_drmloc, "JIGVERT", &place, status );
-  if ( place == NDF__NOPL ) {
-    if ( *status == SAI__OK) {
-      *status = SAI__ERROR;
-      errRep("", "Unable to create placeholder for DREAM jigvert array", status);
-    }
-  }
-  lbnd[0] = 1;
-  lbnd[1] = 1;
-  ubnd[0] = nvert;
-  ubnd[1] = 2;
-  ndfNew ( "_INTEGER", 2, lbnd, ubnd, &place, &sc2store_jigvndf, status );
-  if ( sc2store_jigvndf == NDF__NOID ) {
-    if ( *status == SAI__OK ) {
-      *status = SAI__ERROR;
-      errRep("", "Unable to obtain an NDF identifier for the jigvert array", status);
-    }
-  }
-  /* Map jigvert array so that it's ready to fill */
-  ndfMap ( sc2store_jigvndf, "DATA", "_INTEGER", "WRITE", (void *)jigvert, &el, 
+   ndfXnew ( sc2store_indf, "DREAM", "DREAM_PAR", 0, 0, &sc2store_drmloc, 
+     status );
+     
+   if ( sc2store_drmloc == NULL ) 
+   {
+      if ( *status == SAI__OK) 
+      {
+         *status = SAI__ERROR;
+         errRep ( "", "Unable to create NDF extension for DREAM", status );
+      }
+   }
+
+/* Create NDF for jigvert array */
+
+   ndfPlace ( sc2store_drmloc, "JIGVERT", &place, status );
+   if ( place == NDF__NOPL ) 
+   {
+      if ( *status == SAI__OK) 
+      {
+         *status = SAI__ERROR;
+         errRep ( "", "Unable to create placeholder for DREAM jigvert array",
 	   status );
-  if ( jigvert == NULL ) {
-    if ( *status == SAI__OK) {
-      *status = SAI__ERROR;
-      errRep("", "Unable to map DREAM jigvert array", status);
-    }
-  }
-
-  /* Create NDF for jigpath array */
-  ndfPlace ( sc2store_drmloc, "JIGPATH", &place, status );
-  if ( place == NDF__NOPL ) {
-    if ( *status == SAI__OK) {
-      *status = SAI__ERROR;
-      errRep("", "Unable to create placeholder for DREAM jigpath array", status);
-    }
-  }
-  lbnd[0] = 1;
-  lbnd[1] = 1;
-  ubnd[0] = npath;
-  ubnd[1] = 2;
-  ndfNew ( "_DOUBLE", 2, lbnd, ubnd, &place, &sc2store_jigpndf, status );
-  if ( sc2store_jigpndf == NDF__NOID ) {
-    if ( *status == SAI__OK ) {
-      *status = SAI__ERROR;
-      errRep("", "Unable to obtain an NDF identifier for the jigpath array", status);
-    }
-  }
-  ndfMap ( sc2store_jigpndf, "DATA", "_DOUBLE", "WRITE", (void *)jigpath, &el, 
+      }
+   }
+   lbnd[0] = 1;
+   lbnd[1] = 1;
+   ubnd[0] = nvert;
+   ubnd[1] = 2;
+   ndfNew ( "_INTEGER", 2, lbnd, ubnd, &place, &sc2store_jigvndf, status );
+   if ( sc2store_jigvndf == NDF__NOID ) 
+   {
+      if ( *status == SAI__OK ) 
+      {
+         *status = SAI__ERROR;
+         errRep("", "Unable to obtain an NDF identifier for the jigvert array",
 	   status );
-  if ( jigpath == NULL ) {
-    if ( *status == SAI__OK) {
-      *status = SAI__ERROR;
-      errRep("", "Unable to map DREAM jigpath array", status);
-    }
-  }
+      }
+   }
+   
+/* Map jigvert array so that it's ready to fill */
+
+   ndfMap ( sc2store_jigvndf, "DATA", "_INTEGER", "WRITE", (void *)jigvert, 
+     &el, status );
+   if ( jigvert == NULL ) 
+   {
+      if ( *status == SAI__OK ) 
+      {
+         *status = SAI__ERROR;
+         errRep ( "", "Unable to map DREAM jigvert array", status );
+      }
+   }
+
+/* Create NDF for jigpath array */
+
+   ndfPlace ( sc2store_drmloc, "JIGPATH", &place, status );
+   if ( place == NDF__NOPL ) 
+   {
+      if ( *status == SAI__OK ) 
+      {
+         *status = SAI__ERROR;
+         errRep ( "", "Unable to create placeholder for DREAM jigpath array", 
+	   status );
+      }
+   }
+   lbnd[0] = 1;
+   lbnd[1] = 1;
+   ubnd[0] = npath;
+   ubnd[1] = 2;
+   ndfNew ( "_DOUBLE", 2, lbnd, ubnd, &place, &sc2store_jigpndf, status );
+   if ( sc2store_jigpndf == NDF__NOID ) 
+   {
+      if ( *status == SAI__OK ) 
+      {
+         *status = SAI__ERROR;
+         errRep ( "", 
+	   "Unable to obtain an NDF identifier for the jigpath array", status );
+      }
+   }
+   ndfMap ( sc2store_jigpndf, "DATA", "_DOUBLE", "WRITE", (void *)jigpath, 
+      &el, status );
+   if ( jigpath == NULL ) 
+   {
+      if ( *status == SAI__OK ) 
+      {
+         *status = SAI__ERROR;
+         errRep ( "", "Unable to map DREAM jigpath array", status );
+      }
+   }
 
 }
 
@@ -247,11 +274,12 @@ int *status              /* global status (given and returned) */
 
    if ( *status != SAI__OK ) return;
 
-   ndfXstat( sc2store_indf, "SCU2RED", &isthere, status );
+   ndfXstat ( sc2store_indf, "SCU2RED", &isthere, status );
 
-   if ( !isthere ) {
-     ndfXnew ( sc2store_indf, "SCU2RED", "SCUBA2_MAP_ARR", 0, 0, &sc2store_scu2redloc, 
-	       status );
+   if ( !isthere ) 
+   {
+      ndfXnew ( sc2store_indf, "SCU2RED", "SCUBA2_MAP_ARR", 0, 0,
+        &sc2store_scu2redloc, status );
    }
 
    sc2store_errconv ( status );
@@ -263,10 +291,10 @@ int *status              /* global status (given and returned) */
 void sc2store_cremap
 (
 const char *filename,    /* name of HDS container file (given) */
-int colsize,             /* number of pixels in a column (given) */
-int rowsize,             /* number of pixels in a row (given) */
-int nframes,             /* number of frames (given) */
-int nflat,               /* number of flat coeffs per bol (given) */
+size_t colsize,          /* number of pixels in a column (given) */
+size_t rowsize,          /* number of pixels in a row (given) */
+size_t nframes,          /* number of frames (given) */
+size_t nflat,            /* number of flat coeffs per bol (given) */
 const char *flatname,    /* name of flatfield algorithm (given) */
 int **bzero,             /* pointer to subtracted offset values (returned) */
 unsigned short **data,   /* pointer to data array (returned) */
@@ -296,6 +324,7 @@ int *status              /* global status (given and returned) */
    static int initialised = 0; /* first-time flag */
    int lbnd[3];                /* lower dimension bounds */
    int place;                  /* NDF placeholder */
+   int tdims[1];               /* temporary dimension store */
    int ubnd[3];                /* upper dimension bounds */
 
    if ( *status != SAI__OK ) return;
@@ -402,10 +431,11 @@ int *status              /* global status (given and returned) */
 
 /* Parameter matching each flatfield coefficient */
 
-   datNew ( sc2store_fdataloc, "FLATPAR", "_DOUBLE", 1, &nflat, status );
+   tdims[0] = nflat;
+   datNew ( sc2store_fdataloc, "FLATPAR", "_DOUBLE", 1, tdims, status );
    datFind ( sc2store_fdataloc, "FLATPAR", &sc2store_fparloc, status );
 
-   datMap ( sc2store_fparloc, "_DOUBLE", "WRITE", 1, &nflat, (void **)flatpar, 
+   datMap ( sc2store_fparloc, "_DOUBLE", "WRITE", 1, tdims, (void **)flatpar, 
      status );
 
 /* Create storage for Header values for each frame - store in JCMTSTATE */
@@ -416,7 +446,8 @@ int *status              /* global status (given and returned) */
 
 /* Create the structured extension for each frame */
 
-   ndfXnew ( sc2store_indf, "INCOMPS", "SCUBA2_INC_ARR", 1, &(nframes),
+   tdims[0] = nframes;
+   ndfXnew ( sc2store_indf, "INCOMPS", "SCUBA2_INC_ARR", 1, tdims,
      &sc2store_incomploc, status );
 
    if ( StatusOkP(status) )
@@ -432,15 +463,15 @@ int *status              /* global status (given and returned) */
 
 void sc2store_decompress 
 ( 
-int nval,               /* number of values in frame (given) */
-const int stackz[],     /* stackzero frame to be added (given) */
-int bzero,              /* zero offset for compressed values (given) */
+size_t nval,                  /* number of values in frame (given) */
+const int stackz[],           /* stackzero frame to be added (given) */
+int bzero,                    /* zero offset for compressed values (given) */
 const unsigned short data[],  /* compressed values (given) */
-int npix,               /* number of incompressible values (given) */
-const int pixnum[],     /* indices of incompressible values (given) */
-const int pixval[],     /* incompressible values (given) */
-int digits[],           /* integer values (returned) */
-int *status             /* global status (given and returned) */
+size_t npix,                  /* number of incompressible values (given) */
+const int pixnum[],           /* indices of incompressible values (given) */
+const int pixval[],           /* incompressible values (given) */
+int digits[],                 /* integer values (returned) */
+int *status                   /* global status (given and returned) */
 )
 /*  Description :
      Turn each unsigned short into an integer value by adding bzero and 
@@ -522,7 +553,7 @@ int *status
    {
       errLoad ( param, param_length, &parlen, opstr, opstr_length,
         &oplen, &tstatus );
-      if (tstatus != SAI__OK) ErsRep ( 0, &tstatus, opstr );
+      if ( tstatus != SAI__OK ) ErsRep ( 0, &tstatus, opstr );
    }
 }
 
@@ -629,7 +660,7 @@ int *status          /* global status (given and returned) */
 void sc2store_getincomp
 (
 int frame,         /* frame index (given) */
-int *npix,         /* number of incompressible pixels (returned) */
+size_t *npix,      /* number of incompressible pixels (returned) */
 int pixnum[],      /* indices of incompressible pixels (returned) */
 int pixval[],      /* values of incompressible pixels (returned) */
 int *status        /* global status (given and returned) */
@@ -704,13 +735,12 @@ int *status        /* global status (given and returned) */
 
 
 
-
 /*+ sc2store_headget - get values from the header arrays */
 
 void sc2store_headget
 (
 int frame,                    /* frame index (given) */
-JCMTState *head,         /* header data for the frame (returned) */
+JCMTState *head,              /* header data for the frame (returned) */
 int *status                   /* global status (given and returned) */
 )
 /* Method :
@@ -725,16 +755,17 @@ int *status                   /* global status (given and returned) */
 {
    if ( *status != SAI__OK ) return;
 
-   /* Note that we have to check for NULL in case we had a missing
-      component.  We also check all possible struct members not just
-      SCUBA-2 ones. This is done so that SMURF can support the reading
-      of the JCMTSTATE extension from other instruments in addition to
-      SCUBA-2. This routine is now JCMT-specific rather than SCUBA-2
-      specific and could be factored out. All JCMTSTATE access could
-      usefully be factored out.
-   */
+/* Note that we have to check for NULL in case we had a missing
+   component.  We also check all possible struct members not just
+   SCUBA-2 ones. This is done so that SMURF can support the reading
+   of the JCMTSTATE extension from other instruments in addition to
+   SCUBA-2. This routine is now JCMT-specific rather than SCUBA-2
+   specific and could be factored out. All JCMTSTATE access could
+   usefully be factored out.
+*/
 
-   /* use a macro to simplify things */
+/* use a macro to simplify things */
+
 #define RETRIEVE_STATE(state, index, type, bad )	\
    if ( sc2store_ptr[index] ) { \
      head->state = ((type *)sc2store_ptr[index])[frame]; \
@@ -801,9 +832,10 @@ int *status                   /* global status (given and returned) */
    RETRIEVE_STATE( pol_ang, POL_ANG, double, VAL__BADD );
    RETRIEVE_STATE( fts_pos, FTS_POS, float, VAL__BADR );
 
-   /* Now do the character arrays. We use cnfExprt to allow nul termination. Note that
-      the struct does allocate a space for a nul in addition to the HDS component size.
-    */
+/* Now do the character arrays. We use cnfExprt to allow nul termination. 
+   Note that the struct does allocate a space for a nul in addition to the 
+   HDS component size.
+*/
 
 #define RETRIEVE_CHAR( state, index, len ) \
    if ( sc2store_ptr[index] ) { \
@@ -830,10 +862,10 @@ int *status                   /* global status (given and returned) */
 
 void sc2store_headcremap
 (
-const HDSLoc *headloc,              /* HDS locator (given) */
-int nframes,                  /* number of frames to be created (given) */
-inst_t instrument,            /* instrument code (given) */
-int *status                   /* global status (given and returned) */
+const HDSLoc *headloc,           /* HDS locator (given) */
+size_t nframes,                  /* number of frames to be created (given) */
+inst_t instrument,               /* instrument code (given) */
+int *status                      /* global status (given and returned) */
 )
 
 /* Method :
@@ -858,7 +890,7 @@ int *status                   /* global status (given and returned) */
    int pos;
    size_t len;
 
-   /* This routine only creates and maps SCUBA-2 components */
+/* This routine only creates and maps SCUBA-2 components */
 
    if ( *status != SAI__OK ) return;
 
@@ -867,35 +899,49 @@ int *status                   /* global status (given and returned) */
 
    for ( j=0; j<JCMT_COMP_NUM; j++ )
    {
-     /* what index should we use? */
-     pos = hdsRecords[j].position;
+/* what index should we use? */
 
-     /* Should really initialise outside this routine */
-     sc2store_loc[pos] = NULL;
-     sc2store_ptr[pos] = NULL;
+      pos = hdsRecords[j].position;
 
-     /* see if component is required for this instrument or not */
-     if ( hdsRecords[j].instrument & instrument ) {
-       /* create the component */
-       datNew ( headloc, hdsRecords[j].name, hdsRecords[j].type, 
-		ndim, dim, status );
-       if ( *status != SAI__OK ) break;
-       datFind ( headloc, hdsRecords[j].name, &(sc2store_loc[pos]), 
-		 status );
+/* Should really initialise outside this routine */
 
-       if ( *status != SAI__OK ) break;
-       /* map the data array */
-       datMap ( sc2store_loc[pos], hdsRecords[j].type, "WRITE", 
-		ndim, dim, &(sc2store_ptr[pos]), status );
+      sc2store_loc[pos] = NULL;
+      sc2store_ptr[pos] = NULL;
 
-       /* if this is a string component then we can fill it with
-	  blanks. Other components will not be initialised but they
-	  will always be filled later on. */
-       if (strncmp( "_CHAR", hdsRecords[j].type, 5) == 0) {
-	 datLen( sc2store_loc[pos], &len, status );
-	 if (*status == SAI__OK) memset( sc2store_ptr[pos], ' ', dim[0] * len );
-       }
-     }
+/* see if component is required for this instrument or not */
+
+      if ( hdsRecords[j].instrument & instrument ) 
+      {
+/* create the component */
+
+         datNew ( headloc, hdsRecords[j].name, hdsRecords[j].type, 
+           ndim, dim, status );
+	   
+         if ( *status != SAI__OK ) break;
+	 
+         datFind ( headloc, hdsRecords[j].name, &(sc2store_loc[pos]), 
+           status );
+
+         if ( *status != SAI__OK ) break;
+
+/* map the data array */
+
+         datMap ( sc2store_loc[pos], hdsRecords[j].type, "WRITE", 
+	   ndim, dim, &(sc2store_ptr[pos]), status );
+
+/* if this is a string component then we can fill it with
+   blanks. Other components will not be initialised but they
+   will always be filled later on. */
+   
+         if ( strncmp( "_CHAR", hdsRecords[j].type, 5) == 0 ) 
+	 {
+	    datLen( sc2store_loc[pos], &len, status );
+	    if ( *status == SAI__OK ) 
+	    {
+	       memset ( sc2store_ptr[pos], ' ', dim[0] * len );
+	    }
+         }
+      }
 
       if ( *status != SAI__OK ) break;
 
@@ -910,7 +956,7 @@ int *status                   /* global status (given and returned) */
 void sc2store_headput
 (
 int frame,                    /* frame index (given) */
-JCMTState head,          /* header data for the frame (given) */
+JCMTState head,               /* header data for the frame (given) */
 int *status                   /* global status (given and returned) */
 )
 /* Method :
@@ -1004,7 +1050,7 @@ int *status                   /* global status (given and returned) */
 void sc2store_headrmap
 (
 const HDSLoc *headloc,        /* HDS locator (given) */
-int nframes,                  /* number of frames expected (given) */
+size_t nframes,               /* number of frames expected (given) */
 inst_t instrument,            /* instrument code (given) */
 int *status                   /* global status (given and returned) */
 )
@@ -1101,34 +1147,37 @@ int *status                   /* global status (given and returned) */
    for ( j=0; j<JCMT_COMP_NUM; j++ )
 
    {
-     if (sc2store_loc[j] != NULL) {
-       datUnmap ( sc2store_loc[j], status );
-       sc2store_ptr[j] = NULL;
-       datAnnul ( &(sc2store_loc[j]), status );
-     }
+      if ( sc2store_loc[j] != NULL ) 
+      {
+         datUnmap ( sc2store_loc[j], status );
+         sc2store_ptr[j] = NULL;
+         datAnnul ( &(sc2store_loc[j]), status );
+      }
    }
 }
+
+
 
 /*+ sc2store_ndfreadscan - read a single scan from an NDF file */
 
 void sc2store_ndfreadscan
 (
-const char *filename,     /* name of input map file (given) */
-const char *access,       /* "READ" or "UPDATE" access to data file (given) */
-int flatlen,        /* length of string for flatname (given) */
-int *nframes,       /* number of frames in scan (returned) */
-double **xz,        /* X centre for each frame (returned) */
-double **yz,        /* Y centre for each frame (returned) */
-double **inptr,     /* measurement values (returned) */
-int *nflat,         /* number of flatfield coeffs per pixel (returned) */
-char *flatname,     /* name of flatfield algorithm (returned) */
-double **flatcal,   /* flatfield calibration (returned) */
-double **flatpar,   /* flatfield parameters (returned) */
-int **jigvert,      /* pointer to DREAM jiggle vertices (returned) */
-int *nvert,         /* Number of vertices in jiggle pattern (returned) */
-double **jigpath,   /* pointer to path of SMU over jiggle pattern (returned) */
-int *npath,         /* Number of points in SMU path (returned) */
-int *status         /* global status (given and returned) */
+const char *filename,  /* name of input map file (given) */
+const char *access,    /* "READ" or "UPDATE" access to data file (given) */
+size_t flatlen,        /* length of string for flatname (given) */
+size_t *nframes,       /* number of frames in scan (returned) */
+double **xz,           /* X centre for each frame (returned) */
+double **yz,           /* Y centre for each frame (returned) */
+double **inptr,        /* measurement values (returned) */
+size_t *nflat,         /* number of flatfield coeffs per pixel (returned) */
+char *flatname,        /* name of flatfield algorithm (returned) */
+double **flatcal,      /* flatfield calibration (returned) */
+double **flatpar,      /* flatfield parameters (returned) */
+int **jigvert,         /* pointer to DREAM jiggle vertices (returned) */
+size_t *nvert,         /* Number of vertices in jiggle pattern (returned) */
+double **jigpath,      /* pointer to path of SMU over jiggle pattern (returned) */
+size_t *npath,         /* Number of points in SMU path (returned) */
+int *status            /* global status (given and returned) */
 )
 
 /* Description :
@@ -1153,18 +1202,19 @@ int *status         /* global status (given and returned) */
     24Apr2007 : change declaration of fitsrec and remove maxlen to
                 match change to rdtstream (bdk)
     23Oct2007 : make nfits size_t instead of unsigned int (bdk)
+    30Oct2007 : change name of nfits to nrec (bdk)
 */
 
 {
-   int colsize;            /* number of pixels in column */
+   size_t colsize;         /* number of pixels in column */
    int *dksquid;           /* pointer to dark SQUID data */
    double *fcal;           /* pointer to flat field data */
    static char fitsrec[SC2STORE__MAXFITS*80+1];  /* store for FITS records */
    double *fpar;           /* pointer to flat field parameters */
    JCMTState *frhead;      /* structure for headers for a frame */
    int j;                  /* loop counter */
-   size_t nfits;           /* number of FITS records */
-   int rowsize;            /* number of pixels in row */
+   size_t nrec;            /* number of FITS records */
+   size_t rowsize;         /* number of pixels in row */
    int *tmptr;             /* pointer to decompressed map data */
 
 
@@ -1174,7 +1224,7 @@ int *status         /* global status (given and returned) */
 /* Read the TSTREAM data */
 
    sc2store_rdtstream ( filename, access, flatlen,
-     SC2STORE__MAXFITS, &nfits, fitsrec, &colsize, &rowsize, nframes,
+     SC2STORE__MAXFITS, &nrec, fitsrec, &colsize, &rowsize, nframes,
      nflat, flatname, &frhead, &tmptr, &dksquid, &fcal, &fpar,
      jigvert, nvert, jigpath, npath, status );
 
@@ -1226,13 +1276,13 @@ int ndim,                /* dimensionality of image (given) */
 const int dims[],        /* dimensions of image (given) */
 int seqstart,            /* first sequence number used in image (given) */
 int seqend,              /* last sequence number used in image (given) */
-int nbolx,               /* number of bolometers in X (given) */
-int nboly,               /* number of bolometers in Y (given) */
+size_t nbolx,            /* number of bolometers in X (given) */
+size_t nboly,            /* number of bolometers in Y (given) */
 const double *image,     /* constructed image (given) */
 const double *zero,      /* bolometer zero values (given) */
 const char *fitshd,      /* string of concatenated FITS header records to
                             write (given) */
-int nfits,               /* Number of FITS headers */
+size_t nrec,             /* Number of FITS records */
 int *status              /* global status (given and returned) */
 )
 /* Method :
@@ -1255,6 +1305,7 @@ int *status              /* global status (given and returned) */
                 as FITS headers; rename BZ_IMAGE -> BOLZERO (AGG)
     15May2007 : handle FITS headers as concatenated string (bdk)
     23Oct2007 : remove calls to ndfHcre (bdk)
+    31Oct2007 : change name nfits to nrec (bdk)
 */
 {
 
@@ -1310,8 +1361,7 @@ int *status              /* global status (given and returned) */
 
 /* Store the bolometer zero points as an NDF in the extension */
 
-   ndfXnew ( uindf, "BOLZERO", "SCUBA2_ZER_ARR", 0, 0, &bz_imloc, 
-	     status );
+   ndfXnew ( uindf, "BOLZERO", "SCUBA2_ZER_ARR", 0, 0, &bz_imloc, status );
    ndfPlace ( bz_imloc, "ZERO", &place, status );
 
 /* Create the array for bolometer zeros */
@@ -1339,9 +1389,9 @@ int *status              /* global status (given and returned) */
 
 /* Store the FITS headers */
 
-   if ( nfits > 0 )
+   if ( nrec > 0 )
    {
-      sc2store_wrfitshead ( uindf, nfits, fitshd, status );
+      sc2store_wrfitshead ( uindf, nrec, fitshd, status );
    }
 
 /* Unmap the data array */
@@ -1370,11 +1420,11 @@ int *status              /* global status (given and returned) */
 
 void sc2store_putincomp
 (
-int frame,         /* frame index (given) */
-int npix,          /* number of incompressible pixels (given) */
-const int pixnum[],/* indices of incompressible pixels (given) */
-const int pixval[],/* values of incompressible pixels (given) */
-int *status        /* global status (given and returned) */
+int frame,            /* frame index (given) */
+size_t npix,          /* number of incompressible pixels (given) */
+const int pixnum[],   /* indices of incompressible pixels (given) */
+const int pixval[],   /* values of incompressible pixels (given) */
+int *status           /* global status (given and returned) */
 )
 /*
    History :
@@ -1448,11 +1498,11 @@ int *status        /* global status (given and returned) */
 
 void sc2store_putscanfit
 (
-int nbolx,         /* number of bolometers in X (given) */
-int nboly,         /* number of bolometers in Y (given) */
-int ncoeff,        /* number of coefficients (given) */
-const double *coptr,/* coefficients (given) */
-int *status        /* global status (given and returned) */
+size_t nbolx,         /* number of bolometers in X (given) */
+size_t nboly,         /* number of bolometers in Y (given) */
+size_t ncoeff,        /* number of coefficients (given) */
+const double *coptr,  /* coefficients (given) */
+int *status           /* global status (given and returned) */
 )
 /* Method :
     Create an NDF with image name "SCANFIT", under DA_IMAGE. Store the
@@ -1527,10 +1577,10 @@ int *status        /* global status (given and returned) */
 
 void sc2store_rdfitshead
 (
-int maxfits,          /* maximum number of header items (given) */
-size_t *nfits,        /* number of header items (returned) */
-char *headers,        /* buffer to hold FITS headers (returned) */
-int *status           /* global status (given and returned) */
+size_t maxfits,          /* maximum number of header items (given) */
+size_t *nrec,            /* number of header records (returned) */
+char *headers,           /* buffer to hold FITS headers (returned) */
+int *status              /* global status (given and returned) */
 )
 /*
    History :
@@ -1538,6 +1588,7 @@ int *status           /* global status (given and returned) */
     23Nov2005 : Use Official C HDS interface (TIMJ)
     24Apr2007 : change headers to char* (bdk)
     23Oct2007 : make nfits size_t instead of unsigned int (bdk)
+    31Oct2007 : change name nfits to nrec (bdk)
 */
 {
    int dim[1];                /* number of FITS entries */
@@ -1553,17 +1604,17 @@ int *status           /* global status (given and returned) */
    ndimx = 1;
    ndfXloc ( sc2store_indf, "FITS", "READ", &fitsloc, status );
    datShape ( fitsloc, ndimx, dim, &ndim, status );
-   datMapV ( fitsloc, "_CHAR*80", "READ", &fptr, nfits, status );
+   datMapV ( fitsloc, "_CHAR*80", "READ", &fptr, nrec, status );
 
    if ( *status == SAI__OK )
    {
-      if ( *nfits > maxfits )
+      if ( *nrec > maxfits )
       {
-         *nfits = maxfits;
+         *nrec = maxfits;
       }
       
-      strncpy ( headers, fptr, (*nfits)*80 );
-      headers[(*nfits)*80] = 0;
+      strncpy ( headers, fptr, (*nrec)*80 );
+      headers[(*nrec)*80] = 0;
    }
 
    datAnnul ( &fitsloc, status );
@@ -1579,10 +1630,10 @@ int *status           /* global status (given and returned) */
 void sc2store_rdflatcal
 (
 const char *filename,    /* name of HDS container file (given) */
-int flatlen,             /* length of space for flatfield name (given) */
-int *colsize,            /* number of pixels in column (returned) */
-int *rowsize,            /* number of pixels in row (returned) */
-int *nflat,              /* number of flat coeffs per bol (returned) */
+size_t flatlen,             /* length of space for flatfield name (given) */
+size_t *colsize,         /* number of pixels in column (returned) */
+size_t *rowsize,         /* number of pixels in row (returned) */
+size_t *nflat,           /* number of flat coeffs per bol (returned) */
 char *flatname,          /* name of flatfield algorithm (returned) */
 double **flatcal,        /* pointer to flatfield calibration (returned) */
 double **flatpar,        /* pointer to flatfield parameters (returned) */
@@ -1610,12 +1661,12 @@ int *status              /* global status (given and returned) */
    double *fcal;              /* mapped flatfield calibration */
    double *fpar;              /* mapped flatfield parameters */
    int nbol;                  /* number of bolometers */
-   int nframes;               /* number of data frames */
+   size_t nframes;            /* number of data frames */
    int *stackz;               /* pointer to stackzero frame */
    int *jigvert = NULL;       /* pointer to DREAM jiggle vertices */
    double *jigpath = NULL;    /* pointer to path of SMU over jiggle pattern */
-   int nvert;                 /* Number of vertices in jiggle pattern */
-   int npath;                 /* Number of samples over jiggle pattern */
+   size_t nvert;              /* Number of vertices in jiggle pattern */
+   size_t npath;              /* Number of samples over jiggle pattern */
 
    if ( !StatusOkP(status) ) return;
 
@@ -1669,11 +1720,11 @@ void sc2store_rdmap
 (
 const char *filename,    /* name of HDS container file (given) */
 const char *access,      /* "READ" or "UPDATE" access (given) */
-int flatlen,             /* length of space for flatfield name (given) */
-int *colsize,            /* number of pixels in column (returned) */
-int *rowsize,            /* number of pixels in row (returned) */
-int *nframes,            /* number of frames (returned) */
-int *nflat,              /* number of flat coeffs per bol (returned) */
+size_t flatlen,          /* length of space for flatfield name (given) */
+size_t *colsize,         /* number of pixels in column (returned) */
+size_t *rowsize,         /* number of pixels in row (returned) */
+size_t *nframes,         /* number of frames (returned) */
+size_t *nflat,           /* number of flat coeffs per bol (returned) */
 char *flatname,          /* name of flatfield algorithm (returned) */
 int **bzero,             /* pointer to subtracted offset values (returned) */
 unsigned short **data,   /* pointer to data array (returned) */
@@ -1682,9 +1733,9 @@ int **stackz,            /* pointer to subtracted frame (returned) */
 double **flatcal,        /* pointer to flatfield calibration (returned) */
 double **flatpar,        /* pointer to flatfield parameters (returned) */
 int **jigvert,           /* pointer to DREAM jiggle vertices (returned) */
-int *nvert,              /* Number of vertices in jiggle pattern (returned) */
+size_t *nvert,           /* Number of vertices in jiggle pattern (returned) */
 double **jigpath,        /* pointer to path of SMU over jiggle pattern (returned) */
-int *npath,              /* Number of points in SMU path (returned) */
+size_t *npath,           /* Number of points in SMU path (returned) */
 int *status              /* global status (given and returned) */
 )
 /*
@@ -1712,6 +1763,7 @@ int *status              /* global status (given and returned) */
    int ndim;               /* number of dimensions */
    int ndimx;              /* max number of dimensions */
    int nfdim;              /* number of flatpar dimensions */
+   int fdims[1];           /* flatpar dimensios */
    int place;              /* NDF placeholder */
 
 
@@ -1770,7 +1822,8 @@ int *status              /* global status (given and returned) */
 
 /* FLATCAL flatfield calibration */
 
-   ndfOpen ( sc2store_scuba2loc, "FLATCAL", access, "OLD", &sc2store_findf, &place, status );
+   ndfOpen ( sc2store_scuba2loc, "FLATCAL", access, "OLD", &sc2store_findf,
+     &place, status );
 
    ndfMap ( sc2store_findf, "DATA", "_DOUBLE", access, (void *)flatcal, &el, 
      status );
@@ -1779,9 +1832,10 @@ int *status              /* global status (given and returned) */
    datFind ( sc2store_fdataloc, "FLATNAME", &sc2store_fnameloc, status );
    datGet0C ( sc2store_fnameloc, flatname, flatlen, status );
    datFind ( sc2store_fdataloc, "FLATPAR", &sc2store_fparloc, status );
-   datShape ( sc2store_fparloc, 1, nflat, &nfdim, status );
-   datMap ( sc2store_fparloc, "_DOUBLE", "READ", 1, nflat, (void**)flatpar, 
+   datShape ( sc2store_fparloc, 1, fdims, &nfdim, status );
+   datMap ( sc2store_fparloc, "_DOUBLE", "READ", 1, fdims, (void**)flatpar, 
      status );
+   *nflat = fdims[0];
 
    /* DREAM jiggle parameters */
    ndfXstat( sc2store_indf, "DREAM", &isthere, status );
@@ -1833,14 +1887,14 @@ void sc2store_rdtstream
 (
 const char *filename,    /* name of HDS container file (given) */
 const char *access,      /* "READ" or "UPDATE" access (given) */
-int flatlen,             /* length of space for flatfield name (given) */
-int maxfits,             /* max number of FITS headers (given) */
-size_t *nfits,           /* actual number of FITS headers (returned) */
+size_t flatlen,          /* length of space for flatfield name (given) */
+size_t maxfits,          /* max number of FITS headers (given) */
+size_t *nrec,            /* actual number of FITS records (returned) */
 char *fitshead,          /* up to maxfits FITS header records (returned) */
-int *colsize,            /* number of pixels in column (returned) */
-int *rowsize,            /* number of pixels in row (returned) */
-int *nframes,            /* number of frames (returned) */
-int *nflat,              /* number of flat coeffs per bol (returned) */
+size_t *colsize,         /* number of pixels in column (returned) */
+size_t *rowsize,         /* number of pixels in row (returned) */
+size_t *nframes,         /* number of frames (returned) */
+size_t *nflat,           /* number of flat coeffs per bol (returned) */
 char *flatname,          /* name of flatfield algorithm (returned) */
 JCMTState *frhead[],     /* header data for each frame (returned) */
 int **outdata,           /* pointer to data array (returned) */
@@ -1848,9 +1902,9 @@ int **dksquid,           /* pointer to dark SQUID values (returned) */
 double **flatcal,        /* pointer to flatfield calibration (returned) */
 double **flatpar,        /* pointer to flatfield parameters (returned) */
 int **jigvert,           /* pointer to DREAM jiggle vertices (returned) */
-int *nvert,              /* Number of vertices in jiggle pattern (returned) */
+size_t *nvert,           /* Number of vertices in jiggle pattern (returned) */
 double **jigpath,        /* pointer to path of SMU over jiggle pattern (returned) */
-int *npath,              /* Number of points in SMU path (returned) */
+size_t *npath,           /* Number of points in SMU path (returned) */
 int *status              /* global status (given and returned) */
 )
 
@@ -1872,17 +1926,19 @@ int *status              /* global status (given and returned) */
                 change to rdfitshead (bdk)
 
     23Oct2007 : make nfits size_t instead of unsigned int (bdk)
+    31Oct2007 : change name nfits to nrec (bdk)
 */
 
 {
    int *bzero;             /* pointer to subtracted offset values */
    unsigned short *data;   /* pointer to data array */
    int j;                  /* loop counter */
-   int nbol;               /* number of bolometers */
-   int npix;               /* number of incompressible pixels */
-   static int pixnum[DREAM__MXBOL];       /* indices of incompressible pixels */
-   static int pixval[DREAM__MXBOL];       /* values of incompressible pixels */
-   int *stackz;                     /* pointer to stackzero frame */
+   size_t nbol;            /* number of bolometers */
+   size_t npix;            /* number of incompressible pixels */
+   static int pixnum[DREAM__MXBOL];   /* indices of incompressible pixels */
+   static int pixval[DREAM__MXBOL];   /* values of incompressible pixels */
+   int *stackz;            /* pointer to stackzero frame */
+
 
    if ( !StatusOkP(status) ) return;
 
@@ -1945,7 +2001,7 @@ int *status              /* global status (given and returned) */
 
 /* Read the FITS headers */
 
-   sc2store_rdfitshead ( maxfits, nfits, fitshead, status );
+   sc2store_rdfitshead ( maxfits, nrec, fitshead, status );
 
    sc2store_sc2open = 1; 
 }
@@ -1965,6 +2021,7 @@ int *status           /* global status (given and returned) */
     
    History :
     25Oct2007 : original, based on fragment from Tim Jenness (bdk)
+    26Oct2007 : interpret JITXML_DIR search-path (bdk)
 */
 {
   
@@ -2063,7 +2120,7 @@ int *status           /* global status (given and returned) */
 void sc2store_wrfitshead
 (
 int id_ndf,           /* identifier of ndf (given) */
-int nfits,            /* number of header items (given) */
+size_t nrec,          /* number of header records (given) */
 const char *headers,  /* string of contiguous 80-byte FITS headers (given) */
 int *status           /* global status (given and returned) */
 )
@@ -2079,6 +2136,7 @@ int *status           /* global status (given and returned) */
     20Mar2007 : use const in signature (timj)
     24Apr2004 : pass headers as single string (bdk)
     23Oct2007 : make nfits int instead of unsigned int (bdk)
+    31Oct2007 : change nfits to nrec (bdk)
 */
 {
    HDSLoc *fitsloc = NULL;    /* HDS locator to FITS headers */
@@ -2094,7 +2152,7 @@ int *status           /* global status (given and returned) */
    Note Xnew and MapV require different signedness of their count
    argument */
 
-   nnew = nfits;
+   nnew = nrec;
    ndfXnew ( id_ndf, "FITS", "_CHAR*80", 1, &(nnew), &fitsloc, status );
    datMapV( fitsloc, "_CHAR*80", "WRITE", &vptr, &nvec, status );
    if ( *status == SAI__OK )
@@ -2114,8 +2172,8 @@ int *status           /* global status (given and returned) */
 
 void sc2store_wrmcehead
 (
-const int numsamples,       /* number of samples (given) */
-const int mceheadsz,        /* number of values per MCE header (given) */
+size_t numsamples,          /* number of samples (given) */
+size_t mceheadsz,           /* number of values per MCE header (given) */
 const int *mcehead,         /* MCE header for each sample (given) */
 int *status                 /* global status (given and returned) */
 )
@@ -2164,12 +2222,12 @@ void sc2store_wrtstream
 (
 const char file_name[],     /* output file name (given) */
 int subnum,                 /* Sub-array number (given) */
-int nrec,                   /* number of FITS header records (given) */
+size_t nrec,                /* number of FITS header records (given) */
 const char *fitsrec,        /* contiguous 80-byte FITS records (given) */
-int colsize,                /* number of bolometers in column (given) */
-int rowsize,                /* number of bolometers in row (given) */
-int numsamples,             /* number of samples (given) */
-int nflat,                  /* number of flat coeffs per bol (given) */
+size_t colsize,             /* number of bolometers in column (given) */
+size_t rowsize,             /* number of bolometers in row (given) */
+size_t numsamples,          /* number of samples (given) */
+size_t nflat,               /* number of flat coeffs per bol (given) */
 const char *flatname,       /* name of flatfield algorithm (given) */
 const JCMTState head[],     /* header data for each frame (given) */
 const int *dbuf,            /* time stream data (given) */
@@ -2178,11 +2236,11 @@ const double *fcal,         /* flat-field calibration (given) */
 const double *fpar,         /* flat-field parameters (given) */
 const char *obsmode,        /* Observing mode (given) */
 const int *mcehead,         /* MCE header for each sample (given) */
-const int mceheadsz,        /* number of values per MCE header (given) */
+size_t mceheadsz,           /* number of values per MCE header (given) */
 int jig_vert[][2],          /* Array of jiggle vertices (given) */
-int nvert,                  /* Number of jiggle vertices (given) */
+size_t nvert,               /* Number of jiggle vertices (given) */
 double jig_path[][2],       /* Path of SMU during jiggle cycle (given) */
-int npath,                  /* Number of positions in jiggle path (given) */
+size_t npath,               /* Number of positions in jiggle path (given) */
 const char *xmlfile,        /* name of CONFIGURE XML file (given) */ 
 int *status                 /* global status (given and returned) */
 )
@@ -2221,7 +2279,7 @@ int *status                 /* global status (given and returned) */
    int j;                           /* loop counter */
    double *jigpath;                 /* Pointer to SMU jiggle path */
    int *jigvert;                    /* Pointer to SMU jiggle vertices */
-   int npix;                        /* number of incompressible pixels */
+   size_t npix;                     /* number of incompressible pixels */
    static int pixnum[DREAM__MXBOL]; /* indices of incompressible pixels */
    static int pixval[DREAM__MXBOL]; /* values of incompressible pixels */
    int *stackz;                     /* pointer to stackzero frame */
