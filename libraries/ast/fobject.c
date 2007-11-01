@@ -431,6 +431,14 @@ F77_LOGICAL_FUNCTION(ast_test)( INTEGER(THIS),
 
 #ifdef MEM_DEBUG
 
+F77_SUBROUTINE(ast_beginpm)( void ) {
+   astBeginPM;
+}
+
+F77_SUBROUTINE(ast_endpm)( void ) {
+   astEndPM;
+}
+
 F77_SUBROUTINE(ast_activememory)( CHARACTER(TEXT)
                                   TRAIL(TEXT) ) {
    GENPTR_CHARACTER(TEXT)
@@ -466,6 +474,12 @@ F77_SUBROUTINE(ast_watchmemory)( INTEGER(ID) ) {
 
 F77_SUBROUTINE(ast_flushmemory)( INTEGER(LEAK) ) {
    GENPTR_INTEGER(LEAK)
+}
+
+F77_SUBROUTINE(ast_beginpm)( void ) {
+}
+
+F77_SUBROUTINE(ast_endpm)( void ) {
 }
 
 #endif
