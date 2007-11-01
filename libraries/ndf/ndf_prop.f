@@ -28,8 +28,11 @@
 *     CLIST = CHARACTER * ( * ) (Given)
 *        A comma-separated list of the NDF components which are to be
 *        propagated to the new data structure. By default, the HISTORY,
-*        LABEL and TITLE components and all extensions are propagated.
-*        See the "Component Propagation" section for further details.
+*        LABEL and TITLE components are propagated. All extensions are 
+*        also propagated by default except for any that have had a zero 
+*        value assigned to the corresponding "PXT..." tuning parameter 
+*        using NDF_TUNE. See the "Component Propagation" section for 
+*        further details.
 *     PARAM = CHARACTER * ( * ) (Given)
 *        Name of the ADAM parameter for the new NDF.
 *     INDF2 = INTEGER (Returned)
@@ -64,11 +67,19 @@
 *     suppressed extensions may be re-enabled by specifying
 *     'EXTENSION()' in a similar manner at a later point in the CLIST
 *     value.
+*     -  Whether or not a named extension is propagated by default can be 
+*     controlled via an NDF tuning parameter (see NDF_TUNE). The defaults
+*     established using NDF_TUNE can be over-ridden by specifying the 
+*     extension explicitly within the CLIST parameter; e.g. 
+*     'EXTENSION(FITS)' or 'NOEXTENSION(FITS)' can be used to over-ride
+*     the default established by the PXTFITS tuning parameter.
 *     -  Component names in the CLIST argument may be abbreviated to 3
 *     characters, but extension names must appear in full.
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council
+*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -88,6 +99,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (JACH, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -109,6 +121,8 @@
 *        the output NDF failed. This is now done by HDS.
 *     4-NOV-1993 (RFWS):
 *        Changed to support foreign file formats.
+*     1-NOV-2007 (DSB):
+*        Add support for the PXT... tuning parameters.
 *     {enter_further_changes_here}
 
 *  Bugs:

@@ -38,6 +38,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (JACH, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -54,6 +55,8 @@
 *        Added flags to support foreign file conversion.
 *     11-MAR-1997 (RFWS):
 *        Added TCB_DOCVT flag to control foreign file access.
+*     1-NOV-2007 (DSB):
+*        Added TCB_PXT to control default propgation of named extensions.
 *     {enter_further_changes_here}
 
 *-
@@ -128,12 +131,21 @@
 *  NDF1_INTCB routine.
       LOGICAL TCB_WARN
 
+*  Propagation of extensions 
+*  =========================
+*  This is a pointer to an AST KeyMap in which each entry has a key that 
+*  is the name of an NDF extension, and an integer value that is non-zero 
+*  if the extension is to be propagated by default (by NDF_PROP), or zero
+*  if the extension is not to be propagated by default. Any extension that 
+*  is not specified within this KeyMap is propagated by default.
+      INTEGER TCB_PXT
+
 *  Common blocks:
 *  =============
 
 *  Non-character data.
       COMMON /NDF1_TCB1/ TCB_DOCVT, TCB_ETFLG, TCB_FNFMT, TCB_KEEP,
-     :                   TCB_SHCVT, TCB_WARN
+     :                   TCB_SHCVT, TCB_WARN, TCB_PXT
 
 *  Save common block contents.
       SAVE /NDF1_TCB1/

@@ -1,4 +1,4 @@
-      SUBROUTINE NDF1_PXLST( INCLUD, STR, MXEXTN, EXTN, NEXTN, STATUS )
+      SUBROUTINE NDF1_PXLST( INCLUD, STR, KEYMAP, STATUS )
 *+
 *  Name:
 *     NDF1_PXLST
@@ -10,16 +10,16 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL NDF1_PXLST( INCLUD, STR, MXEXTN, EXTN, NEXTN, STATUS )
+*     CALL NDF1_PXLST( INCLUD, STR, KEYMAP, STATUS )
 
 *  Description:
 *     The routine parses a list of NDF extension names, extracting each
-*     name from a comma separated list supplied and filling a character
-*     array with validated extension names which specify which
-*     extensions to exclude from an NDF copying operation. The comma
-*     separated list may specify names for EXCLUSION (i.e. extensions
-*     not to be copied) or INCLUSION (i.e. extensions to be copied,
-*     over-riding a previous inclusion).
+*     name from a comma separated list supplied and adding the name to an
+*     AST KeyMap. Each entry in the KeyMap has a key that is the
+*     extension name and a value which is zero if INCLUD is FALSE and one 
+*     if INCLUD is TRUE. The comma separated list may specify names for 
+*     EXCLUSION (i.e. extensions not to be copied) or INCLUSION (i.e. 
+*     extensions to be copied, over-riding a previous inclusion).
 
 *  Arguments:
 *     INCLUD = LOGICAL (Given)
@@ -28,38 +28,14 @@
 *        operation.
 *     STR = CHARACTER * ( * ) (Given)
 *        The comma separated list of extension names.
-*     MXEXTN = INTEGER (Given)
-*        The maximum number of extensions which can be excluded (the
-*        declared size of the EXTN array).
-*     EXTN( MXEXTN ) = CHARACTER * ( DAT__SZNAM ) (Given and Returned)
-*        The list of extensions to be excluded from an NDF copying
-*        operation. This list may contain initial entries and will be
-*        updated.
-*     NEXTN = INTEGER (Given and Returned)
-*        The number of significant elements in the EXTN array.
+*     KEYMAP = INTEGER (Given)
+*        A pointer to the AST KeyMap.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Algorithm:
-*     -  Initialise pointers to the position of the "current" list
-*     element.
-*     -  Loop to identify each element in the list.
-*     -  Find the next element and check it is not blank.
-*     -  Extract the extension name, validate it, and convert to upper
-*     case.
-*     -  Search the existing excluded extension list to see if the name
-*     is already there.
-*     -  If it is there and extensions are being INCLUDED, then remove
-*     the name from the list. Move following names down to close the
-*     gap and decrement the count of excluded extensions.
-*     -  If it is not there and extensions are being EXCLUDED, then add
-*     the name to the excluded extension list, first checking that the
-*     list will not overflow and reporting an error if it will.
-*     -  Increment the pointer to the start of the next input list
-*     element and return to process it.
-
 *  Copyright:
 *     Copyright (C) 1989, 1991 Science & Engineering Research Council.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -80,6 +56,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (JACH, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -87,6 +64,9 @@
 *        Original version.
 *     2-JAN-1991 (RFWS):
 *        Fixed illegal string concatenation problem.
+*     1-NOV-2007 (DSB):
+*        Use an AST KeyMap to hold the results rather than an array of
+*        characters.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -100,16 +80,13 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
+      INCLUDE 'AST_PAR'          ! AST_ public constants and functions
       INCLUDE 'NDF_ERR'          ! NDF_ error codes
 
 *  Arguments Given:
       LOGICAL INCLUD
       CHARACTER * ( * ) STR
-      INTEGER MXEXTN
-
-*  Arguments Given and Returned:
-      CHARACTER * ( DAT__SZNAM ) EXTN( MXEXTN )
-      INTEGER NEXTN
+      INTEGER KEYMAP
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -121,8 +98,6 @@
       INTEGER I1                 ! Position of start of list element
       INTEGER I2                 ! Position of end of list element
       INTEGER L                  ! Last character position of name
-      INTEGER POSN               ! List position of pre-existing name
-      LOGICAL THERE              ! Whether a name is in the list
 
 *.
 
@@ -164,51 +139,14 @@
                   NAME = STR( F : L )
                   CALL CHR_UCASE( NAME )
 
-*  Search the existing list of excluded extensions to see if this name
-*  is already there.
-                  THERE = .FALSE.
-                  DO 2 I = 1, NEXTN
-                     IF ( EXTN( I ) .EQ. NAME ) THEN
-                        THERE = .TRUE.
-                        POSN = I
-                        GO TO 3
-                     END IF
-2                 CONTINUE
-3                 CONTINUE
-
-*  If present, and the name specifies an extension to be included, then
-*  the name must be removed from the list.
-                  IF ( THERE ) THEN
-                     IF ( INCLUD ) THEN
-
-*  Move following names in the list down to close the gap which this
-*  name leaves and decrement the excluded extension count.
-                        DO 4 I = POSN, NEXTN - 1
-                           EXTN( I ) = EXTN( I + 1 )
-4                       CONTINUE
-                        NEXTN = NEXTN - 1
-                     END IF
-
-*  If the name is not in the list and it specifies an extension to be
-*  excluded, then check that the list will not overflow. Report an error
-*  if it will.
+*  Add an entry to the KeyMap. This will over-write any existing entry
+*  for this extension name.
+                  IF( INCLUD ) THEN
+                     CALL AST_MAPPUT0I( KEYMAP, NAME, 1, ' ', STATUS )
                   ELSE
-                     IF ( .NOT. INCLUD ) THEN
-                        IF ( NEXTN .GE. MXEXTN ) THEN
-                           STATUS = NDF__XSEXT
-                           CALL MSG_SETI( 'MXEXTN', MXEXTN )
-                           CALL ERR_REP( 'NDF1_PXLST_XS',
-     :                     'The maximum number of extension names ' //
-     :                     '(^MXEXTN) has been exceeded.', STATUS )
-
-*  Increment the excluded extension name count and store the new name in
-*  the excluded extension list.
-                        ELSE
-                           NEXTN = NEXTN + 1
-                           EXTN( NEXTN ) = NAME
-                        END IF
-                     END IF
+                     CALL AST_MAPPUT0I( KEYMAP, NAME, 0, ' ', STATUS )
                   END IF
+
                END IF
             END IF
          END IF

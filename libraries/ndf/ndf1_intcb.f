@@ -48,6 +48,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     DSB: David S. Berry (JACH, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -61,6 +62,8 @@
 *        parameter.
 *     11-MAR-1997 (RFWS):
 *        Added NDF_DOCVT flag.
+*     1-NOV-2007 (DSB):
+*        Add initialisation of TCB_PXT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -73,6 +76,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'NDF_CONST'        ! NDF_ private constants
 
 *  Global Variables:
@@ -89,6 +93,9 @@
 *           Show format conversions flag.
 *        TCB_WARN = LOGICAL (Write)
 *           Warning message flag.
+*        TCB_PXT = INTEGER (Write)
+*           An AST KeyMap holding NDF extension names and their default
+*           propagation flags.
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -180,6 +187,16 @@
             TCB_WARN = ( IVAL .EQ. 1 )
          END IF
          
+*  Propagation of extensions 
+*  =========================
+*  This is a pointer to an AST KeyMap in which each entry has a key that 
+*  is the name of an NDF extension, and an integer value that is non-zero 
+*  if the extension is to be propagated by default (by NDF_PROP), or zero
+*  if the extension is not to be propagated by default. Any extension that 
+*  is not specified within this KeyMap is propagated by default. Note,
+*  these tuning parameter cannot be set from an environment variable.
+         TCB_PXT = AST__NULL
+
 *  Note when the first successful invocation of this routine has
 *  completed.
          IF ( STATUS .EQ. SAI__OK ) FIRST = .FALSE.

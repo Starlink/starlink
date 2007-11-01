@@ -7,6 +7,10 @@ NDF Library
 V1.7
    NDF sections may now be given in terms of WCS coordinates.
 
+   New tuning parameters ("PXT...") can be used to supress the default
+   propagation of named NDF extensions by NDF_PROP and NDF_SCOPY. See 
+   NDF_TUNE.
+
 V1.6-2
    Limited support for NDF array components stored in scaled form is now 
    available.

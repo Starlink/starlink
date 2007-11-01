@@ -43,7 +43,7 @@ F77_SUBROUTINE(ndf_hndlr)( CHARACTER(EVNAME),
 /*
 *+
 *  Name:
-*     NDF1_HNDLR
+*     NDF_HNDLR
 
 *  Purpose:
 *     Register a handler for a class of NDF event.
@@ -52,7 +52,7 @@ F77_SUBROUTINE(ndf_hndlr)( CHARACTER(EVNAME),
 *     ANSI C
 
 *  Invocation:
-*     CALL NDF1_HNDLR( EVNAME, HANDLR, SET, STATUS )
+*     CALL NDF_HNDLR( EVNAME, HANDLR, SET, STATUS )
 
 *  Description:
 *     The routine can be called by an application to register 

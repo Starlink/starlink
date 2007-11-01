@@ -32,6 +32,8 @@
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council
+*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -51,6 +53,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     DSB: David S. Berry (JACH, UClan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -65,6 +68,8 @@
 *        conversion.
 *     11-MAR-1997 (RFWS):
 *        Add the DOCVT tuning parameter.
+*     1-NOV-2007 (DSB):
+*        Add the PXT... tuning parameters.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -78,6 +83,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
+      INCLUDE 'AST_PAR'          ! AST_ public constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'NDF_CONST'        ! NDF_ private constants
       INCLUDE 'NDF_ERR'          ! NDF_ error codes
@@ -94,6 +100,9 @@
 *           Show format conversions flag.
 *        TCB_WARN = LOGICAL (Read)
 *           Warning message flag.
+*        TCB_PXT = INTEGER (Read)
+*           An AST pointer to a KeyMap holding the names of NDF
+*           extensions and their associated default propagation flags.
 
 *  Arguments Given:
       CHARACTER * ( * ) TPAR
@@ -106,6 +115,9 @@
 
 *  External References:
       LOGICAL NDF1_SIMLR         ! String compare with abbreviation
+
+*  Local Variables:
+      CHARACTER XNAME*(DAT__SZNAM) ! An NDF extension name
 
 *.
 
@@ -169,6 +181,37 @@
                VALUE = 1
             ELSE
                VALUE = 0
+            END IF
+
+*  Extension propagation.
+*  ======================
+*  Any tuning flag that begins with "PXT" is assumed to be terminated
+*  with the name of an extension. The tuning flag value is non-zero if
+*  the extension should be propagated by default by NDF_PROP, etc, and
+*  is zero if the extension should not be propagated by default.
+         ELSE IF ( NDF1_SIMLR( TPAR(1:3), 'PXT', NDF__MINAB ) ) THEN
+
+* Get the extension name and check it is not blank.
+            XNAME = TPAR( 4 : )
+            IF( XNAME .NE. ' ' ) THEN
+
+*  If there is a KeyMap, and it contains a value for the named extension,
+*  use the stored value. Otherwise use a defualt value of 1 (all
+*  extensions are propagated by default).
+               IF( TCB_PXT .NE. AST__NULL ) THEN
+                  IF( .NOT. AST_MAPGET0I( TCB_PXT, XNAME, VALUE,
+     :                                    STATUS ) ) VALUE = 1
+               ELSE
+                  VALUE = 1
+               END IF
+
+*  If the extension name was blank, then report an error.
+            ELSE
+               STATUS = NDF__TPNIN
+               CALL ERR_REP( 'NDF_GTUNE_WARN',
+     : '''PXT'' is not a valid tuning parameter name - it should '//
+     : 'be followed by an NDF extension name (possible programming '//
+     : 'error).', STATUS )
             END IF
 
 *  Unknown tuning parameter.

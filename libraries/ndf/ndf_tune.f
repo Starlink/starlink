@@ -73,9 +73,24 @@
 *     message is issued. If WARN is set to 0, then no message is
 *     issued.  In both cases normal execution continues and no STATUS
 *     value is set.
+*     -  'PXT...': Controls whether a named NDF extension should be
+*     propagated by default when NDF_PROP or NDF_SCOPY is called. The
+*     name of the extension should be appended to the string "PXT" to 
+*     form the complete tuning parameter name. Thus the tuning parameter
+*     PXTFITS would control whether the FITS extension is propagated by
+*     default. If the value for the parameter is non-zero, then the
+*     extension will be propagated by default. If the value for the 
+*     parameter is zero, then the extension will not be propagated by 
+*     default. The default established by this tuning parameter can be
+*     over-ridden by specifying the extension explicitly within the CLIST
+*     argument when calling NDF_PROP or NDF_SCOPY. The default value for
+*     all "PXT..." tuning parameters is 1, meaning that all extensions 
+*     are propagated by default.
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council
+*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -95,6 +110,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     DSB: David S. Berry (JACH, UClan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -109,6 +125,8 @@
 *        conversion.
 *     11-MAR-1997 (RFWS):
 *        Add the DOCVT tuning parameter.
+*     1-NOV-2007 (DSB):
+*        Add the PXT... tuning parameters.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -122,6 +140,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
+      INCLUDE 'AST_PAR'          ! AST_ public constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'NDF_CONST'        ! NDF_ private constants
       INCLUDE 'NDF_ERR'          ! NDF_ error codes
@@ -138,6 +157,9 @@
 *           Show format conversions flag.
 *        TCB_WARN = LOGICAL (Write)
 *           Warning message flag.
+*        TCB_PXT = INTEGER (Write)
+*           An AST pointer to a KeyMap holding the names of NDF
+*           extensions and their associated default propagation flags.
 
 *  Arguments Given:
       INTEGER VALUE
@@ -148,6 +170,9 @@
 
 *  External References:
       LOGICAL NDF1_SIMLR         ! String compare with abbreviation
+
+*  Local Variables:
+      CHARACTER XNAME*(DAT__SZNAM) ! An NDF extension name
 
 *.
 
@@ -259,6 +284,41 @@
      : 'The value ^VALUE is not valid for the tuning parameter ' //
      : 'WARN; it should be 0 or 1 (possible programming error).',
      :                       STATUS )
+            END IF
+
+*  Extension propagation.
+*  ======================
+*  Any tuning flag that begins with "PXT" is assumed to be terminated
+*  with the name of an extension. The tuning flag value is non-zero if
+*  the extension should be propagated by default by NDF_PROP, etc, and
+*  is zero if the extension should not be propagated by default.
+         ELSE IF ( NDF1_SIMLR( TPAR(1:3), 'PXT', NDF__MINAB ) ) THEN
+
+* Get the extension name and check it is not blank.
+            XNAME = TPAR( 4 : )
+            IF( XNAME .NE. ' ' ) THEN
+
+*  Ensure an AST KeyMap is available to hold the flags for each extension.
+*  Enclose its creation in an AST "permanent memory" block so that it is
+*  excluded from memory leak checking (since it is never released by the
+*  NDF library it would otherwise appear as a memory leak).
+               IF( TCB_PXT .EQ. AST__NULL ) THEN
+                  CALL AST_BEGINPM
+                  TCB_PXT = AST_KEYMAP( ' ', STATUS )
+                  CALL AST_BEGINPM
+               END IF
+
+*  Store the supplied value flag in the KeyMap, using the supplied
+*  extenmsion name as the key.
+               CALL AST_MAPPUT0I( TCB_PXT, XNAME, VALUE, ' ', STATUS )
+
+*  If the extension name was blank, then report an error.
+            ELSE
+               STATUS = NDF__TPNIN
+               CALL ERR_REP( 'NDF_TUNE_WARN',
+     : '''PXT'' is not a valid tuning parameter name - it should '//
+     : 'be followed by an NDF extension name (possible programming '//
+     : 'error).', STATUS )
             END IF
 
 *  Unknown tuning parameter.

@@ -8,7 +8,7 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {33.8}
 \newcommand{\stardocauthors}   {R.F.~Warren-Smith \& D.S.~Berry}
-\newcommand{\stardocdate}      {4th June 2007}
+\newcommand{\stardocdate}      {1st November 2007}
 \newcommand{\stardoctitle}     {NDF \\ [1ex]
                                 Routines for Accessing the\\
                                 Extensible N-Dimensional Data Format}
@@ -15975,10 +15975,10 @@ locator}{sun92}{using_locators}}
    parameter system
 }{
    \sstdescription{
-      The routine creates a new NDF data structure through the \xref{ADAM}{sg4}{}
+      The routine creates a new NDF data structure through the ADAM
       parameter system, associates it with a parameter and returns an
       identifier for it. The shape, data type, etc. of this new NDF are
-      based on a existing \hi{"}template\hi{"} NDF, and the values of components
+      based on a existing {\tt "}template{\tt "} NDF, and the values of components
       of this template may be selectively propagated to initialise the
       new data structure.
    }
@@ -15997,8 +15997,11 @@ locator}{sun92}{using_locators}}
       }{
          A comma-separated list of the NDF components which are to be
          propagated to the new data structure. By default, the HISTORY,
-         LABEL and TITLE components and all extensions are propagated.
-         See below for further details.
+         LABEL and TITLE components are propagated. All extensions are
+         also propagated by default except for any that have had a zero
+         value assigned to the corresponding {\tt "}PXT...{\tt "} tuning parameter
+         using NDF\_TUNE. See the {\tt "}Component Propagation{\tt "} section for
+         further details.
       }
       \sstsubsection{
          PARAM = CHARACTER $*$ ( $*$ ) (Given)
@@ -16035,25 +16038,33 @@ locator}{sun92}{using_locators}}
          \sstitem
          The template components whose values are to be propagated to
          initialise the new data structure are specified via the CLIST
-         argument. Thus CLIST=\hi{'}DATA,QUALITY\hi{'} would cause the new NDF to
+         argument. Thus CLIST={\tt '}DATA,QUALITY{\tt '} would cause the new NDF to
          inherit its DATA and QUALITY values (if available) from the
          template structure, in addition to those propagated by default.
          Component propagation may be suppressed by supplying a component
-         name with the prefix \hi{'}NO\hi{'}. Thus CLIST=\hi{'}DATA,NOHISTORY\hi{'} would
+         name with the prefix {\tt '}NO{\tt '}. Thus CLIST={\tt '}DATA,NOHISTORY{\tt '} would
          propagate the DATA component, but suppress propagation of
          HISTORY. If component names appear more than once in the CLIST
          value, then the last occurrence takes precedence.
 
          \sstitem
          Propagation of specific NDF extensions may be suppressed by
-         using \hi{'}NOEXTENSION()\hi{'} as one of the items in the CLIST argument;
+         using {\tt '}NOEXTENSION(){\tt '} as one of the items in the CLIST argument;
          a list of the extensions to be suppressed should appear between
-         the parentheses. Thus CLIST=\hi{'}AXIS,NOEXTENSION(IRAS,ASTERIX)\hi{'}
+         the parentheses. Thus CLIST={\tt '}AXIS,NOEXTENSION(IRAS,ASTERIX){\tt '}
          would propagate the AXIS component, but suppress propagation of
          the IRAS and ASTERIX extensions (if present). Propagation of
          suppressed extensions may be re-enabled by specifying
-         \hi{'}EXTENSION()\hi{'} in a similar manner at a later point in the CLIST
+         {\tt '}EXTENSION(){\tt '} in a similar manner at a later point in the CLIST
          value.
+
+         \sstitem
+         Whether or not a named extension is propagated by default can be
+         controlled via an NDF tuning parameter (see NDF\_TUNE). The defaults
+         established using NDF\_TUNE can be over-ridden by specifying the
+         extension explicitly within the CLIST parameter; e.g.
+         {\tt '}EXTENSION(FITS){\tt '} or {\tt '}NOEXTENSION(FITS){\tt '} can be used to over-ride
+         the default established by the PXTFITS tuning parameter.
 
          \sstitem
          Component names in the CLIST argument may be abbreviated to 3
@@ -16623,13 +16634,16 @@ locator}{sun92}{using_locators}}
       }{
          A comma-separated list of the NDF components which are to be
          propagated to the new data structure. By default, the HISTORY,
-         LABEL and TITLE components and all extensions are copied.  See
-         the \hi{"}Component Propagation\hi{"} section for further details.
+         LABEL and TITLE components are propagated. All extensions are
+         also propagated by default except for any that have had a zero
+         value assigned to the corresponding {\tt "}PXT...{\tt "} tuning parameter
+         using NDF\_TUNE. See the {\tt "}Component Propagation{\tt "} section for
+         further details.
       }
       \sstsubsection{
          PLACE = INTEGER (Given and Returned)
       }{
-         An NDF placeholder (e.g. generated by the \htmlref{NDF\_PLACE}{NDF_PLACE} routine)
+         An NDF placeholder (e.g. generated by the NDF\_PLACE routine)
          which indicates the position in the data system where the new
          NDF will reside. The placeholder is annulled by this routine,
          and a value of NDF\_\_NOPL will be returned (as defined in the
@@ -16666,26 +16680,34 @@ locator}{sun92}{using_locators}}
          \sstitem
          The components whose values are to be propagated (copied) from
          the existing NDF to the new data structure are specified via the
-         CLIST argument. Thus CLIST=\hi{'}DATA,QUALITY\hi{'} would cause the DATA
+         CLIST argument. Thus CLIST={\tt '}DATA,QUALITY{\tt '} would cause the DATA
          and QUALITY components to be propagated (if available) from the
          existing NDF to the new structure, in addition to those
          propagated by default.  Component propagation may be suppressed
-         by supplying a component name with the prefix \hi{'}NO\hi{'}. Thus
-         CLIST=\hi{'}DATA,NOHISTORY\hi{'} would propagate the DATA component, but
+         by supplying a component name with the prefix {\tt '}NO{\tt '}. Thus
+         CLIST={\tt '}DATA,NOHISTORY{\tt '} would propagate the DATA component, but
          suppress propagation of HISTORY. If component names appear more
          than once in the CLIST value, then the last occurrence takes
          precedence.
 
          \sstitem
          Propagation of specific NDF extensions may be suppressed by
-         using \hi{'}NOEXTENSION()\hi{'} as one of the items in the CLIST argument;
+         using {\tt '}NOEXTENSION(){\tt '} as one of the items in the CLIST argument;
          a list of the extensions to be suppressed should appear between
-         the parentheses. Thus CLIST=\hi{'}AXIS,NOEXTENSION(IRAS,ASTERIX)\hi{'}
+         the parentheses. Thus CLIST={\tt '}AXIS,NOEXTENSION(IRAS,ASTERIX){\tt '}
          would propagate the AXIS component, but suppress propagation of
          the IRAS and ASTERIX extensions (if present). Propagation of
          suppressed extensions may be re-enabled by specifying
-         \hi{'}EXTENSION()\hi{'} in a similar manner at a later point in the CLIST
+         {\tt '}EXTENSION(){\tt '} in a similar manner at a later point in the CLIST
          value.
+
+         \sstitem
+         Whether or not a named extension is propagated by default can be
+         controlled via an NDF tuning parameter (see NDF\_TUNE). The defaults
+         established using NDF\_TUNE can be over-ridden by specifying the
+         extension explicitly within the CLIST parameter; e.g.
+         {\tt '}EXTENSION(FITS){\tt '} or {\tt '}NOEXTENSION(FITS){\tt '} can be used to over-ride
+         the default established by the PXTFITS tuning parameter.
 
          \sstitem
          Component names in the CLIST argument may be abbreviated to 3
@@ -17347,44 +17369,37 @@ locator}{sun92}{using_locators}}
       \sstitemlist{
 
          \sstitem
-         \hi{'}DOCVT\hi{'}: Controls whether to convert foreign format
-data files to and from native NDF format for access (using the
-facilities described in \xref{SSN/20}{ssn20}{}). If DOCVT is set to 1
-(the default), and the other necessary steps described in SSN/20 have
-been taken, then such conversions will be performed whenever they are
-necessary to gain access to data stored in a foreign format. If DOCVT
-is set to 0, no such conversions will be attempted and all data will
-be accessed in native NDF format only.
-
-The value of DOCVT may be changed at any time. It is the value current
-when a dataset is acquired by the NDF\_ library (or a
-\htmlref{placeholder}{ss:placeholders} for a new dataset is created)
-which is significant.
+         {\tt '}DOCVT{\tt '}: Controls whether to convert foreign format data files
+         to and from native NDF format for access (using the facilities
+         described in SSN/20). If DOCVT is set to 1 (the default), and the
+         other necessary steps described in SSN/20 have been taken, then
+         such conversions will be performed whenever they are necessary to
+         gain access to data stored in a foreign format. If DOCVT is set
+         to 0, no such conversions will be attempted and all data will be
+         accessed in native NDF format only. The value of DOCVT may be
+         changed at any time. It is the value current when a dataset is
+         first accessed by the NDF\_ library which is significant.
 
          \sstitem
-         \hi{'}KEEP\hi{'}: Controls whether to retain a native format NDF copy of
+         {\tt '}KEEP{\tt '}: Controls whether to retain a native format NDF copy of
          any foreign format data files which are accessed by the NDF\_
          library (and automatically converted using the facilities
-         described in \xref{SSN/20}{ssn20}{}). If KEEP is set to 0
-(the default), then
+         described in SSN/20). If KEEP is set to 0 (the default), then
          the results of converting foreign format data files will be stored
          in scratch filespace and deleted when no longer required. If KEEP
          is set to 1, the results of the conversion will instead be stored
          in permanent NDF data files in the default directory (such files
          will have the same name as the foreign file from which they are
-         derived and a file type of \hi{'}.sdf\hi{'}). Setting KEEP to 1 may be
+         derived and a file type of {\tt '}.sdf{\tt '}). Setting KEEP to 1 may be
          useful if the same datasets are to be re-used, as it avoids having
-         to convert them on each occasion.
-
-         The value of KEEP may be changed at any time. It is the value
-         current when a foreign format file is first accessed by the NDF\_
-         library which is significant.
+         to convert them on each occasion. The value of KEEP may be changed
+         at any time. It is the value current when a foreign format file is
+         first accessed by the NDF\_ library which is significant.
 
          \sstitem
-         \hi{'}SHCVT\hi{'}: Controls whether diagnostic information is displayed
+         {\tt '}SHCVT{\tt '}: Controls whether diagnostic information is displayed
          to show the actions being taken to convert to and from foreign
-         data formats (using the facilities described in
-\xref{SSN/20}{ssn20}{}). If SHCVT
+         data formats (using the facilities described in SSN/20). If SHCVT
          is set to 1, then this information is displayed to assist in
          debugging external format conversion software whenever a foreign
          format file is accessed. If SHCVT is set to 0 (the default), this
@@ -17392,7 +17407,7 @@ which is significant.
          silently unless an error occurs.
 
          \sstitem
-         \hi{'}TRACE\hi{'}: Controls the reporting of additional error messages
+         {\tt '}TRACE{\tt '}: Controls the reporting of additional error messages
          which may occasionally be useful for diagnosing internal problems
          within the NDF\_ library. If TRACE is set to 1, then any error
          occurring within the NDF\_ system will be accompanied by error
@@ -17402,15 +17417,31 @@ which is significant.
          standard error messages will be produced.
 
          \sstitem
-         \hi{'}WARN\hi{'}: Controls the issuing of warning messages when certain
+         {\tt '}WARN{\tt '}: Controls the issuing of warning messages when certain
          non-fatal errors in the structure of NDF data objects are
          detected. If WARN is set to 1 (the default), then a warning
          message is issued. If WARN is set to 0, then no message is
          issued.  In both cases normal execution continues and no STATUS
          value is set.
+
+         \sstitem
+         {\tt '}PXT...{\tt '}: Controls whether a named NDF extension should be
+         propagated by default when NDF\_PROP or NDF\_SCOPY is called. The
+         name of the extension should be appended to the string {\tt "}PXT{\tt "} to
+         form the complete tuning parameter name. Thus the tuning parameter
+         PXTFITS would control whether the FITS extension is propagated by
+         default. If the value for the parameter is non-zero, then the
+         extension will be propagated by default. If the value for the
+         parameter is zero, then the extension will not be propagated by
+         default. The default established by this tuning parameter can be
+         over-ridden by specifying the extension explicitly within the CLIST
+         argument when calling NDF\_PROP or NDF\_SCOPY. The default value for
+         all {\tt "}PXT...{\tt "} tuning parameters is 1, meaning that all extensions
+         are propagated by default.
       }
    }
 }
+
 \sstroutine{
    NDF\_TYPE
 }{
@@ -18886,6 +18917,10 @@ the NDF\_ system between versions V1.6 and V1.7 (the current version):
 \begin{enumerate}
 \item NDF sections expressions can now include WCS axis values.
 See \S\ref{ss:axissections}.
+
+\item New tuning parameters (``PXT...'') can be used to supress the default
+propagation of named NDF extensions by NDF\_PROP and NDF\_SCOPY. See 
+\htmlref{NDF\_TUNE}{NDF_TUNE}.
 
 \end{enumerate}
 

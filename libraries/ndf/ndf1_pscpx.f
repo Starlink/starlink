@@ -19,9 +19,12 @@
 *     separated list of component names (optionally abbreviated) or
 *     component names prefixed with 'NO' (to indicate that the
 *     specified component should not be propagated). By default the
-*     HISTORY, LABEL and TITLE components and all extensions are
-*     propagated. Named extensions may be included or excluded by
-*     specifying EXTENSION( ) or NOEXTENSION( ) as one of the list
+*     HISTORY, LABEL and TITLE components are propagated. All extensions
+*     are also propagated by default except for any that have had a zero 
+*     value assigned to the corresponding "PXT..." tuning parameter 
+*     using NDF_TUNE. Named extensions may be included or excluded
+*     (over-riding the defaults set by the "PXT..." tuning parameters) 
+*     by specifying EXTENSION( ) or NOEXTENSION( ) as one of the list
 *     items with a list of the extensions to be affected contained
 *     within the parentheses. The same component name may appear more
 *     than once in the list, and the effects of each occurrence are
@@ -51,6 +54,7 @@
 *  Copyright:
 *     Copyright (C) 1997 Rutherford Appleton Laboratory
 *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  License:
@@ -88,6 +92,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David S. Berry (JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -102,6 +107,9 @@
 *        Added support for the WCS component.
 *     24-DEC-2005 (TIMJ):
 *        Use CHR_FPARX rather than NDF1_FPARX
+*     1-NOV-2007 (DSB):
+*        Use the "PXT..." tuning parameters to determine whether or not
+*        to propagate named extsnions by default.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -115,8 +123,15 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
+      INCLUDE 'AST_PAR'          ! AST_ public constants and functions
       INCLUDE 'NDF_CONST'        ! NDF_ private constants
       INCLUDE 'NDF_ERR'          ! NDF_ error codes
+
+*  Global Variables:
+      INCLUDE 'NDF_TCB'          ! NDF_ Tuning Control Block
+*        TCB_PXT = INTEGER (Read)
+*           An AST pointer to a KeyMap holding the names of NDF
+*           extensions and their associated default propagation flags.
 
 *  Arguments Given:
       CHARACTER * ( * ) STR
@@ -135,18 +150,32 @@
       LOGICAL NDF1_SIMLR         ! String compare with abbreviation
 
 *  Local Variables:
+      CHARACTER KEY*(DAT__SZNAM) ! Extension name
+      INTEGER I                  ! Index into KeyMap
       INTEGER I1                 ! Character position of start of item
       INTEGER I2                 ! Character position of end of item
+      INTEGER INCLUD             ! Non-zero if extension is to be copied
       INTEGER F                  ! Position of start of name to test
       INTEGER L                  ! Position of end of name to test
       INTEGER J1                 ! Position of opening parenthesis
       INTEGER J2                 ! Position of closing parenthesis
+      INTEGER NKEY               ! Number of keys in the KeyMap
+      INTEGER PXT                ! KeyMap holding extension flags
       LOGICAL RECOG              ! Whether item was recognised
 
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  If the TCB contains an AST KeyMap holding default propagation flags
+*  for NDF extensions, then take a copy of it so we can modify it without
+*  making any permanatent changes. Otherwise, create a new empty KeyMap.
+      IF( TCB_PXT .NE. AST__NULL ) THEN
+         PXT = AST_COPY( PXT, STATUS )
+      ELSE 
+         PXT = AST_KEYMAP( ' ', STATUS )
+      END IF
 
 *  Initialise the component propagation flags.
       CPF( NDF__ACPF ) = .FALSE.
@@ -317,14 +346,14 @@
                         IF ( NDF1_SIMLR( STR( F : J1 - 1 ), 'EXTENSION',
      :                                   NDF__MINAB ) ) THEN
 
-*  If this is an EXTENSION specification, then update the list of
-*  excluded extensions accordingly.
+*  If this is an EXTENSION specification, then update the KeyMap to
+*  ensure that the named extensions have a non-zero value and will thus
+*  be propagated.
                            RECOG = .TRUE.
                            IF ( J1 + 1 .LE. J2 - 1 ) THEN
                               CALL NDF1_PXLST( .TRUE.,
      :                                         STR( J1 + 1 : J2 - 1 ),
-     :                                         MXEXTN, EXTN, NEXTN,
-     :                                         STATUS )
+     :                                         PXT, STATUS )
                            END IF
 
 *  Perform the appropriate updating operation if this is a NOEXTENSION
@@ -336,8 +365,7 @@
                            IF ( J1 + 1 .LE. J2 - 1 ) THEN
                               CALL NDF1_PXLST( .FALSE.,
      :                                         STR( J1 + 1 : J2 - 1 ),
-     :                                         MXEXTN, EXTN, NEXTN,
-     :                                         STATUS )
+     :                                         PXT, STATUS )
                            END IF
                         END IF
                      END IF
@@ -361,7 +389,36 @@
          I1 = I2 + 2
          GO TO 1
       END IF
-       
+
+*  Obtain the list of NDF extensions that are not to be propagated. To
+*  do this, go through all entries in the KeyMap looking for any that
+*  have an associated value of zero. The keys associated with such
+*  entries are the names of the extensions that are not to be propagated.
+      NKEY = AST_MAPSIZE( PXT, STATUS )
+      DO I = 1, NKEY
+         KEY = AST_MAPKEY( PXT, I, STATUS )
+         IF( AST_MAPGET0I( PXT, KEY, INCLUD, STATUS ) ) THEN
+
+            IF( INCLUD .EQ. 0 ) THEN
+
+               IF( NEXTN .LT. MXEXTN ) THEN
+                  NEXTN = NEXTN + 1
+                  EXTN( NEXTN ) = KEY
+
+               ELSE IF( STATUS .EQ. SAI__OK ) THEN
+                  STATUS = NDF__XSEXT
+                  CALL MSG_SETI( 'MXEXTN', MXEXTN )
+                  CALL ERR_REP( 'NDF1_PSCPX_XS',
+     :               'The maximum number of extension names ' //
+     :               '(^MXEXTN) has been exceeded.', STATUS )
+               END IF
+            END IF
+         END IF
+      END DO
+
+*  Annul the KeyMap used to hold extension propagation flags.
+      CALL AST_ANNUL( PXT, STATUS )
+
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_PSCPX', STATUS )
 
