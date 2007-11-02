@@ -30,6 +30,8 @@
     A memory leak when contouring external images over the displayed image
     has been fixed.
 
+    The Tycho-2 catalogue has been added to the default list.
+
   Puana Release:
   ==============
 
