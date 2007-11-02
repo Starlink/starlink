@@ -35,7 +35,7 @@
 *     8-AUG-2006 (DSB):
 *        Added ndgGtsup
 *     2-NOV-2007 (DSB):
-*        Added ndgBegpv and ndgEndpv.
+*        Added ndgPtprv, ndgBegpv and ndgEndpv.
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
@@ -78,5 +78,6 @@ void ndgNdfpr( int indf1, const char clist[], const Grp *igrp, int index, int *i
 void ndgGtsup( const Grp *grp, int i, char const *fields[6], int len, int *status );
 void ndgBegpv( int *status );
 void ndgEndpv( int *status );
+void ndgPtprv( int indf1, int indf2, const char id[], int isroot, int *status);
 
 #endif
