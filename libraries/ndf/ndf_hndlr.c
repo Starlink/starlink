@@ -153,9 +153,13 @@ F77_SUBROUTINE(ndf_hndlr)( CHARACTER(EVNAME),
    int ihandler;
    int there;
    int unused;
+   int *old_status;
 
 /* Check the inherited global status. */
    if ( *STATUS != SAI__OK ) return;
+
+/* Make AST use the supplied status variable. */
+   old_status = astWatch( STATUS );
 
 /* Get a pointer to dynamic memory holding a null-terminated copy of the supplied 
    EVNAME string. */
@@ -215,6 +219,10 @@ F77_SUBROUTINE(ndf_hndlr)( CHARACTER(EVNAME),
 
 /* Free resources */
    evname = astFree( evname );
+
+/* Make AST use the original status variable. */
+   astWatch( old_status );
+
 }
 
 
@@ -294,9 +302,13 @@ F77_SUBROUTINE(ndf1_event)( CHARACTER(EVNAME),
    int i;
    int expanded;
    NdfEventHandler *handler_list;
+   int *old_status;
 
 /* Check the inherited global status. */
    if ( *STATUS != SAI__OK ) return;
+
+/* Make AST use the supplied status variable. */
+   old_status = astWatch( STATUS );
 
 /* Get a pointer to dynamic memory holding a null-terminated copy of the supplied 
    EVNAME string. */
@@ -331,6 +343,9 @@ F77_SUBROUTINE(ndf1_event)( CHARACTER(EVNAME),
 
 /* Free resources */
    evname = astFree( evname );
+
+/* Make AST use the original status variable. */
+   astWatch( old_status );
 }
 
 
