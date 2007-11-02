@@ -95,6 +95,8 @@
       INTEGER NR
       INTEGER NW
       INTEGER PLACE
+      INTEGER WRGRP2
+      INTEGER RDGRP2
       LOGICAL THERE
 *.
 
@@ -123,10 +125,15 @@
 *  NDF writen during the provenance block. 
       IF ( STATUS .EQ. SAI__OK ) THEN
 
+*  Purge duplicate entries from the two groups. These can be caused if
+*  the same NDF is opened several times.
+         CALL GRP_PURGE( WRGRP, WRGRP2, STATUS )
+         CALL GRP_PURGE( RDGRP, RDGRP2, STATUS )
+
 *  Loop round each output NDF
-         CALL GRP_GRPSZ( WRGRP, NW, STATUS )
+         CALL GRP_GRPSZ( WRGRP2, NW, STATUS )
          DO IW = 1, NW
-            CALL GRP_GET( WRGRP, IW, 1, WRNDF, STATUS )
+            CALL GRP_GET( WRGRP2, IW, 1, WRNDF, STATUS )
 
 *  Get an NDF identifier for it.
             CALL NDF_OPEN( DAT__ROOT, WRNDF, 'UPDATE', 'OLD', INDF1, 
@@ -137,9 +144,9 @@
             IF( .NOT. THERE ) THEN
 
 *  Otherwise, loop round each input NDF
-               CALL GRP_GRPSZ( RDGRP, NR, STATUS )
+               CALL GRP_GRPSZ( RDGRP2, NR, STATUS )
                DO IR = 1, NR
-                  CALL GRP_GET( RDGRP, IR, 1, RDNDF, STATUS )
+                  CALL GRP_GET( RDGRP2, IR, 1, RDNDF, STATUS )
 
 *  Existing NDFs that were opened for UPDATE will be in both groups. Check
 *  to make sure we are not establishing an NDF as its own parent.
@@ -163,9 +170,12 @@
             CALL NDF_ANNUL( INDF1, STATUS )               
          END DO
 
+*  Delete the GRP groups.
+         CALL GRP_DELET( RDGRP2, STATUS )
+         CALL GRP_DELET( WRGRP2, STATUS )
+
       END IF
 
-*  Delete the GRP groups.
       CALL GRP_DELET( RDGRP, STATUS )
       CALL GRP_DELET( WRGRP, STATUS )
 
