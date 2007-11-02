@@ -34,9 +34,12 @@
 *        Add ndgNdfcr
 *     8-AUG-2006 (DSB):
 *        Added ndgGtsup
+*     2-NOV-2007 (DSB):
+*        Added ndgBegpv and ndgEndpv.
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -73,5 +76,7 @@ void ndgNdfcr( const Grp *igrp, int index, const char ftype[], int ndim,
 	       const hdsdim lbnd[], const hdsdim ubnd[], int *indf, int *status );
 void ndgNdfpr( int indf1, const char clist[], const Grp *igrp, int index, int *indf2, int *status);
 void ndgGtsup( const Grp *grp, int i, char const *fields[6], int len, int *status );
+void ndgBegpv( int *status );
+void ndgEndpv( int *status );
 
 #endif

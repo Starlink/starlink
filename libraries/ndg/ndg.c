@@ -35,10 +35,13 @@
 *        Add ndgNdfcr
 *     8-AUG-2006 (DSB):
 *        Added ndgGtsup
+*     2-NOV-2007 (DSB):
+*        Added ndgBegpv and ndgEndpv.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -233,5 +236,27 @@ void ndgGtsup( const Grp *grp, int i, char const *fields[6], int len, int *statu
 
    return;
 }
+
+
+
+F77_SUBROUTINE(ndg_begpv)( INTEGER(STATUS) );
+
+void ndgBegpv( int * status ) {
+  DECLARE_INTEGER(STATUS);
+  F77_EXPORT_INTEGER(*status, STATUS );
+  F77_CALL(ndg_begpv)( INTEGER_ARG(&STATUS) );
+  F77_IMPORT_INTEGER( STATUS, *status );
+}
+
+F77_SUBROUTINE(ndg_endpv)( INTEGER(STATUS) );
+
+void ndgEndpv( int * status ) {
+  DECLARE_INTEGER(STATUS);
+  F77_EXPORT_INTEGER(*status, STATUS );
+  F77_CALL(ndg_endpv)( INTEGER_ARG(&STATUS) );
+  F77_IMPORT_INTEGER( STATUS, *status );
+}
+
+
 
 
