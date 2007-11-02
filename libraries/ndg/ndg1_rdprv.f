@@ -129,11 +129,9 @@
             CALL DAT_SIZE( ALOC, ASIZE, STATUS )
 
 *  Loop round every element, getting the text identifier for the NDF
-*  described by the element and storing it in a GRP group. We skip the
-*  first element since it will not have a key (the first element is
-*  always reserved for describing the direct parents of the NDF itself).
+*  described by the element and storing it in a GRP group. 
             CALL GRP_NEW( ' ', IGRP, STATUS )
-            DO I = 2, ASIZE
+            DO I = 1, ASIZE
                CALL DAT_CELL( ALOC, 1, I, CLOC, STATUS )
                CALL CMP_GET0C( CLOC, 'ID', KEY, STATUS )
                CALL GRP_PUT1( IGRP, KEY, 0, STATUS )
@@ -163,18 +161,13 @@
 *  Convert each of these integer indices into the corresponding text
 *  identifier.
                   DO IPRNT = 1, NPRNT
-                     CALL GRP_GET( IGRP, PIND( IPRNT ) - 1, 1, 
+                     CALL GRP_GET( IGRP, PIND( IPRNT ), 1, 
      :                             PRNTS( IPRNT ), STATUS )
                   END DO
 
 *  Get the text identifier for the NDF described by the current element
-*  of the ANCESTORS array. The first element will have no "ID" component 
-*  since it describes the direct parents of the NDF.
-                  IF( I .EQ. 1 ) THEN
-                     KEY = ' '
-                  ELSE
-                     CALL CMP_GET0C( CLOC, 'ID', KEY, STATUS )
-                  END IF
+*  of the ANCESTORS array. 
+                  CALL CMP_GET0C( CLOC, 'ID', KEY, STATUS )
 
 *  Add an entry to the returned KeyMap. The key is the text identifier
 *  for an NDF, and the value is an array of text identifiers for the 
@@ -186,6 +179,29 @@
 *  Free resources.
                CALL DAT_ANNUL( CLOC, STATUS )
             END DO
+
+*  Check the PROVENANCE structure has a component called PARENTS. This holds 
+*  the integer indices within the ANCESTORS array of the immediate parents of 
+*  the main NDF. 
+            CALL DAT_THERE( XLOC, 'PARENTS', THERE, STATUS )
+            IF( THERE ) THEN
+
+*  Get the array of integer indices giving the position of the NDFs
+*  parents within the ANCESTORS array.
+               CALL CMP_GET1I( XLOC, 'PARENTS', MXPRNT, PIND, NPRNT, 
+     :                         STATUS )
+
+*  Convert each of these integer indices into the corresponding text
+*  identifier.
+               DO IPRNT = 1, NPRNT
+                  CALL GRP_GET( IGRP, PIND( IPRNT ), 1, 
+     :                          PRNTS( IPRNT ), STATUS )
+               END DO
+
+*  Add an entry to the returned KeyMap. The key is blank to indicate that
+*  this entry holds the direct parents of hte main NDF.
+               CALL AST_MAPPUT1C( PROV, ' ', NPRNT, PRNTS, ' ', STATUS )
+            END IF
 
 *  Free resources.
             CALL DAT_ANNUL( ALOC, STATUS )

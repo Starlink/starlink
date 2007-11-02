@@ -29,19 +29,17 @@
 *        The global status.
 
 *  Notes:
-*     - The PROVENANCE extension in an NDF contains a table with 2 
-*     columns. Each row describers a single NDF - column 1 is the
-*     text identifier for the NDF, and column 2 holds an array of 
-*     integers that are the row indices within the table of the 
-*     immediate parents of the NDF. The first row in the table always
-*     describes the NDF containing the PROVENANCE extension, and its
-*     identifier will be blank. The table is implemented as an array
-*     of HDS structures with type "PROV". Each element in the array 
-*     corresponds to a row in the table. A PROV structure has two 
-*     elements (corresponding to the two columns in the table); the
-*     first is a string called "ID", and the second is an 1D integer
-*     array called "PARENTS" holding the row indices of the parent 
-*     NDFs.
+*     - The PROVENANCE extension in an NDF contains two components; an
+*     array called ANCESTORS that has one element for each of the NDFs
+*     that were used in the creation of the main NDF (either directly or
+*     indirectly), and an array called PARENTS that holds the integer
+*     indices within ANCESTORS of the immediate parents of the main NDF.
+*     Each element of the ANCESTORS array corresponds to a single ancestor 
+*     NDF and has two components; a character string called "ID" that holds 
+*     a textual identifier for the ancestor NDF, and an array called
+*     PARENTS that holds the integer indices within ANCESTORS of the 
+*     immediate parents of the ancestor NDF. If an ancestor NDF has no
+*     known parent NDFs, then it will not have a PARENTS array.
 *     - Each entry in the supplied KeyMap corresponds to a single NDF.
 *     The key associated with each entry is the text identifier for the 
 *     NDF. The value associated with the entry is a vector of character
@@ -140,9 +138,20 @@
       CALL NDF_XNEW( INDF, 'PROVENANCE', 'PROVENANCE', 0, 0, XLOC, 
      :               STATUS )
 
-*  Create an array of PROV structures inside the extension.
+*  Create an integer array to hold the indices of the direct parents of
+*  the main NDF. Do it now so that it will appear first when hdstrace is
+*  used to display the structure of hte PROVEANCE extension.
+      IF( AST_MAPGET1C( PROV, ' ', MXPRNT, NPRNT, PRNTS, STATUS ) ) THEN
+         CALL DAT_NEW1I( XLOC, 'PARENTS', NPRNT, STATUS )
+      END IF
+
+*  Create an array of PROV structures inside the extension, one for each
+*  ancestor of the main NDF. This will be one less than the size of the 
+*  KeyMap since one of the KeyMap entries (the one with a blank key) is 
+*  for the main NDF itself.
       NNDF = AST_MAPSIZE( PROV, STATUS )
-      CALL DAT_NEW( XLOC, 'ANCESTORS', 'PROV', 1, NNDF, STATUS )
+      CALL DAT_NEW( XLOC, 'ANCESTORS', 'PROV', 1, MAX( 1, NNDF - 1 ), 
+     :              STATUS )
       CALL DAT_FIND( XLOC, 'ANCESTORS', ALOC, STATUS )
 
 *  Create a GRP holding the NDF identifiers in the KeyMap (excluding the
@@ -161,32 +170,29 @@
          KEY = AST_MAPKEY( PROV, I, STATUS )
 
 *  If the key is blank, it means that the KeyMap entry describes the
-*  immediate parents of the supplied NDF. This information always goes on
-*  the first row of the ANCESTORS table, set set index to 0
+*  immediate parents of the supplied NDF. This information will stored in
+*  the PARENTS array in the PROVENANCE structure, so use the extension
+*  locator in place of a locator for an indivcudla cell.
          IF( KEY .EQ. ' ' ) THEN
-            INDEX = 0
+            CALL DAT_CLONE( XLOC, CLOC, STATUS )
 
 *  Otherwise, find the index within ANCESTORS at which to store this 
-*  identifier. This is one more than the index at which the identifier 
-*  is stored in IGRP (because we reserve the first row in ANCESTORS for 
-*  the supplied NDF).
+*  identifier. 
          ELSE
             CALL GRP_INDEX( KEY, IGRP, 1, INDEX, STATUS )
-         END IF
 
 *  Get a locator for the required cell in the ANCESTORS table in the 
 *  NDF extension.
-         CALL DAT_CELL( ALOC, 1, INDEX + 1, CLOC, STATUS )
+            CALL DAT_CELL( ALOC, 1, INDEX, CLOC, STATUS )
 
-*  If not blank, store the key as the NDF identifier in column 1 of the 
-*  ANCESTORS table.
-         IF( KEY .NE. ' ' ) THEN
+*  Store the key as the NDF identifier in column 1 of the ANCESTORS table.
             KEYLEN = CHR_LEN( KEY )
             CALL DAT_NEW0C( CLOC, 'ID', KEYLEN, STATUS )
             CALL CMP_PUT0C( CLOC, 'ID', KEY( : KEYLEN), STATUS )
+
          END IF
 
-*  Get the list of parent identifiers,
+*  Get the list of parent identifiers from the KeyMap.
          IF( AST_MAPGET1C( PROV, KEY, MXPRNT, NPRNT, PRNTS, 
      :                     STATUS ) ) THEN
 
@@ -204,16 +210,16 @@
                   CALL GRP_GRPSZ( IGRP, INDEX, STATUS )
                END IF
 
-*  Save the index in the array of parent indices, incrementing it by 1 to
-*  skip over the first row in the table which is reserved for the direct
-*  parents of the supplied NDF.
-               PIND( IPRNT ) = INDEX + 1
+*  Save the index in the array of parent indices.
+               PIND( IPRNT ) = INDEX
             END DO
 
 *  Create a 1D vector of integers in column 2 of the ANCESTORS table to
 *  hold the integer indices within th ANCESTORS table corresponding to the
 *  parent NDFs.
-            CALL DAT_NEW1I( CLOC, 'PARENTS', NPRNT, STATUS )
+            IF( KEY .NE. ' ' ) THEN
+               CALL DAT_NEW1I( CLOC, 'PARENTS', NPRNT, STATUS )
+            END IF
 
 *  Store the parent indices in this new array.
             CALL CMP_PUT1I( CLOC, 'PARENTS', NPRNT, PIND, STATUS )
@@ -228,10 +234,10 @@
 *  element has an ID in column 1, but no list of parents in column 2.
       CALL GRP_GRPSZ( IGRP, ASIZE, STATUS )
       IF( ASIZE .GE. NNDF ) THEN 
-         CALL DAT_ALTER( ALOC, 1, ASIZE + 1, STATUS )
+         CALL DAT_ALTER( ALOC, 1, ASIZE, STATUS )
          DO INDEX = NNDF, ASIZE
             CALL GRP_GET( IGRP, INDEX, 1, KEY, STATUS )
-            CALL DAT_CELL( ALOC, 1, INDEX + 1, CLOC, STATUS )
+            CALL DAT_CELL( ALOC, 1, INDEX, CLOC, STATUS )
             KEYLEN = CHR_LEN( KEY )
             CALL DAT_NEW0C( CLOC, 'ID', KEYLEN, STATUS )
             CALL CMP_PUT0C( CLOC, 'ID', KEY( : KEYLEN), STATUS )
