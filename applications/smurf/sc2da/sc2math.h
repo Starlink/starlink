@@ -86,13 +86,13 @@ double lmat[]      /* equation matrix (given and returned) */
 
 void sc2math_fitsky
 (
-int cliptype,       /* type of sigma clipping (given) */
-int nboll,          /* number of bolometers (given) */
-int nframes,        /* number of frames in scan (given) */
-int ncoeff,         /* number of coefficients (given) */
-double *inptr,      /* measurement values (given) */
-double *coptr,      /* coefficients of fit (returned) */
-int *status         /* global status (given and returned) */
+int cliptype,          /* type of sigma clipping (given) */
+size_t nboll,          /* number of bolometers (given) */
+size_t nframes,        /* number of frames in scan (given) */
+size_t ncoeff,         /* number of coefficients (given) */
+const double *inptr,   /* measurement values (given) */
+double *coptr,         /* coefficients of fit (returned) */
+int *status            /* global status (given and returned) */
 );
 
 /*+ sc2math_flatten - apply flat field correction to set of frames */
@@ -167,10 +167,10 @@ double a[]   /* Square Matrix with NxN points.
 
 void sc2math_linfit
 (
-int np,               /* number of points (given) */
-double x[],           /* X data (given) */
-double y[],           /* Y data (given) */
-double wt[],          /* weights (given) */
+size_t np,            /* number of points (given) */
+const double x[],     /* X data (given) */
+const double y[],     /* Y data (given) */
+const double wt[],    /* weights (given) */
 double *grad,         /* slope (returned) */
 double *cons,         /* offset (returned) */
 int *status           /* global status (given and returned) */
@@ -192,11 +192,11 @@ int *status        /* global status (given and returned) */
 
 void sc2math_matinv 
 ( 
-int norder,          /* degree of matrix (given) */
+int norder,            /* degree of matrix (given) */
 double array[10][10],  /* given matrix, its inverse is returned 
                          (given and returned) */
 double *det,           /* determinant of ARRAY (returned) */
-int *status          /* global status (given and returned) */
+int *status            /* global status (given and returned) */
 );
 
 /*+ sc2math_msv - Multiply matrix with column vector */
@@ -352,10 +352,10 @@ void sc2math_sigmaclip
 int type,             /* 0 for double sided clip, 
                         >0 positive clip, 
                         <0 negative clip (given) */
-int np,               /* number of points (given) */
-double x[],           /* X data (given) */
-double y[],           /* Y data (given) */
-double wt[],          /* weights (given) */
+size_t np,            /* number of points (given) */
+const double x[],     /* X data (given) */
+const double y[],     /* Y data (given) */
+double wt[],          /* weights (returned) */
 double *grad,         /* slope (returned) */
 double *cons,         /* offset (returned) */
 int *status           /* global status (given and returned) */

@@ -584,13 +584,13 @@ double lmat[]      /* equation matrix (given and returned) */
 
 void sc2math_fitsky
 (
-int cliptype,       /* type of sigma clipping (given) */
-int nboll,          /* number of bolometers (given) */
-int nframes,        /* number of frames in scan (given) */
-int ncoeff,         /* number of coefficients (given) */
-double *inptr,      /* measurement values (given) */
-double *coptr,      /* coefficients of fit (returned) */
-int *status         /* global status (given and returned) */
+int cliptype,          /* type of sigma clipping (given) */
+size_t nboll,          /* number of bolometers (given) */
+size_t nframes,        /* number of frames in scan (given) */
+size_t ncoeff,         /* number of coefficients (given) */
+const double *inptr,   /* measurement values (given) */
+double *coptr,         /* coefficients of fit (returned) */
+int *status            /* global status (given and returned) */
 )
 
 /* Description :
@@ -603,6 +603,7 @@ int *status         /* global status (given and returned) */
     25Feb2005 : original (bdk)
     14Jul2005 : add cliptype argument (bdk)
     13Mar2006 : copied from map.c (agg)
+    01Nov2007 : use const and size_t where relevant (bdk)
 */
 
 {
@@ -1218,10 +1219,10 @@ double a[]   /* Square Matrix with NxN points.
 
 void sc2math_linfit
 (
-int np,               /* number of points (given) */
-double x[],           /* X data (given) */
-double y[],           /* Y data (given) */
-double wt[],          /* weights (given) */
+size_t np,            /* number of points (given) */
+const double x[],     /* X data (given) */
+const double y[],     /* Y data (given) */
+const double wt[],    /* weights (given) */
 double *grad,         /* slope (returned) */
 double *cons,         /* offset (returned) */
 int *status           /* global status (given and returned) */
@@ -1234,6 +1235,7 @@ int *status           /* global status (given and returned) */
     20Oct2004 : original (bdk)
     13Mar2006 : copied from map.c (agg)
     24Aug2007 : trap for noiseless data (bdk)
+    01Nov2007 : use const and size_t where relevant (bdk)
 */
 
 {
@@ -1307,7 +1309,7 @@ int *status        /* global status (given and returned) */
 {
    double diff;                 /* data difference */
    double fnum;                 /* number of points used */
-   int roundper;              /* rounded version of period */
+   int roundper;                /* rounded version of period */
    double sumdiff;              /* sum of data differences */
    double sumdiffsq;            /* sum of squares of data differences */
    double sigma;                /* sigma of data differences */
@@ -1373,11 +1375,11 @@ int *status        /* global status (given and returned) */
 
 void sc2math_matinv 
 ( 
-int norder,          /* degree of matrix (given) */
+int norder,            /* degree of matrix (given) */
 double array[10][10],  /* given matrix, its inverse is returned 
                          (given and returned) */
 double *det,           /* determinant of ARRAY (returned) */
-int *status          /* global status (given and returned) */
+int *status            /* global status (given and returned) */
 )
 
 /*   Method :
@@ -2405,10 +2407,10 @@ void sc2math_sigmaclip
 int type,             /* 0 for double sided clip, 
                         >0 positive clip, 
                         <0 negative clip (given) */
-int np,               /* number of points (given) */
-double x[],           /* X data (given) */
-double y[],           /* Y data (given) */
-double wt[],          /* weights (given) */
+size_t np,            /* number of points (given) */
+const double x[],     /* X data (given) */
+const double y[],     /* Y data (given) */
+double wt[],          /* weights (returned) */
 double *grad,         /* slope (returned) */
 double *cons,         /* offset (returned) */
 int *status           /* global status (given and returned) */
@@ -2422,6 +2424,7 @@ int *status           /* global status (given and returned) */
     20Oct2004 : original (bdk)
     14Jul2005 : add type argument (bdk)
     13Mar2006 : copied from map.c (agg)
+    01Nov2007 : use const and size_t where relevant (bdk)
 */
 
 {
@@ -2446,6 +2449,7 @@ int *status           /* global status (given and returned) */
    for ( ; ; )
    {
       sc2math_linfit ( np, x, y, wt, grad, cons, status );
+
 /* calculate scatter in y */
 
       sigma = 0.0;
