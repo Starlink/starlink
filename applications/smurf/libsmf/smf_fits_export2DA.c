@@ -100,6 +100,7 @@ void smf_fits_export2DA ( const AstFitsChan *fitschan, size_t *ncards,
   int found;              /* Boolean to indicate if a card was found */
   size_t i;               /* Loop counter */
 
+  *ncards = 0;
   /* Check status */
   if (*status != SAI__OK) return;
 
@@ -129,6 +130,8 @@ void smf_fits_export2DA ( const AstFitsChan *fitschan, size_t *ncards,
       } else {
 	break;
       }
-   } 
+   }
 
+   /* Guarantee to terminate the buffer */
+   *outpos = '\0';
 }
