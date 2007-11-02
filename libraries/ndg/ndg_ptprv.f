@@ -196,13 +196,13 @@
 *  direct parents of INDF2).
             KEY = AST_MAPKEY( PROV2, I, STATUS )
 
-*  If the key is blank, we use the identifier supplied for INDF2.
-            IF( KEY .EQ. ' ' ) KEY = USEID
-
 *  Get the value of this entry. This is a list of text identifiers for
 *  the direct parents of the ancestor NDF described by the KeyMap entry.
             IF( AST_MAPGET1C( PROV2, KEY, MXPRNT, NPRNT, PRNTS, 
      :                        STATUS ) ) THEN
+
+*  If the key is blank, we use the identifier supplied for INDF2.
+               IF( KEY .EQ. ' ' ) KEY = USEID
 
 *  Append a new entry describing this ancestor to the KeyMap holding the 
 *  provenance information for INDF1. If this ancestor is already included

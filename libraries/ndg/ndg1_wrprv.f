@@ -102,7 +102,10 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Constnats:
+*  External References:
+      INTEGER CHR_LEN
+
+*  Local Constants:
       INTEGER MXPRNT             ! Max no. of parents for an NDF
       PARAMETER (MXPRNT = 255 )
 
@@ -120,6 +123,7 @@
       INTEGER IGRP               ! Group holding ordered identifiers
       INTEGER INDEX              ! Index of text identifier within IGRP
       INTEGER IPRNT              ! Index of current parent
+      INTEGER KEYLEN             ! Used length of KEY
       INTEGER NNDF               ! No. of entries in supplied KeyMap
       INTEGER NPRNT              ! No. of parents for an NDF
       INTEGER PIND( MXPRNT )     ! Indices for parents of an NDF
@@ -135,11 +139,11 @@
       IF( THERE ) CALL NDF_XDEL( INDF, 'PROVENANCE', STATUS )
       CALL NDF_XNEW( INDF, 'PROVENANCE', 'PROVENANCE', 0, 0, XLOC, 
      :               STATUS )
-      CALL DAT_FIND( XLOC, 'ANCESTORS', ALOC, STATUS )
 
 *  Create an array of PROV structures inside the extension.
       NNDF = AST_MAPSIZE( PROV, STATUS )
       CALL DAT_NEW( XLOC, 'ANCESTORS', 'PROV', 1, NNDF, STATUS )
+      CALL DAT_FIND( XLOC, 'ANCESTORS', ALOC, STATUS )
 
 *  Create a GRP holding the NDF identifiers in the KeyMap (excluding the
 *  blank identifier reserved for the supplied NDF). This group is used to
@@ -156,8 +160,8 @@
 *  Get the key for the I'th entry in the KeyMap.
          KEY = AST_MAPKEY( PROV, I, STATUS )
 
-*  If the key is blank, it means that the KeyMap entry descirbes the
-*  immediate parents of ht esupplied NDF. This information always goes on
+*  If the key is blank, it means that the KeyMap entry describes the
+*  immediate parents of the supplied NDF. This information always goes on
 *  the first row of the ANCESTORS table, set set index to 0
          IF( KEY .EQ. ' ' ) THEN
             INDEX = 0
@@ -176,7 +180,11 @@
 
 *  If not blank, store the key as the NDF identifier in column 1 of the 
 *  ANCESTORS table.
-         IF( KEY .NE. ' ' ) CALL CMP_PUT0C( CLOC, 'ID', KEY, STATUS )
+         IF( KEY .NE. ' ' ) THEN
+            KEYLEN = CHR_LEN( KEY )
+            CALL DAT_NEW0C( CLOC, 'ID', KEYLEN, STATUS )
+            CALL CMP_PUT0C( CLOC, 'ID', KEY( : KEYLEN), STATUS )
+         END IF
 
 *  Get the list of parent identifiers,
          IF( AST_MAPGET1C( PROV, KEY, MXPRNT, NPRNT, PRNTS, 
@@ -219,12 +227,17 @@
 *  Now add elements to the ANCESTORS array for any root ndfs. Each such
 *  element has an ID in column 1, but no list of parents in column 2.
       CALL GRP_GRPSZ( IGRP, ASIZE, STATUS )
-      DO INDEX = NNDF, ASIZE
-         CALL GRP_GET( IGRP, INDEX, 1, KEY, STATUS )
-         CALL DAT_CELL( ALOC, 1, INDEX + 1, CLOC, STATUS )
-         CALL CMP_PUT0C( CLOC, 'ID', KEY, STATUS )
-         CALL DAT_ANNUL( CLOC, STATUS )
-      END DO
+      IF( ASIZE .GE. NNDF ) THEN 
+         CALL DAT_ALTER( ALOC, 1, ASIZE + 1, STATUS )
+         DO INDEX = NNDF, ASIZE
+            CALL GRP_GET( IGRP, INDEX, 1, KEY, STATUS )
+            CALL DAT_CELL( ALOC, 1, INDEX + 1, CLOC, STATUS )
+            KEYLEN = CHR_LEN( KEY )
+            CALL DAT_NEW0C( CLOC, 'ID', KEYLEN, STATUS )
+            CALL CMP_PUT0C( CLOC, 'ID', KEY( : KEYLEN), STATUS )
+            CALL DAT_ANNUL( CLOC, STATUS )
+         END DO
+      END IF
 
 *  Free remaining resources
       CALL GRP_DELET( IGRP, STATUS )
