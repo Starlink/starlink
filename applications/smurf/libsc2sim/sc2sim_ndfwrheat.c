@@ -157,8 +157,8 @@ int *status        /* global status (given and returned) */
   /* Local variables */
   char dateobs[SZFITSCARD+1] = "\0"; /* DATE-OBS string for observation */
   AstFitsChan *fitschan;           /* FITS headers */
-  char fitsrec[SC2STORE__MAXFITS+1]; /* Store for FITS records */  
-  size_t nrec;                     /* number of FITS header records */
+  char fitsrec[SC2STORE__MAXFITS*80+1]; /* Store for FITS records */  
+  size_t nrec = 0;                 /* number of FITS header records */
   int subnum;                      /* subarray index */
 
   /* Check status */
