@@ -77,6 +77,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David S Berry (JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -90,6 +91,8 @@
 *        was being closed.
 *     24-DEC-2005 (TIMJ):
 *        Replace NDF1_HFIND with HDS_FIND
+*     2-NOV-2007 (DSB):
+*        Report an error if the supplied HDS object is not scalar.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -103,6 +106,8 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'NDF_ERR'          ! NDF_ error constants
       INCLUDE 'NDF_CONST'        ! NDF_ private constants
 
 *  Arguments Given:
@@ -137,9 +142,23 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  If necessary, check the access mode string for validity.
+*  If necessary, check the access mode string for validity. Otherwise,
+*  check that the supplied locator is not a locator for an array of 
+*  objects.
       VMODE = 'UPDATE'
-      IF ( LOC .EQ. DAT__ROOT ) CALL NDF1_VMOD( MODE, VMODE, STATUS )
+      IF ( LOC .EQ. DAT__ROOT ) THEN
+         CALL NDF1_VMOD( MODE, VMODE, STATUS )
+      ELSE
+         CALL DAT_SHAPE( LOC, NDF__MXDIM, DIM, NDIM, STATUS )
+         IF( NDIM .NE. 0 .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = NDF__DIMIN
+            CALL MSG_SETI( 'ND', NDIM )
+            CALL ERR_REP( 'NDF1_NFIND_ERR1', 'The supplied HDS object'//
+     :                    ' is a ^ND-dimensional array. It must be a '//
+     :                    'scalar object (possible programming error).', 
+     :                    STATUS )
+         END IF
+      END IF
 
 *  Split the NDF name into an HDS object name and a section
 *  specification.
