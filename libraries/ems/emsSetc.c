@@ -24,6 +24,7 @@
  *        The message token name.
  *     cvalue = const char * (Given)
  *        The CHARACTER value to be assigned to the message token.
+ *        A NULL pointer is treated as an empty string.
  *
  *     For historical reasons, the following optional third argument may
  *     be given - in former versions of the function it could be used to
@@ -35,6 +36,7 @@
  *        The maximum desired length of the token.
 
 *  Copyright:
+*     Copyright (C) 2007 Science and Technology Facilities Council.
 *     Copyright (C) 1990, 1991 Science & Engineering Research Council.
 *     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
@@ -59,6 +61,7 @@
  *     PCTR: P.C.T. Rees (STARLINK)
  *     AJC: A.J. Chipperfield (STARLINK)
  *     RTP: R.T.Platon (STARLINK)
+ *     TIMJ: Tim Jenness (JAC, Hawaii)
  *     {enter_new_authors_here}
 
  *  History:
@@ -76,6 +79,8 @@
  *        Properly import strings and make maxlen argument optional.
  *     20-SEP-2001 (AJC):
  *        Restrict string length to EMS__SZTOK
+ *     01-NOV-2007 (TIMJ):
+ *        Trap null pointer.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -102,7 +107,8 @@ void emsSetc( const char *token, const char *cvalue, ... ){
    DEBUG("emsSetc", "emsSetc: '%s'", token);
 
 /*  Find the used length of the string */
-   strncpy( valbuf, cvalue, EMS__SZTOK );
+   valbuf[0] = '\0';
+   if (cvalue) strncpy( valbuf, cvalue, EMS__SZTOK );
    valbuf[EMS__SZTOK] = '\0';
 
    for ( i=strlen(valbuf); i>0 ; i-- ) {
