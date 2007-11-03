@@ -39,7 +39,7 @@ dnl
 dnl   The common_built_drivers are common to the standard set and the
 dnl   Starlink set.
 
-common_built_drivers="exdriv.lo pgdriv.lo cadriv.lo hgdriv.lo lxdriv.lo ppdriv.lo vtdriv.lo gidriv.lo hidriv.lo psdriv.lo ttdriv.lo cwdriv.lo gldriv.lo nedriv.lo wddriv.lo hpdriv.lo lsdriv.lo nudriv.lo qmdriv.lo vadriv.lo cgdriv.lo nexsup.lo rvdriv.lo x2driv.lo xmdriv.lo figdisp_comm.lo pgxwin.lo tkdriv.lo xadriv.lo"
+common_built_drivers="exdriv.lo pgdriv.lo cadriv.lo hgdriv.lo lxdriv.lo ppdriv.lo vtdriv.lo gidriv.lo hidriv.lo psdriv.lo ttdriv.lo cwdriv.lo gldriv.lo nedriv.lo wddriv.lo hpdriv.lo lsdriv.lo nudriv.lo qmdriv.lo vadriv.lo cgdriv.lo nexsup.lo rvdriv.lo x2driv.lo xmdriv.lo figdisp_comm.lo pgxwin.lo tkdriv.lo pkdriv.lo xadriv.lo"
 
 dnl   Add the png driver if the PNG header and library are available.
 AC_CHECK_HEADER(png.h,
@@ -158,7 +158,7 @@ STAR_DECLARE_DEPENDENCIES([link],  [gwm cnf psx mers chr])
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
-AC_CONFIG_FILES([Makefile component.xml cpg/Makefile fonts/Makefile pgdispd/Makefile src/Makefile sys/Makefile examples/Makefile drivers/Makefile drivers/xathena/Makefile drivers/xtk/Makefile drivers/xmotif/Makefile])
+AC_CONFIG_FILES([Makefile component.xml cpg/Makefile fonts/Makefile pgdispd/Makefile src/Makefile sys/Makefile examples/Makefile drivers/Makefile drivers/xathena/Makefile drivers/xtk/Makefile drivers/ptk/Makefile drivers/xmotif/Makefile])
 AC_CONFIG_FILES(pgplot_link, [chmod +x pgplot_link])
 AC_CONFIG_FILES(pgplot_link_adam, [chmod +x pgplot_link_adam])
 

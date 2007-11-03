@@ -69,6 +69,7 @@ my %counts = (
 	      XMDRIV => 0,
 	      XADRIV => 0,
 	      TKDRIV => 0,
+	      PKDRIV => 0,
 	      RVDRIV => 0,
 	      GWMDRIV => 1,
 	     );

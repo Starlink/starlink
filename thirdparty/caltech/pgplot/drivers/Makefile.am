@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = xmotif xathena xtk
+SUBDIRS = xmotif xathena xtk ptk
 
 # To change driver list edit configure.ac
 BUILT_DRIVER_ROUTINES = @BUILT_DRIVERS@
@@ -40,7 +40,7 @@ vadriv.f cgdriv.c nexsup.c rvdriv.c x2driv.c xmdriv.c figdisp_comm.c \
 pgxwin.c pndriv.c tkdriv.c xadriv.c xwdriv.c bcdriv.f gvdriv.f	     \
 ladriv.f lvdriv.f tfdriv.f xedriv.f gcdriv.f todriv.f zedriv.f	     \
 ccdriv.f ljdriv.f lhdriv.f mfdriv.f hjdriv.f lndriv.f pxdriv.f	     \
-txdriv.f epdriv.f godriv.f wsdriv.f vbdriv.f
+txdriv.f epdriv.f godriv.f wsdriv.f vbdriv.f pkdriv.c
 
 STAR_DRIVER_ROUTINES = exdriv.f pgdriv.f cadriv.f hgdriv.f lxdriv.f  \
 ppdriv.f vtdriv.f gidriv.f hidriv.f psdriv.f ttdriv.f cwdriv.f	     \
@@ -49,7 +49,7 @@ vadriv.f cgdriv.c nexsup.c rvdriv.c x2driv.c xmdriv.c figdisp_comm.c \
 pgxwin.c pndriv.c tkdriv.c xadriv.c star_xwdriv.c bcdriv.f gvdriv.f   \
 ladriv.f lvdriv.f tfdriv.f xedriv.f gcdriv.f todriv.f zedriv.f	     \
 ccdriv.f ljdriv.f lhdriv.f mfdriv.f hjdriv.f lndriv.f pxdriv.f	     \
-txdriv.f epdriv.f godriv.f wsdriv.f vbdriv.f gwmdriv.c
+txdriv.f epdriv.f godriv.f wsdriv.f vbdriv.f gwmdriv.c pkdriv.c
 
 AM_CFLAGS = -DPG_PPU
 
