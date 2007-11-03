@@ -2022,10 +2022,11 @@ int *status           /* global status (given and returned) */
    History :
     25Oct2007 : original, based on fragment from Tim Jenness (bdk)
     26Oct2007 : interpret JITXML_DIR search-path (bdk)
+    03Nov2007 : Explicitly allow a NULL filename (timj)
 */
 {
   
-   FILE *fd;                              /* descriptor for XML file */
+   FILE *fd = NULL;                       /* descriptor for XML file */
    HDSLoc *xloc = NULL;                   /* locator to NDF extension */
    HDSLoc *temploc = NULL;                /* HDS locator */
    size_t nlines;                         /* number of lines to be written */
@@ -2037,10 +2038,9 @@ int *status           /* global status (given and returned) */
 
    if ( *status != SAI__OK ) return;
 
-
 /* Open the XML file */
 
-   fd = fopen ( xmlfile, "rb" );
+   if (xmlfile) fd = fopen ( xmlfile, "rb" );
 
 
 /* Note that HDS does not allow a single scalar character to exceed 65535 bytes
@@ -2182,6 +2182,7 @@ int *status                 /* global status (given and returned) */
     
    History :
     25Oct2007 : original (bdk)
+    03Nov2007 : do nothing if mceheadsz = 0 (timj)
 */
 {
    int *headptr;                          /* pointer to HDS store */
@@ -2190,7 +2191,7 @@ int *status                 /* global status (given and returned) */
    hdsdim dims[2];                        /* dimensions to be written */
 
    if ( *status != SAI__OK ) return;
-
+   if ( mceheadsz == 0 ) return;
 
 /* create the extension and array component */
 
