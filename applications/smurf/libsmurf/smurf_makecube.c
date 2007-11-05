@@ -628,7 +628,8 @@
 *        Added Label and Unit values to the extension NDFs.
 *     29-OCT-2007 (EC):
 *        Modified interface to smf_open_file.
-
+*     2-NOV-2007 (DSB):
+*        Added provenance information to output NDFs.
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -713,6 +714,7 @@ void smurf_makecube( int *status ) {
    Grp *tgrp = NULL;          /* Temporary Group pointer */
    HDSLoc *smurf_xloc = NULL; /* HDS locator for output SMURF extension */
    HDSLoc *weightsloc = NULL; /* HDS locator of weights array */
+   char *obsid = NULL;        /* OBSID value in input file */
    char *pname = NULL;        /* Name of currently opened data file */
    char basename[ GRP__SZNAM + 1 ]; /* Output base file name */
    char pabuf[ 10 ];          /* Text buffer for parameter value */
@@ -1550,7 +1552,20 @@ void smurf_makecube( int *status ) {
 /* Store the filename in the keymap for later - the GRP would be fine
    as is but we use a keymap in order to reuse smf_fits_add_prov */
                smf_accumulate_prov( prvkeymap, data->file, NULL, 0, status );
-      
+
+/* Get the OBSID keyword value from the input FITS header. Store a pointer 
+   to a null string no OBSID value is found. */
+               if( !astGetFitsS( data->hdr->fitshdr, "OBSID", &obsid ) ) {
+	          obsid = "";
+               }
+
+/* Update the provenance for the output NDF to include the input NDF as
+   an ancestor. Use the OBSID value to identify the input NDF. This
+   over-rides the automatic provenance propagation provided by the NDG
+   provenance block in smurf_mon.f. Inidcate that each input NDF is a
+   root NDF (i.e. has no parents). */
+               ndgPtprv( ondf, data->file->ndfid, obsid, 1, status );
+
 /* Check that the input data type is single precision. */
                if( data->dtype != SMF__FLOAT ) {
                   if( *status == SAI__OK ) {
