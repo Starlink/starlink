@@ -66,8 +66,9 @@
 *     31-OCT-2007 (DSB):
 *        Original version.
 *     5-NOV-2007 (DSB):
-*        Allow propagation of provenance to be controlled by the AUTOPROV 
+*        - Allow propagation of provenance to be controlled by the AUTOPROV 
 *        environment variable.
+*        - Annul errors and continue if any NDF cannot be opened.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -82,6 +83,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'DAT_PAR'          ! DAT constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'PSX_ERR'          ! PSX error constants
 
 *  Global Variables:
@@ -162,54 +164,80 @@
             DO IW = 1, NW
                CALL GRP_GET( WRGRP2, IW, 1, WRNDF, STATUS )
 
-*  Get an NDF identifier for it.
-               CALL NDF_OPEN( DAT__ROOT, WRNDF, 'UPDATE', 'OLD', INDF1, 
-     :                        PLACE, STATUS )            
+*  Check no error has occurred.
+               IF( STATUS .EQ. SAI__OK ) THEN 
 
-*  If this output NDF has a PROVENANCE extenion, leave it as it is.
-               CALL NDF_XSTAT( INDF1, 'PROVENANCE', THERE, STATUS )
-               IF( .NOT. THERE ) THEN
+*  Get an NDF identifier for it.
+                  CALL NDF_OPEN( DAT__ROOT, WRNDF, 'UPDATE', 'OLD', 
+     :                           INDF1, PLACE, STATUS )            
+
+*  If the output NDF could not be opened (e.g. if it was a temporary NDF
+*  that has since been deleted), annul the error and pass on.
+                  IF( STATUS .NE. SAI__OK ) THEN
+                     CALL ERR_ANNUL( STATUS )
+                     INDF1 =  NDF__NOID
+                      
+*  Otherwise, see if this output NDF has a PROVENANCE extenion
+                  ELSE
+                     CALL NDF_XSTAT( INDF1, 'PROVENANCE', THERE, 
+     :                               STATUS )
+                  END IF
+
+*  Only modify this output NDF if is exists and has no provenance
+*  extension.
+                  IF( .NOT. THERE .AND. INDF1 .NE. NDF__NOID ) THEN
 
 *  Otherwise, loop round each input NDF, maintaining a flag that
 *  indicates if any input NDF had a PROVENANCE extension.
-                  INPRV = .FALSE.
-                  CALL GRP_GRPSZ( RDGRP2, NR, STATUS )
-                  DO IR = 1, NR
-                     CALL GRP_GET( RDGRP2, IR, 1, RDNDF, STATUS )
+                     INPRV = .FALSE.
+                     CALL GRP_GRPSZ( RDGRP2, NR, STATUS )
+                     DO IR = 1, NR
+                        CALL GRP_GET( RDGRP2, IR, 1, RDNDF, STATUS )
 
 *  Existing NDFs that were opened for UPDATE will be in both groups. Check
-*  to make sure we are not establishing an NDF as its own parent.
-                     IF( WRNDF .NE. RDNDF ) THEN 
+*  to make sure we are not establishing an NDF as its own parent. Also
+*  check no error has occurred.
+                        IF( WRNDF .NE. RDNDF .AND. 
+     :                      STATUS .EQ. SAI__OK ) THEN 
 
-*  Get an NDF identifier for it.
-                        CALL NDF_OPEN( DAT__ROOT, RDNDF, 'READ', 'OLD', 
-     :                                 INDF2, PLACE, STATUS )            
+*  Get an NDF identifier for it. This will fail if the NDF has been
+*  deleted (e.g. if it was a temporary NDF), so annul the error if an 
+*  error is reported.
+                           CALL NDF_OPEN( DAT__ROOT, RDNDF, 'READ', 
+     :                                    'OLD', INDF2, PLACE, STATUS )
+                           IF( STATUS .NE. SAI__OK ) THEN
+                              CALL ERR_ANNUL( STATUS )
 
-*  Modify the provenance information in INDF1 to include INDF2 as a parent of 
-*  INDF1. This also transfers all the ancestors of INDF2 to INDF1.
-                        CALL NDG_PTPRV( INDF1, INDF2, ' ', .FALSE., 
-     :                                  STATUS )
+*  Otherwise, modify the provenance information in INDF1 to include 
+*  INDF2 as a parent of INDF1. This also transfers all the ancestors 
+*  of INDF2 to INDF1.
+                           ELSE
+                              CALL NDG_PTPRV( INDF1, INDF2, ' ', 
+     :                                        .FALSE., STATUS )
 
 *  Set the flag that indicates if any INPUT NDF had a provenance extension.
-                        CALL NDF_XSTAT( INDF2, 'PROVENANCE', THERE, 
-     :                                  STATUS )
-                        IF( THERE ) INPRV = .TRUE.
+                              CALL NDF_XSTAT( INDF2, 'PROVENANCE', 
+     :                                        THERE, STATUS )
+                              IF( THERE ) INPRV = .TRUE.
 
 *  Annul the NDF identifiers.
-                        CALL NDF_ANNUL( INDF2, STATUS )               
-                     END IF
-                  END DO
+                              CALL NDF_ANNUL( INDF2, STATUS )               
+                           END IF
+                        END IF
+                     END DO
 
 *  If none of the input NDFs had a provenance extension, delete the
 *  provenance extension from the output NDF unless AUTOPROV indicates that
 *  default provenance information should be stored in the output NDF.
-                  IF( .NOT. INPRV .AND. AUTOPV .EQ. ' ' ) THEN
-                     CALL NDF_XDEL( INDF1, 'PROVENANCE', STATUS )
-                  END IF
+                     IF( .NOT. INPRV .AND. AUTOPV .EQ. ' ' ) THEN
+                        CALL NDF_XDEL( INDF1, 'PROVENANCE', STATUS )
+                     END IF
 
-               END IF
+                  END IF
    
-               CALL NDF_ANNUL( INDF1, STATUS )               
+                  IF( INDF1 .NE. NDF__NOID ) CALL NDF_ANNUL( INDF1,
+     :                                                       STATUS )
+               END IF
             END DO
 
 *  Delete the GRP groups.
