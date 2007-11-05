@@ -76,8 +76,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     30-NOV-2007 (DSB):
+*     30-OCT-2007 (DSB):
 *        Original version.
+*     5-NOV-2007 (DSB):
+*        Omit duplicates from the lists of parents.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -118,13 +120,18 @@
       CHARACTER XLOC*(DAT__SZLOC)! Locator for PROVENANCE extension
       INTEGER ASIZE              ! Size of ANCESTORS array
       INTEGER I                  ! Loop count
+      INTEGER II                 ! Index of next element to read
       INTEGER IGRP               ! Group holding ordered identifiers
       INTEGER INDEX              ! Index of text identifier within IGRP
       INTEGER IPRNT              ! Index of current parent
+      INTEGER J                  ! index of next element to write
       INTEGER KEYLEN             ! Used length of KEY
+      INTEGER NCHECK             ! Number of elemtns to check
       INTEGER NNDF               ! No. of entries in supplied KeyMap
       INTEGER NPRNT              ! No. of parents for an NDF
       INTEGER PIND( MXPRNT )     ! Indices for parents of an NDF
+      INTEGER TEMP               ! Temp storage for swapping
+      LOGICAL SORTED             ! Have values been sorted yet?
       LOGICAL THERE              ! Does object exist?
 *.
 
@@ -220,6 +227,34 @@
             IF( KEY .NE. ' ' ) THEN
                CALL DAT_NEW1I( CLOC, 'PARENTS', NPRNT, STATUS )
             END IF
+
+*  Remove any dupplicates from the list of parents. First sort them into
+*  increasing order (bubble sort).
+            NCHECK = NPRNT
+            SORTED = .FALSE.
+            DO WHILE( .NOT. SORTED )
+               SORTED = .TRUE.
+               DO II =  1, NCHECK - 1
+                  IF( PIND( II ) .GT. PIND( II + 1 ) ) THEN
+                     SORTED = .FALSE.
+                     TEMP = PIND( II )
+                     PIND( II ) = PIND( II + 1 )
+                     PIND( II + 1 ) = TEMP
+                  END IF
+               END DO
+               NCHECK = NCHECK - 1
+            END DO            
+
+*  Remove duplicates. 
+            J = 2
+            DO II = 2, NPRNT
+               IF( PIND( J - 1 ) .NE. PIND( II ) ) THEN
+                  PIND( J ) = PIND( II ) 
+                  J = J + 1
+               END IF
+            END DO
+
+            NPRNT = J - 1
 
 *  Store the parent indices in this new array.
             CALL CMP_PUT1I( CLOC, 'PARENTS', NPRNT, PIND, STATUS )

@@ -25,8 +25,14 @@
 *     in update mode or new NDFs) during the block.
 *
 *     When the block ends, the provenance information within each 
-*     NDF in the second list is modified to include all the NDFs in the
-*     first list as parents.
+*     NDF in the second may be modified to include all the NDFs in the
+*     first list as parents. Whether or not this occurs is controlled by
+*     the AUTOPROV environment variable. If AUTOPROV is set to '1' then
+*     the input NDFs are added to the provenance information in the
+*     output NDF. If AUTOPROV is set to anything other than '1' then the
+*     output provenance is not updated. If AUTOPROV is not set at all, 
+*     then the output provenance will be updated only if one or more of 
+*     the input NDFs contains a PROVENANCE extension.
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -59,6 +65,9 @@
 *  History:
 *     31-OCT-2007 (DSB):
 *        Original version.
+*     5-NOV-2007 (DSB):
+*        Allow propagation of provenance to be controlled by the AUTOPROV 
+*        environment variable.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -73,6 +82,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'DAT_PAR'          ! DAT constants
+      INCLUDE 'PSX_ERR'          ! PSX error constants
 
 *  Global Variables:
       INTEGER RDGRP              ! Group holding input NDFs
@@ -86,6 +96,7 @@
       EXTERNAL NDG1_HNDLR
 
 *  Local Variables:
+      CHARACTER AUTOPV*10
       CHARACTER RDNDF*(GRP__SZNAM)
       CHARACTER WRNDF*(GRP__SZNAM)
       INTEGER INDF1
@@ -97,6 +108,7 @@
       INTEGER PLACE
       INTEGER WRGRP2
       INTEGER RDGRP2
+      LOGICAL INPRV
       LOGICAL THERE
 *.
 
@@ -122,57 +134,88 @@
       CALL ERR_END( STATUS )
 
 *  If no error has occurred, update the provenance information in each
-*  NDF writen during the provenance block. 
+*  NDF writen during the provenance block if required. 
       IF ( STATUS .EQ. SAI__OK ) THEN
+
+*  See if the environment variable AUTOPROV is defined. If so, get its
+*  value.
+         CALL PSX_GETENV( 'AUTOPROV', AUTOPV, STATUS )
+
+*  If the environment variable was not defined, annul the error, and 
+*  indicate that it is not defined.
+         IF( STATUS .EQ. PSX__NOENV ) THEN
+            CALL ERR_ANNUL( STATUS )
+            AUTOPV = ' '
+         END IF
+
+*  We only propagate provenance if AUTOPROV is set to '1', or if AUTOPROV 
+*  is unset and at least one input NDF had a provenance extension.
+         IF( AUTOPV .EQ. '1' .OR. AUTOPV .EQ. ' ' ) THEN
 
 *  Purge duplicate entries from the two groups. These can be caused if
 *  the same NDF is opened several times.
-         CALL GRP_PURGE( WRGRP, WRGRP2, STATUS )
-         CALL GRP_PURGE( RDGRP, RDGRP2, STATUS )
+            CALL GRP_PURGE( WRGRP, WRGRP2, STATUS )
+            CALL GRP_PURGE( RDGRP, RDGRP2, STATUS )
 
 *  Loop round each output NDF
-         CALL GRP_GRPSZ( WRGRP2, NW, STATUS )
-         DO IW = 1, NW
-            CALL GRP_GET( WRGRP2, IW, 1, WRNDF, STATUS )
+            CALL GRP_GRPSZ( WRGRP2, NW, STATUS )
+            DO IW = 1, NW
+               CALL GRP_GET( WRGRP2, IW, 1, WRNDF, STATUS )
 
 *  Get an NDF identifier for it.
-            CALL NDF_OPEN( DAT__ROOT, WRNDF, 'UPDATE', 'OLD', INDF1, 
-     :                     PLACE, STATUS )            
+               CALL NDF_OPEN( DAT__ROOT, WRNDF, 'UPDATE', 'OLD', INDF1, 
+     :                        PLACE, STATUS )            
 
 *  If this output NDF has a PROVENANCE extenion, leave it as it is.
-            CALL NDF_XSTAT( INDF1, 'PROVENANCE', THERE, STATUS )
-            IF( .NOT. THERE ) THEN
+               CALL NDF_XSTAT( INDF1, 'PROVENANCE', THERE, STATUS )
+               IF( .NOT. THERE ) THEN
 
-*  Otherwise, loop round each input NDF
-               CALL GRP_GRPSZ( RDGRP2, NR, STATUS )
-               DO IR = 1, NR
-                  CALL GRP_GET( RDGRP2, IR, 1, RDNDF, STATUS )
+*  Otherwise, loop round each input NDF, maintaining a flag that
+*  indicates if any input NDF had a PROVENANCE extension.
+                  INPRV = .FALSE.
+                  CALL GRP_GRPSZ( RDGRP2, NR, STATUS )
+                  DO IR = 1, NR
+                     CALL GRP_GET( RDGRP2, IR, 1, RDNDF, STATUS )
 
 *  Existing NDFs that were opened for UPDATE will be in both groups. Check
 *  to make sure we are not establishing an NDF as its own parent.
-                  IF( WRNDF .NE. RDNDF ) THEN 
+                     IF( WRNDF .NE. RDNDF ) THEN 
 
 *  Get an NDF identifier for it.
-                     CALL NDF_OPEN( DAT__ROOT, RDNDF, 'READ', 'OLD', 
-     :                              INDF2, PLACE, STATUS )            
+                        CALL NDF_OPEN( DAT__ROOT, RDNDF, 'READ', 'OLD', 
+     :                                 INDF2, PLACE, STATUS )            
 
 *  Modify the provenance information in INDF1 to include INDF2 as a parent of 
 *  INDF1. This also transfers all the ancestors of INDF2 to INDF1.
-                     CALL NDG_PTPRV( INDF1, INDF2, ' ', .FALSE., 
-     :                               STATUS )
+                        CALL NDG_PTPRV( INDF1, INDF2, ' ', .FALSE., 
+     :                                  STATUS )
+
+*  Set the flag that indicates if any INPUT NDF had a provenance extension.
+                        CALL NDF_XSTAT( INDF2, 'PROVENANCE', THERE, 
+     :                                  STATUS )
+                        IF( THERE ) INPRV = .TRUE.
 
 *  Annul the NDF identifiers.
-                     CALL NDF_ANNUL( INDF2, STATUS )               
-                  END IF
-               END DO
-            END IF
+                        CALL NDF_ANNUL( INDF2, STATUS )               
+                     END IF
+                  END DO
 
-            CALL NDF_ANNUL( INDF1, STATUS )               
-         END DO
+*  If none of the input NDFs had a provenance extension, delete the
+*  provenance extension from the output NDF unless AUTOPROV indicates that
+*  default provenance information should be stored in the output NDF.
+                  IF( .NOT. INPRV .AND. AUTOPV .EQ. ' ' ) THEN
+                     CALL NDF_XDEL( INDF1, 'PROVENANCE', STATUS )
+                  END IF
+
+               END IF
+   
+               CALL NDF_ANNUL( INDF1, STATUS )               
+            END DO
 
 *  Delete the GRP groups.
-         CALL GRP_DELET( RDGRP2, STATUS )
-         CALL GRP_DELET( WRGRP2, STATUS )
+            CALL GRP_DELET( RDGRP2, STATUS )
+            CALL GRP_DELET( WRGRP2, STATUS )
+         END IF
 
       END IF
 
