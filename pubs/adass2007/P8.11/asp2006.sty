@@ -1,0 +1,499 @@
+%%%
+%%%This style file is a revised version of newpasp.sty and contains
+%%%new features added by Terry Mahoney. 
+%%%
+%%%If you have any queries concerning this style file, please contact 
+%%%Terry Mahoney at tjm@ll.iac.es
+%%%
+%%%EDITORS MUST INPUT THE FOLLOWING DATA FOR THE SLUG, HALFTITLE PAGE, 
+%%%HALFTITLE VERSO PAGE, TITLE PAGE, AND COPYRIGHT PAGE:
+%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLUG %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\@jourvol{XXX}
+\def\cpr@year{2008}
+\def\vol@title{Astronomical Data Analysis Software and Systems XVII
+%%% THIS MODIFICATION ADDS THE PAPER IDENTIFICATION
+       \makebox[0.33\textwidth][r]{{\bf\thepaperID}}
+}
+\def\vol@author{J.~Lewis, R.~Argyle, P.~Bunclarck, D.~Evans, and E.~Gonzales-Solares, eds.}
+%\def\vol@author{J.~Lewis, R.~Argyle, P.~Bunclarck, D.~Evans, E.~Gonzales-Solares, S.~Hodgkin, M.~Irwin, E.~Jenkins and M.~Riello, eds.}
+%\def\vol@author{J.~Lewis et al., eds.}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% HALFTITLE PAGE %%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\halftitle}[1]{ASTRONOMICAL DATA ANALYSIS SOFTWARE AND SYSTEMS XVII} % In ALL CAPS
+\newcommand{\blurb}[1]{Description of the cover illustration goes here. \\\mbox{}\\
+} % In Mixed Case (Initial Caps)
+
+%%%Suggested acknowledgement wording might include the following, depending
+%%%upon the circumstance:
+%%%\begin{itemize}
+%%%\item Image/drawing/photo courtesy of $<$individual or organization who created the image$>$
+%%%\item Referenced in this volume, $<$author name$>$, p. $<$xxx$>$
+%%%\item By the kind permission of $<$publisher, volume number, author and page number$>$
+%%%\item Copyright held by $<$name and place$>$
+%%%\end{itemize}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TITLE PAGE %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%% (COMMENT OUT THE UNNEEDED COMMANDS) %%%%%%%%%%%%%%%%
+\newcommand{\maintitle}[1]{ASTRONOMICAL DATA ANALYSIS SOFTWARE\\ AND SYSTEMS XVII} % In ALL CAPS
+\newcommand{\venue}[1]{The Westin La Paloma Resort \& Spa, Tucson, AZ, USA} % Spell out fully with the country also listed.
+\newcommand{\when}[1]{15--18 October 2006} % In 7--11 May 2001 format with no commas
+\newcommand{\firsteditor}[1]{Richard A.\ Shaw}
+\newcommand{\firstaffil}[1]{National Optical Astronomy Observatory, Tucson, AZ, USA}
+\newcommand{\secondeditor}[1]{Frank Hill}
+\newcommand{\secondaffil}[1]{National Solar Observatory, Tucson, AZ, USA}
+\newcommand{\thirdeditor}[1]{David J.\ Bell}
+\newcommand{\thirdaffil}[1]{National Optical Astronomy Observatory, Tucson, AZ, USA}
+%\newcommand{\fourtheditor}[1]{**Fourth Editor's Name**}
+%\newcommand{\fourthaffil}[1]{**Fourth Editor's Affiliation**}
+%\newcommand{\fiftheditor}[1]{**Fifth Editor's Name**}
+%\newcommand{\fifthaffil}[1]{**Fifth Editor's Affiliation**}
+%\newcommand{\sixtheditor}[1]{**Sixth Editor's Name**}
+%\newcommand{\sixthaffil}[1]{**Sixth Editor's Affiliation**}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% COPYRIGHT PAGE %%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\@LCCN{**LCCN number**}  % Not used
+\def\@ISSN{**ISSN number**}
+\def\@ISBN{**ISBN number**}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%
+%%%%%%
+%%%%%%	IMPORTANT NOTE! IMPORTANT NOTE! IMPORTANT NOTE!
+%%%%%%
+%%%%%%	WHEN YOU HAVE SUPPLIED THE ABOVE INFORMATION, MAKE NO FURTHER 
+%%%%%%  ALTERATIONS TO THIS FILE!!!
+%%%%%%
+
+%Start by defining the organization (ASP), genre (conference proceedings),
+%version number (version 1.0) and date of version (1 January 2004) - all of
+%which will appear in the .log file:
+\def\revtex@ver{1.0}		
+\def\revtex@date{1 January 2004}	
+\def\revtex@org{ASP}		
+\def\revtex@jnl{}		
+\def\revtex@genre{conference proceedings}	
+%%%The following command types all the above information into the .log file:
+\typeout{\revtex@org\space
+\ifx\revtex@jnl\@empty\else\revtex@jnl\space\fi
+\revtex@genre\space substyle, version \revtex@ver\space <\revtex@date>.}
+%
+\def\revtex@pageid{\xdef\@thefnmark{\null}
+\@footnotetext{This \revtex@genre\space was prepared with the
+\revtex@org\space \revtex@jnl\space Rev\TeX\ macros v\revtex@ver.}}
+%The following routine issues a warning for documentclass font sizes smaller
+%than 11 pt ("\@ptsize takes values 0, 1 or 2 (representing 10, 11 and 12 pt):
+\ifnum\@ptsize<1
+\typeout{Warning: Undersize manuscript font (1\@ptsize\space pts).
+	Use 11pt documentclass option.}
+\fi
+%(The value of 1\@ptsize might need to be 0 for some IAU publications. Check
+%with the IAU.)
+%
+% This routine defines where the slug and page number go on the
+%first page of any article, regardless of whether page is even or odd:
+\def\ps@paspcstitle{\let\@mkboth\@gobbletwo
+\def\@oddhead{\null{\footnotesize\it\@slug}\hfil}
+\def\@oddfoot{\rm\hfil\thepage\hfil}
+\let\@evenhead\@oddhead\let\@evenfoot\@oddfoot
+}
+% Now set odd page head to contain running title & page number:
+\def\ps@myheadings{\let\@mkboth\@gobbletwo
+\def\@oddhead{\hbox{}\hfil\sl\rightmark\hskip 1in\rm\thepage}%
+%The odd foot is empty:
+\def\@oddfoot{}%
+%%. . . and the even page head and foot to contain the author names & page no.:
+\def\@evenhead{\rm\thepage\hskip 1in\sl\leftmark\hfil\hbox{}}%
+% The even foot is also empty:
+\def\@evenfoot{}
+%
+\def\sectionmark##1{}
+\def\subsectionmark##1{}}
+\def\@leftmark#1#2{\sec@upcase{#1}}
+\def\@rightmark#1#2{\sec@upcase{#2}}
+%Define page and text layout:
+\textwidth=5.25in
+\textheight=8.3in
+\headheight=18pt
+\headsep=18pt
+\topmargin=0in
+\footskip=.25in
+\oddsidemargin=0.49in
+\evensidemargin=0.49in
+\parindent=2em
+\parskip=.1ex
+\def\@singleleading{0.9}
+\def\@doubleleading{1.6}
+\def\baselinestretch{\@singleleading}
+\def\tightenlines{\def\baselinestretch{\@singleleading}}
+\def\loosenlines{\def\baselinestretch{\@doubleleading}}
+\clubpenalty\@M
+\widowpenalty\@M
+% Input for slug:
+\def\@journalname{ASP Conference Series}
+\def\cpr@holder{Astronomical Society of the Pacific}
+%\def\@jourvol{**VOLUME**}
+%\def\cpr@year{**YEAR OF PUBLICATION**}
+%\def\vol@title{**TITLE**}
+%\def\vol@author{**NAMES OF EDITORS**}
+%\def\@LCCN{**LCCN number**}
+%\def\@ISBN{**ISBN**}
+\let\journalid=\@gobbletwo
+\let\articleid=\@gobbletwo
+\let\received=\@gobble
+\let\accepted=\@gobble
+%Order of information in slug:
+\def\@slug{{\tabcolsep\z@\begin{tabular}[t]{l}\vol@title\\
+\@journalname, Vol.\ \@jourvol, \cpr@year\\
+\vol@author
+\end{tabular}}
+}
+%%%Define the volume specifications for the 
+%%cover, halftitle verso and title page:
+\def\volume{\@jourvol}
+\def\LCCN{\@LCCN}
+\def\ISBN{\@ISBN}
+\def\ISSN{\@ISSN}
+
+%Title, author names & affiliations to be indented by 0.45 inches:
+\def\paspconf@frontindent{.45in}
+%Title format, font, etc.:
+\def\title#1{\vspace*{1.0\baselineskip}
+\@tempdima\textwidth \advance\@tempdima by-\paspconf@frontindent
+\hfill
+\parbox{\@tempdima}
+	{\pretolerance=10000\raggedright\large\bf\sec@upcase{#1}}\par
+\vspace*{1\baselineskip}\thispagestyle{title}}
+%Author format, font, etc.:
+\def\author#1{\vspace*{1\baselineskip}
+\@tempdima\textwidth \advance\@tempdima by-\paspconf@frontindent
+\hfill
+\parbox{\@tempdima}
+{\pretolerance=10000\raggedright{#1}}\par}
+\def\affil#1{\vspace*{.5\baselineskip}
+\@tempdima\textwidth \advance\@tempdima by-\paspconf@frontindent
+\hfill
+\parbox{\@tempdima}
+{\pretolerance=10000\raggedright{\it #1}}\par}
+%Affiliation format, font, etc.:
+\def\altaffilmark#1{$^{#1}$}
+\def\altaffiltext#1#2{\footnotetext[#1]{#2}}
+%Abstract format
+\def\abstract{\vspace*{1.3\baselineskip}\bgroup\leftskip\paspconf@frontindent
+\noindent{\bf\sec@upcase{\small Abstract.}}\hskip 1em\small}
+\def\endabstract{\par\egroup\vspace*{1.4\baselineskip}}
+% Distance of first footnote from bottom of text.
+\skip\footins 4ex plus 1ex minus .5ex
+%Separation between footnotes:
+\footnotesep 3ex
+%Format the footnotes:
+\long\def\@makefntext#1{\noindent\hbox to\z@{\hss$^{\@thefnmark}$}#1}
+
+\def\tablenotemark#1{\rlap{$^{#1}$}}
+\def\tablenotetext#1#2{
+\@temptokena={\vspace{.5ex}{\noindent\llap{$^{#1}$}#2}\par}
+\@temptokenb=\expandafter{\tblnote@list}
+\xdef\tblnote@list{\the\@temptokenb\the\@temptokena}}
+\def\spewtablenotes{
+\ifx\tblnote@list\@empty
+\else
+\let\@temptokena=\tblnote@list
+\gdef\tblnote@list{\@empty}
+\vspace{4.5ex}
+\footnoterule
+\vspace{.5ex}
+{\footnotesize\@temptokena}
+\fi}
+\newtoks\@temptokenb
+\def\tblnote@list{}
+\def\endtable{\spewtablenotes\end@float}
+\@namedef{endtable*}{\spewtablenotes\end@dblfloat}
+\let\tableline=\hline
+\def\thefigure{\@arabic\c@figure}
+\def\fnum@figure{\small Figure \thefigure.}
+\def\thetable{\@arabic\c@table}
+\def\fnum@table{\small Table \thetable.}
+\long\def\@makecaption#1#2{
+\vskip 10pt
+\setbox\@tempboxa\hbox{#1\hskip 1.5em #2}
+\let\@tempdima=\hsize \advance\@tempdima by -2em
+\ifdim \wd\@tempboxa >\@tempdima
+	{\leftskip 2em
+	#1\hskip 1.5em #2\par}
+\else
+	\hbox to\hsize{\hskip 2em\box\@tempboxa\hfil}
+\fi}
+\def\fps@figure{tbp}
+\def\fps@table{htbp}
+\let\keywords=\@gobble
+\let\subjectheadings=\@gobble
+\setcounter{secnumdepth}{2}
+\def\upper{\def\sec@upcase##1{\uppercase{##1}}}
+\def\sec@upcase#1{\relax#1}
+\def\section{\@startsection {section}{1}{\z@}{-4.2ex plus -1ex minus
+-.2ex}{2.2ex plus .2ex}{\normalsize\bf}}
+\def\subsection{\@startsection{subsection}{2}{\z@}{-2.2ex plus -1ex minus
+-.2ex}{1.1ex plus .2ex}{\normalsize\bf}}
+
+\def\subsubsection{\@startsection{subsubsection}{3}{\z@}{-2.2ex plus
+-1ex minus -.2ex}{-1.2em}{\normalsize\it}}
+\def\thesection{\@arabic\c@section.}
+\def\thesubsection{\thesection\@arabic\c@subsection.}
+\def\thesubsubsection{\thesubsection\@arabic\c@subsubsection.}
+\def\@sect#1#2#3#4#5#6[#7]#8{\ifnum #2>\c@secnumdepth
+\def\@svsec{}\else
+\refstepcounter{#1}\edef\@svsec{\csname the#1\endcsname\hskip 1em }\fi
+\@tempskipa #5\relax
+\ifdim \@tempskipa>\z@
+\begingroup #6\relax
+\@hangfrom{\hskip #3\relax\@svsec}{\interlinepenalty \@M \sec@upcase{#8}\par}%
+\endgroup
+\csname #1mark\endcsname{#7}\addcontentsline
+{toc}{#1}{\ifnum #2>\c@secnumdepth \else
+\protect\numberline{\csname the#1\endcsname}\fi
+#7}\else
+\def\@svsechd{#6\hskip #3\@svsec #8\csname #1mark\endcsname
+{#7}\addcontentsline
+{toc}{#1}{\ifnum #2>\c@secnumdepth \else
+\protect\numberline{\csname the#1\endcsname}\fi
+#7}}\fi
+\@xsect{#5}}
+\def\@ssect#1#2#3#4#5{\@tempskipa #3\relax
+\ifdim \@tempskipa>\z@
+\begingroup #4\@hangfrom{\hskip #1}{\interlinepenalty \@M \sec@upcase{#5}\par}\endgroup
+\else \def\@svsechd{#4\hskip #1\relax #5}\fi
+\@xsect{#3}}
+\def\acknowledgments{\@startsection{paragraph}{4}{1em}
+{1ex plus .5ex minus .5ex}{-1em}{\bf}{\sec@upcase{Acknowledgments.}}}
+\usepackage{natbib}
+\bibpunct[, ]{(}{)}{;}{u}{}{,}
+
+\let\acknowledgements=\acknowledgments			
+\def\qanda@heading{Discussion}
+\newif\if@firstquestion \@firstquestiontrue
+\newenvironment{question}[1]{\if@firstquestion
+\section*{\qanda@heading}\global\@firstquestionfalse\fi
+\par\vskip 1ex
+\noindent{\it#1\/}:}{\par}
+\newenvironment{answer}[1]{\par\vskip 1ex
+\noindent{\it#1\/}:}{\par}
+\def\last{\newif\if@firstquestion \@firstquestiontrue}
+
+\def\mathwithsecnums{
+\@newctr{equation}[section]
+\def\theequation{\hbox{\normalsize\arabic{section}-\arabic{equation}}}}
+\def\references{\small\section*{References}
+\small\bgroup\parindent=0pt\parskip=.5ex
+\def\refpar{\par\hangindent=3em\hangafter=1}}
+\def\endreferences{\refpar\egroup}
+\def\thebibliography{\small\section*{\small References}
+\list{\null}{\leftmargin 3em\labelwidth 0pt\labelsep 0pt\itemindent -3em
+\itemsep 0pt \parsep 0pt\usecounter{enumi}}
+\def\refpar{\relax}
+\def\newblock{\hskip .11em plus .33em minus .07em}
+\sloppy\clubpenalty4000\widowpenalty4000
+\sfcode`\.=1000\relax}
+\def\endthebibliography{\endlist}
+\def\@biblabel#1{\relax}
+\def\@cite#1#2{#1\if@tempswa , #2\fi}
+\def\reference{\relax\refpar}
+\def\@citex[#1]#2{\if@filesw\immediate\write\@auxout{\string\citation{#2}}\fi
+\def\@citea{}\@cite{\@for\@citeb:=#2\do
+{\@citea\def\@citea{,\penalty\@m\ }\@ifundefined
+{b@\@citeb}{\@warning
+{Citation `\@citeb' on page \thepage \space undefined}}%
+{\csname b@\@citeb\endcsname}}}{#1}}
+\let\jnl@style=\rm
+\def\ref@jnl#1{{\jnl@style#1\/}}
+\def\aj{\ref@jnl{AJ}}			
+\def\araa{\ref@jnl{ARA\&A}}		
+\def\apj{\ref@jnl{ApJ}}			
+\def\apjl{\ref@jnl{ApJ}}		
+\def\apjs{\ref@jnl{ApJS}}		
+\def\ao{\ref@jnl{Appl.Optics}}		
+\def\apss{\ref@jnl{Ap\&SS}}		
+\def\aap{\ref@jnl{A\&A}}		
+\def\aapr{\ref@jnl{A\&A~Rev.}}		
+\def\aaps{\ref@jnl{A\&AS}}		
+\def\azh{\ref@jnl{AZh}}			
+\def\baas{\ref@jnl{BAAS}}		
+\def\ion#1#2{{\rm #1}~{\sc #2}}
+\def\jrasc{\ref@jnl{JRASC}}		
+\def\memras{\ref@jnl{MmRAS}}		
+\def\mnras{\ref@jnl{MNRAS}}
+\def\nat{\ref@jnl{Nat}}		
+\def\pra{\ref@jnl{Phys.Rev.A}}		
+\def\prb{\ref@jnl{Phys.Rev.B}}		
+\def\prc{\ref@jnl{Phys.Rev.C}}		
+\def\prd{\ref@jnl{Phys.Rev.D}}		
+\def\prl{\ref@jnl{Phys.Rev.Lett}}	
+\def\pasp{\ref@jnl{PASP}}		
+\def\pasj{\ref@jnl{PASJ}}		
+\def\qjras{\ref@jnl{QJRAS}}
+\def\science{\ref@jnl{Sci}}		
+\def\skytel{\ref@jnl{S\&T}}		
+\def\solphys{\ref@jnl{Solar~Phys.}}	
+\def\sovast{\ref@jnl{Soviet~Ast.}}	
+\def\ssr{\ref@jnl{Space~Sci.Rev.}}	
+\def\zap{\ref@jnl{ZAp}}			
+\let\astap=\aap
+\let\apjlett=\apjl
+\let\apjsupp=\apjs
+\def\deg{\hbox{$^\circ$}}
+\def\sun{\hbox{$\odot$}}
+\def\earth{\hbox{$\oplus$}}
+\def\la{\mathrel{\hbox{\rlap{\hbox{\lower4pt\hbox{$\sim$}}}\hbox{$<$}}}}
+\def\ga{\mathrel{\hbox{\rlap{\hbox{\lower4pt\hbox{$\sim$}}}\hbox{$>$}}}}
+\def\sq{\hbox{\rlap{$\sqcap$}$\sqcup$}}
+\def\arcmin{\hbox{$^\prime$}}
+\def\arcsec{\hbox{$^{\prime\prime}$}}
+\def\fd{\hbox{$.\!\!^{\rm d}$}}
+\def\fh{\hbox{$.\!\!^{\rm h}$}}
+\def\fm{\hbox{$.\!\!^{\rm m}$}}
+\def\fs{\hbox{$.\!\!^{\rm s}$}}
+\def\fdg{\hbox{$.\!\!^\circ$}}
+\def\farcm{\hbox{$.\mkern-4mu^\prime$}}
+\def\farcs{\hbox{$.\!\!^{\prime\prime}$}}
+\def\fp{\hbox{$.\!\!^{\scriptscriptstyle\rm p}$}}
+\def\micron{\hbox{$\mu$m}}
+\def\onehalf{\hbox{$\,^1\!/_2$}}	
+\def\onethird{\hbox{$\,^1\!/_3$}}
+\def\twothirds{\hbox{$\,^2\!/_3$}}
+\def\onequarter{\hbox{$\,^1\!/_4$}}
+\def\threequarters{\hbox{$\,^3\!/_4$}}
+\def\ubv{\hbox{$U\!BV$}}		
+\def\ubvr{\hbox{$U\!BV\!R$}}		
+\def\ubvri{\hbox{$U\!BV\!RI$}}		
+\def\ubvrij{\hbox{$U\!BV\!RI\!J$}}		
+\def\ubvrijh{\hbox{$U\!BV\!RI\!J\!H$}}		
+\def\ubvrijhk{\hbox{$U\!BV\!RI\!J\!H\!K$}}		
+\def\ub{\hbox{$U\!-\!B$}}		
+\def\bv{\hbox{$B\!-\!V$}}		
+\def\vr{\hbox{$V\!-\!R$}}		
+\def\ur{\hbox{$U\!-\!R$}}		
+\newcount\lecurrentfam
+\def\LaTeX{\lecurrentfam=\the\fam \leavevmode L\raise.42ex
+\hbox{$\fam\lecurrentfam\scriptstyle\kern-.3em A$}\kern-.15em\TeX}
+\def\plotone#1{\centering \leavevmode
+\epsfxsize=.95\textwidth \epsfbox{#1}}
+\def\plottwo#1#2{\centering \leavevmode
+\epsfxsize=.45\textwidth \epsfbox{#1} \hfil
+\epsfxsize=.45\textwidth \epsfbox{#2}}
+\def\plotfiddle#1#2#3#4#5#6#7{\centering \leavevmode
+\vbox to#2{\rule{0pt}{#2}}
+\special{psfile=#1 voffset=#7 hoffset=#6 vscale=#5 hscale=#4 angle=#3}}
+\newif\if@finalstyle \@finalstyletrue
+\if@finalstyle
+\ps@myheadings		
+\let\ps@title=\ps@paspcstitle	
+\else
+\ps@plain			
+\let\ps@title=\ps@plain	
+\fi
+\ds@twoside
+
+% Added 7/11/06 by Jared
+\renewcommand\part{%
+  \if@openright
+    \cleardoublepage
+  \else
+    \clearpage
+  \fi
+  \thispagestyle{empty}
+  \if@twocolumn
+    \onecolumn
+    \@tempswatrue
+  \else
+    \@tempswafalse
+  \fi
+  \null\vfil
+  \secdef\@asppart\@spart}
+
+\def\@asppart[#1]#2{%
+    \ifnum \c@secnumdepth >-2\relax
+      \refstepcounter{part}%
+      \addtocontents{toc}{\protect\partline{#2}}%
+    \else
+      \addtocontents{toc}{\protect\unpartline{#2}}%
+    \fi
+    \markboth{}{}%
+    {\centering
+     \interlinepenalty \@M
+     \normalfont
+     \ifnum \c@secnumdepth >-2\relax
+       \huge\bfseries \partname\nobreakspace\thepart
+       \par
+       \vskip 20\p@
+     \fi
+     \Huge \bfseries #2\par}%
+    \@endpart}
+
+\newcommand\tocentry[2]{
+	\addtocontents{toc}{\protect\tocline{#1}{#2}{\thepage}}
+}
+
+\renewcommand\tableofcontents{%
+    \pagestyle{myheadings}%
+    \title{}
+    \thispagestyle{plain}%
+    \parindent 0pt%
+    \markboth{Contents}{Contents}%
+    \Large{\bf Contents}\normalsize\bigskip\linebreak%
+    \@starttoc{toc}%
+    }
+
+\def\tocline#1#2#3{\medskip\vbox{
+	\@dottedtocline{1}{\z@}{.4in}{#1}{#3}
+	\smallskip
+	\protect\@authortocline{1}{.4in}{#2}
+	}
+}
+
+\def\@authortocline#1#2#3{\vskip \z@ plus .2pt
+  {\leftskip #2\relax \rightskip \@tocrmarg
+   \parindent\z@\relax\@afterindenttrue
+   \interlinepenalty\@M
+   \leavevmode 
+   \@tempdimb\textwidth \advance\@tempdimb by-#2
+   \advance\@tempdimb by-\@tocrmarg
+   \parbox{\@tempdimb}{\pretolerance=10000\raggedright\small\sl#3}\par}}
+\newcounter{tocpart}
+\newcounter{tocsect}[tocpart]
+\def\sectline#1{\stepcounter{tocsect}\vskip 3.5ex
+    {{\bf Section \Alph{tocsect}. #1}}\par\smallskip}
+%\def\unpartline#1{\stepcounter{tocpart}\vskip 5.5ex
+\def\unpartline#1{\vskip 5.5ex
+    {\bf #1}\par\bigskip}
+\def\sectline#1{\stepcounter{tocsect}\vskip 3.5ex
+    {{\bf Section \Alph{tocsect}. #1}}\par\smallskip}
+\def\partline#1{\stepcounter{tocpart}\vskip 5.5ex
+    {\bf Part \arabic{tocpart}. #1}\par\bigskip}
+
+
+\def\@sect#1#2#3#4#5#6[#7]#8{%
+  \ifnum #2>\c@secnumdepth
+    \let\@svsec\@empty
+  \else
+    \refstepcounter{#1}%
+    \protected@edef\@svsec{\@seccntformat{#1}\relax}%
+  \fi
+  \@tempskipa #5\relax
+  \ifdim \@tempskipa>\z@
+    \begingroup
+      #6{%
+        \@hangfrom{\hskip #3\relax\@svsec}%
+          \interlinepenalty \@M #8\@@par}%
+    \endgroup
+    \csname #1mark\endcsname{#7}%
+  \else
+    \def\@svsechd{%
+      #6{\hskip #3\relax
+      \@svsec #8}%
+      \csname #1mark\endcsname{#7}%
+    }%
+  \fi
+  \@xsect{#5}}
+
