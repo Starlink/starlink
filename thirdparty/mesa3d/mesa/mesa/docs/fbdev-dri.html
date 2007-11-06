@@ -1,0 +1,248 @@
+<html>
+
+<TITLE>Mesa fbdev/DRI Environment</TITLE>
+
+<link rel="stylesheet" type="text/css" href="mesa.css"></head>
+
+<BODY>
+
+<center><H1>Mesa fbdev/DRI Drivers</H1></center>
+
+
+<H1>1. Introduction</H1>
+
+<p>
+The fbdev/DRI environment supports hardware-accelerated 3D rendering without
+the X window system.  This is typically used for embedded applications.
+</p>
+
+<p>
+Contributors to this project include Jon Smirl, Keith Whitwell and Dave Airlie.
+</p>
+
+<p>
+Applications in the fbdev/DRI environment use
+the <a href="MiniGXL.html"> MiniGLX</a> interface to choose pixel
+formats, create rendering contexts, etc.  It's a subset of the GLX and
+Xlib interfaces allowing some degree of application portability between
+the X and X-less environments.
+</p>
+
+
+<h1>2. Compilation</h1>
+
+<p>
+You'll need the DRM and pciaccess libraries.  Check with:
+</p>
+<pre>
+   pkg-config --modversion libdrm
+   pkg-config --modversion pciaccess
+</pre>
+
+<p>
+You can get them from the git repository with:
+</p>
+<pre>
+   git clone git://anongit.freedesktop.org/git/mesa/drm
+   git clone git://anongit.freedesktop.org/git/xorg/lib/libpciaccess
+</pre>
+
+<p>
+See the README files in those projects for build/install instructions.
+</p>
+
+
+<p>
+You'll need fbdev header files.  Check with:
+</p>
+<pre>
+   ls -l /usr/include/linux/fb.h
+</pre>
+
+<p>
+Compile Mesa with the 'linux-solo' configuration:
+</p>
+<pre>
+   make linux-solo
+</pre>
+
+<p>
+When complete you should have the following:
+</p>
+<ul>
+<li>lib/libGL.so - the GL library which applications link with
+<li>lib/*_dri_so - DRI drivers
+<li>lib/miniglx.conf - sample MiniGLX config file
+<li>progs/miniglx/* - several MiniGLX sample programs
+</ul>
+
+
+
+<h1>3. Using fbdev/DRI</h1>
+
+<p>
+If an X server currently running, exit/stop it so you're working from
+the console.
+</p>
+
+
+<h2>3.1 Load Kernel Modules</h2>
+
+<p>
+You'll need to load the kernel modules specific to your graphics hardware.
+Typically, this consists of the agpgart module, an fbdev driver module
+and the DRM kernel module.
+</p>
+<p>
+As root, the kernel modules can be loaded as follows:
+</p>
+
+<p>
+If you have Intel i915/i945 hardware:
+</p>
+<pre>
+   modprobe agpgart            # the AGP GART module
+   modprobe intelfb            # the Intel fbdev driver
+   modprobe i915               # the i915/945 DRI kernel module
+</pre>
+
+<p>
+If you have ATI Radeon/R200 hardware:
+</p>
+<pre>
+   modprobe agpgart            # the AGP GART module
+   modprobe radeonfb           # the Radeon fbdev driver
+   modprobe radeon             # the Radeon DRI kernel module
+</pre>
+
+<p>
+If you have ATI Rage 128 hardware:
+</p>
+<pre>
+   modprobe agpgart            # the AGP GART module
+   modprobe aty128fb           # the Rage 128 fbdev driver
+   modprobe r128               # the Rage 128 DRI kernel module
+</pre>
+
+<p>
+If you have Matrox G200/G400 hardware:
+</p>
+<pre>
+   modprobe agpgart            # the AGP GART module
+   modprobe mgafb              # the Matrox fbdev driver
+   modprobe mga                # the Matrox DRI kernel module
+</pre>
+
+<p>
+To verify that the agpgart, fbdev and drm modules are loaded:
+</p>
+<pre>
+   ls -l /dev/agpgart /dev/fb* /dev/dri
+</pre>
+<p>
+Alternately, use lsmod to inspect the currently installed modules.
+If you have problems, look at the output of dmesg.
+</p>
+
+
+<h2>3.2 Configuration File</h2>
+
+<p>
+Copy the sample miniglx.conf to /etc/miniglx.conf and review/edit its contents.
+Alternately, the MINIGLX_CONF environment variable can be used to
+indicate the location of miniglx.conf
+</p>
+
+To determine the pciBusID value, run lspci and examine the output.
+For example:
+</p>
+<pre>
+   /sbin/lspci:
+   00:02.0 VGA compatible controller: Intel Corporation 82915G/GV/910GL Express Chipset Family Graphics Controller (rev 04)
+</pre>
+<p>
+00:02.0 indicates that pciBusID should be PCI:0:2:0
+</p>
+
+
+
+
+<h2>3.3 Running fbdev/DRI Programs</h2>
+
+<p>
+Make sure your LD_LIBRARY_PATH environment variable is set to the
+location of the libGL.so library.  You may need to append other paths
+to LD_LIBRARY_PATH if libpciaccess.so is in a non-standard location,
+for example.
+</p>
+
+<p>
+Change to the <code>Mesa/progs/miniglx/</code> directory and
+start the sample_server program in the background:
+</p>
+<pre>
+   ./sample_server &amp;
+</pre>
+
+<p>
+Then try running the <code>miniglxtest</code> program:
+</p>
+<pre>
+   ./miniglxtest
+</pre>
+<p>
+You should see a rotating quadrilateral which changes color as it rotates.
+It will exit automatically after a bit.
+</p>
+
+<p>
+If you run other tests in the miniglx/ directory, you may want to run
+them from a remote shell so that you can stop them with ctrl-C.
+</p>
+
+
+
+<h1>4.0 Troubleshooting</h1>
+
+<ol>
+<li>
+If you try to run miniglxtest and get the following:
+<br>
+<pre>
+   [miniglx] failed to probe chipset
+   connect: Connection refused
+   server connection lost
+</pre>
+It means that the sample_server process is not running.
+<br>
+<br>
+</li>
+</ol>
+
+
+<h1>5.0 Programming Information</h1>
+
+<p>
+OpenGL/Mesa is interfaced to fbdev via the <a href="MiniGLX.html">MiniGLX</a>
+interface.
+MiniGLX is a subset of Xlib and GLX API functions which provides just
+enough functionality to setup OpenGL rendering and respond to simple
+input events.
+</p>
+
+<p>
+Since MiniGLX is a subset of the usual Xlib and GLX APIs, programs written
+to the MiniGLX API can also be run on full Xlib/GLX implementations.
+This allows some degree of flexibility for software development and testing.
+</p>
+
+<p>
+However, the MiniGLX API is not binary-compatible with full Xlib/GLX.
+Some of the structures are different and some macros/functions work
+differently.
+See the <code>GL/miniglx.h</code> header file for details.
+</p>
+
+
+</body>
+</html>
