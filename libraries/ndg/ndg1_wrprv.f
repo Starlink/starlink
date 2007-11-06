@@ -115,6 +115,7 @@
 *  Local Variables:
       CHARACTER ALOC*(DAT__SZLOC)! Locator for ANCESTORS array
       CHARACTER CLOC*(DAT__SZLOC)! Locator for cell of ANCESTORS array
+      CHARACTER PLOC*(DAT__SZLOC)! Locator for PARENTS array
       CHARACTER KEY*( IDLEN )    ! Text identifier for an NDF
       CHARACTER PRNTS( MXPRNT )*( IDLEN ) ! Text id.s for parents of an NDF
       CHARACTER XLOC*(DAT__SZLOC)! Locator for PROVENANCE extension
@@ -147,10 +148,9 @@
 
 *  Create an integer array to hold the indices of the direct parents of
 *  the main NDF. Do it now so that it will appear first when hdstrace is
-*  used to display the structure of hte PROVEANCE extension.
-      IF( AST_MAPGET1C( PROV, ' ', MXPRNT, NPRNT, PRNTS, STATUS ) ) THEN
-         CALL DAT_NEW1I( XLOC, 'PARENTS', NPRNT, STATUS )
-      END IF
+*  used to display the structure of the PROVEANCE extension. Its size
+*  will be altered later if necessary.
+      CALL DAT_NEW1I( XLOC, 'PARENTS', 1, STATUS )
 
 *  Create an array of PROV structures inside the extension, one for each
 *  ancestor of the main NDF. This will be one less than the size of the 
@@ -179,7 +179,7 @@
 *  If the key is blank, it means that the KeyMap entry describes the
 *  immediate parents of the supplied NDF. This information will stored in
 *  the PARENTS array in the PROVENANCE structure, so use the extension
-*  locator in place of a locator for an indivcudla cell.
+*  locator in place of a locator for an individual cell.
          IF( KEY .EQ. ' ' ) THEN
             CALL DAT_CLONE( XLOC, CLOC, STATUS )
 
@@ -221,14 +221,7 @@
                PIND( IPRNT ) = INDEX
             END DO
 
-*  Create a 1D vector of integers in column 2 of the ANCESTORS table to
-*  hold the integer indices within th ANCESTORS table corresponding to the
-*  parent NDFs.
-            IF( KEY .NE. ' ' ) THEN
-               CALL DAT_NEW1I( CLOC, 'PARENTS', NPRNT, STATUS )
-            END IF
-
-*  Remove any dupplicates from the list of parents. First sort them into
+*  Remove any duplicates from the list of parents. First sort them into
 *  increasing order (bubble sort).
             NCHECK = NPRNT
             SORTED = .FALSE.
@@ -256,8 +249,24 @@
 
             NPRNT = J - 1
 
-*  Store the parent indices in this new array.
-            CALL CMP_PUT1I( CLOC, 'PARENTS', NPRNT, PIND, STATUS )
+*  Store the parent indices in this new array. If the key is blank, a
+*  PARENTS component will already have been created, in which case we just
+*  extend it to the correct size. Otherwise, create a new 1D vector of 
+*  integers in column 2 of the ANCESTORS table to hold the integer indices 
+*  within the ANCESTORS table corresponding to the parent NDFs.
+            IF( NPRNT .GT. 0 ) THEN
+               IF( KEY .NE. ' ' ) THEN
+                  CALL DAT_NEW1I( CLOC, 'PARENTS', NPRNT, STATUS )
+               END IF
+
+               CALL DAT_FIND( CLOC, 'PARENTS', PLOC, STATUS )
+               CALL DAT_ALTER( PLOC, 1, NPRNT, STATUS )
+               CALL DAT_PUT1I( PLOC, NPRNT, PIND, STATUS )
+               CALL DAT_ANNUL( PLOC, STATUS )
+
+            ELSE IF( KEY .EQ. ' ' ) THEN
+               CALL DAT_ERASE( CLOC, 'PARENTS', STATUS )
+            END IF
 
          END IF
 
