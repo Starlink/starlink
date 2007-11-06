@@ -201,6 +201,9 @@ void makeclumps( int *status ) {
 *        Original version.
 *     11-DEC-2006 (DSB):
 *        Added parameter DECONV.
+*     6-NOV-2007 (DSB):
+*        "int" and "size_t" have different sizes on 64 bit machines, so
+*         do not cast the address of an int to the address of a size_t.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -250,6 +253,7 @@ void makeclumps( int *status ) {
    int normal;                   /* Clump parameters normally distributed? */
    int nval;                     /* Number of values supplied */
    int ubnd[ 3 ];                /* Upper pixel bounds */
+   size_t st;                    /* A size_t that can be passed as an argument */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
@@ -414,7 +418,11 @@ void makeclumps( int *status ) {
 
 /* See how many clumps we now have (no NDF will have been created for
    this clump if it touches an edge of eh output array). */
-      if( obj ) datSize( obj, (size_t *) &nc, status );
+      if( obj ) {
+         datSize( obj, &st, status );
+         nc = (int) st;
+      }
+      
    }
 
 /* Create the output data array by summing the contents of the NDFs
