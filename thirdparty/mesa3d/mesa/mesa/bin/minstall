@@ -57,13 +57,11 @@ if [ $# -ge 2 ] ; then
 
 			FILE=`basename "$FILE"`
 			# Go to $DEST and make the link
-			PWDSAVE="$PWD"
-			cd "$DEST"        # pushd
-				$RM "$FILE"
-				$SYMLINK "$TARGET" "$FILE"
-			cd "$PWDSAVE"     # popd
+			( cd "$DEST" ;\
+                          $RM "$FILE" \;
+		          $SYMLINK "$TARGET" "$FILE" )
 
-		elif [ -f "$FILE" ] ; then
+		elif [ -r "$FILE" ] ; then
 			#echo "$FILE" is a regular file
 			$RM "$DEST/`basename $FILE`"
 			cp "$FILE" "$DEST"
