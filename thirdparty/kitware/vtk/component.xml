@@ -8,7 +8,7 @@
   <description>VTK/CMAKE</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies >
-    
+    <build>mesa</build><build>tcl</build><build>tk</build>
   </dependencies>
   <developers>
     <person>
