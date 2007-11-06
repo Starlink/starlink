@@ -16,6 +16,11 @@ AC_CONFIG_SRCDIR([VTK/CMakeLists.txt])
 dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
 
+dnl    Dependencies. Main one is Mesa which ensures we have an OpenGL
+dnl    API, but that's a stub on machines with hardware OpenGL or Mesa
+dnl    already installed. Tcl and Tk are needed for the Tcl support.
+STAR_DECLARE_DEPENDENCIES([build], [mesa tcl tk])
+
 dnl    VTK and CMake do not use any autotools, so most of this is a
 dnl    complete fudge. Configuration consists of running bootstrap in CMake
 dnl    (this also does a basic build). Make runs the local cmake and then
