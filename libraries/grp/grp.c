@@ -56,11 +56,14 @@
 *        Add grpIndex
 *     20-NOV-2006 (DSB):
 *        Add grpSetcs
-*     6-JUL-2006 (DSB):
+*     6-JUL-2007 (DSB):
 *        Use "const Grp *" pointers for group parameters that are not
 *        changed by the changed by the called function.
-*     25-OCT-2006 (DSB):
+*     25-OCT-2007 (DSB):
 *        Add grpSetsz
+*     6-NOV-2007 (TIMJ):
+*        Fix compiler error from confusion of C GRP__NOID with Fortran
+*        GRP__NOID.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -147,7 +150,7 @@ Grp *grpF2C( F77_INTEGER_TYPE IGRP, int * status ) {
    int slot;
 
    ret = NULL;
-   if( IGRP != GRP__NOID ) {
+   if( IGRP != GRP__FNOID ) {
       slot = grpSlot( IGRP, status );
       if( slot >= 0 ) {
          ret = Grp_Pointers[ slot ];
@@ -179,10 +182,10 @@ F77_INTEGER_TYPE grpC2F( const Grp *grp, int *status ){
    if( grp ){
       ret = grp->igrp;
       slot = grpSlot( ret, status );
-      if( slot < 0 || slot != grp->slot ) ret = GRP__NOID;
+      if( slot < 0 || slot != grp->slot ) ret = GRP__FNOID;
 
    } else {
-      ret = GRP__NOID;
+      ret = GRP__FNOID;
    }
 
    return ret;

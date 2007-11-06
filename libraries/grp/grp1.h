@@ -23,8 +23,12 @@
 *        Original version.
 *     7-AUG-2006 (TIMJ):
 *        GRP__NOID is a private definition.
+*     6-NOV-2007 (TIMJ):
+*        Fix compiler error from confusion of C GRP__NOID with Fortran
+*        GRP__NOID.
 
 *  Copyright:
+*     Copyright (C) 2007 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -52,8 +56,8 @@ typedef struct Grp {
    int slot;              /* The slot number associated with the GRP ID */  
 } Grp;
 
-/* Internally we need to know what GRP__NOID is defined as */
-enum { GRP__NOID = 0 };
+/* Internally we need to know what GRP__NOID is defined as from Fortran */
+enum { GRP__FNOID = 0 };
 
 /* Include grp.h to pick up the public function prototypes, etc. First 
    define grpINTERNAL to prevent the Grp typedef from being redefined.  */
