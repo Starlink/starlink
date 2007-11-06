@@ -529,8 +529,8 @@ fi
 #
 
 if test -f ${bindir}/gaia/gaia.csh; then
-   gaia () { $GAIA_DIR/gaia.csh ${1+"$@"}; }
-   gaiadisp () { $GAIA_DIR/gaiadisp.csh ${1+"$@"}; }
+   gaia () { $GAIA_DIR/gaia.sh ${1+"$@"}; }
+   gaiadisp () { $GAIA_DIR/gaiadisp.sh ${1+"$@"}; }
 else
    gaia () { ${staretcdir}/notinst gaia; }
    gaiadisp () { ${staretcdir}/notinst gaiadisp; }
