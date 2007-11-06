@@ -40,7 +40,7 @@ SET (TCLTK_POSSIBLE_LIB_PATHS
 )
 
 FIND_LIBRARY(TCL_LIBRARY
-  NAMES tcl tcl84 tcl8.4 tcl83 tcl8.3 tcl82 tcl8.2 tcl80 tcl8.0
+  NAMES tcl84 tcl8.4 tcl83 tcl8.3 tcl82 tcl8.2 tcl80 tcl8.0 tcl
   PATHS ${TCLTK_POSSIBLE_LIB_PATHS}
 )
 
@@ -60,7 +60,7 @@ FIND_LIBRARY(TCL_STUB_LIBRARY_DEBUG
 )
 
 FIND_LIBRARY(TK_LIBRARY 
-  NAMES tk tk84 tk8.4 tk83 tk8.3 tk82 tk8.2 tk80 tk8.0
+  NAMES tk84 tk8.4 tk83 tk8.3 tk82 tk8.2 tk80 tk8.0 tk
   PATHS ${TCLTK_POSSIBLE_LIB_PATHS}
 )
 
