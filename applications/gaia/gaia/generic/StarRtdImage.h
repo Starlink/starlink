@@ -119,13 +119,14 @@ class StarRtdImageOptions : public RtdImageOptions
     }
 };
 
+#if __GNUC__
 //  Define an in-line function that returns the offset of a known member in
 //  the Gaia_Options struct. Use runtime implementation to avoid POD issues
 //  with offsetof macro.
-inline int Gaia_Options_Offset( const char* member )
+static Gaia_Options gaia_options;
+static int Gaia_Options_Offset( const char* member )
 {
-    static Gaia_Options opt;
-    static Gaia_Options *ptr = &opt;
+    static Gaia_Options *ptr = &gaia_options;
     if ( member[0] == 'a' && member[1] == 's' ) {
         return (char *)&ptr->ast_tag - (char *)ptr;
     }
@@ -148,6 +149,16 @@ inline int Gaia_Options_Offset( const char* member )
 {TK_CONFIG_STRING, "-component", NULL, NULL, "data",        GAIA_OPTION("component"), 0, NULL}, \
 {TK_CONFIG_INT,    "-plot_wcs",  NULL, NULL, "1",           GAIA_OPTION("plot_wcs"),  0, NULL}, \
 {TK_CONFIG_INT,    "-ukirt_ql",  NULL, NULL, "0",           GAIA_OPTION("ukirt_ql"),  0, NULL}
+#else
+
+//  Above only known to work with GCC, let other compilers complain (Solaris CC doesn't work).
+#define GAIA_OPTION(x) Tk_Offset(Gaia_Options,x)
+#define GAIA_OPTIONS \
+{TK_CONFIG_STRING, "-ast_tag",   NULL, NULL, "ast_element", GAIA_OPTION(ast_tag),   0, NULL}, \
+{TK_CONFIG_STRING, "-component", NULL, NULL, "data",        GAIA_OPTION(component), 0, NULL}, \
+{TK_CONFIG_INT,    "-plot_wcs",  NULL, NULL, "1",           GAIA_OPTION(plot_wcs),  0, NULL}, \
+{TK_CONFIG_INT,    "-ukirt_ql",  NULL, NULL, "0",           GAIA_OPTION(ukirt_ql),  0, NULL}
+#endif
 
 class StarRtdImage : public Skycat
 {
