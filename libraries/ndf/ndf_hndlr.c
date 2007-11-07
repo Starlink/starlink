@@ -286,6 +286,9 @@ F77_SUBROUTINE(ndf1_event)( CHARACTER(EVNAME),
 *  History:
 *     31-OCT-2007 (DSB):
 *        Original version.
+*     7-NOV-2007 (DSB):
+*        Avoid modifying TEXT_length by copying the required sub-string
+*        to a secondary, dynamically allocated, text string (SHORTTEXT).
 *     {@enter_changes_here@}
 
 *  Bugs:
@@ -297,10 +300,12 @@ F77_SUBROUTINE(ndf1_event)( CHARACTER(EVNAME),
    GENPTR_CHARACTER(EVNAME)
    GENPTR_INTEGER(STATUS)
    DECLARE_CHARACTER(TEXT,EMS__SZMSG+1);
+   DECLARE_CHARACTER_DYN(SHORTTEXT);
    char *evname;
    int ihandler;
    int i;
    int expanded;
+   int tlen;
    NdfEventHandler *handler_list;
    int *old_status;
 
@@ -327,21 +332,24 @@ F77_SUBROUTINE(ndf1_event)( CHARACTER(EVNAME),
 
 /* If not already done, expand the NDF_EVENT message token. */
             if( !expanded ) {
-               emsMload( "", "^NDF_EVENT", TEXT, (int *) &TEXT_length, STATUS );
+               emsMload( "", "^NDF_EVENT", TEXT, &tlen, STATUS );
+               F77_CREATE_CHARACTER(SHORTTEXT,tlen);
+               memcpy( SHORTTEXT, TEXT, tlen );
                expanded = 1;
             }
 
 /* Invoke the handler. */
             ( *handler_list[ i ] )( CHARACTER_ARG(EVNAME),
-                                    CHARACTER_ARG(TEXT),
+                                    CHARACTER_ARG(SHORTTEXT),
                                     INTEGER_ARG(STATUS) 
                                     TRAIL_ARG(EVNAME)
-                                    TRAIL_ARG(TEXT) );
+                                    TRAIL_ARG(SHORTTEXT) );
          }
       }
-   }
 
 /* Free resources */
+      if( expanded ) F77_FREE_CHARACTER(SHORTTEXT);
+   }
    evname = astFree( evname );
 
 /* Make AST use the original status variable. */
