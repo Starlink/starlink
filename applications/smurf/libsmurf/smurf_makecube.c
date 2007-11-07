@@ -630,6 +630,8 @@
 *        Modified interface to smf_open_file.
 *     2-NOV-2007 (DSB):
 *        Added provenance information to output NDFs.
+*     7-NOV-2007 (DSB):
+*        Correct size to tile->size in call to smf_rebincube.
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -1591,7 +1593,7 @@ void smurf_makecube( int *status ) {
          
 /* Rebin the data into the output grid. */
                if( !sparse ) {
-                  smf_rebincube( data, ifile, size, pt, 
+                  smf_rebincube( data, ifile, tile->size, pt, 
                                  badmask, is2d, abskyfrm, tskymap, ospecfrm, 
                                  ospecmap, detgrp, moving, use_wgt, tile->elbnd, 
                                  tile->eubnd, spread, params, genvar, data_array, 
