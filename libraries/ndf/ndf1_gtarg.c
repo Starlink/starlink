@@ -13,6 +13,10 @@
 #include "f77.h"		 /* Fortran 77 <=> C interface macros	    */
 #include "ndf1.h"		 /* Internal NDF definitions		    */
 
+
+F77_SUBROUTINE(ndf1_farg)( INTEGER(IARG), CHARACTER(ARG) TRAIL(ARG) );
+
+
    F77_SUBROUTINE(ndf1_gtarg)( INTEGER(IARG),
                                CHARACTER(ARG),
 			       INTEGER(LARG),
@@ -89,6 +93,7 @@
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     PWD: Peter Draper (Durham)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David S Berry (JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -100,6 +105,8 @@
 *        Fix for g95 when calling G95 intrinsic.
 *     21-SEP-2006 (TIMJ):
 *        Check length before checking content.
+*     7-NOV-2007 (DSB):
+*        Add prototype for ndf1_farg to avoid compiler warnings.
 *     <{enter_further_changes_here}>
 
 *  Bugs:
