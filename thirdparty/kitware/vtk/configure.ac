@@ -32,7 +32,7 @@ dnl    make in the VTK directory.
 )
            
 STAR_SPECIAL_INSTALL_COMMAND([
-   ( cd VTK; $(MAKE) DESTDIR=$$DESTDIR INSTALL_ROOT=$$DESTDIR install );
+   ( cd VTK; $(MAKE) DESTDIR=$$DESTDIR install );
 ])
 
 AC_CONFIG_FILES([Makefile component.xml])

@@ -13,16 +13,16 @@ all:
 	  pwd=`pwd`; \
 	  TCL_LIBRARY_PATH=$(prefix)/lib; export TCL_LIBRARY_PATH; \
 	  cd VTK && \
-	  cmake -D BUILD_SHARED_LIBS=ON \
-	        -D BUILD_TESTING=OFF \
-	        -D CMAKE_INSTALL_PREFIX=$(prefix) \
-		-D CMAKE_INCLUDE_PATH=$(prefix)/include \
-		-D CMAKE_LIBRARY_PATH=$(prefix)/lib \
-	        -D VTK_USE_GUISUPPORT=ON \
-	        -D VTK_WRAP_TCL=ON \
-	        -D VTK_USE_X=ON \
-	        -D VTK_USE_CARBON=OFF \
-	        -D VTK_USE_COCOA=OFF . && \
+	  cmake -D BUILD_SHARED_LIBS:BOOL=ON \
+	        -D BUILD_TESTING:BOOL=OFF \
+	        -D CMAKE_INSTALL_PREFIX:PATH=$(prefix) \
+		-D CMAKE_INCLUDE_PATH:PATH=$(prefix)/include \
+		-D CMAKE_LIBRARY_PATH:PATH=$(prefix)/lib \
+	        -D VTK_USE_GUISUPPORT:BOOL=ON \
+	        -D VTK_WRAP_TCL:BOOL=ON \
+	        -D VTK_USE_X:BOOL=ON \
+	        -D VTK_USE_CARBON:BOOL=OFF \
+	        -D VTK_USE_COCOA:BOOL=OFF . && \
 	  $(MAKE) )
 	( cd $(prefix)/include && rm -rf vtk && $(LN_S) vtk-5.0 vtk )
 
