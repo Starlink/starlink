@@ -1422,18 +1422,15 @@ itcl::class gaia::GaiaCube {
    #  =================
 
    #  Check for the presence of GAIA3D. Only done once per-session.
-   #  The variable VTK_LIBRARY_DIR should define the directory that
-   #  contains the VTK installation (the parent of that will contain
-   #  the shareable libraries and should be on the LD_LIBRARY_PATH).
+   #  VTK is part of the standard build, so should be picked up.
    protected method check_for_gaia3d_ {} {
       if { $have_gaia3d_ == -1 } {
          set have_gaia3d_ 0
          if { [package versions Gaia3d] != "" } {
             if { [ catch {
-                          lappend ::auto_path $::env(VTK_LIBRARY_DIR)
-                          package require vtk
-                          package require Gaia3d
-                          set have_gaia3d_ 1 } msg ] } {
+               package require vtk
+               package require Gaia3d
+               set have_gaia3d_ 1 } msg ] } {
                info_dialog "Failed to load GAIA3D: $msg"
             }
          }
