@@ -51,6 +51,8 @@ f     The LutMap class does not define any new routines beyond those
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -70,6 +72,7 @@ f     The LutMap class does not define any new routines beyond those
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
+*     DSB: David S. Berry (JAC, UCLan)
 
 *  History:
 *     8-JUL-1997 (RFWS):
@@ -90,6 +93,9 @@ f     The LutMap class does not define any new routines beyond those
 *     4-OCT-2006 (DSB):
 *        - Correct "mintick" to "lutinterp" in SetAttrib.
 *        - Do not include bad values in the dumped LUT array.
+*     8-NOV-2007 (DSB):
+*        - Take account of the requested invert flag when comparing two
+*        neighbouring LutMaps for equality in MapMerge.
 *class--
 */
 
@@ -769,6 +775,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    int equal;                    /* Are LutMaps equal? */
    int i;                        /* Mapping index */
    int ilo;                      /* Index of lower LutMap */
+   int invneb;                   /* Should the neigbour be used inverted? */
+   int old_inv;                  /* Original Invert value for neigbour */
    int result;                   /* Result value to return */
    int simpler;                  /* Mapping simplified? */
 
@@ -826,6 +834,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       if( where < ( *nmap - 1 ) && 
           astIsALutMap( ( *map_list )[ where + 1 ] ) ){
          neb = (AstLutMap *) ( *map_list )[ where + 1 ];
+         invneb = ( *invert_list )[ where + 1 ];
          ilo = where;
 
 /* If not, is the lower neighbour a LutMap? If so get a pointer to it,
@@ -833,6 +842,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       } else if( where > 0 && 
                  astIsALutMap( ( *map_list )[ where - 1 ] ) ){
          neb = (AstLutMap *) ( *map_list )[ where - 1 ];
+         invneb = ( *invert_list )[ where - 1 ];
          ilo =  where - 1;
 
       } else {
@@ -844,9 +854,11 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    their Invert flags. Temporarily invert the neighbour, then compare 
    the two LutMaps for equality, then re-invert the neighbour. */
       if( neb ) {
+         old_inv = astGetInvert( neb );
+         astSetInvert( neb, invneb );
          astInvert( neb );
          equal = astEqual( map, neb );
-         astInvert( neb );
+         astSetInvert( neb, old_inv );
 
 /* If the two LutMaps are equal but opposite, annul the first of the two 
    Mappings, and replace it with a UnitMap. Also set the invert flag. */ 
