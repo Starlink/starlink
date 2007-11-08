@@ -161,7 +161,7 @@ C
          CALL GEN_MOVE(BYTES,%VAL(CNF_PVAL(WPTR)),%VAL(CNF_PVAL(OPTR)))
 
          CALL DYN_INCAD(OPTR,'FLOAT',NX,TPTR,ISNEW,STATUS)
-         IF (PISNEW) CALL CNF_UNREGP(TPTR)
+         IF (PISNEW) CALL CNF_UNREGP(OPTR)
          OPTR = TPTR
          PISNEW = ISNEW
       END DO
@@ -178,7 +178,7 @@ C
      :                    %VAL(CNF_PVAL(OVPTR)))
 
             CALL DYN_INCAD(OVPTR,'FLOAT',NX,TPTR,ISNEW,STATUS)
-            IF (PISNEW) CALL CNF_UNREGP(TPTR)
+            IF (PISNEW) CALL CNF_UNREGP(OPTR)
             OVPTR = TPTR
             PISNEW = ISNEW
          END DO
