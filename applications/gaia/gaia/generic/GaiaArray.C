@@ -1,15 +1,16 @@
 /*+
  *  Name:
- *     gaiaArray
+ *     GaiaArray
 
  *  Purpose:
  *     Utility routines for handling arrays.
 
  *  Language:
- *     C
+ *     C++
 
  *  Copyright:
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     Copyright (C) 2007 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -49,7 +50,7 @@
 #include <float.h>
 #include <math.h>
 
-#include <gaiaArray.h>
+#include <GaiaArray.h>
 #include <gaiaUtils.h>
 #include <prm_par.h>
 #include <cnf.h>
@@ -79,20 +80,30 @@ static double EPSILON = 10.0 * DBL_EPSILON;
 /* Prototypes for local functions */
 static void DataNormalise( void *inPtr, int intype, int nel,
                            int isfits, int haveblank, int inBlank,
-                           double bscale, double bzero, int cnfmalloc,
+                           double bscale, double bzero, int memtype,
                            int freescaled, void **outPtr,
                            int *outtype );
 
+static void DataNormaliseCopy( void *inPtr, int intype, int nel, int isfits,
+                               int haveblank, int inBlank, double bscale,
+                               double bzero, int memtype, int nullcheck,
+                               double nullvalue, void **outPtr, int *outtype,
+                               int *nobad );
+
 static void RawImageFromCube( ARRAYinfo *cubeinfo, int dims[], int axis,
                               int index, void **outPtr, size_t *nel,
-                              int cnfmalloc );
+                              int memtype );
 
 static void RawSubImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
                                  int index, int lbnd[2], int ubnd[2],
-                                 void **outPtr, size_t *nel, int cnfmalloc );
+                                 void **outPtr, size_t *nel, int memtype );
 
 static void GetSubImage( void *inPtr, int dims[2], int nbytes, int lbnd[2],
                          int ubnd[2], void *outPtr );
+
+
+static void AllocateMemory( int memtype, size_t nel, void **ptr );
+static void FreeMemory( int memtype, void *ptr );
 
 /**
  * Create an ARRAYinfo structure for a data array. If blank isn't set for your
@@ -101,7 +112,7 @@ static void GetSubImage( void *inPtr, int dims[2], int nbytes, int lbnd[2],
  */
 ARRAYinfo *gaiaArrayCreateInfo( void *ptr, int type, long el, int isfits,
                                 int haveblank, int blank, double bscale,
-                                double bzero, int cnfmalloc )
+                                double bzero, int memtype )
 {
     ARRAYinfo *info = (ARRAYinfo *) malloc( sizeof( ARRAYinfo ) );
     info->ptr = ptr;
@@ -112,7 +123,7 @@ ARRAYinfo *gaiaArrayCreateInfo( void *ptr, int type, long el, int isfits,
     info->blank = blank;
     info->bscale = bscale;
     info->bzero = bzero;
-    info->cnfmalloc = cnfmalloc;
+    info->memtype = memtype;
 
     return info;
 }
@@ -124,6 +135,38 @@ void gaiaArrayFreeInfo( ARRAYinfo *info )
 {
     if ( info != NULL ) {
         free( info );
+    }
+}
+
+/**
+ * Allocate memory using the required allocator.
+ */
+void AllocateMemory( int memtype, size_t nel, void **ptr )
+{
+    if ( memtype == GAIA_ARRAY_MALLOC ) {
+        *ptr = malloc( nel );
+    }
+    else if ( memtype == GAIA_ARRAY_CNFMALLOC ) {
+        *ptr = cnfMalloc( nel );
+    }
+    else if ( memtype == GAIA_ARRAY_NEW ) {
+        *ptr = (void *) new char[nel];
+    }
+}
+
+/**
+ * Free memory allocated using using AllocateMemory.
+ */
+void FreeMemory( int memtype, void *ptr )
+{
+    if ( memtype == GAIA_ARRAY_MALLOC ) {
+        free( ptr );
+    }
+    else if ( memtype == GAIA_ARRAY_CNFMALLOC ) {
+        cnfFree( ptr );
+    }
+    else if ( memtype == GAIA_ARRAY_NEW ) {
+        delete[] (char *) ptr;
     }
 }
 
@@ -255,7 +298,7 @@ char const *gaiaArrayTypeToHDS( int type )
 /**
  * Convert a local enum type into an HDS string type that represents the
  * type that would be used to return an image or spectrum (different for
- * scaled integer FITS data).
+ * scaled integer FITS and NDF byte data).
  */
 char const *gaiaArrayFullTypeToHDS( int intype, int isfits, double bscale, 
                                     double bzero )
@@ -270,7 +313,7 @@ char const *gaiaArrayFullTypeToHDS( int intype, int isfits, double bscale,
 /**
  * Convert a local enum type into a type that represents the type that would
  * be used to return an image or spectrum (different for scaled integer FITS
- * data and NDF byte data).
+ * and NDF byte data).
  */
 int gaiaArrayScaledType( int intype, int isfits, double bscale, double bzero )
 {
@@ -408,15 +451,16 @@ void gaiaArrayToDouble( ARRAYinfo *info, double badValue, double *outPtr )
  *         The index of the plane that will be extracted (along axis "axis").
  *     imageinfo
  *         a pointer to a pointer to be assigned to a new ARRAYinfo structure.
- *         The necessary memory will be allocated using malloc or cnfMalloc as
- *         determined by the final argument. Freeing it is the responsibility
- *         of the caller.
- *     cnfmalloc
- *         Whether to use cnfMalloc to allocate the image data. Otherwise
- *         malloc will be used.
+ *         The necessary memory will be allocated using malloc, cnfMalloc or
+ *         new as determined by the final argument. Freeing it is the
+ *         responsibility of the caller.
+ *     memtype
+ *         Whether to use malloc, cnfMalloc or new to allocate the image
+ *         data (one of GAIA_ARRAY_MALLOC, GAIA_ARRAY_CNFMALLOC,
+ *         GAIA_ARRAY_NEW).
  */
 void gaiaArrayImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
-                             int index, ARRAYinfo **imageinfo, int cnfmalloc )
+                             int index, ARRAYinfo **imageinfo, int memtype )
 {
     int normtype;
     int type = cubeinfo->type;
@@ -426,19 +470,19 @@ void gaiaArrayImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
 
     /* Get the raw image data */
     outPtr = NULL;
-    RawImageFromCube( cubeinfo, dims, axis, index, &outPtr, &nel, cnfmalloc );
+    RawImageFromCube( cubeinfo, dims, axis, index, &outPtr, &nel, memtype );
 
-    /* Normalise the data to remove byte-swapping and unrecognised BAD values,
-     * and convert from a scaled variant. For non-byte NDFs this is a null
-     * op. */
+    /* Normalise the data to remove byte-swapping and unrecognised
+     * BAD values, and convert from a scaled variant. For NDFs this is a
+     * null op. */
     DataNormalise( outPtr, type, nel, cubeinfo->isfits, cubeinfo->haveblank,
                    cubeinfo->blank, cubeinfo->bscale, cubeinfo->bzero,
-                   cnfmalloc, 1, &normPtr, &normtype );
+                   memtype, 1, &normPtr, &normtype );
 
     /* Create the ARRAYinfo structure, note not FITS and BSCALE and BZERO are
      * no longer used. */
     *imageinfo = gaiaArrayCreateInfo( normPtr, normtype, nel,
-                                      0, 0, 0, 1.0, 0.0, cnfmalloc );
+                                      0, 0, 0, 1.0, 0.0, memtype );
 }
 
 /*
@@ -448,7 +492,7 @@ void gaiaArrayImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
  */
 static void RawImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
                               int index, void **outPtr, size_t *nel,
-                              int cnfmalloc )
+                              int memtype )
 {
     char *ptr;
     int axis1;
@@ -472,12 +516,7 @@ static void RawImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
         length = (*nel) * gaiaArraySizeOf( type );
 
         if ( *outPtr == NULL ) {
-            if ( cnfmalloc == 1 ) {
-                *outPtr = cnfMalloc( length );
-            }
-            else {
-                *outPtr = malloc( length );
-            }
+            AllocateMemory( memtype, length, outPtr );
         }
 
         /* Get the offset into cube of first pixel (in bytes). */
@@ -508,12 +547,7 @@ static void RawImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
 
         /* Allocate the memory */
         if ( *outPtr == NULL ) {
-            if ( cnfmalloc == 1 ) {
-                *outPtr = cnfMalloc( length );
-            }
-            else {
-                *outPtr = malloc( length );
-            }
+            AllocateMemory( memtype, length, outPtr );
         }
 
         /* Get the strides for stepping around dimensions */
@@ -582,7 +616,7 @@ static void RawImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
  */
 static void RawSubImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
                                  int index, int lbnd[2], int ubnd[2],
-                                 void **outPtr, size_t *nel, int cnfmalloc )
+                                 void **outPtr, size_t *nel, int memtype )
 {
     char *iptr;
     int axis1;
@@ -608,12 +642,7 @@ static void RawSubImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
     nbytes = gaiaArraySizeOf( type );
     length = (*nel) * nbytes;
     if ( *outPtr == NULL ) {
-        if ( cnfmalloc == 1 ) {
-            *outPtr = cnfMalloc( length );
-        }
-        else {
-            *outPtr = malloc( length );
-        }
+        AllocateMemory( memtype, length, outPtr );
     }
 
     if ( axis == 2 ) {
@@ -621,7 +650,7 @@ static void RawSubImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
         /* Losing last dimension, so can treat images as contiguous. */
 
         /* Move to the start of the image plane we want. */
-        iptr = inPtr;
+        iptr = (char *) inPtr;
         offset = index * dims[0] * dims[1] * nbytes;
         iptr += offset;
 
@@ -730,7 +759,7 @@ static void GetSubImage( void *inPtr, int dims[2], int nbytes, int lbnd[2],
     offset = (size_t) ( lbnd[1] * dims[0] + lbnd[0] ) * nbytes;
 
     /* Loop over all output lines */
-    optr = outPtr;
+    optr = (char *) outPtr;
     for ( i = 0; i < subdims[1]; i++ ) {
 
         /* Get address of first element of this line, in the input. */
@@ -773,14 +802,13 @@ static void GetSubImage( void *inPtr, int dims[2], int nbytes, int lbnd[2],
  *     index2
  *         The indices of the spectrum to extract (these are along the two
  *         axes which are not "axis").
- *     cnfmalloc
- *         Whether to use cnfMalloc to allocate the image data. Otherwise
- *         malloc will be used.
+ *     memtype
+ *         Whether to use malloc, cnfMalloc or new to allocate the image data.
  *     outPtr
  *         a pointer to a pointer that will point at the extracted spectrum on
- *         exit. This memory is allocated using malloc or cnfMalloc as
- *         determined by the cnfMalloc argument. Freeing it is the
- *         responsibility of the caller, or you can call gaiaArrayFree.
+ *         exit. This memory is allocated as determined by the memtype
+ *         argument. Freeing it is the responsibility of the caller, or you
+ *         can call gaiaArrayFree.
  *     nel
  *         the number of elements extracted
  *     outtype
@@ -793,7 +821,7 @@ static void GetSubImage( void *inPtr, int dims[2], int nbytes, int lbnd[2],
  */
 void gaiaArraySpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
                                 int arange[2], int index1, int index2,
-                                int cnfmalloc, void **outPtr, int *nel,
+                                int memtype, void **outPtr, int *nel,
                                 int *outtype )
 {
     int lower;
@@ -818,12 +846,7 @@ void gaiaArraySpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
         *nel = upper - lower;
     }
     length = (*nel) * gaiaArraySizeOf( intype );
-    if ( cnfmalloc == 1 ) {
-        *outPtr = cnfMalloc( length );
-    }
-    else {
-        *outPtr = malloc( length );
-    }
+    AllocateMemory( memtype, length, outPtr );
 
     /* Check bounds. */
     if ( index1 < 0 || index2 < 0 ) {
@@ -939,10 +962,10 @@ void gaiaArraySpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
     }
 #undef EXTRACT_AND_COPY
 
-    /* Normalise the data to remove byte-swapping and unrecognised BAD values
-     * transform scaled FITS integer data and NDF byte data. */
+    /* Normalise the data to remove byte-swapping and unrecognised
+     * BAD values transform scaled FITS integer and NDF byte data. */
     DataNormalise( *outPtr, intype, *nel, info->isfits, info->haveblank,
-                   info->blank, info->bscale, info->bzero, cnfmalloc, 1,
+                   info->blank, info->bscale, info->bzero, memtype, 1,
                    &normPtr, outtype );
     *outPtr = normPtr;
 }
@@ -982,19 +1005,18 @@ void gaiaArraySpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
  *     method
  *         The combination method, GAIA_ARRAY_MEAN or GAIA_ARRAY_MEDIAN
  *         (defined in gaiaArray.h).
- *     cnfmalloc
- *         Whether to use cnfMalloc to allocate the image data. Otherwise
- *         malloc will be used.
+ *     memtype
+ *         Whether to use malloc, cnfMalloc or new to allocate the image data.
  *     outPtr
  *         a pointer to a pointer that will point at the extracted spectrum on
- *         exit. This memory is allocated using malloc or cnfMalloc as
- *         determined by the cnfMalloc argument. Freeing it is the
- *         responsibility of the caller, or you can call gaiaArrayFree.
+ *         exit. This memory is allocated as determined by the memtype
+ *         argument. Freeing it is the responsibility of the caller, or you
+ *         can call gaiaArrayFree.
  *     nel
  *         the number of elements extracted
  *     outtype
  *         the type of the returned data, may be different for scaled FITS
- *         integer types for NDF byte data.
+ *         integer types and NDF byte data.
  *
  *  Notes:
  *     If the spectrum isn't within the array bounds then an empty spectrum
@@ -1002,7 +1024,7 @@ void gaiaArraySpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
  */
 void gaiaArrayRegionSpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
                                       int arange[2], char *region, int method,
-                                      int cnfmalloc, void **outPtr, int *nel,
+                                      int memtype, void **outPtr, int *nel,
                                       int *outtype )
 {
     char *error_mess;
@@ -1050,12 +1072,7 @@ void gaiaArrayRegionSpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
         *nel = upper - lower;
     }
     length = (*nel) * gaiaArraySizeOf( *outtype );
-    if ( cnfmalloc == 1 ) {
-        *outPtr = cnfMalloc( length );
-    }
-    else {
-        *outPtr = malloc( length );
-    }
+    AllocateMemory( memtype, length, outPtr );
 
     /* Generate the ARD mask */
     planeSize = 1;
@@ -1066,7 +1083,7 @@ void gaiaArrayRegionSpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
             mdims[j++] = dims[i];
         }
     }
-    fullMaskPtr = malloc( planeSize * sizeof( int ) );
+    fullMaskPtr = (int *) malloc( planeSize * sizeof( int ) );
     lbnd[0] = ubnd[0] = lbnd[1] = ubnd[1] = 0;
     if ( gaiaUtilsCreateArdMask( region, fullMaskPtr, mdims, lbnd, ubnd,
                                  &error_mess ) != 1 ) {
@@ -1092,7 +1109,7 @@ void gaiaArrayRegionSpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
     /* The mask may not cover the whole image plane, so just consider that
      * from now on to speed up extraction. */
     maskSize = ( ubnd[1] - lbnd[1] + 1 ) * ( ubnd[0] - lbnd[0] + 1 );
-    subMaskPtr = malloc( maskSize * sizeof( int ) );
+    subMaskPtr = (int *) malloc( maskSize * sizeof( int ) );
     GetSubImage( fullMaskPtr, mdims, sizeof( int ), lbnd, ubnd, subMaskPtr );
     free( fullMaskPtr );
 
@@ -1122,7 +1139,7 @@ void gaiaArrayRegionSpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
         sum = 0.0;                                                      \
         count = 0;                                                      \
         maskPtr = subMaskPtr;                                           \
-        ptr = imagePtr;                                                 \
+        ptr = (outtype *) imagePtr;                                     \
         for ( j = 0; j < maskSize; j++ ) {                              \
             if ( *maskPtr > 1 ) {                                       \
                 if ( *ptr != badFlag ) {                                \
@@ -1211,7 +1228,7 @@ void gaiaArrayRegionSpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
             case HDS_DOUBLE:
                 if ( method == GAIA_ARRAY_MEAN ) {
                     EXTRACT_AND_COMBINE_MEAN(double,VAL__BADD)
-                } 
+                }
                 else {
                     EXTRACT_AND_COMBINE_MEDIAN(double,VAL__BADD)
                 }
@@ -1303,15 +1320,10 @@ void gaiaArrayGetStrides( int ndims, int dims[], int strides[] )
  * Free data previously allocated by these routines and associated with an
  * ARRAYinfo structure.
  */
-void gaiaArrayFree( ARRAYinfo *info, int cnfMalloc )
+void gaiaArrayFree( ARRAYinfo *info )
 {
     if ( info->ptr != NULL ) {
-        if ( cnfMalloc ) {
-            cnfFree( info->ptr );
-        }
-        else {
-            free( info->ptr );
-        }
+        FreeMemory( info->memtype, info->ptr );
         info->ptr = NULL;
     }
     else {
@@ -1321,15 +1333,14 @@ void gaiaArrayFree( ARRAYinfo *info, int cnfMalloc )
 
 /**
  *  Normalise an array if this machine does not have native FITS ordering and
- *  the data is in FITS format. Also transform FITS bad values into HDS ones
- *  and converts NDF byte data into word.
+ *  the data is in FITS format. Also transform FITS bad values into HDS ones.
  *
  *  If a scaled array is created the input data will be freed (since it is
  *  designed to replace this), unless freescaled is set to 0.
  */
 static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
                            int haveblank, int inBlank, double bscale,
-                           double bzero, int cnfmalloc, int freescaled,
+                           double bzero, int memtype, int freescaled,
                            void **outPtr, int *outtype )
 {
     int i;
@@ -1337,7 +1348,7 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
     int fscaled;
     long length;
 
-    /*  Only applies to FITS and byte NDF data. */
+    /*  Only applies to FITS and NDF byte data. */
     if ( ! isfits ) {
         if ( intype != HDS_BYTE ) {
             *outPtr = inPtr;
@@ -1346,9 +1357,10 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
         }
     }
 
-    /* Byte swap first, note we do this using macros that require integers,
-     * so cannot merge with bad checking. Also any scaling must happen with
-     * bad checking. Naturally nothing to do for byte data. */
+    /* Byte swap first, note we do this using macros that require integers, so
+     * cannot merge with bad checking. Also any scaling must happen with bad
+     * checking. Naturally nothing to do for byte data. */
+
 #if BIGENDIAN
     /* Nothing to do */
 #else
@@ -1388,38 +1400,30 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
 
         case HDS_UWORD: {
             unsigned short *ptr = (unsigned short *)inPtr;
-            unsigned short value;
             for ( i = 0; i < nel; i++ ) {
-                value = ptr[i];
-                ptr[i] = SWAP16( value );
+                ptr[i] = SWAP_USHORT( ptr[i] );
             }
         }
         break;
     }
 #endif
 
-    /* If the data is to be scaled to a floating type, or converted to word,
+    /* If the data is to be scaled to a floating type, or converted to word, 
      * then allocate the necessary memory. */
     *outtype = gaiaArrayScaledType( intype, isfits, bscale, bzero );
     scaled = ( intype != (*outtype) );
     if ( scaled ) {
         length = nel * gaiaArraySizeOf( *outtype );
-
-        if ( cnfmalloc == 1 ) {
-            *outPtr = cnfMalloc( length );
-        }
-        else {
-            *outPtr = malloc( length );
-        }
+        AllocateMemory( memtype, length, outPtr );
     }
     else {
         *outPtr = inPtr;
     }
-    
+
     /* Scaling can also occur for floating point types, when BSCALE or BZERO
      * are non-trivial */
     fscaled = 0;
-    if ( ( intype == HDS_DOUBLE || intype == HDS_REAL ) && 
+    if ( ( intype == HDS_DOUBLE || intype == HDS_REAL ) &&
          ( bscale != 1.0 || bzero != 0.0 ) ) {
 
         /* Make sure these values are significantly non-trivial */
@@ -1463,15 +1467,15 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
                     if ( isnan( ptr[i] ) ) {
                         ptr[i] = VAL__BADR;
                     }
+                    else {
+                        ptr[i] = ptr[i] * bscale + bzero;
+                    }
                 }
             }
             else {
                 for ( i = 0; i < nel; i++ ) {
                     if ( isnan( ptr[i] ) ) {
                         ptr[i] = VAL__BADR;
-                    }
-                    else {
-                        ptr[i] = ptr[i] * bscale + bzero;
                     }
                 }
             }
@@ -1503,12 +1507,7 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
                 int *ip = (int *)inPtr;
                 double *op = (double *)*outPtr;
                 for ( i = 0; i < nel; i++ ) {
-                    if ( ip[i] != VAL__BADI ) {
-                        op[i] = ip[i] * bscale + bzero;
-                    }
-                    else {
-                        op[i] = VAL__BADD;
-                    }
+                    op[i] = ip[i] * bscale + bzero;
                 }
             }
         }
@@ -1545,12 +1544,7 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
                 float zero = (float) bzero;
                 float scale = (float) bscale;
                 for ( i = 0; i < nel; i++ ) {
-                    if ( ip[i] != VAL__BADW ) {
-                        op[i] = ip[i] * scale + zero;
-                    }
-                    else {
-                        op[i] = VAL__BADR;
-                    }
+                    op[i] = ip[i] * scale + zero;
                 }
             }
         }
@@ -1587,12 +1581,7 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
                 float zero = (float) bzero;
                 float scale = (float) bscale;
                 for ( i = 0; i < nel; i++ ) {
-                    if ( ip[i] != VAL__BADUW ) {
-                        op[i] = ip[i] * scale + zero;
-                    }
-                    else {
-                        op[i] = VAL__BADR;
-                    }
+                    op[i] = ip[i] * scale + zero;
                 }
             }
         }
@@ -1645,12 +1634,7 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
                     float zero = (float) bzero;
                     float scale = (float) bscale;
                     for ( i = 0; i < nel; i++ ) {
-                        if ( ip[i] != VAL__BADB ) {
-                            op[i] = ip[i] * scale + zero;
-                        }
-                        else {
-                            op[i] = VAL__BADR;
-                        }
+                        op[i] = ip[i] * scale + zero;
                     }
                 }
             }
@@ -1688,12 +1672,7 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
                 float zero = (float) bzero;
                 float scale = (float) bscale;
                 for ( i = 0; i < nel; i++ ) {
-                    if ( ip[i] != VAL__BADUB ) {
-                        op[i] = ip[i] * scale + zero;
-                    }
-                    else {
-                        op[i] = VAL__BADR;
-                    }
+                    op[i] = ip[i] * scale + zero;
                 }
             }
         }
@@ -1702,11 +1681,693 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
 
     /* Free the memory if we produced a scaled version and it's requested. */
     if ( scaled && freescaled ) {
-        if ( cnfmalloc ) {
-            cnfFree( inPtr );
+        FreeMemory( memtype, inPtr );
+    }
+}
+
+/**
+ *  Name:
+ *     gaiaArrayNormalisedFromArray
+ *
+ *  Purpose:
+ *     Given an array in a supported data type, return a copy of the data in
+ *     an ARRAYinfo structure, if normalisation from FITS is required or
+ *     replacement of BAD values is required (by a "null" value).
+ *
+ *     The dataType should be one of the enumerations HDS_xxxx defined in
+ *     gaiaArray.h (these correspond to the HDS data types). The underlying
+ *     data will be changed if byte-swapping is needed and may be converted
+ *     into a floating point type, if the data are FITS and have non-trivial
+ *     bscale and bzero values. Note this does not handle NDF byte data
+ *     differently (i.e. does not scale to word).
+ *
+ *  Arguments:
+ *     ininfo
+ *         Pointer to the cube ARRAYinfo structure.
+ *     outinfo
+ *         A pointer to a pointer to be assigned to a new ARRAYinfo structure.
+ *         The necessary memory will be allocated using malloc, cnfMalloc
+ *         or new as determined by the final argument. Freeing it is the
+ *         responsibility of the caller. If not used then NULL is returned.
+ *     nullcheck
+ *         If true then a copy of the data will be made and any BAD
+ *         values will be replaced with the nullvalue (cast to the output
+ *         type).
+ *     nullvalue
+ *         The value to replace BAD values, if found.
+ *     memtype
+ *         One of the values GAIA_ARRAY_MALLOC, GAIA_ARRAY_CNF or
+ *         GAIA_ARRAY_NEW, which determines how to allocate the image
+ *         data.
+ *     nobad
+ *         If returned 1 then the array is known to be free of bad pixels.
+ */
+void gaiaArrayNormalisedFromArray( ARRAYinfo *inInfo, ARRAYinfo **outInfo,
+                                   int nullcheck, double nullvalue,
+                                   int memtype, int *nobad )
+{
+    int normtype;
+    void *normPtr = NULL;
+
+    /* Normalise the data to remove byte-swapping and unrecognised
+     * BAD values, and convert from a scaled variant. For NDFs this is a
+     * null unless we're nullchecking. */
+    DataNormaliseCopy( inInfo->ptr, inInfo->type, inInfo->el, inInfo->isfits,
+                       inInfo->haveblank, inInfo->blank, inInfo->bscale,
+                       inInfo->bzero, memtype, nullcheck, nullvalue,
+                       &normPtr, &normtype, nobad );
+
+    if ( inInfo->ptr != normPtr ) {
+
+        /* Create the ARRAYinfo structure, note FITS and BSCALE and BZERO are
+         * no longer used. */
+        *outInfo = gaiaArrayCreateInfo( normPtr, normtype, inInfo->el,
+                                        0, 0, 0, 1.0, 0.0, memtype );
+    }
+    else {
+        *outInfo = NULL;
+    }
+}
+
+/**
+ *  Normalise an array if this machine does not have native FITS ordering and
+ *  the data is in FITS format. Also transform FITS bad values into HDS ones.
+ *  This variant always creates a copy, unless the input array is not FITS.
+ */
+static void DataNormaliseCopy( void *inPtr, int intype, int nel, int isfits,
+                               int haveblank, int inBlank, double bscale,
+                               double bzero, int memtype, int nullcheck,
+                               double nullvalue, void **outPtr, int *outtype,
+                               int *nobad )
+{
+    int fscaled;
+    int i;
+    int nbad = 0;
+    int scaled;
+    long length;
+
+    /*  No bad pixels yet */
+    *nobad = 0;
+
+    /*  Only applies to FITS data, unless we're null checking */
+    if ( ! isfits && ! nullcheck ) {
+        *outPtr = inPtr;
+        *outtype = intype;
+        return;
+    }
+
+    /*  Allocate the memory, need more if scaling. */
+    *outtype = gaiaArrayScaledType( intype, isfits, bscale, bzero );
+    scaled = ( intype != (*outtype) );
+    length = nel * gaiaArraySizeOf( *outtype );
+    AllocateMemory( memtype, length, outPtr );
+
+    /* Out of memory, give up. */
+    if ( outPtr == NULL ) {
+        return;
+    }
+
+    /* Deal with NDFs that need checking for BAD values first */
+    if ( ! isfits ) {
+
+        /*  No need for byte swapping, simple copy with check */
+
+#define CHECK_AND_REPLACE(type,badFlag)         \
+        {                                       \
+            type *ip = (type *)inPtr;           \
+            type *op = (type *)*outPtr;         \
+            type value;                         \
+            type badvalue = (type) nullvalue;   \
+            for ( i = 0; i < nel; i++ ) {       \
+                value = ip[i];                  \
+                if ( value == badFlag ) {       \
+                    nbad++;                     \
+                    op[i] = badvalue;           \
+                }                               \
+                else {                          \
+                    op[i] = value;              \
+                }                               \
+            }                                   \
         }
-        else {
-            free( inPtr );
+
+        switch ( intype )
+        {
+           case HDS_DOUBLE:
+               CHECK_AND_REPLACE(double,VAL__BADD)
+           break;
+
+           case HDS_REAL:
+               CHECK_AND_REPLACE(float,VAL__BADR)
+           break;
+
+           case HDS_INTEGER:
+               CHECK_AND_REPLACE(int,VAL__BADI)
+           break;
+
+           case HDS_WORD:
+               CHECK_AND_REPLACE(short,VAL__BADW)
+           break;
+
+           case HDS_UWORD:
+               CHECK_AND_REPLACE(unsigned short,VAL__BADUW)
+           break;
+
+           case HDS_BYTE:
+               CHECK_AND_REPLACE(char,VAL__BADB)
+           break;
+
+           case HDS_UBYTE:
+               CHECK_AND_REPLACE(unsigned char,VAL__BADUB)
+           break;
+        }
+
+        /* Done */
+        return;
+    }
+
+    /* Deal with FITS */
+
+    /* Scaling can also occur for floating point types, when BSCALE or BZERO
+     * are non-trivial, but they retain the type. */
+    fscaled = 0;
+    if ( ( intype == HDS_DOUBLE || intype == HDS_REAL ) &&
+         ( bscale != 1.0 || bzero != 0.0 ) ) {
+
+        /* Make sure these values are significantly non-trivial */
+        if ( fabs( bscale - 1.0 ) > EPSILON ) {
+            fscaled = 1;
+        }
+        else if ( fabs( bzero - 1.0 ) > EPSILON ) {
+            fscaled = 1;
         }
     }
+
+    /* Deal with swapping, need macros that eval to noop for bigendian */
+#if BIGENDIAN
+#define SWAP_DOUBLE_(value) value
+#define SWAP_FLOAT_(value) value
+#define SWAP_INT_(value) value
+#define SWAP_SHORT_(value) value
+#define SWAP_USHORT_(value) value
+#else
+#define SWAP_DOUBLE_(value) SWAP_DOUBLE(value)
+#define SWAP_FLOAT_(value) SWAP_FLOAT(value)
+#define SWAP_INT_(value) SWAP_INT(value)
+#define SWAP_SHORT_(value) SWAP_SHORT(value)
+#define SWAP_USHORT_(value) SWAP_USHORT(value)
+#endif
+
+    /* BAD value transformation and variant scaling for integer types.
+     * Also count bad values detected. Useful for optimisations. */
+    switch ( intype )
+    {
+        case HDS_DOUBLE: {
+            double *ip = (double *)inPtr;
+            double value;
+            double *op = (double *)*outPtr;
+            double badvalue = VAL__BADD;
+            if ( nullcheck ) {
+                badvalue = nullvalue;
+            }
+            if ( fscaled ) {
+                for ( i = 0; i < nel; i++ ) {
+                    value = SWAP_DOUBLE_( ip[i] );
+                    if ( isnan( value ) ) {
+                        nbad++;
+                        op[i] = badvalue;
+                    }
+                    else {
+                        op[i] = value * bscale + bzero;
+                    }
+                }
+            }
+            else {
+                for ( i = 0; i < nel; i++ ) {
+                    value = SWAP_DOUBLE_( ip[i] );
+                    if ( isnan( value ) ) {
+                        nbad++;
+                        op[i] = badvalue;
+                    }
+                    else {
+                        op[i] = value;
+                    }
+                }
+            }
+        }
+        break;
+
+        case HDS_REAL: {
+            float *ip = (float *)inPtr;
+            float value;
+            float *op = (float *)*outPtr;
+            float badvalue = VAL__BADR;
+            if ( nullcheck ) {
+                badvalue = (float) nullvalue;
+            }
+            if ( fscaled ) {
+                for ( i = 0; i < nel; i++ ) {
+                    value = SWAP_FLOAT_( ip[i] );
+                    if ( isnan( value ) ) {
+                        nbad++;
+                        op[i] = badvalue;
+                    }
+                    else {
+                        op[i] = value * bscale + bzero;
+                    }
+                }
+            }
+            else {
+                for ( i = 0; i < nel; i++ ) {
+                    value = SWAP_FLOAT_( ip[i] );
+                    if ( isnan( value ) ) {
+                        nbad++;
+                        op[i] = badvalue;
+                    }
+                    else {
+                        op[i] = value;
+                    }
+                }
+            }
+        }
+        break;
+
+        case HDS_INTEGER: {
+            int *ip = (int *)inPtr;
+            int value;
+            if ( scaled ) {
+                double *op = (double *)*outPtr;
+                if ( haveblank ) {
+                    double badvalue = VAL__BADD;
+                    if ( nullcheck ) {
+                        badvalue = nullvalue;
+                    }
+                    for ( i = 0; i < nel; i++ ) {
+                        value = SWAP_INT_( ip[i] );
+                        if ( value == inBlank ) {
+                            nbad++;
+                            op[i] = badvalue;
+                        }
+                        else {
+                            op[i] = value * bscale + bzero;
+                        }
+                    }
+                }
+                else {
+                    for ( i = 0; i < nel; i++ ) {
+                        op[i] = SWAP_INT_( ip[i] ) * bscale + bzero;
+                    }
+                }
+            }
+            else {
+                int *op = (int *)*outPtr;
+                if ( haveblank ) {
+                    int badvalue = VAL__BADI;
+                    if ( nullcheck ) {
+                        badvalue = (int) nullvalue;
+                    }
+                    for ( i = 0; i < nel; i++ ) {
+                        value = SWAP_INT_( ip[i] );
+                        if ( value == inBlank ) {
+                            nbad++;
+                            op[i] = badvalue;
+                        }
+                        else {
+                            op[i] = value;
+                        }
+                    }
+                }
+                else {
+                    for ( i = 0; i < nel; i++ ) {
+                        op[i] = SWAP_INT_( ip[i] );
+                    }
+                }
+            }
+        }
+        break;
+
+        case HDS_WORD: {
+            short blank = (short) inBlank;
+            short *ip = (short *)inPtr;
+            short value;
+            if ( scaled ) {
+                float *op = (float *)*outPtr;
+                float zero = (float) bzero;
+                float scale = (float) bscale;
+                if ( haveblank ) {
+                    float badvalue = VAL__BADR;
+                    if ( nullcheck ) {
+                        badvalue = (float) nullvalue;
+                    }
+                    for ( i = 0; i < nel; i++ ) {
+                        value = SWAP_SHORT_( ip[i] );
+                        if ( value == blank ) {
+                            nbad++;
+                            op[i] = badvalue;
+                        }
+                        else {
+                            op[i] = value * scale + zero;
+                        }
+                    }
+                }
+                else {
+                    for ( i = 0; i < nel; i++ ) {
+                        op[i] = SWAP_SHORT_( ip[i] ) * scale + zero;
+                    }
+                }
+            }
+            else {
+                short *op = (short *)*outPtr;
+                if ( haveblank ) {
+                    short badvalue = VAL__BADW;
+                    if ( nullcheck ) {
+                        badvalue = (short) nullvalue;
+                    }
+                    for ( i = 0; i < nel; i++ ) {
+                        value = SWAP_SHORT_( ip[i] );
+                        if ( value == blank ) {
+                            nbad++;
+                            op[i] = badvalue;
+                        }
+                        else {
+                            op[i] = value;
+                        }
+                    }
+                }
+                else {
+                    for ( i = 0; i < nel; i++ ) {
+                        op[i] = SWAP_SHORT_( ip[i] );
+                    }
+                }
+            }
+        }
+        break;
+
+        case HDS_UWORD: {
+            unsigned short blank = (unsigned short) inBlank;
+            unsigned short *ip = (unsigned short *)inPtr;
+            unsigned short value;
+            if ( scaled ) {
+                float *op = (float *)*outPtr;
+                float zero = (float) bzero;
+                float scale = (float) bscale;
+                if ( haveblank ) {
+                    float badvalue = VAL__BADR;
+                    if ( nullcheck ) {
+                        badvalue = (float) nullvalue;
+                    }
+                    for ( i = 0; i < nel; i++ ) {
+                        value = SWAP_USHORT_( ip[i] );
+                        if ( value == blank ) {
+                            nbad++;
+                            op[i] = badvalue;
+                        }
+                        else {
+                            op[i] = value * scale + zero;
+                        }
+                    }
+                }
+                else {
+                    for ( i = 0; i < nel; i++ ) {
+                        op[i] = SWAP_USHORT_( ip[i] ) * scale + zero;
+                    }
+                }
+            }
+            else {
+                unsigned short *op = (unsigned short *)*outPtr;
+                if ( haveblank ) {
+                    unsigned short badvalue = VAL__BADUW;
+                    if ( nullcheck ) {
+                        badvalue = (unsigned short) nullvalue;
+                    }
+                    for ( i = 0; i < nel; i++ ) {
+                        value = SWAP_USHORT_( ip[i] );
+                        if ( value == blank ) {
+                            nbad++;
+                            op[i] = badvalue;
+                        }
+                        else {
+                            op[i] = value;
+                        }
+                    }
+                }
+                else {
+                    for ( i = 0; i < nel; i++ ) {
+                        op[i] = SWAP_USHORT_( ip[i] );
+                    }
+                }
+            }
+        }
+        break;
+
+        case HDS_BYTE: {
+            char blank = (char) inBlank;
+            char *ip = (char *)inPtr;
+            if ( scaled ) {
+                float *op = (float *)*outPtr;
+                float zero = (float) bzero;
+                float scale = (float) bscale;
+                float badvalue = VAL__BADR;
+                if ( nullcheck ) {
+                    badvalue = (float) nullvalue;
+                }
+                if ( haveblank ) {
+                    for ( i = 0; i < nel; i++ ) {
+                        if ( ip[i] == blank ) {
+                            nbad++;
+                            op[i] = badvalue;
+                        }
+                        else {
+                            op[i] = ip[i] * scale + zero;
+                        }
+                    }
+                }
+                else if ( scaled ) {
+                    for ( i = 0; i < nel; i++ ) {
+                        op[i] = ip[i] * scale + zero;
+                    }
+                }
+            }
+            else {
+                char *op = (char *)*outPtr;
+                if ( haveblank ) {
+                    char badvalue = VAL__BADB;
+                    if ( nullcheck ) {
+                        badvalue = (char) nullvalue;
+                    }
+                    for ( i = 0; i < nel; i++ ) {
+                        if ( ip[i] == blank ) {
+                            nbad++;
+                            op[i] = badvalue;
+                        }
+                        else {
+                            op[i] = ip[i];
+                        }
+                    }
+                }
+                else {
+                    for ( i = 0; i < nel; i++ ) {
+                        op[i] = ip[i];
+                    }
+                }
+            }
+        }
+        break;
+
+
+        case HDS_UBYTE: {
+            unsigned char blank = (unsigned char) inBlank;
+            unsigned char *ip = (unsigned char *)inPtr;
+            if ( scaled ) {
+                float *op = (float *)*outPtr;
+                float zero = (float) bzero;
+                float scale = (float) bscale;
+                if ( haveblank ) {
+                    float badvalue = VAL__BADR;
+                    if ( nullcheck ) {
+                        badvalue = (float) nullvalue;
+                    }
+                    for ( i = 0; i < nel; i++ ) {
+                        if ( ip[i] == blank ) {
+                            nbad++;
+                            op[i] = badvalue;
+                        }
+                        else {
+                            op[i] = ip[i] * scale + zero;
+                        }
+                    }
+                }
+                else {
+                    for ( i = 0; i < nel; i++ ) {
+                        op[i] = ip[i] * scale + zero;
+                    }
+                }
+            }
+            else {
+                unsigned char *op = (unsigned char *)*outPtr;
+                if ( haveblank ) {
+                    unsigned char badvalue = VAL__BADUB;
+                    if ( nullcheck ) {
+                        badvalue = (unsigned char) nullvalue;
+                    }
+                    for ( i = 0; i < nel; i++ ) {
+                        if ( ip[i] == blank ) {
+                            nbad++;
+                            op[i] = badvalue;
+                        }
+                        else {
+                            op[i] = ip[i];
+                        }
+                    }
+                }
+                else {
+                    for ( i = 0; i < nel; i++ ) {
+                        op[i] = ip[i];
+                    }
+                }
+            }
+        }
+        break;
+    }
+
+    /* If we have detected no BAD pixels say so */
+    *nobad = (nbad == 0 );
+}
+
+/**
+ *  Name:
+ *     gaiaArrayCreateUnsignedMask
+ *
+ *  Purpose:
+ *     Given an array in a supported HDS data type (i.e. normalised if
+ *     necessary), return a mask of unsigned chars that represents the
+ *     visibility of any then data in the array with 1 and invalid positions
+ *     with 0. If no bad data are found then NULL is returned.
+ *
+ *  Arguments:
+ *     ininfo
+ *         Pointer to the cube ARRAYinfo structure.
+ *     memtype
+ *         Type of memory to allocate one of GAIA_ARRAY_MALLOC
+ *         or GAIA_ARRAY_NEW
+ */
+unsigned char *gaiaArrayCreateUnsignedMask( ARRAYinfo *info, int memtype )
+{
+    const int isvisible = 1;
+    const int notvisible = 0;
+    int i;
+    int nbad = 0;
+    int nel = info->el;
+    unsigned char* mask = NULL;
+
+    /* Allocate the memory, will be released if not used, saves one scan of
+     * the data, which may be better. */
+    AllocateMemory( memtype, nel, (void **) &mask );
+
+    switch ( info->type )
+    {
+        case HDS_DOUBLE: {
+            double *ptr = (double *)info->ptr;
+            for ( i = 0; i < nel; i++ ) {
+                if ( ptr[i] == VAL__BADD ) {
+                    mask[i] = notvisible;
+                    nbad++;
+                }
+                else {
+                    mask[i] = isvisible;
+                }
+            }
+        }
+        break;
+
+        case HDS_REAL: {
+            float *ptr = (float *)info->ptr;
+            for ( i = 0; i < nel; i++ ) {
+                if ( ptr[i] == VAL__BADR ) {
+                    mask[i] = notvisible;
+                    nbad++;
+                }
+                else {
+                    mask[i] = isvisible;
+                }
+            }
+        }
+        break;
+
+        case HDS_INTEGER: {
+            int *ptr = (int *)info->ptr;
+            for ( i = 0; i < nel; i++ ) {
+                if ( ptr[i] == VAL__BADI ) {
+                    mask[i] = notvisible;
+                    nbad++;
+                }
+                else {
+                    mask[i] = isvisible;
+                }
+            }
+        }
+        break;
+
+        case HDS_WORD: {
+            short *ptr = (short *)info->ptr;
+            for ( i = 0; i < nel; i++ ) {
+                if ( ptr[i] == VAL__BADW ) {
+                    mask[i] = notvisible;
+                    nbad++;
+                }
+                else {
+                    mask[i] = isvisible;
+                }
+            }
+        }
+        break;
+
+        case HDS_UWORD: {
+            unsigned short *ptr = (unsigned short *)info->ptr;
+            for ( i = 0; i < nel; i++ ) {
+                if ( ptr[i] == VAL__BADUW ) {
+                    mask[i] = notvisible;
+                    nbad++;
+                }
+                else {
+                    mask[i] = isvisible;
+                }
+            }
+        }
+        break;
+
+        case HDS_BYTE: {
+            char *ptr = (char *)info->ptr;
+            for ( i = 0; i < nel; i++ ) {
+                if ( ptr[i] == VAL__BADB ) {
+                    mask[i] = notvisible;
+                    nbad++;
+                }
+                else {
+                    mask[i] = isvisible;
+                }
+            }
+        }
+        break;
+
+        case HDS_UBYTE: {
+            unsigned char *ptr = (unsigned char *)info->ptr;
+            for ( i = 0; i < nel; i++ ) {
+                if ( ptr[i] == VAL__BADUB ) {
+                    mask[i] = notvisible;
+                    nbad++;
+                }
+                else {
+                    mask[i] = isvisible;
+                }
+            }
+        }
+        break;
+    }
+
+    /* No bad pixels, so no mask needed */
+    if ( nbad == 0 ) {
+        FreeMemory( memtype, (void *) mask );
+        mask = NULL;
+    }
+    return mask;
 }

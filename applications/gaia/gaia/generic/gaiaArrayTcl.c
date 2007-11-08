@@ -4,10 +4,10 @@
  *
  *  Purpose:
  *     Perform operations on data cubes.
- 
+
  *  Language:
  *     C
- 
+
  *  Authors:
  *     PWD: Peter W. Draper, JAC - University of Durham
 
@@ -47,7 +47,7 @@
 #include <string.h>
 
 #include <tcl.h>
-#include <gaiaArray.h>
+#include <GaiaArray.h>
 
 /* Local prototypes */
 static int gaiaArrayRegionSpectrum( ClientData clientData, Tcl_Interp *interp,
@@ -72,7 +72,7 @@ int Array_Init( Tcl_Interp *interp )
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "array::getregionspectrum", 
+    Tcl_CreateObjCommand( interp, "array::getregionspectrum",
                           gaiaArrayRegionSpectrum,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
@@ -97,7 +97,7 @@ int Array_Init( Tcl_Interp *interp )
 }
 
 /**
- * Extract a "region" spectrum from a data cube. The region is a 2D ARD 
+ * Extract a "region" spectrum from a data cube. The region is a 2D ARD
  * description in the image plane. Each region is combined into point of the
  * resultant spectrum.
  *
@@ -207,10 +207,16 @@ static int gaiaArrayRegionSpectrum( ClientData clientData, Tcl_Interp *interp,
                           (char *) NULL );
         return TCL_ERROR;
     }
+    if ( cnfMalloc ) {
+        cnfMalloc = GAIA_ARRAY_CNFMALLOC;
+    }
+    else {
+        cnfMalloc = GAIA_ARRAY_MALLOC;
+    }
 
     /* Extraction */
-    gaiaArrayRegionSpectrumFromCube( arrayInfo, dims, axis, arange, 
-                                     description, method, cnfMalloc, 
+    gaiaArrayRegionSpectrumFromCube( arrayInfo, dims, axis, arange,
+                                     description, method, cnfMalloc,
                                      &outPtr, &nel, &outtype );
 
     /* Export results as an ARRAYinfo struct */
@@ -331,6 +337,12 @@ static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp,
                           (char *) NULL );
         return TCL_ERROR;
     }
+    if ( cnfMalloc ) {
+        cnfMalloc = GAIA_ARRAY_CNFMALLOC;
+    }
+    else {
+        cnfMalloc = GAIA_ARRAY_MALLOC;
+    }
 
     /* Extraction */
     gaiaArraySpectrumFromCube( arrayInfo, dims, axis, arange,
@@ -421,6 +433,12 @@ static int gaiaArrayImage( ClientData clientData, Tcl_Interp *interp,
                           (char *) NULL );
         return TCL_ERROR;
     }
+    if ( cnfMalloc ) {
+        cnfMalloc = GAIA_ARRAY_CNFMALLOC;
+    }
+    else {
+        cnfMalloc = GAIA_ARRAY_MALLOC;
+    }
 
     /* Extraction */
     gaiaArrayImageFromCube( cubeArrayInfo, dims, axis, index,
@@ -433,17 +451,16 @@ static int gaiaArrayImage( ClientData clientData, Tcl_Interp *interp,
 
 /**
  * Release previously allocated memory. The arguments are a memory address
- * of an ARRAYinfo structure and whether this memory was registered with CNF.
+ * of an ARRAYinfo structure.
  */
 static int gaiaArrayRelease( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] )
 {
-    int cnfMalloc;
     long adr;
 
     /* Check arguments */
-    if ( objc != 3 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "address cnf_free" );
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "address" );
         return TCL_ERROR;
     }
 
@@ -454,15 +471,8 @@ static int gaiaArrayRelease( ClientData clientData, Tcl_Interp *interp,
         return TCL_ERROR;
     }
 
-    /* CNF registered memory */
-    if ( Tcl_GetBooleanFromObj( interp, objv[2], &cnfMalloc ) != TCL_OK ) {
-        Tcl_AppendResult( interp, ": failed to read spectral axis",
-                          (char *) NULL );
-        return TCL_ERROR;
-    }
-
     /* Free memory */
-    gaiaArrayFree( (ARRAYinfo *)adr, cnfMalloc );
+    gaiaArrayFree( (ARRAYinfo *)adr );
 
     return TCL_OK;
 }
@@ -509,7 +519,7 @@ static int gaiaArrayInfo( ClientData clientData, Tcl_Interp *interp,
 
     fulltype = Tcl_NewStringObj( gaiaArrayFullTypeToHDS( info->type,
                                                          info->isfits,
-                                                         info->bscale, 
+                                                         info->bscale,
                                                          info->bzero ), -1 );
     Tcl_ListObjAppendElement(interp, resultObj, fulltype );
 

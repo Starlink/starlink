@@ -310,10 +310,10 @@ $(PACKAGE_NAME)_wish$(EXEEXT): tkAppInit.o initFortran.o $(PKG_LIB_FILE)
               -litcl3.3 -litk3.3 -ltclx8.4 $(itcl_BUILD_SPEC) $(FCLIBS) \
 	      -o $(PACKAGE_NAME)_wish$(EXEEXT)
 
-$(PACKAGE_NAME)_tcl$(EXEEXT): tclAppInit.o initFortran.o ast_tclerr.o
+$(PACKAGE_NAME)_tcl$(EXEEXT): tclAppInit.o initFortran.o ast_tclerr.o grf3d_gaia.o
 	$(LTLINK) $(LDFLAGS) tclAppInit.o initFortran.o \
 	      $(LD_SEARCH_FLAGS) $(LD_LIBS) -litcl3.3 -ltclx8.4 \
-	      $(itcl_BUILD_SPEC) $(TCL_LIB_SPEC) $(FCLIBS) ast_tclerr.o \
+	      $(itcl_BUILD_SPEC) $(TCL_LIB_SPEC) $(FCLIBS) ast_tclerr.o grf3d_gaia.o \
 	      -o $(PACKAGE_NAME)_tcl$(EXEEXT)
 
 

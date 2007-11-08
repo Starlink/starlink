@@ -40,7 +40,7 @@ static inline float SWAP_FLOAT( float x )
     return u.f;
 }
 
-static inline float SWAP_DOUBLE( double x ) 
+static inline double SWAP_DOUBLE( double x ) 
 {
     union {double d; unsigned int l[2];} u;
     unsigned int tmp;
@@ -60,12 +60,17 @@ static inline int SWAP_INT(int x)
     return u.i;
 }
 
-static inline int SWAP_SHORT( short x ) 
+static inline short SWAP_SHORT( short x ) 
 {
     union {short i; unsigned short ui;} u;
     u.i = x;
     u.ui = SWAP16(u.ui);
     return u.i;
+}
+
+static inline unsigned short SWAP_USHORT( unsigned short x ) 
+{
+    return SWAP16( x );
 }
 
 #endif /* _BYTESWAP_INCLUDED_ */

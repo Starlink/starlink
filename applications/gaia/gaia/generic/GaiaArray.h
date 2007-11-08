@@ -1,8 +1,8 @@
 #ifndef _GAIAARRAY_INCLUDED_
 #define _GAIAARRAY_INCLUDED_
- 
+
 /*
- *  External prototypes and definitions for gaiaArray.c.
+ *  External prototypes and definitions for GaiaArray.C.
  */
 
 /* Enumeration for the support data types, these are supposed to match the HDS
@@ -14,11 +14,17 @@ enum { HDS_UNKNOWN = -1,
 /* Combination types */
 enum { GAIA_ARRAY_MEAN, GAIA_ARRAY_MEDIAN };
 
+/* Memory allocations */
+enum { GAIA_ARRAY_NONE = -1,      /* None, memory given */ 
+       GAIA_ARRAY_MALLOC = 0,     /* Using C malloc     */
+       GAIA_ARRAY_CNFMALLOC = 1,  /* Using CNF malloc (for Fortran) */
+       GAIA_ARRAY_NEW = 2 };      /* Using C++ "new"    */
+
 /**
  * An array structure. One of these stores various useful information about an
- * array, such as its memory address, number of elements, data type and
- * some information about FITS derived data. FITS derived data may not be in
- * the native byte ordering and may have a bad value that will differ from HDS.
+ * array, such as its memory address, number of elements, data type and some
+ * information about FITS derived data. FITS derived data may not be in the
+ * native byte ordering and may have a bad value that will differ from HDS.
  * It can also require the application of a scale and zero point to get the
  * actual data values.
  */
@@ -31,7 +37,7 @@ struct ARRAYinfo {
     int blank;           /* The FITS blank value, if applicable */
     double bscale;       /* FITS BSCALE value, used for integer types */
     double bzero;        /* FITS BZERO value, used for integer types */
-    int cnfmalloc;       /* Was pointer to array data malloc by CNF */
+    int memtype;         /* How memory was allocated (enum value) */
 };
 typedef struct ARRAYinfo ARRAYinfo;
 
@@ -43,7 +49,7 @@ extern "C" {
     /* Create and initialise an ARRAYinfo structure */
     ARRAYinfo *gaiaArrayCreateInfo( void *ptr, int type, long el, int isfits,
                                     int haveblank, int blank, double bscale,
-                                    double bzero, int cnfmalloc );
+                                    double bzero, int memtype );
     
     /* Free an ARRAYinfo structure. */
     void gaiaArrayFreeInfo( ARRAYinfo *info );
@@ -79,19 +85,19 @@ extern "C" {
     /* Get a simple image section from a cube */
     void gaiaArrayImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
                                  int index, ARRAYinfo **imageinfo, 
-                                 int cnfmalloc );
+                                 int memtype );
         
     /* Get a spectrum (line of data) from a cube */
     void gaiaArraySpectrumFromCube( ARRAYinfo *info, int dims[3], int axis, 
                                     int arange[2], int index1, int index2, 
-                                    int cnfmalloc, void **outPtr, int *nel,
+                                    int memtype, void **outPtr, int *nel,
                                     int *outtype );
 
     /* Get strides for indexing an ND array */ 
     void gaiaArrayGetStrides( int ndims, int dims[], int strides[] );
 
-    /* Free simple memory we've allocated */
-    void gaiaArrayFree( ARRAYinfo *info, int cnfmalloc );
+    /* Free memory held by an info struct that we've allocated */
+    void gaiaArrayFree( ARRAYinfo *info );
 
     /* Normalise an array from FITS to HDS-like format */
     void gaiaArrayNormalise( ARRAYinfo *info );
@@ -100,8 +106,16 @@ extern "C" {
     void gaiaArrayRegionSpectrumFromCube( ARRAYinfo *info, int dims[3], 
                                           int axis, int arange[2], 
                                           char *region, int method, 
-                                          int cnfmalloc, void **outPtr, 
+                                          int memtype, void **outPtr, 
                                           int *nel, int *outtype );
+
+    /* Normalise an array if needed */
+    void gaiaArrayNormalisedFromArray( ARRAYinfo *inInfo, ARRAYinfo **outInfo,
+                                       int nullcheck, double nullvalue,
+                                       int memtype, int *nobad );
+
+    /* Create a logical mask identifying bad pixels */
+    unsigned char *gaiaArrayCreateUnsignedMask( ARRAYinfo *info, int memtype );
 
 #ifdef __cplusplus
 }

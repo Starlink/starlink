@@ -52,7 +52,7 @@ extern "C" {
 }
 #include <Mem.h>
 #include "StarFitsIO.h"
-#include "gaiaArray.h"
+#include "GaiaArray.h"
 #include "gaiaUtils.h"
 #include "GaiaFITS.h"
 
@@ -371,7 +371,7 @@ static int GaiaFITSTclMap( ClientData clientData, Tcl_Interp *interp,
 
         /* Construct result */
         arrayInfo = gaiaArrayCreateInfo( ptr, type, el, 1, haveblank, blank,
-                                         bscale, bzero, 0 );
+                                         bscale, bzero, GAIA_ARRAY_NONE );
         Tcl_SetObjResult( interp, Tcl_NewLongObj( (long)arrayInfo ) );
         return TCL_OK;
     }

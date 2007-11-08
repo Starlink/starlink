@@ -130,7 +130,7 @@ Mark Taylor (m.b.taylor@bristol.ac.uk)
 GAIA is derived from SkyCat version $skycat_version
 Copyright (C) 1996-2006 ESO - European Southern Observatory
 
-Authors: 
+Authors:
 Allan Brighton (abrighto@eso.org)
 Thomas Herlin (therlin@eso.org)
 Miguel Albrecht (malbrech@eso.org)
@@ -282,9 +282,8 @@ itcl::class gaia::Gaia {
    }
 
    #  Quit the application. Really....
-   #  If being paranoid then ask for confirmation. Note this doesn't
-   #  trap all ways of exiting (can still use window manager close and
-   #  exit by closing all windows until the last is gone).
+   #  If being paranoid then ask for confirmation. Note I think this
+   #  traps all ways of exiting that can be handled.
    public method quit {} {
       if { ! $itk_option(-quiet_exit) } {
          if { ! [confirm_dialog \
@@ -294,10 +293,32 @@ itcl::class gaia::Gaia {
       }
 
       #  Permission supplied so continue with exit.
+      catch {
+         release_vtk_
+      }
       delete object $w_
       after idle exit
    }
 
+   #  Delete this object. Invoke the on_close_cmd if set.
+   public method delete_window {} {
+      delete object $w_
+      if { $itk_option(-on_close_cmd) != {} } {
+         catch {
+            eval $itk_option(-on_close_cmd)
+         }
+      }
+   }
+
+   #  VTK requires that some objects are released before the associated
+   #  windows are destroyed, so any method that deletes this object should
+   #  call this method.
+   protected method release_vtk_ {} {
+      if { [::namespace exists "::gaia3d"] } {
+         gaia3d::Gaia3dVtk::release_all
+      }
+   }
+   
    #  Called after the options have been evaluated. Add GAIA menu and
    #  extra items for other menus.
    public method init {} {
@@ -384,6 +405,9 @@ itcl::class gaia::Gaia {
       if { $itk_option(-debug) } {
          cmdtrace on notruncate [::open "GaiaDebug.log" w]
       }
+
+      #  Trap window closing and handle that.
+      wm protocol $w_ WM_DELETE_WINDOW [code $this quit]
    }
 
    #  Set/get X defaults - can be overridden in subclass and/or
@@ -519,14 +543,6 @@ itcl::class gaia::Gaia {
       #  Keep a list of SkyCat/GAIA instances.
       global ::skycat_images
       lappend skycat_images $itk_component(image)
-   }
-
-   #  Delete this object. Invoke the on_close_cmd if set.
-   public method delete_window {} {
-      delete object $w_
-      if { $itk_option(-on_close_cmd) != {} } {
-         eval $itk_option(-on_close_cmd)
-      }
    }
 
    #  Make changes to Skycat menus that we require.
@@ -724,7 +740,7 @@ itcl::class gaia::Gaia {
          add_menuitem $m.astrom.auto command "Simple..." \
             {Create a WCS for image using AUTOASTROM} \
             -command [code $this make_toolbox simpleautoastrom]
-         
+
          add_menuitem $m.astrom.auto command "Advanced..." \
             {Create a WCS for image using AUTOASTROM} \
             -command [code $this make_toolbox advancedautoastrom]
@@ -1272,7 +1288,7 @@ itcl::class gaia::Gaia {
    public method make_opencube_toolbox {} {
 
       #  If the window exists then just raise it.
-      if { [info exists itk_component(opencube) ] && 
+      if { [info exists itk_component(opencube) ] &&
            [winfo exists $itk_component(opencube) ] } {
 
          wm deiconify $itk_component(opencube)
@@ -1295,6 +1311,19 @@ itcl::class gaia::Gaia {
          }
       }
    }
+
+   #  Return the instance of GaiaCube being used, or the empty string
+   #  if the cube toolbox has not been created or is withdrawn.
+   public method get_gaia_cube {} {
+      if { [info exists itk_component(opencube) ] &&
+           [winfo exists $itk_component(opencube) ] } {
+         if { [wm state $itk_component(opencube)] != "withdrawn" } {
+            return $itk_component(opencube)
+         }
+      }
+      return ""
+   }
+
 
    #  Notification that a file has been loaded into the GaiaImageCtrl.
    protected method file_loaded_ { {filename {}} } {
@@ -1319,17 +1348,17 @@ itcl::class gaia::Gaia {
       #  Load it into cube browser. Note allow trivial cubes with redundant
       #  dimensions 1, or 2, but not 3. 
       if { ( $naxis4 == {} || $naxis4 == 1 ) && $naxis3 != {} && $naxis3 != 1 } {
-         make_opencube_toolbox
-         set msg {}
-         set result [catch {$itk_component(opencube) configure \
-                               -cube $itk_option(-file)} msg]
-         if { $result != 0 } {
+            make_opencube_toolbox
+            set msg {}
+            set result [catch {$itk_component(opencube) configure \
+                                  -cube $itk_option(-file)} msg]
+            if { $result != 0 } {
             maybe_release_cube_
-            $itk_component(opencube) close
-            if { $msg != {} } {
-               info_dialog "$msg" $w_
+               $itk_component(opencube) close
+               if { $msg != {} } {
+                  info_dialog "$msg" $w_
+               }
             }
-         }
       } else {
          #  Make sure toolbox is withdrawn.
          if { [info exists itk_component(opencube)] } {
@@ -1619,12 +1648,10 @@ itcl::class gaia::Gaia {
    #  If a cube is currently loaded release it. Returns if release
    #  happened and the name of the cube.
    protected method maybe_release_cube_ {} {
-      
       set cube_open 0
       set cube_name {}
       if { [info exists itk_component(opencube) ] && 
            [winfo exists $itk_component(opencube) ] } {
-
          set cube_name [$itk_component(opencube) cget -cube]
          set cube_open [$itk_component(opencube) release]
          $itk_component(opencube) halt
@@ -1673,7 +1700,7 @@ itcl::class gaia::Gaia {
    }
 
    #  Ensures that a PLASTIC listener object is in place for this class.
-   #  If no listener currently exists, create one.  If a hub is 
+   #  If no listener currently exists, create one.  If a hub is
    #  apparently running, try connecting to it.
    #  We could in principle have multiple PLASTIC listeners, one for each
    #  GAIA window, but for now use a common one for the whole application.
@@ -1757,8 +1784,8 @@ itcl::class gaia::Gaia {
    }
 
    #  Position the point of interest graphics marker. Used by remote
-   #  applications. The ra and dec should be qualified by a units string, 
-   #  this should be "wcs equinox", "deg equinox", "image" etc. as 
+   #  applications. The ra and dec should be qualified by a units string,
+   #  this should be "wcs equinox", "deg equinox", "image" etc. as
    #  required by the rtdimage convert command. The default equinox is J2000.
    public method position_of_interest {ra dec units} {
 
@@ -1802,7 +1829,7 @@ itcl::class gaia::Gaia {
                   set py [expr ($cy+0.0)/$dh]
                   set xrange [$canvas xview]
                   set yrange [$canvas yview]
-                  
+
                   #  Only move if the position is not currently visible, and
                   #  the image is larger than the window in at least one
                   #  dimension.
@@ -2226,19 +2253,19 @@ window gives you access to this."
 
    # -- Common variables --
 
-   # maximum clone number so far
+   #  Maximum clone number so far
    common clone_max_ 0
 
-   # prefix to use to create new main windows.
+   #  Prefix to use to create new main windows.
    common prefix_ ".gaia"
 
-   # PLASTIC listener; takes care of communication with the hub.
+   #  PLASTIC listener; takes care of communication with the hub.
    common plastic_app_ {}
 
-   # PLASTIC sender; sends messages via the hub to other applications.
+   #  PLASTIC sender; sends messages via the hub to other applications.
    common plastic_sender_ {}
 
-   # Boolean variable which keeps track of whether we are registered with hub.
+   #  Boolean variable which keeps track of whether we are registered with hub.
    common is_plastic_registered_ 0
 }
 

@@ -298,7 +298,7 @@ itcl::class gaia::GaiaContour {
 	 catch {image delete $image_rtd_}
       }
 
-      #  Release all ColourMenu objects.
+      #  Release all ColourLabelMenu objects.
       if { [info exists colour_menu_] } {
          for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
             delete object $colour_menu_($i)
@@ -636,7 +636,7 @@ itcl::class gaia::GaiaContour {
 
          #  Now add all the colours to it.
          set colour_menu_($i) \
-            [gaia::ColourMenu \#auto $itk_component(colour$i) \
+            [gaia::ColourLabelMenu \#auto $itk_component(colour$i) \
                 -change_cmd [code $this set_colour_ $i] \
                 -image $itk_option(-rtdimage) \
                 -show_custom 0]
@@ -671,7 +671,7 @@ itcl::class gaia::GaiaContour {
 
    #  Choose and then add a custom colour to the menus.
    public method choose_custom_colour {} {
-      set new_colour [gaia::ColourMenu::choose_custom_colour]
+      set new_colour [gaia::ColourLabelMenu::choose_custom_colour]
       if { $new_colour != {} } {
          add_custom_colour $new_colour -1
       }
@@ -1737,7 +1737,7 @@ itcl::class gaia::GaiaContour {
    #  Whether to use a single width for all lines.
    protected variable single_width_ 0
 
-   #  Array of the ColourMenu objects in use.
+   #  Array of the ColourLabelMenu objects in use.
    protected variable colour_menu_
 
    #  Common variables: (shared by all instances)

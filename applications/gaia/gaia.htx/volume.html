@@ -1,0 +1,232 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>Volume rendering</title>
+  </head>
+
+  <body>
+    <a name="xref_volume"></a>
+    <h2 align=center><font color=red>Volume Rendering</font></h2>
+
+    <p align="center">
+      <img src="volume.gif"/>
+
+    <p>
+      Using this window you can view all the data in a cube between two data
+      limits as a single volume. Each value is given a colour based on the
+      current colour choice and an opacity running linearly from zero to one
+      (minimum to maximum data value).
+    </p>
+
+    <h3>Data limits</h3>
+    <p>
+      The data limits should encompass a range that covers the data values of
+      interest. Default values are chosen based on the values in the currently
+      displayed slice. To define your own limits just type in the values in
+      the <tt>Min value</tt> and <tt>Max value</tt> fields and press
+      </tt>Draw</tt>.
+    </p>
+    
+    <h3>Colours</h3>
+    <p>
+      The colour choice is made in two ways, either by selecting two colours
+      to represent the high and low data values (linear interpolation in RGB
+      is used to determine colours for data values between these limits), or
+      by choosing a colour map (these are the same as used for images). Colour
+      choice is clearly a matter of aesthetics. To choose a colour map just
+      untick the <tt>Two colour</tt> checkbutton and select the <tt>Colour
+      map</tt> menu.
+    </p>
+
+    <h3>Handling bad data</h3>
+    <p>
+      If your NDF data contain bad values, then you will probably need to
+      replace these with some other value before you can successfully volume
+      render (as each pixel along a line of sight is considered these odd
+      numbers, which cannot be just ignored as usual, will have an
+      effect). This is why the default operation of this toolbox (unlike the
+      <a href="isosurface.html">isosurface</a> version) is to replace bad
+      values with the value zero. The downside of this is that a copy of your
+      data is made. If you know that your data do not have any bad pixels, or
+      the bad value doesn't cause any rendering problems then choose not to do
+      this by unticking the <tt>Replace bad</tt> checkbutton before pressing
+      <tt>Draw</tt>. Clearly this is more important for larger cubes.
+    </p>
+    <p>
+      The position for FITS data is more complicated, but much of the above
+      applies to those as well. The greater complication is that FITS data has
+      a fixed byte order (bigendian), so for some machines (notably those with
+      Intel processors) the overhead of creating a copy cannot be avoided.
+    </p>
+
+    <h3>Interacting with the scene</h3>
+
+    <h4>Mouse and keyboard interactions</h4>
+    <h5>Lost in space?</h5>
+    <p>
+      If you can no longer see any graphics then try pressing the <tt>r</tt>
+      key. That resets scene to view all the data.
+    </p>
+    <h5>Mousing</h5>
+    <p>
+      There are two modes of mouse interaction, joystick and trackerball,
+      these are position sensitive and motion sensitive modes. In joystick
+      mode, the default, motion of the scene occurs as long as a button is
+      pressed, in trackerball mode you need to press a button and move the
+      mouse as well.
+    </p>
+    <ul>
+      <li>
+        <tt>Button 1</tt>: rotates the scene. The rotation is in the direction
+        defined from the centre of the scene towards the current mouse
+        position. In joystick mode the speed of rotation is proportional to
+        the distance from the centre. If the <tt>Control</tt> key is also
+        pressed the scene rolls about the centre.
+      </li>
+      <li>
+        <tt>Button 2</tt>: pan the scene. In joystick mode the pan motion
+        continues until the mouse is released.
+      </li>
+      <li>
+        <tt>Button 3</tt>: zoom the scene. Zoom in if the mouse position is in
+        the top-half of the scene, zoom out if in the bottom half. In joystick
+        mode the amount of zoom is determined by the distance from the
+        horizontal centre line.
+      </li>
+      <li>
+        <tt>Scroll-wheel</tt>: the scroll-wheel of a mouse will zoom the scene
+        in and out.
+      </li>
+    </ul>
+    <p>
+      During mouse events the level of detail shown in the display will
+      decrease to maintain an acceptable level of interaction. The fuller
+      resolution should return when interactions stop (if not just press the
+      <tt>Draw</tt> button to refresh the screen).
+    </p>
+
+
+    <h5>Keys</h5>
+    <ul>
+      <li>
+        <tt>3</tt>: toggle the window into and out of stereo mode. Requires
+        red-blue glasses or other hardware support.
+      </li>
+      <li>
+        <tt>j/t</tt>: toggle between the two mousing modes, joystick and
+        trackerball.
+      </li>
+      <li>
+        <tt>f</tt>: fly to the point under the cursor. Also sets the rotation
+          centre.
+      </li>
+      <li>
+        <tt>r</tt>: reset the scene so that everything is visible.
+      </li>
+      <li>
+        <tt>s</tt>: change representation of scene to surface.
+      </li>
+      <li>
+        <tt>w</tt>: change representation of scene to wireframe.
+      </li>
+
+      <li>
+    </ul>
+    <h5>Arrow Keys</h5>
+    <p>
+      The <tt>Up/Down/Left/Right</tt> keys rotate the scene. Combining with
+      <tt>Control</tt> slows the movement.
+    </p>
+    <p>
+      The <tt>Shift-Up/Down</tt> keys zoom the scene in and out. Combining with
+      <tt>Control</tt> slows the movement.
+    </p>
+    <p>
+      The <tt>Alt-Up/Down/Left/Right</tt> keys pans the scene.
+      Combining with <tt>Control</tt> slows the movement.
+    </p>
+    <p>
+      The <tt>Shift-Left/Right</tt> keys roll the scene about the centre.
+      Combining with <tt>Control</tt> slows the movement.
+    </p>
+    <p>
+      Note that during these events the level of detail shown in the display
+      will remain set to the highest value, unlike for mouse events. 
+    </p>
+
+    <h3>Interacting with GAIA</h3>
+    <h4>The image plane</h4>
+    <p>
+      To view the position of the current slice that is displayed in GAIA you
+      must enable the <tt>Image plane</tt>, do this by ticking the
+      checkbutton. This draws a 2D image in the correct position. If you now
+      change the index of the plane in the image sections toolbox this will
+      move to reflect the new position, as will the image slice displayed in
+      the main window (this is best seen on a machine with dual monitors). You
+      can also move the plane itself and changes to its position will be
+      reflected elsewhere (like an extracted spectrum), to do this you press
+      and hold the middle mouse button somewhere over the image plane (not the
+      edges, they have other interactions) and move the mouse. <b>Note</b>
+      when the image plane is displayed the mouse interactions described above
+      that control the scene are overridden, you need to move off the image
+      plane to regain these (hint: use the keyboard interactions when working
+      at high zooms).
+    </p>
+    <p>
+      To change the extraction axis do the same interaction at the edges, this
+      will rotate the image plane and snap to the nearest axis on release
+      (when you press the middle button on the image plane an inner blue box
+      is drawn, you need to press outside this).
+    </p>
+    <p>
+      There is limited control over the opacity of the image plane in the
+      <tt>Options->Image plane opacity</tt> menu. This allows you to make it
+      see-through, so all the parts of the volume can be seen, or make it
+      completely clear (in which case you see just an outline of its position,
+      but note the mouse interactions will be disabled by this choice).
+    <p>
+    <p>
+      Another option is to choose a colour table for the image plane.
+    </p>
+    <p>
+    <h4>The spectral extraction</h4>
+    <p>
+      To view the position of the extracted spectrum (if one has been
+      extracted, you must do that first by clicking on the main image), you
+      need to enable the <tt>Spectral line</tt> by ticking the
+      checkbutton. The position of this line will be updated as you drag
+      around on the main image. To move the line within the scene you press
+      mouse button 1 on the image plane (which must also be enabled) and drag
+      around. Note that this action also reports the current coordinates and
+      data value at that point on the image plane in the cube.
+    </p>
+
+    <h3>Determining the directions</h3>
+    <p>
+      When rotating a cube it's easy to become disoriented and loose the
+      directions of the celestial and dispersion axes. To see this enable the
+      <tt>Direction axes</tt>, which draws an set of arrow lines pointing in
+      the directions of the world coordinate axes (not the cube axes, RA and
+      Dec are not necessarily aligned with those). These will remain
+      permanently in view.
+    </p>
+    <p>
+      For presentation purposes a set of annotated axes can be labeled and
+      drawn using the <tt>Annotated axes</tt> checkbutton (this is drawn by the
+      AST subroutine library). If the labels become reversed so you cannot
+      read them just redraw the scene.
+    </p>
+
+    <h3>Getting a hardcopy</h3>
+    <p>
+      You save a copy of the current scene to TIFF, JPEG, PNG and EPS formats
+      using the <tt>File->Print</tt> dialog. Make sure that the window is
+      uncovered and fully drawn before using this. For a better drawing with
+      fewer artifacts switch on the <tt>High resolution</tt> item in the
+      <tt>Options</tt> menu.
+    </p>
+
+    <h3>
+
+  </body>
+</html>

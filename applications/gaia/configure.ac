@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(gaia, 4.0-3, gaia@star.rl.ac.uk)
+AC_INIT(gaia, 4.1-0, gaia@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -69,8 +69,9 @@ CONFIGURE_ARGS="$ac_configure_args"
 export CONFIGURE_ARGS
 AC_SUBST(CONFIGURE_ARGS)
 
-dnl    Make sure configure is ran.
+dnl    Make sure configure is ran in sub-directories.
 test -f "gaia/Makefile" && rm -f "gaia/Makefile"
+test -f "gaia3d/Makefile" && rm -f "gaia3d/Makefile"
 
 dnl    Need to determine the suffix for shareable libraries, as used by
 dnl    Tcl, so we can link against the GAIA dynamic library.

@@ -404,7 +404,6 @@ void HtmlBlockDraw(
   }else{
     /* We are dealing with a single HtmlElement which contains something
     ** other than plain text. */
-      int top, btm;
     int cnt, w;
     char zBuf[30];
     switch( src->base.type ){

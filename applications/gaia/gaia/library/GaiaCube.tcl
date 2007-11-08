@@ -28,18 +28,13 @@
 #
 #     Performs the given method on this object.
 
-#  Configuration options:
-#     See itk_option definitions below.
-
-#  Methods:
-#     See individual method declarations below.
-
 #  Inheritance:
 #     util::TopLevelWidget
 
 #  Copyright:
-#     Copyright (C) 2004-2005 Central Laboratory of the Research Councils.
-#     Copyright (C) 2006-2007 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2004-2005 Central Laboratory of the Research Councils
+#     Copyright (C) 2006-2007 Particle Physics & Astronomy Research Council
+#     Copyright (C) 2007 Science and Technology Facilities Council
 #     All Rights Reserved.
 
 #  Licence:
@@ -126,6 +121,19 @@ itcl::class gaia::GaiaCube {
          -accelerator {Control-f}
       bind $w_ <Control-f> [code $this show_fitsheaders_]
 
+      #  3D toolboxes.
+      add_menuitem $View cascade "3D visualisation... " \
+         {Visualise data-cube using volume or iso surface rendering} \
+         -menu [menu $View.visualisation]
+
+      add_menuitem $View.visualisation command "Iso surfaces... " \
+         {Visualise data-cube using iso surface rendering} \
+         -command [code $this make_toolbox isosurface 0]
+
+      add_menuitem $View.visualisation command "Volume rendering... " \
+         {Visualise data-cube using volume rendering} \
+         -command [code $this make_toolbox volume 0]
+
       #  Add the Options menu.
       set Options [add_menubutton "Options" left]
       configure_menubutton Options -underline 0
@@ -174,11 +182,12 @@ itcl::class gaia::GaiaCube {
             -command [code $this component_changed_]
       }
 
-      #  Add the coordinate selection menu.
+      #  Add the coordinate selection menu (use global variable so we can
+      #  share this).
       set SpectralCoords [add_menubutton "Coords" left]
       configure_menubutton "Coords" -underline 0
-      set spec_coords_ [GaiaSpecCoords \#auto \
-                           -change_cmd [code $this coords_changed_]]
+      set spec_coords_ [uplevel \#0 GaiaSpecCoords \#auto]
+      $spec_coords_ configure -change_cmd [code $this coords_changed_]
       $spec_coords_ add_menu $SpectralCoords
 
       #  Add the "Go" menu to switch back and forth between cubes that have
@@ -186,7 +195,8 @@ itcl::class gaia::GaiaCube {
       set GoMenu [add_menubutton "Go" \
                   "Go: menu with shortcuts to view cubes previously viewed"]
       configure_menubutton "Go" -underline 0
-      $GoMenu config -postcommand [code $this update_history_menu_ $GoMenu]
+      set history_ [GaiaCubeHistory \#auto -gaia_cube $this]
+      $GoMenu config -postcommand [code $history_ update_history_menu $GoMenu]
 
       #  Add window help.
       add_help_button cube "On Window..."
@@ -200,7 +210,8 @@ itcl::class gaia::GaiaCube {
             -text "Input cube:" \
             -textvariable [scope itk_option(-cube)] \
             -command [code $this configure -cube] \
-            -filter_types $itk_option(-filter_types)
+            -filter_types $itk_option(-filter_types) \
+            -chooser_title "Select cube"
       }
       pack $itk_component(cube) -side top -fill x -ipadx 1m -ipady 2m
       add_short_help $itk_component(cube) \
@@ -447,8 +458,13 @@ itcl::class gaia::GaiaCube {
 
       #  Delete any registered temporary files.
       $tmpfiles_ clear
-      delete object $tmpfiles_
+      ::delete object $tmpfiles_
       set tmpfiles_ {}
+
+      #  Release memory used for image slice.
+      if { $last_slice_adr_ != 0 } {
+         catch {$cubeaccessor_ release $last_slice_adr_}
+      }
    }
 
    #  Methods:
@@ -479,6 +495,11 @@ itcl::class gaia::GaiaCube {
             set fitsheaders_ {}
          }
       }
+
+      #  Delete GaiaCubeHistory.
+      if { $history_ != {} } {
+         catch {::delete object $history_}
+      }
    }
 
    #  Undo some of the effects of close. Do not reopen cube, that would
@@ -496,7 +517,10 @@ itcl::class gaia::GaiaCube {
          set cubeaccessor_ {}
          set itk_option(-cube) {}
          set ndfname_ {}
-         set last_cube_ {}
+         $history_ clear_last_cube
+
+         #  Clear the iso and volume renderers.
+         renderers_clear_ 1
          return $isopen
       }
       return 0
@@ -517,13 +541,13 @@ itcl::class gaia::GaiaCube {
       if { ! [$namer exists] } {
          if { $itk_option(-cube) != {} } {
             error_dialog "No such file: $itk_option(-cube)" $w_
-            record_last_cube_
+            $history_ record_last_cube
          }
          return
       } else {
 
-         #  Add last_cube_ to the back_list_, including temporary ones.
-         record_last_cube_
+         #  Add last cube  to the back list, including temporary ones.
+         $history_ record_last_cube
 
          #  Always start with the DATA component (essential).
          set component_ "DATA"
@@ -561,7 +585,7 @@ itcl::class gaia::GaiaCube {
          if { $ndims != 3 } {
             error_dialog \
                "Not a cube, must have 3 significant dimensions (has $ndims)"
-            record_last_cube_
+            $history_ record_last_cube
             return
          }
 
@@ -607,10 +631,13 @@ itcl::class gaia::GaiaCube {
          }
 
          #  Add cube to history (and previous cube to back list).
-         add_history $itk_option(-cube)
+         $history_ add_history $itk_option(-cube)
 
          #  Update FITS headers, if viewed.
          maybe_update_fitsheaders_
+
+         #  Clear the iso and volume renderers.
+         renderers_clear_ 0
       }
    }
 
@@ -640,8 +667,8 @@ itcl::class gaia::GaiaCube {
    #  display window and position on the central plane. A dummy NDF is used
    #  for FITS and NDF files as this is the simplest way to make sure that the
    #  toolboxes can also access the data in an efficient manner. When a
-   #  toolbox access this file it will need to save the NDF first to make sure
-   #  that the data values are up to date.
+   #  toolbox accesses this file it will need to save the NDF first to make
+   #  sure that the data values are up to date.
    protected method set_step_axis_ {value {setplane 1}} {
       if { $value != $axis_ && $bounds_ != {} } {
          set axis_ $value
@@ -671,6 +698,9 @@ itcl::class gaia::GaiaCube {
             #  Otherwise update the displayed coordinate for the plane.
             $itk_component(index) configure -value $plane_
          }
+
+         #  Update the 3D renderers.
+         renderers_set_display_axis_
       }
    }
 
@@ -683,6 +713,11 @@ itcl::class gaia::GaiaCube {
       set value $axis_
       incr axis_
       set_step_axis_ $value 0
+   }
+
+   #  Get the plane being displayed.
+   public method get_display_plane {} {
+      return $plane_
    }
 
    #  Set the plane to display and display it. When regen is true a new
@@ -798,6 +833,9 @@ itcl::class gaia::GaiaCube {
       #  Make sure position show in slide matches this (note feedback is
       #  avoided as $newvalue != $plane_).
       $itk_component(index) configure -value $plane_
+
+      #  Send event to GAIA3D toolboxes, if up and running.
+      renderers_set_display_plane_
    }
 
    #  Set the position of a reference line shown in the plot.
@@ -1060,6 +1098,12 @@ itcl::class gaia::GaiaCube {
       return $axis_
    }
 
+   #  Set the current axis.
+   public method set_axis {value} {
+      $itk_component(axis) configure -value $value
+      set_step_axis_ $value
+   }
+
    #  Allow support classes access to the cubeaccessor. This access
    #  should be considered readonly.
    public method get_cubeaccessor {} {
@@ -1077,280 +1121,10 @@ itcl::class gaia::GaiaCube {
       $itk_component(spectrum) ref_range_moved 1 $lower $upper none
    }
 
-   #  ============================================================
-   #  Go menu control. Just like that of Skycat, except filters out
-   #  cubes and allows the history to be updated without opening as
-   #  an image.
-   #  =============================================================
-
-   #  Add a cube to the history catalog under the given filename.
-   #  Re-implementation of SkySearch::add_history that avoids using the
-   #  rtdimage to obtain the cube properties.
-   public method add_history {filename} {
-
-      #  Ignore non-existant cubes.
-      if { $filename == "" || ! [file exists $filename] } {
-         return
-      }
-
-      #  Access history catalogue (need to do this sometime, so do it now).
-      set catalog $history_catalog_
-
-      #  Check if the directory for the catalog exists
-      set dir [file dirname $catalog]
-      if { ! [file isdirectory $dir] } {
-         if { [catch {exec mkdir $dir} msg] } {
-            warning_dialog $msg
-            return
-         }
-      }
-
-      #  Make sure at least an empty catalog exists.
-      if { ! [file exists $catalog] || [file size $catalog] == 0 } {
-
-         # If it doesn't exist yet, create an empty catalog file
-         if { [catch {set fd [::open $catalog w]} msg] } {
-            warning_dialog "can't create image history catalog: $msg"
-            return
-         }
-         puts $fd "Skycat History Catalog v1.0"
-         puts $fd ""
-         puts $fd "ra_col: -1"
-         puts $fd "dec_col: -1"
-         puts $fd "x_col: -1"
-         puts $fd "y_col: -1"
-         puts $fd "show_cols: file ra dec object NAXIS NAXIS1 NAXIS2 NAXIS3"
-         puts $fd "sort_cols: timestamp"
-         puts $fd "sort_order: decreasing"
-         puts $fd ""
-         puts $fd [join $history_cols_ "\t"]
-         puts $fd "----"
-         ::close $fd
-
-         #  Get the catalog into the list of known catalogs.
-         $astrocat_ open $catalog
-      }
-
-      #  Don't record Temp cubes they will be deleted.
-      if { ! [string match {*Temp*} $filename] } {
-
-         #  Add an entry for the given image and filename
-         set id [file tail $filename]
-
-         #  Image centre RA and Dec not easily available, so skip (need image
-         #  loaded).
-         set ra "00:00:00"
-         set dec "00:00:00"
-
-         #  Record cube dimensions.
-         set object [$cubeaccessor_ fitsread OBJECT]
-         set naxis 3
-         set dims [$cubeaccessor_ getdims 0]
-         set naxis1 [lindex $dims 0]
-         set naxis2 [lindex $dims 0]
-         set naxis3 [lindex $dims 0]
-
-         #  Also make these up.
-         set lowcut 0
-         set highcut 1
-         set colormap "real.lasc"
-         set itt "ramp.iasc"
-         set colorscale "linear"
-         set zoom "1"
-
-         set timestamp [clock seconds]
-
-         #  Get full path name of file for preview URL
-         if { "[string index $filename 0]" == "/" } {
-            set fullpath $filename
-         } else {
-            set fullpath [pwd]/$filename
-         }
-         set preview file:$fullpath
-
-         set data [list [list $id $ra $dec $object \
-                            $naxis $naxis1 $naxis2 $naxis3 \
-                            $lowcut $highcut $colormap $itt $colorscale $zoom \
-                            $timestamp $preview]]
-
-         $astrocat_ open $catalog
-         $astrocat_ save $catalog 1 $data ""
-
-         #  Update history catalog window, if it is showing
-         set w [cat::AstroCat::get_instance [file tail $catalog]]
-         if { "$w" != "" && [winfo viewable $w] } {
-            $w search
-         }
-      }
+   #  Return object for controlling the spectral coordinates.
+   public method get_spec_coords {} {
+      return $spec_coords_
    }
-
-   #  SkyCatCtrl like update_history_menu, but filter to only show
-   #  cubes.
-   protected method update_history_menu_ {menu} {
-
-      #  Clear existing items.
-      $menu delete 0 end
-
-      add_menuitem $menu command "Back" \
-         {Go back again to the previous cube} \
-         -command [code $this previous_cube] \
-         -state disabled
-
-      if { [info exists back_list_(cube)] && [llength $back_list_(cube)] } {
-         $menu entryconfig Back -state normal
-      }
-
-      add_menuitem $menu command "Forward" \
-         {Go forward again to the next image} \
-         -command [code $this forward_cube] \
-         -state disabled
-
-      if { [info exists forward_list_(cube)] &&
-            [llength $forward_list_(cube)] } {
-         $menu entryconfig Forward -state normal
-      }
-
-      $menu add separator
-
-      add_history_menu_items $menu 20
-   }
-
-   #  SkySearch::add_history_menu_items, implemented to filter only
-   #  the first n cubes from the history list.
-   protected method add_history_menu_items {menu n} {
-
-      set catalog $history_catalog_
-      if { [catch {$astrocat_ open $catalog} ] } {
-         #  No catalog yet
-         return
-      }
-      set list [$astrocat_ query \
-                   -nrows $n -sort timestamp -sortorder decreasing]
-
-      foreach row $list {
-         eval lassign {$row} $history_cols_
-         if { $NAXIS3 != {} } {
-            set filename [string range $PREVIEW 5 end]
-            $menu add command \
-               -label $file \
-               -command [code $this configure -cube $filename]
-         }
-      }
-   }
-
-   #  Go back to the previous cube.
-   public method previous_cube {} {
-
-      while { [set n [llength $back_list_(cube)]] } {
-
-         set filename [lindex $back_list_(cube) end]
-         set system [lindex $back_list_(system) end]
-         set units [lindex $back_list_(units) end]
-
-         if { "$filename" != "$itk_option(-cube)" &&
-              [file exists $filename] } {
-
-            #  Current file becomes forward.
-            lappend forward_list_(cube) $itk_option(-cube)
-            lassign [$spec_coords_ get_system] oldsystem oldunits
-            if { $oldsystem == "default" } {
-               set oldsystem {}
-               set oldunits {}
-            }
-            lappend forward_list_(system) $oldsystem
-            lappend forward_list_(units) $oldunits
-
-            #  Remove cube we're about to display from back list. This
-            #  will be added again when a new cube is loaded.
-            set back_list_(cube) [lrange $back_list_(cube) 0 [expr $n-2]]
-            set back_list_(system) [lrange $back_list_(system) 0 [expr $n-2]]
-            set back_list_(units) [lrange $back_list_(units) 0 [expr $n-2]]
-
-            #  Ok, now switch to previous file, making sure the current
-            #  file isn't recorded (goes onto the forward list).
-            set last_cube_ {}
-
-            #  Open cube, attempting to keep any world coordinate limits.
-            open_keeplimits $filename
-
-            #  And its system/units.
-            if { $system != {} } {
-               $spec_coords_ set_system $system $units 0
-            }
-            break
-         }
-
-         #  Skip non-existent files.
-         set back_list_(cube) [lrange $back_list_(cube) 0 [expr $n-2]]
-         set back_list_(system) [lrange $back_list_(system) 0 [expr $n-2]]
-         set back_list_(units) [lrange $back_list_(units) 0 [expr $n-2]]
-      }
-   }
-
-   #  Go forward again to the next cube.
-   public method forward_cube {} {
-
-      while { [set n [llength $forward_list_(cube)]] } {
-         set filename [lindex $forward_list_(cube) end]
-         set system [lindex $forward_list_(system) end]
-         set units [lindex $forward_list_(units) end]
-         if {"$filename" != "$itk_option(-cube)" && [file exists $filename]} {
-
-            #  Remove this from lists.
-            set forward_list_(cube) \
-               [lrange $forward_list_(cube) 0 [expr $n-2]]
-            set forward_list_(system) \
-               [lrange $forward_list_(system) 0 [expr $n-2]]
-            set forward_list_(units) \
-               [lrange $forward_list_(units) 0 [expr $n-2]]
-
-            #  Load and display, attempting to keep world coordinate limits.
-            open_keeplimits $filename
-
-            #  Set related system/units.
-            if { $system != {} } {
-               $spec_coords_ set_system $system $units 0
-            }
-            break
-         }
-
-         #  Skip non-existent files.
-         set forward_list_(cube) \
-            [lrange $forward_list_(cube) 0 [expr $n-2]]
-         set forward_list_(system) \
-            [lrange $forward_list_(system) 0 [expr $n-2]]
-         set forward_list_(units) \
-            [lrange $forward_list_(units) 0 [expr $n-2]]
-      }
-   }
-
-   #  Add the "last cube" to the last_cube_ list.
-   protected method record_last_cube_ {} {
-
-      #  Don't add if present as last cube or no cube loaded.
-      if { $last_cube_ != {} } {
-         if { [info exists back_list_(cube)] } {
-            set current_last [lindex $back_list_(cube) end]
-         } else {
-            set current_last {}
-         }
-
-         if { $current_last != $last_cube_ } {
-            lappend back_list_(cube) $last_cube_
-
-            lassign [$spec_coords_ get_system] system units
-            if { $system == "default" } {
-               set system {}
-               set units {}
-            }
-            lappend back_list_(system) $system
-            lappend back_list_(units) $units
-         }
-      }
-
-      set last_cube_ $itk_option(-cube)
-   }
-
 
    #  =================
    #  Methods involved in "saving" the current extraction, animation
@@ -1415,8 +1189,8 @@ itcl::class gaia::GaiaCube {
                foreach type "spectrum animation collapse chanmap" {
                   if { [info exists limits_($type,0)] } {
 
-                     set li [gaiautils::asttrann $convwcs $limits_($type,0)]
-                     set ui [gaiautils::asttrann $convwcs $limits_($type,1)]
+                     set li [gaiautils::asttrann $convwcs 1 $limits_($type,0)]
+                     set ui [gaiautils::asttrann $convwcs 1 $limits_($type,1)]
 
                      #  Convert to integers.
                      set li [expr int([lindex $li $axis])]
@@ -1430,10 +1204,10 @@ itcl::class gaia::GaiaCube {
                #  Restore baselines.
                for {set i 0} {$i < $limits_(baseline,nr)} {incr i} {
                   if { [info exists limits_(baseline,$i,0)] } {
-                     set li \
-                        [gaiautils::asttrann $convwcs $limits_(baseline,$i,0)]
-                     set ui \
-                        [gaiautils::asttrann $convwcs $limits_(baseline,$i,1)]
+                     set li [gaiautils::asttrann $convwcs 1 \
+                                $limits_(baseline,$i,0)]
+                     set ui [gaiautils::asttrann $convwcs 1 \
+                                $limits_(baseline,$i,1)]
 
                      #  Convert to integers.
                      set li [expr int([lindex $li $axis])]
@@ -1475,14 +1249,14 @@ itcl::class gaia::GaiaCube {
       set coords {}
       catch {
          set wcs [$cubeaccessor_ getwcs]
-         set coords [gaiautils::asttrann $wcs $section]
+         set coords [gaiautils::asttrann $wcs 1 $section]
       }
       return $coords
    }
 
-   #  =======
+   #  ============
    #  FITS headers
-   #  =======
+   #  ============
 
    #  Create and display the FITS headers dialog window.
    protected method show_fitsheaders_ {} {
@@ -1500,6 +1274,171 @@ itcl::class gaia::GaiaCube {
             $fitsheaders_ activate
          }
       }
+   }
+
+   # ================
+   # 3D visualisation
+   # ================
+
+   #  Make one of the GAIA3D toolboxes, or deiconify.
+   public method make_toolbox {type {clone 0} } {
+
+      #  Do nothing if no cube is displayed, unless allowed.
+      if { [$cubeaccessor_ cget -dataset] != "" } {
+         set basename $type
+         if { $clone } {
+            #  Request to create a clone (i.e. another) toolbox. Make
+            #  extended name for this.
+            set basename "$basename[incr tool_clones_]"
+         }
+
+         #  If the window exists then just raise it.
+         if { [info exists itk_component($basename) ] &&
+              [winfo exists $itk_component($basename) ] } {
+            wm deiconify $itk_component($basename)
+            raise $itk_component($basename)
+         } else {
+            busy {
+               global ::gaiascreen 
+               set gaiascreen "starpc1:0.0"
+               make_${type}_toolbox $basename $clone
+            }
+         }
+
+         #  Make sure we get the notifications about spectral extraction
+         #  from GaiaCubeSpectrum (do this now to avoid overhead of callback).
+         $itk_component(spectrum) configure -notify_cmd \
+            [code $this renderers_spectrum_moved_]
+      }
+   }
+
+   #  ISO surface rendering toolbox.
+   public method make_isosurface_toolbox {name {cloned 0}} {
+      if { [check_for_gaia3d_] } {
+         itk_component add $name {
+            gaia3d::Gaia3dIsosurface $w_.\#auto \
+               -gaiacube $w_ \
+               -rtdimage $itk_option(-rtdimage) \
+               -number $itk_option(-number) \
+               -clone_cmd [code $this make_toolbox isosurface 1] \
+               -really_die $cloned \
+               -filter_types $itk_option(-filter_types)
+         }
+      } else {
+         warning_dialog \
+            "Cannot render cubes as the GAIA3D extension is not available" $w_
+      }
+   }
+
+   #  Volume rendering toolbox.
+   public method make_volume_toolbox {name {cloned 0}} {
+      if { [check_for_gaia3d_] } {
+         itk_component add $name {
+            gaia3d::Gaia3dVolume $w_.\#auto \
+               -gaiacube $w_ \
+               -rtdimage $itk_option(-rtdimage) \
+               -number $itk_option(-number) \
+               -clone_cmd [code $this make_toolbox volume 1] \
+               -really_die $cloned \
+               -filter_types $itk_option(-filter_types)
+         }
+      } else {
+         warning_dialog \
+            "Cannot render cubes as the GAIA3D extension is not available" $w_
+      }
+   }
+
+   #  Messages to GAIA3D.
+   #  ===================
+
+   #  Clear the scenes displayed by the renderers. Do this if cube data
+   #  changes. If full is true then imagedata is released immediately
+   #  rather than waiting for the next data to load.
+   protected method renderers_clear_ { full } {
+      foreach name "isosurface volume" {
+         if { [info exists itk_component($name) ] } {
+            if { [winfo exists $itk_component($name) ] } {
+               $itk_component($name) clear_scene $full
+            }
+         }
+      }
+   }
+
+   #  Update renderers to display a new plane.
+   protected method renderers_set_display_plane_ {} {
+      foreach name "isosurface volume" {
+         if { [info exists itk_component($name) ] } {
+            if { [winfo exists $itk_component($name) ] } {
+               $itk_component($name) set_display_plane $plane_
+            }
+         }
+      }
+   }
+
+   #  Update renderers to display a new axis
+   protected method renderers_set_display_axis_ {} {
+      foreach name "isosurface volume" {
+         if { [info exists itk_component($name) ] } {
+            if { [winfo exists $itk_component($name) ] } {
+               $itk_component($name) set_display_axis $axis_
+               $itk_component($name) set_display_plane $plane_
+            }
+         }
+      }
+   }
+
+   #  Update renderers to move the spectrum line, if this is a point
+   #  extraction (and it's displayed). XXX handle extraction stops, switch to
+   #  region, reference spectrum XXX.
+   protected method renderers_spectrum_moved_ {type ix iy} {
+      if { $type == "p" } {
+         foreach name "isosurface volume" {
+            if { [info exists itk_component($name) ] } {
+               if { [winfo exists $itk_component($name) ] } {
+                  $itk_component($name) set_spectral_line $ix $iy
+               }
+            }
+         }
+      }
+   }
+
+   #  Communication from GAIA3D.
+   #  ==========================
+
+   #  Set the position of the spectrum, if extraction has been started.
+   #  Coordinates are a position on the image slice.
+   public method set_point_spectrum_position {ix iy} {
+      $itk_component(spectrum) set_point_position $ix $iy
+   }
+
+   #  Get the position of the spectrum, if extraction has been started.
+   #  Coordinates are a position on the image slice. If not extracting
+   #  then "" is returned.
+   public method get_point_spectrum_position {} {
+      return [$itk_component(spectrum) get_point_position]
+   }
+
+   #  GAIA3D utilities.
+   #  =================
+
+   #  Check for the presence of GAIA3D. Only done once per-session.
+   #  The variable VTK_LIBRARY_DIR should define the directory that
+   #  contains the VTK installation (the parent of that will contain
+   #  the shareable libraries and should be on the LD_LIBRARY_PATH).
+   protected method check_for_gaia3d_ {} {
+      if { $have_gaia3d_ == -1 } {
+         set have_gaia3d_ 0
+         if { [package versions Gaia3d] != "" } {
+            if { [ catch {
+                          lappend ::auto_path $::env(VTK_LIBRARY_DIR)
+                          package require vtk
+                          package require Gaia3d
+                          set have_gaia3d_ 1 } msg ] } {
+               info_dialog "Failed to load GAIA3D: $msg"
+            }
+         }
+      }
+      return $have_gaia3d_
    }
 
    #  Configuration options: (public variables)
@@ -1547,9 +1486,6 @@ itcl::class gaia::GaiaCube {
    #  or QUALITY. Keep last component value as a fallback.
    protected variable component_ "DATA"
    protected variable last_component_ "DATA"
-
-   #  Name of the last cube opened.
-   protected variable last_cube_ {}
 
    #  The bounds of the cube, 3 pairs of upper and lower values.
    protected variable bounds_ {}
@@ -1611,10 +1547,6 @@ itcl::class gaia::GaiaCube {
    #  The ref_id value of the baseline controls. Must be last.
    protected variable baseline_id_ ""
 
-   #  Arrays used for the Go=>Back/Forward menu items.
-   protected variable back_list_
-   protected variable forward_list_
-
    #  Data associated with the state of all the limits. Used to restore
    #  between cubes with different sizes.
    protected variable limits_
@@ -1622,8 +1554,14 @@ itcl::class gaia::GaiaCube {
    #  Name of GaiaFITSHeader instance, only set when active.
    protected variable fitsheaders_ {}
 
+   #  Number for creating toolbox clones.
+   protected variable tool_clones_ 0
+
    #  Collection of managed temporary files.
    protected variable tmpfiles_ {}
+
+   #  Object controlling the Go menu and cube history items.
+   protected variable history_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
@@ -1631,17 +1569,8 @@ itcl::class gaia::GaiaCube {
    #  The temporary image count.
    protected common count_ 0
 
-   #  Name of the history catalogue, shared with Skycat and images.
-   protected common history_catalog_ $::env(HOME)/.skycat/history
-
-   #  C++ astrocat object shared with AstroCat?
-   protected common astrocat_ [astrocat ::cat::.astrocat]
-
-   #  List of columns in the history catalog.
-   protected common history_cols_ \
-      [list file ra dec object NAXIS NAXIS1 NAXIS2 NAXIS3 \
-          lowcut highcut colormap itt colorscale zoom timestamp PREVIEW]
-
+   #  Is GAIA3D available, -1 means not checked.
+   protected common have_gaia3d_ -1
 
 #  End of class definition.
 }

@@ -110,7 +110,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       }
       add_short_help $itk_component(reextract) \
          {Re-extract spectrum using new limits}
-      
+
       pack $itk_component(tframe) -side top -fill x -ipadx 1m -ipady 2m
       pack $itk_component(extraction) -side left -expand 0 -anchor w
       pack $itk_component(reextract) -side left -expand 0 -anchor c
@@ -177,7 +177,7 @@ itcl::class gaia::GaiaCubeSpectrum {
          -side top -fill x -ipadx 1m -ipady 2m
       add_short_help $itk_component(datalow) \
          {Lower data limit for spectral plot, press return to apply}
-      
+
       itk_component add datahigh {
          LabelEntry $w_.datahigh \
             -text "Upper data limit:" \
@@ -301,7 +301,6 @@ itcl::class gaia::GaiaCubeSpectrum {
       if { $toolbox_ != {} } {
          ::delete object $toolbox_
       }
-
    }
 
    #  Methods:
@@ -485,9 +484,44 @@ itcl::class gaia::GaiaCubeSpectrum {
          $spectrum_ update_label "$ra, $dec"
       }
 
+      #  Eval the notification command, if have one.
+      if { $itk_option(-notify_cmd) != {} } {
+         eval $itk_option(-notify_cmd) p $ix $iy
+      }
+
       #  Record extraction bounds, these are checked.
       set llb_ $lb
       set lub_ $ub
+   }
+
+   #  Set the position of the point extracted spectrum, if extraction is
+   #  enabled. The position is in image coordinates (not pixel).
+   public method set_point_position {ix iy} {
+      if { $spectrum_ != {} && $last_cxcy_ != {} } {
+         $rtdimage_ convert coords $ix $iy image sx sy screen
+         display_point_spectrum_ "localdrag" $sx $sy
+      }
+   }
+
+   #  Get the position of the point extracted spectrum, if extraction is
+   #  enabled. The position is in image coordinates (not pixel). If
+   #  not extracting or using a region "" is returned.
+   public method get_point_position {} {
+      if { $last_cxcy_ != {} } {
+
+         #  Convert click coordinates from canvas coords to grid coords.
+         lassign $last_cxcy_ cx cy
+         set ccx [$canvas_ canvasx $cx]
+         set ccy [$canvas_ canvasy $cy]
+         $rtdimage_ convert coords $ccx $ccy canvas ix iy image
+
+         #  Make grid coordinates integer to pick centre of pixel.
+         set ix [expr round($ix)]
+         set iy [expr round($iy)]
+
+         return [list $ix $iy]
+      }
+      return ""
    }
 
    #  Display a region spectrum in the local plot. Action can be "localstart"
@@ -544,6 +578,11 @@ itcl::class gaia::GaiaCubeSpectrum {
 
       #  Cannot display the current coordinate, so make sure it is empty.
       $spectrum_ update_label ""
+
+      #  Eval the notification command, if have one.
+      if { $itk_option(-notify_cmd) != {} } {
+         eval $itk_option(-notify_cmd) r $alow $ahigh
+      }
 
       #  Record extraction bounds, these are checked.
       set llb_ $lb
@@ -613,7 +652,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       return "none"
    }
 
-   #  Re-extract the spectrum. Quick button to avoid clicking on the image 
+   #  Re-extract the spectrum. Quick button to avoid clicking on the image
    #  (which can be unzoomed so accuracy is difficult).
    protected method reextract_ {} {
       if { $spectrum_ != {} } {
@@ -660,9 +699,9 @@ itcl::class gaia::GaiaCubeSpectrum {
       set filename [$temp_files_ get_name]
       $spec_writer_ write_as_ndf $filename
 
-      #  If in CYGWIN environment convert filename to windows format.
-      #  SPLAT is a windows application. Otherwise get absolute name
-      #  for SPLAT to locate, if needed.
+      # If in CYGWIN environment convert filename to windows format.
+      # SPLAT is a windows application. Otherwise get absolute name
+      # for SPLAT to locate, if needed.
       if { [string match {CYGWIN*} $::tcl_platform(os)] } {
          set filename [exec cygpath -wa $filename]
       } else {
@@ -956,7 +995,7 @@ itcl::class gaia::GaiaCubeSpectrum {
    public method get_set_limits {} {
       set from [$itk_component(bounds) cget -from]
       set to [$itk_component(bounds) cget -to]
-      if { $from != $itk_option(-lower_limit) || 
+      if { $from != $itk_option(-lower_limit) ||
            $to != $itk_option(-upper_limit) } {
          return [list $itk_option(-lower_limit) $itk_option(-upper_limit)]
       }
@@ -1305,6 +1344,11 @@ itcl::class gaia::GaiaCubeSpectrum {
 
    #  Whether to show the output from splatdisp.
    itk_option define -show_splatdisp show_splatdisp Show_SplatDisp 0
+
+   #  Command to execute when a spectrum is extracted or the extraction has
+   #  been updated. Trailed by "p" or "r" for point and region and the
+   #  extraction indices.
+   itk_option define -notify_cmd notify_cmd Notify_Cmd {}
 
    #  Protected variables: (available to instance)
    #  --------------------

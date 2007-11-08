@@ -117,10 +117,10 @@ itcl::class gaia::LabelFileChooser {
       if { $file_chooser_ == {} } {
          if { $itk_option(-filter_types) == {} } { 
             set file_chooser_ \
-               [FileSelect .\#auto -title "Select Detection Image"]
+               [FileSelect .\#auto -title $itk_option(-chooser_title)]
          } else {
             set file_chooser_ [FileSelect .\#auto \
-                                  -title "Select Detection Image"\
+                                  -title $itk_option(-chooser_title) \
                                   -filter_types $itk_option(-filter_types)]
          }
       }
@@ -137,6 +137,10 @@ itcl::class gaia::LabelFileChooser {
 
    #  Filter types (for images, if used).
    itk_option define -filter_types filter_types Filter_Types {} {}
+
+   #  Title for fileselection window.
+   itk_option define -chooser_title chooser_title Chooser_Title \
+      "Select Detection Image"
 
    #  Protected variables: (available to instance)
    #  --------------------

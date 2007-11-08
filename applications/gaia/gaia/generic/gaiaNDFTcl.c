@@ -52,7 +52,7 @@
 #include <prm_par.h>
 #include "gaiaNDF.h"
 #include "gaiaHDS.h"
-#include "gaiaArray.h"
+#include "GaiaArray.h"
 #include "gaiaUtils.h"
 
 /* Struct for information associated with an identifier */
@@ -581,8 +581,8 @@ static int gaiaNDFTclMap( ClientData clientData, Tcl_Interp *interp,
                 /* Construct result */
                 if ( result == TCL_OK ) {
                     arrayInfo = gaiaArrayCreateInfo( dataPtr, type, el,
-                                                     0, 0, 0,
-                                                     1.0, 0.0, 0 );
+                                                     0, 0, 0, 1.0, 0.0, 
+                                                     GAIA_ARRAY_NONE );
                     Tcl_SetObjResult( interp,Tcl_NewLongObj((long)arrayInfo));
                 }
                 else {

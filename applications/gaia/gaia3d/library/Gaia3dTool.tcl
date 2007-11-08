@@ -1,0 +1,1105 @@
+#+
+#  Name:
+#     Gaia3dTool
+
+#  Type of Module:
+#     [incr Tcl] class
+
+#  Purpose:
+#     Defines a super-class for tools that render volumes.
+
+#  Description:
+#     This class provides common features used by toolboxes that render
+#     data-cubes using VTK, such as the basic window setup data access and
+#     drawing control. Methods that add tool and scene specific controls are
+#     not defined and should be implemented.
+
+#  Invocations:
+#
+#        Gaia3dTool object_name [configuration options]
+#
+#     This creates an instance of a Gaia3dVolume object. The return is
+#     the name of the object.
+#
+#        object_name configure -configuration_options value
+#
+#     Applies any of the configuration options (after the instance has
+#     been created).
+#
+#        object_name method arguments
+#
+#     Performs the given method on this object.
+
+#  Copyright:
+#     Copyright (C) 2007 Science and Technology Facilities Council
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of the
+#     License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+#     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     PWD: Peter Draper (JAC, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     24-JUL-2007 (PWD):
+#        Original version.
+#     {enter_further_changes_here}
+
+#-
+
+#.
+
+itk::usual Gaia3dTool {}
+
+itcl::class gaia3d::Gaia3dTool {
+
+   #  Inheritances:
+   #  -------------
+   inherit util::TopLevelWidget
+
+   #  Constructor:
+   #  ------------
+   constructor {args} {
+
+      package require vtk
+      package require vtkinteraction
+
+      #  Evaluate any options.
+      eval itk_initialize $args
+
+      #  Make it a decent size (packing doesn't work).
+      wm geometry  $w_ 800x700+0+0
+
+      #  Add short help window.
+      make_short_help
+
+      #  Add the File menu.
+      add_menubar
+      set File [add_menubutton "File" left]
+      configure_menubutton File -underline 0
+
+      #  Add option to create a new window.
+      $File add command -label {New window} \
+         -command [code $this clone_me_] \
+         -accelerator {Control-n}
+      bind $w_ <Control-n> [code $this clone_me_]
+      $short_help_win_ add_menu_short_help $File \
+         {New window} {Create a new toolbox}
+
+      #  Add the print menu items for hardcopies.
+      $File add command -label "Print..." \
+         -command [code $this hardcopy] \
+         -accelerator {Control-p}
+      bind $w_ <Control-p> [code $this hardcopy]
+
+      #  Set the close menu item.
+      $File add command -label Close \
+         -command [code $this close] \
+         -accelerator {Control-c}
+      bind $w_ <Control-c> [code $this close]
+
+      #  Add the options menu
+      set Options [add_menubutton "Options" left]
+      configure_menubutton Options -underline 0
+
+      #  Create the extra cubes toolbox.
+      add_menuitem $Options command "Other cubes..." \
+         {Render isosurfaces of other cubes into the scene} \
+         -command [code $this make_extratoolbox]
+
+      #  Add an option to add a customized colour.
+      $Options add command \
+         -label {Add custom colour...} \
+         -command [code $this choose_custom_colour]
+      $short_help_win_ add_menu_short_help $Options \
+         {Add custom colour...} \
+         {Choose a new colour for menus}
+
+      #  Add option to choose the image plane colour map.
+      set submenu [menu $Options.imagecolour]
+      $Options add cascade -label "Image plane colour map" -menu $submenu
+      colourmaps_fill_ $submenu
+
+      #  Add option to choose a type of opacity for the image plane.
+      set submenu [menu $Options.imageopacity]
+      $Options add cascade -label "Image plane opacity" -menu $submenu
+      opacity_fill_ $submenu
+
+      #  AST axes, text scale and a colour.
+      set submenu [menu $Options.textscale]
+      $Options add cascade -label "Annotated text scale" -menu $submenu
+      textscale_fill_ $submenu
+
+      set submenu [menu $Options.textcolour]
+      $Options add cascade -label "Annotated text colour" -menu $submenu
+      textcolour_fill_ $submenu
+
+      #  Create a panedwindow to define the basic layout between the
+      #  graphics display and controls in a left-right split.
+      itk_component add pane {
+         ::panedwindow $w_.pane -width 5i -height 6i -orient horizontal
+      } {
+         #  This is needed. Not sure why.
+      }
+
+      #  Add the renderer widget in the right-hand pane.
+      set renwindow_ [Gaia3dVtkWindow $w_.renwindow]
+      add_short_help $renwindow_ {See help for interactions}
+
+      #  Create the button bar
+      itk_component add actionframe {frame $w_.action}
+
+      #  Add a button to close window.
+      itk_component add close {
+         button $itk_component(actionframe).close -text Close \
+            -command [code $this close]
+      }
+      add_short_help $itk_component(close) {Close window}
+
+      #  Do the rendering.
+      itk_component add draw {
+         button $itk_component(actionframe).draw -text {Draw} \
+            -command [code $this draw]
+      }
+      add_short_help $itk_component(draw) {Draw the 3D volume}
+
+      #  Pack all the components into place.
+      pack $itk_component(actionframe) -side bottom -fill x -pady 5 -padx 5
+      pack $itk_component(pane) -fill both -expand 1 -padx 1m -pady 1m
+      pack $itk_component(close) -side right -expand 1 -pady 3 -padx 3
+      pack $itk_component(draw) -side left -expand 1 -pady 3 -padx 3
+   }
+
+   #  Destructor:
+   #  -----------
+   destructor  {
+
+      #  Release any scene VTK objects and the image data.
+      catch {release_objects 1}
+
+      #  Free the Plot3D.
+      free_plot3d_
+
+      #  Simple axes. These can be just set visible/invisible, so only remove
+      #  on a full release.
+      if { $simpleaxes_ != {} } {
+         ::delete object simpleaxes_
+         set simpleaxes_ {}
+      }
+
+      #  Outline. This can be just set visible/invisible, so only remove
+      #  on a full release.
+      if { $outline_ != {} } {
+         ::delete object outline_
+         set outline_ {}
+      }
+   }
+
+   #  Methods:
+   #  --------
+
+   #  Called after construction is completed. Finish UI.
+   protected method init {} {
+
+      #  Populate the controls part of display (left-hand pane).
+      add_controls_
+
+      #  Add this and the render window to the panedwindow.
+      $itk_component(pane) add $itk_component(controls) $renwindow_
+   }
+
+   #  Create a new instance of this object.
+   protected method clone_me_ {} {
+      if { $itk_option(-clone_cmd) != {} } {
+         eval $itk_option(-clone_cmd)
+      }
+   }
+
+   #  Close this window, kill it if needed, otherwise withdraw. Also
+   #  clear the display. Retains the image data.
+   public method close {} {
+      fullclose 0
+   }
+
+   #  Close this window, also releases the data if fullrelease is true.
+   public method fullclose { fullrelease } {
+      catch {release_objects $fullrelease}
+      if { $itk_option(-really_die) } {
+         delete object $this
+      } else {
+         wm withdraw $w_
+      }
+   }
+
+   #  Create a hardcopy.
+   public method hardcopy {} {
+      utilReUseWidget gaia3d::Gaia3dVtkPrintTool $w_.hardcopy \
+         -renwindow $renwindow_
+   }
+
+   #  Public redraw method.
+   public method redraw { {override 0} } {
+      if { $override } {
+         draw
+      }
+   }
+
+   #  Add generic controls for the data handling.
+   protected method add_controls_ {} {
+
+      set lwidth 12
+
+      itk_component add controls {
+         ::frame $w_.controls
+      }
+
+      itk_component add rule {
+         LabelRule $itk_component(controls).rule -text "Controls:"
+      }
+      pack $itk_component(rule) -side top -fill x
+
+      #  Tool specific controls.
+      add_tool_controls_
+
+      #  Switch on bad pixel replacement, or not.
+      itk_component add replacebad {
+         gaia::StarLabelCheck $itk_component(controls).replacebad \
+            -text "Replace bad:" \
+            -onvalue 1 \
+            -offvalue 0 \
+            -labelwidth $lwidth \
+            -variable [scope checkbad_] \
+            -command [code $this changed_bad_]
+      }
+      pack $itk_component(replacebad) -fill x -expand 0 -ipady 5
+      add_short_help $itk_component(replacebad) \
+         {Replace BAD values in cube before rendering}
+
+      itk_component add replacevalue {
+         util::LabelEntry $itk_component(controls).replacevalue \
+            -text "Replacement value:" \
+            -labelwidth $lwidth \
+            -validate real \
+            -orient vertical \
+            -value 0.0 \
+            -command [code $this changed_bad_]
+      }
+      pack $itk_component(replacevalue) -fill x -expand 0
+      add_short_help $itk_component(replacevalue) \
+         {Value to replace BAD values in cube with}
+
+      #  Image plane visibility.
+      itk_component add showimageplane {
+         gaia::StarLabelCheck $itk_component(controls).showimageplane \
+            -text "Image plane:" \
+            -onvalue 1 \
+            -offvalue 0 \
+            -labelwidth $lwidth \
+            -variable [scope show_image_plane_] \
+            -command [code $this changed_show_image_plane_]
+      }
+      pack $itk_component(showimageplane) -fill x -expand 0 -ipady 5
+      add_short_help $itk_component(showimageplane) \
+         {Show current image slice (interactive)}
+
+      #  Spectral line visibility.
+      itk_component add showspectralline {
+         gaia::StarLabelCheck $itk_component(controls).showspectralline \
+            -text "Spectral line:" \
+            -onvalue 1 \
+            -offvalue 0 \
+            -labelwidth $lwidth \
+            -variable [scope show_spectral_line_] \
+            -command [code $this changed_show_spectral_line_]
+      }
+      pack $itk_component(showspectralline) -fill x -expand 0 -ipady 5
+      add_short_help $itk_component(showspectralline) \
+         {Show spectral extraction line (requires image plane for interaction)}
+
+      #  Simple axes directions.
+      itk_component add showsimpleaxes {
+         gaia::StarLabelCheck $itk_component(controls).showsimpleaxes \
+            -text "Direction axes:" \
+            -onvalue 1 \
+            -offvalue 0 \
+            -labelwidth $lwidth \
+            -variable [scope show_simple_axes_] \
+            -command [code $this changed_show_simple_axes_]
+      }
+      pack $itk_component(showsimpleaxes) -fill x -expand 0 -ipady 5
+      add_short_help $itk_component(showsimpleaxes) \
+         {Show directions axes for world coordinates (always visible)}
+
+      #  Bounding box (aka outline).
+      itk_component add showoutline {
+         gaia::StarLabelCheck $itk_component(controls).showoutline \
+            -text "Bounding box:" \
+            -onvalue 1 \
+            -offvalue 0 \
+            -labelwidth $lwidth \
+            -variable [scope show_outline_] \
+            -command [code $this changed_show_outline_]
+      }
+      pack $itk_component(showoutline) -fill x -expand 0 -ipady 5
+      add_short_help $itk_component(showoutline) \
+         {Show an outline around the cube (bounding box)}
+
+      #  AST annotated axes.
+      itk_component add showastaxes {
+         gaia::StarLabelCheck $itk_component(controls).showastaxes \
+            -text "Annotated axes:" \
+            -onvalue 1 \
+            -offvalue 0 \
+            -labelwidth $lwidth \
+            -variable [scope show_ast_axes_] \
+            -command [code $this changed_show_ast_axes_]
+      }
+      pack $itk_component(showastaxes) -fill x -expand 0 -ipady 5
+      add_short_help $itk_component(showastaxes) \
+         {Show annotated axes around cube (RA and Dec labelling)}
+   }
+
+   #  Get a list of the standard colourmaps, sorted in alphabetic order
+   #  and associated with a short-form name (no .lasc).
+   public method get_colourmaps {} {
+      set slist [lsort -dictionary [gvtk::cmap list]]
+      set cmaps ""
+      foreach cmap $slist {
+         set name [file rootname $cmap]
+         lappend cmaps $cmap $name
+      }
+      return $cmaps
+   }
+
+   #  Fill the colourmaps menu. Use columns to keep length under
+   #  control.
+   protected method colourmaps_fill_ {menu} {
+      set cmaps [get_colourmaps]
+      set n 0
+      foreach {cmap name} $cmaps {
+         if { $n > 20 } {
+            set cbreak 1
+            set n 0
+         } else {
+            set cbreak 0
+         }
+         incr n
+         $menu add radiobutton \
+            -value $cmap \
+            -label $name \
+            -variable [scope plane_colourmap_] \
+            -columnbreak $cbreak \
+            -command [code $this changed_image_plane_colourmap_]
+      }
+   }
+
+   #  Fill the opacity menu with three states, opaque, see-through and
+   #  clear. Full control of the opacity itself isn't used as the scene
+   #  rendering order would require this to go before the main content, but
+   #  that obscures things (as the plane merges into the scene, rather than
+   #  being apart from it). This is less confusing...
+   protected method opacity_fill_ {menu} {
+      $menu add radiobutton \
+         -value 1.0 \
+         -label "opaque" \
+         -variable [scope plane_opacity_] \
+         -command [code $this changed_image_plane_opacity_]
+      $menu add radiobutton \
+         -value 0.9 \
+         -label "see-through" \
+         -variable [scope plane_opacity_] \
+         -command [code $this changed_image_plane_opacity_]
+      $menu add radiobutton \
+         -value 0.0 \
+         -label "clear" \
+         -variable [scope plane_opacity_] \
+         -command [code $this changed_image_plane_opacity_]
+   }
+
+   #  Fill the textscale menu.
+   protected method textscale_fill_ {menu} {
+      foreach i "0.5 0.75 1 1.5 2 3 4 5 6 7 8 9 10 15 20 50" {
+         $menu add radiobutton \
+            -value $i \
+            -label $i \
+            -variable [scope ast_textscale_] \
+            -command [code $this changed_ast_textscale_]
+      }
+   }
+
+   #  Fill the text colour menu. Note doesn't allow extra colours.
+   protected method textcolour_fill_ {menu} {
+      set count [gaia::AstColours::standard_count]
+      for {set i 0} {$i < $count} {incr i} {
+         set colour [gaia::AstColours::lookup_colour $i]
+         $menu add radiobutton \
+            -value $i \
+            -label {   } \
+            -background $colour \
+            -variable [scope ast_textcolour_] \
+            -command [code $this changed_ast_textcolour_]
+      }
+   }
+
+   #  Add the controls specific to this rendering job (contours, data limits
+   #  etc).
+   protected method add_tool_controls_ {} {
+      error "Implement an add_tool_controls_ method"
+   }
+
+   #  Control extra cubes isosurface toolbox.
+   public method make_extratoolbox {} {
+
+      #  If the window exists then just raise it.
+      if { [info exists itk_component(extratoolbox) ] &&
+           [winfo exists $itk_component(extratoolbox) ] } {
+         wm deiconify $itk_component(extratoolbox)
+         raise $itk_component(extratoolbox)
+      } else {
+         busy {
+            itk_component add extratoolbox {
+               Gaia3dExtraIsosurface $w_.\#auto \
+                  -rtdimage $itk_option(-rtdimage) \
+                  -number $itk_option(-number) \
+                  -filter_types $itk_option(-filter_types)
+            }
+         }
+      }
+   }
+
+   #  Choose and then add a custom colour to the menus.
+   public method choose_custom_colour {} {
+      set new_colour [gaia::ColourLabelMenu::choose_custom_colour]
+      if { $new_colour != {} } {
+         add_custom_colour $new_colour -1
+      }
+   }
+
+   #  Add a customized colour to the menus. Use an index if supplied.
+   #  Otherwise create one.
+   public method add_custom_colour { new_colour {index -1} } {
+      error "Implement add_custom_colour method"
+   }
+
+   #  Set variable to get data update next read. Usually when
+   #  bad value handling changed. "args" is ignored.
+   protected method changed_bad_ { args } {
+      set changed_bad_ 1
+   }
+
+   #  Called when variable that controls visibility of the image plane
+   #  is changed. When the plane is translucent we must re-establish the
+   #  prop order, with the plane at the back. So this is done the
+   #  hard way.
+   protected method changed_show_image_plane_ {} {
+      if { $drawn_ } {
+         if { $plane_ != {} } {
+            clear_scene 0
+            draw
+         }
+      }
+   }
+
+   #  Called when the colourmap used by the image plane changes is to be
+   #  changed.
+   protected method changed_image_plane_colourmap_ {} {
+      if { $plane_ != {} } {
+         $plane_ configure -colourmap $plane_colourmap_
+         $plane_ update
+         $renwindow_ render
+      }
+   }
+
+   #  Called when the textscale is changed.
+   protected method changed_ast_textscale_ {} {
+      if { $drawn_ != {} } {
+         draw
+      }
+   }
+
+   #  Called when the textscale is changed.
+   protected method changed_ast_textcolour_ {} {
+      if { $drawn_ != {} } {
+         draw
+      }
+   }
+
+   #  Called when the opacity of the image plane changes.
+   protected method changed_image_plane_opacity_ {} {
+      if { $plane_ != {} } {
+         $plane_ set_opacity $plane_opacity_
+         $renwindow_ render
+      }
+   }
+
+   #  Called when variable that controls visibility of the spectral line
+   #  is changed. When the line is translucent we must re-establish the
+   #  prop order, with the line at the back. So this is done the
+   #  hard way by completely redrawing the scene.
+   protected method changed_show_spectral_line_ {} {
+      if { $drawn_ } {
+         if { $line_ != {} } {
+            if { $show_spectral_line_ } {
+               clear_scene 0
+               draw
+            } else {
+               $line_ set_invisible
+               $renwindow_ render
+            }
+         }
+      }
+   }
+
+   #  Called when variable that controls visibility of the simple
+   #  direction axes is changed.
+   protected method changed_show_simple_axes_ {} {
+      if { $drawn_ } {
+         if { $simpleaxes_ != {} } {
+            if { $show_simple_axes_ } {
+               $simpleaxes_ set_visible
+            } else {
+               $simpleaxes_ set_invisible
+            }
+            $renwindow_ render
+         } else {
+            draw
+         }
+      }
+   }
+
+   #  Called when variable that controls visibility of the outline
+   #  is changed.
+   protected method changed_show_outline_ {} {
+      if { $drawn_ } {
+         if { $outline_ != {} } {
+            if { $show_outline_ } {
+               $outline_ set_visible
+            } else {
+               $outline_ set_invisible
+            }
+            $renwindow_ render
+         } else {
+            draw
+         }
+      }
+   }
+
+   #  Called when variable that controls visibility of the AST axes is
+   #  changed.
+   protected method changed_show_ast_axes_ {} {
+      if { $drawn_ } {
+         draw
+      }
+   }
+
+   #  Start reporting the position of the cursor in the image plane, if
+   #  tracking.
+   protected method start_report_position_ {} {
+      if { [$plane_ has_position] } {
+         $textwcs_ set_visible
+         report_position_
+      }
+   }
+
+   #  Report the position of the cursor in the image plane, if tracking.
+   #  Also updates the spectral extraction in GAIA, if that's enabled.
+   protected method report_position_ {} {
+      if { [$plane_ has_position] } {
+         lassign [$plane_ get_position] ix iy iz
+         incr ix
+         incr iy
+         incr iz
+
+         #  Position the spectrum.
+         if { $line_ != {} } {
+            $line_ set_position $ix $iy $iz
+         }
+
+         #  Report the position in world coords.
+         set value [$plane_ get_value]
+         set coords [gaiautils::asttrann $wcs_ 1 [list $ix $iy $iz] 1]
+         $textwcs_ set_text "coords: $coords -> value: $value"
+
+         #  Track the position in GAIA.
+         line_moved_
+      }
+   }
+
+   #  Stop reporting the position of the cursor in the image plane.
+   protected method end_report_position_ {} {
+      $textwcs_ set_invisible
+   }
+
+   #================================================================
+   #  Interaction with GAIA.
+   #================================================================
+
+   #  To GAIA....
+
+   #  Plane has moved. Set the cube display in GAIA. Note index is zero based
+   #  grid value.
+   protected method image_plane_moved_ {index} {
+      set plane [$itk_option(-gaiacube) axis_grid2pixel [expr $index+1]]
+      $itk_option(-gaiacube) set_display_plane $plane
+   }
+
+   #  User has selected a new axis and plane. Go there.
+   protected method image_plane_snapped_ {axis index} {
+      if { [$itk_option(-gaiacube) get_axis] != $axis } {
+
+         #  Extracted spectrum is now invalid remove from scene.
+         if { $line_ != {} && $show_spectral_line_ } {
+            set show_spectral_line_ 0
+            $line_ set_invisible
+         }
+
+         #  Move GAIA to this axis.
+         $itk_option(-gaiacube) set_axis $axis
+      }
+      image_plane_moved_ $index
+   }
+
+   #  The spectral line has moved. Track this in GAIA if needed.
+   protected method line_moved_ {} {
+      if { $line_ != {} && $show_spectral_line_ } {
+         lassign [$line_ get_axis_position] ix iy
+         $itk_option(-gaiacube) set_point_spectrum_position $ix $iy
+      }
+   }
+
+   #  From GAIA (or local)...
+
+   #  Move image plane to given pixel coordinate.
+   public method set_display_plane {plane} {
+      if { $plane_ != {} && $show_image_plane_ } {
+         set index [$itk_option(-gaiacube) axis_pixel2grid $plane]
+         incr index -1
+         $plane_ set_slice_index $index
+         $renwindow_ render
+      }
+   }
+
+   #  Change the display axis. Reorient image plane and spectral line.
+   #  Spectral position is invalid so removed.
+   public method set_display_axis {axis} {
+      if { $line_ != {} && $show_spectral_line_ } {
+         $line_ configure -axis $axis
+         $line_ fit_to_data
+         set show_spectral_line_ 0
+         $line_ set_invisible
+         $renwindow_ render
+      }
+      if { $plane_ != {} && $show_image_plane_ } {
+         $plane_ configure -axis $axis
+         $renwindow_ render
+      }
+   }
+
+   #  Set position of spectral line (when moved by GAIA).
+   public method set_spectral_line {ix iy} {
+      if { $line_ != {} && $show_spectral_line_ } {
+         incr ix -1
+         incr iy -1
+         $line_ set_axis_position $ix $iy
+         $renwindow_ render
+      }
+   }
+
+   #================================================================
+   #  VTK setup.
+   #================================================================
+
+   #  Do the drawing of the scene.
+   public method draw {} {
+      set drawn_ 1
+      busy {
+         #  Access the main cube image data.
+         set newdata [get_vtk_data_array_]
+
+         #  Clear the scene for new data.
+         if { $newdata } {
+            clear_scene 0
+
+            #  And set the camera to be nearly along the Z axis (facing like
+            #  image, but with side-view).
+            lassign $dims_ nx ny nz
+            $renwindow_ set_camera $nx $ny [expr $nz*5]
+         }
+
+         #  Add the spectral line prop, needs to go before other props so gets
+         #  the interaction first, plus like the image plane will only render
+         #  correctly when drawn before the volume (which will be
+         #  translucent). Note still true for translucent plane and line.
+         if { $line_ == {} } {
+            set line_ [gaia3d::Gaia3dVtkLine \#auto -dataset $imagedata_ \
+                          -renwindow $renwindow_ -align_to_axis 1 \
+                          -axis [$itk_option(-gaiacube) get_axis] \
+                          -clip_to_bounds 1]
+            $line_ add_to_window
+
+            #  Any old position for now...
+            $line_ fit_to_data
+         } else {
+            #  Axis may have changed.
+            $line_ configure -axis [$itk_option(-gaiacube) get_axis]
+         }
+
+         if { $show_spectral_line_ } {
+            #  Set initial position.
+            set result [$itk_option(-gaiacube) get_point_spectrum_position]
+            if { $result != "" } {
+               eval set_spectral_line $result
+            }
+            $line_ set_visible
+         } else {
+            $line_ set_invisible
+         }
+
+         #  Add the image plane prop.
+         if { $plane_ == {} } {
+            set plane_ \
+               [gaia3d::Gaia3dVtkImagePlane \#auto \
+                   -renwindow $renwindow_ \
+                   -rtdimage $itk_option(-rtdimage) \
+                   -dataset $imagedata_ \
+                   -opacity $plane_opacity_ \
+                   -colourmap $plane_colourmap_ \
+                   -axis [$itk_option(-gaiacube) get_axis] \
+                   -move_cmd [code $this image_plane_moved_] \
+                   -snap_cmd [code $this image_plane_snapped_] \
+                   -interact_cmd [code $this report_position_] \
+                   -start_interact_cmd [code $this start_report_position_] \
+                   -end_interact_cmd [code $this end_report_position_]]
+
+            $plane_ add_to_window
+
+            #  Use a text display for the WCS coordinates.
+            set textwcs_ [gaia3d::Gaia3dVtkOverlayText \#auto \
+                             -renwindow $renwindow_]
+            $textwcs_ add_to_window
+         }
+
+         if { $show_image_plane_ } {
+            #  Set the initial plane.
+            set_display_plane [$itk_option(-gaiacube) get_display_plane]
+
+            $plane_ set_visible
+            $textwcs_ set_visible
+         } else {
+            $plane_ set_invisible
+            $textwcs_ set_invisible
+         }
+
+         #  Draw AST axes if requested. XXX allow attributes...
+         #  Remove all existing props (redrawing can be needed even if the
+         #  scene hasn't changed due to text re-orientation and when we have
+         #  it, attribute changes).
+         clear_plot3d_
+         if { $show_ast_axes_ } {
+
+            #  If first time, or the cube has changed, get a plot.
+            if { $plot_ == {} } {
+               create_plot3d_
+            }
+            grid_plot3d_
+
+            #  XXX test markers...
+            #for { set j 0 } { $j < 10 } { incr j } {
+            #   set coords ""
+            #   for { set i 0 } { $i < 5 } { incr i } {
+            #      set x [expr 100.0*rand()]
+            #      set y [expr 100.0*rand()]
+            #      set z [expr 100.0*rand()]
+            #      append coords "$x $y $z "
+            #   }
+            #   gvtk::astmark $plot_  $j "$coords"
+            #}
+         }
+
+         #  Do the work of rendering the fuller scene using the main
+         #  cube. Note use ProgressEvents when possible to update the UI from
+         #  time to time, so although blocked it might not be too bad.
+         draw_scene_ $newdata
+
+         #  Now draw any additional cubes.
+         if { [info exists itk_component(extratoolbox) ] &&
+              [winfo exists $itk_component(extratoolbox) ] } {
+            $itk_component(extratoolbox) render $renwindow_ $wcs_
+         }
+
+         #  2D Widgets go last. Add a orientation marker that is always
+         #  visible to determine the directions.
+         if { $show_simple_axes_ } {
+            if { $simpleaxes_ == {} } {
+               set simpleaxes_ [gaia3d::Gaia3dVtkAxes \#auto \
+                                   -renwindow $renwindow_]
+               $simpleaxes_ add_to_window
+            }
+            $simpleaxes_ configure -wcs $wcs_
+            $simpleaxes_ set_visible
+         } else {
+            if { $simpleaxes_ != {} } {
+               $simpleaxes_ set_invisible
+            }
+         }
+
+         if { $show_outline_ } {
+            if { $outline_ == {} } {
+               set outline_ [gaia3d::Gaia3dVtkOutline \#auto \
+                                -renwindow $renwindow_]
+               $outline_ add_to_window
+            }
+            $outline_ configure -dataset $imagedata_
+            $outline_ set_visible
+         } else {
+            if { $outline_ != {} } {
+               $outline_ set_invisible
+            }
+         }
+
+         #  Do rendering. If new data reset camera to make sure the volume
+         #  and everything else is withing clipping range.
+         if { $newdata } {
+            $renwindow_ reset_camera
+         }
+         $renwindow_ render
+      }
+   }
+
+   #  Create a Plot3D for the current cube.
+   protected method create_plot3d_ {} {
+      free_plot3d_
+      set grf_context_ [gvtk::grfinit [$renwindow_ get_renderer]]
+      set plot_ [gvtk::astplot $wcs_ $dims_ \
+                    "colour(markers)=5,size(markers)=20"]
+   }
+
+   #  Free the current Plot3D.
+   protected method free_plot3d_ {} {
+      if { $plot_ != {} } {
+         gaiautils::astannul $plot_
+         set plot_ {}
+      }
+
+      #  Also release the context. A new one will be created for the new plot.
+      if { $grf_context_ != {} } {
+         gvtk::grffreecontext $grf_context_
+         set grf_context_ {}
+      }
+   }
+
+   #  Clear the Plot3D of all actors. Need to make sure this our context.
+   protected method clear_plot3d_ {} {
+      if { $grf_context_ != {} } {
+         set_plot3d_
+         gvtk::grfclear
+      }
+   }
+   
+   #  Set the Plot3D. Really restore the context.
+   protected method set_plot3d_ {} {
+      if { $grf_context_ != {} } {
+
+         #  Re-establish the context so we get our graphics back for this
+         #  plot, not those of another renderer.
+         gvtk::grfsetcontext $grf_context_
+      }
+   }
+
+   #  Draw a grid using the Plot3D.
+   protected method grid_plot3d_ {} {
+      if { $plot_ != {} } {
+         gvtk::astgrid $plot_ $ast_textscale_ \
+            "colour(numlab)=$ast_textcolour_,colour(textlab)=$ast_textcolour_"
+      }
+   }
+
+   #  Create and update the scene as necessary. If the data has been
+   #  read or changed newdata will be set. The scene will be rendered
+   #  immediately after this call.
+   protected method draw_scene_ { newdata } {
+      error "Implement a draw_scene_ method"
+   }
+
+   #  Access the cube data and wrap this into an instance of vtkArrayData.
+   #  Only done if the image data has changed, returns 1 when this happens,
+   #  and 0 otherwise.
+   protected method get_vtk_data_array_ {} {
+
+      set cubeaccessor_ [$itk_option(-gaiacube) get_cubeaccessor]
+
+      #  For speed of access cache the full WCS.
+      set wcs_ [$cubeaccessor_ getwcs]
+
+      #  And the dimensions.
+      set dims_ [$cubeaccessor_ getdims 0]
+
+      #  Check name of cube data, if changed re-access, or
+      #  bad value handling changed.
+      set newname [$cubeaccessor_ cget -dataset]
+      if { $newname != {} && $cubename_ != $newname || $changed_bad_ } {
+         set changed_bad_ 0
+         set cubename_ $newname
+
+         #  Release old data.
+         if { $imagedata_ != {} } {
+            $imagedata_ Delete
+            $imageimport_ Delete
+            set imagedata_ {}
+            set imageimport_ {}
+         }
+
+         #  Data changed, so new Plot3D required.
+         free_plot3d_
+
+         #  Access data, checking for BAD pixels and replacing if requested.
+         set nullvalue [$itk_component(replacevalue) get]
+         lassign [gaia3d::Gaia3dVtk::import_gaia_cube $cubeaccessor_ \
+                     $checkbad_ $nullvalue] imagedata_ imageimport_
+
+         return 1
+      }
+      return 0
+   }
+
+   #  Clear the scene so that nothing is displayed, by deleting any scene
+   #  objects and re-rendering. Also releases the image data if fullrelease
+   #  is true.
+   public method clear_scene { fullrelease } {
+      release_objects $fullrelease
+
+      #  Do rendering to display a clear scene.
+      $renwindow_ render
+   }
+
+   #  Release all VTK objects used in the scene, also release the image
+   #  data if fullrelease is true. Extend in derived classes. Note
+   #  use clear_scene during interactive clearing (this is designed
+   #  for release when the window is closed).
+   public method release_objects { fullrelease } {
+      if { $fullrelease && $imagedata_ != {} } {
+         $imagedata_ Delete
+         $imageimport_ Delete
+         set imagedata_ {}
+         set imageimport_ {}
+      }
+
+      if { $plane_ != {} } {
+         ::delete object $plane_
+         set plane_ {}
+         ::delete object $textwcs_
+         set textwcs_ {}
+      }
+
+      if { $line_ != {} } {
+         ::delete object $line_
+         set line_ {}
+      }
+   }
+
+   #  Configuration options: (public variables)
+   #  ----------------------
+
+   #  Name of GaiaCube instance that's opened the cube we're rendering.
+   itk_option define -gaiacube gaiacube GaiaCube {} {}
+
+   #  Name of the associated rtdimage widget (displaying slice).
+   itk_option define -rtdimage rtdimage RtdImage {} {}
+
+   #  Identifying number for toolbox (shown in () in window title).
+   itk_option define -number number Number 0 {}
+
+   #  Command to execute to create a new instance of this object.
+   itk_option define -clone_cmd clone_cmd Clone_Cmd {}
+
+   #  If this is a clone, then it should die rather than be withdrawn.
+   itk_option define -really_die really_die Really_Die 0
+
+   #  Filters for selecting files.
+   itk_option define -filter_types filter_types Filter_types {}
+
+   #  Protected variables: (available to instance)
+   #  --------------------
+
+   #  VTK variables:
+   protected variable imagedata_ {}
+   protected variable imageimport_ {}
+
+   #  Wrapped VTK objects.
+   protected variable plane_ {}
+   protected variable textwcs_ {}
+   protected variable line_ {}
+   protected variable simpleaxes_ {}
+   protected variable outline_ {}
+
+   #  Rendering window.
+   protected variable renwindow_ {}
+
+   #  Full name of the cube. Used to check if data has changed.
+   protected variable cubename_ {}
+
+   #  Accessor for the current cube (cached).
+   protected variable cubeaccessor_ {}
+   protected variable wcs_ {}
+   protected variable dims_ {0 0 0}
+
+   #  Whether to check for blank pixels.
+   protected variable checkbad_ 0
+
+   #  Whether user preference for handling bad values has changed.
+   protected variable changed_bad_ 0
+
+   #  Whether to show the image plane.
+   protected variable show_image_plane_ 0
+
+   #  Whether to show the spectral line.
+   protected variable show_spectral_line_ 0
+
+   #  Whether to show the simple orientation axes.
+   protected variable show_simple_axes_ 0
+
+   #  Whether to show the outline.
+   protected variable show_outline_ 0
+
+   #  Whether to show the AST axes.
+   protected variable show_ast_axes_ 0
+
+   #  The Plot3D instance used to draw axes (and markers).
+   protected variable plot_ {}
+   protected variable grf_context_ {}
+
+   #  Whether scene has been drawn. Use to avoid selecting axes etc. causing
+   #  a redraw without pressing "Draw".
+   protected variable drawn_ 0
+
+   #  Colourmap of the image plane.
+   protected variable plane_colourmap_ "ramp.lasc"
+
+   #  The image plane opacity.
+   protected variable plane_opacity_ 1.0
+
+   #  The AST axes text scale.
+   protected variable ast_textscale_ 5.0
+
+   #  The colour of the AST axes text. AST index.
+   protected variable ast_textcolour_ 1
+
+   #  Common variables: (shared by all instances)
+   #  -----------------
+
+#  End of class definition.
+}

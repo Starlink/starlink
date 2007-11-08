@@ -49,7 +49,7 @@
 #include <tcl.h>
 #include <fitshead.h>
 #include <fitsfile.h>
-#include "gaiaArray.h"
+#include "GaiaArray.h"
 #include "star/slalib.h"
 
 /* Local prototypes */

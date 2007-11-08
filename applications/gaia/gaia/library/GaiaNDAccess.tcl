@@ -389,7 +389,7 @@ itcl::class gaia::GaiaNDAccess {
    #  Free data allocated by any of the get methods (spectra and image
    #  sections).
    public method release {adr} {
-      array::release $adr $cnfmap_
+      array::release $adr
    }
 
    #  Return the underlying information about an accessor array. This is the

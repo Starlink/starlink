@@ -64,7 +64,7 @@
 #include <ast.h>
 #include "grf_tkcan.h"
 #include "rtdCanvas.h"
-#include "gaiaArray.h"
+#include "GaiaArray.h"
 
 #define MAX(a,b) ( (a) > (b) ? (a) : (b) )
 #define MIN(a,b) ( (a) < (b) ? (a) : (b) )

@@ -72,6 +72,8 @@ static int GaiaUtilsAstGet( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstGetRefPos( ClientData clientData, Tcl_Interp *interp,
                                   int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsAstLinearApprox( ClientData clientData, Tcl_Interp *interp,
+                                     int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstSet( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstShow( ClientData clientData, Tcl_Interp *interp,
@@ -109,7 +111,7 @@ int GaiaUtils_Init( Tcl_Interp *interp )
     Tcl_CreateObjCommand( interp, "gaiautils::astannul", GaiaUtilsAstAnnul,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "gaiautils::astaxdistance", 
+    Tcl_CreateObjCommand( interp, "gaiautils::astaxdistance",
                           GaiaUtilsAstAxDistance, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -124,6 +126,10 @@ int GaiaUtils_Init( Tcl_Interp *interp )
 
     Tcl_CreateObjCommand( interp, "gaiautils::astgetrefpos",
                           GaiaUtilsAstGetRefPos, (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::astlinearapprox",
+                          GaiaUtilsAstLinearApprox, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::astformat", GaiaUtilsAstFormat,
@@ -749,7 +755,6 @@ static int GaiaUtilsGtAxisWcs( ClientData clientData, Tcl_Interp *interp,
     return result;
 }
 
-
 /**
  * Determine the separation of two values along an axis.
  *
@@ -767,9 +772,9 @@ static int GaiaUtilsAstAxDistance( ClientData clientData, Tcl_Interp *interp,
     long adr;
 
     /* Check arguments, only allow four, the frame, the axis and
-     * the two axis values */ 
+     * the two axis values */
     if ( objc != 5 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, 
+        Tcl_WrongNumArgs( interp, 1, objv,
                           "frame axis axis_coord1 axis_coord2" );
         return TCL_ERROR;
     }
@@ -807,7 +812,6 @@ static int GaiaUtilsAstAxDistance( ClientData clientData, Tcl_Interp *interp,
                    TCL_VOLATILE );
     return TCL_ERROR;
 }
-
 
 /**
  * Return a list of Plots that cover each ROI found in a Plot.
@@ -1107,10 +1111,14 @@ static int GaiaUtilsAstTran2( ClientData clientData, Tcl_Interp *interp,
 /*
  * Transform an nD coordinate using a FrameSet as a Mapping.
  *
- * There are two arguments, the address of a FrameSet and a list of
- * coordinates that define the position to be transformed. Clearly there
- * should be as many coordinates as the "nin" value of the FrameSet. The
- * result is a list of transformed values (unformatted).
+ * There are three required arguments, the address of a FrameSet, whether to
+ * use the forward or backward transform and a list of coordinates that define
+ * the position to be transformed. Clearly there should be as many coordinates
+ * as the "nin" or "nout" values of the FrameSet.
+ *
+ * By default the result is a list of unformatted transformed values,
+ * but if the third optional argument is set to 1 then formatted values
+ * will be returned.
  */
 static int GaiaUtilsAstTranN( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] )
@@ -1118,15 +1126,19 @@ static int GaiaUtilsAstTranN( ClientData clientData, Tcl_Interp *interp,
     AstFrameSet *mapping = NULL;
     Tcl_Obj **listObjv;
     Tcl_Obj *resultObj;
+    const char *result;
     double in[7];
     double out[7];
+    int formatted = 0;
+    int forward = 1;
     int i;
     int indims;
     long adr;
 
-    /* Check arguments, only allow two. */
-    if ( objc != 3 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "Mapping {coord1 coord2 ...}" );
+    /* Check arguments, only allow three or four. */
+    if ( objc != 4 && objc != 5 ) {
+        Tcl_WrongNumArgs( interp, 1, objv,
+                          "Mapping forward {coord1 coord2 ...} [formatted]" );
         return TCL_ERROR;
     }
 
@@ -1136,8 +1148,13 @@ static int GaiaUtilsAstTranN( ClientData clientData, Tcl_Interp *interp,
     }
     mapping = (AstFrameSet *) adr;
 
+    /* Forward or inverse transformation */
+    if ( Tcl_GetBooleanFromObj( interp, objv[2], &forward ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
     /* Get the position */
-    if ( Tcl_ListObjGetElements( interp, objv[2], &indims, &listObjv ) 
+    if ( Tcl_ListObjGetElements( interp, objv[3], &indims, &listObjv )
          != TCL_OK ) {
         return TCL_ERROR;
     }
@@ -1147,15 +1164,37 @@ static int GaiaUtilsAstTranN( ClientData clientData, Tcl_Interp *interp,
         }
     }
 
+    /* Are formatted arguments required? */
+    if ( objc == 5 ) {
+        if ( Tcl_GetBooleanFromObj( interp, objv[4], &formatted ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+    }
+
     /* Do the transform */
-    astTranN( mapping, 1, indims, 1, in, 1, indims, 1, out );
-    astNorm( mapping, out );
+    astTranN( mapping, 1, indims, 1, in, forward, indims, 1, out );
+
+    /* Normalise against the current frame only. Assume baseframes are
+     * pixels. */
+    if ( forward ) {
+        astNorm( mapping, out );
+    }
+
     if ( astOK ) {
         Tcl_ResetResult( interp );
         resultObj = Tcl_GetObjResult( interp );
-        for ( i = 0; i < indims; i++ ) {
-            Tcl_ListObjAppendElement( interp, resultObj, 
-                                      Tcl_NewDoubleObj( out[i] ) );
+        if ( formatted ) {
+            for ( i = 0; i < indims; i++ ) {
+                result = astFormat( mapping, i + 1, out[i] );
+                Tcl_ListObjAppendElement( interp, resultObj,
+                                          Tcl_NewStringObj( result, -1 ) );
+            }
+        }
+        else {
+            for ( i = 0; i < indims; i++ ) {
+                Tcl_ListObjAppendElement( interp, resultObj,
+                                          Tcl_NewDoubleObj( out[i] ) );
+            }
         }
         return TCL_OK;
     }
@@ -1167,7 +1206,7 @@ static int GaiaUtilsAstTranN( ClientData clientData, Tcl_Interp *interp,
 /**
  * Return a Frame extracted from a FrameSet.
  *
- * Two arguments the FrameSet and the index of the Frame to extract. 
+ * Two arguments the FrameSet and the index of the Frame to extract.
  * The result is the address of the picked Frame. The index can be the
  * strings "current" and "base" to select AST__CURRENT and AST__BASE.
  */
@@ -1215,6 +1254,102 @@ static int GaiaUtilsGtFrame( ClientData clientData, Tcl_Interp *interp,
         return TCL_OK;
     }
     Tcl_SetResult( interp, "Failed to extract frame from frameset",
+                   TCL_VOLATILE );
+    return TCL_ERROR;
+}
+
+/*
+ * See if there's a linear approximation to a mapping and if so
+ * return the coefficients.
+ *
+ * There are four arguments, the address of a Mapping/FrameSet, the
+ * lower bounds and upper bounds of a region in the base coordinate system
+ * to check the linear over, and a tolerance (delta in base coordinates).
+ *
+ * The result is a list of the coefficient values.
+ */
+static int GaiaUtilsAstLinearApprox( ClientData clientData, Tcl_Interp *interp,
+                                     int objc, Tcl_Obj *CONST objv[] )
+{
+    AstFrameSet *mapping = NULL;
+    Tcl_Obj **listObjv;
+    Tcl_Obj *resultObj;
+    double fit[56]; // (7+1*7)
+    double lbnd[7];
+    double tol;
+    double ubnd[7];
+    int nbnd;
+    int nin;
+    int nout;
+    long adr;
+
+    /* Check arguments, only allow four. */
+    if ( objc != 5 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "Mapping {lbnd1 lbnd2 ...} "
+                          "{ubnd1 ubnd2 ...} tol" );
+        return TCL_ERROR;
+    }
+
+    /* Get the FrameSet */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    mapping = (AstFrameSet *) adr;
+
+    /* Input and output coordinates */
+    nin = astGetI( mapping, "Nin" );
+    nout = astGetI( mapping, "Nout" );
+
+    /* Get the lower bounds */
+    if ( Tcl_ListObjGetElements( interp, objv[2], &nbnd, &listObjv )
+         != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    if ( nbnd != nin ) {
+        Tcl_SetResult( interp, "Wrong no. of coordinates", TCL_VOLATILE );
+        return TCL_ERROR;
+    }
+    for ( int i = 0; i < nbnd; i++ ) {
+        if ( Tcl_GetDoubleFromObj( interp, listObjv[i], &lbnd[i] )
+             != TCL_OK ) {
+            return TCL_ERROR;
+        }
+    }
+
+    /* Get the upper bounds */
+    if ( nbnd != nin ) {
+        Tcl_SetResult( interp, "Wrong no. of coordinates", TCL_VOLATILE );
+        return TCL_ERROR;
+    }
+    if ( Tcl_ListObjGetElements( interp, objv[3], &nbnd, &listObjv )
+         != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    for ( int i = 0; i < nbnd; i++ ) {
+        if ( Tcl_GetDoubleFromObj( interp, listObjv[i], &ubnd[i] )
+             != TCL_OK ) {
+            return TCL_ERROR;
+        }
+    }
+
+    /* Tolerance */
+    if ( Tcl_GetDoubleFromObj( interp, objv[4], &tol ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
+    /* Do the check */
+    for ( int i = 0; i < 56; i++ ) fit[i] = AST__BAD;
+    if ( astLinearApprox( mapping, lbnd, ubnd, tol, fit ) ) {
+        Tcl_ResetResult( interp );
+        resultObj = Tcl_GetObjResult( interp );
+        for ( int i = 0; i < (nin+1)*nout; i++ ) {
+            Tcl_ListObjAppendElement( interp, resultObj,
+                                      Tcl_NewDoubleObj( fit[i] ) );
+        }
+        return TCL_OK;
+    }
+    astClearStatus;
+    Tcl_SetResult( interp, "Failed to get a linear approximation",
                    TCL_VOLATILE );
     return TCL_ERROR;
 }
