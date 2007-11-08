@@ -75,7 +75,7 @@ void findclumps( int *status ) {
 *  Description:
 *     This application identifies clumps of emission within a 1, 2 or 3 
 *     dimensional NDF. It is assumed that any background has already been
-*     removed from the data array (for instance, using CUPID:FINDCLUMPS). 
+*     removed from the data array (for instance, using CUPID:FINDBACK). 
 *     Information about the clumps is returned in several different ways:
 *
 *     - A pixel mask identifying pixels as background, clump or edge
@@ -365,7 +365,7 @@ void findclumps( int *status ) {
 *     profiles running through the data, and then following the wings of 
 *     each peak down to the noise level or to a local minimum. A mask is 
 *     thus produced in which the edges of the clumps are marked. These edges 
-*     however tend to be quite noisey, and so need to be cleaned up before 
+*     however tend to be quite noisy, and so need to be cleaned up before 
 *     further use. This is done using a pair of cellular automata which 
 *     first dilate the edge regions and then erode them. The volume between 
 *     the edges are then filled with an index value associated with the 
@@ -483,7 +483,7 @@ void findclumps( int *status ) {
 *     The default value of two times the RMS noise level is usually considered 
 *     to be optimal, although this obviously depends on the RMS noise level 
 *     being correct. The value can be supplied either as an absolute data
-*     value, or as a mutliple of the RMS noise using the syntax "[x]*RMS", 
+*     value, or as a multiple of the RMS noise using the syntax "[x]*RMS", 
 *     where "[x]" is a numerical value (e.g. "3.2*RMS"). [2*RMS]
 *     - ClumpFind.FwhmBeam: The FWHM of the instrument beam, in pixels. If 
 *     application paremeter DECONV is set TRUE, the clump widths written to 
