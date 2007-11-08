@@ -896,7 +896,8 @@ $(MANIFESTS)/gaia: \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tcllibs \
 		$(MANIFESTS)/tclx \
-		$(MANIFESTS)/tk
+		$(MANIFESTS)/tk \
+		$(MANIFESTS)/vtk
 	cd applications/gaia \
 	  && $(MAKE_CPT)
 
@@ -1494,6 +1495,10 @@ $(MANIFESTS)/mers: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem
 	cd libraries/mers \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/mesa:
+	cd thirdparty/mesa3d/mesa \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/messgen: \
@@ -2350,6 +2355,13 @@ $(MANIFESTS)/tsp: \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starx
 	cd applications/tsp \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/vtk: \
+		$(MANIFESTS)/mesa \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk
+	cd thirdparty/kitware/vtk \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/xdisplay: \
