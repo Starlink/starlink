@@ -228,7 +228,10 @@ void findclumps( int *status ) {
 *        coordinate system of the input NDF. In addition, the clump 
 *        sizes and volumes are specified in WCS units. Note, the sizes
 *        are still measured parallel to the pixel axes, but are recorded
-*        in WCS units rather than pixel units. 
+*        in WCS units rather than pixel units. Celestial coordinate
+*        positions are units of degrees, sizes are in units are
+*        arc-seconds, and areas in square arc-seconds. Spectral coordinates
+*        are in the units displayed by the KAPPA command "ndftrace".
 *
 *        If the data has less than 3 pixel axes, then the columns
 *        describing the missing axes will not be present in the catalogue.
