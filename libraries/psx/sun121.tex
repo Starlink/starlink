@@ -20,10 +20,10 @@
 \newcommand{\stardocnumber}    {121.5}
 \newcommand{\stardocauthors}   {P M Allan\\
                                 A J Chipperfield}
-\newcommand{\stardocdate}      {10 April 2003}
+\newcommand{\stardocdate}      {8th November 2007}
 \newcommand{\stardoctitle}     {PSX \\ [1ex]
                                 POSIX interface routines} 
-\newcommand{\stardocversion}   {Version 0.4}
+\newcommand{\stardocversion}   {Version 0.5-4}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 \newcommand{\stardocabstract}  {%
 PSX is a FORTRAN subroutine library that allows programmers to use the
@@ -1011,6 +1011,9 @@ PSX\_\_ERRNO & System error during POSIX call
             {Rename a file}
 \noteroutine{PSX\_SRAND}{PSX_SRAND}{( SEED, STATUS )}
             {Set the seed for the random number generator}
+\noteroutine{PSX\_STAT}{PSX_STAT}{}
+            {\textnormal{\textbf{( PATH, ITEM, VALUE, STATUS )}}\\
+            Return an item of information about a file}
 \noteroutine{PSX\_TIME}{PSX_TIME}{( NTICKS, STATUS )}
             {Get the current calendar time}
 \noteroutine{PSX\_TTYNAME}{PSX_TTYNAME}{( FILDSC, TNAME, STATUS )}
@@ -1067,6 +1070,8 @@ PSX\_\_ERRNO & System error during POSIX call
             {Remove a file or empty directory}
 \noteroutine{PSX\_RENAME}{PSX_RENAME}{( INFIL, OUTFIL, STATUS )}
             {Rename a file}
+\noteroutine{PSX\_STAT}{PSX_STAT}{( PATH, ITEM, VALUE, STATUS )}
+            {Return an item of information about a file}
 \end{description}
 
 \subsection{\xlabel{language_specific_services_for_c_fortran_versions}Language Specific Services for C (FORTRAN versions)}
@@ -2863,6 +2868,72 @@ PSX\_\_ERRNO & System error during POSIX call
       Copyright
    }{
       Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   PSX\_STAT
+}{
+   Obtain information about a file
+}{
+   \sstdescription{
+      The routine tries to get information about a specified file. If it
+      succeeds, it returns the information in either IVAL or CVAL. If it
+      fails, it sets STATUS to PSX\_\_ERRNO and reports an error.
+   }
+   \sstinvocation{
+      CALL PSX\_STAT( PATH, ITEM, VALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PATH = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The full path to the file.
+      }
+      \sstsubsection{
+         ITEM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The item of information required about the file. See {\tt "}Items{\tt "}
+         below.
+      }
+      \sstsubsection{
+         VALUE = INTEGER (Returned)
+      }{
+         The value for the requested item of information.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstdiytopic{
+      Items
+   }{
+      The ITEM argument can take any of the following values:
+
+      \sstitemlist{
+
+         \sstitem
+         {\tt "}UID{\tt "} - user ID of owner.
+
+         \sstitem
+         {\tt "}GID{\tt "} - group ID of owner.
+
+         \sstitem
+         {\tt "}SIZE{\tt "} - total file size, in bytes.
+
+         \sstitem
+         {\tt "}ATIME{\tt "} - time of last access.
+
+         \sstitem
+         {\tt "}CTIME{\tt "} - time of last status change (e.g. file creation).
+
+         \sstitem
+         {\tt "}MTIME{\tt "} - time of last modification.
+
+      }
+      The time values are returned as the number of ticks since an
+      arbitrary point in the past. See PSX\_TIME.
    }
 }
 \sstroutine{

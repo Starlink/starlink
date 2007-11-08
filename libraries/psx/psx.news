@@ -1,5 +1,8 @@
 1 PSX - POSIX interface routines
                                                           Expires: **.**.**
+v0.5-4:
+     Added PSX_STAT
+
 v0.5-3:
      Use starMem library for malloc/free
      Release under the GPL
