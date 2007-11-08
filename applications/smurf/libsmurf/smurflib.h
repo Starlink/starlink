@@ -46,6 +46,8 @@
 *        Add STARECALC
 *     2006-11-01 (TIMJ):
 *        Add SMURFHELP
+*     2007-11-08 (DSB):
+*        Add TIMESORT.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -90,5 +92,6 @@ void smurf_impaztec( int * );
 void smurf_skynoise( int * );
 void smurf_starecalc( int * );
 void smurf_help( int * );
+void smurf_timesort( int * );
 
 #endif /* SMURF_LIB_DEFINED */

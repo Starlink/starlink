@@ -92,6 +92,8 @@
 *        solely on the locator leak check.
 *     2007-10-19 (TIMJ):
 *        Add RAWUNPRESS
+*     2007-11-8 (DSB):
+*        Add TIMESORT.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -224,6 +226,8 @@ void smurf_mon( int * status ) {
     smurf_help( status );
   } else if (strcmp( taskname, "RAWUNPRESS" ) == 0 ) {
     smurf_rawunpress( status );
+  } else if (strcmp( taskname, "TIMESORT" ) == 0 ) {
+    smurf_timesort( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );
@@ -284,9 +288,11 @@ void smurf_mon( int * status ) {
   }
   errEnd( status );
 
-  /* Comment out during active usage since it is an unnecessary
-     overhead to free all the AST internal structures each time
-     we are called from the pipeline as a monolith */
+
+  /* The astFlushMemory function does nothing unless AST has been compiled 
+   * with the MEM_DEBUG flag. If this is the case, then it frees all AST 
+   * internal structures, and report the number of memory blocks that have 
+   * not been freed (useful for identifying memory leaks). */
   astFlushMemory( 1 );
 }
 

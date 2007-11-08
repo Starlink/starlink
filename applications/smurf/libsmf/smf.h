@@ -189,6 +189,8 @@
 *        -Added specunion to smf_cubebounds.
 *     2007-10-25 (DSB):
 *        -Added smf_checkdets.
+*     2007-11-8 (DSB):
+*        -Added smf_sortd and smf_reorder<x>.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -692,5 +694,12 @@ void smf_fft_filter( smfData *data, double srate, int *status );
 void smf_concat_smfGroup( smfGroup *igrp, smfArray **concat, int *status );
 
 void smf_checkdets( Grp *detgrp, smfData *data, int *status );
+
+int *smf_sortd( size_t nel, double *array, int *sorted, int *status );
+
+void smf_reorderr( float *in, int ndim, int *dims, int axis, int *index, float *out, int *status );
+void smf_reorderi( int *in, int ndim, int *dims, int axis, int *index, int *out, int *status );
+void smf_reorderd( double *in, int ndim, int *dims, int axis, int *index, double *out, int *status );
+void smf_reorderc( char *in, int len, int ndim, int *dims, int axis, int *index, char *out, int *status );
 
 #endif /* SMF_DEFINED */

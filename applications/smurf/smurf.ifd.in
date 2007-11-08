@@ -150,6 +150,8 @@
 #         Add RAWUNPRESS
 #     25-OCT-2007 (DSB):
 #         Added SPECUNION, POLBINSIZE and NPOLBIN for MAKECUBE
+#     8-NOV-2007 (DSB):
+#         Added action TIMESORT.
 #     {enter_changes_here}
 
 #  Bugs:
@@ -1279,6 +1281,39 @@ package @PACKAGE@ {
 	    helpkey *
 	  }
 
+     }
+
+     action timesort {
+
+         helplib {$SMURF_HELP}
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Input NDF data structure}
+            helpkey *
+          }
+
+         parameter msg_filter {
+            type _CHAR
+            prompt {Message level}
+            default NORM
+            vpath DEFAULT
+            helpkey *
+          }
+         parameter out {
+            position 2
+            type NDF
+            access WRITE
+            vpath {PROMPT }
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Output NDF data structure}
+            helpkey *
+          }
      }
 
 
