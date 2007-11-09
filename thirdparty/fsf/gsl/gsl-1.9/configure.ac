@@ -137,8 +137,11 @@ AC_CHECK_DECLS(atanh,,,[#include <math.h>])
 AC_CHECK_DECLS(ldexp,,,[#include <math.h>])
 AC_CHECK_DECLS(frexp,,,[#include <math.h>])
 AC_CHECK_DECLS(isinf,,,[#include <math.h>])
-AC_CHECK_DECLS(finite,,,[#include <math.h>])
 AC_CHECK_DECLS(isfinite,,,[#include <math.h>])
+AC_CHECK_DECLS(finite,,,[#include <math.h>
+#if HAVE_IEEEFP_H
+#include <ieeefp.h>
+#endif])
 AC_CHECK_DECLS(isnan,,,[#include <math.h>])
 
 dnl OpenBSD has a broken implementation of log1p.
