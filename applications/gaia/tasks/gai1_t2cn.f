@@ -151,6 +151,8 @@
       WVAL = 0
       RACOL = -1
       DECCOL = -1
+      DECRAD = .FALSE.
+      RARAD = .FALSE.
 
 *  Now read the input file until we get to a line that starts with '-'.
       OK = .TRUE.

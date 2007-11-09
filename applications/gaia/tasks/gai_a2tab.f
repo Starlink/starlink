@@ -147,6 +147,9 @@
 *  Set the TAB character
       TAB = CHAR( 9 )
 
+*  Initialise to appease picky compilers
+      ICOL = 0
+
 *  First check if the catalogue is an ASCII_HEAD one. The signature for
 *  this is a header section of the format:
 *
