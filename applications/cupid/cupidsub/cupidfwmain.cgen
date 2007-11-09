@@ -273,7 +273,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    }
 
 /* If required, dump the mask indicating which pixel are below the threshold. */
-   if( ilevel > 0 ) {
+   if( ilevel > 4 ) {
       printf("   About to dump initial mask\n" );
       cupidDumpI( ipa, ndim, dims, slbnd, status );
    }
@@ -294,7 +294,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    work = cupidRCA( ipa, NULL, nel, dims, skip, frac, VAL__MAXI, 0, -1, 1, status );
 
 /* If required, dump the mask resulting from the above cleaning. */
-   if( ilevel > 0 ) {
+   if( ilevel > 4 ) {
       printf("   About to dump cleaned initial mask\n" );
       cupidDumpI( work, ndim, dims, slbnd, status );
    }
@@ -678,7 +678,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    }
 
 /* If required, dump the unmerged clump mask. */
-   if( ilevel > 0 ) {
+   if( ilevel > 4 ) {
       printf("   About to dump raw clump mask\n" );
       cupidDumpI( work, ndim, dims, slbnd, status );
    }
@@ -692,7 +692,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    if( ilevel > 1 ) msgOut( "", "Merging completed", status );
 
 /* If required, dump the merged clump mask. */
-   if( ilevel > 0 ) {
+   if( ilevel > 4 ) {
       printf("   About to dump merged but uncleaned clump mask\n" );
       cupidDumpI( work, ndim, dims, slbnd, status );
    }
@@ -727,7 +727,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    if( m1 != ipa ) memcpy( ipa, work, sizeof( int )*nel );
 
 /* If required, dump the cleaned clump mask. */
-   if( ilevel > 0 ) {
+   if( ilevel > 4 ) {
       printf("   About to dump cleaned clump mask\n" );
       cupidDumpI( ipa, ndim, dims, slbnd, status );
    }
