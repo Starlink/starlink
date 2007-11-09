@@ -1,14 +1,14 @@
-# Configuration for SunOS 5
+# Configuration for SunOS 5 with native compilers.
 
 include $(TOP)/configs/default
 
 CONFIG_NAME = sunos5
 
 # Compiler and flags
-CC = cc
-CXX = c++
-CFLAGS = -KPIC -Xa -O -I/usr/openwin/include -I/usr/dt/include -DUSE_XSHM
-CXXFLAGS = -KPIC -Xa -O -I/usr/openwin/include -I/usr/dt/include
+#CC = 
+#CXX = c++
+CFLAGS = -KPIC -O -I/usr/openwin/include -I/usr/dt/include -DUSE_XSHM
+CXXFLAGS = -KPIC -O -I/usr/openwin/include -I/usr/dt/include
 GLUT_CFLAGS = -DSOLARIS_2_4_BUG
 
 GL_LIB_DEPS = -L/usr/openwin/lib -L/usr/dt/lib -lX11 -lXext -lXmu -lXi -lm
