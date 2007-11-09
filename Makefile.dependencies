@@ -169,6 +169,7 @@ $(MANIFESTS)/atools: \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/atools \
 	  && $(MAKE_CPT)
@@ -402,6 +403,8 @@ $(MANIFESTS)/convert: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starx \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/convert \
 	  && $(MAKE_CPT)
@@ -452,6 +455,7 @@ $(MANIFESTS)/cupid: \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/cupid \
 	  && $(MAKE_CPT)
@@ -486,7 +490,9 @@ $(MANIFESTS)/cursa: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/startcl \
-		$(MANIFESTS)/starx
+		$(MANIFESTS)/starx \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk
 	cd applications/cursa \
 	  && $(MAKE_CPT)
 
@@ -517,6 +523,8 @@ $(MANIFESTS)/daophot: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starx \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/daophot \
 	  && $(MAKE_CPT)
@@ -581,6 +589,8 @@ $(MANIFESTS)/dipso: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starx \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/dipso \
 	  && $(MAKE_CPT)
@@ -639,6 +649,8 @@ $(MANIFESTS)/echomop: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starx \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/echomop \
 	  && $(MAKE_CPT)
@@ -654,7 +666,9 @@ $(MANIFESTS)/echwind: \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
-		$(MANIFESTS)/starx
+		$(MANIFESTS)/starx \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk
 	cd applications/echwind \
 	  && $(MAKE_CPT)
 
@@ -710,6 +724,8 @@ $(MANIFESTS)/esp: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starx \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/esp \
 	  && $(MAKE_CPT)
@@ -781,6 +797,8 @@ $(MANIFESTS)/figaro: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starx \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/figaro \
 	  && $(MAKE_CPT)
@@ -816,7 +834,9 @@ $(MANIFESTS)/findcoords: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/startcl \
-		$(MANIFESTS)/starx
+		$(MANIFESTS)/starx \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk
 	cd applications/findcoords \
 	  && $(MAKE_CPT)
 
@@ -1182,6 +1202,8 @@ $(MANIFESTS)/iras90: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starx \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/obsolete/iras90 \
 	  && $(MAKE_CPT)
@@ -1268,6 +1290,8 @@ $(MANIFESTS)/jcmtdr: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starx \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/jcmtdr \
 	  && $(MAKE_CPT)
@@ -1425,6 +1449,7 @@ $(MANIFESTS)/kaprh: \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/kaprh \
 	  && $(MAKE_CPT)
@@ -1691,7 +1716,9 @@ $(MANIFESTS)/pgplot: \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk
 	cd thirdparty/caltech/pgplot \
 	  && $(MAKE_CPT)
 
@@ -1728,6 +1755,8 @@ $(MANIFESTS)/photom: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starx \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/photom \
 	  && $(MAKE_CPT)
@@ -1767,6 +1796,8 @@ $(MANIFESTS)/pisa: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starx \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/pisa \
 	  && $(MAKE_CPT)
@@ -1851,6 +1882,8 @@ $(MANIFESTS)/pongo: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starx \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/pongo \
 	  && $(MAKE_CPT)
@@ -2130,6 +2163,8 @@ $(MANIFESTS)/specx: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starx \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/specx \
 	  && $(MAKE_CPT)
