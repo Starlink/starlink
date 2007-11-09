@@ -235,7 +235,7 @@
                   I = 1
                   DO 6 IAT = 1, VALLEN, 68
                      WRITE( NAME( 7:7 ), '(I1)' ) I
-                     CALL CAT_PPTSC( CI, NAME, VALUE( IAT:IAT+68 ), ' ', 
+                     CALL CAT_PPTSC( CI, NAME, VALUE( IAT:IAT+68 ), ' ',
      :                               QI, STATUS )
                      CALL CAT_TATTI( QI, 'CSIZE', 68, STATUS )
                      I = I + 1
@@ -243,7 +243,7 @@
                ELSE
 
 *  See if this is a positional parameter which we should skip.
-                  IF ( NAME .NE. 'id_col' .AND. NAME .NE. 'ra_col' .AND. 
+                  IF ( NAME .NE. 'id_col' .AND. NAME .NE. 'ra_col' .AND.
      :                 NAME .NE. 'dec_col' ) THEN
 
 *  Now see if the parameter exists (as stored ones should).
