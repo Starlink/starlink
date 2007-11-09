@@ -1,5 +1,5 @@
 
-#if defined (__digital__) && defined (__unix__) || defined(__IBMCPP__)
+#if defined (__digital__) && defined (__unix__) || defined(__IBMCPP__) || defined(__unix)
 #define HAVE_ALLOCA_H 1
 #endif
 
