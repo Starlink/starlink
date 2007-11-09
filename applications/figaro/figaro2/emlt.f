@@ -273,7 +273,7 @@ C
             DPTR = OPTR
 
             CALL DYN_INCAD(OPTR,'FLOAT',NX,TPTR,ISNEW,STATUS)
-            IF (ISNEW) CALL CNF_UNREGP(OPTR)
+            IF (PISNEW) CALL CNF_UNREGP(OPTR)
             OPTR=TPTR
             PISNEW = ISNEW
          ELSE
@@ -281,7 +281,7 @@ C
      :                     %VAL(CNF_PVAL(WPTR)))
 
             CALL DYN_INCAD(IPTR,'FLOAT',NX,TPTR,ISNEW,STATUS)
-            IF (ISNEW) CALL CNF_UNREGP(IPTR)
+            IF (PISNEW) CALL CNF_UNREGP(IPTR)
             IPTR=TPTR
             PISNEW = ISNEW
 
@@ -301,8 +301,8 @@ C
                XPTR = XBASE
             ELSE
                CALL DYN_INCAD(XPTR,'FLOAT',NX,TPTR,ISNEWX,STATUS)
-               IF (ISNEWX) CALL CNF_UNREGP(IPTR)
-               IPTR=TPTR
+               IF (PISNX) CALL CNF_UNREGP(XPTR)
+               XPTR=TPTR
                PISNX = ISNEWX
             END IF
          END IF
@@ -312,7 +312,7 @@ C
       ELSE
          CALL CNF_UNREGP(IPTR)
       END IF
-      IF (ISNEWX) CALL CNF_UNREGP(IPTR)
+      IF (ISNEWX) CALL CNF_UNREGP(XPTR)
 C
 C     Let the user know the file being used.
 C
