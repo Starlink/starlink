@@ -8,7 +8,7 @@
   <description>Native PGPLOT</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies >
-    <build>cnf</build><build>gwm</build><build>psx</build><build>mers</build><build>chr</build><link>gwm</link><link>cnf</link><link>psx</link><link>mers</link><link>chr</link>
+    <build>cnf</build><build>gwm</build><build>psx</build><build>mers</build><build>chr</build><build>tcl</build><build>tk</build><link>gwm</link><link>cnf</link><link>psx</link><link>mers</link><link>chr</link><link>tcl</link><link>tk</link>
   </dependencies>
   <!--
   <developers>

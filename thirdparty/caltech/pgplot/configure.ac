@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-dnl    Note that for GKS the RAL version number if 1.37 but
+dnl    Note that for GKS the RAL version number is 1.37 but
 dnl    Starlink does not increment that version. Rather than use
 dnl    non-standard nomenclature use the patch level for starlink patching.
 AC_INIT(pgplot, 5.2.2-2, ussc@star.rl.ac.uk)
@@ -92,34 +92,12 @@ fi
 AM_CONDITIONAL( HAVE_XATHENA, \
     [test "$have_xa3dheader" = "yes" && test "$have_xa3dlib" = "yes" ])
 
-dnl    xtk
-have_tk="yes"
-AC_ARG_WITH([tk], 
-             AC_HELP_STRING([--with-tk[=path]],
-             [use Tk (default location /usr)]),
-  [if test "$withval" = "yes"; then
-    # Default place, installed by Fink in /usr
-    LIBS="$LIBS -L/usr/lib"
-    CPPFLAGS="$CPPFLAGS -I/usr/include"
-  elif test "$withval" = "no"; then
-    # We do nothing
-    have_tk="no"
-  else
-    TKLIBDIR=$withval/lib
-    TKINCDIR=$withval/include
-    LIBS="$LIBS -L$TKLIBDIR"
-    CPPFLAGS="$CPPFLAGS -I$TKINCDIR"
-  fi])
-
-if test "$have_tk" = "yes"; then
-   AC_CHECK_HEADER([tk.h], have_tkheader=yes ) 
-   AC_CHECK_LIB(tk, Tk_DisplayName, have_tklib=yes )
-else
-   have_tkheader="no"
-   have_tklib="no"
-fi
-AM_CONDITIONAL( HAVE_TK, \
-    [test "$have_tkheader" = "yes" && test "$have_tklib" = "yes"] )
+dnl    xtk & ptk, use the Starlink version of Tcl/Tk, so don't need to check
+dnl    for it (declared as a build dependency). To keep the various 
+dnl    sub-components happy we need to define HAVE_TK as a conditional.
+dnl    This will always be true.
+STAR_PATH_TCLTK(8.4,[tk])
+AM_CONDITIONAL( HAVE_TK, : )
 
 dnl    xmotif
 have_motif="yes"
@@ -152,8 +130,8 @@ AM_CONDITIONAL( HAVE_XMOTIF, \
    [test "$have_xmheader" = "yes" && test "$have_xmlib" = "yes"] )
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES([build], [cnf gwm psx mers chr])
-STAR_DECLARE_DEPENDENCIES([link],  [gwm cnf psx mers chr])
+STAR_DECLARE_DEPENDENCIES([build], [cnf gwm psx mers chr tcl tk])
+STAR_DECLARE_DEPENDENCIES([link],  [gwm cnf psx mers chr tcl tk])
 
 
 dnl    If you wish to configure extra files, you can add them to this
