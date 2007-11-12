@@ -134,6 +134,8 @@ f    AST_GRIDLINE, AST_POLYCURVE.
 *        Original version.
 *     6-SEP-2007 (DSB):
 *        Re-code the astGrid function.
+*     12-NOV-2007 (DSB):
+*        Clear up compiler warnings.
 *class--
 */
 
@@ -1199,7 +1201,6 @@ static void (* parent_setattrib)( AstObject *, const char * );
 static AstFrameSet *Fset3D( AstFrameSet *, int );
 static AstKeyMap *GetGrfContext( AstPlot * );
 static AstPlot *AxisPlot( AstPlot3D *, int, int * );
-static AstPlot *GetBasePlot( AstPlot3D *, const char * );
 static AstPointSet *ExtendTicks( AstPlot *, AstPointSet * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *RootCornerString( int );
@@ -2569,6 +2570,7 @@ static int Element2D( AstPlot3D *this, int element, int *elem2d1,
       SET_ELEM2D(AST__GRIDLINE1_ID,AST__GRIDLINE2_ID)
 
    } else { 
+      axis3d = 0;
       astError( AST__INTER, "Element2D(Plot3D): The MAKE_CLEAR2 macro "
                 "does not yet support element index %d (internal "
                 "AST programming error).", element );
@@ -3097,55 +3099,6 @@ static int GetObjSize( AstObject *this_object ) {
    if ( !astOK ) result = 0;
 
 /* Return the result, */
-   return result;
-}
-
-static AstPlot *GetBasePlot( AstPlot3D *this, const char *method ) {
-/*
-*  Name:
-*     GetBasePlot
-
-*  Purpose:
-*     Return a pointer to the Plot that spans 2 connected 3D axes.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "plot3d.h"
-*     AstPlot *GetBasePlot( AstPlot3D *this, const char *method  )
-
-*  Class Membership:
-*     Plot member function 
-
-*  Description:
-*     This function returns a pointer to the Plot that spans two
-*     connected 3D axes (e.g. spans (ra,dec) in an (ra,dec,freq) cube).
-
-*  Parameters:
-*     this
-*        Pointer to the Plot3D.
-*     method
-*        Pointer to a string holding the name of the invoking method for
-*        inclusion in error messages.
-
-*  Returned Value:
-*     A pointer to the required Plot.
-
-*/
-
-/* Local Variables: */
-   AstPlot *result = NULL;
-
-   if ( !astOK ) return result;
-
-   result = GET_PLOT( this->baseplot );
-   if( !result ) {
-      astError( AST__INTER, "%s(%s): Illegal value %d for baseplot "
-                "attribute (internal AST programming error).", 
-                 method, astGetClass( this ), this->baseplot );
-   }
-
    return result;
 }
 
@@ -4581,9 +4534,9 @@ static int Plot3DTxExt( AstKeyMap *grfconID, const char *text, float x, float y,
 /* Local Variables: */
    AstKeyMap *grfcon;
    double gcon;
-   float *xb3d;
-   float *yb3d;
-   float *zb3d;
+   float *xb3d = NULL;
+   float *yb3d = NULL;
+   float *zb3d = NULL;
    float bl[ 3 ];
    float norm[ 3 ];
    float ref[ 3 ];
@@ -7143,13 +7096,13 @@ AstPlot3D *astInitPlot3D_( void *mem, size_t size, int init,
 */
 
 /* Local Variables: */
-   AstFrame *baseframe;         /* Pointer to base frame */
-   AstFrame *graphicsframe;     /* Pointer to graphics frame */
-   AstFrameSet *fset0;          /* The n-D FrameSet to be annotated */
-   AstFrameSet *fset;           /* The 2-D FrameSet to be annotated */
-   AstMapping *map;             /* Mapping for converting bbox -> gbox */
-   AstPlot3D *new;              /* Pointer to new Plot3D */
-   char *mess;                  /* Pointer to a descriptive message */
+   AstFrame *baseframe = NULL;  /* Pointer to base frame */
+   AstFrame *graphicsframe = NULL; /* Pointer to graphics frame */
+   AstFrameSet *fset0 = NULL;   /* The n-D FrameSet to be annotated */
+   AstFrameSet *fset = NULL;    /* The 2-D FrameSet to be annotated */
+   AstMapping *map = NULL;      /* Mapping for converting bbox -> gbox */
+   AstPlot3D *new = NULL;       /* Pointer to new Plot3D */
+   char *mess = NULL;           /* Pointer to a descriptive message */
    double djunkbox[ 4 ] = { 0.0, 0.0, 1.0, 1.0 }; /* Dummy 2D basebox */
    float fjunkbox[ 4 ] = { 0.0, 0.0, 1.0, 1.0 }; /* Dummy 2D graphbox */
    int bi;                      /* Index of base frame */

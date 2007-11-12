@@ -9658,6 +9658,7 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
    delta2 = 0.0;
    lblat2 = 0.0;
    uy = 0.0;
+   logticks = 0;
 
 /* Get the minimum dimension of the plotting ares. */
    mindim = MIN( this->xhi - this->xlo, this->yhi - this->ylo );
