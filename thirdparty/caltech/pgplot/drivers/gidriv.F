@@ -1,3 +1,7 @@
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 C*GIDRIV -- PGPLOT GIF drivers
 C+
       SUBROUTINE GIDRIV (IFUNC, RBUF, NBUF, CHR, LCHR, MODE)
@@ -75,11 +79,11 @@ C
       INTEGER GRGMEM, GRFMEM, GROFIL, GRCFIL, GRCTOI
       CHARACTER*80 MSG, INSTR, FILENM
 C
-C Note: for 64-bit operating systems, change the following 
+C Note: for 64-bit operating systems, the following will change
 C declaration to INTEGER*8:
 C
-      INTEGER PIXMAP, WORK
-C
+      INTEGER*SIZEOF_VOID_P PIXMAP, WORK
+
       SAVE UNIT, IC, CTABLE, NPICT, MAXIDX, BX, BY, PIXMAP, FILENM
       SAVE CDEFLT, STATE
       DATA CDEFLT /000,000,000, 255,255,255, 255,000,000, 000,255,000,

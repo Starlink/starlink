@@ -1,3 +1,7 @@
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 C*PPDRIV -- PGPLOT PPM drivers
 C+
       SUBROUTINE PPDRIV (IFUNC, RBUF, NBUF, CHR, LCHR, MODE)
@@ -65,10 +69,10 @@ C
       INTEGER GRGMEM, GRFMEM, GROFIL, GRCFIL, GRCTOI
       CHARACTER*80 MSG, INSTR, FILENM
 C
-C Note: for 64-bit operating systems, change the following 
+C Note: for 64-bit operating systems, the following will change
 C declaration to INTEGER*8:
 C
-      INTEGER PIXMAP
+      INTEGER*SIZEOF_VOID_P PIXMAP
 C
       SAVE    UNIT, IC, CVAL, CTABLE, BX, BY, PIXMAP, NPICT, CDEFLT
       SAVE    STATE

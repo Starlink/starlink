@@ -22,11 +22,16 @@ STAR_DEFAULTS
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_FC
+AC_PROG_FPP
 AC_PROG_LIBTOOL
 AC_C_BIGENDIAN
 AC_HEADER_STDC
 AC_PATH_XTRA
 AC_CHECK_HEADERS(values.h)
+
+dnl    %VAL is used for some memory handling. Under 64bit pointers are 
+dnl    8 bytes. Need to know this.
+AC_CHECK_SIZEOF([void *])
 
 dnl    Other options here, such as
 AC_FC_LIBRARY_LDFLAGS

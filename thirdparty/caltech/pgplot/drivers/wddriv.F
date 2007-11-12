@@ -1,3 +1,7 @@
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 C*WDDRIV -- PGPLOT XWD drivers
 C+
       SUBROUTINE WDDRIV (IFUNC, RBUF, NBUF, CHR, LCHR, MODE)
@@ -58,10 +62,10 @@ C
       INTEGER GRGMEM, GRFMEM, GROFIL, GRCFIL, GRCTOI
       CHARACTER*80 MSG, INSTR, FILENM
 C
-C Note: for 64-bit operating systems, change the following 
+C Note: for 64-bit operating systems, the following will change
 C declaration to INTEGER*8:
 C
-      INTEGER PIXMAP
+      INTEGER*SIZEOF_VOID_P PIXMAP
 C
       SAVE UNIT, IC, CTABLE, NPICT, MAXIDX, BX, BY, PIXMAP, FILENM
       SAVE CDEFLT, STATE
