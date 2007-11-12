@@ -54,6 +54,7 @@
 
 *  Authors:
 *     Nick Eaton  ( DUVAD::NE )
+*     Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -62,6 +63,8 @@
 *     July 1990  Call AGI_1FNAME and HDS_TUNE
 *     Dec  1991  Removed call to HDS_TUNE
 *     Mar  1992  Define file extension using AGI__ENAME parameter
+*     Nov  2007  Protect database name inquiry against bad status and
+*                uninitialised length
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -111,8 +114,11 @@
             CALL AGI_1FNAME( FNAME, LNAME, STATUS )
 
 *   Append the file extension
-            LEXT = LEN( AGI__ENAME )
-            FNAME( LNAME+1 : LNAME+LEXT ) = AGI__ENAME
+            LNAME = 0
+            IF ( STATUS .EQ. SAI__OK ) THEN
+               LEXT = LEN( AGI__ENAME )
+               FNAME( LNAME+1 : LNAME+LEXT ) = AGI__ENAME
+            END IF
 
 *   Set up the HDS tuning parameter to wait if the file is being
 *   accessed by another task
