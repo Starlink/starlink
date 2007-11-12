@@ -29,18 +29,25 @@ SERVICES PROVIDED HEREUNDER.
 The file compress.c contains (slightly modified) source code that
 originally came from gzip-1.2.4, copyright (C) 1992-1993 by Jean-loup
 Gailly.  This gzip code is distributed under the GNU General Public
-Licence and thus requires that any software that uses the CFITSIO
+License and thus requires that any software that uses the CFITSIO
 library (which in turn uses the gzip code) must conform to the
 provisions in the GNU General Public License.  A copy of the GNU
-licence is included at the beginning of compress.c file.
+license is included at the beginning of compress.c file.
 
-An alternate version of the compress.c file (called compress_alternate.c)
-is provided for users who want to use the CFITSIO library but are
-unwilling or unable to publicly release their software under the terms
-of the GNU General Public License.   This alternate version contains
-non-functional stubs for the file compression and uncompression
-routines used by CFITSIO.  Replace the file 'compress.c' with
-'compress_alternate.c' before compiling the CFITSIO library.  This will
+Similarly, the file wcsutil.c contains 2 slightly modified routines
+from the Classic AIPS package that are also distributed under the GNU
+General Public License.
+
+Alternate versions of the compress.c and wcsutil.c files (called
+compress_alternate.c and wcsutil_alternate.c) are provided for users 
+who want to use the CFITSIO library but are unwilling or unable to
+publicly release their software under the terms of the GNU General
+Public License.   These alternate versions contains non-functional
+stubs for the file compression and uncompression routines and the
+world coordinate transformation routines used by CFITSIO.  Replace the
+file `compress.c' with `compress_alternate.c' and 'wcsutil.c' with
+'wcsutil_alternate.c before compiling the CFITSIO library.  This will
 produce a version of CFITSIO which does not support reading or writing
-compressed FITS files but is otherwise identical to the standard
-version.
+compressed FITS files, or doing image coordinate transformations, but
+is otherwise identical to the standard version.  
+

@@ -76,7 +76,7 @@
 #endif
 
 #include <string.h>
-#include "fitsio.h"
+#include "fitsio2.h"
 #include "grparser.h"
 
 NGP_RAW_LINE	ngp_curline = { NULL, NULL, NULL, NGP_TTYPE_UNKNOWN, NULL, NGP_FORMAT_OK, 0 };

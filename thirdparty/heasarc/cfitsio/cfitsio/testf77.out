@@ -1,4 +1,4 @@
- FITSIO TESTPROG, v  2.510
+ FITSIO TESTPROG, v  3.060
   
  Try opening then closing a nonexistent file: 
    ftopen iunit, status (expect an error) =  15 104
@@ -299,9 +299,9 @@
  NOT DEFINED      T   0  12  12  12  12.  12.   0.   0.   0.   0.
  NOT DEFINED      F   0  98  98  98  98.  98.   0.   0.   0.   0.
  NOT DEFINED      F   0   0 -14 -14 -14. -14.   0.   0.   0.   0.
- NOT DEFINED      F   0   0  98  98  98.  98.   0.   0.   0.   0.
+ NOT DEFINED      F   0  98  98  98  98.  98.   0.   0.   0.   0.
  NOT DEFINED      F   0   0 -16 -16 -16. -16.   0.   0.   0.   0.
- NOT DEFINED      T   0   0  98  98  98.  98.   0.   0.   0.   0.
+ NOT DEFINED      T   0  98  98  98  98.  98.   0.   0.   0.   0.
  NOT DEFINED      T   0   0 -18 -18 -18. -18.   0.   0.   0.   0.
  NOT DEFINED      T   0  98  98  98  98.  98.   0.   0.   0.   0.
  NOT DEFINED      T   0   0 -20 -20 -20. -20.   0.   0.   0.   0.
@@ -322,9 +322,9 @@
                   T   0  12  12
                   F   0  99  99
                   F   0   0 -14
-                  F   0   0  99
+                  F   0  99  99
                   F   0   0 -16
-                  T   0   0  99
+                  T   0  99  99
                   T   0   0 -18
                   T   0  99  99
                   T   0   0 -20

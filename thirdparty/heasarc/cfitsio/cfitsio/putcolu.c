@@ -9,17 +9,15 @@
 #include <stdlib.h>
 #include "fitsio2.h"
 
-/* declare variable for passing large firstelem values between routines */
-extern OFF_T large_first_elem_val;
-
 /*--------------------------------------------------------------------------*/
 int ffppru( fitsfile *fptr,  /* I - FITS file pointer                       */
             long  group,      /* I - group to write(1 = 1st group)          */
-            long  firstelem,  /* I - first vector element to write(1 = 1st) */
-            long  nelem,      /* I - number of values to write              */
+            LONGLONG  firstelem,  /* I - first vector element to write(1 = 1st) */
+            LONGLONG  nelem,      /* I - number of values to write              */
             int  *status)     /* IO - error status                          */
 /*
   Write null values to the primary array.
+
 */
 {
     long row;
@@ -47,11 +45,12 @@ int ffppru( fitsfile *fptr,  /* I - FITS file pointer                       */
 }
 /*--------------------------------------------------------------------------*/
 int ffpprn( fitsfile *fptr,  /* I - FITS file pointer                       */
-            long  firstelem,  /* I - first vector element to write(1 = 1st) */
-            long  nelem,      /* I - number of values to write              */
+            LONGLONG  firstelem,  /* I - first vector element to write(1 = 1st) */
+            LONGLONG  nelem,      /* I - number of values to write              */
             int  *status)     /* IO - error status                          */
 /*
   Write null values to the primary array. (Doesn't support groups).
+
 */
 {
     long row = 1;
@@ -78,9 +77,9 @@ int ffpprn( fitsfile *fptr,  /* I - FITS file pointer                       */
 /*--------------------------------------------------------------------------*/
 int ffpclu( fitsfile *fptr,  /* I - FITS file pointer                       */
             int  colnum,     /* I - number of column to write (1 = 1st col) */
-            long  firstrow,  /* I - first row to write (1 = 1st row)        */
-            long  firstelem, /* I - first vector element to write (1 = 1st) */
-            long  nelempar,     /* I - number of values to write               */
+            LONGLONG  firstrow,  /* I - first row to write (1 = 1st row)        */
+            LONGLONG  firstelem, /* I - first vector element to write (1 = 1st) */
+            LONGLONG  nelempar,     /* I - number of values to write               */
             int  *status)    /* IO - error status                           */
 /*
   Set elements of a table column to the appropriate null value for the column
@@ -98,10 +97,11 @@ int ffpclu( fitsfile *fptr,  /* I - FITS file pointer                       */
 {
     int tcode, maxelem, hdutype, writemode = 2, leng;
     short i2null;
-    INT32BIT i4null, i8null[2];
-    long twidth, incre, rownum, remain, next, ntodo;
-    long tnull, ii, nelem;
-    OFF_T repeat, startpos, elemnum, large_elem, wrtptr, rowlen;
+    INT32BIT i4null;
+    long twidth, incre;
+    long ii;
+    LONGLONG largeelem, nelem, tnull, i8null;
+    LONGLONG repeat, startpos, elemnum, wrtptr, rowlen, rownum, remain, next, ntodo;
     double scale, zero;
     unsigned char i1null, lognul = 0;
     char tform[20], *cstring = 0;
@@ -115,10 +115,7 @@ int ffpclu( fitsfile *fptr,  /* I - FITS file pointer                       */
 
     nelem = nelempar;
     
-    if (firstelem == USE_LARGE_VALUE)
-        large_elem = large_first_elem_val;
-    else
-        large_elem = firstelem;
+    largeelem = firstelem;
 
     /*---------------------------------------------------*/
     /*  Check input and get parameters about the column: */
@@ -138,11 +135,11 @@ int ffpclu( fitsfile *fptr,  /* I - FITS file pointer                       */
 
     if (abs(tcode) >= TCOMPLEX)
     { /* treat complex columns as pairs of numbers */
-      large_elem = (large_elem - 1) * 2 + 1;
+      largeelem = (largeelem - 1) * 2 + 1;
       nelem *= 2;
     }
-    
-    if (ffgcpr( fptr, colnum, firstrow, large_elem, nelem, writemode, &scale,
+
+    if (ffgcprll( fptr, colnum, firstrow, largeelem, nelem, writemode, &scale,
        &zero, tform, &twidth, &tcode, &maxelem, &startpos,  &elemnum, &incre,
         &repeat, &rowlen, &hdutype, &tnull, snull, status) > 0)
         return(*status);
@@ -172,7 +169,6 @@ int ffpclu( fitsfile *fptr,  /* I - FITS file pointer                       */
          leng++;        /* copy the terminator too in binary tables */
 
       strncpy(cstring, snull, leng);  /* copy null string to temp buffer */
-
     }
     else if ( tcode == TBYTE  ||
               tcode == TSHORT ||
@@ -187,31 +183,26 @@ int ffpclu( fitsfile *fptr,  /* I - FITS file pointer                       */
       }
 
       if (tcode == TBYTE)
-         i1null = tnull;
+         i1null = (unsigned char) tnull;
       else if (tcode == TSHORT)
       {
-         i2null = tnull;
+         i2null = (short) tnull;
 #if BYTESWAPPED
          ffswap2(&i2null, 1); /* reverse order of bytes */
 #endif
       }
       else if (tcode == TLONG)
       {
-         i4null = tnull;
+         i4null = (INT32BIT) tnull;
 #if BYTESWAPPED
          ffswap4(&i4null, 1); /* reverse order of bytes */
 #endif
       }
       else
       {
-         if (tnull < 0)
-            i8null[0] = -1;
-         else
-            i8null[0] = 0;
-
-         i8null[1] = tnull;
+         i8null = tnull;
 #if BYTESWAPPED
-         ffswap8( (double *) i8null, 1); /* reverse order of bytes */
+         ffswap4( (INT32BIT*) (&i8null), 2); /* reverse order of bytes */
 #endif
       }
     }
@@ -231,7 +222,7 @@ int ffpclu( fitsfile *fptr,  /* I - FITS file pointer                       */
            in the current vector, which ever is smaller.
         */
         ntodo = minvalue(ntodo, (repeat - elemnum));
-        wrtptr = startpos + ((OFF_T)rownum * rowlen) + (elemnum * incre);
+        wrtptr = startpos + ((LONGLONG)rownum * rowlen) + (elemnum * incre);
 
         ffmbyt(fptr, wrtptr, IGNORE_EOF, status); /* move to write position */
 
@@ -258,7 +249,7 @@ int ffpclu( fitsfile *fptr,  /* I - FITS file pointer                       */
             case (TLONGLONG):
 
                 for (ii = 0; ii < ntodo; ii++)
-                  ffpbyt(fptr, 8, i8null, status);
+                  ffpbyt(fptr, 8, &i8null, status);
                 break;
 
             case (TFLOAT):
@@ -299,8 +290,8 @@ int ffpclu( fitsfile *fptr,  /* I - FITS file pointer                       */
         if (*status > 0)  /* test for error during previous write operation */
         {
            sprintf(message,
-             "Error writing %ld thru %ld of null values (ffpclu).",
-              next+1, next+ntodo);
+             "Error writing %.0f thru %.0f of null values (ffpclu).",
+              (double) (next+1), (double) (next+ntodo));
            ffpmsg(message);
 
            if (cstring)
@@ -335,9 +326,9 @@ int ffpclu( fitsfile *fptr,  /* I - FITS file pointer                       */
 /*--------------------------------------------------------------------------*/
 int ffpcluc( fitsfile *fptr,  /* I - FITS file pointer                       */
             int  colnum,     /* I - number of column to write (1 = 1st col) */
-            long  firstrow,  /* I - first row to write (1 = 1st row)        */
-            long  firstelem, /* I - first vector element to write (1 = 1st) */
-            long  nelem,     /* I - number of values to write               */
+            LONGLONG  firstrow,  /* I - first row to write (1 = 1st row)        */
+            LONGLONG  firstelem, /* I - first vector element to write (1 = 1st) */
+            LONGLONG  nelem,     /* I - number of values to write               */
             int  *status)    /* IO - error status                           */
 /*
   Set elements of a table column to the appropriate null value for the column
@@ -357,10 +348,11 @@ int ffpcluc( fitsfile *fptr,  /* I - FITS file pointer                       */
 {
     int tcode, maxelem, hdutype, writemode = 2, leng;
     short i2null;
-    INT32BIT i4null, i8null[2];
-    long twidth, incre, rownum, remain, next, ntodo;
-    long tnull, ii;
-    OFF_T repeat, startpos, elemnum, large_elem, wrtptr, rowlen;
+    INT32BIT i4null;
+    long twidth, incre;
+    long ii;
+    LONGLONG tnull, i8null;
+    LONGLONG repeat, startpos, elemnum, wrtptr, rowlen, rownum, remain, next, ntodo;
     double scale, zero;
     unsigned char i1null, lognul = 0;
     char tform[20], *cstring = 0;
@@ -371,11 +363,6 @@ int ffpcluc( fitsfile *fptr,  /* I - FITS file pointer                       */
 
     if (*status > 0)           /* inherit input status value if > 0 */
         return(*status);
-
-    if (firstelem == USE_LARGE_VALUE)
-        large_elem = large_first_elem_val;
-    else
-        large_elem = firstelem;
 
     /*---------------------------------------------------*/
     /*  Check input and get parameters about the column: */
@@ -393,7 +380,7 @@ int ffpcluc( fitsfile *fptr,  /* I - FITS file pointer                       */
     if (tcode < 0)
          writemode = 0;  /* this is a variable length column */
     
-    if (ffgcpr( fptr, colnum, firstrow, large_elem, nelem, writemode, &scale,
+    if (ffgcprll( fptr, colnum, firstrow, firstelem, nelem, writemode, &scale,
        &zero, tform, &twidth, &tcode, &maxelem, &startpos,  &elemnum, &incre,
         &repeat, &rowlen, &hdutype, &tnull, snull, status) > 0)
         return(*status);
@@ -438,31 +425,26 @@ int ffpcluc( fitsfile *fptr,  /* I - FITS file pointer                       */
       }
 
       if (tcode == TBYTE)
-         i1null = tnull;
+         i1null = (unsigned char) tnull;
       else if (tcode == TSHORT)
       {
-         i2null = tnull;
+         i2null = (short) tnull;
 #if BYTESWAPPED
          ffswap2(&i2null, 1); /* reverse order of bytes */
 #endif
       }
       else if (tcode == TLONG)
       {
-         i4null = tnull;
+         i4null = (INT32BIT) tnull;
 #if BYTESWAPPED
          ffswap4(&i4null, 1); /* reverse order of bytes */
 #endif
       }
       else
       {
-         if (tnull < 0)
-            i8null[0] = -1;
-         else
-            i8null[0] = 0;
-
-         i8null[1] = tnull;
+         i8null = tnull;
 #if BYTESWAPPED
-         ffswap8( (double *) i8null, 1); /* reverse order of bytes */
+         ffswap4( (INT32BIT*) &i8null, 2); /* reverse order of bytes */
 #endif
       }
     }
@@ -482,7 +464,7 @@ int ffpcluc( fitsfile *fptr,  /* I - FITS file pointer                       */
            in the current vector, which ever is smaller.
         */
         ntodo = minvalue(ntodo, (repeat - elemnum));
-        wrtptr = startpos + ((OFF_T)rownum * rowlen) + (elemnum * incre);
+        wrtptr = startpos + ((LONGLONG)rownum * rowlen) + (elemnum * incre);
 
         ffmbyt(fptr, wrtptr, IGNORE_EOF, status); /* move to write position */
 
@@ -509,7 +491,7 @@ int ffpcluc( fitsfile *fptr,  /* I - FITS file pointer                       */
             case (TLONGLONG):
 
                 for (ii = 0; ii < ntodo; ii++)
-                  ffpbyt(fptr, 8, i8null, status);
+                  ffpbyt(fptr, 8, &i8null, status);
                 break;
 
             case (TFLOAT):
@@ -550,8 +532,8 @@ int ffpcluc( fitsfile *fptr,  /* I - FITS file pointer                       */
         if (*status > 0)  /* test for error during previous write operation */
         {
            sprintf(message,
-             "Error writing %ld thru %ld of null values (ffpclu).",
-              next+1, next+ntodo);
+             "Error writing %.0f thru %.0f of null values (ffpclu).",
+              (double) (next+1), (double) (next+ntodo));
            ffpmsg(message);
 
            if (cstring)
@@ -583,5 +565,65 @@ int ffpcluc( fitsfile *fptr,  /* I - FITS file pointer                       */
 
     return(*status);
 }
+/*--------------------------------------------------------------------------*/
+int ffprwu(fitsfile *fptr,
+           LONGLONG firstrow,
+           LONGLONG nrows, 
+           int *status)
 
+/* 
+ * fits_write_nullrows / ffprwu - write TNULLs to all columns in one or more rows
+ *
+ * fitsfile *fptr - pointer to FITS HDU opened for read/write
+ * long int firstrow - first table row to set to null. (firstrow >= 1)
+ * long int nrows - total number or rows to set to null. (nrows >= 1)
+ * int *status - upon return, *status contains CFITSIO status code
+ *
+ * RETURNS: CFITSIO status code
+ *
+ * written by Craig Markwardt, GSFC 
+ */
+{
+  LONGLONG ntotrows;
+  int ncols, i;
+  int typecode = 0;
+  LONGLONG repeat = 0, width = 0;
+  int nullstatus;
+
+  if (*status > 0) return *status;
+
+  if ((firstrow <= 0) || (nrows <= 0)) return (*status = BAD_ROW_NUM);
+
+  fits_get_num_rowsll(fptr, &ntotrows, status);
+
+  if (firstrow + nrows - 1 > ntotrows) return (*status = BAD_ROW_NUM);
+  
+  fits_get_num_cols(fptr, &ncols, status);
+  if (*status) return *status;
+
+
+  /* Loop through each column and write nulls */
+  for (i=1; i <= ncols; i++) {
+    repeat = 0;  typecode = 0;  width = 0;
+    fits_get_coltypell(fptr, i, &typecode, &repeat, &width, status);
+    if (*status) break;
+
+    /* NOTE: data of TSTRING type must not write the total repeat
+       count, since the repeat count is the *character* count, not the
+       nstring count.  Divide by string width to get number of
+       strings. */
+    
+    if (typecode == TSTRING) repeat /= width;
+
+    /* Write NULLs */
+    nullstatus = 0;
+    fits_write_col_null(fptr, i, firstrow, 1, repeat*nrows, &nullstatus);
+
+    /* ignore error if no null value is defined for the column */
+    if (nullstatus && nullstatus != NO_NULL) return (*status = nullstatus);
+    
+  }
+    
+  return *status;
+}
 

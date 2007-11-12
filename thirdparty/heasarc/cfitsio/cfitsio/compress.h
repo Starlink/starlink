@@ -29,6 +29,9 @@ typedef unsigned char  uch;
 typedef unsigned short ush;
 typedef unsigned long  ulg;
 
+/* private version of MIN function */
+#define MINZIP(a,b) ((a) <= (b) ? (a) : (b))
+
 /* Return codes from gzip */
 #define OK      0
 #define ERROR   1

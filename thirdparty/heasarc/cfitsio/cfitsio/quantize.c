@@ -63,7 +63,7 @@ If the function value is zero, the data were not copied to idata.
 	int intflag;		/* true if data are really integer */
 	int i, j, iter;		/* loop indices */
         int anynulls = 0;       /* set if fdata contains any null values */
-        int nshift;
+        int nshift, itemp;
         int first_nonnull = 0;
 	double mean, stdev;	/* mean and RMS of differences */
 	double minval = 0., maxval = 0.;  /* min & max of fdata */
@@ -83,10 +83,14 @@ If the function value is zero, the data were not copied to idata.
 
 	/* Check to see if data are "floating point integer." */
         /* This also catches the case where all the pixels are null */
+
+        /* Since idata and fdata may point to the same memory location, */
+	/* we cannot write to idata unless we are sure we don't need   */
+	/* the corresponding float value any more */
+	
 	intflag = 1;		/* initial value */
 	for (i = 0;  i < nx;  i++) {
             if (fdata[i] == in_null_value) {
-                idata[i] = NULL_VALUE;
                 anynulls = 1;
             }
 	    else if (fdata[i] > INT32_MAX || 
@@ -95,21 +99,42 @@ If the function value is zero, the data were not copied to idata.
 		break;
 	    }
             else {
-  	        idata[i] = (int)(fdata[i] + 0.5);
-                *iminval = minvalue(idata[i], *iminval);
-                *imaxval = maxvalue(idata[i], *imaxval);
+  	        itemp = (int)(fdata[i] + 0.5);
 
-	        if (idata[i] != fdata[i]) {
+	        if (itemp != fdata[i]) {
 		    intflag = 0;	/* not integer */
 		    break;
                 }
 	    }
 	}
+
+        if (intflag) { /* data are "floating point integer" */
+	  for (i = 0;  i < nx;  i++) {
+            if (fdata[i] == in_null_value) {
+                idata[i] = NULL_VALUE;
+                anynulls = 1;
+            }
+            else {
+  	        idata[i] = (int)(fdata[i] + 0.5);
+                *iminval = minvalue(idata[i], *iminval);
+                *imaxval = maxvalue(idata[i], *imaxval);
+	    }
+	  }
+	}
+
 	if (intflag) {  /* data are "floating point integer" */
             if (anynulls) {
                 /* Shift the range of values so they lie close to NULL_VALUE. */
                 /* This will make the compression more efficient.             */
-                nshift = *iminval - NULL_VALUE - N_RESERVED_VALUES;
+                /* Maximum allowed shift is 2^31 - 1 = 2147483646 */
+                /* Can't use 2147483647 because OSF says this is not a legal number */
+
+                if (*iminval >= 0) {
+		   nshift = -(NULL_VALUE + 1) - N_RESERVED_VALUES;
+		} else {
+                  nshift = *iminval - NULL_VALUE - N_RESERVED_VALUES;
+                }
+
                 for (i = 0;  i < nx;  i++) {
                     if (idata[i] != NULL_VALUE) {
                         idata[i] -= nshift;
@@ -142,7 +167,7 @@ If the function value is zero, the data were not copied to idata.
 
         /* allocate temporary buffer for differences */
 	ndiff = nx - first_nonnull - 1;
-	if ((diff = malloc (ndiff * sizeof (float))) == NULL) {
+	if ((diff = (float *) malloc (ndiff * sizeof (float))) == NULL) {
             ffpmsg("Out of memory in 'fits_quantize_float'.");  
 	    return (0);
 	}
@@ -152,7 +177,7 @@ If the function value is zero, the data were not copied to idata.
         ndiff = 0;
 	for (i = j + 1 ;  i < nx;  i++) {
             if (fdata[i] != in_null_value) {
- 	        diff[ndiff] = fabs (fdata[i] - fdata[j]);
+ 	        diff[ndiff] = (float) (fabs (fdata[i] - fdata[j]));
                 j = i;
                 ndiff++;
                 minval = minvalue(minval, fdata[i]);
@@ -234,6 +259,7 @@ If the function value is zero, the data were not copied to idata.
             /* data contains null values; shift the range to be */
             /* close to the value used to represent null values */
             zeropt = minval - delta * (NULL_VALUE + N_RESERVED_VALUES);
+
 	    for (i = 0;  i < nx;  i++) {
                 if (fdata[i] != in_null_value) {
 	            temp = (fdata[i] - zeropt) / delta;
@@ -283,7 +309,7 @@ If the function value is zero, the data were not copied to idata.
 	int intflag;		/* true if data are really integer */
 	int i, j, iter;		/* loop indices */
         int anynulls = 0;       /* set if fdata contains any null values */
-        int nshift;
+        int nshift, itemp;
         int first_nonnull = 0;
 	double mean, stdev;	/* mean and RMS of differences */
 	double minval = 0., maxval = 0.;   /* min & max of fdata */
@@ -303,10 +329,14 @@ If the function value is zero, the data were not copied to idata.
 
 	/* Check to see if data are "floating point integer." */
         /* This also catches the case where all the pixels are null */
+
+        /* Since idata and fdata may point to the same memory location, */
+	/* we cannot write to idata unless we are sure we don't need   */
+	/* the corresponding float value any more */
+	
 	intflag = 1;		/* initial value */
 	for (i = 0;  i < nx;  i++) {
             if (fdata[i] == in_null_value) {
-                idata[i] = NULL_VALUE;
                 anynulls = 1;
             }
 	    else if (fdata[i] > INT32_MAX || 
@@ -315,21 +345,42 @@ If the function value is zero, the data were not copied to idata.
 		break;
 	    }
             else {
-  	        idata[i] = (int)(fdata[i] + 0.5);
-                *iminval = minvalue(idata[i], *iminval);
-                *imaxval = maxvalue(idata[i], *imaxval);
+  	        itemp = (int)(fdata[i] + 0.5);
 
-	        if (idata[i] != fdata[i]) {
+	        if (itemp != fdata[i]) {
 		    intflag = 0;	/* not integer */
 		    break;
                 }
 	    }
 	}
+
+        if (intflag) { /* data are "floating point integer" */
+	  for (i = 0;  i < nx;  i++) {
+            if (fdata[i] == in_null_value) {
+                idata[i] = NULL_VALUE;
+                anynulls = 1;
+            }
+            else {
+  	        idata[i] = (int)(fdata[i] + 0.5);
+                *iminval = minvalue(idata[i], *iminval);
+                *imaxval = maxvalue(idata[i], *imaxval);
+	    }
+	  }
+	}
+
 	if (intflag) {  /* data are "floating point integer" */
             if (anynulls) {
                 /* Shift the range of values so they lie close to NULL_VALUE. */
                 /* This will make the compression more efficient.             */
-                nshift = *iminval - NULL_VALUE - N_RESERVED_VALUES;
+                /* Maximum allowed shift is 2^31 - 1 = 2147483646 */
+                /* Can't use 2147483647 because OSF says this is not a legal number */
+
+                if (*iminval >= 0) {
+		   nshift = -(NULL_VALUE +1) - N_RESERVED_VALUES;
+		} else {
+                  nshift = *iminval - NULL_VALUE - N_RESERVED_VALUES;
+                }
+
                 for (i = 0;  i < nx;  i++) {
                     if (idata[i] != NULL_VALUE) {
                         idata[i] -= nshift;
@@ -362,7 +413,7 @@ If the function value is zero, the data were not copied to idata.
 
         /* allocate temporary buffer for differences */
 	ndiff = nx - first_nonnull - 1;
-	if ((diff = malloc (ndiff * sizeof (float))) == NULL) {
+	if ((diff = (float *) malloc (ndiff * sizeof (float))) == NULL) {
             ffpmsg("Out of memory in 'fits_quantize_double'.");  
 	    return (0);
 	}
@@ -372,7 +423,7 @@ If the function value is zero, the data were not copied to idata.
         ndiff = 0;
 	for (i = j + 1 ;  i < nx;  i++) {
             if (fdata[i] != in_null_value) {
- 	        diff[ndiff] = fabs (fdata[i] - fdata[j]);
+ 	        diff[ndiff] = (float) (fabs (fdata[i] - fdata[j]));
                 j = i;
                 ndiff++;
                 minval = minvalue(minval, fdata[i]);
@@ -398,7 +449,7 @@ If the function value is zero, the data were not copied to idata.
             ndiff = 0;
 	    for (i = j + 1 ;  i < nx;  i++) {
                 if (fdata[i] != in_null_value) {
- 	            diff[ndiff] = fdata[i] - fdata[j];
+ 	            diff[ndiff] = (float) (fdata[i] - fdata[j]);
                     j = i;
                     ndiff++;
                 }
@@ -464,6 +515,199 @@ If the function value is zero, the data were not copied to idata.
 	return (1);			/* yes, data have been quantized */
 }
 /*---------------------------------------------------------------------------*/
+int fits_rms_float (float fdata[], int nx, float in_null_value,
+                   double *rms, int *status) {
+
+/*
+Compute the background RMS (noise) in an array of image pixels.
+
+arguments:
+float fdata[]       i: array of image pixels
+int nx              i: length of fdata array
+float in_null_value i: value used to represent undefined pixels in fdata
+double rms          o: computed RMS value
+*/
+	float *diff;		/* difference array */
+	int ndiff;		/* size of diff array */
+	int i, j, iter;		/* loop indices */
+        int first_nonnull = 0;
+	double mean, stdev;	/* mean and RMS of differences */
+	double median;		/* median of diff array */
+
+	if (*status) return (*status);
+	
+	if (nx <= 1) {
+	    *rms = 0;
+	    return (0);
+	}
+
+        /* find first non-null pixel, and initialize min and max values */
+	for (i = 0;  i < nx;  i++) {
+	    if (fdata[i] != in_null_value) {
+               first_nonnull = i;
+               break;
+            }
+        }
+
+        /* allocate temporary buffer for differences */
+	ndiff = nx - first_nonnull - 1;
+	if ((diff = (float *) malloc (ndiff * sizeof (float))) == NULL) {
+            ffpmsg("Out of memory in 'fits_float_rms'."); 
+	    *status = 113;  /* memory allocation error */ 
+	    return (0);
+	}
+
+        /* calc ABS difference between successive non-null pixels */
+        j = first_nonnull;
+        ndiff = 0;
+	for (i = j + 1 ;  i < nx;  i++) {
+            if (fdata[i] != in_null_value) {
+ 	        diff[ndiff] = (float) (fabs (fdata[i] - fdata[j]));
+                j = i;
+                ndiff++;
+            }
+        }
+
+	/* use median of absolute deviations */
+
+	median = xMedian (diff, ndiff);
+	stdev = median * MEDIAN_TO_RMS;
+	
+	/* substitute sigma-clipping if median is zero */
+	if (stdev == 0.0) {
+
+            /* calculate differences between non-null pixels */
+            j = first_nonnull;
+            ndiff = 0;
+	    for (i = j + 1 ;  i < nx;  i++) {
+                if (fdata[i] != in_null_value) {
+ 	            diff[ndiff] = fdata[i] - fdata[j];
+                    j = i;
+                    ndiff++;
+                }
+            }
+
+	    FqMean (diff, ndiff, &mean, &stdev);
+
+	    for (iter = 0;  iter < NITER;  iter++) {
+		j = 0;
+		for (i = 0;  i < ndiff;  i++) {
+		    if (fabs (diff[i] - mean) < SIGMA_CLIP * stdev) {
+			if (j < i)
+			    diff[j] = diff[i];
+			j++;
+		    }
+		}
+		if (j == ndiff)
+		    break;
+		ndiff = j;
+		FqMean (diff, ndiff, &mean, &stdev);
+	    }
+	}
+	free (diff);
+	
+        *rms = stdev;
+
+	return (0);
+}
+/*---------------------------------------------------------------------------*/
+int fits_rms_short (short fdata[], int nx, short in_null_value,
+                   double *rms, int *status) {
+
+/*
+Compute the background RMS (noise) in an array of image pixels.
+
+arguments:
+short fdata[]       i: array of image pixels
+int nx              i: length of fdata array
+short in_null_value i: value used to represent undefined pixels in fdata
+double rms          o: computed RMS value
+*/
+	float *diff;		/* difference array */
+	int ndiff;		/* size of diff array */
+	int i, j, iter;		/* loop indices */
+        int first_nonnull = 0;
+	double mean, stdev;	/* mean and RMS of differences */
+	double median;		/* median of diff array */
+
+	if (*status) return (*status);
+	
+	if (nx <= 1) {
+	    *rms = 0;
+	    return (0);
+	}
+
+        /* find first non-null pixel, and initialize min and max values */
+	for (i = 0;  i < nx;  i++) {
+	    if (fdata[i] != in_null_value) {
+               first_nonnull = i;
+               break;
+            }
+        }
+
+        /* allocate temporary buffer for differences */
+	ndiff = nx - first_nonnull - 1;
+	if ((diff = (float *) malloc (ndiff * sizeof (float))) == NULL) {
+            ffpmsg("Out of memory in 'fits_float_rms'."); 
+	    *status = 113;  /* memory allocation error */ 
+	    return (0);
+	}
+
+        /* calc ABS difference between successive non-null pixels */
+        j = first_nonnull;
+        ndiff = 0;
+	for (i = j + 1 ;  i < nx;  i++) {
+            if (fdata[i] != in_null_value) {
+ 	        diff[ndiff] = (float) (abs (fdata[i] - fdata[j]));
+                j = i;
+                ndiff++;
+            }
+        }
+
+	/* use median of absolute deviations */
+
+	median = xMedian (diff, ndiff);
+	stdev = median * MEDIAN_TO_RMS;
+	
+	/* substitute sigma-clipping if median is zero */
+	if (stdev == 0.0) {
+
+            /* calculate differences between non-null pixels */
+            j = first_nonnull;
+            ndiff = 0;
+	    for (i = j + 1 ;  i < nx;  i++) {
+                if (fdata[i] != in_null_value) {
+ 	            diff[ndiff] = (float) (fdata[i] - fdata[j]);
+                    j = i;
+                    ndiff++;
+                }
+            }
+
+	    FqMean (diff, ndiff, &mean, &stdev);
+
+	    for (iter = 0;  iter < NITER;  iter++) {
+		j = 0;
+		for (i = 0;  i < ndiff;  i++) {
+		    if (fabs (diff[i] - mean) < SIGMA_CLIP * stdev) {
+			if (j < i)
+			    diff[j] = diff[i];
+			j++;
+		    }
+		}
+		if (j == ndiff)
+		    break;
+		ndiff = j;
+		FqMean (diff, ndiff, &mean, &stdev);
+	    }
+	}
+	free (diff);
+	
+        *rms = stdev;
+
+	return (0);
+}
+
+/*---------------------------------------------------------------------------*/
 /* This computes the mean and standard deviation. */
 
 static void FqMean (float diff[], int ndiff, double *mean, double *stdev) {
@@ -526,7 +770,7 @@ int n         i: number of elements in x (modified locally)
 	if (n == 1)
 	    return (x[0]);
 	if (n == 2)
-	    return ((x[0] + x[1]) / 2.);
+	    return ((float) ((x[0] + x[1]) / 2.));
 
 	done = 0;
 	while (!done) {
@@ -534,7 +778,7 @@ int n         i: number of elements in x (modified locally)
 	    if (n < SORT_CUTOFF) {
 		qsort (x, n, sizeof (float), FqCompare);
 		if (n / 2 * 2 == n)
-		    median = (x[n/2-1] + x[n/2]) / 2.;
+		    median = (float) ((x[n/2-1] + x[n/2]) / 2.);
 		else
 		    median = x[n/2];
 		return (median);
@@ -555,13 +799,13 @@ int n         i: number of elements in x (modified locally)
 		    median = x[i];
 		    break;
 		case 2:
-		    median = (x[i] + x[i+1]) / 2.;
+		    median = (float) ((x[i] + x[i+1]) / 2.);
 		    break;
 		case 3:
 		    median = x[i+1];
 		    break;
 		case 4:
-		    median = (x[i+1] + x[i+2]) / 2.;
+		    median = (float) ((x[i+1] + x[i+2]) / 2.);
 		    break;
 		case 5:				/* NELEM = 5 */
 		    median = x[i+2];

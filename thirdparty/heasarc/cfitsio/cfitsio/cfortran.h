@@ -1,4 +1,4 @@
-/* cfortran.h  4.4_cernlib2002 */
+/* cfortran.h  4.4 */
 /* http://www-zeus.desy.de/~burow/cfortran/                   */
 /* Burkhard Burow  burow@desy.de                 1990 - 2002. */
 
@@ -10,6 +10,15 @@
    SHOULD ALSO HAVE ACCESS TO CFORTRAN.DOC WHICH PROVIDES TERMS FOR USING,
    MODIFYING, COPYING AND DISTRIBUTING THE CFORTRAN.H PACKAGE.
 */
+
+/* The following modifications were made by the authors of CFITSIO or by me. 
+ * They are flagged below with CFITSIO, the author's initials, or KMCCARTY.
+ * PDW = Peter Wilson
+ * DM  = Doug Mink
+ * LEB = Lee E Brotzman
+ * MR  = Martin Reinecke
+ * WDP = William D Pence
+ * -- Kevin McCarty, for Debian (19 Dec. 2005) */
 
 /*******
    Modifications:
@@ -25,12 +34,48 @@
                 (linux/gcc environment detection)
       Apr 2002: If __CYGWIN__ is defined, also define f2cFortran
       Nov 2002: If __APPLE__ defined, also define f2cfortran (for Mac OS-X)
+
+      Nov 2003: If __INTEL_COMPILER or INTEL_COMPILER defined, also define
+                f2cFortran (KMCCARTY)
+      Dec 2005: If f2cFortran is defined, enforce REAL functions in FORTRAN
+                returning "double" in C.  This was one of the items on
+		Burkhard's TODO list. (KMCCARTY)
+      Dec 2005: Modifications to support 8-byte integers. (MR)
+		USE AT YOUR OWN RISK!
+      Feb 2006  Added logic to typedef the symbol 'LONGLONG' to an appropriate
+                intrinsic 8-byte integer datatype  (WDP)
+      Apr 2006: Modifications to support gfortran (and g77 with -fno-f2c flag)
+                since by default it returns "float" for FORTRAN REAL function.
+                (KMCCARTY)
  *******/
+
 /* 
   Avoid symbols already used by compilers and system *.h:
   __ - OSF1 zukal06 V3.0 347 alpha, cc -c -std1 cfortest.c
 
- */
+*/
+
+/* 
+   Determine what 8-byte integer data type is available.
+  'long long' is now supported by most compilers, but older
+  MS Visual C++ compilers before V7.0 use '__int64' instead. (WDP)
+*/
+
+#ifndef LONGLONG_TYPE   /* this may have been previously defined */
+#if defined(_MSC_VER)   /* Microsoft Visual C++ */
+
+#if (_MSC_VER < 1300)   /* versions earlier than V7.0 do not have 'long long' */
+    typedef __int64 LONGLONG;
+#else                   /* newer versions do support 'long long' */
+    typedef long long LONGLONG; 
+#endif
+
+#else
+    typedef long long LONGLONG; 
+#endif
+
+#define LONGLONG_TYPE
+#endif  
 
 
 /* First prepare for the C compiler. */
@@ -90,7 +135,9 @@ only C calling FORTRAN subroutines will work using K&R style.*/
 
 /* Remainder of cfortran.h depends on the Fortran compiler. */
 
-#if defined(CLIPPERFortran) || defined(pgiFortran)
+/* 11/29/2003 (KMCCARTY): add *INTEL_COMPILER symbols here */
+/* 04/05/2006 (KMCCARTY): add gFortran symbol here */
+#if defined(CLIPPERFortran) || defined(pgiFortran) || defined(__INTEL_COMPILER) || defined(INTEL_COMPILER) || defined(gFortran)
 #define f2cFortran
 #endif
 
@@ -105,23 +152,25 @@ only C calling FORTRAN subroutines will work using K&R style.*/
                            Support f2c or f77 with gcc, vcc with f2c. 
                            f77 with vcc works, missing link magic for f77 I/O.*/
 #endif
-#if defined(WIN32) && !defined(__CYGWIN__) /* 04/13/00 DM: Add these lines for NT */
-#define PowerStationFortran   /*    with PowerStationFortran and and Visual C++ */
+/* 04/13/00 DM (CFITSIO): Add these lines for NT */
+/*   with PowerStationFortran and and Visual C++ */
+#if defined(WIN32) && !defined(__CYGWIN__)
+#define PowerStationFortran   
 #define VISUAL_CPLUSPLUS
 #endif
-#if defined(g77Fortran)   /* 11/03/97 PDW */
+#if defined(g77Fortran)                        /* 11/03/97 PDW (CFITSIO) */
 #define f2cFortran
 #endif
-#if        defined(__CYGWIN__) /* 04/11/02 LEB */
+#if        defined(__CYGWIN__)                 /* 04/11/02 LEB (CFITSIO) */
 #define       f2cFortran 
 #endif
-#if        defined(__GNUC__) && defined(linux) /* 06/21/00 PDW */
+#if        defined(__GNUC__) && defined(linux) /* 06/21/00 PDW (CFITSIO) */
 #define       f2cFortran 
 #endif
-#if defined(macintosh)     /* 11/1999 */
+#if defined(macintosh)                         /* 11/1999 (CFITSIO) */
 #define f2cFortran
 #endif
-#if defined(__APPLE__)     /* 11/2002 */
+#if defined(__APPLE__)                         /* 11/2002 (CFITSIO) */
 #define f2cFortran
 #endif
 #if defined(__hpux)             /* 921107: Use __hpux instead of __hp9000s300 */
@@ -165,6 +214,7 @@ only C calling FORTRAN subroutines will work using K&R style.*/
 #if !(defined(mipsFortran)||defined(DECFortran)||defined(vmsFortran)||defined(CONVEXFortran)||defined(PowerStationFortran)||defined(AbsoftUNIXFortran)||defined(AbsoftProFortran)||defined(SXFortran))
 /* If your compiler barfs on ' #error', replace # with the trigraph for #     */
  #error "cfortran.h:  Can't find your environment among:\
+    - GNU gcc (g77) on Linux.                                            \
     - MIPS cc and f77 2.0. (e.g. Silicon Graphics, DECstations, ...)     \
     - IBM AIX XL C and FORTRAN Compiler/6000 Version 01.01.0000.0000     \
     - VAX   VMS CC 3.1 and FORTRAN 5.4.                                  \
@@ -181,11 +231,14 @@ only C calling FORTRAN subroutines will work using K&R style.*/
     - VAXUltrix: vcc,cc or gcc with f2c. gcc or cc with f77.             \
     -            f77 with vcc works; but missing link magic for f77 I/O. \
     -            NO fort. None of gcc, cc or vcc generate required names.\
-    - f2c    : Use #define    f2cFortran, or cc -Df2cFortran             \
+    - f2c/g77:   Use #define    f2cFortran, or cc -Df2cFortran           \
+    - gfortran:  Use #define    gFortran,   or cc -DgFortran             \
+                 (also necessary for g77 with -fno-f2c option)           \
     - NAG f90: Use #define NAGf90Fortran, or cc -DNAGf90Fortran          \
     - Absoft UNIX F77: Use #define AbsoftUNIXFortran or cc -DAbsoftUNIXFortran \
     - Absoft Pro Fortran: Use #define AbsoftProFortran \
-    - Portland Group Fortran: Use #define pgiFortran"
+    - Portland Group Fortran: Use #define pgiFortran \
+    - Intel Fortran: Use #define INTEL_COMPILER"
 /* Compiler must throw us out at this point! */
 #endif
 #endif
@@ -198,6 +251,7 @@ only C calling FORTRAN subroutines will work using K&R style.*/
 
 /* Throughout cfortran.h we use: UN = Uppercase Name.  LN = Lowercase Name.   */
 
+/* "extname" changed to "appendus" below (CFITSIO) */
 #if defined(f2cFortran) || defined(NAGf90Fortran) || defined(DECFortran) || defined(mipsFortran) || defined(apolloFortran) || defined(sunFortran) || defined(CONVEXFortran) || defined(SXFortran) || defined(appendus)
 #define CFC_(UN,LN)            _(LN,_)      /* Lowercase FORTRAN symbols.     */
 #define orig_fcallsc(UN,LN)    CFC_(UN,LN)
@@ -302,7 +356,8 @@ only C calling FORTRAN subroutines will work using K&R style.*/
 #endif
 
 #ifndef apolloFortran
-#define COMMON_BLOCK_DEF(DEFINITION, NAME) DEFINITION NAME
+/* "extern" removed (CFITSIO) */
+#define COMMON_BLOCK_DEF(DEFINITION, NAME) /* extern */ DEFINITION NAME
 #define CF_NULL_PROTO
 #else                                         /* HP doesn't understand #elif. */
 /* Without ANSI prototyping, Apollo promotes float functions to double.    */
@@ -546,7 +601,7 @@ typedef DSC$DESCRIPTOR_A(1) fstringvector;
                     *( (F).dsc$l_m[0]=(F).dsc$bounds[0].dsc$l_u=(ELEMNO)  ),   \
   (F).dsc$a_a0    =  ( (F).dsc$a_pointer=(C) ) - (F).dsc$w_length          ,(F))
 
-#endif      /* PDW: 2/10/98 -- Let VMS see NUM_ELEMS definitions */
+#endif      /* PDW: 2/10/98 (CFITSIO) -- Let VMS see NUM_ELEMS definitions */
 #define _NUM_ELEMS      -1
 #define _NUM_ELEM_ARG   -2
 #define NUM_ELEMS(A)    A,_NUM_ELEMS
@@ -572,8 +627,13 @@ for (num=0; ; num++) {
   if (i==(unsigned)num_term) break;
   else strv += elem_len-i;
 }
+if (0) {  /* to prevent not used warnings in gcc (added by ROOT) */
+   c2fstrv(0, 0, 0, 0); f2cstrv(0, 0, 0, 0); kill_trailing(0, 0);
+   vkill_trailing(0, 0, 0, 0); num_elem(0, 0, 0, 0);
+}
 return (int)num;
 }
+/* #endif removed 2/10/98 (CFITSIO) */
 
 /*-------------------------------------------------------------------------*/
 
@@ -1352,6 +1412,7 @@ do{VVCF(T1,A1,B1)  VVCF(T2,A2,B2)  VVCF(T3,A3,B3)  VVCF(T4,A4,B4)  VVCF(T5,A5,B5
 #define     INTVVVVVVV_cfTYPE int
 #define LOGICALVVVVVVV_cfTYPE int
 #define    LONGVVVVVVV_cfTYPE long
+#define LONGLONGVVVVVVV_cfTYPE LONGLONG   /* added by MR December 2005 */
 #define   SHORTVVVVVVV_cfTYPE short
 #define          PBYTE_cfTYPE INTEGER_BYTE
 #define        PDOUBLE_cfTYPE DOUBLE_PRECISION 
@@ -1359,6 +1420,7 @@ do{VVCF(T1,A1,B1)  VVCF(T2,A2,B2)  VVCF(T3,A3,B3)  VVCF(T4,A4,B4)  VVCF(T5,A5,B5
 #define           PINT_cfTYPE int
 #define       PLOGICAL_cfTYPE int
 #define          PLONG_cfTYPE long
+#define      PLONGLONG_cfTYPE LONGLONG  /* added by MR December 2005 */
 #define         PSHORT_cfTYPE short
 
 #define CFARGS0(A,T,V,W,X,Y,Z) _3(T,_cf,A)
@@ -1376,6 +1438,7 @@ do{VVCF(T1,A1,B1)  VVCF(T2,A2,B2)  VVCF(T3,A3,B3)  VVCF(T4,A4,B4)  VVCF(T5,A5,B5
 #define            INT_cfINT(N,A,B,X,Y,Z)        DOUBLE_cfINT(N,A,B,X,Y,Z)
 #define        LOGICAL_cfINT(N,A,B,X,Y,Z)        DOUBLE_cfINT(N,A,B,X,Y,Z)
 #define           LONG_cfINT(N,A,B,X,Y,Z)        DOUBLE_cfINT(N,A,B,X,Y,Z)
+#define       LONGLONG_cfINT(N,A,B,X,Y,Z)        DOUBLE_cfINT(N,A,B,X,Y,Z) /* added by MR December 2005 */
 #define          SHORT_cfINT(N,A,B,X,Y,Z)        DOUBLE_cfINT(N,A,B,X,Y,Z)
 #define          PBYTE_cfINT(N,A,B,X,Y,Z)       PDOUBLE_cfINT(N,A,B,X,Y,Z)
 #define        PDOUBLE_cfINT(N,A,B,X,Y,Z) _(CFARGS,N)(A,PINT,B,X,Y,Z,0)
@@ -1383,6 +1446,7 @@ do{VVCF(T1,A1,B1)  VVCF(T2,A2,B2)  VVCF(T3,A3,B3)  VVCF(T4,A4,B4)  VVCF(T5,A5,B5
 #define           PINT_cfINT(N,A,B,X,Y,Z)       PDOUBLE_cfINT(N,A,B,X,Y,Z)
 #define       PLOGICAL_cfINT(N,A,B,X,Y,Z)       PDOUBLE_cfINT(N,A,B,X,Y,Z)
 #define          PLONG_cfINT(N,A,B,X,Y,Z)       PDOUBLE_cfINT(N,A,B,X,Y,Z)
+#define      PLONGLONG_cfINT(N,A,B,X,Y,Z)       PDOUBLE_cfINT(N,A,B,X,Y,Z) /* added by MR December 2005 */
 #define         PSHORT_cfINT(N,A,B,X,Y,Z)       PDOUBLE_cfINT(N,A,B,X,Y,Z)
 #define          BYTEV_cfINT(N,A,B,X,Y,Z)       DOUBLEV_cfINT(N,A,B,X,Y,Z)
 #define         BYTEVV_cfINT(N,A,B,X,Y,Z)      DOUBLEVV_cfINT(N,A,B,X,Y,Z)
@@ -1426,6 +1490,13 @@ do{VVCF(T1,A1,B1)  VVCF(T2,A2,B2)  VVCF(T3,A3,B3)  VVCF(T4,A4,B4)  VVCF(T5,A5,B5
 #define      LONGVVVVV_cfINT(N,A,B,X,Y,Z)   DOUBLEVVVVV_cfINT(N,A,B,X,Y,Z)
 #define     LONGVVVVVV_cfINT(N,A,B,X,Y,Z)  DOUBLEVVVVVV_cfINT(N,A,B,X,Y,Z)
 #define    LONGVVVVVVV_cfINT(N,A,B,X,Y,Z) DOUBLEVVVVVVV_cfINT(N,A,B,X,Y,Z)
+#define      LONGLONGV_cfINT(N,A,B,X,Y,Z)       DOUBLEV_cfINT(N,A,B,X,Y,Z) /* added by MR December 2005 */
+#define     LONGLONGVV_cfINT(N,A,B,X,Y,Z)      DOUBLEVV_cfINT(N,A,B,X,Y,Z) /* added by MR December 2005 */
+#define    LONGLONGVVV_cfINT(N,A,B,X,Y,Z)     DOUBLEVVV_cfINT(N,A,B,X,Y,Z) /* added by MR December 2005 */
+#define   LONGLONGVVVV_cfINT(N,A,B,X,Y,Z)    DOUBLEVVVV_cfINT(N,A,B,X,Y,Z) /* added by MR December 2005 */
+#define  LONGLONGVVVVV_cfINT(N,A,B,X,Y,Z)   DOUBLEVVVVV_cfINT(N,A,B,X,Y,Z) /* added by MR December 2005 */
+#define LONGLONGVVVVVV_cfINT(N,A,B,X,Y,Z)  DOUBLEVVVVVV_cfINT(N,A,B,X,Y,Z) /* added by MR December 2005 */
+#define LONGLONGVVVVVVV_cfINT(N,A,B,X,Y,Z) DOUBLEVVVVVVV_cfINT(N,A,B,X,Y,Z) /* added by MR December 2005 */
 #define         SHORTV_cfINT(N,A,B,X,Y,Z)       DOUBLEV_cfINT(N,A,B,X,Y,Z)
 #define        SHORTVV_cfINT(N,A,B,X,Y,Z)      DOUBLEVV_cfINT(N,A,B,X,Y,Z)
 #define       SHORTVVV_cfINT(N,A,B,X,Y,Z)     DOUBLEVVV_cfINT(N,A,B,X,Y,Z)
@@ -1485,7 +1556,12 @@ do{VVCF(T1,A1,B1)  VVCF(T2,A2,B2)  VVCF(T3,A3,B3)  VVCF(T4,A4,B4)  VVCF(T5,A5,B5
 #define      BYTE_cfPU(A)   CFextern INTEGER_BYTE      FCALLSC_QUALIFIER A
 #define    DOUBLE_cfPU(A)   CFextern DOUBLE_PRECISION  FCALLSC_QUALIFIER A
 #if ! (defined(FLOATFUNCTIONTYPE)&&defined(ASSIGNFLOAT)&&defined(RETURNFLOAT))
+#if defined (f2cFortran) && ! defined (gFortran)
+/* f2c/g77 return double from FORTRAN REAL functions. (KMCCARTY, 2005/12/09) */
+#define     FLOAT_cfPU(A)   CFextern DOUBLE_PRECISION  FCALLSC_QUALIFIER A
+#else
 #define     FLOAT_cfPU(A)   CFextern FORTRAN_REAL      FCALLSC_QUALIFIER A
+#endif
 #else				   	                   
 #define     FLOAT_cfPU(A)   CFextern FLOATFUNCTIONTYPE FCALLSC_QUALIFIER A
 #endif				   	                   
@@ -1623,6 +1699,7 @@ do{VVCF(T1,A1,B1)  VVCF(T2,A2,B2)  VVCF(T3,A3,B3)  VVCF(T4,A4,B4)  VVCF(T5,A5,B5
 #define            INT_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,DEFAULT,A,B,C,D,E)
 #define        LOGICAL_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,LOGICAL,A,B,C,D,E)
 #define           LONG_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,DEFAULT,A,B,C,D,E)
+#define       LONGLONG_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,DEFAULT,A,B,C,D,E) /* added by MR December 2005 */
 #define          SHORT_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,DEFAULT,A,B,C,D,E)
 #define          BYTEV_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,DEFAULT,A,B,C,D,E)
 #define         BYTEVV_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,DEFAULT,A,B,C,D,E)
@@ -1666,6 +1743,13 @@ do{VVCF(T1,A1,B1)  VVCF(T2,A2,B2)  VVCF(T3,A3,B3)  VVCF(T4,A4,B4)  VVCF(T5,A5,B5
 #define      LONGVVVVV_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,DEFAULT,A,B,C,D,E)
 #define     LONGVVVVVV_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,DEFAULT,A,B,C,D,E)
 #define    LONGVVVVVVV_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,DEFAULT,A,B,C,D,E)
+#define      LONGLONGV_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,DEFAULT,A,B,C,D,E) /* added by MR December 2005 */
+#define     LONGLONGVV_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,DEFAULT,A,B,C,D,E) /* added by MR December 2005 */
+#define    LONGLONGVVV_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,DEFAULT,A,B,C,D,E) /* added by MR December 2005 */
+#define   LONGLONGVVVV_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,DEFAULT,A,B,C,D,E) /* added by MR December 2005 */
+#define  LONGLONGVVVVV_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,DEFAULT,A,B,C,D,E) /* added by MR December 2005 */
+#define LONGLONGVVVVVV_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,DEFAULT,A,B,C,D,E) /* added by MR December 2005 */
+#define LONGLONGVVVVVVV_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,DEFAULT,A,B,C,D,E) /* added by MR December 2005 */
 #define         SHORTV_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,DEFAULT,A,B,C,D,E)
 #define        SHORTVV_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,DEFAULT,A,B,C,D,E)
 #define       SHORTVVV_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,DEFAULT,A,B,C,D,E)
@@ -1679,6 +1763,7 @@ do{VVCF(T1,A1,B1)  VVCF(T2,A2,B2)  VVCF(T3,A3,B3)  VVCF(T4,A4,B4)  VVCF(T5,A5,B5
 #define           PINT_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,DEFAULT,A,B,C,D,E)
 #define       PLOGICAL_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,PLOGICAL,A,B,C,D,E)
 #define          PLONG_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,DEFAULT,A,B,C,D,E)
+#define      PLONGLONG_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,DEFAULT,A,B,C,D,E) /* added by MR December 2005 */
 #define         PSHORT_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,DEFAULT,A,B,C,D,E)
 #define         STRING_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,STRING,A,B,C,D,E)
 #define        PSTRING_cfSTR(N,T,A,B,C,D,E) _(CFARGS,N)(T,PSTRING,A,B,C,D,E)
@@ -1991,6 +2076,7 @@ static _Icf(2,U,F,CFFUN(UN),0)() {_(F,_cfE) _Icf(3,GZ,F,UN,LN) ABSOFT_cf1(F));_(
 #define            INT_cfT(M,I,A,B,D) *A
 #define        LOGICAL_cfT(M,I,A,B,D)  F2CLOGICAL(*A)
 #define           LONG_cfT(M,I,A,B,D) *A
+#define       LONGLONG_cfT(M,I,A,B,D) *A /* added by MR December 2005 */
 #define          SHORT_cfT(M,I,A,B,D) *A
 #define          BYTEV_cfT(M,I,A,B,D)  A
 #define        DOUBLEV_cfT(M,I,A,B,D)  A
@@ -1998,6 +2084,7 @@ static _Icf(2,U,F,CFFUN(UN),0)() {_(F,_cfE) _Icf(3,GZ,F,UN,LN) ABSOFT_cf1(F));_(
 #define           INTV_cfT(M,I,A,B,D)  A
 #define       LOGICALV_cfT(M,I,A,B,D)  A
 #define          LONGV_cfT(M,I,A,B,D)  A
+#define      LONGLONGV_cfT(M,I,A,B,D)  A /* added by MR December 2005 */
 #define         SHORTV_cfT(M,I,A,B,D)  A
 #define         BYTEVV_cfT(M,I,A,B,D)  (void *)A /* We have to cast to void *,*/
 #define        BYTEVVV_cfT(M,I,A,B,D)  (void *)A /* since we don't know the   */
@@ -2035,6 +2122,12 @@ static _Icf(2,U,F,CFFUN(UN),0)() {_(F,_cfE) _Icf(3,GZ,F,UN,LN) ABSOFT_cf1(F));_(
 #define      LONGVVVVV_cfT(M,I,A,B,D)  (void *)A
 #define     LONGVVVVVV_cfT(M,I,A,B,D)  (void *)A
 #define    LONGVVVVVVV_cfT(M,I,A,B,D)  (void *)A
+#define     LONGLONGVV_cfT(M,I,A,B,D)  (void *)A /* added by MR December 2005 */
+#define    LONGLONGVVV_cfT(M,I,A,B,D)  (void *)A /* added by MR December 2005 */
+#define   LONGLONGVVVV_cfT(M,I,A,B,D)  (void *)A /* added by MR December 2005 */
+#define  LONGLONGVVVVV_cfT(M,I,A,B,D)  (void *)A /* added by MR December 2005 */
+#define LONGLONGVVVVVV_cfT(M,I,A,B,D)  (void *)A /* added by MR December 2005 */
+#define LONGLONGVVVVVVV_cfT(M,I,A,B,D)  (void *)A /* added by MR December 2005 */
 #define        SHORTVV_cfT(M,I,A,B,D)  (void *)A
 #define       SHORTVVV_cfT(M,I,A,B,D)  (void *)A
 #define      SHORTVVVV_cfT(M,I,A,B,D)  (void *)A
@@ -2047,6 +2140,7 @@ static _Icf(2,U,F,CFFUN(UN),0)() {_(F,_cfE) _Icf(3,GZ,F,UN,LN) ABSOFT_cf1(F));_(
 #define           PINT_cfT(M,I,A,B,D)  A
 #define       PLOGICAL_cfT(M,I,A,B,D)  ((*A=F2CLOGICAL(*A)),A)
 #define          PLONG_cfT(M,I,A,B,D)  A
+#define      PLONGLONG_cfT(M,I,A,B,D)  A /* added by MR December 2005 */
 #define         PSHORT_cfT(M,I,A,B,D)  A
 #define          PVOID_cfT(M,I,A,B,D)  A
 #if defined(apolloFortran) || defined(hpuxFortran800) || defined(AbsoftUNIXFortran)
@@ -2117,12 +2211,18 @@ static _Icf(2,U,F,CFFUN(UN),0)() {_(F,_cfE) _Icf(3,GZ,F,UN,LN) ABSOFT_cf1(F));_(
 #define     INT_cfFZ(UN,LN) int   FCALLSC_QUALIFIER fcallsc(UN,LN)(
 #define LOGICAL_cfFZ(UN,LN) int   FCALLSC_QUALIFIER fcallsc(UN,LN)(
 #define    LONG_cfFZ(UN,LN) long  FCALLSC_QUALIFIER fcallsc(UN,LN)(
+#define LONGLONG_cfFZ(UN,LN) LONGLONG FCALLSC_QUALIFIER fcallsc(UN,LN)( /* added by MR December 2005 */
 #define   SHORT_cfFZ(UN,LN) short FCALLSC_QUALIFIER fcallsc(UN,LN)(
 #define    VOID_cfFZ(UN,LN) void  FCALLSC_QUALIFIER fcallsc(UN,LN)(
 #ifndef __CF__KnR
 /* The void is req'd by the Apollo, to make this an ANSI function declaration.
    The Apollo promotes K&R float functions to double. */
-#define   FLOAT_cfFZ(UN,LN) FORTRAN_REAL FCALLSC_QUALIFIER fcallsc(UN,LN)(void
+#if defined (f2cFortran) && ! defined (gFortran)
+/* f2c/g77 return double from FORTRAN REAL functions. (KMCCARTY, 2005/12/09) */
+#define FLOAT_cfFZ(UN,LN) DOUBLE_PRECISION FCALLSC_QUALIFIER fcallsc(UN,LN)(void
+#else
+#define FLOAT_cfFZ(UN,LN) FORTRAN_REAL FCALLSC_QUALIFIER fcallsc(UN,LN)(void
+#endif
 #ifdef vmsFortran
 #define  STRING_cfFZ(UN,LN) void  FCALLSC_QUALIFIER fcallsc(UN,LN)(fstring *AS
 #else
@@ -2138,7 +2238,12 @@ static _Icf(2,U,F,CFFUN(UN),0)() {_(F,_cfE) _Icf(3,GZ,F,UN,LN) ABSOFT_cf1(F));_(
 #endif
 #else
 #if ! (defined(FLOATFUNCTIONTYPE)&&defined(ASSIGNFLOAT)&&defined(RETURNFLOAT))
+#if defined (f2cFortran) && ! defined (gFortran)
+/* f2c/g77 return double from FORTRAN REAL functions. (KMCCARTY, 2005/12/09) */
+#define   FLOAT_cfFZ(UN,LN) DOUBLE_PRECISION  FCALLSC_QUALIFIER fcallsc(UN,LN)(
+#else
 #define   FLOAT_cfFZ(UN,LN) FORTRAN_REAL      FCALLSC_QUALIFIER fcallsc(UN,LN)(
+#endif
 #else
 #define   FLOAT_cfFZ(UN,LN) FLOATFUNCTIONTYPE FCALLSC_QUALIFIER fcallsc(UN,LN)(
 #endif
@@ -2152,13 +2257,19 @@ static _Icf(2,U,F,CFFUN(UN),0)() {_(F,_cfE) _Icf(3,GZ,F,UN,LN) ABSOFT_cf1(F));_(
 #define    BYTE_cfF(UN,LN)     BYTE_cfFZ(UN,LN)
 #define  DOUBLE_cfF(UN,LN)   DOUBLE_cfFZ(UN,LN)
 #ifndef __CF_KnR
+#if defined (f2cFortran) && ! defined (gFortran)
+/* f2c/g77 return double from FORTRAN REAL functions. (KMCCARTY, 2005/12/09) */
+#define   FLOAT_cfF(UN,LN)  DOUBLE_PRECISION FCALLSC_QUALIFIER fcallsc(UN,LN)(
+#else
 #define   FLOAT_cfF(UN,LN)  FORTRAN_REAL FCALLSC_QUALIFIER fcallsc(UN,LN)(
+#endif
 #else
 #define   FLOAT_cfF(UN,LN)    FLOAT_cfFZ(UN,LN)
 #endif
 #define     INT_cfF(UN,LN)      INT_cfFZ(UN,LN)
 #define LOGICAL_cfF(UN,LN)  LOGICAL_cfFZ(UN,LN)
 #define    LONG_cfF(UN,LN)     LONG_cfFZ(UN,LN)
+#define LONGLONG_cfF(UN,LN) LONGLONG_cfFZ(UN,LN) /* added by MR December 2005 */
 #define   SHORT_cfF(UN,LN)    SHORT_cfFZ(UN,LN)
 #define    VOID_cfF(UN,LN)     VOID_cfFZ(UN,LN)
 #define  STRING_cfF(UN,LN)   STRING_cfFZ(UN,LN),
@@ -2221,6 +2332,7 @@ string. */
 #define LOGICAL_cfI  return C2FLOGICAL(A0);
 #endif
 #define    LONG_cfI  return A0;
+#define LONGLONG_cfI  return A0; /* added by MR December 2005 */
 #define   SHORT_cfI  return A0;
 #define  STRING_cfI  return   ;
 #define    VOID_cfI  return   ;

@@ -287,13 +287,13 @@ static int irafrdimage (
 {
     FILE *fd;
     char *bang;
-    int nax, naxis1 = 1, naxis2 = 1, naxis3 = 1, naxis4 = 1, npaxis1, npaxis2;
+    int nax = 1, naxis1 = 1, naxis2 = 1, naxis3 = 1, naxis4 = 1, npaxis1 = 1, npaxis2;
     int bitpix, bytepix, i;
     char *fitsheader, *image;
     int nbr, nbimage, nbaxis, nbl, nbx, nbdiff;
     char *pixheader;
     char *linebuff;
-    int imhver, lpixhead;
+    int imhver, lpixhead = 0;
     char pixname[SZ_IM2PIXFILE+1];
     char errmsg[81];
     size_t newfilesize;
@@ -407,7 +407,7 @@ static int irafrdimage (
 	for (i = 0; i < naxis2; i++) {
 	    nbl = fread (linebuff, 1, nbaxis, fd);
 	    nbr = nbr + nbl;
-	    nbx = fseek (fd, nbdiff, SEEK_CUR);
+	    nbx = fseek (fd, nbdiff, 1);
 	    linebuff = linebuff + nbaxis;
 	    }
 	}

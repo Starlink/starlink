@@ -251,7 +251,7 @@ int ffcpdt(fitsfile *infptr,    /* I - FITS file pointer to input file  */
   This will overwrite any data already in the outfptr CHDU.
 */
     long nb, ii;
-    OFF_T indatastart, indataend, outdatastart;
+    LONGLONG indatastart, indataend, outdatastart;
     char buffer[2880];
 
     if (*status > 0)
@@ -260,11 +260,11 @@ int ffcpdt(fitsfile *infptr,    /* I - FITS file pointer to input file  */
     if (infptr == outfptr)
         return(*status = SAME_FILE);
 
-    ffghof(infptr,  NULL, &indatastart, &indataend, status);
-    ffghof(outfptr, NULL, &outdatastart, NULL, status);
+    ffghadll(infptr,  NULL, &indatastart, &indataend, status);
+    ffghadll(outfptr, NULL, &outdatastart, NULL, status);
 
     /* Calculate the number of blocks to be copied  */
-    nb = (indataend - indatastart) / 2880;
+    nb = (long) ((indataend - indatastart) / 2880);
 
     if (nb > 0)
     {
@@ -300,6 +300,39 @@ int ffcpdt(fitsfile *infptr,    /* I - FITS file pointer to input file  */
     return(*status);
 }
 /*--------------------------------------------------------------------------*/
+int ffwrhdu(fitsfile *infptr,    /* I - FITS file pointer to input file  */
+            FILE *outstream,     /* I - stream to write HDU to */
+            int *status)         /* IO - error status     */
+{
+/*
+  write the data unit from the CHDU of infptr to the output file stream
+*/
+    long nb, ii;
+    LONGLONG hdustart, hduend;
+    char buffer[2880];
+
+    if (*status > 0)
+        return(*status);
+
+    ffghadll(infptr, &hdustart,  NULL, &hduend, status);
+
+    nb = (long) ((hduend - hdustart) / 2880);  /* number of blocks to copy */
+
+    if (nb > 0)
+    {
+
+        /* move to the start of the HDU */
+        ffmbyt(infptr,  hdustart,  REPORT_EOF, status);
+
+        for (ii = 0; ii < nb; ii++)
+        {
+            ffgbyt(infptr,  2880L, buffer, status); /* read input block */
+            fwrite(buffer, 1, 2880, outstream ); /* write to output stream */
+        }
+    }
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
 int ffiimg(fitsfile *fptr,      /* I - FITS file pointer           */
            int bitpix,          /* I - bits per pixel              */
            int naxis,           /* I - number of axes in the array */
@@ -309,9 +342,37 @@ int ffiimg(fitsfile *fptr,      /* I - FITS file pointer           */
   insert an IMAGE extension following the current HDU 
 */
 {
+    LONGLONG tnaxes[99];
+    int ii;
+    
+    if (*status > 0)
+        return(*status);
+
+    if (naxis > 99) {
+        ffpmsg("NAXIS value is too large (>99)  (ffiimg)");
+	return(*status = 212);
+    }
+
+    for (ii = 0; (ii < naxis); ii++)
+       tnaxes[ii] = naxes[ii];
+       
+    ffiimgll(fptr, bitpix, naxis, tnaxes, status);
+
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
+int ffiimgll(fitsfile *fptr,    /* I - FITS file pointer           */
+           int bitpix,          /* I - bits per pixel              */
+           int naxis,           /* I - number of axes in the array */
+           LONGLONG *naxes,     /* I - size of each axis           */
+           int *status)         /* IO - error status               */
+/*
+  insert an IMAGE extension following the current HDU 
+*/
+{
     int bytlen, nexthdu, maxhdu, ii, onaxis;
     long nblocks;
-    OFF_T npixels, newstart, datasize;
+    LONGLONG npixels, newstart, datasize;
     char errmsg[FLEN_ERRMSG], card[FLEN_CARD], naxiskey[FLEN_KEYWORD];
 
     if (*status > 0)
@@ -331,7 +392,7 @@ int ffiimg(fitsfile *fptr,      /* I - FITS file pointer           */
        ((fptr->Fptr)->headstart[maxhdu + 1] >= (fptr->Fptr)->logfilesize ) ) )
       {
         /* then simply append new image extension */
-        ffcrim(fptr, bitpix, naxis, naxes, status);
+        ffcrimll(fptr, bitpix, naxis, naxes, status);
         return(*status);
       }
     }
@@ -342,7 +403,7 @@ int ffiimg(fitsfile *fptr,      /* I - FITS file pointer           */
         bytlen = 2;
     else if (bitpix == 32 || bitpix == -32)
         bytlen = 4;
-    else if (bitpix == -64)
+    else if (bitpix == 64 || bitpix == -64)
         bytlen = 8;
     else
     {
@@ -364,7 +425,7 @@ int ffiimg(fitsfile *fptr,      /* I - FITS file pointer           */
         if (naxes[ii] < 0)
         {
             sprintf(errmsg,
-            "Illegal value for NAXIS%d keyword: %ld", ii + 1,  naxes[ii]);
+            "Illegal value for NAXIS%d keyword: %ld", ii + 1,  (long) naxes[ii]);
             ffpmsg(errmsg);
             return(*status = BAD_NAXES);
         }
@@ -380,7 +441,7 @@ int ffiimg(fitsfile *fptr,      /* I - FITS file pointer           */
         npixels = npixels * naxes[ii];
 
     datasize = npixels * bytlen;          /* size of image in bytes */
-    nblocks = ((datasize + 2879) / 2880) + 1;  /* +1 for the header */
+    nblocks = (long) (((datasize + 2879) / 2880) + 1);  /* +1 for the header */
 
     if ((fptr->Fptr)->writemode == READWRITE) /* must have write access */
     {   /* close the CHDU */
@@ -406,8 +467,8 @@ int ffiimg(fitsfile *fptr,      /* I - FITS file pointer           */
 
         ffgcrd(fptr, naxiskey, card, status);  /* read last NAXIS keyword */
         
-        ffikyj(fptr, "PCOUNT", 0L, "required keyword", status); /* add PCOUNT and */
-        ffikyj(fptr, "GCOUNT", 1L, "required keyword", status); /* GCOUNT keywords */
+        ffikyj(fptr, "PCOUNT", 0, "required keyword", status); /* add PCOUNT and */
+        ffikyj(fptr, "GCOUNT", 1, "required keyword", status); /* GCOUNT keywords */
 
         if (*status > 0)
             return(*status);
@@ -455,7 +516,7 @@ int ffiimg(fitsfile *fptr,      /* I - FITS file pointer           */
     (fptr->Fptr)->hdutype = IMAGE_HDU;  /* might need to be reset... */
 
     /* write the required header keywords */
-    ffphpr(fptr, TRUE, bitpix, naxis, naxes, 0, 1, TRUE, status);
+    ffphprll(fptr, TRUE, bitpix, naxis, naxes, 0, 1, TRUE, status);
 
     /* redefine internal structure for this HDU */
     ffrdef(fptr, status);
@@ -463,8 +524,8 @@ int ffiimg(fitsfile *fptr,      /* I - FITS file pointer           */
 }
 /*--------------------------------------------------------------------------*/
 int ffitab(fitsfile *fptr,  /* I - FITS file pointer                        */
-           long naxis1,     /* I - width of row in the table                */
-           long naxis2,     /* I - number of rows in the table              */
+           LONGLONG naxis1,     /* I - width of row in the table                */
+           LONGLONG naxis2,     /* I - number of rows in the table              */
            int tfields,     /* I - number of columns in the table           */
            char **ttype,    /* I - name of each column                      */
            long *tbcol,     /* I - byte offset in row to each column        */
@@ -478,7 +539,7 @@ int ffitab(fitsfile *fptr,  /* I - FITS file pointer                        */
 {
     int nexthdu, maxhdu, ii, nunit, nhead, ncols, gotmem = 0;
     long nblocks, rowlen;
-    OFF_T datasize, newstart;
+    LONGLONG datasize, newstart;
     char errmsg[81];
 
     if (*status > 0)
@@ -523,7 +584,7 @@ int ffitab(fitsfile *fptr,  /* I - FITS file pointer                        */
     if (extnm && *extnm)
          nunit++;     /* add one for the EXTNAME keyword */
 
-    rowlen = naxis1;
+    rowlen = (long) naxis1;
 
     if (!tbcol || !tbcol[0] || (!naxis1 && tfields)) /* spacing not defined? */
     {
@@ -544,8 +605,8 @@ int ffitab(fitsfile *fptr,  /* I - FITS file pointer                        */
     }
 
     nhead = (9 + (3 * tfields) + nunit + 35) / 36;  /* no. of header blocks */
-    datasize = (OFF_T)rowlen * naxis2;          /* size of table in bytes */
-    nblocks = ((datasize + 2879) / 2880) + nhead;  /* size of HDU */
+    datasize = (LONGLONG)rowlen * naxis2;          /* size of table in bytes */
+    nblocks = (long) (((datasize + 2879) / 2880) + nhead);  /* size of HDU */
 
     if ((fptr->Fptr)->writemode == READWRITE) /* must have write access */
     {   /* close the CHDU */
@@ -596,21 +657,22 @@ int ffitab(fitsfile *fptr,  /* I - FITS file pointer                        */
 }
 /*--------------------------------------------------------------------------*/
 int ffibin(fitsfile *fptr,  /* I - FITS file pointer                        */
-           long naxis2,     /* I - number of rows in the table              */
+           LONGLONG naxis2,     /* I - number of rows in the table              */
            int tfields,     /* I - number of columns in the table           */
            char **ttype,    /* I - name of each column                      */
            char **tform,    /* I - value of TFORMn keyword for each column  */
            char **tunit,    /* I - value of TUNITn keyword for each column  */
-           char *extnm,   /* I - value of EXTNAME keyword, if any         */
-           long pcount,     /* I - size of special data area (heap)         */
+           char *extnm,     /* I - value of EXTNAME keyword, if any         */
+           LONGLONG pcount, /* I - size of special data area (heap)         */
            int *status)     /* IO - error status                            */
 /*
   insert a Binary table extension following the current HDU 
 */
 {
     int nexthdu, maxhdu, ii, nunit, nhead, datacode;
-    long naxis1, nblocks, repeat, width;
-    OFF_T datasize, newstart;
+    LONGLONG naxis1;
+    long nblocks, repeat, width;
+    LONGLONG datasize, newstart;
     char errmsg[81];
 
     if (*status > 0)
@@ -670,8 +732,8 @@ int ffibin(fitsfile *fptr,  /* I - FITS file pointer                        */
             naxis1 = naxis1 + (repeat * width);
     }
 
-    datasize = ((OFF_T)naxis1 * naxis2) + pcount;         /* size of table in bytes */
-    nblocks = ((datasize + 2879) / 2880) + nhead;  /* size of HDU */
+    datasize = ((LONGLONG)naxis1 * naxis2) + pcount;         /* size of table in bytes */
+    nblocks = (long) ((datasize + 2879) / 2880) + nhead;  /* size of HDU */
 
     if ((fptr->Fptr)->writemode == READWRITE) /* must have write access */
     {   /* close the CHDU */
@@ -743,8 +805,8 @@ int ffdhdu(fitsfile *fptr,      /* I - FITS file pointer                   */
         ffphpr(fptr,1,8,0,naxes,0,1,1,status);
 
         /* calc number of blocks to delete (leave just 1 block) */
-        nblocks = ( (fptr->Fptr)->headstart[(fptr->Fptr)->curhdu + 1] - 
-                2880 ) / 2880;
+        nblocks = (long) (( (fptr->Fptr)->headstart[(fptr->Fptr)->curhdu + 1] - 
+                2880 ) / 2880);
 
         /* ffdblk also updates the starting address of all following HDUs */
         if (nblocks > 0)
@@ -762,8 +824,8 @@ int ffdhdu(fitsfile *fptr,      /* I - FITS file pointer                   */
     {
 
         /* calc number of blocks to delete */
-        nblocks = ( (fptr->Fptr)->headstart[(fptr->Fptr)->curhdu + 1] - 
-                (fptr->Fptr)->headstart[(fptr->Fptr)->curhdu] ) / 2880;
+        nblocks = (long) (( (fptr->Fptr)->headstart[(fptr->Fptr)->curhdu + 1] - 
+                (fptr->Fptr)->headstart[(fptr->Fptr)->curhdu] ) / 2880);
 
         /* ffdblk also updates the starting address of all following HDUs */
         if (ffdblk(fptr, nblocks, status) > 0) /* delete the HDU */

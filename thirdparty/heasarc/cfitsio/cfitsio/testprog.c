@@ -91,7 +91,7 @@ int main()
     printf("CFITSIO TESTPROG, v%.3f\n\n",vers);
 
     printf("Try opening then closing a nonexistent file:\n");
-    ffopen(&fptr, "tq123x.kjl", READWRITE, &status);
+    fits_open_file(&fptr, "tq123x.kjl", READWRITE, &status);
     printf("  ffopen fptr, status  = %lu %d (expect an error)\n", 
            (unsigned long) fptr, status);
     ffclos(fptr, &status);

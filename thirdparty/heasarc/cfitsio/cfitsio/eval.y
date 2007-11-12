@@ -55,6 +55,12 @@
 /*  Craig B Markwardt Jun 2004  Use NULL values for range errors instead*/
 /*                              of throwing a parse error               */
 /*  Craig B Markwardt Oct 2004  Add ACCUM() and SEQDIFF() functions     */
+/*  Craig B Markwardt Feb 2005  Add ANGSEP() function                   */
+/*  Craig B Markwardt Aug 2005  CIRCLE, BOX, ELLIPSE, NEAR and REGFILTER*/
+/*                              functions now accept vector arguments   */
+/*  Craig B Markwardt Sum 2006  Add RANDOMN() and RANDOMP() functions   */
+/*  Craig B Markwardt Mar 2007  Allow arguments to RANDOM and RANDOMN to*/
+/*                              determine the output dimensions         */
 /*                                                                      */
 /************************************************************************/
 
@@ -469,9 +475,12 @@ expr:    LONG
                   if( SIZE($$)<SIZE($1) )  Copy_Dims($$, $1);
                 }
        | FUNCTION ')'
-                { if (FSTRCMP($1,"RANDOM(") == 0) {
+                { if (FSTRCMP($1,"RANDOM(") == 0) {  /* Scalar RANDOM() */
                      srand( (unsigned int) time(NULL) );
                      $$ = New_Func( DOUBLE, rnd_fct, 0, 0, 0, 0, 0, 0, 0, 0 );
+		  } else if (FSTRCMP($1,"RANDOMN(") == 0) {/*Scalar RANDOMN()*/
+		     srand( (unsigned int) time(NULL) );
+		     $$ = New_Func( DOUBLE, gasrnd_fct, 0, 0, 0, 0, 0, 0, 0, 0 );
                   } else {
                      yyerror("Function() not supported");
 		     YYERROR;
@@ -567,6 +576,15 @@ expr:    LONG
 		  else if (FSTRCMP($1,"MAX(") == 0)
 		     $$ = New_Func( TYPE($2),  /* Force 1D result */
 				    max1_fct, 1, $2, 0, 0, 0, 0, 0, 0 );
+		  else if (FSTRCMP($1,"RANDOM(") == 0) { /* Vector RANDOM() */
+                     srand( (unsigned int) time(NULL) );
+                     $$ = New_Func( 0, rnd_fct, 1, $2, 0, 0, 0, 0, 0, 0 );
+		     TYPE($$) = DOUBLE;
+		  } else if (FSTRCMP($1,"RANDOMN(") == 0) {
+		     srand( (unsigned int) time(NULL) ); /* Vector RANDOMN() */
+		     $$ = New_Func( 0, gasrnd_fct, 1, $2, 0, 0, 0, 0, 0, 0 );
+		     TYPE($$) = DOUBLE;
+                  } 
   		  else {  /*  These all take DOUBLE arguments  */
 		     if( TYPE($2) != DOUBLE ) $2 = New_Unary( DOUBLE, 0, $2 );
                      if (FSTRCMP($1,"SIN(") == 0)
@@ -598,11 +616,18 @@ expr:    LONG
 			$$ = New_Func( 0, log10_fct, 1, $2, 0, 0, 0, 0, 0, 0 );
 		     else if (FSTRCMP($1,"SQRT(") == 0)
 			$$ = New_Func( 0, sqrt_fct, 1, $2, 0, 0, 0, 0, 0, 0 );
+		     else if (FSTRCMP($1,"ROUND(") == 0)
+			$$ = New_Func( 0, round_fct, 1, $2, 0, 0, 0, 0, 0, 0 );
 		     else if (FSTRCMP($1,"FLOOR(") == 0)
 			$$ = New_Func( 0, floor_fct, 1, $2, 0, 0, 0, 0, 0, 0 );
 		     else if (FSTRCMP($1,"CEIL(") == 0)
 			$$ = New_Func( 0, ceil_fct, 1, $2, 0, 0, 0, 0, 0, 0 );
-		     else {
+		     else if (FSTRCMP($1,"RANDOMP(") == 0) {
+		       srand( (unsigned int) time(NULL) );
+		       $$ = New_Func( 0, poirnd_fct, 1, $2, 
+				      0, 0, 0, 0, 0, 0 );
+		       TYPE($$) = LONG;
+		     } else {
 			yyerror("Function(expr) not supported");
 			YYERROR;
 		     }
@@ -658,6 +683,30 @@ expr:    LONG
 		      }
 		   } else {
 		      yyerror("Function(expr,expr) not supported");
+		      YYERROR;
+		   }
+                }
+       | FUNCTION expr ',' expr ',' expr ',' expr ')'
+                { 
+		  if (FSTRCMP($1,"ANGSEP(") == 0) {
+		    if( TYPE($2) != DOUBLE ) $2 = New_Unary( DOUBLE, 0, $2 );
+		    if( TYPE($4) != DOUBLE ) $4 = New_Unary( DOUBLE, 0, $4 );
+		    if( TYPE($6) != DOUBLE ) $6 = New_Unary( DOUBLE, 0, $6 );
+		    if( TYPE($8) != DOUBLE ) $8 = New_Unary( DOUBLE, 0, $8 );
+		    if( Test_Dims( $2, $4 ) && Test_Dims( $4, $6 ) && 
+			Test_Dims( $6, $8 ) ) {
+		      $$ = New_Func( 0, angsep_fct, 4, $2, $4, $6, $8,0,0,0 );
+		      TEST($$); 
+		      if( SIZE($2)<SIZE($4) ) Copy_Dims($$, $4);
+		      if( SIZE($4)<SIZE($6) ) Copy_Dims($$, $6);
+		      if( SIZE($6)<SIZE($8) ) Copy_Dims($$, $8);
+		    } else {
+		      yyerror("Dimensions of ANGSEP arguments "
+			      "are not compatible");
+		      YYERROR;
+		    }
+		   } else {
+		      yyerror("Function(expr,expr,expr,expr) not supported");
 		      YYERROR;
 		   }
                 }
@@ -839,50 +888,58 @@ bexpr:   BOOLEAN
 		}
        | BFUNCTION expr ',' expr ',' expr ')'
 		{
-		   if( SIZE($2)>1 || SIZE($4)>1 || SIZE($6)>1 ) {
-		      yyerror("Cannot use array as function argument");
-		      YYERROR;
-		   }
 		   if( TYPE($2) != DOUBLE ) $2 = New_Unary( DOUBLE, 0, $2 );
 		   if( TYPE($4) != DOUBLE ) $4 = New_Unary( DOUBLE, 0, $4 );
 		   if( TYPE($6) != DOUBLE ) $6 = New_Unary( DOUBLE, 0, $6 );
-		   if (FSTRCMP($1,"NEAR(") == 0)
-		      $$ = New_Func( BOOLEAN, near_fct, 3, $2, $4, $6,
-				     0, 0, 0, 0 );
-		   else {
-		      yyerror("Boolean Function not supported");
-		      YYERROR;
+		   if( ! (Test_Dims( $2, $4 ) && Test_Dims( $4, $6 ) ) ) {
+		       yyerror("Dimensions of NEAR arguments "
+			       "are not compatible");
+		       YYERROR;
+		   } else {
+		     if (FSTRCMP($1,"NEAR(") == 0) {
+		       $$ = New_Func( BOOLEAN, near_fct, 3, $2, $4, $6,
+				      0, 0, 0, 0 );
+		     } else {
+		       yyerror("Boolean Function not supported");
+		       YYERROR;
+		     }
+		     TEST($$); 
+
+		     if( SIZE($$)<SIZE($2) )  Copy_Dims($$, $2);
+		     if( SIZE($2)<SIZE($4) )  Copy_Dims($$, $4);
+		     if( SIZE($4)<SIZE($6) )  Copy_Dims($$, $6);
 		   }
-                   TEST($$); 
 		}
        | BFUNCTION expr ',' expr ',' expr ',' expr ',' expr ')'
 	        {
-		   if( SIZE($2)>1 || SIZE($4)>1 || SIZE($6)>1 || SIZE($8)>1
-		       || SIZE($10)>1 ) {
-		      yyerror("Cannot use array as function argument");
-		      YYERROR;
-		   }
 		   if( TYPE($2) != DOUBLE ) $2 = New_Unary( DOUBLE, 0, $2 );
 		   if( TYPE($4) != DOUBLE ) $4 = New_Unary( DOUBLE, 0, $4 );
 		   if( TYPE($6) != DOUBLE ) $6 = New_Unary( DOUBLE, 0, $6 );
 		   if( TYPE($8) != DOUBLE ) $8 = New_Unary( DOUBLE, 0, $8 );
 		   if( TYPE($10)!= DOUBLE ) $10= New_Unary( DOUBLE, 0, $10);
-                   if (FSTRCMP($1,"CIRCLE(") == 0)
-		      $$ = New_Func( BOOLEAN, circle_fct, 5, $2, $4, $6, $8,
-				     $10, 0, 0 );
-		   else {
-		      yyerror("Boolean Function not supported");
-		      YYERROR;
+		   if( ! (Test_Dims( $2, $4 ) && Test_Dims( $4, $6 ) && 
+			  Test_Dims( $6, $8 ) && Test_Dims( $8, $10 )) ) {
+		     yyerror("Dimensions of CIRCLE arguments "
+			     "are not compatible");
+		     YYERROR;
+		   } else {
+		     if (FSTRCMP($1,"CIRCLE(") == 0) {
+		       $$ = New_Func( BOOLEAN, circle_fct, 5, $2, $4, $6, $8,
+				      $10, 0, 0 );
+		     } else {
+		       yyerror("Boolean Function not supported");
+		       YYERROR;
+		     }
+		     TEST($$); 
+		     if( SIZE($$)<SIZE($2) )  Copy_Dims($$, $2);
+		     if( SIZE($2)<SIZE($4) )  Copy_Dims($$, $4);
+		     if( SIZE($4)<SIZE($6) )  Copy_Dims($$, $6);
+		     if( SIZE($6)<SIZE($8) )  Copy_Dims($$, $8);
+		     if( SIZE($8)<SIZE($10) ) Copy_Dims($$, $10);
 		   }
-                   TEST($$); 
 		}
        | BFUNCTION expr ',' expr ',' expr ',' expr ',' expr ',' expr ',' expr ')'
                 {
-		   if( SIZE($2)>1 || SIZE($4)>1 || SIZE($6)>1 || SIZE($8)>1
-		       || SIZE($10)>1 || SIZE($12)>1 || SIZE($14)>1 ) {
-		      yyerror("Cannot use array as function argument");
-		      YYERROR;
-		   }
 		   if( TYPE($2) != DOUBLE ) $2 = New_Unary( DOUBLE, 0, $2 );
 		   if( TYPE($4) != DOUBLE ) $4 = New_Unary( DOUBLE, 0, $4 );
 		   if( TYPE($6) != DOUBLE ) $6 = New_Unary( DOUBLE, 0, $6 );
@@ -890,17 +947,32 @@ bexpr:   BOOLEAN
 		   if( TYPE($10)!= DOUBLE ) $10= New_Unary( DOUBLE, 0, $10);
 		   if( TYPE($12)!= DOUBLE ) $12= New_Unary( DOUBLE, 0, $12);
 		   if( TYPE($14)!= DOUBLE ) $14= New_Unary( DOUBLE, 0, $14);
-		   if (FSTRCMP($1,"BOX(") == 0)
-		      $$ = New_Func( BOOLEAN, box_fct, 7, $2, $4, $6, $8,
+		   if( ! (Test_Dims( $2, $4 ) && Test_Dims( $4, $6 ) && 
+			  Test_Dims( $6, $8 ) && Test_Dims( $8, $10 ) &&
+			  Test_Dims($10,$12 ) && Test_Dims($12, $14 ) ) ) {
+		     yyerror("Dimensions of BOX or ELLIPSE arguments "
+			     "are not compatible");
+		     YYERROR;
+		   } else {
+		     if (FSTRCMP($1,"BOX(") == 0) {
+		       $$ = New_Func( BOOLEAN, box_fct, 7, $2, $4, $6, $8,
 				      $10, $12, $14 );
-		   else if (FSTRCMP($1,"ELLIPSE(") == 0)
-		      $$ = New_Func( BOOLEAN, elps_fct, 7, $2, $4, $6, $8,
+		     } else if (FSTRCMP($1,"ELLIPSE(") == 0) {
+		       $$ = New_Func( BOOLEAN, elps_fct, 7, $2, $4, $6, $8,
 				      $10, $12, $14 );
-		   else {
-		      yyerror("SAO Image Function not supported");
-		      YYERROR;
+		     } else {
+		       yyerror("SAO Image Function not supported");
+		       YYERROR;
+		     }
+		     TEST($$); 
+		     if( SIZE($$)<SIZE($2) )  Copy_Dims($$, $2);
+		     if( SIZE($2)<SIZE($4) )  Copy_Dims($$, $4);
+		     if( SIZE($4)<SIZE($6) )  Copy_Dims($$, $6);
+		     if( SIZE($6)<SIZE($8) )  Copy_Dims($$, $8);
+		     if( SIZE($8)<SIZE($10) ) Copy_Dims($$, $10);
+		     if( SIZE($10)<SIZE($12) ) Copy_Dims($$, $12);
+		     if( SIZE($12)<SIZE($14) ) Copy_Dims($$, $14);
 		   }
-                   TEST($$); 
 		}
 
        | GTIFILTER ')'
@@ -1206,6 +1278,8 @@ static int New_Func( int returnType, funcOp Op, int nNodes,
       this->SubNodes[5] = Node6;
       this->SubNodes[6] = Node7;
       i = constant = nNodes;    /* Functions with zero params are not const */
+      if (Op == poirnd_fct) constant = 0; /* Nor is Poisson deviate */
+
       while( i-- )
          constant = ( constant &&
 		      gParse.Nodes[ this->SubNodes[i] ].operation==CONST_OP );
@@ -1539,6 +1613,11 @@ static int New_REG( char *fname, int NodeX, int NodeY, char *colNames )
    Node0 = Alloc_Node(); /* This will hold the Region Data */
    if( NodeX<0 || NodeY<0 || Node0<0 ) return(-1);
 
+   if( ! (Test_Dims( NodeX, NodeY ) ) ) {
+     yyerror("Dimensions of REGFILTER arguments are not compatible");
+     return (-1);
+   }
+
    n = Alloc_Node();
    if( n >= 0 ) {
       this                 = gParse.Nodes + n;
@@ -1552,6 +1631,9 @@ static int New_REG( char *fname, int NodeX, int NodeY, char *colNames )
       this->value.nelem    = 1;
       this->value.naxis    = 1;
       this->value.naxes[0] = 1;
+      
+      Copy_Dims(n, NodeX);
+      if( SIZE(NodeX)<SIZE(NodeY) )  Copy_Dims(n, NodeY);
 
       /* Init Region node to be treated as a "constant" */
 
@@ -1882,8 +1964,8 @@ static void Allocate_Ptrs( Node *this )
       default:      size = 1;                break;
       }
 
-      this->value.data.ptr = malloc( elem*(size+1) );
-      
+      this->value.data.ptr = calloc(size+1, elem);
+
       if( this->value.data.ptr==NULL ) {
 	 gParse.status = MEMORY_ALLOCATION;
       } else {
@@ -2684,7 +2766,7 @@ static void Do_BinOp_lng( Node *this )
 
    } else if ((this->operation == ACCUM) || (this->operation == DIFF)) {
       long i, previous, curr;
-      int undef;
+      long undef;
       rows  = gParse.nRows;
       nelem = this->value.nelem;
       elem  = this->value.nelem * rows;
@@ -2693,7 +2775,7 @@ static void Do_BinOp_lng( Node *this )
       
       if( !gParse.status ) {
 	previous = that2->value.data.lng;
-	undef    = (int) that2->value.undef;
+	undef    = (long) that2->value.undef;
 	
 	if (this->operation == ACCUM) {
 	  /* Cumulative sum of this chunk */
@@ -2864,7 +2946,7 @@ static void Do_BinOp_dbl( Node *this )
 
    } else if ((this->operation == ACCUM) || (this->operation == DIFF)) {
       long i;
-      int undef;
+      long undef;
       double previous, curr;
       rows  = gParse.nRows;
       nelem = this->value.nelem;
@@ -2874,7 +2956,7 @@ static void Do_BinOp_dbl( Node *this )
       
       if( !gParse.status ) {
 	previous = that2->value.data.dbl;
-	undef    = (int) that2->value.undef;
+	undef    = (long) that2->value.undef;
 	
 	if (this->operation == ACCUM) {
 	  /* Cumulative sum of this chunk */
@@ -3136,6 +3218,164 @@ double qselect_median_dbl(double arr[], int n)
 
 #undef ELEM_SWAP
 
+/*
+ * angsep_calc - compute angular separation between celestial coordinates
+ *   
+ * This routine computes the angular separation between to coordinates
+ * on the celestial sphere (i.e. RA and Dec).  Note that all units are
+ * in DEGREES, unlike the other trig functions in the calculator.
+ *
+ * double ra1, dec1 - RA and Dec of the first position in degrees
+ * double ra2, dec2 - RA and Dec of the second position in degrees
+ * 
+ * RETURNS: (double) angular separation in degrees
+ *
+ */
+double angsep_calc(double ra1, double dec1, double ra2, double dec2)
+{
+  double cd;
+  static double deg = 0;
+  double a, sdec, sra;
+  
+  if (deg == 0) deg = ((double)4)*atan((double)1)/((double)180);
+  /* deg = 1.0; **** UNCOMMENT IF YOU WANT RADIANS */
+
+
+  
+/*
+This (commented out) algorithm uses the Low of Cosines, which becomes
+ unstable for angles less than 0.1 arcsec. 
+ 
+  cd = sin(dec1*deg)*sin(dec2*deg) 
+    + cos(dec1*deg)*cos(dec2*deg)*cos((ra1-ra2)*deg);
+  if (cd < (-1)) cd = -1;
+  if (cd > (+1)) cd = +1;
+  return acos(cd)/deg;
+*/
+
+  /* The algorithm is the law of Haversines.  This algorithm is
+     stable even when the points are close together.  The normal
+     Law of Cosines fails for angles around 0.1 arcsec. */
+
+  sra  = sin( (ra2 - ra1)*deg / 2 );
+  sdec = sin( (dec2 - dec1)*deg / 2);
+  a = sdec*sdec + cos(dec1*deg)*cos(dec2*deg)*sra*sra;
+
+  /* Sanity checking to avoid a range error in the sqrt()'s below */
+  if (a < 0) { a = 0; }
+  if (a > 1) { a = 1; }
+
+  return 2.0*atan2(sqrt(a), sqrt(1.0 - a)) / deg;
+}
+
+
+
+
+
+
+static double ran1()
+{
+  static double dval = 0.0;
+  double rndVal;
+
+  if (dval == 0.0) {
+    if( rand()<32768 && rand()<32768 )
+      dval =      32768.0;
+    else
+      dval = 2147483648.0;
+  }
+
+  rndVal = (double)rand();
+  while( rndVal > dval ) dval *= 2.0;
+  return rndVal/dval;
+}
+
+/* Gaussian deviate routine from Numerical Recipes */
+static double gasdev()
+{
+  static int iset = 0;
+  static double gset;
+  double fac, rsq, v1, v2;
+
+  if (iset == 0) {
+    do {
+      v1 = 2.0*ran1()-1.0;
+      v2 = 2.0*ran1()-1.0;
+      rsq = v1*v1 + v2*v2;
+    } while (rsq >= 1.0 || rsq == 0.0);
+    fac = sqrt(-2.0*log(rsq)/rsq);
+    gset = v1*fac;
+    iset = 1;
+    return v2*fac;
+  } else {
+    iset = 0;
+    return gset;
+  }
+
+}
+
+/* lgamma function - from Numerical Recipes */
+
+float gammaln(float xx)
+     /* Returns the value ln Gamma[(xx)] for xx > 0. */
+{
+  /* 
+     Internal arithmetic will be done in double precision, a nicety
+     that you can omit if five-figure accuracy is good enough. */
+  double x,y,tmp,ser;
+  static double cof[6]={76.18009172947146,-86.50532032941677,
+			24.01409824083091,-1.231739572450155,
+			0.1208650973866179e-2,-0.5395239384953e-5};
+  int j;
+  y=x=xx;
+  tmp=x+5.5;
+  tmp -= (x+0.5)*log(tmp);
+  ser=1.000000000190015;
+  for (j=0;j<=5;j++) ser += cof[j]/++y;
+  return (float) -tmp+log(2.5066282746310005*ser/x);
+}
+
+/* Poisson deviate - derived from Numerical Recipes */
+static long poidev(double xm)
+{
+  static double sq, alxm, g, oldm = -1.0;
+  static double pi = 0;
+  double em, t, y;
+
+  if (pi == 0) pi = ((double)4)*atan((double)1);
+
+  if (xm < 20.0) {
+    if (xm != oldm) {
+      oldm = xm;
+      g = exp(-xm);
+    }
+    em = -1;
+    t = 1.0;
+    do {
+      em += 1;
+      t *= ran1();
+    } while (t > g);
+  } else {
+    if (xm != oldm) {
+      oldm = xm;
+      sq = sqrt(2.0*xm);
+      alxm = log(xm);
+      g = xm*alxm-gammaln( (float) (xm+1.0));
+    }
+    do {
+      do {
+	y = tan(pi*ran1());
+	em = sq*y+xm;
+      } while (em < 0.0);
+      em = floor(em);
+      t = 0.9*(1.0+y*y)*exp(em*alxm-gammaln( (float) (em+1.0) )-g);
+    } while (ran1() > t);
+  }
+
+  /* Return integer version */
+  return (long int) floor(em+0.5);
+}
+
 static void Do_Func( Node *this )
 {
    Node *theParams[MAXSUBS];
@@ -3146,7 +3386,6 @@ static void Do_Func( Node *this )
    double dval;
    int  i, valInit;
    long row, elem, nelem;
-   double rndVal;
 
    i = this->nSubNodes;
    allConst = 1;
@@ -3170,6 +3409,9 @@ static void Do_Func( Node *this )
    }
 
    if( this->nSubNodes==0 ) allConst = 0; /* These do produce scalars */
+   if( this->operation == poirnd_fct ) allConst = 0;
+   if( this->operation == gasrnd_fct ) allConst = 0;
+   if( this->operation == rnd_fct ) allConst = 0;
 
    if( allConst ) {
 
@@ -3204,6 +3446,14 @@ static void Do_Func( Node *this )
 	    else
 	       this->value.data.dbl = pVals[0].data.dbl;
 	    break;
+
+	 case poirnd_fct:
+	    if( theParams[0]->type==DOUBLE )
+	      this->value.data.lng = poidev(pVals[0].data.dbl);
+	    else
+	      this->value.data.lng = poidev(pVals[0].data.lng);
+	    break;
+
 	 case abs_fct:
 	    if( theParams[0]->type==DOUBLE ) {
 	       dval = pVals[0].data.dbl;
@@ -3311,6 +3561,12 @@ static void Do_Func( Node *this )
 	       atan2( pVals[0].data.dbl, pVals[1].data.dbl );
 	    break;
 
+	    /* Four-argument ANGSEP function */
+         case angsep_fct:
+	    this->value.data.dbl = 
+	      angsep_calc(pVals[0].data.dbl, pVals[1].data.dbl,
+			  pVals[2].data.dbl, pVals[3].data.dbl);
+
 	    /*  Min/Max functions taking 1 or 2 arguments  */
 
          case min1_fct:
@@ -3348,7 +3604,7 @@ static void Do_Func( Node *this )
 		  maxvalue( pVals[0].data.lng, pVals[1].data.lng );
 	    break;
 
-	    /* Boolean SAO region Functions... all arguments scalar dbls */
+	    /* Boolean SAO region Functions... scalar or vector dbls */
 
 	 case near_fct:
 	    this->value.data.log = bnear( pVals[0].data.dbl, pVals[1].data.dbl,
@@ -3432,17 +3688,62 @@ static void Do_Func( Node *this )
             }
 	    break;
 	 case rnd_fct:
-	    if( rand()<32768 && rand()<32768 )
-	       dval =      32768.0;
-	    else
-	       dval = 2147483648.0;
-	    while( row-- ) {
-               rndVal = (double)rand();
-               while( rndVal > dval ) dval *= 2.0;
-	       this->value.data.dblptr[row] = rndVal/dval;
-	       this->value.undef[row] = 0;
+	   while( elem-- ) {
+	     this->value.data.dblptr[elem] = ran1();
+	     this->value.undef[elem] = 0;
 	    }
 	    break;
+
+	 case gasrnd_fct:
+	    while( elem-- ) {
+	       this->value.data.dblptr[elem] = gasdev();
+	       this->value.undef[elem] = 0;
+	    }
+	    break;
+
+	 case poirnd_fct:
+	   if( theParams[0]->type==DOUBLE ) {
+	      if (theParams[0]->operation == CONST_OP) {
+		while( elem-- ) {
+		  this->value.undef[elem] = (pVals[0].data.dbl < 0);
+		  if (! this->value.undef[elem]) {
+		    this->value.data.lngptr[elem] = poidev(pVals[0].data.dbl);
+		  }
+		} 
+	      } else {
+		while( elem-- ) {
+		  this->value.undef[elem] = theParams[0]->value.undef[elem];
+		  if (theParams[0]->value.data.dblptr[elem] < 0) 
+		    this->value.undef[elem] = 1;
+		  if (! this->value.undef[elem]) {
+		    this->value.data.lngptr[elem] = 
+		      poidev(theParams[0]->value.data.dblptr[elem]);
+		  }
+		} /* while */
+	      } /* ! CONST_OP */
+	   } else {
+	     /* LONG */
+	      if (theParams[0]->operation == CONST_OP) {
+		while( elem-- ) {
+		  this->value.undef[elem] = (pVals[0].data.lng < 0);
+		  if (! this->value.undef[elem]) {
+		    this->value.data.lngptr[elem] = poidev(pVals[0].data.lng);
+		  }
+		} 
+	      } else {
+		while( elem-- ) {
+		  this->value.undef[elem] = theParams[0]->value.undef[elem];
+		  if (theParams[0]->value.data.lngptr[elem] < 0) 
+		    this->value.undef[elem] = 1;
+		  if (! this->value.undef[elem]) {
+		    this->value.data.lngptr[elem] = 
+		      poidev(theParams[0]->value.data.lngptr[elem]);
+		  }
+		} /* while */
+	      } /* ! CONST_OP */
+	   } /* END LONG */
+	   break;
+
 
 	    /* Non-Trig single-argument functions */
 	    
@@ -4007,6 +4308,34 @@ static void Do_Func( Node *this )
 	    }
 	    break;
 
+	    /* Four-argument ANGSEP Function */
+	    
+	 case angsep_fct:
+	    while( row-- ) {
+	       nelem = this->value.nelem;
+	       while( nelem-- ) {
+		  elem--;
+		  i=4; while( i-- )
+		     if( vector[i]>1 ) {
+			pVals[i].data.dbl =
+			   theParams[i]->value.data.dblptr[elem];
+			pNull[i] = theParams[i]->value.undef[elem];
+		     } else if( vector[i] ) {
+			pVals[i].data.dbl =
+			   theParams[i]->value.data.dblptr[row];
+			pNull[i] = theParams[i]->value.undef[row];
+		     }
+		  if( !(this->value.undef[elem] = (pNull[0] || pNull[1] ||
+						   pNull[2] || pNull[3]) ) )
+		     this->value.data.dblptr[elem] =
+		       angsep_calc(pVals[0].data.dbl, pVals[1].data.dbl,
+				   pVals[2].data.dbl, pVals[3].data.dbl);
+	       }
+	    }
+	    break;
+
+
+
 	    /*  Min/Max functions taking 1 or 2 arguments  */
 
          case min1_fct:
@@ -4257,67 +4586,111 @@ static void Do_Func( Node *this )
 	    }
 	    break;
 
-	    /* Boolean SAO region Functions... all arguments scalar dbls */
+	    /* Boolean SAO region Functions... scalar or vector dbls */
 
 	 case near_fct:
 	    while( row-- ) {
-	       this->value.undef[row] = 0;
-	       i=3; while( i-- )
-		  if( vector[i] ) {
-		     pVals[i].data.dbl = theParams[i]->value.data.dblptr[row];
-		     this->value.undef[row] |= theParams[i]->value.undef[row];
-		  }
-	       if( !(this->value.undef[row]) )
-		  this->value.data.logptr[row] =
-		     bnear( pVals[0].data.dbl, pVals[1].data.dbl,
-			    pVals[2].data.dbl );
+	       nelem = this->value.nelem;
+	       while( nelem-- ) {
+		  elem--;
+		  i=3; while( i-- )
+		     if( vector[i]>1 ) {
+			pVals[i].data.dbl =
+			   theParams[i]->value.data.dblptr[elem];
+			pNull[i] = theParams[i]->value.undef[elem];
+		     } else if( vector[i] ) {
+			pVals[i].data.dbl =
+			   theParams[i]->value.data.dblptr[row];
+			pNull[i] = theParams[i]->value.undef[row];
+		     }
+		  if( !(this->value.undef[elem] = (pNull[0] || pNull[1] ||
+						   pNull[2]) ) )
+		    this->value.data.logptr[elem] =
+		      bnear( pVals[0].data.dbl, pVals[1].data.dbl,
+			     pVals[2].data.dbl );
+	       }
 	    }
 	    break;
+
 	 case circle_fct:
 	    while( row-- ) {
-	       this->value.undef[row] = 0;
-	       i=5; while( i-- )
-		  if( vector[i] ) {
-		     pVals[i].data.dbl = theParams[i]->value.data.dblptr[row];
-		     this->value.undef[row] |= theParams[i]->value.undef[row];
-		  }
-	       if( !(this->value.undef[row]) )
-		  this->value.data.logptr[row] =
+	       nelem = this->value.nelem;
+	       while( nelem-- ) {
+		  elem--;
+		  i=5; while( i-- )
+		     if( vector[i]>1 ) {
+			pVals[i].data.dbl =
+			   theParams[i]->value.data.dblptr[elem];
+			pNull[i] = theParams[i]->value.undef[elem];
+		     } else if( vector[i] ) {
+			pVals[i].data.dbl =
+			   theParams[i]->value.data.dblptr[row];
+			pNull[i] = theParams[i]->value.undef[row];
+		     }
+		  if( !(this->value.undef[elem] = (pNull[0] || pNull[1] ||
+						   pNull[2] || pNull[3] ||
+						   pNull[4]) ) )
+		    this->value.data.logptr[elem] =
 		     circle( pVals[0].data.dbl, pVals[1].data.dbl,
 			     pVals[2].data.dbl, pVals[3].data.dbl,
 			     pVals[4].data.dbl );
+	       }
 	    }
 	    break;
+
 	 case box_fct:
 	    while( row-- ) {
-	       this->value.undef[row] = 0;
-	       i=7; while( i-- )
-		  if( vector[i] ) {
-		     pVals[i].data.dbl = theParams[i]->value.data.dblptr[row];
-		     this->value.undef[row] |= theParams[i]->value.undef[row];
-		  }
-	       if( !(this->value.undef[row]) )
-		  this->value.data.logptr[row] =
+	       nelem = this->value.nelem;
+	       while( nelem-- ) {
+		  elem--;
+		  i=7; while( i-- )
+		     if( vector[i]>1 ) {
+			pVals[i].data.dbl =
+			   theParams[i]->value.data.dblptr[elem];
+			pNull[i] = theParams[i]->value.undef[elem];
+		     } else if( vector[i] ) {
+			pVals[i].data.dbl =
+			   theParams[i]->value.data.dblptr[row];
+			pNull[i] = theParams[i]->value.undef[row];
+		     }
+		  if( !(this->value.undef[elem] = (pNull[0] || pNull[1] ||
+						   pNull[2] || pNull[3] ||
+						   pNull[4] || pNull[5] ||
+						   pNull[6] ) ) )
+		    this->value.data.logptr[elem] =
 		     saobox( pVals[0].data.dbl, pVals[1].data.dbl,
 			     pVals[2].data.dbl, pVals[3].data.dbl,
 			     pVals[4].data.dbl, pVals[5].data.dbl,
-			     pVals[6].data.dbl );
+			     pVals[6].data.dbl );	
+	       }
 	    }
 	    break;
+
 	 case elps_fct:
 	    while( row-- ) {
-	       this->value.undef[row] = 0;
-	       i=7; while( i-- )
-		  if( vector[i] ) {
-		     pVals[i].data.dbl = theParams[i]->value.data.dblptr[row];
-		     this->value.undef[row] |= theParams[i]->value.undef[row];
-		  }
-	       if( !(this->value.undef[row]) )
-		  this->value.data.logptr[row] =
+	       nelem = this->value.nelem;
+	       while( nelem-- ) {
+		  elem--;
+		  i=7; while( i-- )
+		     if( vector[i]>1 ) {
+			pVals[i].data.dbl =
+			   theParams[i]->value.data.dblptr[elem];
+			pNull[i] = theParams[i]->value.undef[elem];
+		     } else if( vector[i] ) {
+			pVals[i].data.dbl =
+			   theParams[i]->value.data.dblptr[row];
+			pNull[i] = theParams[i]->value.undef[row];
+		     }
+		  if( !(this->value.undef[elem] = (pNull[0] || pNull[1] ||
+						   pNull[2] || pNull[3] ||
+						   pNull[4] || pNull[5] ||
+						   pNull[6] ) ) )
+		    this->value.data.logptr[elem] =
 		     ellipse( pVals[0].data.dbl, pVals[1].data.dbl,
 			      pVals[2].data.dbl, pVals[3].data.dbl,
 			      pVals[4].data.dbl, pVals[5].data.dbl,
 			      pVals[6].data.dbl );
+	       }
 	    }
 	    break;
 

@@ -32,23 +32,23 @@ int ffuky( fitsfile *fptr,     /* I - FITS file pointer        */
     }
     else if (datatype == TBYTE)
     {
-        ffukyj(fptr, keyname, (long) *(unsigned char *) value, comm, status);
+        ffukyj(fptr, keyname, (LONGLONG) *(unsigned char *) value, comm, status);
     }
     else if (datatype == TSBYTE)
     {
-        ffukyj(fptr, keyname, (long) *(signed char *) value, comm, status);
+        ffukyj(fptr, keyname, (LONGLONG) *(signed char *) value, comm, status);
     }
     else if (datatype == TUSHORT)
     {
-        ffukyj(fptr, keyname, (long) *(unsigned short *) value, comm, status);
+        ffukyj(fptr, keyname, (LONGLONG) *(unsigned short *) value, comm, status);
     }
     else if (datatype == TSHORT)
     {
-        ffukyj(fptr, keyname, (long) *(short *) value, comm, status);
+        ffukyj(fptr, keyname, (LONGLONG) *(short *) value, comm, status);
     }
     else if (datatype == TINT)
     {
-        ffukyj(fptr, keyname, (long) *(int *) value, comm, status);
+        ffukyj(fptr, keyname, (LONGLONG) *(int *) value, comm, status);
     }
     else if (datatype == TUINT)
     {
@@ -66,7 +66,11 @@ int ffuky( fitsfile *fptr,     /* I - FITS file pointer        */
     }
     else if (datatype == TLONG)
     {
-        ffukyj(fptr, keyname, *(long *) value, comm, status);
+        ffukyj(fptr, keyname, (LONGLONG) *(long *) value, comm, status);
+    }
+    else if (datatype == TLONGLONG)
+    {
+        ffukyj(fptr, keyname, *(LONGLONG *) value, comm, status);
     }
     else if (datatype == TFLOAT)
     {
@@ -176,7 +180,7 @@ int ffukyl(fitsfile *fptr,    /* I - FITS file pointer  */
 /*--------------------------------------------------------------------------*/
 int ffukyj(fitsfile *fptr,    /* I - FITS file pointer  */
            char *keyname,     /* I - keyword name       */
-           long value,        /* I - keyword value      */
+           LONGLONG value,    /* I - keyword value      */
            char *comm,        /* I - keyword comment    */
            int *status)       /* IO - error status      */
 {
@@ -409,7 +413,8 @@ int ffmcrd(fitsfile *fptr,    /* I - FITS file pointer  */
            char *card,        /* I - card string value  */
            int *status)       /* IO - error status      */
 {
-    char tcard[FLEN_CARD];
+    char tcard[FLEN_CARD], valstring[FLEN_CARD], comm[FLEN_CARD], value[FLEN_CARD];
+    int keypos, len;
 
     if (*status > 0)           /* inherit input status value if > 0 */
         return(*status);
@@ -418,6 +423,27 @@ int ffmcrd(fitsfile *fptr,    /* I - FITS file pointer  */
         return(*status);
 
     ffmkey(fptr, card, status);
+
+    /* calc position of keyword in header */
+    keypos = (int) ((((fptr->Fptr)->nextkey) - ((fptr->Fptr)->headstart[(fptr->Fptr)->curhdu])) / 80) + 1;
+
+    ffpsvc(tcard, valstring, comm, status);
+
+    /* check for string value which may be continued over multiple keywords */
+    ffc2s(valstring, value, status);   /* remove quotes and trailing spaces */
+    len = strlen(value);
+
+    while (len && value[len - 1] == '&')  /* ampersand used as continuation char */
+    {
+        ffgcnt(fptr, value, status);
+        if (*value)
+        {
+            ffdrec(fptr, keypos, status);  /* delete the keyword */
+            len = strlen(value);
+        }
+        else   /* a null valstring indicates no continuation */
+            len = 0;
+    }
 
     return(*status);
 }
@@ -589,7 +615,7 @@ int ffmkys(fitsfile *fptr,    /* I - FITS file pointer  */
 
     ffmkey(fptr, card, status); /* overwrite the previous keyword */
 
-    keypos = ((((fptr->Fptr)->nextkey) - ((fptr->Fptr)->headstart[(fptr->Fptr)->curhdu])) / 80) + 1;
+    keypos = (int) (((((fptr->Fptr)->nextkey) - ((fptr->Fptr)->headstart[(fptr->Fptr)->curhdu])) / 80) + 1);
 
     /* check if old string value was continued over multiple keywords */
     ffc2s(oldval, valstring, status); /* remove quotes and trailing spaces */
@@ -769,9 +795,9 @@ int ffmkyl(fitsfile *fptr,    /* I - FITS file pointer  */
     return(*status);
 }
 /*--------------------------------------------------------------------------*/
-int ffmkyj(fitsfile *fptr,    /* I - FITS file pointer  */
+int ffmkyj(fitsfile *fptr,   /* I - FITS file pointer  */
            char *keyname,     /* I - keyword name       */
-           long value,        /* I - keyword value      */
+           LONGLONG value,    /* I - keyword value      */
            char *comm,        /* I - keyword comment    */
            int *status)       /* IO - error status      */
 {
@@ -1216,7 +1242,7 @@ int ffikyl(fitsfile *fptr,    /* I - FITS file pointer  */
 /*--------------------------------------------------------------------------*/
 int ffikyj(fitsfile *fptr,    /* I - FITS file pointer  */
            char *keyname,     /* I - keyword name       */
-           long value,        /* I - keyword value      */
+           LONGLONG value,    /* I - keyword value      */
            char *comm,        /* I - keyword comment    */
            int *status)       /* IO - error status      */
 {
@@ -1445,7 +1471,7 @@ int ffikey(fitsfile *fptr,    /* I - FITS file pointer  */
 {
     int ii, len, nshift;
     long nblocks;
-    OFF_T bytepos;
+    LONGLONG bytepos;
     char *inbuff, *outbuff, *tmpbuff, buff1[FLEN_CARD], buff2[FLEN_CARD];
 
     if (*status > 0)           /* inherit input status value if > 0 */
@@ -1462,7 +1488,8 @@ int ffikey(fitsfile *fptr,    /* I - FITS file pointer  */
             return(*status);  
     }
 
-    nshift=( (fptr->Fptr)->headend - (fptr->Fptr)->nextkey ) / 80; /* no. keywords to shift */
+    /* no. keywords to shift */
+    nshift= (int) (( (fptr->Fptr)->headend - (fptr->Fptr)->nextkey ) / 80); 
 
     strncpy(buff2, card, 80);     /* copy card to output buffer */
     buff2[80] = '\0';
@@ -1528,7 +1555,7 @@ int ffdkey(fitsfile *fptr,    /* I - FITS file pointer  */
     }
 
     /* calc position of keyword in header */
-    keypos = (((fptr->Fptr)->nextkey) - ((fptr->Fptr)->headstart[(fptr->Fptr)->curhdu])) / 80;
+    keypos = (int) ((((fptr->Fptr)->nextkey) - ((fptr->Fptr)->headstart[(fptr->Fptr)->curhdu])) / 80);
 
     ffdrec(fptr, keypos, status);  /* delete the keyword */
 
@@ -1558,7 +1585,7 @@ int ffdrec(fitsfile *fptr,   /* I - FITS file pointer  */
 */
 {
     int ii, nshift;
-    OFF_T bytepos;
+    LONGLONG bytepos;
     char *inbuff, *outbuff, *tmpbuff, buff1[81], buff2[81];
     char message[FLEN_ERRMSG];
 
@@ -1575,7 +1602,7 @@ int ffdrec(fitsfile *fptr,   /* I - FITS file pointer  */
 
     (fptr->Fptr)->nextkey = (fptr->Fptr)->headstart[(fptr->Fptr)->curhdu] + (keypos - 1) * 80;
 
-    nshift=( (fptr->Fptr)->headend - (fptr->Fptr)->nextkey ) / 80; /* no. keywords to shift */
+    nshift=(int) (( (fptr->Fptr)->headend - (fptr->Fptr)->nextkey ) / 80); /* no. keywords to shift */
 
     if (nshift <= 0)
     {

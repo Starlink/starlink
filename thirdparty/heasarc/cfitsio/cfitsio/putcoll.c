@@ -8,12 +8,13 @@
 #include <string.h>
 #include <stdlib.h>
 #include "fitsio2.h"
+
 /*--------------------------------------------------------------------------*/
 int ffpcll( fitsfile *fptr,  /* I - FITS file pointer                       */
             int  colnum,     /* I - number of column to write (1 = 1st col) */
-            long  firstrow,  /* I - first row to write (1 = 1st row)        */
-            long  firstelem, /* I - first vector element to write (1 = 1st) */
-            long  nelem,     /* I - number of values to write               */
+            LONGLONG  firstrow,  /* I - first row to write (1 = 1st row)        */
+            LONGLONG  firstelem, /* I - first vector element to write (1 = 1st) */
+            LONGLONG  nelem,     /* I - number of values to write               */
             char *array,     /* I - array of values to write                */
             int  *status)    /* IO - error status                           */
 /*
@@ -21,9 +22,8 @@ int ffpcll( fitsfile *fptr,  /* I - FITS file pointer                       */
 */
 {
     int tcode, maxelem, hdutype;
-    long twidth, incre, rownum, remain, next;
-    long tnull;
-    OFF_T repeat, startpos, elemnum, wrtptr, rowlen;
+    long twidth, incre;
+    LONGLONG repeat, startpos, elemnum, wrtptr, rowlen, rownum, remain, next, tnull;
     double scale, zero;
     char tform[20], ctrue = 'T', cfalse = 'F';
     char message[FLEN_ERRMSG];
@@ -35,7 +35,7 @@ int ffpcll( fitsfile *fptr,  /* I - FITS file pointer                       */
     /*---------------------------------------------------*/
     /*  Check input and get parameters about the column: */
     /*---------------------------------------------------*/
-    if (ffgcpr( fptr, colnum, firstrow, firstelem, nelem, 1, &scale, &zero,
+    if (ffgcprll( fptr, colnum, firstrow, firstelem, nelem, 1, &scale, &zero,
         tform, &twidth, &tcode, &maxelem, &startpos,  &elemnum, &incre,
         &repeat, &rowlen, &hdutype, &tnull, snull, status) > 0)
         return(*status);
@@ -64,8 +64,8 @@ int ffpcll( fitsfile *fptr,  /* I - FITS file pointer                       */
       if (*status > 0)  /* test for error during previous write operation */
       {
         sprintf(message,
-           "Error writing element %ld of input array of logicals (ffpcll).",
-            next+1);
+           "Error writing element %.0f of input array of logicals (ffpcll).",
+            (double) (next+1));
         ffpmsg(message);
         return(*status);
       }
@@ -92,9 +92,9 @@ int ffpcll( fitsfile *fptr,  /* I - FITS file pointer                       */
 /*--------------------------------------------------------------------------*/
 int ffpcnl( fitsfile *fptr,  /* I - FITS file pointer                       */
             int  colnum,     /* I - number of column to write (1 = 1st col) */
-            long  firstrow,  /* I - first row to write (1 = 1st row)        */
-            long  firstelem, /* I - first vector element to write (1 = 1st) */
-            long  nelem,     /* I - number of values to write               */
+            LONGLONG  firstrow,  /* I - first row to write (1 = 1st row)        */
+            LONGLONG  firstelem, /* I - first vector element to write (1 = 1st) */
+            LONGLONG  nelem,     /* I - number of values to write               */
             char  *array,    /* I - array of values to write                */
             char  nulvalue,  /* I - array flagging undefined pixels if true */
             int  *status)    /* IO - error status                           */
@@ -105,7 +105,9 @@ int ffpcnl( fitsfile *fptr,  /* I - FITS file pointer                       */
 */
 {
     tcolumn *colptr;
-    long repeat, first, ngood = 0, nbad = 0, ii, fstelm, fstrow;
+    long  ngood = 0, nbad = 0, ii;
+    LONGLONG repeat, first, fstelm, fstrow;
+    int tcode;
 
     if (*status > 0)
         return(*status);
@@ -124,7 +126,16 @@ int ffpcnl( fitsfile *fptr,  /* I - FITS file pointer                       */
     colptr  = (fptr->Fptr)->tableptr;   /* point to first column */
     colptr += (colnum - 1);     /* offset to correct column structure */
 
-    repeat = colptr->trepeat;  /* repeat count for this column */
+    tcode  = colptr->tdatatype;
+
+    if (tcode > 0)
+       repeat = colptr->trepeat;  /* repeat count for this column */
+    else
+       repeat = firstelem -1 + nelem;  /* variable length arrays */
+
+    /* first write the whole input vector, then go back and fill in the nulls */
+    if (ffpcll(fptr, colnum, firstrow, firstelem, nelem, array, status) > 0)
+          return(*status);
 
     /* absolute element number in the column */
     first = (firstrow - 1) * repeat + firstelem;
@@ -155,10 +166,11 @@ int ffpcnl( fitsfile *fptr,  /* I - FITS file pointer                       */
             fstrow = (fstelm - 1) / repeat + 1;  /* starting row number */
             fstelm = fstelm - (fstrow - 1) * repeat;  /* relative number */
 
+/*  good values have already been written
             if (ffpcll(fptr, colnum, fstrow, fstelm, ngood, &array[ii-ngood],
                 status) > 0)
                 return(*status);
-
+*/
             ngood=0;
          }
 
@@ -174,7 +186,9 @@ int ffpcnl( fitsfile *fptr,  /* I - FITS file pointer                       */
       fstrow = (fstelm - 1) / repeat + 1;  /* starting row number */
       fstelm = fstelm - (fstrow - 1) * repeat;  /* relative number */
 
+/*  these have already been written
       ffpcll(fptr, colnum, fstrow, fstelm, ngood, &array[ii-ngood], status);
+*/
     }
     else if (nbad) /* write last string of bad pixels */
     {
@@ -190,7 +204,7 @@ int ffpcnl( fitsfile *fptr,  /* I - FITS file pointer                       */
 /*--------------------------------------------------------------------------*/
 int ffpclx( fitsfile *fptr,  /* I - FITS file pointer                       */
             int  colnum,     /* I - number of column to write (1 = 1st col) */
-            long  frow,      /* I - first row to write (1 = 1st row)        */
+            LONGLONG  frow,      /* I - first row to write (1 = 1st row)        */
             long  fbit,      /* I - first bit to write (1 = 1st)            */
             long  nbit,      /* I - number of bits to write                 */
             char *larray,    /* I - array of logicals corresponding to bits */
@@ -202,9 +216,9 @@ int ffpclx( fitsfile *fptr,  /* I - FITS file pointer                       */
   The binary table column being written to must have datatype 'B' or 'X'. 
 */
 {
-    OFF_T bstart, repeat, rowlen, elemnum;
-    long offset, fbyte, lbyte, nbyte, bitloc, ndone;
-    long ii, rstart, estart, twidth, incre, tnull;
+    LONGLONG offset, bstart, repeat, rowlen, elemnum, rstart, estart, tnull;
+    long fbyte, lbyte, nbyte, bitloc, ndone;
+    long ii, twidth, incre;
     int tcode, descrp, maxelem, hdutype;
     double dummyd;
     char tform[12], snull[12];
@@ -237,16 +251,16 @@ int ffpclx( fitsfile *fptr,  /* I - FITS file pointer                       */
     lbyte = (fbit + nbit + 6) / 8;
     nbyte = lbyte - fbyte +1;
 
-    /* Save the current heapsize; ffgcpr will increment the value if */
+    /* Save the current heapsize; ffgcprll will increment the value if */
     /* we are writing to a variable length column. */
     offset = (fptr->Fptr)->heapsize;
 
-    /* call ffgcpr in case we are writing beyond the current end of   */
+    /* call ffgcprll in case we are writing beyond the current end of   */
     /* the table; it will allocate more space and shift any following */
     /* HDU's.  Otherwise, we have little use for most of the returned */
     /* parameters, therefore just use dummy parameters.               */
 
-    if (ffgcpr( fptr, colnum, frow, fbyte, nbyte, 1, &dummyd, &dummyd,
+    if (ffgcprll( fptr, colnum, frow, fbyte, nbyte, 1, &dummyd, &dummyd,
         tform, &twidth, &tcode, &maxelem, &bstart, &elemnum, &incre,
         &repeat, &rowlen, &hdutype, &tnull, snull, status) > 0)
         return(*status);
@@ -288,17 +302,17 @@ int ffpclx( fitsfile *fptr,  /* I - FITS file pointer                       */
         repeat = fbit + nbit -1;
 
         /* write the number of elements and the starting offset.    */
-        /* Note: ffgcpr previous wrote the descripter, but with the */
+        /* Note: ffgcprll previous wrote the descripter, but with the */
         /* wrong repeat value  (gave bytes instead of bits).        */
 
         if (tcode == -TBIT)
             ffpdes(fptr, colnum, frow, (long) repeat, offset, status);
 
         /* Calc the i/o pointer location to start of sequence of pixels.   */
-        /* ffgcpr has already calculated a value for bstart that           */
+        /* ffgcprll has already calculated a value for bstart that         */
         /* points to the first element of the vector; we just have to      */
         /* increment it to point to the first element we want to write to. */
-        /* Note: ffgcpr also already updated the size of the heap, so we   */
+        /* Note: ffgcprll also already updated the size of the heap, so we */
         /* don't have to do that again here.                               */
 
         bstart += estart;

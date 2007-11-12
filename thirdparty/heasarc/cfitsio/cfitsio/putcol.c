@@ -10,48 +10,127 @@
 #include <limits.h>
 #include "fitsio2.h"
 
-OFF_T large_first_elem_val = 0;  /* used to pass large firstelem values */
-
 /*--------------------------------------------------------------------------*/
 int ffppx(  fitsfile *fptr,  /* I - FITS file pointer                       */
             int  datatype,   /* I - datatype of the value                   */
             long  *firstpix, /* I - coord of  first pixel to write(1 based) */
-            long  nelem,     /* I - number of values to write               */
+            LONGLONG  nelem,     /* I - number of values to write               */
             void  *array,    /* I - array of values that are written        */
             int  *status)    /* IO - error status                           */
 /*
   Write an array of pixels to the primary array.  The datatype of the
   input array is defined by the 2nd argument. Data conversion
   and scaling will be performed if necessary (e.g, if the datatype of
-  the FITS array is not the same as the array being written). This routine
-  is simillar to ffppr, except it supports writing large images with
-  more than 2.1E9 pixels.
+  the FITS array is not the same as the array being written). 
+  
+  This routine is simillar to ffppr, except it supports writing to 
+  large images with more than 2**31 pixels.
 */
 {
     int naxis, ii;
-    long naxes[9], firstelem, group = 1;
-    OFF_T dimsize = 1;
+    long group = 1;
+    LONGLONG firstelem, dimsize = 1, naxes[9];
 
     if (*status > 0)           /* inherit input status value if > 0 */
         return(*status);
 
     /* get the size of the image */
     ffgidm(fptr, &naxis, status);
-    ffgisz(fptr, 9, naxes, status);
+    ffgiszll(fptr, 9, naxes, status);
 
-    /* store the actual first element value in a external variable      */
-    /* because we can't pass the value directly to the lower routine    */
-    /* because the parameter is declared as 'long' instead of 'off_t'.  */
-
-    large_first_elem_val = 0;
+    firstelem = 0;
     for (ii=0; ii < naxis; ii++)
     {
-        large_first_elem_val += ((firstpix[ii] - 1) * dimsize);
+        firstelem += ((firstpix[ii] - 1) * dimsize);
         dimsize *= naxes[ii];
     }
-    large_first_elem_val++;
+    firstelem++;
 
-    firstelem = USE_LARGE_VALUE; /* special flag value */
+    if (datatype == TBYTE)
+    {
+      ffpprb(fptr, group, firstelem, nelem, (unsigned char *) array, status);
+    }
+    else if (datatype == TSBYTE)
+    {
+      ffpprsb(fptr, group, firstelem, nelem, (signed char *) array, status);
+    }
+    else if (datatype == TUSHORT)
+    {
+      ffpprui(fptr, group, firstelem, nelem, (unsigned short *) array,
+              status);
+    }
+    else if (datatype == TSHORT)
+    {
+      ffppri(fptr, group, firstelem, nelem, (short *) array, status);
+    }
+    else if (datatype == TUINT)
+    {
+      ffppruk(fptr, group, firstelem, nelem, (unsigned int *) array, status);
+    }
+    else if (datatype == TINT)
+    {
+      ffpprk(fptr, group, firstelem, nelem, (int *) array, status);
+    }
+    else if (datatype == TULONG)
+    {
+      ffppruj(fptr, group, firstelem, nelem, (unsigned long *) array, status);
+    }
+    else if (datatype == TLONG)
+    {
+      ffpprj(fptr, group, firstelem, nelem, (long *) array, status);
+    }
+    else if (datatype == TLONGLONG)
+    {
+      ffpprjj(fptr, group, firstelem, nelem, (LONGLONG *) array, status);
+    }
+    else if (datatype == TFLOAT)
+    {
+      ffppre(fptr, group, firstelem, nelem, (float *) array, status);
+    }
+    else if (datatype == TDOUBLE)
+    {
+      ffpprd(fptr, group, firstelem, nelem, (double *) array, status);
+    }
+    else
+      *status = BAD_DATATYPE;
+
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
+int ffppxll(  fitsfile *fptr,  /* I - FITS file pointer                       */
+            int  datatype,   /* I - datatype of the value                   */
+            LONGLONG  *firstpix, /* I - coord of  first pixel to write(1 based) */
+            LONGLONG  nelem,     /* I - number of values to write               */
+            void  *array,    /* I - array of values that are written        */
+            int  *status)    /* IO - error status                           */
+/*
+  Write an array of pixels to the primary array.  The datatype of the
+  input array is defined by the 2nd argument. Data conversion
+  and scaling will be performed if necessary (e.g, if the datatype of
+  the FITS array is not the same as the array being written). 
+  
+  This routine is simillar to ffppr, except it supports writing to 
+  large images with more than 2**31 pixels.
+*/
+{
+    int naxis, ii;
+    long group = 1;
+    LONGLONG firstelem, dimsize = 1, naxes[9];
+
+    if (*status > 0)           /* inherit input status value if > 0 */
+        return(*status);
+
+    /* get the size of the image */
+    ffgidm(fptr, &naxis, status);
+    ffgiszll(fptr, 9, naxes, status);
+
+    firstelem = 0;
+    for (ii=0; ii < naxis; ii++)
+    {
+        firstelem += ((firstpix[ii] - 1) * dimsize);
+        dimsize *= naxes[ii];
+    }
+    firstelem++;
 
     if (datatype == TBYTE)
     {
@@ -107,7 +186,7 @@ int ffppx(  fitsfile *fptr,  /* I - FITS file pointer                       */
 int ffppxn(  fitsfile *fptr,  /* I - FITS file pointer                       */
             int  datatype,   /* I - datatype of the value                   */
             long  *firstpix, /* I - first vector element to write(1 = 1st)  */
-            long  nelem,     /* I - number of values to write               */
+            LONGLONG  nelem,     /* I - number of values to write               */
             void  *array,    /* I - array of values that are written        */
             void  *nulval,   /* I - pointer to the null value               */
             int  *status)    /* IO - error status                           */
@@ -116,11 +195,14 @@ int ffppxn(  fitsfile *fptr,  /* I - FITS file pointer                       */
   input array is defined by the 2nd argument. Data conversion
   and scaling will be performed if necessary (e.g, if the datatype of
   the FITS array is not the same as the array being written).
+
+  This routine supports writing to large images with
+  more than 2**31 pixels.
 */
 {
     int naxis, ii;
-    long naxes[9], firstelem, group = 1;
-    OFF_T dimsize = 1;
+    long group = 1;
+    LONGLONG firstelem, dimsize = 1, naxes[9];
 
     if (*status > 0)           /* inherit input status value if > 0 */
         return(*status);
@@ -133,21 +215,118 @@ int ffppxn(  fitsfile *fptr,  /* I - FITS file pointer                       */
 
     /* get the size of the image */
     ffgidm(fptr, &naxis, status);
-    ffgisz(fptr, 9, naxes, status);
+    ffgiszll(fptr, 9, naxes, status);
 
-    /* store the actual first element value in a external variable      */
-    /* because we can't pass the value directly to the lower routine    */
-    /* because the parameter is declared as 'long' instead of 'off_t'.  */
-
-    large_first_elem_val = 0;
+    firstelem = 0;
     for (ii=0; ii < naxis; ii++)
     {
-        large_first_elem_val += ((firstpix[ii] - 1) * dimsize);
+        firstelem += ((firstpix[ii] - 1) * dimsize);
         dimsize *= naxes[ii];
     }
-    large_first_elem_val++;
+    firstelem++;
 
-    firstelem = USE_LARGE_VALUE; /* special flag value */
+    if (datatype == TBYTE)
+    {
+      ffppnb(fptr, group, firstelem, nelem, (unsigned char *) array, 
+             *(unsigned char *) nulval, status);
+    }
+    else if (datatype == TSBYTE)
+    {
+      ffppnsb(fptr, group, firstelem, nelem, (signed char *) array, 
+             *(signed char *) nulval, status);
+    }
+    else if (datatype == TUSHORT)
+    {
+      ffppnui(fptr, group, firstelem, nelem, (unsigned short *) array,
+              *(unsigned short *) nulval,status);
+    }
+    else if (datatype == TSHORT)
+    {
+      ffppni(fptr, group, firstelem, nelem, (short *) array,
+             *(short *) nulval, status);
+    }
+    else if (datatype == TUINT)
+    {
+      ffppnuk(fptr, group, firstelem, nelem, (unsigned int *) array,
+             *(unsigned int *) nulval, status);
+    }
+    else if (datatype == TINT)
+    {
+      ffppnk(fptr, group, firstelem, nelem, (int *) array,
+             *(int *) nulval, status);
+    }
+    else if (datatype == TULONG)
+    {
+      ffppnuj(fptr, group, firstelem, nelem, (unsigned long *) array,
+              *(unsigned long *) nulval,status);
+    }
+    else if (datatype == TLONG)
+    {
+      ffppnj(fptr, group, firstelem, nelem, (long *) array,
+             *(long *) nulval, status);
+    }
+    else if (datatype == TLONGLONG)
+    {
+      ffppnjj(fptr, group, firstelem, nelem, (LONGLONG *) array,
+             *(LONGLONG *) nulval, status);
+    }
+    else if (datatype == TFLOAT)
+    {
+      ffppne(fptr, group, firstelem, nelem, (float *) array,
+             *(float *) nulval, status);
+    }
+    else if (datatype == TDOUBLE)
+    {
+      ffppnd(fptr, group, firstelem, nelem, (double *) array,
+             *(double *) nulval, status);
+    }
+    else
+      *status = BAD_DATATYPE;
+
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
+int ffppxnll(  fitsfile *fptr,  /* I - FITS file pointer                       */
+            int  datatype,   /* I - datatype of the value                   */
+            LONGLONG  *firstpix, /* I - first vector element to write(1 = 1st)  */
+            LONGLONG  nelem,     /* I - number of values to write               */
+            void  *array,    /* I - array of values that are written        */
+            void  *nulval,   /* I - pointer to the null value               */
+            int  *status)    /* IO - error status                           */
+/*
+  Write an array of values to the primary array.  The datatype of the
+  input array is defined by the 2nd argument. Data conversion
+  and scaling will be performed if necessary (e.g, if the datatype of
+  the FITS array is not the same as the array being written).
+
+  This routine supports writing to large images with
+  more than 2**31 pixels.
+*/
+{
+    int naxis, ii;
+    long  group = 1;
+    LONGLONG firstelem, dimsize = 1, naxes[9];
+
+    if (*status > 0)           /* inherit input status value if > 0 */
+        return(*status);
+
+    if (nulval == NULL)  /* null value not defined? */
+    {
+        ffppxll(fptr, datatype, firstpix, nelem, array, status);
+        return(*status);
+    }
+
+    /* get the size of the image */
+    ffgidm(fptr, &naxis, status);
+    ffgiszll(fptr, 9, naxes, status);
+
+    firstelem = 0;
+    for (ii=0; ii < naxis; ii++)
+    {
+        firstelem += ((firstpix[ii] - 1) * dimsize);
+        dimsize *= naxes[ii];
+    }
+    firstelem++;
 
     if (datatype == TBYTE)
     {
@@ -212,8 +391,8 @@ int ffppxn(  fitsfile *fptr,  /* I - FITS file pointer                       */
 /*--------------------------------------------------------------------------*/
 int ffppr(  fitsfile *fptr,  /* I - FITS file pointer                       */
             int  datatype,   /* I - datatype of the value                   */
-            long  firstelem, /* I - first vector element to write(1 = 1st)  */
-            long  nelem,     /* I - number of values to write               */
+            LONGLONG  firstelem, /* I - first vector element to write(1 = 1st)  */
+            LONGLONG  nelem,     /* I - number of values to write               */
             void  *array,    /* I - array of values that are written        */
             int  *status)    /* IO - error status                           */
 /*
@@ -221,6 +400,7 @@ int ffppr(  fitsfile *fptr,  /* I - FITS file pointer                       */
   input array is defined by the 2nd argument. Data conversion
   and scaling will be performed if necessary (e.g, if the datatype of
   the FITS array is not the same as the array being written).
+
 */
 {
     long group = 1;
@@ -281,8 +461,8 @@ int ffppr(  fitsfile *fptr,  /* I - FITS file pointer                       */
 /*--------------------------------------------------------------------------*/
 int ffppn(  fitsfile *fptr,  /* I - FITS file pointer                       */
             int  datatype,   /* I - datatype of the value                   */
-            long  firstelem, /* I - first vector element to write(1 = 1st)  */
-            long  nelem,     /* I - number of values to write               */
+            LONGLONG  firstelem, /* I - first vector element to write(1 = 1st)  */
+            LONGLONG  nelem,     /* I - number of values to write               */
             void  *array,    /* I - array of values that are written        */
             void  *nulval,   /* I - pointer to the null value               */
             int  *status)    /* IO - error status                           */
@@ -291,6 +471,7 @@ int ffppn(  fitsfile *fptr,  /* I - FITS file pointer                       */
   input array is defined by the 2nd argument. Data conversion
   and scaling will be performed if necessary (e.g, if the datatype of
   the FITS array is not the same as the array being written).
+
 */
 {
     long group = 1;
@@ -376,6 +557,9 @@ int ffpss(  fitsfile *fptr,   /* I - FITS file pointer                       */
   input array is defined by the 2nd argument.  Data conversion
   and scaling will be performed if necessary (e.g, if the datatype of
   the FITS array is not the same as the array being written).
+
+  This routine supports writing to large images with
+  more than 2**31 pixels.
 */
 {
     int naxis;
@@ -451,9 +635,9 @@ int ffpss(  fitsfile *fptr,   /* I - FITS file pointer                       */
 int ffpcl(  fitsfile *fptr,  /* I - FITS file pointer                       */
             int  datatype,   /* I - datatype of the value                   */
             int  colnum,     /* I - number of column to write (1 = 1st col) */
-            long  firstrow,  /* I - first row to write (1 = 1st row)        */
-            long  firstelem, /* I - first vector element to write (1 = 1st) */
-            long  nelem,     /* I - number of elements to write             */
+            LONGLONG  firstrow,  /* I - first row to write (1 = 1st row)        */
+            LONGLONG  firstelem, /* I - first vector element to write (1 = 1st) */
+            LONGLONG  nelem,     /* I - number of elements to write             */
             void  *array,    /* I - array of values that are written        */
             int  *status)    /* IO - error status                           */
 /*
@@ -461,6 +645,7 @@ int ffpcl(  fitsfile *fptr,  /* I - FITS file pointer                       */
   input array is defined by the 2nd argument. Data conversion
   and scaling will be performed if necessary (e.g, if the datatype of
   the FITS column is not the same as the array being written).
+
 */
 {
     if (*status > 0)           /* inherit input status value if > 0 */
@@ -468,7 +653,7 @@ int ffpcl(  fitsfile *fptr,  /* I - FITS file pointer                       */
 
     if (datatype == TBIT)
     {
-      ffpclx(fptr, colnum, firstrow, firstelem, nelem, (char *) array, 
+      ffpclx(fptr, colnum, firstrow, (long) firstelem, (long) nelem, (char *) array, 
              status);
     }
     else if (datatype == TBYTE)
@@ -555,9 +740,9 @@ int ffpcl(  fitsfile *fptr,  /* I - FITS file pointer                       */
 int ffpcn(  fitsfile *fptr,  /* I - FITS file pointer                       */
             int  datatype,   /* I - datatype of the value                   */
             int  colnum,     /* I - number of column to write (1 = 1st col) */
-            long  firstrow,  /* I - first row to write (1 = 1st row)        */
-            long  firstelem, /* I - first vector element to write (1 = 1st) */
-            long  nelem,     /* I - number of elements to write             */
+            LONGLONG  firstrow,  /* I - first row to write (1 = 1st row)        */
+            LONGLONG  firstelem, /* I - first vector element to write (1 = 1st) */
+            LONGLONG  nelem,     /* I - number of elements to write             */
             void  *array,    /* I - array of values that are written        */
             void  *nulval,   /* I - pointer to the null value               */
             int  *status)    /* IO - error status                           */
@@ -566,6 +751,7 @@ int ffpcn(  fitsfile *fptr,  /* I - FITS file pointer                       */
   input array is defined by the 2nd argument. Data conversion
   and scaling will be performed if necessary (e.g, if the datatype of
   the FITS column is not the same as the array being written).
+
 */
 {
     if (*status > 0)           /* inherit input status value if > 0 */
@@ -868,6 +1054,7 @@ int ffiter(int n_cols,
             unsigned long  ulongnull;
             float  floatnull;
             double doublenull;
+	    LONGLONG longlongnull;
         } null;
     } colNulls;
 
@@ -917,7 +1104,8 @@ int ffiter(int n_cols,
             type != TSBYTE && type != TLOGICAL && type != TSTRING &&
             type != TSHORT && type != TINT     && type != TLONG && 
             type != TFLOAT && type != TDOUBLE  && type != TCOMPLEX &&
-            type != TULONG && type != TUSHORT  && type != TDBLCOMPLEX)
+            type != TULONG && type != TUSHORT  && type != TDBLCOMPLEX &&
+	    type != TLONGLONG )
         {
 	    if (type < 0) {
 	      sprintf(message,
@@ -1125,6 +1313,9 @@ int ffiter(int n_cols,
                  break;
              case DOUBLE_IMG:
                  typecode = TDOUBLE;
+                 break;
+             case LONGLONG_IMG:
+                 typecode = TLONGLONG;
                  break;
             }
         }
@@ -1480,6 +1671,21 @@ int ffiter(int n_cols,
 
           /* use value = 2 to flag null values in logical columns */
           col[jj].null.charnull = 2;
+          break;
+
+         case TLONGLONG:
+          cols[jj].array = calloc(ntodo + 1, sizeof(LONGLONG));
+          col[jj].nullsize  = sizeof(LONGLONG);  /* number of bytes per value */
+
+          if (abs(typecode) == TBYTE || abs(typecode) == TSHORT || abs(typecode) == TLONG ||
+	      abs(typecode) == TLONGLONG)
+          {
+              col[jj].null.longlongnull = tnull;
+          }
+          else
+          {
+              col[jj].null.longlongnull = LONGLONG_MIN;   /* use minimum as null */
+          }
           break;
 
          default:

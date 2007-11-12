@@ -534,6 +534,7 @@ value of {\tt datatype}:
   TINT      signed int
   TUINT     unsigned int
   TLONG     signed long
+  TLONGLONG signed 8-byte integer
   TULONG    unsigned long
   TFLOAT    float
   TDOUBLE   double
@@ -844,6 +845,7 @@ value of {\tt datatype}:
   TINT      signed int
   TUINT     unsigned int
   TLONG     signed long
+  TLONGLONG signed 8-byte integer
   TULONG    unsigned long
   TFLOAT    float
   TDOUBLE   double
@@ -1000,7 +1002,8 @@ routine reads keyword number {\tt keynum} (where the first keyword is
 at position 1).  This routine is most commonly used when sequentially
 reading every record in the header from beginning to end.  The 2nd and
 3rd routines read the named keyword and return either the whole
-80-byte record, or the keyword value and comment string.
+record, or the keyword value and comment string.  In each case any 
+non-significant trailing blank characters in the strings are truncated.
 
 Wild card characters (*, ?, and \#) may be used when specifying the name
 of the keyword to be read, in which case the first matching keyword is

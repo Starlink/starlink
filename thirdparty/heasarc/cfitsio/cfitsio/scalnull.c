@@ -82,7 +82,7 @@ int ffpscl(fitsfile *fptr,      /* I - FITS file pointer               */
 }
 /*--------------------------------------------------------------------------*/
 int ffpnul(fitsfile *fptr,      /* I - FITS file pointer                */
-           long nulvalue,       /* I - null pixel value: value of BLANK */
+           LONGLONG nulvalue,   /* I - null pixel value: value of BLANK */
            int *status)         /* IO - error status                    */
 /*
   Define the value used to represent undefined pixels in the primary array or
@@ -161,7 +161,7 @@ int fftscl(fitsfile *fptr,      /* I - FITS file pointer */
 /*--------------------------------------------------------------------------*/
 int fftnul(fitsfile *fptr,      /* I - FITS file pointer                  */
            int colnum,          /* I - column number to apply nulvalue to */
-           long nulvalue,       /* I - null pixel value: value of TNULLn  */
+           LONGLONG nulvalue,   /* I - null pixel value: value of TNULLn  */
            int *status)         /* IO - error status                      */
 /*
   Define the value used to represent undefined pixels in the BINTABLE column.

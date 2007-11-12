@@ -39,7 +39,6 @@ int main(int argc, char *argv[])
  printf("in single quote characters on the Unix command line.\n");
       return(0);
     }
-
     /* Open the input file */
     if ( !fits_open_file(&infptr, argv[1], READONLY, &status) )
     {

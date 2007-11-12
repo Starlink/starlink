@@ -14,9 +14,9 @@
 /*--------------------------------------------------------------------------*/
 int ffgcvs( fitsfile *fptr,   /* I - FITS file pointer                       */
             int  colnum,      /* I - number of column to read (1 = 1st col)  */
-            long  firstrow,   /* I - first row to read (1 = 1st row)         */
-            long  firstelem,  /* I - first vector element to read (1 = 1st)  */
-            long  nelem,      /* I - number of strings to read               */
+            LONGLONG  firstrow,   /* I - first row to read (1 = 1st row)         */
+            LONGLONG  firstelem,  /* I - first vector element to read (1 = 1st)  */
+            LONGLONG  nelem,      /* I - number of strings to read               */
             char *nulval,     /* I - string for null pixels                  */
             char **array,     /* O - array of values that are read           */
             int  *anynul,     /* O - set to 1 if any values are null; else 0 */
@@ -36,9 +36,9 @@ int ffgcvs( fitsfile *fptr,   /* I - FITS file pointer                       */
 /*--------------------------------------------------------------------------*/
 int ffgcfs( fitsfile *fptr,   /* I - FITS file pointer                       */
             int  colnum,      /* I - number of column to read (1 = 1st col) */
-            long  firstrow,   /* I - first row to read (1 = 1st row)        */
-            long  firstelem,  /* I - first vector element to read (1 = 1st) */
-            long  nelem,      /* I - number of strings to read              */
+            LONGLONG  firstrow,   /* I - first row to read (1 = 1st row)        */
+            LONGLONG  firstelem,  /* I - first vector element to read (1 = 1st) */
+            LONGLONG  nelem,      /* I - number of strings to read              */
             char **array,     /* O - array of values that are read           */
             char *nularray,   /* O - array of flags = 1 if nultyp = 2        */
             int  *anynul,     /* O - set to 1 if any values are null; else 0 */
@@ -58,9 +58,9 @@ int ffgcfs( fitsfile *fptr,   /* I - FITS file pointer                       */
 /*--------------------------------------------------------------------------*/
 int ffgcls( fitsfile *fptr,   /* I - FITS file pointer                       */
             int  colnum,      /* I - number of column to read (1 = 1st col) */
-            long  firstrow,   /* I - first row to read (1 = 1st row)        */
-            long  firstelem,  /* I - first vector element to read (1 = 1st) */
-            long  nelem,      /* I - number of strings to read              */
+            LONGLONG  firstrow,   /* I - first row to read (1 = 1st row)        */
+            LONGLONG  firstelem,  /* I - first vector element to read (1 = 1st) */
+            LONGLONG  nelem,      /* I - number of strings to read              */
             int   nultyp,     /* I - null value handling code:               */
                               /*     1: set undefined pixels = nulval        */
                               /*     2: set nularray=1 for undefined pixels  */
@@ -74,14 +74,15 @@ int ffgcls( fitsfile *fptr,   /* I - FITS file pointer                       */
   Returns a formated string value, regardless of the datatype of the column
 */
 {
-    int tcode, hdutype, tstatus, scaled, intcol, dwidth, nulwidth, ll;
+    int tcode, hdutype, tstatus, scaled, intcol, dwidth, nulwidth, ll, dlen;
     long ii, jj;
     tcolumn *colptr;
     char message[FLEN_ERRMSG], *carray, keyname[FLEN_KEYWORD];
-    char cform[20], dispfmt[20], tmpstr[80];
+    char cform[20], dispfmt[20], tmpstr[400], *flgarray, tmpnull[80];
     unsigned char byteval;
     float *earray;
     double *darray, tscale = 1.0;
+    LONGLONG *llarray;
 
     if (*status > 0 || nelem == 0)  /* inherit input status value if > 0 */
         return(*status);
@@ -116,7 +117,7 @@ int ffgcls( fitsfile *fptr,   /* I - FITS file pointer                       */
     else if (tcode == TLOGICAL)
     {
       /* allocate memory for the array of logical values */
-      carray = (char *) malloc(nelem);
+      carray = (char *) malloc((size_t) nelem);
 
       /*  call the logical column reading routine */
       ffgcll(fptr, colnum, firstrow, firstelem, nelem, nultyp, *nulval,
@@ -141,7 +142,7 @@ int ffgcls( fitsfile *fptr,   /* I - FITS file pointer                       */
     else if (tcode == TCOMPLEX)
     {
       /* allocate memory for the array of double values */
-      earray = (float *) calloc(nelem * 2, sizeof(float) );
+      earray = (float *) calloc((size_t) (nelem * 2), sizeof(float) );
       
       ffgcle(fptr, colnum, firstrow, (firstelem - 1) * 2 + 1, nelem * 2,
         1, 1, FLOATNULLVALUE, earray, nularray, anynul, status);
@@ -209,7 +210,7 @@ int ffgcls( fitsfile *fptr,   /* I - FITS file pointer                       */
     else if (tcode == TDBLCOMPLEX)
     {
       /* allocate memory for the array of double values */
-      darray = (double *) calloc(nelem * 2, sizeof(double) );
+      darray = (double *) calloc((size_t) (nelem * 2), sizeof(double) );
       
       ffgcld(fptr, colnum, firstrow, (firstelem - 1) * 2 + 1, nelem * 2,
         1, 1, DOUBLENULLVALUE, darray, nularray, anynul, status);
@@ -273,10 +274,67 @@ int ffgcls( fitsfile *fptr,   /* I - FITS file pointer                       */
 
       free(darray);  /* free the memory */
     }
+    else if (tcode == TLONGLONG)
+    {
+      /* allocate memory for the array of LONGLONG values */
+      llarray = (LONGLONG *) calloc((size_t) nelem, sizeof(LONGLONG) );
+      flgarray = (char *) calloc((size_t) nelem, sizeof(char) );
+      dwidth = 20;  /* max width of displayed long long integer value */
+
+      if (ffgcfjj(fptr, colnum, firstrow, firstelem, nelem,
+            llarray, flgarray, anynul, status) > 0)
+      {
+         free(flgarray);
+         free(llarray);
+         return(*status);
+      }
+
+      /* write the formated string for each value */
+      if (nulval) {
+          strcpy(tmpnull, nulval);
+          nulwidth = strlen(nulval);
+      } else {
+          strcpy(tmpnull, " ");
+          nulwidth = 1;
+      }
+
+      for (ii = 0; ii < nelem; ii++)
+      {
+           if ( flgarray[ii] )
+           {
+              *array[ii] = '\0';
+              if (dwidth < nulwidth)
+                  strncat(array[ii], tmpnull, dwidth);
+              else
+                  sprintf(array[ii],"%*s",dwidth,tmpnull);
+		  
+              if (nultyp == 2)
+	          nularray[ii] = 1;
+           }
+           else
+           {	   
+
+#if defined(_MSC_VER)
+    /* Microsoft Visual C++ 6.0 uses '%I64d' syntax  for 8-byte integers */
+        sprintf(tmpstr, "%20I64d", llarray[ii]);
+#elif (USE_LL_SUFFIX == 1)
+        sprintf(tmpstr, "%20lld", llarray[ii]);
+#else
+        sprintf(tmpstr, "%20ld", llarray[ii]);
+#endif
+              *array[ii] = '\0';
+              strncat(array[ii], tmpstr, 20);
+           }
+      }
+
+      free(flgarray);
+      free(llarray);  /* free the memory */
+
+    }
     else
     {
       /* allocate memory for the array of double values */
-      darray = (double *) calloc(nelem, sizeof(double) );
+      darray = (double *) calloc((size_t) nelem, sizeof(double) );
       
       /* read all other numeric type columns as doubles */
       if (ffgcld(fptr, colnum, firstrow, firstelem, nelem, 1, nultyp, 
@@ -361,8 +419,15 @@ int ffgcls( fitsfile *fptr,   /* I - FITS file pointer                       */
             }
       } 
 
+      if (nulval) {
+          strcpy(tmpnull, nulval);
+          nulwidth = strlen(nulval);
+      } else {
+          strcpy(tmpnull, " ");
+          nulwidth = 1;
+      }
+
       /* write the formated string for each value */
-      nulwidth = strlen(nulval);
       for (ii = 0; ii < nelem; ii++)
       {
            if (tcode == TBIT)
@@ -384,16 +449,22 @@ int ffgcls( fitsfile *fptr,   /* I - FITS file pointer                       */
            {
               *array[ii] = '\0';
               if (dwidth < nulwidth)
-                  strncat(array[ii], nulval, dwidth);
+                  strncat(array[ii], tmpnull, dwidth);
               else
-                  sprintf(array[ii],"%*s",dwidth,nulval);
+                  sprintf(array[ii],"%*s",dwidth,tmpnull);
            }
            else
-           {
-              if (intcol)    
+           {	   
+              if (intcol)
                 sprintf(tmpstr, cform, (int) darray[ii]);
               else
                 sprintf(tmpstr, cform, darray[ii]);
+
+              /* fill field with '*' if number is too wide */
+              dlen = strlen(tmpstr);
+	      if (dlen > dwidth) {
+	         memset(tmpstr, '*', dwidth);
+              }
 
               *array[ii] = '\0';
               strncat(array[ii], tmpstr, dwidth);
@@ -513,12 +584,14 @@ int ffgcdw( fitsfile *fptr,   /* I - FITS file pointer                       */
                  /* this is a binary table */
                   if (tcode == TBIT)           /* 'X' */
                      *width = 8;
-                  else if (tcode == TBYTE)          /* 'B' */
+                  else if (tcode == TBYTE)     /* 'B' */
                      *width = 4;
                   else if (tcode == TSHORT)    /* 'I' */
                      *width = 6;
                   else if (tcode == TLONG)     /* 'J' */
                      *width = 11;
+                  else if (tcode == TLONGLONG) /* 'K' */
+                     *width = 20;
                   else if (tcode == TFLOAT)    /* 'E' */
                      *width = 14;
                   else if (tcode == TDOUBLE)   /* 'D' */
@@ -548,9 +621,9 @@ int ffgcdw( fitsfile *fptr,   /* I - FITS file pointer                       */
 /*--------------------------------------------------------------------------*/
 int ffgcls2 ( fitsfile *fptr,   /* I - FITS file pointer                       */
             int  colnum,      /* I - number of column to read (1 = 1st col) */
-            long  firstrow,   /* I - first row to read (1 = 1st row)        */
-            long  firstelem,  /* I - first vector element to read (1 = 1st) */
-            long  nelem,      /* I - number of strings to read              */
+            LONGLONG  firstrow,   /* I - first row to read (1 = 1st row)        */
+            LONGLONG  firstelem,  /* I - first vector element to read (1 = 1st) */
+            LONGLONG  nelem,      /* I - number of strings to read              */
             int   nultyp,     /* I - null value handling code:               */
                               /*     1: set undefined pixels = nulval        */
                               /*     2: set nularray=1 for undefined pixels  */
@@ -563,11 +636,12 @@ int ffgcls2 ( fitsfile *fptr,   /* I - FITS file pointer                       *
   Read an array of string values from a column in the current FITS HDU.
 */
 {
+    double dtemp;
     long nullen; 
     int tcode, maxelem, hdutype, nulcheck;
-    long twidth, incre, rownum;
-    long ii, jj, ntodo, tnull, remain, next;
-    OFF_T repeat, startpos, elemnum, readptr, rowlen;
+    long twidth, incre;
+    long ii, jj, ntodo;
+    LONGLONG repeat, startpos, elemnum, readptr, tnull, rowlen, rownum, remain, next;
     double scale, zero;
     char tform[20];
     char message[FLEN_ERRMSG];
@@ -587,7 +661,7 @@ int ffgcls2 ( fitsfile *fptr,   /* I - FITS file pointer                       *
         *anynul = 0;
 
     if (nultyp == 2)
-        memset(nularray, 0, nelem);   /* initialize nullarray */
+        memset(nularray, 0, (size_t) nelem);   /* initialize nullarray */
 
     /*---------------------------------------------------*/
     /*  Check input and get parameters about the column: */
@@ -608,17 +682,17 @@ int ffgcls2 ( fitsfile *fptr,   /* I - FITS file pointer                       *
     {
       /* only read a single string; ignore value of firstelem */
 
-      if (ffgcpr( fptr, colnum, firstrow, 1, 1, 0, &scale, &zero,
+      if (ffgcprll( fptr, colnum, firstrow, 1, 1, 0, &scale, &zero,
         tform, &twidth, &tcode, &maxelem, &startpos,  &elemnum, &incre,
         &repeat, &rowlen, &hdutype, &tnull, snull, status) > 0)
         return(*status);
 
       remain = 1;
-      twidth = repeat;  
+      twidth = (long) repeat;  
     }
     else if (tcode == TSTRING)
     {
-      if (ffgcpr( fptr, colnum, firstrow, firstelem, nelem, 0, &scale, &zero,
+      if (ffgcprll( fptr, colnum, firstrow, firstelem, nelem, 0, &scale, &zero,
         tform, &twidth, &tcode, &maxelem, &startpos,  &elemnum, &incre,
         &repeat, &rowlen, &hdutype, &tnull, snull, status) > 0)
         return(*status);
@@ -637,7 +711,10 @@ int ffgcls2 ( fitsfile *fptr,   /* I - FITS file pointer                       *
     /*------------------------------------------------------------------*/
     nulcheck = nultyp; /* by default check for null values in the FITS file */
 
-    if (nultyp == 1 && nulval[0] == 0)
+    if (nultyp == 1 && nulval == 0)
+       nulcheck = 0;    /* calling routine does not want to check for nulls */
+
+    else if (nultyp == 1 && nulval && nulval[0] == 0)
        nulcheck = 0;    /* calling routine does not want to check for nulls */
 
     else if (snull[0] == ASCII_NULL_UNDEFINED)
@@ -659,10 +736,10 @@ int ffgcls2 ( fitsfile *fptr,   /* I - FITS file pointer                       *
          will fit in the buffer space or to the number of pixels that remain
          in the current vector, which ever is smaller.
       */
-      ntodo = minvalue(remain, maxelem);      
-      ntodo = minvalue(ntodo, (repeat - elemnum));
+      ntodo = (long) minvalue(remain, maxelem);      
+      ntodo = (long) minvalue(ntodo, (repeat - elemnum));
 
-      readptr = startpos + ((OFF_T)rownum * rowlen) + (elemnum * incre);
+      readptr = startpos + ((LONGLONG)rownum * rowlen) + (elemnum * incre);
       ffmbyt(fptr, readptr, REPORT_EOF, status);  /* move to read position */
 
       /* read the array of strings from the FITS file into the buffer */
@@ -677,7 +754,7 @@ int ffgcls2 ( fitsfile *fptr,   /* I - FITS file pointer                       *
 
       buffer = ((char *) cbuff) + (ntodo * twidth) - 1;
 
-      for (ii = next + ntodo - 1; ii >= next; ii--)
+      for (ii = (long) (next + ntodo - 1); ii >= next; ii--)
       {
          arrayptr = array[ii] + twidth - 1;
 
@@ -705,18 +782,24 @@ int ffgcls2 ( fitsfile *fptr,   /* I - FITS file pointer                       *
          if (nulcheck && !strncmp(snull, array[ii], nullen) )
          {
            *anynul = 1;   /* this is a null value */
-           if (nultyp == 1)
-             strcpy(array[ii], nulval);
-           else
+           if (nultyp == 1) {
+	   
+	     if (nulval)
+                strcpy(array[ii], nulval);
+	     else
+	        strcpy(array[ii], " ");
+	     
+           } else
              nularray[ii] = 1;
          }
       }
     
       if (*status > 0)  /* test for error during previous read operation */
       {
+         dtemp = (double) next;
          sprintf(message,
-          "Error reading elements %ld thru %ld of data array (ffpcls).",
-             next+1, next+ntodo);
+          "Error reading elements %.0f thru %.0f of data array (ffpcls).",
+             dtemp+1., dtemp+ntodo);
 
          ffpmsg(message);
          return(*status);

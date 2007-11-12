@@ -22,7 +22,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h>
+
+#if defined(unix) || defined(__unix__)  || defined(__unix)
+#include <unistd.h> 
+#endif
 
 
 static int shared_kbase = 0;                    /* base for shared memory handles */
@@ -736,7 +739,7 @@ int     shared_list(int id)
  }
 
 int     shared_getaddr(int id, char **address)
- { int i, r;
+ { int i;
    char segname[10];
 
    if (NULL == shared_gt) return(SHARED_NOTINIT);       /* not initialized */
@@ -907,11 +910,11 @@ int     smem_remove(char *filename)
    return(smem_close(h));                       /* detach segment (this will delete it) */
  }
 
-int     smem_size(int driverhandle, OFF_T *size)
+int     smem_size(int driverhandle, LONGLONG *size)
  {
    if (NULL == size) return(SHARED_NULPTR);
    if (shared_check_locked_index(driverhandle)) return(SHARED_INVALID);
-   *size = (OFF_T) (shared_gt[driverhandle].size - sizeof(DAL_SHM_SEGHEAD));
+   *size = (LONGLONG) (shared_gt[driverhandle].size - sizeof(DAL_SHM_SEGHEAD));
    return(0);
  }
 
@@ -921,7 +924,7 @@ int     smem_flush(int driverhandle)
    return(0);
  }
 
-int     smem_seek(int driverhandle, OFF_T offset)
+int     smem_seek(int driverhandle, LONGLONG offset)
  {
    if (offset < 0) return(SHARED_BADARG);
    if (shared_check_locked_index(driverhandle)) return(SHARED_INVALID);

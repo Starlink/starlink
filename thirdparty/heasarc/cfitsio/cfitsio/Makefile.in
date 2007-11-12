@@ -21,8 +21,13 @@
 # testprog targets. See also changes and comments in configure.in
 #
 
-CFITSIO_LIB =	@CFITSIO_PREFIX@/lib
-CFITSIO_INCLUDE =	@CFITSIO_PREFIX@/include
+prefix		= @prefix@
+exec_prefix	= @exec_prefix@
+CFITSIO_PREFIX	= $(prefix)
+CFITSIO_LIB	= $(exec_prefix)/lib
+CFITSIO_INCLUDE	= $(prefix)/include
+INSTALL_DIRS	= @INSTALL_ROOT@ ${CFITSIO_LIB} ${CFITSIO_LIB}/pkgconfig ${CFITSIO_INCLUDE}
+
 
 SHELL =		/bin/sh
 RANLIB =	@RANLIB@
@@ -43,8 +48,8 @@ SHLIB_SUFFIX =	@SHLIB_SUFFIX@
 
 
 CORE_SOURCES = 	buffers.c cfileio.c checksum.c compress.c drvrfile.c drvrmem.c \
-		drvrnet.c editcol.c edithdu.c eval_l.c eval_y.c \
-		eval_f.c fitscore.c getcol.c getcolb.c getcold.c getcole.c \
+		drvrnet.c drvrgsiftp.c editcol.c edithdu.c eval_l.c \
+		eval_y.c eval_f.c fitscore.c getcol.c getcolb.c getcold.c getcole.c \
 		getcoli.c getcolj.c getcolk.c getcoll.c getcols.c getcolsb.c \
 		getcoluk.c getcolui.c getcoluj.c getkey.c group.c grparser.c \
 		histo.c iraffits.c \
@@ -52,7 +57,7 @@ CORE_SOURCES = 	buffers.c cfileio.c checksum.c compress.c drvrfile.c drvrmem.c \
 		putcolj.c putcolk.c putcoluk.c putcoll.c putcols.c putcolsb.c \
 		putcolu.c putcolui.c putcoluj.c putkey.c region.c scalnull.c \
 		swapproc.c wcssub.c wcsutil.c imcompress.c quantize.c ricecomp.c \
-		pliocomp.c
+		pliocomp.c fits_hcompress.c fits_hdecompress.c
 
 # drvrsmem.o may get built here
 OPTIONAL_OBJECTS = @OPTIONAL_OBJECTS@
@@ -90,20 +95,27 @@ shared: libcfitsio${SHLIB_SUFFIX}
 libcfitsio${SHLIB_SUFFIX}: ${OBJECTS}
 		${SHLIB_LD} -o $@ ${OBJECTS}
 
-install:	libcfitsio.a ${CFITSIO_LIB} ${CFITSIO_INCLUDE}
+install:	libcfitsio.a $(INSTALL_DIRS)
 		@if [ -f libcfitsio.a ]; then \
 			/bin/mv libcfitsio.a ${CFITSIO_LIB}; \
 		fi; \
 		if [ -f libcfitsio${SHLIB_SUFFIX} ]; then \
 			/bin/mv libcfitsio${SHLIB_SUFFIX} ${CFITSIO_LIB}; \
 		fi; \
-		/bin/cp fitsio.h fitsio2.h longnam.h drvrsmem.h ${CFITSIO_INCLUDE}/
+		/bin/cp fitsio.h fitsio2.h longnam.h drvrsmem.h ${CFITSIO_INCLUDE}/; \
+		/bin/cp cfitsio.pc ${CFITSIO_LIB}/pkgconfig
 
 smem:		smem.o libcfitsio.a ${OBJECTS}
 		${CC} $(CFLAGS) $(DEFS) -o smem smem.o -L. -lcfitsio -lm
 
 testprog:	testprog.o libcfitsio.a ${OBJECTS}
 		${CC} $(CFLAGS) $(DEFS) -o testprog testprog.o -L. -lcfitsio -lm ${LIBS}
+
+fpack:		fpack.o fpackutil.o libcfitsio.a ${OBJECTS}
+		${CC} $(CFLAGS) $(DEFS) -o fpack fpack.o fpackutil.o -L. -lcfitsio -lm ${LIBS}
+
+funpack:	funpack.o fpackutil.o libcfitsio.a ${OBJECTS}
+		${CC} $(CFLAGS) $(DEFS) -o funpack funpack.o fpackutil.o -L. -lcfitsio -lm ${LIBS}
 
 fitscopy:	fitscopy.o libcfitsio.a ${OBJECTS}
 		${CC} $(CFLAGS) $(DEFS) -o fitscopy fitscopy.o -L. -lcfitsio -lm ${LIBS}
@@ -134,7 +146,7 @@ clean:
 			smem testprog y.output
 
 distclean:	clean
-	-	/bin/rm -f Makefile config.*
+	-	/bin/rm -f Makefile cfitsio.pc config.* configure.lineno
 
 # Make target which outputs the list of the .o contained in the cfitsio lib
 # usefull to build a single big shared library containing Tcl/Tk and other
@@ -143,9 +155,12 @@ distclean:	clean
 cfitsioLibObjs:
 	@echo ${CORE_OBJECTS}
 
+cfitsioLibSrcs:
+	@echo ${SOURCES}
+
 # This target actually builds the objects needed for the lib in the above
 # case
 objs: ${CORE_OBJECTS}
 
-${CFITSIO_LIB} ${CFITSIO_INCLUDE}:
+$(INSTALL_DIRS):
 	@if [ ! -d $@ ]; then mkdir $@; fi

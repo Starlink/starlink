@@ -10,14 +10,11 @@
 #include <stdlib.h>
 #include "fitsio2.h"
 
-/* declare variable for passing large firstelem values between routines */
-extern OFF_T large_first_elem_val;
-
 /*--------------------------------------------------------------------------*/
 int ffppruj( fitsfile *fptr,  /* I - FITS file pointer                       */
             long  group,     /* I - group to write(1 = 1st group)           */
-            long  firstelem, /* I - first vector element to write(1 = 1st)  */
-            long  nelem,     /* I - number of values to write               */
+            LONGLONG  firstelem, /* I - first vector element to write(1 = 1st)  */
+            LONGLONG  nelem,     /* I - number of values to write               */
    unsigned long  *array,    /* I - array of values that are written        */
             int  *status)    /* IO - error status                           */
 /*
@@ -40,11 +37,7 @@ int ffppruj( fitsfile *fptr,  /* I - FITS file pointer                       */
     {
         /* this is a compressed image in a binary table */
 
-        /* use the OFF_T variable to pass the first element value */
-        if (firstelem != USE_LARGE_VALUE)
-            large_first_elem_val = firstelem;
-
-        fits_write_compressed_pixels(fptr, TULONG, large_first_elem_val, nelem,
+        fits_write_compressed_pixels(fptr, TULONG, firstelem, nelem,
             0, array, &nullvalue, status);
         return(*status);
     }
@@ -57,8 +50,8 @@ int ffppruj( fitsfile *fptr,  /* I - FITS file pointer                       */
 /*--------------------------------------------------------------------------*/
 int ffppnuj( fitsfile *fptr,  /* I - FITS file pointer                       */
             long  group,     /* I - group to write(1 = 1st group)           */
-            long  firstelem, /* I - first vector element to write(1 = 1st)  */
-            long  nelem,     /* I - number of values to write               */
+            LONGLONG  firstelem, /* I - first vector element to write(1 = 1st)  */
+            LONGLONG  nelem,     /* I - number of values to write               */
    unsigned long  *array,    /* I - array of values that are written        */
    unsigned long  nulval,    /* I - undefined pixel value                   */
             int  *status)    /* IO - error status                           */
@@ -84,12 +77,8 @@ int ffppnuj( fitsfile *fptr,  /* I - FITS file pointer                       */
     {
         /* this is a compressed image in a binary table */
 
-        /* use the OFF_T variable to pass the first element value */
-        if (firstelem != USE_LARGE_VALUE)
-            large_first_elem_val = firstelem;
-
         nullvalue = nulval;  /* set local variable */
-        fits_write_compressed_pixels(fptr, TULONG, large_first_elem_val, nelem,
+        fits_write_compressed_pixels(fptr, TULONG, firstelem, nelem,
             1, array, &nullvalue, status);
         return(*status);
     }
@@ -102,9 +91,9 @@ int ffppnuj( fitsfile *fptr,  /* I - FITS file pointer                       */
 /*--------------------------------------------------------------------------*/
 int ffp2duj(fitsfile *fptr,   /* I - FITS file pointer                    */
            long  group,      /* I - group to write(1 = 1st group)         */
-           long  ncols,      /* I - number of pixels in each row of array */
-           long  naxis1,     /* I - FITS image NAXIS1 value               */
-           long  naxis2,     /* I - FITS image NAXIS2 value               */
+           LONGLONG  ncols,      /* I - number of pixels in each row of array */
+           LONGLONG  naxis1,     /* I - FITS image NAXIS1 value               */
+           LONGLONG  naxis2,     /* I - FITS image NAXIS2 value               */
   unsigned long  *array,     /* I - array to be written                   */
            int  *status)     /* IO - error status                         */
 /*
@@ -122,11 +111,11 @@ int ffp2duj(fitsfile *fptr,   /* I - FITS file pointer                    */
 /*--------------------------------------------------------------------------*/
 int ffp3duj(fitsfile *fptr,   /* I - FITS file pointer                    */
            long  group,      /* I - group to write(1 = 1st group)         */
-           long  ncols,      /* I - number of pixels in each row of array */
-           long  nrows,      /* I - number of rows in each plane of array */
-           long  naxis1,     /* I - FITS image NAXIS1 value               */
-           long  naxis2,     /* I - FITS image NAXIS2 value               */
-           long  naxis3,     /* I - FITS image NAXIS3 value               */
+           LONGLONG  ncols,      /* I - number of pixels in each row of array */
+           LONGLONG  nrows,      /* I - number of rows in each plane of array */
+           LONGLONG  naxis1,     /* I - FITS image NAXIS1 value               */
+           LONGLONG  naxis2,     /* I - FITS image NAXIS2 value               */
+           LONGLONG  naxis3,     /* I - FITS image NAXIS3 value               */
   unsigned long  *array,     /* I - array to be written                   */
            int  *status)     /* IO - error status                         */
 /*
@@ -135,8 +124,9 @@ int ffp3duj(fitsfile *fptr,   /* I - FITS file pointer                    */
   FITS array is not the same as the array being written).
 */
 {
-    long tablerow, nfits, narray, ii, jj;
+    long tablerow, ii, jj;
     long fpixel[3]= {1,1,1}, lpixel[3];
+    LONGLONG nfits, narray;
     /*
       the primary array is represented as a binary table:
       each group of the primary array is a row in the table,
@@ -147,9 +137,9 @@ int ffp3duj(fitsfile *fptr,   /* I - FITS file pointer                    */
     if (fits_is_compressed_image(fptr, status))
     {
         /* this is a compressed image in a binary table */
-        lpixel[0] = ncols;
-        lpixel[1] = nrows;
-        lpixel[2] = naxis3;
+        lpixel[0] = (long) ncols;
+        lpixel[1] = (long) nrows;
+        lpixel[2] = (long) naxis3;
        
         fits_write_compressed_img(fptr, TULONG, fpixel, lpixel,
             0,  array, NULL, status);
@@ -209,11 +199,11 @@ int ffpssuj(fitsfile *fptr,   /* I - FITS file pointer                       */
 */
 {
     long tablerow;
-    long fpix[7], irange[7], dimen[7], astart, pstart;
-    long off2, off3, off4, off5, off6, off7;
-    long st10, st20, st30, st40, st50, st60, st70;
-    long st1, st2, st3, st4, st5, st6, st7;
-    long ii, i1, i2, i3, i4, i5, i6, i7;
+    LONGLONG fpix[7], dimen[7], astart, pstart;
+    LONGLONG off2, off3, off4, off5, off6, off7;
+    LONGLONG st10, st20, st30, st40, st50, st60, st70;
+    LONGLONG st1, st2, st3, st4, st5, st6, st7;
+    long ii, i1, i2, i3, i4, i5, i6, i7, irange[7];
 
     if (*status > 0)
         return(*status);
@@ -288,6 +278,7 @@ int ffpssuj(fitsfile *fptr,   /* I - FITS file pointer                       */
         for (i3 = 0; i3 < irange[2]; i3++)
         {
          pstart = st1 + st2 + st3 + st4 + st5 + st6 + st7;
+
          for (i2 = 0; i2 < irange[1]; i2++)
          {
            if (ffpcluj(fptr, 2, tablerow, pstart, i1, &array[astart],
@@ -344,9 +335,9 @@ int ffpgpuj( fitsfile *fptr,   /* I - FITS file pointer                      */
 /*--------------------------------------------------------------------------*/
 int ffpcluj( fitsfile *fptr,  /* I - FITS file pointer                       */
             int  colnum,     /* I - number of column to write (1 = 1st col) */
-            long  firstrow,  /* I - first row to write (1 = 1st row)        */
-            long  firstelem, /* I - first vector element to write (1 = 1st) */
-            long  nelem,     /* I - number of values to write               */
+            LONGLONG  firstrow,  /* I - first row to write (1 = 1st row)        */
+            LONGLONG  firstelem, /* I - first vector element to write (1 = 1st) */
+            LONGLONG  nelem,     /* I - number of values to write               */
    unsigned long  *array,    /* I - array of values to write                */
             int  *status)    /* IO - error status                           */
 /*
@@ -364,9 +355,9 @@ int ffpcluj( fitsfile *fptr,  /* I - FITS file pointer                       */
 */
 {
     int tcode, maxelem, hdutype;
-    long twidth, incre, rownum, remain, next, ntodo;
-    long tnull;
-    OFF_T repeat, startpos, elemnum, large_elem, wrtptr, rowlen;
+    long twidth, incre;
+    long ntodo;
+    LONGLONG repeat, startpos, elemnum, wrtptr, rowlen, rownum, remain, next, tnull;
     double scale, zero;
     char tform[20], cform[20];
     char message[FLEN_ERRMSG];
@@ -381,15 +372,10 @@ int ffpcluj( fitsfile *fptr,  /* I - FITS file pointer                       */
 
     buffer = cbuff;
 
-    if (firstelem == USE_LARGE_VALUE)
-        large_elem = large_first_elem_val;
-    else
-        large_elem = firstelem;
-
     /*---------------------------------------------------*/
     /*  Check input and get parameters about the column: */
     /*---------------------------------------------------*/
-    if (ffgcpr( fptr, colnum, firstrow, large_elem, nelem, 1, &scale, &zero,
+    if (ffgcprll( fptr, colnum, firstrow, firstelem, nelem, 1, &scale, &zero,
         tform, &twidth, &tcode, &maxelem, &startpos,  &elemnum, &incre,
         &repeat, &rowlen, &hdutype, &tnull, snull, status) > 0)
         return(*status);
@@ -413,10 +399,10 @@ int ffpcluj( fitsfile *fptr,  /* I - FITS file pointer                       */
            will fit in the buffer space or to the number of pixels that remain
            in the current vector, which ever is smaller.
         */
-        ntodo = minvalue(remain, maxelem);      
-        ntodo = minvalue(ntodo, (repeat - elemnum));
+        ntodo = (long) minvalue(remain, maxelem);      
+        ntodo = (long) minvalue(ntodo, (repeat - elemnum));
 
-        wrtptr = startpos + ((OFF_T)rownum * rowlen) + (elemnum * incre);
+        wrtptr = startpos + ((LONGLONG)rownum * rowlen) + (elemnum * incre);
 
         ffmbyt(fptr, wrtptr, IGNORE_EOF, status); /* move to write position */
 
@@ -498,8 +484,8 @@ int ffpcluj( fitsfile *fptr,  /* I - FITS file pointer                       */
         if (*status > 0)  /* test for error during previous write operation */
         {
           sprintf(message,
-          "Error writing elements %ld thru %ld of input data array (ffpcluj).",
-              next+1, next+ntodo);
+          "Error writing elements %.0f thru %.0f of input data array (ffpcluj).",
+              (double) (next+1), (double) (next+ntodo));
           ffpmsg(message);
           return(*status);
         }
@@ -536,9 +522,9 @@ int ffpcluj( fitsfile *fptr,  /* I - FITS file pointer                       */
 /*--------------------------------------------------------------------------*/
 int ffpcnuj( fitsfile *fptr,  /* I - FITS file pointer                       */
             int  colnum,     /* I - number of column to write (1 = 1st col) */
-            long  firstrow,  /* I - first row to write (1 = 1st row)        */
-            long  firstelem, /* I - first vector element to write (1 = 1st) */
-            long  nelem,     /* I - number of values to write               */
+            LONGLONG  firstrow,  /* I - first row to write (1 = 1st row)        */
+            LONGLONG  firstelem, /* I - first vector element to write (1 = 1st) */
+            LONGLONG  nelem,     /* I - number of values to write               */
    unsigned long  *array,    /* I - array of values to write                */
    unsigned long   nulvalue, /* I - value used to flag undefined pixels     */
             int  *status)    /* IO - error status                           */
@@ -552,8 +538,9 @@ int ffpcnuj( fitsfile *fptr,  /* I - FITS file pointer                       */
 */
 {
     tcolumn *colptr;
-    long  ngood = 0, nbad = 0, ii, fstrow;
-    OFF_T large_elem, repeat, first, fstelm;
+    long  ngood = 0, nbad = 0, ii;
+    LONGLONG repeat, first, fstelm, fstrow;
+    int tcode, overflow = 0;
 
     if (*status > 0)
         return(*status);
@@ -572,18 +559,30 @@ int ffpcnuj( fitsfile *fptr,  /* I - FITS file pointer                       */
     colptr  = (fptr->Fptr)->tableptr;   /* point to first column */
     colptr += (colnum - 1);     /* offset to correct column structure */
 
-    repeat = colptr->trepeat;  /* repeat count for this column */
+    tcode  = colptr->tdatatype;
 
-    if (firstelem == USE_LARGE_VALUE)
-        large_elem = large_first_elem_val;
+    if (tcode > 0)
+       repeat = colptr->trepeat;  /* repeat count for this column */
     else
-        large_elem = firstelem;
+       repeat = firstelem -1 + nelem;  /* variable length arrays */
 
-    /* hereafter, pass first element parameter via global variable */
-    firstelem = USE_LARGE_VALUE;
+    /* if variable length array, first write the whole input vector, 
+       then go back and fill in the nulls */
+    if (tcode < 0) {
+      if (ffpcluj(fptr, colnum, firstrow, firstelem, nelem, array, status) > 0) {
+        if (*status == NUM_OVERFLOW) 
+	{
+	  /* ignore overflows, which are possibly the null pixel values */
+	  /*  overflow = 1;   */
+	  *status = 0;
+	} else { 
+          return(*status);
+	}
+      }
+    }
 
     /* absolute element number in the column */
-    first = (firstrow - 1) * repeat + large_elem;
+    first = (firstrow - 1) * repeat + firstelem;
 
     for (ii = 0; ii < nelem; ii++)
     {
@@ -594,9 +593,8 @@ int ffpcnuj( fitsfile *fptr,  /* I - FITS file pointer                       */
             fstelm = ii - nbad + first;  /* absolute element number */
             fstrow = (fstelm - 1) / repeat + 1;  /* starting row number */
             fstelm = fstelm - (fstrow - 1) * repeat;  /* relative number */
-            large_first_elem_val = fstelm;
 
-            if (ffpclu(fptr, colnum, fstrow, firstelem, nbad, status) > 0)
+            if (ffpclu(fptr, colnum, fstrow, fstelm, nbad, status) > 0)
                 return(*status);
 
             nbad=0;
@@ -611,12 +609,19 @@ int ffpcnuj( fitsfile *fptr,  /* I - FITS file pointer                       */
             fstelm = ii - ngood + first;  /* absolute element number */
             fstrow = (fstelm - 1) / repeat + 1;  /* starting row number */
             fstelm = fstelm - (fstrow - 1) * repeat;  /* relative number */
-            large_first_elem_val = fstelm;
 
-            if (ffpcluj(fptr, colnum, fstrow, firstelem,ngood, &array[ii-ngood],
-                status) > 0)
-                return(*status);
-
+            if (tcode > 0) {  /* variable length arrays have already been written */
+              if (ffpcluj(fptr, colnum, fstrow, fstelm, ngood, &array[ii-ngood],
+                status) > 0) {
+		if (*status == NUM_OVERFLOW) 
+		{
+		  overflow = 1;
+		  *status = 0;
+		} else { 
+                  return(*status);
+		}
+	      }
+	    }
             ngood=0;
          }
 
@@ -631,18 +636,24 @@ int ffpcnuj( fitsfile *fptr,  /* I - FITS file pointer                       */
       fstelm = ii - ngood + first;  /* absolute element number */
       fstrow = (fstelm - 1) / repeat + 1;  /* starting row number */
       fstelm = fstelm - (fstrow - 1) * repeat;  /* relative number */
-      large_first_elem_val = fstelm;
 
-      ffpcluj(fptr, colnum, fstrow, firstelem, ngood, &array[ii-ngood], status);
+      if (tcode > 0) {  /* variable length arrays have already been written */
+        ffpcluj(fptr, colnum, fstrow, fstelm, ngood, &array[ii-ngood], status);
+      }
     }
     else if (nbad) /* write last string of bad pixels */
     {
       fstelm = ii - nbad + first;  /* absolute element number */
       fstrow = (fstelm - 1) / repeat + 1;  /* starting row number */
       fstelm = fstelm - (fstrow - 1) * repeat;  /* relative number */
-      large_first_elem_val = fstelm;
 
-      ffpclu(fptr, colnum, fstrow, firstelem, nbad, status);
+      ffpclu(fptr, colnum, fstrow, fstelm, nbad, status);
+    }
+
+    if (*status <= 0) {
+      if (overflow) {
+        *status = NUM_OVERFLOW;
+      }
     }
 
     return(*status);
@@ -672,7 +683,7 @@ int ffu4fi1(unsigned long *input,  /* I - array of values to be converted  */
                 output[ii] = UCHAR_MAX;
             }
             else
-                output[ii] = input[ii];
+                output[ii] = (unsigned char) input[ii];
         }
     }
     else
@@ -722,7 +733,7 @@ int ffu4fi2(unsigned long *input, /* I - array of values to be converted */
                 output[ii] = SHRT_MAX;
             }
             else
-                output[ii] = input[ii];
+                output[ii] = (short) input[ii];
         }
     }
     else
@@ -827,74 +838,6 @@ int ffu4fi8(unsigned long *input,  /* I - array of values to be converted  */
   Do datatype conversion and scaling if required
 */
 {
-#if (LONGSIZE == 32) && (! defined HAVE_LONGLONG)
-
-/* don't have a native 8-byte integer, so have to construct the */
-/* 2 equivalent 4-byte integers have the same bit pattern */
-
-    unsigned long *uoutput;
-    long ii, jj, kk, temp;
-    double dvalue;
-
-    uoutput = (unsigned long *) output;
-
-#if BYTESWAPPED  /* jj points to the most significant part of the 8-byte int */
-    jj = 1;
-    kk = 0;
-#else
-    jj = 0;
-    kk = 1;
-#endif
-
-    if (scale == 1. && zero == 0.)
-    {       
-        for (ii = 0; ii < ntodo; ii++, jj += 2, kk += 2)
-        {
-                output[jj] = 0;
-                uoutput[kk] = input[ii];
-        }
-    }
-    else
-    {
-        for (ii = 0; ii < ntodo; ii++, jj += 2, kk += 2)
-        {
-            dvalue = (input[ii] - zero) / scale;
-
-            if (dvalue < DLONGLONG_MIN)
-            {
-                *status = OVERFLOW_ERR;
-                output[jj] = LONG_MIN;
-                output[kk] = 0;
-            }
-            else if (dvalue > DLONGLONG_MAX)
-            {
-                *status = OVERFLOW_ERR;
-                output[jj] = LONG_MAX;
-                output[kk] = -1;
-            }
-            else
-            {
-                if (dvalue < 0)
-                {
-                   temp = (dvalue + 1.) / 4294967296. - 1.;
-                   output[jj] = temp;
-                   uoutput[kk] = 4294967296.  + 
-                      (dvalue - (double) (temp + 1) * 4294967296.);
-                }
-                else
-                {
-                   temp = dvalue / 4294967296.;
-                   output[jj] = temp;
-                   uoutput[kk] = dvalue - (double) temp * 4294967296.;
-                }
-            }
-        }
-    }
-
-#else
-
-/* this is the much simpler case where the native 8-byte integer exists */
-
     long ii;
     double dvalue;
 
@@ -928,9 +871,6 @@ int ffu4fi8(unsigned long *input,  /* I - array of values to be converted  */
             }
         }
     }
-
-#endif
-
     return(*status);
 }
 /*--------------------------------------------------------------------------*/
@@ -955,7 +895,7 @@ int ffu4fr4(unsigned long *input, /* I - array of values to be converted */
     else
     {
         for (ii = 0; ii < ntodo; ii++)
-            output[ii] = (input[ii] - zero) / scale;
+            output[ii] = (float) ((input[ii] - zero) / scale);
     }
     return(*status);
 }

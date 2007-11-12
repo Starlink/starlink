@@ -3,14 +3,6 @@
  
 #include "fitsio.h"
 
-/* Setting SUPPORT_64_BIT_INTEGERS to 1 will enable CFITSIO to read */
-/* and write images with BITPIX = 64 and binary table columns with  */
-/* TFORMn = 'K'.  Otherwise, setting SUPPORT_64_BIT_INTEGERS to 0   */
-/* will cause CFITSIO to not recognize these  non-standard 64-bit   */
-/* FITS datatypes.                                                  */
-
-#define SUPPORT_64BIT_INTEGERS 1
-
 /*
   If REPLACE_LINKS is defined, then whenever CFITSIO fails to open
   a file with write access because it is a soft link to a file that
@@ -36,22 +28,63 @@
 #define MINDIRECT 8640   /* minimum size for direct reads and writes */
                          /* MINDIRECT must have a value >= 8640 */
 
-#define NATIVE             0 /* a generic machine that uses IEEE formats */
-#define ULTRIX             1
-#define ALPHA_OSF          2
-#define VAXVMS             3
-#define ALPHAVMS           4
-#define IBMPC              5
-#define CRAY               6
-#define PC64BIT            7
+/*   it is useful to identify certain specific types of machines   */
+#define NATIVE             0 /* machine that uses non-byteswapped IEEE formats */
+#define OTHERTYPE          1  /* any other type of machine */
+#define VAXVMS             3  /* uses an odd floating point format */
+#define ALPHAVMS           4  /* uses an odd floating point format */
+#define IBMPC              5  /* used in drvrfile.c to work around a bug on PCs */
+#define CRAY               6  /* requires a special NaN test algorithm */
 
-#define GFLOAT             1
-#define IEEEFLOAT          2
+#define GFLOAT             1  /* used for VMS */
+#define IEEEFLOAT          2  /* used for VMS */
 
-/* the following are used to determine what type machine we are running on */
+/* ======================================================================= */
+/* The following logic is used to determine the type machine,              */
+/*  whether the bytes are swapped, and the number of bits in a long value  */
+/* ======================================================================= */
 
-/* the following block determines the size of longs on SGI IRIX machines */
-#if defined(_MIPS_SZLONG)
+/*   The following platforms have sizeof(long) == 8               */
+/*   This block of code should match a similar block in fitsio.h  */
+/*   and the block of code at the beginning of f77_wrap.h         */
+
+#if defined(__alpha) && ( defined(__unix__) || defined(__NetBSD__) )
+                                  /* old Dec Alpha platforms running OSF */
+#define BYTESWAPPED TRUE
+#define LONGSIZE 64
+
+#elif defined(__sparcv9)
+                               /*  SUN Solaris7 in 64-bit mode */
+#define BYTESWAPPED FALSE
+#define MACHINE NATIVE
+#define LONGSIZE 64   
+
+#elif defined(__ia64__)  || defined(__x86_64__)
+                  /*  Intel itanium 64-bit PC, or AMD opteron 64-bit PC */
+#define BYTESWAPPED TRUE
+#define LONGSIZE 64   
+
+#elif defined(_SX)             /* Nec SuperUx */
+
+#define BYTESWAPPED FALSE
+#define MACHINE NATIVE
+#define LONGSIZE 64
+
+#elif defined(__powerpc64__) || defined(__64BIT__) /* IBM 64-bit AIX powerpc*/
+                              /* could also test for __ppc64__ or __PPC64 */
+#define BYTESWAPPED FALSE
+#define MACHINE NATIVE
+#define LONGSIZE 64   
+
+#elif defined(_MIPS_SZLONG)
+
+#  if defined(MIPSEL)
+#    define BYTESWAPPED TRUE
+#  else
+#    define BYTESWAPPED FALSE
+#    define MACHINE NATIVE
+#  endif
+
 #  if _MIPS_SZLONG == 32
 #    define LONGSIZE 32
 #  elif _MIPS_SZLONG == 64
@@ -59,9 +92,11 @@
 #  else
 #    error "can't handle long size given by _MIPS_SZLONG"
 #  endif
-#endif
 
-#if defined(vax) && defined(VMS)
+/* ============================================================== */
+/*  the following are all 32-bit byteswapped platforms            */
+
+#elif defined(vax) && defined(VMS)
  
 #define MACHINE VAXVMS
 #define BYTESWAPPED TRUE
@@ -87,64 +122,50 @@
 #define BYTESWAPPED TRUE
 #define FLOATTYPE IEEEFLOAT
 
-#endif
-
-#elif defined(__alpha) && ( defined(__unix__) || defined(__NetBSD__) )
- 
-#define MACHINE ALPHA_OSF
-#define BYTESWAPPED TRUE
-#define LONGSIZE 64
+#endif  /* end of alpha VMS case */
 
 #elif defined(ultrix) && defined(unix)
- 
-#define MACHINE ULTRIX
+ /* old Dec ultrix machines */
 #define BYTESWAPPED TRUE
  
-#elif defined(__sparcv9)
+#elif defined(__i386) || defined(__i386__) || defined(__i486__) || defined(__i586__) \
+  || defined(_MSC_VER) || defined(__BORLANDC__) || defined(__TURBOC__) \
+  || defined(_NI_mswin_) || defined(__EMX__)
 
-/*  SUN Solaris7 in 64-bit mode */
-#define BYTESWAPPED FALSE
-#define MACHINE NATIVE
-#define LONGSIZE 64   
-
-#elif defined(__i386) || defined(__i386__) || defined(__i486__) || defined(__i586__) 
-
-/*  IBM PC */
+/*  generic 32-bit IBM PC */
 #define MACHINE IBMPC
 #define BYTESWAPPED TRUE
 
-#elif defined(_MSC_VER) || defined(__BORLANDC__) || defined(__TURBOC__)
+#elif defined(__arm__)
 
-/*  IBM PC running DOS or Windows */
-#define MACHINE IBMPC       
+/* This assumes all ARM are little endian.  In the future, it might be  */
+/* necessary to use  "if defined(__ARMEL__)"  to distinguish little from big. */
+/* (__ARMEL__ would be defined on little-endian, but not on big-endian). */
+
 #define BYTESWAPPED TRUE
-
-#elif defined(_NI_mswin_) || defined(__EMX__)
-
-/*  LabWindows/CVI with Windows, or PC runnin OS/2  */
-#define MACHINE IBMPC       
-#define BYTESWAPPED TRUE
-
-#elif defined(__ia64__)  || defined(__x86_64__)
-
-/*  Intel itanium 64-bit PC, or AMD opteron 64-bit PC */
-#define BYTESWAPPED TRUE
-#define MACHINE PC64BIT
-#define LONGSIZE 64   
-
+ 
 #else
 
-/*  assume machine uses the same IEEE formats as used in FITS files */
+/*  assume all other machine uses the same IEEE formats as used in FITS files */
+/*  e.g., Macs fall into this category  */
+
 #define MACHINE NATIVE
 #define BYTESWAPPED FALSE
  
+#endif
+
+#ifndef MACHINE
+#define MACHINE  OTHERTYPE
 #endif
 
 /*  assume longs are 4 bytes long, unless previously set otherwise */
 #ifndef LONGSIZE
 #define LONGSIZE 32
 #endif
-  
+
+/*       end of block that determine long size and byte swapping        */ 
+/* ==================================================================== */
+ 
 #define IGNORE_EOF 1
 #define REPORT_EOF 0
 #define DATA_UNDEFINED -1
@@ -220,8 +241,8 @@
 #endif
 
 #define DULONG_MIN -0.49   /* min double value that fits in an unsigned long */
-#define DLONGLONG_MAX  9.2233720368547752E18 /* max double value  longlong */
-#define DLONGLONG_MIN -9.2233720368547752E18 /* min double value  longlong */
+#define DLONGLONG_MAX  9.2233720368547755807E18 /* max double value  longlong */
+#define DLONGLONG_MIN -9.2233720368547755808E18 /* min double value  longlong */
 #define DUINT_MAX 4294967295.49 /* max dbl that fits in a unsigned 4-byte int */
 #define DUINT_MIN -0.49   /* min dbl that fits in an unsigned 4-byte int */
 #define DINT_MAX  2147483647.49 /* max double value that fits in a 4-byte int */
@@ -263,23 +284,18 @@
 #define LONGLONG_MAX _I64_MAX
 #define LONGLONG_MIN _I64_MIN
 
-#elif defined(HAVE_LONGLONG)
-/* compiler has a 'long long' or equivalent type */
-#define LONGLONG_MAX  9223372036854775807LL /* max 64-bit integer */
-#define LONGLONG_MIN (-LONGLONG_MAX -1LL)   /* min 64-bit integer */
-
 #elif (LONGSIZE == 64)
-/* Compiler may not have a 'long long' type, but sizeof(long) = 64 */
+/* sizeof(long) = 64 */
 #define LONGLONG_MAX  9223372036854775807L /* max 64-bit integer */
 #define LONGLONG_MIN (-LONGLONG_MAX -1L)   /* min 64-bit integer */
 
 #else
 /*  define a default value, even if it is never used */
-#define LONGLONG_MAX  LONG_MAX 
-#define LONGLONG_MIN LONG_MIN 
+#define LONGLONG_MAX  9223372036854775807LL /* max 64-bit integer */
+#define LONGLONG_MIN (-LONGLONG_MAX -1LL)   /* min 64-bit integer */
+
 #endif
 #endif  /* end of ndef LONGLONG_MAX section */
-
 
 #define COMPRESS_NULL_VALUE -2147483647
 
@@ -290,7 +306,7 @@ void ffcdsp(char *tform, char *cform);
 void ffswap2(short *values, long nvalues);
 void ffswap4(INT32BIT *values, long nvalues);
 void ffswap8(double *values, long nvalues);
-int ffi2c(long ival, char *cval, int *status);
+int ffi2c(LONGLONG ival, char *cval, int *status);
 int ffl2c(int lval, char *cval, int *status);
 int ffs2c(char *instr, char *outstr, int *status);
 int ffr2f(float fval, int decim, char *cval, int *status);
@@ -298,6 +314,7 @@ int ffr2e(float fval, int decim, char *cval, int *status);
 int ffd2f(double dval, int decim, char *cval, int *status);
 int ffd2e(double dval, int decim, char *cval, int *status);
 int ffc2ii(char *cval, long *ival, int *status);
+int ffc2jj(char *cval, LONGLONG *ival, int *status);
 int ffc2ll(char *cval, int *lval, int *status);
 int ffc2rr(char *cval, float *fval, int *status);
 int ffc2dd(char *cval, double *dval, int *status);
@@ -305,24 +322,26 @@ int ffc2x(char *cval, char *dtype, long *ival, int *lval, char *sval,
           double *dval, int *status);
 int ffc2s(char *instr, char *outstr, int *status);
 int ffc2i(char *cval, long *ival, int *status);
+int ffc2j(char *cval, LONGLONG *ival, int *status);
 int ffc2r(char *cval, float *fval, int *status);
 int ffc2d(char *cval, double *dval, int *status);
 int ffc2l(char *cval, int *lval, int *status);
 void ffxmsg(int action, char *err_message);
 int ffgcnt(fitsfile *fptr, char *value, int *status);
 int ffgtkn(fitsfile *fptr, int numkey, char *keyname, long *value, int *status);
+int ffgtknjj(fitsfile *fptr, int numkey, char *keyname, LONGLONG *value, int *status);
 int fftkyn(fitsfile *fptr, int numkey, char *keyname, char *value, int *status);
 int ffgphd(fitsfile *fptr, int maxdim, int *simple, int *bitpix, int *naxis,
-        long naxes[], long *pcount, long *gcount, int *extend, double *bscale,
-          double *bzero, long *blank, int *nspace, int *status);
-int ffgttb(fitsfile *fptr, long *rowlen, long *nrows, long *pcount,
+        LONGLONG naxes[], long *pcount, long *gcount, int *extend, double *bscale,
+          double *bzero, LONGLONG *blank, int *nspace, int *status);
+int ffgttb(fitsfile *fptr, LONGLONG *rowlen, LONGLONG *nrows, LONGLONG *pcount,
           long *tfield, int *status);
  
 int ffmkey(fitsfile *fptr, char *card, int *status);
  
-int ffmbyt(fitsfile *fptr, OFF_T bytpos, int ignore_err, int *status);
-int ffgbyt(fitsfile *fptr, long nbytes, void *buffer, int *status);
-int ffpbyt(fitsfile *fptr, long nbytes, void *buffer, int *status);
+/*  ffmbyt has been moved to fitsio.h */
+int ffgbyt(fitsfile *fptr, LONGLONG nbytes, void *buffer, int *status);
+int ffpbyt(fitsfile *fptr, LONGLONG nbytes, void *buffer, int *status);
 int ffgbytoff(fitsfile *fptr, long gsize, long ngroups, long offset, 
            void *buffer, int *status);
 int ffpbytoff(fitsfile *fptr, long gsize, long ngroups, long offset,
@@ -351,9 +370,6 @@ int ffwritehisto(long totaln, long offset, long firstn, long nvalues,
              int narrays, iteratorCol *imagepars, void *userPointer);
 int ffcalchist(long totalrows, long offset, long firstrow, long nrows,
              int ncols, iteratorCol *colpars, void *userPointer);
-int fits_copy_image_cell(fitsfile **fptr, char *outfile, char *colname,
-           long rownum, int *status);
-int fits_copy_image_keywords(fitsfile *infptr, fitsfile *outfptr, int *status);
 int ffrhdu(fitsfile *fptr, int *hdutype, int *status);
 int ffpinit(fitsfile *fptr, int *status);
 int ffainit(fitsfile *fptr, int *status);
@@ -365,70 +381,70 @@ int ffuptf(fitsfile *fptr, int *status);
 
 int ffdblk(fitsfile *fptr, long nblocks, int *status);
 int ffgext(fitsfile *fptr, int moveto, int *exttype, int *status);
-int ffgtbc(fitsfile *fptr, long *totalwidth, int *status);
+int ffgtbc(fitsfile *fptr, LONGLONG *totalwidth, int *status);
 int ffgtbp(fitsfile *fptr, char *name, char *value, int *status);
 int ffiblk(fitsfile *fptr, long nblock, int headdata, int *status);
-int ffshft(fitsfile *fptr, OFF_T firstbyte, OFF_T nbytes, OFF_T nshift,
+int ffshft(fitsfile *fptr, LONGLONG firstbyte, LONGLONG nbytes, LONGLONG nshift,
     int *status);
  
-int ffgcpr(fitsfile *fptr, int colnum, long firstrow, OFF_T firstelem,
-           long nelem, int writemode, double *scale, double *zero, char *tform,
-           long *twidth, int *tcode, int *maxelem, OFF_T *startpos,
-           OFF_T *elemnum, long *incre, OFF_T *repeat, OFF_T *rowlen,
-           int *hdutype, long *tnull, char *snull, int *status);
- 
+ int ffgcprll(fitsfile *fptr, int colnum, LONGLONG firstrow, LONGLONG firstelem,
+           LONGLONG nelem, int writemode, double *scale, double *zero, char *tform,
+           long *twidth, int *tcode, int *maxelem, LONGLONG *startpos,
+           LONGLONG *elemnum, long *incre, LONGLONG *repeat, LONGLONG *rowlen,
+           int *hdutype, LONGLONG *tnull, char *snull, int *status);
+	   
 int ffflushx(FITSfile *fptr);
-int ffseek(FITSfile *fptr, OFF_T position);
+int ffseek(FITSfile *fptr, LONGLONG position);
 int ffread(FITSfile *fptr, long nbytes, void *buffer,
             int *status);
 int ffwrite(FITSfile *fptr, long nbytes, void *buffer,
             int *status);
-int fftrun(fitsfile *fptr, OFF_T filesize, int *status);
+int fftrun(fitsfile *fptr, LONGLONG filesize, int *status);
 
-int ffpcluc(fitsfile *fptr, int colnum, long firstrow, long firstelem, long
-           nelem, int *status);
+int ffpcluc(fitsfile *fptr, int colnum, LONGLONG firstrow, LONGLONG firstelem,
+           LONGLONG nelem, int *status);
 	   
-int ffgcll(fitsfile *fptr, int colnum, long firstrow, OFF_T firstelem, long
-           nelem, int nultyp, char nulval, char *array, char *nularray,
+int ffgcll(fitsfile *fptr, int colnum, LONGLONG firstrow, LONGLONG firstelem,
+           LONGLONG nelem, int nultyp, char nulval, char *array, char *nularray,
            int *anynul, int *status);
-int ffgcls(fitsfile *fptr, int colnum, long firstrow, long firstelem,
-           long nelem, int nultyp, char *nulval,
+int ffgcls(fitsfile *fptr, int colnum, LONGLONG firstrow, LONGLONG firstelem,
+           LONGLONG nelem, int nultyp, char *nulval,
            char **array, char *nularray, int *anynul, int  *status);
-int ffgcls2(fitsfile *fptr, int colnum, long firstrow, long firstelem,
-           long nelem, int nultyp, char *nulval,
+int ffgcls2(fitsfile *fptr, int colnum, LONGLONG firstrow, LONGLONG firstelem,
+           LONGLONG nelem, int nultyp, char *nulval,
            char **array, char *nularray, int *anynul, int  *status);
-int ffgclb(fitsfile *fptr, int colnum, long firstrow, OFF_T firstelem,
-           long nelem, long  elemincre, int nultyp, unsigned char nulval,
+int ffgclb(fitsfile *fptr, int colnum, LONGLONG firstrow, LONGLONG firstelem,
+           LONGLONG nelem, long  elemincre, int nultyp, unsigned char nulval,
            unsigned char *array, char *nularray, int *anynul, int  *status);
-int ffgclsb(fitsfile *fptr, int colnum, long firstrow, OFF_T firstelem,
-           long nelem, long  elemincre, int nultyp, signed char nulval,
+int ffgclsb(fitsfile *fptr, int colnum, LONGLONG firstrow, LONGLONG firstelem,
+           LONGLONG nelem, long  elemincre, int nultyp, signed char nulval,
            signed char *array, char *nularray, int *anynul, int  *status);
-int ffgclui(fitsfile *fptr, int colnum, long firstrow, OFF_T firstelem,
-           long nelem, long  elemincre, int nultyp, unsigned short nulval,
+int ffgclui(fitsfile *fptr, int colnum, LONGLONG firstrow, LONGLONG firstelem,
+           LONGLONG nelem, long  elemincre, int nultyp, unsigned short nulval,
            unsigned short *array, char *nularray, int *anynul, int  *status);
-int ffgcli(fitsfile *fptr, int colnum, long firstrow, OFF_T firstelem,
-           long nelem, long  elemincre, int nultyp, short nulval,
+int ffgcli(fitsfile *fptr, int colnum, LONGLONG firstrow, LONGLONG firstelem,
+           LONGLONG nelem, long  elemincre, int nultyp, short nulval,
            short *array, char *nularray, int *anynul, int  *status);
-int ffgcluj(fitsfile *fptr, int colnum, long firstrow, OFF_T firstelem,
-           long nelem, long elemincre, int nultyp, unsigned long nulval,
+int ffgcluj(fitsfile *fptr, int colnum, LONGLONG firstrow, LONGLONG firstelem,
+           LONGLONG nelem, long elemincre, int nultyp, unsigned long nulval,
            unsigned long *array, char *nularray, int *anynul, int  *status);
-int ffgcljj(fitsfile *fptr, int colnum, long firstrow, OFF_T firstelem,
-           long nelem, long elemincre, int nultyp, LONGLONG nulval, 
+int ffgcljj(fitsfile *fptr, int colnum, LONGLONG firstrow, LONGLONG firstelem,
+           LONGLONG nelem, long elemincre, int nultyp, LONGLONG nulval, 
            LONGLONG *array, char *nularray, int *anynul, int  *status);
-int ffgclj(fitsfile *fptr, int colnum, long firstrow, OFF_T firstelem,
-           long nelem, long elemincre, int nultyp, long nulval, long *array,
+int ffgclj(fitsfile *fptr, int colnum, LONGLONG firstrow, LONGLONG firstelem,
+           LONGLONG nelem, long elemincre, int nultyp, long nulval, long *array,
            char *nularray, int *anynul, int  *status);
-int ffgcluk(fitsfile *fptr, int colnum, long firstrow, OFF_T firstelem,
-           long nelem, long elemincre, int nultyp, unsigned int nulval,
+int ffgcluk(fitsfile *fptr, int colnum, LONGLONG firstrow, LONGLONG firstelem,
+           LONGLONG nelem, long elemincre, int nultyp, unsigned int nulval,
            unsigned int *array, char *nularray, int *anynul, int  *status);
-int ffgclk(fitsfile *fptr, int colnum, long firstrow, OFF_T firstelem,
-           long nelem, long elemincre, int nultyp, int nulval, int *array,
+int ffgclk(fitsfile *fptr, int colnum, LONGLONG firstrow, LONGLONG firstelem,
+           LONGLONG nelem, long elemincre, int nultyp, int nulval, int *array,
            char *nularray, int *anynul, int  *status);
-int ffgcle(fitsfile *fptr, int colnum, long firstrow, OFF_T firstelem,
-           long nelem, long elemincre, int nultyp,  float nulval, float *array,
+int ffgcle(fitsfile *fptr, int colnum, LONGLONG firstrow, LONGLONG firstelem,
+           LONGLONG nelem, long elemincre, int nultyp,  float nulval, float *array,
            char *nularray, int *anynul, int  *status);
-int ffgcld(fitsfile *fptr, int colnum, long firstrow, OFF_T firstelem,
-           long nelem, long elemincre, int nultyp, double nulval,
+int ffgcld(fitsfile *fptr, int colnum, LONGLONG firstrow, LONGLONG firstelem,
+           LONGLONG nelem, long elemincre, int nultyp, double nulval,
            double *array, char *nularray, int *anynul, int  *status);
  
 int ffpi1b(fitsfile *fptr, long nelem, long incre, unsigned char *buffer,
@@ -440,23 +456,23 @@ int ffpi8b(fitsfile *fptr, long nelem, long incre, long *buffer, int *status);
 int ffpr4b(fitsfile *fptr, long nelem, long incre, float *buffer, int *status);
 int ffpr8b(fitsfile *fptr, long nelem, long incre, double *buffer, int *status);
  
-int ffgi1b(fitsfile *fptr, OFF_T pos, long nelem, long incre,
+int ffgi1b(fitsfile *fptr, LONGLONG pos, long nelem, long incre,
           unsigned char *buffer, int *status);
-int ffgi2b(fitsfile *fptr, OFF_T pos, long nelem, long incre, short *buffer,
+int ffgi2b(fitsfile *fptr, LONGLONG pos, long nelem, long incre, short *buffer,
           int *status);
-int ffgi4b(fitsfile *fptr, OFF_T pos, long nelem, long incre, INT32BIT *buffer,
+int ffgi4b(fitsfile *fptr, LONGLONG pos, long nelem, long incre, INT32BIT *buffer,
           int *status);
-int ffgi8b(fitsfile *fptr, OFF_T pos, long nelem, long incre, long *buffer,
+int ffgi8b(fitsfile *fptr, LONGLONG pos, long nelem, long incre, long *buffer,
           int *status);
-int ffgr4b(fitsfile *fptr, OFF_T pos, long nelem, long incre, float *buffer,
+int ffgr4b(fitsfile *fptr, LONGLONG pos, long nelem, long incre, float *buffer,
           int *status);
-int ffgr8b(fitsfile *fptr, OFF_T pos, long nelem, long incre, double *buffer,
+int ffgr8b(fitsfile *fptr, LONGLONG pos, long nelem, long incre, double *buffer,
           int *status);
  
-int ffcins(fitsfile *fptr, long naxis1, long naxis2, long nbytes,
-           long bytepos, int *status);
-int ffcdel(fitsfile *fptr, long naxis1, long naxis2, long nbytes,
-           long bytepos, int *status);
+int ffcins(fitsfile *fptr, LONGLONG naxis1, LONGLONG naxis2, LONGLONG nbytes,
+           LONGLONG bytepos, int *status);
+int ffcdel(fitsfile *fptr, LONGLONG naxis1, LONGLONG naxis2, LONGLONG nbytes,
+           LONGLONG bytepos, int *status);
 int ffkshf(fitsfile *fptr, int firstcol, int tfields, int nshift, int *status);
  
 int fffi1i1(unsigned char *input, long ntodo, double scale, double zero,
@@ -469,7 +485,7 @@ int fffi4i1(INT32BIT *input, long ntodo, double scale, double zero,
             int nullcheck, INT32BIT tnull, unsigned char nullval, char *nullarray,
             int *anynull, unsigned char *output, int *status);
 int fffi8i1(LONGLONG *input, long ntodo, double scale, double zero,
-            int nullcheck, long tnull, unsigned char nullval, char *nullarray,
+            int nullcheck, LONGLONG tnull, unsigned char nullval, char *nullarray,
             int *anynull, unsigned char *output, int *status);
 int fffr4i1(float *input, long ntodo, double scale, double zero,
             int nullcheck, unsigned char nullval, char *nullarray,
@@ -492,7 +508,7 @@ int fffi4s1(INT32BIT *input, long ntodo, double scale, double zero,
             int nullcheck, INT32BIT tnull, signed char nullval, char *nullarray,
             int *anynull, signed char *output, int *status);
 int fffi8s1(LONGLONG *input, long ntodo, double scale, double zero,
-            int nullcheck, long tnull, signed char nullval, char *nullarray,
+            int nullcheck, LONGLONG tnull, signed char nullval, char *nullarray,
             int *anynull, signed char *output, int *status);
 int fffr4s1(float *input, long ntodo, double scale, double zero,
             int nullcheck, signed char nullval, char *nullarray,
@@ -516,7 +532,7 @@ int fffi4u2(INT32BIT *input, long ntodo, double scale, double zero,
             int nullcheck, INT32BIT tnull, unsigned short nullval, char *nullarray,
             int *anynull, unsigned short *output, int *status);
 int fffi8u2(LONGLONG *input, long ntodo, double scale, double zero,
-            int nullcheck, long tnull, unsigned short nullval, char *nullarray,
+            int nullcheck, LONGLONG tnull, unsigned short nullval, char *nullarray,
             int *anynull, unsigned short *output, int *status);
 int fffr4u2(float *input, long ntodo, double scale, double zero,
             int nullcheck, unsigned short nullval, char *nullarray,
@@ -539,7 +555,7 @@ int fffi4i2(INT32BIT *input, long ntodo, double scale, double zero,
             int nullcheck, INT32BIT tnull, short nullval, char *nullarray,
             int *anynull, short *output, int *status);
 int fffi8i2(LONGLONG *input, long ntodo, double scale, double zero,
-            int nullcheck, long tnull, short nullval, char *nullarray,
+            int nullcheck, LONGLONG tnull, short nullval, char *nullarray,
             int *anynull, short *output, int *status);
 int fffr4i2(float *input, long ntodo, double scale, double zero,
             int nullcheck, short nullval, char *nullarray,
@@ -563,7 +579,7 @@ int fffi4u4(INT32BIT *input, long ntodo, double scale, double zero,
             int nullcheck, INT32BIT tnull, unsigned long nullval, char *nullarray,
             int *anynull, unsigned long *output, int *status);
 int fffi8u4(LONGLONG *input, long ntodo, double scale, double zero,
-            int nullcheck, long tnull, unsigned long nullval, char *nullarray,
+            int nullcheck, LONGLONG tnull, unsigned long nullval, char *nullarray,
             int *anynull, unsigned long *output, int *status);
 int fffr4u4(float *input, long ntodo, double scale, double zero,
             int nullcheck, unsigned long nullval, char *nullarray,
@@ -586,7 +602,7 @@ int fffi4i4(INT32BIT *input, long ntodo, double scale, double zero,
             int nullcheck, INT32BIT tnull, long nullval, char *nullarray,
             int *anynull, long *output, int *status);
 int fffi8i4(LONGLONG *input, long ntodo, double scale, double zero,
-            int nullcheck, long tnull, long nullval, char *nullarray,
+            int nullcheck, LONGLONG tnull, long nullval, char *nullarray,
             int *anynull, long *output, int *status);
 int fffr4i4(float *input, long ntodo, double scale, double zero,
             int nullcheck, long nullval, char *nullarray,
@@ -609,7 +625,7 @@ int fffi4int(INT32BIT *input, long ntodo, double scale, double zero,
             int nullcheck, INT32BIT tnull, int nullval, char *nullarray,
             int *anynull, int *output, int *status);
 int fffi8int(LONGLONG *input, long ntodo, double scale, double zero,
-            int nullcheck, long tnull, int nullval, char *nullarray,
+            int nullcheck, LONGLONG tnull, int nullval, char *nullarray,
             int *anynull, int *output, int *status);
 int fffr4int(float *input, long ntodo, double scale, double zero,
             int nullcheck, int nullval, char *nullarray,
@@ -632,7 +648,7 @@ int fffi4uint(INT32BIT *input, long ntodo, double scale, double zero,
             int nullcheck, INT32BIT tnull, unsigned int nullval, char *nullarray,
             int *anynull, unsigned int *output, int *status);
 int fffi8uint(LONGLONG *input, long ntodo, double scale, double zero,
-            int nullcheck, long tnull, unsigned int nullval, char *nullarray,
+            int nullcheck, LONGLONG tnull, unsigned int nullval, char *nullarray,
             int *anynull, unsigned int *output, int *status);
 int fffr4uint(float *input, long ntodo, double scale, double zero,
             int nullcheck, unsigned int nullval, char *nullarray,
@@ -678,7 +694,7 @@ int fffi4r4(INT32BIT *input, long ntodo, double scale, double zero,
             int nullcheck, INT32BIT tnull, float nullval, char *nullarray,
             int *anynull, float *output, int *status);
 int fffi8r4(LONGLONG *input, long ntodo, double scale, double zero,
-            int nullcheck, long tnull, float nullval, char *nullarray,
+            int nullcheck, LONGLONG tnull, float nullval, char *nullarray,
             int *anynull, float *output, int *status);
 int fffr4r4(float *input, long ntodo, double scale, double zero,
             int nullcheck, float nullval, char *nullarray,
@@ -701,7 +717,7 @@ int fffi4r8(INT32BIT *input, long ntodo, double scale, double zero,
             int nullcheck, INT32BIT tnull, double nullval, char *nullarray,
             int *anynull, double *output, int *status);
 int fffi8r8(LONGLONG *input, long ntodo, double scale, double zero,
-            int nullcheck, long tnull, double nullval, char *nullarray,
+            int nullcheck, LONGLONG tnull, double nullval, char *nullarray,
             int *anynull, double *output, int *status);
 int fffr4r8(float *input, long ntodo, double scale, double zero,
             int nullcheck, double nullval, char *nullarray,
@@ -906,7 +922,7 @@ int fits_write_compressed_img(fitsfile *fptr,
             int nullcheck, void *array,  void *nulval,
             int  *status);
 int fits_write_compressed_pixels(fitsfile *fptr, 
-            int  datatype, OFF_T  fpixel, long npixels,   
+            int  datatype, LONGLONG  fpixel, LONGLONG npixels,   
             int nullcheck,  void *array, void *nulval,
             int  *status);
 int fits_write_compressed_img_plane(fitsfile *fptr, int  datatype, 
@@ -914,29 +930,48 @@ int fits_write_compressed_img_plane(fitsfile *fptr, int  datatype,
       long *naxes,  int  nullcheck, 
       void *array,  void *nullval, long *nread, int  *status);
 
-int imcomp_init_table(fitsfile *outfptr, int compress_type,
-        int bitpix, int naxis,long *naxes,long *tilesize, 
-        int rice_blocksize,int rice_nbits,int *status);
-int imcomp_calc_max_elem (int comptype, int nx, int blocksize);
+int imcomp_init_table(fitsfile *outfptr,
+        int bitpix, int naxis,long *naxes, int writebitpix, int *status);
+int imcomp_calc_max_elem (int comptype, int nx, int zbitpix, int blocksize);
 int imcomp_copy_imheader(fitsfile *infptr, fitsfile *outfptr,
                 int *status);
+int imcomp_copy_img2comp(fitsfile *infptr, fitsfile *outfptr, int *status);
+int imcomp_copy_comp2img(fitsfile *infptr, fitsfile *outfptr, 
+                          int norec, int *status);
 int imcomp_compress_image (fitsfile *infptr, fitsfile *outfptr,
                  int *status);
 int imcomp_compress_tile (fitsfile *outfptr, long row, 
-    int datatype,  void *tiledata, long tilelen, int *status);
-
+    int datatype,  void *tiledata, long tilelen, long nx, long ny,
+    int nullcheck, void *nullval, int *status);
+int imcomp_nullscale(int *idata, long tilelen, int nullflagval, int nullval,
+     double scale, double zero, int * status);
+int imcomp_nullvalues(int *idata, long tilelen, int nullflagval, int nullval,
+     int * status);
+int imcomp_scalevalues(int *idata, long tilelen, double scale, double zero,
+     int * status);
+int imcomp_nullscalefloats(float *fdata, long tilelen, int *idata, 
+    double scale, double zero, int nullcheck, float nullflagval, int nullval,
+    int *status);
+int imcomp_nullfloats(float *fdata, long tilelen, int *idata, int nullcheck,
+    float nullflagval, int nullval, int *status);
+int imcomp_nullscaledoubles(double *fdata, long tilelen, int *idata, 
+    double scale, double zero, int nullcheck, double nullflagval, int nullval,
+    int *status);
+int imcomp_nulldoubles(double *fdata, long tilelen, int *idata, int nullcheck,
+    double nullflagval, int nullval, int *status);
+    
+ 
 /*  image decompression routines */
-
 int fits_read_compressed_img(fitsfile *fptr, 
-            int  datatype, long  *fpixel,long  *lpixel,long *inc,   
+            int  datatype, LONGLONG  *fpixel,LONGLONG  *lpixel,long *inc,   
             int nullcheck, void *nulval,  void *array, char *nullarray,
             int  *anynul, int  *status);
 int fits_read_compressed_pixels(fitsfile *fptr, 
-            int  datatype, OFF_T  fpixel, long npixels,   
+            int  datatype, LONGLONG  fpixel, LONGLONG npixels,   
             int nullcheck, void *nulval,  void *array, char *nullarray,
             int  *anynul, int  *status);
 int fits_read_compressed_img_plane(fitsfile *fptr, int  datatype, 
-      int  bytesperpixel,  long   nplane, long *firstcoord, long *lastcoord, 
+      int  bytesperpixel,  long   nplane, LONGLONG *firstcoord, LONGLONG *lastcoord, 
       long *inc,  long *naxes,  int  nullcheck,  void *nullval, 
       void *array, char *nullarray, int  *anynul, long *nread, int  *status);
 
@@ -980,12 +1015,12 @@ int fits_register_driver( char *prefix,
 	int (*checkfile) (char *urltype, char *infile, char *outfile),
 	int (*fitsopen)(char *filename, int rwmode, int *driverhandle),
 	int (*fitscreate)(char *filename, int *driverhandle),
-	int (*fitstruncate)(int driverhandle, OFF_T filesize),
+	int (*fitstruncate)(int driverhandle, LONGLONG filesize),
 	int (*fitsclose)(int driverhandle),
 	int (*fremove)(char *filename),
-        int (*size)(int driverhandle, OFF_T *size),
+        int (*size)(int driverhandle, LONGLONG *size),
 	int (*flush)(int driverhandle),
-	int (*seek)(int driverhandle, OFF_T offset),
+	int (*seek)(int driverhandle, LONGLONG offset),
 	int (*fitsread) (int driverhandle, void *buffer, long nbytes),
 	int (*fitswrite)(int driverhandle, void *buffer, long nbytes));
 
@@ -1001,12 +1036,12 @@ int file_open(char *filename, int rwmode, int *driverhandle);
 int file_compress_open(char *filename, int rwmode, int *hdl);
 int file_openfile(char *filename, int rwmode, FILE **diskfile);
 int file_create(char *filename, int *driverhandle);
-int file_truncate(int driverhandle, OFF_T filesize);
-int file_size(int driverhandle, OFF_T *filesize);
+int file_truncate(int driverhandle, LONGLONG filesize);
+int file_size(int driverhandle, LONGLONG *filesize);
 int file_close(int driverhandle);
 int file_remove(char *filename);
 int file_flush(int driverhandle);
-int file_seek(int driverhandle, OFF_T offset);
+int file_seek(int driverhandle, LONGLONG offset);
 int file_read (int driverhandle, void *buffer, long nbytes);
 int file_write(int driverhandle, void *buffer, long nbytes);
 int file_is_compressed(char *filename);
@@ -1033,12 +1068,12 @@ int mem_compress_open(char *filename, int rwmode, int *hdl);
 int mem_compress_stdin_open(char *filename, int rwmode, int *hdl);
 int mem_iraf_open(char *filename, int rwmode, int *hdl);
 int mem_rawfile_open(char *filename, int rwmode, int *hdl);
-int mem_size(int handle, OFF_T *filesize);
-int mem_truncate(int handle, OFF_T filesize);
+int mem_size(int handle, LONGLONG *filesize);
+int mem_truncate(int handle, LONGLONG filesize);
 int mem_close_free(int handle);
 int mem_close_keep(int handle);
 int mem_close_comp(int handle);
-int mem_seek(int handle, OFF_T offset);
+int mem_seek(int handle, LONGLONG offset);
 int mem_read(int hdl, void *buffer, long nbytes);
 int mem_write(int hdl, void *buffer, long nbytes);
 int mem_uncompress2mem(char *filename, FILE *diskfile, int hdl);
@@ -1057,10 +1092,10 @@ int root_open(char *filename, int rwmode, int *driverhandle);
 int root_create(char *filename, int *driverhandle);
 int root_close(int driverhandle);
 int root_flush(int driverhandle);
-int root_seek(int driverhandle, OFF_T offset);
+int root_seek(int driverhandle, LONGLONG offset);
 int root_read (int driverhandle, void *buffer, long nbytes);
 int root_write(int driverhandle, void *buffer, long nbytes);
-int root_size(int handle, OFF_T *filesize);
+int root_size(int handle, LONGLONG *filesize);
 
 /* http driver I/O routines */
 
@@ -1075,7 +1110,6 @@ int ftp_checkfile(char *urltype, char *infile, char *outfile);
 int ftp_open(char *filename, int rwmode, int *driverhandle);
 int ftp_file_open(char *filename, int rwmode, int *driverhandle);
 int ftp_compress_open(char *filename, int rwmode, int *driverhandle);
-
 
 int uncompress2mem(char *filename, FILE *diskfile,
              char **buffptr, size_t *buffsize,
@@ -1112,24 +1146,22 @@ int compress2file_from_mem(
              size_t *filesize,   /* O - size of file, in bytes              */
              int *status);
 
-/* ==================== SHARED MEMORY DRIVER SECTION ======================= */
+
+#ifdef HAVE_GSIFTP
+/* prototypes for gsiftp driver I/O routines */
+#include "drvrgsiftp.h"
+#endif
 
 #ifdef HAVE_SHMEM_SERVICES
+/* prototypes for shared memory driver I/O routines  */
 #include "drvrsmem.h"
 #endif
 
-/* ==================== END OF SHARED MEMORY DRIVER SECTION ================ */
-
-#endif
-
-
 #if defined(vms) || defined(__vms) || defined(WIN32) || defined(__WIN32__) || (defined(macintosh) && !defined(TARGET_API_MAC_CARBON))
-
-/* ================================================================== */
 /* A hack for nonunix machines, which lack strcasecmp and strncasecmp */
-/* ================================================================== */
-
 int strcasecmp (const char *s1, const char *s2       );
 int strncasecmp(const char *s1, const char *s2, size_t n);
+#endif
 
+/* end of the entire "ifndef _FITSIO2_H" block */
 #endif

@@ -25,8 +25,8 @@ typedef struct    /* structure containing mem file structure */
                          /* always be used, so use *memsizeptr instead. */
     size_t deltasize;    /* Suggested increment for reallocating memory */
     void *(*mem_realloc)(void *p, size_t newsize);  /* realloc function */
-    OFF_T currentpos;   /* current file position, relative to start */
-    OFF_T fitsfilesize; /* size of the FITS file (always <= *memsizeptr) */
+    LONGLONG currentpos;   /* current file position, relative to start */
+    LONGLONG fitsfilesize; /* size of the FITS file (always <= *memsizeptr) */
     FILE *fileptr;      /* pointer to compressed output disk file */
 } memdriver;
 
@@ -213,7 +213,7 @@ int mem_createmem(size_t msize, int *handle)
     /* allocate initial block of memory for the file */
     if (msize > 0)
     {
-        memTable[ii].memaddr = malloc(msize); 
+        memTable[ii].memaddr = (char *) malloc(msize); 
         if ( !(memTable[ii].memaddr) )
         {
             ffpmsg("malloc of initial memory failed (mem_createmem)");
@@ -230,7 +230,7 @@ int mem_createmem(size_t msize, int *handle)
     return(0);
 }
 /*--------------------------------------------------------------------------*/
-int mem_truncate(int handle, OFF_T filesize)
+int mem_truncate(int handle, LONGLONG filesize)
 /*
   truncate the file to a new size
 */
@@ -239,10 +239,10 @@ int mem_truncate(int handle, OFF_T filesize)
 
     /* call the memory reallocation function, if defined */
     if ( memTable[handle].mem_realloc )
-    {
+    {    /* explicit LONGLONG->size_t cast */
         ptr = (memTable[handle].mem_realloc)(
                                 *(memTable[handle].memaddrptr),
-                                 filesize);
+                                 (size_t) filesize);
         if (!ptr)
         {
             ffpmsg("Failed to reallocate memory (mem_truncate)");
@@ -250,15 +250,15 @@ int mem_truncate(int handle, OFF_T filesize)
         }
 
         /* if allocated more memory, initialize it to zero */
-        if ( (size_t) filesize > *(memTable[handle].memsizeptr) )
+        if ( filesize > *(memTable[handle].memsizeptr) )
         {
              memset(ptr + *(memTable[handle].memsizeptr),
                     0,
-                    filesize - *(memTable[handle].memsizeptr) );
+                ((size_t) filesize) - *(memTable[handle].memsizeptr) );
         }
 
         *(memTable[handle].memaddrptr) = ptr;
-        *(memTable[handle].memsizeptr) = filesize;
+        *(memTable[handle].memsizeptr) = (size_t) (filesize);
     }
 
     memTable[handle].fitsfilesize = filesize;
@@ -371,7 +371,7 @@ int stdin2mem(int hd)  /* handle number */
 */
 {
     size_t nread, memsize, delta;
-    OFF_T filesize;
+    LONGLONG filesize;
     char *memptr;
     char simple[] = "SIMPLE";
     int c, ii, jj;
@@ -512,9 +512,9 @@ int stdout_close(int handle)
 {
     int status = 0;
 
-    /* copy from memory to standard out */
+    /* copy from memory to standard out.  explicit LONGLONG->size_t cast */
     if(fwrite(memTable[handle].memaddr, 1,
-              memTable[handle].fitsfilesize, stdout) !=
+              ((size_t) memTable[handle].fitsfilesize), stdout) !=
               (size_t) memTable[handle].fitsfilesize )
     {
                 ffpmsg("failed to copy memory file to stdout (stdout_close)");
@@ -659,7 +659,7 @@ int mem_compress_open(char *filename, int rwmode, int *hdl)
        (( (size_t) memTable[*hdl].fitsfilesize) + 256L) ) 
     {
         ptr = realloc(*(memTable[*hdl].memaddrptr), 
-                       memTable[*hdl].fitsfilesize);
+                     ((size_t) memTable[*hdl].fitsfilesize) );
         if (!ptr)
         {
             ffpmsg("Failed to reduce size of allocated memory (compress_open)");
@@ -667,7 +667,7 @@ int mem_compress_open(char *filename, int rwmode, int *hdl)
         }
 
         *(memTable[*hdl].memaddrptr) = ptr;
-        *(memTable[*hdl].memsizeptr) = memTable[*hdl].fitsfilesize;
+        *(memTable[*hdl].memsizeptr) = (size_t) (memTable[*hdl].fitsfilesize);
     }
 
     return(0);
@@ -713,7 +713,7 @@ int mem_compress_stdin_open(char *filename, int rwmode, int *hdl)
        (( (size_t) memTable[*hdl].fitsfilesize) + 256L) ) 
     {
         ptr = realloc(*(memTable[*hdl].memaddrptr), 
-                       memTable[*hdl].fitsfilesize);
+                      ((size_t) memTable[*hdl].fitsfilesize) );
         if (!ptr)
         {
             ffpmsg("Failed to reduce size of allocated memory (compress_stdin_open)");
@@ -721,7 +721,7 @@ int mem_compress_stdin_open(char *filename, int rwmode, int *hdl)
         }
 
         *(memTable[*hdl].memaddrptr) = ptr;
-        *(memTable[*hdl].memsizeptr) = memTable[*hdl].fitsfilesize;
+        *(memTable[*hdl].memsizeptr) = (size_t) (memTable[*hdl].fitsfilesize);
     }
 
     return(0);
@@ -1017,7 +1017,7 @@ int mem_uncompress2mem(char *filename, FILE *diskfile, int hdl)
   return status;
 }
 /*--------------------------------------------------------------------------*/
-int mem_size(int handle, OFF_T *filesize)
+int mem_size(int handle, LONGLONG *filesize)
 /*
   return the size of the file; only called when the file is first opened
 */
@@ -1060,7 +1060,7 @@ int mem_close_comp(int handle)
     /* compress file in  memory to a .gz disk file */
 
     if(compress2file_from_mem(memTable[handle].memaddr,
-              memTable[handle].fitsfilesize, 
+              (size_t) (memTable[handle].fitsfilesize), 
               memTable[handle].fileptr,
               &compsize, &status ) )
     {
@@ -1079,12 +1079,12 @@ int mem_close_comp(int handle)
     return(status);
 }
 /*--------------------------------------------------------------------------*/
-int mem_seek(int handle, OFF_T offset)
+int mem_seek(int handle, LONGLONG offset)
 /*
   seek to position relative to start of the file.
 */
 {
-    if (offset > (OFF_T) memTable[handle].fitsfilesize )
+    if (offset >  memTable[handle].fitsfilesize )
         return(END_OF_FILE);
 
     memTable[handle].currentpos = offset;

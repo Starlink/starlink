@@ -6,8 +6,8 @@
 #else
 #include <malloc.h>
 #endif
-#include "fitsio.h"     /* needed to define OFF_T */
-#include "drvrsmem.h"   /* uses OFF_T */
+#include "fitsio.h"     /* needed to define LONGLONG */
+#include "drvrsmem.h"   /* uses LONGLONG */
 
 int	main(int argc, char **argv)
 { int cmdok, listmode, longlistmode, recovermode, deletemode, id;

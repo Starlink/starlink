@@ -7,7 +7,8 @@
 #
 
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(fitscore.c)
+AC_INIT
+AC_CONFIG_SRCDIR([fitscore.c])
 
 #--------------------------------------------------------------------
 # Command options
@@ -22,22 +23,51 @@ if test "x$BUILD_HERA" = xyes; then
   AC_DEFINE(BUILD_HERA)
 fi
 
+AC_ARG_WITH(
+  gsiftp-flavour,
+  [ --with-gsiftp-flavour[[=PATH]] Enable Globus Toolkit gsiftp protocol support ],
+  [ if test "x$withval" != "xno"; then
+
+        if test "x$withval" != "xyes" ; then
+            GSIFTP_FLAVOUR=${withval}
+        fi
+        AC_DEFINE(GSIFTP_FLAVOUR,1,[Define Globus Toolkit architecture])
+    fi
+  ]
+)
+
+AC_ARG_WITH(
+  gsiftp,
+  [ --with-gsiftp[[=PATH]] Enable Globus Toolkit gsiftp protocol support ],
+  [ if test "x$withval" != "xno"; then
+
+        if test "x$withval" != "xyes" ; then
+            CFLAGS="$CFLAGS -I${withval}/include/${GSIFTP_FLAVOUR}"
+            LDFLAGS="$LDFLAGS -L${withval}/lib -lglobus_ftp_client_${GSIFTP_FLAVOUR}"
+            HAVE_GSIFTP=yes
+        fi
+        AC_DEFINE(HAVE_GSIFTP,1,[Define if you want Globus Toolkit gsiftp protocol support])
+    fi
+  ]
+)
+
 #--------------------------------------------------------------------
 # Check for install location prefix
 #--------------------------------------------------------------------
 
 AC_PREFIX_DEFAULT(`pwd`)
-if test $prefix = NONE; then
-  CFITSIO_PREFIX=$ac_default_prefix
-else
-  CFITSIO_PREFIX=$prefix
-fi
-AC_SUBST(CFITSIO_PREFIX)
+
+# make will complain about duplicate targets for the install directories
+# if prefix == exec_prefix
+AC_SUBST(INSTALL_ROOT,'${prefix}')
+test "$exec_prefix" != NONE -a "$prefix" != "$exec_prefix" \
+  && INSTALL_ROOT="$INSTALL_ROOT "'${exec_prefix}'
+	
 
 #--------------------------------------------------------------------
 # Check "uname" to determine system type
 #--------------------------------------------------------------------
-AC_PROGRAM_CHECK(uname_found, uname, 1, 0)
+AC_CHECK_PROG([uname_found],[uname],[1],[0])
 if test $uname_found -eq 0 ; then
     echo "cfitsio: No uname found; setting system type to unknown."
     system="unknown"
@@ -54,7 +84,7 @@ if test "x$CC" = x; then
 fi
 AC_PROG_CC
 
-AC_CHECK_PROGS(FC, f77 xlf cf77 gf77 g77 af77 ncf f2c , nope)
+AC_CHECK_PROGS(FC, f77 g77 g95 gfortran ifort xlf cf77 gf77 af77 ncf f2c , nope)
 if test $FC = 'nope' ; then
    AC_MSG_WARN(cfitsio: == No acceptable f77 found in \$PATH)
    AC_MSG_WARN(cfitsio: == Cfitsio will be built without Fortran wrapper support)
@@ -89,7 +119,7 @@ dnl Checks for ANSI stdlib.h.
 AC_CHECK_HEADERS(stdlib.h string.h math.h limits.h ,ANSI_HEADER=yes,ANSI_HEADER=no)dnl
 
 dnl Check if prototyping is allowed.
-AC_TRY_COMPILE( , void d( int , double) , PROTO=yes, PROTO=no)dnl
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[void d( int , double) ]])],[PROTO=yes],[PROTO=no])dnl
 
 if test $ANSI_HEADER = no -o $PROTO = no; then
      echo "   *********** WARNING: CFITSIO CONFIGURE FAILURE ************  "
@@ -114,11 +144,9 @@ case $system in
 	# Darwin can be powerpc or i386
 	ARCH=`uname -p`
 	EXT="darwin"
-	# the -D_FILE_OFFSET_BITS compiler flag is only
-	# needed to support Large FITS files greater than 2.1 GB.
-	# Using this flag caused the Fortran wrappers to break
-	# for at least one combination of C and Fortran compilers.
-	# CFLAGS="$CFLAGS -D_FILE_OFFSET_BITS=64"
+        # For large file support (but may break Absoft compilers):
+        AC_DEFINE(_LARGEFILE_SOURCE)
+        AC_DEFINE(_FILE_OFFSET_BITS,64)
 	;;
     SunOS-4*)
 	ARCH="sun"
@@ -139,6 +167,9 @@ case $system in
 	if test "x$CFORTRANFLAGS" = x ; then
 		CFORTRANFLAGS="-Dsolaris"
 	fi
+        # For large file support:
+        AC_DEFINE(_LARGEFILE_SOURCE)
+        AC_DEFINE(_FILE_OFFSET_BITS,64)
 	;;
     OSF1*)
 	ARCH="alpha"
@@ -157,6 +188,9 @@ case $system in
     Linux*)
 	ARCH="linux"
 	EXT="lnx"
+        # For large file support:
+        AC_DEFINE(_LARGEFILE_SOURCE)
+        AC_DEFINE(_FILE_OFFSET_BITS,64)
 	;;
     FREEBSD*|FreeBSD*)
 	ARCH="linux"
@@ -174,20 +208,23 @@ esac
 
 CFLAGS="$CFLAGS $CFORTRANFLAGS"
 
-case $CC in
-	gcc)
+case $GCC in
+	yes)
 		GCCVERSION="`gcc -dumpversion 2>&1`"
 		echo "cfitsio: == Using gcc version $GCCVERSION"
 		AC_SUBST(GCCVERSION)
                 changequote(,)
-		if test `echo $GCCVERSION | grep -c '2\.[45678]'` -gt 0
+		gcc_test=`echo $GCCVERSION | grep -c '2\.[45678]'`
+		changequote([,])
+		if test $gcc_test -gt 0
 		then
+		    changequote(,)
 		    CFLAGS=`echo $CFLAGS | sed 's:-O[^ ]* *::'`
+		    changequote([,])
 		    AC_MSG_WARN(This gcc is pretty old. Disabling optimization to be safe.)
 		fi
-                changequote([,])
 		;;
-	cc)
+	no)
 		echo "cfitsio: Old CFLAGS is $CFLAGS"
 		CFLAGS=`echo $CFLAGS | sed -e "s/-g/-O/"`
 		case $system in
@@ -223,7 +260,7 @@ case $EXT in
     SHLIB_SUFFIX=".dll"
     ;;
   darwin)
-    SHLIB_LD="cc -dynamiclib"
+    SHLIB_LD="$CC -dynamiclib"
     SHLIB_SUFFIX=".dylib"
     lhea_shlib_cflags="-fPIC -fno-common"
     ;;
@@ -272,26 +309,26 @@ AC_SUBST(OPTIONAL_OBJECTS)dnl
 # ================= test for the unix ftruncate function ================
 
 AC_MSG_CHECKING("whether ftruncate works")
-AC_TRY_LINK([#include <unistd.h>
-], [
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <unistd.h>
+]], [[
 ftruncate(0, 0);
-], [
+]])],[
 AC_DEFINE(HAVE_FTRUNCATE)
 AC_MSG_RESULT("yes")
-], AC_MSG_RESULT("no") )
+],[AC_MSG_RESULT("no") ])
 
 # ---------------------------------------------------------
 # some systems define long long for 64-bit ints
 # ---------------------------------------------------------
  
 AC_MSG_CHECKING("whether long long is defined")
-AC_TRY_COMPILE([#include <stdlib.h>
-], [
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <stdlib.h>
+]], [[
 long long filler;
-], [
+]])],[
 AC_DEFINE(HAVE_LONGLONG)
 AC_MSG_RESULT("yes")
-], AC_MSG_RESULT("no") )
+],[AC_MSG_RESULT("no") ])
 
 # ==================== SHARED MEMORY DRIVER SECTION =======================
 #
@@ -305,28 +342,21 @@ AC_MSG_RESULT("yes")
 # check is System V IPC is supported on this machine
 # -------------------------------------------------------------------------
 
-AC_CHECK_HEADERS([sys/types.h sys/ipc.h])
-
 AC_MSG_CHECKING("whether system V style IPC services are supported")
-AC_TRY_LINK([#if HAVE_SYS_TYPES_H
-#  include <sys/types.h>
-#endif
-#if HAVE_SYS_IPC_H
-#  include <sys/ipc.h>
-#endif
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/sem.h>
-], [
+]], [[
 shmat(0, 0, 0);
 shmdt(0);
 shmget(0, 0, 0);
 semget(0, 0, 0);
-], [
+]])],[
 AC_DEFINE(HAVE_SHMEM_SERVICES)
 my_shmem=\${SOURCES_SHMEM}
 OPTIONAL_OBJECTS="$OPTIONAL_OBJECTS drvrsmem.o"
 AC_MSG_RESULT("yes")
-], AC_MSG_RESULT("no") )
+],[AC_MSG_RESULT("no") ])
 
 AC_SUBST(my_shmem)
 
@@ -335,23 +365,23 @@ AC_SUBST(my_shmem)
 # -------------------------------------------------------------------------
 
 AC_MSG_CHECKING("do we have flock_t defined in sys/fcntl.h")
-AC_TRY_COMPILE([#include <sys/fcntl.h>
-], [
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/fcntl.h>
+]], [[
 flock_t filler;
-], [
+]])],[
 AC_DEFINE(HAVE_FLOCK_T)
 AC_MSG_RESULT("yes") 
-], AC_MSG_RESULT("no") )
+],[AC_MSG_RESULT("no") ])
 
 if test "$HAVE_FLOCK_T" != 1; then
    AC_MSG_CHECKING("do we have flock_t defined in sys/flock.h")
-   AC_TRY_COMPILE([#include <sys/flock.h>
-   ], [
+   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/flock.h>
+   ]], [[
    flock_t filler;
-   ], [
+   ]])],[
    AC_DEFINE(HAVE_FLOCK_T)
    AC_MSG_RESULT("yes") 
-   ], AC_MSG_RESULT("no") )
+   ],[AC_MSG_RESULT("no") ])
 fi
 
 # -------------------------------------------------------------------------
@@ -360,60 +390,34 @@ fi
 # -------------------------------------------------------------------------
 
 AC_MSG_CHECKING("do we have union semun defined")
-AC_TRY_COMPILE(
-[#if HAVE_SYS_TYPES_H
-#  include <sys/types.h>
-#endif
-#if HAVE_SYS_IPC_H
-#  include <sys/ipc.h>
-#endif
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/sem.h>
-], [
+]], [[
 union semun filler;
-], [
+]])],[
 AC_DEFINE(HAVE_UNION_SEMUN)   
 AC_MSG_RESULT("yes")
-], AC_MSG_RESULT("no") )
+],[AC_MSG_RESULT("no") ])
 
 # ==================== END OF SHARED MEMORY DRIVER SECTION ================
 # ================= test for the unix networking functions ================
 
-#--------------------------------------------------------------------
-#	Check for the existence of the -lsocket and -lnsl libraries.
-#	The order here is important, so that they end up in the right
-#	order in the command line generated by make.  Here are some
-#	special considerations:
-#	1. Use "connect" and "accept" to check for -lsocket, and
-#	   "gethostbyname" to check for -lnsl.
-#	2. Use each function name only once:  can't redo a check because
-#	   autoconf caches the results of the last check and won't redo it.
-#	3. Use -lnsl and -lsocket only if they supply procedures that
-#	   aren't already present in the normal libraries.  This is because
-#	   IRIX 5.2 has libraries, but they aren't needed and they're
-#	   bogus:  they goof up name resolution if used.
-#	4. On some SVR4 systems, can't use -lsocket without -lnsl too.
-#	   To get around this problem, check for both libraries together
-#	   if -lsocket doesn't work by itself.
-#--------------------------------------------------------------------
-cfitsio_checkBoth=0
-AC_CHECK_FUNC(connect, cfitsio_checkSocket=0, cfitsio_checkSocket=1)
-if test "$cfitsio_checkSocket" = 1; then
-    AC_CHECK_LIB(socket, main, LIBS="$LIBS -lsocket", cfitsio_checkBoth=1)
-fi
-if test "$cfitsio_checkBoth" = 1; then
-    tk_oldLibs=$LIBS
-    LIBS="$LIBS -lsocket -lnsl"
-    AC_CHECK_FUNC(accept, cfitsio_checkNsl=0, [LIBS=$tk_oldLibs])
-fi
-AC_CHECK_FUNC(gethostbyname, , AC_CHECK_LIB(nsl, main, [LIBS="$LIBS -lnsl"]))
+AC_SEARCH_LIBS([gethostbyname], [nsl], cfitsio_have_nsl=1, cfitsio_have_nsl=0)
+AC_SEARCH_LIBS([connect], [socket], cfitsio_have_socket=1,
+               cfitsio_have_socket=0, [-lnsl])
 
-AC_DEFINE(HAVE_NET_SERVICES)
+if test "$cfitsio_have_nsl" = 1 -a "$cfitsio_have_socket" = 1; then
+   AC_DEFINE(HAVE_NET_SERVICES)
+fi
 
 # ==================== END OF unix networking SECTION ================
 
 
-AC_OUTPUT(Makefile)dnl
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT
+AC_CONFIG_FILES([cfitsio.pc])
+AC_OUTPUT
 
 
 AC_MSG_RESULT([])

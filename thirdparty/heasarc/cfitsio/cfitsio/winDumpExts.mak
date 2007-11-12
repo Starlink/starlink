@@ -1,20 +1,20 @@
 # Microsoft Developer Studio Generated NMAKE File, Based on winDumpExts.dsp
 !IF "$(CFG)" == ""
-CFG=winDumpExts - Win32 Debug
-!MESSAGE No configuration specified. Defaulting to winDumpExts - Win32 Debug.
+CFG=Win32 Debug
+!MESSAGE No configuration specified. Defaulting to Win32 Debug.
 !ENDIF 
 
-!IF "$(CFG)" != "winDumpExts - Win32 Release" && "$(CFG)" != "winDumpExts - Win32 Debug"
+!IF "$(CFG)" != "Win32 Release" && "$(CFG)" != "Win32 Debug"
 !MESSAGE Invalid configuration "$(CFG)" specified.
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "winDumpExts.mak" CFG="winDumpExts - Win32 Debug"
+!MESSAGE NMAKE /f "winDumpExts.mak" CFG="Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "winDumpExts - Win32 Release" (based on "Win32 (x86) Console Application")
-!MESSAGE "winDumpExts - Win32 Debug" (based on "Win32 (x86) Console Application")
+!MESSAGE "Win32 Release" (based on "Win32 (x86) Console Application")
+!MESSAGE "Win32 Debug" (based on "Win32 (x86) Console Application")
 !MESSAGE 
 !ERROR An invalid configuration is specified.
 !ENDIF 
@@ -25,7 +25,7 @@ NULL=
 NULL=nul
 !ENDIF 
 
-!IF  "$(CFG)" == "winDumpExts - Win32 Release"
+!IF  "$(CFG)" == "Win32 Release"
 
 OUTDIR=.\Release
 INTDIR=.\Release
@@ -95,7 +95,7 @@ LINK32_OBJS= \
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
 
-!ELSEIF  "$(CFG)" == "winDumpExts - Win32 Debug"
+!ELSEIF  "$(CFG)" == "Win32 Debug"
 
 OUTDIR=.
 INTDIR=.\Debug
@@ -180,7 +180,7 @@ LINK32_OBJS= \
 !ENDIF 
 
 
-!IF "$(CFG)" == "winDumpExts - Win32 Release" || "$(CFG)" == "winDumpExts - Win32 Debug"
+!IF "$(CFG)" == "Win32 Release" || "$(CFG)" == "Win32 Debug"
 SOURCE=.\winDumpExts.c
 
 "$(INTDIR)\winDumpExts.obj" : $(SOURCE) "$(INTDIR)"

@@ -6,7 +6,7 @@
 int main(int argc, char *argv[])
 {
     fitsfile *infptr, *outfptr;   /* FITS file pointers defined in fitsio.h */
-    int status = 0, ii = 1, iteration = 0, single = 0, hdupos;
+    int status = 0, tstatus, ii = 1, iteration = 0, single = 0, hdupos;
     int hdutype, bitpix, bytepix, naxis = 0, nkeys, datatype = 0, anynul;
     long naxes[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
     long first, totpix = 0, npix;
@@ -105,7 +105,21 @@ int main(int argc, char *argv[])
 
           /* Explicitly create new image, to support compression */
           fits_create_img(outfptr, bitpix, naxis, naxes, &status);
+          if (status) {
+                 fits_report_error(stderr, status);
+                 return(status);
+          }
 
+          if (fits_is_compressed_image(outfptr, &status)) {
+              /* write default EXTNAME keyword if it doesn't already exist */
+	      tstatus = 0;
+              fits_read_card(infptr, "EXTNAME", card, &tstatus);
+	      if (tstatus) {
+	         strcpy(card, "EXTNAME = 'COMPRESSED_IMAGE'   / name of this binary table extension");
+	         fits_write_record(outfptr, card, &status);
+	      }
+          }
+	  	    
           /* copy all the user keywords (not the structural keywords) */
           fits_get_hdrspace(infptr, &nkeys, NULL, &status); 
 
@@ -115,6 +129,18 @@ int main(int argc, char *argv[])
                   fits_write_record(outfptr, card, &status);
           }
 
+              /* delete default EXTNAME keyword if it exists */
+/*
+          if (!fits_is_compressed_image(outfptr, &status)) {
+	      tstatus = 0;
+              fits_read_key(outfptr, TSTRING, "EXTNAME", card, NULL, &tstatus);
+	      if (!tstatus) {
+	         if (strcmp(card, "COMPRESSED_IMAGE") == 0)
+	            fits_delete_key(outfptr, "EXTNAME", &status);
+	      }
+          }
+*/
+	  
           switch(bitpix) {
               case BYTE_IMG:
                   datatype = TBYTE;

@@ -1,7 +1,503 @@
                    Log of Changes Made to CFITSIO
+		   
+Version 3.06 - 27 August 2007
 
+   - modified the imcopy.c utility program (to tile-compress images)
+     so that it writes the default EXTNAME = 'COMPRESSED_IMAGE'
+     keyword in the compressed images, to preserve the behavior of
+     earlier versions of imcopy.
 
-Version 2.501 - 2 December 2004
+   - modified the angsep function in the FITS calculator (in eval.y)
+     to use haversines, instead of the 'law of cosines', to provide
+     more precision at small angles (< 0.1 arcsec).
+
+Version 3.05 -  July 2007 (internal release only)
+
+   - extensive changes to imcompress.c to fully support implicit data
+     type conversion when reading and writing arrays of data to FITS
+     images, where the data type of the array is not the same as the
+     data type of the FITS image.  This includes support for null pixels,
+     and data scaling via the BSCALE and BZERO keywords.
+
+   - rewrote the fits_read_tbl_coord routine in wcssub.c, that gets the 
+     standard set of WCS keywords appropriate to a pair of columns in a
+     table, to better support the full set of officially approved WCS keywords.  
+     
+   - made significant changes to histo.c, which creates an image by binning
+     columns of a table, to better translate the WCS keywords in the table
+     header into the WCS keywords that are appropriate for an image HDU.
+
+   - modified imcompress.c so that when pixels are written to a 
+     tile-compressed image, the appropriate BSCALE and BZERO values of
+     that image are applied.  This fixes a bug in which writing to
+     an unsigned integer datatype image (with BZERO = 32768) was not
+     done correctly.
+     
+Version 3.04 - 3 April 2007
+
+   - The various table calculator routines (fits_select_rows, etc.) implicitly
+     assumed that the input table has not been modified immediately prior to
+     the call.   To cover cases where the table has been modified a call to 
+     ffrdef has been added to ffprs.  IN UNUSUAL CASES THIS CHANGE COULD 
+     CAUSE CFITSIO TO BEHAVE DIFFERENTLY THAN IN PREVIOUS VERSIONS.  For
+     example, opening a FITS table with this column-editing virtual file
+     expression:
+         myfile.fits[3][col A==X; B = sqrt(X)]
+     no longer works, because the X column does not exist when the 
+     sqrt expression is evaluated.  The correct expression in this case is
+         myfile.fits[3][col A==X; B = sqrt(A)]
+     
+   - modified putkey.c to support USHORT_IMG when calling fits_create_img
+     to create a signed byte datatype image.
+     
+   - enhanced the column histrogramming function to propagate any TCn_k and
+     TPn_k keywords in the table header to the corresponding CDi_j and PCi_j 
+     keywords in the image header.
+     
+   - enhanced the random, randomn, and randomp functions in the lexical
+     parser to take a vector column name argument to specify the length
+     of the vector of random numbers that should be generated (provided by
+     Craig Markwardt, GSFC)
+
+   - enhanced the ffmcrd routine (to modify an existing header card) to
+     support long string keywords so that any CONTINUE keywords associated
+     with the previous keyword will be deleted.
+
+   - modified the ffgtbp routine to recognize the TDIMn keyword for 
+     ASCII string columns in a binary table.  The first dimension is
+     taken to be the size of a unit string.   (The TFORMn = 'rAw'
+     syntax may also be used to specify the unit string size).
+     
+   - in fits_img_decompress, the fits_get_img_param function was called
+     with an invalid dimension size, which caused a fatal error on at
+     least 1 platform.
+
+   - in ffopentest, set the status value before returning in case of error.
+   
+   - in the drvrnet.c file, the string terminators needed to be changed
+     from "\n" to "\r\n" to support the strict interpretation of the
+     http and ftp standard that is enforced by some newer web servers.
+
+Version 3.03 - 11 December 2006
+
+  New Routine
+  
+  - fits_write_hdu writes the current HDU to a FILE stream (e.g. stdout).
+  
+  Changes
+  
+  - modified the region parsing code to support region files where the
+    keyword "physical" is on a separate line preceeding the region shape
+    token. (However, "physical" coordinates are not fully supported, and
+    are treated identically to "image" coordinates).
+    
+  - enhanced the iterator routines to support calculations on 64-bit
+    integer columns and images.  Currently, the values are cast to
+    double precision when doing the calculations, which can cause a
+    loss of precision for integer values greater than about 2**52.
+
+  - added support for accessing FITS files on the computational grid.
+    Giuliano Taffoni and Andrea Barisani, at INAF, University of Trieste,
+    Italy, implemented the necessary I/O driver routines in drvrgsiftp.c.
+
+  - modified the tiled image compression/uncompression routines to 
+    preserve/restore the original CHECKSUM and DATASUM keywords if they
+    exist. (saved as ZHECKSUM and ZDATASUM in the compressed image)
+  
+  - split fits_select_image_section into 2 routines: a higher level routine
+    that creates the output file and copies other HDUs from the input file
+    to the output file, and a lower level routine that extracts the image
+    section from the input image into an output image HDU.
+    
+  - Improved the error messages that get generated if one tries to 
+    use the lexical parser to perform calculations on variable-length
+    array columns.
+
+  - added "#define MACHINE NATIVE" in fitsio2.h for all machies where
+    BYTESWAPPED == FALSE.  This may improve the file writing performance
+    by eliminating the need to allocate a temporary buffer in some cases.
+
+  - modified the configure.in and configure script to fix problems with
+    testing if network services are available, which affects the definition
+    of the HAVE_NET_SERIVES flag.
+
+  - added explicit type casting to all malloc statements, and deleted 
+    declarations of unreferenced variables in the image compression code 
+    to suppress compiler warnings.
+    
+  - fixed incorrect logic in fitsio2.h in the way it determined if numerical
+    values are byteswapped or not on MIPS and ARM architectures.
+
+  - added __BORLANDC__ to the list of environments in fitsio.h that don't
+    use %lld in printf for longlong integers
+    
+  - added "#if defined(unix)" around "#include <usistd.h>" statements in
+    several C source files, to make them compatible with Windows.
+    
+
+Version 3.02 - 18 Sept 2006
+
+  - applied the security patch to the gzip code, available at
+    http://security.FreeBSD.org/patches/SA-06:21/gzip.patch
+    The insufficient bounds checks in buffer use can cause gzip to crash,
+    and may permit the execution of arbitrary code.  The NULL pointer
+    deference can cause gzip to crash.  The infinite loop can cause a
+    Denial-of-Service situation where gzip uses all available CPU time.
+
+  - added HCOMPRESS as one of the compression algorithm options in the
+    tiled image compression code.  (code provided by Richard White (STScI))
+    Made other improvements to preserve the exact header structure in the 
+    compressed image file so that the compressed-and-then-uncompressed FITS 
+    image will be as identical as possible to the original FITS image file.  
+
+  New Routines		   
+
+  - the following new routines were added to support reading and writing
+    non-standard extension types:
+     fits_write_exthdr - write required keywords for a conforming extension
+     fits_write_ext - write data to the extension
+     fits_read_ext  - read data from the extension
+     
+  - added new routines to compute the RMS noise in the background pixels
+    of an image: fits_rms_float and fits_rms_short  (take an input
+    array of floats or shorts, respectively).
+
+  Fixes
+
+  - added the missing 64-bit integer case to set of "if (datatype)" 
+    statements in the routine that returns information about a 
+    particular column (ffgbclll).
+    
+  - fixed a parsing error in ffexts in cases where an extension number
+    is followed by a semi-colon and then the column and row number of an
+    array in a binary table.  Also removed an extraneous HISTORY keyword
+    that was being written when specifying an input image in a table cel.
+  
+  - modified the routine that reads a table column returning a string
+    value (ffgcls) so that if the displayed numerical value is too
+    wide to fit in the specified length string, then it will return
+    a string of "*" characters instead of the number string.
+
+  - small change to fitsio.h to support a particular Fortran and C
+    compiler combination on a SGI Altix system
+    
+  - added a test in the gunzip code to prevent seg. fault when trying
+    to uncompress a corrupted file (at least in some cases).
+
+  - fixed a rarely-occurring bug in the routine that copies a table
+    cell into an image; had to call the ffflsh call a few lines earlier.
+
+Version 3.01 - (in FTOOLS 6.1 release)
+
+  - modified fits_copy_image2cell to correctly copy all the appropriate
+    header keywords when copying an image into a table cell
+
+  - in eval.y, explicitly included the code for the lgamma function 
+    instead of assuming it is available in a system library (e.g., the
+    lgamma function is currently not included in MS Visual++ libraries)
+
+  - modified the logic in fits_pixel_filter so that the default data
+    type of the output image will be promoted to at least BITPIX = -32
+    (a single precision floating point) if the expression that is being
+    evaluated resolves to a floating point result.  If the expression 
+    resolves to an integer result, the output image will have the same
+    BITPIX as the input image.
+
+  - in fits_copy_cell2image, added 5 more WCS keywords to the list of
+    keywords related to other columns that should be deleted in the
+    output image header.
+
+  - disabled code in cfileio.c that would write HISTORY keywords to the
+    output file in fits_copy_image2cell and cell2image, because some tasks
+    would not want these extraneous HISTORY keywords.
+
+  - added 2 new random number functions to the CFITSIO parser
+    RANDOMN() - produces a normal deviate (mean=0, stddev=1)
+    RANDOMP(X) - produces a Poisson deviate for an expected # of counts X
+
+  - in f77_wrap.h, removed the restriction that "g77Fortran" must be 
+    defined on 64-bit Itanium machines before assuming that 
+    sizeof(long) = 8.  It appears that "long"s are always
+    8 bytes long on this machine, regardless of what compilers are used.
+
+  - added test in fitsio.h so that LONGLONG cannot be multiply defined
+  
+  - modified longnam.h so that both "fits_write_nulrows" and 
+    "fits_write_nullrows"  get replace by the string "ffprwu".  This
+    fixes a documentation error regarding the long name of this
+    routine.
+
+   Bug fixes
+
+  - fixed a potential null character string dereferencing error in the
+    the ffphtb and ffphbn routines that write the FITS table keywords.
+    This concerned the optional TUNITn keywords.
+
+  - fixed a few issues in fits_copy_cell2image and fits_copy_image2cell
+    related to converting some WCS keyword between the image extension
+    form and the table cell form of the keyword. (cfileio.c)
+
+  - fixed bug in fits_translate_keyword (fitscore.c) that, e.g.,  caused 
+   'EQUINOX' to be translated to EQUINOXA' if the pattern is 'EQUINOXa'
+
+  - fixed 2 bugs that could affect 'tile compressed' floating point
+    images that contain NaN pixels (null pixels).  First, the
+    ZBLANK keyword was not being written, and second, an integer
+    overflow could occur when computing the BZERO offset in the
+    compressed array.  (quantize.c and imcompress.c)
+
+Version 3.006 - 20 February 2006  -(first full release of v3)
+
+  - enhanced the 'col' extended filename syntax to support keyword name
+    expressions like
+       [col error=sqrt(rate); #TUNIT# = 'counts/s'], 
+    in which the trailing '#' will be replaced by the column number
+    of the most recently referenced column.
+    
+  - fixed bug in the parse_data iterator work function that caused it
+    to fail to return a value of -1 in cases where only a selected
+    set of rows were to be processed. (affected Fv)
+
+  - added code to fitsio.h and cfortran.h to typedef LONGLONG to
+    the appropriate 8-byte integer data type.  Most compilers now
+    support the 'long long' data type, but older MS Visual C++
+    compilers used '__int64' instead.
+
+  - made several small changes based on testing by Martin Reinecke:
+    o in  eval.y, change 'int undef' to 'long undef'
+    o in getcold.c and getcole.c, fixed a couple format conversion 
+      specifiers when displaying the value of long long variables.
+    o in fitsio.h, modified the definition of USE_LL_SUFFIX in the
+      case of Athon64 machines.
+    o in fitsio2.h,  defined BYTESWAPPED in the case of SGI machines.
+    o in group.c, added 'include unistd.h' to get rid of compiler warning.
+      
+Version 3.005 - 20 December 2005  (beta)
+
+  - cfortran.h has been enhanced to support 64-bit integer parameters
+    when calling C routines from Fortran.  This modification was kindly 
+    provided by Martin Reinecke (MPE, Garching).  
+    
+  - Many new Fortran wrapper routines have been added to support reading
+    and writing 64-bit integer values in FITS files.  These new routines
+    are documented in the updated version of the 'FITSIO User's Guide' 
+    for Fortran programmers.
+
+  - fixed a problem in the fits_get_keyclass routine that caused it
+    to not recognize the special COMMENT keywords at the beginning
+    of most FITS files that defines the FITS format.
+
+  - added a new check to the ffifile routine that parses the 
+    input extended file name, to distinguish between a FITS extension
+    name that begins with 'pix', and a pixel filtering operator that 
+    begins with the 'pix' keyword.
+
+  - small change to the WCSLIB interface routine, fits_read_wcstab, to
+    be more permissive in allowing the TDIMn keyword to be omitted for
+    degenerate coordinate array.
+
+Version 3.004 - 16 September 2005 (3rd public beta release)
+
+  - a major enhancement to the CFITSIO virtual file parser was provided
+    by Robert Wiegand (GSFC).  One can now specify filtering operations
+    that will be applied on the fly to the pixel values in a FITS image. 
+    For example [pix sqrt(X)] will create a virtual FITS image where the
+    pixel values are the square root of the input image pixels.
+
+  - modified region.c so that it interprets the position angles of regions
+    in a SAO style region file in the same way as DS9.  In particular, if
+    the region parameters are given in WCS units, then the position angle
+    should be relative to the WCS coordinates of the image (increasing CCW
+    from West) instead of relative to the X/Y pixel coordinate system.
+    This only affects rotated images (e.g. with non-zero CROTA2 keyword)
+    with elliptical or rectangular regions.
+
+  - cleaned up fitsio.h and fitsio2.h to make the definition of LONGLONG
+    and BYTESWAPPED and MACHINE more logical.
+    
+  - removed HAVE_LONGLONG everywhere since it is no longer needed (the 
+    compiler now must have an 8-byte integer datatype to build CFITSIO).
+    
+  - added support for the 64-bit IBM AIX platform
+
+  - modifed eval.y so that the circle, ellipse, box, and near functions
+    can operate on vectors as well as scalars.  This allows region filtering
+    on images that are stored in a vector cell in a binary table. 
+    (provided by Craig Markwardt, GSFC)
+
+  New Routines
+  
+  - added new fits_read_wcstab routine that serves as an interface to
+    Mark Calabretta's wcslib library for reading WCS information when
+    the -TAB table lookup convention is used in the FITS file.
+
+  - added new fits_write_nullrows routine, which writes null values into
+    every column of a specified range of rows in a FITS table.
+
+  - added the fits_translate_keyword and fits_translate_keywords utility
+    routines for converting the names of keywords when moving columns and
+    images around.
+    
+  - added fits_copy_cell2image and fits_copy_image2cell routines for
+    copying an image extension (or primary array) to or from a cell
+    in a binary table vector column. 
+  
+  Bug fixes
+  
+  - fixed a memory leak in eval.y;  was fixed by changing a call to malloc
+    to cmalloc instead.
+
+  - changed the definition of several global variables at the beginning
+    of buffers.c to make them 'static' and thus invisible to applications
+    programs.
+
+  - in fits_copy_image_cell, added a call to flush the internal buffers
+    before reading from the file, in case any records had been modified.
+
+Version 3.003 - 28 July 2005 - 2nd public beta release (used in HEASOFT)
+
+  Enhancements
+  
+  - enhanced the string column reading routing fits_get_col_str to 
+    support cases where the user enters a null pointer (rather than
+    a null string) as the nulval parameter.
+
+  - modified the low level ffread and ffwrite routines that physically
+    read and write data from the FITS file so that they write the name
+    of the file to the CFITSIO error stack if an error occurs.
+
+  - changed the definition of fits_open_file into a macro that will test
+    that the version of the fitsio.h include file that was used to 
+    build the CFITSIO library is the same version as included when
+    compiling the application program.
+
+  - made a simple modification to region.c to support regions files
+    of type "linear", for compatibility with ds9 and fv.
+    
+  - modified the internal ffgpr routine (and renamed it ffgprll) so
+    that it returns the TNULL value as a LONGLONG parameter instead
+    of 'long'.
+    
+  - in fits_get_col_display_width, added support for TFORM = 'k'
+  
+  - modified fitsio.h, fitsio2.h, and f77_wrap.h to add test for (_SX)
+    to identify NEC SX supercomputers.
+
+  - modified eval_f.c to treat table columns of TULONG  (unsigned long)
+    as a double.  Also added support for TLONGLONG (8-byte integers) as
+    a double, which is only a temporary fix, since doubles only have about
+    52 bits of precision.
+
+  - changed the 'blank' parameter in the internal ffgphd function to
+    to type LONGLONG to support integer*8 FITS images.
+
+  - when reading the TNULL keyword value, now use ffc2jj instead of
+    ffc2ii, to support integer*8 values.
+
+  Bug fixes
+
+  - fixed a significant bug when writing character strings to a variable
+    length array column of a binary table. This bug would result in some
+    unused space in the variable length heap, making the heap somewhat
+    larger than necessary.  This in itself is usually a minor issue, since
+    the FITS files are perfectly valid, and other software should have
+    no problems reading back the characters strings. In some cases, however,
+    this problem could cause the program that is writing the table
+    to exit with a status = 108 disk read error.
+
+  - modified the standalone imcopy.c utility program to fix a memory allocation
+    bug when running on 64-bit platforms where sizeof(long) = 8 bytes.
+
+  - added an immediate 'return' statement to ffgtcl if the input status >0, 
+    to prevent a segfault on some platforms.
+
+Version 3.002 - 15 April 2005 - first public beta release
+
+  - in drvrfile.c, if it fails to open the file for some reason, then
+    it should reset file_outfile to a null string, to avoid errors on
+    a subsequent call to open a file.
+ 
+  - updated fits_get_keyclass to recognize most of the WCS keywords
+    defined in the WCS Papers I and II.
+
+Version 3.001 - 15 March 2005  - released with HEASOFT 6.0
+
+  - numerous minor changes to the code to get rid of compiler warning
+    messages, mainly dealing with numerical data type casting and the
+    subsequent possible loss of precision in the result.
+
+Version 3.000 - 1 March 2005 (internal beta release)
+
+  Enhancements:
+
+   - Made major changes to many of the CFITSIO routines to more generally 
+     support Large Files (> 2.1 GB).  These changes are intended to 
+     be 100% backward compatible with software that used the previous 
+     versions of CFITSIO.  The datatype of many of the integer parameters 
+     in the CFITSIO functions has been changed from 'long' to 'LONGLONG', 
+     which is typedef'ed to be equivalent to an 8-byte integer datatype on 
+     each platform. With these changes, CFITSIO supports the following:
+        - integer FITS keywords with absolute values > 2**31
+        - FITS files with total sizes > 2**31 bytes
+	- FITS tables in which the number of rows, the row width, or
+	  the size of the heap is > 2**31 bytes
+	- FITS images with dimensions > 2**31 bytes (support is still 
+	  somewhat limited, with full support to be added later).
+
+   - added another lexical parser function (thanks to Craig Markwardt,
+     GSFC): angsep computes the angular separation between 2 positions
+     on the celestial sphere.
+  
+   - modified the image subset extraction code (e.g., when specifying
+     an image subregion when opening the file, such as 
+     'myimage.fits[21:40, 81:90]') so that in addition to
+     updating the values of the primary WCS keywords CRPIXk, CDELTi, and
+     CDj_i in the extracted/binned image, it also looks for and updates 
+     any secondary WCS keywords (e.g., 'CRPIX1P').
+
+   - made cosmetic change to group.c, so that when a group table is
+     copied, any extra columns will be appended after the last existing
+     column, instead of being inserted before the last column.
+     
+   - modified the routines that read tile compressed images to support
+     NULL as the input value for the 'anynul' parameter (meaning the
+     calling program does not want the value of 'anynul' returned to it).
+      
+   - when constructing or parsing a year/month/day character string,
+     (e.g, when writing the DATE keyword) the routines now rigorously
+     verify that the input day value is valid for the given month 
+     (including leap years).
+
+   - added some checks in cfileio.c to detect if some vital parameters
+     that are stored in memory have been corrupted.  This can occur if
+     a user's program writes to areas of memory that it did not allocate.
+
+   - added the wcsutil_alternate.c source code file which contains
+     non-working stubs for the 2 Classic AIPS world coordinate
+     conversion routines that are distributed under the GNU General
+     Public License.  Users who are unwilling or unable to distribute
+     their software under the General Public License may use this 
+     alternate source file which has no GPL restrictions, instead
+     of wcsutil.c.  This will have no effect on programs that use 
+     CFITSIO as long as they do not call the fits_pix_to_world/ffwldp
+     or fits_world_to_pix/ffxypx routines.
+     
+   Bug Fixes
+   
+   - in ffdtdm (which parses the TDIMn keyword value), the check for
+     consistency between the length of the array defined by TDIMn and
+     the size of the TFORMn repeat value, is now not performed for variable
+     length array columns (which always have repeat = 1).
+
+   - fixed byteswapping problem when writing null values to non-standard
+     long integer FITS images with BITPIX = 64 and FITS table columns with
+     TFORMn = 'K'.
+
+   - fixed buffer overflow problem in fits_parse_template/ffgthd that
+     occurred only if the input template keyword value string was much
+     longer than can fit in an 80-char header record.
+     
+Version 2.510 - 2 December 2004
 
   New Routines:
   
@@ -243,7 +739,7 @@ Version 2.470 - 18 August 2003
     data to a FITS image or table.   This was implemented by adding 2
     new C source code files to the package: getcolsb.c and putcolsb.c.
 
-  - Defined a new '1S' shorthand data code for a signed byted column in
+  - Defined a new '1S' shorthand data code for a signed byte column in
     a binary table.  CFITSIO will write TFORMn = '1B' and
     TZEROn = -128 in this case, which is the convention used to
     store signed byte values in a 'B' type column.
@@ -252,7 +748,7 @@ Version 2.470 - 18 August 2003
     support the new AMD Opteron 64-bit processor
 
   - modified configure to not use the -fast compiler flag on Solaris
-    platforms when using the proprietary Solaris cc compilar.  This
+    platforms when using the proprietary Solaris cc compiler.  This
     flag causes compilation problems in eval_y.c (compiler just
     hangs forever).
 
@@ -376,7 +872,7 @@ Version 2.440 - 8 January 2003
   Bug fixes:
 
   - in fits_decompress_img, needed to add a call to ffpscl to turn
-    off the BZERO and BSCALE scaline when reading the compressed image.
+    off the BZERO and BSCALE scaling when reading the compressed image.
 
 Version 2.430 - 4 November 2002
 

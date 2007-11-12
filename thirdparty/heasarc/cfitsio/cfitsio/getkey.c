@@ -30,8 +30,8 @@ int ffghsp(fitsfile *fptr,  /* I - FITS file pointer                     */
     if (fptr->HDUposition != (fptr->Fptr)->curhdu)
         ffmahd(fptr, (fptr->HDUposition) + 1, NULL, status);
 
-    *nexist = ( ((fptr->Fptr)->headend) - 
-                ((fptr->Fptr)->headstart[(fptr->Fptr)->curhdu]) ) / 80;
+    *nexist = (int) (( ((fptr->Fptr)->headend) - 
+                ((fptr->Fptr)->headstart[(fptr->Fptr)->curhdu]) ) / 80);
 
     if ((fptr->Fptr)->datastart == DATA_UNDEFINED)
     {
@@ -42,7 +42,7 @@ int ffghsp(fitsfile *fptr,  /* I - FITS file pointer                     */
     {
       /* calculate space available between the data and the END card */
       if (nmore)
-        *nmore = ((fptr->Fptr)->datastart - (fptr->Fptr)->headend) / 80 - 1;
+        *nmore = (int) (((fptr->Fptr)->datastart - (fptr->Fptr)->headend) / 80 - 1);
     }
 
     return(*status);
@@ -63,8 +63,8 @@ int ffghps(fitsfile *fptr, /* I - FITS file pointer                     */
     if (fptr->HDUposition != (fptr->Fptr)->curhdu)
         ffmahd(fptr, (fptr->HDUposition) + 1, NULL, status);
 
-  *nexist = ( ((fptr->Fptr)->headend) - ((fptr->Fptr)->headstart[(fptr->Fptr)->curhdu]) ) / 80;
-  *position = ( ((fptr->Fptr)->nextkey) - ((fptr->Fptr)->headstart[(fptr->Fptr)->curhdu]) ) / 80 + 1;
+  *nexist = (int) (( ((fptr->Fptr)->headend) - ((fptr->Fptr)->headstart[(fptr->Fptr)->curhdu]) ) / 80);
+  *position = (int) (( ((fptr->Fptr)->nextkey) - ((fptr->Fptr)->headstart[(fptr->Fptr)->curhdu]) ) / 80 + 1);
   return(*status);
 }
 /*--------------------------------------------------------------------------*/
@@ -78,7 +78,7 @@ int ffnchk(fitsfile *fptr,  /* I - FITS file pointer                     */
 */
 {
     long ii, nblock;
-    OFF_T bytepos;
+    LONGLONG bytepos;
     int length, nullpos;
     char block[2881];
     
@@ -96,8 +96,8 @@ int ffnchk(fitsfile *fptr,  /* I - FITS file pointer                     */
     else
     {
         /* calculate number of blocks in the header */
-        nblock = ( (fptr->Fptr)->datastart - 
-                   (fptr->Fptr)->headstart[(fptr->Fptr)->curhdu] ) / 2880;
+        nblock = (long) (( (fptr->Fptr)->datastart - 
+                   (fptr->Fptr)->headstart[(fptr->Fptr)->curhdu] ) / 2880);
     }
 
     bytepos = (fptr->Fptr)->headstart[(fptr->Fptr)->curhdu];
@@ -161,7 +161,7 @@ int ffgnky(fitsfile *fptr,  /* I - FITS file pointer     */
 */
 {
     int jj, nrec;
-    OFF_T bytepos, endhead;
+    LONGLONG bytepos, endhead;
     char message[FLEN_ERRMSG];
 
     if (*status > 0)
@@ -188,7 +188,7 @@ int ffgnky(fitsfile *fptr,  /* I - FITS file pointer     */
     if (bytepos > endhead ||  
         bytepos < (fptr->Fptr)->headstart[(fptr->Fptr)->curhdu] ) 
     {
-        nrec=(bytepos - (fptr->Fptr)->headstart[(fptr->Fptr)->curhdu]) / 80 + 1;
+        nrec= (int) ((bytepos - (fptr->Fptr)->headstart[(fptr->Fptr)->curhdu]) / 80 + 1);
         sprintf(message, "Cannot get keyword number %d.  It does not exist.",
                 nrec);
         ffpmsg(message);
@@ -297,7 +297,7 @@ int ffgky( fitsfile *fptr,     /* I - FITS file pointer        */
             if (longval > UCHAR_MAX || longval < 0)
                 *status = NUM_OVERFLOW;
             else
-                *(unsigned char *) value = longval;
+                *(unsigned char *) value = (unsigned char) longval;
         }
     }
     else if (datatype == TSBYTE)
@@ -307,7 +307,7 @@ int ffgky( fitsfile *fptr,     /* I - FITS file pointer        */
             if (longval > 127 || longval < -128)
                 *status = NUM_OVERFLOW;
             else
-                *(signed char *) value = longval;
+                *(signed char *) value = (signed char) longval;
         }
     }
     else if (datatype == TUSHORT)
@@ -317,7 +317,7 @@ int ffgky( fitsfile *fptr,     /* I - FITS file pointer        */
             if (longval > USHRT_MAX || longval < 0)
                 *status = NUM_OVERFLOW;
             else
-                *(unsigned short *) value = longval;
+                *(unsigned short *) value = (unsigned short) longval;
         }
     }
     else if (datatype == TSHORT)
@@ -327,7 +327,7 @@ int ffgky( fitsfile *fptr,     /* I - FITS file pointer        */
             if (longval > SHRT_MAX || longval < SHRT_MIN)
                 *status = NUM_OVERFLOW;
             else
-                *(short *) value = longval;
+                *(short *) value = (short) longval;
         }
     }
     else if (datatype == TUINT)
@@ -361,12 +361,16 @@ int ffgky( fitsfile *fptr,     /* I - FITS file pointer        */
             if (doubleval > (double) ULONG_MAX || doubleval < 0)
                 *status = NUM_OVERFLOW;
             else
-                 *(unsigned long *) value = doubleval;
+                 *(unsigned long *) value = (unsigned long) doubleval;
         }
     }
     else if (datatype == TLONG)
     {
         ffgkyj(fptr, keyname, (long *) value, comm, status);
+    }
+    else if (datatype == TLONGLONG)
+    {
+        ffgkyjj(fptr, keyname, (LONGLONG *) value, comm, status);
     }
     else if (datatype == TFLOAT)
     {
@@ -894,6 +898,28 @@ int ffgkyj( fitsfile *fptr,     /* I - FITS file pointer         */
     return(*status);
 }
 /*--------------------------------------------------------------------------*/
+int ffgkyjj( fitsfile *fptr,     /* I - FITS file pointer         */
+            char *keyname,      /* I - name of keyword to read   */
+            LONGLONG *value,    /* O - keyword value             */
+            char *comm,         /* O - keyword comment           */
+            int  *status)       /* IO - error status             */
+/*
+  Read (get) the named keyword, returning the value and comment.
+  The value will be implicitly converted to a (long) integer if it not
+  already of this datatype.  The comment may be up to 69 characters long.
+*/
+{
+    char valstring[FLEN_VALUE];
+
+    if (*status > 0)
+        return(*status);
+
+    ffgkey(fptr, keyname, valstring, comm, status);  /* read the keyword */
+    ffc2j(valstring, value, status);   /* convert string to value */
+
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
 int ffgkye( fitsfile *fptr,     /* I - FITS file pointer         */
             char  *keyname,     /* I - name of keyword to read   */
             float *value,       /* O - keyword value             */
@@ -1327,6 +1353,79 @@ int ffgknj( fitsfile *fptr,     /* I - FITS file pointer                    */
     return(*status);
 }
 /*--------------------------------------------------------------------------*/
+int ffgknjj( fitsfile *fptr,    /* I - FITS file pointer                    */
+            char *keyname,      /* I - root name of keywords to read        */
+            int  nstart,        /* I - starting index number                */
+            int  nmax,          /* I - maximum number of keywords to return */
+            LONGLONG *value,    /* O - array of keyword values              */
+            int  *nfound,       /* O - number of values that were returned  */
+            int  *status)       /* IO - error status                        */
+/*
+  Read (get) an indexed array of keywords with index numbers between
+  NSTART and (NSTART + NMAX -1) inclusive.  
+*/
+{
+    int nend, lenroot, ii, nkeys, mkeys, tstatus, undefinedval;
+    long ival;
+    char keyroot[FLEN_KEYWORD], keyindex[8], card[FLEN_CARD];
+    char svalue[FLEN_VALUE], comm[FLEN_COMMENT];
+
+    if (*status > 0)
+        return(*status);
+
+    *nfound = 0;
+    nend = nstart + nmax - 1;
+
+    keyroot[0] = '\0';
+    strncat(keyroot, keyname, 8);
+
+    lenroot = strlen(keyroot);
+    if (lenroot == 0 || lenroot > 7)     /* root must be 1 - 7 chars long */
+        return(*status);
+
+    for (ii=0; ii < lenroot; ii++)           /*  make sure upper case  */
+        keyroot[ii] = toupper(keyroot[ii]);
+
+    ffghps(fptr, &nkeys, &mkeys, status);  /*  get the number of keywords  */
+
+    ffmaky(fptr, 3, status);  /* move to 3rd keyword (skip 1st 2 keywords) */
+
+    undefinedval = FALSE;
+    for (ii=3; ii <= nkeys; ii++)  
+    {
+       if (ffgnky(fptr, card, status) > 0)     /*  get next keyword  */
+           return(*status);
+
+       if (strncmp(keyroot, card, lenroot) == 0)  /* see if keyword matches */
+       {
+          keyindex[0] = '\0';
+          strncat(keyindex, &card[lenroot], 8-lenroot);  /*  copy suffix */
+
+          tstatus = 0;
+          if (ffc2ii(keyindex, &ival, &tstatus) <= 0)     /*  test suffix  */
+          {
+             if (ival <= nend && ival >= nstart)
+             {
+                ffpsvc(card, svalue, comm, status);   /*  parse the value */
+                ffc2j(svalue, &value[ival-nstart], status);  /* convert */
+                if (ival - nstart + 1 > *nfound)
+                      *nfound = ival - nstart + 1;  /*  max found */ 
+
+                if (*status == VALUE_UNDEFINED)
+                {
+                    undefinedval = TRUE;
+                   *status = 0;  /* reset status to read remaining values */
+                }
+             }
+          }
+       }
+    }
+    if (undefinedval && (*status <= 0) )
+        *status = VALUE_UNDEFINED;  /* report at least 1 value undefined */
+
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
 int ffgkne( fitsfile *fptr,     /* I - FITS file pointer                    */
             char *keyname,      /* I - root name of keywords to read        */
             int  nstart,        /* I - starting index number                */
@@ -1498,6 +1597,31 @@ int ffgtdm(fitsfile *fptr,  /* I - FITS file pointer                        */
     return(*status);
 }
 /*--------------------------------------------------------------------------*/
+int ffgtdmll(fitsfile *fptr,  /* I - FITS file pointer                      */
+           int colnum,      /* I - number of the column to read             */
+           int maxdim,      /* I - maximum no. of dimensions to read;       */
+           int *naxis,      /* O - number of axes in the data array         */
+           LONGLONG naxes[], /* O - length of each data axis                 */
+           int *status)     /* IO - error status                            */
+/*
+  read and parse the TDIMnnn keyword to get the dimensionality of a column
+*/
+{
+    int tstatus = 0;
+    char keyname[FLEN_KEYWORD], tdimstr[FLEN_VALUE];
+
+    if (*status > 0)
+        return(*status);
+
+    ffkeyn("TDIM", colnum, keyname, status);      /* construct keyword name */
+
+    ffgkys(fptr, keyname, tdimstr, NULL, &tstatus); /* try reading keyword */
+
+    ffdtdmll(fptr, tdimstr, colnum, maxdim,naxis, naxes, status); /* decode it */
+
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
 int ffdtdm(fitsfile *fptr,  /* I - FITS file pointer                        */
            char *tdimstr,   /* I - TDIMn keyword value string. e.g. (10,10) */
            int colnum,      /* I - number of the column             */
@@ -1570,7 +1694,7 @@ int ffdtdm(fitsfile *fptr,  /* I - FITS file pointer                        */
             return(*status = BAD_TDIM);
         }
 
-        if ((long) colptr->trepeat != totalpix)
+        if ((colptr->tdatatype > 0) && ((long) colptr->trepeat != totalpix))
         {
           sprintf(message,
           "column vector length, %ld, does not equal TDIMn array size, %ld",
@@ -1582,7 +1706,100 @@ int ffdtdm(fitsfile *fptr,  /* I - FITS file pointer                        */
     }
     return(*status);
 }
+/*--------------------------------------------------------------------------*/
+int ffdtdmll(fitsfile *fptr,  /* I - FITS file pointer                        */
+           char *tdimstr,   /* I - TDIMn keyword value string. e.g. (10,10) */
+           int colnum,      /* I - number of the column             */
+           int maxdim,      /* I - maximum no. of dimensions to read;       */
+           int *naxis,      /* O - number of axes in the data array         */
+           LONGLONG naxes[],    /* O - length of each data axis                 */
+           int *status)     /* IO - error status                            */
+/*
+  decode the TDIMnnn keyword to get the dimensionality of a column.
+  Check that the value is legal and consistent with the TFORM value.
+*/
+{
+    LONGLONG dimsize;
+    LONGLONG totalpix = 1;
+    char *loc, *lastloc, message[81];
+    tcolumn *colptr;
+    double doublesize;
 
+    if (*status > 0)
+        return(*status);
+
+    if (fptr->HDUposition != (fptr->Fptr)->curhdu)
+        ffmahd(fptr, (fptr->HDUposition) + 1, NULL, status);
+
+    if (colnum < 1 || colnum > (fptr->Fptr)->tfield)
+        return(*status = BAD_COL_NUM);
+
+    colptr = (fptr->Fptr)->tableptr;   /* set pointer to the first column */
+    colptr += (colnum - 1);    /* increment to the correct column */
+
+    if (!tdimstr[0])   /* TDIMn keyword doesn't exist? */
+    {
+        *naxis = 1;                   /* default = 1 dimensional */
+        if (maxdim > 0)
+            naxes[0] = colptr->trepeat; /* default length = repeat */
+    }
+    else
+    {
+        *naxis = 0;
+
+        loc = strchr(tdimstr, '(' );  /* find the opening quote */
+        if (!loc)
+        {
+            sprintf(message, "Illegal TDIM keyword value: %s", tdimstr);
+            return(*status = BAD_TDIM);
+        }
+
+        while (loc)
+        {
+            loc++;
+
+    /* Read value as a double because the string to 64-bit int function is  */
+    /* platform dependent (strtoll, strtol, _atoI64).  This still gives     */
+    /* about 48 bits of precision, which is plenty for this purpose.        */
+
+            doublesize = strtod(loc, &loc);
+            dimsize = (LONGLONG) (doublesize + 0.1);
+
+            if (*naxis < maxdim)
+                naxes[*naxis] = dimsize;
+
+            if (dimsize < 0)
+            {
+                ffpmsg("one or more TDIM values are less than 0 (ffdtdm)");
+                ffpmsg(tdimstr);
+                return(*status = BAD_TDIM);
+            }
+
+            totalpix *= dimsize;
+            (*naxis)++;
+            lastloc = loc;
+            loc = strchr(loc, ',');  /* look for comma before next dimension */
+        }
+
+        loc = strchr(lastloc, ')' );  /* check for the closing quote */
+        if (!loc)
+        {
+            sprintf(message, "Illegal TDIM keyword value: %s", tdimstr);
+            return(*status = BAD_TDIM);
+        }
+
+        if ((colptr->tdatatype > 0) && (colptr->trepeat != totalpix))
+        {
+          sprintf(message,
+          "column vector length, %.0f, does not equal TDIMn array size, %.0f",
+          (double) (colptr->trepeat), (double) totalpix);
+          ffpmsg(message);
+          ffpmsg(tdimstr);
+          return(*status = BAD_TDIM);
+        }
+    }
+    return(*status);
+}
 /*--------------------------------------------------------------------------*/
 int ffghpr(fitsfile *fptr,  /* I - FITS file pointer                        */
            int maxdim,      /* I - maximum no. of dimensions to read;       */
@@ -1601,12 +1818,48 @@ int ffghpr(fitsfile *fptr,  /* I - FITS file pointer                        */
   or IMAGE extension.
 */
 {
+    int idummy, ii;
+    LONGLONG lldummy;
+    double ddummy;
+    LONGLONG tnaxes[99];
+
+    ffgphd(fptr, maxdim, simple, bitpix, naxis, tnaxes, pcount, gcount, extend,
+          &ddummy, &ddummy, &lldummy, &idummy, status);
+	  
+    if (naxis && naxes) {
+         for (ii = 0; (ii < *naxis) && (ii < maxdim); ii++)
+	     naxes[ii] = (long) tnaxes[ii];
+    } else if (naxes) {
+         for (ii = 0; ii < maxdim; ii++)
+	     naxes[ii] = (long) tnaxes[ii];
+    }
+
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
+int ffghprll(fitsfile *fptr,  /* I - FITS file pointer                        */
+           int maxdim,      /* I - maximum no. of dimensions to read;       */
+           int *simple,     /* O - does file conform to FITS standard? 1/0  */
+           int *bitpix,     /* O - number of bits per data value pixel      */
+           int *naxis,      /* O - number of axes in the data array         */
+           LONGLONG naxes[],    /* O - length of each data axis                 */
+           long *pcount,    /* O - number of group parameters (usually 0)   */
+           long *gcount,    /* O - number of random groups (usually 1 or 0) */
+           int *extend,     /* O - may FITS file haave extensions?          */
+           int *status)     /* IO - error status                            */
+/*
+  Get keywords from the Header of the PRimary array:
+  Check that the keywords conform to the FITS standard and return the
+  parameters which determine the size and structure of the primary array
+  or IMAGE extension.
+*/
+{
     int idummy;
-    long ldummy;
+    LONGLONG lldummy;
     double ddummy;
 
     ffgphd(fptr, maxdim, simple, bitpix, naxis, naxes, pcount, gcount, extend,
-          &ddummy, &ddummy, &ldummy, &idummy, status);
+          &ddummy, &ddummy, &lldummy, &idummy, status);
 
     return(*status);
 }
@@ -1629,9 +1882,10 @@ int ffghtb(fitsfile *fptr,  /* I - FITS file pointer                        */
 */
 {
     int ii, maxf, nfound, tstatus;
-    long pcount, fields;
+    long fields;
     char name[FLEN_KEYWORD], value[FLEN_VALUE], comm[FLEN_COMMENT];
     char xtension[FLEN_VALUE], message[81];
+    LONGLONG llnaxis1, llnaxis2, pcount;
 
     if (*status > 0)
         return(*status);
@@ -1668,13 +1922,19 @@ int ffghtb(fitsfile *fptr,  /* I - FITS file pointer                        */
         return(*status = NO_XTENSION);
     }
 
-    if (ffgttb(fptr, naxis1, naxis2, &pcount, &fields, status) > 0)
+    if (ffgttb(fptr, &llnaxis1, &llnaxis2, &pcount, &fields, status) > 0)
         return(*status);
+
+    if (naxis1)
+       *naxis1 = (long) llnaxis1;
+
+    if (naxis2)
+       *naxis2 = (long) llnaxis2;
 
     if (pcount != 0)
     {
-       sprintf(message, "PCOUNT = %ld is illegal in ASCII table; must = 0",
-               pcount);
+       sprintf(message, "PCOUNT = %.0f is illegal in ASCII table; must = 0",
+               (double) pcount);
        ffpmsg(message);
        return(*status = BAD_PCOUNT);
     }
@@ -1747,6 +2007,149 @@ int ffghtb(fitsfile *fptr,  /* I - FITS file pointer                        */
     return(*status);
 }
 /*--------------------------------------------------------------------------*/
+int ffghtbll(fitsfile *fptr, /* I - FITS file pointer                        */
+           int maxfield,    /* I - maximum no. of columns to read;          */
+           LONGLONG *naxis1, /* O - length of table row in bytes             */
+           LONGLONG *naxis2, /* O - number of rows in the table              */
+           int *tfields,    /* O - number of columns in the table           */
+           char **ttype,    /* O - name of each column                      */
+           LONGLONG *tbcol, /* O - byte offset in row to each column        */
+           char **tform,    /* O - value of TFORMn keyword for each column  */
+           char **tunit,    /* O - value of TUNITn keyword for each column  */
+           char *extnm,     /* O - value of EXTNAME keyword, if any         */
+           int *status)     /* IO - error status                            */
+/*
+  Get keywords from the Header of the ASCII TaBle:
+  Check that the keywords conform to the FITS standard and return the
+  parameters which describe the table.
+*/
+{
+    int ii, maxf, nfound, tstatus;
+    long fields;
+    char name[FLEN_KEYWORD], value[FLEN_VALUE], comm[FLEN_COMMENT];
+    char xtension[FLEN_VALUE], message[81];
+    LONGLONG llnaxis1, llnaxis2, pcount;
+
+    if (*status > 0)
+        return(*status);
+
+    /* read the first keyword of the extension */
+    ffgkyn(fptr, 1, name, value, comm, status);
+
+    if (!strcmp(name, "XTENSION"))
+    {
+            if (ffc2s(value, xtension, status) > 0)  /* get the value string */
+            {
+                ffpmsg("Bad value string for XTENSION keyword:");
+                ffpmsg(value);
+                return(*status);
+            }
+
+            /* allow the quoted string value to begin in any column and */
+            /* allow any number of trailing blanks before the closing quote */
+            if ( (value[0] != '\'')   ||  /* first char must be a quote */
+                 ( strcmp(xtension, "TABLE") ) )
+            {
+                sprintf(message,
+                "This is not a TABLE extension: %s", value);
+                ffpmsg(message);
+                return(*status = NOT_ATABLE);
+            }
+    }
+
+    else  /* error: 1st keyword of extension != XTENSION */
+    {
+        sprintf(message,
+        "First keyword of the extension is not XTENSION: %s", name);
+        ffpmsg(message);
+        return(*status = NO_XTENSION);
+    }
+
+    if (ffgttb(fptr, &llnaxis1, &llnaxis2, &pcount, &fields, status) > 0)
+        return(*status);
+
+    if (naxis1)
+       *naxis1 = llnaxis1;
+
+    if (naxis2)
+       *naxis2 = llnaxis2;
+
+    if (pcount != 0)
+    {
+       sprintf(message, "PCOUNT = %.0f is illegal in ASCII table; must = 0",
+             (double) pcount);
+       ffpmsg(message);
+       return(*status = BAD_PCOUNT);
+    }
+
+    if (tfields)
+       *tfields = fields;
+
+    if (maxfield < 0)
+        maxf = fields;
+    else
+        maxf = minvalue(maxfield, fields);
+
+    if (maxf > 0)
+    {
+        for (ii = 0; ii < maxf; ii++)
+        {   /* initialize optional keyword values */
+            if (ttype)
+                *ttype[ii] = '\0';   
+
+            if (tunit)
+                *tunit[ii] = '\0';
+        }
+
+   
+        if (ttype)
+            ffgkns(fptr, "TTYPE", 1, maxf, ttype, &nfound, status);
+
+        if (tunit)
+            ffgkns(fptr, "TUNIT", 1, maxf, tunit, &nfound, status);
+
+        if (*status > 0)
+            return(*status);
+
+        if (tbcol)
+        {
+            ffgknjj(fptr, "TBCOL", 1, maxf, tbcol, &nfound, status);
+
+            if (*status > 0 || nfound != maxf)
+            {
+                ffpmsg(
+        "Required TBCOL keyword(s) not found in ASCII table header (ffghtbll).");
+                return(*status = NO_TBCOL);
+            }
+        }
+
+        if (tform)
+        {
+            ffgkns(fptr, "TFORM", 1, maxf, tform, &nfound, status);
+
+            if (*status > 0 || nfound != maxf)
+            {
+                ffpmsg(
+        "Required TFORM keyword(s) not found in ASCII table header (ffghtbll).");
+                return(*status = NO_TFORM);
+            }
+        }
+    }
+
+    if (extnm)
+    {
+        extnm[0] = '\0';
+
+        tstatus = *status;
+        ffgkys(fptr, "EXTNAME", extnm, comm, status);
+
+        if (*status == KEY_NO_EXIST)
+            *status = tstatus;  /* keyword not required, so ignore error */
+    }
+
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
 int ffghbn(fitsfile *fptr,  /* I - FITS file pointer                        */
            int maxfield,    /* I - maximum no. of columns to read;          */
            long *naxis2,    /* O - number of rows in the table              */
@@ -1754,7 +2157,7 @@ int ffghbn(fitsfile *fptr,  /* I - FITS file pointer                        */
            char **ttype,    /* O - name of each column                      */
            char **tform,    /* O - TFORMn value for each column             */
            char **tunit,    /* O - TUNITn value for each column             */
-           char *extnm,   /* O - value of EXTNAME keyword, if any         */
+           char *extnm,     /* O - value of EXTNAME keyword, if any         */
            long *pcount,    /* O - value of PCOUNT keyword                  */
            int *status)     /* IO - error status                            */
 /*
@@ -1764,9 +2167,10 @@ int ffghbn(fitsfile *fptr,  /* I - FITS file pointer                        */
 */
 {
     int ii, maxf, nfound, tstatus;
-    long naxis1, fields;
+    long  fields;
     char name[FLEN_KEYWORD], value[FLEN_VALUE], comm[FLEN_COMMENT];
     char xtension[FLEN_VALUE], message[81];
+    LONGLONG naxis1ll, naxis2ll, pcountll;
 
     if (*status > 0)
         return(*status);
@@ -1806,8 +2210,137 @@ int ffghbn(fitsfile *fptr,  /* I - FITS file pointer                        */
         return(*status = NO_XTENSION);
     }
 
-    if (ffgttb(fptr, &naxis1, naxis2, pcount, &fields, status) > 0)
+    if (ffgttb(fptr, &naxis1ll, &naxis2ll, &pcountll, &fields, status) > 0)
         return(*status);
+
+    if (naxis2)
+       *naxis2 = (long) naxis2ll;
+
+    if (pcount)
+       *pcount = (long) pcountll;
+
+    if (tfields)
+        *tfields = fields;
+
+    if (maxfield < 0)
+        maxf = fields;
+    else
+        maxf = minvalue(maxfield, fields);
+
+    if (maxf > 0)
+    {
+        for (ii = 0; ii < maxf; ii++)
+        {   /* initialize optional keyword values */
+            if (ttype)
+                *ttype[ii] = '\0';   
+
+            if (tunit)
+                *tunit[ii] = '\0';
+        }
+
+        if (ttype)
+            ffgkns(fptr, "TTYPE", 1, maxf, ttype, &nfound, status);
+
+        if (tunit)
+            ffgkns(fptr, "TUNIT", 1, maxf, tunit, &nfound, status);
+
+        if (*status > 0)
+            return(*status);
+
+        if (tform)
+        {
+            ffgkns(fptr, "TFORM", 1, maxf, tform, &nfound, status);
+
+            if (*status > 0 || nfound != maxf)
+            {
+                ffpmsg(
+        "Required TFORM keyword(s) not found in binary table header (ffghbn).");
+                return(*status = NO_TFORM);
+            }
+        }
+    }
+
+    if (extnm)
+    {
+        extnm[0] = '\0';
+
+        tstatus = *status;
+        ffgkys(fptr, "EXTNAME", extnm, comm, status);
+
+        if (*status == KEY_NO_EXIST)
+          *status = tstatus;  /* keyword not required, so ignore error */
+    }
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
+int ffghbnll(fitsfile *fptr,  /* I - FITS file pointer                        */
+           int maxfield,    /* I - maximum no. of columns to read;          */
+           LONGLONG *naxis2,    /* O - number of rows in the table              */
+           int *tfields,    /* O - number of columns in the table           */
+           char **ttype,    /* O - name of each column                      */
+           char **tform,    /* O - TFORMn value for each column             */
+           char **tunit,    /* O - TUNITn value for each column             */
+           char *extnm,     /* O - value of EXTNAME keyword, if any         */
+           LONGLONG *pcount,    /* O - value of PCOUNT keyword                  */
+           int *status)     /* IO - error status                            */
+/*
+  Get keywords from the Header of the BiNary table:
+  Check that the keywords conform to the FITS standard and return the
+  parameters which describe the table.
+*/
+{
+    int ii, maxf, nfound, tstatus;
+    long  fields;
+    char name[FLEN_KEYWORD], value[FLEN_VALUE], comm[FLEN_COMMENT];
+    char xtension[FLEN_VALUE], message[81];
+    LONGLONG naxis1ll, naxis2ll, pcountll;
+
+    if (*status > 0)
+        return(*status);
+
+    /* read the first keyword of the extension */
+    ffgkyn(fptr, 1, name, value, comm, status);
+
+    if (!strcmp(name, "XTENSION"))
+    {
+            if (ffc2s(value, xtension, status) > 0)  /* get the value string */
+            {
+                ffpmsg("Bad value string for XTENSION keyword:");
+                ffpmsg(value);
+                return(*status);
+            }
+
+            /* allow the quoted string value to begin in any column and */
+            /* allow any number of trailing blanks before the closing quote */
+            if ( (value[0] != '\'')   ||  /* first char must be a quote */
+                 ( strcmp(xtension, "BINTABLE") &&
+                   strcmp(xtension, "A3DTABLE") &&
+                   strcmp(xtension, "3DTABLE")
+                 ) )
+            {
+                sprintf(message,
+                "This is not a BINTABLE extension: %s", value);
+                ffpmsg(message);
+                return(*status = NOT_BTABLE);
+            }
+    }
+
+    else  /* error: 1st keyword of extension != XTENSION */
+    {
+        sprintf(message,
+        "First keyword of the extension is not XTENSION: %s", name);
+        ffpmsg(message);
+        return(*status = NO_XTENSION);
+    }
+
+    if (ffgttb(fptr, &naxis1ll, &naxis2ll, &pcountll, &fields, status) > 0)
+        return(*status);
+
+    if (naxis2)
+       *naxis2 = naxis2ll;
+
+    if (pcount)
+       *pcount = pcountll;
 
     if (tfields)
         *tfields = fields;
@@ -1868,13 +2401,13 @@ int ffgphd(fitsfile *fptr,  /* I - FITS file pointer                        */
            int *simple,     /* O - does file conform to FITS standard? 1/0  */
            int *bitpix,     /* O - number of bits per data value pixel      */
            int *naxis,      /* O - number of axes in the data array         */
-           long naxes[],    /* O - length of each data axis                 */
+           LONGLONG naxes[],    /* O - length of each data axis                 */
            long *pcount,    /* O - number of group parameters (usually 0)   */
            long *gcount,    /* O - number of random groups (usually 1 or 0) */
            int *extend,     /* O - may FITS file haave extensions?          */
            double *bscale,  /* O - array pixel linear scaling factor        */
            double *bzero,   /* O - array pixel linear scaling zero point    */
-           long *blank,     /* O - value used to represent undefined pixels */
+           LONGLONG *blank, /* O - value used to represent undefined pixels */
            int *nspace,     /* O - number of blank keywords prior to END    */
            int *status)     /* IO - error status                            */
 {
@@ -1884,7 +2417,8 @@ int ffgphd(fitsfile *fptr,  /* I - FITS file pointer                        */
   structure of the primary array or IMAGE extension.
 */
     int unknown, found_end, tstatus, ii, nextkey, namelen;
-    long longbitpix, longnaxis, axislen;
+    long longbitpix, longnaxis;
+    LONGLONG axislen;
     char message[FLEN_ERRMSG], keyword[FLEN_KEYWORD];
     char card[FLEN_CARD];
     char name[FLEN_KEYWORD], value[FLEN_VALUE], comm[FLEN_COMMENT];
@@ -1992,7 +2526,7 @@ int ffgphd(fitsfile *fptr,  /* I - FITS file pointer                        */
 
         if (naxes)
         {
-            ffgisz(fptr, maxdim, naxes, status);  /* get NAXISn value */
+            ffgiszll(fptr, maxdim, naxes, status);  /* get NAXISn value */
 
             if (*status > 0)
             {
@@ -2061,7 +2595,7 @@ int ffgphd(fitsfile *fptr,  /* I - FITS file pointer                        */
         for (ii=0, nextkey=4; ii < longnaxis; ii++, nextkey++)
         {
             ffkeyn("NAXIS", ii+1, keyword, status);
-            ffgtkn(fptr, 4+ii, keyword, &axislen, status);
+            ffgtknjj(fptr, 4+ii, keyword, &axislen, status);
 
             if (*status == BAD_ORDER)
                 return(*status = NO_NAXES);
@@ -2169,7 +2703,7 @@ int ffgphd(fitsfile *fptr,  /* I - FITS file pointer                        */
             *nspace = 0;  /* reset count of blank keywords */
             ffpsvc(card, value, comm, status); /* parse value and comment */
 
-            if (ffc2ii(value, blank, status) > 0) /* convert to long */
+            if (ffc2jj(value, blank, status) > 0) /* convert to LONGLONG */
             {
                 /* reset error status and continue, but still issue warning */
                 *status = tstatus;
@@ -2255,9 +2789,9 @@ int ffgphd(fitsfile *fptr,  /* I - FITS file pointer                        */
 }
 /*--------------------------------------------------------------------------*/
 int ffgttb(fitsfile *fptr,      /* I - FITS file pointer*/
-           long *rowlen,        /* O - length of a table row, in bytes */
-           long *nrows,         /* O - number of rows in the table */
-           long *pcount,        /* O - value of PCOUNT keyword */
+           LONGLONG *rowlen,        /* O - length of a table row, in bytes */
+           LONGLONG *nrows,         /* O - number of rows in the table */
+           LONGLONG *pcount,    /* O - value of PCOUNT keyword */
            long *tfields,       /* O - number of fields in the table */
            int *status)         /* IO - error status    */
 {
@@ -2280,17 +2814,17 @@ int ffgttb(fitsfile *fptr,      /* I - FITS file pointer*/
     else if (*status == NOT_POS_INT)
         return(*status = BAD_NAXIS); /* value != 2 */
 
-    if (ffgtkn(fptr, 4, "NAXIS1", rowlen, status) == BAD_ORDER) /* 4th key */
+    if (ffgtknjj(fptr, 4, "NAXIS1", rowlen, status) == BAD_ORDER) /* 4th key */
         return(*status = NO_NAXES);  /* keyword not NAXIS1 */
     else if (*status == NOT_POS_INT)
         return(*status == BAD_NAXES); /* bad NAXIS1 value */
 
-    if (ffgtkn(fptr, 5, "NAXIS2", nrows, status) == BAD_ORDER) /* 5th key */
+    if (ffgtknjj(fptr, 5, "NAXIS2", nrows, status) == BAD_ORDER) /* 5th key */
         return(*status = NO_NAXES);  /* keyword not NAXIS2 */
     else if (*status == NOT_POS_INT)
         return(*status == BAD_NAXES); /* bad NAXIS2 value */
 
-    if (ffgtkn(fptr, 6, "PCOUNT", pcount, status) == BAD_ORDER) /* 6th key */
+    if (ffgtknjj(fptr, 6, "PCOUNT", pcount, status) == BAD_ORDER) /* 6th key */
         return(*status = NO_PCOUNT);  /* keyword not PCOUNT */
     else if (*status == NOT_POS_INT)
         return(*status = BAD_PCOUNT); /* bad PCOUNT value */
@@ -2367,6 +2901,60 @@ int ffgtkn(fitsfile *fptr,  /* I - FITS file pointer              */
     return(*status);
 }
 /*--------------------------------------------------------------------------*/
+int ffgtknjj(fitsfile *fptr,  /* I - FITS file pointer              */
+           int numkey,      /* I - number of the keyword to read  */
+           char *name,      /* I - expected name of the keyword   */
+           LONGLONG *value, /* O - integer value of the keyword   */
+           int *status)     /* IO - error status                  */
+{
+/*
+  test that keyword number NUMKEY has the expected name and get the
+  integer value of the keyword.  Return an error if the keyword
+  name does not match the input name, or if the value of the
+  keyword is not a positive integer.
+*/
+    char keyname[FLEN_KEYWORD], valuestring[FLEN_VALUE];
+    char comm[FLEN_COMMENT], message[FLEN_ERRMSG];
+   
+    if (*status > 0)
+        return(*status);
+    
+    keyname[0] = '\0';
+    valuestring[0] = '\0';
+
+    if (ffgkyn(fptr, numkey, keyname, valuestring, comm, status) <= 0)
+    {
+        if (strcmp(keyname, name) )
+            *status = BAD_ORDER;  /* incorrect keyword name */
+
+        else
+        {
+            ffc2jj(valuestring, value, status);  /* convert to integer */
+
+            if (*status > 0 || *value < 0 )
+               *status = NOT_POS_INT;
+        }
+
+        if (*status > 0)
+        {
+            sprintf(message,
+              "ffgtknjj found unexpected keyword or value for keyword no. %d.",
+              numkey);
+            ffpmsg(message);
+
+            sprintf(message,
+              " Expected positive integer keyword %s, but instead", name);
+            ffpmsg(message);
+
+            sprintf(message,
+              " found keyword %s with value %s", keyname, valuestring);
+            ffpmsg(message);
+        }
+    }
+
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
 int fftkyn(fitsfile *fptr,  /* I - FITS file pointer              */
            int numkey,      /* I - number of the keyword to read  */
            char *name,      /* I - expected name of the keyword   */
@@ -2426,7 +3014,7 @@ int ffh2st(fitsfile *fptr,   /* I - FITS file pointer           */
 {
     int nkeys;
     long nrec;
-    OFF_T headstart;
+    LONGLONG headstart;
 
     if (*status > 0)
         return(*status);
@@ -2446,7 +3034,7 @@ int ffh2st(fitsfile *fptr,   /* I - FITS file pointer           */
          return(*status);
     }
 
-    ffghof(fptr, &headstart, NULL, NULL, status); /* get header address */
+    ffghadll(fptr, &headstart, NULL, NULL, status); /* get header address */
     ffmbyt(fptr, headstart, REPORT_EOF, status);   /* move to header */
     ffgbyt(fptr, nrec * 2880, *header, status);     /* copy header */
     *(*header + (nrec * 2880)) = '\0';
@@ -2538,7 +3126,8 @@ int ffhdr2str( fitsfile *fptr,  /* I - FITS file pointer                    */
     (*nkeys)++;
 
     *headptr = '\0';   /* terminate the header string */
-    realloc(*header, (*nkeys *80) + 1);  /* minimize the allocated memory */
+    /* minimize the allocated memory */
+    *header = (char *) realloc(*header, (*nkeys *80) + 1);  
 
     return(*status);
 }

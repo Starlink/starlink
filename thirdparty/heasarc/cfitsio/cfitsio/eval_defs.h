@@ -20,6 +20,7 @@
 #define CONST_OP  -1000
 #define pERROR       -1
 
+
 typedef struct {
                   char   name[MAXVARNAME+1];
                   int    type;
@@ -83,12 +84,14 @@ typedef struct {
                   int         nCols;
                   iteratorCol *colData;
                   DataInfo    *varData;
+                  PixelFilter *pixFilter;
 
                   long        firstDataRow;
                   long        nDataRows;
                   long        totalRows;
 
                   int         datatype;
+                  int         hdutype;
 
                   int         status;
                                 } ParseData;
@@ -133,7 +136,10 @@ typedef enum {
 		  median_fct,
 		  average_fct,
 		  stddev_fct,
-		  nonnull_fct
+		  nonnull_fct,
+		  angsep_fct,
+		  gasrnd_fct,
+		  poirnd_fct
                                 } funcOp;
 
 extern ParseData gParse;

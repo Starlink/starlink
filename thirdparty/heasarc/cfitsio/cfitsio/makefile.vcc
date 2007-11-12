@@ -1,20 +1,20 @@
 # Microsoft Developer Studio Generated NMAKE File, Based on cfitsio.dsp
 !IF "$(CFG)" == ""
-CFG=cfitsio - Win32 Release
-!MESSAGE No configuration specified. Defaulting to cfitsio - Win32 Release.
+CFG=Win32 Release
+!MESSAGE No configuration specified. Defaulting to Win32 Release.
 !ENDIF 
 
-!IF "$(CFG)" != "cfitsio - Win32 Release" && "$(CFG)" != "cfitsio - Win32 Debug"
+!IF "$(CFG)" != "Win32 Release" && "$(CFG)" != "Win32 Debug"
 !MESSAGE Invalid configuration "$(CFG)" specified.
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "cfitsio.mak" CFG="cfitsio - Win32 Debug"
+!MESSAGE NMAKE /f "cfitsio.mak" CFG="Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "cfitsio - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "cfitsio - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 !ERROR An invalid configuration is specified.
 !ENDIF 
@@ -29,7 +29,7 @@ CPP=cl.exe
 MTL=midl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "cfitsio - Win32 Release"
+!IF  "$(CFG)" == "Win32 Release"
 
 OUTDIR=.
 INTDIR=.\Release
@@ -98,6 +98,8 @@ CLEAN :
 	-@erase "$(INTDIR)\ricecomp.obj"
 	-@erase "$(INTDIR)\quantize.obj"
 	-@erase "$(INTDIR)\pliocomp.obj"
+	-@erase "$(INTDIR)\fits_hcompress.obj"
+	-@erase "$(INTDIR)\fits_hdecompress.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\wcssub.obj"
 	-@erase "$(INTDIR)\wcsutil.obj"
@@ -111,7 +113,7 @@ CLEAN :
 "$(INTDIR)" :
     if not exist "$(INTDIR)/$(NULL)" mkdir "$(INTDIR)"
 
-CPP_PROJ=/nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "CFITSIO_EXPORTS" /Fp"$(INTDIR)\cfitsio.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "CFITSIO_EXPORTS" /D "_CRT_SECURE_NO_DEPRECATE" /Fp"$(INTDIR)\cfitsio.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /win32 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\cfitsio.bsc" 
@@ -178,6 +180,8 @@ LINK32_OBJS= \
 	"$(INTDIR)\ricecomp.obj" \
 	"$(INTDIR)\quantize.obj" \
 	"$(INTDIR)\pliocomp.obj" \
+	"$(INTDIR)\fits_hcompress.obj" \
+	"$(INTDIR)\fits_hdecompress.obj" \
 	"$(INTDIR)\wcssub.obj"  \
 	"$(INTDIR)\wcsutil.obj" 
 
@@ -187,7 +191,7 @@ LINK32_OBJS= \
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
 
-!ELSEIF  "$(CFG)" == "cfitsio - Win32 Debug"
+!ELSEIF  "$(CFG)" == "Win32 Debug"
 
 OUTDIR=.
 INTDIR=.\Debug
@@ -260,6 +264,8 @@ CLEAN :
 	-@erase "$(INTDIR)\ricecomp.obj"
 	-@erase "$(INTDIR)\quantize.obj"
 	-@erase "$(INTDIR)\pliocomp.obj"
+	-@erase "$(INTDIR)\fits_hcompress.obj"
+	-@erase "$(INTDIR)\fits_hdecompress.obj"
 	-@erase "$(OUTDIR)\cfitsio.dll"
 	-@erase "$(OUTDIR)\cfitsio.exp"
 	-@erase "$(OUTDIR)\cfitsio.ilk"
@@ -272,7 +278,7 @@ CLEAN :
 "$(INTDIR)" :
     if not exist "$(INTDIR)/$(NULL)" mkdir "$(INTDIR)"
 
-CPP_PROJ=/nologo /MD /W3 /Gm /GX /ZI /Od /D "__WIN32__" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "CFITSIO_EXPORTS" /Fp"$(INTDIR)\cfitsio.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c 
+CPP_PROJ=/nologo /MDd /W3 /Gm /GX /ZI /Od /D "__WIN32__" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "CFITSIO_EXPORTS" /D "_CRT_SECURE_NO_DEPRECATE" /Fp"$(INTDIR)\cfitsio.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c 
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /win32 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\cfitsio.bsc" 
@@ -340,8 +346,9 @@ LINK32_OBJS= \
 	"$(INTDIR)\imcompress.obj" \
 	"$(INTDIR)\ricecomp.obj" \
 	"$(INTDIR)\quantize.obj" \
-	"$(INTDIR)\pliocomp.obj" 
-
+	"$(INTDIR)\pliocomp.obj" \
+	"$(INTDIR)\fits_hcompress.obj" \
+	"$(INTDIR)\fits_hdecompress.obj" \
 
 "$(OUTDIR)\cfitsio.dll" : $(LINK32_OBJS) WINDUMP
 	windumpexts -o $(DEF_FILE) cfitsio.dll $(LINK32_OBJS)    
@@ -391,7 +398,7 @@ LINK32_OBJS= \
 !ENDIF 
 
 
-!IF "$(CFG)" == "cfitsio - Win32 Release" || "$(CFG)" == "cfitsio - Win32 Debug"
+!IF "$(CFG)" == "Win32 Release" || "$(CFG)" == "Win32 Debug"
 SOURCE=.\buffers.c
 
 "$(INTDIR)\buffers.obj" : $(SOURCE) "$(INTDIR)"
@@ -680,6 +687,14 @@ SOURCE=quantize.c
 SOURCE=pliocomp.c
 
 "$(INTDIR)\pliocomp.obj" : $(SOURCE) "$(INTDIR)"
+
+SOURCE=fits_hcompress.c
+
+"$(INTDIR)\fits_hcompress.obj" : $(SOURCE) "$(INTDIR)"
+
+SOURCE=fits_hdecompress.c
+
+"$(INTDIR)\fits_hdecompress.obj" : $(SOURCE) "$(INTDIR)"
 
 !ENDIF 
 

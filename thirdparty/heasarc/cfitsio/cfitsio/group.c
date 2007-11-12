@@ -20,6 +20,14 @@
 #include <string.h>
 #include <stdlib.h>
 
+#if defined(WIN32) || defined(__WIN32__)
+#include <direct.h>   /* defines the getcwd function on Windows PCs */
+#endif
+
+#if defined(unix) || defined(__unix__)  || defined(__unix)
+#include <unistd.h>  /* needed for getcwd prototype on unix machines */
+#endif
+
 #define HEX_ESCAPE '%'
 
 /*---------------------------------------------------------------------------
@@ -4562,7 +4570,9 @@ int ffgtcpr(fitsfile   *infptr,  /* input FITS file pointer                 */
 	     strcasecmp(keyvalue,"MEMBER_LOCATION") != 0 &&
 	     strcasecmp(keyvalue,"MEMBER_URI_TYPE") != 0   )
 	    {
-	      *status = fits_copy_col(infptr,outfptr,i,newTfields,1,status);
+ 
+	      /* SPR 3956, add at the end of the table */
+	      *status = fits_copy_col(infptr,outfptr,i,newTfields+1,1,status);
 	      ++newTfields;
 	    }
 	}
