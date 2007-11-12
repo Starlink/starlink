@@ -10,7 +10,7 @@ bin_SCRIPTS = cfitsio/imcopy cfitsio/fitscopy cfitsio/listhead
 ## as automake doesn't like the unknown extension.
 lib_LIBRARIES = cfitsio/libcfitsio.a
 liblibdir = $(libdir)
-liblib_SCRIPTS = cfitsio/libcfitsio@SHLIB_SUFFIX@
+liblib_SCRIPTS = cfitsio/libcfitsio@SHLIB_SUFFIX@ cfitsio/cfitsio.pc
 
 # There are no sources for libcfits in this directory.
 cfitsio_libcfitsio_a_SOURCES =
@@ -25,7 +25,7 @@ EXAMPLE_SOURCES = cfitsio/cookbook.c cfitsio/cookbook.f
 
 # Put examples in dist_pkgdata
 dist_pkgdata_DATA = $(EXAMPLE_SOURCES) cfitsio_changes.txt CFITSIO_CONDITIONS\
- Licence.txt
+ License.txt
 
 # Extra documentation for stardocs (not converted to hypertext).
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ mud162.tex mud167.tex mud166.tex
@@ -77,5 +77,3 @@ check:
 	diff testprog.out tmp.out)
 
 dist_starnews_DATA = cfitsio.news
-
-
