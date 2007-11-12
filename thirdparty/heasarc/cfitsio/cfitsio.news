@@ -1,5 +1,29 @@
 1 CFITSIO - C FITS I/O functions - update
 
+ 12-NOV-2007:
+ ------------
+ 
+ The CFITSIO library has been updated to version 3.06.
+
+ 05-JUL-2007:
+ ------------
+ 
+ The utility programs "imcopy", "fitscopy" and "listhead" are now built
+ and installed by default.
+
+ 09-JUL-2007:
+ ------------
+
+ The shared library is now built by default.
+
+ 24-FEB-2005:
+ ------------
+
+ The CFITSIO library has been updated to version 2.501.
+  
+ 22-JUN-2007:
+ ------------ 
+
  The CFITSIO function library v2.4.90 is now available.
 
  CFITSIO provides a C interface for reading and writing FITS files and 
@@ -15,11 +39,3 @@
  HEASARC at the NASA Goddard Space Flight Center for permission to release 
  CFITSIO with the Starlink software.
 
- 05-JUL-2007:
- 
- The utility programs "imcopy", "fitscopy" and "listhead" are now built
- and installed by default.
-
- 09-JUL-2007:
-
- The shared library is now built by default.
