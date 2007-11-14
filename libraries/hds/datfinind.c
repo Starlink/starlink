@@ -52,6 +52,7 @@ datFind( const HDSLoc *locator1,
    int             ncomp;
    int             i;
    char            *name1;
+   int             loc2ok = 0;
 
 /* Import the name string */
    _strcsimp(   &name, name_str );
@@ -151,6 +152,7 @@ datFind( const HDSLoc *locator1,
       dat1_alloc_lcp(locator2, &lcp2 );
       if ( _ok( hds_gl_status ) )
       {
+         loc2ok = 1;
          data2 = &lcp2->data;
          rec_get_handle( &rid, &han, &data2->han );
          rec_get_rid( &han, &data2->parent );
@@ -216,8 +218,8 @@ HDS structure.",
    }
 
 /* If the routine will exit with status set, then nullify the output      */
-/* locator.                    */
-   if ( !_ok( hds_gl_status ) )
+/* locator. (unless it has not been allocated by this routine)            */
+   if ( !_ok( hds_gl_status ) && loc2ok )
    {
      dat1_free_hdsloc( locator2 );
    }

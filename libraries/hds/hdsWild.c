@@ -109,11 +109,32 @@ hdsWild(const char *fspec,
 *     include file DAT_ERR.
 
 *  Copyright:
-*     Copyright (C) 1992 Science & Engineering Research Council
+*     Copyright (C) 1992 Science & Engineering Research Council.
+*     Copyright (C) 1995, 2001 Central Laboratory of the Research Councils.
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     BKM:  B.K. McIlwrath    (STARLINK, RAL)
+*     TIMJ: Tim Jenness       (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -128,6 +149,9 @@ hdsWild(const char *fspec,
 *        Convert to C interface and remove tabs.
 *     16-NOV-2005 (TIMJ):
 *        Use HDSLoc**
+*     14-NOV-2007 (TIMJ):
+*        Only free the output locator on error if the locator was
+*        allocated by this routine.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -148,6 +172,7 @@ hdsWild(const char *fspec,
       int again;                 /* Look for another file name?             */
       int alldone;               /* All filenames processed?                */
       int first;                 /* Initial call to HDS_WILD?               */
+      int outlocok = 0;          /* Was the output locator allocated ok?    */
       struct HAN han;            /* Handle for top-level object             */
       struct LCP *lcp;           /* Pointer to Locator Control Packet       */
       struct ODL odl;            /* Object Descriptor Label                 */
@@ -248,6 +273,7 @@ the specification \'^FSPEC\'.",
                   dat1_alloc_lcp(locator, &lcp );
                   if ( _ok( hds_gl_status ) )
                   {
+                     outlocok = 1;
 
 /* Locate the container record's dynamic domain (the Component Record       */
 /* Vector), locate the top-level object name, and extract it for storage in */
@@ -328,7 +354,7 @@ the specification \'^FSPEC\'.",
 /* contextual error report.                                                 */
       if ( !_ok( hds_gl_status ) )
       {
- 	 dat1_free_hdsloc( locator );
+         if (outlocok) dat1_free_hdsloc( locator );
          emsRep( "HDS_WILD_ERR",
                     "HDS_WILD: Error performing a wild-card search for HDS \
 container files.", &hds_gl_status );

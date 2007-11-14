@@ -69,7 +69,27 @@ datParen(const HDSLoc *locator1,
 *     is Z.STRUC(17).
 
 *  Copyright:
-*     Copyright (C) 1992 Science & Engineering Research Council
+*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     Copyright (C) 2005 Particle Physics and Engineering Research Council.
+*     Copyright (C) 2000, 2002 Central Laborartory of the Research Councils.
+*     Copyright (C) 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
 
 *  Authors:
 *     WFL: William Lupton (AAO)
@@ -97,6 +117,8 @@ datParen(const HDSLoc *locator1,
 *     15-NOV-2005 (TIMJ):
 *        Use dat1_import_loc
 *        Use HDSLoc in API
+*     14-NOV-2007 (TIMJ):
+*        Only free locator2 if it was successfully allocated by this routine.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -127,6 +149,7 @@ datParen(const HDSLoc *locator1,
    struct RID ridpar;            /* RID of parent object                    */
    unsigned char *crv;           /* Pointer to Component Record Vector      */
    unsigned char *srv;           /* Pointer to Structure Record Vector      */
+   int loc2ok = 0;               /* Boolean to indicate that loc2 is ok     */
 
 /*.                                                                         */
 
@@ -238,6 +261,7 @@ structure (possible programming error).",
       dat1_alloc_lcp( locator2, &lcp2 );
       if ( _ok( hds_gl_status ) )
       {
+         loc2ok = 1;
          data2 = &lcp2->data;
 
 /* Fill in the LCP handle and parent fields for the new object and record   */
@@ -297,8 +321,8 @@ HDS object.",
    }
 
 /* If the routine will exit with status set, then nullify the output        */
-/* locator.                                                                 */
-   if ( !_ok( hds_gl_status ) )
+/* locator (if it was allocated by this routine)                            */
+   if ( !_ok( hds_gl_status ) && loc2ok )
    {
      dat1_free_hdsloc( locator2 );
    }
