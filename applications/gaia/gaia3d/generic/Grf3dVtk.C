@@ -190,8 +190,8 @@ static int StandardStipples[] = {
  *  PGPLOT standard colourset).
  *
  *                                  R     G     B
- *     0   Black                  0.00, 0.00, 0.00
- *     1   White                  1.00, 1.00, 1.00
+ *     0   White                  1.00, 1.00, 1.00
+ *     1   Black                  0.00, 0.00, 0.00
  *     2   Red                    1.00, 0.00, 0.00
  *     3   Green                  0.00, 1.00, 0.00
  *     4   Blue                   0.00, 0.00, 1.00
@@ -208,8 +208,8 @@ static int StandardStipples[] = {
  *    15   Light Gray             0.66, 0.66, 0.66
  */
 static double StandardColours[][3] = {
-    {0.00, 0.00, 0.00},
     {1.00, 1.00, 1.00},
+    {0.00, 0.00, 0.00},
     {1.00, 0.00, 0.00},
     {0.00, 1.00, 0.00},
     {0.00, 0.00, 1.00},
@@ -279,7 +279,7 @@ void *Grf3dVtk_Init( vtkRenderer *r, int lac )
     gc->configInfo.width = 1.0;
     gc->configInfo.size = 1.0;
     gc->configInfo.font = 0;
-    gc->configInfo.colour = 0;
+    gc->configInfo.colour = 1;
 
     /*  This becomes the current GC. */
     Grf3dVtk_SetContext( gc );
