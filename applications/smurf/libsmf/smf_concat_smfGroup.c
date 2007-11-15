@@ -13,11 +13,32 @@
 *     C function
 
 *  Invocation:
-*     smf_concat_smfGroup( smfGroup *igrp, smfArray **concat, int *status )
+*     smf_concat_smfGroup( smfGroup *igrp, int isTordered, 
+*			  AstFrameSet *outfset, int moving, 
+*	        	  int *lbnd_out, int *ubnd_out, int flags,
+*			  smfArray **concat, int *status )
+
 
 *  Arguments:
 *     igrp = SmfGroup* (Given)
 *        Group of input data files
+*     isTordered = int (Given)
+*        If 0, ensure concatenated data is ordered by bolometer. If 1 ensure 
+*        concatenated data is ordered by time slice (default ICD ordering)
+*     outfset = AstFrameSet* (Given)
+*        Frameset containing the sky->output map mapping if calculating
+*        pointing LUT on-the-fly
+*     moving = int (Given)
+*        Is coordinate system tracking moving object? (if outfset specified)
+*     lbnd_out = double* (Given)
+*        2-element array pixel coord. for the lower bounds of the output map
+*        (if outfset specified) 
+*     ubnd_out = double* (Given)
+*        2-element array pixel coord. for the upper bounds of the output map 
+*        (if outfset specified) 
+*     flags = int (Given)
+*        Additional flags to control processing of individual data files
+*        as they are being concatenated.
 *     concat = smfArray ** (Returned)
 *        smfArray containing concatenated data for each subarray
 *     status = int* (Given and Returned)
@@ -29,7 +50,9 @@
 *     This routine attempts to load all of the data into memory at once, 
 *     concatenates it into a single contiguous piece of memory for each
 *     subarray, and optionally re-orders the data to bolo-ordered rather
-*     than time-ordered if desired.
+*     than time-ordered if desired. If a pointing LUT is to be calculated
+*     as data is being loaded, specify outfset, moving, lbnd_out and
+*     ubnd_out. Otherwise set outfset to NULL.
 *     
 *  Authors:
 *     EC: Edward Chapin (UBC)
@@ -43,9 +66,14 @@
 *        -Inserted Ast status check after copying FITS headers
 *        -Fixed bug in reference file dimensions 
 *        -Modified interface to smf_open_file.
+*     2007-11-15 (EC):
+*        -Added projection information, flags and isTordered to interface.
+*        -With projection info pointing LUT can now be calculated on-the-fly
 
 *  Notes:
-*     Currently buggy / not fully implemented.
+*     Currently buggy / not fully implemented. WCS and FITS channels in
+*     header are not modified. It is assumed that input files are
+*     time-ordered.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -88,7 +116,10 @@
 
 #define FUNC_NAME "smf_concat_smfGroup"
 
-void smf_concat_smfGroup( smfGroup *igrp, smfArray **concat, int *status ) {
+void smf_concat_smfGroup( smfGroup *igrp, int isTordered, 
+			  AstFrameSet *outfset, int moving, 
+			  int *lbnd_out, int *ubnd_out, int flags,
+			  smfArray **concat, int *status ) {
 
   /* Local Variables */
   smfData *data=NULL;           /* Concatenated smfData */
@@ -97,11 +128,13 @@ void smf_concat_smfGroup( smfGroup *igrp, smfArray **concat, int *status ) {
   int exists;                   /* Flag for NDF component existence */
   char filename[GRP__SZNAM+1];  /* Input filename, derived from GRP */
   int havearray[3];             /* flags for DATA/QUALITY/VARIANCE present */
+  int havelut;                  /* flag for pointing LUT present */
   smfHead *hdr;                 /* pointer to smfHead in concat data */
   dim_t i;                      /* Loop counter */
   int indf;                     /* NDF identifier for current file */
   dim_t j;                      /* Loop counter */
   dim_t k;                      /* Loop counter */
+  dim_t l;                      /* Loop counter */
   dim_t nbolo;                  /* Number of detectors */
   dim_t ndata;                  /* Total data points: nbolo*tlen */
   int ndims;                    /* Number of axes in NDF */
@@ -176,11 +209,13 @@ void smf_concat_smfGroup( smfGroup *igrp, smfArray **concat, int *status ) {
 
 	  if( *status == SAI__OK ) {
 	    if( j == 0 ) {
-	      /* If this is the first chunk we will use it for refdims - the
-		 first two dimensions give numbers of detectors */
+	      /* If this is the first chunk we will use it for refdims - check
+                 the number of bolometers! (WARNING: Assumption is that
+                 input data is standard ICD-compliant time-ordered data) */
+
 	      refdims[0] = dims[0];
 	      refdims[1] = dims[1];
-	      nbolo = dims[0]*dims[1];
+	      nbolo = refdims[0]*refdims[1];
 
 	      /* Check for DATA/VARIANCE/QUALITY and data type */
 	      ndfState( indf, "DATA", &(havearray[0]), status );
@@ -255,8 +290,27 @@ void smf_concat_smfGroup( smfGroup *igrp, smfArray **concat, int *status ) {
 	if( (pass == 1) && (*status == SAI__OK) ) {
 
 	  /* Open the file corresponding to this chunk */
-	  smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ", 0, 
+	  smf_open_file( igrp->grp, igrp->subgroups[j][i], "UPDATE", 0, 
 			 &refdata, status );
+
+	  /* Calculate the pointing LUT if requested */
+	  if( !(flags & SMF__NOCREATE_LUT) && outfset ) {
+	    
+	    /* Set havelut flag */
+	    havelut = 1;
+
+	    /* This creates the extension and then closes it (silly) */
+	    smf_calc_mapcoord( refdata, outfset, moving, lbnd_out, ubnd_out, 
+			       status );
+
+	    /* Now open that extension to get the LUT. Mode is UPDATE
+               since we may re-order the LUT */
+	    smf_open_mapcoord( refdata, "UPDATE", status );
+
+	  }
+
+	  /* Change data order if required */
+	  smf_dataOrder( refdata, isTordered, status );
 
 	  if( *status == SAI__OK ) {
 
@@ -294,9 +348,16 @@ void smf_concat_smfGroup( smfGroup *igrp, smfArray **concat, int *status ) {
 		
 		/* Allocate space in the smfData for DATA/VARAIANCE/QUALITY */
 		data->dtype = smf_dtype_fromstring( refdtype, status );
-		data->dims[0] = refdims[0];
-		data->dims[1] = refdims[1];
-		data->dims[2] = tlen;
+
+		if( isTordered ) {
+		  data->dims[0] = refdims[0];
+		  data->dims[1] = refdims[1];
+		  data->dims[2] = tlen;
+		} else {
+		  data->dims[0] = tlen;
+		  data->dims[1] = refdims[0];
+		  data->dims[2] = refdims[1];
+		}
 		data->ndims = 3;
 		
 		ndata = nbolo*tlen;
@@ -307,15 +368,24 @@ void smf_concat_smfGroup( smfGroup *igrp, smfArray **concat, int *status ) {
 		  data->pntr[k] = smf_malloc(ndata, sz, 0, status);
 		}
 
+		/* Allocate space for the pointing LUT if needed */
+		if( havelut ) {
+		  data->lut = smf_malloc(ndata, sizeof(*(data->lut)), 0, 
+					 status);
+		}
+
 		/* Copy over the FITS header */
-		hdr->fitshdr = astCopy( refhdr->fitshdr );
-		if (!astOK) {
-		  if (*status == SAI__OK) {
-		    *status = SAI__ERROR;
-		    errRep( FUNC_NAME, "AST error copying FITS header", 
-			    status);
+		if( *status == SAI__OK ) {
+		  hdr->fitshdr = astCopy( refhdr->fitshdr );
+		  if (!astOK) {
+		    if (*status == SAI__OK) {
+		      *status = SAI__ERROR;
+		      errRep( FUNC_NAME, "AST error copying FITS header", 
+			      status);
+		    }
 		  }
 		}
+		
 	      }
 	    }
 
@@ -326,19 +396,59 @@ void smf_concat_smfGroup( smfGroup *igrp, smfArray **concat, int *status ) {
 	      reftlen = refdata->dims[2];
 	      refndata = reftlen*nbolo;
 
+	      /* Copy over JCMTstate */
+	      hdr = data->hdr;
+	      refhdr = refdata->hdr;	    
+	      memcpy( &(hdr->allState[tchunk]), refhdr->allState, 
+		      reftlen*sizeof(*hdr->allState) );
+
+	      /* Copy LUT */
+
+	      if( havelut ) {
+		sz = sizeof( *(refdata->lut) );
+		if( isTordered ) {
+		  /* If concatenating time-ordered data just copy entire
+		     chunk over at once */
+
+		  memcpy( (char *)data->lut + tchunk*nbolo*sz,
+			  refdata->lut, refndata*sz );
+		} else {
+		  /* If concatenating bolo-ordered data need to copy
+		     one chunk of bolometer data over at a time */
+		  
+		  for( l=0; l<nbolo; l++ ) {
+		    memcpy( (char *)data->lut + l*tlen*sz + tchunk*sz,
+			    (char *)refdata->lut + l*reftlen*sz,
+			    reftlen*sz );
+		  }
+		}
+	      }
+
+	      /* Now do DATA/QUALITY/VARIANCE */
 	      for( k=0; k<3; k++ ) if( havearray[k] ) {
 		if( k == 2 ) sz = smf_dtype_sz( SMF__USHORT, status );
 		else sz = smf_dtype_sz(data->dtype, status );
 	      
-		hdr = data->hdr;
-		refhdr = refdata->hdr;	    
-
 		if( *status == SAI__OK ) {
-		  memcpy( (char *)data->pntr[k] + tchunk*nbolo*sz,
-			  refdata->pntr[k], refndata*sz );
 
-		  memcpy( &(hdr->allState[tchunk]), refhdr->allState, 
-			  reftlen*sizeof(*hdr->allState) );
+		  if( isTordered ) {
+		    /* If concatenating time-ordered data just copy entire
+		       chunk over at once */
+
+		    memcpy( (char *)data->pntr[k] + tchunk*nbolo*sz,
+			    refdata->pntr[k], refndata*sz );
+
+		  } else {
+		    /* If concatenating bolo-ordered data need to copy
+                       one chunk of bolometer data over at a time */
+
+		    for( l=0; l<nbolo; l++ ) {
+		      memcpy( (char *)data->pntr[k] + l*tlen*sz + tchunk*sz,
+			      (char *)refdata->pntr[k] + l*reftlen*sz,
+			      reftlen*sz );
+		    }
+
+		  }
 		}
 
 	      }
