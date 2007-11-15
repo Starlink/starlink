@@ -34,6 +34,8 @@
 *        Initial version
 *     2006-08-08 (TIMJ):
 *        Do not return immediately if status is bad.
+*     2007-11-15 (EC):
+*        Added check for existence of data->file
 
 *  Notes:
 *     - This function attempts to free resources even if status is bad
@@ -81,24 +83,36 @@
 void smf_close_mapcoord( smfData *data, int *status ) {
 
   smfFile *file = NULL;        /* Pointer to smfFile */
-  
+  int dofree = 0;              /* LUT is not memory mapped so free it */
+
   /* We are freeing resources so we should not return if status
      is bad. Instead we should be defensive and check pointers
      before dereferencing them. */
   
-  file = data->file;
+  if( data ) {
+    file = data->file;
 
-  if( file != NULL ) {
-    /* annul mapcoord NDF if it exists (frees memory used by LUT) */
-    if( file->mapcoordid != NDF__NOID ) {
-      ndfAnnul( &(file->mapcoordid), status );
-
-      if( *status == SAI__OK ) {
-        data->lut = NULL;
+    if( file != NULL ) {
+      /* annul mapcoord NDF if it exists (frees memory used by LUT) */
+      if( file->mapcoordid != NDF__NOID ) {
+	ndfAnnul( &(file->mapcoordid), status );
+	
+	if( *status == SAI__OK ) {
+	  data->lut = NULL;
+	} else {
+	  errRep( FUNC_NAME, "Error annulling MAPCOORD", status );
+	}
       } else {
-        errRep( FUNC_NAME, "Error annulling MAPCOORD", status );
+	dofree = 1;
       }
+    } else {
+      dofree = 1;
+    }
+
+    /* If the LUT pointer is non-null and dofree=1 we should free it */
+    if( dofree && data->lut ) {
+      smf_free( data->lut, status );
+      data->lut = NULL;
     }
   }
-
 }
