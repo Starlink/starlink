@@ -465,6 +465,11 @@ itcl::class gaia::GaiaCube {
       if { $last_slice_adr_ != 0 } {
          catch {$cubeaccessor_ release $last_slice_adr_}
       }
+
+      #  Delete GaiaCubeHistory.
+      if { $history_ != {} } {
+         catch {::delete object $history_}
+      }
    }
 
    #  Methods:
@@ -494,11 +499,6 @@ itcl::class gaia::GaiaCube {
             destroy $fitsheaders_
             set fitsheaders_ {}
          }
-      }
-
-      #  Delete GaiaCubeHistory.
-      if { $history_ != {} } {
-         catch {::delete object $history_}
       }
    }
 
