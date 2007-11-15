@@ -165,6 +165,8 @@
 *        Add moving to smf_calc_mapcoord interface
 *     2007-10-29 (EC):
 *        Modified interface to smf_open_file.
+*     2007-11-15 (EC):
+*        Modified smf_iteratemap interface.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -484,9 +486,8 @@ void smurf_makemap( int *status ) {
     }
 
     /* Call the low-level iterative map-maker */
-    smf_iteratemap( igrp, keymap, map, variance, weights,
-		    (ubnd_out[0]-lbnd_out[0]+1)*(ubnd_out[1]-lbnd_out[1]+1),
-		    status );
+    smf_iteratemap( igrp, keymap, outfset, moving, lbnd_out, ubnd_out,
+		    map, variance, weights, status );
   }
 
   /* Write WCS */
