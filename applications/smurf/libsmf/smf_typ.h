@@ -25,7 +25,7 @@
 *     David Berry (JAC, UCLan)
 *     {enter_new_authors_here}
 
-*  History:n
+*  History:
 *     2005-11-02 (AGG):
 *        Initial test version
 *     2005-11-07 (TIMJ):
@@ -102,6 +102,8 @@
 *        Added isTordered to smfData.
 *     2007-10-29 (EC):
 *        Added definition of SMF__NOCREATE_DATA for use by smf_open_file
+*     2007-11-15 (EC):
+*        Added SMF__NOCREATE_LUT flag for file I/O 
 *     {enter_further_changes_here}
 
 
@@ -174,13 +176,14 @@ typedef enum smf_modeltype {
 #define SMF__DIMM_FIRSTCOMP 1
 #define SMF__DIMM_FIRSTITER 2
 
-/* Flags for smf_create_smf* and smf_open_file
+/* Flags for smf_create_smf*, smf_open_file and smf_concat_smfGroup
    Must be individual bits in a single integer
 */
-#define SMF__NOCREATE_DA 1
-#define SMF__NOCREATE_HEAD 2
-#define SMF__NOCREATE_FILE 4
-#define SMF__NOCREATE_DATA 8
+#define SMF__NOCREATE_DA 1            /* Don't open DA data */
+#define SMF__NOCREATE_HEAD 2          /* Don't open header */
+#define SMF__NOCREATE_FILE 4          /* Don't open file */
+#define SMF__NOCREATE_DATA 8          /* Don't open DATA/QUALITY/VARIANCE */
+#define SMF__NOCREATE_LUT 16          /* Don't open pointing LUT */
 
 /* Flags for smf_open_newfile
    Must be individual bits in a single integer
