@@ -200,6 +200,8 @@
 *     2007-10-31 (TIMJ):
 *        DA now uses size_t to count things. A read-only dateobs was being
 *        written to.
+*     2007-11-15 (AGG):
+*        Write sub-image FITS headers in the correct order
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -725,22 +727,30 @@ int *status              /* Global status (given and returned) */
        seqend++;
 
        /* Construct additional FITS headers to add to the existing
-	  FitsChan */
+	  FitsChan - first `rewind' to beginning of FitsChan */
        astClear( fitschan, "Card");
-       /* First find and delete old entries */
-       fitsfind = astFindFits( fitschan, "SEQSTART", NULL, 0);
-       astDelFits( fitschan );
-       fitsfind = astFindFits( fitschan, "SEQEND", NULL, 0);
-       astDelFits( fitschan );
+       /* Find and delete old entries before adding new ones - check
+	  that fitsfind is not 0 before proceeding */
        fitsfind = astFindFits( fitschan, "DATE-OBS", NULL, 0);
-       astDelFits( fitschan );
-       /* Add new entries */
-       astSetFitsI( fitschan, "SEQSTART", seqstart, 
-		    "RTS index number of first frame in image", 0);
-       astSetFitsI( fitschan, "SEQEND", seqend, 
-		    "RTS index number of last frame in image", 0);
-       astSetFitsS ( fitschan, "DATE-OBS", imdateobs, 
-		     "Date and time (UTC) of start of sub-scan", 0 );
+       if ( fitsfind ) {
+	 astDelFits( fitschan );
+	 astSetFitsS ( fitschan, "DATE-OBS", imdateobs, 
+		       "Date and time (UTC) of start of sub-scan", 0 );
+       }
+
+       fitsfind = astFindFits( fitschan, "SEQSTART", NULL, 0);
+       if ( fitsfind ) {
+	 astDelFits( fitschan );
+	 astSetFitsI( fitschan, "SEQSTART", seqstart, 
+		      "RTS index number of first frame in image", 0);
+       }
+
+       fitsfind = astFindFits( fitschan, "SEQEND", NULL, 0);
+       if ( fitsfind ) {
+	 astDelFits( fitschan );
+	 astSetFitsI( fitschan, "SEQEND", seqend, 
+		      "RTS index number of last frame in image", 0);
+       }
 
        /* Convert the AstFitsChan data to a char array */
        smf_fits_export2DA ( fitschan, &nrec, fitsrec, status );
