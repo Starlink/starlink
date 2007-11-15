@@ -189,8 +189,14 @@
 *        -Added specunion to smf_cubebounds.
 *     2007-10-25 (DSB):
 *        -Added smf_checkdets.
+*     2007-10-31 (EC):
+*        -Added mode to smf_open_mapcoord interface
 *     2007-11-8 (DSB):
 *        -Added smf_sortd and smf_reorder<x>.
+*     2007-11-15 (EC):
+*        -Added projection information to interfaces of 
+*         smf_iteratemap and smf_concat_smfGroup
+*        -Added iarray to smf_model_create interface
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -444,9 +450,11 @@ void smf_insert_tslice ( smfData **idata, smfData *tdata, int index,
 
 inst_t smf_inst_get( const smfHead * hdr, int * status );
 
-void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
- 		     double *map, double *variance, double *weights,
-	 	     int msize, int *status );
+void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, 
+		     AstFrameSet *outfset, int moving, 
+	             int *lbnd_out, int *ubnd_out,
+		     double *map, double *mapvar, double *weights,
+		     int *status );
 
 void * smf_malloc( size_t nelem, size_t bytes_per_elem, int zero, 
                    int * status );
@@ -460,9 +468,10 @@ void smf_mapbounds_approx( Grp *igrp, int index, char *system, double pixsize,
 			   int *lbnd_out, int *ubnd_out, AstFrameSet **outframeset, 
 			   int *moving, int *status );
 
-void smf_model_create( const smfGroup *igrp, smf_modeltype mtype, 
-		       smfGroup **mgroup, int nofile, int leaveopen, 
-		       smfArray **mdata, int *status);
+void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
+		       int nchunks, smf_modeltype mtype, 
+		       smfGroup **mgroup, int nofile, int leaveopen,
+		       smfArray **mdata, int *status );
 
 char *smf_model_getname( smf_modeltype type, int *status);
 
@@ -474,7 +483,7 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index,
 void smf_open_file( const Grp * igrp, int index, const char * mode, int withHdr,
 		    smfData ** data, int *status);
 
-void smf_open_mapcoord( smfData *data, int *status );
+void smf_open_mapcoord( smfData *data, const char *mode, int *status );
 
 void smf_open_ndf( const int newndf, char *accmode, char *filename, 
 		   smf_dtype dtype, smfData **ndata, int *status);
@@ -691,7 +700,10 @@ void smf_polext( int ondf, double angle, int *status );
 
 void smf_fft_filter( smfData *data, double srate, int *status );
 
-void smf_concat_smfGroup( smfGroup *igrp, smfArray **concat, int *status );
+void smf_concat_smfGroup( smfGroup *igrp, int isTordered, 
+			  AstFrameSet *outfset, int moving, 
+			  int *lbnd_out, int *ubnd_out, int flags,
+			  smfArray **concat, int *status );
 
 void smf_checkdets( Grp *detgrp, smfData *data, int *status );
 
