@@ -13,11 +13,13 @@
 *     C function
 
 *  Invocation:
-*     smf_open_mapcoord( smfData *data, int *status );
+*     smf_open_mapcoord( smfData *data, const char *mode, int *status );
 
 *  Arguments:
 *     data = smfData* (Given)
-*        Pointer to smfData struct 
+*        Pointer to smfData struct
+*     mode = const char * (Given)
+*        File access mode for the LUT array
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -34,6 +36,8 @@
 *        Initial version
 *     2006-07-07 (EC):
 *        Changed name of the extension to MAPCOORD from SCU2RED.MAPCOORD
+*     2007-10-31 (EC):
+*        Added mode to the interface
 
 *  Notes:
 
@@ -78,7 +82,7 @@
 
 #define FUNC_NAME "smf_open_mapcoord"
 
-void smf_open_mapcoord( smfData *data, int *status ) {
+void smf_open_mapcoord( smfData *data, const char *mode, int *status ) {
   int lbnd[1];                  /* Pixel bounds for 1d pointing array */
   void *mapptr[3];              /* Pointer to array of mapped components */
   int nbolo;                    /* Number of bolometers */
@@ -91,7 +95,7 @@ void smf_open_mapcoord( smfData *data, int *status ) {
   
   /* Get HDS locator for the MAPCOORD extension  */
   mapcoordloc = smf_get_xloc( data, "MAPCOORD", "MAPCOORD_Calculations",
-                           "READ", 0, 0, status );
+                           mode, 0, 0, status );
 
   /* Since other things may eventually get put into the MAPCOORD
      extension, and to prevent it from having problems if called multiple
@@ -106,13 +110,13 @@ void smf_open_mapcoord( smfData *data, int *status ) {
 
     if( (data->file)->mapcoordid == NDF__NOID ) {
       (data->file)->mapcoordid = smf_get_ndfid( mapcoordloc, 
-						"LUT", "READ", "UNKNOWN",
+						"LUT", mode, "UNKNOWN",
 						"_INTEGER", 1, lbnd, ubnd, 
 						status );
     }
      
     if( data->lut == NULL ) {
-      ndfMap( (data->file)->mapcoordid, "DATA", "_INTEGER", "READ", mapptr, 
+      ndfMap( (data->file)->mapcoordid, "DATA", "_INTEGER", mode, mapptr, 
 	      &nmap, status );    
       
       if( *status == SAI__OK ) {
