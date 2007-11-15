@@ -13,13 +13,20 @@
 *     Library routine
 
 *  Invocation:
-*     smf_model_create( const smfGroup *igroup, smf_modeltype mtype, 
+*     smf_model_create( const smfGroup *igroup, const smfArray **iarray,
+*                       int nchunks, smf_modeltype mtype, 
 *                       smfGroup **mgroup, int nofile, int leaveopen,
 *                       smfArray **mdata, int *status);
 
 *  Arguments:
 *     igroup = const smfGroup * (Given)
 *        NDG group identifier for input template files
+*     iarray = const smfArray ** (Given)
+*        If igroup unspecified, use an array of smfArrays as the template
+*        instead. In this case nchunks must also be specified.
+*     nchunks = int (Given)
+*        If iarray specified instead of igroup, nchunks gives number of
+*        smfArrays in iarray (otherwise it is derived from igroup).
 *     mtype = smf_modeltype (Given)
 *        Type of model component to create
 *     mgroup = smfGroup ** (Returned)
@@ -30,7 +37,7 @@
 *     leaveopen = int (Given)
 *        If true, don't close files once created and store in mdata
 *     mdata = smfArray ** (Given and Returned)
-*        Container to store data is leaveopen is set: array of
+*        Container to store data if leaveopen is set: array of
 *        smfArray pointers. The top-level array must already be
 *        allocated (same number of elements as ngroups in igroup), but
 *        the individual smfArrays get allocated here.
@@ -85,6 +92,9 @@
 *        Added nofile flag
 *     2007-08-21 (EC):
 *        Fixed up warnings caused by ambiguous pointer math
+*     2007-11-15 (EC):
+*        Added ability to create models from a smfArray template, requiring
+*        a change to the interface.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -109,6 +119,7 @@
 *     MA 02111-1307, USA
 
 *  Bugs:
+*     Using iarray is buggy.
 *     {note_any_bugs_here}
 *-
 */
@@ -133,10 +144,10 @@
 
 #define FUNC_NAME "smf_model_create"
 
-void smf_model_create( const smfGroup *igroup, smf_modeltype mtype, 
-		       smfGroup **mgroup, int nofile, int leaveopen, 
-		       smfArray **mdata, int *status) {
-
+void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
+		       int nchunks, smf_modeltype mtype, 
+		       smfGroup **mgroup, int nofile, int leaveopen,
+		       smfArray **mdata, int *status ) {
   /* Local Variables */
   int added=0;                  /* Number of names added to group */
   void *buf=NULL;               /* Pointer to total container buffer */
@@ -155,6 +166,7 @@ void smf_model_create( const smfGroup *igroup, smf_modeltype mtype,
   int idx=0;                    /* Index within subgroup */
   int indf=0;                   /* NDF ID for propagation */
   int isize=0;                  /* Number of files in input group */
+  int isTordered;               /* Time or bolo-ordered data? */
   dim_t j;                      /* Loop counter */
   dim_t k;                      /* Loop counter */
   Grp *mgrp=NULL;               /* Temporary group to hold model names */
@@ -164,93 +176,172 @@ void smf_model_create( const smfGroup *igroup, smf_modeltype mtype,
   char name[GRP__SZNAM+1];      /* Name of container file without suffix */
   size_t ndata=0;               /* Number of elements in data array */
   int nmap=0;                   /* Number of elements mapped */
+  int nrel=0;                   /* Number of related elements (subarrays) */
   long pagesize=0;              /* Size of memory page used by mmap */
   char *pname=NULL;             /* Poiner to fname */
   long remainder=0;             /* Extra length beyond integer pagesuze */
   char suffix[] = SMF__DIMM_SUFFIX; /* String containing model suffix */
   smfData *tempdata=NULL;       /* Temporary smfData pointer */
+  int thisnrel;                 /* Number of related items for this model */
 
+  int *testptr;
 
   /* Main routine */
   if (*status != SAI__OK) return;
 
+  /* Check to see if igroup or iarray is being used for template */
+  if( igroup == NULL ) {
+    if( iarray == NULL ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Neither igroup nor iarray specified", 
+	     status);        
+    } else if( nchunks <= 0 ) {
+      *status = SAI__ERROR;
+      msgSeti("NCHUNKS",nchunks);
+      errRep(FUNC_NAME, 
+	     "iarray specified but invalid number of chunks, ^NCHUNKS",
+	     status);        
+    } else {
+      /* Since we're using smfArrays as template, no associated files */
+      nofile = 1;
+
+      /* We have at most SMF__MXSMF related objects (subarrays) at each time 
+	 chunk */
+      nrel = SMF__MXSMF;
+
+      /* NULL mgroup since we won't be using it */
+      mgroup = NULL;
+    }
+  } else {
+    /* Get number of time chunks and related objects from igroup */
+    nchunks = igroup->ngroups;
+    nrel = igroup->nrelated;
+  }
+
   /* If nofile is set, leaveopen=0 is meaningless */
   if( nofile ) leaveopen = 1;
 
-  /* Get size of the input group */
-  grpGrpsz( igroup->grp, &isize, status );
+  /* If using igroup as a template use group expressions to make filenames */
+  if( igroup != NULL ) {
+    /* Get size of the input group */
+    grpGrpsz( igroup->grp, &isize, status );
 
-  /* Create group of NDF names with model name suffix */
-  mgrp = grpNew( "model component", status );
-  mname = smf_model_getname( mtype, status );
+    /* Create group of NDF names with model name suffix */
+    mgrp = grpNew( "model component", status );
+    mname = smf_model_getname( mtype, status );
 
-  /* Form a group expression for the filename */
-  if( *status == SAI__OK ) {
-    sprintf( fname_grpex, "*_");
-    strncat( fname_grpex, mname, sizeof(mname) );
-    strncat( fname_grpex, suffix, sizeof(suffix) );
+    /* Form a group expression for the filename */
+    if( *status == SAI__OK ) {
+      sprintf( fname_grpex, "*_");
+      strncat( fname_grpex, mname, sizeof(mname) );
+      strncat( fname_grpex, suffix, sizeof(suffix) );
+    }
+
+    grpGrpex( fname_grpex, igroup->grp, mgrp, &msize, &added, &flag, status );
+
+    if( (*status == SAI__OK) && (msize != isize) ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Couldn't create group of NDF model containers.", 
+	     status);        
+    }
+
+    /* Now that we have the Grp of names, create a new smfGroup with the same
+       grouping as igroup. mgroup has a copy of mgrp inside, so free up
+       mgrp afterward. */
+
+    *mgroup = smf_construct_smfGroup( mgrp, igroup->subgroups, igroup->ngroups,
+				      igroup->nrelated, 1, status );
+
+    if( mgrp ) grpDelet( &mgrp, status );
   }
 
-  grpGrpex( fname_grpex, igroup->grp, mgrp, &msize, &added, &flag, status );
-
-  if( (*status == SAI__OK) && (msize != isize) ) {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, "Couldn't create group of NDF model containers.", 
-	   status);        
-  }
-
-  /* Now that we have the Grp of names, create a new smfGroup with the same
-     grouping as igroup. mgroup has a copy of mgrp inside, so free up
-     mgrp afterward. */
-
-  *mgroup = smf_construct_smfGroup( mgrp, igroup->subgroups, igroup->ngroups,
-				    igroup->nrelated, 1, status );
-
-  if( mgrp ) grpDelet( &mgrp, status );
-
-  /* Loop over subgroups */
-  for( i=0; i<(*mgroup)->ngroups; i++ ) {
-
-    /* For models that only have one file per subgroup, fix up 
+  /* Loop over time chunks */
+  if( *status == SAI__OK ) for( i=0; i<nchunks; i++ ) {
+    
+    /* For models that only have one file per subgroup fix up 
        mgroup such that only the first filename in each subgroup
        is used. Do this by setting remaining elements of mgroup->subgroups
-       to 0. */
+       to 0. nrel is 1. */
 
     if( mtype == SMF__COM ) {
-      for( j=1; j<(*mgroup)->nrelated; j++ ) {
-	(*mgroup)->subgroups[i][j] = 0;
+      if (mgroup != NULL) {
+	for( j=1; j<(*mgroup)->nrelated; j++ ) {
+	  (*mgroup)->subgroups[i][j] = 0;
+	}
+      }
+
+      nrel = 1;
+    }
+
+    /* Check to see how many related elements in this chunk */
+
+    thisnrel = 0;
+
+    for( j=0; j<nrel; j++ ) {
+      /* Check mgroup if we're using igroup as a template */
+      if( mgroup != NULL ) {
+
+	/* Check for non-zero grp index at this position */
+	if( (*mgroup)->subgroups[i][j] != 0 ) {
+	  thisnrel = j+1;
+	} else {
+	  /* If grp index is 0 we've reached the end of the subarrays. Set
+             the exit condition */
+	  j=nrel;
+	}
       }
     }
 
-    /* Loop over elements of subgroup */
-    for( j=0; j<(*mgroup)->nrelated; j++ ) {
-    
-      /* obtain grp idx for j'th element of i'th subgroup */
-      idx=(*mgroup)->subgroups[i][j];
-      
-      /* Only continue if there is a valid idx */
-      if( idx > 0 ) {
+    if( mgroup == NULL ) {
+      /* Otherwise just check the iarray */
+      thisnrel = iarray[i]->ndat;
 
-	/* Open the template file */
-	smf_open_file( igroup->grp, idx, "READ", 0, &idata, status );
+      /* Ensure that thisnrel isn't bigger than nrel */
+      if( thisnrel > nrel ) {
+	thisnrel = nrel;
+      }
+    }
+
+    /* Loop over subarrays */
+    for( j=0; j<thisnrel; j++ ) {
     
-	/* Check that the template is time-ordered data */
-	if( *status == SAI__OK ) {
-	  if( idata->ndims != 3 ) {
-	    *status = SAI__ERROR;
-	    errRep(FUNC_NAME, "Input file is not time-ordered data!", 
-		   status);      
-	  }
+      /* Open the relevant template file if using igroup */
+      if( igroup ) {
+	
+	/* obtain grp idx for j'th element of i'th subgroup */
+	idx=(*mgroup)->subgroups[i][j];
+	
+	/* Only continue if there is a valid idx */
+	if( idx > 0 ) {
 	  
-	  if( idata->dtype != SMF__DOUBLE ) {
-	    *status = SAI__ERROR;
-	    errRep(FUNC_NAME, 
-		   "Input file does not contain double precision data!",
-		   status);      
-	  }
+	  /* Open the template file */
+	  smf_open_file( igroup->grp, idx, "READ", 0, &idata, status );
+	}
+      } else {
+	/* Otherwise obtain a pointer to the relevant smfData in the
+	   template smfArray at this time chunk */
+	idata = iarray[i]->sdata[j];
+      }
+
+      /* Check that the template is time-varying data */
+      printf("i=%i ndims=%i\n", i, idata->ndims);
+
+      if( *status == SAI__OK ) {
+	if( idata->ndims != 3 ) {
+	  *status = SAI__ERROR;
+	  errRep(FUNC_NAME, "Template data is not time-varying!", 
+		 status);      
 	}
 	
-	if( *status == SAI__OK ) {
+	if( idata->dtype != SMF__DOUBLE ) {
+	  *status = SAI__ERROR;
+	  errRep(FUNC_NAME, 
+		 "Template data is not double precision!",
+		 status);      
+	}
+      }
+      
+      if( *status == SAI__OK ) {
 	  
 	  /* initialzie the header */
 	  
@@ -319,7 +410,6 @@ void smf_model_create( const smfGroup *igroup, smf_modeltype mtype,
 	  }
 
 	  /* Propagate information from template if copying */
-
 	  if( copyinput ) { /* If copying input, copy data dims directly */
 	    head.dtype = idata->dtype; /* Inherit data type from template */
 	    head.ndims = idata->ndims;
@@ -351,9 +441,16 @@ void smf_model_create( const smfGroup *igroup, smf_modeltype mtype,
 	  }
 	  datalen = ndata * smf_dtype_sz(head.dtype, status); 
 
-	  /* Obtain a character string corresponding to the file name */
-	  pname = name;
-	  grpGet( (*mgroup)->grp, idx, 1, &pname, GRP__SZNAM, status );
+	  if( mgroup != NULL ) {
+	    /* Obtain a character string corresponding to the file name 
+	       if we used a group as the template */
+	    pname = name;
+	    grpGet( (*mgroup)->grp, idx, 1, &pname, GRP__SZNAM, status );
+	  } else {
+	    /* Otherwise form a name based on the model type */
+	    mname = smf_model_getname( mtype, status );
+	    sprintf( name, "%s_%i_%i%s", mname, i, j, suffix );
+	  }
 
 	  if( nofile ) {
 	    /* If there is no file associated with the data, use smf_malloc 
@@ -364,7 +461,7 @@ void smf_model_create( const smfGroup *igroup, smf_modeltype mtype,
 	    
 	  } else {
 	    /* If we are writing a file create and map it here */
-     
+	    
 	    if( (fd = open( name, O_RDWR | O_CREAT | O_TRUNC, 
 			    S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH )) == -1 ) {
 	      *status = SAI__ERROR;
@@ -412,11 +509,21 @@ void smf_model_create( const smfGroup *igroup, smf_modeltype mtype,
 	      memset( dataptr, 0, datalen );
 	    }
 	    
-	    /* If this is a LUT try to open the LUT extension of the
-	       template and copy it over */
+	    /* If this is a LUT try to copy it over */
 	    if( mtype == SMF__LUT ) {	  
-	      smf_open_mapcoord( idata, status );
+
+	      /* Open the LUT if idata associated with file */
+	      if( igroup ) {
+		smf_open_mapcoord( idata, "READ", status );
+	      } 
 	      
+	      /* Check that lut is now set to something */
+	      if( idata->lut == NULL ) {
+		*status = SAI__ERROR;
+		errRep(FUNC_NAME, "No LUT present in template for LUT model", 
+		       status);      
+	      } 
+
 	      if( *status == SAI__OK ) {
 		/* memcpy because target and source are same type */
 		memcpy( dataptr, idata->lut, datalen );
@@ -439,10 +546,20 @@ void smf_model_create( const smfGroup *igroup, smf_modeltype mtype,
 	      /* Create a smfData for this element of the subgroup */
 	      flag = SMF__NOCREATE_HEAD | SMF__NOCREATE_DA;
 
+	      printf("before i=%i j=%i, ndims=%i\n",
+		     i, j, iarray[i]->sdata[j]->ndims);
+
+	      testptr = &(iarray[0]->sdata[0]->ndims);
+	      printf("testptr=%i\n",testptr);
+
 	      data = smf_create_smfData( flag, status );
+
+	      printf("after i=%i j=%i, ndims=%i\n",
+		     i, j, iarray[i]->sdata[j]->ndims);
 	      
 	      if( *status == SAI__OK ) {
 		/* Data from file header */
+		data->isTordered = idata->isTordered;
 		data->dtype = head.dtype;
 		data->ndims = head.ndims;
 		memcpy( data->dims, head.dims, sizeof( head.dims ) );
@@ -455,13 +572,13 @@ void smf_model_create( const smfGroup *igroup, smf_modeltype mtype,
 		if( !nofile ) {
 		  data->file->fd = fd;
 		}
-
+		
 		/* Copy the DIMM filename into the smfFile. Even though
                    there may not be an associated file on disk we store
                    the name here in case we wish to export the data
                    to an NDF file at a later point. */
 		strncpy( data->file->name, name, SMF_PATH_MAX );
-
+		
 		/* Add the smfData to the smfArray */
 		smf_addto_smfArray( mdata[i], data, status );
 	      }
@@ -502,17 +619,22 @@ void smf_model_create( const smfGroup *igroup, smf_modeltype mtype,
 	      }
 	    }
 	  }
-
+	  
 	  /* Close the input template file */
 	  smf_close_file( &idata, status );
-	}
       }
 
-      /* Set main loop exit condition if bad status was set */
+      /* Set loop exit condition if bad status was set */
       if( *status != SAI__OK ) {
-	i = (*mgroup)->ngroups;
-	j = (*mgroup)->nrelated;
+	j = thisnrel;
       }
+    }
+    
+    /* Set loop exit condition if bad status was set */
+    if( *status != SAI__OK ) {
+      i = nchunks;
     }
   }
 }
+
+
