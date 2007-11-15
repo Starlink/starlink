@@ -13,23 +13,31 @@
 *     C function
 
 *  Invocation:
-*     smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map, 
-*		     double *variance, double *weights,
-*		     int msize, int *status );
+*     smf_iteratemap( Grp *igrp, AstKeyMap *keymap, 
+*                    AstFrameSet *outfset, int moving, 
+*	             int *lbnd_out, int *ubnd_out,
+*                    double *map, double *mapvar, double *weights,
+*		     int *status );
 
 *  Arguments:
 *     igrp = Grp* (Given)
 *        Group of input data files
 *     keymap = AstKeyMap* (Given)
 *        keymap containing parameters to control map-maker
+*     outfset = AstFrameSet* (Given)
+*        Frameset containing the sky->output map mapping if calculating
+*        pointing LUT on-the-fly
+*     moving = int (Given)
+*        Is coordinate system tracking moving object? (if outfset specified)
+*     lbnd_out = double* (Given)
+*        2-element array pixel coord. for the lower bounds of the output map
+*        (if outfset specified) 
 *     map = double* (Returned)
 *        The output map array 
-*     variance = double* (Returned)
+*     mapvar = double* (Returned)
 *        Variance of each pixel in map
 *     weights = double* (Returned)
 *        Relative weighting for each pixel in map
-*     msize = int (Given)
-*        Number of pixels in the 2d maps
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -86,6 +94,9 @@
 *     2007-08-17 (EC):
 *        Added nofile flag to smf_model_create to avoid creating .dimm files
 *        in memiter=1 case.
+*     2007-11-15 (EC):
+*        -Use smf_concat_smfGroup for memiter=1 case.
+*        -Modified interface to hand projection from caller to concat_smfGroup
 
 *  Notes:
 
@@ -135,9 +146,11 @@
 
 #define FUNC_NAME "smf_iteratemap"
 
-void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map, 
-		     double *mapvar, double *weights,
-		     int msize, int *status ) {
+void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, 
+		     AstFrameSet *outfset, int moving, 
+	             int *lbnd_out, int *ubnd_out,
+		     double *map, double *mapvar, double *weights,
+		     int *status ) {
 
   /* Local Variables */
   smfArray **ast=NULL;          /* Astronomical signal */
@@ -166,6 +179,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   smf_modeltype *modeltyps=NULL;/* Array of model types */
   char modelname[4];            /* Name of current model component */
   smf_calcmodelptr modelptr=NULL; /* Pointer to current model calc function */
+  int msize;                    /* Number of elements in map */
   int nbolo;                    /* Number of bolometers */
   int nchunks=0;                /* Number of time-chunks of data */
   int nmap;                     /* Number of elements mapped */
@@ -180,6 +194,9 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 
   /* Main routine */
   if (*status != SAI__OK) return;
+
+  /* Calculate number of elements in the map */
+  msize = (ubnd_out[0]-lbnd_out[0]+1)*(ubnd_out[1]-lbnd_out[1]+1);
 
   /* Get size of the input group */
   grpGrpsz( igrp, &isize, status );
@@ -279,8 +296,29 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
      the files */
 
   smf_grp_related( igrp, isize, 1, &igroup, status );
+
   if( *status == SAI__OK ) {
-    nchunks = igroup->ngroups;
+
+    /* If memiter=1 concat everything into a single smfArray */
+    if( memiter ) {
+      msgSeti( "ALLCHUNKS", igroup->ngroups );
+      msgOut(" ", "SMF_ITERATEMAP: Concatenating ^ALLCHUNKS time chunks", 
+	     status);
+
+      /* Only one time chunk */
+      nchunks = 1;
+      
+      /* Allocate length 1 array of smfArrays for single time chunk */
+      res = smf_malloc( nchunks, sizeof(*res), 1, status );
+
+      /* Concatenate the input data (time-ordered for now) */
+      smf_concat_smfGroup( igroup, 1, 
+			   outfset, moving, lbnd_out, ubnd_out, 0,
+			   &res[0], status );
+    } else {
+      /* Otherwise number of time chunks given by igroup */
+      nchunks = igroup->ngroups;
+    }
     msgSeti( "NCHUNKS", nchunks );
     msgOut(" ", "SMF_ITERATEMAP: ^NCHUNKS time chunks", status);
   }
@@ -291,33 +329,77 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   /* Components that always get made */
   if( igroup && (*status == SAI__OK) ) {
 
-    /* there is one smfArray for RES, LUT and AST at each chunk */
-    res = smf_malloc( nchunks, sizeof(*res), 1, status );
+    /* there is one smfArray for LUT and AST at each chunk */
     lut = smf_malloc( nchunks, sizeof(*lut), 1, status );
     ast = smf_malloc( nchunks, sizeof(*ast), 1, status );
 
-    smf_model_create( igroup, SMF__RES, &resgroup, memiter, memiter, res, 
-		      status );
-    smf_model_create( igroup, SMF__LUT, &lutgroup, memiter, memiter, lut, 
-		      status ); 
-    smf_model_create( igroup, SMF__AST, &astgroup, memiter, memiter, ast, 
-		      status );
+    if( memiter ) {
+      /* If iterating in memory then RES has already been created from
+         the concatenation of the input data. Create the other required
+         models using res[0] as a template */
+
+      printf("here1 %i\n", *status);
+
+      smf_model_create( NULL, res, nchunks, SMF__LUT, NULL, memiter, 
+			memiter, lut, status ); 
+
+      printf("here2 %i\n", *status);
+
+      smf_model_create( NULL, res, nchunks, SMF__AST, NULL, memiter, 
+			memiter, ast, status );
+
+      printf("here3 %i\n", *status);
+
+      /* Since a copy of the LUT is still open in res[0] free it up here */
+      for( i=0; i<res[0]->ndat; i++ ) {
+	if( res[0]->sdata[i] ) {
+	  smf_close_mapcoord( res[0]->sdata[i], status );
+	}
+      }
+      
+      printf("here4 %i\n", *status);
+
+    } else {
+      /* If iterating using disk i/o need to create res and other model 
+         components using igroup as template */
+
+      res = smf_malloc( nchunks, sizeof(*res), 1, status );
+      
+      smf_model_create( igroup, NULL, 0, SMF__RES, &resgroup, memiter, 
+			memiter, res, status );
+      smf_model_create( igroup, NULL, 0, SMF__LUT, &lutgroup, memiter, 
+			memiter, lut, status ); 
+      smf_model_create( igroup, NULL, 0, SMF__AST, &astgroup, memiter, 
+			memiter, ast, status );
+    }
   }
 
   /* Dynamic components */
   if( igroup && (nmodels > 0) && (*status == SAI__OK) ) {
 
-    /* Array of smfgroups (one for each dynamic model component) */
-    modelgroups = smf_malloc( nmodels, sizeof(*modelgroups), 1, status );  
-
     /* nmodel array of pointers to nchunk smfArray pointers */
     model = smf_malloc( nmodels, sizeof(*model), 1, status );
-    
+
+    if( memiter != 1 ) {
+      /* Array of smfgroups (one for each dynamic model component) */
+      modelgroups = smf_malloc( nmodels, sizeof(*modelgroups), 1, status );  
+    }
+
     for( i=0; i<nmodels; i++ ) {
       model[i] = smf_malloc( nchunks, sizeof(**model), 1, status );
+      
+      if( memiter ) {
+	printf("here5 %i\n", *status );
 
-      smf_model_create( igroup, modeltyps[i], &modelgroups[i], memiter, 
-			memiter, model[i], status );
+	smf_model_create( NULL, res, nchunks, modeltyps[i], NULL,
+			  memiter, memiter, model[i], status ); 
+
+	printf("here6 %i\n", *status );
+	
+      } else {
+	smf_model_create( igroup, NULL, 0, modeltyps[i], &modelgroups[i], 
+			  memiter, memiter, model[i], status );
+      }
     }
   }
 
@@ -353,8 +435,19 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 	  }
 	} 
 
-	/* Call the model calculations in the desired order. */
+	/* If first iteration pre-condition the data */
 
+	//if( iter == 0 ) {
+	//  msgOut(" ", "SMF_ITERATEMAP: Pre-conditioning chunk", status);
+	//  for( idx=0; idx<res[i]->ndat; idx++ ) {
+	//    smf_fft_filter( res[i]->sdata[idx], 200., status );
+	    
+	    /* The filter sets bolo-ordering so reset to time ordered */
+	//    smf_dataOrder( res[i]->sdata[idx], 1, status );
+	//  }
+	//}
+	
+	/* Call the model calculations in the desired order. */
 	if( *status == SAI__OK ) {
 	  for( j=0; j<nmodels; j++ ) {
 	    
@@ -546,9 +639,17 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 
   /* dynamic model smfArrays */
   for( i=0; i<nchunks; i++ ) {
-    if( res[i] ) smf_close_related( &res[i], status );
-    if( ast[i] ) smf_close_related( &ast[i], status );
-    if( lut[i] ) smf_close_related( &lut[i], status );
+    if( res ) {
+      if( res[i] ) smf_close_related( &res[i], status );
+    }
+
+    if( ast ) {
+      if( ast[i] ) smf_close_related( &ast[i], status );
+    }
+
+    if( lut ) {
+      if( lut[i] ) smf_close_related( &lut[i], status );
+    }
   }
 
   /* dynamic model smfGroups */
@@ -585,5 +686,5 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   if( igroup ) {
     smf_close_smfGroup( &igroup, status );
   }
-  
+ 
 }
