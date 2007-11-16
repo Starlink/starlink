@@ -93,8 +93,9 @@
 *     2007-08-21 (EC):
 *        Fixed up warnings caused by ambiguous pointer math
 *     2007-11-15 (EC):
-*        Added ability to create models from a smfArray template, requiring
-*        a change to the interface.
+*        -Added ability to create models from a smfArray template, 
+*         requiring a change to the interface.
+*        -Fixed memory allocation bug
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -183,8 +184,6 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
   char suffix[] = SMF__DIMM_SUFFIX; /* String containing model suffix */
   smfData *tempdata=NULL;       /* Temporary smfData pointer */
   int thisnrel;                 /* Number of related items for this model */
-
-  int *testptr;
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -324,7 +323,6 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
       }
 
       /* Check that the template is time-varying data */
-      printf("i=%i ndims=%i\n", i, idata->ndims);
 
       if( *status == SAI__OK ) {
 	if( idata->ndims != 3 ) {
@@ -546,17 +544,8 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 	      /* Create a smfData for this element of the subgroup */
 	      flag = SMF__NOCREATE_HEAD | SMF__NOCREATE_DA;
 
-	      printf("before i=%i j=%i, ndims=%i\n",
-		     i, j, iarray[i]->sdata[j]->ndims);
-
-	      testptr = &(iarray[0]->sdata[0]->ndims);
-	      printf("testptr=%i\n",testptr);
-
 	      data = smf_create_smfData( flag, status );
 
-	      printf("after i=%i j=%i, ndims=%i\n",
-		     i, j, iarray[i]->sdata[j]->ndims);
-	      
 	      if( *status == SAI__OK ) {
 		/* Data from file header */
 		data->isTordered = idata->isTordered;
@@ -620,8 +609,10 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 	    }
 	  }
 	  
-	  /* Close the input template file */
-	  smf_close_file( &idata, status );
+	  /* Close the input template file if it was opened here */
+	  if( igroup ) {
+	    smf_close_file( &idata, status );
+	  }
       }
 
       /* Set loop exit condition if bad status was set */
