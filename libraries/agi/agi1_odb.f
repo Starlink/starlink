@@ -33,7 +33,9 @@
 *     Endif.
 
 *  Copyright:
-*     Copyright (C) 1988, 1989, 1990, 1991, 1992 Science & Engineering Research Council.
+*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     Copyright (C) 1988, 1989, 1990, 1991, 1992 Science & Engineering
+*     Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -54,17 +56,26 @@
 
 *  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*     Peter W. Draper (JAC, Durham University)
+*     PWD: Peter W. Draper (JAC, Durham University)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
-*     July 1988
-*     July 1989  Read database locator from common block
-*     July 1990  Call AGI_1FNAME and HDS_TUNE
-*     Dec  1991  Removed call to HDS_TUNE
-*     Mar  1992  Define file extension using AGI__ENAME parameter
-*     Nov  2007  Protect database name inquiry against bad status and
-*                uninitialised length
+*     1998-JUL-01 (NE):
+*        Original version.
+*     1989-JUL-01 (NE):
+*        Read database locator from common block.
+*     1990-JUL-01 (NE):
+*        Call AGI_1FNAME and HDS_TUNE
+*     1991-DEC-01 (NE):
+*        Removed call to GDS_TUNE
+*     1992-MAR-01 (NE):
+*        Define file extension using AGI__ENAME parameter.
+*     2007-NOV-12 (PWD):
+*        Protect database name inquiry against bad status and
+*        uninitialised length
+*     2007-NOV-15 (TIMJ):
+*        Fix initialisation of LNAME.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -111,10 +122,11 @@
          IF ( .NOT. FOUND ) THEN
 
 *   Inquire the database file name
+            LNAME = 0
+            FNAME = ' '
             CALL AGI_1FNAME( FNAME, LNAME, STATUS )
 
 *   Append the file extension
-            LNAME = 0
             IF ( STATUS .EQ. SAI__OK ) THEN
                LEXT = LEN( AGI__ENAME )
                FNAME( LNAME+1 : LNAME+LEXT ) = AGI__ENAME
