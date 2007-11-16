@@ -201,7 +201,9 @@
 *        DA now uses size_t to count things. A read-only dateobs was being
 *        written to.
 *     2007-11-15 (AGG):
-*        Write sub-image FITS headers in the correct order
+*        Write sub-image FITS headers in the correct order, check old
+*        headers exist before deleting them and make sure that
+*        SEQSTART/END headers are written for first image
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -726,30 +728,43 @@ int *status              /* Global status (given and returned) */
        seqstart++;
        seqend++;
 
-       /* Construct additional FITS headers to add to the existing
-	  FitsChan - first `rewind' to beginning of FitsChan */
-       astClear( fitschan, "Card");
-       /* Find and delete old entries before adding new ones - check
-	  that fitsfind is not 0 before proceeding */
-       fitsfind = astFindFits( fitschan, "DATE-OBS", NULL, 0);
-       if ( fitsfind ) {
-	 astDelFits( fitschan );
-	 astSetFitsS ( fitschan, "DATE-OBS", imdateobs, 
-		       "Date and time (UTC) of start of sub-scan", 0 );
-       }
-
-       fitsfind = astFindFits( fitschan, "SEQSTART", NULL, 0);
-       if ( fitsfind ) {
-	 astDelFits( fitschan );
+       /* First time round the loop the SEQSTART/END headers won't
+	  exist so just write them. Plus there is no need to change
+	  the DATE-OBS/END for the first sub-image */
+       if ( k == 0 ) {
 	 astSetFitsI( fitschan, "SEQSTART", seqstart, 
 		      "RTS index number of first frame in image", 0);
-       }
-
-       fitsfind = astFindFits( fitschan, "SEQEND", NULL, 0);
-       if ( fitsfind ) {
-	 astDelFits( fitschan );
 	 astSetFitsI( fitschan, "SEQEND", seqend, 
 		      "RTS index number of last frame in image", 0);
+       } else { 
+	 /* On subsequent passes find and delete old entries before
+	    adding new ones - check that fitsfind is not 0 before
+	    proceeding. First `rewind' to beginning of FitsChan. */
+	 astClear( fitschan, "Card");
+	 fitsfind = astFindFits( fitschan, "DATE-OBS", NULL, 0);
+	 if ( fitsfind ) {
+	   astDelFits( fitschan );
+	   astSetFitsS ( fitschan, "DATE-OBS", imdateobs, 
+			 "Date and time (UTC) of start of sub-scan", 0 );
+	 }
+	 fitsfind = astFindFits( fitschan, "DATE-END", NULL, 0);
+	 if ( fitsfind ) {
+	   astDelFits( fitschan );
+	   astSetFitsS ( fitschan, "DATE-END", imdateobs, 
+			 "Date and time (UTC) of end of sub-scan", 0 );
+	 }
+	 fitsfind = astFindFits( fitschan, "SEQSTART", NULL, 0);
+	 if ( fitsfind ) {
+	   astDelFits( fitschan );
+	   astSetFitsI( fitschan, "SEQSTART", seqstart, 
+			"RTS index number of first frame in image", 0);
+	 }
+	 fitsfind = astFindFits( fitschan, "SEQEND", NULL, 0);
+	 if ( fitsfind ) {
+	   astDelFits( fitschan );
+	   astSetFitsI( fitschan, "SEQEND", seqend, 
+			"RTS index number of last frame in image", 0);
+	 }
        }
 
        /* Convert the AstFitsChan data to a char array */
