@@ -97,6 +97,7 @@
 *     2007-11-15 (EC):
 *        -Use smf_concat_smfGroup for memiter=1 case.
 *        -Modified interface to hand projection from caller to concat_smfGroup
+*        -Check for file name existence when calling smf_model_NDFexport
 
 *  Notes:
 
@@ -338,17 +339,11 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
          the concatenation of the input data. Create the other required
          models using res[0] as a template */
 
-      printf("here1 %i\n", *status);
-
       smf_model_create( NULL, res, nchunks, SMF__LUT, NULL, memiter, 
 			memiter, lut, status ); 
 
-      printf("here2 %i\n", *status);
-
       smf_model_create( NULL, res, nchunks, SMF__AST, NULL, memiter, 
 			memiter, ast, status );
-
-      printf("here3 %i\n", *status);
 
       /* Since a copy of the LUT is still open in res[0] free it up here */
       for( i=0; i<res[0]->ndat; i++ ) {
@@ -357,8 +352,6 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	}
       }
       
-      printf("here4 %i\n", *status);
-
     } else {
       /* If iterating using disk i/o need to create res and other model 
          components using igroup as template */
@@ -389,13 +382,9 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       model[i] = smf_malloc( nchunks, sizeof(**model), 1, status );
       
       if( memiter ) {
-	printf("here5 %i\n", *status );
-
 	smf_model_create( NULL, res, nchunks, modeltyps[i], NULL,
 			  memiter, memiter, model[i], status ); 
 
-	printf("here6 %i\n", *status );
-	
       } else {
 	smf_model_create( igroup, NULL, 0, modeltyps[i], &modelgroups[i], 
 			  memiter, memiter, model[i], status );
@@ -573,7 +562,8 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
     /* Export DIMM model components to NDF files.
        Note that we don't do LUT since it is originally an extension in the
-       input flatfielded data */
+       input flatfielded data.
+       Also - check that a filename is defined in the smfFile! */
   
     if( exportNDF && (*status == SAI__OK) ) {
       msgOut(" ", "SMF_ITERATEMAP: Export model components to NDF files.", 
@@ -591,9 +581,11 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	  smf_open_related_model( resgroup, i, "READ", &res[i], status );
 
 	for( idx=0; idx<res[i]->ndat; idx++ ) {
-	  smf_model_NDFexport( res[i]->sdata[idx], 
-			       res[i]->sdata[idx]->file->name, 
-			       status );
+	  if( (res[i]->sdata[idx]->file->name)[0] ) {
+	    smf_model_NDFexport( res[i]->sdata[idx], 
+				 res[i]->sdata[idx]->file->name, 
+				 status );
+	  }
 	}
 	if( !memiter ) 
 	  smf_close_related( &res[i], status );
@@ -602,9 +594,11 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	  smf_open_related_model( astgroup, i, "READ", &ast[i], status );
 
 	for( idx=0; idx<ast[i]->ndat; idx++ ) {
-	  smf_model_NDFexport( ast[i]->sdata[idx], 
-			       ast[i]->sdata[idx]->file->name, 
-			       status );
+	  if( (ast[i]->sdata[idx]->file->name)[0] ) {
+	    smf_model_NDFexport( ast[i]->sdata[idx], 
+				 ast[i]->sdata[idx]->file->name, 
+				 status );
+	  }
 	}
 	if( !memiter ) 
 	  smf_close_related( &ast[i], status );
@@ -615,10 +609,11 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 				    status );
 	  
 	  for( idx=0; idx<model[j][i]->ndat; idx++ ) {
-	    smf_model_NDFexport( model[j][i]->sdata[idx], 
-				 model[j][i]->sdata[idx]->file->name, 
-				 status);
-	    
+	    if( (model[j][i]->sdata[idx]->file->name)[0] ) {
+	      smf_model_NDFexport( model[j][i]->sdata[idx], 
+				   model[j][i]->sdata[idx]->file->name, 
+				   status);
+	    }
 	  }
 	  if( !memiter ) 
 	    smf_close_related( &model[j][i], status );
