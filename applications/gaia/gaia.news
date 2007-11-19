@@ -32,6 +32,9 @@
 
     The Tycho-2 catalogue has been added to the default list.
 
+    A bug in the gaia_tcl program caused the gaiadisp command to fail
+    under OS X. This has been fixed.
+
   Puana Release:
   ==============
 
