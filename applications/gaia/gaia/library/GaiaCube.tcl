@@ -258,7 +258,7 @@ itcl::class gaia::GaiaCube {
       #  Add tab window for choosing either the helper controls.
       itk_component add tabnotebook {
          iwidgets::tabnotebook $w_.tab -equaltabs 0 \
-            -angle 0 -tabpos n -width 420 -height 525
+            -angle 0 -tabpos n -width 420 -height 550
       }
       pack $itk_component(tabnotebook) -fill both -expand 1
 
@@ -1124,6 +1124,12 @@ itcl::class gaia::GaiaCube {
    #  Return object for controlling the spectral coordinates.
    public method get_spec_coords {} {
       return $spec_coords_
+   }
+   
+   #  Return the spectral extraction limits in pixel indices. Empty string if
+   #  not set (i.e. at bounds of data).
+   public method get_extraction_limits {} {
+      return [$itk_component(spectrum) get_set_limits]
    }
 
    #  =================
