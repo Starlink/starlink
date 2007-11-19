@@ -82,7 +82,7 @@ itcl::class gaia3d::Gaia3dTool {
       eval itk_initialize $args
 
       #  Make it a decent size (packing doesn't work).
-      wm geometry  $w_ 800x700+0+0
+      wm geometry  $w_ 800x720+0+0
 
       #  Add short help window.
       make_short_help
@@ -745,7 +745,8 @@ itcl::class gaia3d::Gaia3dTool {
          #  correctly when drawn before the volume (which will be
          #  translucent). Note still true for translucent plane and line.
          if { $line_ == {} } {
-            set line_ [gaia3d::Gaia3dVtkLine \#auto -dataset $imagedata_ \
+            set line_ [gaia3d::Gaia3dVtkLine \#auto \
+                          -dataset [$imagedata_ get_imagedata] \
                           -renwindow $renwindow_ -align_to_axis 1 \
                           -axis [$itk_option(-gaiacube) get_axis] \
                           -clip_to_bounds 1]
@@ -775,7 +776,7 @@ itcl::class gaia3d::Gaia3dTool {
                [gaia3d::Gaia3dVtkImagePlane \#auto \
                    -renwindow $renwindow_ \
                    -rtdimage $itk_option(-rtdimage) \
-                   -dataset $imagedata_ \
+                   -dataset [$imagedata_ get_imagedata] \
                    -opacity $plane_opacity_ \
                    -colourmap $plane_colourmap_ \
                    -axis [$itk_option(-gaiacube) get_axis] \
@@ -863,7 +864,7 @@ itcl::class gaia3d::Gaia3dTool {
                                 -renwindow $renwindow_]
                $outline_ add_to_window
             }
-            $outline_ configure -dataset $imagedata_
+            $outline_ configure -dataset [$imagedata_ get_imagedata]
             $outline_ set_visible
          } else {
             if { $outline_ != {} } {
@@ -909,7 +910,7 @@ itcl::class gaia3d::Gaia3dTool {
          gvtk::grfclear
       }
    }
-   
+
    #  Set the Plot3D. Really restore the context.
    protected method set_plot3d_ {} {
       if { $grf_context_ != {} } {
@@ -936,8 +937,8 @@ itcl::class gaia3d::Gaia3dTool {
    }
 
    #  Access the cube data and wrap this into an instance of vtkArrayData.
-   #  Only done if the image data has changed, returns 1 when this happens,
-   #  and 0 otherwise.
+   #  Only done if the image data has changed or the extraction limits have
+   #  changed, returns 1 when this happens, and 0 otherwise.
    protected method get_vtk_data_array_ {} {
 
       set cubeaccessor_ [$itk_option(-gaiacube) get_cubeaccessor]
@@ -948,29 +949,37 @@ itcl::class gaia3d::Gaia3dTool {
       #  And the dimensions.
       set dims_ [$cubeaccessor_ getdims 0]
 
+      #  Get the extraction limits. Only support this along the "spectral"
+      #  axis at present.
+      set limits [$itk_option(-gaiacube) get_extraction_limits]
+      set changed_limits 0
+      if { $limits != $limits_ } {
+         set changed_limits 1
+      }
+      set limits_ $limits
+
       #  Check name of cube data, if changed re-access, or
       #  bad value handling changed.
       set newname [$cubeaccessor_ cget -dataset]
-      if { $newname != {} && $cubename_ != $newname || $changed_bad_ } {
+      if { $newname != {} && $cubename_ != $newname || $changed_bad_ ||
+           $changed_limits } {
          set changed_bad_ 0
          set cubename_ $newname
 
-         #  Release old data.
-         if { $imagedata_ != {} } {
-            $imagedata_ Delete
-            $imageimport_ Delete
-            set imagedata_ {}
-            set imageimport_ {}
+         #  Create object to access the cube data.
+         if { $imagedata_ == {} } {
+            set imagedata_ [uplevel \#0 gaia3d::Gaia3dVtkCubeData \#auto]
          }
 
          #  Data changed, so new Plot3D required.
          free_plot3d_
 
          #  Access data, checking for BAD pixels and replacing if requested.
-         set nullvalue [$itk_component(replacevalue) get]
-         lassign [gaia3d::Gaia3dVtk::import_gaia_cube $cubeaccessor_ \
-                     $checkbad_ $nullvalue] imagedata_ imageimport_
-
+         $imagedata_ configure \
+            -cubeaccessor $cubeaccessor_ \
+            -checkbad $checkbad_ \
+            -nullvalue [$itk_component(replacevalue) get]
+         $imagedata_ access
          return 1
       }
       return 0
@@ -992,10 +1001,8 @@ itcl::class gaia3d::Gaia3dTool {
    #  for release when the window is closed).
    public method release_objects { fullrelease } {
       if { $fullrelease && $imagedata_ != {} } {
-         $imagedata_ Delete
-         $imageimport_ Delete
+         ::delete object $imagedata_
          set imagedata_ {}
-         set imageimport_ {}
       }
 
       if { $plane_ != {} } {
@@ -1035,11 +1042,8 @@ itcl::class gaia3d::Gaia3dTool {
    #  Protected variables: (available to instance)
    #  --------------------
 
-   #  VTK variables:
-   protected variable imagedata_ {}
-   protected variable imageimport_ {}
-
    #  Wrapped VTK objects.
+   protected variable imagedata_ {}
    protected variable plane_ {}
    protected variable textwcs_ {}
    protected variable line_ {}
@@ -1056,6 +1060,9 @@ itcl::class gaia3d::Gaia3dTool {
    protected variable cubeaccessor_ {}
    protected variable wcs_ {}
    protected variable dims_ {0 0 0}
+
+   #  Limits of spectral extraction.
+   protected variable limits_ {}
 
    #  Whether to check for blank pixels.
    protected variable checkbad_ 0

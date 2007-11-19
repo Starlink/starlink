@@ -397,8 +397,8 @@ itcl::class gaia3d::Gaia3dVolume {
 
       #  Set image data, if changed or new.
       if { $newdata } {
-         $mainmapper_ SetInput $imagedata_
-         $fastmapper_ SetInput $imagedata_
+         $mainmapper_ SetInput [$imagedata_ get_imagedata]
+         $fastmapper_ SetInput [$imagedata_ get_imagedata]
       }
 
       #  Gather properties.

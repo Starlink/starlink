@@ -607,7 +607,8 @@ itcl::class gaia3d::Gaia3dIsosurface {
    #  Create objects to manage a contour.
    protected method create_iso_contour_ {index} {
       if { $imagedata_ != {} } {
-         set contour_($index) [Gaia3dVtkIso \#auto -imagedata $imagedata_ \
+         set contour_($index) [Gaia3dVtkIso \#auto \
+                                  -imagedata [$imagedata_ get_imagedata] \
                                   -renwindow $renwindow_]
          $contour_($index) add_to_window
          $contour_($index) set_visible

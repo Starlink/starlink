@@ -155,10 +155,8 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
    protected method release_cube_ {index} {
       if { [info exists cubeaccessor_($index)] } {
          $cubeaccessor_($index) close
-         $imagedata_($index) Delete
-         $imageimport_($index) Delete
+         ::delete object $imagedata_($index)
          set imagedata_($index) {}
-         set imageimport_($index) {}
       }
    }
 
@@ -182,10 +180,10 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
 
       #  Don't want to exit this method without resetting the domain.
       catch {
-
          #  Create an actor for each possible level of each cube.
          for { set i 0 } { $i < $itk_option(-maxcubes) } { incr i } {
-            if { [info exists cubename_($i)] && $cubename_($i) != {} } {
+            if { $display_($i) && 
+                 [info exists cubename_($i)] && $cubename_($i) != {} } {
 
                #  Connect the coordinates of this cube with the target.
                set wcs_current [gaiautils::astget $wcs_($i) "Current"]
@@ -209,7 +207,7 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
          }
       } msg
       if { $msg != {} } {
-         puts "Matched error: $msg"
+         puts stderr "Error matching cube coordinate systems: $msg"
       }
 
       gaiautils::astset $target_wcs "Current=$target_current"
@@ -238,9 +236,10 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
                set wcs_($i) [$cubeaccessor_($i) getwcs]
 
                #  Access data, wrapping to an vtkImageData instance.
-               lassign [gaia3d::Gaia3dVtk::import_gaia_cube \
-                           $cubeaccessor_($i) 0 0] \
-                  imagedata_($i) imageimport_($i)
+               set imagedata_($i) [gaia3d::Gaia3dVtkCubeData \#auto]
+               $imagedata_($i) configure -cubeaccessor $cubeaccessor_($i) \
+                  -checkbad 0 -nullvalue 0
+               $imagedata_($i) access
             }
          }
 
@@ -254,7 +253,8 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
    #  cube coordinates to the graphics coordinates.
    protected method create_iso_contour_ {i j wcs renwindow} {
       if { $cubename_($i) != {} } {
-         set contour_($i,$j) [Gaia3dVtkIso \#auto -imagedata $imagedata_($i) \
+         set contour_($i,$j) [Gaia3dVtkIso \#auto \
+                                 -imagedata [$imagedata_($i) get_imagedata] \
                                  -renwindow $renwindow -wcs $wcs]
          $contour_($i,$j) add_to_window
          $contour_($i,$j) set_visible
@@ -305,8 +305,11 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
    public method release_iso_objects {i} {
       for {set j 0} {$j < $itk_option(-maxcnt)} {incr j} {
          if { [info exists contour_($i,$j)] } {
-            $contour_($i,$j) remove_from_window
-            ::delete object $contour_($i,$j)
+            catch {
+               $contour_($i,$j) remove_from_window
+               ::delete object $contour_($i,$j)
+            }
+            unset contour_($i,$j)
          }
       }
    }
@@ -355,12 +358,19 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
          add_short_help $itk_component(cube$i) \
             {Name of a data file, must be a cube}
 
-         #  Bind <3> to open a pop-up menu containing a list of cubes that
-         #  have already been opened.
-         set entry [$itk_component(cube$i) component entry]
-         ::bind $entry <3> "puts \"you pressed <3>: $i\""
-
          #  Display or not.
+         set display_($i) 1
+         itk_component add display$i {
+            gaia::StarLabelCheck $parent.display$i \
+               -text "Display:" \
+               -onvalue 1 \
+               -offvalue 0 \
+               -labelwidth 5 \
+               -variable [scope display_($i)]
+         }
+         pack $itk_component(display$i) -side top -fill x -padx 3 -pady 3
+         add_short_help $itk_component(display$i) \
+            {Display cube in rendered scene}
 
          #  Add controls for line attributes.
          itk_component add tab$i {
@@ -537,15 +547,14 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
    #  The cached AST FrameSet.
    protected variable wcs_
 
-   #  VTK variables for vtkImageData and vtkImageImport instances.
+   #  Gaia3dVtkCubeData instances. Provide access to wrapped cube.
    protected variable imagedata_
-   protected variable imageimport_
 
    #  VTK variables for isosurfaces.
    protected variable contour_
 
    #  Whether named cube should be rendered.
-   protected variable enabled_
+   protected variable display_
 
    #  Common variables: (shared by all instances)
    #  -----------------
