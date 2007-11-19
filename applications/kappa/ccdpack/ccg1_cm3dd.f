@@ -1,6 +1,6 @@
-      SUBROUTINE CCG1_CM3DD( STACK, NPIX, NLINES, VARS, COORDS, WIDTHS,
-     :                       IMETH, MINPIX, NITER, NSIGMA, ALPHA, RMIN,
-     :                       RMAX, RESULT, COIND, WRK1, WRK2, NCON,
+      SUBROUTINE CCG1_CM3DD( STACK, NPIX, NLINES, VARS, COORDS, IMETH,
+     :                       MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
+     :                       RESULT, WIDTHS, COIND, WRK1, WRK2, NCON,
      :                       POINT, USED, STATUS )
 *+
 *  Name:
@@ -14,8 +14,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCG1_CM3DD( STACK, NPIX, NLINES, VARS, COORDS, WIDTHS, IMETH,
-*                      MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX, RESULT,
+*     CALL CCG1_CM3DD( STACK, NPIX, NLINES, VARS, COORDS, IMETH, MINPIX,
+*                      NITER, NSIGMA, ALPHA, RMIN, RMAX, RESULT, WIDTHS,
 *                      COIND, WRK1, WRK2, NCON, POINT, USED, STATUS )
 
 *  Description:
@@ -38,9 +38,6 @@
 *     COORDS( NPIX, NLINES ) = DOUBLE PRECISION (Given)
 *        The co-ordinates along the collapse axis for each pixel.
 *        It is accessed only for IMETH = 22, 23, 33, 34.
-*     WIDTHS( NPIX, NLINES ) = DOUBLE PRECISION (Given)
-*        The widths along the collapse axis for each pixel.  It is
-*        accessed only for IMETH = 21.
 *     IMETH = INTEGER (Given)
 *        The method to use in combining the lines.  It has a code of 1
 *        to 300 which represent the following statistics.
@@ -82,6 +79,9 @@
 *        The maximum allowed data value ( IMETH = 7 )
 *     RESULT( NPIX ) = DOUBLE PRECISION (Returned)
 *        The output line of data.
+*     WIDTHS( NPIX, NLINES ) = DOUBLE PRECISION (Returned)
+*        The widths along the collapse axis for each pixel.  It is
+*        calculated only for IMETH = 21.
 *     COIND( NPIX ) = INTEGER (Given and Returned)
 *        Workspace to hold co-ordinate indices.
 *     WRK1( NLINES ) = DOUBLE PRECISION (Given and Returned)
@@ -152,6 +152,8 @@
 *     2006 February 10 (MJC):
 *        Fixed reverse-editing bug where STACK was removed instead
 *        of VARS from CCG1_SUM3D call (SUM method).
+*     2007 November 17 (MJC):
+*        WIDTHS is returned, not supplied, so move it in the API.   
 *    {enter_further_changes_here}
 
 *  Bugs:
@@ -173,7 +175,6 @@
       DOUBLE PRECISION STACK( NPIX, NLINES )
       DOUBLE PRECISION VARS( NLINES )
       DOUBLE PRECISION COORDS( NPIX, NLINES )
-      DOUBLE PRECISION WIDTHS( NPIX, NLINES )
       INTEGER NITER
       REAL NSIGMA
       REAL ALPHA
@@ -190,6 +191,7 @@
 
 *  Arguments Returned:
       DOUBLE PRECISION RESULT( NPIX )
+      DOUBLE PRECISION WIDTHS( NPIX, NLINES )
 
 *  Status:
       INTEGER STATUS             ! Global status

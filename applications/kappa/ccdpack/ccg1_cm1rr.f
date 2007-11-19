@@ -1,6 +1,6 @@
-      SUBROUTINE CCG1_CM1RR( STACK, NPIX, NLINES, VARS, COORDS, WIDTHS,
-     :                       IMETH, MINPIX, NITER, NSIGMA, ALPHA, RMIN,
-     :                       RMAX, RESULT, RESVAR, COIND, WRK1, WRK2,
+      SUBROUTINE CCG1_CM1RR( STACK, NPIX, NLINES, VARS, COORDS, IMETH,
+     :                       MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
+     :                       RESULT, RESVAR, WIDTHS, COIND, WRK1, WRK2,
      :                       PP, COVEC, NMAT, NCON, POINT, USED, 
      :                       STATUS )
 *+
@@ -15,9 +15,9 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCG1_CM1RR( STACK, NPIX, NLINES, VARS, COORDS, WIDTHS, IMETH,
-*                      MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX, RESULT,
-*                      RESVAR, COIND, WRK1, WRK2, PP, COVEC, NMAT, NCON,
+*     CALL CCG1_CM1RR( STACK, NPIX, NLINES, VARS, COORDS, IMETH, MINPIX,
+*                      NITER, NSIGMA, ALPHA, RMIN, RMAX, RESULT, RESVAR,
+*                      WIDTHS, COIND, WRK1, WRK2, PP, COVEC, NMAT, NCON,
 *                      POINT, USED, STATUS )
 
 *  Description:
@@ -42,9 +42,6 @@
 *     COORDS( NPIX, NLINES ) = REAL (Given)
 *        The co-ordinates along the collapse axis for each pixel.
 *        It is accessed only for IMETH = 22, 23, 33, 34.
-*     WIDTHS( NPIX, NLINES ) = REAL (Given)
-*        The widths along the collapse axis for each pixel.  It is
-*        accessed only for IMETH = 21.
 *     IMETH = INTEGER (Given)
 *        The method to use in combining the lines.  It has a code of 1
 *        to 300 which represent the following statistics.
@@ -88,6 +85,9 @@
 *        The output line of data.
 *     RESVAR( NPIX ) = REAL (Returned)
 *        The output variances.
+*     WIDTHS( NPIX, NLINES ) = REAL (Returned)
+*        The widths along the collapse axis for each pixel.  It is
+*        calculated only for IMETH = 21.
 *     COIND( NPIX ) = INTEGER (Given and Returned)
 *        Workspace to hold co-ordinate indices.
 *     WRK1( NLINES ) = REAL (Given and Returned)
@@ -180,6 +180,8 @@
 *        Use CCG1_I2WC instead of KPG1_VASV to cope with the
 *        two-dimensional co-ordinate array.  Derive the widths for
 *        IMETH = 21 from the co-ordinates.
+*     2007 November 17 (MJC):
+*        WIDTHS is returned, not supplied, so move it in the API.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -203,7 +205,6 @@
       REAL STACK( NPIX, NLINES )
       REAL VARS( NPIX, NLINES )
       REAL COORDS( NPIX, NLINES )
-      REAL WIDTHS( NPIX, NLINES )
       DOUBLE PRECISION PP( NLINES )
       INTEGER NITER
       REAL NSIGMA
@@ -223,6 +224,7 @@
 *  Arguments Returned:
       REAL RESULT( NPIX )
       REAL RESVAR( NPIX )
+      REAL WIDTHS( NPIX, NLINES )
 
 *  Status:
       INTEGER STATUS             ! Global status
