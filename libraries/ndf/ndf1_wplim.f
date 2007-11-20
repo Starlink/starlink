@@ -96,6 +96,10 @@
 *        - Handle axes correctly that have no inverse transformation.
 *        - Handle cases where the I'th pixel axis does not feed the I'th
 *        WCS axis.
+*     20-NOV-2007 (DSB):
+*        Ensure the section width is correct if the user has requested a
+*        specified width in pixels (rounding errors could cause this not
+*        to be the case in the previous version of this file).
 *     {enter_changes_here}
 
 *  Bugs:
@@ -697,7 +701,17 @@ c      write(*,*) '   '
                PUBND( I ) = TEMP
             END IF
             UBND( I ) = NINT( PUBND( I ) ) 
-            LBND( I ) = UBND( I ) - NINT( PUBND( I ) - PLBND( I ) ) + 1 
+
+*  If the section width was specified in pixels, ensure that the section
+*  has the requested width (rounding problems can otherwise cause this not
+*  to be the case).
+            IF( ISPIX2( I ) .AND. .NOT. ISBND( I ) ) THEN
+               LBND( I ) = UBND( I ) + VALUE2( I ) - 1
+            ELSE
+               LBND( I ) = UBND( I ) - NINT( PUBND( I ) - PLBND( I ) ) 
+     :                     + 1 
+            END IF
+
          END DO
       END IF
 
