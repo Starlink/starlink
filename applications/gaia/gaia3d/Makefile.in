@@ -14,6 +14,10 @@
 #
 # RCS: @(#) $Id: Makefile.in,v 1.76 2007/06/05 16:34:41 pwd Exp $
 
+# Increment this number for new sources. Forces generation to enumerate
+# them in the Makefile.
+NEW_SOURCE_COUNT = 0
+
 #========================================================================
 # Add additional lines to handle any additional AC_SUBST cases that
 # have been added in a customized configure script.
