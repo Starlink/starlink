@@ -71,6 +71,7 @@
 *     AJC: Alan Chipperfield (Starlink, RAL)
 *     TIMJ: Tim Jenness (JAC)
 *     PWD: Peter W. Draper (Starlink, Durham University)
+*     BC: Brad Cavanagh (Joint Astronomy Centre)
 *     {enter_new_authors_here}
 
 *  History:
@@ -106,6 +107,8 @@
 *        Cache result after first call. This helps NDF history writing
 *        which makes extensive use of PSX_CUSERID. Assumes that the
 *        user ID does not change.
+*     21-NOV-2007 (BC):
+*        Define L_cuserid if it does not exist on the system.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -155,6 +158,10 @@ extern char *cuserid( const char *);
 #        endif
 #     endif
 #  endif
+#endif
+
+#if !HAVE_DECL_CUSERID
+#   define L_cuserid 64
 #endif
 
 /* Cache storage to minimize system calls. This routine is used
