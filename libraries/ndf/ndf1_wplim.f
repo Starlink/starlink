@@ -100,6 +100,8 @@
 *        Ensure the section width is correct if the user has requested a
 *        specified width in pixels (rounding errors could cause this not
 *        to be the case in the previous version of this file).
+*     21-NOV-2007 (DSB):
+*        Avoid compiler warnings.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -148,7 +150,6 @@
       DOUBLE PRECISION PRANGE
       DOUBLE PRECISION PUBND( NDF__MXDIM )
       DOUBLE PRECISION PUBND2( NDF__MXDIM )
-      DOUBLE PRECISION SCALE
       DOUBLE PRECISION V1
       DOUBLE PRECISION V2
       DOUBLE PRECISION WLBND( NDF__MXDIM )
@@ -469,11 +470,18 @@ c      write(*,*) '   '
 *  Find the pixel axis that covers the largest range between the
 *  positions at which the upper and lower WCS limits were found.
                MAXRNG = -1.0
+               JJ = 0
                DO J = 1, NPIX
-                  PRANGE = ABS( XU( J ) - XL( J ) )
-                  IF( PRANGE .GT. MAXRNG ) THEN
-                     JJ = J
-                     MAXRNG = PRANGE
+
+                  IF( XU( J ) .NE. AST__BAD .AND. 
+     :                XL( J ) .NE. AST__BAD ) THEN
+
+                     PRANGE = ABS( XU( J ) - XL( J ) )
+                     IF( PRANGE .GT. MAXRNG ) THEN
+                        JJ = J
+                        MAXRNG = PRANGE
+                     END IF
+
                   END IF
                END DO
 
@@ -481,7 +489,7 @@ c      write(*,*) '   '
 *  the WCS values themselves but by which one gives the lower or upper 
 *  value on the corresponding pixel axis. Use this criterion to fill in
 *  values for which ever WCS bound has not been supplied.
-               IF( WLBND( I ) .EQ. AST__BAD ) THEN
+               IF( WLBND( I ) .EQ. AST__BAD .AND. JJ .GT. 0 ) THEN
                   IF( XL( JJ ) .LT. XU( JJ ) ) THEN
                      WLBND( I ) = V1
                   ELSE 
@@ -489,7 +497,7 @@ c      write(*,*) '   '
                   END IF
                END IF
 
-               IF( WUBND( I ) .EQ. AST__BAD ) THEN
+               IF( WUBND( I ) .EQ. AST__BAD  .AND. JJ .GT. 0 ) THEN
                   IF( XL( JJ ) .GT. XU( JJ ) ) THEN
                      WUBND( I ) = V1
                   ELSE 
@@ -504,20 +512,11 @@ c      write(*,*) '   '
 *  may have a value of (say) 359 degrees and the upper limit be (say) 2
 *  degrees. In this example the following code converts the upper limit
 *  to 361 degrees.
-
-
             DELTA = AST_AXDISTANCE( CFRM, I, WLBND( I ), WUBND( I ),
      :                              STATUS )
             WUBND( I ) = WLBND( I ) + DELTA
 
          END DO
-
-c      write(*,*) 'C:'
-c      write(*,*) '   PLBND: ',PLBND(1),PLBND(2)
-c      write(*,*) '   PUBND: ',PUBND(1),PUBND(2)
-c      write(*,*) '   WLBND: ',WLBND(1),WLBND(2)
-c      write(*,*) '   WUBND: ',WUBND(1),WUBND(2)
-c      write(*,*) '   '
 
 *  If any centre/width bounds remain in which the centre is a WCS value 
 *  and the width is a pixel value, then we need to convert them into 
