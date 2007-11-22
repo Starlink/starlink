@@ -1184,6 +1184,7 @@ itcl::class gaia::GaiaCubeSpectrum {
             catch {
                set rra [$rtdimage_ astget "SkyRef(1)"]
                set rdec [$rtdimage_ astget "SkyRef(2)"]
+
                if { $rra == "" || $rra == 0.0 } {
                   set frameset [$cubeaccessor getwcs]
                   set specframe [gaiautils::getaxis $frameset $axis]
@@ -1195,14 +1196,11 @@ itcl::class gaia::GaiaCubeSpectrum {
                   set rdec [expr $rdec*180.0/$PI_]
                }
 
-               #  Convert into an image position.
-               $rtdimage_ convert coords $rra $rdec "deg J2000" rx ry image
-
-               #  Derive offsets along sky axes.
-               $rtdimage_ convert coords $rx $ry image cra cdec deg
+               #  Get extraction position in degrees (again), and work out
+               #  the offsets to this reference position.
                $rtdimage_ convert coords $iix $iiy image pra pdec deg
-               set drefra [angdiff_ $pra $cra]
-               set drefdec [angdiff_ $pdec $cdec]
+               set drefra [angdiff_ $pra $rra]
+               set drefdec [angdiff_ $pdec $rdec]
 
                set drefra [format "%f" [expr $drefra*3600.0]]
                set drefdec [format "%f" [expr $drefdec*3600.0]]
@@ -1214,7 +1212,7 @@ itcl::class gaia::GaiaCubeSpectrum {
                set refdec \
                   [gaiautils::astformat $skyframe 2 [expr $rdec*$PI_/180.0]]
                gaiautils::astannul $skyframe
-            }
+            } msg
          }
 
          #  Image centre in world coordinates.
