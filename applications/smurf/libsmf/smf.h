@@ -197,6 +197,8 @@
 *        -Added projection information to interfaces of 
 *         smf_iteratemap and smf_concat_smfGroup
 *        -Added iarray to smf_model_create interface
+*     2007-11-23 (DSB):
+*        Added smf_updateprov.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -713,5 +715,6 @@ void smf_reorderr( float *in, int ndim, int *dims, int axis, int *index, float *
 void smf_reorderi( int *in, int ndim, int *dims, int axis, int *index, int *out, int *status );
 void smf_reorderd( double *in, int ndim, int *dims, int axis, int *index, double *out, int *status );
 void smf_reorderc( char *in, int len, int ndim, int *dims, int axis, int *index, char *out, int *status );
+void smf_updateprov( int ondf, smfData *data, int *status );
 
 #endif /* SMF_DEFINED */
