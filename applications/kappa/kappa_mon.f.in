@@ -610,7 +610,7 @@
 *  unchanged (so individual application can over-ride this automatic
 *  provenance handling by adding a provenance extension to the output NDF
 *  itself).
-         CALL NDG_ENDPV( STATUS )
+         CALL NDG_ENDPV( 'KAPPA:'//NAME, STATUS )
 
       END DO
 
