@@ -161,7 +161,9 @@ extern char *cuserid( const char *);
 #endif
 
 #if !HAVE_DECL_CUSERID
+# ifndef L_cuserid
 #   define L_cuserid 64
+# endif
 #endif
 
 /* Cache storage to minimize system calls. This routine is used
