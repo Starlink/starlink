@@ -46,6 +46,8 @@
 *       SMF__NOCREATE_HEAD: Do not allocate smfHead
 *       SMF__NOCREATE_DATA: Do not map DATA/VARIANCE/QUALITY arrays (NOT YET
                             IMPLEMENTED!)
+*     - SMF__NOCREATE_DATA is not actually implemented yet!
+			    
 
 *  Authors:
 *     Andy Gibb (UBC)
