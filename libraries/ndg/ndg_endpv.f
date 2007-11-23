@@ -1,4 +1,4 @@
-      SUBROUTINE NDG_ENDPV( STATUS )
+      SUBROUTINE NDG_ENDPV( CREATR, STATUS )
 *+
 *  Name:
 *     NDG_ENDPV
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL NDG_ENDPV( STATUS )
+*     CALL NDG_ENDPV( CREATR, STATUS )
 
 *  Description:
 *     This routine should be called to mark the end of an NDF 
@@ -35,6 +35,10 @@
 *     the input NDFs contains a PROVENANCE extension.
 
 *  Arguments:
+*     CREATR = CHARACTER * ( * ) (Given)
+*        An identifier for the software that created INDF1 (usually the
+*        name of the calling application). The format of the identifier
+*        is arbitrary, but the form "PACKAGE:COMMAND" is recommended.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -69,6 +73,8 @@
 *        - Allow propagation of provenance to be controlled by the AUTOPROV 
 *        environment variable.
 *        - Annul errors and continue if any NDF cannot be opened.
+*     21-NOV-2007 (DSB):
+*        Add CREATR argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -90,6 +96,9 @@
       INTEGER RDGRP              ! Group holding input NDFs
       INTEGER WRGRP              ! Group holding output NDFs
       COMMON /NDG_PRV/ RDGRP, WRGRP
+
+*  Arguments Given:
+      CHARACTER CREATR*(*) 
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -212,8 +221,8 @@
 *  INDF2 as a parent of INDF1. This also transfers all the ancestors 
 *  of INDF2 to INDF1.
                            ELSE
-                              CALL NDG_PTPRV( INDF1, INDF2, ' ', 
-     :                                        .FALSE., STATUS )
+                              CALL NDG_PTPRV( INDF1, INDF2, DAT__NOLOC,
+     :                                        .FALSE., CREATR, STATUS )
 
 *  Set the flag that indicates if any INPUT NDF had a provenance extension.
                               CALL NDF_XSTAT( INDF2, 'PROVENANCE', 

@@ -37,6 +37,8 @@
 *        Added ndgGtsup
 *     2-NOV-2007 (DSB):
 *        Added ndgPtprv, ndgBegpv and ndgEndpv.
+*     23-NOV-2007 (DSB):
+*        Removed ndgPtprv (now in ndg_provenance.c) and modified ndgEndpv.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -239,6 +241,19 @@ void ndgGtsup( const Grp *grp, int i, char const *fields[6], int len, int *statu
 
 
 
+F77_SUBROUTINE(ndg_endpv)( CHARACTER(CREATR), INTEGER(STATUS) TRAIL(CREATR) );
+
+void ndgEndpv( const char *creator, int * status ) {
+  DECLARE_CHARACTER_DYN(CREATR);
+  DECLARE_INTEGER(STATUS);
+  F77_EXPORT_INTEGER(*status, STATUS );
+  F77_CREATE_EXPORT_CHARACTER( creator, CREATR );
+  F77_CALL(ndg_endpv)( CHARACTER_ARG(CREATR), INTEGER_ARG(&STATUS)
+                       TRAIL_ARG(CREATR) );
+  F77_IMPORT_INTEGER( STATUS, *status );
+  F77_FREE_CHARACTER( CREATR );
+}
+
 F77_SUBROUTINE(ndg_begpv)( INTEGER(STATUS) );
 
 void ndgBegpv( int * status ) {
@@ -248,40 +263,7 @@ void ndgBegpv( int * status ) {
   F77_IMPORT_INTEGER( STATUS, *status );
 }
 
-F77_SUBROUTINE(ndg_endpv)( INTEGER(STATUS) );
 
-void ndgEndpv( int * status ) {
-  DECLARE_INTEGER(STATUS);
-  F77_EXPORT_INTEGER(*status, STATUS );
-  F77_CALL(ndg_endpv)( INTEGER_ARG(&STATUS) );
-  F77_IMPORT_INTEGER( STATUS, *status );
-}
-
-
-
-F77_SUBROUTINE(ndg_ptprv)( INTEGER(INDF1), INTEGER(INDF2), CHARACTER(ID), 
-                           LOGICAL(ISROOT), INTEGER(STATUS) TRAIL(ID));
-
-void ndgPtprv( int indf1, int indf2, const char id[], int isroot, int *status) {
-
-  DECLARE_INTEGER(INDF1);
-  DECLARE_INTEGER(INDF2);
-  DECLARE_CHARACTER(ID, 128);
-  DECLARE_LOGICAL(ISROOT);
-  DECLARE_INTEGER(STATUS);
-
-  F77_EXPORT_INTEGER(indf1, INDF1);
-  F77_EXPORT_INTEGER(indf2, INDF2);
-  F77_EXPORT_CHARACTER( id, ID, 128);
-  F77_EXPORT_LOGICAL(isroot, ISROOT );
-  F77_EXPORT_INTEGER(*status, STATUS);
-
-  F77_CALL(ndg_ptprv)( INTEGER_ARG(&INDF1), INTEGER_ARG(&INDF2), 
-                       CHARACTER_ARG(ID), LOGICAL_ARG(&ISROOT),
-		       INTEGER_ARG(&STATUS) TRAIL_ARG(ID) );
-
-  F77_IMPORT_INTEGER( STATUS, *status);
-}
 
 
 

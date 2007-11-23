@@ -31,17 +31,27 @@
 *  History:
 *     12-AUG-1992 (DSB):
 *         Original version
+*     9-NOV-2007 (DSB):
+*         Added constants defining the PROVENANCE extension.
 
 *-
 
+      CHARACTER NDG__BKSLH*1  ! A single backslash, '\\' works for UNIX
       CHARACTER NDG__NDFTP*4  ! NDF/HDS file type.
-      INTEGER   NDG__SZFMT    ! Size of string holding NDF formats list
-      LOGICAL   NDG__UCASE    ! True if all file names are to be 
-                              ! converted to upper case.
+      CHARACTER NDG__PANAM*9  ! HDS name of PROVENANCE.ANCESTORS component
+      CHARACTER NDG__PATYP*4  ! HDS type of PROVENANCE.ANCESTORS component
+      CHARACTER NDG__PCNAM*7  ! HDS name of PROVENANCE.CREATOR component
+      CHARACTER NDG__PDNAM*4  ! HDS name of PROVENANCE.DATE component
+      CHARACTER NDG__PPNAM*7  ! HDS name of PROVENANCE.PARENTS component
+      CHARACTER NDG__PXNAM*10 ! HDS name of PROVENANCE extension
+      CHARACTER NDG__PXTYP*10 ! HDS type of PROVENANCE extension
+      CHARACTER NDG__STRUC*9  ! HDS type for structures created by NDG
       CHARACTER NDG__WILD1*1  ! Single-character wildcard.
       CHARACTER NDG__WILD2*1  ! Multi-character wildcard.
-      CHARACTER NDG__STRUC*9  ! HDS type for structures created by NDG
-      CHARACTER NDG__BKSLH*1  ! A single backslash, '\\' works for UNIX
+      INTEGER   NDG__SZFMT    ! Size of string holding NDF formats list
+      INTEGER NDG__PDLEN      ! Length of a format GMT date/time string
+      LOGICAL   NDG__UCASE    ! True if all file names are to be converted to 
+                              ! upper case.
 
       PARAMETER (
      :            NDG__NDFTP = '.sdf',
@@ -50,4 +60,13 @@
      :            NDG__WILD1 = '?',
      :            NDG__WILD2 = '*',
      :            NDG__STRUC = 'STRUCTURE',
-     :            NDG__BKSLH = '\\' )
+     :            NDG__BKSLH = '\\',
+     :            NDG__PXNAM = 'PROVENANCE',
+     :            NDG__PXTYP = 'PROVENANCE',
+     :            NDG__PDNAM = 'DATE',
+     :            NDG__PCNAM = 'CREATOR',
+     :            NDG__PPNAM = 'PARENTS',
+     :            NDG__PANAM = 'ANCESTORS',
+     :            NDG__PATYP = 'PROV',
+     :            NDG__PDLEN = 25 )
+
