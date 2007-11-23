@@ -102,6 +102,8 @@
 *        to be the case in the previous version of this file).
 *     21-NOV-2007 (DSB):
 *        Avoid compiler warnings.
+*     23-NOV-2007 (DSB):
+*        Correction to the 20-NOV-2007 fix.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -705,7 +707,7 @@ c      write(*,*) '   '
 *  has the requested width (rounding problems can otherwise cause this not
 *  to be the case).
             IF( ISPIX2( I ) .AND. .NOT. ISBND( I ) ) THEN
-               LBND( I ) = UBND( I ) + VALUE2( I ) - 1
+               LBND( I ) = UBND( I ) - VALUE2( I ) + 1
             ELSE
                LBND( I ) = UBND( I ) - NINT( PUBND( I ) - PLBND( I ) ) 
      :                     + 1 
