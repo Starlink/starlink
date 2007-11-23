@@ -57,7 +57,8 @@
 *        The full Mapping. This is constructed by joining all the parallel 
 *        Mappings back together again, and so should always have an inverse 
 *        transformation (so long as the supplied Mapping can be split 
-*        succesfully).
+*        succesfully). If the supplied Mapping cannot be split, a clone
+*        of the supplied Mapping is returned.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -90,6 +91,9 @@
 *        Original version.
 *     10-OCT-2007 (DSB):
 *        Terminate MPAX loop early if all axes have been used up.
+*     23-NOV-2007 (DSB):
+*        Ensure MAP is returned holding a valid Mapping even if the
+*        supplied Mapping cannot be split.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -294,6 +298,7 @@
 *  Return the supplied Mapping.
          MAPS( 1 ) = AST_CLONE( MAPIN, STATUS )
          HASINV( 1 ) = AST_GETL( MAPIN, 'TranInverse', STATUS )
+         MAP = AST_CLONE( MAPIN, STATUS )
 
 *  Reset the number of Mappings being returned to 1.
          NMAP = 1
