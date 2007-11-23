@@ -84,7 +84,7 @@ static Prov *ndg1FreeProv( Prov *, int * );
 static Prov *ndg1MakeProv( const char *, const char *, const char *, HDSLoc *, Provenance *, int * );
 static Provenance *ndg1FreeProvenance( Provenance *, int, int * );
 static Provenance *ndg1MakeProvenance( Prov *, int * );
-static Provenance *ndg1ReadProvenanceExtension( int, const char *, int, int * );
+static Provenance *ndg1ReadProvenanceExtension( int, HDSLoc *, const char *, int, int * );
 static char *ndg1GetTextComp( HDSLoc *, const char *, char *, size_t, int * );
 static int ndg1TheSame( Prov *, Prov *, int * );
 static void ndg1Disown( Prov *, Prov *, int * );
@@ -293,8 +293,8 @@ void ndgPtprv( int indf1, int indf2, HDSLoc *more, int isroot,
    old_status = astWatch( status );
 
 /* Get the existing provenance information from the two NDFs. */
-   prov1 = ndg1ReadProvenanceExtension( indf1, creator, 0, status );
-   prov2 = ndg1ReadProvenanceExtension( indf2, NULL, isroot, status );
+   prov1 = ndg1ReadProvenanceExtension( indf1, NULL, creator, 0, status );
+   prov2 = ndg1ReadProvenanceExtension( indf2, more, NULL, isroot, status );
 
 /* Indicate that the "Prov" structures referred to by prov2 should be
    freed when ndgFreeProvenance is called. */
@@ -1008,7 +1008,8 @@ static void ndg1PurgeProvenance( Provenance *provenance,
 
 }
 
-static Provenance *ndg1ReadProvenanceExtension( int indf, const char *creator,
+static Provenance *ndg1ReadProvenanceExtension( int indf, HDSLoc *more, 
+                                                const char *creator,
                                                 int isroot, int *status ){
 /*
 *  Name:
@@ -1018,7 +1019,8 @@ static Provenance *ndg1ReadProvenanceExtension( int indf, const char *creator,
 *     Create a new Provenance structure from an NDF PROVENANCE extension.
 
 *  Synopsis:
-*     Provenance *ndg1ReadProvenanceExtension( int indf, const char *creator,
+*     Provenance *ndg1ReadProvenanceExtension( int indf, HDSLoc *more, 
+*                                              const char *creator,
 *                                              int isroot, int *status )
 
 *  Description:
@@ -1033,6 +1035,10 @@ static Provenance *ndg1ReadProvenanceExtension( int indf, const char *creator,
 *  Parameters:
 *     indf
 *        The NDF identifier.
+*     more
+*        An optional HDS structure holding additional information about
+*        the NDF. This is stored in the main Prov structure in the
+*        returned Provenance.
 *     creator
 *        An optional text string to be stored as the "creator" string in
 *        the returned Prov structure. This is only used if the supplied
@@ -1102,7 +1108,7 @@ static Provenance *ndg1ReadProvenanceExtension( int indf, const char *creator,
    path = path_buf;
 
 /* Create a Prov structure to describe the main NDF. */
-   main_prov = ndg1MakeProv( path, date, creator, NULL, NULL, status );
+   main_prov = ndg1MakeProv( path, date, creator, more, NULL, status );
 
 /* Create the basic Provenance structure. As yet it only contains
    information about the main NDF. */
@@ -1310,6 +1316,7 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance, int indf,
    HDSLoc *cloc = NULL;
    HDSLoc *loc = NULL;
    HDSLoc *more = NULL;
+   HDSLoc *mloc = NULL;
    HDSLoc *xloc = NULL;
    Prov *parent = NULL;
    Prov *prov = NULL;
@@ -1418,11 +1425,14 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance, int indf,
             datAnnul( &loc, status );
          }
 
-/* Store "more" */
+/* Store a deep copy of "more". Note, the "more" variable is a locator
+   for a temporary structure that contains the required MORE struture as
+   its one and only component. It is not a locator for the MORE structure
+   itself. */
          if( more ) {
-            dim[ 0 ] = 1;
-            datNew( cloc, MORE_NAME, MORE_TYPE, 1, dim, status );
-            datCopy( more, cloc, MORE_NAME, status );
+            datFind( more, MORE_NAME, &mloc, status );
+            datCopy( mloc, cloc, MORE_NAME, status );
+            datAnnul( &mloc, status );
          }
 
 /* Create a PARENTS array of the correct length, and map it. */
