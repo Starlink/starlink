@@ -7,6 +7,9 @@
 #include "rec1.h"
 #include "dat1.h"
 
+#include <stdlib.h>
+#include <stdio.h>
+
 /*
 *+
 *  Name:
@@ -22,6 +25,7 @@
 *  Copyright:
 *     Copyright (C) 2004 Central Laboratory of the Research Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2007 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -65,6 +69,8 @@
 *     25-JUL-2007 (BKM):
 *      Logic again wrong when LRB contents referred to items in preceeding
 *      blocks.
+*     23-NOV-2007 (TIMJ):
+*      Abort the dump if the HCB is corrupt.
 *     {enter_further_changes_here}
 
 *-
@@ -105,6 +111,7 @@ main(int argc, char **argv)
    unsigned int cbm;					   /* Chip Bit Mask */
 
    int i, j;
+   int status;
    INT_BIG cblk;
    HDS_PTYPE axsz;
    UINT_BIG size, tpdb, tlrb;
@@ -132,7 +139,12 @@ main(int argc, char **argv)
 /*
  * Decode and print HCB contents
  */      
-   rec1_unpack_hcb( block, &hcb );
+   status = rec1_unpack_hcb( block, &hcb );
+   if (status != DAT__OK) {
+     printf("Unable to unpack HCB. Aborting dump.\n");
+     fclose( fp );
+     exit(1);
+   }
    printf("HCB information:\n HDS version %d, eof block=%" HDS_INT_BIG_S "\n", 
           hcb.version, hcb.eof);
    printf(" Stack information (LRB)\n");
