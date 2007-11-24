@@ -41,9 +41,33 @@ static int unpack_value( const unsigned char *ptr, struct STK *stk);
 /*    int rec1_unpack_hcb                                                   */
 /*       The global status value current on exit.                           */
 
+/* Copyright:                                                               */
+/*    Copyright (C) 1990-1991 Science & Engineering Research Council        */
+/*    Copyright (C) 2000,2004 Particle Physics and Astronomy Research       */
+/*    Council. Copyright (C) 2007 Science and Technology Facilities Council.*/
+/*    All Rights Reserved.                                                  */
+
+/*  Licence:                                                                */
+/*     This program is free software; you can redistribute it and/or        */
+/*     modify it under the terms of the GNU General Public License as       */
+/*     published by the Free Software Foundation; either version 2 of       */
+/*     the License, or (at your option) any later version.                  */
+
+/*     This program is distributed in the hope that it will be              */
+/*     useful, but WITHOUT ANY WARRANTY; without even the implied           */
+/*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR              */
+/*     PURPOSE. See the GNU General Public License for more details.        */
+
+/*     You should have received a copy of the GNU General Public            */
+/*     License along with this program; if not, write to the Free           */
+/*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,       */
+/*     MA 02111-1307, USA                                                   */
+
+
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
 /*    BKM:  B.K. McIlwrath    (STARLINK)                                    */
+/*    TIMJ: Tim Jenness       (JAC, Hawaii)                                 */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
@@ -64,8 +88,11 @@ static int unpack_value( const unsigned char *ptr, struct STK *stk);
 /*       in HDS version 4.                                                  */
 /*    26-JUN-2000 (BKM):                                                    */
 /*       Modify to accept both HDS V3 and HDS V4 packed formats.            */
-/*    20-MAY-2004 (BKM)                                                     */
+/*    20-MAY-2004 (BKM):                                                    */
 /*       Do not attempt to unpack HCB for invalid HDS files                 */
+/*    23-NOV-2007 (TIMJ):                                                   */
+/*       Use emsRep when status is set to bad so that people can know the   */
+/*       reason for failure.                                                */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -111,6 +138,9 @@ static int unpack_value( const unsigned char *ptr, struct STK *stk);
           hcb->version > REC__VERSION4 )
       {
          hds_gl_status = DAT__FILIN;     
+         emsRep( "REC1_UNPACK_HCB_1",
+                 "HDS file is invalid. Header Control Block is corrupt.",
+                 &hds_gl_status);
          return hds_gl_status;
       }         
 /* Test for older format HCB (from HDS Version 3)                           */
