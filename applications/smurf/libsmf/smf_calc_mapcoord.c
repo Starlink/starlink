@@ -34,7 +34,9 @@
 *     This function creates a MAPCOORD extension in the NDF associated
 *     with data based on outfset & lbnd/ubnd_out. If a MAPCOORD
 *     extension already exists and it uses the same mapping defined by
-*     outfset/lbnd_out/ubnd_out it will not get re-calculated.
+*     outfset/lbnd_out/ubnd_out it will not get re-calculated. If the routine
+*     exits with clean status the smfData will have the LUT mapped and
+*     the NDF ID of the table stored in the associated smfFile.
 *
 *     
 *  Authors:
@@ -53,6 +55,10 @@
 *        -adding moving to interface
 *        -Replaced calculation of bolo2map with a call to smf_rebincube_totmap
 *        -Changed name of smf_rebincube_totmap to smf_rebin_totmap
+*     2007-11-26 (EC):
+*        -Don't annul the NDF corresponding to the mapped LUT to leave it open
+*        -If LUT doesn't need re-calculation, open with smf_open_mapcoord.
+*        -Store the NDF ID of the LUT in the associated smfFile
 
 *  Notes:
 
@@ -102,7 +108,7 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
 
   /* Local Variables */
 
-  AstSkyFrame *abskyfrm = NULL; /* Output SkyFrame (always absolute) */
+  AstSkyFrame *abskyfrm = NULL;/* Output SkyFrame (always absolute) */
   AstMapping *bolo2map=NULL;   /* Combined mapping bolo->map coordinates */
   int bndndf=NDF__NOID;        /* NDF identifier for map bounds */
   void *data_index[1];         /* Array of pointers to mapped arrays in ndf */
@@ -348,9 +354,15 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
 	  }
 	  /* clean up ast objects */
 	  bolo2map = astAnnul( bolo2map );
+
+	  /* Break out of loop over time slices if bad status */
+	  if (*status != SAI__OK) goto CLEANUP;
 	}
-	/* Break out of loop over time slices if bad status */
-	if (*status != SAI__OK) goto CLEANUP;
+
+	/* Set the lut pointer in data to the buffer, and store the
+           NDF identifier */
+	data->lut = lut;
+	file->mapcoordid = lutndf;
       }
       
       /* Write the WCS for the projection to the extension */
@@ -406,18 +418,23 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
     
     if( abskyfrm ) abskyfrm = astAnnul( abskyfrm );
     if( oskyfrm ) oskyfrm = astAnnul( oskyfrm );  
-
-    ndfAnnul( &lutndf, status );    
+    
     datAnnul( &mapcoordloc, status );
-
-    } else { 
-
+    
+    /* If we get this far and docalc=0, and status is OK, there must be
+       a good LUT in there already. Map it so that it is accessible to
+       the caller; "UPDATE" so that the caller can modify it if desired. */
+    if( (*status == SAI__OK) && (docalc == 0) ) {
+      smf_open_mapcoord( data, "UPDATE", status );
+    } 
+    
+  } else { 
     /* smfdata not associated with a file */
-
+    
     *status = SAI__ERROR;
     errRep(FUNC_NAME,"No file associated with smfdata",
 	   status);
- }
+  }
   
 
 }
