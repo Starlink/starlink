@@ -51,7 +51,9 @@
 
 #-
 
-#  If available and not set then initialize the CONVERT package.
+#  If available and not set then initialize the CONVERT package. Note this
+#  script only exists for this purpose (the gaia.sh script also initialises
+#  CONVERT, but that is bash specific, not sh, so this is more portable).
 if ( $?CONVERT_DIR && ! $?NDF_FORMATS_IN ) then
    alias echo 'echo >/dev/null'
    if ( "`alias convert`" != "" ) then 

@@ -3,7 +3,7 @@ dist_bin_SCRIPTS = $(SCRIPTS_GAIA)
 
 ##  GAIA top-level scripts.
 SCRIPTS_GAIA = displaycat displaypolcat gaia.csh gaiacmap.sh gaiacut \
-               gaiadisp.csh gaiadisp.sh gaiaremote.sh gaia.sh \
+               gaiadisp gaiadisp.csh gaiadisp.sh gaiaremote.sh gaia.sh \
                gaia_standalone.csh gaiawcs2tab pix2wcs tabbedgaia.csh \
                tabbedgaia.sh wcs2pix zoomcutandflip
 

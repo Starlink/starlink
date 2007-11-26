@@ -11,11 +11,12 @@
 #     C-Shell
 
 #  Invocation:
-#     gaiadisp.csh clone_number
+#     gaiadisp.csh --help for options
 
 #  Copyright:
 #     Copyright (C) 1997-2005 Central Laboratory of the Research Councils.
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2007 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -51,7 +52,10 @@
 
 #-
 
-#  If available and not set then initialize the CONVERT package.
+#  If available and not set then initialize the CONVERT package. Note this
+#  script only exists for this purpose (the gaiadisp.sh script also
+#  initialises CONVERT, but that is bash specific, not sh, so this is more
+#  portable).
 if ( $?CONVERT_DIR && ! $?NDF_FORMATS_IN ) then
    alias echo 'echo >/dev/null'
    if ( "`alias convert`" != "" ) then 
