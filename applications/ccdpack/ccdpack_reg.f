@@ -45,6 +45,7 @@
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     MBT: Mark Taylor (STARLINK)
+*     DSB: David S Berry (JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -60,6 +61,8 @@
 *        Added new task DRIZZLE.
 *     22-DEC-2000 (MBT):
 *        Added new task DRAWNDF.
+*     27-NOV-2007 (DSB):
+*        Use NDG_BEGPV/ENDPV to provide automatic provenance propagation.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -94,6 +97,13 @@
 
 *  Tweak the numerics on a RedHat 7 Linux system.
       CALL CCD1_LINFLT
+
+*  Begin a provenance block. This causes event handlers to be registered
+*  with the NDF library so that a handler routine in NDG is called every
+*  time an NDF is opened. This handler routine keeps a record of all NDFs 
+*  that are opened for input or output, until the block is closed by 
+*  calling NDG_ENDPV.
+      CALL NDG_BEGPV( STATUS )
 
 *  Test the action name against each valid value in turn, calling the
 *  appropriate routine...  
@@ -157,6 +167,15 @@
      :                 'not recognised by the CCDPACK '//
      :                 'monolith.', STATUS )
       END IF
+
+*  End the provenance block. This will result in every output NDF being
+*  given a provenance extension containing a record of the input NDFs
+*  that the application accessed in order to create the output NDF. Any
+*  output NDF that already contains a provenance extension is left
+*  unchanged (so individual application can over-ride this automatic
+*  provenance handling by adding a provenance extension to the output NDF 
+*  itself).
+      CALL NDG_ENDPV( 'CCDPACK:'//ACTION, STATUS )
 
       END
 * $Id$
