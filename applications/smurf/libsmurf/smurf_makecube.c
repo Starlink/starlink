@@ -433,9 +433,7 @@
 *          can be accomplished by supplying non-null values for the TILEDIMS 
 *          parameter. If supplied, these values give the spatial size of each 
 *          output tile, in pixels. If only one value is supplied, the
-*          supplied value is duplicated to create square tiles. If necessary, 
-*          the full size output array is padded with blank pixels to ensure 
-*          it is an integer multiple of the specified tile size. Tiles are
+*          supplied value is duplicated to create square tiles. Tiles are
 *          created in a raster fashion, from bottom left to top right of
 *          the spatial extent. The NDF file name specified by "out" is
 *          modified for each tile by appending "_<N>" to the end of it, 
@@ -443,10 +441,12 @@
 *          number of tiles created is written to output parameter NTILES.
 *          The tiles all share the same projection and so can be simply 
 *          pasted together in pixel coordinates to reconstruct the full 
-*          size output array. If a null (!) value is supplied for TILEDIMS, 
-*          then the entire output array is created as a single tile and 
-*          stored in a single output NDF with the name given by parameter 
-*          OUT (without any "_<N>" appendix). [!]
+*          size output array. The tiles are centred so that the reference
+*          position (given by REFLON and REFLAT) falls at the centre of a
+*          tile. If a null (!) value is supplied for TILEDIMS, then the 
+*          entire output array is created as a single tile and stored in 
+*          a single output NDF with the name given by parameter OUT 
+*          (without any "_<N>" appendix). [!]
 *     TRIM = _LOGICAL (Read)
 *          If TRUE, then the output cube will be trimmed to exclude any
 *          borders filled with bad data caused by one or more detectors 
@@ -632,6 +632,9 @@
 *        Added provenance information to output NDFs.
 *     7-NOV-2007 (DSB):
 *        Correct size to tile->size in call to smf_rebincube.
+*     26-NOV-2007 (DSB):
+*        Pass output FrameSet to smf_choosetiles so that tiles can be
+*        centred on ref point.
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -1091,7 +1094,8 @@ void smurf_makecube( int *status ) {
       } else {
          if( nval == 1 ) tiledims[ 1 ] = tiledims[ 0 ];
          tiles = smf_choosetiles( igrp, size, lbnd_out, ubnd_out, boxes, 
-                                  spread, params, tiledims, &ntile, status );
+                                  spread, params, wcsout, tiledims, &ntile, 
+                                  status );
       }
    }
 
@@ -1101,7 +1105,8 @@ void smurf_makecube( int *status ) {
    if( !tiles ) {
       tiledims[ 0 ] = -1;
       tiles = smf_choosetiles( igrp, size, lbnd_out, ubnd_out, boxes, 
-                               spread, params, tiledims, &ntile, status );
+                               spread, params, wcsout, tiledims, &ntile, 
+                               status );
    }
 
 /* Write the number of tiles being created to an output parameter. */

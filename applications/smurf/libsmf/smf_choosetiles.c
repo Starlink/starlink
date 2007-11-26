@@ -16,7 +16,8 @@
 *  Invocation:
 *     tiles = smf_choosetiles( Grp *igrp,  int size, int *lbnd, int *ubnd, 
 *                              smfBox *boxes, int spread, const double params[],
-*                              int tile_size[ 2 ], int *ntiles, int *status )
+*                              AstFrameSet *wcsout, int tile_size[ 2 ], 
+*                              int *ntiles, int *status )
 
 *  Arguments:
 *     igrp = Grp * (Given)
@@ -44,6 +45,8 @@
 *        See docs for astRebinSeq (SUN/211) for further information. If no 
 *        additional parameters are required, this array is not used and a
 *        NULL pointer may be given. 
+*     wcsout = AstFrameSet * (Given)
+*        Pointer to the FrameSet describing the WCS of the output cube.
 *     tile_size = int[ 2 ] * (Given)
 *        An array holding the spatial dimensions of each tile, in pixels.
 *        If the first value is less than zero, then a single tile
@@ -103,6 +106,9 @@
 *        Added "jndf" compone to the smfTile structure. This holds the
 *        zero-based index within the supplied group of each input NDF that
 *        overlaps the tile.
+*     26-NOV-2007 (DSB):
+*        Added argument "wcsout", and changed the tile positions so that
+*        a tile is centred at the SkyRef position.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -140,19 +146,22 @@
 
 smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd, 
                           int *ubnd, smfBox *boxes, int spread, 
-                          const double params[], int tile_size[ 2 ], 
+                          const double params[], AstFrameSet *wcsout, 
+                          int tile_size[ 2 ], 
                           int *ntiles, int *status ){
 
 /* Local Variables */
    AstUnitMap *umap = NULL;
    char *pname = NULL;
    char filename[ GRP__SZNAM + 1 ]; 
+   double new_lbnd;
+   double new_ubnd;
+   double refpix[ 3 ];
+   double refwcs[ 3 ];
    double shift[ 3 ];
    float *w = NULL;
    float *work = NULL;
    float val;
-   int dim;
-   int dimpad;
    int extend;
    int i;
    int ix;
@@ -214,16 +223,50 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 /* If the tile size is positive, we split the output array into tiles... */
    } else {
 
-/* Pad the supplied full size grid bounds by adding a border to each
-   edge so that the padded dimension is an integer multiple of the supplied
-   tile size. This also finds the number of tiles required along the x
-   and y pixel axes. */
+/* Get the celestial coordinates of the reference position (the SkyRef
+   value in the current Frame of the output WCS FrameSet), and find the
+   corresponding grid coordinates. */
+      refwcs[ 0 ] = astGetD( wcsout, "SkyRef(1)" );
+      refwcs[ 1 ] = astGetD( wcsout, "SkyRef(2)" );
+      refwcs[ 2 ] = AST__BAD;
+      astTranN( wcsout, 1, 3, 1, refwcs, 0, 3, 1, refpix );
+
+/* Convert grid coords to pixel coords */
+      refpix[ 0 ] += lbnd[ 0 ] - 1.5;
+      refpix[ 1 ] += lbnd[ 1 ] - 1.5;
+
+/* Define another coordinate system that is a scaled and shifted form of
+   pixel coords. Unit length in the new coordinate system is equal to one
+   tile size, and the reference position has position (0.5,0.5) in the
+   new coordinate system. We pad the supplied full size grid bounds by 
+   adding a border to each edge so that each of the padded bounds is at 
+   an integer value in the new coordinate system. This means that the ref
+   position will be at the centre of a tile. We also finds the number of 
+   tiles required along the x and y pixel axes. */
       for( i = 0; i < 2; i++ ) {
-         dim = ubnd[ i ] - lbnd[ i ] + 1;
-         numtile[ i ] = 1 + ( ( dim - 1 )/tile_size[ i ] );
-         dimpad =  numtile[ i ]*tile_size[ i ];
-         plbnd[ i ] = lbnd[ i ] - ( dimpad - dim )/2;
-         pubnd[ i ] = dimpad + plbnd[ i ] - 1;
+
+/* Convert the supplied lower bound into the new coordinate system. */
+         new_lbnd = ( lbnd[ i ] + 0.5*tile_size[ i ] - refpix[ i ] )
+                    / tile_size[ i ];
+
+/* Find the next lower integer value. */
+         new_lbnd = floor( new_lbnd );
+
+/* Convert this back to grid coords. */
+         plbnd[ i ] = ( new_lbnd - 0.5 )*tile_size[ i ] + refpix[ i ];
+
+/* Convert the supplied upper bound into the new coordinate system. */
+         new_ubnd = ( ubnd[ i ] + 0.5*tile_size[ i ] - refpix[ i ] )
+                    / tile_size[ i ];
+
+/* Find the next higher integer value. */
+         new_ubnd = ceil( new_ubnd );
+
+/* Convert this back to grid coords. */
+         pubnd[ i ] = ( new_ubnd - 0.5 )*tile_size[ i ] + refpix[ i ];
+
+/* Store the number of tiles spanned by this axis. */
+         numtile[ i ] = (int) ( new_ubnd - new_lbnd + 0.5 );
       }
 
 /* Determine the constant width border by which the basic tile area is to be
@@ -240,17 +283,18 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
       lbout = -1000;
       ubout = 1000;
       work = astMalloc( sizeof( float )*( ubout - lbout + 1 ) );
+      if( work ) {   
+         astRebinF( umap, 0.0, 1, &lbin, &ubin, &val, NULL, spread, params, 0,
+                    0.0, 0, VAL__BADR, 1, &lbout, &ubout, &lbin, &ubin, work, 
+                    NULL );
    
-      astRebinF( umap, 0.0, 1, &lbin, &ubin, &val, NULL, spread, params, 0,
-                 0.0, 0, VAL__BADR, 1, &lbout, &ubout, &lbin, &ubin, work, 
-                 NULL );
-   
-      w = work + 1001;
-      while( *w != VAL__BADR && *w != 0.0 ) w++;
-      extend = w  - ( work + 1001 );
-   
-      umap = astAnnul( umap );
-      work = astFree( work );
+         w = work + 1001;
+         while( *w != VAL__BADR && *w != 0.0 ) w++;
+         extend = w  - ( work + 1001 );
+      
+         umap = astAnnul( umap );
+         work = astFree( work );
+      }
    
 /* Return the total number of tiles, and create the returned array. */
       *ntiles = numtile[ 0 ]*numtile[ 1 ];
@@ -260,7 +304,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
       tile = result;   
    
 /* Loop round each row of tiles. */
-      for( iy = 0; iy < numtile[ 1 ]; iy++ ) {
+      for( iy = 0; iy < numtile[ 1 ] && *status == SAI__OK; iy++ ) {
    
 /* Store the y axis bounds of the tiles in this row. */
          ylo = plbnd[ 1 ] + iy*tile_size[ 1 ];
@@ -276,7 +320,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
             tile->ubnd[ 1 ] = yhi;
             tile->lbnd[ 2 ] = lbnd[ 2 ];
             tile->ubnd[ 2 ] = ubnd[ 2 ];
-   
+
 /* Store the extended tile area. */
             tile->elbnd[ 0 ] = tile->lbnd[ 0 ] - extend;
             tile->eubnd[ 0 ] = tile->ubnd[ 0 ] + extend;

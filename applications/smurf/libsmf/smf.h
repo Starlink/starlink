@@ -199,6 +199,8 @@
 *        -Added iarray to smf_model_create interface
 *     2007-11-23 (DSB):
 *        Added smf_updateprov.
+*     2007-11-26 (DSB):
+*        Added wcsout to smf_choosetiles argument list.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -682,7 +684,8 @@ void smf_open_related_model( const smfGroup *group, const int subindex,
 
 smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd, 
                           int *ubnd, smfBox *boxes, int spread, 
-                          const double params[], int tile_size[ 2 ], 
+                          const double params[], AstFrameSet *wcsout, 
+                          int tile_size[ 2 ], 
                           int *ntiles, int *status );
 
 smfTile *smf_freetiles( smfTile *tiles, int size, int *status );
