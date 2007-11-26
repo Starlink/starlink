@@ -38,8 +38,12 @@
 *        Changed name of the extension to MAPCOORD from SCU2RED.MAPCOORD
 *     2007-10-31 (EC):
 *        Added mode to the interface
+*     2007-11-26 (EC):
+*        Return more useful SMF__NOLUT status if no MAPCOORD xtension found.
 
 *  Notes:
+*     If no HDS locator can be obtained for a "MAPCOORD" extension then
+*     status is set to SMF__NOLUT
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -79,6 +83,7 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
+#include "libsmf/smf_err.h"
 
 #define FUNC_NAME "smf_open_mapcoord"
 
@@ -130,6 +135,7 @@ void smf_open_mapcoord( smfData *data, const char *mode, int *status ) {
     /* Annul the HDS locator to the extension */
     datAnnul( &mapcoordloc , status );
   } else {
+    *status = SMF__NOLUT;
     errRep( FUNC_NAME, 
             "Couldn't get locator for MAPCOORD extension",
             status);

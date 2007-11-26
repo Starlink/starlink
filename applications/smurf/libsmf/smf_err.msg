@@ -11,5 +11,6 @@ NOHDR      <No FITS component>
 STRUN      <String truncated>
 BDTYP      <Bad data type>
 NOMEM      <Memory Allocation Error>
-NOKWRD   <Requested keyword is not present in header>
+NOKWRD     <Requested keyword is not present in header>
+NOLUT      <Object does not contain a MAPCOORD extension>
 .END
