@@ -74,6 +74,7 @@
 #  Copyright:
 #     Copyright (C) 1999-2005 Central Laboratory of the Research Councils.
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2007 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -330,7 +331,7 @@ itcl::class gaia::GaiaImageName {
          set type_ [string range $imagename $i1 end]
       }
       set diskname [string range $imagename 0 $i1]
-      if {  [ file exists $diskname ] } {
+      if {  [ file exists $diskname ] && [ file isfile $diskname ] } {
          set type_ [file extension $diskname]
          if { ! [check_type_] } {
             #  Use type as after first period, not last.
