@@ -2004,6 +2004,17 @@ L1:
                used = 0;
             }
 
+/* If not found attempt to clear the attribute value in the Axis, omitting
+   the axis index. */
+            if( ! used ) {
+               astClearAttrib( pfrm, axis_attrib );
+               if( !astOK ) {
+                  astClearStatus;
+               } else {
+                  used = 1;
+               }
+            }
+
 /* Annul the primary Frame pointer. */
             pfrm = astAnnul( pfrm );
          }
@@ -4463,6 +4474,17 @@ L1:
 
             } else {
                used =  0;
+            }
+
+/* If not found attempt to get the attribute value from the Axis, omitting
+   the axis index. */
+            if( ! used ) {
+               result = astGetAttrib( pfrm, axis_attrib );
+               if( !astOK ) {
+                  astClearStatus;
+               } else {
+                  used = 1;
+               }
             }
 
 /* Annul the primary Frame pointer. */
@@ -8456,6 +8478,17 @@ L1:
                   used = 0;
                }
 
+/* If not found attempt to set the attribute value in the Axis, omitting
+   the axis index. */
+               if( ! used ) {
+                  astSetAttrib( pfrm, axis_setting );
+                  if( !astOK ) {
+                     astClearStatus;
+                  } else {
+                     used = 1;
+                  }
+               }
+
 /* Free the setting string, and annul the primary Frame pointer. */
                pfrm = astAnnul( pfrm );
             }
@@ -9498,6 +9531,17 @@ L1:
 
             } else {
                used = 0;
+            }
+
+/* If not found attempt to test the attribute value in the Axis, omitting
+   the axis index. */
+            if( ! used ) {
+               result = astTestAttrib( pfrm, axis_attrib );
+               if( !astOK ) {
+                  astClearStatus;
+               } else {
+                  used = 1;
+               }
             }
 
 /* Annul the primary Frame pointer. */
