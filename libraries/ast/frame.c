@@ -242,6 +242,10 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        TestAttrib.
 *     25-JUN-2007 (DSB):
 *        Documentation typos.
+*     26-NOV-2007 (DSB):
+*        In Clear/Get/Set/TestAttrib, include any appropriate axis index in 
+*        the attribute name when attempting to get the attribute value from 
+*        the primary frame
 *class--
 */
 
@@ -1755,6 +1759,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    AstAxis *ax;                  /* Pointer to Axis */
    AstFrame *pfrm;               /* Pointer to primary Frame containing axis */
    AstFrame *this;               /* Pointer to the Frame structure */
+   char pfrm_attrib[ 100 ];      /* Primary Frame attribute */
    char *axis_attrib;            /* Pointer to axis attribute name */
    const char *old_attrib;       /* Pointer to supplied attribute name string */
    int axis;                     /* Frame axis number */
@@ -1977,13 +1982,25 @@ L1:
 /* Find the primary Frame containing the specified axis. */
             astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
 
+/* Only attempt to use the primary Frame if it is not the same as "this"
+   - otherwise we could end up in an infinite loop. */
+            if( pfrm != this ) {
+
+/* Modify the attribute name to refer to the axis numbering of the
+   primary frame. */
+               sprintf( pfrm_attrib, "%s(%d)", axis_attrib, paxis + 1 );
+            
 /* Attempt to clear the attribute as an attribute of the primary Frame. */
-            astClearAttrib( pfrm, axis_attrib );
+               astClearAttrib( pfrm, pfrm_attrib );
 
 /* If this failed, clear the status and indicate that we have not managed to 
    use the attribute name. */
-            if( !astOK ) {
-               astClearStatus;
+               if( !astOK ) {
+                  astClearStatus;
+                  used = 0;
+               }
+
+            } else {
                used = 0;
             }
 
@@ -4058,6 +4075,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    AstFrame *pfrm;               /* Pointer to primary Frame containing axis */
    AstFrame *this;               /* Pointer to the Frame structure */
    AstSystemType system;         /* System code */
+   char pfrm_attrib[ 100 ];      /* Primary Frame attribute */
    char *axis_attrib;            /* Pointer to axis attribute name */
    const char *old_attrib;       /* Pointer to supplied attribute name string */
    const char *result;           /* Pointer value to return */
@@ -4425,14 +4443,26 @@ L1:
 /* Find the primary Frame containing the specified axis. */
             astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
 
+/* Only attempt to use the primary Frame if it is not the same as "this"
+   - otherwise we could end up in an infinite loop. */
+            if( pfrm != this ) {
+
+/* Modify the attribute name to refer to the axis numbering of the
+   primary frame. */
+               sprintf( pfrm_attrib, "%s(%d)", axis_attrib, paxis + 1 );
+            
 /* Attempt to use the Axis astGetAttrib method to obtain the result. */
-            result = astGetAttrib( pfrm, axis_attrib );
+               result = astGetAttrib( pfrm, pfrm_attrib );
 
 /* If this failed, clear the status and indicate that we have not managed to 
    use the attribute name. */
-            if( !astOK ) {
-               astClearStatus;
-               used = 0;
+               if( !astOK ) {
+                  astClearStatus;
+                  used = 0;
+               }
+
+            } else {
+               used =  0;
             }
 
 /* Annul the primary Frame pointer. */
@@ -7989,6 +8019,8 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    AstFrame *pfrm;               /* Pointer to primary Frame containing axis */
    AstFrame *this;               /* Pointer to the Frame structure */
    AstSystemType system_code;    /* System code */
+   char pfrm_attrib[ 100 ];      /* Primary Frame attribute */
+   char *pfrm_setting;           /* Primary Frame attribute */
    char *axis_setting;           /* Pointer to axis attribute setting string */
    const char *equals;           /* Pointer to equals sign */
    const char *old_setting;      /* Pointer to supplied setting string */
@@ -8392,13 +8424,35 @@ L1:
 /* Find the primary Frame containing the specified axis. */
                astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
 
+/* Only attempt to use the primary Frame if it is not the same as "this"
+   - otherwise we could end up in an infinite loop. */
+               if( pfrm != this ) {
+
+/* Modify the attribute name to refer to the axis numbering of the
+   primary frame. */
+                  sprintf( pfrm_attrib, "%.*s(%d)", axis_nc, setting, paxis + 1 );
+            
+/* Create a setting string in which the attribute name refers to the axis 
+   numbering of the primary frame. */
+                  pfrm_setting = NULL;
+                  nc = 0;
+                  pfrm_setting = astAppendString( pfrm_setting, &nc, pfrm_attrib );
+                  pfrm_setting = astAppendString( pfrm_setting, &nc, setting + axis_value );
+                  
 /* Attempt to set the attribute within the primary Frame. */
-               astSetAttrib( pfrm, axis_setting );
+                  astSetAttrib( pfrm, pfrm_setting );
+
+/* Free the memory. */
+                  pfrm_setting = astFree( pfrm_setting );
 
 /* If this failed, clear the status and indicate that we have not managed to 
    use the attribute setting. */
-               if( !astOK ) {
-                  astClearStatus;
+                  if( !astOK ) {
+                     astClearStatus;
+                     used = 0;
+                  }
+
+               } else {
                   used = 0;
                }
 
@@ -9199,6 +9253,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    AstAxis *ax;                  /* Pointer to Axis */
    AstFrame *pfrm;               /* Pointer to primary Frame containing axis */
    AstFrame *this;               /* Pointer to the Frame structure */
+   char pfrm_attrib[ 100 ];      /* Primary Frame attribute */
    char *axis_attrib;            /* Pointer to axis attribute name */
    const char *old_attrib;       /* Pointer to supplied attribute name string */
    int axis;                     /* Frame axis number */
@@ -9423,13 +9478,25 @@ L1:
 /* Find the primary Frame containing the specified axis. */
             astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
 
+/* Only attempt to use the primary Frame if it is not the same as "this"
+   - otherwise we could end up in an infinite loop. */
+            if( pfrm != this ) {
+
+/* Modify the attribute name to refer to the axis numbering of the
+   primary frame. */
+               sprintf( pfrm_attrib, "%s(%d)", axis_attrib, paxis + 1 );
+            
 /* Attempt to test the attribute as an attribute of the primary Frame. */
-            result = astTestAttrib( pfrm, axis_attrib );
+               result = astTestAttrib( pfrm, pfrm_attrib );
 
 /* If this failed, clear the status and indicate that we have not managed to 
    use the attribute name. */
-            if( !astOK ) {
-               astClearStatus;
+               if( !astOK ) {
+                  astClearStatus;
+                  used = 0;
+               }
+
+            } else {
                used = 0;
             }
 
