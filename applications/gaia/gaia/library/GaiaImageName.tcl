@@ -338,6 +338,13 @@ itcl::class gaia::GaiaImageName {
             set tail [file tail $imagename]
             set i1 [string first {.} $tail]
             set type_ [string range $tail $i1 end]
+            if { $type_ == $tail } {
+               #  No type, but file exists, pick another with .sdf extension
+               #  if that exists.
+               if { [file exists ${diskname}.sdf] } {
+                  set type_ ".sdf"
+               }
+            }
          }
       } else {
          set tail [file tail $diskname]
