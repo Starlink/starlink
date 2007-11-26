@@ -96,6 +96,112 @@ static void ndg1WriteProvenanceExtension( Provenance *, int, int * );
 /* Public functions. */
 /* ================= */
 
+F77_SUBROUTINE(ndg_gtprv)( INTEGER(indf), INTEGER(ianc), CHARACTER(fprov),
+                           INTEGER(status) TRAIL(fprov) ){
+/*
+*+
+*  Name:
+*     NDG_GTPRV
+
+*  Purpose:
+*     Get provenance information from an NDF.
+
+*  Language:
+*     Starlink ANSI C (callable from Fortran)
+
+*  Invocation:
+*     CALL NDG_GTPRV( INDF, IANC, PROV, STATUS )
+
+*  Description:
+*     This routine returns information from the "PROVENANCE" extension
+*     in INDF, describing the ancestor NDF with a given index.
+
+*  Arguments:
+*     INDF = INTEGER (Given)
+*        An identifier for the NDF containing the provenance information.
+*     IANC = INTEGER (Given)
+*        The index of the ancestor NDF for which information should be
+*        returned. A value of zero will result in information about the NDF 
+*        specified by INDF being returned. Otherwise, the IANC value
+*        is used as an index into the ANCESTORS array in the PROVENANCE 
+*        extension. No error is reported if IANC is too large, but DAT__NOLOC 
+*        will be returned for PROV.
+*     PROV = CHARACTER * (DAT__SZLOC) (Returned)
+*        A locator for a temporary HDS object containing the following 
+*        components:
+*
+*        - "PATH": A string holding the path of the ancestor NDF.
+*        - "DATE": A string holding the formatted UTC date and time at 
+*          which the provenance information for the ancestor NDF was 
+*          recorded.
+*        - "CREATOR": A string identifying the software that created the
+*          ancestor NDF.
+*        - "MORE": Any extra information stored with the ancestor.
+*        - "PARENTS": A 1D vector of integers that are the indices of the
+*          immediate parents of the ancestor.
+*
+*        If the specified ancestor does not have any of these items of
+*        information, then the corresponding component will not be
+*        present in the returned HDS object. For instance, if the
+*        ancestor has no immediate parent NDFs, then the "PARENTS" 
+*        component will not be present in the returned HDS object. The
+*        returned locator should be annulled using DAT_ANNUL when no
+*        longer needed.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Copyright:
+*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     26-NOV-2007 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*/
+   GENPTR_INTEGER(indf)
+   GENPTR_INTEGER(ianc)
+   GENPTR_CHARACTER(fprov) 
+   GENPTR_INTEGER(status)
+
+/* Local variables: */
+   HDSLoc *prov = NULL;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* Call the C function to do the work. */
+   ndgGtprv( *indf, *ianc, &prov, status );
+
+/* Export the locator string. */
+   datExportFloc( &prov, 0, fprov_length, fprov, status );
+}
+
 F77_SUBROUTINE(ndg_ptprv)( INTEGER(indf1), INTEGER(indf2), CHARACTER(fmore),
                            LOGICAL(isroot), CHARACTER(creatr), INTEGER(status)
                            TRAIL(fmore) TRAIL(creatr) ){
@@ -145,7 +251,7 @@ F77_SUBROUTINE(ndg_ptprv)( INTEGER(indf1), INTEGER(indf2), CHARACTER(fmore),
 *     - The PROVENANCE extension in an NDF contains four components:
 *     "PARENTS", "ANCESTORS", "CREATOR" and "DATE". The DATE component is 
 *     a character string holding the date and time at which the information 
-*     in the provenance extension was last modified. The date is GMT 
+*     in the provenance extension was last modified. The date is UTC
 *     formatted by PSX_ASCTIME. The ANCESTORS component is a 1D array
 *     of "PROV" structures (described below). Each element describes a
 *     single NDF that was used in the creation of the main NDF, either
@@ -160,7 +266,7 @@ F77_SUBROUTINE(ndg_ptprv)( INTEGER(indf1), INTEGER(indf2), CHARACTER(fmore),
 *     is a 1D integer array holding the the indices within the ANCESTORS array 
 *     of the direct parents of the ancestor NDF. If PARENTS is not present, 
 *     the ancestor NDF is a "root" NDF (that is, it has no known parents).
-*     If present, the DATE component is a string holding the formatted GMT 
+*     If present, the DATE component is a string holding the formatted UTC 
 *     date at which the provenance information for the ancestor NDF was 
 *     determined. If this date is not known, the DATE component will not
 *     be present (this will be the case, for instance, for all root NDFs).
@@ -241,7 +347,7 @@ void ndgPtprv( int indf1, int indf2, HDSLoc *more, int isroot,
                const char *creator, int *status ){
 /*
 *  Name:
-*     ndgPtPrv
+*     ndgPtprv
 
 *  Purpose:
 *     Add provenance information to an NDF.
@@ -339,6 +445,159 @@ void ndgPtprv( int indf1, int indf2, HDSLoc *more, int isroot,
 /* Re-instate the original AST status variable. */
    astWatch( old_status );
 }
+
+
+void ndgGtprv( int indf, int ianc, HDSLoc **prov, int *status ){
+/*
+*  Name:
+*     ndgPtprv
+
+*  Purpose:
+*     Get provenance information from an NDF.
+
+*  Synopsis:
+*     void ndgGtprv( int indf, int ianc, HDSLoc **prov, int *status )
+
+*  Description:
+*     This routine returns information from the "PROVENANCE" extension
+*     in INDF, describing the ancestor NDF with a given index.
+
+*  Parameters:
+*     indf
+*        An identifier for the NDF containing the provenance information.
+*     ianc
+*        The index of the ancestor NDF for which information should be
+*        returned. A value of zero will result in information about the NDF 
+*        specified by "indf" being returned. Otherwise, the "ianc" value
+*        is used as an index into the ANCESTORS array in the PROVENANCE 
+*        extension. No error is reported if "ianc" is too large, but a
+*        NULL pointer will be returned for "prov".
+*     prov
+*        The location at which to return a pointer to a locator for a
+*        temporary HDS object containing the following components:
+*
+*        - "PATH": A string holding the path of the ancestor NDF.
+*        - "DATE": A string holding the formatted UTC date and time at 
+*          which the provenance information for the ancestor NDF was 
+*          recorded.
+*        - "CREATOR": A string identifying the software that created the
+*          ancestor NDF.
+*        - "MORE": Any extra information stored with the ancestor.
+*        - "PARENTS": A 1D vector of integers that are the indices of the
+*          immediate parents of the ancestor.
+*
+*        If the specified ancestor does not have any of these items of
+*        information, then the corresponding component will not be
+*        present in the returned HDS object. For instance, if the
+*        ancestor has no immediate parent NDFs, then the "PARENTS" 
+*        component will not be present in the returned HDS object. The
+*        returned locator should be annulled using datAnnul when no
+*        longer needed.
+*     status 
+*        The global status.
+*/
+
+/* Local variables: */
+   HDSLoc *loc = NULL;
+   Prov *anc = NULL;
+   Prov *parent = NULL;
+   Provenance *prov1 = NULL;
+   hdsdim  dim[1];
+   int *old_status;
+   int *parents = NULL;
+   int iparent;
+   int k;
+   int len;
+
+/* Initialise. */
+   *prov = NULL;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* Ensure AST uses the supplied status variable. */
+   old_status = astWatch( status );
+
+/* Read the provenance extension from the NDF. */
+   prov1 = ndg1ReadProvenanceExtension( indf, NULL, NULL, 0, status );
+
+/* Check the "ianc" value is within the bounds of the ANCESTORS array. */
+   if( prov1 && ianc >= 0 && ianc < prov1->nprov ) {
+
+/* Get a pointer to the ancestors Prov structure. */
+      anc = prov1->provs[ ianc ];
+
+/* Create the returned temporary HDS object. */
+      datTemp( "STARLINK_PROV", 0, NULL, prov, status );
+
+/* If defined, add a PATH component. */
+      if( anc->path ) {
+         len = astChrLen( anc->path );
+         if( len ) {
+            datNew0C( *prov, PATH_NAME, len, status );
+            datFind( *prov, PATH_NAME, &loc, status );
+            datPut0C( loc, anc->path, status );
+            datAnnul( &loc, status );
+         }
+      }
+
+/* If defined, add a DATE component. */
+      if( anc->date ) {
+         len = astChrLen( anc->date );
+         if( len ) {
+            datNew0C( *prov, DATE_NAME, len, status );
+            datFind( *prov, DATE_NAME, &loc, status );
+            datPut0C( loc, anc->date, status );
+            datAnnul( &loc, status );
+         }
+      }
+
+/* If defined, add a CREATOR component. */
+      if( anc->creator ) {
+         len = astChrLen( anc->creator );
+         if( len ) {
+            datNew0C( *prov, CREATOR_NAME, len, status );
+            datFind( *prov, CREATOR_NAME, &loc, status );
+            datPut0C( loc, anc->creator, status );
+            datAnnul( &loc, status );
+         }
+      }
+
+/* If defined, copy the MORE structure. */
+      if( anc->more ) datCopy( anc->more, *prov, MORE_NAME, status );
+
+/* Create a component holding the indices of the parents (if any). */
+      if( anc->nparent) {
+         datNew1I( *prov, PARENTS_NAME, anc->nparent, status );
+         datFind( *prov, PARENTS_NAME, &loc, status );
+         dim[ 0 ] = anc->nparent;
+         datMapI( loc, "WRITE", 1, dim, &parents, status );
+
+/* Loop round each cell of this array. */
+         for( k = 0; k < anc->nparent && *status == SAI__OK; k++ ) {
+            parent = anc->parents[ k ];
+
+/* Find the index of this parent in the provs array. */
+            for( iparent = 0; iparent < prov1->nprov; iparent++ ) {
+               if( prov1->provs[ iparent ] == parent ) break;
+            }
+
+            parents[ k ] = iparent;
+         }
+
+/* Free the parents array. */
+         datUnmap( loc, status );
+         datAnnul( &loc, status );
+      }
+   }
+
+/* Free resources. */
+   ndg1FreeProvenance( prov1, 1, status );
+
+/* Re-instate the original AST status variable. */
+   astWatch( old_status );
+}
+
 
 
 /* Private functions. */

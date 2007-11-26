@@ -79,5 +79,6 @@ void ndgGtsup( const Grp *grp, int i, char const *fields[6], int len, int *statu
 void ndgBegpv( int *status );
 void ndgEndpv( const char *creator, int *status );
 void ndgPtprv( int indf1, int indf2, HDSLoc *more, int isroot, const char *creator, int *status );
+void ndgGtprv( int indf, int ianc, HDSLoc **prov, int *status );
 
 #endif

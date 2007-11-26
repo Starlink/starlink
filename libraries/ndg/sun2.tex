@@ -6,13 +6,13 @@
 %------------------------------------------------------------------------------
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun2.5}
-\newcommand{\stardocnumber}    {2.5}
+\newcommand{\stardocsource}    {sun2.6}
+\newcommand{\stardocnumber}    {2.6}
 \newcommand{\stardocauthors}   {D.S.\ Berry \\ M.B.\ Taylor}
-\newcommand{\stardocdate}      {12th November 2004}
+\newcommand{\stardocdate}      {26th November 2007}
 \newcommand{\stardoctitle}     {NDG \\ [1ex]
                                 Routines for Accessing Groups of NDFs}
-\newcommand{\stardocversion}   {Version 5.2}
+\newcommand{\stardocversion}   {Version 5.3}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -1204,6 +1204,30 @@ to add further members.
 }
 \newpage
 \sstroutine{
+   NDG\_BEGPV
+}{
+   Begin an NDF provenance block
+}{
+   \sstdescription{
+      This routine should be called to mark the start of an NDF
+      provenance block. The block should be ended by a matching
+      call to NDG\_ENDPV. See NDG\_ENDPV for more details.
+
+      Note - provenance blocks must not be nested.
+   }
+   \sstinvocation{
+      CALL NDG\_BEGPV( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
    NDG\_CREA1
 }{
    Create a single new simple NDF using a specified parameter
@@ -1449,6 +1473,124 @@ to add further members.
          NAME = CHARACTER $*$ ( $*$ ) (Returned)
       }{
          The full file specification for the NDF.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   NDG\_ENDPV
+}{
+   End an NDF provenance block
+}{
+   \sstdescription{
+      This routine should be called to mark the end of an NDF
+      provenance block. The block should have been started by a
+      matching call to NDG\_BEGPV. Note, provenance blocks must
+      not be nested.
+
+      During a provenance block, a list is maintained of all the
+      existing NDFs that have been read (either in read or update
+      mode) during the block. Another list is maintained of all
+      the NDFs that have been written (either existing NDFs accessed
+      in update mode or new NDFs) during the block.
+
+      When the block ends, the provenance information within each
+      NDF in the second may be modified to include all the NDFs in the
+      first list as parents. Whether or not this occurs is controlled by
+      the AUTOPROV environment variable. If AUTOPROV is set to {\tt '}1{\tt '} then
+      the input NDFs are added to the provenance information in the
+      output NDF. If AUTOPROV is set to anything other than {\tt '}1{\tt '} then the
+      output provenance is not updated. If AUTOPROV is not set at all,
+      then the output provenance will be updated only if one or more of
+      the input NDFs contains a PROVENANCE extension.
+   }
+   \sstinvocation{
+      CALL NDG\_ENDPV( CREATR, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         CREATR = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         An identifier for the software that created INDF1 (usually the
+         name of the calling application). The format of the identifier
+         is arbitrary, but the form {\tt "}PACKAGE:COMMAND{\tt "} is recommended.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   NDG\_GTPRV
+}{
+   Get provenance information from an NDF
+}{
+   \sstdescription{
+      This routine returns information from the {\tt "}PROVENANCE{\tt "} extension
+      in INDF, describing the ancestor NDF with a given index.
+   }
+   \sstinvocation{
+      CALL NDG\_GTPRV( INDF, IANC, PROV, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF = INTEGER (Given)
+      }{
+         An identifier for the NDF containing the provenance information.
+      }
+      \sstsubsection{
+         IANC = INTEGER (Given)
+      }{
+         The index of the ancestor NDF for which information should be
+         returned. A value of zero will result in information about the NDF
+         specified by INDF being returned. Otherwise, the IANC value
+         is used as an index into the ANCESTORS array in the PROVENANCE
+         extension. No error is reported if IANC is too large, but DAT\_\_NOLOC
+         will be returned for PROV.
+      }
+      \sstsubsection{
+         PROV = CHARACTER $*$ (DAT\_\_SZLOC) (Returned)
+      }{
+         A locator for a temporary HDS object containing the following
+         components:
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}PATH{\tt "}: A string holding the path of the ancestor NDF.
+
+            \sstitem
+            {\tt "}DATE{\tt "}: A string holding the formatted UTC date and time at
+              which the provenance information for the ancestor NDF was
+              recorded.
+
+            \sstitem
+            {\tt "}CREATOR{\tt "}: A string identifying the software that created the
+              ancestor NDF.
+
+            \sstitem
+            {\tt "}MORE{\tt "}: Any extra information stored with the ancestor.
+
+            \sstitem
+            {\tt "}PARENTS{\tt "}: A 1D vector of integers that are the indices of the
+              immediate parents of the ancestor.
+
+         }
+         If the specified ancestor does not have any of these items of
+         information, then the corresponding component will not be
+         present in the returned HDS object. For instance, if the
+         ancestor has no immediate parent NDFs, then the {\tt "}PARENTS{\tt "}
+         component will not be present in the returned HDS object. The
+         returned locator should be annulled using DAT\_ANNUL when no
+         longer needed.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -1866,6 +2008,100 @@ to add further members.
 }
 \newpage
 \sstroutine{
+   NDG\_PTPRV
+}{
+   Add provenance information to an NDF
+}{
+   \sstdescription{
+      This routine stores information in the {\tt "}PROVENANCE{\tt "} extension of
+      INDF1 indicating that INDF2 was used in the creation of INDF1.
+      The provenance information is stored in an NDF extension call
+      {\tt "}PROVENANCE{\tt "}.
+   }
+   \sstinvocation{
+      CALL NDG\_PTPRV( INDF1, INDF2, MORE, ISROOT, CREATR, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF1 = INTEGER (Given)
+      }{
+         An identifier for a newly created NDF.
+      }
+      \sstsubsection{
+         INDF2 = INTEGER (Given)
+      }{
+         An identifier for an NDF that was used in the creation of INDF1.
+      }
+      \sstsubsection{
+         MORE = CHARACTER $*$ (DAT\_\_SZLOC) (Given)
+      }{
+         A locator for an HDS structure containing arbitrary additional
+         information about INDF2, and how INDF2 was used in the creation
+         of INDF1. This information is stored in the provenance extension
+         of INDF1.
+      }
+      \sstsubsection{
+         ISROOT = LOGICAL (Given)
+      }{
+         If TRUE, then INDF2 will be treated as a root NDF. That is,
+         any provenance information in INDF2 is ignored. If FALSE, then
+         any provenance information in INDF2 is copied into INDF1. INDF2
+         is then only a root NDF if it contains no provenance information.
+      }
+      \sstsubsection{
+         CREATR = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A text identifier for the software that created INDF1 (usually the
+         name of the calling application). The format of the identifier
+         is arbitrary, but the form {\tt "}PACKAGE:COMMAND{\tt "} is recommended.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The PROVENANCE extension in an NDF contains four components:
+         {\tt "}PARENTS{\tt "}, {\tt "}ANCESTORS{\tt "}, {\tt "}CREATOR{\tt "} and {\tt "}DATE{\tt "}. The DATE component is
+         a character string holding the date and time at which the information
+         in the provenance extension was last modified. The date is UTC
+         formatted by PSX\_ASCTIME. The ANCESTORS component is a 1D array
+         of {\tt "}PROV{\tt "} structures (described below). Each element describes a
+         single NDF that was used in the creation of the main NDF, either
+         directly or indirectly. The PARENTS component is a 1D integer
+         array holding the indices within the ANCESTORS array of the NDFs
+         that are the direct parents of the main NDF. The CREATOR component
+         holds an arbitrary identifier for the software that created the
+         main NDF.
+
+         \sstitem
+         Each PROV structure describes a single NDF that was used in the
+         creation of the main NDF, and contains up to four components; {\tt "}PARENTS{\tt "},
+         {\tt "}DATE{\tt "}, {\tt "}PATH{\tt "}, {\tt "}CREATOR{\tt "} and {\tt "}MORE{\tt "}. If present, the PARENTS component
+         is a 1D integer array holding the the indices within the ANCESTORS array
+         of the direct parents of the ancestor NDF. If PARENTS is not present,
+         the ancestor NDF is a {\tt "}root{\tt "} NDF (that is, it has no known parents).
+         If present, the DATE component is a string holding the formatted UTC
+         date at which the provenance information for the ancestor NDF was
+         determined. If this date is not known, the DATE component will not
+         be present (this will be the case, for instance, for all root NDFs).
+         The PATH component will always be present, and is a string holding
+         the full path to the ancestor NDF. This includes any HDS path
+         within the container file, but will not include any NDF or HDS section
+         specifier. Neither will it include the trailing {\tt "}.sdf{\tt "} suffix. If
+         present, the MORE component is an arbitrary HDS structure in which
+         any extra information about the ancestor NDF can be stored. The
+         CREATOR component holds an arbitrary identifier for the software that
+         created the ancestor NDF.
+      }
+   }
+}
+\newpage
+\sstroutine{
    NDG\_PTSUP
 }{
    Store suplemental information for an NDF
@@ -1952,6 +2188,12 @@ to add further members.
 }
 
 \newpage
+\section{Changes Introduced in NDG Version 5.3}
+\begin{itemize}
+   \item Added routines for storing and retrieving provenance information:
+         NDG\_PTPRV, NDG\_GTPRV, NDG\_BEGPV and NDG\_ENDPV.
+\end{itemize}
+
 \section{Changes Introduced in NDG Version 5.2}
 \begin{itemize}
    \item The C routine ndg1\_regsb.c has been changed to avoid warning 

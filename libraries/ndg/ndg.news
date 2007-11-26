@@ -1,5 +1,10 @@
 1 NDG_library
 
+Version 5.3
+
+   o New routines for accessing provenance information within NDFs;
+   NDG_GTPRV, NDG_PTPRV, NDG_BEGPV and NDG_ENDPV.
+
 Version 5.2-3
 
    o Released under the GPL
