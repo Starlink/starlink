@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sgp/050</path>
+  <description>Starlink Document Styles</description>
+  <abstract><p>
+     This document describes the various styles which are recommended
+     for Starlink documents. It also explains how to use the templates
+     which are provided by Starlink to help authors create documents
+     in a standard style.
+     
+     This paper is concerned mainly with conveying the "look and
+     feel" of the various styles of Starlink document rather than
+     describing the technical details of how to produce them. Other
+     Starlink papers give recommendations for the detailed aspects of
+     document production, design, layout, and typography.
+     
+     The only style that is likely to be used by most Starlink authors
+     is the Standard style.
+  </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>M D Lawden</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1997</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
