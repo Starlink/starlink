@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sgp/016</path>
+  <description>Starlink Application Programming Standard</description>
+  <abstract><p>
+    This Programming Standard should be read by all those who implement
+    programs on Starlink computers.  The techniques described are
+    requirements for Starlink-supported applications software but are equally
+    appropriate for private programming.  The standard applies mainly
+    to the implementation of freestanding VAX/VMS and Unix
+    applications, but also includes some material specific to developing
+    programs for the Starlink ADAM Software Environment.
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>P.T.Wallace</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1981-1992</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
