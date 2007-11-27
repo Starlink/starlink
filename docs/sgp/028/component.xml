@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="sgp28">
+  <version>8</version>
+  <path>docs/sgp/028</path>
+  <description>How to write good documents for Starlink</description>
+  <abstract><p>
+     This document gives advice on how to write good Starlink
+     documents. It lists Starlink documents which users said they
+     liked in the 1994 Starlink Software Survey, and identifies common
+     characteristics of style and organisation which can be
+     recommended to authors.
+  
+     Various features of documentation which the authors believe to be
+     harmful are specified, including common problems with pages
+     produced for the World Wide Web. Many of these will inevitably
+     reflect the taste of the authors, and these may not correspond to
+     your own. However, they derive from our belief that it is right
+     for an author to spend time and effort on a document in order to
+     save the reader time and effort in reading it.
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>M D Lawden</name>
+      <name>A C Charles</name>
+    </person>
+  </developers>
+  <documentation> sgp28</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>?-1997</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
