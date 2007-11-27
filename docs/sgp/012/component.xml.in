@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sgp/012</path>
+  <description>AVS as a GUI for ADAM</description>
+  <abstract><p>
+    This describes an experiment to test the feasiblity of using AVS networks
+    in the ADAM context, based upon the conversion of an ADAM application into 
+    an AVS module.  After an outline of AVS and its data types, this
+    paper reports various steps in the conversion of the KAPPA ADD task.
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>D L Terrett</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1992</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
