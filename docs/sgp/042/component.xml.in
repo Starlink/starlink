@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sgp/042</path>
+  <description>Starlink Software Strategy</description>
+  <abstract><p>
+     This document contains the text of a paper presented to the
+     Starlink Panel in March 1995 and describes a strategy for
+     Starlink software activities over the next 3 years. It is based
+     heavily on the input provided by the 1993-94 Starlink Software
+     Survey (SGP/43) and subsequent discussions at Starlink Software
+     Strategy Group (SSG) meetings during late 1994.
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>R.F. Warren-Smith</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1995</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
