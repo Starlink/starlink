@@ -1,18 +1,17 @@
-\documentstyle{article}
+%\documentclass[twoside,11pt]{article}
+\documentstyle[11pt,twoside]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
 \newcommand{\stardoccategory}  {Starlink General Paper}
 \newcommand{\stardocinitials}  {SGP}
 \newcommand{\stardocnumber}    {38.2}
-\newcommand{\stardocauthors}   {Malcolm  J Currie, P T Wallace \&
+\newcommand{\stardocauthors}   {Malcolm J Currie, P T Wallace \&
                                 R F Warren-Smith}
-\newcommand{\stardocdate}      {20 January 1989}
+\newcommand{\stardocdate}      {1989 January 20}
 \newcommand{\stardoctitle}     {Starlink Standard Data Structures}
 %------------------------------------------------------------------------------
 
-\newcommand{\numcir}[1]{\mbox{\hspace{3ex}$\bigcirc$\hspace{-1.7ex}{\small #1}}}
-\newcommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
 \markright{\stardocname}
 \setlength{\textwidth}{160mm}
@@ -24,6 +23,111 @@
 \setlength{\parskip}{\medskipamount}
 \setlength{\unitlength}{1mm}
 
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% conditional text
+\newcommand{\latexelsehtml}[2]{#1}
+\begin{htmlonly}
+  \renewcommand{\latexelsehtml}[2]{#2}
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+
+\newcommand{\numcir}[1]{\mbox{\hspace{3ex}$\bigcirc$\hspace{-1.7ex}{\small #1}}}
+\begin{htmlonly}
+\renewcommand{\numcir}[1]{~~~~~~ #1} 
+\end{htmlonly}
+
+\newcommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
+
+% -----------------------------------------------------------------------------
 \begin{document}
 \thispagestyle{empty}
 SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
@@ -56,7 +160,7 @@ standard ways of arranging data, using the Hierarchical
 Data System (HDS).  The most important of these is the NDF
 (Extensible $n$-Dimensional-Data Format), which is suitable for
 expressing a wide variety of data which occur in $n$-dimensional
-arrays --- for example pictures, spectra and time series.
+arrays---for example pictures, spectra and time series.
 
 The early part of the document deals mainly with
 concepts, while later sections give more detailed
@@ -107,10 +211,10 @@ you get to the items themselves (the primitives);  all the
 rest is packaging.
 
 Readers of the present document
-should be familiar with the HDS Programmer's Guide, SUN/92.
+should be familiar with the HDS Programmer's Guide, \xref{SUN/92}{sun92}.
 
 In conjunction with a release of
-the Starlink Software Environment ({\small SSE} --- a forerunner of the
+the Starlink Software Environment ({\small SSE}---a forerunner of the
 {\small ADAM} system),
 Wright \& Giddings (1983) proposed a number of standard data structures
 using HDS.  The discussions which followed raised many
@@ -125,9 +229,8 @@ folders.  It has not been easy to produce a design which
 will please everyone, for reasons that will be dealt with
 in the next section.
 
-\section{Overview}
+\section{\xlabel{se_overview}Overview\label{se:overview}}
 
-\label{se:overview}
 It has taken a long time and a large amount of effort
 to agree the design which is described here.
 The solutions to many apparently
@@ -175,7 +278,7 @@ approach in favour of one where:
 \item There is orderly treatment of extensions.
 \end{itemize}
 
-The third point --- the treatment of extensions --- is
+The third point---the treatment of extensions---is
 crucial.  Most astronomer/programmers feel drawn to the
 familiar TOE approach, where
 there is a place to put the $\alpha,\delta$, exposure time,
@@ -216,11 +319,11 @@ outside astronomy.
 The Starlink standard data structures can be divided into two 
 categories:
 {\it low-level,} and {\it composite}.  Low-level structures are
-self-contained;  coupled with
+self-contained; coupled with
 individual data objects they are used to build the composite
 formats, and include axis information, title, history, and quality.
 The composite formats are akin to the Interim
-Environment's Bulk Data Frame (see SUN/4).
+Environment's Bulk Data Frame (see \xref{SUN/4}{sun4}).
 
 Since the idea of some completely general data format has
 been rejected (for reasons already presented), even for
@@ -231,18 +334,16 @@ The only current example of a composite data format,
 the NDF, is presented in
 Table~\ref{ta:example1}.  (NDF is
 short for {\it Extensible n-Dimensional-Data Format} and will
-be described fully in Section~\ref{se:ndf}).  The NDF
+be described fully
+\latexelsehtml{in Section~\ref{se:ndf}).}{\htmlref{here.)}{se:ndf}}  The NDF
 is based on the $n$-dimensional data array, which is the most natural
-way to express many sorts of astronomical data set --- notably
+way to express many sorts of astronomical data set---notably
 spectra, pictures and time series.
 
 Within an HDS container file, the NDF structure resides usually,
-though not
-necessarily, at the top level.  For example, the top-level
-structure within a container file might
-be built from several NDFs, each 
-an observation of the same source but
-through a different filter.
+though not necessarily, at the top level.  For example, the top-level
+structure within a container file might be built from several NDFs,
+each an observation of the same source but through a different filter.
 
 \begin{table}[htb]
 \centering
@@ -297,12 +398,13 @@ general processing.  They comprise:
                   \end{tabular}\end{minipage}
 \end{itemize}
 Only the {[}{\bf DATA\_ARRAY}{]} is
-mandatory --- so a primitive HDS object containing
+mandatory---so a primitive HDS object containing
 a 2-D array of numbers (for example) is
 valid as the only component of an NDF.
 A full description of the components is given
-in Section~\ref{se:ndf} and the meaning of the TYPEs in
-Section~\ref{se:natyvar}. 
+\latexelsehtml{in Section~\ref{se:ndf}}{\htmlref{here}{se:ndf}}
+and the meaning of the TYPEs in
+\latexelsehtml{Section~\ref{se:natyvar}.}{\htmlref{Naming, Types and Variants.}{se:natyvar}} 
 
 The omission from the NDF of the maximum and minimum
 values of the data array, and other quantities which can be
@@ -314,10 +416,10 @@ numbers up to date.
 In designing the NDF, efforts were made
 to retain some compatibility
 with the original Wright-Giddings proposals.  A limited but
-useful degree of compatibility was achieved --- the former
+useful degree of compatibility was achieved---the former
 location of the main data array ({\it i.e.}\ at the top level) is
 still recognised, and the name has been
-retained --- but it proved impossible to accommodate more
+retained---but it proved impossible to accommodate more
 of the original proposals without enormously
 adding to the complexity of the processing rules.
 
@@ -329,7 +431,7 @@ are all essentially $n$-dimensional arrays together with
 some ancillary items, and fit naturally into the
 form of the NDF, simple though it is.
 In the next section, we will look at the
-general question of {\bf layering} --- how the
+general question of {\bf layering}---how the
 elaborate requirements of any particular data type can
 be broken down into different levels of generality.  We
 will then go on to consider
@@ -395,14 +497,14 @@ these low-level objects is relatively easy to write,
 and once written can be used by many different packages. 
 
 {\small KAPPA} ({\bf K}ernel {\bf Ap}plication {\bf Pa}ckage ---
-see SUN/95) is a set of
+see \xref{SUN/95}{sun95}) is a set of
 applications which processes these abstracted data
 objects.  {\small KAPPA} is
 intended to be a quick, exploratory data-analysis tool, and its
 applications will act as paradigms
 or templates for specialist software packages.
 
-Another important package is {\small FIGARO} (SUN/86), which
+Another important package is {\small FIGARO} (\xref{SUN/86}{sun86}), which
 has been influential in defining the Starlink
 standard data formats and is at present undergoing a refit
 to bring it fully into line.
@@ -454,8 +556,8 @@ would probably be inefficient to represent a
 celestial position with separate components for hours, minutes, seconds
 and degrees, arcminutes, arcseconds, rather than expressing
 the two angles as floating-point numbers or using
-a single character string (notwithstanding the example in SSN/27,
-which is a demonstration rather than a recommendation!). 
+a single character string (notwithstanding the example in 
+\xref{SSN/27}{ssn27}, which is a demonstration rather than a recommendation!). 
 
 \begin{table}[htb]
 \centering
@@ -530,7 +632,8 @@ contents must {\bf not} be used by applications to
 control processing.
 
 The rules for designing new structures are presented in
-Section~\ref{se:newdesign}. 
+\latexelsehtml{Section~\ref{se:newdesign}.}{\htmlref{Creating New
+Structures.}{se:newdesign}}
 
 \paragraph{Extensibility}
 No data format design will ever satisfy all requirements, and
@@ -540,7 +643,7 @@ particular instrument for example.  What should an application
 do if it encounters objects which are not part of a
 standard structure?
 
-In most of the {\small ASPIC} applications (see SG/1) such objects ---
+In most of the {\small ASPIC} applications (see \xref{SG/1}{sg1}) such objects ---
 which have to be expressed in simple ways akin to {\small FITS}
 descriptors ---
 are simply ignored, and consequently do not appear in any new data
@@ -600,7 +703,7 @@ An application may only process and
 propagate a data object whose processing rules it understands
 and can fully implement, in order to avoid
 rendering the object meaningless or wrong. Unknown or poorly
-understood objects must be ignored --- never fudged.
+understood objects must be ignored---never fudged.
 \end{itemize}
 
 \paragraph{Tree walking}
@@ -642,19 +745,19 @@ invoked, in order to save time.  Note that in this document the term
 an {\em array element} or {\em bin}, and therefore, {\em pixel}
 does not imply membership of a two-dimensional array.
 
-Full details of bad-pixel methods are presented in
-Section~\ref{se:badpixel}. 
+Full details of bad-pixel methods are presented
+\latexelsehtml{in Section~\ref{se:badpixel}.}{\htmlref{here.}{se:badpixel}}
 
-\section{Naming, Types and Variants}
-\label{se:natyvar}
+\section{\xlabel{se_natyvar}Naming, Types and
+Variants\label{se:natyvar}}
 
-\subsection{Character Set}
-\label{se:charset}
+\subsection{\xlabel{se_charset}Character Set\label{se:charset}}
+
 NAMEs, TYPEs and the contents of strings in HDS
 {\bf must} consist only of
 printable ASCII characters ({\it i.e.}\ hexadecimal
 20 through 7E).  Beyond this, HDS itself
-(see SUN/92) imposes restrictions on NAMEs and TYPES,
+(see \xref{SUN/92}{sun92}) imposes restrictions on NAMEs and TYPES,
 to which we add the
 requirement that the first character of a
 (non-primitive) TYPE must {\bf not} be
@@ -676,15 +779,14 @@ will, at some stage, cause insurmountable difficulties.
 The names of HDS container files should be chosen to be the
 same as the names of their top-level data structures, or at
 least to be closely related.  Note that filenames must {\bf not}
-appear in applications code (see SGP/16).
+appear in applications code (see \xref{SGP/16}{sgp16}).
 
-\subsection{The R\^{o}le of TYPE}
-\label{se:roleoftype}
+\subsection{\xlabel{se_roleoftype}The R\^{o}le of TYPE\label{se:roleoftype}}
+
 TYPE describes the form of a data structure and the general rules
-for interpreting or processing
-all structures of that form.  The NAME identifies the
-particular object.  The TYPE tells the program what to expect and
-how to interpret the object.
+for interpreting or processing all structures of that form.  The NAME
+identifies the particular object.  The TYPE tells the program what to 
+expect and how to interpret the object.
 
 It is possible to take the view that the TYPE attribute
 of HDS objects is important only for
@@ -741,8 +843,8 @@ to rummage within a data structure
 and identify the components it needs by other methods, if the particular
 TYPE is not recognised.
 
-\subsection{Notation and Pseudo-types}
-\label{se:notation}
+\subsection{\xlabel{se_notation}Notation and Pseudo-types\label{se:notation}}
+
 A component of an HDS structure is characterised
 by its dimension(s), NAME, TYPE and meaning.  The
 notation adopted in this document to describe these
@@ -765,7 +867,7 @@ The meaning of these constants are described for each structure.
 A {\bf NAME} in capitals is the NAME the component must take; where the NAME
 is in lowercase it is generic, {\it i.e.}\  it may be chosen by the
 programmer provided it does not duplicate a Starlink-reserved NAME.
-NAME is not globally significant --- its meaning is only defined within
+NAME is not globally significant---its meaning is only defined within
 the context of a containing structure.
 
 {\bf TYPE} may be one of the {\it primitives} or one
@@ -775,10 +877,10 @@ $<${\bf TYPE}$>$ respectively. As mentioned earlier, the $>$ and
 $<$ signs form a notation convention used in the text of this
 document to signify the TYPE of a data object, and they are not
 themselves part of the TYPE. Details of
-HDS primitive TYPEs can be found in SUN/92.
+HDS primitive TYPEs can be found in \xref{SUN/92}{sun92}.
 
 Within Starlink standard data structures TYPE is
-recognised globally --- a given TYPE always means the same thing no 
+recognised globally---a given TYPE always means the same thing no 
 matter where it appears in a structure.
 
 In order to allow for
@@ -810,10 +912,12 @@ $<${\bf s\_array}$>$ & a $<${\bf numeric}$>$ scalar or $<${\bf p\_array}$>$ \\ \
 
 The $<${\bf various}$>$ notation is used where the options do not neatly 
 fit into one of the categories in Table~\ref{ta:pseudotypes}.
-Sections~\ref{se:basic} and \ref{se:ndf} contain tables of the contents
-of standard structures, followed by descriptions of the individual items.
-The possible options for each $<${\bf various}$>$ can be found within the
-description of the associated data object.
+\latexelsehtml{Sections~\ref{se:basic}}{\htmlref{Low-Level Structures}{se:basic}} and 
+\latexelsehtml{\ref{se:ndf}}{\htmlref{The Extensible n-dimensional Format}{se:ndf}} 
+contain tables of the contents of standard structures, followed by
+descriptions of the individual items. The possible options for each
+$<${\bf various}$>$ can be found within the description of the
+associated data object.
 
 There is problem for the notation.
 Certain data objects are arrays. The number and sizes of each dimension
@@ -876,8 +980,7 @@ Name & Pseudo-type & Name and dimensions & Type \\ \hline
 \end{tabular}
 \end{table}
 
-\section{Labels and Units}
-\label{se:labunit}
+\section{\xlabel{se_labunit}Labels and Units\label{se:labunit}}
 
 Often, data values stored in structures will be accompanied
 by textual labels describing what they are and what units they
@@ -975,11 +1078,12 @@ The {\small FITS} scheme may be summarised as follows:
 \item Add Janskys (Jy) for flux density.
 \end{itemize}
 
-The first proposal --- conformity with SI ---
+The first proposal---conformity with SI ---
 includes the standard prefixes used to
 scale values by factor multiples of 1000.  There is one problem here:
 micro- is abbreviated to $\mu$, which is not a character available
-within HDS strings (see Section~\ref{se:charset});
+within HDS strings (see 
+\latexelsehtml{Section~\ref{se:charset};}{\htmlref{Character Set;}{se:charset}}
 the character {\tt u} should be
 used instead.  Also, the SI units include an
 $\Omega$ abbreviation; here, the full unit name,
@@ -992,7 +1096,7 @@ would probably not be acceptable.  (There is also the
 complication that to distinguish the abbreviations for
 seconds and siemens case-sensitive testing would be required.)
 
-\begin{table}[p]
+\begin{table}[htb]
 \centering
 \caption{International System (SI) Nomenclature}
 \label{ta:siunit}
@@ -1035,7 +1139,7 @@ ionising radiation) & & \\ \hline
 Some of the SI quantities are rarely, if ever, used in astronomy,
 but are included in Table~\ref{ta:siunit} for completeness.
 
-\begin{table}[p]
+\begin{table}[htb]
 \centering
 \caption{The more commonly appearing quantities, their SI
 units, and alternatives in current use}
@@ -1073,8 +1177,7 @@ of units currently employed, and the duplication of abbreviations,
 recommendation is to use SI units;  if this is unacceptable,
 the names or abbreviations used must be unambiguous.
 
-\section{Errors}
-\label{se:errors}
+\section{\xlabel{se_errors}Errors\label{se:errors}}
 
 ``Error'' is a woolly concept;  it means different things to different
 people, and is generally intimately tied to specialist data or
@@ -1125,15 +1228,15 @@ For the storage of information related to the genealogy and
 processing history of a data frame, the
 Birmingham/Asterix design and subroutine-interface library
 has been adopted.  Therefore the structure is named
-{{[}{\bf HISTORY}{]} and has TYPE $<${\bf HISTORY}$>$.  (See
+{[}{\bf HISTORY}{]} and has TYPE $<${\bf HISTORY}$>$.  (See
 Asterix Programmer Note 86\_008.)
-A {{[}{\bf HISTORY}{]} structure describes
+A {[}{\bf HISTORY}{]} structure describes
 the object in which it appears at the top level;
 it never describes anything at higher levels.
 This usually means that one history applies to one
 main data array.
 
-History is optional and is under the control of applications --- only
+History is optional and is under the control of applications---only
 they know whether they have done anything important to a file, and which
 parameters are important, though the user will always
 have the opportunity to add commentary via various patching
@@ -1148,16 +1251,18 @@ application, for example, would not have to write a history
 record.
 
 History records must not be regarded by applications as
-machine readable --- they must not be used to specify parameters
+machine readable---they must not be used to specify parameters
 or to control processing, even to re-enact automatically
 a processing sequence.  They are present to assist the user:
 ``What did I do to these data?'', ``Did I flat-field this image?''.
 
 History records should be brief.
 
-Details are given in Section~\ref{se:shistory}.
+Details are given in 
+\latexelsehtml{Section~\ref{se:shistory}.}{\htmlref{$<${\bf
+HISTORY}$>$ Structure.}{se:history}}
 
-\section{Bad-Pixel Methods}
+\section{\xlabel{se_badpixel}Bad-Pixel Methods\label{se:badpixel}}
 
 Starlink standard data formats support two
 methods of handling bad data: {\it magic value} (which
@@ -1168,12 +1273,10 @@ be used to indicate any attribute of selected pixels, including
 and efficient.  Data quality
 is flexible and preserves the original data.
 
-\label{se:badpixel}
-\subsection{Quality}
-\label{se:quality}
-To flag a data value as ``bad'', an
-associated {\it data-quality} value can be used.  This is an
-array of
+\subsection{\xlabel{se_quality}Quality\label{se:quality}}
+
+To flag a data value as ``bad'', an associated {\it data-quality} 
+value can be used.  This is an array of
 8-bit positive integers, one per element of the data
 array with which it is associated (a single value,
 applying to all elements of the data array, is also
@@ -1228,11 +1331,11 @@ data-quality; that would be unnecessary and quite wasteful of resources.
 Normally, data-quality values are associated with basic observational
 or measured data.
 
-\subsection{Magic or Undefined Value}
-\label{se:magic}
+\subsection{\xlabel{se_magic}Magic or Undefined Value\label{se:magic}}
+
 The alternative method for handling bad pixels is the so-called {\it
 magic value} method,  where a pixel is assigned a special flag when it
-has an undefined value --- it corresponds to a dead element in a CCD
+has an undefined value---it corresponds to a dead element in a CCD
 chip, for example, or is the result of division by zero.  This
 terminology should not be confused with the HDS ``undefined state'',
 where a data object exists, but has no value(s) assigned to it.  In this
@@ -1265,8 +1368,8 @@ application finds a data-object in this state, it must report an error,
 so that the malfunctioning application which created the object can be
 identified and corrected. The error is fatal.
 
-\subsection{Implementation}
-\label{se:badimplement}
+\subsection{\xlabel{se_badimplement}Implementation\label{se:badimplement}}
+
 General-purpose applications, like those in the
 {\small KAPPA} package, should support
 both magic-value and quality
@@ -1284,8 +1387,8 @@ binary encoding, and adopt the convention that 1$\equiv$true.
 Specific VAX representations and conventions are {\bf not}
 followed and are not in any way involved with the discussion.
 
-\subsubsection{Data Quality}
-\label{se:impquality}
+\subsubsection{\xlabel{se_impquality}Data Quality\label{se:impquality}}
+
 Quality is an 8-bit value associated with each datum, and is stored as
 an unsigned byte.  A value of zero
 ({\it i.e.}\ all quality flags set 0$\equiv$false) implies a
@@ -1330,7 +1433,7 @@ For a single bit, the above expression has the following truth table:\\
 \medskip
 
 and the overall logical value of BAD is the OR of the results
-for all eight bits --- just one of which has to be TRUE to make
+for all eight bits---just one of which has to be TRUE to make
 the resulting pixel bad.
 
 An example may clarify this.  Assume {[}{\bf BADBITS}{]} is 01001010
@@ -1374,7 +1477,8 @@ value and quality or (2) to propagate an undefined pixel.
 \item [Conventions] ---
 \begin{itemize}
 \item When there is more than one
-input data array ({\it c.f.}\ Section~\ref{se:propag}),
+input data array ({\it cf.}\ 
+\latexelsehtml{Section~\ref{se:Propag}}{\htmlref{Propagation}{se:propag}}),
 the {\it input} or {\it original} data quality is deemed to be that
 associated with the {\it principal} data array.
 However,
@@ -1414,9 +1518,9 @@ There is no one ideal way of handling data quality in general-purpose
 routines.  Methods will evolve as experience with real applications and
 data is gained.  The main considerations are:
 \begin{itemize}
-\item Disc space and virtual memory --- use of full-size work arrays
+\item Disc space and virtual memory---use of full-size work arrays
 may be unacceptable for large data frames.
-\item Speed --- checks for magic value and data quality
+\item Speed---checks for magic value and data quality
 in pixel-by-pixel processing loops should be kept to a
 minimum.  For example, the program could
 first determine whether bad pixels and data quality
@@ -1471,8 +1575,8 @@ the data values themselves untouched.
 largely unchanged from the
 Wright-Giddings proposal.)
 
-\subsubsection{Magic Values}
-\label{se:impmagic}
+\subsubsection{\xlabel{se_impmagic}Magic Values\label{se:impmagic}}
+
 For each of HDS's primitive TYPEs, the
 magic-value method uses the values given in Table~\ref{ta:magicvalues}.
 Alert readers will note that these are the
@@ -1507,7 +1611,7 @@ For efficiency, pixel values are tested inline for equality with the
 magic value of the appropriate type.  However, the numerical values
 given above must not be written explicitly in the code; instead,
 variables called {\tt VAL\_\_BAD<T>}, where {\tt <T>} is the one or two-letter
-type code ({\it e.g.}\  see SUN/7), should
+type code ({\it e.g.}\  see \xref{SUN/7}{sun7}), should
 be used.  These variables are specified
 via an INCLUDE file with logical name BAD\_PAR.  Here is a trivial
 example, which computes the mean of a one-dimensional REAL array.
@@ -1551,8 +1655,7 @@ permissible to bypass magic-value testing.  Thus, many packages
 will support two sets of algorithmic subroutines; one which
 tests magic values, and one which does not. 
 
-\section{Extensions}
-\label{se:exten}
+\section{\xlabel{se_exten}Extensions\label{se:exten}}
 
 The flexible and general-purpose character of the structures
 described in this document stems from their simplicity.  This
@@ -1591,15 +1694,16 @@ Starlink general-purpose packages, {\it e.g.}
 
 Starlink will, in due course,
 define standard representations of time and celestial
-positions (using the rules of Section~\ref{se:newdesign}).
+positions (using the rules of 
+\latexelsehtml{Section~\ref{se:newdesign}).}{\htmlref{Creating New
+Structures).}{se:newdesign}}
 They will be implemented as extensions, not additions to the
 standard structures.  It has not yet been decided
 whether applications in the {\small KAPPA} package
 will process these standard extensions, or whether a
 new package, of basic astronomy applications, will be written.
 
-\section{Propagation of Data Objects}
-\label{se:propag}
+\section{\xlabel{se_propag}Propagation of Data Objects\label{se:propag}}
 
 Many applications take one or more {\it input} objects and
 generate one or more {\it output} objects.  In such cases,
@@ -1609,9 +1713,9 @@ objects are to be propagated to the outputs, guided by the
 following rules:
 \begin{itemize}
 \item
-General-purpose applications will copy extensions
-({\it c.f.} Section~\ref{se:exten}) to the same
-location within an output structure provided their
+General-purpose applications will copy extensions ({\it cf.} 
+\latexelsehtml{Section~\ref{se:exten}}{\htmlref{Extensions}{se:exten}})
+to the same location within an output structure provided their
 parent structure has
 been propagated; specialist applications are, of course,
 allowed to process individual items within the extensions
@@ -1626,8 +1730,8 @@ or structures rendered meaningless, wrong or even dubious by the
 processing must not be propagated.  The {\it ad hoc} approach to
 doubtful cases is strongly discouraged.
 \item
-``Rogue'' objects --- anything outside the Starlink standard ---
-should be ignored.
+``Rogue'' objects---anything outside the Starlink standard---should 
+be ignored.
 \item
 Applications are not allowed to pollute standard structures
 with rogue objects;  all application-specific items must reside
@@ -1661,7 +1765,7 @@ cases, it will be necessary to advise the user which items have
 been propagated and which have been lost;  if the result is
 unsuitable, the application can then be re-run with the
 parameters specified in a different order, or other programs can
-be run to fine-tune the result --- by replacing a label, for example.
+be run to fine-tune the result---by replacing a label, for example.
 
 The specific rules for HISTORY are as follows.
 
@@ -1676,15 +1780,14 @@ HDS editor application will be provided for grafting
 in history records taken from
 existing $<${\bf HISTORY}$>$ structures.
 
-\section{Low-Level Structures}
-\label{se:basic}
+\section{\xlabel{se_basic}Low-Level Structures\label{se:basic}}
 
 In this section, we begin by describing a number of
 {\it low-level} structures, the basic building blocks which
 can be used to build NDFs and other {\it composite} structures.
 
-\subsection{$<${\bf POLYNOMIAL}$>$ Structure}
-\label{se:spolynomial}
+\subsection{\xlabel{se_polynomial}$<${\bf POLYNOMIAL}$>$ Structure\label{se:spolynomial}}
+
 The $<${\bf POLYNOMIAL}$>$ structure is used for storing the coefficients of an
 $n$-dimensional ordinary or Chebyshev polynomial.  Evaluation of
 the polynomial yields a $<${\bf float}$>$ scalar result.
@@ -1722,7 +1825,7 @@ of the polynomial coefficients.
 The {[}{\bf DATA\_ARRAY}{]} is the $NAXIS$-dimensional array containing
 the $NAXIS$-di\-men\-sion\-al poly\-no\-mial
 co\-efficients.  The function is evaluated as:
-\[{\rm VALUE} = \sum {\rm DATA\_ARRAY}(I_1,I_2,\ldots,I_{\rm NAXIS}) \prod_{j=1}^{\rm NAXIS} {\rm AXIS}_j\!^{I_j-1} \]
+\[{\rm VALUE} = \sum {\rm DATA\underline{~~}ARRAY}(I_1,I_2,\ldots,I_{\rm NAXIS}) \prod_{j=1}^{\rm NAXIS} {\rm AXIS}_j\!^{I_j-1} \]
 summed over all elements of the DATA\_ARRAY.
 
 Here, AXIS$_n$ is the co-ordinate value along axis $n$, and
@@ -1732,7 +1835,7 @@ NAXIS$_n$ is the dimension of axis $n$.
 The {[}{\bf DATA\_ARRAY}{]} contains the NAXIS-dimensional
 array of Chebyshev-polynomial coefficients.  The function is evaluated as: 
 
-\[{\rm VALUE}=\sum {\rm DATA\_ARRAY}(I_1,I_2,\ldots,I_{\rm NAXIS})\prod_{j=1}^{\rm NAXIS} T(I_{j-1},S_j) \]
+\[{\rm VALUE}=\sum {\rm DATA\underline{~~}ARRAY}(I_1,I_2,\ldots,I_{\rm NAXIS})\prod_{j=1}^{\rm NAXIS} T(I_{j-1},S_j) \]
 summed over all elements of the DATA\_ARRAY, where
 $T(m,x)$ is the Chebyshev polynomial of order $m$ evaluated at
 $x$ (in the range $-$1 to $+$1),
@@ -1759,11 +1862,12 @@ co-ordinate range.  Only processed if
 {[}{\bf VARIANT}{]} = {\tt `CHEBYSHEV'}, for which they are mandatory.
 \end{description}
 
-\subsection{$<${\bf ARRAY}$>$ Structure}
-\label{se:sarray}
-We will now describe the various structures for arrays
-of numbers introduced in Section~\ref{se:notation}.
+\subsection{\xlabel{se_array}$<${\bf ARRAY}$>$Structure\label{se:sarray}}
 
+We will now describe the various structures for arrays
+of numbers introduced in 
+\latexelsehtml{Section~\ref{se:notation}.}{\htmlref{Notation and
+Pseudo-types.}{se:notation}}
 An \mbox{$<${\bf ARRAY}$>$} structure has a number of variants.
 
 \subsubsection{{[}{\bf VARIANT}{]} = `SIMPLE'}
@@ -2020,8 +2124,8 @@ polynomial.
 (This variant does not conform to the 
 guideline about variants since conversion of an array of numbers to a
 polynomial requires additional information.  However, for clarity and
-because the reverse operation is possible --- polynomial to an array of
-numbers --- a variant of $<${\bf ARRAY}$>$ has been used.)
+because the reverse operation is possible---polynomial to an array of
+numbers---a variant of $<${\bf ARRAY}$>$ has been used.)
 
 \begin{table}[htb]
 \centering
@@ -2083,8 +2187,8 @@ users will probably be warned that their data are in a special format,
 be given the option to abort the application, and be directed to
 documentation for applications better suited to the data. 
 
-\subsection{$<${\bf COMPLEX\_ARRAY}$>$ Structure}
-\label{se:scomplex}
+\subsection{\xlabel{se_complex}$<${\bf COMPLEX\_ARRAY}$>$ Structure\label{se:scomplex}}
+
 HDS does not provide a $<${\bf \_COMPLEX}$>$ primitive type, and
 therefore if complex data are to be stored a $<${\bf COMPLEX\_ARRAY}$>$
 structure, defined in Table~\ref{ta:complex} must be used.
@@ -2117,8 +2221,8 @@ one element is flagged, the whole pixel should be regarded as undefined.
 The {[}{\bf ORIGIN]} components should match, but only {[}{\bf REAL.ORIGIN}{]}
 is used.
 
-\subsection{$<${\bf AXIS}$>$ Structure}
-\label{se:saxis}
+\subsection{\xlabel{se_axis}$<${\bf AXIS}$>$ Structure\label{se:saxis}}
+
 This structure has TYPE $<${\bf AXIS}$>$ and is used to
 store information describing the size and spacing of the
 pixels in a multi-dimensional data array.
@@ -2158,7 +2262,7 @@ Each value corresponds to the {\it centre} of a pixel.  For an
 $n$-dimensional data array, with no axis calibration, and equally spaced
 data, the Starlink standard is for the $n^{\rm th}$ pixel centre to be at
 $(n-1)$.5 in each axis, {\it e.g.}\  for display purposes
-({\it c.f.}\  SSN/22). However, in some applications the pixel
+({\it cf.}\  \xref{SSN/22}{ssn22}). However, in some applications the pixel
 index is adequate and clearer.  Programmers should take care to use
 the appropriate scheme.
 
@@ -2170,7 +2274,7 @@ the polynomial or spaced variant of TYPE \mbox{$<${\bf ARRAY}$>$}.
 \item [{[}LABEL{]}]
 This is a textual description of the co-ordinate type.  It may
 contain the ``control'' codes that are used by graphics packages
-to produce special characters --- backslashes {\it etc}.
+to produce special characters---backslashes {\it etc}.
 \item [{[}UNITS{]}]
 This is a textual description of the co-ordinate units.
 \item [{[}VARIANCE{]}]
@@ -2208,8 +2312,8 @@ axis-related information can be stored,
 spatial, temporal {\it etc.}
 \end{description}
 
-\subsection{$<${\bf QUALITY}$>$ Structure}
-\label{se:squality}
+\subsection{\xlabel{se_squality}$<${\bf QUALITY}$>$ Structure\label{se:squality}}
+
 This structure is used for storing data-quality information.
 
 \begin{table}[htb]
@@ -2243,10 +2347,10 @@ is ignored in deciding whether a pixel is bad or not)
 is assumed.
 \end{description}
 
-\subsection{$<${\bf HISTORY}$>$ Structure}
-\label{se:shistory}
+\subsection{\xlabel{se_shistory}$<${\bf HISTORY}$>$ Structure\label{se:shistory}}
+
 This structure has NAME
-{{[}{\bf HISTORY}{]} and
+{[}{\bf HISTORY}{]} and
 TYPE $<${\bf HISTORY}$>$.  Its components are shown in
 Table~\ref{ta:history}.
 
@@ -2326,8 +2430,7 @@ Note there are currently no variants
 of the $<${\bf HISTORY}$>$ and $<${\bf HIST\_REC}$>$
 structures.
 
-\section{The Extensible n-Dimensional-Data Format}
-\label{se:ndf}
+\xlabel{se_ndf}\section{The Extensible n-Dimensional-Data Format\label{se:ndf}}
 
 The most-common structure for data that are not instrument specific is
 what has become known as the {\it bulk-data frame}.  To avoid
@@ -2340,11 +2443,13 @@ has an optional
 TYPE of $<${\bf NDF}$>$ that will not be tested by general-purpose
 applications but is recommended to assist
 recognition by human readers of structure listings.
-NDFs may be structured recursively --- see the 
+NDFs may be structured recursively---see the 
 polarimetry example below, for example.
 
 It was not, in fact, possible to keep strictly to
-the rules in Section~\ref{se:newdesign} when
+the rules in 
+\latexelsehtml{Section~\ref{se:newdesign}}{\htmlref{Creating New
+Structures}{se:newdesign}} when
 designing
 the NDF structure;
 compromises were necessary in order to
@@ -2448,8 +2553,8 @@ can be stored in specialised extensions, yet to be defined.
 is false, applications may assume that
 {[}{\bf DATA\_ARRAY}{]} and {[}{\bf VARIANCE}{]} contain no magic-value
 pixels. If it is either true or absent, applications
-must either test for magic-value pixels or --- if incapable
-of performing bad-pixel processing --- give up.
+must either test for magic-value pixels or---if incapable
+of performing bad-pixel processing---give up.
 \item [{[}QUALITY{]}]  The data-quality values for the
 corresponding elements of {[}{\bf DATA\_ARRAY}{]}.
 Its TYPE is either $<${\bf narray}$>$ or $<${\bf QUALITY}$>$.
@@ -2483,7 +2588,9 @@ be defined separately and in many cases will belong
 to specific applications packages.
 Each extension must have a unique NAME, by which it is recognised.
 Its TYPE may be any one of the Starlink-defined standard TYPEs, or
-may a new one defined according to rules in Section~\ref{se:newdesign}.
+may a new one defined according to rules in 
+\latexelsehtml{Section~\ref{se:newdesign}.}{\htmlref{Creating New
+Structures.}{se:newdesign}}
 Each extension (with the NAME, TYPE and variants)
 must be registered with the Starlink Head of Applications.
 Further NDFs may be located within these structures, and these
@@ -2590,11 +2697,10 @@ element of which is an NDF.
 \item Merging two or more $<${\bf NDF}$>$ structures
 
 The merging of history records has been discussed in
-Section~\ref{se:shistory}, and the same approach
-is followed for other data
-objects within an $<${\bf NDF}$>$.
-Thus,
-cases are divided into (i)
+\latexelsehtml{Section~\ref{se:shistory},}{\htmlref{$<${\bf
+HISTORY}$>$ Structure,}{se:shistory}} and the same approach
+is followed for other data objects within an $<${\bf NDF}$>$.
+Thus, cases are divided into (i)
 those with a principal data array, where only the
 components of its $<${\bf NDF}$>$ structure are
 processed/copied to an output array, and
@@ -2608,8 +2714,8 @@ suggested that a common {\small ADAM} parameter name be assigned to this `princi
 $<${\bf NDF}$>$, {\it e.g.}\  MAIN\_ARRAY.
 \end{enumerate}
 
-\subsection{Polarimetry Example}
-\label{se:expolarimetry}
+\xlabel{se_expolarimetry}\subsection{Polarimetry Example\label{se:expolarimetry}}
+
 {\it Stokes parameters} are the most common method for storing and analysis
 of polarimetric data.  Here is an illustrative
 example of how they might be stored
@@ -2688,8 +2794,8 @@ If the default is taken, the application should look
 for the $<${\bf AXIS}$>$ structure in
 the normal place, {\it i.e.}\  within {[}{\bf STOKES\_Q.}{]} 
 
-\subsection{Simplified $<${\bf NDF}$>$ Structure}
-\label{se:sndf}
+\xlabel{se_sndf}\subsection{Simplified $<${\bf NDF}$>$ Structure\label{se:sndf}}
+
 The support software associated with the
 standard data structures described above
 will take a long time to develop. In the meantime, some astronomers
@@ -2744,11 +2850,10 @@ Mandatory.
 \item [{[}LABEL{]}]  No change from the normal $<${\bf AXIS}$>$ structure.
 \item [{[}UNITS{]}]  No change.
 \end{description}
-Applications must test pixels for magic values --- there is no
+Applications must test pixels for magic values---there is no
 {[}{\bf BAD\_PIXEL}{]} flag in the simplified $<${\bf NDF}$>$.
 
-\section{Comparison with Wright-Giddings proposals}
-\label{se:comparison}
+\xlabel{se_comparison}\section{Comparison with Wright-Giddings proposals\label{se:comparison}}
 
 The term ``structure'' in the Wright-Giddings (WG) proposals meant
 a collection of related data objects, so that one level of the hierarchy
@@ -2834,11 +2939,12 @@ Calibration data should be situated in {[}{\bf MORE}{]} within an extension, per
 which shadows the main {[}{\bf AXIS}{]} structures.
 \end{description}
 
-\section{Creating new structures}
-\label{se:newdesign}
+\xlabel{se_newdesign}\section{Creating new structures\label{se:newdesign}}
 
 The methods presented in this section are intended to ensure that the
-rules given in Section~\ref{se:overview} are adhered to. Particularly, it
+rules given in 
+\latexelsehtml{Section~\ref{se:overview}}{\htmlref{Overview}{se:overview}}
+are adhered to. Particularly, it
 makes sure that standard structures are used wherever possible, and
 therefore encourages the building of new structures (when needed) by
 gathering together existing structures, so ensuring the maximum
@@ -2851,8 +2957,8 @@ HDS hierarchy then provides a natural barrier between separate
 structures, and ensures that further components can later be added at
 any level without risking naming conflicts.  
 
-\subsection{Definitions}
-\label{se:newdef}
+\xlabel{se_newdef}\subsection{Definitions\label{se:newdef}}
+
 In the description
 of the design process the total hierarchy of structures is called a
 {\it dataset} to distinguish it from a single component structure. 
@@ -2861,8 +2967,8 @@ The term {\it structure} refers to a set of related data items; it
 corresponds to a single level of a dataset.
 Often a dataset will consist simply of a single structure.
 
-\subsection{Algorithm}
-\label{se:newalg}
+\xlabel{se_newalg}\subsection{Algorithm\label{se:newalg}}
+
 A summary of the algorithm to be used when creating a new dataset is 
 given below.  The circled numbering refers to expanded notes in the next 
 subsection.
@@ -2895,8 +3001,8 @@ Start at the most deeply nested level of the hierarchy\\
 {\bf endfor} \\
 \end{tabbing}
 
-\subsection{Explanatory Notes}
-\label{se:newexn}
+\xlabel{se_newexn}\subsection{Explanatory Notes\label{se:newexn}}
+
 \begin{enumerate}
 \item
 \begin{itemize}
@@ -3009,7 +3115,7 @@ define what will happen to them in all circumstances.
 \item
 The software should obey all the conventions appropriate to
 the new structure (and any other structures it uses).  When accessing a
-structure, software should first check its TYPE --- this specifies how the
+structure, software should first check its TYPE---this specifies how the
 structure contents are to be interpreted. Any component not covered by
 the structure definition should be completely ignored. 
 \item
@@ -3067,7 +3173,7 @@ problem is broken into manageable
 pieces, the complexity of which does not exceed our software-writing
 abilities.
 
-\section{Acknowledgements}
+\section{Acknowledgments}
 \label{se:acknow}
 
 Parts of this document have been adapted from earlier proposals. The
@@ -3095,4 +3201,3 @@ di Trieste, p.445.
 \vspace{-2mm}
 \end{verse}
 \end{document}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
