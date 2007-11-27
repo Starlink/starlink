@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sgp/004</path>
+  <description>Starlink C Programming Standard</description>
+  <abstract><p>
+    This describes Starlink's coding standard for the C language.
+    The advice wis grouped into five sections concerning 
+    Starlink naming conventions, programming advice, program design, 
+    machine independence, and preprocessor advice respectively.
+    The suggestions are made with maintainability, portability and 
+    efficiency in mind.
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Anne Charles</name>
+      <name>Jo Murray</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1990, 1994</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
