@@ -227,6 +227,12 @@ f     The SkyFrame class does not define any new routines beyond those
 *        Compare target and template AlignSystem values in Match, rather
 *        than comparing target and result AlignSystem values in MakeSkyMapping
 *        (since result is basically a copy of target).
+*     27-NOV-2007 (DSB):
+*        - Modify SetSystem to ensure that SkyRef and SkyRefP position are
+*        always transformed as absolute values, rather than as offset
+*        values.
+*        - Modify SubMatch so that a value of zero is assumed for
+*        AlignOffset when restoring thre integrity of a FrameSet.
 *class--
 */
 
@@ -7619,10 +7625,14 @@ static void SetSystem( AstFrame *this_frame, AstSystemType system ) {
    AstSkyFrame *sfrm;            /* Copy of original SkyFrame */
    AstSkyFrame *this;            /* Pointer to SkyFrame structure */
    double xin[ 2 ];              /* Axis 0 values */
-   double yin[ 2 ];              /* Axis 1 values */
    double xout[ 2 ];             /* Axis 0 values */
+   double yin[ 2 ];              /* Axis 1 values */
    double yout[ 2 ];             /* Axis 1 values */
+   int aloff;                    /* The AlignOffset attribute value */
+   int aloff_set;                /* Is the AlignOffset attribute set? */
    int skyref_set;               /* Is either SkyRef attribute set? */
+   int skyrefis;                 /* The SkyRefIs attribute value */
+   int skyrefis_set;             /* Is the SkyRefIs attribute set? */
    int skyrefp_set;              /* Is either SkyRefP attribute set? */
 
 /* Check the global error status. */
@@ -7645,12 +7655,17 @@ static void SetSystem( AstFrame *this_frame, AstSystemType system ) {
 /* Now modify the SkyRef and SkyRefP attributes if necessary. */
    if( sfrm ) {
 
-/* Save the SkyRef and SkyRefP values. */
+/* Save the AlignOffset, SkyRefIs, SkyRef and SkyRefP values. */
+      aloff_set = astTestAlignOffset( sfrm );
+      aloff = astGetAlignOffset( sfrm );
+      skyrefis_set = astTestSkyRefIs( sfrm );
+      skyrefis = astGetSkyRefIs( sfrm );
+
       xin[ 0 ] = astGetSkyRef( sfrm, 0 );
       xin[ 1 ] = astGetSkyRefP( sfrm, 0 );
       yin[ 0 ] = astGetSkyRef( sfrm, 1 );
       yin[ 1 ] = astGetSkyRefP( sfrm, 1 );
-
+      
 /* Clear the SkyRef values to avoid infinite recursion in the following
    call to astConvert. */
       if( skyref_set ) {
@@ -7659,6 +7674,11 @@ static void SetSystem( AstFrame *this_frame, AstSystemType system ) {
          astClearSkyRef( this, 0 );
          astClearSkyRef( this, 1 );
       }
+
+/* Also set AlignOffset and SkyRefIs so that the following call to
+   astConvert does not align in offset coords. */
+      astSetAlignOffset( sfrm, 0 );
+      astSetSkyRefIs( sfrm, IGNORED_REF );
 
 /* Get the Mapping from the original System to the new System. Invoking 
    astConvert will recursively invoke SetSystem again. This is why we need
@@ -7686,6 +7706,19 @@ static void SetSystem( AstFrame *this_frame, AstSystemType system ) {
          if( skyrefp_set ) {
             astSetSkyRefP( this, 0, xout[ 1 ] );
             astSetSkyRefP( this, 1, yout[ 1 ] );
+         }
+
+/* Restore the original SkyRefIs and AlignOffset values. */
+         if( aloff_set ) {
+            astSetAlignOffset( this, aloff );
+         } else {
+            astClearAlignOffset( this );
+         }
+
+         if( skyrefis_set ) {
+            astSetSkyRefIs( this, skyrefis );
+         } else {
+            astClearSkyRefIs( this );
          }
 
 /* Free resources. */
@@ -8052,15 +8085,28 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
          align_sys = astGetAlignSystem( target );
       }
 
-/* If the template is a SkyFrame and both template and target want alignment 
-   to occur in the offset coordinate system, then use UnitMap to connect
-   them. */
-      if( astGetAlignOffset( target ) && template && astIsASkyFrame( template ) ){
-         if( astGetAlignOffset( (AstSkyFrame *) template ) ) {
-            match = 1;
-            *map = (AstMapping *) astUnitMap( 2, "" );
+/* See whether alignment occurs in offset coordinates or absolute
+   coordinates. If the current call to this function is part of the 
+   process of restoring a FrameSet's integrity following changes to 
+   the FrameSet's current Frame, then we ignore the setting of the 
+   AlignOffset attributes and use 0. This ensures that when the System 
+   attribute (for instance) is changed via a FrameSet pointer, the 
+   Mappings within the FrameSet are modified to produce offsets in the  
+   new System. If we are not currently restoring a FrameSet's integrity,
+   then we align in offsets if the template is a SkyFrame and both template 
+   and target want alignment to occur in the offset coordinate system. In 
+   this case we use a UnitMap to connect them. */
+      if( ( astGetFrameFlags( target_frame ) & AST__INTFLAG ) == 0 ) { 
+         if( astGetAlignOffset( target ) && 
+             astGetSkyRefIs( target ) != IGNORED_REF && 
+             template && astIsASkyFrame( template ) ){
+            if( astGetAlignOffset( (AstSkyFrame *) template ) &&
+                astGetSkyRefIs( (AstSkyFrame *) template ) != IGNORED_REF ) {
+               match = 1;
+               *map = (AstMapping *) astUnitMap( 2, "" );
+            }
          }
-      }
+      }  
 
 /* Otherwise, generate a Mapping that takes account of changes in the sky 
    coordinate system (equinox, epoch, etc.) between the target SkyFrame and 
@@ -9037,12 +9083,15 @@ f     AST_FINDFRAME or AST_CONVERT) as a template to match another (target)
 *     SkyFrame. It determines the coordinate system in which the two 
 *     SkyFrames are aligned if a match occurs.
 *
-*     If the template and target SkyFrames both have a non-zero value
-*     for AlignOffset, then alignment occurs within the offset coordinate
-*     systems (that is, a UnitMap will always be used to align the two
-*     SkyFrames). If either the template or target SkyFrame has zero (the 
-*     default value) for AlignOffset, then alignment occurring within the 
-*     coordinate system specified by the AlignSystem attribute.
+*     If the template and target SkyFrames both have defined offset coordinate
+*     systems (i.e. the SkyRefIs attribute is set to either "Origin" or "
+*     Pole"), and they both have a non-zero value for AlignOffset, then 
+*     alignment occurs within the offset coordinate systems (that is, a 
+*     UnitMap will always be used to align the two SkyFrames). If either 
+*     the template or target SkyFrame has zero (the default value) for 
+*     AlignOffset, or if either SkyFrame has SkyRefIs set to "Ignored", then 
+*     alignment occurring within the coordinate system specified by the 
+*     AlignSystem attribute.
 
 *  Applicability:
 *     SkyFrame
