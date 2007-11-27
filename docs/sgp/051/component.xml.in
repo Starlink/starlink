@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sgp/051</path>
+  <description>Starlink Software Maintenance Procedures</description>
+  <abstract><p>
+     This document sets out the steps involved in maintaining and
+     developing the Starlink Software Collection.  The intended
+     audience is all those involved in maintenance and development of
+     Starlink software.  Some sections will be of particular relevance
+     to programmers while other sections will be of interest to those
+     involved in software distribution.
+
+     It details the process from the passing of a bug report to the
+     support programmer through to the final release of a fix to a
+     package.  It also specifies the steps required for handling a new
+     package, porting of existing packages to new platforms, and
+     developing updates to packages.
+
+     There are also sections on beta-testing packages, and the production of
+     CD-ROMs.
+
+     It does not cover Base Set software, nor does it detail the use of
+     Starlink standard makefiles, and does not specify the mechanics of the
+     procedures, which evolve with operational demands.
+  </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>M.J. Bly</name>
+      <name>R.F. Warren-Smith</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1997</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
