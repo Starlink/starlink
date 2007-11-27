@@ -3000,13 +3000,14 @@ therefore contain the 16 output NDFs in components \verb+I1+ to
 \begin{itemize}
 \item If an application asks for a group of input data files, the following 
 are all possible responses:
+\medskip
 
 \small
 \begin{verbatim}
    b1,b2,b3,b4
 \end{verbatim}
 \normalsize
-\vspace{-3mm}
+\latexonly{\vspace{-4mm}}
 
 This means ``Use the NDFs stored in files \verb+b1.sdf+, \verb+b2.sdf+,
 \verb+b3.sdf+ and \verb+b4.sdf+''.  If \htmlref{`on-the-fly format
@@ -3026,42 +3027,44 @@ the corresponding file type in the group expression.  An example such as:
    b1.fit,b2.fit,b3.fit,b4.fit
 \end{verbatim}
 \normalsize
-
+\latexonly{\vspace{-4mm}}
 would read just the specified FITS files.
+\medskip
 
 \small
 \begin{verbatim}
    cena_b1-
 \end{verbatim}
 \normalsize
-\vspace{-3mm}
-
+\latexonly{\vspace{-4mm}}
 This means ``Use \verb+cena_b1.sdf+ and then (because of the hyphen
 at the end) ask the user for more data files''.
+\medskip
 
 \small
 \begin{verbatim}
    *
 \end{verbatim}
 \normalsize
-\vspace{-3mm}
+\latexonly{\vspace{-4mm}}
 This means ``Use all accessible data files in the current directory''. 
+\medskip
 
 \small
 \begin{verbatim}
    hh1_b1s*_ds
 \end{verbatim}
 \normalsize
-\vspace{-3mm}
+\latexonly{\vspace{-4mm}}
 This means ``Use \verb+hh1_b1s1_ds.sdf+, \verb+hh1_b1s2_ds.sdf+, \emph{etc.}''.
+\medskip
 
 \small
 \begin{verbatim}
    hh1_b[12]s*_ds
 \end{verbatim}
 \normalsize
-\vspace{-3mm}
-
+\latexonly{\vspace{-4mm}}
 This means ``Use \verb+hh1_b1s1_ds.sdf+, \verb+hh1_b1s2_ds.sdf+,
 \emph{etc.}, and also \verb+hh1_b2s1_ds.sdf+, \verb+hh1_b2s2_ds.sdf+,
 \emph{etc.}''.  The string {\tt "[12]"} matches either a single
@@ -3069,61 +3072,65 @@ character {\tt "1"}
 or a single character {\tt "2"}.  The string {\tt "[0-9]"} would match any single
 digit character.  The string {\tt "[a-z]"} would match any single lowercase
 alphabetical character.
+\medskip
 
 \small
 \begin{verbatim}
    data.fit[12]
 \end{verbatim}
 \normalsize
-\vspace{-3mm}
-
+\latexonly{\vspace{-4mm}}
 This means ``Use files \verb+data.fit1+ and \verb+data.fit2+ if they
 exist.  If neither of these files exists, use the twelth image extension 
 in the multi-extension FITS file \verb+data.fit+''.
-
+\medskip
 
 \small
 \begin{verbatim}
    ^files.lis
 \end{verbatim}
 \normalsize
-\vspace{-3mm}
+\latexonly{\vspace{-4mm}}
 This means ``Read the names of data files from the text file
 \verb+files.lis+.''
+\medskip
 
 \small
 \begin{verbatim}
    ../data/*
 \end{verbatim}
 \normalsize
-\vspace{-3mm}
+\latexonly{\vspace{-4mm}}
 This means ``Use all accessible data files contained in the directory 
 \verb+../data+''.
+\medskip
 
 \small
 \begin{verbatim}
    data_{new,old,back}
 \end{verbatim}
 \normalsize
-\vspace{-3mm}
+\latexonly{\vspace{-4mm}}
 This means ``Use files \verb+data_new.sdf+, \verb+data_old.sdf+ and
 \verb+data_back.sdf+''.
+\medskip
 
 \small
 \begin{verbatim}
    {^files}_A
 \end{verbatim}
 \normalsize
-\vspace{-3mm}
+\latexonly{\vspace{-4mm}}
 This means ``Read names of data files from text file \verb+files+ and 
 append \verb+_A+ to the end of each one''.
+\medskip
 
 \small
 \begin{verbatim}
    `grep -l "OBJECT  = 'm57'" *.fit`
 \end{verbatim}
 \normalsize
-\vspace{-3mm}
+\latexonly{\vspace{-4mm}}
 
 The string is enclosed in back quotes (\verb+`+) which causes the string
 to be executed as a shell command, and the resulting output to be used as
@@ -3139,32 +3146,35 @@ are possible responses:
    file1,file2,file3
 \end{verbatim}
 \normalsize
-\vspace{-3mm}
+\latexonly{\vspace{-4mm}}
 This means ``Create \verb+file1.sdf+, \verb+file2.sdf+ and \verb+file3.sdf+''.
+\medskip
 
 \small
 \begin{verbatim}
    ^out.dat
 \end{verbatim}
 \normalsize
-\vspace{-3mm}
+\latexonly{\vspace{-4mm}}
 This means ``Read the names of the output data files from text file \verb+out.dat+''.
+\medskip
 
 \small
 \begin{verbatim}
    *_ds
 \end{verbatim}
 \normalsize
-\vspace{-3mm}
+\latexonly{\vspace{-4mm}}
 This means ``Append the string {\tt "\_ds"} to the end of all 
                       the input data file names.''
+\medskip
 
 \small
 \begin{verbatim}
    ../bk/*|_ds|_bk|
 \end{verbatim}
 \normalsize
-\vspace{-3mm}
+\latexonly{\vspace{-4mm}}
 This means ``Substitute the string {\tt "\_bk"} for all  occurrences of the string
 {\tt "\_ds"} in the  input data file names, and put the files in 
 directory \verb+../bk+''.
