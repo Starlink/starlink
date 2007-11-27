@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sgp/021</path>
+  <description>Starlink Software Distribution Policy</description>
+  <abstract><p>
+     This paper describes Starlink's software distribution policy and
+     the conditions of use of the collection. There is also a section
+     giving contact information of some of the commercial software
+     Starlink provides for its UK sites but may not redistribute.
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>M.J.Bly</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1981-2000</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
