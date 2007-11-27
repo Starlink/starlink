@@ -176,7 +176,9 @@ itcl::class gaia::GaiaStartup {
       foreach prop [$props_ get_named_keys Gaia] {
          set value [$props_ get_property $prop]
          set key [$props_ get_unnamed_key Gaia $prop]
-         set values_($this,$key) $value
+         if { $value != {} } {
+            set values_($this,$key) $value
+         }
       }
    }
 
@@ -225,6 +227,10 @@ itcl::class gaia::GaiaStartup {
       set values_($this,with_zoom_window) 1
       set values_($this,zoom_factor) 4
       set values_($this,autoscale) 0
+
+      set values_($this,labelfont) $::gaia_fonts(labelfont)
+      set values_($this,textfont) $::gaia_fonts(textfont)
+      set values_($this,wcsfont) $::gaia_fonts(wcsfont)
    }
 
    #  Update the properties object to the local values and cause a
@@ -236,7 +242,7 @@ itcl::class gaia::GaiaStartup {
                    transient_tools transient_spectralplot quiet_exit \
                    min_scale max_scale zoom_factor default_cut default_cmap \
                    default_itt linear_cartesian always_merge check_for_cubes \
-                   isize maxshift autoscale" {
+                   isize maxshift autoscale labelfont textfont wcsfont" {
          $props_ set_named_property Gaia $key $values_($this,$key)
       }
       $props_ save_properties
@@ -507,7 +513,7 @@ itcl::class gaia::GaiaStartup {
             -command [code $this set_value_ min_scale]
       }
       add_short_help $itk_component(minscale) \
-         {Minimum zoom scale (-ve for smaller)}
+         {Minimum zoom scale (-ve for smaller, requires restart)}
       pack $itk_component(minscale) -side top -fill x
 
       #  Maximum zoom scale.
@@ -621,25 +627,39 @@ itcl::class gaia::GaiaStartup {
          {Default colourmap (requires restart)}
       pack $itk_component(defaultcmap) -side top -fill x -expand 0
 
-      #  Default itt
-      itk_component add defaultitt {
-         LabelMenu $w_.itt -text "Default itt:" \
+      #  Fonts, label, text and WCS.
+      itk_component add labelfont {
+         LabelEntry $w_.labelfont \
+            -text "Label font:" \
             -labelwidth $lwidth \
-            -variable [scope values_($this,default_itt)]
+            -value $values_($this,labelfont) \
+            -textvariable [scope values_($this,labelfont)]
       }
-      set itt_files [$itk_option(-image) itt list]
-      foreach map $itt_files {
-         set map [file rootname $map]
-         $itk_component(defaultitt) add -label $map \
-            -command [code $this set_value_ default_itt $map]
-      }
-      add_short_help $itk_component(defaultitt) \
-         {Default intensity transfer table (requires restart)}
-      pack $itk_component(defaultitt) -side top -fill x -expand 0
+      add_short_help $itk_component(labelfont) \
+         {Font used for labels (requires restart)}
+      pack $itk_component(labelfont) -side top -fill x -expand 0
 
-      #  Make defaults show
-      set values_($this,default_cmap) $values_($this,default_cmap)
-      set values_($this,default_itt) $values_($this,default_itt)
+      itk_component add textfont {
+         LabelEntry $w_.textfont \
+            -text "Text font:" \
+            -labelwidth $lwidth \
+            -value $values_($this,textfont) \
+            -textvariable [scope values_($this,textfont)]
+      }
+      add_short_help $itk_component(textfont) \
+         {Font used for fixed width text (requires restart)}
+      pack $itk_component(textfont) -side top -fill x -expand 0
+
+      itk_component add wcsfont {
+         LabelEntry $w_.wcsfont \
+            -text "WCS font:" \
+            -labelwidth $lwidth \
+            -value $values_($this,wcsfont) \
+            -textvariable [scope values_($this,wcsfont)]
+      }
+      add_short_help $itk_component(wcsfont) \
+         {Font used for WCS labels (requires restart)}
+      pack $itk_component(wcsfont) -side top -fill x -expand 0
    }
 
    #  Configuration options: (public variables)

@@ -42,12 +42,11 @@ proc gaia::setXdefaults {} {
     #  Overrides of other defaults (cat/skycat/rtd/util).
     option add *LabelMenu.relief raised
 
-    #  Define fonts that are generally available and work well on
-    #  Solaris (the font rendering on Solaris is very slow...).
-    #  Other systems seem to handle these OK?
-    set labelFont variable
-    set textFont  fixed
-    set wcsFont   -*-symbol-*-*-*-*-*-140-*-*-*-*-*-*
+    #  Use three main fonts for the UI. One for labels, monospaced text
+    #  and the special symbols.
+    set labelFont $::gaia_fonts(labelfont)
+    set textFont $::gaia_fonts(textfont)
+    set wcsFont $::gaia_fonts(wcsfont)
 
     option add *Font        $labelFont
     option add *labelFont   $labelFont
