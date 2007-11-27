@@ -1326,6 +1326,10 @@ F77_SUBROUTINE(dat_move)( CHARACTER(locator1),
    
 /* Enter routine.	*/
 
+/* Since the input locator is modified for output, abort early
+   to prevent datExportFloc trashing the locator on bad status */
+   if (*status != DAT__OK) return;
+
 /* Import the first locator string                  */
    datImportFloc( locator1, locator1_length, &locator1_c, status );
 
@@ -1955,6 +1959,10 @@ F77_SUBROUTINE(dat_prmry)( F77_LOGICAL_TYPE *set,
    int set_c;
    int primary_c;
    
+/* Since the input locator is modified for output, abort early
+   to prevent datExportFloc trashing the locator on bad status */
+   if (*status != DAT__OK) return;
+
 /* Enter routine.	*/
    if ( F77_ISTRUE( *set ) ) {
       set_c = TRUE;
