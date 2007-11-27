@@ -9,118 +9,140 @@
 
 <h2 align=center><font color=red>Configuring startup options</font></h2>
 
-<p>This window allows you to set the various options that GAIA supports
-when starting up. These will be saved when applied and then used the
-next time that GAIA starts. All these options can also be specified on
-the command-line, or by using X properties.
-
-<ul>
-      <li><b>Use a floating panel (-float_panel)</b><br>
-        Create the control panel area in a detached window.</li>
-
-      <li><b>Panel orientation (-panel_orient)</b><br >
-        Set the orientation for the properties panel. If vertical
-        if will appear on the left (makes the display area more square on wide
-        display, moves the panel from under the spectral plot).
+    <p>This window allows you to set the various options that GAIA supports
+    when starting up. These will be saved when applied and then used the next
+    time that GAIA starts. All these options can also be specified on the
+    command-line, or by using X properties.
+    </p>
+    <ul>
+      <li><b>Use a floating panel (-float_panel)</b><br> Create the control
+      panel area in a detached window.</li>
+      
+      <li><b>Panel orientation (-panel_orient)</b><br > Set the orientation
+      for the properties panel. If vertical if will appear on the left (makes
+      the display area more square on wide display, moves the panel from under
+      the spectral plot).
       </li>
       
-      <li><b>Display a zoom window (-with_zoom_window)</b><br>
-        Display, or not, the zoom window in the control panel.</li>
+      <li><b>Display a zoom window (-with_zoom_window)</b><br> Display, or
+      not, the zoom window in the control panel.</li>
       
-      <li><b>Display a panner window (-with_pan_window)</b><br>
-        Display, or not, the panner window in the control panel.</li>
+      <li><b>Display a panner window (-with_pan_window)</b><br> Display, or
+      not, the panner window in the control panel.</li>
 
-      <li><b>Display a color ramp (-with_colorramp)</b><br>
-        Display, or not, the color ramp shown at the bottom of the
-        main window.</li> 
+      <li><b>Display a color ramp (-with_colorramp)</b><br> Display, or not,
+      the color ramp shown at the bottom of the main window.</li>
 
-      <li><b>Focus follows mouse (-focus_follows_mouse)</b><br>
-        Image and entry focus follows mouse pointer, alternative is to click
-        on these first.</li>
+      <li><b>Focus follows mouse (-focus_follows_mouse)</b><br> Image and
+      entry focus follows mouse pointer, alternative is to click on these
+      first.</li>
       
-      <li><b>Show image scrollbars (-scrollbars)</b><br>
-        Display, or not, the scrollbars around the main image.</li>
+      <li><b>Show image scrollbars (-scrollbars)</b><br> Display, or not, the
+      scrollbars around the main image.</li>
 
-      <li><b>Make toolboxes transient (-transient_tools)</b><br>
-        Ask the window manager to make any toolboxes transient, or
-        not. Transient windows may remain permanently above their parent
-        window (depends on window manager properties).</li>
+      <li><b>Make toolboxes transient (-transient_tools)</b><br> Ask the
+      window manager to make any toolboxes transient, or not. Transient
+      windows may remain permanently above their parent window (depends on
+      window manager properties).</li>
 
       <li><b>Make spectral plot transient (-transient_spectralplot)</b><br>
-        Ask the window manager to make the spectral plot windows transient, or
-        not. Transient windows may remain permanently above their parent
-        window (depends on window manager properties).</li>
+      Ask the window manager to make the spectral plot windows transient, or
+      not. Transient windows may remain permanently above their parent window
+      (depends on window manager properties).</li>
 
-      <li><b>Exit without prompt (-quiet_exit)</b><br>
-        When closing GAIA using the <tt>Exit</tt> item ask for confirmation
-        before exiting, or not. Note that it is still possible to close GAIA
-        without a request, if this is the last window and you use
-        <tt>Close</tt>, or the window manager closes the last window.</li>
+      <li><b>Exit without prompt (-quiet_exit)</b><br> When closing GAIA using
+      the <tt>Exit</tt> item ask for confirmation before exiting, or not. Note
+      that it is still possible to close GAIA without a request, if this is
+      the last window and you use <tt>Close</tt>, or the window manager closes
+      the last window.</li>
 
-      <li><b>Display milli-arcsecs (-extended_precision)</b><br>
-        The default precision for RA is three decimal places in
-        seconds of time, for DEC two decimal places. If this option is
-        selected an extra decimal place is added to give roughly
-        milli-arcsecond resolution.
+      <li><b>Display milli-arcsecs (-extended_precision)</b><br> The default
+      precision for RA is three decimal places in seconds of time, for DEC two
+      decimal places. If this option is selected an extra decimal place is
+      added to give roughly milli-arcsecond resolution.
         </li>
 
-      <li><b>Show HDU chooser (-show_hdu_chooser)</b><br>
-        By default when you open a FITS or HDS file that contains more
-        than one image the HDU chooser appears so that you can select between
-        the images. This window can also be opened for any image using
-        the "Select FITS HDU/NDF..." item in the "View" menu. On some
-        occasions (mainly when running GAIA using remote control) this
-        behaviour is unwanted and the chooser should remain inactive.
+      <li><b>Show HDU chooser (-show_hdu_chooser)</b><br> By default when you
+      open a FITS or HDS file that contains more than one image the HDU
+      chooser appears so that you can select between the images. This window
+      can also be opened for any image using the "Select FITS HDU/NDF..." item
+      in the "View" menu. On some occasions (mainly when running GAIA using
+      remote control) this behaviour is unwanted and the chooser should remain
+      inactive.
       </li>
 
-      <li><b>Always merge MEF headers (-always_merge)</b><br>
-        When looking for a WCS in a FITS extension some of the details may be
-        only present in the primary data units headers (dates and systems
-        usually). When this is true you will want to merge the primary and
-        extension headers. An option as this can cause unanticipated problems.
+      <li><b>Always merge MEF headers (-always_merge)</b><br> When looking for
+      a WCS in a FITS extension some of the details may be only present in the
+      primary data units headers (dates and systems usually). When this is
+      true you will want to merge the primary and extension headers. An option
+      as this can cause unanticipated problems.
       </li>
 
-      <li><b>Check for cubes (-check_for_cubes)</b><br>
-        When a data file is opened, from the the command-line, open dialog or
-        Go history menu, check if it contains a cube and if so open it using
-        the cube toolbox. It's more efficient to open such a file directly
-        from the cube toolbox, so this is an option.
+      <li><b>Check for cubes (-check_for_cubes)</b><br> When a data file is
+      opened, from the the command-line, open dialog or Go history menu, check
+      if it contains a cube and if so open it using the cube toolbox. It's
+      more efficient to open such a file directly from the cube toolbox, so
+      this is an option.
       </li>
 
-      <li><b>Minimum zoom (-min_zoom)</b><br>
-        The lowest zoom factor to be offered in the <tt>Scale:</tt>
-        menu. Negative values are lower factors.
-        </li>
-
-      <li><b>Maximum zoom (_max_zoom)</b><br>
-        The highest zoom factor to be offered in the <tt>Scale:</tt>
-        menu. Note that the <tt>Scale:</tt> menu may run off the edges
-        of the display if the difference between the minimum zoom and
-        this value is too large.
-        </li>
-
-      <li><b>Zoom factor (-zoom_factor)</b><br>
-        The zoom factor used in the zoom window. 
-        </li>
-
-      <li><b>Default cut (-default_cut)</b><br>
-        The default percentile cut used when opening an image. Note that this
-        only apply to images (files) that have not already been opened. Images
-        that have already been opened use the value stored in the history.
-        To clear the history remove the file <tt>$HOME/.skycat/history or</tt>
-        use the <tt>"Data Servers"->"History..."</tt> window.
+      <li><b>Minimum zoom (-min_zoom)</b><br> The lowest zoom factor to be
+      offered in the <tt>Scale:</tt> menu. Negative values are lower factors.
       </li>
 
-      <li><b>Default colormap (-default_cmap)</b><br>
-        The colormap to be used by default. Note that this isn't as
-        useful as it might seem as images previously viewed will be
-        shown with the colormap they where last displayed with, and
-        the default colormap becomes the one last selected.
+      <li><b>Maximum zoom (_max_zoom)</b><br> The highest zoom factor to be
+      offered in the <tt>Scale:</tt> menu. Note that the <tt>Scale:</tt> menu
+      may run off the edges of the display if the difference between the
+      minimum zoom and this value is too large.
       </li>
 
-      <li><b>Default itt (-default_itt)</b><br>
-        The default intensity transfer table (the notes about
-        colormaps also apply to this option).
+      <li><b>Zoom factor (-zoom_factor)</b><br> The zoom factor used in the
+      zoom window.
+      </li>
+
+      <li><b>Default cut (-default_cut)</b><br> The default percentile cut
+      used when opening an image. Note that this only apply to images (files)
+      that have not already been opened. Images that have already been opened
+      use the value stored in the history.  To clear the history remove the
+      file <tt>$HOME/.skycat/history or</tt> use the <tt>"Data
+      Servers"->"History..."</tt> window.
+      </li>
+
+      <li><b>Default colormap (-default_cmap)</b><br> The colormap to be used
+      by default. Note that this isn't as useful as it might seem as images
+      previously viewed will be shown with the colormap they where last
+      displayed with, and the default colormap becomes the one last selected.
+      </li>
+
+      <li><b>Default itt (-default_itt)</b><br> The default intensity transfer
+      table (the notes about colormaps also apply to this option).
+      </li>
+
+      <li><b>Label font (-labelfont)</b><br> The font used in the many labels
+      in the GAIA interface. You may need to change this if your
+      <tt>variable</tt> font doesn't match the expected size (usually 12
+      pixel). Any font reported by the <tt>xlsfonts</tt> or selected by the
+      <tt>xfontsel</tt> commands can be used, as can Tcl generic fonts
+      (see the section <tt>n</tt> font man page, a good default may be
+      </tt>"Helvetica -12 bold"</tt>).
+      </li>
+
+      <li><b>Text font (-textfont)</b><br> The font used in the many text
+      reports in the GAIA interface. You may need to change this if your
+      <tt>fixed</tt> font doesn't match the expected size (usually 12
+      pixel). Any font reported by the <tt>xlsfonts</tt> or selected by the
+      <tt>xfontsel</tt> commands can be used, as can Tcl generic fonts (see
+      the section <tt>n</tt> font man page, a good default may be </tt>"Fixed
+      -12"</tt>).
+      </li>
+
+      <li><b>WCS font (-labelfont)</b><br> The font used in the labels showing
+      alpha and delta as symbols in the GAIA interface. You may need to change
+      this if the default font doesn't match the expected size (usually 14
+      pixel). Any font reported by the <tt>xlsfonts</tt> or selected by the
+      <tt>xfontsel</tt> commands can be used, as can Tcl generic fonts, but
+      the alpha and delta labels should be the <tt>a</tt> and <tt>d</tt>
+      characters (see the section <tt>n</tt> font man page, a good default may
+      be </tt>"Symbol -14"</tt>).
       </li>
 </ul>
 
