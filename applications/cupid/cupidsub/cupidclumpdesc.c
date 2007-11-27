@@ -164,6 +164,9 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 *     14-JUN-2007 (DSB):
 *        Make "ncomp" static. Fixes spurious values appearing in the
 *        extra columsn created using the ExtraCols config parameter.
+*     27-NOV-2007 (DSB):
+*        If the min and max value in the clump are equal, use uniform
+*        weighting.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -182,14 +185,15 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
    double *pd;              /* Pointer to next element of data array */
    double *ret;             /* Returned list of parameters */
    double csw;              /* Clump size in WCS units */
-   double d;                /* Height above background */
+   double d;                /* Height above background (the pixel weight) */
    double dmax;             /* Max value in data array */
    double dmin;             /* Min value in data array */
    double outlier[ 3 ];     /* Offset position */
    double peakfactor;       /* Factor by which to increase the peak value */
    double pixpos[ 3 ][ 5 ]; /* Pixel coord positions */
    double pixvol;           /* Volume of 1 cubic pixel in WCS units */
-   double s;                /* Sum of weights */
+   double sd;               /* Sum of weights */
+   double s;                /* Sum of data values */
    double sx2;              /* Sum of weighted squared X pixel indices */
    double sx;               /* Sum of weighted X pixel indices */
    double sy2;              /* Sum of weighted squared X pixel indices */
@@ -432,14 +436,24 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
       sy2 = 0;
       sz2 = 0;
       s = 0;
+      sd = 0;
       n = 0;
       pd = ipd;
       for( k = lbnd[ 2 ]; k <= ubnd[ 2 ]; k++ ) {
          for( j = lbnd[ 1 ]; j <= ubnd[ 1 ]; j++ ) {
             for( i = lbnd[ 0 ]; i <= ubnd[ 0 ]; i++, pd++ ) {
                if( *pd != VAL__BADD ) {
-                  d = *pd - dmin;
 
+/* Use the height of the pixel above the miniumum value as the weight for
+   this axis value. If all pixels have the same value use a uniform
+   weight of 1.0. */
+                  if( dmax > dmin ) {
+                     d = *pd - dmin;
+                  } else {
+                     d = 1.0;
+                  }
+
+/* update the weighted sums. */
                   sx += d*i;
                   sy += d*j;
                   sz += d*k;
@@ -448,7 +462,9 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
                   sy2 += d*j*j;
                   sz2 += d*k*k;
 
-                  s += d;
+                  sd += d;
+
+                  s += *pd;
 
                   n++;
                }            
@@ -459,9 +475,9 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 /* Calculate and store the clump parameters, using pixel units initially. */
       if( s != 0 ) {
          ret[ 0 ] = px - 0.5;
-         ret[ ndim ] = sx/s;
+         ret[ ndim ] = sx/sd;
 
-         v0 = sx2/s - ret[ ndim ]*ret[ ndim ];
+         v0 = sx2/sd - ret[ ndim ]*ret[ ndim ];
          if( v0 <= 0.0 ) v0 = 0.25;
 
          v = v0 - beamcorr[ 0 ]*beamcorr[ 0 ]/5.5451774;
@@ -476,9 +492,9 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 
          if( ndim > 1 ) {
             ret[ 1 ] = py - 0.5;
-            ret[ 1 + ndim ] = sy/s;
+            ret[ 1 + ndim ] = sy/sd;
 
-            v0 = sy2/s - ret[ 1 + ndim ]*ret[ 1 + ndim ];
+            v0 = sy2/sd - ret[ 1 + ndim ]*ret[ 1 + ndim ];
             if( v0 <= 0.0 ) v0 = 0.25;
 
             v = v0 - beamcorr[ 1 ]*beamcorr[ 1 ]/5.5451774;
@@ -496,9 +512,9 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 
             if( ndim > 2 ) {
                ret[ 2 ] = pz - 0.5; 
-               ret[ 2 + ndim ] = sz/s;
+               ret[ 2 + ndim ] = sz/sd;
 
-               v0 = sz2/s - ret[ 2 + ndim ]*ret[ 2 + ndim ];
+               v0 = sz2/sd - ret[ 2 + ndim ]*ret[ 2 + ndim ];
                if( v0 <= 0.0 ) v0 = 0.25;
 
                v = v0 - beamcorr[ 2 ]*beamcorr[ 2 ]/5.5451774;
@@ -537,7 +553,7 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
          }
       }
 
-      ret[ 3*ndim ] = s + n*dmin;
+      ret[ 3*ndim ] = s;
       ret[ 3*ndim + 1 ] = dmax*( (peakfactor > 0.0) ? sqrt( peakfactor ) : 1.0 );
       ret[ 3*ndim + 2 ] = n;
 
