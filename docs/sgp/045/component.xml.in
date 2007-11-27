@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sgp/045</path>
+  <description>ADAM Review Panel Report</description>
+  <abstract><p>
+     The ADAM Review Panel was constituted by SERC in early 1994
+     under the Chairmanship of Professor R. Hills (MRAO, Cambridge)
+     and met for the first time in March of that year. Its final
+     report was issued on 16th March 1995 and is reproduced here.
+  </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>B K McIlwrath</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1995</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
