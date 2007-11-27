@@ -24,6 +24,7 @@
 #                            Adapted for new widget RtdImageFitsHeader for viewing
 #                            FITS HDU headers.
 # P.W.Draper      05/12/06   Allow autoscale of image whose dimensions are 1.
+#                 27/11/07   Autoscale for all items on canvas, not just image.
 
 itk::usual RtdImageCtrl {}
 
@@ -800,8 +801,15 @@ itcl::class rtd::RtdImageCtrl {
     # The arguments are the dimensions of the image canvas.
 
     protected method fill_to_fit {cw ch} {
-	set w [$image_ width]
-	set h [$image_ height]
+
+        #  Fit to all items on the canvas, not just the image.
+        lassign [$canvas_ bbox all] x0 y0 x1 y1
+        $image_ convert coords $x0 $y0 canvas x0 y0 image
+        $image_ convert coords $x1 $y1 canvas x1 y1 image
+
+        set w [expr int(abs($x1-$x0))]
+        set h [expr int(abs($y1-$y0))]
+
         set factor [expr {min(150,min($cw/$w, $ch/$h))}]
 	if {$factor == 0} {
 	    set factor [expr {-max(($w-1)/$cw+1, ($h-1)/$ch+1)}]
