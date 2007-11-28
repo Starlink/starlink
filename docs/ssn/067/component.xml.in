@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/ssn/067</path>
+  <description>Unix Security Cookbook</description>
+  <abstract><p>
+     This document has been written to help Site Managers secure their
+     Unix hosts from being compromised by hackers. I have given brief
+     introductions to the security tools along with downloading,
+     configuring and running information. I have also included a
+     section on my recommendations for installing these security tools
+     starting from an absolute minimum security requirement.
+  </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>S C Rehan</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1996</year>
+    <name>PPARC</name>
+  </copyright>
+</component>
