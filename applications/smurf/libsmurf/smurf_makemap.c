@@ -167,6 +167,8 @@
 *        Modified interface to smf_open_file.
 *     2007-11-15 (EC):
 *        Modified smf_iteratemap interface.
+*     2007-11-28 (EC):
+*        Fixed flag in smf_open_file
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -456,7 +458,7 @@ void smurf_makemap( int *status ) {
     if( *status == SAI__OK ) {
       for(i=1; i<=size; i++ ) {	
 
-        smf_open_file( igrp, i, "UPDATE", SMF__NOCREATE_HEAD, &data, status );
+        smf_open_file( igrp, i, "UPDATE", SMF__NOCREATE_DATA, &data, status );
         if( *status != SAI__OK) {
           errRep(FUNC_NAME, "Bad status opening smfData", status);      
         }
