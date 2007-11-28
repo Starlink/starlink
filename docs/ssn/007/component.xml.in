@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/ssn/007</path>
+  <description>Administering Starlink Sun systems</description>
+  <abstract><p>
+     The purpose of this document is to ensure that all of the
+     Starlink Sun systems are set up in a secure, logical and
+     consistent fashion and that they do not begin to diverge from one
+     another.
+  </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>C A Clayton</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1991</year>
+    <name>SERC</name>
+  </copyright>
+</component>
