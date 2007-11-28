@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="ssn64">
+  <version>5</version>
+  <path>docs/ssn/064</path>
+  <description>ADAM---Organization of Application Packages</description>
+  <abstract><p>
+     This document explains the standard way in which ADAM applications packages
+    are set up to run on Starlink machines. It covers the systems permitting
+    use of the applications direct from the shell and from the Interactive
+    Command Language on Unix.
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>A J Chipperfield</name>
+    </person>
+  </developers>
+  <documentation> ssn64</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>?-2002</year>
+    <name>PPARC</name>
+  </copyright>
+</component>

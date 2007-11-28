@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/ssn/064</path>
+  <description>ADAM---Organization of Application Packages</description>
+  <abstract><p>
+     This document explains the standard way in which ADAM applications packages
+    are set up to run on Starlink machines. It covers the systems permitting
+    use of the applications direct from the shell and from the Interactive
+    Command Language on Unix.
+  </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>A J Chipperfield</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>?-2002</year>
+    <name>PPARC</name>
+  </copyright>
+</component>
