@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/ssn/022</path>
+  <description>Coordinate Systems for Pixel Arrays</description>
+  <abstract><p>
+     This defines the coordinate system adopted by Starlink for
+     pixel arrays.  The bottom left-hand corner of
+     the bottom left-hand pixel has picture coordinates (0.0,0.0).
+  </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>P.T. Wallace</name>
+      <name>M.J. Bly</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1983, 1992</year>
+    <name>SERC</name>
+  </copyright>
+</component>

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="ssn22">
+  <version>3</version>
+  <path>docs/ssn/022</path>
+  <description>Coordinate Systems for Pixel Arrays</description>
+  <abstract><p>
+     This defines the coordinate system adopted by Starlink for
+     pixel arrays.  The bottom left-hand corner of
+     the bottom left-hand pixel has picture coordinates (0.0,0.0).
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P.T. Wallace</name>
+      <name>M.J. Bly</name>
+    </person>
+  </developers>
+  <documentation> ssn22</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1983, 1992</year>
+    <name>SERC</name>
+  </copyright>
+</component>
