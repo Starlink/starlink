@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_model_create( const smfGroup *igroup, const smfArray **iarray,
-*                       int nchunks, smf_modeltype mtype, 
+*                       int nchunks, smf_modeltype mtype, int isTordered, 
 *                       smfGroup **mgroup, int nofile, int leaveopen,
 *                       smfArray **mdata, int *status);
 
@@ -29,6 +29,9 @@
 *        smfArrays in iarray (otherwise it is derived from igroup).
 *     mtype = smf_modeltype (Given)
 *        Type of model component to create
+*     isTordered = int (Given)
+*        If 0, ensure template data is ordered by bolometer. If 1 ensure 
+*        template data is ordered by time slice (default ICD ordering)
 *     mgroup = smfGroup ** (Returned)
 *        Pointer to smfGroup pointer that will contain model file names
 *     nofile = int (Given)
@@ -49,7 +52,7 @@
 *     creates new NDF files with dimensions appropriate for the model
 *     parameters.  For example, a common-model signal is represented
 *     by a 1-dimensional array as a function of time. The names of the
-*     containers are the same as the input templated, with a suffix
+*     containers are the same as the input template, with a suffix
 *     added. The containers can be stored in smfArrays if leavelopen
 *     is set. In this case it is up to the caller to first generate an
 *     array of smfArray pointers (mdata) which then get new smfArrays
@@ -96,6 +99,8 @@
 *        -Added ability to create models from a smfArray template, 
 *         requiring a change to the interface.
 *        -Fixed memory allocation bug
+*     2007-11-28 (EC):
+*        -Added ability to assert the dataOrder (isTordered parameter)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -146,7 +151,7 @@
 #define FUNC_NAME "smf_model_create"
 
 void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
-		       int nchunks, smf_modeltype mtype, 
+		       int nchunks, smf_modeltype mtype, int isTordered,
 		       smfGroup **mgroup, int nofile, int leaveopen,
 		       smfArray **mdata, int *status ) {
   /* Local Variables */
@@ -167,7 +172,6 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
   int idx=0;                    /* Index within subgroup */
   int indf=0;                   /* NDF ID for propagation */
   int isize=0;                  /* Number of files in input group */
-  int isTordered;               /* Time or bolo-ordered data? */
   dim_t j;                      /* Loop counter */
   dim_t k;                      /* Loop counter */
   Grp *mgrp=NULL;               /* Temporary group to hold model names */
@@ -315,6 +319,9 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 	  
 	  /* Open the template file */
 	  smf_open_file( igroup->grp, idx, "READ", 0, &idata, status );
+
+	  /* Assert the data order */
+	  smf_dataOrder( idata, isTordered, status );
 	}
       } else {
 	/* Otherwise obtain a pointer to the relevant smfData in the
@@ -376,7 +383,12 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 	    copyinput = 0;
 	    head.dtype = SMF__DOUBLE;
 	    head.ndims = 1;
-	    head.dims[0] = (idata->dims)[2];
+
+	    if( isTordered ) { /* T is 3rd axis if time-ordered */
+	      head.dims[0] = (idata->dims)[2]; 
+	    } else {           /* T is 1st axis if bolo-ordered */
+	      head.dims[0] = (idata->dims)[0]; 
+	    }
 	    break;
 	
 	  case SMF__NOI: /* Noise model */
@@ -579,7 +591,7 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 		if( msync( buf, headlen, MS_ASYNC ) == -1 ) {
 		  *status = SAI__ERROR;
 		  errRep( FUNC_NAME, 
-			  "Unable to synch header in model container file", 
+			  "Unable to sync header in model container file", 
 			  status ); 
 		} else if( munmap( buf, headlen ) == -1 ) {
 		  *status = SAI__ERROR;
@@ -595,7 +607,7 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 	      
 	      if( msync( buf, headlen+datalen, MS_ASYNC ) == -1 ) {
 		*status = SAI__ERROR;
-		errRep( FUNC_NAME, "Unable to synch model container file", 
+		errRep( FUNC_NAME, "Unable to sync model container file", 
 			status ); 
 	      } else if( munmap( buf, headlen+datalen ) == -1 ) {
 		*status = SAI__ERROR;
