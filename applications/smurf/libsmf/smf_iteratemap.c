@@ -98,6 +98,8 @@
 *        -Use smf_concat_smfGroup for memiter=1 case.
 *        -Modified interface to hand projection from caller to concat_smfGroup
 *        -Check for file name existence when calling smf_model_NDFexport
+*     2007-11-15 (EC):
+*        -Switch to time-ordering the data. Compiles but still buggy.
 
 *  Notes:
 
@@ -158,6 +160,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   double *ast_data=NULL;        /* Pointer to DATA component of ast */
   smfGroup *astgroup=NULL;      /* smfGroup of ast model files */
   const char *asttemp=NULL;     /* Pointer to static strings created by ast */
+  smfData *data=NULL;           /* Temporary smfData pointer */
   int dimmflags;                /* Control flags for DIMM model components */
   dim_t dsize;                  /* Size of data arrays in containers */
   int exportNDF=0;              /* If set export DIMM files to NDF at end */
@@ -300,8 +303,10 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
   if( *status == SAI__OK ) {
 
-    /* If memiter=1 concat everything into a single smfArray */
     if( memiter ) {
+      /* If memiter=1 concat everything into a single smfArray. Note that
+         the pointing LUT gets generated in smf_concat_smfGroup below. */
+
       msgSeti( "ALLCHUNKS", igroup->ngroups );
       msgOut(" ", "SMF_ITERATEMAP: Concatenating ^ALLCHUNKS time chunks", 
 	     status);
@@ -312,13 +317,31 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       /* Allocate length 1 array of smfArrays for single time chunk */
       res = smf_malloc( nchunks, sizeof(*res), 1, status );
 
-      /* Concatenate the input data (time-ordered for now) */
-      smf_concat_smfGroup( igroup, 1, 
+      /* Concatenate the input data (and change to bolo-ordered) */
+      smf_concat_smfGroup( igroup, 0, 
 			   outfset, moving, lbnd_out, ubnd_out, 0,
 			   &res[0], status );
     } else {
-      /* Otherwise number of time chunks given by igroup */
+      /* Otherwise number of time chunks given by igroup. */
+
       nchunks = igroup->ngroups;
+
+      /* Calculate MAPCOORD explicitly here for each input file since
+	 we don't call smf_concat_smfGroup in this case */
+
+      for(i=1; i<=isize; i++ ) {	
+	/* We only need to open the file's header info to generate the 
+	   pointing LUT in the MAPCOORD extension */
+        smf_open_file( igrp, i, "UPDATE", SMF__NOCREATE_DATA, &data, status );
+        smf_calc_mapcoord( data, outfset, moving, lbnd_out, ubnd_out, status );
+	smf_close_file( &data, status );
+
+        /* Exit if bad status was generate */
+	if( *status != SAI__OK ) {
+	  i = isize+1;
+	}
+      }
+
     }
     msgSeti( "NCHUNKS", nchunks );
     msgOut(" ", "SMF_ITERATEMAP: ^NCHUNKS time chunks", status);
@@ -336,13 +359,15 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
     if( memiter ) {
       /* If iterating in memory then RES has already been created from
-         the concatenation of the input data. Create the other required
-         models using res[0] as a template */
+         the concatenation of the input data. Create the other
+         required models using res[0] as a template. Assert
+         bolo-ordered data although the work has already been done at
+         the concatenation stage. */
 
-      smf_model_create( NULL, res, nchunks, SMF__LUT, NULL, memiter, 
+      smf_model_create( NULL, res, nchunks, SMF__LUT, 0, NULL, memiter, 
 			memiter, lut, status ); 
 
-      smf_model_create( NULL, res, nchunks, SMF__AST, NULL, memiter, 
+      smf_model_create( NULL, res, nchunks, SMF__AST, 0, NULL, memiter, 
 			memiter, ast, status );
 
       /* Since a copy of the LUT is still open in res[0] free it up here */
@@ -354,15 +379,16 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       
     } else {
       /* If iterating using disk i/o need to create res and other model 
-         components using igroup as template */
+         components using igroup as template. Tell smf_model_create
+         to assert bolo-ordered template (in this case res). */
 
       res = smf_malloc( nchunks, sizeof(*res), 1, status );
       
-      smf_model_create( igroup, NULL, 0, SMF__RES, &resgroup, memiter, 
+      smf_model_create( igroup, NULL, 0, SMF__RES, 0, &resgroup, memiter, 
 			memiter, res, status );
-      smf_model_create( igroup, NULL, 0, SMF__LUT, &lutgroup, memiter, 
+      smf_model_create( igroup, NULL, 0, SMF__LUT, 0, &lutgroup, memiter, 
 			memiter, lut, status ); 
-      smf_model_create( igroup, NULL, 0, SMF__AST, &astgroup, memiter, 
+      smf_model_create( igroup, NULL, 0, SMF__AST, 0, &astgroup, memiter, 
 			memiter, ast, status );
     }
   }
@@ -382,11 +408,11 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       model[i] = smf_malloc( nchunks, sizeof(**model), 1, status );
       
       if( memiter ) {
-	smf_model_create( NULL, res, nchunks, modeltyps[i], NULL,
+	smf_model_create( NULL, res, nchunks, modeltyps[i], 0, NULL,
 			  memiter, memiter, model[i], status ); 
 
       } else {
-	smf_model_create( igroup, NULL, 0, modeltyps[i], &modelgroups[i], 
+	smf_model_create( igroup, NULL, 0, modeltyps[i], 0, &modelgroups[i], 
 			  memiter, memiter, model[i], status );
       }
     }
@@ -537,7 +563,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
 	    smf_open_related_model( astgroup, i, "UPDATE", &ast[i], status );
 	    smf_open_related_model( resgroup, i, "UPDATE", &res[i], status );
-	    smf_open_related_model( lutgroup, i, "READ", &lut[i], status );
+	    smf_open_related_model( lutgroup, i, "READ", &lut[i], status );  
 	  }
 
 	  /* Calculate the AST model component. It is a special model
