@@ -10,7 +10,7 @@ smf_free.c smf_malloc.c smf_realloc.c \
 smf_open_file.c smf_close_file.c \
 smf_dtype_check.c smf_dtype_string.c smf_dtype_size.c smf_dtype_check_fatal.c \
 smf_dtype_fromstring.c \
-smf_fits_getI.c smf_fits_getD.c smf_fits_getF.c smf_fits_getS.c \
+smf_fits_getI.c smf_fits_getD.c smf_fits_getF.c smf_fits_getS.c smf_fits_getL.c\
 smf_history_check.c smf_history_write.c smf_history_read.c smf_history_add.c\
 smf_inst_get.c smf_tslice_ast.c \
 smf_open_and_flatfield.c \
@@ -54,7 +54,7 @@ smf_dtype_sz.c smf_model_NDFexport.c smf_accumulate_prov.c \
 smf_open_related_model.c smf_choosetiles.c smf_freetiles.c smf_reshapendf.c \
 smf_dataOrder.c smf_choosepolbins.c smf_freepolbins.c smf_polext.c \
 smf_fft_filter.c smf_concat_smfGroup.c smf_checkdets.c smf_sortd.c \
-smf_reorder.c smf_updateprov.c
+smf_reorder.c smf_updateprov.c smf_fits_setL.c
 
 noinst_INCLUDES = smf.h smf_typ.h
 

@@ -201,6 +201,8 @@
 *        Added smf_updateprov.
 *     2007-11-26 (DSB):
 *        Added wcsout to smf_choosetiles argument list.
+*     2007-11-27 (EC):
+*        Added smf_fits_getL, smf_fits_setL
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -407,6 +409,8 @@ void smf_fits_export2DA ( const AstFitsChan *fitschan, size_t *ncards,
    string is required. If we return a string we must know who should free it */
 void smf_fits_getI( const smfHead * hdr, const char * cardname, int * result, 
 		    int * status );
+void smf_fits_getL( const smfHead * hdr, const char * cardname, int * result, 
+		    int * status );
 void smf_fits_getD( const smfHead * hdr, const char * cardname, 
                     double * result, int * status );
 void smf_fits_getF( const smfHead * hdr, const char * cardname, 
@@ -473,7 +477,7 @@ void smf_mapbounds_approx( Grp *igrp, int index, char *system, double pixsize,
 			   int *moving, int *status );
 
 void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
-		       int nchunks, smf_modeltype mtype, 
+		       int nchunks, smf_modeltype mtype, int isTordered, 
 		       smfGroup **mgroup, int nofile, int leaveopen,
 		       smfArray **mdata, int *status );
 
@@ -719,5 +723,8 @@ void smf_reorderi( int *in, int ndim, int *dims, int axis, int *index, int *out,
 void smf_reorderd( double *in, int ndim, int *dims, int axis, int *index, double *out, int *status );
 void smf_reorderc( char *in, int len, int ndim, int *dims, int axis, int *index, char *out, int *status );
 void smf_updateprov( int ondf, smfData *data, int *status );
+
+void smf_fits_setL( const smfHead *hdr, const char *name, int value, 
+		    const char *comment, int overwrite, int *status );
 
 #endif /* SMF_DEFINED */
