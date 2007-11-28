@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/ssn/018</path>
+  <description>Administering Solaris Sun systems</description>
+  <abstract><p>
+     This document is intended for Sun System administrators
+     as a follow up to SSN/7 which described how to set up
+     Starlink Sun systems under SunOS 4.X. The present document refers
+     to the set up of Sun systems under Solaris 2.X (a.k.a. SunOS 5.X).
+  </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>C A Clayton</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1994</year>
+    <name>SERC</name>
+  </copyright>
+</component>
