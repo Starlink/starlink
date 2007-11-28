@@ -42,7 +42,9 @@
 *     time domain using the LUT.
 
 *  Notes:
-*     The model pointer is ignored and should be set to NULL.
+*     -The model pointer is ignored and should be set to NULL.
+*     -Rather than blindly asserting everything as bolo-ordered, in this
+*      case just ensure that RES has the same order as LUT
 
 *  Authors:
 *     Edward Chapin (UBC)
@@ -62,6 +64,8 @@
 *        new DIMM file format
 *     2007-07-10 (EC)
 *        Use smfArray instead of smfData
+*     2007-11-28 (EC)
+*        Added assertions to ensure different data orders will work.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -121,6 +125,9 @@ void smf_calcmodel_ast( smfArray *res, AstKeyMap *keymap, smfArray *lut,
 
   /* Loop over index in subgrp (subarray) */
   for( idx=0; idx<res->ndat; idx++ ) {
+
+    /* Ensure that RES has the same data order as LUT */
+    smf_dataOrder( res->sdata[idx], lut->sdata[idx]->isTordered, status );
 
     /* Get pointers to DATA components */
     res_data = (double *)(res->sdata[idx]->pntr)[0];
