@@ -53,6 +53,8 @@
 *     2007-10-31 (EC):
 *        - changed index multiplications to successive additions in tight loops
 *        - re-order pointing LUT if it exists
+*     2007-11-28 (EC):
+*        Update FITS keyword TORDERED when data order is modified
 
 *  Notes:
 *     Nothing is done about the FITS channels or WCS information stored in
@@ -95,6 +97,7 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
+#include "libsmf/smf_err.h"
 
 /* Other includes */
 
@@ -135,6 +138,8 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
   /* If value of isTordered matches current value in smfData return */
   if( data->isTordered == isTordered ) return;
   
+  printf("Inside smf_dataOrder - re-ordering data to %i\n", isTordered );
+
   /* Make sure we're looking at 3-dimensions of bolo data */
   if( data->ndims != 3 ) {
     *status = SAI__ERROR;
@@ -184,6 +189,8 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
 
     /* Allocate buffer */
     newbuf = smf_malloc( ndata, sz, 0, status );
+
+    printf("newbuf = %i\n", newbuf);
 
     if( *status == SAI__OK ) {
 
@@ -322,12 +329,41 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
     }
   }
 
-  /* Now re-order the pointing LUT if it exists */
+  /* If there is a FITS header associated with the smfData, update the
+     TORDERED keyword to match isTordered */
+  if( data->hdr ) {
+    smf_fits_setL( data->hdr, "TORDERED", isTordered, NULL, 1, status );
 
+    /* If NDF file associated with the data, write out the modified
+       FITS header */
+    if( data->file ) {
+      if( data->file->ndfid != NDF__NOID ) {
+	kpgPtfts( data->file->ndfid, data->hdr->fitshdr, status );
+      }
+    }
+  }
+
+  /* Check for the existence of a pointing LUT in the MAPCOORD extension */
   oldlut = data->lut;
-  if( oldlut ) {
-    newlut = smf_malloc( ndata, sizeof(*newlut), 0, status );
+  if( oldlut == NULL ) { 
+    /* If there is a MAPCOORD xtension it's not open. Try opening here. */
+    smf_open_mapcoord( data, "UPDATE", status );
     
+    if( *status == SAI__OK ) {
+      /* Good status so the LUT is now mapped */
+      oldlut = data->lut;
+    } else if( *status == SMF__NOLUT ) {
+      /* There is no extension to map. Annul the error and continue. */
+      errAnnul( status );
+    }
+  }
+
+  /* If there is a mapped LUT re-order it here */
+  if( oldlut ) {
+
+    newlut = smf_malloc( ndata, sizeof(*newlut), 0, status );
+    printf("newlut = %i\n", newlut);    
+
     if( *status == SAI__OK ) {
       if( isTordered ) { /* Converting bolo ordered -> time ordered */
 	timebase = 0;
