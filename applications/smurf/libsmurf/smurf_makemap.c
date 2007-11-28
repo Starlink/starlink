@@ -452,20 +452,15 @@ void smurf_makemap( int *status ) {
       errRep(FUNC_NAME, "CONFIG unspecified", status);      
     }
     
-    /* Loop over all input data files to put in the pointing extension */
+    /* Loop over all input data files to setup provenance handling */
     if( *status == SAI__OK ) {
       for(i=1; i<=size; i++ ) {	
 
-        smf_open_file( igrp, i, "UPDATE", 0, &data, status );
+        smf_open_file( igrp, i, "UPDATE", SMF__NOCREATE_HEAD, &data, status );
         if( *status != SAI__OK) {
           errRep(FUNC_NAME, "Bad status opening smfData", status);      
         }
-          
-        smf_calc_mapcoord( data, outfset, moving, lbnd_out, ubnd_out, status );
-        if( *status != SAI__OK) {
-          errRep(FUNC_NAME, "Bad status calculating MAPCOORD", status);      
-        }
-
+        
 	/* Store the filename in the keymap for later - the GRP would be fine
 	   as is but we use a keymap in order to reuse smf_fits_add_prov */
 	if (*status == SAI__OK)
