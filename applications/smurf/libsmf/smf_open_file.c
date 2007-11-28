@@ -45,9 +45,7 @@
 *     - The following bit flags defined in smf_typ.h are used for "flags" par:
 *       SMF__NOCREATE_HEAD: Do not allocate smfHead
 *       SMF__NOCREATE_DATA: Do not map DATA/VARIANCE/QUALITY arrays (NOT YET
-                            IMPLEMENTED!)
-*     - SMF__NOCREATE_DATA is not actually implemented yet!
-			    
+                            IMPLEMENTED!)			    
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -141,6 +139,8 @@
 *        Add flag controlling header read.
 *     2007-10-31 (TIMJ):
 *        Use size_t following changes to sc2store.
+*     2007-11-28 (EC):
+*        Add check for TORDERED keyword in FITS header
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -420,6 +420,15 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
 	  errRep(FUNC_NAME, "File has no FITS header - continuing but this may cause problems later", status );
 	  errAnnul( status );
 	}
+
+	/* Check for TORDERED keyword. If no keyword is present assume that
+           the data order is ICD-compliant (i.e. true) */
+	smf_fits_getL( hdr, "TORDERED", &((*data)->isTordered), status );
+	if( *status != SAI__OK ) {
+	  /* If bad status just annul and set isTordered to 1 */
+	  (*data)->isTordered = 1;
+	  errAnnul( status );
+	} 
 
 	/* Determine and store the telescope location in hdr->telpos */
 	smf_telpos_get( hdr, status );
