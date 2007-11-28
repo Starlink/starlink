@@ -69,6 +69,10 @@
 *     2007-11-15 (EC):
 *        -Added projection information, flags and isTordered to interface.
 *        -With projection info pointing LUT can now be calculated on-the-fly
+*     2007-11-28 (EC):
+*        -Use smf_open_file with SMF__NOCREATE_DATA for first pass
+*        -Set bad status if input is not ICD-compliant time-ordered data
+*        -Fixed bug in time-axis length which depends on output data order
 
 *  Notes:
 *     Currently buggy / not fully implemented. WCS and FITS channels in
@@ -110,6 +114,7 @@
 #include "star/ndg.h"
 #include "prm_par.h"
 #include "par_par.h"
+#include "kpg_err.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -123,30 +128,25 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
 
   /* Local Variables */
   smfData *data=NULL;           /* Concatenated smfData */
-  int dims[3];                  /* Size of each axis in NDF */
-  char dtype[NDF__SZTYP+1];     /* String for DATA/VARIANCE type */
-  int exists;                   /* Flag for NDF component existence */
-  char filename[GRP__SZNAM+1];  /* Input filename, derived from GRP */
   int havearray[3];             /* flags for DATA/QUALITY/VARIANCE present */
   int havelut;                  /* flag for pointing LUT present */
   smfHead *hdr;                 /* pointer to smfHead in concat data */
   dim_t i;                      /* Loop counter */
-  int indf;                     /* NDF identifier for current file */
   dim_t j;                      /* Loop counter */
   dim_t k;                      /* Loop counter */
   dim_t l;                      /* Loop counter */
   dim_t nbolo;                  /* Number of detectors */
   dim_t ndata;                  /* Total data points: nbolo*tlen */
-  int ndims;                    /* Number of axes in NDF */
   int nrelated;                 /* Number of subarrays */
   int pass;                     /* Two passes over list of input files */
-  char *pname=NULL;             /* Pointer to filename */
   smfData *refdata=NULL;        /* Reference smfData */
   int refdims[2];               /* reference dimensions for array (not time) */
-  char refdtype[NDF__SZTYP+1];  /* String for reference DATA/VARIANCE type */
+  smf_dtype refdtype;           /* reference DATA/VARIANCE type */
+  char *refdtypestr;            /* const string for reference data type */
   smfHead *refhdr=NULL;         /* pointer to smfHead in ref data */
   dim_t refndata;               /* Number data points in reference file */
   dim_t reftlen;                /* Number of time slices in reference file */
+  int refTordered;              /* Data order of reference file */
   dim_t tchunk;                 /* Time offset in concat. array this chunk */
   dim_t tlen;                   /* Time length entire concatenated array */
   dim_t sz;                     /* Data type size */
@@ -185,108 +185,108 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
 	/* First pass - get dimensions */
 	if( pass == 0 ) {
 
-	  /* Get filename from the group */
-	  pname = filename;
-	  grpGet( igrp->grp, igrp->subgroups[j][i], 1, &pname, SMF_PATH_MAX, 
-		  status);
-
-	  /* Obtain NDF identifier for this element of the grp */
-	  ndgNdfas( igrp->grp, igrp->subgroups[j][i], "READ", &indf, status );
-
-	  /* Obtain the dimensions of the NDF */
-	  ndfDim( indf, 3, dims, &ndims, status );
+	  smf_open_file( igrp->grp, igrp->subgroups[j][i], "UPDATE", 
+			 SMF__NOCREATE_DATA, &refdata, status );
 
 	  /* Verify that the array is 3-dimensional and compatible with the
 	     reference array dimensions. */
 
 	  if( *status == SAI__OK ) {
-	    if( ndims != 3 ) {
+	    msgSetc( "FILE", refdata->file->name );
+
+	    if( refdata->ndims != 3 ) {
 	      *status = SAI__ERROR;
-	      msgSetc( "FILE", filename );
-	      errRep( FUNC_NAME, "^FILE is not 3-dimensional data!", status );
+	      errRep( FUNC_NAME, "^FILE does not contain 3-dimensional data!", 
+		      status );
 	    }
+	  }
+
+	  /* If data order is 0 (bolo-ordered) then fail since that case
+             is not currently handled. */
+
+	  if( (*status == SAI__OK) && (refdata->isTordered == 0) ) {
+	    *status = SAI__ERROR;
+	    errRep(FUNC_NAME, "^FILE contains bolo-ordered (unsupported)",
+	  	   status);
 	  }
 
 	  if( *status == SAI__OK ) {
 	    if( j == 0 ) {
-	      /* If this is the first chunk we will use it for refdims - check
-                 the number of bolometers! (WARNING: Assumption is that
-                 input data is standard ICD-compliant time-ordered data) */
+	      /* If this is the first chunk we will use it for refdims
+                 - check the number of bolometers! (Assumption is that
+                 input data is standard ICD-compliant time-ordered
+                 data) */
 
-	      refdims[0] = dims[0];
-	      refdims[1] = dims[1];
+	      refdims[0] = refdata->dims[0];
+	      refdims[1] = refdata->dims[1];
 	      nbolo = refdims[0]*refdims[1];
 
 	      /* Check for DATA/VARIANCE/QUALITY and data type */
-	      ndfState( indf, "DATA", &(havearray[0]), status );
-	      ndfState( indf, "VARIANCE", &(havearray[1]), status );
-	      ndfState( indf, "QUALITY", &(havearray[2]), status );
-	      ndfType( indf, "DATA,VARIANCE", refdtype, NDF__SZTYP+1, status );
-	      
+	      for( k=0; k<3; k++ ) {
+		havearray[k] = (refdata->pntr[k] != NULL);
+	      }
+	      refdtype = refdata->dtype;
+	      refdtypestr = smf_dtype_string(refdata, status);
+
 	    } else {
 	      /* Check these dims against refdims */
-	      if( (dims[0] != refdims[0]) || (dims[1] != refdims[1]) ) {
-		*status = SAI__ERROR;
-		msgSeti( "XREF", refdims[0] );
-		msgSeti( "YREF", refdims[1] );
-		msgSeti( "X", dims[0] );
-		msgSeti( "Y", dims[1] );
-		msgSetc( "FILE", filename );
+	      if( (refdata->dims[0] != refdims[0]) || 
+		  (refdata->dims[1] != refdims[1]) ) {
 
-		errRep( FUNC_NAME, "Detector dimensions (^X,^Y) in ^FILE do not match reference (^XREF,^YREF)", status );
+	  	*status = SAI__ERROR;
+	  	msgSeti( "XREF", refdims[0] );
+	  	msgSeti( "YREF", refdims[1] );
+	  	msgSeti( "X", refdata->dims[0] );
+	  	msgSeti( "Y", refdata->dims[1] );
+		
+	  	errRep( FUNC_NAME, "Detector dimensions (^X,^Y) in ^FILE do not match reference (^XREF,^YREF)", status );
 	      }
 	      
 	      /* Check existence of DATA/QUALITY/VARIANCE */
-	      ndfState( indf, "DATA", &exists, status );
-	      if( exists != havearray[0] ) {
+
+	      if( (refdata->pntr[0] != NULL) != havearray[0] ) {
 		*status = SAI__ERROR;
-		msgSetc( "FILE", filename );
 		if( havearray[0] ) msgSetc( "FLAG", "is missing" );
 		else msgSetc( "FLAG", "has extra" );
 		errRep( FUNC_NAME, "^FILE ^FLAG component DATA", status );
-	      }
+	     }
 
-	      ndfState( indf, "VARIANCE", &exists, status );
-	      if( exists != havearray[1] ) {
+	      if( (refdata->pntr[1] != NULL) != havearray[1] ) {
 		*status = SAI__ERROR;
-		msgSetc( "FILE", filename );
 		if( havearray[1] ) msgSetc( "FLAG", "is missing" );
 		else msgSetc( "FLAG", "has extra" );
 		errRep( FUNC_NAME, "^FILE ^FLAG component VARIANCE", status );
 	      }
 
-	      ndfState( indf, "QUALITY", &exists, status );
-	      if( exists != havearray[2] ) {
+	      if( (refdata->pntr[2] != NULL) != havearray[2] ) {
 		*status = SAI__ERROR;
-		msgSetc( "FILE", filename );
 		if( havearray[2] ) msgSetc( "FLAG", "is missing" );
 		else msgSetc( "FLAG", "has extra" );
 		errRep( FUNC_NAME, "^FILE ^FLAG component QUALITY", status );
 	      }
 
 	      /* Check data type */
-	      ndfType( indf, "DATA,VARIANCE", dtype, NDF__SZTYP+1, status );
-	      if( strncmp( dtype, refdtype, NDF__SZTYP+1 ) != 0 ) {
+	      //ndfType( indf, "DATA,VARIANCE", dtype, NDF__SZTYP+1, status );
+	      //if( strncmp( dtype, refdtype, NDF__SZTYP+1 ) != 0 ) {
+
+	      if( refdata->dtype != refdtype ) {
 		*status = SAI__ERROR;
-		msgSetc( "FILE", filename );
-		msgSetc( "DTYPE", dtype );
-		msgSetc( "REFDTYPE", refdtype );
+		msgSetc( "DTYPE", smf_dtype_string(refdata,status) );
+		msgSetc( "REFDTYPE", refdtypestr );
 		errRep( FUNC_NAME, 
 			"^FILE data type is ^DTYPE, should be ^REFDTYPE", 
 			status);
-
 	      }
 	    }
 	  }
 
 	  if( *status == SAI__OK ) {
 	    /* At this stage increment tlen for this chunk */	  
-	    tlen += dims[2];
+	    tlen += refdata->dims[2];
 	  }
-
-	} 
-
-	/* Second pass copy data over to new array */
+	}
+      
+      	/* Second pass copy data over to new array */
 	if( (pass == 1) && (*status == SAI__OK) ) {
 
 	  /* Open the file corresponding to this chunk */
@@ -299,13 +299,17 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
 	    /* Set havelut flag */
 	    havelut = 1;
 
-	    /* This creates the extension and then closes it (silly) */
+	    /* This creates the extension and leaves it mapped (access
+               mode is WRITE or UPDATE since smf_calc_mapcoord had to
+               write it in the first place - so we will be able to
+               re-order the LUT if needed in call to smf_dataOrder */
+
 	    smf_calc_mapcoord( refdata, outfset, moving, lbnd_out, ubnd_out, 
 			       status );
 
 	    /* Now open that extension to get the LUT. Mode is UPDATE
                since we may re-order the LUT */
-	    smf_open_mapcoord( refdata, "UPDATE", status );
+	    /*smf_open_mapcoord( refdata, "UPDATE", status );*/
 
 	  }
 
@@ -329,9 +333,6 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
 		hdr->instrument = refhdr->instrument;
 
 		switch ( hdr->instrument ) {
-		case INST__ACSIS:
-		  acs_fill_smfHead( hdr, indf, status );
-		  break;
 		case INST__AZTEC:
 		  aztec_fill_smfHead( hdr, NDF__NOID, status );
 		  break;
@@ -346,9 +347,10 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
 		hdr->allState = smf_malloc( tlen, sizeof(*(hdr->allState)), 
 					    0, status );
 		
-		/* Allocate space in the smfData for DATA/VARAIANCE/QUALITY */
-		data->dtype = smf_dtype_fromstring( refdtype, status );
+		printf("allState space allocated: %i\n", 
+		       tlen*sizeof(*(hdr->allState)));
 
+		/* Allocate space in the smfData for DATA/VARAIANCE/QUALITY */
 		if( isTordered ) {
 		  data->dims[0] = refdims[0];
 		  data->dims[1] = refdims[1];
@@ -393,12 +395,21 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
                concatenated smfData */
 
 	    if( *status == SAI__OK ) {
-	      reftlen = refdata->dims[2];
+
+	      /* Which dimension contains reference time slices depends on
+		 ordering */
+	      if( isTordered ) {
+		reftlen = refdata->dims[2]; 
+	      } else {
+		reftlen = refdata->dims[0];
+	      }
+
 	      refndata = reftlen*nbolo;
 
 	      /* Copy over JCMTstate */
 	      hdr = data->hdr;
 	      refhdr = refdata->hdr;	    
+	      
 	      memcpy( &(hdr->allState[tchunk]), refhdr->allState, 
 		      reftlen*sizeof(*hdr->allState) );
 
