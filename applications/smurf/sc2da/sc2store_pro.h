@@ -10,23 +10,11 @@ size_t nval,            /* number of values in frame (given) */
 const int stackz[],     /* stackzero frame to be subtracted (given) */
 int digits[],           /* integer values (given and returned) */
 int *bzero,             /* zero offset for compressed values (returned) */
-unsigned short data[],  /* compressed values (returned) */
+short data[],           /* compressed values (returned) */
 size_t *npix,           /* number of incompressible values (returned) */
 int pixnum[],           /* indices of incompressible values (returned) */
 int pixval[],           /* incompressible values (returned) */
 int *status             /* global status (given and returned) */
-);
-
-/*+ sc2store_credream - create DREAM extension in output file */
-
-void sc2store_credream
-(
-size_t nvert,            /* Number of vertices in DREAM pattern (given)  */
-int **jigvert,           /* Pointer to stored jiggle vertices (returned) */
-size_t npath,            /* Number of points along SMU path in DREAM pattern 
-			    (given) */
-double **jigpath,        /* Pointer to stored jiggle path (returned) */
-int *status              /* Global status (given and returned) */
 );
 
 /*+ sc2store_creimages - create structure to store images */
@@ -47,7 +35,7 @@ size_t nframes,          /* number of frames (given) */
 size_t nflat,            /* number of flat coeffs per bol (given) */
 const char *flatname,    /* name of flatfield algorithm (given) */
 int **bzero,             /* pointer to subtracted offset values (returned) */
-unsigned short **data,   /* pointer to data array (returned) */
+short **data,            /* pointer to data array (returned) */
 int **dksquid,           /* pointer to dark SQUID values (returned) */
 int **stackz,            /* pointer to subtracted frame (returned) */
 double **flatcal,        /* pointer to flat calibration (returned) */
@@ -62,7 +50,7 @@ void sc2store_decompress
 size_t nval,                  /* number of values in frame (given) */
 const int stackz[],           /* stackzero frame to be added (given) */
 int bzero,                    /* zero offset for compressed values (given) */
-const unsigned short data[],  /* compressed values (given) */
+const short data[],           /* compressed values (given) */
 size_t npix,                  /* number of incompressible values (given) */
 const int pixnum[],           /* indices of incompressible values (given) */
 const int pixval[],           /* incompressible values (given) */
@@ -162,6 +150,18 @@ size_t *npath,         /* Number of points in SMU path (returned) */
 int *status            /* global status (given and returned) */
 );
 
+/*+ sc2store_open - open a SCUBA-2 data file */
+
+void sc2store_open
+(
+const char *filename,    /* name of HDS container file (given) */
+const char *access,      /* "READ" or "UPDATE" access (given) */
+size_t *colsize,         /* number of pixels in column (returned) */
+size_t *rowsize,         /* number of pixels in row (returned) */
+size_t *nframes,         /* number of frames (returned) */
+int *status              /* global status (given and returned) */
+);
+
 /*+ sc2store_putimage - store constructed image */
 
 void sc2store_putimage
@@ -204,13 +204,14 @@ const double *coptr,  /* coefficients (given) */
 int *status           /* global status (given and returned) */
 );
 
-/*+ sc2store_rdfitshead - read the FITS headers */
+/*+ sc2store_rdfitshead - read FITS headers from a SCUBA-2 file */
 
 void sc2store_rdfitshead
 (
-size_t maxfits,          /* maximum number of header items (given) */
-size_t *nrec,            /* number of header records (returned) */
-char *headers,           /* buffer to hold FITS headers (returned) */
+const char *filename,    /* name of HDS container file (given) */
+size_t maxfits,          /* maximum number of FITS records accepted (given) */
+size_t *nrec,            /* number of FITS records (returned) */
+char *fitshead,          /* up to maxfits FITS header records (returned) */
 int *status              /* global status (given and returned) */
 );
 
@@ -229,28 +230,13 @@ double **flatpar,        /* pointer to flatfield parameters (returned) */
 int *status              /* global status (given and returned) */
 );
 
-/*+ sc2store_rdmap - open an existing HDS container file and map data arrays */
+/*+ sc2store_rdframehead - read SCUBA-2 frame headers */
 
-void sc2store_rdmap
+void sc2store_rdframehead
 (
 const char *filename,    /* name of HDS container file (given) */
-const char *access,      /* "READ" or "UPDATE" access (given) */
-size_t flatlen,          /* length of space for flatfield name (given) */
-size_t *colsize,         /* number of pixels in column (returned) */
-size_t *rowsize,         /* number of pixels in row (returned) */
-size_t *nframes,         /* number of frames (returned) */
-size_t *nflat,           /* number of flat coeffs per bol (returned) */
-char *flatname,          /* name of flatfield algorithm (returned) */
-int **bzero,             /* pointer to subtracted offset values (returned) */
-unsigned short **data,   /* pointer to data array (returned) */
-int **dksquid,           /* pointer to dark SQUID values (returned) */
-int **stackz,            /* pointer to subtracted frame (returned) */
-double **flatcal,        /* pointer to flatfield calibration (returned) */
-double **flatpar,        /* pointer to flatfield parameters (returned) */
-int **jigvert,           /* pointer to DREAM jiggle vertices (returned) */
-size_t *nvert,           /* Number of vertices in jiggle pattern (returned) */
-double **jigpath,        /* pointer to path of SMU over jiggle pattern (returned) */
-size_t *npath,           /* Number of points in SMU path (returned) */
+size_t *nframes,         /* number of data frames (returned) */
+JCMTState *frhead[],     /* header data for each frame (returned) */
 int *status              /* global status (given and returned) */
 );
 
@@ -281,6 +267,79 @@ size_t *npath,           /* Number of points in SMU path (returned) */
 int *status              /* global status (given and returned) */
 );
 
+/*+ sc2store_readfitshead - read the FITS headers */
+
+void sc2store_readfitshead
+(
+size_t maxfits,          /* maximum number of header items (given) */
+size_t *nrec,            /* number of header records (returned) */
+char *headers,           /* buffer to hold FITS headers (returned) */
+int *status              /* global status (given and returned) */
+);
+
+/*+ sc2store_readflatcal - read flatfield calibration */
+
+void sc2store_readflatcal
+(
+const char *access,      /* "READ" or "UPDATE" access (given) */
+size_t flatlen,          /* length of space for flatfield name (given) */
+size_t *nflat,           /* number of flat coeffs per bol (returned) */
+char *flatname,          /* name of flatfield algorithm (returned) */
+double **flatcal,        /* pointer to flatfield calibration (returned) */
+double **flatpar,        /* pointer to flatfield parameters (returned) */
+int *status              /* global status (given and returned) */
+);
+
+/*+ sc2store_readframehead - read the frame headers */
+
+void sc2store_readframehead
+(
+size_t nframes,          /* number of data frames (given) */
+JCMTState *frhead[],     /* header data for each frame (returned) */
+int *status              /* global status (given and returned) */
+);
+
+/*+ sc2store_readjig - read details of jiggle pattern */
+
+void sc2store_readjig
+(
+const char *access,      /* "READ" or "UPDATE" access (given) */
+int **jigvert,           /* pointer to DREAM jiggle vertices (returned) */
+size_t *nvert,           /* Number of vertices in jiggle pattern (returned) */
+double **jigpath,        /* pointer to path of SMU over jiggle pattern (returned) */
+size_t *npath,           /* Number of points in SMU path (returned) */
+int *status              /* global status (given and returned) */
+);
+
+/*+ sc2store_readraw - read raw SCUBA-2 data */
+
+void sc2store_readraw
+(
+const char *access,      /* "READ" or "UPDATE" access (given) */
+size_t colsize,          /* number of pixels in column (given) */
+size_t rowsize,          /* number of pixels in row (given) */
+size_t nframes,          /* number of frames (given) */
+int **rawdata,           /* raw timestream data (returned) */
+int **dksquid,           /* pointer to dark SQUID values (returned) */
+int *status              /* global status (given and returned) */
+);
+
+/*+ sc2store_setbscale - Set the scale factor for data compression */
+
+void sc2store_setbscale
+(
+double bscale,        /* value to be set (given) */
+int *status           /* global status (given and returned) */
+);
+
+/*+ sc2store_setcompflag - Set the flag controlling data compression */
+
+void sc2store_setcompflag
+(
+int compflag,         /* value to be set, 1=>compress 0=>don't (given) */
+int *status           /* global status (given and returned) */
+);
+
 /*+ sc2store_wrconfigxml - Store the CONFIGURE XML */
 
 void sc2store_wrconfigxml
@@ -289,14 +348,60 @@ const char *xmlfile,  /* name of CONFIGURE XML file (given) */
 int *status           /* global status (given and returned) */
 );
 
-/*+ sc2store_wrfitshead - write the FITS headers */
+/*+ sc2store_writefitshead - write the FITS headers */
 
-void sc2store_wrfitshead
+void sc2store_writefitshead
 (
 int id_ndf,           /* identifier of ndf (given) */
 size_t nrec,          /* number of header records (given) */
 const char *headers,  /* string of contiguous 80-byte FITS headers (given) */
 int *status           /* global status (given and returned) */
+);
+
+/*+ sc2store_writeflatcal - write flatfield calibration */
+
+void sc2store_writeflatcal
+(
+size_t colsize,             /* number of pixels in a column (given) */
+size_t rowsize,             /* number of pixels in a row (given) */
+size_t nflat,               /* number of flat coeffs per bol (given) */
+const char *flatname,       /* name of flatfield algorithm (given) */
+const double *flatcal,      /* flat-field calibration (given) */
+const double *flatpar,      /* flat-field parameters (given) */
+int *status              /* global status (given and returned) */
+);
+
+/*+ sc2store_writeframehead - store SCUBA-2 per-frame header items */
+
+void sc2store_writeframehead
+(
+size_t nframes,             /* number of frames (given) */
+const JCMTState head[],     /* header data for each frame (given) */
+int *status                 /* global status (given and returned) */
+);
+
+/*+ sc2store_writejig - create and write DREAM extension in output file */
+
+void sc2store_writejig
+(
+int jigvert[][2],           /* Array of jiggle vertices (given) */
+size_t nvert,               /* Number of jiggle vertices (given) */
+double jigpath[][2],        /* Path of SMU during jiggle cycle (given) */
+size_t npath,               /* Number of positions in jiggle path (given) */
+int *status              /* Global status (given and returned) */
+);
+
+/*+ sc2store_writeraw - create HDS container file and write raw data */
+
+void sc2store_writeraw
+(
+const char *filename,    /* name of HDS container file (given) */
+size_t colsize,          /* number of pixels in a column (given) */
+size_t rowsize,          /* number of pixels in a row (given) */
+size_t nframes,          /* number of frames (given) */
+const int *dbuf,         /* time stream data (given) */
+const int *dksquid,      /* dark SQUID time stream data (given) */
+int *status              /* global status (given and returned) */
 );
 
 /*+ sc2store_wrmcehead - Store the MCE headers for each frame */
@@ -313,26 +418,26 @@ int *status                 /* global status (given and returned) */
 
 void sc2store_wrtstream
 (
-const char file_name[],     /* output file name (given) */
+const char filename[],      /* output file name (given) */
 int subnum,                 /* Sub-array number (given) */
 size_t nrec,                /* number of FITS header records (given) */
 const char *fitsrec,        /* contiguous 80-byte FITS records (given) */
 size_t colsize,             /* number of bolometers in column (given) */
 size_t rowsize,             /* number of bolometers in row (given) */
-size_t numsamples,          /* number of samples (given) */
+size_t nframes,             /* number of frames (given) */
 size_t nflat,               /* number of flat coeffs per bol (given) */
 const char *flatname,       /* name of flatfield algorithm (given) */
 const JCMTState head[],     /* header data for each frame (given) */
 const int *dbuf,            /* time stream data (given) */
-const int *darksquid,       /* dark SQUID time stream data (given) */
-const double *fcal,         /* flat-field calibration (given) */
-const double *fpar,         /* flat-field parameters (given) */
+const int *dksquid,         /* dark SQUID time stream data (given) */
+const double *flatcal,      /* flat-field calibration (given) */
+const double *flatpar,      /* flat-field parameters (given) */
 const char *obsmode,        /* Observing mode (given) */
 const int *mcehead,         /* MCE header for each sample (given) */
 size_t mceheadsz,           /* number of values per MCE header (given) */
-int jig_vert[][2],          /* Array of jiggle vertices (given) */
+int jigvert[][2],           /* Array of jiggle vertices (given) */
 size_t nvert,               /* Number of jiggle vertices (given) */
-double jig_path[][2],       /* Path of SMU during jiggle cycle (given) */
+double jigpath[][2],        /* Path of SMU during jiggle cycle (given) */
 size_t npath,               /* Number of positions in jiggle path (given) */
 const char *xmlfile,        /* name of CONFIGURE XML file (given) */ 
 int *status                 /* global status (given and returned) */
