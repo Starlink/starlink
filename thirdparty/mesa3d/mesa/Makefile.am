@@ -13,7 +13,7 @@ mesa-src:
 	cd mesa && rm -f configs/current
 	cd mesa && $(MAKE) $(MESA_SYSTEM)
 
-#  Don't build jpeglib.  Just create a stamp file.
+#  Don't build Mesa.  Just create a stamp file.
 mesa-stamp:
 	rm -f $@
 	{ date; \
