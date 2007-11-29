@@ -16,23 +16,26 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {214.31}
+\newcommand{\stardocnumber}    {214.32}
 \newcommand{\stardocauthors}   {Peter W. Draper, 
                                 Norman Gray, 
                                 David S. Berry \& 
                                 Mark Taylor }
-\newcommand{\stardocdate}      {5th October 2007}
-\newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and Image Analysis Tool}
-\newcommand{\stardocversion}   {4.0-3}
+\newcommand{\stardocdate}      {14th November 2007}
+\newcommand{\stardoctitle}     {GAIA -- 
+                                Graphical Astronomy and Image Analysis Tool}
+\newcommand{\stardocversion}   {4.1-0}
 \newcommand{\stardocmanual}    {User's Manual}
 
-\newcommand{\stardocabstract} {GAIA is an image display and analysis
-tool for astronomy. It provides the usual facilities of image display
-tools, plus more astronomically useful ones such as aperture \& optimal
-photometry, contouring, source detection, surface photometry,
+\newcommand{\stardocabstract} {GAIA is an image and data-cube display 
+and analysis tool for astronomy. It provides the usual facilities of image
+display tools, plus more astronomically useful ones such as aperture \&
+optimal photometry, contouring, source detection, surface photometry,
 arbitrary region analysis, celestial coordinate readout, calibration
 and modification, grid overlays, blink comparison, defect patching and
-the ability to query on-line (WWW) catalogues.}
+the ability to query on-line (WWW) catalogues and image servers. It can 
+also display slices from data-cubes, extract and visualise spectra as 
+well as perform full 3D rendering.}
 
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -286,17 +289,22 @@ the ability to query on-line (WWW) catalogues.}
 \section{Introduction\xlabel{introduction}\label{introduction}}
 
 GAIA is an highly interactive image display tool but with the additional
-capability of being extendable to integrate other programs.  At present
-extensions are provided that cover the astronomically interesting areas of
-aperture \& optimal photometry, automatic source detection, surface
-photometry, contouring, arbitrary region analysis, celestial coordinate
-readout, calibration and modification, grid overlays, blink comparison, image
-defect patching, polarization vector plotting and the ability to connect to
-resources available in on-line (WWW) catalogues and archives.
+capability of being extendable to integrate other programs and to manipulate
+and display data-cubes.  At present image analysis extensions are provided
+that cover the astronomically interesting areas of aperture \& optimal
+photometry, automatic source detection, surface photometry, contouring,
+arbitrary region analysis, celestial coordinate readout, calibration and
+modification, grid overlays, blink comparison, image defect patching,
+polarization vector plotting and the ability to connect to resources available
+in on-line (WWW) catalogues and image archives.
 
-GAIA also features tools for interactively displaying image planes from data
-cubes and plotting spectra extracted from the third dimension. It can also 
-interoperate with other PLASTIC enabled applications.
+GAIA also features tools for interactively displaying image planes from
+data-cubes and plotting spectra extracted from the third dimension. It can
+also display 3D visualisations of data-cubes using iso-surfaces and volume
+rendering.
+
+Interoperatability with other PLASTIC enabled applications is provided so that
+GAIA can be used as part of the Virtual Observatory.
 
 GAIA is a derivative of the
 \htmladdnormallinkfoot{SkyCat}{http://archive.eso.org/skycat/} image
@@ -304,6 +312,9 @@ display and catalogue browsing tool, developed as part of the
 \htmladdnormallinkfoot{VLT}{http://www.eso.org/vlt/} project at
 \htmladdnormallinkfoot{ESO}{http://www.eso.org/}. Both SkyCat and GAIA are
 free software under the terms of the GNU copyright.
+
+The 3D facilities in GAIA use the
+\htmladdnormallink{VTK}{http://www.kitware.com} library.
 
 \section{\xlabel{getting_started}Getting Started}
 
@@ -335,10 +346,7 @@ The GAIA home page is at:
 \begin{quote}
 \htmladdnormallink{\mytt{http://www.starlink.rl.ac.uk/gaia/}}{http://www.starlink.rl.ac.uk/gaia/}.
 \end{quote}
-which may be updated from time-to-time. GAIA was created by the now
-closed Starlink UK project, funded by the Particle Physics and Astronomy Research
-Council (see links on the front page) and has been more recently support by
-the Joint Astronomy Centre Hawaii (another PPARC funded organisation).
+which may be updated from time-to-time. 
 
 \subsection{\xlabel{using_gaia_from_the_cshell}Using GAIA from the C-shell}
 
@@ -939,12 +947,17 @@ the Tcl community.
 Thanks are also due to the many people who helped test out GAIA and
 iron out minor and major problems (in particular Tim Jenness, Tim
 Gledhill and Nigel Metcalfe) and all the users who have reported bugs
-and sent support since the early releases.
+and sent support since the early releases and continue to do so.
 
-GAIA was created within the, now closed, Starlink project with funding from
-the Particle Physics and Astronomy Research Council. More recent developments
-(GAIA 3) have been supported by the Joint Astronomy Centre, Hawaii, again with
-funding from the Particle Physics and Astronomy Research Council.
+The 3D facilities of GAIA make extensive use of the 
+\htmladdnormallink{VTK}{http://www.kitware.com} library. Also a free
+library.
+
+GAIA was created by the now closed Starlink UK project, funded by the Particle
+Physics and Astronomy Research Council (PPARC) and has been more recently
+supported by the Joint Astronomy Centre Hawaii funded again by PPARC and more
+recently by its successor organisation the Science and Technology Facilities
+Council (STFC).
 
 % ? End of main text
 \end{document}

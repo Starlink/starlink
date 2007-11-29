@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(gaia, 4.1-0, gaia@star.rl.ac.uk)
+AC_INIT(gaia, 4.2-0, gaia@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -97,7 +97,9 @@ AC_SUBST(TCL_PACKAGE_VERSION)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
-AC_CONFIG_FILES([Makefile component.xml tasks/Makefile scripts/Makefile teagaia/Makefile])
+AC_CONFIG_FILES([Makefile tasks/Makefile scripts/Makefile teagaia/Makefile])
+AC_CONFIG_FILES([component.xml])
+AC_CONFIG_FILES([gaia/configure.in gaia3d/configure.in])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT

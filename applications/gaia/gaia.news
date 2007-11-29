@@ -1,3 +1,18 @@
+    GAIA-3D extension.
+    ==================
+    
+    New facilities for visualising data cubes have been developed for
+    GAIA. These include the facility to display 3D iso-surfaces and also to do
+    volume rendering. The current slice and spectral point extraction can also
+    be rendered into the scene, and there are also facilities for drawing
+    annotated axes and direction vectors. The scene is fully interactive and
+    can be manipulated to view regions of interest, as well as move the
+    current slice and spectrum.  Readout of the celestial and spectral
+    coordinates are also available (these work with the visualised
+    slice). Finally it is also possible to display iso-surfaces of other cubes
+    into the same scene for intercomparison purposes. See the "View" menu of
+    the cube toolbox.
+
     A new command-line option "-autoscale" has been added. This enables
     the "View->Auto scale" option to scale the image to fit the main window
     (but disables interactive control of the Scale: value). Also available
@@ -34,6 +49,21 @@
 
     A bug in the gaia_tcl program caused the gaiadisp command to fail
     under OS X. This has been fixed.
+
+    When extracting spectra from ACSIS sparse cubes, the offset
+    from the source position should now be correctly determined.
+
+    A problem in the ROSAT catalogue query URL has been fixed.
+
+    A problem opening NDFs with the same basename as a directory, in the
+    same directory, has been fixed.
+
+    The "Auto scale" feature now includes any graphics that have been drawn, 
+    so these now remain visible.
+
+    The major fonts used in the interface may now be changed as startup options.
+    Some platforms continue to provide poor size matching between the variable,
+    fixed and symbol fonts.
 
   Puana Release:
   ==============

@@ -141,12 +141,14 @@ int Gaia3dVtk_Init( Tcl_Interp *interp )
 }
 
 /**
- * Set the array component of an vtkImageImport object.
+ * Set the array component of an vtkImageImport object to all or part of a
+ * given data-cube.
  *
- * There are four arguments, the ARRAYinfo struct containing the array
- * data, the vtkImageImport command reference. The last two determine if
- * bad values are replaced with a null value (this is important for
- * volume rendering).
+ * There are six arguments, the ARRAYinfo struct containing the array data,
+ * the vtkImageImport command reference, the current data dimensions and the
+ * new axes limits along those dimensions (blank for none). The last two
+ * determine if bad values are replaced with a null value (this is important
+ * for volume rendering).
  *
  * Note you must create the vtkImageImport object, the ARRAYinfo struct
  * can be from an NDF or FITS file.
@@ -157,59 +159,110 @@ int Gaia3dVtk_Init( Tcl_Interp *interp )
 static int Gaia3dVtkSetArray( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] )
 {
-    ARRAYinfo *arrayInfo = NULL;
-    ARRAYinfo *normInfo = NULL;
-    Tcl_CmdInfo cmdInfo;
-    double nullvalue = 0.0;
-    int savemem = 0;
-    int nobad = 0;
-    int nullcheck = 0;
-    long adr;
-    vtkImageImport *vii = NULL;
-
-    /* Check arguments, only allow three or four. */
-    if ( objc != 5 && objc != 4 ) {
+    /* Check arguments, only allow six. */
+    if ( objc != 7 ) {
         Tcl_WrongNumArgs( interp, 1, objv, "array_handle vtkImageImport "
-                          "check_null [nullvalue]" );
+                          "dims limits check_null nullvalue" );
         return TCL_ERROR;
     }
 
     /* Get the ARRAYinfo struct */
+    long adr;
     if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
         return TCL_ERROR;
     }
-    arrayInfo = (ARRAYinfo *) adr;
+    ARRAYinfo *arrayInfo = (ARRAYinfo *) adr;
 
     /* Access the Tcl_Command for the vtkImageImport object */
+    Tcl_CmdInfo cmdInfo;
     if ( Tcl_GetCommandInfo( interp, Tcl_GetString( objv[2] ), &cmdInfo ) ) {
 
         /* Get the vtkImageImport object */
         ClientData cd = cmdInfo.clientData;
-        vii = (vtkImageImport *)(((vtkTclCommandArgStruct *)cd)->Pointer);
+        vtkImageImport *vii = 
+            (vtkImageImport *)(((vtkTclCommandArgStruct *)cd)->Pointer);
 
-        /* Check for nulls? */
-        if ( Tcl_GetBooleanFromObj( interp, objv[3], &nullcheck ) != TCL_OK ) {
+        /* Get the dimensions. */
+        int dims[3];
+        Tcl_Obj **dimObjv;
+        int ndims;
+        if ( Tcl_ListObjGetElements( interp, objv[3], &ndims, &dimObjv ) != 
+             TCL_OK) {
             return TCL_ERROR;
         }
-        if ( nullcheck && objc == 5 ) {
-            if ( Tcl_GetDoubleFromObj(interp, objv[4], &nullvalue) != TCL_OK) {
+        for ( int i = 0; i < 3; i++ ) {
+            if ( Tcl_GetIntFromObj(interp, dimObjv[i], &dims[i]) != TCL_OK ) {
                 return TCL_ERROR;
             }
         }
 
-        /* Normalise the data from FITS format if needed */
-        gaiaArrayNormalisedFromArray( arrayInfo, &normInfo, nullcheck,
-                                      nullvalue, GAIA_ARRAY_NEW, &nobad );
+        /* See if a section of the data is required. */
+        int nvals;
+        if ( Tcl_ListObjGetElements( interp, objv[4], &nvals, &dimObjv ) != 
+             TCL_OK) {
+            return TCL_ERROR;
+        }
+        int lbnd[3];
+        int ubnd[3];
+        if ( nvals > 1 ) {
+            for ( int i = 0, j = 0; i < 3; i++, j += 2  ) {
+                if ( Tcl_GetIntFromObj( interp, dimObjv[j], &lbnd[i] ) 
+                     != TCL_OK ) {
+                    return TCL_ERROR;
+                }
+                if ( Tcl_GetIntFromObj( interp, dimObjv[j+1], &ubnd[i] ) 
+                     != TCL_OK) {
+                    return TCL_ERROR;
+                }
+            }
+        }
 
+        /* Check for nulls? */
+        int nullcheck = 0;
+        if ( Tcl_GetBooleanFromObj( interp, objv[5], &nullcheck ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+        double nullvalue = 0.0;
+        if ( Tcl_GetDoubleFromObj(interp, objv[6], &nullvalue) != TCL_OK) {
+            return TCL_ERROR;
+        }
+
+        /* Extract and normalise the data -- FITS & byte -- if
+         * needed. Otherwise just normalise the data. */
+        ARRAYinfo *normInfo = NULL;
+        ARRAYinfo *currentInfo = arrayInfo;
+        int nobad = 0;
+        int savemem = 0;
+        if ( nvals > 1 ) {
+            gaiaArrayRawCubeFromCube( arrayInfo, dims, lbnd, ubnd, 
+                                      &currentInfo, GAIA_ARRAY_NEW );
+        }
+        gaiaArrayNormalisedFromArray( currentInfo, &normInfo, nullcheck,
+                                      nullvalue, GAIA_ARRAY_NEW, &nobad );
+            
         /* If new memory was allocated need to handle it */
         if ( normInfo == NULL ) {
-            /* Using original memory */
-            normInfo = arrayInfo;
-            savemem = 1;
+            normInfo = currentInfo;
+
+            /* Data not normalised, but that could be a from a section which
+             * will be a copy. */
+            if ( nvals > 1 ) {
+                /* New memory. */
+                savemem = 0;
+            }
+            else {
+                savemem = 1;
+            }
         }
         else {
             /* New memory */
             savemem = 0;
+
+            /* If from a section we can free that memory now. */
+            if ( nvals > 1 ) {
+                gaiaArrayFree( currentInfo );
+                gaiaArrayFreeInfo( currentInfo );
+            }
         }
 
         /* Set related meta-data */

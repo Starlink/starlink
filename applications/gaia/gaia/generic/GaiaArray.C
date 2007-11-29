@@ -101,6 +101,10 @@ static void RawSubImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
 static void GetSubImage( void *inPtr, int dims[2], int nbytes, int lbnd[2],
                          int ubnd[2], void *outPtr );
 
+static void RawCubeFromCube( ARRAYinfo *cubeinfo, int dims[], int lbnd[],
+                             int ubnd[], void **outPtr, size_t *nel,
+                             int memtype );
+
 
 static void AllocateMemory( int memtype, size_t nel, void **ptr );
 static void FreeMemory( int memtype, void *ptr );
@@ -776,6 +780,170 @@ static void GetSubImage( void *inPtr, int dims[2], int nbytes, int lbnd[2],
     }
 }
 
+/**
+ *  Name:
+ *     gaiaArrayCubeFromCube
+ *
+ *  Purpose:
+ *     Given an array of 3 significant dimensions, in a supported data type,
+ *     extract a sub-cube and return the data in that section in an ARRAYinfo
+ *     structure. The dataType should be one of the enumerations HDS_xxxx
+ *     defined in gaiaArray.h (these correspond to the HDS data types). The
+ *     underlying data will be changed if byte-swapping is needed and may be
+ *     converted into a floating point type, if the data are FITS and have
+ *     non-trivial bscale and bzero values.
+ *
+ *  Arguments:
+ *     ininfo
+ *         Pointer to the cube ARRAYinfo structure.
+ *     dims[3]
+ *         The dimensions of the cube.
+ *     lbnd[3]
+ *         The lower bounds of the cube to be extracted.
+ *     ubnd[3]
+ *         The upper bounds of the cube to be extracted.
+ *     outinfo
+ *         a pointer to a pointer to be assigned to a new ARRAYinfo structure.
+ *         The necessary memory will be allocated using malloc, cnfMalloc or
+ *         new as determined by the final argument. Freeing it is the
+ *         responsibility of the caller.
+ *     memtype
+ *         Whether to use malloc, cnfMalloc or new to allocate the image
+ *         data (one of GAIA_ARRAY_MALLOC, GAIA_ARRAY_CNFMALLOC,
+ *         GAIA_ARRAY_NEW).
+ */
+void gaiaArrayCubeFromCube( ARRAYinfo *ininfo, int dims[3], int lbnd[3],
+                            int ubnd[3], ARRAYinfo **outinfo, int memtype )
+{
+    int normtype;
+    int type = ininfo->type;
+    size_t nel;
+    void *normPtr = NULL;
+    void *outPtr = NULL;
+
+    /* Get the raw image data */
+    outPtr = NULL;
+    RawCubeFromCube( ininfo, dims, lbnd, ubnd, &outPtr, &nel, memtype );
+
+    /* Normalise the data to remove byte-swapping and unrecognised
+     * BAD values, and convert from a scaled variant. For NDFs this is a
+     * null op. */
+    DataNormalise( outPtr, type, nel, ininfo->isfits, ininfo->haveblank,
+                   ininfo->blank, ininfo->bscale, ininfo->bzero,
+                   memtype, 1, &normPtr, &normtype );
+
+    /* Create the ARRAYinfo structure, note not FITS and BSCALE and BZERO are
+     * no longer used. */
+    *outinfo = gaiaArrayCreateInfo( normPtr, normtype, nel,
+                                    0, 0, 0, 1.0, 0.0, memtype );
+}
+
+/*
+ * Extract a cube image from another cube, just returning the raw data. The
+ * output memory may be pre-allocated (when it isn't make sure *outPtr is set
+ * to NULL). No normalisation of the data is attempted.
+ */
+static void RawCubeFromCube( ARRAYinfo *cubeinfo, int dims[3], int lbnd[3],
+                             int ubnd[3], void **outPtr, size_t *nel,
+                             int memtype )
+{
+    int i;
+    int j;
+    int k;
+    int l;
+    int m;
+    int n;
+    int offs;
+    int type = cubeinfo->type;
+    size_t area;
+    size_t length;
+    size_t offset;
+    void *inPtr = cubeinfo->ptr;
+    void *ptr;
+
+    /* Work out area of an "image" and the volume of the sub-cube in pixels. */
+    area = (size_t) (ubnd[0] - lbnd[0]) * (size_t) (ubnd[1] - lbnd[1]);
+    *nel = area * (size_t) (ubnd[2] - lbnd[2]);
+
+    /* Size of sub-cube in bytes. */
+    length = (*nel) * gaiaArraySizeOf( type );
+
+    /* Allocate the memory, if needed. */
+    if ( *outPtr == NULL ) {
+        AllocateMemory( memtype, length, outPtr );
+    }
+
+    if ( lbnd[0] == 0 && ubnd[0] == dims[0] &&
+         lbnd[1] == 0 && ubnd[1] == dims[1] ) {
+        
+        /* Full sized first and second dimensions with extraction limits along
+         * third (or possibly whole cube). This memory will be contiguous, so
+         * just copy. */
+
+        /* Get the offset into cube of first pixel (in bytes). */
+        offset = gaiaArraySizeOf( type ) * area * (size_t) lbnd[2];
+        ptr = ((char *) inPtr) + offset;
+
+        /* And copy the memory */
+        memcpy( *outPtr, ptr, length );
+    }
+    else {
+
+        /* Noncontiguous memory, so need to pick it out pixel by pixel */
+
+        /* Copy the data, use type switch to keep pointer arithmetic simple.
+         * Use a macro to keep repeated code under control, simple loops so no
+         * need to use full striding. */
+#define EXTRACT_AND_COPY(type)                                  \
+{                                                               \
+         type *fromPtr = (type *) inPtr;                        \
+         type *toPtr = (type *) *outPtr;                        \
+         l = 0;                                                 \
+         for ( k = lbnd[2]; k < ubnd[2]; k++ ) {                \
+             m = dims[0] * dims[1] * k;                         \
+             for ( j = lbnd[1]; j < ubnd[1]; j++ ) {            \
+                 n = dims[0] * j;                               \
+                 for ( i = lbnd[0]; i < ubnd[0]; i++ ) {        \
+                     offs = m + n + i;                          \
+                     toPtr[l++] = fromPtr[offs];                \
+                 }                                              \
+             }                                                  \
+         }                                                      \
+}
+        switch ( type )
+        {
+            case HDS_DOUBLE:
+                EXTRACT_AND_COPY(double)
+            break;
+
+            case HDS_REAL:
+                EXTRACT_AND_COPY(float)
+            break;
+
+            case HDS_INTEGER:
+                EXTRACT_AND_COPY(int)
+            break;
+
+            case HDS_WORD:
+                EXTRACT_AND_COPY(short)
+            break;
+
+            case HDS_UWORD:
+                EXTRACT_AND_COPY(unsigned short)
+            break;
+
+            case HDS_BYTE:
+                EXTRACT_AND_COPY(char)
+            break;
+
+            case HDS_UBYTE:
+                EXTRACT_AND_COPY(unsigned char)
+            break;
+        }
+    }
+#undef EXTRACT_AND_COPY
+
+}
 
 /**
  *  Name:
@@ -1687,6 +1855,53 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
 
 /**
  *  Name:
+ *     gaiaArrayRawCubeFromCube
+ *
+ *  Purpose:
+ *     Given an array of 3 significant dimensions, in a supported data type,
+ *     extract a sub-cube and return the data in that section in an ARRAYinfo
+ *     structure. The data is not transformed in any way (if that is required
+ *     see gaiaArrayCubeFromCube, or follow this by a call to
+ *     gaiaArrayNormalisedFromArray, that would be typical).
+ *
+ *  Arguments:
+ *     ininfo
+ *         Pointer to the cube ARRAYinfo structure.
+ *     dims[3]
+ *         The dimensions of the cube.
+ *     lbnd[3]
+ *         The lower bounds of the cube to be extracted.
+ *     ubnd[3]
+ *         The upper bounds of the cube to be extracted.
+ *     outinfo
+ *         a pointer to a pointer to be assigned to a new ARRAYinfo structure.
+ *         The necessary memory will be allocated using malloc, cnfMalloc or
+ *         new as determined by the final argument. Freeing it is the
+ *         responsibility of the caller.
+ *     memtype
+ *         Whether to use malloc, cnfMalloc or new to allocate the image
+ *         data (one of GAIA_ARRAY_MALLOC, GAIA_ARRAY_CNFMALLOC,
+ *         GAIA_ARRAY_NEW).
+ */
+void gaiaArrayRawCubeFromCube( ARRAYinfo *ininfo, int dims[3], int lbnd[3],
+                               int ubnd[3], ARRAYinfo **outinfo, int memtype )
+{
+    int type = ininfo->type;
+    size_t nel;
+    void *outPtr = NULL;
+
+    /* Get the raw image data */
+    outPtr = NULL;
+    RawCubeFromCube( ininfo, dims, lbnd, ubnd, &outPtr, &nel, memtype );
+
+    /* Create an ARRAYinfo structure. */
+    *outinfo = gaiaArrayCreateInfo( outPtr, type, nel, ininfo->isfits,
+                                    ininfo->haveblank, ininfo->blank, 
+                                    ininfo->bscale, ininfo->bzero, memtype );
+}
+
+/**
+ *  Name:
  *     gaiaArrayNormalisedFromArray
  *
  *  Purpose:
@@ -1751,8 +1966,11 @@ void gaiaArrayNormalisedFromArray( ARRAYinfo *inInfo, ARRAYinfo **outInfo,
 
 /**
  *  Normalise an array if this machine does not have native FITS ordering and
- *  the data is in FITS format. Also transform FITS bad values into HDS ones.
- *  This variant always creates a copy, unless the input array is not FITS.
+ *  the data is in FITS format. Also transform FITS bad values into HDS ones
+ *  and can also change all bad values into a given nullvalue, if requested.
+ *
+ *  This variant always creates a copy, unless the input array is not FITS
+ *  and no bad value transformation is require.
  */
 static void DataNormaliseCopy( void *inPtr, int intype, int nel, int isfits,
                                int haveblank, int inBlank, double bscale,

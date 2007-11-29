@@ -188,11 +188,12 @@ itcl::class gaia3d::Gaia3dTool {
    #  -----------
    destructor  {
 
+      #  Free the Plot3D. XXX don't do this as the renderer is destructing
+      #  so it's not safe.
+      #  free_plot3d_
+
       #  Release any scene VTK objects and the image data.
       catch {release_objects 1}
-
-      #  Free the Plot3D.
-      free_plot3d_
 
       #  Simple axes. These can be just set visible/invisible, so only remove
       #  on a full release.
@@ -631,7 +632,8 @@ itcl::class gaia3d::Gaia3dTool {
 
          #  Report the position in world coords.
          set value [$plane_ get_value]
-         set coords [gaiautils::asttrann $wcs_ 1 [list $ix $iy $iz] 1]
+         set coords \
+            [gaiautils::asttrann [$imagedata_ get_wcs] 1 [list $ix $iy $iz] 1]
          $textwcs_ set_text "coords: $coords -> value: $value"
 
          #  Track the position in GAIA.
@@ -653,7 +655,8 @@ itcl::class gaia3d::Gaia3dTool {
    #  Plane has moved. Set the cube display in GAIA. Note index is zero based
    #  grid value.
    protected method image_plane_moved_ {index} {
-      set plane [$itk_option(-gaiacube) axis_grid2pixel [expr $index+1]]
+      set plane [$imagedata_ grid2pixel \
+                    [$itk_option(-gaiacube) get_axis] [expr $index+1]]
       $itk_option(-gaiacube) set_display_plane $plane
    }
 
@@ -686,7 +689,8 @@ itcl::class gaia3d::Gaia3dTool {
    #  Move image plane to given pixel coordinate.
    public method set_display_plane {plane} {
       if { $plane_ != {} && $show_image_plane_ } {
-         set index [$itk_option(-gaiacube) axis_pixel2grid $plane]
+         set index [$imagedata_ pixel2grid \
+                       [$itk_option(-gaiacube) get_axis] $plane]
          incr index -1
          $plane_ set_slice_index $index
          $renwindow_ render
@@ -728,16 +732,20 @@ itcl::class gaia3d::Gaia3dTool {
       set drawn_ 1
       busy {
          #  Access the main cube image data.
-         set newdata [get_vtk_data_array_]
+         set datachange [get_vtk_data_array_]
 
-         #  Clear the scene for new data.
-         if { $newdata } {
+         #  Clear the scene for a data change.
+         if { $datachange != 0 } {
             clear_scene 0
 
             #  And set the camera to be nearly along the Z axis (facing like
-            #  image, but with side-view).
-            lassign $dims_ nx ny nz
-            $renwindow_ set_camera $nx $ny [expr $nz*5]
+            #  image, but with side-view), if the data file changed. Otherwise
+            #  the limits or bad pixel handling changed, want to keep the
+            #  scene position in that case.
+            if { $datachange == 1 } {
+               lassign [$imagedata_ get_dims] nx ny nz
+               $renwindow_ set_camera $nx $ny [expr $nz*5]
+            }
          }
 
          #  Add the spectral line prop, needs to go before other props so gets
@@ -817,29 +825,18 @@ itcl::class gaia3d::Gaia3dTool {
                create_plot3d_
             }
             grid_plot3d_
-
-            #  XXX test markers...
-            #for { set j 0 } { $j < 10 } { incr j } {
-            #   set coords ""
-            #   for { set i 0 } { $i < 5 } { incr i } {
-            #      set x [expr 100.0*rand()]
-            #      set y [expr 100.0*rand()]
-            #      set z [expr 100.0*rand()]
-            #      append coords "$x $y $z "
-            #   }
-            #   gvtk::astmark $plot_  $j "$coords"
-            #}
          }
 
          #  Do the work of rendering the fuller scene using the main
          #  cube. Note use ProgressEvents when possible to update the UI from
          #  time to time, so although blocked it might not be too bad.
-         draw_scene_ $newdata
+         draw_scene_ $datachange
 
          #  Now draw any additional cubes.
          if { [info exists itk_component(extratoolbox) ] &&
               [winfo exists $itk_component(extratoolbox) ] } {
-            $itk_component(extratoolbox) render $renwindow_ $wcs_
+            $itk_component(extratoolbox) render $renwindow_ \
+               [$imagedata_ get_wcs]
          }
 
          #  2D Widgets go last. Add a orientation marker that is always
@@ -850,7 +847,7 @@ itcl::class gaia3d::Gaia3dTool {
                                    -renwindow $renwindow_]
                $simpleaxes_ add_to_window
             }
-            $simpleaxes_ configure -wcs $wcs_
+            $simpleaxes_ configure -wcs [$imagedata_ get_wcs]
             $simpleaxes_ set_visible
          } else {
             if { $simpleaxes_ != {} } {
@@ -872,9 +869,9 @@ itcl::class gaia3d::Gaia3dTool {
             }
          }
 
-         #  Do rendering. If new data reset camera to make sure the volume
-         #  and everything else is withing clipping range.
-         if { $newdata } {
+         #  Do rendering. If new data file reset camera to make sure the
+         #  volume and everything else is withing clipping range.
+         if { $datachange == 1 } {
             $renwindow_ reset_camera
          }
          $renwindow_ render
@@ -885,7 +882,7 @@ itcl::class gaia3d::Gaia3dTool {
    protected method create_plot3d_ {} {
       free_plot3d_
       set grf_context_ [gvtk::grfinit [$renwindow_ get_renderer]]
-      set plot_ [gvtk::astplot $wcs_ $dims_ \
+      set plot_ [gvtk::astplot [$imagedata_ get_wcs] [$imagedata_ get_dims] \
                     "colour(markers)=5,size(markers)=20"]
    }
 
@@ -930,24 +927,19 @@ itcl::class gaia3d::Gaia3dTool {
    }
 
    #  Create and update the scene as necessary. If the data has been
-   #  read or changed newdata will be set. The scene will be rendered
-   #  immediately after this call.
-   protected method draw_scene_ { newdata } {
+   #  read or changed datachange will be set to 1 or 2. The scene will be
+   #  rendered immediately after this call.
+   protected method draw_scene_ { datachange } {
       error "Implement a draw_scene_ method"
    }
 
    #  Access the cube data and wrap this into an instance of vtkArrayData.
    #  Only done if the image data has changed or the extraction limits have
-   #  changed, returns 1 when this happens, and 0 otherwise.
+   #  changed. Returns 1 when the data has changed and 2 when the limits have
+   #  or bad pixel replacement has changed and 0 otherwise.
    protected method get_vtk_data_array_ {} {
 
       set cubeaccessor_ [$itk_option(-gaiacube) get_cubeaccessor]
-
-      #  For speed of access cache the full WCS.
-      set wcs_ [$cubeaccessor_ getwcs]
-
-      #  And the dimensions.
-      set dims_ [$cubeaccessor_ getdims 0]
 
       #  Get the extraction limits. Only support this along the "spectral"
       #  axis at present.
@@ -961,10 +953,21 @@ itcl::class gaia3d::Gaia3dTool {
       #  Check name of cube data, if changed re-access, or
       #  bad value handling changed.
       set newname [$cubeaccessor_ cget -dataset]
-      if { $newname != {} && $cubename_ != $newname || $changed_bad_ ||
-           $changed_limits } {
-         set changed_bad_ 0
+      
+      #  Has the data changed?
+      set result 0
+      if { $newname != {} && $cubename_ != $newname } {
+         set result 1
          set cubename_ $newname
+      } else {
+         if { $changed_bad_ || $changed_limits } {
+            set result 2
+         }
+      }
+
+      #  Read data if needed.
+      if { $result != 0 } {
+         set changed_bad_ 0
 
          #  Create object to access the cube data.
          if { $imagedata_ == {} } {
@@ -974,15 +977,36 @@ itcl::class gaia3d::Gaia3dTool {
          #  Data changed, so new Plot3D required.
          free_plot3d_
 
-         #  Access data, checking for BAD pixels and replacing if requested.
+         #  Configure data access object so that we check for BAD pixels and
+         #  replace if requested.
          $imagedata_ configure \
             -cubeaccessor $cubeaccessor_ \
             -checkbad $checkbad_ \
             -nullvalue [$itk_component(replacevalue) get]
+         
+         #  If we have limits for the spectral axis, update them so that only
+         #  part of the date is read (forces a copy however).
+         if { $changed_limits } {
+            if { $limits != {} } {
+               #  Limits are in pixel coordinates.
+               set l1 \
+                  [$itk_option(-gaiacube) axis_pixel2grid [lindex $limits 0]]
+               set l2 \
+                  [$itk_option(-gaiacube) axis_pixel2grid [lindex $limits 1]]
+               set ll [expr min($l1,$l2)-1]
+               set ul [expr max($l1,$l2)]
+               set axis [$itk_option(-gaiacube) get_axis]
+               $imagedata_ set_axis_limits $axis "$ll $ul"
+            } else {
+               #  No limits, so back to full cube.
+               $imagedata_ configure -limits {}
+            }
+         }
+
+         #  Finally ready to read the data.
          $imagedata_ access
-         return 1
       }
-      return 0
+      return $result
    }
 
    #  Clear the scene so that nothing is displayed, by deleting any scene
@@ -1058,8 +1082,6 @@ itcl::class gaia3d::Gaia3dTool {
 
    #  Accessor for the current cube (cached).
    protected variable cubeaccessor_ {}
-   protected variable wcs_ {}
-   protected variable dims_ {0 0 0}
 
    #  Limits of spectral extraction.
    protected variable limits_ {}

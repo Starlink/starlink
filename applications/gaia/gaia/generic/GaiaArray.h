@@ -109,6 +109,16 @@ extern "C" {
                                           int memtype, void **outPtr, 
                                           int *nel, int *outtype );
 
+    /* Extract a cube from a cube */
+    void gaiaArrayCubeFromCube( ARRAYinfo *ininfo, int dims[3], int lbnd[3],
+                                int ubnd[3], ARRAYinfo **outinfo, 
+                                int memtype );
+
+    /* Extract a cube from a cube, raw data version */
+    void gaiaArrayRawCubeFromCube( ARRAYinfo *ininfo, int dims[3], int lbnd[3],
+                                   int ubnd[3], ARRAYinfo **outinfo, 
+                                   int memtype );
+
     /* Normalise an array if needed */
     void gaiaArrayNormalisedFromArray( ARRAYinfo *inInfo, ARRAYinfo **outInfo,
                                        int nullcheck, double nullvalue,

@@ -10,6 +10,7 @@
 
  *  Copyright:
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     Copyright (C) 2007 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -100,6 +101,8 @@ static int GaiaUtilsGtFrame( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsGtROIPlots( ClientData clientData, Tcl_Interp *interp,
                                 int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsShiftWcs( ClientData clientData, Tcl_Interp *interp,
+                              int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsUrlGet( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
 
@@ -176,6 +179,9 @@ int GaiaUtils_Init( Tcl_Interp *interp )
     Tcl_CreateObjCommand( interp, "gaiautils::getroiplots",
                           GaiaUtilsGtROIPlots, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::shiftwcs", GaiaUtilsShiftWcs,
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::urlget", GaiaUtilsUrlGet,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
@@ -312,7 +318,7 @@ static int GaiaUtilsAstGetRefPos( ClientData clientData, Tcl_Interp *interp,
 
     /* Check arguments, only allow one. */
     if ( objc != 2 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "AstSpecFrame" );
+        Tcl_WrongNumArgs( interp, 1, objv, "specframe" );
         return TCL_ERROR;
     }
 
@@ -1024,7 +1030,7 @@ static int GaiaUtilsAstConvert( ClientData clientData, Tcl_Interp *interp,
 
     /* Check arguments, only allow three. */
     if ( objc != 4 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "Frame Frame DomainList" );
+        Tcl_WrongNumArgs( interp, 1, objv, "frame frame domain_list" );
         return TCL_ERROR;
     }
 
@@ -1073,7 +1079,7 @@ static int GaiaUtilsAstTran2( ClientData clientData, Tcl_Interp *interp,
 
     /* Check arguments, only allow three. */
     if ( objc != 4 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "Mapping pos1 pos2" );
+        Tcl_WrongNumArgs( interp, 1, objv, "mapping pos1 pos2" );
         return TCL_ERROR;
     }
 
@@ -1138,7 +1144,7 @@ static int GaiaUtilsAstTranN( ClientData clientData, Tcl_Interp *interp,
     /* Check arguments, only allow three or four. */
     if ( objc != 4 && objc != 5 ) {
         Tcl_WrongNumArgs( interp, 1, objv,
-                          "Mapping forward {coord1 coord2 ...} [formatted]" );
+                          "mapping forward {coord1 coord2 ...} [formatted]" );
         return TCL_ERROR;
     }
 
@@ -1285,7 +1291,7 @@ static int GaiaUtilsAstLinearApprox( ClientData clientData, Tcl_Interp *interp,
 
     /* Check arguments, only allow four. */
     if ( objc != 5 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "Mapping {lbnd1 lbnd2 ...} "
+        Tcl_WrongNumArgs( interp, 1, objv, "mapping {lbnd1 lbnd2 ...} "
                           "{ubnd1 ubnd2 ...} tol" );
         return TCL_ERROR;
     }
@@ -1350,6 +1356,74 @@ static int GaiaUtilsAstLinearApprox( ClientData clientData, Tcl_Interp *interp,
     }
     astClearStatus;
     Tcl_SetResult( interp, "Failed to get a linear approximation",
+                   TCL_VOLATILE );
+    return TCL_ERROR;
+}
+
+
+/*
+ * Create a new AST FrameSet that represents a shift in base coordinates
+ * of an existing FrameSet.
+ *
+ * There are two arguments, the address of a FrameSet followed by the 
+ * shifts (these are in the sense of NDF sections based on GRID coordinates).
+ *
+ * The result is a new FrameSet.
+ */
+static int GaiaUtilsShiftWcs( ClientData clientData, Tcl_Interp *interp,
+                              int objc, Tcl_Obj *CONST objv[] )
+{
+    /* Check arguments, only allow two. */
+    if ( objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "frameset {shift1 shift2 ...} " );
+        return TCL_ERROR;
+    }
+
+    /* Get the FrameSet */
+    long adr;
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    AstFrameSet *frameset = (AstFrameSet *) adr;
+
+    /* Number of base coordinates. */
+    int nin = astGetI( frameset, "Nin" );
+    
+    /* Get the shifts. */
+    Tcl_Obj **listObjv;
+    int nvals;
+    if ( Tcl_ListObjGetElements( interp, objv[2], &nvals, &listObjv )
+         != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    if ( nvals != nin ) {
+        Tcl_SetResult( interp, "Wrong no. of bounds", TCL_VOLATILE );
+        return TCL_ERROR;
+    }
+    double shifts[7];
+    for ( int i = 0; i < nvals; i++ ) {
+        if (Tcl_GetDoubleFromObj(interp, listObjv[i], &shifts[i]) != TCL_OK) {
+            return TCL_ERROR;
+        }
+
+        /* To apply these in a shiftmap we need to reflect about 0. */
+        shifts[i] = -shifts[i];
+    }
+
+    /* Construct a mapping using the shifts. */
+    AstShiftMap *shiftMap = astShiftMap( nvals, shifts, "" );
+
+    /* Create copies of the input FrameSet and remap then base frame. */
+    AstFrameSet *copy = (AstFrameSet *) astCopy( frameset );
+    astRemapFrame( copy, AST__BASE, shiftMap );
+    astAnnul( shiftMap );
+    
+    /* Export the new FrameSet. */
+    if ( astOK ) {
+        Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) copy ) );
+        return TCL_OK;
+    }
+    Tcl_SetResult( interp, "Failed to apply shift to frameset",
                    TCL_VOLATILE );
     return TCL_ERROR;
 }

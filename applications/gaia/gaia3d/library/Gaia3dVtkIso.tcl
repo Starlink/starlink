@@ -62,7 +62,8 @@ itcl::class ::gaia3d::Gaia3dVtkIso {
    constructor {args} {
 
       #  Create the necessary VTK objects.
-      set contour_ [::vtkMarchingContourFilter New]
+      #set contour_ [::vtkMarchingContourFilter New]
+      set contour_ [::vtkImageMarchingCubes New]
 
       #  Create a mapper for the polygonal data created to represent the iso
       #  surface.
@@ -70,8 +71,9 @@ itcl::class ::gaia3d::Gaia3dVtkIso {
       $mapper_ SetInputConnection [$contour_ GetOutputPort]
       $mapper_ ScalarVisibilityOff
 
-      #  Observe the progress of the mapper so that we can update the UI
-      #  during long rendering jobs.
+      #  Observe the progress of the mapper and contour so that we can update
+      #  the UI during long rendering jobs.
+      $contour_ AddObserver ProgressEvent [code $this update_ui_]
       $mapper_ AddObserver ProgressEvent [code $this update_ui_]
 
       #  Create an actor for the polygonal data.
