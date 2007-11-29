@@ -2098,6 +2098,8 @@ int *status              /* global status (given and returned) */
     Return a ponter to existing SCUBA-2 timestream data.
    History :
     16Nov2007 : original (bdk)
+    29Nov2007 : calloc returned pointer irrespective of the file data being
+                compressed (bdk)
 */
 {
    int *bzero;                 /* pointer to compression offset values */
@@ -2107,15 +2109,28 @@ int *status              /* global status (given and returned) */
    int j;                      /* loop counter */
    int nbol;                   /* number of bolometers */
    int place;                  /* NDF placeholder */
-   char type[NDF__SZTYP+1];    /* type of stored raw data */
    size_t npix;                /* number of incompressible pixels */
    static int pixnum[DREAM__MXBOL];  /* indices of incompressible pixels */
    static int pixval[DREAM__MXBOL];  /* values of incompressible pixels */
    int *stackz;                /* pointer to subtracted frame in compression */
+   char type[NDF__SZTYP+1];    /* type of stored raw data */
+   int *udata;                 /* pointer to uncompressed data array */
 
 
    if ( *status != SAI__OK ) return;
 
+
+/* Allocate space for the raw data */
+
+    nbol = colsize * rowsize;
+    *rawdata = (int *) calloc ( nframes*nbol, sizeof(int) );
+    if ( *rawdata == NULL )
+    {
+       *status = DITS__APP_ERROR;
+       ErsRep ( 0, status, 
+         "sc2store_readraw: failed to map space for timestream data" );
+       return;  
+    }
 
 /* Check for whether the data are "_SHORT", ie compressed, or "_INTEGER" */
 
@@ -2126,8 +2141,12 @@ int *status              /* global status (given and returned) */
 
 /* Map the data array */
 
-      ndfMap ( sc2store_indf, "DATA", "_INTEGER", "READ", (void *)rawdata, &el, 
+      ndfMap ( sc2store_indf, "DATA", "_INTEGER", "READ", (void *)(&udata), &el, 
         status );
+      if ( *status == SAI__OK )
+      {
+         memcpy ( *rawdata, udata, el*sizeof(int) );
+      }
    }
    else
    {
@@ -2172,8 +2191,6 @@ int *status              /* global status (given and returned) */
 
       if ( StatusOkP(status) ) 
       {
-         nbol = colsize * rowsize;
-         *rawdata = (int *) calloc ( nframes*nbol, sizeof(int) );
 
 /* get details of incompressible pixels and decompress frames */
 
