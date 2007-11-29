@@ -148,6 +148,17 @@ itcl::class gaia3d::Gaia3dTool {
       $Options add cascade -label "Annotated text colour" -menu $submenu
       textcolour_fill_ $submenu
 
+      #  Interactor mode, joystick by default, so offer trackerball.
+      $Options add checkbutton \
+         -label {Trackerball interactions} \
+         -variable [scope interaction_mode_] \
+         -onvalue trackerball \
+         -offvalue joystick \
+         -command [code $this set_interaction_mode_]
+      $short_help_win_ add_menu_short_help $Options \
+         {Trackerball interactions} \
+         {Mouse interaction mode, joystick (off) or trackerball (on)}
+
       #  Create a panedwindow to define the basic layout between the
       #  graphics display and controls in a left-right split.
       itk_component add pane {
@@ -646,6 +657,11 @@ itcl::class gaia3d::Gaia3dTool {
       $textwcs_ set_invisible
    }
 
+   #  Set the mouse interaction mode.
+   protected method set_interaction_mode_ {} {
+      $renwindow_ set_interaction_mode $interaction_mode_
+   }
+
    #================================================================
    #  Interaction with GAIA.
    #================================================================
@@ -1126,6 +1142,9 @@ itcl::class gaia3d::Gaia3dTool {
 
    #  The colour of the AST axes text. AST index.
    protected variable ast_textcolour_ 1
+
+   #  Interaction mode.
+   protected variable interaction_mode_ "joystick"
 
    #  Common variables: (shared by all instances)
    #  -----------------

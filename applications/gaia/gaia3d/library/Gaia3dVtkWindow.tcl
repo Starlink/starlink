@@ -197,6 +197,15 @@ itcl::class gaia3d::Gaia3dVtkWindow {
       [get_interactor] SetDesiredUpdateRate $value
    }
 
+   #  Set the interactor mousing mode, trackerball or joystick (default).
+   public method set_interaction_mode {mode} {
+      if { $mode == "trackerball" } {
+         [[get_interactor] GetInteractorStyle] SetCurrentStyleToTrackballCamera
+      } else {
+         [[get_interactor] GetInteractorStyle] SetCurrentStyleToJoystickCamera
+      }
+   }
+
    #  Set the background colour using VTK RGB values.
    public method set_rgb_background { R G B } {
       set rgb_background_ [list $R $G $B]
