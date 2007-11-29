@@ -121,6 +121,10 @@
 *        Original version, derived from KPG1_ASTRM.
 *     26-JUN-2006 (DSB):
 *        Shrink the ROI bounds before transforming it into current Frame.
+*     29-NOV-2006 (DSB):
+*        Attempt to split the existing Mapping first, then only use the
+*        old method of appending a permmap in series with the original
+*        Mapping if the mapping cannot be split.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -175,6 +179,12 @@
       INTEGER ICUR0
       INTEGER ICUR1
       INTEGER INVAXES( ATL__MXDIM )
+      INTEGER INPRM( ATL__MXDIM )
+      INTEGER OUTPRM( ATL__MXDIM )
+      INTEGER SPMAP
+      INTEGER PMAP
+      INTEGER NSPIN
+      INTEGER CMAP
       INTEGER IPOUT
       INTEGER IS
       INTEGER IU
@@ -238,6 +248,59 @@
             CALL AST_SETC( NEWCUR, 'TITLE', TTL( : LTTL ), STATUS )
          END IF
 
+*  By choice we would like to split the base to current Frame Mapping up
+*  into two parallel Mappings, one of which produces the current Frame axis
+*  values that are to be retained, and the other of which produces the
+*  curent Frame axis values that are to be dropped. It may or may not be 
+*  possible to split the Mapping in this way, but if we can it will
+*  simplify the returned FrameSet and avoid some potential problems to do
+*  with inverse transformations not being defined. Try splitting the
+*  Mapping. We require the pixel axes to feed the selected current Frame
+*  axes. See if this is the case. Since AST_MAPSPLIT splits off inputsd,
+*  but we want to choose outputs, we need to invert he Mapping first so that
+*  inputs become outputs and vice-versa.
+         CMAP = AST__NULL
+         CALL AST_INVERT( BCMAP, STATUS )
+
+         CALL AST_MAPSPLIT( BCMAP, NDIM, AXES, OUTPRM, SPMAP, STATUS ) 
+         IF( SPMAP .NE. AST__NULL ) THEN
+            CALL AST_INVERT( SPMAP, STATUS )
+            NSPIN = AST_GETI( SPMAP, 'Nin', STATUS )
+            IF( NSPIN .EQ. NDIM ) THEN
+
+*  If it is the case, create a PermMap that re-orders the inputs to the
+*  new Mapping so that they correspond to the inputs of the original Mapping.
+               DO I = 1, NDIM
+                  INPRM( OUTPRM( I ) ) = I
+               END DO
+
+               PMAP = AST_PERMMAP( NDIM, INPRM, NDIM, OUTPRM, 0.0D0,
+     :                             ' ', STATUS )
+
+*  Combine them in series. This gives a Mapping from the supplied base
+*  Frame to the required subFrame of the supplied current Frame.
+               CMAP = AST_SIMPLIFY( AST_CMPMAP( PMAP, SPMAP, 1, ' ',
+     :                                          STATUS ), STATUS )
+
+*  Delete the original current Frame from the FrameSet.
+               CALL AST_REMOVEFRAME( IWCS, AST__CURRENT, STATUS )
+
+*  Add in the required subFrame, using the above Mapping to connect it to
+*  the original base Frame. The new Frame becomes the current Frame.
+               CALL AST_ADDFRAME( IWCS, AST__BASE, CMAP, NEWCUR, 
+     :                            STATUS )
+
+            END IF
+         END IF
+         CALL AST_INVERT( BCMAP, STATUS )
+
+*  If the original Mapping could not be split, we use an alternative
+*  approach which involves appending a PermMap to the original Mapping that
+*  selects the required axes and drops the other axes on the floor. This
+*  has the dis-advantage that is can produce Mappings that have no
+*  inverse transformation.
+         IF( CMAP .EQ. AST__NULL ) THEN
+
 *  Determine a Mapping which can be used to join the existing current
 *  Frame to the Frame containing just the selected axes. We do not
 *  simply use the PermMap returned by AST_PICKAXES above will assign
@@ -250,39 +313,39 @@
 *  current Frame axis is selected, store its index within the selected
 *  axis frame. If the current Frame axis has not been selected, store 
 *  zero.
-         DO I = 1, NFC
-            INVAXES( I ) = 0
-            LUTMAP( I ) = AST__NULL
-         END DO
-
-         DO I = 1, NDIM
-            INVAXES( AXES( I ) ) = I
-         END DO
-
+            DO I = 1, NFC
+               INVAXES( I ) = 0
+               LUTMAP( I ) = AST__NULL
+            END DO
+   
+            DO I = 1, NDIM
+               INVAXES( AXES( I ) ) = I
+            END DO
+   
 *  Loop round all pixel axes.
-         DO I = 1, NDIM
-            MAPPED = .FALSE.
-
+            DO I = 1, NDIM
+               MAPPED = .FALSE.
+   
 *  Find which current Frame axes are fed by this pixel axis, and this 
 *  pixel axis alone. Pass on unless this pixel axis feeds at least 2 
 *  current frame axes
-            CALL AST_MAPSPLIT( BCMAP, 1, I, IAXIS, MAP1, STATUS )
-            IF( MAP1 .NE. AST__NULL ) THEN
-               N = AST_GETI( MAP1, 'Nout', STATUS )
-               IF( N .GT. 1 ) THEN                  
-
+               CALL AST_MAPSPLIT( BCMAP, 1, I, IAXIS, MAP1, STATUS )
+               IF( MAP1 .NE. AST__NULL ) THEN
+                  N = AST_GETI( MAP1, 'Nout', STATUS )
+                  IF( N .GT. 1 ) THEN                  
+   
 *  Get a Frame holding just the current Frame axes which are specified 
 *  by the current pixel axis alone. This Frame is used to normalise 
 *  values later on.
-                  SFRM = AST_PICKAXES( CFRM, N, IAXIS, MAP5, STATUS )
-
+                     SFRM = AST_PICKAXES( CFRM, N, IAXIS, MAP5, STATUS )
+   
 *  Loop round the current Frame axes fed by the pixel axis, passing 
 *  over axes which have been selected by the user.
-                  DO J = 1, N
-                     IU = IAXIS( J )
-                     JU = J
-                     IF( INVAXES( IU ) .EQ. 0 ) THEN
-
+                     DO J = 1, N
+                        IU = IAXIS( J )
+                        JU = J
+                        IF( INVAXES( IU ) .EQ. 0 ) THEN
+   
 *  The J'th output from MAP1 corresponds to a current Frame axis which
 *  has not been selected by the user. The Mapping from selected Frame
 *  to current Frame needs to introduce a value for this axis. We now
@@ -291,15 +354,15 @@
 *  which are fed by the same pixel axis. Loop again round the current
 *  Frame axes fed by the pixel axis, this time passing over axes which
 *  have not been selected by the user.
-                        DO K = 1, N
-
+                           DO K = 1, N
+   
 *  Also pass on if the unselected axis IU has already been assigned a 
 *  value on a previous pass through the K loop.
-                           IF( INVAXES( IU ) .EQ. 0 ) THEN
-                              IS = IAXIS( K ) 
-                              KS = K
-                              IF( INVAXES( IS ) .GT. 0 ) THEN
-
+                              IF( INVAXES( IU ) .EQ. 0 ) THEN
+                                 IS = IAXIS( K ) 
+                                 KS = K
+                                 IF( INVAXES( IS ) .GT. 0 ) THEN
+   
 *  So now, IS and IU are the indices of two current Frame axes which
 *  are both fed from the same single pixel axis (pixel axis I). Axis IS
 *  has been selected by the user, but axis IU has not been selected by
@@ -312,47 +375,48 @@
 *  get the corresponding IU and IS values. Then create a CmpMap which
 *  uses the IS values as X and the IU values as Y. Store in an array
 *  indexed by current Frame axis IU.
-                                  IF( .NOT. MAPPED ) THEN
-                                     MAPPED = .TRUE.
-                                     PX = DBLE( LBND( I ) ) - 0.25D0
-                                     NX = 2*( UBND( I ) - LBND( I ) 
-     :                                        + 1 ) 
-        
-                                     DO L = 1, NX
-                                        WORK( L ) = PX + ( L - 1 )*
-     :                                              0.5D0
-                                     END DO
-        
-                                     CALL PSX_CALLOC( N*NX, '_DOUBLE',
-     :                                                IPOUT, STATUS )
-        
-                                     CALL AST_TRANN( MAP1, NX, 1, NX, 
-     :                                      WORK, .TRUE., N, NX, 
-     :                                      %VAL( CNF_PVAL( IPOUT ) ), 
-     :                                      STATUS )
-                                  END IF
-        
-                                  CALL ATL_MKLUT( KS, JU, NX, N, SFRM,
-     :                                      %VAL( CNF_PVAL( IPOUT ) ),
-     :                                      LUTMAP( IU ), STATUS )
-
+                                     IF( .NOT. MAPPED ) THEN
+                                        MAPPED = .TRUE.
+                                        PX = DBLE( LBND( I ) ) - 0.25D0
+                                        NX = 2*( UBND( I ) - LBND( I ) 
+     :                                           + 1 ) 
+           
+                                        DO L = 1, NX
+                                           WORK( L ) = PX + ( L - 1 )*
+     :                                                 0.5D0
+                                        END DO
+           
+                                        CALL PSX_CALLOC( N*NX, 
+     :                                                   '_DOUBLE',
+     :                                                   IPOUT, STATUS )
+           
+                                        CALL AST_TRANN( MAP1, NX, 1, NX, 
+     :                                        WORK, .TRUE., N, NX, 
+     :                                        %VAL( CNF_PVAL( IPOUT ) ), 
+     :                                        STATUS )
+                                     END IF
+           
+                                     CALL ATL_MKLUT( KS, JU, NX, N, 
+     :                                  SFRM, %VAL( CNF_PVAL( IPOUT ) ),
+     :                                         LUTMAP( IU ), STATUS )
+   
 *  Note the index of the selected axis which feeds the unselected 
 *  current frame axis.
-                                 IF( LUTMAP( IU ) .NE. AST__NULL ) 
-     :                                  INVAXES( IU ) = INVAXES( IS )
-
+                                    IF( LUTMAP( IU ) .NE. AST__NULL ) 
+     :                                     INVAXES( IU ) = INVAXES( IS )
+   
+                                 END IF
                               END IF
-                           END IF
-                        END DO
-                     END IF
-                  END DO
+                           END DO
+                        END IF
+                     END DO
+                  END IF
                END IF
-            END IF
-
-            IF( MAPPED ) CALL PSX_FREE( IPOUT, STATUS )
-
-         END DO
-
+   
+               IF( MAPPED ) CALL PSX_FREE( IPOUT, STATUS )
+   
+            END DO
+   
 *  So now, we have two arrays, INVAXES and LUTMAP, each of which has an
 *  element for each current Frame axis. For each such axis, INVAXES
 *  holds the index of an associated axis within the Frame of selected
@@ -373,13 +437,13 @@
 *  (if possible) corresponding values for the unselected current Frame
 *  axes. A value of AST__BAD is assigned to any unselected current
 *  Frame axis for which this is not possible.
-
+   
 *  Create a UnitMap which can be used to copy all the NFC current
 *  Frame axis values to the following PermMap. This UnitMap will be 
 *  encapsulated within a TranMap so that its inverse transformation 
 *  will not be used.
-         MAP1 = AST_UNITMAP( NFC, ' ', STATUS )
-
+            MAP1 = AST_UNITMAP( NFC, ' ', STATUS )
+   
 *  Now create a CmpMap which will provide the inverse transformation in
 *  the TranMap (from the NFC inputs of the following PermMap to the NFC
 *  axes of the current Frame). Each selected current Frame axis is
@@ -388,161 +452,165 @@
 *  unselected axes which cannot be created form one of the selected
 *  axes use a UnitMap to simply copy the AST__BAD value supplied by the
 *  following PermMap.
-         IF( LUTMAP( 1 ) .EQ. AST__NULL ) THEN
-            LUTMAP( 1 ) = AST_UNITMAP( 1, ' ', STATUS )
-            UNIT = .TRUE.
-         ELSE
-            UNIT = .FALSE.
-         END IF
-         MAP2 = AST_CLONE( LUTMAP( 1 ), STATUS )
-
-         DO I = 2, NFC
-            IF( LUTMAP( I ) .EQ. AST__NULL ) THEN
-               LUTMAP( I ) = AST_UNITMAP( 1, '', STATUS )
+            IF( LUTMAP( 1 ) .EQ. AST__NULL ) THEN
+               LUTMAP( 1 ) = AST_UNITMAP( 1, ' ', STATUS )
+               UNIT = .TRUE.
             ELSE
                UNIT = .FALSE.
             END IF
-            MAP2 = AST_CMPMAP( MAP2, LUTMAP( I ), .FALSE., ' ', 
-     :                         STATUS )
-         END DO
-
+            MAP2 = AST_CLONE( LUTMAP( 1 ), STATUS )
+   
+            DO I = 2, NFC
+               IF( LUTMAP( I ) .EQ. AST__NULL ) THEN
+                  LUTMAP( I ) = AST_UNITMAP( 1, '', STATUS )
+               ELSE
+                  UNIT = .FALSE.
+               END IF
+               MAP2 = AST_CMPMAP( MAP2, LUTMAP( I ), .FALSE., ' ', 
+     :                            STATUS )
+            END DO
+   
 *  If the splitting gave us some advantage, create the TranMap to 
 *  combine these two Mappings.
-         IF( .NOT. UNIT ) THEN
-            CALL AST_INVERT( MAP2, STATUS )
-            MAP3 = AST_TRANMAP( MAP1, MAP2, ' ', STATUS )
-
+            IF( .NOT. UNIT ) THEN
+               CALL AST_INVERT( MAP2, STATUS )
+               MAP3 = AST_TRANMAP( MAP1, MAP2, ' ', STATUS )
+   
 *  Create the following PermMap which has an input for every current
 *  Frame axis and an output for each selected axis.
-            MAP4 = AST_PERMMAP( NFC, INVAXES, NDIM, AXES, AST__BAD, 
-     :                          ' ', STATUS )
-
+               MAP4 = AST_PERMMAP( NFC, INVAXES, NDIM, AXES, AST__BAD, 
+     :                             ' ', STATUS )
+   
 *  Combine the TranMap and the PermMap in series, and simplify.
-            MAP5 = AST_SIMPLIFY( AST_CMPMAP( MAP3, MAP4, .TRUE., ' ', 
-     :                                       STATUS ), STATUS )
-
+               MAP5 = AST_SIMPLIFY( AST_CMPMAP( MAP3, MAP4, .TRUE., ' ', 
+     :                                          STATUS ), STATUS )
+   
 *  Add the selected axis Frame into the FrameSet using this CmpMap to
 *  connect it to the original current Frame. It becomes the current 
 *  Frame.
-            CALL AST_ADDFRAME( IWCS, AST__CURRENT, MAP5, NEWCUR, 
-     :                         STATUS )
-
+               CALL AST_ADDFRAME( IWCS, AST__CURRENT, MAP5, NEWCUR, 
+     :                            STATUS )
+   
 *  If splitting the Mapping did not allow us to assign a value to any
 *  unwanted axes, then we look to see if there are an Regions in the
 *  FrameSet with a Domain of "ROI<k>" where <k> is a positive integer.
-         ELSE
-
+            ELSE
+   
 *  Note the index of the original current Frame.
-            ICUR0 = AST_GETI( IWCS, 'Current', STATUS )
-
+               ICUR0 = AST_GETI( IWCS, 'Current', STATUS )
+   
 *  Indicate the new current Frame has not yet been set. 
-            ICUR1 = AST__NOFRAME
-
+               ICUR1 = AST__NOFRAME
+   
 *  Loop round all Frames in the supplied FrameSet.
-            NFRM = AST_GETI( IWCS, 'Nframe', STATUS )
-            DO I = 1, NFRM
-               FRM = AST_GETFRAME( IWCS, I, STATUS )
-
+               NFRM = AST_GETI( IWCS, 'Nframe', STATUS )
+               DO I = 1, NFRM
+                  FRM = AST_GETFRAME( IWCS, I, STATUS )
+   
 *  Pass on if this Frame is not a Region, or if its Domain value does 
 *  not begin with the string "ROI".
-               IF( AST_ISAREGION( FRM, STATUS ) ) THEN
-                  DOM = AST_GETC( FRM, 'Domain', STATUS )
-                  IF( DOM( : 3 ) .EQ. 'ROI' .AND. 
-     :                STATUS .EQ. SAI__OK ) THEN
-
+                  IF( AST_ISAREGION( FRM, STATUS ) ) THEN
+                     DOM = AST_GETC( FRM, 'Domain', STATUS )
+                     IF( DOM( : 3 ) .EQ. 'ROI' .AND. 
+     :                   STATUS .EQ. SAI__OK ) THEN
+   
 *  Attempt to read an integer from the rest of the Domain name. Check 
 *  the CHR status afterwards to see if an integer was read succesfully.
-                     CSTAT = SAI__OK
-                     CALL CHR_CTOI( DOM( 4 : ), K, CSTAT )
-                     IF( CSTAT .EQ. SAI__OK ) THEN
-
+                        CSTAT = SAI__OK
+                        CALL CHR_CTOI( DOM( 4 : ), K, CSTAT )
+                        IF( CSTAT .EQ. SAI__OK ) THEN
+   
 *  Get the Mapping from the ROI Region to the original current Frame.
-                        MAP2 = AST_GETMAPPING( IWCS, I, ICUR0, STATUS )
-
-*  Get the bounding box of the Region
-                        CALL AST_GETREGIONBOUNDS( FRM, RLBND, RUBND, 
+                           MAP2 = AST_GETMAPPING( IWCS, I, ICUR0, 
      :                                            STATUS )
-
+   
+*  Get the bounding box of the Region
+                           CALL AST_GETREGIONBOUNDS( FRM, RLBND, RUBND, 
+     :                                               STATUS )
+   
 *  Shrink the bounding box slightly to reduce the effect of rounding errors
 *  (positions exactly on the boundary of a Region can be tricky to transform).
-                        DO IAX = 1, AST_GETI( FRM, 'Naxes', STATUS )
-                           DELTA = 0.005*( RUBND( IAX ) - RLBND( IAX ) )
-                           RUBND( IAX ) = RUBND( IAX ) - DELTA
-                           RLBND( IAX ) = RLBND( IAX ) + DELTA
-                        END DO
-
+                           DO IAX = 1, AST_GETI( FRM, 'Naxes', STATUS )
+                              DELTA = 0.005*( RUBND( IAX ) - 
+     :                                        RLBND( IAX ) )
+                              RUBND( IAX ) = RUBND( IAX ) - DELTA
+                              RLBND( IAX ) = RLBND( IAX ) + DELTA
+                           END DO
+   
 *  Loop round all axes in the original current Frame.
-                        J = 1
-                        DO IAX = 1, NFC
-
+                           J = 1
+                           DO IAX = 1, NFC
+   
 *  If this is not an unwanted axis, pass on.
-                           IF( INVAXES( IAX ) .LE. 0 ) THEN
-
+                              IF( INVAXES( IAX ) .LE. 0 ) THEN
+   
 *  Find the bounds of the Region on the current output axis.
-                              CALL AST_MAPBOX( MAP2, RLBND, RUBND, 
-     :                                         .TRUE., IAX, CLBND,
-     :                                         CUBND, XL, XU, STATUS )
-
+                                 CALL AST_MAPBOX( MAP2, RLBND, RUBND, 
+     :                                           .TRUE., IAX, CLBND,
+     :                                           CUBND, XL, XU, STATUS )
+   
 *  Use the mid value as the value to be returned by the inverse
 *  transformation of the PermMap.
-                              CONST( J ) = 0.5*( CLBND + CUBND )
-                              INVAXES( IAX ) = -J
-
-                           END IF
-                        END DO
-
+                                 CONST( J ) = 0.5*( CLBND + CUBND )
+                                 INVAXES( IAX ) = -J
+   
+                              END IF
+                           END DO
+   
 *  Create the PermMap.
-                        MAP1 = AST_PERMMAP( NFC, INVAXES, NDIM, AXES, 
-     :                                      CONST, ' ', STATUS )
-
+                           MAP1 = AST_PERMMAP( NFC, INVAXES, NDIM, AXES, 
+     :                                         CONST, ' ', STATUS )
+   
 *  Take a copy of the new current Frame and set its Ident attribute to
 *  identify the corresponding ROI Region. Also append the same string to
 *  the end of the Domain name.
-                        CURF = AST_COPY( NEWCUR, STATUS )
-                        CALL AST_SETC( CURF, 'Ident', DOM, STATUS )
-
-                        CALL AST_SETC( CURF, 'Ident', DOM, STATUS )
-                        NEWDOM = AST_GETC( CURF, 'Domain', STATUS )
-  	                IAT = CHR_LEN( NEWDOM )
-  	                CALL CHR_APPND( "-", NEWDOM, IAT )
-  	                CALL CHR_APPND( DOM, NEWDOM, IAT )
-  	                CALL AST_SETC( CURF, 'Domain', NEWDOM( : IAT ), 
-     :                                 STATUS )
- 
+                           CURF = AST_COPY( NEWCUR, STATUS )
+                           CALL AST_SETC( CURF, 'Ident', DOM, STATUS )
+   
+                           CALL AST_SETC( CURF, 'Ident', DOM, STATUS )
+                           NEWDOM = AST_GETC( CURF, 'Domain', STATUS )
+     	                IAT = CHR_LEN( NEWDOM )
+     	                CALL CHR_APPND( "-", NEWDOM, IAT )
+     	                CALL CHR_APPND( DOM, NEWDOM, IAT )
+     	                CALL AST_SETC( CURF, 'Domain', NEWDOM( : IAT ), 
+     :                                    STATUS )
+    
 *  Add this Frame into the FrameSet using the above PermMap to connect 
 *  it to the original current Frame. It becomes the current Frame.
-                        CALL AST_ADDFRAME( IWCS, ICUR0, MAP1, CURF, 
-     :                                     STATUS )
-
+                           CALL AST_ADDFRAME( IWCS, ICUR0, MAP1, CURF, 
+     :                                        STATUS )
+   
 *  If the index of the new current Frame has not yet been noted, note 
 *  it now.
-                        IF( ICUR1 .EQ. AST__NOFRAME ) THEN
-                           ICUR1 = AST_GETI( IWCS, 'Current', STATUS )
-                        END IF
-
+                           IF( ICUR1 .EQ. AST__NOFRAME ) THEN
+                              ICUR1 = AST_GETI( IWCS, 'Current', 
+     :                                          STATUS )
+                           END IF
+   
 *  Annul AST resources.
-                        CALL AST_ANNUL( CURF, STATUS )
-                        CALL AST_ANNUL( MAP1, STATUS )
-                        CALL AST_ANNUL( MAP2, STATUS )
-
+                           CALL AST_ANNUL( CURF, STATUS )
+                           CALL AST_ANNUL( MAP1, STATUS )
+                           CALL AST_ANNUL( MAP2, STATUS )
+   
+                        END IF
                      END IF
                   END IF
-               END IF
-
-               CALL AST_ANNUL( FRM, STATUS )
-            END DO
-
+   
+                  CALL AST_ANNUL( FRM, STATUS )
+               END DO
+   
 *  If any ROI Regions were found, set the final current Frame.
-            IF( ICUR1 .NE. AST__NOFRAME ) THEN
-               CALL AST_SETI( IWCS, 'Current', ICUR1, STATUS ) 
-
+               IF( ICUR1 .NE. AST__NOFRAME ) THEN
+                  CALL AST_SETI( IWCS, 'Current', ICUR1, STATUS ) 
+   
 *  Otherwise, we connect the new current Frame to the original using a
 *  PermMap that supplied AST__BAD for the unwanted axes. 
-            ELSE
-               MAP1 = AST_PERMMAP( NFC, INVAXES, NDIM, AXES, 
-     :                             AST__BAD, ' ', STATUS )
-               CALL AST_ADDFRAME( IWCS, AST__CURRENT, MAP1, NEWCUR, 
-     :                            STATUS )
+               ELSE
+                  MAP1 = AST_PERMMAP( NFC, INVAXES, NDIM, AXES, 
+     :                                AST__BAD, ' ', STATUS )
+                  CALL AST_ADDFRAME( IWCS, AST__CURRENT, MAP1, NEWCUR, 
+     :                               STATUS )
+               END IF
             END IF
          END IF
 
