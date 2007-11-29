@@ -39,6 +39,8 @@
 *  History:
 *     2007-10-19 (TIMJ):
 *        Clone from smurf_flatfield.c
+*     2007-11-28 (TIMJ):
+*        Copy the right number of elements!
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -139,6 +141,7 @@ void smurf_rawunpress( int *status ) {
 
     /* Copy all the data from uncmpressed smfData to output. All are integer types. */
     if (*status == SAI__OK) {
+      nout *= sizeof(int); /* number of bytes to copy */
       memcpy( (outdata)[0], (data->pntr)[0], nout );
     }
 
