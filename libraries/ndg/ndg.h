@@ -63,6 +63,9 @@
 /* Need Grp type definitions */
 #include "star/grp.h"
 
+/* Need AST type definitions. */
+#include "ast.h"
+
 /* Need HDS dim type */
 #include "star/hds_types.h"
 
@@ -80,5 +83,6 @@ void ndgBegpv( int *status );
 void ndgEndpv( const char *creator, int *status );
 void ndgPtprv( int indf1, int indf2, HDSLoc *more, int isroot, const char *creator, int *status );
 void ndgGtprv( int indf, int ianc, HDSLoc **prov, int *status );
+void ndgRtprv( int indf, AstKeyMap **roots, int *status );
 
 #endif

@@ -3,7 +3,7 @@
 Version 5.3
 
    o New routines for accessing provenance information within NDFs;
-   NDG_GTPRV, NDG_PTPRV, NDG_BEGPV and NDG_ENDPV.
+   NDG_GTPRV, NDG_RTPRV, NDG_PTPRV, NDG_BEGPV and NDG_ENDPV.
 
 Version 5.2-3
 

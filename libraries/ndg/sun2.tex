@@ -2153,6 +2153,44 @@ to add further members.
 }
 \newpage
 \sstroutine{
+   NDG\_RTPRV
+}{
+   Identify the root ancestors of an NDF
+}{
+   \sstdescription{
+      This routine uses the PROVENANCE extension of the supplied NDF to
+      obtain and return information identifying the root ancestors of
+      the supplied NDF. An ancestor is a root ancestor if it does not itself
+      have any ancestors.
+   }
+   \sstinvocation{
+      CALL NDG\_RTPRV( INDF, ROOTS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF = INTEGER (Given)
+      }{
+         An identifier for the NDF containing the provenance information.
+      }
+      \sstsubsection{
+         ROOTS = INTEGER (Returned)
+      }{
+         A pointer to a new AST KeyMap. This KeyMap will contain an entry for
+         each root ancestor. The key associated with each entry is the path
+         to the NDF and the value of the entry is an integer that gives the
+         position of the root ancestor within the list of all ancestors. This
+         integer value can be supplied to ndgGtprv in order to get further
+         information about the root ancestor.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
    NDG\_SETSZ
 }{
    Reduces the size of an NDG group
@@ -2191,7 +2229,7 @@ to add further members.
 \section{Changes Introduced in NDG Version 5.3}
 \begin{itemize}
    \item Added routines for storing and retrieving provenance information:
-         NDG\_PTPRV, NDG\_GTPRV, NDG\_BEGPV and NDG\_ENDPV.
+         NDG\_PTPRV, NDG\_RTPRV, NDG\_GTPRV, NDG\_BEGPV and NDG\_ENDPV.
 \end{itemize}
 
 \section{Changes Introduced in NDG Version 5.2}

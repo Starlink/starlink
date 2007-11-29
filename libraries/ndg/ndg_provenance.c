@@ -343,6 +343,90 @@ F77_SUBROUTINE(ndg_ptprv)( INTEGER(indf1), INTEGER(indf2), CHARACTER(fmore),
 }
 
 
+F77_SUBROUTINE(ndg_rtprv)( INTEGER(indf), INTEGER(roots), INTEGER(status) ){
+/*
+*+
+*  Name:
+*     NDG_RTPRV
+
+*  Purpose:
+*     Identify the root ancestors of an NDF.
+
+*  Language:
+*     Starlink ANSI C (callable from Fortran)
+
+*  Invocation:
+*     CALL NDG_RTPRV( INDF, ROOTS, STATUS )
+
+*  Description:
+*     This routine uses the PROVENANCE extension of the supplied NDF to 
+*     obtain and return information identifying the root ancestors of
+*     the supplied NDF. An ancestor is a root ancestor if it does not itself
+*     have any ancestors.
+
+*  Arguments:
+*     INDF = INTEGER (Given)
+*        An identifier for the NDF containing the provenance information.
+*     ROOTS = INTEGER (Returned)
+*        A pointer to a new AST KeyMap. This KeyMap will contain an entry for 
+*        each root ancestor. The key associated with each entry is the path 
+*        to the NDF and the value of the entry is an integer that gives the 
+*        position of the root ancestor within the list of all ancestors. This 
+*        integer value can be supplied to ndgGtprv in order to get further 
+*        information about the root ancestor.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Copyright:
+*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     29-NOV-2007 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*/
+   GENPTR_INTEGER(indf)
+   GENPTR_INTEGER(roots)
+   GENPTR_INTEGER(status)
+
+   AstKeyMap *keymap = NULL;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* Call the C function to do the work. */
+   ndgRtprv( *indf, &keymap, status );
+
+/* Export the AST pointer. */
+   *roots = astP2I( keymap );
+}
+
 void ndgPtprv( int indf1, int indf2, HDSLoc *more, int isroot, 
                const char *creator, int *status ){
 /*
@@ -450,7 +534,7 @@ void ndgPtprv( int indf1, int indf2, HDSLoc *more, int isroot,
 void ndgGtprv( int indf, int ianc, HDSLoc **prov, int *status ){
 /*
 *  Name:
-*     ndgPtprv
+*     ndgGtprv
 
 *  Purpose:
 *     Get provenance information from an NDF.
@@ -589,6 +673,75 @@ void ndgGtprv( int indf, int ianc, HDSLoc **prov, int *status ){
          datUnmap( loc, status );
          datAnnul( &loc, status );
       }
+   }
+
+/* Free resources. */
+   ndg1FreeProvenance( prov1, 1, status );
+
+/* Re-instate the original AST status variable. */
+   astWatch( old_status );
+}
+
+void ndgRtprv( int indf, AstKeyMap **roots, int *status ){
+/*
+*  Name:
+*     ndgRtprv
+
+*  Purpose:
+*     Identify the root ancestors of an NDF.
+
+*  Synopsis:
+*     void ndgRtprv( int indf, AstKeyMap **roots, int *status )
+
+*  Description:
+*     This routine uses the PROVENANCE extension of the supplied NDF to 
+*     obtain and return information identifying the root ancestors of
+*     the supplied NDF. An ancestor is a root ancestor if it does not itself
+*     have any ancestors.
+
+*  Parameters:
+*     indf
+*        An identifier for the NDF containing the provenance information.
+*     roots
+*        A location at which to return a pointer to an AST KeyMap. This
+*        KeyMap will contain an entry for each root ancestor. The key
+*        associated with each entry is the path to the NDF and the value 
+*        of the entry is an integer that gives the position of the root
+*        ancestor within the list of all ancestors. This integer value
+*        can be supplied to ndgGtprv in order to get further information
+*        about the root ancestor.
+*     status 
+*        The global status.
+*/
+
+/* Local variables: */
+   Prov *prov = NULL;
+   Provenance *prov1 = NULL;
+   int *old_status;
+   int i;
+
+/* Initialise. */
+   *roots = NULL;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* Ensure AST uses the supplied status variable. */
+   old_status = astWatch( status );
+
+/* Read the provenance extension from the NDF. */
+   prov1 = ndg1ReadProvenanceExtension( indf, NULL, NULL, 0, status );
+
+/* Create the returned KeyMap. */
+   *roots = astKeyMap( "", status );
+
+/* Loop round every ancestor. */
+   for( i = 0; i < prov1->nprov;  i++ ) {
+      prov = prov1->provs[ i ];
+
+/* If this ancestor has no parents, add its details to the returned
+   KeyMap. */
+      if( prov->nparent == 0 ) astMapPut0I( *roots, prov->path, i, "" );
    }
 
 /* Free resources. */
