@@ -279,8 +279,8 @@
 
 *  Combine them in series. This gives a Mapping from the supplied base
 *  Frame to the required subFrame of the supplied current Frame.
-               CMAP = AST_SIMPLIFY( AST_CMPMAP( PMAP, SPMAP, 1, ' ',
-     :                                          STATUS ), STATUS )
+               CMAP = AST_SIMPLIFY( AST_CMPMAP( PMAP, SPMAP, .TRUE., 
+     :                                          ' ', STATUS ), STATUS )
 
 *  Delete the original current Frame from the FrameSet.
                CALL AST_REMOVEFRAME( IWCS, AST__CURRENT, STATUS )
@@ -390,9 +390,9 @@
      :                                                   '_DOUBLE',
      :                                                   IPOUT, STATUS )
            
-                                        CALL AST_TRANN( MAP1, NX, 1, NX, 
+                                        CALL AST_TRANN( MAP1, NX, 1, NX,
      :                                        WORK, .TRUE., N, NX, 
-     :                                        %VAL( CNF_PVAL( IPOUT ) ), 
+     :                                        %VAL( CNF_PVAL( IPOUT ) ),
      :                                        STATUS )
                                      END IF
            
@@ -482,7 +482,7 @@
      :                             ' ', STATUS )
    
 *  Combine the TranMap and the PermMap in series, and simplify.
-               MAP5 = AST_SIMPLIFY( AST_CMPMAP( MAP3, MAP4, .TRUE., ' ', 
+               MAP5 = AST_SIMPLIFY( AST_CMPMAP( MAP3, MAP4, .TRUE., ' ',
      :                                          STATUS ), STATUS )
    
 *  Add the selected axis Frame into the FrameSet using this CmpMap to
@@ -558,7 +558,7 @@
                            END DO
    
 *  Create the PermMap.
-                           MAP1 = AST_PERMMAP( NFC, INVAXES, NDIM, AXES, 
+                           MAP1 = AST_PERMMAP( NFC, INVAXES, NDIM, AXES,
      :                                         CONST, ' ', STATUS )
    
 *  Take a copy of the new current Frame and set its Ident attribute to
