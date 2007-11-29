@@ -141,12 +141,14 @@
 *        Use size_t following changes to sc2store.
 *     2007-11-28 (EC):
 *        Add check for TORDERED keyword in FITS header
+*     2007-11-28 (TIMJ):
+*        Raw data is now _WORD and can be _INTEGER
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) Science and Technology Facilities Council.
+*     Copyright (C) 2007 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
+*     Copyright (C) 2005-2007 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -304,8 +306,11 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
     isFlat = 1;    /* Data have been flat-fielded */
     isTseries = 0; /* Data are not in time series format */
   } else if (ndims == 3) { /* Time series data */
-    /* Check if raw timeseries */
-    if (strncmp(dtype, "_UWORD", 6) == 0) {
+    /* Check if raw timeseries - _WORD, _UWORD or _INTEGER */
+    /* Note that _INTEGER may or may not have been flatfielded */
+    if ( (strncmp(dtype, "_WORD", 5) == 0 ) ||     /* Compressed */
+         (strncmp(dtype, "_INTEGER", 7) == 0 ) ||  /* Uncompressed */
+         (strncmp(dtype, "_UWORD", 6) == 0 ) ) {   /* Old format */
       isFlat = 0;  /* Data have not been flatfielded */
     } else {
       /* Note that the data should be of type _DOUBLE here */
