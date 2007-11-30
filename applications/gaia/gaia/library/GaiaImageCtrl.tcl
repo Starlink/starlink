@@ -158,14 +158,24 @@ itcl::class gaia::GaiaImageCtrl {
       $canvas_ bind $image_ <1> +[code $this focus_ in]
 
       #  Add mouse wheel bindings, override Canvas, see gaia_defaults, as that
-      #  is too slow for images.
-      bind $canvas_ <4> "%W yview scroll -$itk_option(-wheel_step) units; break"
-      bind $canvas_ <5> "%W yview scroll $itk_option(-wheel_step) units; break"
-      bind $canvas_ <6> "%W xview scroll -$itk_option(-wheel_step) units; break"
-      bind $canvas_ <7> "%W xview scroll $itk_option(-wheel_step) units; break"
+      #  is too slow for images. Note to get 6 and 7 we need to get %b, the
+      #  events are not handled by Tk.
+      bind $canvas_ <Button> [code $this handle_button_ %W %b]
 
       #  Pass on UKIRT quick look config.
       $image_ configure -ukirt_ql $itk_option(-ukirt_ql)
+   }
+
+   protected method handle_button_ {w n} {
+      if { $n == 4 } {
+         $w yview scroll -$itk_option(-wheel_step) units
+      } elseif { $n == 5 } {
+         $w yview scroll $itk_option(-wheel_step) units
+      } elseif { $n == 6 } {
+         $w xview scroll -$itk_option(-wheel_step) units
+      } elseif { $n == 7 } {
+         $w xview scroll $itk_option(-wheel_step) units
+      }
    }
 
    #  Make the panel info subwindow. Override to use GaiaImagePanel,
