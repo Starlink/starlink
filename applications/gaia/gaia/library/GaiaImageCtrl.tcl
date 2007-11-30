@@ -157,6 +157,13 @@ itcl::class gaia::GaiaImageCtrl {
       #  Clicking in main window gives it focus.
       $canvas_ bind $image_ <1> +[code $this focus_ in]
 
+      #  Add mouse wheel bindings, override Canvas, see gaia_defaults, as that
+      #  is too slow for images.
+      bind $canvas_ <4> "%W yview scroll -$itk_option(-wheel_step) units; break"
+      bind $canvas_ <5> "%W yview scroll $itk_option(-wheel_step) units; break"
+      bind $canvas_ <6> "%W xview scroll -$itk_option(-wheel_step) units; break"
+      bind $canvas_ <7> "%W xview scroll $itk_option(-wheel_step) units; break"
+
       #  Pass on UKIRT quick look config.
       $image_ configure -ukirt_ql $itk_option(-ukirt_ql)
    }
@@ -1180,6 +1187,9 @@ itcl::class gaia::GaiaImageCtrl {
    #  Whether to attempt to show and control the HDU chooser. If 0
    #  then control is only attempted when the HDU already exists.
    itk_option define -show_hdu_chooser show_hdu_chooser Show_Hdu_Chooser 1
+
+   #  The number of units to move for a scrollwheel interaction.
+   itk_option define -wheel_step wheel_step Wheel_Step 100
 
    #  Protected variables:
    #  ====================

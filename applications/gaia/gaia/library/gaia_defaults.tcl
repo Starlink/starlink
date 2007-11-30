@@ -165,4 +165,17 @@ proc gaia::setXdefaults {} {
     #  DialogWidget
     option add *DialogWidget.messageWidth 6i
     option add *DialogWidget.messageFont $labelFont
+
+    #  Mousewheel support for various classes. These are mapped to higher
+    #  buttons. 
+    bind Canvas <4> "%W yview scroll -1 units"
+    bind Canvas <5> "%W yview scroll 1 units"
+    bind Canvas <6> "%W xview scroll -1 units"
+    bind Canvas <7> "%W xview scroll 1 units"
+
+    bind Listbox <4> "%W yview scroll -1 units; puts 9"
+    bind Listbox <5> "%W yview scroll 1 units; puts 10"
+    bind Listbox <6> "%W xview scroll -1 units; puts 11"
+    bind Listbox <7> "%W xview scroll 1 units; puts 12"
+
 }

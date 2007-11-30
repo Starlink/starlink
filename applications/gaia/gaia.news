@@ -65,6 +65,8 @@
     Some platforms continue to provide poor size matching between the variable,
     fixed and symbol fonts.
 
+    The mouse wheel will now scroll the main image (and some other components).
+
   Puana Release:
   ==============
 
