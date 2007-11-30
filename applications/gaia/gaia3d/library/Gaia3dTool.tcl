@@ -148,6 +148,16 @@ itcl::class gaia3d::Gaia3dTool {
       $Options add cascade -label "Annotated text colour" -menu $submenu
       textcolour_fill_ $submenu
 
+      #  Use the spectral extraction limits to clip cube data.
+      $Options add checkbutton \
+         -label {Apply extraction limits} \
+         -variable [scope apply_extraction_limits_] \
+         -onvalue 1 \
+         -offvalue 0
+      $short_help_win_ add_menu_short_help $Options \
+         {Apply extraction limits} \
+         {Use the spectral extraction limits of cube toolbox to clip data}
+
       #  Interactor mode, joystick by default, so offer trackerball.
       $Options add checkbutton \
          -label {Trackerball interactions} \
@@ -959,8 +969,12 @@ itcl::class gaia3d::Gaia3dTool {
 
       #  Get the extraction limits. Only support this along the "spectral"
       #  axis at present.
-      set limits [$itk_option(-gaiacube) get_extraction_limits]
       set changed_limits 0
+      if { $apply_extraction_limits_ } {
+         set limits [$itk_option(-gaiacube) get_extraction_limits]
+      } else {
+         set limits {}
+      }
       if { $limits != $limits_ } {
          set changed_limits 1
       }
@@ -1145,6 +1159,9 @@ itcl::class gaia3d::Gaia3dTool {
 
    #  Interaction mode.
    protected variable interaction_mode_ "joystick"
+
+   #  Whether to clip data to the extraction limits.
+   protected variable apply_extraction_limits_ 1
 
    #  Common variables: (shared by all instances)
    #  -----------------
