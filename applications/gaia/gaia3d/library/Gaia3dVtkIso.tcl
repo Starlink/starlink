@@ -62,7 +62,6 @@ itcl::class ::gaia3d::Gaia3dVtkIso {
    constructor {args} {
 
       #  Create the necessary VTK objects.
-      #set contour_ [::vtkMarchingContourFilter New]
       set contour_ [::vtkImageMarchingCubes New]
 
       #  Create a mapper for the polygonal data created to represent the iso
@@ -216,7 +215,7 @@ itcl::class ::gaia3d::Gaia3dVtkIso {
    }
 
    #  The optional WCS frameset. Re-connects the pipeline to use a mapper that
-   #  transform polygon data.
+   #  transforms the polygon data.
    public variable wcs {} {
       wcs_changed_
       set last_wcs_ $wcs

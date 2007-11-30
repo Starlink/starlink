@@ -219,14 +219,14 @@ itcl::class gaia3d::Gaia3dTool {
       #  Simple axes. These can be just set visible/invisible, so only remove
       #  on a full release.
       if { $simpleaxes_ != {} } {
-         ::delete object simpleaxes_
+         catch {::delete object simpleaxes_}
          set simpleaxes_ {}
       }
 
       #  Outline. This can be just set visible/invisible, so only remove
       #  on a full release.
       if { $outline_ != {} } {
-         ::delete object outline_
+         catch{::delete object outline_}
          set outline_ {}
       }
    }

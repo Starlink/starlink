@@ -129,7 +129,7 @@ itcl::class ::gaia3d::Gaia3dVtkCubeData {
       set imagedata_ [$imageimport_ GetOutput]
 
       #  Origins are 1, not 0 for AST GRID coordinates, so stick to that.
-      #  We have a default spacing of 1,1,1 at this time.
+      #  We have a default spacing of 1,1,1.
       $imagedata_ SetOrigin 1.0 1.0 1.0
 
       #  If we have limits that only use part of the cube need to match the
