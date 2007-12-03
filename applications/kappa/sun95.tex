@@ -50,9 +50,9 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %\begin{latexonly} and %\end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -87,7 +87,6 @@
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -98,25 +97,33 @@
 \newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
 \newcommand{\htmladdnormallink}[2]{#1}
 \newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
 \newcommand{\hyperref}[4]{#2\ref{#4}#3}
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
 
+\newenvironment{latexonly}{}{}
+\newcommand{\html}[1]{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\latexhtml}[2]{#1}
+
+%  Provide CSS support.
+\newcommand{\htmlsetstyle}[3][]{}
+\newcommand{\htmladdtostyle}[3][]{}
+
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
 \newcommand{\xlabel}[1]{}
 
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+%  Define LaTeX2HTML symbol.
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
 
 %  Define command to re-centre underscore for Latex and leave as normal
 %  for HTML (severe problems with \_ in tabbing environments and \_\_
 %  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
+\renewcommand{\_}{\texttt{\symbol{95}}}
+%\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+%\latex{\setunderscore}
 
 %  Redefine the \tableofcontents command. This procrastination is necessary 
 %  to stop the automatic creation of a second table of contents page
@@ -134,6 +141,7 @@
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document-specific \newcommand or \newenvironment commands.
 
@@ -142,77 +150,71 @@
 % degrees symbol
 \newcommand{\dgs}{\hbox{$^\circ$}} 
 %\begin{htmlonly}
-%\renewcommand{\dgs}{{\rawhtml &deg;}} 
+%  \newcommand{\dgs}{{\rawhtml &deg;}} 
 %\end{htmlonly}
 
 % arcminute symbol
 \newcommand{\arcm}{\hbox{$^\prime$}} 
 %\begin{htmlonly}
-%\renewcommand{\arcm}{{\rawhtml &acute;}} 
+%  \newcommand{\arcm}{{\rawhtml &acute;}} 
 %\end{htmlonly}
 
 % arcsec symbol
 \newcommand{\arcsec}{\arcm\hskip -0.1em\arcm}
 %\begin{htmlonly}
-%\renewcommand{\arcsec}{{\rawhtml &quot;}} 
+%  \newcommand{\arcsec}{{\rawhtml &quot;}} 
 %\end{htmlonly}
 
 % hours symbol
 \newcommand{\hr}{\hbox{$^{\rm h}$}}
-\begin{htmlonly}
-\renewcommand{\hr}{~hours}
-\end{htmlonly}
+%\begin{htmlonly}
+%  \newcommand{\hr}{~hours}
+%\end{htmlonly}
 
 % minutes symbol
 \newcommand{\mn}{\hbox{$^{\rm m}$}}
-\begin{htmlonly}
-\renewcommand{\mn}{~minutes}
-\end{htmlonly}
+%\begin{htmlonly}
+%  \newcommand{\mn}{~minutes}
+%\end{htmlonly}
 
 % seconds symbol
 \newcommand{\scn}{\hbox{$^{\rm s}$}}
-\begin{htmlonly}
-\renewcommand{\scn}{~seconds}
-\end{htmlonly}
+%\begin{htmlonly}
+%  \newcommand{\scn}{~seconds}
+%\end{htmlonly}
 
 % decimal-minutes symbol
 \newcommand{\um}{\hskip-0.3em\hbox{$^{\rm m}$}\hskip-0.08em}
 \begin{htmlonly}
-\renewcommand{\um}{\mn} 
+  \newcommand{\um}{\mn} 
 \end{htmlonly}
 
 % decimal-degree symbol
 \newcommand{\udeg}{\hskip-0.3em\dgs\hskip-0.08em}
 \begin{htmlonly}
-\renewcommand{\udeg}{{\rawhtml &deg;}} 
+  \newcommand{\udeg}{{\rawhtml &deg;}} 
 \end{htmlonly}
 
 % decimal-second symbol
 \newcommand{\us}{\hskip-0.27em\hbox{$^{\rm s}$}\hskip-0.06em}  
-\begin{htmlonly}
-\renewcommand{\us}{\scn}
-\end{htmlonly}
+%\begin{htmlonly}
+%  \newcommand{\us}{\scn}
+%\end{htmlonly}
 
 % decimal-arcminute symbol
 \newcommand{\uarcm}{\hskip-0.28em\arcm\hskip-0.04em}  
 \begin{htmlonly}
-\renewcommand{\uarcm}{{\rawhtml &acute;}} 
+  \newcommand{\uarcm}{{\rawhtml &acute;}} 
 \end{htmlonly}
 
 % decimal-arcsecond symbol
 \newcommand{\uarcs}{\hskip-0.27em\arcsec\hskip-0.02em}  
-\begin{htmlonly}
-\renewcommand{\uarcs}{{\rawhtml &quot;}}
-\end{htmlonly}
+%\begin{htmlonly}
+%  \newcommand{\uarcs}{{\rawhtml &quot;}}
+%\end{htmlonly}
 
 % centre an asterisk
 \newcommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
-
-% conditional text
-\newcommand{\latexelsehtml}[2]{#1}
-\begin{htmlonly}
-  \renewcommand{\latexelsehtml}[2]{#2}
-\end{htmlonly}
 
 \hyphenation{which-ever}
 
@@ -263,7 +265,7 @@
 % appears to work, but needs further investigation or a TeX wizard.
 \newcommand{\att}[1]{\sf #1}
 \begin{htmlonly}
-\renewcommand{\att}[1]{\large{\tt #1}}
+  \newcommand{\att}[1]{\large{\tt #1}}
 \end{htmlonly}
 \newcommand{\htmlattref}[2]{\htmlref{\att{#1}}{#2}\rm}
 
@@ -559,7 +561,7 @@
 %  Format a list of items while in paragraph mode, and where there
 %  is a heading, thus the negative vertical space is not needed.
 \newcommand{\ssthitemlist}[1]{
-  \latexonly{
+  \latex{
   \mbox{} \\
   \vspace{-5.0ex}
   }
@@ -579,7 +581,7 @@
    \newcommand{\ssttt}{\tt}
 
 %  sstroutine.
-   \renewcommand{\sstroutine}[3]{
+   \newcommand{\sstroutine}[3]{
       \subsection{#1\xlabel{#1}-\label{#1}#2}
       \begin{description}
          #3
@@ -587,7 +589,7 @@
    }
 
 %  sstattribute. Note the further level of subsectioning.
-   \renewcommand{\sstattribute}[3]{
+   \newcommand{\sstattribute}[3]{
       \subsubsection{#1\xlabel{#1}-\label{#1}#2}
       \begin{description}
          #3
@@ -595,24 +597,24 @@
    }
 
 %  sstdescription
-   \renewcommand{\sstdescription}[1]{\item[Description:]
+   \newcommand{\sstdescription}[1]{\item[Description:]
       \begin{description}
          #1
       \end{description}
    }
 
 %  sstusage
-   \renewcommand{\sstusage}[1]{\htmlref{\item[Usage:]}{ap:usage} \mbox{} \\ {\ssttt #1}}
+   \newcommand{\sstusage}[1]{\htmlref{\item[Usage:]}{ap:usage} \mbox{} \\ {\ssttt #1}}
 
 %  sstinvocation
-   \renewcommand{\sstinvocation}[1]{\item[Invocation:]
+   \newcommand{\sstinvocation}[1]{\item[Invocation:]
       \begin{description}
          {\ssttt #1}
       \end{description}
    }
 
 %  sstarguments
-   \renewcommand{\sstarguments}[1]{
+   \newcommand{\sstarguments}[1]{
       \item[Arguments:]
       \begin{description}
          #1
@@ -620,7 +622,7 @@
    }
 
 %  sstreturnedvalue
-   \renewcommand{\sstreturnedvalue}[1]{
+   \newcommand{\sstreturnedvalue}[1]{
       \item[Returned Value:]
       \begin{description}
          #1
@@ -628,7 +630,7 @@
    }
 
 %  sstparameters
-   \renewcommand{\sstparameters}[1]{
+   \newcommand{\sstparameters}[1]{
       \htmlref{\item[Parameters:]}{se:param}
       \begin{description}
          #1
@@ -636,7 +638,7 @@
    }
 
 %  sstresparameters
-   \renewcommand{\sstresparameters}[1]{
+   \newcommand{\sstresparameters}[1]{
       \htmlref{\item[Results Parameters:]}{se:parout}
       \begin{description}
          #1
@@ -644,7 +646,7 @@
    }
 
 %  sstexamples
-   \renewcommand{\sstexamples}[1]{
+   \newcommand{\sstexamples}[1]{
       \htmlref{\item[Examples:]}{ap:example}
       \begin{description}
          #1
@@ -652,27 +654,27 @@
    }
 
 %  sstsubsection
-   \renewcommand{\sstsubsection}[1]{\item[{#1}]}
+   \newcommand{\sstsubsection}[1]{\item[{#1}]}
 
 %  sstexamplesubsection
-   \renewcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
+   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
 
 %  sstnotes
-   \renewcommand{\sstnotes}[1]{\item[Notes:]
+   \newcommand{\sstnotes}[1]{\item[Notes:]
       \begin{description}
          #1
       \end{description}
    }
 
 %  sstdiytopic
-   \renewcommand{\sstdiytopic}[2]{\item[{#1}]
+   \newcommand{\sstdiytopic}[2]{\item[{#1}]
       \begin{description}
          #2
       \end{description}
    }
 
 %  sstimplementationstatus
-   \renewcommand{\sstimplementationstatus}[1]{\item[Implementation Status:] 
+   \newcommand{\sstimplementationstatus}[1]{\item[Implementation Status:] 
       \begin{description}
          #1
       \end{description}
@@ -692,149 +694,6 @@
 % End of SST definitions
 % ----------------------
 
-%    Starlink definitions for \LaTeX\ macros used in MAN output
-%
-%  Description:
-%    As much as possible of the output from the MAN automatic manual generator
-%    uses calls to user-alterable macros rather than direct calls to built-in
-%    \LaTeX\ macros. This file is a version of the MAN default definitions for
-%    these macros modified for Starlink preferences.
-%
-%  Language:
-%    \LaTeX
-%
-%  Support:
-%    William Lupton, {AAO}
-%    Alan Chipperfield (RAL)
-%-
-%  History:
-%    16-Nov-88 - WFL - Add definitions to permit hyphenation to work on
-%                      words containing special characters and in teletype fonts.
-%    27-Feb-89 - AJC - Redefine \manroutine
-%                      Added \manheadstyle
-%                      Switch order of argument descriptors
-%    07-Mar-89 - AJC - Narrower box for parameter description
-%                      Remove Intro section and other unused bits
-%
-% permit hyphenation when in teletype font (support 9,10,11,12 point only -
-% could extend), define lccodes for special characters so that the hyphen-
-% ation algorithm is not switched off. Define underscore character to be
-% explicit underscore rather than lots of kerns etc.
-
-\typeout{Starlink MAN macros. Released 27th February 1989}
-
-%\hyphenchar\nintt=`-\hyphenchar\tentt=`-\hyphenchar\elvtt=`-\hyphenchar\twltt=`-
-
-\lccode`_=`_\lccode`$=`$
-
-%    Macros used in the .TEX_SUMMARY file
-%
-%  Description:
-%    There is a command to introduce a new section (mansection) and a list-like
-%    environment (mansectionroutines) that handles the list of routines in the
-%    current section. In addition a mansectionitem command can be used instead
-%    of the item command to introduce a new routine in the current section.
-%-
-
-\newcommand {\mansection}[2]{\subsection{#1 --- #2}}
-
-\newenvironment {mansectionroutines}{\begin{description}\begin{description}}%
-{\end{description}\end{description}}
-
-\newcommand {\mansectionitem}[1]{\item [#1:] \mbox{}}
-
-%    Macros used in the .TEX_DESCR file
-%
-%  Description:
-%    There is a command to introduce a new routine (manroutine) and a list-like
-%    environment (manroutinedescription) that handles the list of paragraphs
-%    describing the current routine. In addition a manroutineitem command can
-%    be used instead of the item command to introduce a new paragraph for the
-%    current routine.
-%
-%    Two-column tables (the ones that can occur anywhere and which are
-%    triggered by "=>" as the second token on a line) are bracketed by a
-%    new environment (mantwocolumntable). Other sorts of table are introduced
-%    by relevant  environments (manparametertable, manfunctiontable and
-%    manvaluetable). The definitions of these environments call various other
-%    user-alterable commands, thus allowing considerable user control over such
-%    tables... (to be filled in when the commands have been written)
-%-
-
-\newcommand {\manrule}{\rule{\textwidth}{0.5mm}}
-
-%\newcommand {\manroutine}[2]{\subsection{#1 --- #2}}
-\newlength{\speccaption}
-\newlength{\specname}
-\newcommand{\manroutine}[2]{\goodbreak
-                          \markboth{{\stardocname}~ --- #1}{{\stardocname}~ --- #1}
-                          \rule{\textwidth}{0.5mm}  % draw thick line
-                          \settowidth{\specname}{{\Large {\bf #1}}}
-                        % left and right box width is text width plus gap
-                          \addtolength{\specname}{4ex}
-                        % caption width is width of page less the two names
-                        % less than empirical fudge factor
-                          \setlength{\speccaption}{\textwidth}
-                          \addtolength{\speccaption}{-2.0\specname}
-                          \addtolength{\speccaption}{-4.9pt}
-                        % move text up the page because \flushleft environ-
-                        % ment creates a paragraph
-                          \vspace{-7mm}
-                          \newline
-                          \parbox[t]{\specname}{\flushleft{\Large {\bf #1}}}
-                          \parbox[t]{\speccaption}{\flushleft{\Large #2}}
-                          \parbox[t]{\specname}{\flushright{\Large {\bf #1}}}
-                          }
-
-\newenvironment {manroutinedescription}{\begin{description}}{\end{description}}
-
-\newcommand {\manroutineitem}[2]{\pagebreak[3]\item [#1:] #2\mbox{}}
-
-
-% parameter tables
-
-\newcommand {\manparametercols}{lllp{90mm}}
-
-\newcommand {\manparameterorder}[3]{#2 & #3 & #1 &}
-
-\newcommand {\manparametertop}{}
-
-\newcommand {\manparameterblank}{\gdef\manparameterzhl{}\gdef\manparameterzss{}}
-
-\newcommand {\manparameterbottom}{}
-
-\newenvironment {manparametertable}{\gdef\manparameterzss{}%
-\gdef\manparameterzhl{}\hspace*{\fill}\vspace*{-\partopsep}\begin{trivlist}%
-\item[]\begin{tabular}{\manparametercols}\manparametertop}{\manparameterbottom%
-\end{tabular}\end{trivlist}}
-
-\newcommand {\manparameterentry}[3]{\manparameterzss\gdef\manparameterzss{\\}%
-\gdef\manparameterzhl{\hline}\manparameterorder{#1}{#2}{#3}}
-
-
-% list environments
-
-\newenvironment {manenumerate}{\begin{enumerate}}{\end{enumerate}}
-
-\newcommand {\manenumerateitem}[1]{\item [#1]}
-
-\newenvironment {manitemize}{\begin{itemize}}{\end{itemize}}
-
-\newcommand {\manitemizeitem}{\item}
-
-\newenvironment
-{mandescription}{\begin{description}\item{~}\vspace*{-5.6ex}\begin{description}}%
-{\end{description}\end{description}}
-
-\newcommand {\mandescriptionitem}[1]{\item [#1]}
-
-\newcommand {\mantt}{\tt}
-
-% manheadstyle for Starlink
-\newcommand {\manheadstyle}{}
-
-%\catcode`\_=12
-
 % ? End of document specific commands
 %------------------------------------------------------------------------------
 %  Title Page.
@@ -842,6 +701,9 @@
 \renewcommand{\thepage}{\roman{page}}
 \begin{document}
 \thispagestyle{empty}
+
+%  Colour verbatim text.
+\htmlsetstyle[PRE]{}{background=LightBlue}
 
 %  Latex document header.
 %  ======================
@@ -1091,7 +953,7 @@ to individual needs and stored within \htmlref{`style files'}{se:style}.
 \KAPPA\ handles \htmlref{bad pixels, and processes
 quality}{se:masking}, variance, \htmlref{World Co-ordinate System}{se:wcsuse}
 (WCS), and other information stored within
-NDFs \latexonly{(SUN/33 and Section~\ref{se:datastr})}.  In order to
+NDFs \latex{(SUN/33 and Section~\ref{se:datastr})}.  In order to
 achieve generality \KAPPA\ does not process non-standard
 extensions; however, it does not lose non-standard ancillary data
 since it copies extensions to any NDFs that it creates.
@@ -1136,7 +998,7 @@ application.  The best way to learn the basics is to try some example
 sessions.
 
 Login to a colour workstation or X-terminal.  Then enter the commands
-following the prompts shown below.  The {\tt \%} is the shell prompt
+following the prompts shown below.  The \texttt{\%} is the shell prompt
 string, which you don't type.  As we go along there will be
 commentary explaining what is happening and why.  Let's begin. 
 
@@ -1181,7 +1043,7 @@ most commonly used.  Parameters given on the command line are not
 subsequently prompted for by the application.  Also you see that the
 NDF file extensions are not given.  The {\tt .sdf} extension indicates
 that it was created by the \xref{Hierarchical Data System}{sun92}{}
-\latexonly{ (SUN/92)}, or HDS for short.  Note that an arbitrary
+\latex{ (SUN/92)}, or HDS for short.  Note that an arbitrary
 {\tt .sdf} file is not necessarily an NDF.
 
 Next we run the statistics task.  Here we have not given any parameters.
@@ -1647,10 +1509,10 @@ error message from \ICL.
 That's the end of the second demonstration.  Of course, these
 introductions have only scratched the surface of what \KAPPA\ can
 do for you.  You should look at 
-\latexelsehtml{Appendix~\ref{ap:classified}}{the
+\latexhtml{Appendix~\ref{ap:classified}}{the
 \htmlref{classified lists}{ap:classified}} to search for the desired
 function, and then find more details in
-\latexelsehtml{Appendix~\ref{ap:full}.}{the \htmlref{specifications}{ap:full}.}
+\latexhtml{Appendix~\ref{ap:full}.}{the \htmlref{specifications}{ap:full}.}
 
 If you get stuck or something untoward happens, there is a {\tt Hints}
 help topic.
@@ -1724,10 +1586,10 @@ you'll see message from \KAPPA\ telling you which version is
 ready for use.
 
 So what do you get for your trouble?  
-\latexelsehtml{Appendix~\ref{ap:summary}}{\htmlref{The application
+\latexhtml{Appendix~\ref{ap:summary}}{\htmlref{The application
 specifications}{ap:summary}} lists
 in alphabetical order all the commands and their functions, and
-\latexelsehtml{Appendix~\ref{ap:classified}}{there}
+\latexhtml{Appendix~\ref{ap:classified}}{there}
 is a \htmlref{classified list}{ap:classified} of the same commands.
 Many examples are given in subsequent sections.
 
@@ -1736,7 +1598,7 @@ To run an application you then can just give its name---you will be
 prompted for any required parameters.  Alternatively, you may enter
 parameter values on the command line specified by position or by
 keyword.  More on this in
-\latexelsehtml{Section~\ref{se:param}.}{\htmlref{Parameters}{se:param}}
+\latexhtml{Section~\ref{se:param}.}{\htmlref{Parameters}{se:param}}
 
 Commands are interpreted in a case-independent way from \ICLref , but
 from the shell they must be given in lowercase.  In \ICL,
@@ -1784,9 +1646,9 @@ C-shell which might confuse you should you forget that
 \medskip
 
 {\large {\bf Since the {\normalsize{\bf KAPPA}} commands are the same
-in both the shell and {\normalsize{\bf ICL}}, the {\tt \%} and {\tt
+in both the shell and {\normalsize{\bf ICL}}, the \texttt{\%} and {\tt
 ICL>} prompts in the examples and description
-\latexelsehtml{below}{in subsequent pages} are
+\latexhtml{below}{in subsequent pages} are
 interchangeable unless noted otherwise.}}
 
 \subsection{\xlabel{se_kaphelp}Obtaining Help\label{se:kaphelp}}
@@ -1866,7 +1728,7 @@ Starlink packages.)
 
 If you have commenced running an application you can still access the
 help library whenever you are prompted for a parameter.  See
-\latexelsehtml{Section~\ref{se:parhelp}}{\htmlref{Entering the Help 
+\latexhtml{Section~\ref{se:parhelp}}{\htmlref{Entering the Help 
 System}{se:parhelp}} for details.
 
 \subsubsection{Navigating Help Hierarchies} 
@@ -1993,9 +1855,9 @@ Once back to the shell enter {\tt icl} to return to \ICL, and
 then kill the process as described above.
 
 If you have interrupted a task, it may be necessary to delete the
-\htmlref{parameter file}{se:defaults} \latexonly{(Section~\ref{se:defaults})} and
+\htmlref{parameter file}{se:defaults} \latex{(Section~\ref{se:defaults})} and
 the \htmlref{graphics database}{se:agitidy}
-\latexonly{ (Section~\ref{se:agitidy})}.
+\latex{ (Section~\ref{se:agitidy})}.
 
 \newpage
 \section{\xlabel{se_param}Parameters\label{se:param}}
@@ -2019,7 +1881,7 @@ If you want more information, go to the appropriate section.
 
 \item Command-line values \newline
  On the command line you can supply values by keyword or by position.
- See \latexelsehtml{Section~\ref{se:cmdlindef}}{\htmlref{Specifying Parameter
+ See \latexhtml{Section~\ref{se:cmdlindef}}{\htmlref{Specifying Parameter
  Values on Command Lines}{se:cmdlindef}} for more details including abbreviated
  keywords.
 
@@ -2028,7 +1890,7 @@ If you want more information, go to the appropriate section.
  be prompted.  {\tt PROMPT} prompts for all the parameters not given on
  the command line, and {\tt RESET} resets all the suggested defaults to
  their initial values.  You can find more details and examples in
- \latexelsehtml{Section~\ref{se:parspeckey}.}{\htmlref{Special Keywords: ACCEPT,
+ \latexhtml{Section~\ref{se:parspeckey}.}{\htmlref{Special Keywords: ACCEPT,
  PROMPT, RESET}{se:parspeckey}.}
 
 \item {\tt NAME - Prompt string /Suggested default/ $>$} \newline
@@ -2037,7 +1899,7 @@ If you want more information, go to the appropriate section.
  special responses available (see below).
  If you just hit the return key, the suggested default becomes the
  parameter value.  Many parameters are defaulted without prompting.  See 
- \latexelsehtml{Section~\ref{se:defaults} and
+ \latexhtml{Section~\ref{se:defaults} and
  Section~\ref{se:parglobals}}{\htmlref{Defaults}{se:defaults} and
  \htmlref{Globals}{se:parglobals}} for more details.
 \end{description}
@@ -2058,7 +1920,7 @@ differences, they are noted.
 \item {\tt [[11,21,31],[12,22,32]]} \newline
  This is a 3$\times$2 array.  Arrays of dimension $>$ 2 should
  appear in nested brackets.  See
- \latexelsehtml{Section~\ref{se:pararrays}}{\htmlref{Arrays}{se:pararrays}}
+ \latexhtml{Section~\ref{se:pararrays}}{\htmlref{Arrays}{se:pararrays}}
  for more about array values. 
 
 \item {\tt T} \newline
@@ -2077,11 +1939,11 @@ differences, they are noted.
  This is a string.  Strings need not be quoted at prompts.  Quotes are
  required on the command line if the string includes spaces or
  wildcards, or is a comma-separated array of strings.  There is more in
- \latexelsehtml{Section~\ref{se:parstrings}.}{\htmlref{Strings}{se:parstrings}.}
+ \latexhtml{Section~\ref{se:parstrings}.}{\htmlref{Strings}{se:parstrings}.}
  Some parameters offer a selection from a menu to which you give
  an unambiguous abbreviation to select an option.  Other parameters
  can be numerical or a string.  (See
- \latexelsehtml{Section~\ref{se:parmenu}}{\htmlref{Menus}{se:parmenu}}
+ \latexhtml{Section~\ref{se:parmenu}}{\htmlref{Menus}{se:parmenu}}
  for more information.)
 
 \item {\tt filename} \newline
@@ -2092,14 +1954,14 @@ differences, they are noted.
  extension.  Foreign formats will
  usually have the file extension.  Should the filename be a numerical
  value, it must be preceded by an {\tt @}.  There is more in
- \latexelsehtml{Section~\ref{se:parstrings}.}{\htmlref{Strings}{se:parstrings}.}
+ \latexhtml{Section~\ref{se:parstrings}.}{\htmlref{Strings}{se:parstrings}.}
 
 \item {\tt min} \newline
 \vspace{-5ex}
 \item {\tt max} \newline
  This selects the minimum- or maximum-allowed value, but not all
  parameters have a defined range of permitted values.  See
- \latexelsehtml{Section~\ref{se:parminmax}.}{\htmlref{MIN and MAX
+ \latexhtml{Section~\ref{se:parminmax}.}{\htmlref{MIN and MAX
  parameter values}{se:parminmax}.}
 
 \item {\tt{!}} \newline
@@ -2107,7 +1969,7 @@ differences, they are noted.
  one will depend on the particular parameter.  For example, null might
  indicate that an output file is not to be created, or a loop is to be
  ended.  There are more examples in
- \latexelsehtml{Section~\ref{se:abortnull}.}{\htmlref{Abort and
+ \latexhtml{Section~\ref{se:abortnull}.}{\htmlref{Abort and
  Null}{se:abortnull}.}
 
 \item {\tt !!} \newline
@@ -2119,7 +1981,7 @@ differences, they are noted.
  A single question mark presents the online help for the parameter,
  and then reprompts.  A double question mark leaves you in the help
  system to explore other help information.  See
- \latexelsehtml{Section~\ref{se:parhelp}}{\htmlref{Help}{se:parhelp}}
+ \latexhtml{Section~\ref{se:parhelp}}{\htmlref{Help}{se:parhelp}}
  for examples.  These special values are not supported from the
  command line.
 
@@ -2143,7 +2005,7 @@ applications to have many options, say for controlling the appearance of
 some graphical output, without making routine operations tedious because
 of a large number of prompts.  The values of normally defaulted
 parameters are given in 
-\latexelsehtml{Appendix~\ref{ap:full}.}{the \htmlref{application
+\latexhtml{Appendix~\ref{ap:full}.}{the \htmlref{application
 specifications}{ap:full}.}
 You can also find them by obtaining online help on a specific
 parameter.  They are enclosed in square brackets at the end of the
@@ -2195,7 +2057,7 @@ to prefix your value with an {\tt @}, {\emph{e.g.}}
 \normalsize
 There are rare cases when the syntax is ambiguous, and it is then that you
 need to include the {\tt @}.
-\latexelsehtml{Section~\ref{se:parstrings}}{\htmlref{Strings}{se:parstrings}}
+\latexhtml{Section~\ref{se:parstrings}}{\htmlref{Strings}{se:parstrings}}
 describes when the {\tt @} is needed.
 
 From both \ICLref\ \normalsize and the shell the default value can be edited to save 
@@ -2241,12 +2103,13 @@ directory as the individual files.  This duality means that there are
 two independent sets of current values for each task depending on
 where you ran it from.
 
-The parameter file should not be deleted unless the parameters
-values are to be completely reset, or the file has been corrupted in
-some way.  If you suspect the latter case, say after \htmlref{interrupting
-a task}\latexonly{ (Section~\ref{se:exiting})}, run 
-{\HDSTRACEref\normalsize}~ \latexonly{(SUN/102)} on the file to check
-its integrity.
+The parameter file should not be deleted unless the parameters 
+values are to be completely reset, or the file has been corrupted in 
+some way.  If you suspect the latter case, say after 
+\htmlref{interrupting a task}{se:exiting}\latex{(Section~\ref{se:exiting})}, 
+run 
+{\HDSTRACEref\normalsize}~\latex{(SUN/102)} 
+on the file to check its integrity.
 
 \subsection{\xlabel{se_parglobals}Globals\label{se:parglobals}}
 
@@ -2267,11 +2130,11 @@ given below.
 \newline
 \newline
 \begin{tabular}{@{\hspace{5ex}}l@{~~ --- ~~}l}
-{\tt GLOBAL.DATA\_ARRAY}      & Last NDF or foreign data file accessed or written.\\
-{\tt GLOBAL.GRAPHICS\_DEVICE} & Current graphics workstation.\\
-{\tt GLOBAL.INTERACTIONMODE}  & Current interaction mode. \\
-{\tt GLOBAL.LUT} & Last lookup table file accessed or written. \\
-{\tt GLOBAL.TRANSFORM} & Current transformation structure. \\
+\texttt{GLOBAL.DATA\_ARRAY}      & Last NDF or foreign data file accessed or written.\\
+\texttt{GLOBAL.GRAPHICS\_DEVICE} & Current graphics workstation.\\
+\texttt{GLOBAL.INTERACTIONMODE}  & Current interaction mode. \\
+\texttt{GLOBAL.LUT} & Last lookup table file accessed or written. \\
+\texttt{GLOBAL.TRANSFORM} & Current transformation structure. \\
 \end{tabular}
 
 \KAPPA\ uses the last DATA\_ARRAY written or accessed as
@@ -2465,7 +2328,7 @@ or {\tt "Automatic"}.
 
 Some parameters permit a mixture---a choice from a menu, or a
 numerical value within a range.  The options are described in full in
-\latexelsehtml{the help system and
+\latexhtml{the help system and
 Appendix~\ref{ap:full}.}{\htmlref{application specifications}{ap:full}.}
 
 \subsection{\xlabel{se_envvar}Environment Variables\label{se:envvar}}
@@ -2497,7 +2360,7 @@ command line: by keyword and by position.  The two forms may be
 mixed with care.  The parser looks for positional parameters then
 keywords, so you can have some positional values followed by keyword
 values.  See some of the examples presented in 
-\latexelsehtml{Appendix~\ref{ap:full}.}{the \htmlref{application
+\latexhtml{Appendix~\ref{ap:full}.}{the \htmlref{application
 specifications}{ap:full}.}
 
 \subsubsection{\xlabel{se_parkeyword}Keyword\label{se:parkeyword}}
@@ -2564,7 +2427,7 @@ called clipped.  The values between 0 and 255 are unchanged.  Note that
 trailing parameters may be omitted---NEWLO and NEWHI in the above
 example---but intermediate ones may not.  The position of a parameter
 can be found in the {\tt Usage} heading in
-\latexelsehtml{Appendix~\ref{ap:full}}{the \htmlref{application
+\latexhtml{Appendix~\ref{ap:full}}{the \htmlref{application
 specifications}{ap:full}} or the help for the application.
 
 \subsubsection{\xlabel{se_keyvspar}Keyword versus Positional Parameters
@@ -2576,14 +2439,14 @@ would be tedious not only to enter all the intermediate values between
 the ones you want to define, but also to remember them all.  Another
 consideration is that some parameters do not have defined positions
 because they are normally defaulted.  Keywords may also be
-\htmlref{abbreviated}{se:parabbrev}\latexonly{(Section~\ref{se:parabbrev})}.
+\htmlref{abbreviated}{se:parabbrev}\latex{(Section~\ref{se:parabbrev})}.
 Thus the keyword technique is recommended for most parameters,
 especially in scripts and procedures.  Unabbreviated keywords insulate
 scripts against new keywords and positional changes that are sometimes
 needed.
 
 See
-\latexelsehtml{Section~\ref{se:custom}}{\htmlref{custom \KAPPA\ 
+\latexhtml{Section~\ref{se:custom}}{\htmlref{custom \KAPPA\ 
 commands}{se:customcom}}
 if you want to learn how further to abbreviate command strings to
 reduce typing for manual operation.
@@ -2638,7 +2501,7 @@ appears on the command line, or all subsequent parameters if it is
 supplied to a prompt.  In other words, those parameters which would
 normally be prompted with a value between {\tt / /} delimiters take
 the value between those delimiters, {\emph{e.g.}}\ XDIM we saw in
-\latexelsehtml{Section~\ref{se:defaults}}{\htmlref{parameter
+\latexhtml{Section~\ref{se:defaults}}{\htmlref{parameter
 defaults}{se:defaults}} would take the value {\tt 64}.  Parameters
 that are normally defaulted behave as usual.  The ACCEPT keyword needs
 to be used with care in scripts because not every parameter has a
@@ -2724,7 +2587,7 @@ original, preset values, and accept these as the parameter values.
 
 These special keywords may be abbreviated to no fewer than
 two characters, if you have enabled
-\htmlref{keyword-abbreviation}{se:parabbrev}\latexonly{ (Section~\ref{se:parabbrev})}.
+\htmlref{keyword-abbreviation}{se:parabbrev}\latex{ (Section~\ref{se:parabbrev})}.
 
 \subsection{\xlabel{se_parminmax}MIN and MAX parameter values
 \label{se:parminmax}}
@@ -2765,7 +2628,7 @@ require a group of strings, others may require a group of numerical
 values, or data files.  No matter what the nature of the object, groups
 are specified using a syntax called a \emph{group expression}.  The GRP
 library is used to interpret these group expressions, and the \xref{GRP
-documentation}{sun150}{} \latexonly{ (SUN/150)}, should be consulted for
+documentation}{sun150}{} \latex{ (SUN/150)}, should be consulted for
 full details.  A summary is given here.
 
 A group expression can identify the members of the group in any of the
@@ -3007,11 +2870,11 @@ are all possible responses:
    b1,b2,b3,b4
 \end{verbatim}
 \normalsize
-\latexonly{\vspace{-4mm}}
+\latex{\vspace{-4mm}}
 
 This means ``Use the NDFs stored in files \verb+b1.sdf+, \verb+b2.sdf+,
 \verb+b3.sdf+ and \verb+b4.sdf+''.  If \htmlref{`on-the-fly format
-conversion'}{se:autoconvert} (see \latexonly{Section~\ref{se:autoconvert}
+conversion'}{se:autoconvert} (see \latex{Section~\ref{se:autoconvert}
 and} \xref{SUN/55}{sun55}{}) is being used, then this example would pick
 up data files with the highest priority data format (\emph{i.e.} the
 format nearest to the start of the list of formats supplied in
@@ -3027,7 +2890,7 @@ the corresponding file type in the group expression.  An example such as:
    b1.fit,b2.fit,b3.fit,b4.fit
 \end{verbatim}
 \normalsize
-\latexonly{\vspace{-4mm}}
+\latex{\vspace{-4mm}}
 would read just the specified FITS files.
 \medskip
 
@@ -3036,7 +2899,7 @@ would read just the specified FITS files.
    cena_b1-
 \end{verbatim}
 \normalsize
-\latexonly{\vspace{-4mm}}
+\latex{\vspace{-4mm}}
 This means ``Use \verb+cena_b1.sdf+ and then (because of the hyphen
 at the end) ask the user for more data files''.
 \medskip
@@ -3046,7 +2909,7 @@ at the end) ask the user for more data files''.
    *
 \end{verbatim}
 \normalsize
-\latexonly{\vspace{-4mm}}
+\latex{\vspace{-4mm}}
 This means ``Use all accessible data files in the current directory''. 
 \medskip
 
@@ -3055,7 +2918,7 @@ This means ``Use all accessible data files in the current directory''.
    hh1_b1s*_ds
 \end{verbatim}
 \normalsize
-\latexonly{\vspace{-4mm}}
+\latex{\vspace{-4mm}}
 This means ``Use \verb+hh1_b1s1_ds.sdf+, \verb+hh1_b1s2_ds.sdf+, \emph{etc.}''.
 \medskip
 
@@ -3064,7 +2927,7 @@ This means ``Use \verb+hh1_b1s1_ds.sdf+, \verb+hh1_b1s2_ds.sdf+, \emph{etc.}''.
    hh1_b[12]s*_ds
 \end{verbatim}
 \normalsize
-\latexonly{\vspace{-4mm}}
+\latex{\vspace{-4mm}}
 This means ``Use \verb+hh1_b1s1_ds.sdf+, \verb+hh1_b1s2_ds.sdf+,
 \emph{etc.}, and also \verb+hh1_b2s1_ds.sdf+, \verb+hh1_b2s2_ds.sdf+,
 \emph{etc.}''.  The string {\tt "[12]"} matches either a single
@@ -3079,7 +2942,7 @@ alphabetical character.
    data.fit[12]
 \end{verbatim}
 \normalsize
-\latexonly{\vspace{-4mm}}
+\latex{\vspace{-4mm}}
 This means ``Use files \verb+data.fit1+ and \verb+data.fit2+ if they
 exist.  If neither of these files exists, use the twelth image extension 
 in the multi-extension FITS file \verb+data.fit+''.
@@ -3090,7 +2953,7 @@ in the multi-extension FITS file \verb+data.fit+''.
    ^files.lis
 \end{verbatim}
 \normalsize
-\latexonly{\vspace{-4mm}}
+\latex{\vspace{-4mm}}
 This means ``Read the names of data files from the text file
 \verb+files.lis+.''
 \medskip
@@ -3100,7 +2963,7 @@ This means ``Read the names of data files from the text file
    ../data/*
 \end{verbatim}
 \normalsize
-\latexonly{\vspace{-4mm}}
+\latex{\vspace{-4mm}}
 This means ``Use all accessible data files contained in the directory 
 \verb+../data+''.
 \medskip
@@ -3110,7 +2973,7 @@ This means ``Use all accessible data files contained in the directory
    data_{new,old,back}
 \end{verbatim}
 \normalsize
-\latexonly{\vspace{-4mm}}
+\latex{\vspace{-4mm}}
 This means ``Use files \verb+data_new.sdf+, \verb+data_old.sdf+ and
 \verb+data_back.sdf+''.
 \medskip
@@ -3120,7 +2983,7 @@ This means ``Use files \verb+data_new.sdf+, \verb+data_old.sdf+ and
    {^files}_A
 \end{verbatim}
 \normalsize
-\latexonly{\vspace{-4mm}}
+\latex{\vspace{-4mm}}
 This means ``Read names of data files from text file \verb+files+ and 
 append \verb+_A+ to the end of each one''.
 \medskip
@@ -3130,7 +2993,7 @@ append \verb+_A+ to the end of each one''.
    `grep -l "OBJECT  = 'm57'" *.fit`
 \end{verbatim}
 \normalsize
-\latexonly{\vspace{-4mm}}
+\latex{\vspace{-4mm}}
 
 The string is enclosed in back quotes (\verb+`+) which causes the string
 to be executed as a shell command, and the resulting output to be used as
@@ -3146,7 +3009,7 @@ are possible responses:
    file1,file2,file3
 \end{verbatim}
 \normalsize
-\latexonly{\vspace{-4mm}}
+\latex{\vspace{-4mm}}
 This means ``Create \verb+file1.sdf+, \verb+file2.sdf+ and \verb+file3.sdf+''.
 \medskip
 
@@ -3155,7 +3018,7 @@ This means ``Create \verb+file1.sdf+, \verb+file2.sdf+ and \verb+file3.sdf+''.
    ^out.dat
 \end{verbatim}
 \normalsize
-\latexonly{\vspace{-4mm}}
+\latex{\vspace{-4mm}}
 This means ``Read the names of the output data files from text file \verb+out.dat+''.
 \medskip
 
@@ -3164,7 +3027,7 @@ This means ``Read the names of the output data files from text file \verb+out.da
    *_ds
 \end{verbatim}
 \normalsize
-\latexonly{\vspace{-4mm}}
+\latex{\vspace{-4mm}}
 This means ``Append the string {\tt "\_ds"} to the end of all 
                       the input data file names.''
 \medskip
@@ -3174,7 +3037,7 @@ This means ``Append the string {\tt "\_ds"} to the end of all
    ../bk/*|_ds|_bk|
 \end{verbatim}
 \normalsize
-\latexonly{\vspace{-4mm}}
+\latex{\vspace{-4mm}}
 This means ``Substitute the string {\tt "\_bk"} for all  occurrences of the string
 {\tt "\_ds"} in the  input data file names, and put the files in 
 directory \verb+../bk+''.
@@ -3190,7 +3053,7 @@ Example results are statistics like the standard deviation or the FWHM
 of the point-spread function, the co-ordinates of points selected by a
 cursor, or the attributes of an NDF.  They are not data files created
 by the application.  In
-\latexelsehtml{Appendix~\ref{ap:full}}{the \htmlref{application
+\latexhtml{Appendix~\ref{ap:full}}{the \htmlref{application
 specifications}{ap:full}} they are listed separately from
 other parameters.
 
@@ -3234,7 +3097,7 @@ prevent the parameter system splitting the string at the commas.  The
 string must then also be enclosed in double quotes to prevent the UNIX shell
 from interpreting the parantheses and equals signs.  A simpler way of
 specifying a ploting style is to put the attribute settings in a 
-\htmlref{text file}{se:style} \latexonly{(see Section~\ref{se:style})}.}.
+\htmlref{text file}{se:style} \latex{(see Section~\ref{se:style})}.}.
 There are more examples in the \xref{{\sl C-Shell Cookbook}}{sc4}{}.
 
 At the time of writing, \ICLref\@ only permits scalar variables.  To do the
@@ -3251,7 +3114,7 @@ as the \verb+$+ in the C-shell example, meaning ``the value of'' the
 variable.  Note that you can't redirect the output to {\tt /dev/null}.
 
 If you use the \htmlref{PROMPT keyword}{se:parspeckey}
-\latexonly{(see Section~\ref{se:parspeckey})} for an application with output
+\latex{(see Section~\ref{se:parspeckey})} for an application with output
 parameters, the programme will bizarrely prompt you for these.  It is
 not asking for a value, but a {\em location\/} where to store the
 value.  It is strongly recommended that you just accept the default
@@ -4932,7 +4795,7 @@ would be transparent.  Starlink applications attempt to achieve this
 through standard, but extensible, data structures, and the ability to
 apparently operate on other formats through the so-called
 \htmlref{`on-the-fly conversion'}{se:autoconvert} (see
-\latexonly{Section~\ref{se:autoconvert} and} \xref{SUN/55}{sun55}{}).
+\latex{Section~\ref{se:autoconvert} and} \xref{SUN/55}{sun55}{}).
 
 The official standard data format used by Starlink applications is the
 \NDFextref{NDF}\ (Extensible \textit{n}-dimensional Data Format, SUN/33).  The
@@ -4951,14 +4814,14 @@ to store any ancillary data associated with the data array, even other
 NDFs.
 
 The NDF format and its components are described more fully in
-\latexelsehtml{Appendices~\ref{ap:NDFformat},}{\htmlref{NDF standard components}
+\latexhtml{Appendices~\ref{ap:NDFformat},}{\htmlref{NDF standard components}
 {ap:NDFformat},}  which includes commands for manipulating the components.  
 
 The NDF format permits arrays to have seven dimensions, but some
 applications only handle one-dimensional and/or two-dimen\-sional data
 arrays.  The data and variance arrays are not constrained to a single
 data type.  Valid types are the \htmlref{HDS numeric primitive
-types}{ap:HDStypes}\latexonly{, see Appendix~\ref{ap:HDStypes}}.
+types}{ap:HDStypes}\latex{, see Appendix~\ref{ap:HDStypes}}.
 
 Many applications are generic, that is they can work on all or some of
 these data types directly.  This makes these applications faster, since
@@ -5002,7 +4865,7 @@ output data structures (the vast majority).
 You can look at a summary of an \NDFref{NDF} structure using the task
 \htmlref{NDFTRACE}{NDFTRACE}, and obtain the values of NDF extension
 components with the {\tt \htmlref{setext}{SETEXT} option=get} command.
-\HDSTRACEref\ \latexonly{(SUN/102)} can be used to look at array values and
+\HDSTRACEref\ \latex{(SUN/102)} can be used to look at array values and
 extensions.
 
 \subsection{Editing the Data Structures}
@@ -5020,7 +4883,7 @@ rename extension components, and assign new values to existing
 components.  There are a number of commands for manipulating
 FITS-header information stored in the NDF's FITS extension.  These are
 described in
-\latexelsehtml{Section~\ref{se:fitsairlock}.}{\htmlref{the FITS
+\latexhtml{Section~\ref{se:fitsairlock}.}{\htmlref{the FITS
 airlock}{se:fitsairlock}.}
 
 \Figaroref\ offers some additional tasks (\xref{CREOBJ}{sun86}{CREOBJ},
@@ -5119,7 +4982,7 @@ dimension, as follows
 where `{\tt a:b}', `{\tt c:d}', (\emph{etc.}) specify the lower and upper
 bounds.  The bounds specified need not necessarily lie within the actual
 bounds of the NDF, because \htmlref{{\em bad\/} pixels}{se:masking} 
-\latexonly{(see Section~\ref{se:masking})} will be supplied in the
+\latex{(see Section~\ref{se:masking})} will be supplied in the
 usual way, if required, to pad out the NDF's array components whenever
 they are accessed.  However, none of the lower bounds should exceed the
 corresponding upper bound. 
@@ -5217,7 +5080,7 @@ A further variation is that numerical values in subscript expressions
 may be specified either as integers, in which case they refer to pixel
 indices, or as floating-point numbers, in which case they refer to
 {\em axis\/} co-ordinates 
-\latexelsehtml{(for a description of {\em AXIS\/} co-ordinates, see
+\latexhtml{(for a description of {\em AXIS\/} co-ordinates, see
 Section~\ref{se:domains}).}{(see \htmlref{``Co-ordinate Frames, Axes and
 Domains''}{se:domains} for a description).}  Here a
 `floating-point' number is one containing a decimal point and/or an
@@ -5293,7 +5156,7 @@ planes of a datacube.
 \label{se:ndfsec-mixing}}
 
 In the \htmlref{last example}{se:ndfsec-axis}
-\latexonly{ (in Section~\ref{se:ndfsec-axis})} both {\em axis\/}
+\latex{ (in Section~\ref{se:ndfsec-axis})} both {\em axis\/}
 co-ordinates and pixel indices were mixed in the same subscript
 expression.  In fact, any of the features described earlier may be
 combined when specifying an NDF section, the only restriction being that
@@ -5306,14 +5169,14 @@ sections
 \begin{quote}
 \begin{center}
 \begin{tabular}{l}
-{\tt NDF(3.7)}\\
-{\tt NDF(,5:)}\\
-{\tt NDF(-77:13.8,,4)}\\
-{\tt NDF(66}$\sim${\tt 9,4:17)}\\
-{\tt NDF(}$\sim${\tt 5,6}$\sim${\tt )}\\
-{\tt NDF(}$\sim${\tt ,:)}\\
-{\tt NDF(5500.0}$\sim${\tt 150,)}\\
-{\tt NDF(3.0}$\sim${\tt 1.5,-78.06D-3:13.0545,,,,)}\\
+\texttt{NDF(3.7)}\\
+\texttt{NDF(,5:)}\\
+\texttt{NDF(-77:13.8,,4)}\\
+\texttt{NDF(66}$\sim$\texttt{9,4:17)}\\
+\texttt{NDF(}$\sim$\texttt{5,6}$\sim$\texttt{)}\\
+\texttt{NDF(}$\sim$\texttt{,:)}\\
+\texttt{NDF(5500.0}$\sim$\texttt{150,)}\\
+\texttt{NDF(3.0}$\sim$\texttt{1.5,-78.06D-3:13.0545,,,,)}\\
 \end{tabular}
 \end{center}
 \end{quote}
@@ -5551,7 +5414,7 @@ Creating X-windows with too many colours can restrict the availability of
 colours for other X applications.
 
 First of all we make the X-window the current graphics device 
-(as described in \latexelsehtml{Section~\ref{se:devglobal}).}{in
+(as described in \latexhtml{Section~\ref{se:devglobal}).}{in
 \htmlref{global device names}{se:devglobal}.)}  This selection will remain in force
 until changed.  The following command would not be necessary if the
 global parameter already had this value:
@@ -5620,7 +5483,7 @@ a little larger since no margins need to be left for the axes):
 \end{htmlonly}
 
 The X-window should now look like Figure~
-\latexelsehtml{\ref{fi:agi1}}{1}.  The application has displayed the
+\latexhtml{\ref{fi:agi1}}{1}.  The application has displayed the
 image in the middle of the current picture (the BASE picture), and has made 
 it as large as possible, subject to the constraints that it must lie entirely 
 within the current picture.  Note, as with many IRAS images, equatorial
@@ -5763,7 +5626,7 @@ the pixels appear black and 30\% appear white:
 
 
 The X-window should now look like Figure~
-\latexelsehtml{\ref{fi:agi2}}{2}.  We can use \htmlref{PICLIST}{PICLIST} 
+\latexhtml{\ref{fi:agi2}}{2}.  We can use \htmlref{PICLIST}{PICLIST} 
 again to list the pictures stored in the database:
 
 \small
@@ -5833,7 +5696,7 @@ right corners of a box enclosing the required sub-section of the image:
 
 \end{htmlonly}
 
-The box I selected is indicated in Figure~ \latexelsehtml{\ref{fi:agi3}}{3}. 
+The box I selected is indicated in Figure~ \latexhtml{\ref{fi:agi3}}{3}. 
 
 When an application such as DISPLAY produces a DATA picture containing
 a representation of an NDF, it saves a copy of the NDF's \htmlref{WCS
@@ -5950,7 +5813,7 @@ pixel bounds in the specification of the input NDF when we run DISPLAY:
 
 \end{htmlonly}
 
-The X-window should now look like Figure~ \latexelsehtml{\ref{fi:agi4}}{4}. 
+The X-window should now look like Figure~ \latexhtml{\ref{fi:agi4}}{4}. 
 
 The string \verb+m31(173:213,79:114)+ is called an \emph{NDF section
 specifier}.  These are described more fully \hyperref{here}{in Section~}
@@ -6016,7 +5879,7 @@ string giving a title for the contour plot:
 
 \end{htmlonly}
 
-The X-window should now look like Figure~ \latexelsehtml{\ref{fi:agi5}}{5}. 
+The X-window should now look like Figure~ \latexhtml{\ref{fi:agi5}}{5}. 
 
 The most important parameter in the above invocation of CONTOUR is the
 NOCLEAR keyword (equivalent to CLEAR=NO).  This tells CONTOUR not to clear
@@ -6136,7 +5999,7 @@ We now draw the first of the two line profiles:
 
 \end{htmlonly}
 
-The X-window should now look like Figure~ \latexelsehtml{\ref{fi:agi6}}{6}. 
+The X-window should now look like Figure~ \latexhtml{\ref{fi:agi6}}{6}. 
 The plotting attributes specified by the STYLE parameter do the following;
 \verb+tickall=0+ stops tick marks from being drawn on the un-labelled
 edges (\emph{i.e.} the top and right edges); \verb+colour(curve)=black+
@@ -6187,7 +6050,7 @@ drawn in white, and data label is different.
 
 \end{htmlonly}
 
-The X-window should now look like Figure~ \latexelsehtml{\ref{fi:agi7}}{7}. 
+The X-window should now look like Figure~ \latexhtml{\ref{fi:agi7}}{7}. 
 
 As a final touch, we will add two `warp' lines to the display joining
 the corners of the box marking the enlarged image area to the
@@ -6237,7 +6100,7 @@ We now run CURSOR again to draw the second warp line:
 
 Point and click over the bottom right corners of the two boxes this time.
 The final X-window should look now look like Figure~ 
-\latexelsehtml{\ref{fi:agi8}}{8}. 
+\latexhtml{\ref{fi:agi8}}{8}. 
 \begin{latexonly}
    \begin{figure}[hbt]
    \begin{center}
@@ -6302,7 +6165,7 @@ The bottom-left picture would be labelled SPEC1 and the rest are
 numbered in sequence from left to right to SPEC12---the top-right
 picture.  You'd call \htmlref{PICSEL}{PICSEL} to select each picture
 in turn via a {\tt while} loop in a C-shell
-script\latexonly{ (see Section~\ref{se:cshscript})}.  Since this is a
+script\latex{ (see Section~\ref{se:cshscript})}.  Since this is a
 common operation a shorthand command, \htmlref{PICGRID}{PICGRID}, is
 available.  For instance:
 
@@ -6561,7 +6424,7 @@ output is that there is no cursor available when using PostScript.  This
 means, for instance, that you cannot use \htmlref{PICDEF}{PICDEF} in
 cursor mode, and you cannot use \htmlref{CURSOR}{CURSOR} at all! We made
 use of both these facilities when we produced 
-Figure~ \latexelsehtml{\ref{fi:agi8}}{8}. 
+Figure~ \latexhtml{\ref{fi:agi8}}{8}. 
 Pictures must be defined using PICDEF in {\tt XY} mode, or one
 of the other positional mode ({\tt CC}, {\tt BL}, \emph{etc.}).  Annotation
 such as produced by CURSOR can be created using
@@ -6643,7 +6506,7 @@ the annotation produced by CURSOR when you were prototyping.
 
 As an illustrated example, this section describes how to produce a
 PostScript file containing a plot similar to that in Figure~
-\latexelsehtml{\ref{fi:agi8}}{8}.  For clarity (at the time), the earlier
+\latexhtml{\ref{fi:agi8}}{8}.  For clarity (at the time), the earlier
 sections of this chapter did not adhere to either of the tips given above
 when prototyping in an X-window; that is, we did not choose the shape of
 the X-window to match our PostScript device, and we did not save the
@@ -6694,7 +6557,7 @@ cleared the database using \htmlref{GDCLEAR}{GDCLEAR}):
 \normalsize
 
 The choice of a portrait PostScript device may have surprised you, given
-that Figure~ \latexelsehtml{\ref{fi:agi8}}{8} seems more naturally to fit
+that Figure~ \latexhtml{\ref{fi:agi8}}{8} seems more naturally to fit
 into a landscape page.  Portrait mode was chosen so that the final plot
 appears up-right when included in a document.  If landscape mode had been
 chosen, the final plot would have been rotated by 90\dgs\ when included
@@ -6736,7 +6599,7 @@ by subsequent graphics commands.  Throughout the rest of this example, we
 will save each required PostScript file in this way.
 
 We now draw a box over this image to mark the `selected region'
-indicated in Figure~ \latexelsehtml{\ref{fi:agi3}}{3}.  In this
+indicated in Figure~ \latexhtml{\ref{fi:agi3}}{3}.  In this
 particular case, we use \htmlref{LISTMAKE}{LISTMAKE} to create a positions list holding the
 RA and DEC at the two opposite corners of the box.  Alternatively, we
 could have saved the output from CURSOR while prototyping, using the
@@ -7046,7 +6909,7 @@ created to produce the final encapsulated PostScript file:
 \end{verbatim}
 \normalsize
 
-The file {\tt total.eps} is displayed in Figure~ \latexelsehtml{\ref{fi:agi9}}{9}.
+The file {\tt total.eps} is displayed in Figure~ \latexhtml{\ref{fi:agi9}}{9}.
 
 \begin{htmlonly}
    \label{fi:agi9}
@@ -7070,7 +6933,7 @@ pixels along each axis of an NDF.  The first pixel can be given any
 arbitrary pixel index, and this value is known as the \emph{pixel origin}.
 When a section is extracted from an NDF, the pixel origin in the
 extracted section is set so that each pixel retains its original pixel
-indices (see Figure~\latexelsehtml{\ref{fi:pixind}}{1}). 
+indices (see Figure~\latexhtml{\ref{fi:pixind}}{10}). 
 
 \begin{latexonly}
    \begin{figure}[hbt]
@@ -7093,7 +6956,7 @@ indices (see Figure~\latexelsehtml{\ref{fi:pixind}}{1}).
 
 \emph{Pixel co-ordinates} are floating point values which allow positions
 to be specified with sub-pixel accuracy.  They are related to pixel indices
-as indicated in Figure~\latexelsehtml{\ref{fi:pixco}}{2}). 
+as indicated in Figure~\latexhtml{\ref{fi:pixco}}{11}). 
 
 \begin{latexonly}
    \begin{figure}[hbt]
@@ -7122,7 +6985,7 @@ co-ordinates' (FITS makes no provision for an arbitrary pixel
 origin).  When a section is extracted from an array, the grid co-ordinates
 of the extracted section include no knowledge of where the section
 was located in the original array.  See
-Figure~\latexelsehtml{\ref{fi:gridco}}{3}). 
+Figure~\latexhtml{\ref{fi:gridco}}{12}). 
 
 \begin{latexonly}
    \begin{figure}[hbt]
@@ -9181,7 +9044,7 @@ button at the right hand end of the menu bar.
 \subsection{\xlabel{se_palette}Palette\label{se:palette}}
 
 There are four commands for controlling the
-\htmlref{palette}{se:coltab}\latexonly{ (Section~\ref{se:coltab})}, all
+\htmlref{palette}{se:coltab}\latex{ (Section~\ref{se:coltab})}, all
 beginning PAL.  If you inherit the graphics device after a non-\KAPPA\ user
 or after a device reset, you will probably have to reset
 the palette.  You can do this either by loading the default
@@ -9191,7 +9054,7 @@ or load a palette you've created yourself via \htmlref{PALREAD}{PALREAD}.
 You modify the palette by changing individual colours within it using
 \htmlref{PALENTRY}{PALENTRY}.  The colour
 specification can be a \htmlref{named colour}{ap:colset}
-\latexonly{(see Appendix~\ref{ap:colset} for a list)}, or RGB intensities.
+\latex{(see Appendix~\ref{ap:colset} for a list)}, or RGB intensities.
 For example,
 
 \small
@@ -9215,10 +9078,10 @@ colour table in a special file.  Each time a graphics application is run,
 the current colour table and palette are read back from this file, and
 used to reset the pen colours in the \PGPLOT\  colour table before any
 drawing is performed.  Some application change the colour table or
-palette; \htmlref{PALENTRY}, \htmlref{LUTABLE}, \emph{etc.}.  When such
-applications terminates, they write the modified colour table or palette
-back to the file so that it will be used by subsequent graphics
-applications.
+palette; \htmlref{PALENTRY}{PALENTRY}, \htmlref{LUTABLE}{LUTABLE}, 
+\emph{etc.}.  When such applications terminates, they write the modified 
+colour table or palette back to the file so that it will be used by 
+subsequent graphics applications.
 
 Separate palettes and colour tables are maintained for each known
 graphics device, so running \htmlref{LUTGREY}{LUTGREY} on an xwindows
@@ -9507,7 +9370,7 @@ outline of the selected regions on top of a display image using
 \end{htmlonly}
 
 Figure~
-\latexelsehtml{\ref{fi:ardwork}}{8} shows the image with the original
+\latexhtml{\ref{fi:ardwork}}{8} shows the image with the original
 regions outlined to the left.  Note only the section (:270,~:360) is
 displayed.  To see where you have masked, use \htmlref{DISPLAY}{DISPLAY}, which lets you
 define a colour for bad pixels using the BADCOL parameter.
@@ -9518,7 +9381,7 @@ define a colour for bad pixels using the BADCOL parameter.
 \end{verbatim}
 \normalsize
 To the right of Figure~
-\latexelsehtml{\ref{fi:ardwork}}{8} is the final masked image.
+\latexhtml{\ref{fi:ardwork}}{8} is the final masked image.
 
 \subsubsection{\xlabel{se_badsegment}SEGMENT and
 ZAPLIN\label{se:badsegment}}
@@ -10141,14 +10004,14 @@ normally interpreted as part of the syntax of a group expression, such as
 In addition to processing Starlink NDF structures, \KAPPA
 can also process many non-NDF (`foreign') data files.  This is achieved
 through \htmlref{`on-the-fly conversion'}{se:autoconvert} (see
-\latexonly{Section~\ref{se:autoconvert} and} \xref{SUN/55}{sun55}{}).
+\latex{Section~\ref{se:autoconvert} and} \xref{SUN/55}{sun55}{}).
 
 When this scheme is in use, you need not include explicit file types for
 all input file names. If no file type is given, the file with the highest
 priority file type amongst all files with the specified base name will be 
 used.  The priority of a file type is determined by its position within the 
 list of file types given by \htmlref{{\tt{NDF\_FORMATS\_IN}}}{se_autoconvert} 
-environment variable \latexonly{(see Section~\ref{se:autoconvert})}. File 
+environment variable \latex{(see Section~\ref{se:autoconvert})}. File 
 types near the start of the list have higher priority than those which
 follow. Note, native NDF files always have the highest priority and will
 be used (if they exist) in preference to all other files types.
@@ -10243,7 +10106,7 @@ appropriate format with it. If none of the files exist, you'll receive
 a ``file not found'' error message.
 
 You can still define an
-\latexelsehtml{NDF section (see Section~\ref{se:ndfsect})}{\htmlref{NDF
+\latexhtml{NDF section (see Section~\ref{se:ndfsect})}{\htmlref{NDF
 section}{se:ndfsect}} when you access an existing data file in a foreign
 format.  Thus
 
@@ -10257,7 +10120,7 @@ would derive the statistics for \textit{x} pixels between 100 and 200, and
 
 The conversion tasks may be your own for some private format, but
 normally they will come from the \CONVERTref\ \normalsize package
-\latexonly{ (SUN/55)}.  If you want
+\latex{ (SUN/55)}.  If you want
 to learn how to add conversions to the standard ones, you should
 consult \xref{SSN/20}{ssn20}{}.
 
@@ -10350,7 +10213,7 @@ See the \CONVERT\ documentation for more details of these conversions.
 You can run \CONVERT\ ({\it{cf.}}~SUN/55) directly to perform
 conversions.  There is also \htmlref{TRANDAT}{TRANDAT}, which will read a text file of
 data values, or co-ordinates and data values into an NDF, and 
-\xref{ASCIN}{sun86}{ASCIN} in the \Figaroref\ package\latexonly{ (SUN/86)}.
+\xref{ASCIN}{sun86}{ASCIN} in the \Figaroref\ package\latex{ (SUN/86)}.
 
 \subsection{\xlabel{se_fitsreaders}FITS readers\label{se:fitsreaders}}
 
@@ -10370,7 +10233,7 @@ currently have all the features of the corresponding \CONVERTref commands
 FITS extension). For this reason, you should normally use the CONVERT
 commands described in \xref{SUN/55}{sun55}{}. 
 
-\latexonly{Let's see the \KAPPA\ FITS readers in action.}
+\latex{Let's see the \KAPPA\ FITS readers in action.}
 
 \subsubsection{\xlabel{se_readfitstape}Reading FITS Tapes\label{se:readfitstape}}
 
@@ -10425,7 +10288,7 @@ that the FITS headers are stored verbatim in a component .MORE.FITS.
 This is the FITS extension.  The extension contents can be listed with
 \htmlref{FITSLIST}{FITSLIST}.  There is more on this NDF extension and
 its purpose in
-\latexelsehtml{Section~\ref{se:fitsairlock}.}{the \htmlref{FITS
+\latexhtml{Section~\ref{se:fitsairlock}.}{the \htmlref{FITS
 Airlock}{se:fitsairlock}.}
 
 \small
@@ -10623,7 +10486,7 @@ called FITS within your NDF.  The extension is a literal copy of all
 the 80-character `card images' in order.  These can be inspected or
 written to a file via the command FITSLIST.  There is more on this NDF
 extension and its purpose in
-\latexelsehtml{Section~\ref{se:fitsairlock}.}{the \htmlref{FITS
+\latexhtml{Section~\ref{se:fitsairlock}.}{the \htmlref{FITS
 Airlock}{se:fitsairlock}.}
 
 \subsection{\xlabel{se_fitsairlock}The FITS Airlock\label{se:fitsairlock}}
@@ -10806,17 +10669,17 @@ not advised unless you are familiar with the rules for writing FITS
 headers.  See the NOST 
 \htmladdnormallink{{\em A User's Guide to FITS}}
 {http://archive.stsci.edu/fits/users_guide/}
-\latexonly{ (URL {\tt http://archive.stsci.edu/fits/users\_guide/})}.
+\latex{ (URL {\tt http://archive.stsci.edu/fits/users\_guide/})}.
 Other useful FITS documents, test files, and software are available at 
 the \htmladdnormallink{FITS Support Office Home Page} 
 {http://fits.gsfc.nasa.gov/}
-\latexonly{ (URL {\tt http://fits.gsfc.nasa.gov/})}.  
+\latex{ (URL {\tt http://fits.gsfc.nasa.gov/})}.  
 
 
 FITSTEXT does perform some limited validation of the FITS headers, and
 informs you of any problems it detects.  See the
 \htmlref{FITSHEAD}{FITSHEAD} Notes in
-\latexelsehtml{Appendix~\ref{ap:full}}{\htmlref{application
+\latexhtml{Appendix~\ref{ap:full}}{\htmlref{application
 specifications}{ap:full}} for details.
 
 A safer bet for a hand-crafted FITS extension is to edit an existing
@@ -11715,7 +11578,7 @@ to find the interface file, and if there isn't one to look in {\tt
 directory containing the executable is assumed.  Thus if you've not
 created your own interface file for a task, you'll get the released
 version.  Of course, once you have done this, the documentation in
-\latexelsehtml{Appendix~\ref{ap:full}}{the \htmlref{application
+\latexhtml{Appendix~\ref{ap:full}}{the \htmlref{application
 specifications}{ap:full}} will no longer be correct.
 
 \subsection{\xlabel{se_custom}Commands\label{se:customcom}}
@@ -14275,7 +14138,7 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
                   \mbox{[beams]} pos pos2-pos5=?
                   \end{tabular} }
         \right.$ 
-        \newline\latexelsehtml{\hspace*{9.45em}}{~~~~~~~~~~~~~~~~~~}
+        \newline\latexhtml{\hspace*{9.45em}}{~~~~~~~~~~~~~~~~~~}
         \makebox[0mm][c]{\small mode}
       
    }
@@ -15493,14 +15356,14 @@ KAPPA: \htmlref{MATHS}{MATHS}.
          the IN1 NDF.  The following labels and units are also assigned:
 
          \begin{tabular}[h]{lll}
-            I &  {\tt "Total Intensity"} &       UNITS of IN1 \\
-            IA & {\tt "Total Intensity"} &       UNITS of IN1 \\
-            IB & {\tt "Total Intensity"} &       UNITS of IN1 \\
-            IP & {\tt "Polarised Intensity"} &   UNITS of IN1 \\
-            P &  {\tt "Percentage Polarisation"} & {\tt "\%"} \\
-            Q &  {\tt "Stokes Q"} &              --- \\
-            U &  {\tt "Stokes U"} &              --- \\
-            THETA & {\tt "Polarisation Angle"} & {\tt "Degrees"} \\
+            I &  \texttt{"Total Intensity"} &       UNITS of IN1 \\
+            IA & \texttt{"Total Intensity"} &       UNITS of IN1 \\
+            IB & \texttt{"Total Intensity"} &       UNITS of IN1 \\
+            IP & \texttt{"Polarised Intensity"} &   UNITS of IN1 \\
+            P &  \texttt{"Percentage Polarisation"} & \texttt{"\%"} \\
+            Q &  \texttt{"Stokes Q"} &              --- \\
+            U &  \texttt{"Stokes U"} &              --- \\
+            THETA & \texttt{"Polarisation Angle"} & \texttt{"Degrees"} \\
          \end{tabular}
       }
    }
@@ -15667,7 +15530,7 @@ KAPPA: \htmlref{ADD}{ADD},
                   incat=?
                   \end{tabular} }
         \right.$ [search] [maxiter] [maxshift] [toler]
-        \newline\latexelsehtml{\hspace*{10em}}{~~~~~~~~~~~~~~~~~~}
+        \newline\latexhtml{\hspace*{10em}}{~~~~~~~~~~~~~~~~~~}
         \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
@@ -17275,7 +17138,7 @@ KAPPA: \htmlref{ADD}{ADD},
    }
    \sstparameters{
       \sstsubsection{
-         BADCOL = \htmlref{LITERAL} (Read)
+         BADCOL = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The colour with which to mark any bad (\emph{i.e.} missing) pixels in the
          display.  There are a number of options described below.
@@ -23824,7 +23687,7 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
                   table=?
                   \end{tabular} }
         \right.$
-        \newline\latexelsehtml{\hspace*{5.8em}}{~~~~~~~~~~}
+        \newline\latexhtml{\hspace*{5.8em}}{~~~~~~~~~~}
         \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
@@ -24500,7 +24363,7 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
                   \mbox{[knots]}
                   \end{tabular} }
         \right.$
-        \newline\latexelsehtml{\hspace*{12.5em}}{~~~~~~~~~~~~~~~~~~~~~~}
+        \newline\latexhtml{\hspace*{12.5em}}{~~~~~~~~~~~~~~~~~~~~~~}
         \makebox[0mm][c]{\small fittype}
    }
    \sstparameters{
@@ -25825,7 +25688,7 @@ KAPPA: \htmlref{GDSET}{GDSET},
          reported).
 
          The appearance of the outline is controlled by the attributes
-         \htmlattref{Colour(Border)}{Colour(element)}, \latexonly{\goodbreak} 
+         \htmlattref{Colour(Border)}{Colour(element)}, \latex{\goodbreak} 
          \htmlattref{Width(Border)}{Width(element)}, \emph{etc.} (the synonym 
          {\att Outline} may be used in place of {\att Border}).  In addition, 
          the following attributes
@@ -25941,7 +25804,7 @@ KAPPA: \htmlref{GDSET}{GDSET},
          \sstitem
          Previous versions of this application reported bounds in
          \htmlref{`Normalised Device Co-ordinates'}{se:agiframes}
-         \latexonly{(see Section~\ref{se:agiframes})}.  Similar functionality is now
+         \latex{(see Section~\ref{se:agiframes})}.  Similar functionality is now
          provided by setting parameter FRAME to {\tt "BASEPIC"}.  Be aware though,
          that Normalised Device Co-ordinates were normalised so that the
          longer of the two axes had a length of 1.0, but BASEPIC co-ordinates
@@ -26004,7 +25867,7 @@ KAPPA: \htmlref{GDSET}{GDSET},
                   pixpos=?
                   \end{tabular} }
         \right.$
-        \newline\latexelsehtml{\hspace*{11em}}{~~~~~~~~~~~~~~~~~~~~}
+        \newline\latexhtml{\hspace*{11em}}{~~~~~~~~~~~~~~~~~~~~}
         \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
@@ -26169,7 +26032,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
                   comment=?
                   \end{tabular} }
         \right.$ 
-        \newline\latexelsehtml{\hspace*{8.85em}}{~~~~~~~~~~~~~~~~}
+        \newline\latexhtml{\hspace*{8.85em}}{~~~~~~~~~~~~~~~~}
         \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
@@ -26298,7 +26161,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          BRIEF = \_LOGICAL (Read)
       }{
          This controls whether a summary or the full history information
-         is reported.\latexonly{\goodbreak}  BRIEF={\tt TRUE} requests that only the date and
+         is reported.\latex{\goodbreak}  BRIEF={\tt TRUE} requests that only the date and
          application name in each history record is listed.  BRIEF={\tt FALSE}
          causes the task to report the history text in addition.
          {\tt [FALSE]}
@@ -27506,7 +27369,7 @@ plot (6k).
          \emph{e.g.} {\tt Colour\_Set} can be shortened to {\tt C\_S}.
  
          \sstitem
-         The characters {\tt \%} and {\tt $\lsk$} act as wildcards, where
+         The characters \texttt{\%} and {\tt $\lsk$} act as wildcards, where
          the percent sign matches any single character, and asterisk
          matches any sequence of characters.  Thus to display information
          on all available topics, type an asterisk in reply to a prompt.
@@ -28672,7 +28535,7 @@ plot (10k).
                   position=?
                   \end{tabular} }
         \right.$
-        \newline\latexelsehtml{\hspace*{14.4em}}{~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+        \newline\latexhtml{\hspace*{14.4em}}{~~~~~~~~~~~~~~~~~~~~~~~~~~~}
         \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
@@ -29680,7 +29543,7 @@ KAPPA: \htmlref{LOG10}{LOG10},
                   \end{tabular} }
         \right.$
         \newline\hspace*{1.9em}
-%        \newline\latexelsehtml{\hspace*{27.9em}}{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+%        \newline\latexhtml{\hspace*{27.9em}}{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
         \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
@@ -29968,7 +29831,7 @@ KAPPA: \htmlref{LOG10}{LOG10},
          COFRAME or WCS statements within the description (see SUN/183).
          For instance, starting the description with the text
          {\tt "COFRAME(PIXEL)"} will indicate that positions are specified in
-         pixel co-ordinates.  The statement \latexonly{\goodbreak}{\tt "COFRAME(SKY,System=FK5)"} would
+         pixel co-ordinates.  The statement \latex{\goodbreak}{\tt "COFRAME(SKY,System=FK5)"} would
          indicate that positions are specified in RA/DEC (FK5,J2000).  If
          no such statements are included, then a default co-ordinate system
          is used as specified in the parameter description above.
@@ -32606,7 +32469,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
                 psf=?
                 \end{tabular} }
       \right.$
-      \newline\latexelsehtml{\hspace*{10.5em}}{~~~~~~~~~~~~~~~~~}
+      \newline\latexhtml{\hspace*{10.5em}}{~~~~~~~~~~~~~~~~~}
       \makebox[0mm][c]{\small psftype}
    }
    \sstparameters{
@@ -35336,7 +35199,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          reported).
 
          The appearance of the best-fitting straight line is controlled by
-         the attributes \latexonly{\goodbreak} \htmlattref{Colour(Curves)}{Colour(element)}, 
+         the attributes \latex{\goodbreak} \htmlattref{Colour(Curves)}{Colour(element)}, 
          \htmlattref{Width(Curves)}{Width(element)}, \emph{etc.} (the synonym {\att Line}
          may be used in place of {\att Curves}).  The appearance of markers is
          controlled by {\att Colour(Markers)}, {\att Width(Markers)}, 
@@ -35837,7 +35700,7 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
 }{
    \sstdescription{
       This routine assigns a specified value (which may be
-      \htmlref{\emph{bad}{se:masking}}) to
+      \htmlref{\emph{bad}}{se:masking}) to
       either the outside or inside of a specified circle within a
       specified component of a given two-dimensional \NDFref{NDF}.
    }
@@ -36825,7 +36688,7 @@ KAPPA: \htmlref{PICCUR}{PICCUR},
                   lbound=? ubound=?
                   \end{tabular} }
         \right.$
-        \newline\latexelsehtml{\hspace*{12.4em}}{~~~~~~~~~~~~~~~~~~~~~~~}
+        \newline\latexhtml{\hspace*{12.4em}}{~~~~~~~~~~~~~~~~~~~~~~~}
         \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
@@ -38330,7 +38193,7 @@ KAPPA: \htmlref{COMPADD}{COMPADD},
                    incat=?
                    \end{tabular} }
           \right.$
-          \newline\latexelsehtml{\hspace*{15.85em}}{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+          \newline\latexhtml{\hspace*{15.85em}}{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
           \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
@@ -38750,7 +38613,7 @@ KAPPA: \htmlref{ADD}{ADD},
                   incat=?
                   \end{tabular} }
         \right.$
-        \newline\latexelsehtml{\hspace*{7.35em}}{~~~~~~~~~~~~~}
+        \newline\latexhtml{\hspace*{7.35em}}{~~~~~~~~~~~~~}
         \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
@@ -40424,7 +40287,7 @@ KAPPA: \htmlref{CADD}{CADD},
          ANGLE is a multiple of 90 degrees or NNMETH={\tt TRUE}; in these cases
          the variance array is merely propagated.  If a null ({\tt{!}}) value is
          supplied, the value used is {\tt TRUE} if the input NDF has a VARIANCE
-         component, and {\t FALSE} otherwise.  Note that following this operation
+         component, and {\tt FALSE} otherwise.  Note that following this operation
          the errors are no longer independent. {\tt [!]}
       }
    }
@@ -40822,7 +40685,7 @@ KAPPA: \htmlref{NORMALIZE}{NORMALIZE}.
                   poly1-poly20=?
                   \end{tabular} }
         \right.$
-        \newline\latexelsehtml{\hspace*{9.8em}}{~~~~~~~~~~~~~~~~~~}
+        \newline\latexhtml{\hspace*{9.8em}}{~~~~~~~~~~~~~~~~~~}
         \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
@@ -41215,7 +41078,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
                   exprs=? \\
                   \end{tabular} }
         \right.$
-        \newline\latexelsehtml{\hspace*{13.9em}}{~~~~~~~~~~~~~~~~~~~~~~~~~~}
+        \newline\latexhtml{\hspace*{13.9em}}{~~~~~~~~~~~~~~~~~~~~~~~~~~}
         \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
@@ -41918,7 +41781,7 @@ KAPPA: \htmlref{NDFCOPY}{NDFCOPY},
                   xtype=? 
                   \end{tabular} }
         \right.$
-        \newline\latexelsehtml{\hspace*{14.95em}}{~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+        \newline\latexhtml{\hspace*{14.95em}}{~~~~~~~~~~~~~~~~~~~~~~~~~~~}
         \makebox[0mm][c]{\small option}
    }
    \sstparameters{
@@ -42274,7 +42137,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
    \sstdescription{
       This routine sets a new value for one or all the normalisation
       flags in an \NDFref{NDF} \htmlref{AXIS}{apndf:axis}~ 
-      \latexonly{\goodbreak} data structure.  The NDF is accessed in
+      \latex{\goodbreak} data structure.  The NDF is accessed in
       update mode.  This flag determines how the NDF's data and
       variance arrays behave when the associated axis information is
       modified.
@@ -42696,7 +42559,7 @@ KAPPA: \htmlref{QUALTOBAD}{QUALTOBAD},
    }
    \sstusage{
       setsky ndf positions coords epoch [projtype] [lon] [lat]
-             [refcode] \latexonly{\goodbreak} [pixelsize] [orient] [tilt] [logfile]
+             [refcode] \latex{\goodbreak} [pixelsize] [orient] [tilt] [logfile]
    }
    \sstparameters{
       \sstsubsection{
@@ -43718,7 +43581,7 @@ KAPPA: \htmlref{REGRID}{REGRID},
                   pixscale=?
                   \end{tabular} }
         \right.$
-        \newline\latexelsehtml{\hspace*{6.9em}}{~~~~~~~~~~}
+        \newline\latexhtml{\hspace*{6.9em}}{~~~~~~~~~~}
         \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
@@ -45999,7 +45862,7 @@ plot (7k).
    }
    \sstexamples{
       \sstexamplesubsection{
-         wcsadd speca axis frmtype=specframe maptype=unit \latexonly{\linebreak}
+         wcsadd speca axis frmtype=specframe maptype=unit \latex{\linebreak}
          attrs="'system=wave,unit=Angstrom'"
       }{
          This example assumes the NDF called speca has an Axis
@@ -46055,8 +45918,8 @@ plot (7k).
          axes, but is translated by 1024 pixels on the third axis.
       }
       \sstexamplesubsection{
-         wcsadd plane pixel polar math simpif simpfi \latexonly{\linebreak}
-            forexp="'r=sqrt(x$*$x+y$*$y),theta=atan2(y,x)'" \latexonly{\linebreak}
+         wcsadd plane pixel polar math simpif simpfi \latex{\linebreak}
+            forexp="'r=sqrt(x$*$x+y$*$y),theta=atan2(y,x)'" \latex{\linebreak}
             invexp="'x=r$*$cos(theta),y=r$*$sin(theta)'"
       }{
          A new Frame is added which gives pixel positions in polar
@@ -48181,7 +48044,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
                   colin=?
                   \end{tabular} }
         \right.$
-        \newline\latexelsehtml{\hspace*{10.92em}}{~~~~~~~~~~~~~~~~~~~~}
+        \newline\latexhtml{\hspace*{10.92em}}{~~~~~~~~~~~~~~~~~~~~}
         \makebox[0mm][c]{\small mode}
    }
    \sstparameters{
@@ -48404,7 +48267,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          reported).
 
          The appearance of vertical and horizontal lines is controlled by
-         the attributes \latexonly{\goodbreak} \htmlattref{Colour(Curves)}{Colour(element)}, 
+         the attributes \latex{\goodbreak} \htmlattref{Colour(Curves)}{Colour(element)}, 
          \htmlattref{Width(Curves)}{Width(element)}, 
          \emph{etc.} (the synonym {\att Lines} may be used in place of 
          {\att Curves}).  The appearance of boxes is controlled by the 
@@ -49673,7 +49536,7 @@ calibration data or results produced during processing of the data
 array, {\it{e.g.}}\ spectral-line fits. The extensions are located
 within the MORE top-level component.  {\tt example.sdf} began life as
 a \Figaroref\ file.  It was converted to an NDF using the command
-\xref{DST2NDF}{sun55}{DST2NDF}\latexonly{ (see SUN/55)}.  It contains
+\xref{DST2NDF}{sun55}{DST2NDF}\latex{ (see SUN/55)}.  It contains
 values for the airmass and exposure time associated with the
 observations.  These are stored in the FIGARO extension, and the
 intention is that the \FIGARO\ applications which use these
@@ -49703,8 +49566,8 @@ data array, a character title,
 and the maximum and minimum data values.  It is variant of the
 original Wright-Giddings IMAGE structure.  There are others is use
 that contain more items.  An example structure is shown schematically
-below using the \HDSTRACEref\latexonly{ (SUN/102)} notation; see
-\latexelsehtml{Appendix~\ref{ap:NDFformat}}{\htmlref{the NDF format}{ap:NDFformat}}.
+below using the \HDSTRACEref\latex{ (SUN/102)} notation; see
+\latexhtml{Appendix~\ref{ap:NDFformat}}{\htmlref{the NDF format}{ap:NDFformat}}.
 \begin{verbatim}
    HORSEHEAD  <IMAGE>
 
@@ -50196,7 +50059,7 @@ and hypertext.
      NUMBA's functionality.
   \item [PICK2D]  \htmlref{NDFCOPY}{NDFCOPY} or
      \htmlref{SETBOUND}{SETBOUND} provides the functionality in \textit{n}-d.
-  \item [STATS2D]  Use \htmlref{STATS}{STATS} with \latexonly{NDF
+  \item [STATS2D]  Use \htmlref{STATS}{STATS} with \latex{NDF
      sectioning (see SUN/33.3 Section 16 or Section~\ref{se:ndfsect})}
      \htmlref{NDF sectioning}{se:ndfsect}
      replaces the capability of STATS2D.
@@ -50707,12 +50570,12 @@ PICDEF can now be used to do this, using the new SIZE parameter.  A picture
 of the required size should be created before running the appropriate 
 plotting application.
 
-\latexelsehtml{Section~\ref{se:agitate} of SUN/95}{The section} ``Graphics Database'' has been
+\latexhtml{Section~\ref{se:agitate} of SUN/95}{The section} ``Graphics Database'' has been
 completely re-written to illustrate the new WCS facilities of the AGI
 graphics database.  In addition, two new sections have been added:
-\latexelsehtml{Section~\ref{se:wcsuse}}{\htmlref{``Using World
+\latexhtml{Section~\ref{se:wcsuse}}{\htmlref{``Using World
 Co-ordinate Systems''}{se:wcsuse}} describes the use of WCS information 
-within NDFs, and \latexelsehtml{Section~\ref{se:style}}{\htmlref{``Plotting 
+within NDFs, and \latexhtml{Section~\ref{se:style}}{\htmlref{``Plotting 
 Styles and Attributes''}{se:style}} relates the use of graphical style parameters.
 
 \subsection{Modified applications}
@@ -51185,7 +51048,7 @@ lists below for details.}
 In addition, \KAPPA\ commands which process individual NDFs or positions
 lists can now be supplied with a group of such files, and the application 
 will automatically be re-invoked to process the entire group.  See section
-\latexelsehtml{Section~\ref{se:multinvoc}}{\htmlref{here}{se:multinvoc}}.
+\latexhtml{Section~\ref{se:multinvoc}}{\htmlref{here}{se:multinvoc}}.
 
 \subsection{Modified applications}
 The following applications have been modified:
@@ -51795,7 +51658,7 @@ now includes a Frame with Domain CURPIC which represents normalized
 co-ordinates with in each individual picture. 
 
 \item Defaults for style parameters can now be set for individual
-applications.  See \latexelsehtml{Section~\ref{se:styles}}
+applications.  See \latexhtml{Section~\ref{se:styles}}
 {\htmlref{here}{se:styles}}.
 
 \item The following applications have been converted to use the GKS version of 
@@ -51823,7 +51686,7 @@ This is a rather unlikely thing to want to do however!
 appearing when a set of annotated axes is drawn.
 
 \item The example C-shell script, {\tt multiplot.csh} (see 
-\latexelsehtml{section~\ref{se:cshscript}}{\htmlref{here}{se:cshscript}})
+\latexhtml{section~\ref{se:cshscript}}{\htmlref{here}{se:cshscript}})
 has been updated to work with the current version of \KAPPA.  It now also
 uses the Starlink version of \PSMERGEref\ even if another command of that
 name is defined.
