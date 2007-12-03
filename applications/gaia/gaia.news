@@ -66,6 +66,8 @@
     fixed and symbol fonts.
 
     The mouse wheel will now scroll the main image (and some other components).
+    Using it in combination with the control and shift keys gives horizontal
+    scrolling (also available for horizontal wheels) and zooming.
 
   Puana Release:
   ==============

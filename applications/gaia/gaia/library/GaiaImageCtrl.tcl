@@ -161,11 +161,14 @@ itcl::class gaia::GaiaImageCtrl {
       #  is too slow for images. Note to get 6 and 7 we need to get %b, the
       #  events are not handled by Tk.
       bind $canvas_ <Button> [code $this handle_button_ %W %b]
+      bind $canvas_ <Control-Button> [code $this handle_control_button_ %W %b]
+      bind $canvas_ <Shift-Button> [code $this handle_shift_button_ %b]
 
       #  Pass on UKIRT quick look config.
       $image_ configure -ukirt_ql $itk_option(-ukirt_ql)
    }
 
+   #  Test for buttons 4, 5 6 and 7 and scroll the main window.
    protected method handle_button_ {w n} {
       if { $n == 4 } {
          $w yview scroll -$itk_option(-wheel_step) units
@@ -175,6 +178,24 @@ itcl::class gaia::GaiaImageCtrl {
          $w xview scroll -$itk_option(-wheel_step) units
       } elseif { $n == 7 } {
          $w xview scroll $itk_option(-wheel_step) units
+      }
+   }
+
+   #  Alternate horizontal scrolling, no 6 or 7.
+   protected method handle_control_button_ {w n} {
+      if { $n == 4 } {
+         $w xview scroll -$itk_option(-wheel_step) units
+      } elseif { $n == 5 } {
+         $w xview scroll $itk_option(-wheel_step) units
+      }
+   }
+
+   #  Alternate zoom for mousewheel (buttons 4 and 5).
+   protected method handle_shift_button_ {n} {
+      if { $n == 4 } {
+         inc_zoom 1
+      } elseif { $n == 5 } {
+         inc_zoom -1
       }
    }
 
