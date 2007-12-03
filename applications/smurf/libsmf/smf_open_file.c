@@ -143,6 +143,8 @@
 *        Add check for TORDERED keyword in FITS header
 *     2007-11-28 (TIMJ):
 *        Raw data is now _WORD and can be _INTEGER
+*     2007-12-02 (AGG):
+*        Do not map DATA/VARIANCE/QUALITY if SMF__NOCREATE_DATA flag is set
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -404,18 +406,20 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
 
     if (isFlat) {
 
-      ndfState( indf, "QUALITY", &qexists, status);
-      ndfState( indf, "VARIANCE", &vexists, status);
+      /* Map the DATA, VARIANCE and QUALITY if requested */
+      if ( !(flags & SMF__NOCREATE_DATA) ) {
+	ndfState( indf, "QUALITY", &qexists, status);
+	ndfState( indf, "VARIANCE", &vexists, status);
 
-      /* Map each component as necessary */
-      ndfMap( indf, "DATA", dtype, mode, &outdata[0], &nout, status );
-      if (qexists) {
-	ndfMap( indf, "QUALITY", "_UBYTE", mode, &outdata[2], &nout, status );
+	/* Map each component as necessary */
+	ndfMap( indf, "DATA", dtype, mode, &outdata[0], &nout, status );
+	if (qexists) {
+	  ndfMap( indf, "QUALITY", "_UBYTE", mode, &outdata[2], &nout, status );
+	}
+	if (vexists) {
+	  ndfMap( indf, "VARIANCE", dtype, mode, &outdata[1], &nout, status );
+	}
       }
-      if (vexists) {
-	ndfMap( indf, "VARIANCE", dtype, mode, &outdata[1], &nout, status );
-      }
-
       if ( !(flags & SMF__NOCREATE_HEAD) ) {
 
 	/* Read the FITS headers */
@@ -542,7 +546,16 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
 	}
 
 	/* Tdata is malloced by rdtstream for our use */
-	outdata[0] = tdata;
+	if ( flags & SMF__NOCREATE_DATA ) {
+	  /* Free the memory used by tdata and set pointer to NULL -
+	     note that tdata is checked for non-NULL status by the
+	     sc2store routine above so if we get this far tdata should
+	     be a valid pointer */
+	  free( tdata );
+	  tdata = NULL;
+	} else {
+	  outdata[0] = tdata;
+	}
 
 	/* Malloc local copies of the flatfield information.
 	   This allows us to close the file immediately so that
@@ -651,9 +664,11 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
       (*data)->dtype = itype;
       strncpy(file->name, pname, SMF_PATH_MAX);
 
-      /* Store the data in the smfData struct */
-      for (i=0; i<3; i++) {
-	((*data)->pntr)[i] = outdata[i];
+      /* Store the data in the smfData struct if needed */
+      if ( !(flags & SMF__NOCREATE_DATA) ) {
+	for (i=0; i<3; i++) {
+	  ((*data)->pntr)[i] = outdata[i];
+	}
       }
       /* Store the dimensions and the size of each axis */
       (*data)->ndims = ndims;
