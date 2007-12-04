@@ -1507,7 +1507,7 @@ static int GetObjSize( AstObject *this ) {
 /* Check the global error status. */
    if ( !astOK ) return 0;
 
-/* Return the number of Frame axes. */
+/* Return the object size. */
    return this->size;
 }
 
