@@ -27,8 +27,10 @@ f     AST_KEYMAP
 *     The KeyMap class inherits from the Object class.
 
 *  Attributes:
-*     The KeyMap class does not define any new attributes beyond those
-*     which are applicable to all Objects.
+*     In addition to those attributes common to all Objects, every
+*     KeyMap also has the following attributes:
+*
+*     - SizeGuess: The expected size of the KeyMap.
 
 *  Functions:
 c     In addition to those functions applicable to all Objects, the
@@ -101,6 +103,11 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map.
 *        Replace astSetPermMap within DEBUG blocks by astBeginPM/astEndPM.
 *     5-JUN-2006 (DSB):
 *        Added support for single precision entries.
+*     30-NOV-2007 (DSB):
+*        Added SizeGuess attribute.
+*     4-DEC-2007 (DSB):
+*        Allow size of hash table to grow dynamically as more entries are
+*        added to the KeyMap.
 *class--
 */
 
@@ -110,6 +117,13 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map.
    the header files that define class interfaces that they should make
    "protected" symbols available. */
 #define astCLASS KeyMap
+
+/* Default value for the SizeGuess attribute. */
+#define DEFSIZE 300
+
+/* The maximum number of entries per element of the hash table. If this
+   value is exceeded the hash table will be doubled in size. */
+#define MAX_ENTRIES_PER_TABLE_ENTRY 10
 
 /* Include files. */
 /* ============== */
@@ -207,6 +221,10 @@ static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
 static int (* parent_getobjsize)( AstObject * );
+static const char *(* parent_getattrib)( AstObject *, const char * );
+static int (* parent_testattrib)( AstObject *, const char * );
+static void (* parent_clearattrib)( AstObject *, const char * );
+static void (* parent_setattrib)( AstObject *, const char * );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -221,16 +239,16 @@ static AstMapEntry *AddTableEntry( AstKeyMap *, int, AstMapEntry * );
 static AstMapEntry *CopyMapEntry( AstMapEntry * );
 static AstMapEntry *FreeMapEntry( AstMapEntry * );
 static AstMapEntry *SearchTableEntry( AstKeyMap *, int, const char * );
-static int GetObjSize( AstObject * );
 static const char *GetKey( AstKeyMap *, int index );
 static const char *MapKey( AstKeyMap *, int index );
 static int ConvertValue( void *, int, void *, int );
-static int HashFun( const char * );
+static int GetObjSize( AstObject * );
+static int HashFun( const char *, int, unsigned long * );
 static int KeyCmp( const char *, const char * );
 static int MapGet0A( AstKeyMap *, const char *, AstObject ** );
 static int MapGet0C( AstKeyMap *, const char *, const char ** );
-static int MapGet0F( AstKeyMap *, const char *, float * );
 static int MapGet0D( AstKeyMap *, const char *, double * );
+static int MapGet0F( AstKeyMap *, const char *, float * );
 static int MapGet0I( AstKeyMap *, const char *, int * );
 static int MapGet1A( AstKeyMap *, const char *, int, int *, AstObject ** );
 static int MapGet1C( AstKeyMap *, const char *, int, int, int *, char * );
@@ -247,6 +265,7 @@ static void CheckCircle( AstKeyMap *, AstObject *, const char * );
 static void Copy( const AstObject *, AstObject * );
 static void CopyTableEntry( AstKeyMap *, AstKeyMap *, int );
 static void Delete( AstObject * );
+static void DoubleTableSize( AstKeyMap * );
 static void Dump( AstObject *, AstChannel * );
 static void DumpEntry( AstMapEntry *, AstChannel *, int );
 static void FreeTableEntry( AstKeyMap *, int itab );
@@ -261,8 +280,18 @@ static void MapPut1D( AstKeyMap *, const char *, int, double *, const char * );
 static void MapPut1F( AstKeyMap *, const char *, int, float *, const char * );
 static void MapPut1I( AstKeyMap *, const char *, int, int *, const char * );
 static void MapRemove( AstKeyMap *, const char *);
+static void NewTable( AstKeyMap *, int );
 static void RemoveTableEntry( AstKeyMap *, int, const char * );
 
+static const char *GetAttrib( AstObject *, const char * );
+static int TestAttrib( AstObject *, const char * );
+static void ClearAttrib( AstObject *, const char * );
+static void SetAttrib( AstObject *, const char * );
+
+static int GetSizeGuess( AstKeyMap * );
+static int TestSizeGuess( AstKeyMap * );
+static void ClearSizeGuess( AstKeyMap * );
+static void SetSizeGuess( AstKeyMap *, int );
 
 /* Member functions. */
 /* ================= */
@@ -287,6 +316,9 @@ static AstMapEntry *AddTableEntry( AstKeyMap *this, int itab, AstMapEntry *entry
 *  Description:
 *     This function adds the supplied MapEntry to the head of the linked
 *     list of MapEntries stored at the specified entry of the hash table. 
+*     If this results in the linked list having too many entries, then a
+*     new larger hash table is allocated and the entries in the existing 
+*     table are moved into the new table.
 
 *  Parameters:
 *     this
@@ -312,8 +344,15 @@ static AstMapEntry *AddTableEntry( AstKeyMap *this, int itab, AstMapEntry *entry
    hash table. */
    this->table[ itab ] = entry;
 
-/* Increment the number of entriesin the hash table element. */
+/* Increment the length of linked list. */
    this->nentry[ itab ]++;
+
+/* If the population of this table entry is now too large, duble the size
+   of the table, moving the table entries to appropriate places in the
+   new larger table. */
+   if( this->nentry[ itab ] > MAX_ENTRIES_PER_TABLE_ENTRY ) {
+      DoubleTableSize( this );
+   }
 
 /* Return a NULL pointer. */
    return NULL;
@@ -409,6 +448,120 @@ static void CheckCircle( AstKeyMap *this, AstObject *obj, const char *method ) {
             }
          }
       }
+   }
+}
+
+static void ClearAttrib( AstObject *this_object, const char *attrib ) {
+/*
+*  Name:
+*     ClearAttrib
+
+*  Purpose:
+*     Clear an attribute value for a KeyMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     void ClearAttrib( AstObject *this, const char *attrib )
+
+*  Class Membership:
+*     KeyMap member function (over-rides the astClearAttrib protected
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function clears the value of a specified attribute for a
+*     KeyMap, so that the default value will subsequently be used.
+
+*  Parameters:
+*     this
+*        Pointer to the KeyMap.
+*     attrib
+*        Pointer to a null-terminated string specifying the attribute
+*        name.  This should be in lower case with no surrounding white
+*        space.
+*/
+
+/* Local Variables: */
+   AstKeyMap *this;             /* Pointer to the KeyMap structure */
+   
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the KeyMap structure. */
+   this = (AstKeyMap *) this_object;
+
+/* Check the attribute name and clear the appropriate attribute. */
+
+/* SizeGuess. */
+/* ---------- */
+   if ( !strcmp( attrib, "sizeguess" ) ) {
+      astClearSizeGuess( this );
+
+/* If the attribute is still not recognised, pass it on to the parent
+   method for further interpretation. */
+   } else {
+      (*parent_clearattrib)( this_object, attrib );
+   }
+}
+
+static void ClearSizeGuess( AstKeyMap *this ) {
+/*
+*+
+*  Name:
+*     astClearSizeGuess
+
+*  Purpose:
+*     Clear the value of the SizeGuess attribute for a KeyMap.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     void astClearSizeGuess( AstKeyMap *this )
+
+*  Class Membership:
+*     KeyMap method.
+
+*  Description:
+*     This function clears the value of the SizeGuess attribute for a
+*     KeyMap. It reports an error if the KeyMap contains any entries.
+
+*  Parameters:
+*     this
+*        Pointer to the KeyMap.
+
+*-
+*/
+
+/* Local Variables: */
+   int empty;                 /* Is the KeyMap empty? */
+   int itab;                  /* Index into hash table */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* See if the KeyMap is empty. */
+   empty = 1;
+   for( itab = 0; itab < this->mapsize; itab++ ) {
+      if( this->nentry[ itab ] > 0 ) {
+         empty = 0;
+         break;
+      }
+   }
+
+/* If not report an error. */
+   if( !empty ) {
+      astError( AST__NOWRT, "astClearAttrib(KeyMap): Illegal attempt to "
+                "clear the SizeGuess attribute of a non-empty KeyMap." );
+
+/* Otherwise, store the "cleared" value and change the size of the hash
+   table. */
+   } else {
+      this->sizeguess = INT_MAX;
+      NewTable( this, DEFSIZE/MAX_ENTRIES_PER_TABLE_ENTRY );
    }
 }
 
@@ -920,16 +1073,24 @@ static void CopyTableEntry( AstKeyMap *in, AstKeyMap *out, int itab ){
    associated with the specified index of the input KeyMaps hash table. */
    next = in->table[ itab ];
 
+/* If the hash table element is empty, store a null pointer and pass on. */
+   if( !next ) {
+      out->table[ itab ] = NULL;
+
+/* Otherwise copy the liked list. */
+   } else {
+
 /* Loop round until we have copied all entries. */
-   while( next ) {
+      while( next && astOK ) {
 
 /* Copy the next entry, storing the resulting pointer at the position
    indicated by "link". */
-      *link = CopyMapEntry( next );
+         *link = CopyMapEntry( next );
 
 /* Update "link" and "next" */
-      next = next->next;
-      link = &( (*link)->next );
+         next = next->next;
+         link = &( (*link)->next );
+      }
    }
 
 /* Set the number of entries in the output to be the same as the input. */
@@ -937,6 +1098,112 @@ static void CopyTableEntry( AstKeyMap *in, AstKeyMap *out, int itab ){
 
 /* If an error has occurred, attempt to delete the returned MapEntry. */
    if( !astOK ) FreeTableEntry( out, itab );
+}
+
+static void DoubleTableSize( AstKeyMap *this ) {
+/*
+*  Name:
+*     DoubleTableSize
+
+*  Purpose:
+*     Double the size of the hash table in a KeyMap
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     void DoubleTableSize( AstKeyMap *this )
+
+*  Class Membership:
+*     KeyMap member function.
+
+*  Description:
+*     This function creates a new hash table which has twice as many
+*     elements as the current hash table, and moves all the entries out 
+*     of the old table into the new table (at their new positions).
+
+*  Parameters:
+*     this
+*        The KeyMap pointer.
+
+*/
+
+/* Local Variables: */
+   AstMapEntry **newtable;
+   AstMapEntry *next;
+   AstMapEntry *new_next;
+   int *newnentry;
+   int i;
+   int newi;
+   int newmapsize;
+
+/* Check the global error status. */
+   if( !astOK ) return;
+
+/* Create the new arrays, leaving the old arrays intact for the moment. */
+   newmapsize = 2*this->mapsize;
+   newtable = astMalloc( newmapsize*sizeof( AstMapEntry * ) );
+   newnentry = astMalloc( newmapsize*sizeof( int ) );
+   if( astOK ) {
+
+/* Initialise the new table. */
+      for( i = 0; i < newmapsize; i++ ) {
+         newtable[ i ] = NULL;
+         newnentry[ i ] = 0;
+      }
+
+/* Loop round each of the existing table entries. */
+      for( i = 0; i < this->mapsize; i++ ) {
+
+/* The "next" variable holds the address of the next MapEntry to be
+   moved. Initialise this to the MapEntry at the head of the linked list
+   associated with the specified index of the input KeyMaps hash table. */
+         next = this->table[ i ];
+
+/* Loop round until we have moved all entries. */
+         while( next && astOK ) {
+
+/* Find the index within the new table at which to store this entry. */
+            newi = ( next->hash % newmapsize );        
+
+
+/* Save the pointer to the next entry following the current one in the
+   linked list. */
+            new_next = next->next;
+
+/* Put a pointer to the MapEntry which is currently at the head of the 
+   linked list in the "next" component of the current MapEntry. */
+            next->next = newtable[ newi ];
+
+/* Store the supplied MapEntry pointer in the requested element of the
+   hash table. */
+            newtable[ newi ] = next;
+
+/* Increment the length of linked list. */
+            newnentry[ newi ]++;
+
+/* Use the pointer to the next map entry to be moved. */
+            next = new_next;
+         }
+      }
+   }
+
+/* If OK, delete the existing table and use the new table */
+   if( astOK ) {
+      this->mapsize = newmapsize;
+
+      (void) astFree( this->table );
+      this->table = newtable;
+
+      (void) astFree( this->nentry );
+      this->nentry = newnentry;
+
+/* If not OK, delete the new table. */
+   } else {
+      newtable = astFree( newtable );
+      newnentry = astFree( newnentry );
+   }
 }
 
 static void DumpEntry( AstMapEntry *entry, AstChannel *channel, int nentry ) {
@@ -1265,7 +1532,7 @@ static void FreeTableEntry( AstKeyMap *this, int itab ){
    AstMapEntry *next;     /* Pointer the next MapEntry to be freed */
 
 /* Check it is safe to proceed. */
-   if( this && itab >= 0 && itab < AST__MAPSIZE ) {
+   if( this && itab >= 0 && itab < this->mapsize ) {
 
 /* Store a pointer to the MapEntry which is to be freed next. */
       next = this->table[ itab ];
@@ -1289,6 +1556,98 @@ static void FreeTableEntry( AstKeyMap *this, int itab ){
 /* Sets the number of entries in this hash table element to zero. */
       this->nentry[ itab ] = 0;
    }
+}
+
+static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
+/*
+*  Name:
+*     GetAttrib
+
+*  Purpose:
+*     Get the value of a specified attribute for a KeyMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     const char *GetAttrib( AstObject *this, const char *attrib )
+
+*  Class Membership:
+*     KeyMap member function (over-rides the protected astGetAttrib
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns a pointer to the value of a specified
+*     attribute for a KeyMap, formatted as a character string.
+
+*  Parameters:
+*     this
+*        Pointer to the KeyMap.
+*     attrib
+*        Pointer to a null-terminated string containing the name of
+*        the attribute whose value is required. This name should be in
+*        lower case, with all white space removed.
+
+*  Returned Value:
+*     - Pointer to a null-terminated string containing the attribute
+*     value.
+
+*  Notes:
+*     - The returned string pointer may point at memory allocated
+*     within the KeyMap, or at static memory. The contents of the
+*     string may be over-written or the pointer may become invalid
+*     following a further invocation of the same function or any
+*     modification of the KeyMap. A copy of the string should
+*     therefore be made if necessary.
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Constants: */
+#define BUFF_LEN 50              /* Max. characters in result buffer */
+
+/* Local Variables: */
+   AstKeyMap *this;              /* Pointer to the KeyMap structure */
+   const char *result;           /* Pointer value to return */
+   int ival;                     /* Attribute value */
+   static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */   
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the KeyMap structure. */
+   this = (AstKeyMap *) this_object;
+
+/* Compare "attrib" with each recognised attribute name in turn,
+   obtaining the value of the required attribute. If necessary, write
+   the value into "buff" as a null-terminated string in an appropriate
+   format.  Set "result" to point at the result string. */
+
+/* SizeGuess. */
+/* ---------- */
+   if ( !strcmp( attrib, "sizeguess" ) ) {
+      ival = astGetSizeGuess( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
+
+/* If the attribute name was not recognised, pass it on to the parent
+   method for further interpretation. */
+   } else {
+      result = (*parent_getattrib)( this_object, attrib );
+   }
+
+/* Return the result. */
+   return result;
+
+/* Undefine macros local to this function. */
+#undef BUFF_LEN
 }
 
 static int GetObjSize( AstObject *this_object ) {
@@ -1352,7 +1711,7 @@ static int GetObjSize( AstObject *this_object ) {
    which are stored in dynamically allocated memory. */
    result = (*parent_getobjsize)( this_object );
 
-   for( itab = 0; itab < AST__MAPSIZE; itab++ ) {
+   for( itab = 0; itab < this->mapsize; itab++ ) {
       next = this->table[ itab ];
       while( next ) {
          nel = next->nel;
@@ -1472,7 +1831,7 @@ static const char *GetKey( AstKeyMap *this, int index ) {
 
 /* Loop round each entry in the hash table. */
    ilast = -1;
-   for( itab = 0; itab < AST__MAPSIZE; itab++ ) {
+   for( itab = 0; itab < this->mapsize; itab++ ) {
 
 /* Find the index of the first and the last Entry in the linked list associated
    with this element of the hash table. */
@@ -1509,7 +1868,57 @@ static const char *GetKey( AstKeyMap *this, int index ) {
    return result;
 }
 
-static int HashFun( const char *key ){
+static int GetSizeGuess( AstKeyMap *this ) {
+/*
+*+
+*  Name:
+*     astGetSizeGuess
+
+*  Purpose:
+*     Get the value of the SizeGuess attribute for a KeyMap.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     int astGetSizeGuess( AstKeyMap *this )
+
+*  Class Membership:
+*     KeyMap method.
+
+*  Description:
+*     This function returns the value of the SizeGuess attribute for a
+*     KeyMap. 
+
+*  Parameters:
+*     this
+*        Pointer to the KeyMap.
+
+*  Returned Value:
+*     The value of the SizeGuess attribute.
+
+*  Notes:
+*     - A value of zero is returned if this function is invoked with the 
+*     global error status set.
+
+*-
+*/
+
+/* Local Variables: */
+   int result;                /* Returned value */
+
+/* Initialise */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Return the attribute value using a default of DEFSIZE if not set. */
+   return ( this->sizeguess == INT_MAX ) ? DEFSIZE : this->sizeguess;
+}
+
+static int HashFun( const char *key, int mapsize, unsigned long *hash ){
 /*
 *  Name:
 *     HashFun
@@ -1522,20 +1931,26 @@ static int HashFun( const char *key ){
 
 *  Synopsis:
 *     #include "keymap.h"
-*     int HashFun( const char *key )
+*     int HashFun( const char *key, int mapsize, int *hash )
 
 *  Class Membership:
 *     KeyMap member function.
 
 *  Description:
 *     This function returns an integer hash code for the supplied string,
+*     This is the value that isused as the index into the hash table for
+*     the specified key.
 
 *  Parameters:
 *     key
 *        Pointer to the string. Trailing spaces are ignored.
+*     mapsize
+*        The length of the hash table.
+*     hash
+*        Pointer to a location at which to put the full width hash value.
 
 *  Returned Value:
-*     An integer in the range zero to ( AST__MAPSIZE - 1 ).
+*     An integer in the range zero to ( mapsize - 1 ).
 
 *  Notes:
 *     - A value of zero is returned if this function is invoked with the 
@@ -1543,7 +1958,6 @@ static int HashFun( const char *key ){
 */
 
 /* Local Variables: */
-   unsigned long hash;  
    int c;            
 
 /* Check the local error status. */
@@ -1553,13 +1967,13 @@ static int HashFun( const char *key ){
    ago in comp.lang.c Each through the "hile" loop corresponds to 
    "hash = hash*33 + c ". Ignore spaces so that trailing spaces used to
    pad F77 character variables will be ignored. */   
-   hash = 5381;
+   *hash = 5381;
    while( (c = *key++) ) {
       if( c != ' ' ) {     
-         hash = ((hash << 5) + hash) + c;
+         *hash = ((*hash << 5) + *hash) + c;
       }
    }
-   return ( hash % AST__MAPSIZE );
+   return ( *hash % mapsize );
 }
 
 void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name ) {
@@ -1647,6 +2061,11 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name ) {
    vtab->MapHasKey = MapHasKey;
    vtab->MapKey = MapKey;
 
+   vtab->ClearSizeGuess = ClearSizeGuess;
+   vtab->SetSizeGuess = SetSizeGuess;
+   vtab->GetSizeGuess = GetSizeGuess;
+   vtab->TestSizeGuess = TestSizeGuess;
+
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
    object = (AstObjectVtab *) vtab;
@@ -1655,6 +2074,15 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name ) {
    new member functions implemented here. */
    parent_getobjsize = object->GetObjSize;
    object->GetObjSize = GetObjSize;
+
+   parent_clearattrib = object->ClearAttrib;
+   object->ClearAttrib = ClearAttrib;
+   parent_getattrib = object->GetAttrib;
+   object->GetAttrib = GetAttrib;
+   parent_setattrib = object->SetAttrib;
+   object->SetAttrib = SetAttrib;
+   parent_testattrib = object->TestAttrib;
+   object->TestAttrib = TestAttrib;
 
 /* Declare the destructor, copy constructor and dump function. */
    astSetDelete( vtab, Delete );
@@ -1981,6 +2409,7 @@ static void MapPut0##X( AstKeyMap *this, const char *key, Xtype value, \
       mapentry = (AstMapEntry *) entry; \
       mapentry->next = NULL; \
       mapentry->key = NULL; \
+      mapentry->hash = 0; \
       mapentry->comment = NULL; \
 \
 /* Now store the new values. */ \
@@ -2005,7 +2434,7 @@ static void MapPut0##X( AstKeyMap *this, const char *key, Xtype value, \
 \
 /* Use the hash function to determine the element of the hash table in \
    which to store the new entry. */ \
-      itab = HashFun( mapentry->key ); \
+      itab = HashFun( mapentry->key, this->mapsize, &(mapentry->hash) ); \
 \
 /* Remove any existing entry with the given key from the table element. */ \
       RemoveTableEntry( this, itab, mapentry->key ); \
@@ -2165,6 +2594,7 @@ static void MapPut1##X( AstKeyMap *this, const char *key, int size, Xtype value[
 /* Initialise pointers in the new structure.*/ \
       mapentry = (AstMapEntry *) entry; \
       mapentry->next = NULL; \
+      mapentry->hash = 0; \
       mapentry->key = NULL; \
       mapentry->comment = NULL; \
 \
@@ -2194,7 +2624,7 @@ static void MapPut1##X( AstKeyMap *this, const char *key, int size, Xtype value[
 \
 /* Use the hash function to determine the element of the hash table in \
    which to store the new entry. */ \
-      itab = HashFun( mapentry->key ); \
+      itab = HashFun( mapentry->key, this->mapsize, &(mapentry->hash) ); \
 \
 /* Remove any existing entry with the given key from the table element. */ \
       RemoveTableEntry( this, itab, mapentry->key ); \
@@ -2289,6 +2719,7 @@ void astMapPut1AId_( AstKeyMap *this, const char *key, int size, AstObject *valu
 /* Initialise pointers in the new structure.*/
       mapentry = (AstMapEntry *) entry;
       mapentry->next = NULL;
+      mapentry->hash = 0;
       mapentry->key = NULL;
       mapentry->comment = NULL;
 
@@ -2319,7 +2750,7 @@ void astMapPut1AId_( AstKeyMap *this, const char *key, int size, AstObject *valu
 
 /* Use the hash function to determine the element of the hash table in
    which to store the new entry. */
-      itab = HashFun( mapentry->key );
+      itab = HashFun( mapentry->key, this->mapsize, &(mapentry->hash) );
 
 /* Remove any existing entry with the given key from the table element. */
       RemoveTableEntry( this, itab, mapentry->key );
@@ -2456,6 +2887,7 @@ static int MapGet0##X( AstKeyMap *this, const char *key, Xtype *value ) { \
    int itab;               /* Index of hash table element to use */ \
    int result;             /* Returned flag */ \
    int raw_type;           /* Data type of stored value */ \
+   unsigned long hash;     /* Full width hash value */ \
    void *raw;              /* Pointer to stored value */ \
 \
 /* Initialise */ \
@@ -2466,7 +2898,7 @@ static int MapGet0##X( AstKeyMap *this, const char *key, Xtype *value ) { \
 \
 /* Use the hash function to determine the element of the hash table in \
    which the key will be stored. */ \
-   itab = HashFun( key ); \
+   itab = HashFun( key, this->mapsize, &hash ); \
 \
 /* Search the relevent table entry for the required MapEntry. */ \
    mapentry = SearchTableEntry( this, itab, key ); \
@@ -2582,6 +3014,7 @@ int astMapGet0AId_( AstKeyMap *this, const char *key, AstObject **value ) {
    int itab;               /* Index of hash table element to use */
    int result;             /* Returned flag */
    int raw_type;           /* Data type of stored value */
+   unsigned long hash;     /* Full width hash value */ 
    void *raw;              /* Pointer to stored value */
 
 /* Initialise */
@@ -2592,7 +3025,7 @@ int astMapGet0AId_( AstKeyMap *this, const char *key, AstObject **value ) {
 
 /* Use the hash function to determine the element of the hash table in
    which the key will be stored. */
-   itab = HashFun( key );
+   itab = HashFun( key, this->mapsize, &hash );
 
 /* Search the relevent table entry for the required MapEntry. */
    mapentry = SearchTableEntry( this, itab, key );
@@ -2804,6 +3237,7 @@ static int MapGet1##X( AstKeyMap *this, const char *key, int mxval, int *nval, X
    int result;             /* Returned flag */ \
    int raw_type;           /* Data type of stored value */ \
    size_t raw_size;        /* Size of a single raw value */ \
+   unsigned long hash;     /* Full width hash value */ \
    void *raw;              /* Pointer to stored value */ \
 \
 /* Initialise */ \
@@ -2815,7 +3249,7 @@ static int MapGet1##X( AstKeyMap *this, const char *key, int mxval, int *nval, X
 \
 /* Use the hash function to determine the element of the hash table in \
    which the key will be stored. */ \
-   itab = HashFun( key ); \
+   itab = HashFun( key, this->mapsize, &hash ); \
 \
 /* Search the relevent table entry for the required MapEntry. */ \
    mapentry = SearchTableEntry( this, itab, key ); \
@@ -2959,6 +3393,7 @@ static int MapGet1C( AstKeyMap *this, const char *key, int l, int mxval,
    int raw_type;           /* Data type of stored value */
    int result;             /* Returned flag */
    size_t raw_size;        /* Size of a single raw value */
+   unsigned long hash;     /* Full width hash value */
    void *raw;              /* Pointer to stored value */ 
 
 /* Initialise */ 
@@ -2970,7 +3405,7 @@ static int MapGet1C( AstKeyMap *this, const char *key, int l, int mxval,
 
 /* Use the hash function to determine the element of the hash table in 
    which the key will be stored. */ 
-   itab = HashFun( key ); 
+   itab = HashFun( key, this->mapsize, &hash ); 
 
 /* Search the relevent table entry for the required MapEntry. */ 
    mapentry = SearchTableEntry( this, itab, key ); 
@@ -3113,6 +3548,7 @@ int astMapGet1AId_( AstKeyMap *this, const char *key, int mxval, int *nval,
    int raw_type;           /* Data type of stored value */
    int result;             /* Returned flag */
    size_t raw_size;        /* Size of a single raw value */
+   unsigned long hash;     /* Full width hash value */
    void *raw;              /* Pointer to stored value */ 
 
 /* Initialise */ 
@@ -3124,7 +3560,7 @@ int astMapGet1AId_( AstKeyMap *this, const char *key, int mxval, int *nval,
 
 /* Use the hash function to determine the element of the hash table in 
    which the key will be stored. */ 
-   itab = HashFun( key ); 
+   itab = HashFun( key, this->mapsize, &hash ); 
 
 /* Search the relevent table entry for the required MapEntry. */ 
    mapentry = SearchTableEntry( this, itab, key ); 
@@ -3277,6 +3713,7 @@ f     .FALSE.
    AstMapEntry *mapentry;  /* Pointer to entry in linked list */
    int itab;               /* Index of hash table element to use */
    int result;             /* Returned value */
+   unsigned long hash;     /* Full width hash value */
 
 /* Initialise */
    result = 0;
@@ -3286,7 +3723,7 @@ f     .FALSE.
 
 /* Use the hash function to determine the element of the hash table in
    which the key will be stored. */
-   itab = HashFun( key );
+   itab = HashFun( key, this->mapsize, &hash );
 
 /* Search the relevent table entry for the required MapEntry. */
    mapentry = SearchTableEntry( this, itab, key );
@@ -3344,13 +3781,14 @@ f        The global status.
 
 /* Local Variables: */
    int itab;               /* Index of hash table element to use */
+   unsigned long hash;     /* Full width hash value */
 
 /* Check the global error status. */
    if ( !astOK ) return;
 
 /* Use the hash function to determine the element of the hash table in 
    which the key will be stored. */
-   itab = HashFun( key );
+   itab = HashFun( key, this->mapsize, &hash );
 
 /* Search the relevent table entry for the required MapEntry and remove it. */
    RemoveTableEntry( this, itab, key );
@@ -3411,7 +3849,7 @@ f     AST_MAPSIZE = INTEGER
    if ( !astOK ) return result;
 
 /* Add up the number of entries in all elements of the hash table. */
-   for( itab = 0; itab < AST__MAPSIZE; itab++ ) result += this->nentry[ itab ];
+   for( itab = 0; itab < this->mapsize; itab++ ) result += this->nentry[ itab ];
 
 /* Return the result. */
    return result;
@@ -3482,6 +3920,7 @@ c        This does not include the trailing null character.
    int raw_type;           /* Data type of stored value */
    int result;             /* Returned value */
    size_t raw_size;        /* Size of a single raw value */
+   unsigned long hash;     /* Full width hash value */
    void *raw;              /* Pointer to stored value */ 
 
 /* Initialise */
@@ -3492,7 +3931,7 @@ c        This does not include the trailing null character.
 
 /* Use the hash function to determine the element of the hash table in
    which the key will be stored. */
-   itab = HashFun( key );
+   itab = HashFun( key, this->mapsize, &hash );
 
 /* Search the relevent table entry for the required MapEntry. */
    mapentry = SearchTableEntry( this, itab, key );
@@ -3634,6 +4073,7 @@ f     AST_MAPLENGTH = INTEGER
    AstMapEntry *mapentry;  /* Pointer to entry in linked list */
    int itab;               /* Index of hash table element to use */
    int result;             /* Returned value */
+   unsigned long hash;     /* Full width hash value */
 
 /* Initialise */
    result = 0;
@@ -3643,7 +4083,7 @@ f     AST_MAPLENGTH = INTEGER
 
 /* Use the hash function to determine the element of the hash table in
    which the key will be stored. */
-   itab = HashFun( key );
+   itab = HashFun( key, this->mapsize, &hash );
 
 /* Search the relevent table entry for the required MapEntry. */
    mapentry = SearchTableEntry( this, itab, key );
@@ -3724,6 +4164,7 @@ f     AST_MAPTYPE = INTEGER
    AstMapEntry *mapentry;  /* Pointer to entry in linked list */
    int itab;               /* Index of hash table element to use */
    int result;             /* Returned value */
+   unsigned long hash;     /* Full width hash value */
 
 /* Initialise */
    result = AST__BADTYPE;
@@ -3733,7 +4174,7 @@ f     AST_MAPTYPE = INTEGER
 
 /* Use the hash function to determine the element of the hash table in
    which the key will be stored. */
-   itab = HashFun( key );
+   itab = HashFun( key, this->mapsize, &hash );
 
 /* Search the relevent table entry for the required MapEntry. */
    mapentry = SearchTableEntry( this, itab, key );
@@ -3747,6 +4188,67 @@ f     AST_MAPTYPE = INTEGER
 /* Return the result. */
    return result;
 
+}
+
+static void NewTable( AstKeyMap *this, int size ){
+/*
+*  Name:
+*     NewTable
+
+*  Purpose:
+*     Create a new hash table.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     void NewTable( AstKeyMap *this, int size )
+
+*  Class Membership:
+*     KeyMap member function.
+
+*  Description:
+*     This function removes any existing hash table and allocates memory
+*     for a new one of teh specified size. The table is initialised to
+*     indicate that it is empty.
+
+*  Parameters:
+*     this
+*        Pointer to the KeyMap.
+*     size
+*        The reuqired size of the hash table.
+
+*/
+
+/* Local Variables: */
+   int i;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Ensure the table has at least 20 elements. */
+   if( size < 20 ) size = 20;
+
+/* Remove any existing entries. */
+   for( i = 0; i < this->mapsize; i++ ) FreeTableEntry( this, i );
+
+/* Do nothing more if the table size is not changing. */
+   if( size != this->mapsize ) {
+
+/* Modify the size of the existing table. */
+      this->mapsize = size;
+      this->table = astGrow( this->table, size, sizeof( AstMapEntry * ) );
+      this->nentry = astGrow( this->nentry, size, sizeof( int ) );
+
+/* Initialise the new table. */
+      if( astOK ) {
+         for( i = 0; i < size; i++ ) {
+            this->table[ i ] = NULL;
+            this->nentry[ i ] = 0;
+         }
+      }
+   }
 }
 
 static void RemoveTableEntry( AstKeyMap *this, int itab, const char *key ){
@@ -3903,6 +4405,143 @@ static AstMapEntry *SearchTableEntry( AstKeyMap *this, int itab, const char *key
    return result;
 }
 
+static void SetAttrib( AstObject *this_object, const char *setting ) {
+/*
+*  Name:
+*     astSetAttrib
+
+*  Purpose:
+*     Set an attribute value for a KeyMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     void SetAttrib( AstObject *this, const char *setting )
+
+*  Class Membership:
+*     KeyMap member function (over-rides the astSetAttrib protected
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function assigns an attribute value for a KeyMap, the
+*     attribute and its value being specified by means of a string of
+*     the form:
+*
+*        "attribute= value "
+*
+*     Here, "attribute" specifies the attribute name and should be in
+*     lower case with no white space present. The value to the right
+*     of the "=" should be a suitable textual representation of the
+*     value to be assigned and this will be interpreted according to
+*     the attribute's data type.  White space surrounding the value is
+*     only significant for string attributes.
+
+*  Parameters:
+*     this
+*        Pointer to the KeyMap.
+*     setting
+*        Pointer to a null-terminated string specifying the new attribute
+*        value.
+*/
+
+/* Local Variables: */
+   AstKeyMap *this;             /* Pointer to the KeyMap structure */
+   int ival;                    /* Attribute value */
+   int len;                     /* Length of setting string */
+   int nc;                      /* Number of characters read by astSscanf */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the KeyMap structure. */
+   this = (AstKeyMap *) this_object;
+
+/* Obtain the length of the setting string. */
+   len = (int) strlen( setting );
+
+/* Test for each recognised attribute in turn, using "astSscanf" to parse
+   the setting string and extract the attribute value (or an offset to
+   it in the case of string values). In each case, use the value set
+   in "nc" to check that the entire string was matched. Once a value
+   has been obtained, use the appropriate method to set it. */
+
+/* SizeGuess. */
+/* ---------- */
+   if ( nc = 0,
+        ( 1 == astSscanf( setting, "sizeguess= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetSizeGuess( this, ival );
+
+/* If the attribute is still not recognised, pass it on to the parent
+   method for further interpretation. */
+   } else {
+      (*parent_setattrib)( this_object, setting );
+   }
+}
+
+static void SetSizeGuess( AstKeyMap *this, int sizeguess ) {
+/*
+*+
+*  Name:
+*     astSetSizeGuess
+
+*  Purpose:
+*     Set the value of the SizeGuess attribute for a KeyMap.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     void astSetSizeGuess( AstKeyMap *this, int sizeguess )
+
+*  Class Membership:
+*     KeyMap method.
+
+*  Description:
+*     This function sets a new value for the SizeGuess attribute of a
+*     KeyMap. It reports an error if the KeyMap contains any entries.
+
+*  Parameters:
+*     this
+*        Pointer to the KeyMap.
+*     sizeguess
+*        The new attribute value.
+
+*-
+*/
+
+/* Local Variables: */
+   int empty;                 /* Is the KeyMap empty? */
+   int itab;                  /* Index into hash table */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* See if the KeyMap is empty. */
+   empty = 1;
+   for( itab = 0; itab < this->mapsize; itab++ ) {
+      if( this->nentry[ itab ] > 0 ) {
+         empty = 0;
+         break;
+      }
+   }
+
+/* If not report an error. */
+   if( !empty ) {
+      astError( AST__NOWRT, "astSetAttrib(KeyMap): Illegal attempt to "
+                "change the SizeGuess attribute of a non-empty KeyMap." );
+
+/* Otherwise, store the new value and change the size of the hash
+   table. */
+   } else {
+      this->sizeguess = sizeguess;
+      NewTable( this, sizeguess/MAX_ENTRIES_PER_TABLE_ENTRY );
+   }
+}
+
 static size_t SizeOfEntry( AstMapEntry *entry ){
 /*
 *  Name:
@@ -3980,12 +4619,162 @@ static size_t SizeOfEntry( AstMapEntry *entry ){
    return result;
 }
 
+static int TestAttrib( AstObject *this_object, const char *attrib ) {
+/*
+*  Name:
+*     TestAttrib
+
+*  Purpose:
+*     Test if a specified attribute value is set for a KeyMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     int TestAttrib( AstObject *this, const char *attrib )
+
+*  Class Membership:
+*     KeyMap member function (over-rides the astTestAttrib protected
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     a value has been set for one of a KeyMap's attributes.
+
+*  Parameters:
+*     this
+*        Pointer to the KeyMap.
+*     attrib
+*        Pointer to a null-terminated string specifying the attribute
+*        name.  This should be in lower case with no surrounding white
+*        space.
+
+*  Returned Value:
+*     One if a value has been set, otherwise zero.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstKeyMap *this;             /* Pointer to the KeyMap structure */
+   int result;                   /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the KeyMap structure. */
+   this = (AstKeyMap *) this_object;
+
+/* Check the attribute name and test the appropriate attribute. */
+
+/* SizeGuess. */
+/* ---------- */
+   if ( !strcmp( attrib, "sizeguess" ) ) {
+      result = astTestSizeGuess( this );
+
+/* If the attribute is still not recognised, pass it on to the parent
+   method for further interpretation. */
+   } else {
+      result = (*parent_testattrib)( this_object, attrib );
+   }
+
+/* Return the result, */
+   return result;
+}
+
+static int TestSizeGuess( AstKeyMap *this ) {
+/*
+*+
+*  Name:
+*     astTestSizeGuess
+
+*  Purpose:
+*     Test the value of the SizeGuess attribute for a KeyMap.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     int astTestSizeGuess( AstKeyMap *this )
+
+*  Class Membership:
+*     KeyMap method.
+
+*  Description:
+*     This function returns a non-zero value if the SizeGuess attribute
+*     has been set in a KeyMap. 
+
+*  Parameters:
+*     this
+*        Pointer to the KeyMap.
+
+*  Returned Value:
+*     Non-zero if the SizeGuess attribute is set.
+
+*  Notes:
+*     - A value of zero is returned if this function is invoked with the 
+*     global error status set.
+
+*-
+*/
+
+/* Local Variables: */
+   int result;                /* Returned value */
+
+/* Initialise */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Return non-zero if the attribute is still set to its "not set" value. */
+   return ( this->sizeguess != INT_MAX );
+}
+
 /* Functions which access class attributes. */
 /* ---------------------------------------- */
-/* Implement member functions to access the attributes associated with
-   this class using the macros defined for this purpose in the
-   "object.h" file. For a description of each attribute, see the class
-   interface (in the associated .h file). */
+
+/*
+*att++
+*  Name:
+*     SizeGuess
+
+*  Purpose:
+*     The expected size of the KeyMap.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer.
+
+*  Description:
+*     This is attribute gives an estimate of the number of entries that
+*     will be stored in the KeyMap. It is used to tune the internal
+*     properties of the KeyMap for speed and efficiency. A larger value
+*     will result in faster access at the expense of increased memory 
+*     requirements. However if the SizeGuess value is much larger than
+*     the actual size of the KeyMap, then there will be little, if any,
+*     speed gained by making the SizeGuess even larger. The default value
+*     is 300.
+*
+*     The value of this attribute can only be changed if the KeyMap is
+*     empty. Its value can be set conveniently when creating the KeyMap.
+*     An error will be reported if an attempt is made to set or clear the 
+*     attribute when the KeyMap contains any entries.
+
+*  Applicability:
+*     KeyMap
+*        All KeyMaps have this attribute.
+*att--
+*/
 
 /* Copy constructor. */
 /* ----------------- */
@@ -4033,17 +4822,20 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* For safety, first clear any references to the input memory from
    the output KeyMap. */
-   for( i = 0; i < AST__MAPSIZE; i++ ) {
-      out->table[ i ] = NULL;
-      out->nentry[ i ] = 0;
-   }
+   out->table = NULL;
+   out->nentry = NULL;
 
 /* Make copies of the table entries. */
-   for( i = 0; i < AST__MAPSIZE; i++ ) CopyTableEntry( in, out, i );
+   out->table = astMalloc( sizeof( AstMapEntry * )*( out->mapsize ) );
+   out->nentry = astMalloc( sizeof( int )*( out->mapsize ) );
+
+   for( i = 0; i < out->mapsize; i++ ) CopyTableEntry( in, out, i );
 
 /* If an error occurred, clean up by freeing all memory allocated above. */
    if ( !astOK ) {
-      for( i = 0; i < AST__MAPSIZE; i++ ) FreeTableEntry( out, i );
+      for( i = 0; i < out->mapsize; i++ ) FreeTableEntry( out, i );
+      out->table = astFree( out->table );
+      out->nentry = astFree( out->nentry );
    }
 }
 
@@ -4086,8 +4878,11 @@ static void Delete( AstObject *obj ) {
    this = (AstKeyMap *) obj;
 
 /* Free all allocated memory. */
-   for( i = 0; i < AST__MAPSIZE; i++ ) FreeTableEntry( this, i );
+   for( i = 0; i < this->mapsize; i++ ) FreeTableEntry( this, i );
 
+/* Free memory used to hold tables. */
+   this->table = astFree( this->table );
+   this->nentry = astFree( this->nentry );
 }
 
 /* Dump function. */
@@ -4118,10 +4913,12 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 */
 
 /* Local Variables: */
-   AstKeyMap *this;                 /* Pointer to the KeyMap structure */
-   AstMapEntry *next;               /* Pointer to the next AstMapEntry to dump */
+   AstKeyMap *this;              /* Pointer to the KeyMap structure */
+   AstMapEntry *next;            /* Pointer to the next AstMapEntry to dump */
    int i;                        /* Index into hash table */
    int nentry;                   /* Number of entries dumped so far */
+   int set;                      /* Is attribute set? */
+   int ival;                     /* Attribute value */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -4132,8 +4929,18 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* Initialise the number of KeyMap entries dumped so far. */
    nentry = 0;
 
+/* SizeGuess. */
+/* ---------- */
+   set = TestSizeGuess( this );
+   ival = set ? GetSizeGuess( this ) : astGetSizeGuess( this );
+   astWriteInt( channel, "SzGss", set, 0, ival, "Guess at KeyMap size" );
+
+/* MapSize. */
+/* -------- */
+   astWriteInt( channel, "MapSz", 1, 1, this->mapsize, "Size of hash table" );
+
 /* Loop round each entry in the hash table. */
-   for( i = 0; i < AST__MAPSIZE; i++ ) {
+   for( i = 0; i < this->mapsize; i++ ) {
 
 /* Get a pointer to the next KeyMap entry to dump. */
       next = this->table[ i ];
@@ -4344,7 +5151,7 @@ AstKeyMap *astInitKeyMap_( void *mem, size_t size, int init, AstKeyMapVtab *vtab
 *  Synopsis:
 *     #include "keymap.h"
 *     AstKeyMap *astInitKeyMap( void *mem, size_t size, int init, AstKeyMapVtab *vtab, 
-*                         const char *name )
+*                               const char *name )
 
 *  Class Membership:
 *     KeyMap initialiser.
@@ -4395,7 +5202,6 @@ AstKeyMap *astInitKeyMap_( void *mem, size_t size, int init, AstKeyMapVtab *vtab
 
 /* Local Variables: */
    AstKeyMap *new;              /* Pointer to the new KeyMap */
-   int i;                    /* Loop count */
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
@@ -4413,10 +5219,12 @@ AstKeyMap *astInitKeyMap_( void *mem, size_t size, int init, AstKeyMapVtab *vtab
 /* Initialise the KeyMap data. */
 /* ---------------------------- */
 /* Initialise all attributes to their "undefined" values. */
-      for( i = 0; i < AST__MAPSIZE; i++ ) {
-         new->table[ i ] = NULL;
-         new->nentry[ i ] = 0;
-      }
+      new->sizeguess = INT_MAX;
+      new->mapsize = 0;
+      new->table = NULL;
+      new->nentry = NULL;
+
+      NewTable( new, DEFSIZE/MAX_ENTRIES_PER_TABLE_ENTRY );
 
 /* If an error occurred, clean up by deleting the new KeyMap. */
       if ( !astOK ) new = astDelete( new );
@@ -4427,7 +5235,7 @@ AstKeyMap *astInitKeyMap_( void *mem, size_t size, int init, AstKeyMapVtab *vtab
 }
 
 AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab, 
-                     const char *name, AstChannel *channel ) {
+                           const char *name, AstChannel *channel ) {
 /*
 *+
 *  Name:
@@ -4517,6 +5325,7 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
    int ival;                 /* Integer value for an entry */
    int nel;                  /* Vector length */
    int nentry;               /* Number of KeyMap entries read so far */
+   int mapsize;              /* Size for new hash table */
    int type;                 /* Data type for an entry */
 
 /* Initialise. */
@@ -4548,6 +5357,11 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
 
    if ( astOK ) {
 
+/* Inidicate the KeyMap is empty. */
+      new->mapsize = 0;
+      new->table = NULL;
+      new->nentry = NULL;
+
 /* Read input data. */
 /* ================ */
 /* Request the input Channel to read all the input data appropriate to
@@ -4556,6 +5370,20 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
 
 /* Now read each individual data item from this list and use it to
    initialise the appropriate instance variable(s) for this class. */
+
+/* SizeGuess. */
+/* ---------- */
+      new->sizeguess = astReadInt( channel, "szgss", INT_MAX );
+      if ( TestSizeGuess( new ) ) SetSizeGuess( new, new->sizeguess );
+
+/* MapSize. */
+/* -------- */
+      mapsize = astReadInt( channel, "mapsz",
+                            DEFSIZE/MAX_ENTRIES_PER_TABLE_ENTRY );
+      NewTable( new, mapsize );
+
+/* Entries... */
+/* ---------- */
 
 /* Initialise the index of the next AstMapEntry to be read. */
       nentry = 0;
@@ -4808,19 +5636,19 @@ const char *astMapKey_( AstKeyMap *this, int index ){
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,KeyMap,MapKey))(this,index); 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+int astGetSizeGuess_( AstKeyMap *this ){
+   if( !astOK ) return 0;
+   return (**astMEMBER(this,KeyMap,GetSizeGuess))(this); 
+}
+int astTestSizeGuess_( AstKeyMap *this ){
+   if( !astOK ) return 0;
+   return (**astMEMBER(this,KeyMap,TestSizeGuess))(this); 
+}
+void astClearSizeGuess_( AstKeyMap *this ){
+   if( !astOK ) return;
+   (**astMEMBER(this,KeyMap,ClearSizeGuess))(this); 
+}
+void astSetSizeGuess_( AstKeyMap *this, int sizeguess ){
+   if( !astOK ) return;
+   (**astMEMBER(this,KeyMap,SetSizeGuess))(this,sizeguess); 
+}

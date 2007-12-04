@@ -68,9 +68,6 @@
 
 /* Macros */
 /* ====== */
-/* The number of elements in the hash table stored in each KeyMap structure. */
-#define AST__MAPSIZE 23
-
 /* Data type constants: */
 #define AST__BADTYPE 0
 #define AST__INTTYPE 1
@@ -89,6 +86,7 @@
 typedef struct AstMapEntry {
    struct AstMapEntry *next; /* Pointer to next structure in list. */
    const char *key;          /* The name used to identify the entry */
+   unsigned long hash;       /* The full width hash value */
    int type;                 /* Data type. */
    int nel;                  /* 0 => scalar, >0 => array with "nel" elements */
    const char *comment;      /* Pointer to a comment for the entry */
@@ -104,9 +102,11 @@ typedef struct AstKeyMap {
    AstObject object;                   /* Parent class structure */
 
 /* Attributes specific to objects in this class. */
-   AstMapEntry *table[ AST__MAPSIZE ]; /* Hash table containing pointers to 
+   int sizeguess;                      /* Guess at KeyMap size */
+   AstMapEntry **table;                /* Hash table containing pointers to 
                                           the KeyMap entries */
-   int nentry[ AST__MAPSIZE ];         /* No. of Entries in each table element */
+   int *nentry;                        /* No. of Entries in each table element */
+   int mapsize;                        /* Length of table */
 } AstKeyMap;
 
 /* Virtual function table. */
@@ -150,6 +150,11 @@ typedef struct AstKeyMapVtab {
    int (* MapType)( AstKeyMap *, const char * );
    int (* MapHasKey)( AstKeyMap *, const char * );
    const char *(* MapKey)( AstKeyMap *, int );
+
+   int (* GetSizeGuess)( AstKeyMap * );
+   int (* TestSizeGuess)( AstKeyMap * );
+   void (* SetSizeGuess)( AstKeyMap *, int );
+   void (* ClearSizeGuess)( AstKeyMap * );
 
 } AstKeyMapVtab;
 #endif
@@ -218,6 +223,12 @@ void astMapPut1F_( AstKeyMap *, const char *, int, float *, const char * );
 void astMapPut1I_( AstKeyMap *, const char *, int, int *, const char * );
 void astMapRemove_( AstKeyMap *, const char * );
 
+#if defined(astCLASS)            /* Protected */
+int astGetSizeGuess_( AstKeyMap * );
+int astTestSizeGuess_( AstKeyMap * );
+void astSetSizeGuess_( AstKeyMap *, int );
+void astClearSizeGuess_( AstKeyMap * );
+#endif
 
 /* Function interfaces. */
 /* ==================== */
@@ -291,6 +302,16 @@ astINVOKE(O,astLoadKeyMap_(mem,size,vtab,name,astCheckChannel(channel)))
 #define astMapGet0A(this,key,value) astINVOKE(V,astMapGet0A_(astCheckKeyMap(this),key,(AstObject **)(value)))
 #define astMapGet1A(this,key,mxval,nval,value) astINVOKE(V,astMapGet1A_(astCheckKeyMap(this),key,mxval,nval,(AstObject **)(value)))
 #define astMapPut1A(this,key,size,value,comment) astINVOKE(V,astMapPut1A_(astCheckKeyMap(this),key,size,value,comment))
+
+#define astClearSizeGuess(this) \
+astINVOKE(V,astClearSizeGuess_(astCheckKeyMap(this)))
+#define astGetSizeGuess(this) \
+astINVOKE(V,astGetSizeGuess_(astCheckKeyMap(this)))
+#define astSetSizeGuess(this,sizeguess) \
+astINVOKE(V,astSetSizeGuess_(astCheckKeyMap(this),sizeguess))
+#define astTestSizeGuess(this) \
+astINVOKE(V,astTestSizeGuess_(astCheckKeyMap(this)))
+
 #else
 #define astMapGet0A(this,key,value) astINVOKE(V,astMapGet0AId_(astCheckKeyMap(this),key,(AstObject **)(value)))
 #define astMapGet1A(this,key,mxval,nval,value) astINVOKE(V,astMapGet1AId_(astCheckKeyMap(this),key,mxval,nval,(AstObject **)(value)))
