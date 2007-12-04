@@ -7339,7 +7339,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 *  Parameters:
 *     this
-*        Pointer to the original FrameSet.
+*        Pointer to the original CmpFrame.
 
 *  Returned Value:
 *     A new pointer to the simplified CmpFrame. 
@@ -9187,7 +9187,8 @@ AstCmpFrame *astInitCmpFrame_( void *mem, size_t size, int init,
 *  Synopsis:
 *     #include "cmpframe.h"
 *     AstCmpFrame *astInitCmpFrame( void *mem, size_t size, int init,
-*                                   AstCmpFrameVtab *vtab, const char *name )
+*                                   AstCmpFrameVtab *vtab, const char *name,
+*                                   AstFrame *frame1, AstFrame *frame2 )
 
 *  Class Membership:
 *     CmpFrame initialiser.
@@ -9228,6 +9229,10 @@ AstCmpFrame *astInitCmpFrame_( void *mem, size_t size, int init,
 *        contains the name of the class to which the new object
 *        belongs (it is this pointer value that will subsequently be
 *        returned by the Object astClass function).
+*     frame1
+*        Pointer to the first Frame to be included in the new CmpFrame.
+*     frame2
+*        Pointer to the second Frame to be included in the new CmpFrame.
 
 *  Returned Value:
 *     A pointer to the new CmpFrame.
