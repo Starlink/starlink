@@ -119,6 +119,7 @@
 /* ---------------------- */
 #include "channel.h"             /* I/O channels (parent class) */
 #include "pointset.h"            /* Defines AST__BAD */
+#include "keymap.h"              /* Defines the AstKeyMap type */
 
 /* C header files. */
 /* --------------- */
@@ -171,7 +172,8 @@ typedef struct AstFitsChan {
    char *warnings;  /* Pointer to a string containing warning conditions */
    void *card;      /* Pointer to next FitsCard to be read */
    void *head;      /* Pointer to first FitsCard in the circular linked list */
-   void *keyseq;    /* List of keyword sequence numbers used */
+   AstKeyMap *keyseq;   /* List of keyword sequence numbers used */
+   AstKeyMap *keywords; /* A KeyMap holding the keywords in the FitsChan */
    const char *(* source)( void ); /* Pointer to source function */
    char *(* source_wrap)( const char *(*)( void ) );
                                    /* Source wrapper function pointer */

@@ -790,6 +790,10 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *     20-SEP-2007 (DSB):
 *        Changed FitOK to check that the RMS residual is not more than
 *        a fixed small fraction of the pixel size.
+*     4-DEC-2007 (DSB):
+*        Changed CreateKeyword so that it uses a KeyMap to search for
+*        existing keywords. This is much faster than checking every
+*        FitsCard in the FitsChan explicitly.
 *class--
 */
 
@@ -1013,13 +1017,6 @@ typedef struct FitsCard {
    struct FitsCard *next;     /* Pointer to next structure in list. */
    struct FitsCard *prev;     /* Pointer to previous structure in list. */
 } FitsCard;   
-
-
-typedef struct FitsKeySeq {   /* Associate a keyword with a sequence no. */
-   char *key;                 /* Pointer to basic FITS keyword string */
-   int seq;                   /* Sequence number last used */
-   struct FitsKeySeq *next;   /* Pointer to next list element */
-} FitsKeySeq;
 
 
 /* Structure used to store information derived from the FITS WCS keyword 
@@ -1296,6 +1293,7 @@ static int MatchChar( char, char, const char *, const char *, const char * );
 static int MatchFront( const char *, const char *, char *, int *, int *, int *, const char *, const char *, const char * );
 static int MoveCard( AstFitsChan *, int, const char *, const char * );
 static int PCFromStore( AstFitsChan *, FitsStore *, const char *, const char * );
+static int HasCard( AstFitsChan *, const char *, const char *, const char *);
 static int SearchCard( AstFitsChan *, const char *, const char *, const char *);
 static int SetFits( AstFitsChan *, const char *, void *, int, const char *, int );
 static int Similar( const char *, const char * );
@@ -4679,11 +4677,11 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
       }      
 
 /* Ensure the FitsChan contains OBJECT and LINE headers */
-      if( !SearchCard( this, "OBJECT", method, class ) ) {
+      if( !HasCard( this, "OBJECT", method, class ) ) {
          cval = " ";
          SetValue( this, "OBJECT", &cval, AST__STRING, NULL );
       }
-      if( !SearchCard( this, "LINE", method, class ) ) {
+      if( !HasCard( this, "LINE", method, class ) ) {
          cval = " ";
          SetValue( this, "LINE", &cval, AST__STRING, NULL );
       }
@@ -6105,111 +6103,83 @@ static void CreateKeyword( AstFitsChan *this, const char *name,
 */
 
 /* Local Variables: */
-   const char *class;            /* Object clas */
-   FitsKeySeq *keyseq;           /* Pointer to sequence number list entry */
    char *seq_chars = SEQ_CHARS;  /* Pointer to characters used for encoding */
+   char seq_char;                /* The first sequence character */
+   const char *class;            /* Object clas */
    int found;                    /* Keyword entry found in list? */
-   int icard;                    /* Index of current card on entry */
    int limit;                    /* Sequence number has reached limit? */
    int nc;                       /* Number of basic keyword characters */
+   int seq;                      /* The sequence number */
    static int seq_nchars = -1;   /* Number of characters used for encoding */
 
 /* Check the global error status. */
-   if ( !astOK ) return;
+   if( !astOK ) return;
 
 /* Store the object class. */
    class = astGetClass( this );
 
-/* Remember the index of the current card. */
-   icard = astGetCard( this );
-
 /* On the first invocation only, determine the number of characters
    being used to encode sequence number information and save this
    value. */
-   if ( seq_nchars < 0 ) seq_nchars = (int) strlen( seq_chars );
+   if( seq_nchars < 0 ) seq_nchars = (int) strlen( seq_chars );
 
 /* Copy the name supplied into the output array, converting to upper
    case. Leave space for two characters to encode a sequence
    number. Terminate the resulting string. */
-   for ( nc = 0; name[ nc ] && ( nc < ( FITSNAMLEN - 2 ) ); nc++ ) {
+   for( nc = 0; name[ nc ] && ( nc < ( FITSNAMLEN - 2 ) ); nc++ ) {
       keyword[ nc ] = toupper( name[ nc ] );
    }
    keyword[ nc ] = '\0';
 
 /* We now search the list of sequence numbers already allocated to
-   find the next one to use for this keyword. Obtain a pointer to the
-   start of this list and loop until the end of the list is reached,
-   or the keyword is found. */
-   found = 0;
-   keyseq = (FitsKeySeq *) this->keyseq;
-   while ( keyseq && !found ) {
-
-/* Compare each entry with the keyword we want to match. */
-      if ( !strcmp( keyseq->key, keyword ) ) {
-         found = 1;
-
-/* Test the next list entry if the current one doesn't match. */
-      } else {
-         keyseq = keyseq->next;
-      }
+   find the next one to use for this keyword. */
+   if( this->keyseq ) {
+      found = astMapGet0I( this->keyseq, keyword, &seq );
+   } else {
+      found = 0;
+      this->keyseq = astKeyMap( "" );
    }
 
 /* If the keyword was not found in the list, create a new list entry
    to describe it. */
-   if ( !found ) {
-      keyseq = astMalloc( sizeof( FitsKeySeq ) );
-
-/* If OK, store a copy of the keyword and initialise its sequence
-   number (note that sequence number zero is not actually used for
-   cosmetic reasons). */
-      if ( astOK ) {
-         keyseq->key = astString( keyword, nc );
-         keyseq->seq = 0;
-
-/* Prefix the new entry to the list. */
-         if ( astOK ) {
-            keyseq->next = (FitsKeySeq *) this->keyseq;
-            this->keyseq = (void *) keyseq;
-
-/* If an error occurred, clean up by freeing the memory allocated for
-   the new list entry. */
-         } else {
-            keyseq = astFree( keyseq );
-         }
-      }
-   }
+   if( !found ) seq = 0;
 
 /* If OK, loop to find a new sequence number which results in a FITS
    keyword that hasn't already been used to store data in the
    FitsChan. */
-   if ( astOK ) {
-      while ( 1 ) {
+   if( astOK ) {
+      while( 1 ) {
 
 /* Determine if the sequence number just obtained has reached the
    upper limit. This is unlikely to happen in practice, but if it
    does, we simply re-use this maximum value. Otherwise, we increment
    the sequence number last used for this keyword to obtain a new
    one. */
-         limit = ( keyseq->seq >= ( seq_nchars * seq_nchars - 1 ) );
-         if ( !limit ) keyseq->seq++;
+         limit = ( seq >= ( seq_nchars * seq_nchars - 1 ) );
+         if( !limit ) seq++;
 
 /* Encode the sequence number into two characters and append them to
    the original keyword (with a terminating null). */
-         keyword[ nc ] = seq_chars[ keyseq->seq / seq_nchars ];
-         keyword[ nc + 1 ] = seq_chars[ keyseq->seq % seq_nchars ];
+         seq_char = seq_chars[ seq / seq_nchars ];
+         keyword[ nc ] = seq_char;
+         keyword[ nc + 1 ] = seq_chars[ seq % seq_nchars ];
          keyword[ nc + 2 ] = '\0';
 
 /* If the upper sequence number limit has not been reached, try to
    look up the resulting keyword in the FitsChan to see if it has
    already been used. Quit searching when a suitable keyword is
    found. */
-         if ( limit || !SearchCard( this, keyword, "astWrite", class ) ) break;
+         if ( limit || !HasCard( this, keyword, "astWrite", class ) ) break;
       }
+
+/* Store the update sequence number in the keymap. The keys into this
+   keymap are the base keyword name without the appended sequence string, so
+   temporaily terminate the returned keyword name to exclude the sequence
+   string. */
+      keyword[ nc ] = '\0';
+      astMapPut0I( this->keyseq, keyword, seq, NULL );
+      keyword[ nc ] = seq_char;
    }
-
-/* Reinstate the original current card. */
-   astSetCard( this, icard );
-
 }
 
 static int DataDefined( int type, void *data ){
@@ -6498,6 +6468,9 @@ static void DeleteCard( AstFitsChan *this, const char *method,
 
 /* Get a pointer to the card to be deleted (the current card). */
    card = (FitsCard *) this->card;
+
+/* Remove it from the KeyMap holding all keywords. */
+   astMapRemove( this->keywords, card->name );
 
 /* Move the current card on to the next card. */
    MoveCard( this, 1, method, class );
@@ -7540,8 +7513,6 @@ static void Empty( AstFitsChan *this ){
 /* Local Variables: */
    const char *class;         /* Pointer to string holding object class */
    const char *method;        /* Pointer to string holding calling method */
-   FitsKeySeq *tmp;           /* Temporary pointer to list element */
-   FitsKeySeq *keyseq;        /* Temporary pointer to list head */
    int old_ignoreused;        /* Original setting of external IgnoreUsed variable */
 
 /* Store the method and class strings. */
@@ -7556,26 +7527,13 @@ static void Empty( AstFitsChan *this ){
    while( !astFitsEof( this ) ) DeleteCard( this, method, class );   
    IgnoreUsed = old_ignoreused;
 
-/* Empty the list which holds keywords and the latest sequence number
-   used by each of them, by repeatedly removing the first element. */
+/* Delete the KeyMap which holds keywords and the latest sequence number
+   used by each of them. */
+   if( this->keyseq ) this->keyseq = astAnnul( this->keyseq );
 
-   keyseq = (FitsKeySeq *) this->keyseq;
-   while ( keyseq ) {
+/* Delete the KeyMap holding the keyword names. */
+   if( this->keywords ) this->keywords = astAnnul( this->keywords );
 
-/* Free the keyword string. */
-      keyseq->key = astFree( keyseq->key );
-
-/* Remove the first element from the list, retaining a pointer to
-   it. */
-      tmp = keyseq;
-      keyseq = tmp->next;
-
-/* Free the memory used by the first element. */
-      tmp = astFree( tmp );
-   }
-
-/* Store a NULL pointer in the FitsChan. */
-   this->keyseq = NULL;
 }
 
 static int EncodeFloat( char *buf, int digits, int width, int maxwidth,
@@ -10048,7 +10006,8 @@ static int GetObjSize( AstObject *this_object ) {
    result = (*parent_getobjsize)( this_object );
 
    result += astTSizeOf( this->warnings );
-   result += astTSizeOf( this->keyseq );
+   result += astGetObjSize( this->keyseq );
+   result += astGetObjSize( this->keywords );
 
    card = (FitsCard *) ( this->head );
    while( card ) {
@@ -14884,6 +14843,56 @@ static int HasAIPSSpecAxis( AstFitsChan *this, const char *method,
 
 }
 
+static int HasCard( AstFitsChan *this, const char *name, 
+                    const char *method, const char *class ){
+/*
+*  Name:
+*     HasCard
+
+*  Purpose:
+*     Check if the FitsChan contains a specified keyword.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "fitschan.h"
+*     int HasCard( AstFitsChan *this, const char *name, 
+*                  const char *method, const char *class )
+
+*  Class Membership:
+*     FitsChan member function.
+
+*  Description:
+*     Returns a non-zero value if the FitsChan contains the given keyword,
+*     and zero otherwise. The current card is unchanged.
+
+*  Parameters:
+*     this
+*        Pointer to the FitsChan.
+*     name
+*        Pointer to a string holding the keyword name.
+*     method
+*        Pointer to string holding name of calling method.
+
+*  Returned Value:
+*     A value of 1 is returned if a card was found refering to the given
+*     keyword. Otherwise zero is returned.
+
+*/
+
+/* Check the supplied pointers (we can rely on astMapHasKey to check the
+   inherited status). */
+   if( !name || !this || !this->keywords ) return 0;
+
+/* Search the KeyMap holding the keywords currently in the FitsChan,
+   returning non-zero if the keyword was found. A KeyMap is used because
+   it uses a hashing algorithm to find the entries and is therefore a lot
+   quicker than searching through the list of linked FitsCards. */
+   return astMapHasKey( this->keywords, name );
+
+}
+
 void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name ) {
 /*
 *+
@@ -18346,6 +18355,14 @@ static void NewCard( AstFitsChan *this, const char *name, int type,
       b = new->name;
       while( *a ) *(b++) = (char) toupper( (int) *(a++) );
       *b = 0;
+
+/* Ensure that a KeyMap exists to hold the keywords currently in the
+   FitsChan. */
+      if( !this->keywords ) this->keywords = astKeyMap( "" );
+
+/* Add the keyword name to the KeyMap. The value associated with the
+   KeyMap entry is not used and is set arbitrarily to zero. */
+      astMapPut0I( this->keywords, new->name, 0, NULL );
 
 /* Copy the data type. */
       new->type = type;
@@ -23975,19 +23992,19 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                if( tlbnd[ 0 ] <= axlon + 1 && axlon + 1 <= tubnd[ 0 ] ) {
 
 /* Are either PVi_1 or PVi_2 available? */
-                  if( SearchCard( this, FormatKey( "PV", axlon + 1, 1, ' ' ),
-                                  method, class ) || 
-                      SearchCard( this, FormatKey( "PV", axlon + 1, 2, ' ' ),
-                                  method, class ) ) {
+                  if( HasCard( this, FormatKey( "PV", axlon + 1, 1, ' ' ),
+                               method, class ) || 
+                      HasCard( this, FormatKey( "PV", axlon + 1, 2, ' ' ),
+                               method, class ) ) {
                      
 /* If so use PROJP if PVi_0 is not also available. */
-                     if( !SearchCard( this, FormatKey( "PV", axlon + 1, 0, ' ' ),
-                                      method, class ) ) use_projp = 1;
+                     if( !HasCard( this, FormatKey( "PV", axlon + 1, 0, ' ' ),
+                                   method, class ) ) use_projp = 1;
 
 /* If neither PVi_1 or PVi_2 are available, use PROJP if PVi_0 is
    available. */
-                  } else if( SearchCard( this, FormatKey( "PV", axlon + 1, 0, ' ' ),
-                                         method, class ) ) {
+                  } else if( HasCard( this, FormatKey( "PV", axlon + 1, 0, ' ' ),
+                                      method, class ) ) {
                      use_projp = 1;
 
                   }
@@ -27962,7 +27979,7 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
          if( !ok ) {
 
 /* First check that the keyword is not included in "fc2". */
-            if( !SearchCard( fc2, keynam, method, class ) ) {
+            if( !HasCard( fc2, keynam, method, class ) ) {
                sprintf( buf, "The original FITS header contained a value for "
                         "keyword %s which could not be converted to a %s.",
                         keynam, ( type==AST__FLOAT ? "floating point number":
@@ -33184,8 +33201,6 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
    const char *class;        /* Pointer to object class */
    AstFitsChan *in;          /* Pointer to input FitsChan */
    AstFitsChan *out;         /* Pointer to output FitsChan */
-   FitsKeySeq *keyseq_in;
-   FitsKeySeq *keyseq_out;
    int *flags;
    int icard;
    int old_ignoreused;       /* Original value of external variable IgnoreUsed */
@@ -33202,6 +33217,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
    out->card = NULL;
    out->head = NULL;
    out->keyseq = NULL;
+   out->keywords = NULL;
    out->source = NULL;
    out->source_wrap = NULL;
    out->sink = NULL;
@@ -33241,34 +33257,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
    astSetCard( in, icard );
    astSetCard( out, icard );
 
-/* Copy the list of keyword sequence numbers used, considering each
-   input list element in turn. */
-   keyseq_in = (FitsKeySeq *) in->keyseq;
-   while ( astOK && keyseq_in ) {
-
-/* Allocate space for the new list element and store a copy of the
-   corresponding input element's keyword string. */
-      keyseq_out = (FitsKeySeq *) astMalloc( sizeof( FitsKeySeq ) );
-      if ( astOK ) {
-         keyseq_out->key = astStore( NULL, keyseq_in->key,
-                                     strlen( keyseq_in->key ) + (size_t) 1 );
-
-/* If an error occurs, free the list element. */
-         if ( !astOK ) {
-            keyseq_out = astFree( keyseq_out );
-
-/* Otherwise, copy the input sequence number and link the new element
-   into the output list */
-         } else {
-            keyseq_out->seq = keyseq_in->seq;
-            keyseq_out->next = out->keyseq;
-            out->keyseq = (void *) keyseq_out;
-            
-/* Consider the next input element. */
-            keyseq_in = keyseq_in->next;
-         }
-      }
-   }
+/* Copy the list of keyword sequence numbers used. */
+   if( in->keyseq ) out->keyseq = astCopy( in->keyseq );
 
 /* Reinstate the original setting of the external IgnoreUsed variable. */
    IgnoreUsed = old_ignoreused;
@@ -34202,6 +34192,7 @@ AstFitsChan *astInitFitsChan_( void *mem, size_t size, int init,
       new->head = NULL;
       new->card = NULL;
       new->keyseq = NULL;
+      new->keywords = NULL;
       new->defb1950 = -1;
       new->cdmatrix = -1;
       new->carlin = -1;
@@ -34360,6 +34351,9 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
 /* Request the input Channel to read all the input data appropriate to
    this class into the internal "values list". */
       astReadClassData( channel, "FitsChan" );
+
+/* Initialise the KeyMap holding the keywords in the FitsChan. */
+      new->keywords = NULL;
 
 /* Initialise the list of keyword sequence numbers. */
       new->keyseq = NULL;
