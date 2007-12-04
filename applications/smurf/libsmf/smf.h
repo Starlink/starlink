@@ -203,6 +203,8 @@
 *        Added wcsout to smf_choosetiles argument list.
 *     2007-11-27 (EC):
 *        Added smf_fits_getL, smf_fits_setL
+*     2007-12-054 (DSB):
+*        Added trim to smf_choosetiles argument list.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -689,7 +691,7 @@ void smf_open_related_model( const smfGroup *group, const int subindex,
 smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd, 
                           int *ubnd, smfBox *boxes, int spread, 
                           const double params[], AstFrameSet *wcsout, 
-                          int tile_size[ 2 ], 
+                          int tile_size[ 2 ], int trim,
                           int *ntiles, int *status );
 
 smfTile *smf_freetiles( smfTile *tiles, int size, int *status );

@@ -16,8 +16,8 @@
 *  Invocation:
 *     tiles = smf_choosetiles( Grp *igrp,  int size, int *lbnd, int *ubnd, 
 *                              smfBox *boxes, int spread, const double params[],
-*                              AstFrameSet *wcsout, int tile_size[ 2 ], 
-*                              int *ntiles, int *status )
+*                              AstFrameSet *wcsout, int tile_size[ 2 ],
+*                              int trim, int *ntiles, int *status )
 
 *  Arguments:
 *     igrp = Grp * (Given)
@@ -47,6 +47,9 @@
 *        NULL pointer may be given. 
 *     wcsout = AstFrameSet * (Given)
 *        Pointer to the FrameSet describing the WCS of the output cube.
+*     trim = int (Given)
+*        If true then the border tiles are trimmed to exclude pixels off
+*        the edge of the full size output array.
 *     tile_size = int[ 2 ] * (Given)
 *        An array holding the spatial dimensions of each tile, in pixels.
 *        If the first value is less than zero, then a single tile
@@ -147,7 +150,7 @@
 smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd, 
                           int *ubnd, smfBox *boxes, int spread, 
                           const double params[], AstFrameSet *wcsout, 
-                          int tile_size[ 2 ], 
+                          int tile_size[ 2 ], int trim,
                           int *ntiles, int *status ){
 
 /* Local Variables */
@@ -322,12 +325,12 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
             tile->ubnd[ 2 ] = ubnd[ 2 ];
 
 /* Limit the tile area to the bounds of the output cube. */
-/*
-            if( tile->lbnd[ 0 ] < lbnd[ 0 ] ) tile->lbnd[ 0 ] = lbnd[ 0 ];
-            if( tile->lbnd[ 1 ] < lbnd[ 1 ] ) tile->lbnd[ 1 ] = lbnd[ 1 ];
-            if( tile->ubnd[ 0 ] > ubnd[ 0 ] ) tile->ubnd[ 0 ] = ubnd[ 0 ];
-            if( tile->ubnd[ 1 ] > ubnd[ 1 ] ) tile->ubnd[ 1 ] = ubnd[ 1 ];
-*/
+            if( trim ) {
+               if( tile->lbnd[ 0 ] < lbnd[ 0 ] ) tile->lbnd[ 0 ] = lbnd[ 0 ];
+               if( tile->lbnd[ 1 ] < lbnd[ 1 ] ) tile->lbnd[ 1 ] = lbnd[ 1 ];
+               if( tile->ubnd[ 0 ] > ubnd[ 0 ] ) tile->ubnd[ 0 ] = ubnd[ 0 ];
+               if( tile->ubnd[ 1 ] > ubnd[ 1 ] ) tile->ubnd[ 1 ] = ubnd[ 1 ];
+            }
    
 /* Store the extended tile area. */
             tile->elbnd[ 0 ] = tile->lbnd[ 0 ] - extend;
