@@ -246,14 +246,14 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
       for( i = 0; i < 2; i++ ) {
 
 /* Convert the supplied lower bound into the new coordinate system. */
-         new_lbnd = ( lbnd[ i ] + 0.5*tile_size[ i ] - refpix[ i ] )
+         new_lbnd = ( lbnd[ i ] - 1.0 + 0.5*tile_size[ i ] - refpix[ i ] )
                     / tile_size[ i ];
 
 /* Find the next lower integer value. */
          new_lbnd = floor( new_lbnd );
 
 /* Convert this back to grid coords. */
-         plbnd[ i ] = ( new_lbnd - 0.5 )*tile_size[ i ] + refpix[ i ];
+         plbnd[ i ] = ceil( ( new_lbnd - 0.5 )*tile_size[ i ] + refpix[ i ] );
 
 /* Convert the supplied upper bound into the new coordinate system. */
          new_ubnd = ( ubnd[ i ] + 0.5*tile_size[ i ] - refpix[ i ] )
@@ -263,7 +263,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
          new_ubnd = ceil( new_ubnd );
 
 /* Convert this back to grid coords. */
-         pubnd[ i ] = ( new_ubnd - 0.5 )*tile_size[ i ] + refpix[ i ];
+         pubnd[ i ] = ceil( ( new_ubnd - 0.5 )*tile_size[ i ] + refpix[ i ] );
 
 /* Store the number of tiles spanned by this axis. */
          numtile[ i ] = (int) ( new_ubnd - new_lbnd + 0.5 );
@@ -321,6 +321,14 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
             tile->lbnd[ 2 ] = lbnd[ 2 ];
             tile->ubnd[ 2 ] = ubnd[ 2 ];
 
+/* Limit the tile area to the bounds of the output cube. */
+/*
+            if( tile->lbnd[ 0 ] < lbnd[ 0 ] ) tile->lbnd[ 0 ] = lbnd[ 0 ];
+            if( tile->lbnd[ 1 ] < lbnd[ 1 ] ) tile->lbnd[ 1 ] = lbnd[ 1 ];
+            if( tile->ubnd[ 0 ] > ubnd[ 0 ] ) tile->ubnd[ 0 ] = ubnd[ 0 ];
+            if( tile->ubnd[ 1 ] > ubnd[ 1 ] ) tile->ubnd[ 1 ] = ubnd[ 1 ];
+*/
+   
 /* Store the extended tile area. */
             tile->elbnd[ 0 ] = tile->lbnd[ 0 ] - extend;
             tile->eubnd[ 0 ] = tile->ubnd[ 0 ] + extend;
