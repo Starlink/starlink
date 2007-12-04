@@ -1071,6 +1071,15 @@ package @PACKAGE@ {
 	    helpkey *
 	  }
 
+	 parameter trimtiles {
+	    type _LOGICAL
+	    vpath DEFAULT
+	    prompt {Trim the output tiles?}
+	    ppath CURRENT DEFAULT
+	    default FALSE
+	    helpkey *
+	  }
+
  	  parameter weights {
 	    type _LOGICAL
 	    vpath DEFAULT

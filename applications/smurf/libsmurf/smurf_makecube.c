@@ -454,6 +454,13 @@
 *          the pixel bounds of the output cube will be such as to include 
 *          data from all detectors, whether or not they have been selected 
 *          for inclusion using the DETECTORS parameter. [TRUE]
+*     TRIMTILES = _LOGICAL (Read)
+*          Only accessed if the output is being split up into more than
+*          one spatial tile (see parameter TILEDIMS). If TRUE, then the 
+*          tiles around the border will be trimmed to exclude areas that 
+*          fall outside the bounds of the full sized output array. This
+*          will result in the border tiles being smaller than the central 
+*          tiles. [FALSE]
 *     UBOUND( 3 ) = _INTEGER (Write)
 *          The upper pixel bounds of the output NDF. Note, values will be
 *          written to this output parameter even if a null value is supplied 
@@ -635,6 +642,8 @@
 *     26-NOV-2007 (DSB):
 *        Pass output FrameSet to smf_choosetiles so that tiles can be
 *        centred on ref point.
+*     4-DEC-2007 (DSB):
+*        Added parameter TRIMTILES.
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -803,6 +812,7 @@ void smurf_makecube( int *status ) {
    int spread = 0;            /* Pixel spreading method */
    int tiledims[2];           /* Dimensions (in pixels) of each output tile */
    int trim;                  /* Trim the output cube to exclude bad pixels? */
+   int trimtiles;             /* Trim the border tiles to exclude bad pixels? */
    int ubnd_out[ 3 ];         /* Upper pixel bounds for full output map */
    int ubnd_wgt[ 4 ];         /* Upper pixel bounds for weight array */
    int use_wgt;               /* Use input variance to weight input data? */
@@ -1092,10 +1102,11 @@ void smurf_makecube( int *status ) {
       if( *status == PAR__NULL ) {
          errAnnul( status );
       } else {
+         parGet0l( "TRIMTILES", &trimtiles, status );
          if( nval == 1 ) tiledims[ 1 ] = tiledims[ 0 ];
          tiles = smf_choosetiles( igrp, size, lbnd_out, ubnd_out, boxes, 
-                                  spread, params, wcsout, tiledims, &ntile, 
-                                  status );
+                                  spread, params, wcsout, tiledims,
+                                  trimtiles, &ntile, status );
       }
    }
 
@@ -1105,8 +1116,8 @@ void smurf_makecube( int *status ) {
    if( !tiles ) {
       tiledims[ 0 ] = -1;
       tiles = smf_choosetiles( igrp, size, lbnd_out, ubnd_out, boxes, 
-                               spread, params, wcsout, tiledims, &ntile, 
-                               status );
+                               spread, params, wcsout, tiledims, 
+                               0, &ntile, status );
    }
 
 /* Write the number of tiles being created to an output parameter. */
