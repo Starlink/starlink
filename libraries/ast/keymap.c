@@ -108,6 +108,8 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map.
 *     4-DEC-2007 (DSB):
 *        Allow size of hash table to grow dynamically as more entries are
 *        added to the KeyMap.
+*     5-DEC-2007 (DSB):
+*        Ensure mapsize is always a power of 2.
 *class--
 */
 
@@ -119,7 +121,7 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map.
 #define astCLASS KeyMap
 
 /* Default value for the SizeGuess attribute. */
-#define DEFSIZE 300
+#define DEFSIZE 160
 
 /* The maximum number of entries per element of the hash table. If this
    value is exceeded the hash table will be doubled in size. */
@@ -4210,8 +4212,9 @@ static void NewTable( AstKeyMap *this, int size ){
 
 *  Description:
 *     This function removes any existing hash table and allocates memory
-*     for a new one of teh specified size. The table is initialised to
-*     indicate that it is empty.
+*     for a new one of the specified size (except that the supplied size
+*     is modified to be the next higher power of 2). The table is 
+*     initialised to indicate that it is empty.
 
 *  Parameters:
 *     this
@@ -4227,8 +4230,12 @@ static void NewTable( AstKeyMap *this, int size ){
 /* Check the global error status. */
    if ( !astOK ) return;
 
-/* Ensure the table has at least 20 elements. */
-   if( size < 20 ) size = 20;
+/* Ensure the table size is at least 16 and is a power of 2. */
+   if( size <= 16 ) {
+      size = 16;
+   } else {
+      size = (int) ( 0.5 + pow( 2.0, ceil( log( size )/log( 2.0 ) ) ) );
+   }
 
 /* Remove any existing entries. */
    for( i = 0; i < this->mapsize; i++ ) FreeTableEntry( this, i );
