@@ -91,6 +91,8 @@
 *        Original version.
 *     26-JUN-2001 (DSB):
 *        Modified for ARD version 2.0.
+*     5-DEC-2007 (DSB):
+*        Correct test for shear.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -173,9 +175,10 @@
       END IF
 
 *  Report an error and abort if the there is any shear.
-      IF( ABS( D( 5 )*D( 6 ) + D( 2 )*D( 3 ) ) .GE. 
-     :    ABS( D( 2 )*D( 3 )*VAL__EPSD ) .AND.
+      IF( ABS( D( 3 )*D( 6 ) + D( 2 )*D( 5 ) ) .GE. 
+     :    100*( XSCA + YSCA )*VAL__EPSD .AND.
      :    STATUS .EQ. SAI__OK ) THEN
+
          STATUS = ARD__SCALE
          CALL ERR_REP( 'ARD1_FRA_ERR3', 'Current ARD user '//
      :                 'co-ordinate system has sheared '//
