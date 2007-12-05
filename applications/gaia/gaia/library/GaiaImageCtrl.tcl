@@ -190,11 +190,15 @@ itcl::class gaia::GaiaImageCtrl {
       }
    }
 
-   #  Alternate zoom for mousewheel (buttons 4 and 5).
+   #  Alternate zoom for mousewheel either direction zooms in and out.
    protected method handle_control_button_ {n} {
       if { $n == 4 } {
          inc_zoom 1
       } elseif { $n == 5 } {
+         inc_zoom -1
+      } elseif { $n == 6 } {
+         inc_zoom 1
+      } elseif { $n == 7 } {
          inc_zoom -1
       }
    }
