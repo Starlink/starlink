@@ -24,6 +24,8 @@
  *                            changed.
  *                  04/04/06  Added "refcnt" member so that owner can control
  *                            when to release memory.
+ *                  05/12/07  Change length function to return off_t instead
+ *                            of int.
  */
 
 #include <cstdio>
@@ -173,7 +175,7 @@ public:
     static void cleanup();
 
     // return the working length of the memory
-    int length() const {return int(length_ ? length_ : (rep_->size - offset_));}
+    off_t length() const {return off_t(length_ ? length_ : (rep_->size - offset_));}
 
     // set optional length
     void length(long newLength) {length_ = newLength;}
