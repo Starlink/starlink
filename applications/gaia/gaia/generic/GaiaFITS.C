@@ -150,11 +150,11 @@ int GaiaFITSGtWcs( StarFitsIO *fitsio, AstFrameSet **iwcs,
 
     Mem mem = fitsio->header();
     char *header = (char *)mem.ptr();
-    int lheader = mem.size();
+    size_t lheader = mem.size();
 
     // Read headers using a FITS channel.
     AstFitsChan *fitschan = astFitsChan( NULL, NULL, "" );
-    int ncard = (int) lheader / FITSCARD;
+    int ncard = (int) ( lheader / (size_t) FITSCARD );
     gaiaUtilsGtFitsChan( (char *) header, ncard, &fitschan );
 
     // Look for the image dimensions.
