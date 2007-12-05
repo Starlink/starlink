@@ -153,7 +153,7 @@
 *        WLIM specifies the minimum fraction of good pixels which must
 *        be present in order to generate a good output pixel.  If this 
 *        specified minimum fraction of good input pixels is not present,
-*        then a bad output pixel will result, otherwise an good output 
+*        then a bad output pixel will result, otherwise a good output 
 *        value will be calculated.  The value of this parameter should 
 *        lie between 0.0 and 1.0 (the actual number used will be rounded
 *        up if necessary to correspond to at least one pixel).  [0.3]
