@@ -17,11 +17,11 @@
 {Copyright \copyright\ 2000-2004 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {199.8}
+\newcommand{\stardocnumber}    {199.9}
 \newcommand{\stardocauthors}   {P W Draper\\
                                 A J Chipperfield\\
                                 M D Lawden}
-\newcommand{\stardocdate}      {15 October 2004}
+\newcommand{\stardocdate}      {5 December 2007}
 \newcommand{\stardoctitle}     {Star2HTML\\[1ex]
                                 Converting Starlink Documents to Hypertext}
 \newcommand{\stardocversion}   {Version 1.5}
@@ -342,7 +342,7 @@ Copy one of the Starlink template documents into a working directory:
 
 \begin{quote}
 \begin{verbatim}
-# cp /star/docs/sun.tex .
+# cp /star/share/sun.tex .
 \end{verbatim}
 \end{quote}
 
@@ -484,7 +484,7 @@ Its use is described in
 
 The templates are skeleton \LaTeX\ documents with preambles giving
 the document a standard style and extra hypertext facilities.
-They are stored in directory \texttt{/star/docs} and have filenames
+They are stored in directory \texttt{/star/share} and have filenames
 which are based on the name of the Starlink document class for which they
 have been designed (\texttt{sun.tex}, \texttt{ssn.tex}, \textit{etc.}).
 
@@ -633,7 +633,7 @@ and unstructured.
 If your document uses the standard macros defined for the Simple
 Software Tools (SST) package on VMS, then you should add the command:
 \begin{quote}
-\verb+\+\verb+input{/star/docs/sst}+
+\verb+\+\verb+input{/star/share/sst}+
 \end{quote}
 to the ``Document specific \ldots commands'' section of the template.
 The new definitions are a direct replacement for the old macros and should not
@@ -641,13 +641,6 @@ cause any problems for existing documents unless you have modified the old
 macros.
 If you have done so, you must work out how to incorporate your changes into
 the new definitions.
-
-SST has not been released for Unix, but an
-\htmladdnormallinkfoot{unsupported port}
-{http://star-www.dur.ac.uk/\~{}pdraper/sst/sst.html}
-is available.
-The VMS version is still available on \texttt{stadat} (the residual Starlink
-VAX/VMS service).
 
 \section{\xlabel{adding_links}Adding links}
 
@@ -1212,33 +1205,6 @@ If the area of text is large or long, use \verb+\small+ inside the quote
 environment.
 
 \end{itemize}
-
-\section{\xlabel{submitting_your_document_for_release}Submitting your document for release}
-
-If you want your document to be released through the Starlink software
-distribution system, you should store all the files for the paper and
-hypertext versions in a single \texttt{.tar} file and e-mail this to the
-Starlink Software Librarian (\texttt{ussc@star.rl.ac.uk}).
-Star2HTML stores a document's hypertext files (often a large number) in a
-directory with a name like \texttt{sunx.htx}.
-
-For independent documents (ones not associated with an item of software) you
-should produce the required \texttt{.tar} file with a command like:
-
-\begin{quote}
-\texttt{\# tar cvf sunx.tar sunx.tex sunx.htx}
-\end{quote}
-
-If the document has extra files, such as an index (\texttt{sunx.ind}) or some
-figure images, add them to the command line.
-
-Documents released with software should have separate \texttt{.tex} and
-\texttt{.tar} files.
-In this case, use a command like:
-
-\begin{quote}
-\texttt{\# tar cvf sunx.htx\_tar sunx.htx}
-\end{quote}
 
 \section{\xlabel{finally}Finally}
 
