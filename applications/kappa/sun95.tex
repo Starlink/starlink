@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.33}
 \newcommand{\stardocnumber}    {95.33}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2007 December 4}
+\newcommand{\stardocdate}      {2007 December 5}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.8-5}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -1004,23 +1004,23 @@ commentary explaining what is happening and why.  Let's begin.
 
 \subsection{From the C-shell}
 
-\small
+\latex{\small}
 \begin{verbatim}
      % kappa
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 This defines C-shell aliases for each \KAPPA\ \normalsize
 command, includes the help information, and shows the version number.  It need
 only be issued once per login session.  Thus you will see
 
-\small
+\latex{\small}
 \begin{verbatim}
       KAPPA commands are now available -- (Version 1.0)
  
       Type kaphelp for help on KAPPA commands
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Let's run a \KAPPA\ \normalsize application.  \htmlref{CADD}{CADD} adds a
 scalar constant to an \NDFref{NDF} file---the Starlink standard data
@@ -1029,11 +1029,11 @@ short).  In this case ten is added to the pixels in {\tt
 \$KAPPA\_DIR/comwest.sdf} to create {\tt test.sdf} in the current
 directory.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % cadd $KAPPA_DIR/comwest 10 test
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 There are three \htmlref{{\em parameters\/}}{se:param} qualifying
 the CADD command: the names of the input and output NDFs and the
@@ -1050,20 +1050,20 @@ Next we run the statistics task.  Here we have not given any parameters.
 In this case the application will ask for the values of any parameters
 it needs.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % stats
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 The only parameter required is called NDF, and \htmlref{STATS}{STATS}
 prompts us for it.
 
-\small
+\latex{\small}
 \begin{verbatim}
      NDF - Data structure to analyse /@test/ >
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 In this example, STATS wants to know for which NDF we require
 statistical data.  The text between the {\tt //} delimiters is the
@@ -1076,7 +1076,7 @@ suggested default to save typing.  Since {\tt test} is the NDF whose
 statistics we want we just hit the return key.  Again we exclude the
 {\tt .sdf} extension.  Here is the output from STATS.
 
-\small
+\latex{\small}
 \begin{verbatim}
         Pixel statistics for the NDF structure /home/scratch/mjc/test
 
@@ -1096,7 +1096,7 @@ statistics we want we just hit the return key.  Again we exclude the
               Number of pixels used  : 65536 (100.0%)
 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Of course, in your case the current directory will not be {\tt
 /home/scratch/mjc}.  The NDF title is the unchanged from the 
@@ -1115,11 +1115,11 @@ these.  By default, STATS uses the data array, as indicated here.
 Next we wish to smooth our data.  \htmlref{GAUSMOOTH}{GAUSMOOTH}
 performs a Gaussian smooth of neighbouring pixels.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % gausmooth
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Again we are prompted with the same suggested default, since we
 have not created any new NDFs within STATS.  Say we don't want to
@@ -1131,18 +1131,18 @@ NDF was called 234 you must enter {\tt @234}, otherwise the parameter
 system will think you are giving the integer 234.  Yes \ldots I 
 know \ldots the parameter system is trying to be too clever.)
 
-\small
+\latex{\small}
 \begin{verbatim}
      IN - Input NDF /@test/ > $KAPPA_DIR/comwest
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 The description of parameter FWHM is too brief for us to select a value.
 So we obtain some help on this parameter, and then GAUSMOOTH reprompts
 for a value.  The smoothed NDF is written to the NDF called {\tt testsm}
 in the current directory.
 
-\small
+\latex{\small}
 \begin{verbatim}
      FWHM - Gaussian PSF full-width at half-maximum /5/ > ?
 
@@ -1170,7 +1170,7 @@ in the current directory.
      FWHM - Gaussian PSF full-width at half-maximum /5/ >
      OUT - Output NDF > testsm
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Next we want to look at the result of our image processing.  The first
 thing to do is to select an graphics device.  The {\tt xwindows} device
@@ -1179,11 +1179,11 @@ becomes the current graphics device and remains so until the next
 {\tt xdisplay} command (\xref{SUN/129}{sun129}{}) to redirect
 the output from the host computer to the screen in front you.)
 
-\small
+\latex{\small}
 \begin{verbatim}
      % gdset xwindows
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Now we actually display it on the screen.  Some applications have
 many parameters, and it would be impractical to have to specify all
@@ -1194,22 +1194,22 @@ current percentile range.  Note that you may abbreviate the options
 of a menu, such as offered by parameter MODE, to any unambiguous
 string.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % display mode=pe accept
      Data will be scaled from 78.38278 to 235.3536.
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 If you have just created the window, the image will not look much like
 the comet, because the existing colour table is poor.  If we replace
 the table with a grey-scale ramp from white to black,
 
-\small
+\latex{\small}
 \begin{verbatim}
      % lutneg
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 what happens depends on your workstation hardware and settings.  If your
 graphics system is set to 256 colours (technically, an \emph{8-bit
@@ -1243,22 +1243,22 @@ table\footnote{Again, you will need to re-display the image to see the
 effects of this command unless your graphics system is set to 256
 colours.}:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % lutwarm
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 If you are not happy with this colour table, you may want to explore a
 wider range of colour tables using the \htmlref{LUTEDIT}{LUTEDIT} 
 command which provides a complete graphical user interface for
 manipulating and viewing colour tables.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % lutedit image=$KAPPA_DIR/comwest
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \subsection{From ICL}
 \ICLref\ is a command language designed for use with Starlink applications,
@@ -1275,11 +1275,11 @@ from the accept backslash.
 
 Let's start the second example.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % icl
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 This starts \ICL.  System, local and user-defined \ICL
 login files are invoked.  Here there is only a system login procedure
@@ -1290,7 +1290,7 @@ We enter it after receiving the \ICL\ prompt.
 
 You should see something like the following.
 
-\small
+\latex{\small}
 \begin{verbatim}
     ICL (UNIX) Version 3.1-9 14/02/2000
 
@@ -1307,27 +1307,27 @@ You should see something like the following.
         Type `help kappa' or `kaphelp' for help on KAPPA commands.
  
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Now we run an application, \htmlref{ADD}{ADD}, that adds the pixels in
 {\tt \$KAPPA\_DIR/comwest.sdf} to those in {\tt \$KAPPA\_DIR/ccdframec.sdf}. 
 Although these images have different
 dimensions, the intersection is made.
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> add $KAPPA_DIR/comwest $KAPPA_DIR/ccdframec
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 After the first \KAPPA\ command is issued you'll see an arcane
 message like this.
 
-\small
+\latex{\small}
 \begin{verbatim}
      Loading /star/bin/kappa/kappa_mon into kappa_mon11601 (attached)
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 It just tells you that the \KAPPA\ monolith is being loaded.
 You'll see similar messages for each of the three monoliths when they
@@ -1337,13 +1337,13 @@ Since we did not give the name of the destination
 \xref{NDF}{sun33}{overview_of_an_ndf} that will hold the co-added NDFs,
 ADD prompts for it.  Notice that literal parameters are case insensitive.
 
-\small
+\latex{\small}
 \begin{verbatim}
      OUT - Output NDF / / > demo1
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> ndftrace \
 
@@ -1361,7 +1361,7 @@ ADD prompts for it.  Notice that literal parameters are case insensitive.
             Storage form:  PRIMITIVE
             Bad pixels may be present
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 This shows that the {\tt demo1} NDF has the same dimensions as the
 smaller of the two NDFs.
@@ -1370,7 +1370,7 @@ We were going to display the image on the current graphics device, but
 then changed our minds.  A {\tt !!} in response to a prompt
 \htmlref{aborts}{se:abortnull} a task.
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> display demo1
      MODE - Method to define the scaling limits /'PERCENTILES'/ > !!
@@ -1379,16 +1379,16 @@ then changed our minds.  A {\tt !!} in response to a prompt
      - "DISPLAY"
      ADAMERR  %PAR, Parameter request aborted
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \KAPPA\ uses the graphics database, which records the positions
 and extents of graphs and images, collectively called pictures.
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> picgrid 2 1
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 This instruction divides the display surface into two equally sized
 pictures, side by side.  They are labelled 1 and 2 in the database.
@@ -1399,7 +1399,7 @@ Thus in picture 1 we display an image of Comet West around which we
 draw annotated axes.  The backslash causes the current scaling method
 to be used.
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> display comwest axes \
      !! Error accessing file '/home/scratch/mjc/comwest.sdf' -
@@ -1407,49 +1407,49 @@ to be used.
      !  HDS_OPEN: Error opening an HDS container file.
      !  NDF_ASSOC: Unable to associate an NDF structure with the '%IN' parameter.
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \htmlref{DISPLAY}{DISPLAY} could not find the a {\tt comwest.sdf} in
 the current directory.  So there is an error message and we are
 prompted.  This time we remember to add the environment variable.
 
-\small
+\latex{\small}
 \begin{verbatim}
      IN - NDF to be displayed /@comwest_bas/ > $KAPPA_DIR/comwest
      Data will be scaled from 67.46276 to 226.5568.
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 An image of Comet West should be visible to the left of the screen.
 
 \htmlref{SHADOW}{SHADOW} creates an image that appears like a bas-relief.  We've called
 the resulting NDF comwest\_bas.  The backslash causes the current NDF
 to be the input NDF for SHADOW.
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> shadow out=comwest_bas \
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 We select the right-hand picture created earlier.
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> picsel 2
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 As above we display the current NDF, the bas-relief image, with annotated
 axes on the right of the raw comet image (we do not need to request the
 axes explicitly this time, since the {\tt axes} parameter retains the
 value used in the previous invocation until changed).
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> display border \
      Data will be scaled from -4.721756 to 5.697861.
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 The relief looks best with a grey-scale colour table.  Note that this
 does not affect the colour of the border.  \htmlref{LUTGREY}{LUTGREY}
@@ -1457,12 +1457,12 @@ is a procedure which calls a more-general application.  Since it is
 the first procedure we've invoked there is a short pause while all the
 \KAPPA\ procedures are compiled and loaded.
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> lutgrey
      Loading procedure file $KAPPA_DIR/kappa_proc.icl
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Next we decide to make a hard copy of the bas-relief image. 
 \htmlref{DISPLAY}{DISPLAY} does this and can add a key of grey levels
@@ -1473,7 +1473,7 @@ If this name isn't recognised at your site, issue the
 names.  Select the landscape PostScript device.  We scale between
 wider limits to reduce the glare.
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> display key=yes device="/PS"
      IN - NDF to be displayed /@comwest_bas/ >
@@ -1481,7 +1481,7 @@ wider limits to reduce the glare.
      LOW - Low value for display /187.5625/ > 11
      HIGH - High value for display /-183.453125/ > -8.33
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 DISPLAY does not send your plot to the printer, since this is hardware
 and node dependent.  Therefore, you must issue a shell command
@@ -1489,22 +1489,22 @@ from \ICL\ to perform this action.  That's not difficult---just
 insert a {\tt{!}} before the UNIX command, and in most cases just issue
 the command as if you were in the shell, like we do below.
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> !lpr -P1 pgplot.ps
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Shell aliases may also be used, so if {\tt ri} equates to {\tt rm -i},
 we could remove any unwanted \HDSref\ files.  If you don't
 have this symbol, as is likely, then you will receive the appropriate
 error message from \ICL.
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> ri *.sdf
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 That's the end of the second demonstration.  Of course, these
 introductions have only scratched the surface of what \KAPPA\ can
@@ -1536,11 +1536,11 @@ indicated.  The choice is yours.
 
 To run \KAPPA\ from the shell just enter the following command.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % kappa
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 This executes a procedure setting up aliases for \KAPPA's
 command names and to make help information available.  Then you'll be
 able to mix \KAPPA\ commands with the familiar shell ones. 
@@ -1549,38 +1549,38 @@ If the {\tt kappa} command is not recognised, you probably haven't
 enabled the Starlink software.  In your {\tt .cshrc} or {\tt .tcshrc}
 file, you insert the line
 
-\small
+\latex{\small}
 \begin{verbatim}
      source /star/etc/cshrc
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 and in {\tt .login} you include the equivalent line
 
-\small
+\latex{\small}
 \begin{verbatim}
      source /star/etc/login
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 At non-Starlink sites the {\tt /star} path may be different.
 
 To run \KAPPA\ from \ICL\ you have to start up the
 command language if you are not already using it.  This requires just
 one extra command, namely
 
-\small
+\latex{\small}
 \begin{verbatim}
      % icl
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 You will see any messages produced by system and user procedures, followed
 by the {\tt ICL>} prompt.  Again there is a procedure for making the
 commands known to the command language, and not unexpectedly, it too is
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> kappa
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 Then you are ready to go.  Not too painful, was it?  In either case
 you'll see message from \KAPPA\ telling you which version is
 ready for use.
@@ -1606,22 +1606,22 @@ commands may also be abbreviated provided they are unambiguous strings
 with at least four characters.  Commands shorter than five characters,
 therefore, cannot be shortened.  So
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> CREF
      ICL> crefr
      ICL> CreFra
      ICL> CREFRAM
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 would all run CREFRAME.  Whereas
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> FITS
      ICL> FITSI
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 would be ambiguous, since there are several commands beginning
 {\tt FITS}, and two starting {\tt FITSI}, namely FITSIN and FITSIMP.
 
@@ -1631,11 +1631,11 @@ command will run that command in the package last activated.  You can
 ensure running the \KAPPA\ command by inserting a {\tt kap\_}
 prefix before the command name.  For example,
 
-\small
+\latex{\small}
 \begin{verbatim}
       % kap_rotate
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 will execute \KAPPA's \htmlref{ROTATE}{ROTATE} application.  There may also be a
 clash with UNIX commands and shell built-in functions, though there are
 now far fewer conflicts than in earlier versions of \KAPPA, with
@@ -1659,11 +1659,11 @@ A modified version of this document exists in hypertext form.  One way
 to access it is to use the
 \xref{{\tt showme}}{sun188}{displaying_parts_of_documents} command
 
-\small
+\latex{\small}
 \begin{verbatim}
      % showme sun95
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 and a Web browser will appear, presenting the index to the hypertext
 form of this document.  The hypertext permits easy location of
 referenced documents and applications.  It also includes colour
@@ -1673,11 +1673,11 @@ The \xref{{\tt findme}}{sun188}{performing_keyword_searches}
 command lets you search the Starlink documents by
 keywords.  For instance,
 
-\small
+\latex{\small}
 \begin{verbatim}
      % findme masking
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 searches the document looking for the word `masking' in
 them.  The level of searching depends on whether a match is found.
 The search starts with the document title, the page (section)
@@ -1687,22 +1687,22 @@ level of the search.  The search string may include {\bf sed} or
 {\bf grep} regular expressions.  See \xref{SUN/188}{sun188}{}
 or enter
 
-\small
+\latex{\small}
 \begin{verbatim}
      % findme findme
      % findme showme 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 to learn more about the {\tt findme} and {\tt showme} commands.
 
 \subsubsection{Entering the Help System}
 To access the \KAPPA\ help use \htmlref{KAPHELP}{KAPHELP}.
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> kaphelp
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 The system responds by introducing \KAPPA's help library,
 followed by a long list of topics for which help is available,
 followed by the prompt {\tt Topic?}.  These topics are mostly the
@@ -1713,12 +1713,12 @@ selecting a graphics device.
 From \ICLref\ \normalsize you can issue other commands for
 obtaining help about \KAPPA.
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> help kappa
      ICL> help packages
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 The former is nearly equivalent to entering {\tt kaphelp}.  However,
 it is less easy to use as it lacks many of the navigational aids of
 KAPHELP.  The latter gives a summary of Starlink packages available
@@ -1753,61 +1753,61 @@ the rules for wildcarding and abbreviating topics.
 Help on an individual \KAPPA\ application is simply achieved by
 entering {\tt kaphelp} followed by the command name, for example
 
-\small
+\latex{\small}
 \begin{verbatim}
      % kaphelp centroid
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 will give the description and usage of the CENTROID command.  There
 are subtopics which contain details of the parameters, including
 defaults, and valid ranges; examples; notes expanding on the
 description; implementation status; and occasionally timing. For
 example,
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> kaphelp hist param ndf
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 gives details of parameter {\tt NDF} in all applications prefixed by
 {\tt HIST}.
 
 (From \ICL\ you can also invoke its help system, thus
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> help centroid
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 is similar to {\tt kaphelp centroid}, though the \ICL\ system has
 drawbacks, and you are recommended to run \htmlref{KAPHELP}{KAPHELP}.)
 
 The instruction
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> kaphelp classified
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 displays a list of subject areas as subtopics.  Each subtopic lists and
 gives the function of each \KAPPA\ application in that
 classification.  There is also an alphabetic list which can be obtained
 directly via the command
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> kaphelp summary
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \subsection{Changing the Current Directory in ICL}
 You should change default directories in \ICLref\ using its
 DEFAULT command, and not {\bf cd}.  Thus
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> default /home/scratch/dro
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 makes {\tt /home/scratch/dro} the default directory for the 
 \ICL\ \normalsize session, and for existing and future subprocesses,
 including application packages.
@@ -1831,22 +1831,22 @@ From \ICLref\ this ought to return you to a prompt, but the
 processing will continue.  Then you can stop the running process by
 `killing' it.  First find the task name
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> tasks
                            TASKNAME  Process Id
 
                    ndfpack_mon16528  15186
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 and then kill it.
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> kill ndfpack_mon16528
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 This removes a the \NDFPACK\ monolith.  \NDFPACK\ will be
 loaded again once you enter one its commands.  If pressing {\tt CTRL/C}
 several times fails to return you to an \ICL\ prompt then
@@ -2011,11 +2011,11 @@ You can also find them by obtaining online help on a specific
 parameter.  They are enclosed in square brackets at the end of the
 parameter description.
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> kaphelp median param *
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 gives details of all parameters in application
 \htmlref{MEDIAN}{MEDIAN}.  Other packages have similar help
 commands.  If you want to override one of these defaults,
@@ -2026,35 +2026,35 @@ value in {\tt / /} delimiters.  You can choose to accept the default by
 pressing carriage return.  For example, {\tt 64} is the suggested value
 below.
 
-\small
+\latex{\small}
 \begin{verbatim}
      XDIM - x dimension of output array /64/ >
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 Alternatively, enter a different value
 
-\small
+\latex{\small}
 \begin{verbatim}
      XDIM - x dimension of output array /64/ > 109
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 to override the default.
 Some defaults begin with an {\tt @}.
 
-\small
+\latex{\small}
 \begin{verbatim}
      IN - Input image /@starfield/ >
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 These are associated with files (text and \HDSref ) and devices (graphics
 and tape).  If you want to override the default given, you do not have
 to prefix your value with an {\tt @}, {\emph{e.g.}}
 
-\small
+\latex{\small}
 \begin{verbatim}
      DEVICE - Name of display device /@xwindows/ > x2w
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 There are rare cases when the syntax is ambiguous, and it is then that you
 need to include the {\tt @}.
 \latexhtml{Section~\ref{se:parstrings}}{\htmlref{Strings}{se:parstrings}}
@@ -2069,7 +2069,7 @@ value of the parameter will be substituted, or a dynamic value is
 suggested depending on the values of other parameters.  Here is an
 example comprising a loop within an application.
 
-\small
+\latex{\small}
 \begin{verbatim}
 
      NDF - NDF to examine /@horsehead > 
@@ -2084,7 +2084,7 @@ example comprising a loop within an application.
         .              .               .              .
 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 and so on.  Notice that the current values of the centres are the
 suggested values at the second prompt.
 
@@ -2149,7 +2149,7 @@ The values of all global parameters may be inspected with the
 \htmlref{GLOBALS}{GLOBALS} task.  You can make them undefined using
 \htmlref{NOGLOBALS}{NOGLOBALS}.
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> globals
      The current data file                : @/home/dro/jkt/ccdpic
@@ -2158,7 +2158,7 @@ The values of all global parameters may be inspected with the
      The current transformation is        : @/home/dro/deform/warpit
      The current interaction mode is      : <undefined>
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 In the above example no interaction mode is defined.  The next time
 you call an application which uses the interaction mode you
 would be prompted for a value.  (Under normal circumstances you will not
@@ -2174,22 +2174,22 @@ treated as separate positional parameters.
 
 From the shell the quotes must be escaped.  For example,
 
-\small
+\latex{\small}
 \begin{verbatim}
      % settitle myndf \"A new title\"
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 would assign the title {\tt "A new title"} to the NDF called myndf.
 
 To indicate that the parameter should come from a data-structure object,
 prefix the name with an {\tt @} to tell the parameter system that it is
 a file name, and not a literal value.
 
-\small
+\latex{\small}
 \begin{verbatim}
      TITLE - New NDF title /' '/ @$ADAM_USER/galaxy.mytitle
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 In this example TITLE has the value of object MYTITLE in {\tt
 galaxy.sdf}.  If the {\tt @} were omitted TITLE would be {\tt
 "\$ADAM\_USER/galaxy.mytitle"}.  You will need the {\tt @} prefix if your
@@ -2207,11 +2207,11 @@ are treated literally.
 If a parameter requires an array of values, the series
 should be in brackets separated by commas or spaces.  For example,
 
-\small
+\latex{\small}
 \begin{verbatim}
      PERCENTILES - List of percentiles > [25,95.5,75]
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 would input three values: 25, 95.5, and 75 into the real parameter
 PERCENTILES.  If the application is expecting an exact number of values
 you will be reprompted, either for all the values if you give too many,
@@ -2221,13 +2221,13 @@ response to a prompt for a one-dimensional numeric array as above.
 
 From the shell you must escape the brackets.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % display key=yes mode=pe percentiles=\[95,5\]
      % display key=yes mode=pe percentiles='[95,5]'
      % display key=yes mode=pe percentiles="[95,5]"
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 All the above do this.  Single quotes have the advantage
 that you can protect all the metacharacters that lie between
 the quotes, so you don't need to escape each metacharacter.
@@ -2235,11 +2235,11 @@ the quotes, so you don't need to escape each metacharacter.
 Arrays of parameter values should appear in nested brackets.  For
 example,
 
-\small
+\latex{\small}
 \begin{verbatim}
      CVALUE - Component values > [[2,3],[5,4],[7,1]]
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 supplies the values for a 2$\times$3-element parameter array, where
 element (1,3) has value 7.
 
@@ -2263,7 +2263,7 @@ prematurely can leave files mapped or corrupted.
 To get help about a parameter enter {\tt ?}.  Usually, this will give
 access to the help-library information for that parameter, for example,
 
-\small
+\latex{\small}
 \begin{verbatim}
      BOX - Smoothing box size /3,3/ > ?
 
@@ -2282,7 +2282,7 @@ access to the help-library information for that parameter, for example,
 
      BOX - Smoothing box size /3,3/ >
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 and then immediately reprompt you for the parameter.  There are
 occasions when information about the parameter is insufficient; you
 may require to examine the examples or the description of related
@@ -2297,7 +2297,7 @@ You do not have to enter the full option string, but merely a string
 that selects a choice unambiguously.  In many cases this can be as
 little as a single character.  Here is an example,
 
-\small
+\latex{\small}
 \begin{verbatim}
      MODE - Method for selecting contour heights /'Free'/ > ?
          The method used to select the contour levels.  The options are
@@ -2321,7 +2321,7 @@ little as a single character.  Here is an example,
                          level.
 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 where an {\tt F} would be sufficient to select the {\tt "Free"} option,
 but at least two characters would be needed if you wanted {\tt "Area"}
 or {\tt "Automatic"}.
@@ -2339,11 +2339,11 @@ an environment variable pointing to a directory containing the
 NDF called ngc1365, you could access it at a prompt as shown
 below.
 
-\small
+\latex{\small}
 \begin{verbatim}
      IN - Input image /@starfield/ > $IMAGEDIR/ngc1365
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \subsection{\xlabel{se_cmdlindef}Specifying Parameter Values on Command Lines
 \label{se:cmdlindef}}
@@ -2368,28 +2368,28 @@ specifications}{ap:full}.}
 Keywords may appear in any order.
 Here is an example of command-line defaults using keywords.
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> picdef current fraction=0.4
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 FRACTION is a real parameter.  CURRENT is a logical parameter; by giving
 just its name it is assigned the value {\tt TRUE}.  {\tt CURRENT=T} would
 have the same effect.  To obtain a {\tt FALSE} value for a logical parameter
 you add a {\tt NO} prefix to keyword, for example,
 
-\small
+\latex{\small}
 \begin{verbatim}
      icl> picdef nocurrent
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 would be equivalent to the following.
 
-\small
+\latex{\small}
 \begin{verbatim}
      icl> picdef current=false
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \subsubsection{\xlabel{se_parabbrev}Abbreviations\label{se:parabbrev}}
 
@@ -2399,12 +2399,12 @@ must first create an environment variable called {\tt ADAM\_ABBRV}
 with an arbitrary value.
 
 So for example
-\small
+\latex{\small}
 \begin{verbatim}
      % setenv ADAM_ABBRV true
      % display mo=pe pe=\[5,95\] ba=blue
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 would display an NDF between the 5 and 95 percentiles, and marking bad
 pixels in blue.
 
@@ -2417,11 +2417,11 @@ intended.
 Alternatively, you can specify command-line values by position.
 Here is an example.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % thresh raw clipped 0 255
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 This applies thresholds to the NDF called raw to form a new NDF
 called clipped.  The values between 0 and 255 are unchanged.  Note that
 trailing parameters may be omitted---NEWLO and NEWHI in the above
@@ -2458,20 +2458,20 @@ behaviour, usually to inhibit a loop for procedures, or to eliminate
 unnecessary processing.
 For instance,
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> centroid blob init="51,42" mode=i
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 will determine the centroid near the point (51,42) in the NDF called
 blob, and then it exits, whereas without the INIT value you would be
 reprompted for a further initial position; and
 
-\small
+\latex{\small}
 \begin{verbatim}
      % display galaxy mode=sc high=3000 low=1000
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 prevents the calculation of the extreme values of the NDF called
 galaxy that are normally given as suggested defaults for parameters
 HIGH and LOW, because HIGH and LOW are already known.
@@ -2511,20 +2511,20 @@ application to work properly.  For example,
 OUT, the name of the output NDF.  If we run the application
 like this:
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> creframe accept
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 it would fail in the sense that it would still have to prompt for a
 value---it does not know where to write the output NDF. 
 However, if we run CREFRAME like this:
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> creframe out=stars accept
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 it would generate an output image using default values for all the
 parameters except OUT, and write the output to file {\tt stars.sdf}.
 Another point to be wary of is that some applications have loops,
@@ -2537,31 +2537,31 @@ Sometimes the keyword ACCEPT can be used without any parameter value
 specifications on the command line.
 For example, we could follow the above command by the command:
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> look accept
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 and the central 7$\times$7 array of the image created by CREFRAME would
 be displayed on your terminal without any parameter values being
 prompted.  The symbol \verb+\+ has the same effect as ACCEPT
 when used on the command line or at prompts, thus:
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> look \
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 would have the same effect as the previous example---and is quicker
 to type.  In command lines from the shell, the backslash is a
 metacharacter and has to be escaped.  The easiest way to do that is
 to double the backslash.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % look \\
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 How do you find out which parameters have suggested defaults, as
 opposed to those that are normally defaulted?  Well, a good rule of
@@ -2577,11 +2577,11 @@ then put them on the command line in your procedure.
 
 The RESET and ACCEPT keywords will work in tandem.  So for instance,
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> look reset accept
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 will reset the suggested defaults of LOOK to their
 original, preset values, and accept these as the parameter values.
 
@@ -2599,11 +2599,11 @@ supply {\tt MIN} to select the minimum-allowed value, and {\tt MAX}
 to select the maximum.  This applies both on the command line and at
 prompts.  In the example,
 
-\small
+\latex{\small}
 \begin{verbatim}
      % block wlim=max
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 parameter WLIM takes its maximum (1.0) meaning that if any of the
 input pixels in the smoothing box is bad, the corresponding output
 pixel is set bad.
@@ -2613,11 +2613,11 @@ parameter has such a range.  If you attempt to use {\tt MIN} and
 {\tt MAX} where there is no range defined, you'll see an error
 message like
 
-\small
+\latex{\small}
 \begin{verbatim}
     !! SUBPAR_MNMX: Parameter FONT - no upper limit set
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 and you'll be invited to give another value.
 
 \subsection{\xlabel{se_groups}Specifying Groups of Objects\label{se:groups}}
@@ -2654,11 +2654,11 @@ usually required, as in the following example where a group expression
 (in this case, a comma-separated list) is used to specify a plotting
 style:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % display style='"grid=1,colour(grid)=red,title=My new image"'
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 These quotes are not required if the group expression is given in
 response to a prompt.
@@ -2686,12 +2686,12 @@ processed in the same way as a group expression supplied directly.  In
 particular, a text file may contain references to other text files.  If
 the file \verb+style.dat+ contained the following two lines:
 
-\small
+\latex{\small}
 \begin{verbatim}
    grid=1,colour(grid)=red,border=1
    colour(border)=red,^labels.dat
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 then the strings \verb+grid=1+, \verb+colour(grid)=red+, \verb+border=1+
 and \verb+colour(border)=red+ would be returned to the application, and
@@ -2739,11 +2739,11 @@ strings.
 
 For instance;
 
-\small
+\latex{\small}
 \begin{verbatim}
    A{^file}B|my|your|
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 This will read strings from the text file \verb+file+.  Each occurence of
 the string {\tt "my"} will then be replaced by {\tt "your"}.  The resulting
@@ -2780,12 +2780,12 @@ these characters within the strings being passed to the application.  For
 instance, if you want to specify a group of data files using a shell
 pipe-line, you may want to do something like:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % display 
      IN - NDF to be displayed > `find . -newer a.fit | grep good `
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Within a group expression, the \verb+|+ character indicates a request for
 a string substitution (as described above).  In this case, the GRP library
@@ -2799,12 +2799,12 @@ special meaning within the context of a group expression is ignored.
 To escape a group expression syntax character, it should be preceded
 with a backslash (\verb+"\"+).  So the above command should be changed to:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % display 
      IN - NDF to be displayed > `find . -newer a.fit \| grep good `
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Any other special character can be escaped in the same way.  For instance,
 you can escape commas within text strings using this method.
@@ -2865,11 +2865,11 @@ therefore contain the 16 output NDFs in components \verb+I1+ to
 are all possible responses:
 \medskip
 
-\small
+\latex{\small}
 \begin{verbatim}
    b1,b2,b3,b4
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 \latex{\vspace{-4mm}}
 
 This means ``Use the NDFs stored in files \verb+b1.sdf+, \verb+b2.sdf+,
@@ -2885,48 +2885,48 @@ and {\tt .fit} formats within {\tt NDF\_FORMATS\_IN}.  If you want to restrict
 things explicitly to a particular data format, then you should include
 the corresponding file type in the group expression.  An example such as:
 
-\small
+\latex{\small}
 \begin{verbatim}
    b1.fit,b2.fit,b3.fit,b4.fit
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 \latex{\vspace{-4mm}}
 would read just the specified FITS files.
 \medskip
 
-\small
+\latex{\small}
 \begin{verbatim}
    cena_b1-
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 \latex{\vspace{-4mm}}
 This means ``Use \verb+cena_b1.sdf+ and then (because of the hyphen
 at the end) ask the user for more data files''.
 \medskip
 
-\small
+\latex{\small}
 \begin{verbatim}
    *
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 \latex{\vspace{-4mm}}
 This means ``Use all accessible data files in the current directory''. 
 \medskip
 
-\small
+\latex{\small}
 \begin{verbatim}
    hh1_b1s*_ds
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 \latex{\vspace{-4mm}}
 This means ``Use \verb+hh1_b1s1_ds.sdf+, \verb+hh1_b1s2_ds.sdf+, \emph{etc.}''.
 \medskip
 
-\small
+\latex{\small}
 \begin{verbatim}
    hh1_b[12]s*_ds
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 \latex{\vspace{-4mm}}
 This means ``Use \verb+hh1_b1s1_ds.sdf+, \verb+hh1_b1s2_ds.sdf+,
 \emph{etc.}, and also \verb+hh1_b2s1_ds.sdf+, \verb+hh1_b2s2_ds.sdf+,
@@ -2937,62 +2937,62 @@ digit character.  The string {\tt "[a-z]"} would match any single lowercase
 alphabetical character.
 \medskip
 
-\small
+\latex{\small}
 \begin{verbatim}
    data.fit[12]
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 \latex{\vspace{-4mm}}
 This means ``Use files \verb+data.fit1+ and \verb+data.fit2+ if they
 exist.  If neither of these files exists, use the twelth image extension 
 in the multi-extension FITS file \verb+data.fit+''.
 \medskip
 
-\small
+\latex{\small}
 \begin{verbatim}
    ^files.lis
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 \latex{\vspace{-4mm}}
 This means ``Read the names of data files from the text file
 \verb+files.lis+.''
 \medskip
 
-\small
+\latex{\small}
 \begin{verbatim}
    ../data/*
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 \latex{\vspace{-4mm}}
 This means ``Use all accessible data files contained in the directory 
 \verb+../data+''.
 \medskip
 
-\small
+\latex{\small}
 \begin{verbatim}
    data_{new,old,back}
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 \latex{\vspace{-4mm}}
 This means ``Use files \verb+data_new.sdf+, \verb+data_old.sdf+ and
 \verb+data_back.sdf+''.
 \medskip
 
-\small
+\latex{\small}
 \begin{verbatim}
    {^files}_A
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 \latex{\vspace{-4mm}}
 This means ``Read names of data files from text file \verb+files+ and 
 append \verb+_A+ to the end of each one''.
 \medskip
 
-\small
+\latex{\small}
 \begin{verbatim}
    `grep -l "OBJECT  = 'm57'" *.fit`
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 \latex{\vspace{-4mm}}
 
 The string is enclosed in back quotes (\verb+`+) which causes the string
@@ -3004,39 +3004,39 @@ contain an OBJECT keyword equal to {\tt 'm57'}''.
 \item If an application asks for a group of output data files, the following 
 are possible responses:
 
-\small
+\latex{\small}
 \begin{verbatim}
    file1,file2,file3
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 \latex{\vspace{-4mm}}
 This means ``Create \verb+file1.sdf+, \verb+file2.sdf+ and \verb+file3.sdf+''.
 \medskip
 
-\small
+\latex{\small}
 \begin{verbatim}
    ^out.dat
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 \latex{\vspace{-4mm}}
 This means ``Read the names of the output data files from text file \verb+out.dat+''.
 \medskip
 
-\small
+\latex{\small}
 \begin{verbatim}
    *_ds
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 \latex{\vspace{-4mm}}
 This means ``Append the string {\tt "\_ds"} to the end of all 
                       the input data file names.''
 \medskip
 
-\small
+\latex{\small}
 \begin{verbatim}
    ../bk/*|_ds|_bk|
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 \latex{\vspace{-4mm}}
 This means ``Substitute the string {\tt "\_bk"} for all  occurrences of the string
 {\tt "\_ds"} in the  input data file names, and put the files in 
@@ -3062,13 +3062,13 @@ From the shell you can access these output parameters using the
 want to subtract the mean of an NDF called myndf to make an
 a new NDF called outndf.
 
-\small
+\latex{\small}
 \begin{verbatim}
     % stats myndf > /dev/null
     % set mean = `parget mean stats`
     % csub myndf $mean outndf 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \htmlref{STATS}{STATS} calculates the statistics of myndf,
 the displayed output being discarded.  PARGET reports the mean value
@@ -3078,13 +3078,13 @@ command subtracts the mean from myndf.
 
 You can obtain vector values too.
 
-\small
+\latex{\small}
 \begin{verbatim}
     % ndftrace myndf > /dev/null
     % set axlab = `parget alabel ndftrace`
     % display otherndf style="'label(1)=$axlab[1],label(2)=$axlab[2]"' axes 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 This displays the image otherndf surrounded by axes, but the plot's
 axis labels originate from another dataset called myndf
@@ -3103,12 +3103,12 @@ There are more examples in the \xref{{\sl C-Shell Cookbook}}{sc4}{}.
 At the time of writing, \ICLref\@ only permits scalar variables.  To do the
 first example above from \ICL, you would enter something like this.
 
-\small
+\latex{\small}
 \begin{verbatim}
     ICL> stats myndf mean=(vmean)
     ICL> csub myndf (vmean) outndf 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 {\tt vmean} is an ICL variable.  The parentheses have the same effect
 as the \verb+$+ in the C-shell example, meaning ``the value of'' the
 variable.  Note that you can't redirect the output to {\tt /dev/null}.
@@ -3178,11 +3178,11 @@ us to perform other necessary actions just once.
 There is a command for selecting the current graphics device:
 \htmlref{GDSET}{GDSET}.  For example,
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> gdset xwindows
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 A selection remains in force until you change it using GDSET again, use
 \htmlref{NOGLOBALS}{NOGLOBALS}, or delete the globals file.  The current
@@ -3194,11 +3194,11 @@ You can override the global parameter for the duration of a single
 application by specifying it by keyword (normally {\tt DEVICE=}), or in
 some applications, by position.  Here is an example.
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> contour device=ps_p
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \subsubsection{\xlabel{se_x-windows}X-windows\label{se:x-windows}}
 
@@ -3216,19 +3216,19 @@ running the \KAPPA\ executables you will need to redirect
 output to your screen, if you have not already done so for some other
 software.  You either use the \xref{{\tt xdisplay}}{sun129}{} command
 
-\small
+\latex{\small}
 \begin{verbatim}
     % xdisplay myterm.mysite.mydomain.mycountry
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 or set the DISPLAY environment variable to point to the address of
 your screen.
 
-\small
+\latex{\small}
 \begin{verbatim}
     % setenv DISPLAY myterm.mysite.mydomain.mycountry:0
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 You substitute your machine's address or IP number.  (Ask your
 computer manager.)
 
@@ -3240,11 +3240,11 @@ allocated, the size and location of the window.  These defaults may be
 altered with an X-defaults file, or a window created with the 
 \GWM\ {\bf xmake} command.
 
-\small
+\latex{\small}
 \begin{verbatim}
     % xmake xwindows -geom 600x450 -fg yellow -bg black
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 This example makes a window of dimension 600-by-450 pixels, the
 background colour is black and colour for the line graphics is
 yellow. 
@@ -3254,12 +3254,12 @@ compromise, as it maximises the number of colour indices for the
 graphics window (xwindows), and has a second graphics window (x2windows).  
 In the defaults file there are the following lines
 
-\small
+\latex{\small}
 \begin{verbatim}
      gwm*xwindows*colours:         80
      gwm*xwindows2*colours:        20
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 and you can also set the sizes of the windows too.  Notice that the
 second device name is x2windows, but the window name is xwindows2.
 Don't ask why.  This
@@ -3275,11 +3275,11 @@ The following tells \KAPPA\ that this is the current device.
 This remains as a global parameter, so you probably will not need to
 issue this command that often.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % gdset x2windows
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 \bigskip
 
 \subsection{Composite Hardcopy Plots}
@@ -3307,7 +3307,7 @@ combine the plots.
 To give an example, suppose we wanted to overlay a contour plot
 on an image.
 
-\small
+\latex{\small}
 \begin{verbatim}
     % gdset epsfcol_l
     % display $KAPPA_DIR/comwest lut=$KAPPA_DIR/spectrum_lut mode=ra axes
@@ -3317,11 +3317,11 @@ on an image.
     % psmerge display.ps contour.ps  > myplot.ps
     % rm display.ps contour.ps 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 or alternatively:
 
-\small
+\latex{\small}
 \begin{verbatim}
     % display $KAPPA_DIR/comwest device="epsfcol_l;display.ps" \
               lut=$KAPPA_DIR/spectrum_lut mode=ra axes
@@ -3329,7 +3329,7 @@ or alternatively:
     % psmerge display.ps contour.ps  > myplot.ps
     % rm display.ps contour.ps 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 You then print {\tt myplot.ps} to the colour PostScript printer.
 {\footnotesize PSMERGE} \normalsize also has options for scaling and rotating plots.
@@ -3353,12 +3353,12 @@ A plotting attribute has a \emph{name} and a \emph{value}.
 Strings which assign new values to particular plotting attributes are
 called attribute setting strings.  For instance:
 
-\small
+\latex{\small}
 \begin{verbatim}
    Border=1
    Title=This is my plot title
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 are two attribute setting strings.  The first assigns the value {\tt 1} to
 the attribute called {\att Border}, and the second assigns the string
@@ -3403,12 +3403,12 @@ Some attribute names can be qualified so that they refer to a particular
 component of the plot.  This is done by putting the qualifier in
 parentheses after the attribute name.  For instance:
 
-\small
+\latex{\small}
 \begin{verbatim}
    Colour(border)=2
    Edge(2)=left
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 assigns the value {\tt 2} to the {\att Colour} attribute for the plot border,
 and assigns the value {\tt left} to the {\att Edge} attribute for the second
@@ -3538,7 +3538,7 @@ setting strings in a text file, one per line, and then just give the name
 of this text file (preceded by an up-arrow) as the value for the STYLE
 parameter.  For instance, the file {\tt style.dat} may contain:
 
-\small
+\latex{\small}
 \begin{verbatim}
    # A test plotting style
    
@@ -3546,18 +3546,18 @@ parameter.  For instance, the file {\tt style.dat} may contain:
    edge(2)=right
    title=This is my title
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 The first line and the following blank line are ignored.  The remaining three
 lines specify three attribute values to use.  When running an application
 such as \htmlref{DISPLAY}{DISPLAY}, this style file would be specified on
 the command line as follows:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % display style=^style.dat
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Alternatively, you can specify the setting strings explicitly on the
 command line.  This can get a bit messy because you need to protect 
@@ -3569,11 +3569,11 @@ character is not one of these special characters, and so a simple
 reference to a single text file does not need to be enclosed in quotes.}
 So the above style could be given on the command line as follows:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % display style="'width=2,edge(2)=right,title=This is my title'"
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 A bit messy as I said! However, it can be useful to combine this method
 with the previous method.  If you have a long, complicated style file, and 
@@ -3585,11 +3585,11 @@ the results look like, you can avoid the trouble of editing the style file
 by giving both the original style file \emph{and} the new attribute settings 
 on the command line.  For instance:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % display style="'^style.dat,width=3'"
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 This reads the contents of our test style file {\tt style.dat}, which
 includes the attribute setting {\tt width=2}.  It then also applies the
@@ -3599,11 +3599,11 @@ the value of several attributes at once, you could put the new attribute
 settings into a second file, say {\tt style2.dat}, and then run the 
 application as follows:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % display style="'^style.dat,^style2.dat'"
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Again, the contents of {\tt style.dat} would be read, followed by the
 contents of {\tt style2.dat}, over-writing any settings for the same
@@ -3630,12 +3630,12 @@ You should remember that a synonym is simply an alternative way of
 specifying a particular attribute.  So if you are running CONTOUR and you
 give the two setting strings:
 
-\small
+\latex{\small}
 \begin{verbatim}
    Colour(cont)=red
    Colour(curve)=blue
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 the contours will appear blue, not red, because the second attribute
 setting overrides the first one.
@@ -3647,23 +3647,23 @@ do not recognise, without reporting an error.  Thus if the file containing
 your default plotting style (used by all applications---see later)
 contains the two lines:
 
-\small
+\latex{\small}
 \begin{verbatim}
    Colour(curve)=blue
    Colour(cont)=red
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 then CONTOUR will draw contours in red, but other applications will draw
 their curves in blue since they ignore the {\tt Colour(cont)=red} line.
 Note, if these two lines were the other way round:
 
-\small
+\latex{\small}
 \begin{verbatim}
    Colour(cont)=red
    Colour(curve)=blue
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 then all curves, \emph{including} contours drawn by CONTOUR, would be
 blue.  This is because CONTOUR will process both lines in the order
@@ -4841,11 +4841,11 @@ use the same data structure as both input and output for a command.  This
 is to minimise the risks of accidentally over-writing valuable data.  So,
 for instance, if you try the following command:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % cadd in=m31 scalar=10 out=m31
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 you will find that the value of {\tt m31} for parameter OUT is rejected with a 
 message indicating that the data structure is already in use, and you
@@ -4901,11 +4901,11 @@ process occurs.  NATIVE also replaces any IEEE
 floating point NaN or Inf values with the appropriate Starlink bad value.
 The following converts all the HDS files in the current directory.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % native "*"
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \newpage
 \section{\xlabel{se_ndfsect}NDF Sections\label{se:ndfsect}}
@@ -4932,11 +4932,11 @@ default in an interface file.  The syntax is a series of subscripts
 within parentheses and may be given in several ways.  Here is a simple
 example.
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> stats cluster(101:200,51:150)
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 This would derive statistics of a 100$\times$100-pixel region
 starting at pixel indices (101,~51) in the NDF called cluster.
@@ -4954,12 +4954,12 @@ you should use the command NDFCOPY.  An NDF's shape may be changed
 you must escape the parentheses.}  For example, the following
 are both equivalent to the earlier example.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % stats cluster"(101:200,51:150)"
      % stats cluster\(101:200,51:150\)
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 
 
@@ -4971,13 +4971,13 @@ may be given in several ways.  One possible method (corresponding with
 the example above) is to give the lower and upper bounds in each
 dimension, as follows
 
-\small
+\latex{\small}
 \begin{quote}
 \begin{center}
 {\tt NAME( a:b, c:d, ... )}
 \end{center}
 \end{quote}
-\normalsize
+\latex{\normalsize}
 
 where `{\tt a:b}', `{\tt c:d}', (\emph{etc.}) specify the lower and upper
 bounds.  The bounds specified need not necessarily lie within the actual
@@ -4995,23 +4995,23 @@ be selected for that dimension.  Omitting the bounds entirely for a
 dimension (but still retaining the comma) will cause the entire extent
 of that dimension to be used.  Thus, 
 
-\small
+\latex{\small}
 \begin{quote}
 \begin{center}
 {\tt IMAGE(,64)}
 \end{center}
 \end{quote}
-\normalsize
+\latex{\normalsize}
 
 could be used to specify row 64 of a two-dimensional image, while
 
-\small
+\latex{\small}
 \begin{quote}
 \begin{center}
 {\tt CUBE( 1, 257:, 100 )}
 \end{center}
 \end{quote}
-\normalsize
+\latex{\normalsize}
 
 would specify column 1, pixels 257 onwards, selected from plane number
 100 of a three-dimensional `data cube', forming a one-dimensional section.
@@ -5023,24 +5023,24 @@ An alternative form for the subscript expression involves specifying the
 centre and extent of the region required along each dimension, as
 follows
 
-\small
+\latex{\small}
 \begin{quote}
 \begin{center}
 {\tt NAME( p}$\sim${\tt q, r}$\sim${\tt s, ... )}
 \end{center}
 \end{quote}
-\normalsize
+\latex{\normalsize}
 
 where `{\tt p}$\sim${\tt q}', `{\tt r}$\sim${\tt s}', (\emph{etc.})
 specify the centre and extent.  Thus, 
 
-\small
+\latex{\small}
 \begin{quote}
 \begin{center}
 {\tt NAME(100}$\sim${\tt 11,200}$\sim${\tt 5)}
 \end{center}
 \end{quote}
-\normalsize
+\latex{\normalsize}
 
 would refer to an 11$\times$5-pixel region of an image centred on pixel
 (100,~200).
@@ -5051,24 +5051,24 @@ if there are an even number of pixels).  If the value following the
 `$\sim$' is omitted, it will default to the number of pixels in that
 dimension.  Thus, 
 
-\small
+\latex{\small}
 \begin{quote}
 \begin{center}
 {\tt IMAGE( }$\sim${\tt 100, }$\sim${\tt 100)}
 \end{center}
 \end{quote}
-\normalsize
+\latex{\normalsize}
 
 could be used to refer to a 100$\times$100-pixel region located
 centrally within an image, while 
 
-\small
+\latex{\small}
 \begin{quote}
 \begin{center}
 {\tt IMAGE( 10}$\sim${\tt , 20}$\sim$ {\tt )}
 \end{center}
 \end{quote}
-\normalsize
+\latex{\normalsize}
 
 would specify a section which is the same size as the original image, but
 displaced so that it is centred on pixel (10,~20).
@@ -5091,36 +5091,36 @@ co-ordinates are supported, the values supplied being automatically
 converted into the corresponding pixel indices before use.  For
 instance,
 
-\small
+\latex{\small}
 \begin{quote}
 \begin{center}
 {\tt SPECTRUM(6500.0:7250.0)}
 \end{center}
 \end{quote}
-\normalsize
+\latex{\normalsize}
 
 could be used to select the appropriate region of a spectrum calibrated
 in {\AA}ngstroms, while
 
-\small
+\latex{\small}
 \begin{quote}
 \begin{center}
 {\tt SPECTRUM(6000.0}$\sim${\tt 500.0)}
 \end{center}
 \end{quote}
-\normalsize
+\latex{\normalsize}
 
 would select a region of the spectrum approximately from 5750 to 
 6250.0~{\AA}ngstroms (the exact extent depending the values of the
 axis co-ordinates), and
 
-\small
+\latex{\small}
 \begin{quote}
 \begin{center}
 {\tt SPECTRUM(5500.0}$\sim${\tt 21)}
 \end{center}
 \end{quote}
-\normalsize
+\latex{\normalsize}
 
 would select a 21-pixel-wide region of the spectrum centred on
 5500~{\AA}ngstroms.
@@ -5165,7 +5165,7 @@ the lower bound must not exceed the upper bound in any dimension.  Thus,
 all the following might be used as valid specifications for NDF
 sections 
 
-\small
+\latex{\small}
 \begin{quote}
 \begin{center}
 \begin{tabular}{l}
@@ -5180,7 +5180,7 @@ sections
 \end{tabular}
 \end{center}
 \end{quote}
-\normalsize
+\latex{\normalsize}
 
 Many other combinations are obviously possible.
 
@@ -5219,11 +5219,11 @@ three update modes---{\tt "Quiet"}, {\tt "Normal"}, and {\tt
 Task \htmlref{HISSET}{HISSET} lets you set the history update mode.
 The default is {\tt "Normal"}, thus here the command
 
-\small
+\latex{\small}
 \begin{verbatim}
      % hisset hr1068
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 switches normal history recording on for NDF hr1068.  Thereafter
 whenever you alter this NDF, or create another NDF from it,
 the task automatically records the name of the application which was
@@ -5235,11 +5235,11 @@ may provide task-dependent additional text.
 
 If disc space is not a concern, you might prefer the verbose level.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % hisset hr1068 verbose
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 the supplementary information being the machine type, and its operating
 system name and version.
 
@@ -5250,12 +5250,12 @@ the quiet level.  This does not record the command line.
 HISSET lets you switch off history recording, if you want to do
 something `off the record', or erase the history altogether.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % hisset hr1068 disabled
      % hisset hr1068 erase
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \subsection{\xlabel{se_commenthistory}Adding Commentary to History Recording
 \label{se:commenthistory}}
@@ -5263,16 +5263,16 @@ something `off the record', or erase the history altogether.
 Once history recording is enabled, you can add commentary to an
 NDF using \htmlref{HISCOM}{HISCOM}.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % hiscom hr1068 i "There may have been cloud during the integration."
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 You aren't limited to single lines if you respond to the prompt for 
 the comment.  You can give a series of lines, terminated by supplying
 {\tt{!}}.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % hiscom hr1068
      COMMENT - Comment line > The dome may have been obstructing the telescope 
@@ -5280,16 +5280,16 @@ the comment.  You can give a series of lines, terminated by supplying
      COMMENT - Comment line > filter is correct either.
      COMMENT - Comment line > !
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 If you prefer, you may edit some text into a file and append its
 contents to the history records.  Thus
 
-\small
+\latex{\small}
 \begin{verbatim}
      % hiscom hr1068 f file=comments.lis
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 appends the text contained in {\tt comments.lis} to the history
 records of NDF hr1068.
 
@@ -5299,7 +5299,7 @@ records of NDF hr1068.
 At some point you will want to refer back to the history records.
 The \htmlref{HISLIST}{HISLIST} task does this.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % hislist hr1068
 
@@ -5312,14 +5312,14 @@ The \htmlref{HISLIST}{HISLIST} task does this.
         Parameters: MODE='Normal' NDF=@hr1068
         Software: /star/bin/kappa/hisset
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 Before you ask\ldots at present there are no parameters for selecting a
 time interval and there is no output of the machine and username, but
 they're not forgotten.
 
 Here is another example showing a series of history records.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % hislist hr1068 \\
 
@@ -5356,7 +5356,7 @@ Here is another example showing a series of history records.
         The dome may have been obstructing the telescope during the integration.
         We are not sure that the filter is correct either.
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 The first history item shows HISSET enabling history.  This was followed by
 a smooth of the data with \htmlref{GAUSMOOTH}{GAUSMOOTH}.  Then the
@@ -5402,11 +5402,11 @@ the graphics device---an X-window containing a plotting area of 850 by 500
 pixels---is available.  To create such a window use the {\tt xmake}
 (\xref{SUN/130}{sun130}{}) command:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % xmake xwindows -height 500 -width 850 -colours 64 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 This command limits the number of colours used by the X-window to
 64.  It is usually a good idea to be sparing with X-window colours.
@@ -5419,20 +5419,20 @@ First of all we make the X-window the current graphics device
 until changed.  The following command would not be necessary if the
 global parameter already had this value:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % gdset xwindows
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 Next we shall clear the X-window, and empty the graphics database
 of xwindows pictures (pictures relating to other graphics 
 devices are retained):
 
-\small
+\latex{\small}
 \begin{verbatim}
      % gdclear
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 The display is now clear, but one picture remains in the graphics
 database; this is the BASE picture and corresponds to the entire
@@ -5455,7 +5455,7 @@ the pixels appear as pure black, and 1\% appear as pure white.  We ensure
 that no annotated axes are produced (this will result in the image being
 a little larger since no margins need to be left for the axes):
 
-\small
+\latex{\small}
 \begin{verbatim}
      % lutgrey
      % display $KAPPA_DIR/iras noaxes 
@@ -5463,7 +5463,7 @@ a little larger since no margins need to be left for the axes):
      PERCENTILES - Percentiles for scaling /[10,90]/ > 10,99
      Data will be scaled from 0.05178363 to 1.051904.
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \begin{latexonly}
    \begin{figure}[hbt]
@@ -5493,7 +5493,7 @@ Let's now use the \htmlref{PICLIST}{PICLIST} command to look at the contents
 of the graphics database (press return in response for the prompt for 
 parameter PICNUM):
 
-\small
+\latex{\small}
 \begin{verbatim}
      % piclist
 
@@ -5503,7 +5503,7 @@ parameter PICNUM):
          2 DATA             KAPPA_DISPLAY                              Ref
      PICNUM - Number of new current picture /!/ > 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 This shows us that there are now two pictures in the database, listed in
 the order in which they were created.  The current picture is still the
@@ -5535,21 +5535,21 @@ for it to be placed towards the left hand side of the X-window.  To do this,
 we first clear the whole X-window and graphics database using
 \htmlref{GDCLEAR}{GDCLEAR}:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % gdclear
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 We now create a new picture using the \htmlref{PICDEF}{PICDEF} command
 (note, the \verb+"\"+ characters are needed to prevent the UNIX shell
 interpreting the square bracket characters):
 
-\small
+\latex{\small}
 \begin{verbatim}
      % picdef mode=cl fraction=\[0.6,1.0\] outline=no
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 The MODE parameter specifies the position of the new picture within the
 BASE picture; in this case {\tt "cl"} indicates that the new picture is to be
@@ -5566,7 +5566,7 @@ this option off.
 
 If we run PICLIST again, we get:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % piclist
 
@@ -5576,7 +5576,7 @@ If we run PICLIST again, we get:
      C   2 FRAME            KAPPA_PICDEF
      PICNUM - Number of new current picture /!/ > 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 The picture created earlier by DISPLAY was deleted when we ran GDCLEAR.
 The BASE picture is still there (of course), and we also have the picture
@@ -5596,7 +5596,7 @@ within the current picture (\emph{i.e.} the picture created by PICDEF above).  W
 scale the pixel values to produce a negative image in which 1\% of
 the pixels appear black and 30\% appear white:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % display axes
      IN - NDF to be displayed /@$KAPPA_DIR/iras/ > $KAPPA_DIR/m31
@@ -5604,7 +5604,7 @@ the pixels appear black and 30\% appear white:
      PERCENTILES - Percentiles for scaling /[10,99]/ > 99,30
      Data will be scaled from 10854.78 to 3889.016.
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \begin{latexonly}
    \begin{figure}[hbt]
@@ -5629,7 +5629,7 @@ The X-window should now look like Figure~
 \latexhtml{\ref{fi:agi2}}{2}.  We can use \htmlref{PICLIST}{PICLIST} 
 again to list the pictures stored in the database:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % piclist
        No. Name             Comment                   Label            Ref
@@ -5640,7 +5640,7 @@ again to list the pictures stored in the database:
          4 DATA             KAPPA_DISPLAY                              Ref
      PICNUM - Number of new current picture /!/ > 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 There are four pictures this time; the BASE picture, the picture created
 by \htmlref{PICDEF}{PICDEF} (number 2), and two pictures created by
@@ -5658,7 +5658,7 @@ indicate the bottom left and top-right corners of a box enclosing the
 required area.  Click the left mouse button at the bottom left and top
 right corners of a box enclosing the required sub-section of the image:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % cursor showpixel plot=box maxpos=2
 
@@ -5676,7 +5676,7 @@ right corners of a box enclosing the required sub-section of the image:
       (212.8       113.9)
 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \begin{latexonly}
    \begin{figure}[hbt]
@@ -5766,7 +5766,7 @@ the current picture, it can be anywhere within the BASE picture.} We
 use this mode to create a new FRAME picture occupying the area to the
 top right of the existing image:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % picdef mode=cursor nooutline
 
@@ -5777,7 +5777,7 @@ top right of the existing image:
      Co-ordinates are ( 0.9155139, 0.5470942 ) and ( 1.683106, 0.9799599 )
 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 The co-ordinates displayed by PICDEF are BASEPIC co-ordinates.
 
@@ -5787,13 +5787,13 @@ runs from pixel 173 to 213 on the first (X) axis, and from pixel 79 to
 114 on the second (Y) axis.  To display just this section we include the
 pixel bounds in the specification of the input NDF when we run DISPLAY:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % display border noaxes mode=scale high=3889.016 low=10854.78
      IN - NDF to be displayed /@m31/ > m31(173:213,79:114)
      Data will be scaled from 10854.78 to 3889.016.
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \begin{latexonly}
    \begin{figure}[hbt]
@@ -5840,7 +5840,7 @@ depend on the accuracy of the astrometry information supplied with the
 image.} In addition, we also use CURSOR to mark a position with a text
 string giving a title for the contour plot:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % contour noclear noaxes nokey iras mode=perc percentiles=\[55,75,95\] 
      Alignment has occurred within the SKY Domain.
@@ -5859,7 +5859,7 @@ string giving a title for the contour plot:
        X = 1.308796      Y = 0.9839679
 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \begin{latexonly}
    \begin{figure}[hbt]
@@ -5912,7 +5912,7 @@ of the two images.  We then display these one-dimensional NDFs using
 application \htmlref{LINPLOT}{LINPLOT}.  First we choose the line along
 which the profiles are to be taken, using CURSOR (again!):
 
-\small
+\latex{\small}
 \begin{verbatim}
      % cursor plot=chain marker=3 style='colour=white' outcat=zz maxpos=2 
 
@@ -5930,7 +5930,7 @@ which the profiles are to be taken, using CURSOR (again!):
        (202.917     107.3986)
 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 The pointer is positioned at the two ends of the required profile, and the
 left button clicked at each position.  The supplied positions are marked by 
@@ -5940,7 +5940,7 @@ output catalogue stored in file {\tt zz.FIT}.  We now sample the data in the
 two images along this profile to create a pair of  one-dimensional NDFs
 (\verb+m31_prof+ and \verb+iras_prof+):
 
-\small
+\latex{\small}
 \begin{verbatim}
      % profile m31 incat=zz out=m31_prof
        Alignment has occurred within the SKY Domain.
@@ -5951,7 +5951,7 @@ two images along this profile to create a pair of  one-dimensional NDFs
        Profile contains 38 samples.
 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 We want to draw the two line profiles in a new plot in the clear area at
 the bottom right of the X-window.  We therefore need to create a new FRAME
@@ -5960,12 +5960,12 @@ the new FRAME picture are given explicitly using parameters UBOUND and
 LBOUND (we could have used cursor mode again; we use XY mode just to
 explore the different possibilities):
 
-\small
+\latex{\small}
 \begin{verbatim}
      % picdef mode=xy lbound=\[0.93,0.03\] ubound=\[1.67,0.54\] nooutline
        Bounds are ( 0, 0 ) and ( 1.701635, 1 )
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 The bounds are supplied in the BASEPIC Frame (the bounds reported by the
 application are the bounds of the entire BASE picture).  The new FRAME
@@ -5974,12 +5974,12 @@ subsequent graphics applications will draw in the new FRAME picture.
 
 We now draw the first of the two line profiles:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % linplot m31_prof style='"tickall=0,colour(curve)=black, \
                drawtitle=0,label(2)=DSS data value (black)"'
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \begin{latexonly}
    \begin{figure}[hbt]
@@ -6010,14 +6010,14 @@ the left hand edge.
 
 We now draw the second line plot over the top of the first line plot:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % linplot iras_prof noclear noalign style='"edge(2)=r,tickall=0, \
                colour(curve)=white,drawtitle=0, \
                label(2)=IRAS data value (white)"'
 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Again, the NOCLEAR keyword prevents \htmlref{LINPLOT}{LINPLOT} from
 clearing the graphics device before drawing the new line plot.
@@ -6070,19 +6070,19 @@ always refer to the co-ordinate system of the current picture.  So,
 first make the BASE picture the current picture.  This is done using
 PICLIST, remembering that the BASE picture is always picture number 1:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % piclist picnum=1
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 We now run CURSOR to draw the first warp line:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % cursor plot=poly mode=current maxpos=2 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Position the pointer over the top left corner of the black box marking
 the selected image section in the main image display, and click the left
@@ -6092,11 +6092,11 @@ between these two points.
 
 We now run CURSOR again to draw the second warp line:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % cursor plot=poly mode=current maxpos=2 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Point and click over the bottom right corners of the two boxes this time.
 The final X-window should look now look like Figure~ 
@@ -6130,21 +6130,21 @@ description of a few more:
 \htmlref{PICLABEL}{PICLABEL}.  This provides a convenient `handle' by which
 pictures can be referred to.  For instance:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % piclabel fred
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 will give the label FRED to the current picture.  This picture could be
 made current again at a later time by re-selecting it using
 \htmlref{PICSEL}{PICSEL}:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % picsel fred
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Any label associated with a picture is displayed in the list produced by
 \htmlref{PICLIST}{PICLIST}.
@@ -6155,11 +6155,11 @@ labelling all the pictures, so you can easily switch between the
 elements of the picture array.  You might use the following command in
 a shell script to display a series of up to twelve spectra:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % picdef mode=a prefix=spec xpic=3 ypic=4
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 The bottom-left picture would be labelled SPEC1 and the rest are
 numbered in sequence from left to right to SPEC12---the top-right
@@ -6169,11 +6169,11 @@ script\latex{ (see Section~\ref{se:cshscript})}.  Since this is a
 common operation a shorthand command, \htmlref{PICGRID}{PICGRID}, is
 available.  For instance:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % picgrid 3 4
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 is equivalent to the previous example, except that the pictures are
 labelled 1 to 12.
@@ -6205,7 +6205,7 @@ even plot an outline with the OUTLINE keyword if you can't visualise the
 device co-ordinates.  In the following example, the current picture does
 not have a label.  If it did this too would be listed by GDSTATE:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % gdstate
  
@@ -6220,7 +6220,7 @@ not have a label.  If it did this too would be listed by GDSTATE:
         Axis 2 (Y) : 0.010 to 0.605
  
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \end{itemize}
 
@@ -6354,11 +6354,11 @@ For instance, if you want all applications to write graphical output to
 monochrome landscape encapsulated PostScript files set the graphics
 device as follows:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % gdset epsf_l
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \subsubsection{The PostScript Files}
 
@@ -6387,11 +6387,11 @@ printed or included in a document.  To do this, we use
 \PSMERGEref\  as follows\footnote{You can include all the PostScript files,
 including any which do not contain any actual drawing commands.}:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % psmerge display.ps contour.ps stars.ps > total.ps
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 This stacks the three specified PostScript files into a single file called
 {\tt total.ps}.  This will be a normal (\emph{i.e.} not encapsulated) PostScript
@@ -6399,11 +6399,11 @@ file, so you can print it, but it will be difficult to include it in a
 document.  If you include the {\tt -e} option when running 
 PSMERGE, then an encapsulated PostScript file is created instead:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % psmerge -e display.ps contour.ps stars.ps > total.ps
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 The output file can be included in other documents but often causes problem 
 when being printed.
@@ -6449,19 +6449,19 @@ prevents you accidentally drawing things within regions of the X-window
 which are not available in PostScript.  To find the require aspect ratio,
 do:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % gdclear device=epsf_l
    % gdstate device=epsf_l
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 This clears the PostScript device, and then displays the bounds of the 
 BASE picture (all the other pictures were erased by
 \htmlref{GDCLEAR}{GDCLEAR}).  The results
 will look something like this:
 
-\small
+\latex{\small}
 \begin{verbatim}
 
 Status of the epsf_l graphics device...
@@ -6475,18 +6475,18 @@ Status of the epsf_l graphics device...
       Axis 2 (Y) : 0.000 to 1.000
 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 This tells you that the aspect ratio (the ratio of the width to the height)
 of the PostScript device is 1.455.  You should now make an X-window with
 this aspect ratio:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % xdestroy xwindows
    % xmake xwindows -height 500 -width 730    
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 The {\tt xdestroy} command deletes any existing X-window, and the {\tt
 xmake} command creates a new one with a height of 500 pixels and a 
@@ -6517,12 +6517,12 @@ and do not mimic exactly the steps taken while prototyping.
 First, select and clear the graphics device.  We choose a monochrome,
 portrait, encapsulated PostScript device:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % gdset epsf_p
    % gdclear
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 We will sometimes need to specify positions within the BASE picture.
 To do this we can either use the GRAPHICS, the BASEPIC or the NDC Frame,
@@ -6539,7 +6539,7 @@ bounds of the available plotting space in the BASEPIC Frame, use
 the current picture (this will be the case at the moment since we have just 
 cleared the database using \htmlref{GDCLEAR}{GDCLEAR}):
 
-\small
+\latex{\small}
 \begin{verbatim}
    % gdstate
 
@@ -6554,7 +6554,7 @@ cleared the database using \htmlref{GDCLEAR}{GDCLEAR}):
          Axis 2 (Y) : 0.000 to 1.455
 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 The choice of a portrait PostScript device may have surprised you, given
 that Figure~ \latexhtml{\ref{fi:agi8}}{8} seems more naturally to fit
@@ -6574,7 +6574,7 @@ the limits found above, giving the FRAME picture the label `main' so
 that we can easily re-select the picture later.  We then display the
 optical image within it, including annotated axes:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % picdef mode=xy lbound=\[0.0,0.0\] ubound=\[0.6,0.6\] outline=no
    % piclabel main
@@ -6582,7 +6582,7 @@ optical image within it, including annotated axes:
              margin=\[0.2,0.02\] 
    % mv pgplot.ps display1.ps
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Note, we are using a monochrome PostScript device, and so the colour of
 all annotation produced by \htmlref{DISPLAY}{DISPLAY} was set to black using the STYLE
@@ -6605,7 +6605,7 @@ RA and DEC at the two opposite corners of the box.  Alternatively, we
 could have saved the output from CURSOR while prototyping, using the
 OUTCAT parameter.  In either case, we use \htmlref{LISTSHOW}{LISTSHOW} to draw the box:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % listmake ndf=m31 outcat=boxpos
      POSITION - A position for the output list /!/ > 0:41:33.5 40:33:01
@@ -6614,7 +6614,7 @@ OUTCAT parameter.  In either case, we use \htmlref{LISTSHOW}{LISTSHOW} to draw t
    % listshow boxpos plot=box style='colour=black'
    % mv pgplot.ps box.ps
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Specifying {\tt ndf=m31} resulted in LISTMAKE interpreting the supplied
 positions as positions within the current co-ordinate Frame of the NDF
@@ -6626,17 +6626,17 @@ which a magnified image of the selected region will be displayed.  The
 picture occupies the remainder of the width left over by the main image
 (0.4 of the total width) and half the height.:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % picdef mode=xy lbound=\[0.6,0.3\] ubound=\[1.0,0.6\] outline=no
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 We now display the selected image section within the FRAME picture just
 created, and overlay contours from {\tt iras.sdf}.  We draw the border
 with twice the default width:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % display 'm31(173:213,79:114)' border noaxes mode=scale low=3889 high=10854.78 \
               borstyle='width=2'
@@ -6646,7 +6646,7 @@ with twice the default width:
    % contour noclear noaxes nokey iras mode=perc percentiles=\[55,75,95\]
    % mv pgplot.ps contour.ps
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 What are those two extra commands in the middle? Well, we will need to be
 able to re-select the DATA picture holding the image when we come to draw
@@ -6660,7 +6660,7 @@ horizontally within the enclosing FRAME picture ({\it{i.e.}} half way
 between 0.6 and 1.0), and drawn so that its bottom edge is placed at the
 top of the Frame:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % listmake frame=basepic outcat=ttlpos 
      POSITION - A position for the output list /!/ > 0.8 0.6
@@ -6668,7 +6668,7 @@ top of the Frame:
    % listshow ttlpos plot=text strings='"IRAS 12 \gmm contours"' just=bc
    % mv pgplot.ps title.ps
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 LISTMAKE is used to store the position in a positions list, and then
 LISTSHOW is used to draw the title.  Again, we could have saved the output
@@ -6681,7 +6681,7 @@ We now draw the line marking the path of the profiles which will be
 displayed later.  We draw them in white so that they show up against 
 the predominantly dark background of the image:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % listmake ndf=m31 outcat=prfpos 
      POSITION - A position for the output list /!/ > 0:41:22.7 40:35:12
@@ -6690,24 +6690,24 @@ the predominantly dark background of the image:
    % listshow prfpos plot=chain marker=3 style="'colour=white,width=3'"
    % mv pgplot.ps line.ps
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 The line is drawn with three times the default width.  We now create the 
 profiles as before:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % profile m31 incat=prfpos out=m31_prof
    % profile iras incat=prfpos out=iras_prof
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 We now create a FRAME picture occupying the remaining area at the bottom 
 right corner of the page, and display the two profiles in it.  We use
 line style to differentiate the two curves, instead of colour as we
 did when prototyping:
  
-\small
+\latex{\small}
 \begin{verbatim}
    % picdef mode=xy lbound=\[0.6,0.0\] ubound=\[1.0,0.3\] outline=no
    % linplot m31_prof style=^style1 keystyle='size=0.7'
@@ -6715,13 +6715,13 @@ did when prototyping:
    % linplot iras_prof noclear noalign style=^style2
    % mv pgplot.ps iras_prof.ps 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 The appearances of the two plots are controlled by the two plotting
 styles contained in the text files {\tt style1} and {\tt style2}.
 {\tt style1} contains the following attribute settings:
 
-\small
+\latex{\small}
 \begin{verbatim}
    tickall=0
    colour=black
@@ -6731,11 +6731,11 @@ styles contained in the text files {\tt style1} and {\tt style2}.
    textlabgap(1)=0.02
    labelunits=0
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 The file {\tt style2} contains the following attribute settings:
 
-\small
+\latex{\small}
 \begin{verbatim}
    edge(2)=r
    gap(2)=0.2
@@ -6747,7 +6747,7 @@ The file {\tt style2} contains the following attribute settings:
    textlabgap(1)=0.02
    labelunits=0
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Now comes the complicated bit---the warp lines! The problem is that we
 used the cursor to define the start and end of these lines when
@@ -6781,7 +6781,7 @@ consequently give the wrong BASEPIC co-ordinates.  We use
 select the FRAME picture containing the main image (so that it becomes
 the current picture), and then run LISTSHOW:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % picsel main   
    % listshow boxpos plot=blank frame=BASEPIC
@@ -6796,7 +6796,7 @@ the current picture), and then run LISTSHOW:
        #2         0.4269177   0.245274
 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 The parameter assignment {\tt PLOT=BLANK} tells LISTSHOW to search the graphics
 database for a picture with which the positions in {\tt boxpos} can be
@@ -6819,14 +6819,14 @@ the lower pixel index bounds by 1.0 in order to convert the integer
 (see \hyperref{here}{Section~}{}{se:pixgrd} for more information about
 pixel co-ordinates and indices): 
 
-\small
+\latex{\small}
 \begin{verbatim}
    % listmake frame=pixel dim=2 outcat=magpos
      POSITION - A position for the output list /!/ > 172.0 78.0
      POSITION - A position for the output list /!/ > 213.0 114.0
      POSITION - A position for the output list /!/ > 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 We now need to use LISTSHOW to get the corresponding BASEPIC co-ordinates,
 aligning the above PIXEL co-ordinates with the DATA picture holding the
@@ -6837,7 +6837,7 @@ those in the grey-scale image, and so we need to make sure that LISTSHOW
 is using the correct DATA picture.  However, we labelled the required DATA
 picture when it was created and so we can just use PICSEL to re-select it:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % picsel mag
    % listshow magpos plot=blank frame=BASEPIC
@@ -6854,7 +6854,7 @@ picture when it was created and so we can just use PICSEL to re-select it:
        #2         0.9524395   0.5838399
 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 We now create a positions list containing the BASEPIC co-ordinates at 
 the ends of the upper warp line, and draw it.  By default, LISTSHOW draws
@@ -6863,7 +6863,7 @@ Since the line is not contained within a single DATA picture, we need to
 tell LISTSHOW to draw within the BASE picture.  This is done by setting
 parameter NAME to BASE (we also revert to drawing in black):
 
-\small
+\latex{\small}
 \begin{verbatim}
    % listmake frame=basepic outcat=war1pos
      POSITION - A position for the output list /!/ > 0.3657834 0.245274
@@ -6872,7 +6872,7 @@ parameter NAME to BASE (we also revert to drawing in black):
    % listshow war1pos plot=poly style='colour=black' name=base
    % mv pgplot.ps war1.ps 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \begin{latexonly}
    \begin{figure}[hbt]
@@ -6887,7 +6887,7 @@ parameter NAME to BASE (we also revert to drawing in black):
 The last drawing we need to do is to create the second warp line in the
 same way:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % listmake frame=basepic outcat=war2pos
      POSITION - A position for the output list /!/ > 0.4269177 0.1911708
@@ -6896,18 +6896,18 @@ same way:
    % listshow war2pos plot=poly name=base
    % mv pgplot.ps war2.ps 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 We now have separate PostScript files containing the output from all the
 above applications.  These are stacked together in the order they were
 created to produce the final encapsulated PostScript file:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % psmerge -e display1.ps box.ps display2.ps contour.ps title.ps \
                 line.ps m31_prof.ps iras_prof.ps war1.ps war2.ps > total.eps
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 The file {\tt total.eps} is displayed in Figure~ \latexhtml{\ref{fi:agi9}}{9}.
 
@@ -7154,11 +7154,11 @@ The current co-ordinate Frame can also be examined using
 it also allows you to change the current co-ordinate Frame in the NDF.
 For instance:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % wcsframe m31 pixel
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 will make the PIXEL Frame the current co-ordinate Frame in the NDF
 \verb+m31+.  After this, all references to positions within the NDF
@@ -7166,13 +7166,13 @@ will make the PIXEL Frame the current co-ordinate Frame in the NDF
 current co-ordinate system using \htmlref{WCSATTRIB}{WCSATTRIB}:
 
 
-\small
+\latex{\small}
 \begin{verbatim}
      % wcsattrib myspectrum set system Frequency 
      % wcsattrib myspectrum set unit GHz 
      % wcsattrib myspectrum set sor Helio
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 The above changes the values of the `System', `Unit' and `SOR'
 attributes of the current Frame in the NDF \verb+myspectrum+ so that
@@ -7259,7 +7259,7 @@ appropriately).
 
 An SCS specification is made up of two parts; a co-ordinate system name,
 followed by an optional epoch giving the reference equinox.  Any of the
-three system names {\small EQUATORIAL, ECLIPTIC} and {\small GALACTIC}
+three system names {\latex{\small} EQUATORIAL, ECLIPTIC} and {\small GALACTIC}
 can be used.  Case is insignificant, and abbreviations may be given.
 
 Ecliptic and equatorial co-ordinates are referred to the mean equinox of a
@@ -7379,7 +7379,7 @@ command.  For instance:
    % erase m31.more.iras90
    % erase m31.more.fits
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 will erase the IRAS90 and FITS extensions from the NDF \verb+m31+.
 
@@ -7397,7 +7397,7 @@ celestial co-ordinates at a single position on each line.  For instance,
 if you have five known RA/DEC (B1950) positions in your image, the file 
 may look like:
 
-\small
+\latex{\small}
 \begin{verbatim}
 
  0 49 05.9,   42 25 30,    32,    266
@@ -7407,7 +7407,7 @@ may look like:
  0 45 47.7,   41 54 03,    93,    213
 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 The first column gives the RA values (hours, minutes and seconds), the 
 second gives the DEC values (degrees, arcminutes and arcseconds), the 
@@ -7417,7 +7417,7 @@ co-ordinates.
 If this file is called \verb+pos.dat+, then the following command can be
 used to create a WCS component:
 
-\small
+\latex{\small}
 \begin{verbatim}
    % setsky m31 ^pos.dat coords='equ(b1950)' epoch=1998.0 projtype=gno
 
@@ -7432,7 +7432,7 @@ used to create a WCS component:
        Tilt of celestial sphere             : 0d 0m 0.00s
 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Note the up-arrow character (\verb+"^"+) before the file name
 (\verb+pos.dat+).  This tells SETSKY that the string is a file name.  A
@@ -7486,12 +7486,12 @@ at the centre of each pixel in units of GHz.  The following command will add
 an appropriate SpecFrame to the WCS component of the NDF (and will also
 make it the \emph{current} Frame):
 
-\small
+\latex{\small}
 \begin{verbatim}
     % wcsadd fred frame=axis maptype=unit frmtype=spec domain=SPECTRUM \
              attrs="'System=freq,Unit=GHz'"
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 The FRMTYPE parameter indicates that a SpecFrame should be created.  The
 ATTRS parameter gives the attribute values to be assigned to the
@@ -7515,7 +7515,7 @@ include the extra information in the ATTRS parameter value above, or you
 can add the information later using \htmlref{WCSATTRIB}{WCSATTRIB}.  For
 example:
 
-\small
+\latex{\small}
 \begin{verbatim}
     % wcsattrib fred remap=no set Stdofrest topo
     % wcsattrib fred remap=no set RefRA '"10:12:24.2"'
@@ -7524,7 +7524,7 @@ example:
     % wcsattrib fred remap=no set GeoLat '"N19:49:33"'
     % wcsattrib fred remap=no set GeoLon '"W155:28:47"'
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 These commands set new values for named attributes within the current
 Frame of NDF {\tt fred}.  These attributes are described
@@ -7543,11 +7543,11 @@ For instance, if you have a SpecFrame describing frequency at each
 pixel, and you want to change it so that it describes the
 corresponding wavelength at each pixel, then doing:
 
-\small
+\latex{\small}
 \begin{verbatim}
     % wcsattrib fred set System wave
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 will modify the Mapping between the pixel Frame and the SpecFrame using
 the relationship ``wavelength = speed of light/frequency''. 
@@ -7563,11 +7563,11 @@ from the pixel Frame to the spectral Frame unchanged since the Mapping
 already gives the correct \emph{wavelength} value (previously, but
 erroneously, thought to be a frequency value).  So here you would do:
 
-\small
+\latex{\small}
 \begin{verbatim}
     % wcsattrib fred remap=no set System wave
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 
 
@@ -7597,33 +7597,33 @@ within the attribute name.  If WCS axis 1 is the spectral axis, 2 is the
 RA axis and 3 is the Dec. axis, then we would do the following:
 
 
-\small
+\latex{\small}
 \begin{verbatim}
     % wcsattrib fred set "System(1)" vopt
     % wcsattrib fred set "System(2)" galactic
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 In fact, we could have used {\tt "System(3)"} in place of {\tt "System(2)"} since
 axes 2 and 3 are both contained within the same sky Frame and so setting
 the {\att System} attribute for either one will have the same effect.  We could
 now examine the attributes as follows:
 
-\small
+\latex{\small}
 \begin{verbatim}
     % wcsattrib fred get "System(1)" 
     % wcsattrib fred get "System(2)" 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 These commands will display {\tt vopt} and {\tt Galactic}, as expected.  Note,
 the following command:
 
-\small
+\latex{\small}
 \begin{verbatim}
     % wcsattrib fred get "System" 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 will display {\tt Compound} since it is displaying the {\att System} value of the
 compound Frame \emph{as a whole} (because no axis index was included).
@@ -7634,30 +7634,30 @@ class (which represents spectral axes) has an attribute called
 specific to the SpecFrame class and is not recognised by other classes
 of Frames.  If we do:
 
-\small
+\latex{\small}
 \begin{verbatim}
     % wcsattrib fred set "StdOfRest" LSRK
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 we will get an error saying the attribute name is unknown.  This is because 
 compound Frames do not have a {\att StdOfRest} attribute.  If we want to set the
 standard of rest, we must indicate the index of the spectral axis as follows:
 
-\small
+\latex{\small}
 \begin{verbatim}
     % wcsattrib fred set "StdOfRest(1)" LSRK
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Likewise, if we wanted to set the \htmlattref{Equinox}{Equinox}~
 attribute of the sky Frame, we could say:
 
-\small
+\latex{\small}
 \begin{verbatim}
     % wcsattrib fred set "Equinox(2)" "J2003.5"
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 
 \sstattribute{
@@ -8753,7 +8753,7 @@ interaction mode.
 
 First we display an image on the {\tt xw} windows device.
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> gdset xw
      ICL> display $KAPPA_DIR/ccdframec mode=pe \
@@ -8761,14 +8761,14 @@ First we display an image on the {\tt xw} windows device.
      ICL> globals
      The current interaction mode is      : <undefined>
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 Now we obtain the centroids of a couple of stellar/galaxian images via
 each of the interaction modes.  First in cursor mode.  Note that
 \htmlref{CENTROID}{CENTROID} obtains the name of the input NDF from the
 graphics database in this mode.  If you need to preview which NDF is
 going to be selected use the \htmlref{PICIN}{PICIN} command.
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> centroid mode=c
      Current picture has name: DATA, comment: KAPPA_DISPLAY.
@@ -8788,7 +8788,7 @@ going to be selected use the \htmlref{PICIN}{PICIN} command.
  
      Use the cursor to select one point.
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 If we look at the global parameters again, indeed we see that it has
 become cursor mode.  
 
@@ -8797,7 +8797,7 @@ unless it is undefined or the application does not support the current
 mode, you must change the mode on the command line.  First we shall
 prompt for the co-ordinates.  A null ends the loop.
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> centroid mode=i
      NDF - Array to be analysed /@/star/bin/kappa/ccdframec/ >
@@ -8813,11 +8813,11 @@ prompt for the co-ordinates.  A null ends the loop.
  
      INIT - Guess at co-ordinates of star-like feature /73.3,319/ > !
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 Finally, we can create a text file called {\tt starlist.dat} and run
 CENTROID in file mode.  
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> cat > starlist.dat
      86 295
@@ -8833,7 +8833,7 @@ CENTROID in file mode.
      Input guess position was     73, 320
      Output centroid position is  72.76437, 318.9484
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 Such co-ordinate files can also be created interactively with images by
 \htmlref{CURSOR}{CURSOR}.
 
@@ -8962,7 +8962,7 @@ there are no obvious discontinuities, {\it{e.g.}}\ spectrum-like.
 
 Let's have a few examples.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % lutheat
      % lutramps
@@ -8970,7 +8970,7 @@ Let's have a few examples.
      % lutable li ex sawtooth nn
      % lutsave pirated
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 \htmlref{LUTHEAT}{LUTHEAT} loads the standard `heat' lookup table into
 the colour table using linear interpolation, whilst
 \htmlref{LUTRAMPS}{LUTRAMPS} loads the standard coloured ramps using
@@ -8987,11 +8987,11 @@ steal other people's attractive colour tables that they've carelessly
 left in the display's memory!  It does not matter should the display
 not have a palette, since
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> lutsave pirated full
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 will save the full set of pens (including the first 16) to the NDF.
 
 \subsection{\xlabel{se_mancoltab}Manipulating Colour Tables
@@ -9012,7 +9012,7 @@ example if you want a six equal blocks of red, blue, yellow, pink,
 sienna and turquoise you could create the text file {\tt col6.dat}
 with contents
 
-\small
+\latex{\small}
 \begin{verbatim}
      # Red, blue, yellow, pink, sienna, and turquoise LUT
      1.0 0.0 0.0
@@ -9022,14 +9022,14 @@ with contents
      0.56 0.42 0.14
      0.68 0.92 0.92
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 and then run TRANDAT to make the NDF called collut6.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % trandat col6 collut6 shape='[3,6]' auto
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \subsubsection{\xlabel{se_runlutedit}Running LUTEDIT\label{se:runlutedit}}
 
@@ -9057,12 +9057,12 @@ specification can be a \htmlref{named colour}{ap:colset}
 \latex{(see Appendix~\ref{ap:colset} for a list)}, or RGB intensities.
 For example,
 
-\small
+\latex{\small}
 \begin{verbatim}
      % palentry 1 Skyblue
      % palentry 14 [1.0,1.0,0.3]
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 would make palette index 1 sky blue and index 14 a pale yellow.  Once
 you have a palette you like, save it in an NDF with
 \htmlref{PALSAVE}{PALSAVE}.  
@@ -9163,7 +9163,7 @@ the \htmlref{world co-ordinate system}{se:wcsuse} and dimensionality.
 
 Here is an example of the creation of an ARD file.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % cat myard.ard
      COFRAME(PIXEL)
@@ -9175,7 +9175,7 @@ Here is an example of the creation of an ARD file.
      CIRCLE( 10:09:12.2, -45:12:13, ::40 ) 
      CTRL/D
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 The COFRAME statements indicate the co-ordinate system in which
 subsequent positions are supplied.  Its first argument is the
@@ -9225,50 +9225,50 @@ selected pixels are all that intersect with the line's locus.
 
 Here are some more examples of ARD files.
 
-\small
+\latex{\small}
 \begin{verbatim}
      COFRAME(GRID)
      ROTBOX( 12, 15, 20, 10, 36.3 ) .AND. .NOT. ( COLUMN( 13 ) .OR. ROW( 8 ) )
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Now the co-ordinates are \htmlref{Grid co-ordinates}{fi:gridco}.  This
 selects all the pixels with a rotated box except those in thirteenth
 column or eighth row.  Note the use of parentheses to adjust or
 clarify the precedence.  The box is centred on grid pixel (12,~15) has
 sides of length 20 and 10 pixels.  The first side of the box---the one
-with length 20---is at an angle of 36$\udeg$.3 measured anticlockwise
+with length 20---is at an angle of 36$\udeg$3 measured anticlockwise
 from the X axis.
 \medskip
 
-\small
+\latex{\small}
 \begin{verbatim}
      DIMENSION(3)
      CIRCLE( 10.3, 21.6, 32.9, 10.4 )
      LINE( 1.1, 2.2, 3.3, 4.4, 5.5, 6.6 )
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 This defines a sphere centred at pixel co-ordinates (10.3,~21.6,~32.9)
 with radius 10.4 pixels, and a line from (1.1,~2.2,~3.3) to
 (4.4,~5.5,~6.6).
 \medskip
 
-\small
+\latex{\small}
 \begin{verbatim}
      CIRCLE( 10.3, 21.6, 32.9, 10.4 )
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 This defines a sphere centred at pixel co-ordinates (10.3,~21.6,~32.9)
 with radius 10.4 pixels.
 \medskip
 
-\small
+\latex{\small}
 \begin{verbatim}
      .NOT. ELLIPSE( 75.2, 296.6, 33, 16, 78 ) 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 This selects the whole array except for the ellipse defined as before.
 Something like this might be useful for excluding a galaxy image before
@@ -9303,17 +9303,17 @@ which positions are specified, allowing later applications to
 interpret them correctly, and convert them (if necessary) into other
 co-ordinate systems.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % ardgen demo.ard
      Current picture has name: DATA, comment: KAPPA_DISPLAY.
      SHAPE - Region shape /'CIRCLE'/ >
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 At this point you can select a shape.  Enter {\tt ?} to get the
 list.  Once you've selected a shape you'll receive instructions.
 
-\small
+\latex{\small}
 \begin{verbatim}
      SHAPE - Region shape /'COLUMN'/ > ellipse
 
@@ -9323,13 +9323,13 @@ list.  Once you've selected a shape you'll receive instructions.
     To select a position press the space bar or left mouse button
     To exit press "." or the right mouse button
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 Once you have defined one ellipse, you can define another or exit to
 the OPTION prompt.  In addition to keyboard 1, pressing the right-hand
 mouse button has the same effect.  Thus in the example, the new shape is
 a rotated box.
 
-\small
+\latex{\small}
 \begin{verbatim}
      Region completed. Identify another 'ELLIPSE' region...
      OPTION - Next operation to perform /'SHAPE'/ > shape
@@ -9340,7 +9340,7 @@ a rotated box.
      a point on the opposite edge.
      Region completed. Identify another 'ROTBOX' region...
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 If you make a mistake, use the `Undo' option.  Alternatively, enter {\tt
 List} at the OPTION prompt to see a list of the regions.  Note the
@@ -9353,7 +9353,7 @@ Now suppose you want to combine or invert regions in some way, you
 supply {\tt Combine} at the OPTION prompt.  So suppose we have
 created the following regions in {\tt \$KAPPA\_DIR/ccdframe}.
 
-\small
+\latex{\small}
 \begin{verbatim}
        Region          Region Description
        Index
@@ -9370,20 +9370,20 @@ created the following regions in {\tt \$KAPPA\_DIR/ccdframe}.
                          229.8, 265.8,
                          228.6, 256.2 )
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 We want to form the region inside the first ellipse but not inside
 the second.  This done in two stages.  First we invert the second
 ellipse, meaning that pixels are included if they are not inside
 this ellipse, by combining with the {\tt NOT} operator.
 
-\small
+\latex{\small}
 \begin{verbatim}
      OPTION - Next operation to perform /'SHAPE'/ > comb
      OPERATOR - How to combine the regions /'AND'/ > not  
      OPERANDS - Indices of regions to combine or invert /6/ > 2
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 This removes the original region 2, decrements the region numbers of
 the other regions following 2 by one, so that region 3 becomes 2, 4
@@ -9394,30 +9394,30 @@ regions.  The second stage is to combine it with region 1, using the
 In this example, that means all the pixels outside the second ellipse
 but which lie within the first.
 
-\small
+\latex{\small}
 \begin{verbatim}
     OPTION - Next operation to perform /'SHAPE'/ > com
     OPERATOR - How to combine the regions /'AND'/ > 
     OPERANDS - Indices of regions to combine or invert /[6,7]/ > 1,6
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Here is another example of combination.  This creates a region for
 pixels are included provided they are in one of two regions, but not
 in both.  Here we apply the {\tt .XOR.} operator to the small ellipse
 and the first rotated box.
 
-\small
+\latex{\small}
 \begin{verbatim}
      OPTION - Next operation to perform /'SHAPE'/ > comb
      OPERATOR - How to combine the regions /'AND'/ > xor
      OPERANDS - Indices of regions to combine or invert /[4,5]/ > 1,2
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Here is the final set of regions.
 
-\small
+\latex{\small}
 \begin{verbatim}
      OPTION - Next operation to perform /'SHAPE'/ > list
 
@@ -9441,7 +9441,7 @@ Here is the final set of regions.
                   .XOR.
                   ROTBOX( 40.5, 219.2, 63.8, 38.3, 37.24281 ) )
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Once you are done, enter {\tt "Exit"} at the OPTION prompt, and the
 ARD file is created.  {\tt "Quit"} also leaves the programme, but
@@ -9452,11 +9452,11 @@ masked image with \htmlref{ARDMASK}{ARDMASK}\footnote{You can also plot the
 outline of the selected regions on top of a display image using 
 \htmlref{ARDPLOT}{ARDPLOT}.}:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % ardmask $KAPPA_DIR/ccdframec demo.ard ardccdmask
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 \medskip
 
 \begin{latexonly}
@@ -9486,11 +9486,11 @@ original regions outlined to the left.  Note only the section
 \htmlref{DISPLAY}{DISPLAY}, which lets you define a colour for bad
 pixels using the BADCOL parameter.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % display ardccdmask badcol=red \\
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 To the right of Figure~
 \latexhtml{\ref{fi:ardwork}}{13} is the final masked image.
 
@@ -9502,18 +9502,18 @@ from one NDF to another.  You may also use SEGMENT to copy bad pixels
 into the polygonal regions by giving the null value for one of the two
 input NDFs.  For instance,
 
-\small
+\latex{\small}
 \begin{verbatim}
      % segment in1=! in2=$KAPPA_DIR/ccdframec out=ccdmask
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 NDF ccdmask will have bad values inside the polygons, whereas
 
-\small
+\latex{\small}
 \begin{verbatim}
      % segment in2=! in1=$KAPPA_DIR/ccdframec out=ccdmask
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 the pixels exterior to the polygons are flagged.  SEGMENT lets you
 define the polygon vertices interactively, like in
 \htmlref{ARDGEN}{ARDGEN}, but you can also use text files, or respond
@@ -9590,24 +9590,24 @@ The application \htmlref{SETBB}{SETBB} allows you to modify the
 bad-bits mask in an NDF.  It allows you to specify the bit pattern in
 a number of ways including decimal and binary as illustrated below.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % setbb RO950124 5
      % setbb RO950124 b101
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 These both set the bad-bits mask to 00000101 for the NDF RO950124.
 SETBB also allows you to combine an existing NDF bad-bits mask with
 another mask using the operators AND and OR.  OR lets you switch on
 additional bits without affecting those already on; AND lets you turn
 off selected bits leaving the rest unchanged.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % setbb RO950124 b00010001 or
      % setbb RO950124 b11101110 and
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 The first example sets bits 1 and 5 but leaves the other bits of
 the mask unaltered, whereas the second switches off the same bits.
 
@@ -9635,33 +9635,33 @@ want to remove the bad pixels.
 First you could replace the bad values with some other reasonable value,
 such as zero.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % nomagic old new 0 comp=all
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 Here dataset new is the same as dataset old except that any bad value
 in the data or variance array has now become zero.
 
 If you wanted some representative value used based upon neighbouring
 pixels, use the \htmlref{GLITCH}{GLITCH} command.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % glitch old new mode=bad
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 This replaces the bad values in the data and variance arrays with the median 
 of the eight neighbouring pixels.  This works
 fine for isolated bad pixels but not for large blocks.  If your data are
 generally flat, large areas can be replaced using the
 \htmlref{FILLBAD}{FILLBAD} task.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % fillbad old new size=4
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 The value of parameter SIZE should be about half the diameter of the
 largest region of bad pixels.  Both the data array and variance arrays
 are filled.
@@ -9669,7 +9669,7 @@ are filled.
 You may replace individual pixels or rectangular sections using
 \htmlref{CHPIX}{CHPIX}.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % chpix old new
      SECTION - Section to be set to a constant /'55,123'/ >
@@ -9678,7 +9678,7 @@ You may replace individual pixels or rectangular sections using
      NEWVAL - New value for the section /'-1'/ >
      SECTION - Section to be set to a constant /'1:30,-10:24'/ > !
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 This replaces pixel (55,~123) with value 60, and the region from
 (1,~$-$10) to (30,~24) with $-$1.  The final {\tt{!}} ends the loop of
 replacements.  If you supply NEWVAL on the command line, only one
@@ -9687,11 +9687,11 @@ replacement occurs.
 It is also possible to paste other datasets where your bad values lie
 with the \htmlref{PASTE}{PASTE} and \htmlref{SEGMENT}{SEGMENT} tasks.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % paste old fudge"(10:20,29:30)" out=new
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 The dataset old is a copy of dataset new, except in the 22-pixel region
 (10,~29) to (20,~30), where the values originate from the fudge dataset.
 
@@ -9816,11 +9816,11 @@ group of several data files rather than just one. In this case, the
 application is automatically re-run until all the supplied data files have 
 been processed. For instance, in the following command:
 
-\small
+\latex{\small}
 \begin{verbatim}
     % display in="../a*" mode=perc accept 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 a group of NDFs (all those beginning with ``a'' in the parent directory)
 are assigned to the IN parameter, and the \htmlref{DISPLAY}{DISPLAY} command 
@@ -9829,32 +9829,32 @@ slow!) movie.
 
 Another example:
 
-\small
+\latex{\small}
 \begin{verbatim}
     % stats ndf=^files
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 will display the pixel statistics of all NDFs listed within the text file 
 \verb+files+.  The ``\verb+^+'' character indicates that the following
 string (\verb+files+) is not the name of an NDF, but the name of a text 
 file from which NDF names should be read. 
 
-\small
+\latex{\small}
 \begin{verbatim}
     % wcsframe '"image_a,image_b,image_c"' sky
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 This will set the current co-ordinate Frame for the three NDFs
 \verb+image_a+, \verb+image_b+ and \verb+image_c+ so that celestial sky
 co-ordinates are used to refer to positions within the NDFs, if possible.
 
-\small
+\latex{\small}
 \begin{verbatim}
     % cursor outcat="'first,^list_names'"
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 This will run \htmlref{CURSOR}{CURSOR} several times, allowing you
 to select display positions using a cursor.  On the first invocation,  
@@ -9863,11 +9863,11 @@ the selected positions are written to a positions list stored in file
 written to positions lists with names read from the text file
 \verb+list_names+. Finally, if this CURSOR command is followed by:
 
-\small
+\latex{\small}
 \begin{verbatim}
     % listshow accept
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \htmlref{LISTSHOW}{LISTSHOW} will display the contents of all the
 catalogues created previously by CURSOR.
@@ -9879,11 +9879,11 @@ processing continues normally until the smallest group is exhausted. For
 instance, the following example adds NDF \verb+a1+ to \verb+a2+, and
 \verb+b1+ to \verb+b2+, putting the results in \verb+a3+ and \verb+b3+:
 
-\small
+\latex{\small}
 \begin{verbatim}
     % add in1="'a1,b1'" in2="'a2,b2'" out="'a3,b3'"
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
  
 If (say) an extra NDF had been specified for parameter IN2, the
 application would have been invoked twice to process the first two
@@ -9956,11 +9956,11 @@ an appropriate CENTRE value for each displayed image.  If you want to use
 the same CENTRE value for all images you should specify it explicitly on
 the command line, for instance:
 
-\small
+\latex{\small}
 \begin{verbatim}
     % display in="../a*" mode=perc centre="'12:00:00 -32:00:00'" accept 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \subsection{Output Parameters}
 If you tried out the examples at the start of this section, you may be
@@ -10025,21 +10025,21 @@ by setting the shell environment variable {\tt KAPPA\_LOOP\_DELAY} to the
 required delay time (in units of seconds). For instance, in the
 C-shell:
 
-\small
+\latex{\small}
 \begin{verbatim}
     % setenv KAPPA_LOOP_DELAY 2.5
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 causes a delay of 2.5 seconds between invocations of any \KAPPA\ 
 command.  To remove the delay, you should undefined {\tt KAPPA\_LOOP\_DELAY}. 
 In C-shell:
 
-\small
+\latex{\small}
 \begin{verbatim}
     % unsetenv KAPPA_LOOP_DELAY
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \subsection{Reporting the Data Files being Processed}
 When processing a single data file, some applications report the name of 
@@ -10056,22 +10056,22 @@ environment variable {\tt KAPPA\_REPORT\_NAMES} to an arbitrary
 value.\footnote{The actual value does not matter.} For instance, in the
 C-shell:
 
-\small
+\latex{\small}
 \begin{verbatim}
     % setenv KAPPA_REPORT_NAMES 1
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 This causes the value used for each data file parameter to be displayed in the
 form \verb+"parameter = value"+ on each invocation.  To go back to the
 normal, quiet reporting scheme, you should undefined {\tt KAPPA\_REPORT\_NAMES}.
 In C-shell:
 
-\small
+\latex{\small}
 \begin{verbatim}
     % unsetenv KAPPA_REPORT_NAMES
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \subsection{The Syntax for Specifying Groups of Data Files}
 
@@ -10134,11 +10134,11 @@ data files.  This can be done by setting the environment variable
 {\tt KAPPA\_LOOP\_DISABLE} to an arbitrary value.\footnote{The actual value does 
 not matter.} For instance, in the C-shell:
 
-\small
+\latex{\small}
 \begin{verbatim}
     % setenv KAPPA_LOOP_DISABLE 1
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 will cause all NDF and positions list parameters to accept only a single
 data file, and each application will be run only once. Note, the extra
@@ -10146,11 +10146,11 @@ facilities for specifying data files provided by the group expression
 syntax will not then be available.  To re-enable looping, you should
 undefine {\tt KAPPA\_LOOP\_DISABLE}. In C-shell:
 
-\small
+\latex{\small}
 \begin{verbatim}
     % unsetenv KAPPA_LOOP_DISABLE
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \newpage
 \section{\xlabel{se_datainput}Getting Data into KAPPA\label{se:datainput}}
@@ -10186,29 +10186,29 @@ an environment variable called {\tt NDF\_FORMATS\_IN} which defines the
 allowed formats in a comma-separated list with the file extensions in
 parentheses.  Here is an example.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % setenv NDF_FORMATS_IN 'FITS(.fit),IRAF(.imh),FIGARO(.dst)'
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 Once defined it lets you run \KAPPA\ tasks on FITS,
 \IRAF, or \FIGARO\ files, like
-\small
+\latex{\small}
 \begin{verbatim}
      % stats m51.fit
      % stats m51.dst
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 would compute the statistics of a FITS file {\tt m51.fit}, and then
 a \FIGARO\ file {\tt m51.dst}.
 
 The environment variable also defines a search order.  Had you entered
 
-\small
+\latex{\small}
 \begin{verbatim}
      % stats m51
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 \htmlref{STATS}{STATS} would first look for an NDF called m51 (stored in file {\tt
 m51.sdf}). If it could not locate that NDF, STATS would then look for
 a file called {\tt m51.fit}, and then {\tt m51.imh}, and finally {\tt
@@ -10221,11 +10221,11 @@ You can still define an
 section}{se:ndfsect}} when you access an existing data file in a foreign
 format.  Thus
 
-\small
+\latex{\small}
 \begin{verbatim}
      % stats m51.imh"(100:200,200~81)"
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 would derive the statistics for \textit{x} pixels between 100 and 200, and
 \textit{y} pixels 160 to 240 in the \IRAF\ file {\tt m51.imh}.
 
@@ -10239,28 +10239,28 @@ There is an environment variable that defines the format of new data
 files.  This could be assigned the same value as {\tt NDF\_FORMATS\_OUT},
 though they don't have to be.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % setenv NDF_FORMATS_OUT 'FITS(.fit),IRAF(.imh),FIGARO(.dst)'
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 If you supply the file extension when a \KAPPA\ task creates a
 new dataset, and it appears in {\tt NDF\_FORMATS\_OUT}, you'll get a file in
 that format.  So for instance,
 
-\small
+\latex{\small}
 \begin{verbatim}
      % ffclean in=m51.dst out=m51_cleaned.dst \\
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 cleans {\tt m51.dst} and stores the result in {\tt m51\_cleaned.dst}.
 On the other hand, if you only give the dataset name
-\small
+\latex{\small}
 \begin{verbatim}
      % ffclean in=m51.dst out=m51_cleaned \\
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 the output dataset would be the first in the {\tt NDF\_FORMATS\_OUT} list.
 Thus if you want to work predominantly in a foreign format, place it
 first in the {\tt NDF\_FORMATS\_IN} and {\tt NDF\_FORMATS\_OUT} lists.
@@ -10268,29 +10268,29 @@ first in the {\tt NDF\_FORMATS\_IN} and {\tt NDF\_FORMATS\_OUT} lists.
 If you want to create an output NDF, you must insert a full stop at the
 head of the list.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % setenv NDF_FORMATS_OUT '.,FITS(.fit),IRAF(.imh),FIGARO(.dst)'
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 This is the recommended behaviour.  If you just want to propagate the
 input data format, insert an asterisk at the start of the output-format
 list.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % setenv NDF_FORMATS_OUT '*,.,FITS(.fit),IRAF(.imh),FIGARO(.dst)'
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 This only affects applications which create a dataset using information
 propagated from an existing dataset.  For instance, if the above
 {\tt NDF\_FORMATS\_OUT} were defined,
 
-\small
+\latex{\small}
 \begin{verbatim}
      % ffclean in=m51.dst out=m51_cleaned \\
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 would now create {\tt m51\_cleaned.dst}.  If there is no propagation
 in the given application, the asterisk is ignored. 
 
@@ -10301,7 +10301,7 @@ and will save the conversion each time you access the dataset.
 The {\tt convert} command, which sets up definitions for the \CONVERT\ 
 package defines the lists of input and output formats as follows.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % setenv NDF_FORMATS_IN \
      'FITS(.fit),FIGARO(.dst),IRAF(.imh),STREAM(.das),UNFORMATTED(.unf),UNF0(.dat),
@@ -10315,7 +10315,7 @@ package defines the lists of input and output formats as follows.
      UNF0(.dat),ASCII(.asc),TEXT(.txt),GIF(.gif),TIFF(.tif),GASP(.hdr),
      COMPRESSED(.sdf.Z),GZIP(.sdf.gz)'
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 See the \CONVERT\ documentation for more details of these conversions.
 
@@ -10362,7 +10362,7 @@ the FITS keywords BSCALE and BZERO, if present.  If you are wondering
 why there is {\tt (1)} after the file number, that's present because
 FITS files can have sub-files, stored as FITS extensions.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % fitsin
      MT - Tape deck /@/dev/nrmt0h/ >
@@ -10393,7 +10393,7 @@ FITS files can have sub-files, stored as FITS extensions.
      Completed processing of tape file 2 to ff1.
      MORE - Any more files? /NO/ >
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 We can trace the structure to reveal the 2-byte integer CCD image.  Notice
 that the FITS headers are stored verbatim in a component .MORE.FITS.
 This is the FITS extension.  The extension contents can be listed with
@@ -10402,7 +10402,7 @@ its purpose in
 \latexhtml{Section~\ref{se:fitsairlock}.}{the \htmlref{FITS
 Airlock}{se:fitsairlock}.}
 
-\small
+\latex{\small}
 \begin{verbatim}
      % hdstrace ff1
      FF1  <NDF>
@@ -10417,7 +10417,7 @@ Airlock}{se:fitsairlock}.}
    
      End of Trace.
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 If you have many FITS files to read there is a quick method for
 extracting all files or a selection.  In automatic mode the output
 files are generated without manual intervention and the headers aren't
@@ -10431,7 +10431,7 @@ The following example extracts the fourth to sixth, and eighth files.
 Note that the {\tt [~]} are needed because the value for parameter FILES is
 a character array. 
 
-\small
+\latex{\small}
 \begin{verbatim}
      % fitsin auto
      MT - Tape deck /@/dev/nrmt0h/ >
@@ -10444,18 +10444,18 @@ a character array.
      Completed processing of tape file 8 to JKT8.
      MORE - Any more files? /NO/ >
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 You can list selected FITS headers from a FITS tape without attempting
 to read in the data into NDFs by using \htmlref{FITSHEAD}{FITSHEAD}.
 You can redirect its output to a file to browse at your leisure, and
 identify the files you want to convert.  So for instance,
 
-\small
+\latex{\small}
 \begin{verbatim}
      % fitshead /dev/nrmt1h > headers.lis
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 lists all the FITS headers from a FITS tape on device {\tt /dev/nrmt1h}
 to file {\tt headers.lis}.
 
@@ -10483,7 +10483,7 @@ wildcards.  However, a comma-separated list must be enclosed in
 quotation marks.  Also wildcards must be protected.  Here are some
 examples so you get the idea.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % fitsdin '*.fit'
      % fitsdin \*.fit
@@ -10491,11 +10491,11 @@ examples so you get the idea.
      % fitsdin '"i*.fit,abc123.fts"'
      ICL> fitsdin "i*.fit,abc123.fts"
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 In the following example a floating-point file is read (BITPIX=$-$32)
 and so FMTCNV is not required.
-\small
+\latex{\small}
 \begin{verbatim}
      % fitsdin '*.fits'
 
@@ -10552,12 +10552,12 @@ and so FMTCNV is not required.
      OUT - Output image > iraf
      Completed processing of disc file /home/scratch/dro/indef.fits to iraf.
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 \htmlref{NDFTRACE}{NDFTRACE} shows that the object name is written to
 the NDF's title, that axes derived from the FITS headers are present,
 and that gr is a \_REAL NDF.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % ndftrace gr
  
@@ -10591,7 +10591,7 @@ and that gr is a \_REAL NDF.
               FITS             <_CHAR*80>
  
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 Both FITSIN and FITSDIN write the FITS headers into an NDF extension
 called FITS within your NDF.  The extension is a literal copy of all
 the 80-character `card images' in order.  These can be inspected or
@@ -10668,13 +10668,13 @@ of extension information: \htmlref{FITSIMP}{FITSIMP} and
 translation table between the FITS keyword and extension components.
 Starting with FITSIMP, its translation table might look like this.
 
-\small
+\latex{\small}
 \begin{verbatim}
      ORDER_NUMBER _INTEGER  ORDNUM 
      PLATE_SCALE  _REAL SCALE         ! The plate scale in arcsec/mm
      SMOOTHED  _LOGICAL FILTERED 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 It consists of three fields: the first is the name of the component in
 the chosen extension, the second is the \htmlref{HDS data type}{ap:HDStypes}
@@ -10684,11 +10684,11 @@ these lines in file {\tt imptable}, we could create an extension
 called MYEXT of data type MJC\_EXT (if it did not already exist)
 containing components ORDER\_NUMBER, PLATE\_SCALE, and SMOOTHED.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % fitsimp mydata imptable myext mjc_ext
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 Should any of the keywords not exist in the FITS extension, you'll be
 warned.  If the extension already exists, you don't need to specify
 the extension data type.  FITSIMP will even handle hierarchical
@@ -10696,13 +10696,13 @@ keywords and those much-loved ING packets from La Palma.
 
 Going in the opposite direction, the text translation file could look
 like this
-\small
+\latex{\small}
 \begin{verbatim}
      MYEXT.ORDER_NUMBER  ORDNUM(LAST) The spectral order number
      MYEXT.PLATE_SCALE   SCALE   The plate scale in arcsec/mm
      MYEXT.SMOOTHED  FILTERED 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 where the first column is the `name' of the extension component to be
 copied to the FITS extension.  The `name' includes the extension name
 and substructures.  The second column gives the FITS keyword to which
@@ -10723,11 +10723,11 @@ exposure time, as part of your data processing.
 \htmlref{FITSLIST}{FITSLIST} lists the contents of the FITS extension
 of an NDF or file.  You can even search for keywords with {\bf grep}.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % fitslist myndf | grep "ELAPSED ="
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 This would find the keyword ELAPSED in the FITS extension of NDF
 myndf.  (Keywords are 8 characters long and those with values are
 immediately followed by an equals sign.)  However, the recommended
@@ -10736,16 +10736,16 @@ command only reports the value, it is particularly useful in scripts
 that need ancillary-data values during processing.  The following
 obtains the value of keyword ELAPSED.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % fitsval myndf ELAPSED
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 In a script you may need to know whether the keyword exists and take
 appropriate action.
 
-\small
+\latex{\small}
 \begin{verbatim}
      filterpre = `fitsexist myndf filter`
      if ( $filterpre == "TRUE" ) then
@@ -10755,7 +10755,7 @@ appropriate action.
         set filter = $<
      endif
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 Shell variable {\tt filterpres} would be assigned {\tt "TRUE"} when
 the FILTER card is present, and {\tt "FALSE"} otherwise.  (The
 {\tt `~`} quotes cause the enclosed command to be executed.)  So the
@@ -10769,12 +10769,12 @@ Besides the conversion utilities, you can import your own FITS
 extension using \htmlref{FITSTEXT}{FITSTEXT}.  You first prepare a
 FITS-like header in a text file.  For example,
 
-\small
+\latex{\small}
 \begin{verbatim}
      % fitstext myndf myfile
 \end{verbatim}
 
-\normalsize
+\latex{\normalsize}
 places the contents of {\tt myfile} in the NDF called myndf.  This is
 not advised unless you are familiar with the rules for writing FITS
 headers.  See the NOST 
@@ -10799,20 +10799,20 @@ for any new keywords you wish to add.  \htmlref{FITSEDIT}{FITSEDIT}
 lets you do this with your favourite text editor.  Define the
 environment variable EDITOR to your editor, say
 
-\small
+\latex{\small}
 \begin{verbatim}
      % setenv EDITOR jed
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 to choose {\bf jed}.  If you don't do this, and EDITOR is unassigned,
 FITSEDIT selects the {\bf vi} editor.  Then to edit the NDF extension
 is simple.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % fitsedit myndf
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 This edits the FITS extension of the NDF called myndf.
 FITSEDIT extracts the file into a temporary file ({\tt{zzfitsedit.tmp}})
 which you edit, and then uses FITSTEXT to restore the FITS extension.
@@ -10826,11 +10826,11 @@ Should you wish to write a new value without knowing about FITS, or
 in a script where manual editing is undesirable, the
 \htmlref{FITSWRITE}{FITSWRITE} command does the job.  So for example,
 
-\small
+\latex{\small}
 \begin{verbatim}
      % fitswrite myndf filter value=K
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 will create a keyword FILTER with value {\tt K} in the FITS extension
 of the NDF called myndf.  If the extension does not exist, this
 command will first create it.
@@ -10838,26 +10838,26 @@ command will first create it.
 The \htmlref{FITSMOD}{FITSMOD} command has several editing options
 including the ability to delete a keyword:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % fitsmod myndf airmass edit=delete
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 here it removes the AIRMASS header; or rename a keyword:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % fitsmod myndf band rename newkey=filter
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 as in this example, where keyword BAND becomes keyword FILTER; or
 update an existing keyword:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % fitsmod myndf filter edit=u value=\$V comment='"Standard filter name"'
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 this example modifies the comment string associated with the FILTER
 keyword, leaving the value unchanged.
 
@@ -10900,7 +10900,7 @@ the NDF you want to display.  When you substitute an \ICL
 variable for a parameter value you enclose it in parentheses.  The lines
 beginning with {\tt \{ } are comments.
 
-\small
+\latex{\small}
 \begin{verbatim}
      PROC FLASH INPIC
      {
@@ -10909,28 +10909,28 @@ beginning with {\tt \{ } are comments.
         DISPLAY IN=(INPIC) MODE=FL 
      END PROC
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 To make \ICL\ recognise your procedure you must `load' it.  The
 command
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> LOAD FLASH
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 will load the file {\tt FLASH.ICL}.
 Thereafter in the \ICL\ session you can invoke FLASH for many
 NDFs.  The following will display the NDFs called GORDON and FLOOD
 side-by-side.
 
-\small
+\latex{\small}
 \begin{verbatim}
      ICL> PICGRID 2 1 
      ICL> FLASH GORDON
      ICL> PICSEL 2
      ICL> FLASH FLOOD
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 It would be tedious to have to load lots of individual procedures, but
 you don't. If you have related procedures that you regularly require
 they can be concatenated into a single file which you load.  Better
@@ -10939,24 +10939,24 @@ login file.  This is defined as the value of the ICL\_LOGIN
 environment variable.  A reasonable place is in your home directory
 and you'd define it like this.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % setenv ICL_LOGIN $HOME/login.icl
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 However, the file doesn't have to be in your home directory, or called
 {\tt login.icl}, but it's convenient to do so.  Suppose you have three
 procedures: FLASH, PICGREY in file {\tt \$MY\_DIR/display\_proc.icl},
 and FILTER in {\tt /home/user1/dro/improc.icl}.  In your {\tt
 \$HOME/login.icl} you could add the following
 
-\small
+\latex{\small}
 \begin{verbatim}
      defproc  flash     $MY_DIR/display_proc.icl
      defproc  sfilt     $HOME/user1/dro/improc.icl filter
      defproc  picgr(ey) $MY_DIR/display_proc.icl
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 which defines three commands that will be available each time you
 use \ICL: FLASH which will run your FLASH
 procedure, PICGREY to execute the PICGREY procedure, and SFILT which
@@ -10968,7 +10968,7 @@ Suppose you have a series of commands to run on a number of files.
 You could create a procedure to perform all the stages of the
 processing, deleting the intermediate files that it creates.
 
-\small
+\latex{\small}
 \begin{verbatim}
      PROC UNSHARPMASK NDFIN CLIP NDFOUT
 
@@ -11003,7 +11003,7 @@ processing, deleting the intermediate files that it creates.
         ! rm tmp4.sdf
      END PROC
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 There is a piece of syntax to note which often catches people out.
 Filenames, data objects, and devices passed via \ICL\ variables
 to applications, such as NDFIN and NDFOUT in the above example, must
@@ -11013,7 +11013,7 @@ A common use of procedures is likely to be to duplicate processing
 for several files.  Here is an example procedure that does that.  It uses
 some intrinsic functions which look just like Fortran.
 
-\small
+\latex{\small}
 \begin{verbatim}
      PROC MULTISTAT
 
@@ -11037,7 +11037,7 @@ some intrinsic functions which look just like Fortran.
         END LOOP
      END PROC
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 If NUM is set to 10, the above procedure obtains the statistics of the
 images named REDX1, REDX2, \dots REDX10.  The \ICL\ variable FILE is in
 parentheses because its value is to be substituted into parameter NDF. 
@@ -11050,7 +11050,7 @@ loop.  Note the {\tt \~{}} continuation character (it's not
 required but it's included for pedagogical reasons).
 \pagebreak[3]
 
-\small
+\latex{\small}
 \begin{verbatim}
      PROC FLATFIELD
 
@@ -11084,7 +11084,7 @@ required but it's included for pedagogical reasons).
         END LOOP
      END PROC
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 Some \KAPPA\ applications, particularly the statistical ones,
 produce output parameters which can be passed between applications via
 \ICL\ variables.  Here is an example to draw a
@@ -11094,7 +11094,7 @@ stored in an output NDF file.  Note the syntax required to define the
 value of parameter INIT; the space between the left bracket and
 parenthesis is essential.
 
-\small
+\latex{\small}
 \begin{verbatim}
      PROC COLSTAR FILE,X,Y,SIZE,OUTFILE
 
@@ -11157,7 +11157,7 @@ parenthesis is essential.
         END EXCEPTION
      END PROC
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \newpage
 \section{\xlabel{se_probpage}Problems Problems\label{se:probpage}}
@@ -11183,12 +11183,12 @@ You can precede the wildcard character with {\tt $\backslash$}, or
 surround the wildcard characters in {\tt " "} quotes.  Here are some
 examples.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % ndftrace ccd\?_ff
      % stats \*118_"[b-d]?"
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \subsection{Unable to Obtain Work Space}
 
@@ -11207,7 +11207,7 @@ you can try increasing your process limits using the C-shell built-in
 function {\tt limit}.  You can find your current limits by entering
 {\tt limit}.  You should see a list something like this.
 
-\small
+\latex{\small}
 \begin{verbatim}
      cputime         unlimited
      filesize        unlimited
@@ -11218,7 +11218,7 @@ function {\tt limit}.  You can find your current limits by entering
      vmemoryuse      1048576 kbytes
      descriptors     4096 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 The relevant keywords are {\tt datasize} and the {\tt vmemoryuse}.  In
 effect {\tt datasize} specifies the maximum total size of data files
 you can map at one time in a single programme.  The default should be
@@ -11226,16 +11226,16 @@ adequate for most purposes and only need be modified for those working
 with large images or cubes.  The {\tt vmemoryuse} specifies the maximum
 virtual memory you can use.
 
-\small
+\latex{\small}
 \begin{verbatim}
     % limit datasize 32768
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 sets the maximum size of mapped data to 32 megabytes.  Values cannot
 exceed the system limits.  You can list these with the {\tt -h}
 qualifier.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % limit -h
      cputime         unlimited
@@ -11247,7 +11247,7 @@ qualifier.
      vmemoryuse      1048576 kbytes
      descriptors     4096 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 Although you can set your limits to the system maxima, it doesn't mean
 that you should just increase your quotas to the limits. You might
 become unpopular with some of your colleagues, especially if you
@@ -11274,11 +11274,11 @@ directly.  You can override the AGI NDF also by specifying the
 required NDF on the command line, provided it has pixels whose indices
 lies within the world co-ordinates of the {\tt DATA} picture.  Thus
 
-\small
+\latex{\small}
 \begin{verbatim}
      % inspect myndf
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 will inspect the NDF called myndf.  The command \htmlref{PICIN}{PICIN} will
 show the last DATA picture and its associated NDF.
 
@@ -11301,11 +11301,11 @@ has been reset.  \htmlref{PALDEF}{PALDEF} will set up the default
 colours for the palette, and so most line graphics will then appear in
 white.  Alternatively,
 
-\small
+\latex{\small}
 \begin{verbatim}
      % palentry 1 white
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 will normally suffice.
 
 \subsection{Error Obtaining a Locator to a Slice of an HDS array}
@@ -11322,12 +11322,12 @@ defining an \htmlref{NDF section}{se:ndfsect} in the UNIX shell.
 Try inserting a backslash before each parenthesis or enclosing all the
 special characters inside {\tt " "} quotes.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % stats myndf\(100:200,\)
      % linplot spectrum"(5087.0~30)"
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 
 \subsection{Attempt to use 'positional' parameter value ({\tt{x}}) in an 
@@ -11337,18 +11337,18 @@ adding positional parameters unintentionally, is to forget to escape
 the {\tt{"}} from the shell when supplying a string with spaces or
 wildcards.  For example, this error would arise if we entered
 
-\small
+\latex{\small}
 \begin{verbatim}
      % settitle myndf "A title"
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 instead of say
 
-\small
+\latex{\small}
 \begin{verbatim}
      % settitle myndf '"A title"'
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 which protects all special characters between the single quotes.
 
 \subsection{The choice {\tt x} is not in the menu.  The options
@@ -11360,22 +11360,22 @@ For the latter, part of another value is being
 interpreted as a positional value for the parameter the task is
 complaining about.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % linplot $KAPPA_DIR/spectrum style="Title=Red-giant plot"
      !! The choice plot is not in the menu.  The options are
      !     Data,Quality,Error,Variance.
      !  Invalid selection for parameter COMP.
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 Here it thinks that {\tt plot} is a positional value.  Escape
 the {\tt{"}} to cure the problem.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % linplot $KAPPA_DIR/spectrum style='"Title=Red-giant plot"'
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 \subsection{Annotated axes show the wrong co-ordinate system}
 Each NDF has an associated {\em current co-ordinate system} which is used
@@ -11385,11 +11385,11 @@ different} co-ordinate system, you need to change the current co-ordinate
 system (more often called the current co-ordinate {\em frame}) of the NDF
 by using command \htmlref{WCSFRAME}{WCSFRAME}. For instance,
 
-\small
+\latex{\small}
 \begin{verbatim}
      % wcsframe m57 pixel
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 will cause all subsequent commands to use pixel co-ordinates when
 reporting positions, or obtaining positions.
@@ -11410,42 +11410,42 @@ the \htmlref{FITSDIN}{FITSDIN} application to generate the output NDF
 or foreign format.  For example to convert a FITS file from device
 {\tt /dev/nrst0} to an NDF called ndfname, you might enter
 
-\small
+\latex{\small}
 \begin{verbatim}
      % dd if=/dev/nrst0 ibs=2880 of=file.fits
      % fitsdin files=file.fits out=ndfname
      % rm file.fits
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 where {\tt file.fits} is the temporary disc-FITS file.  The 2880 is
 the length of a FITS record in bytes.  Repeated {\bf dd} commands to
 a no-rewind tape device (those with the {\tt n} prefix on OSF/1 and the
 {\tt n} suffix on Solaris) will copy successive files.  To skip over
 files or rewind the tape, use the {\bf mt} command.  For example,
 
-\small
+\latex{\small}
 \begin{verbatim}
      % mt -f /dev/rmt/1n fsf 3
            :       :       :
      % mt -f /dev/rmt/1n asf 4
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 moves the tape on device {\tt /dev/rmt/1n} forward three files,
 then moves to the fourth file,
 
-\small
+\latex{\small}
 \begin{verbatim}
      % mt bsf 2
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 moves back two files on the default tape drive (defined by the
 environment variable TAPE), and
 
-\small
+\latex{\small}
 \begin{verbatim}
      % mt -f /dev/nrmt0h rewind
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 rewinds to the start of the tape on device {\tt /dev/nrmt0h}.
 Thus it is possible to write a script for extracting and converting a
 series of files including ranges, just like FITSIN does.  
@@ -11458,7 +11458,7 @@ If the above approach fails, try another tape drive.
 If you attempt to read a FITS magnetic tape with
 \htmlref{FITSIN}{FITSIN}, you might receive an error like this
 
-\vspace*{-\smallskipamount}
+\vspace*{-\latex{\small}skipamount}
 \small
 \begin{verbatim}
      % fitsin
@@ -11468,7 +11468,7 @@ If you attempt to read a FITS magnetic tape with
      !  /dev/nrmt3l: MAG__UNKDV, Unable to locate device in DEVDATASET
 \end{verbatim}
 \vspace*{-\medskipamount}
-\normalsize
+\latex{\normalsize}
 when you enter the device name.  The magnetic-tape system uses an
 \HDSref\ file called the device dataset (DEVDATASET) to store the
 position of the tape between invocations of Starlink applications.
@@ -11485,11 +11485,11 @@ not accessible on the particular machine, or because your computer manager
 has not maintained the DEVDATASET when a drive was added.  You can look
 at the contents of the DEVDATASET with this command.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % hdstrace /star/etc/devdataset
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 
 Oh and one other point: make sure the tape is loaded in the drive.
@@ -11517,13 +11517,13 @@ will keep the \htmlref{global}{se:parglobals} and
 The way to look for corrupted HDS files is trace them.
 Assuming that \$ADAM\_USER and \$AGI\_USER are defined,
 
-\small
+\latex{\small}
 \begin{verbatim}
      % hdstrace $ADAM_USER/GLOBALS full
      % hdstrace $ADAM_USER/ardmask full
      % hdstrace $AGI_USER/agi_cacvad full
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 traces the {\tt GLOBALS} file, the application you were running when the
 weird error occurred (here \htmlref{ARDMASK}{ARDMASK}), and the
 graphics database for machine {\tt cacvad}.  Once you have identified
@@ -11539,13 +11539,13 @@ on the type of task that failed: graphics, NDF components, or
 the rest (mostly image processing) corresponding to these three
 monolith interface files.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % hdstrace $ADAM_USER/kapview_mon full
      % hdstrace $ADAM_USER/ndfpack_mon full
      % hdstrace $ADAM_USER/kappa_mon full
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 
 If that doesn't cure the problem, send the Starlink Software Librarian 
@@ -11589,7 +11589,7 @@ modify STATS.  First to save typing define environment variables, say
 Starlink software, \KAPPA\ and \KAPLIBS\  source is stored.  Next
 we extract the source files to change.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % setenv STAR /star
      % setenv KAPPA /star/sources/kappa
@@ -11600,7 +11600,7 @@ we extract the source files to change.
      % tar xf $KAPLIBS/kapgen_sub.tar kpg1_stdsr.f
      % tar xf $KAPPA/kappa_source.tar kappa_link_adam
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 We modify {\tt kpg1\_statr.f} to compute the additional statistics;
 {\tt kpg1\_stdsr.f} to list the statistics; {\tt stats.f} to update the
@@ -11611,7 +11611,7 @@ modified, but it is needed during linking.
 
 Next some soft links to include files need to be made.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % star_dev
      % ndf_dev
@@ -11619,7 +11619,7 @@ Next some soft links to include files need to be made.
      % par_dev
      % kaplibs_dev
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 For some other application and subroutines, you can find what is
 needed by trying to compile them and see which include files the
 compiler cannot locate.  You then invoke the appropriate package
@@ -11627,36 +11627,36 @@ definitions: {\em pkg}{\tt \_dev}, where {\em pkg\/} is the three-letter
 package abbreviation.  Now compile the modified code.  This is for
 OSF/1:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % f77 -O -c -nowarn stats.f kpg1_statr.f kpg1_stdsr.f
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 and this is for Solaris:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % f77 -O -PIC -c -w stats.f kpg1_statr.f kpg1_stdsr.f
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 The {\tt -nowarn} and {\tt -w} prevent warning messages appearing.
 
 And this is for Linux:
 
-\small
+\latex{\small}
 \begin{verbatim}
      % g77 -fno-second-underscore -O -c stats.f kpg1_statr.f kpg1_stdsr.f
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 Now link the task to produce a new {\tt stats} executable.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % alink stats.o -o stats kpg1_statr.o kpg1_stdsr.o \
      -L$STAR/lib `./kappa_link_adam`
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 If you want to use \KAPPA\ subroutines for your own application
 here are words of warning: {\em the code may undergo alterations of
@@ -11678,11 +11678,11 @@ fieldnames, and how to recompile the interface file.  If you use
 ndfpack\_mon.ifl}.  Finally, you will need to specify a search path
 that includes the directory containing your modified interface file.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % setenv ADAM_IFL /home/scratch/dro/ifls:/usr/local/kappa
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 This asks Starlink programmes to look in {\tt /home/scratch/dro/ifls}
 to find the interface file, and if there isn't one to look in {\tt
 /usr/local/kappa}.  If the interface file search is unsuccessful, the
@@ -11712,11 +11712,11 @@ different work in different directories.  Now to abbreviate a command
 you put a DEFSTRING entry into the \ICL\ login file.  For
 example,
 
-\small
+\latex{\small}
 \begin{verbatim}
      DEFSTRING MYC{ON} CONTOUR CLEAR=F PENROT MODE=AU NCONT=7
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 defines {\tt MYC} or {\tt MYCO} or {\tt MYCON} to run
 \htmlref{CONTOUR}{CONTOUR} without clearing the screen, with pen
@@ -11724,30 +11724,30 @@ rotation and seven equally spaced contour heights.  The symbols are not
 limited to \KAPPA.  Indeed they can include shorthands for
 shell commands.  For example,
 
-\small
+\latex{\small}
 \begin{verbatim}
      DEFSTRING DA ls -al 
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 would make DA produce a directory listing of all files with sizes and
 modification dates.
 
 You can check what the current login files are as follows.
 
-\small
+\latex{\small}
 \begin{verbatim}
      % printenv | grep ICL_LOGIN
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 
 For shell usage similar definitions can be made with aliases. For
 example, 
  
-\small
+\latex{\small}
 \begin{verbatim}
      % alias mycon contour clear=f penrot mode=au ncont=7
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
  
 is the equivalent of the DEFSTRING above, except that in keeping with
 UNIX tradition the command is in lowercase, and the alias cannot be
@@ -12910,11 +12910,11 @@ WCS component of an NDF.
 No special quotas are needed to run \KAPPA.  If you have large
 datasets you might need to increase the datasize limit in the C-shell.
 
-\small
+\latex{\small}
 \begin{verbatim}
     % limit datasize 65336
 \end{verbatim}
-\normalsize
+\latex{\normalsize}
 sets the maximum size of a data file to 64 megabytes.  To list the
 current values use the {\bf limit} command without any arguments.
 
@@ -17225,7 +17225,7 @@ KAPPA: \htmlref{ADD}{ADD},
       The NDF outputs are intended to be displayed with \KAPPA\ application
       DISPLAY, using the command:
 
-      \hspace{5mm} {\small {\tt display $<$out$>$ scale=no lut=$<$lut$>$} }
+      \hspace{5mm} {\latex{\small} {\tt display $<$out$>$ scale=no lut=$<$lut$>$} }
 
       where ``{\tt $<$out$>$}'' and ``{\tt $<$lut$>$}'' are the names of the
       NDF image and colour table created by this application using
@@ -17413,7 +17413,7 @@ KAPPA: \htmlref{ADD}{ADD},
          The created colour composite image should be displayed using the
          command:
 
-         \hspace{5mm} {\small {\tt display m31\_col scale=no lut=m31\_lut} }
+         \hspace{5mm} {\latex{\small} {\tt display m31\_col scale=no lut=m31\_lut} }
 
       }
       \sstexamplesubsection{
@@ -17423,12 +17423,12 @@ KAPPA: \htmlref{ADD}{ADD},
          {\tt m31.ppm} is created which (for instance) can be displayed using
          the command:
 
-         \hspace{5mm} {\small {\tt xv m31.ppm} }
+         \hspace{5mm} {\latex{\small} {\tt xv m31.ppm} }
 
          It can be converted to a GIF (for instance, for inclusion in
          WWW pages) using the command:
 
-         \hspace{5mm} {\small {\tt ppmquant 256 m31.ppm $|$ ppmtogif $>$ m31.gif} }
+         \hspace{5mm} {\latex{\small} {\tt ppmquant 256 m31.ppm $|$ ppmtogif $>$ m31.gif} }
 
          These commands assume you have {\bf xv}, {\bf ppmquant} and 
          {\bf ppmtogif} installed at your site.  None of them are 
