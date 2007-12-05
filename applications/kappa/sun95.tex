@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.33}
 \newcommand{\stardocnumber}    {95.33}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2007 October 11}
+\newcommand{\stardocdate}      {2007 December 4}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.8-5}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -192,7 +192,7 @@
 % decimal-degree symbol
 \newcommand{\udeg}{\hskip-0.3em\dgs\hskip-0.08em}
 \begin{htmlonly}
-  \newcommand{\udeg}{{\rawhtml &deg;}} 
+  \newcommand{\udeg}{\hskip-0.12em\dgs\hskip-0.08em}
 \end{htmlonly}
 
 % decimal-second symbol
@@ -9148,8 +9148,20 @@ flagging pixels with certain properties or locations.
 
 \subsubsection{\xlabel{se_ardwork}Doing it the ARD Way\label{se:ardwork}}
 
-To mask a region or a series of regions within an NDF, you can
-create an \xref{ASCII Region Definition}{sun183}{} (ARD) file.
+To mask a region or a series of regions within an NDF, you can create
+an \xref{ASCII Region Definition}{sun183}{} (ARD) text file.  ARD has
+a powerful syntax for combining regions and supplying WCS information,
+described fully in \xref{SUN/183}{sun183}{}.  An ARD file comprises
+\xref{keywords}{sun183}{ARDKeywords} that define a region, such as
+{\tt RECT} to specify a rectangular box;
+\xref{operators}{sun183}{ARDOperators} that enable regions to be
+combined, for instance {\tt .AND.} that will form the intersection of
+two regions; and \xref{statements}{sun183}{ARDStatements} to define
+the \htmlref{world co-ordinate system}{se:wcsuse} and dimensionality.
+\latex{For further details see the three sections called
+\emph{Regions}, \emph{Operators}, and \emph{Statements} in SUN/183.}
+
+Here is an example of the creation of an ARD file.
 
 \small
 \begin{verbatim}
@@ -9157,7 +9169,7 @@ create an \xref{ASCII Region Definition}{sun183}{} (ARD) file.
      COFRAME(PIXEL)
      PIXEL( 23.5, -17.2 )
      ELLIPSE( 75.2, 296.6, 33, 16, 78 ) 
-     POLYGON( 110, 115, 123, 132, 130, 125 )
+     POLYGON( 109.5, 114.5, 122.5, 131.5, 199.5, 124.5 )
      CIRCLE( 10, 10, 40 ) .AND. .NOT. CIRCLE( 10, 10, 30 )
      COFRAME(SKY,SYSTEM=FK5,EQUINOX=2000)
      CIRCLE( 10:09:12.2, -45:12:13, ::40 ) 
@@ -9165,22 +9177,119 @@ create an \xref{ASCII Region Definition}{sun183}{} (ARD) file.
 \end{verbatim}
 \normalsize
 
-In this example, the regions are: the pixel with index [24,~$-$17] (note
-the rounding of \emph{pixel co-ordinates} to \emph{pixel indices}), an
-ellipse centred at (75.2,~296.6) with semi-major axis of 33 pixels and
-semi-minor axis of 16 pixels, at orientation 78\dgs\ clockwise from the
-\textit{x} axis, and an annulus centred on pixel co-ordinates (10.0,~10.0)
-between radius 30 and 40 pixels, a circle centred on RA 10:09:12.2, and
-DEC -45:12:13 of radius 40 arcseconds.  The COFRAME statements indicate
-the co-ordinate system in which subsequent positions are supplied.  There
-are several other keywords besides those shown here.  ARD has powerful
-syntax for combining regions and supplying WCS information, described
-fully in \xref{SUN/183}{sun183}{}, but you'll be relieved to learn that
-there is a shortcut\ldots
+The COFRAME statements indicate the co-ordinate system in which
+subsequent positions are supplied.  Its first argument is the
+\htmlref{domain}{se:resdoms}.  Here the first {\tt COFRAME(PIXEL)}
+refers to \htmlref{pixel co-ordinates}{fi:pixco}.  Note that these are
+not the same as \htmlref{pixel indices}{fi:pixind}, as they are
+displaced by -0.5 with respect to pixel indices.  The second {\tt
+COFRAME} selects a SKY domain using the FK5 system, so that regular
+equatorial co-ordinates may be supplied as arguments to subsequent
+keywords.  Other possible values for \htmlref{System}{System}~ include
+{\tt ECLIPTIC} and {\tt GALACTIC}.  If no COFRAME or WCS statement is
+present, the default co-ordinate system is pixel co-ordinates
+transformed by any COEFFS, OFFSET, TWIST, STRETCH, SCALE statements.
+Note that the \htmlref{ARDMASK}{ARDMASK} application, used to mask
+data with an ARD file, has a DEFPIX parameter where you can choose
+whether the default co-ordinates are pixel or those of the
+\htmlref{current WCS Frame}{se:curframe}. if there is no COFRAME or
+WCS statement in your ARD file.  Still you are recommended to supply a
+COFRAME or WCS statement in your ARD files to avoid accidentally
+selecting the wrong regions.
 
-If you are dealing with two-dimensional data, \KAPPA\ offers an
-interactive graphical tool for generating ARD files.  To use
-\htmlref{ARDGEN}{ARDGEN} you must first display your data on a device
+In this example, the regions are: the single pixel at co-ordinates
+(23.5,~-17.2); an ellipse centred at (75.2,~296.6) with semi-major
+axis of 33 pixels and semi-minor axis of 16 pixels, at orientation
+78\dgs\ clockwise from the \textit{x} axis; a triangle with vertices
+at pixel indices (110,~115), (123,~132), (200,~125); an annulus
+centred on pixel co-ordinates (10.0,~10.0) between radius 30 and 40
+pixels; and a circle centred on RA 10:09:12.2, and DEC -45:12:13 of
+radius 40 arcseconds.
+
+Operators combine regions using a Fortran-like logical expression,
+where each keyword acts like a logical operand acted upon by the
+adjoinning operators.  Statements are ignored in such logical
+expressions.  There is an implicit {\tt .OR.} operator for every
+keyword on a new line.  Thus pixels that lie in any of the above
+regions (the union) are selected.
+
+Where a keyword (such as CIRCLE, RECT, POLYGON) defines an area or
+volume a pixel is deemed to be part of that region if its
+\emph{centre} lies on or within the the boundary of the region.  For
+regions of zero volume (such as keywords PIXEL, LINE, COLUMN), the
+pixel is regarded as part of the region when the locus of the region
+passes through that pixel.  So for example, a PIXEL region will be the
+pixel emcompassing the supplied co-ordinates; and for a LINE, the
+selected pixels are all that intersect with the line's locus.
+
+
+Here are some more examples of ARD files.
+
+\small
+\begin{verbatim}
+     COFRAME(GRID)
+     ROTBOX( 12, 15, 20, 10, 36.3 ) .AND. .NOT. ( COLUMN( 13 ) .OR. ROW( 8 ) )
+\end{verbatim}
+\normalsize
+
+Now the co-ordinates are \htmlref{Grid co-ordinates}{fi:gridco}.  This
+selects all the pixels with a rotated box except those in thirteenth
+column or eighth row.  Note the use of parentheses to adjust or
+clarify the precedence.  The box is centred on grid pixel (12,~15) has
+sides of length 20 and 10 pixels.  The first side of the box---the one
+with length 20---is at an angle of 36$\udeg$.3 measured anticlockwise
+from the X axis.
+\medskip
+
+\small
+\begin{verbatim}
+     DIMENSION(3)
+     CIRCLE( 10.3, 21.6, 32.9, 10.4 )
+     LINE( 1.1, 2.2, 3.3, 4.4, 5.5, 6.6 )
+\end{verbatim}
+\normalsize
+
+This defines a sphere centred at pixel co-ordinates (10.3,~21.6,~32.9)
+with radius 10.4 pixels, and a line from (1.1,~2.2,~3.3) to
+(4.4,~5.5,~6.6).
+\medskip
+
+\small
+\begin{verbatim}
+     CIRCLE( 10.3, 21.6, 32.9, 10.4 )
+\end{verbatim}
+\normalsize
+
+This defines a sphere centred at pixel co-ordinates (10.3,~21.6,~32.9)
+with radius 10.4 pixels.
+\medskip
+
+\small
+\begin{verbatim}
+     .NOT. ELLIPSE( 75.2, 296.6, 33, 16, 78 ) 
+\end{verbatim}
+\normalsize
+
+This selects the whole array except for the ellipse defined as before.
+Something like this might be useful for excluding a galaxy image before
+fitting to the background around the galaxy.
+\medskip
+
+
+There are more details and further ARD facilities described in
+\xref{SUN/183}{sun183}{}.  If you do not wish to read SUN/183, you'll be
+relieved to learn that there are shortcuts for two-dimensional
+data\ldots
+
+The first is is provided by \xref{GAIA}{sun214}{} by its {\tt Image
+Analysis} $\rightarrow$ {\tt Image Regions\ldots} tool.  Here you can
+select region types and interactively adjust the region locations and
+shapes, and then record the selected regions in an ARD file.  However,
+it does not provide the boolean operators other than .OR. to combine a
+series of regions, or use co-ordinates other than pixel.
+
+\KAPPA\ offers its own interactive graphical tool for generating ARD files. 
+To use \htmlref{ARDGEN}{ARDGEN} you must first display your data on a device
 with a cursor, such as an X-terminal.  \htmlref{DISPLAY}{DISPLAY} with
 a grey-scale lookup table is probably best for doing that.  The grey
 lets you see the coloured overlays clearly.  The following example
@@ -9295,7 +9404,7 @@ but which lie within the first.
 
 Here is another example of combination.  This creates a region for
 pixels are included provided they are in one of two regions, but not
-in both.  Here we apply the {\tt XOR} operator to the small ellipse
+in both.  Here we apply the {\tt .XOR.} operator to the small ellipse
 and the first rotated box.
 
 \small
@@ -9348,6 +9457,7 @@ outline of the selected regions on top of a display image using
      % ardmask $KAPPA_DIR/ccdframec demo.ard ardccdmask
 \end{verbatim}
 \normalsize
+\medskip
 
 \begin{latexonly}
    \begin{figure}[hbt]
@@ -9367,13 +9477,14 @@ outline of the selected regions on top of a display image using
    Figure 13: Masking of {\tt \$KAPPA\_DIR/ccdframec}.  To the left shows
    the original ARDMASK regions, and to the right shows the final
    masked regions after some have been combined.
+
 \end{htmlonly}
 
-Figure~
-\latexhtml{\ref{fi:ardwork}}{8} shows the image with the original
-regions outlined to the left.  Note only the section (:270,~:360) is
-displayed.  To see where you have masked, use \htmlref{DISPLAY}{DISPLAY}, which lets you
-define a colour for bad pixels using the BADCOL parameter.
+Figure~\latexhtml{\ref{fi:ardwork}}{13} shows the image with the
+original regions outlined to the left.  Note only the section
+(:270,~:360) is displayed.  To see where you have masked, use
+\htmlref{DISPLAY}{DISPLAY}, which lets you define a colour for bad
+pixels using the BADCOL parameter.
 
 \small
 \begin{verbatim}
@@ -9381,7 +9492,7 @@ define a colour for bad pixels using the BADCOL parameter.
 \end{verbatim}
 \normalsize
 To the right of Figure~
-\latexhtml{\ref{fi:ardwork}}{8} is the final masked image.
+\latexhtml{\ref{fi:ardwork}}{13} is the final masked image.
 
 \subsubsection{\xlabel{se_badsegment}SEGMENT and
 ZAPLIN\label{se:badsegment}}
@@ -13650,8 +13761,8 @@ KAPPA: \htmlref{ARDPLOT}{ARDPLOT},
          system in which positions within this file are given should be
          indicated by including suitable COFRAME or WCS statements within
          the file (see SUN/183), but will default to pixel co-ordinates or 
-         current WCS Frame co-ordinates in the absence of any such statements
-         (see parameter DEFPIX). For instance, starting the
+         \htmlref{current WCS Frame}{se:curframe} co-ordinates in the absence of 
+         any such statements (see parameter DEFPIX).  For instance, starting the
          file with a line containing the text {\tt "COFRAME(SKY,System=FK5)"} would
          indicate that positions are specified in RA/DEC (FK5,J2000).  The
          statement {\tt "COFRAME(PIXEL)"} indicates explicitly that positions are
@@ -16246,7 +16357,7 @@ KAPPA: \htmlref{PASTE}{PASTE},
          WLIM specifies the minimum fraction of good pixels which must
          be present in order to generate a good output pixel.  If this
          specified minimum fraction of good input pixels is not present,
-         then a bad output pixel will result, otherwise an good output
+         then a bad output pixel will result, otherwise a good output
          value will be calculated.  The value of this parameter should
          lie between 0.0 and 1.0 (the actual number used will be rounded
          up if necessary to correspond to at least one pixel).  [0.3]
@@ -17592,7 +17703,7 @@ XV; PBMPLUS; NETPBM.
          WLIM specifies the minimum fraction of good pixels which must
          be present in order to generate a good output pixel.  If this
          specified minimum fraction of good input pixels is not present,
-         then a bad output pixel will result, otherwise an good output
+         then a bad output pixel will result, otherwise a good output
          value will be calculated.  The value of this parameter should lie
          between 0.0 and 1.0 (the actual number used will be rounded up if
          necessary to correspond to at least one pixel). {\tt [0.3]}
