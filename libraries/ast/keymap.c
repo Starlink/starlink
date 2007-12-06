@@ -111,9 +111,11 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map.
 *     5-DEC-2007 (DSB):
 *        Ensure mapsize is always a power of 2.
 *     6-DEC-2007 (DSB):
-*        Define the minium table size rather than the default SizeGuess
+*        - Define the minium table size rather than the default SizeGuess
 *        value, and derive the default SizeGuess value from the minimum
 *        table size.
+*        - Use "&" rather than "%" to get the hash table index from the
+*        full width hash value (& may be faster than %).
 *class--
 */
 
@@ -1140,6 +1142,7 @@ static void DoubleTableSize( AstKeyMap *this ) {
    AstMapEntry *next;
    AstMapEntry *new_next;
    int *newnentry;
+   int bitmask;
    int i;
    int newi;
    int newmapsize;
@@ -1147,8 +1150,14 @@ static void DoubleTableSize( AstKeyMap *this ) {
 /* Check the global error status. */
    if( !astOK ) return;
 
-/* Create the new arrays, leaving the old arrays intact for the moment. */
+/* Determine the new hash table size. Since mapsize starts out as a power
+   of 2 (ensured by the NewTable function), the new mapsize will also be
+   a power of 2. Also, create a bit mask that can be used to zero the
+   upper bits in a full width hash value. */
    newmapsize = 2*this->mapsize;
+   bitmask = newmapsize - 1;
+
+/* Create the new arrays, leaving the old arrays intact for the moment. */
    newtable = astMalloc( newmapsize*sizeof( AstMapEntry * ) );
    newnentry = astMalloc( newmapsize*sizeof( int ) );
    if( astOK ) {
@@ -1171,7 +1180,7 @@ static void DoubleTableSize( AstKeyMap *this ) {
          while( next && astOK ) {
 
 /* Find the index within the new table at which to store this entry. */
-            newi = ( next->hash % newmapsize );        
+            newi = ( next->hash & bitmask );        
 
 /* Save the pointer to the next entry following the current one in the
    linked list. */
@@ -1924,7 +1933,7 @@ static int GetSizeGuess( AstKeyMap *this ) {
            MIN_TABLE_SIZE*MAX_ENTRIES_PER_TABLE_ENTRY : this->sizeguess;
 }
 
-static int HashFun( const char *key, int mapsize, unsigned long *hash ){
+static int HashFun( const char *key, int bitmask, unsigned long *hash ){
 /*
 *  Name:
 *     HashFun
@@ -1937,7 +1946,7 @@ static int HashFun( const char *key, int mapsize, unsigned long *hash ){
 
 *  Synopsis:
 *     #include "keymap.h"
-*     int HashFun( const char *key, int mapsize, int *hash )
+*     int HashFun( const char *key, int bitmask, int *hash )
 
 *  Class Membership:
 *     KeyMap member function.
@@ -1950,8 +1959,10 @@ static int HashFun( const char *key, int mapsize, unsigned long *hash ){
 *  Parameters:
 *     key
 *        Pointer to the string. Trailing spaces are ignored.
-*     mapsize
-*        The length of the hash table.
+*     bitmask
+*        A bit mask that is used to zero the upper bits of a full width
+*        hash value in order to produce the required array index. This 
+*        should be one less than the length of the hash table.
 *     hash
 *        Pointer to a location at which to put the full width hash value.
 
@@ -1979,7 +1990,7 @@ static int HashFun( const char *key, int mapsize, unsigned long *hash ){
          *hash = ((*hash << 5) + *hash) + c;
       }
    }
-   return ( *hash % mapsize );
+   return ( *hash & bitmask );
 }
 
 void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name ) {
@@ -2440,7 +2451,7 @@ static void MapPut0##X( AstKeyMap *this, const char *key, Xtype value, \
 \
 /* Use the hash function to determine the element of the hash table in \
    which to store the new entry. */ \
-      itab = HashFun( mapentry->key, this->mapsize, &(mapentry->hash) ); \
+      itab = HashFun( mapentry->key, this->mapsize - 1, &(mapentry->hash) ); \
 \
 /* Remove any existing entry with the given key from the table element. */ \
       RemoveTableEntry( this, itab, mapentry->key ); \
@@ -2630,7 +2641,7 @@ static void MapPut1##X( AstKeyMap *this, const char *key, int size, Xtype value[
 \
 /* Use the hash function to determine the element of the hash table in \
    which to store the new entry. */ \
-      itab = HashFun( mapentry->key, this->mapsize, &(mapentry->hash) ); \
+      itab = HashFun( mapentry->key, this->mapsize - 1, &(mapentry->hash) ); \
 \
 /* Remove any existing entry with the given key from the table element. */ \
       RemoveTableEntry( this, itab, mapentry->key ); \
@@ -2756,7 +2767,7 @@ void astMapPut1AId_( AstKeyMap *this, const char *key, int size, AstObject *valu
 
 /* Use the hash function to determine the element of the hash table in
    which to store the new entry. */
-      itab = HashFun( mapentry->key, this->mapsize, &(mapentry->hash) );
+      itab = HashFun( mapentry->key, this->mapsize - 1, &(mapentry->hash) );
 
 /* Remove any existing entry with the given key from the table element. */
       RemoveTableEntry( this, itab, mapentry->key );
@@ -2904,7 +2915,7 @@ static int MapGet0##X( AstKeyMap *this, const char *key, Xtype *value ) { \
 \
 /* Use the hash function to determine the element of the hash table in \
    which the key will be stored. */ \
-   itab = HashFun( key, this->mapsize, &hash ); \
+   itab = HashFun( key, this->mapsize - 1, &hash ); \
 \
 /* Search the relevent table entry for the required MapEntry. */ \
    mapentry = SearchTableEntry( this, itab, key ); \
@@ -3031,7 +3042,7 @@ int astMapGet0AId_( AstKeyMap *this, const char *key, AstObject **value ) {
 
 /* Use the hash function to determine the element of the hash table in
    which the key will be stored. */
-   itab = HashFun( key, this->mapsize, &hash );
+   itab = HashFun( key, this->mapsize - 1, &hash );
 
 /* Search the relevent table entry for the required MapEntry. */
    mapentry = SearchTableEntry( this, itab, key );
@@ -3255,7 +3266,7 @@ static int MapGet1##X( AstKeyMap *this, const char *key, int mxval, int *nval, X
 \
 /* Use the hash function to determine the element of the hash table in \
    which the key will be stored. */ \
-   itab = HashFun( key, this->mapsize, &hash ); \
+   itab = HashFun( key, this->mapsize - 1, &hash ); \
 \
 /* Search the relevent table entry for the required MapEntry. */ \
    mapentry = SearchTableEntry( this, itab, key ); \
@@ -3411,7 +3422,7 @@ static int MapGet1C( AstKeyMap *this, const char *key, int l, int mxval,
 
 /* Use the hash function to determine the element of the hash table in 
    which the key will be stored. */ 
-   itab = HashFun( key, this->mapsize, &hash ); 
+   itab = HashFun( key, this->mapsize - 1, &hash ); 
 
 /* Search the relevent table entry for the required MapEntry. */ 
    mapentry = SearchTableEntry( this, itab, key ); 
@@ -3566,7 +3577,7 @@ int astMapGet1AId_( AstKeyMap *this, const char *key, int mxval, int *nval,
 
 /* Use the hash function to determine the element of the hash table in 
    which the key will be stored. */ 
-   itab = HashFun( key, this->mapsize, &hash ); 
+   itab = HashFun( key, this->mapsize - 1, &hash ); 
 
 /* Search the relevent table entry for the required MapEntry. */ 
    mapentry = SearchTableEntry( this, itab, key ); 
@@ -3729,7 +3740,7 @@ f     .FALSE.
 
 /* Use the hash function to determine the element of the hash table in
    which the key will be stored. */
-   itab = HashFun( key, this->mapsize, &hash );
+   itab = HashFun( key, this->mapsize - 1, &hash );
 
 /* Search the relevent table entry for the required MapEntry. */
    mapentry = SearchTableEntry( this, itab, key );
@@ -3794,7 +3805,7 @@ f        The global status.
 
 /* Use the hash function to determine the element of the hash table in 
    which the key will be stored. */
-   itab = HashFun( key, this->mapsize, &hash );
+   itab = HashFun( key, this->mapsize - 1, &hash );
 
 /* Search the relevent table entry for the required MapEntry and remove it. */
    RemoveTableEntry( this, itab, key );
@@ -3937,7 +3948,7 @@ c        This does not include the trailing null character.
 
 /* Use the hash function to determine the element of the hash table in
    which the key will be stored. */
-   itab = HashFun( key, this->mapsize, &hash );
+   itab = HashFun( key, this->mapsize - 1, &hash );
 
 /* Search the relevent table entry for the required MapEntry. */
    mapentry = SearchTableEntry( this, itab, key );
@@ -4089,7 +4100,7 @@ f     AST_MAPLENGTH = INTEGER
 
 /* Use the hash function to determine the element of the hash table in
    which the key will be stored. */
-   itab = HashFun( key, this->mapsize, &hash );
+   itab = HashFun( key, this->mapsize - 1, &hash );
 
 /* Search the relevent table entry for the required MapEntry. */
    mapentry = SearchTableEntry( this, itab, key );
@@ -4180,7 +4191,7 @@ f     AST_MAPTYPE = INTEGER
 
 /* Use the hash function to determine the element of the hash table in
    which the key will be stored. */
-   itab = HashFun( key, this->mapsize, &hash );
+   itab = HashFun( key, this->mapsize - 1, &hash );
 
 /* Search the relevent table entry for the required MapEntry. */
    mapentry = SearchTableEntry( this, itab, key );
