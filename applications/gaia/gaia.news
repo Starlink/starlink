@@ -72,6 +72,9 @@
     A bug open FITS cubes with sizes greater than 2Gb has been fixed. Previously
     these could be reported as having no dimensions.
 
+    The time needed to open some NDFs with very large lookup tables in their 
+    WCS has been significantly decreased.
+
   Puana Release:
   ==============
 
