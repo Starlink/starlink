@@ -71,16 +71,16 @@
 *          in order to optimise the grid. [FALSE]
 *     BADMASK = LITERAL (Read)
 *          A string determining the way in which bad pixels are propagated
-*          from input to output. "AND" should usually be 
-*          used since this scheme uses all input data, thus reducing the 
-*          noise in the output, and also minimises the number of bad pixels in
-*          the output. However, for large data sets, the memory requirements 
-*          of the "AND" scheme can be excessive. For this reason, two
-*          other schemes, "FIRST" and "OR", are provided which greatly reduce 
-*          the memory requirements, at the expense either of introducing more 
-*          bad pixels into the output ("OR") or producing higher output noise 
-*          levels ("FIRST"). The value supplied for this parameter is used
-*          only if SPREAD is set to "Nearest":
+*          from input to output. "AND" should usually be used since this 
+*          scheme uses all input data, thus reducing the noise in the output, 
+*          and also minimises the number of bad pixels in the output. 
+*          However, for large data sets, the memory requirements of the "AND" 
+*          scheme can be excessive. For this reason, two other schemes, 
+*          "FIRST" and "OR", are provided which greatly reduce the memory 
+*          requirements, at the expense either of introducing more bad pixels 
+*          into the output ("OR") or producing higher output noise levels 
+*          ("FIRST"). The value supplied for this parameter is used only if 
+*          SPREAD is set to "Nearest" (otherwise "AND" is always used):
 *
 *          - "FIRST" -- The bad pixel mask in each output spectrum is 
 *          inherited from the first input spectrum that contributes to the 
@@ -644,6 +644,8 @@
 *        centred on ref point.
 *     4-DEC-2007 (DSB):
 *        Added parameter TRIMTILES.
+*     6-DEC-2007 (DSB):
+*        Clarify docs for BADMASK.
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
