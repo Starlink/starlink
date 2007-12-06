@@ -72,6 +72,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'AST_PAR'         ! AST parameters
+      INCLUDE 'CNF_PAR'         ! CNF_PVAL function
 
 *  Arguments Given:
       INTEGER IWCS
@@ -93,6 +94,10 @@
       CHARACTER * ( 80 ) CARD   ! The FITS card
       INTEGER CHAN              ! FITS channel
       INTEGER RESULT            ! Number of objects written by channel
+      LOGICAL THERE             ! END keyword present
+      INTEGER ICARD             ! Position of END card
+      INTEGER NOCCUR            ! Dummy
+      CHARACTER * ( 80 ) VALUE  ! Value of FITS card
 
 *.
 
@@ -108,17 +113,32 @@
 
 *  And write out the FrameSet to the channel.
          RESULT = AST_WRITE( CHAN, IWCS, STATUS )
+         CALL AST_CLEAR( CHAN, 'CARD', STATUS )
+
+*  Locate the END card, this is where insertion starts. If fails should
+*  be at end of block.
+         NOCCUR = 1
+         THERE = .FALSE.
+         ICARD = 0
+         CALL RTD1_GKEYC( NHEAD, %VAL( CNF_PVAL( IPHEAD ) ), 0, 'END ', 
+     :                    NOCCUR, THERE, VALUE, ICARD, STATUS, 
+     :                    %VAL( 80 ) )
 
 *  Now read the channel until we have all the cards.
-         CALL AST_CLEAR( CHAN, 'CARD', STATUS )
  1       CONTINUE
          IF ( AST_FINDFITS( CHAN, '%f', CARD, .TRUE., STATUS ) ) THEN
             IF ( STATUS .EQ. SAI__OK ) THEN
-               CALL RTD1_WRCRD( CARD, IPHEAD, NHEAD, AVAIL, STATUS )
+               CALL GAI1_INCRD( CARD, IPHEAD, NHEAD, ICARD, AVAIL,
+     :                          STATUS )
+               ICARD = ICARD + 1
                GO TO 1
             END IF
          END IF
          CALL AST_ANNUL( CHAN, STATUS )
+
+*  Insert an END card.
+         CARD = 'END'
+         CALL GAI1_INCRD( CARD, IPHEAD, NHEAD, ICARD, AVAIL,
+     :                    STATUS )
       END IF
       END
-

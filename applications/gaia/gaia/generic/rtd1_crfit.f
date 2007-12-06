@@ -371,8 +371,7 @@
             CALL ERR_ANNUL( STATUS )
          END IF
 
-*  Fall-back to basic NDF WCS. Simplify for AXIS structures that are
-*  really just WinMaps.
+*  Fall-back to basic NDF WCS. 
          IF ( IWCS .EQ. AST__NULL ) THEN
             CALL ERR_MARK
             CALL NDF_GTWCS( NDF, IWCS, STATUS )
