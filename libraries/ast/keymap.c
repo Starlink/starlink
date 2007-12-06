@@ -110,6 +110,10 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map.
 *        added to the KeyMap.
 *     5-DEC-2007 (DSB):
 *        Ensure mapsize is always a power of 2.
+*     6-DEC-2007 (DSB):
+*        Define the minium table size rather than the default SizeGuess
+*        value, and derive the default SizeGuess value from the minimum
+*        table size.
 *class--
 */
 
@@ -120,8 +124,8 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map.
    "protected" symbols available. */
 #define astCLASS KeyMap
 
-/* Default value for the SizeGuess attribute. */
-#define DEFSIZE 160
+/* Minimum size for the hash table. */
+#define MIN_TABLE_SIZE 16
 
 /* The maximum number of entries per element of the hash table. If this
    value is exceeded the hash table will be doubled in size. */
@@ -563,7 +567,7 @@ static void ClearSizeGuess( AstKeyMap *this ) {
    table. */
    } else {
       this->sizeguess = INT_MAX;
-      NewTable( this, DEFSIZE/MAX_ENTRIES_PER_TABLE_ENTRY );
+      NewTable( this, MIN_TABLE_SIZE );
    }
 }
 
@@ -1168,7 +1172,6 @@ static void DoubleTableSize( AstKeyMap *this ) {
 
 /* Find the index within the new table at which to store this entry. */
             newi = ( next->hash % newmapsize );        
-
 
 /* Save the pointer to the next entry following the current one in the
    linked list. */
@@ -1916,8 +1919,9 @@ static int GetSizeGuess( AstKeyMap *this ) {
 /* Check the global error status. */
    if ( !astOK ) return result;
 
-/* Return the attribute value using a default of DEFSIZE if not set. */
-   return ( this->sizeguess == INT_MAX ) ? DEFSIZE : this->sizeguess;
+/* Return the attribute value using a default if not set. */
+   return ( this->sizeguess == INT_MAX ) ?
+           MIN_TABLE_SIZE*MAX_ENTRIES_PER_TABLE_ENTRY : this->sizeguess;
 }
 
 static int HashFun( const char *key, int mapsize, unsigned long *hash ){
@@ -4230,9 +4234,9 @@ static void NewTable( AstKeyMap *this, int size ){
 /* Check the global error status. */
    if ( !astOK ) return;
 
-/* Ensure the table size is at least 16 and is a power of 2. */
-   if( size <= 16 ) {
-      size = 16;
+/* Ensure the table size is at least MIN_TABLE_SIZE and is a power of 2. */
+   if( size <= MIN_TABLE_SIZE ) {
+      size = MIN_TABLE_SIZE;
    } else {
       size = (int) ( 0.5 + pow( 2.0, ceil( log( size )/log( 2.0 ) ) ) );
    }
@@ -5231,7 +5235,7 @@ AstKeyMap *astInitKeyMap_( void *mem, size_t size, int init, AstKeyMapVtab *vtab
       new->table = NULL;
       new->nentry = NULL;
 
-      NewTable( new, DEFSIZE/MAX_ENTRIES_PER_TABLE_ENTRY );
+      NewTable( new, MIN_TABLE_SIZE );
 
 /* If an error occurred, clean up by deleting the new KeyMap. */
       if ( !astOK ) new = astDelete( new );
@@ -5385,8 +5389,7 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
 
 /* MapSize. */
 /* -------- */
-      mapsize = astReadInt( channel, "mapsz",
-                            DEFSIZE/MAX_ENTRIES_PER_TABLE_ENTRY );
+      mapsize = astReadInt( channel, "mapsz", MIN_TABLE_SIZE );
       NewTable( new, mapsize );
 
 /* Entries... */
