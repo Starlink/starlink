@@ -303,6 +303,8 @@
 *     2007 July 19 (MJC):
 *        Used new KPG1_ASAPA to identify pixel axis corresponding to
 *        the collapsed WCS axis, rather than inline code.
+*     2007 December 7 (MJC):
+*        Revised KPS1_CLPSx API.
 *     {enter_further_changes_here}
 
 *-
@@ -1073,10 +1075,10 @@
      :                          UBNDBI, %VAL( CNF_PVAL( IPIN( 1 ) ) ),
      :                          %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
      :                          %VAL( CNF_PVAL( IPCO ) ),
-     :                          %VAL( CNF_PVAL( IPWID ) ), NDIMO, 
-     :                          LBNDBO, UBNDBO, HIGHER,
+     :                          NDIMO, LBNDBO, UBNDBO, HIGHER,
      :                          %VAL( CNF_PVAL( IPCH( 1 ) ) ), 
      :                          %VAL( CNF_PVAL( IPCH( 2 ) ) ),
+     :                          %VAL( CNF_PVAL( IPWID ) ),
      :                          %VAL( CNF_PVAL( IPW1 ) ), 
      :                          %VAL( CNF_PVAL( IPW2 ) ), 
      :                          %VAL( CNF_PVAL( IPW3 ) ), STATUS )
@@ -1087,10 +1089,10 @@
      :                          UBNDBI, %VAL( CNF_PVAL( IPIN( 1 ) ) ),
      :                          %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
      :                          %VAL( CNF_PVAL( IPCO ) ),
-     :                          %VAL( CNF_PVAL( IPWID ) ), NDIMO, 
-     :                          LBNDBO, UBNDBO, HIGHER,
+     :                          NDIMO, LBNDBO, UBNDBO, HIGHER,
      :                          %VAL( CNF_PVAL( IPCH( 1 ) ) ), 
      :                          %VAL( CNF_PVAL( IPCH( 2 ) ) ),
+     :                          %VAL( CNF_PVAL( IPWID ) ),
      :                          %VAL( CNF_PVAL( IPW1 ) ), 
      :                          %VAL( CNF_PVAL( IPW2 ) ), 
      :                          %VAL( CNF_PVAL( IPW3 ) ), STATUS )
