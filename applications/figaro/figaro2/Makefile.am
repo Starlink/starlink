@@ -39,7 +39,7 @@ figaro2_LDADD = $(LDADD) \
 ../gkd/libgkd.la \
 ../par/libfigpar.la \
 ../ich/libfigich.la \
-`pda_link` `pgplot_link_adam` `agp_link_adam` `grp_link_adam` `ndf_link_adam` `fio_link_adam`
+`pda_link` `agi_link_adam` `grp_link_adam` `ndf_link_adam` `fio_link_adam`
 
 MISC_BUILT_FILES = version.dat figaro2 figaro2.ifl
 
