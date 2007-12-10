@@ -792,7 +792,7 @@ itcl::class gaia::GaiaContour {
                set drawn_($ncont) \
                   [$itk_option(-rtdimage) contour \
                       $value $rtdimage $careful_ $smooth_ \
-                      $att $bounds]
+                      $att $bounds [expr {$ncont == 0}]]
 
                #  Add/update the key.
                draw_key_
@@ -808,7 +808,7 @@ itcl::class gaia::GaiaContour {
             set drawn_($index) \
                [$itk_option(-rtdimage) contour \
                    $levels $rtdimage $careful_ $smooth_ \
-                   $atts $bounds]
+                   $atts $bounds 1]
 
             #  Add/update the key.
             draw_key_

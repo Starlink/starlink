@@ -306,7 +306,7 @@ public:
     { "biasimage",       &StarRtdImage::biasimageCmd,       0, 3 },
     { "blankcolor",      &StarRtdImage::blankcolorCmd,      1, 1 },
     { "colorramp",       &StarRtdImage::colorrampCmd,       0, 2 },
-    { "contour",         &StarRtdImage::contourCmd,         1, 6 },
+    { "contour",         &StarRtdImage::contourCmd,         1, 7 },
     { "dump",            &StarRtdImage::dumpCmd,            1, 2 },
     { "foreign",         &StarRtdImage::foreignCmd,         2, 2 },
     { "fullname",        &StarRtdImage::fullNameCmd,        0, 0 },
@@ -1546,8 +1546,8 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
         if ( newsky != (AstSkyFrame *) NULL ) {
             astInvert( wcs );
         }
-        AstPlot *plot = createPlot( wcs, (AstFrameSet *) newsky,
-                                    (coordArgc == 0), 0, region );
+        AstPlot *plot = createPlot( wcs, (AstFrameSet *) newsky, NULL,
+                                    (coordArgc == 0), 0, region, 0 );
         inerror = ( inerror || plot == (AstPlot *) NULL );
         if ( ! inerror ) {
 
@@ -3986,6 +3986,8 @@ int StarRtdImage::get_compass( double x, double y, const char* xy_units,
 //       the bounds, in canvas coordinates, of the region to be
 //       drawn. If NULL then the whole canvas is used.
 //
+//       The seventh command is a boolean, of true a report is made about the
+//       coordinate system alignment, if used.
 //-
 int StarRtdImage::contourCmd( int argc, char *argv[] )
 {
@@ -3995,14 +3997,14 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
 
     int inerror = 0;
     if ( !image_ ) {
-        return error("no image loaded");
+        return error( "no image loaded" );
     }
 
     // Do the initial split of the input lists.
     char **levelsArgv;
     int nlevels = 0;
     double *levels;
-    if ( argc > 6 || argc == 0 ) {
+    if ( argc > 7 || argc == 0 ) {
         error( "wrong # args: contour levels [rtdimage] [careful] [smooth] [options_list] [canvas_area]" );
         inerror = 1;
     } else {
@@ -4072,7 +4074,7 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
     char **coordArgv;
     int ncoords = 0;
     double region[4];
-    if ( argc == 6 ) {
+    if ( argc >= 6 ) {
         if ( *argv[5] != '\0' ) {
             if ( Tcl_SplitList( interp_, argv[5], &ncoords, &coordArgv ) != TCL_OK ) {
                 error( "sorry: failed to decode region of image to contour" );
@@ -4109,6 +4111,15 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
                     region[3] = max( temp[1], temp[3] );
                 }
             }
+        }
+    }
+
+    //  Get whether to report coordinate matching.
+    int report = 0;
+    if ( argc == 7 ) {
+        if ( Tcl_GetBoolean( interp_, argv[6], &report )  != TCL_OK ) {
+            error( "sorry: failed to decode reporting value" );
+            inerror = 1;
         }
     }
 
@@ -4155,14 +4166,17 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
     if ( ! inerror && wcs != (AstFrameSet *) NULL ) {
 
         //  Current frame is the GRID coordinates of the image to be
-        //  contoured.
+        //  contoured. Get domain as this is the route we'd like to connect
+        //  through.
+        const char *domain = astGetC( wcs, "Domain" );
         astSetI( wcs, "Current", AST__BASE );
 
         //  Create an AstPlot that incorporates an additional FrameSet
         //  that describes an system we want to add.
-        AstPlot *plot = createPlot( wcs, farwcs, 1, ncoords != 0, region );
+        AstPlot *plot = createPlot( wcs, farwcs, domain, 1, ncoords != 0, 
+                                    region, report );
         inerror = ( inerror || plot == (AstPlot *) NULL );
-
+        
         //  Initialise the interpreter and canvas name for the Tk plotting
         //  routines.
         astTk_Init( interp_, canvasName_ );
@@ -4344,6 +4358,10 @@ AstFrameSet* StarRtdImage::makeGridWCS( ImageData *image )
 //       the new image that correspond to a region in the old image,
 //       useful for clipping).
 //
+//       If given domain is a domain that should be used to route the
+//       connection between the framesets. If that fails then a default list
+//       of expected domains is tried.
+//
 //    Return:
 //       An AstPlot, or NULL if failed.
 //
@@ -4351,8 +4369,10 @@ AstFrameSet* StarRtdImage::makeGridWCS( ImageData *image )
 //-
 AstPlot* StarRtdImage::createPlot( AstFrameSet *wcs,
                                    AstFrameSet *extraset,
+                                   const char *domain,
                                    int full, int image,
-                                   double region[] )
+                                   double region[],
+                                   int report )
 {
 #ifdef _DEBUG_
     cout << "Called StarRtdImage::createPlot" << std::endl;
@@ -4375,8 +4395,8 @@ AstPlot* StarRtdImage::createPlot( AstFrameSet *wcs,
         gbox[1] = pbox[1] = rh;
         gbox[2] = pbox[2] = rw;
         gbox[3] = pbox[3] = 0.0;
-    } else {
-
+    } 
+    else {
         //  Just using part of the canvas.
         gbox[0] = pbox[0] = region[0];
         gbox[1] = pbox[1] = region[1];
@@ -4399,16 +4419,34 @@ AstPlot* StarRtdImage::createPlot( AstFrameSet *wcs,
     AstFrameSet *plotset = NULL;
     if ( extraset != (AstFrameSet *) NULL ) {
         astInvert( extraset );
-        plotset = (AstFrameSet *) astConvert( wcs, extraset,
-                                              "SKY,AXIS,PIXEL,GRID,," );
+
+        //  Test various ways of converting. Prefer the domain of the current
+        //  system if given.
+        if ( domain != NULL ) {
+            plotset = (AstFrameSet *) astConvert( wcs, extraset, domain );
+        }
+        if ( ! astOK || plotset == (AstFrameSet *) NULL ) {
+            //  Attempt a list of preset domains expected in images.
+            plotset = (AstFrameSet *) astConvert( wcs, extraset,
+                                                  "SKY,AXIS,PIXEL,GRID,," );
+        }
+
         astInvert( extraset );
         if ( ! astOK || plotset == (AstFrameSet *) NULL ) {
-            more_error ( "sorry: cannot find a way to convert your existing "
-                         "coordinates to the requested system");
+            more_error( "sorry: cannot find a way to convert your existing "
+                        "coordinates to the requested system");
             if ( plotset != (AstFrameSet *) NULL ) {
                 plotset = (AstFrameSet *) astAnnul( plotset );
             }
             return (AstPlot *) NULL;
+        }
+        if ( report ) {
+            cerr << "INFO: matched using domain " << astGetC( wcs, "Domain" ) ;
+            cerr << ", tried: ";
+            if ( domain != NULL && strcmp( domain, "SKY" ) != 0 ) {
+                cerr << domain << ",";
+            }
+            cerr << "SKY,AXIS,PIXEL,GRID,any" << endl;
         }
 
         //  Transform region from old image to new image if asked.
@@ -4446,7 +4484,8 @@ AstPlot* StarRtdImage::createPlot( AstFrameSet *wcs,
             region[2] = xout[3] + xdist * 0.5;
             region[3] = yout[3] + ydist * 0.5;
         }
-    } else {
+    } 
+    else {
 
         //  Just using plain WCS.
         plotset = wcs;
@@ -4471,7 +4510,8 @@ AstPlot* StarRtdImage::createPlot( AstFrameSet *wcs,
     }
     if ( astOK ) {
         return plot;
-    } else {
+    } 
+    else {
         return (AstPlot *) NULL;
     }
 }
