@@ -6,7 +6,10 @@
 ##  Note need a softlink so that include files are located using <vtk/>
 ##  (this will need updating for new major versions of VTK).
 ##  On OS X we make sure that this is an X11 build, so require all the
-##  various options below.
+##  various options below. Note managled Mesa and OS Mesa are disabled
+##  so that searches for them are not made (this picks up libraries from
+##  non-standard places quite often). If managled Mesa is required for
+##  offscreen rendering this will need a better fix (create local version).
 all:
 	( cd cmake && $(MAKE) )
 	( PATH=`pwd`/cmake/bin:${PATH}; export PATH; \
@@ -21,6 +24,8 @@ all:
 	        -D VTK_USE_GUISUPPORT:BOOL=ON \
 	        -D VTK_WRAP_TCL:BOOL=ON \
 	        -D VTK_USE_X:BOOL=ON \
+	        -D VTK_USE_MANGLED_MESA:BOOL=OFF \
+	        -D VTK_OPENGL_HAS_OSMESA:BOOL=OFF \
 	        -D VTK_USE_CARBON:BOOL=OFF \
 	        -D VTK_USE_COCOA:BOOL=OFF . && \
 	  $(MAKE) )
