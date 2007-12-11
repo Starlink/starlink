@@ -4422,13 +4422,25 @@ AstPlot* StarRtdImage::createPlot( AstFrameSet *wcs,
 
         //  Test various ways of converting. Prefer the domain of the current
         //  system if given.
+        int presetused = 0;
         if ( domain != NULL ) {
             plotset = (AstFrameSet *) astConvert( wcs, extraset, domain );
+
+            //  If this domain isn't the one we requested try with the default
+            //  list.
+            if ( plotset != (AstFrameSet *) NULL && astOK ) {
+                AstFrame *base = (AstFrame *) astGetFrame( wcs, AST__BASE );
+                if ( strcasecmp( astGetC( base , "Domain" ), domain ) != 0 ) {
+                    plotset = (AstFrameSet *) astAnnul( plotset );
+                }
+                astAnnul( base );
+            }
         }
         if ( ! astOK || plotset == (AstFrameSet *) NULL ) {
             //  Attempt a list of preset domains expected in images.
             plotset = (AstFrameSet *) astConvert( wcs, extraset,
                                                   "SKY,AXIS,PIXEL,GRID,," );
+            presetused = 1;
         }
 
         astInvert( extraset );
@@ -4440,13 +4452,17 @@ AstPlot* StarRtdImage::createPlot( AstFrameSet *wcs,
             }
             return (AstPlot *) NULL;
         }
-        if ( report ) {
-            cerr << "INFO: matched using domain " << astGetC( wcs, "Domain" ) ;
-            cerr << ", tried: ";
-            if ( domain != NULL && strcmp( domain, "SKY" ) != 0 ) {
-                cerr << domain << ",";
+        if ( report ) {            
+            AstFrame *base = (AstFrame *) astGetFrame( wcs, AST__BASE );
+            cerr << "INFO: coordinates matched using " << astGetC( base, "Domain" );
+            if ( presetused ) {
+                cerr << " (tried: ";
+                if ( domain != NULL && strcmp( domain, "SKY" ) != 0 ) {
+                    cerr << domain << ",";
+                }
+                cerr << "SKY,AXIS,PIXEL,GRID,any";
             }
-            cerr << "SKY,AXIS,PIXEL,GRID,any" << endl;
+            cerr << endl;
         }
 
         //  Transform region from old image to new image if asked.
