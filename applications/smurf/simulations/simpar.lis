@@ -3,16 +3,14 @@
 # All of these parameters should be defined for all observing modes
 # ##################################################################
 
-# List of subarrays to simulate data for (semi-colon separated). Note
-# that for flatfield runs (obsmode=heatrun), only ONE subarray should
-# be specified.
+# List of subarrays to simulate data for (semi-colon separated). 
 subname=s8a;s8b;s8c;s8d
 
 # Name of model atmosphere file
 atmname=atm.sdf
 
 # Name of model astronomical sky file
-astname=ast.sdf
+astname=candycanes.sdf
 
 # Add a model atmosphere to the simulation? A mean sky level is always
 # calculated (derived from tauzen), but setting this flag will add sky
