@@ -3,8 +3,8 @@ Directory contents
 
 This directory contains the following files:
 
-obsfile.lis    : observation parameters common to all observing modes
-simfile.lis    : simulation parameters common to all observing modes
+obspar.lis     : observation parameters common to all observing modes
+simpar.lis     : simulation parameters common to all observing modes
 heatrunobs.lis : HEATRUN (flatfield) observation parameters
 heatrunsim.lis : HEATRUN (flatfield) simulation parameters
 stareobs.lis   : STARE observation parameters
@@ -19,23 +19,30 @@ candycanes.sdf : Example astronomical sky image
 Input files for the simulator
 -----------------------------
 
-The simulator requires two input files: one containing `observation'
-parameters, the other containing `simulation' parameters.  There is no
-requirement for them to have a particular name. Some parameters are
-common to all observing modes, while others are only meaningful to
-particular modes.
+The simulator requires two sets of input parameters: one containing
+`observation' parameters, the other containing `simulation'
+parameters.  There is no requirement for them to have a particular
+name. Some parameters are common to all observing modes, while others
+are only meaningful to particular modes.
 
-The two most important files are `obsfile.lis' and `simfile.lis' which
-contain all the parameters common to all observing modes.
+The two most important files are `obspar.lis' and `simpar.lis' which
+contain all the parameters common to all observing modes. The other
+files contain additional parameters which must be specified for the
+various observing modes.
 
 The simulator tries to choose sensible default values when parameters
 are not defined, but they will probably not be what you want so if in
 doubt, keep all of the parameters given in the template files.
 
 To carry out a simulation of a given observing mode, include the
-necessary mode-specific parameters into obsfile.lis and simfile.lis
-files. 
+necessary mode-specific parameters into obspar.lis and simpar.lis
+files. (For example, for a PONG simulation, add the parameters in
+pongobs.lis to obspar.lis before running the simulator.)
 
-Note: the first step is to create flatfield (heatrun) files. Therefore
-the first time the simulator is run should be to create those files
-with a HEATRUN observing mode.
+A suitable atmospheric sky model may be created with the SMURF task
+SKYNOISE, using obspar.lis and simpar.lis for input parameters.
+
+Note: the first step before running a sky simulation with SC2SIM is to
+create flatfield (heatrun) files. Therefore the first time the
+simulator is run should be to create those files with a HEATRUN
+observing mode.
