@@ -245,6 +245,10 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        all the rebinning stuff has been modified to keep "nused" up to date.
 *        This is needed to correct a fault in the generation of GENVAR 
 *        variances.
+*     12-DEC-2007 (DSB):
+*        Some rebinning kernels (e.g. SINCSINC) have negative values and
+*        can result in overall negative output weights. Therefore do not
+*        set output pixels with negative weights bad.
 *class--
 */
 
@@ -8928,14 +8932,14 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
       if( out_var ) { \
          v = out_var; \
          for( ipix_out = 0; ipix_out < npix_out; ipix_out++, d++, w++, v++ ) { \
-            if( *w < wlim ) { \
+            if( fabs( *w ) < wlim ) { \
                *d = badval; \
                *v = badval; \
             } \
          } \
       } else { \
          for( ipix_out = 0; ipix_out < npix_out; ipix_out++, d++, w++ ) { \
-            if( *w < wlim ) *d = badval; \
+            if( fabs( *w ) < wlim ) *d = badval; \
          } \
       } \
 \
@@ -11005,9 +11009,7 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
          if( flags & AST__VARWGT ) { \
             sw = 0.0; \
             for( i = 0; i < npix_out; i++ ) { \
-               if( weights[ i ] > 0 ) { \
-                  sw += weights[ i ]; \
-               } \
+               sw += weights[ i ]; \
             } \
             mwpip = sw/( *nused ); \
 \
@@ -11023,7 +11025,7 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
          for( i = 0; i < npix_out; i++ ) { \
             sw = weights[ i ]; \
             nn = sw/mwpip; \
-            if( nn > 2.0 && weights[ i ] >= wlim ) { \
+            if( nn > 2.0 && fabs( sw ) >= wlim ) { \
                a = out[ i ]/sw; \
                out_var[ i ] = ( out_var[ i ]/sw - a*a )*weights[ i + npix_out ]; \
                if( out_var[ i ] < 0.0 ) { \
@@ -11039,7 +11041,7 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
 \
 /* Normalise the returned data and variance arrays. */ \
       for( i = 0; i < npix_out; i++ ) { \
-         if( weights[ i ] >= wlim && out[ i ] != badval ) { \
+         if( fabs( weights[ i ] ) >= wlim && out[ i ] != badval ) { \
             out[ i ] /= weights[ i ]; \
          } else { \
             out[ i ] = badval; \
@@ -11047,7 +11049,7 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
       } \
       if( out_var ) { \
          for( i = 0; i < npix_out; i++ ) { \
-            if( weights[ i ] >= wlim && out_var[ i ] != badval ) { \
+            if( fabs( weights[ i ] ) >= wlim && out_var[ i ] != badval ) { \
                out_var[ i ] /= ( weights[ i ]*weights[ i ] ); \
             } else { \
                out_var[ i ] = badval; \
