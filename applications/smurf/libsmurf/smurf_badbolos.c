@@ -63,6 +63,7 @@
 
 *  Authors:
 *     Jen Balfour (UBC)
+*     Andy Gibb (UBC)
 *     {enter_new_authors_here}
 
 *  History :
@@ -70,10 +71,11 @@
 *        Original version
 *     2006-09-14 (JB): 
 *        Remove unused variables and replace GRP__NOID with NULL
-*     
+*     2007-12-11 (AGG):
+*        Add status checking
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
+*     Copyright (C) 2006-7 University of British Columbia. All Rights
 *     Reserved.
 
 *  Licence:
@@ -83,13 +85,13 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *
 *     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
-*     Software Foundation, Inc., 59 Temple Place,Suite 330, Boston,
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 *     MA 02111-1307, USA
 
 *  Bugs:
@@ -144,15 +146,15 @@
 void smurf_badbolos( int *status ) {
 
    /* Local variables */
-   int *badcols;                  /* Array of bad columns */
-   int *badrows;                  /* Array of bad rows */
+   int *badcols = NULL;           /* Array of bad columns */
+   int *badrows = NULL;           /* Array of bad rows */
    int bndf;                      /* NDF identifier of bad pixel
                                      extension */
-   int *bolos;                    /* Array of all bolometers */
+   int *bolos = NULL;             /* Array of all bolometers */
    HDSLoc *bpmloc=NULL;           /* HDS locator of bad pixel extension */      
    char ard[LEN__METHOD];         /* Name of ARD description */
    int ardFlag=0;                 /* Flag for ARD description */
-   Grp *ardGrp = NULL;           /* Group containing ARD description */
+   Grp *ardGrp = NULL;            /* Group containing ARD description */
    int curbad;                    /* The current bad object */
    int i;                         /* Loop counter */
    int j;                         /* Loop counter */
@@ -212,7 +214,9 @@ void smurf_badbolos( int *status ) {
 
    ndfMap ( bndf, "DATA", "_INTEGER", "WRITE", &bolos, &n, status );
 
-   memset ( bolos, 0, n*sizeof(*bolos) );
+   if ( *status == SAI__OK ) {
+     memset ( bolos, 0, n*sizeof(*bolos) );
+   }
 
    /* Get METHOD.  Determines whether to use a user-supplied ARD description
       or a randomly generated mask of bad bolometers */
@@ -232,144 +236,145 @@ void smurf_badbolos( int *status ) {
       ardWork ( ardGrp, 2, lbnd, ubnd, &trcoeff, 0, &regval, bolos,
                 lbndi, ubndi, lbnde, ubnde, status );
 
-   } else {
+   } else if ( strncmp( method, "RAN", 3 ) == 0 ) {
 
-      /* Allocate memory for the arrays */
+     /* Allocate memory for the arrays */
      badcols = smf_malloc ( (size_t)dims[0], sizeof ( *badcols ), 1, status );
      badrows = smf_malloc ( (size_t)dims[1], sizeof ( *badrows ), 1, status );
 
-      /* Get number of bad columns and make sure it isn't greater 
-         than the max */
-      parGet0i ( "BAD_COLUMNS", &nbadcols, status ); 
+     /* Get number of bad columns and make sure it isn't greater 
+	than the max */
+     parGet0i ( "BAD_COLUMNS", &nbadcols, status ); 
 
-      if ( nbadcols > dims[0] ) {
-         *status = SAI__ERROR;
-         errRep ( FUNC_NAME, 
-                  "Number of bad columns exceeds total number of columns",
-                  status );
-         return;
-      }
+     if ( nbadcols > dims[0] ) {
+       *status = SAI__ERROR;
+       errRep ( FUNC_NAME, 
+		"Number of bad columns exceeds total number of columns",
+		status );
+       return;
+     }
 
-      /* Get number of bad rows and make sure it isn't greater than the max */
-      parGet0i ( "BAD_ROWS", &nbadrows, status );
-   
-      if ( nbadrows > dims[1] ) {
-         *status = SAI__ERROR;
-         errRep ( FUNC_NAME, 
-                  "Number of bad rows exceeds total number of rows", 
-                  status );
-         return;
-      }
+     /* Get number of bad rows and make sure it isn't greater than the max */
+     parGet0i ( "BAD_ROWS", &nbadrows, status );
 
-      /* Get number of bad individual bolometers and make sure it isn't 
-         greater than the max */
-      parGet0i ( "BAD_BOLOS", &nbadbolos, status );
-   
-      if ( nbadbolos > dims[0] * dims[1] ) {
-         *status = SAI__ERROR;
-         errRep ( FUNC_NAME, 
-	          "Number of bad individual bolometers exceeds total number of bolometers",
-                  status );
-         return;
-      }
+     if ( nbadrows > dims[1] ) {
+       *status = SAI__ERROR;
+       errRep ( FUNC_NAME, 
+		"Number of bad rows exceeds total number of rows", 
+		status );
+       return;
+     }
 
-      parGet0i ( "SEED", &seed, status );
+     /* Get number of bad individual bolometers and make sure it isn't 
+	greater than the max */
+     parGet0i ( "BAD_BOLOS", &nbadbolos, status );
 
-      /* Seed random number generator, either with the time in 
-         milliseconds, or from user-supplied seed */
-      if ( *status == PAR__NULL ) {
-	 errAnnul ( status );
-         gettimeofday ( &time, NULL );
-         seed = ( time.tv_sec * 1000 ) + ( time.tv_usec / 1000 );
-         msgOutif(MSG__VERB," ",
-                  "Seeding random numbers with clock time", status);
-      } else {
-         msgSeti( "SEED", seed );
-         msgOutif(MSG__VERB," ","Seeding random numbers with ^SEED", status);
-      }
+     if ( nbadbolos > dims[0] * dims[1] ) {
+       *status = SAI__ERROR;
+       errRep ( FUNC_NAME, 
+		"Number of bad individual bolometers exceeds total number of bolometers",
+		status );
+       return;
+     }
 
-      srand ( seed );
+     parGet0i ( "SEED", &seed, status );
 
-      /* Add in bad bolometers from bad columns */
-      curbad = rand() % dims[0];
+     /* Seed random number generator, either with the time in 
+	milliseconds, or from user-supplied seed */
+     if ( *status == PAR__NULL ) {
+       errAnnul ( status );
+       gettimeofday ( &time, NULL );
+       seed = ( time.tv_sec * 1000 ) + ( time.tv_usec / 1000 );
+       msgOutif(MSG__VERB," ",
+		"Seeding random numbers with clock time", status);
+     } else {
+       msgSeti( "SEED", seed );
+       msgOutif(MSG__VERB," ","Seeding random numbers with ^SEED", status);
+     }
 
-      for ( i = 0; i < nbadcols; i++ ) {
-         /* Randomly choose a column, if this column has already
-            been flagged as bad move on and try the next one.  Note
-            that this is NOT an ideal solution, it leads to 
-            clumping, and with a larger percentage of bad bolometers
-            this technique becomes less random. */
-         if ( curbad >= dims[0] )
-            curbad = 0;
-         if ( badcols[curbad] == 1 ) {
-            curbad++;
-            i--;
-         } else {
-            badcols[curbad] = 1;
-            for ( j = 0; j < dims[1]; j++ ) {
-	       bolos[(j * dims[0]) + curbad] = 1;
-            }
-            curbad = rand() % dims[0]; 
-         }
-      }     
+     srand ( seed );
 
-      /* Add in bad bolometers from bad rows */
-      curbad = rand() % dims[1];
-      for ( i = 0; i < nbadrows; i++ ) {
-         /* Randomly choose a row, if this row has already
-            been flagged as bad move on and try the next one. 
-            Note that this is NOT an ideal solution, it leads to 
-            clumping, and with a larger percentage of bad bolometers
-            this technique becomes less random. */
-         if ( curbad >= dims[1] )
-            curbad = 0;
-         if ( badrows[curbad] == 1 ) {
-	    curbad++;
-            i--;
-         } else {
-            badrows[curbad] = 1;
-            for ( j = 0; j < dims[0]; j++ ) {
-	       bolos[curbad * dims[0] + j] = 1;
-            }
-            curbad = rand() % dims[1];
-         }
-      }  
+     /* Add in bad bolometers from bad columns */
+     curbad = rand() % dims[0];
 
-      /* Add in the rest of the required bad individual bolometers */
-      curbad = rand() % dims[0] * dims[1];
-      for ( i = 0; i < nbadbolos; i++ ) {
-         /* Randomly choose a bolo, if this bolo has already
-            been flagged as bad move on and try the next one.
-            Note that this is NOT an ideal solution, it leads to 
-            clumping, and with a larger percentage of bad bolometers
-            this technique becomes less random. */ 
-         if ( curbad >= dims[0] * dims[1] )
-	    curbad = 0;
-         if ( bolos[curbad] == 1 ) {
-	    curbad++;
-            i--;
-         } else {
-	    bolos[curbad] = 1;
-            curbad = rand() % dims[0] * dims[1];
-         }
-      }
+     for ( i = 0; i < nbadcols; i++ ) {
+       /* Randomly choose a column, if this column has already been
+	  flagged as bad move on and try the next one.  Note that this
+	  is NOT an ideal solution, it leads to clumping, and with a
+	  larger percentage of bad bolometers this technique becomes
+	  less random. */
+       if ( curbad >= dims[0] )
+	 curbad = 0;
+       if ( badcols[curbad] == 1 ) {
+	 curbad++;
+	 i--;
+       } else {
+	 badcols[curbad] = 1;
+	 for ( j = 0; j < dims[1]; j++ ) {
+	   bolos[(j * dims[0]) + curbad] = 1;
+	 }
+	 curbad = rand() % dims[0]; 
+       }
+     }     
 
-      smf_free( badcols, status );
-      smf_free( badrows, status );
- 
+     /* Add in bad bolometers from bad rows */
+     curbad = rand() % dims[1];
+     for ( i = 0; i < nbadrows; i++ ) {
+       /* Randomly choose a row, if this row has already been flagged
+	  as bad move on and try the next one.  Note that this is NOT
+	  an ideal solution, it leads to clumping, and with a larger
+	  percentage of bad bolometers this technique becomes less
+	  random. */
+       if ( curbad >= dims[1] )
+	 curbad = 0;
+       if ( badrows[curbad] == 1 ) {
+	 curbad++;
+	 i--;
+       } else {
+	 badrows[curbad] = 1;
+	 for ( j = 0; j < dims[0]; j++ ) {
+	   bolos[curbad * dims[0] + j] = 1;
+	 }
+	 curbad = rand() % dims[1];
+       }
+     }  
+
+     /* Add in the rest of the required bad individual bolometers */
+     curbad = rand() % dims[0] * dims[1];
+     for ( i = 0; i < nbadbolos; i++ ) {
+       /* Randomly choose a bolo, if this bolo has already been
+	  flagged as bad move on and try the next one.  Note that this
+	  is NOT an ideal solution, it leads to clumping, and with a
+	  larger percentage of bad bolometers this technique becomes
+	  less random. */ 
+       if ( curbad >= dims[0] * dims[1] )
+	 curbad = 0;
+       if ( bolos[curbad] == 1 ) {
+	 curbad++;
+	 i--;
+       } else {
+	 bolos[curbad] = 1;
+	 curbad = rand() % dims[0] * dims[1];
+       }
+     }
+
+     smf_free( badcols, status );
+     smf_free( badrows, status );
    }
 
    /* Report the bad pixel mask to the user */
-   for ( i = 0; i < dims[1]; i++ ) {
-      for ( j = 0; j < dims[0]; j++ ) {
+   if ( *status == SAI__OK ) {
+     for ( i = 0; i < dims[1]; i++ ) {
+       for ( j = 0; j < dims[0]; j++ ) {
 	 if ( bolos[(i * dims[0]) + j] != 0 ) {
-	    printf ( "." );
+	   printf ( "." );
          } else {
-	    printf ( "0" );            
+	   printf ( "0" );            
          }
-      }
-      printf ( "\n" );
-   } 
+       }
+       printf ( "\n" );
+     } 
+   }
 
    /* Free resources */
    datAnnul ( &bpmloc, status );       
