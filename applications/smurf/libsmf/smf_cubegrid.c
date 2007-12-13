@@ -401,7 +401,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    were not found in the data. If the supplied group holds the detectors
    to be excluded, modify it so that it holds the detectors to be
    included. */
-      //smf_checkdets( detgrp, data, status );
+      smf_checkdets( detgrp, data, status );
 
 /* Store a pointer to the next input data value */
       pdata = ( data->pntr )[ 0 ];
