@@ -1,7 +1,7 @@
       SUBROUTINE CCG1_CM1RR( STACK, NPIX, NLINES, VARS, COORDS, IMETH,
      :                       MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
      :                       RESULT, RESVAR, WIDTHS, COIND, WRK1, WRK2,
-     :                       PP, COVEC, NMAT, NCON, POINT, USED, 
+     :                       PP, COVEC, NMAT, NCON, POINT, USED, NFLAG,
      :                       STATUS )
 *+
 *  Name:
@@ -18,7 +18,7 @@
 *     CALL CCG1_CM1RR( STACK, NPIX, NLINES, VARS, COORDS, IMETH, MINPIX,
 *                      NITER, NSIGMA, ALPHA, RMIN, RMAX, RESULT, RESVAR,
 *                      WIDTHS, COIND, WRK1, WRK2, PP, COVEC, NMAT, NCON,
-*                      POINT, USED, STATUS )
+*                      POINT, USED, NFLAG, STATUS )
 
 *  Description:
 *     The routine works along each line of the input stack of lines,
@@ -58,7 +58,8 @@
 *        11 = Fast median
 *        12 = Sum
 *        13 = Standard deviation about the mean
-*        21 = Integrated value (sum of pixel co-ordinate width times value)
+*        21 = Integrated value (sum of pixel co-ordinate width times 
+*             value)
 *        22 = Intensity-weighted co-ordinate
 *        23 = Intensity-weighted dispersion of the co-ordinate.
 *        24 = Root mean square
@@ -88,26 +89,30 @@
 *     WIDTHS( NPIX, NLINES ) = REAL (Returned)
 *        The widths along the collapse axis for each pixel.  It is
 *        calculated only for IMETH = 21.
-*     COIND( NPIX ) = INTEGER (Given and Returned)
+*     COIND( NPIX ) = INTEGER (Returned)
 *        Workspace to hold co-ordinate indices.
-*     WRK1( NLINES ) = REAL (Given and Returned)
+*     WRK1( NLINES ) = REAL (Returned)
 *        Workspace for calculations.
-*     WRK2( NLINES ) = REAL (Given and Returned)
+*     WRK2( NLINES ) = REAL (Returned)
 *        Workspace for calculations.
-*     PP( NLINES ) = DOUBLE PRECISION (Given and Returned)
+*     PP( NLINES ) = DOUBLE PRECISION (Returned)
 *        Workspace for order statistics calculations.
-*     COVEC( NMAT, NLINES ) = DOUBLE PRECISION (Given and Returned)
+*     COVEC( NMAT, NLINES ) = DOUBLE PRECISION (Returned)
 *        Workspace for storing ordered statistics variance-covariance
 *        matrix.  Used for IMETHs 3 to 11.
-*     NCON( NLINES ) = DOUBLE PRECISION (Given and Returned)
+*     NCON( NLINES ) = DOUBLE PRECISION (Returned)
 *        The actual number of contributing pixels from each input line
 *        to the output line.
-*     POINT( NLINES ) = INTEGER (Given and Returned)
+*     POINT( NLINES ) = INTEGER (Returned)
 *        Workspace to hold pointers to the original positions of the
 *        data before extraction and conversion in to the WRK1 array.
-*     USED( NLINES ) = LOGICAL (Given and Returned)
+*     USED( NLINES ) = LOGICAL (Returned)
 *        Workspace used to indicate which values have been used in
 *        estimating a resultant value.
+*     NFLAG = INTEGER (Returned)
+*        Number of output pixels set to bad because insufficient pixels
+*        were present to form the statistic for the collapsed axis,
+*        provided the minimum number of contributing data values is one.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -182,6 +187,9 @@
 *        IMETH = 21 from the co-ordinates.
 *     2007 November 17 (MJC):
 *        WIDTHS is returned, not supplied, so move it in the API.
+*     2007 December 7 (MJC):
+*        Return number of flagged values through new argument NFLAG. 
+*        Initialise count of the contributing pixels in each line.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -212,7 +220,10 @@
       REAL RMIN
       REAL RMAX
 
-*  Arguments Given and Returned:
+*  Arguments Returned:
+      REAL RESULT( NPIX )
+      REAL RESVAR( NPIX )
+      REAL WIDTHS( NPIX, NLINES )
       INTEGER COIND( NPIX )
       REAL WRK1( NLINES )
       REAL WRK2( NLINES )
@@ -220,34 +231,41 @@
       DOUBLE PRECISION NCON( NLINES )
       INTEGER POINT( NLINES )
       LOGICAL USED( NLINES )
-
-*  Arguments Returned:
-      REAL RESULT( NPIX )
-      REAL RESVAR( NPIX )
-      REAL WIDTHS( NPIX, NLINES )
+      INTEGER NFLAG
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      LOGICAL HASCNT             ! Method counts contributing pixels?
+      INTEGER I                  ! Loop counter
       INTEGER IPW1               ! Work space pointer
       INTEGER NBAD               ! Number of bad values
 
 *.
 
 *  Check inherited global status.
+      NFLAG = 0
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  If we're doing a trimmed mean derive the variance-covariance matrix
-*  for the order statistics of a normal popl with up to NLINE members.
-*  This also sets up the scale factor for converting mean variances to
-*  median variances.
+*  for the order statistics of a normal population with up to NLINE 
+*  members.  This also sets up the scale factor for converting mean 
+*  variances to median variances.
       IF ( IMETH .GE. 3 .AND. IMETH .LE. 11 ) THEN
           CALL PSX_CALLOC( NLINES*NLINES, '_DOUBLE', IPW1, STATUS )
           CALL CCD1_ORVAR( NLINES, NMAT, PP, COVEC, 
      :                     %VAL( CNF_PVAL( IPW1 ) ),
      :                     STATUS )
           CALL PSX_FREE( IPW1, STATUS )
+      END IF
+
+*  Initialise the count of the contributing pixels in each line.
+      HASCNT = IMETH .LT. 30
+      IF ( HASCNT ) THEN
+         DO I = 1, NLINES
+            NCON( I ) = 0
+         END DO
       END IF
 
 *  Now branch for each method.
@@ -411,8 +429,18 @@
 *  Invalid method report error
          STATUS = SAI__ERROR
          CALL ERR_REP( 'BAD_METH',
-     :                 'Bad method specified for image combination'//
-     :                 ' ( invalid or not implemented )', STATUS )
+     :                 'Bad method specified for image combination '//
+     :                 '(invalid or not implemented)', STATUS )
+      END IF
+
+*  Count the number of pixels flagged because too few valid data were
+*  present, but exclude those with no data present at all.
+      IF ( HASCNT .AND. MINPIX .GT. 1 ) THEN
+         DO I = 1, NLINES 
+            IF ( NINT( NCON( I ) ) .LT. MINPIX .AND.
+     :           NINT( NCON( I ) ) .GT. 0 ) NFLAG = NFLAG + 1
+         END DO
+
       END IF
 
       END

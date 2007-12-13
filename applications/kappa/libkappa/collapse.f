@@ -228,6 +228,14 @@
 *     are found.  The pixel axis with the largest projection is selected
 *     as the collapse axis, and the two end points of the projection 
 *     define the range of axis values to collapse.
+*     -  A warning is issued (at the normal reporting level) whenever 
+*     any output values are set bad because there are too few 
+*     contributing data values.  This reports the fraction of flagged 
+*     output data in comparison with the WLIM parameter.  
+*
+*     No warning is given when parameter WLIM=0.  Input data containing 
+*     only bad values are not counted in the flagged fraction, since no 
+*     potential good output value has been lost.
 
 *  Related Applications:
 *     KAPPA: WCSFRAME, COMPAVE, COMPICK, COMPADD.
@@ -244,7 +252,8 @@
 *  Copyright:
 *     Copyright (C) 2000-2001, 2004 Central Laboratory of the Research
 *     Councils. Copyright (C) 2005-2006 Particle Physics & Astronomy
-*     Research Council. All Rights Reserved.
+*     Research Council.  Copyright (C) 2007 Science and Technology 
+*     Facilities Council.  All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -361,6 +370,10 @@
 *        the collapsed WCS axis, rather than inline code.
 *     2007 November 17 (MJC):
 *        Revised KPS1_CLPSx API.
+*     2007 December 10 (MJC):
+*        Add warning for non-zero WLIM when its threshold introduces bad
+*        values into the output and the corresponding input data 
+*        contain some good values.
 *     {enter_further_changes_here}
 
 *-
@@ -375,6 +388,7 @@
       INCLUDE  'DAT_PAR'         ! HDS public constants
       INCLUDE  'AST_PAR'         ! AST constants and functions
       INCLUDE  'CNF_PAR'         ! For CNF_PVAL function
+      INCLUDE  'MSG_PAR'         ! Message-system constants
 
 *  Status:
       INTEGER STATUS
@@ -407,7 +421,6 @@
       CHARACTER NAME*(DAT__SZNAM)! The component name
       CHARACTER TTLC*( 255 )     ! Title of original current Frame
       CHARACTER UNITS*( 60 )     ! Units of data 
-      INTEGER AEL                ! Number of collapse axis elements
       DOUBLE PRECISION AXHIGH    ! High bound of collapse axis in
                                  ! current Frame
       DOUBLE PRECISION AXLOW     ! Low bound of collapse axis in current
@@ -423,6 +436,7 @@
       DOUBLE PRECISION PPOS( 2, NDF__MXDIM ) ! Two pixel Frame positions
       DOUBLE PRECISION PXHIGH    ! High pixel bound of collapse axis 
       DOUBLE PRECISION PXLOW     ! Low pixel bound of collapse axis 
+      INTEGER AEL                ! Number of collapse axis elements
       INTEGER AXES( NDF__MXDIM ) ! A list of axis indices
       INTEGER CFRM               ! Original Current Frame pointer
       INTEGER D                  ! A dimension size
@@ -480,6 +494,7 @@
       INTEGER NDIM               ! Number of pixel axes in input NDF
       INTEGER NDIMO              ! Number of pixel axes in output NDF
       INTEGER NERR               ! Number of numerical errors
+      INTEGER NFLAG              ! Number of WLIM-flagged o/p values
       INTEGER NVAL               ! Number of values obtained (1)
       INTEGER OBL                ! Identifier for output-NDF block
       INTEGER OBLSIZ( NDF__MXDIM ) ! Output-NDF sizes for processing 
@@ -500,10 +515,11 @@
                                  ! NDF's variance array (if present)
       LOGICAL VAR                ! Process variances?
       REAL WLIM                  ! Value of WLIM parameter
+
 *.
 
 *  Check the global status.
-      IF( STATUS .NE. SAI__OK ) RETURN
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Obtain input NDF and some of its AST Frames.
 *  ============================================
@@ -547,7 +563,7 @@
       CALL KPG1_GTAXI( 'AXIS', CFRM, 1, IAXIS, STATUS )
 
 *  Abort if an error has occurred.
-      IF( STATUS .NE. SAI__OK ) GO TO 999  
+      IF ( STATUS .NE. SAI__OK ) GO TO 999  
 
 *  Get the bounding values for the specified current Frame axis defining
 *  the height of the slab to be collapsed.
@@ -562,7 +578,7 @@
 *  If a null value was supplied for either of these parameters, annul 
 *  the error and set a flag indicating that the whole axis should be
 *  used.
-      IF( STATUS .EQ. PAR__NULL ) THEN
+      IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          USEALL = .TRUE.
       ELSE
@@ -640,7 +656,7 @@
       CALL PAR_GET0L( 'TRIM', TRIM, STATUS )
 
 *  If we are removing the collapsed pixel axis... */
-      IF( TRIM ) THEN
+      IF ( TRIM ) THEN
 
 *  The output NDF will have one fewer axes than the input NDF.
          NDIMO = NDIM - 1
@@ -731,7 +747,7 @@
 *  ===================================
 
 *  Easy if we are retaining the collapsed axes....
-      IF( .NOT. TRIM ) THEN
+      IF ( .NOT. TRIM ) THEN
          CALL NDF_SBND( NDIMO, LBNDO, UBNDO, INDFO, STATUS ) 
 
 *  Otherwise...
@@ -808,7 +824,7 @@
                   CALL DAT_NAME( LOC5, NAME, STATUS )
                   CALL DAT_ANNUL( LOC5, STATUS )
                   CALL DAT_ERASE( LOC4, NAME, STATUS )
-                  IF( STATUS .NE. SAI__OK ) GO TO 999
+                  IF ( STATUS .NE. SAI__OK ) GO TO 999
                END DO
    
 *  Get a locator to the corresponding cell in the OLDAXIS array.
@@ -832,7 +848,7 @@
                   CALL DAT_ANNUL( LOC6, STATUS )
    
 *  Abort if an error has occurred.
-                  IF( STATUS .NE. SAI__OK ) GO TO 999
+                  IF ( STATUS .NE. SAI__OK ) GO TO 999
    
                END DO
    
@@ -939,7 +955,7 @@
 
 *  If we are retaining the degenerate collapsed pixel axis in the output
 *  NDF, then the output block size for that axis can be 1.
-         ELSE IF( .NOT. TRIM ) THEN
+         ELSE IF ( .NOT. TRIM ) THEN
             J = J + 1
             OBLSIZ( J ) = 1
 
@@ -967,6 +983,7 @@
       CALL NDF_NBLOC( INDFS, NDIM, IBLSIZ, NBLOCK, STATUS )
 
 *  Loop through each block.  Start a new NDF context.
+      NFLAG = 0
       DO IBLOCK = 1, NBLOCK
          CALL NDF_BEGIN
          CALL NDF_BLOCK( INDFS, NDIM, IBLSIZ, IBLOCK, IBL, STATUS ) 
@@ -1079,7 +1096,7 @@
      :                       %VAL( CNF_PVAL( IPIN( 1 ) ) ),
      :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
      :                       %VAL( CNF_PVAL( IPCO ) ),
-     :                       NDIMO, LBNDO, UBNDO, HIGHER,
+     :                       NDIMO, LBNDO, UBNDO, HIGHER, NFLAG,
      :                       %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
      :                       %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                       %VAL( CNF_PVAL( IPWID ) ), 
@@ -1093,7 +1110,7 @@
      :                       %VAL( CNF_PVAL( IPIN( 1 ) ) ),
      :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
      :                       %VAL( CNF_PVAL( IPCO ) ),
-     :                       NDIMO, LBNDO, UBNDO, HIGHER,
+     :                       NDIMO, LBNDO, UBNDO, HIGHER, NFLAG,
      :                       %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
      :                       %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                       %VAL( CNF_PVAL( IPWID ) ), 
@@ -1101,7 +1118,7 @@
      :                       %VAL( CNF_PVAL( IPW2 ) ), 
      :                       %VAL( CNF_PVAL( IPW3 ) ), STATUS )
 
-         ELSE IF( STATUS .EQ. SAI__OK ) THEN
+         ELSE IF ( STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'T', ITYPE )
             CALL ERR_REP( 'COLLAPSE_ERR5', 'COLLAPSE: Unsupported '//
@@ -1129,6 +1146,31 @@
 *   Close NDF context.
          CALL NDF_END( STATUS )
       END DO
+
+
+*  Warn about lost pixels due to insufficient input values.
+*  ========================================================
+       IF ( NFLAG .GT. 0 ) THEN
+         CALL MSG_FMTR( 'WLIM', 'F6.4', WLIM )
+         IF ( NFLAG .EQ. AEL ) THEN
+            CALL MSG_OUTIF( MSG__NORM, '',
+     :        'WARNING: ^All of the output pixels are set bad due to '/
+     :        /'an excessive number of bad values along the axis of '/
+     :        /'axis of collapse.  If this is undesired, decrease the '/
+     :        /'fraction of good values required with parameter WLIM'/
+     :        /'WLIM (currently ^WLIM).', STATUS )
+
+*  There's nothing that can be done if
+         ELSE IF ( MAX( 1, NINT( WLIM * REAL( AEL ) ) ) .NE. 1 ) THEN
+            CALL MSG_FMTR( 'FRAC', 'F6.4', REAL( NFLAG ) / REAL( AEL ) )
+            CALL MSG_OUTIF( MSG__NORM, '',
+     :        'WARNING: ^FRAC of the output pixels are set bad due to '/
+     :        /'an excessive number of bad values along the collapse '/
+     :        /'axis.  If this is undesired, decrease the fraction of '/
+     :        /'good values required with parameter WLIM (currently '/
+     :        /'^WLIM).', STATUS )
+            END IF
+         END IF
 
 *  Alter the WCS FrameSet.
 *  =======================
@@ -1159,7 +1201,7 @@
       CALL AST_END( STATUS )
 
 *  Report a contextual message if anything went wrong.
-      IF( STATUS .NE. SAI__OK ) THEN
+      IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'COLLAPSE_ERR6', 'COLLAPSE: Unable to collapse '/
      :                  /'an NDF along one axis.', STATUS )
       END IF

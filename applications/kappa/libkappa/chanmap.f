@@ -305,6 +305,8 @@
 *        the collapsed WCS axis, rather than inline code.
 *     2007 December 7 (MJC):
 *        Revised KPS1_CLPSx API.
+*     2007 December 10 (MJC):
+*        Newly revised KPS1_CLPSx API.
 *     {enter_further_changes_here}
 
 *-
@@ -458,6 +460,7 @@
       INTEGER NERR               ! Number of numerical errors
       CHARACTER NEWDOM*( 20 )    ! Domain name for revised current Frame
       INTEGER NEWFRM             ! Pointer to revised current Frame
+      INTEGER NFLAG              ! Number of WLIM-flagged o/p values
       INTEGER NOCHAN             ! Number of channels
       INTEGER NVAL               ! Number of values obtained (1)
       INTEGER ODIMS( NDF__MXDIM ) ! Output NDF dimensions
@@ -1075,7 +1078,7 @@
      :                          UBNDBI, %VAL( CNF_PVAL( IPIN( 1 ) ) ),
      :                          %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
      :                          %VAL( CNF_PVAL( IPCO ) ),
-     :                          NDIMO, LBNDBO, UBNDBO, HIGHER,
+     :                          NDIMO, LBNDBO, UBNDBO, HIGHER, NFLAG,
      :                          %VAL( CNF_PVAL( IPCH( 1 ) ) ), 
      :                          %VAL( CNF_PVAL( IPCH( 2 ) ) ),
      :                          %VAL( CNF_PVAL( IPWID ) ),
@@ -1089,7 +1092,7 @@
      :                          UBNDBI, %VAL( CNF_PVAL( IPIN( 1 ) ) ),
      :                          %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
      :                          %VAL( CNF_PVAL( IPCO ) ),
-     :                          NDIMO, LBNDBO, UBNDBO, HIGHER,
+     :                          NDIMO, LBNDBO, UBNDBO, HIGHER, NFLAG,
      :                          %VAL( CNF_PVAL( IPCH( 1 ) ) ), 
      :                          %VAL( CNF_PVAL( IPCH( 2 ) ) ),
      :                          %VAL( CNF_PVAL( IPWID ) ),

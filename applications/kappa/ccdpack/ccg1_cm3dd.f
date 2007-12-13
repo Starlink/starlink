@@ -1,7 +1,7 @@
       SUBROUTINE CCG1_CM3DD( STACK, NPIX, NLINES, VARS, COORDS, IMETH,
      :                       MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
      :                       RESULT, WIDTHS, COIND, WRK1, WRK2, NCON,
-     :                       POINT, USED, STATUS )
+     :                       POINT, USED, NFLAG, STATUS )
 *+
 *  Name:
 *     CCG1_CM3DD
@@ -16,7 +16,8 @@
 *  Invocation:
 *     CALL CCG1_CM3DD( STACK, NPIX, NLINES, VARS, COORDS, IMETH, MINPIX,
 *                      NITER, NSIGMA, ALPHA, RMIN, RMAX, RESULT, WIDTHS,
-*                      COIND, WRK1, WRK2, NCON, POINT, USED, STATUS )
+*                      COIND, WRK1, WRK2, NCON, POINT, USED, NFLAG,
+*                      STATUS )
 
 *  Description:
 *     The routine works along each line of the input stack of lines,
@@ -82,21 +83,25 @@
 *     WIDTHS( NPIX, NLINES ) = DOUBLE PRECISION (Returned)
 *        The widths along the collapse axis for each pixel.  It is
 *        calculated only for IMETH = 21.
-*     COIND( NPIX ) = INTEGER (Given and Returned)
+*     COIND( NPIX ) = INTEGER (Returned)
 *        Workspace to hold co-ordinate indices.
-*     WRK1( NLINES ) = DOUBLE PRECISION (Given and Returned)
+*     WRK1( NLINES ) = DOUBLE PRECISION (Returned)
 *        Workspace for calculations.
-*     WRK2( NLINES ) = DOUBLE PRECISION (Given and Returned)
+*     WRK2( NLINES ) = DOUBLE PRECISION (Returned)
 *        Workspace for calculations.
-*     NCON( NLINES ) = DOUBLE PRECISION (Given and Returned)
+*     NCON( NLINES ) = DOUBLE PRECISION (Returned)
 *        The actual number of contributing pixels from each input line
 *        to the output line.
-*     POINT( NLINES ) = INTEGER (Given and Returned)
+*     POINT( NLINES ) = INTEGER (Returned)
 *        Workspace to hold pointers to the original positions of the
 *        data before extraction and conversion in to the WRK1 array.
-*     USED( NLINES ) = LOGICAL (Given and Returned)
+*     USED( NLINES ) = LOGICAL (Returned)
 *        Workspace used to indicate which values have been used in
 *        estimating a resultant value.
+*     NFLAG = INTEGER (Returned)
+*        Number of output pixels set to bad because insufficient pixels
+*        were present to form the statistic for the collapsed axis,
+*        provided the minimum number of contributing data values is one.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -154,6 +159,9 @@
 *        of VARS from CCG1_SUM3D call (SUM method).
 *     2007 November 17 (MJC):
 *        WIDTHS is returned, not supplied, so move it in the API.   
+*     2007 December 7 (MJC):
+*        Return number of flagged values through new argument NFLAG. 
+*        Initialise count of the contributing pixels in each line.
 *    {enter_further_changes_here}
 
 *  Bugs:
@@ -181,28 +189,39 @@
       REAL RMIN
       REAL RMAX
 
-*  Arguments Given and Returned:
+*  Arguments Returned:
+      DOUBLE PRECISION RESULT( NPIX )
+      DOUBLE PRECISION WIDTHS( NPIX, NLINES )
       INTEGER COIND( NPIX )
       DOUBLE PRECISION WRK1( NLINES )
       DOUBLE PRECISION WRK2( NLINES )
       DOUBLE PRECISION NCON( NLINES )
       INTEGER POINT( NLINES )
       LOGICAL USED( NLINES )
-
-*  Arguments Returned:
-      DOUBLE PRECISION RESULT( NPIX )
-      DOUBLE PRECISION WIDTHS( NPIX, NLINES )
+      INTEGER NFLAG
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      LOGICAL HASCNT             ! Method counts contribting pixels
+      INTEGER I                  ! Loop counter
       INTEGER NBAD               ! Number of bad values
+      REAL PERCNT                ! Percentage of pixels set to bad
 
 *.
 
 *  Check inherited global status.
+      NFLAG = 0
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise the count of the contributing pixels in each line.
+      HASCNT = IMETH .LT. 30
+      IF ( HASCNT ) THEN
+         DO I = 1, NLINES
+            NCON( I ) = 0
+         END DO
+      END IF
 
 *  Branch for each method.
       IF ( IMETH .EQ. 1 ) THEN
@@ -361,8 +380,17 @@
 *  Invalid method report error
          STATUS = SAI__ERROR
          CALL ERR_REP( 'BAD_METH',
-     :                 'Bad method specified for image combination'//
-     :                 ' ( invalid or not implemented )', STATUS )
+     :                 'Bad method specified for image combination '//
+     :                 '(invalid or not implemented)', STATUS )
+      END IF
+
+*  Count the number of pixels flagged because too few valid data were
+*  present, but exclude those with no data present at all.
+      IF ( HASCNT .AND. MINPIX .GT. 1 ) THEN
+         DO I = 1, NLINES 
+            IF ( NINT( NCON( I ) ) .LT. MINPIX .AND.
+     :           NINT( NCON( I ) ) .GT. 0 ) NFLAG = NFLAG + 1
+         END DO
       END IF
 
       END

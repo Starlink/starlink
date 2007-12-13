@@ -1,7 +1,7 @@
       SUBROUTINE KPS1_CLPS<T>( AXIS, LO, HI, VAR, METH, WLIM, NEL2, 
      :                       NDIM1, LBND1, UBND1, DIN, VIN, CIN, NDIM2,
-     :                       LBND2, UBND2, USEWRK, DOUT, VOUT, WOUT,
-     :                       WORK1, WORK2, WORK3, STATUS )
+     :                       LBND2, UBND2, USEWRK, NFLAG, DOUT, VOUT, 
+     :                       WOUT, WORK1, WORK2, WORK3, STATUS )
 *+
 *  Name:
 *     KPS1_CLPS<T>
@@ -16,8 +16,8 @@
 *  Invocation:
 *     CALL KPS1_CLPS<T>( AXIS, LO, HI, VAR, METH, WLIM, NEL2, NDIM1, 
 *                      LBND1, UBND1, DIN, VIN, CIN, NDIM2, LBND2,
-*                      UBND2, USEWRK, DOUT, VOUT, WOUT, WORK1, WORK2,
-*                      WORK3, STATUS )
+*                      UBND2, USEWRK, NFLAG, DOUT, VOUT, WOUT, WORK1, 
+*                      WORK2, WORK3, STATUS )
 
 *  Description:
 *     This routine collapses the supplied data and variance arrays
@@ -69,6 +69,12 @@
 *        Whether or not to use the work arrays.  This should be set
 *        .TRUE. if there are significant (i.e. >1) higher dimensions
 *        than the collapse axis.
+*     NFLAG = INTEGER (Given & Returned)
+*        Number of output pixels set to bad because insufficient pixels
+*        were present to form the statistic for the collapsed axis.
+*        The count excludes those lines where there are no good values.
+*        NFLAG  should be initialised to zero before any subdivision of
+*        the collapse by chunking.
 *     DOUT( * ) = <TYPE> (Returned)
 *        The output data values.
 *     VOUT( * ) = <TYPE> (Returned)
@@ -176,6 +182,8 @@
 *        Recognise that the width array is calculated within, not 
 *        supplied, hence rename WIN to WOUT and relocate in the API.
 *        Bug fix: reorder the co-ordinate array for INTEG.
+*     2007 December 10 (MJC);
+*        Add NFLAG argument.
 *     {enter_further_changes_here}
 
 *-
@@ -208,6 +216,9 @@
       INTEGER UBND2( NDIM2 )
       LOGICAL USEWRK
 
+*  Arguments Given and Returned:
+      INTEGER NFLAG
+
 *  Arguments Returned:
       <TYPE> DOUT( * )
       <TYPE> VOUT( * )
@@ -223,6 +234,7 @@
       LOGICAL CARRY              ! Increment next axis?
       INTEGER DIM1( NDF__MXDIM ) ! Input dimension sizes
       INTEGER DIM2( NDF__MXDIM ) ! Output dimension sizes
+      LOGICAL HASCNT             ! Method counts contribting pixels
       INTEGER IAX1               ! Input axis index
       INTEGER IAX2               ! Output axis index
       INTEGER IEL1               ! Index into input data vectors
@@ -317,7 +329,10 @@
      :        IMETH .EQ. 34
       USECV = IMETH .GE. 3 .AND. IMETH .LE. 11
       USEWID = IMETH .EQ. 21
-     
+
+*  Decide whether the WLIM pertains to the method.
+      HASCNT = IMETH .LT. 30
+
 *  Find the size of each dimension in the output array. Also initialize 
 *  the pixel indices of the current output pixel to be the first pixel.
       DO IAX2 = 1, NDIM2
@@ -474,7 +489,8 @@
      :                           %VAL( CNF_PVAL( IPCOV ) ), NMAT,
      :                           %VAL( CNF_PVAL( IPNCON ) ), 
      :                           %VAL( CNF_PVAL( IPPNT ) ),
-     :                           %VAL( CNF_PVAL( IPUSED ) ), STATUS )
+     :                           %VAL( CNF_PVAL( IPUSED ) ), 
+     :                           NFLAG, STATUS )
 
 *  If the collapse axis is the last axis, we can use the original input
          ELSE 
@@ -489,7 +505,8 @@
      :                           %VAL( CNF_PVAL( IPCOV ) ), NMAT,
      :                           %VAL( CNF_PVAL( IPNCON ) ), 
      :                           %VAL( CNF_PVAL( IPPNT ) ),
-     :                           %VAL( CNF_PVAL( IPUSED ) ), STATUS )
+     :                           %VAL( CNF_PVAL( IPUSED ) ),
+     :                           NFLAG, STATUS )
          END IF
 
          CALL PSX_FREE( IPPP, STATUS )
@@ -515,7 +532,8 @@
      :                           %VAL( CNF_PVAL( IPWRK2 ) ),
      :                           %VAL( CNF_PVAL( IPNCON ) ), 
      :                           %VAL( CNF_PVAL( IPPNT ) ),
-     :                           %VAL( CNF_PVAL( IPUSED ) ), STATUS )
+     :                           %VAL( CNF_PVAL( IPUSED ) ),
+     :                           NFLAG, STATUS )
 
 *  If the collapse axis is the last axis, we can use the original input
 *  data.
@@ -529,7 +547,8 @@
      :                           %VAL( CNF_PVAL( IPWRK2 ) ),
      :                           %VAL( CNF_PVAL( IPNCON ) ), 
      :                           %VAL( CNF_PVAL( IPPNT ) ),
-     :                           %VAL( CNF_PVAL( IPUSED ) ), STATUS )
+     :                           %VAL( CNF_PVAL( IPUSED ) ),
+     :                           NFLAG, STATUS )
          END IF
 
          CALL PSX_FREE( IPVAR, STATUS )

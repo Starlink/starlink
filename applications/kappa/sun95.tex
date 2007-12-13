@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.33}
 \newcommand{\stardocnumber}    {95.33}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2007 December 5}
+\newcommand{\stardocdate}      {2007 December 10}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.8-5}
+\newcommand{\stardocversion}   {1.8-6}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -11459,7 +11459,7 @@ If the above approach fails, try another tape drive.
 If you attempt to read a FITS magnetic tape with
 \htmlref{FITSIN}{FITSIN}, you might receive an error like this
 
-\vspace*{-\latex{\small}skipamount}
+\vspace*{-\smallskipamount}
 \small
 \begin{verbatim}
      % fitsin
@@ -17774,6 +17774,16 @@ XV; PBMPLUS; NETPBM.
          pixel axis with the largest projection is selected as the
          collapse axis, and the two end points of the projection
          define the range of axis values to collapse.
+
+         \sstitem
+         A warning is issued (at the normal reporting level) whenever 
+         any output values are set bad because there are too few 
+         contributing data values.  This reports the fraction of flagged 
+         output data in comparison with the WLIM parameter.  
+
+         No warning is given when parameter WLIM=0.  Input data 
+         containing only bad values are not counted in the flagged 
+         fraction, since no potential good output value has been lost.
       }
    }
    \sstdiytopic{
@@ -53363,6 +53373,17 @@ The following applications have been modified:
          be masked independently using the supplied ARD description.
          For example, you can now use a two-dimensional ARD description 
          to mask each plane in a three-dimensional NDF.
+      \end{itemize}
+
+   \item [\htmlref{COLLAPSE}{COLLAPSE}] \mbox{}
+      \begin{itemize}
+         \item  A warning is issued (at the normal reporting level)
+         whenever any output values are set bad because there are too 
+         few contributing data values.  This reports the fraction of
+         flagged output data in comparison with the WLIM parameter.  
+         No warning is given when parameter WLIM=0.  Input data 
+         containing only bad values are not counted in the flagged 
+         fraction, since no potential good output value has been lost.
       \end{itemize}
 
    \item [\htmlref{FILLBAD}{FILLBAD}] \mbox{}
