@@ -205,6 +205,8 @@
 *        Added smf_fits_getL, smf_fits_setL
 *     2007-12-054 (DSB):
 *        Added trim to smf_choosetiles argument list.
+*     2007-12-14 (EC):
+*        Added flags to smf_calc_mapcoord interface.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -264,7 +266,7 @@ double smf_calc_covar ( const smfData *data, const int i, const int j,
 			int lo, int hi, int *status);
 
 void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving, 
-			int *lbnd_out, int *ubnd_out, int *status );
+			int *lbnd_out, int *ubnd_out, int flags, int *status );
 
 void smf_calc_skyrot( smfData *data, double maxangle, int *nsamples, int *status );
 
