@@ -24,6 +24,11 @@
 *     to NDF files in a format approximating the SCUBA2 ICD so that they
 *     may subsequently be read by other SMURF routines to make maps.
 
+*  Notes:
+*     No base coordinates were stored in netcdf files.
+*     Time is presently inaccurate and requires an optimization routine
+*     to calculate the time that makes Az/El and RA/Dec consistent.
+
 *  ADAM Parameters:
 *     IN = CHAR (Read)
 *          Name of the input NetCDF file to be converted.  This name
@@ -73,6 +78,13 @@
 *     2007-10-02 (CVL):
 *        Ignore data when pointing information has not updated for
 *        more than 20 frames
+*     2007-12-13 (EC):
+*        -Added code to generate framesets (preparation for time fix)
+*        -Obtain tracking system and set in the FITS header
+*        -Set WAVELEN FITS header
+*        -Use the base coordinates from the .nc file rather than the
+*         first boresite coordinates in the file (although the base 
+*         coordinates are identically 0 and un-useable). 
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -190,6 +202,7 @@ void smurf_impaztec( int *status ) {
   double *full_bolosig=NULL;   /* all bolo signals [NBOLOSxNFRAMES] */
   double ha;                   /* hour angle */
   struct JCMTState *head=NULL; /* header data for each frame  */
+  smfHead hdr;
   int hour;                    /* hour of beginning of observation */
   dim_t i;                     /* loop counter */
   int i_good;                  /* index for good frames */
@@ -247,13 +260,18 @@ void smurf_impaztec( int *status ) {
   double *trackbasec2 = NULL;
   double *trackdemandc1 = NULL;
   double *trackdemandc2 = NULL;
+  char tracksys[MAXSTRING];
   int ubnd[3];                 /* Dimensions of the DATA component */
   int varid_h1b1;              /* netCDF variable id of bolo h1b1 signal */
+
   double x_min = 0;            /* Maximum extent of pointing offsets */
   double x_max = 0;
   double y_min = 0;
   double y_max = 0;
   int yr;                      /* year of beginning of observation */
+
+
+  double xtemp, ytemp, xout, yout; 
 
   /* Main routine */
 
@@ -272,6 +290,10 @@ void smurf_impaztec( int *status ) {
   }
 
   if( *status == SAI__OK ) {
+
+    /* Populate bolo LUT */
+    memset( &hdr, sizeof(hdr), 0 );
+    aztec_fill_smfHead( &hdr, 0, status );
 
     /* Preset some required values */
     meanwvm    = 0; /* fix */
@@ -297,14 +319,14 @@ void smurf_impaztec( int *status ) {
     /* create and fill the header with rts/tcs data */
     head = smf_malloc( nframes, sizeof(*head), 1, status );
 
-    /* Retrieve values to convert from the netcdf file */
+    /* Retrieve values to convert from the netcdf file. */
 
     time = smf_malloc ( nframes, sizeof(*time), 1, status );  
     airmass = smf_malloc ( nframes, sizeof(*airmass), 1, status );  
     trackactc1 = smf_malloc ( nframes, sizeof(*trackactc1), 1, status );  
     trackactc2 = smf_malloc ( nframes, sizeof(*trackactc2), 1, status );  
-    trackdemandc1 = smf_malloc ( nframes, sizeof(*trackdemandc1), 1, status );  
-    trackdemandc2 = smf_malloc ( nframes, sizeof(*trackdemandc2), 1, status );  
+    trackdemandc1 = smf_malloc ( nframes, sizeof(*trackdemandc1), 1, status ); 
+    trackdemandc2 = smf_malloc ( nframes, sizeof(*trackdemandc2), 1, status ); 
     trackbasec1 = smf_malloc ( nframes, sizeof(*trackbasec1), 1, status );  
     trackbasec2 = smf_malloc ( nframes, sizeof(*trackbasec2), 1, status );  
     azelactc1 = smf_malloc ( nframes, sizeof(*azelactc1), 1, status );  
@@ -313,7 +335,6 @@ void smurf_impaztec( int *status ) {
     azeldemandc2 = smf_malloc ( nframes, sizeof(*azeldemandc2), 1, status );  
     azelbasec1 = smf_malloc ( nframes, sizeof(*azelbasec1), 1, status );  
     azelbasec2 = smf_malloc ( nframes, sizeof(*azelbasec2), 1, status );
-
     dbuf = smf_malloc( nframes*nbolos, sizeof(*dbuf), 0, status );
     dksquid = smf_malloc( nframes*nbolos, sizeof(*dksquid), 0, status ); 
     posptr = smf_malloc( 2*nframes, sizeof(*posptr), 0, status );   
@@ -351,6 +372,7 @@ void smurf_impaztec( int *status ) {
     slaCaldj ( yr, month, day, &djm, &date_status );
 
     /* Get the hours, minutes, and seconds */
+
     nc_get_att_text ( ncid, NC_GLOBAL, "start_time", time_str );
     curtok = strtok ( time_str, ":");
     hour = atoi ( curtok );
@@ -383,7 +405,14 @@ void smurf_impaztec( int *status ) {
     dec = strtod ( dec_str, NULL );
     printf("IMPAZTEC ra,dec from jcmt_header: %g %g\n", ra, dec);
 
-    /* Calculate the JCMTState at each timeslice */
+    /* Get tracking system */
+    nc_get_att_text ( ncid, NC_GLOBAL, "jcmt_script_track_sys", tracksys );
+    if( strncmp( tracksys, "Planet", 6 ) == 0 ) {
+      strcpy( tracksys, "APP" );
+    }
+
+    /* Calculate the JCMTState at each timeslice 
+       NOTE: jcmt_*Base* are identically 0 and will need to be generated! */
 
     nc_getSignal ( ncid, "jcmt_airmass", airmass, status );
     nc_getSignal ( ncid, "jcmt_trackActC1", trackactc1, status );
@@ -398,7 +427,6 @@ void smurf_impaztec( int *status ) {
     nc_getSignal ( ncid, "jcmt_azElDemandC2", azeldemandc2, status);
     nc_getSignal ( ncid, "jcmt_azElBaseC1", azelbasec1, status );
     nc_getSignal ( ncid, "jcmt_azElBaseC2", azelbasec2, status );
-
 
     /* Because AzTEC starts recording data before an observation
        acutally starts determine the frame at which the observation
@@ -415,11 +443,9 @@ void smurf_impaztec( int *status ) {
        the frames following that are 'bad'. In the future one might try
        interpolating the pointing information over the mid-scan 'bad'
        frames. */
+
     startframe = nframes;
     for ( i = 0; i < nframes; i++ ) {      
-
-      printf("%i %f %f %f %f\n", i, trackactc1[i], trackactc2[i],
-	     azelactc1[i], azelactc2[i]);
 
       lst_coord_prev = lst_coord;
       slaDh2e( azelactc1[i], azelactc2[i], telpos[1]*2*3.1415926536/360.0,
@@ -469,29 +495,63 @@ void smurf_impaztec( int *status ) {
 
     i_good=0;
     for( i=0; i<nframes; i++) {
+
       if(quality[i]==1) {
+
 	head[i_good].rts_num = i_good;   
 	head[i_good].rts_end = mjuldate[i];
+	head[i_good].tcs_tai = mjuldate[i];
 	head[i_good].tcs_airmass = airmass[i];
+	strcpy( head[i_good].tcs_tr_sys, tracksys );
 	head[i_good].tcs_tr_ac1 = trackactc1[i];
 	head[i_good].tcs_tr_ac2 = trackactc2[i];
 	head[i_good].tcs_tr_dc1 = trackdemandc1[i];
 	head[i_good].tcs_tr_dc2 = trackdemandc2[i];
-	head[i].tcs_tr_bc1 = trackactc1[startframe];
-	  /* trackbasec1[i]; strange values? */
-	head[i_good].tcs_tr_bc2 = trackactc2[startframe];
-	  /* trackbasec2[i]; strange values? */
+
+	/*head[i_good].tcs_tr_bc1 = trackactc1[startframe];*/
+	/*head[i_good].tcs_tr_bc2 = trackactc2[startframe];*/
+	head[i_good].tcs_tr_bc1 = trackbasec1[i]; 
+	head[i_good].tcs_tr_bc2 = trackbasec2[i]; 
+
 	head[i_good].tcs_az_ac1 = azelactc1[i];
 	head[i_good].tcs_az_ac2 = azelactc2[i];  
 	head[i_good].tcs_az_dc1 = azeldemandc1[i];
 	head[i_good].tcs_az_dc2 = azeldemandc2[i];
-	head[i_good].tcs_az_bc1 = azelactc1[startframe];
-	  // azelbasec1[i+startframe];
-	head[i_good].tcs_az_bc2 = azelactc2[startframe];
-	  // azelbasec2[i+startframe]; 
+
+	/*head[i_good].tcs_az_bc1 = azelactc1[startframe];*/
+	/*head[i_good].tcs_az_bc2 = azelactc2[startframe];*/
+
+	head[i_good].tcs_az_bc1 = azelbasec1[i];
+	head[i_good].tcs_az_bc2 = azelbasec2[i]; 
       
 	posptr[2*i_good +0] = azelactc1[i];
 	posptr[2*i_good +1] = azelactc2[i];
+
+	/* Create frameset */
+
+	smf_create_lutwcs( 0, hdr.fplanex, hdr.fplaney, hdr.ndet, 
+			   &(head[i_good]), hdr.instap, telpos, steptime,
+			   &(hdr.wcs), status );
+
+	/*
+	astSet( hdr.wcs, "SYSTEM=FK5" );
+	xtemp = 2.;
+	ytemp = 2.;
+	  
+	astTran2( hdr.wcs, 1, &xtemp, &ytemp, 1, &xout, &yout ); 
+
+	printf("RADEC head: %f %f out: %f %f\n", 
+	       head[i_good].tcs_tr_ac1, head[i_good].tcs_tr_ac2,
+	       xout, yout );
+
+	astSet( hdr.wcs, "SYSTEM=AZEL" );
+	  
+	astTran2( hdr.wcs, 1, &xtemp, &ytemp, 1, &xout, &yout ); 
+
+	printf("AZEL head: %f %f out: %f %f\n", 
+	       head[i_good].tcs_az_ac1, head[i_good].tcs_az_ac2,
+	       xout, yout );
+	*/
 
 	i_good++;
       }
@@ -575,6 +635,7 @@ void smurf_impaztec( int *status ) {
   astSetFitsI ( fitschan, "NUMSAMP", numsamples, "number of samples", 0 );
   astSetFitsS ( fitschan, "FILTER", "1100", "filter used", 0 );
   astSetFitsS ( fitschan, "INSTRUME", "AZTEC", "Instrument name", 0 );
+  astSetFitsF ( fitschan, "WAVELEN", 1100, "Observing wavelength", 0 );
   astSetFitsS ( fitschan, "TELESCOP", "JCMT", "Name of telescope", 0 );
    
   /* Determine extent of the map from posptr + known size of the arrays */
