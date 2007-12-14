@@ -99,7 +99,10 @@
 *        -Modified interface to hand projection from caller to concat_smfGroup
 *        -Check for file name existence when calling smf_model_NDFexport
 *     2007-11-15 (EC):
-*        -Switch to time-ordering the data. Compiles but still buggy.
+*        -Switch to bolo-ordering the data. Compiles but still buggy.
+*     2007-12-14 (EC):
+*        -set file access to UPDATE for model components (was READ)
+*        -modified smf_calc_mapcoord interface
 
 *  Notes:
 
@@ -333,7 +336,8 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	/* We only need to open the file's header info to generate the 
 	   pointing LUT in the MAPCOORD extension */
         smf_open_file( igrp, i, "UPDATE", SMF__NOCREATE_DATA, &data, status );
-        smf_calc_mapcoord( data, outfset, moving, lbnd_out, ubnd_out, status );
+        smf_calc_mapcoord( data, outfset, moving, lbnd_out, ubnd_out, 0,
+			   status );
 	smf_close_file( &data, status );
 
         /* Exit if bad status was generate */
@@ -386,8 +390,10 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       
       smf_model_create( igroup, NULL, 0, SMF__RES, 0, &resgroup, memiter, 
 			memiter, res, status );
+
       smf_model_create( igroup, NULL, 0, SMF__LUT, 0, &lutgroup, memiter, 
 			memiter, lut, status ); 
+
       smf_model_create( igroup, NULL, 0, SMF__AST, 0, &astgroup, memiter, 
 			memiter, ast, status );
     }
@@ -441,7 +447,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	  
 	  /* If memiter not set, use efficient access modes */
 	  smf_open_related_model( resgroup, i, "UPDATE", &res[i], status );
-	  smf_open_related_model( lutgroup, i, "READ", &lut[i], status );
+	  smf_open_related_model( lutgroup, i, "UPDATE", &lut[i], status );
 	  smf_open_related_model( astgroup, i, "UPDATE", &ast[i], status );
 
 	  for( j=0; j<nmodels; j++ ) {
@@ -563,7 +569,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
 	    smf_open_related_model( astgroup, i, "UPDATE", &ast[i], status );
 	    smf_open_related_model( resgroup, i, "UPDATE", &res[i], status );
-	    smf_open_related_model( lutgroup, i, "READ", &lut[i], status );  
+	    smf_open_related_model( lutgroup, i, "UPDATE", &lut[i], status );  
 	  }
 
 	  /* Calculate the AST model component. It is a special model
@@ -604,7 +610,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
            then close subgroup. DIMM open/close not needed if memiter set */
 
 	if( !memiter ) 
-	  smf_open_related_model( resgroup, i, "READ", &res[i], status );
+	  smf_open_related_model( resgroup, i, "UPDATE", &res[i], status );
 
 	for( idx=0; idx<res[i]->ndat; idx++ ) {
 	  if( (res[i]->sdata[idx]->file->name)[0] ) {
@@ -617,7 +623,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	  smf_close_related( &res[i], status );
 
 	if( !memiter ) 
-	  smf_open_related_model( astgroup, i, "READ", &ast[i], status );
+	  smf_open_related_model( astgroup, i, "UPDATE", &ast[i], status );
 
 	for( idx=0; idx<ast[i]->ndat; idx++ ) {
 	  if( (ast[i]->sdata[idx]->file->name)[0] ) {
@@ -631,7 +637,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	
 	for( j=0; j<nmodels; j++ ) { 
 	  if( !memiter ) 
-	    smf_open_related_model( modelgroups[j], i, "READ", &model[j][i], 
+	    smf_open_related_model( modelgroups[j], i, "UPDATE", &model[j][i], 
 				    status );
 	  
 	  for( idx=0; idx<model[j][i]->ndat; idx++ ) {
