@@ -55,6 +55,9 @@
 *        - re-order pointing LUT if it exists
 *     2007-11-28 (EC):
 *        Update FITS keyword TORDERED when data order is modified
+*     2007-12-14 (EC):
+*        - fixed LUT re-ordering pointer bug
+*        - extra file existence checking if writing TORDERED FITS entry
 
 *  Notes:
 *     Nothing is done about the FITS channels or WCS information stored in
@@ -138,8 +141,6 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
   /* If value of isTordered matches current value in smfData return */
   if( data->isTordered == isTordered ) return;
   
-  printf("Inside smf_dataOrder - re-ordering data to %i\n", isTordered );
-
   /* Make sure we're looking at 3-dimensions of bolo data */
   if( data->ndims != 3 ) {
     *status = SAI__ERROR;
@@ -189,8 +190,6 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
 
     /* Allocate buffer */
     newbuf = smf_malloc( ndata, sz, 0, status );
-
-    printf("newbuf = %i\n", newbuf);
 
     if( *status == SAI__OK ) {
 
@@ -307,6 +306,7 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
 
       if( inPlace ) {
 	/* Copy newbuf to oldbuf */
+
 	memcpy( oldbuf, newbuf, ndata*sz );
 
 	/* Free newbuf */
@@ -332,7 +332,9 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
   /* If there is a FITS header associated with the smfData, update the
      TORDERED keyword to match isTordered */
   if( data->hdr ) {
-    smf_fits_setL( data->hdr, "TORDERED", isTordered, NULL, 1, status );
+    smf_fits_setL( data->hdr, "TORDERED", isTordered, 
+		   "T=time-ordered data (ICD), F=bolo-ordered data", 
+		   1, status );
 
     /* If NDF file associated with the data, write out the modified
        FITS header */
@@ -340,6 +342,13 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
       if( data->file->ndfid != NDF__NOID ) {
 	kpgPtfts( data->file->ndfid, data->hdr->fitshdr, status );
       }
+    }
+  }
+
+  /* If NDF associated with data, modify dimensions of the data */
+  if( data->file ) {
+    if( data->file->ndfid != NDF__NOID ) {
+
     }
   }
 
@@ -362,7 +371,6 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
   if( oldlut ) {
 
     newlut = smf_malloc( ndata, sizeof(*newlut), 0, status );
-    printf("newlut = %i\n", newlut);    
 
     if( *status == SAI__OK ) {
       if( isTordered ) { /* Converting bolo ordered -> time ordered */
@@ -388,19 +396,19 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
       }
 
       if( inPlace ) {
-	/* Copy newbuf to oldbuf */
+	/* Copy newlut to oldlut */
 	memcpy( oldlut, newlut, ndata*sizeof(*newlut) );
 	
-	/* Free newbuf */
+	/* Free newlut */
 	smf_free( newlut, status );
 	
       } else {
 	
-	/* Free oldbuf */
+	/* Free oldlut */
 	smf_free( oldlut, status );
 
 	/* Set pntr to newbuf */
-	data->lut = oldlut;
+	data->lut = newlut;
       }
     }
   }
