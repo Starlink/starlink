@@ -49,6 +49,9 @@
 *        Header length is now static / padded to multiple of pagesize 
 *     2007-08-20 (TIMJ):
 *        Use const char * mode
+*     2007-12-14 (EC):
+*        -DIMM files now leave both header + data mapped
+*        -Include isTordered flag stored in DIMM files
 
 *  Notes:
 
@@ -166,8 +169,8 @@ void smf_open_model( const Grp *igrp, int index, const char *mode, smfData **dat
     }
     datalen = ndata * smf_dtype_sz(head.dtype,status); 
 
-    /* map the data array, after the header*/
-    if( (buf = mmap( 0, datalen, mflags, MAP_SHARED, fd, headlen ) ) 
+    /* map the entire file including the header */
+    if( (buf = mmap( 0, datalen+headlen, mflags, MAP_SHARED, fd, 0 ) ) 
 	== MAP_FAILED ) {
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "Unable to map model container file", status ); 
@@ -181,10 +184,11 @@ void smf_open_model( const Grp *igrp, int index, const char *mode, smfData **dat
     /* Data from file header */
     (*data)->dtype = head.dtype;
     (*data)->ndims = head.ndims;
+    (*data)->isTordered = head.isTordered;
     memcpy( (*data)->dims, head.dims, sizeof( head.dims ) );
     
     /* Data pointer points to memory AFTER HEADER */
-    (*data)->pntr[0] = buf;
+    (*data)->pntr[0] = buf + headlen;
 
     /* Store the file descriptor to enable us to unmap when we close */
     (*data)->file->fd = fd;
