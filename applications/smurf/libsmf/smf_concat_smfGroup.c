@@ -73,6 +73,10 @@
 *        -Use smf_open_file with SMF__NOCREATE_DATA for first pass
 *        -Set bad status if input is not ICD-compliant time-ordered data
 *        -Fixed bug in time-axis length which depends on output data order
+*     2007-12-14 (EC):
+*        -close reference data
+*        -modified smf_calc_mapcoord interface
+*        -properly set isTordered flag
 
 *  Notes:
 *     Currently buggy / not fully implemented. WCS and FITS channels in
@@ -206,7 +210,7 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
 
 	  if( (*status == SAI__OK) && (refdata->isTordered == 0) ) {
 	    *status = SAI__ERROR;
-	    errRep(FUNC_NAME, "^FILE contains bolo-ordered (unsupported)",
+	    errRep(FUNC_NAME, "^FILE contains bolo-ordered data (unsupported)",
 	  	   status);
 	  }
 
@@ -266,8 +270,6 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
 	      }
 
 	      /* Check data type */
-	      //ndfType( indf, "DATA,VARIANCE", dtype, NDF__SZTYP+1, status );
-	      //if( strncmp( dtype, refdtype, NDF__SZTYP+1 ) != 0 ) {
 
 	      if( refdata->dtype != refdtype ) {
 		*status = SAI__ERROR;
@@ -284,6 +286,10 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
 	    /* At this stage increment tlen for this chunk */	  
 	    tlen += refdata->dims[2];
 	  }
+
+	  /* Close the reference file */
+	  smf_close_file( &refdata, status );
+
 	}
       
       	/* Second pass copy data over to new array */
@@ -305,12 +311,7 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
                re-order the LUT if needed in call to smf_dataOrder */
 
 	    smf_calc_mapcoord( refdata, outfset, moving, lbnd_out, ubnd_out, 
-			       status );
-
-	    /* Now open that extension to get the LUT. Mode is UPDATE
-               since we may re-order the LUT */
-	    /*smf_open_mapcoord( refdata, "UPDATE", status );*/
-
+			       SMF__NOCREATE_FILE, status );
 	  }
 
 	  /* Change data order if required */
@@ -347,9 +348,6 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
 		hdr->allState = smf_malloc( tlen, sizeof(*(hdr->allState)), 
 					    0, status );
 		
-		printf("allState space allocated: %i\n", 
-		       tlen*sizeof(*(hdr->allState)));
-
 		/* Allocate space in the smfData for DATA/VARAIANCE/QUALITY */
 		if( isTordered ) {
 		  data->dims[0] = refdims[0];
@@ -362,6 +360,10 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
 		}
 		data->ndims = 3;
 		
+		/* Set the data type and order */
+		data->dtype = refdtype;
+		data->isTordered = isTordered;
+
 		ndata = nbolo*tlen;
 
 		for( k=0; k<3; k++ ) if( havearray[k] ) {
