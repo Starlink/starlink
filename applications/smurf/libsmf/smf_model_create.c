@@ -101,6 +101,10 @@
 *        -Fixed memory allocation bug
 *     2007-11-28 (EC):
 *        -Added ability to assert the dataOrder (isTordered parameter)
+*     2007-12-14 (EC):
+*        -template is now loaded into refdata and copies to idata
+*        -properly set isTordered in created smfData
+*        -don't unmap the header portion of the model in DIMM files
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -147,6 +151,7 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
+#include "libsmf/smf_err.h"
 
 #define FUNC_NAME "smf_model_create"
 
@@ -184,7 +189,8 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
   int nrel=0;                   /* Number of related elements (subarrays) */
   long pagesize=0;              /* Size of memory page used by mmap */
   char *pname=NULL;             /* Poiner to fname */
-  long remainder=0;             /* Extra length beyond integer pagesuze */
+  smfData *refdata=NULL;        /* Pointer to ref smfData on disk */
+  long remainder=0;             /* Extra length beyond integer pagesize */
   char suffix[] = SMF__DIMM_SUFFIX; /* String containing model suffix */
   smfData *tempdata=NULL;       /* Temporary smfData pointer */
   int thisnrel;                 /* Number of related items for this model */
@@ -318,16 +324,50 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 	if( idx > 0 ) {
 	  
 	  /* Open the template file */
-	  smf_open_file( igroup->grp, idx, "READ", 0, &idata, status );
+	  smf_open_file( igroup->grp, idx, "READ", 0, &refdata, status );
 
-	  /* Assert the data order */
-	  smf_dataOrder( idata, isTordered, status );
+	  /* Make a local copy that we can modify */
+	  idata = smf_deepcopy_smfData( refdata, 0, SMF__NOCREATE_HEAD |
+					SMF__NOCREATE_FILE | SMF__NOCREATE_DA,
+					status );
+
+	  /* Since deepcopy doesn't copy the LUT yet, open and copy over if
+	     it is available */
+
+	  if( mtype == SMF__LUT ) {
+	    smf_open_mapcoord( refdata, "READ", status );
+	    if( *status == SAI__OK ) {
+	      /* Good status means mapcoord was read successfully */
+	      ndata = 1;
+	      for( k=0; k<idata->ndims; k++ ) {
+		ndata *= idata->dims[k];
+	      }
+	      
+	      idata->lut = smf_malloc( ndata, sizeof(*(idata->lut)), 0, 
+				       status );
+
+	      if( *status == SAI__OK ) {
+		memcpy( idata->lut, refdata->lut, ndata*sizeof(*(idata->lut)));
+	      }
+	      
+	    } else if(*status == SMF__NOLUT) { 
+	      /* Otherwise annul bad status and proceed without LUT */
+	      errAnnul( status );
+	    }	    
+	  }
+
+	  /* Close the reference file now because we're done with it */
+	  smf_close_file( &refdata, status );
+
 	}
       } else {
 	/* Otherwise obtain a pointer to the relevant smfData in the
 	   template smfArray at this time chunk */
 	idata = iarray[i]->sdata[j];
       }
+
+      /* Assert the data order in the template */
+      smf_dataOrder( idata, isTordered, status );
 
       /* Check that the template is time-varying data */
 
@@ -428,10 +468,13 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 	    }
 	  } 
 
+	  /* Set the data-ordering flag in the header */
+	  head.isTordered = idata->isTordered;
+
 	  /* Calculate the size of the data buffer. Format:
 
 	  Header:
-	  smfData with only dtype, ndims and dims defined
+	  smfData struct 
 
 	  Data:
 	  buf   = [smf_dtype] * dims[0] * dims[1] * ...
@@ -495,7 +538,7 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 		errRep( FUNC_NAME, "Unable to map model container file", 
 			status ); 
 	      }
-	    }
+	    } 
 
 	    if( *status == SAI__OK ) {
 	      headptr = buf;
@@ -520,23 +563,15 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 	    }
 	    
 	    /* If this is a LUT try to copy it over */
-	    if( mtype == SMF__LUT ) {	  
-
-	      /* Open the LUT if idata associated with file */
-	      if( igroup ) {
-		smf_open_mapcoord( idata, "READ", status );
-	      } 
-	      
-	      /* Check that lut is now set to something */
-	      if( idata->lut == NULL ) {
+	    if( mtype == SMF__LUT ) {
+	      if( idata->lut != NULL ) {	  
+		/* dataptr is the mmap'd memory */
+		memcpy( dataptr, idata->lut, 
+			ndata*smf_dtype_sz(head.dtype, status) );
+	      } else {
 		*status = SAI__ERROR;
 		errRep(FUNC_NAME, "No LUT present in template for LUT model", 
 		       status);      
-	      } 
-
-	      if( *status == SAI__OK ) {
-		/* memcpy because target and source are same type */
-		memcpy( dataptr, idata->lut, datalen );
 	      }
 	    }
 	  }
@@ -559,8 +594,7 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 	      data = smf_create_smfData( flag, status );
 
 	      if( *status == SAI__OK ) {
-		/* Data from file header */
-		data->isTordered = idata->isTordered;
+		data->isTordered = head.isTordered; 
 		data->dtype = head.dtype;
 		data->ndims = head.ndims;
 		memcpy( data->dims, head.dims, sizeof( head.dims ) );
@@ -587,6 +621,7 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 	      /* Synchronize and unmap the header portion of the mmap'd 
 		 memory since it will not get free'd by smf_close_file */
 	      
+	      /*
 	      if( !nofile ) {
 		if( msync( buf, headlen, MS_ASYNC ) == -1 ) {
 		  *status = SAI__ERROR;
@@ -600,6 +635,8 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 			  status ); 
 		}
 	      }
+	      */
+
 	    } else if (!nofile) {
 	      
 	      /* If leaveopen not set (and there is a file) write buffer to 
