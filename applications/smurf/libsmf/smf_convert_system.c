@@ -33,10 +33,13 @@
 
 *  Authors:
 *     DSB: David S. Berry (JAC, UCLan)
+*     EC: Ed Chapin (UBC)
 
 *  History:
 *     25-SEP-2006 (DSB):
 *        Original version.
+*     13-DEC-2007 (EC):
+*        Use strncmp instead of strcmp
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
@@ -83,23 +86,23 @@ const char *smf_convert_system( const char *label, int *status ){
    if (*status != SAI__OK) return result;
 
 /* Compare the supplied labelwith each known type. */
-   if( !strcmp( label, "AZEL" ) ) {
+   if( !strncmp( label, "AZEL", 4 ) ) {
       result = "AZEL";
 
-   } else if( !strcmp( label, "APP" ) ) {
+   } else if( !strncmp( label, "APP", 3 ) ) {
       result = "GAPPT";
 
-   } else if( !strcmp( label, "GAL" ) ) {
+   } else if( !strncmp( label, "GAL", 3 ) ) {
       result = "GALACTIC";
 
-   } else if( !strcmp( label, "ICRS" ) ||
-              !strcmp( label, "ICRF" ) ) {
+   } else if( !strncmp( label, "ICRS", 4 ) ||
+              !strncmp( label, "ICRF", 4 ) ) {
       result = "ICRS";
 
-   } else if( !strcmp( label, "B1950" ) ) {
+   } else if( !strncmp( label, "B1950", 5 ) ) {
       result = "FK4";
 
-   } else if( !strcmp( label, "J2000" ) ) {
+   } else if( !strncmp( label, "J2000", 5 ) ) {
       result = "FK5";
 
    } else {
