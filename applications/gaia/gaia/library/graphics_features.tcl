@@ -12,6 +12,8 @@
 # who         when       what
 # --------   ---------   ----------------------------------------------
 # A.Brighton 20 Jan 98   created
+# P.W.Draper 14 Dec 07   use tcl_precision=17 when saving, needed for
+#                        edge values like -DBL_MAX.
 #
 
 # Add "Save Graphics" and "Load Graphics" menu items to the Skycat
@@ -60,72 +62,77 @@ proc convert_coords {coords from_units to_units image} {
 # Ask for a file name and save line graphics to the given file
 
 proc save_graphics {w} {
-    set filename [filename_dialog]
-    if {"$filename" == ""} {
-	return
-    }
-    
-    # check if file exists and, if so, ask for confirmation
-    if {[file exists $filename]} {
-	if {! [confirm_dialog "File `[file tail $filename]' exists. Overwrite it?"]} {
-	    return
-	}
-    }
-
-    # ask if we should save the graphics in world or image coords
-    set choice [choice_dialog \
-		    "Please select the type of coordinates to save the graphics in:" \
-		    {{World Coordinates} {Image Coordinates} Cancel} {World Coordinates} $w]
-    if {$choice == "Cancel"} {
-	return
-    } elseif {$choice == "World Coordinates"} {
-	set units {deg J2000}
-    } else {
-	set units image
-    }
-
-    # create the file
-    if {[catch {set fd [open $filename w]} msg]} {
-	error_dialog $msg
-	return
-    }
-
-    # get the handle of the canvas window for the image
-    set canvas [$w component image component canvas]
-
-    # get the handle for the rtdimage item (for converting coordinates)
-    set image [$w component image get_image]
-
-    # get the handle for the image' graphic editor (class CanvasDraw) 
-    # so that we can deselect any selected graphic objects
-    set draw [$w component image component draw]
-    $draw deselect_objects
-
-    # save the coordinate type: degrees J2000 or image pixel coords
-    puts $fd "set units \"$units\""
-    
-    # loop through the canvas items
-    foreach item [$canvas find all] {
-	set type [$canvas type $item]
-	if {"$type" == "image"} {
-	    continue
-	}
-	# get item coords and convert from canvas coords to $units
-	set coords [convert_coords [$canvas coords $item] canvas $units $image]
-
-	# add a special tag to this item so we can delete it before reloading it
-	$canvas addtag $filename withtag $item
-
-	# get list of configuration options for the item
-	set config {}
-	foreach cfg [$canvas itemconfigure $item] {
-	    lappend config [list [lindex $cfg 0] [lindex $cfg 4]]
-	}
-
-	puts $fd [list $type $coords $config]
-    }
-
-    close $fd
+   set filename [filename_dialog]
+   if {"$filename" == ""} {
+      return
+   }
+   
+   # check if file exists and, if so, ask for confirmation
+   if {[file exists $filename]} {
+      if {! [confirm_dialog "File `[file tail $filename]' exists. Overwrite it?"]} {
+         return
+      }
+   }
+   
+   # ask if we should save the graphics in world or image coords
+   set choice [choice_dialog \
+                  "Please select the type of coordinates to save the graphics in:" \
+                  {{World Coordinates} {Image Coordinates} Cancel} {World Coordinates} $w]
+   if {$choice == "Cancel"} {
+      return
+   } elseif {$choice == "World Coordinates"} {
+      set units {deg J2000}
+   } else {
+      set units image
+   }
+   
+   # create the file
+   if {[catch {set fd [open $filename w]} msg]} {
+      error_dialog $msg
+      return
+   }
+   
+   # get the handle of the canvas window for the image
+   set canvas [$w component image component canvas]
+   
+   # get the handle for the rtdimage item (for converting coordinates)
+   set image [$w component image get_image]
+   
+   # get the handle for the image' graphic editor (class CanvasDraw) 
+   # so that we can deselect any selected graphic objects
+   set draw [$w component image component draw]
+   $draw deselect_objects
+   
+   # save the coordinate type: degrees J2000 or image pixel coords
+   puts $fd "set units \"$units\""
+   
+   # use full precision so that we do not loose any
+   set old_tcl_precision $::tcl_precision
+   set ::tcl_precision 17
+   catch {
+      
+      # loop through the canvas items
+      foreach item [$canvas find all] {
+         set type [$canvas type $item]
+         if {"$type" == "image"} {
+            continue
+         }
+         # get item coords and convert from canvas coords to $units
+         set coords [convert_coords [$canvas coords $item] canvas $units $image]
+         
+         # add a special tag to this item so we can delete it before reloading it
+         $canvas addtag $filename withtag $item
+         
+         # get list of configuration options for the item
+         set config {}
+         foreach cfg [$canvas itemconfigure $item] {
+            lappend config [list [lindex $cfg 0] [lindex $cfg 4]]
+         }
+         puts $fd [list $type $coords $config]
+      }
+   }
+   set ::tcl_precision $old_tcl_precision
+   close $fd
 }
 
 
