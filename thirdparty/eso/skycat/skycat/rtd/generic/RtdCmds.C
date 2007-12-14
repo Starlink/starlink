@@ -28,6 +28,8 @@
 *                          Will be re-used in reference counted copies
 *                          (inappropriately when extra high factors are in
 *                          use, leading to memory allocation errors).
+*                 14/12/07 Add option to statisticsCmd so that world
+*                          coordinates can be reported in degrees (J2000).
 */
 
 /************************************************************************
@@ -2663,12 +2665,14 @@ int RtdImage::spectrumCmd(int argc, char* argv[])
  * statistics subcommand: calculate statistics.
  *
  * usage:  set list [$image statistics]
+ *         set list [$image statistics degrees]
  *  or:    set list [$image statistics noise x0 y0 nx ny]
  *
  * no args -
- *           With no arguments the statistics on the section of the image
- *           being displayed is calculated (used for "pick object").
- *           The return value in Tcl is a list of the following values: 
+ *           With no arguments or an argument of degrees the statistics on the
+ *           section of the image being displayed is calculated (used for
+ *           "pick object"). The return value in Tcl is a list of the
+ *           following values:  
  *
  *           {x y ra dec equinox fwhmX fwhmY angle objectPeak meanBackground}
  *
@@ -2684,6 +2688,9 @@ int RtdImage::spectrumCmd(int argc, char* argv[])
  *           angle          = angle of major axis, degrees, along X
  *           objectPeak     = peak value of object above background
  *           meanBackground = mean background level
+ * 
+ *           If the single argument is "degrees" then the ra and dec values
+ *           are not formatted into sexagesimal.
  *
  *           Note: compare results with Midas (center/gauss) when changes are done
  *
@@ -2712,7 +2719,7 @@ int RtdImage::statisticsCmd(int argc, char* argv[])
     if (!image_)
 	return error("no image loaded");
 
-    if (argc == 0) {
+    if (argc == 0 || ( argc == 1 && strcmp(argv[0], "degrees") == 0 ) ) {
 	double w = reqWidth_, h = reqHeight_;
 	undoTrans(w, h, 1); // get only visible area
 	double x = xOffset_, y = yOffset_;
@@ -2756,19 +2763,36 @@ int RtdImage::statisticsCmd(int argc, char* argv[])
       
 	// get the world coords position from the image coords
 	WorldCoords pos;
+        double dx, dy;
 	if (imageToWorldCoords(x, y, 0) == TCL_OK) {
-	    pos = WorldCoords(x, y);
-	    if (pos.status() != 0)
-		pos = WorldCoords();
+            pos = WorldCoords(x, y);
+            if (pos.status() != 0)
+                pos = WorldCoords();
+
+            // also report in degrees if asked
+            if ( argc == 1 ) {
+                pos.get( dx, dy, 2000.0 );
+            }
 	}
       
 	ostringstream os;
 	os << ix << ' ' << iy << ' ';
       
-	if (pos.status() == 0 && ! pos.isNull())
-	    os << pos << " J2000 "; // ra, dec, equinox: XXX use default equinox ?
-	else 
+	if (pos.status() == 0 && ! pos.isNull()) {
+            if ( argc == 1 ) {
+                //  report in degrees, try to keep precision reasonable
+                char cx[TCL_DOUBLE_SPACE], cy[TCL_DOUBLE_SPACE];
+                sprintf( cx, "%.9g", dx );
+                sprintf( cy, "%.9g", dy );
+                os << cx << ' ' << cy << " J2000 "; // ra, dec, equinox, degrees.
+            } 
+            else {
+                os << pos << " J2000 "; // ra, dec, equinox: XXX use default equinox ?
+            }
+        } 
+        else {
 	    os << "{} {} {} ";      // no world coords
+        }
       
 	os << fwhmX << ' ' << fwhmY << ' ' << angle << ' ' 
 	   << objectPeak << ' ' << meanBackground;

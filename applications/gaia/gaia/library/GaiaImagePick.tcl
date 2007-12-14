@@ -119,9 +119,22 @@ itcl::class gaia::GaiaImagePick {
 	    -text "Comment:"
       }
       pack $itk_component(comment) \
-         -side top -fill x -padx 2m -pady 2m -before $itk_component(buttons)
+         -side top -fill x -padx 2m -pady 1m -before $itk_component(buttons)
       add_short_help $itk_component(comment) \
          {Comment to add with results in log file}
+
+      #  Toggle to report coordinates in degrees (often useful for scripts).
+      itk_component add degrees {
+         StarLabelCheck $w_.degrees \
+            -text "Degrees:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth 8 \
+            -variable [scope show_degrees_]
+      }
+      pack $itk_component(degrees) \
+         -side top -fill x -padx 2m -pady 1m -before $itk_component(buttons)
+      add_short_help $itk_component(degrees) \
+         {Show RA and Dec values in decimal degrees}
 
       #  Add a save/append button.
       itk_component add save {
@@ -130,7 +143,7 @@ itcl::class gaia::GaiaImagePick {
 	    -command [code $this save]
       }
       pack $itk_component(save) \
-         -side left -expand 1 -padx 2m -pady 2m -in $itk_component(buttons)
+         -side left -expand 1 -padx 2m -pady 1m -in $itk_component(buttons)
       add_short_help $itk_component(save) \
          {Append values to log file, created if doesn't exist}
    }
@@ -201,10 +214,37 @@ itcl::class gaia::GaiaImagePick {
       return [format {%.2f} $val]
    }
 
+   #  Override method called when the user clicks in the image to select an
+   #  object or star for the "pick_object" method. Added ability to report
+   #  world coordinates in degrees.
+   public method picked_object {} {
+      # display busy cursor in image and pick window...
+      $itk_option(-target_image) busy {
+         busy {
+            if { $show_degrees_ } {
+               if {[catch {set list [$image_ statistics degrees]} msg]} {
+                  error_dialog $msg
+                  cancel_pick
+               } else {
+                  picked_wcs_object $list
+               }
+            } else {
+               if {[catch {set list [$image_ statistics]} msg]} {
+                  error_dialog $msg
+                  cancel_pick
+               } else {
+                  picked_wcs_object $list
+               }
+            }
+         }
+      }
+   }
 
    #  Protected variables.
 
    #  Name of log file.
    protected variable logfile_ "GaiaPick.Log"
 
+   #  Show RA and Dec in degrees.
+   protected variable show_degrees_ 0
 }
