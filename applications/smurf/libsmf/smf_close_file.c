@@ -81,6 +81,8 @@
 *        Moved DIMM file info into smfFile, so handle closing there
 *     2007-06-25 (EC)
 *        Check for file descriptor if unmap is required
+*     2007-12-14 (EC)
+*        Unmap the header portion of DIMM files
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -112,6 +114,9 @@
 /* General includes */
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 /* SMURF and STARLINK includes */
 #include "smf.h"
@@ -126,15 +131,21 @@
 
 void smf_close_file( smfData ** data, int * status ) {
 
+  void *buf=NULL;         /* Buffer pointer */
+  size_t buflen=0;        /* Size of buffer */
   smfDA   * da;           /* pointer to smfDA in smfData */
   size_t datalen=0;       /* Size of data buffer in bytes */
   smfDream *dream = NULL; /* Pointer to smfDream in smfData */
   smfFile * file;         /* pointer to smfFile in smfData */
   int       freedata = 0; /* should the data arrays be freed? */
   smfHead * hdr;          /* pointer to smfHead in smfData */
+  size_t headlen=0;       /* Size of header (mmap'd files) in bytes */ 
   int       i;            /* loop counter */
   int       isSc2store = 0; /* is this sc2Store data */
   size_t ndata=0;         /* Number of elements in data array */
+  long pagesize=0;        /* Size of memory page used by mmap */
+  long remainder=0;       /* Extra length beyond integer pagesuze */
+  smfData *temphead=NULL; /* Temporary smfData pointer */
 
 
   /* we need to be able to clean up even if input status is bad -
@@ -178,8 +189,14 @@ void smf_close_file( smfData ** data, int * status ) {
       ndfAnnul( &(file->ndfid), status );
       	
     } else if( file->fd ) {
-      /* Array was mmap'd to a file, and must now be synch'd and unmapped,
+      /* Array was mmap'd to a file, and must now be sync'd and unmapped,
          and the file descriptor closed */
+
+      /* Length of the header including padding to page boundary */
+      pagesize = sysconf(_SC_PAGESIZE);
+      headlen = sizeof(temphead);
+      remainder = headlen % pagesize;
+      if( remainder  ) headlen = headlen - remainder + pagesize;
 
       /* Length of data array buffer */
       ndata = 1;
@@ -188,10 +205,24 @@ void smf_close_file( smfData ** data, int * status ) {
       }
       datalen = ndata * smf_dtype_sz((*data)->dtype,status); 
 
-      if( msync( (*data)->pntr[0], datalen, MS_ASYNC ) == -1 ) {
+      buflen = headlen+datalen; /* Length of entire mapped buffer */
+
+      /* The header is in the same mapped array as the data array,
+         but headlen bytes earlier. Point temphead to this location and
+         update relevant header values before closing */
+
+      buf = ((*data)->pntr[0] - headlen);
+
+      temphead = (smfData *) buf;
+      temphead->isTordered = (*data)->isTordered;
+      temphead->dtype = (*data)->dtype;
+      temphead->ndims = (*data)->ndims;
+      memcpy( temphead->dims, (*data)->dims, sizeof( temphead->dims ) );
+
+      if( msync( buf, buflen, MS_ASYNC ) == -1 ) {
 	*status = SAI__ERROR;
 	errRep( ERRFUNC, "Unable to synch model container file", status ); 
-      } else if( munmap( (*data)->pntr[0], datalen ) == -1 ) {
+      } else if( munmap( buf, buflen ) == -1 ) {
 	*status = SAI__ERROR;
 	errRep( ERRFUNC, "Unable to unmap model container file", status ); 
       } else if( close( file->fd ) == -1 ) {
