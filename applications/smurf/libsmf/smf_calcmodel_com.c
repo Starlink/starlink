@@ -65,6 +65,8 @@
 *     2007-08-09 (EC):
 *        Fixed bug in replacement of model in residual before calculating
 *        new model for current iteration.
+*     2007-12-14 (EC):
+*        Updated to use bolo-ordered data, disabled boxcar smoothing
 *     {enter_further_changes_here}
 
 
@@ -118,7 +120,7 @@ void smf_calcmodel_com( smfArray *res, AstKeyMap *keymap,
   dim_t i;                      /* Loop counter */
   int idx=0;                    /* Index within subgroup */
   dim_t j;                      /* Loop counter */
-  double mean=0;                /* Array mean */
+  double sum=0;                /* Array sum */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   double *model_data_copy=NULL; /* Copy of model_data */
   dim_t nbolo=0;                /* Number of bolometers */
@@ -140,8 +142,14 @@ void smf_calcmodel_com( smfArray *res, AstKeyMap *keymap,
     do_boxcar = 1;
   }
 
-  /* The common mode signal is stored as a 1d array for the entire subgroup.
-     The corresponding smfData is at position 0 in the model sdata. */
+  /* Assert bolo-ordered data for the residual */
+  for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
+    smf_dataOrder( res->sdata[idx], 0, status );
+  }
+
+  /* The common mode signal is stored as a single 1d vector for all 4
+     subarrays.  The corresponding smfData is at position 0 in the
+     model sdata. */
   
   if( model->sdata[0] ) {
     /* Pointer to model data array */
@@ -174,15 +182,15 @@ void smf_calcmodel_com( smfArray *res, AstKeyMap *keymap,
   for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
 
     /* Obtain dimensions of the data */
-    thisnbolo = (res->sdata[idx]->dims)[0] * (res->sdata[idx]->dims)[1];
-    thisntslice = (res->sdata[idx]->dims)[2];
+    thisnbolo = (res->sdata[idx]->dims)[1] * (res->sdata[idx]->dims)[2];
+    thisntslice = (res->sdata[idx]->dims)[0];
     thisndata = thisnbolo*thisntslice;
 
     if( idx == 0 ) {
       /* Store dimensions of the first file */
       nbolo = thisnbolo;
       ntslice = thisntslice;
-      ndata = thisndata;
+      ndata = thisndata;      
     } else {
       /* Check that dimensions haven't changed */
       if( (thisnbolo != nbolo) || (thisntslice != ntslice) || 
@@ -203,25 +211,23 @@ void smf_calcmodel_com( smfArray *res, AstKeyMap *keymap,
       errRep(FUNC_NAME, "Null data in inputs", status);      
     } else {
     
+      /* Loop over time slice */
       for( i=0; i<ntslice; i++ ) {
 	
-	base = i*nbolo;  /* Index to first data point in i'th time slice */
-
-
-	/* Add the previous iteration of the model back into the residual, 
-	   and then set the model to 0. */
+	/* First loop over bolometers to put the previous common-mode
+	   signal back in at each time-slice, and calculate the sum of
+	   all the detectors. */
 
 	lastmean = model_data_copy[i];
+	sum = 0;
+	base = 0; /* Offset to the start of the j'th bolometer in the buffer */
 
-	for( j=0; j<nbolo; j++ ) {
-	  res_data[base + j] += lastmean;
+	for( j=0; j<nbolo; j++ ) if( res_data[base+i] != VAL__BADD) {
+	  res_data[base+i] += lastmean;
+	  model_data[i] += res_data[base+i];
+	  weight[i]++;
+	  base += ntslice;
 	}
-
-	/* Now calculate the new contribution to the model from the current
-	   sub-array average at this time slice */
-	smf_calc_stats( res->sdata[idx], "t", i, 0, 0, &mean, &sigma, status );
-	model_data[i] += mean;
-	weight[i] ++;
       }
     }
   }
@@ -234,9 +240,11 @@ void smf_calcmodel_com( smfArray *res, AstKeyMap *keymap,
   }
 
   /* boxcar smooth if desired */
+  /* Currently disabled
   if( do_boxcar ) {
     smf_boxcar1( model_data, ntslice, boxcar, status );
   }
+  */
 
   /* remove common mode from residual */
   for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
@@ -245,12 +253,14 @@ void smf_calcmodel_com( smfArray *res, AstKeyMap *keymap,
 
     /* Remove common mode from the residual */
     for( i=0; i<ntslice; i++ ) {
-      base = i*nbolo;  /* Index to first data point in i'th time slice */
       
+      base = 0;
+
       /* Loop over bolometer */
       for( j=0; j<nbolo; j++ ) {
 	/* update the residual model */
-	res_data[base + j] -= model_data[i];
+	res_data[base + i] -= model_data[i];
+	base += ntslice;
       }
     }    
   }
