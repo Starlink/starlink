@@ -163,6 +163,8 @@
 *        Added parameter "specunion".
 *     29-OCT-2007 (EC):
 *        Modified interface to smf_open_file.
+*     14-DEC-2007 (EC):
+*        Call smf_open_file with SMF__NOCREATE_DATA
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -313,7 +315,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       box->ubnd[ 1 ] = VAL__MIND;
 
 /* Obtain information about the current input NDF. */
-      smf_open_file( igrp, ifile, "READ", 0, &data, status );
+      smf_open_file( igrp, ifile, "READ", SMF__NOCREATE_DATA, &data, status );
 
 /* Issue a suitable message and abort if anything went wrong. */
       if( *status != SAI__OK ) {

@@ -88,6 +88,8 @@
 *        Remove attempts to retrieve non-existent FITS headers
 *     2007-10-29 (EC):
 *        Modified interface to smf_open_file.
+*     2007-12-14 (EC):
+*        Call smf_open_file with SMF__NOCREATE_DATA
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -196,7 +198,7 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
   /* Read data from the given input file in the group - note index
      should be 1 as we use the first file in the Grp to define the map
      bounds */
-  smf_open_file( igrp, index, "READ", 0, &data, status );
+  smf_open_file( igrp, index, "READ", SMF__NOCREATE_DATA, &data, status );
 
   /* Retrieve file name for use feedback */
   file = data->file;

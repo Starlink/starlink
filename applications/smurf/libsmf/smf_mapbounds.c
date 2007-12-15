@@ -91,6 +91,8 @@
 *        -Changed name of smf_rebincube_totmap to smf_rebin_totmap
 *     2007-10-29 (EC):
 *        Modified interface to smf_open_file.
+*     2007-12-14 (EC):
+*        Call smf_open_file with SMF__NOCREATE_DATA
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -192,7 +194,7 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
   /* Loop over all files in the Grp */
   for( i=1; i<=size; i++ ) {
     /* Read data from the ith input file in the group */      
-    smf_open_file( igrp, i, "READ", 0, &data, status );
+    smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
     
     if( *status == SAI__OK ) {
       file = data->file;
