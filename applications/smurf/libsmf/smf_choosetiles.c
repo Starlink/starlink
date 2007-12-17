@@ -157,8 +157,6 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
    AstUnitMap *umap = NULL;
    char *pname = NULL;
    char filename[ GRP__SZNAM + 1 ]; 
-   double new_lbnd;
-   double new_ubnd;
    double refpix[ 3 ];
    double refwcs[ 3 ];
    double shift[ 3 ];
@@ -174,6 +172,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
    int numtile[ 2 ];
    int plbnd[ 2 ];
    int pubnd[ 2 ];
+   int refpixind;
    int ubin;
    int ubout;
    int yhi;
@@ -238,38 +237,37 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
       refpix[ 0 ] += lbnd[ 0 ] - 1.5;
       refpix[ 1 ] += lbnd[ 1 ] - 1.5;
 
-/* Define another coordinate system that is a scaled and shifted form of
-   pixel coords. Unit length in the new coordinate system is equal to one
-   tile size, and the reference position has position (0.5,0.5) in the
-   new coordinate system. We pad the supplied full size grid bounds by 
-   adding a border to each edge so that each of the padded bounds is at 
-   an integer value in the new coordinate system. This means that the ref
-   position will be at the centre of a tile. We also finds the number of 
-   tiles required along the x and y pixel axes. */
+/* We place the pixel containing the refereence position at vthe centre
+   of a tile, and then pad the supplied full size grid bounds by adding a 
+   border to each edge so that each axis is spanned by an integer number
+   of tiles. Do each spatial axis separately. */
       for( i = 0; i < 2; i++ ) {
 
-/* Convert the supplied lower bound into the new coordinate system. */
-         new_lbnd = ( lbnd[ i ] - 1.0 + 0.5*tile_size[ i ] - refpix[ i ] )
-                    / tile_size[ i ];
+/* Get the pixel index of the pixel containing the reference point. */
+         refpixind = (int) ceil( refpix[ i ] );
 
-/* Find the next lower integer value. */
-         new_lbnd = floor( new_lbnd );
-
-/* Convert this back to grid coords. */
-         plbnd[ i ] = ceil( ( new_lbnd - 0.5 )*tile_size[ i ] + refpix[ i ] );
-
-/* Convert the supplied upper bound into the new coordinate system. */
-         new_ubnd = ( ubnd[ i ] + 0.5*tile_size[ i ] - refpix[ i ] )
-                    / tile_size[ i ];
-
-/* Find the next higher integer value. */
-         new_ubnd = ceil( new_ubnd );
-
-/* Convert this back to grid coords. */
-         pubnd[ i ] = ceil( ( new_ubnd - 0.5 )*tile_size[ i ] + refpix[ i ] );
+/* Find the pixel bounds of a tile centred on this pixel. If the
+   tile size is even, we place the reference pixel on the higher of the
+   two central pixels. */
+         plbnd[ i ] = refpixind - tile_size[ i ]/2;
+         pubnd[ i ] = plbnd[ i ] + tile_size[ i ] - 1;
 
 /* Store the number of tiles spanned by this axis. */
-         numtile[ i ] = (int) ( new_ubnd - new_lbnd + 0.5 );
+         numtile[ i ] = 1;
+
+/* Decrease the lower pixel bounds by a tile size until the whol output
+   array is encompassed. Then do the equivalent thing with the upper
+   bounds. */
+         while( plbnd[ i ] > lbnd[ i ] ) {
+            plbnd[ i ] -= tile_size[ i ];
+            numtile[ i ]++;
+         }
+
+         while( pubnd[ i ] < ubnd[ i ] ) {
+            pubnd[ i ] += tile_size[ i ];
+            numtile[ i ]++;
+         }
+
       }
 
 /* Determine the constant width border by which the basic tile area is to be
@@ -277,7 +275,6 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
    rebinnig a single non-zero pixel value using the supplied spreading
    scheme, and then determining the width of the resulting non-zero pixel
    values. */
-
       umap = astUnitMap( 1, "" );
       lbin = 0;
       ubin = 0;
