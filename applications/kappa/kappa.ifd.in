@@ -2765,6 +2765,13 @@ package kappa {
             helpkey *
          }
 
+         parameter setting {
+            type LITERAL
+            ppath DYNAMIC
+            prompt {List of attribute settings}
+            helpkey *
+          }
+
          parameter state {
             type _LOGICAL
             access WRITE

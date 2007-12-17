@@ -38,7 +38,8 @@
 *     parameter MODE, and can be:
 *
 *     -  display the value of an attribute;
-*     -  set a new value for an attribute;
+*     -  set a new value for a single attribute;
+*     -  set new values for a list of attributes;
 *     -  clear an attribute value; and
 *     -  test the state of an attribute.
 *
@@ -65,6 +66,9 @@
 *        attribute has not yet been assigned a value (or has been 
 *        cleared), then the default value will be displayed.
 *
+*        - "MSet" -- Assigns new values to multiple attributes. The
+*        attribute names and values are obtained using parameter SETTING.
+*
 *        - "Set" -- Assigns a new value, given by parameter NEWVAL, to
 *        the attribute. 
 *
@@ -78,12 +82,12 @@
 *
 *        The initial suggested default is "Get".
 *     NAME = LITERAL (Read)
-*        The attribute name
+*        The attribute name. Not used if MODE is "MSet".
 *     NDF = NDF (Read and Write)
 *        The NDF to be modified or read.  When MODE="Get", the access is
 *        Read only.
 *     NEWVAL = LITERAL (Read)
-*        The new value to assign to the attribute.
+*        The new value to assign to the attribute. Only used if MODE is "Set".
 *     REMAP = _LOGICAL (Read)
 *        Only accessed if MODE is "Set". If REMAP is TRUE, then the
 *        Mappings which connect the current Frame to the other Frames
@@ -98,14 +102,23 @@
 *        incorrect attribute values for some reason, which need to be 
 *        corrected without altering the Mappings to take account of the 
 *        change. [TRUE]
+*     SETTING = LITERAL (Read)
+*        Only accessed if MODE is set to "MSet". It should hold a comma
+*        separated list of "<attribute>=<value>" strings, where
+*        <attribute> is the name of an attribute and <value> is the value
+*        to assign to the attribute. 
 *     STATE = _LOGICAL (Write)
 *        On exit, this holds the state of the attribute on entry to this
-*        application.
+*        application. Not used if MODE is "MSet".
 *     VALUE = LITERAL (Write)
 *        On exit, this holds the value of the attribute on entry to this
-*        application.
+*        application. Not used if MODE is "MSet".
 
 *  Examples:
+*     wcsattrib my_spec mset setting="'unit(1)=km/s,system(1)=vrad'"
+*        This sets new values of "km/s" and "vrad" simultaneously for the 
+*        Unit and System attributes for the first axis of the NDF called 
+*        my_spec.
 *     wcsattrib my_spec set System freq
 *        This sets the System attribute of the current co-ordinate Frame
 *        in the NDF called my_Spec so that the Frame represents
@@ -172,6 +185,7 @@
 *     Copyright (C) 1998, 2001, 2003 Central Laboratory of the Research
 *     Councils. All Rights Reserved.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -204,6 +218,8 @@
 *        Added parameter REMAP.
 *     2006 June 28 (MJC):
 *        Give only read access to the NDF when the MODE=Get.
+*     17-DEC-2007 (DSB):
+*        Added mode "MSet".
 *     {enter_further_changes_here}
 
 *-
@@ -227,6 +243,7 @@
       CHARACTER MODE*5           ! Required operation
       CHARACTER NAME*30          ! Attribute name
       CHARACTER NEWVAL*255       ! New attribute value
+      CHARACTER SETTNG*512       ! List of attribute settings
       CHARACTER VALUE*255        ! Value of the attribute on entry
       INTEGER FRM                ! Pointer to current Frame
       INTEGER INDF               ! NDF identifier for NDF being modified
@@ -251,7 +268,7 @@
       CALL NDF_BEGIN
 
 *  Get the operation to perform.
-      CALL PAR_CHOIC( 'MODE', 'Get', 'Get,Set,Test,Clear', .FALSE., 
+      CALL PAR_CHOIC( 'MODE', 'Get', 'Get,Set,MSet,Test,Clear', .FALSE., 
      :                MODE, STATUS )
 
 *  Obtain an identifier for the NDF to be modified.
@@ -264,24 +281,26 @@
 *  Get the WCS FrameSet associated with the NDF.
       CALL KPG1_GTWCS( INDF, IWCS, STATUS )
 
-*  Get the attribute name.
-      CALL PAR_GET0C( 'NAME', NAME, STATUS )
-      CALL CHR_RMBLK( NAME )
-      CALL CHR_UCASE( NAME )
-
 *  Get the Domain of the current Frame.
       DOM = AST_GETC( IWCS, 'DOMAIN', STATUS )
 
+*  If required, get the attribute name.
+      IF( MODE .NE. 'MSET' ) THEN
+         CALL PAR_GET0C( 'NAME', NAME, STATUS )
+         CALL CHR_RMBLK( NAME )
+         CALL CHR_UCASE( NAME )
+
 *  Get the current state of the attribute and assign it to the output
 *  parameter STATE.
-      STATE = AST_TEST( IWCS, NAME, STATUS )
-      CALL PAR_PUT0L( 'STATE', STATE, STATUS )
+         STATE = AST_TEST( IWCS, NAME, STATUS )
+         CALL PAR_PUT0L( 'STATE', STATE, STATUS )
 
 *  Get the current value of the attribute and assign it to the output
 *  parameter VALUE.
-      VALUE = AST_GETC( IWCS, NAME, STATUS )
-      LVAL = MAX( 1, CHR_LEN( VALUE ) )
-      CALL PAR_PUT0C( 'VALUE', VALUE( : LVAL ), STATUS )
+         VALUE = AST_GETC( IWCS, NAME, STATUS )
+         LVAL = MAX( 1, CHR_LEN( VALUE ) )
+         CALL PAR_PUT0C( 'VALUE', VALUE( : LVAL ), STATUS )
+      END IF
 
 *  Branch for the four operations...
 
@@ -352,6 +371,44 @@
             END IF
          END IF
 
+*  MSet.
+      ELSE IF ( MODE .EQ. 'MSET' ) THEN
+
+*  Do not allow any changes to be made to the three NDF-managed Frames
+*  using this mode.
+         IF( RDONLY( DOM ) .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'D', DOM )
+            CALL ERR_REP( 'WCSATTRIB_ERR4', 'The attributes of '//
+     :                    'the ^D Frame cannot be changed using '//
+     :                    'MODE=MSET.', STATUS )
+            CALL ERR_REP( 'WCSATTRIB_ERR5', 'Try using MODE=SET '//
+     :                    'instead.', STATUS )
+         ELSE
+
+*  Get the list of attribute settings.
+            CALL PAR_GET0C( 'SETTING', SETTNG, STATUS )
+
+*  See if the attributes should be modified using the FrameSet method
+*  (which may cause inter-Frame Mappings to change in order to maintain
+*  FrameSet integrity), or the Frame method (which will leave the
+*  Mappings unchanged).
+            CALL PAR_GET0L( 'REMAP', REMAP, STATUS )
+
+*  If the Frame is to be remapped, use the FrameSet method.
+            IF( REMAP ) THEN
+               CALL AST_SET( IWCS, SETTNG( : MAX( 1,CHR_LEN(SETTNG)) ), 
+     :                       STATUS )
+
+*  Otherwise, extract the Frame and use the Frame method.
+            ELSE
+               FRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
+               CALL AST_SET( FRM, SETTNG( : MAX( 1,CHR_LEN(SETTNG) ) ), 
+     :                       STATUS )
+               CALL AST_ANNUL( FRM, STATUS )
+            END IF
+         END IF
+
 *  Test.
       ELSE IF( MODE .EQ. 'TEST' ) THEN
          CALL MSG_SETL( 'VAL', STATE )
@@ -361,7 +418,7 @@
       ELSE
          IF( NAME .EQ. 'BASE' .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'WCSATTRIB_ERR4', 'Cannot clear the Base '//
+            CALL ERR_REP( 'WCSATTRIB_ERR6', 'Cannot clear the Base '//
      :                    'attribute of the WCS FrameSet.', STATUS )
 
 *  If the current Frame is one of the Frames managed internally by the
@@ -372,7 +429,7 @@
             CALL CHR_UCASE( NAME( 1 : 1 ) )
             CALL MSG_SETC( 'N', NAME )
             CALL MSG_SETC( 'D', DOM )
-            CALL ERR_REP( 'WCSATTRIB_ERR5', 'The ^N attribute of the '//
+            CALL ERR_REP( 'WCSATTRIB_ERR7', 'The ^N attribute of the '//
      :                    '^D Frame cannot be cleared.', STATUS )
 
 *  Clear the attribute.
