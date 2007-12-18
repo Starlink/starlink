@@ -203,15 +203,12 @@ itcl::class ::gaia3d::Gaia3dVtkLine {
    #  position it within the cube in the right direction.
    public method fit_to_data {} {
       lassign [get_dimensions_] xdim ydim zdim
-      set xc [expr $xdim*0.5]
-      set yc [expr $ydim*0.5]
-      set zc [expr $zdim*0.5]
       if { $axis == 1 } {
-         set_end_points 1 $yc $zc $xdim $yc $zc
+         set_end_points 1 $y1_ $z1_ $xdim $y1_ $z1_
       } elseif { $axis == 2 } {
-         set_end_points $xc 1 $zc $xc $ydim $zc
+         set_end_points $x1_ 1 $z1_ $x1_ $ydim $z1_
       } else {
-         set_end_points $xc $yc 1 $xc $yc $zdim
+         set_end_points $x1_ $y1_ 1 $x1_ $y1_ $zdim
       }
    }
 
@@ -286,7 +283,7 @@ itcl::class ::gaia3d::Gaia3dVtkLine {
    }
 
    #  Whether to keep line within dataset bounds.
-   public variable clip_to_bounds 0
+   public variable clip_to_bounds 1
 
    #  Whether to align to an axis.
    public variable align_to_axis 0
