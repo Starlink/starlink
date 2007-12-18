@@ -210,6 +210,8 @@
 *     2007-12-18 (DSB):
 *        -Added smf_getrefwcs.
 *        -Added specrefwcs and spacerefwcs to smf_cubebounds.
+*     2007-12-18 (AGG):
+*        New smf_free behaviour: now returns a NULL pointer if successful
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -434,7 +436,7 @@ void smf_flatfield ( const smfData *idata, smfData **odata, const int flags,
 
 void smf_flatten ( smfData *data, int *status );
 
-void smf_free( void * pntr, int * status );
+void *smf_free( void * pntr, int * status );
 
 void smf_get_gridcoords ( double *row, double *col, int nrow, int ncol,
 			     int *status );
