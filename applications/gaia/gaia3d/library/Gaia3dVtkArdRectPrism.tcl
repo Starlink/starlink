@@ -67,28 +67,34 @@ itcl::class ::gaia3d::Gaia3dVtkArdRectPrism {
    #  Methods and procedures:
    #  -----------------------
 
-   #  Create the polygon for the rectangle locus.
+   #  Create the polygon for the rectangle locus. Note -1 correction to
+   #  VTK grid coords.
    protected method create_polygon_ {} {
 
       $points_ Reset
       $cells_ Reset
       $cells_ InsertNextCell 4
 
+      set x0v [expr $x0-1]
+      set x1v [expr $x1-1]
+      set y0v [expr $y0-1]
+      set y1v [expr $y1-1]
+
       if { $axis == 1 } {
-         $points_ InsertPoint 0 0.0 $x0 $y0
-         $points_ InsertPoint 1 0.0 $x0 $y1
-         $points_ InsertPoint 2 0.0 $x1 $y1
-         $points_ InsertPoint 3 0.0 $x1 $y0
+         $points_ InsertPoint 0 0.0 $x0v $y0v
+         $points_ InsertPoint 1 0.0 $x0v $y1v
+         $points_ InsertPoint 2 0.0 $x1v $y1v
+         $points_ InsertPoint 3 0.0 $x1v $y0v
       } elseif { $axis == 2 } {
-         $points_ InsertPoint 0 $x0 0.0 $y0
-         $points_ InsertPoint 1 $x0 0.0 $y1
-         $points_ InsertPoint 2 $x1 0.0 $y1
-         $points_ InsertPoint 3 $x1 0.0 $y0
+         $points_ InsertPoint 0 $x0v 0.0 $y0v
+         $points_ InsertPoint 1 $x0v 0.0 $y1v
+         $points_ InsertPoint 2 $x1v 0.0 $y1v
+         $points_ InsertPoint 3 $x1v 0.0 $y0v
       } else {
-         $points_ InsertPoint 0 $x0 $y0 0.0
-         $points_ InsertPoint 1 $x0 $y1 0.0
-         $points_ InsertPoint 2 $x1 $y1 0.0
-         $points_ InsertPoint 3 $x1 $y0 0.0
+         $points_ InsertPoint 0 $x0v $y0v 0.0
+         $points_ InsertPoint 1 $x0v $y1v 0.0
+         $points_ InsertPoint 2 $x1v $y1v 0.0
+         $points_ InsertPoint 3 $x1v $y0v 0.0
       }
       $cells_ InsertCellPoint 0
       $cells_ InsertCellPoint 1
@@ -97,6 +103,36 @@ itcl::class ::gaia3d::Gaia3dVtkArdRectPrism {
 
       $polydata_ SetPoints $points_
       $polydata_ SetPolys $cells_
+   }
+
+   #  Apply a shift to the corners.
+   protected method apply_shift_ {sx sy} {
+      configure -x0 [expr $x0+$sx] -x1 [expr $x1+$sx] \
+                -y0 [expr $y0+$sy] -y1 [expr $y1+$sy]      
+   }
+
+   #  Get an ARD description for this shape.
+   public method get_desc {} {
+      return "RECT($x0,$y0,$x1,$y1)"
+   }
+
+   #  Set the properties of this object from an ARD description.
+   public method set_from_desc {desc} {
+      lassign [get_ard_args $desc] x0 y0 x1 y1
+      configure -x0 $x0 -x1 $x1 -y0 $y0 -y1 $y1
+   }
+
+   #  See if an ARD description presents a polygon.
+   public proc matches {desc} {
+      return [string match -nocase "rec*" $desc]
+   }
+
+   #  Given an ARD description of a rectangle create an instance of this class.
+   #  Make sure this passes the matches check first.
+   public proc instance {desc} {
+      lassign [get_ard_args $desc] x0 y0 x1 y1
+      return [uplevel \#0 gaia3d::Gaia3dVtkArdRectPrism \#auto \
+                 -x0 $x0 -x1 $x1 -y0 $y0 -y1 $y1]
    }
 
    #  Configuration options: (public variables)

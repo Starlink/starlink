@@ -66,28 +66,75 @@ itcl::class ::gaia3d::Gaia3dVtkArdCirclePrism {
    #  Methods and procedures:
    #  -----------------------
 
-   #  Create the polygon for the circle locus.
+   #  Create the polygon for the circle locus. Note -1 correction to VTK grid
+   #  coordinates 
    protected method create_polygon_ {} {
 
+      #  Clear any existing positions.
       $points_ Reset
       $cells_ Reset
       $cells_ InsertNextCell $segments
 
+      set xc [expr $xcentre-1]
+      set yc [expr $ycentre-1]
+
       set step [expr $2pi_/($segments-1)]
-      for {set i 0} {$i < $segments} {incr i} {
-         set x [expr $xcentre + $radius*cos($step*$i)]
-         set y [expr $ycentre + $radius*sin($step*$i)]
-         if { $axis == 1 } {
+
+      #  Separate loops per axis for speed.
+      if { $axis == 1 } {
+         for {set i 0} {$i < $segments} {incr i} {
+            set x [expr $xc + $radius*cos($step*$i)]
+            set y [expr $yc + $radius*sin($step*$i)]
             $points_ InsertPoint $i 0.0 $x $y
-         } elseif { $axis == 2 } {
-            $points_ InsertPoint $i $x 0.0 $y
-         } else {
-            $points_ InsertPoint $i $x $y 0.0
+            $cells_ InsertCellPoint $i
          }
-         $cells_ InsertCellPoint $i
+      } elseif { $axis == 2 } {
+         for {set i 0} {$i < $segments} {incr i} {
+            set x [expr $xc + $radius*cos($step*$i)]
+            set y [expr $yc + $radius*sin($step*$i)]
+            $points_ InsertPoint $i $x 0.0 $y
+            $cells_ InsertCellPoint $i
+         }
+      } else {
+         for {set i 0} {$i < $segments} {incr i} {
+            set x [expr $xc + $radius*cos($step*$i)]
+            set y [expr $yc + $radius*sin($step*$i)]
+            $points_ InsertPoint $i $x $y 0.0
+            $cells_ InsertCellPoint $i
+         }
       }
+
       $polydata_ SetPoints $points_
       $polydata_ SetPolys $cells_
+   }
+
+   #  Apply a shift to the centre.
+   protected method apply_shift_ {sx sy} {
+      configure -xcentre [expr $xcentre+$sx] -ycentre [expr $ycentre+$sy]
+   }
+
+   #  Get an ARD description for this shape.
+   public method get_desc {} {
+      return "CIRCLE($xcentre,$ycentre,$radius)"
+   }
+
+   #  Set the properties of this object from an ARD description.
+   public method set_from_desc {desc} {
+      lassign [get_ard_args $desc] xcentre ycentre radius
+      configure -xcentre $xcentre -ycentre $ycentre -radius $radius
+   }
+
+   #  See if an ARD description presents a circle.
+   public proc matches {desc} {
+      return [string match -nocase "cir*" $desc]
+   }
+
+   #  Given an ARD description of a circle create an instance of this class.
+   #  Make sure this passes the matches check first.
+   public proc instance {desc} {
+      lassign [get_ard_args $desc] xcentre ycentre radius
+      return [uplevel \#0 gaia3d::Gaia3dVtkArdCirclePrism \#auto \
+                 -xcentre $xcentre -ycentre $ycentre -radius $radius]
    }
 
    #  Configuration options: (public variables)

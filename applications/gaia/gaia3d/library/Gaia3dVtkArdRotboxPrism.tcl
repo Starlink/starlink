@@ -66,45 +66,91 @@ itcl::class ::gaia3d::Gaia3dVtkArdRotboxPrism {
    #  Methods and procedures:
    #  -----------------------
 
-   #  Create the polygon for the rotbox locus.
+   #  Create the polygon for the rotbox locus. Note -1 correction of centre to
+   #  VTK grid coords.
    protected method create_polygon_ {} {
 
       $points_ Reset
       $cells_ Reset
       $cells_ InsertNextCell 4
 
-      #  Angle to radians.
+      #  Cos and sin angle.
       set cospa [expr cos($angle*$d2r_)]
       set sinpa [expr sin($angle*$d2r_)]
 
       #  Coordinates of centered, unrotated box.
-      set x(0) $semimajor
-      set x(3) $x(0)
-      set x(1) [expr -1*$semimajor]
-      set x(2) $x(1)
+      set smajor [expr $major*0.5]
+      set cx(0) $smajor
+      set cx(3) $cx(0)
+      set cx(1) [expr -1.0*$smajor]
+      set cx(2) $cx(1)
 
-      set y(0) $semimajor
-      set y(1) $y(0)
-      set y(2) [expr -1*$semiminor]
-      set y(3) $y(2)
+      set sminor [expr $minor*0.5]
+      set cy(0) $sminor
+      set cy(1) $cy(0)
+      set cy(2) [expr -1.0*$sminor]
+      set cy(3) $cy(2)
+
+      set xc [expr $xcentre-1]
+      set yc [expr $ycentre-1]
     
-      #  Now Apply rotation and offset.
-      for {set i 0} {$i < 4} {incr i} {
-         set xc [expr $xcentre + $x($i)*$cospa - $y($i)*$sinpa]
-         set yc [expr $ycentre + $x($i)*$sinpa + $y($i)*$cospa]
-
-         if { $axis == 1 } {
-            $points_ InsertPoint $i 0.0 $xc $yc
-         } elseif { $axis == 2 } {
-            $points_ InsertPoint $i $xc 0.0 $yc
-         } else {
-            $points_ InsertPoint $i $xc $yc 0.0
+      #  Now Apply rotation and offset. Separate loops for speed.
+      if { $axis == 1 } {
+         for {set i 0} {$i < 4} {incr i} {
+            set x [expr $xc + $cx($i)*$cospa - $cy($i)*$sinpa]
+            set y [expr $yc + $cx($i)*$sinpa + $cy($i)*$cospa]
+            $points_ InsertPoint $i 0.0 $x $y
+            $cells_ InsertCellPoint $i
          }
-         $cells_ InsertCellPoint $i
+      } elseif { $axis == 2 } {
+         for {set i 0} {$i < 4} {incr i} {
+            set x [expr $xc + $cx($i)*$cospa - $cy($i)*$sinpa]
+            set y [expr $yc + $cx($i)*$sinpa + $cy($i)*$cospa]
+            $points_ InsertPoint $i $x 0.0 $y
+            $cells_ InsertCellPoint $i
+         }
+      } else {
+         for {set i 0} {$i < 4} {incr i} {
+            set x [expr $xc + $cx($i)*$cospa - $cy($i)*$sinpa]
+            set y [expr $yc + $cx($i)*$sinpa + $cy($i)*$cospa]
+            $points_ InsertPoint $i $x $y 0.0
+            $cells_ InsertCellPoint $i
+         }
       }
 
       $polydata_ SetPoints $points_
       $polydata_ SetPolys $cells_
+   }
+
+   #  Apply a shift to the centre.
+   protected method apply_shift_ {sx sy} {
+      configure -xcentre [expr $xcentre+$sx] -ycentre [expr $ycentre+$sy]
+   }
+
+   #  Get an ARD description for this shape.
+   public method get_desc {} {
+      return "ROTBOX($xcentre,$ycentre,$major,$minor,$angle)"
+   }
+
+   #  Set the properties of this object from an ARD description.
+   public method set_from_desc {desc} {
+      lassign [get_ard_args $desc] xcentre ycentre major minor angle
+      configure -xcentre $xcentre -ycentre $ycentre -major $major \
+         -minor $minor -angle $angle
+   }
+
+   #  See if an ARD description presents a polygon.
+   public proc matches {desc} {
+      return [string match -nocase "rot*" $desc]
+   }
+
+   #  Given an ARD description of a rotbox create an instance of this class.
+   #  Make sure this passes the matches check first.
+   public proc instance {desc} {
+      lassign [get_ard_args $desc] xcentre ycentre major minor angle
+      return [uplevel \#0 gaia3d::Gaia3dVtkArdRotboxPrism \#auto \
+                 -xcentre $xcentre -ycentre $ycentre \
+                 -major $major -minor $minor -angle $angle]
    }
 
    #  Configuration options: (public variables)
@@ -116,11 +162,11 @@ itcl::class ::gaia3d::Gaia3dVtkArdRotboxPrism {
    #  Y position.
    public variable ycentre 0
 
-   #  Semimajor axis.
-   public variable semimajor 1.0
+   #  Major axis.
+   public variable major 1.0
 
-   #  Semiminor axis.
-   public variable semiminor 1.0
+   #  Minor axis.
+   public variable minor 1.0
 
    #  Position angle.
    public variable angle 0.0

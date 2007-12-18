@@ -524,6 +524,21 @@ itcl::class gaia::GaiaCubeSpectrum {
       return ""
    }
 
+   #  Get the ARD region of the extracted spectrum, if extraction is
+   #  enabled. If not extracting or using a point "" is returned.
+   public method get_region_position {} {
+      if { $last_region_ != {} } {
+         return $last_region_
+      }
+      return ""
+   }
+
+   #  Set the ARD region of the extracted spectrum.
+   public method set_region_position {region} {
+      #  Need to access the underlying ARD shape, so get it.
+      $toolbox_ set_selected_description $region
+   }
+
    #  Display a region spectrum in the local plot. Action can be "localstart"
    #  or "localdrag", to start a spectral display (sets the initial scale of a
    #  drag), or update during a drag.
@@ -579,9 +594,11 @@ itcl::class gaia::GaiaCubeSpectrum {
       #  Cannot display the current coordinate, so make sure it is empty.
       $spectrum_ update_label ""
 
-      #  Eval the notification command, if have one.
+      #  Eval the notification command, if have one. Note contract assumes 
+      #  a single character string, no remove any newlines (polygon).
       if { $itk_option(-notify_cmd) != {} } {
-         eval $itk_option(-notify_cmd) r $alow $ahigh
+         regsub -all {\n} $region { } region
+         eval $itk_option(-notify_cmd) r $region
       }
 
       #  Record extraction bounds, these are checked.
@@ -1345,7 +1362,7 @@ itcl::class gaia::GaiaCubeSpectrum {
 
    #  Command to execute when a spectrum is extracted or the extraction has
    #  been updated. Trailed by "p" or "r" for point and region and the
-   #  extraction indices.
+   #  extraction position, or region description.
    itk_option define -notify_cmd notify_cmd Notify_Cmd {}
 
    #  Protected variables: (available to instance)

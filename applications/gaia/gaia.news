@@ -75,6 +75,9 @@
     The time needed to open some NDFs with very large lookup tables in their 
     WCS has been significantly decreased.
 
+    A bug saving graphics that included contour lines to a disk file has been
+    fixed (present since March 2006).
+
   Puana Release:
   ==============
 

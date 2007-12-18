@@ -641,14 +641,14 @@ itcl::class gaia3d::Gaia3dTool {
    #  Also updates the spectral extraction in GAIA, if that's enabled.
    protected method report_position_ {} {
       if { [$plane_ has_position] } {
-         lassign [$plane_ get_position] ix iy iz
+         lassign [$plane_ get_position_and_delta] ix iy iz dx dy dz
          incr ix
          incr iy
          incr iz
 
-         #  Position the spectrum.
+         #  Position the extraction region.
          if { $line_ != {} } {
-            $line_ set_position $ix $iy $iz
+            $line_ set_position $ix $iy $iz $dx $dy $dz
          }
 
          #  Report the position in world coords.
@@ -705,10 +705,30 @@ itcl::class gaia3d::Gaia3dTool {
    #  The spectral line has moved. Track this in GAIA if needed.
    protected method line_moved_ {} {
       if { $line_ != {} && $show_spectral_line_ } {
-         lassign [$line_ get_axis_position] ix iy
-         $itk_option(-gaiacube) set_point_spectrum_position $ix $iy
+         lassign [$line_ get_description] type desc
+         if { $type == "p" } {
+            eval $itk_option(-gaiacube) set_point_spectrum_position $desc
+         } else {
+            $itk_option(-gaiacube) set_region_spectrum_position $desc
+         }
       }
    }
+
+   #  Get the position of the spectral line.
+   public method get_spectral_line {} {
+      if { $show_spectral_line_ && $line_ != {} } {
+         set pos [$itk_option(-gaiacube) get_point_spectrum_position]
+         if { $pos != {} } {
+            return "p $pos"
+         }
+         set region [$itk_option(-gaiacube) get_region_spectrum_position]
+         if { $region != {} } {
+            return "r $region"
+         }
+      }
+      return {}
+   }
+   
 
    #  From GAIA (or local)...
 
@@ -739,12 +759,16 @@ itcl::class gaia3d::Gaia3dTool {
       }
    }
 
-   #  Set position of spectral line (when moved by GAIA).
-   public method set_spectral_line {ix iy} {
-      if { $line_ != {} && $show_spectral_line_ } {
-         incr ix -1
-         incr iy -1
-         $line_ set_axis_position $ix $iy
+   #  Set position of spectral line, when moved by GAIA.
+   public method set_spectral_line {type args} {
+      if { $show_spectral_line_ && $line_ != {} } {
+         if { $type == "p" } {
+            set ix [expr [lindex $args 0] -1]
+            set iy [expr [lindex $args 1] -1]
+            $line_ set_description p "$ix $iy"
+         } else {
+            $line_ set_description $type $args
+         }
          $renwindow_ render
       }
    }
@@ -777,17 +801,22 @@ itcl::class gaia3d::Gaia3dTool {
          #  Add the spectral line prop, needs to go before other props so gets
          #  the interaction first, plus like the image plane will only render
          #  correctly when drawn before the volume (which will be
-         #  translucent). Note still true for translucent plane and line.
+         #  translucent). Note not true for translucent plane and line.
          if { $line_ == {} } {
-            set line_ [gaia3d::Gaia3dVtkLine \#auto \
+            set line_ [gaia3d::Gaia3dArdPrismProxy \#auto \
                           -dataset [$imagedata_ get_imagedata] \
-                          -renwindow $renwindow_ -align_to_axis 1 \
-                          -axis [$itk_option(-gaiacube) get_axis] \
-                          -clip_to_bounds 1]
+                          -renwindow $renwindow_ \
+                          -align_to_axis 1 \
+                          -axis [$itk_option(-gaiacube) get_axis]]
             $line_ add_to_window
 
-            #  Any old position for now...
-            $line_ fit_to_data
+            #  See if GAIA has position, if not just use a dummy position.
+            lassign [get_spectral_line] type pos
+            if { $type != {} } {
+               set_spectral_line $type $pos
+            } else {
+               set_spectral_line p 0 0
+            }
          } else {
             #  Axis may have changed.
             $line_ configure -axis [$itk_option(-gaiacube) get_axis]
@@ -797,7 +826,7 @@ itcl::class gaia3d::Gaia3dTool {
             #  Set initial position.
             set result [$itk_option(-gaiacube) get_point_spectrum_position]
             if { $result != "" } {
-               eval set_spectral_line $result
+               eval set_spectral_line p $result
             }
             $line_ set_visible
          } else {
@@ -1100,9 +1129,11 @@ itcl::class gaia3d::Gaia3dTool {
    protected variable imagedata_ {}
    protected variable plane_ {}
    protected variable textwcs_ {}
-   protected variable line_ {}
    protected variable simpleaxes_ {}
    protected variable outline_ {}
+
+   #  The extraction line or ARD region.
+   protected variable line_ {}
 
    #  Rendering window.
    protected variable renwindow_ {}

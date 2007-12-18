@@ -1393,16 +1393,13 @@ itcl::class gaia::GaiaCube {
       }
    }
 
-   #  Update renderers to move the spectrum line, if this is a point
-   #  extraction (and it's displayed). XXX handle extraction stops, switch to
-   #  region, reference spectrum XXX.
-   protected method renderers_spectrum_moved_ {type ix iy} {
-      if { $type == "p" } {
-         foreach name "isosurface volume" {
-            if { [info exists itk_component($name) ] } {
-               if { [winfo exists $itk_component($name) ] } {
-                  $itk_component($name) set_spectral_line $ix $iy
-               }
+   #  Update renderers to move the spectrum extraction visualisation.
+   #   XXX handle reference spectrum XXX.
+   protected method renderers_spectrum_moved_ {type args} {
+      foreach name "isosurface volume" {
+         if { [info exists itk_component($name) ] } {
+            if { [winfo exists $itk_component($name) ] } {
+               eval $itk_component($name) set_spectral_line $type $args
             }
          }
       }
@@ -1422,6 +1419,19 @@ itcl::class gaia::GaiaCube {
    #  then "" is returned.
    public method get_point_spectrum_position {} {
       return [$itk_component(spectrum) get_point_position]
+   }
+
+   #  Get the region used to extract the spectrum, if region extraction has
+   #  been started. Coordinates are a position on the image slice. If not
+   #  extracting then "" is returned.
+   public method get_region_spectrum_position {} {
+      return [$itk_component(spectrum) get_region_position]
+   }
+   
+   #  Set the local current region to a description from GAIA3D. The
+   #  updated description will include any changes (shifts).
+   public method set_region_spectrum_position {desc} {
+      $itk_component(spectrum) set_region_position $desc
    }
 
    #  GAIA3D utilities.

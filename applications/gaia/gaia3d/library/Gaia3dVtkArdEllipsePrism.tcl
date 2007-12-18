@@ -66,7 +66,8 @@ itcl::class ::gaia3d::Gaia3dVtkArdEllipsePrism {
    #  Methods and procedures:
    #  -----------------------
 
-   #  Create the polygon for the elliptical locus.
+   #  Create the polygon for the elliptical locus. Note -1 correction of
+   #  centre to VTK grid coords.
    protected method create_polygon_ {} {
 
       $points_ Reset
@@ -74,31 +75,79 @@ itcl::class ::gaia3d::Gaia3dVtkArdEllipsePrism {
       $cells_ InsertNextCell $segments
       set step [expr $2pi_/($segments-1)]
 
-      #  Angle to radians.
       set cospa [expr cos($angle*$d2r_)]
       set sinpa [expr sin($angle*$d2r_)]
+      set minorcospa [expr $semiminor*$cospa]
+      set majorcospa [expr $semimajor*$cospa]
+      set minorsinpa [expr $semiminor*$sinpa]
+      set majorsinpa [expr $semimajor*$sinpa]
 
-      for {set i 0} {$i < $segments} {incr i} {
+      set xc [expr $xcentre-1]
+      set yc [expr $ycentre-1]
 
-         set costheta [expr cos($step*$i)]
-         set sintheta [expr sin($step*$i)]
-
-         set x [expr $xcentre + \
-                   $semimajor*$cospa*$costheta - $semiminor*$sinpa*$sintheta]
-         set y [expr $ycentre + \
-                   $semimajor*$sinpa*$costheta + $semiminor*$cospa*$sintheta]
-
-         if { $axis == 1 } {
+      #  Separate loops by axis for speed.
+      if { $axis == 1 } {
+         for {set i 0} {$i < $segments} {incr i} {
+            set costheta [expr cos($step*$i)]
+            set sintheta [expr sin($step*$i)]
+            set x [expr $xc + $majorcospa*$costheta - $minorsinpa*$sintheta]
+            set y [expr $yc + $majorsinpa*$costheta + $minorcospa*$sintheta]
             $points_ InsertPoint $i 0.0 $x $y
-         } elseif { $axis == 2 } {
-            $points_ InsertPoint $i $x 0.0 $y
-         } else {
-            $points_ InsertPoint $i $x $y 0.0
+            $cells_ InsertCellPoint $i
          }
-         $cells_ InsertCellPoint $i
+      } elseif { $axis == 2 } {
+         for {set i 0} {$i < $segments} {incr i} {
+            set costheta [expr cos($step*$i)]
+            set sintheta [expr sin($step*$i)]
+            set x [expr $xc + $majorcospa*$costheta - $minorsinpa*$sintheta]
+            set y [expr $yc + $majorsinpa*$costheta + $minorcospa*$sintheta]
+            $points_ InsertPoint $i $x 0.0 $y
+            $cells_ InsertCellPoint $i
+         }
+      } else {
+         for {set i 0} {$i < $segments} {incr i} {
+            set costheta [expr cos($step*$i)]
+            set sintheta [expr sin($step*$i)]
+            set x [expr $xc + $majorcospa*$costheta - $minorsinpa*$sintheta]
+            set y [expr $yc + $majorsinpa*$costheta + $minorcospa*$sintheta]
+            $points_ InsertPoint $i $x $y 0.0
+            $cells_ InsertCellPoint $i
+         }
       }
       $polydata_ SetPoints $points_
       $polydata_ SetPolys $cells_
+   }
+
+   #  Apply a shift to the centre.
+   protected method apply_shift_ {sx sy} {
+      configure -xcentre [expr $xcentre+$sx] -ycentre [expr $ycentre+$sy]
+   }
+
+   #  Get an ARD description for this shape.
+   public method get_desc {} {
+      return "ELLIPSE($xcentre,$ycentre,$semimajor,$semiminor,$angle)"
+   }
+
+   #  Set the properties of this object from an ARD description.
+   public method set_from_desc {desc} {
+      lassign [get_ard_args $desc] xcentre ycentre smajor sminor angle
+      configure -xcentre $xcentre -ycentre $ycentre -semimajor $smajor \
+         -semiminor $sminor -angle $angle
+   }
+
+
+   #  See if an ARD description presents an ellipse.
+   public proc matches {desc} {
+      return [string match -nocase "ell*" $desc]
+   }
+
+   #  Given an ARD description of an ellipse create an instance of this class.
+   #  Make sure this passes the matches check first.
+   public proc instance {desc} {
+      lassign [get_ard_args $desc] xcentre ycentre smajor sminor angle
+      return [uplevel \#0 gaia3d::Gaia3dVtkArdEllipsePrism \#auto \
+                 -xcentre $xcentre -ycentre $ycentre \
+                 -semimajor $smajor -semiminor $sminor -angle $angle]
    }
 
    #  Configuration options: (public variables)
