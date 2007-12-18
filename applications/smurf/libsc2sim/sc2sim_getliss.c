@@ -69,9 +69,11 @@
 *        Added multiple map cycle capabilities.
 *     2006-12-08 (JB):
 *        smf_free mapptr.
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
+*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
 *  Licence:
@@ -221,6 +223,6 @@ int *status          /* global status (given and returned) */
      (*posptr)[i] = mapptr[i % (mcount * 2)];
    } 
 
-   smf_free ( mapptr, status );
+   mapptr = smf_free ( mapptr, status );
 
 }

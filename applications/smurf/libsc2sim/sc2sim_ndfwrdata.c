@@ -204,6 +204,8 @@
 *        Write sub-image FITS headers in the correct order, check old
 *        headers exist before deleting them and make sure that
 *        SEQSTART/END headers are written for first image
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -239,6 +241,8 @@
 #include "ndf.h"
 #include "star/kaplibs.h"
 #include "mers.h"
+#include "sae_par.h"
+#include "prm_par.h"
 
 /* SC2SIM includes */
 #include "sc2sim.h"
@@ -691,7 +695,7 @@ int *status              /* Global status (given and returned) */
 	   coadd[i] += rdata[framesize*j+i];
 	 }
        }
-       /* Average the coadd frame */
+       /* Average the coadd frame - set bad bolometers to BAD */
        for ( i=0; i<framesize; i++ ) {
 	 coadd[i] /= (double)naver;
        }
@@ -782,8 +786,8 @@ int *status              /* Global status (given and returned) */
    sc2store_putscanfit ( inx->nbolx, inx->nboly, ncoeff, poly, status );
 
    /* Free memory allocated for pointers */
-   smf_free( poly, status );
-   smf_free( rdata, status );
+   poly = smf_free( poly, status );
+   rdata = smf_free( rdata, status );
  
    /* Close the file */
    sc2store_free ( status );

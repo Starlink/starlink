@@ -252,6 +252,8 @@
 *        Modified interface to smf_open_file.
 *     2007-10-31 (TIMJ):
 *        use size_t for some variables following sc2store mods
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -339,7 +341,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 		       int nbol, double *pzero, int rseed, double samptime, 
 		       double weights[], double *xbc, double *xbolo, 
 		       double *ybc, double *ybolo, 
-                       int hitsonly, int overwrite, int simstats, int *status ) {
+                       int hitsonly, int overwrite, int simstats, 
+		       int *status ) {
 
   double accel[2];                /* telescope accelerations (arcsec) */
   float aeff[3];                  /* output of wvmOpt */
@@ -1526,23 +1529,23 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
  CLEANUP:
 
-  smf_free( head, status );
-  smf_free( posptr, status );
-  smf_free( dbuf, status );
-  smf_free( digits, status );
-  smf_free( dksquid, status );
-  smf_free( mjuldate, status );
-  smf_free( lst, status );
-  smf_free( base_az, status );
-  smf_free( base_el, status );
-  smf_free( base_p, status );
-  smf_free( bor_az, status );
-  smf_free( bor_el, status );
-  smf_free( bor_ra, status );
-  smf_free( bor_dec, status );
-  smf_free( jig_x_hor, status );
-  smf_free( jig_y_hor, status );
-  smf_free( airmass, status );
+  head = smf_free( head, status );
+  posptr = smf_free( posptr, status );
+  dbuf = smf_free( dbuf, status );
+  digits = smf_free( digits, status );
+  dksquid = smf_free( dksquid, status );
+  mjuldate = smf_free( mjuldate, status );
+  lst = smf_free( lst, status );
+  base_az = smf_free( base_az, status );
+  base_el = smf_free( base_el, status );
+  base_p = smf_free( base_p, status );
+  bor_az = smf_free( bor_az, status );
+  bor_el = smf_free( bor_el, status );
+  bor_ra = smf_free( bor_ra, status );
+  bor_dec = smf_free( bor_dec, status );
+  jig_x_hor = smf_free( jig_x_hor,status );
+  jig_y_hor = smf_free( jig_y_hor,status );
+  airmass = smf_free( airmass, status );
 
   if ( !hitsonly ) {
 

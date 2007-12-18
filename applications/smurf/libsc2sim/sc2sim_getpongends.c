@@ -53,6 +53,8 @@
 *        Include smf.h
 *     2006-10-23 (EC):
 *        Fixed off-by-one memory allocation error
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -232,8 +234,8 @@ int *status            /* pointer to global status */
 
      /* Clean up */
      
-     smf_free( xgrid, status );
-     smf_free( ygrid, status );
+     xgrid = smf_free( xgrid, status );
+     ygrid = smf_free( ygrid, status );
 
    }
 }

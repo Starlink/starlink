@@ -54,6 +54,9 @@
 *        Split from dsim.c
 *     2007-05-29 (AGG):
 *        Set bad values to zero
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
+
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
@@ -149,8 +152,7 @@ int *status                  /* global status (given and returned) */
       }
    }
 
-   smf_free(skycoord, status);
-   skycoord = NULL;
+   skycoord = smf_free(skycoord, status);
 }
 
 

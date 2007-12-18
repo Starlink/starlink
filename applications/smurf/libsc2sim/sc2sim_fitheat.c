@@ -46,6 +46,8 @@
 *        Put into dsim library from map library
 *     2006-07-20 (JB):
 *        Split from dsim.c
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -156,7 +158,7 @@ int *status            /* global status (given and returned) */
          }
       }
 
-      smf_free ( scan, status );
+      scan = smf_free ( scan, status );
 
    }
 
