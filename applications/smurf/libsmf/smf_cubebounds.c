@@ -14,7 +14,8 @@
 
 *  Invocation:
 *     smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
-*                     int autogrid, int usedetpos, double par[ 7 ], 
+*                     int autogrid, int usedetpos, AstFrameSet *spacerefwcs, 
+*                     AstFrameSet *specrefwcs, double par[ 7 ], 
 *                     Grp *detgrp, int moving, int specunion, int lbnd[ 3 ], 
 *                     int ubnd[ 3 ], AstFrameSet **wcsout, int *npos, 
 *                     int *hasoffexp, smfBox **boxes, int *status );
@@ -28,7 +29,9 @@
 *        A SkyFrame that specifies the coordinate system used to describe 
 *        the spatial axes of the output cube. If "moving" is non-zero, this
 *        should represent offsets from the tracking centre rather than
-*        absolute celestial coordinates.
+*        absolute celestial coordinates. If "spacerefwcs" is non-NULL,
+*        the supplied value is ignored and the current Frame in "spacererfwcs" 
+*        is used instead.
 *     autogrid = int (Given)
 *        If non-zero then the fractional pixel shift implied by elements
 *        0 and 1 of "par" are retained. Otherwise, they are ignored and 
@@ -39,17 +42,31 @@
 *        a given time slice are read directly from the input NDF. Otherwise 
 *        the detector positions are calculated on the basis of the focal
 *        plane detector positions and the telescope pointing information.
+*     spacerefwcs = AstFrameSet * (Given)
+*        A pointer to a FrameSet describing the spatial axes of the reference 
+*        NDF. This will be NULL if no reference NDF was supplied or if
+*        the reference NDF had no spatial axes. If a non-null pointer is
+*        supplied, the output WCS is inherited from this FrameSet rather than 
+*        from the values supsplied in "par".
+*     specrefwcs = AstFrameSet * (Given)
+*        A pointer to a FrameSet describing the spectral axis of the reference 
+*        NDF. This will be NULL if no reference NDF was supplied or if
+*        the reference NDF had no spectral axis. If a non-null pointer is
+*        supplied, the output WCS is inherited from this FrameSet rather than 
+*        from the spectral axis of the first input NDF.
 *     par = double[ 7 ] (Given)
-*        An array holding the parameters describing the spatial projection
-*        between celestial (longitude,latitude) in the system specified
-*        by "oskyframe", and an interim GRID coordinate system for the output 
-*        cube (interim because the bounds of the output cube are not yet
-*        known - the interim grid system is thus more like a PIXEL system
-*        for the output cube but with an arbitrary pixel origin). These are 
-*        stored in the order CRPIX1, CRPIX2, CRVAL1, CRVAL2, CDELT1, CDELT2, 
-*        CROTA2. The supplied values are used to produce the output WCS 
-*        FrameSet. All the angular parameters are in units of radians,
-*        and CRPIX1/2 are in units of pixels. 
+*        This parameter is ignored if a non-NULL value is supplied for
+*        "spacerefwcs". Otherwise, it should be an array holding the 
+*        parameters describing the spatial projection between celestial 
+*        (longitude,latitude) in the system specified by "oskyframe", and an 
+*        interim GRID coordinate system for the output cube (interim because 
+*        the bounds of the output cube are not yet known - the interim grid 
+*        system is thus more like a PIXEL system for the output cube but with 
+*        an arbitrary pixel origin). These are stored in the order CRPIX1, 
+*        CRPIX2, CRVAL1, CRVAL2, CDELT1, CDELT2, CROTA2. The supplied values 
+*        are used to produce the output WCS FrameSet. All the angular 
+*        parameters are in units of radians, and CRPIX1/2 are in units of 
+*        pixels. 
 *     detgrp = Grp * (Given)
 *        A Group containing the names of the detectors to be used. All
 *        detectors will be used to calculate the bounds of the output
@@ -97,7 +114,7 @@
 *     longitude and latitude in the system specified by "system". The spatial
 *     projection in the cube is a tangent plane projection defined by 
 *     "par". The spectral axis system and projection are inherited from the 
-*     first supplied input data file.
+*     first supplied input data file, or from "specrefwcs".
 *
 *     If "moving" is non-zero, the spatial axes represent (lon,lat) offsets 
 *     in the requested output frame from the base telescope position associated
@@ -165,6 +182,9 @@
 *        Modified interface to smf_open_file.
 *     14-DEC-2007 (EC):
 *        Call smf_open_file with SMF__NOCREATE_DATA
+*     18-DEC-2007 (DSB):
+*        - Added arguments spacerefwcs and specrefwcs.
+*        - Remove the SMF__NOCREATE_DATA flag in the call to smf_open_file.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -217,7 +237,8 @@
 #define NINT(x) ( ( x > 0 ) ? (int)( x + 0.5 ) : (int)( x - 0.5 ) )
 
 void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
-                     int autogrid, int usedetpos, double par[ 7 ], 
+                     int autogrid, int usedetpos, AstFrameSet *spacerefwcs, 
+                     AstFrameSet *specrefwcs, double par[ 7 ], 
                      Grp *detgrp, int moving, int specunion, int lbnd[ 3 ], 
                      int ubnd[ 3 ], AstFrameSet **wcsout, int *npos, 
                      int *hasoffexp, smfBox **boxes, int *status ){
@@ -295,6 +316,10 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    dubnd[ 1 ] = VAL__MIND;
    dubnd[ 2 ] = VAL__MIND;
 
+/* If spatial reference WCS was supplied, use its current frame rather
+   than the supplied "oskyframe". */
+   if( spacerefwcs ) oskyframe = astGetFrame( spacerefwcs, AST__CURRENT );   
+
 /* Create an empty FitsChan that can be used for creating mappings from a
    given set of FITS-WCS keyword values. */
    fct = astFitsChan ( NULL, NULL, "" );
@@ -315,7 +340,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       box->ubnd[ 1 ] = VAL__MIND;
 
 /* Obtain information about the current input NDF. */
-      smf_open_file( igrp, ifile, "READ", SMF__NOCREATE_DATA, &data, status );
+      smf_open_file( igrp, ifile, "READ", 0, &data, status );
 
 /* Issue a suitable message and abort if anything went wrong. */
       if( *status != SAI__OK ) {
@@ -456,9 +481,8 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    coord to spectral coord. */
       astInvert( specmap );
 
-/* The spectral axis of the output cube is inherited from the spectral axis
-   of the first input file. So, if this is the first input file, initialise 
-   the interim GRID bounds of the spectral axis in the output cube. */
+/* If this is the first input file, initialise the bounds of the spectral 
+   axis in the output cube. */
       if( !ospecframe ) {
          dlbnd[ 2 ] = 1.0;
          dubnd[ 2 ] = (data->dims)[ 0 ];
@@ -528,7 +552,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       xout = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
       yout = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
 
-/* Store the input "GRID" coords of the detectors. Thes are just the
+/* Store the input "GRID" coords of the detectors. These are just the
    detector index on axis 1 and a fixed value of 1 on axis 2. */
       for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
          xin[ irec ] = irec + 1.0;
@@ -566,42 +590,57 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
          if( *wcsout == NULL && *status == SAI__OK ) { 
 
 /* The spectral Mapping (from interim GRID to SPECTRUM) and Frame (a SpecFrame)
-   are inherited from the first input file. */
-            ospecframe = astClone( specframe );
-            ospecmap = astClone( specmap );
+   are obtained from the supplied spectral reference NDF, or are inherited 
+   from the first input file. */
+            if( specrefwcs ) {
+               ospecframe = astGetFrame( specrefwcs, AST__CURRENT );
+               ospecmap = astGetMapping( specrefwcs, AST__BASE, AST__CURRENT );
+            } else {
+               ospecframe = astClone( specframe );
+               ospecmap = astClone( specmap );
+            }
 
 /* Ensure the specframe has the same epoch as the supplied SkyFrame. */
             if( astTest( oskyframe, "Epoch" ) ) {
                astSetC( ospecframe, "Epoch", astGetC( oskyframe, "Epoch" ) ); 
             }           
 
-/* Now populate a FitsChan with FITS-WCS headers describing the required 
+/* Now create a spatial Mappign. If this has been supplied in "spacerefwcs",  
+   get it. */
+            if( spacerefwcs ) {
+               oskymap = astGetMapping( spacerefwcs, AST__BASE, AST__CURRENT );
+
+/* Otherwise, get it from the "par" values using a FitsChan. */
+            } else {
+
+/* Populate a FitsChan with FITS-WCS headers describing the required 
    tan plane projection from interim grid coords to celestial longitude
    and latitude. The longitude and latitude axis types are set to either 
    (RA,Dec) or (AZ,EL) to get the correct handedness. The projection 
    parameters are supplied in "par". Convert from radians to degrees as 
    required by FITS. */
-            if( !strcmp( astGetC( oskyframe, "System" ), "AZEL" ) ){
-               astSetFitsS( fct, "CTYPE1", "AZ---TAN", " ", 1 );
-               astSetFitsS( fct, "CTYPE2", "EL---TAN", " ", 1 );
-            } else {
-               astSetFitsS( fct, "CTYPE1", "RA---TAN", " ", 1 );
-               astSetFitsS( fct, "CTYPE2", "DEC--TAN", " ", 1 );
-            }
-            astSetFitsF( fct, "CRPIX1", par[ 0 ], " ", 1 );
-            astSetFitsF( fct, "CRPIX2", par[ 1 ], " ", 1 );
-            astSetFitsF( fct, "CRVAL1", par[ 2 ]*AST__DR2D, " ", 1 );
-            astSetFitsF( fct, "CRVAL2", par[ 3 ]*AST__DR2D, " ", 1 );
-            astSetFitsF( fct, "CDELT1", par[ 4 ]*AST__DR2D, " ", 1 );
-            astSetFitsF( fct, "CDELT2", par[ 5 ]*AST__DR2D, " ", 1 );
-            astSetFitsF( fct, "CROTA2", par[ 6 ]*AST__DR2D, " ", 1 );
-
+               if( !strcmp( astGetC( oskyframe, "System" ), "AZEL" ) ){
+                  astSetFitsS( fct, "CTYPE1", "AZ---TAN", " ", 1 );
+                  astSetFitsS( fct, "CTYPE2", "EL---TAN", " ", 1 );
+               } else {
+                  astSetFitsS( fct, "CTYPE1", "RA---TAN", " ", 1 );
+                  astSetFitsS( fct, "CTYPE2", "DEC--TAN", " ", 1 );
+               }
+               astSetFitsF( fct, "CRPIX1", par[ 0 ], " ", 1 );
+               astSetFitsF( fct, "CRPIX2", par[ 1 ], " ", 1 );
+               astSetFitsF( fct, "CRVAL1", par[ 2 ]*AST__DR2D, " ", 1 );
+               astSetFitsF( fct, "CRVAL2", par[ 3 ]*AST__DR2D, " ", 1 );
+               astSetFitsF( fct, "CDELT1", par[ 4 ]*AST__DR2D, " ", 1 );
+               astSetFitsF( fct, "CDELT2", par[ 5 ]*AST__DR2D, " ", 1 );
+               astSetFitsF( fct, "CROTA2", par[ 6 ]*AST__DR2D, " ", 1 );
+   
 /* Read a FrameSet from this FitsChan. */
-	    astClear( fct, "Card" );
-            fs = astRead( fct );
-
+               astClear( fct, "Card" );
+               fs = astRead( fct );
+   
 /* Extract the interim GRID->SKY Mapping. */
-            oskymap = astGetMapping( fs, AST__BASE, AST__CURRENT );
+               oskymap = astGetMapping( fs, AST__BASE, AST__CURRENT );
+            }
 
 /* Get a copy of the output SkyFrame and ensure it represents absolute
    coords rather than offset coords. */
@@ -850,13 +889,22 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* Now we know the bounds of the output cube in interim GRID coords, we
    can remap the GRID Frame in the output WCS FrameSet so that it
    represents real GRID coords rather than interim grid coords, and we
-   can also add a PIXEL Frame. For the spatial axes, we choose the PIXEL 
+   can also add a PIXEL Frame. If reference WCS was supplied then we
+   retain the existing bounds. This will cause the reference PIXEL origin 
+   to be retained. Otherwise, for the spatial axes, we choose the PIXEL 
    origin so that the centre of pixel (1,1) (i.e. pixel coords (0.5,0.5) ) 
    is at the tangent point specified by par[2] and par[3]. However, if an 
    optimal grid is being used, then this is modified to retain the fractional 
    pixel offsets included in par[0] and par[1]. First deal with causes
    where we are not using an optimal grid. */
    if( !autogrid ) {
+
+/* If spatial reference wcs was supplied, store par values that result in
+   no change to the pixel origin. */
+      if( spacerefwcs ){
+         par[ 0 ] = 0.5;
+         par[ 1 ] = 0.5;
+      }
 
 /* We want the interim grid value of par[0] to correspond to an output pixel 
    coord of 0.5. Therefore the upper bound in interim grid coords (i.e. 
@@ -912,19 +960,28 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       gshift[ 1 ] = 2.0 - NINT( par[ 1 ] ) - lbnd[ 1 ];
    }
 
-/* Now do the spectral axis. Find the indices of the pixels containing the 
-   DLBND and DUBND points. */
-   lbnd[ 2 ] = NINT( dlbnd[ 2 ] );
-   ubnd[ 2 ] = NINT( dubnd[ 2 ] );
+/* Now do the spectral axis. If spectral reference WCS was supplied,
+   arrange for no change to the pixel origin. */
+   if( specrefwcs ) {
+      lbnd[ 2 ] = ceil( dlbnd[ 2 ] );
+      ubnd[ 2 ] = ceil( dubnd[ 2 ] );
+      gshift[ 2 ] = 1.5 - lbnd[ 2 ];
 
+/* Otherwise, find the indices of the pixels containing the 
+   DLBND and DUBND points. */
+   } else {
+      lbnd[ 2 ] = NINT( dlbnd[ 2 ] );
+      ubnd[ 2 ] = NINT( dubnd[ 2 ] );
+   
 /* Find the integer pixel shifts needed to put the lower bounds at pixel
    (1,1,1). */
-   gshift[ 2 ] = 1 - lbnd[ 2 ];
+      gshift[ 2 ] = 1 - lbnd[ 2 ];
 
 /* Modify the bounds to put the origin at the centre */
-   ishift = 1 + ( ubnd[ 2 ] + lbnd[ 2 ] )/2;
-   lbnd[ 2 ] -= ishift;
-   ubnd[ 2 ] -= ishift;
+      ishift = 1 + ( ubnd[ 2 ] + lbnd[ 2 ] )/2;
+      lbnd[ 2 ] -= ishift;
+      ubnd[ 2 ] -= ishift;
+   }
 
 /* Now remap the interrim GRID Frame in the returned FrameSet so that it
    represent actual GRID coords in the output cube. */

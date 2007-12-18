@@ -207,6 +207,9 @@
 *        Added trim to smf_choosetiles argument list.
 *     2007-12-14 (EC):
 *        Added flags to smf_calc_mapcoord interface.
+*     2007-12-18 (DSB):
+*        -Added smf_getrefwcs.
+*        -Added specrefwcs and spacerefwcs to smf_cubebounds.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -553,7 +556,8 @@ void smf_telpos_get( const smfHead * hdr, int * status );
 void smf_tslice_ast (smfData * data, int index, int needwcs, int * status );
 
 void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
-                     int autogrid, int usedetpos, double par[ 7 ], 
+                     int autogrid, int usedetpos, AstFrameSet *spacerefwcs, 
+                     AstFrameSet *specrefwcs, double par[ 7 ], 
                      Grp *detgrp, int moving, int specunion, int lbnd[ 3 ], 
                      int ubnd[ 3 ], AstFrameSet **wcsout, int *npos, 
                      int *hasoffexp, smfBox **boxes, int *status );
@@ -730,5 +734,9 @@ void smf_updateprov( int ondf, smfData *data, int *status );
 
 void smf_fits_setL( const smfHead *hdr, const char *name, int value, 
 		    const char *comment, int overwrite, int *status );
+
+void smf_getrefwcs( const char *param, AstFrameSet **specwcs,
+                    AstFrameSet **spacewcs, int *status );
+
 
 #endif /* SMF_DEFINED */

@@ -56,6 +56,10 @@
 *        all other values are in units of radians. The values refer to the 
 *        celestial coodinate represented by the returned SkyFrame. Returned 
 *        holding the values indicated by the "autogrid" argument. 
+*
+*        If a NULL pointer is supplied for this parameter, then it is
+*        assumed that the spatial projection for the output cube is
+*        already known.
 *     moving = int * (Returned)
 *        Address of an int in which to return a flag indicating if the 
 *        telescope is tracking a moving object. If so, the returned
@@ -267,7 +271,9 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    smfHead *hdr = NULL;  /* Pointer to data header for this time slice */
 
 /* Initialise the returned array to hold vad values. */
-   for( ipar = 0; ipar < 7; ipar++ ) par[ ipar ] = AST__BAD;
+   if( par ) {
+      for( ipar = 0; ipar < 7; ipar++ ) par[ ipar ] = AST__BAD;
+   }
    *skyframe = NULL;
    *moving = 0;
    *gottsys = 0;
@@ -663,232 +669,239 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    the tangent point is at (0,0) (i.e. it is at the origin of the offset
    coordinate system). If the targte is not moving, the tangent point is
    at the position held in "skyref". */
-   if( *moving ){
-      par[ 2 ] = 0.0;
-      par[ 3 ] = 0.0;
-   } else {
-      par[ 2 ] = skyref[ 0 ];
-      par[ 3 ] = skyref[ 1 ];
-   } 
+   if( par ) {
+      if( *moving ){
+         par[ 2 ] = 0.0;
+         par[ 3 ] = 0.0;
+      } else {
+         par[ 2 ] = skyref[ 0 ];
+         par[ 3 ] = skyref[ 1 ];
+      } 
 
 /* If required, calculate the optimal projection parameters. If the target 
    is moving, these refer to the offset coordinate system centred on the 
    first time slice base pointing position, with north defined by the
    requested output coordinate system. */
-   if( autogrid && usesys ) {
-      kpg1Opgrd( nallpos, allpos, strcmp( usesys, "AZEL" ), par, &rdiam, 
-                 status );
+      if( autogrid && usesys ) {
+         kpg1Opgrd( nallpos, allpos, strcmp( usesys, "AZEL" ), par, &rdiam, 
+                    status );
 
 /* See if all the points are effectively co-incident (i.e. within a radius 
    of 2.0 arcsec). If so, we use default grid parameters that result in a 
    grid of 1x1 spatial pixels. The grid pixel sizes (par[4] and par[5]) 
    are made twice the size of the area covered by the points in order to
    avoid points spanning two pixels. */
-      if( rdiam < 2.0*AST__DD2R/3600.0 || nallpos < 3 ) {
-         if( rdiam < 0.1*AST__DD2R/3600.0 ) rdiam = 0.1*AST__DD2R/3600.0;
-         par[ 0 ] = 0.0;
-         par[ 1 ] = 0.0;
-         par[ 4 ] = -rdiam*2;
-         par[ 5 ] = -par[ 4 ];
-         par[ 6 ] = 0.0;
-
-         coin = 1;
-
+         if( rdiam < 2.0*AST__DD2R/3600.0 || nallpos < 3 ) {
+            if( rdiam < 0.1*AST__DD2R/3600.0 ) rdiam = 0.1*AST__DD2R/3600.0;
+            par[ 0 ] = 0.0;
+            par[ 1 ] = 0.0;
+            par[ 4 ] = -rdiam*2;
+            par[ 5 ] = -par[ 4 ];
+            par[ 6 ] = 0.0;
+   
+            coin = 1;
+   
 /* If the sky positions are not co-incident, and the automatic grid
    determination failed, we cannot use a grid, so warn the user. */
-      } else if( par[ 0 ] == AST__BAD ) {
-         msgOutif( MSG__NORM, " ", "   Automatic grid determination "
-                   "failed: the detector samples do not form a "
-                   "regular grid.", status );
-      }
-
+         } else if( par[ 0 ] == AST__BAD ) {
+            msgOutif( MSG__NORM, " ", "   Automatic grid determination "
+                      "failed: the detector samples do not form a "
+                      "regular grid.", status );
+         }
+   
 /* Otherwise use fixed values. */
-   } else {
-      par[ 0 ] = 0.0;
-      par[ 1 ] = 0.0;
-      par[ 4 ] = (6.0/3600.0)*AST__DD2R;
-      par[ 5 ] = (6.0/3600.0)*AST__DD2R;
-      par[ 6 ] = 0.0;
-   }
-
-/* Ensure the pixel sizes have the correct signs. */
-   if( par[ 4 ] != AST__BAD ) {
-      if( usesys && !strcmp( usesys, "AZEL" ) ) {
-         par[ 4 ] = fabs( par[ 4 ] );
-      } else {
-         par[ 4 ] = -fabs( par[ 4 ] );
+      } else if( par ) {
+         par[ 0 ] = 0.0;
+         par[ 1 ] = 0.0;
+         par[ 4 ] = (6.0/3600.0)*AST__DD2R;
+         par[ 5 ] = (6.0/3600.0)*AST__DD2R;
+         par[ 6 ] = 0.0;
       }
-      par[ 5 ] = fabs( par[ 5 ] );
-   }
-
+   
+/* Ensure the pixel sizes have the correct signs. */
+      if( par[ 4 ] != AST__BAD ) {
+         if( usesys && !strcmp( usesys, "AZEL" ) ) {
+            par[ 4 ] = fabs( par[ 4 ] );
+         } else {
+            par[ 4 ] = -fabs( par[ 4 ] );
+         }
+         par[ 5 ] = fabs( par[ 5 ] );
+      }
+   
 /* See if the output cube is to include a spatial projection, or a sparse
    list of spectra. */
-   parDef0l( "SPARSE", ( par[ 0 ] == AST__BAD ), status );
-   parGet0l( "SPARSE",  sparse, status );
+      parDef0l( "SPARSE", ( par[ 0 ] == AST__BAD ), status );
+      parGet0l( "SPARSE",  sparse, status );
 
 /* If we are producing an output cube with the XY plane being a spatial
    projection, then get the parameters describing the projection, using the
    defaults calculated above. */
-   if( !*sparse && *status == SAI__OK ) {
+      if( !*sparse && *status == SAI__OK ) {
 
 /* If the target is moving, display the tracking centre coordinates for
    the first time slice. */
-      if( *moving ) {
-         astClear( *skyframe, "SkyRefIs" ); 
-         msgBlank( status );
-         msgSetc( "S1", astGetC( *skyframe, "Symbol(1)" ) );
-         msgSetc( "S2", astGetC( *skyframe, "Symbol(2)" ) );
-         msgOutif( MSG__NORM, " ", "   Output sky coordinates are "
-                   "(^S1,^S2) offsets from the (moving)", status );
-         msgSetc( "S1", astGetC( *skyframe, "Symbol(1)" ) );
-         msgSetc( "S2", astGetC( *skyframe, "Symbol(2)" ) );
-         msgSetc( "SREF", astGetC( *skyframe, "SkyRef" ) );
-         msgOutif( MSG__NORM, " ", "   telescope base position, which "
-                   "started at (^S1,^S2) = (^SREF).", status );
-         astSet( *skyframe, "SkyRefIs=Origin" ); 
-      }
-
+         if( *moving ) {
+            astClear( *skyframe, "SkyRefIs" ); 
+            msgBlank( status );
+            msgSetc( "S1", astGetC( *skyframe, "Symbol(1)" ) );
+            msgSetc( "S2", astGetC( *skyframe, "Symbol(2)" ) );
+            msgOutif( MSG__NORM, " ", "   Output sky coordinates are "
+                      "(^S1,^S2) offsets from the (moving)", status );
+            msgSetc( "S1", astGetC( *skyframe, "Symbol(1)" ) );
+            msgSetc( "S2", astGetC( *skyframe, "Symbol(2)" ) );
+            msgSetc( "SREF", astGetC( *skyframe, "SkyRef" ) );
+            msgOutif( MSG__NORM, " ", "   telescope base position, which "
+                      "started at (^S1,^S2) = (^SREF).", status );
+            astSet( *skyframe, "SkyRefIs=Origin" ); 
+         }
+   
 /* Set up a flag indicating that the default values calculated above are
    being used. */
-      usedefs = 1;
-
+         usedefs = 1;
+   
 /* Ensure we have usable CRPIX1/2 values */
-      if( par[ 0 ] == AST__BAD ) par[ 0 ] = 1.0;
-      if( par[ 1 ] == AST__BAD ) par[ 1 ] = 1.0;
-
+         if( par[ 0 ] == AST__BAD ) par[ 0 ] = 1.0;
+         if( par[ 1 ] == AST__BAD ) par[ 1 ] = 1.0;
+   
 /* Get the reference position strings. Use the returned SkyFrame to
    format and unformat them. */
-      if( par[ 2 ] != AST__BAD ) {
-         deflon = astFormat( *skyframe, 1, par[ 2 ] );
-         parDef0c( "REFLON", deflon, status );
-      } else {
-         deflon = NULL;
-      }
-
-      if( par[ 3 ] != AST__BAD ) {
-         deflat = astFormat( *skyframe, 2, par[ 3 ] );
-         parDef0c( "REFLAT", deflat, status );
-      } else {
-         deflat = NULL;
-      }
-
-      parGet0c( "REFLON", reflon, 40, status );
-      parGet0c( "REFLAT", reflat, 40, status );
-
-      if( *status == SAI__OK ) {
-
-         if( ( deflat && strcmp( deflat, reflat ) ) ||
-             ( deflon && strcmp( deflon, reflon ) ) ) usedefs = 0;
+         if( par[ 2 ] != AST__BAD ) {
+            deflon = astFormat( *skyframe, 1, par[ 2 ] );
+            parDef0c( "REFLON", deflon, status );
+         } else {
+            deflon = NULL;
+         }
+   
+         if( par[ 3 ] != AST__BAD ) {
+            deflat = astFormat( *skyframe, 2, par[ 3 ] );
+            parDef0c( "REFLAT", deflat, status );
+         } else {
+            deflat = NULL;
+         }
+   
+         parGet0c( "REFLON", reflon, 40, status );
+         parGet0c( "REFLAT", reflat, 40, status );
+   
+         if( *status == SAI__OK ) {
+   
+            if( ( deflat && strcmp( deflat, reflat ) ) ||
+                ( deflon && strcmp( deflon, reflon ) ) ) usedefs = 0;
+            
+            if( astUnformat( *skyframe, 1, reflon, par + 2 ) == 0 && *status == SAI__OK ) {
+               msgSetc( "REFLON", reflon );
+               errRep( "", "Bad value supplied for REFLON: '^REFLON'", status );
+            }
          
-         if( astUnformat( *skyframe, 1, reflon, par + 2 ) == 0 && *status == SAI__OK ) {
-            msgSetc( "REFLON", reflon );
-            errRep( "", "Bad value supplied for REFLON: '^REFLON'", status );
+            if( astUnformat( *skyframe, 2, reflat, par + 3 ) == 0 && *status == SAI__OK ) {
+               msgSetc( "REFLAT", reflat );
+               errRep( "", "Bad value supplied for REFLAT: '^REFLAT'", status );
+            }  
          }
       
-         if( astUnformat( *skyframe, 2, reflat, par + 3 ) == 0 && *status == SAI__OK ) {
-            msgSetc( "REFLAT", reflat );
-            errRep( "", "Bad value supplied for REFLAT: '^REFLAT'", status );
-         }  
-      }
-   
 /* Get the user defined spatial pixel size in arcsec (the calibration for 
    the spectral axis is fixed by the first input data file - see 
    smf_cubebounds.c). First convert the autogrid values form rads to arcsec
    and establish them as the dynamic default for "PIXSIZE". */
-      if( par[ 4 ] != AST__BAD && par[ 5 ] != AST__BAD ) {
-         defsize[ 0 ] = 0.1*NINT( fabs( par[ 4 ] )*AST__DR2D*36000.0 );
-         defsize[ 1 ] = 0.1*NINT( fabs( par[ 5 ] )*AST__DR2D*36000.0 );
-         parDef1d( "PIXSIZE", ( defsize[ 0 ] == defsize[ 1 ] ) ? 1 : 2, 
-                   defsize, status );
-      }
-      parGet1d( "PIXSIZE", 2, pixsize, &nval, status );
-
+         if( par[ 4 ] != AST__BAD && par[ 5 ] != AST__BAD ) {
+            defsize[ 0 ] = 0.1*NINT( fabs( par[ 4 ] )*AST__DR2D*36000.0 );
+            defsize[ 1 ] = 0.1*NINT( fabs( par[ 5 ] )*AST__DR2D*36000.0 );
+            parDef1d( "PIXSIZE", ( defsize[ 0 ] == defsize[ 1 ] ) ? 1 : 2, 
+                      defsize, status );
+         }
+         parGet1d( "PIXSIZE", 2, pixsize, &nval, status );
+   
 /* If OK, duplicate the first value if only one value was supplied. */
-      if( *status == SAI__OK ) {
-         if( nval < 2 ) pixsize[ 1 ] = pixsize[ 0 ];
-
-         if( defsize[ 0 ] != pixsize[ 0 ] ||
-             defsize[ 1 ] != pixsize[ 1 ] ) usedefs = 0;
+         if( *status == SAI__OK ) {
+            if( nval < 2 ) pixsize[ 1 ] = pixsize[ 0 ];
    
+            if( defsize[ 0 ] != pixsize[ 0 ] ||
+                defsize[ 1 ] != pixsize[ 1 ] ) usedefs = 0;
+      
 /* Check the values are OK. */
-         if( pixsize[ 0 ] <= 0 || pixsize[ 1 ] <= 0 ) {
-            msgSetd( "P1", pixsize[ 0 ] );
-            msgSetd( "P2", pixsize[ 1 ] );
-            *status = SAI__ERROR;
-            errRep( FUNC_NAME, "Invalid pixel sizes (^P1,^P2).", status);
-         }
-
-/* Convert to rads, and set the correct signs. */
-         if( par[ 4 ] == AST__BAD || par[ 4 ] < 0.0 ) {
-            par[ 4 ] = -pixsize[ 0 ]*AST__DD2R/3600.0;
-         } else {
-            par[ 4 ] = pixsize[ 0 ]*AST__DD2R/3600.0;
-         }
-
-         if( par[ 5 ] == AST__BAD || par[ 5 ] < 0.0 ) {
-            par[ 5 ] = -pixsize[ 1 ]*AST__DD2R/3600.0;
-         } else {
-            par[ 5 ] = pixsize[ 1 ]*AST__DD2R/3600.0;
-         }
-         
-      }
+            if( pixsize[ 0 ] <= 0 || pixsize[ 1 ] <= 0 ) {
+               msgSetd( "P1", pixsize[ 0 ] );
+               msgSetd( "P2", pixsize[ 1 ] );
+               *status = SAI__ERROR;
+               errRep( FUNC_NAME, "Invalid pixel sizes (^P1,^P2).", status);
+            }
    
+/* Convert to rads, and set the correct signs. */
+            if( par[ 4 ] == AST__BAD || par[ 4 ] < 0.0 ) {
+               par[ 4 ] = -pixsize[ 0 ]*AST__DD2R/3600.0;
+            } else {
+               par[ 4 ] = pixsize[ 0 ]*AST__DD2R/3600.0;
+            }
+   
+            if( par[ 5 ] == AST__BAD || par[ 5 ] < 0.0 ) {
+               par[ 5 ] = -pixsize[ 1 ]*AST__DD2R/3600.0;
+            } else {
+               par[ 5 ] = pixsize[ 1 ]*AST__DD2R/3600.0;
+            }
+            
+         }
+      
 /* Convert the autogrid CROTA value from rads to degs and set as the
    dynamic default for parameter CROTA (the position angle of the output 
    Y axis, in degrees). The get the CROTA value and convert to rads. */
-      if( par[ 6 ] != AST__BAD ) {
-         defrot = par[ 6 ]*AST__DR2D;
-         parDef0d( "CROTA", defrot, status );
-      } else {
-         defrot = AST__BAD;
-      }
-
-      parGet0d( "CROTA", par + 6, status );
-      if( par[ 6 ] != defrot ) usedefs = 0;
-      par[ 6 ] *= AST__DD2R;
-
+         if( par[ 6 ] != AST__BAD ) {
+            defrot = par[ 6 ]*AST__DR2D;
+            parDef0d( "CROTA", defrot, status );
+         } else {
+            defrot = AST__BAD;
+         }
+   
+         parGet0d( "CROTA", par + 6, status );
+         if( par[ 6 ] != defrot ) usedefs = 0;
+         par[ 6 ] *= AST__DD2R;
+   
 /* If any parameter were given explicit values which differ from the
    default values, then we need to re-calculate the optimal CRPIX1/2 
    values. We also do this if all the points are effectively co-incident. */
-      if( ( coin || !usedefs ) && autogrid && usesys ) {
-         par[ 0 ] = AST__BAD;
-         par[ 1 ] = AST__BAD;
-         kpg1Opgrd( nallpos, allpos, strcmp( usesys, "AZEL" ), par,
-                    &rdiam, status );
+         if( ( coin || !usedefs ) && autogrid && usesys ) {
+            par[ 0 ] = AST__BAD;
+            par[ 1 ] = AST__BAD;
+            kpg1Opgrd( nallpos, allpos, strcmp( usesys, "AZEL" ), par,
+                       &rdiam, status );
+         }
+   
+/* Abort if an error has occurred. */
+         if( *status != SAI__OK ) goto L999;
+   
+/* Display the projection parameters being used. */
+         msgBlank( status );
+         msgOutif( MSG__NORM, " ", "   Projection parameters used:", status );
+         msgSetd( "V", par[ 0 ] );
+         msgOutif( MSG__NORM, " ", "      CRPIX1 = ^V", status );
+         msgSetd( "V", par[ 1 ] );
+         msgOutif( MSG__NORM, " ", "      CRPIX2 = ^V", status );
+         msgSetd( "V", par[ 2 ]*AST__DR2D );
+         msgSetc( "V2", astFormat( *skyframe, 1, par[ 2 ] ) );
+         msgSetc( "S", astGetC( *skyframe, "Symbol(1)" ) );
+         msgOutif( MSG__NORM, " ", "      CRVAL1 = ^V ( ^S = ^V2 )", status );
+         msgSetd( "V", par[ 3 ]*AST__DR2D );
+         msgSetc( "V2", astFormat( *skyframe, 2, par[ 3 ] ) );
+         msgSetc( "S", astGetC( *skyframe, "Symbol(2)" ) );
+         msgOutif( MSG__NORM, " ", "      CRVAL2 = ^V ( ^S = ^V2 )", status );
+         msgSetd( "V", par[ 4 ]*AST__DR2D );
+         msgSetd( "V2", 0.1*NINT(par[ 4 ]*AST__DR2D*36000.0) );
+         msgOutif( MSG__NORM, " ", "      CDELT1 = ^V ( ^V2 arcsec )", status );
+         msgSetd( "V", par[ 5 ]*AST__DR2D );
+         msgSetd( "V2", 0.1*NINT(par[ 5 ]*AST__DR2D*36000.0) );
+         msgOutif( MSG__NORM, " ", "      CDELT2 = ^V ( ^V2 arcsec )", status );
+         msgSetd( "V", par[ 6 ]*AST__DR2D );
+         msgOutif( MSG__NORM, " ", "      CROTA2 = ^V", status );
+   
+/* If no grid was found, indicate that no spatial projection will be used. */
+      } else {
+         msgBlank( status );
+         msgOutif( MSG__NORM, " ", "   The output will be a sparse array "
+                   "containing a list of spectra.", status );
       }
 
-/* Abort if an error has occurred. */
-      if( *status != SAI__OK ) goto L999;
-
-/* Display the projection parameters being used. */
-      msgBlank( status );
-      msgOutif( MSG__NORM, " ", "   Projection parameters used:", status );
-      msgSetd( "V", par[ 0 ] );
-      msgOutif( MSG__NORM, " ", "      CRPIX1 = ^V", status );
-      msgSetd( "V", par[ 1 ] );
-      msgOutif( MSG__NORM, " ", "      CRPIX2 = ^V", status );
-      msgSetd( "V", par[ 2 ]*AST__DR2D );
-      msgSetc( "V2", astFormat( *skyframe, 1, par[ 2 ] ) );
-      msgSetc( "S", astGetC( *skyframe, "Symbol(1)" ) );
-      msgOutif( MSG__NORM, " ", "      CRVAL1 = ^V ( ^S = ^V2 )", status );
-      msgSetd( "V", par[ 3 ]*AST__DR2D );
-      msgSetc( "V2", astFormat( *skyframe, 2, par[ 3 ] ) );
-      msgSetc( "S", astGetC( *skyframe, "Symbol(2)" ) );
-      msgOutif( MSG__NORM, " ", "      CRVAL2 = ^V ( ^S = ^V2 )", status );
-      msgSetd( "V", par[ 4 ]*AST__DR2D );
-      msgSetd( "V2", 0.1*NINT(par[ 4 ]*AST__DR2D*36000.0) );
-      msgOutif( MSG__NORM, " ", "      CDELT1 = ^V ( ^V2 arcsec )", status );
-      msgSetd( "V", par[ 5 ]*AST__DR2D );
-      msgSetd( "V2", 0.1*NINT(par[ 5 ]*AST__DR2D*36000.0) );
-      msgOutif( MSG__NORM, " ", "      CDELT2 = ^V ( ^V2 arcsec )", status );
-      msgSetd( "V", par[ 6 ]*AST__DR2D );
-      msgOutif( MSG__NORM, " ", "      CROTA2 = ^V", status );
-
-/* If no grid was found, indicate that no spatial projection will be used. */
+/* If we have a pre-defined spatial projection, indicate that the output
+   array need not be sparse. */
    } else {
-      msgBlank( status );
-      msgOutif( MSG__NORM, " ", "   The output will be a sparse array "
-                "containing a list of spectra.", status );
+      *sparse = 0;
    }
 
 /* If creating an output catalogue, re-order the array containing the 

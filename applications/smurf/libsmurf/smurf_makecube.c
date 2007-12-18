@@ -50,7 +50,9 @@
 *     parameters CROTA, PIXSIZE, REFLAT, REFLON. Alternatively, parameter 
 *     AUTOGRID can be set true, in which case projection parameters are 
 *     determined automatically in a manner that favours projections that 
-*     place samples centrally within pixels.
+*     place samples centrally within pixels. Alternatively, a reference
+*     NDF can be supplied (see parameter REF), in which case the same pixel 
+*     grid will be used for the output cube.
 *
 *     Variance values in the output can be calculated wither on the basis
 *     of the spread of input dat avalues contributing to each output pixel,
@@ -59,6 +61,7 @@
 
 *  ADAM Parameters:
 *     AUTOGRID = _LOGICAL (Read)
+*          Only accessed if a null value is supplied for parameter REF.
 *          Determines how the dynamic default values should be determined 
 *          for the projection parameters CROTA, PIXSIZE, REFLAT and REFLON. 
 *          If TRUE, then default projection parameters are determined by 
@@ -138,6 +141,7 @@
 *          Such values are interpreted as a Besselian epoch if less than 
 *          1984.0 and as a Julian epoch otherwise. 
 *     CROTA = _REAL (Read)
+*          Only accessed if a null value is supplied for parameter REF.
 *          The angle, in degrees, from north through east (in the
 *          coordinate system specified by the SYSTEM parameter) to the second
 *          pixel axis in the output cube. The dynamic default value is
@@ -272,6 +276,7 @@
 *          matching the FWHM of the envelope function, given by PARAMS(2),
 *          to the point-spread function of the input data.  []
 *     PIXSIZE( 2 ) = _REAL (Read)
+*          Only accessed if a null value is supplied for parameter REF.
 *          Pixel dimensions in the output image, in arcsec. If only one value 
 *          is supplied, the same value will be used for both axes. The 
 *          dynamic default value is determined by the AUTOGRID parameter. []
@@ -293,12 +298,23 @@
 *          putput parameter NPOLBIN. If a null value (!) is supplied, then a 
 *          single output NDF (without POLPACK extension) is created for each 
 *          tile, containing all input data. [!]
+*     REF = NDF (Read)
+*          An existing NDF that is to be used to define the output grid.
+*          If supplied, the output grid will be aligned with the supplied 
+*          reference NDF. The supplied NDF need not be 3D. For instance,
+*          a 2D image can be supplied in which case the spatial axes of 
+*          the output cube will be aligned with the reference image and 
+*          the spectral axis will be inherited form the first input NDF.
+*          If a null (!) value is supplied then the output grid is
+*          determined by parameters AUTOGRID, REFLON, REFLAT, etc. [!]
 *     REFLAT = LITERAL (Read)
+*          Only accessed if a null value is supplied for parameter REF.
 *          The formatted celestial latitude value at the tangent point of 
 *          the spatial projection in the output cube. This should be provided 
 *          in the system specified by parameter SYSTEM. The dynamic default 
 *          value is determined by the AUTOGRID parameter. []
 *     REFLON = LITERAL (Read)
+*          Only accessed if a null value is supplied for parameter REF.
 *          The formatted celestial longitude value at the tangent point of 
 *          the spatial projection in the output cube. This should be provided 
 *          in the system specified by parameter SYSTEM. The dynamic default 
@@ -646,6 +662,8 @@
 *        Added parameter TRIMTILES.
 *     6-DEC-2007 (DSB):
 *        Clarify docs for BADMASK.
+*     18-DEC-2007 (DSB):
+*        Added parameter REF.
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -711,7 +729,10 @@ void smurf_makecube( int *status ) {
 /* Local Variables */
    AstFitsChan *fchan = NULL; /* FitsChan holding output NDF FITS extension */
    AstFrame *ospecfrm = NULL; /* SpecFrame from the output WCS Frameset */
+   AstFrame *spacerefframe = NULL;/* Spatial reference Frame */
    AstFrame *tfrm = NULL;     /* Current Frame from output WCS */
+   AstFrameSet *spacerefwcs = NULL;/* WCS Frameset for spatial reference axes */
+   AstFrameSet *specrefwcs = NULL;/* WCS Frameset for spectral reference axis */
    AstFrameSet *wcsout = NULL;/* WCS Frameset for output cube */
    AstFrameSet *wcsout2d = NULL;/* WCS Frameset describing 2D spatial axes */
    AstFrameSet *wcstile = NULL;/* WCS Frameset for output tile */
@@ -758,10 +779,10 @@ void smurf_makecube( int *status ) {
    float *var_array = NULL;   /* Pointer to temporary variance array */
    float *var_out = NULL;     /* Pointer to the output variance array */
    float *work2_array = NULL; /* Pointer to temporary work array */
-   float polbinsize;          /* Angular size of polarisation bins */
    float medeff;              /* Median effective integration time in output NDF. */
    float medexp;              /* Median exposure time in output NDF. */
    float medtsys;             /* Median system temperature in output NDF. */
+   float polbinsize;          /* Angular size of polarisation bins */
    float teff;                /* Effective integration time */
    float var;                 /* Variance value */
    int ***ptime;              /* Holds time slice indices for each bol bin */
@@ -780,6 +801,7 @@ void smurf_makecube( int *status ) {
    int i;                     /* Loop index */
    int ifile;                 /* Input file index */
    int iout;                  /* Index of next output NDF name */
+   int ipbin;                 /* Index of current polarisation angle bin */
    int is2d;                  /* Is the weights array 2-dimensional? */
    int ispec;                 /* Index of next spectrum within output NDF */
    int itile;                 /* Output tile index */
@@ -794,7 +816,6 @@ void smurf_makecube( int *status ) {
    int neluse;                /* Number of elements used */
    int ngood;                 /* No. of o/p pixels with good data */
    int nparam = 0;            /* No. of parameters required for spreading scheme */
-   int ipbin;                 /* Index of current polarisation angle bin */
    int npbin;                 /* No. of polarisation angle bins */
    int npos;                  /* Number of samples included in output NDF */
    int nreject;               /* Number of rejected input spectra */
@@ -893,20 +914,34 @@ void smurf_makecube( int *status ) {
    par[ 5 ] = AST__BAD;
    par[ 6 ] = AST__BAD;
 
-/* See if any unspecified projection parameters are to be determined using
-   an optimal fitting process. */
-   parGet0l( "AUTOGRID", &autogrid, status );
-
 /* See if the output grp should be trimmed to exclude missing data (e.g.
    caused by detectors not being selected for inclusion via parameter
    DETECTORS). */
    parGet0l( "TRIM", &trim, status );
 
-/* Calculate the default grid parameters. This also modifies the contents
+/* Attempt to get WCS information from a reference NDF. */
+   smf_getrefwcs( "REF", &specrefwcs, &spacerefwcs, status );
+
+/* If no spatial reference WCS was obtained, see if any unspecified 
+   projection parameters are to be determined using an optimal fitting 
+   process. */
+   if( !spacerefwcs ) {
+      parGet0l( "AUTOGRID", &autogrid, status );
+   } else {
+      autogrid = 0;
+   }  
+
+/* Calculate the default grid parameters (these are only used if no
+   reference spatial WCS was obtained). This also modifies the contents
    of "detgrp" if needed so that it always holds a list of detectors to be
    included (not excluded). */
    smf_cubegrid( igrp,  size, system, usedetpos, autogrid, detgrp, 
-                 par, &moving, &oskyfrm, &sparse, &hastsys, status );
+                 spacerefframe ? NULL : par, &moving, &oskyfrm, 
+                 &sparse, &hastsys, status );
+
+/* If we have spatial reference WCS, use the SkyFrame from the spatial 
+   reference WCS. */
+   if( spacerefwcs ) oskyfrm = astGetFrame( spacerefwcs, AST__CURRENT );
 
 /* Get the pixel spreading scheme to use. */
    if( !sparse ) {
@@ -1017,7 +1052,8 @@ void smurf_makecube( int *status ) {
 
 /* Validate the input files, create the WCS FrameSet to store in the
    output cube, and get the pixel index bounds of the output cube. */
-      smf_cubebounds( igrp, size, oskyfrm, autogrid, usedetpos, par, 
+      smf_cubebounds( igrp, size, oskyfrm, autogrid, usedetpos,
+                      spacerefwcs, specrefwcs, par, 
                       ( trim ? detgrp : NULL ), moving, specunion, lbnd_out, 
                       ubnd_out, &wcsout, &npos, &hasoffexp, &boxes, status );
 

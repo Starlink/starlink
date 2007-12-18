@@ -152,6 +152,8 @@
 #         Added SPECUNION, POLBINSIZE and NPOLBIN for MAKECUBE
 #     8-NOV-2007 (DSB):
 #         Added action TIMESORT.
+#     18-DEC-2007 (DSB):
+#         Added parameter REF to MAKECUBE.
 #     {enter_changes_here}
 
 #  Bugs:
@@ -1008,6 +1010,16 @@ package @PACKAGE@ {
             default !
 	    helpkey *
 	  }
+
+         parameter ref {
+            type NDF
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Reference NDF}
+            default !
+            helpkey *
+          }
 
 	  parameter reflat {
             type LITERAL
