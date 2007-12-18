@@ -226,7 +226,7 @@ itcl::class gaia::StarArdList {
       #  Get a list of the currently selected objects.
       for {set i 1} {$i <= $highest_index_} {incr i} {
          if { [info exists objects_($i)] } {
-            if { [$objects_($i) is_selected] } { 
+            if { [$objects_($i) is_selected] } {
                puts $ios [$objects_($i) getard]
                set ok 1
             }
@@ -246,12 +246,24 @@ itcl::class gaia::StarArdList {
       return $desc
    }
 
+   #  Set the description of the selected object (first if more than one).
+   method set_selected_description {desc} {
+      for {set i 1} {$i <= $highest_index_} {incr i} {
+         if { [info exists objects_($i)] } {
+            if { [$objects_($i) is_selected] } {
+               $objects_($i) setard $desc
+               return
+            }
+         }
+      }
+   }
+
    #  Get the description of the currently selected objects as a string.
    method get_selected_description {} {
       set desc ""
       for {set i 1} {$i <= $highest_index_} {incr i} {
          if { [info exists objects_($i)] } {
-            if { [$objects_($i) is_selected] } { 
+            if { [$objects_($i) is_selected] } {
                append desc [$objects_($i) getard]
             }
          }
@@ -273,10 +285,10 @@ itcl::class gaia::StarArdList {
                 -canvas $canvas \
                 -rtdimage $rtdimage \
                 -canvasdraw $canvasdraw ]
-         if { $resize } { 
+         if { $resize } {
             $objects_($selected_) create_and_resize \
                [code $this created_object $selected_]
-         } else { 
+         } else {
             $objects_($selected_) createard "$desc" \
                [code $this created_object $selected_]
          }
@@ -287,7 +299,7 @@ itcl::class gaia::StarArdList {
 
    #  Method to deal with object creation confirmation.
    method created_object {index id} {
-       if { $notify_created_cmd != {} } { 
+       if { $notify_created_cmd != {} } {
 	   eval $notify_created_cmd $index $id
        }
    }

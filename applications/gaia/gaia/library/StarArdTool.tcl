@@ -311,6 +311,11 @@ itcl::class gaia::StarArdTool {
       return [$object_list_ get_selected_description]
    }
 
+   #  Set the description of the selected region (first if more than one).
+   method set_selected_description {desc} {
+      $object_list_ set_selected_description $desc
+   }
+
    #  Create an ARD region of the given type.
    method create_region {type} {
       disable_types_frame
