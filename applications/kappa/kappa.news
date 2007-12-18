@@ -1,6 +1,6 @@
 1 KAPPA_Version_1.8
 
-   A new release of KAPPA (V1.8) is under development,  The main changes
+   A new release of KAPPA (V1.8) is under development.  The main changes
    so far are listed below.  For complete details of all changes, see
    the "Release Notes" appendix in SUN/95.
 
@@ -23,6 +23,13 @@
       -  It can now use a two-dimensional ARD description to mask each
       plane in a three-dimensional NDF.
 
+   o  COLLAPSE issues a warning whenever any output values are set
+      bad because there are too few contributing data values.  This
+      reports the fraction of flagged output data in comparison with
+      the WLIM parameter.  Input data containing only bad values are
+      not counted in the flagged fraction, since no potential good
+      output value has been lost.
+
    o  FILLBAD
 
       -  This is no longer limited to two-dimensional data.  The scale
@@ -42,8 +49,11 @@
       current co-ordinate system, along with the previously listed 
       pixel ranges in parentheses.
 
-   o  PSF has a new output parameter TOTAL which returns the total flux
-      for the fitted Sersic function.
+   o  PSF has a new output parameter TOTAL which returns the total
+      flux for the fitted Sersic function.
+
+   o  WCSATTRIB permits the setting of multiple attributes through new 
+      MSET option for parameter MODE, and the new parameter SETTING.
 
 1 KAPPA_Version_1.7
 
