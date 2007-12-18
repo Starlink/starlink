@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.33}
 \newcommand{\stardocnumber}    {95.33}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2007 December 10}
+\newcommand{\stardocdate}      {2007 December 17}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.8-6}
+\newcommand{\stardocversion}   {1.8-7}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -604,7 +604,10 @@
    }
 
 %  sstusage
-   \newcommand{\sstusage}[1]{\item[\htmlref{Usage:}{ap:usage}] \mbox{} \\ {\ssttt #1}}
+   \newcommand{\sstusage}[1]{%
+      \item[\htmlref{Usage:}{ap:usage}] \mbox{}
+      {\ssttt #1}\smallskip%
+   }
 
 %  sstinvocation
    \newcommand{\sstinvocation}[1]{\item[Invocation:]
@@ -646,8 +649,8 @@
    }
 
 %  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[\htmlref{Examples:}{ap:example}]
+   \newcommand{\sstexamples}[1]{%
+      \item[\htmlref{Examples:}{ap:example}]%
       \begin{description}
          #1
       \end{description}
@@ -657,7 +660,10 @@
    \newcommand{\sstsubsection}[1]{\item[{#1}]}
 
 %  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
+   \newcommand{\sstexamplesubsection}[2]{%
+      \item[{\ssttt #1}]
+      #2\smallskip%
+   }
 
 %  sstnotes
    \newcommand{\sstnotes}[1]{\item[Notes:]
@@ -46628,6 +46634,9 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          set a new value for an attribute;
 
          \sstitem
+         set new values for a list of attributes;
+
+         \sstitem
          clear an attribute value; and
 
          \sstitem
@@ -46668,6 +46677,10 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
             default value will be displayed.
 
             \sstitem
+            {\tt "MSet"} --- Assigns new values to multiple attributes. The
+            attribute names and values are obtained using parameter SETTING.
+
+            \sstitem
             {\tt "Set"} --- Assigns a new value, given by parameter NEWVAL, to the
             attribute.
 
@@ -46683,7 +46696,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       \sstsubsection{
          NAME = LITERAL (Read)
       }{
-         The attribute name.
+         The attribute name.  It is not used if MODE is {\tt "MSet"}.
       }
       \sstsubsection{
          NDF = NDF (Read and Write)
@@ -46693,7 +46706,8 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       \sstsubsection{
          NEWVAL = LITERAL (Read)
       }{
-         The new value to assign to the attribute.
+         The new value to assign to the attribute.  It is only used if
+         MODE is {\tt "Set"}.
       }
       \sstsubsection{
          REMAP = \_LOGICAL (Read)
@@ -46712,32 +46726,46 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
 	 reason, which need to be corrected without altering the Mappings to
 	 take account of the change. {\tt [TRUE]}
       }
+      \sstsubsection{
+         SETTING = LITERAL (Read)
+      }{
+         This is only accessed if MODE is set to {\tt "MSet"}.  It should hold
+         a comma-separated list of {\tt "<attribute>=<value>"} strings, where
+         {\tt <attribute>} is the name of an attribute and {\tt <value>} is 
+         the value to assign to the attribute. 
+      }
    }
    \sstresparameters{
       \sstsubsection{
          STATE = \_LOGICAL (Write)
       }{
          On exit, this holds the state of the attribute on entry to this
-         application.
+         application.  It is not used if MODE is {\tt "MSet"}.
       }
       \sstsubsection{
          VALUE = LITERAL (Write)
       }{
          On exit, this holds the value of the attribute on entry to this
-         application.
+         application.  It is not used if MODE is {\tt "MSet"}.
       }
    }
    \sstexamples{
       \sstexamplesubsection{
          wcsattrib my\_spec set System freq
       }{
-
          This sets the \htmlattref{System}{System}~ attribute of the
 	 current co-ordinate Frame in the NDF called my\_Spec so that
 	 the Frame represents frequency (this assumes the current
 	 Frame is a \xref{SpecFrame}{sun210}{SpecFrame}).  The
 	 Mappings between the current Frame and the other Frames are
 	 modified to take account of the change of system.
+      }
+      \sstexamplesubsection{
+         wcsattrib my\_spec mset setting='unit(1)=km/s,system(1)=vrad'
+      }{
+         This sets new values of "km/s" and "vrad" simultaneously for the 
+         Unit and System attributes for the first axis of the NDF called 
+         my\_spec.
       }
       \sstexamplesubsection{
          wcsattrib ngc5128 set title "Polarization map of Centaurus-A"
@@ -53412,6 +53440,12 @@ The following applications have been modified:
       \begin{itemize}
          \item The new output parameter TOTAL returns the total flux
          for the fitted S\'{e}rsic function.
+      \end{itemize}
+
+   \item [\htmlref{WCSATTRIB}{WCSATTRIB}] \mbox{}
+      \begin{itemize}
+         \item It is now possible to set multiple attributes through new 
+         MSET option for parameter MODE, and the new parameter SETTING.
       \end{itemize}
 
 \end{description}
