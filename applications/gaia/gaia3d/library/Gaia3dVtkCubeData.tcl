@@ -257,7 +257,7 @@ itcl::class ::gaia3d::Gaia3dVtkCubeData {
    #  dimensions. These will be applied during the next access.
    public method set_axis_limits {axis axlimits} {
       set dims [$cubeaccessor getdims 0]
-      lassign $dims nx ny yz
+      lassign $dims nx ny nz
       lassign $axlimits ll ul
       if { $axis == 1 } {
          set limits "$ll $ul 0 $ny 0 $nz"
