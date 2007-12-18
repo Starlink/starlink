@@ -794,6 +794,11 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        Changed CreateKeyword so that it uses a KeyMap to search for
 *        existing keywords. This is much faster than checking every
 *        FitsCard in the FitsChan explicitly.
+*     18-DEC-2007 (DSB):
+*        Add keyword VLSR to the CLASS encoding. It holds the same value
+*        as VELO-LSR, but different versions of class use different names.
+*        Also write out the DELTAV keyword in the LSR rest frame rather
+*        than the source rest frame.
 *class--
 */
 
@@ -4306,6 +4311,7 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
    double rf;          /* Rest freq (Hz) */
    double specfactor;  /* Factor for converting internal spectral units */
    double val;         /* General purpose value */
+   double aval[ 2 ];   /* General purpose array */
    int axlat;          /* Index of latitude FITS WCS axis */
    int axlon;          /* Index of longitude FITS WCS axis */
    int axspec;         /* Index of spectral FITS WCS axis */
@@ -4626,16 +4632,6 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
                    AST__FLOAT, "Pixel size" );
       }
 
-/* Older versions of CLASS require DELTAV to be present. */
-      if( axspec != -1 ) {
-         if( strncmp( spectype, "VELO", 4 ) ) {
-            delta = -AST__C*cdelt[ axspec ]/rf;
-         } else {
-            delta = cdelt[ axspec ];
-         }
-         SetValue( this, "DELTAV", &delta, AST__FLOAT, "[m/s] Velocity resolution" );
-      }
-
 /* Reference equinox */
       if( equ != AST__BAD ) SetValue( this, "EQUINOX", &equ, AST__FLOAT, 
                                         "Epoch of reference equinox" );
@@ -4687,8 +4683,8 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
       }
 
 /* CLASS expects the VELO-LSR keyword to hold the radio velocity of the
-   reference channel (NOT of the source I was told!!) with respect to the 
-   LSRK rest frame. The "crval" array holds the frequency of the
+   reference channel (NOT of the source as I was told!!) with respect to
+   the LSRK rest frame. The "crval" array holds the frequency of the
    reference channel in the source rest frame, so we need to convert this
    to get the value for VELO-LSR. Create a SpecFrame describing the
    required frame (other attributes such as Epoch etc are left unset and
@@ -4723,12 +4719,20 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
          if( fsconv1 ) {
 
 /* Use this Mapping to convert the spectral crval value from frequency to
-   velocity. */
-            val = crval[ axspec ]*specfactor;
-            astTran1( fsconv1, 1, &val, 1, &val );
+   velocity. Also convert the value for the neighbouring channel. */
+            aval[ 0 ] = crval[ axspec ]*specfactor;
+            aval[ 1 ] = aval[ 0 ] + cdelt[ axspec ]*specfactor;
+            astTran1( fsconv1, 2, aval, 1, aval );
 
-/* Source velocity */
-            SetValue( this, "VELO-LSR", &val, AST__FLOAT, "[m/s] Reference velocity" );
+/* Store the value. Also store it as VLSR since this keyword seems to be
+   used for the same thing. */
+            SetValue( this, "VELO-LSR", aval, AST__FLOAT, "[m/s] Reference velocity" );
+            SetValue( this, "VLSR", aval, AST__FLOAT, "[m/s] Reference velocity" );
+
+/* The DELTAV keyword holds the radio velocity channel spacing in the
+   LSR. */ 
+            delta = aval[ 1 ] - aval[ 0 ];
+            SetValue( this, "DELTAV", &delta, AST__FLOAT, "[m/s] Velocity resolution" );
 
 /* Free remaining resources. */
             fsconv1 = astAnnul( fsconv1 );            
