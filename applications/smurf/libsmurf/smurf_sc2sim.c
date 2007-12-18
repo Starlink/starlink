@@ -456,6 +456,7 @@
 *     2006-08-18:  fixed memory leak (elc)
 *     2006-08-21:  removed unused variables (jb)
 *     2007-07-03:  made obsMode enumerated type more readable (EC)
+*     2007-12-18   Update to use new smf_free behaviour (AGG)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -508,6 +509,7 @@
 #include "star/grp.h"
 #include "star/kaplibs.h"
 #include "star/slalib.h"
+#include "star/ard.h"
 
 #include "sc2da/Dits_Err.h"
 #include "sc2da/Ers.h"
@@ -572,6 +574,23 @@ void smurf_sc2sim( int *status ) {
 				      in arcsec */
    double *ybolo=NULL;             /* Native bolo y-offsets */
 
+   char ard[LEN__METHOD];         /* Name of ARD description */
+   int ardFlag=0;                 /* Flag for ARD description */
+   Grp *ardGrp = NULL;            /* Group containing ARD description */
+   int *bolos = NULL;             /* Array of all bolometers */
+   int lbnd[2];                   /* Lower pixel bounds for bad pixel mask */
+   int lbnde[2];                  /* Lower pixel bounds encompassing all
+                                     external pixels */
+   int lbndi[2];                  /* Lower pixel bounds encompassing all
+                                     internal pixels */
+   int regval=0;                  /* First keyword in ARD description */
+   float trcoeff;                 /* Coefficients for ARD mapping */
+   int ubnd[2];                   /* Upper pixel bounds for bad pixel mask */
+   int ubnde[2];                  /* Upper pixel bounds encompassing all
+                                     external pixels */
+   int ubndi[2];                  /* Upper pixel bounds encompassing all
+                                     internal pixels */
+   int i;
 
    /* Get input parameters */
    kpg1Gtgrp ( "OBSPAR", &obsGrp, &osize, status );
@@ -608,6 +627,21 @@ void smurf_sc2sim( int *status ) {
    srand ( rseed );
 
    nbol = inx.nbolx * inx.nboly;
+   /* Bad bolometer mask */
+   bolos = smf_malloc( (size_t)(nbol), sizeof(int), 1, status );
+   lbnd[0] = 1;
+   lbnd[1] = 1;
+   ubnd[0] = inx.nbolx;
+   ubnd[1] = inx.nboly;
+   parGet0c("BADBOL", ard, LEN__METHOD, status);
+   if ( *status == PAR__NULL ) {
+     errAnnul( status );
+   } else {
+     ardGrpex ( ard, NULL, &ardGrp, &ardFlag, status );
+     trcoeff = VAL__BADR;
+     ardWork ( ardGrp, 2, lbnd, ubnd, &trcoeff, 0, &regval, bolos,
+	       lbndi, ubndi, lbnde, ubnde, status );
+   }
 
    /* String for the wavelength of the filter */
    sprintf( filter,"%i",(int) (inx.lambda*1e6) );
@@ -704,13 +738,14 @@ void smurf_sc2sim( int *status ) {
  
    /* Free resources */
 
-   smf_free( heater, status );
-   smf_free( pzero, status );
-   smf_free( xbc, status );
-   smf_free( ybc, status );
-   smf_free( xbolo, status );
-   smf_free( ybolo, status );
+   heater = smf_free( heater, status );
+   pzero = smf_free( pzero, status );
+   xbc = smf_free( xbc, status );
+   ybc = smf_free( ybc, status );
+   xbolo = smf_free( xbolo, status );
+   ybolo = smf_free( ybolo, status );
 
+   if ( ardGrp ) grpDelet ( &ardGrp, status ); 
    if ( simGrp ) grpDelet ( &simGrp, status ); 
    if ( obsGrp ) grpDelet ( &obsGrp, status ); 
 

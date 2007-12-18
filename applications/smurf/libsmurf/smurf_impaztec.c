@@ -85,6 +85,8 @@
 *        -Use the base coordinates from the .nc file rather than the
 *         first boresite coordinates in the file (although the base 
 *         coordinates are identically 0 and un-useable). 
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -696,32 +698,32 @@ void smurf_impaztec( int *status ) {
 
   /* Free memory */
  CLEANUP:
-  smf_free ( bolosig, status );
-  smf_free ( head, status );
-  smf_free ( dbuf, status );
-  smf_free ( dksquid, status );
-  smf_free ( fcal, status );
-  smf_free ( fpar, status );
-  smf_free ( posptr, status );
-  smf_free ( mjuldate, status );
-  smf_free ( tempbuff, status );
+  bolosig = smf_free ( bolosig, status );
+  head = smf_free ( head, status );
+  dbuf = smf_free ( dbuf, status );
+  dksquid = smf_free ( dksquid, status );
+  fcal = smf_free ( fcal, status );
+  fpar = smf_free ( fpar, status );
+  posptr = smf_free ( posptr, status );
+  mjuldate = smf_free ( mjuldate, status );
+  tempbuff = smf_free ( tempbuff, status );
 
-  smf_free ( time, status );
-  smf_free ( airmass, status );
-  smf_free ( trackactc1, status );
-  smf_free ( trackactc2, status );
-  smf_free ( trackdemandc1, status );
-  smf_free ( trackdemandc2, status );
-  smf_free ( trackbasec1, status );
-  smf_free ( trackbasec2, status );  
-  smf_free ( azelactc1, status );
-  smf_free ( azelactc2, status );
-  smf_free ( azeldemandc1, status );
-  smf_free ( azeldemandc2, status );
-  smf_free ( azelbasec1, status );
-  smf_free ( azelbasec2, status );
+  time = smf_free ( time, status );
+  airmass = smf_free ( airmass, status );
+  trackactc1 = smf_free ( trackactc1, status );
+  trackactc2 = smf_free ( trackactc2, status );
+  trackdemandc1 = smf_free ( trackdemandc1, status );
+  trackdemandc2 = smf_free ( trackdemandc2, status );
+  trackbasec1 = smf_free ( trackbasec1, status );
+  trackbasec2 = smf_free ( trackbasec2, status );  
+  azelactc1 = smf_free ( azelactc1, status );
+  azelactc2 = smf_free ( azelactc2, status );
+  azeldemandc1 = smf_free ( azeldemandc1, status );
+  azeldemandc2 = smf_free ( azeldemandc2, status );
+  azelbasec1 = smf_free ( azelbasec1, status );
+  azelbasec2 = smf_free ( azelbasec2, status );
 
-  smf_free ( quality, status );
+  quality = smf_free ( quality, status );
 
   if ( *status == SAI__OK ) {
     msgOutif(MSG__VERB," ", 

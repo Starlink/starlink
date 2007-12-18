@@ -76,6 +76,8 @@
 *        Rework to handle PRV* as well as OBS*
 *     2007-07-05 (TIMJ):
 *        Fix provenance file name handling.
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -267,7 +269,7 @@ void smurf_qlmakemap( int *status ) {
   smf_close_file ( &odata, status );
   if ( ogrp != NULL ) grpDelet( &ogrp, status );
 
-  smf_free( weights, status );
+  weights = smf_free( weights, status );
   grpDelet( &igrp, status );
   
   ndfEnd( status );

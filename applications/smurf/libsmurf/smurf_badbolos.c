@@ -73,6 +73,8 @@
 *        Remove unused variables and replace GRP__NOID with NULL
 *     2007-12-11 (AGG):
 *        Add status checking
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 
 *  Copyright:
 *     Copyright (C) 2006-7 University of British Columbia. All Rights
@@ -146,15 +148,15 @@
 void smurf_badbolos( int *status ) {
 
    /* Local variables */
+   char ard[LEN__METHOD];         /* Name of ARD description */
+   int ardFlag=0;                 /* Flag for ARD description */
+   Grp *ardGrp = NULL;            /* Group containing ARD description */
    int *badcols = NULL;           /* Array of bad columns */
    int *badrows = NULL;           /* Array of bad rows */
    int bndf;                      /* NDF identifier of bad pixel
                                      extension */
    int *bolos = NULL;             /* Array of all bolometers */
    HDSLoc *bpmloc=NULL;           /* HDS locator of bad pixel extension */      
-   char ard[LEN__METHOD];         /* Name of ARD description */
-   int ardFlag=0;                 /* Flag for ARD description */
-   Grp *ardGrp = NULL;            /* Group containing ARD description */
    int curbad;                    /* The current bad object */
    int i;                         /* Loop counter */
    int j;                         /* Loop counter */
@@ -358,8 +360,8 @@ void smurf_badbolos( int *status ) {
        }
      }
 
-     smf_free( badcols, status );
-     smf_free( badrows, status );
+     badcols = smf_free( badcols, status );
+     badrows = smf_free( badrows, status );
    }
 
    /* Report the bad pixel mask to the user */

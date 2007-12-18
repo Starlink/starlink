@@ -61,7 +61,7 @@
 *
 *          The parameter names and their default values are listed
 *          below.  The default values will be used for any unspecified
-*          parameters.  Unregnized parameters are ignored (i.e. no
+*          parameters.  Unrecognized parameters are ignored (i.e. no
 *          error is reported).
 *
 *          aomega (double) : 0,179
@@ -98,6 +98,8 @@
 *        - Removed sigma from interface to sc2sim_invf2d; it will now be used
 *          to scale the sky noise on-the-fly in sc2sim_simframe
 *        - For same reason removed calculation of meanatm from here
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 *     
 *     {enter_further_changes_here}
 
@@ -257,7 +259,7 @@ void smurf_skynoise ( int *status ) {
 
    ndfUnmap ( indf, "DATA", status );
 
-   smf_free ( spectrum, status );
+   spectrum = smf_free ( spectrum, status );
 
    if ( simGrp ) grpDelet ( &simGrp, status ); 
    if ( obsGrp ) grpDelet ( &obsGrp, status ); 

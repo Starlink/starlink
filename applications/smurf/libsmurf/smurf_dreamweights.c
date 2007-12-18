@@ -53,6 +53,8 @@
 *        Set some default values if a config file is not specified
 *     2007-10-29 (EC):
 *        Modified interface to smf_open_file.
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -191,7 +193,7 @@ void smurf_dreamweights ( int *status ) {
 
   /* Free up resources */
   if ( gridminmax != NULL ) {
-    smf_free( gridminmax, status);
+    gridminmax = smf_free( gridminmax, status);
   }
   if ( ogrp != NULL ) {
     grpDelet( &ogrp, status);
