@@ -239,14 +239,6 @@ int *status                  /* global status (given and returned) */
    double ysky;                    /* Y position on sky screen */
    double zenatm;                  /* zenith atmospheric signal (pW) */
 
-   double avatm;
-   double avnoise;
-   double avnoisesq;
-   double noisesigma;
-   double pnoise;
-   double dnbol;
-   double temp;
-  
     /* Check status */
    if ( !StatusOkP(status) ) return;
 
@@ -320,10 +312,6 @@ int *status                  /* global status (given and returned) */
    /* Get the zenith atmospheric signal */ 
    sc2sim_calctrans( inx.lambda, &skytrans, sinx.tauzen, status );
    sc2sim_atmsky( inx.lambda, skytrans, &zenatm, status );
-
-   avnoise = 0.0;
-   avnoisesq = 0.0;
-   avatm = 0.0;
 
    if( *status == SAI__OK ) {
      for ( bol=0; bol<nbol; bol++ ) {
@@ -414,8 +402,6 @@ int *status                  /* global status (given and returned) */
          atmvalue = meanatm;
        }
 
-       avatm += atmvalue;
-
        /* Calculate atmospheric transmission for this bolometer */
        sc2sim_atmtrans ( inx.lambda, meanatm, &skytrans, status );
        
@@ -425,16 +411,12 @@ int *status                  /* global status (given and returned) */
              The 0.01 is needed because skytrans is a % */
 	 flux = 0.01 * skytrans * astvalue + atmvalue + telemission + spike;
        }	 
-       temp = flux;
        /*  Add photon noise */
        if ( sinx.add_pns == 1 ) {
          sc2sim_addpnoise( sinx.refload, sinx.refnoise, samptime, &flux, 
 			   status );
        }
-       pnoise = (flux-temp);
-       avnoise += pnoise;
-       avnoisesq += (pnoise*pnoise);
-       
+
        /* Add heater, assuming mean heater level is set to add onto meanatm and
 	  TELEMISSION to give targetpow */
        
@@ -485,13 +467,6 @@ int *status                  /* global status (given and returned) */
        }
      }
    }
-
-   dnbol = (double)nbol;
-   avnoise /= dnbol;
-   noisesigma = sqrt(avnoisesq - (avnoise*avnoise)) / dnbol;
-   avatm /= dnbol;
-
-   /*   printf("Atm: %g %g %g %g\n",inx.lambda*1e6, zenatm, avatm, noisesigma);*/
 
    /* Free resources */
 
