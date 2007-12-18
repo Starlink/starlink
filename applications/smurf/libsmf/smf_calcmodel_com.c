@@ -67,6 +67,8 @@
 *        new model for current iteration.
 *     2007-12-14 (EC):
 *        Updated to use bolo-ordered data, disabled boxcar smoothing
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 *     {enter_further_changes_here}
 
 
@@ -266,8 +268,10 @@ void smf_calcmodel_com( smfArray *res, AstKeyMap *keymap,
   }
 
   /* Clean up */
-  if( weight) smf_free( weight, status );
-  if( model_data_copy ) smf_free( model_data_copy, status );
+  if( weight) 
+    weight = smf_free( weight, status );
+  if( model_data_copy ) 
+    model_data_copy = smf_free( model_data_copy, status );
 }
 
 

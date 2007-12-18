@@ -51,6 +51,8 @@
 *        smfArray.sdata is now static array with SMF__MXSMF entries, and
 *        smfArray.ndat is initialized to 0 (incremented with each 
 *        smf_addto_smfArray call)
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -123,7 +125,8 @@ smfArray *smf_create_smfArray( int * status ) {
   return ary;
 
  CLEANUP:
-  smf_free( ary, status );
+  if ( ary ) 
+    ary = smf_free( ary, status );
   
   return NULL;
 }

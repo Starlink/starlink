@@ -67,6 +67,8 @@
 *     2007-07-05 (AGG):
 *        Add status check before accessing gridext pointer to ensure
 *        smooth error reporting
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -352,7 +354,7 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
 	ndfXpt0d( gridstep, ofile->ndfid, "DREAM", "GRID_SIZE", status);
 	ndfAnnul( &gridndf, status );
 
-	smf_free( par, status );
+	par = smf_free( par, status );
 	smf_close_file( &gwtdata, status );
 	smf_close_file( &invdata, status );
 	datAnnul( &weightsloc, status );

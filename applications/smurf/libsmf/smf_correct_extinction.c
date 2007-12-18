@@ -80,11 +80,13 @@
 *        Update calls to slaAirmas to reflect new C interface
 *     2006-07-26 (TIMJ):
 *        sc2head no longer used. Use JCMTState instead.
-*     2008-03-05 (EC):
+*     2007-03-05 (EC):
 *        Return allextcorr.
 *        Check for existence of header.
-*     2008-03-22 (AGG):
+*     2007-03-22 (AGG):
 *        Check for incompatible combinations of data and parameters
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -327,7 +329,10 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
 	 the GRID coordinate frame */
       base = npts * k; /* Offset into 3d data array */
       if (quick) {
+	/* For 2-D data, get airmass from the FITS header rather than
+	   the state structure */
 	if ( ndims == 2 ) {
+	  /* This may change depending on exact FITS keyword */
 	  smf_fits_getD( hdr, "AMSTART", &airmass, status );
 	} else {
 	  airmass = hdr->state->tcs_airmass;
@@ -348,6 +353,10 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
 	     correction term for this bolometer, timeslice */
 	  if( allextcorr ) allextcorr[index] = extcorr;
 	  
+	  /* Scale variances by the extinction correction. This
+	     assumes that the extinction correction is the same for
+	     all points, clearly not true but it may be close
+	     enough. */
 	  /*	if (vardata != NULL && vardata[index] != VAL__BADD) {
 	    vardata[index] *= extcorr*extcorr;
 	    }*/
@@ -378,10 +387,10 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
 
  CLEANUP:
   if (!quick) {
-    smf_free(xin,status);
-    smf_free(yin,status);
-    smf_free(xout,status);
-    smf_free(yout,status);
+    xin = smf_free(xin,status);
+    yin = smf_free(yin,status);
+    xout = smf_free(xout,status);
+    yout = smf_free(yout,status);
   }
-  smf_free(indices,status);
+  indices = smf_free(indices,status);
 }

@@ -34,6 +34,8 @@
 *  History:
 *     2006-07-04 (AGG):
 *        Initial version
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 
 *  Copyright:
 *     Copyright (C) 2006 University of British Columbia.  All Rights
@@ -111,13 +113,12 @@ void smf_close_smfGroup ( smfGroup **group, int *status ) {
       /* Retrieve pointer to array of indices */
       indices = subgroups[i];
       /* Free memory associated with current array of indices */
-      smf_free( indices, status );
+      indices = smf_free( indices, status );
     }
     /* Free pointer to subgroups */
-    smf_free( subgroups, status );
+    subgroups = smf_free( subgroups, status );
 
     /* Finally free the group */
-    smf_free( *group, status);
-    *group = NULL;
+    *group = smf_free( *group, status);
   }
 }

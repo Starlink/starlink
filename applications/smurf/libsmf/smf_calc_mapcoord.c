@@ -67,6 +67,8 @@
 *     2007-12-14 (EC):
 *        -Added flags so that MAPCOORD extensions isn't always generated
 *        -Assert ICD data order
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 
 *  Notes:
 *     This routines asserts ICD data order.
@@ -439,7 +441,7 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
   /* Clean Up */
  CLEANUP:
 
-  if( outmapcoord ) smf_free( outmapcoord, status );
+  if( outmapcoord ) outmapcoord = smf_free( outmapcoord, status );
   if( testsimpmap ) testsimpmap = astAnnul( testsimpmap );
   if( testcmpmap ) testcmpmap = astAnnul( testcmpmap );
   if( map2sky_old ) map2sky_old = astAnnul( map2sky_old );	

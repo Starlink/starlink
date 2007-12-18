@@ -64,6 +64,8 @@
 *        Moved DIMM file parameters to smfFile
 *     2007-09-14 (EC):
 *        Initialize isTordered
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -163,10 +165,10 @@ smf_create_smfData( int flags, int * status ) {
   return data;
 
  CLEANUP:
-  smf_free( &data, status );
-  smf_free( &file, status );
-  smf_free( &hdr, status );
-  smf_free( &da, status );
+  data = smf_free( data, status );
+  file = smf_free( file, status );
+  hdr = smf_free( hdr, status );
+  da = smf_free( da, status );
   
   return NULL;
 }

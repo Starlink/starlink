@@ -49,6 +49,8 @@
 *        Change OBSMODE to SAM_MODE
 *     2007-09-07 (AGG):
 *        Add integer npts for call to ndfMap
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -419,8 +421,8 @@ void smf_dreamsolve( smfData *data, int *status ) {
 			 solint, pbolzero, status );
 
 	/* Free memory allocated for output solution pointers */
-	smf_free( solint, status );
-	smf_free( solme, status );
+	solint = smf_free( solint, status );
+	solme = smf_free( solme, status );
       } /* End loop over cycle */
     }
     /* Add a history entry if everything's OK */

@@ -56,6 +56,8 @@
 *        Initial version
 *     2007-07-16 (EC):
 *        Added copysubgroups
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 
 *  Copyright:
 *     Copyright (C) 2006 University of British Columbia.  All Rights
@@ -161,7 +163,8 @@ smfGroup *smf_construct_smfGroup( Grp *igrp, int **subgroups,
   return group;
 
  CLEANUP:
-  smf_free( &group, status );
+  if ( group )
+    group = smf_free( group, status );
 
   return NULL;
 

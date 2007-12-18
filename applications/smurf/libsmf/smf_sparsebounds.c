@@ -77,6 +77,8 @@
 *        Added hasoffexp argument.
 *     29-OCT-2007 (EC):
 *        Modified interface to smf_open_file.
+*     18-DEC-2007 (AGG):
+*        Update to use new smf_free behaviour
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -278,8 +280,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    rather than RECEPPOS, then free the detpos array in the smfHead
    structure. This will cause smf_tslice_ast to use the fplanex/y values. */
       if( !usedetpos && hdr->detpos ) {
-         smf_free( (double *) hdr->detpos, status );      
-         hdr->detpos = NULL;
+         hdr->detpos = smf_free( (double *) hdr->detpos, status );      
       }
 
 /* We want a description of the spectral WCS axis in the input file. If 

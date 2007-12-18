@@ -37,6 +37,8 @@
 *  History:
 *     2007-09-27 (EC):
 *        Initial Version
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -190,5 +192,5 @@ void smf_fft_filter( smfData *data, double srate, int *status ) {
   /* Clean up */
 
   fftw_free( fft );
-  smf_free( filter, status );
+  filter = smf_free( filter, status );
 }

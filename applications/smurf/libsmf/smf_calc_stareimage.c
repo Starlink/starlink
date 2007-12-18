@@ -42,6 +42,8 @@
 *        Change OBSMODE to SAM_MODE
 *     2007-04-17 (AGG):
 *        Change verbose level for warning message to normal
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -155,7 +157,7 @@ void smf_calc_stareimage( smfData *data, const int naver, int *status) {
       smf_store_image( data, scu2redloc, j, 2, dims, naver, 0, 0, avdata, zero, 
 		       status);
 
-      smf_free( zero, status );
+      zero = smf_free( zero, status );
     }
     /* Add a history entry if everything's OK */
     smf_history_write(data, "smf_calc_stareimage", 

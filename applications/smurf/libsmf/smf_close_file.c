@@ -83,6 +83,8 @@
 *        Check for file descriptor if unmap is required
 *     2007-12-14 (EC)
 *        Unmap the header portion of DIMM files
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -237,7 +239,7 @@ void smf_close_file( smfData ** data, int * status ) {
       freedata = 1;
     }
 
-    smf_free( file, status );
+    (*data)->file = smf_free( (*data)->file, status );
   } else {
     /* no file - data is ours to free */
     freedata = 1;
@@ -258,34 +260,43 @@ void smf_close_file( smfData ** data, int * status ) {
 	  /* make sure we use free() */
 	  free(hdr->allState);
 	} else {
-	  smf_free(hdr->allState, status);
+	  hdr->allState = smf_free(hdr->allState, status);
 	}
       }
-      if (hdr->fplanex) smf_free( hdr->fplanex, status );
-      if (hdr->fplaney) smf_free( hdr->fplaney, status );
-      if (hdr->detpos) smf_free( hdr->detpos, status );
-      if (hdr->tsys) smf_free( hdr->tsys, status );
-      if (hdr->detname) smf_free( hdr->detname, status );
+      if (hdr->fplanex) hdr->fplanex = smf_free( hdr->fplanex, status );
+      if (hdr->fplaney) hdr->fplaney = smf_free( hdr->fplaney, status );
+      if (hdr->detpos) hdr->detpos = smf_free( hdr->detpos, status );
+      if (hdr->tsys) hdr->tsys = smf_free( hdr->tsys, status );
+      if (hdr->detname) hdr->detname = smf_free( hdr->detname, status );
     }
-    smf_free( hdr, status );
+    hdr = smf_free( hdr, status );
+    printf("SMF_CLOSE_FILE: hdr = %p\n",hdr);
   }
 
   /* Now the smfDA itself */
   if ( (*data)->da != NULL ) {
     da = (*data)->da;
-    smf_free( da->flatcal, status );
-    smf_free( da->flatpar, status );
-    smf_free( da, status );
+    da->flatcal = smf_free( da->flatcal, status );
+    da->flatpar = smf_free( da->flatpar, status );
+    da = smf_free( da, status );
   }
 
   /* Free smfDream */
   if ( (*data)->dream != NULL ) {
     dream = (*data)->dream;
     if ( dream->gridwts != NULL) 
-      smf_free( dream->gridwts, status );
+      dream->gridwts = smf_free( dream->gridwts, status );
     if ( dream->invmatx != NULL) 
-      smf_free( dream->invmatx, status );
-    smf_free( dream, status );
+      dream->invmatx = smf_free( dream->invmatx, status );
+    dream= smf_free( dream, status );
+  }
+
+  /* Free up other pointers in the smfData: poly and lut */
+  if ( (*data)->poly != NULL ) {
+    (*data)->poly = smf_free( (*data)->poly, status );
+  }
+  if ( (*data)->lut != NULL ) {
+    (*data)->lut = smf_free( (*data)->lut, status );
   }
 
   /* Free the data arrays if they are non-null (they should have been
@@ -293,8 +304,8 @@ void smf_close_file( smfData ** data, int * status ) {
      in a separate action as temp storage */
   if (freedata) {
     for (i = 0; i < 3; i++ ) {
-      if ( ((*data)->pntr)[i] != NULL ) 
-        smf_free( ((*data)->pntr)[i], status );
+      if ( ((*data)->pntr)[i] != NULL )
+        ((*data)->pntr)[i] = smf_free( ((*data)->pntr)[i], status );
     }
   } else if (isSc2store) {
     /* just the data array */
@@ -302,7 +313,6 @@ void smf_close_file( smfData ** data, int * status ) {
   }
 
   /* finally free smfData */
-  smf_free( *data, status );
-  *data = NULL;
+  *data = smf_free( *data, status );
 
 }

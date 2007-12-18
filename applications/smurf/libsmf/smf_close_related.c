@@ -37,10 +37,12 @@
 *  History:
 *     2006-07-07 (AGG):
 *        Initial version
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia.  All Rights
-*     Reserved.
+*     Copyright (C) 2006-2007 University of British Columbia.  All
+*     Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -106,7 +108,5 @@ void smf_close_related ( smfArray **relfiles, int *status ) {
       smf_close_file( &data, status );
     }
   }
-  smf_free( *relfiles, status );
-  /* Just to be safe - set it to NULL */
-  *relfiles = NULL;
+  *relfiles = smf_free( *relfiles, status );
 }

@@ -34,11 +34,13 @@
 *  History:
 *     2006-07-26 (AGG):
 *        Initial version
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2006-2007 University of British Columbia. All
+*     Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -124,6 +126,6 @@ smfDream *smf_create_smfDream( int * status ) {
   return dream;
 
  CLEANUP:
-  smf_free( &dream, status );
+  dream = smf_free( dream, status );
   return NULL;
 }

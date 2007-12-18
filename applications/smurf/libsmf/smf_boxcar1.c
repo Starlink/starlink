@@ -50,7 +50,9 @@
 *        Change int arguments to size_t
 *     2007-06-27 (EC):
 *        Changed algorithm to calculate a "smooth" boxcar (old algorithm
-*     assigned same smooth value to all samples within disjoint windows)
+*        assigned same smooth value to all samples within disjoint windows)
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -162,7 +164,7 @@ void smf_boxcar1 ( double *series, const size_t ninpts, size_t window, int *stat
   }
 
   /* Clean Up */
-
-  if( seriescopy ) smf_free( seriescopy, status );
+  if ( seriescopy ) 
+    seriescopy = smf_free( seriescopy, status );
 
 }

@@ -103,6 +103,8 @@
 *     2007-12-14 (EC):
 *        -set file access to UPDATE for model components (was READ)
 *        -modified smf_calc_mapcoord interface
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 
 *  Notes:
 
@@ -656,7 +658,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
   /* Cleanup. If memiter set all files get closed here */
 
-  if( modeltyps ) smf_free( modeltyps, status );
+  if( modeltyps ) modeltyps = smf_free( modeltyps, status );
   modeltyps = NULL;
 
   /* fixed model smfGroups */
@@ -686,7 +688,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     }
 
     /* Free array of smfGroup pointers at this time chunk */
-    smf_free( modelgroups, status );
+    modelgroups = smf_free( modelgroups, status );
     modelgroups = NULL;
   }
     
@@ -701,12 +703,10 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	}
 	
 	/* Free array of smfArray pointers for this model */
-	smf_free( model[i], status );
-	model[i] = NULL;
+	model[i] = smf_free( model[i], status );
       }
     }
-    smf_free( model, status );
-    model = NULL;
+    model = smf_free( model, status );
   }
   
   /* finally close igroup */

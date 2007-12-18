@@ -41,6 +41,8 @@
 *  History:
 *     2006-01-09 (AGG):
 *        Initial version.
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -121,5 +123,5 @@ void smf_insert_tslice (smfData **idata, smfData *tdata, int index, int *status 
   }
 
   /* Free tdata so we don't leak memory */
-  smf_free (tdata, status);
+  tdata = smf_free (tdata, status);
 }

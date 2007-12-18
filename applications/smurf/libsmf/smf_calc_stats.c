@@ -68,6 +68,8 @@
 *        - Eliminate GSL calls, now call kpgStatd
 *     2006-07-11 (AGG):
 *        Delete weight-setting code
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -301,6 +303,6 @@ void smf_calc_stats ( const smfData *data, const char *mode, const int index,
 
   /* Free resources */
   if ( statsdata != NULL)
-    smf_free( statsdata, status );
+    statsdata = smf_free( statsdata, status );
 
 }

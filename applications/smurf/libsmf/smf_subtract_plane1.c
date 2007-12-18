@@ -86,10 +86,12 @@
 *        Created smf_subtract_plane1 from original smf_subtract_plane
 *     2007-03-23 (TIMJ):
 *        Only do the output messsages if message filter is suitable.
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia.
+*     Copyright (C) 2006-2007 University of British Columbia.
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -483,15 +485,15 @@ void smf_subtract_plane1( smfData *data, const char *fittype, int *status ) {
 
   /* Free all resources in use */
   CLEANUP:
-  smf_free(xin,status);
-  smf_free(yin,status);
+  xin = smf_free(xin,status);
+  yin = smf_free(yin,status);
   if ( needast ) {
-    smf_free(xout,status);
-    smf_free(yout,status);
-    smf_free(x0,status);
-    smf_free(y0,status);
-    smf_free(ynew,status);
+    xout = smf_free(xout,status);
+    yout = smf_free(yout,status);
+    x0 = smf_free(x0,status);
+    y0 = smf_free(y0,status);
+    ynew = smf_free(ynew,status);
   }
-  smf_free(indices,status);
+  indices = smf_free(indices,status);
 
 }

@@ -44,6 +44,8 @@
 *  History:
 *     2006-09-15 (AGG):
 *        Initial version
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -159,7 +161,7 @@ void smf_dream_getgrid( const AstKeyMap *keymap, double *gridstep, int *ngrid,
       (*gridminmax)[2] = gridymin;
       (*gridminmax)[3] = gridymax;
     } else {
-      smf_free( gridminmax, status );
+      *gridminmax = smf_free( gridminmax, status );
       errRep(FUNC_NAME, "Unable to allocate memory for grid extent array", status);
     }
   } else {

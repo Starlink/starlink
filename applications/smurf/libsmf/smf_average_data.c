@@ -57,6 +57,8 @@
 *     2007-07-06 (AGG):
 *        - Ignore bad values
 *        - Check averaging window is a factor of the number of samples
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -253,7 +255,7 @@ void smf_average_data( const smfData *data, int start,  int nslice,
       }
     }
   } else {
-    smf_free( *avdata, status);
+    *avdata = smf_free( *avdata, status);
   }
 }
 

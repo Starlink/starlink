@@ -49,6 +49,8 @@
 *        Initial test version
 *     2006-05-26 (AGG):
 *        Free allocated resources
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -215,9 +217,9 @@ double smf_calc_covar ( const smfData *data, const int i, const int j,
 
   /* Free resources */
   if ( idata != NULL)
-    smf_free( idata, status );
+    idata = smf_free( idata, status );
   if ( jdata != NULL)
-    smf_free( jdata, status );
+    jdata = smf_free( jdata, status );
 
   return covar;
 

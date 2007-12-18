@@ -34,6 +34,8 @@
 *  History:
 *     2006-07-28 (AGG):
 *        Initial version
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -83,11 +85,9 @@ void smf_close_smfDream( smfDream **dream, int * status ) {
 
   if ( *dream != NULL ) {
     /* Free the pointers associated with the smfDream */
-    smf_free( (*dream)->gridwts, status );
-    smf_free( (*dream)->invmatx, status );
-    smf_free( *dream, status );
-    
-    *dream = NULL;
+    (*dream)->gridwts = smf_free( (*dream)->gridwts, status );
+    (*dream)->invmatx = smf_free( (*dream)->invmatx, status );
+    *dream = smf_free( *dream, status );
   } else {
     if ( *status == SAI__OK ) {
       *status = SAI__ERROR;

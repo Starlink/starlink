@@ -53,6 +53,8 @@
 *     2006-09-18 (AGG):
 *        Initial version, copied from the original version of
 *        smf_subtract_plane
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -401,9 +403,9 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, int *status ) {
 
   CLEANUP:
     if ( needast ) {
-      smf_free(azel, status);
+      azel = smf_free(azel, status);
     }
-    smf_free(indices, status);
+    indices = smf_free(indices, status);
   }
 
   /* Write history entry if we finish with good status. */

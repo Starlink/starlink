@@ -36,6 +36,8 @@
 *        Do not return immediately if status is bad.
 *     2007-11-15 (EC):
 *        Added check for existence of data->file
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 
 *  Notes:
 *     - This function attempts to free resources even if status is bad
@@ -111,8 +113,7 @@ void smf_close_mapcoord( smfData *data, int *status ) {
 
     /* If the LUT pointer is non-null and dofree=1 we should free it */
     if( dofree && data->lut ) {
-      smf_free( data->lut, status );
-      data->lut = NULL;
+      data->lut = smf_free( data->lut, status );
     }
   }
 }

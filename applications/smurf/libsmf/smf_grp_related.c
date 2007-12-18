@@ -60,6 +60,8 @@
 *        Modified interface to smf_open_file; use SMF__NOCREATE_DATA flag.
 *     2007-12-14 (EC):
 *        Actually use SMF__NOCREATE_DATA in smf_open_file call.
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -279,13 +281,13 @@ void smf_grp_related (  Grp *igrp, const int grpsize, const int grpbywave, smfGr
 				   status );
 
  CLEANUP:
-  smf_free( starts, status );
-  smf_free( ends, status );
-  smf_free( nbolx, status );
-  smf_free( nboly, status );
+  starts = smf_free( starts, status );
+  ends = smf_free( ends, status );
+  nbolx = smf_free( nbolx, status );
+  nboly = smf_free( nboly, status );
   if ( *status != SAI__OK ) {
-    smf_free( indices, status );
-    smf_free( subgroups, status );
+    indices = smf_free( indices, status );
+    subgroups = smf_free( subgroups, status );
   }
 
 }

@@ -58,6 +58,8 @@
 *     2007-12-14 (EC):
 *        - fixed LUT re-ordering pointer bug
 *        - extra file existence checking if writing TORDERED FITS entry
+*     2007-12-18 (AGG):
+*        Update to use new smf_free behaviour
 
 *  Notes:
 *     Nothing is done about the FITS channels or WCS information stored in
@@ -310,12 +312,12 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
 	memcpy( oldbuf, newbuf, ndata*sz );
 
 	/* Free newbuf */
-	smf_free( newbuf, status );
+	newbuf = smf_free( newbuf, status );
 
       } else {
 
 	/* Free oldbuf */
-	smf_free( oldbuf, status );
+	oldbuf = smf_free( oldbuf, status );
 
 	/* Set pntr to newbuf */
 	data->pntr[i] = (void *) newbuf;
@@ -400,12 +402,12 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
 	memcpy( oldlut, newlut, ndata*sizeof(*newlut) );
 	
 	/* Free newlut */
-	smf_free( newlut, status );
+	newlut = smf_free( newlut, status );
 	
       } else {
 	
 	/* Free oldlut */
-	smf_free( oldlut, status );
+	oldlut = smf_free( oldlut, status );
 
 	/* Set pntr to newbuf */
 	data->lut = newlut;
