@@ -182,7 +182,27 @@ itcl::class ::gaia3d::Gaia3dVtkImagePlane {
 
    #  Return the current coordinates.
    public method get_position {} {
-      return [$plane_ GetCurrentCursorPosition]
+      lassign [$plane_ GetCurrentCursorPosition] lastx_ lasty_ lastz_
+      return "$lastx_ $lasty_ $lastz_"
+   }
+
+   #  Return the current position and change in position since last call to
+   #  this routine or get_position.
+   public method get_position_and_delta {} {
+      lassign [$plane_ GetCurrentCursorPosition] x y z
+      if { $lastx_ == -1.0 } {
+         set dx 0.0
+         set dy 0.0
+         set dz 0.0
+      } else {
+         set dx [expr $x-$lastx_]
+         set dy [expr $y-$lasty_]
+         set dz [expr $z-$lastz_]
+      }
+      set lastx_ $x
+      set lasty_ $y
+      set lastz_ $z
+      return "$x $y $z $dx $dy $dz"
    }
 
    #  Get the current data value.
@@ -192,6 +212,8 @@ itcl::class ::gaia3d::Gaia3dVtkImagePlane {
 
    #  Handle the start of interaction event. May initiate a callback.
    protected method start_interact_ {} {
+      #  Zero deltas.
+      set lastx_ -1.0
       if { $start_interact_cmd != {} } {
          eval $start_interact_cmd
       }
@@ -202,13 +224,18 @@ itcl::class ::gaia3d::Gaia3dVtkImagePlane {
    #  is not available (not tracking) and we're axis aligned, so we're moving
    #  along axis.
    protected method interact_ {} {
-      if { $interact_cmd != {} } {
-         eval $interact_cmd
-      }
-      if { $move_cmd != {} } {
-         if { ! [has_position] && [is_axis_aligned_] } {
-            eval $move_cmd [get_slice_index]
+      catch {
+         if { $interact_cmd != {} } {
+            eval $interact_cmd
          }
+         if { $move_cmd != {} } {
+            if { ! [has_position] && [is_axis_aligned_] } {
+               eval $move_cmd [get_slice_index]
+            }
+         }
+      } msg
+      if { $msg != {} } {
+         puts $msg
       }
    }
 
@@ -364,9 +391,13 @@ itcl::class ::gaia3d::Gaia3dVtkImagePlane {
    protected variable plane_ {}
    protected variable lookup_ {}
 
+   #  Previously reported position.
+   protected variable lastx_ -1.0
+   protected variable lasty_ -1.0
+   protected variable lastz_ -1.0
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
 #  End of class definition.
 }
-
