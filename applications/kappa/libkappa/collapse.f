@@ -1154,11 +1154,11 @@
          CALL MSG_FMTR( 'WLIM', 'F6.4', WLIM )
          IF ( NFLAG .EQ. AEL ) THEN
             CALL MSG_OUTIF( MSG__NORM, '',
-     :        'WARNING: ^All of the output pixels are set bad due to '/
+     :        'WARNING: All of the output pixels are set bad due to '/
      :        /'an excessive number of bad values along the axis of '/
      :        /'axis of collapse.  If this is undesired, decrease the '/
-     :        /'fraction of good values required with parameter WLIM'/
-     :        /'WLIM (currently ^WLIM).', STATUS )
+     :        /'fraction of good values required with parameter WLIM '/
+     :        /'(currently ^WLIM).', STATUS )
 
 *  There's nothing that can be done if
          ELSE IF ( MAX( 1, NINT( WLIM * REAL( AEL ) ) ) .NE. 1 ) THEN
