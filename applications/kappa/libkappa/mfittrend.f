@@ -316,6 +316,9 @@
 *        Make the original Single method Global, and introduce a new
 *        Single that uses the standard deviation within the line being
 *        filtered.  Made Single method the default.
+*     2007 December 19 (MJC):
+*        Fixed logic bug when using Single mode when no bad pixels are 
+*        present.
 *     {enter_further_changes_here}
 
 *-
@@ -919,7 +922,7 @@
          END IF
  5    CONTINUE
 
-      IF ( USEVAR .OR. HASBAD ) THEN
+      IF ( USEVAR .OR. HASBAD .OR. SINGLE ) THEN
          CALL PSX_CALLOC( AREA * ( ORDER + 1 ) * ( ORDER + 1 ),
      :                    '_DOUBLE', IPAS, STATUS )
       ELSE
