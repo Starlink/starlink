@@ -209,7 +209,7 @@ itcl::class gaia3d::Gaia3dTool {
    #  -----------
    destructor  {
 
-      #  Free the Plot3D. XXX don't do this as the renderer is destructing
+      #  Free the Plot3D. Don't do this as the renderer is destructing
       #  so it's not safe.
       #  free_plot3d_
 
@@ -706,6 +706,8 @@ itcl::class gaia3d::Gaia3dTool {
    protected method line_moved_ {} {
       if { $line_ != {} && $show_spectral_line_ } {
          lassign [$line_ get_description] type desc
+         set last_line_type_ "$type"
+         set last_line_desc_ "$desc"
          if { $type == "p" } {
             eval $itk_option(-gaiacube) set_point_spectrum_position $desc
          } else {
@@ -738,8 +740,16 @@ itcl::class gaia3d::Gaia3dTool {
          set index [$imagedata_ pixel2grid \
                        [$itk_option(-gaiacube) get_axis] $plane]
          incr index -1
-         $plane_ set_slice_index $index
-         $renwindow_ render
+         
+         #  Avoid unnecessary updates.
+         if { [$plane_ get_slice_index] != $index } {
+            $renwindow_ set_rate_to_desired
+            catch {
+               $plane_ set_slice_index $index
+               $renwindow_ render
+            }
+            $renwindow_ set_rate_to_still
+         }
       }
    }
 
@@ -762,14 +772,24 @@ itcl::class gaia3d::Gaia3dTool {
    #  Set position of spectral line, when moved by GAIA.
    public method set_spectral_line {type args} {
       if { $show_spectral_line_ && $line_ != {} } {
-         if { $type == "p" } {
-            set ix [expr [lindex $args 0] -1]
-            set iy [expr [lindex $args 1] -1]
-            $line_ set_description p "$ix $iy"
-         } else {
-            $line_ set_description $type $args
+         
+         #  Avoid unnecessary updates.
+         if { $last_line_type_ != "$type" || $last_line_desc_ != "$args" } {
+
+            #  Fast LOD updates for volumes.
+            $renwindow_ set_rate_to_desired
+            catch {
+               if { $type == "p" } {
+                  set ix [expr [lindex $args 0] -1]
+                  set iy [expr [lindex $args 1] -1]
+                  $line_ set_description p "$ix $iy"
+               } else {
+                  $line_ set_description $type $args
+               }
+               $renwindow_ render
+            }
+            $renwindow_ set_rate_to_still
          }
-         $renwindow_ render
       }
    }
 
@@ -1193,6 +1213,10 @@ itcl::class gaia3d::Gaia3dTool {
 
    #  Whether to clip data to the extraction limits.
    protected variable apply_extraction_limits_ 1
+
+   #  The last line description sent to GAIA.
+   protected variable last_line_type_ {}
+   protected variable last_line_desc_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

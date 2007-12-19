@@ -224,18 +224,13 @@ itcl::class ::gaia3d::Gaia3dVtkImagePlane {
    #  is not available (not tracking) and we're axis aligned, so we're moving
    #  along axis.
    protected method interact_ {} {
-      catch {
-         if { $interact_cmd != {} } {
-            eval $interact_cmd
+      if { $interact_cmd != {} } {
+         eval $interact_cmd
+      }
+      if { $move_cmd != {} } {
+         if { ! [has_position] && [is_axis_aligned_] } {
+            eval $move_cmd [get_slice_index]
          }
-         if { $move_cmd != {} } {
-            if { ! [has_position] && [is_axis_aligned_] } {
-               eval $move_cmd [get_slice_index]
-            }
-         }
-      } msg
-      if { $msg != {} } {
-         puts $msg
       }
    }
 

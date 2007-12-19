@@ -121,7 +121,10 @@ itcl::class gaia3d::Gaia3dVtkWindow {
    #  calls to render so that they will be skipped (as they unwind with no
    #  VTK updates between them, at least I think that's what occurs).
    public method queue_render {} {
-      after 10 [code $this render]
+      after 10 [code $this interactor_render_]
+   }
+   protected method interactor_render_ {} {
+      $interactor_ Render
    }
 
    #  Stop rendering.
@@ -186,15 +189,29 @@ itcl::class gaia3d::Gaia3dVtkWindow {
    }
 
    #  Set the non-interacting minimum update rate required. Determines what
-   #  mapper is used by a level of detail object when not interacting.
-   public method set_min_update_rate {value} {
+   #  mapper is used by a level of detail actor when not interacting.
+   public method set_interactor_still_update_rate {value} {
       [get_interactor] SetStillUpdateRate $value
    }
 
    #  Set the interacting minimum update rate required. Determines what
-   #  mapper is used by a level of detail object when interacting.
-   public method set_interactive_update_rate {value} {
+   #  mapper is used by a level of detail actor when interacting via the mouse.
+   public method set_interactor_desired_update_rate {value} {
       [get_interactor] SetDesiredUpdateRate $value
+   }
+
+   #  Set the expected update rate of the window to the currently desired
+   #  value of the interactor. Call this when interacting with the scene and
+   #  not using the interactor (i.e. mouse) so that the interactive response of
+   #  level of detail actors is used. Undo with set_rate_to_still.
+   public method set_rate_to_desired {} {
+      $renwindow_ SetDesiredUpdateRate [[get_interactor] GetDesiredUpdateRate]
+   }
+
+   #  Set the render window to use the still rate as the desired rate. Undoes
+   #  effects of set_rate_to_desired.
+   public method set_rate_to_still {} {
+      $renwindow_ SetDesiredUpdateRate [[get_interactor] GetStillUpdateRate]
    }
 
    #  Set the interactor mousing mode, trackerball or joystick (default).
@@ -228,7 +245,7 @@ itcl::class gaia3d::Gaia3dVtkWindow {
    public method set_camera {x y z} {
       [$renderer_ GetActiveCamera] SetPosition $x $y $z
       [$renderer_ GetActiveCamera] SetViewUp 0 0 1
-  }
+   }
 
    #  Create a widget to display the renderer image, adding a renderer
    #  and setting up the default interactions.
@@ -283,7 +300,7 @@ itcl::class gaia3d::Gaia3dVtkWindow {
       ::update
    }
 
-   #  Get the renderer (XXX don't use).
+   #  Get the renderer (don't use).
    public method get_renderer {} {
       return $renderer_
    }
@@ -300,7 +317,7 @@ itcl::class gaia3d::Gaia3dVtkWindow {
 
    #  Add bindings to control the scene view from the keyboard. These are
    #  needed for case when other interactions are occupying the mouse and
-   #  some people like the additional accuracy they provide. Based around 
+   #  some people like the additional accuracy they provide. Based around
    #  the arrow keys with various modifiers. Note all work on the camera
    #  not the actors, regardless.
    protected method add_keyboard_bindings_ {} {
@@ -314,7 +331,7 @@ itcl::class gaia3d::Gaia3dVtkWindow {
       ::bind $itk_component(renwidget) <Right> [code $this rotate_leftright -5]
       ::bind $itk_component(renwidget) <Control-Left> [code $this rotate_leftright 1]
       ::bind $itk_component(renwidget) <Control-Right> [code $this rotate_leftright -1]
-      
+
       # Zoom
       ::bind $itk_component(renwidget) <Shift-Up> [code $this zoom 1.02]
       ::bind $itk_component(renwidget) <Shift-Down> [code $this zoom 0.98]
@@ -336,10 +353,17 @@ itcl::class gaia3d::Gaia3dVtkWindow {
       ::bind $itk_component(renwidget) <Shift-Right> [code $this roll -5]
       ::bind $itk_component(renwidget) <Control-Shift-Left> [code $this roll 1]
       ::bind $itk_component(renwidget) <Control-Shift-Right> [code $this roll -1]
+
+      # Undo
+      ::bind $itk_component(renwidget) <KeyRelease-Up> [code $this set_rate_to_still]
+      ::bind $itk_component(renwidget) <KeyRelease-Down> [code $this set_rate_to_still]
+      ::bind $itk_component(renwidget) <KeyRelease-Left> [code $this set_rate_to_still]
+      ::bind $itk_component(renwidget) <KeyRelease-Right> [code $this set_rate_to_still]
    }
 
    #  Rotate the camera position in up direction by incr degrees.
    public method rotate_updown {incr} {
+      set_rate_to_desired
       set camera [$renderer_ GetActiveCamera]
       $camera Elevation $incr
       $camera OrthogonalizeViewUp
@@ -348,6 +372,7 @@ itcl::class gaia3d::Gaia3dVtkWindow {
 
    #  Rotate the camera position in right direction by incr degrees.
    public method rotate_leftright {incr} {
+      set_rate_to_desired
       set camera [$renderer_ GetActiveCamera]
       $camera Azimuth $incr
       $camera OrthogonalizeViewUp
@@ -356,6 +381,7 @@ itcl::class gaia3d::Gaia3dVtkWindow {
 
    #  Zoom (dolly) camera in or out by the given factor (1+/-).
    public method zoom {factor} {
+      set_rate_to_desired
       set camera [$renderer_ GetActiveCamera]
       if { [$camera GetParallelProjection] } {
          set parallelScale [expr [$camera GetParallelScale] * $factor];
@@ -369,6 +395,7 @@ itcl::class gaia3d::Gaia3dVtkWindow {
 
    #  Scroll camera position by the given increments in the X and Y directions.
    public method scroll {xincr yincr} {
+      set_rate_to_desired
       set camera [$renderer_ GetActiveCamera]
 
       set centre [$renwindow_ GetSize]
@@ -405,22 +432,23 @@ itcl::class gaia3d::Gaia3dVtkWindow {
          set RPoint1 [expr $RPoint1 / $RPoint3]
          set RPoint2 [expr $RPoint2 / $RPoint3]
       }
-      
+
       $camera SetFocalPoint \
          [expr ($FPoint0 - $RPoint0)/2.0 + $FPoint0] \
          [expr ($FPoint1 - $RPoint1)/2.0 + $FPoint1] \
          [expr ($FPoint2 - $RPoint2)/2.0 + $FPoint2]
-      
+
       $camera SetPosition \
          [expr ($FPoint0 - $RPoint0)/2.0 + $PPoint0] \
          [expr ($FPoint1 - $RPoint1)/2.0 + $PPoint1] \
          [expr ($FPoint2 - $RPoint2)/2.0 + $PPoint2]
-      
+
       queue_render
    }
 
    #  Roll the camera by incr degrees.
    public method roll {incr} {
+      set_rate_to_desired
       set camera [$renderer_ GetActiveCamera]
       $camera Roll $incr
       $camera OrthogonalizeViewUp
