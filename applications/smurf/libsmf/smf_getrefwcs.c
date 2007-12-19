@@ -127,15 +127,17 @@ void smf_getrefwcs( const char *param, AstFrameSet **specwcs,
    } else {
       ndfGtwcs( refndf, &refwcs, status ); 
 
-/* We no longer need the NDF so annul it. */
+/* We no longer need the NDF so annul it. For some reason, we also need
+   to cancel the parameter, otherwise some HDS locators for the NDF object
+   are left dangling. */
       ndfAnnul( &refndf, status );
+      parCancl( param, status );
 
-/* Since astConvert converts between current Frames, we need to ensure
-   that the PIXEL Frame is the current Frame in the refernce WCS. This means
-   that astConvert will return us the mapping from PIXEL coords to the 
-   required WCS coords. The NDF libray ensures that the PIXEL Frame is
-   always frame 2. */
-      astSetI( refwcs, "Current", 2 );
+/* We want astFindFrame to return us the conversion from PIXEL coords to
+   celestial or spectral coords, so we need to make the PIXEL Frame the
+   base Frame in the reference WCS FrameSet. The NDF libray ensures that 
+   the PIXEL Frame is always frame 2. */
+      astSetI( refwcs, "Base", 2 );
 
 /* First look for the spatial WCS. Create a SkyFrame that we can use as a
    template for searching the reference WCS. Set a high value for MaxAxes 
@@ -144,9 +146,9 @@ void smf_getrefwcs( const char *param, AstFrameSet **specwcs,
    the sky axes in the reference WCS is preserved. */
       template = (AstFrame *) astSkyFrame( "MaxAxes=7,PreserveAxes=1" );
 
-/* Use astConvert to search the reference WCS for a SkyFrame. This search
+/* Use astFindFrame to search the reference WCS for a SkyFrame. This search
    includes the component Frames contained within CmpFrames. */
-      fs = astConvert( refwcs, template, "" );
+      fs = astFindFrame( refwcs, template, "" );
 
 /* If a SkyFrame was found... */
       if( fs ) {
@@ -187,9 +189,9 @@ void smf_getrefwcs( const char *param, AstFrameSet **specwcs,
    more than 1 axis). */
       template = (AstFrame *) astDSBSpecFrame( "MaxAxes=7" );
 
-/* Use astConvert to search the reference WCS for a DSBSpecFrame. This search
+/* Use astFindFrame to search the reference WCS for a DSBSpecFrame. This search
    includes the component Frames contained within CmpFrames. */
-      fs = astConvert( refwcs, template, "" );
+      fs = astFindFrame( refwcs, template, "" );
 
 /* If a DSBSpecFrame was found... */
       if( fs ) {
@@ -219,7 +221,7 @@ void smf_getrefwcs( const char *param, AstFrameSet **specwcs,
 /* Create the returned spectral FrameSet. */
             *specwcs = astFrameSet( gfrm, "" );
             astInvert( splitmap );
-            astAddFrame( *spacewcs, AST__BASE, splitmap, cfrm );
+            astAddFrame( *specwcs, AST__BASE, splitmap, cfrm );
          }                        
       }
    }

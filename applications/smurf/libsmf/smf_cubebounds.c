@@ -187,6 +187,8 @@
 *        - Remove the SMF__NOCREATE_DATA flag in the call to smf_open_file.
 *     18-DEC-2007 (AGG):
 *        Update to use new smf_free behaviour
+*     19-DEC-2007 (DSB):
+*        Correct the way reference WCS is handled.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -330,6 +332,15 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    the next one to be initialised. */
    *boxes = astMalloc( sizeof( smfBox )*size );
    box = *boxes;
+
+/* If a reference NDF was supplied, the spectral Mapping (from output
+   spectral to interim GRID) and Frame (a SpecFrame) are obtained from the 
+   supplied spectral reference NDF. Otherwise, these pointers will be set 
+   later from the first input NDF. */
+   if( specrefwcs ) {
+      ospecframe = astGetFrame( specrefwcs, AST__CURRENT );
+      ospecmap = astGetMapping( specrefwcs, AST__CURRENT, AST__BASE );
+   } 
 
 /* Loop round all the input NDFs. */
    for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++, box++ ) {
@@ -482,13 +493,15 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    coord to spectral coord. */
       astInvert( specmap );
 
-/* If this is the first input file, initialise the bounds of the spectral 
-   axis in the output cube. */
-      if( !ospecframe ) {
+/* If this is the first input file, and the output is inheriting the
+   spectral WCS from the first input file, initialise the bounds of the 
+   spectral axis in the output cube. */
+      if( !ospecframe && !specrefwcs ) {
          dlbnd[ 2 ] = 1.0;
          dubnd[ 2 ] = (data->dims)[ 0 ];
 
-/* If this is not the first input file, then there is potentially a
+/* If this is not the first input file, or if we are copying spectral WCS
+   from a reference NDF to the output NDF, then there is potentially a
    difference between the spectral system of this input file and the spectral
    system of the output cube. So use astConvert to get a Mapping from one
    to the other. */
@@ -519,6 +532,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                                ospecmap, 1, "" );
 
          }
+
 
 /* Use this Mapping to transform the first and last spectral values
    in the input into the corresponding values on the output spectral
@@ -590,15 +604,16 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    in the interim grid system have been found. */
          if( *wcsout == NULL && *status == SAI__OK ) { 
 
-/* The spectral Mapping (from interim GRID to SPECTRUM) and Frame (a SpecFrame)
-   are obtained from the supplied spectral reference NDF, or are inherited 
-   from the first input file. */
-            if( specrefwcs ) {
-               ospecframe = astGetFrame( specrefwcs, AST__CURRENT );
-               ospecmap = astGetMapping( specrefwcs, AST__BASE, AST__CURRENT );
-            } else {
+/* If no reference NDF was supplied, the spectral Mapping (from interim GRID 
+   to SPECTRUM) and Frame (a SpecFrame) are obtained from the first input 
+   file. If a spectral Mapping was obtained from the reference NDF, then
+   invert it so that he "ospecmap" mapping goes from grid to spectral coords
+   which ever way it was obtained. */
+            if( !specrefwcs ) {
                ospecframe = astClone( specframe );
                ospecmap = astClone( specmap );
+            } else {
+               astInvert( ospecmap );
             }
 
 /* Ensure the specframe has the same epoch as the supplied SkyFrame. */
@@ -606,7 +621,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                astSetC( ospecframe, "Epoch", astGetC( oskyframe, "Epoch" ) ); 
             }           
 
-/* Now create a spatial Mappign. If this has been supplied in "spacerefwcs",  
+/* Now create a spatial Mapping. If this has been supplied in "spacerefwcs",  
    get it. */
             if( spacerefwcs ) {
                oskymap = astGetMapping( spacerefwcs, AST__BASE, AST__CURRENT );
@@ -678,7 +693,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
             astInvert( ospecmap );
          }
 
-/* Find out how to convert from input GRID coords (i.e. detetcor index) to 
+/* Find out how to convert from input GRID coords (i.e. detector index) to 
    the output sky frame. Note, we want absolute sky coords here, even if the 
    target is moving. Record the original base frame before calling astConvert
    so that it can be re-instated later (astConvert modifies the base Frame). */
@@ -983,6 +998,12 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       lbnd[ 2 ] -= ishift;
       ubnd[ 2 ] -= ishift;
    }
+
+
+printf("floating point spectral bounds: %g:%g \n", dlbnd[2], dubnd[2] );
+printf("integer spectral bounds: %d:%d \n", lbnd[2], ubnd[2] );
+
+
 
 /* Now remap the interrim GRID Frame in the returned FrameSet so that it
    represent actual GRID coords in the output cube. */

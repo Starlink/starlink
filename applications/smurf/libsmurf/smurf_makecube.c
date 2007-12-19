@@ -666,6 +666,8 @@
 *        Added parameter REF.
 *     18-DEC-2007 (AGG):
 *        Update to use new smf_free behaviour
+*     19-DEC-2007 (DSB):
+*        Correct the way reference WCS is handled.
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -731,7 +733,6 @@ void smurf_makecube( int *status ) {
 /* Local Variables */
    AstFitsChan *fchan = NULL; /* FitsChan holding output NDF FITS extension */
    AstFrame *ospecfrm = NULL; /* SpecFrame from the output WCS Frameset */
-   AstFrame *spacerefframe = NULL;/* Spatial reference Frame */
    AstFrame *tfrm = NULL;     /* Current Frame from output WCS */
    AstFrameSet *spacerefwcs = NULL;/* WCS Frameset for spatial reference axes */
    AstFrameSet *specrefwcs = NULL;/* WCS Frameset for spectral reference axis */
@@ -938,7 +939,7 @@ void smurf_makecube( int *status ) {
    of "detgrp" if needed so that it always holds a list of detectors to be
    included (not excluded). */
    smf_cubegrid( igrp,  size, system, usedetpos, autogrid, detgrp, 
-                 spacerefframe ? NULL : par, &moving, &oskyfrm, 
+                 spacerefwcs ? NULL : par, &moving, &oskyfrm, 
                  &sparse, &hastsys, status );
 
 /* If we have spatial reference WCS, use the SkyFrame from the spatial 

@@ -155,6 +155,8 @@
 *        Modified interface to smf_open_file.
 *     18-DEC-2007 (AGG):
 *        Update to use new smf_free behaviour
+*     19-DEC-2007 (DSB):
+*        Correct the way reference WCS is handled.
 *     {enter_further_changes_here}
 
 *  Copyright:
