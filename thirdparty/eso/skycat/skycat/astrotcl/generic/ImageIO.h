@@ -39,6 +39,7 @@
  */
 
 #include <iostream>
+#include <cstdlib>
 #include <cmath>
 #include "WCSRep.h"
 #include "Mem.h"
