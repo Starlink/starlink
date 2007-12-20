@@ -23,7 +23,7 @@
 #endif 
 
 #include <stdio.h>
-#include <string>
+#include <cstring>
 
 #include "DICOMConfig.h"
 #include "DICOMFile.h"

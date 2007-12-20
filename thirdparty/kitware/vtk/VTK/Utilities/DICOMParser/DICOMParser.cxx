@@ -36,7 +36,7 @@
 #include <sys/types.h>
 #endif
 
-#include <string>
+#include <cstring>
 
 #include "DICOMConfig.h"
 #include "DICOMParser.h"
