@@ -1,9 +1,0 @@
-# ####################################
-# DREAM-specific simulation parameters
-# ####################################
-
-# Number of times to repeat the DREAM pattern
-ncycle=1
-
-# SMU timing error (ms)
-smu_terr=0.0
