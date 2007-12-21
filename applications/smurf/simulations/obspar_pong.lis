@@ -1,0 +1,25 @@
+# ####################################
+# PONG-specific observation parameters
+# ####################################
+
+# Select PONG observing mode
+obsmode=pong
+
+# Select TYPE of PONG pattern to use: straight or curve
+pong_type=curve
+
+# Maximum scan velocity (arcsec/s). Upper limit is 600 arcsec/s.
+vmax=200.0
+
+# Spacing of successive scans in the pattern (arcsec)
+spacing=240.0
+
+# Size of area to be mapped (arcsec)
+height=3600.0
+width=3600.0
+
+# Angle of scan direction relative to coordinate frame (radians)
+scan_angle=0.0
+
+# Number of times to repeat the map (default 1)
+nmaps=1
