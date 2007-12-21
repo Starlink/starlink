@@ -497,7 +497,6 @@
 
 /* STARLINK includes */
 #include "ast.h"
-#include "fitsio.h"
 #include "mers.h"
 #include "par.h"
 #include "par_par.h"
