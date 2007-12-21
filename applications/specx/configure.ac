@@ -57,6 +57,7 @@ AC_CHECK_FUNCS([ieee_handler])
 
 AC_FC_MAIN
 STAR_CNF_COMPATIBLE_SYMBOLS
+STAR_PRM_COMPATIBLE_SYMBOLS
 
 dnl    Need to find readline library
 dnl    Sometimes it also requires termcap so if readline does not
