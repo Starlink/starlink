@@ -591,7 +591,7 @@ float fred_() {
 # Define the global symbol used to access the Fortran blank common block.
 # Usually under UNIX this is _BLNK__, but gfortran uses __BLNK__, so we
 # need to check for that. Gfortran is just detected by being a GNU compiler
-# and having "Fortran 95" as part of its --version output.
+# and having "Fortran (GCC) 4.x[x].x[x]" as part of its --version output.
 #
 # The effect of this macro is to substitute BLANK_COMMON_SYMBOL with
 # the expected value.
@@ -602,7 +602,7 @@ AC_DEFUN([STAR_CNF_BLANK_COMMON],
        [AC_REQUIRE([AC_PROG_FC])
        star_cv_blank_common_symbol=_BLNK__
        if test "$ac_cv_fc_compiler_gnu" = yes; then
-            if "$FC" --version 2>&1 < /dev/null | grep 'Fortran 95' > /dev/null; then
+            if "$FC" --version 2>&1 < /dev/null | grep 'GNU Fortran.*[[4-9]]\.[[0-9]][[0-9]]*\.[[0-9]][[0-9]]*' > /dev/null; then
                 star_cv_blank_common_symbol=__BLNK__
             fi
        fi])
@@ -1531,9 +1531,9 @@ fi
 # optional (docs say that heap initialisation relies on the startup call).
 #
 # The test for g95 relies on the output from `g95 --version' containing the
-# string "G95". Gfortran requires "Fortran 95".  Note that this whole area
-# probably needs rethinking as g95 also has a g95_runtime_stop() function,
-# that should be called.
+# string "G95". Gfortran requires "GNU Fortran (GCC) 4+.x[x].x[x]".  Note that
+# this whole area probably needs rethinking as g95 also has a g95_runtime_stop()
+# function, that should be called.
 #
 # Intel Fortran needs the for_rtl_init_ function, there is also a
 # for_rtl_finish_ to run during closedown. The intel compiler signature
@@ -1547,7 +1547,7 @@ AC_DEFUN([STAR_INITIALISE_FORTRAN],
        if test "$ac_cv_fc_compiler_gnu" = yes; then
             if "$FC" --version 2>&1 < /dev/null | grep 'G95' > /dev/null; then
                 star_cv_initialise_fortran=g95-start
-            elif "$FC" --version 2>&1 < /dev/null | grep 'Fortran 95' > /dev/null; then
+            elif "$FC" --version 2>&1 < /dev/null | grep 'GNU Fortran.*[[4-9]]\.[[0-9]][[0-9]]*\.[[0-9]][[0-9]]*' > /dev/null; then
                 star_cv_initialise_fortran=gfortran-setarg
             elif "$FC" --version 2>&1 < /dev/null | grep 'IFORT' > /dev/null; then
                 star_cv_initialise_fortran=ifort-setarg
