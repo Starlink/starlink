@@ -1,6 +1,19 @@
-# ####################################
-# PONG-specific observation parameters
-# ####################################
+# ##################################################################
+#          EXAMPLE PONG OBSERVATION PARAMETERS
+# ##################################################################
+
+# RA/Dec as HH/DD:MM:SS.S
+ra=00:00:00.0
+dec=00:00:00.0
+
+# Pick your wavelength (m)
+lambda=0.85e-3
+
+# Start observing on this date (UT MJD)
+mjdaystart=53997.5
+
+# Sample time (s)
+steptime=5.0e-3
 
 # Select PONG observing mode
 obsmode=pong
