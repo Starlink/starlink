@@ -141,7 +141,8 @@
 
    	  IF ( type .eq. '_LOGICAL' ) THEN
             CALL DAT_MAPV(LOC,TYPE,'WRITE',PTR,NVAL,STATUS)
-	    CALL HREAD_LPUT ( LUN, BINARY,%VAL(CNF_PVAL(PTR)),NVAL,STATUS)
+	    CALL HREAD_LPUT ( LUN, BINARY,%VAL(CNF_PVAL(PTR)),NVAL,
+     &                        STATUS)
 	  ELSEIF (( type .eq. '_INTEGER' )  .OR.
      &         ( type .eq. '_UWORD'   )  .OR.
      &         ( type .eq. '_WORD'    )  .OR.
