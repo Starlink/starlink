@@ -1,0 +1,65 @@
+# ##################################################################
+#          EXAMPLE STARE SIMULATION PARAMETERS
+# ##################################################################
+
+# List of subarrays to simulate data for (semi-colon separated). 
+subname=s8a;s8b;s8c;s8d
+
+# Name of model atmosphere file
+atmname=atm.sdf
+
+# Name of model astronomical sky file
+astname=candycanes.sdf
+
+# Add a model atmosphere to the simulation? A mean sky level is always
+# calculated (derived from tauzen), but setting this flag will add sky
+# fluctuations from the model atmosphere file
+add_atm=1
+
+# Add photon noise? If this is turned out you get white noise added to
+# the data from an NEFD that is derived to be consistent with the mean sky
+# level and choice of tauzen
+add_pns=1
+
+# Add 1/f noise? If set independent 1/f (low-frequency) noise is added.
+add_fnoise=0
+
+# Zenith opacity at 225 GHz
+tauzen=0.05
+
+# Telescope background emission per detector (pW), typically 4/29 pW
+# at 850/450 um respectively
+telemission=4.0
+
+# Instead of specifying bandGHz and aomega, we now use the following 3 
+# parameters to control the model for bolometer white noise:
+
+# The conversion from Jy to pW EXCLUDING ATMOSPHERIC TRANSMISSION. A guess
+# for 850um is 2.3e-3 pW/Jy, and 7.7e-3 pW/Jy at 450um 
+jy2pw=2.3e-3
+
+# The optical power of a reference load for the bolometer noise model. Use
+# 7.4 pW at 850um and 85 pW at 450um
+refload=7.4
+
+# The noise equivalent power (NEP) for the reference load. Use
+# 6.5e-5 pW/sqrt(Hz) at 850um and 2.9e-4 pW at 450um
+refnoise=6.5e-5
+
+# Spikes: t0 = mean time between spikes in seconds, p0 is the minimum
+# power, and p1 the maximum power, in non-extinction corrected Jy, and
+# alpha is the index of a p-law distribution for the spikes: 
+# n(P) = A p^alpha where A is a scale chosen to normalize this curve
+# integrated from p0 to p1. Alpha = -1.5 roughly matches the energy
+# spectrum of cosmic ray hits detected with BLAST at an altitude of
+# about 40 km.
+
+spike_t0        = 20
+spike_p0        = 1
+spike_p1        = 1000
+spike_alpha     = -1.5
+
+# Ambient temperature at start and end of simulation, used for
+# calculating water-vapour brightness temperatures (deg C)
+atstart=5.0
+atend=5.0
