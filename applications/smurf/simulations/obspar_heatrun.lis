@@ -1,0 +1,23 @@
+# #######################################
+# HEATRUN-specific observation parameters
+# #######################################
+
+# Select the HEATRUN observing mode
+obsmode=heatrun
+
+# Name of desired flatfield method: TABLE or POLYNOMIAL
+flatname=TABLE
+
+# Heater settings for TABLE: note the start and increment are
+# wavelength dependent. See the general simfile.lis for information on
+# the relative atmospheric power at 850/450 um.
+
+# Starting heater power (pW)
+heatstart=24.2
+
+# Increment in heater power (pW)
+heatstep=0.01
+
+# Number of steps to increment heater power
+heatnum=150
+
