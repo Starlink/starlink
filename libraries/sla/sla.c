@@ -74,6 +74,8 @@
 *        Add SLA_RDPLAN
 *     03-APR-2007 (TIMJ):
 *        Add SLA_DR2TF
+*     14-DEC-2007 (TIMJ):
+*        Add slaDafin, Add slaMap
 *-
 */
 
@@ -995,6 +997,55 @@ void slaMappa ( double eq, double date, double amprms[21] ) {
    for ( i = 0; i < 21; i++ ) amprms[ i ] = AMPRMS[ i ];
 }
 
+F77_SUBROUTINE(sla_map)(DOUBLE(RM), DOUBLE(DM),
+			DOUBLE(PR), DOUBLE(PD),
+			DOUBLE(PX),
+			DOUBLE(RV),
+			DOUBLE(EQ),
+			DOUBLE(DATE),
+			DOUBLE(RA), DOUBLE(DA) );
+
+void
+slaMap( double rm, double dm, double pr, double pd, double px,
+	double rv, double eq, double date, double * ra, double * da ) {
+  DECLARE_DOUBLE(RM);
+  DECLARE_DOUBLE(DM);
+  DECLARE_DOUBLE(PR);
+  DECLARE_DOUBLE(PD);
+  DECLARE_DOUBLE(PX);
+  DECLARE_DOUBLE(RV);
+  DECLARE_DOUBLE(EQ);
+  DECLARE_DOUBLE(DATE);
+  DECLARE_DOUBLE(RA);
+  DECLARE_DOUBLE(DA);
+
+  F77_EXPORT_DOUBLE(rm,RM);
+  F77_EXPORT_DOUBLE(dm,DM);
+  F77_EXPORT_DOUBLE(pr,PR);
+  F77_EXPORT_DOUBLE(pd,PD);
+  F77_EXPORT_DOUBLE(px,PX);
+  F77_EXPORT_DOUBLE(rv,RV);
+  F77_EXPORT_DOUBLE(eq,EQ);
+  F77_EXPORT_DOUBLE(date,DATE);
+
+  F77_CALL(sla_map)( DOUBLE_ARG(&RM),
+		     DOUBLE_ARG(&DM),
+		     DOUBLE_ARG(&PR),
+		     DOUBLE_ARG(&PD),
+		     DOUBLE_ARG(&PX),
+		     DOUBLE_ARG(&RV),
+		     DOUBLE_ARG(&EQ),
+		     DOUBLE_ARG(&DATE),
+		     DOUBLE_ARG(&RA),
+		     DOUBLE_ARG(&DA)
+		     );
+
+
+  F77_IMPORT_DOUBLE(RA, *ra);
+  F77_IMPORT_DOUBLE(DA, *da);
+}
+
+
 F77_SUBROUTINE(sla_mapqkz)( DOUBLE(RM),
                             DOUBLE(DM),
                             DOUBLE_ARRAY(AMPRMS),
@@ -1679,4 +1730,28 @@ slaRdplan( double date, int i, double elong, double phi,
   F77_IMPORT_DOUBLE( RA, *ra );
   F77_IMPORT_DOUBLE( DEC, *dec );
   F77_IMPORT_DOUBLE( DIAM, *diam );
+}
+
+F77_SUBROUTINE(sla_dafin)( CHARACTER(STRING), INTEGER(IPTR), DOUBLE(A),
+			   INTEGER(J) TRAIL(STRING) );
+
+void
+slaDafin( char * string, int * iptr, double *a, int *j ) {
+
+  DECLARE_CHARACTER_DYN(STRING);
+  DECLARE_DOUBLE(A);
+  DECLARE_INTEGER(IPTR);
+  DECLARE_INTEGER(J);
+
+  F77_EXPORT_INTEGER( *iptr, IPTR );
+  F77_CREATE_EXPORT_CHARACTER( string, STRING );
+
+  F77_CALL(sla_dafin)( CHARACTER_ARG(STRING), INTEGER_ARG(&IPTR),
+		       DOUBLE_ARG(&A), INTEGER_ARG(&J) TRAIL_ARG(STRING) );
+
+  F77_IMPORT_INTEGER(IPTR, *iptr );
+  F77_IMPORT_INTEGER(J, *j );
+  F77_IMPORT_DOUBLE(A, *a );
+  F77_FREE_CHARACTER(STRING);
+
 }
