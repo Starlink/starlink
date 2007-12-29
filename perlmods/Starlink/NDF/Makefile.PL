@@ -9,9 +9,9 @@ eval "use Starlink::Config qw/ :override :verbose /;";
 if ($@) {
   print "Could not find Starlink::Config - using /star\n";
   %StarConfig = (
-                 Star_Inc => $ENV{STARLINK} . '/include',
-                 Star_Lib => $ENV{STARLINK} . '/lib',
-		 Star_Bin => $ENV{STARLINK} . '/bin',
+                 Star_Inc => '/star/include',
+                 Star_Lib => '/star/lib',
+		 Star_Bin => '/star/bin',
                 );
 }
 
