@@ -686,7 +686,7 @@ int StarFitsIO::saveCompressedImage( const char *filename )
     int bitpix = 0;
     int bytepix = 0;
     int datatype = 0;
-    long naxes[2];
+    long naxes[7];
     int naxis = 0;
     int status = 0;
     long nbytes = 0;
@@ -711,14 +711,15 @@ int StarFitsIO::saveCompressedImage( const char *filename )
         return cfitsio_error();
     }
 
-    //  Get image dimensions and total number of pixels in image.
-    naxes[0] = 1;
-    naxes[1] = 1;
-    fits_get_img_param( fitsio_, 2, &bitpix, &naxis, naxes, &status );
+    //  Get dimensions and total number of pixels (may be higher dimensional
+    //  than an image, allow that up to the usual 7).
+    for ( int i = 0; i < 7; i++ ) naxes[i] = 1;
+    fits_get_img_param( fitsio_, 7, &bitpix, &naxis, naxes, &status );
     if ( status != 0 ) {
         return cfitsio_error();
     }
-    npix = naxes[0] * naxes[1];
+    npix = 1;
+    for ( int i = 0; i < naxis; i++ ) npix *= naxes[i];
 
     // Create the new image
     fits_create_img( outfptr, bitpix, naxis, naxes, &status );
