@@ -88,6 +88,8 @@
 *              Improve prologue
 *    09-MAY-2007 (TIMJ):
 *        Bigger buffer for file name
+*    03-JAN-2008 (TIMJ):
+*        Cancel INP parameter
 *-
 
 *    Type Definitions :
@@ -175,6 +177,8 @@
         CALL AIO_CANCL( 'DEV', STATUS )
 
       END IF
+
+      CALL DAT_CANCL( 'INP', STATUS )
 
       END
 
