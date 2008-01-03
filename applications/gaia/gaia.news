@@ -78,6 +78,8 @@
     A bug saving graphics that included contour lines to a disk file has been
     fixed (present since March 2006).
 
+    Inline compressed images (e.g. RICE) can now have more than 2 dimensions.
+
   Puana Release:
   ==============
 
