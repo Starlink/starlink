@@ -7,7 +7,6 @@
  *     Special care is taken to handle Fortran character arrays correctly.
  *
  *  Language:
- *
  *     Starlink ANSI C
  *
  *  Description:
@@ -18,14 +17,17 @@
  *     CALL AIO_APPFCO( FCO, LDIMS, DPTR, INDICES, STR, STATUS )
  *
  *  Authors:
- *
  *     David J. Allan (ROSAT,BHVAD::DJA)
+ *     Tim Jenness (JAC, Hawaii)
  *
  *  History:
- *
  *     26-Apr-1994 (DJA):
  *        Original version.
- *- */
+ *     03-Jan-2008 (TIMJ):
+ *        Use CNF to import the fortran pointer.  
+
+ *-
+ */
 
 
 #include <stdlib.h>			/* malloc etc */
@@ -55,9 +57,9 @@ F77_SUBROUTINE(aio_appfco)( POINTER(fco), INTEGER_ARRAY(dims),
   if ( *status != SAI__OK )             /* Check status on entry */
     return;
 
-  fcoref = (AIOformatControl *) *fco;	/* Import foreign pointer */
+  fcoref = cnfCptr(*fco);	/* Import foreign pointer */
 
-  cnf_copyf( fcoref->fmt,fcoref->fmtlen,/* Import format string */
+  cnfCopyf( fcoref->fmt,fcoref->fmtlen,/* Import format string */
              fmt, fmt_length );
 
   if ( fcoref->type == AIO_T_CHAR )	/* Character array? */

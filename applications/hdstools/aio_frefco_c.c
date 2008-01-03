@@ -6,25 +6,25 @@
  *     Destroy a format convertor object 
  *
  *  Language:
- *
  *     Starlink ANSI C
  *
  *  Description:
  *
  *
- *  Invokation:
- *
+ *  Invocation:
  *     CALL AIO_FREFCO( PTR, STATUS )
  *
  *  Authors:
- *
  *     David J. Allan (ROSAT,BHVAD::DJA)
+ *     Tim Jenness (JAC, Hawaii)
  *
  *  History:
- *
  *     26-Apr-1994 (DJA):
  *        Original version.
- *- */
+ *     03-Jan-2008 (TIMJ):
+ *        Use CNF to import the fortran pointer.  
+ *-
+ */
 
 
 #include <stdlib.h>			/* malloc etc */
@@ -44,11 +44,11 @@ F77_SUBROUTINE(aio_frefco)( POINTER(fco), INTEGER(status) )
   if ( *status != SAI__OK )             /* Check status on entry */
     return;  
 
-  fcoref = (AIOformatControl *) *fco;	/* Import the block pointer */
+  fcoref = cnfCptr( *fco );	/* Import the block pointer */
 
-  cnf_free( fcoref->fmt );		/* Release format string */
+  cnfFree( fcoref->fmt );		/* Release format string */
 
-  free( fcoref );			/* Release the block storage space */
+  cnfFree( fcoref );		/* Release the block storage space */
 
   *fco = (F77_POINTER_TYPE) 0;		/* Reset the external pointer */
   }
