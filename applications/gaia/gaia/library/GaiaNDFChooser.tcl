@@ -485,6 +485,8 @@ itcl::class gaia::GaiaNDFChooser {
       if {[llength $sel]} {
          lassign [lindex $sel 0] number
          select_image_ndf_ $number $component
+      } else {
+         warning_dialog "No NDF is selected (click on a row)" $w_
       }
    }
 
