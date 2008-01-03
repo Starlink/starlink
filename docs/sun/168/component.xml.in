@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sun/168</path>
+  <description>EDT mode for JED --- An advanced Unix text editor</description>
+  <abstract><p>
+    This note describes Starlink extended EDT emulation for the JED
+    editor. It provides a Unix text editor which can utilise the
+    advanced facilities of DEC VTn00, xterm and similar terminals. JED
+    in this mode provides a reasonably good emulation of the VAX/VMS
+    editor EDT in addition to many extra facilities
+  </p></abstract>  
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>B.K. McIlwrath</name>
+      <name>C.G. Page</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1993,1995,1998</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
