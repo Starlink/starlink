@@ -35,7 +35,7 @@ sculib_get_fits_i.f sculib_get_fits_l.f sculib_get_fits_r.f	       \
 sculib_decode_spec.f sculib_decode_component.f sculib_get_sub_bols.f   \
 sculib_gaussian_xisq.f sculib_gaussj.f				       \
 sculib_integrate_photom_jiggle.f sculib_invert_matrix.f sculib_jnu.f   \
-sculib_lst.f sculib_malloc.f sculib_map_allan_variance.f	       \
+sculib_malloc.f sculib_map_allan_variance.f	       \
 sculib_mrqcof.f sculib_mrqmin.f sculib_mulcar.f sculib_multare.f       \
 sculib_nfilli.f sculib_nfillr.f sculib_j_theoretical.f		       \
 sculib_photom_bolselect.f sculib_power2.f sculib_put_fits_c.f	       \
@@ -50,7 +50,7 @@ sculib_skydip_allan_variance.f sculib_skydip_bols.f sculib_skyfunc_1.f \
 sculib_skyfunc_2.f sculib_sqrootr.f sculib_standard_apparent.f	       \
 sculib_sub_tauz.f sculib_subare.f sculib_sumad.f sculib_tidy_line.f    \
 sculib_unpack.f sculib_unpack_chopscan.f sculib_unpack_jiggle.f	       \
-sculib_unpack_jiggle_separates.f sculib_ut1.f sculib_copyb.f	       \
+sculib_unpack_jiggle_separates.f sculib_copyb.f	       \
 sculib_cfillb.f sculib_bits.f sculib_linear_wtinit.f		       \
 sculib_set_quality.f sculib_extract_2dim_b.f sculib_extract_2dim_r.f   \
 sculib_extract_2dim_d.f sculib_skyfunc.f sculib_skyfuncd.f	       \
