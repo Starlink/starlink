@@ -13,6 +13,10 @@
 #     opacities to draw isosurfaces of the cube. An instance of this class
 #     should be associated with a Gaia3dTool which is used to do the actual
 #     rendering and instantiation.
+#
+#     The coordinate system used to match these cubes to the primary one
+#     associated with the Gaia3dTool instance can be made to take into
+#     account transformations between sky and spectral coordinates.
 
 #  Copyright:
 #     Copyright (C) 2007 Science and Technology Facilities Council
@@ -109,6 +113,38 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
          {Use single opacity} \
          {Draw all iso surfaces with the same opacity}
 
+      #  Spectral axes alignment. Offer same as SPLAT.
+
+      #  Matching on and off, whole cube.
+      $Options add checkbutton \
+         -label {Match coordinates} \
+         -variable [scope match_] \
+         -onvalue 1 \
+         -offvalue 0
+      $short_help_win_ add_menu_short_help $Options \
+         {Match coordinates} \
+         {Determine transformations to the main cube coordinates}
+
+      #  Matching with knowledge of the sidebands.
+      $Options add checkbutton \
+         -label {Match sidebands} \
+         -variable [scope match_sidebands_] \
+         -onvalue 1 \
+         -offvalue 0
+      $short_help_win_ add_menu_short_help $Options \
+         {Match sidebands} \
+         {Match spectral axes using sidebands}
+
+      #  Matching using the base system, useful for velocities.
+      $Options add checkbutton \
+         -label {Match using base system} \
+         -variable [scope match_base_system_] \
+         -onvalue 1 \
+         -offvalue 0
+      $short_help_win_ add_menu_short_help $Options \
+         {Match using base system} \
+         {Match spectral axes using current coordinate system}
+
       #  Main controls.
       add_controls_
 
@@ -168,35 +204,94 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
       #  Make sure all cube data is available. Also clear existing contours.
       open_cubes_
 
-      #  Connection should go through the domain of the current coordinates.
-      set domain [gaiautils::astget $target_wcs "Domain"]
+      if { $match_ } {
+         #  Connection should go through the domain of the current coordinates.
+         set domain [gaiautils::astget $target_wcs "Domain"]
 
-      #  The relevant coordinates are base to base as we are working in
-      #  graphics coordinates, same as GRID. So switch this WCS to that
-      #  domain.
-      set target_current [gaiautils::astget $target_wcs "Current"]
-      set target_base [gaiautils::astget $target_wcs "Base"]
-      gaiautils::astset $target_wcs "Current=$target_base"
+         #  Locate the DSBSpecFrame or SpecFrame, if we have any.
+         set dsbspecaxis_(target) [locate_axis_ $target_wcs "dsbspecframe"]
+         set specaxis_(target) [locate_axis_ $target_wcs "specframe"]
 
-      #  Don't want to exit this method without resetting the domain.
-      catch {
+         #  Set the AlignSideBand attribute as required.
+         if { $dsbspecaxis_(target) != 0 } {
+            gaiautils::astset $target_wcs \
+               "AlignSideBand($dsbspecaxis_(target))=$match_sidebands_"
+         }
+
+         #  If matching using the spectral base system, set it (needed to
+         #  match velocities with different rest frequencies).
+         if { $specaxis_(target) != 0 && $match_base_system_ } {
+            set target_system \
+               [gaiautils::astget $target_wcs "system($specaxis_(target))"]
+            gaiautils::astset $target_wcs \
+               "AlignSystem($specaxis_(target))=$target_system"
+         }
+
+         #  The relevant coordinates are base to base as we are working in
+         #  graphics coordinates, same as GRID. So switch this WCS to that
+         #  domain. Same applies to the other WCS.
+         set target_current [gaiautils::astget $target_wcs "Current"]
+         set target_base [gaiautils::astget $target_wcs "Base"]
+         gaiautils::astset $target_wcs "Current=$target_base"
+
+         #  Don't want to exit this method without resetting the domain.
+         catch {
+            #  Create an actor for each possible level of each cube.
+            for { set i 0 } { $i < $itk_option(-maxcubes) } { incr i } {
+               if { $display_($i) &&
+                    [info exists cubename_($i)] && $cubename_($i) != {} } {
+
+                  #  If required match the spectral coordinates using
+                  #  sidebands. Both need setting and have DSBSpecFrames.
+                  if { $dsbspecaxis_(target) != 0 && $dsbspecaxis_($i) != 0 } {
+                     gaiautils::astset $wcs_($i) \
+                        "AlignSideBand($dsbspecaxis_($i))=$match_sidebands_"
+                  }
+
+                  #  Connect the coordinates of this cube with the target.
+                  set wcs_current [gaiautils::astget $wcs_($i) "Current"]
+                  set wcs_base [gaiautils::astget $wcs_($i) "Base"]
+                  gaiautils::astset $wcs_($i) "Current=$wcs_base"
+
+                  set connection_wcs \
+                     [gaiautils::astconvert $wcs_($i) $target_wcs $domain]
+                  gaiautils::astset $wcs_($i) "Current=$wcs_current"
+                  gaiautils::astset $wcs_($i) "Base=$wcs_base"
+
+                  #  Create an iso contour for each level of this cube.
+                  for { set j 0 } { $j < $itk_option(-maxcnt) } { incr j } {
+                     create_iso_contour_ $i $j $connection_wcs $renwindow
+                  }
+
+                  #  Update colours, levels and opacities.
+                  for { set j 0 } { $j < $itk_option(-maxcnt) } { incr j } {
+                     update_iso_contour_ $i $j
+                  }
+               }
+            }
+         } msg
+         if { $msg != {} } {
+            puts stderr "Error matching cube coordinate systems: $msg"
+         }
+
+         #  Back to original base and current frames.
+         gaiautils::astset $target_wcs "Current=$target_current"
+         gaiautils::astset $target_wcs "Base=$target_base"
+
+         #  Clear AlignSystem if set.
+         if { $specaxis_(target) != 0 && $match_base_system_ } {
+            gaiautils::astclear $target_wcs "AlignSystem($specaxis_(target))"
+         }
+
+      } else {
+         #  Not matching. Transforms are unit maps.
+
          #  Create an actor for each possible level of each cube.
          for { set i 0 } { $i < $itk_option(-maxcubes) } { incr i } {
-            if { $display_($i) && 
+            if { $display_($i) &&
                  [info exists cubename_($i)] && $cubename_($i) != {} } {
-
-               #  Connect the coordinates of this cube with the target.
-               set wcs_current [gaiautils::astget $wcs_($i) "Current"]
-               set wcs_base [gaiautils::astget $wcs_($i) "Base"]
-               gaiautils::astset $wcs_($i) "Current=$wcs_base"
-
-               set connection_wcs \
-                  [gaiautils::astconvert $wcs_($i) $target_wcs $domain]
-               gaiautils::astset $wcs_($i) "Current=$wcs_current"
-               gaiautils::astset $wcs_($i) "Base=$wcs_base"
-
                for { set j 0 } { $j < $itk_option(-maxcnt) } { incr j } {
-                  create_iso_contour_ $i $j $connection_wcs $renwindow
+                  create_iso_contour_ $i $j {} $renwindow
                }
 
                #  Update colours, levels and opacities.
@@ -205,13 +300,7 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
                }
             }
          }
-      } msg
-      if { $msg != {} } {
-         puts stderr "Error matching cube coordinate systems: $msg"
       }
-
-      gaiautils::astset $target_wcs "Current=$target_current"
-      gaiautils::astset $target_wcs "Base=$target_base"
    }
 
    #  Access all active cubes and wrap these into instances of vtkArrayData.
@@ -231,9 +320,14 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
 
                #  And access the new cube.
                $cubeaccessor_($i) configure -dataset $cubename_($i)
+               $itk_component(cube$i) add_to_history $cubename_($i)
 
                #  For speed of access cache the full WCS.
                set wcs_($i) [$cubeaccessor_($i) getwcs]
+
+               #  And check for SpecFrames and DSBSpecFrames.
+               set dsbspecaxis_($i) [locate_axis_ $wcs_($i) "dsbspecframe"]
+               set specaxis_($i) [locate_axis_ $wcs_($i) "specframe"]
 
                #  Access data, wrapping to an vtkImageData instance.
                set imagedata_($i) [gaia3d::Gaia3dVtkCubeData \#auto]
@@ -250,12 +344,18 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
 
    #  Create objects to manage a contour for a cube, i is cube index, j the
    #  index of the level. "wcs" is an AST Mapping/FrameSet connecting the
-   #  cube coordinates to the graphics coordinates.
+   #  cube coordinates to the graphics coordinates, can be "".
    protected method create_iso_contour_ {i j wcs renwindow} {
       if { $cubename_($i) != {} } {
-         set contour_($i,$j) [Gaia3dVtkIso \#auto \
-                                 -imagedata [$imagedata_($i) get_imagedata] \
-                                 -renwindow $renwindow -wcs $wcs]
+         if { $wcs != {} } {
+            set contour_($i,$j) [Gaia3dVtkIso \#auto \
+                                   -imagedata [$imagedata_($i) get_imagedata] \
+                                   -renwindow $renwindow -wcs $wcs]
+         } else {
+            set contour_($i,$j) [Gaia3dVtkIso \#auto \
+                                   -imagedata [$imagedata_($i) get_imagedata] \
+                                   -renwindow $renwindow]
+         }
          $contour_($i,$j) add_to_window
          $contour_($i,$j) set_visible
       }
@@ -399,7 +499,6 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
    #  Set the name of a cube.
    protected method set_cubename_ {i name} {
       set cubename_($i) $name
-      $itk_component(cube$i) add_to_history $name
    }
 
    #  Add the controls for the contour levels and attributes.
@@ -514,6 +613,19 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
       }
    }
 
+   #  Locate an axis of a given type in the given cube WCS.
+   protected method locate_axis_ {wcs type} {
+      set axis 0
+      for {set i 1} {$i < 4} {incr i} {
+         if { [gaiautils::frameisa $wcs $i $type] } {
+            set axis $i
+            break
+         }
+      }
+      return $axis
+   }
+
+
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -547,6 +659,10 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
    #  The cached AST FrameSet.
    protected variable wcs_
 
+   #  Indices of the SpecFrame and DSBSpecFrame axes, if present.
+   protected variable specaxis_
+   protected variable dsbspecaxis_
+
    #  Gaia3dVtkCubeData instances. Provide access to wrapped cube.
    protected variable imagedata_
 
@@ -555,6 +671,15 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
 
    #  Whether named cube should be rendered.
    protected variable display_
+
+   #  Whether to match the cube coordinate systems.
+   protected variable match_ 1
+
+   #  Whether to match the cube spectral coordinates using sideband knowledge.
+   protected variable match_sidebands_ 0
+
+   #  Whether to match the cube spectral coordinates using the base system.
+   protected variable match_base_system_ 1
 
    #  Common variables: (shared by all instances)
    #  -----------------
