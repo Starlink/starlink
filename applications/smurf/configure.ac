@@ -7,6 +7,10 @@ PACKAGE_UPCASE='SMURF'
 AC_DEFINE( [PACKAGE_UPCASE], "SMURF", [Upper cased package name] )
 AC_SUBST(PACKAGE_UPCASE)
 
+dnl    Would like the version number as an integer
+AC_DEFINE_UNQUOTED([PACKAGE_VERSION_INTEGER], $PACKAGE_VERSION_INTEGER,
+                    [Integer version number, in the form major*1e6+minor*1e3+release])
+
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
 AM_INIT_AUTOMAKE(1.8.2-starlink)
@@ -26,6 +30,14 @@ STAR_CHECK_PROGS( ifd2star )
 STAR_CHECK_PROGS( hlib )
 STAR_CHECK_PROGS(prohlp,sst)
 STAR_CHECK_PROGS(perl)
+
+dnl    Variable sizes - needed for specwriter
+AC_CHECK_SIZEOF(float)
+AC_CHECK_SIZEOF(double)
+AC_CHECK_SIZEOF(int)
+
+dnl    Library functions - needed for specwriter
+AC_CHECK_FUNCS([mkstemp mkstemps])
 
 
 STAR_MESSGEN( [ libsmf/smf_err.msg ] )
