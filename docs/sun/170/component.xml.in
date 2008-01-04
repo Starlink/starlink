@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sun/170</path>
+  <description>Editors on Unix</description>
+  <abstract><p>
+     The purpose of this document is to give new users advice on how
+     to choose which editor to use on Unix machines. Under Unix the
+     default editors are considered to be unfriendly and many users
+     prefer to use other more sophisticated alternatives. However,
+     many such alternatives exist; there is not one single editor that
+     everyone finds acceptable and hence each user must decide for
+     himself or herself which to adopt.
+  </p></abstract>  
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>C.A. Clayton</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1993,1997</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
