@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sun/247</path>
+  <description>nu/TPU --- A DEC TPU compatible editor for UNIX</description>
+  <abstract><p>
+  
+    nu/TPU is a fully programmable text processing utility compatible
+    with the TPU system found on VMS systems. People used to using
+    TPU or EDT on the former Starlink VAX/VMS service will find that
+    nu/TPU is very similar to these editors.  
+  </p></abstract>  
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>S.C. Rehan</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1995</year>
+    <name>PPARC</name>
+  </copyright>
+</component>
