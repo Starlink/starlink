@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sun/205</path>
+  <description>FORUM --- Starlink Conferencing Software</description>
+  <abstract><p>
+
+     FORUM is Starlink's conferencing software.  It is based on the
+     World Wide Web (WWW) and provides similar capabilities under Unix
+     to those provided by the DEC product VAXnotes under VMS.  Its
+     main features are that it retains an archive of entries or notes,
+     organized in a hierarchy, and it can restrict access.  Users can
+     both read existing notes and submit new ones.  The hierarchy of
+     entries, from the top down, is: `Conference', `Topic', `Reply'
+     and `Riposte'.  One difference compared with VAXnotes is that
+     while VAXnotes could maintain an index of all Conferences, even
+     when the Conferences were located on separate systems at several
+     Starlink sites, FORUM maintains an index only for each instance
+     of FORUM.
+
+     The best way to find out more about FORUM is to run it.  FORUM
+     has also been described in a Starlink Bulletin} article, December
+     1995.
+
+  </p></abstract>  
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>D.J.Rawlinson</name>
+      <name>J.C. Sherman</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1995</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
