@@ -362,7 +362,7 @@
 /*  ---  Declare and construct dynamic CHARACTER arguments ---                      */
 #define DECLARE_CHARACTER_DYN(X)   F77_CHARACTER_TYPE *X;\
    int X##_length
-#define F77_CREATE_CHARACTER(X,L)  X=cnfCref(L);\
+#define F77_CREATE_CHARACTER(X,L)  X=slaStringCreate(L);\
    X##_length = (L>0?L:1)
 
 /* Declare Dynamic Fortran arrays */
@@ -424,12 +424,12 @@
 #define F77_FREE_WORD(X)
 #define F77_FREE_UWORD(X)
 #define F77_FREE_POINTER(X) cnfFree((void *)X);
-#define F77_FREE_CHARACTER(X) cnfFreef( X )
+#define F77_FREE_CHARACTER(X) slaStringFree( X )
 #define F77_FREE_LOGICAL(X) cnfFree( (char *)X )
 
 /*  ---  IMPORT and EXPORT of values  --- */
 /* Export C variables to Fortran variables */
-#define F77_EXPORT_CHARACTER(C,F,L) cnfExprt(C,F,L)
+#define F77_EXPORT_CHARACTER(C,F,L) slaStringExport(C,F,L)
 #define F77_EXPORT_DOUBLE(C,F) F=C
 #define F77_EXPORT_INTEGER(C,F) F=C
 #define F77_EXPORT_LOGICAL(C,F) F=C?F77_TRUE:F77_FALSE
@@ -750,7 +750,7 @@
                                   X = X/**/_arg->dsc$a_pointer; \
                                   X/**/_length = X/**/_arg->dsc$w_length
 #undef F77_FREE_CHARACTER
-#define F77_FREE_CHARACTER(X)     cnfFreef( X/**/_arg )
+#define F77_FREE_CHARACTER(X)     slaStringFree( X/**/_arg )
 
 /*  ---  Pass arguments to a FORTRAN routine  ---			    */
 

@@ -237,7 +237,32 @@ void slaStringImport( const char *source_f, int source_len, char *dest_c )
    }
 }
 
+/* Allocate string buffer dynamically. Taken from cnfCref.
+   See cnfCref for more details.
+*/
 
+F77_CHARACTER_ARG_TYPE *slaStringCreate( int length ) {
+  /* Local Variables:                                                         */
+   F77_CHARACTER_ARG_TYPE *ptr;  /* A pointer to the string allocated       */
+
+/* Allocate the space.                                                      */
+   ptr = (F77_CHARACTER_ARG_TYPE *)
+       malloc( (size_t)( ( length > 0 ) ? length : 1 ) );
+
+/* Check for malloc returning a null value. If it does not, set the string  */
+/* to the null character.                                                   */
+   if ( ptr != 0 ) {
+       ptr[0] = '\0';
+   }
+
+   return( ptr );
+}
+
+/* Free space allocate by slaStringCreate. Take from cnfFreef */
+
+void slaStringFree ( F77_CHARACTER_ARG_TYPE * temp ) {
+  free( temp );
+}
 
 
 /* SLALIB wrapper implementations. */
