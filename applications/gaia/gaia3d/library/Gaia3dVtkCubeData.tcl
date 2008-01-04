@@ -71,7 +71,7 @@ itcl::class ::gaia3d::Gaia3dVtkCubeData {
       if { $imageimport_ != {} && [info exists $imageimport_] } {
          $imageimport_ Delete
       }
-      if { $limits_ != {} } {
+      if { $limits != {} } {
          if { $wcs_ != {} } {
             catch {gaiautils::astannul $wcs_}
          }
