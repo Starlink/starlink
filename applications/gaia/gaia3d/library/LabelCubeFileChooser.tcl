@@ -86,10 +86,10 @@ itcl::class gaia3d::LabelCubeFileChooser {
    #  ------------
    constructor {args} {
 
-      #  Create the object to manage the cube list and history. Note
-      #  this requires some methods of the GaiaCube class are implemented
-      #  as dummies to honour the interface. Also need a cubeaccessor
-      #  so that cube size can be stored with history.
+      #  Create the object to manage the cube list and history. Note this
+      #  requires some methods of the GaiaCube and GaiaSpecCoords classes are
+      #  implemented as dummies to honour the interfaces. Also need a
+      #  cubeaccessor so that cube size can be stored with history.
       set history_ [GaiaCubeHistory \#auto -gaia_cube $this]
 
       #  Add a menu button to the widget.
@@ -135,13 +135,21 @@ itcl::class gaia3d::LabelCubeFileChooser {
    
    #  GaiaCube implementation.
    public method get_spec_coords {} {
-      return {}
+      return $this
    }
    public method add_menu_short_help {args} {
       return {}
    }
    public method get_cubeaccessor {} {
       return $itk_option(-cubeaccessor)
+   }
+
+   #  GaiaSpecCoords implementation. Does nothing.
+   public method get_system {} {
+      return "default default"
+   }
+   public method set_system {args} {
+      #  Do nothing.
    }
 
    #  Configuration options: (public variables)
