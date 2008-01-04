@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sun/249</path>
+  <description>Starlink Standard Data Structures</description>
+  <abstract><p>
+   Images observed using the Wide Field Camera instrument on the Isaac
+   Newton Telescope contain nonlinear optical distortions. This note
+   gives a quantitative description of these distortions. It also
+   explains how they can be corrected for easily using the
+   CCDPACK package.
+  </p></abstract>  
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Mark Taylor</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>2005</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
