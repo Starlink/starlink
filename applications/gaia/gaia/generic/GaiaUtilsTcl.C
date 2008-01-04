@@ -10,7 +10,7 @@
 
  *  Copyright:
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
- *     Copyright (C) 2007 Science and Technology Facilities Council.
+ *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -63,6 +63,8 @@ static int GaiaUtilsAstAnnul( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstAxDistance( ClientData clientData, Tcl_Interp *interp,
                                    int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsAstClear( ClientData clientData, Tcl_Interp *interp,
+                              int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstConvert( ClientData clientData, Tcl_Interp *interp,
                                 int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstCopy( ClientData clientData, Tcl_Interp *interp,
@@ -117,6 +119,9 @@ int GaiaUtils_Init( Tcl_Interp *interp )
     Tcl_CreateObjCommand( interp, "gaiautils::astaxdistance",
                           GaiaUtilsAstAxDistance, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::astclear", GaiaUtilsAstClear,
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::astconvert", GaiaUtilsAstConvert,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
@@ -240,7 +245,7 @@ static int GaiaUtilsAstGet( ClientData clientData, Tcl_Interp *interp,
 
     /* Check arguments, only allow two. */
     if ( objc != 3 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "AstObject attribute" );
+        Tcl_WrongNumArgs( interp, 1, objv, "AST_object attribute" );
         return TCL_ERROR;
     }
 
@@ -265,20 +270,20 @@ static int GaiaUtilsAstGet( ClientData clientData, Tcl_Interp *interp,
 }
 
 /**
- * Apply AST attributes to a FrameSet.
+ * Apply AST attributes to an AST object.
  *
- * There are two arguments, the address of the AST FrameSet and the attributes
+ * There are two arguments, the address of the AST object and the attributes
  * string ("option=value,option=value" etc.).
  */
 static int GaiaUtilsAstSet( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] )
 {
-    AstFrameSet *wcs;
+    AstObject *object;
     long adr;
 
     /* Check arguments, only allow two. */
     if ( objc != 3 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "frameset attributes" );
+        Tcl_WrongNumArgs( interp, 1, objv, "AST_object attributes" );
         return TCL_ERROR;
     }
 
@@ -286,10 +291,10 @@ static int GaiaUtilsAstSet( ClientData clientData, Tcl_Interp *interp,
     if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
         return TCL_ERROR;
     }
-    wcs = (AstFrameSet *) adr;
+    object = (AstObject *) adr;
 
     /* Set the attributes */
-    astSet( wcs, Tcl_GetString( objv[2] ) );
+    astSet( object, Tcl_GetString( objv[2] ) );
     if ( ! astOK ) {
         char *buf = ckalloc( 1024 );
         sprintf( buf, "Failed to set AST attribute (%s)",
@@ -302,49 +307,100 @@ static int GaiaUtilsAstSet( ClientData clientData, Tcl_Interp *interp,
 }
 
 /**
- * Get the reference position (RefRA,RefDec) in decimal degrees J2000.
+ * Clear an AST attribute.
  *
- * There is one argument, the address of a SpecFrame. Returns the
- * pair of values.
+ * There are two arguments, the address of the AST object and the attribute
+ * to clear.
  */
-static int GaiaUtilsAstGetRefPos( ClientData clientData, Tcl_Interp *interp,
-                                  int objc, Tcl_Obj *CONST objv[] )
+static int GaiaUtilsAstClear( ClientData clientData, Tcl_Interp *interp,
+                              int objc, Tcl_Obj *CONST objv[] )
 {
-    AstSpecFrame *object;
-    Tcl_Obj *resultObj;
-    double lat;
-    double lon;
+    AstObject *object;
+    long adr;
+
+    /* Check arguments, only allow two. */
+    if ( objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "AST_object attribute" );
+        return TCL_ERROR;
+    }
+
+    /* Get the AST object */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    object = (AstObject *) adr;
+
+    /* Clear the attribute */
+    astClear( object, Tcl_GetString( objv[2] ) );
+    if ( ! astOK ) {
+        astClearStatus;
+        Tcl_SetResult( interp, "Failed to clear AST attribute", TCL_DYNAMIC );
+        return TCL_ERROR;
+    }
+    return TCL_OK;
+}
+
+/**
+ * Test if the value of an AST attribute has been set.
+ *
+ * There are two arguments, the address of the AST object and the attribute.
+ */
+static int GaiaUtilsAstTest( ClientData clientData, Tcl_Interp *interp,
+                             int objc, Tcl_Obj *CONST objv[] )
+{
+    AstObject *object;
+    long adr;
+    int test;
+
+    /* Check arguments, only allow two. */
+    if ( objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "AST_object attribute" );
+        return TCL_ERROR;
+    }
+
+    /* Get the AST object. */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    object = (AstObject *) adr;
+
+    /* Do the test, an error equals not set */
+    test = astTest( object, Tcl_GetString( objv[2] ) );
+    if ( ! astOK ) {
+        astClearStatus;
+        test = 0;
+    }
+    Tcl_SetObjResult( interp, Tcl_NewBooleanObj( test ) );
+    return TCL_OK;
+}
+
+/**
+ * Annul an AST object.
+ *
+ * There is one argument, the address of the AST object.
+ */
+static int GaiaUtilsAstAnnul( ClientData clientData, Tcl_Interp *interp,
+                              int objc, Tcl_Obj *CONST objv[] )
+{
     long adr;
 
     /* Check arguments, only allow one. */
     if ( objc != 2 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "specframe" );
+        Tcl_WrongNumArgs( interp, 1, objv, "AST_object" );
         return TCL_ERROR;
     }
 
-    /* Get the AstSpecFrame */
+    /* Get the object */
     if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
         return TCL_ERROR;
     }
-    object = (AstSpecFrame *) adr;
+    astAnnul( (AstObject *) adr );
 
-    /* Get the value */
-    astGetRefPos( object, (AstSkyFrame *) NULL, &lon, &lat );
     if ( ! astOK ) {
         astClearStatus;
-        Tcl_SetResult( interp, "Failed to get reference positions",
-                       TCL_VOLATILE );
+        Tcl_SetResult( interp, "Failed to annul AST object", TCL_VOLATILE );
         return TCL_ERROR;
     }
-
-    /* Radians to degrees */
-    lat *= r2d_;
-    lon *= r2d_;
-
-    Tcl_ResetResult( interp );
-    resultObj = Tcl_GetObjResult( interp );
-    Tcl_ListObjAppendElement( interp, resultObj, Tcl_NewDoubleObj( lon ) );
-    Tcl_ListObjAppendElement( interp, resultObj, Tcl_NewDoubleObj( lat ) );
     return TCL_OK;
 }
 
@@ -371,7 +427,7 @@ static int GaiaUtilsAstShow( ClientData clientData, Tcl_Interp *interp,
     /* Check arguments, allo up to three  */
     if ( objc < 2 || objc > 4 ) {
         Tcl_WrongNumArgs( interp, 1, objv,
-                          "ast_object [native|FITS|XML] [FITSencoding]" );
+                          "AST_object [native|FITS|XML] [FITSencoding]" );
         return TCL_ERROR;
     }
 
@@ -424,36 +480,49 @@ static int GaiaUtilsAstShow( ClientData clientData, Tcl_Interp *interp,
 }
 
 /**
- * Test if the value of an AST attribute has been set.
+ * Get the spectral reference position (RefRA,RefDec) in decimal degrees J2000.
  *
- * There are two arguments, the address of the AST FrameSet and the attribute.
+ * There is one argument, the address of a SpecFrame. Returns the
+ * pair of values.
  */
-static int GaiaUtilsAstTest( ClientData clientData, Tcl_Interp *interp,
-                             int objc, Tcl_Obj *CONST objv[] )
+static int GaiaUtilsAstGetRefPos( ClientData clientData, Tcl_Interp *interp,
+                                  int objc, Tcl_Obj *CONST objv[] )
 {
-    AstFrameSet *wcs;
+    AstSpecFrame *object;
+    Tcl_Obj *resultObj;
+    double lat;
+    double lon;
     long adr;
-    int test;
 
-    /* Check arguments, only allow two. */
-    if ( objc != 3 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "frameset attribute" );
+    /* Check arguments, only allow one. */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "specframe" );
         return TCL_ERROR;
     }
 
-    /* Get the frameset */
+    /* Get the AstSpecFrame */
     if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
         return TCL_ERROR;
     }
-    wcs = (AstFrameSet *) adr;
+    object = (AstSpecFrame *) adr;
 
-    /* Do the test, an error equals not set */
-    test = astTest( wcs, Tcl_GetString( objv[2] ) );
+    /* Get the value */
+    astGetRefPos( object, (AstSkyFrame *) NULL, &lon, &lat );
     if ( ! astOK ) {
         astClearStatus;
-        test = 0;
+        Tcl_SetResult( interp, "Failed to get reference positions",
+                       TCL_VOLATILE );
+        return TCL_ERROR;
     }
-    Tcl_SetObjResult( interp, Tcl_NewBooleanObj( test ) );
+
+    /* Radians to degrees */
+    lat *= r2d_;
+    lon *= r2d_;
+
+    Tcl_ResetResult( interp );
+    resultObj = Tcl_GetObjResult( interp );
+    Tcl_ListObjAppendElement( interp, resultObj, Tcl_NewDoubleObj( lon ) );
+    Tcl_ListObjAppendElement( interp, resultObj, Tcl_NewDoubleObj( lat ) );
     return TCL_OK;
 }
 
@@ -932,35 +1001,6 @@ static int GaiaUtilsAstSkyFrame( ClientData clientData, Tcl_Interp *interp,
     return TCL_ERROR;
 }
 
-/**
- * Annul an AST object.
- *
- * There is one argument, the address of the AST object.
- */
-static int GaiaUtilsAstAnnul( ClientData clientData, Tcl_Interp *interp,
-                              int objc, Tcl_Obj *CONST objv[] )
-{
-    long adr;
-
-    /* Check arguments, only allow one. */
-    if ( objc != 2 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "object" );
-        return TCL_ERROR;
-    }
-
-    /* Get the object */
-    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
-        return TCL_ERROR;
-    }
-    astAnnul( (AstObject *) adr );
-
-    if ( ! astOK ) {
-        astClearStatus;
-        Tcl_SetResult( interp, "Failed to annul AST object", TCL_VOLATILE );
-        return TCL_ERROR;
-    }
-    return TCL_OK;
-}
 
 /**
  * Format a value along an axis of a given AST Frame or FrameSet.
