@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="sun243">
+  <version>3</version>
+  <path>docs/sun/243</path>
+  <description>SPLAT - A Spectral Analysis Tool</description>
+  <abstract><p>
+
+    SPLAT is a graphical tool for displaying, comparing, modifying and
+    analysing astronomical spectra stored in NDF, FITS and TEXT files
+    as well as the new NDX format. It can read in many spectra at the
+    same time and then display these as line plots. Each display
+    window, of which there can be many, can be used to view one or
+    several spectra at the same time. Display windows can be
+    interactively zoomed and scrolled, centred on specific
+    wavelengths, provide continuous coordinate readout, annotated,
+    produce printable hardcopy and be configured in many ways. They
+    also provide the basis for interactive analysis facilities. All of
+    these functions are displayed in a visually rich format, that is
+    intended to appeal especially to casual users of spectral data
+    analysis facilities, as it includes some facilities such as
+    drag-and-drop and undo-able editing.
+
+    The current set of analysis facilities include background
+    estimation line fitting, filtering, and de-noising.  A database of
+    laboratory line positions is available to aid in identification.
+
+    SPLAT also supports a full range of coordinate systems for
+    spectra, using the latest facilities of the Starlink AST library.
+    </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Peter W. Draper</name>
+    </person>
+  </developers>
+  <documentation> sun243</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>2003,2004</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
