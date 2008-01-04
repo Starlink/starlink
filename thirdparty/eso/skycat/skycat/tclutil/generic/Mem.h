@@ -29,6 +29,7 @@
  */
 
 #include <cstdio>
+#include <sys/types.h>
 class Mem_Map;
 
 // internal struct used for reference counting
