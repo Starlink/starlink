@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sun/202</path>
+  <description>XRT: ROSAT XRT Data Reduction</description>
+  <abstract><p>
+    This note gives a general overview of the methods available for
+    using Starlink Infrastructure subroutine libraries with
+    applications.  There is an outline of how to use the include files
+    for a subroutine library, and a guide to the methods available for
+    linking with the subroutine libraries.
+
+    All the Starlink Infrastructure libraries are organised in the
+    same way, so it is possible to give a general guide to the
+    principles involved.  However, some libraries do differ, and for
+    precise details of how to use a particular subroutine library, you
+    should consult the Starlink document for that library. 
+  </p></abstract>  
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>M.J. Bly</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1997,1998</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
