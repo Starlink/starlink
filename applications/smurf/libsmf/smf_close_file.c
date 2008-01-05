@@ -85,11 +85,12 @@
 *        Unmap the header portion of DIMM files
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
-*     04-JAN-2008 (TIMJ):
+*     2008-01-04 (TIMJ):
 *        Remove debugging printf statements.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
