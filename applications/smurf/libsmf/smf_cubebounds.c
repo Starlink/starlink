@@ -127,6 +127,8 @@
 *  Authors:
 *     David S Berry (JAC, UCLan)
 *     Ed Chapin (UBC)
+*     Andy Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -189,10 +191,13 @@
 *        Update to use new smf_free behaviour
 *     19-DEC-2007 (DSB):
 *        Correct the way reference WCS is handled.
+*     04-JAN-2008 (TIMJ):
+*        Remove debugging printf statements.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2007, 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2006, 2007 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -998,12 +1003,6 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       lbnd[ 2 ] -= ishift;
       ubnd[ 2 ] -= ishift;
    }
-
-
-printf("floating point spectral bounds: %g:%g \n", dlbnd[2], dubnd[2] );
-printf("integer spectral bounds: %d:%d \n", lbnd[2], ubnd[2] );
-
-
 
 /* Now remap the interrim GRID Frame in the returned FrameSet so that it
    represent actual GRID coords in the output cube. */

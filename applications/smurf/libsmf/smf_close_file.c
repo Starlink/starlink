@@ -85,6 +85,8 @@
 *        Unmap the header portion of DIMM files
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     04-JAN-2008 (TIMJ):
+*        Remove debugging printf statements.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -270,7 +272,6 @@ void smf_close_file( smfData ** data, int * status ) {
       if (hdr->detname) hdr->detname = smf_free( hdr->detname, status );
     }
     hdr = smf_free( hdr, status );
-    printf("SMF_CLOSE_FILE: hdr = %p\n",hdr);
   }
 
   /* Now the smfDA itself */
