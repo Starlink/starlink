@@ -78,7 +78,7 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
       configure_menubutton File -underline 0
 
       #  Add window help.
-      add_help_button extraisosurface "On Window..."
+      add_help_button extracubes "On Window..."
       add_short_help $itk_component(menubar).help \
          {Help menu: get some help about this window}
 
