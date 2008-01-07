@@ -1,5 +1,5 @@
-    GAIA-3D extension.
-    ==================
+    GAIA-3D volume visualisation extension.
+    =======================================
     
     New facilities for visualising data cubes have been developed for
     GAIA. These include the facility to display 3D iso-surfaces and also to do
@@ -7,11 +7,11 @@
     be rendered into the scene, and there are also facilities for drawing
     annotated axes and direction vectors. The scene is fully interactive and
     can be manipulated to view regions of interest, as well as move the
-    current slice and spectrum.  Readout of the celestial and spectral
+    current slice and spectrum. Readout of the celestial and spectral
     coordinates are also available (these work with the visualised
     slice). Finally it is also possible to display iso-surfaces of other cubes
     into the same scene for intercomparison purposes. See the "View" menu of
-    the cube toolbox.
+    the cube toolbox. 
 
     A new command-line option "-autoscale" has been added. This enables
     the "View->Auto scale" option to scale the image to fit the main window
