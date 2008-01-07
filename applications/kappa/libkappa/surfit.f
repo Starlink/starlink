@@ -92,6 +92,9 @@
 *        The type of fit.  It must be either "Polynomial" for a
 *        Chebyshev polynomial or "Spline" for a bi-cubic spline.  The
 *        default is the current value, which initially is "Spline". []
+*     GENVAR = _LOGICAL (Read)
+*        If TRUE, a constant variance array is created in the output NDF
+*        assigned to the mean square surface-fit error.  [FALSE]
 *     LOGFILE = FILENAME (Read)
 *        Name of the file to log the binned array and errors before and
 *        after fitting.  If null, there will be no logging. [!]
@@ -160,8 +163,8 @@
 *     component SCALE.  All of these components have type _REAL.
 *
 *     Also stored in the SURFACEFIT extension is the r.m.s. deviation 
-*     to the fit (component RMS); and the co-ordinate system component 
-*     COSYS, set to "GRID".
+*     of data values compared with the fit (component RMS); and the
+*     co-ordinate system component COSYS, set to "GRID".
 
 *  Examples:
 *     surfit comaB comaB_bg
@@ -192,19 +195,20 @@
 *     KAPPA: ARDMASK, FITSURFACE, MAKESURFACE.
 
 *  Implementation Status:
-*     -  This routine correctly processes the AXIS, DATA, QUALITY,
+*     -  This routine correctly processes the AXIS, DATA, QUALITY, 
 *     LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF.
-*     There is no support for VARIANCE processing.
+*     Any input VARIANCE is ignored.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
 *     -  All non-complex numeric data types can be handled.  Arithmetic
 *     is performed using single- or double-precision floating point for
-*     FITTYPE = "Spline" or "Polynomial" respectively.
+*     FITTYPE = "Spline" or "Polynomial" respectively.  The output NDF's
+*     DATA and VARIANCE components have type _REAL (single-precision).
 
 *  Copyright:
 *     Copyright (C) 1996, 1998, 2000, 2004 Central Laboratory of the
 *     Research Councils. 
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -248,6 +252,11 @@
 *        equations and to provide the variances of the polynomial 
 *        coefficients, stored in the SURFACEFIT extension.  Writes a
 *        SURFACEFIT structure for bi-cubic spline fitting.  
+*     2007 December 20 (MJC):
+*        Add GENVAR parameter and evaluate pixel-by-pixel variance.
+*     2008 January 5 (MJC):
+*        Write a constant variance array using the mean square residual
+*        of the fit when parameter GENVAR is TRUE.
 *     {enter_further_changes_here}
 
 *-
@@ -340,6 +349,7 @@
                                  ! fitting
       REAL COEFF( MBCOEF )       ! B-spline coefficients of the fit
       INTEGER CPTR               ! Pointer to mapped covariance matrix
+      LOGICAL CREVAR             ! Create variance array?
       CHARACTER * ( 100 ) DATNAM ! Name of input and output IMAGEs
       INTEGER DIMS( NDIM )       ! Dimensions of both data arrays
       DOUBLE PRECISION DRMS      ! RMS difference of the input and
@@ -428,7 +438,7 @@
       INTEGER PANPTR             ! Mnemonic pointer to panel-ordering
                                  ! workspace
       INTEGER PNTRI( 1 )         ! Pointer to input data array
-      INTEGER PNTRO( 1 )         !    "     " output     "
+      INTEGER PNTRO( 2 )         !    "     " output data & variance
       INTEGER RESPTR             ! Mnemonic pointer to the residuals to
                                  ! fitted binned data
       REAL RMS                   ! RMS difference of the input and
@@ -758,6 +768,9 @@
 *  Get the method of final evaluation.
       CALL PAR_CHOIC( 'EVALUATE', 'Interpolate', 'Interpolate,All',
      :                .TRUE., EVMETH, STATUS )
+
+*  Determine whether or not a variance array is to be created.
+      CALL PAR_GET0L( 'GENVAR', CREVAR, STATUS )
 
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
@@ -1113,10 +1126,19 @@
 *  Map the input and output arrays.
 *  ================================
 
-*  Map the input and output data arrays.  The binning routines take
-*  a _REAL array as input but generate _REAL or _DOUBLE vectors.
+*  Map the input data array.  The binning routines take a _REAL array 
+*  as input but generate _REAL or _DOUBLE vectors.
       CALL KPG1_MAP( NDFI, 'Data', '_REAL', 'READ', PNTRI, EL, STATUS )
-      CALL KPG1_MAP( NDFO, 'Data', '_REAL', 'WRITE', PNTRO, EL, STATUS )
+
+*  Map the data array (and possibly the variance) of the new NDF for
+*  write access.
+      IF ( CREVAR ) THEN
+         CALL KPG1_MAP( NDFO, 'Data,Variance', '_REAL',
+     :                  'WRITE/BAD', PNTRO, EL, STATUS )
+      ELSE
+         CALL KPG1_MAP( NDFO, 'Data', '_REAL',
+     :                  'WRITE/BAD', PNTRO, EL, STATUS )
+      END IF
 
 *  Bin the data.
 *  =============
@@ -1244,7 +1266,7 @@
 
 *  Fit a polynomial surface to the binned array.  Use this routine in
 *  preference to KPS1_SUPF because it computes the variance of the
-coefficients.
+*  coefficients.
             CALL KPS1_FSPF2( DXMIN, DXMAX, DYMIN, DYMAX, NXPAR, NYPAR,
      :                       FIRST, NBIN, MPCOEF, MAXBIN,
      :                       %VAL( CNF_PVAL( XPTR ) ), 
@@ -1518,6 +1540,12 @@ coefficients.
      :                    COEFF, SCALE, SNGL( RSMAX ), RMS, 'GRID',
      :                    STATUS )
 
+      END IF
+
+*  Assign the RMS residual squared to the variance.
+      IF ( CREVAR ) THEN
+         CALL KPG1_FILLR( RMS * RMS, EL, %VAL( CNF_PVAL( PNTRO( 2 ) ) ),
+     :                    STATUS )
       END IF
 
 *  Report the fitted data and residuals to the log file.

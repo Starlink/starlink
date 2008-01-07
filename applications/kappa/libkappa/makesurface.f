@@ -64,9 +64,9 @@
 *        Upper bounds of new NDF (if LIKE=!).  The suggested defaults
 *        are the upper bounds of the IN NDF.
 *     VARIANCE = _LOGICAL (Read)
-*        If TRUE, a variance array is created in the output NDF
-*        provided the SURFACEFIT.FIT structure contains variance
-*        information.
+*        If TRUE, a uniform variance array equated to the mean squared
+*        residual of the fit is created in the output NDF, provided the 
+*        SURFACEFIT structure  contains the RMS component.  [FALSE]
 *     XLIMIT( 2 ) = _DOUBLE (Read)
 *        Co-ordinates of the left then right edges of the x axis (if
 *        LIKE=!).  The suggested defaults are respectively the minimum
@@ -102,7 +102,8 @@
 *     -  The polynomial surface fit is stored in SURFACEFIT extension,
 *     component FIT of type POLYNOMIAL, variant CHEBYSHEV or BSPLINE.  
 *     This extension is created by FITSURFACE.  Also read from the
-*     SURFACEFIT extension is the co-ordinate system (component COSYS).
+*     SURFACEFIT extension is the co-ordinate system (component COSYS),
+*     and the fit RMS (component RMS).
 *     -  When LIKE=!, COSYS="Data" or "Axis" and the original NDF had an
 *     axis that decreased with increasing pixel index, you may want to 
 *     flip the co-ordinate limits (via parameters XLIMIT or YLIMIT) to 
@@ -128,7 +129,7 @@
 *     Copyright (C) 1995, 1997-1998, 2004 Central Laboratory of the
 *     Research Councils. 
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -183,6 +184,11 @@
 *        Allow for COSYS to be AXIS, PIXEL, or GRID.
 *     2007 July 6 (MJC):
 *        Added support and restructured for BSPLINE variant.
+*     2008 January 3 (MJC):
+*        Denormalise the fit variances before evaluation. 
+*     2008 January 5 (MJC):
+*        Write a constant variance array using the SURFACEFIT.RMS 
+*        component when parameter VARIANCE is TRUE.
 *     {enter_further_changes_here}
 
 *-
@@ -268,6 +274,7 @@
                                  ! is valid
       DOUBLE PRECISION PYMIN     ! Minimum y for which fitted surface
                                  ! is valid
+      REAL RMS                   ! Root-mean squared of fitted surface
       DOUBLE PRECISION ROUND( 2 )! Rounding needed to compare
                                  ! co-ordinate limits as SUBPAR loses
                                  ! accuracy
@@ -339,6 +346,19 @@
 
 *  Obtain the co-ordinate system.
       CALL NDF_XGT0C( NDFI, 'SURFACEFIT', 'COSYS', COSYS, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 999
+
+*  Determine whether or not a variance array is to be created.  It isn't
+*  when the SURFACEFIT structure does not contain an RMS component.
+      CALL ERR_MARK
+      CALL NDF_XGT0R( NDFI, 'SURFACEFIT', 'RMS', RMS, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_ANNUL( STATUS )
+         CREVAR = .FALSE.
+      ELSE
+         CALL PAR_GET0L( 'VARIANCE', CREVAR, STATUS )
+      END IF
+      CALL ERR_RLSE
 
       OBWORK = .FALSE.
 
@@ -362,14 +382,6 @@
          CALL KPG1_PL2GE( FLOC, MXPAR, VARNT, NXPAR, NYPAR, LIMITS,
      :                    PXMIN, PXMAX, PYMIN, PYMAX, CHCOEF,
      :                    VARPRE, VARIAN, WORK, STATUS )
-
-*  Determine whether or not a variance array is to be created.  It isn't
-*  when the polynomial structure does not contain a VARIANCE component.
-         IF ( VARPRE ) THEN
-            CALL PAR_GET0L( 'VARIANCE', CREVAR, STATUS )
-         ELSE
-            CREVAR = .FALSE.
-         END IF
 
          IF ( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -800,24 +812,6 @@
      :                       %VAL( CNF_PVAL( DPTR( 1 ) ) ), STATUS )
          END IF
 
-*  Create the variance array.
-         IF ( CREVAR ) THEN
-
-            IF ( ITYPE .EQ. '_REAL' ) THEN
-               CALL KPS1_MSPAR( XDIM, YDIM, %VAL( CNF_PVAL( XPTR ) ),
-     :                          PXMIN, PXMAX, %VAL( CNF_PVAL( YPTR ) ),
-     :                          PYMIN, PYMAX, NXPAR, NYPAR, MCHOEF, 
-     :                          VARIAN, %VAL( CNF_PVAL( WPTR ) ),
-     :                          %VAL( CNF_PVAL( DPTR( 2 ) ) ), STATUS )
-
-            ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPS1_MSPAD( XDIM, YDIM, %VAL( CNF_PVAL( XPTR ) ),
-     :                          PXMIN, PXMAX, %VAL( CNF_PVAL( YPTR ) ),
-     :                          PYMIN, PYMAX, NXPAR, NYPAR, MCHOEF, 
-     :                          VARIAN, %VAL( CNF_PVAL( WPTR ) ),
-     :                          %VAL( CNF_PVAL( DPTR( 2 ) ) ), STATUS )
-            END IF
-         END IF
 
 *  B-spline evaluation
 *  ===================
@@ -842,6 +836,19 @@
      :                       %VAL( CNF_PVAL( DPTR( 1 ) ) ), STATUS )
          END IF
       END IF
+
+*  Create the cinstant variance array.
+*  ===================================
+         IF ( CREVAR ) THEN
+            IF ( ITYPE .EQ. '_REAL' ) THEN
+               CALL KPG1_FILLR( RMS * RMS, EL, 
+     :                          %VAL( CNF_PVAL( DPTR( 2 ) ) ), STATUS )
+
+            ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+               CALL KPG1_FILLD( DBLE( RMS * RMS ), EL, 
+     :                          %VAL( CNF_PVAL( DPTR( 2 ) ) ), STATUS )
+            END IF
+         END IF
 
 *  Tidy up the workspace.
       CALL PSX_FREE( WPTR, STATUS )

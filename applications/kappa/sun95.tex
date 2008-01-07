@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.33}
 \newcommand{\stardocnumber}    {95.33}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2007 December 17}
+\newcommand{\stardocdate}      {2008 January 5}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.8-7}
+\newcommand{\stardocversion}   {1.8-8}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -31567,9 +31567,9 @@ KAPPA: \htmlref{DISPLAY}{DISPLAY},
       \sstsubsection{
          VARIANCE = \_LOGICAL (Read)
       }{
-         If {\tt TRUE}, a variance array is created in the output NDF
-         provided the SURFACEFIT.FIT structure contains variance
-         information. {\tt [FALSE]}
+         If {\tt TRUE}, a uniform variance array equated to the mean squared 
+         residual of the fit is created in the output NDF, provided the 
+         SURFACEFIT structure contains the RMS component.  {\tt [FALSE]}
       }
       \sstsubsection{
          XLIMIT( 2 ) = \_DOUBLE (Read)
@@ -31628,7 +31628,7 @@ KAPPA: \htmlref{DISPLAY}{DISPLAY},
 	 component FIT of type POLYNOMIAL, variant CHEBYSHEV or
 	 BSPLINE.  This extension is created by FITSURFACE.  Also read
 	 from the SURFACEFIT extension is the co-ordinate system
-	 (component COSYS).
+	 (component COSYS), and the fit RMS (component RMS).
 
          \sstitem
          When LIKE={\tt{!}}, COSYS={\tt "Data"} or {\tt "Axis"} and
@@ -31650,10 +31650,9 @@ KAPPA: \htmlref{FITSURFACE}{FITSURFACE},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance},
-\htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of an NDF
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of an NDF
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.  However, neither
- QUALITY nor a SURFACEFIT extension is propagated when LIKE is not
+         QUALITY nor a SURFACEFIT extension is propagated when LIKE is not
          null.
 
          \sstitem
@@ -44535,6 +44534,12 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          default is the current value, which initially is {\tt "Spline"}. {\tt []}
       }
       \sstsubsection{
+         GENVAR = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, a constant variance array is created in the output NDF
+         assigned to the mean square surface-fit error.  {\tt [FALSE]}
+      }
+      \sstsubsection{
          LOGFILE = FILENAME (Read)
       }{
          Name of the file to log the binned array and errors before and
@@ -44689,7 +44694,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
          \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of the input NDF.
-         There is no support for \htmlref{VARIANCE}{apndf:variance}~ processing.
+         Any input \htmlref{VARIANCE}{apndf:variance}~ is ignored.
 
          \sstitem
          Processing of \htmlref{bad pixels}{se:masking} and automatic \htmlref{quality masking}{se:qualitymask} are
@@ -44698,7 +44703,8 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          \sstitem
          All \htmlref{non-complex numeric data types}{ap:HDStypes} can be handled.  Arithmetic
          is performed using single- or double-precision floating point for
-         FITTYPE={\tt "Spline"} or {\tt "Polynomial"} respectively.
+         FITTYPE={\tt "Spline"} or {\tt "Polynomial"} respectively.  The output 
+         NDF's DATA and VARIANCE components have type \_REAL (single-precision).
       }
    }
 }
@@ -53422,6 +53428,14 @@ The following applications have been modified:
          length of zero for that axis.
       \end{itemize}
 
+   \item [\htmlref{MAKESURFACE}{MAKESURFACE}] \mbox{}
+      \begin{itemize}
+         \item When parameter VARIANCE is {\tt TRUE}, a uniform VARIANCE 
+         component is written to the output NDF.  Since the constant variance 
+         is the mean squared residual of the fit, variance information can now 
+         be created for a spline fit.
+      \end{itemize}
+
    \item [\htmlref{MFITTREND}{MFITTREND}] \mbox{}
       \begin{itemize}
          \item There are three new parameters: METHOD allows a choice
@@ -53440,6 +53454,13 @@ The following applications have been modified:
       \begin{itemize}
          \item The new output parameter TOTAL returns the total flux
          for the fitted S\'{e}rsic function.
+      \end{itemize}
+
+   \item [\htmlref{SURFIT}{SURFIT}] \mbox{}
+      \begin{itemize}
+         \item There is a new parameter GENVAR to enable creation of a uniform 
+         VARIANCE component in the output NDF.  The constant variance is the
+         mean squared residual of the fit.
       \end{itemize}
 
    \item [\htmlref{WCSATTRIB}{WCSATTRIB}] \mbox{}

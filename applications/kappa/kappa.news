@@ -6,21 +6,21 @@
 
 2 New_applications
 
-   o  PLUCK extracts slices parallel to pixel axes from an NDF.  The slices
-   are nominated positions that are not at pixel centres.  Thus it can
-   be used for example, with a spectral imaging cube to extract spectra
-   at specified equatorial co-ordinates, or an image at a given spectral
-   co-ordinate.
+   o PLUCK extracts slices parallel to pixel axes from an NDF.  The 
+   slices are nominated positions that are not at pixel centres.  Thus
+   it can be used for example, with a spectral imaging cube to extract
+   spectra at specified equatorial co-ordinates, or an image at a
+   given spectral co-ordinate.
 
 2 Modified_applications
 
    o  ARDMASK 
    
-      -  This now has an option to use WCS co-ordinates in the input NDF 
-      as the default co-ordinate system for the supplied ARD description.
-      See the new parameter DEFPIX.
+      - This now has an option to use WCS co-ordinates in the input
+      NDF as the default co-ordinate system for the supplied ARD
+      description.  See the new parameter DEFPIX.
 
-      -  It can now use a two-dimensional ARD description to mask each
+      - It can now use a two-dimensional ARD description to mask each
       plane in a three-dimensional NDF.
 
    o  COLLAPSE issues a warning whenever any output values are set
@@ -37,6 +37,11 @@
       and can be disabled along axes by supplying a scale length of 
       zero for that axis.
 
+   o  MAKESURFACE parameter VARIANCE set to TRUE now writes a uniform 
+      VARIANCE component to the output NDF.  Since the constant
+      variance is the mean squared residual of the fit, variance
+      information can be created for a spline fit.
+
    o  MFITTREND
 
       -  There are three new parameters: METHOD allows a choice of
@@ -51,6 +56,10 @@
 
    o  PSF has a new output parameter TOTAL which returns the total
       flux for the fitted Sersic function.
+
+   o  SURFIT has a new parameter GENVAR to enable creation of a uniform 
+      VARIANCE component in the output NDF.  The constant variance is 
+      the mean squared residual of the fit.
 
    o  WCSATTRIB permits the setting of multiple attributes through new 
       MSET option for parameter MODE, and the new parameter SETTING.

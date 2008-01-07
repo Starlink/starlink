@@ -16127,6 +16127,15 @@ iraf! {
             default SPLINE
           }
 
+         parameter genvar {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Generate output variances from fitting errors?}
+            helpkey *
+          }
+
          parameter logfile {
             type FILENAME
             access READ
