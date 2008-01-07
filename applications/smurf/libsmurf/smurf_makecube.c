@@ -215,6 +215,10 @@
 *          If TRUE, the weights used are the reciprocal of the variances
 *          associated with the input spectra, as determined from the Tsys 
 *          values in the input. [TRUE]
+*     LBND( 2 ) = _INTEGER (Read)
+*        An array of values giving the lower pixel index bound on each
+*        spatial axis of the output NDF. The suggested default values 
+*        encompass all the input spatial information. []
 *     LBOUND( 3 ) = _INTEGER (Write)
 *          The lower pixel bounds of the output NDF. Note, values will be
 *          written to this output parameter even if a null value is supplied 
@@ -477,6 +481,10 @@
 *          fall outside the bounds of the full sized output array. This
 *          will result in the border tiles being smaller than the central 
 *          tiles. [FALSE]
+*     UBND( 2 ) = _INTEGER (Read)
+*        An array of values giving the upper pixel index bound on each
+*        spatial axis of the output NDF. The suggested default values 
+*        encompass all the input spatial information. []
 *     UBOUND( 3 ) = _INTEGER (Write)
 *          The upper pixel bounds of the output NDF. Note, values will be
 *          written to this output parameter even if a null value is supplied 
@@ -668,6 +676,8 @@
 *        Update to use new smf_free behaviour
 *     19-DEC-2007 (DSB):
 *        Correct the way reference WCS is handled.
+*     7-JAN-2008 (DSB):
+*        Added LBND and UBND.
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -790,6 +800,7 @@ void smurf_makecube( int *status ) {
    float var;                 /* Variance value */
    int ***ptime;              /* Holds time slice indices for each bol bin */
    int *pt;                   /* Holds time slice indices for each bol bin */
+   int actval;                /* Number of parameter values supplied */
    int autogrid;              /* Determine projection parameters automatically? */
    int axes[ 2 ];             /* Indices of selected axes */
    int badmask;               /* How is the output bad pixel mask chosen? */

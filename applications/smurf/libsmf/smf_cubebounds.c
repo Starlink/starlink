@@ -193,6 +193,9 @@
 *        Correct the way reference WCS is handled.
 *     04-JAN-2008 (TIMJ):
 *        Remove debugging printf statements.
+*     7-JAN-2008 (DSB):
+*        Allow user to override default output pixel bounds using
+*        parameters LBND and UBND.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -289,6 +292,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    double specout[ 2];   /* Transformed spectral values */
    double temp;          /* Temporary storage used when swapping values */
    float *pdata;         /* Pointer to next data sample */
+   int actval;           /* Number of parameter values supplied */
    int found;            /* Was the detector name found in the supplied group? */
    int good;             /* Are there any good detector samples? */
    int ibasein;          /* Index of base Frame in input FrameSet */
@@ -297,6 +301,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    int ishift;           /* Shift to put pixel origin at centre */
    int ispec;            /* Index of current spectral sample */
    int itime;            /* Index of current time slice */
+   int itmp;             /* Temporary storage */
    int nval;             /* Number of values supplied */
    int pixax[ 3 ];       /* The output fed by each selected mapping input */
    int specax;           /* Index of spectral axis in input FrameSet */
@@ -1007,6 +1012,29 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* Now remap the interrim GRID Frame in the returned FrameSet so that it
    represent actual GRID coords in the output cube. */
    astRemapFrame( *wcsout, AST__BASE, astShiftMap( 3, gshift, "" ) );
+
+/* Allow the user to override the output pixel bounds calculated above. */
+   parDef1i( "LBND", 2, lbnd, status );
+   parDef1i( "UBND", 2, ubnd, status );
+
+   parGet1i( "LBND", 2, lbnd, &actval, status );
+   if( actval == 1 ) lbnd[ 1 ] = lbnd[ 0 ];
+
+   parGet1i( "UBND", 2, ubnd, &actval, status );
+   if( actval == 1 ) ubnd[ 1 ] = ubnd[ 0 ];
+
+/* Ensure the bounds are the right way round. */
+   if( lbnd[ 0 ] > ubnd[ 0 ] ) { 
+      itmp = lbnd[ 0 ];
+      lbnd[ 0 ] = ubnd[ 0 ];
+      ubnd[ 0 ] = itmp;
+   }      
+
+   if( lbnd[ 1 ] > ubnd[ 1 ] ) { 
+      itmp = lbnd[ 1 ];
+      lbnd[ 1 ] = ubnd[ 1 ];
+      ubnd[ 1 ] = itmp;
+   }      
 
 /* Report the pixel bounds of the cube. */
    if( *status == SAI__OK ) {

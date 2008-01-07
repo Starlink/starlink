@@ -931,6 +931,16 @@ package @PACKAGE@ {
 	    helpkey *
 	  }
 
+         parameter lbnd {
+            size *
+            type _INTEGER
+            access READ
+            vpath DYNAMIC
+            ppath DYNAMIC
+            prompt {Lower pixel index bounds for output spatial axes}
+            helpkey *
+          }
+
          parameter lbound {
             size *
             type _INTEGER
@@ -1119,6 +1129,17 @@ package @PACKAGE@ {
             default TRACKING
             helpkey *
 	  }
+
+
+         parameter ubnd {
+            size *
+            type _INTEGER
+            access READ
+            vpath DYNAMIC
+            ppath DYNAMIC
+            prompt {Upper pixel index bounds for output spatial axes}
+            helpkey *
+          }
 
           parameter ubound {
             size *
