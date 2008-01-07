@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>Extra cubes</title>
+  </head>
+  
+  <body>
+    </h1>
+    <a name="xref_extracubes"></a>
+    <h2 align=center><font color=red>
+        Displaying additional iso-surfaces from other cubes
+      </font></h2>
+    <p>
+      Using this toolbox you can open up additional cubes and draw
+      iso-surfaces from them in the rendered scene (this works for both the
+      iso-surface and volume rendering toolboxes). This allows you to compare
+      data from different energies and sources.
+    </p>
+    <p>
+      Choosing the data and selecting levels should be straight-forward (note
+      that the <tt>Go</tt> menus provide a simple way to select a cube you've
+      previously opened). A cube can be temporarily removed by de-selecting
+      the <tt>Display:</tt> checkbox. <b>Note</b> that to display the
+      iso-surfaces, or see any changes, you must press the <tt>Draw</tt>
+      button in the rendering window.
+    </p>
+
+    <h3>Alignment</h3>
+    <p>
+      By default GAIA will use any coordinate system information to align the
+      iso-surfaces of the extra cubes to that of the displayed cube. So you
+      should see a scene in which the cubes are aligned correctly on the sky
+      and along the spectral axis.
+    </p>
+    <p>
+      Sometimes you'll want to align cube using their simple grid
+      positions. To do this you need to de-select the <tt>Match
+      coordinates</tt> item in the <tt>Options</tt> menu.
+    </p>
+    <p>
+      The other coordinate matching options are
+      <tt>Match sidebands</tt> and <tt>Match using base system</tt>.
+    </p>
+    <p>
+      If you select <tt>Match sidebands</tt> and you have heterodyne cubes
+      with suitably defined dual-sideband spectral coordinates then this will
+      be taken into account when matching (otherwise matching will just use
+      the frequencies or velocites of the current sideband).
+    </p>
+    <p>
+      <tt>Match using base system:</tt> when matching spectral coordinates it
+      is usual to achieve this by transforming all coordinate systems into a
+      common system, this system is wavelength by default. For some systems it
+      may be better to use another common system so by selecting this option
+      (which is on by default) you can set the common system used to be that
+      of the current spectral axes of the main cube. This option is most
+      useful when working with velocities, when you want the alignment to
+      happen in that system (because the spectra have different rest
+      frequencies).
+    </p>
+  </body>
+</html>

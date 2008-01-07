@@ -15,6 +15,10 @@
       and very good speed is available on machines whose physical memory is
       greater than the size of the cube.
     </p>
+    <p>
+      3D iso-surface and volume visualisation is provided in the
+      <tt>View</tt> menu.
+    </p>
 
     <h3>Displaying image planes</h3>
     <p>
@@ -44,7 +48,7 @@
     </p>
     <p>
       The extraction limits along the spectral axis are the full range by
-      default. To extract a smaller range of values you can use the 
+      default. To extract a smaller range of values you can use the
       <tt>Lower index:</tt> and <tt>Upper index:</tt> controls. The new
       extraction limits are not used until you click on the image again,
       or press the <tt>Re-extract</tt> button.
@@ -81,13 +85,13 @@
       maximum of the pixel or region clicked on. Subsequent drags (without
       releasing) continue to use this same range. In this mode it's easy to
       compare spectra and spectral extraction is fast. If you'd like to have
-      the data range always set to the minimum and maximum select the 
+      the data range always set to the minimum and maximum select the
       <tt>Options->Autoscale</tt> item in the spectral plot window. The final
       option is to fix the data range to some preset values that you'd
       like. To use this select the <tt>Fix data range:</tt> control and enter
       the data range you want. Remember to press return to apply a limit.
     </p>
-    
+
     <h5>Comparing spectra</h5>
     <p>
       It is possible to have two extracted spectra on display at the same
@@ -109,15 +113,15 @@
     <h5>Animation</h5>
     <p>
       Using these controls you can automatically step through a range of
-      indices. At the end of the range you can choose to either stop 
-      (<tt>Off</tt>), continuously start again from the beginning 
-      (<tt>On</tt>) or continuously reverse direction 
+      indices. At the end of the range you can choose to either stop
+      (<tt>Off</tt>), continuously start again from the beginning
+      (<tt>On</tt>) or continuously reverse direction
       (<tt>Rock 'n Roll</tt>). The limits to animate over can be controlled
       using the sliders, or you can select "Show limits on plot:" to interact
       with a graphic displayed over the spectral plot.
     </p>
     <p>
-      The animation can be saved to an animated GIF by selecting the 
+      The animation can be saved to an animated GIF by selecting the
       <tt>Capture</tt> item. The capture process requires that the main window
       is visible, and not overlaid by any other window. If you want to change
       the size of the animation GIF then you can only do that by resizing the
@@ -132,26 +136,26 @@
       These controls run the KAPPA application COLLAPSE to create white-light
       images of various kinds. The collapse range is controlled as in the
       Animation tab. The combination method provides a wide range of methods,
-      including: 
+      including:
     </p>
     <ul>
       <li> <tt>Mean</tt> - Mean value </li>
       <li> <tt>WMean</tt> - Weighted mean in which each data value is weighted
-        by the reciprocal of the associated variance.</li> 
+        by the reciprocal of the associated variance.</li>
       <li> <tt>Mode</tt> - Modal value</li>
       <li> <tt>Median</tt> - Median value. Note that this is extremely memory
         and CPU intensive for large datasets; use with care!</li>
       <li> <tt>Absdev</tt> - Mean absolute deviation from the unweighted
-        mean.</li> 
+        mean.</li>
       <li> <tt>Comax</tt> - Co-ordinate of the maximum value.</li>
       <li> <tt>Comin</tt> - Co-ordinate of the minimum value.</li>
       <li> <tt>Integ</tt> - Integrated value, being the sum of the products of
-        the value and pixel width in world co-ordinates.</li> 
+        the value and pixel width in world co-ordinates.</li>
       <li> <tt>Iwc</tt> - Intensity-weighted co-ordinate, being the sum of
         each value times its co-ordinate, all divided by the integrated value
-        (see the <tt>Integ</tt> option).</li> 
+        (see the <tt>Integ</tt> option).</li>
       <li> <tt>Iwd</tt> - Intensity-weighted dispersion of the co-ordinate,
-        normalised like <tt>Iwc</tt> by the integrated value.</li> 
+        normalised like <tt>Iwc</tt> by the integrated value.</li>
       <li> <tt>Max</tt> - Maximum value.</li>
       <li> <tt>Min</tt> - Minimum value.</li>
       <li> <tt>Rms</tt> - Root-mean-square value.</li>
@@ -161,7 +165,7 @@
 
     <h5>Chanmap</h5>
     <p>
-      These controls run the KAPPA application CHANMAP to create a 
+      These controls run the KAPPA application CHANMAP to create a
       <tt>channel map</tt> image. A channel map image consists of image tiles,
       each tile being the result of collapsing a range of planes in a cube.
       These ranges are chosen to create a given number of tiles between two
@@ -176,8 +180,8 @@
       inspect the coordinates of each tile and compare positions across all
       tiles. The average values of the collapsed axis can be seen by clicking
       on a tile and inspecting the <tt>Selected coord:</tt> readout, this
-      click will also result in an attempt to display a marker at the 
-      equivalent positions on all the other tiles. 
+      click will also result in an attempt to display a marker at the
+      equivalent positions on all the other tiles.
     </p>
     <p>
       Fuller coordinate information can also be tracked in the
@@ -193,8 +197,8 @@
     </p>
     <p>
       The rebinning is controlled by three bin factors, one for each
-      dimension, so it is possible to avoid rebinning in either the 
-      image or spectral dimensions, if required (by setting the bin 
+      dimension, so it is possible to avoid rebinning in either the
+      image or spectral dimensions, if required (by setting the bin
       factor for that axis to 1).
     </p>
     <p>
@@ -210,7 +214,7 @@
     <p>
       These controls allow you to smooth the image planes of the cube using
       either a block or gaussian filter. The block filter can be a simple
-      square or a rectangle. The gaussian filter can be symmetric or 
+      square or a rectangle. The gaussian filter can be symmetric or
       ellipsoidal, at a given angle.
     </p>
     <p>
@@ -283,7 +287,7 @@
       The <tt>Go</tt> menu provides you with a quick menu of cubes that have
       been recently loaded. To revisit one just select its name in the list.
       Cubes that have been loaded in this session can also be switched back
-      and forth using the <tt>Back</tt> and <tt>Forward</tt> items. When 
+      and forth using the <tt>Back</tt> and <tt>Forward</tt> items. When
       using these an attempt to preserve any extraction limits will be
       made. This will be perfect if the size of the spectral dimension of the
       cube doesn't change, otherwise a transformation from the old coordinates
@@ -293,11 +297,42 @@
     </p>
 
     <h3>View</h3>
+
     <p>
-      The <tt>View</tt> menu has only one entry <tt>Fits header...</tt>,
-      which will open a window and display any FITS headers associated with
-      the cube.
+      The <tt>View</tt> menu item <tt>Fits header...</tt>, will open a window
+      and display any FITS headers associated with the cube (note if you look
+      at the FITS headers in the main window these will only apply to the
+      extracted image).
     </p>
+
+    <h3><font color="red">Volume Visualisation</font></h3>
+    <p>
+      The <tt>View menu</tt> has two items for viewing and interacting with
+      your cube. The first allows you to drawing 3D surfaces at specified data
+      values, so called <a href="isosurface.html">iso-surfaces</a>, 
+      and the second to view a representation
+      of the the whole cube between two data limits using 
+      <a href="volume.html">volume rendering</a>.
+    </p>
+    <p>
+      Which tool to use depends on what aspects of your data you're trying to
+      perceive, but in general since iso-surfaces are quicker to render and
+      use less memory, that's probably the best tool to start with.
+    </p>
+    <p>
+      Each tool will also display the position of the current slice and the
+      currently extracted spectrum (region or line) and can display 3D axes.
+      They can also display additional cubes, as iso-surfaces, so that you can
+      intercompare data. See the help in these windows for a fuller
+      description.
+    </p>
+
+    <p>
+      Volume visualisation is a CPU and memory intensive operation, so a fast
+      machine with a lot of memory is required. Equally important is a good
+      graphics setup with hardware support for OpenGL. If you don't have that
+      slow software rendering will be used.
+    <p>
 
     <h3>Data formats and efficiency</h3>
     <p>
