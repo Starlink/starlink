@@ -73,7 +73,7 @@ itcl::class ::gaia3d::Gaia3dVtkLine {
       #  Set some properties.
       set property_ [::vtkProperty New]
       $property_ SetRepresentationToSurface
-      $property_ SetColor 0.0 1.0 1.0
+      #$property_ SetColor 0.0 1.0 1.0
       $property_ SetAmbient 1.0
       $property_ SetAmbientColor 1.0 1.0 1.0
       $property_ SetLineWidth 2.0
@@ -290,6 +290,14 @@ itcl::class ::gaia3d::Gaia3dVtkLine {
 
    #  The axis to align to.
    public variable axis 3
+
+   #  The colour (Tcl colour).
+   public variable colour {#0ff} {
+      if { $property_ != {} } {
+         set rgb [::gaia3d::Gaia3dVtkWindow::get_rgb_colour $colour]
+         eval $property_ SetColor $rgb
+      }
+   }
 
    #  Protected variables: (available to instance)
    #  --------------------

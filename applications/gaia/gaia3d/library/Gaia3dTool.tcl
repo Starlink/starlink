@@ -139,6 +139,11 @@ itcl::class gaia3d::Gaia3dTool {
       $Options add cascade -label "Image plane opacity" -menu $submenu
       opacity_fill_ $submenu
 
+      #  Add option to choose a colour for the spectral line/region.
+      set submenu [menu $Options.spectralcolour]
+      $Options add cascade -label "Spectral colour" -menu $submenu
+      spectral_colour_fill_ $submenu
+
       #  AST axes, text scale and a colour.
       set submenu [menu $Options.textscale]
       $Options add cascade -label "Annotated text scale" -menu $submenu
@@ -477,6 +482,20 @@ itcl::class gaia3d::Gaia3dTool {
       }
    }
 
+   #  Fill the spectral colour menu. Use AST colours, but not bound to them.
+   protected method spectral_colour_fill_ {menu} {
+      set count [gaia::AstColours::standard_count]
+      for {set i 0} {$i < $count} {incr i} {
+         set colour [gaia::AstColours::lookup_colour $i]
+         $menu add radiobutton \
+            -value $colour \
+            -label {   } \
+            -background $colour \
+            -variable [scope spectral_colour_] \
+            -command [code $this changed_spectral_colour_]
+      }
+   }
+
    #  Add the controls specific to this rendering job (contours, data limits
    #  etc).
    protected method add_tool_controls_ {} {
@@ -542,6 +561,14 @@ itcl::class gaia3d::Gaia3dTool {
       if { $plane_ != {} } {
          $plane_ configure -colourmap $plane_colourmap_
          $plane_ update
+         $renwindow_ render
+      }
+   }
+
+   #  Called when the spectral line or region colour is changed.
+   protected method changed_spectral_colour_ {} {
+      if { $line_ != {} } {
+         $line_ configure -colour $spectral_colour_
          $renwindow_ render
       }
    }
@@ -827,6 +854,7 @@ itcl::class gaia3d::Gaia3dTool {
                           -dataset [$imagedata_ get_imagedata] \
                           -renwindow $renwindow_ \
                           -align_to_axis 1 \
+                          -colour $spectral_colour_ \
                           -axis [$itk_option(-gaiacube) get_axis]]
             $line_ add_to_window
 
@@ -1201,6 +1229,9 @@ itcl::class gaia3d::Gaia3dTool {
 
    #  The image plane opacity.
    protected variable plane_opacity_ 1.0
+
+   #  The colour of the spectral line or region.
+   protected variable spectral_colour_ [gaia::AstColours::lookup_colour 5]
 
    #  The AST axes text scale.
    protected variable ast_textscale_ 5.0

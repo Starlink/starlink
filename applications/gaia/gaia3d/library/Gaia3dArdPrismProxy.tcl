@@ -186,7 +186,8 @@ itcl::class ::gaia3d::Gaia3dArdPrismProxy {
             -dataset $dataset \
             -renwindow $renwindow \
             -align_to_axis $align_to_axis \
-            -axis $axis
+            -axis $axis \
+            -colour $colour
          fit_to_data
       }
    }
@@ -218,6 +219,11 @@ itcl::class ::gaia3d::Gaia3dArdPrismProxy {
 
    #  The axis to align to.
    public variable axis 3 {
+      apply_configuration_
+   }
+
+   #  The colour.
+   public variable colour {#0ff} {
       apply_configuration_
    }
 

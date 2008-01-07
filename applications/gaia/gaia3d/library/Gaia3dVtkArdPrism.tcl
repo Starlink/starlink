@@ -280,6 +280,14 @@ itcl::class ::gaia3d::Gaia3dVtkArdPrism {
    #  interface. Has no effect as always aligned.
    public variable align_to_axis 1
 
+   #  The colour (Tcl colour).
+   public variable colour {#0ff} {
+      if { $property_ != {} } {
+         set rgb [::gaia3d::Gaia3dVtkWindow::get_rgb_colour $colour]
+         eval $property_ SetColor $rgb
+      }
+   }
+
    #  Protected variables: (available to instance)
    #  --------------------
 
