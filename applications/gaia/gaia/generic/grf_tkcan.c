@@ -33,6 +33,7 @@
  *  Copyright:
  *     Copyright (C) 1997-2004 Central Laboratory of the Research Councils
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     Copyright (C) 2007 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -287,20 +288,7 @@ int astTk_Init( Tcl_Interp *theinterp, const char *thecanvas ) {
 
     /*  Set the default colormap (this can be overwritten and
         extended, but is only initialised once) */
-    if ( numColours == 0 ) {
-        numColours = sizeof( StandardColours ) / sizeof( char * );
-        for (i = 0; i < numColours; i++ ) {
-            Colours[i] = NULL;
-            (void) astTk_AddColour( i, StandardColours[i] );
-        }
-
-        /*  Extra colours are white */
-        for (i = numColours; i < MAXCOLOURS; i++ ) {
-            Colours[i] = NULL;
-            (void) astTk_AddColour( i, StandardColours[0] );
-        }
-        numColours = MAXCOLOURS;
-    }
+    astTk_InitColours();
 
     /*  Need a line segment item. */
     NewSegment = 1;
@@ -392,6 +380,42 @@ void astTk_Tag( const char *newtag ) {
     
     /*  Need a line segment item. */
     NewSegment = 1;
+}
+
+void astTk_InitColours() {
+/*
+ *+
+ *  Name:
+ *     astTk_InitColours
+ 
+ *  Purpose:
+ *     Initialise the standard colours.
+
+ *  Synopsis:
+ *     include "grf_tkcan.h"
+ *     int astTk_InitColours()
+
+ *  Description:
+ *     If not already done so initialise the standard colours and set the
+ *     extra colours to white. Can be called safely at any time.
+
+ *-
+ */
+    int i;
+    if ( numColours == 0 ) {
+        numColours = sizeof( StandardColours ) / sizeof( char * );
+        for ( i = 0; i < numColours; i++ ) {
+            Colours[i] = NULL;
+            (void) astTk_AddColour( i, StandardColours[i] );
+        }
+
+        /*  Extra colours are white */
+        for ( i = numColours; i < MAXCOLOURS; i++ ) {
+            Colours[i] = NULL;
+            (void) astTk_AddColour( i, StandardColours[0] );
+        }
+        numColours = MAXCOLOURS;
+    }
 }
 
 void astTk_AddColour( const int index, const char *colour ) {
