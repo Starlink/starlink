@@ -1345,6 +1345,7 @@ static AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
 /* Local Variables: */
    AstKeyMap *result = NULL;
    HDSLoc *cloc = NULL;
+   HDSLoc *mloc = NULL;
    HDSLoc *dloc = NULL;
    Prov *prov = NULL;
    char *p = NULL;
@@ -1489,13 +1490,16 @@ static AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
    of it. */
    if( prov->more ) {
 
+/* The MORE object itself is contained within prov->more. */
+      datFind( prov->more, "MORE", &mloc, status );
+
 /* See if the MORE object is primtive. */
-      datPrim( prov->more, &prim, status );
+      datPrim( mloc, &prim, status );
 
 /* If the MORE object is an array, we just give its type and shape. */
-      datShape( prov->more, NDF__MXDIM, dims, &ndim, status );
+      datShape( mloc, NDF__MXDIM, dims, &ndim, status );
       if( ndim > 0 ) {
-         datType( prov->more, type, status );
+         datType( mloc, type, status );
          list = astAppendString( list, &nc, "<" );
          list = astAppendString( list, &nc, type );
          list = astAppendString( list, &nc, ">(" );
@@ -1511,17 +1515,17 @@ static AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
 
 /* Otherwise if the MORE object is a primitive scalar, just store its value. */
       } else if( prim ){
-         datLen( prov->more, &len, status );
+         datLen( mloc, &len, status );
          nc = len;
          list = astMalloc( ( nc + 1 )* sizeof( char ) );
-         datGet0C( prov->more, list, nc + 1, status );
+         datGet0C( mloc, list, nc + 1, status );
       
 /* Otherwise the MORE object is a single structure. Loop round each of its
    components. */
       } else {
-         datNcomp( prov->more, &ncomp, status );
+         datNcomp( mloc, &ncomp, status );
          for( icomp = 1; icomp <= ncomp; icomp++ ) {
-            datIndex( prov->more, icomp, &cloc, status );
+            datIndex( mloc, icomp, &cloc, status );
 
 /* Unless this is the first component, add a comma to separate this
    component from the previous one in the summary string. */
@@ -1607,6 +1611,9 @@ static AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
             datAnnul( &cloc, status );
          }
       }
+
+/* Annul the MORE locator. */
+      datAnnul( &mloc, status );
    }
 
 /* If the summary is not empty, store it in the returned KeyMap, and then 
