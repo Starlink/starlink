@@ -130,7 +130,7 @@ fitsimp fitsin fitslist fitsmod fitstext fitsval hiscom hislist hisset \
 native ndfcompress ndfcopy ndftrace setaxis setbad setbb setbound setext setlabel \
 setnorm setorigin setsky settitle settype setunits setvar wcsadd \
 wcsattrib wcscopy wcsframe wcsremove wcsshow chain reshape showqual \
-setqual remqual qualtobad
+setqual remqual qualtobad showprov
 
 
 
@@ -231,7 +231,7 @@ ndftrace.ifc qualtobad.ifc remqual.ifc reshape.ifc \
 setaxis.ifc setbad.ifc setbb.ifc setbound.ifc \
 setext.ifc setlabel.ifc setnorm.ifc setorigin.ifc \
 setqual.ifc setsky.ifc settitle.ifc settype.ifc \
-setunits.ifc setvar.ifc showqual.ifc wcsadd.ifc \
+setunits.ifc setvar.ifc showqual.ifc showprov.ifc wcsadd.ifc \
 wcsattrib.ifc wcscopy.ifc wcsframe.ifc wcsremove.ifc \
 wcsshow.ifc axconv.ifc axlabel.ifc axunits.ifc \
 erase.ifc fitsdin.ifc fitsexist.ifc fitsexp.ifc \
@@ -304,7 +304,7 @@ qualtobad.ifl remqual.ifl reshape.ifl scatter.ifl \
 setaxis.ifl setbad.ifl setbb.ifl setbound.ifl \
 setext.ifl setlabel.ifl setnorm.ifl setorigin.ifl \
 setqual.ifl setsky.ifl settitle.ifl settype.ifl \
-setunits.ifl setvar.ifl showqual.ifl vecplot.ifl \
+setunits.ifl setvar.ifl showqual.ifl showprov.ifl vecplot.ifl \
 wcsadd.ifl wcsattrib.ifl wcscopy.ifl wcsframe.ifl \
 wcsremove.ifl wcsshow.ifl axconv.ifl mem2d.ifl
 
