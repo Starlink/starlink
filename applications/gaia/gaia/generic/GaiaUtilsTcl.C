@@ -53,6 +53,7 @@ extern "C" {
 #include <ast.h>
 }
 #include "gaiaUtils.h"
+#include "grf_tkcan.h"
 
 static const double pi_ = 3.14159265358979323846;
 static const double r2d_ = 180.0/pi_;
@@ -91,6 +92,10 @@ static int GaiaUtilsAstTranN( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsFrameIsA( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsGrfAddColour( ClientData clientData, Tcl_Interp *interp,
+                                  int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsGrfFontResize( ClientData clientData, Tcl_Interp *interp,
+                                   int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsGt2DWcs( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsGtAxis( ClientData clientData, Tcl_Interp *interp,
@@ -164,6 +169,14 @@ int GaiaUtils_Init( Tcl_Interp *interp )
 
     Tcl_CreateObjCommand( interp, "gaiautils::frameisa", GaiaUtilsFrameIsA,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::grfaddcolour", 
+                          GaiaUtilsGrfAddColour, (ClientData) NULL, 
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::grffontresize", 
+                          GaiaUtilsGrfFontResize, (ClientData) NULL, 
+                          (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::get2dwcs", GaiaUtilsGt2DWcs,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
@@ -1466,4 +1479,59 @@ static int GaiaUtilsShiftWcs( ClientData clientData, Tcl_Interp *interp,
     Tcl_SetResult( interp, "Failed to apply shift to frameset",
                    TCL_VOLATILE );
     return TCL_ERROR;
+}
+
+/*  ============
+ *  GRF commands
+ *  ============
+ */
+
+/*
+ * Make a Tcl colour available in the AST graphics interface.
+ *
+ * The two input values are an index for the colour (the maximum index is 63
+ * and the first 15 are protected) and the colour itself (in a form understood
+ * by Tk).
+ */
+static int GaiaUtilsGrfAddColour( ClientData clientData, Tcl_Interp *interp,
+                                  int objc, Tcl_Obj *CONST objv[] )
+{
+    /* Check arguments, only allow two. */
+    if ( objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "index colour" );
+        return TCL_ERROR;
+    }
+    
+    /* Extract the index. */
+    int index = 0;
+    if ( Tcl_GetIntFromObj( interp, objv[1], &index ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
+    /* Make sure that default colours are established and add new one. */
+    astTk_InitColours();
+    astTk_AddColour( index, Tcl_GetString( objv[2] ) );
+    return TCL_OK;
+}
+
+/*
+ * Set whether GRF controlled fonts are resized as the canvas is scaled.
+ *
+ * One argument a boolean.
+ */
+static int GaiaUtilsGrfFontResize( ClientData clientData, Tcl_Interp *interp,
+                                   int objc, Tcl_Obj *CONST objv[] )
+{
+    /* Check arguments, only allow one. */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "do_resize" );
+        return TCL_ERROR;
+    }
+    
+    int resize = 0;
+    if ( Tcl_GetBooleanFromObj( interp, objv[1], &resize ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    astTk_ResizeFonts( resize );
+    return TCL_OK;
 }

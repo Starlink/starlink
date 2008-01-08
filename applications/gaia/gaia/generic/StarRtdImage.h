@@ -16,6 +16,7 @@
  *  Copyright:
  *     Copyright (C) 1997-2005 Central Laboratory of the Research Councils.
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     Copyright (C) 2007 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -192,12 +193,6 @@ class StarRtdImage : public Skycat
 
    //  Return if we are really using X shared memory
    int usingxshmCmd( int argc, char *argv[] );
-
-   //  Add a colour to extend the default set.
-   int astaddcolourCmd( int argc, char *argv[] );
-
-   //  Set whether fonts should be resized with canvas.
-   int astfontresizeCmd( int argc, char *argv[] );
 
    //  Return the value of an AST attribute of the main AstFrameSet.
    int astgetCmd( int argc, char *argv[] );

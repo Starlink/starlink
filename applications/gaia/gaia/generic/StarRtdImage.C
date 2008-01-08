@@ -195,6 +195,8 @@
  *        Added replaceImageDataCmd.
  *     26-APR-2006 (PWD):
  *        Added objectCmd and volatileCmd.
+ *     08-JAN-2008 (PWD):
+ *        Removed astaddcolour & astfontresize (moved into gaiautils::).
  *-
  */
 #if HAVE_CONFIG_H
@@ -274,7 +276,6 @@ public:
     int min_args;                                      // Min number of args
     int max_args;                                      // Max number of args
 } subcmds_[] = {
-    { "astaddcolour",    &StarRtdImage::astaddcolourCmd,    2, 2 },
     { "astalwaysmerge",  &StarRtdImage::astalwaysmergeCmd,  1, 1 },
     { "astassign",       &StarRtdImage::astassignCmd,       7, 7 },
     { "astbootstats",    &StarRtdImage::astbootstatsCmd,    4, 4 },
@@ -286,7 +287,6 @@ public:
     { "astdelete",       &StarRtdImage::astdeleteCmd,       1, 1 },
     { "astdomains",      &StarRtdImage::astdomainsCmd,      0, 1 },
     { "astfix",          &StarRtdImage::astfixCmd,          0, 0 },
-    { "astfontresize",   &StarRtdImage::astfontresizeCmd,   1, 1 },
     { "astget",          &StarRtdImage::astgetCmd,          1, 1 },
     { "astmilli",        &StarRtdImage::astmilliCmd,        1, 1 },
     { "astpix2cur",      &StarRtdImage::astpix2curCmd,      2, 2 },
@@ -1787,65 +1787,6 @@ int StarRtdImage::astsetCmd( int argc, char *argv[] )
     }
 
     return error( "Failed to set:" , argv[0] );
-}
-
-//+
-//   StarRtdImage::astaddcolourCmd
-//
-//   Purpose:
-//       Make a Tcl colour available in the AST graphics interface.
-//
-//    Notes:
-//       The two input values are an index for the colour (the maximum
-//       index is 63) and the colour itself (in a form understood by
-//       Tk).
-//
-//    Return:
-//       TCL status.
-//
-//-
-int StarRtdImage::astaddcolourCmd( int argc, char *argv[] )
-{
-#ifdef _DEBUG_
-    cout << "Called StarRtdImage::astaddcolourCmd" << std::endl;
-#endif
-
-    //  Extract the index.
-    int index = 0;
-    if ( Tcl_GetInt( interp_, argv[0], &index ) != TCL_OK ) {
-        return error( argv[0], " is not an integer");
-    }
-    else {
-        // Make sure that default colours are established and add new
-        // one.
-        astTk_Init( interp_, canvasName_ );
-        astTk_AddColour( index, argv[1] );
-    }
-    return TCL_OK;
-}
-
-//+
-//   StarRtdImage::astfontresizeCmd
-//
-//   Purpose:
-//       Set whether fonts are resized as the canvas is scaled.
-//
-//    Return:
-//       TCL status.
-//
-//-
-int StarRtdImage::astfontresizeCmd( int argc, char *argv[] )
-{
-#ifdef _DEBUG_
-    cout << "Called StarRtdImage::astfontresizeCmd" << std::endl;
-#endif
-    astTk_Init( interp_, canvasName_ );
-    int resize = 0;
-    if ( *argv[0] == '1' ) {
-        resize = 1;
-    }
-    astTk_ResizeFonts( resize );
-    return TCL_OK;
 }
 
 //+
