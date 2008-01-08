@@ -77,6 +77,8 @@ static int Gaia3dVtkAstPlot( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
 static int Gaia3dVtkCreateMask( ClientData clientData, Tcl_Interp *interp,
                                 int objc, Tcl_Obj *CONST objv[] );
+static int Gaia3dVtkGrfAddColour( ClientData clientData, Tcl_Interp *interp,
+                                  int objc, Tcl_Obj *CONST objv[] );
 static int Gaia3dVtkGrfClear( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
 static int Gaia3dVtkGrfInit( ClientData clientData, Tcl_Interp *interp,
@@ -118,6 +120,9 @@ int Gaia3dVtk_Init( Tcl_Interp *interp )
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gvtk::createmask", Gaia3dVtkCreateMask,
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gvtk::grfaddcolour", Gaia3dVtkGrfAddColour,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gvtk::grfclear", Gaia3dVtkGrfClear,
@@ -394,6 +399,42 @@ static int Gaia3dVtkGrfInit( ClientData clientData, Tcl_Interp *interp,
     
     /* Export the graphics context. */
     Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) gc ) );
+    return TCL_OK;
+}
+
+/**
+ *  Add a new VTK colour to the standard colourmap used by the GRF interface.
+ *
+ *  Four arguments are required, the index to insert the colour at (can 
+ *  overwrite the standard set, but that shouldn't normally be done) and
+ *  the VTK RGB values.
+ */
+static int Gaia3dVtkGrfAddColour( ClientData clientData, Tcl_Interp *interp,
+                                  int objc, Tcl_Obj *CONST objv[] )
+{
+    /* Check arguments, need four, the index and the colour. */
+    if ( objc != 5  ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "index R G B" );
+        return TCL_ERROR;
+    }
+
+    /* Index */
+    int index;
+    if ( Tcl_GetIntFromObj( interp, objv[1], &index ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
+    /* Colour */
+    double colour[3];
+    for ( int i = 0; i < 3; i++ ) {
+        if (Tcl_GetDoubleFromObj( interp, objv[i+2], &colour[i] ) != TCL_OK) {
+            return TCL_ERROR;
+        }
+    }
+    
+    /* Add colour, but make sure we're initialised first. */
+    Grf3dVtk_InitColours();
+    Grf3dVtk_AddColour( index, colour[0], colour[1], colour[2] );
     return TCL_OK;
 }
 

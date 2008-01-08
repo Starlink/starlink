@@ -236,6 +236,8 @@ static double markerSettings[MAXTYPES] = {
     0.0, 1.0, 0.5, 2.0, 5.0, 0.0, 1.0, 0.5, 2.0, 5.0
 };
 
+/*  Set the local functions as the Grf3D interface, or not. */
+static int grfRegistered = 0;
 
 /* ================
  * Public interface
@@ -284,32 +286,9 @@ void *Grf3dVtk_Init( vtkRenderer *r, int lac )
     /*  This becomes the current GC. */
     Grf3dVtk_SetContext( gc );
 
-    /*  Set the default colormap (this can be overwritten and extended, but is
-     *  only initialised once and shared with all contexts). */
-    if ( lookupTable == NULL ) {
-
-        /*  Create a lookup table for managing colours. */
-        lookupTable = vtkLookupTable::New();
-        lookupTable->SetNumberOfColors( MAXCOLOURS );
-        lookupTable->Build();
-
-        /*  Add standard colours. */
-        int numColours = sizeof(StandardColours) / sizeof(*StandardColours);
-        for ( int i = 0; i < numColours; i++ ) {
-            Grf3dVtk_AddColour( i, StandardColours[i][0],
-                                StandardColours[i][1],
-                                StandardColours[i][2] );
-        }
-
-        /*  Extra colours are white */
-        for ( int i = numColours; i < MAXCOLOURS; i++ ) {
-            Grf3dVtk_AddColour( i, StandardColours[0][0],
-                                StandardColours[0][1],
-                                StandardColours[0][2] );
-        }
-
-        /*  Also get GAIA to use the local functions as the Grf3D
-         * interface (done once). */
+    /*  Get GAIA to use the local functions as the Grf3D interface (done
+     *  once). */ 
+    if ( ! grfRegistered ) {
         Grf3d_Register( (Grf3DCapFun) &vtkG3DCap,
                         (Grf3DFlushFun) &vtkG3DFlush,
                         (Grf3DLineFun) &vtkG3DLine,
@@ -318,9 +297,14 @@ void *Grf3dVtk_Init( vtkRenderer *r, int lac )
                         (Grf3DTextFun) &vtkG3DText,
                         (Grf3DTxExtFun) &vtkG3DTxExt,
                         (Grf3DAttrFun) &vtkG3DAttr );
+        grfRegistered = 1;
     }
 
-    //  Return the context.
+    /*  Set the default colormap (this can be overwritten and extended, but is
+     *  only initialised once and shared with all contexts). */
+    Grf3dVtk_InitColours();
+
+    /*  Return the context. */
     return (void *) gc;
 }
 
@@ -395,6 +379,51 @@ void Grf3dVtk_Clear()
     /*  Assembly gathers all props for lines, text and marker elements for new
      *  graphics. */
     currentGC->assembly = vtkPropAssembly::New();
+}
+
+/*
+ *+
+ *  Name:
+ *     Grf3dVtk_InitColours
+
+ *  Purpose:
+ *     Initialise the default colourmap, if needed.
+
+ *  Synopsis:
+ *     void Grf3dVtk_InitColours()
+
+ *  Description:
+ *     Set the default colormap, which can be overwritten and extended, but is
+ *     only initialised once and shared with all contexts. 
+ * 
+ *     Note also resets additional colours to white.
+
+ *-
+ */
+void Grf3dVtk_InitColours()
+{
+    if ( lookupTable == NULL ) {
+
+        /*  Create a lookup table for managing colours. */
+        lookupTable = vtkLookupTable::New();
+        lookupTable->SetNumberOfColors( MAXCOLOURS );
+        lookupTable->Build();
+
+        /*  Add standard colours. */
+        int numColours = sizeof(StandardColours) / sizeof(*StandardColours);
+        for ( int i = 0; i < numColours; i++ ) {
+            Grf3dVtk_AddColour( i, StandardColours[i][0],
+                                StandardColours[i][1],
+                                StandardColours[i][2] );
+        }
+
+        /*  Extra colours are white */
+        for ( int i = numColours; i < MAXCOLOURS; i++ ) {
+            Grf3dVtk_AddColour( i, StandardColours[0][0],
+                                StandardColours[0][1],
+                                StandardColours[0][2] );
+        }
+    }
 }
 
 /*

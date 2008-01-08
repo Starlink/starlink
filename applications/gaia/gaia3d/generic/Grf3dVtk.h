@@ -66,6 +66,9 @@ void Grf3dVtk_FreeContext( void *gc );
 /* Clear the renderer of all actors. */
 void Grf3dVtk_Clear();
 
+/* Initialise the standard colour map and reset all others (done once).*/
+void Grf3dVtk_InitColours();
+
 /* Add an indexed colour. */
 void Grf3dVtk_AddColour( int index, double r, double g, double b );
 
