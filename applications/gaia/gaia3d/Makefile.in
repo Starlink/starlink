@@ -16,7 +16,7 @@
 
 # Increment this number for new sources. Forces generation to enumerate
 # them in the Makefile.
-NEW_SOURCE_COUNT = 0
+NEW_SOURCE_COUNT = 1
 
 #========================================================================
 # Add additional lines to handle any additional AC_SUBST cases that
