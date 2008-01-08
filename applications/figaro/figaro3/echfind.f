@@ -402,7 +402,7 @@
             WRITE(10,'(''Average Y value '',F13.7)') CENTRE(ITRACK)
             WRITE(10,'(3D23.16)') (AK(I),I=1,ADEG+1),(0.0,I=ADEG+2,11)
          ELSE
-            WRITE(10,'(5I5,<ADEG+1>(1PG14.6))') IORD,(END(ITRACK)-
+            WRITE(10,'(5I5,(1PG14.6))') IORD,(END(ITRACK)-
      +             START(ITRACK)+1),NINT(SMIDX(1)),NINT(SMIDX(NP)),
      +                                      ADEG,(AK(I),I=1,ADEG+1)
          END IF
