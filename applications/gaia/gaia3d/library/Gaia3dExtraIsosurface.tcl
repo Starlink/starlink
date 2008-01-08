@@ -553,7 +553,6 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
          set colour_menu_($i) \
             [gaia::ColourLabelMenu \#auto $itk_component(colour$index$i) \
                 -change_cmd [code $this set_colour_ $index $i] \
-                -image $itk_option(-rtdimage) \
                 -show_custom 0]
 
          #  Set to next colour in list.

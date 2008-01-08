@@ -258,7 +258,6 @@ itcl::class gaia3d::Gaia3dIsosurface {
          set colour_menu_($i) \
             [gaia::ColourLabelMenu \#auto $itk_component(colour$i) \
                 -change_cmd [code $this set_colour_ $i] \
-                -image $itk_option(-rtdimage) \
                 -show_custom 0]
 
          #  Set to next colour in list.
@@ -305,6 +304,7 @@ itcl::class gaia3d::Gaia3dIsosurface {
             $colour_menu_($i) add_custom_colour $new_colour $index
          }
       }
+      Gaia3dTool::add_custom_colour $new_colour $index
    }
 
    #  Get the level and attributes as a single string.

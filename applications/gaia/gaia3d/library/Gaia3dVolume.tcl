@@ -184,11 +184,9 @@ itcl::class gaia3d::Gaia3dVolume {
       #  Now add all the colours.
       set min_colour_menu_ [gaia::ColourLabelMenu \#auto \
                                $itk_component(mincolour) \
-                               -image $itk_option(-rtdimage) \
                                -show_custom 0]
       set max_colour_menu_ [gaia::ColourLabelMenu \#auto \
                                $itk_component(maxcolour) \
-                               -image $itk_option(-rtdimage) \
                                -show_custom 0]
 
       #  Set default colours, black and orange to match GAIA.
@@ -293,6 +291,7 @@ itcl::class gaia3d::Gaia3dVolume {
          $min_colour_menu_ add_custom_colour $new_colour $index
          $max_colour_menu_ add_custom_colour $new_colour $index
       }
+      Gaia3dTool::add_custom_colour $new_colour $index
    }
 
    #  Called when the colour source is changed. Need to act on this. Note

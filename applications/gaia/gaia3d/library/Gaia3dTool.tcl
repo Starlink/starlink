@@ -140,18 +140,20 @@ itcl::class gaia3d::Gaia3dTool {
       opacity_fill_ $submenu
 
       #  Add option to choose a colour for the spectral line/region.
-      set submenu [menu $Options.spectralcolour]
-      $Options add cascade -label "Spectral colour" -menu $submenu
-      spectral_colour_fill_ $submenu
+      set spectral_colour_menu_ [menu $Options.spectralcolour]
+      $Options add cascade -label "Spectral colour" \
+         -menu $spectral_colour_menu_
+      spectral_colour_fill_
 
       #  AST axes, text scale and a colour.
       set submenu [menu $Options.textscale]
       $Options add cascade -label "Annotated text scale" -menu $submenu
       textscale_fill_ $submenu
 
-      set submenu [menu $Options.textcolour]
-      $Options add cascade -label "Annotated text colour" -menu $submenu
-      textcolour_fill_ $submenu
+      set ast_textcolour_menu_ [menu $Options.textcolour]
+      $Options add cascade -label "Annotated text colour" \
+         -menu $ast_textcolour_menu_
+      textcolour_fill_
 
       #  Use the spectral extraction limits to clip cube data.
       $Options add checkbutton \
@@ -468,12 +470,12 @@ itcl::class gaia3d::Gaia3dTool {
       }
    }
 
-   #  Fill the text colour menu. Note doesn't allow extra colours.
-   protected method textcolour_fill_ {menu} {
+   #  Fill the text colour menu.
+   protected method textcolour_fill_ {} {
       set count [gaia::AstColours::standard_count]
       for {set i 0} {$i < $count} {incr i} {
          set colour [gaia::AstColours::lookup_colour $i]
-         $menu add radiobutton \
+         $ast_textcolour_menu_ add radiobutton \
             -value $i \
             -label {   } \
             -background $colour \
@@ -483,11 +485,11 @@ itcl::class gaia3d::Gaia3dTool {
    }
 
    #  Fill the spectral colour menu. Use AST colours, but not bound to them.
-   protected method spectral_colour_fill_ {menu} {
+   protected method spectral_colour_fill_ {} {
       set count [gaia::AstColours::standard_count]
       for {set i 0} {$i < $count} {incr i} {
          set colour [gaia::AstColours::lookup_colour $i]
-         $menu add radiobutton \
+         $spectral_colour_menu_ add radiobutton \
             -value $colour \
             -label {   } \
             -background $colour \
@@ -531,9 +533,25 @@ itcl::class gaia3d::Gaia3dTool {
    }
 
    #  Add a customized colour to the menus. Use an index if supplied.
-   #  Otherwise create one.
+   #  Otherwise create one. If overridden must call this method.
    public method add_custom_colour { new_colour {index -1} } {
-      error "Implement add_custom_colour method"
+
+      #  AST text labels colour. Note need to handle in Grf3d.
+      set i [gaia3d::Grf3dColours::add_custom_colour $index $new_colour]
+      $ast_textcolour_menu_ add radiobutton \
+         -value $i \
+         -label {   } \
+         -background $new_colour \
+         -variable [scope ast_textcolour_] \
+         -command [code $this changed_ast_textcolour_]
+
+      #  Spectral line/region colour.
+      $spectral_colour_menu_ add radiobutton \
+         -value $new_colour \
+         -label {   } \
+         -background $new_colour \
+         -variable [scope spectral_colour_] \
+         -command [code $this changed_spectral_colour_]
    }
 
    #  Set variable to get data update next read. Usually when
@@ -757,7 +775,7 @@ itcl::class gaia3d::Gaia3dTool {
       }
       return {}
    }
-   
+
 
    #  From GAIA (or local)...
 
@@ -767,7 +785,7 @@ itcl::class gaia3d::Gaia3dTool {
          set index [$imagedata_ pixel2grid \
                        [$itk_option(-gaiacube) get_axis] $plane]
          incr index -1
-         
+
          #  Avoid unnecessary updates.
          if { [$plane_ get_slice_index] != $index } {
             $renwindow_ set_rate_to_desired
@@ -799,7 +817,7 @@ itcl::class gaia3d::Gaia3dTool {
    #  Set position of spectral line, when moved by GAIA.
    public method set_spectral_line {type args} {
       if { $show_spectral_line_ && $line_ != {} } {
-         
+
          #  Avoid unnecessary updates.
          if { $last_line_type_ != "$type" || $last_line_desc_ != "$args" } {
 
@@ -1060,7 +1078,7 @@ itcl::class gaia3d::Gaia3dTool {
       #  Check name of cube data, if changed re-access, or
       #  bad value handling changed.
       set newname [$cubeaccessor_ cget -dataset]
-      
+
       #  Has the data changed?
       set result 0
       if { $newname != {} && $cubename_ != $newname } {
@@ -1090,7 +1108,7 @@ itcl::class gaia3d::Gaia3dTool {
             -cubeaccessor $cubeaccessor_ \
             -checkbad $checkbad_ \
             -nullvalue [$itk_component(replacevalue) get]
-         
+
          #  If we have limits for the spectral axis, update them so that only
          #  part of the date is read (forces a copy however).
          if { $changed_limits } {
@@ -1233,11 +1251,17 @@ itcl::class gaia3d::Gaia3dTool {
    #  The colour of the spectral line or region.
    protected variable spectral_colour_ [gaia::AstColours::lookup_colour 5]
 
+   #  Menu for spectral line or region colours.
+   protected variable spectral_colour_menu_ {}
+
    #  The AST axes text scale.
    protected variable ast_textscale_ 5.0
 
    #  The colour of the AST axes text. AST index.
    protected variable ast_textcolour_ 1
+
+   #  Menu for axes text colour.
+   protected variable ast_textcolour_menu_ {}
 
    #  Interaction mode.
    protected variable interaction_mode_ "joystick"
