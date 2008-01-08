@@ -486,7 +486,7 @@ itcl::class gaia::GaiaAstGrid {
 
    #  Set the font resizing option. Re-draw on change.
    protected method set_font_resize_ {args} {
-      $itk_option(-rtdimage) astfontresize $font_resize_($this)
+      gaiautils::grffontresize $font_resize_($this)
       draw_grid_
    }
 
