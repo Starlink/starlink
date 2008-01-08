@@ -96,6 +96,83 @@ static void ndg1WriteProvenanceExtension( Provenance *, int, int * );
 /* Public functions. */
 /* ================= */
 
+F77_SUBROUTINE(ndg_ctprv)( INTEGER(indf), INTEGER(nanc), INTEGER(status) ){
+/*
+*+
+*  Name:
+*     NDG_CTPRV
+
+*  Purpose:
+*     Count the number of ancestors used in the creation of an NDF.
+
+*  Language:
+*     Starlink ANSI C (callable from Fortran)
+
+*  Invocation:
+*     CALL NDG_CTPRV( INDF, NANC, STATUS )
+
+*  Description:
+*     This routine returns the number of ancestors described in the 
+*     "PROVENANCE" extension of the supplied INDF.
+
+*  Arguments:
+*     INDF = INTEGER (Given)
+*        An identifier for the NDF containing the provenance information.
+*     NANC = INTEGER (Returned)
+*        The number of ancestor NDFs stored in the provenance information
+*        of INDF.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Copyright:
+*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     8-JAN-2008 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*/
+   GENPTR_INTEGER(indf)
+   GENPTR_INTEGER(nanc)
+   GENPTR_INTEGER(status)
+
+/* Initialise */
+   *nanc = 0;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* Call the C function to do the work. */
+   ndgCtprv( *indf, nanc, status );
+
+}
+
 F77_SUBROUTINE(ndg_gtprv)( INTEGER(indf), INTEGER(ianc), CHARACTER(fprov),
                            INTEGER(status) TRAIL(fprov) ){
 /*
@@ -124,8 +201,9 @@ F77_SUBROUTINE(ndg_gtprv)( INTEGER(indf), INTEGER(ianc), CHARACTER(fprov),
 *        returned. A value of zero will result in information about the NDF 
 *        specified by INDF being returned. Otherwise, the IANC value
 *        is used as an index into the ANCESTORS array in the PROVENANCE 
-*        extension. No error is reported if IANC is too large, but DAT__NOLOC 
-*        will be returned for PROV.
+*        extension. No error is reported if IANC is too large (i.e.
+*        larger than the value returned by NDG_CTPRV), but DAT__NOLOC 
+*        will be returned for PROV. 
 *     PROV = CHARACTER * (DAT__SZLOC) (Returned)
 *        A locator for a temporary HDS object containing the following 
 *        components:
@@ -427,54 +505,37 @@ F77_SUBROUTINE(ndg_rtprv)( INTEGER(indf), INTEGER(roots), INTEGER(status) ){
    *roots = astP2I( keymap );
 }
 
-void ndgPtprv( int indf1, int indf2, HDSLoc *more, int isroot, 
-               const char *creator, int *status ){
+void ndgCtprv( int indf, int *nanc, int *status ){
 /*
 *  Name:
-*     ndgPtprv
+*     ndgCtprv
 
 *  Purpose:
-*     Add provenance information to an NDF.
+*     Count the number of ancestors used in the creation of an NDF.
 
 *  Synopsis:
-*     void ndgPtprv( int indf1, int indf2, HDSLoc *more, int isroot, 
-*                    const char *creator, int *status )
+*     void ndgCtprv( int indf, int *nanc, int *status )
 
 *  Description:
-*     This routine stores information in the "PROVENANCE" extension of
-*     INDF1 indicating that INDF2 was used in the creation of INDF1. 
-*     The provenance information is stored in an NDF extension call 
-*     "PROVENANCE".
+*     This routine returns the number of ancestors described in the 
+*     "PROVENANCE" extension of the supplied INDF.
 
 *  Parameters:
-*     indf1 
-*        An identifier for a newly created NDF.
-*     indf2 
-*        An identifier for an NDF that was used in the creation of INDF1.
-*     more 
-*        A locator for an HDS structure containing arbitrary additional 
-*        information about INDF2, and how INDF2 was used in the creation 
-*        of INDF1. This information is stored in the provenance extension 
-*        of INDF1.
-*     isroot 
-*        If non-zero, then INDF2 will be treated as a root NDF. That is,
-*        any provenance information in INDF2 is ignored. If zero, then
-*        any provenance information in INDF2 is copied into INDF1. INDF2
-*        is then only a root NDF if it contains no provenance information.
-*     creator
-*        A text identifier for the software that created INDF1 (usually the
-*        name of the calling application). The format of the identifier
-*        is arbitrary, but the form "PACKAGE:COMMAND" is recommended.
+*     indf
+*        An identifier for the NDF containing the provenance information.
+*     nanc
+*        Pointer to an int in which to returned the number of ancestor NDFs 
+*        stored in the provenance information of INDF.
 *     status 
 *        The global status.
 */
 
 /* Local variables: */
-   Provenance *prov1 = NULL;
-   Provenance *prov2 = NULL;
-   int free_provs;
-   int i;
+   Provenance *prov = NULL;
    int *old_status;
+
+/* Initialise. */
+   *nanc = 0;
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;
@@ -482,54 +543,18 @@ void ndgPtprv( int indf1, int indf2, HDSLoc *more, int isroot,
 /* Ensure AST uses the supplied status variable. */
    old_status = astWatch( status );
 
-/* Get the existing provenance information from the two NDFs. */
-   prov1 = ndg1ReadProvenanceExtension( indf1, NULL, creator, 0, status );
-   prov2 = ndg1ReadProvenanceExtension( indf2, more, NULL, isroot, status );
+/* Read the provenance extension from the NDF. */
+   prov = ndg1ReadProvenanceExtension( indf, NULL, NULL, 0, status );
 
-/* Indicate that the "Prov" structures referred to by prov2 should be
-   freed when ndgFreeProvenance is called. */
-   free_provs = 1;
+/* Return the size of the ancestors array. */
+   *nanc = prov->nprov;
 
-/* Extend the "provs" list in "prov1" so that we can add pointers to all the 
-   Prov structures in "prov2. */
-   if( prov1 && prov2 ) {
-      prov1->provs = astGrow( prov1->provs, prov1->nprov + prov2->nprov,
-                              sizeof( Prov *) );
-   }
-   if( astOK ) {
-
-/* Copy the Prov pointers from "prov2" to "prov1". */
-      for( i = 0; i < prov2->nprov; i++ ) {
-         prov1->provs[ i + prov1->nprov ] = prov2->provs[ i ];
-      }   
-
-/* Update the length of the "provs" array in "prov1". */
-      prov1->nprov += prov2->nprov;   
-
-/* Indicate that the "Prov" structures referred to by "prov2" should not be
-   freed when ndgFreeProvenance is called. This is because they are now
-   the responsibility of "prov1", having been copied into the
-   prov1->provs list above. */
-      free_provs = 0;
-
-/* Record INDF2 as a parent of INDF1. */
-      ndg1ParentChild( prov2->main, prov1->main, status );
-
-/* Purge any duplicate entries in the extended provenance information. */
-      ndg1PurgeProvenance( prov1, status );
-
-/* Write the extended provenance information out to INDF1. */
-      ndg1WriteProvenanceExtension( prov1, indf1, status );
-   }
-
-/* Free the provenance structures. */
-   ndg1FreeProvenance( prov1, 1, status );
-   ndg1FreeProvenance( prov2, free_provs, status );
+/* Free resources. */
+   ndg1FreeProvenance( prov, 1, status );
 
 /* Re-instate the original AST status variable. */
    astWatch( old_status );
 }
-
 
 void ndgGtprv( int indf, int ianc, HDSLoc **prov, int *status ){
 /*
@@ -677,6 +702,109 @@ void ndgGtprv( int indf, int ianc, HDSLoc **prov, int *status ){
 
 /* Free resources. */
    ndg1FreeProvenance( prov1, 1, status );
+
+/* Re-instate the original AST status variable. */
+   astWatch( old_status );
+}
+
+void ndgPtprv( int indf1, int indf2, HDSLoc *more, int isroot, 
+               const char *creator, int *status ){
+/*
+*  Name:
+*     ndgPtprv
+
+*  Purpose:
+*     Add provenance information to an NDF.
+
+*  Synopsis:
+*     void ndgPtprv( int indf1, int indf2, HDSLoc *more, int isroot, 
+*                    const char *creator, int *status )
+
+*  Description:
+*     This routine stores information in the "PROVENANCE" extension of
+*     INDF1 indicating that INDF2 was used in the creation of INDF1. 
+*     The provenance information is stored in an NDF extension call 
+*     "PROVENANCE".
+
+*  Parameters:
+*     indf1 
+*        An identifier for a newly created NDF.
+*     indf2 
+*        An identifier for an NDF that was used in the creation of INDF1.
+*     more 
+*        A locator for an HDS structure containing arbitrary additional 
+*        information about INDF2, and how INDF2 was used in the creation 
+*        of INDF1. This information is stored in the provenance extension 
+*        of INDF1.
+*     isroot 
+*        If non-zero, then INDF2 will be treated as a root NDF. That is,
+*        any provenance information in INDF2 is ignored. If zero, then
+*        any provenance information in INDF2 is copied into INDF1. INDF2
+*        is then only a root NDF if it contains no provenance information.
+*     creator
+*        A text identifier for the software that created INDF1 (usually the
+*        name of the calling application). The format of the identifier
+*        is arbitrary, but the form "PACKAGE:COMMAND" is recommended.
+*     status 
+*        The global status.
+*/
+
+/* Local variables: */
+   Provenance *prov1 = NULL;
+   Provenance *prov2 = NULL;
+   int free_provs;
+   int i;
+   int *old_status;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* Ensure AST uses the supplied status variable. */
+   old_status = astWatch( status );
+
+/* Get the existing provenance information from the two NDFs. */
+   prov1 = ndg1ReadProvenanceExtension( indf1, NULL, creator, 0, status );
+   prov2 = ndg1ReadProvenanceExtension( indf2, more, NULL, isroot, status );
+
+/* Indicate that the "Prov" structures referred to by prov2 should be
+   freed when ndgFreeProvenance is called. */
+   free_provs = 1;
+
+/* Extend the "provs" list in "prov1" so that we can add pointers to all the 
+   Prov structures in "prov2. */
+   if( prov1 && prov2 ) {
+      prov1->provs = astGrow( prov1->provs, prov1->nprov + prov2->nprov,
+                              sizeof( Prov *) );
+   }
+   if( astOK ) {
+
+/* Copy the Prov pointers from "prov2" to "prov1". */
+      for( i = 0; i < prov2->nprov; i++ ) {
+         prov1->provs[ i + prov1->nprov ] = prov2->provs[ i ];
+      }   
+
+/* Update the length of the "provs" array in "prov1". */
+      prov1->nprov += prov2->nprov;   
+
+/* Indicate that the "Prov" structures referred to by "prov2" should not be
+   freed when ndgFreeProvenance is called. This is because they are now
+   the responsibility of "prov1", having been copied into the
+   prov1->provs list above. */
+      free_provs = 0;
+
+/* Record INDF2 as a parent of INDF1. */
+      ndg1ParentChild( prov2->main, prov1->main, status );
+
+/* Purge any duplicate entries in the extended provenance information. */
+      ndg1PurgeProvenance( prov1, status );
+
+/* Write the extended provenance information out to INDF1. */
+      ndg1WriteProvenanceExtension( prov1, indf1, status );
+   }
+
+/* Free the provenance structures. */
+   ndg1FreeProvenance( prov1, 1, status );
+   ndg1FreeProvenance( prov2, free_provs, status );
 
 /* Re-instate the original AST status variable. */
    astWatch( old_status );
