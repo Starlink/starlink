@@ -8,6 +8,7 @@
 #define PARENTS_NAME "PARENTS"
 #define PATH_NAME "PATH"
 #define MORE_NAME "MORE"
+#define ID_NAME "ID"
 
 /* HDS types for components used in the PROVENANCE extension of an NDF */
 #define EXT_TYPE "PROVENANCE"
@@ -79,19 +80,20 @@ typedef struct Provenance {
 
 /* Prototypes for Private Functions. */
 /* --------------------------------- */
-static void ndg1PurgeProvenance( Provenance *, int * );
+static AstKeyMap *ndg1FormatProv( Provenance *, int, int, AstKeyMap *, int * );
 static Prov *ndg1FreeProv( Prov *, int * );
 static Prov *ndg1MakeProv( const char *, const char *, const char *, HDSLoc *, Provenance *, int * );
 static Provenance *ndg1FreeProvenance( Provenance *, int, int * );
 static Provenance *ndg1MakeProvenance( Prov *, int * );
 static Provenance *ndg1ReadProvenanceExtension( int, HDSLoc *, const char *, int, int * );
 static char *ndg1GetTextComp( HDSLoc *, const char *, char *, size_t, int * );
+static int ndg1FindAncestorIndex( Prov *, Provenance *, int * );
 static int ndg1TheSame( Prov *, Prov *, int * );
 static void ndg1Disown( Prov *, Prov *, int * );
 static void ndg1ParentChild( Prov *, Prov *, int * );
 static void ndg1ParentChildIndex( Provenance *, int, int, int * );
+static void ndg1PurgeProvenance( Provenance *, int * );
 static void ndg1WriteProvenanceExtension( Provenance *, int, int * );
-
 
 /* Public functions. */
 /* ================= */
@@ -171,6 +173,124 @@ F77_SUBROUTINE(ndg_ctprv)( INTEGER(indf), INTEGER(nanc), INTEGER(status) ){
 /* Call the C function to do the work. */
    ndgCtprv( *indf, nanc, status );
 
+}
+
+F77_SUBROUTINE(ndg_fmprv)( INTEGER(indf), LOGICAL(base), INTEGER(fkeymap), 
+                           INTEGER(status) ){
+/*
+*+
+*  Name:
+*     NDG_FMPRV
+
+*  Purpose:
+*     Format the provenance information from an NDF.
+
+*  Language:
+*     Starlink ANSI C (callable from Fortran)
+
+*  Invocation:
+*     CALL NDG_FMPRV( INDF, BASE, KEYMAP, STATUS )
+
+*  Description:
+*     This routine returns an AST KeyMap holding a set of text strings
+*     containing information taken from the "PROVENANCE" extension in INDF.
+*
+*     The returned KeyMap has an entry with key "0" that describes the 
+*     supplied NDF. It also has an entry describing each ancestor NDF.
+*     These entries have keys "1", "2", "3", etc, up to the number of
+*     ancestors in the NDF. 
+*
+*     Each of these entries contains a pointer to another AST KeyMap
+*     which may contain any subset of the following entries (all of which 
+*     are strings):
+*
+*     "ID" - the integer index within the ancestors array (zero for the
+*            main NDF).
+*
+*     "PATH" - The full path or base name for the NDF (see argument "BASE").
+*
+*     "DATE" - The date of creation of the NDF.
+*
+*     "CREATOR" - The software item that created the NDF.
+*
+*     "PARENTS" - A comma separated list of indicies into the ancestors
+*                 array that identifies the direct parents of the NDF.
+*
+*     "MORE" - A summary of the contents of the MORE structure associated
+*              with the NDF.
+*
+*     A missing key implies that the corresponding item of information is
+*     not available.
+*
+*     Finally, the returned KeyMap has an entry with key "MXLEN" that is
+*     again a pointer to another KeyMap with the same entries listed above.
+*     However, this time the entries are integers, not strings, and holds 
+*     the maximum field width used to format the strings. Also, all
+*     entries are guaranteed to be present in the keymap (but may hold
+*     zero if none of the ancestors contained a particular item of 
+*     information).
+
+*  Arguments:
+*     INDF = INTEGER (Given)
+*        An identifier for the NDF containing the provenance information.
+*     BASE = LOGICAL (Given)
+*        If .TRUE., then the PATH field in the returned KeyMap holds the 
+*        base name of each NDF rather than the full path.
+*     KEYMAP = INTEGER (Returned)
+*        A pointer to the returned AST KeyMap.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Copyright:
+*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     8-JAN-2008 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*/
+   GENPTR_INTEGER(indf)
+   GENPTR_LOGICAL(base)
+   GENPTR_INTEGER(fkeymap)
+   GENPTR_INTEGER(status)
+
+   AstKeyMap *keymap = NULL;
+
+/* Check the inherited status. */
+   if( *status == SAI__OK ) {
+
+/* Call the C function to do the work. */
+      ndgFmprv( *indf, F77_ISTRUE( *base ), &keymap, status );
+   }
+
+/* Export the AST pointer. */
+   *fkeymap = astP2I( keymap );
 }
 
 F77_SUBROUTINE(ndg_gtprv)( INTEGER(indf), INTEGER(ianc), CHARACTER(fprov),
@@ -496,10 +616,11 @@ F77_SUBROUTINE(ndg_rtprv)( INTEGER(indf), INTEGER(roots), INTEGER(status) ){
    AstKeyMap *keymap = NULL;
 
 /* Check the inherited status. */
-   if( *status != SAI__OK ) return;
+   if( *status == SAI__OK ) {
 
 /* Call the C function to do the work. */
-   ndgRtprv( *indf, &keymap, status );
+      ndgRtprv( *indf, &keymap, status );
+   }
 
 /* Export the AST pointer. */
    *roots = astP2I( keymap );
@@ -551,6 +672,147 @@ void ndgCtprv( int indf, int *nanc, int *status ){
 
 /* Free resources. */
    ndg1FreeProvenance( prov, 1, status );
+
+/* Re-instate the original AST status variable. */
+   astWatch( old_status );
+}
+
+void ndgFmprv( int indf, int base, AstKeyMap **keymap, int *status ){
+/*
+*+
+*  Name:
+*     ndgFmprv
+
+*  Purpose:
+*     Format the provenance information from an NDF.
+
+*  Synopsis:
+*     void ndgFmprv( int indf, int base, AstKeyMap **keymap, int *status )
+
+*  Description:
+*     This routine returns an AST KeyMap holding a set of text strings
+*     containing information taken from the "PROVENANCE" extension in INDF.
+*
+*     The returned KeyMap has an entry with key "0" that describes the 
+*     supplied NDF. It also has an entry describing each ancestor NDF.
+*     These entries have keys "1", "2", "3", etc, up to the number of
+*     ancestors in the NDF. 
+*
+*     Each of these entries contains a pointer to another AST KeyMap
+*     which may contain any subset of the following entries (all of which 
+*     are strings):
+*
+*     "ID" - the integer index within the ancestors array (zero for the
+*            main NDF).
+*
+*     "PATH" - The full path or base name for the NDF (see "base").
+*
+*     "DATE" - The date of creation of the NDF.
+*
+*     "CREATOR" - The software item that created the NDF.
+*
+*     "PARENTS" - A comma separated list of indicies into the ancestors
+*                 array that identifies the direct parents of the NDF.
+*
+*     "MORE" - A summary of the contents of the MORE structure associated
+*              with the NDF.
+*
+*     Finally, the returned KeyMap has an entry with key "MXLEN" that is
+*     again a pointer to another KeyMap with the same entries listed above.
+*     However, this time the entries are integers, not strings, and holds 
+*     the maximum field width used to format the strings.
+
+*  Parameters:
+*     indf
+*        An identifier for the NDF containing the provenance information.
+*     base
+*        If non-zero, then the PATH field in the returned KeyMap holds the 
+*        base name of each NDF rather than the full path.
+*     keymap
+*        A location at which to returned a pointer to the returned AST KeyMap.
+*     status
+*        The global status.
+
+*  Copyright:
+*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     8-JAN-2008 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*/
+
+/* Local variables: */
+   AstKeyMap *mxkey = NULL;
+   AstKeyMap *anckey = NULL;
+   Provenance *prov1 = NULL;
+   char key[10];
+   int *old_status;
+   int i;
+
+/* Initialise */
+   *keymap = NULL;
+
+/* Ensure AST uses the supplied status variable. */
+   old_status = astWatch( status );
+
+/* Read the provenance extension from the NDF. */
+   prov1 = ndg1ReadProvenanceExtension( indf, NULL, NULL, 0, status );
+
+/* Create the returned KeyMap. */
+   *keymap = astKeyMap( "" );
+
+/* Create a KeyMap to hold the field widths. */
+   mxkey = astKeyMap( "" );
+
+/* Loop round every ancestor. */
+   for( i = 0; i < prov1->nprov;  i++ ) {
+
+/* Create a new KeyMap holding the formatted details of the ancestor. This
+   also updates the maximum field widths for each field (held in "mxkey"). */
+      anckey = ndg1FormatProv( prov1, i, base, mxkey, status );
+
+/* Put the "anckey" KeyMap into the returned KeyMap, using the formatted
+   integer index as the key. */
+      sprintf( key, "%d", i );
+      astMapPut0A( *keymap, key, anckey, NULL );
+
+/* Free resources specific to this ancestor. */
+      (void) astAnnul( anckey );
+   }
+
+/* Put the "mxkey" KeyMap into the returned KeyMap. */
+   astMapPut0A( *keymap, "MXLEN", mxkey, NULL );
+
+/* Free resources. */
+   (void) astAnnul( mxkey );
+   ndg1FreeProvenance( prov1, 1, status );
 
 /* Re-instate the original AST status variable. */
    astWatch( old_status );
@@ -861,7 +1123,7 @@ void ndgRtprv( int indf, AstKeyMap **roots, int *status ){
    prov1 = ndg1ReadProvenanceExtension( indf, NULL, NULL, 0, status );
 
 /* Create the returned KeyMap. */
-   *roots = astKeyMap( "", status );
+   *roots = astKeyMap( "" );
 
 /* Loop round every ancestor. */
    for( i = 0; i < prov1->nprov;  i++ ) {
@@ -955,6 +1217,418 @@ static void ndg1Disown( Prov *parent, Prov *child, int *status ){
 /* Reduce the number of children. */
    parent->nchild = j;
 
+}
+
+static int ndg1FindAncestorIndex( Prov *prov, Provenance *provenance,
+                                  int *status ){
+/*
+*  Name:
+*     ndg1FindAncestorIndex
+
+*  Purpose:
+*     Return the index of a Prov structure within the ANCESTORS array.
+
+*  Synopsis:
+*     int ndg1FindAncestorIndex( Prov *prov, Provenance *provenance,
+*                                int *status )
+
+*  Description:
+*     This function returns the integer index of a Prov structure within
+*     the ANCESTORS array described by a Provenance structure.
+
+*  Parameters:
+*     prov
+*        The Prov structure.
+*     provenance
+*        The Provenance structure.
+*     status
+*        Pointer to the inherited status variable.
+
+* Returned Value:
+*   The integer index. This is a one-based value (zero refers to the main
+*   NDF).
+
+*/
+
+/* Local Variables: */
+   int imain;
+   int iprov;
+   int result;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the inherited status value. */
+   if( *status != SAI__OK ) return result;
+
+/* Find the index of the supplied Prov within the provs array. Also
+   note the index of the main NDF in the provs array. */
+   imain = provenance->nprov + 1;
+   for( iprov = 0; iprov < provenance->nprov; iprov++ ) {
+      if( provenance->provs[ iprov ] == provenance->main ) imain = iprov;
+      if( provenance->provs[ iprov ] == prov ) break;
+   }
+
+/* If it is greater than the index of the main NDF in "provs" then reduce
+   it by one since the main NDF is not stored in the ANCESTORS array. */
+   if( iprov > imain ) iprov--;
+
+/* Add 1 to convert from zero-based to one-based and return. */
+   return iprov + 1;
+}
+
+static AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
+                                  AstKeyMap *mxlenkey, int *status ){
+/*
+*  Name:
+*     ndg1FormatProv
+
+*  Purpose:
+*     Format information in a Prov structure.
+
+*  Synopsis:
+*     AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
+*                                AstKeyMap *mxlenkey, int *status )
+
+*  Description:
+*     This function formats the information in a Prov structure and
+*     puts the formatted strings into a new AstKeyMap. It also updates the 
+*     maximum length for any formatted item.
+*
+*     The returned KeyMap has string entries for a subset of the following 
+*     keys:
+*
+*        "ID" - the integer index within the ancestors array (zero for the
+*               main NDF).
+*        
+*        "PATH" - The full path or base name for the NDF (see "base").
+*        
+*        "DATE" - The date of creation of the NDF.
+*        
+*        "CREATOR" - The software item that created the NDF.
+*        
+*        "PARENTS" - A comma separated list of indicies into the ancestors
+*                    array that identifies the direct parents of the NDF.
+*        
+*        "MORE" - A summary of the contents of the MORE structure associated
+*                 with the NDF.
+*
+*     A key will be missing in the returned KeyMap if the Provenance
+*     structure does not contain that item.
+
+*  Parameters:
+*     provenance
+*        Pointer to the Provenance structure that contains the Prov 
+*        structure that is to be formatted.
+*     i
+*        The index of the Prov structure to be formatted within the 
+*        supplied Provenance structure.
+*     base
+*        If non-zero, then the PATH field in the returned KeyMap holds the 
+*        base name of each NDF rather than the full path.
+*     mxlenkey
+*        Pointer to an existing KeyMap. On exit it will contain an entry for
+*        each of the keys listed under "Description:" above. All entries
+*        will be be scalar integers. Each integer value is updated by this
+*        function so that it holds the larger of the supplied value and the 
+*        field width used to format the corresponding item in the returned 
+*        KeyMap. The supplied value is left unchanged if the returned
+*        KeyMap does not contain a value.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     A pointer to the new KeyMap describing the supplied Prov structure.
+
+*/
+
+/* Local Variables: */
+   AstKeyMap *result = NULL;
+   HDSLoc *cloc = NULL;
+   HDSLoc *dloc = NULL;
+   Prov *prov = NULL;
+   char *p = NULL;
+   char *list = NULL;
+   char *val = NULL;
+   char buf[ 20 ];
+   char name[DAT__SZNAM+1];
+   char type[DAT__SZTYP + 1];
+   hdsdim dims[ NDF__MXDIM ];
+   int icomp;
+   int idim;
+   int iel;
+   int k;
+   size_t len;
+   int mxlen;
+   int nc;
+   int ncomp;
+   int ndim;
+   int prim;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return result;
+
+/* Get a pointer to the Prov structure to be formatted. */
+   prov = provenance->provs[ i ];
+
+/* Create the returned KeyMap. */
+   result = astKeyMap( "" );
+
+/* Store the ID value. */
+   nc = sprintf( buf, "%d", i );
+   astMapPut0C( result, ID_NAME, buf, NULL );
+
+/* Update the maximum length of the ID field. */
+   if( astMapGet0I( mxlenkey, ID_NAME, &mxlen ) ) {
+      mxlen = ( nc > mxlen ) ? nc : mxlen;
+   } else {
+      mxlen = nc;
+   }
+   astMapPut0I( mxlenkey, ID_NAME, mxlen, NULL );
+
+/* If the supplied Prov structure has a "path" component, store it in the
+   returned KeyMap, and update the maximum length of the "PATH" field. If
+   "base" is non-zero, we only store the bit following the final "/"
+   character. */
+   if( prov->path ) {
+      nc = strlen( prov->path );
+      if( base ) {
+         p = prov->path + nc - 1;
+         while( p > prov->path && p[ -1 ] != '/' ) p--;        
+         nc = strlen( p );
+      } else {
+         p = prov->path;
+      }
+
+   } else {
+      nc = 0;
+      p = NULL;
+   }
+
+   if( nc ) astMapPut0C( result, PATH_NAME, p, NULL );
+
+   if( astMapGet0I( mxlenkey, PATH_NAME, &mxlen ) ) {
+      mxlen = ( nc > mxlen ) ? nc : mxlen;
+   } else {
+      mxlen = nc;
+   }
+   astMapPut0I( mxlenkey, PATH_NAME, mxlen, NULL );
+
+/* If the supplied Prov structure has a "date" component, store it in the
+   returned KeyMap, and update the maximum length of the "DATE" field. */
+   nc = ( prov->date ) ? strlen( prov->date ) : 0;
+   if( nc ) astMapPut0C( result, DATE_NAME, prov->date, NULL );
+
+   if( astMapGet0I( mxlenkey, DATE_NAME, &mxlen ) ) {
+      mxlen = ( nc > mxlen ) ? nc : mxlen;
+   } else {
+      mxlen = nc;
+   }
+   astMapPut0I( mxlenkey, DATE_NAME, mxlen, NULL );
+
+/* If the supplied Prov structure has a "creator" component, store it in the
+   returned KeyMap, and update the maximum length of the "CREATOR" field. */
+   nc = ( prov->creator ) ? strlen( prov->creator ) : 0;
+   if( nc ) astMapPut0C( result, CREATOR_NAME, prov->creator, NULL );
+
+   if( astMapGet0I( mxlenkey, CREATOR_NAME, &mxlen ) ) {
+      mxlen = ( nc > mxlen ) ? nc : mxlen;
+   } else {
+      mxlen = nc;
+   }
+   astMapPut0I( mxlenkey, CREATOR_NAME, mxlen, NULL );
+
+/* Initialise a pointer to a dynamic string holding the comma separated
+   list of parent indices. */
+   list = NULL;
+   nc = 0;
+
+/* If the supplied Prov structure has any parents, store a comma separated 
+   list of the corresponding ANCESTOR indices in the returned KeyMap, and 
+   update the maximum length of the "PARENTS" field. */
+   if( prov->nparent > 0 ) {
+
+/* Loop round each of the parents. */
+      for( k = 0; k < prov->nparent && *status == SAI__OK; k++ ) {
+
+/* Find the index of this parent in the ANCESTORS array, and format it. */
+         sprintf( buf, "%d", ndg1FindAncestorIndex( prov->parents[ k ], 
+                                                     provenance, status ) );
+
+/* Append this string to the end of the comma separated list, preceeding
+   it with a comma unless it is the first value. */
+         if( k > 0 ) list = astAppendString( list, &nc, "," );
+         list = astAppendString( list, &nc, buf );
+      }
+   }
+
+/* If the list is not empty, store it in the returned KeyMap, and then 
+   free it. */
+   if( list ) {
+      astMapPut0C( result, PARENTS_NAME, list, NULL );
+      list = astFree( list );
+   } 
+      
+/* Find the maximum of the current field width and the previous maximum
+   field width. */
+   if( astMapGet0I( mxlenkey, PARENTS_NAME, &mxlen ) ) {
+      mxlen = ( nc > mxlen ) ? nc : mxlen;
+   } else {
+      mxlen = nc;
+   }
+
+/* Store the new maximum field width. */
+   astMapPut0I( mxlenkey, PARENTS_NAME, mxlen, NULL );
+
+/* Initialise a pointer to a dynamic string holding the summary of the
+   MORE structure. */
+   list = NULL;
+   nc = 0;
+
+/* If the supplied Prov structure has a MORE object, create a summary
+   of it. */
+   if( prov->more ) {
+
+/* See if the MORE object is primtive. */
+      datPrim( prov->more, &prim, status );
+
+/* If the MORE object is an array, we just give its type and shape. */
+      datShape( prov->more, NDF__MXDIM, dims, &ndim, status );
+      if( ndim > 0 ) {
+         datType( prov->more, type, status );
+         list = astAppendString( list, &nc, "<" );
+         list = astAppendString( list, &nc, type );
+         list = astAppendString( list, &nc, ">(" );
+         sprintf( buf, "%d", dims[ 0 ] );
+         list = astAppendString( list, &nc, buf );
+
+         for( idim = 1; idim < ndim; idim++ ) {
+            list = astAppendString( list, &nc, "," );
+            sprintf( buf, "%d", dims[ idim ] );
+            list = astAppendString( list, &nc, buf );
+         }
+         list = astAppendString( list, &nc, ")" );
+
+/* Otherwise if the MORE object is a primitive scalar, just store its value. */
+      } else if( prim ){
+         datLen( prov->more, &len, status );
+         nc = len;
+         list = astMalloc( ( nc + 1 )* sizeof( char ) );
+         datGet0C( prov->more, list, nc + 1, status );
+      
+/* Otherwise the MORE object is a single structure. Loop round each of its
+   components. */
+      } else {
+         datNcomp( prov->more, &ncomp, status );
+         for( icomp = 1; icomp <= ncomp; icomp++ ) {
+            datIndex( prov->more, icomp, &cloc, status );
+
+/* Unless this is the first component, add a comma to separate this
+   component from the previous one in the summary string. */
+            if( icomp > 1 ) list = astAppendString( list, &nc, ", " );
+
+/* Get the component name and type, whether it is a primitive, and its
+   shape. */
+            datName( cloc, name, status );
+            datType( cloc, type, status );
+            datPrim( cloc, &prim, status );
+            datShape( cloc, NDF__MXDIM, dims, &ndim, status );
+
+/* If it is scalar... */
+            if( ndim == 0 ) {
+
+/* If it is primitive, display it as "name=value". */
+               if( prim ) {
+                  list = astAppendString( list, &nc, name );
+                  list = astAppendString( list, &nc, "=" );
+                  datClen( cloc, &len, status );
+                  val = astMalloc( ( len + 1 )*sizeof( char ) );
+                  datGet0C( cloc, val, len + 1, status );
+                  list = astAppendString( list, &nc, val );
+                  val = astFree( val );
+
+/* If it is a structure, display it as "name=<type>". */
+               } else {
+                  list = astAppendString( list, &nc, name );
+                  list = astAppendString( list, &nc, "=<" );
+                  list = astAppendString( list, &nc, type );
+                  list = astAppendString( list, &nc, ">" );
+               }
+
+/* If it is an array... */
+            } else {
+
+/* If it is a 1D primitive, display it as "name=(value1,value2,...)" up to a
+   maximum of 10 values. Append an ellipsis if there are more than 10
+   values. */
+               if( prim && ndim == 1 ) {
+                  list = astAppendString( list, &nc, name );
+                  list = astAppendString( list, &nc, "=(" );
+                  datClen( cloc, &len, status );
+                  val = astMalloc( ( len + 1 )*sizeof( char ) );
+
+                  for( iel = 1; iel <= dims[ 0 ]; iel++ ) {
+                     datCell( cloc, 1, (hdsdim *) &iel, &dloc, status );
+                     datGet0C( dloc, val, len + 1, status );
+
+                     if( iel > 1 ) list = astAppendString( list, &nc, "," );
+                     list = astAppendString( list, &nc, val );
+                     datAnnul( &dloc, status );
+
+                     if( iel == 10 ) break;
+                  }
+
+                  if( dims[ 0 ] > 10 ) list = astAppendString( list, &nc, 
+                                                               ",..." );
+                  list = astAppendString( list, &nc, ")" );
+                  val = astFree( val );
+
+/* If it is a structure array, or if it is a multi-dimensional primitive
+   array, display it as "name=<type>(shape)". */
+               } else {
+                  list = astAppendString( list, &nc, name );
+                  list = astAppendString( list, &nc, "=<" );
+                  list = astAppendString( list, &nc, type );
+                  list = astAppendString( list, &nc, ">(" );
+                  sprintf( buf, "%d", dims[ 0 ] );
+                  list = astAppendString( list, &nc, buf );
+         
+                  for( idim = 1; idim < ndim; idim++ ) {
+                     list = astAppendString( list, &nc, "," );
+                     sprintf( buf, "%d", dims[ idim ] );
+                     list = astAppendString( list, &nc, buf );
+                  }
+                  list = astAppendString( list, &nc, ")" );
+
+               }
+            }
+
+/* Annul the component locator. */
+            datAnnul( &cloc, status );
+         }
+      }
+   }
+
+/* If the summary is not empty, store it in the returned KeyMap, and then 
+   free it. */
+   if( list ) {
+      astMapPut0C( result, MORE_NAME, list, NULL );
+      list = astFree( list );
+   } 
+
+/* Find the maximum of the current field width and the previous maximum
+   field width. */
+   if( astMapGet0I( mxlenkey, MORE_NAME, &mxlen ) ) {
+      mxlen = ( nc > mxlen ) ? nc : mxlen;
+   } else {
+      mxlen = nc;
+   }
+
+/* Store the new maximum field width. */
+   astMapPut0I( mxlenkey, MORE_NAME, mxlen, NULL );
+
+/* Return the result. */
+   return result;
 }
 
 static Prov *ndg1FreeProv( Prov *prov, int *status ){
@@ -1142,7 +1816,7 @@ static char *ndg1GetTextComp( HDSLoc *loc, const char *comp, char *buf,
       }
 
 /* Read the value of the component into the results buffer. */
-      if( result ) datGet0C( cloc, result, buflen, status );
+      if( result ) datGet0C( cloc, result, buflen + 1, status );
 
 /* Annul the component locator. */
       datAnnul( &cloc, status ); 
@@ -1568,7 +2242,7 @@ static Provenance *ndg1ReadProvenanceExtension( int indf, HDSLoc *more,
 *     structure, and copies provenance information from the PROVENANCE
 *     extension of the supplied NDF into the new Provenance structure.
 *     If the NDF does not have a PROVENANCE extension, then the returned
-*     Provenance structure contains a only single Prov structure, for the 
+*     Provenance structure contains only a single Prov structure, for the 
 *     supplied NDF itself. The only item stored in this Prov structure is
 *     the NDF path.
 
@@ -1858,15 +2532,12 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance, int indf,
    HDSLoc *more = NULL;
    HDSLoc *mloc = NULL;
    HDSLoc *xloc = NULL;
-   Prov *parent = NULL;
    Prov *prov = NULL;
    char *date = NULL;
    char *path = NULL;
    hdsdim  dim[1];
    int *parents = NULL;
    int i;
-   int imain;
-   int iparent;
    int k;
    int len;
    int there;
@@ -1884,11 +2555,6 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance, int indf,
    extension. */
    if( provenance ) {
       ndfXnew( indf, EXT_NAME, EXT_TYPE, 0, NULL, &xloc, status ); 
-
-/* Find the index of the main NDF in the provs array. */
-      for( imain = 0; imain < provenance->nprov; imain++ ) {
-         if( provenance->provs[ imain ] == provenance->main ) break;
-      }
 
 /* Create an ANCESTORS array of the correct length (exclude the main NDF
    Prov structure), and get a locator for it. */
@@ -1982,22 +2648,12 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance, int indf,
             dim[ 0 ] = prov->nparent;
             datMapI( loc, "WRITE", 1, dim, &parents, status );
 
-/* Loop round each cell of this array. */
+/* Loop round each cell of this array (i.e. each parent). */
             for( k = 0; k < prov->nparent && *status == SAI__OK; k++ ) {
-               parent = prov->parents[ k ];
 
-/* Find the index of this parent in the provs array. */
-               for( iparent = 0; iparent < provenance->nprov; iparent++ ) {
-                  if( provenance->provs[ iparent ] == parent ) break;
-               }
-
-/* If it is greater than the index of the main NDF in "provs" then reduce
-   it by one since the main NDF is not stored in the ANCESTORS array. */
-               if( iparent > imain ) iparent--;
-
-/* Add 1 to convert from zero-based to one-based, and store this index in 
-   the ANCESTORS array. */
-               parents[ k ] = iparent + 1;
+/* Find and store the index of this parent in the ANCESTORS array. */
+               parents[ k ] = ndg1FindAncestorIndex( prov->parents[ k ], 
+                                                     provenance, status );
             }
 
 /* Free the parents array. */
@@ -2015,7 +2671,6 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance, int indf,
    }
 
 }
-
 
 
 
