@@ -41,6 +41,7 @@
 #  Copyright:
 #     Copyright (C) 2000-2005 Central Laboratory of the Research Councils.
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2008 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -99,9 +100,8 @@ itcl::class gaia::AstColours {
 
    #  Add a new colour. Ignored if an attempt to overwrite a standard
    #  colour is made. Set index to -1 for automatic chosing of index
-   #  (this is returned). The image argument should be any rtdimage
-   #  available. Maximum colour index is 63 (i.e. 64 colours).
-   public proc add_custom_colour {image index colour} {
+   #  (this is returned). Maximum colour index is 63 (i.e. 64 colours).
+   public proc add_custom_colour {index colour} {
       if { $index == -1 } { 
          set index $count_
       }
@@ -112,10 +112,8 @@ itcl::class gaia::AstColours {
          set colours_($index) $colour
          set indices_($colour) $index
          
-         #  If have an rtdimage then need to add this colour.
-         if { $image != {} } {
-            $image astaddcolour $index $colour
-         }
+         #  Add colour to GRF interface
+         gaiautils::grfaddcolour $index $colour
 
          #  If index is outside of current colour range then make this
          #  the top value.
@@ -158,11 +156,10 @@ itcl::class gaia::AstColours {
 
    #  Restore a set of custom colours. This is a list of index versus
    #  colour pairs probably created by the describe_custom procedure.
-   #  The image is any rtdimage reference.
-   public proc restore_custom {image spec} {
+   public proc restore_custom {spec} {
       if { $spec != {} } {
          foreach {index colour} "$spec" {
-            add_custom_colour $image $index $colour
+            add_custom_colour $index $colour
          }
       }
    }

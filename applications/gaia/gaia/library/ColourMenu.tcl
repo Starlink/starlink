@@ -114,7 +114,7 @@ itcl::class gaia::ColourMenu {
    #  given then one is chosen and returned.
    public method add_custom_colour {new_colour {index -1} } {
       remove_customizer_
-      set index [gaia::AstColours::add_custom_colour $image $index $new_colour]
+      set index [gaia::AstColours::add_custom_colour $index $new_colour]
       add_menu_colour_ $new_colour $index
       add_customizer_
       return $index
@@ -202,10 +202,6 @@ itcl::class gaia::ColourMenu {
          add_custom_colour $c
       }
    }
-
-   #  The rtdimage widget that we should use to control creation of
-   #  new colours.
-   public variable image {}
 
    #  Protected variables: (available to instance)
    #  --------------------
