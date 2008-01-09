@@ -678,6 +678,8 @@
 *        Correct the way reference WCS is handled.
 *     7-JAN-2008 (DSB):
 *        Added LBND and UBND.
+*     9-JAN-2008 (DSB):
+*        Do not create empty output tiles.
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -1377,12 +1379,6 @@ void smurf_makecube( int *status ) {
    tile = tiles;
    for( itile = 1; itile <= ntile && *status == SAI__OK; itile++, tile++ ) {
 
-/* Begin an AST context for the current tile. */
-      astBegin;
-
-/* Begin an NDF context for the current tile. */
-      ndfBegin();
-
 /* Tell the user which tile is being produced. */
       if( ntile > 1 ) {
          if( !blank ) msgBlank( status );
@@ -1398,6 +1394,20 @@ void smurf_makecube( int *status ) {
          msgBlank( status );
          blank = 1;
       }
+
+/* If the tile is empty, do not create it. Continue on to the next tile. */
+      if( tile->size == 0 ) {
+         msgOutif( MSG__NORM, "TILE_MSG2", "      No input data "
+                   "contributes to this output tile and so the tile "
+                   "will not be created.", status );
+         continue;
+      }
+
+/* Begin an AST context for the current tile. */
+      astBegin;
+
+/* Begin an NDF context for the current tile. */
+      ndfBegin();
 
 /* Create FrameSets that are appropriate for this tile. This involves
    remapping the base (GRID) Frame of the full size output WCS so that
