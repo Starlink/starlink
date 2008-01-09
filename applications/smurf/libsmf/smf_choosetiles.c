@@ -112,10 +112,12 @@
 *     26-NOV-2007 (DSB):
 *        Added argument "wcsout", and changed the tile positions so that
 *        a tile is centred at the SkyRef position.
+*     9-JAN-2008 (DSB):
+*        Correct check for overlap between input boxes and tile areas.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -237,7 +239,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
       refpix[ 0 ] += lbnd[ 0 ] - 1.5;
       refpix[ 1 ] += lbnd[ 1 ] - 1.5;
 
-/* We place the pixel containing the refereence position at vthe centre
+/* We place the pixel containing the reference position at the centre
    of a tile, and then pad the supplied full size grid bounds by adding a 
    border to each edge so that each axis is spanned by an integer number
    of tiles. Do each spatial axis separately. */
@@ -272,7 +274,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 
 /* Determine the constant width border by which the basic tile area is to be
    extended to accomodate the specified spreading kernel. We do this by
-   rebinnig a single non-zero pixel value using the supplied spreading
+   rebinning a single non-zero pixel value using the supplied spreading
    scheme, and then determining the width of the resulting non-zero pixel
    values. */
       umap = astUnitMap( 1, "" );
@@ -371,10 +373,10 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 /* Does the bounding box for the i'th input file overlap the extended
    tile area? If so, include the name of the input file in the group of 
    file names that contribute to the current tile. */
-                  if( box->lbnd[ 0 ] < tile->eubnd[ 0 ] &&
-                      box->ubnd[ 0 ] > tile->elbnd[ 0 ] &&
-                      box->lbnd[ 1 ] < tile->eubnd[ 1 ] &&
-                      box->ubnd[ 1 ] > tile->elbnd[ 1 ] ) {
+                  if( box->lbnd[ 0 ] <= tile->eubnd[ 0 ] &&
+                      box->ubnd[ 0 ] >= tile->elbnd[ 0 ] &&
+                      box->lbnd[ 1 ] <= tile->eubnd[ 1 ] &&
+                      box->ubnd[ 1 ] >= tile->elbnd[ 1 ] ) {
       
                      pname = filename;
                      grpGet( igrp, i, 1, &pname, GRP__SZNAM, status );

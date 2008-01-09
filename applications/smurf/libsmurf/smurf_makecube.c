@@ -1397,8 +1397,9 @@ void smurf_makecube( int *status ) {
 /* If the tile is empty, do not create it. Continue on to the next tile. */
       if( tile->size == 0 ) {
          msgOutif( MSG__NORM, "TILE_MSG2", "      No input data "
-                   "contributes to this output tile and so the tile "
+                   "contributes to this output tile. The tile "
                    "will not be created.", status );
+         msgBlank( status );
          continue;
       }
 
