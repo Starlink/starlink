@@ -2485,21 +2485,10 @@ package kappa {
 
       }
 
-      action showprov {
-         alias {showp(rov)}
+      action provshow {
+         alias {provsh(ow)}
 
          helplib {$KAPPA_HELP}
-
-         parameter basename {
-            position 3
-            type _LOGICAL
-            access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            default FALSE
-            prompt {Display only the base name for each NDF?}
-            helpkey *
-          }
 
          parameter ndf {
             position 1
@@ -2508,28 +2497,6 @@ package kappa {
             ppath GLOBAL
             association <-GLOBAL.DATA_ARRAY
             prompt {The input NDF}
-            helpkey *
-          }
-
-         parameter show {
-            position 2
-            type LITERAL
-            access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            default PT
-            prompt {Codes for the fields to include in the screen output}
-            helpkey *
-          }
-
-         parameter tabular {
-            position 4
-            type _LOGICAL
-            access READ
-            vpath DEFAULT
-            ppath CURRENT DEFAULT
-            default FALSE
-            prompt {Display each NDF descrirption on a single line?}
             helpkey *
           }
 
