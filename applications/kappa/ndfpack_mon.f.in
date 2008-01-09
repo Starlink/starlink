@@ -278,6 +278,10 @@
          ELSE IF ( NAME .EQ. 'NDFTRACE' ) THEN
             CALL NDFTRACE ( STATUS )
 
+*  Display provenance
+         ELSE IF ( NAME .EQ. 'PROVSHOW' ) THEN
+            CALL PROVSHOW ( STATUS )
+
 *  Set pixels bad which have a given set of qualities.
          ELSE IF ( NAME .EQ. 'QUALTOBAD' ) THEN
             CALL QUALTOBAD ( STATUS )
