@@ -91,7 +91,6 @@
 #include "sae_par.h"
 #include "star/grp.h"
 #include "star/ndg.h"
-#include "grp_par.h"
 #include "tcl.h"
 #include "cnf.h"
 #include "ccdaux.h"
