@@ -62,7 +62,7 @@ itcl::class ::gaia3d::Gaia3dVtkIso {
    constructor {args} {
 
       #  Create the necessary VTK objects.
-      set contour_ [::vtkImageMarchingCubes New]
+      set contour_ [::vtkMarchingCubes New]
 
       #  Create a mapper for the polygonal data created to represent the iso
       #  surface.
