@@ -589,6 +589,9 @@ itcl::class gaia::GaiaCube {
             return
          }
 
+         #  Clear the iso and volume renderers before changing data.
+         renderers_clear_ 0
+
          #  Map in all data, this makes it immediately available within
          #  application
          load_cube_ 1
@@ -635,9 +638,6 @@ itcl::class gaia::GaiaCube {
 
          #  Update FITS headers, if viewed.
          maybe_update_fitsheaders_
-
-         #  Clear the iso and volume renderers.
-         renderers_clear_ 0
       }
    }
 

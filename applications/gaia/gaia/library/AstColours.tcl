@@ -82,7 +82,7 @@ itcl::class gaia::AstColours {
 
    #  Constructor:
    #  ------------
-   private constructor {menu args} {
+   private constructor {args} {
    }
 
    #  Destructor:
@@ -112,7 +112,7 @@ itcl::class gaia::AstColours {
          set colours_($index) $colour
          set indices_($colour) $index
          
-         #  Add colour to GRF interface
+         #  Add colour to GRF interface.
          gaiautils::grfaddcolour $index $colour
 
          #  If index is outside of current colour range then make this
