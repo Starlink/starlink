@@ -802,7 +802,6 @@ void smurf_makecube( int *status ) {
    float var;                 /* Variance value */
    int ***ptime;              /* Holds time slice indices for each bol bin */
    int *pt;                   /* Holds time slice indices for each bol bin */
-   int actval;                /* Number of parameter values supplied */
    int autogrid;              /* Determine projection parameters automatically? */
    int axes[ 2 ];             /* Indices of selected axes */
    int badmask;               /* How is the output bad pixel mask chosen? */
