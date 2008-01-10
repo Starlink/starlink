@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="sug">
+  <version>1</version>
+  <path>docs/sug</path>
+  <description>Starlink User Guide</description>
+  <abstract><p>
+    This is a general introduction to the Starlink Project for new
+    users. You should also read the local guide for your site before
+    attempting to use Starlink computers. This will tell you how to
+    access your local machine and what facilities are available. As
+    these documents cannot be updated very frequently, you should
+    refer to the on-line files mentioned for current details of
+    Starlink staff, sites, documents, and software.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>M D Lawden</name>
+    </person>
+  </developers>
+  <documentation> sug</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1997</year>
+    <name>PPARC</name>
+  </copyright>
+</component>
