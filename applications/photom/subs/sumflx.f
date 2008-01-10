@@ -64,6 +64,7 @@
 *  Authors :
 *     TN: Tim Naylor (Keele University)
 *     AA: Alasdair Allan (Starlink, Keele University)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 *
 *  History :
@@ -78,6 +79,9 @@
 *        Added CODE to passed arguements
 *     07-SEP-2004
 *        Changed to use CNF pointers
+*     10-JAN-2008 (PWD):
+*        Keep the MIN1, MIN2, MAX1 and MAX2 limits within the 
+*        bounds of the IMAGE array.
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -163,6 +167,11 @@
             MAX2 = INT(APAR(6)+CLIP+0.5)
       ENDIF    
 
+*   Clip to array bounds, 1->NX & 1->NY.
+      MIN1 = MAX( MIN1, 1 )
+      MIN2 = MAX( MIN2, 1 )
+      MAX1 = MIN( MAX1, NX )
+      MAX2 = MIN( MAX2, NY )
 
 *   Get some temporary workspace for our HDS objects, this is
 *   a hack to get around the lack of allocatable arrays in F77

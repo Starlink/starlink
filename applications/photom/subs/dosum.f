@@ -1,9 +1,9 @@
 ************************************************************************
-      SUBROUTINE DOSUM(IMAGE, NX, NY, VVAR, RVAR, MASK, DATA, X, 
-     :                 Y, SKY, SIGMA, VSKY, APAR, PADU, SATURE,  
+      SUBROUTINE DOSUM(IMAGE, NX, NY, VVAR, RVAR, MASK, DATA, X,
+     :                 Y, SKY, SIGMA, VSKY, APAR, PADU, SATURE,
      :                 CLIP, ERROR, BESTN, STAR, MIN1, MAX1,
      :                 MIN2, MAX2, CODE, STATUS)
-      
+
 *+
 *  Name :
 *     DOSUM
@@ -16,8 +16,8 @@
 *  Invocation :
 *      CALL DOSUM(IMAGE, NX, NY, %VAL(CNF_PVAL(VVAR)), %VAL(CNF_PVAL(RVAR)),
 *     :           %VAL(CNF_PVAL(MASK)), %VAL(CNF_PVAL(DATA)), X, Y, SKY,
-*     :           SIGMA, VSKY, APAR, PADU, SATURE, CLIP, ERROR, BESTN, 
-*     :           STAR, MIN1, MAX1, MIN2, MAX2, STATUS)  
+*     :           SIGMA, VSKY, APAR, PADU, SATURE, CLIP, ERROR, BESTN,
+*     :           STAR, MIN1, MAX1, MIN2, MAX2, STATUS)
 *
 *  Description :
 *        This subroutine is not original to OPPHOT. To get round
@@ -91,6 +91,7 @@
 *  Authors :
 *     TN: Tim Naylor (Keele University)
 *     AA: Alasdair Allan (Starlink, Keele University)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 *
 *  History :
@@ -102,6 +103,8 @@
 *        Added CODE to passed arguements
 *     28-SEP-2000 (AA):
 *        Added code to handle bad pixels inside the PSF mask.
+*     10-JAN-2008 (PWD):
+*        Switch do loop indexing to Fortran first fatest order.
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -113,26 +116,26 @@
 
 *  Global Constants :
 
-      INCLUDE 'SAE_PAR' 
+      INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
 
-*  Arguments Given : 
-      
-      INTEGER X 
-      INTEGER Y 
-      
+*  Arguments Given :
+
+      INTEGER X
+      INTEGER Y
+
       INTEGER NX, NY
-      
+
       REAL IMAGE(NX, NY)
-      
+
       INTEGER MIN1, MAX1, MIN2, MAX2
-      
+
       REAL VVAR(X,Y)
       REAL RVAR(X,Y)
       REAL MASK(X,Y)
 
       REAL CLIP, PADU, SATURE
-      REAL SKY, SIGMA, VSKY 
+      REAL SKY, SIGMA, VSKY
 
 *  Note DATA moved here since Solaris won't let you pass dimensions to
 *  a local array. This worked under the Linux and DEC Unix compilers.
@@ -141,30 +144,30 @@
 
 *  Arguments Given and Returned :
 
-      REAL APAR(6) 
-      
+      REAL APAR(6)
+
 *  Arguments Returned :
 
       REAL STAR, ERROR, BESTN
       CHARACTER * ( 2 ) CODE
 
-*  Local Variables :  
+*  Local Variables :
 
       INTEGER I, J
       INTEGER ICOUNT
       INTEGER XCOUNT, YCOUNT
-            
+
       REAL PEAK, DIST
       REAL NORM, HGAUSS
 
-      INTEGER STATUS 
-      
+      INTEGER STATUS
+
       LOGICAL SOFT, BAD, SAT
-      
+
 *  Debug variables
 *
 *      REAL MSUM
-      
+
 *  Running counters
 
       DOUBLE PRECISION SNSUM, MASUM
@@ -173,12 +176,12 @@
 *  Functions
 
       REAL TGAUSS
-                  
+
 *.
-      
+
 *  Check status on entry - return if not o.k.
 
-      IF ( STATUS .NE. SAI__OK ) RETURN  
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Set SOFT to .TRUE. maybe make it user accesible later, but
 *  it is very unlikely that you'd want a hard edge to your mask
@@ -189,27 +192,27 @@
 
 *  Fill DATA array (a sub-set of the IMAGE array)
 
-      XCOUNT = 0
-      DO I = MIN1, MAX1
-	 YCOUNT = 0
-	 XCOUNT = XCOUNT + 1
-	 DO J = MIN2, MAX2
-	     YCOUNT = YCOUNT + 1
-	     DATA(XCOUNT,YCOUNT) = IMAGE(I,J)
+      YCOUNT = 0
+      DO J = MIN2, MAX2
+         YCOUNT = YCOUNT + 1
+         XCOUNT = 0
+         DO I = MIN1, MAX1
+            XCOUNT = XCOUNT + 1
+            DATA(XCOUNT,YCOUNT) = IMAGE(I,J)
 	 END DO
-      END DO  
-        
-      
+      END DO
+
+
 *  Fill the variance array and the real variances array
-      DO I = 1, X
-         DO J = 1, Y 
+      DO J = 1, Y
+         DO I = 1, X
 	     HGAUSS = TGAUSS( (MIN1-1+I),(MIN2-1+J) , APAR, 2)
       	     VVAR(I,J) = VSKY + HGAUSS/PADU
 	     RVAR(I,J) = VSKY + (DATA(I,J)-SKY)/PADU
 	     IF(RVAR(I,J) .LE. 0.0) RVAR(I,J) = VSKY
 	 END DO
       END DO
-      
+
       SNSUM = 0.0
       MASUM = 0.0
 
@@ -217,38 +220,38 @@
       PEAK = APAR(4)
       APAR(4) = 1.0
 
-      DO I = 1, X
-         DO J = 1, Y    
+      DO J = 1, Y
+         DO I = 1, X
 	     DIST = SQRT( (REAL(MIN1-1+I)-APAR(5))*
      :                    (REAL(MIN1-1+I)-APAR(5))+
-     :                    (REAL(MIN2-1+J)-APAR(6))*  
-     :                    (REAL(MIN2-1+J)-APAR(6))  )  
+     :                    (REAL(MIN2-1+J)-APAR(6))*
+     :                    (REAL(MIN2-1+J)-APAR(6))  )
 
              IF( DIST .LT. (CLIP+0.5) ) THEN
-	     
+
 *  This is a useful pixel
 *
 *  Calculate the value of the estimated profile at this point. Note
 *  that the value of the Gaussian at this point is used. Perfectionists
-*  may prefer to call the function IGAUSS, that integrates over the 
+*  may prefer to call the function IGAUSS, that integrates over the
 *  pixel, but Tim has never found a case where this helped.
 
-                 MASK(I,J) = TGAUSS((MIN1-1+I),(MIN2-1+J), APAR, 2) 
-	 
+                 MASK(I,J) = TGAUSS((MIN1-1+I),(MIN2-1+J), APAR, 2)
+
 		 IF( DIST .GT. (CLIP-0.5) ) THEN
 
 *  Make a soft edge
-                     
+
 		     IF(SOFT) THEN
 		         MASK(I,J) = MASK(I,J)*(0.5-(DIST-CLIP))
 		     ELSE IF( DIST .GT. CLIP) THEN
 		         MASK(I,J) = 0.0
 		     END IF
 		 END IF
-		 
+
 *  Keep tabs on the signal-to-noise
 
-	         IF(DATA(I,J) .NE. VAL__BADR) THEN 
+	         IF(DATA(I,J) .NE. VAL__BADR) THEN
                     SNSUM = SNSUM+DBLE((DATA(I,J)-SKY)**2.0)/RVAR(I,J)
 		 ELSE
 		    BAD = .TRUE.
@@ -257,74 +260,74 @@
 
 		 ICOUNT = ICOUNT + 1
              ELSE
-	     
-*  Throw it back 
-	     
+
+*  Throw it back
+
 	         MASK(I,J) = 0.0
 	     END IF
 
-*  Is the star saturated, flag it as such.	     
+*  Is the star saturated, flag it as such.
 	     IF(DATA(I,J).GE.SATURE .AND. MASK(I,J).GE.0.0) THEN
                    SAT = .TRUE.
 	     ENDIF
-      
-         END DO      
-      END DO
-      
-      APAR(4) = PEAK
-            
-*   Normalise the profile to one
-      DO I = 1, X
-         DO J = 1, Y          
-             MASK(I,J) = MASK(I,J)/REAL(MASUM)
-         END DO      
-      END DO	
 
-	           
+         END DO
+      END DO
+
+      APAR(4) = PEAK
+
+*   Normalise the profile to one
+      DO J = 1, Y
+         DO I = 1, X
+             MASK(I,J) = MASK(I,J)/REAL(MASUM)
+         END DO
+      END DO
+
+
 *   Calculate the term to divide by
 
       NORM = 0.0
-      DO I = 1, X
-         DO J = 1, Y 
-	     NORM = NORM + ( MASK(I,J)*MASK(I,J)/VVAR(I,J) )  
-         END DO      
-      END DO	  
+      DO J = 1, Y
+         DO I = 1, X
+	     NORM = NORM + ( MASK(I,J)*MASK(I,J)/VVAR(I,J) )
+         END DO
+      END DO
 
 *   Calculate the weight mask and finalise output
- 	     
+
       FLUX = 0.0
       ERROR = 0.0
-      DO I = 1, X
-         DO J = 1, Y 
+      DO J = 1, Y
+         DO I = 1, X
              MASK(I,J) = MASK(I,J)/VVAR(I,J)
 	     MASK(I,J) = MASK(I,J)/NORM
-	     
-*  Check to see if we have a bad pixel, if so, flag it     
-	     IF(DATA(I,J) .NE. VAL__BADR) THEN 
-                 FLUX = FLUX + DBLE( MASK(I,J)*(DATA(I,J)-SKY) ) 
+
+*  Check to see if we have a bad pixel, if so, flag it
+	     IF(DATA(I,J) .NE. VAL__BADR) THEN
+                 FLUX = FLUX + DBLE( MASK(I,J)*(DATA(I,J)-SKY) )
                  ERROR = ERROR + RVAR(I,J)*MASK(I,J)*MASK(I,J)
      :                   + SIGMA*SIGMA*REAL(MASUM)
              ELSE
-	      	BAD = .TRUE. 
+	      	BAD = .TRUE.
              ENDIF
-         END DO      
-      END DO	 
+         END DO
+      END DO
       ERROR = SQRT(ERROR)
-         
+
 *   Output the flux
 
       STAR = REAL(FLUX)
-                   	    	     
+
 *   Find the available signal-to-noise
 
       IF( SNSUM .GT. DBLE(ICOUNT) ) THEN
           BESTN = FLUX/SQRT(REAL(SNSUM)-REAL(ICOUNT))
       ELSE
-      
+
 *   Sometimes happens for weak sources, flag it by returning
-*   a negative number to tell the user to get better data!     
+*   a negative number to tell the user to get better data!
           BESTN = FLUX/SQRT(REAL(ICOUNT)-SNSUM)
-      ENDIF	     
+      ENDIF
 
 *   Indicate the error codes
       IF ( BAD ) THEN
@@ -334,10 +337,10 @@
       IF ( SAT ) THEN
          CODE = 'S'
       ENDIF
-      	       
+
 *   End of routine
 
   99  CONTINUE
 
-      END           
-      
+      END
+

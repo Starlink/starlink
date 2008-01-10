@@ -35,6 +35,7 @@
 *  Authors :
 *     TN: Tim Naylor (Keele University)
 *     AA: Alasdair Allan (Starlink, Keele University)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 *
 *  History :
@@ -46,6 +47,8 @@
 *        Added GAUSS return arguement
 *     04-JAN-1998
 *        Converted back to function from subroutine
+*     10-JAN-2008 (PWD):
+*        Make sure THETA is initialised.
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -89,12 +92,14 @@
 
       IF(ABS(R) .GT. 0.0) THEN
       
-*   Relpace the functionality of the F90 SIGN() call    
+*   Replace the functionality of the F90 SIGN() call    
             IF ( Y .GT. 0.0 ) THEN
 	          THETA = -1.0*ACOS(X/R)
             ELSE
 	          THETA = ACOS(X/R)
             ENDIF
+      ELSE
+            THETA = 0.0
       ENDIF 
       
       WORK = R*R*( (COS(THETA+APAR(3))/APAR(1))**2.0 

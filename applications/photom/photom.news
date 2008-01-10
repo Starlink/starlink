@@ -38,6 +38,15 @@
   
   Bug Fixes 
   ---------
+    Since v1.10
+    -----------
+
+    A memory fault in the optimal photometry code when stars where close to
+    the edges of the image has been fixed. Various initialisation issues have
+    also been fixed.
+  
+    AUTOASTROM: extended error messages when parsing bad input catalogues
+    have been added (previously unspecific error reports where made).
   
     Since v1.9
     ----------
