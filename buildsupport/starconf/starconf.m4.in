@@ -934,7 +934,7 @@ dnl  and Fink on OSX
 # available, either through [STAR_CHECK_PROGS(star2html)] or otherwise.
 AC_DEFUN([STAR_LATEX_DOCUMENTATION],
    [m4_ifval([$1], [], [AC_FATAL([$0: called with no documentcode])])dnl
-    m4_if(m4_bregexp([$1], [^ *\([a-z][a-z]*[0-9][0-9]*/? *\)*$]),
+    m4_if(m4_bregexp([$1], [^ *\([a-z][a-z]*[0-9]*/? *\)*$]),
           [0],
           [],
           [AC_FATAL([$0: bad doccode in $1 -- must be eg sun123 or sun123/])])
@@ -996,7 +996,7 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
 # you almost certainly won't need to use this.
 AC_DEFUN([STAR_XML_DOCUMENTATION],
    [m4_ifval([$1], [], [AC_FATAL([$0: called with no documentcode])])dnl
-    m4_if(m4_bregexp([$1], [^ *\([a-z][a-z]*[0-9][0-9]*/? *\)*$]),
+    m4_if(m4_bregexp([$1], [^ *\([a-z][a-z]*[0-9]*/? *\)*$]),
           [0],
           [],
           [AC_FATAL([$0: bad doccode in $1 -- must be eg sun123 or sun123/])])
