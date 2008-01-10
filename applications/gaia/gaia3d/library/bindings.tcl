@@ -244,6 +244,7 @@ namespace eval ::gaia3d {
    # keep the interactive performance.
 
    proc cb_iren_configure_event {iren} {
+
       # Cancel the previous timer if any
       set timer [::vtk::get_widget_variable_value $iren ConfigureEventTimer]
       if {$timer != ""} {
@@ -258,9 +259,13 @@ namespace eval ::gaia3d {
    # i.e. a new area is visible. It usually happens when the widget window
    # is brought to the front, or when the widget is resized.
 
+   # PWD: XXX do render using after so that they can be deferred, seems to fix
+   # a problem when the window is resized during an initial iso-surface
+   # renderer (something is getting out of sequence).
+
    proc cb_iren_expose_event {iren} {
       ::update
-      [$iren GetRenderWindow] Render
+      after 10 [list [$iren GetRenderWindow] Render]
    }
 
    # Add the above observers to a vtk(Generic)RenderWindowInteractor
