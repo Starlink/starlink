@@ -73,10 +73,14 @@
 #     2006 March 16 (MJC):
 #       Retain any supplied spectral axis section if a spatial region is
 #       selected by cursor.
-#     {enter_further changes_here}
+#     2008 January 10 (MJC):
+#       Revise command line for CLINPLOT's second iteration parameter
+#       names.
+#     {enter_further_changes_here}
 #
 #  Copyright:
-#     Copyright (C) 2000-2006 Central Laboratory of the Research Councils
+#     Copyright (C) 2000-2006 Central Laboratory of the Research Councils.
+#     Science and Technology Facilities Council.  All Rights Reserved.
 #-
 
 # Preliminaries
@@ -275,8 +279,8 @@ else
    echo "        Clinplot: Grid of spectra
 endif
 
-clinplot ndf=${cmpfile} device=${plotdev} lpstyle="colour(curve)=red" \
-         axes extaxes axes lpmargin="[0.4,0.15,0.15,0.4]" \
+clinplot ndf=${cmpfile} device=${plotdev} specstyle="colour(curve)=red" \
+         axes reflabel margin="[0.15,0.17,0.12,0.1]" \
          style="title=${infile}" reset
 
 # Clean up.
