@@ -88,7 +88,7 @@ itcl::class gaia3d::Gaia3dVtkWindow {
       #  Evaluate any options.
       eval itk_initialize $args
 
-      #  Create the widget and renderer.
+      #  Create the widget and renderer (requires width and height).
       create_renderer_widget_
    }
 
@@ -262,6 +262,10 @@ itcl::class gaia3d::Gaia3dVtkWindow {
       set renwindow_ [$itk_component(renwidget) GetRenderWindow]
       set renderer_ [::vtkRenderer New]
       $renwindow_ AddRenderer $renderer_
+
+      #  Initial backingstore state (funny order as options already
+      #  configured as need width & height above).
+      configure -backingstore_on $itk_option(-backingstore_on)
 
       #  Set up render window interactions.
       add_bindings_
