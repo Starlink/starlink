@@ -269,9 +269,6 @@ itcl::class gaia3d::Gaia3dVtkWindow {
       #  Set some basic properties of the renderer.
       eval set_rgb_background $rgb_background_
 
-      #  Enable backing store for faster refreshes.
-      $renderer_ BackingStoreOn
-
       #  Observe the progress of the renderer so that we can update the UI
       #  during long jobs and execute a command if given.
       add_renderer_observer ProgressEvent [code $this renderer_progress_]
@@ -528,6 +525,17 @@ itcl::class gaia3d::Gaia3dVtkWindow {
    #  Initial width and height in pixels.
    itk_option define -width width Width 600
    itk_option define -height height Height 600
+
+   #  Whether to enable backingstore.
+   itk_option define -backingstore_on backingstore_on BackingStore_On 0 {
+      if { $renderer_ != {} } {
+         if { $itk_option(-backingstore_on) } {
+            $renderer_ BackingStoreOn
+         } else {
+            $renderer_ BackingStoreOff
+         }
+      }
+   }
 
    #  Protected variables: (available to instance)
    #  --------------------

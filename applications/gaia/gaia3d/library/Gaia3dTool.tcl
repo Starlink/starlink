@@ -176,6 +176,17 @@ itcl::class gaia3d::Gaia3dTool {
          {Trackerball interactions} \
          {Mouse interaction mode, joystick (off) or trackerball (on)}
 
+      #  Backingstore on or off (off as faster for interactions).
+      $Options add checkbutton \
+         -label {Use backingstore} \
+         -variable [scope backingstore_on_] \
+         -onvalue 1 \
+         -offvalue 0 \
+         -command [code $this set_backingstore_mode_]
+      $short_help_win_ add_menu_short_help $Options \
+         {Use backingstore} \
+         {Use a backingstore to refresh scene, faster for simple refreshes}
+
       #  Create a panedwindow to define the basic layout between the
       #  graphics display and controls in a left-right split.
       itk_component add pane {
@@ -715,6 +726,11 @@ itcl::class gaia3d::Gaia3dTool {
    #  Set the mouse interaction mode.
    protected method set_interaction_mode_ {} {
       $renwindow_ set_interaction_mode $interaction_mode_
+   }
+
+   #  Set the backingstore mode.
+   protected method set_backingstore_mode_ {} {
+      $renwindow_ configure -backingstore_on $backingstore_on_ 
    }
 
    #================================================================
@@ -1272,6 +1288,9 @@ itcl::class gaia3d::Gaia3dTool {
    #  The last line description sent to GAIA.
    protected variable last_line_type_ {}
    protected variable last_line_desc_ {}
+
+   #  Backingstore interaction mode.
+   protected variable backingstore_on_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------
