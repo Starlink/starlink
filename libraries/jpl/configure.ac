@@ -18,6 +18,12 @@ STAR_DEFAULTS
 #   Checks for programs
 AC_PROG_FC
 AC_PROG_FPP
+
+#   Need to disable shared libraries as the common blocks are publically
+#   available.
+AC_DISABLE_SHARED
+
+#   More checks for programs
 AC_PROG_LIBTOOL
 AC_PROG_LN_S
 
