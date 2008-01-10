@@ -1150,6 +1150,13 @@
 
 *  Warn about lost pixels due to insufficient input values.
 *  ========================================================
+
+*  For some applications such as spectral-cube analysis where large 
+*  sections may be flagged, the wrong WLIM may lead to surprising 
+*  results.  While the WLIM default could be set to zero, this is not
+*  the normal default of 0.3 used elsewhere in KAPPA.  At the risk of
+*  annoying some users, report the number of output data that were 
+*  flagged by the WLIM threshold at the normal reporting level.
        IF ( NFLAG .GT. 0 ) THEN
          CALL MSG_FMTR( 'WLIM', 'F6.4', WLIM )
          IF ( NFLAG .EQ. AEL ) THEN
@@ -1160,7 +1167,7 @@
      :        /'fraction of good values required with parameter WLIM '/
      :        /'(currently ^WLIM).', STATUS )
 
-*  There's nothing that can be done if
+*  The FRAC token is directly comparable with WLIM.
          ELSE IF ( MAX( 1, NINT( WLIM * REAL( AEL ) ) ) .NE. 1 ) THEN
             CALL MSG_FMTR( 'FRAC', 'F6.4', REAL( NFLAG ) / REAL( AEL ) )
             CALL MSG_OUTIF( MSG__NORM, '',
