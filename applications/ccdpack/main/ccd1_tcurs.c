@@ -1,7 +1,7 @@
 #include "f77.h"
 #include "sae_par.h"
 #include "ast.h"
-#include "grp_par.h"
+#include "star/grp.h"
 #include "mers.h"
 #include "tcl.h"
 #include <stdio.h>

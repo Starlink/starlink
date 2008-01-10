@@ -7,7 +7,7 @@
 #include <string.h>
 #include "tcltalk.h"
 #include "ccdaux.h"
-#include "grp_par.h"
+#include "star/grp.h"
 
    void *ccdMall( char *type, int size, int *status );
 
