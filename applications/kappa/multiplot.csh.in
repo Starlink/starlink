@@ -54,12 +54,14 @@
 
 #  Copyright:
 #     Copyright (C) 1995-1996, 2000 Central Laboratory of the Research
-#     Councils. All Rights Reserved.
+#     Councils. 
+#     (C) 2007 Science and Technology Facilitties Council.
+#     All Rights Reserved.
 
 #  Licence:
 #     This program is free software; you can redistribute it and/or
 #     modify it under the terms of the GNU General Public License as
-#     published by the Free Software Foundation; either version 2 of
+#     published by the Free Software Foundation; either Version 2 of
 #     the License, or (at your option) any later version.
 #
 #     This program is distributed in the hope that it will be
@@ -69,8 +71,8 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with this program; if not, write to the Free Software
-#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-#     02111-1307, USA
+#     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+#     02111-1307, USA.
 
 #  Authors:
 #     MJC: Malcolm J. Currie (Starlink, RAL)
@@ -86,6 +88,8 @@
 #     20-JAN-2000 (DSB):
 #        Use PICDEF MODE=GRID instead of PICGRID. Update DISPLAY
 #        parameters to V0.13. Ensure Starlink psmerge command is used.
+#     2007 September 28 (MJC):
+#        Correct and extend the search for the Starlink psmerge.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -99,8 +103,15 @@
     source $KAPPA_DIR/kappa.csh
     unalias echo
 
-#  Ensure the starlink psmerge command is used.
-    alias psmerge @bindir@/psmerge
+#  Endeavourthe Starlink psmerge command is used.
+    if ( -e $STARLINK_DIR/bin/psmerge ) then
+       set psmerge_dir = "$STARLINK_DIR/bin/psmerge"
+    else if ( -e $KAPPA_DIR/../psmerge )
+       set psmerge_dir = "$KAPPA_DIR/../psmerge"
+    else
+       set psmerge_dir = ""
+    endif
+    alias psmerge ${psmerge_dir}/psmerge
 
 #  Initialize some shell variables.
     set xpic = 4
