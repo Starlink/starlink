@@ -1,4 +1,4 @@
-      SUBROUTINE CON_WCSPX( INDF, IMAP, GEOLON, GEOLAT, STATUS )
+      SUBROUTINE CON_WCSPX( INDF, IMAP, OBSLON, OBSLAT, STATUS )
 *+
 *  Name:
 *     CON_WCSPX
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CON_WCSPX( INDF, IMAP, GEOLON, GEOLAT, STATUS )
+*     CALL CON_WCSPX( INDF, IMAP, OBSLON, OBSLAT, STATUS )
 
 *  Description:
 *     This routine adds a WCS component to the output NDF holdiong a
@@ -24,9 +24,9 @@
 *        The NDF identifier for the NDF created by SPECX2NDF.
 *     IMAP = INTEGER (Given)
 *        The NDF identifier for the SPECX map file.
-*     GEOLON = DOUBLE PRECISION (Given)
+*     OBSLON = DOUBLE PRECISION (Given)
 *        The geodetic longitude of the observatory. Radians, positive east.
-*     GEOLAT = DOUBLE PRECISION (Given)
+*     OBSLAT = DOUBLE PRECISION (Given)
 *        The geodetic latitude of the observatory. Radians, positive north.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -48,6 +48,14 @@
 *        Convert to use DSBSpecFrame
 *      14-AUG-2005 (TIMJ):
 *        Minor tweak to multiplication statement to make it standards compliant.
+*      10-JAN-2008 (DSB):
+*        - For increased precision, store the Epoch directly in the SkyFrame 
+*        using AST_SETD rather than indirectly via the MJD-OBS FITS header. 
+*        - Use AST attributes ObsLon/Lat instead of GeoLon/Lat
+*        - Convert observation date from UT1 (sed by SPECX) to TDB (used
+*        by AST) before storing it in the output WCS.
+*        - Asume that the SPECX axis is in the rest frame given by the
+*        bottom 4 bits of LSRFLG rather than in the source's rest frame.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -65,8 +73,8 @@
 *  Arguments Given:
       INTEGER INDF
       INTEGER IMAP
-      DOUBLE PRECISION GEOLON
-      DOUBLE PRECISION GEOLAT
+      DOUBLE PRECISION OBSLON
+      DOUBLE PRECISION OBSLAT
 
 *  Status:
       INTEGER STATUS               ! Global status
@@ -129,6 +137,9 @@
       INTEGER SF             ! Pointer to AST SkyFrame
       INTEGER SKYFRM         ! Pointer to AST SkyFrame
       INTEGER SPCFRM         ! Pointer to AST SpecFrame
+      INTEGER TDBFRM         ! TimeFrame describing the TDB timescale
+      INTEGER TIMEFS         ! FrameSet connecting TDB abd UT1 timescales
+      INTEGER UT1FRM         ! TimeFrame describing the UT1 timescale
       INTEGER YEAR           ! Year 
       LOGICAL ISDSB          ! Is this a double sideband observation?
       LOGICAL THERE          ! Does object exist?
@@ -240,28 +251,42 @@
          GO TO 999
       END IF
 
-*  Add the fractional day onto the Modified Julian Date, and format into a 
-*  form suitable for use with AST_SETC.
+*  Add the fractional day onto the Modified Julian Date.
       MJD = MJD + DAYS
+
+*  We need to convert this MJD from UT1 (used by specx) to TDB (used by
+*  AST). Create two TimeFrames describing these two time systems. SPECX
+*  does not seem to store a DUT1 value, so the default of zero will be used.
+      UT1FRM = AST_TIMEFRAME( 'TimeScale=UT1', STATUS )
+      CALL AST_SETD( UT1FRM, 'ObsLon', OBSLON/D2R, STATUS )
+      CALL AST_SETD( UT1FRM, 'ObsLat', OBSLAT/D2R, STATUS )
+
+      TDBFRM = AST_TIMEFRAME( 'TimeScale=TDB', STATUS )
+      CALL AST_SETD( TDBFRM, 'ObsLon', OBSLON/D2R, STATUS )
+      CALL AST_SETD( TDBFRM, 'ObsLat', OBSLAT/D2R, STATUS )
+
+*  Get a Mapping that converts from UT1 to TDB, and use it to transform
+*  the epoch value.
+      TIMEFS = AST_CONVERT( UT1FRM, TDBFRM, ' ', STATUS )
+      CALL AST_TRAN1( TIMEFS, 1, MJD, .TRUE., MJD, STATUS )
+
+*  Format the TDB MJD into a form suitable for use with AST_SETC.
       WRITE( EPOCH, * ) 'MJD ',MJD
 
 *  Set the Epoch attribute.
       CALL AST_SETC( SPCFRM, 'Epoch', EPOCH, STATUS )
 
 *  Observatory position. 
-      CALL AST_SETD( SPCFRM, 'GeoLon', GEOLON/D2R, STATUS )
-      CALL AST_SETD( SPCFRM, 'GeoLat', GEOLAT/D2R, STATUS )
+      CALL AST_SETD( SPCFRM, 'ObsLon', OBSLON/D2R, STATUS )
+      CALL AST_SETD( SPCFRM, 'ObsLat', OBSLAT/D2R, STATUS )
       
-*  Standard of rest. In order to get consistency with plots produced by
-*  SPECX, it seems that the frequency axis defined by the JFCEN and JFINC
-*  SPECX extension items (created below) give the frequency in the rest
-*  frame of the source. 
-      CALL AST_SETC( SPCFRM, 'StdOfRest', 'Source', STATUS )
-
-*  The souce is assumed to be moving at a speed given by V_SETL(4) within 
-*  the rest frame given by the bottom 4 bits of the LSRFLG extension item 
-*  (0=Topocentric (called "Telluric" within SPECX), 1=kinematic LSR 
-*  2=Heliocentric, 3 = geocentric). Set the source velocity rest frame.
+*  Standard of rest. Before 10/01/2008, in order to get consistency with 
+*  plots produced by SPECX, it seemed that the frequency axis defined by 
+*  the JFCEN and JFINC SPECX extension items (created below) must give 
+*  the frequency in the rest frame of the source. As of 10/01/2008, this
+*  assumption has been changed. We now assume that the standard of rest
+*  is given by the bottom 4 bits of the LSRFLG. (0=Topocentric (called 
+*  "Telluric" within SPECX), 1=kinematic LSR 2=Heliocentric, 3 = geocentric). 
       CALL NDF_XGT0I( IMAP, 'SPECX', 'LSRFLG', LSRFLG, STATUS)
       ISOR = MOD( LSRFLG, 16 )
 
@@ -287,6 +312,10 @@
          GO TO 999
       END IF      
 
+      CALL AST_SETC( SPCFRM, 'StdOfRest', SOR, STATUS )
+
+*  Set the source velocity rest frame. The souce is assumed to be moving at 
+*  a speed given by V_SETL(4) within the above rest frame.
       CALL AST_SETC( SPCFRM, 'SourceVRF', SOR, STATUS )
 
 *  Get the assumed velocity of the source in the rest frame obtained from
@@ -450,11 +479,6 @@
       CALL AST_PUTFITS( FC, 'EQUINOX = 1950.0', .FALSE., STATUS ) 
       CALL AST_PUTFITS( FC, 'RADESYS = ''FK4''', .FALSE., STATUS ) 
 
-      CARD = 'MJD-OBS = '
-      IAT = 10
-      CALL CHR_PUTD( MJD, CARD, IAT )
-      CALL AST_PUTFITS( FC, CARD, .FALSE., STATUS ) 
-
       CALL AST_PUTFITS( FC, 'CTYPE3  =  ''FREQ    ''', .FALSE., STATUS ) 
 
       CARD = 'CRPIX3  = '
@@ -485,6 +509,9 @@
       SKYFRM = AST_PICKAXES( AST_GETFRAME( FS, AST__CURRENT, STATUS ),
      :                       2, AXES, DMAP, STATUS ) 
 
+*  Set the Epoch to be the same as the SpecFrame.
+      CALL AST_SETC( SKYFRM, 'Epoch', EPOCH, STATUS )
+
 *  The Base Frame in the FrameSet will correspond to 3D GRID coordinates.
 *  Get the Mapping from GRID to SPECTRUM-SKY coordinates.
       MAP = AST_GETMAPPING( FS, AST__BASE, AST__CURRENT, STATUS )
@@ -505,11 +532,6 @@
 *  Add the CmpFrame created above into the NDF WCS FrameSet, using the
 *  Mapping created above to connect it to the GRID Frame.
       CALL AST_ADDFRAME( IWCS, AST__BASE, MAP, FRM, STATUS )       
-
-*  Set the standard of rest to the rest frame indicated by
-*  the LSRFLG extension item. This was requested by JACH (rather than
-*  leaving the standard of rest set to "Source").
-      CALL AST_SETC( IWCS, 'StdOfRest', SOR, STATUS )
 
 *  Store the FrameSet back in the NDF.
       CALL NDF_PTWCS( IWCS, INDF, STATUS )
