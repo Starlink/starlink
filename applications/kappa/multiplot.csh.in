@@ -103,7 +103,7 @@
     source $KAPPA_DIR/kappa.csh
     unalias echo
 
-#  Endeavourthe Starlink psmerge command is used.
+#  Endeavour to use the Starlink psmerge command.
     if ( -e $STARLINK_DIR/bin/psmerge ) then
        set psmerge_dir = "$STARLINK_DIR/bin/psmerge"
     else if ( -e $KAPPA_DIR/../psmerge )
