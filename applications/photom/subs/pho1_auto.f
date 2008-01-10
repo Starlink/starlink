@@ -152,6 +152,9 @@
 *        Changes to support modifications to PSFCAL()
 *     07-SEP-2004 (PWD):
 *        Changed to use CNF pointer.
+*     10-JAN-2008 (PWD):
+*        Add checks around CHR_ calls and report an error if they fail.
+*        CHR_ calls set status with making an error report.
 *     {enter_changes_here}
 
 *  Bugs :
@@ -325,13 +328,24 @@
            CALL GRP_GET( PSFINF, 1, 1, BUFFER, STATUS )
            CALL CHR_DCWRD( BUFFER, 9, NWRD, START, STOP, APRWRD, 
      :                     LSTAT )
+           IF ( LSTAT .NE. SAI__OK ) THEN
+              CALL ERR_REP( 'PHO1_AUTO', 'Error parsing PSF star '//
+     :                      'information (too many words)', STATUS )
+              GO TO 99
+           END IF
            CODE = 'OK'
 	   ECCEN = 0.0
 	   ANGLE = 0.0
+           IF ( STATUS .NE. SAI__OK ) GO TO 99
            CALL CHR_CTOR( APRWRD( 1 ), XPOS, STATUS )
            CALL CHR_CTOR( APRWRD( 2 ), YPOS, STATUS )
-	   CALL CHR_CTOR( APRWRD( 7 ), CLIP, STATUS )
+           CALL CHR_CTOR( APRWRD( 7 ), CLIP, STATUS )
            CALL CHR_CTOR( APRWRD( 8 ), SEE, STATUS )
+           IF ( STATUS .NE. SAI__OK ) THEN
+              CALL ERR_REP( 'PHO1_AUTO', 'Error converting PSF '//
+     :                      'star values', STATUS )
+              GO TO 99
+           END IF
 
 *  Correct for NDF origin.
            XPOS = XPOS - REAL( ORIGIN( 1 ) - 1 )
@@ -359,9 +373,15 @@
 *  outer scales.
                      CALL GRP_GET( SKYINF, J, 1, BUFFER, STATUS )
                      CALL CHR_DCWRD( BUFFER, 2, NWRD, START, STOP,
-     :                               SKYWRD,LSTAT )
+     :                               SKYWRD, LSTAT )
                      CALL CHR_CTOR( SKYWRD( 1 ), INNER, STATUS )
                      CALL CHR_CTOR( SKYWRD( 2 ), OUTER, STATUS )
+                     IF ( STATUS .NE. SAI__OK ) THEN
+                        CALL ERR_REP( 'PHO1_AUTO', 
+     :                                'Error reading sky regions', 
+     :                                STATUS )
+                        GO TO 99
+                     END IF
                      GO TO 40
                     END IF
                END DO
@@ -429,12 +449,18 @@
 *  information about this aperture.
                      CALL GRP_GET( SKYINF, J, 1, BUFFER, STATUS )
                      CALL CHR_DCWRD( BUFFER, 6, NWRD, START, STOP,
-     :                               SKYWRD,LSTAT )
+     :                               SKYWRD, LSTAT )
+                     IF ( STATUS .NE. SAI__OK ) GO TO 99
                      CALL CHR_CTOR( SKYWRD( 1 ), XSKY, STATUS )
                      CALL CHR_CTOR( SKYWRD( 2 ), YSKY, STATUS )
                      CALL CHR_CTOR( SKYWRD( 4 ), MAJSKY, STATUS )
                      CALL CHR_CTOR( SKYWRD( 5 ), ECCSKY, STATUS )
                      CALL CHR_CTOR( SKYWRD( 6 ), ANGSKY, STATUS )
+                     IF ( STATUS .NE. SAI__OK ) THEN
+                        CALL ERR_REP( 'PHO1_AUTO', 'Error converting'//
+     :                                ' sky region values', STATUS )
+                        GO TO 99
+                     END IF
 
 *  Correct for NDF origin.
                      XSKY = XSKY - REAL( ORIGIN( 1 ) - 1 )
@@ -652,8 +678,15 @@
                        CALL GRP_GET( SKYINF, J, 1, BUFFER, STATUS )
                        CALL CHR_DCWRD( BUFFER, 2, NWRD, START, STOP,
      :                                 SKYWRD, LSTAT )
+                       IF ( STATUS .NE. SAI__OK ) GO TO 99
                        CALL CHR_CTOR( SKYWRD( 1 ), INNER, STATUS )
                        CALL CHR_CTOR( SKYWRD( 2 ), OUTER, STATUS )
+                       IF ( STATUS .NE. SAI__OK ) THEN
+                          CALL ERR_REP( 'PHO1_AUTO',
+     :                                  'Error converting sky '//
+     :                                  'region values', STATUS )
+                          GO TO 99
+                       END IF
                        GO TO 41
                     END IF
                  END DO
@@ -722,12 +755,19 @@
 *  information about this aperture.
                        CALL GRP_GET( SKYINF, J, 1, BUFFER, STATUS )
                        CALL CHR_DCWRD( BUFFER, 6, NWRD, START, STOP,
-     :                                 SKYWRD,LSTAT )
+     :                                 SKYWRD, LSTAT )
+                       IF ( STATUS .NE. SAI__OK ) GO TO 99
                        CALL CHR_CTOR( SKYWRD( 1 ), XSKY, STATUS )
                        CALL CHR_CTOR( SKYWRD( 2 ), YSKY, STATUS )
                        CALL CHR_CTOR( SKYWRD( 4 ), MAJSKY, STATUS )
                        CALL CHR_CTOR( SKYWRD( 5 ), ECCSKY, STATUS )
                        CALL CHR_CTOR( SKYWRD( 6 ), ANGSKY, STATUS )
+                       IF ( STATUS .NE. SAI__OK ) THEN
+                          CALL ERR_REP( 'PHO1_AUTO',
+     :                                  'Error converting sky '//
+     :                                  'region values', STATUS )
+                          GO TO 99
+                       END IF
 
 *  Correct for NDF origin.
                        XSKY = XSKY - REAL( ORIGIN( 1 ) - 1 )
@@ -872,12 +912,18 @@
 
          CALL GRP_GET( OBJINF, I, 1, BUFFER, STATUS )
          CALL CHR_DCWRD( BUFFER, 12, NWRD, START, STOP, APRWRD, LSTAT )
+         IF ( STATUS .NE. SAI__OK ) GO TO 99
          CALL CHR_CTOR( APRWRD( 1 ), XPOS, STATUS )
          CALL CHR_CTOR( APRWRD( 2 ), YPOS, STATUS )
          CALL CHR_CTOR( APRWRD( 8 ), MAJOR, STATUS )
          CODE = 'OK'
          CALL CHR_CTOR( APRWRD( 9 ), ECCEN, STATUS )
          CALL CHR_CTOR( APRWRD( 10 ), ANGLE, STATUS )
+         IF ( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_REP( 'PHO1_AUTO', 'Error converting aperture '//
+     :                    'star values', STATUS )
+            GO TO 99
+         END IF
 
 *  Now extract the object index.
          CALL GRP_GET( OBJIND, I, 1, INDEXO, STATUS )
@@ -979,8 +1025,15 @@
                      CALL GRP_GET( SKYINF, J, 1, BUFFER, STATUS )
                      CALL CHR_DCWRD( BUFFER, 2, NWRD, START, STOP,
      :                               SKYWRD,LSTAT )
+                     IF ( STATUS .NE. SAI__OK ) GO TO 99
                      CALL CHR_CTOR( SKYWRD( 1 ), INNER, STATUS )
                      CALL CHR_CTOR( SKYWRD( 2 ), OUTER, STATUS )
+                     IF ( STATUS .NE. SAI__OK ) THEN
+                        CALL ERR_REP( 'PHO1_AUTO',
+     :                              'Error converting sky '//
+     :                              'annulus values', STATUS )
+                        GO TO 99
+                     END IF
                      GO TO 5
                   END IF
  4             CONTINUE
@@ -1048,11 +1101,18 @@
                      CALL GRP_GET( SKYINF, J, 1, BUFFER, STATUS )
                      CALL CHR_DCWRD( BUFFER, 6, NWRD, START, STOP,
      :                               SKYWRD,LSTAT )
+                     IF ( STATUS .NE. SAI__OK ) GO TO 99
                      CALL CHR_CTOR( SKYWRD( 1 ), XSKY, STATUS )
                      CALL CHR_CTOR( SKYWRD( 2 ), YSKY, STATUS )
                      CALL CHR_CTOR( SKYWRD( 4 ), MAJSKY, STATUS )
                      CALL CHR_CTOR( SKYWRD( 5 ), ECCSKY, STATUS )
                      CALL CHR_CTOR( SKYWRD( 6 ), ANGSKY, STATUS )
+                     IF ( STATUS .NE. SAI__OK ) THEN
+                        CALL ERR_REP( 'PHO1_AUTO',
+     :                              'Error converting sky '//
+     :                              'region values', STATUS )
+                        GO TO 99
+                     END IF
 
 *  Correct for NDF origin.
                      XSKY = XSKY - REAL( ORIGIN( 1 ) - 1 )
