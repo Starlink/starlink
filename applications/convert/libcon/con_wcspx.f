@@ -56,6 +56,14 @@
 *        by AST) before storing it in the output WCS.
 *        - Asume that the SPECX axis is in the rest frame given by the
 *        bottom 4 bits of LSRFLG rather than in the source's rest frame.
+*      11-JAN-2008 (DSB):
+*        - The specx user guide says that JFINC is a topocentric value
+*        and JFCEN is a source frame value. So convert JFINC from topo to
+*        source before using it. This involves backing out of yesterdays 
+*        change that assumed the SPECX axis (i.e. both JFCEN and JFINC) was 
+*        in the rest frame given by the bottom 4 bits of LSRFLG.
+*        - Use the correct definition of the source velocity (radio,
+*        optical or relativistic) as read from bits 5 and 6 of LSRFLG.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -96,6 +104,7 @@
       CHARACTER MONTHS(12)*3 ! Months of the year.
       CHARACTER SIDEBAND*3   ! USB or LSB?
       CHARACTER SOR*10       ! Value for StdOfRest attribute
+      CHARACTER SYS*10       ! Value for System attribute
       CHARACTER UTDATE*15    ! UT date of the observation
       CHARACTER UTIME*15     ! UT time of the observation
       DOUBLE PRECISION CD1   ! RA pixel size
@@ -108,6 +117,7 @@
       DOUBLE PRECISION DDEC  ! Dec offset (arc-seconds)
       DOUBLE PRECISION DEC   ! Central Dec (degrees)
       DOUBLE PRECISION DRA   ! RA offset (seconds)
+      DOUBLE PRECISION DTBYDS! Rate of change of topo freq wrt source freq
       DOUBLE PRECISION IFFREQ! IF Frequency (GHz)
       DOUBLE PRECISION MJD   ! Modified Julian Date of observation
       DOUBLE PRECISION POSANG! Position angle of Y axis (degs East of North)
@@ -124,6 +134,7 @@
       INTEGER HOUR           ! Hour of observation
       INTEGER IAT            ! Used length of string
       INTEGER ISOR           ! LSR identifier extracted from LSRFLG
+      INTEGER ISYS           ! Spectral system identifier from LSRFLG
       INTEGER IWCS           ! Pointer to NDF's WCS FrameSet
       INTEGER JFCEN          ! Frequency (kHz) at spectral axis centre
       INTEGER JFINC          ! Pixel size (Hz) on spectral axis 
@@ -138,6 +149,7 @@
       INTEGER SKYFRM         ! Pointer to AST SkyFrame
       INTEGER SPCFRM         ! Pointer to AST SpecFrame
       INTEGER TDBFRM         ! TimeFrame describing the TDB timescale
+      INTEGER TPFRM          ! SpecFrame describing Topocentric rest frame
       INTEGER TIMEFS         ! FrameSet connecting TDB abd UT1 timescales
       INTEGER UT1FRM         ! TimeFrame describing the UT1 timescale
       INTEGER YEAR           ! Year 
@@ -280,13 +292,17 @@
       CALL AST_SETD( SPCFRM, 'ObsLon', OBSLON/D2R, STATUS )
       CALL AST_SETD( SPCFRM, 'ObsLat', OBSLAT/D2R, STATUS )
       
-*  Standard of rest. Before 10/01/2008, in order to get consistency with 
-*  plots produced by SPECX, it seemed that the frequency axis defined by 
-*  the JFCEN and JFINC SPECX extension items (created below) must give 
-*  the frequency in the rest frame of the source. As of 10/01/2008, this
-*  assumption has been changed. We now assume that the standard of rest
-*  is given by the bottom 4 bits of the LSRFLG. (0=Topocentric (called 
-*  "Telluric" within SPECX), 1=kinematic LSR 2=Heliocentric, 3 = geocentric). 
+*  Standard of rest. In order to get consistency with plots produced by
+*  SPECX, it seems that the frequency axis defined by the JFCEN and JFINC
+*  SPECX extension items (created below) give the frequency in the rest
+*  frame of the source. There is more info on this in the specx user
+*  manual (specx_v6-3.tex) section "Notes on individual header parameters".
+      CALL AST_SETC( SPCFRM, 'StdOfRest', 'Source', STATUS )
+
+*  The source is assumed to be moving at a speed given by V_SETL(4) within 
+*  the rest frame given by the bottom 4 bits of the LSRFLG extension item 
+*  (0=Topocentric (called "Telluric" within SPECX), 1=kinematic LSR 
+*  2=Heliocentric, 3 = geocentric). Set the source velocity rest frame.
       CALL NDF_XGT0I( IMAP, 'SPECX', 'LSRFLG', LSRFLG, STATUS)
       ISOR = MOD( LSRFLG, 16 )
 
@@ -312,14 +328,36 @@
          GO TO 999
       END IF      
 
-      CALL AST_SETC( SPCFRM, 'StdOfRest', SOR, STATUS )
-
-*  Set the source velocity rest frame. The souce is assumed to be moving at 
-*  a speed given by V_SETL(4) within the above rest frame.
       CALL AST_SETC( SPCFRM, 'SourceVRF', SOR, STATUS )
 
-*  Get the assumed velocity of the source in the rest frame obtained from
-*  LSRFLG.
+*  The source velocity is radio, optical or relativistic, depending on the 
+*  bits 5 and 6 of the LSRFLG extension item (0=radio, 1=optical,
+*  2=relativistic). Set the source velocity system.
+      ISYS = LSRFLG / 16
+
+      IF( ISYS .EQ. 0 ) THEN
+         SYS = 'VRAD'
+
+      ELSE IF( ISYS .EQ. 1 ) THEN
+         SYS = 'VOPT'
+
+      ELSE IF( ISYS .EQ. 2 ) THEN
+         SYS = 'VELO'
+
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETI( 'I', LSRFLG )
+         CALL MSG_SETI( 'J', ISYS )
+         CALL ERR_REP( 'CON_WCSPX_ERR2', 'The ''LSRFLG'' item in the '//
+     :                 'SPECX header has value ^I which specifies an '//
+     :                 'unknown velocity system value (^J).', STATUS )
+         GO TO 999
+      END IF      
+
+      CALL AST_SETC( SPCFRM, 'SourceSys', SYS, STATUS )
+
+*  Get the assumed velocity of the source in the rest frame and spectral
+*  system obtained from LSRFLG.
       CALL NDF_XGT0D( IMAP, 'SPECX', 'V_SETL(4)', SRCVEL, STATUS )
 
 *  If the source velocity is not zero, assign it to the SourceVel
@@ -352,6 +390,22 @@
 *  Get the frequency increment per pixel, in Hz. Convert to GHz.
       CALL NDF_XGT0I( IMAP, 'SPECX', 'JFINC(1)', JFINC, STATUS)
       CD3 = DBLE( JFINC )*1.0E-9
+
+*  The specx user manual implies that, whilst the JFCEN value is in the
+*  source rest frame, the JFINC value is in the topocentric rest frame. 
+*  So we need to convert JFINC from topcentric to source rest frame. Take
+*  a copy of the SpecFrame and set its rest frame to topocentric.
+      TPFRM = AST_COPY( SPCFRM, STATUS )
+      CALL AST_SETC( TPFRM, 'StdOfRest', 'Topo', STATUS )
+
+*  Get the Mapping from source to topocentric rest frame, and get the
+*  rate of change of topocentric frequency with respect to source frequency
+*  at the frequency given by JFCEN.
+      DTBYDS = AST_RATE( AST_CONVERT( SPCFRM, TPFRM, ' ', STATUS ), 
+     :                   CRVAL3, 1, 1, STATUS )
+
+*  Convert the frequency increment from topocentric to source.
+      CD3 = CD3/DTBYDS
 
 *  Since this is a convenient time, configure the DSB-ness
       IF (ISDSB) THEN
@@ -532,6 +586,11 @@
 *  Add the CmpFrame created above into the NDF WCS FrameSet, using the
 *  Mapping created above to connect it to the GRID Frame.
       CALL AST_ADDFRAME( IWCS, AST__BASE, MAP, FRM, STATUS )       
+
+*  Set the standard of rest to the rest frame indicated by
+*  the LSRFLG extension item. This was requested by JACH (rather than
+*  leaving the standard of rest set to "Source").
+      CALL AST_SETC( IWCS, 'StdOfRest', SOR, STATUS )
 
 *  Store the FrameSet back in the NDF.
       CALL NDF_PTWCS( IWCS, INDF, STATUS )
