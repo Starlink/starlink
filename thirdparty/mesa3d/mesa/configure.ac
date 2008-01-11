@@ -34,6 +34,7 @@ dnl    AC_CANONICAL_BUILD, not needed, but used for build value.
 case "$build" in
   *alpha*)                 MESA_SYSTEM=osf1;;
   *solaris*)               MESA_SYSTEM=sunos5;;
+  *darwin*)                MESA_SYSTEM=darwin;;
   *)                       MESA_SYSTEM=linux;;
 esac
 AC_SUBST(MESA_SYSTEM)
