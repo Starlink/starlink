@@ -57,10 +57,13 @@
 *  History:
 *     12-APR-1996 (PDRAPER):
 *        Original version.
-*     1-FEB-1999 (AALLAN)
+*     01-FEB-1999 (AALLAN)
 *        Reflects changes to the input file for optimal extraction
-*      28-MAY-1999 (PDRAPER):
+*     28-MAY-1999 (PDRAPER):
 *        Changed number of PSF fields to match documentation.
+*     11-JAN-2008 (PDRAPER):
+*        Clean TABs from input strings. Not documented that only spaces
+*        are allowed, so bend on this.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -100,22 +103,36 @@
 *  Status:
       INTEGER STATUS            ! Global status
 
+*  External references:
+      EXTERNAL CHR_LEN
+      INTEGER CHR_LEN           ! Used length of string.
+
+*  Local constants:
+      INTEGER TABVAL            ! ASCII TAB
+      PARAMETER ( TABVAL = 9 )
+
 *  Local Constants:
+      CHARACTER * ( 1 ) TAB     ! TAB character value
       CHARACTER * ( GRP__SZNAM ) BUFFER ! Input line buffer
       CHARACTER * ( VAL__SZD ) WORDS( MAXWRD ) ! Input line broken into words
+      INTEGER J                 ! Loop variable
+      INTEGER L                 ! Used length of string
+      INTEGER LSTAT             ! Local status
+      INTEGER NLINE             ! Line count
+      INTEGER NOBJ              ! Number of object apertures
+      INTEGER NPSF		! Number of PSF apertures
+      INTEGER NSKY              ! Number of sky regions
       INTEGER NWRD              ! Number of words in line
       INTEGER START( MAXWRD )   ! Starting positions of words in buffer
       INTEGER STOP( MAXWRD )    ! End positions of words in buffer
-      INTEGER LSTAT             ! Local status
       LOGICAL OK                ! Ok to read file again
-      INTEGER NSKY              ! Number of sky regions
-      INTEGER NOBJ              ! Number of object apertures
-      INTEGER NPSF		! Number of PSF apertures
-      INTEGER NLINE             ! Line count
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise TAB value.
+      TAB = CHAR( TABVAL )
 
 *  Create the groups to contain the decoded information.
       CALL GRP_NEW( 'Object indices', OBJIND, STATUS )
@@ -141,12 +158,22 @@
             OK = .FALSE.
          ELSE
 
+*  Used length for efficiency.
+            L = CHR_LEN( BUFFER )
+
+*  Pre-process line by replacing any TABs with spaces.
+            DO 2 J = 1, L
+               IF ( BUFFER( J : J ) .EQ. TAB ) THEN
+                  BUFFER( J : J ) = ' '
+               END IF
+ 2          CONTINUE
+
 *  Read a line need to determine what it is.
             NLINE = NLINE + 1
             IF ( BUFFER( 1:1 ) .NE. '#' ) THEN
 
 *  Probable object line (note we skip blank lines in this part).
-               CALL CHR_DCWRD( BUFFER, MAXWRD, NWRD, START, STOP,
+               CALL CHR_DCWRD( BUFFER( :L ), MAXWRD, NWRD, START, STOP,
      :                         WORDS, LSTAT )
                IF ( LSTAT .EQ. SAI__ERROR ) THEN
                   CALL MSG_SETI( 'NUM', NLINE )
@@ -159,14 +186,14 @@
 *  13 fields in line, must be an object so record the information.
                   NOBJ = NOBJ + 1
                   CALL GRP_PUT( OBJIND, 1, WORDS( 1 ), 0, STATUS )
-                  CALL GRP_PUT( OBJINF, 1, BUFFER( START( 2 ): ), 0,
+                  CALL GRP_PUT( OBJINF, 1, BUFFER( START( 2 ): L ), 0,
      :                          STATUS )
                ELSE IF ( NWRD .EQ. 9 ) THEN
 
 *  9 fields in line, must be an optimal object so record the information.
                   NOBJ = NOBJ + 1
                   CALL GRP_PUT( OBJIND, 1, WORDS( 1 ), 0, STATUS )
-                  CALL GRP_PUT( OBJINF, 1, BUFFER( START( 2 ): ), 0,
+                  CALL GRP_PUT( OBJINF, 1, BUFFER( START( 2 ): L ), 0,
      :                          STATUS )
 
                ELSE IF ( NWRD .EQ. 10 ) THEN
@@ -177,7 +204,7 @@
 		  ENDIF
                   NPSF = NPSF + 1
                   CALL GRP_PUT( PSFIND, 1, WORDS( 1 ), 0, STATUS )
-                  CALL GRP_PUT( PSFINF, 1, BUFFER( START( 2 ): ), 0,
+                  CALL GRP_PUT( PSFINF, 1, BUFFER( START( 2 ): L ), 0,
      :                          STATUS )
 
                ELSE IF ( NWRD .NE. 0 ) THEN
@@ -192,7 +219,7 @@
             ELSE IF ( BUFFER( 1:4 ) .EQ. '#SKY' ) THEN
 
 *  Probable SKY region line.
-               CALL CHR_DCWRD( BUFFER, 8, NWRD, START, STOP,
+               CALL CHR_DCWRD( BUFFER( :L ), 8, NWRD, START, STOP,
      :                         WORDS, LSTAT )
                IF ( LSTAT .EQ. SAI__ERROR ) THEN
                   CALL MSG_SETI( 'NUM', NLINE )
@@ -211,13 +238,13 @@
 *  Correct number of words so record information.
                   NSKY = NSKY + 1
                   CALL GRP_PUT( SKYIND, 1, WORDS( 2 ), 0, STATUS )
-                  CALL GRP_PUT( SKYINF, 1, BUFFER( START( 3 ): ), 0,
+                  CALL GRP_PUT( SKYINF, 1, BUFFER( START( 3 ): L ), 0,
      :                          STATUS )
                END IF
             ELSE IF ( BUFFER( 1:4 ) .EQ. '#ANN' ) THEN
 
 *  Probable annulus sky region line.
-               CALL CHR_DCWRD( BUFFER, 4, NWRD, START, STOP,
+               CALL CHR_DCWRD( BUFFER( :L ), 4, NWRD, START, STOP,
      :                         WORDS, LSTAT )
                IF ( LSTAT .EQ. SAI__ERROR ) THEN
                   CALL MSG_SETI( 'NUM', NLINE )
@@ -236,7 +263,7 @@
 *  Correct number of words so record information.
                   NSKY = NSKY + 1
                   CALL GRP_PUT( SKYIND, 1, WORDS( 2 ), 0, STATUS )
-                  CALL GRP_PUT( SKYINF, 1, BUFFER( START( 3 ): ), 0,
+                  CALL GRP_PUT( SKYINF, 1, BUFFER( START( 3 ): L ), 0,
      :                          STATUS )
                END IF
             END IF

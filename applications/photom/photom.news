@@ -47,6 +47,8 @@
   
     AUTOASTROM: extended error messages when parsing bad input catalogues
     have been added (previously unspecific error reports where made).
+    The input description file may now contain tab character between
+    the various fields.
   
     Since v1.9
     ----------
