@@ -41,6 +41,7 @@
 *     Edward Chapin (UBC)
 *     Jen Balfour (UBC)
 *     Christa VanLaerhoven (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -90,6 +91,7 @@
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2007 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
 *     Council and the University of British Columbia. All Rights
 *     Reserved.
@@ -159,13 +161,14 @@
 
 #define MAXSTRING 256
 
+
+/* Ratio between solar and sidereal time (from SLA_AOPPA) */
+#define SOLSID 1.00273790935
+
 #ifdef HAVE_LIBNETCDF
 /* Prototypes for local functions that wrap netcdf messages */
 void nc_getSignal(int ncid, char* signalname, double* signal, int* status);
 void nc_error(int nc_status, int *status);
-
-/* prototype for slalib routine that calculates calendar date -> njd */
-void slaCaldj ( int iy, int im, int id, double *djm, int *j );
 
 #endif
 
@@ -173,6 +176,7 @@ void smurf_impaztec( int *status ) {
  
   /* Local Variables */
   double *airmass = NULL;      /* airmass of each frame */
+  double *tel_lst = NULL;      /* LST read from telescope */
   double amend;                /* airmass at end  */
   double amstart;              /* airmass at beginning  */
   double atend;		       /* ambient temperature at end (Celsius)  */
@@ -242,7 +246,7 @@ void smurf_impaztec( int *status ) {
   int place=0;                 /* NDF placeholder */
   void *pntr=NULL;             /* Temporary pointer */
   double *posptr=NULL;         /* pointing offsets from map centre */
-  int *quality;                /* for a given frame: 1 is good, 0 is bad */
+  int *quality=NULL;           /* for a given frame: 1 is good, 0 is bad */
   double ra=0;                 /* ra of observation in radians  */
   double rad;                  /* RA of observation in degrees */
   char ra_str[MAXSTRING];      /* string rep. of ra */
@@ -271,16 +275,33 @@ void smurf_impaztec( int *status ) {
   double y_min = 0;
   double y_max = 0;
   int yr;                      /* year of beginning of observation */
-
+  int jrslt = 0;
+  int nstrt = 0;
+  double lst_err;    /* Error in LST */
 
   double xtemp, ytemp, xout, yout; 
+  double* ra_app = NULL;
+  double *dec_app = NULL;
+  double obsgeo[3];
+
+  /* DUT1 for end of 2005 is approx -0.6
+     for first half of 2006 is about 0.2 */
+  double dut1 = -0.6;
 
   /* Main routine */
 
 #ifdef HAVE_LIBNETCDF
 
+  /* We should use the telescope location that the TCS actually used.
+     We therefore use the OBSGEO coordinates known to be in use at that
+     time (2005/2006 rather than relying on a name lookup. */
+     
+  obsgeo[0] = -5464594.335493;
+  obsgeo[1] = -2492695.151639;
+  obsgeo[2] = 2150964.058506;
+
   /* Get the LON/LAT of JCMT */
-  smf_calc_telpos( NULL, "JCMT", telpos, status );
+  smf_calc_telpos( obsgeo, "JCMT", telpos, status );
 
   /* Get the user defined input and output file names */
   parGet0c( "IN", ncfile, MAXSTRING, status);
@@ -325,6 +346,7 @@ void smurf_impaztec( int *status ) {
 
     time = smf_malloc ( nframes, sizeof(*time), 1, status );  
     airmass = smf_malloc ( nframes, sizeof(*airmass), 1, status );  
+    tel_lst = smf_malloc ( nframes, sizeof(*tel_lst), 1, status );  
     trackactc1 = smf_malloc ( nframes, sizeof(*trackactc1), 1, status );  
     trackactc2 = smf_malloc ( nframes, sizeof(*trackactc2), 1, status );  
     trackdemandc1 = smf_malloc ( nframes, sizeof(*trackdemandc1), 1, status ); 
@@ -344,6 +366,8 @@ void smurf_impaztec( int *status ) {
     fpar = smf_malloc( nflat, sizeof(*fpar), 0, status );
     mjuldate = smf_malloc ( nframes, sizeof(*mjuldate), 1, status );
     tempbuff = smf_malloc ( nframes, sizeof(*tempbuff), 1, status );
+    ra_app = smf_malloc ( nframes, sizeof(*ra_app), 1, status );
+    dec_app = smf_malloc ( nframes, sizeof(*dec_app), 1, status );
 
     quality = smf_malloc ( nframes, sizeof(*quality), 1, status );
     memset( quality, 0, nframes*sizeof(int) );
@@ -397,7 +421,7 @@ void smurf_impaztec( int *status ) {
     /* Use simulator routine to calculate array of UT for each
        timeslice. NOTE: this is UT1, not UTC. Also DUT1 passed in as 0
        since we don't have any way of inputting it. */
-    sc2sim_calctime( telpos[0]*DD2R, djm, 0.0, steptime, nframes,
+    sc2sim_calctime( telpos[0]*DD2R, djm, dut1, steptime, nframes,
                      mjuldate, tempbuff, status );       
 
     /* RA + Dec at centre of map */
@@ -416,19 +440,140 @@ void smurf_impaztec( int *status ) {
     /* Calculate the JCMTState at each timeslice 
        NOTE: jcmt_*Base* are identically 0 and will need to be generated! */
 
+    nc_getSignal ( ncid, "jcmt_lst", tel_lst, status );
     nc_getSignal ( ncid, "jcmt_airmass", airmass, status );
     nc_getSignal ( ncid, "jcmt_trackActC1", trackactc1, status );
     nc_getSignal ( ncid, "jcmt_trackActC2", trackactc2, status );
     nc_getSignal ( ncid, "jcmt_trackDemandC1", trackdemandc1, status );
     nc_getSignal ( ncid, "jcmt_trackDemandC1", trackdemandc1, status );
-    nc_getSignal ( ncid, "jcmt_trackBaseC1", trackbasec1, status );
-    nc_getSignal ( ncid, "jcmt_trackBaseC2", trackbasec2, status );
     nc_getSignal ( ncid, "jcmt_azElActC1", azelactc1, status );
     nc_getSignal ( ncid, "jcmt_azElActC2", azelactc2, status );
     nc_getSignal ( ncid, "jcmt_azElDemandC1", azeldemandc1, status);
     nc_getSignal ( ncid, "jcmt_azElDemandC2", azeldemandc2, status);
-    nc_getSignal ( ncid, "jcmt_azElBaseC1", azelbasec1, status );
-    nc_getSignal ( ncid, "jcmt_azElBaseC2", azelbasec2, status );
+
+    /* Calculate the error in LST in radians */
+    lst_err = tempbuff[nframes-1] - (DH2R * tel_lst[nframes-1]);
+
+    {
+      double range;
+      range = tel_lst[nframes-1] - tel_lst[0]; // range in decimal hours
+      range /= (int)nframes;  // length of frame 
+      range /= SOLSID; // UT
+      range /= 24.0;  // fraction of day
+      range *= SPD;  // seconds
+      printf("length of step = %f\n",range);
+      range = tempbuff[nframes-1] - tempbuff[0]; // range in decimal hours
+      range /= (int)nframes;  // length of frame 
+      range /= SOLSID; // UT
+      range *= DR2H;
+      range /= 24.0;  // fraction of day
+      range *= SPD;  // seconds
+      printf("length of step = %f\n",range);
+      range = mjuldate[nframes-1] - mjuldate[0]; // range in decimal hours
+      range /= (int)nframes;  // length of frame 
+      //      range /= SOLSID; // UT
+      range *= SPD;  // seconds
+      printf("length of step = %f\n",range);
+    }
+
+    /* this corresponds to a utc error that needs to be adjusted by the
+       different length of the second */
+    lst_err /= SOLSID;
+
+    /* convert the error to seconds */
+    lst_err *= DR2S;
+
+    printf("Error in LST = %f sec\n", lst_err  );
+
+    /* calculate offset for UT1 */
+    lst_err += slaDtt( mjuldate[0] );
+
+    /* correct to TAI */
+    lst_err -= 32.184;
+
+    printf("Final correction = %f sec \n",lst_err);
+
+
+    lst_err = 10;
+    /* and then to a fraction of a day */
+    lst_err /= SPD;
+
+    // with correction of lst_diff - slaDtt =  -1058 arcsec error
+    // with no correction error = 141 arcsec
+    // with just DTT (64 sec) = -1108
+    // with correction of 157 error = -2506
+    // with correction of 32.184  error = -626
+    // with correction of 10 error = -292
+
+    /* and correct the UTC values */
+    for (i=0; i < nframes; i++) {
+           mjuldate[i] += lst_err;
+    }
+
+
+    /* if this is a planet the base position needs to be recalculated.
+       If this is a sidereal source we can read the base position from
+       the header. Unfortunately the AZEL base is always moving */
+
+    if (strcmp(tracksys, "APP" ) == 0 ) {
+
+      /* calculate base for planet at each time slice */
+
+    } else {
+      size_t len;
+      /* need to get tracking centre */
+      nc_get_att_text ( ncid, NC_GLOBAL, "source_ra", ra_str );
+      nc_get_att_text ( ncid, NC_GLOBAL, "source_dec", dec_str );
+
+      len = strlen(ra_str);
+      for (i=0; i <len; i++) {
+	if (ra_str[i] == ':') {
+	  ra_str[i] = ' ';
+	}
+      }
+      len = strlen(dec_str);
+      for (i=0; i <len; i++) {
+	if (dec_str[i] == ':') {
+	  dec_str[i] = ' ';
+	}
+      }
+
+      /* convert to radians */
+      nstrt = 1;
+      slaDafin( ra_str, &nstrt, &ra, &jrslt );
+      ra *= 15.0;
+      nstrt = 1;
+      slaDafin( dec_str, &nstrt, &dec, &jrslt );
+
+      /* store base position in ra/dec and calculate apparent */
+      for (i = 0; i < nframes ; i++ ) {
+	trackbasec1[i] = ra;
+	trackbasec2[i] = dec;
+
+	slaMap( ra, dec, 0., 0., 0., 0., 2000., mjuldate[i],
+		&(ra_app[i]), &(dec_app[i]));
+
+      }
+
+    }
+
+    /* now convert base RA/Dec to azel - there will be a slight
+     error because AST and TCS take into account more effects 
+     than are handled by slaDe2h */
+    
+    
+    for (i=0; i< nframes; i++) {
+      double hourangle;
+      double phi = DD2R * telpos[1];
+
+      /* Calculate hour angle */
+      hourangle = tel_lst[i] - ra_app[i];
+
+      /* Calculate the az/el corresponding to the map centre (base) */
+      slaDe2h ( hourangle, dec_app[i], phi, &(azelbasec1[i]),&(azelbasec2[i]));
+
+    }
+
 
     /* Because AzTEC starts recording data before an observation
        acutally starts determine the frame at which the observation
@@ -529,31 +674,41 @@ void smurf_impaztec( int *status ) {
 	posptr[2*i_good +0] = azelactc1[i];
 	posptr[2*i_good +1] = azelactc2[i];
 
+
 	/* Create frameset */
 
 	smf_create_lutwcs( 0, hdr.fplanex, hdr.fplaney, hdr.ndet, 
 			   &(head[i_good]), hdr.instap, telpos, steptime,
 			   &(hdr.wcs), status );
 
-	/*
-	astSet( hdr.wcs, "SYSTEM=FK5" );
-	xtemp = 2.;
-	ytemp = 2.;
+	if (i_good == 0) {
+	  double radiff;
+	  double decdiff;
+	  astSet( hdr.wcs, "SYSTEM=FK5" );
+	  xtemp = 3.;
+	  ytemp = 1.;
 	  
-	astTran2( hdr.wcs, 1, &xtemp, &ytemp, 1, &xout, &yout ); 
+	  astTran2( hdr.wcs, 1, &xtemp, &ytemp, 1, &xout, &yout ); 
 
-	printf("RADEC head: %f %f out: %f %f\n", 
-	       head[i_good].tcs_tr_ac1, head[i_good].tcs_tr_ac2,
-	       xout, yout );
+	  printf("RADEC head: %f %f out: %f %f\n", 
+		 head[i_good].tcs_tr_ac1, head[i_good].tcs_tr_ac2,
+		 xout, yout );
 
-	astSet( hdr.wcs, "SYSTEM=AZEL" );
+	  radiff = head[i_good].tcs_tr_ac1 - xout ;
+	  radiff *= cos(head[i_good].tcs_tr_ac2) * DR2AS;
+	  decdiff = head[i_good].tcs_tr_ac2 - yout ;
+	  decdiff *= DR2AS;
+
+	  printf("Diff = %f , %f \n", radiff, decdiff);
+
+	  astSet( hdr.wcs, "SYSTEM=AZEL" );
 	  
-	astTran2( hdr.wcs, 1, &xtemp, &ytemp, 1, &xout, &yout ); 
+	  astTran2( hdr.wcs, 1, &xtemp, &ytemp, 1, &xout, &yout ); 
 
-	printf("AZEL head: %f %f out: %f %f\n", 
-	       head[i_good].tcs_az_ac1, head[i_good].tcs_az_ac2,
-	       xout, yout );
-	*/
+	  printf("AZEL head: %f %f out: %f %f\n", 
+		 head[i_good].tcs_az_ac1, head[i_good].tcs_az_ac2,
+		 xout, yout );
+	}
 
 	i_good++;
       }
@@ -617,7 +772,7 @@ void smurf_impaztec( int *status ) {
       j = nbolos;
     }
   }
-  if(i_good != ngframes) {
+  if(*status == SAI__OK && i_good != ngframes) {
     printf("IMPAZTEC i_good after filling bolo signals != ngframes,  i_good: %i\n",
 	   i_good);
   }
@@ -641,28 +796,30 @@ void smurf_impaztec( int *status ) {
   astSetFitsS ( fitschan, "TELESCOP", "JCMT", "Name of telescope", 0 );
    
   /* Determine extent of the map from posptr + known size of the arrays */
-  for ( i=0; i<numsamples; i++ ) {
+  if (*status == SAI__OK) {
+    for ( i=0; i<numsamples; i++ ) {
     
-    if( i == 0 ) {
-      x_min = posptr[0];
-      x_max = posptr[0];
-      y_min = posptr[1];
-      y_max = posptr[1];
+      if( i == 0 ) {
+	x_min = posptr[0];
+	x_max = posptr[0];
+	y_min = posptr[1];
+	y_max = posptr[1];
+      }
+    
+      if( posptr[i*2] < x_min ) x_min = posptr[i*2];
+      if( posptr[i*2] > x_max ) x_max = posptr[i*2];
+      if( posptr[i*2+1] < y_min ) y_min = posptr[i*2+1];
+      if( posptr[i*2+1] > y_max ) y_max = posptr[i*2+1];
+    
     }
-    
-    if( posptr[i*2] < x_min ) x_min = posptr[i*2];
-    if( posptr[i*2] > x_max ) x_max = posptr[i*2];
-    if( posptr[i*2+1] < y_min ) y_min = posptr[i*2+1];
-    if( posptr[i*2+1] > y_max ) y_max = posptr[i*2+1];
-    
-  }
   
-  map_wdth = (x_max - x_min) + 1000; /* 1000 arcsec for array FOV */
-  map_hght = (y_max - y_min) + 1000; /* 1000 arcsec for array FOV */
-  map_pa = 0; /* kludge */
-  map_x = (x_max + x_min)/2.;
-  map_y = (y_max + y_min)/2.;
-  
+    map_wdth = (x_max - x_min) + 1000; /* 1000 arcsec for array FOV */
+    map_hght = (y_max - y_min) + 1000; /* 1000 arcsec for array FOV */
+    map_pa = 0; /* kludge */
+    map_x = (x_max + x_min)/2.;
+    map_y = (y_max + y_min)/2.;
+  }  
+
   astSetFitsF ( fitschan, "MAP_HGHT", map_hght, "Map height (arcsec)", 0 );
   astSetFitsF ( fitschan, "MAP_WDTH", map_wdth, "Map width (arcsec)", 0 );
   astSetFitsF ( fitschan, "MAP_PA", map_pa, "Map PA (degrees)", 0 );
@@ -749,6 +906,7 @@ void smurf_impaztec( int *status ) {
 void nc_getSignal(int ncid, char* signalname, double* signal,int* status){
 
   int sigid, nc_status;
+  if (*status != SAI__OK) return;
   nc_inq_varid(ncid,signalname, &sigid);
   nc_status = nc_get_var_double(ncid,sigid,signal);
   if(nc_status != NC_NOERR){
