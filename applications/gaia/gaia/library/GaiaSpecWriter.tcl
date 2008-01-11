@@ -636,8 +636,10 @@ itcl::class gaia::GaiaSpecWriter {
 
                   #  The DATE-OBS keyword for this spectrum can be defined
                   #  more accurately as the Epoch, so do that. Note we need to
-                  #  move back to TAI (/UTC) from TDB.
+                  #  move back to TAI from TDB and then to UTC.
                   set epoch [expr $epoch - (32.184/86400.0)]
+                  set leaps [sla::dat $epoch]
+                  set epoch [expr $epoch - ($leaps/86400.0)]
                   set dateobs [sla::datemjd2obs $epoch]
 
                   #  Record system and equinox of coordinates.
