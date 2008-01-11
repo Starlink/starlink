@@ -227,6 +227,7 @@ itcl::class gaia::GaiaStartup {
       set values_($this,with_zoom_window) 1
       set values_($this,zoom_factor) 4
       set values_($this,autoscale) 0
+      set values_($this,autofit) 0
 
       set values_($this,labelfont) $::gaia_fonts(labelfont)
       set values_($this,textfont) $::gaia_fonts(textfont)
@@ -242,7 +243,8 @@ itcl::class gaia::GaiaStartup {
                    transient_tools transient_spectralplot quiet_exit \
                    min_scale max_scale zoom_factor default_cut default_cmap \
                    default_itt linear_cartesian always_merge check_for_cubes \
-                   isize maxshift autoscale labelfont textfont wcsfont" {
+                   isize maxshift autoscale autofit \
+                   labelfont textfont wcsfont" {
          $props_ set_named_property Gaia $key $values_($this,$key)
       }
       $props_ save_properties
@@ -278,6 +280,8 @@ itcl::class gaia::GaiaStartup {
             $values_($this,maxshift)
          $itk_option(-gaia) configure -autoscale \
             $values_($this,autoscale)
+         $itk_option(-gaia) configure -autofit \
+            $values_($this,autofit)
       }
    }
 
@@ -496,6 +500,18 @@ itcl::class gaia::GaiaStartup {
       add_short_help $itk_component(autoscale) \
          {Auto scale images to fit window, disables zoom}
       pack $itk_component(autoscale) -side top -fill x
+
+      #  Autofit images to window (once).
+      itk_component add autofit {
+         StarLabelCheck $w_.autofit \
+            -text "Auto fit:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $lwidth \
+            -variable [scope values_($this,autofit)]
+      }
+      add_short_help $itk_component(autofit) \
+         {Auto fit new images to window, keeps zoom}
+      pack $itk_component(autofit) -side top -fill x
 
       #  Minimum zoom scale.
       itk_component add minscale {

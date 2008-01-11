@@ -503,6 +503,9 @@ itcl::class gaia::GaiaImageCtrl {
          update
          after idle [code $this apply_hdu_]
       }
+
+      #  Do autofit if needed.
+      autofit_
    }
 
    #  Apply the current HDU, provided that it isn't zero. Used when setting
@@ -1114,6 +1117,19 @@ itcl::class gaia::GaiaImageCtrl {
       }
    }
 
+   #  Autofit. This option is like autoscale except it only applies once to
+   #  new images, so that they fit the window and subsequent zooming is
+   #  allowed.
+   protected method autofit_ {} {
+      if { $itk_option(-autofit) } {
+         #  Works by toggling maybe_autoscale to do the work.
+         set oldvalue $autoscale_
+         set autoscale_ 1
+         maybe_autoscale
+         set autoscale_ $oldvalue
+      }
+   }
+
    #  Configuration options.
    #  ======================
 
@@ -1225,6 +1241,14 @@ itcl::class gaia::GaiaImageCtrl {
 
    #  The number of units to move for a scrollwheel interaction.
    itk_option define -wheel_step wheel_step Wheel_Step 100
+
+   #  Whether to autofit new images to fit window. Also applies first
+   #  time regardless.
+   itk_option define -autofit autofit AutoFit 0 {
+      if { $itk_option(-autofit) } {
+         autofit_
+      }
+   }
 
    #  Protected variables:
    #  ====================

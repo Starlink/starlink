@@ -160,6 +160,7 @@ Usage: gaia ?NDF/fitsFile? ?-option value ...?
 
 Options:
  -autoscale <bool>        - scale image to fit window (disables zoom).
+ -autofit <bool>          - scale new image to fit window (keeps zoom).
  -always_merge <bool>     - always merge primary & extension headers (MEFs).
  -cat <bool>              - include ESO/Archive catalog extensions (default).
  -catalog  "<c1> <c2> .." - open windows for the given catalogs on startup.
@@ -318,7 +319,7 @@ itcl::class gaia::Gaia {
          gaia3d::Gaia3dVtk::release_all
       }
    }
-   
+
    #  Called after the options have been evaluated. Add GAIA menu and
    #  extra items for other menus.
    public method init {} {
@@ -386,6 +387,9 @@ itcl::class gaia::Gaia {
       #  If autoscaling, need to wait for realization the first time.
       if { $itk_option(-autoscale) } {
          after 0 [code $this configure -autoscale 1]
+      }
+      if { $itk_option(-autofit) } {
+         after 0 [code $this configure -autofit 1]
       }
 
       #  Attempt to register as PLASTIC listener, adding callbacks to be
@@ -627,6 +631,15 @@ itcl::class gaia::Gaia {
       insert_menuitem $m $index command "Astrometry warnings..." \
          {See any problems found with current astrometry headers} \
          -command [code $image_ display_astwarn]
+
+      #  Auto fit to complement autoscale.
+      set index [$m index "Auto scale"]
+      incr index
+      insert_menuitem $m $index checkbutton "Auto fit" \
+         {Scale the image to the max. visible size when loaded} \
+         -variable [scope itk_option(-autofit)] \
+         -onvalue 1 -offvalue 0 \
+         -command [code $this autofit_]
 
       #  HDUs are for NDFs too.
       $m entryconfigure "Select FITS HDU..." \
@@ -1346,7 +1359,7 @@ itcl::class gaia::Gaia {
       set naxis4 [$rtdimage fits get NAXIS4]
 
       #  Load it into cube browser. Note allow trivial cubes with redundant
-      #  dimensions 1, or 2, but not 3. 
+      #  dimensions 1, or 2, but not 3.
       if { ( $naxis4 == {} || $naxis4 == 1 ) && $naxis3 != {} && $naxis3 != 1 } {
             make_opencube_toolbox
             set msg {}
@@ -1466,7 +1479,7 @@ itcl::class gaia::Gaia {
          set imagename [lindex $args 0]
 	 set namer [GaiaImageName \#auto -imagename $imagename]
 	 if { [$namer exists] } {
-            
+
             #  Release any cubes before proceeding, otherwise this holds
             #  dataset open when we'd like to reopen if needed here (will
             #  return to file_loaded_ after reading file).
@@ -1650,7 +1663,7 @@ itcl::class gaia::Gaia {
    protected method maybe_release_cube_ {} {
       set cube_open 0
       set cube_name {}
-      if { [info exists itk_component(opencube) ] && 
+      if { [info exists itk_component(opencube) ] &&
            [winfo exists $itk_component(opencube) ] } {
          set cube_name [$itk_component(opencube) cget -cube]
          set cube_open [$itk_component(opencube) release]
@@ -2054,6 +2067,11 @@ window gives you access to this."
       }
    }
 
+   # Apply the autofit value.
+   protected method autofit_ {} {
+      $image_ configure -autofit $itk_option(-autofit)
+   }
+
    # -- public variables (also program options) --
 
    #  Is this controlled from the tabbed interface?
@@ -2192,6 +2210,14 @@ window gives you access to this."
        set $w_.autoscale $itk_option(-autoscale)
        if { [info exists image_] } {
           $image_ autoscale $w_.autoscale
+       }
+   }
+
+   #  Autofit new images to fit main window. Like autoscale except only
+   #  applies when image is first loaded and zoom remain enabled.
+   itk_option define -autofit autofit AutoFit 0 {
+       if { [info exists image_] } {
+          autofit_
        }
    }
 

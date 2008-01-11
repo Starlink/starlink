@@ -15,8 +15,14 @@
 
     A new command-line option "-autoscale" has been added. This enables
     the "View->Auto scale" option to scale the image to fit the main window
-    (but disables interactive control of the Scale: value). Also available
-    as a persistent startup option.
+    and to keep it scaled when the main window is resized (but disables 
+    interactive control of the Scale: value). Also available as a persistent 
+    startup option.
+
+    A new command-line option "-autofit" and "View->Auto fit" menu item has 
+    been added. This arranges for newly loaded images to fit the main window
+    (unlike "Auto scale" this happens just once and control of the zoom
+    remains active). Also available as a persistent startup option.
 
     The cube toolbox can now read an ARD region from a file.
 
