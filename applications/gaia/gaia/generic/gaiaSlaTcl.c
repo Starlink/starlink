@@ -10,6 +10,7 @@
 
  *  Copyright:
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     Copyright (C) 2008 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -56,6 +57,9 @@
 static int gaiaSlaObs( ClientData clientData, Tcl_Interp *interp,
                        int objc, Tcl_Obj *CONST objv[] );
 
+static int gaiaSlaDat( ClientData clientData, Tcl_Interp *interp,
+                       int objc, Tcl_Obj *CONST objv[] );
+
 static int gaiaSlaDateObs2Je( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
 
@@ -71,7 +75,7 @@ static int gaiaSlaDateMjd2Obs( ClientData clientData, Tcl_Interp *interp,
  */
 int Sla_Init( Tcl_Interp *interp )
 {
-    Tcl_CreateObjCommand( interp, "sla::obs", gaiaSlaObs,
+    Tcl_CreateObjCommand( interp, "sla::dat", gaiaSlaDat,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -86,6 +90,11 @@ int Sla_Init( Tcl_Interp *interp )
     Tcl_CreateObjCommand( interp, "sla::datemjd2obs", gaiaSlaDateMjd2Obs,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "sla::obs", gaiaSlaObs,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
     return TCL_OK;
 }
 
@@ -255,6 +264,30 @@ static int gaiaSlaDateMjd2Obs( ClientData clientData, Tcl_Interp *interp,
              ihmsf[2], ihmsf[3] ); 
 
     Tcl_SetResult( interp, date, TCL_VOLATILE );
+    return TCL_OK;
+}
+
+/**
+ * Given an UTC as an MJD return the correction to TAI.
+ */
+static int gaiaSlaDat( ClientData clientData, Tcl_Interp *interp,
+                       int objc, Tcl_Obj *CONST objv[] )
+{
+    double mjd;
+    double delta;
+
+    /* Check arguments, require one */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "Modified_Julian_Date" );
+        return TCL_ERROR;
+    }
+
+    if ( Tcl_GetDoubleFromObj( interp, objv[1], &mjd ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
+    delta = slaDat( mjd );
+    Tcl_SetObjResult( interp, Tcl_NewDoubleObj( delta ) );
     return TCL_OK;
 }
 
