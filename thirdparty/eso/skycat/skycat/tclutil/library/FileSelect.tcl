@@ -92,6 +92,9 @@
 #                 07 Jul 03  Added horizontal scrollbars.
 #                 22 Nov 05  Removed panedwindow as this seems to be stopping
 #                            the delivery of double clicks.
+#                 12 Jan 08  Allow extra space to be taken by the file list
+#                            by default. Add a panedwindow to control dir
+#                            and file list share of space.
 
 
 itk::usual FileSelect {}
@@ -124,7 +127,7 @@ itcl::class util::FileSelect {
 	set f [frame $w_.fs]
 
 	set fs(filterf) [frame $f.filterf]
-	set fs(listf) [frame $f.listf]
+        set fs(listf) [panedwindow $f.listf -width 4i -orient horizontal]
 	set fs(self) [frame $f.self]
 	set fs(btnf) [frame $f.btnf -height 30]
 
@@ -189,16 +192,17 @@ itcl::class util::FileSelect {
 	pack $fs(filef).list -side left -expand yes -fill both
 
         #
-        # Pack the directory and file lists based on the attributes
-	# for displaying each list.
+        # Add the directory and file lists based on the attributes
+	# for displaying each list. Uses a split pane with extra space
+        # to the file list.
         #
         frame $fs(listf).buf -width $_margin -borderwidth 0
 
         if {$itk_option(-dispdir)} {
-           pack $fs(dirf) -side left -fill both -expand yes
+           $fs(listf) add $fs(dirf)
         }
 	if {$itk_option(-dispfile)} {
-           pack $fs(filef) -side right -fill both -expand yes
+           $fs(listf) add $fs(filef)
         }
 
 	#
