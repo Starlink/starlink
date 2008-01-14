@@ -613,6 +613,63 @@ void irqSetqm( IRQLocs *locs, int bad, const char *qname, int size,
 
 /* ------------------------------- */
 
+F77_SUBROUTINE(irq_getqn)( CHARACTER_ARRAY(LOCS), 
+                           CHARACTER(QNAME), 
+                           LOGICAL(FIXED),
+                           LOGICAL(VALUE),
+                           INTEGER(BIT),
+                           CHARACTER(COMMNT), 
+                           INTEGER(STATUS)
+                           TRAIL(LOCS)
+                           TRAIL(QNAME)
+                           TRAIL(COMMNT) );
+
+void irqGetqn( IRQLocs *locs, char *qname, int *fixed, int *value, int *bit, 
+               char *commnt, int commnt_len, int *status ){
+
+   DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);  
+   DECLARE_CHARACTER_DYN(QNAME);
+   DECLARE_LOGICAL(FIXED);
+   DECLARE_LOGICAL(VALUE);
+   DECLARE_INTEGER(BIT);
+   DECLARE_CHARACTER_DYN(COMMNT);
+   DECLARE_INTEGER(STATUS);
+
+   HDS_EXPORT_CLOCATOR( locs->loc[0], LOCS[0], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[1], LOCS[1], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[2], LOCS[2], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[3], LOCS[3], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[4], LOCS[4], status );
+
+   F77_CREATE_CHARACTER( QNAME, strlen( qname ) );
+   F77_EXPORT_CHARACTER( qname, QNAME, QNAME_length );
+   F77_CREATE_CHARACTER( COMMNT, commnt_len-1 );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(irq_getqn)( CHARACTER_ARRAY_ARG(LOCS),
+                        CHARACTER_ARG(QNAME),
+                        LOGICAL_ARG(&FIXED),
+                        LOGICAL_ARG(&VALUE),
+                        INTEGER_ARG(&BIT),
+                        CHARACTER_ARG(COMMNT),
+                        INTEGER_ARG(&STATUS) 
+                        TRAIL_ARG(LOCS) 
+                        TRAIL_ARG(QNAME) 
+                        TRAIL_ARG(COMMNT) );
+
+   F77_IMPORT_LOGICAL( FIXED, *fixed );
+   F77_IMPORT_LOGICAL( VALUE, *value );
+   F77_IMPORT_INTEGER( BIT, *bit );
+   F77_IMPORT_CHARACTER( COMMNT, COMMNT_length, commnt );
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   F77_FREE_CHARACTER( QNAME );
+   F77_FREE_CHARACTER( COMMNT );
+}
+
+
+/* ------------------------------- */
+
 F77_SUBROUTINE(kpg1_wwrt)( INTEGER(IAST),
                            CHARACTER(NAME), 
                            CHARACTER(LOC), 
