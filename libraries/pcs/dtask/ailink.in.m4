@@ -59,6 +59,7 @@ ifelse(__SCRIPTNAME, alink,
 #       Copyright (C) 1991-1995 Science & Engineering Research Council.
 #       Copyright (C) 1996-1999, 2004 Central Laboratory of the Research Council.
 #       Copyright (C) 2006 Particle Physics & Engineering Research Council.
+#       Copyright (C) 2008 Science and Technology Facilities Council.
 #       All Rights Reserved.
 #
 #  Licence:
@@ -81,6 +82,7 @@ ifelse(__SCRIPTNAME, alink,
 #	CAAG: C A A Goswell (RLVAD::CAAG)
 #       AJC:  A J Chipperfield (Starlink)
 #       NG:   Norman Gray (Starlink)
+#       PWD:  Peter W. Draper (JAC, Durham University)
 #
 # History:
 #	24.07.1991 (CAAG):
@@ -153,8 +155,11 @@ ifelse(__SCRIPTNAME, alink,
 #        26-APR-2004 (NG):
 #          Generate both alink.in and ilink.in from ailink.in.m4.
 #          Do linking using dtask_libtool.
-#        1-AUG-2004 (NG): For subsequent modifications, see the CVS
-#          commit notes for successive revisions.
+#        1-AUG-2004 (NG): 
+#          For subsequent modifications, see the CVS commit notes for 
+#          successive revisions.
+#          Check for -dylib_file as a linker option (OS X). Has an argument which
+#          should also be gathered and not used for the program name.
 #-
 
 # Strip off `our' options from the beginning of the list of arguments
@@ -230,6 +235,10 @@ INITOPTS=
 while [ $# != 0 -a -z "$PROGNAME" ]
 do
     case $1 in
+        -dylib_file)
+            INITOPTS="$INITOPTS $1 $2"
+            shift
+            ;;
         -*)
             INITOPTS="$INITOPTS $1"
             ;;
