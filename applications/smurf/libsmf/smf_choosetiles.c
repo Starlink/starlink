@@ -17,7 +17,7 @@
 *     tiles = smf_choosetiles( Grp *igrp,  int size, int *lbnd, int *ubnd, 
 *                              smfBox *boxes, int spread, const double params[],
 *                              AstFrameSet *wcsout, int tile_size[ 2 ],
-*                              int trim, int *ntiles, int *status )
+*                              int trim, int border, int *ntiles, int *status )
 
 *  Arguments:
 *     igrp = Grp * (Given)
@@ -54,6 +54,10 @@
 *        An array holding the spatial dimensions of each tile, in pixels.
 *        If the first value is less than zero, then a single tile
 *        containing the entire output array is used, with no padding.
+*     border = int (Given)
+*        The size of the overlap reqired between adjacent tiles, in
+*        pixels. The actual overlap used will be the larger of this value 
+*        and the value needed to accomodate the specicified spreading scheme.
 *     ntiles = int * (Returned)
 *        Pointer to an int in which to return the number of tiles needed
 *        to cover the full size grid.
@@ -86,8 +90,9 @@
 *        no gap or overlap.
 *        - The bounds of an extended rectangle centred on the tile. This 
 *        extended area is equal to the tile area with an additonal
-*        constant-width border that is wide enough to accomodate the 
-*        kernel specified by "spread".
+*        constant-width border that is at least wide enough to accomodate 
+*        the kernel specified by "spread", but can be made wider by
+*        specifying a value for argument "border".
 *        - The bounds of the basic tile area, expressed in the GRID
 *        coordinate system of th eexpanded tile area.
 *        - A pointer to a Grp group holding the names of the input files
@@ -114,6 +119,8 @@
 *        a tile is centred at the SkyRef position.
 *     9-JAN-2008 (DSB):
 *        Correct check for overlap between input boxes and tile areas.
+*     14-JAN-2008 (DSB):
+*        Added argument "border".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -152,7 +159,7 @@
 smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd, 
                           int *ubnd, smfBox *boxes, int spread, 
                           const double params[], AstFrameSet *wcsout, 
-                          int tile_size[ 2 ], int trim,
+                          int tile_size[ 2 ], int trim, int border,
                           int *ntiles, int *status ){
 
 /* Local Variables */
@@ -293,6 +300,10 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
          w = work + 1001;
          while( *w != VAL__BADR && *w != 0.0 ) w++;
          extend = w  - ( work + 1001 );
+
+/* Ensure that the border width is no smaller than the requested birder
+   width. */
+         if( extend < border ) extend = border;
       
          umap = astAnnul( umap );
          work = astFree( work );

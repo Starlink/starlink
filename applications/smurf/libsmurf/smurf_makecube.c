@@ -446,6 +446,18 @@
 *          had for the first time slice. For any other system, no such 
 *          shifts are applied, even if the base telescope position is
 *          changing through the observation. [TRACKING]
+*     TILEBORDER = _INTEGER (Read)
+*          Only accessed if a non-null value is supplied for parameter
+*          TILEDIMS. It gives the width, in pixels, of the overlap
+*          between adjacent output tiles. If the default value of zero is
+*          accepted, then output tiles will abut each other in pixel
+*          space without any overlap. If a non-zero value is supplied,
+*          then each pair of adjacent tiles will overlap by the given
+*          number of pixels. Pixels within the overlap border will be
+*          given a quality name of "BORDER" (see KAPPA:SHOWQUAL). Note, 
+*          if a non-zero value is supplied, the value used will be the
+*          larger of the supplied value and the width of the spreading kernel
+*          selected via parameter SPREAD. [0]
 *     TILEDIMS( 2 ) = _INTEGER (Read)
 *          For large data sets, it may sometimes be beneficial to break 
 *          the output array up into a number of smaller rectangular tiles, 
@@ -848,6 +860,7 @@ void smurf_makecube( int *status ) {
    int sparse;                /* Create a sparse output array? */
    int specunion;             /* O/p spec range = union of i/p spec ranges? */
    int spread = 0;            /* Pixel spreading method */
+   int tileborder;            /* Dimensions (in pixels) of tile overlap */
    int tiledims[2];           /* Dimensions (in pixels) of each output tile */
    int trim;                  /* Trim the output cube to exclude bad pixels? */
    int trimtiles;             /* Trim the border tiles to exclude bad pixels? */
@@ -1156,10 +1169,11 @@ void smurf_makecube( int *status ) {
          errAnnul( status );
       } else {
          parGet0l( "TRIMTILES", &trimtiles, status );
+         parGet0i( "TILEBORDER", &tileborder, status );
          if( nval == 1 ) tiledims[ 1 ] = tiledims[ 0 ];
          tiles = smf_choosetiles( igrp, size, lbnd_out, ubnd_out, boxes, 
                                   spread, params, wcsout, tiledims,
-                                  trimtiles, &ntile, status );
+                                  trimtiles, tileborder, &ntile, status );
       }
    }
 
@@ -1170,7 +1184,7 @@ void smurf_makecube( int *status ) {
       tiledims[ 0 ] = -1;
       tiles = smf_choosetiles( igrp, size, lbnd_out, ubnd_out, boxes, 
                                spread, params, wcsout, tiledims, 
-                               0, &ntile, status );
+                               0, 0, &ntile, status );
    }
 
 /* Write the number of tiles being created to an output parameter. */
@@ -1937,12 +1951,12 @@ void smurf_makecube( int *status ) {
    first clone the NDF identifier, then close the file (which will unmap
    the NDF arrays), and then reshape the NDF to exclude the boundary 
    that was added to the tile to avoid edge effects. */
-         smf_reshapendf( &expdata, tile, status );
-         smf_reshapendf( &expdata, tile, status );
-         smf_reshapendf( &effdata, tile, status );
-         smf_reshapendf( &tsysdata, tile, status );
-         smf_reshapendf( &wdata, tile, status );
-         smf_reshapendf( &odata, tile, status );
+         smf_reshapendf( &expdata, tile, ( tileborder <= 0 ), status );
+         smf_reshapendf( &expdata, tile, ( tileborder <= 0 ), status );
+         smf_reshapendf( &effdata, tile, ( tileborder <= 0 ), status );
+         smf_reshapendf( &tsysdata, tile, ( tileborder <= 0 ), status );
+         smf_reshapendf( &wdata, tile, ( tileborder <= 0 ), status );
+         smf_reshapendf( &odata, tile, ( tileborder <= 0 ), status );
    
 /* Free other resources related to the current tile. */  
          if( wgt_array && !savewgt ) wgt_array = astFree( wgt_array );

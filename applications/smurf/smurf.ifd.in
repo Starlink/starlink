@@ -1075,6 +1075,15 @@ package @PACKAGE@ {
             helpkey *
           }
 
+	 parameter tileborder {
+	    type _INTEGER
+	    prompt {Width of tile overlap in pixels}
+	    ppath CURRENT DEFAULT
+	    vpath DEFAULT
+	    default 0
+	    helpkey *
+	  }
+
 	 parameter tiledims {
 	    type _INTEGER
 	    prompt {Output tile dimensions in pixels}

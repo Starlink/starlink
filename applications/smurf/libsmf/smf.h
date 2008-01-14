@@ -212,6 +212,9 @@
 *        -Added specrefwcs and spacerefwcs to smf_cubebounds.
 *     2007-12-18 (AGG):
 *        New smf_free behaviour: now returns a NULL pointer if successful
+*     2008-1-14 (DSB):
+*        Added argument "border" to smf_choosetiles, and "trim" to
+*        smf_reshapendf.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -699,12 +702,12 @@ void smf_open_related_model( const smfGroup *group, const int subindex,
 smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd, 
                           int *ubnd, smfBox *boxes, int spread, 
                           const double params[], AstFrameSet *wcsout, 
-                          int tile_size[ 2 ], int trim,
+                          int tile_size[ 2 ], int trim, int border,
                           int *ntiles, int *status );
 
 smfTile *smf_freetiles( smfTile *tiles, int size, int *status );
 
-void smf_reshapendf( smfData **data, smfTile *tile, int *status );
+void smf_reshapendf( smfData **data, smfTile *tile, int trim, int *status );
 
 void smf_dataOrder( smfData *data, int isTordered, int *status );
 
