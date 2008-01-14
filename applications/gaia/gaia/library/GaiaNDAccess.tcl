@@ -133,6 +133,7 @@ itcl::class gaia::GaiaNDAccess {
    #  stage.
    protected method open_ {} {
       set handle_ [${type_}::open [$namer_ fullname 0]]
+      set prop_changes_ 0
    }
 
    #  Close the dataset, if open, returns 1 in that case.
@@ -557,9 +558,17 @@ itcl::class gaia::GaiaNDAccess {
       return $accessor
    }
 
+   #  Current number of property changes. Use this value as a cheap 
+   #  datestamp for modifications to the WCS and FITS headers (by 
+   #  comparing the value from the last access to the current one).
+   public method getpropchanges {} {
+      return $prop_changes_
+   }
+
    #  Apply a strings of AST attributes to the WCS component of the dataset.
    public method astset {attribs} {
       set wcs [${type_}::getwcs $handle_]
+      incr prop_changes_
       return [gaiautils::astset $wcs $attribs]
    }
 
@@ -642,6 +651,7 @@ itcl::class gaia::GaiaNDAccess {
       } else {
          ${type_}::fitswrite $handle_ $keyword
       }
+      incr prop_changes_
    }
 
    #  Configuration options: (public variables)
@@ -703,6 +713,9 @@ itcl::class gaia::GaiaNDAccess {
    #  with getlastspectrum to retrieve this.
    protected variable last_spectrum_args_ {}
    protected variable last_spectrum_type_ point
+
+   #  Integer which will be incremented when a property is changed.
+   protected variable prop_changes_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------
