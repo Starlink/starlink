@@ -691,6 +691,10 @@
 *        Added LBND and UBND.
 *     9-JAN-2008 (DSB):
 *        Do not create empty output tiles.
+*     15-JAN-2008 (DSB):
+*        Ensure that the output tile names are in line with the ITILE value 
+*        stored in the SMURF extension even when some output tiles are
+*        skipped due to being empty.
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -1408,12 +1412,19 @@ void smurf_makecube( int *status ) {
          blank = 1;
       }
 
-/* If the tile is empty, do not create it. Continue on to the next tile. */
+/* If the tile is empty, do not create it. */
       if( tile->size == 0 ) {
+
+/* Issue a warning. */
          msgOutif( MSG__NORM, "TILE_MSG2", "      No input data "
                    "contributes to this output tile. The tile "
                    "will not be created.", status );
          msgBlank( status );
+
+/* Skip over the unused output file names. */
+         iout += npbin;
+
+/* Proceed to the next tile. */
          continue;
       }
 
