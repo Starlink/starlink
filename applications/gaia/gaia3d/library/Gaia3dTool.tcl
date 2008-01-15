@@ -1091,6 +1091,16 @@ itcl::class gaia3d::Gaia3dTool {
       }
       set limits_ $limits
 
+      #  See if the WCS has changed. This can happen if a system or units
+      #  change is made.
+      set changed_wcs 0
+      set prop_changes [$cubeaccessor_ getpropchanges]
+      if { $wcs_prop_changes_ != $prop_changes } {
+         set wcs_prop_changes_ $prop_changes
+         set changed_wcs 1
+      }
+      
+
       #  Check name of cube data, if changed re-access, or
       #  bad value handling changed.
       set newname [$cubeaccessor_ cget -dataset]
@@ -1101,7 +1111,7 @@ itcl::class gaia3d::Gaia3dTool {
          set result 1
          set cubename_ $newname
       } else {
-         if { $changed_bad_ || $changed_limits } {
+         if { $changed_bad_ || $changed_limits || $changed_wcs } {
             set result 2
          }
       }
@@ -1291,6 +1301,9 @@ itcl::class gaia3d::Gaia3dTool {
 
    #  Backingstore interaction mode.
    protected variable backingstore_on_ 0
+
+   #  Changed counter for accessor WCS. Should be updated when WCS changes.
+   protected variable wcs_prop_changes_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------
