@@ -106,6 +106,7 @@ void irqNew( int, const char *, IRQLocs **, int * );
 void irqAddqn( IRQLocs *, const char *, int, const char *, int * );
 void irqSetqm( IRQLocs *, int, const char *, int, float *, int *, int * );
 void irqGetqn( IRQLocs *, char *, int *, int *, int *, char *, int, int * );
+void irqRbit( IRQLocs *, const char *, int *, int * );
 
 int kpgGtfts( int, AstFitsChan ** fchan, int * status );
 int kpgPtfts( int, const AstFitsChan * fchan, int * status );
