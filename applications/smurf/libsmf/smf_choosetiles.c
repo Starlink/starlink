@@ -124,9 +124,11 @@
 *     14-JAN-2008 (DSB):
 *        Added argument "border".
 *     15-JAN-2008 (DSB):
-*        Change the "basic" tile bounds to include the requested boirder,
+*        - Change the "basic" tile bounds to include the requested boirder,
 *        and add another box to the Tile structure holding the tile
 *        bounds without border.
+*        - Allow for reference points that are outside the bounds of the
+*        full sized output array.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -277,17 +279,31 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 /* Store the number of tiles spanned by this axis. */
          numtile[ i ] = 1;
 
-/* Decrease the lower pixel bounds by a tile size until the whol output
-   array is encompassed. Then do the equivalent thing with the upper
-   bounds. */
+/* Decrease the lower pixel bounds by a tile size until the whole output
+   array is encompassed. */
          while( plbnd[ i ] > lbnd[ i ] ) {
             plbnd[ i ] -= tile_size[ i ];
             numtile[ i ]++;
          }
 
+/* If the ref pixel is outside the full sized output array, we may need
+   to exclude tiles that are off the edge. So increase the lower pixel 
+   bounds by a tile size until the upper bound of the corresponding tile
+   is inside the full sized output array. */
+         while( plbnd[ i ] + tile_size[ i ] - 1 < lbnd[ i ] ) {
+            plbnd[ i ] += tile_size[ i ];
+            numtile[ i ]--;
+         }
+
+/* Now modify the upper bounds in the same way. */
          while( pubnd[ i ] < ubnd[ i ] ) {
             pubnd[ i ] += tile_size[ i ];
             numtile[ i ]++;
+         }
+
+         while( pubnd[ i ] - tile_size[ i ] + 1 > ubnd[ i ] ) {
+            pubnd[ i ] -= tile_size[ i ];
+            numtile[ i ]--;
          }
 
       }
