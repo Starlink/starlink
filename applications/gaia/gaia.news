@@ -86,6 +86,9 @@
 
     Inline compressed images (e.g. RICE) can now have more than 2 dimensions.
 
+    The scale factor used in the pick object zoom window is now a command-line
+    and startup option.
+
   Puana Release:
   ==============
 

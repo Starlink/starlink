@@ -226,6 +226,7 @@ itcl::class gaia::GaiaStartup {
       set values_($this,with_pan_window) 1
       set values_($this,with_zoom_window) 1
       set values_($this,zoom_factor) 4
+      set values_($this,pick_zoom_factor) 10
       set values_($this,autoscale) 0
       set values_($this,autofit) 0
 
@@ -244,7 +245,7 @@ itcl::class gaia::GaiaStartup {
                    min_scale max_scale zoom_factor default_cut default_cmap \
                    default_itt linear_cartesian always_merge check_for_cubes \
                    isize maxshift autoscale autofit \
-                   labelfont textfont wcsfont" {
+                   labelfont textfont wcsfont pick_zoom_factor" {
          $props_ set_named_property Gaia $key $values_($this,$key)
       }
       $props_ save_properties
@@ -569,6 +570,25 @@ itcl::class gaia::GaiaStartup {
       add_short_help $itk_component(zoomfactor) \
          {Zoom factor of zoomed window (requires restart)}
       pack $itk_component(zoomfactor) -side top -fill x
+
+      #  Zoom factor used in pick window.
+      itk_component add pickzoomfactor {
+         LabelEntryScale $w_.pickzoomfactor \
+            -text {Pick zoom factor:} \
+            -labelwidth $lwidth \
+            -valuewidth 4 \
+            -from 2 \
+            -to 16 \
+            -increment 1 \
+            -show_arrows 1 \
+            -resolution 1 \
+            -anchor w \
+            -value $values_($this,pick_zoom_factor) \
+            -command [code $this set_value_ pick_zoom_factor]
+      }
+      add_short_help $itk_component(pickzoomfactor) \
+         {Default zoom factor of pick window (requires restart)}
+      pack $itk_component(pickzoomfactor) -side top -fill x
 
       #  Default percentage cut used for new files.
       itk_component add defaultcut {

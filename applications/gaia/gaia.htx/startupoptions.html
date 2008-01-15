@@ -60,7 +60,14 @@
       precision for RA is three decimal places in seconds of time, for DEC two
       decimal places. If this option is selected an extra decimal place is
       added to give roughly milli-arcsecond resolution.
-        </li>
+      </li>
+      
+      <li><b>Linear CAR projections (-linear_cartesian)</b></br> Assume CAR
+      projections are a linear mapping. Assumes that all Cartesian projections
+      are simple linear mappings, ignoring the possibility of spherical
+      rotations. Refer to the CarLin attribute of the AST (SUN/211) library
+      for more about this option.
+      </li>
 
       <li><b>Show HDU chooser (-show_hdu_chooser)</b><br> By default when you
       open a FITS or HDS file that contains more than one image the HDU
@@ -85,18 +92,38 @@
       this is an option.
       </li>
 
-      <li><b>Minimum zoom (-min_zoom)</b><br> The lowest zoom factor to be
+      <li><b>Show Interop menu (-interop_menu)</b><br> Display the
+      <tt>Interop</tt> menu (default), so that PLASTIC can be used for
+      interoperating with other VO-enabled applications.
+      </li>
+
+      <li><b>Auto scale (-autoscale)</b><br> Scale the image and graphics so
+      that they always fit within the main window (disables the zoom controls,
+      but responds to resizing of the main window). See <tt>View->Auto
+      scale</tt>.
+      </li>
+
+      <li><b>Auto fit (-autofit)</b><br> Scale the image so that it fits
+      within the main window when first opened.  See <tt>View->Auto fit</tt>.
+      </li>
+
+      <li><b>Minimum zoom (-min_zoom)</b><br> The lowest scale factor to be
       offered in the <tt>Scale:</tt> menu. Negative values are lower factors.
       </li>
 
-      <li><b>Maximum zoom (_max_zoom)</b><br> The highest zoom factor to be
+      <li><b>Maximum zoom (_max_zoom)</b><br> The highest scale factor to be
       offered in the <tt>Scale:</tt> menu. Note that the <tt>Scale:</tt> menu
       may run off the edges of the display if the difference between the
       minimum zoom and this value is too large.
       </li>
 
-      <li><b>Zoom factor (-zoom_factor)</b><br> The zoom factor used in the
+      <li><b>Zoom factor (-zoom_factor)</b><br> The scale factor used in the
       zoom window.
+      </li>
+
+      <li><b>Pick zoom factor (-pick_zoom_factor)</b><br> The scale factor 
+        used in the zoom window of the <tt>View->Pick Object...</tt> 
+        toolbox.
       </li>
 
       <li><b>Default cut (-default_cut)</b><br> The default percentile cut
@@ -107,15 +134,23 @@
       Servers"->"History..."</tt> window.
       </li>
 
+      <li><b>Centroid search box (-isize)</b><br> Search box size used when
+      centroiding.
+      </li>
+
+      <li><b>Centroid max shift (-maxshift)</b><br> Maximum shift from initial
+      position when centroiding.
+      </li>
+
       <li><b>Default colormap (-default_cmap)</b><br> The colormap to be used
       by default. Note that this isn't as useful as it might seem as images
       previously viewed will be shown with the colormap they where last
       displayed with, and the default colormap becomes the one last selected.
       </li>
 
-      <li><b>Default itt (-default_itt)</b><br> The default intensity transfer
-      table (the notes about colormaps also apply to this option).
-      </li>
+      <!-- li><b>Default itt (-default_itt)</b><br> The default intensity
+      transfer table (the notes about colormaps also apply to this option).
+      </li>-->
 
       <li><b>Label font (-labelfont)</b><br> The font used in the many labels
       in the GAIA interface. You may need to change this if your

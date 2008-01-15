@@ -183,6 +183,7 @@ Options:
  -panel_layout <layout>   - panel layout, one of: "saoimage", "reverse" or "default" .
  -panel_orient <orient>   - panel orientation, one of: "horizontal", "vertical"
  -pickobjectorient <v>    - orientation for pick object win: "horizontal", "vertical"
+ -pick_zoom_factor <n>    - scale factor used in pick object zoom window.
  -port <port>             - listen for remote cmds on port (default: 0 = choose port).
  -remote <bool>           - use existing skycat process, if available, with Tk send.
  -rtd <bool>              - include ESO/VLT Real-Time Features.
@@ -200,7 +201,7 @@ Options:
  -with_pan_window <bool>  - display the pan window (default).
  -with_warp <bool>        - add bindings to move mouse ptr with arrow keys (default: 1).
  -with_zoom_window <bool> - display the zoom window (default).
- -zoom_factor <n>         - zooming factor (default: 4).
+ -zoom_factor <n>         - scale factor for zoom window (default: 4).
 }
 
 itk::usual Gaia {}
@@ -534,6 +535,7 @@ itcl::class gaia::Gaia {
             -min_scale $itk_option(-min_scale) \
             -max_scale $itk_option(-max_scale) \
             -pickobjectorient $itk_option(-pickobjectorient) \
+            -pick_zoom_factor $itk_option(-pick_zoom_factor) \
             -hdu $itk_option(-hdu) \
             -ukirt_ql $itk_option(-ukirt_ql) \
             -appname $appname_ \
@@ -2237,6 +2239,8 @@ window gives you access to this."
       set ::gaia_fonts(wcsfont) $itk_option(-wcsfont)
    }
 
+   #  Zoom factor used in the pick object window.
+   itk_option define -pick_zoom_factor pick_zoom_factor Pick_Zoom_Factor 10
 
    # -- Protected variables --
 

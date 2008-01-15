@@ -377,7 +377,8 @@ itcl::class gaia::GaiaImageCtrl {
          -verbose $itk_option(-verbose) \
          -orient $itk_option(-pickobjectorient) \
          -debug $itk_option(-debug) \
-         -shorthelpwin $itk_option(-shorthelpwin)
+         -shorthelpwin $itk_option(-shorthelpwin) \
+         -factor $itk_option(-pick_zoom_factor)
       $w_.pick pick_object
    }
 
@@ -1241,6 +1242,9 @@ itcl::class gaia::GaiaImageCtrl {
 
    #  The number of units to move for a scrollwheel interaction.
    itk_option define -wheel_step wheel_step Wheel_Step 100
+
+   #  Zoom factor used in the pick object window.
+   itk_option define -pick_zoom_factor pick_zoom_factor Pick_Zoom_Factor 10
 
    #  Whether to autofit new images to fit window. Also applies first
    #  time regardless.
