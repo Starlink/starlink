@@ -687,7 +687,7 @@ JCMT telescope based on Mauna Kea, Hawaii.
 </component>
 
 <component id="gaia" support="S">
-  <version>4.1-0</version>
+  <version>4.2-1</version>
   <path>applications/gaia</path>
   <description>GAIA - Graphical Astronomy and Image Analysis</description>
   <abstract><p>
@@ -895,7 +895,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>1.8-5</version>
+  <version>1.8-8</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -1282,7 +1282,7 @@ A software package designed to search for periodicities in data.
 </component>
 
 <component id="photom" support="S">
-  <version>1.10-0</version>
+  <version>1.10-1</version>
   <path>applications/photom</path>
   <description>PHOTOM - A Photometry Package</description>
   <abstract><p>PHOTOM is a package for measuring the sky corrected
@@ -1530,7 +1530,7 @@ the James Clerk Maxwell Telescope. The tasks allows one to completely
 reduce your SCUBA-2 data.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><sourceset>messgen</sourceset><build>ast</build><build>sae</build><build>pcs</build><build>mers</build><build>ndf</build><build>shl</build><build>gsl</build><link>ndf</link><link>ast</link><link>hlp</link><link>ndg</link><link>shl</link><sourceset>sst</sourceset>
+    <build>pcs</build><sourceset>messgen</sourceset><build>ast</build><build>sae</build><build>pcs</build><build>mers</build><build>ndf</build><build>shl</build><build>gsl</build><build>ndg</build><build>fftw</build><build>ard</build><build>kaplibs</build><build>pda</build><link>ndf</link><link>ast</link><link>hlp</link><link>ndg</link><link>shl</link><link>pda</link><sourceset>sst</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -2410,6 +2410,1107 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
+<component id="sgp1">
+  <version>1</version>
+  <path>docs/sgp/001</path>
+  <description>Procedure for reporting bugs</description>
+  <abstract><p>
+   The present procedure for reporting bugs in the Starlink Software
+   Collection is thought by many to be unsatisfactory. The purpose of
+   this document is to outline the procedures to be followed by the
+   person discovering the bug, the Starlink Software Librarian and the
+   person to whom the bug is reported. In the past, bug reports have
+   seemed to disappear down a black hole, with a fix (maybe)
+   appearing, without warning, sometime later. This was generally due
+   to a lack of communication on all parts and it is hoped that the
+   procedures outlined below will keep all users informed of the
+   progress of a bug through the system.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>D J Rawlinson</name>
+    </person>
+  </developers>
+  <documentation> sgp1</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1989</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sgp2">
+  <version>2</version>
+  <path>docs/sgp/002</path>
+  <description>Starlink Software Support Responsibilities</description>
+  <abstract><p>
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P T Wallace</name>
+    </person>
+  </developers>
+  <documentation> sgp2</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1988, 1990</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sgp4">
+  <version>2</version>
+  <path>docs/sgp/004</path>
+  <description>Starlink C Programming Standard</description>
+  <abstract><p>
+    This describes Starlink's coding standard for the C language.
+    The advice wis grouped into five sections concerning 
+    Starlink naming conventions, programming advice, program design, 
+    machine independence, and preprocessor advice respectively.
+    The suggestions are made with maintainability, portability and 
+    efficiency in mind.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Anne Charles</name>
+      <name>Jo Murray</name>
+    </person>
+  </developers>
+  <documentation> sgp4</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1990, 1994</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sgp7">
+  <version>1</version>
+  <path>docs/sgp/007</path>
+  <description>Unix and Starlink</description>
+  <abstract><p>
+     In order to exploit the most cost-effective hardware and to
+     maintain compatibility with the international community, Starlink has
+     begun introducing Unix-based computers.  A mixed Unix/VMS service, with
+     its extra system management and software support costs, will not be
+     efficient in the long term, and over the next few years the existing
+     VMS service will run down and a complete change to Unix will occur.
+     The details and timing of this transition will vary from site to site in
+     accordance with local needs and conditions.  However, as far as possible
+     all future hardware purchases will be Unix-based.  As representatives of
+     the user community, the Starlink Users' Committee has worked closely
+     with the Project in formulating these plans and firmly endorses them
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P.T.Wallace</name>
+    </person>
+  </developers>
+  <documentation> sgp7</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1991</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sgp12">
+  <version>1</version>
+  <path>docs/sgp/012</path>
+  <description>AVS as a GUI for ADAM</description>
+  <abstract><p>
+    This describes an experiment to test the feasiblity of using AVS networks
+    in the ADAM context, based upon the conversion of an ADAM application into 
+    an AVS module.  After an outline of AVS and its data types, this
+    paper reports various steps in the conversion of the KAPPA ADD task.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>D L Terrett</name>
+    </person>
+  </developers>
+  <documentation> sgp12</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1992</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sgp16">
+  <version>10</version>
+  <path>docs/sgp/016</path>
+  <description>Starlink Application Programming Standard</description>
+  <abstract><p>
+    This Programming Standard should be read by all those who implement
+    programs on Starlink computers.  The techniques described are
+    requirements for Starlink-supported applications software but are equally
+    appropriate for private programming.  The standard applies mainly
+    to the implementation of freestanding VAX/VMS and Unix
+    applications, but also includes some material specific to developing
+    programs for the Starlink ADAM Software Environment.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P.T.Wallace</name>
+    </person>
+  </developers>
+  <documentation> sgp16</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1981-1992</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sgp21">
+  <version>10</version>
+  <path>docs/sgp/021</path>
+  <description>Starlink Software Distribution Policy</description>
+  <abstract><p>
+     This paper describes Starlink's software distribution policy and
+     the conditions of use of the collection. There is also a section
+     giving contact information of some of the commercial software
+     Starlink provides for its UK sites but may not redistribute.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>M.J.Bly</name>
+    </person>
+  </developers>
+  <documentation> sgp21</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1981-2000</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sgp25">
+  <version>13</version>
+  <path>docs/sgp/025</path>
+  <description>Starlink Site Manager's Guide</description>
+  <abstract><p>
+
+     This guide helps Starlink Site Managers carry out their role
+     within the Starlink Project. It details their responsibilities
+     and describes the methods of communication and administration
+     used to manage Starlink. It also describes the operating
+     standards for Starlink computers and Starlink software. Finally,
+     it describes the management of Starlink users.
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Starlink Project</name>
+      <name>M J Bly</name> 
+      <name>C A Clayton</name> 
+      <name>M J Currie</name> 
+      <name>M D Lawden</name> 
+      <name>A J Penny</name> 
+      <name>D J Rawlinson</name>
+      <name>A V Roberts</name> 
+      <name>J C Sherman</name> 
+      <name>P T Wallace</name>
+    </person>
+  </developers>
+  <documentation> sgp25</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1981-1997</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sgp28">
+  <version>8</version>
+  <path>docs/sgp/028</path>
+  <description>How to write good documents for Starlink</description>
+  <abstract><p>
+     This document gives advice on how to write good Starlink
+     documents. It lists Starlink documents which users said they
+     liked in the 1994 Starlink Software Survey, and identifies common
+     characteristics of style and organisation which can be
+     recommended to authors.
+  
+     Various features of documentation which the authors believe to be
+     harmful are specified, including common problems with pages
+     produced for the World Wide Web. Many of these will inevitably
+     reflect the taste of the authors, and these may not correspond to
+     your own. However, they derive from our belief that it is right
+     for an author to spend time and effort on a document in order to
+     save the reader time and effort in reading it.
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>M D Lawden</name>
+      <name>A C Charles</name>
+    </person>
+  </developers>
+  <documentation> sgp28</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>?-1997</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sgp31">
+  <version>11</version>
+  <path>docs/sgp/031</path>
+  <description>STARLINK</description>
+  <abstract><p>
+     This describes the Starlink Project.  Topics include hardware,
+     software, sites, the user population, the organisational aspects, 
+     and the work supported within Starlink.  There is also a brief 
+     history of the Project.
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>M D Lawden</name>
+    </person>
+  </developers>
+  <documentation> sgp31</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>?-1996</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sgp38">
+  <version>2</version>
+  <path>docs/sgp/038</path>
+  <description>Starlink Standard Data Structures</description>
+  <abstract><p>
+   This document should be read by programmers wishing to write
+   applications software for Starlink.  It describes various
+   standard ways of arranging data, using the Hierarchical
+   Data System (HDS).  The most important of these is the NDF
+   (Extensible n-Dimensional-Data Format), which is suitable for
+   expressing a wide variety of data which occur in n-dimensional
+   arrays, for example, pictures, spectra and time series.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Malcolm J. Currie</name>
+      <name>P T Wallace</name>
+      <name>R F Warren-Smith</name>
+    </person>
+  </developers>
+  <documentation> sgp38</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1988, 1989</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sgp41">
+  <version>1</version>
+  <path>docs/sgp/041</path>
+  <description>Local Management Arrangements</description>
+  <abstract><p>
+     In July 1993, the Starlink Panel reviewed the existing local
+     management arrangements, based on the Area Management Committees
+     (AMCs), and decided to introduce a number of reforms.  The new
+     arrangements, which are the subject of this paper, concentrate
+     the old AMC responsibilities into one individual at each site
+     called the Site Chairman, leaving it up to that individual to set
+     up the consultative machinery appropriate to his or her
+     community.  Sites normally opt to set up committees much like the
+     old LMCs or AMCs, but adapted to suit local needs.
+
+     A prospective Site Chairman proposes and agrees with the Starlink
+     Project Scientist local procedures for consulting and
+     representing users which are acceptable to both Starlink and the
+     Institution.  The effectiveness of these procedures is kept under
+     review; accreditation of the Site Chairman is renewed annually.
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P.T.Wallace</name>
+    </person>
+  </developers>
+  <documentation> sgp41</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1994</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sgp42">
+  <version>1</version>
+  <path>docs/sgp/007</path>
+  <description>Starlink Software Strategy</description>
+  <abstract><p>
+     This document contains the text of a paper presented to the
+     Starlink Panel in March 1995 and describes a strategy for
+     Starlink software activities over the next 3 years. It is based
+     heavily on the input provided by the 1993-94 Starlink Software
+     Survey (SGP/43) and subsequent discussions at Starlink Software
+     Strategy Group (SSG) meetings during late 1994.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>R.F. Warren-Smith</name>
+    </person>
+  </developers>
+  <documentation> sgp42</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1995</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sgp44">
+  <version>1</version>
+  <path>docs/sgp/044</path>
+  <description>Guidelines for Starlink Software Strategy Groups</description>
+  <abstract><p>
+     Software Strategy Groups (SSGs) are Starlink user groups which
+     have been set up by the Project to allow it to consult with
+     expert software users and to obtain advice about those software
+     issues which affect the use of its computing service.  The SSGs
+     also form an important part of a procedure for annually re-assessing
+     the software priorities of the Project and for identifying future
+     objectives.
+
+     This document describes the nature of the SSGs and the role which
+     they play in this procedure. It also covers some administrative
+     arrangements.  Its primary purpose is to give guidance to those
+     participating in SSGs, so that they can operate as effectively as
+     possible.
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>R.F. Warren-Smith</name>
+    </person>
+  </developers>
+  <documentation> sgp44</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1995</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sgp45">
+  <version>1</version>
+  <path>docs/sgp/045</path>
+  <description>ADAM Review Panel Report</description>
+  <abstract><p>
+     The ADAM Review Panel was constituted by SERC in early 1994
+     under the Chairmanship of Professor R. Hills (MRAO, Cambridge)
+     and met for the first time in March of that year. Its final
+     report was issued on 16th March 1995 and is reproduced here.
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>B K McIlwrath</name>
+    </person>
+  </developers>
+  <documentation> sgp45</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1995</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sgp47">
+  <version>1</version>
+  <path>docs/sgp/047</path>
+  <description>Computer Algebra Software</description>
+  <abstract><p>
+     This document is designed as an aid to those who need to find, or
+     use, software for computer algebra. Some of the text is based on
+     a review undertaken to determine whether the existing Starlink
+     provision for computer algebra is sufficient and appropriate. At
+     present there is a copy of Maple, available to anyone with a
+     Starlink account, on the central stadat machine.
+
+     The document compares the two main packages available for
+     computer algebra, gives short descriptions of other popular
+     packages, includes a list of `pointers' to other sources of
+     information, and offers some general hints on selecting software.
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Martin Clayton</name>
+    </person>
+  </developers>
+  <documentation> sgp47</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1997</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sgp49">
+  <version>1</version>
+  <path>docs/sgp/049</path>
+  <description>Starlink's Support for PCs</description>
+  <abstract><p>
+     This paper outlines Starlink's policy on support for PCs.
+     Essentially, we aim to use PCs as low-end multi-user workstations
+     running Linux, a variant of Unix, and to integrate them with
+     existing Unix systems.  We also aim to make most Starlink
+     software available for the PC/Linux platform.
+ 
+     Starlink's policy on support of PCs is likely to develop over the
+     next few years.  Readers are therefore advised to check that they
+     have the most up-to-date version of this document.  The policy
+     outlined here was agreed by the Starlink Panel at their meeting
+     in March 1996.
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>J.C. Sherman</name>
+      <name>C.A. Clayton</name>
+    </person>
+  </developers>
+  <documentation> sgp49</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1996</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sgp50">
+  <version>3</version>
+  <path>docs/sgp/050</path>
+  <description>Starlink Document Styles</description>
+  <abstract><p>
+
+     This document describes the various styles which are recommended
+     for Starlink documents. It also explains how to use the templates
+     which are provided by Starlink to help authors create documents
+     in a standard style.
+     
+     This paper is concerned mainly with conveying the "look and
+     feel" of the various styles of Starlink document rather than
+     describing the technical details of how to produce them. Other
+     Starlink papers give recommendations for the detailed aspects of
+     document production, design, layout, and typography.
+     
+     The only style that is likely to be used by most Starlink authors
+     is the Standard style.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>M D Lawden</name>
+    </person>
+  </developers>
+  <documentation> sgp50</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1997</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sgp51">
+  <version>1</version>
+  <path>docs/sgp/051</path>
+  <description>Starlink Software Maintenance Procedures</description>
+  <abstract><p>
+     This document sets out the steps involved in maintaining and
+     developing the Starlink Software Collection.  The intended
+     audience is all those involved in maintenance and development of
+     Starlink software.  Some sections will be of particular relevance
+     to programmers while other sections will be of interest to those
+     involved in software distribution.
+
+     It details the process from the passing of a bug report to the
+     support programmer through to the final release of a fix to a
+     package.  It also specifies the steps required for handling a new
+     package, porting of existing packages to new platforms, and
+     developing updates to packages.
+
+     There are also sections on beta-testing packages, and the production of
+     CD-ROMs.
+
+     It does not cover Base Set software, nor does it detail the use of
+     Starlink standard makefiles, and does not specify the mechanics of the
+     procedures, which evolve with operational demands.
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>M.J. Bly</name>
+      <name>R.F. Warren-Smith</name>
+    </person>
+  </developers>
+  <documentation> sgp51</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1997</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sgp52">
+  <version>1</version>
+  <path>docs/sgp/052</path>
+  <description>{Plan for Starlink Software Distribution</description>
+  <abstract><p>
+     This paper outlines changes to the Starlink Software Distribution
+     system.
+
+     The new scheme is based on a twice-yearly release of the whole
+     Unix Starlink Software Collection (USSC) on CD-ROM backed up by
+     releases of bug fixes using the Starlink Software Store.
+     Development versions of the USSC will be maintained at RAL and
+     made available to sites hosting contract programmers.
+     Information files and management documentation will be
+     distributed monthly using a simplified version of the current
+     distribution system.  Commercial software will be distributed
+     using a modified version of the current distribution system, to
+     coincide with CD-ROM releases.
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>M J Bly</name>
+    </person>
+  </developers>
+  <documentation> sgp52</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1997</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="ssn3">
+  <version>1</version>
+  <path>docs/ssn/003</path>
+  <description>The ECH Echelle Spectrograph Model Package</description>
+  <abstract><p>
+     The ECH package consists of a set of routines which model the
+     behaviour of the UCL coude echelle spectrograph (UCLES) and of
+     echelle spectrographs of similar design. Such spectrographs can
+     differ in focal length (which is in fact irrelevant to the model
+     package), cross-dispersing-prism apex angle, echelle ruling
+     frequency, echelle blaze angle, and camera focal length.
+
+     It is not capable of dealing with spectrographs which differ in
+     any more major ways from UCLES, although it could be extended to
+     do so should the need arise.
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>William Lupton</name>
+    </person>
+  </developers>
+  <documentation> ssn3</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1989</year>
+    <name>SERC</name>
+  </copyright>
+</component>
+
+<component id="ssn6">
+  <version>1</version>
+  <path>docs/ssn/006</path>
+  <description>The Cipher M990 Tape drive</description>
+  <abstract><p>
+     This document is aimed at Site Managers and describes how to make
+     the most of their Cipher M990s. Some of these devices have not
+     been optimally set-up by engineers and some simple tuning may
+     improve performance dramatically. Any corrections, improvements
+     or suggestions for this document will be most gratefully received
+     by the author. This document does not attempt to explain to users
+     how to use the drive since this is almost impossible to do this
+     without complex diagrams and it is far more effective for a Site
+     Manager to actually demonstrate the procedures to new users.
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>C.A. Clayton</name>
+    </person>
+  </developers>
+  <documentation> ssn6</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1990</year>
+    <name>SERC</name>
+  </copyright>
+</component>
+
+<component id="ssn7">
+  <version>2</version>
+  <path>docs/ssn/007</path>
+  <description>Administering Starlink Sun systems</description>
+  <abstract><p>
+     The purpose of this document is to ensure that all of the
+     Starlink Sun systems are set up in a secure, logical and
+     consistent fashion and that they do not begin to diverge from one
+     another.
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>C A Clayton</name>
+    </person>
+  </developers>
+  <documentation> ssn7</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1991</year>
+    <name>SERC</name>
+  </copyright>
+</component>
+
+<component id="ssn8">
+  <version>1</version>
+  <path>docs/ssn/008</path>
+  <description>{Naming Conventions for Accessing Starlink Subroutine Libraries</description>
+  <abstract><p>
+     This document defines a set of naming conventions to be used for
+     accessing Starlink subroutine libraries on VAX/VMS machines.
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>R.F. Warren-Smith</name>
+    </person>
+  </developers>
+  <documentation> ssn8</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1991</year>
+    <name>SERC</name>
+  </copyright>
+</component>
+
+<component id="ssn18">
+  <version>1</version>
+  <path>docs/ssn/018</path>
+  <description>Administering Solaris Sun systems</description>
+  <abstract><p>
+     This document is intended for Sun System administrators
+     as a follow up to SSN/7 which described how to set up
+     Starlink Sun systems under SunOS 4.X. The present document refers
+     to the set up of Sun systems under Solaris 2.X (a.k.a. SunOS 5.X).
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>C A Clayton</name>
+    </person>
+  </developers>
+  <documentation> ssn18</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1994</year>
+    <name>SERC</name>
+  </copyright>
+</component>
+
+<component id="ssn22">
+  <version>3</version>
+  <path>docs/ssn/022</path>
+  <description>Coordinate Systems for Pixel Arrays</description>
+  <abstract><p>
+     This defines the coordinate system adopted by Starlink for
+     pixel arrays.  The bottom left-hand corner of
+     the bottom left-hand pixel has picture coordinates (0.0,0.0).
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P.T. Wallace</name>
+      <name>M.J. Bly</name>
+    </person>
+  </developers>
+  <documentation> ssn22</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1983, 1992</year>
+    <name>SERC</name>
+  </copyright>
+</component>
+
+<component id="ssn23">
+  <version>3</version>
+  <path>docs/ssn/023</path>
+  <description>Starlink Benchmarking Utility</description>
+  <abstract><p>
+     The Starlink Benchmarking Utility provides a set of tools for 
+     investigating the performance of computer systems running
+     astronomy data reduction software. This manual is intended for
+     Starlink Site Managers and describes how to install and use the
+     package.
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>T.M. Gledhill</name>
+      <name>C.A. Clayton</name>
+    </person>
+  </developers>
+  <documentation> ssn23</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1995, 1996, 1997</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="ssn24">
+  <version>3</version>
+  <path>docs/ssn/024</path>
+  <description>otes for Site Managers about TeX and LaTeX</description>
+  <abstract><p>
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Anne Charles</name>
+    </person>
+  </developers>
+  <documentation> ssn24</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1997</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="ssn26">
+  <version>1</version>
+  <path>docs/ssn/026</path>
+  <description>Configuring, monitoring and tuning SPARC/Solaris systems</description>
+  <abstract><p>
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>C A Clayton</name>
+    </person>
+  </developers>
+  <documentation> ssn26</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1995</year>
+    <name>PPARC</name>
+  </copyright>
+</component>
+
+<component id="ssn27">
+  <version>1</version>
+  <path>docs/ssn/027</path>
+  <description>staradmin---Starlink User Database Maintainer</description>
+  <abstract><p>
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Adrian Fish</name>
+    </person>
+  </developers>
+  <documentation> ssn27</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1995</year>
+    <name>PPARRC</name>
+  </copyright>
+</component>
+
+<component id="ssn30">
+  <version>2</version>
+  <path>docs/ssn/030</path>
+  <description>SYSTUNE: Tools for SPARC/Solaris Performance Monitoring and Tuning</description>
+  <abstract><p>
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>T.M. Gledhill</name>
+    </person>
+  </developers>
+  <documentation> ssn30</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1995, 1996</year>
+    <name>PPARRC</name>
+  </copyright>
+</component>
+
+<component id="ssn31">
+  <version>1</version>
+  <path>docs/ssn/031</path>
+  <description>A Starlink Guide to Cartridge Tape Subsystems</description>
+  <abstract><p>
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>K.P. Duffey</name>
+    </person>
+  </developers>
+  <documentation> ssn31</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1995</year>
+    <name>PPARC</name>
+  </copyright>
+</component>
+
+<component id="ssn32">
+  <version>1</version>
+  <path>docs/ssn/032</path>
+  <description>Custom Jumpstart Tutorial</description>
+  <abstract><p>
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Geoff Mellor</name>
+    </person>
+  </developers>
+  <documentation> ssn32</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1995</year>
+    <name>PPARC</name>
+  </copyright>
+</component>
+
+<component id="ssn33">
+  <version>1</version>
+  <path>docs/ssn/033</path>
+  <description>Installing Starlink FORUM: A Conferencing Facility on the World Wide Web</description>
+  <abstract><p>
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Adrian Fish</name>
+    </person>
+  </developers>
+  <documentation> ssn33</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1995</year>
+    <name>PPARRC</name>
+  </copyright>
+</component>
+
+<component id="ssn36">
+  <version>1</version>
+  <path>docs/ssn/036</path>
+  <description>XpressWare Installation User guide</description>
+  <abstract><p>
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>K P Duffey</name>
+    </person>
+  </developers>
+  <documentation> ssn36</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1996</year>
+    <name>PPARC</name>
+  </copyright>
+</component>
+
+<component id="ssn37">
+  <version>1</version>
+  <path>docs/ssn/003</path>
+  <description>Starlink Security</description>
+  <abstract><p>
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>C A Clayton</name>
+    </person>
+  </developers>
+  <documentation> ssn37</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1996</year>
+    <name>PPARC</name>
+  </copyright>
+</component>
+
+<component id="ssn39">
+  <version>6</version>
+  <path>docs/ssn/039</path>
+  <description>GKS---Installation and Modification</description>
+  <abstract><p>
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>D.L. Terrett</name>
+    </person>
+  </developers>
+  <documentation> ssn39</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1992</year>
+    <name>SERC</name>
+  </copyright>
+</component>
+
+<component id="ssn64">
+  <version>5</version>
+  <path>docs/ssn/064</path>
+  <description>ADAM---Organization of Application Packages</description>
+  <abstract><p>
+     This document explains the standard way in which ADAM applications packages
+    are set up to run on Starlink machines. It covers the systems permitting
+    use of the applications direct from the shell and from the Interactive
+    Command Language on Unix.
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>A J Chipperfield</name>
+    </person>
+  </developers>
+  <documentation> ssn64</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>?-2002</year>
+    <name>PPARC</name>
+  </copyright>
+</component>
+
+<component id="ssn67">
+  <version>1</version>
+  <path>docs/ssn/067</path>
+  <description>Unix Security Cookbook</description>
+  <abstract><p>
+     This document has been written to help Site Managers secure their
+     Unix hosts from being compromised by hackers. I have given brief
+     introductions to the security tools along with downloading,
+     configuring and running information. I have also included a
+     section on my recommendations for installing these security tools
+     starting from an absolute minimum security requirement.
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>S C Rehan</name>
+    </person>
+  </developers>
+  <documentation> ssn67</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1996</year>
+    <name>PPARC</name>
+  </copyright>
+</component>
+
 <component id="ssn75">
   <version>1</version>
   <path>docs/ssn/075</path>
@@ -2462,6 +3563,480 @@ to handle data from a variety of different instruments.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
+<component id="sug">
+  <version>1</version>
+  <path>docs/sug</path>
+  <description>Starlink User Guide</description>
+  <abstract><p>
+    This is a general introduction to the Starlink Project for new
+    users. You should also read the local guide for your site before
+    attempting to use Starlink computers. This will tell you how to
+    access your local machine and what facilities are available. As
+    these documents cannot be updated very frequently, you should
+    refer to the on-line files mentioned for current details of
+    Starlink staff, sites, documents, and software.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>M D Lawden</name>
+    </person>
+  </developers>
+  <documentation> sug</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1997</year>
+    <name>PPARC</name>
+  </copyright>
+</component>
+
+<component id="sun163">
+  <version>3</version>
+  <path>docs/sun/163</path>
+  <description>IRAS90 --- IRAS Survey and PO Data Analysis Package --- Reference Guide</description>
+  <abstract><p>
+     IRAS90 is a package of applications which provides facilities for
+     the reduction and analysis of {\small IRAS} Survey and Pointed
+     Observation (PO) data (also known as ``Additional Observation'',
+     or ``AO'' data). It does not provide facilities for handling Low
+     Resolution Spectrometer (LRS) data, or catalogue data. 
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David S. Berry</name>
+      <name>W. Gong</name>
+      <name>D.C. Parsons</name>
+    </person>
+  </developers>
+  <documentation> sun163</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1993,1994,1995</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sun165">
+  <version>4</version>
+  <path>docs/sun/165</path>
+  <description>IRAS90 Programmer's Guide</description>
+  <abstract><p>
+    IRAS90 is a package of applications which provides facilities for
+    the reduction and analysis of IRAS Survey and Pointed Observation
+    (PO) data (also known as `Additional Observation', or `AO' data).
+    It does not provide facilities for handling Low Resolution
+    Spectrometer (LRS) data, or catalogue data. This document gives
+    some guide-lines for users who want to produce their own IRAS90
+    applications.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David S. Berry</name>
+      <name>Diana Parsons</name>
+    </person>
+  </developers>
+  <documentation> sun165</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1993,1994,1995</year>
+    <name>PPARRC</name>
+  </copyright>
+</component>
+
+<component id="sun168">
+  <version>3</version>
+  <path>docs/sun/168</path>
+  <description>EDT mode for JED --- An advanced Unix text editor</description>
+  <abstract><p>
+    This note describes Starlink extended EDT emulation for the JED
+    editor. It provides a Unix text editor which can utilise the
+    advanced facilities of DEC VTn00, xterm and similar terminals. JED
+    in this mode provides a reasonably good emulation of the VAX/VMS
+    editor EDT in addition to many extra facilities
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>B.K. McIlwrath</name>
+      <name>C.G. Page</name>
+    </person>
+  </developers>
+  <documentation> sun168</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1993,1995,1998</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sun169">
+  <version>3</version>
+  <path>docs/sun/169</path>
+  <description>PINE --- Electronic mail interface</description>
+  <abstract><p>
+     The PINE mail interface is a user-friendly mail utility for Unix
+     systems. It has been adopted by Starlink as the recommended mail
+     utility because of its ease of use compared with the mail
+     utilities supplied as standard with the Unix operating system.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>G.R. Mellor</name>
+    </person>
+  </developers>
+  <documentation> sun169</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1993,1994</year>
+    <name>PPARC</name>
+  </copyright>
+</component>
+
+<component id="sun170">
+  <version>2</version>
+  <path>docs/sun/170</path>
+  <description>Editors on Unix</description>
+  <abstract><p>
+     The purpose of this document is to give new users advice on how
+     to choose which editor to use on Unix machines. Under Unix the
+     default editors are considered to be unfriendly and many users
+     prefer to use other more sophisticated alternatives. However,
+     many such alternatives exist; there is not one single editor that
+     everyone finds acceptable and hence each user must decide for
+     himself or herself which to adopt.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>C.A. Clayton</name>
+    </person>
+  </developers>
+  <documentation> sun170</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1993,1997</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sun172">
+  <version>1</version>
+  <path>docs/sun/172</path>
+  <description>FTNCHEK: A Fortran77 Source-code Checker</description>
+  <abstract><p>
+  
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>C.G. Page</name>
+    </person>
+  </developers>
+  <documentation> sun172</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1993</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sun174">
+  <version>1</version>
+  <path>docs/sun/174</path>
+  <description>An Astronomer's Guide to On-line Bibliographic Databases and Information Services</description>
+  <abstract><p>
+     This document is a guide to on-line bibliographic databases and
+     other information services which might be useful to astronomers.
+     It concentrates on facilities which are either provided within
+     the astronomical community, or which are available free of
+     charge. For each facility listed a brief description is given,
+     together with details of how to access it and how to obtain
+     further information about it. The document aims to provide
+     sufficient information for you to decide which facilities will be
+     useful to you, and then obtain further information on them,
+     rather than providing comprehensive documentation for each
+     facility. It should be possible to access most of the facilities
+     described here from Starlink computers. This document is
+     complementary to SUN/162 which describes some of the observation
+     and data archives available on-line.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>A.C. Davenhall</name>
+    </person>
+  </developers>
+  <documentation> sun174</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1993</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sun189">
+  <version>3</version>
+  <path>docs/sun/189</path>
+  <description>ISPELL --- Spelling Checker</description>
+  <abstract><p>
+    ISPELL is a screen-oriented spelling checker that shows errors in
+    the context of the original file, and suggests possible
+    corrections when it can figure them out.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Martin Clayton</name>
+    </person>
+  </developers>
+  <documentation> sun189</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1994,1995,1996</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sun192">
+  <version>1</version>
+  <path>docs/sun/247</path>
+  <description>nu/TPU --- A DEC TPU compatible editor for UNIX</description>
+  <abstract><p>
+  
+    nu/TPU is a fully programmable text processing utility compatible
+    with the TPU system found on VMS systems. People used to using
+    TPU or EDT on the former Starlink VAX/VMS service will find that
+    nu/TPU is very similar to these editors.  
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>S.C. Rehan</name>
+    </person>
+  </developers>
+  <documentation> sun192</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1995</year>
+    <name>PPARC</name>
+  </copyright>
+</component>
+
+<component id="sun197">
+  <version>2</version>
+  <path>docs/sun/247</path>
+  <description>GHOSTSCRIPT - PostScript Interpreter/previewer</description>
+  <abstract><p>
+    This document announces the availability of GHOSTSCRIPT on Starlink.  
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>A.C. Davenhall</name>
+      <name>R.T. Platon</name>
+    </person>
+  </developers>
+  <documentation> sun197</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1994,1997</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sun201">
+  <version>1</version>
+  <path>docs/sun/201</path>
+  <description>LATEX2HTML LaTeX-to-HTML converter</description>
+  <abstract><p>
+     LATEX2HTML converts \LaTeX\ source files into a set of HTML
+     files, suitable for browsing on the World Wide Web. It is used by
+     STAR2HTML, which is the preferred program to use for converting
+     Starlink documents to hypertext form.  
+    </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>M.J. Bly</name>
+    </person>
+  </developers>
+  <documentation> sun201</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1995</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sun202">
+  <version>2</version>
+  <path>docs/sun/202</path>
+  <description>XRT: ROSAT XRT Data Reduction</description>
+  <abstract><p>
+    This note gives a general overview of the methods available for
+    using Starlink Infrastructure subroutine libraries with
+    applications.  There is an outline of how to use the include files
+    for a subroutine library, and a guide to the methods available for
+    linking with the subroutine libraries.
+
+    All the Starlink Infrastructure libraries are organised in the
+    same way, so it is possible to give a general guide to the
+    principles involved.  However, some libraries do differ, and for
+    precise details of how to use a particular subroutine library, you
+    should consult the Starlink document for that library. 
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>M.J. Bly</name>
+    </person>
+  </developers>
+  <documentation> sun202</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1997,1998</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sun205">
+  <version>1</version>
+  <path>docs/sun/205</path>
+  <description>FORUM --- Starlink Conferencing Software</description>
+  <abstract><p>
+
+     FORUM is Starlink's conferencing software.  It is based on the
+     World Wide Web (WWW) and provides similar capabilities under Unix
+     to those provided by the DEC product VAXnotes under VMS.  Its
+     main features are that it retains an archive of entries or notes,
+     organized in a hierarchy, and it can restrict access.  Users can
+     both read existing notes and submit new ones.  The hierarchy of
+     entries, from the top down, is: `Conference', `Topic', `Reply'
+     and `Riposte'.  One difference compared with VAXnotes is that
+     while VAXnotes could maintain an index of all Conferences, even
+     when the Conferences were located on separate systems at several
+     Starlink sites, FORUM maintains an index only for each instance
+     of FORUM.
+
+     The best way to find out more about FORUM is to run it.  FORUM
+     has also been described in a Starlink Bulletin} article, December
+     1995.
+
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>D.J.Rawlinson</name>
+      <name>J.C. Sherman</name>
+    </person>
+  </developers>
+  <documentation> sun205</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1995</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sun207">
+  <version>1</version>
+  <path>docs/sun/207</path>
+  <description>AIPS --- Astronomical Image Processing System</description>
+  <abstract><p>
+     This is a brief manual indicating the availability of the NRAO
+     Astronomical Image Processing System (AIPS) on Starlink.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>J.W. Palmer</name>
+    </person>
+  </developers>
+  <documentation> sun207</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1996</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sun243">
+  <version>3</version>
+  <path>docs/sun/243</path>
+  <description>SPLAT - A Spectral Analysis Tool</description>
+  <abstract><p>
+
+    SPLAT is a graphical tool for displaying, comparing, modifying and
+    analysing astronomical spectra stored in NDF, FITS and TEXT files
+    as well as the new NDX format. It can read in many spectra at the
+    same time and then display these as line plots. Each display
+    window, of which there can be many, can be used to view one or
+    several spectra at the same time. Display windows can be
+    interactively zoomed and scrolled, centred on specific
+    wavelengths, provide continuous coordinate readout, annotated,
+    produce printable hardcopy and be configured in many ways. They
+    also provide the basis for interactive analysis facilities. All of
+    these functions are displayed in a visually rich format, that is
+    intended to appeal especially to casual users of spectral data
+    analysis facilities, as it includes some facilities such as
+    drag-and-drop and undo-able editing.
+
+    The current set of analysis facilities include background
+    estimation line fitting, filtering, and de-noising.  A database of
+    laboratory line positions is available to aid in identification.
+
+    SPLAT also supports a full range of coordinate systems for
+    spectra, using the latest facilities of the Starlink AST library.
+    </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Peter W. Draper</name>
+    </person>
+  </developers>
+  <documentation> sun243</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>2003,2004</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
 <component id="sun248" support="U">
   <version>0.1</version>
   <path>docs/sun/248</path>
@@ -2483,6 +4058,33 @@ to handle data from a variety of different instruments.
   </developers>
   <documentation> sun248</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
+<component id="sun249">
+  <version>2</version>
+  <path>docs/sun/249</path>
+  <description>Starlink Standard Data Structures</description>
+  <abstract><p>
+   Images observed using the Wide Field Camera instrument on the Isaac
+   Newton Telescope contain nonlinear optical distortions. This note
+   gives a quantitative description of these distortions. It also
+   explains how they can be corrected for easily using the
+   CCDPACK package.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Mark Taylor</name>
+    </person>
+  </developers>
+  <documentation> sun249</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>2005</year>
+    <name>CLRC</name>
+  </copyright>
 </component>
 
 <component id="info" support="S">
@@ -3371,7 +4973,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="ndg" support="S">
-  <version>5.2-3</version>
+  <version>5.3</version>
   <path>libraries/ndg</path>
   <description>NDG - Routines for Accessing Groups of NDFs</description>
   <abstract><p>NDG provides facilities for handling groups of NDFs.
@@ -3757,7 +5359,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="psx" support="U">
-  <version>0.5-3</version>
+  <version>0.5-4</version>
   <path>libraries/psx</path>
   <description>POSIX interface routines</description>
    <abstract><p>PSX is a FORTRAN subroutine library that allows
@@ -4200,7 +5802,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="cfitsio" support="U">
-  <version>2.510</version>
+  <version>3.06</version>
   <path>thirdparty/heasarc/cfitsio</path>
   <description>CFITSIO -- C and Fortran libraries for access to FITS files
         </description>
