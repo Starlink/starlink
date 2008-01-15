@@ -215,6 +215,8 @@
 *     2008-1-14 (DSB):
 *        Added argument "border" to smf_choosetiles, and "trim" to
 *        smf_reshapendf.
+*     2008-1-15 (DSB):
+*        Remove argument "trim" from smf_reshapendf.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -707,7 +709,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 
 smfTile *smf_freetiles( smfTile *tiles, int size, int *status );
 
-void smf_reshapendf( smfData **data, smfTile *tile, int trim, int *status );
+void smf_reshapendf( smfData **data, smfTile *tile, int *status );
 
 void smf_dataOrder( smfData *data, int isTordered, int *status );
 

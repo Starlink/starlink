@@ -448,16 +448,15 @@
 *          changing through the observation. [TRACKING]
 *     TILEBORDER = _INTEGER (Read)
 *          Only accessed if a non-null value is supplied for parameter
-*          TILEDIMS. It gives the width, in pixels, of the overlap
-*          between adjacent output tiles. If the default value of zero is
-*          accepted, then output tiles will abut each other in pixel
+*          TILEDIMS. It gives the width, in pixels, of a border to add to
+*          each output tile. These borders contain data from the adjacent
+*          tile. This results in an overlap between adjacent tiles equal to
+*          twice the supplied border width. If the default value of zero 
+*          is accepted, then output tiles will abut each other in pixel
 *          space without any overlap. If a non-zero value is supplied,
-*          then each pair of adjacent tiles will overlap by the given
-*          number of pixels. Pixels within the overlap border will be
-*          given a quality name of "BORDER" (see KAPPA:SHOWQUAL). Note, 
-*          if a non-zero value is supplied, the value used will be the
-*          larger of the supplied value and the width of the spreading kernel
-*          selected via parameter SPREAD. [0]
+*          then each pair of adjacent tiles will overlap by twice the 
+*          given number of pixels. Pixels within the overlap border will
+*          be given a quality name of "BORDER" (see KAPPA:SHOWQUAL). [0]
 *     TILEDIMS( 2 ) = _INTEGER (Read)
 *          For large data sets, it may sometimes be beneficial to break 
 *          the output array up into a number of smaller rectangular tiles, 
@@ -747,6 +746,7 @@
 #include "smurf_par.h"
 #include "smurflib.h"
 #include "libsmf/smf.h"
+#include "libsmf/smf_typ.h"
 
 #define FUNC_NAME "smurf_makecube"
 #define TASK_NAME "MAKECUBE"
@@ -1343,7 +1343,7 @@ void smurf_makecube( int *status ) {
          goto L998;
       }
 
-/* Expand the group to hold an output NDF name fo reach tile. */
+/* Expand the group to hold an output NDF name for each tile. */
       if( ntile > 1 ) {
          pname = basename;
          grpGet( ogrp, 1, 1, &pname, GRP__SZNAM, status );
@@ -1951,12 +1951,12 @@ void smurf_makecube( int *status ) {
    first clone the NDF identifier, then close the file (which will unmap
    the NDF arrays), and then reshape the NDF to exclude the boundary 
    that was added to the tile to avoid edge effects. */
-         smf_reshapendf( &expdata, tile, ( tileborder <= 0 ), status );
-         smf_reshapendf( &expdata, tile, ( tileborder <= 0 ), status );
-         smf_reshapendf( &effdata, tile, ( tileborder <= 0 ), status );
-         smf_reshapendf( &tsysdata, tile, ( tileborder <= 0 ), status );
-         smf_reshapendf( &wdata, tile, ( tileborder <= 0 ), status );
-         smf_reshapendf( &odata, tile, ( tileborder <= 0 ), status );
+         smf_reshapendf( &expdata, tile, status );
+         smf_reshapendf( &expdata, tile, status );
+         smf_reshapendf( &effdata, tile, status );
+         smf_reshapendf( &tsysdata, tile, status );
+         smf_reshapendf( &wdata, tile, status );
+         smf_reshapendf( &odata, tile, status );
    
 /* Free other resources related to the current tile. */  
          if( wgt_array && !savewgt ) wgt_array = astFree( wgt_array );

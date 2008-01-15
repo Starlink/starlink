@@ -13,8 +13,7 @@
 *     C function
 
 *  Invocation:
-*     void smf_reshapendf( smfData **data, smfTile *tile, int trim, 
-*                          int *status )
+*     void smf_reshapendf( smfData **data, smfTile *tile, int *status )
 
 *  Arguments:
 *     data = smfData ** (Given and Returned)
@@ -23,14 +22,12 @@
 *     tile = smfTile * (Given)
 *        Pointer to the structure defining the required shape for the
 *        re-shaped NDF. 
-*     trim = int (Given)
-*        A flag indicating if the bounds of the tile should be trimmed.
 *     status = int * (Given and Returned)
 *        Inherited status value. This function attempts to execute even
 *        if status is set to an error value on entry.
 
 *  Description:
-*     This function closes the specified NDF and assocaited resources,
+*     This function closes the specified NDF and associated resources,
 *     then optionally changes the pixel bounds of the NDF to match the 
 *     unextended bounds of the specified tile.
 
@@ -46,6 +43,8 @@
 *        as the original NDF.
 *     14-JAB-2008 (DSB):
 *        Added argument "trim".
+*     15-JAN-2008 (DSB):
+*        Removed argument "trim".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -80,15 +79,13 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
+#include "libsmf/smf_typ.h"
 
-void smf_reshapendf( smfData **data, smfTile *tile, int trim, int *status ){
+void smf_reshapendf( smfData **data, smfTile *tile, int *status ){
 
 /* Local Variables */
    IRQLocs *qlocs;              
-   char comm[ 100 ];
    int bit;
-   int dim[ 3 ];
-   int fixed;
    int ix;
    int iy;
    int iz;
@@ -98,7 +95,6 @@ void smf_reshapendf( smfData **data, smfTile *tile, int trim, int *status ){
    int there;
    int tndf;
    int ubnd[ 3 ];
-   int value;
    unsigned char *ipq;
    unsigned char *q;
    unsigned char qval;
@@ -119,16 +115,18 @@ void smf_reshapendf( smfData **data, smfTile *tile, int trim, int *status ){
 /* Get the number of pixel axes in the original NDF (should be 3 for the
    main arrays, and 2 for the extension arrays). */
       if( tndf != NDF__NOID ) {
+         ndfBound( tndf, 3, lbnd, ubnd, &ndim, status ); 
 
-/* If required, change the shape of the NDF. */
-         if( trim ) {
-            ndfDim( tndf, 3, dim, &ndim, status ); 
-            ndfSbnd( ndim, tile->lbnd, tile->ubnd, tndf, status ); 
+/* Change the shape of the NDF. */
+         ndfSbnd( ndim, tile->lbnd, tile->ubnd, tndf, status ); 
 
-/* Otherwise, update the quality array to include a quality flag
-   indicating the border pixels. We assume that the output NDF currently
-   has no quality information. */
-         } else {
+/* If the output NDF includes a border area, update the quality array to 
+   include a quality flag indicating the border pixels. We assume that the 
+   output NDF currently has no quality information. */
+         if( tile->lbnd[ 0 ] < tile->qlbnd[ 0 ] ||
+             tile->lbnd[ 1 ] < tile->qlbnd[ 1 ] ||
+             tile->ubnd[ 0 ] > tile->qubnd[ 0 ] ||
+             tile->ubnd[ 1 ] > tile->qubnd[ 1 ] ){
 
 /* Do not store quality info in sub-NDFs such as TSYS, etc. These are
    distinguished by the fact that they do not already have a SMURF
@@ -145,9 +143,8 @@ void smf_reshapendf( smfData **data, smfTile *tile, int trim, int *status ){
 
 /* Determine which bit is used to represent the BORDER quality, and set the
    required mumerical quality value. */
-               irqGetqn( qlocs, "BORDER", &fixed, &value, &bit, comm, 100,
-                         status );
-               qval = pow( 2, bit );
+               irqRbit( qlocs, "BORDER", &bit, status );
+               qval = pow( 2, bit - 1 );
             
 /* Map the quality array of the output NDF. */
                ndfMap( tndf, "Quality", "_UBYTE", "WRITE", (void **) &ipq, &nel, 
@@ -158,13 +155,12 @@ void smf_reshapendf( smfData **data, smfTile *tile, int trim, int *status ){
 
 /* Fill the quality array with zeros, except for the border pixels that are
    assigned "qval". */
-                  ndfBound( tndf, 3, lbnd, ubnd, &ndim, status ); 
                   q = ipq;
-                  for( iz = lbnd[ 2 ]; iz <= ubnd[ 2 ]; iz++ ) {
-                     for( iy = lbnd[ 1 ]; iy <= ubnd[ 1 ]; iy++ ) {
-                        for( ix = lbnd[ 0 ]; ix <= ubnd[ 0 ]; ix++ ) {
-                           if( ix < tile->lbnd[ 0 ] || ix > tile->ubnd[ 0 ] || 
-                               iy < tile->lbnd[ 1 ] || iy > tile->ubnd[ 1 ] ){
+                  for( iz = tile->lbnd[ 2 ]; iz <= tile->ubnd[ 2 ]; iz++ ) {
+                     for( iy = tile->lbnd[ 1 ]; iy <= tile->ubnd[ 1 ]; iy++ ) {
+                        for( ix = tile->lbnd[ 0 ]; ix <= tile->ubnd[ 0 ]; ix++ ) {
+                           if( ix < tile->qlbnd[ 0 ] || ix > tile->qubnd[ 0 ] || 
+                               iy < tile->qlbnd[ 1 ] || iy > tile->qubnd[ 1 ] ){
                               *(q++) = qval;
                            } else {
                               *(q++) = 0;

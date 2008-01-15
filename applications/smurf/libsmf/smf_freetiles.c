@@ -75,6 +75,7 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
+#include "libsmf/smf_typ.h"
 
 smfTile *smf_freetiles( smfTile *tiles, int size, int *status ){
 

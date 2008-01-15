@@ -104,6 +104,8 @@
 *        Added definition of SMF__NOCREATE_DATA for use by smf_open_file
 *     2007-11-15 (EC):
 *        Added SMF__NOCREATE_LUT flag for file I/O 
+*     2008-1-15 (DSB):
+*        Added qlbnd/qubnd to the smfTile structure. 
 *     {enter_further_changes_here}
 
 
@@ -312,6 +314,8 @@ typedef struct smfTile {
   int eubnd[ 3 ];
   int glbnd[ 3 ];
   int gubnd[ 3 ];
+  int qlbnd[ 3 ];
+  int qubnd[ 3 ];
   Grp *grp;
   int *jndf;
   int size;

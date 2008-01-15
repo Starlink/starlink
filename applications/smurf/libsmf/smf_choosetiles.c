@@ -56,8 +56,10 @@
 *        containing the entire output array is used, with no padding.
 *     border = int (Given)
 *        The size of the overlap reqired between adjacent tiles, in
-*        pixels. The actual overlap used will be the larger of this value 
-*        and the value needed to accomodate the specicified spreading scheme.
+*        pixels. The actual overlap used will be larger than this (by the
+*        width of the spreading kernel) in order to avoid edge effects.
+*        However, the extra border (the spreading width) will be trimmed
+*        off the tiles before the application terminates.
 *     ntiles = int * (Returned)
 *        Pointer to an int in which to return the number of tiles needed
 *        to cover the full size grid.
@@ -88,13 +90,13 @@
 *        - The bounds of the tile specified as pixel indices within the
 *        full size grid. These bounds result in the tiles abutting with
 *        no gap or overlap.
-*        - The bounds of an extended rectangle centred on the tile. This 
-*        extended area is equal to the tile area with an additonal
-*        constant-width border that is at least wide enough to accomodate 
-*        the kernel specified by "spread", but can be made wider by
-*        specifying a value for argument "border".
-*        - The bounds of the basic tile area, expressed in the GRID
-*        coordinate system of th eexpanded tile area.
+*        - The bounds of the tile including the requested border, specified 
+*        as pixel indices within the full size grid. 
+*        - The bounds of a tile that is further extended by the width of
+*        the spreading kernel (i.e. these bounds include both the
+*        requested biorder and the kernel width).
+*        - The bounds of the tile plus border area, expressed in the GRID
+*        coordinate system of the expanded tile area.
 *        - A pointer to a Grp group holding the names of the input files
 *        that have data falling within the extended tile area.
 *        - A pointer to an int array holding the zero-based index within the
@@ -121,6 +123,10 @@
 *        Correct check for overlap between input boxes and tile areas.
 *     14-JAN-2008 (DSB):
 *        Added argument "border".
+*     15-JAN-2008 (DSB):
+*        Change the "basic" tile bounds to include the requested boirder,
+*        and add another box to the Tile structure holding the tile
+*        bounds without border.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -203,10 +209,16 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
       result = astMalloc( sizeof( smfTile ) );
       if( result ) {
 
-/* Store the tile area. */
+/* Store the bordered tile area. */
          for( i = 0; i < 3; i++ ) {
             result->lbnd[ i ] = lbnd[ i ];
             result->ubnd[ i ] = ubnd[ i ];
+         }
+
+/* Store the non-border tile area (the same). */
+         for( i = 0; i < 3; i++ ) {
+            result->qlbnd[ i ] = lbnd[ i ];
+            result->qubnd[ i ] = ubnd[ i ];
          }
 
 /* Store the extended tile area (the same). */
@@ -214,6 +226,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
             result->elbnd[ i ] = lbnd[ i ];
             result->eubnd[ i ] = ubnd[ i ];
          }
+
 
 /* We do not need to re-map the GRID frame of the full sized output WCS
    FrameSet. */
@@ -301,10 +314,6 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
          while( *w != VAL__BADR && *w != 0.0 ) w++;
          extend = w  - ( work + 1001 );
 
-/* Ensure that the border width is no smaller than the requested birder
-   width. */
-         if( extend < border ) extend = border;
-      
          umap = astAnnul( umap );
          work = astFree( work );
       }
@@ -319,30 +328,46 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 /* Loop round each row of tiles. */
       for( iy = 0; iy < numtile[ 1 ] && *status == SAI__OK; iy++ ) {
    
-/* Store the y axis bounds of the tiles in this row. */
+/* Store the y axis bounds (without border or extension) of the tiles in 
+   this row. */
          ylo = plbnd[ 1 ] + iy*tile_size[ 1 ];
          yhi = ylo + tile_size[ 1 ] - 1;
    
 /* Loop round each tile in the current row. */
          for( ix = 0; ix < numtile[ 0 ]; ix++, tile++ ) {
    
-/* Store the tile area. */
-            tile->lbnd[ 0 ] = plbnd[ 0 ] + ix*tile_size[ 0 ];
-            tile->ubnd[ 0 ] = tile->lbnd[ 0 ] + tile_size[ 0 ] - 1;
-            tile->lbnd[ 1 ] = ylo;
-            tile->ubnd[ 1 ] = yhi;
-            tile->lbnd[ 2 ] = lbnd[ 2 ];
-            tile->ubnd[ 2 ] = ubnd[ 2 ];
+/* Store the tile area (without border or extension). */
+            tile->qlbnd[ 0 ] = plbnd[ 0 ] + ix*tile_size[ 0 ];
+            tile->qubnd[ 0 ] = tile->qlbnd[ 0 ] + tile_size[ 0 ] - 1;
+            tile->qlbnd[ 1 ] = ylo;
+            tile->qubnd[ 1 ] = yhi;
+            tile->qlbnd[ 2 ] = lbnd[ 2 ];
+            tile->qubnd[ 2 ] = ubnd[ 2 ];
 
 /* Limit the tile area to the bounds of the output cube. */
+            if( trim ) {
+               if( tile->qlbnd[ 0 ] < lbnd[ 0 ] ) tile->qlbnd[ 0 ] = lbnd[ 0 ];
+               if( tile->qlbnd[ 1 ] < lbnd[ 1 ] ) tile->qlbnd[ 1 ] = lbnd[ 1 ];
+               if( tile->qubnd[ 0 ] > ubnd[ 0 ] ) tile->qubnd[ 0 ] = ubnd[ 0 ];
+               if( tile->qubnd[ 1 ] > ubnd[ 1 ] ) tile->qubnd[ 1 ] = ubnd[ 1 ];
+            }
+   
+/* Store the tile area including a spatial border of the requested width. */
+            tile->lbnd[ 0 ] = tile->qlbnd[ 0 ] - border;
+            tile->ubnd[ 0 ] = tile->qubnd[ 0 ] + border;
+            tile->lbnd[ 1 ] = tile->qlbnd[ 1 ] - border;
+            tile->ubnd[ 1 ] = tile->qubnd[ 1 ] + border;
+            tile->lbnd[ 2 ] = tile->qlbnd[ 2 ];
+            tile->ubnd[ 2 ] = tile->qubnd[ 2 ];
+
             if( trim ) {
                if( tile->lbnd[ 0 ] < lbnd[ 0 ] ) tile->lbnd[ 0 ] = lbnd[ 0 ];
                if( tile->lbnd[ 1 ] < lbnd[ 1 ] ) tile->lbnd[ 1 ] = lbnd[ 1 ];
                if( tile->ubnd[ 0 ] > ubnd[ 0 ] ) tile->ubnd[ 0 ] = ubnd[ 0 ];
                if( tile->ubnd[ 1 ] > ubnd[ 1 ] ) tile->ubnd[ 1 ] = ubnd[ 1 ];
             }
-   
-/* Store the extended tile area. */
+
+/* Store the extended tile area (this also includes the above border). */
             tile->elbnd[ 0 ] = tile->lbnd[ 0 ] - extend;
             tile->eubnd[ 0 ] = tile->ubnd[ 0 ] + extend;
             tile->elbnd[ 1 ] = tile->lbnd[ 1 ] - extend;
@@ -350,9 +375,9 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
             tile->elbnd[ 2 ] = lbnd[ 2 ];
             tile->eubnd[ 2 ] = ubnd[ 2 ];
 
-/* Store the bounds of the basic (non-extended) tile in a grid coordinate
-   system that has value (1.0,1.0) at the centre of the first pixel in
-   the extended tile. */
+/* Store the bounds of the basic (bordered but non-extended) tile in a grid 
+   coordinate system that has value (1.0,1.0) at the centre of the first pixel 
+   in the extended tile. */
             tile->glbnd[ 0 ] = tile->lbnd[ 0 ] - tile->elbnd[ 0 ] + 1;
             tile->gubnd[ 0 ] = tile->ubnd[ 0 ] - tile->elbnd[ 0 ] + 1;
             tile->glbnd[ 1 ] = tile->lbnd[ 1 ] - tile->elbnd[ 1 ] + 1;
