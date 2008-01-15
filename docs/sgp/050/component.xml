@@ -7,7 +7,6 @@
   <path>docs/sgp/050</path>
   <description>Starlink Document Styles</description>
   <abstract><p>
-
      This document describes the various styles which are recommended
      for Starlink documents. It also explains how to use the templates
      which are provided by Starlink to help authors create documents
@@ -21,7 +20,7 @@
      
      The only style that is likely to be used by most Starlink authors
      is the Standard style.
-    </p></abstract>
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
