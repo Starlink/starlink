@@ -82,8 +82,11 @@
 
 *  Copyright:
 *     Copyright (C) 1998-1999, 2001-2002, 2004 Central Laboratory of
-*     the Research Councils. Copyright (C) 2005-2006 Particle Physics &
-*     Astronomy Research Council. All Rights Reserved.
+*     the Research Councils. 
+*     Copyright (C) 2005-2006 Particle Physics & Astronomy Research 
+*     Council. All Rights Reserved.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -138,6 +141,9 @@
 *     5-SEP-2007 (DSB):
 *        Handle identification of spectral axes in cases where input and 
 *        output have different number of axes.
+*     15-JAN-2008 (DSB):
+*        Use AST_RESAMPLEUB instead of AST_RESAMPLEUW when resampling the
+*        quality array.
 *     {enter_further_changes_here}
 
 *-
@@ -621,7 +627,7 @@
          FLAGS = 0
 
 *  Do the resampling.
-         RESULT = AST_RESAMPLEUW( MAP5, NDIM1, LGRID1, UGRID1, 
+         RESULT = AST_RESAMPLEUB( MAP5, NDIM1, LGRID1, UGRID1, 
      :                            %VAL( CNF_PVAL( IPQ1 ) ), 
      :                            DUMMY, METHOD, AST_NULL,
      :                            PARAMS, FLAGS, TOL, MAXPIX, 
