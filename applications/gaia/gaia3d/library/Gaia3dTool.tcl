@@ -81,6 +81,20 @@ itcl::class gaia3d::Gaia3dTool {
       #  Evaluate any options.
       eval itk_initialize $args
 
+      #  Restore properties. These all apply to local variables, not
+      #  configuration options, so harder work...
+      set props_ [gaia::GaiaProperties::instance]
+      set keys [$props_ get_named_keys Gaia3dTool]
+      if { $keys != {} } {
+         foreach key $keys {
+            set value [$props_ get_property $key]
+            if { $value != {} } {
+               set lkey [$props_ get_unnamed_key Gaia3dTool $key]
+               eval set $lkey $value
+            }
+         }
+      }
+
       #  Make it a decent size (packing doesn't work).
       wm geometry  $w_ 800x720+0+0
 
@@ -128,6 +142,12 @@ itcl::class gaia3d::Gaia3dTool {
       $short_help_win_ add_menu_short_help $Options \
          {Add custom colour...} \
          {Choose a new colour for menus}
+
+      #  Reset all saved attributes to their defaults.
+      $Options add command -label "Reset" \
+         -command [code $this reset_options_]
+      add_menu_short_help $Options {Reset}  \
+         {Reset any saved options to their default value}
 
       #  Add option to choose the image plane colour map.
       set submenu [menu $Options.imagecolour]
@@ -196,7 +216,9 @@ itcl::class gaia3d::Gaia3dTool {
       }
 
       #  Add the renderer widget in the right-hand pane.
-      set renwindow_ [Gaia3dVtkWindow $w_.renwindow]
+      set renwindow_ [Gaia3dVtkWindow $w_.renwindow \
+                         -backingstore_on $backingstore_on_]
+      $renwindow_ set_interaction_mode $interaction_mode_
       add_short_help $renwindow_ {See help for interactions}
 
       #  Create the button bar
@@ -247,6 +269,9 @@ itcl::class gaia3d::Gaia3dTool {
          catch{::delete object outline_}
          set outline_ {}
       }
+
+      #  Save global properties.
+      catch {$props_ save_properties}
    }
 
    #  Methods:
@@ -472,7 +497,7 @@ itcl::class gaia3d::Gaia3dTool {
 
    #  Fill the textscale menu.
    protected method textscale_fill_ {menu} {
-      foreach i "0.5 0.75 1 1.5 2 3 4 5 6 7 8 9 10 15 20 50" {
+      foreach i "0.25 0.5 0.75 1 1.5 2 3 4 5 6 7 8 9 10 11 12 15 20 50" {
          $menu add radiobutton \
             -value $i \
             -label $i \
@@ -587,6 +612,7 @@ itcl::class gaia3d::Gaia3dTool {
    #  Called when the colourmap used by the image plane changes is to be
    #  changed.
    protected method changed_image_plane_colourmap_ {} {
+      $props_ set_named_property Gaia3dTool plane_colourmap_ $plane_colourmap_
       if { $plane_ != {} } {
          $plane_ configure -colourmap $plane_colourmap_
          $plane_ update
@@ -596,6 +622,7 @@ itcl::class gaia3d::Gaia3dTool {
 
    #  Called when the spectral line or region colour is changed.
    protected method changed_spectral_colour_ {} {
+      $props_ set_named_property Gaia3dTool spectral_colour_ $spectral_colour_
       if { $line_ != {} } {
          $line_ configure -colour $spectral_colour_
          $renwindow_ render
@@ -604,6 +631,7 @@ itcl::class gaia3d::Gaia3dTool {
 
    #  Called when the textscale is changed.
    protected method changed_ast_textscale_ {} {
+      $props_ set_named_property Gaia3dTool ast_textscale_ $ast_textscale_
       if { $drawn_ != {} } {
          draw
       }
@@ -611,6 +639,7 @@ itcl::class gaia3d::Gaia3dTool {
 
    #  Called when the textscale is changed.
    protected method changed_ast_textcolour_ {} {
+      $props_ set_named_property Gaia3dTool ast_textcolour_ $ast_textcolour_
       if { $drawn_ != {} } {
          draw
       }
@@ -618,6 +647,7 @@ itcl::class gaia3d::Gaia3dTool {
 
    #  Called when the opacity of the image plane changes.
    protected method changed_image_plane_opacity_ {} {
+      $props_ set_named_property Gaia3dTool plane_opacity_ $plane_opacity_
       if { $plane_ != {} } {
          $plane_ set_opacity $plane_opacity_
          $renwindow_ render
@@ -725,13 +755,43 @@ itcl::class gaia3d::Gaia3dTool {
 
    #  Set the mouse interaction mode.
    protected method set_interaction_mode_ {} {
+      $props_ set_named_property Gaia3dTool \
+         interaction_mode_ $interaction_mode_
       $renwindow_ set_interaction_mode $interaction_mode_
    }
 
    #  Set the backingstore mode.
    protected method set_backingstore_mode_ {} {
+      $props_ set_named_property Gaia3dTool backingstore_on_ $backingstore_on_
       $renwindow_ configure -backingstore_on $backingstore_on_ 
    }
+   
+   #  Reset all the saved options to their default values. KEEP this up
+   #  to date.
+   protected method reset_options_ {} {
+
+      set plane_colourmap_ "ramp.lasc"
+      changed_image_plane_colourmap_
+
+      set plane_opacity_ 1.0
+      changed_image_plane_opacity_
+
+      set spectral_colour_ [gaia::AstColours::lookup_colour 5]
+      changed_spectral_colour_
+
+      set ast_textscale_ 5.0
+      changed_ast_textscale_
+
+      set ast_textcolour_ 1
+      changed_ast_textcolour_
+
+      set interaction_mode_ "joystick"
+      set_interaction_mode_
+
+      set backingstore_on_ 0
+      set_backingstore_mode_
+   }
+
 
    #================================================================
    #  Interaction with GAIA.
@@ -1304,6 +1364,9 @@ itcl::class gaia3d::Gaia3dTool {
 
    #  Changed counter for accessor WCS. Should be updated when WCS changes.
    protected variable wcs_prop_changes_ 0
+
+   #  Global properties handler.
+   protected variable props_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
