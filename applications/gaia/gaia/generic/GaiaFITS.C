@@ -107,8 +107,8 @@ int GaiaFITSParseName( const char *spec, char *name, int name_length,
 
     // If found terminate the name string and try to read the integer.
     if ( left && right ) {
-        left = '\0';
-        right = '\0';
+        *right = '\0';
+        *left = '\0';
         sscanf( left + 1, "%d", hdu );
     }
     else {
