@@ -2464,21 +2464,21 @@ f     When AST_FINDFRAME or AST_CONVERT
 *
 *     - If both DSBSpecFrames have a value of 1 for the AlignSideBand
 *     attribute, map values from the target's current sideband (given by its 
-*     SideBand attribute) to the USB. If the target already represents the 
-*     USB, this step will leave the values unchanged. If either of the two
-*     DSBSpecFrames have a value of zero for its AlignSideBand attribute,
-*     then this step is omitted.
+*     SideBand attribute) to the observed sideband (whether USB or LSB). If 
+*     the target already represents the observed sideband, this step will 
+*     leave the values unchanged. If either of the two DSBSpecFrames have a 
+*     value of zero for its AlignSideBand attribute, then this step is omitted.
 *
 *     - Map the values from the spectral system of the target to the spectral 
 *     system of the template. This Mapping takes into account all the
 *     inherited SpecFrame attributes such as System, StdOfRest, Unit, etc.
 *
 *     - If both DSBSpecFrames have a value of 1 for the AlignSideBand
-*     attribute, map values from the USB to the result's current sideband 
-*     (given by its SideBand attribute). If the result already represents the 
-*     USB, this step will leave the values unchanged. If either of the two
-*     DSBSpecFrames have a value of zero for its AlignSideBand attribute,
-*     then this step is omitted.
+*     attribute, map values from the result's observed sideband to the 
+*     result's current sideband (given by its SideBand attribute). If the 
+*     result already represents the observed sideband, this step will leave 
+*     the values unchanged. If either of the two DSBSpecFrames have a value 
+*     of zero for its AlignSideBand attribute, then this step is omitted.
 
 *  Applicability:
 *     DSBSpecFrame
