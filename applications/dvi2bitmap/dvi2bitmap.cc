@@ -46,11 +46,13 @@ static const char RCSID[] =
 #  include <cstdlib>
 #  include <cstdarg>
 #  include <cassert>
+#  include <cstring>
 #else
 #  include <stdio.h>		// for vsprintf
 #  include <stdlib.h>
 #  include <stdarg.h>
 #  include <assert.h>
+#  include <string.h>
 #endif
 
 #include <bitset>
@@ -802,7 +804,7 @@ int main (int argc, char **argv)
     }
     
     if (processing_.none())
-	STD::exit (0);
+	exit (0);
 
     argc -= optind;
     argv += optind;
@@ -825,7 +827,7 @@ int main (int argc, char **argv)
 	if (verbosity > silent)
 	    cerr << "Error: Can't make output filename pattern from "
 		 << dviname << endl;
-	STD::exit(1);
+	exit(1);
     }
 
     bool fonts_ok = true;	// are there accumulated font errors?
@@ -839,7 +841,7 @@ int main (int argc, char **argv)
 	    if (verbosity > silent)
 		cerr << "Error: Can't open file " << dviname
 		     << " to read" << endl;
-	    STD::exit(1);
+	    exit(1);
 	}
 
 	bool all_fonts_present = true; // are all expected fonts found?
@@ -961,7 +963,7 @@ int main (int argc, char **argv)
     // exit zero/success if (a) we were processing the DVI
     // file normally and we found at least one font, or (b) we were
     // just checking the preamble and we found _all_ the fonts.
-    STD::exit(fonts_ok ? 0 : 1);
+    exit(fonts_ok ? 0 : 1);
 }
 
 void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
@@ -1680,5 +1682,5 @@ void Usage (bool andExit)
 "  -P   Processing: b=blur bitmap, t=set transparent, c=do cropping (BTC->off)" << endl;
 #endif
     if (andExit)
-        STD::exit (1);
+        exit (1);
 }

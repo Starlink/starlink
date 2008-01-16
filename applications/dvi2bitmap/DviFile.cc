@@ -36,6 +36,7 @@
 #endif
 
 #ifdef HAVE_CSTD_INCLUDE
+#  include <cstdlib>
 #  include <cmath>		// for fabs()
 #  include <cassert>
 #  include <cctype>		// for isprint
@@ -43,6 +44,7 @@
 using std::isprint;
 #  endif
 #else
+#  include <stdlib.h>
 #  include <math.h>
 #  include <assert.h>
 #  include <ctype.h>

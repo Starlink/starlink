@@ -55,8 +55,10 @@
 #endif
 #if HAVE_CSTD_INCLUDE
 #  include <cerrno>
+#  include <cstring>
 #else
 #  include <errno.h>
+#  include <string.h>
 #endif
 
 #include <unistd.h>

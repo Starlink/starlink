@@ -33,6 +33,8 @@
 #  include <cstdio>
 #  include <cctype>
 #  include <cctype>
+#  include <cstring>
+#  include <cstdlib>
 #  if CCTYPE_IN_STD
 using std::isspace;
 using std::isxdigit;
@@ -41,6 +43,8 @@ using std::isxdigit;
 #  include <stdio.h>
 #  include <ctype.h>
 #  include <ctype.h>
+#  include <cstring.h>
+#  include <stdlib.h>
 #endif
 #include <unistd.h>		// this is standard according to single-unix, 
 				// how POSIXy is that?  How C++?

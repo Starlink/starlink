@@ -38,9 +38,11 @@
 #ifdef HAVE_CSTD_INCLUDE
 #include <cstring>
 #include <cmath>
+#include <cstdlib>
 #else
 #include <string.h>
 #include <math.h>
+#include <stdlib.h>
 #endif
 
 using STD::cerr;

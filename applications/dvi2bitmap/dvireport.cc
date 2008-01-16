@@ -4,6 +4,7 @@
 #include <iostream>
 #include <bitset>
 #include <ctype.h>
+#include <stdlib.h>
 
 using STD::cout;
 using STD::cerr;
@@ -149,7 +150,7 @@ int main (int argc, char **argv)
     } catch (DviError& e) {
 	cerr << "Can't open DVI file " << dviname
 	     << ": " << e.problem() << endl;
-	STD::exit (1);
+	exit (1);
     }
     
     DviFileEvent *ev;
@@ -229,13 +230,13 @@ int main (int argc, char **argv)
     
     delete dvi;
 
-    STD::exit (0);
+    exit (0);
 }
 
 void Usage()
 {
     cerr << "Usage: " << progname
 	 << " [-F] [-s[cfrsA]] [-u[bcdimpx]] dvifile" << endl;
-    STD::exit (1);
+    exit (1);
 }
 
