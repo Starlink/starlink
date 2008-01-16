@@ -388,7 +388,7 @@ itcl::class gaia::GaiaSpectralPlot {
       }
 
       #  Save global properties (should do this once at application exit).
-      $props_ save_properties
+      catch {$props_ save_properties}
    }
 
    #  Methods:
