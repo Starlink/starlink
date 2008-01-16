@@ -111,6 +111,10 @@ f     The DSBSpecFrame class does not define any new routines beyond those
 *     19-OCT-2007 (DSB):
 *        Ignore SideBand alignment if the AlignSideBand attribute is zero
 *        in either the target or the template.
+*     16-JAN-2007 (DSB):
+*        Modify SubFrame so that DSBSpecFrames are aligned in the
+*        observed sideband (LSB or USB) rather than always being aligned
+*        in the USB.
 *class--
 
 *  Implementation Deficiencies:
@@ -1412,12 +1416,15 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
 */
 
 /* Local Variables: */
+   AstDSBSpecFrame *dsbresult;/* Pointer to the DSBSpecFrame result Frame */
    AstDSBSpecFrame *dsbtarget;/* Pointer to the DSBSpecFrame target Frame */
    AstMapping *map1;          /* Intermediate Mapping */
    AstMapping *map2;          /* Intermediate Mapping */
    AstMapping *map3;          /* Intermediate Mapping */
    int alignsb;               /* Use sidebands to align the Frames? */
    int match;                 /* Coordinate conversion is possible? */
+   int obs_sb;                /* The observed sideband value */
+   int old_sb;                /* The original Sideband value */
 
 /* Initialise the returned values. */
    *map = NULL;
@@ -1468,25 +1475,61 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
    sidebands. */
       if( alignsb ) {
 
+/* We assume that alignment occurs in the observed sideband. Determine
+   which side band is the observed sideband in the target. */
+         old_sb = astGetSideBand( dsbtarget );
+         astSetC( dsbtarget, "SideBand", "observed" );
+         obs_sb = astGetSideBand( dsbtarget );
+         astSetSideBand( dsbtarget, old_sb );
+
 /* Create a Mapping which transforms positions from the target to an exact 
    copy of the target in which the SideBand attribute is set to the
-   USB sideband. This will be a UnitMap if the target already represents
-   the USB sideband. */
-         map1 = ToUSBMapping( dsbtarget, "astSubFrame" );
+   observed (USB or LSB) sideband. This will be a UnitMap if the target 
+   already represents the observed sideband. */
+         if( obs_sb == USB ) {
+            map1 = ToUSBMapping( dsbtarget, "astSubFrame" );
+   
+         } else if( obs_sb == LSB ) {
+            map1 = ToLSBMapping( dsbtarget, "astSubFrame" );
+   
+         } else {
+            map1 = NULL;
+            astError( AST__INTER, "astGetImagFreq(%s): Illegal sideband value "
+                      "(%d) encountered (internal AST programming error).", 
+                      astGetClass( target_frame ), obs_sb );
+         }  
+
+/* Determine which side band is the observed sideband in the result. */
+         dsbresult = (AstDSBSpecFrame *) *result;
+         old_sb = astGetSideBand( dsbresult );
+         astSetC( dsbresult, "SideBand", "observed" );
+         obs_sb = astGetSideBand( dsbresult );
+         astSetSideBand( dsbresult, old_sb );
 
 /* Create a Mapping which transforms positions from the result to an exact 
    copy of the result in which the SideBand attribute is set to the
-   USB sideband. This will be a UnitMap if the target already represents
-   the USB sideband. */
-         map2 = ToUSBMapping( (AstDSBSpecFrame *) *result, "astSubFrame" );
+   obserfed sideband. This will be a UnitMap if the target already represents
+   the observed sideband. */
+         if( obs_sb == USB ) {
+            map2 = ToUSBMapping( dsbresult, "astSubFrame" );
+   
+         } else if( obs_sb == LSB ) {
+            map2 = ToLSBMapping( dsbresult, "astSubFrame" );
+   
+         } else {
+            map2 = NULL;
+            astError( AST__INTER, "astGetImagFreq(%s): Illegal sideband value "
+                      "(%d) encountered (internal AST programming error).", 
+                      astGetClass( target_frame ), obs_sb );
+         }  
 
-/* Invert it to get the mapping from the USB to the result. */
+/* Invert it to get the mapping from the observed sideband to the result. */
          astInvert( map2 );
 
-/* Form a Mapping which first maps target values to the USB, then applies the 
-   Mapping returned by the parent SubFrame method in order to convert between 
-   spectral systems, and then converts from the USB to the SideBand of the 
-   result. */
+/* Form a Mapping which first maps target values to the observed sideband, 
+   then applies the Mapping returned by the parent SubFrame method in
+   order to convert between spectral systems, and then converts from the 
+   observed sideband to the SideBand of the result. */
          map3 = (AstMapping *) astCmpMap( map1, *map, 1, "" );
          map1 = astAnnul( map1 );
          *map = astAnnul( *map );
