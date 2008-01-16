@@ -14,7 +14,7 @@
 #     This routine runs the LaTeX2HTML conversion routine on a Starlink
 #     document. It makes sure that the correct authors, document
 #     creation date and a sensible document title and copyright statement
-#     are used together with a valid e-mail address 
+#     are used together with a valid e-mail address
 #
 #     It also modifies the document to ensure that the html perl style
 #     file is used (the equivalents to these commands are defined in
@@ -26,9 +26,10 @@
 #     LaTEX2HTML flags "-dir" and "-no_subdir" should be made.
 
 #  Invocation:
-#     star2html [-a author(s)] [-aux] [-c copyright_statement] 
-#               [-d document_date] [-m email_address] [-old] [-s 0|1] 
-#               [-t title] [arguments for LaTeX2HTML] document
+#     star2html [-a author(s)] [-aux] [-c copyright_statement]
+#               [-d document_date] [-m email_address] [-old]
+#               [-obsolete] [-s 0|1] [-t title]
+#               [arguments for LaTeX2HTML] document
 
 #  Parameters:
 #     -a authors (optional)
@@ -48,14 +49,13 @@
 #     -c "copyright statement" (optional)
 #        A copyright statement to override the default which will appear
 #        in the footer of each page. The default statement is found from
-#        the \stardoccopyright command if there is one in the document, 
+#        the \stardoccopyright command if there is one in the document,
 #        or failing that from the environment variable HTX_COPYRIGHT if
-#        defined, or failing that the default is: "Copyright © YYYY 
-#        Council for the Central Laboratory of the Research Councils"
-#        (where YYYY is the current year). To prevent any copyright 
-#        statement from appearing, specify "-c none" or, in the absence
-#        of a \stardoccopyright command or explicit -c switch, set
-#        HTX_COPYRIGHT to "none". 
+#        defined, or failing that the default is: "Copyright Â© YYYY
+#        Science and Technology Facilities Council" (where YYYY is the
+#        current year). To prevent any copyright statement from appearing,
+#        specify "-c none" or, in the absence of a \stardoccopyright
+#        command or explicit -c switch, set HTX_COPYRIGHT to "none".
 #     -d "document date" (optional)
 #        The date the document was created. If not supplied the value of
 #        the \stardocdate command will be used, if this doesn't exist
@@ -67,6 +67,10 @@
 #        will be used. This appears in the footer of every page. If
 #        you are only reponsible for converting yor own documents then
 #        set by using the environment variable (in your .login).
+#     -obsolete
+#        This flag indicates that the document is obsolete (out of date
+#        or no longer maintained) and should be marked as such with a
+#        background image.
 #     -old
 #        This flag indicates that you want to use the "old"
 #        compatibility version of LaTeX2HTML. Normally the star2html
@@ -99,7 +103,7 @@
 #       be overridden by the command line parameter -m.
 #
 #     HTX_COPYRIGHT
-#       If set then this will be used as the copyright statement. This 
+#       If set then this will be used as the copyright statement. This
 #       can be overridden by the command line parameter -c.
 
 #  Examples:
@@ -121,8 +125,8 @@
 #     It is expected that the icons associated with LaTeX2HTML are
 #     stored in a subdirectory icons.gif/ of the directory in which the
 #     latex2html script is located. These are copied into the
-#     document directory. INCOMPAT....
-#     
+#     document directory.
+#
 #     You can override the initialisation defaults set by this routine by
 #     including a ".latex2html-init" file in the ".htx" directory
 #     before running star2html on your document. This file should have
@@ -192,8 +196,8 @@
 #     8-JUN-1998 (AJC):
 #        Correct command removal and tidying of AUTHORS and DATE
 #     9-JUN-1998 (PDRAPER):
-#        Stopped the production of the index.html linked file. This 
-#        caused problems with HTX indices (multiple references to 
+#        Stopped the production of the index.html linked file. This
+#        caused problems with HTX indices (multiple references to
 #        the same _xref) and editting the same file twice as part
 #        of a stream of files.
 #     24-JUN-1998 (PDRAPER):
@@ -218,13 +222,15 @@
 #     29-OCT-2000 (TIMJ):
 #        Use gmtime rather than running the shell date command
 #        Use perl5 Cwd module rather than perl4 getcwd library
-#     31-OCT-2000 (PWD):
+#     31-OCT-2000 (PDRAPER):
 #        Incorporated TIMJ changes into repository code base. Changed
 #        to use the Starlink release of Perl, rather than the one
 #        found on the PATH or in /star/local/bin/perl.
 #     13-AUG-2004 (TIMJ):
 #        Replace generate_icon code with perl code in order to
 #        remove dependency on external uudecode and gunzip.
+#     16-JAN-2008 (PDRAPER):
+#        Add obsolete document handling.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -251,8 +257,8 @@ $AUXCOPY = 0;
 
 #  Default copyright statement.
 $year = ((gmtime())[5]) + 1900;
-$DEFAULT_COPYRIGHT = 'Copyright &copy ' . $year . 
-  ' Council for the Central Laboratory of the Research Councils';
+$DEFAULT_COPYRIGHT = 'Copyright &copy ' . $year .
+                     ' Science and Technology Facilities Council';
 
 #  Do split file into parts by default.
 $SPLIT = 1;
@@ -264,6 +270,9 @@ $GUESS_VERSION = 1;
 #  The clear_up routine may exit.
 $CANEXIT = 1;
 
+#  The document is not obsolete.
+$OBSOLETE = 0;
+
 #.
 
 #  Sort out how we are going to get the current directory name.
@@ -274,7 +283,7 @@ $DEFAULTDIR = getcwd();
 #  directory as this file.
 ( $SCRIPTDIR, $SCRIPTNAME ) = &get_filename_and_directory( $0 );
 
-#  Also check for the "latex2html" script, which should be in the same 
+#  Also check for the "latex2html" script, which should be in the same
 #  place.
 $LATEX2HTML = $SCRIPTDIR . '/latex2html';
 if ( ! -x $LATEX2HTML ) {
@@ -305,6 +314,9 @@ while (@ARGV) {
    elsif ( $next_element =~ /^-s$/ ) {
      $SPLIT = shift;
    }
+   elsif ( $next_element =~ /^-obsolete$/ ) {
+     $OBSOLETE = 1;
+   }
    elsif ( $next_element =~ /^-old$/ ) {
      $GUESS_VERSION = 0;
      $VERSION = 'old';
@@ -312,8 +324,8 @@ while (@ARGV) {
    elsif ( $next_element =~ /^-c$/ ) {
      $COPYRIGHT = shift;
 
-     #  The copyright should have a value. If the next word 
-     #  begins with a "-" then is should be put back. Similarily if it 
+     #  The copyright should have a value. If the next word
+     #  begins with a "-" then is should be put back. Similarily if it
      #  is a filename. If the value is "none", no copyright statement
      #  will appear; if it is omitted, we revert to the default behaviour.
      if ( $COPYRIGHT =~ /^-.*/ ) {
@@ -334,7 +346,8 @@ while (@ARGV) {
    }
    elsif ( $next_element =~ /^-h(elp)?$/ ) {
       print( 'Usage: star2html [-a author(s)] [-aux] [-d document date] '.
-             '[-s 1|0] [-c copyright statement] [-m email address] '. 
+             '[-s 1|0] [-c copyright statement] [-old] [-obsolete] '.
+             '[-m email address] '.
              '[-t title] [arguments for LaTeX2HTML] '.
              'starlink_document[.tex]'. "\n");
       system( "$LATEX2HTML -h");
@@ -386,7 +399,7 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
    }
 
 #  Change the default into the destination directory.
-   chdir( $DESTDIR ) 
+   chdir( $DESTDIR )
      or &clear_up( "Star2HTML fatal: cannot chdir to $DESTDIR\n" );
 
 #  Edit the necessary corrections to the tex file. This makes a copy
@@ -394,7 +407,7 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
    &edit_main;
    $have_texfile = 1;
 
-#  Copy aux file if it exists and we've been asked too.
+#  Copy aux file if it exists and we've been asked to.
    $file = $TEXDIR . '/'. $TEXNAME . '.aux';
    if ( -e $file && $AUXCOPY ) {
       system("cp $file $DESTDIR") and
@@ -456,7 +469,7 @@ if ( $NOCOPYRIGHT ) {
 } elsif ( !$COPYRIGHT ) {
    $COPYRIGHT = &get_item('\stardoccopyright');
    if ( $COPYRIGHT ) {
-      $COPYRIGHT =~ s/\\copyright\\/&copy/;
+      $COPYRIGHT =~ s/\\copyright\\/&copy/g;
    } elsif ( $ENV{'HTX_COPYRIGHT'} ) {
       $COPYRIGHT = $ENV{'HTX_COPYRIGHT'};
       if ( $COPYRIGHT =~ /^none$/i ) {
@@ -510,7 +523,7 @@ if ( ! $COPYRIGHT ) {
                     . $TYPE  .   '<BR>'
                     . $AUTHORS . '<BR>'
                     . $DATE .    '<BR>'
-                    . 'E-mail:' . $MAIL 
+                    . 'E-mail:' . $MAIL
                     . '</I>';
 } else {
   $ADDRESS = '<I>'  . $TITLE .   '<BR>'
@@ -525,7 +538,7 @@ if ( ! $COPYRIGHT ) {
 
 #  If requested look for the string "\newcommand{\latexhtml}" this
 #  defines whether the document is compatible with the current or old
-#  version of LaTeX2HTML.  
+#  version of LaTeX2HTML.
 if ( $GUESS_VERSION ) {
   $VERSION = 'old';
   while( <FILE> ) {
@@ -547,17 +560,17 @@ close(FILE);
 &create_initfile;
 
 #------------------------------------------------------------------------------
-#  Invoke latex2html on the temporary file. Note we inhibit index file 
+#  Invoke latex2html on the temporary file. Note we inhibit index file
 #  production.
-if ( $VERSION eq 'current' ) { 
+if ( $VERSION eq 'current' ) {
   print( "Preparations finished - now starting LaTeX2HTML\n\n");
   system( "$LATEX2HTML -vers current " .
-          "-init_file .star2html-init -no_subdir -tmp . " . 
+          "-init_file .star2html-init -no_subdir -tmp . " .
           "-no_auto_link @EXTRAS $DESTFILE" );
 } else {
   print( "Preparations finished - now starting LaTeX2HTML (compatibility mode)\n\n");
   system( "$LATEX2HTML -vers old " .
-          "-init_file .star2html-init -no_subdir " . 
+          "-init_file .star2html-init -no_subdir " .
           "-no_auto_link @EXTRAS $DESTFILE" );
 }
 if ( $? ) {
@@ -572,12 +585,15 @@ $CURRENT_L2H = $ENV{'CURRENT_L2H'} || "@l2hdir@/current";
 $OLD_L2H = $ENV{'OLD_L2H'} || "@l2hdir@/old";
 $ICONDIR = ($VERSION eq 'current' ? $CURRENT_L2H : $OLD_L2H) . '/icons.gif';
 if ( -d $ICONDIR ) {
-  system( "cp $ICONDIR/* .") && 
+  system( "cp $ICONDIR/* .") &&
     warn "Failed to copy icons from $ICONDIR to output directory\n";
 }
 
 #  Extract the retrieve source icon.
 &source_icon;
+
+#  If obsolete do the marking.
+&make_obsolete;
 
 #  Clear up all temporary files etc.
 $CANEXIT = 0;
@@ -648,8 +664,8 @@ sub edit_main {
 
 #  Check current line for any of the expected patterns.
 #  \documentstyle or \documentclass or end of document (assumed to be
-#  on one line). 
-      if ( ( index( $_, '\documentstyle' ) != -1 ) || 
+#  on one line).
+      if ( ( index( $_, '\documentstyle' ) != -1 ) ||
 	   ( index( $_, '\documentclass' ) != -1 ) ) {
         if ( $need_styles ) {
           print( EDIT  $_ );
@@ -677,7 +693,7 @@ sub edit_main {
          $comment_out = 0;
       }
 
-      if ( $SPLIT ) { 
+      if ( $SPLIT ) {
 
 #  Check for \section etc. These toggle new files to contain their contents.
          if ( m/^\\section|^\\subsection|^\\sstroutine|^\\routine/o ) {
@@ -708,7 +724,7 @@ sub edit_main {
    }
 
 #  Close the files.
-   if ( $SPLIT ) { 
+   if ( $SPLIT ) {
      close( SECTION );
    }
    close( FILE );
@@ -998,7 +1014,7 @@ sub clear_up {
    }
 
 #  Remove document parts if split.
-   if ( $SPLIT ) { 
+   if ( $SPLIT ) {
       for ($i = 0; $i < $NSECTIONS; $i++) {
          $file = $DESTDIR . 'section' . $i . '.tex';
          unlink( $file );
@@ -1060,7 +1076,7 @@ sub top_navigation_panel {
     "$NEXT $UP $PREVIOUS $CONTENTS $INDEX $CUSTOM_BUTTONS" .
 
     "<BR>\n" .          # Line break
-       
+
     # If ``next'' section exists, add its title to the navigation panel
     ($NEXT_TITLE ? "<B> Next:</B> $NEXT_TITLE<BR>\n" : undef) .
 
@@ -1083,7 +1099,7 @@ sub bot_navigation_panel {
     "$NEXT $UP $PREVIOUS $CONTENTS $INDEX $CUSTOM_BUTTONS" .
 
     "<BR>\n" .          # Line break
-       
+
     # If ``next'' section exists, add its title to the navigation panel
     ($NEXT_TITLE ? "<B> Next:</B> $NEXT_TITLE<BR>\n" : undef) .
 
@@ -1114,7 +1130,7 @@ _EOF_
    } else {
 
 #  Final line. If appending assume exists already
-      print( DEFAULTS "1;\n"); 
+      print( DEFAULTS "1;\n");
    }
    close(DEFAULTS);
 }
@@ -1169,6 +1185,26 @@ sub get_absolute_directory {
     }
     $directory;
 }
+
+#------------------------------------------------------------------------------
+
+sub make_obsolete {
+#+
+#   Subroutine to make the document "obsolete" if required. This is done
+#   by displaying a image in the background and is requested by the
+#   -obsolete argument.
+#-
+  if ( $OBSOLETE ) {
+    $CSSFILE = $DESTDIR . "/" . $TEXNAME . ".css";
+    # Look for the CSS file and append the background image to that.
+    if ( -f $CSSFILE ) {
+      open( CSS, ">>${TEXNAME}.css" );
+      print( CSS "\nBODY   {background-image: url('obsolete.jpg')}\n" );
+      close( CSS );
+    }
+  }
+}
+
 
 #------------------------------------------------------------------------------
 

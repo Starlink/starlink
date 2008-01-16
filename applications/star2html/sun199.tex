@@ -14,14 +14,16 @@
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardoccopyright} 
-{Copyright \copyright\ 2000-2004 Council for the Central Laboratory of the Research Councils}
+{Copyright \copyright\ 2000-2004 Council for the Central Laboratory of the Research Councils
+<br>
+Copyright \copyright\ 2008 Science and Technology Facilities Council}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {199.9}
+\newcommand{\stardocnumber}    {199.10}
 \newcommand{\stardocauthors}   {P W Draper\\
                                 A J Chipperfield\\
                                 M D Lawden}
-\newcommand{\stardocdate}      {5 December 2007}
+\newcommand{\stardocdate}      {15 January 2008}
 \newcommand{\stardoctitle}     {Star2HTML\\[1ex]
                                 Converting Starlink Documents to Hypertext}
 \newcommand{\stardocversion}   {Version 1.5}
@@ -616,7 +618,7 @@ The statement specified in the \verb+\stardoccopyright+ command will appear at
 the bottom of the second page of the paper version; the HTML version will, by
 default, have the copyright statement in the footer of each page.
 
-Copyright is assigned to CCLRC by default.
+Copyright is assigned to STFC by default.
 \end{quote}
 
 \verb+% ? Latex document Table of Contents (if used)+
@@ -1281,7 +1283,7 @@ The templates also now include a copyright statement for the paper document
 and the star2html script will add a copyright statement to the footer of each
 page unless it is specifically prevented. (The action of the -c switch and 
 HTX\_COPYRIGHT environment variable has changed.) By default the copyright 
-statement will assign copyright to CCLRC.
+statement will assign copyright to STFC.
 
 This document has been updated to describe the new scheme.
 
@@ -1440,7 +1442,7 @@ The full format of the command is:
 \begin{verbatim}
 # star2html [-a author(s)] [-aux] [-c copyright_statement] 
             [-d document_date] [-m email_address] [-s 0|1] 
-            [-old] [-t title] [arguments for LaTeX2HTML] document
+            [-old] [-obsolete] [-t title] [arguments for LaTeX2HTML] document
 \end{verbatim}
 \end{quote}
 
@@ -1489,6 +1491,10 @@ The switches (all of which are optional) have the following meanings:
    If you are only responsible for producing your own documents, you may find
    it convenient to set this environment variable in your \texttt{.login}
    script.
+\item[\texttt{-obsolete}] \dash\
+   This flag indicates you want to mark the document as obsolete. This is
+   done by displaying an image with the word OBSOLETE written into it as
+   the background.
 \item[\texttt{-old}] \dash\
    This flag indicates that you want to use the ``old''
    compatibility version of \latextohtml. Normally the \verb#star2html#

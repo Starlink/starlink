@@ -1,9 +1,7 @@
 1 Star2HTML_update
 
  Star2HTML, the Starlink internal document hypertext support package,
- has been updated so that all document cross references now point at
- the RAL central service. You will need to run the hypertext linker
- hlink to restore the old behaviour of pointing at local documents
- (if any are available).
-
- Peter W. Draper 15-OCT-2004
+ has been updated so that the default copyright is now assigned to 
+ the Science and Technology Facilities Council. A new option -obsolete
+ has also been introduced to display an background image with the word
+ OBSOLETE displayed.
