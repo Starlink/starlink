@@ -4615,7 +4615,7 @@ int StarRtdImage::ndfHduCmd( const ImageIO &imio, int argc, char *argv[] )
     // <path> hdu listheadings
     // (return a list of table headings matching the "hdu list" output)
     if ( strcmp(argv[0], "listheadings") == 0 ) {
-        return set_result( "number name  naxis1  naxis2 hasvar hasqual" );
+        return set_result( "number name naxis1 naxis2 hasvar hasqual" );
     }
 
     // <path> hdu headings ?$number?  Table command not implemented
