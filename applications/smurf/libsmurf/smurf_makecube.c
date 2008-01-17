@@ -521,17 +521,18 @@
 *     of every input NDF, and it must have the same value in all input
 *     NDFs.
 *     - The output NDF will contain an extension named "SMURF" containing
-*     three NDFs named "EXP_TIME", "EFF_TIME" and "TSYS". Each of these NDFs 
-*     is 2-dimensional, with the same pixel bounds as the spatial axes of the 
-*     main output NDF, so that a pixel in one of these NDFs corresponds
-*     to a spectrum in the main output NDF. EXP_TIME holds the sum of the 
-*     total exposure times (Ton + Toff) for the input spectra that 
-*     contributed to each output spectrum. EFF_TIME holds the sum of the
+*     two NDFs named "EXP_TIME" and "EFF_TIME". In addition, if parameter
+*     SPREAD is set to "Nearest", a third NDF called "TSYS" will be created. 
+*     Each of these NDFs is 2-dimensional, with the same pixel bounds as the 
+*     spatial axes of the main output NDF, so that a pixel in one of these 
+*     NDFs corresponds to a spectrum in the main output NDF. EXP_TIME holds 
+*     the sum of the total exposure times (Ton + Toff) for the input spectra 
+*     that contributed to each output spectrum. EFF_TIME holds the sum of the
 *     effective integration times (Teff) for the input spectra that contributed
 *     to each output spectrum, scaled up by a factor of 4 in order to normalise
 *     it to the reported exposure times in EXP_TIME. TSYS holds the effective 
 *     system temperature for each output spectrum. The TSYS array is not 
-*     created if GENVAR is "None".
+*     created if GENVAR is "None" or if SPREAD is not "Nearest".
 *     - FITS keywords EXP_TIME, EFF_TIME and MEDTSYS are added to the output 
 *     FITS extension. The EXP_TIME and EFF_TIME keywords holds the median 
 *     values of the EXP_TIME and EFF_TIME arrays (stored in the SMURF extension
@@ -695,9 +696,11 @@
 *        Ensure that the output tile names are in line with the ITILE value 
 *        stored in the SMURF extension even when some output tiles are
 *        skipped due to being empty.
+*     17-JAN-2008 (DSB):
+*        Only create the output Tsys array if SPREAD is Nearest.
 
 *  Copyright:
-*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
 *     Council. Copyright (C) 2006 University of British Columbia.
 *     All Rights Reserved.
@@ -1551,8 +1554,8 @@ void smurf_makecube( int *status ) {
             }
          }
    
-/* Create a SMURF extension in the output NDF and create three 2D NDFs in 
-   the extension; one for the total exposure time ("on+off"), one for the 
+/* Create a SMURF extension in the output NDF and create two or three 2D NDFs 
+   in the extension; one for the total exposure time ("on+off"), one for the 
    "on" time, and one for the Tsys values. Each of these 2D NDFs inherits 
    the spatial bounds of the main output NDF. Note, the Tsys array also 
    needs variances to be calculated. Include spatial WCS in each NDF. */
@@ -1581,7 +1584,7 @@ void smurf_makecube( int *status ) {
             ndfCput( "s", effdata->file->ndfid, "Unit", status ); 
          }
    
-         if( genvar ) {
+         if( genvar && spread == AST__NEAREST ) {
             smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "TSYS", "NEW", 
                                "_REAL", 2, (int *) tile->elbnd, 
                                (int *) tile->eubnd, &tsysdata, status );
@@ -1812,21 +1815,23 @@ void smurf_makecube( int *status ) {
 /* If all the input files had the same backend degradation factor and
    channel width, calculate a 2D array of Tsys values for the output
    cube. */
-               if( fcon != VAL__BADD ) {
-                  for( el0 = 0; el0 < nxy; el0++ ) {
-                     teff = eff_array[ el0 ];
-                     var = var_array[ el0 ];
-                     if( teff != VAL__BADR && teff > 0.0 && 
-                         var != VAL__BADR && var > 0.0 ) {
-                        tsys_array[ el0 ] = sqrt( 0.25*var*teff/fcon );
-                     } else {
+               if( tsys_array ) {
+                  if( fcon != VAL__BADD ) {
+                     for( el0 = 0; el0 < nxy; el0++ ) {
+                        teff = eff_array[ el0 ];
+                        var = var_array[ el0 ];
+                        if( teff != VAL__BADR && teff > 0.0 && 
+                            var != VAL__BADR && var > 0.0 ) {
+                           tsys_array[ el0 ] = sqrt( 0.25*var*teff/fcon );
+                        } else {
+                           tsys_array[ el0 ] = VAL__BADR;
+                        }
+                     }
+            
+                  } else {
+                     for( el0 = 0; el0 < nxy; el0++ ) {
                         tsys_array[ el0 ] = VAL__BADR;
                      }
-                  }
-         
-               } else {
-                  for( el0 = 0; el0 < nxy; el0++ ) {
-                     tsys_array[ el0 ] = VAL__BADR;
                   }
                }
       
@@ -1835,7 +1840,7 @@ void smurf_makecube( int *status ) {
       
 /* For 3D variances, the output Tsys values are based on the mean
    variance in every output spectrum. */
-            } else if( fcon != VAL__BADD ) {
+            } else if( fcon != VAL__BADD && tsys_array ) {
       
                work2_array = astMalloc( nxy*sizeof( float ) );
                if( work2_array ) {
@@ -1885,28 +1890,32 @@ void smurf_makecube( int *status ) {
                msgBlank( status );
                blank = 1;
       
-               for( el0 = 0; el0 < nxy; el0++ ) {
-                  tsys_array[ el0 ] = VAL__BADR;
-               }
-      
+               if( tsys_array ) {
+                  for( el0 = 0; el0 < nxy; el0++ ) {
+                     tsys_array[ el0 ] = VAL__BADR;
+                  }
+               }      
+
             }
          }
       
 /* If we created an output Variance component, store the median system 
    temperature as keyword TSYS in the FitsChan. */
-         if( genvar ) {
-            work2_array = astStore( work2_array, tsys_array, nxy*sizeof( float ) );
-            kpg1Medur( 1, nxy, work2_array, &medtsys, &neluse, status );
-            atlPtftr( fchan, "MEDTSYS", medtsys, 
-                      "[K] Median MAKECUBE system temperature", status );
-      
-         } else {
-            if( !blank ) msgBlank( status );
-            msgOutif( MSG__NORM, " ", "WARNING: Cannot create output Tsys "
-                      "values since no output variances have been created.",
-                      status );
-            msgBlank( status );
-            blank = 1;
+         if( tsys_array ) {
+            if( genvar ) {
+               work2_array = astStore( work2_array, tsys_array, nxy*sizeof( float ) );
+               kpg1Medur( 1, nxy, work2_array, &medtsys, &neluse, status );
+               atlPtftr( fchan, "MEDTSYS", medtsys, 
+                         "[K] Median MAKECUBE system temperature", status );
+         
+            } else {
+               if( !blank ) msgBlank( status );
+               msgOutif( MSG__NORM, " ", "WARNING: Cannot create output Tsys "
+                         "values since no output variances have been created.",
+                         status );
+               msgBlank( status );
+               blank = 1;
+            }
          }
       
 /* Store the median exposure time as keyword EXP_TIME in the FitsChan.
