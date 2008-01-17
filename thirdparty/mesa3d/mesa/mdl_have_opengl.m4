@@ -76,17 +76,11 @@
 AC_DEFUN([MDL_HAVE_OPENGL],
 [
   AC_REQUIRE([AC_PROG_CC])
-  AC_REQUIRE([AC_PATH_X])
-dnl  AC_REQUIRE([AC_PATH_XTRA])
-
   AC_CACHE_CHECK([for OpenGL], mdl_cv_have_OpenGL,
   [
 dnl Check for Mesa first, unless we were asked not to.
-    AC_ARG_WITH([--with-Mesa],
-                   [Prefer the Mesa library over a vendors native OpenGL library (default=yes)],
-                   with_Mesa_help_string)
-    AC_ARG_ENABLE(Mesa, $with_Mesa_help_string, use_Mesa=$enableval, use_Mesa=yes)
-
+    AC_ARG_ENABLE(Mesa, [  --enable-Mesa           prefer the Mesa library over a vendors native OpenGL library],
+                  use_Mesa=$enableval, use_Mesa=yes)
     if test x"$use_Mesa" = xyes; then
        GL_search_list="MesaGL   GL"
       GLU_search_list="MesaGLU GLU"
@@ -101,13 +95,12 @@ dnl Check for Mesa first, unless we were asked not to.
     AC_LANG_C
 
 dnl If we are running under X11 then add in the appropriate libraries.
-if test x"$no_x" != xyes; then
-dnl Add everything we need to compile and link X programs to GL_X_CFLAGS
-dnl and GL_X_LIBS.
-dnl  AC_PATH_XTRA
-  GL_CFLAGS="$X_CFLAGS"
-  GL_X_LIBS="$X_PRE_LIBS $X_LIBS $X_EXTRA_LIBS"
-fi
+    if test x"$no_x" != xyes; then
+dnl    Add everything we need to compile and link X programs to GL_X_CFLAGS
+dnl    and GL_X_LIBS.
+       GL_CFLAGS="$X_CFLAGS"
+       GL_X_LIBS="$X_PRE_LIBS $X_LIBS $X_EXTRA_LIBS"
+    fi
     GL_save_CPPFLAGS="$CPPFLAGS"
     CPPFLAGS="$GL_CFLAGS"
 

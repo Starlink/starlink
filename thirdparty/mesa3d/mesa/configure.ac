@@ -13,22 +13,25 @@ STAR_DEFAULTS
 
 AC_PROG_MAKE_SET
 
+dnl    Do not check for an existing OpenGL if requested.
+AC_ARG_ENABLE([opengl-check], [  --enable-opengl-check    check for existing OpenGL],
+              [opengl_check=$enableval], [opengl_check=yes])
+
 dnl    Check for OpenGL libraries, if these are present and we've
 dnl    not been told to proceed regardless, then this component
 dnl    will not build anything (its purpose is to provide 3D
-dnl    software rendering on platforms without hardware support.
-dnl    A remaining question is how to provide this as a option
-dnl    regardless, for those machines whose platforms have OpenGL
-dnl    but specific hardware doesn't).
-sinclude(mdl_have_opengl.m4)
-AC_PATH_XTRA
-MDL_HAVE_OPENGL
-if test "$have_GL" = "yes"; then
-   MAIN_TARGET="mesa-stamp"
-else
-   MAIN_TARGET="mesa-src"
+dnl    software rendering on platforms without hardware support).
+if test "$opengl_check" = "yes"; then
+   sinclude(mdl_have_opengl.m4)
+   AC_PATH_XTRA
+   MDL_HAVE_OPENGL
+   if test "$have_GL" = "yes"; then
+      MAIN_TARGET="mesa-stamp"
+   else
+      MAIN_TARGET="mesa-src"
+   fi
+   AC_SUBST(MAIN_TARGET)
 fi
-AC_SUBST(MAIN_TARGET)
 
 dnl    MESA has a funny build system, need to determine a platform.
 dnl    AC_CANONICAL_BUILD, not needed, but used for build value.
