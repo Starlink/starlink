@@ -1015,17 +1015,21 @@ AC_DEFUN([STAR_XML_DOCUMENTATION],
             do_the_build=  # blank if we're to go ahead, string expl. otherwise
             AC_PATH_PROGS(JADE, [openjade jade], NOJADE)
             AC_PATH_PROGS(SGMLNORM, [osgmlnorm sgmlnorm], NOSGMLNORM)
-            if test "$JADE" = NOJADE -o "$SGMLNORM" = NOSGMLNORM; then
+            STAR_CHECK_PROGS([sgml2docs])
+            if test "$JADE" = NOJADE -o "$SGMLNORM" = NOSGMLNORM -o "$SGML2DOCS" = "sgml2docs"; then
                 if $_star_docs_only; then
                     # Building documentation is all we're supposed to do,
                     # and we can't, so suppress further building.
-                    do_the_build="This docs-only component requires both Jade
-                         and sgmlnorm.  All I could find were $JADE for Jade,
-                         and $SGMLNORM for sgmlnorm.  Your system may have
-                         a way to install them as a package, in which case
-                         you should re-run configure and make."
+                    do_the_build=\
+"This docs-only component requires Jade, sgmlnorm and sgml2docs.  
+        All I could find were:
+        $JADE for Jade, 
+        $SGMLNORM for sgmlnorm and 
+        $SGML2DOCS for sgml2docs (requires full path).
+        Your system may have a way to install Jade and sgmlnorm as a package,
+        sgml2docs is part of the SGMLKIT package."
                 else
-                    AC_MSG_WARN([can't find (open)jade + (o)sgmlnorm -- skipping XML documentation $1])
+                    AC_MSG_WARN([can't find (open)jade + (o)sgmlnorm + sgml2docs -- skipping XML documentation $1])
                 fi
             else
                 # Test Jade version
@@ -1061,7 +1065,6 @@ AC_DEFUN([STAR_XML_DOCUMENTATION],
                     AC_MSG_RESULT([too old])
                     do_the_build="Your openjade is version $JADEVERS; need 1.3.2 or better"
                 fi
-                STAR_CHECK_PROGS([sgml2docs sgmlnorm])
                 SGMLKIT_HOME=$prefix/lib/sgmlkit
                 AC_SUBST(SGMLKIT_HOME)
             fi
