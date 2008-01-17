@@ -120,6 +120,9 @@ itcl::class gaia::GaiaBlink {
       configure_menubutton File -underline 0
       add_short_help $itk_component(menubar).file {File menu:}
 
+      #  Add short_help window.
+      make_short_help
+
       #  Add option to create a new window.
       $File add command -label {New window} \
          -command [code $this clone_me_] \
@@ -147,6 +150,10 @@ itcl::class gaia::GaiaBlink {
       configure_menubutton Actions -underline 0
       add_short_help $itk_component(menubar).actions \
          {Choose an action}
+
+      add_menuitem $Actions command "Use grid positions" \
+         {Align images at lower left corner} \
+         -command [code $this fix_origins_]
 
       add_menuitem $Actions command "Apply WCS shifts" \
          {Attempt to position images using WCS projected shifts} \
@@ -235,18 +242,23 @@ itcl::class gaia::GaiaBlink {
          button $itk_component(Bframe).close \
             -text {Close} -command [code $this close]
       }
+      add_short_help $itk_component(Close) \
+         {Close window}
 
       #  Add a button start the animation.
       itk_component add Blinkon {
          button $itk_component(Bframe).on \
             -text {Blink on} -command [code $this animate_on]
       }
+      add_short_help $itk_component(Blinkon) \
+         {Start blinking by cycling through selected images}
 
       #  Add a button stop the animation.
       itk_component add Blinkoff {
          button $itk_component(Bframe).off \
             -text {Blink off} -command [code $this animate_off]
       }
+      add_short_help $itk_component(Blinkoff) {Stop blinking}
 
       #  Slider for speeding and slowing the animation.
       itk_component add Sframe {
@@ -261,6 +273,8 @@ itcl::class gaia::GaiaBlink {
             -min 1 \
             -max 100
       }
+      add_short_help $itk_component(Speed) \
+         {Relative speed of blink, less for faster}
 
       #  Button to request the view of the next image.
       itk_component add Next {
@@ -268,6 +282,8 @@ itcl::class gaia::GaiaBlink {
             -text {View next image} \
             -command [code $this view_next]
       }
+      add_short_help $itk_component(Next) \
+         {Display next selected image}
 
       #  Button for setting the mobile image.
       itk_component add Mobile {
@@ -275,6 +291,8 @@ itcl::class gaia::GaiaBlink {
             -text {Mark image mobile} \
             -command [code $this set_mobile]
       }
+      add_short_help $itk_component(Mobile) \
+         {Make the current image the mobile one, that is one that moves}
 
       #  Frame for image info.
       itk_component add Iframe {
@@ -286,6 +304,8 @@ itcl::class gaia::GaiaBlink {
          LabelValue $itk_component(Iframe).name \
             -text {Image:} -value {} -valuewidth 30 -justify right
       }
+      add_short_help $itk_component(Blinkon) \
+         {Name of current image}
 
       #  Offset of clone's lower corner.
       itk_component add Xlow {
@@ -298,12 +318,18 @@ itcl::class gaia::GaiaBlink {
             -text {Y offset:} -command [code $this place_image_ y] \
             -value 1
       }
+      add_short_help $itk_component(Xlow) \
+         {Offset from mobile image, or offset to apply (<return>)}
+      add_short_help $itk_component(Ylow) \
+         {Offset from mobile image, or offset to apply (<return>)}
 
       #  Add arrows for adjusting image position.
       itk_component add Arrows {
          ScrollArrows $itk_component(Iframe).arrows \
             -command [code $this move_mobile_]
       }
+      add_short_help $itk_component(Arrows) \
+         {Press to scroll mobile image position}
 
       #  Create a frame to hold the main canvas and scrollbars.
       itk_component add MainFrame {
@@ -653,7 +679,7 @@ itcl::class gaia::GaiaBlink {
       return "$cx0 $cy0 $cx1 $cy1"
    }
 
-   #  Set the top clone information. If n is set then thie become the
+   #  Set the top clone information. If n is set then this become the
    #  top_ image.
    private method top_clone_ { {n -1} } {
       if { $n != -1 } {
@@ -875,6 +901,26 @@ itcl::class gaia::GaiaBlink {
          }
       } msg
       if { $msg != "" } {
+         info_dialog $msg
+      }
+   }
+
+   protected method fix_origins_ {} {
+      catch {
+         if { [info exists clones_(0)] } {
+
+            #  Place mobile image at 0 0.
+            $canvas_ coords $image_($mobile_) 0 0
+            set_scroll_region_
+            for { set i 0 } { $i < $n_ } { incr i } {
+               $canvas_ coords $image_($i) 0 0
+            }
+
+            #  Final scrollregion encompasses positions of all images.
+            set_scroll_region_
+         }
+      } msg
+      if { $msg != {} } {
          info_dialog $msg
       }
    }
