@@ -73,12 +73,11 @@
 #   make and distribute a modified version of the Autoconf Macro, you
 #   may extend this special exception to the GPL to apply to your
 #   modified version as well.
-
 AC_DEFUN([MDL_HAVE_OPENGL],
 [
   AC_REQUIRE([AC_PROG_CC])
   AC_REQUIRE([AC_PATH_X])
-  AC_REQUIRE([AC_PATH_XTRA])
+dnl  AC_REQUIRE([AC_PATH_XTRA])
 
   AC_CACHE_CHECK([for OpenGL], mdl_cv_have_OpenGL,
   [
@@ -105,7 +104,7 @@ dnl If we are running under X11 then add in the appropriate libraries.
 if test x"$no_x" != xyes; then
 dnl Add everything we need to compile and link X programs to GL_X_CFLAGS
 dnl and GL_X_LIBS.
-  AC_PATH_XTRA
+dnl  AC_PATH_XTRA
   GL_CFLAGS="$X_CFLAGS"
   GL_X_LIBS="$X_PRE_LIBS $X_LIBS $X_EXTRA_LIBS"
 fi
@@ -115,13 +114,12 @@ fi
     GL_save_LIBS="$LIBS"
     LIBS="$GL_X_LIBS"
 
-
     # Save the "AC_MSG_RESULT file descriptor" to FD 8.
-    exec 8>&AC_FD_MSG
+    exec 8>&AS_MESSAGE_FD
 
     # Temporarily turn off AC_MSG_RESULT so that the user gets pretty
     # messages.
-    exec AC_FD_MSG>/dev/null
+    exec AS_MESSAGE_FD>/dev/null
 
     AC_SEARCH_LIBS(glAccum,          $GL_search_list, have_GL=yes,   have_GL=no)
     AC_SEARCH_LIBS(gluBeginCurve,   $GLU_search_list, have_GLU=yes,  have_GLU=no)
@@ -129,9 +127,8 @@ fi
     AC_SEARCH_LIBS(glutInit,        glut,             have_glut=yes, have_glut=no)
 
 
-
     # Restore pretty messages.
-    exec AC_FD_MSG>&8
+    exec AS_MESSAGE_FD>&8
 
     if test -n "$LIBS"; then
       mdl_cv_have_OpenGL=yes

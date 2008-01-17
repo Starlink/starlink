@@ -21,6 +21,7 @@ dnl    A remaining question is how to provide this as a option
 dnl    regardless, for those machines whose platforms have OpenGL
 dnl    but specific hardware doesn't).
 sinclude(mdl_have_opengl.m4)
+AC_PATH_XTRA
 MDL_HAVE_OPENGL
 if test "$have_GL" = "yes"; then
    MAIN_TARGET="mesa-stamp"
