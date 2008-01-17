@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="mesa" support="U">
+  <version>7.0.1</version>
+  <path>thirdparty/mesa3d/mesa</path>
+  <description>Mesa library for OpenGL support</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies >
+    
+  </dependencies>
+  <!--developers>
+    <person>
+    </person>
+  </developers-->
+  <!-- <documentation></documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
