@@ -151,7 +151,7 @@ itcl::class gaia::GaiaBlink {
       add_short_help $itk_component(menubar).actions \
          {Choose an action}
 
-      add_menuitem $Actions command "Use grid positions" \
+      add_menuitem $Actions command "Apply grid positions" \
          {Align images at lower left corner} \
          -command [code $this fix_origins_]
 
@@ -905,15 +905,30 @@ itcl::class gaia::GaiaBlink {
       }
    }
 
+   #  Set grid origins to be the same (lower left corners).
    protected method fix_origins_ {} {
       catch {
          if { [info exists clones_(0)] } {
 
-            #  Place mobile image at 0 0.
+            #  Place mobile image at 0 0 and get image height.
             $canvas_ coords $image_($mobile_) 0 0
+            set byo [$image_($mobile_) height]
+
             set_scroll_region_
             for { set i 0 } { $i < $n_ } { incr i } {
+
+               #  Height of this image.
+               set yo [$image_($i) height]
+
+               #  Pixel shift from mobile image upper left to this one.
+               set dy [expr $byo-$yo]
+
+               #  Equivalent canvas shift.
+               $image_($mobile_) convert dist 0 $dy image dx dy canvas
+
+               #  Apply shift
                $canvas_ coords $image_($i) 0 0
+               $canvas_ move $image_($i) $dx $dy
             }
 
             #  Final scrollregion encompasses positions of all images.
