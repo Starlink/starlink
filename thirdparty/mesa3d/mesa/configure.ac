@@ -25,13 +25,16 @@ if test "$opengl_check" = "yes"; then
    sinclude(mdl_have_opengl.m4)
    AC_PATH_XTRA
    MDL_HAVE_OPENGL
-   if test "$have_GL" = "yes"; then
-      MAIN_TARGET="mesa-stamp"
-   else
-      MAIN_TARGET="mesa-src"
-   fi
-   AC_SUBST(MAIN_TARGET)
+else
+   have_GL=no
+   AC_MSG_RESULT([not checking for OpenGL])
 fi
+if test "$have_GL" = "yes"; then
+   MAIN_TARGET="mesa-stamp"
+else
+   MAIN_TARGET="mesa-src"
+fi
+AC_SUBST(MAIN_TARGET)
 
 dnl    MESA has a funny build system, need to determine a platform.
 dnl    AC_CANONICAL_BUILD, not needed, but used for build value.
