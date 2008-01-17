@@ -217,11 +217,13 @@
 *        smf_reshapendf.
 *     2008-1-15 (DSB):
 *        Remove argument "trim" from smf_reshapendf.
+*     2008-1-17 (DSB):
+*        Added argument "alignsys" to smf_cubegrid.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2007 University of British Columbia.
 *     All Rights Reserved.
 
@@ -641,7 +643,7 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
 			      int *status );
 
 void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos, 
-                   int autogrid, Grp *detgrp, double par[ 7 ], 
+                   int autogrid, int alignsys, Grp *detgrp, double par[ 7 ], 
                    int *moving, AstSkyFrame **skyframe, int *sparse, 
                    int *gottsys, int *status );
 

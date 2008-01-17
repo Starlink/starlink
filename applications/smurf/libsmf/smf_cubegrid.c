@@ -14,9 +14,9 @@
 
 *  Invocation:
 *     smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos, 
-*                   int autogrid, Grp *detgrp, double par[ 7 ], int *moving, 
-*                   AstSkyFrame **skyframe, int *sparse, int *gottsys,
-*                   int *status );
+*                   int autogrid, int alignsys, Grp *detgrp, double par[ 7 ], 
+*                   int *moving, AstSkyFrame **skyframe, int *sparse, 
+*                   int *gottsys, int *status );
 
 *  Arguments:
 *     igrp = Grp * (Given)
@@ -42,6 +42,10 @@
 *        If autogrid is zero, CRPIX1/2 are set to zero, CRVAL1/2 are set to 
 *        the first pointing BASE position, CROTA2 is set to zero, CDELT1/2 
 *        are set to 6 arc-seconds.
+*     alignsys = int (Given)
+*        If non-zero, then the input data will be aligned in the coordinate 
+*        system specified by "system" rather than in the default system
+*        (ICRS).
 *     detgrp = Grp * (Given)
 *        A Group of detectors names to include in or exclude from the 
 *        output cube. If the first name begins with a minus sign then the 
@@ -157,10 +161,13 @@
 *        Update to use new smf_free behaviour
 *     19-DEC-2007 (DSB):
 *        Correct the way reference WCS is handled.
+*     17-JAN-2008 (DSB):
+*        Added argument alignsys.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2006,2007 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -211,9 +218,9 @@
 #define NINT(x) ( ( (x) > 0 ) ? (int)( (x) + 0.5 ) : (int)( (x) - 0.5 ) )
 
 void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos, 
-                   int autogrid, Grp *detgrp, double par[ 7 ], int *moving, 
-                   AstSkyFrame **skyframe, int *sparse, int *gottsys,
-                   int *status ){
+                   int autogrid, int alignsys, Grp *detgrp, double par[ 7 ], 
+                   int *moving, AstSkyFrame **skyframe, int *sparse, 
+                   int *gottsys, int *status ){
 
 /* Local Variables */
    AstFrame *sf1 = NULL;      /* Spatial Frame representing AZEL system */
@@ -448,15 +455,9 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
             *skyframe = astCopy( skyin );
             astSetC( *skyframe, "System", usesys );
 
-/* If the output is an AZEL grid, ensure that alignment on the sky is
-   performed in the azel coordinate system rather than the default (ICRS). */
-/* 2/10/2007 COMMENTED OUT SINCE TIMJ HAS NOT YET DECIDED WHETHER THIS IS
-   THE RIGHT THING TO DO. 
-            if( !strcmp( usesys, "AZEL" ) ) {
-               astSetC( *skyframe, "AlignSystem", "AZEL" );
-            }
-*/
-
+/* If required, ensure that alignment on the sky is performed in the output
+   coordinate system rather than the default (ICRS). */
+            if( alignsys ) astSetC( *skyframe, "AlignSystem", usesys );
 
 /* We will later record the telescope base pointing position as the SkyRef 
    attribute in the output SkyFrame. To do this, we need to convert the 

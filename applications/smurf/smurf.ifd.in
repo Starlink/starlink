@@ -42,7 +42,7 @@
 #     This file is tcl source code.
 
 #  Copyright:
-#     Copyright (C) 2007 Science and Technology Facilities Council.
+#     Copyright (C) 2007-2008 Science and Technology Facilities Council.
 #     Copyright (C) 2005-2007 University of British Columbia.
 #     Copyright (C) 2005-2006 Particle Physics & Astronomy Research Council.
 #     All Rights Reserved.
@@ -154,6 +154,8 @@
 #         Added action TIMESORT.
 #     18-DEC-2007 (DSB):
 #         Added parameter REF to MAKECUBE.
+#     17-JAN-2008 (DSB):
+#         Added parameter ALIGNSYS to MAKECUBE.
 #     {enter_changes_here}
 
 #  Bugs:
@@ -800,6 +802,15 @@ package @PACKAGE@ {
      action makecube {
 
          helplib {$SMURF_HELP}
+
+ 	  parameter alignsys {
+	    type _LOGICAL
+	    vpath DEFAULT
+	    ppath CURRENT
+	    prompt {Align data in the output spatial co-ordinate system?}
+	    default FALSE
+	    helpkey *
+	  }
 
  	  parameter autogrid {
 	    type _LOGICAL

@@ -60,6 +60,15 @@
 *     input NDFs (see parameter GENVAR).
 
 *  ADAM Parameters:
+*     ALIGNSYS = _LOGICAL (Read)
+*          If TRUE, then the spatial positions of the input data are
+*          aligned in the co-ordinate system specified by parameter
+*          SYSTEM. Otherwise, they are aligned in the ICRS co-ordinate
+*          system. For instance, if the output co-ordinate system is
+*          AZEL, then setting ALIGNSYS to TRUE will result in the AZEL
+*          values of the input data positions being compared directly,
+*          disregarding the fact that a given AZEL will correspond to
+*          different positions on the sky at different times. [FALSE]
 *     AUTOGRID = _LOGICAL (Read)
 *          Only accessed if a null value is supplied for parameter REF.
 *          Determines how the dynamic default values should be determined 
@@ -697,7 +706,8 @@
 *        stored in the SMURF extension even when some output tiles are
 *        skipped due to being empty.
 *     17-JAN-2008 (DSB):
-*        Only create the output Tsys array if SPREAD is Nearest.
+*        - Only create the output Tsys array if SPREAD is Nearest.
+*        - Added parameter ALIGNSYS.
 
 *  Copyright:
 *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
@@ -821,6 +831,7 @@ void smurf_makecube( int *status ) {
    float var;                 /* Variance value */
    int ***ptime;              /* Holds time slice indices for each bol bin */
    int *pt;                   /* Holds time slice indices for each bol bin */
+   int alignsys;              /* Align data in the output system? */
    int autogrid;              /* Determine projection parameters automatically? */
    int axes[ 2 ];             /* Indices of selected axes */
    int badmask;               /* How is the output bad pixel mask chosen? */
@@ -966,12 +977,16 @@ void smurf_makecube( int *status ) {
       autogrid = 0;
    }  
 
+/* See if the input data is to be aligned in the output coordinate system
+   rather than teh default of ICRS. */
+   parGet0l( "ALIGNSYS", &alignsys, status );
+
 /* Calculate the default grid parameters (these are only used if no
    reference spatial WCS was obtained). This also modifies the contents
    of "detgrp" if needed so that it always holds a list of detectors to be
    included (not excluded). */
-   smf_cubegrid( igrp,  size, system, usedetpos, autogrid, detgrp, 
-                 spacerefwcs ? NULL : par, &moving, &oskyfrm, 
+   smf_cubegrid( igrp,  size, system, usedetpos, autogrid, alignsys, 
+                 detgrp, spacerefwcs ? NULL : par, &moving, &oskyfrm, 
                  &sparse, &hastsys, status );
 
 /* If we have spatial reference WCS, use the SkyFrame from the spatial 
