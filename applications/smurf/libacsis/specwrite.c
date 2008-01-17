@@ -2635,11 +2635,12 @@ flushResources( const obsData * obsinfo, subSystem * subsys, int * status ) {
 #if SPW_DEBUG_LEVEL > 0
   double percent = 0.0;
 #endif
-
+#if USE_MEMORY_CACHE
+  subSystem output;  /* Some where to store file information */
+#endif
   if (*status != SAI__OK) return;
 
 #if USE_MEMORY_CACHE
-  subSystem output;  /* Some where to store file information */
 
 #if SPW_DEBUG_LEVEL > 0
   if (subsys->cursize > 0) {
