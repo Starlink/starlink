@@ -22,7 +22,7 @@
 //    program in the file LICENCE.
 //
 //    Author: Norman Gray <norman@astro.gla.ac.uk>
-//    $Id: PipeStream.cc,v 1.16 2006/10/26 15:03:59 normang Exp $
+//    $Id: PipeStream.cc,v 1.17 2008/01/17 21:02:25 normang Exp $
 
 
 #include <config.h>
@@ -34,10 +34,12 @@
 
 #ifdef HAVE_CSTD_INCLUDE
 #  include <cstdio>
+#  include <cstdlib>
 #  include <cctype>
 #  include <cerrno>
 #else
 #  include <stdio.h>
+#  include <stdlib.h>
 #  include <ctype.h>
 #  include <errno.h>
 #endif

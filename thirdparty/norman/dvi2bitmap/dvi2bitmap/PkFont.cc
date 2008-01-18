@@ -22,7 +22,7 @@
 //    program in the file LICENCE.
 //
 //    Author: Norman Gray <norman@astro.gla.ac.uk>
-//    $Id: PkFont.cc,v 1.70 2006/10/26 15:05:21 normang Exp $
+//    $Id: PkFont.cc,v 1.71 2008/01/17 21:02:25 normang Exp $
 
 
 #include <config.h>
@@ -36,11 +36,13 @@
 //#include <memory>		// for auto_ptr
 
 #ifdef HAVE_CSTD_INCLUDE
-#include <cstring>
-#include <cmath>
+#  include <cstring>
+#  include <cmath>
+#  include <cstdlib>
 #else
-#include <string.h>
-#include <math.h>
+#  include <string.h>
+#  include <math.h>
+#  include <stdlib.h>
 #endif
 
 using STD::cerr;

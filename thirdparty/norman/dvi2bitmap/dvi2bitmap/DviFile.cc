@@ -22,7 +22,7 @@
 //    program in the file LICENCE.
 //
 //    Author: Norman Gray <norman@astro.gla.ac.uk>
-//    $Id: DviFile.cc,v 1.72 2005/12/08 09:34:21 normang Exp $
+//    $Id: DviFile.cc,v 1.73 2008/01/17 21:02:25 normang Exp $
 
 
 #include <config.h>
@@ -36,6 +36,7 @@
 #endif
 
 #ifdef HAVE_CSTD_INCLUDE
+#  include <cstdlib>
 #  include <cmath>		// for fabs()
 #  include <cassert>
 #  include <cctype>		// for isprint
@@ -43,6 +44,7 @@
 using std::isprint;
 #  endif
 #else
+#  include <stdlib.h>
 #  include <math.h>
 #  include <assert.h>
 #  include <ctype.h>

@@ -1,5 +1,6 @@
 //    This file is part of dvi2bitmap.
 //    Copyright 1999--2004, Council for the Central Laboratory of the Research Councils
+//    Copyright 2008, Norman Gray
 //    
 //    This program is part of the Starlink Software Distribution: see
 //    http://www.starlink.ac.uk 
@@ -22,7 +23,7 @@
 //    program in the file LICENCE.
 //
 //    Author: Norman Gray <norman@astro.gla.ac.uk>
-//    $Id: InputByteStream.cc,v 1.40 2005/06/04 15:51:04 normang Exp $
+//    $Id: InputByteStream.cc,v 1.41 2008/01/17 21:02:25 normang Exp $
 
 
 #include <config.h>
@@ -36,10 +37,12 @@
 #  include <cstdio>
 #  include <cstdlib>
 #  include <cassert>
+#  include <cstring>
 #else
 #  include <stdio.h>
 #  include <stdlib.h>
 #  include <assert.h>
+#  include <string.h>
 #endif
 
 #if HAVE_SYS_ERRNO_H

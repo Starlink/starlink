@@ -22,11 +22,11 @@
 //    program in the file LICENCE.
 //
 //    Author: Norman Gray <norman@astro.gla.ac.uk>
-//    $Id: dvi2bitmap.cc,v 1.104 2006/10/26 15:05:50 normang Exp $
+//    $Id: dvi2bitmap.cc,v 1.105 2008/01/17 21:02:25 normang Exp $
 
 
 static const char RCSID[] =
-	"$Id: dvi2bitmap.cc,v 1.104 2006/10/26 15:05:50 normang Exp $";
+	"$Id: dvi2bitmap.cc,v 1.105 2008/01/17 21:02:25 normang Exp $";
 
 // FIXME: at several points in the option processing below, I've noted
 // sensible changes to the behaviour.  These, and the corresponding
@@ -46,11 +46,13 @@ static const char RCSID[] =
 #  include <cstdlib>
 #  include <cstdarg>
 #  include <cassert>
+#  include <cstring>
 #else
 #  include <stdio.h>		// for vsprintf
 #  include <stdlib.h>
 #  include <stdarg.h>
 #  include <assert.h>
+#  include <string.h>
 #endif
 
 #include <bitset>
@@ -61,6 +63,7 @@ using STD::cout;		// these are used multiple times
 using STD::cerr;
 using STD::endl;
 using STD::strcmp;
+using STD::exit;
 
 #include "DviFile.h"
 #include "PkFont.h"
@@ -806,7 +809,7 @@ int main (int argc, char **argv)
     }
     
     if (processing_.none())
-	STD::exit (0);
+	exit(0);
 
     argc -= optind;
     argv += optind;
@@ -829,7 +832,7 @@ int main (int argc, char **argv)
 	if (verbosity > silent)
 	    cerr << "Error: Can't make output filename pattern from "
 		 << dviname << endl;
-	STD::exit(1);
+	exit(1);
     }
 
     bool fonts_ok = true;	// are there accumulated font errors?
@@ -843,7 +846,7 @@ int main (int argc, char **argv)
 	    if (verbosity > silent)
 		cerr << "Error: Can't open file " << dviname
 		     << " to read" << endl;
-	    STD::exit(1);
+	    exit(1);
 	}
 
 	bool all_fonts_present = true; // are all expected fonts found?
@@ -965,7 +968,7 @@ int main (int argc, char **argv)
     // exit zero/success if (a) we were processing the DVI
     // file normally and we found at least one font, or (b) we were
     // just checking the preamble and we found _all_ the fonts.
-    STD::exit(fonts_ok ? 0 : 1);
+    exit(fonts_ok ? 0 : 1);
 }
 
 void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
@@ -1685,5 +1688,5 @@ void Usage (bool andExit)
 "  -P   Processing: b=blur bitmap, t=set transparent, c=do cropping (BTC->off)" << endl;
 #endif
     if (andExit)
-        STD::exit (1);
+        exit(1);
 }
