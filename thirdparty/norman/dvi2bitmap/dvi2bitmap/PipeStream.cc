@@ -37,11 +37,13 @@
 #  include <cstdlib>
 #  include <cctype>
 #  include <cerrno>
+#  include <cstring>
 #else
 #  include <stdio.h>
 #  include <stdlib.h>
 #  include <ctype.h>
 #  include <errno.h>
+#  include <string.h>
 #endif
 
 // the assert headers appear to be slightly less predictable...

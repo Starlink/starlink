@@ -9,7 +9,6 @@
 using STD::cout;
 using STD::cerr;
 using STD::endl;
-using STD::exit;
 
 #include "DviFile.h"
 
