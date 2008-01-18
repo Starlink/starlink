@@ -1013,15 +1013,14 @@ itcl::class gaia::GaiaImageCtrl {
       config -zoomwin $itk_component(zoom)
    }
 
-
-
    #  Display a popup window listing the HDUs in the current image.
    public method display_fits_hdus {} {
       if { [$image_ isfits] } {
          utilReUseWidget gaia::GaiaHduChooser $w_.hdu \
             -image $this \
             -center 0 \
-            -transient 0
+            -transient 0 \
+            -cube_cmd $itk_option(-cube_cmd)
       } else {
          utilReUseWidget gaia::GaiaNDFChooser $w_.ndfhdu \
             -image $this \
@@ -1253,6 +1252,10 @@ itcl::class gaia::GaiaImageCtrl {
          autofit_
       }
    }
+
+   #  Command to execute if a FITS cube is browsed in a HDU. Will be
+   #  trailed by the qualified file specification.
+   itk_option define -cube_cmd cube_cmd Cube_Cmd {}
 
    #  Protected variables:
    #  ====================

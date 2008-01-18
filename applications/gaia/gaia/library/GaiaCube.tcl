@@ -564,9 +564,10 @@ itcl::class gaia::GaiaCube {
 
          $namer absolute
          set ndfname_ [$namer ndfname 0]
+         set fullname [$namer fullname]
          set type_ [$namer type]
 
-         $cubeaccessor_ configure -dataset "$ndfname_"
+         $cubeaccessor_ configure -dataset "$fullname"
 
          set bounds_ [$cubeaccessor_ getbounds 0]
          set ndims [expr [llength $bounds_]/2]

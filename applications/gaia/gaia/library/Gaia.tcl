@@ -411,6 +411,12 @@ itcl::class gaia::Gaia {
          cmdtrace on notruncate [::open "GaiaDebug.log" w]
       }
 
+      #  If looking out for cubes to autoload. Start doing that now
+      #  after the initial file_loaded_.
+      if { $itk_option(-check_for_cubes) } {
+         $image_ configure -cube_cmd [code $this file_loaded_]
+      }
+
       #  Trap window closing and handle that.
       wm protocol $w_ WM_DELETE_WINDOW [code $this quit]
    }
@@ -1339,9 +1345,9 @@ itcl::class gaia::Gaia {
       return ""
    }
 
-
    #  Notification that a file has been loaded into the GaiaImageCtrl.
    protected method file_loaded_ { {filename {}} } {
+
       if { $filename != {} } {
          configure -file $filename
       }
@@ -1360,15 +1366,18 @@ itcl::class gaia::Gaia {
       set naxis3 [$rtdimage fits get NAXIS3]
       set naxis4 [$rtdimage fits get NAXIS4]
 
+      #  If this isn't the first HDU then we need the fully qualified name.
+      set fullname [$rtdimage fullname]
+
       #  Load it into cube browser. Note allow trivial cubes with redundant
       #  dimensions 1, or 2, but not 3.
       if { ( $naxis4 == {} || $naxis4 == 1 ) && $naxis3 != {} && $naxis3 != 1 } {
             make_opencube_toolbox
             set msg {}
             set result [catch {$itk_component(opencube) configure \
-                                  -cube $itk_option(-file)} msg]
+                                  -cube $fullname} msg]
             if { $result != 0 } {
-            maybe_release_cube_
+               maybe_release_cube_
                $itk_component(opencube) close
                if { $msg != {} } {
                   info_dialog "$msg" $w_
@@ -1477,6 +1486,7 @@ itcl::class gaia::Gaia {
    #  FITS extensions are enabled if needed by using the "fullname 0"
    #  switch.
    public method open {args} {
+
       if { "$args" != "" } {
          set imagename [lindex $args 0]
 	 set namer [GaiaImageName \#auto -imagename $imagename]

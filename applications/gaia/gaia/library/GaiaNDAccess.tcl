@@ -132,7 +132,7 @@ itcl::class gaia::GaiaNDAccess {
    #  These should be light-weight accesses that just get meta-data at this
    #  stage.
    protected method open_ {} {
-      set handle_ [${type_}::open [$namer_ fullname 0]]
+      set handle_ [${type_}::open [$namer_ fullname 1]]
       set prop_changes_ 0
    }
 
