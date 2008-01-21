@@ -219,6 +219,8 @@
 *        Remove argument "trim" from smf_reshapendf.
 *     2008-1-17 (DSB):
 *        Added argument "alignsys" to smf_cubegrid.
+*     2008-1-21 (DSB):
+*        Added argument "polobs" to smf_cubebounds and smf_sparsebounds.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -569,7 +571,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                      AstFrameSet *specrefwcs, double par[ 7 ], 
                      Grp *detgrp, int moving, int specunion, int lbnd[ 3 ], 
                      int ubnd[ 3 ], AstFrameSet **wcsout, int *npos, 
-                     int *hasoffexp, smfBox **boxes, int *status );
+                     int *hasoffexp, smfBox **boxes, int *polobs, int *status );
 
 void smf_rebincube( smfData *data, int index, int size, int *ptime, int badmask, int is2d,
                     AstSkyFrame *abskyfrm, AstMapping *oskymap, 
@@ -683,7 +685,7 @@ void smf_labelunit( Grp *igrp,  int size, smfData *odata, int *status );
 
 void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
                        int usedetpos, Grp *detgrp, int lbnd[ 3 ], int ubnd[ 3 ],
-                       AstFrameSet **wcsout, int *hasoffexp, int *status );
+                       AstFrameSet **wcsout, int *hasoffexp, int *polobs, int *status );
 
 void smf_rebinsparse( smfData *data, int ifile, int *ptime, AstFrame *ospecfrm, AstMapping *ospecmap, 
                       AstSkyFrame *oskyframe, Grp *detgrp, int lbnd_out[ 3 ], 

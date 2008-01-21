@@ -294,8 +294,10 @@
 *          is supplied, the same value will be used for both axes. The 
 *          dynamic default value is determined by the AUTOGRID parameter. []
 *     POLBINSIZE = _REAL (Read)
-*          The size of the bins used for grouping polarisation analyser angles,
-*          in degrees. The "analyser angle" is the anti-clockwise angle
+*          This parameter is only prompted for if the input files contain
+*          polarisation data. The supplied value is used as the bin size 
+*          (in degrees) for grouping polarisation analyser angles.
+*          The "analyser angle" is the anti-clockwise angle
 *          from celestial north (in the system chosen by parameter SYSTEM) 
 *          to the axis of the "effective analyser" - a rotating analyser that
 *          would have the same effect as the combination of fixed analyser 
@@ -310,7 +312,7 @@
 *          is an integer bin index. The largest value of N is written to
 *          putput parameter NPOLBIN. If a null value (!) is supplied, then a 
 *          single output NDF (without POLPACK extension) is created for each 
-*          tile, containing all input data. [!]
+*          tile, containing all input data.
 *     REF = NDF (Read)
 *          An existing NDF that is to be used to define the output grid.
 *          If supplied, the output grid will be aligned with the supplied 
@@ -872,6 +874,7 @@ void smurf_makecube( int *status ) {
    int ondf;                  /* Output NDF identifier */
    int outax[ 2 ];            /* Indices of corresponding output axes */
    int outsize;               /* Number of files in output group */
+   int polobs;                /* Do the input files contain polarisation data? */
    int savewgt;               /* Should weights be saved in the output NDF? */
    int size;                  /* Number of files in input group */
    int smfflags;              /* Flags for smfData */
@@ -1105,7 +1108,8 @@ void smurf_makecube( int *status ) {
       smf_cubebounds( igrp, size, oskyfrm, autogrid, usedetpos,
                       spacerefwcs, specrefwcs, par, 
                       ( trim ? detgrp : NULL ), moving, specunion, lbnd_out, 
-                      ubnd_out, &wcsout, &npos, &hasoffexp, &boxes, status );
+                      ubnd_out, &wcsout, &npos, &hasoffexp, &boxes,
+                      &polobs, status );
 
 /* See if the input data should be weighted according to the reciprocal
    of the input variances. This required ACS_OFFEXPOSURE values in the
@@ -1150,7 +1154,7 @@ void smurf_makecube( int *status ) {
 /* Validate the input files, create the WCS FrameSet to store in the
    output cube, and get the pixel index bounds of the output cube. */
       smf_sparsebounds( igrp, size, oskyfrm, usedetpos, detgrp, lbnd_out, 
-                        ubnd_out, &wcsout, &hasoffexp, status );
+                        ubnd_out, &wcsout, &hasoffexp, &polobs, status );
 
 /* See how the output Variances are to be created (the "Spread" option is
    not available in sparse mode). */
@@ -1333,7 +1337,14 @@ void smurf_makecube( int *status ) {
 /* Get the polarisation analyser angular bin size, and convert from
    degrees to radians. Watch for null values, using zero bin size to flag
    that polarisation analyser angle should be ignored. */
-   if( *status == SAI__OK ) {
+   if( *status == SAI__OK && polobs ) {
+
+      if( !blank ) msgBlank( status );
+      msgOutif( MSG__NORM, "POL_MSG1", "   The input files contain "
+                "polarisation data.", status );
+      msgBlank( status );
+      blank = 1;
+
       parGet0r( "POLBINSIZE", &polbinsize, status );
       if( *status == PAR__NULL ) {
          errAnnul( status );
@@ -1341,7 +1352,10 @@ void smurf_makecube( int *status ) {
       } else {
          polbinsize *= AST__DD2R;
       }
-   }   
+
+   } else {
+      polbinsize = 0.0;
+   }
 
 /* Choose a set of polarisation angle bins, and assign each time slice in
    each input NDF to one of these bins. */
@@ -1438,6 +1452,7 @@ void smurf_makecube( int *status ) {
                    "contributes to this output tile. The tile "
                    "will not be created.", status );
          msgBlank( status );
+         blank = 1;
 
 /* Skip over the unused output file names. */
          iout += npbin;

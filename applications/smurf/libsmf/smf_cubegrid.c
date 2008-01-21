@@ -434,6 +434,9 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
          smf_tslice_ast( data, itime, 1, status );
          swcsin = hdr->wcs;
 
+
+
+
 /* Get a pointer to the current WCS Frame in the input file. */
          skyin = astGetFrame( swcsin, AST__CURRENT );
 

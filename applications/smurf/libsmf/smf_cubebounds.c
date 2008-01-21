@@ -18,7 +18,8 @@
 *                     AstFrameSet *specrefwcs, double par[ 7 ], 
 *                     Grp *detgrp, int moving, int specunion, int lbnd[ 3 ], 
 *                     int ubnd[ 3 ], AstFrameSet **wcsout, int *npos, 
-*                     int *hasoffexp, smfBox **boxes, int *status );
+*                     int *hasoffexp, smfBox **boxes, int *polobs, 
+*                     int *status );
 
 *  Arguments:
 *     igrp = Grp * (Given)
@@ -101,6 +102,8 @@
 *        of the spatial coverage of the corresponding input file, given as 
 *        pixel indices within the output cube. The array should be freed 
 *        using astFree when no longer needed.
+*     polobs = int * (Returned)
+*        Non-zero if all the input files contain polarisation data.
 *     status = int * (Given and Returned)
 *        Pointer to inherited status.
 
@@ -196,6 +199,8 @@
 *     7-JAN-2008 (DSB):
 *        Allow user to override default output pixel bounds using
 *        parameters LBND and UBND.
+*     21-JAN-2008 (DSB):
+*        Added argument polobs.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -254,7 +259,8 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                      AstFrameSet *specrefwcs, double par[ 7 ], 
                      Grp *detgrp, int moving, int specunion, int lbnd[ 3 ], 
                      int ubnd[ 3 ], AstFrameSet **wcsout, int *npos, 
-                     int *hasoffexp, smfBox **boxes, int *status ){
+                     int *hasoffexp, smfBox **boxes, int *polobs, 
+                     int *status ){
 
 /* Local Variables */
    AstCmpFrame *cmpfrm = NULL;  /* Current Frame for output FrameSet */
@@ -313,6 +319,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* Initialise returned values */
    *npos = 0;
    *hasoffexp = 0;
+   *polobs = 0;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -352,6 +359,9 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       ospecframe = astGetFrame( specrefwcs, AST__CURRENT );
       ospecmap = astGetMapping( specrefwcs, AST__CURRENT, AST__BASE );
    } 
+
+/* Assume for the moment that all data is polarisation data. */
+   *polobs = 1;
 
 /* Loop round all the input NDFs. */
    for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++, box++ ) {
@@ -606,6 +616,9 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* Update the flag indicating if any OFF_EXPOSURE values are available in
    the input data. */
          if( hdr->state->acs_offexposure != VAL__BADR ) *hasoffexp = 1;
+
+/* Update the flag indicating if all input data is polarisation data. */
+         if( hdr->state->pol_ang == VAL__BADD ) *polobs = 0;
 
 /* Create an interim FrameSet describing the WCS to be associated with the 
    output cube unless this has already be done. It is described as

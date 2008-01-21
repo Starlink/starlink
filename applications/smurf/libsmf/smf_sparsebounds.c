@@ -16,7 +16,7 @@
 *     smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
 *                       int usedetpos, Grp *detgrp, int lbnd[ 3 ], 
 *                       int ubnd[ 3 ], AstFrameSet **wcsout, int *hasoffexp, 
-*                       int *status )
+*                       int *polobs, int *status )
 
 *  Arguments:
 *     igrp = Grp * (Given)
@@ -45,6 +45,8 @@
 *        Address of an int in which to return a flag indicating if any of
 *        the supplied input files has a OFF_EXPOSURE component in the JCMTSTATE
 *        NDF extension.
+*     polobs = int * (Returned)
+*        Non-zero if all the input files contain polarisation data.
 *     status = int * (Given and Returned)
 *        Pointer to inherited status.
 
@@ -79,9 +81,12 @@
 *        Modified interface to smf_open_file.
 *     18-DEC-2007 (AGG):
 *        Update to use new smf_free behaviour
+*     21-JAN-2008 (DSB):
+*        Added argument polobs.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -133,7 +138,7 @@
 void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
                        int usedetpos, Grp *detgrp, int lbnd[ 3 ], 
                        int ubnd[ 3 ], AstFrameSet **wcsout, int *hasoffexp, 
-                       int *status ){
+                       int *polobs, int *status ){
 
 /* Local Variables */
    AstCmpMap *cmpmap1 = NULL;   /* Combined Mappings */
@@ -190,6 +195,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
 /* Initialise */
    *hasoffexp = 0;
+   *polobs = 0;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -210,6 +216,9 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    lonlut = NULL;
    latlut = NULL;
    lutsize = 0;     
+
+/* Assume for the moment that all data is polarisation data. */
+   *polobs = 1;
 
 /* Loop round all the input NDFs. */
    for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++ ) {
@@ -470,6 +479,9 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* Update the flag indicating if any OFF_EXPOSURE values are available in
    the input data. */
          if( hdr->state->acs_offexposure != VAL__BADR ) *hasoffexp = 1;
+
+/* Update the flag indicating if all input data is polarisation data. */
+         if( hdr->state->pol_ang == VAL__BADD ) *polobs = 0;
 
 /* We now create a Mapping from detector index to position in oskyframe. */
          astInvert( swcsin );
