@@ -199,6 +199,9 @@
 *        Added support for 4D input cubes.
 *     22-SEP-2004 (TIMJ):
 *        Use CNF_PVAL
+*     21-JAN-2008 (DSB):
+*        Cancel parameter IN before returning to avoid a dangling HDS
+*        locator.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -915,6 +918,10 @@
 
 *  End the AST context.
       CALL AST_END( STATUS )
+
+*  For some reason, we end up with a dangling HDS locator unless we cancl
+*  the 'IN' parameter...
+      CALL PAR_CANCL( 'IN', STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
