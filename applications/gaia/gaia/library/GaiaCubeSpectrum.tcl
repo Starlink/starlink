@@ -486,7 +486,7 @@ itcl::class gaia::GaiaCubeSpectrum {
 
       #  Eval the notification command, if have one.
       if { $itk_option(-notify_cmd) != {} } {
-         eval $itk_option(-notify_cmd) p $ix $iy
+         eval $itk_option(-notify_cmd) p \"$ix $iy\"
       }
 
       #  Record extraction bounds, these are checked.
@@ -1362,7 +1362,7 @@ itcl::class gaia::GaiaCubeSpectrum {
 
    #  Command to execute when a spectrum is extracted or the extraction has
    #  been updated. Trailed by "p" or "r" for point and region and the
-   #  extraction position, or region description.
+   #  extraction position, or region description as a single argument.
    itk_option define -notify_cmd notify_cmd Notify_Cmd {}
 
    #  Protected variables: (available to instance)
