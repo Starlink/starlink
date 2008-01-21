@@ -1130,3 +1130,49 @@ void kpg1Asffr( AstFrameSet *target, const char *domain, int *ifrm, int *status 
 }
 
 
+
+/* ------------------------------- */
+
+F77_SUBROUTINE(kpg1_datcp)( CHARACTER(LOC1),
+                            CHARACTER(LOC2),
+                            CHARACTER(NAME),
+                            INTEGER(STATUS)
+                            TRAIL(LOC1)
+                            TRAIL(LOC2)
+                            TRAIL(NAME) );
+
+void kpg1Datcp( HDSLoc *loc1, HDSLoc *loc2, const char *name, int *status ){
+   DECLARE_CHARACTER(LOC1,DAT__SZLOC);
+   DECLARE_CHARACTER(LOC2,DAT__SZLOC);
+   DECLARE_CHARACTER_DYN(NAME);
+   DECLARE_INTEGER(STATUS);
+
+   if ( loc1 == NULL ) {
+      F77_EXPORT_LOCATOR( DAT__ROOT, LOC1 );
+   } else {
+      HDS_EXPORT_CLOCATOR( loc1, LOC1, status );
+   }
+
+   if ( loc2 == NULL ) {
+      F77_EXPORT_LOCATOR( DAT__ROOT, LOC2 );
+   } else {
+      HDS_EXPORT_CLOCATOR( loc2, LOC2, status );
+   }
+
+   F77_CREATE_CHARACTER( NAME, strlen( name ) );
+   F77_EXPORT_CHARACTER( name, NAME, NAME_length );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(kpg1_datcp)( CHARACTER_ARG(LOC1),
+                         CHARACTER_ARG(LOC2),
+                         CHARACTER_ARG(NAME),
+                         INTEGER_ARG(&STATUS)
+                         TRAIL_ARG(LOC1)
+                         TRAIL_ARG(LOC2)
+                         TRAIL_ARG(NAME) );
+
+   F77_FREE_CHARACTER( NAME );
+   F77_IMPORT_INTEGER( STATUS, *status );
+}
+
+

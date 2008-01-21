@@ -14,13 +14,15 @@
 *     CALL KPG1_COPY( TYPE, NEL, IPIN, IPOUT, STATUS )
 
 *  Description:
-*     This routine calls the appropriate version of the VEC_<T>TO<T>
-*     routines to do the copy.
+*     This routine copies a 1-D array of numerical or character values
+*     from an input array to an output array.
 
 *  Arguments:
 *     TYPE = CHARACTER * ( * ) (Given)
 *        The data type to be copied. Must be one of the HDS numeric
-*        types, _BYTE, _UBYTE, _WORD, _UWORD, _INTEGER, _REAL or _DOUBLE.
+*        types, _BYTE, _UBYTE, _WORD, _UWORD, _INTEGER, _REAL or _DOUBLE,
+*        or "_CHAR*<N>)" where "<N>" is an integer giving the length of
+*        the character strings.
 *     NEL = INTEGER (Given)
 *        The number of elements in the vectorised arrays pointed to by
 *        IPIN and IPOUT.
@@ -37,6 +39,7 @@
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -57,6 +60,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     DSB: David S. Berry (JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -64,6 +68,8 @@
 *        Original version.
 *     29-SEP-2005 (PDRAPER):
 *        Converted into KAPLIBS routine.
+*     21-JAN-2008 (DSB):
+*        Added support for copying character arrays.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -92,6 +98,7 @@
 *  Local Variable:
       INTEGER IERR              ! Not used
       INTEGER NERR              ! Not used
+      INTEGER CLEN              ! Length of character strings
 *.
 
 *  Check inherited global status.
@@ -134,12 +141,19 @@
          CALL VEC_UBTOUB( .FALSE., NEL, %VAL( CNF_PVAL( IPIN ) ),
      :                    %VAL( CNF_PVAL( IPOUT ) ), IERR, NERR,
      :                    STATUS )
+
+      ELSE IF( TYPE( : 6 ) .EQ. '_CHAR*' ) THEN
+         CALL CHR_CTOI( TYPE( 7 : ), CLEN, STATUS )
+         CALL KPG1_COPYC( NEL, %VAL( CNF_PVAL( IPIN ) ), 
+     :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS,
+     :                    %VAL( CLEN ), %VAL( CLEN ) )
+
       ELSE
 
 *  Bad TYPE.
          STATUS = SAI__ERROR
          CALL ERR_REP( 'KPG1_COPY',
-     :   'Error copying array, bad numeric type (possible programming'//
+     :   'Error copying array, bad data type (possible programming'//
      :   ' error)', STATUS )
       END IF
       END

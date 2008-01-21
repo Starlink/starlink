@@ -173,10 +173,12 @@ kpg1_cmuld.f \
 kpg1_cnlim.f \
 kpg1_colnm.f \
 kpg1_copy.f \
+kpg1_copyc.f \
 kpg1_cpsty.f \
 kpg1_ctcpc.f \
 kpg1_cshft.f \
 kpg1_danot.f \
+kpg1_datcp.f \
 kpg1_dauni.f \
 kpg1_debug.f \
 kpg1_dnag2r.f \

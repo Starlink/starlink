@@ -127,5 +127,6 @@ void kpg1Opgrd( int, double *, int, double *, double *, int * );
 void kpg1Gtaxv( const char *, int, int, AstFrame *, int, double *, int *, int * );
 void kpg1Gilst( int, int, int, const char *, int *, int *, int *, int * );
 void kpg1Asffr( AstFrameSet *, const char *, int *, int * );
+void kpg1Datcp( HDSLoc *, HDSLoc *, const char *, int * );
 
 #endif
