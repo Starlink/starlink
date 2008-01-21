@@ -26,6 +26,7 @@
 #include "prm_par.h"
 #include "dat_par.h"
 #include "star/hds.h"
+#include "star/kaplibs.h"
 #include "ast.h"
 #include "ndf.h"
 #include "mers.h"
@@ -1030,7 +1031,6 @@ int *status                   /* global status (given and returned) */
      if (isthere) {
        datFind ( headloc, hdsRecords[j].name, &(sc2store_loc[pos]), 
 		 status );
-
        if ( *status != SAI__OK ) break;
        datMap ( sc2store_loc[pos], hdsRecords[j].type, "READ", 
 		ndim, dim, &(sc2store_ptr[pos]), status );
@@ -1978,6 +1978,7 @@ int *status              /* global status (given and returned) */
     16Nov2007 : original (bdk)
 */
 {
+   HDSLoc *tloc = NULL;       /* Temporary HDS locator */
    int isthere = 0;           /* is an extension present? */
    int j;                     /* loop counter */
 
@@ -1991,8 +1992,14 @@ int *status              /* global status (given and returned) */
    ndfXstat ( sc2store_indf, JCMT__EXTNAME, &isthere, status );
    if ( isthere ) 
    {
-      ndfXloc( sc2store_indf, JCMT__EXTNAME, "READ", &sc2store_jcmtstateloc, 
+      ndfXloc( sc2store_indf, JCMT__EXTNAME, "READ", &tloc, 
         status );
+
+/* Re-size the arrays in the JCMTSTATE extension to match the pixel index 
+   bounds of the NDF. The resized arrays are stored in a new temporary HDS 
+   object, and the old locator is annull. */
+      sc2store_resize_head( sc2store_indf, &tloc, &sc2store_jcmtstateloc,
+                            status );
    } 
    else 
    {
@@ -2220,6 +2227,144 @@ int *status              /* global status (given and returned) */
 
 }
 
+
+
+/*+ sc2store_resize_head - modify JCMTSTATE arrays to take account of the
+                           NDF pixel origin. */
+
+void sc2store_resize_head
+(
+int indf,                /* Id. for NDF holding the JCMTSTATE extension */
+HDSLoc **xloc,           /* Locator for the JCMTSTATE extension (annuled on 
+                            exit) */
+HDSLoc **yloc,           /* Locator for new HDS object containing resized 
+                            arrays. */
+int *status              /* Global status (given and returned) */
+)
+/*
+   Method :
+    Create a new temporary HDS object and copy to it all the information
+    from the NDFs JCMTSTATE extension. Each array that has an axis
+    corresponding to time slice is modified so that only the section that 
+    refers to the pixel bounds of the NDF is copied. The supplied locator 
+    is annulled before returning. 
+   History :
+    18Jan2008 : original (dsb)
+*/
+{
+
+/* Local Variables: */
+   HDSLoc *xloc3 = NULL;
+   HDSLoc *xloc2 = NULL;
+   char name[ DAT__SZNAM + 1 ];
+   hdsdim lower[ 1 ];
+   hdsdim upper[ 1 ];
+   int isthere;
+   int j;
+   int lbnd[ 3 ];
+   int ncomp;
+   int ndim;
+   int ubnd[ 3 ];
+   int update;
+   size_t nslice;
+
+/* Initialise the returned pointer. */
+   *yloc = NULL;
+
+/* Check inherited status */
+   if ( *status != SAI__OK ) return;
+
+/* Only proceed if we have an NDF. */
+   if( indf != NDF__NOID ) {
+
+/* Get the pixel index bounds of the NDF. */
+      ndfBound( indf, 3, lbnd, ubnd, &ndim, status );
+
+/* Initially, assume we do not need to change the arrays in the extension. */
+      update = 0;
+
+/* We do not change anything unless the NDF is 3-dimensional. */
+      if( ndim == 3 ){
+
+/* If the lower pixel bounds on the time slice axis (assumed to be the
+   third axis) is not 1, then we need to adjust the arrays. */
+         if( lbnd[ 2 ] != 1 ) {
+            update = 1;
+
+/* If the lower bound is 1, we check the length of the arrays in the
+   extension. If they are not the saem length as the third NDF axis,
+   then we need to adjust the arrays. We take the array lengths from the
+   first array that is present in the extension. */
+         } else {
+
+            for( j = 0; j < JCMT_COMP_NUM; j++ ){
+               datThere( *xloc, hdsRecords[ j ].name, &isthere, status );
+               if( isthere ) {
+                  datFind( *xloc, hdsRecords[ j ].name, &xloc2, status ); 
+                  datSize( xloc2, &nslice, status );
+                  update = ( nslice != ubnd[ 2 ] );
+                  datAnnul( &xloc2, status );
+                  break;
+               }
+            }
+
+         }
+      }
+
+/* If required, produce a temporary copy of the supplied object. This includes 
+   any scalars as well as the arrays. */
+      if( update ) {
+         datTemp( JCMT__EXTTYPE, 0, NULL, yloc, status );
+         datNcomp( *xloc, &ncomp, status );
+         for( j = 1; j <= ncomp; j++ ) {
+            datIndex( *xloc, j, &xloc2, status );
+            datName( xloc2, name, status );
+            kpg1Datcp( xloc2, *yloc, name, status );
+            datAnnul( &xloc2, status );
+         }
+
+/* Store the pixel bounds on the time slice axis. */
+         lower[ 0 ] = lbnd[ 2 ];
+         upper[ 0 ] = ubnd[ 2 ];
+
+/* Loop round all the arrays that may need to be resized. */
+         for( j = 0; j < JCMT_COMP_NUM; j++ ){
+
+/* See if the component exists (it may be an ACSIS or SCUBA-2 or whatever) */
+            datThere( *xloc, hdsRecords[ j ].name, &isthere, status );
+            if( isthere ) {
+
+/* Get a locator for the component of the NDF extension that holds the 
+   required values. */ 
+               datFind( *xloc, hdsRecords[ j ].name, &xloc2, status ); 
+
+/* Extract a slice of this array that matches the pixel bounds of the NDF
+   on the third pixel axis. */
+               datSlice( xloc2, 1, lower, upper, &xloc3, status );
+
+/* Delete the old (full-sized) component from the returned temporary HDS 
+   object. */
+               datErase( *yloc, hdsRecords[ j ].name, status );
+
+/* Copy the resized slice into a component of the returned temporary HDS 
+   object. kpg1Datcp is identical to datCopy except that it will
+   succesfully copy an array slice (which datCopy will not). */
+               kpg1Datcp( xloc3, *yloc, hdsRecords[ j ].name, status );
+
+/* Annul the locators. */
+               datAnnul( &xloc3, status );
+               datAnnul( &xloc2, status );
+            }
+         }
+      }
+   }
+
+/* If no new object was created, return a clone of the supplied locator. */
+   if( ! *yloc ) datClone( *xloc, yloc, status );
+
+/* Annul the supplied locator. */
+   datAnnul( xloc, status );
+}
 
 
 /*+ sc2store_setbscale - Set the scale factor for data compression */

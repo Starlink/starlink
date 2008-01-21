@@ -232,6 +232,7 @@
 /* Starlink includes */
 #include "ast.h"
 #include "mers.h"
+#include "par.h"
 #include "sae_par.h"
 #include "prm_par.h"
 #include "star/ndg.h"

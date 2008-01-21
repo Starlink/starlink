@@ -88,6 +88,7 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
   HDSLoc * rloc = NULL;   /* locator of RECEPPOS */
   HDSLoc * tloc = NULL;   /* locator of TSYS */
   HDSLoc * xloc = NULL;   /* locator of required extension */
+  HDSLoc *tmploc;         /* Temporary HDS locator */
   char *cout;             /* Pointer to next output character */
   char *receptor;         /* String holding receptor names */
   const char *cin;        /* Pointer to next input character */
@@ -108,11 +109,18 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
   double trac1;           /* Frame TCS_TR_AC1 value */
   double trac2;           /* Frame TCS_TR_AC2 value */
   double trd;             /* Distance from receptor to TCS_TR_AC1/2 */
+  hdsdim lower[ 3 ];      /* New array lower bounds */
+  hdsdim upper[ 3 ];      /* New array upper bounds */
   int iframe;             /* Frame index */
   int irec;               /* Receptor index */
   int j;                  /* Character count */
+  int lbnd[ 3 ];          /* NDF lower pixel bounds */
+  int ndim;               /* Number of used pixel axes */
   int ri;                 /* Index into receppos or TSYS array */
+  int ubnd[ 3 ];          /* NDF upper pixel bounds */
   size_t clen;            /* Character length */
+  size_t origu1;          /* Original upper bound on second pixel axis */
+  size_t origu2;          /* Original upper bound on third pixel axis */
   size_t sizen;           /* Number of RECEPTOR list */
   size_t sizer;           /* Number of RECEPPOS coordinates */
   size_t sizet;           /* Number of TSYS coordinates */
@@ -137,6 +145,70 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
   datFind( xloc, "RECEPPOS", &rloc, status );
   datFind( xloc, "RECEPTORS", &nloc, status );
   datFind( xloc, "TSYS", &tloc, status );
+
+  /* Get the pixel index bounds of the NDF. */
+  ndfBound( indf, 3, lbnd, ubnd, &ndim, status );
+
+  /* See which, if either, of axes 2 and 3 represent a section of the 
+     original NDF. The original NDF had lower bound of 1 on all axes.
+     The original upper bound on axis 2 (detector index) is assumed to be 
+     equal to the length of the "FPLANEX" array. The original upper bound 
+     on axis 3 (time slice index) is assumed to be equal to the length of 
+     the second axis of the "RECEPPOS" array. Get these original upper 
+     bounds. */
+   datSize( fxloc, &origu1, status );
+   datSize( rloc, &origu2, status );
+   origu2 /= origu1*2;
+
+  /* Get slices of the extension arrays that match the pixel index 
+     bounds of the NDF. Only do this if the arrays do not already match
+     the pixel index bounds. First do the 1D arrays. */
+  if( lbnd[ 1 ] != 1 || ubnd[ 1 ] != origu1 ) {
+     lower[ 0 ] = lbnd[ 1 ];
+     upper[ 0 ] = ubnd[ 1 ];
+
+     tmploc = NULL;
+     datSlice( fxloc, 1, lower, upper, &tmploc, status );
+     datAnnul( &fxloc, status );
+     fxloc = tmploc;
+      
+     tmploc = NULL;
+     datSlice( fyloc, 1, lower, upper, &tmploc, status );
+     datAnnul( &fyloc, status );
+     fyloc = tmploc;
+      
+     tmploc = NULL;
+     datSlice( nloc, 1, lower, upper, &tmploc, status );
+     datAnnul( &nloc, status );
+     nloc = tmploc;
+  } 
+
+  /* Now do the 2D arrays. */
+  if( lbnd[ 1 ] != 1 || ubnd[ 1 ] != origu1 ||
+      lbnd[ 2 ] != 1 || ubnd[ 2 ] != origu2 ) {
+     lower[ 0 ] = lbnd[ 1 ];
+     upper[ 0 ] = ubnd[ 1 ];
+     lower[ 1 ] = lbnd[ 2 ];
+     upper[ 1 ] = ubnd[ 2 ];
+
+     tmploc = NULL;
+     datSlice( tloc, 2, lower, upper, &tmploc, status );
+     datAnnul( &tloc, status );
+     tloc = tmploc;
+
+  /* Now do the 3D arrays. */
+     lower[ 0 ] = 1;
+     upper[ 0 ] = 2;
+     lower[ 1 ] = lbnd[ 1 ];
+     upper[ 1 ] = ubnd[ 1 ];
+     lower[ 2 ] = lbnd[ 2 ];
+     upper[ 2 ] = ubnd[ 2 ];
+
+     tmploc = NULL;
+     datSlice( rloc, 3, lower, upper, &tmploc, status );
+     datAnnul( &rloc, status );
+     rloc = tmploc;
+  }
 
   /* map numericals them as vectorized _DOUBLEs */
   datMapV( fxloc, "_DOUBLE", "READ", &tpntr, &sizex, status );

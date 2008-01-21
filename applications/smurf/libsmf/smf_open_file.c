@@ -229,6 +229,7 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
   smfHead *hdr = NULL;       /* pointer to smfHead struct */
   smfDA *da = NULL;          /* pointer to smfDA struct, initialize to NULL */
 
+  HDSLoc *tloc = NULL;       /* Locator to the NDF JCMTSTATE extension */
   HDSLoc *xloc = NULL;       /* Locator to time series headers,
 				SCANFIT coeffs and DREAM parameters*/
 
@@ -456,7 +457,13 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
 	  ndfGtwcs( indf, &(hdr->tswcs), status );
 
 	  /* Need to get the location of the extension for STATE parsing */
-	  ndfXloc( indf, JCMT__EXTNAME, "READ", &xloc, status );
+	  ndfXloc( indf, JCMT__EXTNAME, "READ", &tloc, status );
+
+          /* Re-size the arrays in the JCMTSTATE extension to match the
+	  pixel index bounds of the NDF. The resized arrays are stored in
+	  a new temporary HDS object, and the old locator is annull. */
+          sc2store_resize_head( indf, &tloc, &xloc, status );
+
 	  /* And need to map the header making sure we have the right components
 	     for this instrument. */
           nframes = ndfdims[2];
@@ -464,7 +471,7 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
 
 	  /* Malloc some memory to hold all the time series data */
 	  hdr->allState = smf_malloc( nframes, sizeof(JCMTState),
-					 1, status );
+	                              1, status );
 
 	  /* Loop over each element, reading in the information */
 	  tmpState = hdr->allState;

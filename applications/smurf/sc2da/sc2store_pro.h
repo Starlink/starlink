@@ -443,6 +443,18 @@ const char *xmlfile,        /* name of CONFIGURE XML file (given) */
 int *status                 /* global status (given and returned) */
 );
 
- 
+
+/*+ sc2store_resize_head - modify JCMTSTATE arrays to take account of the
+                           NDF pixel origin. */
+
+void sc2store_resize_head
+(
+int indf,                /* Id. for NDF holding the JCMTSTATE extension */
+HDSLoc **xloc,           /* Locator for the JCMTSTATE extension (annuled on 
+                            exit) */
+HDSLoc **yloc,           /* Locator for new HDS object containing resized 
+                            arrays. */
+int *status              /* Global status (given and returned) */
+);
  
 #endif
