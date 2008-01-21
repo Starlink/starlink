@@ -34,7 +34,7 @@
 #  Copyright:
 #     Copyright (C) 2004-2005 Central Laboratory of the Research Councils
 #     Copyright (C) 2006-2007 Particle Physics & Astronomy Research Council
-#     Copyright (C) 2007 Science and Technology Facilities Council
+#     Copyright (C) 2007-2008 Science and Technology Facilities Council
 #     All Rights Reserved.
 
 #  Licence:
@@ -182,6 +182,12 @@ itcl::class gaia::GaiaCube {
             -command [code $this component_changed_]
       }
 
+      #  Slave toolbox. Send slice and spectral extraction updates to this.
+      #  Note content is dynamic and refreshed each time.
+      set submenu [menu $Options.slave]
+      $Options add cascade -label "Slaves" -menu $submenu
+      $submenu config -postcommand [code $this update_slave_menu_ $submenu]
+
       #  Add the coordinate selection menu (use global variable so we can
       #  share this).
       set SpectralCoords [add_menubutton "Coords" left]
@@ -302,8 +308,8 @@ itcl::class gaia::GaiaCube {
             -valuewidth $vwidth \
             -spec_coords [code $spec_coords_] \
             -component $component_ \
-            -transient_spectralplot $itk_option(-transient_spectralplot)
-
+            -transient_spectralplot $itk_option(-transient_spectralplot) \
+            -notify_cmd [code $this spectrum_moved_]
       }
       set ref_range_controls_($ref_ids) $itk_component(spectrum)
       pack $itk_component(spectrum) -side top -fill both -ipadx 1m -ipady 2m
@@ -618,10 +624,10 @@ itcl::class gaia::GaiaCube {
 
          #  Set up object to control units. Do this before axis change
          #  so that cube is available for units query.
-         $spec_coords_ configure -accessor $cubeaccessor_ 
+         $spec_coords_ configure -accessor $cubeaccessor_
 
          #  Now apply axis change.
-         $spec_coords_ configure -axis $axis 
+         $spec_coords_ configure -axis $axis
          $itk_component(axis) configure -value $axis
          set_step_axis_ $axis
 
@@ -837,6 +843,9 @@ itcl::class gaia::GaiaCube {
 
       #  Send event to GAIA3D toolboxes, if up and running.
       renderers_set_display_plane_
+
+      #  Send event to any slave toolboxes.
+      slave_set_display_plane_
    }
 
    #  Set the position of a reference line shown in the plot.
@@ -1126,7 +1135,7 @@ itcl::class gaia::GaiaCube {
    public method get_spec_coords {} {
       return $spec_coords_
    }
-   
+
    #  Return the spectral extraction limits in pixel indices. Empty string if
    #  not set (i.e. at bounds of data).
    public method get_extraction_limits {} {
@@ -1261,6 +1270,13 @@ itcl::class gaia::GaiaCube {
       return $coords
    }
 
+   #  Deal with movement of the spectrum. Listeners in the 3D and other slave
+   #  toolboxes may need updating.
+   protected method spectrum_moved_ {type desc} {
+      renderers_spectrum_moved_ $type $desc
+      slave_spectrum_moved_ $type $desc
+   }
+
    #  ============
    #  FITS headers
    #  ============
@@ -1306,7 +1322,7 @@ itcl::class gaia::GaiaCube {
             raise $itk_component($basename)
          } else {
             busy {
-               global ::gaiascreen 
+               global ::gaiascreen
                set gaiascreen "starpc1:0.0"
                make_${type}_toolbox $basename $clone
             }
@@ -1314,8 +1330,8 @@ itcl::class gaia::GaiaCube {
 
          #  Make sure we get the notifications about spectral extraction
          #  from GaiaCubeSpectrum (do this now to avoid overhead of callback).
-         $itk_component(spectrum) configure -notify_cmd \
-            [code $this renderers_spectrum_moved_]
+         #$itk_component(spectrum) configure -notify_cmd \
+         #   [code $this spectrum_moved_]
       }
    }
 
@@ -1396,11 +1412,11 @@ itcl::class gaia::GaiaCube {
 
    #  Update renderers to move the spectrum extraction visualisation.
    #   XXX handle reference spectrum XXX.
-   protected method renderers_spectrum_moved_ {type args} {
+   protected method renderers_spectrum_moved_ {type desc} {
       foreach name "isosurface volume" {
          if { [info exists itk_component($name) ] } {
             if { [winfo exists $itk_component($name) ] } {
-               eval $itk_component($name) set_spectral_line $type $args
+               eval $itk_component($name) set_spectral_line $type $desc
             }
          }
       }
@@ -1428,7 +1444,7 @@ itcl::class gaia::GaiaCube {
    public method get_region_spectrum_position {} {
       return [$itk_component(spectrum) get_region_position]
    }
-   
+
    #  Set the local current region to a description from GAIA3D. The
    #  updated description will include any changes (shifts).
    public method set_region_spectrum_position {desc} {
@@ -1453,6 +1469,95 @@ itcl::class gaia::GaiaCube {
          }
       }
       return $have_gaia3d_
+   }
+
+   #  Communication with other Cube toolboxes.
+   #  ========================================
+
+   #  Update the Options->slaves menu to show the currently available
+   #  cube toolboxes.
+   protected method update_slave_menu_ {menu} {
+
+      #  Clear existing items.
+      $menu delete 0 end
+
+      #  Purge the slaves_ array of any toolboxes that no longer exist,
+      #  or have been withdrawn.
+      if { [info exists slaves_] } {
+         foreach w [array names slaves_] {
+            if { ! [winfo exists $w] || [wm state $w] == "withdrawn" } {
+               unset slaves_($w)
+            }
+         }
+      }
+
+      #  Get list of cube toolboxes. Only show active ones. Note slaves_
+      #  is indexed by the widget name, not the object name (no leading ::).
+      set list [::itcl::find objects -class gaia::GaiaCube]
+      foreach tb $list {
+         if { $tb != $this } {
+            set w [string trimleft $tb ":"]
+            if { [wm state $w] != "withdrawn" } {
+               set i [$tb cget -number]
+               $menu add checkbutton \
+                  -onvalue 1 \
+                  -offvalue 0 \
+                  -variable [scope slaves_($w)] \
+                  -label $i \
+                  -command [code $this slave_changed_ $w]
+            }
+         }
+      }
+   }
+
+   #  Send message to slave toolboxes to match our slice position.
+   protected method slave_set_display_plane_ {} {
+      if { [info exists slaves_] } {
+         foreach w [array names slaves_] {
+            if { [winfo exists $w] && [wm state $w] != "withdrawn" } {
+               $w set_display_plane $plane_
+            } else {
+               unset slaves_($w)
+            }
+         }
+      }
+   }
+
+   #  Send message to enabled slave toolboxes to match our spectral extraction
+   #  position (note delay by 10ms to eat up repeats).
+   protected method slave_spectrum_moved_ {type desc} {
+      if { [info exists slaves_] } {
+         foreach w [array names slaves_] {
+            if { $slaves_($w) } {
+               if { [winfo exists $w] && [wm state $w] != "withdrawn" } {
+                  if { $type == "p" } {
+                     lassign $desc ix iy
+                     after 10 "$w set_point_spectrum_position $ix $iy"
+                  }
+               } else {
+                  unset slaves_($w)
+               }
+            }
+         }
+      }
+   }
+
+   #  Clear another toolbox making it definitely not our slave.
+   public method clear_slave {w} {
+      if { [info exists slaves_] && [info exists slaves_($w)] } {
+         set slaves_($w) 0
+      }
+   }
+
+   #  Called when the status of a slave toolbox is changed in the menu.
+   #  Send message to the selected toolbox that we cannot be a slave
+   #  for it, if selected as our slave.
+   protected method slave_changed_ {w} {
+      if { $slaves_($w) } {
+         if { [winfo exists $w] } {
+            $w clear_slave $w_
+         }
+      }
    }
 
    #  Configuration options: (public variables)
@@ -1576,6 +1681,9 @@ itcl::class gaia::GaiaCube {
 
    #  Object controlling the Go menu and cube history items.
    protected variable history_ {}
+
+   #  The slave toolboxes.
+   protected variable slaves_
 
    #  Common variables: (shared by all instances)
    #  -----------------
