@@ -8,6 +8,7 @@
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -28,10 +29,14 @@
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (JAC, Durham University)
 
 *  History:
 *     18-FEB-2006 (TIMJ):
 *         Original version.
+*     22-JAN-2008 (PWD):
+*         Add extended test of starCalloc to check more than one element
+*         can be initialised.
 
 *-
 */
@@ -45,6 +50,7 @@ int main( void )
   int i;
   int **p;
   int *q;
+  double *d;
 
   starMemInit();
   for (i = 0; i < 10000000; ++i)
@@ -56,6 +62,13 @@ int main( void )
      starFree( *p );
      starFree( p );
    }
+
+  d = starCalloc( 200, sizeof(double *));
+  for ( i = 0; i < 200; i++ ) 
+   {
+     assert(d[i] == 0.0);
+   }
+  starFree( d );
   return 0;
 }
 
