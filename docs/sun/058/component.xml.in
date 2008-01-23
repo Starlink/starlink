@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sun/058</path>
+  <description>IUEDA --- Access to the IUE data archive</description>
+  <abstract><p>
+     The International Ultraviolet Explorer satellite (IUE) is one of
+     the most successful, versatile and productive astronomical
+     satellites, providing ultraviolet spectra of a wide range of
+     sources for the whole astronomical community. The UK hosts one of
+     the three full archives of IUE data which is supported and
+     maintained by members of the UK IUE Project in the Space Science
+     Department at RAL. The archive comprises some 100,000 images,
+     and a catalogue which gives details of the exposures. The aim is
+     to provide UK astronomers with quick and painless access to IUE
+     data. This document describes how to interrogate the catalogue
+     and extract data from the archive.
+  </p></abstract>  
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>C. Lloyd</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1986--1995</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
