@@ -169,6 +169,8 @@
 *        Modified smf_iteratemap interface.
 *     2007-11-28 (EC):
 *        Fixed flag in smf_open_file
+*     2008-01-22 (EC):
+*        Added hitsmap to smf_iteratemap interface
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -484,7 +486,7 @@ void smurf_makemap( int *status ) {
 
     /* Call the low-level iterative map-maker */
     smf_iteratemap( igrp, keymap, outfset, moving, lbnd_out, ubnd_out,
-		    map, variance, weights, status );
+		    map, NULL, variance, weights, status );
   }
 
   /* Write WCS */

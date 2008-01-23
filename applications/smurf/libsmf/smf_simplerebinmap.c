@@ -14,8 +14,9 @@
 
 *  Invocation:
 *     smf_simplerebinmap( double *data, double *variance, int *lut, int dsize, 
-*			  int flags, double *map, double *mapvar, int msize, 
-*                         int *status )
+			 int flags, double *map, double *mapweight, 
+			 unsigned int *hitsmap, double *mapvar, int msize, 
+			 int *status ) {
 
 *  Arguments:
 *     data = double* (Given)
@@ -32,6 +33,8 @@
 *        The output map array 
 *     mapweight = double* (Returned)
 *        Relative weighting for each pixel in map
+*     hitsmap = unsigned int* (Returned)
+*        Number of samples that land in a pixel (ignore if NULL pointer)
 *     mapvar = double* (Returned)
 *        Variance of each pixel in map 
 *     msize = int (Given)
@@ -40,7 +43,9 @@
 *        Pointer to global status.
 
 *  Description:
-*     This function does a simple regridding of data into a map
+*     This function does a simple regridding of data into a map. If a 
+*     variance array is supplied it is used to calculated weights. Optionally
+*     return a hitsmap (number of samples that land in a pixel).
 *     
 *  Authors:
 *     Edward Chapin (UBC)
@@ -51,6 +56,8 @@
 *        Initial version.
 *     2006-08-16 (EC):
 *        Rebin the case that no variance array is given
+*     2008-01-22 (EC):
+*        Added hitsmap calculation
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -98,7 +105,8 @@
 
 void smf_simplerebinmap( double *data, double *variance, int *lut, int dsize, 
 			 int flags, double *map, double *mapweight, 
-			 double *mapvar, int msize, int *status ) {
+			 unsigned int *hitsmap, double *mapvar, int msize, 
+			 int *status ) {
 
   /* Local Variables */
   dim_t i;                   /* Loop counter */
@@ -108,9 +116,11 @@ void smf_simplerebinmap( double *data, double *variance, int *lut, int dsize,
 
   /* If this is the first data to be accumulated zero the arrays */
   if( (flags & AST__REBININIT) == AST__REBININIT ) { 
-    memset( map, 0, msize*sizeof(double) );
-    memset( mapweight, 0, msize*sizeof(double) );
-    memset( mapvar, 0, msize*sizeof(double) );
+    memset( map, 0, msize*sizeof(*map) );
+    memset( mapweight, 0, msize*sizeof(*mapweight) );
+    memset( mapvar, 0, msize*sizeof(*mapvar) );
+
+    if( hitsmap ) memset( hitsmap, 0, msize*sizeof(*hitsmap) );
   }
 
   if( variance ) {
@@ -120,7 +130,10 @@ void smf_simplerebinmap( double *data, double *variance, int *lut, int dsize,
       if( (lut[i] != VAL__BADI) && (data[i] != VAL__BADD) && 
           (variance[i] != VAL__BADD) && (variance[i] != 0) ) {        
         map[lut[i]] += data[i]/variance[i];
-        mapweight[lut[i]] += 1/variance[i];
+        mapweight[lut[i]] += 1/variance[i];  
+
+	/* If hitsmap array provided, accumulate hits */
+	if( hitsmap ) hitsmap[lut[i]] ++;
       }
     }
   } else {
@@ -130,6 +143,9 @@ void smf_simplerebinmap( double *data, double *variance, int *lut, int dsize,
       if( (lut[i] != VAL__BADI) && (data[i] != VAL__BADD) ) {
         map[lut[i]] += data[i];
         mapweight[lut[i]] ++;
+
+	/* If hitsmap array provided, accumulate hits */
+	if( hitsmap ) hitsmap[lut[i]] ++;
       }
     }
   }

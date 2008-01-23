@@ -221,6 +221,8 @@
 *        Added argument "alignsys" to smf_cubegrid.
 *     2008-1-21 (DSB):
 *        Added argument "polobs" to smf_cubebounds and smf_sparsebounds.
+*     2008-01-22 (EC):
+*        Added hitsmap to smf_simplerebinmap, smf_iteratemap
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -479,8 +481,8 @@ inst_t smf_inst_get( const smfHead * hdr, int * status );
 void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, 
 		     AstFrameSet *outfset, int moving, 
 	             int *lbnd_out, int *ubnd_out,
-		     double *map, double *mapvar, double *weights,
-		     int *status );
+                     double *map, unsigned int *hitsmap, double *mapvar, 
+		     double *weights, int *status );
 
 void * smf_malloc( size_t nelem, size_t bytes_per_elem, int zero, 
                    int * status );
@@ -542,7 +544,8 @@ void smf_scanfit( smfData *data, int order, int *status );
 
 void smf_simplerebinmap( double *data, double *variance, int *lut, int dsize, 
 			 int flags, double *map, double *mapweight, 
-			 double *mapvar, int msize, int *status );
+			 unsigned int *hitsmap, double *mapvar, int msize, 
+			 int *status );
 
 void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim, 
 		      int dims[], int nsampcycle, int vxmin, int vymin, 

@@ -16,8 +16,8 @@
 *     smf_iteratemap( Grp *igrp, AstKeyMap *keymap, 
 *                    AstFrameSet *outfset, int moving, 
 *	             int *lbnd_out, int *ubnd_out,
-*                    double *map, double *mapvar, double *weights,
-*		     int *status );
+*                    double *map, unsigned int *hitsmap, double *mapvar, 
+*                    double *weights, int *status );
 
 *  Arguments:
 *     igrp = Grp* (Given)
@@ -34,6 +34,8 @@
 *        (if outfset specified) 
 *     map = double* (Returned)
 *        The output map array 
+*     hitsmap = unsigned int* (Returned)
+*        Number of samples that land in a pixel (ignore if NULL pointer)
 *     mapvar = double* (Returned)
 *        Variance of each pixel in map
 *     weights = double* (Returned)
@@ -105,6 +107,8 @@
 *        -modified smf_calc_mapcoord interface
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     2008-01-22 (EC):
+*        Added hitsmap to interface
 
 *  Notes:
 
@@ -157,8 +161,8 @@
 void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, 
 		     AstFrameSet *outfset, int moving, 
 	             int *lbnd_out, int *ubnd_out,
-		     double *map, double *mapvar, double *weights,
-		     int *status ) {
+                     double *map, unsigned int *hitsmap, double *mapvar, 
+		     double *weights, int *status ) {
 
   /* Local Variables */
   smfArray **ast=NULL;          /* Astronomical signal */
@@ -538,7 +542,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	    
 	    /* Rebin the residual + astronomical signal into a map */
 	    smf_simplerebinmap( res_data, NULL, lut_data, dsize,
-				rebinflags, map, weights, mapvar,
+				rebinflags, map, weights, hitsmap, mapvar,
 				msize, status );
 	  }
 	}
