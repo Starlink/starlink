@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="sun1">
+  <version>24</version>
+  <path>docs/sun/001</path>
+  <description>STARLINK Software Collection}</description>
+  <abstract><p>
+    The Starlink Software Collection is a set of software which is
+    managed and distributed by the Starlink Project.  Some of the
+    software was written by members of the Project, but some of it
+    comes from outside the Project.  This note describes the functions
+    of the individual items in the Collection and provides an overview
+    of the software so that readers can identify the items they need.
+
+    The software is classified into four main divisions:
+
+    Packages -- are large collections of programs for people who want
+    to analyse, convert, and display data.  They are subdivided into
+    eleven classes to help you find what you want.
+
+    Utilities -- are small programs devoted to a specific purpose.
+    For example, they help you prepare for observations, write
+    documents, and write programs.
+
+    Subroutine Libraries -- are for programmers writing astronomical
+    software.  They provide facilities such as astronomical
+    calculations, data management and graphics.
+
+    Infrastructure -- are items which are mainly of interest to people
+    writing programs within the Starlink Software Environment.  They
+    are included for completeness.
+
+    Each item is described in sufficient detail for you to decide
+    whether or not to investigate it further. If you want to find out
+    more about an item, follow the document references given opposite
+    the item name. If you are using the hypertext version of this
+    document, the most up-to-date document references can be found by
+    following the link from the software item name.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>ed. S.E. Rankin</name>
+    </person>
+  </developers>
+  <documentation> sun1</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1980--2003</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
