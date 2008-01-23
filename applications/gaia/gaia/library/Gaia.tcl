@@ -272,7 +272,7 @@ itcl::class gaia::Gaia {
    }
 
    # Restore the position of the top level window from the previous
-   # session, or not depending on mode and whether an explicit value 
+   # session, or not depending on mode and whether an explicit value
    # has been given on the command-line (0x0 resets to default size).
    protected method load_toplevel_geometry {} {
       if { $itk_option(-tabbedgaia) } {
@@ -420,8 +420,8 @@ itcl::class gaia::Gaia {
       }
 
       #  Set the blank and background colours for the first time.
-      set_blankcolour_ $itk_option(-blank_color)
-      set_image_background_ $itk_option(-image_background)
+      set_blankcolour
+      set_image_background
 
       #  If looking out for cubes to autoload. Start doing that now
       #  after the initial file_loaded_.
@@ -680,7 +680,7 @@ itcl::class gaia::Gaia {
             -variable [scope itk_option(-blank_color)] \
             -value $colour \
             -label {    } \
-            -command [code $this set_blankcolour_ $colour]
+            -command [code $this set_blankcolour $colour]
       }
 
       insert_menuitem $m $index cascade "Image background" \
@@ -692,7 +692,7 @@ itcl::class gaia::Gaia {
             -variable [scope itk_option(-image_background)] \
             -value $colour \
             -label {    } \
-            -command [code $this set_image_background_ $colour]
+            -command [code $this set_image_background $colour]
       }
 
       #  UKIRT quick look likes to attach to camera immediately.
@@ -1369,8 +1369,8 @@ itcl::class gaia::Gaia {
       }
 
       #  Restore the blank colour and background.
-      set_blankcolour_ $itk_option(-blank_color)
-      set_image_background_ $itk_option(-image_background)
+      set_blankcolour
+      set_image_background
 
       if { ! $itk_option(-check_for_cubes) } {
          return
@@ -1707,12 +1707,18 @@ itcl::class gaia::Gaia {
    public method get_image {} { return $image_ }
 
    #  Set the colour of the main canvas background.
-   protected method set_image_background_ {colour} {
+   public method set_image_background {{colour {}}} {
+      if { $colour == {} } {
+         set colour $itk_option(-image_background)
+      }
       [$image_ get_canvas] configure -background $colour
    }
 
    #  Set the colour of the any blank pixels.
-   protected method set_blankcolour_ {colour} {
+   public method set_blankcolour {{colour {}}} {
+      if { $colour == {} } {
+         set colour $itk_option(-blank_color)
+      }
       [$image_ get_image] blankcolor $colour
    }
 
