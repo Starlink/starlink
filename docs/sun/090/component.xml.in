@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sun/090</path>
+  <description>SNX --- Starlink Extensions to the NCAR Graphics Utilities</description>
+  <abstract><p>
+     The NCAR graphics suite (SUN/88) consists of a set of subprograms
+     which can be used to produce complete graphs in a variety of
+     formats.  The package has been in wide use for some years; the
+     latest version employs the ISO standard GKS interfaces for its
+     low-level plotting, giving it access to all Starlink graphics
+     devices, present and future.
+
+     The NCAR routines themselves are thoroughly documented, and just
+     a few simple calls will produce graphs of excellent appearance.
+     The package also provides a high level of flexibility, with
+     dozens of different details of the plot independently
+     controllable to give exactly the result required.  However,
+     beginners may be daunted by the mass of features offered, and
+     unless they take the extreme step of reading the manual may give
+     up before they realise what the package can do for them.  This
+     document describes minor extensions which provide more convenient
+     access to certain features without sacrificing flexibility.
+
+     The AUTOGRAPH part of the NCAR suite, used in conjunction with
+     the Starlink NCAR extensions and the Starlink low level plotting
+     package SGS (SUN/85), offers an alternative high level system to
+     PGPLOT (SUN/15) for producing graphs of one variable plotted
+     against another. All of the Starlink extensions provided within
+     SNX enhance the power of the facilities provided by AUTOGRAPH and
+     make it more accessible to the beginner.
+  </p></abstract>  
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>P C T Rees</name>
+      <name>M J Bly</name>
+      <name>P T Wallace</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1987,1988,1989,1990,1991,1992,1993,1994,1995</year>
+    <name>PPARC</name>
+  </copyright>
+</component>
