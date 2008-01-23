@@ -14,7 +14,7 @@
     annotated axes and direction vectors. The scene is fully interactive and
     can be manipulated to view regions of interest, as well as move the
     current slice and spectrum. Readout of the celestial and spectral
-    coordinates are also available (these work with the visualised
+    coordinates are also available (these work in the plane of the visualised
     slice). Finally it is also possible to display iso-surfaces of other cubes
     into the same scene for intercomparison purposes. See the "View" menu of
     the cube toolbox. 
@@ -29,6 +29,10 @@
     been added. This arranges for newly loaded images to fit the main window
     (unlike "Auto scale" this happens just once and control of the zoom
     remains active). Also available as a persistent startup option.
+
+    A cube toolbox can now couple the position of its slice and spectral
+    extraction to another toolbox so that cubes of the same size can be
+    inspected concurrently. See the "Options" menu of a cube toolbox.
 
     The cube toolbox can now read an ARD region from a file.
 

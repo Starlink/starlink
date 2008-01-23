@@ -334,6 +334,21 @@
       slow software rendering will be used.
     <p>
 
+    <h3>Comparing cubes</h3>
+    <p>
+      Sometimes you'll want to inspect two related data cubes. There are two
+      ways to do this. The first is to use one of the volume visualisation
+      tools to draw iso-surfaces from the second cube over the first, the
+      second is to display the second cube in a GAIA clone (use the
+      <tt>File->New Window</tt> item in the main window) and then to select
+      that clone as a slave. Do this using the <tt>Options->Slaves</tt> menu.
+      At present a slave will use the same indices for positioning the slice
+      and extracting a spectrum, so the cubes must have the same dimensions.
+      Note a slave must already be extracting a spectrum for that control to
+      work and a slave cannot enslave its master (that will force the master
+      to drop the slave).
+    </p>
+
     <h3>Data formats and efficiency</h3>
     <p>
       The toolbox should handle both NDF and FITS data cubes with more-or-less
