@@ -224,7 +224,7 @@ itcl::class gaia::StarArdTool {
       destroy $w
    }
 
-   #  Parse the ARD description and create the necessary regions.
+   #  Parse the ARD description in a file and create the necessary regions.
    method read_description {filename} {
       if { [file readable $filename] } {
          set fid [open $filename r]
@@ -314,6 +314,21 @@ itcl::class gaia::StarArdTool {
    #  Set the description of the selected region (first if more than one).
    method set_selected_description {desc} {
       $object_list_ set_selected_description $desc
+   }
+
+   #  Find an ARD region that matches the given description and make it
+   #  the currently selected region.
+   method match_description {desc} {
+      return [$object_list_ match_description $desc]
+   }
+
+   #  Parse an ARD description stored in a single string and create the
+   #  region.
+   method parse_description {desc} {
+      #  Create the required ARD region.
+      if { ![$object_list_ createard $desc] } {
+         error "Unable to interpret \"$desc\" as an ARD region."
+      }
    }
 
    #  Create an ARD region of the given type.

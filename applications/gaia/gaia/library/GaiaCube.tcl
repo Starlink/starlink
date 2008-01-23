@@ -1533,6 +1533,8 @@ itcl::class gaia::GaiaCube {
                   if { $type == "p" } {
                      lassign $desc ix iy
                      after 10 "$w set_point_spectrum_position $ix $iy"
+                  } else {
+                     after 10 "$w set_region_spectrum_position $desc"
                   }
                } else {
                   unset slaves_($w)

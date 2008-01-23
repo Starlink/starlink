@@ -246,16 +246,13 @@ itcl::class gaia::StarArdList {
       return $desc
    }
 
-   #  Set the description of the selected object (first if more than one).
+   #  Set the description of the list selected object.
    method set_selected_description {desc} {
-      for {set i 1} {$i <= $highest_index_} {incr i} {
-         if { [info exists objects_($i)] } {
-            if { [$objects_($i) is_selected] } {
-               $objects_($i) setard $desc
-               return
-            }
-         }
+      if { [info exists objects_($selected_)] } {
+         $objects_($selected_) setard $desc
+         return 1
       }
+      error "no selected region"
    }
 
    #  Get the description of the currently selected objects as a string.
@@ -295,6 +292,39 @@ itcl::class gaia::StarArdList {
       } else {
          error "Unknown ARD region type \"$type\""
       }
+   }
+
+   #  Find an ARD region that matches the given description and make it
+   #  the locally selected region (not graphics).
+   method match_description {desc} {
+      set shape [gaia::StarArdPrim::get_ard_region $desc]
+      set type [string tolower $shape]
+      foreach f $known_types_ {
+         if { [string compare -nocase -length 4 $shape $f] == 0 } {
+            set type [string tolower $f]
+         }
+      }
+
+      #  Selected region first.
+      if { [info exists objects_($selected_)] } {
+         set f [$objects_($selected_) cget -mode]
+         if { [string compare -nocase -length 4 $type $f] == 0 } {
+            return 1
+         }
+      }
+
+      #  Search rest.
+      for {set i 1} {$i <= $highest_index_} {incr i} {
+         if { [info exists objects_($i)] } {
+            set f [$objects_($i) cget -mode]
+            if { [string compare -nocase -length 4 $type $f] == 0 } {
+               set selected_ $i
+               $canvasdraw deselect_objects
+               return 1
+            }
+         }
+      }
+      return 0
    }
 
    #  Method to deal with object creation confirmation.

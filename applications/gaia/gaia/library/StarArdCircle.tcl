@@ -127,6 +127,7 @@ itcl::class gaia::StarArdCircle {
                configure -coords "$x $y"
                configure -rad $rad
                set failed 0
+               set_radius_
             }
          }
          if { $failed } {

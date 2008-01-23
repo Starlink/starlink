@@ -132,6 +132,7 @@ itcl::class gaia::StarArdEllipse {
                configure -semiminor $smin 
                configure -angle $sang
                set failed 0
+               set_size_
             }
          }
          if { $failed } { 

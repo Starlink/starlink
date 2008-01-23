@@ -457,7 +457,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       if { $action == "localstart" } {
          busy {
             $spectrum_ display $cubeaccessor $axis $alow $ahigh $ix $iy 1
-         }
+         } 0
 
          #  Set first-time position of the main reference line. This is
          #  the position of the current image slice.
@@ -475,7 +475,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       } else {
          busy {
             $spectrum_ display $cubeaccessor $axis $alow $ahigh $ix $iy 0
-         }
+         } 0
       }
 
       #  Display the current coordinate for reference.
@@ -495,11 +495,17 @@ itcl::class gaia::GaiaCubeSpectrum {
    }
 
    #  Set the position of the point extracted spectrum, if extraction is
-   #  enabled. The position is in image coordinates (not pixel).
+   #  enabled. The position is in image coordinates (not pixel). Note
+   #  if spectrum is enabled, but we're not extraction a position, that is
+   #  started. 
    public method set_point_position {ix iy} {
-      if { $spectrum_ != {} && $last_cxcy_ != {} } {
+      if { $spectrum_ != {} } {
          $rtdimage_ convert coords $ix $iy image sx sy screen
-         display_point_spectrum_ "localdrag" $sx $sy
+         if { $last_cxcy_ != {} } {
+            display_point_spectrum_ "localdrag" $sx $sy
+         } else {
+            display_point_spectrum_ "localstart" $sx $sy
+         }
       }
    }
 
@@ -533,10 +539,27 @@ itcl::class gaia::GaiaCubeSpectrum {
       return ""
    }
 
-   #  Set the ARD region of the extracted spectrum.
+   #  Set the ARD region of the extracted spectrum. The basic types may not
+   #  match so this can fail. Just handle that silently and hope the message
+   #  gets through.
    public method set_region_position {region} {
-      #  Need to access the underlying ARD shape, so get it.
-      $toolbox_ set_selected_description $region
+      if { $spectrum_ != {} } {
+         if { [catch {$toolbox_ set_selected_description $region} ] } {
+
+            #  Simple set failed, look for a suitable shape or create one.
+            if { [$toolbox_ match_description $region] } {
+               $toolbox_ set_selected_description $region
+            } else {
+               #  Create new shape.
+               $toolbox_ parse_description $region
+            }
+            
+            #  And extract the spectrum.
+            display_region_spectrum_ localstart $region
+         } else {
+            display_region_spectrum_ localdrag $region
+         }
+      }
    }
 
    #  Display a region spectrum in the local plot. Action can be "localstart"
@@ -569,7 +592,7 @@ itcl::class gaia::GaiaCubeSpectrum {
          busy {
             $spectrum_ display_region $cubeaccessor $axis $alow $ahigh \
                $region $combination_type_ 1
-         }
+         } 0
 
          #  Set first-time position of the main reference line. This is
          #  the position of the current image slice.
@@ -588,7 +611,7 @@ itcl::class gaia::GaiaCubeSpectrum {
          busy {
             $spectrum_ display_region $cubeaccessor $axis $alow $ahigh \
                $region $combination_type_ 0
-         }
+         } 0
       }
 
       #  Cannot display the current coordinate, so make sure it is empty.
@@ -769,7 +792,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       set axis [$itk_option(-gaiacube) get_axis]
       busy {
          $spectrum_ display_reference $cubeaccessor $axis $alow $ahigh $ix $iy
-      }
+      } 0
 
       #  Re-create the marker for the image position, if needed.
       if { $ref_position_mark_ == {} } {
@@ -807,7 +830,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       busy {
          $spectrum_ display_region_reference $cubeaccessor $axis $alow $ahigh \
             $region $combination_type_
-      }
+      } 0
 
       #  Reference position marker doesn't apply.
       if { $ref_position_mark_ != {} } {

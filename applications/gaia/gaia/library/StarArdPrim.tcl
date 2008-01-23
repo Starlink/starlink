@@ -268,6 +268,15 @@ itcl::class gaia::StarArdPrim {
       }
    }
 
+   #  Return the ARD region shape from "shape(a1,a2..)".
+   public proc get_ard_region {desc} {
+      #  Replace all delimeters with spaces.
+      regsub -all {\(|,|\)} $desc { } desc
+
+      #  Return first word.
+      return [lindex $desc 0]
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
    public variable unary_operator {} {}

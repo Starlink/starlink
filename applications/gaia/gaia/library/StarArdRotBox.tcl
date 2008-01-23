@@ -132,6 +132,7 @@ itcl::class gaia::StarArdRotBox {
                configure -minor $min
                configure -angle $ang
                set failed 0
+               set_size_
             }
          }
          if { $failed } {
