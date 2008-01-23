@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sun/162</path>
+  <description>A Guide to Astronomical Catalogues, Databases and Archives available through Starlink</description>
+  <abstract><p>
+     This note is a guide to the astronomical catalogues, databases
+     and archives which are either available on Starlink computers or
+     which can be accessed from Starlink computers. It also describes
+     the Starlink software for manipulating catalogues and tables. A
+     brief description is given of each facility or software item.
+  </p></abstract>  
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>A C Davenhall</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1993</year>
+    <name>CCLRC</name>
+  </copyright>
+</component>
