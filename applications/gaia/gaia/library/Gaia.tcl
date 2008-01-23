@@ -174,6 +174,7 @@ Options:
  -file <file>             - image file to load.
  -float_panel <bool>      - put info panel in a popup window (default: 0).
  -focus_follows_mouse <bool> - entry focus follows mouse (default: 0).
+ -geometry <wxh+x+y>      - geometry of the main window (default: last session).
  -linear_cartesian <bool> - assuming CAR projections are a linear mapping (default: 1).
  -interop_menu <bool>     - reveal interop menu for PLASTIC interactions (default: 1).
  -isize <n>               - search box for centroiding (default: 9).
@@ -271,16 +272,23 @@ itcl::class gaia::Gaia {
    }
 
    # Restore the position of the top level window from the previous
-   # session, or not depending on mode.
+   # session, or not depending on mode and whether an explicit value 
+   # has been given on the command-line (0x0 resets to default size).
    protected method load_toplevel_geometry {} {
       if { $itk_option(-tabbedgaia) } {
          return
       }
-      if {[catch {set fd [::open $toplevel_geometry_]}]} {
-         return
+      if { [info exists ::geometry] } {
+         if { $::geometry != "0x0" } {
+            catch {wm geometry $w_ $::geometry}
+         }
+      } else {
+         if {[catch {set fd [::open $toplevel_geometry_]}]} {
+            return
+         }
+         catch {wm geometry $w_ [gets $fd]}
+         ::close $fd
       }
-      catch {wm geometry $w_ [gets $fd]}
-      ::close $fd
    }
 
    #  Quit the application. Really....
