@@ -1,5 +1,11 @@
+  Huma Release
+  ============
+   
+    Version 4.2-1
+    =============
+
     GAIA-3D volume visualisation extension.
-    =======================================
+    ---------------------------------------
     
     New facilities for visualising data cubes have been developed for
     GAIA. These include the facility to display 3D iso-surfaces and also to do
@@ -92,6 +98,8 @@
 
     The scale factor used in the pick object zoom window is now a command-line
     and startup option.
+
+    A -geometry command-line option is now available. 
 
   Puana Release:
   ==============
