@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sun/093</path>
+  <description>TeX --- A superior document preparation system</description>
+  <abstract><p>
+    TeX is an extremely flexible computer type-setting system designed
+    by Donald Knuth. The full capabilities of TeX are described by
+    its creator in `The TeX book' with the help of which the
+    enthusiastic TeX user can produce elaborate documents of almost
+    limitless complexity. However, unadventurous users can produce
+    ordinary documents with a minimum of effort; simple Runoff
+    files for example can be edited into TeX format very easily.
+
+    This manual is an introduction to the use of TeX on Starlink
+    machines.
+  </p></abstract>  
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Jo Murray</name>
+      <name>Ann Charles</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1989,1990,1995</year>
+    <name>SERC</name>
+  </copyright>
+</component>
