@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="sun120">
+  <version>3</version>
+  <path>docs/sun/120</path>
+  <description>CATPAC --- Catalogue Applications Package on UNIX</description>
+  <abstract><p>
+    CATPAC is the STARLINK Catalogue and Table Package. This document
+    describes the CATPAC applications available on UNIX. These include
+    applications for inputing, processing and reporting tabular data
+    including astronomical catalogues.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>A R Wood</name>
+    </person>
+  </developers>
+  <documentation> sun120</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1991,1993,1994</year>
+    <name>DRAL</name>
+  </copyright>
+</component>
