@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sun/082</path>
+  <description>IRAS --- Data Products Prime</description>
+  <abstract><p>
+     The purpose of this note is to introduce the IRAS data products,
+     describe how to gain access or obtain copies of selected data,
+     and to guide potential users to Starlink software and
+     documentation which can help in the analysis of the data.
+  </p></abstract>  
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>D.C. Parsons</name>
+      <name>H J Walker</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1987,1989,1992,1993</year>
+    <name>SERC</name>
+  </copyright>
+</component>
