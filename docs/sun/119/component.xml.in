@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sun/119</path>
+  <description>CHI --- Catalogue Handling Interface</description>
+  <abstract><p>
+     The CHI (Catalogue Handling Interface) and CHP (Catalogue
+     Handling Plus) routines provide access to the STARLINK database
+     systems. Applications written using the CHI and CHP routines will
+     run on the current STARLINK database (ADC) and any future
+     STARLINK database systems.
+  </p></abstract>  
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>A R Wood</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1991,1992</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
