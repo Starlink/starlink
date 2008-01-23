@@ -31,6 +31,7 @@
 # P.W.Draper      09 May 07  Make HelpWin class a public common variable
 #                            so it can be changed (not possible to sub-
 #                            class and override).
+#                 23 Jan 08  Make focus control is busy method optional.
 
 
 itk::usual TopLevelWidget {}
@@ -249,15 +250,17 @@ itcl::class util::TopLevelWidget {
 	    
     # run the given tcl command in the scope of this class
     # while displaying the (blt) busy cursor in the toplevel
-    # window
+    # window, if defocus is false don't handle focussing.
 
-    public method busy {cmd} {
+    public method busy {cmd {defocus 1}} {
 	global ::errorInfo ::errorCode
 	if {[incr busy_count_] == 1} {
             #  First busy level so record current focus and move it out
             #  of the window.
-            set oldfocus [focus -displayof $w_]
-	    catch {focus .}
+            if { $defocus } {
+               set oldfocus [focus -displayof $w_]
+	       catch {focus .}
+            }
 	    blt::busy hold $w_
 	    update idletasks
 	}
@@ -272,13 +275,15 @@ itcl::class util::TopLevelWidget {
         # (doing this can cause unexpected grabs).
         if {[incr busy_count_ -1] == 0} {
             blt::busy release $w_
-            if { $oldfocus != "" && [winfo exists $oldfocus]} {
-                set lastfocus $oldfocus
-            } else {
-                set lastfocus [focus -lastfor $w_]
-            }
-            if { $lastfocus != $w_ } {
-                catch {focus $lastfocus}
+            if { $defocus } {
+               if { $oldfocus != "" && [winfo exists $oldfocus]} {
+                  set lastfocus $oldfocus
+               } else {
+                  set lastfocus [focus -lastfor $w_]
+               }
+               if { $lastfocus != $w_ } {
+                  catch {focus $lastfocus}
+              }
             }
         }
 
