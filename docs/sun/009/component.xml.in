@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sun/009</path>
+  <description>LaTeX --- A Document Preparation System</description>
+  <abstract><p>
+    This is a guide to the LaTeX facilities available on Starlink. It
+    gives a brief description of how LaTeX works. It also tells how
+    to display or print the document, and how to include a PostScript
+    file.
+  </p></abstract>  
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Anne Charles</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1987--1997</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
