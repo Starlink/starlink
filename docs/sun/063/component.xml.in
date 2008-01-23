@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sun/063</path>
+  <description></description>
+  <abstract><p>
+     SPAG is a program for unscrambling `spaghetti' Fortran code by
+     re-ordering blocks of statements in such a way that the structure
+     of the Fortran is improved, whilst remaining logically equivalent
+     to the original program. The result improves the readability and
+     maintainability of badly-written Fortran.
+  </p></abstract>  
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Paul Rees</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1988,1989,1992</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
