@@ -2276,8 +2276,14 @@ window gives you access to this."
    #  Zoom factor used in the pick object window.
    itk_option define -pick_zoom_factor pick_zoom_factor Pick_Zoom_Factor 10
 
-   #  Additional text for title bar (expected use is identifying amongst instances).
-   itk_option define -ident ident Ident {}
+   #  Additional text for title bar (expected use is identifying amongst
+   # instances). 
+   itk_option define -ident ident Ident {} {
+       if { [info exists image_] } {
+          $image_ configure -ident $itk_option(-ident)
+          $image_ update_title
+       }
+   }
 
    #  Colour for blank pixels. Usually black.
    itk_option define -blank_color blank_color Blank_Colour black
