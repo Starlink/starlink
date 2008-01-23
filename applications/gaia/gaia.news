@@ -89,8 +89,8 @@
     Using it in combination with the control and shift keys gives horizontal
     scrolling (also available for horizontal wheels) and zooming.
 
-    A bug open FITS cubes with sizes greater than 2Gb has been fixed. Previously
-    these could be reported as having no dimensions.
+    A bug open FITS cubes with sizes greater than 2Gb has been fixed. 
+    Previously these could be reported as having no dimensions.
 
     The time needed to open some NDFs with very large lookup tables in their 
     WCS has been significantly decreased.
@@ -103,7 +103,13 @@
     The scale factor used in the pick object zoom window is now a command-line
     and startup option.
 
-    A -geometry command-line option is now available. 
+    A -geometry command-line option is now available. This uses the standard
+    X11 syntax, widthxheight+xoffset+yoffset.
+
+    Other new command-line options, -blank_color, -image_background and 
+    -ident, which set the blank pixel colour and the background colour
+    of the main window. -ident adds a string to the window title so that
+    different instances of GAIA may be distinguished.
 
   Puana Release:
   ==============

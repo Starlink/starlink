@@ -16,6 +16,7 @@
 #  Copyright:
 #     Copyright (C) 1997-2005 Central Laboratory of the Research Councils.
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2008 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -68,9 +69,9 @@ endif
 
 #  Now start up the application proper. 
 if ( $?GAIA_DIR ) then 
-   $GAIA_DIR/gaia.sh "$1" $argv[2-]
+   eval $GAIA_DIR/gaia.sh "$1" $argv[2-]
 else if ( -e /star/bin/gaia/gaia.sh ) then 
-   /star/bin/gaia/gaia.sh "$1" $argv[2-]
+   eval /star/bin/gaia/gaia.sh "$1" $argv[2-]
 else 
    echo Sorry cannot find GAIA anywhere on your system
 endif

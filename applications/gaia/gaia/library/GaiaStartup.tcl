@@ -233,6 +233,9 @@ itcl::class gaia::GaiaStartup {
       set values_($this,labelfont) $::gaia_fonts(labelfont)
       set values_($this,textfont) $::gaia_fonts(textfont)
       set values_($this,wcsfont) $::gaia_fonts(wcsfont)
+
+      set values_($this,blank_color) black
+      set values_($this,image_background) black
    }
 
    #  Update the properties object to the local values and cause a
@@ -245,7 +248,8 @@ itcl::class gaia::GaiaStartup {
                    min_scale max_scale zoom_factor default_cut default_cmap \
                    default_itt linear_cartesian always_merge check_for_cubes \
                    isize maxshift autoscale autofit \
-                   labelfont textfont wcsfont pick_zoom_factor" {
+                   labelfont textfont wcsfont pick_zoom_factor \
+                   blank_color image_background" {
          $props_ set_named_property Gaia $key $values_($this,$key)
       }
       $props_ save_properties
@@ -283,6 +287,11 @@ itcl::class gaia::GaiaStartup {
             $values_($this,autoscale)
          $itk_option(-gaia) configure -autofit \
             $values_($this,autofit)
+
+         $itk_option(-gaia) configure -blank_color \
+            $values_($this,blank_color)
+         $itk_option(-gaia) configure -image_background \
+            $values_($this,image_background)
       }
    }
 
@@ -663,6 +672,45 @@ itcl::class gaia::GaiaStartup {
          {Default colourmap (requires restart)}
       pack $itk_component(defaultcmap) -side top -fill x -expand 0
 
+      #  Blank pixel colour.
+      itk_component add blankcolour {
+         LabelMenu $w_.blankcolour \
+            -text "Blank colour:" \
+            -labelwidth $lwidth \
+            -variable [scope values_($this,blank_color)]
+      }
+      foreach colour $colours_ {
+         $itk_component(blankcolour) add \
+            -label {    } \
+            -value $colour \
+            -background $colour \
+            -command [code $this set_value_ blank_color $colour]
+      }
+      add_short_help $itk_component(blankcolour) \
+         {Colour for blank pixels (requires restart)}
+      pack $itk_component(blankcolour) -side top -fill x -expand 0
+      $itk_component(blankcolour) configure -value $values_($this,blank_color)
+
+      #  Image background colour.
+      itk_component add backgroundcolour {
+         LabelMenu $w_.backgroundcolour \
+            -text "Background colour:" \
+            -labelwidth $lwidth \
+            -variable [scope values_($this,image_background)]
+      }
+      foreach colour $colours_ {
+         $itk_component(backgroundcolour) add \
+            -label {    } \
+            -value $colour \
+            -background $colour \
+            -command [code $this set_value_ image_background $colour]
+      }
+      add_short_help $itk_component(backgroundcolour) \
+         {Colour for main image background (requires restart)}
+      pack $itk_component(backgroundcolour) -side top -fill x -expand 0
+      $itk_component(backgroundcolour) configure \
+         -value $values_($this,image_background)
+
       #  Fonts, label, text and WCS.
       itk_component add labelfont {
          LabelEntry $w_.labelfont \
@@ -721,6 +769,14 @@ itcl::class gaia::GaiaStartup {
 
    #  The GaiaProperties object. Just one instance of this.
    protected variable props_ {}
+
+   #  Offered colours of the main background and blank pixels.
+   protected variable colours_ {
+      white
+      grey90 grey80 grey70 grey60 grey50 grey40 grey30 grey20 grey10
+      black
+      red green blue cyan magenta yellow
+   }
 
    #  Common variables: (shared by all instances)
    #  -----------------

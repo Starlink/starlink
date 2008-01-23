@@ -458,7 +458,7 @@ itcl::class gaia::GaiaImageCtrl {
    public method update_title {} {
       set file "[file tail [$image_ fullname]]"
       set w [winfo toplevel $w_]
-      wm title $w "$itk_option(-appname): $file ([$w cget -number])"
+      wm title $w "$itk_option(-ident)$itk_option(-appname): $file ([$w cget -number])"
       wm iconname $w $file
    }
 
@@ -1256,6 +1256,9 @@ itcl::class gaia::GaiaImageCtrl {
    #  Command to execute if a FITS cube is browsed in a HDU. Will be
    #  trailed by the qualified file specification.
    itk_option define -cube_cmd cube_cmd Cube_Cmd {}
+
+   #  Additional text for the title. Used to mark different instances.
+   itk_option define -ident ident Ident {}
 
    #  Protected variables:
    #  ====================

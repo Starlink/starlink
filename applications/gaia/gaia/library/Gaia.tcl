@@ -419,6 +419,10 @@ itcl::class gaia::Gaia {
          cmdtrace on notruncate [::open "GaiaDebug.log" w]
       }
 
+      #  Set the blank and background colours for the first time.
+      set_blankcolour_ $itk_option(-blank_color)
+      set_image_background_ $itk_option(-image_background)
+
       #  If looking out for cubes to autoload. Start doing that now
       #  after the initial file_loaded_.
       if { $itk_option(-check_for_cubes) } {
@@ -557,7 +561,8 @@ itcl::class gaia::Gaia {
             -linear_cartesian $itk_option(-linear_cartesian) \
             -always_merge $itk_option(-always_merge) \
             -show_hdu_chooser $itk_option(-show_hdu_chooser) \
-            -default_cut $itk_option(-default_cut)
+            -default_cut $itk_option(-default_cut) \
+            -ident $itk_option(-ident)
       }
 
       #  Keep a list of SkyCat/GAIA instances.
@@ -672,7 +677,7 @@ itcl::class gaia::Gaia {
       foreach colour $colours_ {
          $m.blank add radiobutton \
             -background $colour \
-            -variable $w_.blank \
+            -variable [scope itk_option(-blank_color)] \
             -value $colour \
             -label {    } \
             -command [code $this set_blankcolour_ $colour]
@@ -684,10 +689,10 @@ itcl::class gaia::Gaia {
       foreach colour $colours_ {
          $m.back add radiobutton \
             -background $colour \
-            -variable $w_.back \
+            -variable [scope itk_option(-image_background)] \
             -value $colour \
             -label {    } \
-            -command [code $this set_background_ $colour]
+            -command [code $this set_image_background_ $colour]
       }
 
       #  UKIRT quick look likes to attach to camera immediately.
@@ -1362,6 +1367,11 @@ itcl::class gaia::Gaia {
       if { $itk_option(-file) == {} } {
          return
       }
+
+      #  Restore the blank colour and background.
+      set_blankcolour_ $itk_option(-blank_color)
+      set_image_background_ $itk_option(-image_background)
+
       if { ! $itk_option(-check_for_cubes) } {
          return
       }
@@ -1697,7 +1707,7 @@ itcl::class gaia::Gaia {
    public method get_image {} { return $image_ }
 
    #  Set the colour of the main canvas background.
-   protected method set_background_ {colour} {
+   protected method set_image_background_ {colour} {
       [$image_ get_canvas] configure -background $colour
    }
 
@@ -2260,6 +2270,15 @@ window gives you access to this."
    #  Zoom factor used in the pick object window.
    itk_option define -pick_zoom_factor pick_zoom_factor Pick_Zoom_Factor 10
 
+   #  Additional text for title bar (expected use is identifying amongst instances).
+   itk_option define -ident ident Ident {}
+
+   #  Colour for blank pixels. Usually black.
+   itk_option define -blank_color blank_color Blank_Colour black
+
+   #  Colour for image background. Usually black.
+   itk_option define -image_background image_background Image_Background black
+
    # -- Protected variables --
 
    #  Application name.
@@ -2275,7 +2294,7 @@ window gives you access to this."
    protected variable Init_
    protected variable Progress_
 
-   #  Colours of the main background.
+   #  Offered colours of the main background and blank pixels.
    protected variable colours_ {
       white
       grey90 grey80 grey70 grey60 grey50 grey40 grey30 grey20 grey10
