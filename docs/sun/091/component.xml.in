@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sun/091</path>
+  <description>IRAS --- Calibrated Raw Detector Data Analysis User Guide</description>
+  <abstract><p>
+     This guide describes the IRAS Calibrated Raw Detector Data, how
+     to access the data, and the programs available to process it and
+     examine the results.
+  </p></abstract>  
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>D C Parsons</name>
+      <name>P J Richards</name>
+      <name>D L Giaretta</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1987,1989</year>
+    <name>SERC</name>
+  </copyright>
+</component>
