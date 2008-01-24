@@ -9,7 +9,7 @@
 \newcommand{\stardocsource}    {sun2.6}
 \newcommand{\stardocnumber}    {2.6}
 \newcommand{\stardocauthors}   {D.S.\ Berry \\ M.B.\ Taylor}
-\newcommand{\stardocdate}      {26th November 2007}
+\newcommand{\stardocdate}      {24th January 2008}
 \newcommand{\stardoctitle}     {NDG \\ [1ex]
                                 Routines for Accessing Groups of NDFs}
 \newcommand{\stardocversion}   {Version 5.3}
@@ -802,7 +802,6 @@ to add further members.
 \small
 
 
-\newpage
 \sstroutine{
    NDG\_ASEXP
 }{
@@ -1025,7 +1024,6 @@ to add further members.
       }
    }
 }
-\newpage
 \sstroutine{
    NDG\_ASSOC
 }{
@@ -1202,7 +1200,7 @@ to add further members.
       }
    }
 }
-\newpage
+
 \sstroutine{
    NDG\_BEGPV
 }{
@@ -1226,7 +1224,7 @@ to add further members.
       }
    }
 }
-\newpage
+
 \sstroutine{
    NDG\_CREA1
 }{
@@ -1288,7 +1286,6 @@ to add further members.
       }
    }
 }
-\newpage
 \sstroutine{
    NDG\_CREAT
 }{
@@ -1424,7 +1421,6 @@ to add further members.
       }
    }
 }
-\newpage
 \sstroutine{
    NDG\_CREP1
 }{
@@ -1481,7 +1477,39 @@ to add further members.
       }
    }
 }
-\newpage
+
+\sstroutine{
+   NDG\_CTPRV
+}{
+   Count the number of ancestors used in the creation of an NDF
+}{
+   \sstdescription{
+      This routine returns the number of ancestors described in the
+      {\tt "}PROVENANCE{\tt "} extension of the supplied INDF.
+   }
+   \sstinvocation{
+      CALL NDG\_CTPRV( INDF, NANC, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF = INTEGER (Given)
+      }{
+         An identifier for the NDF containing the provenance information.
+      }
+      \sstsubsection{
+         NANC = INTEGER (Returned)
+      }{
+         The number of ancestor NDFs stored in the provenance information
+         of INDF.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+
 \sstroutine{
    NDG\_ENDPV
 }{
@@ -1527,7 +1555,78 @@ to add further members.
       }
    }
 }
-\newpage
+
+\sstroutine{
+   NDG\_FMPRV
+}{
+   Format the provenance information from an NDF
+}{
+   \sstdescription{
+      This routine returns an AST KeyMap holding a set of text strings
+      containing information taken from the {\tt "}PROVENANCE{\tt "} extension in INDF.
+
+      The returned KeyMap has an entry with key {\tt "}0{\tt "} that describes the
+      supplied NDF. It also has an entry describing each ancestor NDF.
+      These entries have keys {\tt "}1{\tt "}, {\tt "}2{\tt "}, {\tt "}3{\tt "}, etc, up to the number of
+      ancestors in the NDF.
+
+      Each of these entries contains a pointer to another AST KeyMap
+      which may contain any subset of the following entries (all of which
+      are strings):
+
+      {\tt "}ID{\tt "} - the integer index within the ancestors array (zero for the
+             main NDF).
+
+      {\tt "}PATH{\tt "} - The full path or base name for the NDF (see argument {\tt "}BASE{\tt "}).
+
+      {\tt "}DATE{\tt "} - The date of creation of the NDF.
+
+      {\tt "}CREATOR{\tt "} - The software item that created the NDF.
+
+      {\tt "}PARENTS{\tt "} - A comma separated list of indicies into the ancestors
+                  array that identifies the direct parents of the NDF.
+
+      {\tt "}MORE{\tt "} - A summary of the contents of the MORE structure associated
+               with the NDF.
+
+      A missing key implies that the corresponding item of information is
+      not available.
+
+      Finally, the returned KeyMap has an entry with key {\tt "}MXLEN{\tt "} that is
+      again a pointer to another KeyMap with the same entries listed above.
+      However, this time the entries are integers, not strings, and holds
+      the maximum field width used to format the strings. Also, all
+      entries are guaranteed to be present in the keymap (but may hold
+      zero if none of the ancestors contained a particular item of
+      information).
+   }
+   \sstinvocation{
+      CALL NDG\_FMPRV( INDF, BASE, KEYMAP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF = INTEGER (Given)
+      }{
+         An identifier for the NDF containing the provenance information.
+      }
+      \sstsubsection{
+         BASE = LOGICAL (Given)
+      }{
+         If .TRUE., then the PATH field in the returned KeyMap holds the
+         base name of each NDF rather than the full path.
+      }
+      \sstsubsection{
+         KEYMAP = INTEGER (Returned)
+      }{
+         A pointer to the returned AST KeyMap.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
 \sstroutine{
    NDG\_GTPRV
 }{
@@ -1553,7 +1652,8 @@ to add further members.
          returned. A value of zero will result in information about the NDF
          specified by INDF being returned. Otherwise, the IANC value
          is used as an index into the ANCESTORS array in the PROVENANCE
-         extension. No error is reported if IANC is too large, but DAT\_\_NOLOC
+         extension. No error is reported if IANC is too large (i.e.
+         larger than the value returned by NDG\_CTPRV), but DAT\_\_NOLOC
          will be returned for PROV.
       }
       \sstsubsection{
@@ -1599,7 +1699,7 @@ to add further members.
       }
    }
 }
-\newpage
+
 \sstroutine{
    NDG\_GTSUP
 }{
@@ -1652,7 +1752,7 @@ to add further members.
       }
    }
 }
-\newpage
+
 \sstroutine{
    NDG\_NDFAS
 }{
@@ -1709,7 +1809,7 @@ to add further members.
       }
    }
 }
-\newpage
+
 \sstroutine{
    NDG\_NDFCO
 }{
@@ -1767,7 +1867,7 @@ to add further members.
       }
    }
 }
-\newpage
+
 \sstroutine{
    NDG\_NDFCP
 }{
@@ -1825,7 +1925,7 @@ to add further members.
       }
    }
 }
-\newpage
+
 \sstroutine{
    NDG\_NDFCR
 }{
@@ -1887,7 +1987,7 @@ to add further members.
       }
    }
 }
-\newpage
+
 \sstroutine{
    NDG\_NDFPR
 }{
@@ -1953,7 +2053,7 @@ to add further members.
       }
    }
 }
-\newpage
+
 \sstroutine{
    NDG\_PROP1
 }{
@@ -2006,7 +2106,7 @@ to add further members.
       }
    }
 }
-\newpage
+
 \sstroutine{
    NDG\_PTPRV
 }{
@@ -2100,7 +2200,7 @@ to add further members.
       }
    }
 }
-\newpage
+
 \sstroutine{
    NDG\_PTSUP
 }{
@@ -2151,7 +2251,7 @@ to add further members.
       }
    }
 }
-\newpage
+
 \sstroutine{
    NDG\_RTPRV
 }{
@@ -2189,7 +2289,7 @@ to add further members.
       }
    }
 }
-\newpage
+
 \sstroutine{
    NDG\_SETSZ
 }{
