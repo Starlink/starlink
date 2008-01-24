@@ -2611,31 +2611,37 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance, int indf,
 /* Store the path. */
          if( path ) {
             len = astChrLen( path );
-            path[ len ] = 0;
-            datNew0C( cloc, PATH_NAME, len, status );
-            datFind( cloc, PATH_NAME, &loc, status );
-            datPut0C( loc, path, status );
-            datAnnul( &loc, status );
+            if( len ) {
+               path[ len ] = 0;
+               datNew0C( cloc, PATH_NAME, len, status );
+               datFind( cloc, PATH_NAME, &loc, status );
+               datPut0C( loc, path, status );
+               datAnnul( &loc, status );
+            }
          }
 
 /* Store the date. */
          if( date ) {
             len = astChrLen( date );
-            date[ len ] = 0;
-            datNew0C( cloc, DATE_NAME, len, status );
-            datFind( cloc, DATE_NAME, &loc, status );
-            datPut0C( loc, date, status );
-            datAnnul( &loc, status );
+            if( len ) {
+               date[ len ] = 0;
+               datNew0C( cloc, DATE_NAME, len, status );
+               datFind( cloc, DATE_NAME, &loc, status );
+               datPut0C( loc, date, status );
+               datAnnul( &loc, status );
+            }
          }
 
 /* Store the creator (the same code for both main and ancestor NDFs). */
          if( prov->creator ) {
             len = astChrLen( prov->creator );
-            prov->creator[ len ] = 0;
-            datNew0C( cloc, CREATOR_NAME, len, status );
-            datFind( cloc, CREATOR_NAME, &loc, status );
-            datPut0C( loc, prov->creator, status );
-            datAnnul( &loc, status );
+            if( len ) {
+               prov->creator[ len ] = 0;
+               datNew0C( cloc, CREATOR_NAME, len, status );
+               datFind( cloc, CREATOR_NAME, &loc, status );
+               datPut0C( loc, prov->creator, status );
+               datAnnul( &loc, status );
+            }
          }
 
 /* Store a deep copy of "more". Note, the "more" variable is a locator
