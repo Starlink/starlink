@@ -2485,6 +2485,63 @@ package kappa {
 
       }
 
+      action provadd {
+         alias {prova(dd)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter creator {
+            position 3
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Name of software that created the modified NDF}
+            helpkey *
+          }
+
+         parameter isroot {
+            position 4
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Ignore any provenance within the parent NDF?}
+            helpkey *
+          }
+
+         parameter more {
+            position 5
+            type UNIV
+            ppath CURRENT DEFAULT
+            vpath DEFAULT
+            prompt {HDS object containing extra information about the parent}
+            helpkey *
+            default !
+          }
+
+         parameter ndf {
+            position 1
+            type NDF
+            access UPDATE
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <->GLOBAL.DATA_ARRAY
+            prompt {NDF to be modified}
+            helpkey *
+          }
+
+         parameter parent {
+            position 2
+            type NDF
+            access READ
+            ppath CURRENT 
+            prompt {Parent NDF}
+            helpkey *
+          }
+      }
+
       action provshow {
          alias {provsh(ow)}
 
