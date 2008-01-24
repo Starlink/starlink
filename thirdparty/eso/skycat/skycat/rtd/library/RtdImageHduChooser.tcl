@@ -319,12 +319,17 @@ itcl::class rtd::RtdImageHduChooser {
 	    }
 	}
 
+        # PWD: XXX commented out for now. Problem when loading cubes
+        # as this causes the cube to load, which displays an NDF (as the
+        # slice) that destroys this object (to make way for the NDF
+        # chooser) before the latter lines are executed.
+
 	# Select the HDU being displayed, if any
-        if {$first_image == -1} {
-            select_image_hdu [$image_ hdu]
-        } else {
-            select_image_hdu $first_image
-        }
+        #if {$first_image == -1} {
+        #    select_image_hdu [$image_ hdu]
+        #} else {
+        #    select_image_hdu $first_image
+        #}
 
         if { $num_images_ > 1 } {
             $w_.buttons.show config -state normal
