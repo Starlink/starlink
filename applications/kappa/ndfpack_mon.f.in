@@ -87,6 +87,8 @@
 *        reason.
 *     2-NOV-2007 (DSB):
 *        Use NDG_BEGPV/ENDPV to provide automatic provenance propagation.
+*     24-JAN-2008 (DSB):
+*        Added PROVADD.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -277,6 +279,10 @@
 *  Displays the attributes of an NDF data structure.
          ELSE IF ( NAME .EQ. 'NDFTRACE' ) THEN
             CALL NDFTRACE ( STATUS )
+
+*  Store provenance
+         ELSE IF ( NAME .EQ. 'PROVADD' ) THEN
+            CALL PROVADD ( STATUS )
 
 *  Display provenance
          ELSE IF ( NAME .EQ. 'PROVSHOW' ) THEN
