@@ -69,6 +69,8 @@
 *        -Assert ICD data order
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     2008-01-25 (EC):
+*        -explicitly close MAPCOORD extension before calculating new one
 
 *  Notes:
 *     This routines asserts ICD data order.
@@ -163,6 +165,11 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
   lbnd_old[1] = 0;
   ubnd_old[0] = 0;
   ubnd_old[1] = 0;
+
+  /* Check for pre-existing LUT and de-allocate it. This will only waste
+     time if the MAPCOORD extension is found to be valid and it has
+     to be re-loaded from disk. */
+  smf_close_mapcoord( data, status );
 
   /* Assert ICD data order */
   smf_dataOrder( data, 1, status );
