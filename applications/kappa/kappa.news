@@ -1,16 +1,24 @@
 1 KAPPA_Version_1.8
 
-   A new release of KAPPA (V1.8) is under development.  The main changes
-   so far are listed below.  For complete details of all changes, see
-   the "Release Notes" appendix in SUN/95.
+   A new release of KAPPA (V1.8-9) is available.  The main changes are
+   listed below.  For complete details of all changes, see the 
+   "Release Notes" appendix in SUN/95.
 
 2 New_applications
 
-   o PLUCK extracts slices parallel to pixel axes from an NDF.  The 
+   o  PLUCK extracts slices parallel to pixel axes from an NDF.  The 
    slices are nominated positions that are not at pixel centres.  Thus
    it can be used for example, with a spectral imaging cube to extract
    spectra at specified equatorial co-ordinates, or an image at a
    given spectral co-ordinate.
+
+   o  PROVADD modifies the provenance information stored in an NDF.  It 
+   records a second specified NDF as a direct parent of the first NDF. 
+   
+   o  PROVSHOW displays details of the NDFs that were used in the 
+   creation of a supplied NDF.  This information is read from the 
+   PROVENANCE extension within the NDF, and includes both immediate 
+   parent NDFs and older ancestor NDFs.
 
 2 Modified_applications
 

@@ -31,22 +31,22 @@
 *  ADAM Parameters:
 *     CREATOR = LITERAL (Read)
 *        A text identifier for the software that created the main NDF
-*        (usually the name of the calling application). The format of the
-*        identifier is arbitrary, but the form "PACKAGE:COMMAND" is
+*        (usually the name of the calling application).  The format of 
+*        the identifier is arbitrary, but the form "PACKAGE:COMMAND" is
 *        recommended. If a null (!) value is supplied, no creator
-*        information is stored. [!]
+*        information is stored.  [!]
 *     ISROOT = _LOGICAL (Read)
-*        If TRUE, then the NDF given by parameter "PARENT" will be treated 
-*        as a root NDF. That is, any provenance information within PARENT
-*        describing its own parents is ignored. If FALSE, then any provenance 
-*        information within PARENT is copied into the main NDF. PARENT 
-*        is then only a root NDF only if it contains no provenance
-*        information. [FALSE]
+*        If TRUE, then the NDF given by parameter "PARENT" will be 
+*        treated as a root NDF.  That is, any provenance information 
+*        within PARENT describing its own parents is ignored.  If FALSE,
+*        then any provenance information within PARENT is copied into
+*        the main NDF.  PARENT is then only a root NDF only if it 
+*        contains no provenance information.  [FALSE]
 *     MORE = UNIV (Read)
-*        An HDS object containing arbitrary additional information about 
-*        the parent NDF, and how it was used in the creation of the main NDF.
-*        If supplied, this information is stored with the provenance in
-*        the main NDF. [!]
+*        An HDS object containing arbitrary additional information about
+*        the parent NDF, and how it was used in the creation of the main
+*        NDF.  If supplied, this information is stored with the 
+*        provenance in the main NDF.  [!]
 *     NDF = NDF (Read and Write)
 *        The NDF which is to be modified.
 *     PARENT = NDF (Read)
@@ -64,7 +64,7 @@
 *     applications.
 
 *  Related Applications:
-*     KAPPA: SHOWPROV.
+*     KAPPA: PROVSHOW, HISCOM.
 
 *  Copyright:
 *     Copyright (C) 2008 Science & Technology Facilities Council.
@@ -73,7 +73,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -83,8 +83,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. berry (JAC,UCLan)
