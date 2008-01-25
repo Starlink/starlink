@@ -15,6 +15,8 @@
 *  Invocation:
 *     smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 *                       int nchunks, smf_modeltype mtype, int isTordered, 
+*		        AstFrameSet *outfset, int moving, 
+*		        int *lbnd_out, int *ubnd_out,
 *                       smfGroup **mgroup, int nofile, int leaveopen,
 *                       smfArray **mdata, int *status);
 
@@ -31,7 +33,19 @@
 *        Type of model component to create
 *     isTordered = int (Given)
 *        If 0, ensure template data is ordered by bolometer. If 1 ensure 
-*        template data is ordered by time slice (default ICD ordering)
+*        template data is ordered by time slice (default ICD ordering). 
+*        Ignored if not creating SMF__LUT.
+*     outfset = AstFrameSet* (Given)
+*        Frameset containing the sky->output map mapping if calculating
+*        pointing LUT on-the-fly. Ignored if not creating SMF__LUT.
+*     moving = int (Given)
+*        Is coordinate system tracking moving object? (if outfset specified)
+*     lbnd_out = double* (Given)
+*        2-element array pixel coord. for the lower bounds of the output map
+*        (if outfset specified) 
+*     ubnd_out = double* (Given)
+*        2-element array pixel coord. for the upper bounds of the output map 
+*        (if outfset specified) 
 *     mgroup = smfGroup ** (Returned)
 *        Pointer to smfGroup pointer that will contain model file names
 *     nofile = int (Given)
@@ -57,7 +71,8 @@
 *     is set. In this case it is up to the caller to first generate an
 *     array of smfArray pointers (mdata) which then get new smfArrays
 *     assigned to them. In this case it is up to the caller to close
-*     the smfArrays.
+*     the smfArrays. If a SMF__LUT component is being calculated, the
+*     projection information must be supplied: outfset, moving and ?bnd_out.
 
 *  Notes:
 
@@ -69,7 +84,7 @@
 *     2006-07-06 (EC):
 *        Initial Version
 *     2006-11-02 (EC):
-*        Propagate inputs to residual, create others with sm_open_newfile 
+*        Propagate inputs to residual, create others with smf_open_newfile 
 *     2007-02-07 (EC):
 *        - Simplified container files.
 *        - In copyinput case map data array so that it gets copied.
@@ -105,6 +120,8 @@
 *        -template is now loaded into refdata and copies to idata
 *        -properly set isTordered in created smfData
 *        -don't unmap the header portion of the model in DIMM files
+*     2008-01-24 (EC):
+*        Template can now be non-flatfielded.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -157,8 +174,11 @@
 
 void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 		       int nchunks, smf_modeltype mtype, int isTordered,
+		       AstFrameSet *outfset, int moving, 
+		       int *lbnd_out, int *ubnd_out,
 		       smfGroup **mgroup, int nofile, int leaveopen,
 		       smfArray **mdata, int *status ) {
+
   /* Local Variables */
   int added=0;                  /* Number of names added to group */
   void *buf=NULL;               /* Pointer to total container buffer */
@@ -187,6 +207,7 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
   size_t ndata=0;               /* Number of elements in data array */
   int nmap=0;                   /* Number of elements mapped */
   int nrel=0;                   /* Number of related elements (subarrays) */
+  int oflag=0;                  /* Flags for opening template file */
   long pagesize=0;              /* Size of memory page used by mmap */
   char *pname=NULL;             /* Poiner to fname */
   smfData *refdata=NULL;        /* Pointer to ref smfData on disk */
@@ -264,6 +285,19 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
     if( mgrp ) grpDelet( &mgrp, status );
   }
 
+  /* Check the mtype to decide how we should open the template files, and
+     decide if we will propagate the template to the model file */
+
+  oflag = 0;
+
+  if( mtype != SMF__LUT ) oflag |= SMF__NOCREATE_HEAD;
+  if( mtype == SMF__RES ) {
+    copyinput = 1;
+  } else {
+    oflag |= SMF__NOCREATE_DATA;
+  }
+	
+
   /* Loop over time chunks */
   if( *status == SAI__OK ) for( i=0; i<nchunks; i++ ) {
     
@@ -323,43 +357,25 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 	/* Only continue if there is a valid idx */
 	if( idx > 0 ) {
 	  
-	  /* Open the template file */
-	  smf_open_file( igroup->grp, idx, "READ", 0, &refdata, status );
+	  /* Open the template file - flags are set above depending
+             on the type of model. If we're propagating input, then
+             do an open_and_flatfield */
 
-	  /* Make a local copy that we can modify */
-	  idata = smf_deepcopy_smfData( refdata, 0, SMF__NOCREATE_HEAD |
-					SMF__NOCREATE_FILE | SMF__NOCREATE_DA,
-					status );
-
-	  /* Since deepcopy doesn't copy the LUT yet, open and copy over if
-	     it is available */
-
+	  if( copyinput ) {
+	    smf_open_and_flatfield( igroup->grp, NULL, idx, &idata, status );
+	  } else {
+	    smf_open_file( igroup->grp, idx, "READ", oflag, &idata, status );
+	  }
+	
+	  /* Calculate the LUT if necessary */
+	  
 	  if( mtype == SMF__LUT ) {
-	    smf_open_mapcoord( refdata, "READ", status );
-	    if( *status == SAI__OK ) {
-	      /* Good status means mapcoord was read successfully */
-	      ndata = 1;
-	      for( k=0; k<idata->ndims; k++ ) {
-		ndata *= idata->dims[k];
-	      }
-	      
-	      idata->lut = smf_malloc( ndata, sizeof(*(idata->lut)), 0, 
-				       status );
-
-	      if( *status == SAI__OK ) {
-		memcpy( idata->lut, refdata->lut, ndata*sizeof(*(idata->lut)));
-	      }
-	      
-	    } else if(*status == SMF__NOLUT) { 
-	      /* Otherwise annul bad status and proceed without LUT */
-	      errAnnul( status );
-	    }	    
+	    smf_calc_mapcoord( idata, outfset, moving, lbnd_out, 
+			       ubnd_out, SMF__NOCREATE_FILE, status );
 	  }
 
-	  /* Close the reference file now because we're done with it */
-	  smf_close_file( &refdata, status );
-
 	}
+
       } else {
 	/* Otherwise obtain a pointer to the relevant smfData in the
 	   template smfArray at this time chunk */
@@ -378,12 +394,6 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 		 status);      
 	}
 	
-	if( idata->dtype != SMF__DOUBLE ) {
-	  *status = SAI__ERROR;
-	  errRep(FUNC_NAME, 
-		 "Template data is not double precision!",
-		 status);      
-	}
       }
       
       if( *status == SAI__OK ) {
@@ -398,7 +408,6 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 	  switch( mtype ) {
 	    
 	  case SMF__CUM: /* Cumulative model */
-	    copyinput = 0;
 	    head.dtype = SMF__DOUBLE;
 	    head.ndims = 3;
 	    head.dims[0] = (idata->dims)[0];
@@ -407,11 +416,10 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 	    break;
 	    
 	  case SMF__RES: /* Model residual */
-	    copyinput = 1;
+	    /* Nothing here since copyinput set */
 	    break;
 	    
 	  case SMF__AST: /* Time-domain projection of map */
-	    copyinput = 0;
 	    head.dtype = SMF__DOUBLE;
 	    head.ndims = 3;
 	    head.dims[0] = (idata->dims)[0];
@@ -420,7 +428,6 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 	    break;
 	    
 	  case SMF__COM: /* Common-mode at each time step */
-	    copyinput = 0;
 	    head.dtype = SMF__DOUBLE;
 	    head.ndims = 1;
 
@@ -432,7 +439,6 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 	    break;
 	
 	  case SMF__NOI: /* Noise model */
-	    copyinput = 0;
 	    head.dtype = SMF__DOUBLE;
 	    head.ndims = 3;
 	    head.dims[0] = (idata->dims)[0];
@@ -441,7 +447,6 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 	    break;
 
 	  case SMF__EXT: /* Extinction correction - gain for each bolo/time */
-	    copyinput = 0;
 	    head.dtype = SMF__DOUBLE;
 	    head.ndims = 3;
 	    head.dims[0] = (idata->dims)[0];
@@ -450,7 +455,6 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 	    break;
 
 	  case SMF__LUT: /* Pointing LookUp Table for each data point */
-	    copyinput = 0;
 	    head.dtype = SMF__INTEGER;
 	    head.ndims = 3;
 	    head.dims[0] = (idata->dims)[0];
@@ -562,10 +566,10 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 	      memset( dataptr, 0, datalen );
 	    }
 	    
-	    /* If this is a LUT try to copy it over */
+	    /* If this is a LUT copy it over from the template */
 	    if( mtype == SMF__LUT ) {
-	      if( idata->lut != NULL ) {	  
-		/* dataptr is the mmap'd memory */
+	      if( idata->lut ) {	  
+		/* dataptr can be mmap'd or malloc'd memory */
 		memcpy( dataptr, idata->lut, 
 			ndata*smf_dtype_sz(head.dtype, status) );
 	      } else {
@@ -618,25 +622,6 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 		smf_addto_smfArray( mdata[i], data, status );
 	      }
 	      
-	      /* Synchronize and unmap the header portion of the mmap'd 
-		 memory since it will not get free'd by smf_close_file */
-	      
-	      /*
-	      if( !nofile ) {
-		if( msync( buf, headlen, MS_ASYNC ) == -1 ) {
-		  *status = SAI__ERROR;
-		  errRep( FUNC_NAME, 
-			  "Unable to sync header in model container file", 
-			  status ); 
-		} else if( munmap( buf, headlen ) == -1 ) {
-		  *status = SAI__ERROR;
-		  errRep( FUNC_NAME, 
-			  "Unable to unmap header in model container file", 
-			  status ); 
-		}
-	      }
-	      */
-
 	    } else if (!nofile) {
 	      
 	      /* If leaveopen not set (and there is a file) write buffer to 
