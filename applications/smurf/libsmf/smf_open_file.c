@@ -145,6 +145,9 @@
 *        Raw data is now _WORD and can be _INTEGER
 *     2007-12-02 (AGG):
 *        Do not map DATA/VARIANCE/QUALITY if SMF__NOCREATE_DATA flag is set
+*     2008-01-25 (EC):
+*        -removed check for TORDERED FITS keyword
+*        -Added check for SMF__NOCREATE_HEAD when extracting DREAM parameters
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -431,15 +434,6 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
 	  errAnnul( status );
 	}
 
-	/* Check for TORDERED keyword. If no keyword is present assume that
-           the data order is ICD-compliant (i.e. true) */
-	smf_fits_getL( hdr, "TORDERED", &((*data)->isTordered), status );
-	if( *status != SAI__OK ) {
-	  /* If bad status just annul and set isTordered to 1 */
-	  (*data)->isTordered = 1;
-	  errAnnul( status );
-	} 
-
 	/* Determine and store the telescope location in hdr->telpos */
 	smf_telpos_get( hdr, status );
 
@@ -647,7 +641,9 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
 	  *status = SAI__ERROR;
 	  errRep( "smf_open_file", "Number of input timeslices not equal to the number of output timeslices (^NF != ^DIMS)",status);
 	} else {
-	  hdr->nframes = nframes;
+	  if ( !(flags & SMF__NOCREATE_HEAD) ) {
+	    hdr->nframes = nframes;
+	  }
 	}
 
 	/* Set flag to indicate data read by sc2store_() */
@@ -657,9 +653,11 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
 	file->isTstream = 1;
 
 	/* Store DREAM parameters */
-	dream = smf_construct_smfDream( *data, nvert, nsampcycle, jigvert, jigpath, 
-					status );
-	(*data)->dream = dream;
+	if ( !(flags & SMF__NOCREATE_HEAD) ) {
+	  dream = smf_construct_smfDream( *data, nvert, nsampcycle, jigvert, 
+					  jigpath, status );
+	  (*data)->dream = dream;
+	}
       }
 
       /* Close the file */
@@ -687,7 +685,7 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
        has to be done here as these methods rely on information in the
        main smfData struct. First retrieve jigvert and jigpath from
        file */ 
-    if ( isTseries && isFlat ) {
+    if ( isTseries && isFlat && !(flags & SMF__NOCREATE_HEAD) ) {
       /* Obtain locator to DREAM extension if we have DREAM data */
       xloc = smf_get_xloc( *data, "DREAM", "DREAM_PAR", "READ", 0, 0, status );
       /* If it's NULL then we don't have dream data */
@@ -730,8 +728,9 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
 	    errRep(FUNC_NAME, "smfData for SMU path is NULL", status);
 	  }
 	}
-	dream = smf_construct_smfDream( *data, nvert, nsampcycle, jigvert, jigpath, 
-					status );
+
+	dream = smf_construct_smfDream( *data, nvert, nsampcycle, jigvert, 
+					jigpath, status );
 	(*data)->dream = dream;
     
 	/* Free up the smfDatas for jigvert and jigpath */
