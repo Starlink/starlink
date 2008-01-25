@@ -109,6 +109,9 @@
 *        Update to use new smf_free behaviour
 *     2008-01-22 (EC):
 *        Added hitsmap to interface
+*     2008-01-25 (EC):
+*        Handle non-flatfielded input data. Pointing LUT is now calculated
+*        in smf_model_create rather than requiring calls to smf_calc_mapcoord.
 
 *  Notes:
 
@@ -323,7 +326,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       /* Only one time chunk */
       nchunks = 1;
       
-      /* Allocate length 1 array of smfArrays for single time chunk */
+      /* Allocate length 1 array of smfArrays for single time chunk */   
       res = smf_malloc( nchunks, sizeof(*res), 1, status );
 
       /* Concatenate the input data (and change to bolo-ordered) */
@@ -332,27 +335,9 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 			   &res[0], status );
     } else {
       /* Otherwise number of time chunks given by igroup. */
-
       nchunks = igroup->ngroups;
-
-      /* Calculate MAPCOORD explicitly here for each input file since
-	 we don't call smf_concat_smfGroup in this case */
-
-      for(i=1; i<=isize; i++ ) {	
-	/* We only need to open the file's header info to generate the 
-	   pointing LUT in the MAPCOORD extension */
-        smf_open_file( igrp, i, "UPDATE", SMF__NOCREATE_DATA, &data, status );
-        smf_calc_mapcoord( data, outfset, moving, lbnd_out, ubnd_out, 0,
-			   status );
-	smf_close_file( &data, status );
-
-        /* Exit if bad status was generate */
-	if( *status != SAI__OK ) {
-	  i = isize+1;
-	}
-      }
-
     }
+
     msgSeti( "NCHUNKS", nchunks );
     msgOut(" ", "SMF_ITERATEMAP: ^NCHUNKS time chunks", status);
   }
@@ -374,10 +359,14 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
          bolo-ordered data although the work has already been done at
          the concatenation stage. */
 
-      smf_model_create( NULL, res, nchunks, SMF__LUT, 0, NULL, memiter, 
+      smf_model_create( NULL, res, nchunks, SMF__LUT, 0, 
+			NULL, 0, NULL, NULL,
+			NULL, memiter, 
 			memiter, lut, status ); 
 
-      smf_model_create( NULL, res, nchunks, SMF__AST, 0, NULL, memiter, 
+      smf_model_create( NULL, res, nchunks, SMF__AST, 0, 
+			NULL, 0, NULL, NULL,
+			NULL, memiter, 
 			memiter, ast, status );
 
       /* Since a copy of the LUT is still open in res[0] free it up here */
@@ -389,18 +378,26 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       
     } else {
       /* If iterating using disk i/o need to create res and other model 
-         components using igroup as template. Tell smf_model_create
-         to assert bolo-ordered template (in this case res). */
+         components using igroup as template. In this case the pointing
+         LUT probably doesn't exist, so give projection information to
+         smf_model_create. Also assert bolo-ordered template 
+	 (in this case res). */
 
       res = smf_malloc( nchunks, sizeof(*res), 1, status );
       
-      smf_model_create( igroup, NULL, 0, SMF__RES, 0, &resgroup, memiter, 
+      smf_model_create( igroup, NULL, 0, SMF__RES, 0, 
+			NULL, 0, NULL, NULL,
+			&resgroup, memiter, 
 			memiter, res, status );
 
-      smf_model_create( igroup, NULL, 0, SMF__LUT, 0, &lutgroup, memiter, 
+      smf_model_create( igroup, NULL, 0, SMF__LUT, 0, 
+			outfset, moving, lbnd_out, ubnd_out,
+			&lutgroup, memiter, 
 			memiter, lut, status ); 
 
-      smf_model_create( igroup, NULL, 0, SMF__AST, 0, &astgroup, memiter, 
+      smf_model_create( igroup, NULL, 0, SMF__AST, 0, 
+			NULL, 0, NULL, NULL,
+			&astgroup, memiter, 
 			memiter, ast, status );
     }
   }
@@ -420,11 +417,13 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       model[i] = smf_malloc( nchunks, sizeof(**model), 1, status );
       
       if( memiter ) {
-	smf_model_create( NULL, res, nchunks, modeltyps[i], 0, NULL,
-			  memiter, memiter, model[i], status ); 
+	smf_model_create( NULL, res, nchunks, modeltyps[i], 0, 
+			  NULL, 0, NULL, NULL,
+			  NULL, memiter, memiter, model[i], status ); 
 
       } else {
-	smf_model_create( igroup, NULL, 0, modeltyps[i], 0, &modelgroups[i], 
+	smf_model_create( igroup, NULL, 0, modeltyps[i], 0, 
+			  NULL, 0, NULL, NULL, &modelgroups[i], 
 			  memiter, memiter, model[i], status );
       }
     }
@@ -447,7 +446,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	       status);
 
         /* Open model files here if looping on-disk. Otherwise everything
-           is already  open from the smf_model_create calls */
+           is already open from the smf_model_create calls */
 
 	if( !memiter ) {
 	  
@@ -464,16 +463,15 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
 	/* If first iteration pre-condition the data */
 
-	//if( iter == 0 ) {
-	//  msgOut(" ", "SMF_ITERATEMAP: Pre-conditioning chunk", status);
-	//  for( idx=0; idx<res[i]->ndat; idx++ ) {
-	//    smf_fft_filter( res[i]->sdata[idx], 200., status );
-	    
-	    /* The filter sets bolo-ordering so reset to time ordered */
-	//    smf_dataOrder( res[i]->sdata[idx], 1, status );
-	//  }
-	//}
-	
+	/*
+	if( iter == 0 ) {
+	  msgOut(" ", "SMF_ITERATEMAP: Pre-conditioning chunk", status);
+	  for( idx=0; idx<res[i]->ndat; idx++ ) {
+	    smf_fft_filter( res[i]->sdata[idx], 200., status );
+	  }
+	}
+	*/
+
 	/* Call the model calculations in the desired order. */
 	if( *status == SAI__OK ) {
 	  for( j=0; j<nmodels; j++ ) {
