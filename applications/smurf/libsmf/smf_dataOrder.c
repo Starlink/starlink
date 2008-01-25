@@ -21,7 +21,6 @@
 *     isTordered = int (Given)
 *        If 0, ensure data is ordered by bolometer. If 1 ensure data is
 *        ordered by time slice (default ICD ordering)
-*
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -40,7 +39,9 @@
 *     it simply returns. If the smfData was memory mapped then the
 *     routine changes the data order in-place (slightly
 *     slower). Otherwise a new buffer is allocated with the re-ordered
-*     data, and the old buffer is free'd.
+*     data, and the old buffer is free'd. If flags set to SMF__NOCREATE_FILE
+*     and a file is associated with the data, don't write anything 
+*     (workaround for cases where it was opened read-only).
 
 *
 *  Authors:
@@ -60,6 +61,9 @@
 *        - extra file existence checking if writing TORDERED FITS entry
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     2008-01-25 (EC):
+*        -removed setting of TORDERED keyword from FITS header
+*        -always set data dimensions (moved out of loop)
 
 *  Notes:
 *     Nothing is done about the FITS channels or WCS information stored in
@@ -322,28 +326,6 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
 	/* Set pntr to newbuf */
 	data->pntr[i] = (void *) newbuf;
       }
-
-      /* Set the new dimensions in the smfData */
-      if( *status == SAI__OK ) {
-	memcpy( data->dims, newdims, 3*sizeof(*newdims) );
-	data->isTordered = isTordered;
-      }
-    }
-  }
-
-  /* If there is a FITS header associated with the smfData, update the
-     TORDERED keyword to match isTordered */
-  if( data->hdr ) {
-    smf_fits_setL( data->hdr, "TORDERED", isTordered, 
-		   "T=time-ordered data (ICD), F=bolo-ordered data", 
-		   1, status );
-
-    /* If NDF file associated with the data, write out the modified
-       FITS header */
-    if( data->file ) {
-      if( data->file->ndfid != NDF__NOID ) {
-	kpgPtfts( data->file->ndfid, data->hdr->fitshdr, status );
-      }
     }
   }
 
@@ -413,6 +395,12 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
 	data->lut = newlut;
       }
     }
+  }
+
+  /* Set the new dimensions in the smfData */
+  if( *status == SAI__OK ) {
+    memcpy( data->dims, newdims, 3*sizeof(*newdims) );
+    data->isTordered = isTordered;
   }
 
 }
