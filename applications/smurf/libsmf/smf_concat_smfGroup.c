@@ -77,6 +77,8 @@
 *        -close reference data
 *        -modified smf_calc_mapcoord interface
 *        -properly set isTordered flag
+*     2008-01-25 (EC):
+*        -use smf_open_and_flatfield in case input data is raw
 
 *  Notes:
 *     Currently buggy / not fully implemented. WCS and FITS channels in
@@ -229,7 +231,9 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
 	      for( k=0; k<3; k++ ) {
 		havearray[k] = (refdata->pntr[k] != NULL);
 	      }
-	      refdtype = refdata->dtype;
+
+	      /* Concatenated data is always double precision */
+	      refdtype = SMF__DOUBLE;
 	      refdtypestr = smf_dtype_string(refdata, status);
 
 	    } else {
@@ -268,17 +272,6 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
 		else msgSetc( "FLAG", "has extra" );
 		errRep( FUNC_NAME, "^FILE ^FLAG component QUALITY", status );
 	      }
-
-	      /* Check data type */
-
-	      if( refdata->dtype != refdtype ) {
-		*status = SAI__ERROR;
-		msgSetc( "DTYPE", smf_dtype_string(refdata,status) );
-		msgSetc( "REFDTYPE", refdtypestr );
-		errRep( FUNC_NAME, 
-			"^FILE data type is ^DTYPE, should be ^REFDTYPE", 
-			status);
-	      }
 	    }
 	  }
 
@@ -295,9 +288,11 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
       	/* Second pass copy data over to new array */
 	if( (pass == 1) && (*status == SAI__OK) ) {
 
-	  /* Open the file corresponding to this chunk */
-	  smf_open_file( igrp->grp, igrp->subgroups[j][i], "UPDATE", 0, 
-			 &refdata, status );
+	  /* Open the file corresponding to this chunk. Data may
+             require flat-fielding. */
+
+	  smf_open_and_flatfield( igrp->grp, NULL, igrp->subgroups[j][i], 
+				  &refdata, status );
 
 	  /* Calculate the pointing LUT if requested */
 	  if( !(flags & SMF__NOCREATE_LUT) && outfset ) {
@@ -305,10 +300,7 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
 	    /* Set havelut flag */
 	    havelut = 1;
 
-	    /* This creates the extension and leaves it mapped (access
-               mode is WRITE or UPDATE since smf_calc_mapcoord had to
-               write it in the first place - so we will be able to
-               re-order the LUT if needed in call to smf_dataOrder */
+	    /* Calculate the LUT for this chunk */
 
 	    smf_calc_mapcoord( refdata, outfset, moving, lbnd_out, ubnd_out, 
 			       SMF__NOCREATE_FILE, status );
