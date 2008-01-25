@@ -223,6 +223,8 @@
 *        Added argument "polobs" to smf_cubebounds and smf_sparsebounds.
 *     2008-01-22 (EC):
 *        Added hitsmap to smf_simplerebinmap, smf_iteratemap
+*     2008-01-25 (EC):
+*        Added map projection information to smf_model_create interface
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -498,6 +500,8 @@ void smf_mapbounds_approx( Grp *igrp, int index, char *system, double pixsize,
 
 void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 		       int nchunks, smf_modeltype mtype, int isTordered, 
+		       AstFrameSet *outfset, int moving, 
+		       int *lbnd_out, int *ubnd_out,
 		       smfGroup **mgroup, int nofile, int leaveopen,
 		       smfArray **mdata, int *status );
 
