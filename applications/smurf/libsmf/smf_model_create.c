@@ -121,7 +121,8 @@
 *        -properly set isTordered in created smfData
 *        -don't unmap the header portion of the model in DIMM files
 *     2008-01-24 (EC):
-*        Template can now be non-flatfielded.
+*        -Template can now be non-flatfielded.
+*        -Better file names for models based on iarray
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -146,7 +147,6 @@
 *     MA 02111-1307, USA
 
 *  Bugs:
-*     Using iarray is buggy.
 *     {note_any_bugs_here}
 *-
 */
@@ -262,9 +262,9 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 
     /* Form a group expression for the filename */
     if( *status == SAI__OK ) {
-      sprintf( fname_grpex, "*_");
-      strncat( fname_grpex, mname, sizeof(mname) );
-      strncat( fname_grpex, suffix, sizeof(suffix) );
+      strncpy( fname_grpex, "*_", GRP__SZNAM );
+      strncat( fname_grpex, mname, GRP__SZNAM );
+      strncat( fname_grpex, suffix, GRP__SZNAM );
     }
 
     grpGrpex( fname_grpex, igroup->grp, mgrp, &msize, &added, &flag, status );
@@ -504,9 +504,12 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 	    pname = name;
 	    grpGet( (*mgroup)->grp, idx, 1, &pname, GRP__SZNAM, status );
 	  } else {
-	    /* Otherwise form a name based on the model type */
+	    /* Otherwise get the name from the smfArray */
 	    mname = smf_model_getname( mtype, status );
-	    sprintf( name, "%s_%i_%i%s", mname, i, j, suffix );
+
+	    strncpy( name, idata->file->name, GRP__SZNAM );
+	    strncat( name, "_", GRP__SZNAM );
+	    strncat( name, mname, GRP__SZNAM );
 	  }
 
 	  if( nofile ) {

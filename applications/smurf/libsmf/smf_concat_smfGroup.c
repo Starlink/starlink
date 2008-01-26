@@ -79,6 +79,7 @@
 *        -properly set isTordered flag
 *     2008-01-25 (EC):
 *        -use smf_open_and_flatfield in case input data is raw
+*        -store name of first file of subarray with "_con" suffix
 
 *  Notes:
 *     Currently buggy / not fully implemented. WCS and FITS channels in
@@ -134,6 +135,7 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
 
   /* Local Variables */
   smfData *data=NULL;           /* Concatenated smfData */
+  char filename[GRP__SZNAM+1];  /* Input filename, derived from GRP */
   int havearray[3];             /* flags for DATA/QUALITY/VARIANCE present */
   int havelut;                  /* flag for pointing LUT present */
   smfHead *hdr;                 /* pointer to smfHead in concat data */
@@ -145,6 +147,7 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
   dim_t ndata;                  /* Total data points: nbolo*tlen */
   int nrelated;                 /* Number of subarrays */
   int pass;                     /* Two passes over list of input files */
+  char *pname;                  /* Pointer to input filename */
   smfData *refdata=NULL;        /* Reference smfData */
   int refdims[2];               /* reference dimensions for array (not time) */
   smf_dtype refdtype;           /* reference DATA/VARIANCE type */
@@ -322,7 +325,6 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
 		/* Copy over basic header information from the reference */
 		hdr = data->hdr;
 		refhdr = refdata->hdr;	    
-
 		hdr->instrument = refhdr->instrument;
 
 		switch ( hdr->instrument ) {
@@ -334,6 +336,15 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
 		  /* SCUBA-2 has nothing special here because the focal plane
 		     coordinates are derived using an AST polyMap */
 		}
+
+		/* Copy over the name of the first file in subarray. Add
+                   the suffix "_con" to denote concatenated data */
+
+		pname = filename;
+		grpGet( igrp->grp, igrp->subgroups[j][i], 1, &pname, 
+			SMF_PATH_MAX, status);		
+		strncpy( data->file->name, filename, SMF_PATH_MAX );
+		strncat( data->file->name, "_con", SMF_PATH_MAX );
 
 		/* Allocate space for the concatenated allState */
 		hdr->nframes = tlen;
