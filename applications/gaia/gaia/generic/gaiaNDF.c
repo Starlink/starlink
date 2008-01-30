@@ -546,6 +546,8 @@ int gaiaCopyNDF( const char *filename, int indf, const char *clist,
                     ndfAmap( *ondf, c[i], 1, "_DOUBLE", "WRITE", &outptr, &nel,
                              &status );
                     if ( status == SAI__OK ) {
+                        /*  Offset raw cube by lower bound. */
+                        inptr = ((double *)inptr) + lbnd[0] - 1;
                         memcpy( outptr, inptr, nel *  sizeof( double ) );
                     }
                     ndfAunmp( indf, "CENTRE", axis, &status );
