@@ -524,8 +524,10 @@ itcl::class gaia::GaiaNDAccess {
          if { $type_ == "ndf" } {
             #  Create the NDF as a copy of this NDF without the array
             #  components, but set the pixel origins and data type of these.
-            set newhandle [ndf::copy $name $handle_ "UNITS" \
-                              $alow $ahigh $fulltype $spectralwcs]
+            #  Need to handle copying of the AXIS component, if
+            #  any, so that is implicit.
+            set newhandle [ndf::copy $name $handle_ "AXIS, UNITS" \
+                              $alow $ahigh $fulltype $spectralwcs $axis]
          } else {
             #  Create a simple NDF.
             set newhandle [ndf::create $name $alow $ahigh \

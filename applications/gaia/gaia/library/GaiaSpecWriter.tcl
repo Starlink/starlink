@@ -228,11 +228,11 @@ itcl::class gaia::GaiaSpecWriter {
       if { $filename != {} } {
          blt::busy hold $w_
 
-         #  Use the GaiaCubeSpectrum to get access to the GaiaNDAccess
+         #  Use the GaiaCube to get access to the GaiaNDAccess
          #  instance and use that to re-extract the data.
          set cubeaccessor [$gaiacube get_cubeaccessor]
 
-         #  Set name of the spectrum.
+         #  Set name of the spectrum to the extracted spectrum section name.
          set shortname [$cubespectrum sectioned_name]
          if { $shortname == {} } {
             set shortname "$filename"
@@ -301,7 +301,7 @@ itcl::class gaia::GaiaSpecWriter {
       if { $filename != {} } {
          blt::busy hold $w_
 
-         #  Use the GaiaCubeSpectrum to get access to the GaiaNDAccess
+         #  Use the GaiaCube to get access to the GaiaNDAccess
          #  instance and use that to re-extract the data.
          set cubeaccessor [$gaiacube get_cubeaccessor]
 

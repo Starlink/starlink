@@ -483,11 +483,26 @@ int gaiaCreateNDF( const char *filename, int ndim, int lbnd[], int ubnd[],
  *     existing NDF using the ndfScopy() routine. The filename is for the new
  *     NDF. The dimensionality and data type of the array components can be
  *     set, and a new (matching) wcs established.
+ *
+ *     If an axis value is given (i.e. has positive value) then this
+ *     forces the "axis" AXIS component to be copied to the first AXIS
+ *     component, if an AXIS component is present (use when extracting a
+ *     single axis and the AXIS component is still required, i.e. spectral
+ *     extraction). In this case "AXIS" must be in the component list.
  */
 int gaiaCopyNDF( const char *filename, int indf, const char *clist,
                  int ndim, int lbnd[], int ubnd[], const char *type,
-                 AstFrameSet *wcs, int *ondf, char **error_mess )
+                 AstFrameSet *wcs, int axis, int *ondf, char **error_mess )
 {
+    char value[132];
+    const char *c[] = { "CENTRE", "WIDTH", "VARIANCE" };
+    const char *cc[] = { "LABEL", "UNITS" };
+    void *inptr;
+    void *outptr;
+    int exists;
+    int haveaxis;
+    int i;
+    int nel;
     int place;
     int status = SAI__OK;
 
@@ -496,12 +511,48 @@ int gaiaCopyNDF( const char *filename, int indf, const char *clist,
     /* Open NDF, overwrites an existing NDF and returns a place holder */
     ndfOpen( NULL, filename, "WRITE", "NEW", ondf, &place, &status );
 
-    /* Create the NDF by copy the components */
+    /* Create the NDF by copying the components */
     ndfScopy( indf, clist, &place, ondf, &status );
 
     /* If new dimensionalities are given, set those */
     if ( ndim > 0 ) {
         ndfSbnd( ndim, lbnd, ubnd, *ondf, &status );
+    }
+
+    /* Copy AXIS component, if needed. Note if axis == 1 this isn't needed,
+     * scopy will have done the correct thing. Note need to do this after
+     * dimensioning as axis size should match after that. */
+    if ( axis > 1 && status == SAI__OK ) {
+
+        ndfState( *ondf, "AXIS", &haveaxis, &status );
+        if ( haveaxis ) {
+            /*  AXIS component was copied. */
+
+            /*  UNITS and LABEL. */
+            for ( i = 0; i < 2; i++ ) {
+                ndfAstat( indf, cc[i], axis, &exists, &status );
+                if ( exists ) {
+                    ndfAcget( indf, cc[i], axis, value, 132, &status );
+                    ndfAcput( value, *ondf, cc[i], 1, &status );
+                }
+            }
+
+            /*  CENTRE, WIDTH, VARIANCE */
+            for ( i = 0; i < 3; i++ ) {
+                ndfAstat( indf, c[i], axis, &exists, &status );
+                if ( exists ) {
+                    ndfAmap( indf, c[i], axis, "_DOUBLE", "READ", &inptr, &nel,
+                             &status );
+                    ndfAmap( *ondf, c[i], 1, "_DOUBLE", "WRITE", &outptr, &nel,
+                             &status );
+                    if ( status == SAI__OK ) {
+                        memcpy( outptr, inptr, nel *  sizeof( double ) );
+                    }
+                    ndfAunmp( indf, "CENTRE", axis, &status );
+                    ndfAunmp( *ondf, "CENTRE", 1, &status );   
+                }
+            }
+        }
     }
 
     /* And the data type */

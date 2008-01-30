@@ -372,6 +372,10 @@ static int gaiaNDFTclCreate( ClientData clientData, Tcl_Interp *interp,
  * opened for write access. Requires the existing NDF and a list of components
  * to copy. The size and type of the new NDF are set to those given and a WCS
  * that matches the dimensionality must be given.
+ *
+ * If an axis value is given it is assumed that this is an extraction to a
+ * single axis (nD to 1D) and that any AXIS component for axis "axis", should
+ * be also be extracted and copied to the first dimension.
  */
 static int gaiaNDFTclCopy( ClientData clientData, Tcl_Interp *interp,
                            int objc, Tcl_Obj *CONST objv[] )
@@ -384,6 +388,7 @@ static int gaiaNDFTclCopy( ClientData clientData, Tcl_Interp *interp,
     char *name;
     char *type;
     const char *clist;
+    int axis = -1;
     int i;
     int lbnd[NDF__MXDIM];
     int n;
@@ -394,9 +399,9 @@ static int gaiaNDFTclCopy( ClientData clientData, Tcl_Interp *interp,
     long adr;
 
     /* Check arguments. */
-    if ( objc != 8 ) {
+    if ( objc != 8 && objc != 9 ) {
         Tcl_WrongNumArgs( interp, 1, objv, "ndf_name ndf_handle "
-                          "clist lbnds ubnds type frameset" );
+                          "clist lbnds ubnds type frameset [axis]" );
         return TCL_ERROR;
     }
 
@@ -449,10 +454,17 @@ static int gaiaNDFTclCopy( ClientData clientData, Tcl_Interp *interp,
         }
         wcs = (AstFrameSet *) adr;
 
+        /* If an axis is given we may need to copy the AXIS structure. */
+        if ( objc == 9 ) {
+            if ( Tcl_GetIntFromObj( interp, objv[8], &axis ) != TCL_OK ) {
+                return TCL_ERROR;
+            }
+        }
+
         /* And do the creation and copy */
         resultObj = Tcl_GetObjResult( interp );
         if ( gaiaCopyNDF( name, info->ndfid, clist, ndims, lbnd, ubnd, type,
-                          wcs, &ondf, &error_mess ) ) {
+                          wcs, axis, &ondf, &error_mess ) ) {
             Tcl_SetLongObj( resultObj, exportNdfHandle( ondf, wcs ) );
             return TCL_OK;
         }

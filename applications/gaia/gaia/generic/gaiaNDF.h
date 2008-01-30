@@ -45,7 +45,7 @@ extern "C" {
    /*  Create a new NDF by selective copying of an existing NDF */
     int gaiaCopyNDF( const char *filename, int indf, const char *clist, 
                      int ndim, int lbndf[], int ubnd[], const char *type,
-                     AstFrameSet *wcs, int *ondf, char **error_mess );
+                     AstFrameSet *wcs, int axis, int *ondf, char **error_mess );
 
 /*  Multiple NDFs per container interface */
 /*  ===================================== */
