@@ -1,3 +1,11 @@
+
+    Version 4.2-2
+    =============
+
+    The AXIS component of an NDF cube will now be propagated with any
+    extracted spectra. Previously this didn't happen so saved spectra
+    could loose their coordinates.
+
   Humu Release
   ============
    
