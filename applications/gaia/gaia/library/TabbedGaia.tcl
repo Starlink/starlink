@@ -76,14 +76,14 @@ itcl::class gaia::TabbedGaia {
    #  ------------
    constructor {args} {
 
-      #  Arrange same X defaults as main application.
-      setXdefaults
-
       #  And stop geometry restoration from working.
       configure -center 0
 
       #  Evaluate any options.
       eval itk_initialize $args
+
+      #  Arrange same X defaults as main application.
+      setXdefaults
 
       #  Create the UI. This consists of a toplevel window, plus menu
       #  for basic control and a tabbedpane for viewing the GAIA
@@ -506,6 +506,22 @@ itcl::class gaia::TabbedGaia {
 
    # Whether to control popup windows.
    itk_option define -control_popups control_popups Control_Popups 0
+
+   #  A font used for labels.
+   itk_option define -labelfont labelfont LabelFont variable {
+      set ::gaia_fonts(labelfont) $itk_option(-labelfont)
+   }
+
+   #  A font used for fixed width text.
+   itk_option define -textfont textfont TextFont fixed {
+      set ::gaia_fonts(textfont) $itk_option(-textfont)
+   }
+
+   #  A font used for labels that require symbols (alpha & delta).
+   itk_option define -wcsfont wcsfont WcsFont \
+      "-*-symbol-*-*-*-*-*-140-*-*-*-*-*-*" {
+      set ::gaia_fonts(wcsfont) $itk_option(-wcsfont)
+   }
 
    #  Protected variables: (available to instance)
    #  --------------------
