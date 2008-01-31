@@ -254,12 +254,18 @@
 *        use size_t for some variables following sc2store mods
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     2008-01-30 (AGG):
+*        - Fix posptr bug when calling sc2sim_ndfwrdata
+*        - Factor out calculation of frame offset into time series for
+           current output file
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
-*     Council.  University of British Columbia. All Rights Reserved.
+*     Council. 
+*     Copyright (C) 2006-2008 University of British Columbia. All
+*     Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -411,6 +417,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 					all subarrays */
   double *flatpar[8];             /* flatfield parameters for all subarrays */
   int frame;                      /* frame counter */
+  int frameoffset;                /* Frame offset into time stream for current file */
   int frmperms;                   /* number of frames per microstep */
   AstFrameSet *fs=NULL;           /* frameset for tanplane projection */
   int obscounter;                 /* Counter for observation number
@@ -976,9 +983,10 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     }
 
     /* Retrieve the values for this chunk */
+    frameoffset = ( curms * frmperms ) + ( curchunk * maxwrite );
     for ( frame = 0; frame < lastframe && (*status == SAI__OK); frame++ ) {
 
-      curframe = ( curms * frmperms ) + ( curchunk * maxwrite ) + frame;
+      curframe = frame + frameoffset;
 
       /* If we are simulating a planet observation, calculate apparent
          RA, Dec at each time step - actually don't need to do this if
@@ -1082,7 +1090,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	  bor_y_cel = (posptr[curframe*2+1])*DAS2R;
 	  
 	  /* Rotate by the parallactic angle to get offsets in AzEl */
-	  
 	  bor_x_hor =  bor_x_cel*cos(-base_p[frame]) - 
 	    bor_y_cel*sin(-base_p[frame]);
 
@@ -1234,7 +1241,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                               &(dbuf[(k*nbol*maxwrite) + (nbol*frame)]), 
 			      status );
 	  }
-
           /* Annul sc2 frameset for this time slice */
           if( fs ) fs = astAnnul( fs );
           if( fitschan ) fitschan = astAnnul( fitschan );
@@ -1252,13 +1258,12 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
           /* RTS -------------------------------------------------------*/
 	  /* Sequence number */
-          head[j].rts_num = ( curms * frmperms ) + ( curchunk * maxwrite ) + j;
+          head[j].rts_num = frameoffset + j;
 	  /* Calculate TAI corresponding to MID-TIME of sample and store */
 	  head[j].tcs_tai = mjuldate[j] + (taiutc - inx->dut1 + 0.5*samptime)/SPD;
 
 	  /* RTS_END is a TAI time, corresponding to END time of sample */
           head[j].rts_end = head[j].tcs_tai +0.5*samptime/SPD;
-
 
           /* TCS - Telescope tracking structure ----------------------- */
 	  /* Coord. system  */
@@ -1477,7 +1482,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	    sc2sim_ndfwrdata( inx, sinx, tauCSO, filename, lastframe, nflat[k],
 			      flatname[k], head, digits, dksquid, flatcal[k], 
 			      flatpar[k], INSTRUMENT, filter, dateobs, obsid,
-			      &(posptr[curframe*2]), jigsamples, 
+			      &(posptr[frameoffset*2]), jigsamples, 
                               &(jigpat[0]), obscounter,
 			      subscanno, obsend, obstype, utdate, 
 			      head[0].tcs_az_bc1, 
