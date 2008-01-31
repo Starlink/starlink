@@ -336,12 +336,12 @@ int *status              /* Global status (given and returned) */
    AstFrameSet *wcs;               /* WCS frameset for output image */
    char weightsname[SZFITSCARD] = "\0";           /* Name of weights file for DREAM 
 				      reconstruction */
-   double x_max = 0;               /* X extent of pointing centre offsets */
-   double x_min = 0;               /* X extent of pointing centre offsets */
-   double y_max = 0;               /* Y extent of pointing centre offsets */
-   double y_min = 0;               /* Y extent of pointing centre offsets */
+   double x_max = -1.0e38;         /* X extent of pointing centre offsets */
+   double x_min =  1.0e38;         /* X extent of pointing centre offsets */
+   double y_max = -1.0e38;         /* Y extent of pointing centre offsets */
+   double y_min =  1.0e38;         /* Y extent of pointing centre offsets */
    double zero[2*DREAM__MXBOL];    /* Bolometer zero points */
-   char imdateobs[30];              /* DATE-OBS for IMAGE header */
+   char imdateobs[30];             /* DATE-OBS for IMAGE header */
 
    /* Check status */
    if ( !StatusOkP(status) ) return;
@@ -361,12 +361,12 @@ int *status              /* Global status (given and returned) */
      if( posptr[i*2+1] < y_min ) y_min = posptr[i*2+1];
      if( posptr[i*2+1] > y_max ) y_max = posptr[i*2+1];
    }
+
    map_wdth = (x_max - x_min) + 650.0; /* 650 arcsec for array diagonal FOV */
    map_hght = (y_max - y_min) + 650.0; /* 650 arcsec for array diagonal FOV */
    map_pa = 0; /* kludge for now since it is not specified by the user */
    map_x = (x_max + x_min)/2.;
    map_y = (y_max + y_min)/2.;
-  
 
    /* Define the FITS headers to add to the output file */
    fitschan = astFitsChan ( NULL, NULL, "" );
