@@ -4593,7 +4593,7 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
                val *= specfactor;
                val -= rf;
             }
-            sprintf( combuf, "Freq at ref. pixel on axis %d", i + 1 );
+            sprintf( combuf, "Value at ref. pixel on axis %d", i + 1 );
             SetValue( this, FormatKey( "CRVAL", i + 1, -1, s ), &val, 
                       AST__FLOAT, combuf );
          }
