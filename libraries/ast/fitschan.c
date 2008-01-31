@@ -799,6 +799,8 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        as VELO-LSR, but different versions of class use different names.
 *        Also write out the DELTAV keyword in the LSR rest frame rather
 *        than the source rest frame.
+*     31-JAN-2008 (DSB):
+*        Correct calculation of redshift from radio velocity in ClassTrans.
 *class--
 */
 
@@ -4593,7 +4595,7 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
                val *= specfactor;
                val -= rf;
             }
-            sprintf( combuf, "Freq at ref. pixel on axis %d", i + 1 );
+            sprintf( combuf, "Value at ref. pixel on axis %d", i + 1 );
             SetValue( this, FormatKey( "CRVAL", i + 1, -1, s ), &val, 
                       AST__FLOAT, combuf );
          }
@@ -4928,14 +4930,13 @@ static void ClassTrans( AstFitsChan *this, AstFitsChan *ret, int axlat,
       }
    }
 
-
-/* Look for a keyword with name "VELO-...". This specifies the velocity
+/* Look for a keyword with name "VELO-...". This specifies the radio velocity
    at the reference channel, in a standard of rest specified by the "..." 
    in the keyword name. */
    if( GetValue2( ret, this, "VELO-%3c", AST__FLOAT, (void *) &vref, 0, 
                   method, class ) ){
 
-/* Calculate the velocity (in the rest frame of the source) corresponding
+/* Calculate the radio velocity (in the rest frame of the source) corresponding
    to the frequency at the reference channel. */
       v0 = AST__C*( restfreq - crval )/restfreq;
 
@@ -4956,8 +4957,8 @@ static void ClassTrans( AstFitsChan *this, AstFitsChan *ret, int axlat,
       }
       SetValue( ret, "SSYSSRC", (void *) &ssyssrc, AST__STRING, NULL );
 
-/* Convert from velocity to redshift and store as ZSOURCE */
-      zsource = sqrt( (AST__C + vsource)/ (AST__C - vsource) ) - 1.0;
+/* Convert from radio velocity to redshift and store as ZSOURCE */
+      zsource = ( AST__C / (AST__C - vsource) ) - 1.0;
       SetValue( ret, "ZSOURCE", (void *) &zsource, AST__FLOAT, NULL );
    }
 }
