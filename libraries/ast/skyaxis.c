@@ -22,6 +22,8 @@ f     only within textual output (e.g. from AST_WRITE).
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -104,6 +106,9 @@ f     only within textual output (e.g. from AST_WRITE).
 *        Guard against a null "str1" value in AxisAbbrev.
 *     7-AUG-2007 (DSB):
 *        Added CentreZero attribute.
+*     1-FEB-2008 (DSB):
+*        Modified AxisUnformat to allow the final numerical field to include 
+*        an exponent.
 *class--
 */
 
@@ -3619,6 +3624,7 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
    int decimal;                  /* Decimal point in field? */
    int dh;                       /* Hours field required? */
    int digs;                     /* Default no. of digits of precision */
+   int exponent;                 /* Exponent at end of field? */
    int field_id[ 3 ];            /* Field identification (0 = don't know) */
    int final;                    /* Final field read? */
    int good_sep;                 /* Separator character valid? */
@@ -3626,6 +3632,7 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
    int ifield;                   /* Loop counter for fields */
    int lead_zero;                /* Add leading zeros? */
    int len;                      /* Significant length of string */
+   int m;                        /* Number of characters read by astSscanf */
    int match;                    /* Character pattern matches? */
    int min;                      /* Minutes field required? */
    int n;                        /* Number of characters read by astSscanf */
@@ -3726,11 +3733,12 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
 /* Each field must consist of a string of digits, possibly surrounded
    by white space, except that an optional decimal point may also be
    present (in which case it indicates the final field). Since we want
-   to exclude signs, exponents, etc. from these fields, we must first
-   identify a valid sequence of digits, before attempting to read them
-   as a number. Start by assuming that we will find a decimal
-   point. */
+   to exclude signs, etc. from these fields, we must first identify a 
+   valid sequence of digits, before attempting to read them as a number. 
+   Start by assuming that we will find a decimal point but not an 
+   exponent. */
          decimal = 1;
+         exponent = 0;
 
 /* Match a field and obtain its value. */
 /* ----------------------------------- */
@@ -3759,6 +3767,32 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
 
 /* Note we have not found a decimal point. */
             decimal = 0;
+         }
+
+/* Now look for numbers that end with an exponent. First check that the
+   string starts with a sequence of digits with or without a decimal point. */
+         if( match ) {
+
+/* See if the numbers are followed by an exponent with an explicit sign
+   character. If so, increment the number of characters in the numerical
+   string prefix. */
+            m = 0;
+            if( ( 0 == astSscanf( s + n, "%*1[Ee]%*1[+-]%*[0123456789]%n", &m ) ) 
+                && m ) {
+               n += m;
+               exponent = 1;
+
+/* If the above check failed, see if the numbers are followed by an exponent 
+   without an explicit sign character. If so, increment the number of 
+   characters in the numerical string prefix. */
+            } else {
+               m = 0;
+               if( ( 0 == astSscanf( s + n, "%*1[Ee]%*[0123456789]%n", &m ) ) 
+                   && m ) {
+                  n += m;
+                  exponent = 1;
+               }
+            }
          }
 
 /* If we identified a suitable sequence of characters above, we will
@@ -3903,10 +3937,10 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
          }
 
 /* We have also read all the fields if: (a) the last one contained a
-   decimal point, or (b) the next character is not a valid field
-   separator, or (c) we have read the seconds field so the next field
-   ID would exceed 3. */
-         final = final || decimal || !good_sep || ( next_id > 3 );
+   decimal point, or (b) the last one ended with an exponent, or (c) 
+   the next character is not a valid field separator, or (d) we have 
+   read the seconds field so the next field ID would exceed 3. */
+         final = final || decimal || exponent || !good_sep || ( next_id > 3 );
 
 /* Quit reading if we have read the final field. Otherwise, save the
    separator character and attempt to read the next field. */
