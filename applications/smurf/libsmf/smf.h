@@ -225,6 +225,8 @@
 *        Added hitsmap to smf_simplerebinmap, smf_iteratemap
 *     2008-01-25 (EC):
 *        Added map projection information to smf_model_create interface
+*     2008-2-1 (DSB):
+*        Added smf_resampcube* functions.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -756,5 +758,32 @@ void smf_fits_setL( const smfHead *hdr, const char *name, int value,
 void smf_getrefwcs( const char *param, AstFrameSet **specwcs,
                     AstFrameSet **spacewcs, int *status );
 
+
+void smf_resampcube( smfData *data, int index, int size, 
+                     AstSkyFrame *abskyfrm, AstMapping *iskymap, 
+                     AstFrame *ispecfrm, AstMapping *ispecmap, 
+                     Grp *detgrp, int moving, int slbnd[ 3 ], 
+                     int subnd[ 3 ], int interp, const double params[], 
+                     float *in_data, float *out_data, int *status );
+
+
+void smf_resampcube_copy( dim_t nchan, dim_t nsky, int *spectab, 
+                          dim_t iv0, dim_t nxy, float *ddata, 
+                          float *in_data, int *status );
+
+void smf_resampcube_nn( smfData *data, int index, int size, dim_t nchan, 
+                   dim_t ndet, dim_t nslice, dim_t nel, dim_t nxy, 
+                   dim_t nsky, dim_t dim[3], AstMapping *ssmap, 
+                   AstSkyFrame *abskyfrm, AstMapping *iskymap, 
+                   Grp *detgrp, int moving, float *in_data, 
+                   float *out_data, int *status );
+
+void smf_resampcube_ast( smfData *data, int index, int size, dim_t nchan,
+                         dim_t ndet, dim_t nslice, dim_t nel, dim_t nxy, 
+                         dim_t nsky, dim_t dim[3], AstMapping *ssmap,
+                         AstSkyFrame *abskyfrm, AstMapping *iskymap, 
+                         Grp *detgrp, int moving, int interp, 
+                         const double params[], float *in_data, 
+                         float *out_data, int *status );
 
 #endif /* SMF_DEFINED */

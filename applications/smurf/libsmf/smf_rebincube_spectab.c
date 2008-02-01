@@ -20,12 +20,13 @@
 
 *  Arguments:
 *     nchan = dim_t (Given)
-*        The number of spectral channels in the input NDF.
+*        The number of spectral channels in the input (or template) time
+*        series NDF.
 *     nchanout = dim_t (Given)
-*        The number of spectral channels in the output NDF.
+*        The number of spectral channels in the output (or sky cube) NDF.
 *     ssmap = AstMapping * (Given)
-*        A Mapping that goes from input spectral grid axis (pixel axis 1)
-*        to the output spectral grid axis (pixel axis 3).
+*        A Mapping that goes from time series spectral grid axis (pixel 
+*        axis 1) to the sky cube spectral grid axis (pixel axis 3).
 *     pspectab = int ** (Returned)
 *        An address at which to store a pointer to an array of "int"s.
 *        This array will have "nchan" elements, and each element will

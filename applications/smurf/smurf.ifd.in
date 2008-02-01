@@ -156,6 +156,8 @@
 #         Added parameter REF to MAKECUBE.
 #     17-JAN-2008 (DSB):
 #         Added parameter ALIGNSYS to MAKECUBE.
+#     25-JAN-2008 (DSB):
+#        Add UNMAKECUBE.
 #     {enter_changes_here}
 
 #  Bugs:
@@ -1165,6 +1167,88 @@ package @PACKAGE@ {
             type _INTEGER
             access WRITE
             vpath INTERNAL
+            helpkey *
+          }
+
+ 	  parameter usedetpos {
+	    type _LOGICAL
+	    vpath DEFAULT
+	    ppath CURRENT
+	    prompt {Read detector positions from the input NDF?}
+	    default TRUE
+	    helpkey *
+	  }
+
+     }
+
+     action unmakecube {
+
+         helplib {$SMURF_HELP}
+
+	  parameter detectors {
+            type LITERAL
+            access READ
+            vpath DEFAULT 
+            ppath CURRENT DEFAULT
+            prompt {Names of detectors to be included}
+            default !
+            helpkey *
+	  }
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Input (ra,dec,vel) cube}
+            helpkey *
+          }
+
+         parameter interp {
+            type LITERAL
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Pixel interpolation method}
+            helpkey *
+            default {Nearest}
+         }
+
+         parameter out {
+            position 3
+            type NDF
+            access WRITE
+            vpath {PROMPT }
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Output time series cubes}
+            helpkey *
+          }
+
+         parameter params {
+            size *
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Auxiliary interpolation parameters}
+            helpkey *
+         }
+
+	  parameter msg_filter {
+	    type _CHAR
+	    prompt {Message level}
+	    default NORM
+	    vpath DEFAULT	
+	    helpkey *
+	  }
+
+         parameter ref {
+            position 2
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Template time series cubes}
             helpkey *
           }
 

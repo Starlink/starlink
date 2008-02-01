@@ -94,10 +94,12 @@
 *        Add RAWUNPRESS
 *     2007-11-8 (DSB):
 *        Add TIMESORT.
+*     2008-01-25 (DSB):
+*        Add UNMAKECUBE
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2007 Council and the University of British Columbia.
 *     All Rights Reserved.
@@ -204,6 +206,8 @@ void smurf_mon( int * status ) {
     smurf_qlmakemap( status );
   } else if (strcmp( taskname, "MAKECUBE" ) == 0 ) {
     smurf_makecube( status );
+  } else if (strcmp( taskname, "UNMAKECUBE" ) == 0 ) {
+    smurf_unmakecube( status );
   } else if (strcmp( taskname, "REMSKY" ) == 0 ) {
     smurf_remsky( status );
   } else if (strcmp( taskname, "SCANFIT" ) == 0 ) {

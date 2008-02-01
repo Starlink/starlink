@@ -32,6 +32,8 @@ smf_rebincube_init.c \
 smf_rebincube_spectab.c \
 smf_rebincube_tcon.c \
 smf_rebin_totmap.c \
+smf_resampcube.c smf_resampcube_ast.c \
+smf_resampcube_copy.c  smf_resampcube_nn.c \
 smf_check_smfData.c smf_check_smfDA.c smf_check_smfFile.c smf_check_smfHead.c \
 smf_calc_wvm.c smf_subtract_poly.c smf_subtract_plane.c smf_fit_poly.c \
 smf_calc_stats.c smf_calc_covar.c \

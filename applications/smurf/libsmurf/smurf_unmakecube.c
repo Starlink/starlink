@@ -1,0 +1,479 @@
+/* Defining the FPTRAP macro will cause floating point exceptions to
+   occur whenever a NaN, inf or overflow is generated. This can make it
+   easier to debug the cause of these values. */
+#if defined(FPTRAP)
+#define _GNU_SOURCE
+#include <fenv.h>
+#endif
+
+/*
+*+
+*  Name:
+*     UNMAKECUBE
+
+*  Purpose:
+*     Produce simulated time series data from a regrided ACSIS data cube.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
+*     smurf_unmakecube( int *status );
+
+*  Arguments:
+*     status = int* (Given and Returned)
+*        Pointer to global status.
+
+*  Description:
+*     This routine creates one or more time series cubes, spanned by
+*     (frequency, detector number, time) axes, from a single input sky
+*     cube spanned by (celestial longitude, celestial latitude, spectrum) 
+*     axes. Thus, it performs a sort of inverse to the MAKECUBE application.
+*
+*     The output time series detector samples are created by interpolating the
+*     supplied input sky cube at the position of the reference time series 
+*     sample centre. Various interpolation methods can be used (see parameter 
+*     INTERP).
+*
+*     The output time series cubes inherit all meta-data from the
+*     corresponding input reference time series. The only thing modified
+*     is the values in the NDF "Data" array.
+
+*  ADAM Parameters:
+*     DETECTORS = LITERAL (Read)
+*          A group of detector names. Only data for the named detectors
+*          will be included in the output time series cubes. If a null (!) 
+*          value is supplied, data for all detectors will be created. [!]
+*     IN = NDF (Read)
+*          The input (ra,dec,spectrum) sky cube.
+*     INTERP = LITERAL (Read)
+*          The method to use when resampling the input sky cube pixel values. 
+*          For details of these schemes, see the descriptions of routines 
+*          AST_RESAMPLEx in SUN/210. INTERP can take the following values:
+*	   
+*          - "Linear" -- The output sample values are calculated by bi-linear 
+*          interpolation among the four nearest pixels values in the input 
+*          sky cube.  Produces smoother output NDFs than the nearest-neighbour 
+*          scheme, but is marginally slower.
+*	   
+*          - "Nearest" -- The output sample values are assigned the value of 
+*          the single nearest input pixel. A very fast method.
+*	   
+*          - "Sinc" -- Uses the sinc(pi*x) kernel, where x is the pixel
+*          offset from the interpolation point and sinc(z)=sin(z)/z.  Use 
+*          of this scheme is not recommended.
+*	   
+*          - "SincSinc" -- Uses the sinc(pi*x)sinc(k*pi*x) kernel. A
+*          valuable general-purpose scheme, intermediate in its visual
+*          effect on NDFs between the bi-linear and nearest-neighbour
+*          schemes. 
+*	   
+*          - "SincCos" -- Uses the sinc(pi*x)cos(k*pi*x) kernel.  Gives
+*          similar results to the "Sincsinc" scheme.
+*	   
+*          - "SincGauss" -- Uses the sinc(pi*x)exp(-k*x*x) kernel.  Good 
+*          results can be obtained by matching the FWHM of the
+*          envelope function to the point-spread function of the
+*          input data (see parameter PARAMS).
+*	   
+*          - "Somb" -- Uses the somb(pi*x) kernel, where x is the pixel
+*          offset from the interpolation point and somb(z)=2*J1(z)/z (J1 is
+*          the first-order Bessel function of the first kind.  This scheme
+*          is similar to the "Sinc" scheme.
+*	   
+*          - "SombCos" -- Uses the somb(pi*x)cos(k*pi*x) kernel.  This
+*          scheme is similar to the "SincCos" scheme.
+*	   
+*          [current value]
+*     OUT = NDF (Write)
+*          A group of output NDFs into which the simulated time series data 
+*          will be written.
+*     PARAMS( 2 ) = _DOUBLE (Read)
+*          An optional array which consists of additional parameters
+*          required by the Sinc, SincSinc, SincCos, SincGauss, Somb and
+*          SombCos interpolation schemes (see parameter INTERP).
+*	   
+*          PARAMS( 1 ) is required by all the above schemes. It is used to 
+*          specify how many pixels are to contribute to the interpolated 
+*          result on either side of the interpolation point in each dimension. 
+*          Typically, a value of 2 is appropriate and the minimum allowed 
+*          value is 1 (i.e. one pixel on each side). A value of zero or fewer 
+*          indicates that a suitable number of pixels should be calculated 
+*          automatically. [0]
+*	   
+*          PARAMS( 2 ) is required only by the SombCos, SincSinc, 
+*          SincCos, and SincGauss schemes.  For the SombCos, SincSinc, and
+*          SincCos schemes, it specifies the number of pixels at which the
+*          envelope of the function goes to zero.  The minimum value is
+*          1.0, and the run-time default value is 2.0.  For the SincGauss 
+*          scheme, it specifies the full-width at half-maximum (FWHM) of 
+*          the Gaussian envelope.  The minimum value is 0.1, and the 
+*          run-time default is 1.0.  Good results are often obtained by 
+*          approximately matching the FWHM of the envelope function, given 
+*          by PARAMS(2), to the point-spread function of the input data. []
+*     REF = NDF (Read)
+*          A group of existing time series data cubes. These act as templates
+*          for the new time series cubes created by this application, and 
+*          specified via parameter OUT.
+*     USEDETPOS = _LOGICAL (Read)
+*          If a true value is supplied, then the detector positions are
+*          read from the detector position arrays in each template NDF.
+*          Otherwise, the detector positions are calculated on the basis
+*          of the FPLANEX/Y arrays. Both methods should (in the absence 
+*          of bugs) result in identical cubes. [TRUE]
+
+*  Authors:
+*     David Berry (JAC, UCLan)
+*     {enter_new_authors_here}
+
+*  History:
+*     23-JAN-2008 (DSB):
+*        Original version.
+
+*  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 3 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place,Suite 330, Boston,
+*     MA 02111-1307, USA
+
+*  Bugs:
+*     {note_any_bugs_here}
+*-
+*/
+
+
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+#include <string.h>
+#include <stdio.h>
+
+/* STARLINK includes */
+#include "ast.h"
+#include "mers.h"
+#include "par.h"
+#include "par_par.h"
+#include "prm_par.h"
+#include "ndf.h"
+#include "sae_par.h"
+#include "star/hds.h"
+#include "star/ndg.h"
+#include "star/grp.h"
+#include "star/atl.h"
+#include "star/kaplibs.h"
+
+
+/* SMURF includes */
+#include "smurf_par.h"
+#include "smurflib.h"
+#include "libsmf/smf.h"
+
+#define FUNC_NAME "smurf_unmakecube"
+#define TASK_NAME "UNMAKECUBE"
+#define LEN__METHOD 20
+
+void smurf_unmakecube( int *status ) {
+
+/* Local Variables */
+   AstFrame *ispecfrm = NULL;   /* SpecFrame from the input WCS Frameset */
+   AstFrame *tfrm = NULL;       /* Current Frame from input WCS */
+   AstFrameSet *wcsin = NULL;   /* WCS Frameset for input cube */
+   AstMapping *iskymap = NULL;  /* GRID->SkyFrame Mapping from input WCS */
+   AstMapping *ispecmap = NULL; /* GRID->SpecFrame Mapping from input WCS */
+   AstMapping *tmap = NULL;     /* Base->current Mapping from input WCS */
+   AstSkyFrame *abskyfrm = NULL;/* Input SkyFrame (always absolute) */
+   AstSkyFrame *iskyfrm = NULL; /* SkyFrame from the input WCS Frameset */
+   Grp *detgrp = NULL;        /* Group of detector names */
+   Grp *igrp = NULL;          /* Group of input files */
+   Grp *ogrp = NULL;          /* Group containing output file */
+   char *pname = NULL;        /* Name of currently opened data file */
+   char pabuf[ 10 ];          /* Text buffer for parameter value */
+   double params[ 4 ];        /* astResample parameters */
+   int slbnd[3];              /* Array of lower bounds of input cube */
+   int subnd[3];              /* Array of lower bounds of input cube */
+   int axes[ 2 ];             /* Indices of selected axes */
+   int blank;                 /* Was a blank line just output? */
+   int ifile;                 /* Input file index */
+   int interp = 0;            /* Pixel interpolation method */
+   int moving;                /* Is the telescope base position changing? */
+   int ndet;                  /* Number of detectors supplied for "DETECTORS" */
+   int nel;                   /* Number of elements in 3D array */
+   int nparam = 0;            /* No. of parameters required for interpolation scheme */
+   int indf;                  /* Input cube NDF identifier */
+   int ondf;                  /* Output time series NDF identifier */
+   int flag;                  /* Was the group expression flagged? */
+   int outax[ 2 ];            /* Indices of corresponding output axes */
+   int outsize;               /* Number of files in output group */
+   int sdim[3];               /* Array of significant pixel axes */
+   int size;                  /* Number of files in input group */
+   int usedetpos;             /* Should the detpos array be used? */
+   smfData *data = NULL;      /* Pointer to data struct */
+   void *in_data = NULL;      /* Pointer to the input cube data array */
+   void *out_data = NULL;     /* Pointer to the output cube data array */
+
+#if defined(FPTRAP)
+   feenableexcept(FE_DIVBYZERO|FE_INVALID|FE_OVERFLOW);
+#endif
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* We have not yet displayed a blank line on stdout. */
+   blank = 0;
+
+/* Begin an AST context */
+   astBegin;
+
+/* Begin an NDF context. */
+   ndfBegin();
+
+/* Get an identifier for the input (ra,dec,spectrum) cube. We use NDG 
+   (via kpg1_Rgndf) instead of calling ndfAssoc directly since NDF/HDS 
+   has problems with file names containing spaces, which NDG does not 
+   have. */
+   kpg1Rgndf( "IN", 1, 1, "", &igrp, &size, status );
+   ndgNdfas( igrp, 1, "READ", &indf, status );
+   grpDelet( &igrp, status );
+
+/* Get a group of reference time series files to use as templates for 
+   the output time series files.*/ 
+   ndgAssoc( "REF", 1, &igrp, &size, &flag, status );
+
+/* See if the detector positions are to be read from the RECEPPOS array
+   in the template NDFs. Otherwise, they are calculated on the basis of 
+   the FPLANEX/Y arrays. */
+   parGet0l( "USEDETPOS", &usedetpos, status );
+
+/* Get the detectors to use. If a null value is supplied, annull the
+   error. Otherwise, make the group case insensitive. */
+   detgrp = NULL;
+   if( *status == SAI__OK ) {
+      kpg1Gtgrp( "DETECTORS", &detgrp, &ndet, status );
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+	 if (detgrp) {
+	   grpDelet( &detgrp, status );
+	 }
+      } else {
+         grpSetcs( detgrp, 0, status );
+      }
+   }
+
+/* Get the pixel interpolation scheme to use. */
+   parChoic( "INTERP", "NEAREST", "NEAREST,LINEAR,SINC,"
+             "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS", 
+             1, pabuf, 10, status );
+
+   if( !strcmp( pabuf, "NEAREST" ) ) {
+      interp = AST__NEAREST;
+      nparam = 0;
+
+   } else if( !strcmp( pabuf, "LINEAR" ) ) {
+      interp = AST__LINEAR;
+      nparam = 0;
+
+   } else if( !strcmp( pabuf, "SINC" ) ) {      
+      interp = AST__SINC;
+      nparam = 1;
+
+   } else if( !strcmp( pabuf, "SINCSINC" ) ) {      
+      interp = AST__SINCSINC;
+      nparam = 2;
+
+   } else if( !strcmp( pabuf, "SINCCOS" ) ) {      
+      interp = AST__SINCCOS;
+      nparam = 2;
+
+   } else if( !strcmp( pabuf, "SINCGAUSS" ) ) {      
+      interp = AST__SINCGAUSS;
+      nparam = 2;
+
+   } else if( !strcmp( pabuf, "SOMB" ) ) {      
+      interp = AST__SOMB;
+      nparam = 1;
+
+   } else if( !strcmp( pabuf, "SOMBCOS" ) ) {      
+      interp = AST__SOMBCOS;
+      nparam = 2;
+
+   } else if( *status == SAI__OK ) {
+      nparam = 0;
+      *status = SAI__ERROR;
+      msgSetc( "V", pabuf );
+      errRep( "", "Support not available for INTERP = ^V (programming "
+              "error)", status );
+   }
+
+/* Get an additional parameter vector if required. */
+   if( nparam > 0 ) parExacd( "PARAMS", nparam, params, status );
+
+/* Get the WCS FrameSet from the (ra,dec,spectrum) cube, together with 
+   its bounds. */
+   kpg1Asget( indf, 3, 1, 1, 1, sdim, slbnd, subnd, &wcsin, status );
+
+/* Get the base->current Mapping from the input WCS FrameSet, and split it 
+   into two Mappings; one (iskymap) that maps the first 2 GRID axes into 
+   celestial sky coordinates, and one (ispecmap) that maps the third GRID
+   axis into a spectral coordinate. Also extract the SpecFrame and
+   SkyFrame from the current Frame. */
+   tmap = astGetMapping( wcsin, AST__BASE, AST__CURRENT );
+   tfrm = astGetFrame( wcsin, AST__CURRENT );
+
+   axes[ 0 ] = 1;
+   axes[ 1 ] = 2;
+   astMapSplit( tmap, 2, axes, outax, &iskymap );
+   iskyfrm = astPickAxes( tfrm, 2, outax, NULL );
+
+   axes[ 0 ] = 3;
+   astMapSplit( tmap, 1, axes, outax, &ispecmap );
+   ispecfrm = astPickAxes( tfrm, 1, outax, NULL );
+
+/* Create a copy of "iskyfrm" representing absolute coords rather than 
+   offsets. We assume the target is moving if the cube represents offsets. */
+   abskyfrm = astCopy( iskyfrm );
+   astClear( abskyfrm, "SkyRefIs" );
+   moving = ( *status == SAI__OK && !strcmp( astGetC( iskyfrm, "SkyRefIs" ),
+                                             "Origin" ) ) ? 1 : 0;
+
+/* Invert the Mappings (for the convenience of smf_resamplecube), so 
+   that they go from current Frame to grid axis. */
+   astInvert( ispecmap );
+   astInvert( iskymap );
+
+/* Map the data array in the cube. */
+   ndfMap( indf, "DATA", "_REAL", "READ", &in_data, &nel, status );
+
+/* Create a group holding the names of the output NDFs. */
+   ndgCreat ( "OUT", igrp, &ogrp, &outsize, &flag, status );
+   if( outsize != size && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      msgSeti( "O", outsize );
+      msgSeti( "I", size );
+      errRep( "", "Numbers of input reference cubes (^I) and output "
+              "cubes (^O) differ.", status );
+   }
+
+/* Loop round all the template time series files. */
+   for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++ ) {
+
+/* Start a new NDF context. */
+      ndfBegin();
+
+/* Obtain information about the current template NDF, but do not map the
+   arrays. */
+      smf_open_file( igrp, ifile, "READ", SMF__NOCREATE_DATA, &data, status );
+
+/* Issue a suitable message and abort if anything went wrong. */
+      if( *status != SAI__OK ) {
+         errRep( FUNC_NAME, "Could not open input template file.", status );
+         break;
+   
+      } else {
+         if( data->file == NULL ) {
+            *status = SAI__ERROR;
+            errRep( FUNC_NAME, "No smfFile associated with smfData.", 
+                    status );
+            break;
+   
+         } else if( data->hdr == NULL ) {
+            *status = SAI__ERROR;
+            errRep( FUNC_NAME, "No smfHead associated with smfData.", 
+                    status );
+            break;
+
+         } 
+      }
+   
+/* Report the name of the input template. */
+      pname =  data->file->name;
+      msgSetc( "FILE", pname );
+      msgSeti( "THISFILE", ifile );
+      msgSeti( "NUMFILES", size );
+      msgOutif( MSG__VERB, " ", 
+                "SMURF_UNMAKECUBE: Simulating ^THISFILE/^NUMFILES ^FILE",
+                status );
+
+/* Create the output NDF by propagation from the input template NDF.
+   Everything is copied except for the array components and any PROVENANCE
+   extension. */
+      ndgNdfpr( data->file->ndfid, "TITLE,LABEL,UNITS,AXIS,WCS,HISTORY,"
+                "NOEXTENSION(PROVENANCE)", ogrp, ifile, &ondf, status );
+
+/* Ensure the output NDF has a history component. */
+      ndfHcre( ondf, status );
+
+/* Get a pointer to the mapped output data array. */
+      ndfMap( ondf, "DATA", "_REAL", "WRITE", &out_data, &nel, status );
+
+/* Record details of the input cube and template in the provenance
+   extension of the output time series. */
+      ndgPtprv( ondf, data->file->ndfid, NULL, 0, "SMURF:UNMAKECUBE",
+                status );
+      ndgPtprv( ondf, indf, NULL, 0, "SMURF:UNMAKECUBE", status );
+
+/* If the detector positions are to calculated on the basis of FPLANEX/Y
+   rather than detpos, then free the detpos array in the templates smfHead
+   structure. This will cause smf_tslice_ast to use the fplanex/y values. */
+      if( !usedetpos && data->hdr->detpos ) {
+         smf_free( (double *) data->hdr->detpos, status );      
+         data->hdr->detpos = NULL;
+      }
+   
+/* Resample the cube data into the output time series. */
+      smf_resampcube( data, ifile, size, abskyfrm, iskymap, ispecfrm, 
+                      ispecmap, detgrp, moving, slbnd, subnd, interp, 
+                      params, in_data, out_data, status );
+
+/* Close the input files. */
+      if( data != NULL ) {
+         smf_close_file( &data, status );
+         data = NULL;
+      }
+
+/* End the NDF context. */
+      ndfEnd( status );
+   }
+
+/* Close any input data file that is still open due to an early exit from
+   the above loop. */
+   if( data != NULL ) {
+      smf_close_file( &data, status );
+      data = NULL;
+   }
+
+/* Free remaining resources. */  
+   if( detgrp != NULL) grpDelet( &detgrp, status);
+   if( igrp != NULL) grpDelet( &igrp, status);
+   if( ogrp != NULL) grpDelet( &ogrp, status);
+
+/* End the NDF context. */
+   ndfEnd( status );
+
+/* End the tile's AST context. */
+   astEnd;
+
+/* Issue a status indication.*/  
+   if( *status == SAI__OK ) {
+      msgOutif(MSG__VERB," ",TASK_NAME " succeeded, time series written.", status);
+   } else {
+      msgOutif(MSG__VERB," ",TASK_NAME " failed.", status);
+   }
+}
