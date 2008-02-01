@@ -144,9 +144,11 @@ void smf_resampcube_nn( smfData *data, int index, int size, dim_t nchan,
    float *ddata = NULL;        /* Pointer to start of output detector data */
    float *tdata = NULL;        /* Pointer to start of sky cube time slice data */
    int *spectab = NULL;        /* Template->sky cube channel number conversion table */
+   int detok;                  /* Did the detector receive any data? */
    int found;                  /* Was current detector name found in detgrp? */
    int gxsky;                  /* Sky cube X grid index */
    int gysky;                  /* Sky cube Y grid index */
+   int ichan;                  /* Output channel index */
    int idet;                   /* Detector index */
    int itime;                  /* Index of current time slice */
    int iv0;                    /* Offset for pixel in 1st sky cube spectral channel */
@@ -224,7 +226,11 @@ void smf_resampcube_nn( smfData *data, int index, int size, dim_t nchan,
 /* Loop round each detector, obtaining its output value from the sky cube. */
       for( idet = 0; idet < ndet; idet++ ) {
 
+/* Get a pointer to the start of the output spectrum data. */
+         ddata = tdata + idet*nchan;
+
 /* Check the detector has a valid position in sky cube grid coords */
+         detok = 0;
          if( detxskycube[ idet ] != AST__BAD && detyskycube[ idet ] != AST__BAD ){
 
 /* Find the closest sky cube pixel and check it is within the bounds of the
@@ -243,6 +249,14 @@ void smf_resampcube_nn( smfData *data, int index, int size, dim_t nchan,
                ddata = tdata + idet*nchan;
                smf_resampcube_copy( nchan, nsky, spectab, iv0, nxy, 
                                     ddata, in_data, status );
+               detok = 1;
+            }
+         }
+
+/* If the detector did not receive any data, fill it with bad values. */
+         if( ! detok ) {
+            for( ichan = 0; ichan < nchan; ichan++ ) {
+               ddata[ ichan ] = VAL__BADR;
             }
          }
       }

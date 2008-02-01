@@ -236,6 +236,12 @@ void smf_resampcube( smfData *data, int index, int size,
                                  1, "" ), 
                       ispecmap, 1, "" );
 
+/* Issue a warning if any of the detector names specified in "detgrp"
+   were not found in the data. If the supplied group holds the detectors
+   to be excluded, modify it so that it holds the detectors to be
+   included. */
+      smf_checkdets( detgrp, data, status );
+
 /* If we are using nearest neighbour resampling, we can use specialist
    code that is faster than AST. */
    if( interp == AST__NEAREST ) {
