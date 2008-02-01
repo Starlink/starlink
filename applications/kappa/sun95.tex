@@ -12,12 +12,12 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun95.33}
-\newcommand{\stardocnumber}    {95.33}
+\newcommand{\stardocsource}    {sun95.34}
+\newcommand{\stardocnumber}    {95.34}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2008 January 5}
+\newcommand{\stardocdate}      {2008 January 24}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.8-8}
+\newcommand{\stardocversion}   {1.8-9}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -955,14 +955,17 @@ through an image; \htmlref{vector plot}{VECPLOT} of an image.
 to individual needs and stored within \htmlref{`style files'}{se:style}.
 \end{itemize} 
 
-\subsubsection{General}
-\KAPPA\ handles \htmlref{bad pixels, and processes
-quality}{se:masking}, variance, \htmlref{World Co-ordinate System}{se:wcsuse}
-(WCS), and other information stored within
-NDFs \latex{(SUN/33 and Section~\ref{se:datastr})}.  In order to
-achieve generality \KAPPA\ does not process non-standard
-extensions; however, it does not lose non-standard ancillary data
-since it copies extensions to any NDFs that it creates.
+\subsubsection{General} \KAPPA\ handles \htmlref{bad pixels, and
+processes quality}{se:masking}, variance, \htmlref{World Co-ordinate
+System}{se:wcsuse} (WCS), and other information stored within NDFs
+\latex{(SUN/33 and Section~\ref{se:datastr})}.  In order to achieve
+generality \KAPPA\ does not process non-standard extensions; however,
+it does not lose non-standard ancillary data since it copies
+extensions to any NDFs that it creates.  The standard extensions that
+\KAPPA\ recognises are the \htmlref{FITS airlock}{se:fitsairlock},
+that holds metadata in the form of FITS headers; and
+\htmlref{PROVENANCE}{apndf:provenance} that records the lineage of an
+NDF, much like a family tree.
 
 \KAPPA\ can also process data in other formats, such as FITS
 and \IRAF, using an automatic-data conversion facility
@@ -12102,6 +12105,10 @@ picture.}
  Takes the specified power of each  pixel of a data array.}
 \menuitem{PROFILE}{
  Creates a one-dimensional profile through an \textit{n}-dimensional NDF.}
+\menuitem{PROVADD}{
+ Stores \htmlref{provenance information}{apndf:provenance} in an NDF.}
+\menuitem{PROVSHOW}{
+ Displays provenance information for an NDF.}
 \menuitem{PSF}{
  Determines the parameters of a model star profile by fitting star images in a two-dimensional NDF.}
 \menuitem{QUALTOBAD}{
@@ -12685,6 +12692,16 @@ functions as follows.
 \vspace*{0.7ex}
 %
 \goodbreak
+\label{cl:prov}
+\item {\large\bf NDF Provenance}
+\begin{description}
+\classitem{PROVADD}
+ Stores \htmlref{provenance information}{apndf:provenance} in an NDF.
+\classitem{PROVSHOW}
+ Displays provenance information for an NDF.
+\end{description}
+\vspace*{0.7ex}
+%
 \label{cl:wcs}
 \item {\large\bf NDF World Co-ordinate Systems}
 \begin{description}
@@ -38982,6 +38999,176 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
    }
 }
 \sstroutine{
+   PROVADD
+}{
+   Stores provenance information in an NDF
+}{
+   \sstdescription{
+      This application modifies the provenance information stored in an
+      NDF.  It records a second specified NDF as a direct parent of the
+      first NDF.  If an NDF has more than one direct parent then this
+      application should be run multiple times, once for each parent.
+   }
+   \sstusage{
+      provadd ndf parent creator isroot more
+   }
+   \sstparameters{
+      \sstsubsection{
+         CREATOR = LITERAL (Read)
+      }{
+         A text identifier for the software that created the main NDF
+         (usually the name of the calling application).  The format of the
+         identifier is arbitrary, but the form {\tt "PACKAGE:COMMAND"} is
+         recommended.  If a null ({\tt{!}}) value is supplied, no creator
+         information is stored.  {\tt [!]}
+      }
+      \sstsubsection{
+         ISROOT = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, then the NDF given by parameter {\tt "PARENT"} will be treated
+         as a root NDF.  That is, any provenance information within PARENT
+         describing its own parents is ignored.  If {\tt FALSE}, then any provenance
+         information within PARENT is copied into the main NDF.  PARENT
+         is then a root NDF only if it contains no provenance
+         information.  {\tt [FALSE]}
+      }
+      \sstsubsection{
+         MORE = UNIV (Read)
+      }{
+         An HDS object containing arbitrary additional information about
+         the parent NDF, and how it was used in the creation of the main NDF.
+         If supplied, this information is stored with the provenance in
+         the main NDF.  {\tt [!]}
+      }
+      \sstsubsection{
+         NDF = NDF (Read and Write)
+      }{
+         The NDF which is to be modified.
+      }
+      \sstsubsection{
+         PARENT = NDF (Read)
+      }{
+         An NDF that is to be recorded as a direct parent of the NDF
+         given by parameter {\tt "NDF"}.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         provadd m51\_ff ff
+      }{
+         Records the fact that NDF ff was used in the creation of NDF m51\_ff.
+      }
+   }
+   \sstnotes{
+      Provenance information is stored in an NDF extension called
+      PROVENANCE, and is propagated automatically by all KAPPA
+      applications.
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: \htmlref{PROVSHOW}{PROVSHOW}, \htmlref{HISCOM}{HISCOM}.
+   }
+}
+
+\sstroutine{
+   PROVSHOW
+}{
+   Displays provenance information for an NDF
+}{
+   \sstdescription{
+      This application displays details of the NDFs that were used in
+      the creation of the supplied NDF.  This information is read from the
+      PROVENANCE extension within the NDF, and includes both immediate
+      parent NDFs and older ancestor NDFs (\emph{i.e.} the parents of the
+      parents, \emph{etc.}).
+
+      Each NDF (including the supplied NDF itself) is described in a
+      block of lines.  The first line holds an integer index for the NDF
+      followed by the path to that NDF.  Note, this path is where the NDF
+      was when the provenance information was recorded.  It is of course
+      possible that the NDF may subsequently have been moved or deleted.
+
+      The remaining lines in the NDF description are as follows:
+
+      \sstitemlist{
+
+         \sstitem
+         {\tt "Parents"} --- A comma-separated list of integers that
+	 are the indices of the immediate parents of the NDF.  These
+	 are the integers that are displayed on the first line of each
+	 NDF description.
+
+         \sstitem
+         {\tt "Date"} --- The formatted UTC date and time at which the
+	 provenance information for the NDF was recorded.
+
+         \sstitem
+         {\tt "Creator"} --- A string identifying the software that created
+         the NDF.
+
+         \sstitem
+         {\tt "More"} --- A summary of any extra information about the
+	 NDF stored with the provenance information.  In general this may
+	 be an arbitrary HDS structure and so full details cannot be
+	 given on a single line.  The HDSTRACE command can be used to
+	 examine the MORE field in detail.  To see full details of the
+	 NDF with {\tt "ID"} value of 12 (say), enter (from a UNIX shell)
+	 {\tt "hdstrace fred.more.provenance.ancestors'(12)'"}, where
+	 {\tt fred} is the name of the NDF supplied for parameter NDF.
+	 If the NDF has no extra information, this item will not be
+	 present.
+      } 
+   } 
+   \sstusage{
+      provshow ndf
+   }
+   \sstparameters{ 
+      \sstsubsection{ 
+         NDF = NDF (Read) 
+      }{ 
+         The NDF data structure.
+      } 
+   } 
+   \sstexamples{ 
+      \sstexamplesubsection{
+         provshow m51
+      }{ 
+        This displays the provenance information in the NDF m51.
+        }
+      }
+      \sstnotes{
+         \sstitemlist{
+
+         \sstitem
+
+         If a KAPPA application uses one or more input NDFs to create an
+	 output NDF, the output NDF may or may not contain provenance
+	 information depending on two things: 1) whether any of the input
+	 NDFs already contain provenance information, and 2) the value of
+	 the AUTOPROV environment variable.  It is usually necessary to
+	 set the AUTOPROV variable to {\tt "1"} in order to create output
+	 NDFs that contain provenance information.  The exception to this
+	 if you are supplied with NDFs from another source that already
+	 contain provenance.  If such NDFs are used as inputs to KAPPA
+	 applications, then the output NDFs will contain provenance even
+	 if the AUTOPROV variable is unset.  However, setting AUTOPROV to
+	 {\tt "0"} will always prevent provenance information being
+	 stored in the output NDFs.
+
+         \sstitem
+         Some other packages, such as CCDPACK, follow the same strategy
+         for creating and propagating provenance information.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: \htmlref{PROVADD}{PROVADD}, \htmlref{HISLIST}{HISLIST}.
+   }
+}
+
+\sstroutine{
    PSF
 }{
    Determines the parameters of a model star profile by fitting star
@@ -44715,6 +44902,7 @@ Click \htmladdnormallink{here}{surfit_exam.gif} to see an example plot
 right.
 \end{htmlonly}
 
+\pagebreak
 \sstroutine{
    THRESH
 }{
@@ -46867,6 +47055,8 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
 \htmlref{WCSCOPY}{WCSCOPY}.
    }
 }
+
+\pagebreak
 \sstroutine{
    WCSCOPY
 }{
@@ -49710,6 +49900,21 @@ reverse operation.  The extension can be listed via the command
 \htmlref{FITSLIST}{FITSLIST}.  \htmlref{FITSEDIT}{FITSEDIT} allows you
 to edit the headers prior to export of the dataset to another format
 such as \FITSref\ or \IRAFref\@.
+
+\label{apndf:provenance} \KAPPA\ uses a PROVENANCE extension to record
+details of the ancestor NDFs used to generate an NDF.  This lets you
+determine how the NDF before you, came to be.  For each ancestor NDF,
+the provenance information includes its path at creation time, the
+creation epoch, the software that generated the ancestor, and indices
+to its parent NDFs (if any exist) within the PROVENANCE extension.
+There is also a MORE component within PROVENANCE that can be filled
+with arbitrary additional information.  Provenance recording is
+controlled through the AUTOPROV environment variable: set it to {\tt
+1} to enable recording and {\tt 0} to disable.  If a supplied NDF
+already has provenance, the created NDFs will also have provenance
+unless AUTOPROV is set to {\tt 0}.  You can examine provenance with
+\htmlref{PROVSHOW}{PROVSHOW}, and modify it with
+\htmlref{PROVADD}{PROVADD}.
 
 \end{description}
 
@@ -53388,6 +53593,18 @@ The following new applications have been added:
    be used for example, with a spectral imaging cube to extract spectra
    at specified equatorial co-ordinates, or an image at a given spectral
    co-ordinate.
+
+   \item [\htmlref{PROVADD}{PROVADD}] \mbox{}
+   This modifies the \htmlref{provenance information}{apndf:provenance} stored 
+   in an NDF.  It records a second specified NDF as a direct parent of the
+   first NDF. 
+   
+   \item [\htmlref{PROVSHOW}{PROVSHOW}] \mbox{}
+   This displays details of the NDFs that were used in the creation of
+   a supplied NDF.  This information is read from the PROVENANCE
+   extension within the NDF, and includes both immediate parent NDFs and
+   older ancestor NDFs.
+   
 \end{description}
 
 \subsection{Modified Commands}
@@ -53967,6 +54184,15 @@ functions as follows.
 \vspace*{0.7ex}
 %
 \goodbreak
+\item {\large\bf NDF Provenance}
+\begin{description}
+\classitem{PROVADD}
+ Stores \htmlref{provenance information}{apndf:provenance} in an NDF.
+\classitem{PROVSHOW}
+ Displays provenance information for an NDF.
+\end{description}
+\vspace*{0.7ex}
+%
 \item {\large\bf NDF World Co-ordinate Systems}
 \begin{description}
 \classitem{PERMAXES}

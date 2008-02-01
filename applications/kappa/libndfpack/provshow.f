@@ -4,7 +4,7 @@
 *     PROVSHOW
 
 *  Purpose:
-*     Display provenance information for an NDF.
+*     Displays provenance information for an NDF.
 
 *  Language:
 *     Starlink Fortran 77
@@ -21,37 +21,39 @@
 
 *  Description:
 *     This application displays details of the NDFs that were used in
-*     the creation of the supplied NDF. This information is read from the
-*     PROVENANCE extension within the NDF, and includes both immediate
-*     parent NDFs and older ancestor NDFs (i.e. the parents of the
-*     parents, etc).
+*     the creation of the supplied NDF. This information is read from
+*     the PROVENANCE extension within the NDF, and includes both
+*     immediate parent NDFs and older ancestor NDFs (i.e. the parents of
+*     the parents, etc.).
 *
 *     Each NDF (including the supplied NDF itself) is described in a
 *     block of lines. The first line holds an integer index for the NDF
-*     followed by the path to the NDF. Note, this path is where the NDF 
+*     followed by the path to that NDF. Note, this path is where the NDF
 *     was when the provenance information was recorded. It is of course 
-*     possible that the NDF may subsequently have been moved or deleted .
+*     possible that the NDF may subsequently have been moved or deleted.
 *
 *     The remaining lines in the NDF description are as follows:
 *
-*     - "Parents": A comma separated list of integers that are the indices 
-*     of the immediate parents of the NDF. These are the integers that are 
-*     displayed on the first line of each NDF description.
+*       "Parents" -- A comma-separated list of integers that are the 
+*       indices of the immediate parents of the NDF.  These are the
+*       integers that are displayed on the first line of each NDF 
+*       description.
 *
-*     - "Date": The formatted UTC date and time at which the provenance 
-*     information for the NDF was recorded.
+*       "Date" -- The formatted UTC date and time at which the 
+*       provenance information for the NDF was recorded.
 *
-*     - "Creator": A string identifying the software that created the
-*     NDF.
+*       "Creator" -- A string identifying the software that created the
+*       NDF.
 *
-*     - "More": A summary of any extra information about the NDF stored with 
-*     the provenance information. In general this may be an arbitrary HDS
-*     structure and so full details cannot be given on a single line. The
-*     HDSTRACE command can be used to examine the MORE field in detail. To
-*     see full details of the NDF with "ID" value of 12 (say), do
-*     "hdstrace fred.more.provenance.ancestors'(12)'", where "fred" is
-*     the name of the NDF supplied for parameter "NDF". If the NDF has no
-*     extra information, this item will not be present.
+*       "More" -- A summary of any extra information about the NDF 
+*       stored with the provenance information.  In general this may be 
+*       an arbitrary HDS structure and so full details cannot be given 
+*       on a single line.  The HDSTRACE command can be used to examine 
+*       the MORE field in detail.  To see full details of the NDF with 
+*       "ID" value of 12 (say), enter (from a UNIX shell)
+*       "hdstrace fred.more.provenance.ancestors'(12)'", where "fred" is
+*       the name of the NDF supplied for parameter "NDF".  If the NDF 
+*       has no extra information, this item will not be present.
 
 *  Usage:
 *     provshow ndf 
@@ -64,21 +66,25 @@
 *     - If a KAPPA application uses one or more input NDFs to create an 
 *     output NDF, the output NDF may or may not contain provenance 
 *     information depending on two things: 1) whether any of the
-*     input NDFs already contain provenance information and 2) the value
-*     of the AUTOPROV environment variable. It is usually necessary to 
-*     set the AUTOPROV variable to "1" in order to create output NDFs that
-*     contain provenance information. The exception to this if you are 
-*     supplied with NDFs from another source that already contain
-*     provenance. If such NDFs are used as inputs to KAPPA applications
-*     then the output NDFs will contain provenance even if the AUTOPROV
-*     variable is unset. However, setting AUTOPROV to "0" will always
-*     prevent provenance information being stored in the output NDFs.
+*     input NDFs already contain provenance information, and 2) the
+*     value of the AUTOPROV environment variable. It is usually 
+*     necessary to set the AUTOPROV variable to "1" in order to create 
+*     output NDFs that contain provenance information.  The exception to
+*     this if you are supplied with NDFs from another source that 
+*     already contain provenance.  If such NDFs are used as inputs to 
+*     KAPPA applications, then the output NDFs will contain provenance 
+*     even if the AUTOPROV variable is unset.  However, setting AUTOPROV
+*     to "0" will always prevent provenance information being stored in 
+*     the output NDFs.
 *     - Some other packages, such as CCDPACK, follow the same strategy
 *     for creating and propagating provenance information.
 
 *  Examples:
 *     provshow m51 
 *        This displays the provenance information in the NDF m51. 
+
+*  Related Applications:
+*     KAPPA: PROVADD, HISLIST.
 
 *  Copyright:
 *     Copyright (C) 2008 Science & Technology Facilities Council.
@@ -87,7 +93,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -97,8 +103,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
