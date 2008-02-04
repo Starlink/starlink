@@ -106,8 +106,10 @@
 *        input data if the VARIANCE parameter is set TRUE).  If GENVAR
 *        is set FALSE, the output variances are based on the variances
 *        in the input NDFs, so long as all input NDFs contain variances 
-*        (otherwise the output NDF will not contain any Variances).  
-*        [FALSE]
+*        (otherwise the output NDF will not contain any Variances). If a
+*        null (!) value is supplied, then a value of FALSE is adopted if 
+*        and only if all the input NDFs have variance components (TRUE is
+*        used otherwise). [FALSE]
 *     ILEVEL = _INTEGER (Read)
 *        Controls the amount of information displayed on the screen. If
 *        set to 1, no information will be displayed while the command
@@ -304,7 +306,7 @@
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics & Astronomy Research Council. 
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -354,6 +356,8 @@
 *        Add new argument NUSED to calls to AST_REBINSEQ.
 *     19-JUN-2007 (DSB):
 *        New output parameters FLBND and FUBND.
+*     4-FEB-2008 (DSB):
+*        Allow a null value to be supplied for parameter GENVAR.
 *     {enter_further_changes_here}
 
 *-
@@ -593,16 +597,29 @@
       CALL PAR_GET0I( 'MAXPIX', MAXPIX, STATUS )
       MAXPIX = MAX( 1, MAXPIX )
 
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
 *  See if output variances are to be generated on the basis of the
-*  spread of input data values.  If so, we do not use input variances.
+*  spread of input data values.  
       CALL PAR_GET0L( 'GENVAR', GENVAR, STATUS )
+
+*  If a null value was supplied, annul the error and use FALSE if all the
+*  input NDFs have a variance component, and TRUE otherwise.
+      If( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         GENVAR = .NOT. HASVAR
+      END IF         
+
+*  If we are creating output variances from the spread of input data
+*  values, then we do not use the inptu variances to calculate the output
+*  variances.
       IF( GENVAR ) THEN
          USEVAR = .FALSE.
 
 *  If output variances are not being created on the basis of the spread
-*  in input values, then assume that output variances are being created on
-*  the basis of input variances, if all input NDF have defined Variance
-*  components. 
+*  in input values, then thet are created on the basis of input variances, 
+*  if all input NDF have defined Variance components. 
       ELSE
          USEVAR = HASVAR
       END IF
