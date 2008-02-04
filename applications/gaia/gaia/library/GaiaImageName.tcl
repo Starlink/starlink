@@ -168,9 +168,25 @@ itcl::class gaia::GaiaImageName {
       }
    }
 
+   #  Set the FITS extension number, ignored for NDFs. Note invalidates
+   #  any previous checks and reformats filename.
+   public method setfitshdunum {hdu} {
+      if { $slice_ == {} } {
+         set fitshdu_ $hdu
+         set fitsext_ "\[$hdu\]"
+         get_fullname_
+      }
+   }
+
    #  Get the HDS path.
    public method path {} {
       return $path_
+   }
+
+   #  Set the HDS path. Note invalidates any previous checks and reformats filename.
+   public method setpath {path} {
+      set path_ $path
+      get_fullname_
    }
 
    #  Get the diskfile type.

@@ -45,4 +45,7 @@ int GaiaFITSCreate( const char* filename, void *data,
                     double bzero, long blank, const char *object,
                     const char *units, int naxis, long naxes[] );
 
+/* Meta-list of MEF contents */
+const char *GaiaFITSHduList( StarFitsIO *fitsio, string &result );
+
 #endif

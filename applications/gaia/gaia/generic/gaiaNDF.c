@@ -15,7 +15,8 @@
 
  *  Copyright:
  *     Copyright (C) 1995-2005 Central Laboratory of the Research Councils
- *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     Copyright (C) 2006 Particle Physics & Astronomy Research Council
+ *     Copyright (C) 2008 Science and Technology Facilities Council
  *     All Rights Reserved.
 
  *  Licence:
@@ -551,7 +552,7 @@ int gaiaCopyNDF( const char *filename, int indf, const char *clist,
                         memcpy( outptr, inptr, nel *  sizeof( double ) );
                     }
                     ndfAunmp( indf, "CENTRE", axis, &status );
-                    ndfAunmp( *ondf, "CENTRE", 1, &status );   
+                    ndfAunmp( *ondf, "CENTRE", 1, &status );
                 }
             }
         }
@@ -691,7 +692,7 @@ static NDFinfo *getNDFInfo( const void *handle, const int index )
  *  Purpose:
  *     Initialise access to an NDF and/or any related NDFs. This
  *     routine should be called before any others in the multiple
- *     NDFs per container file interface.
+ *     image NDFs per container file interface.
  *
  *  Description:
  *     Categorise and store displayable information for the given NDF and
@@ -793,7 +794,7 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
     else {
 
         /*  May just be a HDS container name with NDFs at this level. Need
-         *  to parse down to a filename and a HDS path.
+         *  to parse down to a filename and an HDS path.
          */
         filename = strdup( name );
         path = strstr( filename, ".sdf" );
@@ -1811,6 +1812,121 @@ int gaiaNDFGetPropertyDims( int ndfid, const char *extension,
         emsRlse();
         return TCL_ERROR;
     }
+    emsRlse();
+    return TCL_OK;
+}
+
+/*
+ * Search an HDS container file for sibling NDFs. Siblings are at the same HDS
+ * level as the given NDF. The number of sibling located and a Tcl list of
+ * their basic properties is returned (HDS path and dimensionality followed by
+ * the first three dimensions).
+ */
+int gaiaNDFSiblingSearch( int ndfid, int *nsiblings, char **props )
+{
+    HDSLoc *baseloc = NULL;
+    HDSLoc *ndfloc = NULL;
+    HDSLoc *newloc = NULL;
+    char *error_mess;
+    char *ptr;
+    char name[DAT__SZNAM+1];
+    int added;
+    int avail;
+    int dims[NDF__MXDIM];
+    int i;
+    int isect;
+    int ncomp;
+    int ndims;
+    int need;
+    int newid;
+    int place;
+    int same;
+    int status = SAI__OK;
+    int used;
+    int valid;
+
+    /*  Mark the error stack */
+    emsMark();
+
+    /*  Get the locator to the NDF. */
+    ndfloc = NULL;
+    ndfLoc( ndfid, "READ", &ndfloc, &status );
+
+    /*  Create a string for the Tcl list of properties. The first entry is
+     *  for the given NDF. */
+    *props = (char *) malloc( EMS__SZMSG );
+    ptr = *props;
+    ndfDim( ndfid, NDF__MXDIM, dims, &ndims, &status );
+    datName( ndfloc, name, &status );
+    *nsiblings = 1;
+    added = sprintf( ptr, "{{%d} {NDF} {%s} {%d} {%d} {%d} {%d}} ",
+                     *nsiblings, name, ndims, dims[0], dims[1], dims[2] );
+    ptr += added;
+
+    /*  Manage string space, realloc when avail < need. */
+    used = 0;
+    avail = EMS__SZMSG;
+    need = added * 2;
+    avail -= added;
+    used = added;
+
+    /*  Get locator to the NDF parent. */
+    datParen( ndfloc, &baseloc, &status );
+    datValid( baseloc, &valid, &status );
+    if ( valid && status == SAI__OK ) {
+
+        /*  Now look for additional NDFs at baseloc. */
+        datNcomp( baseloc, &ncomp, &status );
+        if ( status != SAI__OK || ncomp == 1 ) {
+            ncomp = 0;
+        }
+        datName( baseloc, name, &status );
+
+        for ( i = 1; i <= ncomp; i++ ) {
+            status = SAI__OK;
+            newloc = NULL;
+            datIndex( baseloc, i, &newloc, &status );
+
+            /*  See if newloc is an NDF by attempting to open it. */
+            ndfOpen( newloc, "", "READ", "OLD", &newid, &place, &status );
+            if ( status == SAI__OK ) {
+
+                /*  Don't include self twice. */
+                ndfSame( ndfid, newid, &same, &isect, &status );
+                if ( ! same ) {
+                    (*nsiblings)++;
+
+                    /* Add description. */
+                    ndfDim( newid, NDF__MXDIM, dims, &ndims, &status );
+                    datName( newloc, name, &status );
+                    if ( avail < need ) {
+                        *props = (char *) realloc( *props, 
+                                                   used + avail + EMS__SZMSG );
+                        avail += EMS__SZMSG;
+                        ptr = *props;
+                        ptr += used;
+                    }
+                    added = sprintf( ptr, "{{%d} {NDF} {%s} {%d} {%d} {%d} {%d}} ",
+                                     *nsiblings, name, ndims, dims[0], dims[1], dims[2] );
+                    ptr += added;
+                    avail -= added;
+                    used += added;
+                }
+                ndfAnnul( &newid, &status );
+            }
+            datAnnul( &newloc, &status );
+            if ( status != SAI__OK ) {
+                emsAnnul( &status );
+            }
+        }
+    }
+
+    datAnnul( &ndfloc, &status );
+    datAnnul( &baseloc, &status );
+    if ( status != SAI__OK ) {
+        emsAnnul( &status );
+    }
+
     emsRlse();
     return TCL_OK;
 }

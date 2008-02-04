@@ -46,6 +46,8 @@
 #include "config.h"
 #endif
 
+#include <string>
+#include <sstream>
 #include <cstdio>
 #include <unistd.h>
 #include <cstring>
@@ -394,4 +396,70 @@ int GaiaFITSHPutCard( StarFitsIO *fitsio, const char *card )
 {
     fitsio->putcard( card );
     return TCL_OK;
+}
+
+
+/*
+ * Return a string containing a Tcl list with various meta-data descriptions
+ * of the extensions in the given FITS file. The meta-data values are:
+ *
+ * "HDU Type ExtName NAXIS NAXIS1 NAXIS2 NAXIS3 CRPIX1 CRPIX2"
+ */
+int GaiaFITSHduList( StarFitsIO* fits, string &result )
+{
+    int numHDUs = fits->getNumHDUs();
+    if ( numHDUs <= 0 ) {
+        //  No HDUs.
+	return TCL_OK;
+    }
+
+    //  Save current HDU, then loop through all HDUs to get info
+    int curHDU = fits->getHDUNum();
+    ostringstream os;
+    int status = 0;
+    int count = 0;
+    for ( int i = 1; i <= numHDUs; i++ ) {
+	if ( fits->setHDU( i ) != 0 ) {
+	    status++;
+	    break;
+	}
+	const char* type = fits->getHDUType();
+	if ( !type ) {
+	    status++;
+	    break;
+	}
+
+	//  Get these keyword values and default to "".
+	char extName[80];
+        int naxis, naxis1, naxis2, naxis3;
+	double crpix1, crpix2;
+	fits->get( "EXTNAME", extName, 80 );
+	fits->get( "NAXIS", naxis );
+	fits->get( "NAXIS1", naxis1 );
+	fits->get( "NAXIS2", naxis2 );
+	fits->get( "NAXIS3", naxis3 );
+	fits->get( "CRPIX1", crpix1 );
+	fits->get( "CRPIX2", crpix2 );
+
+        os << "{"
+           << i
+           << " " << type
+           << " {" << extName << "}"
+           << " {" << naxis << "}"
+           << " {" << naxis1 << "}"
+           << " {" << naxis2 << "}"
+           << " {" << naxis3 << "}"
+           << " {" << crpix1 << "}"
+           << " {" << crpix2 << "}"
+           << "} ";
+	count++;
+    }
+    if ( count > 0 ) {
+        fits->setHDU( curHDU );
+	if ( status == 0 ) {
+            result = os.str();
+            return TCL_OK;
+	}
+    }
+    return TCL_ERROR;
 }

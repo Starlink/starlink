@@ -13,6 +13,7 @@
 
  *  Copyright:
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     Copyright (C) 2008 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -62,6 +63,8 @@ struct NDFinfo {
     AstFitsChan *fitschan; /* All FITS headers in a channel, if used */
     int fitschanmod;       /* Set true then fitschan has been modified
                             * (will require saving) */
+    int nhdu;              /* Number of HDUs associated with this NDF */
+    char *hdulist;         /* Tcl list of the properties of each HDU */
 };
 typedef struct NDFinfo NDFinfo;
 
@@ -98,12 +101,14 @@ static int gaiaNDFTclGetDoubleProperty( ClientData clientData,
                                         int objc, Tcl_Obj *CONST objv[] );
 static int gaiaNDFTclGetProperty( ClientData clientData, Tcl_Interp *interp,
                                   int objc, Tcl_Obj *CONST objv[] );
-static int gaiaNDFTclGetPropertyDims( ClientData clientData, 
+static int gaiaNDFTclGetPropertyDims( ClientData clientData,
                                       Tcl_Interp *interp,
                                       int objc, Tcl_Obj *CONST objv[] );
 static int gaiaNDFTclGtWcs( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
 static int gaiaNDFTclMap( ClientData clientData, Tcl_Interp *interp,
+                          int objc, Tcl_Obj *CONST objv[] );
+static int gaiaNDFTclHdu( ClientData clientData, Tcl_Interp *interp,
                           int objc, Tcl_Obj *CONST objv[] );
 static int gaiaNDFTclOpen( ClientData clientData, Tcl_Interp *interp,
                            int objc, Tcl_Obj *CONST objv[] );
@@ -118,6 +123,7 @@ static int queryNdfCoord( AstFrameSet *frameSet, int axis, double *coords,
 static void storeCard( AstFitsChan *channel, const char *keyword,
                        const char *value, const char *comment,
                        const char *type, int overwrite );
+static void hduSearch( NDFinfo info );
 
 /**
  * Register all the NDF access commands.
@@ -174,9 +180,12 @@ int Ndf_Init( Tcl_Interp *interp )
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
-
     Tcl_CreateObjCommand( interp, "ndf::getpropertydims",
                           gaiaNDFTclGetPropertyDims,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "ndf::hdu", gaiaNDFTclHdu,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -245,6 +254,8 @@ static long exportNdfHandle( int ndfid, AstFrameSet *wcs )
     info->wcs = wcs;
     info->fitschan = NULL;
     info->fitschanmod = 0;
+    info->nhdu = -1;
+    info->hdulist = NULL;
 
     return (long) info;
 }
@@ -519,6 +530,9 @@ static int gaiaNDFTclClose( ClientData clientData, Tcl_Interp *interp,
         result = gaiaNDFClose( &info->ndfid );
 
         /* Free the handle */
+        if ( info->hdulist != NULL ) {
+            free( info->hdulist );
+        }
         free( info );
         info = NULL;
     }
@@ -593,7 +607,7 @@ static int gaiaNDFTclMap( ClientData clientData, Tcl_Interp *interp,
                 /* Construct result */
                 if ( result == TCL_OK ) {
                     arrayInfo = gaiaArrayCreateInfo( dataPtr, type, el,
-                                                     0, 0, 0, 1.0, 0.0, 
+                                                     0, 0, 0, 1.0, 0.0,
                                                      GAIA_ARRAY_NONE );
                     Tcl_SetObjResult( interp,Tcl_NewLongObj((long)arrayInfo));
                 }
@@ -1461,7 +1475,7 @@ static int gaiaNDFTclGetDoubleProperty( ClientData clientData,
  * Return the dimensionality of a named component stored in an extension.
  * If the extension or component do not exist then an error will occur.
  */
-static int gaiaNDFTclGetPropertyDims( ClientData clientData, 
+static int gaiaNDFTclGetPropertyDims( ClientData clientData,
                                       Tcl_Interp *interp,
                                       int objc, Tcl_Obj *CONST objv[] )
 {
@@ -1495,19 +1509,19 @@ static int gaiaNDFTclGetPropertyDims( ClientData clientData,
 
         /* Get the size. If this fails then the dimensionality is returned
          * as zero */
-        result = gaiaNDFGetPropertyDims( info->ndfid, extension, name, 
+        result = gaiaNDFGetPropertyDims( info->ndfid, extension, name,
                                          dims, &ndim, &error_mess );
 
         if ( result == TCL_OK && ndim > 0 ) {
             resultObj = Tcl_GetObjResult( interp );
             for ( i = 0; i < ndim; i++ ) {
-                Tcl_ListObjAppendElement( interp, resultObj, 
+                Tcl_ListObjAppendElement( interp, resultObj,
                                           Tcl_NewIntObj( dims[i] ) );
             }
         }
         else {
             if ( ndim == 0 && result == TCL_OK ) {
-                Tcl_SetResult( interp, 
+                Tcl_SetResult( interp,
                                "Failed to get extension component dimensions",
                                TCL_VOLATILE );
                 result = TCL_ERROR;
@@ -1519,4 +1533,67 @@ static int gaiaNDFTclGetPropertyDims( ClientData clientData,
         }
     }
     return result;
+}
+
+/**
+ * Commands for querying the HDUs associated with the current NDF.
+ * Symbolically HDUs are NDFs at the same level as the current NDF
+ * (maps to the FITS HDU concept).
+ *
+ * "list"               returns a list of all the HDU properties.
+ * "listheadings"       returns a list of headings for the returned properties.
+ * "get <n> filename"   noop.
+ *
+ * Given just the NDF handle the current HDU number is returned.
+ *
+ * The headings are: HDU Type ExtName NAXIS NAXIS1 NAXIS2 NAXIS3, note we
+ * do not also list the presence of other displayable components in the NDF
+ * (variance & quality) and Type is always "NDF".
+ */
+static int gaiaNDFTclHdu( ClientData clientData, Tcl_Interp *interp,
+                           int objc, Tcl_Obj *CONST objv[] )
+{
+    NDFinfo *info;
+    int result;
+
+    /* Check arguments, need the NDF handle and the hdu command. */
+    if ( objc < 2 || objc > 5 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "ndf_handle [list|listheadings]" );
+        return TCL_ERROR;
+    }
+
+    /* Import the NDF */
+    result = importNdfHandle( interp, objv[1], &info );
+    if ( result != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
+    const char *action = Tcl_GetString( objv[2] );
+
+    //  hdu listheadings.
+    if ( strcmp( action, "listheadings" ) == 0 ) {
+        Tcl_SetResult( interp, "HDU Type ExtName NAXIS NAXIS1 NAXIS2 NAXIS3",
+                       TCL_VOLATILE );
+        return TCL_OK;
+    }
+
+    //  hdu list.
+    if ( strcmp( action, "list" ) == 0 ) {
+
+        /* If this NDF hasn't been check for "HDUs" then do that now. */
+        if ( info->nhdu == -1 ) {
+            gaiaNDFSiblingSearch( info->ndfid, &info->nhdu, &info->hdulist );
+        }
+        Tcl_SetResult( interp, info->hdulist, TCL_VOLATILE );
+        return TCL_OK;
+    }
+
+    //  hdu get <n> filename. Does nothing, just satifies the interface.
+    if ( strcmp( action, "get" ) == 0 ) {
+        return TCL_OK;
+    }
+
+    //  Should never arrive here.
+    Tcl_SetResult( interp, "Unknown HDU command", TCL_VOLATILE );
+    return TCL_ERROR;
 }

@@ -134,6 +134,10 @@ itcl::class gaia::GaiaCube {
          {Visualise data-cube using volume rendering} \
          -command [code $this make_toolbox volume 0]
 
+      #  MEF selection.
+      $View add command -label "Select HDU..." \
+         -command [code $this show_hdu_list_]
+
       #  Add the Options menu.
       set Options [add_menubutton "Options" left]
       configure_menubutton Options -underline 0
@@ -476,6 +480,11 @@ itcl::class gaia::GaiaCube {
       if { $history_ != {} } {
          catch {::delete object $history_}
       }
+
+      #  Name handler.
+      if { $namer_ != {} } {
+         catch {::delete object $namer_}
+      }
    }
 
    #  Methods:
@@ -543,8 +552,12 @@ itcl::class gaia::GaiaCube {
    #  dimensions change.
    protected method set_chosen_cube_ {{keeplimits 0}} {
 
-      set namer [GaiaImageName \#auto -imagename $itk_option(-cube)]
-      if { ! [$namer exists] } {
+      if { $namer_ == {} } {
+         set namer_ [GaiaImageName \#auto]
+      }
+      $namer_ configure -imagename $itk_option(-cube)
+
+      if { ! [$namer_ exists] } {
          if { $itk_option(-cube) != {} } {
             error_dialog "No such file: $itk_option(-cube)" $w_
             $history_ record_last_cube
@@ -568,10 +581,10 @@ itcl::class gaia::GaiaCube {
             save_limits_
          }
 
-         $namer absolute
-         set ndfname_ [$namer ndfname 0]
-         set fullname [$namer fullname]
-         set type_ [$namer type]
+         $namer_ absolute
+         set ndfname_ [$namer_ ndfname 0]
+         set fullname [$namer_ fullname]
+         set type_ [$namer_ type]
 
          $cubeaccessor_ configure -dataset "$fullname"
 
@@ -1298,6 +1311,16 @@ itcl::class gaia::GaiaCube {
          }
       }
    }
+   
+   #  =============
+   #  HDU selection
+   #  =============
+   protected method show_hdu_list_ {} {
+      if { $hdu_list_ == {} } {
+         set hdu_list_ $w_.hdulist
+      }
+      utilReUseWidget GaiaCubeHduChooser $hdu_list_ -gaiacube $this
+   }
 
    # ================
    # 3D visualisation
@@ -1686,6 +1709,12 @@ itcl::class gaia::GaiaCube {
 
    #  The slave toolboxes.
    protected variable slaves_
+
+   #  HDU selection toolbox.
+   protected variable hdu_list_ {}
+
+   #  Name handling object.
+   protected variable namer_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

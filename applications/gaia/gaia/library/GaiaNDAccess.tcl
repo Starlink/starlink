@@ -656,6 +656,17 @@ itcl::class gaia::GaiaNDAccess {
       incr prop_changes_
    }
 
+   #  HDU access method. Returns number of HDUs and meta-data describing
+   #  the HDUs found. Also provides for the switching of the HDU and
+   #  querying the current HDU. The args can be "list", "listheadings",
+   #  "<n>" (switch to HDU "n"), "get <n> file", or empty (get current HDU).
+   public method hdu {args} {
+      if { $args == {} } {
+         return [${type_}::hdu $handle_]
+      }
+      return [eval ${type_}::hdu $handle_ $args]
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
 

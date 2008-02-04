@@ -42,6 +42,7 @@
 #include "config.h"
 #endif
 
+#include <string>
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
@@ -99,6 +100,8 @@ static int GaiaFITSTclGetProperty( ClientData clientData, Tcl_Interp *interp,
                                    int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclGtWcs( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
+static int GaiaFITSTclHdu( ClientData clientData, Tcl_Interp *interp,
+                           int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclMap( ClientData clientData, Tcl_Interp *interp,
                            int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclOpen( ClientData clientData, Tcl_Interp *interp,
@@ -169,6 +172,10 @@ int Fits_Init( Tcl_Interp *interp )
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "fits::getwcs", GaiaFITSTclGtWcs,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "fits::hdu", GaiaFITSTclHdu,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -1052,5 +1059,97 @@ static int GaiaFITSTclParseCard( ClientData clientData, Tcl_Interp *interp,
         return TCL_OK;
     }
     Tcl_SetResult( interp, "Error reading FITS card", TCL_VOLATILE );
+    return TCL_ERROR;
+}
+
+
+/**
+ * Commands for querying the FITS HDUs of the current file.
+ *
+ * "list"             returns a list of all the HDU properties.
+ * "listheadings"     returns a list of headings for the returned properties.
+ * "get <n> filename" save the nth HDU to the given diskfile, in fact this
+ *                    currently only saves compressed images.
+ * 
+ *
+ * The headings are: HDU Type ExtName NAXIS NAXIS1 NAXIS2 NAXIS3 CRPIX1 CRPIX2,
+ * as returned by the rtdimage command of the same name.
+ */
+static int GaiaFITSTclHdu( ClientData clientData, Tcl_Interp *interp,
+                           int objc, Tcl_Obj *CONST objv[] )
+{
+    FITSinfo *info;
+    int result;
+
+    /* Check arguments, need the fits handle and the hdu command. */
+    if ( objc < 3 || objc > 5 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "fits_identifier "
+                          "[list|listheadings|get hdu filename]" );
+        return TCL_ERROR;
+    }
+
+    /* Import FITS identifier */
+    result = importFITSIdentifier( interp, objv[1], &info );
+    if ( result != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
+    //  Return current HDU number. Note error returns 1.
+    if ( objc == 2 ) {
+        int nhdu = info->handle->getHDUNum();
+        Tcl_SetObjResult( interp, Tcl_NewIntObj( nhdu ) );
+        return TCL_OK;
+    }
+    
+    const char *action = Tcl_GetString( objv[2] );
+    
+    //  hdu listheadings.
+    if ( strcmp( action, "listheadings" ) == 0 ) {
+        Tcl_SetResult( interp, "HDU Type ExtName NAXIS NAXIS1 "
+                       "NAXIS2 NAXIS3 CRPIX1 CRPIX2", TCL_VOLATILE );
+        return TCL_OK;
+    }
+    
+    //  hdu list.
+    if ( strcmp( action, "list" ) == 0 ) {
+        string list;
+        if( GaiaFITSHduList( info->handle, list ) == TCL_OK ) {
+            Tcl_SetResult( interp, (char *) list.c_str(), TCL_VOLATILE );
+            return TCL_OK;
+        }
+        Tcl_SetResult( interp, "Error list FITS file extensions",
+                       TCL_VOLATILE );
+        return TCL_ERROR;
+    }
+
+    //  hdu get <n> filename. Saves only compressed images...
+    if ( strcmp( action, "get" ) == 0 ) {
+        if ( objc != 5 ) {
+            Tcl_SetResult( interp, "hdu get requires a hdu and filename", 
+                           TCL_VOLATILE );
+            return TCL_ERROR;
+        }
+        int hdu;
+        if ( Tcl_GetIntFromObj( interp, objv[3], &hdu ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+        const char *filename = Tcl_GetString( objv[4] );
+        
+        //  Switch to the required HDU.
+        int oldhdu = info->handle->getHDUNum();
+        if ( info->handle->setHDU( hdu ) == TCL_OK ) {
+            if ( info->handle->isCompressedImage() ) {
+                if (info->handle->saveCompressedImage( filename ) == TCL_OK) {
+                    info->handle->setHDU( oldhdu );
+                    return TCL_OK;
+                }
+            }
+        }
+        Tcl_SetResult( interp, "Failed to save HDU to disk", TCL_VOLATILE );
+        return TCL_ERROR;
+    }
+    
+    //  Should never arrive here.
+    Tcl_SetResult( interp, "Unknown HDU command", TCL_VOLATILE );
     return TCL_ERROR;
 }

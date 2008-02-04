@@ -1122,10 +1122,13 @@ itcl::class gaia::GaiaImageCtrl {
    #  allowed.
    protected method autofit_ {} {
       if { $itk_option(-autofit) } {
-         #  Works by toggling maybe_autoscale to do the work.
+         #  Works by toggling maybe_autoscale to do the work. Catch as this
+         #  can fail for empty image (FITS primary in MEF), not serious.
          set oldvalue $autoscale_
          set autoscale_ 1
-         maybe_autoscale
+         catch {
+            maybe_autoscale
+         }
          set autoscale_ $oldvalue
       }
    }
