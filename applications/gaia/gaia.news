@@ -6,6 +6,9 @@
     extracted spectra. Previously this didn't happen so saved spectra
     could loose their coordinates.
 
+    A new option for browsing the extensions of an MEF or other NDFs
+    of an HDS container file for cubes has been added to the cube toolbox.
+
   Humu Release
   ============
    
