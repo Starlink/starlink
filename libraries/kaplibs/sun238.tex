@@ -6239,7 +6239,7 @@ from one graphical element to another.
 \sstroutine{
    FTS1\_WCSAX
 }{
-   Re-create AXIS structures from a WCS component FrameSet
+   Re-creates AXIS structures from a WCS component FrameSet
 }{
    \sstdescription{
       This routine creates NDF Axis structures from an AXIS Frame in the
@@ -6278,7 +6278,7 @@ from one graphical element to another.
 \sstroutine{
    FTS1\_WCSDF
 }{
-   See if two FrameSets are different after being written to a
+   Sees if two FrameSets are different after being written to a
    FitsChan
 }{
    \sstdescription{
@@ -6695,7 +6695,7 @@ from one graphical element to another.
 \sstroutine{
    FTS1\_UKEYx
 }{
-   Write the value of type $<$COMM$>$ to the specified keyword from a
+   Writes the value of type $<$COMM$>$ to the specified keyword from a
    buffer of FITS-header card images
 }{
    \sstdescription{
@@ -8350,7 +8350,7 @@ from one graphical element to another.
 \sstroutine{
    IRA\_READ
 }{
-   Get an identifier for astrometry information stored in an HDS
+   Gets an identifier for astrometry information stored in an HDS
    astrometry structure
 }{
    \sstdescription{
@@ -9239,6 +9239,51 @@ from one graphical element to another.
       }{
          Returned true if this routine is called when no more names
          remain to be returned.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRQ\_RBIT
+}{
+   Reserve a bit number for a given quality name
+}{
+   \sstdescription{
+      If the supplied quality name already has a bit number associated
+      with it, the bit number is returned. Otherwise, the next available
+      plane in the quality array is asigned to the quality name, and its
+      bit number is returned.
+
+      Note, write or update access must be available for the NDF (as
+      set up by routine LPG\_ASSOC for instance).
+   }
+   \sstinvocation{
+      CALL IRQ\_RBIT( LOCS, QNAME, BIT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         An array of 5 HDS locators. These locators identify the NDF
+         and the associated quality name information.  They should have
+         been obtained using routine IRQ\_FIND or routine IRQ\_NEW.
+      }
+      \sstsubsection{
+         QNAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The quality name. This quality name must be defined in the NDF
+         specified by LOCS. Name definitions can be added to the NDF
+         using routine IRQ\_ADDQN.
+      }
+      \sstsubsection{
+         BIT = INTEGER (Returned)
+      }{
+         The bit number used by the quality name within the quality
+         array. Note, the least significant bit is bit 1, not bit 0.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -10477,7 +10522,7 @@ from one graphical element to another.
       will align with other similar Frames.
    }
    \sstinvocation{
-      CALL KPG1\_ALSYS( PARAM, FRM1, FRM2, STATUS )
+      CALL KPG1\_ALSYS( PARAM, FRM1, FRM2, AXIS, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -10494,9 +10539,20 @@ from one graphical element to another.
       \sstsubsection{
          FRM2 = INTEGER (Given)
       }{
-         A pointer to an AST Frame. The AlignSystem value will be copied
-         from this Frame to FRM1 if the user supplied the value {\tt "}Data{\tt "} for
-         the parameter.
+         A pointer to an AST Frame. The System value from this Frame will
+         be used as the AlignSystem value for FRM1 if the user supplied the
+         value {\tt "}Data{\tt "} for the parameter.
+      }
+      \sstsubsection{
+         AXIS = INTEGER (Given)
+      }{
+         The index (one or more) of a single axis within FRM1 which is to
+         have its AlsignSystem value changed, or zero. If zero is
+         supplied, the new AlignSystem value is applied to the whole Frame.
+         Supplying an axis index allows a single Frame within a CmpFrame
+         to have its AlignSystem value changed. If FRM1 is not a
+         CmpFrame, then the supplied value is ignored and a value of zero
+         is assumed.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -10636,6 +10692,94 @@ from one graphical element to another.
          Bad input co-ordinates will be set to AST\_\_BAD, but TRANSFORM uses
          VAL\_\_BADD to mark bad values. We assume here that VAL\_\_BADD and
          AST\_\_BAD are the same.
+      }
+   }
+}
+\sstroutine{
+   KPG1\_ASAPA
+}{
+   Determines which pixel axis is most closely aligned with a WCS
+   axis
+}{
+   \sstdescription{
+      This routine aligns a supplied WCS axis to the best-matching
+      pixel axis of an NDF.  It also returns pixel co-ordinates
+      corresponding to supplied WCS-axis limits, and where possible a
+      mapping with one input and one output that transforms current
+      Frame co-ordinates into pixel co-ordinates.
+
+      It first attempts to split the mapping to derive a one-to-one
+      mapping.  Failing that it
+   }
+   \sstinvocation{
+      CALL KPG1\_ASAPA( INDF, FRM, MAP, IAXIS, AXLOW, AXHIGH, PAXIS,
+                       PXLOW, PXHIGH, MAP1D, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF = INTEGER (Given)
+      }{
+         The identifier of the NDF containing a WCS component.
+      }
+      \sstsubsection{
+         FRM = INTEGER (Given)
+      }{
+         An AST pointer to the current Frame in the NDF.
+      }
+      \sstsubsection{
+         MAP = INTEGER (Given)
+      }{
+         The mapping from the PIXEL Frame to the current WCS Frame.
+         This can also be a mapping from GRID to the current Frame.
+         In which case the returned co-ordinates and mapping apply
+         to GRID co-ordinates instead of PIXEL.
+      }
+      \sstsubsection{
+         IAXIS = INTEGER (Given)
+      }{
+         The index of the WCS axis in the current Frame to be aligned.
+      }
+      \sstsubsection{
+         AXLOW = DOUBLE PRECISION (Given)
+      }{
+         Lower bound of the WCS axis.  If either AXLOW or AXHIGH is
+         set to AST\_\_BAD, then the whole axis range is used.
+      }
+      \sstsubsection{
+         AXHIGH = DOUBLE PRECISION (Given)
+      }{
+         Upper bound of the WCS axis.  If either AXLOW or AXHIGH is
+         set to AST\_\_BAD, then the whole axis range is used.
+      }
+      \sstsubsection{
+         PAXIS = INTEGER (Returned)
+      }{
+         The index of the pixel most closely aligned with the supplied
+         WCS axis.
+      }
+      \sstsubsection{
+         PXLOW = DOUBLE PRECISION (Given)
+      }{
+         Lower bound of the PIXEL axis corresponding to the AXLOW in
+         the WCS axis.
+      }
+      \sstsubsection{
+         PXHIGH = DOUBLE PRECISION (Given)
+      }{
+         Upper bound of the PIXEL axis corresponding to the AXHIGH in
+         the WCS axis.
+      }
+      \sstsubsection{
+         MAP1D = INTEGER (Returned)
+      }{
+         The mapping from the current WCS Frame to PIXEL whose input
+         is purely along the chosen axis (IAXIS).  It is set to
+         AST\_\_NULL if the supplied mapping (MAP) could not be split.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
       }
    }
 }
@@ -11035,7 +11179,7 @@ from one graphical element to another.
 \sstroutine{
    KPG1\_ASFRM
 }{
-   Set the current Frame in a FrameSet to a Frame specified through
+   Sets the current Frame in a FrameSet to a Frame specified through
    the environment
 }{
    \sstdescription{
@@ -11534,7 +11678,7 @@ from one graphical element to another.
 \sstroutine{
    KPG1\_ASMRG
 }{
-   Merge two FrameSets by aligning them in a common Frame
+   Merges two FrameSets by aligning them in a common Frame
 }{
    \sstdescription{
       This routine merges two FrameSet by aligning them in a suitable
@@ -11559,10 +11703,10 @@ from one graphical element to another.
       the alignment Frame then a warning is issued.
 
       If the above attempt to align the Frames directly using astConvert
-      fails, then a further attempt is made if oneof the two Frames is a
+      fails, then a further attempt is made if one of the two Frames is a
       SpecFrame or SkyFrame, and the other Frame is a CmpFrame. In this
       case, the CmpFrame is searched for a Frame that can be aligned with
-      the SkyFrame or SpecFrame. If this is succesful, the other axes i
+      the SkyFrame or SpecFrame. If this is succesful, the other axes in
       the CmpFrame are fed bad values by the Mapping which connects the
       two Frames.
    }
@@ -11792,9 +11936,14 @@ from one graphical element to another.
       using AST\_GRFSET.
    }
    \sstinvocation{
-      RESULT = KPG1\_ASPLN( N, X, Y )
+      RESULT = KPG1\_ASPLN( GRFCON, N, X, Y )
    }
    \sstarguments{
+      \sstsubsection{
+         GRFCON = INTEGER (Given)
+      }{
+         A KeyMap containing information passed from the calling application.
+      }
       \sstsubsection{
          N = INTEGER (Given)
       }{
@@ -11882,16 +12031,17 @@ from one graphical element to another.
 \sstroutine{
    KPG1\_ASPRP
 }{
-   Propagate the WCS component from one NDF to another with the same
-   number of axes, allowing for a linear mapping of the pixel coordinates
+   Propagates the WCS component from one NDF to another with the same
+   number of axes, allowing for a linear mapping of the pixel
+   co-ordinates
 }{
    \sstdescription{
       This routine copies the WCS FrameSet from INDF1, re-mapping the
-      GRID Frame in the process so that pixel coordinates in the output
-      NDF are related to pixel coordinates in the input NDF by the
-      supplied linear transformation. The mapping from pixel coordinates
-      in INDF1 ({\tt "}PIX1{\tt "}) to the corresponding pixel coordinates in INDF2
-      ({\tt "}PIX2{\tt "}) is:
+      GRID Frame in the process so that pixel co-ordinates in the output
+      NDF are related to pixel co-ordinates in the input NDF by the
+      supplied linear transformation. The mapping from pixel
+      co-ordinates in INDF1 ({\tt "}PIX1{\tt "}) to the corresponding pixel
+      co-ordinates in INDF2 ({\tt "}PIX2{\tt "}) is:
 
          PIX2 = MATRIX . PIX1 $+$ OFFSET
 
@@ -11913,14 +12063,15 @@ from one graphical element to another.
       \sstsubsection{
          INDF1 = INTEGER (Given)
       }{
-         An identifier for the source NDF. If this does not have NDIM pixel
-         axes, a NDF section with NDIM axes will be obtained from the
-         supplied NDF.
+         An identifier for the source NDF. If this does not have NDIM
+         pixel axes, a NDF section with NDIM axes will be obtained from
+         the supplied NDF.
       }
       \sstsubsection{
          INDF2 = INTEGER (Given)
       }{
-         An identifier for the destination NDF. This must have NDIM pixel axes.
+         An identifier for the destination NDF. This must have NDIM
+          pixel axes.
       }
       \sstsubsection{
          MATRIX( NDIM, NDIM ) = DOUBLE PRECISION (Given)
@@ -12124,7 +12275,7 @@ from one graphical element to another.
 \sstroutine{
    KPG1\_ASREG
 }{
-   Register all AST IntraMaps known by KAPPA
+   Registers all AST IntraMaps known by KAPPA
 }{
    \sstdescription{
       This routine registers all AST IntraMaps known to KAPPA. It should
@@ -12525,9 +12676,9 @@ from one graphical element to another.
       \sstsubsection{
          FRAME = INTEGER (Given)
       }{
-         An AST pointer to the Frame in which the polyline is defined. This
-         is used to define geodesic curves joining the supplied profile
-         positions. Only accessed if GEO is .TRUE.
+         An AST pointer to the Frame in which the polyline is defined.
+         This is used to define geodesic curves joining the supplied
+         profile positions. Only accessed if GEO is .TRUE.
       }
       \sstsubsection{
          ARRDIM = INTEGER (Given)
@@ -12557,8 +12708,8 @@ from one graphical element to another.
          GEO = LOGICAL (Given)
       }{
          Should the poly-line be constructed from geodesic curves in the
-         supplied Frame? If not, the poly-line is made up of straight line
-         segments in the supplied Frame.
+         supplied Frame? If not, the poly-line is made up of
+         straight-line segments in the supplied Frame.
       }
       \sstsubsection{
          NSAMP = INTEGER (Given)
@@ -12694,7 +12845,7 @@ from one graphical element to another.
 \sstroutine{
    KPG1\_ASSTY
 }{
-   Check for synonyms and colour names in AST attribute settings
+   Checks for synonyms and colour names in AST attribute settings
 }{
    \sstdescription{
       This routine splits the supplied AST attribute setting string up
@@ -13580,14 +13731,48 @@ from one graphical element to another.
    }
 }
 \sstroutine{
+   KPG1\_COPYC
+}{
+   Copy a 1D array of character strings
+}{
+   \sstdescription{
+      This routine copies a 1D array of character strings.
+   }
+   \sstinvocation{
+      CALL KPG1\_COPYC( NEL, IN, OUT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NEL = INTEGER (Given)
+      }{
+         The length of the array.
+      }
+      \sstsubsection{
+         IN = CHARACTER( NEL ) $*$ ( $*$ ) (Given)
+      }{
+         The input array.
+      }
+      \sstsubsection{
+         OUT = CHARACTER( NEL ) $*$ ( $*$ ) (Returned)
+      }{
+         The output array.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    KPG1\_COPY
 }{
    To copy an array of a given type to another array of the same
    type
 }{
    \sstdescription{
-      This routine calls the appropriate version of the VEC\_$<$T$>$TO$<$T$>$
-      routines to do the copy.
+      This routine copies a 1-D array of numerical or character values
+      from an input array to an output array.
    }
    \sstinvocation{
       CALL KPG1\_COPY( TYPE, NEL, IPIN, IPOUT, STATUS )
@@ -13597,7 +13782,9 @@ from one graphical element to another.
          TYPE = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The data type to be copied. Must be one of the HDS numeric
-         types, \_BYTE, \_UBYTE, \_WORD, \_UWORD, \_INTEGER, \_REAL or \_DOUBLE.
+         types, \_BYTE, \_UBYTE, \_WORD, \_UWORD, \_INTEGER, \_REAL or \_DOUBLE,
+         or {\tt "}\_CHAR$*$$<$N$>$){\tt "} where {\tt "}$<$N$>${\tt "} is an integer giving the length of
+         the character strings.
       }
       \sstsubsection{
          NEL = INTEGER (Given)
@@ -13909,6 +14096,45 @@ from one graphical element to another.
    }
 }
 \sstroutine{
+   KPG1\_DATCP
+}{
+   Get an AST FrameSet from an NDF
+}{
+   \sstdescription{
+      Recursively copy an object into a component. This means that the
+      complete object (including its components and its components{\tt '}s
+      components, etc.) is copied, not just the top level.
+
+      This routine is exactly like DAT\_COPY except that it will copy
+      array slices, which DAT\_COPY will not.
+   }
+   \sstinvocation{
+      CALL KPG1\_DATCP( LOC1, LOC2, NAME, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         LOC1 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Object locator.
+      }
+      \sstsubsection{
+         LOC2 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Structure locator.
+      }
+      \sstsubsection{
+         NAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Component name.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    KPG1\_DAUNI
 }{
    Generates a string containing the units of an NDF{\tt '}s data or
@@ -14118,13 +14344,13 @@ from one graphical element to another.
 \sstroutine{
    KPG1\_DSFR1
 }{
-   Display a textual description of the Current Frame in a FrameSet
+   Displays a textual description of the Current Frame in a FrameSet
 }{
    \sstdescription{
-      This routine displays a textual description of the supplied AST Frame.
-      The displayed information does not include any axis-specific details
-      which are common to all classes of Frame (such as axis units, labels,
-      etc).
+      This routine displays a textual description of the supplied AST
+      Frame.  The displayed information does not include any
+      axis-specific details that are common to all classes of Frame
+      (such as axis units, labels, etc).
    }
    \sstinvocation{
       CALL KPG1\_DSFR1( FRM, TEXT, NIND, FULL, STATUS )
@@ -14180,7 +14406,11 @@ from one graphical element to another.
          TEXT = CHARACTER $*$ ( $*$ ) (Given)
       }{
          Text to display before the Frame description. May contain MSG
-         tokens.
+         tokens. This may be prefixed with a string that indicates
+         further processing options. Currently the only such string
+         recognised is {\tt "}ndftrace:{\tt "}, which causes the pixel scales to be
+         written out to the output parameter FPIXSCALE. Any such string is
+         not included in the displayed title.
       }
       \sstsubsection{
          FULL = LOGICAL (Given)
@@ -14588,6 +14818,89 @@ from one graphical element to another.
    }
 }
 \sstroutine{
+   KPG1\_GTCHV
+}{
+   Obtains a vector of choices from the environment
+}{
+   \sstdescription{
+      This routine gets up to MAXVAL strings from the user, selected
+      from those supplied in OPTS.  The indices of the supplied strings
+      within OPTS are returned.  The user supplies the strings in the
+      form of a GRP group expression, using the default GRP control
+      characters.
+
+      The user may supply an integer value instead of a string, in
+      which case the integer is understood to be the index of the
+      required string within OPTS.  If the supplied list of strings
+      contains the integer itself, then the integer is understood to be
+      a string, not an index.
+   }
+   \sstinvocation{
+      CALL KPG1\_GCHMV( PARAM, NOPT, OPTS, MAXVAL, IDEF, NVAL, VALS,
+                       STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the parameter to use.
+      }
+      \sstsubsection{
+         NOPT = INTEGER (Given)
+      }{
+         The number of available options supplied in OPTS.
+      }
+      \sstsubsection{
+         OPTS( NOPT ) = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         An array holding the options from which the user must choose.
+         Leading and trailing white space is ignored. Blank options are
+         not allowed.
+      }
+      \sstsubsection{
+         MAXVAL = INTEGER (Given)
+      }{
+         The maximum number of choices.
+      }
+      \sstsubsection{
+         IDEF( MAXVAL ) = INTEGER (Given)
+      }{
+         The indices within OPTS of the default strings to use if a
+         null (!) value is supplied for the parameter.  If the first
+         value is zero, a null parameter value results in a PAR\_\_NULL
+         status being returned.
+      }
+      \sstsubsection{
+         NVAL = INTEGER (Given)
+      }{
+         The number of choices supplied.
+      }
+      \sstsubsection{
+         VALS( MAXVAL ) = INTEGER (Returned)
+      }{
+         The indices within OPTS of the selected options.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Case is insignificant when comparing supplied strings with
+         available options.
+
+         \sstitem
+         A dynamic default is set for the parameter before accessing it
+         if IDEF supplied suitable defaults.  The default consists of a
+         comma-separated list of the default options.
+      }
+   }
+}
+\sstroutine{
    KPG1\_GDARE
 }{
    Defines a region within the current PGPLOT window
@@ -14694,6 +15007,93 @@ from one graphical element to another.
          UBND( 2 ) = REAL (Returned)
       }{
          Co-ordinates of the upper bound that defines a region.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   KPG1\_GDFND
+}{
+   Selects the highest picture of a given name with WCS within the
+   current AGI picture
+}{
+   \sstdescription{
+      This routine searches forwards through the AGI database for a
+      picture of a given name that lies within the current picture and
+      has an associated AST Plot structure. The the current picture
+      itself is included in the search.  If such a picture is found it
+      becomes the new current picture.  Otherwise, a bad status will be
+      returned, and the current picture is unchanged.
+
+      This routine is like KPG1\_AGFND except that KPG1\_AGFDN does not
+      require the returned picture to have an associated Plot.
+   }
+   \sstinvocation{
+      CALL KPG1\_GDFND( NAME, IPIC, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the picture to be searched for in the graphics
+         database.
+      }
+      \sstsubsection{
+         IPIC = INTEGER (Returned)
+      }{
+         The picture identifier of the most-recent picture named NAME.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   KPG1\_GDFNP
+}{
+   Selects the highest picture of a given name that embraces a
+   position and has WCS
+}{
+   \sstdescription{
+      This routine returns an AGI identifier for the youngest picture
+      that has the specified name, embraces the given position and
+      lies within the bounds of the current picture. In this sense it is
+      like AGI\_RCLP. However, it also applies an extra requirement that
+      the returned picture should have associated WCS. If no picture with
+      associated WCS can be found, then it abandons this extra requirement
+      and just returns the youngest picture encompassing the supplied
+      position.
+   }
+   \sstinvocation{
+      CALL KPG1\_GDFNP( NAME, X, Y, IPIC, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the picture to be searched for in the graphics
+         database.
+      }
+      \sstsubsection{
+         X = REAL (Given)
+      }{
+         X position of test point
+      }
+      \sstsubsection{
+         Y = REAL (Given)
+      }{
+         Y position of test point
+      }
+      \sstsubsection{
+         IPIC = INTEGER (Returned)
+      }{
+         The picture identifier of the most-recent picture named NAME.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -14810,7 +15210,7 @@ from one graphical element to another.
 \sstroutine{
    KPG1\_GDNEW
 }{
-   Create a new DATA picture with ancillary pictures
+   Creates a new DATA picture with ancillary pictures
 }{
    \sstdescription{
       This routine returns identifiers for a new DATA picture together
@@ -15453,7 +15853,7 @@ from one graphical element to another.
    }
 }
 \sstroutine{
-   KPG1\_GTNDF
+   KPG1\_GNDFP
 }{
    Gets an NDF or NDF section with a specified number of significant
    dimensions, but also may select one further significant iteration
@@ -16564,6 +16964,72 @@ from one graphical element to another.
    }
 }
 \sstroutine{
+   KPG1\_GTAXI
+}{
+   Selects Frame axes using an environment parameter
+}{
+   \sstdescription{
+      This routine returns the indices of selected axes in a supplied
+      Frame.  The axes to select are determined using the supplied
+      environment parameter.  Each axis can be specified either by
+      giving its index within the Frame in the range 1 to the number of
+      axes in the Frame, or by giving its symbol.  If the first value
+      supplied in AXES is not zero, the supplied axes are used as the
+      dynamic default for the parameter.  The parameter value should be
+      given as a GRP group expression, with default GRP control
+      characters.
+   }
+   \sstinvocation{
+      CALL KPG1\_GTAXM( PARAM, FRAME, MAXAX, AXES, NAX, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the parameter to use.
+      }
+      \sstsubsection{
+         FRAME = INTEGER (Given)
+      }{
+         An AST pointer for the Frame from which axes may be chosen.
+      }
+      \sstsubsection{
+         MAXAX = INTEGER (Given)
+      }{
+         The maximum number of axes that can be be selected.
+      }
+      \sstsubsection{
+         AXES( NAX ) = INTEGER (Given and Returned)
+      }{
+         On entry, the axes to be specified as the dynamic default for
+         the parameter (if AXES( 1 ) is not zero).  On exit, it holds
+         the indices of the selected axes.  If AXES(1) is zero the
+         supplied values are ignored and a PAR\_\_NULL status value is
+         returned if a null (!) value is supplied for the parameter.
+         Otherwise, the PAR\_NULL status is annulled if a null value is
+         supplied, and the supplied axes are returned.
+      }
+      \sstsubsection{
+         NAX = INTEGER (Given)
+      }{
+         The number of axes actually selected.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Case is insignificant when comparing supplied strings with
+         available axis symbols.
+      }
+   }
+}
+\sstroutine{
    KPG1\_GTAXV
 }{
    Gets one or more formatted axis values from the environment
@@ -16863,7 +17329,7 @@ from one graphical element to another.
    Gets an AST Object using an environment parameter
 }{
    \sstdescription{
-      Get an AST Object from an NDF, FITS file or text file using an
+      Gets an AST Object from an NDF, FITS file or text file using an
       environment parameter.
    }
    \sstinvocation{
@@ -16899,6 +17365,122 @@ from one graphical element to another.
          STATUS = INTEGER (Given and Returned)
       }{
          The global status.
+      }
+   }
+}
+\sstroutine{
+   KPG1\_GTPLR
+}{
+   Gets a spatial position from the environment as polar co-ordinates
+}{
+   \sstdescription{
+      This routine obtains a two-dimensional spatial position from the
+      environment, using a specified parameter.  The user supplies the
+      position in polar co-ordinates about a supplied centre within the
+      co-ordinate system of the Current Frame in the supplied WCS
+      FrameSet.  This FrameSet must have two axes, otherwise the routine
+      will exit with an error.
+
+      To be acceptable, the supplied position must correspond to a valid
+      position (on both axes) in the Base Frame of the supplied FrameSet.
+      If a Frame is supplied instead of a FrameSet this restriction is
+      not imposed, however polar co-ordinates cannot be supplied,
+      only regular co-ordinates along both axes.
+
+      If the polar position supplied in argument CC on entry is valid
+      (i.e. does not contain any AST\_\_BAD values), then it is used as a
+      dynamic default for the parameter.  Otherwise, no dynamic default
+      is used.
+
+      The parameter is accessed as a single literal string containing a
+      space- or comma-separated list of radius and position-angle
+      values.  For SkyFrames the position angle is measured in degrees
+      from North via East; for other Frames, it is anticlockwise from
+      the origin defined by argument PAORIG.  The allowed formats for
+      the co-ordinates depends on the class of the Current Frame in the
+      supplied FrameSet, and are described in SUN/210.
+
+      If the string supplied for the parameter consists of a single
+      colon, then a description of the Current co-ordinate Frame is
+      displayed, together with an indication of the format required for
+      each axis value, and a new parameter value is then obtained.
+   }
+   \sstinvocation{
+      CALL KPG1\_GTPLR( PARAM, IWCS, NULL, POLE, PAORIG, CC, BC, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the parameter to use.
+      }
+      \sstsubsection{
+         IWCS = INTEGER (Given)
+      }{
+         A pointer to an AST FrameSet.  If a pointer to a Frame is
+         supplied instead the routine will issue a warning that it is
+         unable to handle polar co-ordinates and will expect spatial
+         positions like routine KPG1\_GTPOS.  This can be aborted (!!) at
+         the parameter prompt.
+      }
+      \sstsubsection{
+         NULL = LOGICAL (Given)
+      }{
+         If TRUE, a null (!) parameter value will result in the dynamic
+         default value being used. If FALSE (or if there is no dynamic
+         default), a null parameter value will result in a PAR\_\_NULL
+         error status.
+      }
+      \sstsubsection{
+         PAORIG = DOUBLE PRECISION (Given)
+      }{
+         This applies when the current Frame is not a SkyFrame.  It
+         specifies the origin for the position angle in degrees from
+         the the first WCS axis.  The normal convention is for this to
+         be zero (i.e. from X in a Cartesian co-ordinate system) but
+         another may be 90 for starting from up or Y.
+      }
+      \sstsubsection{
+         POLE( 2 )  = DOUBLE PRECISION (Given)
+      }{
+         The position of the pole of the polar co-ordinates measured
+         in the current co-ordinate Frame along each axis.  If any of
+         the co-ordinates are bad, the routine will issue a warning that
+         it is unable to handle polar co-ordinates and will expect two
+         spatial positions like routine KPG1\_GTPOS.  This can be aborted
+         (!!) at the parameter prompt.
+      }
+      \sstsubsection{
+         CC( 2 ) = DOUBLE PRECISION (Given and Returned)
+      }{
+         On entry, holds the position to use as the dynamic default for
+         the parameter, in the Current Frame of the supplied FrameSet
+         (or Frame).  On exit, it holds the supplied position in the
+         Current Frame.  There should be one element for both axes.
+      }
+      \sstsubsection{
+         BC( 2 ) = DOUBLE PRECISION (Returned)
+      }{
+         Returned holding the Base Frame position corresponding to the
+         supplied Current Frame position.  If a Frame is supplied for
+         IWCS instead of a FrameSet, then BC will not be accessed.  The
+         returned values will be good on both axes.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         CC and BC are left unchanged if an error has already occurred.
+
+         \sstitem
+         Values of AST\_\_BAD are returned in CC (and optionally BC) if an
+         error occurs during this routine.
       }
    }
 }
@@ -18918,16 +19500,16 @@ from one graphical element to another.
 \sstroutine{
    KPG1\_OPGRD
 }{
-   Get the parameters of an optimal projection for a given set of sky
+   Gets the parameters of an optimal projection for a given set of sky
    positions
 }{
    \sstdescription{
-      This routine calculates the parameters of a tangent plane projection
-      that gives an optimal representation of a set of supplied sky
-      positions. The projection parameters are the normal FITS CRPIX1/2,
-      CRVAL1/2, CDELT1/2 and CROTA2 parameters. They are chosen in order
-      to maximise the number of sky positions that fall close to the
-      centre of a pixel.
+      This routine calculates the parameters of a tangent-plane
+      projection that gives an optimal representation of a set of
+      supplied sky positions. The projection parameters are the normal
+      FITS CRPIX1/2, CRVAL1/2, CDELT1/2 and CROTA2 keywords. They are
+      chosen in order to maximise the number of sky positions that fall
+      close to the centre of a pixel.
    }
    \sstinvocation{
       CALL KPG1\_OPGRD( NPOS, POS, WEST, PAR, RDIAM, STATUS )
@@ -18941,15 +19523,15 @@ from one graphical element to another.
       \sstsubsection{
          POS( 2, NPOS ) = DOUBLE PRECISION (Given)
       }{
-         The sky positions. These should be (longitude,latitude) values, in
-         radians, in any celestial coordinate system.
+         The sky positions. These should be (longitude,latitude) values,
+         in radians, in any celestial co-ordinate system.
       }
       \sstsubsection{
          WEST = LOGICAL (Given)
       }{
          If .TRUE., then it is assumed that the X grid axis increases
          westwards (assuming north is parallel to $+$ve Y). This is the
-         case for most celestial coordinate systems such as (RA,Dec) etc.
+         case for most celestial co-ordinate systems such as (RA,Dec) etc.
          If .FALSE., then it is assumed that the X grid axis increases
          eastwards (assuming north is parallel to $+$ve Y). This is the
          case for a few systems such as (az,el) and geographic
@@ -18974,8 +19556,8 @@ from one graphical element to another.
       \sstsubsection{
          RDIAM = DOUBLE PRECISION (Returned)
       }{
-         The diameter of the circle that just encloses all the supplied sky
-         positions, in radians.
+         The diameter of the circle that just encloses all the supplied
+         sky positions, in radians.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -19255,7 +19837,7 @@ from one graphical element to another.
 \sstroutine{
    KPG1\_PGCUR
 }{
-   Use the cursor to get a set of points
+   Uses the cursor to get a set of points
 }{
    \sstdescription{
       This routine uses the PGPLOT cursor to get a set of positions in the
@@ -19568,7 +20150,7 @@ from one graphical element to another.
 \sstroutine{
    KPG1\_PGLOC
 }{
-   Locate a component of an HDS structure relating to the currently
+   Locates a component of an HDS structure relating to the currently
    opened PGPLOT device
 }{
    \sstdescription{
@@ -19681,7 +20263,7 @@ from one graphical element to another.
 \sstroutine{
    KPG1\_PGOPN
 }{
-   Open the AGI database and activate a PGPLOT workstation
+   Opens the AGI database and activate a PGPLOT workstation
 }{
    \sstdescription{
       This routine opens the graphics database and activates a PGPLOT
@@ -19944,6 +20526,68 @@ from one graphical element to another.
    }
 }
 \sstroutine{
+   KPG1\_PIXSC
+}{
+   Determines pixel scales at a given grid position
+}{
+   \sstdescription{
+      This routine determines the scales of the WCS axes in the current
+      Frame of the supplied FrameSet. For a specified WCS axis, the
+      returned scale is the WCS axis increment produced by moving a
+      distance of one grid pixel away from the supplied {\tt "}AT{\tt "} position,
+      along the WCS axis.
+   }
+   \sstinvocation{
+      CALL KPG1\_PIXSC( IWCS, AT, PIXSC, VALUE, UNIT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IWCS = INTEGER (Given)
+      }{
+         The FrameSet.
+      }
+      \sstsubsection{
+         AT( $*$ ) = DOUBLE PRECISION (Given)
+      }{
+         The position in GRID co-ordinates at which the pixel scales are
+         to be determined. Note, the pixel scales may vary across the data
+         array if the WCS Mappings are non-linear. The array should have
+         one element for each GRID axis.
+      }
+      \sstsubsection{
+         PIXSC( $*$ ) = DOUBLE PRECISION (Returned)
+      }{
+         The returned pixel scales. Note, the pixel scale for both celestial
+         longitude and latitude axes are returned as an arc-distance in
+         radians. The array should have one element for each WCS axis.
+      }
+      \sstsubsection{
+         VALUE( $*$ ) = CHARACTER( $*$ ) (Returned)
+      }{
+         The formatted pixel scales. Celestial axes are formatted as
+         arc-seconds using a {\tt "}G15.6{\tt "} format. Time values are also formatted
+         using G15.6 (the Format attribute in the current WCS Frame is
+         ignored, since it may produce a calendar date), in what ever
+         units are indicated in the current Frame. Other types of
+         axes (including spectral axes) are formatted using the axis Format
+         attribute in the current WCS Frame. The array should have one
+         element for each WCS axis. Each element of the array should be at
+         least 15 characters long. The returned text is left justified.
+      }
+      \sstsubsection{
+         UNIT( $*$ ) = CHARACTER( $*$ ) (Returned)
+      }{
+         Units strings that describe the values returned in VALUES. The
+         array should have one element for each WCS axis.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    KPG1\_PL2GE
 }{
    Reads two-dimensional polynomial information from a POLYNOMIAL
@@ -20093,7 +20737,7 @@ from one graphical element to another.
       the structure are written as DOUBLE PRECISION.
 
       It is assumed the calling programme has a one-dimensional array of
-      coefficients, where COEFF( (IX-1)$*$NYPAR $+$ IY ) contains the
+      coefficients, where COEFF( ( IX - 1 ) $*$ NYPAR $+$ IY ) contains the
       coefficient for the (IX,IY)th term (with NYPAR being the total
       number of Y terms).  Such a one-dimensional array is used by the
       NAG routines and defined in the NAG manual (see Chapter E02 on
@@ -20108,7 +20752,7 @@ from one graphical element to another.
       XMAX, YMIN and YMAX.  Note that these are compulsory when
       VARNT={\tt '}CHEBYSHEV{\tt '} but optional when VARNT={\tt '}SIMPLE{\tt '}.  In the latter
       case the logical parameter LIMITS will be used to decide whether
-      to write the limits.
+      to write the limits.  All the components have type \_DOUBLE.
    }
    \sstinvocation{
       CALL KPG1\_PL2PU( LOC, VARNT, NXPAR, NYPAR, LIMITS, XMIN, XMAX,
@@ -20778,7 +21422,7 @@ from one graphical element to another.
 \sstroutine{
    KPG1\_PLOTP
 }{
-   Create a new DATA picture, with optionally ancillary pictures
+   Creates a new DATA picture, with optionally ancillary pictures
 }{
    \sstdescription{
       This routine createa a new DATA picture, together with optional
@@ -21143,7 +21787,7 @@ from one graphical element to another.
       within the viewport should be GRAPHICS co-ordinates (millimetres from the
       bottom left corner of the view surface).
 
-      The Plotting style is accessed using the environment parameter
+      The Plotting style is accessed using one or more environment parameters
       specified by PARAM, and may include the following synonyms for graphical
       elements:
          {\tt "}Err(Bars){\tt "} - Specifies colour, etc for error bars. Size(errbars)
@@ -21224,8 +21868,11 @@ from one graphical element to another.
       \sstsubsection{
          PARAM = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The name of the style parameter to be used when obtaining the
-         plotting style.
+         The names of one or more style parameters to be used when obtaining
+         the plotting style. If more than one parameter is supplied, the
+         list should be separated by commas. The supplied parameters will
+         be used in the order supplied, with later parameters allowing
+         attributes obtained via earlier parameters to be assigned new values.
       }
       \sstsubsection{
          IPLOT = INTEGER (Given)
@@ -21509,13 +22156,14 @@ from one graphical element to another.
 \sstroutine{
    KPG1\_PX2AX
 }{
-   Convert a pixel{\tt '}s indices into axis coordinates
+   Convert a pixel{\tt '}s indices into WCS or axis coordinates
 }{
    \sstdescription{
       This routine converts the pixel indices of an NDF pixel into the
-      axis coordinate values of the pixel{\tt '}s centre. If an axis
-      coordinate system is not defined for the NDF, then the pixel
-      coordinate system will be used instead.
+      WCS coordinate values of the pixel{\tt '}s centre. If a WCS FrameSet is
+      not available, then the pixel indices are converted into the axis
+      coordinate system. If an axis coordinate system is not defined for
+      the NDF, then the pixel coordinate system will be used instead.
    }
    \sstinvocation{
       CALL KPG1\_PX2AX( NDIM, PX, INDF, AX, STATUS )
@@ -21537,9 +22185,11 @@ from one graphical element to another.
          NDF identifier.
       }
       \sstsubsection{
-         AX( NDIM ) = DOUBLE PRECISION (Returned)
+         AX( $*$ ) = DOUBLE PRECISION (Returned)
       }{
-         Axis coordinate values for the pixel{\tt '}s centre.
+         WCS or axis coordinate values for the pixel{\tt '}s centre.
+         There should be enough elements in this array for all the
+         current frame WCS axes (which need not be the same as NDIM).
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -21717,7 +22367,7 @@ from one graphical element to another.
       and Y, and Domain GRID. If there is also a column named Z, then
       the Frame will be 3D, with a Z axis.
 
-      Hoqwever the FrameSet is obtained, it is assumed that the columns
+      However the FrameSet is obtained, it is assumed that the columns
       containing the axis values have CAT names equal to the Symbol
       attribute of the corresponding AST Axis. The catalogue columns from
       which to read the axis values are chosen by matching column names
@@ -22148,7 +22798,7 @@ from one graphical element to another.
 \sstroutine{
    KPG1\_SCALX
 }{
-   Copy array values into another array, scaling them in the process
+   Copies array values into another array, scaling them in the process
 }{
    \sstdescription{
       This routine copies values from one array to another, applying a
@@ -22635,7 +23285,7 @@ from one graphical element to another.
 \sstroutine{
    KPG1\_SRCTA
 }{
-   Read AST\_ data as text from a GRP group
+   Reads AST\_ data as text from a GRP group
 }{
    \sstdescription{
       This is a service routine to be provided as a {\tt "}source{\tt "} routine
@@ -22874,7 +23524,7 @@ from one graphical element to another.
 \sstroutine{
    KPG1\_WCAXC
 }{
-   Obtain co-ordinates for an axis from a WCS component FrameSet
+   Obtains co-ordinates for an axis from a WCS component FrameSet
 }{
    \sstdescription{
       This routine returns an array of world co-ordinates along a
@@ -22925,39 +23575,53 @@ from one graphical element to another.
 }{
    \sstdescription{
       This routine returns the world co-ordinate along a nominated WCS
-      axis for each pixel centre of the supplied NDF.  The co-ordinates
-      are defined within the current Frame in the supplied FrameSet.
+      axis for each pixel centre of an NDF.  The co-ordinates are defined
+      within the current Frame in the supplied FrameSet. It is assumed
+      that the nominated axis is independent of the other axes.
    }
    \sstinvocation{
-      CALL KPG1\_WCFAX( INDF, FS, AXIS, EL, CENTRE, STATUS )
+      CALL KPG1\_WCFAX( LBND, UBND, MAP, JAXIS, IAXIS, CENTRE, WORK,
+                       STATUS )
    }
    \sstarguments{
       \sstsubsection{
-         INDF = INTEGER (Given)
+         LBND( $*$ ) = INTEGER (Given)
       }{
-         The NDF identifier.
+         The lower pixel index bounds of the NDF. This array should have
+         one element for each NDF pixel axis.
       }
       \sstsubsection{
-         FS = INTEGER (Given)
+         UBND( $*$ ) = INTEGER (Given)
       }{
-         An AST pointer for a FrameSet.
+         The upper pixel index bounds of the NDF. This array should have
+         one element for each NDF pixel axis.
       }
       \sstsubsection{
-         AXIS = INTEGER (Given)
+         MAP = INTEGER (Given)
       }{
-         The number of the WCS axis whose co-ordinates are to be
-         returned.
+         Mapping from PIXEL coords in the NDF to current WCS coords.
       }
       \sstsubsection{
-         EL = INTEGER (Given)
+         JAXIS = INTEGER (Given)
       }{
-         The number of elements in the co-ordinate array.
+         The number of the pixel axis which is varied.
       }
       \sstsubsection{
-         CENTRE( EL ) = DOUBLE PRECISION (Returned)
+         IAXIS = INTEGER (Given)
       }{
-         The current-Frame co-ordinate along the nominated WCS axis
-          at each pixel centre.
+         The number of the WCS axis whose values are returned.
+      }
+      \sstsubsection{
+         CENTRE( $*$ ) = DOUBLE PRECISION (Returned)
+      }{
+         The current-Frame co-ordinate along the nominated axis at each
+         pixel centre. The size and shape of this array should be the
+         same as the NDF.
+      }
+      \sstsubsection{
+         WORK( $*$ ) = DOUBLE PRECISION (Returned)
+      }{
+         A work array with the same length as the requested pixel axis.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -25358,6 +26022,11 @@ from one graphical element to another.
                        YDEG, NCOEF, CC, NW, WORK, EVAL, STATUS )
    }
    \sstarguments{
+      \sstsubsection{
+         NPTS = INTEGER (Given)
+      }{
+         The number of evaluations to perform at constant Y position.
+      }
       \sstsubsection{
          XMIN = ? (Given)
       }{
@@ -28803,6 +29472,107 @@ from one graphical element to another.
    }
 }
 \sstroutine{
+   KPG1\_KER1x
+}{
+   Smooths an N-dimensional array using a specified 1D kernel
+}{
+   \sstdescription{
+      The routine smooths the array IN using a specified 1-dimensional
+      kernel and returns the result in the array OUT. The 1D kernel can
+      be used to smooth either a single axis or mutiple axes. If multiple
+      axes are smoothed, the total smoothing kernel is equivalent to the
+      product of the kernels used to smooth each individual axis.
+
+      Any output pixel that is contributed to by a bad pixel, or a pixel
+      that is over the edge of the input data array, is set bad in the
+      output.
+   }
+   \sstinvocation{
+      CALL KPG1\_KER1$<$T$>$( NDIM, DIMS, IN, NAX, AXES, SIZE, CENTRE, KERNEL,
+                         WORK, OUT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NDIM = INTEGER (Given)
+      }{
+         The number of pixel axes in the IN and OUT arrays.
+      }
+      \sstsubsection{
+         DIMS( NDIM ) = INTEGER (Given)
+      }{
+         The length, in pixels, of each dimension of the IN and OUT arrays.
+      }
+      \sstsubsection{
+         IN( $*$ ) = ? (Given)
+      }{
+         The input array, accessed as a 1D vector.
+      }
+      \sstsubsection{
+         NAX = INTEGER (Given)
+      }{
+         The number of axes along which smoothing should be performed.
+      }
+      \sstsubsection{
+         AXES( NAX ) = INTEGER (Given)
+      }{
+         The indices of the pixel axes along which smoothing should be
+         performed. The first axis is axis 1.
+      }
+      \sstsubsection{
+         SIZE = INTEGER (Given)
+      }{
+         The number of values in the kernel.
+      }
+      \sstsubsection{
+         CENTRE = INTEGER (Given)
+      }{
+         The index of the element within KERNEL that corresponds to the
+         centre of the kernel.
+      }
+      \sstsubsection{
+         KERNEL( SIZE ) = ? (Given)
+      }{
+         The kernel array. The values in this array are used as supplied
+         \sstitemlist{
+
+            \sstitem
+            they are not normalised to a total sum of unity.
+         }
+      }
+      \sstsubsection{
+         WORK( SIZE ) = ? (Given and Returned)
+      }{
+         A work array.
+      }
+      \sstsubsection{
+         OUT( $*$ ) = ? (Returned)
+      }{
+         The output array, accessed as a 1D vector.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine can be used to smooth either DATA or VARIANCE
+         arrays. If a DATA array is smoothed with a given kernel, the
+         corresponding VARIANCE array should be smoothed with a kernel
+         containing the squares of the values in the original kernel.
+
+         \sstitem
+         There are routines for processing double precision and real data.
+         Replace {\tt "}x{\tt "} in the routine name by D or R as appropriate.  The
+         data types of the IN, KERNEL and OUT arguments must match the
+         routine used.
+      }
+   }
+}
+\sstroutine{
    KPG1\_LITNx
 }{
    Creates linear transformation expressions between two
@@ -29695,7 +30465,7 @@ from one graphical element to another.
    }
 }
 \sstroutine{
-   KPG1\_MXMNx
+   KPG1\_MMTHx
 }{
    Returns the maximum and minimum values of an array within
    thresholds
@@ -29713,8 +30483,8 @@ from one graphical element to another.
       of the thresholds.
    }
    \sstinvocation{
-       CALL KPG1\_MXMNx( BAD, EL, ARRAY, THRESH, NINVAL, MAXMUM,
-      :                 MINMUM, MAXPOS, MINPOS, STATUS )
+      CALL KPG1\_MMTHx( BAD, EL, ARRAY, THRESH, NINVAL, MAXMUM,
+                       MINMUM, MAXPOS, MINPOS, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -30274,8 +31044,8 @@ from one graphical element to another.
       good and bad pixels in the array.
    }
    \sstinvocation{
-       CALL KPG1\_MXMNx( BAD, EL, ARRAY, NINVAL, MAXMUM,
-      :                 MINMUM, MAXPOS, MINPOS, STATUS )
+      CALL KPG1\_MXMNx( BAD, EL, ARRAY, NINVAL, MAXMUM,
+                       MINMUM, MAXPOS, MINPOS, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -30975,6 +31745,88 @@ from one graphical element to another.
    }
 }
 \sstroutine{
+   KPG1\_PTNDx
+}{
+   Paste a section of an n-dimensional array into another array
+}{
+   \sstdescription{
+      This routine pastes a specified section of the supplied n-dimensional
+      array (IN) into an output array (OUT).
+   }
+   \sstinvocation{
+      CALL KPG1\_PTNDx( NDIM, LBNDI, UBNDI, IN, LBNDO, UBNDO, BAD,
+                       OUT, EL, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NDIM = INTEGER (Given)
+      }{
+         The number of axes.
+      }
+      \sstsubsection{
+         LBNDI( NDIM ) = INTEGER (Given)
+      }{
+         The lower pixel index bounds of the IN array.
+      }
+      \sstsubsection{
+         UBNDI( NDIM ) = INTEGER (Given)
+      }{
+         The upper pixel index bounds of the IN array.
+      }
+      \sstsubsection{
+         IN( $*$ ) = ? (Given)
+      }{
+         The input array. Bounds given by LBNDI and UBNDI.
+      }
+      \sstsubsection{
+         LBNDO( NDIM ) = INTEGER (Given)
+      }{
+         The lower pixel index bounds of the area of the IN array to be
+         pasted into OUT.
+      }
+      \sstsubsection{
+         UBNDO( NDIM ) = INTEGER (Given)
+      }{
+         The upper pixel index bounds of the area of the IN array to be
+         pasted into OUT.
+      }
+      \sstsubsection{
+         BAD = LOGICAL (Given)
+      }{
+         If .TRUE., then any sections of the output array that fall
+         outside the input array are filled with bad values. Otherwise,
+         the the supplied values in such output array sections are left
+         unchanged.
+      }
+      \sstsubsection{
+         OUT( $*$ ) = ? (Given and Returned)
+      }{
+         The output array. Bounds given by LBNDO and UBNDO.
+      }
+      \sstsubsection{
+         EL = INTEGER (Returned)
+      }{
+         The number of elements in the output array. Derived from LBNDO
+         and UBNDO.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each numerical data type: replace {\tt "}x{\tt "} in
+         the routine name by B, D, I, R, W, UB or UW as appropriate.  The
+         IN and OUT arrays supplied to the routine must have the data type
+         specified.
+      }
+   }
+}
+\sstroutine{
    KPG1\_PXDPx
 }{
    Expands an n-dimensional array by pixel duplication
@@ -31358,7 +32210,7 @@ from one graphical element to another.
       \sstsubsection{
          ARRAY( EL ) = ? (Given)
       }{
-         The array to be sorted.
+         The input array.
       }
       \sstsubsection{
          NVAL = INTEGER (Given)
@@ -31373,7 +32225,7 @@ from one graphical element to another.
       \sstsubsection{
          VALUES( NVAL ) = ? (Returned)
       }{
-         The value of the Xth aray element.
+         The value of the Xth array element.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -32187,7 +33039,7 @@ from one graphical element to another.
 \sstroutine{
    KPG1\_STDSx
 }{
-   Display statistics generated by KPG1\_STATx and KPG1\_HSTAx
+   Displays statistics generated by KPG1\_STATx and KPG1\_HSTAx
 }{
    \sstdescription{
       This routine diplays the statistics of pixel data as generated by
@@ -32196,7 +33048,8 @@ from one graphical element to another.
    \sstinvocation{
       CALL KPG1\_STDSx( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
                        DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
-                       MEDIAN, MODE, NUMPER, PERCNT, PERVAL, STATUS )
+                       MEDIAN, MODE, NUMPER, PERCNT, PERVAL,
+                       MAXWCS, MINWCS, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -32295,6 +33148,16 @@ from one graphical element to another.
       }{
          Percentile values corresponding to the percentile fractions
          in PERCNT.
+      }
+      \sstsubsection{
+         MAXWCS = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The formatted WCS co-ordinates at the minimum position.
+      }
+      \sstsubsection{
+         MINWCS = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The formatted WCS co-ordinates at the minimum position.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
