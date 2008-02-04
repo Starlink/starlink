@@ -4,7 +4,8 @@
 *     FFCLEAN
 
 *  Purpose:
-*     Removes defects from a substantially flat 1- or 2-dimensional NDF.
+*     Removes defects from a substantially flat 1-, 2- or 3-dimensional 
+*     NDF.
 
 *  Language:
 *     Starlink Fortran 77
@@ -18,23 +19,39 @@
 
 *  Description:
 *     This application cleans a 1- or 2-dimensional NDF by removing
-*     defects smaller than a specified size.  The defects are flagged
-*     with the bad value.  The defects are found by looking for pixels
-*     that deviate from the image's smoothed version by more than an
-*     arbitrary number of standard deviations from the local mean,
-*     and that lie within a specified range of values.  Therefore, the
-*     image must be substantially flat.  The data variances provide the
-*     local-noise estimate for the threshold, but if these are not
-*     available a variance for the whole of the image is derived from
-*     the mean squared deviations of the original and smoothed images.
-*     The smoothed version of the image is obtained by block averaging
-*     over a rectangular box.  An iterative process progressively
-*     removes the outliers from the image.
+*     defects smaller than a specified size.  In addition, 3-dimensional
+*     NDFs can be cleaned by processing each row or plane within it using
+*     the 1- or 2-dimensional algorithm (see parameter AXES).
+*
+*     The defects are flagged with the bad value.  The defects are found
+*     by looking for pixels that deviate from the image's smoothed version
+*     by more than an arbitrary number of standard deviations from the
+*     local mean, and that lie within a specified range of values.
+*     Therefore, the image must be substantially flat.  The data variances
+*     provide the local-noise estimate for the threshold, but if these are
+*     not available a variance for the whole of the image is derived from
+*     the mean squared deviations of the original and smoothed images. The
+*     smoothed version of the image is obtained by block averaging over a
+*     rectangular box.  An iterative process progressively removes the
+*     outliers from the image.
 
 *  Usage:
 *     ffclean in out clip box [thresh] [wlim] [ilevel]
 
 *  ADAM Parameters:
+*     AXES( 2 ) = _INTEGER (Read)
+*        Specified the indices of up to two axes that span the rows or planes
+*        that are to be cleaned. If only one value is supplied, then the 
+*        NDF is processed as a set of 1D spectra parallel to the specified
+*        pixel axis. If two values are supplied, then the NDF is
+*        processed as a set of 2D images spanned by the given axes. Thus,
+*        a 2D NDF can be processed either as a single 2D image or as a set 
+*        of 1D spectra. Likewise, a 3D NDF can be processed either as a
+*        set of 2D images or a set of 1D spectra. By default, a 2D NDF is
+*        processed as a single 2D image, and a 3D NDF is processed as a set 
+*        of 1D spectra (the spectral axis is chosen by examining the WCS
+*        component - pixel axis 1 is used if the current WCS frame does not
+*        contain a spectral axis). []
 *     BOX( 2 ) = _INTEGER (Read)
 *        The x and y sizes (in pixels) of the rectangular box to be
 *        applied to smooth the image.  If only a single value is given,
@@ -50,11 +67,27 @@
 *        made bad.  The number of values given specifies the number of
 *        iterations.  Values should lie in the range 0.5--100.  Up to
 *        one hundred values may be given.  [3.0, 3.0, 3.0]
+*     GENVAR = _LOGICAL (Read)
+*        If TRUE, the noise level implied by the deviations from the 
+*        local mean over the supplied box size are stored in the output
+*        Variance component. This noise level has a constant value over
+*        the whole NDF (or over each section of the NDF if the NDF is 
+*        being processed in sections - see parameter AXES). This constant
+*        noise level is also displayed on the screen if parameter ILEVEL 
+*        is set to 2. If GENVAR is FALSE, then the output Variances
+*        will be copied from the input variances (if the input NDF has no
+*        variances, then the output NDF will not have any variances
+*        either). [FALSE]
 *     ILEVEL = _INTEGER (Read)
 *        The interactive level of the routine.  When it is greater or
 *        equal to two, the application will report the intermediate
-*        results after each iteration during processing.  It should lie
-*        between 1 and 3. [2]
+*        results after each iteration during processing.  In addition,
+*        it will report the section of the input NDF currently being 
+*        processed (but only if the NDF is being processed in sections -
+*        see parameter AXES). It should lie between 1 and 3. The dynamic
+*        default is 2 if the supplied NDF is being cleaned as a single
+*        array, and 1 if it is being cleaned in sections (see parameter 
+*        AXES). []
 *     IN = NDF (Read)
 *        The 1- or 2-dimensional NDF containing the input image to be
 *        cleaned.
@@ -62,6 +95,9 @@
 *        The NDF to contain the cleaned image.
 *     SIGMA = _DOUBLE (Write)
 *        The estimation of the RMS noise per pixel of the output image.
+*        If the NDF is processed in sections (see parameter AXES), then 
+*        the value stored in this output parameter refers to the final 
+*        section processed.
 *     THRESH( 2 ) = _DOUBLE (Read)
 *        The range between which data values must lie if cleaning is to
 *        occur.  Thus it is possible to clean the background without
@@ -130,7 +166,9 @@
 *  Copyright:
 *     Copyright (C) 1981, 1990-1992 Science & Engineering Research
 *     Council. Copyright (C) 1995, 2004 Central Laboratory of the
-*     Research Councils. All Rights Reserved.
+*     Research Councils. 
+*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -153,6 +191,7 @@
 *     WG: Wei Gong  (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David Berry (JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -181,6 +220,8 @@
 *        workspace.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     4-FEB-2008 (DSB):
+*        Added parameters AXES and GENVAR.
 *     {enter_further_changes_here}
 
 *-
@@ -211,9 +252,25 @@
 *  Local Variables:
       INTEGER BOX( NDIM )        ! Size of smoothing box
       INTEGER DIM( NDF__MXDIM )  ! Size of the image in each dimension
+      INTEGER EL                 ! No. of elements copied
       INTEGER I                  ! Loop index
       INTEGER IBOX( 2 )          ! Smoothing box half-size
+      INTEGER IL1                ! Grid index on first looping axis
+      INTEGER IL2                ! Grid index on second looping axis
       INTEGER ILEVEL             ! Interaction level
+      INTEGER IPVIN              ! Pointer to input variance array
+      INTEGER IPDIN              ! Pointer to input data array
+      INTEGER IPVOUT             ! Pointer to output variance array
+      INTEGER IPDOUT             ! Pointer to output data array
+      INTEGER ITMP               ! Temporary storage
+      INTEGER IWCS               ! WCS FrameSet
+      INTEGER J                  ! Loop index
+      INTEGER LBND( NDF__MXDIM ) ! Lower pixel index bounds of NDF
+      INTEGER LBNDG( 3 )         ! Lower grid index bounds of NDF
+      INTEGER LAXES( NDIM )      ! Indices of looping significant axes
+      INTEGER LDIM( 2 )          ! Sizes of looping axes
+      INTEGER LNAX               ! No. of looping axes
+      INTEGER LNEL               ! No. of spectra/planes
       INTEGER NCLIP              ! Number of gammas given by users, and
                                  ! also the number of rejecting
                                  ! iteration will be performed
@@ -225,10 +282,18 @@
       INTEGER NGOOD              ! Number of valid pixels after
                                  ! rejection
       INTEGER NLIM               ! Minimum good pixel limit
+      INTEGER NSDIM              ! Significant number of the dimension 
+                                 ! of the image
       INTEGER NVAL               ! Number of values obtained
       INTEGER NVAR               ! Number of elements of variance
                                  ! component of the image
       INTEGER NWS( 0:NDIM-1 )    ! Number of elements of work spaces
+      INTEGER OFF                ! Vector offset into NDF arrays
+      INTEGER PAXES( NDIM )      ! Indices of processed significant axes
+      INTEGER PDIM( 2 )          ! Axis sizes in processed spectrum/plane
+      INTEGER PLBNDG( 3 )        ! Lower grid bounds of spectrum/plane
+      INTEGER PNAX               ! No. of processing axes
+      INTEGER PNEL               ! No. of elements in a spectrum/plane
       INTEGER PNTIN( 2 )         ! Pointer to the mapped data and
                                  ! Variance of the input image
       INTEGER PNTINW             ! Pointer to work space
@@ -236,7 +301,12 @@
                                  ! variance of the output image
       INTEGER PNTAS( NDIM-1 )    ! Pointer to work spaces AS
       INTEGER PNTNS( NDIM-1 )    ! Pointer to work spaces NS
-      INTEGER SDIM( NDF__MXDIM ) ! Significant NDF dimensions
+      INTEGER PUBNDG( 3 )        ! Upper grid bounds of spectrum/plane
+      INTEGER SAXES( 3 )         ! Indices of significant NDF axes
+      INTEGER SPAX               ! Indices of spectral axis
+      INTEGER SPFRM              ! Spectral Frame
+      INTEGER UBND( NDF__MXDIM ) ! Upper pixel index bounds of NDF
+      INTEGER UBNDG( 3 )         ! Upper grid index bounds of NDF
 
       REAL CLIP( MXCLIP )        ! Number of standard deviation for
                                  ! rejection threshold for each
@@ -247,6 +317,9 @@
                                  ! single-precision array
       REAL WLIM                  ! Fraction of good pixels required
 
+      REAL RSIGMA                ! RMS noise per pixel in the output
+                                 ! image
+
       DOUBLE PRECISION DTHDEF( 2 ) ! Suggested default Thresholds for
                                  ! cleaning a d.p. array
       DOUBLE PRECISION DTHRES( 2 ) ! Thresholds for cleaning a d.p.
@@ -254,10 +327,13 @@
       DOUBLE PRECISION SIGMA     ! RMS noise per pixel in the output
                                  ! image
 
-      CHARACTER * ( 13 ) COMP    ! The array component(s) of NDF
+      CHARACTER * ( 13 ) COMPI   ! The array component(s) of input NDF
+      CHARACTER * ( 13 ) COMPO   ! The array component(s) of output NDF
       CHARACTER * ( NDF__SZFTP ) DTYPE ! Numeric type for output arrays
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Numeric type for processing
 
+      LOGICAL CONTIG             ! Are spectra/planes contiguous?
+      LOGICAL GENVAR             ! Create output variances?
       LOGICAL SAMBAD             ! Propagate bad pixels to same place?
       LOGICAL VAR                ! Variance array present?
 
@@ -267,46 +343,198 @@
 *  Obtain the input NDF.
 *  =====================
 
-*  Begin an NDF context.
+*  Begin NDF and AST contexts.
+      CALL AST_BEGIN( STATUS )
       CALL NDF_BEGIN
+
+*  Initialise the upper and lower GRID index bounds.
+      LBNDG( 1 ) = 1
+      LBNDG( 2 ) = 1
+      LBNDG( 3 ) = 1
+
+      UBNDG( 1 ) = 1
+      UBNDG( 2 ) = 1
+      UBNDG( 3 ) = 1
 
 *  Get identifier for the NDF containing the input image.
       CALL LPG_ASSOC( 'IN', 'READ', NDFI, STATUS )
 
-*  Find whether or not there are no more than two significant
-*  dimensions and which ones they are.
-      CALL KPG1_SDIMP( NDFI, NDIM, SDIM, STATUS )
+*  Get the bounds of all pixel axes in the NDF.
+      CALL NDF_BOUND( NDFI, NDF__MXDIM, LBND, UBND, NDIMS, STATUS )
 
-*  Exit if an error occurred.  This is needed because the significant
-*  dimensions are used as array indices.
-      IF ( STATUS .NE. SAI__OK ) GOTO 999
+*  Find and count the NDF pixel axes that have a length of more than 
+*  1 pixel. Also update the upper grid index bounds.
+      NSDIM = 0
+      DO I = 1, NDIMS
+         DIM( I ) = UBND( I ) - LBND( I ) + 1
 
-*  Determine its dimensions (note that only two significant dimensions
-*  can be accommodated).  Then ignore non-significant dimensions.
-      CALL NDF_DIM( NDFI, SDIM( NDIM ), DIM, NDIMS, STATUS )
-      DIM( 1 ) = DIM( SDIM( 1 ) )
-      DIM( 2 ) = DIM( SDIM( 2 ) )
+         IF( DIM( I ) .GT. 1 ) THEN
+            NSDIM = NSDIM + 1
+            SAXES( NSDIM ) = I
+            UBNDG( NSDIM ) = DIM( I )
+         END IF
 
-*  Check the state of variance component of the NDF.      
-      CALL NDF_STATE( NDFI, 'Variance', VAR, STATUS )
+      END DO
+
+*  If the data has only 1 significant pixel axis, then there can be only
+*  1 processing axis, and no looping will be needed.
+      IF( NSDIM .EQ. 1 ) THEN
+         PNAX = 1
+         PAXES( 1 ) = 1
+         LNAX = 0
+
+*  If the data has 2 significant pixel axes, then we can process it as a
+*  single 2D plane or as a set of 1D spectra. Ask the user what to do.
+*  The default is to process as a single plane.
+      ELSE IF( NSDIM .EQ. 2 ) THEN
+         PAXES( 1 ) = 1
+         PAXES( 2 ) = 2
+         CALL PAR_DEF1I( 'AXES', 2, PAXES, STATUS )
+         CALL PAR_GDRVI( 'AXES', 2, 1, 2, PAXES, PNAX, STATUS )
+
+*  Determine the looping axes implied by the users choice of processing
+*  axes. Also Ensure the processing axes are in increasing order.
+         IF( PNAX .EQ. 1 ) THEN
+            LNAX = 1
+            LAXES( 1 ) = 3 - PAXES( 1 )
+         ELSE
+            LNAX = 0
+            IF( PAXES( 2 ) .LT. PAXES( 1 ) ) THEN
+               ITMP = PAXES( 2 )
+               PAXES( 2 ) = PAXES( 1 )
+               PAXES( 1 ) = ITMP
+            END IF
+         END IF
+
+*  If the data has 3 significant pixel axes, then we can process it as a
+*  a set of 2D planes or as a set of 1D spectra. Ask the user what to do.
+*  The default is to process as a set of 1D spectra along the spectral
+*  axis (or along pixel axis 1 if there is no spectral axis).
+      ELSE IF( NSDIM .EQ. 3 ) THEN
+
+*  Get the WCS FrameSet from the input NDF, and then search the current
+*  WCS Frame for a SpecFrame.
+         CALL KPG1_GTWCS( NDFI, IWCS, STATUS )
+         CALL ATL_FSPEC( IWCS, SPAX, SPFRM, STATUS )
+         IF( SPAX .EQ. 0 ) SPAX = 1
+
+*  Set up the default for parameter AXES and then get a new value.
+         PAXES( 1 ) = SPAX
+         CALL PAR_DEF1I( 'AXES', 1, PAXES, STATUS )
+         CALL PAR_GDRVI( 'AXES', 2, 1, 3, PAXES, PNAX, STATUS )
+
+*  Determine the looping axes implied by the users choice of processing
+*  axes.
+         IF( PNAX .EQ. 1 ) THEN
+            LNAX = 2
+            IF( PAXES( 1 ) .EQ. 1 ) THEN
+               LAXES( 1 ) = 2
+               LAXES( 2 ) = 3
+            ELSE IF( PAXES( 1 ) .EQ. 2 ) THEN
+               LAXES( 1 ) = 1
+               LAXES( 2 ) = 3
+            ELSE
+               LAXES( 1 ) = 1
+               LAXES( 2 ) = 2
+            END IF
+
+         ELSE
+            LNAX = 1
+            LAXES( 1 ) = 6 - PAXES( 1 ) - PAXES( 2 )
+
+            IF( PAXES( 2 ) .LT. PAXES( 1 ) ) THEN
+               ITMP = PAXES( 2 )
+               PAXES( 2 ) = PAXES( 1 )
+               PAXES( 1 ) = ITMP
+            END IF
+
+         END IF
+
+*  Report an error if the number of significant pixel axes cannot be
+*  handled by this application.
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+         PNAX = 0
+         LNAX = 0
+         STATUS = SAI__ERROR
+         CALL NDF_MSG( 'NDF', NDFI )
+         CALL MSG_SETI( 'ND', NSDIM )
+         CALL ERR_REP( 'KAPPA_FFCLEAN_ND', 'The NDF ^NDF has ^ND '//
+     :                 'significant dimensions. This application '//
+     :                 'can only handled from 1 to 3.', STATUS )
+      END IF
+
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Find the length of the axes.
+      DO I = 1, PNAX
+         PDIM( I ) = DIM( SAXES( PAXES( I ) ) )
+      END DO
+
+      DO I = 1, LNAX
+         LDIM( I ) = DIM( SAXES( LAXES( I ) ) )
+      END DO
+
+*  Pad the arrays with insignficant axes.
+      IF( LNAX .EQ. 0 ) LDIM( 1 ) = 1
+      IF( LNAX .LE. 1 ) LDIM( 2 ) = 1
+      IF( PNAX .EQ. 1 ) PDIM( 2 ) = 1
+
+*  Check the processing axes are distinct.
+      IF( PNAX .EQ. 2 .AND. STATUS .EQ. SAI__OK ) THEN
+         IF( PAXES( 1 ) .EQ. PAXES( 2 ) ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETI( 'ND', NSDIM )
+            CALL ERR_REP( 'KAPPA_FFCLEAN_DS', 'The two axis indices '//
+     :                    'supplied for parameter AXES are the same.',
+     :                    STATUS )
+         END IF
+      END IF
+
+*  Get the number of elements in one processing plane or spectrum.
+      PNEL = PDIM( 1 )
+      IF( PNAX .EQ. 2 ) PNEL = PNEL * PDIM( 2 )
+
+*  Get the number of planes or spectra to be processed.
+      LNEL = LDIM( 1 )
+      IF( LNAX .EQ. 2 ) LNEL = LNEL * LDIM( 2 )
+
+*  See if output variances are to be created from the deviations from the
+*  local mean.
+      CALL PAR_GET0L( 'GENVAR', GENVAR, STATUS )
+
+*  If not, check the state of variance component of the NDF.      
+      IF( .NOT. GENVAR ) THEN
+         CALL NDF_STATE( NDFI, 'Variance', VAR, STATUS )
 
 *  Set the NDF component string according to the state of variance
 *  component.
-      IF ( VAR ) THEN
+         IF ( VAR ) THEN
 
 *  Set the component string for the case when variance component exists.
-         COMP = 'Data,Variance'
-      ELSE
+            COMPI = 'Data,Variance'
+            COMPO = 'Data,Variance'
+         ELSE
 
 *  Set the component string for the case when variance component does
 *  not exist.
-         COMP = 'Data'
+            COMPI = 'Data'
+            COMPO = 'Data'
+         END IF
+
+*  If we are creating output variances from the local spread of values,
+*  then the input variance array is not needed, but the output variance
+*  array is needed.
+      ELSE
+         VAR = .FALSE.
+         COMPI = 'Data'
+         COMPO = 'Data,Variance'
       END IF
 
 *  Determine the numeric type to be used for processing the input
 *  arrays.  This application supports single- and double-precision
 *  floating point processing.
-      CALL NDF_MTYPE( '_REAL,_DOUBLE', NDFI, NDFI, COMP, ITYPE, DTYPE,
+      CALL NDF_MTYPE( '_REAL,_DOUBLE', NDFI, NDFI, COMPI, ITYPE, DTYPE,
      :                STATUS )
 
 *  Create the output NDF and map arrays.
@@ -317,11 +545,11 @@
 *  numeric type for the output arrays.
       CALL LPG_PROP( NDFI, 'WCS,Axis,Units,Quality', 'OUT', NDFO, 
      :               STATUS )
-      CALL NDF_STYPE( DTYPE, NDFO, COMP, STATUS )
+      CALL NDF_STYPE( DTYPE, NDFO, COMPO, STATUS )
 
 *  Map the input and output data arrays.
-      CALL KPG1_MAP( NDFI, COMP, ITYPE, 'READ', PNTIN, NEL, STATUS )
-      CALL KPG1_MAP( NDFO, COMP, ITYPE, 'WRITE', PNTOUT, NEL, STATUS )
+      CALL KPG1_MAP( NDFI, COMPI, ITYPE, 'READ', PNTIN, NEL, STATUS )
+      CALL KPG1_MAP( NDFO, COMPO, ITYPE, 'WRITE', PNTOUT, NEL, STATUS )
 
 *  Exit if an error occurred.
       IF ( STATUS .NE. SAI__OK ) GOTO 999
@@ -333,12 +561,12 @@
       IF ( VAR ) THEN
 
 *  When variance component exists, it has the same number of element as 
-*  the data array.
-         NVAR=NEL
+*  the processing plane or spectrum.
+         NVAR = PNEL
       ELSE
 
 *  Otherwise assume it has 1 element.
-         NVAR=1
+         NVAR = 1
       END IF
 
 *  Create and map work space for the smoothing.
@@ -346,7 +574,7 @@
 
 *  Get the required work space for to hold the cleaned iterations to
 *  be input to local-mean routine.
-      CALL PSX_CALLOC( NEL, ITYPE, PNTINW, STATUS )
+      CALL PSX_CALLOC( PNEL, ITYPE, PNTINW, STATUS )
 
 *  Initial the element number of work spaces.
       DO 10 I = 0, NDIM-1
@@ -357,11 +585,11 @@
       DO 20 I = 1, NDIM-1
 
 *  Calculate the element number of ith work spaces.
-         NWS( I ) = NWS( I-1 ) * DIM( I )
+         NWS( I ) = NWS( I-1 ) * PDIM( I )
 
 *  Get the required work spaces for smoothing I+1 dimensional image. 
-         CALL PSX_CALLOC( DIM( I ), ITYPE, PNTAS( I ), STATUS )
-         CALL PSX_CALLOC( DIM( I ), '_INTEGER', PNTNS( I ), STATUS )
+         CALL PSX_CALLOC( PDIM( I ), ITYPE, PNTAS( I ), STATUS )
+         CALL PSX_CALLOC( PDIM( I ), '_INTEGER', PNTNS( I ), STATUS )
 
    20 CONTINUE
 
@@ -383,13 +611,13 @@
 *  data, setting the default box size to 1 element.
       BOX( 1 ) = 3
       BOX( 2 ) = 3
-      IF ( DIM( 1 ) .EQ. 1 .OR. DIM( 2 ) .EQ. 1 ) THEN
+      IF ( PDIM( 1 ) .EQ. 1 .OR. PDIM( 2 ) .EQ. 1 ) THEN
          CALL PAR_DEF1I( 'BOX', 1, BOX, STATUS )
       ELSE
          CALL PAR_DEF1I( 'BOX', NDIM, BOX, STATUS )
       END IF
 
-      CALL PAR_GDRVI( 'BOX', NDIM, 1, MAX( DIM( 1 ), DIM( 2 ) ), BOX,
+      CALL PAR_GDRVI( 'BOX', NDIM, 1, MAX( PDIM( 1 ), PDIM( 2 ) ), BOX,
      :                NVAL, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -398,7 +626,7 @@
       END IF
 
       DO I = 1, NDIM
-         IF ( DIM( I ) .EQ. 1 ) THEN
+         IF ( PDIM( I ) .EQ. 1 ) THEN
             IBOX( I ) = 0
             BOX( I ) = 1
          ELSE
@@ -411,7 +639,12 @@
       CALL PAR_GET1R( 'CLIP', MXCLIP, CLIP, NCLIP, STATUS )
 
 *  Get interaction level for rejection algorithm.
-      CALL PAR_GDR0I( 'ILEVEL', 2, 1, 3, .TRUE., ILEVEL, STATUS )
+      IF( LNEL .EQ. 1 ) THEN
+         ILEVEL = 2
+      ELSE
+         ILEVEL = 1
+      END IF
+      CALL PAR_GDR0I( 'ILEVEL', ILEVEL, 1, 3, .TRUE., ILEVEL, STATUS )
 
 *  Obtain the minimum fraction of good pixels which should be used to
 *  calculate an output pixel value.  Test if a null value is specified
@@ -458,34 +691,281 @@
       END IF
       CALL ERR_RLSE
 
+
+*  Loop round all spectra or planes being processed.
+*  ================================================
+
+*  If each processed spectrum or plane forms a contiguous block of pixels 
+*  in the NDF, then we read input data directly from the input NDF and
+*  write output data directly to the output NDF.
+      IF( ( PAXES( 1 ) .EQ. 1 ) .AND. ( PNAX .EQ. 1 .OR. 
+     :                                  PAXES( 2 ) .EQ. 2 ) ) THEN
+         CONTIG = .TRUE.
+         IPDIN = PNTIN( 1 )
+         IPVIN = PNTIN( 2 )
+         IPDOUT = PNTOUT( 1 )
+         IPVOUT = PNTOUT( 2 )
+
+*  Otherwise, we copy each spectrum or plane from the input NDF to
+*  workspace, process it, and then copy it to the output NDF. Allocate
+*  the necessary workspace.
+      ELSE
+         CONTIG = .FALSE.
+         CALL PSX_CALLOC( PNEL, ITYPE, IPDIN, STATUS )
+         CALL PSX_CALLOC( PNEL, ITYPE, IPDOUT, STATUS )
+         IF( VAR ) THEN
+            CALL PSX_CALLOC( PNEL, ITYPE, IPVIN, STATUS )
+         ELSE
+            IPVIN = IPDIN
+         END IF
+
+         IF( VAR .OR. GENVAR ) THEN
+            CALL PSX_CALLOC( PNEL, ITYPE, IPVOUT, STATUS )
+         ELSE
+            IPVOUT = IPDOUT
+         END IF
+
+      END IF
+
+*  Initialise the grid index bounds on the processing axes of the next 
+*  spectrum or plane to be processed.
+      DO I = 1, PNAX
+         PLBNDG( PAXES( I ) ) = 1
+         PUBNDG( PAXES( I ) ) = PDIM( I )
+      END DO
+
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Loop round each spectrum or plane, and complete the grid index bounds of
+*  the current spectrum or plane.
+      OFF = -PNEL*VAL__NBR
+      DO IL2 = 1, LDIM( 2 )
+
+         IF( LNAX .EQ. 2 ) THEN
+            PLBNDG( LAXES( 2 ) ) = IL2
+            PUBNDG( LAXES( 2 ) ) = IL2
+         END IF
+
+         DO IL1 = 1, LDIM( 1 )
+
+            IF( LNAX .GT. 0 ) THEN
+               PLBNDG( LAXES( 1 ) ) = IL1
+               PUBNDG( LAXES( 1 ) ) = IL1
+            END IF
+
+*  If required, report the section being processed.
+            IF( LNEL .GT. 1 .AND. ILEVEL .EQ. 2 ) THEN
+
+               J = 1
+               DO I = 1, NDIMS 
+                  IF( DIM( I ) .EQ. 1 ) THEN
+                     CALL MSG_SETI( 'SEC', LBND( I ) )
+                     CALL MSG_SETC( 'SEC', ':' )
+                     CALL MSG_SETI( 'SEC', UBND( I ) )
+                  ELSE
+                     CALL MSG_SETI( 'SEC', PLBNDG( J ) + LBND( I ) - 1 )
+                     CALL MSG_SETC( 'SEC', ':' )
+                     CALL MSG_SETI( 'SEC', PUBNDG( J ) + LBND( I ) - 1 )
+                     J = J + 1
+                  END IF
+
+                  IF( I .NE. NDIMS ) CALL MSG_SETC( 'SEC', ',' )
+               END DO
+
+               CALL MSG_BLANK( STATUS )
+               CALL MSG_OUT( ' ', '   Processing section (^SEC)...', 
+     :                       STATUS )
+
+            END IF
+
+*  If required, copy the current spectrum or plane from the input NDF to
+*  the work arrays.
+            IF( .NOT. CONTIG ) THEN
+               OFF = 0
+
+               IF ( ITYPE .EQ. '_REAL' ) THEN
+
+                  CALL KPG1_CPNDR( NSDIM, LBNDG, UBNDG, 
+     :                             %VAL( CNF_PVAL( PNTIN( 1 ) ) ), 
+     :                             PLBNDG, PUBNDG, 
+     :                             %VAL( CNF_PVAL( IPDIN ) ), 
+     :                             EL, STATUS )
+
+                  IF( VAR ) THEN
+                     CALL KPG1_CPNDR( NSDIM, LBNDG, UBNDG, 
+     :                                %VAL( CNF_PVAL( PNTIN( 2 ) ) ), 
+     :                                PLBNDG, PUBNDG, 
+     :                                %VAL( CNF_PVAL( IPVIN ) ), 
+     :                                EL, STATUS )
+                  END IF
+
+               ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+
+                  CALL KPG1_CPNDD( NSDIM, LBNDG, UBNDG, 
+     :                             %VAL( CNF_PVAL( PNTIN( 1 ) ) ), 
+     :                             PLBNDG, PUBNDG, 
+     :                             %VAL( CNF_PVAL( IPDIN ) ), 
+     :                             EL, STATUS )
+
+                  IF( VAR ) THEN
+                     CALL KPG1_CPNDD( NSDIM, LBNDG, UBNDG, 
+     :                                %VAL( CNF_PVAL( PNTIN( 2 ) ) ), 
+     :                                PLBNDG, PUBNDG, 
+     :                                %VAL( CNF_PVAL( IPVIN ) ), 
+     :                                EL, STATUS )
+                  END IF
+
+               END IF
+
+*  For contiguous access, increment the offset into the input and output
+*  NDFs.
+            ELSE
+               IF( ITYPE .EQ. '_REAL' ) THEN
+                  OFF = OFF + PNEL*VAL__NBR
+               ELSE
+                  OFF = OFF + PNEL*VAL__NBD
+               END IF
+            END IF
+
 *  Perform the filtering.
 *  ======================
 
 *  Reject pixels deviating from their local mean by more than the
 *  threshold calling the routine of the appropriate data type.
-      IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPS1_CFF2R( DIM( 1 ), DIM( 2 ), 
-     :                    %VAL( CNF_PVAL( PNTIN( 1 ) ) ), VAR,
-     :                    NVAR, %VAL( CNF_PVAL( PNTIN( 2 ) ) ), 
-     :                    BOX, NCLIP, CLIP,
-     :                    THRESH, ILEVEL, SAMBAD, NLIM, 
-     :                    %VAL( CNF_PVAL( PNTINW ) ),
-     :                    %VAL( CNF_PVAL( PNTOUT( 1 ) ) ), 
-     :                    %VAL( CNF_PVAL( PNTOUT( 2 ) ) ),
-     :                    NGOOD, SIGMA, %VAL( CNF_PVAL( PNTAS( 1 ) ) ),
-     :                    %VAL( CNF_PVAL( PNTNS( 1 ) ) ), STATUS )
+            IF ( ITYPE .EQ. '_REAL' ) THEN
+               CALL KPS1_CFF2R( PDIM( 1 ), PDIM( 2 ), 
+     :                          %VAL( CNF_PVAL( IPDIN ) + OFF ), VAR,
+     :                          NVAR, %VAL( CNF_PVAL( IPVIN ) + OFF ), 
+     :                          BOX, NCLIP, CLIP,
+     :                          THRESH, ILEVEL, SAMBAD, NLIM, 
+     :                          %VAL( CNF_PVAL( PNTINW ) ),
+     :                          %VAL( CNF_PVAL( IPDOUT ) + OFF ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) + OFF ), NGOOD,
+     :                          SIGMA, %VAL( CNF_PVAL( PNTAS( 1 ) ) ),
+     :                          %VAL( CNF_PVAL( PNTNS( 1 ) ) ), STATUS )
+	    
+            ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+               CALL KPS1_CFF2D( PDIM( 1 ), PDIM( 2 ), 
+     :                          %VAL( CNF_PVAL( IPDIN ) + OFF ), VAR,
+     :                          NVAR, %VAL( CNF_PVAL( IPVIN ) + OFF ), 
+     :                          BOX, NCLIP, CLIP,
+     :                          DTHRES, ILEVEL, SAMBAD, NLIM, 
+     :                          %VAL( CNF_PVAL( PNTINW ) ),
+     :                          %VAL( CNF_PVAL( IPDOUT ) + OFF ), 
+     :                          %VAL( CNF_PVAL( IPVOUT ) + OFF ), NGOOD,
+     :                          SIGMA, %VAL( CNF_PVAL( PNTAS( 1 ) ) ),
+     :                          %VAL( CNF_PVAL( PNTNS( 1 ) ) ), STATUS )
+    	    
+            END IF
 
-      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPS1_CFF2D( DIM( 1 ), DIM( 2 ), 
-     :                    %VAL( CNF_PVAL( PNTIN( 1 ) ) ), VAR,
-     :                    NVAR, %VAL( CNF_PVAL( PNTIN( 2 ) ) ), 
-     :                    BOX, NCLIP, CLIP,
-     :                    DTHRES, ILEVEL, SAMBAD, NLIM, 
-     :                    %VAL( CNF_PVAL( PNTINW ) ),
-     :                    %VAL( CNF_PVAL( PNTOUT( 1 ) ) ), 
-     :                    %VAL( CNF_PVAL( PNTOUT( 2 ) ) ),
-     :                    NGOOD, SIGMA, %VAL( CNF_PVAL( PNTAS( 1 ) ) ),
-     :                    %VAL( CNF_PVAL( PNTNS( 1 ) ) ), STATUS )
+*  If we are processing multiple spectra or pleanes, and an error
+*  occurred with this one, annull the error and fill the output spectrum
+*  or plane with bad values.
+            IF( STATUS .NE. SAI__OK .AND. LNEL .GT. 1 ) THEN
+               CALL ERR_ANNUL( STATUS )
+               IF( ITYPE .EQ. '_REAL' ) THEN
+                  CALL KPG1_FILLR( VAL__BADR, PNEL,
+     :                             %VAL( CNF_PVAL( IPDOUT ) + OFF ), 
+     :                             STATUS ) 
+                  IF( VAR ) THEN
+                     CALL KPG1_FILLR( VAL__BADR, PNEL,
+     :                                %VAL( CNF_PVAL( IPVOUT ) + OFF ), 
+     :                                STATUS ) 
+                  END IF
+
+               ELSE
+                  CALL KPG1_FILLD( VAL__BADD, PNEL,
+     :                             %VAL( CNF_PVAL( IPDOUT ) + OFF ), 
+     :                             STATUS ) 
+                  IF( VAR ) THEN
+                     CALL KPG1_FILLD( VAL__BADD, PNEL,
+     :                                %VAL( CNF_PVAL( IPVOUT ) + OFF ), 
+     :                                STATUS ) 
+                  END IF
+
+               END IF
+
+               SIGMA = VAL__BADD
+
+            END IF
+
+*  If we are generating output variances from the local spread of values,
+*  fill the output variance array with the sigma value returned by the
+*  filtering algorithm.
+            IF( GENVAR ) THEN
+               IF( ITYPE .EQ. '_REAL' ) THEN
+
+                  IF( SIGMA .EQ. VAL__BADD ) THEN
+                     RSIGMA = VAL__BADR
+                  ELSE
+                     RSIGMA = REAL( SIGMA**2 )
+                  END IF
+
+                  CALL KPG1_FILLR( RSIGMA, PNEL,
+     :                             %VAL( CNF_PVAL( IPVOUT ) + OFF ), 
+     :                             STATUS ) 
+
+               ELSE
+                  CALL KPG1_FILLD( SIGMA**2, PNEL,
+     :                             %VAL( CNF_PVAL( IPVOUT ) + OFF ), 
+     :                             STATUS ) 
+
+               END IF
+            END IF
+
+*  If required, paste the current spectrum or plane into the output NDF.
+            IF( .NOT. CONTIG ) THEN
+               IF ( ITYPE .EQ. '_REAL' ) THEN
+
+                  EL = -1
+                  CALL KPG1_PTNDR( NSDIM, PLBNDG, PUBNDG, 
+     :                             %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                             LBNDG, UBNDG, .FALSE.,
+     :                             %VAL( CNF_PVAL( PNTOUT( 1 ) ) ), 
+     :                             EL, STATUS )
+
+                  IF( VAR .OR. GENVAR ) THEN
+                     EL = -1
+                     CALL KPG1_PTNDR( NSDIM, PLBNDG, PUBNDG, 
+     :                                %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                                LBNDG, UBNDG, .FALSE.,
+     :                                %VAL( CNF_PVAL( PNTOUT( 2 ) ) ), 
+     :                                EL, STATUS )
+                  END IF
+
+               ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+
+                  EL = -1
+                  CALL KPG1_PTNDD( NSDIM, PLBNDG, PUBNDG, 
+     :                             %VAL( CNF_PVAL( IPDOUT ) ), 
+     :                             LBNDG, UBNDG, .FALSE.,
+     :                             %VAL( CNF_PVAL( PNTOUT( 1 ) ) ), 
+     :                             EL, STATUS )
+
+                  IF( VAR .OR. GENVAR ) THEN
+                     EL = -1
+                     CALL KPG1_PTNDD( NSDIM, PLBNDG, PUBNDG, 
+     :                                %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                                LBNDG, UBNDG, .FALSE.,
+     :                                %VAL( CNF_PVAL( PNTOUT( 2 ) ) ), 
+     :                                EL, STATUS )
+                  END IF
+
+               END IF
+            END IF
+
+
+         END DO
+      END DO
+
+*  Release work space.
+      IF( .NOT. CONTIG ) THEN
+         CALL PSX_FREE( IPDIN, STATUS )
+         CALL PSX_FREE( IPDOUT, STATUS )
+
+         IF( VAR ) CALL PSX_FREE( IPVIN, STATUS )
+         IF( VAR .OR. GENVAR ) CALL PSX_FREE( IPVOUT, STATUS )
 
       END IF
 
@@ -519,8 +999,9 @@
 
   999 CONTINUE
 
-* End the NDF context.
+* End the NDF and AST contexts.
       CALL NDF_END( STATUS )
+      CALL AST_END( STATUS )
 
 *  End the routine.
       

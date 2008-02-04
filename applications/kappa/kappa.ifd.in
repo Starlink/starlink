@@ -9942,6 +9942,15 @@ package kappa {
 
          helplib {$KAPPA_HELP}
 
+         parameter axes {
+            type _INTEGER
+            vpath DYNAMIC
+            ppath DYNAMIC
+            prompt {Pixel axes spanning the rows or planes to be cleaned}
+            helpkey *
+            size *
+          }
+
          parameter box {
             position 4
             type _INTEGER
@@ -9962,6 +9971,15 @@ package kappa {
             prompt {Clipping levels}
             helpkey *
             size *
+          }
+
+         parameter genvar {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Generate output variance from local variations?}
+            helpkey *
           }
 
          parameter in {
@@ -9988,7 +10006,8 @@ package kappa {
          parameter ilevel {
             position 7
             type _INTEGER
-            vpath DEFAULT
+            vpath DYNAMIC
+            ppath DYNAMIC
             prompt {Interaction level}
             default 2
             helpkey *
