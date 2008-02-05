@@ -9,7 +9,7 @@ $| =1;
 # is not defined use $INSTALL. If that is not defined
 # use /star as a guess
 # Extended to use the Autoconf variables STARCONF_DEFAULT_PREFIX
-# and STARCONF_DEFAULT_STARLINK
+# and STARCONF_DEFAULT_STARLINK and STARLINK_DIR
 # Priority is given to the autoconf forms in each case.
 
 my $pkg = "Starlink::Config";
@@ -26,6 +26,9 @@ if (exists $ENV{STARCONF_DEFAULT_STARLINK}) {
 } elsif (exists $ENV{INSTALL}) {
   $base = $ENV{INSTALL};
   print "$pkg - Reading Starlink location from \$INSTALL\n";
+} elsif (exists $ENV{STARLINK_DIR}) {
+  $base = $ENV{STARLINK_DIR};
+  print "$pkg - Reading Starlink location from \$STARLINK_DIR\n";
 } elsif (-d '/star') {
   $base = '/star';
   print "$pkg - Guessing Starlink location to be /star\n";
@@ -234,7 +237,7 @@ sub import {
   if ( grep { $_ eq ':override' } @_) {
     my $dir;
 
-    for my $try ( qw/ STARCONF_DEFAULT_STARLINK STARLINK /) {
+    for my $try ( qw/ STARCONF_DEFAULT_STARLINK STARLINK STARLINK_DIR /) {
       if ( exists $ENV{$try} && -d $ENV{$try}) {
 	$OVERRIDE = $ENV{$try};
 
