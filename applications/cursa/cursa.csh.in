@@ -136,10 +136,10 @@ if ( -e @PERL@ ) then
    set starperl=@PERL@
 else 
    if ( -e $STARLINK_DIR/Perl/bin/perl ) then
-      set starperl $STARLINK_DIR/Perl/bin/perl
+      set starperl=$STARLINK_DIR/Perl/bin/perl
    else
 #  No Starlink Perl, see what the default one can achieve.
-      set starperl perl
+      set starperl=perl
    endif
 endif
 
