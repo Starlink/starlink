@@ -606,13 +606,13 @@
 
 *  If a null value was supplied, annul the error and use FALSE if all the
 *  input NDFs have a variance component, and TRUE otherwise.
-      If( STATUS .EQ. PAR__NULL ) THEN
+      IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          GENVAR = .NOT. HASVAR
       END IF         
 
 *  If we are creating output variances from the spread of input data
-*  values, then we do not use the inptu variances to calculate the output
+*  values, then we do not use the input variances to calculate the output
 *  variances.
       IF( GENVAR ) THEN
          USEVAR = .FALSE.

@@ -1,3 +1,28 @@
+1 KAPPA_Version_1.9
+
+   A new release of KAPPA (V1.9) is under development,  The main changes
+   so far are listed below.  For complete details of all changes, see
+   the "Release Notes" appendix in SUN/95.
+
+2 Modified_applications
+
+   o  FFCLEAN has been extended to operate on cubes, either by
+   processing the cubes as a set of independent one-dimensional
+   spectra, or as a set of independent two-dimensional images
+   (see the new parameter AXES).  Likewise you can process a
+   two-dimensional NDF as a set of independent one-dimensional
+   spectra.
+
+   It can store the calculated noise level in the output variance
+   array (see new parameter GENVAR).  If the NDF is processed as a set
+   of spectra or images, then each individual spectrum or image is
+   assigned its own noise level.
+
+   o  WCSMOSAIC Parameter GENVAR now allows a null value.  Null 
+   requests that a value of FALSE be adopted if and only if all the
+   input NDFs have variance components.  TRUE is used otherwise.
+
+
 1 KAPPA_Version_1.8
 
    A new release of KAPPA (V1.8-9) is available.  The main changes are
