@@ -87,6 +87,7 @@ static Provenance *ndg1FreeProvenance( Provenance *, int, int * );
 static Provenance *ndg1MakeProvenance( Prov *, int * );
 static Provenance *ndg1ReadProvenanceExtension( int, HDSLoc *, const char *, int, int * );
 static char *ndg1GetTextComp( HDSLoc *, const char *, char *, size_t, int * );
+static const char *ndg1Date( int * );
 static int ndg1FindAncestorIndex( Prov *, Provenance *, int * );
 static int ndg1TheSame( Prov *, Prov *, int * );
 static void ndg1Disown( Prov *, Prov *, int * );
@@ -2552,7 +2553,7 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance, int indf,
    HDSLoc *mloc = NULL;
    HDSLoc *xloc = NULL;
    Prov *prov = NULL;
-   char *date = NULL;
+   const char *date = NULL;
    char *path = NULL;
    hdsdim  dim[1];
    int *parents = NULL;
@@ -2616,7 +2617,7 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance, int indf,
          } else {
             path = NULL;
             time( &t );
-            date = asctime( gmtime( &t ) );
+            date = ndg1Date( status );
             more = NULL;
          }
 
@@ -2636,7 +2637,6 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance, int indf,
          if( date ) {
             len = astChrLen( date );
             if( len ) {
-               date[ len ] = 0;
                datNew0C( cloc, DATE_NAME, len, status );
                datFind( cloc, DATE_NAME, &loc, status );
                datPut0C( loc, date, status );
@@ -2696,6 +2696,48 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance, int indf,
    }
 
 }
+
+static const char *ndg1Date( int *status ){
+/*
+*  Name:
+*     ndg1Date
+
+*  Purpose:
+*     Return the current UTC date and time in ISO Gregorian calendar
+*     format.
+
+*  Synopsis:
+*     const char *ndg1Date( int *status )
+
+*  Description:
+*     This function returns a pointer to a static string holding the
+*     current UTC date and time in ISO Gregorian calendar format.
+
+*  Parameters:
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   AstTimeFrame *tf;
+   const char *result;
+
+/* Initialise */
+   result = "";
+
+/* Check the inherited status value. */
+   if( *status != SAI__OK ) return result;
+
+/* Create a TimeFrame representing UTC, then use the TimeFrame to
+   determine and format the current time. */
+   tf = astTimeFrame("TimeScale=UTC,Format(1)=iso.0");
+   result = astFormat( tf, 1, astCurrentTime( tf ) );
+   tf = astAnnul( tf );
+
+   return result;
+}
+
 
 
 
