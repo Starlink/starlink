@@ -295,24 +295,27 @@
 *          dynamic default value is determined by the AUTOGRID parameter. []
 *     POLBINSIZE = _REAL (Read)
 *          This parameter is only prompted for if the input files contain
-*          polarisation data. The supplied value is used as the bin size 
-*          (in degrees) for grouping polarisation analyser angles.
-*          The "analyser angle" is the anti-clockwise angle
-*          from celestial north (in the system chosen by parameter SYSTEM) 
-*          to the axis of the "effective analyser" - a rotating analyser that
-*          would have the same effect as the combination of fixed analyser 
-*          and half-wave plate actually present in the polarimeter. The 
+*          polarisation data. The supplied value is used as the bin size
+*          (in degrees) for grouping polarisation analyser angles. The
+*          "analyser angle" is the anti-clockwise angle from celestial
+*          north (in the system chosen by parameter SYSTEM) to the axis
+*          of the "effective analyser" - a rotating analyser that would
+*          have the same effect as the combination of fixed analyser and
+*          half-wave plate actually present in the polarimeter. The
 *          supplied value for POLBINSIZE will be modified if required to
-*          ensure that a whole number of bins is used to cover the complete 
-*          range of analyser angles (0 to 360 degrees). A separate output
-*          cube will be created for each bin that is not empty, and each
-*          output NDF will contain a POLPACK extension suitable for use with 
-*          the POLPACK POLCAL command. The NDF name will be the same as
-*          the tile name but with "_p<N>" appended to the end, where "<N>" 
-*          is an integer bin index. The largest value of N is written to
-*          putput parameter NPOLBIN. If a null value (!) is supplied, then a 
-*          single output NDF (without POLPACK extension) is created for each 
-*          tile, containing all input data.
+*          ensure that a whole number of bins is used to cover the
+*          complete range of analyser angles (0 to 360 degrees). A
+*          separate output cube will be created for each bin that is not
+*          empty, and each output NDF will contain a POLPACK extension
+*          suitable for use with the POLPACK POLCAL command. These NDFs
+*          are all stored in a single HDS container file (one per tile)
+*          with the name specified by parameter OUT. Within this
+*          container file, each cube will be held in a component with
+*          name of the form "P<N>" appended to the end, where "<N>" is an
+*          integer bin index. The largest value of N is written to putput
+*          parameter NPOLBIN. If a null value (!) is supplied, then a
+*          single output NDF (without POLPACK extension) is created for
+*          each tile, containing all input data.
 *     REF = NDF (Read)
 *          An existing NDF that is to be used to define the output grid.
 *          If supplied, the output grid will be aligned with the supplied 
@@ -710,6 +713,8 @@
 *     17-JAN-2008 (DSB):
 *        - Only create the output Tsys array if SPREAD is Nearest.
 *        - Added parameter ALIGNSYS.
+*     6-FEB-2008 (DSB):
+*        Write all output polarisation cubes to a single container file.
 
 *  Copyright:
 *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
@@ -1406,7 +1411,7 @@ void smurf_makecube( int *status ) {
             blen = astChrLen( basename );
 
             for( ipbin = 0; ipbin < npbin; ipbin++ ){
-               sprintf( basename + blen, "_p%d", ipbin + 1 );            
+               sprintf( basename + blen, ".p%d", ipbin + 1 );            
                grpPut1( tgrp, basename, 0, status );
             }
 
