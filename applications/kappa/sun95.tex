@@ -22082,14 +22082,14 @@ KAPPA: \htmlref{LOG10}{LOG10},
       from the spectrum or image's smoothed version by more than an
       arbitrary number of standard deviations from the local mean, and
       that lie within a specified range of values.  Therefore, the
-      spectrum or image must be substantially flat.  The data
-      variances provide the local noise estimate for the threshold,
-      but if these are not available a variance for the whole of the
-      spectrum or image is derived from the mean squared deviations 
-      of the original and smoothed versions.  The smoothed version of
-      the image is obtained by block averaging over a rectangular box.
-      An iterative process progressively removes the outliers from the
-      image.
+      data array must be substantially flat.  The data variances
+      provide the local noise estimate for the threshold, but if these
+      are not available a variance for the whole of the data array is
+      derived from the mean squared deviations of the original and
+      smoothed versions.  The smoothed version of the data array is
+      obtained by block averaging over a rectangular box.  An
+      iterative process progressively removes the outliers from the
+      data array.
    }
    \sstusage{
       ffclean in out clip box [thresh] [wlim] [ilevel]
