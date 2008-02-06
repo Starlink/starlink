@@ -88,13 +88,17 @@
 *         coordinates are identically 0 and un-useable). 
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     2008-01-11 (TIMJ):
+*        - Fix JCMT telescope position
+*        - Calculate base positions in AZEL (except for planets)
+*        - Attempt to calculate the time error
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007 Science and Technology Facilities Council.
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
-*     Council and the University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+*     Copyright (C) 2005-2008 Univeristy of British Columbia.
+*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
+*     Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -152,7 +156,7 @@
 #include "libsc2sim/sc2sim.h"
 
 /* netCDF includes */
-#ifdef HAVE_LIBNETCDF
+#if HAVE_LIBNETCDF
 #include "netcdf.h"
 #endif
 
@@ -165,7 +169,7 @@
 /* Ratio between solar and sidereal time (from SLA_AOPPA) */
 #define SOLSID 1.00273790935
 
-#ifdef HAVE_LIBNETCDF
+#if HAVE_LIBNETCDF
 /* Prototypes for local functions that wrap netcdf messages */
 void nc_getSignal(int ncid, char* signalname, double* signal, int* status);
 void nc_error(int nc_status, int *status);
@@ -290,7 +294,7 @@ void smurf_impaztec( int *status ) {
 
   /* Main routine */
 
-#ifdef HAVE_LIBNETCDF
+#if HAVE_LIBNETCDF
 
   /* We should use the telescope location that the TCS actually used.
      We therefore use the OBSGEO coordinates known to be in use at that
