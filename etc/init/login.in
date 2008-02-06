@@ -459,54 +459,11 @@ if ( -e ${bindir}/period ) then
    setenv PERIOD_HELP ${starhelpdir}/period
 endif
 
-#set perl_version = `${exec_prefix}/Perl/bin/perl -e 'use Config;' -e 'print $Config{'version'};'`
-#echo PERL version is ${perl_version}
 #
 #  PERL
-#if ( -e ${exec_prefix}/dates/perl_datestamp ) then
-#   set perl_install=`grep INSTALL ${exec_prefix}/dates/perl_datestamp | awk -F: '{print $2}' - `
-#   if ( "${exec_prefix}" != ${perl_install} ) then
-#      set perl_version = `${exec_prefix}/Perl/bin/perl -e 'use Config;' -e 'print $Config{'version'};'`
-#      if ( -e ${exec_prefix}/Perl/perl_sys ) then
-#         set perl_sys=`cat ${exec_prefix}/Perl/perl_sys`
-#         if ( ! ${?PERL5LIB} ) then
-#            setenv PERL5LIB ${exec_prefix}/Perl/lib/perl5/${perl_version}/${perl_sys}
-#         else
-#            setenv PERL5LIB ${PERL5LIB}:${exec_prefix}/Perl/lib/perl5/${perl_version}/${perl_sys}
-#         endif
-#         setenv PERL5LIB ${PERL5LIB}:${exec_prefix}/Perl/lib/perl5/${perl_version}
-#         setenv PERL5LIB ${PERL5LIB}:${exec_prefix}/Perl/lib/perl5/site_perl/${perl_version}/${perl_sys}
-#         setenv PERL5LIB ${PERL5LIB}:${exec_prefix}/Perl/lib/perl5/site_perl/${perl_version}
-#         setenv PERL5LIB ${PERL5LIB}:${exec_prefix}/Perl/lib/perl5/site_perl
-#      endif
-#   endif
-#   unset perl_install perl_version
-#endif
-
-
-#
-#  PERL -- note this isn't a third party package at present.
-if ( -e ${exec_prefix}/manifests/perl ) then
-   set perl_names=`grep 'bin/perl' ${exec_prefix}/manifests/perl`
-   set perl_install=`echo $perl_names[1]:h:h`
-   if ( "${exec_prefix}" != ${perl_install} ) then
-      set perl_version = 5.8.8
-      if ( -e ${exec_prefix}/Perl/perl_sys ) then
-         set perl_sys=`cat ${exec_prefix}/Perl/perl_sys`
-         if ( ! ${?PERL5LIB} ) then
-            setenv PERL5LIB ${exec_prefix}/Perl/lib/perl5/${perl_version}/${perl_sys}
-         else
-            setenv PERL5LIB ${PERL5LIB}:${exec_prefix}/Perl/lib/perl5/${perl_version}/${perl_sys}
-         endif
-         setenv PERL5LIB ${PERL5LIB}:${exec_prefix}/Perl/lib/perl5/${perl_version}
-         setenv PERL5LIB ${PERL5LIB}:${exec_prefix}/Perl/lib/perl5/site_perl/${perl_version}/${perl_sys}
-         setenv PERL5LIB ${PERL5LIB}:${exec_prefix}/Perl/lib/perl5/site_perl/${perl_version}
-         setenv PERL5LIB ${PERL5LIB}:${exec_prefix}/Perl/lib/perl5/site_perl
-      endif
-   endif
-   unset perl_install perl_version perl_names
+if ( ${exec_prefix} != @exec_prefix@ ) then
+   setenv PERL5LIB ${exec_prefix}/Perl/lib/perl5
 endif
-
 
 #
 #  PHOTOM

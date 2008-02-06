@@ -321,6 +321,12 @@ if test -f ${bindir}/period/period; then
    export PERIOD_HELP=${starhelpdir}/period
 fi
 
+#  PERL
+
+if [ "${exec_prefix}" != "@exec_prefix@" ]; then
+   export PERL5LIB=${exec_prefix}/Perl/lib/perl5
+fi
+
 #  PGPLOT
 
 if test -z "${PGPLOT_DIR}"; then
