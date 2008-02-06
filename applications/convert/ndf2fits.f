@@ -185,6 +185,22 @@
 *        FITS header as HISTORY cards.  These follow the mandatory
 *        headers and any merged FITS-extension headers (see parameter
 *        PROFITS).  [TRUE]
+*     PROVENANCE = LITERAL (Read)
+*        This controls the export of NDF provenance information to the 
+*        FITS file.  Allowed values are as follows.
+*
+*        "None" -- No provenance is written.
+*
+*        "CADC" -- The CADC headers are written.  These record the
+*        number and paths of both the direct parents of the NDF being
+*        converted, and its root ancestors (the ones without parents).
+*
+*        "Generic" -- Encapsulates the entire PROVENANCE structure in 
+*        FITS headers in sets of five character-value indexed headers.
+*        there is a set for the current NDF and each parent.
+*
+*        See Section "Provenance" for more details.
+*        ["None"]
 
 *  Examples:
 *     ndf2fits horse logo.fit d
@@ -331,9 +347,14 @@
 *          regardless of whether or not there are bad values actually
 *          present in the array; this is for the same efficiency reasons
 *          as before.  The END card terminates the FITS header.
-*       HISTORY headers are propagated from the FITS airlock when
+*        HISTORY headers are propagated from the FITS airlock when
 *          PROFITS is TRUE, and from the NDF history component when
 *          PROHIS is TRUE.
+*
+*     See also the sections "Provenance" and "World Co-ordinate Systems"
+*     for details of headers used to describe the PROVENANCE extension 
+*     and WCS information respectively.
+
 *     -  Extension information may be transferred to the FITS file when
 *     PROEXTS is TRUE.  The whole hierarchy of extensions is propagated
 *     in order.  This includes substructures, and arrays of extensions
@@ -434,6 +455,30 @@
 *     component may appear in the output FITS file.  If this causes a
 *     problem, then PROFITS should be set to FALSE or the offending
 *     keywords removed using KAPPA FITSEDIT, for example.
+
+*  Provenance:
+*     The following PROVENANCE headers are written if parameter
+*     PROVENANCE is set to "Generic".
+*        PRVPn --- is the path of the <nth> NDF.
+*        PRVIn --- is a comma-seapated list of the identifiers of the 
+*          direct parents for <nth> ancestor.
+*        PRVDn --- is the creation date of <nth> ancestor in ISO order.
+*        PRVCn --- is the software used to create the <nth> ancestor.
+*        PRVMn --- lists the contents of the MORE structure of <nth> 
+*          parent.
+*     All have value '<unknown>' if the information could not be found, 
+*     except for the PRVMn header, which is omitted if there is no MORE 
+*     information to record.   The index n used in each keyword's name 
+*     is the provenance identifier for the NDF, and starts at 0 for the
+*     NDF being converted to FITS..
+*
+*     The following PROVENANCE headers are written if parameter
+*     PROVENANCE is set to "CADC".
+*        PRVCNT --- is the number of immediate parents.
+*        PRVm --- is name of the mth immediate parent.
+*        OBSCNT --- is the number of root ancestor OBSm headers.
+*        OBSm --- is mth root ancestor identifier from its
+*          MORE.OBSIDSS component.
 
 *  Special Formats:
 *     In the general case, NDF extensions (excluding the FITS extension)
@@ -568,6 +613,10 @@
 *        Added CHECKSUM parameter.
 *     2007 October 19 (MJC):
 *        Added DUPLEX parameter.
+*     2008 January 8 (MJC):
+*        Added PROVENANCE header.
+*     2008 February 6 (MJC):
+*        Document PROVENANCE parameter's Generic option.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -667,6 +716,7 @@
                                  ! propagated
       LOGICAL PROHIS             ! True if history information is
                                  ! propagated
+      CHARACTER * ( 7 ) PROVEX   ! Provenance export option
       LOGICAL QUAPRE             ! True if the QUA:LITY component is
                                  ! present
       LOGICAL QUASEL             ! True if QUALITY was selected
@@ -1072,6 +1122,10 @@
 *  Determine whether or not the HISTORY component is to be propagated.
       CALL PAR_GET0L( 'PROHIS', PROHIS, STATUS )
 
+*  Determine how the PROVENANCE component is to be handled.
+      CALL PAR_CHOIC( 'PROVENANCE', 'None', 'None,CADC,Generic', .TRUE.,
+     :                PROVEX, STATUS )
+
 *  Determine whether or not the integrity headers are to be written.
       CALL PAR_GET0L( 'CHECKSUM', CHECKS, STATUS )
 
@@ -1383,8 +1437,8 @@
 *  Finally convert the NDF to the FITS file, as best we can.
                CALL COF_NDF2F( NDF, FILNAM, NAPRES, ARRPRE, BITPIX, 
      :                         BLOCKF, ORIGIN, PROFIT, DUPLEX, PROEXT, 
-     :                         PROHIS, CHECKS, ENCOD, NATIVE, FOPEN,
-     :                         FCLOSE, STATUS )
+     :                         PROHIS, PROVEX, CHECKS, ENCOD, NATIVE, 
+     :                         FOPEN, FCLOSE, STATUS )
 
 *  There are no arrays to transfer to the FITS file for the .HEADER
 *  NDF.
@@ -1399,15 +1453,15 @@
 *  Convert the NDF to the FITS file.
                CALL COF_NDF2F( NDF, FILNAM, 1, 'HEADER', -32, BLOCKF,
      :                         ORIGIN, PROFIT, DUPLEX, PROEXT, PROHIS, 
-     :                         CHECKS, ENCOD, NATIVE, FOPEN, FCLOSE,
-     :                         STATUS )
+     :                         PROVEX, CHECKS, ENCOD, NATIVE, FOPEN, 
+     :                         FCLOSE, STATUS )
             ELSE
 
 *  Convert the NDF to the FITS file.
                CALL COF_NDF2F( NDF, FILNAM, NAPRES, ARRPRE, BITPIX,
      :                         BLOCKF, ORIGIN, PROFIT, DUPLEX, PROEXT,
-     :                         PROHIS, CHECKS, ENCOD, NATIVE, FOPEN,
-     :                         FCLOSE, STATUS )
+     :                         PROHIS, PROVEX, CHECKS, ENCOD, NATIVE, 
+     :                         FOPEN, FCLOSE, STATUS )
             END IF
  
 *  Tidy the NDF.

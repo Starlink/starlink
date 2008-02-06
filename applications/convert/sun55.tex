@@ -4398,6 +4398,32 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          headers and any merged FITS-extension headers (see parameter
          PROFITS). \texttt{[TRUE]}
       }
+      \sstsubsection{
+         PROVENANCE = LITERAL (Read)
+      }{
+         This controls the export of NDF provenance information to the 
+         FITS file.  Allowed values are as follows.
+         \ssthitemlist{
+
+            \sstitem  
+            \texttt{"None"} --- No provenance is written.
+
+            \sstitem
+            \texttt{"CADC"} --- The CADC headers are written.  These
+	    record the number and paths of both the direct parents
+	    of the NDF being converted, and its root ancestors (the
+	    ones without parents).
+ 
+            \sstitem
+            \texttt{"Generic"} --- Encapsulates the entire
+	    PROVENANCE structure in FITS headers in sets of five
+	    character-value indexed headers. there is a set for the
+	    current NDF and each parent. See Section
+	    \htmlref{\texttt{"}Provenance\texttt{"}}{ndf2fits_provenance}
+	    for more details.
+         }
+         {\texttt ["None"]}
+      }
    }
    \sstexamples{
       \sstexamplesubsection{
@@ -4625,6 +4651,11 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
               history component when PROHIS is \texttt{TRUE}.
 
          }
+         See also the sections
+         \htmlref{\texttt{"}Provenance\texttt{"}}{ndf2fits_provenance} and
+         \htmlref{\texttt{"}World Co-ordinate Systems\texttt{"}}{world_coordinate_systems}
+         for details of headers used to describe the PROVENANCE extension 
+         and WCS information respectively.
 
          \sstitem
          Extension information may be transferred to the FITS file when
@@ -4761,6 +4792,54 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       using \KAPPA\ 
       \xref{FITSEDIT}{sun95}{FITSEDIT}
       for example.
+   }
+   \sstdiytopic{
+      \label{ndf2fits_provenance}Provenance
+   }{
+      The following PROVENANCE headers are written if parameter
+      PROVENANCE is set to \texttt{"Generic"}.
+      \ssthitemlist{
+
+         \sstitem
+         PRVP$n$ --- is the path of the $n$th NDF.
+
+         \sstitem
+         PRVIn --- is a comma-separated list of the identifiers of the 
+           direct parents for the $n$th ancestor.
+
+         \sstitem
+         PRVDn --- is the creation date in ISO order of the $n$th ancestor.
+
+         \sstitem
+         PRVCn --- is the software used to create the $n$th ancestor
+         
+         \sstitem
+         PRVMn --- lists the contents of the MORE structure of the $n$th
+           parent.
+      }
+      All have value \texttt{<unknown>} if the information could not be found, 
+      except for the PRVM$n$ header, which is omitted if there is no MORE 
+      information to record.   The index $n$ used in each keyword's name 
+      is the provenance identifier for the NDF, and starts at 0 for the
+      NDF being converted to FITS.
+
+      The following PROVENANCE headers are written if parameter
+      PROVENANCE is set to \texttt{"CADC"}.
+      \ssthitemlist{
+
+         \sstitem
+         PRVCNT --- is the number of immediate parents.
+
+         \sstitem
+         PRV$m$ --- is name of the $m$th immediate parent.
+
+         \sstitem
+         OBSCNT --- is the number of root ancestor OBS$m$ headers.
+
+         \sstitem
+         OBS$m$ --- is $m$th root ancestor identifier from its MORE.OBSIDSS
+         component.
+      }
    }
    \sstdiytopic{
       Special Formats
@@ -7218,5 +7297,13 @@ also in the IMAGE extensions for the VARIANCE and QUALITY arrays.
 \htmlref{NDF2FITS}{NDF2FITS} now makes special provision for the JCMT
 SMURF-package extension.  It treats the extension contents as NDFs
 rather than arbitrary HDS structures.
+
+\section{Release Notes -- V1.5-13}
+
+\htmlref{NDF2FITS}{NDF2FITS} supports the propagation of provenance
+information to FITS headers.  There is a choice of generic propagation
+that attempts to propagate all the information, or to write
+CADC-specific headers, or to exclude provenance (the default),
+governed by the new PROVENANCE parameter.
 
 \end{document}

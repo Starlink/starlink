@@ -1,3 +1,11 @@
+1 CONVERT_Version_1.5-13
+
+NDF2FITS supports the propagation of provenance information to FITS
+headers.  There is a choice of generic propagation that attempts to
+propagate all the information, or to write CADC-specific headers, or
+to exclude provenance (the default), governed by the new PROVENANCE
+parameter.
+
 1 CONVERT_Version_1.5-12
 
 NDF2FITS now makes special provision for the JCMT SMURF-package

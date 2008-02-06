@@ -875,6 +875,8 @@ endinterface
 #        Added CHECKSUMS.
 #     2007 October 19 (MJC):
 #        Added DUPLEX.
+#     2008 January 8 (MJC):
+#        Added PROVENANCE.
 #     {enter_further_changes_here}
 
 #-
@@ -1011,6 +1013,15 @@ interface NDF2FITS
       vpath       'DEFAULT'
       default     TRUE
       helpkey     '*'
+   endparameter
+
+   parameter      PROVENANCE     # How to export PROVENANCE
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Storage of provenance information'
+      helpkey     '*'
+      default     'None'
    endparameter
 
 endinterface

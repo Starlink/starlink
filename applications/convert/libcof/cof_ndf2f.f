@@ -1,6 +1,7 @@
       SUBROUTINE COF_NDF2F( NDF, FILNAM, NOARR, ARRNAM, BITPIX, BLOCKF,
      :                      ORIGIN, PROFIT, DUPLEX, PROEXT, PROHIS, 
-     :                      SUMS, ENCOD, NATIVE, FOPEN, FCLOSE, STATUS )
+     :                      PROVEN, SUMS, ENCOD, NATIVE, FOPEN, FCLOSE, 
+     :                      STATUS )
 *+
 *  Name:
 *     COF_NDF2F
@@ -13,8 +14,8 @@
 
 *  Invocation:
 *     CALL COF_NDF2F( NDF, FILNAM, NOARR, ARRNAM, BITPIX, BLOCKF,
-*                     ORIGIN, PROFIT, DUPLEX, PROEXT, PROHIS, SUMS,
-*                     ENCOD, NATIVE, STATUS )
+*                     ORIGIN, PROFIT, DUPLEX, PROEXT, PROHIS, PROVEN,
+*                     SUMS, ENCOD, NATIVE, STATUS )
 
 *  Description:
 *     This routine converts an NDF into a FITS file.  It uses as much
@@ -74,6 +75,19 @@
 *        If .TRUE., any NDF history records are written to the primary
 *        FITS header as HISTORY cards.  These follow the mandatory
 *        headers and any merged FITS-extension headers (see PROFIT).
+*     PROVEN = CHARACTER * ( * ) (Given)
+*        This controls the export of NDF provenance information to the 
+*        FITS file.  Allowed values are as follows.
+*
+*        "NONE" -- No provenance is written.
+*
+*        "CADC" -- The CADC headers are written.  These record the
+*        number and paths of both the direct parents of the NDF being
+*        converted, and its root ancestors (the ones without parents).
+*
+*        "GENERIC" -- Encapsulates the entire PROVENANCE structure in 
+*        FITS headers in sets of five character-value indexed headers.
+*        There is a set for the current NDF and each parent.
 *     SUMS = LOGICAL (Given)
 *        If .TRUE., DATASUM and CHECKSUM headers are written to each
 *        HDU.
@@ -168,8 +182,29 @@
 *          PROFIT is .TRUE., and from the NDF HISTORY component when
 *          PROHIS is .TRUE..
 *
-*     There are additional rules if a multi-NDF container file is being
-*     converted.  This excludes the case where there are but two 
+*     -  The following PROVENANCE headers are written if argument PROVEN
+*     is set to "GENERIC".
+*        PRVPn --- is the path of the nth NDF.
+*        PRVIn --- is a comma-separated list of the identifiers of the 
+*          direct parents for the nth ancestor.
+*        PRVDn --- is the creation date in ISO order of the $n$th ancestor.
+*        PRVCn --- is the software used to create the nth ancestor.
+*        PRVMn --- lists the contents of the MORE structure of the nth 
+*          parent.
+*     All have value '<unknown>' if the information could not be found, 
+*     except for the PRVMn header, which is omitted if there is no MORE 
+*     information to record.
+*
+*     The following PROVENANCE headers are written if argument PROVEN
+*     is set to "CADC".
+*        PRVCNT --- is the number of immediate parents.
+*        PRVm --- is name of the mth immediate parent.
+*        OBSCNT --- is the number of root ancestor OBSm headers.
+*        OBSm --- is mth root ancestor identifier from its
+*          MORE.OBSIDSS component.
+*
+*     -  There are additional rules if a multi-NDF container file is 
+*     being converted.  This excludes the case where there are but two 
 *     NDFs---one data and the other just headers---that have already
 *     been merged:
 *     -  For multiple NDFs a header-only HDU may be created followed by
@@ -182,7 +217,6 @@
 *        HDSTYPE is set to "NDF" for a component NDF in a multi-NDF
 *          container file.
 
-*  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -269,6 +303,10 @@
 *        Implement the revised COF_WHEAD API.
 *     2007 October 26 (MJC):
 *        Implement the further revised COF_WHEAD API.
+*     2008 January 8 (MJC):
+*        Add PROVEN argument and invoke its CADC option.
+*     2008 February 6 (MJC):
+*        Invoke and document PROVEN argument's GENERIC option.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -299,6 +337,7 @@
       LOGICAL DUPLEX
       LOGICAL PROEXT
       LOGICAL PROHIS
+      CHARACTER * ( * ) PROVEN
       LOGICAL SUMS
       CHARACTER * ( * ) ENCOD
       LOGICAL NATIVE
@@ -622,6 +661,13 @@
             IF ( HISPRE ) CALL COF_WHISR( NDF, FUNIT, STATUS )
          END IF
 
+*  Write provenance headers.
+         IF ( PROVEN .EQ. 'CADC' ) THEN
+            CALL COF_PCADC( NDF, FUNIT, STATUS )
+
+         ELSE IF ( PROVEN .EQ. 'GENERIC' ) THEN
+            CALL COF_WPROV( NDF, FUNIT, STATUS )
+         END IF
          IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Determine the block-floating point conversion and blank value.
@@ -1024,7 +1070,10 @@
          END IF
 
 *  Write integrity-check headers.
-         IF ( SUMS ) CALL FTPCKS( FUNIT, STATUS )
+         IF ( SUMS ) THEN
+            CALL FTPREC( FUNIT, ' ', STATUS )
+            CALL FTPCKS( FUNIT, STATUS )
+         END IF
 
       END DO
 

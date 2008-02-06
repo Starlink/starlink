@@ -19,7 +19,9 @@ F_ROUTINES = \
  cof_thier.f cof_typsz.f cof_wfexf.f cof_wfext.f cof_wgbfe.f cof_whead.f \
  cof_whisr.f cof_wndfh.f cof_wrtab.f cof_ftwcs.f cof_fpwcs.f cof_fndfs.f \
  cof_wcsax.f cof_wcsdf.f cof_wcsex.f cof_wcsim.f cof_wcsut.f cof_mghdr.f \
- cof_getfc.f cof_getyp.f cof_stscl.f cof_smurf.f cof_nex2f.f
+ cof_getfc.f cof_getyp.f cof_stscl.f cof_smurf.f cof_nex2f.f cof_pcadc.f \
+ cof_wprov.f
+
 
 GEN_ROUTINES = $(DIRW_GEN_ROUTINES) $(CDILR_GEN_ROUTINES) 
 
