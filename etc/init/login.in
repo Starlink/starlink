@@ -1,5 +1,5 @@
 #+
-#  Date: 2003.12.12
+#  Date: 2008.01.06
 #  File: @staretcdir@/login
 #  Init Version: @VERSION@
 #
@@ -40,7 +40,6 @@ else
     set mandir = @mandir@
     set starjavadir = @starjavadir@
 endif
-unset relocate
 
 #  Add Starlink directories to relevant paths 
 
@@ -491,7 +490,7 @@ if ( -e ${exec_prefix}/manifests/perl ) then
    set perl_names=`grep 'bin/perl' ${exec_prefix}/manifests/perl`
    set perl_install=`echo $perl_names[1]:h:h`
    if ( "${exec_prefix}" != ${perl_install} ) then
-      set perl_version = 5.8.0
+      set perl_version = 5.8.8
       if ( -e ${exec_prefix}/Perl/perl_sys ) then
          set perl_sys=`cat ${exec_prefix}/Perl/perl_sys`
          if ( ! ${?PERL5LIB} ) then
@@ -690,6 +689,7 @@ unset datadir
 unset mandir
 unset starjavadir
 unset exec_prefix
+unset relocate
 
 #
 #  Set the flag to indicate this has been sourced
