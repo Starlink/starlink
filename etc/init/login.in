@@ -461,8 +461,9 @@ endif
 
 #
 #  PERL
-if ( ${exec_prefix} != @exec_prefix@ ) then
+if ( ${relocate} ) then
    setenv PERL5LIB ${exec_prefix}/Perl/lib/perl5
+   setenv PERL5LIB ${exec_prefix}/Perl/lib/perl5/site_perl:${PERL5LIB}
 endif
 
 #
