@@ -1810,7 +1810,7 @@ sub solve {
 
       open my $bestfit_fh, ">", $self->bestfitlog or croak "Could not open " . $self->bestfitlog . " for writing: $!";
       print $bestfit_fh "    n nterms         centre        prms       q FITS-WCS\n";
-      my $num_results = @$results;
+      my $num_results = @$results - 1;
       foreach my $k ( 0..$num_results ) {
         if( $results->[$k]->{STATUS} ) {
           next if $results->[$k]->{nterms} > $self->maxfit;
