@@ -56,6 +56,7 @@ use Class::Struct;
 use Starlink::ADAM;
 use Starlink::AMS::Init;
 use Starlink::AMS::Task;
+use Starlink::Config qw/ :override /;
 use Starlink::EMS qw/ :sai get_facility_error /;
 use Astro::Catalog;
 
@@ -227,6 +228,320 @@ sub extract {
 
 # Set up a new Astro::Catalog object.
   my $catalog = new Astro::Catalog;
+
+# Deal with arguments.
+  if( !defined( $args{'frame'} ) ) {
+    croak "Must pass frame name in order to do source extraction";
+  }
+  if( !defined( $args{'filter'} ) ) {
+    croak "Must pass filter in order to do source extraction";
+  }
+  if( !UNIVERSAL::isa( $args{'filter'}, "Astro::WaveBand" ) ) {
+    croak "Must pass filter as Astro::WaveBand object in order to do source extraction";
+  }
+  my $ndf = $args{'frame'};
+  my $filter = $args{'filter'};
+  my $quality = $args{'quality'};
+  if( ! defined( $quality ) ) {
+    $quality = -1;
+  }
+
+# Try to find the extractor binary. First, check to see if
+# the EXTRACTOR_DIR environment variable has been set.
+  my $extractor_bin;
+  if( defined( $ENV{'EXTRACTOR_DIR'} ) &&
+      -d $ENV{'EXTRACTOR_DIR'} &&
+      -e File::Spec->catfile( $ENV{'EXTRACTOR_DIR'}, "extractor" ) ) {
+    $extractor_bin = File::Spec->catfile( $ENV{'EXTRACTOR_DIR'}, "extractor" );
+  } else {
+
+    my $starbin = $StarConfig{'Star_Bin'};
+
+    if( -d File::Spec->catfile( $starbin, "extractor" ) &&
+        -e File::Spec->catfile( $starbin, "extractor", "extractor" ) ) {
+      $extractor_bin = File::Spec->catfile( $starbin, "extractor", "extractor" );
+    } else {
+      croak "Could not find EXTRACTOR binary";
+    }
+  }
+  print "EXTRACTOR binary is in $extractor_bin\n" if $DEBUG;
+
+# Set the defaults, just in case we haven't already.
+  $self->defaults;
+
+# Write the configuration file.
+  $self->_write_config_temp_file;
+
+# Write the parameter file.
+  $self->_write_param_temp_file;
+
+# If the user requested a checkerboard pattern, do it now.
+  if( defined( $self->checkerboard ) ) {
+
+    # Get a new temporary file name for the catalog.
+    $self->_catalog_file_name( 1 );
+    $self->catalog_name( $self->_catalog_file_name );
+    $self->_write_config_temp_file;
+
+    my $segments = $self->checkerboard->{SEGMENTS};
+    my $interval = $self->checkerboard->{INTERVAL};
+
+    # Calculate the height and width of the regions. We need to get
+    # the NDF dimensions for this.
+    my $STATUS = 0;
+    err_begin( $STATUS );
+    ndf_begin();
+    ndf_find( &NDF::DAT__ROOT(), $ndf, my $ndf_id, $STATUS );
+    ndf_bound( $ndf_id, 2, my @lbnd, my @ubnd, my $ndim, $STATUS );
+    ndf_annul( $ndf_id, $STATUS );
+    ndf_end( $STATUS );
+    if( $STATUS != &NDF::SAI__OK ) {
+      my ( $oplen, @errs );
+      do {
+        err_load( my $param, my $parlen, my $opstr, $oplen, $STATUS );
+        push @errs, $opstr;
+      } until ( $oplen == 1 );
+      err_annul( $STATUS );
+      err_end( $STATUS );
+      croak "Error determining NDF pixel bounds:\n" . join "\n", @errs;
+    }
+    err_end( $STATUS );
+    if( $ndim != 2 ) {
+      croak "Cannot run SExtractor on a non-2D image\n";
+    }
+
+    my $height = int( ( $ubnd[1] - $lbnd[1] ) / $segments );
+    my $width = int( ( $ubnd[0] - $lbnd[0] ) / $segments );
+
+    # Calculate the image regions.
+    my %regions;
+    for my $i ( 1 .. $segments ) {
+      for my $j ( 1 .. $segments ) {
+        $regions{ $segments * ( $j - 1 ) + $i } =
+          { x_start => ( $i - 1 ) * $width + 1,
+            y_start => ( $j - 1 ) * $height + 1,
+            x_end => $i * $width,
+            y_end => $j * $height,
+          };
+      }
+    }
+
+    # Now, start at 1 and increment by $increment until we hit
+    # ($segments**2).
+    for ( my $k = 1; $k < ( $segments**2 ); $k = $k + $interval ) {
+
+      my $ndfregion = '(';
+      $ndfregion .= $regions{$k}->{x_start};
+      $ndfregion .= ":";
+      $ndfregion .= $regions{$k}->{x_end};
+      $ndfregion .= ",";
+      $ndfregion .= $regions{$k}->{y_start};
+      $ndfregion .= ":";
+      $ndfregion .= $regions{$k}->{y_end};
+      $ndfregion .= ")";
+
+      # Do the extraction.
+      my $ams = new Starlink::AMS::Init(1);
+      my $set_messages = $ams->messages;
+      if( ! defined( $set_messages ) ) {
+        $ams->messages( $self->messages );
+      }
+      $ams->timeout( $self->timeout );
+      if( ! defined $TASK ) {
+        $TASK = new Starlink::AMS::Task("extractor", $extractor_bin );
+      }
+      my $STATUS = $TASK->contactw;
+      if( ! $STATUS ) {
+        croak "Could not contact EXTRACTOR monolith";
+      }
+      $STATUS = $TASK->obeyw("extract", "image=$ndf$ndfregion config=" . $self->_config_file_name );
+      if( $STATUS != SAI__OK && $STATUS != &Starlink::ADAM::DTASK__ACTCOMPLETE ) {
+        ( my $facility, my $ident, my $text ) = get_facility_error( $STATUS );
+        croak "Error in running EXTRACTOR: $STATUS - $text";
+      }
+
+      # Form a catalogue from Astro::Catalog.
+      my $newcatalog = new Astro::Catalog( Format => 'SExtractor',
+                                           File => $self->_catalog_file_name,
+                                           ReadOpt => { Filter => $filter },
+                                         );
+
+      # Merge it in with the main catalog;
+      my @newstars = $newcatalog->allstars;
+      $catalog->pushstar( @newstars );
+    }
+
+  } elsif( defined( $self->crowded ) && $self->crowded ) {
+
+    # We're operating on a crowded field, so just take a central
+    # region with sides equal to 25% of the width and height of the
+    # array.
+
+    # To do this we first need the NDF dimensions.
+    my $STATUS = 0;
+    err_begin( $STATUS );
+    ndf_begin();
+    ndf_find( &NDF::DAT__ROOT(), $ndf, my $ndf_id, $STATUS );
+    ndf_bound( $ndf_id, 2, my @lbnd, my @ubnd, my $ndim, $STATUS );
+    ndf_annul( $ndf_id, $STATUS );
+    ndf_end( $STATUS );
+    if( $STATUS != &NDF::SAI__OK ) {
+      my ( $oplen, @errs );
+      do {
+        err_load( my $param, my $parlen, my $opstr, $oplen, $STATUS );
+        push @errs, $opstr;
+      } until ( $oplen == 1 );
+      err_annul( $STATUS );
+      err_end( $STATUS );
+      croak "Error determining NDF pixel bounds:\n" . join "\n", @errs;
+    }
+    err_end( $STATUS );
+    if( $ndim != 2 ) {
+      croak "Cannot run SExtractor on a non-2D image\n";
+    }
+
+    my $height = $ubnd[1] - $lbnd[1];
+    my $width = $ubnd[0] - $lbnd[0];
+
+    my $x_origin = $lbnd[0];
+    my $y_origin = $lbnd[1];
+
+    my @regions;
+
+    # Central patch.
+    my %region = ( x_start => int( $lbnd[0] + 0.375 * $width ),
+                   x_end   => int( $lbnd[0] + 0.625 * $width ),
+                   y_start => int( $lbnd[1] + 0.375 * $height ),
+                   y_end   => int( $lbnd[1] + 0.625 * $height ),
+                 );
+
+    push @regions, \%region;
+
+    # Top-left corner;
+    my %region_tl = ( x_start => int( $lbnd[0] ),
+                      x_end   => int( $lbnd[0] + 0.15 * $width ),
+                      y_start => int( $ubnd[1] - 0.15 * $height ),
+                      y_end   => int( $ubnd[1] ) );
+#    push @regions, \%region_tl;
+
+    # Get a new temporary file name for the catalogue.
+    $self->_catalog_file_name( 1 );
+    $self->catalog_name( $self->_catalog_file_name );
+    $self->_write_config_temp_file;
+
+    foreach my $region ( @regions ) {
+
+      # Set up the NDF region.
+      my $ndfregion = '(';
+      $ndfregion   .= $region->{x_start};
+      $ndfregion   .= ':';
+      $ndfregion   .= $region->{x_end};
+      $ndfregion   .= ',';
+      $ndfregion   .= $region->{y_start};
+      $ndfregion   .= ':';
+      $ndfregion   .= $region->{y_end};
+      $ndfregion   .= ')';
+
+      # Do the extraction.
+      my $ams = new Starlink::AMS::Init(1);
+      my $set_messages = $ams->messages;
+      if( ! defined( $set_messages ) ) {
+        $ams->messages( $self->messages );
+      }
+      $ams->timeout( $self->timeout );
+      if( ! defined $TASK ) {
+        $TASK = new Starlink::AMS::Task("extractor", $extractor_bin );
+      }
+      my $STATUS = $TASK->contactw;
+      if( ! $STATUS ) {
+        croak "Could not contact EXTRACTOR monolith";
+      }
+      $STATUS = $TASK->obeyw("extract", "image=$ndf$ndfregion config=" . $self->_config_file_name );
+      if( $STATUS != SAI__OK && $STATUS != &Starlink::ADAM::DTASK__ACTCOMPLETE ) {
+        ( my $facility, my $ident, my $text ) = get_facility_error( $STATUS );
+        croak "Error in running EXTRACTOR: $STATUS - $text";
+      }
+
+      # Form a catalogue from Astro::Catalog.
+      my $newcatalog = new Astro::Catalog( Format => 'SExtractor',
+                                           File => $self->_catalog_file_name,
+                                           ReadOpt => { Filter => $filter },
+                                         );
+
+      # We need to add x_start and y_start to the x and y positions of
+      # each detected object.
+      foreach my $star ( $newcatalog->stars ) {
+        $star->x( $star->x + $region->{x_start} - $x_origin );
+        $star->y( $star->y + $region->{y_start} - $y_origin );
+      }
+
+      # Merge it in with the main catalog;
+      my @newstars = $newcatalog->allstars;
+      $catalog->pushstar( @newstars );
+
+    }
+
+
+  } else {
+
+    # Just do the extraction.
+    my $ams = new Starlink::AMS::Init(1);
+    my $set_messages = $ams->messages;
+    if( ! defined( $set_messages ) ) {
+      $ams->messages( $self->messages );
+    }
+    $ams->timeout( $self->timeout );
+    if( ! defined $TASK ) {
+      $TASK = new Starlink::AMS::Task("extractor", $extractor_bin );
+    }
+    my $STATUS = $TASK->contactw;
+    if( ! $STATUS ) {
+      croak "Could not contact EXTRACTOR monolith";
+    }
+    $STATUS = $TASK->obeyw("extract", "image=$ndf config=" . $self->_config_file_name );
+    if( $STATUS != SAI__OK && $STATUS != &Starlink::ADAM::DTASK__ACTCOMPLETE ) {
+      ( my $facility, my $ident, my $text ) = get_facility_error( $STATUS );
+      croak "Error in running EXTRACTOR: $STATUS - $text";
+    }
+
+    # Form a catalogue from Astro::Catalog.
+    $catalog = new Astro::Catalog( Format => 'SExtractor',
+                                   File => $self->_catalog_file_name,
+                                   ReadOpt => { Filter => $filter,
+                                                Quality => $quality },
+                                 );
+  }
+
+# Delete the configuration file.
+  $self->_delete_config_temp_file if ! $DEBUG;
+
+# Delete the parameter file.
+  $self->_delete_param_temp_file if ! $DEBUG;
+
+# Delete the catalog file.
+  $self->_delete_catalog_temp_file if ! $DEBUG;
+
+# Return the catalogue.
+  return $catalog;
+}
+
+=item B<extract_nocat>
+
+As C<extract>, but do not return an C<Astro::Catalog> object. Also,
+the catalogue file will be retained, allowing for quick parsing and
+injestion.
+
+  $extract->extract_nocat( frame => $ndf, filter => $filter );
+
+The catalogue will be written to the file pointed to by the
+catalog_name method.
+
+=cut
+
+sub extract_nocat {
+  my $self = shift;
+
+  my %args = @_;
 
 # Deal with arguments.
   if( !defined( $args{'frame'} ) ) {
