@@ -1340,7 +1340,7 @@ C--------------------------------------------------------------------
 
 *  Local Parameters
       INTEGER MAXOBS            ! Maximum number of Observatories
-      PARAMETER (MAXOBS = 80)
+      PARAMETER (MAXOBS = 83)
       INTEGER LL
       INTEGER OL
       CHARACTER*80 OBSINFO(MAXOBS),LINE
@@ -1433,6 +1433,9 @@ C--------------------------------------------------------------------
       data obsinfo(78) / '78+ESO VLT, Paranal, Chile: UT3+8' /
       data obsinfo(79) / '79+ESO VLT, Paranal, Chile: UT4+8' /
       data obsinfo(80) / '80+Gemini South 8-m telescope+8' /
+      data obsinfo(81) / '81+KOSMA 3m telescope, Gornergrat+13' /
+      data obsinfo(82) / '82+Magellan 1, 6.5m, Las Campanas+8' /
+      data obsinfo(83) / '83+Magellan 2, 6.5m, Las Campanas+8' /
 
 C
 C---  CHECK ARRAY BOUNDS ARE WITHIN RANGE
