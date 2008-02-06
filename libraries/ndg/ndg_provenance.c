@@ -876,9 +876,11 @@ void ndgGtprv( int indf, int ianc, HDSLoc **prov, int *status ){
    hdsdim  dim[1];
    int *old_status;
    int *parents = NULL;
+   int icomp;
    int iparent;
    int k;
    int len;
+   int ncomp;
 
 /* Initialise. */
    *prov = NULL;
@@ -935,7 +937,17 @@ void ndgGtprv( int indf, int ianc, HDSLoc **prov, int *status ){
       }
 
 /* If defined, copy the MORE structure. */
-      if( anc->more ) datCopy( anc->more, *prov, MORE_NAME, status );
+      if( anc->more ) {
+
+/* Copy each component of the provenance MORE structure into the re MORE
+   component of the returned temporary structure. */
+         datNcomp( anc->more, &ncomp, status );
+         for( icomp = 1; icomp <= ncomp; icomp++ ) {
+            datIndex( anc->more, icomp, &loc, status );
+            datCopy( loc, *prov, MORE_NAME, status );
+            datAnnul( &loc, status );
+         }
+      }
 
 /* Create a component holding the indices of the parents (if any). */
       if( anc->nparent) {
