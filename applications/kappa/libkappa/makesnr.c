@@ -5,6 +5,7 @@
 #include "star/kaplibs.h" 
 #include "star/grp.h" 
 #include "par.h" 
+#include "par_par.h"
 #include "prm_par.h"
 #include <math.h> 
 #include <string.h> 
@@ -93,6 +94,9 @@ F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
 *  History:
 *     6-APR-2006 (DSB):
 *        Original version.
+*     7-FEB-2008 (DSB):
+*        Only calculate a default value for MINVAR if no value has been
+*        supplied on the command line.
 *     {enter_further_changes_here}
 
 *-
@@ -132,6 +136,7 @@ F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
    int minpop;               /* Smallest bin population found so far */
    int nbad;                 /* Number of rejected pixels */
    int size;                 /* Size of GRP group */
+   int state;                /* Parameter state */
 
 /* Abort if an error has already occurred. */
    if( *STATUS != SAI__OK ) return;
@@ -149,8 +154,12 @@ F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
 /* Map the input Variance component as an array of doubles. */
    ndfMap( indf, "Variance", "_DOUBLE", "READ", (void *) &ipvin, &el, STATUS );
 
+/* If a value for MINVAR was supplied on the command line, we do not need
+   to work out a default value. */
+   parState( "MINVAR", &state, STATUS );
+
 /* Find the maximum and minimum good, non-zero Variance value. */
-   if( *STATUS == SAI__OK ) {
+   if( *STATUS == SAI__OK && state != PAR__ACTIVE ) {
       minv = VAL__MAXD;
       maxv = VAL__MIND;
       vin = ipvin;
@@ -218,12 +227,13 @@ F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
             }
          }
 
-/* Get a value for the minimum allowed Variance value using the value
-   found above as the dynamic default. */
+/* Set the value found above as the dynamic default for MINVAR. */
          parDef0d( "MINVAR", minvar, STATUS );
-         parGet0d( "MINVAR", &minvar, STATUS );
       }
    }
+
+/* Get a new value for the minimum allowed Variance value. */
+   parGet0d( "MINVAR", &minvar, STATUS );
 
 /* Create the output by propagating everything except the Unit, Data and
    Variance arrays. */
