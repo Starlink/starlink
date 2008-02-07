@@ -87,6 +87,7 @@ static Provenance *ndg1FreeProvenance( Provenance *, int, int * );
 static Provenance *ndg1MakeProvenance( Prov *, int * );
 static Provenance *ndg1ReadProvenanceExtension( int, HDSLoc *, const char *, int, int * );
 static char *ndg1GetTextComp( HDSLoc *, const char *, char *, size_t, int * );
+static const char *ndg1Date( int * );
 static int ndg1FindAncestorIndex( Prov *, Provenance *, int * );
 static int ndg1TheSame( Prov *, Prov *, int * );
 static void ndg1Disown( Prov *, Prov *, int * );
@@ -876,9 +877,11 @@ void ndgGtprv( int indf, int ianc, HDSLoc **prov, int *status ){
    hdsdim  dim[1];
    int *old_status;
    int *parents = NULL;
+   int icomp;
    int iparent;
    int k;
    int len;
+   int ncomp;
 
 /* Initialise. */
    *prov = NULL;
@@ -935,7 +938,17 @@ void ndgGtprv( int indf, int ianc, HDSLoc **prov, int *status ){
       }
 
 /* If defined, copy the MORE structure. */
-      if( anc->more ) datCopy( anc->more, *prov, MORE_NAME, status );
+      if( anc->more ) {
+
+/* Copy each component of the provenance MORE structure into the re MORE
+   component of the returned temporary structure. */
+         datNcomp( anc->more, &ncomp, status );
+         for( icomp = 1; icomp <= ncomp; icomp++ ) {
+            datIndex( anc->more, icomp, &loc, status );
+            datCopy( loc, *prov, MORE_NAME, status );
+            datAnnul( &loc, status );
+         }
+      }
 
 /* Create a component holding the indices of the parents (if any). */
       if( anc->nparent) {
@@ -2134,7 +2147,7 @@ static void ndg1PurgeProvenance( Provenance *provenance,
 
 *  Description:
 *     This function removes any duplicated ancestors in the supplied
-*     Provenancen structure.
+*     Provenance structure.
 
 *  Parameters:
 *     provenance
@@ -2145,13 +2158,16 @@ static void ndg1PurgeProvenance( Provenance *provenance,
 */
 
 /* Local Variables; */
+   Prov *better;
    Prov *child;
+   Prov *poorer;
    Prov *prov1;
    Prov *prov2;
    int done;
    int i;
    int ichild;
    int j;
+   int keep;
 
 /* Check the inherited status value. */
    if( *status != SAI__OK ) return;
@@ -2165,16 +2181,27 @@ static void ndg1PurgeProvenance( Provenance *provenance,
    the same NDF. */
          for( j = i + 1; j < provenance->nprov; j++ ) {
             prov2 = provenance->provs[ j ];
-            if( prov2 && ndg1TheSame( prov1, prov2, status ) ) {
+            keep = ndg1TheSame( prov1, prov2, status );
+            if( prov2 && keep ) {
 
 /* If the two provenance structures refer to the same NDF, break the
-   parent-child link for the j'th Prov and register the i'th Prov with
-   the parent in place of the j'th Prov. */
-               for( ichild = 0; ichild < prov2->nchild; ichild++ ) {
-                  child = prov2->children[ ichild ];
-                  ndg1Disown( prov2, child, status );
-                  ndg1ParentChild( prov1, child, status );
+   parent-child link for the poorer Prov and register the better Prov with
+   the parent in place of the poorer Prov. The better Prov is the one
+   that contains most information. */
+               if( keep == 1 ) {
+                  better = prov1;
+                  poorer = prov2;
+               } else {
+                  better = prov2;
+                  poorer = prov1;
                }
+
+               for( ichild = 0; ichild < poorer->nchild; ichild++ ) {
+                  child = poorer->children[ ichild ];
+                  ndg1Disown( poorer, child, status );
+                  ndg1ParentChild( better, child, status );
+               }
+
             }
          }
       }
@@ -2455,13 +2482,17 @@ static int ndg1TheSame( Prov *prov1, Prov *prov2, int *status ) {
 *        Pointer to the inherited status variable.
 
 * Returned Value:
-*   One if the twio Prov structures describe the same NDF, and zero
-*   otherwise.
+*   Non-zero if the two Prov structures describe the same NDF, and zero
+*   otherwise. If the two Prov structures describe the same NDF, then the
+*   returned value will be +1 if "prov1" contains more information than
+*   "prov2" and will be +2 otherwise.
 
 */
 
 /* Local Variables: */
    int result;
+   int nitem1;
+   int nitem2;
 
 /* Initialise. */
    result = 0;
@@ -2471,21 +2502,12 @@ static int ndg1TheSame( Prov *prov1, Prov *prov2, int *status ) {
 
 /* If the pointer are the same, they describe the same ND. */
    if( prov1 == prov2 ) {
-      result = 1;
+      result = 2;
 
-/* Otherwise, we assume a match if the NDF path and the date of the
-   provenance information are the same. */
+/* Otherwise, we assume a match if the NDF path and (if known) the date 
+   of the provenance information are the same. */
    } else {
       result = 1;
-      if( prov1->date ) {
-         if( prov2->date ) {
-            if( strcmp( prov1->date, prov2->date ) ) result = 0;
-         } else {
-            result = 0;
-         }
-      } else if( prov2->date ) {
-         result = 0;
-      }
 
       if( prov1->path ) {
          if( prov2->path ) {
@@ -2497,6 +2519,30 @@ static int ndg1TheSame( Prov *prov1, Prov *prov2, int *status ) {
          result = 0;
       }
 
+      if( prov1->date && prov2->date ) {
+         if( strcmp( prov1->date, prov2->date ) ) result = 0;
+      }
+
+/* If they refer to the same NDF, count the number of items of information 
+   stored for "prov1" and "prov2". */
+      if( result ) {
+         nitem1 = 0;
+         if( prov1->date ) nitem1++;
+         if( prov1->creator ) nitem1++;
+         if( prov1->more ) nitem1++;
+         if( prov1->nparent ) nitem1++;
+
+         nitem2 = 0;
+         if( prov2->date ) nitem2++;
+         if( prov2->creator ) nitem2++;
+         if( prov2->more ) nitem2++;
+         if( prov2->nparent ) nitem2++;
+
+/* Return a non-zero result indicating which of the two Prov structures 
+   contains the most information. */
+         result = ( nitem1 > nitem2 ) ? 1 : 2;
+
+      }
    }
 
 /* Return the result. */
@@ -2540,7 +2586,7 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance, int indf,
    HDSLoc *mloc = NULL;
    HDSLoc *xloc = NULL;
    Prov *prov = NULL;
-   char *date = NULL;
+   const char *date = NULL;
    char *path = NULL;
    hdsdim  dim[1];
    int *parents = NULL;
@@ -2604,7 +2650,7 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance, int indf,
          } else {
             path = NULL;
             time( &t );
-            date = asctime( gmtime( &t ) );
+            date = ndg1Date( status );
             more = NULL;
          }
 
@@ -2624,7 +2670,6 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance, int indf,
          if( date ) {
             len = astChrLen( date );
             if( len ) {
-               date[ len ] = 0;
                datNew0C( cloc, DATE_NAME, len, status );
                datFind( cloc, DATE_NAME, &loc, status );
                datPut0C( loc, date, status );
@@ -2684,6 +2729,48 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance, int indf,
    }
 
 }
+
+static const char *ndg1Date( int *status ){
+/*
+*  Name:
+*     ndg1Date
+
+*  Purpose:
+*     Return the current UTC date and time in ISO Gregorian calendar
+*     format.
+
+*  Synopsis:
+*     const char *ndg1Date( int *status )
+
+*  Description:
+*     This function returns a pointer to a static string holding the
+*     current UTC date and time in ISO Gregorian calendar format.
+
+*  Parameters:
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   AstTimeFrame *tf;
+   const char *result;
+
+/* Initialise */
+   result = "";
+
+/* Check the inherited status value. */
+   if( *status != SAI__OK ) return result;
+
+/* Create a TimeFrame representing UTC, then use the TimeFrame to
+   determine and format the current time. */
+   tf = astTimeFrame("TimeScale=UTC,Format(1)=iso.0");
+   result = astFormat( tf, 1, astCurrentTime( tf ) );
+   tf = astAnnul( tf );
+
+   return result;
+}
+
 
 
 
