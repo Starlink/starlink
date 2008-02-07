@@ -50,6 +50,8 @@
 *     2006 May 8 (MJC):
 *        Allow for the different component paths of on-the-fly 
 *        conversions.
+*     2008 February 7 (MJC):
+*        Only search for the first MORE component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -89,6 +91,7 @@
       INTEGER END( MAXWRD )      ! End columns of words (not used)
       CHARACTER * ( ( MAXWRD+1 ) * DAT__SZNAM ) EXPATH ! Extension path
       CHARACTER * ( DAT__SZTYP ) EXTYPE ! Extension data type
+      LOGICAL GOMORE             ! Look for the top MORE component?
       INTEGER INDICE( MAXWRD - 2 ) ! Indices of the structure's cell
       INTEGER LEVEL              ! Extension level
       CHARACTER * ( DAT__SZLOC ) LOC ! Locator to full structure
@@ -164,10 +167,17 @@
 *  Break the path into words.  Extension must be at least the second
 *  item because the first is the top-level NDF name.  The extensions 
 *  normally begin at level 3 in an NDF, but allow for on-the-fly
-*  conversion where the path is longer.
+*  conversion where the path is longer.  Find only the first MORE
+*  component in case there extensions within the extensions.  Since
+*  the number of levels isn't huge go for the regular DO loop ratgher
+*  than a DO WHILE once the MORE is found.
       CALL CHR_DCWRD( EXPATH, MAXWRD, NWORD, START, END, WORDS, STATUS )
+      GOMORE = .TRUE.
       DO LEVEL = 2, NWORD
-        IF ( WORDS( LEVEL ) .EQ. 'MORE' ) ELEVEL = LEVEL + 1
+         IF ( WORDS( LEVEL ) .EQ. 'MORE' .AND. GOMORE ) THEN 
+            ELEVEL = LEVEL + 1
+            GOMORE =.FALSE.
+         END IF
       END DO
 
 *  Extract the extension's name, number of dimensions and their values,
