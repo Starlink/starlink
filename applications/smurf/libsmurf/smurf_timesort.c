@@ -43,9 +43,11 @@
 *  History:
 *     7-NOV-2007 (DSB):
 *        Original version.
+*     7-FEB-2008 (DSB):
+*        Store provenance info in the output NDFs.
 
 *  Copyright:
-*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -192,10 +194,11 @@ void smurf_timesort( int *status ) {
    next input NDF. Otherwise propagate everything except the data arrays
    and then go on to copy the re-ordered arrays into the output. */
       if( sorted ) {
-         ndgNdfpr( indf1, "Data,Variance,Quality,Units,Axis,WCS", igrp2, 
-                   ifile, &indf2, status );
+         ndgNdfpr( indf1, "Data,Variance,Quality,Units,Axis,WCS,"
+                   "NoExtension(Provenance)", igrp2, ifile, &indf2, status );
       } else {
-         ndgNdfpr( indf1, "Units,Axis,WCS", igrp2, ifile, &indf2, status );
+         ndgNdfpr( indf1, "Units,Axis,WCS,NoExtension(Provenance)", igrp2, 
+                   ifile, &indf2, status );
 
 /* Get the pixel dimensions of the input NDF. Report an error if not
    three dimensional. */
@@ -404,6 +407,9 @@ void smurf_timesort( int *status ) {
 /* Free remaining resources. */
       index = astFree( index );
       datAnnul( &loc1, status );
+
+/* Record indf1 as a direct parent of indf2. */
+      ndgPtprv( indf2, indf1, NULL, 0, "SMURF:TIMESORT", status );
 
 /* End the AST and NDF contexts for this pair of input and output NDFs. */
       ndfEnd( status );
