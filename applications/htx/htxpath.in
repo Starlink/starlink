@@ -34,6 +34,11 @@
 #     time of installation. If it has not been installed (e.g. during software
 #     development), then these variables will be translated at the time the
 #     script is invoked.
+#
+#     The above is still true, but if the environment variable STARLINK_DIR is
+#     defined it will be used as the value of STARLINK, rather than the baked
+#     in version. This allows the whole tree of documents to be relocated
+#     following the standard fashion for the applications.
 
 #  Notes:
 #     The value of the environment variable HTX_PATH (if defined and not null)
@@ -42,6 +47,7 @@
 #  Copyright:
 #     Copyright (C) 1995 The Central Laboratory of the Research Councils
 #     Copyright (C) 2006 Particle Physics and Astronomy Research Council
+#     Copyright (C) 2008 Science and Technology Facilities Council
 
 #  Authors:
 #     RFWS: R.F. Warren-Smith (Starlink, RAL)
@@ -57,6 +63,8 @@
 #        Allow the script to be edited during installation.
 #     17-AUG-2006 (PWD):
 #        Add starjava/docs directory.
+#     6-FEB-2008 (PWD):
+#        Add STARLINK_DIR as the default STARLINK value when set.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -75,6 +83,11 @@
       fi
       if test "${starlink}" = '|STAR''LINK|'; then
          starlink="${STARLINK:-/star}"
+      fi
+
+#  Test if STARLINK_DIR is defined. That overrides any STARLINK value.
+      if test "$STARLINK_DIR" != ""; then
+         starlink="${STARLINK_DIR}"
       fi
 
 #  If "install" and "starlink" have the same values, then output a simplified
