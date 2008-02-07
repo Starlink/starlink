@@ -66,6 +66,7 @@ edit = sed \
     -e 's,@staretcdir\@,$(staretcdir),g' \
     -e 's,@bindir\@,$(bindir),g' \
     -e 's,@libdir\@,$(libdir),g' \
+    -e 's,@includedir\@,$(includedir),g' \
     -e 's,@CC\@,$(CC),g' \
     -e 's,@CFLAGS\@,$(CFLAGS),g' \
     -e 's,@FC\@,$(FC),g' \

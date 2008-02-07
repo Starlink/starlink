@@ -225,6 +225,31 @@ dnl shift is an m4 macro
     [[shift]]
 done
 
+if test ! -z $STARLINK_DIR;
+then
+  relocate=1
+  star_libdir=${STARLINK_DIR}/lib
+  star_bindir=${STARLINK_DIR}/bin
+  star_incdir=${STARLINK_DIR}/include
+  star_etcdir=${STARLINK_DIR}/etc
+else
+  relocate=0
+  star_libdir=@libdir@
+  star_bindir=@bindir@
+  star_incdir=@includedir@
+  star_etcdir=@staretcdir@
+fi
+
+star_cppflags="@STAR_CPPFLAGS@"
+star_fcflags="@STAR_FCFLAGS@"
+star_ldflags="@STAR_LDFLAGS@"
+
+if [ $relocate -ne 0 ]
+then
+  star_cppflags=`echo $star_cppflags | sed -e "s,@includedir@,$star_incdir,"`
+  star_fcflags=`echo $star_fcflags | sed -e "s,@includedir@,$star_incdir,"`
+  star_ldflags=`echo $star_ldflags | sed -e "s,@libdir@,$star_libdir,"`
+fi
 
 # Get name of program by enquiry if necessary.
 # Shift any initial option arguments into INITOPTS.
@@ -378,8 +403,8 @@ done
 if $found_c_files
 then
     $verbose && echo "Compiling C files"
-    $verbose && echo @CC@ -c @STAR_CPPFLAGS@ @CFLAGS@ $CARGS
-    @CC@ -c @STAR_CPPFLAGS@ @CFLAGS@ $CARGS
+    $verbose && echo @CC@ -c $star_cppflags @CFLAGS@ $CARGS
+    @CC@ -c $star_cppflags @CFLAGS@ $CARGS
 fi
 
 cat >dtask_applic.f <<EOD
@@ -480,7 +505,7 @@ ifelse(__SCRIPTNAME, alink,
       END
 EOD
 
-LIBTOOL=${DTASK_LIBTOOL-@bindir@/dtask_libtool}
+LIBTOOL=${DTASK_LIBTOOL-$star_bindir/dtask_libtool}
 echo LIBTOOL=$LIBTOOL
 
 extra_mode_args=
@@ -494,7 +519,7 @@ if $includedebug
 then
     $verbose && echo "Including debugging support in dtask_main.f"
     linkextraflags="$linkextraflags -g"
-    sed -e s#PROGNAME#$PROGNAME# @staretcdir@/dtask_main.txt \
+    sed -e s#PROGNAME#$PROGNAME# $staretcdir/dtask_main.txt \
            >dtask_main.f
 fi
 
@@ -504,17 +529,17 @@ fi
 ## in ways which are not appropriate for these compile/link commands,
 ## since they are working in a different directory, building some completely
 ## different application or library.
-cmpdtask="$LIBTOOL --mode=compile @FC@ @FCFLAGS@ $extra_mode_args @STAR_FCFLAGS@ \
+cmpdtask="$LIBTOOL --mode=compile @FC@ @FCFLAGS@ $extra_mode_args $star_fcflags \
         -c dtask_applic.f"
 $verbose && echo $cmpdtask
 eval $cmpdtask
 
-linkcmd="$LIBTOOL --mode=link @FC@ @FCFLAGS@ @STAR_FCFLAGS@ $extra_mode_args @STAR_LDFLAGS@ \
+linkcmd="$LIBTOOL --mode=link @FC@ @FCFLAGS@ $star_fcflags $extra_mode_args $star_ldflags \
         -o $EXENAME \
         $linkextraflags \
-        @libdir@/dtask_main.o \
+        ${star_libdir}/dtask_main.o \
         dtask_applic.lo \
-	@libdir@/starMemInit.o \
+        ${star_libdir}/starMemInit.o \
         $ARGS \
         -lhdspar_adam \
         -lpar_adam \
@@ -530,9 +555,9 @@ xlinkcmd=
 for x in $linkcmd
 do
     l=`expr x$x : 'x-l\(.*\)'`
-    if [ -n "$l" -a -r @libdir@/lib$l.la ]
+    if [ -n "$l" -a -r $star_libdir/lib$l.la ]
     then
-        xlinkcmd="$xlinkcmd @libdir@/lib$l.la"
+        xlinkcmd="$xlinkcmd $star_libdir/lib$l.la"
     else
         xlinkcmd="$xlinkcmd $x"
     fi
