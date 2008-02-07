@@ -54,6 +54,9 @@
 *       "hdstrace fred.more.provenance.ancestors'(12)'", where "fred" is
 *       the name of the NDF supplied for parameter "NDF".  If the NDF 
 *       has no extra information, this item will not be present.
+*
+*    In addition, a text file can be created containing the paths for the
+*    direct parents of the supplied NDF. See parameter PARENTS.
 
 *  Usage:
 *     provshow ndf 
