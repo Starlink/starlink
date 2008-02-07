@@ -882,8 +882,8 @@ itcl::class gaia::GaiaAutoAstrom {
       set ok 1
       set nlines 0
       while { [::gets $fid line] > -1 && $ok } {
-         if { [string match "ASTROM:*" $line] } {
-            if { [string match "ASTROM: best fit*" $line] } {
+         if { [string match "Astrom:*" $line] } {
+            if { [string match "Astrom: best fit*" $line] } {
                set ok 0
             }
             continue
