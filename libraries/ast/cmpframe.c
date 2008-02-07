@@ -155,6 +155,12 @@ f     The CmpFrame class does not define any new routines beyond those
 *     15-MAR-2007 (DSB):
 *        Override astClearAlignSystem by an implementation that clears 
 *        AlignSystem in the component Frames.
+*     7-FEB-2008 (DSB):
+*        Allow the MaxAxes and MinAxes attributes to be specified for a
+*        CmpFrame (rather than just being the sum of the attribute values
+*        in the component frames). This enables, for instance, a (detector 
+*        index,mjd) frame to match with a ((velocity,detector index),mjd) 
+*        frame.
 *class--
 */
 
@@ -530,6 +536,7 @@ static int Test##attribute( AstFrame *this_frame, int axis ) { \
 
 /* C header files. */
 /* --------------- */
+#include <limits.h>
 #include <float.h>
 #include <math.h>
 #include <stdarg.h>
@@ -546,6 +553,8 @@ static AstCmpFrameVtab class_vtab; /* Virtual function table */
 static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
+static int (* parent_getmaxaxes)( AstFrame * );
+static int (* parent_getminaxes)( AstFrame * );
 static int (* parent_getobjsize)( AstObject * );
 static AstSystemType (* parent_getalignsystem)( AstFrame * );
 static AstSystemType (* parent_getsystem)( AstFrame * );
@@ -628,8 +637,6 @@ static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstM
 static int TestDirection( AstFrame *, int );
 static int TestFormat( AstFrame *, int );
 static int TestLabel( AstFrame *, int );
-static int TestMaxAxes( AstFrame * );
-static int TestMinAxes( AstFrame * );
 static int TestSymbol( AstFrame *, int );
 static int TestUnit( AstFrame *, int );
 static int Unformat( AstFrame *, int, const char *, double * );
@@ -637,8 +644,6 @@ static void AddExtraAxes( int, int [], int, int, int );
 static void ClearDirection( AstFrame *, int );
 static void ClearFormat( AstFrame *, int );
 static void ClearLabel( AstFrame *, int );
-static void ClearMaxAxes( AstFrame * );
-static void ClearMinAxes( AstFrame * );
 static void ClearSymbol( AstFrame *, int );
 static void ClearUnit( AstFrame *, int );
 static void Copy( const AstObject *, AstObject * );
@@ -660,8 +665,6 @@ static void SetFrameFlags( AstFrame *, int );
 static void SetDirection( AstFrame *, int, int );
 static void SetFormat( AstFrame *, int, const char * );
 static void SetLabel( AstFrame *, int, const char * );
-static void SetMaxAxes( AstFrame *, int );
-static void SetMinAxes( AstFrame *, int );
 static void SetSymbol( AstFrame *, int, const char * );
 static void SetUnit( AstFrame *, int, const char * );
 static void Overlay( AstFrame *, const int *, AstFrame * );
@@ -1516,76 +1519,6 @@ static void ClearObsLon( AstFrame *this_frame ) {
 /* Now clear the ObsLon attribute in the two component Frames. */
    astClearObsLon( this->frame1 );
    astClearObsLon( this->frame2 );
-}
-
-static void ClearMaxAxes( AstFrame *this_frame ) {
-/*
-*  Name:
-*     ClearMaxAxes
-
-*  Purpose:
-*     Clear the value of the MaxAxes attribute for a CmpFrame.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "cmpframe.h"
-*     void ClearMaxAxes( AstFrame *this )
-
-*  Class Membership:
-*     CmpFrame member function (over-rides the astClearMaxAxes method
-*     inherited from the Frame class).
-
-*  Description:
-*     This function does nothing because the MaxAxes attribute for a
-*     CmpFrame is determined by the Frames it contains and cannot be
-*     altered independently.
-
-*  Parameters:
-*     this
-*        Pointer to the CmpFrame.
-
-*  Returned Value:
-*     void.
-*/
-
-/* Do nothing. */
-}
-
-static void ClearMinAxes( AstFrame *this_frame ) {
-/*
-*  Name:
-*     ClearMinAxes
-
-*  Purpose:
-*     Clear the value of the MinAxes attribute for a CmpFrame.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "cmpframe.h"
-*     void ClearMinAxes( AstFrame *this )
-
-*  Class Membership:
-*     CmpFrame member function (over-rides the astClearMinAxes method
-*     inherited from the Frame class).
-
-*  Description:
-*     This function does nothing because the MinAxes attribute for a
-*     CmpFrame is determined by the Frames it contains and cannot be
-*     altered independently.
-
-*  Parameters:
-*     this
-*        Pointer to the CmpFrame.
-
-*  Returned Value:
-*     void.
-*/
-
-/* Do nothing. */
 }
 
 static void Decompose( AstMapping *this_cmpframe, AstMapping **map1, 
@@ -2701,8 +2634,8 @@ static int GetMaxAxes( AstFrame *this_frame ) {
 
 *  Description:
 *     This function returns a value for the MaxAxes attribute of a
-*     CmpFrame.  This will be the sum of the MaxAxes attributes for
-*     each of its component Frames.
+*     CmpFrame.  A large default value is supplied that is much larger 
+*     than the maximum likely number of axes in a Frame.
 
 *  Parameters:
 *     this
@@ -2719,8 +2652,6 @@ static int GetMaxAxes( AstFrame *this_frame ) {
 
 /* Local Variables: */
    AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
-   int max_axes1;                /* MaxAxes attribute for frame1 */
-   int max_axes2;                /* MaxAxes attribute for frame2 */
    int result;                   /* Result value to return */
 
 /* Initialise. */
@@ -2732,12 +2663,13 @@ static int GetMaxAxes( AstFrame *this_frame ) {
 /* Obtain a pointer to the CmpFrame structure. */
    this = (AstCmpFrame *) this_frame;
 
-/* Obtain the MaxAxes attribute value for each component Frame. */
-   max_axes1 = astGetMaxAxes( this->frame1 );
-   max_axes2 = astGetMaxAxes( this->frame2 );
-
-/* If OK, sum these values. */
-   if ( astOK ) result = max_axes1 + max_axes2;
+/* If a value has been set explicitly for the CmpFrame, return it.
+   Otherwise returned a large default value. */
+   if( astTestMaxAxes( this ) ) {
+      result = (*parent_getmaxaxes)( this_frame );
+   } else {
+      result = 1000000;
+   }
 
 /* Return the result. */
    return result;
@@ -2764,8 +2696,7 @@ static int GetMinAxes( AstFrame *this_frame ) {
 
 *  Description:
 *     This function returns a value for the MinAxes attribute of a
-*     CmpFrame.  This will be the sum of the MinAxes attributes for
-*     each of its component Frames.
+*     CmpFrame.  A default value of zero is used.
 
 *  Parameters:
 *     this
@@ -2782,8 +2713,6 @@ static int GetMinAxes( AstFrame *this_frame ) {
 
 /* Local Variables: */
    AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
-   int min_axes1;                /* MinAxes attribute for frame1 */
-   int min_axes2;                /* MinAxes attribute for frame2 */
    int result;                   /* Result value to return */
 
 /* Initialise. */
@@ -2795,12 +2724,13 @@ static int GetMinAxes( AstFrame *this_frame ) {
 /* Obtain a pointer to the CmpFrame structure. */
    this = (AstCmpFrame *) this_frame;
 
-/* Obtain the MinAxes attribute value for each component Frame. */
-   min_axes1 = astGetMinAxes( this->frame1 );
-   min_axes2 = astGetMinAxes( this->frame2 );
-
-/* If OK, sum these values. */
-   if ( astOK ) result = min_axes1 + min_axes2;
+/* If a value has been set explicitly for the CmpFrame, return it.
+   Otherwise returned a default value of zero. */
+   if( astTestMinAxes( this ) ) {
+      result = (*parent_getminaxes)( this_frame );
+   } else {
+      result = 0;
+   }
 
 /* Return the result. */
    return result;
@@ -3674,14 +3604,18 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name ) {
    parent_setframeflags = frame->SetFrameFlags;
    frame->SetFrameFlags = SetFrameFlags;
 
+   parent_getmaxaxes = frame->GetMaxAxes;
+   frame->GetMaxAxes = GetMaxAxes;
+
+   parent_getminaxes = frame->GetMinAxes;
+   frame->GetMinAxes = GetMinAxes;
+
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
    frame->Abbrev = Abbrev;
    frame->ClearDirection = ClearDirection;
    frame->ClearFormat = ClearFormat;
    frame->ClearLabel = ClearLabel;
-   frame->ClearMaxAxes = ClearMaxAxes;
-   frame->ClearMinAxes = ClearMinAxes;
    frame->ClearSymbol = ClearSymbol;
    frame->ClearUnit = ClearUnit;
    mapping->Decompose = Decompose;
@@ -3693,8 +3627,6 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name ) {
    frame->GetDirection = GetDirection;
    frame->GetFormat = GetFormat;
    frame->GetLabel = GetLabel;
-   frame->GetMaxAxes = GetMaxAxes;
-   frame->GetMinAxes = GetMinAxes;
    frame->GetNaxes = GetNaxes;
    frame->GetPerm = GetPerm;
    frame->GetSymbol = GetSymbol;
@@ -3712,16 +3644,12 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name ) {
    frame->SetDirection = SetDirection;
    frame->SetFormat = SetFormat;
    frame->SetLabel = SetLabel;
-   frame->SetMaxAxes = SetMaxAxes;
-   frame->SetMinAxes = SetMinAxes;
    frame->SetSymbol = SetSymbol;
    frame->SetUnit = SetUnit;
    frame->SubFrame = SubFrame;
    frame->TestDirection = TestDirection;
    frame->TestFormat = TestFormat;
    frame->TestLabel = TestLabel;
-   frame->TestMaxAxes = TestMaxAxes;
-   frame->TestMinAxes = TestMinAxes;
    frame->TestSymbol = TestSymbol;
    frame->TestUnit = TestUnit;
    frame->Unformat = Unformat;
@@ -3950,8 +3878,8 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 /* Obtain the minimum and maximum number of axes that each component
    Frame of the template CmpFrame can match. */
    minax1 = astGetMinAxes( template->frame1 );
-   minax2 = astGetMinAxes( template->frame2 );
    maxax1 = astGetMaxAxes( template->frame1 );
+   minax2 = astGetMinAxes( template->frame2 );
    maxax2 = astGetMaxAxes( template->frame2 );
 
 /* Obtain the number of axes in the target Frame and test to see if it
@@ -7239,80 +7167,6 @@ static void SetObsLon( AstFrame *this_frame, double val ) {
    astSetObsLon( this->frame2, val );
 }
 
-static void SetMaxAxes( AstFrame *this_frame, int maxaxes ) {
-/*
-*  Name:
-*     SetMaxAxes
-
-*  Purpose:
-*     Set a value for the MaxAxes attribute of a CmpFrame.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "cmpframe.h"
-*     void SetMaxAxes( AstFrame *this, int maxaxes )
-
-*  Class Membership:
-*     CmpFrame member function (over-rides the astSetMaxAxes method
-*     inherited from the Frame class).
-
-*  Description:
-*     This function does nothing because the MaxAxes attribute for a
-*     CmpFrame is determined by the Frames it contains and cannot be
-*     altered independently.
-
-*  Parameters:
-*     this
-*        Pointer to the CmpFrame.
-*     maxaxes
-*        The new value to be set (ignored).
-
-*  Returned Value:
-*     void.
-*/
-
-/* Do nothing. */
-}
-
-static void SetMinAxes( AstFrame *this_frame, int minaxes ) {
-/*
-*  Name:
-*     SetMinAxes
-
-*  Purpose:
-*     Set a value for the MinAxes attribute of a CmpFrame.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "cmpframe.h"
-*     void SetMinAxes( AstFrame *this, int minaxes )
-
-*  Class Membership:
-*     CmpFrame member function (over-rides the astSetMinAxes method
-*     inherited from the Frame class).
-
-*  Description:
-*     This function does nothing because the MinAxes attribute for a
-*     CmpFrame is determined by the Frames it contains and cannot be
-*     altered independently.
-
-*  Parameters:
-*     this
-*        Pointer to the CmpFrame.
-*     minaxes
-*        The new value to be set (ignored).
-
-*  Returned Value:
-*     void.
-*/
-
-/* Do nothing. */
-}
-
 static AstMapping *Simplify( AstMapping *this_mapping ) {
 /*
 *  Name:
@@ -8229,118 +8083,6 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* Return the result. */
    return result;
 
-}
-
-static int TestMaxAxes( AstFrame *this_frame ) {
-/*
-*  Name:
-*     TestMaxAxes
-
-*  Purpose:
-*     Test if a value has been set for the MaxAxes attribute of a CmpFrame.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "cmpframe.h"
-*     int TestMaxAxes( AstFrame *this )
-
-*  Class Membership:
-*     CmpFrame member function (over-rides the astTestMaxAxes method
-*     inherited from the Frame class).
-
-*  Description:
-*     This function returns a boolean value indicating if a value has
-*     been set for the MaxAxes attribute of a CmpFrame. This will be 1
-*     if a value has been set for the MaxAxes attribute of either of
-*     its component Frames, otherwise it will be zero.
-
-*  Parameters:
-*     this
-*        Pointer to the CmpFrame.
-
-*  Returned Value:
-*     1 if a MaxAxes value has been set for either component Frame,
-*     otherwise zero.
-
-*  Notes:
-*     - A value of zero will be returned if this function is invoked
-*     with the global error status set or if it should fail for any
-*     reason.
-*/
-
-/* Local Variables: */
-   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
-   int result;                   /* Result value to return */
-
-/* Check the global error status. */
-   if ( !astOK ) return 0;
-
-/* Obtain a pointer to the CmpFrame structure. */
-   this = (AstCmpFrame *) this_frame;
-
-/* See if a MaxAxes attribute value is set for either component Frame. */
-   result = astTestMaxAxes( this->frame1 ) || astTestMaxAxes( this->frame2 );
-
-/* Return the result. */
-   return result;
-}
-
-static int TestMinAxes( AstFrame *this_frame ) {
-/*
-*  Name:
-*     TestMinAxes
-
-*  Purpose:
-*     Test if a value has been set for the MinAxes attribute of a CmpFrame.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "cmpframe.h"
-*     int TestMinAxes( AstFrame *this )
-
-*  Class Membership:
-*     CmpFrame member function (over-rides the astTestMinAxes method
-*     inherited from the Frame class).
-
-*  Description:
-*     This function returns a boolean value indicating if a value has
-*     been set for the MinAxes attribute of a CmpFrame. This will be 1
-*     if a value has been set for the MinAxes attribute of either of
-*     its component Frames, otherwise it will be zero.
-
-*  Parameters:
-*     this
-*        Pointer to the CmpFrame.
-
-*  Returned Value:
-*     1 if a MinAxes value has been set for either component Frame,
-*     otherwise zero.
-
-*  Notes:
-*     - A value of zero will be returned if this function is invoked
-*     with the global error status set or if it should fail for any
-*     reason.
-*/
-
-/* Local Variables: */
-   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
-   int result;                   /* Result value to return */
-
-/* Check the global error status. */
-   if ( !astOK ) return 0;
-
-/* Obtain a pointer to the CmpFrame structure. */
-   this = (AstCmpFrame *) this_frame;
-
-/* See if a MinAxes attribute value is set for either component Frame. */
-   result = astTestMinAxes( this->frame1 ) || astTestMinAxes( this->frame2 );
-
-/* Return the result. */
-   return result;
 }
 
 static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,

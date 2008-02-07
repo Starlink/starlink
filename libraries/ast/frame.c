@@ -11004,10 +11004,15 @@ f     AST_FINDFRAME) as a template to match another (target) Frame. It
 *        The default MaxAxes value for a Frame is equal to the number
 *        of Frame axes (Naxes attribute).
 *     CmpFrame
-*        The MaxAxes attribute of a CmpFrame is equal to the sum of
-*        the MaxAxes values of its two component Frames. Any attempt
-*        to alter this value (other than through the component Frames)
-*        is simply ignored.
+*        The MaxAxes attribute of a CmpFrame defaults to a large number
+*        (1000000) which is much larger than any likely number of axes in
+*        a Frame. Combined with the MinAxes default of zero (for a
+*        CmpFrame), this means that the default behaviour for a CmpFrame 
+*        is to match any target Frame that consists of a subset of the 
+*        axes in the template CmpFrame. To change this so that a CmpFrame
+*        will only match Frames that have the same number of axes, you
+*        should set the CmpFrame MaxAxes and MinAxes attributes to the 
+*        number of axes in the CmpFrame.
 *     FrameSet
 *        The MaxAxes attribute of a FrameSet is the same as that of
 *        its current Frame (as specified by the Current attribute).
@@ -11067,10 +11072,13 @@ f     AST_FINDFRAME) as a template to match another (target) Frame. It
 *        The default MinAxes value for a Frame is equal to the number
 *        of Frame axes (Naxes attribute).
 *     CmpFrame
-*        The MinAxes attribute of a CmpFrame is equal to the sum of
-*        the MinAxes values of its two component Frames. Any attempt
-*        to alter this value (other than through the component Frames)
-*        is simply ignored.
+*        The MinAxes attribute of a CmpFrame defaults to zero. Combined 
+*        with the MaxAxes default of 1000000 (for a CmpFrame), this means 
+*        that the default behaviour for a CmpFrame is to match any target 
+*        Frame that consists of a subset of the axes in the template 
+*        CmpFrame. To change this so that a CmpFrame will only match Frames 
+*        that have the same number of axes, you should set the CmpFrame 
+*        MinAxes and MaxAxes attributes to the number of axes in the CmpFrame.
 *     FrameSet
 *        The MinAxes attribute of a FrameSet is the same as that of
 *        its current Frame (as specified by the Current attribute).
