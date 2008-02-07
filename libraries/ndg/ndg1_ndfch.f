@@ -81,6 +81,8 @@
 *        Modified to use NDF automatic data conversion facilities.
 *     10-APR-2000 (DSB):
 *        Added argument VERB.
+*     7-FEB-2008 (DSB):
+*        Ignore blank names.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -165,14 +167,19 @@
          NAME = ' '
          CALL GRP_GET( IGRP3, I, 1, NAME, STATUS )
 
+*  Skip blank names.
+         IF( NAME .NE. ' ' ) THEN
+
 *  Expand the name into separate file names, appending them to the 
 *  truncated input group.
-         CALL NDG1_EXPAN( NAME, VERB, IGRP1, NFMT, FMT, FOUND, STATUS )
+            CALL NDG1_EXPAN( NAME, VERB, IGRP1, NFMT, FMT, FOUND, 
+     :                       STATUS )
 
 *  If no files were found matching the name, add the name to the group
 *  containing bad NDF names.
-         IF( .NOT. FOUND .AND. IGRP2 .NE. GRP__NOID ) THEN
-            CALL GRP_PUT( IGRP2, 1, NAME, 0, STATUS )
+            IF( .NOT. FOUND .AND. IGRP2 .NE. GRP__NOID ) THEN
+               CALL GRP_PUT( IGRP2, 1, NAME, 0, STATUS )
+            END IF
          END IF
 
 *  Get the next template from the input group.
