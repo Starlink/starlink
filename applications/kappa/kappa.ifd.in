@@ -2557,6 +2557,16 @@ package kappa {
             helpkey *
           }
 
+         parameter parents {
+            type FILENAME
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Filename in which to store direct parents}
+            default !
+            helpkey *
+          }
+
       }
 
       action showqual {

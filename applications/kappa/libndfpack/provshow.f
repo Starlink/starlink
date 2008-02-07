@@ -61,6 +61,10 @@
 *  ADAM Parameters:
 *     NDF = NDF (Read)
 *        The NDF data structure.
+*     PARENTS = FILENAME (Read)
+*        Name of a new text file in which to put the paths to the direct
+*        parents of the supplied NDF. These are written one per line with
+*        no extra text. If null, no file is created. [!]
 
 *  Notes:
 *     - If a KAPPA application uses one or more input NDFs to create an 
@@ -113,6 +117,8 @@
 *  History:
 *     9-JAN-2008 (DSB):
 *        Original version.
+*     7-FEB-2008 (DSB):
+*        Added parameter PARENTS.
 *     {enter_further_changes_here}
 
 *-
@@ -121,7 +127,8 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'PAR_PAR'          ! PAR constants 
+      INCLUDE 'PAR_ERR'          ! PAR error constants 
+      INCLUDE 'DAT_PAR'          ! DAT constants 
       INCLUDE 'AST_PAR'          ! AST constants 
 
 *  Status:
@@ -131,16 +138,26 @@
       INTEGER CHR_LEN            ! Used length of a string
 
 *  Local Variables:
-      CHARACTER KEY*20           ! Key for entry within KeyMap
+      CHARACTER CLOC*(DAT__SZLOC)! Locator to array cell
       CHARACTER ID*10            ! Integer index for the current NDF
+      CHARACTER KEY*20           ! Key for entry within KeyMap
+      CHARACTER PLOC*(DAT__SZLOC)! Locator for PARENTS array
+      CHARACTER PROV*(DAT__SZLOC)! Locator for provenance information
+      CHARACTER PROVP*(DAT__SZLOC)! Locator for parent provenance info
       CHARACTER VALUE*255        ! Buffer for one field value
+      INTEGER FD                 ! File descriptor for parents file
       INTEGER INDF               ! NDF identifier
+      INTEGER IPAR               ! Index into list of parent indices
       INTEGER IROW               ! Row index
       INTEGER KYMAP1             ! AST KeyMap holding all prov info
       INTEGER KYMAP2             ! AST KeyMap holding field widths
       INTEGER NC                 ! String length
+      INTEGER NPAR               ! Number of direct parents
       INTEGER NROW               ! No. of lines to display
+      INTEGER PARI               ! Index of current parent in ancestors
+      LOGICAL THERE              ! Does the named component exist?
 *.
+
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -244,6 +261,69 @@
 
 *  A final blank line.
       CALL MSG_BLANK( STATUS )
+
+*  If required, create a text file containing the paths to the direct
+*  parents of the supplied NDF.
+*  ================================================================
+
+*  Get an FIO file descriptor for the output file. Annul the error if no
+*  file is needed.
+      CALL FIO_ASSOC( 'PARENTS', 'WRITE', 'LIST', 255, FD, STATUS )
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+
+*  If a file is beign created, get the provenance information for the
+*  supplied NDF. This includes the indices of the NDFs direct parents.
+      ELSE
+         CALL NDG_GTPRV( INDF, 0, PROV, STATUS )
+
+*  Check that the NDF has some parents.
+         CALL DAT_THERE( PROV, 'PARENTS', THERE, STATUS )
+         IF( THERE ) THEN
+
+*  Loop round each integer index in the PARENTS component of the
+*  NDFs provenance information. These are the indices of the NDFs direct
+*  parents.
+            CALL DAT_FIND( PROV, 'PARENTS', PLOC, STATUS )
+            CALL DAT_SIZE( PLOC, NPAR, STATUS )
+            DO IPAR = 1, NPAR
+
+*  Get a locator for the current cell of the PARENTS array, and ge the
+*  integer value in the cell.
+               CALL DAT_CELL( PLOC, 1, IPAR, CLOC, STATUS )
+               CALL DAT_GET0I( CLOC, PARI, STATUS )
+
+*  Get the provenance information for the ancestor with the index read
+*  from the current cell of the PARENTS aray.
+               CALL NDG_GTPRV( INDF, PARI, PROVP, STATUS )
+
+*  Check the provenance information includes a path to the parent file.
+*  If so, get the path and write it to the output text file.
+               CALL DAT_THERE( PROVP, 'PATH', THERE, STATUS )
+               IF( THERE ) THEN
+                  CALL CMP_GET0C( PROVP, 'PATH', VALUE, STATUS )
+                  CALL FIO_WRITE( FD, VALUE( : CHR_LEN( VALUE ) ), 
+     :                            STATUS )
+               END IF
+
+*  Free the locators to the parent's provenance information, and the
+*  current cell of the PARENTS array.
+               CALL DAT_ANNUL( PROVP, STATUS )
+               CALL DAT_ANNUL( CLOC, STATUS )
+
+*  Next parent.
+            END DO
+
+*  Free the locator to the PARENTS array.
+            CALL DAT_ANNUL( PLOC, STATUS )
+
+         END IF
+
+*  Free the locator to the NDFs provenance information, and close the
+*  output text file.
+         CALL DAT_ANNUL( PROV, STATUS )
+         CALL FIO_ANNUL( FD, STATUS )
+      END IF
 
 *  Arrive here if an error occurs.
  999  CONTINUE
