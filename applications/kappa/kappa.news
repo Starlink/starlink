@@ -59,8 +59,8 @@
       NUMBIN specifies the number of bins for the automatic mode.
 
       -  The reported fitting ranges are now given in the current
-      current co-ordinate system, along with the previously listed 
-      pixel ranges in parentheses.
+      co-ordinate system, along with the previously listed pixel 
+      ranges in parentheses.
 
    o  PSF has a new output parameter TOTAL which returns the total
       flux for the fitted Sersic function.
@@ -72,6 +72,12 @@
    o  WCSATTRIB permits the setting of multiple attributes through new 
       MSET option for parameter MODE, and the new parameter SETTING.
 
+2 General_changes
+
+   Each KAPPA command can now store provenance information in its
+   output NDF(s) describing the input NDFs (this includes the 
+   provenance for each input NDF).
+         
 1 KAPPA_Version_1.7
 
    A new release of KAPPA (V1.7-10) has been made.  The main changes
