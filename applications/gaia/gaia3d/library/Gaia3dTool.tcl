@@ -719,13 +719,15 @@ itcl::class gaia3d::Gaia3dTool {
    protected method start_report_position_ {} {
       if { [$plane_ has_position] } {
          $textwcs_ set_visible
-         report_position_
+         report_position_ 1
       }
    }
 
    #  Report the position of the cursor in the image plane, if tracking.
    #  Also updates the spectral extraction in GAIA, if that's enabled.
-   protected method report_position_ {} {
+   #  If init is true then a request to autorange the data extraction limits
+   #  is made. 
+   protected method report_position_ { {init 0} } {
       if { [$plane_ has_position] } {
          lassign [$plane_ get_position_and_delta] ix iy iz dx dy dz
          incr ix
@@ -744,7 +746,7 @@ itcl::class gaia3d::Gaia3dTool {
          $textwcs_ set_text "coords: $coords -> value: $value"
 
          #  Track the position in GAIA.
-         line_moved_
+         line_moved_ $init
       }
    }
 
@@ -823,16 +825,17 @@ itcl::class gaia3d::Gaia3dTool {
       image_plane_moved_ $index
    }
 
-   #  The spectral line has moved. Track this in GAIA if needed.
-   protected method line_moved_ {} {
+   #  The spectral line has moved. Track this in GAIA if needed. If init
+   #  is true then a request to autorange the data extraction limits is made.
+   protected method line_moved_ { init } {
       if { $line_ != {} && $show_spectral_line_ } {
          lassign [$line_ get_description] type desc
          set last_line_type_ "$type"
          set last_line_desc_ "$desc"
          if { $type == "p" } {
-            eval $itk_option(-gaiacube) set_point_spectrum_position $desc
+            eval $itk_option(-gaiacube) set_point_spectrum_position $init $desc
          } else {
-            $itk_option(-gaiacube) set_region_spectrum_position $desc
+            $itk_option(-gaiacube) set_region_spectrum_position $init $desc
          }
       }
    }

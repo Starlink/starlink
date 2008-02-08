@@ -1284,10 +1284,11 @@ itcl::class gaia::GaiaCube {
    }
 
    #  Deal with movement of the spectrum. Listeners in the 3D and other slave
-   #  toolboxes may need updating.
-   protected method spectrum_moved_ {type desc} {
+   #  toolboxes may need updating, init should be set when the data limits 
+   #  should be autoranged (initial click).
+   protected method spectrum_moved_ {type init desc} {
       renderers_spectrum_moved_ $type $desc
-      slave_spectrum_moved_ $type $desc
+      slave_spectrum_moved_ $type $init $desc
    }
 
    #  ============
@@ -1449,9 +1450,10 @@ itcl::class gaia::GaiaCube {
    #  ==========================
 
    #  Set the position of the spectrum, if extraction has been started.
-   #  Coordinates are a position on the image slice.
-   public method set_point_spectrum_position {ix iy} {
-      $itk_component(spectrum) set_point_position $ix $iy
+   #  Coordinates are a position on the image slice, init should be set
+   #  true when the data limts need resetting (initial click).
+   public method set_point_spectrum_position {init ix iy} {
+      $itk_component(spectrum) set_point_position $init $ix $iy
    }
 
    #  Get the position of the spectrum, if extraction has been started.
@@ -1468,10 +1470,11 @@ itcl::class gaia::GaiaCube {
       return [$itk_component(spectrum) get_region_position]
    }
 
-   #  Set the local current region to a description from GAIA3D. The
-   #  updated description will include any changes (shifts).
-   public method set_region_spectrum_position {desc} {
-      $itk_component(spectrum) set_region_position $desc
+   #  Set the local current region to a description from GAIA3D. The updated
+   #  description will include any changes (shifts), init should be set true
+   #  when the data limts need resetting (initial click).
+   public method set_region_spectrum_position {init desc} {
+      $itk_component(spectrum) set_region_position $init $desc
    }
 
    #  GAIA3D utilities.
@@ -1548,16 +1551,16 @@ itcl::class gaia::GaiaCube {
 
    #  Send message to enabled slave toolboxes to match our spectral extraction
    #  position (note delay by 10ms to eat up repeats).
-   protected method slave_spectrum_moved_ {type desc} {
+   protected method slave_spectrum_moved_ {type init desc} {
       if { [info exists slaves_] } {
          foreach w [array names slaves_] {
             if { $slaves_($w) } {
                if { [winfo exists $w] && [wm state $w] != "withdrawn" } {
                   if { $type == "p" } {
                      lassign $desc ix iy
-                     after 10 "$w set_point_spectrum_position $ix $iy"
+                     after 10 "$w set_point_spectrum_position $init $ix $iy"
                   } else {
-                     after 10 "$w set_region_spectrum_position $desc"
+                     after 10 "$w set_region_spectrum_position $init $desc"
                   }
                } else {
                   unset slaves_($w)

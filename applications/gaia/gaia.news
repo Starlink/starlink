@@ -9,6 +9,10 @@
     A new option for browsing the extensions of an MEF or other NDFs
     of an HDS container file for cubes has been added to the cube toolbox.
 
+    The data limits used for spectral extraction will now be updated
+    when either a master starts an extraction, or the 3D scene starts
+    moving the spectral extraction shape (region or line).
+
   Humu Release
   ============
    

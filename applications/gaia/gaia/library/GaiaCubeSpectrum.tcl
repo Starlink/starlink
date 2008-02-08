@@ -486,7 +486,11 @@ itcl::class gaia::GaiaCubeSpectrum {
 
       #  Eval the notification command, if have one.
       if { $itk_option(-notify_cmd) != {} } {
-         eval $itk_option(-notify_cmd) p \"$ix $iy\"
+         if { $action == "localstart" } {
+            eval $itk_option(-notify_cmd) p 1 \"$ix $iy\"
+         } else {
+            eval $itk_option(-notify_cmd) p 0 \"$ix $iy\"
+         }
       }
 
       #  Record extraction bounds, these are checked.
@@ -497,14 +501,15 @@ itcl::class gaia::GaiaCubeSpectrum {
    #  Set the position of the point extracted spectrum, if extraction is
    #  enabled. The position is in image coordinates (not pixel). Note
    #  if spectrum is enabled, but we're not extraction a position, that is
-   #  started. 
-   public method set_point_position {ix iy} {
+   #  started. The init argument should be set true when the extraction
+   #  bounds should be re-initialised (a localstart).
+   public method set_point_position {init ix iy} {
       if { $spectrum_ != {} } {
          $rtdimage_ convert coords $ix $iy image sx sy screen
-         if { $last_cxcy_ != {} } {
-            display_point_spectrum_ "localdrag" $sx $sy
-         } else {
+         if { $last_cxcy_ == {} || $init } {
             display_point_spectrum_ "localstart" $sx $sy
+         } else {
+            display_point_spectrum_ "localdrag" $sx $sy
          }
       }
    }
@@ -541,8 +546,9 @@ itcl::class gaia::GaiaCubeSpectrum {
 
    #  Set the ARD region of the extracted spectrum. The basic types may not
    #  match so this can fail. Just handle that silently and hope the message
-   #  gets through.
-   public method set_region_position {region} {
+   #  gets through, init should be set true when the data limits should be
+   #  autoscaled (following a click).
+   public method set_region_position {init region} {
       if { $spectrum_ != {} } {
          if { [catch {$toolbox_ set_selected_description $region} ] } {
 
@@ -557,7 +563,11 @@ itcl::class gaia::GaiaCubeSpectrum {
             #  And extract the spectrum.
             display_region_spectrum_ localstart $region
          } else {
-            display_region_spectrum_ localdrag $region
+            if { $init } {
+               display_region_spectrum_ localstart $region
+            } else {
+               display_region_spectrum_ localdrag $region
+            }
          }
       }
    }
@@ -621,7 +631,11 @@ itcl::class gaia::GaiaCubeSpectrum {
       #  a single character string, no remove any newlines (polygon).
       if { $itk_option(-notify_cmd) != {} } {
          regsub -all {\n} $region { } region
-         eval $itk_option(-notify_cmd) r $region
+         if { $action == "localstart" } {
+            eval $itk_option(-notify_cmd) r 1 $region
+         } else {
+            eval $itk_option(-notify_cmd) r 0 $region
+         }
       }
 
       #  Record extraction bounds, these are checked.
@@ -1384,8 +1398,9 @@ itcl::class gaia::GaiaCubeSpectrum {
    itk_option define -show_splatdisp show_splatdisp Show_SplatDisp 0
 
    #  Command to execute when a spectrum is extracted or the extraction has
-   #  been updated. Trailed by "p" or "r" for point and region and the
-   #  extraction position, or region description as a single argument.
+   #  been updated. Trailed by "p" or "r" for point, 0 or 1 to indicate if a
+   #  locatstart or locatdrag has been done, and the extraction position, or
+   #  region description as a single argument.
    itk_option define -notify_cmd notify_cmd Notify_Cmd {}
 
    #  Protected variables: (available to instance)
