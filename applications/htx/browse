@@ -157,6 +157,8 @@
 #        is used.
 #     10-MAY-2006 (PWD):
 #        Merge all netscape, mozilla and firefox code into one.
+#     8-JAN-2008 (PWD):
+#        Use SUSV3 "tail -n +3" command, "tail +3" is non-standard.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -219,7 +221,7 @@
 
 #  Select the names of all but the most recent few temporary files and remove
 #  these older ones if necessary.
-            oldfiles="`echo "${tempfiles}" | tail +3`"
+            oldfiles="`echo "${tempfiles}" | tail -n +3`"
             if test -n "${oldfiles}"; then rm -f ${oldfiles}; fi
          fi
 
@@ -295,7 +297,7 @@
 
 #  Select the names of all but the most recent few temporary files and remove
 #  these older ones if necessary.
-            oldfiles="`echo "${tempfiles}" | tail +3`"
+            oldfiles="`echo "${tempfiles}" | tail -n +3`"
             if test -n "${oldfiles}"; then rm -f ${oldfiles}; fi
          fi
 
