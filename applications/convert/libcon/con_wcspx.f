@@ -624,7 +624,7 @@
 
       CT = REAL( JFINC )*REAL( INTT )
       IF( CT .GT. 0.0 .AND. TSYS .GT. 0.0 ) THEN
-         VAR = 2.0*TSYS/SQRT( 0.001*CT )
+         VAR = 4000.0*TSYS*TSYS/ CT
       ELSE
          VAR = VAL__BADR
       END IF
