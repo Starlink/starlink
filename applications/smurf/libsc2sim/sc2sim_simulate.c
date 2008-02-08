@@ -257,7 +257,11 @@
 *     2008-01-30 (AGG):
 *        - Fix posptr bug when calling sc2sim_ndfwrdata
 *        - Factor out calculation of frame offset into time series for
-           current output file
+*          current output file
+*     2008-02-08 (CV):
+*        Set obscounter to 1 at the beginning of the simulation and
+*        increment as necessary rather than resetting to 1 (then
+*        incrementing as necessary) for each file.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -420,7 +424,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   int frameoffset;                /* Frame offset into time stream for current file */
   int frmperms;                   /* number of frames per microstep */
   AstFrameSet *fs=NULL;           /* frameset for tanplane projection */
-  int obscounter;                 /* Counter for observation number
+  int obscounter=1;               /* Counter for observation number
 				     portion of output filename */
   JCMTState *head = NULL;         /* per-frame headers */
   char heatname[SC2SIM__FLEN];    /* name of flatfield cal file */
@@ -1420,7 +1424,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	  /* Compress and store as NDF */
           if( *status == SAI__OK ) {
 
-	    obscounter = 1;
             sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k], 
 		     date_yr, date_mo, date_da, obscounter, subscanno );
 	    /*If we are not overwriting existing files see if the file exists*/
