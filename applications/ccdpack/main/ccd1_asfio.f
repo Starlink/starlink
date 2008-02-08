@@ -48,6 +48,7 @@
 
 *  Copyright:
 *     Copyright (C) 1989, 1992-1993 Science & Engineering Research
+*     Copyright (C) 2008 Science and Technology Facilities Council
 *     Council. All Rights Reserved.
 
 *  Licence:
@@ -80,6 +81,8 @@
 *     18-MAR-1993 (PDRAPER):
 *        Added checks for file opened for write access which fails
 *        (on UNIX system).
+*     8-FEB-2008 (PDRAPER):
+*        Initialise FD to protect against exit without checking OPEN.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -132,6 +135,7 @@
       LOOP = 0
       LOOPAG = .TRUE.
       OPEN = .FALSE.
+      FD = 0
 
 *  Loop until exceed number of tries or file is sucessfully opened.
  1    CONTINUE                   ! Start of 'DO WHILE' loop

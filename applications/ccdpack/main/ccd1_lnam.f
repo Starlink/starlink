@@ -57,6 +57,7 @@
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council.
 *     Copyright (C) 2000-2001 Central Laboratory of the Research
+*     Copyright (C) 2008 Science and Technology Facilities Council
 *     Councils. All Rights Reserved.
 
 *  Licence:
@@ -89,6 +90,8 @@
 *        Replaced use of IRH/IRG with GRP/NDG.
 *     19-JUN-2001 (MBT):
 *        Added COMGID parameter.
+*     8-FEB-2008 (PWD):
+*        Do nothing if the file is not opened.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -144,51 +147,51 @@
 
 *  Open the file via the named adam parameter.
       OPEN = .FALSE.
-      FD = 0
       CALL CCD1_ASFIO( PARAM, 'WRITE', 'LIST', GRP__SZNAM, FD, OPEN,
      :                 STATUS )
+      IF ( OPEN ) THEN
 
 *  Write the title
-      CALL FIO_WRITE( FD, TITLE( : CHR_LEN( TITLE ) ), STATUS )
+         CALL FIO_WRITE( FD, TITLE( : CHR_LEN( TITLE ) ), STATUS )
 
 *  Loop over the required index extracting the names and then writing
 *  them into the file.
-      DO 1 I = INDXLO, INDXHI
-         NAME = ' '
+         DO 1 I = INDXLO, INDXHI
+            NAME = ' '
 
 *  Get the item name.
-         CALL GRP_GET( GRPID, I, 1, NAME, STATUS )
-         CALL MSG_SETC( 'NAME', NAME )
+            CALL GRP_GET( GRPID, I, 1, NAME, STATUS )
+            CALL MSG_SETC( 'NAME', NAME )
 
 *  Construct the output line.
-         IF ( COMGID .EQ. GRP__NOID ) THEN
+            IF ( COMGID .EQ. GRP__NOID ) THEN
 
 *  No comments to write - just use the name.
-            CALL MSG_LOAD( ' ', '^NAME', LINE, LENG, STATUS )
-         ELSE
+               CALL MSG_LOAD( ' ', '^NAME', LINE, LENG, STATUS )
+            ELSE
 
 *  If we have comments to write, extract them from the comment group.
-            CALL MSG_SETC( 'COMMENTCHR', COMCHR )
-            CALL GRP_GET( COMGID, I, 1, COMTXT, STATUS )
-            CALL MSG_SETC( 'COMMENT', COMTXT )
-            CALL MSG_LOAD( ' ', '^NAME ^COMMENTCHR ^COMMENT', LINE,
-     :                     LENG, STATUS )
-         END IF
+               CALL MSG_SETC( 'COMMENTCHR', COMCHR )
+               CALL GRP_GET( COMGID, I, 1, COMTXT, STATUS )
+               CALL MSG_SETC( 'COMMENT', COMTXT )
+               CALL MSG_LOAD( ' ', '^NAME ^COMMENTCHR ^COMMENT', LINE,
+     :                        LENG, STATUS )
+            END IF
 
 *  Now write out the constructed line.
-         CALL FIO_WRITE( FD, LINE( 1:LENG ), STATUS )
- 1    CONTINUE
+            CALL FIO_WRITE( FD, LINE( 1:LENG ), STATUS )
+ 1       CONTINUE
 
-      IF ( COMMEN .AND. STATUS .EQ. SAI__OK ) THEN 
+         IF ( COMMEN .AND. STATUS .EQ. SAI__OK ) THEN 
 
 *  Write a comment about the name of the list.
-         CALL FIO_FNAME( FD, FNAME, STATUS )
-         CALL MSG_SETC( 'FNAME', FNAME )
-         CALL CCD1_MSG( ' ',
-     :   '  Namelist written to file: ^FNAME', STATUS )
+            CALL FIO_FNAME( FD, FNAME, STATUS )
+            CALL MSG_SETC( 'FNAME', FNAME )
+            CALL CCD1_MSG( ' ',
+     :                  '  Namelist written to file: ^FNAME', STATUS )
+         END IF
+         CALL FIO_CLOSE( FD, STATUS )
       END IF
 
-*  Close the file if it is open.
-      IF ( OPEN ) CALL FIO_CLOSE( FD, STATUS )
       END
 * $Id$
