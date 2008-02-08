@@ -21,12 +21,12 @@ C_ROUTINES = con_gbl.c con_cclos.c con_copen.c con_cwrit.c con_cwri2.c \
  bit_andub_c.c
 
 GEN_ROUTINES = $(DR_GEN_ROUTINES) $(WR_GEN_ROUTINES) $(DIR_GEN_ROUTINES) \
- $(DRLI_GEN_ROUTINES) $(N_GEN_ROUTINES) $(DL_GEN_ROUTINES) \
+ $(DRLI_GEN_ROUTINES) $(N_GEN_ROUTINES) $(DLR_GEN_ROUTINES) \
  $(WIR_GEN_ROUTINES) $(I_GEN_ROUTINES) $(D_GEN_ROUTINES)
 
 F_GEN_FILES = $(DR_GEN_ROUTINES:.gen=.f) $(WR_GEN_ROUTINES:.gwr=.f) \
  $(DIR_GEN_ROUTINES:.gdir=.f) $(DRLI_GEN_ROUTINES:.gdrli=.f) \
- $(N_GEN_ROUTINES:.gn=.f) $(DL_GEN_ROUTINES:.gdl=.f) \
+ $(N_GEN_ROUTINES:.gn=.f) $(DLR_GEN_ROUTINES:.gdlr=.f) \
  $(WIR_GEN_ROUTINES:.gwir=.f) $(I_GEN_ROUTINES:.gi=.f) $(D_GEN_ROUTINES:.gd=.f)
 
 INCLUDE_FILES = DTACODES DYNAMIC_MEMORY
@@ -48,8 +48,8 @@ DRLI_GEN_ROUTINES = con_fkeyx.gdrli con_gkeyx.gdrli
 ##  All numeric types.
 N_GEN_ROUTINES = con_ifufx.gn con_iudax.gn con_ofufx.gn con_oudax.gn
 
-##  Double and logical.
-DL_GEN_ROUTINES = con_consx.gdl
+##  Double, logical and real.
+DLR_GEN_ROUTINES = con_consx.gdlr
 
 ##  Word, integer and real.
 WIR_GEN_ROUTINES = con_chvax.gwir
@@ -86,10 +86,10 @@ FGENERIC=@FGENERIC@
 	$(FGENERIC) -t n $(<:.gn=.gen)
 	$(RM) $(<:.gn=.gen)
 
-.gdl.f:
-	$(LN_S) $< $(<:.gdl=.gen)
-	$(FGENERIC) -t dl $(<:.gdl=.gen)
-	$(RM) $(<:.gdl=.gen)
+.gdlr.f:
+	$(LN_S) $< $(<:.gdlr=.gen)
+	$(FGENERIC) -t dlr $(<:.gdlr=.gen)
+	$(RM) $(<:.gdlr=.gen)
 
 .gwir.f:
 	$(LN_S) $< $(<:.gwir=.gen)

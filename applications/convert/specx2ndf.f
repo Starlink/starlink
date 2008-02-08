@@ -33,6 +33,10 @@
 *
 *     In both cases, WCS components are added to the output NDFs
 *     describing the spectral and spatial axes.
+*
+*     A Variance component is added to the output NDF that has a constant
+*     value derived from the Tsys value, integration time, and channel 
+*     spacing in the input.
 
 *  Usage:
 *     specx2ndf in out [gridfile] [telescope] [latitude] [longitude]
@@ -217,6 +221,8 @@
 *        Fix NDF label for spectra as well as maps.
 *     2004 September 9 (TIMJ):
 *        Use CNF_PVAL
+*     8-FEB-2008 (DSB):
+*        Add a variance component to the output NDF.
 *     {enter_further_changes_here}
 *-
 
@@ -232,6 +238,7 @@
       INCLUDE 'DAT_PAR'          ! HDS constants 
       INCLUDE 'NDF_PAR'          ! NDF constants 
       INCLUDE 'PAR_ERR'          ! PAR_ error constants.
+      INCLUDE 'PRM_PAR'          ! VAL constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
@@ -278,6 +285,7 @@
       INTEGER DIMS             ! Array dimensionality
       INTEGER INDF1            ! Identifier for an input NDF
       INTEGER INDF2            ! Identifier for an output NDF
+      INTEGER IPVOUT           ! Pointer to output variuance array
       INTEGER IPWORK           ! Pointer to work space
       INTEGER LTTL             ! Length of title for output NDF
       INTEGER MLWBND(3)        ! Lower bounds for the ndf
@@ -290,6 +298,7 @@
       INTEGER SPTS             ! Number of points in each spectrum
       LOGICAL APPHST           ! Flag; append history to output cube?
       LOGICAL GRIDFG           ! Flag; write schematic of grid to a file?
+      REAL VAR                 ! Constant variance for output spectra
       REAL VERSN               ! Data format version number
 *.
 
@@ -414,7 +423,17 @@
      :                  NSPEC, SPTS, INDF2, STATUS )
 
 *  Create the WCS component.
-         CALL CON_WCSPX( INDF2, INDF1, LONG, LAT, STATUS )
+         CALL CON_WCSPX( INDF2, INDF1, LONG, LAT, VAR, STATUS )
+
+*  Map the output variance array and fill it with the constant value
+*  returned by CON_WCSPX. 
+         IF( VAR .NE. VAL__BADR ) THEN
+            CALL NDF_MAP( INDF2, 'VARIANCE', '_REAL', 'WRITE', 
+     :                    IPVOUT, EL, STATUS ) 
+            CALL CON_CONSR( VAR, EL, %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                      STATUS )
+            CALL NDF_UNMAP( INDF2, 'VARIANCE', STATUS )
+         END IF
 
 *  Add AXIS structures to the output NDF.
          CALL PSX_CALLOC( 6*MXDIM, '_DOUBLE', IPWORK, STATUS )
@@ -557,7 +576,17 @@
                CALL NDF_UNMAP( INDF2, '*', STATUS )
 
 *  Create the WCS component.
-               CALL CON_WCSPX( INDF2, INDF1, LONG, LAT, STATUS )
+               CALL CON_WCSPX( INDF2, INDF1, LONG, LAT, VAR, STATUS )
+
+*  Map the output variance array and fill it with the constant value
+*  returned by CON_WCSPX. 
+               IF( VAR .NE. VAL__BADR ) THEN
+                  CALL NDF_MAP( INDF2, 'VARIANCE', '_REAL', 'WRITE', 
+     :                          IPVOUT, EL, STATUS ) 
+                  CALL CON_CONSR( VAR, EL, %VAL( CNF_PVAL( IPVOUT ) ), 
+     :                            STATUS )
+                  CALL NDF_UNMAP( INDF2, 'VARIANCE', STATUS )
+               END IF
 
 *  Add AXIS structures to the output NDF.
                CALL PSX_CALLOC( 6*( MUPBND(3) - MLWBND(3) + 1 ), 

@@ -1,4 +1,4 @@
-      SUBROUTINE CON_WCSPX( INDF, IMAP, OBSLON, OBSLAT, STATUS )
+      SUBROUTINE CON_WCSPX( INDF, IMAP, OBSLON, OBSLAT, VAR, STATUS )
 *+
 *  Name:
 *     CON_WCSPX
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CON_WCSPX( INDF, IMAP, OBSLON, OBSLAT, STATUS )
+*     CALL CON_WCSPX( INDF, IMAP, OBSLON, OBSLAT, VAR, STATUS )
 
 *  Description:
 *     This routine adds a WCS component to the output NDF holdiong a
@@ -18,6 +18,9 @@
 *     DEC on axis 2, and frequency on axis 3. The parameters defining the
 *     axes are read from the SPECX extensions in the supplied SPECX map,
 *     except for the observatory location which is provided by the caller.
+*
+*     Also calculates and returns a constant variance value based on the
+*     Tsys value in the SPECX extension.
 
 *  Arguments:
 *     INDF = INTEGER (Given)
@@ -28,6 +31,9 @@
 *        The geodetic longitude of the observatory. Radians, positive east.
 *     OBSLAT = DOUBLE PRECISION (Given)
 *        The geodetic latitude of the observatory. Radians, positive north.
+*     VAR = REAL (Returned)
+*        A constant variance valued derived from the values in the SPECX
+*        extension.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -64,6 +70,8 @@
 *        in the rest frame given by the bottom 4 bits of LSRFLG.
 *        - Use the correct definition of the source velocity (radio,
 *        optical or relativistic) as read from bits 5 and 6 of LSRFLG.
+*      8-FEB-2008 (DSB):
+*        Added argument VAR.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -76,6 +84,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! VAL constants
       INCLUDE 'AST_PAR'          ! AST constants
 
 *  Arguments Given:
@@ -83,6 +92,9 @@
       INTEGER IMAP
       DOUBLE PRECISION OBSLON
       DOUBLE PRECISION OBSLAT
+
+*  Arguments Returned:
+      REAL VAR
 
 *  Status:
       INTEGER STATUS               ! Global status
@@ -133,6 +145,7 @@
       INTEGER FS             ! Pointer to AST FrameSet
       INTEGER HOUR           ! Hour of observation
       INTEGER IAT            ! Used length of string
+      INTEGER INTT           ! Integration time in ms
       INTEGER ISOR           ! LSR identifier extracted from LSRFLG
       INTEGER ISYS           ! Spectral system identifier from LSRFLG
       INTEGER IWCS           ! Pointer to NDF's WCS FrameSet
@@ -155,14 +168,19 @@
       INTEGER YEAR           ! Year 
       LOGICAL ISDSB          ! Is this a double sideband observation?
       LOGICAL THERE          ! Does object exist?
+      REAL CT                ! Product of channel spacing and integ time
       REAL DAYS              ! Time of observation as fraction of a day
       REAL SEC               ! Seconds of observation
+      REAL TSYS              ! Tsys 
 
       DATA MONTHS /'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL',
      :             'AUG', 'SEP', 'OCT', 'NOV', 'DEC'/
 
 
 *.
+
+*  Initialise returned values.
+      VAR = VAL__BADR
 
 *  Check the inherited status. 
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -388,6 +406,7 @@
       CRVAL3 = DBLE( JFCEN )*1.0E-6
 
 *  Get the frequency increment per pixel, in Hz. Convert to GHz.
+      JFINC = 0
       CALL NDF_XGT0I( IMAP, 'SPECX', 'JFINC(1)', JFINC, STATUS)
       CD3 = DBLE( JFINC )*1.0E-9
 
@@ -594,6 +613,21 @@
 
 *  Store the FrameSet back in the NDF.
       CALL NDF_PTWCS( IWCS, INDF, STATUS )
+
+*  Calculate and return the constant variance value implied by the
+*  Tsys, channel spacing, and integration time in the SPECX header.
+      INTT = 0
+      CALL NDF_XGT0I( IMAP, 'SPECX', 'INTT', INTT, STATUS )
+
+      TSYS = 0.0
+      CALL NDF_XGT0R( IMAP, 'SPECX', 'TSYS(1)', TSYS, STATUS )
+
+      CT = REAL( JFINC )*REAL( INTT )
+      IF( CT .GT. 0.0 .AND. TSYS .GT. 0.0 ) THEN
+         VAR = 2.0*TSYS/SQRT( 0.001*CT )
+      ELSE
+         VAR = VAL__BADR
+      END IF
 
  999  CONTINUE
 
