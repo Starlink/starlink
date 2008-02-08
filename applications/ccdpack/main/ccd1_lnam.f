@@ -144,6 +144,7 @@
 
 *  Open the file via the named adam parameter.
       OPEN = .FALSE.
+      FD = 0
       CALL CCD1_ASFIO( PARAM, 'WRITE', 'LIST', GRP__SZNAM, FD, OPEN,
      :                 STATUS )
 
