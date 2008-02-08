@@ -418,6 +418,7 @@
 *  Copyright:
 *     Copyright (C) 1992-1993 Science & Engineering Research Council.
 *     Copyright (C) 1995-2002 Central Laboratory of the Research
+*     Copyright (C) 2008 Science and Technology Facilities Council
 *     Councils. All Rights Reserved.
 
 *  Licence:
@@ -499,6 +500,9 @@
 *     11-FEB-2002 (MBT):
 *        Modified a call to CCD1_GMMP to take care of an uninitialised
 *        array bug when OVERRIDE is true.
+*     8-FEB-2008 (PWD):
+*        Initialise NSUP so that related resources are not accidently
+*        released when exiting in error.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -682,6 +686,9 @@
       FIOGR = GRP__NOID
       OUTGRP = GRP__NOID
       NDFGR = GRP__NOID
+
+*  No super lists and associated resources yet.
+      NSUP = 0
 
 *  Find out what is to be used for the source of the position list
 *  names. Are they stored in NDF extensions or will just straight list
