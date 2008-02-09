@@ -64,6 +64,8 @@
 *     2008-01-25 (EC):
 *        -removed setting of TORDERED keyword from FITS header
 *        -always set data dimensions (moved out of loop)
+*     2008-02-08 (EC):
+*        -Fixed dtype for QUALITY -- SMF__UBYTE instead of SMF__USHORT
 
 *  Notes:
 *     Nothing is done about the FITS channels or WCS information stored in
@@ -186,7 +188,7 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
     oldbuf = data->pntr[i];
 
     if( i==2 ) {     /* If QUALITY unsigned char */
-      dtype = SMF__USHORT;
+      dtype = SMF__UBYTE;
     } else {         /* Otherwise get type from the smfData */ 
       dtype = data->dtype;      
     }
@@ -237,11 +239,12 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
 	  }
 	  break;
 	  
-	case SMF__USHORT:
+	case SMF__UBYTE:
 	  for( j=0; j<ntslice; j++ ) { /* Loop over tslice */
 	    bolobase = 0;
 	    for( k=0; k<nbolo; k++ ) { /* Loop over bolo */
-	      ((short *)newbuf)[timebase+k] = ((short *)oldbuf)[bolobase+j];
+	      ((unsigned char *)newbuf)[timebase+k] = 
+		((unsigned char *)oldbuf)[bolobase+j];
 	      bolobase += ntslice;
 	    }
 	    timebase += nbolo;
@@ -292,11 +295,12 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
 	  }
 	  break;
 
-	case SMF__USHORT:
+	case SMF__UBYTE:
 	  for( j=0; j<ntslice; j++ ) { /* Loop over tslice */
 	    bolobase = 0;
 	    for( k=0; k<nbolo; k++ ) { /* Loop over bolo */
-	      ((short *)newbuf)[bolobase+j] = ((short *)oldbuf)[timebase+k];
+	      ((unsigned char *)newbuf)[bolobase+j] = 
+		((unsigned char *)oldbuf)[timebase+k];
 	      bolobase += ntslice;
 	    }
 	    timebase += nbolo;
