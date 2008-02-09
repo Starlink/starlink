@@ -38,6 +38,8 @@
 *  History:
 *     2007-06-13 (EC):
 *        Initial version factors code out from smf_dtype_size.c
+*     2008-02-01 (EC):
+*        Added SMF__UBYTE
 
 *  Notes:
 *     - See also smf_dtype_check, smf_dtype_string
@@ -97,7 +99,10 @@ size_t smf_dtype_sz( const smf_dtype dtype, int *status ) {
     retval = sizeof(double);
     break;
   case SMF__USHORT:
-    retval = sizeof(short);
+    retval = sizeof(unsigned short);
+    break;
+  case SMF__UBYTE:
+    retval = sizeof(unsigned char);
     break;
   default:
     retval = 0;
