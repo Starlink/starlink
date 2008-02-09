@@ -44,8 +44,7 @@
 *     - JCMTState is NULL for non-time series data
 *     - The following bit flags defined in smf_typ.h are used for "flags" par:
 *       SMF__NOCREATE_HEAD: Do not allocate smfHead
-*       SMF__NOCREATE_DATA: Do not map DATA/VARIANCE/QUALITY arrays (NOT YET
-                            IMPLEMENTED!)			    
+*       SMF__NOCREATE_DATA: Do not map DATA/VARIANCE/QUALITY
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -148,6 +147,9 @@
 *     2008-01-25 (EC):
 *        -removed check for TORDERED FITS keyword
 *        -Added check for SMF__NOCREATE_HEAD when extracting DREAM parameters
+*     2008-02-08 (EC):
+*        -In general map QUALITY unless SMF__NOCREATE_QUALITY set, or
+*         QUALITY doesn't exist, and access mode READ
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -415,14 +417,34 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
 	ndfState( indf, "QUALITY", &qexists, status);
 	ndfState( indf, "VARIANCE", &vexists, status);
 
-	/* Map each component as necessary */
-	ndfMap( indf, "DATA", dtype, mode, &outdata[0], &nout, status );
-	if (qexists) {
-	  ndfMap( indf, "QUALITY", "_UBYTE", mode, &outdata[2], &nout, status );
+
+        /* If access mode is READ, map the QUALITY array only if it
+           already existed, and SMF__NOCREATE_QUALITY is not set. However,
+           if the access mode is not READ, create QUALITY by default. 
+           Map first so that QUALITY can be used to mask DATA when it is
+	   map'd */
+
+	if ( !(flags & SMF__NOCREATE_QUALITY) && 
+	     ( qexists || strncmp(mode,"READ",4) ) ) {
+	  
+	  if( qexists ) {
+	    ndfMap( indf, "QUALITY", "_UBYTE", mode, &outdata[2], &nout, 
+		    status );
+	  } else {
+	    ndfMap( indf, "QUALITY", "_UBYTE", "WRITE", &outdata[2], &nout, 
+		       status );
+	  }
 	}
+
+	/* Always map DATA if we get this far */
+	ndfMap( indf, "DATA", dtype, mode, &outdata[0], &nout, status );
+
+	/* Default behaviour is to map VARIANCE only if it exists already */
 	if (vexists) {
+
 	  ndfMap( indf, "VARIANCE", dtype, mode, &outdata[1], &nout, status );
 	}
+
       }
       if ( !(flags & SMF__NOCREATE_HEAD) ) {
 
