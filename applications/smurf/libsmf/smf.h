@@ -227,6 +227,8 @@
 *        Added map projection information to smf_model_create interface
 *     2008-2-1 (DSB):
 *        Added smf_resampcube* functions.
+*     2008-2-8 (EC):
+*        Added smf_update_quality
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -785,5 +787,7 @@ void smf_resampcube_ast( smfData *data, int index, int size, dim_t nchan,
                          Grp *detgrp, int moving, int interp, 
                          const double params[], float *in_data, 
                          float *out_data, int *status );
+
+void smf_update_quality( smfData *data, unsigned char *badmask, int *status );
 
 #endif /* SMF_DEFINED */
