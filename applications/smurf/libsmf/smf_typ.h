@@ -106,8 +106,11 @@
 *        Added SMF__NOCREATE_LUT flag for file I/O 
 *     2008-1-15 (DSB):
 *        Added qlbnd/qubnd to the smfTile structure. 
+*     2008-2-8 (EC):
+*        -Added SMF__NOCREATE_QUALITY flag, and data quality SMF__Q* flags
+*        -Added SMF__NOCREATE_VARIANCE, SMF__QUA model component
+*        -Added SMF__UBYTE data type
 *     {enter_further_changes_here}
-
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -150,13 +153,13 @@
 #define SMF__MXSMF 8 /* Maximum number of smfDatas in a smfArray */
 
 /* Different data types supported by SMURF */
-
 typedef enum smf_dtype {
   SMF__NULL,
   SMF__INTEGER,
   SMF__FLOAT,
   SMF__DOUBLE,
   SMF__USHORT,
+  SMF__UBYTE
 } smf_dtype;
 
 /* Different types of model components used by iterative map-maker */
@@ -169,6 +172,7 @@ typedef enum smf_modeltype {
   SMF__NOI=5,             /* Noise model */
   SMF__EXT=6,             /* Extinction correction */
   SMF__LUT=7,             /* Pointing LUT */
+  SMF__QUA=8,             /* Quality flags */
 } smf_modeltype;
 
 /* suffix for simple binary files that store DIMM model components */
@@ -181,11 +185,19 @@ typedef enum smf_modeltype {
 /* Flags for smf_create_smf*, smf_open_file and smf_concat_smfGroup
    Must be individual bits in a single integer
 */
-#define SMF__NOCREATE_DA 1            /* Don't open DA data */
-#define SMF__NOCREATE_HEAD 2          /* Don't open header */
-#define SMF__NOCREATE_FILE 4          /* Don't open file */
-#define SMF__NOCREATE_DATA 8          /* Don't open DATA/QUALITY/VARIANCE */
-#define SMF__NOCREATE_LUT 16          /* Don't open pointing LUT */
+#define SMF__NOCREATE_DA 1       /* Don't open DA data */
+#define SMF__NOCREATE_HEAD 2     /* Don't open header */
+#define SMF__NOCREATE_FILE 4     /* Don't open file */
+#define SMF__NOCREATE_DATA 8     /* Don't open DATA/QUALITY/VARIANCE */
+#define SMF__NOCREATE_VARIANCE 16/* If !SMF__NOCREATE_DATA don't map VARIANCE*/
+#define SMF__NOCREATE_QUALITY 32 /* If !SMF__NOCREATE_DATA don't map QUALITY */
+#define SMF__NOCREATE_LUT 64     /* Don't open pointing LUT */
+
+/* Data quality bit flags (single byte for QUALITY arrays */
+#define SMF__Q_BADS 1     /* Bad sample (VAL__BADD) flagged by DA system  */
+#define SMF__Q_BADB 2     /* All samples from this bolo should be ignored */
+#define SMF__Q_SPIKE 4    /* Location of a spike */ 
+#define SMF__Q_JUMP 8     /* Location of a DC jump */
 
 /* Flags for smf_open_newfile
    Must be individual bits in a single integer
