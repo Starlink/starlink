@@ -80,11 +80,20 @@
 *     2008-01-25 (EC):
 *        -use smf_open_and_flatfield in case input data is raw
 *        -store name of first file of subarray with "_con" suffix
+*     2008-02-08 (EC):
+*        -Fixed data type for QUALITY
+*        -generate QUALITY array if not present
+*        -Use SMF__NOCREATE* flags
 
 *  Notes:
-*     Currently buggy / not fully implemented. WCS and FITS channels in
-*     header are not modified. It is assumed that input files are
-*     time-ordered.
+*     It is assumed that input files are time-ordered. If projection
+*     information supplied, pointing LUT will not be concatenated if
+*     SMF__NOCREATE_LUT is specified. By default, a QUALITY array is
+*     created even if one is not present in the template file. This behaviour
+*     can be avoided by setting flag bit SMF__NOCREATE_QUALITY. Additionally,
+*     if VARIANCE and/or QUALITY is present in the template, prevent
+*     propagation to the concatenated file by setting SMF__NOCREATE_VARIANCE /
+*     SMF__NOCREATE_QUALITY.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -369,10 +378,27 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
 
 		ndata = nbolo*tlen;
 
+		/* Un-set havearray values corresponding to flags */
+		havearray[0] = havearray[0] && !(flags&SMF__NOCREATE_DATA);
+		havearray[1] = havearray[1] && !(flags&SMF__NOCREATE_VARIANCE);
+		havearray[2] = havearray[2] && !(flags&SMF__NOCREATE_QUALITY);
+
+		/* Allocate space for arrays being propagated from template */
 		for( k=0; k<3; k++ ) if( havearray[k] ) {
-		  if( k == 2 ) sz = smf_dtype_sz( SMF__USHORT, status );
+		  if( k == 2 ) sz = smf_dtype_sz( SMF__UBYTE, status );
 		  else sz = smf_dtype_sz(data->dtype, status );
 		  data->pntr[k] = smf_malloc(ndata, sz, 0, status);
+		}
+
+		/* Check to see if havearray for QUALITY is not set,
+                   but SMF__NOCREATE_QUALITY is also not set. In this
+                   case, allocate a fresh QUALITY component that will
+                   not require propagation from the template */
+		
+		if( !havearray[2] && !(flags & SMF__NOCREATE_QUALITY) ) {
+		  data->pntr[2] = smf_malloc(ndata, 
+					     smf_dtype_sz(SMF__UBYTE,status),
+					     1, status);
 		}
 
 		/* Allocate space for the pointing LUT if needed */
@@ -442,7 +468,7 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
 
 	      /* Now do DATA/QUALITY/VARIANCE */
 	      for( k=0; k<3; k++ ) if( havearray[k] ) {
-		if( k == 2 ) sz = smf_dtype_sz( SMF__USHORT, status );
+		if( k == 2 ) sz = smf_dtype_sz( SMF__UBYTE, status );
 		else sz = smf_dtype_sz(data->dtype, status );
 	      
 		if( *status == SAI__OK ) {
