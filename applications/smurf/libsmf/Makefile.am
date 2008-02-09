@@ -56,7 +56,8 @@ smf_dtype_sz.c smf_model_NDFexport.c smf_accumulate_prov.c \
 smf_open_related_model.c smf_choosetiles.c smf_freetiles.c smf_reshapendf.c \
 smf_dataOrder.c smf_choosepolbins.c smf_freepolbins.c smf_polext.c \
 smf_fft_filter.c smf_concat_smfGroup.c smf_checkdets.c smf_sortd.c \
-smf_reorder.c smf_updateprov.c smf_fits_setL.c smf_getrefwcs.c
+smf_reorder.c smf_updateprov.c smf_fits_setL.c smf_getrefwcs.c \
+smf_update_quality.c
 
 noinst_INCLUDES = smf.h smf_typ.h
 
