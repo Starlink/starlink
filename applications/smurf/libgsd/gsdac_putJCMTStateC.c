@@ -76,7 +76,7 @@
 #include "gsd.h"
 #include "prm_par.h"
 #include "sae_par.h"
-#include "slalib.h"
+#include "star/slalib.h"
 
 /* SMURF includes */
 #include "smurf_par.h"
