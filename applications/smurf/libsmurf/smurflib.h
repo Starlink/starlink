@@ -93,5 +93,6 @@ void smurf_skynoise( int * );
 void smurf_starecalc( int * );
 void smurf_help( int * );
 void smurf_timesort( int * );
+void smurf_gsd2acsis( int * );
 
 #endif /* SMURF_LIB_DEFINED */

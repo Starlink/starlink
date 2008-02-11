@@ -2,7 +2,7 @@
 
 # Build libsmf before the applications
 
-SUBDIRS = libsmf libsmurf libsc2sim libacsis libaztec
+SUBDIRS = libsmf libsmurf libsc2sim libacsis libaztec libgsd 
 
 # can not use surf_mon_FCFLAGS yet
 AM_FCFLAGS = -Isrc -Isc2da -Isc2sim
@@ -22,7 +22,7 @@ jcmtinclude_HEADERS = jcmt/state.h
 # Tasks
 smurf_mon_TASKS = extinction flatfield makemap remsky qlmakemap scanfit sc2sim \
                   dreamsolve makecube unmakecube impaztec dreamweights badbolos skynoise \
-                  starecalc smurfhelp rawunpress timesort
+                  starecalc smurfhelp rawunpress timesort gsd2acsis
 
 # These files are not built inside a subdir because they are in CVS
 # under an alternate build system that SMURF can not modify.
@@ -35,7 +35,8 @@ WVM_FILES = wvm/wvmOpt.c wvm/wvmTau.c wvm/wvmCal.c
 # Linking
 
 smurf_mon_LDADD = libsmurf/libsmurf.la libsc2sim/libsc2sim.la \
-                  libsmf/libsmf.la libacsis/libacsis.la libaztec/libaztec.la \
+                  libsmf/libsmf.la libaztec/libaztec.la \
+                  libgsd/libgsd.la libacsis/libacsis.la \
                   `$(srcdir)/smurf_link_adam`
 
 ##  Any misc files that have no where else.

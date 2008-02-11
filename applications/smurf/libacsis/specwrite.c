@@ -52,10 +52,13 @@
 
 /* Maximum number of subsystems we can handle 
    We know that ACSIS can have at most 4 spectral subsystems
-   and they will not change during a single observation. */
+   and they will not change during a single observation. 
+   CHANGED to 16 to support DAS observations. */
 
-#define MAXSUBSYS 4
+#define MAXSUBSYS 16
 static const unsigned int maxsubsys = MAXSUBSYS;
+
+static backend_type backendFlag = ACS__BACKEND_ACSIS;
 
 /* String size for obsData */
 #define SPW__SZFSTAT 10
@@ -237,7 +240,6 @@ static double duration ( struct timeval * tp1, struct timeval * tp2 );
 /* Stolen code */
 static int kpgPtfts( int indf, const AstFitsChan * fchan, int * status );
 
-
 /* Function to put quotes around a symbol so that we can do
    CPP string concatenation */
 #define myxstr(s) mystr(s)
@@ -311,7 +313,8 @@ static size_t hdsRecordSizes[JCMT_COMP_NUM];
 #define NGROW  (MAXRATE * PRESIZETIME)
 
 /* Number of bytes we should accumulate before opening a new file */
-#define MAXBYTES ( 512 * 1024 * 1024 )
+//#define MAXBYTES ( 512 * 1024 * 1024 )
+static double maxbytes = 536870912;
 
 /* if we have unfeasibly small spectra and 1 receptor we could get
    a very large requirement for memory for all the extensions
@@ -324,7 +327,8 @@ static size_t hdsRecordSizes[JCMT_COMP_NUM];
    or more feasibly
           MAXBYTES / (4 * 1024 * 1       ) = 130,000 sequences
  */
-#define MAXSEQ ( MAXBYTES / ( 4 * 1024 * 1 ) )
+//#define MAXSEQ ( ( 512 * 1024 * 1024 ) / ( 4 * 1024 * 1 ) )
+static double maxsequence = 131072;
 
 /*
 *+
@@ -841,8 +845,8 @@ acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectru
 
     /* Calculate the number of sequence steps that we are allowed to grow
        before opening new file. */
-    maxseq = MAXBYTES / ( nperseq * SIZEOF_FLOAT );
-    subsys->maxsize = ( maxseq > MAXSEQ ? MAXSEQ : maxseq );
+    maxseq = maxbytes / ( nperseq * SIZEOF_FLOAT );
+    subsys->maxsize = ( maxseq > maxsequence ? maxsequence : maxseq );
 
 #if SPW_DEBUG_LEVEL > 1
     printf("Calculated maximum number of sequence steps per file: %u\n", subsys->maxsize);
@@ -1505,6 +1509,7 @@ static char * getOkFileName( const char * dir, unsigned int yyyymmdd,
 static char * getFileRoot( unsigned int yyyymmdd, unsigned int subsys,
 			   unsigned int obsnum, unsigned int subscan, int * status ) {
 
+  static char btype;             /* character for backend */
   static char rootname[MAXFILE]; /* buffer for filename - will be returned */
   int flen = 0;                  /* Length of string from snprintf */
 
@@ -1513,12 +1518,17 @@ static char * getFileRoot( unsigned int yyyymmdd, unsigned int subsys,
   /* Check subsys */
   CHECKSUBSYS(subsys, status );
 
+  /* Check backend type (default is a) */
+  if ( backendFlag == ACS__BACKEND_ACSIS ) btype = 'a';
+  else if ( backendFlag == ACS__BACKEND_DAS ) btype = 'h';
+  else btype = 'a';
+ 
   /* Form the file name - assume posix filesystem */
   if (*status == SAI__OK) {
     if (subscan > 0) {
-      flen = snprintf(rootname, MAXFILE, "a%u_%05u_%02u_%04u", yyyymmdd, obsnum, subsys, subscan );
+      flen = snprintf(rootname, MAXFILE, "%1c%u_%05u_%02u_%04u", btype, yyyymmdd, obsnum, subsys, subscan );
     } else {
-      flen = snprintf(rootname, MAXFILE, "a%u_%05u", yyyymmdd, obsnum );
+      flen = snprintf(rootname, MAXFILE, "%1c%u_%05u", btype, yyyymmdd, obsnum );
     }
   }
 
@@ -1644,7 +1654,7 @@ openNDF( const obsData * obsinfo, const subSystem * template, subSystem * file,
     *status = SAI__ERROR;
     emsSetu( "NS", nseq);
     emsSetu( "MAX", template->maxsize );
-    emsSetu( "MB", MAXBYTES / (1024*1024));
+    emsSetu( "MB", maxbytes / (1024*1024));
     emsRep(" ", "openNDF: Unable to open NDF since the number of sequences to be stored (^NS) already exceeds the maximum allowed (^MAX seq equivalent to ^MB megabytes)", status);
     return;
   }
@@ -2551,7 +2561,6 @@ allocResources( const obsData * obsinfo, subSystem * subsys, unsigned int nseq, 
   size_t nbytes;
   float * pos;
   unsigned int i;
-
 
   if (*status != SAI__OK) return;
 
@@ -3749,6 +3758,26 @@ static void checkNoFileExists( const char * file, int * status ) {
 
 }
 
+/* Overrides default backend flag (0 for ACSIS). */
+void acsSpecSetBackend ( backend_type type, int *status ) {
+
+  if (*status != SAI__OK) return;
+
+  backendFlag = type;
+
+}
+
+/* Overrides default memory allocation. */
+void acsSpecSetMem ( const int nBytes, int *status ) {
+
+  if (*status != SAI__OK) return;
+
+  maxbytes = nBytes;
+  maxsequence = maxbytes / ( 1024.0 * 4.0 );
+
+}
+  
+
 /******************** kpgPtfts ***********************/
 
 /* Stolen from kpgPtfts to minimize dependencies. Very bad. */
@@ -3916,3 +3945,5 @@ static int kpgPtfts( int indf, const AstFitsChan * fchan, int * status ) {
 
   return *status;
 }
+
+

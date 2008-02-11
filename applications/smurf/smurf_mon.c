@@ -232,6 +232,8 @@ void smurf_mon( int * status ) {
     smurf_rawunpress( status );
   } else if (strcmp( taskname, "TIMESORT" ) == 0 ) {
     smurf_timesort( status );
+  } else if (strcmp( taskname, "GSD2ACSIS" ) == 0 ) {
+    smurf_gsd2acsis( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );

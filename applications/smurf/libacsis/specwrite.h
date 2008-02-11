@@ -81,6 +81,13 @@ typedef struct ACSISSpecHdr {
   float  acs_trx;
 } ACSISSpecHdr;
 
+typedef enum backend_type {
+   ACS__BACKEND_NONE,
+   ACS__BACKEND_ACSIS,
+   ACS__BACKEND_DAS,
+   ACS__BACKEND_AOS,
+} backend_type;
+
 
 /* NDF versions of the Spectrum writing */
 
@@ -112,6 +119,14 @@ void acsSpecCloseTS( const AstFitsChan * fits[],
 
 /* Library version number */
 int acsSpecWriterVersion( void );
+
+/* Set the backend type flag */
+void acsSpecSetBackend ( backend_type type, 
+                         int *status );
+
+/* Overrides default memory allocation. */
+void acsSpecSetMem ( const int nBytes, 
+                     int *status );
 
 /* INCLUDE_HDS_SPEC_H */
 #endif

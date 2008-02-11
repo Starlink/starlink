@@ -158,6 +158,8 @@
 #         Added parameter ALIGNSYS to MAKECUBE.
 #     25-JAN-2008 (DSB):
 #        Add UNMAKECUBE.
+#     05-FEB-2008 (JB):
+#         Added action GSD2ACSIS
 #     {enter_changes_here}
 
 #  Bugs:
@@ -1457,6 +1459,51 @@ package @PACKAGE@ {
             vpath {PROMPT }
             association ->GLOBAL.DATA_ARRAY
             prompt {Output NDF data structure}
+            helpkey *
+          }
+     }
+
+     action gsd2acsis {
+
+         helplib {$SMURF_HELP}
+
+         parameter in {
+            position 1
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            prompt {Input DAS or AOSC GSD File}
+            ppath GLOBAL CURRENT
+            helpkey *
+          }
+
+         parameter directory {
+            position 2
+            type _CHAR
+            access WRITE
+            vpath {PROMPT }
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Output Directory}
+            ppath GLOBAL CURRENT
+            helpkey *
+          }
+
+         parameter obsnum {
+            position 3
+            type _INTEGER
+            access WRITE
+            vpath {PROMPT }
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Observation Number}
+            ppath GLOBAL CURRENT
+            helpkey *
+          }
+
+          parameter msg_filter {
+            type _CHAR
+            prompt {Message level}
+            vpath DEFAULT
+	    default NORM
             helpkey *
           }
      }
