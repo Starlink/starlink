@@ -368,9 +368,6 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* Assume for the moment that all data is polarisation data. */
    *polobs = 1;
 
-
-printf("\ncubebounds\n");
-
 /* Loop round all the input NDFs. */
    for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++, box++ ) {
 
@@ -423,11 +420,6 @@ printf("\ncubebounds\n");
       msgSeti( "N", size );
       msgOutif( MSG__VERB, " ", "SMF_CUBEBOUNDS: Processing ^I/^N ^FILE", 
                 status );
-
-
-printf("   file %s\n",pname);
-
-
 
 /* Make sure the input file is a suitable ACSIS cube. */
       if( hdr->instrument != INST__ACSIS ) {
@@ -810,11 +802,6 @@ printf("   file %s\n",pname);
          astTran2( totmap, (data->dims)[ 1 ], xin, yin, 1, xout, yout );
          for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
 
-if( irec == 0 ) {
-   printf("   %d: %g %g\n",itime, xout[irec], yout[irec] );
-}
-
-
 /* If a group of detectors to be used was supplied, search the group for
    the name of the current detector. If not found, set the "good" flag
    false in order to skip this detector. */
@@ -838,10 +825,6 @@ if( irec == 0 ) {
                      break;
                   }
                }         
-
-if( irec == 0 ) {
-   printf("      good=%d\n", good );
-}
 
 /* If it did, extend the interim grid bounding box for the file and for the
    output cube to include the detector. */
@@ -1114,9 +1097,4 @@ if( irec == 0 ) {
 /* Issue a context message if anything went wrong. */
    if( *status != SAI__OK ) errRep( FUNC_NAME, "Unable to determine cube "
                                     "bounds", status );
-
-
-printf("\n\n");
-
-
 }
