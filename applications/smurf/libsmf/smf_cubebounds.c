@@ -201,6 +201,9 @@
 *        parameters LBND and UBND.
 *     21-JAN-2008 (DSB):
 *        Added argument polobs.
+*     12-FEB-2008 (DSB):
+*        Modify the pixel origin in the returned FrameSet if the user
+*        changes the lower pixel bounds using parameter LBND.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -309,9 +312,11 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    int ispec;            /* Index of current spectral sample */
    int itime;            /* Index of current time slice */
    int itmp;             /* Temporary storage */
+   int lbnd0[ 2 ];       /* Defaults for LBND parameter */
    int nval;             /* Number of values supplied */
    int pixax[ 3 ];       /* The output fed by each selected mapping input */
    int specax;           /* Index of spectral axis in input FrameSet */
+   int ubnd0[ 2 ];       /* Defaults for UBND parameter */
    smfData *data = NULL; /* Pointer to data struct for current input file */
    smfFile *file = NULL; /* Pointer to file struct for current input file */
    smfHead *hdr = NULL;  /* Pointer to data header for this time slice */
@@ -362,6 +367,9 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
 /* Assume for the moment that all data is polarisation data. */
    *polobs = 1;
+
+
+printf("\ncubebounds\n");
 
 /* Loop round all the input NDFs. */
    for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++, box++ ) {
@@ -415,6 +423,11 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       msgSeti( "N", size );
       msgOutif( MSG__VERB, " ", "SMF_CUBEBOUNDS: Processing ^I/^N ^FILE", 
                 status );
+
+
+printf("   file %s\n",pname);
+
+
 
 /* Make sure the input file is a suitable ACSIS cube. */
       if( hdr->instrument != INST__ACSIS ) {
@@ -797,6 +810,11 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
          astTran2( totmap, (data->dims)[ 1 ], xin, yin, 1, xout, yout );
          for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
 
+if( irec == 0 ) {
+   printf("   %d: %g %g\n",itime, xout[irec], yout[irec] );
+}
+
+
 /* If a group of detectors to be used was supplied, search the group for
    the name of the current detector. If not found, set the "good" flag
    false in order to skip this detector. */
@@ -820,6 +838,10 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                      break;
                   }
                }         
+
+if( irec == 0 ) {
+   printf("      good=%d\n", good );
+}
 
 /* If it did, extend the interim grid bounding box for the file and for the
    output cube to include the detector. */
@@ -1023,13 +1045,18 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       ubnd[ 2 ] -= ishift;
    }
 
-/* Now remap the interrim GRID Frame in the returned FrameSet so that it
+/* Now remap the interim GRID Frame in the returned FrameSet so that it
    represent actual GRID coords in the output cube. */
    astRemapFrame( *wcsout, AST__BASE, astShiftMap( 3, gshift, "" ) );
 
 /* Allow the user to override the output pixel bounds calculated above. */
-   parDef1i( "LBND", 2, lbnd, status );
-   parDef1i( "UBND", 2, ubnd, status );
+   lbnd0[ 0 ] = lbnd[ 0 ];
+   lbnd0[ 1 ] = lbnd[ 1 ];
+   parDef1i( "LBND", 2, lbnd0, status );
+
+   ubnd0[ 0 ] = ubnd[ 0 ];
+   ubnd0[ 1 ] = ubnd[ 1 ];
+   parDef1i( "UBND", 2, ubnd0, status );
 
    parGet1i( "LBND", 2, lbnd, &actval, status );
    if( actval == 1 ) lbnd[ 1 ] = lbnd[ 0 ];
@@ -1049,6 +1076,14 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       lbnd[ 1 ] = ubnd[ 1 ];
       ubnd[ 1 ] = itmp;
    }      
+
+/* Modify the returned FrameSet to take account of the new pixel origin. */
+   gshift[ 0 ] = lbnd0[ 0 ] - lbnd[ 0 ];
+   gshift[ 1 ] = lbnd0[ 1 ] - lbnd[ 1 ];
+   gshift[ 2 ] = 0.0;
+   if( gshift[ 0 ] != 0.0 || gshift[ 1 ] != 0.0 ) {
+      astRemapFrame( *wcsout, AST__BASE, astShiftMap( 3, gshift, "" ) );
+   }
 
 /* Report the pixel bounds of the cube. */
    if( *status == SAI__OK ) {
@@ -1079,4 +1114,9 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* Issue a context message if anything went wrong. */
    if( *status != SAI__OK ) errRep( FUNC_NAME, "Unable to determine cube "
                                     "bounds", status );
+
+
+printf("\n\n");
+
+
 }
