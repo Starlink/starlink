@@ -57,7 +57,7 @@
 *     contain data for the polarisatiom angle from the input NDF. The length 
 *     of these final arrays is unspecified, but a value of VAL__MAXI will be 
 *     stored to mark the end of each array. A NULL pointer is returned if
-*     no input NDFs contain any valid POL_ANGLE values.
+*     no input NDFs contain any valid POL_ANG values.
 
 *  Description:
 *     This function examines the POL_ANG values stored in the JCMTSTATE 
@@ -71,11 +71,11 @@
 *     The memory allocated within this function should be freed using a call 
 *     to smf_freepolbins.
 *
-*     If no POL_ANGLE values are available in the input NDFs, then all time 
+*     If no POL_ANG values are available in the input NDFs, then all time 
 *     slices are assigned to a single bin that is given a "pangle" value of 
 *     AST__BAD, and a NULL pointer is returned as the function value. If one 
-*     or more POL_ANGLE values are available in the input NDFs, then any time 
-*     slices that do not have a valid POL_ANGLE value are excluded from the 
+*     or more POL_ANG values are available in the input NDFs, then any time 
+*     slices that do not have a valid POL_ANG value are excluded from the 
 *     returned list of time slices to be used. 
 
 *  Authors:
@@ -89,7 +89,8 @@
 *     29-OCT-2007 (EC):
 *        Modified interface to smf_open_file.
 *     12-FEB-2008 (DSB):
-*        Added argument binzero.
+*        - Added argument binzero.
+*        - POL_ANG is stored in degrees, not radians.
 
 *     {enter_further_changes_here}
 
@@ -273,11 +274,11 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
    reference direction. So we choose north in the output sky frame as the
    fixed reference direction and record the effective analyser position with
    respect to north. The following assumes the POL_ANG value is measured 
-   from EL through AZ. */
+   from EL through AZ, in degrees. */
                point1[ 0 ] = state->tcs_az_bc1;
                point1[ 1 ] = state->tcs_az_bc2;
                (void) astOffset2( polfrm, point1, 
-                                  AST__DPI/2 - 2.0*state->pol_ang,
+                                  AST__DPI/2 - 2.0*AST__DD2R*state->pol_ang,
                                   AST__DD2R/3600.0, point2 );
 
 /* Transform these two positions into the output sky coordinate system. */
