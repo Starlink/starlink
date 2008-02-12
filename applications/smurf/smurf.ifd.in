@@ -160,6 +160,8 @@
 #        Add UNMAKECUBE.
 #     05-FEB-2008 (JB):
 #         Added action GSD2ACSIS
+#     12-FEB-2008 (DSB):
+#         Added parameter POLBINZERO to MAKECUBE.
 #     {enter_changes_here}
 
 #  Bugs:
@@ -1032,6 +1034,15 @@ package @PACKAGE@ {
 	    prompt {Angular size of analyser angle bins (degs)}
 	    ppath CURRENT DEFAULT
             default !
+	    helpkey *
+	  }
+
+	 parameter polbinzero {
+	    type _REAL
+	    prompt {Angle at centre of first polarisation bin (degs)}
+	    vpath DEFAULT
+	    ppath CURRENT DEFAULT
+            default 0.0
 	    helpkey *
 	  }
 

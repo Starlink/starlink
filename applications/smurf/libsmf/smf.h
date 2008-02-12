@@ -229,6 +229,9 @@
 *        Added smf_resampcube* functions.
 *     2008-2-8 (EC):
 *        Added smf_update_quality
+*     2008-2-12 (DSB):
+*        Changed interface to smf_choosepolbins, smf_rebincube*, and
+*        smf_rebinsparse.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -584,7 +587,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                      int ubnd[ 3 ], AstFrameSet **wcsout, int *npos, 
                      int *hasoffexp, smfBox **boxes, int *polobs, int *status );
 
-void smf_rebincube( smfData *data, int index, int size, int *ptime, int badmask, int is2d,
+void smf_rebincube( smfData *data, int first, int last, int *ptime, int badmask, int is2d,
                     AstSkyFrame *abskyfrm, AstMapping *oskymap, 
                     AstFrame *ospecfrm, AstMapping *ospecmap, Grp *detgrp,
                     int moving, int usewgt, 
@@ -594,7 +597,7 @@ void smf_rebincube( smfData *data, int index, int size, int *ptime, int badmask,
                     double *wgt_array, float *texp_array, float *teff_array, 
                     double *fcon, int *nused, int *nreject, int *naccept, int *status );
 
-void smf_rebincube_ast( smfData *data, int index, int size, int *ptime, dim_t nchan,
+void smf_rebincube_ast( smfData *data, int first, int last, int *ptime, dim_t nchan,
                         dim_t ndet, dim_t nslice, dim_t nel, dim_t nxy, 
                         dim_t nout, dim_t dim[3], AstMapping *ssmap,
                         AstSkyFrame *abskyfrm, AstMapping *oskymap, 
@@ -604,7 +607,7 @@ void smf_rebincube_ast( smfData *data, int index, int size, int *ptime, dim_t nc
                         double *wgt_array, float *texp_array, 
                         float *teff_array, int *good_tsys, int *nused, int *status );
 
-void smf_rebincube_nn( smfData *data, int index, int size, int *ptime, dim_t nchan,
+void smf_rebincube_nn( smfData *data, int first, int last, int *ptime, dim_t nchan,
                        dim_t ndet, dim_t nslice, dim_t nel, dim_t nxy,
                        dim_t nout, dim_t dim[3], int badmask, int is2d,
                        AstMapping *ssmap, AstSkyFrame *abskyfrm, 
@@ -698,7 +701,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                        int usedetpos, Grp *detgrp, int lbnd[ 3 ], int ubnd[ 3 ],
                        AstFrameSet **wcsout, int *hasoffexp, int *polobs, int *status );
 
-void smf_rebinsparse( smfData *data, int ifile, int *ptime, AstFrame *ospecfrm, AstMapping *ospecmap, 
+void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm, AstMapping *ospecmap, 
                       AstSkyFrame *oskyframe, Grp *detgrp, int lbnd_out[ 3 ], 
                       int ubnd_out[ 3 ], int genvar, float *data_array, 
                       float *var_array, int *ispec, float *texp_array, 
@@ -728,7 +731,7 @@ void smf_reshapendf( smfData **data, smfTile *tile, int *status );
 
 void smf_dataOrder( smfData *data, int isTordered, int *status );
 
-int ***smf_choosepolbins( Grp *igrp, int size, float binsize,
+int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
                           AstFrameSet *wcsout2d, int *npbin, double **pangle, 
                           int *status );
 

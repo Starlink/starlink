@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_rebincube_ast( smfData *data, int index, int size, int *ptime, 
+*     smf_rebincube_ast( smfData *data, int first, int last, int *ptime, 
 *                        dim_t nchan, dim_t ndet, dim_t nslice, dim_t nel, 
 *                        dim_t nxy, dim_t nout, dim_t dim[3], AstMapping *ssmap,
 *                        AstSkyFrame *abskyfrm, AstMapping *oskymap, 
@@ -27,10 +27,12 @@
 *  Arguments:
 *     data = smfData * (Given)
 *        Pointer to the input smfData structure.
-*     index = int (Given)
-*        Index of the current input file within the group of input files.
-*     size = int (Given)
-*        Index of the last input file within the group of input files.
+*     first = int (Given)
+*        Is this the first call to this routine for the current output
+*        cube?
+*     last = int (Given)
+*        Is this the last call to this routine for the current output
+*        cube?
 *     ptime = int * (Given)
 *        Pointer to an array of integers, each one being the index of a 
 *        time slice that is to be pasted into the output cube. If this is 
@@ -204,7 +206,7 @@
 
 #define FUNC_NAME "smf_rebincube_ast"
 
-void smf_rebincube_ast( smfData *data, int index, int size, int *ptime, 
+void smf_rebincube_ast( smfData *data, int first, int last, int *ptime, 
                         dim_t nchan, dim_t ndet, dim_t nslice, dim_t nel, 
                         dim_t nxy, dim_t nout, dim_t dim[3], AstMapping *ssmap,
                         AstSkyFrame *abskyfrm, AstMapping *oskymap, 
@@ -288,8 +290,8 @@ void smf_rebincube_ast( smfData *data, int index, int size, int *ptime,
               &sslut, status );
 
 /* If this is the first pass through this file, initialise the arrays. */
-   if( index == 1 ) smf_rebincube_init( 0, nxy, nout, genvar, data_array, var_array, 
-                                        wgt_array, texp_array, teff_array, &junk, status );
+   if( first ) smf_rebincube_init( 0, nxy, nout, genvar, data_array, var_array, 
+                                   wgt_array, texp_array, teff_array, &junk, status );
 
 /* Initialisation the flags for astRebinSeq (we do not include flag 
    AST__REBININIT because the arrays have been initialised). */
@@ -482,7 +484,7 @@ void smf_rebincube_ast( smfData *data, int index, int size, int *ptime,
 
 /* If this is the final pass through this function, normalise the returned
    data and variance values. */
-   if( index == size ) {
+   if( last ) {
 
 /* Create a dummy mapping that can be used with astRebinSeq (it is not
    actually used for anything since we are not adding any more data into the

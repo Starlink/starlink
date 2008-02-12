@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     ptime = smf_choosepolbins( Grp *igrp, int size, float binsize, 
-*                                AstFrameSet *wcsout2d, int *npbin, 
-*                                double **pangle, int *status )
+*                                float binzero, AstFrameSet *wcsout2d, 
+*                                int *npbin, double **pangle, int *status )
 
 *  Arguments:
 *     igrp = Grp * (Given)
@@ -27,6 +27,10 @@
 *        all time slices are put into a single bin, which is given an
 *        angle value of AST__BAD, and a NULL pointer is returned as the 
 *        function value.
+*     binzero = float (Given)
+*        The angle at the centre of the first bin, in radians. A value of
+*        zero corresponds to north in the celestial co-ordinate system 
+*        specified by "wcsout2d".
 *     wcsout2d = AstFrameSet * (Given)
 *        A pointer to the FrameSet describing the relationship between
 *        2D GRID and 2D SKY coordinates in the output cube.
@@ -84,11 +88,13 @@
 *        Initial version.
 *     29-OCT-2007 (EC):
 *        Modified interface to smf_open_file.
+*     12-FEB-2008 (DSB):
+*        Added argument binzero.
 
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -124,7 +130,7 @@
 /* Seconds per day */
 #define SPD 86400.0
 
-int ***smf_choosepolbins( Grp *igrp, int size, float binsize,
+int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
                           AstFrameSet *wcsout2d, int *npbin, double **pangle, 
                           int *status ){
 
@@ -356,11 +362,11 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize,
 /* We now have arrays holding the effective analyser angle for every time
    slice of every input NDF, with respect to north in the output sky
    co-ordinate system. We now assign each time slice to an angle bin. The
-   first bin (bin zero) start at north and extends east for the angular 
-   size given by "binsize". All bins are equal sized and abut without
-   overlap. If fewer that 10% of all time slices have usable POL_ANG values, 
-   issue a warning and skip to the end so that all time slices are
-   assined to the same bin. */
+   first bin (bin zero) start at the angle given by "binzero" and extends 
+   east for the angular size given by "binsize". All bins are equal sized
+   and abut without overlap. If fewer that 10% of all time slices have usable 
+   POL_ANG values, issue a warning and skip to the end so that all time 
+   slices are assined to the same bin. */
    if( nang < 0.1*ntime ) {
       msgOut( "", "Warning: less than 10% of the input data has usable "
               "polarisation angle (POL_ANG) values. Therefore polarisation "
@@ -402,7 +408,9 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize,
 /* Get the bin index for this time slice. */
                ang = *(p++);
                if( ang != AST__BAD ) {
-                  ibin = (int) ( ang/binsize );
+                  ibin = (int) ( ( ang - binzero + 0.5*binsize ) /binsize );
+                  while( ibin >= maxbin ) ibin -= maxbin;
+                  while( ibin < 0 ) ibin += maxbin;
 
 /* Increment the sums for the bin. */
                   angsum[ ibin ] += ang;
@@ -462,7 +470,9 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize,
 /* Get the original bin index for this time slice. */
                ang = *(p++);
                if( ang != AST__BAD ) {
-                  ibin = (int) ( ang/binsize );
+                  ibin = (int) ( ( ang - binzero + 0.5*binsize ) /binsize );
+                  while( ibin >= maxbin ) ibin -= maxbin;
+                  while( ibin < 0 ) ibin += maxbin;
 
 /* Convert this bin index into the index into the list of non-empty bins. */
                   ibin = angcnt[ ibin ];

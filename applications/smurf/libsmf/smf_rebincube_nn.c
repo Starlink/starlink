@@ -15,7 +15,7 @@
 *     C function
 
 *  Invocation:
-*     smf_rebincube_nn( smfData *data, int index, int size, int *ptime, 
+*     smf_rebincube_nn( smfData *data, int first, int last, int *ptime, 
 *                       dim_t nchan, dim_t ndet, dim_t nslice, 
 *                       dim_t nel, dim_t nxy, dim_t nout, dim_t dim[3], 
 *                       int badmask, int is2d, AstMapping *ssmap, 
@@ -30,10 +30,12 @@
 *  Arguments:
 *     data = smfData * (Given)
 *        Pointer to the input smfData structure.
-*     index = int (Given)
-*        Index of the current input file within the group of input files.
-*     size = int (Given)
-*        Index of the last input file within the group of input files.
+*     first = int (Given)
+*        Is this the first call to this routine for the current output
+*        cube?
+*     last = int (Given)
+*        Is this the last call to this routine for the current output
+*        cube?
 *     ptime = int * (Given)
 *        Pointer to an array of integers, each one being the index of a 
 *        time slice that is to be pasted into the output cube. If this is 
@@ -177,10 +179,13 @@
 *        Only update exposure time arrays if the spectrum is used.
 *     11-OCT-2007 (DSB):
 *        Added parameter "ptime".
+*     12-FEB-2008 (DSB):
+*        Modify the way that good Tsys values are cheked for so that 
+*        data that falls outside the otuput cube is included in the check.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -220,7 +225,7 @@
 
 #define FUNC_NAME "smf_rebincube_nn"
 
-void smf_rebincube_nn( smfData *data, int index, int size, 
+void smf_rebincube_nn( smfData *data, int first, int last, 
                        int *ptime, dim_t nchan, dim_t ndet, dim_t nslice, 
                        dim_t nel, dim_t nxy, dim_t nout, dim_t dim[3], 
                        int badmask, int is2d, AstMapping *ssmap, 
@@ -301,7 +306,7 @@ void smf_rebincube_nn( smfData *data, int index, int size,
    }
 
 /* If this is the first pass through this file, initialise the arrays. */
-   if( index == 1 ){
+   if( first ){
       smf_rebincube_init( is2d, nxy, nout, genvar, data_array, var_array, 
                           wgt_array, texp_array, teff_array, nused, status );
 
@@ -380,6 +385,7 @@ void smf_rebincube_nn( smfData *data, int index, int size,
       tsys = smf_rebincube_tcon( hdr, itime, fcon, &texp, &teff, &tcon, 
                                  status );
 
+
 /* Use this Mapping to get the output spatial grid coords for each input 
    detector. */
       astTran2( totmap, ndet, detxin, detyin, 1, detxout, detyout );
@@ -387,6 +393,9 @@ void smf_rebincube_nn( smfData *data, int index, int size,
 /* Loop round each detector, pasting its spectral values into the output
    cube. */
       for( idet = 0; idet < ndet; idet++ ) {
+
+/* See if any good tsys values are present. */
+         if( ((float) tsys[ idet ]) != VAL__BADR ) *good_tsys = 1;
 
 /* Check the detector has a valid position in output grid coords */
          if( detxout[ idet ] != AST__BAD && detyout[ idet ] != AST__BAD ){
@@ -407,7 +416,6 @@ void smf_rebincube_nn( smfData *data, int index, int size,
                invar = VAL__BADR;
                if( usewgt || genvar == 2 ) { 
                   if( (float) tsys[ idet ] != VAL__BADR ) {
-                     *good_tsys = 1;
                      if( tcon != VAL__BADD ) invar = tcon*tsys[ idet ]*tsys[ idet ];
                   }
                }
@@ -475,7 +483,7 @@ void smf_rebincube_nn( smfData *data, int index, int size,
 /* If this is the final pass through this function, normalise the returned
    data and variance values, and release any static resources allocated 
    within this function. */
-   if( index == size ) {
+   if( last ) {
       if( is2d ) {
          smf_rebincube_norm2d( nout, nxy, genvar, data_array, 
                                var_array, wgt_array, pop_array, status );

@@ -14,7 +14,7 @@
 *     C function
 
 *  Invocation:
-*     smf_rebincube( smfData *data, int index, int size, 
+*     smf_rebincube( smfData *data, int first, int last, 
 *                    int *ptime, int badmask, int is2d, 
 *                    AstSkyFrame *abskyfrm, AstMapping *oskymap, 
 *                    AstFrame *ospecfrm, AstMapping *ospecmap, 
@@ -28,10 +28,12 @@
 *  Arguments:
 *     data = smfData * (Given)
 *        Pointer to the input smfData structure.
-*     index = int (Given)
-*        Index of the current input file within the group of input files.
-*     size = int (Given)
-*        Index of the last input file within the group of input files.
+*     first = int (Given)
+*        Is this the first call to this routine for the current output
+*        cube?
+*     last = int (Given)
+*        Is this the last call to this routine for the current output
+*        cube?
 *     ptime = int * (Given)
 *        Pointer to an array of integers, each one being the index of a 
 *        time slice that is to be pasted into the output cube. If this is 
@@ -130,13 +132,13 @@
 *        include the supplied input NDF. It should be big enough to hold a 
 *        single spatial plane from the output cube.
 *     fcon = double * (Given and Returned)
-*        If "index" is supplied as one, then *fcon is returned holding
+*        If "first" is supplied non-zero, then *fcon is returned holding
 *        the ratio of the squared backend degradation factor to the spectral
 *        channel width (this is the factor needed for calculating the
 *        variances from the Tsys value). This returned value should be
-*        left unchanged on subsequent invocations of this function. For 
-*        other values of "index", the value is returned holding VAL__BADD
-*        if the factor for the current file has a different value.
+*        left unchanged on subsequent invocations of this function. If
+*        "first" is zero on entry, the reurned value is VAL__BADD if the 
+*        factor for the current file has a different value.
 *     nused = int * (Given and Returned)
 *        Use to accumulate the total number of input data samples that
 *        have been pasted into the output cube.
@@ -174,6 +176,12 @@
 *        Allow fcon to drift a little
 *     11-OCT-2007 (DSB):
 *        Added parameter "ptime".
+*     12-FEB-2008 (DSB):
+*        Replaced arguments "index" and "size" with "first" and "last".
+*        This is because different output tiles and/or polarisation bins
+*        will receive contributions from different input files, not
+*        necessarily starting at the first input file or ending at the
+*        last.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -217,7 +225,7 @@
 
 #define FUNC_NAME "smf_rebincube"
 
-void  smf_rebincube( smfData *data, int index, int size, 
+void  smf_rebincube( smfData *data, int first, int last, 
                      int *ptime, int badmask, int is2d, 
                      AstSkyFrame *abskyfrm, AstMapping *oskymap, 
                      AstFrame *ospecfrm, AstMapping *ospecmap, 
@@ -421,7 +429,7 @@ void  smf_rebincube( smfData *data, int index, int size,
    }
 
 /* Return the factor needed for calculating Tsys from the variance. */
-   if( index == 1 ) {
+   if( *fcon == -1.0 ) {
       *fcon = fcon2;
 
    } else if (fcon2 == VAL__BADD) {
@@ -467,7 +475,7 @@ void  smf_rebincube( smfData *data, int index, int size,
 /* If we are using nearest neighbour rebinning, we can use specialist
    code that is faster than AST. */
    if( spread == AST__NEAREST ) {
-      smf_rebincube_nn( data, index, size, ptime, nchan, ndet, nslice, 
+      smf_rebincube_nn( data, first, last, ptime, nchan, ndet, nslice, 
                         nel, nxy, nout, dim, badmask, is2d, (AstMapping *) ssmap, 
                         abskyfrm, oskymap, detgrp, moving, usewgt, genvar, 
                         tfac, fcon2, data_array, var_array, wgt_array, 
@@ -476,7 +484,7 @@ void  smf_rebincube( smfData *data, int index, int size,
 
 /* For all other spreading schemes, we use AST. */
    } else {
-      smf_rebincube_ast( data, index, size, ptime, nchan, ndet, nslice, 
+      smf_rebincube_ast( data, first, last, ptime, nchan, ndet, nslice, 
                          nel, nxy, nout, dim, (AstMapping *) ssmap, abskyfrm, 
                          oskymap, detgrp, moving, usewgt, spread, params, 
                          genvar, tfac, fcon2, data_array, var_array, wgt_array,
@@ -485,7 +493,7 @@ void  smf_rebincube( smfData *data, int index, int size,
 
 /* If this is the final pass through this function, convert zero texp_array 
    and texp_array values to bad values. */
-   if( index == size ) {
+   if( last ) {
       for( iv = 0; iv < nxy; iv++ ) {
          if( texp_array[ iv ] <= 0.0 ) {
             texp_array[ iv ] = VAL__BADR;

@@ -39,9 +39,9 @@
 *
 *     In addition, there is an option to divide the output up into separate
 *     polarisation angle bins (see parameter POLBINSIZE). If this option
-*     is selected, each tile is split up into several output NDFs, each 
-*     one containing the input data relating to a particular range of
-*     polarisation angle. 
+*     is selected, each tile is split up into several output NDFs (all
+*     within the same container file), each one containing the input data 
+*     relating to a particular range of polarisation angle. 
 *
 *     The full output cube can be either a regularly gridded tangent plane
 *     projection of the sky, or a sparse array (see parameter SPARSE).
@@ -297,7 +297,8 @@
 *          This parameter is only prompted for if the input files contain
 *          polarisation data. The supplied value is used as the bin size
 *          (in degrees) for grouping polarisation analyser angles. The
-*          "analyser angle" is the anti-clockwise angle from celestial
+*          first bin is centred at the angle given by parameter POLBINZERO.
+*          The "analyser angle" is the anti-clockwise angle from celestial
 *          north (in the system chosen by parameter SYSTEM) to the axis
 *          of the "effective analyser" - a rotating analyser that would
 *          have the same effect as the combination of fixed analyser and
@@ -316,6 +317,12 @@
 *          parameter NPOLBIN. If a null value (!) is supplied, then a
 *          single output NDF (without POLPACK extension) is created for
 *          each tile, containing all input data.
+*     POLBINZERO = _REAL (Read)
+*          This parameter is only prompted for if the input files contain
+*          polarisation data. It is the analyser angle (in degrees) at the 
+*          centre of the first analyser angle bin. A value of zero
+*          corresponds to north in the celestial co-ordinate system specified 
+*          by parameter SYSTEM. [0]
 *     REF = NDF (Read)
 *          An existing NDF that is to be used to define the output grid.
 *          If supplied, the output grid will be aligned with the supplied 
@@ -715,6 +722,12 @@
 *        - Added parameter ALIGNSYS.
 *     6-FEB-2008 (DSB):
 *        Write all output polarisation cubes to a single container file.
+*     12-FEB-2008 (DSB):
+*        - Take account of the fact that the first input file to be pasted 
+*        into the output cube is not necessarily the first input file
+*        supplied. The same applies to the last input file pasted into the 
+*        output cube.
+*        - Add parameter POLBINZERO.
 
 *  Copyright:
 *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
@@ -834,6 +847,7 @@ void smurf_makecube( int *status ) {
    float medexp;              /* Median exposure time in output NDF. */
    float medtsys;             /* Median system temperature in output NDF. */
    float polbinsize;          /* Angular size of polarisation bins */
+   float polbinzero;          /* Angle at centre of first polarisation bin */
    float teff;                /* Effective integration time */
    float var;                 /* Variance value */
    int ***ptime;              /* Holds time slice indices for each bol bin */
@@ -846,12 +860,14 @@ void smurf_makecube( int *status ) {
    int blen;                  /* Used length of the "basename" string */
    int el0;                   /* Index of 2D array element */
    int el;                    /* Index of 3D array element */
+   int first;                 /* Is this the first input file? */
    int flag;                  /* Is group expression to be continued? */
    int genvar;                /* How to create output Variances */
    int hasoffexp;             /* Any ACS_OFFEXPOSURE values found in the i/p? */
    int hastsys;               /* Have some good Tsys values been found? */
    int i;                     /* Loop index */
    int ifile;                 /* Input file index */
+   int ilast;                 /* Index of the last input file */
    int iout;                  /* Index of next output NDF name */
    int ipbin;                 /* Index of current polarisation angle bin */
    int is2d;                  /* Is the weights array 2-dimensional? */
@@ -1341,7 +1357,8 @@ void smurf_makecube( int *status ) {
 
 /* Get the polarisation analyser angular bin size, and convert from
    degrees to radians. Watch for null values, using zero bin size to flag
-   that polarisation analyser angle should be ignored. */
+   that polarisation analyser angle should be ignored. Also get the
+   analyser angle at the centre of the first bin. */
    if( *status == SAI__OK && polobs ) {
 
       if( !blank ) msgBlank( status );
@@ -1358,14 +1375,18 @@ void smurf_makecube( int *status ) {
          polbinsize *= AST__DD2R;
       }
 
+      parGet0r( "POLBINZERO", &polbinzero, status );
+      polbinzero *= AST__DD2R;
+
    } else {
       polbinsize = 0.0;
+      polbinzero = 0.0;
    }
 
 /* Choose a set of polarisation angle bins, and assign each time slice in
    each input NDF to one of these bins. */
-   ptime = smf_choosepolbins( igrp, size, polbinsize, wcsout2d, &npbin, 
-                              &pangle, status ); 
+   ptime = smf_choosepolbins( igrp, size, polbinsize, polbinzero, wcsout2d, 
+                              &npbin, &pangle, status ); 
 
 /* Write the number of polarisation angle bins being created to an output 
    parameter. */
@@ -1423,6 +1444,10 @@ void smurf_makecube( int *status ) {
 
 /* Initialise the index of the next output NDF name to use in "ogrp". */
    iout = 1;
+
+/* Initialise the factor needed for calculating the variances from the 
+   Tsys value, to indicate that no factor has yet been calculated. */
+   fcon = -1.0;
 
 /* Loop round, creating each tile of the output array. Each tile is
    initially made a little larger than required so that edge effects
@@ -1638,13 +1663,26 @@ void smurf_makecube( int *status ) {
    
 /* Create provenance keymap */
          prvkeymap = astKeyMap( "" );
-   
+
+/* Find the last input file that contributes to the current output tile
+   and polarisation bin. */
+         ilast = 0;
+         for( ifile = tile->size; ifile >= 1 && *status == SAI__OK; ifile-- ) {
+            jin = ( tile->jndf ) ? tile->jndf[ ifile - 1 ] : ifile - 1;
+            pt = ptime ?  ptime[ jin ][ ipbin ] : NULL;
+            if( !pt || pt[ 0 ] < VAL__MAXI ) {
+               ilast = ifile;
+               break;
+            }
+         }
+
 /* Loop round all the input files that overlap this tile, pasting each one 
    into the output NDF. */
          naccept = 0;
          nreject = 0;
          nused = 0;
          ispec = 0;
+         first = 1;
          for( ifile = 1; ifile <= tile->size && *status == SAI__OK; ifile++ ) {
 
 /* Get the zero-based index of the current input file (ifile) within the 
@@ -1723,21 +1761,22 @@ void smurf_makecube( int *status ) {
          
 /* Rebin the data into the output grid. */
                if( !sparse ) {
-                  smf_rebincube( data, ifile, tile->size, pt, 
-                                 badmask, is2d, abskyfrm, tskymap, ospecfrm, 
-                                 ospecmap, detgrp, moving, use_wgt, tile->elbnd, 
+                  smf_rebincube( data, first, (ifile == ilast ), pt, badmask, 
+                                 is2d, abskyfrm, tskymap, ospecfrm, ospecmap, 
+                                 detgrp, moving, use_wgt, tile->elbnd, 
                                  tile->eubnd, spread, params, genvar, data_array, 
                                  var_array, wgt_array, exp_array, eff_array, &fcon, 
                                  &nused, &nreject, &naccept, status );
          
                } else {
-                  smf_rebinsparse( data, ifile, pt, 
-                                   ospecfrm, ospecmap, abskyfrm, detgrp,
-                                   tile->elbnd, tile->eubnd, genvar, data_array, var_array, 
-                                   &ispec, exp_array, eff_array, &fcon, status );
+                  smf_rebinsparse( data, first, pt, ospecfrm, ospecmap, 
+                                   abskyfrm, detgrp, tile->elbnd, tile->eubnd, 
+                                   genvar, data_array, var_array, &ispec, 
+                                   exp_array, eff_array, &fcon, status );
                }
             
                blank = 0;
+               first = 0;
          
 /* Close the input data file. */
                if( data != NULL ) {

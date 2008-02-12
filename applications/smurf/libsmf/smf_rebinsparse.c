@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_rebinsparse( smfData *data, int index, int *ptime, AstFrame *ospecfrm,
+*     smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
 *                      AstMapping *ospecmap, AstSkyFrame *oskyframe, 
 *                      Grp *detgrp, int lbnd_out[ 3 ], int ubnd_out[ 3 ], 
 *                      int genvar, float *data_array, float *var_array, 
@@ -23,8 +23,9 @@
 *  Arguments:
 *     data = smfData * (Given)
 *        Pointer to the input smfData structure.
-*     index = int (Given)
-*        Index of the current input file within the group of input files.
+*     first = int (Given)
+*        Is this the first call to this routine for the current output
+*        cube?
 *     ptime = int * (Given)
 *        Pointer to an array of integers, each one being the index of a 
 *        time slice that is to be pasted into the output cube. If this is 
@@ -75,12 +76,12 @@
 *        NDF. Only used if "spread" is AST__NEAREST. It should be big enough 
 *        to hold a single spatial plane from the output cube.
 *     fcon = double * (Given and Returned)
-*        If "index" is supplied as one, then *fcon is returned holding
+*        If "first" is supplied non-zero, then *fcon is returned holding
 *        the ratio of the squared backend degradation factor to the spectral
 *        channel width (this is the factor needed for calculating the
 *        variances from the Tsys value). This returned value should be
-*        left unchanged on subseuqnet invocations of this function. For 
-*        other values of "index", the value is returned holding VAL__BADD
+*        left unchanged on subseuqnet invocations of this function. If
+*        "first" is zero, the value is returned holding VAL__BADD
 *        if the factor for the current file has a different value.
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
@@ -114,10 +115,16 @@
 *        Change ton_array to teff_array.
 *     12-OCT-2007 (DSB):
 *        Added parameter "ptime".
+*     12-FEB-2008 (DSB):
+*        Replaced argument "index" with "first". This is because different 
+*        output tiles and/or polarisation bins will receive contributions 
+*        from different input files, not necessarily starting at the first 
+*        input file or ending at the last.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -159,7 +166,7 @@
 /* Returns nearest integer to "x" */
 #define NINT(x) ( ( x > 0 ) ? (int)( x + 0.5 ) : (int)( x - 0.5 ) )
 
-void smf_rebinsparse( smfData *data, int index, int *ptime, AstFrame *ospecfrm,
+void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
                       AstMapping *ospecmap, AstSkyFrame *oskyframe, 
                       Grp *detgrp, int lbnd_out[ 3 ], int ubnd_out[ 3 ], 
                       int genvar, float *data_array, float *var_array, 
@@ -396,7 +403,7 @@ void smf_rebinsparse( smfData *data, int index, int *ptime, AstFrame *ospecfrm,
    }
 
 /* Return the factor needed for calculating Tsys from the variance. */
-   if( index == 1 ) {
+   if( first ) {
       *fcon = fcon2;
    } else if( fcon2 != *fcon ) {
       *fcon = VAL__BADD;
