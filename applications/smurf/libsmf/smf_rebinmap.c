@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     smf_rebinmap( smfData *data, int index, int size, 
-*                    AstFrameSet *outfset, int moving,
-*                   int *lbnd_out, int *ubnd_out, 
+*                   AstFrameSet *outfset, int spread, const double params[], 
+*                   int moving, int *lbnd_out, int *ubnd_out, 
 *                   double *map, double *variance, double *weights,
 *         	    int *status );
 
@@ -28,6 +28,10 @@
 *        Number of elements in igrp
 *     outfset = AstFrameSet* (Given)
 *        Frameset containing the sky->output map mapping
+*     spread = int (Given)
+*        Integer code for pixel-spreading scheme
+*     params[] = const double (Given)
+*        Array of additional parameters for certain schemes
 *     moving = int (Given)
 *        Flag to denote whether the object is moving
 *     lbnd_out = double* (Given)
@@ -81,6 +85,8 @@
 *     2008-02-12 (AGG):
 *        Updated API to allow processing of bad bolometer masks. These
 *        updates deprecate smf_bbrebinmap.
+*     2008-02-13 (AGG):
+*        Add parameters for pixel spreading scheme
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -127,7 +133,7 @@
 #define FUNC_NAME "smf_rebinmap"
 
 void smf_rebinmap( smfData *data, int usebad, int indf, int index, int size, 
-		   AstFrameSet *outfset, 
+		   AstFrameSet *outfset, int spread, const double params[], 
 		   int moving, int *lbnd_out, int *ubnd_out, double *map, 
 		   double *variance, double *weights, int *status ) {
 
@@ -249,9 +255,12 @@ void smf_rebinmap( smfData *data, int usebad, int indf, int index, int size,
     if( (index == size) && (i == (data->dims)[2]-1) ) /* Flags end rebin */
       rebinflags = rebinflags | AST__REBINEND;
 
+    /* Generate VARIANCE */
+    /*rebinflags = rebinflags | AST__GENVAR;*/
+ 
     /* Rebin this time slice */
     astRebinSeqD( bolo2map, 0.0, 2, lbnd_in, ubnd_in, &(boldata[i*nbol]),
-		  NULL, AST__LINEAR, NULL, rebinflags, 0.1, 1000000, 
+		  NULL, spread, params, rebinflags, 0.1, 1000000, 
 		  VAL__BADD, 2, lbnd_out, ubnd_out, lbnd_in, ubnd_in,
 		  map, variance, weights, &nused );
 
