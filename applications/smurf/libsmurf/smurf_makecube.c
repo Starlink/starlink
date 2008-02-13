@@ -731,11 +731,13 @@
 *     13-FEB-2008 (DSB):
 *        Move the inversion of "tskymap" (the output GRID<->SKY Mapping)
 *        outside the polarisation bin loop.
+*     13-FEB-2008 (AGG):
+*        Factor out code for setting pixel-spreading parameters into new routine
 
 *  Copyright:
 *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
-*     Council. Copyright (C) 2006 University of British Columbia.
+*     Council. Copyright (C) 2006-2008 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -1026,50 +1028,7 @@ void smurf_makecube( int *status ) {
                 "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS", 
                 1, pabuf, 10, status );
 
-      if( !strcmp( pabuf, "NEAREST" ) ) {
-         spread = AST__NEAREST;
-         nparam = 0;
-   
-      } else if( !strcmp( pabuf, "LINEAR" ) ) {
-         spread = AST__LINEAR;
-         nparam = 0;
-   
-      } else if( !strcmp( pabuf, "SINC" ) ) {      
-         spread = AST__SINC;
-         nparam = 1;
-   
-      } else if( !strcmp( pabuf, "SINCSINC" ) ) {      
-         spread = AST__SINCSINC;
-         nparam = 2;
-   
-      } else if( !strcmp( pabuf, "SINCCOS" ) ) {      
-         spread = AST__SINCCOS;
-         nparam = 2;
-   
-      } else if( !strcmp( pabuf, "SINCGAUSS" ) ) {      
-         spread = AST__SINCGAUSS;
-         nparam = 2;
-   
-      } else if( !strcmp( pabuf, "SOMB" ) ) {      
-         spread = AST__SOMB;
-         nparam = 1;
-   
-      } else if( !strcmp( pabuf, "SOMBCOS" ) ) {      
-         spread = AST__SOMBCOS;
-         nparam = 2;
-   
-      } else if( !strcmp( pabuf, "GAUSS" ) ) {      
-         spread = AST__GAUSS;
-         nparam = 2;
-   
-      } else if( *status == SAI__OK ) {
-         nparam = 0;
-         *status = SAI__ERROR;
-         msgSetc( "V", pabuf );
-         errRep( "", "Support not available for SPREAD = ^V (programming "
-                 "error)", status );
-      }
-
+      smf_get_spread( pabuf, &spread, &nparam, status );
    } else {
       spread = AST__NEAREST;
       nparam = 0;
