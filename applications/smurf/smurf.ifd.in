@@ -164,6 +164,8 @@
 #         Added parameter POLBINZERO to MAKECUBE.
 #     12-FEB-2008 (AGG):
 #         Add USEBAD parameter to QLMAKEMAP
+#     13-FEB-2008 (AGG):
+#         Add SPREAD and PARAMS to MAKEMAP and QLMAKEMAP
 #     {enter_changes_here}
 
 #  Bugs:
@@ -378,6 +380,24 @@ package @PACKAGE@ {
             helpkey *
           }
 
+         parameter params {
+            size *
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Auxiliary rebinning parameters}
+            helpkey *
+         }
+
+         parameter spread {
+            type LITERAL
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Pixel spreading method}
+            helpkey *
+            default {Nearest}
+         }
+
 	  parameter system {
 	    position 4
             type LITERAL
@@ -424,6 +444,15 @@ package @PACKAGE@ {
             helpkey *
           }
 
+         parameter params {
+            size *
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Auxiliary rebinning parameters}
+            helpkey *
+         }
+
 	 parameter pixsize {
 	    position 3
 	    type _REAL
@@ -433,6 +462,15 @@ package @PACKAGE@ {
 	    default 3.0
 	    helpkey *
 	  }
+
+         parameter spread {
+            type LITERAL
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Pixel spreading method}
+            helpkey *
+            default {Nearest}
+         }
 
 	  parameter system {
 	    position 4
