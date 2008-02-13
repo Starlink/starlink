@@ -13,15 +13,20 @@
     when either a master starts an extraction, or the 3D scene starts
     moving the spectral extraction shape (region or line).
 
+    New hot keys "1", "2" and "3" have been added to the 3D display for
+    pointing an axis out of the screen. Note that the existing binding
+    to "3" has been moved to "7" (switch to stereo mode).
+
+
   Humu Release
   ============
-   
+
     Version 4.2-1
     =============
 
     GAIA-3D volume visualisation extension.
     ---------------------------------------
-    
+
     New facilities for visualising data cubes have been developed for
     GAIA. These include the facility to display 3D iso-surfaces and also to do
     volume rendering. The current slice and spectral point extraction can also
@@ -32,15 +37,15 @@
     coordinates are also available (these work in the plane of the visualised
     slice). Finally it is also possible to display iso-surfaces of other cubes
     into the same scene for intercomparison purposes. See the "View" menu of
-    the cube toolbox. 
+    the cube toolbox.
 
     A new command-line option "-autoscale" has been added. This enables
     the "View->Auto scale" option to scale the image to fit the main window
-    and to keep it scaled when the main window is resized (but disables 
-    interactive control of the Scale: value). Also available as a persistent 
+    and to keep it scaled when the main window is resized (but disables
+    interactive control of the Scale: value). Also available as a persistent
     startup option.
 
-    A new command-line option "-autofit" and "View->Auto fit" menu item has 
+    A new command-line option "-autofit" and "View->Auto fit" menu item has
     been added. This arranges for newly loaded images to fit the main window
     (unlike "Auto scale" this happens just once and control of the zoom
     remains active). Also available as a persistent startup option.
@@ -55,7 +60,7 @@
     information from FITS headers has been improved.
 
     A problem displaying cubes using the gaiadisp command has been
-    fixed (reported an invalid NDF identifier when the cube spectral 
+    fixed (reported an invalid NDF identifier when the cube spectral
     axis changed from that of the previous cube).
 
     Temporary files created by GAIA can now be placed into a named
@@ -93,7 +98,7 @@
     A problem opening NDFs with the same basename as a directory, in the
     same directory, has been fixed.
 
-    The "Auto scale" feature now includes any graphics that have been drawn, 
+    The "Auto scale" feature now includes any graphics that have been drawn,
     so these now remain visible.
 
     The major fonts used in the interface may now be changed as startup options.
@@ -104,10 +109,10 @@
     Using it in combination with the control and shift keys gives horizontal
     scrolling (also available for horizontal wheels) and zooming.
 
-    A bug open FITS cubes with sizes greater than 2Gb has been fixed. 
+    A bug open FITS cubes with sizes greater than 2Gb has been fixed.
     Previously these could be reported as having no dimensions.
 
-    The time needed to open some NDFs with very large lookup tables in their 
+    The time needed to open some NDFs with very large lookup tables in their
     WCS has been significantly decreased.
 
     A bug saving graphics that included contour lines to a disk file has been
@@ -121,7 +126,7 @@
     A -geometry command-line option is now available. This uses the standard
     X11 syntax, widthxheight+xoffset+yoffset.
 
-    Other new command-line options, -blank_color, -image_background and 
+    Other new command-line options, -blank_color, -image_background and
     -ident, which set the blank pixel colour and the background colour
     of the main window. -ident adds a string to the window title so that
     different instances of GAIA may be distinguished.
@@ -144,23 +149,23 @@
     has been corrected. Previously the coordinates were incorrect
     by a single channel.
 
-    When merging FITS headers from the primary data unit into those of an 
+    When merging FITS headers from the primary data unit into those of an
     extension the INHERIT keyword is now checked.
 
     Inline compressed images (e.g. RICE) are now extracted more efficiently
     using built-in methods, rather than an external filter. The primary
     headers are now merged into such images as needed.
 
-    Reading FITS catalogues is now also handled using built-in methods. 
+    Reading FITS catalogues is now also handled using built-in methods.
     This should be more efficient.
 
     FITS catalogues can now have 64 bit integer columns ('K' type).
 
     Compressed NDFs (.gz and .Z) can now be opened directly in the cube
-    toolbox. 
+    toolbox.
 
     Very small images (a few pixels wide or tall) now fill the zoom window.
-    Previously small images did not show correctly. 
+    Previously small images did not show correctly.
 
     The rotatable box graphics item can now be used as a catalogue symbol.
 

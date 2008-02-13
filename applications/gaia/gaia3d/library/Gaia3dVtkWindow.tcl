@@ -247,6 +247,44 @@ itcl::class gaia3d::Gaia3dVtkWindow {
       [$renderer_ GetActiveCamera] SetViewUp 0 0 1
    }
 
+   #  Set the camera so that a selected axis is pointed at the camera,
+   #  with the other axes aligned to the viewport.
+   public method point_axis_at_camera {iaxis} {
+
+      #  Position we want for camera is fx,fy,[fz+d] (corrected for axis).
+      #  That points back at fx,fy,fz.
+      set camera [$renderer_ GetActiveCamera]
+      lassign [$camera GetFocalPoint] fx fy fz
+      set dist [$camera GetDistance]
+
+      set vx 0
+      set vy 0
+      set vz 0
+
+      if { $iaxis == 1 } {
+         set vz 1
+         set x [expr $fx+$dist]
+         set y $fy
+         set z $fz
+      }  elseif  { $iaxis == 2 } {
+         set vx 1
+         set x $fx
+         set y [expr $fy+$dist]
+         set z $fz
+      } else {
+         set vy 1
+         set x $fx
+         set y $fy
+         set z [expr $fz+$dist]
+      }
+
+      $camera SetViewUp $vx $vy $vz
+      $camera SetPosition $x $y $z
+      $camera OrthogonalizeViewUp
+      $renderer_ ResetCameraClippingRange
+      render
+   }
+
    #  Create a widget to display the renderer image, adding a renderer
    #  and setting up the default interactions.
    protected method create_renderer_widget_ {} {
@@ -315,6 +353,11 @@ itcl::class gaia3d::Gaia3dVtkWindow {
       ::gaia3d::bind_tk_widget $itk_component(renwidget) $renwindow_
       return
    }
+   
+   #  Add a custom binding mouse or keyboard binding.
+   public method add_binding {tag cmd} {
+      ::bind $itk_component(renwidget) $tag $cmd
+   }
 
    #  Add bindings to control the scene view from the keyboard. These are
    #  needed for case when other interactions are occupying the mouse and
@@ -360,6 +403,11 @@ itcl::class gaia3d::Gaia3dVtkWindow {
       ::bind $itk_component(renwidget) <KeyRelease-Down> [code $this set_rate_to_still]
       ::bind $itk_component(renwidget) <KeyRelease-Left> [code $this set_rate_to_still]
       ::bind $itk_component(renwidget) <KeyRelease-Right> [code $this set_rate_to_still]
+
+      #  Point axis at camera.
+      ::bind $itk_component(renwidget) <KeyPress-1> [code $this point_axis_at_camera 1]
+      ::bind $itk_component(renwidget) <KeyPress-2> [code $this point_axis_at_camera 2]
+      ::bind $itk_component(renwidget) <KeyPress-3> [code $this point_axis_at_camera 3]
    }
 
    #  Rotate the camera position in up direction by incr degrees.
