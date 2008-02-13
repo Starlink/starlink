@@ -78,6 +78,9 @@
 *        Fix provenance file name handling.
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     2008-02-12 (AGG):
+*        - Add USEBAD parameter (default NO)
+*        - Update to reflect change in API for smf_rebinmap
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -144,6 +147,7 @@ void smurf_qlmakemap( int *status ) {
   int flag;                  /* Flag */
   dim_t i;                   /* Loop counter */
   Grp *igrp = NULL;          /* Group of input files */
+  int indf = 0;              /* NDF identifier of output file */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   void *map = NULL;          /* Pointer to the rebinned map data */
   int moving = 0;            /* Flag to denote a moving object */
@@ -160,6 +164,7 @@ void smurf_qlmakemap( int *status ) {
   char system[10];           /* Celestial coordinate system for output image */
   double tau;                /* 225 GHz optical depth */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
+  int usebad;                /* Flag for whether to use bad bolos mask */
   void *variance = NULL;     /* Pointer to the variance map */
   void *weights = NULL;      /* Pointer to the weights map */
 
@@ -181,6 +186,10 @@ void smurf_qlmakemap( int *status ) {
     errRep( " ", "Invalid pixel size, ^PIXSIZE (must be positive but < 60 arcsec)", 
 	   status );
   }
+
+  /* Determine whether or not to use the bad bolos mask.  If 
+     unspecified, use the mask */
+  parGtd0l ("USEBAD", 0, 1, &usebad, status);
 
   /* Calculate the map bounds - from the FIRST FILE only! */
   msgOutif( MSG__VERB," ", 
@@ -238,9 +247,15 @@ void smurf_qlmakemap( int *status ) {
     smf_fits_getD( data->hdr, "MEANWVM", &tau, status );
     smf_correct_extinction( data, "CSOTAU", 1, tau, NULL, status );
 
-    /* If all's well, add the data into the map */
-    smf_rebinmap( data, i, size, outframeset, moving, lbnd_out, ubnd_out, 
-		  map, variance, weights, status );
+    /* Retrieve the NDF identifier for this input file to read the
+       bad bolometer mask */
+    if ( usebad ) {
+      ndgNdfas ( igrp, i, "READ", &indf, status );
+    }
+    msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Beginning the REBIN step", status);
+    /* Rebin the data onto the output grid */
+    smf_rebinmap(data, usebad, indf, i, size, outframeset, moving, 
+		 lbnd_out, ubnd_out, map, variance, weights, status );
 
     smf_close_file( &data, status );
   }
