@@ -232,12 +232,14 @@
 *     2008-2-12 (DSB):
 *        Changed interface to smf_choosepolbins, smf_rebincube*, and
 *        smf_rebinsparse.
+*     2008-02-12 (AGG):
+*        Update API to smf_rebinmap, deprecate smf_bbrebinmap
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
-*     Copyright (C) 2005-2007 University of British Columbia.
+*     Copyright (C) 2005-2008 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -275,11 +277,6 @@ void smf_addto_smfArray( smfArray *ary, const smfData *data, int *status );
 
 void smf_average_data( const smfData *data, int start, int nslice, 
 		       const int interval, double **avdata, size_t *nelem, int *status);
-
-void smf_bbrebinmap( smfData *data,  int indf, int index, int size, 
-                     AstFrameSet *outfset, int moving, int *lbnd_out, 
-		     int *ubnd_out, double *map, double *variance, 
-		     double *weights, int *status );
 
 void smf_boxcar1 ( double *series, const size_t ninpts, size_t window, int *status);
 
@@ -543,7 +540,7 @@ void smf_open_related( const smfGroup *group, const int subindex, const char *ac
 void * smf_realloc( void * pntr, size_t nelem, size_t bytes_per_elem,
 		    int * status );
 
-void smf_rebinmap( smfData *data, int index, int size, 
+void smf_rebinmap( smfData *data, int usebad, int indf, int index, int size, 
                    AstFrameSet *outframeset, int moving,
 		   int *lbnd_out, int *ubnd_out,
                    double *map, double *variance,
