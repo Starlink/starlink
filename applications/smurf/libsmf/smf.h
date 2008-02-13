@@ -234,6 +234,10 @@
 *        smf_rebinsparse.
 *     2008-02-12 (AGG):
 *        Update API to smf_rebinmap, deprecate smf_bbrebinmap
+*     2008-02-13 (AGG):
+*        - smf_rebinmap: add parameters for pixel spreading scheme
+*        - smf_get_spread: new routine to get parameters for chosen
+           pixel-spreading scheme
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -462,6 +466,8 @@ int smf_get_ndfid ( const HDSLoc *loc, const char *name, const char *accmode,
 		    const char *state, const char *dattype, const int ndims, 
 		    const int *lbnd, const int *ubnd, int *status );
 
+void smf_get_spread( char *pabuf, int *spread, int *nparam, int *status );
+
 HDSLoc *smf_get_xloc ( const smfData *data, const char *extname, 
 			const char *extype, const char *accmode, 
 			const int ndims, const int *dims, int *status );
@@ -541,8 +547,8 @@ void * smf_realloc( void * pntr, size_t nelem, size_t bytes_per_elem,
 		    int * status );
 
 void smf_rebinmap( smfData *data, int usebad, int indf, int index, int size, 
-                   AstFrameSet *outframeset, int moving,
-		   int *lbnd_out, int *ubnd_out,
+                   AstFrameSet *outframeset, int spread, const double params[], 
+		   int moving, int *lbnd_out, int *ubnd_out,
                    double *map, double *variance,
 		   double *weights, int *status );
 
