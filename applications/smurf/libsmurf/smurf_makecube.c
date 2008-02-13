@@ -728,6 +728,9 @@
 *        supplied. The same applies to the last input file pasted into the 
 *        output cube.
 *        - Add parameter POLBINZERO.
+*     13-FEB-2008 (DSB):
+*        Move the inversion of "tskymap" (the output GRID<->SKY Mapping)
+*        outside the polarisation bin loop.
 
 *  Copyright:
 *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
@@ -1511,6 +1514,10 @@ void smurf_makecube( int *status ) {
    "oskymap"). */
       tskymap = astGetMapping( wcstile2d, AST__BASE, AST__CURRENT );
 
+/* Invert the output sky mapping so that it goes from sky to pixel
+   coords. */
+      astInvert( tskymap );
+   
 /* Store the initial number of pixels per spatial plane in the output tile. */
       nxy = ( tile->eubnd[ 0 ] - tile->elbnd[ 0 ] + 1 )*
             ( tile->eubnd[ 1 ] - tile->elbnd[ 1 ] + 1 );
@@ -1656,10 +1663,6 @@ void smurf_makecube( int *status ) {
                ndfCput( "K", tsysdata->file->ndfid, "Unit", status ); 
             }
          }
-   
-/* Invert the output sky mapping so that it goes from sky to pixel
-   coords. */
-         astInvert( tskymap );
    
 /* Create provenance keymap */
          prvkeymap = astKeyMap( "" );
